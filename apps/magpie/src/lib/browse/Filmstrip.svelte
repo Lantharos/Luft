@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { fileDragStart, tooltip } from '@luft/ui';
 	import Play from '@lucide/svelte/icons/play';
-	import type { Item } from '#lib/bridge/api.js';
+	import type { Item } from '#lib/bindings.js';
 	import { library } from '#lib/library/library.svelte.js';
 	import { thumbnails } from '#lib/library/thumbnails.svelte.js';
 

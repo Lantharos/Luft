@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { events as sabineEvents, type SingleInstanceEvent } from '@lantharos/sabine';
 	import { appearance, fileDrop, GlassShell, plural, Toast } from '@luft/ui';
-	import type { Activation } from '#lib/bridge/api.js';
-	import * as api from '#lib/bridge/api.js';
+	import { commands, events } from '#lib/bindings.js';
 	import { openPaths } from '#lib/app/actions.js';
 	import { chrome } from '#lib/app/chrome.svelte.js';
 	import { handleKeydown } from '#lib/app/keyboard.js';
@@ -54,10 +54,10 @@
 		volume.start();
 		chrome.wake();
 		const stops = [
-			api.events.folder(library.receive),
-			api.events.thumbnails(thumbnails.receive),
-			api.events.media(mediaSession.receive),
-			api.events.activation((activation) => void activate(activation))
+			events.magpieFolder(library.receive),
+			events.magpieThumbnails(thumbnails.receive),
+			events.magpieMedia(mediaSession.receive),
+			sabineEvents.singleInstance((activation) => void activate(activation))
 		];
 		void start();
 		return () => stops.forEach((stop) => stop());
@@ -68,16 +68,16 @@
 	});
 
 	async function start() {
-		const state = await api.appState();
+		const state = await commands.appState();
 		appearance.start(state);
 		chrome.start(state.launchPaths.length ? 'viewer' : 'library');
 		if (viewer) return openPaths(state.launchPaths);
-		library.places = await api.places();
+		library.places = await commands.places();
 		if (library.places[0]) await library.browse(library.places[0].path);
 	}
 
-	async function activate(activation: Activation) {
-		await openPaths(await api.resolveArguments(activation));
+	async function activate(activation: SingleInstanceEvent) {
+		await openPaths(await commands.resolveArguments(activation));
 	}
 
 	const drop = fileDrop((paths) => void openPaths(paths));

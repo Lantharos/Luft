@@ -3,8 +3,8 @@
 	import { canPlayNatively, decodeFailed, NativeVideoSurface } from '@luft/ui';
 	import Play from '@lucide/svelte/icons/play';
 	import { onDestroy } from 'svelte';
-	import type { Cue, Item, MediaAction, SubtitleTrack, VideoInfo } from '#lib/bridge/api.js';
-	import * as api from '#lib/bridge/api.js';
+	import { commands } from '#lib/bindings.js';
+	import type { Cue, Item, MediaAction, SubtitleTrack, VideoInfo } from '#lib/bindings.js';
 	import { chrome } from '#lib/app/chrome.svelte.js';
 	import { registerKeys } from '#lib/app/keys.js';
 	import { fileSource } from '#lib/bridge/index.js';
@@ -88,7 +88,7 @@
 	};
 
 	$effect(() => {
-		api.videoInfo(item.path).then((found) => {
+		commands.videoInfo({ path: item.path }).then((found) => {
 			info = found;
 			if (!playable(found) && canPlayNatively()) native = true;
 		});
@@ -204,7 +204,7 @@
 		if (!next || !media) return clock.detach();
 		const cues: Cue[] = next.path
 			? parseSubtitles(await fetch(fileSource(next.path)).then((response) => response.text()))
-			: plainCues(await api.subtitleCues(item.path, next.id));
+			: plainCues(await commands.subtitleCues({ path: item.path, id: next.id }, { timeoutMs: 5 * 60 * 1000 }));
 		if (subtitle === next && media) clock.attach(media, cues);
 	}
 

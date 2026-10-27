@@ -5,15 +5,15 @@
 	import FolderOpen from '@lucide/svelte/icons/folder-open';
 	import Image from '@lucide/svelte/icons/image';
 	import Music from '@lucide/svelte/icons/music';
-	import type { Place } from '#lib/bridge/api.js';
-	import * as api from '#lib/bridge/api.js';
+	import { commands } from '#lib/bindings.js';
+	import type { Place } from '#lib/bindings.js';
 	import { library } from '#lib/library/library.svelte.js';
 	import { PLACE_NAMES } from '#lib/library/places.js';
 
 	const ICONS: Record<Place, typeof Image> = { pictures: Image, videos: Film, music: Music, documents: FileText };
 
 	async function openFolder() {
-		const folder = await api.chooseFolder().catch(() => null);
+		const folder = await commands.chooseFolder({ timeoutMs: 24 * 60 * 60 * 1000 }).catch(() => null);
 		if (folder) await library.browse(folder);
 	}
 </script>

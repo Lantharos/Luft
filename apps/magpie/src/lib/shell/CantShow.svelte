@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { Item } from '#lib/bridge/api.js';
-	import * as api from '#lib/bridge/api.js';
+	import type { Item } from '#lib/bindings.js';
+	import { showInFolder } from '#lib/bridge/index.js';
 	import OpenWithMenu from './OpenWithMenu.svelte';
 
 	let { item, message, detail }: { item: Item; message: string; detail?: string } = $props();
@@ -14,7 +14,7 @@
 		{/if}
 		<div class="mt-4 flex flex-wrap justify-center gap-2">
 			<OpenWithMenu path={item.path} />
-			<button type="button" class="button" onclick={() => api.showInFolder(item.path)}>Show in folder</button>
+			<button type="button" class="button" onclick={() => showInFolder(item.path)}>Show in folder</button>
 		</div>
 	</div>
 </div>

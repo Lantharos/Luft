@@ -1,7 +1,7 @@
-import type { MediaAction, Playback, Repeat } from '#lib/bridge/api.js';
-import * as api from '#lib/bridge/api.js';
+import { commands } from '#lib/bindings.js';
+import type { MediaAction, Repeat } from '#lib/bindings.js';
 import { fileSource } from '#lib/bridge/index.js';
-import { mediaSession, type MediaOwner } from '#lib/playback/session.js';
+import { mediaSession, type MediaOwner, type Playback } from '#lib/playback/session.js';
 import { volume } from '#lib/playback/volume.svelte.js';
 import { albumOrder, shuffled, trackArtist, trackFrom, trackTitle, type Track } from './queue';
 
@@ -41,7 +41,7 @@ class Player implements MediaOwner {
 	}
 
 	async load(paths: string[], start: string) {
-		const tracks = albumOrder((await api.audioTags(paths)).map(trackFrom));
+		const tracks = albumOrder((await commands.audioTags({ paths })).map(trackFrom));
 		this.queue = tracks;
 		const index = tracks.findIndex((track) => track.path === start);
 		this.#reorder(index);
@@ -52,7 +52,7 @@ class Player implements MediaOwner {
 		const known = new Set(this.queue.map((track) => track.path));
 		const fresh = paths.filter((path) => !known.has(path));
 		if (!fresh.length) return 0;
-		const tracks = (await api.audioTags(fresh)).map(trackFrom);
+		const tracks = (await commands.audioTags({ paths: fresh })).map(trackFrom);
 		const first = this.queue.length;
 		this.queue = [...this.queue, ...tracks];
 		this.order = [...this.order, ...tracks.map((_, offset) => first + offset)];

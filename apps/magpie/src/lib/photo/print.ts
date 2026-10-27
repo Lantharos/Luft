@@ -1,5 +1,5 @@
 import { print } from '@lantharos/sabine';
-import type { Item } from '#lib/bridge/api.js';
+import type { Item } from '#lib/bindings.js';
 import { fileSource } from '#lib/bridge/index.js';
 import { pngBlob } from './png';
 import type { PhotoSource } from './source';

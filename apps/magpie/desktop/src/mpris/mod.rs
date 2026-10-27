@@ -10,6 +10,7 @@ use parking_lot::Mutex;
 use tokio::sync::Mutex as AsyncMutex;
 use zbus::Variant;
 
+pub use interfaces::MediaAction;
 use interfaces::{Player, Root, Shared};
 pub use playback::Playback;
 use playback::Reported;

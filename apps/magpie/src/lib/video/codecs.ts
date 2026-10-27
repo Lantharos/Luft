@@ -1,4 +1,4 @@
-import type { VideoInfo } from '#lib/bridge/api.js';
+import type { VideoInfo } from '#lib/bindings.js';
 
 const PROBES: Record<string, string> = {
 	'H.264': 'video/mp4; codecs="avc1.640028"',

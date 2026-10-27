@@ -1,12 +1,12 @@
-import type { Item } from '#lib/bridge/api.js';
-import * as api from '#lib/bridge/api.js';
+import { commands } from '#lib/bindings.js';
+import type { Item } from '#lib/bindings.js';
 import { fileSource } from '#lib/bridge/index.js';
 import { extension } from '#lib/library/kinds.js';
 import { isAnimated } from './animated';
 
 export type PhotoSource =
 	| { type: 'bitmap'; width: number; height: number; image: ImageBitmap }
-	| { type: 'pixels'; width: number; height: number; channels: 3 | 4; data: Uint8Array }
+	| { type: 'pixels'; width: number; height: number; channels: number; data: Uint8Array }
 	| { type: 'element'; width: number; height: number; url: string };
 
 const ELEMENT_EXTENSIONS = ['svg', 'gif'];
@@ -19,7 +19,7 @@ function key(item: Item) {
 }
 
 async function pixels(item: Item): Promise<PhotoSource> {
-	const decoded = await api.decodeImage(item.path);
+	const decoded = await commands.decodeImage({ path: item.path });
 	const response = await fetch(fileSource(decoded.path));
 	const data = new Uint8Array(await response.arrayBuffer());
 	return { type: 'pixels', width: decoded.width, height: decoded.height, channels: decoded.channels, data };

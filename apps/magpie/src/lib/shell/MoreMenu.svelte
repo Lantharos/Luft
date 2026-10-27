@@ -2,7 +2,7 @@
 	import { MenuButton, MenuItem, MenuSeparator, tooltip } from '@luft/ui';
 	import Ellipsis from '@lucide/svelte/icons/ellipsis';
 	import type { Snippet } from 'svelte';
-	import * as api from '#lib/bridge/api.js';
+	import { showInFolder } from '#lib/bridge/index.js';
 	import { openFile } from '#lib/app/actions.js';
 	import { library } from '#lib/library/library.svelte.js';
 
@@ -20,7 +20,7 @@
 			<MenuItem
 				onclick={() => {
 					close();
-					void api.showInFolder(library.current!.path);
+					void showInFolder(library.current!.path);
 				}}>Show in folder</MenuItem
 			>
 		{/if}

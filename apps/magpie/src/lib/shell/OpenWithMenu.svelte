@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { AppIcon, MenuButton, MenuItem } from '@luft/ui';
-	import type { App } from '#lib/bridge/api.js';
-	import * as api from '#lib/bridge/api.js';
+	import { commands } from '#lib/bindings.js';
+	import type { App } from '#lib/bindings.js';
+	import { openWith } from '#lib/bridge/index.js';
 
 	let { path }: { path: string } = $props();
 
@@ -9,7 +10,7 @@
 
 	$effect(() => {
 		apps = null;
-		api.otherApps(path).then((found) => (apps = found), () => (apps = []));
+		commands.otherApps({ path }).then((found) => (apps = found), () => (apps = []));
 	});
 </script>
 
@@ -21,7 +22,7 @@
 				<MenuItem
 					onclick={() => {
 						close();
-						void api.openWith(path, app.id);
+						void openWith(path, app.id);
 					}}
 				>
 					<AppIcon icon={app.icon} id={app.id} size={20} />

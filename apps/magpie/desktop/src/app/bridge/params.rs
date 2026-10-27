@@ -4,9 +4,6 @@ use serde::Deserialize;
 use specta::Type;
 
 #[derive(Deserialize, Type)]
-pub struct Empty {}
-
-#[derive(Deserialize, Type)]
 pub struct Path {
     pub path: String,
 }
@@ -48,7 +45,7 @@ pub struct Uri {
 }
 
 #[derive(Deserialize, Type)]
-pub struct FontFace {
+pub struct FontSource {
     pub path: String,
     pub index: u32,
 }

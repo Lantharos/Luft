@@ -10,7 +10,7 @@ const DELETE: u32 = 0x7f;
 const LAST_C1_CONTROL: u32 = 0x9f;
 
 #[derive(Serialize, Type)]
-pub struct Axis {
+pub struct FontAxis {
     tag: String,
     name: String,
     min: f32,
@@ -19,13 +19,13 @@ pub struct Axis {
 }
 
 #[derive(Serialize, Type)]
-pub struct Instance {
+pub struct FontInstance {
     name: String,
     coordinates: Vec<(String, f32)>,
 }
 
 #[derive(Serialize, Type)]
-pub struct Identity {
+pub struct FontIdentity {
     pub family: String,
     pub style: String,
     pub postscript: Option<String>,
@@ -33,10 +33,10 @@ pub struct Identity {
 
 #[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
-pub struct Face {
+pub struct FontFace {
     index: u32,
     #[serde(flatten)]
-    identity: Identity,
+    identity: FontIdentity,
     full_name: Option<String>,
     weight: f32,
     italic: bool,
@@ -50,8 +50,8 @@ pub struct Face {
     glyphs: u16,
     monospace: bool,
     characters: Vec<[u32; 2]>,
-    axes: Vec<Axis>,
-    instances: Vec<Instance>,
+    axes: Vec<FontAxis>,
+    instances: Vec<FontInstance>,
 }
 
 fn text(font: &FontRef, id: StringId) -> Option<String> {
@@ -93,11 +93,11 @@ fn character_ranges(font: &FontRef) -> Vec<[u32; 2]> {
     ranges
 }
 
-fn axes(font: &FontRef) -> Vec<Axis> {
+fn axes(font: &FontRef) -> Vec<FontAxis> {
     font.axes()
         .iter()
         .filter(|axis| !axis.is_hidden())
-        .map(|axis| Axis {
+        .map(|axis| FontAxis {
             tag: axis.tag().to_string(),
             name: text(font, axis.name_id()).unwrap_or_else(|| axis.tag().to_string()),
             min: axis.min_value(),
@@ -107,7 +107,7 @@ fn axes(font: &FontRef) -> Vec<Axis> {
         .collect()
 }
 
-fn instances(font: &FontRef) -> Vec<Instance> {
+fn instances(font: &FontRef) -> Vec<FontInstance> {
     let tags: Vec<String> = font
         .axes()
         .iter()
@@ -116,7 +116,7 @@ fn instances(font: &FontRef) -> Vec<Instance> {
     font.named_instances()
         .iter()
         .filter_map(|instance| {
-            Some(Instance {
+            Some(FontInstance {
                 name: text(font, instance.subfamily_name_id())?,
                 coordinates: tags.iter().cloned().zip(instance.user_coords()).collect(),
             })
@@ -124,8 +124,8 @@ fn instances(font: &FontRef) -> Vec<Instance> {
         .collect()
 }
 
-fn identity(font: &FontRef) -> Identity {
-    Identity {
+fn identity(font: &FontRef) -> FontIdentity {
+    FontIdentity {
         family: first_text(
             font,
             &[StringId::TYPOGRAPHIC_FAMILY_NAME, StringId::FAMILY_NAME],
@@ -143,9 +143,9 @@ fn identity(font: &FontRef) -> Identity {
     }
 }
 
-fn face(index: u32, font: &FontRef) -> Face {
+fn face(index: u32, font: &FontRef) -> FontFace {
     let attributes = font.attributes();
-    Face {
+    FontFace {
         index,
         identity: identity(font),
         full_name: text(font, StringId::FULL_NAME),
@@ -183,10 +183,10 @@ fn each<T>(bytes: &[u8], read: impl Fn(u32, &FontRef) -> T) -> Result<Vec<T>, St
     Ok(faces)
 }
 
-pub fn read(bytes: &[u8]) -> Result<Vec<Face>, String> {
+pub fn read(bytes: &[u8]) -> Result<Vec<FontFace>, String> {
     each(bytes, face)
 }
 
-pub fn identities(bytes: &[u8]) -> Result<Vec<Identity>, String> {
+pub fn identities(bytes: &[u8]) -> Result<Vec<FontIdentity>, String> {
     each(bytes, |_, font| identity(font))
 }

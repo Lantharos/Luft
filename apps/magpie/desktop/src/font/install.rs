@@ -6,19 +6,19 @@ use serde::Serialize;
 use specta::Type;
 
 use super::data::FontData;
-use super::faces::{self, Identity};
+use super::faces::{self, FontIdentity};
 
 const MAX_SUFFIX: u32 = 100;
 
 #[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
-pub enum Status {
+pub enum FontStatus {
     Missing,
     System,
     User,
 }
 
-fn matches(identity: &Identity, face: &fonts::Face) -> bool {
+fn matches(identity: &FontIdentity, face: &fonts::Face) -> bool {
     match &identity.postscript {
         Some(postscript) if !face.postscript.is_empty() => *postscript == face.postscript,
         _ => {
@@ -52,14 +52,14 @@ fn user_copies(path: &Path, copies: Vec<PathBuf>) -> Vec<PathBuf> {
     owned
 }
 
-pub fn status(path: &Path) -> Result<Status, String> {
+pub fn status(path: &Path) -> Result<FontStatus, String> {
     let Some(copies) = installed_copies(path)? else {
-        return Ok(Status::Missing);
+        return Ok(FontStatus::Missing);
     };
     Ok(if user_copies(path, copies).is_empty() {
-        Status::System
+        FontStatus::System
     } else {
-        Status::User
+        FontStatus::User
     })
 }
 
@@ -71,7 +71,7 @@ fn target(folder: &Path, stem: &str, extension: &str, bytes: &[u8]) -> Result<Pa
         .ok_or_else(|| "There's no free name for this font in your fonts folder".into())
 }
 
-pub fn install(path: &Path) -> Result<Status, String> {
+pub fn install(path: &Path) -> Result<FontStatus, String> {
     let data = FontData::read(path)?;
     let folder = fonts::user_folder()?;
     fs::create_dir_all(&folder).map_err(|error| error.to_string())?;
@@ -86,9 +86,9 @@ pub fn install(path: &Path) -> Result<Status, String> {
     status(path)
 }
 
-pub fn use_as(path: &Path, role: fonts::Role) -> Result<Status, String> {
+pub fn use_as(path: &Path, role: fonts::Role) -> Result<FontStatus, String> {
     let status = match status(path)? {
-        Status::Missing => install(path)?,
+        FontStatus::Missing => install(path)?,
         installed => installed,
     };
     let data = FontData::read(path)?;
@@ -102,12 +102,12 @@ pub fn use_as(path: &Path, role: fonts::Role) -> Result<Status, String> {
     Ok(status)
 }
 
-pub fn remove(path: &Path) -> Result<Status, String> {
+pub fn remove(path: &Path) -> Result<FontStatus, String> {
     let copies = installed_copies(path)?.unwrap_or_default();
     fonts::remove(&user_copies(path, copies))?;
     if path.exists() {
         status(path)
     } else {
-        Ok(Status::Missing)
+        Ok(FontStatus::Missing)
     }
 }

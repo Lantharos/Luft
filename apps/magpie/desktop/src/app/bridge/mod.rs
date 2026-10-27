@@ -4,7 +4,7 @@ use std::path::Path as FilePath;
 
 use gio::prelude::*;
 use luft_app::portal::{self, FileChooser, Filter};
-use luft_app::{Activation, Commands, file_manager};
+use luft_app::{Activation, Commands, Empty, file_manager};
 use sabine::SabineWindow;
 
 use crate::app::state::MagpieState;
@@ -15,7 +15,7 @@ use crate::{apps, font, launch, photo};
 use params::*;
 
 pub fn register(window: SabineWindow, state: &MagpieState) -> SabineWindow {
-    let window = register_app(window, state);
+    let window = register_app(crate::app::events::declare(window), state);
     let window = register_media(window, state);
     let window = register_fonts(window);
     register_files(window, state)
@@ -112,7 +112,7 @@ fn register_fonts(window: SabineWindow) -> SabineWindow {
         .command("font_info", |Path { path }| {
             font::info(FilePath::new(&path))
         })
-        .command("font_source", |FontFace { path, index }| {
+        .command("font_source", |FontSource { path, index }| {
             font::source(FilePath::new(&path), index)
         })
         .command("font_status", |Path { path }| {

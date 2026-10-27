@@ -9,7 +9,7 @@ use zbus::{ObjectPath, OwnedVariant, Variant};
 const MICROSECONDS: f64 = 1_000_000.0;
 
 #[derive(Deserialize, Serialize, Clone, Copy, PartialEq, Eq, Default, Type)]
-pub enum Status {
+pub enum PlaybackStatus {
     Playing,
     Paused,
     #[default]
@@ -24,7 +24,7 @@ pub enum Repeat {
     Playlist,
 }
 
-impl Status {
+impl PlaybackStatus {
     pub fn name(self) -> &'static str {
         match self {
             Self::Playing => "Playing",
@@ -56,7 +56,7 @@ impl Repeat {
 #[serde(rename_all = "camelCase")]
 pub struct Playback {
     pub track: u32,
-    pub status: Status,
+    pub status: PlaybackStatus,
     pub title: Option<String>,
     pub artist: Option<String>,
     pub album: Option<String>,
@@ -87,7 +87,7 @@ impl Reported {
 
     pub fn position(&self) -> i64 {
         let playback = &self.playback;
-        let elapsed = if playback.status == Status::Playing {
+        let elapsed = if playback.status == PlaybackStatus::Playing {
             self.at.elapsed().as_secs_f64() * playback.rate
         } else {
             0.0

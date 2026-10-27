@@ -1,4 +1,4 @@
-import type { Cue } from '#lib/bridge/api.js';
+import type { Cue } from '#lib/bindings.js';
 
 const TIMING = /(?:(\d+):)?(\d{1,2}):(\d{2})[.,](\d{1,3})\s*-->\s*(?:(\d+):)?(\d{1,2}):(\d{2})[.,](\d{1,3})/;
 const MARKUP = /<[^>]+>|\{\\[^}]*\}/g;

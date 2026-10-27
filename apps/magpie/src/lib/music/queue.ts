@@ -1,5 +1,5 @@
 import { basename } from '@luft/ui';
-import type { Tags } from '#lib/bridge/api.js';
+import type { Tags } from '#lib/bindings.js';
 import { stem } from '#lib/library/kinds.js';
 
 export interface Track extends Tags {

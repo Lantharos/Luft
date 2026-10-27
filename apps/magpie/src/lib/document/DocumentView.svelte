@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { Item } from '#lib/bridge/api.js';
-	import * as api from '#lib/bridge/api.js';
+	import type { Item } from '#lib/bindings.js';
+	import { openUri } from '#lib/bridge/index.js';
 	import CantShow from '#lib/shell/CantShow.svelte';
 	import { DOCUMENT_SCOPE, openDocument, pdfModules } from './pdf';
 	import { documentState } from './state.svelte';
@@ -50,7 +50,7 @@
 		const link = (event.target as Element).closest('a[href]') as HTMLAnchorElement | null;
 		if (!link || link.href.startsWith(location.origin) || link.getAttribute('href')?.startsWith('#')) return;
 		event.preventDefault();
-		void api.openUri(link.href);
+		void openUri(link.href);
 	}
 </script>
 

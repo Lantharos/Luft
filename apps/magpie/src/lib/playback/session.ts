@@ -1,6 +1,8 @@
 import { appWindow } from '@lantharos/sabine';
-import type { MediaAction, Playback } from '#lib/bridge/api.js';
-import * as api from '#lib/bridge/api.js';
+import { commands } from '#lib/bindings.js';
+import type { MediaAction } from '#lib/bindings.js';
+
+export type Playback = Parameters<typeof commands.mediaUpdate>[0];
 
 export interface MediaOwner {
 	playback(): Playback;
@@ -18,11 +20,11 @@ class MediaSession {
 	release(owner: MediaOwner) {
 		if (this.#owner !== owner) return;
 		this.#owner = null;
-		void api.mediaClear();
+		void commands.mediaClear();
 	}
 
 	update(owner: MediaOwner) {
-		if (this.#owner === owner) void api.mediaUpdate(owner.playback());
+		if (this.#owner === owner) void commands.mediaUpdate(owner.playback());
 	}
 
 	owns(owner: MediaOwner) {

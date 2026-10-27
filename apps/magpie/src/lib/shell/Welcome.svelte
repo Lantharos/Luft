@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { basename } from '@luft/ui';
-	import * as api from '#lib/bridge/api.js';
+	import { showInFolder } from '#lib/bridge/index.js';
 	import { openFile } from '#lib/app/actions.js';
 	import { library } from '#lib/library/library.svelte.js';
 	import OpenWithMenu from './OpenWithMenu.svelte';
@@ -13,7 +13,7 @@
 			<p class="text-[13px] leading-relaxed text-[var(--text-muted)]">Magpie shows photos, videos, music, PDFs and fonts.</p>
 			<div class="mt-5 flex flex-wrap justify-center gap-2">
 				<OpenWithMenu path={library.unopenable} />
-				<button type="button" class="button" onclick={() => api.showInFolder(library.unopenable!)}>Show in folder</button>
+				<button type="button" class="button" onclick={() => showInFolder(library.unopenable!)}>Show in folder</button>
 			</div>
 		{:else}
 			<h2 class="text-[20px] font-semibold">Open something to look at</h2>

@@ -7,7 +7,7 @@ use specta::Type;
 
 #[derive(Serialize, Type)]
 #[serde(rename_all = "lowercase")]
-pub enum Style {
+pub enum WallpaperStyle {
     Light,
     Dark,
 }
@@ -43,7 +43,7 @@ fn library_copy(source: &Path) -> Result<PathBuf, String> {
     Ok(target)
 }
 
-pub fn set_wallpaper(source: &Path) -> Result<Style, String> {
+pub fn set_wallpaper(source: &Path) -> Result<WallpaperStyle, String> {
     let target = library_copy(source)?;
     let uri = gio::File::for_path(&target).uri();
     let dark =
@@ -57,5 +57,9 @@ pub fn set_wallpaper(source: &Path) -> Result<Style, String> {
         .set_string(key, &uri)
         .map_err(failed)?;
     gio::Settings::sync();
-    Ok(if dark { Style::Dark } else { Style::Light })
+    Ok(if dark {
+        WallpaperStyle::Dark
+    } else {
+        WallpaperStyle::Light
+    })
 }

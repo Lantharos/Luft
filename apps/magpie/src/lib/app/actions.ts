@@ -1,5 +1,5 @@
 import { print } from '@lantharos/sabine';
-import * as api from '#lib/bridge/api.js';
+import { commands } from '#lib/bindings.js';
 import { library } from '#lib/library/library.svelte.js';
 import { player } from '#lib/music/player.svelte.js';
 import { activePhoto } from '#lib/photo/active.svelte.js';
@@ -7,7 +7,7 @@ import { printPhoto } from '#lib/photo/print.js';
 import { chrome } from './chrome.svelte';
 
 export async function openFile() {
-	const path = await api.chooseFile().catch(() => null);
+	const path = await commands.chooseFile({ timeoutMs: 24 * 60 * 60 * 1000 }).catch(() => null);
 	if (path) await library.open(path);
 }
 

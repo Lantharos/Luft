@@ -4,6 +4,7 @@ use std::sync::Arc;
 use luft_app::Events;
 use parking_lot::Mutex;
 use serde::Serialize;
+use specta::Type;
 use zbus::{ObjectPath, OwnedVariant, interface};
 
 use super::playback::{self, Repeat, Reported};
@@ -20,9 +21,9 @@ const MIMES: [&str; 8] = [
     "video/webm",
 ];
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(tag = "action", content = "value", rename_all = "camelCase")]
-pub enum Action {
+pub enum MediaAction {
     Play,
     Pause,
     Toggle,
@@ -47,7 +48,7 @@ pub struct Root {
 #[interface(name = "org.mpris.MediaPlayer2")]
 impl Root {
     fn raise(&self) {
-        self.events.emit(MEDIA_ACTION, Action::Raise);
+        self.events.emit(MEDIA_ACTION, MediaAction::Raise);
     }
 
     fn quit(&self) {}
@@ -94,7 +95,7 @@ pub struct Player {
 }
 
 impl Player {
-    fn send(&self, action: Action) {
+    fn send(&self, action: MediaAction) {
         self.events.emit(MEDIA_ACTION, action);
     }
 }
@@ -102,36 +103,36 @@ impl Player {
 #[interface(name = "org.mpris.MediaPlayer2.Player")]
 impl Player {
     fn next(&self) {
-        self.send(Action::Next);
+        self.send(MediaAction::Next);
     }
 
     fn previous(&self) {
-        self.send(Action::Previous);
+        self.send(MediaAction::Previous);
     }
 
     fn pause(&self) {
-        self.send(Action::Pause);
+        self.send(MediaAction::Pause);
     }
 
     fn play_pause(&self) {
-        self.send(Action::Toggle);
+        self.send(MediaAction::Toggle);
     }
 
     fn stop(&self) {
-        self.send(Action::Stop);
+        self.send(MediaAction::Stop);
     }
 
     fn play(&self) {
-        self.send(Action::Play);
+        self.send(MediaAction::Play);
     }
 
     fn seek(&self, offset: i64) {
-        self.send(Action::Seek(playback::seconds(offset)));
+        self.send(MediaAction::Seek(playback::seconds(offset)));
     }
 
     fn set_position(&self, track: ObjectPath<'_>, position: i64) {
         if track == playback::track_path(self.state.lock().playback.track) {
-            self.send(Action::Position(playback::seconds(position)));
+            self.send(MediaAction::Position(playback::seconds(position)));
         }
     }
 
@@ -149,7 +150,7 @@ impl Player {
 
     #[zbus(property)]
     fn set_loop_status(&self, value: String) {
-        self.send(Action::Repeat(Repeat::from_name(&value)));
+        self.send(MediaAction::Repeat(Repeat::from_name(&value)));
     }
 
     #[zbus(property)]
@@ -159,7 +160,7 @@ impl Player {
 
     #[zbus(property)]
     fn set_rate(&self, rate: f64) {
-        self.send(Action::Rate(rate));
+        self.send(MediaAction::Rate(rate));
     }
 
     #[zbus(property)]
@@ -169,7 +170,7 @@ impl Player {
 
     #[zbus(property)]
     fn set_shuffle(&self, shuffle: bool) {
-        self.send(Action::Shuffle(shuffle));
+        self.send(MediaAction::Shuffle(shuffle));
     }
 
     #[zbus(property)]
@@ -184,7 +185,7 @@ impl Player {
 
     #[zbus(property)]
     fn set_volume(&self, volume: f64) {
-        self.send(Action::Volume(volume.clamp(0.0, 1.0)));
+        self.send(MediaAction::Volume(volume.clamp(0.0, 1.0)));
     }
 
     #[zbus(property(emits_changed_signal = "false"))]

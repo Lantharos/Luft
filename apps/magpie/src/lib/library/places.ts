@@ -1,5 +1,5 @@
 import { basename } from '@luft/ui';
-import type { Location, Place } from '#lib/bridge/api.js';
+import type { Location, Place } from '#lib/bindings.js';
 
 export const PLACE_NAMES: Record<Place, string> = {
 	pictures: 'Pictures',

@@ -1,6 +1,6 @@
 import { SvelteMap } from 'svelte/reactivity';
-import type { Item, ThumbnailBatch } from '#lib/bridge/api.js';
-import * as api from '#lib/bridge/api.js';
+import { commands } from '#lib/bindings.js';
+import type { Item, ThumbnailBatch } from '#lib/bindings.js';
 import { fileSource } from '#lib/bridge/index.js';
 import { OnScreen } from './onscreen';
 
@@ -48,7 +48,7 @@ class Thumbnails {
 		if (request === this.#requested) return;
 		this.#requested = request;
 		this.#forgetHidden();
-		void api.requestThumbnails(wanted, SIZE);
+		void commands.requestThumbnails({ paths: wanted, size: SIZE });
 	}
 
 	#forgetHidden() {

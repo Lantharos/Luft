@@ -1,6 +1,6 @@
 import { errorText } from '@luft/ui';
-import type { FontFace, FontFile, FontInstance, FontRole, FontStatus } from '#lib/bridge/api.js';
-import * as api from '#lib/bridge/api.js';
+import { commands } from '#lib/bindings.js';
+import type { FontFace, FontFile, FontInstance, FontStatus, Role } from '#lib/bindings.js';
 import { chrome } from '#lib/app/chrome.svelte.js';
 import { loadFont } from './faces';
 
@@ -31,7 +31,7 @@ class FontState {
 		this.family = null;
 		this.problem = null;
 		try {
-			const [file, status] = await Promise.all([api.fontInfo(path), api.fontStatus(path)]);
+			const [file, status] = await Promise.all([commands.fontInfo({ path }), commands.fontStatus({ path })]);
 			if (this.path !== path) return;
 			this.file = file;
 			this.status = status;
@@ -46,7 +46,7 @@ class FontState {
 		const face = this.file!.faces[index];
 		this.faceIndex = index;
 		this.coordinates = Object.fromEntries(face.axes.map((axis) => [axis.tag, axis.default]));
-		const family = await loadFont(await api.fontSource(path, face.index));
+		const family = await loadFont(await commands.fontSource({ path, index: face.index }));
 		if (this.path === path && this.faceIndex === index) this.family = family;
 	}
 
@@ -55,18 +55,18 @@ class FontState {
 	}
 
 	async install() {
-		await this.#change(api.installFont, (family) => `${family} is installed`);
+		await this.#change((path) => commands.fontInstall({ path }), (family) => `${family} is installed`);
 	}
 
-	async use(role: FontRole) {
+	async use(role: Role) {
 		await this.#change(
-			(path) => api.useFont(path, role),
+			(path) => commands.fontUse({ path, role }),
 			(family) => (role === 'interface' ? `${family} is now the system font` : `${family} is now the monospace font`)
 		);
 	}
 
 	async remove() {
-		await this.#change(api.removeFont, (family) => `${family} was moved to the trash`);
+		await this.#change((path) => commands.fontRemove({ path }), (family) => `${family} was moved to the trash`);
 	}
 
 	async #change(action: (path: string) => Promise<FontStatus>, done: (family: string) => string) {

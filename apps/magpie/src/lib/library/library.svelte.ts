@@ -1,6 +1,6 @@
 import { parent } from '@luft/ui';
-import type { Folder, Item, Listing, Location } from '#lib/bridge/api.js';
-import * as api from '#lib/bridge/api.js';
+import { commands } from '#lib/bindings.js';
+import type { Folder, Item, Listing, Location } from '#lib/bindings.js';
 import { groupOf, type Group } from './kinds';
 
 const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
@@ -27,17 +27,17 @@ class Library {
 	hasNext = $derived(this.index >= 0 && this.index < this.siblings.length - 1);
 
 	async open(path: string) {
-		const listing = await api.openFolder(parent(path)).catch(() => null);
+		const listing = await commands.openFolder({ path: parent(path) }).catch(() => null);
 		const item = listing?.items.find((candidate) => candidate.path === path);
 		if (listing && item) return this.#show(listing, item);
-		const inside = await api.openFolder(path).catch(() => null);
+		const inside = await commands.openFolder({ path }).catch(() => null);
 		const first = inside && sorted(inside.items)[0];
 		if (inside && first) return this.#show(inside, first);
 		this.unopenable = path;
 	}
 
 	async browse(folder: string) {
-		const listing = await api.openFolder(folder).catch(() => null);
+		const listing = await commands.openFolder({ path: folder }).catch(() => null);
 		if (!listing) return;
 		this.#list(listing);
 		this.current = null;

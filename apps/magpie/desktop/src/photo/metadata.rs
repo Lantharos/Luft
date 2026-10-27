@@ -10,7 +10,7 @@ const ROTATED_ORIENTATIONS: [u32; 4] = [5, 6, 7, 8];
 
 #[derive(Serialize, Default, Type)]
 #[serde(rename_all = "camelCase")]
-pub struct Details {
+pub struct ImageDetails {
     width: Option<usize>,
     height: Option<usize>,
     camera: Option<String>,
@@ -20,17 +20,17 @@ pub struct Details {
     iso: Option<u32>,
     focal_length: Option<f64>,
     taken: Option<String>,
-    location: Option<Location>,
+    location: Option<Coordinates>,
 }
 
 #[derive(Serialize, Type)]
-pub struct Location {
+pub struct Coordinates {
     latitude: f64,
     longitude: f64,
     altitude: Option<f64>,
 }
 
-pub fn details(path: &Path) -> Details {
+pub fn details(path: &Path) -> ImageDetails {
     let exif = File::open(path).ok().and_then(|file| {
         exif::Reader::new()
             .read_from_container(&mut BufReader::new(file))
@@ -53,8 +53,8 @@ pub fn details(path: &Path) -> Details {
     details
 }
 
-fn from_exif(exif: &Exif) -> Details {
-    Details {
+fn from_exif(exif: &Exif) -> ImageDetails {
+    ImageDetails {
         camera: camera(exif),
         lens: text(exif, Tag::LensModel),
         exposure: number(exif, Tag::ExposureTime),
@@ -63,7 +63,7 @@ fn from_exif(exif: &Exif) -> Details {
         focal_length: number(exif, Tag::FocalLength),
         taken: taken(exif),
         location: location(exif),
-        ..Details::default()
+        ..ImageDetails::default()
     }
 }
 
@@ -121,13 +121,13 @@ fn coordinate(exif: &Exif, tag: Tag, reference: Tag, negative: &str) -> Option<f
     Some(if flipped { -value } else { value })
 }
 
-fn location(exif: &Exif) -> Option<Location> {
+fn location(exif: &Exif) -> Option<Coordinates> {
     let latitude = coordinate(exif, Tag::GPSLatitude, Tag::GPSLatitudeRef, "S")?;
     let longitude = coordinate(exif, Tag::GPSLongitude, Tag::GPSLongitudeRef, "W")?;
     let below_sea = number(exif, Tag::GPSAltitudeRef) == Some(1.0);
     let altitude =
         number(exif, Tag::GPSAltitude).map(|altitude| if below_sea { -altitude } else { altitude });
-    Some(Location {
+    Some(Coordinates {
         latitude,
         longitude,
         altitude,

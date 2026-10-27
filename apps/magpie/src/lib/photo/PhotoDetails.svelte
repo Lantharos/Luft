@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { bytes, tooltip } from '@luft/ui';
-	import type { ImageDetails, Item } from '#lib/bridge/api.js';
-	import * as api from '#lib/bridge/api.js';
+	import { commands } from '#lib/bindings.js';
+	import type { ImageDetails, Item } from '#lib/bindings.js';
+	import { openUri } from '#lib/bridge/index.js';
 	import { formatCoordinate, formatDate, formatExposure } from '#lib/library/format.js';
 	import { extension } from '#lib/library/kinds.js';
 
@@ -11,7 +12,7 @@
 
 	$effect(() => {
 		const path = item.path;
-		api.imageDetails(path).then((found) => item.path === path && (details = found));
+		commands.imageDetails({ path }).then((found) => item.path === path && (details = found));
 	});
 
 	let rows = $derived.by(() => {
@@ -41,7 +42,7 @@
 		const location = details?.location;
 		if (!location) return;
 		const { latitude, longitude } = location;
-		void api.openUri(`https://www.openstreetmap.org/?mlat=${latitude}&mlon=${longitude}#map=15/${latitude}/${longitude}`);
+		void openUri(`https://www.openstreetmap.org/?mlat=${latitude}&mlon=${longitude}#map=15/${latitude}/${longitude}`);
 	}
 </script>
 

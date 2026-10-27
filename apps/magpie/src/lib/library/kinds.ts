@@ -1,4 +1,4 @@
-import type { Kind } from '#lib/bridge/api.js';
+import type { Kind } from '#lib/bindings.js';
 
 export type Group = 'visual' | 'audio' | 'document' | 'font';
 

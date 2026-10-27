@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { bytes, plural } from '@luft/ui';
-	import type { Item } from '#lib/bridge/api.js';
-	import * as api from '#lib/bridge/api.js';
+	import type { Item } from '#lib/bindings.js';
+	import { openUri } from '#lib/bridge/index.js';
 	import { count } from './characters';
 	import { fontState } from './state.svelte';
 
@@ -36,7 +36,7 @@
 		{#if face?.licenseUrl}
 			{@const url = face.licenseUrl}
 			<dt></dt>
-			<dd><button type="button" class="plain-button -ml-3" onclick={() => api.openUri(url)}>Read the license</button></dd>
+			<dd><button type="button" class="plain-button -ml-3" onclick={() => openUri(url)}>Read the license</button></dd>
 		{/if}
 	</dl>
 </div>

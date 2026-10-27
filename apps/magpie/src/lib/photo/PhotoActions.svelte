@@ -3,7 +3,7 @@
 	import Info from '@lucide/svelte/icons/info';
 	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
 	import RotateCw from '@lucide/svelte/icons/rotate-cw';
-	import * as api from '#lib/bridge/api.js';
+	import { commands } from '#lib/bindings.js';
 	import { canPrint, printCurrent } from '#lib/app/actions.js';
 	import { chrome } from '#lib/app/chrome.svelte.js';
 	import MoreMenu from '#lib/shell/MoreMenu.svelte';
@@ -22,7 +22,7 @@
 	async function useAsWallpaper() {
 		const item = activePhoto.item;
 		if (!item) return;
-		await api.setWallpaper(item.path).then(
+		await commands.setWallpaper({ path: item.path }).then(
 			(style) => chrome.notify(style === 'dark' ? 'Set as your dark style wallpaper' : 'Set as your light style wallpaper'),
 			() => chrome.notify("The wallpaper couldn't be changed")
 		);

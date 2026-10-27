@@ -5,6 +5,7 @@ import { isUnitPath } from '../units/units';
 import { covers, Graph } from './graph';
 import { changedFiles, git, resolveRange } from './range';
 import { buildRust, type Crate, packageArguments, workspaceChanges } from './rust';
+import { touchesTranslations } from './translations';
 import { buildWeb, touchesInstall } from './web';
 
 process.chdir(git('rev-parse', '--show-toplevel')!);
@@ -17,13 +18,14 @@ const graph = new Graph();
 const crates = buildRust(graph, files);
 const webTargets = buildWeb(graph, files);
 
-function plan(changes: { base: string; files: string[] } | undefined): { crates: Crate[]; web: string[]; units: boolean } {
-	if (!changes || changes.files.some((file) => RUNS_EVERYTHING.some((path) => covers(path, file)))) return { crates, web: webTargets, units: true };
+function plan(changes: { base: string; files: string[] } | undefined): { crates: Crate[]; web: string[]; units: boolean; weblate: boolean } {
+	if (!changes || changes.files.some((file) => RUNS_EVERYTHING.some((path) => covers(path, file)))) return { crates, web: webTargets, units: true, weblate: true };
 	const affected = graph.affected([...changes.files, ...workspaceChanges(crates, changes.files, changes.base)]);
 	return {
 		crates: crates.filter((crate) => affected.has(crate.dir)),
 		web: touchesInstall(changes.files) ? webTargets : webTargets.filter((dir) => affected.has(dir)),
 		units: changes.files.some((file) => isUnitPath(file) || covers(UNIT_CHECK, file)),
+		weblate: touchesTranslations(changes.files),
 	};
 }
 
@@ -39,6 +41,7 @@ const outputs = {
 	'meet-windows': String(runs.crates.some((crate) => crate.targetsWindows)),
 	web: JSON.stringify(runs.web),
 	units: String(runs.units),
+	weblate: String(runs.weblate),
 };
 
 const lines = Object.entries(outputs).map(([key, value]) => `${key}=${value}`);

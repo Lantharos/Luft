@@ -125,4 +125,10 @@ Translations happen on [Hosted Weblate](https://hosted.weblate.org) under its fr
 
 Weblate doesn't remove messages from translations when they leave the English file, so whoever removes an English message removes it from every language in the same change; the checker insists on it.
 
+## Moving translation files
+
+Weblate finds each component's files through its file mask, so moving, renaming or adding `.ftl` files means updating `packages/i18n/components.json` and the component's file mask and base file in Weblate › Settings › Files together. Otherwise Weblate stops finding the files and raises a "No file mask matches" alert.
+
+`bun run weblate` in `packages/i18n` compares the project's components on Hosted Weblate with `components.json` and the repository, and names every component whose file mask or base file differs, points at files that don't exist, or is missing on either side. The checks workflow runs it whenever a translation file or `components.json` changes. When Weblate can't be reached, it only warns, so an outage doesn't hold up a merge.
+
 Hosted Weblate's documentation covers the details: [adding components](https://docs.weblate.org/en/latest/admin/projects.html), [the Fluent format](https://docs.weblate.org/en/latest/formats/fluent.html) and [continuous localization](https://docs.weblate.org/en/latest/admin/continuous.html).

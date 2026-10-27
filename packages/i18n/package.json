@@ -16,7 +16,8 @@
 	},
 	"scripts": {
 		"check": "svelte-check --tsconfig ./tsconfig.json && bun tools/lint.ts",
-		"transliterate": "bun tools/transliterate.ts"
+		"transliterate": "bun tools/transliterate.ts",
+		"weblate": "bun tools/weblate.ts"
 	},
 	"dependencies": {
 		"@fluent/bundle": "^0.19.1"

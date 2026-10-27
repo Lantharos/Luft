@@ -28,6 +28,7 @@ jobs:
       meet-windows: ${{ steps.affected.outputs.meet-windows }}
       web: ${{ steps.affected.outputs.web }}
       units: ${{ steps.affected.outputs.units }}
+      weblate: ${{ steps.affected.outputs.weblate }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -165,9 +166,24 @@ jobs:
 
       - run: bun .github/scripts/units/index.ts
 
+  weblate:
+    name: Weblate components
+    needs: changes
+    if: needs.changes.outputs.weblate == 'true'
+    runs-on: ubuntu-slim
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun packages/i18n/tools/weblate.ts
+
   checks:
     name: Checks
-    needs: [changes, rust, uefi, meet-windows, web, units]
+    needs: [changes, rust, uefi, meet-windows, web, units, weblate]
     if: always()
     runs-on: ubuntu-slim
     steps:

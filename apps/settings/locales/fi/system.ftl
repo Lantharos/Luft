@@ -199,6 +199,7 @@ settings-updates-variant-standard = Vaihda vakiokuvaan
 settings-updates-variant-nvidia-reason = NVIDIA-näytönohjaimesi täysi nopeus
 settings-updates-variant-standard-reason = Pienempi, koska tässä tietokoneessa ei ole NVIDIA-näytönohjainta
 settings-updates-switch = Vaihda
+settings-updates-done = Valmis
 
 ## About
 

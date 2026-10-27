@@ -199,6 +199,7 @@ settings-updates-variant-standard = Standart sistem görüntüsüne geç
 settings-updates-variant-nvidia-reason = NVIDIA grafik kartınızdan tam performans
 settings-updates-variant-standard-reason = Daha küçük, çünkü bu bilgisayarda NVIDIA grafik kartı yok
 settings-updates-switch = Geç
+settings-updates-done = Bitti
 
 ## About
 

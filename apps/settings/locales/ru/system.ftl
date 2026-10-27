@@ -205,6 +205,7 @@ settings-updates-variant-standard = Перейти на стандартный �
 settings-updates-variant-nvidia-reason = Полная производительность видеокарты NVIDIA
 settings-updates-variant-standard-reason = Он меньше, а видеокарты NVIDIA в этом компьютере нет
 settings-updates-switch = Перейти
+settings-updates-done = Готово
 
 ## About
 

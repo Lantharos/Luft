@@ -199,6 +199,7 @@ settings-updates-variant-standard = Overstappen naar de standaardimage
 settings-updates-variant-nvidia-reason = Volle snelheid uit je grafische kaart van NVIDIA
 settings-updates-variant-standard-reason = Kleiner, want deze computer heeft geen grafische kaart van NVIDIA
 settings-updates-switch = Overstappen
+settings-updates-done = Klaar
 
 ## About
 

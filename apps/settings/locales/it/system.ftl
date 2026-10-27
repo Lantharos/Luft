@@ -199,6 +199,7 @@ settings-updates-variant-standard = Passa all’immagine standard
 settings-updates-variant-nvidia-reason = Piena velocità dalla tua scheda video NVIDIA
 settings-updates-variant-standard-reason = Più leggera, perché questo computer non ha una scheda video NVIDIA
 settings-updates-switch = Passa
+settings-updates-done = Fine
 
 ## About
 

@@ -205,6 +205,7 @@ settings-updates-variant-standard = Prejsť na štandardný obraz
 settings-updates-variant-nvidia-reason = Plný výkon grafiky NVIDIA
 settings-updates-variant-standard-reason = Menší, keďže tento počítač nemá grafiku NVIDIA
 settings-updates-switch = Prepnúť
+settings-updates-done = Hotovo
 
 ## About
 

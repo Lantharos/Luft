@@ -225,6 +225,7 @@ settings-updates-variant-nvidia-reason = Full speed from your NVIDIA graphics
 settings-updates-variant-standard-reason = Smaller, as this computer has no NVIDIA graphics
 # Button, verb
 settings-updates-switch = Switch
+settings-updates-done = Done
 
 ## About
 

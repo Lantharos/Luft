@@ -208,6 +208,7 @@ settings-updates-variant-standard = Athraigh chuig an íomhá chaighdeánach
 settings-updates-variant-nvidia-reason = Lánluas ó ghrafaic NVIDIA
 settings-updates-variant-standard-reason = Níos lú, ós rud é nach bhfuil grafaic NVIDIA sa ríomhaire seo
 settings-updates-switch = Athraigh
+settings-updates-done = Déanta
 
 ## About
 

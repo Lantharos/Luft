@@ -205,6 +205,7 @@ settings-updates-variant-standard = Перейти на стандартний �
 settings-updates-variant-nvidia-reason = Повна швидкість вашої графіки NVIDIA
 settings-updates-variant-standard-reason = Менший, бо в цьому комп’ютері немає графіки NVIDIA
 settings-updates-switch = Перейти
+settings-updates-done = Готово
 
 ## About
 

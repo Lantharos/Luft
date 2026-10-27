@@ -205,6 +205,7 @@ settings-updates-variant-standard = Preklopi na standardno sliko sistema
 settings-updates-variant-nvidia-reason = Polna hitrost grafične kartice NVIDIA
 settings-updates-variant-standard-reason = Manjša, ker ta računalnik nima grafične kartice NVIDIA
 settings-updates-switch = Preklopi
+settings-updates-done = Končano
 
 ## About
 

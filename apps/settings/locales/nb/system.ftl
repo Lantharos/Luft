@@ -199,6 +199,7 @@ settings-updates-variant-standard = Bytt til standardbildet
 settings-updates-variant-nvidia-reason = Full hastighet fra NVIDIA-grafikken din
 settings-updates-variant-standard-reason = Mindre, siden denne datamaskinen ikke har NVIDIA-grafikk
 settings-updates-switch = Bytt
+settings-updates-done = Ferdig
 
 ## About
 

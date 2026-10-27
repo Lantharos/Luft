@@ -199,6 +199,7 @@ settings-updates-variant-standard = Zum Standard-Image wechseln
 settings-updates-variant-nvidia-reason = Volle Leistung deiner NVIDIA-Grafik
 settings-updates-variant-standard-reason = Kleiner, da dieser Computer keine NVIDIA-Grafik hat
 settings-updates-switch = Wechseln
+settings-updates-done = Fertig
 
 ## About
 

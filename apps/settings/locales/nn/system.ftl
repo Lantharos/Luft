@@ -199,6 +199,7 @@ settings-updates-variant-standard = Byt til standardbiletet
 settings-updates-variant-nvidia-reason = Full fart frå NVIDIA-grafikken din
 settings-updates-variant-standard-reason = Mindre, sidan denne datamaskinen ikkje har NVIDIA-grafikk
 settings-updates-switch = Byt
+settings-updates-done = Ferdig
 
 ## About
 

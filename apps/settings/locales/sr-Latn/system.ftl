@@ -202,6 +202,7 @@ settings-updates-variant-standard = Pređi na standardnu sliku sistema
 settings-updates-variant-nvidia-reason = Puna brzina vaše NVIDIA grafike
 settings-updates-variant-standard-reason = Manja je, jer ovaj računar nema NVIDIA grafiku
 settings-updates-switch = Pređi
+settings-updates-done = Gotovo
 
 ## About
 

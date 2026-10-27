@@ -199,6 +199,7 @@ settings-updates-variant-standard = Skift til standardudgaven
 settings-updates-variant-nvidia-reason = Fuld fart fra dit NVIDIA-grafikkort
 settings-updates-variant-standard-reason = Mindre, da denne computer ikke har NVIDIA-grafik
 settings-updates-switch = Skift
+settings-updates-done = Udført
 
 ## About
 

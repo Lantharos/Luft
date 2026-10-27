@@ -199,6 +199,7 @@ settings-updates-variant-standard = Mudar para a imagem padrão
 settings-updates-variant-nvidia-reason = Desempenho total da sua placa de vídeo NVIDIA
 settings-updates-variant-standard-reason = Menor, já que este computador não tem placa de vídeo NVIDIA
 settings-updates-switch = Mudar
+settings-updates-done = Concluído
 
 ## About
 

@@ -199,6 +199,7 @@ settings-updates-variant-standard = Skipta yfir í staðlaða kerfismynd
 settings-updates-variant-nvidia-reason = Fullur hraði úr NVIDIA-skjákortinu þínu
 settings-updates-variant-standard-reason = Minni, þar sem þessi tölva er ekki með NVIDIA-skjákort
 settings-updates-switch = Skipta
+settings-updates-done = Lokið
 
 ## About
 

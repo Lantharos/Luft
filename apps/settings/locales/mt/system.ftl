@@ -208,6 +208,7 @@ settings-updates-variant-standard = Aqleb għall-immaġni standard
 settings-updates-variant-nvidia-reason = Veloċità sħiħa mill-grafika NVIDIA
 settings-updates-variant-standard-reason = Iżgħar, għax dan il-kompjuter m’għandux grafika NVIDIA
 settings-updates-switch = Aqleb
+settings-updates-done = Lest
 
 ## About
 

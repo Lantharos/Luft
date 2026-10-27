@@ -202,6 +202,7 @@ settings-updates-variant-standard = Pāriet uz standarta attēlu
 settings-updates-variant-nvidia-reason = Pilns ātrums jūsu NVIDIA grafikai
 settings-updates-variant-standard-reason = Mazāks, jo šim datoram nav NVIDIA grafikas
 settings-updates-switch = Pāriet
+settings-updates-done = Gatavs
 
 ## About
 

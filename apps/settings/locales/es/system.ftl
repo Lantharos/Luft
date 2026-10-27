@@ -199,6 +199,7 @@ settings-updates-variant-standard = Cambiar a la imagen estándar
 settings-updates-variant-nvidia-reason = Todo el rendimiento de tu gráfica NVIDIA
 settings-updates-variant-standard-reason = Más ligera, ya que este ordenador no tiene gráfica NVIDIA
 settings-updates-switch = Cambiar
+settings-updates-done = Listo
 
 ## About
 

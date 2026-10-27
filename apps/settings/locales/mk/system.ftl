@@ -199,6 +199,7 @@ settings-updates-variant-standard = Префрли се на стандардн�
 settings-updates-variant-nvidia-reason = Полна брзина од вашата графика NVIDIA
 settings-updates-variant-standard-reason = Помала е, бидејќи овој компјутер нема графика NVIDIA
 settings-updates-switch = Префрли
+settings-updates-done = Готово
 
 ## About
 

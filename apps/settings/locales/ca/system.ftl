@@ -199,6 +199,7 @@ settings-updates-variant-standard = Canvia a la imatge estàndard
 settings-updates-variant-nvidia-reason = Tot el rendiment de la targeta gràfica NVIDIA
 settings-updates-variant-standard-reason = Més petita, perquè aquest ordinador no té gràfics NVIDIA
 settings-updates-switch = Canvia
+settings-updates-done = Fet
 
 ## About
 

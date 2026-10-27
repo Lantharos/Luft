@@ -205,6 +205,7 @@ settings-updates-variant-standard = Przełącz na standardowy obraz
 settings-updates-variant-nvidia-reason = Pełna wydajność grafiki NVIDIA
 settings-updates-variant-standard-reason = Mniejszy, bo ten komputer nie ma grafiki NVIDIA
 settings-updates-switch = Przełącz
+settings-updates-done = Gotowe
 
 ## About
 

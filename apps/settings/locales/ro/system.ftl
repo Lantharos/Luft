@@ -202,6 +202,7 @@ settings-updates-variant-standard = Treci la imaginea standard
 settings-updates-variant-nvidia-reason = Viteză maximă de la placa grafică NVIDIA
 settings-updates-variant-standard-reason = Mai mică, deoarece acest computer nu are placă grafică NVIDIA
 settings-updates-switch = Comută
+settings-updates-done = Gata
 
 ## About
 

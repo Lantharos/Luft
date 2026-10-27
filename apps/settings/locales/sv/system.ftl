@@ -199,6 +199,7 @@ settings-updates-variant-standard = Byt till standardavbildningen
 settings-updates-variant-nvidia-reason = Full fart från ditt NVIDIA-grafikkort
 settings-updates-variant-standard-reason = Mindre, eftersom datorn inte har något NVIDIA-grafikkort
 settings-updates-switch = Byt
+settings-updates-done = Klar
 
 ## About
 

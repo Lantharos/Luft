@@ -199,6 +199,7 @@ settings-updates-variant-standard = Kalo te imazhi standard
 settings-updates-variant-nvidia-reason = Shpejtësi e plotë nga grafika jote NVIDIA
 settings-updates-variant-standard-reason = Më i vogël, pasi ky kompjuter nuk ka grafikë NVIDIA
 settings-updates-switch = Kalo
+settings-updates-done = U krye
 
 ## About
 

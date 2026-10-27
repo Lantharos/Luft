@@ -199,6 +199,7 @@ settings-updates-variant-standard = Váltás a normál rendszerképre
 settings-updates-variant-nvidia-reason = Teljes sebesség az NVIDIA-videokártyától
 settings-updates-variant-standard-reason = Kisebb, mivel ebben a számítógépben nincs NVIDIA-videokártya
 settings-updates-switch = Váltás
+settings-updates-done = Kész
 
 ## About
 

@@ -202,6 +202,7 @@ settings-updates-variant-standard = Lülitu tavalisele tõmmisele
 settings-updates-variant-nvidia-reason = Sinu NVIDIA graafika täiskiirusel
 settings-updates-variant-standard-reason = Väiksem, kuna selles arvutis pole NVIDIA graafikat
 settings-updates-switch = Lülitu
+settings-updates-done = Valmis
 
 ## About
 

@@ -199,6 +199,7 @@ settings-updates-variant-standard = Μετάβαση στην τυπική ει�
 settings-updates-variant-nvidia-reason = Πλήρεις επιδόσεις από την κάρτα γραφικών NVIDIA
 settings-updates-variant-standard-reason = Μικρότερη, αφού ο υπολογιστής δεν έχει κάρτα γραφικών NVIDIA
 settings-updates-switch = Μετάβαση
+settings-updates-done = Τέλος
 
 ## About
 

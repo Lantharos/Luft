@@ -205,6 +205,7 @@ settings-updates-variant-standard = Pereiti prie standartinio atvaizdžio
 settings-updates-variant-nvidia-reason = Visa jūsų NVIDIA vaizdo plokštės sparta
 settings-updates-variant-standard-reason = Mažesnis, nes šiame kompiuteryje nėra NVIDIA vaizdo plokštės
 settings-updates-switch = Perjungti
+settings-updates-done = Atlikta
 
 ## About
 

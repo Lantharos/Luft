@@ -5,7 +5,7 @@ import Meta from 'gi://Meta';
 import St from 'gi://St';
 import {toggleSurface, Main, getInputSourceManager} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
-import {descendants, labelled, named, shown, shownStyled} from '../lib/actors.js';
+import {descendants, labelled, named, shown, shownStyled, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {inputMethodSettled} from '../lib/input/inputMethod.js';
 import {centerOf, hold, press, release} from '../lib/input/input.js';
@@ -38,6 +38,8 @@ const layer = actor => Main.layoutManager.uiGroup.get_children().indexOf(actor);
 const keyboardLayer = () => layer(Main.layoutManager.keyboardBox.get_parent());
 const coversPoint = ([x, y]) => keyboard().contains(global.stage.get_actor_at_pos(Clutter.PickMode.REACTIVE, x, y));
 const intoCaret = ({x, y, height}) => [x + 8, y + height / 2];
+const emojiKey = () => descendants(keyboard()).find(actor => actor.icon_name === 'osk-emoji-picker-symbolic' && actor.mapped);
+const emojiPane = () => shownStyled('emoji-panel', keyboard());
 
 async function tapsOpen(label, point) {
   await tap(point);
@@ -167,6 +169,19 @@ async function checkSabine() {
   }
 }
 
+async function checkEmoji(search) {
+  require(emojiKey(), 'the on-screen keyboard offers an emoji key');
+  await tap(centerOf(emojiKey()));
+  await eventually(emojiPane, 'the emoji key opens the emoji pane');
+  await settled();
+  await capture('tablet-keyboard-emoji');
+  const emoji = styled('keyboard-key', shownStyled('emoji-page', keyboard())).find(key => key.mapped);
+  await tap(centerOf(emoji));
+  await eventually(() => search.get_text() === `q${emoji.label}`, 'tapping an emoji writes it into the Start search');
+  await tap(centerOf(labelled('ABC', emojiPane())));
+  await eventually(() => !emojiPane() && shown(labelled('q', keyboard())), 'the letters key brings the letters back');
+}
+
 async function checkStart() {
   toggleSurface('start');
   const start = named('kestrel-start');
@@ -182,6 +197,7 @@ async function checkStart() {
   await eventually(() => search.get_text() === 'q', 'typing on the on-screen keyboard writes into the Start search');
   require(search.clutter_text.has_key_focus() && keyboardShown(), 'the Start search keeps focus while the keyboard types');
   await capture('tablet-keyboard-start');
+  await checkEmoji(search);
 
   await hide('Start closes', () => toggleSurface('start'));
   await eventually(() => !shown(start), 'Start closes');

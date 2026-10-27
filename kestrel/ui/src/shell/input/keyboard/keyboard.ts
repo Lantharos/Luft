@@ -48,7 +48,6 @@ export const Keyboard = GObject.registerClass({
   private readonly levels = new KeyLevels();
   private currentLayout: Clutter.Actor | null = null;
   private languagePopup: LanguageSelectionPopup | null = null;
-  private purpose?: Clutter.InputContentPurpose;
   private contentHints = 0;
   private focusInExtendedKeys = false;
   private emojiActive = false;
@@ -263,7 +262,7 @@ export const Keyboard = GObject.registerClass({
 
   private shouldShowEmoji(): boolean {
     if ((this.contentHints & Clutter.InputContentHintFlags.NO_EMOJI) !== 0) return false;
-    return this.purpose !== undefined && EMOJI_PURPOSES.has(this.purpose);
+    return EMOJI_PURPOSES.has(this.controller.purpose);
   }
 
   private onContentHintsChanged(contentHints: Clutter.InputContentHintFlags): void {

@@ -39,8 +39,12 @@ impl UserManager {
             .max_by_key(|unit| unit.bytes)
     }
 
+    pub fn compositor_pressure(&self, resource: &str) -> PathBuf {
+        self.0.join(COMPOSITOR).join(format!("{resource}.pressure"))
+    }
+
     pub fn compositor_stall_share(&self) -> f64 {
-        fs::read_to_string(self.0.join(COMPOSITOR).join("memory.pressure"))
+        fs::read_to_string(self.compositor_pressure("memory"))
             .ok()
             .and_then(|pressure| {
                 pressure

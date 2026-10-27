@@ -1,5 +1,5 @@
-import * as api from '#lib/bridge/index.js';
-import type { SpaceUpdate } from '#lib/bridge/index.js';
+import { commands, events } from '#lib/bindings.js';
+import type { SpaceUpdate } from '#lib/bindings.js';
 
 const same = (a: string[], b: string[]) => a.length === b.length && a.every((part, index) => part === b[index]);
 
@@ -14,7 +14,7 @@ class Space {
 	title = $derived(this.path.at(-1) ?? this.name);
 
 	listen() {
-		api.events.space((update) => {
+		events.spaceUpdate((update) => {
 			if (update.scan === this.update?.scan && (!update.view || same(update.view.path, this.path))) this.update = update;
 		});
 	}
@@ -24,13 +24,13 @@ class Space {
 		this.name = name;
 		this.path = [];
 		this.hovered = null;
-		this.update = await api.space.scan(root);
+		this.update = await commands.spaceScan({ path: root });
 	}
 
 	refresh() {
 		if (!this.root) return;
 		const path = this.path;
-		void api.space.scan(this.root).then((update) => {
+		void commands.spaceScan({ path: this.root }).then((update) => {
 			this.update = update;
 			this.path = [];
 			if (path.length) void this.go(path);
@@ -40,7 +40,7 @@ class Space {
 	async go(path: string[]) {
 		this.path = path;
 		this.hovered = null;
-		this.update = await api.space.view(path);
+		this.update = await commands.spaceView({ path });
 	}
 
 	up() {
@@ -52,11 +52,11 @@ class Space {
 		if (!this.root) return;
 		this.root = null;
 		this.update = null;
-		void api.space.stop();
+		void commands.spaceStop();
 	}
 
 	async trash(path: string[]) {
-		this.update = await api.space.trash(path);
+		this.update = await commands.spaceTrash({ path });
 	}
 }
 

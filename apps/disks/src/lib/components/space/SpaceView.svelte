@@ -1,7 +1,7 @@
 <script lang="ts">
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 	import { bytes, tooltip } from '@luft/ui';
-	import * as api from '#lib/bridge/index.js';
+	import { showInRover } from '#lib/bridge/index.js';
 	import { dialogs } from '#lib/dialogs/dialogs.svelte.js';
 	import { disks } from '#lib/state/disks.svelte.js';
 	import { space } from '#lib/state/space.svelte.js';
@@ -27,7 +27,7 @@
 
 	function actions(tile: Tile): Action[][] {
 		const path = [...space.path, tile.name];
-		const show: Action = { label: 'Show in Rover', run: () => void api.space.show(path).catch((caught) => disks.fail(caught)) };
+		const show: Action = { label: 'Show in Rover', run: () => void showInRover(path).catch((caught) => disks.fail(caught)) };
 		const trash: Action = { label: 'Move to trash…', danger: true, run: () => dialogs.open({ kind: 'trash', path, name: tile.name, size: tile.size, folder: tile.kind === 'dir' }) };
 		return [[show], tile.done ? [trash] : []];
 	}

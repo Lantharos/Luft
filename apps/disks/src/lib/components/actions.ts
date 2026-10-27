@@ -1,5 +1,6 @@
-import * as api from '#lib/bridge/index.js';
-import type { Drive, Volume } from '#lib/bridge/index.js';
+import { commands } from '#lib/bindings.js';
+import type { Drive, Volume } from '#lib/bindings.js';
+import { WAIT, openFolder } from '#lib/bridge/index.js';
 import { dialogs } from '#lib/dialogs/dialogs.svelte.js';
 import { editor } from '#lib/editor/editor.svelte.js';
 import { changing } from '#lib/encryption.svelte.js';
@@ -20,7 +21,7 @@ function act(volume: Volume, action: () => Promise<unknown>) {
 
 function unlock(volume: Volume) {
 	void disks.run(volume.block, async () => {
-		const outcome = await api.unlock(volume.block, null, false);
+		const outcome = await commands.disksUnlock({ block: volume.block, passphrase: null, remember: false }, WAIT);
 		if (!('done' in outcome && outcome.done)) dialogs.open({ kind: 'unlock', volume });
 	});
 }
@@ -32,7 +33,7 @@ function imageActions(drive: Drive, block: string, name: string): Action[] {
 			label: 'Restore disk image…',
 			run: () =>
 				void disks.run(block, async () => {
-					const image = await api.chooseImage();
+					const image = await commands.disksImageChoose();
 					if (image) dialogs.open({ kind: 'restore', drive, block, target: name, image });
 				})
 		}
@@ -41,7 +42,7 @@ function imageActions(drive: Drive, block: string, name: string): Action[] {
 
 function resume(drive: Drive, volume: Volume) {
 	void disks.run(volume.block, async () => {
-		const outcome = await api.trust.resume(volume.uuid, '');
+		const outcome = await commands.trustResume({ uuid: volume.uuid, unlock: '' }, WAIT);
 		if ('wrongKey' in outcome) dialogs.open({ kind: 'encryption', drive, volume });
 	});
 }
@@ -57,8 +58,8 @@ export function primaryAction(drive: Drive, volume: Volume): Action | null {
 	if (volume.encryption && !volume.encryption.cleartext) return { label: 'Unlock', run: () => unlock(volume) };
 	const encryption = disks.encryption(volume);
 	if (encryption && (encryption.state === 'paused' || encryption.state === 'waiting')) return { label: 'Resume', run: () => resume(drive, volume) };
-	if (mounted) return { label: 'Open', run: () => void api.openFolder(contents.mountPoints[0]) };
-	if (contents.usage === 'filesystem') return { label: 'Mount', run: () => act(volume, () => api.mount(contents.block)) };
+	if (mounted) return { label: 'Open', run: () => void openFolder(contents.mountPoints[0]) };
+	if (contents.usage === 'filesystem') return { label: 'Mount', run: () => act(volume, () => commands.disksMount({ block: contents.block }, WAIT)) };
 	return null;
 }
 
@@ -68,14 +69,14 @@ export function volumeMenu(drive: Drive, volume: Volume, remembered: boolean): A
 	const filesystem = contents.usage === 'filesystem';
 	const name = volumeName(volume);
 	const look: Action[] = [];
-	if (mounted && isProtected(volume)) look.push({ label: 'Open', run: () => void api.openFolder(contents.mountPoints[0]) });
+	if (mounted && isProtected(volume)) look.push({ label: 'Open', run: () => void openFolder(contents.mountPoints[0]) });
 	if (explorable(volume)) look.push({ label: 'See what’s using space', run: () => disks.explore(contents.mountPoints[0], name) });
 	look.push({ label: 'Details', run: () => dialogs.open({ kind: 'details', drive, volume }) });
 	if (isProtected(volume) || drive.readOnly) return [look];
 
 	const state: Action[] = [];
-	if (mounted && filesystem) state.push({ label: 'Unmount', run: () => act(volume, () => api.unmount(contents.block)) });
-	if (volume.encryption?.cleartext) state.push({ label: 'Lock', run: () => act(volume, () => api.lock(volume.block)) });
+	if (mounted && filesystem) state.push({ label: 'Unmount', run: () => act(volume, () => commands.disksUnmount({ block: contents.block }, WAIT)) });
+	if (volume.encryption?.cleartext) state.push({ label: 'Lock', run: () => act(volume, () => commands.disksLock({ block: volume.block }, WAIT)) });
 
 	const edit: Action[] = [];
 	if (filesystem) {
@@ -89,13 +90,13 @@ export function volumeMenu(drive: Drive, volume: Volume, remembered: boolean): A
 	if (disks.protection.available && volume.encryption) {
 		encryption.push({ label: 'Encryption…', run: () => dialogs.open({ kind: 'encryption', drive, volume }) });
 		if (progress?.state === 'encrypting' || progress?.state === 'decrypting') {
-			encryption.push({ label: 'Pause', run: () => act(volume, () => api.trust.pause(volume.uuid)) });
+			encryption.push({ label: 'Pause', run: () => act(volume, () => commands.trustPause({ uuid: volume.uuid }, WAIT)) });
 		}
 	} else if (disks.protection.available && (filesystem || !contents.usage) && !changing(progress)) {
 		encryption.push({ label: 'Turn on encryption…', run: () => dialogs.open({ kind: 'encrypt', drive, volume }) });
 	} else if (volume.encryption) {
 		encryption.push({ label: 'Change passphrase…', run: () => dialogs.open({ kind: 'passphrase', volume }) });
-		if (remembered) encryption.push({ label: 'Forget saved passphrase', run: () => act(volume, () => api.forgetPassphrase(volume.block)) });
+		if (remembered) encryption.push({ label: 'Forget saved passphrase', run: () => act(volume, () => commands.disksForgetPassphrase({ block: volume.block }, WAIT)) });
 	}
 
 	const erase: Action[] = [{ label: 'Format…', run: () => dialogs.open({ kind: 'format-volume', drive, volume }), danger: true }];

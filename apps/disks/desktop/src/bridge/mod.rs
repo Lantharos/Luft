@@ -1,12 +1,13 @@
 use std::path::Path;
 
 use gio::prelude::*;
-use luft_app::{Activation, Appearance, Commands, Events};
+use luft_app::{Activation, Appearance, Commands, Empty, Events};
 use sabine::SabineWindow;
 use serde::Serialize;
-use serde_json::Value;
+use specta::Type;
 
 use crate::actions::{drive, encryption, formatting, mounting, plan};
+use crate::events::SYSTEM_STEP;
 use crate::images::{self, Imaging};
 use crate::launch;
 use crate::space::Explorer;
@@ -15,13 +16,11 @@ use crate::udisks::{self, snapshot};
 use luft_disks::{partitions, systems};
 use requests::{
     Block, ChangePassphrase, CreateImage, CreatePartition, Drive, Encrypt, Folder, FormatDrive,
-    FormatEncrypted, FormatVolume, Grow, Handoff, KeySheet, Label, Place, PlanStep, Remove,
+    FormatEncrypted, FormatVolume, Grow, Handoff, KeySheet, Label, NextStep, Place, Remove,
     RestoreImage, Resume, Selftest, Shown, Startup, SystemId, Unlock, Unlocked, Unlocking, Uuid,
 };
 
 mod requests;
-
-const SYSTEM_STEP: &str = "disks.system";
 
 #[derive(Clone, Default)]
 pub struct State {
@@ -30,7 +29,7 @@ pub struct State {
     pub explorer: Explorer,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 struct AppState {
     activation: Activation,
     #[serde(flatten)]
@@ -49,11 +48,11 @@ pub fn register(window: SabineWindow, state: &State) -> SabineWindow {
 
 fn register_trust(window: SabineWindow) -> SabineWindow {
     window
-        .command_async("trust_state", |_: Value| trust::state())
+        .command_async("trust_state", |Empty {}| trust::state())
         .command_async("trust_check", |Block { block }| async move {
             encryption_drives::check(&block).await
         })
-        .command_async("trust_recovery_key", |_: Value| {
+        .command_async("trust_recovery_key", |Empty {}| {
             encryption_drives::recovery_key()
         })
         .command_async(
@@ -128,7 +127,7 @@ fn register_space(window: SabineWindow, state: &State) -> SabineWindow {
                 state.explorer.show(path, token.as_deref()).await
             },
         )
-        .with("space_stop", state, |state, _: Value| {
+        .with("space_stop", state, |state, Empty {}| {
             state.explorer.stop();
             Ok(())
         })
@@ -138,13 +137,13 @@ fn register_plan(window: SabineWindow, state: &State) -> SabineWindow {
     window.with_async(
         "disks_plan_step",
         state,
-        |state, PlanStep { step }| async move { plan::run(&state.events, step).await },
+        |state, NextStep { step }| async move { plan::run(&state.events, step).await },
     )
 }
 
 fn register_systems(window: SabineWindow, state: &State) -> SabineWindow {
     window
-        .command_async("disks_systems", |_: Value| systems::find())
+        .command_async("disks_systems", |Empty {}| systems::find())
         .with_async(
             "disks_remove_system",
             state,
@@ -162,13 +161,13 @@ fn register_systems(window: SabineWindow, state: &State) -> SabineWindow {
 
 fn register_volumes(window: SabineWindow) -> SabineWindow {
     window
-        .command_async("app_state", |_: Value| async {
+        .command_async("app_state", |Empty {}| async {
             Ok(AppState {
                 activation: Activation::current_process(),
                 appearance: Appearance::current().await,
             })
         })
-        .command_async("disks_snapshot", |_: Value| async {
+        .command_async("disks_snapshot", |Empty {}| async {
             Ok(snapshot::build(&udisks::objects().await?))
         })
         .command_async("disks_locate", |activation: Activation| async move {
@@ -177,7 +176,7 @@ fn register_volumes(window: SabineWindow) -> SabineWindow {
                 &snapshot::build(&udisks::objects().await?),
             ))
         })
-        .command_async("disks_formats", |_: Value| async {
+        .command_async("disks_formats", |Empty {}| async {
             Ok(formatting::supported().await)
         })
         .command_async("disks_mount", |Block { block }| async move {
@@ -285,9 +284,9 @@ fn register_drives(window: SabineWindow, state: &State) -> SabineWindow {
         })
         .command(
             "disks_image_folder",
-            |_: Value| Ok(images::default_folder()),
+            |Empty {}| Ok(images::default_folder()),
         )
-        .with_async("disks_image_choose_folder", state, |state, _: Value| async move {
+        .with_async("disks_image_choose_folder", state, |state, Empty {}| async move {
             state.imaging.choose_folder().await
         })
         .with_async(
@@ -300,7 +299,7 @@ fn register_drives(window: SabineWindow, state: &State) -> SabineWindow {
                     .await
             },
         )
-        .with_async("disks_image_choose", state, |state, _: Value| async move {
+        .with_async("disks_image_choose", state, |state, Empty {}| async move {
             state.imaging.choose().await
         })
         .with_async(
@@ -313,7 +312,7 @@ fn register_drives(window: SabineWindow, state: &State) -> SabineWindow {
                     .await
             },
         )
-        .with("disks_image_cancel", state, |state, _: Value| {
+        .with("disks_image_cancel", state, |state, Empty {}| {
             state.imaging.cancel();
             Ok(())
         })

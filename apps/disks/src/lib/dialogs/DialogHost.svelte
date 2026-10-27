@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { bytes, ConfirmDialog, RecoveryKeyDialog } from '@luft/ui';
-	import * as api from '#lib/bridge/index.js';
+	import { commands } from '#lib/bindings.js';
+	import type { Drive, Volume } from '#lib/bindings.js';
+	import { WAIT } from '#lib/bridge/index.js';
 	import { volumeName } from '#lib/format.js';
 	import { disks } from '#lib/state/disks.svelte.js';
 	import { space } from '#lib/state/space.svelte.js';
 	import { editor } from '#lib/editor/editor.svelte.js';
-	import type { Drive, Volume } from '#lib/bridge/index.js';
 	import DriveDetails from './details/DriveDetails.svelte';
 	import HealthDialog from './details/HealthDialog.svelte';
 	import VolumeDetails from './details/VolumeDetails.svelte';
@@ -65,8 +66,8 @@
 		{key}
 		title="Recovery key for “{name}”"
 		description="Keep a copy somewhere other than this drive and computer."
-		onsave={() => api.trust.saveKey(key, name)}
-		onprint={() => api.trust.printKey(key, name)}
+		onsave={() => commands.trustSaveKey({ key, name }, WAIT)}
+		onprint={() => commands.trustPrintKey({ key, name }, WAIT)}
 		onclose={dialogs.close}
 	/>
 {:else if dialog?.kind === 'format-volume'}
@@ -105,7 +106,7 @@
 		description="The partition and all {bytes(volume.size)} on it will be removed from {drive.name}. This can't be undone."
 		action="Delete partition"
 		danger
-		run={() => disks.run(volume.block, () => api.deletePartition(volume.block))}
+		run={() => disks.run(volume.block, () => commands.disksDeletePartition({ block: volume.block }, WAIT))}
 		onclose={dialogs.close}
 	/>
 {:else if dialog?.kind === 'trash'}
@@ -125,7 +126,7 @@
 		description="Everything on {target === drive.name ? `${drive.name} (${bytes(drive.size)})` : `“${target}” on ${drive.name}`} will be replaced by the {bytes(image.size)} image. This can't be undone."
 		action="Erase and write"
 		danger
-		run={() => disks.run(block, () => api.restoreImage(block, image.path))}
+		run={() => disks.run(block, () => commands.disksImageRestore({ block, path: image.path }, WAIT))}
 		onclose={dialogs.close}
 	/>
 {/if}

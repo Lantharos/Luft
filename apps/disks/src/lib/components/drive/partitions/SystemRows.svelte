@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Monitor from '@lucide/svelte/icons/monitor';
 	import { Row } from '@luft/ui';
-	import type { OtherSystem } from '#lib/bridge/index.js';
+	import type { OtherSystem } from '#lib/bindings.js';
 	import { dialogs } from '#lib/dialogs/dialogs.svelte.js';
 	import { summary } from '#lib/systems.js';
 

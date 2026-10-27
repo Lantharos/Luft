@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { bytes, Dialog } from '@luft/ui';
-	import * as api from '#lib/bridge/index.js';
-	import type { Drive, Volume } from '#lib/bridge/index.js';
+	import type { Drive, Volume } from '#lib/bindings.js';
+	import { openFolder } from '#lib/bridge/index.js';
 	import { filesystemName, inner, volumeName } from '#lib/format.js';
 	import { explorable, typeName } from '#lib/partitions/types.js';
 	import { disks } from '#lib/state/disks.svelte.js';
@@ -23,7 +23,7 @@
 		[
 			{ label: 'Format', value: volume.encryption ? encryption() : filesystemName(volume) },
 			{ label: 'Size', value: bytes(volume.size) },
-			mounted && { label: 'Mounted at', value: contents.mountPoints.join(', '), open: () => void api.openFolder(contents.mountPoints[0]) },
+			mounted && { label: 'Mounted at', value: contents.mountPoints.join(', '), open: () => void openFolder(contents.mountPoints[0]) },
 			contents.startup && { label: 'At startup', value: `Mounts at ${contents.startup.directory}` }
 		].filter((fact) => fact !== false && fact !== null)
 	);

@@ -1,5 +1,6 @@
-import * as api from '#lib/bridge/index.js';
-import type { Drive, OtherSystem } from '#lib/bridge/index.js';
+import { commands } from '#lib/bindings.js';
+import type { Drive, OtherSystem } from '#lib/bindings.js';
+import { WAIT } from '#lib/bridge/index.js';
 
 function layoutKey(drives: Drive[]) {
 	return drives
@@ -43,7 +44,7 @@ class Systems {
 	async #fetch() {
 		do {
 			this.#stale = false;
-			this.list = await api.otherSystems().catch(() => []);
+			this.list = await commands.disksSystems(WAIT).catch(() => []);
 		} while (this.#stale);
 	}
 }

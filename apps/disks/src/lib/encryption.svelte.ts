@@ -1,4 +1,4 @@
-import type { DriveEncryption, Outcome } from './bridge/index';
+import type { DriveEncryption, Outcome } from './bindings';
 import { percent } from './format';
 
 export const SHORTEST_PASSPHRASE = 8;

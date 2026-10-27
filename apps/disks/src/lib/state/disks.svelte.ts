@@ -1,7 +1,9 @@
 import { SvelteSet } from 'svelte/reactivity';
 import { appearance, errorText, Toasts } from '@luft/ui';
-import * as api from '#lib/bridge/index.js';
-import type { Activation, Drive, ImageProgress, Protection, Segment, Support, Volume } from '#lib/bridge/index.js';
+import { events as sabineEvents } from '@lantharos/sabine';
+import { commands, events } from '#lib/bindings.js';
+import type { Activation, Drive, ImageProgress, Protection, Segment, Support, Volume } from '#lib/bindings.js';
+import { CANCELLED } from '#lib/bridge/index.js';
 import { dialogs } from '#lib/dialogs/dialogs.svelte.js';
 import { space } from './space.svelte';
 import { systems } from './systems.svelte';
@@ -27,17 +29,17 @@ class Disks {
 	drive = $derived(this.drives.find((drive) => drive.id === this.driveId) ?? this.drives[0] ?? null);
 
 	async start() {
-		const state = await api.appState();
+		const state = await commands.appState();
 		appearance.start(state);
-		api.events.changed(({ drives }) => {
+		events.disksChanged(({ drives }) => {
 			this.drives = drives;
 			systems.follow(drives);
 		});
-		api.events.image((progress) => this.#imageProgress(progress));
+		events.disksImage((progress) => this.#imageProgress(progress));
 		space.listen();
-		api.events.trust((protection) => (this.protection = protection));
-		api.events.activated((activation) => void this.#locate(activation));
-		const [{ drives }, formats, protection] = await Promise.all([api.snapshot(), api.formats(), api.trust.state().catch(() => this.protection)]);
+		events.disksTrust((protection) => (this.protection = protection));
+		sabineEvents.singleInstance((activation) => void this.#locate(activation));
+		const [{ drives }, formats, protection] = await Promise.all([commands.disksSnapshot(), commands.disksFormats(), commands.trustState().catch(() => this.protection)]);
 		this.drives = drives;
 		systems.follow(drives);
 		this.formats = formats;
@@ -80,7 +82,7 @@ class Disks {
 
 	fail(caught: unknown) {
 		const message = errorText(caught);
-		if (message === api.CANCELLED) return;
+		if (message === CANCELLED) return;
 		this.notices.show(message, { failed: true });
 	}
 
@@ -102,7 +104,7 @@ class Disks {
 	}
 
 	async #locate(activation: Activation) {
-		const located = await api.locate(activation).catch(() => null);
+		const located = await commands.disksLocate(activation).catch(() => null);
 		if (located?.target) this.select(located.target.drive, located.target.block);
 		if (located?.image) dialogs.open({ kind: 'write-image', image: located.image });
 		if (located?.system) void this.#offerRemoval(located.system);

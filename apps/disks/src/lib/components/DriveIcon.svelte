@@ -4,7 +4,7 @@
 	import HardDrive from '@lucide/svelte/icons/hard-drive';
 	import MemoryStick from '@lucide/svelte/icons/memory-stick';
 	import Usb from '@lucide/svelte/icons/usb';
-	import type { Kind } from '#lib/bridge/index.js';
+	import type { Kind } from '#lib/bindings.js';
 
 	interface Props {
 		kind: Kind;

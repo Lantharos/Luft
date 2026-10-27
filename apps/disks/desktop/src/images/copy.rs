@@ -6,10 +6,10 @@ use std::time::{Duration, Instant};
 
 use luft_app::Events;
 use serde::Serialize;
+use specta::Type;
 
+use crate::events::IMAGE_PROGRESS;
 use crate::udisks::{self, BLOCK, no_options};
-
-pub const PROGRESS: &str = "disks.image";
 
 const CHUNK: usize = 4 * 1024 * 1024;
 const REPORT_EVERY: Duration = Duration::from_millis(250);
@@ -28,9 +28,9 @@ pub enum Direction {
     },
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
-struct Progress<'a> {
+pub struct ImageProgress<'a> {
     block: &'a str,
     restoring: bool,
     copied: u64,
@@ -44,8 +44,8 @@ pub fn run(events: &Events, block: &str, direction: Direction, cancelled: &Atomi
     let restoring = matches!(direction, Direction::Restore { .. });
     let report = |copied: u64, total: u64, rate: u64, finished: bool, error: Option<String>| {
         events.emit(
-            PROGRESS,
-            Progress {
+            IMAGE_PROGRESS,
+            ImageProgress {
                 block,
                 restoring,
                 copied,

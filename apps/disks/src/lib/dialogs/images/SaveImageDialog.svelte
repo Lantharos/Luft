@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import { Dialog, TextField } from '@luft/ui';
-	import * as api from '#lib/bridge/index.js';
+	import { commands } from '#lib/bindings.js';
+	import { WAIT } from '#lib/bridge/index.js';
 	import { disks } from '#lib/state/disks.svelte.js';
 
 	interface Props {
@@ -18,18 +19,18 @@
 	let valid = $derived(file.trim().length > 0 && !file.includes('/') && folder.length > 0);
 
 	$effect(() => {
-		void api.imageFolder().then((path) => (folder ||= path));
+		void commands.disksImageFolder().then((path) => (folder ||= path));
 	});
 
 	async function change() {
-		const chosen = await api.chooseFolder().catch((caught) => (disks.fail(caught), null));
+		const chosen = await commands.disksImageChooseFolder().catch((caught) => (disks.fail(caught), null));
 		if (chosen) folder = chosen;
 	}
 
 	async function submit() {
 		if (!valid || working) return;
 		working = true;
-		const done = await disks.run(block, () => api.createImage(block, `${folder.replace(/\/$/, '')}/${file.trim()}`));
+		const done = await disks.run(block, () => commands.disksImageCreate({ block, path: `${folder.replace(/\/$/, '')}/${file.trim()}` }, WAIT));
 		working = false;
 		if (done) onclose();
 	}

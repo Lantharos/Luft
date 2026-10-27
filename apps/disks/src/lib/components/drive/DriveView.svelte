@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Drive } from '#lib/bridge/index.js';
+	import type { Drive } from '#lib/bindings.js';
 	import { disks } from '#lib/state/disks.svelte.js';
 	import { systems } from '#lib/state/systems.svelte.js';
 	import CapacityBar from './CapacityBar.svelte';

@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import { Dialog } from '@luft/ui';
-	import * as api from '#lib/bridge/index.js';
-	import type { Drive, Format } from '#lib/bridge/index.js';
+	import { commands } from '#lib/bindings.js';
+	import type { Drive, Format } from '#lib/bindings.js';
+	import { WAIT } from '#lib/bridge/index.js';
 	import { disks } from '#lib/state/disks.svelte.js';
 	import FormatFields from './FormatFields.svelte';
 	import SizeField from './SizeField.svelte';
@@ -27,7 +28,7 @@
 
 	async function submit() {
 		working = true;
-		const done = await disks.run(drive.block, () => api.createPartition(drive.block, offset, length >= size ? 0 : length, $state.snapshot(format)));
+		const done = await disks.run(drive.block, () => commands.disksCreatePartition({ table: drive.block, offset, size: length >= size ? 0 : length, format: $state.snapshot(format) }, WAIT));
 		working = false;
 		if (done) onclose();
 	}

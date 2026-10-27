@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { bytes, Dialog } from '@luft/ui';
-	import type { Drive } from '#lib/bridge/index.js';
+	import type { Drive } from '#lib/bindings.js';
 	import { driveKindName } from '#lib/format.js';
 	import Facts from './Facts.svelte';
 

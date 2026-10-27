@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { bytes, Dialog, errorText } from '@luft/ui';
-	import * as api from '#lib/bridge/index.js';
-	import type { OtherSystem, Removed } from '#lib/bridge/index.js';
+	import { commands, events } from '#lib/bindings.js';
+	import type { OtherSystem, Removed } from '#lib/bindings.js';
+	import { CANCELLED, WAIT, openFolder } from '#lib/bridge/index.js';
 	import { KeyRequest } from '#lib/encryption.svelte.js';
 	import { inner } from '#lib/format.js';
 	import { disks } from '#lib/state/disks.svelte.js';
@@ -51,10 +52,10 @@
 
 	async function openFiles() {
 		try {
-			if (system.folder) return await api.openFolder(system.folder);
+			if (system.folder) return await openFolder(system.folder);
 			if (!system.files) return;
 			const mounted = contentsOf(system.files)?.mountPoints[0];
-			await api.openFolder(mounted ?? (await api.mount(system.files)));
+			await openFolder(mounted ?? (await commands.disksMount({ block: system.files }, WAIT)));
 		} catch (caught) {
 			disks.fail(caught);
 		}
@@ -63,21 +64,21 @@
 	async function remove() {
 		phase = 'working';
 		error = '';
-		const stop = api.events.system((step) => {
+		const stop = events.disksSystem((step) => {
 			const key = stepKey(step);
 			if (key === GROW_STEP.key) growStarted = true;
 			current = key;
 		});
 		try {
-			removed = await api.removeSystem(system.id);
+			removed = await commands.disksRemoveSystem({ id: system.id }, WAIT);
 			request.asking = removed.needsKey;
 			phase = 'done';
 		} catch (caught) {
 			const message = errorText(caught);
-			if (message === api.CANCELLED && current === null) {
+			if (message === CANCELLED && current === null) {
 				phase = 'confirm';
 			} else {
-				error = message === api.CANCELLED ? 'Administrator rights are needed to continue.' : message;
+				error = message === CANCELLED ? 'Administrator rights are needed to continue.' : message;
 				phase = 'failed';
 			}
 		} finally {
@@ -92,8 +93,8 @@
 		let grown = 0;
 		try {
 			const done = await request.run(async (unlock) => {
-				const outcome = await api.growSystem(unlock);
-				if ('done' in outcome) grown = outcome.done;
+				const outcome = await commands.disksGrowSystem({ unlock }, WAIT);
+				if (outcome.done !== undefined) grown = outcome.done;
 				return outcome;
 			});
 			if (done) {
@@ -102,7 +103,7 @@
 			}
 		} catch (caught) {
 			const message = errorText(caught);
-			if (message !== api.CANCELLED) request.error = message;
+			if (message !== CANCELLED) request.error = message;
 		} finally {
 			growing = false;
 		}

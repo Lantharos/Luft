@@ -12,9 +12,10 @@ use luft_app::{Events, file_manager};
 use parking_lot::Mutex;
 use serde::Serialize;
 
-use tree::{Node, View};
+use crate::events::SPACE_UPDATE;
+use specta::Type;
+use tree::{Node, SpaceView};
 
-pub const UPDATE: &str = "space.update";
 const TICK: Duration = Duration::from_millis(120);
 const MOST_THREADS: usize = 16;
 
@@ -33,12 +34,12 @@ struct Scan {
     took: Arc<Mutex<Option<Duration>>>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
-pub struct Update {
+pub struct SpaceUpdate {
     scan: u64,
     root: String,
-    view: Option<View>,
+    view: Option<SpaceView>,
     scanning: bool,
     total_items: u64,
     total_size: u64,
@@ -47,10 +48,10 @@ pub struct Update {
 }
 
 impl Scan {
-    fn update(&self) -> Update {
+    fn update(&self) -> SpaceUpdate {
         let focus = self.focus.lock().clone();
         let took = *self.took.lock();
-        Update {
+        SpaceUpdate {
             scan: self.id,
             root: self.path.display().to_string(),
             view: self.root.find(&focus).map(|node| node.view(focus)),
@@ -112,7 +113,7 @@ fn report(scan: &Scan, events: &Events) {
         }
         let update = scan.update();
         let finished = !update.scanning;
-        events.emit(UPDATE, update);
+        events.emit(SPACE_UPDATE, update);
         if finished {
             return;
         }
@@ -127,7 +128,7 @@ impl Explorer {
             .ok_or_else(|| "Nothing is being measured".to_owned())
     }
 
-    pub fn start(&self, events: &Events, path: &str) -> Result<Update, String> {
+    pub fn start(&self, events: &Events, path: &str) -> Result<SpaceUpdate, String> {
         self.stop();
         let path = Path::new(path)
             .canonicalize()
@@ -162,13 +163,13 @@ impl Explorer {
         }
     }
 
-    pub fn view(&self, path: Vec<String>) -> Result<Update, String> {
+    pub fn view(&self, path: Vec<String>) -> Result<SpaceUpdate, String> {
         let scan = self.current()?;
         *scan.focus.lock() = path;
         Ok(scan.update())
     }
 
-    pub fn trash(&self, components: Vec<String>) -> Result<Update, String> {
+    pub fn trash(&self, components: Vec<String>) -> Result<SpaceUpdate, String> {
         let scan = self.current()?;
         let (parent, path) = scan.location(&components).ok_or("It's no longer there")?;
         let name = components.last().ok_or("Nothing to move")?;
@@ -257,7 +258,7 @@ mod tests {
         let view = notes.view(vec!["notes".to_owned()]);
         assert!(matches!(
             view.children.as_slice(),
-            [tree::Item::Other { count: 40, .. }]
+            [tree::SpaceItem::Other { count: 40, .. }]
         ));
 
         std::fs::remove_dir_all(&root).unwrap();

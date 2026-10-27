@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { bytes, Row, Section } from '@luft/ui';
-	import * as api from '#lib/bridge/index.js';
-	import type { ImageProgress } from '#lib/bridge/index.js';
+	import { commands } from '#lib/bindings.js';
+	import type { ImageProgress } from '#lib/bindings.js';
 	import { disks } from '#lib/state/disks.svelte.js';
 
 	interface Props {
@@ -32,7 +32,7 @@
 		{#if progress.finished}
 			<button type="button" class="button" onclick={() => (disks.image = null)}>Done</button>
 		{:else}
-			<button type="button" class="button" onclick={api.cancelImage}>Cancel</button>
+			<button type="button" class="button" onclick={() => commands.disksImageCancel()}>Cancel</button>
 		{/if}
 		{#snippet below()}
 			<div class="h-1.5 overflow-hidden rounded-full bg-[var(--control)]">

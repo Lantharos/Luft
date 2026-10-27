@@ -4,6 +4,7 @@ use std::sync::{Arc, Weak};
 
 use parking_lot::RwLock;
 use serde::Serialize;
+use specta::Type;
 
 const SHOWN: usize = 240;
 const INNER: usize = 12;
@@ -30,9 +31,9 @@ pub struct Node {
     pub contents: RwLock<Contents>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(tag = "kind", rename_all = "camelCase")]
-pub enum Item {
+pub enum SpaceItem {
     Dir {
         name: String,
         size: u64,
@@ -50,22 +51,24 @@ pub enum Item {
     },
 }
 
-impl Item {
+impl SpaceItem {
     fn size(&self) -> u64 {
         match self {
-            Item::Dir { size, .. } | Item::File { size, .. } | Item::Other { size, .. } => *size,
+            SpaceItem::Dir { size, .. }
+            | SpaceItem::File { size, .. }
+            | SpaceItem::Other { size, .. } => *size,
         }
     }
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
-pub struct View {
+pub struct SpaceView {
     pub path: Vec<String>,
     pub size: u64,
     pub items: u64,
     pub done: bool,
-    pub children: Vec<Item>,
+    pub children: Vec<SpaceItem>,
     pub hidden_count: u64,
     pub hidden_size: u64,
 }
@@ -150,14 +153,14 @@ impl Node {
         sizes
     }
 
-    pub fn view(&self, path: Vec<String>) -> View {
-        let mut children: Vec<(Item, Option<Arc<Node>>)> = {
+    pub fn view(&self, path: Vec<String>) -> SpaceView {
+        let mut children: Vec<(SpaceItem, Option<Arc<Node>>)> = {
             let contents = self.contents.read();
             contents
                 .dirs
                 .iter()
                 .map(|dir| {
-                    let item = Item::Dir {
+                    let item = SpaceItem::Dir {
                         name: display(&dir.name),
                         size: dir.size(),
                         items: dir.items(),
@@ -167,14 +170,14 @@ impl Node {
                     (item, Some(dir.clone()))
                 })
                 .chain(contents.files.iter().map(|file| {
-                    let item = Item::File {
+                    let item = SpaceItem::File {
                         name: display(&file.name),
                         size: file.size,
                     };
                     (item, None)
                 }))
                 .chain((contents.other_count > 0).then_some((
-                    Item::Other {
+                    SpaceItem::Other {
                         count: contents.other_count,
                         size: contents.other_size,
                     },
@@ -184,7 +187,7 @@ impl Node {
         };
         children.sort_unstable_by_key(|(item, _)| std::cmp::Reverse(item.size()));
         let hidden = children.split_off(children.len().min(SHOWN));
-        View {
+        SpaceView {
             path,
             size: self.size(),
             items: self.items(),
@@ -192,7 +195,7 @@ impl Node {
             hidden_count: hidden
                 .iter()
                 .map(|(item, _)| match item {
-                    Item::Other { count, .. } => *count,
+                    SpaceItem::Other { count, .. } => *count,
                     _ => 1,
                 })
                 .sum(),
@@ -200,7 +203,7 @@ impl Node {
             children: children
                 .into_iter()
                 .map(|(mut item, node)| {
-                    if let (Item::Dir { inner, .. }, Some(node)) = (&mut item, node) {
+                    if let (SpaceItem::Dir { inner, .. }, Some(node)) = (&mut item, node) {
                         *inner = node.inner();
                     }
                     item

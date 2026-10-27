@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { Dialog, errorText } from '@luft/ui';
-	import * as api from '#lib/bridge/index.js';
-	import type { Volume } from '#lib/bridge/index.js';
+	import { commands } from '#lib/bindings.js';
+	import type { Volume } from '#lib/bindings.js';
+	import { CANCELLED, WAIT } from '#lib/bridge/index.js';
 	import { KeyRequest } from '#lib/encryption.svelte.js';
 	import { volumeName } from '#lib/format.js';
 	import KeyPrompt from './KeyPrompt.svelte';
@@ -22,10 +23,10 @@
 		working = true;
 		error = '';
 		try {
-			if (await request.run((unlock) => api.trust.decrypt(volume.block, unlock))) onclose();
+			if (await request.run((unlock) => commands.trustDecrypt({ block: volume.block, unlock }, WAIT))) onclose();
 		} catch (caught) {
 			const message = errorText(caught);
-			if (message !== api.CANCELLED) error = message;
+			if (message !== CANCELLED) error = message;
 		} finally {
 			working = false;
 		}

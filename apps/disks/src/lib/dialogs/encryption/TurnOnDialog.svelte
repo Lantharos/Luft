@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import { EncryptionWizard, errorText, PassphraseFields } from '@luft/ui';
-	import * as api from '#lib/bridge/index.js';
-	import type { Drive, DriveCheck, Volume } from '#lib/bridge/index.js';
+	import { commands } from '#lib/bindings.js';
+	import type { Drive, DriveCheck, Volume } from '#lib/bindings.js';
+	import { CANCELLED, WAIT } from '#lib/bridge/index.js';
 	import { SHORTEST_PASSPHRASE } from '#lib/encryption.svelte.js';
 	import { volumeName } from '#lib/format.js';
 	import SwitchLine from './SwitchLine.svelte';
@@ -58,21 +59,24 @@
 	);
 
 	async function check() {
-		plan = await api.trust.check(volume.block);
+		plan = await commands.trustCheck({ block: volume.block }, WAIT);
 		auto = !plan.autoUnlock && !drive.removable;
 		return plan.checks;
 	}
 
 	async function encrypt(key: string) {
 		const secret = usePassphrase ? passphrase : '';
-		if (!reformat) return api.trust.encrypt(volume.block, key, secret, auto);
+		if (!reformat) {
+			await commands.trustEncrypt({ block: volume.block, recoveryKey: key, passphrase: secret, autoUnlock: auto }, WAIT);
+			return;
+		}
 		const label = (volume.label || name).slice(0, EXT4_LABEL);
-		await api.trust.format(volume.block, { filesystem: 'ext4', label, passphrase: secret || null, remember: false, erase: false }, key, auto);
+		await commands.trustFormat({ block: volume.block, format: { filesystem: 'ext4', label, passphrase: secret || null, remember: false, erase: false }, recoveryKey: key, autoUnlock: auto }, WAIT);
 	}
 
 	function explain(caught: unknown) {
 		const message = errorText(caught);
-		return message === api.CANCELLED ? '' : message;
+		return message === CANCELLED ? '' : message;
 	}
 </script>
 
@@ -81,9 +85,9 @@
 	{descriptions}
 	{check}
 	{blocked}
-	recoveryKey={api.trust.recoveryKey}
-	onsave={(key) => api.trust.saveKey(key, name)}
-	onprint={(key) => api.trust.printKey(key, name)}
+	recoveryKey={commands.trustRecoveryKey}
+	onsave={(key) => commands.trustSaveKey({ key, name }, WAIT)}
+	onprint={(key) => commands.trustPrintKey({ key, name }, WAIT)}
 	{unlockReady}
 	{summary}
 	finish={reformat ? 'Erase and encrypt' : 'Encrypt'}

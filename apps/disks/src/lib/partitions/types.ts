@@ -1,6 +1,4 @@
-import type { Volume } from '#lib/bridge/index.js';
-
-export type Table = 'gpt' | 'dos';
+import type { PartitionTable, Volume } from '#lib/bindings.js';
 
 type Role = 'firmware' | 'boot' | 'reserved' | 'swap' | 'data';
 
@@ -56,18 +54,18 @@ export function typeName(value: string | null) {
 	return partitionType(value)?.label ?? value;
 }
 
-export function typeOptions(table: Table, current: string) {
+export function typeOptions(table: PartitionTable, current: string) {
 	const offered = (table === 'gpt' ? GPT : DOS).filter((type) => type.offered);
 	const known = offered.some((type) => type.value === current.toLowerCase());
 	return [...(known || !current ? [] : [{ value: current, label: typeName(current) ?? current }]), ...offered.map(({ value, label }) => ({ value, label }))];
 }
 
-const FILESYSTEM_TYPES: Record<Table, Record<string, string>> = {
+const FILESYSTEM_TYPES: Record<PartitionTable, Record<string, string>> = {
 	gpt: { exfat: BASIC_DATA, ntfs: BASIC_DATA, vfat: BASIC_DATA },
 	dos: { exfat: '0x07', ntfs: '0x07', vfat: '0x0c' }
 };
 
-export function typeFor(table: Table, filesystem: string) {
+export function typeFor(table: PartitionTable, filesystem: string) {
 	return FILESYSTEM_TYPES[table][filesystem] ?? (table === 'gpt' ? LINUX_DATA : '0x83');
 }
 
@@ -89,7 +87,7 @@ export function explorable(volume: Volume) {
 	return !(bootOnly && volume.size <= SMALL_BOOT);
 }
 
-export const FLAGS: Record<Table, { bit: number; label: string; description: string }[]> = {
+export const FLAGS: Record<PartitionTable, { bit: number; label: string; description: string }[]> = {
 	gpt: [
 		{ bit: 0, label: 'Needed by the firmware', description: 'Tools leave it alone, even when it looks unused' },
 		{ bit: 2, label: 'Bootable on older computers', description: 'Marks it for computers that start without UEFI' },

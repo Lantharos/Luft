@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { Dialog, tooltip } from '@luft/ui';
-	import * as api from '#lib/bridge/index.js';
-	import type { Drive, Health } from '#lib/bridge/index.js';
+	import { commands } from '#lib/bindings.js';
+	import type { Drive, Health } from '#lib/bindings.js';
+	import { WAIT } from '#lib/bridge/index.js';
 	import { duration, healthAdvice, selftestResult } from '#lib/format.js';
 	import { disks } from '#lib/state/disks.svelte.js';
 	import Facts from './Facts.svelte';
@@ -28,7 +29,7 @@
 	);
 
 	function test(extended: boolean) {
-		void disks.run(key, () => api.startSelftest(drive.id, extended));
+		void disks.run(key, () => commands.disksSelftest({ drive: drive.id, extended }, WAIT));
 	}
 </script>
 
@@ -41,7 +42,7 @@
 	{/if}
 	{#snippet actions()}
 		{#if testing}
-			<button type="button" class="button mr-auto" disabled={busy} onclick={() => disks.run(key, () => api.stopSelftest(drive.id))}>Stop test</button>
+			<button type="button" class="button mr-auto" disabled={busy} onclick={() => disks.run(key, () => commands.disksSelftestStop({ drive: drive.id }, WAIT))}>Stop test</button>
 		{:else}
 			<button type="button" class="button" disabled={busy} onclick={() => test(false)} {@attach tooltip('A couple of minutes, while you keep using it')}>Quick test</button>
 			<button type="button" class="button mr-auto" disabled={busy} onclick={() => test(true)} {@attach tooltip('Can take hours, while you keep using it')}>Full test</button>

@@ -1,8 +1,8 @@
 <script lang="ts">
 	import Lock from '@lucide/svelte/icons/lock';
 	import { bytes } from '@luft/ui';
-	import * as api from '#lib/bridge/index.js';
-	import type { Drive, Volume } from '#lib/bridge/index.js';
+	import { commands } from '#lib/bindings.js';
+	import type { Drive, Volume } from '#lib/bindings.js';
 	import { dialogs } from '#lib/dialogs/dialogs.svelte.js';
 	import { changing, rowStatus } from '#lib/encryption.svelte.js';
 	import { filesystemName, inner, jobText, usedShare, volumeName } from '#lib/format.js';
@@ -41,7 +41,7 @@
 
 	$effect(() => {
 		remembered = false;
-		if (volume.encryption) void api.remembered(volume.block).then((value) => (remembered = value));
+		if (volume.encryption) void commands.disksRemembered({ block: volume.block }).then((value) => (remembered = value));
 	});
 </script>
 

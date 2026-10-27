@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Drive } from '#lib/bridge/index.js';
+	import type { Drive } from '#lib/bindings.js';
 	import { segmentKey } from '#lib/state/disks.svelte.js';
 	import FreeRow from './FreeRow.svelte';
 	import PartitionRow from './PartitionRow.svelte';

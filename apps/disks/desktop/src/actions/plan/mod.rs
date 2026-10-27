@@ -1,5 +1,5 @@
 mod guard;
-mod moving;
+pub mod moving;
 
 use luft_app::Events;
 use luft_disks::{partitions, resize};
@@ -10,14 +10,15 @@ use super::mounting;
 use crate::trust;
 use crate::udisks::{self, BLOCK, ENCRYPTED, FILESYSTEM, PARTITION, TABLE, no_options};
 use guard::Guard;
+use specta::Type;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 #[serde(
     tag = "kind",
     rename_all = "camelCase",
     rename_all_fields = "camelCase"
 )]
-pub enum Step {
+pub enum PlanStep {
     Create {
         table: String,
         offset: u64,
@@ -50,9 +51,9 @@ pub enum Step {
     },
 }
 
-pub async fn run(events: &Events, step: Step) -> Result<Option<String>, String> {
+pub async fn run(events: &Events, step: PlanStep) -> Result<Option<String>, String> {
     match step {
-        Step::Create {
+        PlanStep::Create {
             table,
             offset,
             size,
@@ -82,7 +83,7 @@ pub async fn run(events: &Events, step: Step) -> Result<Option<String>, String> 
                     &table,
                     (offset, size),
                     (&partition_type, &name),
-                    &Format::plain(filesystem, label),
+                    &Format::plain(&filesystem, label)?,
                     false,
                 )
                 .await?
@@ -92,26 +93,26 @@ pub async fn run(events: &Events, step: Step) -> Result<Option<String>, String> 
             }
             Ok(Some(created))
         }
-        Step::Delete { block } => {
+        PlanStep::Delete { block } => {
             Guard::volume(&block).await?.changeable()?;
             partitions::delete(&block).await.map(|()| None)
         }
-        Step::Place {
+        PlanStep::Place {
             block,
             offset,
             size,
         } => place(events, &block, offset, size).await,
-        Step::Format {
+        PlanStep::Format {
             block,
             filesystem,
             label,
         } => {
             Guard::volume(&block).await?.changeable()?;
-            formatting::format_volume(&block, &Format::plain(filesystem, label))
+            formatting::format_volume(&block, &Format::plain(&filesystem, label)?)
                 .await
                 .map(|()| None)
         }
-        Step::Change {
+        PlanStep::Change {
             block,
             partition_type,
             name,

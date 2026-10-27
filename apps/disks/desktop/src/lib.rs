@@ -1,5 +1,6 @@
 mod actions;
 mod bridge;
+mod events;
 mod images;
 mod launch;
 mod space;
@@ -20,7 +21,7 @@ pub fn run() -> ! {
     let state = bridge::State::default();
     luft_app::run(
         &state.events,
-        |window| bridge::register(GLASS_WINDOW.apply(window), &state),
+        |window| bridge::register(events::declare(GLASS_WINDOW.apply(window)), &state),
         |events| {
             udisks::watch::start(events.clone());
             trust::watch(events);

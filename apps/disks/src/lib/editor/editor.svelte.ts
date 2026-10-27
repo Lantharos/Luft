@@ -1,6 +1,7 @@
 import { errorText } from '@luft/ui';
-import * as api from '#lib/bridge/index.js';
-import type { PlanStep } from '#lib/bridge/index.js';
+import { commands, events } from '#lib/bindings.js';
+import type { PlanStep } from '#lib/bindings.js';
+import { CANCELLED, WAIT } from '#lib/bridge/index.js';
 import { disks } from '#lib/state/disks.svelte.js';
 import { describePlan } from './describe';
 import { apply, layoutOf, type Layout, type Step } from './model';
@@ -137,13 +138,13 @@ class Editor {
 		this.outcome = null;
 		let done = 0;
 		let error: string | null = null;
-		const stop = api.events.moved(({ copied, total }) => {
+		const stop = events.disksPlan(({ copied, total }) => {
 			if (this.progress) this.progress = { ...this.progress, copied, total };
 		});
 		try {
 			for (const [index, step] of steps.entries()) {
 				this.progress = { index, copied: 0, total: 0 };
-				const result = await api.planStep(this.#request(step, blocks, drive.block));
+				const result = await commands.disksPlanStep({ step: this.#request(step, blocks, drive.block) }, WAIT);
 				if (result) blocks.set(step.key, result);
 				done += 1;
 			}
@@ -154,7 +155,7 @@ class Editor {
 		}
 		this.progress = null;
 		this.frozen = null;
-		if (error === api.CANCELLED && done === 0) return;
+		if (error === CANCELLED && done === 0) return;
 		this.steps = [];
 		this.history = [];
 		this.selected = null;

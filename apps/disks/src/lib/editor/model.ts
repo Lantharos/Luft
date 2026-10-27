@@ -1,6 +1,5 @@
-import type { Drive, Volume } from '#lib/bridge/index.js';
+import type { Drive, PartitionTable, Volume } from '#lib/bindings.js';
 import { inner, volumeName } from '#lib/format.js';
-import type { Table } from '#lib/partitions/types.js';
 
 export const MiB = 1024 ** 2;
 const GPT_ENTRIES = 128;
@@ -35,7 +34,7 @@ export interface Span {
 }
 
 export interface Layout {
-	table: Table;
+	table: PartitionTable;
 	start: number;
 	end: number;
 	extended: Span | null;

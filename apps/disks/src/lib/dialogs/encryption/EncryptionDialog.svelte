@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { Dialog, errorText } from '@luft/ui';
-	import * as api from '#lib/bridge/index.js';
-	import type { Drive, Volume } from '#lib/bridge/index.js';
+	import { commands } from '#lib/bindings.js';
+	import type { Drive, Outcome, Volume } from '#lib/bindings.js';
+	import { CANCELLED, WAIT } from '#lib/bridge/index.js';
 	import { changing, KeyRequest, progressSentence } from '#lib/encryption.svelte.js';
 	import { volumeName } from '#lib/format.js';
 	import { disks } from '#lib/state/disks.svelte.js';
@@ -23,7 +24,7 @@
 	let working = $state(false);
 	let error = $state('');
 	let remembered = $state(false);
-	let pending = $state<((unlock: string) => Promise<api.Outcome<unknown>>) | null>(null);
+	let pending = $state<((unlock: string) => Promise<Outcome<unknown>>) | null>(null);
 
 	let name = $derived(volumeName(volume));
 	let encryption = $derived(disks.encryption(volume));
@@ -41,24 +42,24 @@
 	);
 
 	$effect(() => {
-		void api.remembered(volume.block).then((value) => (remembered = value));
+		void commands.disksRemembered({ block: volume.block }).then((value) => (remembered = value));
 	});
 
-	async function attempt(action: () => Promise<boolean | void>) {
+	async function attempt<T>(action: () => Promise<T>) {
 		working = true;
 		error = '';
 		try {
 			return await action();
 		} catch (caught) {
 			const message = errorText(caught);
-			if (message !== api.CANCELLED) error = message;
+			if (message !== CANCELLED) error = message;
 			return false;
 		} finally {
 			working = false;
 		}
 	}
 
-	async function keyed(action: (unlock: string) => Promise<api.Outcome<unknown>>) {
+	async function keyed(action: (unlock: string) => Promise<Outcome<unknown>>) {
 		pending = action;
 		const done = await attempt(() => request.run(action));
 		if (done) {
@@ -70,29 +71,29 @@
 	}
 
 	function setAutoUnlock(checked: boolean) {
-		void keyed((unlock) => api.trust.unlocking(volume.block, unlock, '', checked));
+		void keyed((unlock) => commands.trustUnlocking({ block: volume.block, unlock, recoveryKey: '', autoUnlock: checked }, WAIT));
 	}
 
 	async function showKey() {
 		const key = await attempt(async () => {
-			const shown = await api.trust.showKey(volume.uuid);
+			const shown = await commands.trustShowKey({ uuid: volume.uuid }, WAIT);
 			dialogs.open({ kind: 'recovery-key', key: shown, name });
 		});
 		return key;
 	}
 
 	async function addKey() {
-		const key = await api.trust.recoveryKey().catch((caught) => (error = errorText(caught), ''));
+		const key = await commands.trustRecoveryKey().catch((caught) => (error = errorText(caught), ''));
 		if (!key) return;
-		if (await keyed((unlock) => api.trust.unlocking(volume.block, unlock, key, encryption?.autoUnlock ?? false))) dialogs.open({ kind: 'recovery-key', key, name });
+		if (await keyed((unlock) => commands.trustUnlocking({ block: volume.block, unlock, recoveryKey: key, autoUnlock: encryption?.autoUnlock ?? false }, WAIT))) dialogs.open({ kind: 'recovery-key', key, name });
 	}
 
 	function pause() {
-		void attempt(() => api.trust.pause(volume.uuid));
+		void attempt(() => commands.trustPause({ uuid: volume.uuid }, WAIT));
 	}
 
 	function resume() {
-		void keyed((unlock) => api.trust.resume(volume.uuid, unlock));
+		void keyed((unlock) => commands.trustResume({ uuid: volume.uuid, unlock }, WAIT));
 	}
 </script>
 
@@ -119,7 +120,7 @@
 	</Line>
 	{#if remembered}
 		<Line title="Saved in your keyring" hint="Unlocking it here needs no typing">
-			<button type="button" class="button" disabled={working} onclick={() => attempt(() => api.forgetPassphrase(volume.block).then(() => (remembered = false)))}>Forget</button>
+			<button type="button" class="button" disabled={working} onclick={() => attempt(() => commands.disksForgetPassphrase({ block: volume.block }, WAIT).then(() => (remembered = false)))}>Forget</button>
 		</Line>
 	{/if}
 	{#if request.asking && pending}

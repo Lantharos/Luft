@@ -1,8 +1,9 @@
 <script lang="ts">
 	import Check from '@lucide/svelte/icons/check';
 	import { bytes, Dialog } from '@luft/ui';
-	import * as api from '#lib/bridge/index.js';
-	import type { ChosenImage } from '#lib/bridge/index.js';
+	import { commands } from '#lib/bindings.js';
+	import type { ChosenImage } from '#lib/bindings.js';
+	import { WAIT } from '#lib/bridge/index.js';
 	import DriveIcon from '#lib/components/DriveIcon.svelte';
 	import { disks } from '#lib/state/disks.svelte.js';
 
@@ -23,7 +24,7 @@
 		if (!chosen) return;
 		working = true;
 		const drive = chosen;
-		const done = await disks.run(drive.block, () => api.restoreImage(drive.block, image.path));
+		const done = await disks.run(drive.block, () => commands.disksImageRestore({ block: drive.block, path: image.path }, WAIT));
 		working = false;
 		if (done) {
 			disks.select(drive.id);

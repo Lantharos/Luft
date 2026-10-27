@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { tick } from 'svelte';
 	import { Dialog, errorText, PasswordField } from '@luft/ui';
-	import * as api from '#lib/bridge/index.js';
-	import type { Volume } from '#lib/bridge/index.js';
+	import { commands } from '#lib/bindings.js';
+	import type { Volume } from '#lib/bindings.js';
+	import { CANCELLED, WAIT } from '#lib/bridge/index.js';
 	import { volumeName } from '#lib/format.js';
 
 	interface Props {
@@ -31,12 +32,12 @@
 		working = true;
 		error = '';
 		try {
-			const outcome = await api.changePassphrase(volume.block, current, next);
+			const outcome = await commands.disksChangePassphrase({ block: volume.block, current, next }, WAIT);
 			if ('wrongKey' in outcome) error = 'The current passphrase isn’t right';
 			else onclose();
 		} catch (caught) {
 			const message = errorText(caught);
-			if (message !== api.CANCELLED) error = message;
+			if (message !== CANCELLED) error = message;
 		} finally {
 			working = false;
 		}

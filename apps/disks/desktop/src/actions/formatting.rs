@@ -1,42 +1,83 @@
+use std::str::FromStr;
+
 use luft_app::dbus::objects::Objects;
 use serde::{Deserialize, Serialize};
+use specta::Type;
 use zbus::{OwnedObjectPath, Variant};
 
 use super::{encryption, mounting};
 use crate::udisks::{self, BLOCK, Options, TABLE, no_options};
 
-const FILESYSTEMS: &[&str] = &["ext4", "btrfs", "exfat", "ntfs", "vfat"];
-const OWNED: &[&str] = &["ext4", "btrfs"];
 const ALIGNMENT: u64 = 1024 * 1024;
 const LARGE_TABLE: u64 = 2 * 1024 * 1024 * 1024 * 1024;
 
-#[derive(Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Type, Clone, Copy, PartialEq)]
+#[serde(rename_all = "lowercase")]
+pub enum Filesystem {
+    Ext4,
+    Btrfs,
+    Exfat,
+    Ntfs,
+    Vfat,
+}
+
+impl Filesystem {
+    const ALL: [Self; 5] = [Self::Ext4, Self::Btrfs, Self::Exfat, Self::Ntfs, Self::Vfat];
+
+    fn as_str(self) -> &'static str {
+        match self {
+            Self::Ext4 => "ext4",
+            Self::Btrfs => "btrfs",
+            Self::Exfat => "exfat",
+            Self::Ntfs => "ntfs",
+            Self::Vfat => "vfat",
+        }
+    }
+
+    fn owned(self) -> bool {
+        matches!(self, Self::Ext4 | Self::Btrfs)
+    }
+}
+
+impl FromStr for Filesystem {
+    type Err = String;
+
+    fn from_str(name: &str) -> Result<Self, String> {
+        Self::ALL
+            .into_iter()
+            .find(|filesystem| filesystem.as_str() == name)
+            .ok_or_else(|| format!("{name} isn't offered here"))
+    }
+}
+
+#[derive(Deserialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Format {
-    pub filesystem: String,
+    pub filesystem: Filesystem,
     pub label: String,
     pub passphrase: Option<String>,
     pub remember: bool,
     pub erase: bool,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Support {
-    filesystem: &'static str,
+    filesystem: Filesystem,
     available: bool,
     missing: String,
     resize: u64,
 }
 
 pub async fn supported() -> Vec<Support> {
-    let mut supported = Vec::with_capacity(FILESYSTEMS.len());
-    for filesystem in FILESYSTEMS {
-        let (available, missing) = udisks::manager::<(bool, String)>("CanFormat", &(*filesystem,))
-            .await
-            .unwrap_or((false, String::new()));
+    let mut supported = Vec::with_capacity(Filesystem::ALL.len());
+    for filesystem in Filesystem::ALL {
+        let (available, missing) =
+            udisks::manager::<(bool, String)>("CanFormat", &(filesystem.as_str(),))
+                .await
+                .unwrap_or((false, String::new()));
         let (resizable, resize, _) =
-            udisks::manager::<(bool, u64, String)>("CanResize", &(*filesystem,))
+            udisks::manager::<(bool, u64, String)>("CanResize", &(filesystem.as_str(),))
                 .await
                 .unwrap_or((false, 0, String::new()));
         supported.push(Support {
@@ -50,25 +91,22 @@ pub async fn supported() -> Vec<Support> {
 }
 
 impl Format {
-    pub fn plain(filesystem: String, label: String) -> Self {
-        Self {
-            filesystem,
+    pub fn plain(filesystem: &str, label: String) -> Result<Self, String> {
+        Ok(Self {
+            filesystem: filesystem.parse()?,
             label,
             passphrase: None,
             remember: false,
             erase: false,
-        }
+        })
     }
 
-    fn options(&self, erase: bool, typed: bool) -> Result<Options<'_>, String> {
-        if !FILESYSTEMS.contains(&self.filesystem.as_str()) {
-            return Err(format!("{} isn't offered here", self.filesystem));
-        }
+    fn options(&self, erase: bool, typed: bool) -> Options<'_> {
         let mut options = no_options();
         options.insert("label", Variant::from(self.label.as_str()));
         options.insert("update-partition-type", Variant::from(typed));
         options.insert("tear-down", Variant::from(true));
-        if OWNED.contains(&self.filesystem.as_str()) {
+        if self.filesystem.owned() {
             options.insert("take-ownership", Variant::from(true));
         }
         if erase && self.erase {
@@ -82,7 +120,7 @@ impl Format {
             options.insert("encrypt.passphrase", Variant::from(passphrase));
             options.insert("encrypt.type", Variant::from("luks2"));
         }
-        Ok(options)
+        options
     }
 
     async fn remember(&self, block: &str) -> Result<(), String> {
@@ -101,7 +139,7 @@ pub async fn format_volume(block: &str, format: &Format) -> Result<(), String> {
         block,
         BLOCK,
         "Format",
-        &(format.filesystem.as_str(), format.options(true, true)?),
+        &(format.filesystem.as_str(), format.options(true, true)),
     )
     .await?;
     format.remember(block).await
@@ -161,7 +199,7 @@ pub async fn create_typed(
             name,
             no_options(),
             format.filesystem.as_str(),
-            format.options(erase, kind.is_empty())?,
+            format.options(erase, kind.is_empty()),
         ),
     )
     .await

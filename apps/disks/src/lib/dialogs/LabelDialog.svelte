@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import { Dialog, TextField } from '@luft/ui';
-	import * as api from '#lib/bridge/index.js';
-	import type { Filesystem, Volume } from '#lib/bridge/index.js';
+	import { commands } from '#lib/bindings.js';
+	import type { Filesystem, Volume } from '#lib/bindings.js';
+	import { WAIT } from '#lib/bridge/index.js';
 	import { LABEL_LIMITS, volumeName } from '#lib/format.js';
 	import { disks } from '#lib/state/disks.svelte.js';
 
@@ -18,7 +19,7 @@
 	let valid = $derived(label.length <= limit && label !== volume.label);
 
 	async function submit() {
-		if (valid && (await disks.run(volume.block, () => api.setLabel(volume.block, label)))) onclose();
+		if (valid && (await disks.run(volume.block, () => commands.disksLabel({ block: volume.block, label }, WAIT)))) onclose();
 	}
 </script>
 

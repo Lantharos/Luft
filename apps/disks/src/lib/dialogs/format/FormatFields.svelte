@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Checkbox, PasswordField, Segmented, Select, Switch, TextField, tooltip } from '@luft/ui';
-	import type { Filesystem, Format } from '#lib/bridge/index.js';
+	import type { Filesystem, Format } from '#lib/bindings.js';
 	import { FILESYSTEM_NAMES, LABEL_LIMITS } from '#lib/format.js';
 	import { disks } from '#lib/state/disks.svelte.js';
 

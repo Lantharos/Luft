@@ -2,8 +2,7 @@ use luft_app::Events;
 use luft_app::dbus::{self, objects};
 
 use super::{ROOT, SERVICE, snapshot};
-
-pub const CHANGED: &str = "disks.changed";
+use crate::events::DISKS_CHANGED;
 
 pub fn start(events: Events) {
     luft_app::spawn(async move {
@@ -17,7 +16,7 @@ async fn follow(events: &Events) -> Result<(), String> {
     let mut changes = objects::signals(dbus::system().await?, SERVICE, ROOT).await?;
     while objects::settle(&mut changes).await {
         if let Ok(objects) = super::objects().await {
-            events.emit(CHANGED, snapshot::build(&objects));
+            events.emit(DISKS_CHANGED, snapshot::build(&objects));
         }
     }
     Ok(())

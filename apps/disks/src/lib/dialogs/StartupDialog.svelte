@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import { Dialog, Switch, TextField } from '@luft/ui';
-	import * as api from '#lib/bridge/index.js';
-	import type { Volume } from '#lib/bridge/index.js';
+	import { commands } from '#lib/bindings.js';
+	import type { Volume } from '#lib/bindings.js';
+	import { WAIT } from '#lib/bridge/index.js';
 	import { volumeName } from '#lib/format.js';
 	import { disks } from '#lib/state/disks.svelte.js';
 
@@ -19,7 +20,7 @@
 	let valid = $derived(!enabled || /^\/[^\s]+$/.test(directory));
 
 	async function submit() {
-		if (valid && (await disks.run(volume.block, () => api.setStartup(volume.block, enabled ? directory : null, readOnly)))) onclose();
+		if (valid && (await disks.run(volume.block, () => commands.disksStartup({ block: volume.block, directory: enabled ? directory : null, readOnly }, WAIT)))) onclose();
 	}
 </script>
 

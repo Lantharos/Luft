@@ -5,18 +5,18 @@ use std::time::{Duration, Instant};
 
 use luft_app::Events;
 use serde::Serialize;
+use specta::Type;
 use zbus::Variant;
 
+use crate::events::MOVE_PROGRESS;
 use crate::udisks::{self, BLOCK, PARTITION, TABLE, no_options};
-
-const PROGRESS: &str = "disks.plan";
 
 const EDGE: u64 = 1024 * 1024;
 const CHUNK: u64 = 8 * 1024 * 1024;
 const REPORT_EVERY: Duration = Duration::from_millis(250);
 
-#[derive(Serialize)]
-struct Progress {
+#[derive(Serialize, Type)]
+pub struct MoveProgress {
     copied: u64,
     total: u64,
 }
@@ -196,9 +196,9 @@ fn copy_body(
         copied += length;
         if reported.elapsed() >= REPORT_EVERY {
             reported = Instant::now();
-            events.emit(PROGRESS, Progress { copied, total });
+            events.emit(MOVE_PROGRESS, MoveProgress { copied, total });
         }
     }
-    events.emit(PROGRESS, Progress { copied, total });
+    events.emit(MOVE_PROGRESS, MoveProgress { copied, total });
     Ok(())
 }

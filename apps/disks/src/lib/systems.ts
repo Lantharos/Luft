@@ -1,5 +1,5 @@
 import { bytes } from '@luft/ui';
-import type { OtherSystem, SystemPart, SystemStep } from './bridge/index';
+import type { OtherSystem, SystemPart, SystemStep } from './bindings';
 
 const MEET_PARTS: Record<string, string> = {
 	Luft: 'Try Luft, from Meet Luft',

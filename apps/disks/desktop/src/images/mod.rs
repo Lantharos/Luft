@@ -1,4 +1,4 @@
-mod copy;
+pub mod copy;
 
 use std::fs::File;
 use std::os::fd::OwnedFd;
@@ -15,6 +15,7 @@ use zbus::OwnedObjectPath;
 use crate::actions::mounting;
 use crate::udisks::{self, BLOCK, TABLE, no_options};
 use copy::Direction;
+use specta::Type;
 
 const IMAGE_PATTERNS: &[&str] = &["*.iso", "*.img", "*.raw", "*.bin"];
 
@@ -23,7 +24,7 @@ pub struct Imaging {
     running: Arc<Mutex<Option<Arc<AtomicBool>>>>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct ChosenImage {
     path: String,

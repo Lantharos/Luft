@@ -1,11 +1,12 @@
 use std::time::Duration;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::actions::formatting::{self, Format};
 use crate::actions::mounting;
 use crate::udisks::{self, BLOCK, FILESYSTEM, bytes_text};
 use luft_trust::{self as client, DRIVES, Outcome, TRUST};
+use specta::Type;
 
 const EXPLANATION: [&str; 3] = [
     "If this drive asks for a recovery key, type this key to unlock it.",
@@ -15,10 +16,18 @@ const EXPLANATION: [&str; 3] = [
 const MOUNT_WAIT: Duration = Duration::from_millis(100);
 const MOUNT_TRIES: usize = 50;
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize, Type)]
+#[serde(rename_all = "kebab-case")]
+enum EncryptionMethod {
+    InPlace,
+    Reformat,
+    None,
+}
+
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
-pub struct Check {
-    method: String,
+pub struct DriveCheck {
+    method: EncryptionMethod,
     checks: Vec<client::Check>,
     auto_unlock: String,
 }
@@ -32,11 +41,11 @@ async fn device_of(block: &str) -> Result<String, String> {
         .ok_or_else(|| "This partition is gone".to_owned())
 }
 
-pub async fn check(block: &str) -> Result<Check, String> {
+pub async fn check(block: &str) -> Result<DriveCheck, String> {
     let (method, checks, auto_unlock): (String, Vec<(String, bool, String)>, String) =
         client::call(&DRIVES, "Check", &(device_of(block).await?,)).await?;
-    Ok(Check {
-        method,
+    Ok(DriveCheck {
+        method: super::parse(method).ok_or("Disks can't tell how to encrypt this drive")?,
         checks: checks.into_iter().map(client::Check::from).collect(),
         auto_unlock,
     })

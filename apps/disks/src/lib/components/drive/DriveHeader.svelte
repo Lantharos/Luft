@@ -1,6 +1,7 @@
 <script lang="ts">
-	import * as api from '#lib/bridge/index.js';
-	import type { Drive } from '#lib/bridge/index.js';
+	import { commands } from '#lib/bindings.js';
+	import type { Drive } from '#lib/bindings.js';
+	import { WAIT } from '#lib/bridge/index.js';
 	import { driveSummary } from '#lib/format.js';
 	import { disks } from '#lib/state/disks.svelte.js';
 	import ActionMenu from '../ActionMenu.svelte';
@@ -20,7 +21,7 @@
 	<p class="min-w-0 flex-1 truncate text-[14px] text-[var(--text-muted)]">{summary}</p>
 	<ActionMenu label="More for {drive.name}" groups={driveMenu(drive)} disabled={busy} />
 	{#if drive.removable && !drive.system}
-		<button type="button" class="button" disabled={busy} onclick={() => disks.run(drive.id, () => api.safelyRemove(drive.id, drive.block))}>
+		<button type="button" class="button" disabled={busy} onclick={() => disks.run(drive.id, () => commands.disksSafelyRemove({ drive: drive.id, block: drive.block }, WAIT))}>
 			{drive.canPowerOff ? 'Safely remove' : 'Eject'}
 		</button>
 	{/if}

@@ -2,20 +2,21 @@ use std::path::{Path, PathBuf};
 
 use luft_app::Activation;
 use serde::Serialize;
+use specta::Type;
 
 use crate::images::ChosenImage;
 
 use crate::udisks::snapshot::{Drive, Snapshot};
 use crate::udisks::volumes::{Segment, Volume};
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Target {
     drive: String,
     block: Option<String>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct Launch {
     target: Option<Target>,
     image: Option<ChosenImage>,

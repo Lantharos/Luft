@@ -72,6 +72,9 @@ jobs:
       - if: matrix.check == 'test'
         run: cargo test --locked ${{ matrix.group.packages }}
 
+      - if: matrix.check == 'test' && matrix.group.name == 'apps'
+        run: .github/scripts/bindings/check.sh ${{ matrix.group.packages }}
+
   uefi:
     name: Rust UEFI
     needs: changes

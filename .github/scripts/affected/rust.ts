@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { basename, dirname, join } from 'node:path';
 
 import { lockedPackages } from '../../../os/image/parts/stages/workspace';
 import { Graph } from './graph';
@@ -57,6 +57,12 @@ export function buildRust(graph: Graph, files: string[]): Crate[] {
 		const node = graph.owner(file);
 		if (!node || !crates.some((crate) => crate.dir === node.dir)) continue;
 		for (const [, path] of readFileSync(file, 'utf8').matchAll(INCLUDE)) graph.link(node, join(dirname(file), path), false);
+	}
+
+	for (const sabine of files.filter((file) => basename(file) === 'Sabine.toml')) {
+		const app = Bun.TOML.parse(readFileSync(sabine, 'utf8')) as { app?: { cargo_manifest?: string }; bindings?: { path: string } };
+		const node = app.bindings && graph.owner(join(dirname(sabine), app.app?.cargo_manifest ?? 'Cargo.toml'));
+		if (node) graph.link(node, join(dirname(sabine), app.bindings!.path), false);
 	}
 
 	return crates;

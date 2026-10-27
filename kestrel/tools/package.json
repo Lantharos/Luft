@@ -1,0 +1,15 @@
+{
+  "name": "@luft/kestrel-tools",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "tsc --noEmit && tsc --noEmit -p tsconfig.bun.json"
+  },
+  "devDependencies": {
+    "@luft/kestrel-types": "workspace:*",
+    "@luft/kestrel-ui": "workspace:*",
+    "@types/bun": "^1.4.3",
+    "esbuild": "0.28.2",
+    "typescript": "7.0.2"
+  }
+}

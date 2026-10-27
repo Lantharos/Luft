@@ -14,11 +14,11 @@ source "$(dirname "$0")/environment.sh"
 size="${KESTREL_CAPTURE_SIZE:-1440x900}"
 case "$mode" in
   nested) args=(--wayland --devkit) ;;
-  capture) args=(--headless --virtual-monitor "$size" --automation-script "$tools/automation/capture.js") ;;
-  performance | frames | motion) args=(--headless --virtual-monitor "$size" --automation-script "$tools/automation/$mode.js") ;;
-  setup) args=(--setup --headless --virtual-monitor "$size" --automation-script "$tools/automation/setup.js") ;;
+  capture) args=(--headless --virtual-monitor "$size" --automation-script "$built_tools/automation/capture.js") ;;
+  performance | frames | motion) args=(--headless --virtual-monitor "$size" --automation-script "$built_tools/automation/$mode.js") ;;
+  setup) args=(--setup --headless --virtual-monitor "$size" --automation-script "$built_tools/automation/setup.js") ;;
   scaling)
-    args=(--headless --automation-script "$tools/automation/scaling.js")
+    args=(--headless --automation-script "$built_tools/automation/scaling.js")
     while IFS=$'\t' read -r panel _; do args+=(--virtual-monitor "$panel"); done < "$tools/fixtures/scaling/panels.tsv"
     ;;
   *) usage ;;

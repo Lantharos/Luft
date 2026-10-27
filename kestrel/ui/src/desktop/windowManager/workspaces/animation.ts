@@ -26,7 +26,7 @@ export class WorkspaceAnimationController {
   movingWindow: Meta.Window | null = null;
   private switchData: SwitchData | null = null;
   private grab: Clutter.Grab | null = null;
-  private readonly swipeTracker = new SwipeTracker(global.stage,
+  readonly swipeTracker = new SwipeTracker(global.stage,
     Clutter.Orientation.HORIZONTAL,
     Shell.ActionMode.NORMAL,
     {
@@ -44,6 +44,10 @@ export class WorkspaceAnimationController {
     global.display.bind_property('compositor-modifiers',
       this.swipeTracker, 'scroll-modifiers',
       GObject.BindingFlags.SYNC_CREATE);
+  }
+
+  get currentSwitch(): SwitchData | null {
+    return this.switchData;
   }
 
   private prepareWorkspaceSwitch(workspaceIndices: number[] = [...Array(global.workspace_manager.get_n_workspaces()).keys()]): SwitchData {

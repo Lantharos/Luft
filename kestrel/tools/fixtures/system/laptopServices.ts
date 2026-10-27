@@ -1,0 +1,28 @@
+import Gio from 'gi://Gio';
+import GLib from 'gi://GLib';
+
+const RFKILL = `<node><interface name="com.lantharos.Settings.Rfkill">
+  <property name="AirplaneMode" type="b" access="readwrite"/>
+  <property name="HasAirplaneMode" type="b" access="read"/>
+  <property name="HardwareAirplaneMode" type="b" access="read"/>
+  <property name="ShouldShowAirplaneMode" type="b" access="read"/>
+</interface></node>`;
+
+function exportWritable(xml: string, path: string, name: string, type: string, initial: boolean, constants: object) {
+  let value = initial;
+  const object = {
+    ...constants,
+    get [name]() { return value; },
+    set [name](next: boolean) {
+      value = next;
+      exported.emit_property_changed(name, new GLib.Variant(type, next));
+    },
+  };
+  const exported = Gio.DBusExportedObject.wrapJSObject(xml, object);
+  exported.export(Gio.DBus.session, path);
+}
+
+exportWritable(RFKILL, '/com/lantharos/Settings/Rfkill', 'AirplaneMode', 'b', false,
+  { HasAirplaneMode: true, HardwareAirplaneMode: false, ShouldShowAirplaneMode: true });
+Gio.bus_own_name_on_connection(Gio.DBus.session, 'com.lantharos.Settings.Rfkill', Gio.BusNameOwnerFlags.NONE, null, null);
+new GLib.MainLoop(null, false).run();

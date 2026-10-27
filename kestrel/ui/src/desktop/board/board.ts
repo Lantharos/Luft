@@ -56,7 +56,7 @@ interface BoardHost {
 export class Board implements BoardActions {
   readonly camera: Camera;
   readonly input: BoardInput;
-  private readonly backdrop: Backdrop;
+  readonly backdrop: Backdrop;
   private readonly corner: Corner;
   private readonly collisions: Collisions;
   private readonly keys: BoardKeys;

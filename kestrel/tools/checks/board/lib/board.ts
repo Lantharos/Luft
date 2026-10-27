@@ -1,0 +1,75 @@
+import type Meta from 'gi://Meta';
+import {board as currentBoard, touchpad as handleTouchpad, Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
+
+import {gjs, waitForWindow, windows} from '../../lib/processes.js';
+import type {Area} from '../../lib/screenshots.js';
+import {nextFrame, settled, waitUntil} from '../../lib/wait.js';
+import {touchpad} from './touchpad.js';
+
+const WINDOWS = [['Notes', 720, 460], ['Inbox', 640, 520], ['Music', 560, 380], ['Files', 800, 500]] as const;
+
+const overlap = (a: Area, b: Area) => a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height;
+
+export const board = () => currentBoard()!;
+export const view = () => ({...board().camera.view});
+export type View = ReturnType<typeof view>;
+export const sameView = (a: View, b: View) => JSON.stringify(a) === JSON.stringify(b);
+export const boardWindows = () => windows().filter(window => WINDOWS.some(([title]) => window.get_title()?.startsWith(title)));
+export const switching = () => Main.wm.workspaceAnimation.currentSwitch !== null;
+
+export function windowNamed(title: string): Meta.Window {
+  const window = boardWindows().find(candidate => candidate.get_title().startsWith(title));
+  if (!window) throw new Error(`No board window is titled ${title}`);
+  return window;
+}
+
+const onDevicePixel = (value: number) => {
+  const pixels = value * global.display.get_monitor_scale(Main.layoutManager.primaryIndex);
+  return Math.abs(pixels - Math.round(pixels)) < 1e-3;
+};
+
+export const onWholePixels = () => onDevicePixel(global.window_group.translation_x) && onDevicePixel(global.window_group.translation_y);
+
+export function noOverlap() {
+  const rects = boardWindows().filter(window => !window.minimized).map(window => window.get_frame_rect());
+  return rects.every((a, i) => rects.every((b, j) => i === j || !overlap(a, b)));
+}
+
+export function openBoardWindow(title: string, width: number, height: number, state = 'normal') {
+  return gjs('clients/windows/boardWindow.js', [title, `${width}`, `${height}`, state]);
+}
+
+export async function openWindows() {
+  for (const [title, width, height] of WINDOWS) openBoardWindow(title, width, height);
+  await Promise.all(WINDOWS.map(([title]) => waitForWindow(window => window.get_title()?.startsWith(title), `a window titled ${title} opens`)));
+}
+
+export async function boardResting() {
+  const {camera} = board();
+  await nextFrame();
+  await waitUntil(() => !camera.travelling && !camera.gliding && !camera.settling, 'the board view comes to rest');
+  await settled();
+}
+
+export function fourFingerSwipe(dy: number) {
+  for (const event of [touchpad.swipe('begin', 4), touchpad.swipe('update', 4, 0, dy), touchpad.swipe('end', 4)])
+    handleTouchpad(event);
+}
+
+export function doubleTapSuper() {
+  global.display.emit('overlay-key');
+  global.display.emit('overlay-key');
+}
+
+export async function showBoard() {
+  doubleTapSuper();
+  await waitUntil(() => board().shown, 'the board turns on');
+  await boardResting();
+}
+
+export async function leaveBoard() {
+  if (!board().shown) return;
+  board().toggle();
+  await waitUntil(() => !board().shown, 'the board turns off');
+  await settled();
+}

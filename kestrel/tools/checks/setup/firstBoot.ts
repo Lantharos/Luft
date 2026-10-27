@@ -1,0 +1,83 @@
+import Gio from 'gi://Gio';
+
+import {call} from '../lib/dbus.js';
+import {gjs, waitForWindow} from '../lib/processes.js';
+import {pause} from '../lib/wait.js';
+import type {Point} from '../lib/input/input.js';
+import {eventually, require, Setup} from './lib/driver.js';
+
+const AT = {
+  back: [85, 547],
+  code: [690, 547],
+  later: [560, 547],
+  notNow: [575, 547],
+  addFingerprint: [690, 547],
+  continue: [722, 547],
+  restart: [720, 547],
+} satisfies Record<string, Point>;
+const HANDOFF = 5000;
+
+async function checkSecureBoot(setup: Setup) {
+  await setup.shot('secure-boot');
+  await setup.click(AT.code, 'asking for the code shows it');
+  await setup.called('EnrollSigningKey', 'the code comes from trustd, which asks shim to add the key');
+  await setup.shot('secure-boot-code');
+  await setup.click(AT.later, 'restarting later moves on to fingerprints');
+}
+
+async function released(setup: Setup, times: number, label: string) {
+  await eventually(async () => (await setup.calls()).filter(call => call === 'fingerprint Release').length === times, label);
+  await setup.app.settle(() => true);
+}
+
+async function checkFingerprint(setup: Setup) {
+  await setup.shot('fingerprint');
+  await setup.click(AT.addFingerprint, 'adding a fingerprint starts scanning');
+  await setup.called('fingerprint EnrollStart right-index-finger', 'the right index finger is tried first');
+  await released(setup, 1, 'the reader is released once it says Windows already saved the finger');
+  await setup.shot('fingerprint-duplicate');
+  await setup.click(AT.back, 'going back from the refused finger shows the finger choice again');
+  await setup.shot('fingerprint-back');
+  await setup.click(AT.back, 'going back from the finger choice shows the Secure Boot code again');
+  await setup.click(AT.later, 'restarting later returns to fingerprints');
+  await setup.click(AT.addFingerprint, 'adding a fingerprint starts scanning');
+  await setup.called('fingerprint EnrollStart left-index-finger', 'the next finger is offered after the refused one');
+  await released(setup, 2, 'the reader is released once the finger is added');
+  await setup.shot('fingerprint-added');
+  await setup.click(AT.continue, 'continuing moves on');
+}
+
+async function checkHandoff(endSession: () => Promise<void>) {
+  gjs('clients/windows/window.js', [], {env: {GDK_BACKEND: 'x11'}});
+  await waitForWindow('Kestrel window check', 'an X11 window is open next to setup when it finishes');
+  await endSession();
+  await call('com.lantharos.Kestrel.Setup', '/com/lantharos/Kestrel/Setup', 'com.lantharos.Kestrel.Setup', 'Finish', null, null,
+    {connection: Gio.DBus.session});
+  await pause(HANDOFF);
+  throw new Error('Kestrel kept running after setup finished');
+}
+
+async function checkKeyAlreadyTrusted() {
+  const setup = new Setup();
+  await setup.setSigningKey('enrolled');
+  await setup.open();
+  await setup.shot('first-boot-trusted');
+  await setup.click(AT.notNow, 'setup opens on fingerprints when the computer already trusts Luft');
+  require(!(await setup.calls()).includes('EnrollSigningKey'), 'no code is asked for when the computer already trusts Luft');
+  await setup.close();
+  await setup.setSigningKey('none');
+}
+
+export async function checkFirstBoot(endSession: () => Promise<void>) {
+  const setup = new Setup();
+  await setup.setPhase('first-boot');
+  await checkKeyAlreadyTrusted();
+  await setup.open();
+  await checkSecureBoot(setup);
+  await checkFingerprint(setup);
+  await setup.shot('ready');
+  setup.tap(AT.restart);
+  await setup.called('installer FinishFirstBoot', 'finishing tells the installer setup is done');
+  await eventually(async () => (await setup.calls()).includes('Reboot'), 'adding Luft’s key needs a restart to finish');
+  await checkHandoff(endSession);
+}

@@ -1,7 +1,7 @@
 import { mkdir, readdir, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
-import { KAOMOJI } from '../../ui/src/surfaces/emoji/catalog/kaomoji.ts';
+import { KAOMOJI } from '../../ui/src/surfaces/emoji/catalog/kaomoji.js';
 
 const [cldr, emojiPath, charactersPath, output, depfile] = process.argv.slice(2);
 const FOLDERS = ['annotations', 'annotationsDerived'];

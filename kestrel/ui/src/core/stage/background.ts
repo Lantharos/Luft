@@ -43,7 +43,7 @@ export class BackgroundManager extends EventEmitter {
   backgroundActor: BackgroundActor;
   private newBackgroundActor: BackgroundActor | null = null;
   private readonly backgroundSource: BackgroundSource;
-  private readonly container: Clutter.Actor;
+  readonly container: Clutter.Actor;
   private readonly layoutManager: LayoutManager;
   private readonly monitorIndex: number;
   private readonly vignette: boolean;

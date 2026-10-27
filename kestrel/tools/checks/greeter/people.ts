@@ -1,0 +1,81 @@
+import Clutter from 'gi://Clutter';
+import Gio from 'gi://Gio';
+import GLib from 'gi://GLib';
+import St from 'gi://St';
+
+import {existing, named, shown, styled} from '../lib/actors.js';
+import {click, press, type} from '../lib/input/input.js';
+import {capture} from '../lib/screenshots.js';
+import {eventually, events, lastSessionStart, promptState, require} from './lib/prompt.js';
+
+function accentStylesheet() {
+  const file = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_user_runtime_dir(), 'kestrel', GLib.getenv('WAYLAND_DISPLAY')!, 'greeter-accent-dark.css']));
+  return new TextDecoder().decode(file.load_contents(null)[1]);
+}
+
+const typed = (text: string) => promptState().entry?.text === text;
+
+export async function checkPeople() {
+  const background = new Gio.Settings({schema_id: 'org.gnome.desktop.background'});
+
+  press(Clutter.KEY_space);
+  await eventually(() => shown(named('kestrel-greeter-users')) && shown(named('kestrel-greeter-controls')),
+    'waking the screen shows the people and controls');
+  const users = existing('kestrel-greeter-users');
+  require(typed(''), 'the key that wakes the screen is not typed into the field');
+  require(global.stage.context.get_backend().get_default_seat().get_keymap().get_num_lock_state(), 'Num Lock is on, as the last session left it');
+  const rows = styled('kestrel-greeter-user', users).filter((row): row is St.Button => row instanceof St.Button && row.mapped);
+  require(rows.map(row => row.accessible_name).join(', ') === 'Mara Lindqvist, Theo Brandt, Another account',
+    'people are listed by name with a way to type a hidden account');
+  await eventually(() => rows[0].checked && lastSessionStart() === 'mara', 'the person who signed in most recently is ready to sign in');
+  await eventually(() => promptState().message === 'Welcome back, Mara' && !promptState().warning,
+    'information from the sign-in steps is shown');
+  await capture('login-users');
+
+  type('tuli');
+  await eventually(() => promptState().secret && typed('tuli'), 'typing goes into a hidden password field');
+  await capture('login-password');
+  for (let index = 0; index < 4; index++) press(Clutter.KEY_BackSpace);
+  await eventually(() => typed(''), 'erasing empties the password field');
+
+  const firstAccent = accentStylesheet();
+  click(rows[1]);
+  await eventually(() => background.get_string('picture-uri-dark').endsWith('/users/2002/wallpaper.jpg'),
+    'choosing another person crossfades to their wallpaper');
+  await eventually(() => accentStylesheet() !== firstAccent, 'the accent color follows the chosen wallpaper');
+  await eventually(() => lastSessionStart() === 'theo' && promptState().warning && promptState().message === 'Your password expires in 3 days',
+    'warnings from the sign-in steps stand out');
+  await capture('login-switch-user');
+
+  type('sunflower');
+  await eventually(() => typed('sunflower'), 'the password is typed');
+  press(Clutter.KEY_Return);
+  await eventually(() => promptState().message === 'That password didn’t work' &&
+    events().some(event => event.type === 'authentication-failed' && event.username === 'theo'), 'a wrong password says so');
+  await eventually(() => typed('') && promptState().entry?.reactive && promptState().secret,
+    'the password field is cleared and ready for another try');
+  await capture('login-wrong-password');
+
+  click(rows[2]);
+  await eventually(() => !promptState().secret && promptState().hint === 'Username', 'another account asks for a username first');
+  require(background.get_string('picture-uri-dark') === background.get_default_value('picture-uri-dark')?.unpack(),
+    'another account shows Luft’s own wallpaper behind the prompt');
+  await capture('login-another-account');
+  const user = GLib.get_user_name();
+  type(user);
+  await eventually(() => typed(user), 'the username is typed');
+  press(Clutter.KEY_Return);
+  const uid = new Gio.Credentials().get_unix_user();
+  const state = GLib.getenv('KESTREL_GREETER_STATE_DIR');
+  await eventually(() => background.get_string('picture-uri-dark') === Gio.File.new_for_path(`${state}/users/${uid}/wallpaper.jpg`).get_uri(),
+    'a typed username shows that person’s wallpaper');
+  const [, focusY] = new Gio.Settings({schema_id: 'com.lantharos.kestrel'}).get_value('wallpaper-focus-dark').deepUnpack<[number, number]>();
+  require(focusY === 0.75, 'their wallpaper keeps the part they chose on screen');
+  await eventually(() => lastSessionStart() === user && promptState().secret && promptState().hint === 'Password',
+    'then asks for their password');
+  press(Clutter.KEY_Escape);
+  await eventually(() => promptState().hint === 'Username', 'going back returns to the username');
+
+  click(rows[0]);
+  await eventually(() => lastSessionStart() === 'mara' && promptState().secret, 'choosing a listed person again starts over for them');
+}

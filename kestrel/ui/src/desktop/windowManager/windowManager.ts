@@ -53,9 +53,9 @@ export class WindowManager {
   private readonly allowedKeybindings = new Map<string, Shell.ActionMode>();
   private readonly cornerSnap = new CornerSnap((window, rect, monitorIndex) => this.showCornerPreview(window, rect, monitorIndex),
     window => this.morphWindow(window));
-  private readonly windowMenuManager: WindowMenuManager;
+  readonly windowMenuManager: WindowMenuManager;
   private readonly workspaceTracker: WorkspaceTracker | null;
-  private readonly workspaceAnimation: WorkspaceAnimationController;
+  readonly workspaceAnimation: WorkspaceAnimationController;
   private tileRequest: TileRequest | null = null;
   private tilePreview: TilePreview | null = null;
   private resizePopup: ResizePopup | null = null;
@@ -170,6 +170,14 @@ export class WindowManager {
 
     const activeIndex = workspaceManager.get_active_workspace_index();
     if (activeIndex >= pos) workspaceManager.get_workspace_by_index(activeIndex + 1)!.activate(global.get_current_time());
+  }
+
+  get previewingTile(): boolean {
+    return this.tilePreview?.showing ?? false;
+  }
+
+  get switcherPopup(): WorkspaceSwitcherPopup | null {
+    return this.workspaceSwitcherPopup;
   }
 
   blockWorkspaceUpdates(): void {

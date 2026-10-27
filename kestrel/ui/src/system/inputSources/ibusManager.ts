@@ -56,8 +56,8 @@ class IBusManager extends EventEmitter {
   declare connect: GObject.SignalMethods<this, IBusManagerSignals>['connect'];
   declare emit: GObject.SignalMethods<this, IBusManagerSignals>['emit'];
 
-  private readonly candidatePopup = new CandidatePopup();
-  private readonly ibus: IBus.Bus;
+  readonly candidatePopup = new CandidatePopup();
+  readonly ibus: IBus.Bus;
   private panelService: IBus.PanelService | null = null;
   private currentCaret: CursorLocation | null = null;
   private engines = new Map<string, IBus.EngineDesc>();
@@ -86,6 +86,18 @@ class IBusManager extends EventEmitter {
 
   get caret(): CursorLocation | null {
     return this.currentCaret;
+  }
+
+  get isReady(): boolean {
+    return this.ready;
+  }
+
+  get engineName(): string | null {
+    return this.currentEngineName;
+  }
+
+  get daemonGuid(): string | null {
+    return this.connection?.get_guid() ?? null;
   }
 
   private async systemdServiceExists(): Promise<boolean> {

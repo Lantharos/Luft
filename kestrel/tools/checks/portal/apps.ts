@@ -1,0 +1,146 @@
+import Clutter from 'gi://Clutter';
+import Gio from 'gi://Gio';
+import GioUnix from 'gi://GioUnix';
+import GLib from 'gi://GLib';
+import St from 'gi://St';
+import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
+
+import {descendants, labelled, ofType, showsText, styled} from '../lib/actors.js';
+import {checks} from '../lib/check.js';
+import {privateConnection, subscribe} from '../lib/dbus.js';
+import {click} from '../lib/input/input.js';
+import {BACKEND, call, PORTAL_PATH, portalDialog, requestHandle} from '../lib/access/portal.js';
+import {scratch} from '../lib/processes.js';
+import {capture} from '../lib/screenshots.js';
+import {pause, settled} from '../lib/wait.js';
+
+const {require, eventually} = checks('portal');
+
+type Invocation = [string, string, string, ...unknown[]];
+
+async function openedDialog(label: string) {
+  await eventually(() => portalDialog(), label);
+  await settled();
+  return ofType(portalDialog(), St.Widget);
+}
+
+async function checkAppChooser() {
+  const ids = Gio.AppInfo.get_recommended_for_type('text/plain').map(info => info.get_id()!.replace(/\.desktop$/, ''));
+  require(ids.length >= 2, 'the session has apps for text files to choose from');
+  const handle = requestHandle();
+  const chosen = call('AppChooser', 'ChooseApplication', new GLib.Variant('(ossasa{sv})', [handle, 'com.lantharos.rover', '', ids.slice(0, 1), {
+    content_type: new GLib.Variant('s', 'text/plain'),
+    filename: new GLib.Variant('s', 'Shopping list.txt'),
+    last_choice: new GLib.Variant('s', ids[1]),
+  }]), '(ua{sv})');
+  const dialog = await openedDialog('opening a file asks which app to use');
+  await call('AppChooser', 'UpdateChoices', new GLib.Variant('(oas)', [handle, ids.slice(0, 3)]), null);
+  const rows = () => styled('kestrel-portal-row', dialog);
+  await eventually(() => rows().length === Math.min(ids.length, 3) && ofType(rows()[0], St.Button).checked, 'the app chooser lists new apps and starts on the last choice');
+  await capture('portal-app-chooser');
+  click(ofType(labelled('Open', dialog), Clutter.Actor));
+  const [response, results] = (await chosen).recursiveUnpack();
+  require(response === 0 && results.choice === ids[1], 'the chosen app is handed back');
+}
+
+async function checkDynamicLauncher() {
+  const bytes = new TextEncoder().encode('<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="64" height="64" rx="14" fill="#6b8cff"/></svg>');
+  const icon = new Gio.BytesIcon({bytes: new GLib.Bytes(bytes)}).serialize()!;
+  const prepared = call('DynamicLauncher', 'PrepareInstall', new GLib.Variant('(osssva{sv})', [requestHandle(), 'org.mozilla.firefox', '', 'Weather', icon, {
+    launcher_type: new GLib.Variant('u', 2),
+    target: new GLib.Variant('s', 'https://weather.example.org/today'),
+  }]), '(ua{sv})');
+  const dialog = await openedDialog('installing a web app asks first');
+  require(showsText('weather.example.org will open in its own window from Start.', dialog), 'web apps name the site they open');
+  await capture('portal-web-app');
+  ofType(descendants(dialog).find(actor => actor instanceof St.Entry) ?? null, St.Entry).text = 'Forecast';
+  click(ofType(labelled('Add', dialog), Clutter.Actor));
+  const [response, results] = (await prepared).deepUnpack();
+  require(response === 0 && results.name.unpack() === 'Forecast' && results.icon.unpack<GLib.Variant>().equal(icon), 'the edited name and the icon are handed back');
+  const token = (appId: string) => call('DynamicLauncher', 'RequestInstallToken', new GLib.Variant('(sa{sv})', [appId, {}]), '(u)').then(reply => reply.deepUnpack()[0]);
+  require(await token('com.lantharos.schelf') === 0 && await token('org.example.Random') === 2, 'only Schelf installs launchers without asking');
+}
+
+async function checkEmail() {
+  const sent = scratch('kestrel-mailto.txt');
+  const applications = GLib.build_filenamev([GLib.get_user_data_dir(), 'applications']);
+  GLib.mkdir_with_parents(applications, 0o755);
+  const desktop = GLib.build_filenamev([applications, 'com.lantharos.MailCheck.desktop']);
+  GLib.file_set_contents(desktop, `[Desktop Entry]\nType=Application\nName=Mail Check\nExec=sh -c 'printf %%s "$1" > ${sent}' mail %u\nMimeType=x-scheme-handler/mailto;\nNoDisplay=true\n`);
+  const previous = Gio.AppInfo.get_default_for_uri_scheme('mailto');
+  const mail = () => GLib.file_test(sent, GLib.FileTest.EXISTS) ? new TextDecoder().decode(GLib.file_get_contents(sent)[1]) : null;
+  try {
+    GioUnix.DesktopAppInfo.new_from_filename(desktop)!.set_as_default_for_type('x-scheme-handler/mailto');
+    const [response] = (await call('Email', 'ComposeEmail', new GLib.Variant('(ossa{sv})', [requestHandle(), 'org.gnome.TextEditor', '', {
+      address: new GLib.Variant('s', 'theo@example.org'),
+      cc: new GLib.Variant('as', ['sam@example.org']),
+      subject: new GLib.Variant('s', 'Dinner & drinks'),
+      body: new GLib.Variant('s', 'See you at seven?'),
+    }]), '(ua{sv})')).deepUnpack();
+    require(response === 0, 'apps can compose emails');
+    await eventually(() => mail() === 'mailto:theo@example.org?cc=sam@example.org&subject=Dinner%20%26%20drinks&body=See%20you%20at%20seven%3F',
+      'emails open in the mail app with their recipients, subject and text');
+  } finally {
+    if (previous) previous.set_as_default_for_type('x-scheme-handler/mailto');
+    else Gio.AppInfo.reset_type_associations('x-scheme-handler/mailto');
+    GLib.unlink(desktop);
+    GLib.unlink(sent);
+  }
+}
+
+async function checkBackground() {
+  const [states] = (await call('Background', 'GetAppState', null, '(a{sv})')).deepUnpack();
+  require(typeof states === 'object', 'apps running in the background can be listed');
+  const [response, results] = (await call('Background', 'NotifyBackground', new GLib.Variant('(oss)', [requestHandle(), 'org.example.Player', 'Player']), '(ua{sv})')).recursiveUnpack();
+  require(response === 0 && results.result === 1, 'apps may keep running in the background');
+}
+
+async function checkNotification() {
+  const appId = 'com.lantharos.rover';
+  const name = GioUnix.DesktopAppInfo.new(`${appId}.desktop`)!.get_name();
+  const shows = () => Main.messageTray.getSources().some(source => source.title === name &&
+    source.notifications.some(notification => notification.title === 'Pick up the parcel'));
+  await call('Notification', 'AddNotification', new GLib.Variant('(ssa{sv})', [appId, 'reminder', {
+    title: new GLib.Variant('s', 'Pick up the parcel'),
+    body: new GLib.Variant('s', 'The shop closes at six.'),
+  }]), null);
+  await eventually(shows, 'apps can show notifications');
+  await call('Notification', 'RemoveNotification', new GLib.Variant('(ss)', [appId, 'reminder']), null);
+  await eventually(() => !shows(), 'apps can withdraw their notifications');
+}
+
+async function checkNotificationActions() {
+  const appId = 'com.obsproject.Studio';
+  const invoked: Invocation[] = [];
+  const unsubscribe = subscribe<Invocation>({sender: BACKEND, iface: 'org.freedesktop.impl.portal.Notification', member: 'ActionInvoked', path: PORTAL_PATH},
+    (_signal, parameters) => invoked.push(parameters));
+  const impostor = privateConnection();
+  try {
+    impostor.emit_signal(null, '/org/gtk/Notifications', 'org.gtk.Notifications', 'ActionInvoked',
+      new GLib.Variant('(sssava{sv})', [appId, 'recording', 'stop', [], {}]));
+    await pause(500);
+    require(!invoked.length, 'other programs cannot pretend a notification was clicked');
+
+    await call('Notification', 'AddNotification', new GLib.Variant('(ssa{sv})', [appId, 'recording', {
+      title: new GLib.Variant('s', 'Recording'),
+      'default-action': new GLib.Variant('s', 'stop'),
+    }]), null);
+    const notification = () => Main.messageTray.getSources().flatMap(source => source.notifications).find(item => item.title === 'Recording');
+    (await eventually(notification, 'apps can show notifications with actions')).activate();
+    await eventually(() => invoked.some(([app, id, action]) => app === appId && id === 'recording' && action === 'stop'),
+      'clicking a notification reaches the app that sent it');
+  } finally {
+    unsubscribe();
+    impostor.close_sync(null);
+    await call('Notification', 'RemoveNotification', new GLib.Variant('(ss)', [appId, 'recording']), null);
+  }
+}
+
+export async function run() {
+  await checkAppChooser();
+  await checkDynamicLauncher();
+  await checkEmail();
+  await checkBackground();
+  await checkNotification();
+  await checkNotificationActions();
+}

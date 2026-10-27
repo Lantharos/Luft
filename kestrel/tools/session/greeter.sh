@@ -8,7 +8,7 @@ if [[ $# -ne 0 ]]; then
 fi
 # shellcheck source-path=SCRIPTDIR
 source "$(dirname "$0")/environment.sh"
-fixtures="$tools/fixtures/greeter"
+fixtures="$built_tools/fixtures/greeter"
 prepare_session "${KESTREL_SESSION_DIR:-$root/kestrel/run}" greeter
 run="$session/greeter"
 events="$run/events.jsonl"
@@ -62,5 +62,5 @@ export XDG_CONFIG_HOME="$run/config" XDG_STATE_HOME="$run/state-home"
 mkdir -p "$KESTREL_CAPTURE_DIR"
 
 dbus-run-session -- meson devenv -C "$build" "$build/src/kestrel" --greeter \
-  --headless --virtual-monitor "${KESTREL_CAPTURE_SIZE:-1440x900}" --automation-script "$tools/automation/greeter.js"
+  --headless --virtual-monitor "${KESTREL_CAPTURE_SIZE:-1440x900}" --automation-script "$built_tools/automation/greeter.js"
 gjs -m "$fixtures/signedIn.js" "$events"

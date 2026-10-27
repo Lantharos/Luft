@@ -21,14 +21,14 @@ usage() {
 
 all_groups() {
   local area laptop
-  (cd "$tools/checks" && find . -mindepth 2 -maxdepth 2 -name '*.js' -not -path './lib/*' -not -path './greeter/*' -not -path './setup/*' -not -path './scaling/*') \
-    | sed 's|^\./||; s|\.js$||; s|/|:|' | sort
+  (cd "$tools/checks" && find . -mindepth 2 -maxdepth 2 -name '*.ts' -not -path './lib/*' -not -path './greeter/*' -not -path './setup/*' -not -path './scaling/*') \
+    | sed 's|^\./||; s|\.ts$||; s|/|:|' | sort
   for laptop in "${!laptops[@]}"; do
     for area in "${laptop_areas[@]}"; do
       if [[ "$area" == *:* ]]; then
         echo "$area+$laptop"
       else
-        (cd "$tools/checks/$area" && find . -maxdepth 1 -name '*.js') | sed "s|^\./|$area:|; s|\.js$|+$laptop|"
+        (cd "$tools/checks/$area" && find . -maxdepth 1 -name '*.ts') | sed "s|^\./|$area:|; s|\.ts$|+$laptop|"
       fi
     done
   done | sort

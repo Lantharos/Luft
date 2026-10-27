@@ -143,7 +143,7 @@ export class LockBackdrop {
   readonly actor: Clutter.Actor;
   loaded!: Promise<void[]>;
   private readonly offscreen: boolean;
-  private monitors: MonitorBackdrop[] = [];
+  private backdrops: MonitorBackdrop[] = [];
 
   constructor({ offscreen = false }: LockBackdropOptions = {}) {
     this.actor = new Clutter.Actor({ opacity: offscreen ? 0 : 255 });
@@ -157,16 +157,20 @@ export class LockBackdrop {
     this.rebuild();
   }
 
+  get monitors(): readonly MonitorBackdrop[] {
+    return this.backdrops;
+  }
+
   private destroyMonitors(): void {
-    for (const monitor of this.monitors) monitor.destroy();
-    this.monitors = [];
+    for (const monitor of this.backdrops) monitor.destroy();
+    this.backdrops = [];
   }
 
   private rebuild(): void {
     this.destroyMonitors();
     this.actor.destroy_all_children();
-    this.monitors = Main.layoutManager.monitors.map((monitor: Monitor, monitorIndex: number) =>
+    this.backdrops = Main.layoutManager.monitors.map((monitor: Monitor, monitorIndex: number) =>
       new MonitorBackdrop(this.actor, monitor, monitorIndex, this.offscreen));
-    this.loaded = Promise.all(this.monitors.map(monitor => monitor.shown));
+    this.loaded = Promise.all(this.backdrops.map(monitor => monitor.shown));
   }
 }

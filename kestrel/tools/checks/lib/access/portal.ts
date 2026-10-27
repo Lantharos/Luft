@@ -1,0 +1,31 @@
+import Gio from 'gi://Gio';
+import GLib from 'gi://GLib';
+
+import {shownStyled} from '../actors.js';
+
+export const BACKEND = 'org.freedesktop.impl.portal.desktop.kestrel';
+export const PORTAL_PATH = '/org/freedesktop/portal/desktop';
+const SERVICE = 'com.lantharos.Kestrel.Portal';
+const SERVED = new Set(['Account', 'AppChooser', 'DynamicLauncher', 'Email', 'Lockdown', 'Print', 'Usb', 'Wallpaper']);
+
+export const backendOf = (iface: string) => SERVED.has(iface) ? SERVICE : BACKEND;
+
+let requests = 0;
+
+export function call<S extends string = string>(iface: string, method: string, parameters: GLib.Variant | null, replyType: S | null,
+  path = PORTAL_PATH): Promise<GLib.Variant<S>> {
+  return Gio.DBus.session.call(backendOf(iface), path, `org.freedesktop.impl.portal.${iface}`, method, parameters,
+    replyType ? new GLib.VariantType(replyType) : null, Gio.DBusCallFlags.NONE, -1, null);
+}
+
+export function requestHandle() {
+  return `/org/freedesktop/portal/desktop/request/kestrel/check${++requests}`;
+}
+
+export function sessionHandle() {
+  return `/org/freedesktop/portal/desktop/session/kestrel/check${++requests}`;
+}
+
+export function portalDialog() {
+  return shownStyled('kestrel-portal-dialog');
+}

@@ -1,7 +1,7 @@
 import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
-import { TABS, type SectionSource } from './characterGroups.ts';
+import { TABS, type SectionSource } from './characterGroups.js';
 
 const SOURCE = process.argv[2] ?? 'https://www.unicode.org/Public/UCD/latest/ucd';
 const OUTPUT = join(import.meta.dir, '../../engine/data/characters.json');

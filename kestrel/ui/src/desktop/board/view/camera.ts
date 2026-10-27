@@ -58,6 +58,14 @@ export class Camera {
     return this.tween.is_playing();
   }
 
+  get gliding(): boolean {
+    return this.momentum.is_playing();
+  }
+
+  get settling(): boolean {
+    return this.settleTimer !== 0;
+  }
+
   engage(view: View, pixelScale: number): void {
     this.engaged = true;
     this.pixel = 1 / pixelScale;

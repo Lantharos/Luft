@@ -1,5 +1,7 @@
 import Clutter from 'gi://Clutter';
 
+import { gestureEvent } from './gestureEvent.js';
+
 // A touchscreen works like one big touchpad: three or more fingers swipe and two pinch, for whatever takes the
 // touchpad's gestures. Fingers nothing wants stay with the app under them, or the desktop's own workspace swipe.
 const SWIPE_FINGERS = 3;
@@ -42,26 +44,13 @@ function shapeOf(gesture: Clutter.Gesture): Shape {
 
 const slotOf = (event: Clutter.Event) => event.get_event_sequence()?.get_slot() ?? -1;
 
-// Stands in for a touchpad gesture event. Gestures that track the touchpad's height cover half the screen's,
-// since a hand travels further over a screen than a touchpad
+// Gestures that track the touchpad's height cover half the screen's, since a hand travels further over a screen than a touchpad
 function touchpadEvent(type: Clutter.EventType, phase: Clutter.TouchpadGesturePhase, shape: Shape, delta: Point, scale: number): Clutter.Event {
   const device = {
-    get_dimensions: () => [true, global.screen_width / 2 / UNITS_PER_MM, global.screen_height / 2 / UNITS_PER_MM],
+    get_dimensions: (): [boolean, number, number] => [true, global.screen_width / 2 / UNITS_PER_MM, global.screen_height / 2 / UNITS_PER_MM],
     get_device_type: () => Clutter.InputDeviceType.TOUCHSCREEN_DEVICE,
   };
-  const time = shape.time;
-  return {
-    type: () => type,
-    get_gesture_phase: () => phase,
-    get_touchpad_gesture_finger_count: () => shape.fingers,
-    get_time: () => time,
-    get_coords: () => shape.center,
-    get_gesture_motion_delta: () => delta,
-    get_gesture_motion_delta_unaccelerated: () => delta,
-    get_gesture_pinch_scale: () => scale,
-    get_state: () => 0,
-    get_source_device: () => device,
-  } as unknown as Clutter.Event;
+  return gestureEvent({ type, phase, fingers: shape.fingers, time: shape.time, coords: shape.center, delta, scale, device });
 }
 
 class TouchGesture {

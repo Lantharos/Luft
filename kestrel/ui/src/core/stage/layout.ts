@@ -61,7 +61,7 @@ export const LayoutManager = GObject.registerClass({
   private readonly chrome = new ChromeTracker(actor => this.findMonitorForActor(actor));
   private readonly inputPanelGroup: Clutter.Actor;
   private readonly bgGroup: Meta.BackgroundGroup;
-  private readonly backgrounds: MonitorBackgrounds;
+  readonly backgrounds: MonitorBackgrounds;
   private systemBackground: Clutter.Actor | null = null;
   private coverPane: Clutter.Actor | null = null;
   private backdropStore: LockBackdrop | null = null;

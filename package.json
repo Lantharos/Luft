@@ -1,5 +1,5 @@
 {
 	"name": "luft",
 	"private": true,
-	"workspaces": ["apps/*", "kestrel/types", "kestrel/ui", "packages/i18n", "packages/web/*", "web/*"]
+	"workspaces": ["apps/*", "kestrel/tools", "kestrel/types", "kestrel/ui", "packages/i18n", "packages/web/*", "web/*"]
 }

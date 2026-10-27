@@ -149,13 +149,29 @@ export class MessageTray extends St.Widget {
     this.updateState();
   }
 
-  private expireNotification(): void {
+  expireNotification(): void {
     this.notificationExpired = true;
     this.updateState();
   }
 
   get queueCount(): number {
     return this.notificationQueue.length;
+  }
+
+  get queuedNotifications(): readonly Notification[] {
+    return this.notificationQueue;
+  }
+
+  get activeNotification(): Notification | null {
+    return this.notification;
+  }
+
+  get activeBanner(): NotificationBanner | null {
+    return this.banner;
+  }
+
+  get bannerState(): State {
+    return this.notificationState;
   }
 
   set bannerBlocked(blocked: boolean) {

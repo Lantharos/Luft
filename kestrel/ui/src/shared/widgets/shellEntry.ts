@@ -110,6 +110,10 @@ function onPopup(entry: MenuEntry, menu: EntryMenu): void {
   menu.open();
 }
 
+export function contextMenuOf(entry: St.Entry): EntryMenu | null {
+  return (entry as MenuEntry).menu ?? null;
+}
+
 export function addContextMenu(target: St.Entry, { actionMode = Shell.ActionMode.POPUP }: { actionMode?: Shell.ActionMode } = {}): void {
   const entry = target as MenuEntry;
   if (entry.menu) return;

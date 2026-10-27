@@ -1,0 +1,10 @@
+{
+  "extends": "../ui/tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "resource:///com/lantharos/kestrel/kestrel.js": ["../ui/src/kestrel.ts"]
+    }
+  },
+  "include": ["automation", "checks", "fixtures", "frames", "motion", "tools.d.ts", "../ui/src/*.d.ts", "../types/gir/*.d.ts"],
+  "exclude": []
+}

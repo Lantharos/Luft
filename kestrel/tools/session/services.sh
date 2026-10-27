@@ -12,6 +12,7 @@ shift 2
 # shellcheck source-path=SCRIPTDIR
 source "$(dirname "$0")/environment.sh"
 fixtures="$tools/fixtures"
+built_fixtures="$built_tools/fixtures"
 pids=()
 
 stop_services() {
@@ -80,11 +81,11 @@ ln -sfn "$XDG_RUNTIME_DIR/dconf" "$KESTREL_APP_RUNTIME_DIR/dconf"
 rm -f "$KESTREL_AUTHENTICATE_SOCK" "$KESTREL_READY_SOCK"
 start_system_bus
 start gjs -m "$build/ui/kestrel-session.js"
-system_services="$fixtures/system/systemBus.js"
-[[ "$mode" == setup ]] && system_services="$fixtures/setup/systemBus.js"
+system_services="$built_fixtures/system/systemBus.js"
+[[ "$mode" == setup ]] && system_services="$built_fixtures/setup/systemBus.js"
 DBUS_SYSTEM_BUS_ADDRESS="$system_bus" start gjs -m "$system_services"
 DBUS_SYSTEM_BUS_ADDRESS="$system_bus" start "$fixtures/session/printServer.sh" "$session/cups" "$CUPS_SERVER"
-start gjs -m "$fixtures/auth/authenticator.js" "$KESTREL_AUTHENTICATE_SOCK"
+start gjs -m "$built_fixtures/auth/authenticator.js" "$KESTREL_AUTHENTICATE_SOCK"
 start pipewire -c "$fixtures/session/pipewire.conf"
 gdbus wait --session --timeout 10 org.gnome.SessionManager
 gdbus wait --address "$system_bus" --timeout 10 com.lantharos.KestrelChecks

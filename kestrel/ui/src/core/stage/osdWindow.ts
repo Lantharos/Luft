@@ -28,7 +28,7 @@ export class OsdWindow extends Clutter.Actor {
   private readonly hbox = new St.BoxLayout({ style_class: 'osd-window' });
   private readonly icon = new St.Icon({ y_expand: true });
   private readonly vbox = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, y_align: Clutter.ActorAlign.CENTER });
-  private readonly caption = new St.Label();
+  readonly caption = new St.Label();
   private readonly level = new BarLevel.BarLevel({ style_class: 'level' });
   private hideTimeoutId = 0;
 
@@ -139,7 +139,7 @@ export class OsdWindow extends Clutter.Actor {
 }
 
 export class OsdWindowManager {
-  private readonly osdWindows: OsdWindow[] = [];
+  readonly osdWindows: OsdWindow[] = [];
 
   constructor() {
     Main.layoutManager.connect('monitors-changed', () => this.monitorsChanged());

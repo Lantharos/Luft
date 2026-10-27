@@ -1,5 +1,5 @@
 import { createContext } from 'svelte';
-import type { FileEntry } from '#lib/types/index.js';
+import type { FileEntry } from '#lib/bindings.js';
 import type { VcsState } from '#lib/vcs/state.svelte.js';
 import type { ChooserState } from '../chooser.svelte';
 import type { DragController } from '../drag/controller.svelte';

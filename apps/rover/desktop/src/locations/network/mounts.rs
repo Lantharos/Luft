@@ -2,26 +2,27 @@ use std::sync::mpsc;
 
 use gio::prelude::*;
 use serde::Serialize;
+use specta::Type;
 
 const DEVICE_SCHEMES: &[&str] = &["mtp", "gphoto2", "afc"];
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
-pub struct Location {
+pub struct NetworkLocation {
     name: String,
     uri: String,
     path: String,
     device: bool,
 }
 
-fn location(mount: &gio::Mount) -> Option<Location> {
+fn location(mount: &gio::Mount) -> Option<NetworkLocation> {
     let root = mount.root();
     let uri = root.uri().to_string();
     let scheme = root.uri_scheme()?.to_string();
     if scheme == "file" {
         return None;
     }
-    Some(Location {
+    Some(NetworkLocation {
         name: mount.name().to_string(),
         path: root.path()?.to_string_lossy().into_owned(),
         device: DEVICE_SCHEMES.contains(&scheme.as_str()),
@@ -29,7 +30,7 @@ fn location(mount: &gio::Mount) -> Option<Location> {
     })
 }
 
-pub fn list() -> Vec<Location> {
+pub fn list() -> Vec<NetworkLocation> {
     gio::VolumeMonitor::get()
         .mounts()
         .iter()
@@ -37,7 +38,7 @@ pub fn list() -> Vec<Location> {
         .collect()
 }
 
-pub fn locate(file: &gio::File) -> Result<Location, String> {
+pub fn locate(file: &gio::File) -> Result<NetworkLocation, String> {
     let mount = file
         .find_enclosing_mount(gio::Cancellable::NONE)
         .map_err(|error| explain(&error))?;

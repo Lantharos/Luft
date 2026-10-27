@@ -1,10 +1,11 @@
 use luft_app::Activation;
 use serde::Serialize;
+use specta::Type;
 use url::Url;
 
 pub const REVEAL: &str = "--reveal";
 
-#[derive(Clone, Serialize)]
+#[derive(Clone, Serialize, Type)]
 pub struct Launch {
     paths: Vec<String>,
     reveal: bool,
@@ -23,7 +24,10 @@ pub fn resolve(activation: &Activation) -> Launch {
     }
     Launch {
         paths,
-        reveal: activation.arguments().iter().any(|argument| argument == REVEAL),
+        reveal: activation
+            .arguments()
+            .iter()
+            .any(|argument| argument == REVEAL),
     }
 }
 

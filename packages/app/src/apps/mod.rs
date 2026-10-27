@@ -2,8 +2,9 @@ mod icons;
 
 use gio::prelude::*;
 use serde::Serialize;
+use specta::Type;
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Type)]
 pub struct App {
     pub id: String,
     pub name: String,

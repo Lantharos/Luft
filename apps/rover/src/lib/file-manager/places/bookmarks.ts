@@ -1,6 +1,6 @@
-import * as api from '#lib/bridge/index.js';
+import { commands } from '#lib/bindings.js';
+import type { FileEntry, PinnedFolder } from '#lib/bindings.js';
 import { settings } from '#lib/state/settings.svelte.js';
-import type { FileEntry, PinnedFolder } from '#lib/types/index.js';
 import { fileKind } from '#lib/utils/kinds.js';
 
 export function isPinned(path: string) {
@@ -16,7 +16,7 @@ function pin(bookmarks: PinnedFolder[]) {
 
 export async function pinPaths(paths: string[], known: FileEntry[]) {
 	const byPath = new Map(known.map((entry) => [entry.path, entry]));
-	const entries = await Promise.all(paths.map((path) => byPath.get(path) ?? api.getFileInfo(path).catch(() => null)));
+	const entries = await Promise.all(paths.map((path) => byPath.get(path) ?? commands.getFileInfo({ path }).catch(() => null)));
 	pin(entries.filter((entry): entry is FileEntry => Boolean(entry)).map(bookmarkFor));
 }
 

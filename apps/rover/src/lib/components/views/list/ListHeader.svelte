@@ -2,10 +2,10 @@
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import ChevronUp from '@lucide/svelte/icons/chevron-up';
 	import { on } from 'svelte/events';
+	import type { ListColumnId, SortBy } from '#lib/bindings.js';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
 	import { COLUMN_SORT, columnLabel, type ListColumns } from '#lib/file-manager/view/list-columns.svelte.js';
 	import { settings } from '#lib/state/settings.svelte.js';
-	import type { ListColumnId, SortBy } from '#lib/types/index.js';
 
 	interface Props {
 		manager: FileManager;

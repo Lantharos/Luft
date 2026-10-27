@@ -7,10 +7,12 @@ use gio::glib;
 use gio::prelude::*;
 use luft_app::Events;
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
-use super::discover::{self, Place};
-use super::mounts::{self, Location};
+use super::discover;
+use super::mounts::{self, NetworkLocation};
 use crate::app::events::{NETWORK_ASK as ASK, NETWORK_CHANGED as CHANGED};
+use crate::app::settings::NetworkPlace;
 
 static NEXT_REQUEST: AtomicU32 = AtomicU32::new(1);
 
@@ -24,13 +26,13 @@ pub struct Session {
     events: Events,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(
     rename_all = "camelCase",
     rename_all_fields = "camelCase",
     tag = "kind"
 )]
-enum Ask {
+pub enum NetworkAsk {
     Password {
         id: u32,
         message: String,
@@ -52,7 +54,7 @@ enum Ask {
     },
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Answer {
     id: u32,
@@ -105,14 +107,14 @@ impl Session {
             .map_err(|_| "The network connection stopped".to_owned())
     }
 
-    pub fn locations(&self) -> Vec<Location> {
+    pub fn locations(&self) -> Vec<NetworkLocation> {
         self.call(|reply| {
             let _ = reply.send(mounts::list());
         })
         .unwrap_or_default()
     }
 
-    pub fn connect(&self, uri: String) -> Result<Location, String> {
+    pub fn connect(&self, uri: String) -> Result<NetworkLocation, String> {
         let events = self.events.clone();
         self.call(move |reply| {
             let file = gio::File::for_uri(&uri);
@@ -126,7 +128,7 @@ impl Session {
                 gio::Cancellable::NONE,
                 move |result| {
                     WAITING.with_borrow_mut(|waiting| waiting.remove(&id));
-                    events.emit(ASK, Ask::Done { id });
+                    events.emit(ASK, NetworkAsk::Done { id });
                     let mounted = match result {
                         Err(error) if !error.matches(gio::IOErrorEnum::AlreadyMounted) => {
                             Err(mounts::explain(&error))
@@ -175,7 +177,7 @@ impl Session {
         self.call(move |reply| mounts::unmount(&uri, reply))?
     }
 
-    pub fn discover(&self) -> Result<Vec<Place>, String> {
+    pub fn discover(&self) -> Result<Vec<NetworkPlace>, String> {
         self.call(discover::browse)?
     }
 }
@@ -186,7 +188,7 @@ fn operation(id: u32, events: Events) -> gio::MountOperation {
     operation.connect_ask_password(move |_, message, user, domain, flags| {
         asking.emit(
             ASK,
-            Ask::Password {
+            NetworkAsk::Password {
                 id,
                 message: message.to_owned(),
                 user: user.to_owned(),
@@ -210,7 +212,7 @@ fn operation(id: u32, events: Events) -> gio::MountOperation {
             .unwrap_or_default();
         events.emit(
             ASK,
-            Ask::Question {
+            NetworkAsk::Question {
                 id,
                 message,
                 choices,

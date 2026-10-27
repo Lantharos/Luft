@@ -14,23 +14,24 @@ use serde::Serialize;
 
 use crate::app::events::SEARCH_RESULTS;
 use crate::files::entries::{FileEntry, file_entry};
-pub use matcher::Query;
+pub use matcher::SearchQuery;
 use matcher::{Found, Matcher};
+use specta::Type;
 
 const MAX_RESULTS: usize = 2000;
 const BATCH_WINDOW: Duration = Duration::from_millis(60);
 const VIRTUAL_ROOTS: [&str; 4] = ["/proc", "/sys", "/dev", "/run/user"];
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct SearchResult {
     #[serde(flatten)]
     entry: FileEntry,
     snippet: Option<String>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
-struct SearchUpdate {
+pub struct SearchUpdate {
     id: u64,
     results: Vec<SearchResult>,
     done: bool,
@@ -60,7 +61,7 @@ impl Search {
         }
     }
 
-    pub fn start(&self, query: Query) -> Result<u64, String> {
+    pub fn start(&self, query: SearchQuery) -> Result<u64, String> {
         let matcher = Matcher::new(&query)?;
         let root = PathBuf::from(&query.root);
         if !root.is_dir() {

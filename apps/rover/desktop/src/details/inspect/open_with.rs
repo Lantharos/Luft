@@ -2,14 +2,15 @@ use gio::prelude::*;
 use luft_app::apps::App;
 use luft_app::launch;
 use serde::Serialize;
+use specta::Type;
 
-#[derive(Serialize)]
-pub struct OpenWith {
+#[derive(Serialize, Type)]
+pub struct OpenWithApps {
     default: Option<App>,
     others: Vec<App>,
 }
 
-pub fn apps_for(path: &str) -> OpenWith {
+pub fn apps_for(path: &str) -> OpenWithApps {
     let Some(content_type) = gio::File::for_path(path)
         .query_info(
             gio::FILE_ATTRIBUTE_STANDARD_CONTENT_TYPE,
@@ -19,7 +20,7 @@ pub fn apps_for(path: &str) -> OpenWith {
         .ok()
         .and_then(|info| info.content_type())
     else {
-        return OpenWith {
+        return OpenWithApps {
             default: None,
             others: Vec::new(),
         };
@@ -34,7 +35,7 @@ pub fn apps_for(path: &str) -> OpenWith {
         .collect();
     others.sort_by_cached_key(|app| app.name.to_lowercase());
     others.dedup_by(|a, b| a.id == b.id);
-    OpenWith { default, others }
+    OpenWithApps { default, others }
 }
 
 pub fn launch(path: &str, app: &str, token: Option<&str>) -> Result<bool, String> {
@@ -54,6 +55,7 @@ fn open_in(app: &gio::AppInfo, file: &gio::File, token: Option<&str>) -> Result<
     if app.id().is_some_and(|id| id.starts_with(crate::APP_ID)) {
         return Ok(true);
     }
-    launch::open_files(app, std::slice::from_ref(file), token).map_err(|error| error.to_string())?;
+    launch::open_files(app, std::slice::from_ref(file), token)
+        .map_err(|error| error.to_string())?;
     Ok(false)
 }

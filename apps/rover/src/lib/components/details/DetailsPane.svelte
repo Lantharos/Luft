@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { basename, bytes, parent, plural } from '@luft/ui';
 	import { cubicOut } from 'svelte/easing';
+	import type { FileEntry } from '#lib/bindings.js';
 	import EntryIcon from '#lib/components/pane/EntryIcon.svelte';
 	import FilePreview from '#lib/components/preview/FilePreview.svelte';
 	import { EntryDetails } from '#lib/file-manager/inspect/details.svelte.js';
 	import { detailRows, tildePath, type DetailRow } from '#lib/file-manager/inspect/rows.js';
 	import { thumbnailOf } from '#lib/file-manager/listing/thumbnails.js';
 	import { entryContext } from '#lib/file-manager/view/entry-props.js';
-	import type { FileEntry } from '#lib/types/index.js';
 	import { fileKind, kindLabel } from '#lib/utils/kinds.js';
 	import OpenWith from './OpenWith.svelte';
 

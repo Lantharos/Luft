@@ -3,12 +3,13 @@ use std::io;
 use std::path::{Path, PathBuf};
 
 use serde::Deserialize;
+use specta::Type;
 
 use super::rename_no_replace;
 use crate::files::text::items;
 use crate::history::{History, Step};
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Renaming {
     pub path: String,
     pub name: String,

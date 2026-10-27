@@ -3,6 +3,7 @@ use std::path::Path;
 
 use luft_app::dbus::{self, failed};
 use serde::{Deserialize, Serialize};
+use specta::Type;
 use zbus::Variant;
 
 const SERVICE: &str = "com.lantharos.Windows1";
@@ -19,7 +20,7 @@ struct Drive {
     mounted: bool,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct WindowsDrive {
     pub device: String,
     pub name: String,

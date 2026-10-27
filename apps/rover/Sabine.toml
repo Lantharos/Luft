@@ -36,3 +36,6 @@ dist = "dist"
 entry = "dist/index.html"
 build = "bun run build"
 local_files = true
+
+[bindings]
+path = "src/lib/bindings.ts"

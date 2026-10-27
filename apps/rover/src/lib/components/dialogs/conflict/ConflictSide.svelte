@@ -2,7 +2,7 @@
 	import { basename, bytes, dateTime, parent, relativeDay, tooltip } from '@luft/ui';
 	import File from '@lucide/svelte/icons/file';
 	import Folder from '@lucide/svelte/icons/folder';
-	import type { ConflictItem } from '#lib/features/types.js';
+	import type { ConflictItem } from '#lib/bindings.js';
 
 	interface Props {
 		heading: string;

@@ -1,14 +1,17 @@
 use std::collections::HashMap;
 
 use futures_util::StreamExt;
+use sabine::BridgeEvent;
 use serde::Serialize;
+use specta::datatype::DataType;
+use specta::{Type, Types};
 use zbus::Proxy;
 use zbus::fdo::PropertiesProxy;
 
 use crate::bridge::events::Events;
 use crate::dbus;
 
-pub const PALETTE_CHANGED: &str = "kestrel.palette";
+pub const PALETTE_CHANGED: BridgeEvent<Palette> = BridgeEvent::new("kestrel.palette");
 
 const DESTINATION: &str = "com.lantharos.Kestrel";
 const PATH: &str = "/com/lantharos/Kestrel/Appearance";
@@ -40,6 +43,13 @@ pub struct IconPaint {
     ink: String,
     shade: String,
     rim: f64,
+}
+
+/// Pages read the palette through `@luft/ui`, which owns its TypeScript type.
+impl Type for Palette {
+    fn definition(_: &mut Types) -> DataType {
+        DataType::Reference(specta_typescript::define("import(\"@luft/ui\").Palette"))
+    }
 }
 
 impl AppIcons {

@@ -1,19 +1,14 @@
 use std::sync::mpsc;
 
 use gio::prelude::*;
-use serde::Serialize;
+
+use crate::app::settings::NetworkPlace;
 
 const NETWORK: &str = "network:///";
 const ATTRIBUTES: &str = "standard::display-name,standard::target-uri";
 const BATCH: i32 = 64;
 
-#[derive(Serialize)]
-pub struct Place {
-    name: String,
-    uri: String,
-}
-
-pub fn browse(reply: mpsc::Sender<Result<Vec<Place>, String>>) {
+pub fn browse(reply: mpsc::Sender<Result<Vec<NetworkPlace>, String>>) {
     gio::File::for_uri(NETWORK).enumerate_children_async(
         ATTRIBUTES,
         gio::FileQueryInfoFlags::NONE,
@@ -30,8 +25,8 @@ pub fn browse(reply: mpsc::Sender<Result<Vec<Place>, String>>) {
 
 fn collect(
     children: gio::FileEnumerator,
-    mut places: Vec<Place>,
-    reply: mpsc::Sender<Result<Vec<Place>, String>>,
+    mut places: Vec<NetworkPlace>,
+    reply: mpsc::Sender<Result<Vec<NetworkPlace>, String>>,
 ) {
     children.clone().next_files_async(
         BATCH,
@@ -49,10 +44,10 @@ fn collect(
     );
 }
 
-fn place(info: &gio::FileInfo) -> Option<Place> {
+fn place(info: &gio::FileInfo) -> Option<NetworkPlace> {
     let uri = info.attribute_string("standard::target-uri")?.to_string();
     url::Url::parse(&uri).ok()?.host_str()?;
-    Some(Place {
+    Some(NetworkPlace {
         name: info.display_name().to_string(),
         uri,
     })

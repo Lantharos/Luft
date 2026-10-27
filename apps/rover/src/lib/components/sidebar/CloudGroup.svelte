@@ -7,11 +7,11 @@
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 	import { isInside, tooltip } from '@luft/ui';
 	import type { Component } from 'svelte';
+	import type { Drive } from '#lib/bindings.js';
 	import * as api from '#lib/bridge/index.js';
 	import type { DragController } from '#lib/file-manager/drag/controller.svelte.js';
 	import { dropKey } from '#lib/file-manager/drag/drop-targets.js';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
-	import type { CloudDrive } from '#lib/types/cloud.js';
 	import SidebarItem from './SidebarItem.svelte';
 
 	interface Props {
@@ -23,7 +23,7 @@
 
 	let { manager, drag, adding, onopentab }: Props = $props();
 
-	function mark(drive: CloudDrive): { icon: Component; label: string; spinning?: boolean } | null {
+	function mark(drive: Drive): { icon: Component; label: string; spinning?: boolean } | null {
 		if (drive.state === 'signInAgain') return { icon: CircleAlert, label: 'Sign in again in Settings' };
 		if (drive.paused) return { icon: Pause, label: drive.paused === 'metered' ? 'Paused on a metered connection' : 'Paused while the battery is low' };
 		if (drive.syncing > 0) return { icon: RefreshCw, label: 'Syncing', spinning: true };

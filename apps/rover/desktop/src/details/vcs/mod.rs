@@ -8,17 +8,18 @@ use std::thread;
 
 use luft_app::Events;
 use serde::Serialize;
+use specta::Type;
 
 use crate::app::events::VCS_STATUS;
 
 static NEXT_STATUS_ID: AtomicU64 = AtomicU64::new(1);
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Type)]
 pub struct VcsRoot {
     pub root: String,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct VcsProject {
     pub root: String,
@@ -31,7 +32,7 @@ pub struct VcsProject {
     pub conflicted_count: usize,
 }
 
-#[derive(Debug, Clone, Copy, Eq, Ord, PartialEq, PartialOrd, Serialize)]
+#[derive(Debug, Clone, Copy, Eq, Ord, PartialEq, PartialOrd, Serialize, Type)]
 #[serde(rename_all = "lowercase")]
 pub enum VcsFileStatus {
     Modified,
@@ -45,8 +46,8 @@ pub enum VcsFileStatus {
 
 type Statuses = BTreeMap<String, VcsFileStatus>;
 
-#[derive(Serialize)]
-struct StatusEvent {
+#[derive(Serialize, Type)]
+pub struct VcsStatusEvent {
     id: String,
     project: Option<VcsProject>,
     statuses: Option<Statuses>,
@@ -74,7 +75,7 @@ pub fn start_status(root: String, events: Events) -> String {
         };
         events.emit(
             VCS_STATUS,
-            StatusEvent {
+            VcsStatusEvent {
                 id: event_id,
                 project,
                 statuses,

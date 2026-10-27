@@ -1,5 +1,5 @@
 import { createSubscriber } from 'svelte/reactivity';
-import type { FileEntry } from '#lib/types/index.js';
+import type { FileEntry } from '#lib/bindings.js';
 
 export class OnScreen {
 	readonly entries = new Map<string, FileEntry>();

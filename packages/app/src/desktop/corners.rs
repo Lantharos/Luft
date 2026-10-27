@@ -1,12 +1,14 @@
+use sabine::BridgeEvent;
 use serde::Serialize;
+use specta::Type;
 use zbus::{OwnedVariant, Proxy};
 
-pub const CORNERS_CHANGED: &str = "appearance.corners";
+pub const CORNERS_CHANGED: BridgeEvent<Corners> = BridgeEvent::new("appearance.corners");
 
 const KESTREL: &str = "com.lantharos.kestrel";
 const ROUNDED: &str = "rounded-window-corners";
 
-#[derive(Clone, Copy, Default, PartialEq, Serialize)]
+#[derive(Clone, Copy, Default, PartialEq, Serialize, Type)]
 #[serde(rename_all = "lowercase")]
 pub enum Corners {
     #[default]

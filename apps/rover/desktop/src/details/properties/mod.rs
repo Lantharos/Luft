@@ -7,12 +7,13 @@ use std::path::Path;
 
 use gio::prelude::*;
 use serde::Serialize;
+use specta::Type;
 
-pub use measure::Measurements;
+pub use measure::{Measurement, Measurements};
 
 const MODE_BITS: u32 = 0o7777;
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Ownership {
     owner: String,

@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { events as sabineEvents } from '@lantharos/sabine';
 	import { appearance, GlassShell } from '@luft/ui';
-	import * as api from '#lib/bridge/index.js';
+	import { commands, events } from '#lib/bindings.js';
 	import DetailsPane from '#lib/components/details/DetailsPane.svelte';
 	import DialogHost from '#lib/components/dialogs/DialogHost.svelte';
 	import FilePane from '#lib/components/pane/FilePane.svelte';
@@ -51,20 +52,20 @@
 
 	onMount(() => {
 		const unsubscribe = [
-			api.events.operations((operations) => {
+			events.roverOperations((operations) => {
 				manager.receiveOperations(operations);
 				trash.receiveOperations(operations);
 			}),
-			api.events.drives(manager.reloadDrives),
-			api.events.network(manager.reloadNetwork),
-			api.events.cloud(manager.cloud.load),
-			api.events.networkAsk(manager.network.receiveAsk),
-			api.events.vcsStatus(vcs.receive),
-			api.events.directory(({ path }) => {
+			events.roverDrives(manager.reloadDrives),
+			events.roverNetwork(manager.reloadNetwork),
+			events.roverCloud(manager.cloud.load),
+			events.roverNetworkAsk(manager.network.receiveAsk),
+			events.roverVcs(vcs.receive),
+			events.roverDirectory(({ path }) => {
 				void manager.refreshListing(path);
 				vcs.refresh();
 			}),
-			api.events.activation((activation) => void openActivation(manager, activation))
+			sabineEvents.singleInstance((activation) => void openActivation(manager, activation))
 		];
 		void start();
 		return () => unsubscribe.forEach((stop) => stop());
@@ -80,11 +81,11 @@
 	});
 
 	async function start() {
-		const state = await api.appState();
+		const state = await commands.appState();
 		chooser = state.chooser && new ChooserState(state.chooser, manager);
 		await manager.start(state, state.chooser?.currentFolder ?? undefined);
 		if (!state.chooser) await openLaunch(manager, state.launch);
-		const operations = await api.listOperations();
+		const operations = await commands.listOperations();
 		manager.receiveOperations(operations);
 		trash.receiveOperations(operations);
 	}

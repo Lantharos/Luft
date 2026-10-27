@@ -13,6 +13,7 @@ name = "rover_lib"
 [dependencies]
 sabine.workspace = true
 serde_json.workspace = true
+specta.workspace = true
 serde.workspace = true
 tokio = { workspace = true, features = ["default", "process"] }
 walkdir.workspace = true

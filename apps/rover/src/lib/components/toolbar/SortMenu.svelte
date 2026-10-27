@@ -3,9 +3,9 @@
 	import ArrowUpNarrowWide from '@lucide/svelte/icons/arrow-up-narrow-wide';
 	import Check from '@lucide/svelte/icons/check';
 	import { MenuButton, MenuItem, MenuSeparator, tooltip } from '@luft/ui';
+	import type { GroupBy, SortBy } from '#lib/bindings.js';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
 	import { settings } from '#lib/state/settings.svelte.js';
-	import type { GroupBy, SortBy } from '#lib/types/index.js';
 
 	interface Props {
 		manager: FileManager;

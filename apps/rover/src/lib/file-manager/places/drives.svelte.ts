@@ -1,7 +1,7 @@
 import { isInside } from '@luft/ui';
 import { SvelteSet } from 'svelte/reactivity';
-import * as api from '#lib/bridge/index.js';
-import type { DriveInfo, WindowsDrive } from '#lib/types/index.js';
+import { commands } from '#lib/bindings.js';
+import type { DriveInfo, WindowsDrive } from '#lib/bindings.js';
 
 export class DrivesState {
 	list = $state.raw<DriveInfo[]>([]);
@@ -14,7 +14,7 @@ export class DrivesState {
 	ordered = $derived(this.list.toSorted((a, b) => rank(a) - rank(b) || a.name.localeCompare(b.name)));
 
 	load = async () => {
-		const [list, windows] = await Promise.all([api.listDrives().catch(() => this.list), api.listWindows().catch(() => [])]);
+		const [list, windows] = await Promise.all([commands.listDrives().catch(() => this.list), commands.listWindows().catch(() => [])]);
 		this.list = list;
 		this.windows = windows;
 	};
@@ -22,7 +22,7 @@ export class DrivesState {
 	open = async (drive: WindowsDrive, readOnly: boolean) => {
 		this.opening.add(drive.device);
 		try {
-			return await api.openWindows(drive.device, readOnly);
+			return await commands.openWindows({ device: drive.device, readOnly }, { timeoutMs: 300_000 });
 		} finally {
 			this.opening.delete(drive.device);
 			await this.load();
@@ -33,7 +33,7 @@ export class DrivesState {
 		if (this.ejecting.has(drive.mountPoint)) return;
 		this.ejecting.add(drive.mountPoint);
 		try {
-			await api.ejectDrive(drive.mountPoint);
+			await commands.ejectDrive({ mountPoint: drive.mountPoint });
 		} finally {
 			this.ejecting.delete(drive.mountPoint);
 			await this.load();

@@ -14,6 +14,7 @@ use std::process::Command;
 use gio::prelude::*;
 use luft_app::launch;
 use serde::Serialize;
+use specta::Type;
 
 #[cfg(test)]
 pub(crate) use mount_table::parse_mountinfo;
@@ -26,7 +27,7 @@ const GIB: u64 = 1024 * 1024 * 1024;
 const SAMPLE_SYSTEM_SPACE: (u64, u64) = (931 * GIB, 612 * GIB);
 const SAMPLE_DRIVE_SPACE: (u64, u64) = (64 * GIB, 41 * GIB);
 
-#[derive(Debug, Serialize, Clone)]
+#[derive(Debug, Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct DriveInfo {
     pub name: String,

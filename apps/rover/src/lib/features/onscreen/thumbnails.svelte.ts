@@ -1,11 +1,10 @@
 import { fileUrl } from '@lantharos/sabine';
 import { SvelteMap } from 'svelte/reactivity';
+import { commands } from '#lib/bindings.js';
+import type { FileEntry, ThumbnailBatch, ThumbnailSize } from '#lib/bindings.js';
 import { localFileSource } from '#lib/bridge/index.js';
-import type { FileEntry } from '#lib/types/index.js';
 import { isImage } from '#lib/utils/kinds.js';
-import * as api from '../api';
 import { OnScreen } from './tracker';
-import type { ThumbnailBatch, ThumbnailSize } from '../types';
 
 const SIZES: [number, ThumbnailSize][] = [
 	[128, 'normal'],
@@ -66,7 +65,7 @@ class Thumbnails {
 		if (request === this.#requested) return;
 		this.#requested = request;
 		this.#forgetHidden();
-		void api.requestThumbnails(wanted, this.#size);
+		void commands.requestThumbnails({ paths: wanted, size: this.#size });
 	}
 
 	#forgetHidden() {

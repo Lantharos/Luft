@@ -9,8 +9,8 @@
 	import Usb from '@lucide/svelte/icons/usb';
 	import X from '@lucide/svelte/icons/x';
 	import { basename, bytes, duration, plural } from '@luft/ui';
-	import * as api from '#lib/bridge/index.js';
-	import type { Operation } from '#lib/types/index.js';
+	import { commands } from '#lib/bindings.js';
+	import type { Operation } from '#lib/bindings.js';
 
 	interface Props {
 		operations: Operation[];
@@ -143,15 +143,15 @@
 					{#if isActive(operation)}
 						<div class="flex shrink-0 items-center gap-1">
 							{#if operation.status === 'InProgress'}
-								<button class="icon-button" type="button" aria-label="Pause" onclick={() => api.pauseOperation(operation.id)}>
+								<button class="icon-button" type="button" aria-label="Pause" onclick={() => commands.pauseOperation({ id: operation.id })}>
 									<Pause size={14} />
 								</button>
 							{:else}
-								<button class="icon-button" type="button" aria-label="Resume" onclick={() => api.resumeOperation(operation.id)}>
+								<button class="icon-button" type="button" aria-label="Resume" onclick={() => commands.resumeOperation({ id: operation.id })}>
 									<Play size={14} />
 								</button>
 							{/if}
-							<button class="icon-button" type="button" aria-label="Cancel" onclick={() => api.cancelOperation(operation.id)}>
+							<button class="icon-button" type="button" aria-label="Cancel" onclick={() => commands.cancelOperation({ id: operation.id })}>
 								<X size={14} />
 							</button>
 						</div>

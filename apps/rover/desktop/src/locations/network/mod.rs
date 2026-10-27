@@ -5,16 +5,17 @@ mod session;
 use std::path::Path;
 use std::sync::OnceLock;
 
-use luft_app::{Commands, Events};
+use luft_app::{Commands, Empty, Events};
 use sabine::SabineWindow;
 use serde::Deserialize;
-use serde_json::Value;
 
+pub use session::NetworkAsk;
 use session::{Answer, Session};
+use specta::Type;
 
 static FUSE_ROOT: OnceLock<String> = OnceLock::new();
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Address {
     uri: String,
 }
@@ -32,7 +33,7 @@ pub fn is_remote(path: &str) -> bool {
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     let session = Session::start(events.clone());
     window
-        .with("network_locations", &session, |session, _: Value| {
+        .with("network_locations", &session, |session, Empty {}| {
             Ok(session.locations())
         })
         .with("network_connect", &session, |session, Address { uri }| {
@@ -47,7 +48,7 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
             &session,
             |session, Address { uri }| session.disconnect(uri),
         )
-        .with("network_discover", &session, |session, _: Value| {
+        .with("network_discover", &session, |session, Empty {}| {
             session.discover()
         })
 }

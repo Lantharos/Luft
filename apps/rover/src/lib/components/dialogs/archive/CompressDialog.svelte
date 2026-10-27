@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { tick, untrack } from 'svelte';
 	import { Dialog, errorText, plural, Segmented, TextField } from '@luft/ui';
-	import * as features from '#lib/features/api.js';
+	import { commands } from '#lib/bindings.js';
+	import type { ArchiveFormat, FileEntry } from '#lib/bindings.js';
 	import { archiveName } from '#lib/features/archives.js';
-	import type { ArchiveFormat } from '#lib/features/types.js';
-	import type { FileEntry } from '#lib/types/index.js';
 
 	interface Props {
 		entries: FileEntry[];
@@ -36,12 +35,7 @@
 	async function submit() {
 		if (!valid) return;
 		try {
-			await features.compressItems(
-				entries.map((entry) => entry.path),
-				destination,
-				name.trim(),
-				format
-			);
+			await commands.compressItems({ paths: entries.map((entry) => entry.path), destination, name: name.trim(), format });
 			onclose();
 		} catch (caught) {
 			error = errorText(caught);

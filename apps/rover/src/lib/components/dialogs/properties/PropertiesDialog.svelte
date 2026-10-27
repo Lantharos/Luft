@@ -1,10 +1,7 @@
 <script lang="ts">
 	import { bytes, dateTime, Dialog, errorText, parent, plural } from '@luft/ui';
-	import * as api from '#lib/bridge/index.js';
-	import * as features from '#lib/features/api.js';
-	import type { Measurement, Ownership } from '#lib/features/types.js';
-	import type { DriveInfo, FileEntry } from '#lib/types/index.js';
-	import type { FileDetails } from '#lib/types/details.js';
+	import { commands, events } from '#lib/bindings.js';
+	import type { DriveInfo, FileDetails, FileEntry, Measurement, Ownership } from '#lib/bindings.js';
 	import DefaultApp from './DefaultApp.svelte';
 	import PermissionGrid from './PermissionGrid.svelte';
 
@@ -31,25 +28,25 @@
 	$effect(() => {
 		if (!single) return;
 		const path = single.path;
-		void api.fileDetails(path).then((result) => (details = result)).catch(() => (details = null));
-		void features.fileOwnership(path).then((result) => (ownership = result)).catch(() => (ownership = null));
+		void commands.fileDetails({ path }).then((result) => (details = result)).catch(() => (details = null));
+		void commands.fileOwnership({ path }).then((result) => (ownership = result)).catch(() => (ownership = null));
 	});
 
 	$effect(() => {
 		if (!measured) return;
 		let id: number | null = null;
 		const early = new Map<number, Measurement>();
-		const stop = features.events.measure((update) => {
+		const stop = events.roverMeasure((update) => {
 			if (id === null) early.set(update.id, update);
 			else if (update.id === id) measurement = update;
 		});
-		void features.measure(entries.map((entry) => entry.path)).then((started) => {
+		void commands.measure({ paths: entries.map((entry) => entry.path) }).then((started) => {
 			id = started;
 			measurement = early.get(started) ?? measurement;
 		});
 		return () => {
 			stop();
-			if (id !== null) void features.cancelMeasure(id);
+			if (id !== null) void commands.cancelMeasure({ id });
 		};
 	});
 
@@ -74,7 +71,7 @@
 		ownership = { ...ownership, mode };
 		error = null;
 		try {
-			await features.setPermissions(single.path, mode);
+			await commands.setPermissions({ path: single.path, mode });
 		} catch (caught) {
 			ownership = previous;
 			error = errorText(caught);

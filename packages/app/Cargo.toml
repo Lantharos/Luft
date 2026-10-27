@@ -54,6 +54,8 @@ parking_lot = { workspace = true, optional = true }
 png = { workspace = true, optional = true }
 sabine.workspace = true
 skrifa = { workspace = true, optional = true }
+specta.workspace = true
+specta-typescript.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 tokio = { workspace = true, features = ["rt"] }

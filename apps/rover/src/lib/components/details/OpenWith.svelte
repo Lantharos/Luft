@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { AppIcon } from '@luft/ui';
+	import type { App, OpenWithApps } from '#lib/bindings.js';
 	import * as api from '#lib/bridge/index.js';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
-	import type { AppChoice, OpenWithApps } from '#lib/types/details.js';
 
 	interface Props {
 		apps: OpenWithApps;
@@ -17,7 +17,7 @@
 	let expanded = $state(false);
 	let others = $derived(expanded ? apps.others : apps.others.slice(0, COLLAPSED_COUNT));
 
-	async function open(app: AppChoice) {
+	async function open(app: App) {
 		try {
 			if (await api.openWithApp(path, app.id)) await manager.actions.extractNextTo(path);
 		} catch (caught) {
@@ -26,7 +26,7 @@
 	}
 </script>
 
-{#snippet choice(app: AppChoice, primary: boolean)}
+{#snippet choice(app: App, primary: boolean)}
 	<button class={['open-with__app', primary && 'is-default']} type="button" onclick={() => open(app)}>
 		<AppIcon icon={app.icon} id={app.id} size={primary ? 28 : 22} />
 		<span class="min-w-0 flex-1 truncate">{app.name}</span>

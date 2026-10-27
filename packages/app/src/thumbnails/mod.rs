@@ -15,19 +15,21 @@ use std::thread;
 use std::time::{Duration, Instant};
 
 use parking_lot::{Condvar, Mutex};
+use sabine::BridgeEvent;
 use serde::Serialize;
 
 use crate::bridge::events::Events;
 pub use cache::ThumbnailSize;
 use child::Cancellation;
 use generate::Ready;
+use specta::Type;
 use system::Registry;
 
 const MAX_WORKERS: usize = 3;
 const BATCH_WINDOW: Duration = Duration::from_millis(40);
 
-#[derive(Serialize)]
-struct Batch {
+#[derive(Serialize, Type)]
+pub struct ThumbnailBatch {
     items: Vec<Ready>,
 }
 
@@ -62,7 +64,7 @@ struct Inner {
 }
 
 impl Thumbnails {
-    pub fn new(events: Events, ready_event: &'static str) -> Self {
+    pub fn new(events: Events, ready_event: BridgeEvent<ThumbnailBatch>) -> Self {
         let (results, receiver) = mpsc::channel();
         let inner = Arc::new(Inner {
             state: Mutex::default(),
@@ -143,7 +145,11 @@ impl Inner {
     }
 }
 
-fn emit_batches(receiver: &Receiver<Ready>, events: &Events, ready_event: &str) {
+fn emit_batches(
+    receiver: &Receiver<Ready>,
+    events: &Events,
+    ready_event: BridgeEvent<ThumbnailBatch>,
+) {
     while let Ok(first) = receiver.recv() {
         let mut items = vec![first];
         let deadline = Instant::now() + BATCH_WINDOW;
@@ -154,6 +160,6 @@ fn emit_batches(receiver: &Receiver<Ready>, events: &Events, ready_event: &str) 
                 Err(RecvTimeoutError::Disconnected) => return,
             }
         }
-        events.emit(ready_event, Batch { items });
+        events.emit(ready_event, ThumbnailBatch { items });
     }
 }

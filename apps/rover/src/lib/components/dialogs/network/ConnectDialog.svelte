@@ -3,11 +3,11 @@
 	import X from '@lucide/svelte/icons/x';
 	import { tick } from 'svelte';
 	import { Checkbox, Dialog, TextField } from '@luft/ui';
-	import * as api from '#lib/bridge/index.js';
+	import { commands } from '#lib/bindings.js';
+	import type { NetworkPlace } from '#lib/bindings.js';
 	import { normalizeAddress, protocolName } from '#lib/file-manager/location/addresses.js';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
 	import { settings } from '#lib/state/settings.svelte.js';
-	import type { NetworkPlace } from '#lib/types/index.js';
 
 	interface Props {
 		manager: FileManager;
@@ -27,7 +27,7 @@
 
 	$effect(() => {
 		void tick().then(() => field?.focus());
-		void api.discoverNetwork().then((places) => (nearby = places), () => (nearby = []));
+		void commands.networkDiscover().then((places) => (nearby = places), () => (nearby = []));
 	});
 
 	function connect(target = address) {

@@ -6,6 +6,7 @@ use std::path::PathBuf;
 use std::time::Duration;
 
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 pub const RESPONSE_ENV: &str = "ROVER_CHOOSER_RESPONSE";
 pub const MODE_ENV: &str = "ROVER_CHOOSER_MODE";
@@ -19,7 +20,7 @@ pub const FILES_ENV: &str = "ROVER_CHOOSER_FILES";
 
 const EXIT_DELAY: Duration = Duration::from_millis(80);
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Type)]
 #[serde(rename_all = "snake_case")]
 pub enum ChooserMode {
     Open,
@@ -45,7 +46,7 @@ impl ChooserMode {
     }
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct ChooserConfig {
     pub mode: ChooserMode,

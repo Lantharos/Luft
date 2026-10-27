@@ -1,4 +1,5 @@
-import type { FileEntry } from '#lib/types/index.js';
+import type { FileEntry } from '#lib/bindings.js';
+
 
 export type RenameMode = 'replace' | 'number' | 'case';
 export type Casing = 'lower' | 'upper' | 'title' | 'sentence';

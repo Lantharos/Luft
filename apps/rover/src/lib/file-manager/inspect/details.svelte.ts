@@ -1,6 +1,5 @@
-import * as api from '#lib/bridge/index.js';
-import type { FileEntry } from '#lib/types/index.js';
-import type { FileDetails, OpenWithApps } from '#lib/types/details.js';
+import { commands } from '#lib/bindings.js';
+import type { FileDetails, FileEntry, OpenWithApps } from '#lib/bindings.js';
 
 export type MediaInfo = { width: number | null; height: number | null; duration: number | null };
 
@@ -20,9 +19,9 @@ export class EntryDetails {
 		this.apps = NO_APPS;
 		this.media = null;
 		if (!entry) return;
-		void api.fileDetails(entry.path).then((details) => this.#settle(key, () => (this.details = details)), () => undefined);
+		void commands.fileDetails({ path: entry.path }).then((details) => this.#settle(key, () => (this.details = details)), () => undefined);
 		if (!entry.isDir) {
-			void api.appsForFile(entry.path).then((apps) => this.#settle(key, () => (this.apps = apps)), () => undefined);
+			void commands.appsForFile({ path: entry.path }).then((apps) => this.#settle(key, () => (this.apps = apps)), () => undefined);
 		}
 	};
 

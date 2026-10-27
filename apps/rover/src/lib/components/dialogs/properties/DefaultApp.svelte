@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { AppIcon, errorText, Select } from '@luft/ui';
-	import * as api from '#lib/bridge/index.js';
-	import * as features from '#lib/features/api.js';
-	import type { OpenWithApps } from '#lib/types/details.js';
+	import { commands } from '#lib/bindings.js';
+	import type { OpenWithApps } from '#lib/bindings.js';
 
 	interface Props {
 		path: string;
@@ -21,13 +20,13 @@
 	});
 
 	async function load(target: string) {
-		apps = await api.appsForFile(target).catch(() => null);
+		apps = await commands.appsForFile({ path: target }).catch(() => null);
 	}
 
 	async function choose(id: string) {
 		error = null;
 		try {
-			await features.setDefaultApp(path, id);
+			await commands.setDefaultApp({ path, app: id });
 			await load(path);
 		} catch (caught) {
 			error = errorText(caught);

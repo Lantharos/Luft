@@ -1,11 +1,11 @@
-import * as api from './api';
-import type { HistoryState, NoticeKind } from './types';
+import { commands } from '#lib/bindings.js';
+import type { HistoryState, NoticeKind } from '#lib/bindings.js';
 
 const TOAST_MS = 6000;
 
 export interface Toast {
 	id: number;
-	kind: NoticeKind;
+	kind: NoticeKind | 'info';
 	message: string;
 }
 
@@ -24,11 +24,11 @@ class History {
 	};
 
 	undo = () => {
-		if (this.canUndo) void api.undo();
+		if (this.canUndo) void commands.undo();
 	};
 
 	redo = () => {
-		if (this.canRedo) void api.redo();
+		if (this.canRedo) void commands.redo();
 	};
 
 	dismiss = () => {
@@ -45,7 +45,7 @@ class History {
 		this.#timer = setTimeout(this.dismiss, TOAST_MS);
 	};
 
-	#show(kind: NoticeKind, message: string) {
+	#show(kind: Toast['kind'], message: string) {
 		this.toast = { id: ++this.#next, kind, message };
 		this.release();
 	}

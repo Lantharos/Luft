@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { tick, untrack } from 'svelte';
 	import { Checkbox, Dialog, PasswordField, Segmented, TextField } from '@luft/ui';
-	import * as api from '#lib/bridge/index.js';
-	import type { NetworkAsk } from '#lib/types/index.js';
+	import { commands } from '#lib/bindings.js';
+	import type { NetworkAsk } from '#lib/bindings.js';
 
 	interface Props {
 		ask: Exclude<NetworkAsk, { kind: 'done' }>;
@@ -26,8 +26,8 @@
 		void tick().then(() => (initial.kind === 'password' && initial.needsUser && !user ? userField : passwordField)?.focus());
 	});
 
-	function reply(answer: Partial<Parameters<typeof api.answerNetwork>[0]>) {
-		void api.answerNetwork({ id: ask.id, cancelled: false, anonymous: false, remember: false, ...answer });
+	function reply(answer: Partial<Parameters<typeof commands.networkAnswer>[0]>) {
+		void commands.networkAnswer({ id: ask.id, cancelled: false, anonymous: false, remember: false, ...answer });
 		onclose();
 	}
 

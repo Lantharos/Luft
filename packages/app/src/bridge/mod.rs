@@ -3,14 +3,19 @@ pub mod events;
 use std::future::Future;
 
 use sabine::{BridgeError, SabineWindow};
-use serde::Serialize;
 use serde::de::DeserializeOwned;
+use serde::{Deserialize, Serialize};
+use specta::Type;
+
+/// The params of a command that takes none.
+#[derive(Deserialize, Type)]
+pub struct Empty {}
 
 pub type Handler<Req, Res> = fn(Req) -> Result<Res, String>;
 pub type ContextHandler<C, Req, Res> = fn(&C, Req) -> Result<Res, String>;
 
 pub trait Commands {
-    fn command<Req: DeserializeOwned + 'static, Res: Serialize + 'static>(
+    fn command<Req: DeserializeOwned + Type + 'static, Res: Serialize + Type + 'static>(
         self,
         name: &str,
         handler: Handler<Req, Res>,
@@ -24,15 +29,15 @@ pub trait Commands {
     ) -> Self
     where
         C: Clone + Send + Sync + 'static,
-        Req: DeserializeOwned + 'static,
-        Res: Serialize + 'static;
+        Req: DeserializeOwned + Type + 'static,
+        Res: Serialize + Type + 'static;
 
     /// A command whose handler is awaited on Sabine's async runtime, for
     /// work that waits on D-Bus or other I/O.
     fn command_async<Req, Res, F, Fut>(self, name: &str, handler: F) -> Self
     where
-        Req: DeserializeOwned + 'static,
-        Res: Serialize + 'static,
+        Req: DeserializeOwned + Type + 'static,
+        Res: Serialize + Type + 'static,
         F: Fn(Req) -> Fut + Send + Sync + 'static,
         Fut: Future<Output = Result<Res, String>> + Send + 'static;
 
@@ -40,14 +45,14 @@ pub trait Commands {
     fn with_async<C, Req, Res, F, Fut>(self, name: &str, context: &C, handler: F) -> Self
     where
         C: Clone + Send + Sync + 'static,
-        Req: DeserializeOwned + 'static,
-        Res: Serialize + 'static,
+        Req: DeserializeOwned + Type + 'static,
+        Res: Serialize + Type + 'static,
         F: Fn(C, Req) -> Fut + Send + Sync + 'static,
         Fut: Future<Output = Result<Res, String>> + Send + 'static;
 }
 
 impl Commands for SabineWindow {
-    fn command<Req: DeserializeOwned + 'static, Res: Serialize + 'static>(
+    fn command<Req: DeserializeOwned + Type + 'static, Res: Serialize + Type + 'static>(
         self,
         name: &str,
         handler: Handler<Req, Res>,
@@ -65,8 +70,8 @@ impl Commands for SabineWindow {
     ) -> Self
     where
         C: Clone + Send + Sync + 'static,
-        Req: DeserializeOwned + 'static,
-        Res: Serialize + 'static,
+        Req: DeserializeOwned + Type + 'static,
+        Res: Serialize + Type + 'static,
     {
         let context = context.clone();
         self.bridge_typed(name, move |request| {
@@ -76,8 +81,8 @@ impl Commands for SabineWindow {
 
     fn command_async<Req, Res, F, Fut>(self, name: &str, handler: F) -> Self
     where
-        Req: DeserializeOwned + 'static,
-        Res: Serialize + 'static,
+        Req: DeserializeOwned + Type + 'static,
+        Res: Serialize + Type + 'static,
         F: Fn(Req) -> Fut + Send + Sync + 'static,
         Fut: Future<Output = Result<Res, String>> + Send + 'static,
     {
@@ -90,8 +95,8 @@ impl Commands for SabineWindow {
     fn with_async<C, Req, Res, F, Fut>(self, name: &str, context: &C, handler: F) -> Self
     where
         C: Clone + Send + Sync + 'static,
-        Req: DeserializeOwned + 'static,
-        Res: Serialize + 'static,
+        Req: DeserializeOwned + Type + 'static,
+        Res: Serialize + Type + 'static,
         F: Fn(C, Req) -> Fut + Send + Sync + 'static,
         Fut: Future<Output = Result<Res, String>> + Send + 'static,
     {

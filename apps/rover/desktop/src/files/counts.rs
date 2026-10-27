@@ -5,17 +5,18 @@ use std::thread;
 use luft_app::Events;
 use parking_lot::{Condvar, Mutex};
 use serde::Serialize;
+use specta::Type;
 
 use crate::app::events::FOLDER_COUNTS;
 
-#[derive(Serialize)]
-struct Counted {
+#[derive(Serialize, Type)]
+pub struct Counted {
     path: String,
     count: Option<usize>,
 }
 
-#[derive(Serialize)]
-struct Batch {
+#[derive(Serialize, Type)]
+pub struct CountBatch {
     items: Vec<Counted>,
 }
 
@@ -77,7 +78,7 @@ impl Inner {
                     path,
                 })
                 .collect();
-            self.events.emit(FOLDER_COUNTS, Batch { items });
+            self.events.emit(FOLDER_COUNTS, CountBatch { items });
         }
     }
 }

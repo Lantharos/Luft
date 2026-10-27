@@ -9,6 +9,7 @@ mod start;
 use std::process::Command;
 
 use serde::Deserialize;
+use specta::Type;
 
 #[cfg(feature = "launch")]
 pub use start::{open, open_files, start};
@@ -27,7 +28,7 @@ const IDENTITY_VARIABLES: [&str; 4] = [
 const WEB_SCHEMES: [&str; 3] = ["http", "https", "mailto"];
 
 /// The parameters of a command that only hands the page's token on.
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Token {
     pub token: Option<String>,
 }

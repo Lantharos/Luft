@@ -9,11 +9,11 @@
 <script lang="ts">
 	import { fileUrl } from '@lantharos/sabine';
 	import { canPlayNatively, decodeFailed, MediaControls } from '@luft/ui';
+	import type { FileEntry } from '#lib/bindings.js';
 	import { localFileSource } from '#lib/bridge/index.js';
 	import EntryIcon from '#lib/components/pane/EntryIcon.svelte';
 	import type { MediaInfo } from '#lib/file-manager/inspect/details.svelte.js';
 	import { thumbnailOf } from '#lib/file-manager/listing/thumbnails.js';
-	import type { FileEntry } from '#lib/types/index.js';
 	import { fileKind, mayBeTransparent, previewKind } from '#lib/utils/kinds.js';
 	import NativePreview from './NativePreview.svelte';
 

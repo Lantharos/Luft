@@ -1,7 +1,6 @@
 import { appWindow } from '@lantharos/sabine';
 import { isInside, parent } from '@luft/ui';
-import * as api from '#lib/bridge/index.js';
-import { extractArchives } from '#lib/features/api.js';
+import { commands } from '#lib/bindings.js';
 import type { FileManager } from './manager.svelte';
 
 export class FileActions {
@@ -15,7 +14,7 @@ export class FileActions {
 
 	extractNextTo = async (path: string) => {
 		const manager = this.#manager;
-		await extractArchives([path], parent(path)).then(manager.selectWhenDone, manager.notify);
+		await commands.extractArchives({ paths: [path], destination: parent(path) }).then(manager.selectWhenDone, manager.notify);
 	};
 
 	copy = () => {
@@ -42,10 +41,10 @@ export class FileActions {
 		if (move && sources.every((source) => parent(source) === destination)) return;
 		try {
 			if (move) {
-				await api.moveItems(sources, destination);
+				await commands.moveItems({ sources, destination });
 				if (destination !== manager.currentPath) this.#hideEntries(sources);
 			} else {
-				await api.copyItems(sources, destination);
+				await commands.copyItems({ sources, destination });
 			}
 		} catch (caught) {
 			manager.notify(caught);
@@ -57,7 +56,7 @@ export class FileActions {
 		const selected = [...manager.selection];
 		if (selected.length === 0) return;
 		if (manager.view === 'trash') {
-			await api.deletePermanently(selected).catch(manager.notify);
+			await commands.deletePermanently({ ids: selected }).catch(manager.notify);
 			await manager.loadTrash();
 			return;
 		}
@@ -70,7 +69,7 @@ export class FileActions {
 		const previous = manager.entries;
 		this.#hideEntries(paths);
 		try {
-			await api.moveToTrash(paths);
+			await commands.moveToTrash({ paths });
 			if (manager.view === 'trash') await manager.loadTrash();
 		} catch (caught) {
 			manager.entries = previous;
@@ -80,12 +79,12 @@ export class FileActions {
 
 	restoreTrash = async (ids: string[]) => {
 		if (ids.length === 0) return;
-		await api.restoreFromTrash(ids).catch(this.#manager.notify);
+		await commands.restoreFromTrash({ ids }).catch(this.#manager.notify);
 		await this.#manager.loadTrash();
 	};
 
 	emptyTrash = async (trashPath: string | null) => {
-		await api.emptyTrash(trashPath).catch(this.#manager.notify);
+		await commands.emptyTrash({ trashPath }).catch(this.#manager.notify);
 		if (this.#manager.view === 'trash') await this.#manager.loadTrash();
 	};
 

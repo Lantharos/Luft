@@ -3,6 +3,7 @@ use sabine::{
     WindowRegion, WindowRegionRect,
 };
 use serde::Serialize;
+use specta::Type;
 
 use crate::bridge::events::Events;
 use crate::desktop::palette::{self, Palette};
@@ -74,14 +75,14 @@ impl GlassWindow<'_> {
     }
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct Locale {
     languages: Vec<String>,
     formats: String,
     fixed: bool,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct Appearance {
     palette: Option<Palette>,
     typography: Typography,
@@ -113,7 +114,7 @@ pub fn run(
 ) -> ! {
     let events = events.clone();
     SabineWindow::main_with_process(
-        move |window| Ok(build(window)),
+        move |window| Ok(desktop::declare_events(build(window))),
         move |process| {
             if let Some(emitter) = process.bridge_event_emitter() {
                 events.attach(emitter);

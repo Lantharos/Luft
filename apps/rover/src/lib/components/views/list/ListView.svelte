@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { bytes, parent, plural, relativeDay, VirtualScroller } from '@luft/ui';
 	import type { Attachment } from 'svelte/attachments';
+	import type { FileEntry, ListColumnId } from '#lib/bindings.js';
 	import EntryIcon from '#lib/components/pane/EntryIcon.svelte';
 	import CloudMark from '#lib/components/cloud/CloudMark.svelte';
 	import VcsBadge from '#lib/components/vcs/VcsBadge.svelte';
@@ -10,7 +11,6 @@
 	import { entryClasses, entryContext, entryProps } from '#lib/file-manager/view/entry-props.js';
 	import { ListColumns } from '#lib/file-manager/view/list-columns.svelte.js';
 	import { EntrySurface, isGroupRow } from '#lib/file-manager/view/surface.svelte.js';
-	import type { FileEntry, ListColumnId } from '#lib/types/index.js';
 	import { fileKind, kindLabel } from '#lib/utils/kinds.js';
 	import EntryName from '../EntryName.svelte';
 	import ColumnsMenu from './ColumnsMenu.svelte';

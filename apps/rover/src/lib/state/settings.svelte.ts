@@ -1,5 +1,5 @@
-import * as api from '#lib/bridge/index.js';
-import type { ListColumn, Settings } from '#lib/types/index.js';
+import { commands } from '#lib/bindings.js';
+import type { ListColumn, Settings } from '#lib/bindings.js';
 
 export const DEFAULT_LIST_COLUMNS: ListColumn[] = [
 	{ id: 'date', width: 150, visible: true },
@@ -40,7 +40,7 @@ class SettingsState {
 		this.#saving = true;
 		do {
 			this.#dirty = false;
-			await api.updateSettings($state.snapshot(this.value)).catch((error) => console.error('Could not save settings', error));
+			await commands.updateSettings({ settings: $state.snapshot(this.value) }).catch((error) => console.error('Could not save settings', error));
 		} while (this.#dirty);
 		this.#saving = false;
 	}

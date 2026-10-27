@@ -1,7 +1,7 @@
 mod params;
 mod tools;
 
-use luft_app::{Activation, Commands};
+use luft_app::{Activation, Commands, Empty};
 use sabine::SabineWindow;
 
 use crate::app::settings;
@@ -21,7 +21,7 @@ pub fn register(window: SabineWindow, state: &RoverState) -> SabineWindow {
     let window = crate::locations::places::register(crate::details::inspect::register(window));
     let window = crate::locations::network::register(window, &state.events);
     let window = crate::locations::cloud::register(window, &state.events);
-    register_app(window, state)
+    register_app(crate::app::events::declare(window), state)
 }
 
 fn register_files(window: SabineWindow, state: &RoverState) -> SabineWindow {

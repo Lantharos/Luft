@@ -1,4 +1,5 @@
-import type { FileEntry } from '#lib/types/index.js';
+import type { FileEntry } from '#lib/bindings.js';
+
 
 export type OpenDialog =
 	| { kind: 'properties'; entries: FileEntry[] }

@@ -7,13 +7,14 @@ use std::sync::OnceLock;
 use image::RgbaImage;
 use md5::{Digest, Md5};
 use serde::Deserialize;
+use specta::Type;
 
 const FAIL_FOLDER: &str = concat!("fail/luft-", env!("CARGO_PKG_VERSION"));
 const PNG_SIGNATURE: &[u8; 8] = b"\x89PNG\r\n\x1a\n";
 const URI_KEY: &str = "Thumb::URI";
 const MTIME_KEY: &str = "Thumb::MTime";
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Deserialize, Type)]
 #[serde(rename_all = "kebab-case")]
 pub enum ThumbnailSize {
     Normal,

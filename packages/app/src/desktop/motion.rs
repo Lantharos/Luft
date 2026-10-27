@@ -1,14 +1,16 @@
+use sabine::BridgeEvent;
 use serde::Serialize;
+use specta::Type;
 use zbus::{OwnedVariant, Proxy};
 
-pub const MOTION_CHANGED: &str = "appearance.motion";
+pub const MOTION_CHANGED: BridgeEvent<Motion> = BridgeEvent::new("appearance.motion");
 
 const INTERFACE: &str = "org.gnome.desktop.interface";
 const ANIMATIONS: &str = "enable-animations";
 const APPEARANCE: &str = "org.freedesktop.appearance";
 const REDUCED_MOTION: &str = "reduced-motion";
 
-#[derive(Clone, Copy, Default, PartialEq, Serialize)]
+#[derive(Clone, Copy, Default, PartialEq, Serialize, Type)]
 #[serde(rename_all = "lowercase")]
 pub enum Motion {
     #[default]

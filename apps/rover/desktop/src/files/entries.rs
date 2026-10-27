@@ -8,13 +8,14 @@ use std::time::SystemTime;
 use parking_lot::Mutex;
 use rustc_hash::FxHashMap;
 use serde::Serialize;
+use specta::Type;
 
 use super::privileged::{is_permission_error, os, run_pkexec};
 use crate::files::text::quoted;
 use crate::history::{History, Step};
 use crate::locations::drives;
 
-#[derive(Debug, Serialize, Clone)]
+#[derive(Debug, Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct FileEntry {
     pub name: String,
@@ -28,13 +29,13 @@ pub struct FileEntry {
     pub extension: Option<String>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Type)]
 pub struct DirectoryContents {
     pub path: String,
     pub entries: Vec<FileEntry>,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Type)]
 pub struct UserDirs {
     pub home: String,
     pub documents: Option<String>,

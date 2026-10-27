@@ -1,6 +1,6 @@
+import { commands } from '#lib/bindings.js';
+import type { SearchKind, SearchQuery, SearchResult, SearchUpdate } from '#lib/bindings.js';
 import { settings } from '#lib/state/settings.svelte.js';
-import * as api from './api';
-import type { SearchKind, SearchQuery, SearchResult, SearchUpdate } from './types';
 
 const DEBOUNCE_MS = 140;
 const DAY = 86_400;
@@ -80,7 +80,7 @@ class Search {
 		const run = ++this.#runs;
 		this.running = true;
 		this.#starting = true;
-		const id = await api.startSearch(this.#query()).catch(() => null);
+		const id = await commands.startSearch({ query: this.#query() }).catch(() => null);
 		if (run !== this.#runs) return;
 		this.#starting = false;
 		if (id === null) {
@@ -103,7 +103,7 @@ class Search {
 		clearTimeout(this.#timer);
 		this.#runs++;
 		this.#starting = false;
-		if (this.running) void api.cancelSearch(this.#id);
+		if (this.running) void commands.cancelSearch({ id: this.#id });
 		this.#id = 0;
 		this.#buffer = [];
 		this.running = false;

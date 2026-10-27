@@ -1,9 +1,7 @@
 <script lang="ts">
 	import { Checkbox, Dialog } from '@luft/ui';
-	import * as api from '#lib/bridge/index.js';
-	import * as features from '#lib/features/api.js';
-	import type { Resolution } from '#lib/features/types.js';
-	import type { Operation } from '#lib/types/index.js';
+	import { commands } from '#lib/bindings.js';
+	import type { Operation, Resolution } from '#lib/bindings.js';
 	import ConflictSide from './ConflictSide.svelte';
 
 	interface Props {
@@ -28,11 +26,11 @@
 	function answer(resolution: Resolution) {
 		if (answering) return;
 		answering = true;
-		void features.resolveConflict(operation.id, resolution, applyToAll).catch(() => (answering = false));
+		void commands.resolveConflict({ id: operation.id, resolution, applyToAll }).catch(() => (answering = false));
 	}
 
 	function stop() {
-		void api.cancelOperation(operation.id);
+		void commands.cancelOperation({ id: operation.id });
 	}
 </script>
 

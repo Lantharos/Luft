@@ -7,6 +7,7 @@ use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 use luft_app::Events;
 use parking_lot::{Mutex, RwLock};
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 use crate::app::events::OPERATIONS_CHANGED;
 
@@ -14,7 +15,7 @@ const PROGRESS_EMIT_INTERVAL: Duration = Duration::from_millis(100);
 const FINISHED_RETENTION_MS: i64 = 30_000;
 const DECISION_POLL_INTERVAL: Duration = Duration::from_millis(150);
 
-#[derive(Debug, Clone, Copy, Serialize, PartialEq)]
+#[derive(Debug, Clone, Copy, Serialize, PartialEq, Type)]
 pub enum OperationType {
     Copy,
     Move,
@@ -24,7 +25,7 @@ pub enum OperationType {
     Extract,
 }
 
-#[derive(Debug, Clone, Copy, Serialize, PartialEq)]
+#[derive(Debug, Clone, Copy, Serialize, PartialEq, Type)]
 pub enum OperationStatus {
     InProgress,
     Paused,
@@ -33,7 +34,7 @@ pub enum OperationStatus {
     Cancelled,
 }
 
-#[derive(Debug, Clone, Copy, Serialize, PartialEq)]
+#[derive(Debug, Clone, Copy, Serialize, PartialEq, Type)]
 pub enum OperationPhase {
     Preparing,
     Copying,
@@ -46,7 +47,7 @@ pub enum OperationPhase {
     SafeToEject,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct ConflictItem {
     pub path: String,
@@ -56,13 +57,13 @@ pub struct ConflictItem {
     pub modified: Option<i64>,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Type)]
 pub struct Conflict {
     pub source: ConflictItem,
     pub target: ConflictItem,
 }
 
-#[derive(Debug, Clone, Copy, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Copy, Deserialize, PartialEq, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum Resolution {
     Replace,
@@ -77,7 +78,7 @@ pub struct Decision {
     pub apply_to_all: bool,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Operation {
     pub id: String,

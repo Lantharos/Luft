@@ -1,11 +1,11 @@
 <script lang="ts">
 	import Trash from '@lucide/svelte/icons/trash';
 	import { bytes, parent, plural, relativeDay, Segmented, VirtualScroller } from '@luft/ui';
+	import type { TrashItem } from '#lib/bindings.js';
 	import EntryIcon from '#lib/components/pane/EntryIcon.svelte';
 	import { dialogs } from '#lib/features/dialogs.svelte.js';
 	import EmptyState from '#lib/components/pane/EmptyState.svelte';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
-	import type { TrashItem } from '#lib/types/index.js';
 
 	interface Props {
 		manager: FileManager;

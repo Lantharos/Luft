@@ -16,6 +16,7 @@ futures-util = { workspace = true, optional = true }
 luft-dbus = { workspace = true, optional = true }
 serde.workspace = true
 serde_json = { workspace = true, optional = true }
+specta.workspace = true
 zbus = { workspace = true, features = ["proxy", "tokio"], optional = true }
 
 [lints]

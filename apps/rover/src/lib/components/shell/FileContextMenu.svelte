@@ -27,13 +27,13 @@
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import { ContextMenu, MenuItem, MenuSeparator } from '@luft/ui';
 	import type { Component } from 'svelte';
+	import type { FileEntry } from '#lib/bindings.js';
 	import * as tools from '#lib/features/actions.js';
 	import * as cloud from '#lib/features/cloud.js';
 	import { isArchive } from '#lib/features/archives.js';
 	import * as bookmarks from '#lib/file-manager/places/bookmarks.js';
 	import type { ContextMenuState, FileManager } from '#lib/file-manager/manager.svelte.js';
 	import type { ViewState } from '#lib/file-manager/view/view-state.svelte.js';
-	import type { FileEntry } from '#lib/types/index.js';
 	import type { VcsState } from '#lib/vcs/state.svelte.js';
 
 	interface Props {

@@ -28,8 +28,8 @@ pub mod watch;
 mod window;
 
 pub use activation::Activation;
-pub use bridge::Commands;
 pub use bridge::events::Events;
+pub use bridge::{Commands, Empty};
 pub use sample::sample_system;
 pub use tasks::{block_on, spawn};
 pub use window::{Appearance, GlassWindow, run};

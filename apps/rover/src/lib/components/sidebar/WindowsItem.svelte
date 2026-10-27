@@ -2,8 +2,8 @@
 	import HardDrive from '@lucide/svelte/icons/hard-drive';
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 	import { Dialog, errorText } from '@luft/ui';
+	import type { WindowsDrive } from '#lib/bindings.js';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
-	import type { WindowsDrive } from '#lib/types/index.js';
 	import SidebarItem from './SidebarItem.svelte';
 
 	interface Props {

@@ -1,4 +1,5 @@
-import type { FileEntry, InlineDraft } from '#lib/types/index.js';
+import type { FileEntry } from '#lib/bindings.js';
+import type { InlineDraft } from '#lib/types/index.js';
 
 export const DRAFT_PATH = '\u0000draft';
 

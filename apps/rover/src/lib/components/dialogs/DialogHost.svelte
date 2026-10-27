@@ -1,15 +1,15 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { commands, events } from '#lib/bindings.js';
+	import type { FileEntry } from '#lib/bindings.js';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
 	import type { TrashCounter } from '#lib/file-manager/places/places.svelte.js';
-	import * as features from '#lib/features/api.js';
 	import { dialogs } from '#lib/features/dialogs.svelte.js';
 	import { folderCounts } from '#lib/features/onscreen/folder-counts.svelte.js';
 	import { history } from '#lib/features/history.svelte.js';
 	import { search } from '#lib/features/search.svelte.js';
 	import { thumbnailSize, thumbnails } from '#lib/features/onscreen/thumbnails.svelte.js';
 	import { settings } from '#lib/state/settings.svelte.js';
-	import type { FileEntry } from '#lib/types/index.js';
 	import CompressDialog from './archive/CompressDialog.svelte';
 	import EmptyTrashDialog from './trash/EmptyTrashDialog.svelte';
 	import AskDialog from './network/AskDialog.svelte';
@@ -35,13 +35,13 @@
 
 	onMount(() => {
 		const unsubscribe = [
-			features.events.history(history.receive),
-			features.events.thumbnails(thumbnails.receive),
-			features.events.counts(folderCounts.receive),
-			features.events.search(search.receive)
+			events.roverHistory(history.receive),
+			events.roverThumbnails(thumbnails.receive),
+			events.roverCounts(folderCounts.receive),
+			events.roverSearch(search.receive)
 		];
 		thumbnails.skipWhen(manager.cloud.onlineOnly);
-		void features.historyState().then(history.receive);
+		void commands.historyState().then(history.receive);
 		return () => unsubscribe.forEach((stop) => stop());
 	});
 

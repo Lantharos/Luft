@@ -1,7 +1,9 @@
+use sabine::BridgeEvent;
 use serde::Serialize;
+use specta::Type;
 use zbus::{OwnedVariant, Proxy};
 
-pub const TYPOGRAPHY_CHANGED: &str = "appearance.typography";
+pub const TYPOGRAPHY_CHANGED: BridgeEvent<Typography> = BridgeEvent::new("appearance.typography");
 
 pub const INTERFACE: &str = "org.gnome.desktop.interface";
 pub const INTERFACE_FONT: &str = "font-name";
@@ -39,7 +41,7 @@ pub fn family(description: &str) -> String {
     words.join(" ")
 }
 
-#[derive(Clone, PartialEq, Serialize)]
+#[derive(Clone, PartialEq, Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Typography {
     interface: Option<String>,

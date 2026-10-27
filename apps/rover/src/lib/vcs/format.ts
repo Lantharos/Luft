@@ -1,4 +1,5 @@
-import type { VcsChangedFile, VcsFileStatus, VcsProject } from './types';
+import type { VcsFileStatus, VcsProject } from '#lib/bindings.js';
+import type { VcsChangedFile } from './types';
 
 export const statusOrder: VcsFileStatus[] = ['conflicted', 'deleted', 'added', 'untracked', 'renamed', 'modified', 'ignored'];
 

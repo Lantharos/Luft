@@ -1,8 +1,9 @@
 import { errorText } from '@luft/ui';
-import * as api from '#lib/bridge/index.js';
+import { commands } from '#lib/bindings.js';
+import type { VcsFileStatus, VcsProject, VcsStatusEvent } from '#lib/bindings.js';
 import { absolutePath, relativePath } from '#lib/utils/paths.js';
 import { groupChangedFiles, statusOrder } from './format';
-import type { VcsBusyState, VcsChangedFile, VcsFileStatus, VcsProject, VcsStatusEvent } from './types';
+import type { VcsBusyState, VcsChangedFile } from './types';
 
 const REFRESH_DELAY_MS = 720;
 
@@ -33,7 +34,7 @@ export class VcsState {
 
 	open = async (path: string) => {
 		this.#path = path;
-		const root = await api.vcsRoot(path).catch(() => null);
+		const root = await commands.vcsRoot({ path }).catch(() => null);
 		if (this.#path !== path) return;
 		if (!root) return this.clear();
 		if (this.project?.root !== root.root) this.#schedule(root.root);
@@ -80,7 +81,7 @@ export class VcsState {
 		this.error = null;
 		this.diffPath = path;
 		try {
-			this.diff = await api.vcsDiff(this.project.root, path && absolutePath(this.project.root, path));
+			this.diff = await commands.vcsDiff({ root: this.project.root, filePath: path && absolutePath(this.project.root, path) });
 		} catch (caught) {
 			this.diff = '';
 			this.error = errorText(caught);
@@ -93,7 +94,7 @@ export class VcsState {
 		const project = this.project;
 		if (!project) return;
 		await this.#run('save', async () => {
-			await api.saveVcs(project.root, message, files.map((path) => absolutePath(project.root, path)));
+			await commands.vcsSave({ root: project.root, message, files: files.map((path) => absolutePath(project.root, path)) });
 			this.saveDialogOpen = false;
 			this.lastResult = 'Committed';
 		});
@@ -103,7 +104,7 @@ export class VcsState {
 		const project = this.project;
 		if (!project) return;
 		await this.#run('sync', async () => {
-			await api.syncVcs(project.root);
+			await commands.vcsSync({ root: project.root });
 			this.lastResult = 'Synced';
 		});
 	};
@@ -128,7 +129,7 @@ export class VcsState {
 
 	async #load(root: string) {
 		const generation = ++this.#generation;
-		const id = await api.startVcsStatus(root).catch(() => null);
+		const id = await commands.vcsStatus({ root }).catch(() => null);
 		if (!id) return;
 		const result = this.#arrived.get(id) ?? (await new Promise<StatusResult>((resolve) => this.#waiting.set(id, resolve)));
 		this.#arrived.delete(id);

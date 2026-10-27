@@ -8,6 +8,7 @@ use std::thread;
 use luft_app::Events;
 use parking_lot::Mutex;
 use serde::Serialize;
+use specta::Type;
 
 use crate::app::events::HISTORY_CHANGED;
 use crate::files::operations::{OperationPhase, OperationType, OperationsQueue};
@@ -34,7 +35,7 @@ struct Stacks {
     redo: Vec<Change>,
 }
 
-#[derive(Clone, Copy, Serialize)]
+#[derive(Clone, Copy, Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 enum NoticeKind {
     Done,
@@ -43,13 +44,13 @@ enum NoticeKind {
     Failed,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 struct Notice {
     kind: NoticeKind,
     message: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct HistoryState {
     can_undo: bool,

@@ -4,10 +4,19 @@ pub mod palette;
 pub mod typography;
 
 use futures_util::StreamExt;
+use sabine::SabineWindow;
 use zbus::{OwnedVariant, Proxy};
 
 use crate::bridge::events::Events;
 use crate::dbus;
+
+pub fn declare_events(window: SabineWindow) -> SabineWindow {
+    window
+        .bridge_event(&palette::PALETTE_CHANGED)
+        .bridge_event(&typography::TYPOGRAPHY_CHANGED)
+        .bridge_event(&motion::MOTION_CHANGED)
+        .bridge_event(&corners::CORNERS_CHANGED)
+}
 
 async fn proxy() -> Result<Proxy<'static>, String> {
     Proxy::new(

@@ -1,26 +1,11 @@
 import { SvelteSet } from 'svelte/reactivity';
 import { appearance, basename, errorText, parent } from '@luft/ui';
+import { commands } from '#lib/bindings.js';
+import type { AppState, DriveInfo, FileEntry, GroupBy, Operation, PinnedFolder, SortBy, TrashContents, UserDirs, ViewMode } from '#lib/bindings.js';
 import * as api from '#lib/bridge/index.js';
 import { settings } from '#lib/state/settings.svelte.js';
 import { Tabs } from '#lib/state/tabs.svelte.js';
-import type {
-	AppState,
-	Arrival,
-	ClipboardState,
-	DriveInfo,
-	FileEntry,
-	GroupBy,
-	InlineDraft,
-	Operation,
-	PinnedFolder,
-	SidebarView,
-	SortBy,
-	TabHistoryEntry,
-	TrashContents,
-	UserDirs,
-	ViewMemory,
-	ViewMode
-} from '#lib/types/index.js';
+import type { Arrival, ClipboardState, InlineDraft, SidebarView, TabHistoryEntry, ViewMemory } from '#lib/types/index.js';
 import { pathSegments, trimTrailingSlash } from '#lib/utils/paths.js';
 import { FileActions } from './actions';
 import { CloudState } from './places/cloud.svelte';
@@ -202,10 +187,10 @@ export class FileManager {
 		const token = this.loading.start();
 		this.error = null;
 		try {
-			const listing = await api.listDirectory(path, settings.value.showHidden);
+			const listing = await commands.listDirectory({ path, showHidden: settings.value.showHidden });
 			if (!this.loading.isCurrent(token)) return;
 			this.#showListing(listing.path, listing.entries);
-			void api.watchDirectory(listing.path);
+			void commands.watchDirectory({ path: listing.path });
 		} catch (caught) {
 			if (!this.loading.isCurrent(token)) return;
 			this.#showListing(path, []);
@@ -217,7 +202,7 @@ export class FileManager {
 
 	refreshListing = async (path: string) => {
 		if (this.view !== 'home' || this.currentPath !== path || this.loading.active) return;
-		const listing = await api.listDirectory(path, settings.value.showHidden).catch(() => null);
+		const listing = await commands.listDirectory({ path, showHidden: settings.value.showHidden }).catch(() => null);
 		if (!listing || this.view !== 'home' || this.currentPath !== path || this.loading.active) return;
 		this.entries = listing.entries;
 		this.cloud.follow(path);
@@ -229,7 +214,7 @@ export class FileManager {
 		const token = this.loading.start();
 		this.error = null;
 		try {
-			const trash = await api.listTrash();
+			const trash = await commands.listTrash();
 			if (!this.loading.isCurrent(token)) return;
 			this.trash = trash;
 			this.selection.clear();
@@ -246,7 +231,7 @@ export class FileManager {
 		const token = this.loading.start();
 		this.entries = [];
 		try {
-			const recent = await api.recentFiles();
+			const recent = await commands.recentFiles();
 			if (!this.loading.isCurrent(token)) return;
 			this.entries = recent;
 			this.#arrive('');
@@ -443,10 +428,10 @@ export class FileManager {
 		try {
 			const entry =
 				draft.mode === 'rename'
-					? await api.renameItem(draft.targetPath!, name)
+					? await commands.renameItem({ path: draft.targetPath!, newName: name })
 					: draft.itemType === 'folder'
-						? await api.createDirectory(this.currentPath, name)
-						: await api.createFile(this.currentPath, name);
+						? await commands.createDirectory({ path: this.currentPath, name })
+						: await commands.createFile({ path: this.currentPath, name });
 			this.draft = null;
 			await this.refreshListing(this.currentPath);
 			this.selectOnly(entry.path);

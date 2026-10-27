@@ -6,10 +6,11 @@ use std::path::{Path, PathBuf};
 use chrono::{Local, NaiveDateTime};
 use percent_encoding::percent_decode_str;
 use serde::Serialize;
+use specta::Type;
 
 use crate::locations::drives;
 
-#[derive(Debug, Serialize, Clone)]
+#[derive(Debug, Serialize, Clone, Type)]
 pub struct TrashLocation {
     pub name: String,
     pub path: String,

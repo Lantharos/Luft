@@ -1,8 +1,8 @@
 import { isInside } from '@luft/ui';
 import { SvelteMap } from 'svelte/reactivity';
-import * as api from '#lib/bridge/index.js';
+import { commands } from '#lib/bindings.js';
+import type { FileEntry } from '#lib/bindings.js';
 import { settings } from '#lib/state/settings.svelte.js';
-import type { FileEntry } from '#lib/types/index.js';
 import { pathSegments } from '#lib/utils/paths.js';
 import { sortedEntries } from '../listing/entries';
 import type { FileManager } from '../manager.svelte';
@@ -64,7 +64,7 @@ export class ColumnsData {
 	}
 
 	async #fetch(path: string) {
-		const listing = await api.listDirectory(path, settings.value.showHidden).catch(() => null);
+		const listing = await commands.listDirectory({ path, showHidden: settings.value.showHidden }).catch(() => null);
 		return listing?.entries ?? [];
 	}
 }

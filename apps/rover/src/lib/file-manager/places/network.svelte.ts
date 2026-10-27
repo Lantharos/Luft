@@ -1,8 +1,8 @@
 import { isInside } from '@luft/ui';
 import { SvelteSet } from 'svelte/reactivity';
-import * as api from '#lib/bridge/index.js';
+import { commands } from '#lib/bindings.js';
+import type { NetworkAsk, NetworkLocation, NetworkPlace } from '#lib/bindings.js';
 import { settings } from '#lib/state/settings.svelte.js';
-import type { NetworkAsk, NetworkLocation, NetworkPlace } from '#lib/types/index.js';
 import { addressName, normalizeAddress, sameAddress } from '../location/addresses';
 
 const RECENT_SERVERS = 8;
@@ -32,7 +32,7 @@ export class NetworkState {
 	});
 
 	load = async () => {
-		this.locations = await api.networkLocations().catch(() => this.locations);
+		this.locations = await commands.networkLocations().catch(() => this.locations);
 	};
 
 	receiveAsk = (ask: NetworkAsk) => {
@@ -63,7 +63,7 @@ export class NetworkState {
 		if (known) return known;
 		this.connecting.add(uri);
 		try {
-			const location = await api.connectNetwork(uri);
+			const location = await commands.networkConnect({ uri });
 			this.#remember(uri);
 			if (keep) this.save({ name: location.name, uri });
 			await this.load();
@@ -77,7 +77,7 @@ export class NetworkState {
 	};
 
 	disconnect = async (uri: string) => {
-		await api.disconnectNetwork(uri);
+		await commands.networkDisconnect({ uri });
 		await this.load();
 	};
 

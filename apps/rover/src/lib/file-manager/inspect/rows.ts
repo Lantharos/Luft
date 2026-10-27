@@ -1,6 +1,5 @@
 import { bytes, dateTime, formatClock, parent, plural } from '@luft/ui';
-import type { FileEntry } from '#lib/types/index.js';
-import type { FileDetails } from '#lib/types/details.js';
+import type { FileDetails, FileEntry } from '#lib/bindings.js';
 import { statusLabel } from '#lib/vcs/format.js';
 import type { VcsState } from '#lib/vcs/state.svelte.js';
 import type { MediaInfo } from './details.svelte';

@@ -1,16 +1,16 @@
 import { basename, isInside, parent } from '@luft/ui';
-import * as api from '#lib/bridge/index.js';
-import type { CloudConflict, CloudDrive, FileState } from '#lib/types/cloud.js';
+import { commands } from '#lib/bindings.js';
+import type { CloudConflict, Drive, FileState } from '#lib/bindings.js';
 
 export class CloudState {
 	available = $state(false);
-	drives = $state.raw<CloudDrive[]>([]);
+	drives = $state.raw<Drive[]>([]);
 	states = $state.raw<Record<string, FileState>>({});
 	folder = $state('');
 
 	load = async () => {
 		try {
-			this.drives = await api.cloudDrives();
+			this.drives = await commands.cloudDrives();
 			this.available = true;
 		} catch {
 			this.available = false;
@@ -33,7 +33,7 @@ export class CloudState {
 		return parent(path) === this.folder ? this.states[basename(path)] : undefined;
 	}
 
-	conflictsIn(folder: string): { drive: CloudDrive; conflict: CloudConflict }[] {
+	conflictsIn(folder: string): { drive: Drive; conflict: CloudConflict }[] {
 		const drive = this.holding(folder);
 		if (!drive) return [];
 		return drive.conflicts
@@ -51,7 +51,7 @@ export class CloudState {
 	async #refreshStates() {
 		const folder = this.folder;
 		if (!folder || !this.holding(folder)) return;
-		const states = await api.cloudStates(folder).catch(() => null);
+		const states = await commands.cloudStates({ path: folder }).catch(() => null);
 		if (states && folder === this.folder) this.states = states;
 	}
 }

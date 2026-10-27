@@ -1,9 +1,8 @@
 import { SvelteMap } from 'svelte/reactivity';
+import { commands } from '#lib/bindings.js';
+import type { CountBatch, FileEntry } from '#lib/bindings.js';
 import { settings } from '#lib/state/settings.svelte.js';
-import type { FileEntry } from '#lib/types/index.js';
-import * as api from '../api';
 import { OnScreen } from './tracker';
-import type { CountBatch } from '../types';
 
 const REMEMBERED = 2000;
 
@@ -47,7 +46,7 @@ class FolderCounts {
 		this.#requested = request;
 		this.#asked = new Map(wanted.map((entry) => [entry.path, { modified: entry.modified, hidden }]));
 		this.#forgetHidden();
-		void api.countItems([...this.#asked.keys()], hidden);
+		void commands.countItems({ paths: [...this.#asked.keys()], showHidden: hidden });
 	}
 
 	#forgetHidden() {

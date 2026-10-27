@@ -6,8 +6,8 @@ import Music from '@lucide/svelte/icons/music';
 import Video from '@lucide/svelte/icons/video';
 import { basename } from '@luft/ui';
 import type { Component } from 'svelte';
-import * as api from '#lib/bridge/index.js';
-import type { Operation, UserDirs } from '#lib/types/index.js';
+import { commands } from '#lib/bindings.js';
+import type { Operation, UserDirs } from '#lib/bindings.js';
 
 export type Place = { path: string; label: string; icon: Component };
 
@@ -33,7 +33,7 @@ export class TrashCounter {
 	#settled = new Set<string>();
 
 	refresh = async () => {
-		this.count = await api.trashCount().catch(() => this.count);
+		this.count = await commands.trashCount().catch(() => this.count);
 	};
 
 	receiveOperations = (operations: Operation[]) => {

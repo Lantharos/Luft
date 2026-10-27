@@ -9,10 +9,10 @@
 	import PanelRight from '@lucide/svelte/icons/panel-right';
 	import { Segmented, tooltip, WindowControls } from '@luft/ui';
 	import type { Component } from 'svelte';
+	import type { ViewMode } from '#lib/bindings.js';
 	import type { DragController } from '#lib/file-manager/drag/controller.svelte.js';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
 	import type { ViewState } from '#lib/file-manager/view/view-state.svelte.js';
-	import type { ViewMode } from '#lib/types/index.js';
 	import type { VcsState } from '#lib/vcs/state.svelte.js';
 	import MoreMenu from './MoreMenu.svelte';
 	import NewMenu from './NewMenu.svelte';

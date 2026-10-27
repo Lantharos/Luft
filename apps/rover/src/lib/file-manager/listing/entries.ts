@@ -1,4 +1,5 @@
-import type { FileEntry, SortBy } from '#lib/types/index.js';
+import type { FileEntry, SortBy } from '#lib/bindings.js';
+
 
 const collator = new Intl.Collator(undefined, { sensitivity: 'base', numeric: true });
 

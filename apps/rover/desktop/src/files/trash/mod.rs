@@ -14,8 +14,9 @@ pub use locations::TrashLocation;
 use locations::parse_trashinfo;
 pub(crate) use locations::trash_locations;
 pub use put::{Trashed, put, restore as restore_item};
+use specta::Type;
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct TrashItem {
     pub id: String,
@@ -27,7 +28,7 @@ pub struct TrashItem {
     pub is_dir: bool,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Type)]
 pub struct TrashContents {
     pub items: Vec<TrashItem>,
     pub locations: Vec<TrashLocation>,

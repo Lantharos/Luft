@@ -1,8 +1,9 @@
 use serde::Deserialize;
+use specta::Type;
 
-#[derive(Debug, Clone, Copy, PartialEq, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Deserialize, Type)]
 #[serde(rename_all = "lowercase")]
-pub enum Kind {
+pub enum SearchKind {
     Folder,
     Image,
     Video,
@@ -36,18 +37,18 @@ const CODE: &[&str] = &[
     "cfg", "env", "lock",
 ];
 
-pub fn kind_of(name: &str, is_dir: bool) -> Option<Kind> {
+pub fn kind_of(name: &str, is_dir: bool) -> Option<SearchKind> {
     if is_dir {
-        return Some(Kind::Folder);
+        return Some(SearchKind::Folder);
     }
     let extension = extension(name)?;
     [
-        (Kind::Image, IMAGES),
-        (Kind::Video, VIDEOS),
-        (Kind::Audio, AUDIO),
-        (Kind::Document, DOCUMENTS),
-        (Kind::Archive, ARCHIVES),
-        (Kind::Code, CODE),
+        (SearchKind::Image, IMAGES),
+        (SearchKind::Video, VIDEOS),
+        (SearchKind::Audio, AUDIO),
+        (SearchKind::Document, DOCUMENTS),
+        (SearchKind::Archive, ARCHIVES),
+        (SearchKind::Code, CODE),
     ]
     .into_iter()
     .find(|(_, extensions)| extensions.contains(&extension.as_str()))

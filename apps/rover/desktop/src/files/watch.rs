@@ -4,14 +4,15 @@ use std::time::Duration;
 use luft_app::Events;
 use luft_app::watch::{FolderWatcher, Report, Watch, WatchMask};
 use serde::Serialize;
+use specta::Type;
 
 use crate::app::events::DIRECTORY_CHANGED;
 
 #[derive(Clone)]
 pub struct DirectoryWatcher(Option<FolderWatcher>);
 
-#[derive(Serialize)]
-struct DirectoryChanged<'a> {
+#[derive(Serialize, Type)]
+pub struct DirectoryChanged<'a> {
     path: &'a str,
 }
 

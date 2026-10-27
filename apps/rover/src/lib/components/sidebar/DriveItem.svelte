@@ -4,10 +4,10 @@
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 	import Usb from '@lucide/svelte/icons/usb';
 	import { bytes, tooltip } from '@luft/ui';
+	import type { DriveInfo } from '#lib/bindings.js';
 	import type { DragController } from '#lib/file-manager/drag/controller.svelte.js';
 	import { dropKey } from '#lib/file-manager/drag/drop-targets.js';
 	import type { FileManager, SidebarPlace } from '#lib/file-manager/manager.svelte.js';
-	import type { DriveInfo } from '#lib/types/index.js';
 	import SidebarItem from './SidebarItem.svelte';
 
 	interface Props {

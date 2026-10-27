@@ -4,10 +4,11 @@ use std::time::SystemTime;
 
 use gio::prelude::*;
 use serde::Serialize;
+use specta::Type;
 
 const DIRECTORY_TYPE: &str = "inode/directory";
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct FileDetails {
     kind: String,

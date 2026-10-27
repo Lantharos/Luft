@@ -1,4 +1,5 @@
-import type { FileEntry } from '#lib/types/index.js';
+import type { FileEntry } from '#lib/bindings.js';
+
 
 export type FileKind = 'folder' | 'file' | 'image' | 'video' | 'audio' | 'archive' | 'document' | 'package' | 'code';
 export type PreviewKind = 'folder' | 'image' | 'video' | 'audio' | 'markdown' | 'text' | 'pdf' | 'none';

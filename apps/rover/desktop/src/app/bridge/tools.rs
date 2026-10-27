@@ -1,9 +1,10 @@
-use luft_app::Commands;
 use luft_app::thumbnails::ThumbnailSize;
+use luft_app::{Commands, Empty};
 use sabine::SabineWindow;
 use serde::Deserialize;
+use specta::Type;
 
-use super::params::{Empty, Handoff, Path, Paths};
+use super::params::{Handoff, Path, Paths};
 use crate::app::state::RoverState;
 use crate::archives::{self, ArchiveFormat};
 use crate::details::properties;
@@ -11,9 +12,9 @@ use crate::files::operations::{Decision, Resolution};
 use crate::files::rename::{self, Renaming};
 use crate::files::transfer;
 use crate::integration::terminal;
-use crate::search::Query;
+use crate::search::SearchQuery;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 struct ConflictAnswer {
     id: String,
@@ -21,28 +22,28 @@ struct ConflictAnswer {
     apply_to_all: bool,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct BatchRename {
     renamings: Vec<Renaming>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct ThumbnailRequest {
     paths: Vec<String>,
     size: ThumbnailSize,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct SearchRequest {
-    query: Query,
+    query: SearchQuery,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Task {
     id: u64,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Compress {
     paths: Vec<String>,
     destination: String,
@@ -50,19 +51,19 @@ struct Compress {
     format: ArchiveFormat,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Extract {
     paths: Vec<String>,
     destination: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Permissions {
     path: String,
     mode: u32,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct DefaultApp {
     path: String,
     app: String,

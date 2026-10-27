@@ -1,4 +1,4 @@
-import * as api from '#lib/bridge/index.js';
+import { commands } from '#lib/bindings.js';
 import { settings } from '#lib/state/settings.svelte.js';
 import { expandHome } from './expand';
 
@@ -76,7 +76,7 @@ export class PathCompletion {
 	#list(folder: string) {
 		let folders = this.#folders.get(folder);
 		if (!folders) {
-			folders = api.listFolders(folder).catch(() => []);
+			folders = commands.listFolders({ path: folder }).catch(() => []);
 			this.#folders.set(folder, folders);
 		}
 		return folders;

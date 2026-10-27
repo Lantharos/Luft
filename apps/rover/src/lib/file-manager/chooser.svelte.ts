@@ -1,6 +1,6 @@
 import { join } from '@luft/ui';
-import * as api from '#lib/bridge/index.js';
-import type { ChooserConfig, FileEntry, PinnedFolder } from '#lib/types/index.js';
+import { commands } from '#lib/bindings.js';
+import type { ChooserConfig, FileEntry, PinnedFolder } from '#lib/bindings.js';
 import type { FileManager } from './manager.svelte';
 
 export class ChooserState {
@@ -56,13 +56,13 @@ export class ChooserState {
 	submit = async (paths = this.acceptPaths) => {
 		if (this.#finished || paths.length === 0) return;
 		this.#finished = true;
-		await api.acceptChooser(paths).catch((error) => console.error('Could not return the chosen files', error));
+		await commands.acceptChooser({ paths }).catch((error) => console.error('Could not return the chosen files', error));
 	};
 
 	cancel = async () => {
 		if (this.#finished) return;
 		this.#finished = true;
-		await api.cancelChooser().catch((error) => console.error('Could not cancel the file chooser', error));
+		await commands.cancelChooser().catch((error) => console.error('Could not cancel the file chooser', error));
 	};
 
 	#acceptPaths() {

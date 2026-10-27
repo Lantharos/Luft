@@ -1,6 +1,6 @@
 use std::sync::{Arc, OnceLock};
 
-use sabine::BridgeEventEmitter;
+use sabine::{BridgeEvent, BridgeEventEmitter, Bytes};
 use serde::Serialize;
 
 #[derive(Clone, Default)]
@@ -11,11 +11,10 @@ impl Events {
         let _ = self.0.set(emitter);
     }
 
-    pub fn emit(&self, name: &str, payload: impl Serialize) -> bool {
-        let (Some(emitter), Ok(payload)) = (self.0.get(), serde_json::to_value(payload)) else {
-            return false;
-        };
-        emitter.emit(name, payload)
+    pub fn emit<T: Serialize>(&self, event: BridgeEvent<T>, payload: T) -> bool {
+        self.0
+            .get()
+            .is_some_and(|emitter| emitter.send(&event, &payload))
     }
 
     pub fn set_square_corners(&self, square: bool) -> bool {
@@ -24,9 +23,9 @@ impl Events {
             .is_some_and(|emitter| emitter.set_square_corners(square))
     }
 
-    pub fn emit_bytes(&self, name: &str, bytes: &[u8]) -> bool {
+    pub fn emit_bytes(&self, event: BridgeEvent<Bytes>, bytes: &[u8]) -> bool {
         self.0
             .get()
-            .is_some_and(|emitter| emitter.emit_bytes(name, bytes))
+            .is_some_and(|emitter| emitter.send_bytes(&event, bytes))
     }
 }

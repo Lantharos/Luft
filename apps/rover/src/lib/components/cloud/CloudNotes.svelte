@@ -1,9 +1,9 @@
 <script lang="ts">
 	import Copy from '@lucide/svelte/icons/copy';
 	import { basename } from '@luft/ui';
-	import * as api from '#lib/bridge/index.js';
+	import { commands } from '#lib/bindings.js';
+	import type { CloudConflict, Drive } from '#lib/bindings.js';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
-	import type { CloudConflict, CloudDrive } from '#lib/types/cloud.js';
 
 	let { manager }: { manager: FileManager } = $props();
 
@@ -11,12 +11,12 @@
 
 	let notes = $derived(manager.view === 'home' ? manager.cloud.conflictsIn(manager.currentPath) : []);
 
-	function show(drive: CloudDrive, conflict: CloudConflict) {
+	function show(drive: Drive, conflict: CloudConflict) {
 		manager.selectOnly(`${drive.path}/${conflict.copy}`);
 	}
 
-	function dismiss(drive: CloudDrive, conflict: CloudConflict) {
-		api.dismissConflict(drive.account, conflict.copy).catch(manager.notify);
+	function dismiss(drive: Drive, conflict: CloudConflict) {
+		commands.cloudDismissConflict({ account: drive.account, copy: conflict.copy }).catch(manager.notify);
 	}
 </script>
 

@@ -5,6 +5,7 @@ use std::path::{Path, PathBuf};
 
 use chrono::{DateTime, Local};
 use serde::Deserialize;
+use specta::Type;
 use zip::CompressionMethod;
 use zip::write::{SimpleFileOptions, ZipWriter};
 
@@ -13,7 +14,7 @@ use super::progress::{Counted, Progress};
 const ZSTD_LEVEL: i32 = 3;
 const READ_BUFFER: usize = 256 * 1024;
 
-#[derive(Debug, Clone, Copy, Deserialize)]
+#[derive(Debug, Clone, Copy, Deserialize, Type)]
 #[serde(rename_all = "kebab-case")]
 pub enum ArchiveFormat {
     Zip,

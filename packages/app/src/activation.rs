@@ -2,6 +2,7 @@ use std::env;
 use std::path::{Component, Path, PathBuf};
 
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 use crate::portal;
 
@@ -9,7 +10,7 @@ const ROOT: &str = "/";
 
 /// The command line an app was started with, either this process's own or the
 /// one a second launch forwarded as the page's `singleInstance.activate` event.
-#[derive(Clone, Debug, Default, Serialize, Deserialize)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Activation {
     arguments: Vec<String>,

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { parent, tooltip } from '@luft/ui';
+	import type { SearchResult } from '#lib/bindings.js';
 	import { KIND_ICONS } from '#lib/components/pane/kind-icons.js';
-	import type { SearchResult } from '#lib/features/types.js';
 	import { fileKind } from '#lib/utils/kinds.js';
 
 	interface Props {

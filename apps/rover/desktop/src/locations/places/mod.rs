@@ -1,12 +1,8 @@
 mod recent;
 mod trash;
 
-use luft_app::Commands;
+use luft_app::{Commands, Empty};
 use sabine::SabineWindow;
-use serde::Deserialize;
-
-#[derive(Deserialize)]
-struct Empty {}
 
 pub fn register(window: SabineWindow) -> SabineWindow {
     window

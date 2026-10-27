@@ -4,6 +4,7 @@ use luft_app::thumbnails::Thumbnails;
 use luft_app::{Activation, Appearance, Events};
 use parking_lot::RwLock;
 use serde::Serialize;
+use specta::Type;
 
 use crate::APP_NAME;
 use crate::app::events::THUMBNAILS_READY;
@@ -34,7 +35,7 @@ pub struct RoverState {
     user_dirs: Arc<Option<UserDirs>>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct AppState {
     chooser: Option<ChooserConfig>,

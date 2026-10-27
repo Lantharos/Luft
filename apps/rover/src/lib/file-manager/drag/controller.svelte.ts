@@ -1,5 +1,6 @@
 import { isInside } from '@luft/ui';
-import type { FileEntry, Tab } from '#lib/types/index.js';
+import type { FileEntry } from '#lib/bindings.js';
+import type { Tab } from '#lib/types/index.js';
 import type { FileManager } from '../manager.svelte';
 import { dataTransferHasPaths, dataTransferPaths, setFileDragData } from './data-transfer';
 import { dropKey, TRASH_DROP_PATH, tabDropKey, type DropTarget } from './drop-targets';

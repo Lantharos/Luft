@@ -4,7 +4,7 @@
 	import Cloud from '@lucide/svelte/icons/cloud';
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 	import type { Component } from 'svelte';
-	import type { FileState } from '#lib/types/cloud.js';
+	import type { FileState } from '#lib/bindings.js';
 
 	interface Props {
 		state: FileState | undefined;

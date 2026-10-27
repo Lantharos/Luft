@@ -3,6 +3,7 @@ use std::io::Read;
 use std::path::{Path, PathBuf};
 
 use serde::Serialize;
+use specta::Type;
 
 use super::cache::{self, Source, ThumbnailSize};
 use super::child::Cancellation;
@@ -11,7 +12,7 @@ use super::system::{Failure, Registry};
 
 const SNIFF_BYTES: usize = 4096;
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub(super) struct Ready {
     path: String,
     thumbnail: Option<String>,

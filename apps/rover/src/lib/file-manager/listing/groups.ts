@@ -1,5 +1,5 @@
 import { month } from '@luft/ui';
-import type { FileEntry, GroupBy } from '#lib/types/index.js';
+import type { FileEntry, GroupBy } from '#lib/bindings.js';
 import { fileKind, type FileKind } from '#lib/utils/kinds.js';
 
 export type Section = { key: string; label: string; count: number };

@@ -1,9 +1,9 @@
 import { print } from '@lantharos/sabine';
-import { getFileInfo } from '#lib/bridge/index.js';
+import { commands } from '#lib/bindings.js';
+import type { FileEntry } from '#lib/bindings.js';
+import * as api from '#lib/bridge/index.js';
 import type { FileManager } from '#lib/file-manager/manager.svelte.js';
-import type { FileEntry } from '#lib/types/index.js';
 import { isPrintable } from '#lib/utils/kinds.js';
-import * as api from './api';
 import { dialogs } from './dialogs.svelte';
 import { search } from './search.svelte';
 
@@ -16,7 +16,7 @@ export function targetsOf(manager: FileManager, target: FileEntry) {
 }
 
 export function duplicate(manager: FileManager, entries: FileEntry[]) {
-	api.duplicateItems(entries.map((entry) => entry.path)).catch(manager.notify);
+	commands.duplicateItems({ paths: entries.map((entry) => entry.path) }).catch(manager.notify);
 }
 
 export function copyPaths(manager: FileManager, entries: FileEntry[]) {
@@ -32,10 +32,7 @@ export function exploreSpace(manager: FileManager, path: string) {
 }
 
 export function extract(manager: FileManager, entries: FileEntry[]) {
-	api.extractArchives(
-		entries.map((entry) => entry.path),
-		manager.currentPath
-	).then(manager.selectWhenDone, manager.notify);
+	commands.extractArchives({ paths: entries.map((entry) => entry.path), destination: manager.currentPath }).then(manager.selectWhenDone, manager.notify);
 }
 
 export function printable(entries: FileEntry[]) {
@@ -60,7 +57,7 @@ export function showProperties(entries: FileEntry[]) {
 }
 
 export function showPathProperties(manager: FileManager, path: string) {
-	getFileInfo(path)
+	commands.getFileInfo({ path })
 		.then((entry) => dialogs.properties([entry]))
 		.catch(manager.notify);
 }

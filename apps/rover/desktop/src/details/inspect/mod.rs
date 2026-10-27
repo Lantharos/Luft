@@ -4,19 +4,20 @@ mod open_with;
 use luft_app::Commands;
 use sabine::SabineWindow;
 use serde::Deserialize;
+use specta::Type;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Target {
     path: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Opening {
     path: String,
     token: Option<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Launch {
     path: String,
     app: String,

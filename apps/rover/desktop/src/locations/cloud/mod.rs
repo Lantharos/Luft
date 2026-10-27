@@ -7,34 +7,35 @@ use futures_util::StreamExt;
 use luft_accounts::client::{self, Signal};
 use luft_accounts::types::{Drive, FileState};
 use luft_app::launch::{self, Token};
-use luft_app::{Commands, Events};
+use luft_app::{Commands, Empty, Events};
 use sabine::SabineWindow;
 use serde::Deserialize;
-use serde_json::Value;
+use specta::Type;
 
-const CHANGED: &str = "rover.cloud";
+use crate::app::events::CLOUD_CHANGED;
+
 const ADD_ACCOUNT: &str = "kestrel-settings:accounts/add";
 
 static CLOUD_ROOT: OnceLock<PathBuf> = OnceLock::new();
 static WATCH: Once = Once::new();
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Folder {
     path: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Handoff {
     path: String,
     token: Option<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Paths {
     paths: Vec<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Conflict {
     account: String,
     copy: String,
@@ -49,7 +50,7 @@ fn open(address: &str, token: Option<&str>) -> Result<(), String> {
     launch::open(address, token).map_err(|error| error.to_string())
 }
 
-async fn drives(events: Events, _: Value) -> Result<Vec<Drive>, String> {
+async fn drives(events: Events, Empty {}: Empty) -> Result<Vec<Drive>, String> {
     let drives = client::drives().await?;
     WATCH.call_once(|| {
         luft_app::spawn(watch(events));
@@ -64,7 +65,7 @@ async fn watch(events: Events) {
     let mut signals = pin!(signals);
     while let Some(signal) = signals.next().await {
         if matches!(signal, Signal::Drives | Signal::Accounts) {
-            events.emit(CHANGED, ());
+            events.emit(CLOUD_CHANGED, ());
         }
     }
 }

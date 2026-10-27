@@ -1,4 +1,4 @@
-import type { Settings, UserDirs, ViewMode } from '#lib/types/index.js';
+import type { Settings, UserDirs, ViewMode } from '#lib/bindings.js';
 import { trimTrailingSlash } from '#lib/utils/paths.js';
 
 const GALLERY_DIRS: (keyof UserDirs)[] = ['pictures', 'videos'];

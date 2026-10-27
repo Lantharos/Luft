@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { tick } from 'svelte';
 	import { basename, Dialog, parent, plural, SearchField } from '@luft/ui';
+	import type { SearchResult } from '#lib/bindings.js';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
 	import { search } from '#lib/features/search.svelte.js';
-	import type { SearchResult } from '#lib/features/types.js';
 	import SearchFilters from './SearchFilters.svelte';
 	import SearchResults from './SearchResults.svelte';
 

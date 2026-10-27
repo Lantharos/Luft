@@ -9,6 +9,7 @@ use luft_app::Events;
 use parking_lot::Mutex;
 use rustc_hash::FxHashSet;
 use serde::Serialize;
+use specta::Type;
 
 use super::scope::{self, Scope};
 use crate::app::events::MEASURE_PROGRESS;
@@ -35,8 +36,8 @@ impl Linked {
     }
 }
 
-#[derive(Serialize)]
-struct Measurement {
+#[derive(Serialize, Type)]
+pub struct Measurement {
     id: u64,
     bytes: u64,
     files: u64,

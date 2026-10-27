@@ -6,20 +6,21 @@ use std::path::Path;
 use memchr::memchr;
 use regex::bytes::{Regex, RegexBuilder};
 use serde::Deserialize;
+use specta::Type;
 
-use super::kinds::{Kind, is_binary_extension, kind_of};
+use super::kinds::{SearchKind, is_binary_extension, kind_of};
 
 const MAX_CONTENT_BYTES: u64 = 16 * 1024 * 1024;
 const BINARY_PROBE_BYTES: usize = 8 * 1024;
 const SNIPPET_CHARS: usize = 120;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
-pub struct Query {
+pub struct SearchQuery {
     pub root: String,
     pub text: String,
     pub contents: bool,
-    pub kinds: Vec<Kind>,
+    pub kinds: Vec<SearchKind>,
     pub modified_after: Option<i64>,
     pub min_size: Option<u64>,
     pub max_size: Option<u64>,
@@ -34,14 +35,14 @@ pub enum Found {
 pub struct Matcher {
     tokens: Vec<String>,
     contents: Option<Regex>,
-    kinds: Vec<Kind>,
+    kinds: Vec<SearchKind>,
     modified_after: Option<i64>,
     min_size: Option<u64>,
     max_size: Option<u64>,
 }
 
 impl Matcher {
-    pub fn new(query: &Query) -> Result<Self, String> {
+    pub fn new(query: &SearchQuery) -> Result<Self, String> {
         let text = query.text.trim();
         let contents = (query.contents && !text.is_empty())
             .then(|| {

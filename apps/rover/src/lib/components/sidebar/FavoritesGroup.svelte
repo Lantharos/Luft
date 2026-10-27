@@ -1,6 +1,7 @@
 <script lang="ts">
 	import X from '@lucide/svelte/icons/x';
 	import { tooltip } from '@luft/ui';
+	import type { PinnedFolder } from '#lib/bindings.js';
 	import { KIND_ICONS } from '#lib/components/pane/kind-icons.js';
 	import * as bookmarks from '#lib/file-manager/places/bookmarks.js';
 	import type { ChooserState } from '#lib/file-manager/chooser.svelte.js';
@@ -9,7 +10,6 @@
 	import { dropKey } from '#lib/file-manager/drag/drop-targets.js';
 	import type { FileManager, SidebarPlace } from '#lib/file-manager/manager.svelte.js';
 	import { settings } from '#lib/state/settings.svelte.js';
-	import type { PinnedFolder } from '#lib/types/index.js';
 	import type { FileKind } from '#lib/utils/kinds.js';
 	import SidebarItem from './SidebarItem.svelte';
 

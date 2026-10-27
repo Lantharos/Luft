@@ -23,8 +23,9 @@ pub fn booted() -> Option<String> {
     let command_line = fs::read_to_string("/proc/cmdline").ok()?;
     command_line
         .split_whitespace()
-        .find_map(|argument| argument.strip_prefix("composefs="))
-        .map(|digest| digest.trim_start_matches('?').to_owned())
+        .find_map(|argument| argument.strip_prefix("composefs.digest="))
+        .and_then(|value| value.split_once(':'))
+        .map(|(_, digest)| digest.to_owned())
 }
 
 /// Mounts the deployment's system read-only at `at`, checking every file against its digest

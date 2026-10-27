@@ -35,7 +35,7 @@ require_signed_by_keys "$system"
 
 mkdir -p "$vm/share"
 
-podman build --quiet --tag "$vm_system" --build-arg "IMAGE=$system" --build-arg "USER=$user" \
+podman build --quiet --no-hosts --no-hostname --tag "$vm_system" --build-arg "IMAGE=$system" --build-arg "USER=$user" \
   --build-arg "PASSWORD=$password" --file - "$os/vm" >/dev/null <<'CONTAINERFILE'
 ARG IMAGE
 FROM ${IMAGE}
@@ -73,10 +73,9 @@ helper="$vm/helper.img"
 rm -f "$helper"
 truncate -s 64G "$helper"
 podman unshare mkfs.ext4 -q -F -L luft-helper -d "$tree" "$helper"
-kernel="$(podman unshare sh -c "ls '$tree/usr/lib/modules'")"
-podman unshare sh -c "cat '$tree/usr/lib/modules/$kernel/vmlinuz'" >"$vm/helper-vmlinuz"
 podman unshare sh -c "cat '$tree'/boot/EFI/Linux/*.efi" >"$vm/helper-startup.efi"
 podman unshare podman image unmount "$test_image" >/dev/null
+objcopy -O binary --only-section=.linux "$vm/helper-startup.efi" "$vm/helper-vmlinuz"
 objcopy -O binary --only-section=.initrd "$vm/helper-startup.efi" "$vm/helper-initramfs.img"
 
 unit="$vm/luft-vm-install.service"

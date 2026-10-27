@@ -29,8 +29,8 @@ pack_store() {
 }
 
 copy_kernel() {
-  install -Dm644 "$live"/usr/lib/modules/*/vmlinuz "$tree/boot/vmlinuz"
   install -Dm644 "$work/initrd.img" "$tree/boot/initrd.img"
+  objcopy -O binary --only-section=.linux "$live"/boot/EFI/Linux/luft.efi "$tree/boot/vmlinuz"
 }
 
 make_esp() {

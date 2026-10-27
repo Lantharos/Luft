@@ -36,7 +36,7 @@ size="$(podman image inspect --format '{{.Size}}' "$base")"
 printf '[images.default]\nsource = "oci-archive:/run/luft-source/luft.ociarchive"\ntarget = "ghcr.io/lantharos/luft:1"\nsize = %s\n' "$size" |
   install -Dm644 /dev/stdin "$stage/root/usr/lib/luft-installer/install.toml"
 cp "$here/Containerfile" "$stage/"
-podman build --quiet --build-arg "BASE=$base" --tag "$system" "$stage" > /dev/null
+podman build --quiet --no-hosts --no-hostname --build-arg "BASE=$base" --tag "$system" "$stage" > /dev/null
 "$luft/os/image/seal.sh" "$system" "$image"
 
 rm -rf "$vm/source" && mkdir -p "$vm/source/windows"
@@ -49,11 +49,11 @@ podman unshare sh -c "
   set -e
   tree=\$(podman image mount '$image')
   mkfs.ext4 -q -F -L luft-check-root -d \"\$tree\" '$vm/root.img' 16G
-  cp \"\$tree\"/usr/lib/modules/*/vmlinuz '$vm/vmlinuz'
   cp \"\$tree\"/boot/EFI/Linux/*.efi '$vm/startup.efi'
-  chmod 644 '$vm/vmlinuz' '$vm/startup.efi'
+  chmod 644 '$vm/startup.efi'
   podman image unmount '$image' > /dev/null
 "
+objcopy -O binary --only-section=.linux "$vm/startup.efi" "$vm/vmlinuz"
 objcopy -O binary --only-section=.initrd "$vm/startup.efi" "$vm/initramfs.img"
 truncate -s 120G "$vm/drive.img"
 cp "$firmware/OVMF_VARS.fd" "$vm/vars.fd"

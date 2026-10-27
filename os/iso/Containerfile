@@ -1,2 +1,2 @@
 FROM registry.fedoraproject.org/fedora:45
-RUN dnf install -y erofs-utils xorriso shim-x64 grub2-efi-x64 mtools dosfstools jq libselinux-utils && dnf clean all
+RUN dnf install -y erofs-utils xorriso shim-x64 grub2-efi-x64 mtools dosfstools jq libselinux-utils binutils && dnf clean all

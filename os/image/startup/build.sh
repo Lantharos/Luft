@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-digest="$1"
-key="$2"
-certificate="$3"
-pcr_key="$4"
-out="$5"
-kernel="$(ls /usr/lib/modules)"
+system="$1"
+kernels="$2"
+key="$3"
+certificate="$4"
+pcr_key="$5"
+out="$6"
+kernel="$(ls "$system/usr/lib/modules")"
 work="$(mktemp -d)"
 rescue_drops=(quiet rhgb loglevel systemd.show_status sushi plymouth.enable)
 unused_modules=(
@@ -33,10 +34,6 @@ unused_drivers=(
   mt76.* mt79.* mt792x-lib mac80211 cfg80211
 )
 
-kernel_arguments() {
-  bootc container inspect --json | python3 -c 'import json, sys; print(" ".join(json.load(sys.stdin)["kargs"]))'
-}
-
 without() {
   local argument dropped kept=()
   for argument in $1; do
@@ -48,19 +45,24 @@ without() {
   echo "${kept[*]}"
 }
 
-main="$(kernel_arguments) composefs=$digest"
-rescue="$(without "$main") systemd.unit=rescue.target systemd.setenv=SYSTEMD_SULOGIN_FORCE=1"
+command_line() {
+  ukify inspect "$1" --json=short | python3 -c 'import json, sys; print(json.load(sys.stdin)[".cmdline"]["text"].strip())'
+}
 
+startup_image() {
+  bootc container ukify --rootfs "$system" --kernel-dir "$work/$kernel" -- "$@"
+}
+
+mkdir -p "$work/$kernel"
+ln -s "$kernels/$kernel/vmlinuz" "$work/$kernel/vmlinuz"
 dracut --quiet --force --no-hostonly --omit "${unused_modules[*]}" --omit-drivers "${unused_drivers[*]}" \
-  --kver "$kernel" "$work/initramfs.img"
+  --kver "$kernel" "$work/$kernel/initramfs.img"
+startup_image --output="$work/unsigned.efi"
+main="$(command_line "$work/unsigned.efi")"
+rescue="$(without "$main") systemd.unit=rescue.target systemd.setenv=SYSTEMD_SULOGIN_FORCE=1"
 ukify build --profile=$'ID=rescue\nTITLE=Rescue' --cmdline="$rescue" --output="$work/rescue.efi"
 mkdir -p "$out"
-ukify build \
-  --linux="/usr/lib/modules/$kernel/vmlinuz" \
-  --initrd="$work/initramfs.img" \
-  --uname="$kernel" \
-  --os-release=@/usr/lib/os-release \
-  --cmdline="$main" \
+startup_image \
   --profile=ID=main \
   --join-profile="$work/rescue.efi" \
   --signtool=sbsign \

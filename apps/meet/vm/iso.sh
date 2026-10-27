@@ -54,7 +54,7 @@ CONTAINERFILE
 
 overlay() {
   local suffix="$1" system="$image_name-meet-system:45$1"
-  podman build --quiet --build-arg "BASE=$image_name-system:45$suffix" --tag "$system" "$stage" > /dev/null
+  podman build --quiet --no-hosts --no-hostname --build-arg "BASE=$image_name-system:45$suffix" --tag "$system" "$stage" > /dev/null
   "$luft/os/image/seal.sh" "$system" "$image_name-meet:45$suffix"
 }
 

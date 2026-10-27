@@ -9,6 +9,7 @@ registry="${LUFT_PARTS:-localhost/luft-parts}"
 image_name="${LUFT_IMAGE_NAME:-localhost/luft}"
 fedora=45
 signed_parts=(boot nvidia)
+bootc_minimum=1.17.1-1.fc45
 chunkah=quay.io/coreos/chunkah:v0.7.1
 bun="docker.io/oven/bun:$(sed -n 's/^ARG BUN_VERSION=//p' "$image/parts/Containerfile")-distroless"
 retries=(--retry 6 --retry-delay 20s)
@@ -30,7 +31,9 @@ localhost/luft:45-nvidia, with localhost/luft-system:45(-nvidia) as the systems
 before sealing (LUFT_IMAGE_NAME names them something other than localhost/luft).
 The default system is split into layers by content with chunkah, so a layer
 only changes when what's in it does, and the NVIDIA system is that system plus
-the driver, so the two images share every layer below it.
+the driver, so the two images share every layer below it. The kernel only
+ships inside the startup image, so it moves out of the systems into
+localhost/luft-kernel:45, where os/image/seal.sh takes it from.
 
 The image is put together from parts: Kestrel, the boot services, the patched
 bootc, libsecret and xdg-desktop-portal, the web runtime, Helium, the system
@@ -126,11 +129,15 @@ repo_version() {
   podman run --rm "$base" dnf repoquery --quiet --latest-limit 1 --arch "$(uname -m)" --qf '%{VERSION}-%{RELEASE}' "$1"
 }
 
+bootc_version() {
+  { base_version bootc; echo; echo "$bootc_minimum"; } | sort -V | tail -1
+}
+
 part_target() {
   case "$1" in
     app-keys) echo "app APP=keys APP_SOURCES=keys-sources" ;;
     app-*) echo "app APP=${1#app-}" ;;
-    bootc) echo "bootc BOOTC=$(base_version bootc)" ;;
+    bootc) echo "bootc BOOTC=$(bootc_version)" ;;
     libsecret) echo "libsecret LIBSECRET=$(base_version libsecret)" ;;
     portal) echo "portal PORTAL=$(repo_version xdg-desktop-portal)" ;;
     runtime) echo "runtime CEF=$cef" ;;
@@ -282,7 +289,7 @@ gather_parts() {
 build_system() {
   local target="$1" tag="$2"
   shift 2
-  podman build "${retries[@]}" --layers --security-opt label=disable --target "$target" --file "$image/Containerfile" \
+  podman build "${retries[@]}" --layers --no-hosts --no-hostname --security-opt label=disable --target "$target" --file "$image/Containerfile" \
     --build-context "parts=$state/parts" --build-arg "BASE=$base" --build-arg "CEF=$cef" "$@" \
     "${podman_options[@]}" --tag "$tag" "$luft"
 }
@@ -292,7 +299,7 @@ rechunk() {
   work="$(mktemp -d "${TMPDIR:-/var/tmp}/luft-rechunk.XXXXXX")"
   CHUNKAH_CONFIG_STR="$(podman image inspect "$system")" podman run "${retries[@]}" --rm --security-opt label=disable \
     --mount "type=image,source=$system,destination=/chunkah" --volume "$work:/out" --env CHUNKAH_CONFIG_STR \
-    "$chunkah" build --rootfs /chunkah --max-layers 128 --prune /sysroot/ \
+    "$chunkah" build --rootfs /chunkah --max-layers 128 --prune /sysroot/ --prune /kernel \
     --label ostree.commit- --label ostree.final-diffid- --label rpmostree.inputhash- --output oci:/out/system
   id="$(podman pull --quiet "oci:$work/system")"
   podman tag "$id" "$system"
@@ -309,7 +316,8 @@ build_images() {
     [[ -z "${LUFT_REBUILD:-}" ]] && part_exists "$ref" || echo "$name $ref"
   done <<<"$refs" | build_parts
   gather_parts <<<"$refs"
-  build_system luft "$system"
+  build_system luft-kernel "$image_name-kernel:$fedora"
+  build_system luft-split "$system"
   rechunk "$system"
   for variant; do
     case "$variant" in

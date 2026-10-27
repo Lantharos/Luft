@@ -43,8 +43,9 @@ fn booted_system() -> Option<String> {
     std::fs::read_to_string("/proc/cmdline")
         .ok()?
         .split_whitespace()
-        .find_map(|argument| argument.strip_prefix("composefs="))
-        .map(str::to_owned)
+        .find_map(|argument| argument.strip_prefix("composefs.digest="))
+        .and_then(|value| value.split_once(':'))
+        .map(|(_, digest)| digest.to_owned())
 }
 
 fn holds_entry_for(boot: &BootPartition, system: &str) -> bool {

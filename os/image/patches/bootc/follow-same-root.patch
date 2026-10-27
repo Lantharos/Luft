@@ -1,0 +1,154 @@
+From 7b1b75c34c005d8669fc08cc30edda6fda3ddc0b Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Tue, 27 Oct 2026 21:06:15 +0100
+Subject: [PATCH 2/2] composefs: Let the booted deployment follow an image with
+ its root
+
+Publishing the same root filesystem under another reference, as promoting
+a tested build to a release does, gives an image with the booted
+deployment's fs-verity digest. bootc switch refused it, so a system could
+not move to the release channel until a later build there, and an upgrade
+to such an image failed the same way.
+
+Pull the target, which only adds its manifest and config, and point the
+booted deployment's origin at it instead of deploying the same root again.
+A collision with the staged or rollback deployment is still an error.
+---
+ crates/lib/src/bootc_composefs/state.rs  | 22 ++++++++++++++++++++++
+ crates/lib/src/bootc_composefs/switch.rs |  2 +-
+ crates/lib/src/bootc_composefs/update.rs | 24 ++++++++++++++++++++----
+ 3 files changed, 43 insertions(+), 5 deletions(-)
+
+diff --git a/crates/lib/src/bootc_composefs/state.rs b/crates/lib/src/bootc_composefs/state.rs
+index dd15d7c2..19a66882 100644
+--- a/crates/lib/src/bootc_composefs/state.rs
++++ b/crates/lib/src/bootc_composefs/state.rs
+@@ -201,6 +201,28 @@ fn add_update_in_origin(
+     Ok(())
+ }
+ 
++/// Points the deployment's origin at `imgref`, whose manifest is `manifest_digest`
++pub(crate) fn update_image_in_origin(
++    storage: &Storage,
++    deployment_id: &str,
++    imgref: &ImageReference,
++    manifest_digest: &str,
++) -> Result<()> {
++    let imgref = imgref.to_image_proxy_ref()?;
++    add_update_in_origin(
++        storage,
++        deployment_id,
++        "origin",
++        &[(ORIGIN_CONTAINER, &format!("ostree-unverified-image:{imgref}"))],
++    )?;
++    add_update_in_origin(
++        storage,
++        deployment_id,
++        ORIGIN_KEY_IMAGE,
++        &[(ORIGIN_KEY_MANIFEST_DIGEST, manifest_digest)],
++    )
++}
++
+ pub(crate) fn update_boot_digest_in_origin(
+     storage: &Storage,
+     digest: &str,
+diff --git a/crates/lib/src/bootc_composefs/switch.rs b/crates/lib/src/bootc_composefs/switch.rs
+index 0cb0b9eb..392ffd38 100644
+--- a/crates/lib/src/bootc_composefs/switch.rs
++++ b/crates/lib/src/bootc_composefs/switch.rs
+@@ -110,7 +110,7 @@ pub(crate) async fn switch_composefs(
+                 return Ok(());
+             }
+ 
+-            UpdateAction::Proceed => {
++            UpdateAction::Proceed | UpdateAction::Retarget => {
+                 return do_upgrade(
+                     storage,
+                     booted_cfs,
+diff --git a/crates/lib/src/bootc_composefs/update.rs b/crates/lib/src/bootc_composefs/update.rs
+index a08a120b..1ecd7016 100644
+--- a/crates/lib/src/bootc_composefs/update.rs
++++ b/crates/lib/src/bootc_composefs/update.rs
+@@ -26,7 +26,7 @@ use crate::{
+         repo::pull_composefs_repo,
+         service::start_finalize_stated_svc,
+         soft_reboot::prepare_soft_reboot_composefs,
+-        state::write_composefs_state,
++        state::{update_image_in_origin, write_composefs_state},
+         status::{
+             ImgConfigManifest, StagedDeployment, get_bootloader, get_composefs_status,
+             get_container_manifest_and_config, get_imginfo,
+@@ -95,6 +95,9 @@ pub(crate) enum UpdateAction {
+     Skip,
+     /// Proceed with the update
+     Proceed,
++    /// Follow the target image from the booted deployment, which already has
++    /// the same root filesystem
++    Retarget,
+ }
+ 
+ /// Determines what action should be taken for the update
+@@ -133,6 +136,7 @@ pub(crate) enum UpdateAction {
+ /// # Returns
+ /// * UpdateAction::Skip    - Skip the update/switch as we have it as a deployment
+ /// * UpdateAction::Proceed - Proceed with the update
++/// * UpdateAction::Retarget - Switch to an image whose root filesystem is the booted one
+ pub(crate) fn validate_update(
+     storage: &Storage,
+     booted_cfs: &BootedComposefs,
+@@ -168,6 +172,11 @@ pub(crate) fn validate_update(
+     });
+ 
+     if let Some(collision) = found_depl {
++        if is_switch && matches!(collision.ty, Some(crate::status::Slot::Booted)) {
++            // The target is the booted root filesystem published under another
++            // reference; do_upgrade makes the booted deployment follow it.
++            return Ok(UpdateAction::Retarget);
++        }
+         if is_switch {
+             // For `bootc switch`, any digest collision is an error: two images
+             // from different sources can produce identical composefs roots and we
+@@ -292,14 +301,21 @@ pub(crate) async fn do_upgrade(
+     .await?;
+ 
+     // If the target image produces the same fs-verity digest as any existing
+-    // deployment (booted, staged, rollback, or pinned), error out.  Two images
++    // deployment (staged, rollback, or pinned), error out.  Two images
+     // from different sources can have identical content; we cannot silently reuse
+     // an existing state directory whose /etc was seeded from a different image.
++    // The booted deployment instead follows the target from now on, as when a
++    // tested build is published again as a release.
+     let all_deployments = host.all_composefs_deployments()?;
+     if let Some(collision) = all_deployments
+         .iter()
+         .find(|d| d.deployment.verity == id.to_hex())
+     {
++        if matches!(collision.ty, Some(crate::status::Slot::Booted)) {
++            update_image_in_origin(storage, &id.to_hex(), imgref, &manifest_digest)?;
++            println!("The booted deployment now follows {imgref:#}");
++            return Ok(());
++        }
+         anyhow::bail!(
+             "Target image has the same fs-verity digest as the existing {:?} deployment.",
+             collision.ty,
+@@ -566,7 +582,7 @@ pub(crate) async fn upgrade_composefs(
+             )?;
+ 
+             match action {
+-                UpdateAction::Skip => {
++                UpdateAction::Skip | UpdateAction::Retarget => {
+                     println!("No changes in staged image: {booted_imgref:#}");
+                     return Ok(());
+                 }
+@@ -598,7 +614,7 @@ pub(crate) async fn upgrade_composefs(
+         )?;
+ 
+         match action {
+-            UpdateAction::Skip => {
++            UpdateAction::Skip | UpdateAction::Retarget => {
+                 println!("No changes in: {booted_imgref:#}");
+                 return Ok(());
+             }
+-- 
+2.56.0
+

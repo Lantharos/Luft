@@ -36,11 +36,12 @@ podman unshare sh -c "
   set -e
   tree=\$(podman image mount '$image')
   mkfs.ext4 -q -F -L luft-sleep-check -d \"\$tree\" '$vm/root.img' 16G
-  cp \"\$tree\"/usr/lib/modules/*/vmlinuz '$vm/vmlinuz'
+  cp \"\$tree\"/boot/EFI/Linux/*.efi '$vm/startup.efi'
   cp \"\$tree\"/usr/lib/luft-sleep-check/initramfs.img '$vm/initramfs.img'
-  chmod 644 '$vm/vmlinuz' '$vm/initramfs.img'
+  chmod 644 '$vm/startup.efi' '$vm/initramfs.img'
   podman image unmount '$image' > /dev/null
 "
+objcopy -O binary --only-section=.linux "$vm/startup.efi" "$vm/vmlinuz"
 
 boot() {
   rm -f "$serial"

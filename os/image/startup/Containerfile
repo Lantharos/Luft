@@ -1,17 +1,23 @@
 ARG IMAGE
+ARG KERNEL
+
+FROM ${KERNEL} AS kernel
+
+FROM ${IMAGE} AS system
 
 FROM ${IMAGE} AS startup
 RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
     dnf install -y --setopt=keepcache=True systemd-ukify sbsigntools
 COPY build.sh /usr/local/bin/luft-startup-image
 COPY check-policy.py /usr/local/lib/luft-check-policy.py
-ARG DIGEST
 ARG SIGNED_BY
-RUN --mount=type=secret,id=secureboot-key \
+RUN --mount=type=bind,from=system,target=/target \
+    --mount=type=bind,from=kernel,target=/kernel \
+    --mount=type=secret,id=secureboot-key \
     --mount=type=secret,id=secureboot-cert \
     --mount=type=secret,id=pcr-key \
     : "signed by ${SIGNED_BY}" && \
-    luft-startup-image "${DIGEST}" /run/secrets/secureboot-key /run/secrets/secureboot-cert /run/secrets/pcr-key /out
+    luft-startup-image /target /kernel /run/secrets/secureboot-key /run/secrets/secureboot-cert /run/secrets/pcr-key /out
 
 FROM ${IMAGE}
 COPY --from=startup /out/ /boot/EFI/Linux/

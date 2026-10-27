@@ -1,6 +1,6 @@
-From b8f70ea5baafa55e020e38eea99d252f22ffd8a4 Mon Sep 17 00:00:00 2001
+From f4cff707607c73daae67199cd909c198d23b2358 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <imeri@lanth.me>
-Date: Tue, 20 Oct 2026 08:57:19 +0200
+Date: Thu, 22 Oct 2026 02:00:53 +0200
 Subject: [PATCH] initramfs: Refuse a composefs image without fs-verity when
  the command line is strict
 
@@ -19,7 +19,7 @@ verity=require, whatever meta.json says.
  1 file changed, 30 insertions(+), 5 deletions(-)
 
 diff --git a/crates/initramfs/src/lib.rs b/crates/initramfs/src/lib.rs
-index 8d2de21..96418c5 100644
+index ed989c57..6be4b8b4 100644
 --- a/crates/initramfs/src/lib.rs
 +++ b/crates/initramfs/src/lib.rs
 @@ -24,7 +24,7 @@ use serde::Deserialize;
@@ -29,9 +29,9 @@ index 8d2de21..96418c5 100644
 -    mount::FsHandle,
 +    mount::{FsHandle, MountOptions, VerityRequirement, composefs_fsmount},
      mountcompat::{overlayfs_set_fd, overlayfs_set_lower_and_data_fds, prepare_mount},
-     repository::Repository,
+     repository::{ImageNotFound, Repository},
  };
-@@ -350,18 +350,43 @@ pub fn mount_composefs_image(
+@@ -365,18 +365,43 @@ pub fn mount_composefs_image(
      // that lack meta.json: it infers the algorithm and verity mode from
      // existing objects, writes meta.json, and opens normally.
      let (mut repo, _upgraded) = Repository::<Sha512HashValue>::open_upgrade(sysroot, "composefs")?;
@@ -76,9 +76,9 @@ index 8d2de21..96418c5 100644
 +    .context("Mounting the composefs image with fs-verity required")
 +}
 +
- /// Mounts a subdirectory with the specified configuration
- #[context("Mounting subdirectory")]
- pub fn mount_subdir(
+ fn parse_composefs_candidates(cmdline: &str) -> Result<Vec<ComposefsCmdline<Sha512HashValue>>> {
+     let mut candidates = Vec::new();
+     let mut seen_legacy = false;
 -- 
 2.56.0
 

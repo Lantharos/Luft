@@ -10,7 +10,7 @@ spec="$top/SPECS/$package.spec"
 
 mkdir -p "$top"
 dnf install -y --setopt=keepcache=True rpm-build
-dnf download --source --destdir "$top" "$package-$version"
+dnf download --source --enablerepo=updates-testing --destdir "$top" "$package-$version"
 rpm --define "_topdir $top" -i "$top/$package"-*.src.rpm
 cp "$patches"/*.patch "$top/SOURCES/"
 sed -i -e 's/^Release:\(\s*\)%{\?autorelease}\?$/Release:\1%{autorelease -e luft}/' "$spec"

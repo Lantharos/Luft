@@ -19,7 +19,7 @@ USAGE
 }
 
 booted() {
-  tr ' ' '\n' </proc/cmdline | sed -n 's/^composefs=?\{0,1\}//p'
+  tr ' ' '\n' </proc/cmdline | sed -n 's/^composefs\.digest=[^:]*://p'
 }
 
 gather() {

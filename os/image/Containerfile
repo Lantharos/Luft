@@ -37,9 +37,14 @@ LABEL org.opencontainers.image.version="${VERSION}" org.opencontainers.image.rev
     org.opencontainers.image.base.name="${BASE}" com.lantharos.release-notes="${RELEASE_NOTES}" \
     com.lantharos.cef="${CEF}"
 
+FROM luft AS luft-split
+RUN mkdir /kernel && bootc container split-kernel-and-rootfs --rootfs / --output /kernel
+
+FROM scratch AS luft-kernel
+COPY --from=luft-split /kernel/ /
+
 FROM ${SYSTEM} AS luft-nvidia
-RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
-    --mount=type=bind,source=os/image/stages,target=/run/luft/stages \
+RUN --mount=type=bind,source=os/image/stages,target=/run/luft/stages \
     --mount=type=bind,from=parts,source=nvidia,target=/run/luft/nvidia \
     /run/luft/stages/nvidia.sh /run/luft/nvidia
 RUN bootc container lint

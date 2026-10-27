@@ -87,10 +87,6 @@ leave_greetd_config_to_the_greeter() {
   rm -f /etc/greetd/config.toml
 }
 
-leave_initramfs_to_the_startup_image() {
-  rm -f /usr/lib/modules/*/initramfs.img
-}
-
 check_typelibs() {
   local namespace missing=()
   while read -r namespace; do
@@ -120,5 +116,4 @@ refresh_caches
 let_line_out_play_beside_headphones
 make_efi_mountpoint
 leave_greetd_config_to_the_greeter
-leave_initramfs_to_the_startup_image
 clean_build_state

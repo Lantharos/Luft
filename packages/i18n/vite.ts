@@ -1,7 +1,8 @@
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import type { Plugin } from 'vite';
 
-import { localeFiles, locales, merged } from './tools/merge.js';
+import { localeFiles, locales, merged } from './tools/merge.ts';
 
 const MODULE = 'virtual:luft-locales';
 const RESOLVED = `\0${MODULE}`;
@@ -10,12 +11,9 @@ const UI_LOCALES = fileURLToPath(new URL('../web/ui/locales', import.meta.url));
 /**
  * Bundles an app's Fluent files, one lazily loaded chunk per locale with the
  * English messages filled in for anything not yet translated.
- * @param {{ dirs?: string[] }} [options]
- * @returns {import('vite').Plugin}
  */
-export function luftLocales({ dirs = ['locales'] } = {}) {
-	/** @type {string[]} */
-	let folders = [];
+export function luftLocales({ dirs = ['locales'] }: { dirs?: string[] } = {}): Plugin {
+	let folders: string[] = [];
 	return {
 		name: 'luft-locales',
 		configResolved(config) {

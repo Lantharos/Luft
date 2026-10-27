@@ -12,7 +12,7 @@
 		},
 		"./core": "./src/core.ts",
 		"./locales": "./src/locales.ts",
-		"./vite": "./vite.js"
+		"./vite": "./vite.ts"
 	},
 	"scripts": {
 		"check": "svelte-check --tsconfig ./tsconfig.json && bun tools/lint.ts",

@@ -5,14 +5,13 @@
 		"moduleResolution": "bundler",
 		"lib": ["ESNext", "DOM"],
 		"types": ["bun"],
-		"allowJs": true,
-		"checkJs": true,
 		"strict": true,
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"noEmit": true,
+		"allowImportingTsExtensions": true,
 		"skipLibCheck": true,
 		"verbatimModuleSyntax": true
 	},
-	"include": ["src", "tools", "vite.js"]
+	"include": ["src", "tools", "vite.ts"]
 }

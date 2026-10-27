@@ -1,11 +1,10 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { Comment, GroupComment, Junk, parse, Resource, ResourceComment, serialize } from '@fluent/syntax';
+import { Message, parse, Resource, serialize, Term } from '@fluent/syntax';
 
 export const SOURCE_LOCALE = 'en';
 
-/** @param {string} dir @param {string} locale */
-export function localeFiles(dir, locale) {
+export function localeFiles(dir: string, locale: string) {
 	const folder = join(dir, locale);
 	if (!existsSync(folder)) return [];
 	return readdirSync(folder)
@@ -14,25 +13,19 @@ export function localeFiles(dir, locale) {
 		.map((name) => join(folder, name));
 }
 
-/** @param {string[]} files */
-function entries(files) {
+function entries(files: string[]) {
 	return files.flatMap((file) =>
-		parse(readFileSync(file, 'utf8'), { withSpans: false }).body.filter(
-			(entry) => !(entry instanceof Comment || entry instanceof GroupComment || entry instanceof ResourceComment || entry instanceof Junk)
-		)
+		parse(readFileSync(file, 'utf8'), { withSpans: false }).body.filter((entry) => entry instanceof Message || entry instanceof Term)
 	);
 }
 
-/** @param {any} entry */
-const idOf = (entry) => `${entry.type === 'Term' ? '-' : ''}${entry.id.name}`;
+const idOf = (entry: Message | Term) => `${entry instanceof Term ? '-' : ''}${entry.id.name}`;
 
 /**
  * One Fluent source for a locale: its own messages from every folder, and the
  * English ones for whatever it hasn't translated yet.
- * @param {string[]} dirs
- * @param {string} locale
  */
-export function merged(dirs, locale) {
+export function merged(dirs: string[], locale: string) {
 	const own = entries(dirs.flatMap((dir) => localeFiles(dir, locale)));
 	const known = new Set(own.map(idOf));
 	const missing = locale === SOURCE_LOCALE ? [] : entries(dirs.flatMap((dir) => localeFiles(dir, SOURCE_LOCALE))).filter((entry) => !known.has(idOf(entry)));
@@ -41,8 +34,7 @@ export function merged(dirs, locale) {
 	return serialize(new Resource(body), {});
 }
 
-/** @param {string[]} dirs */
-export function locales(dirs) {
+export function locales(dirs: string[]) {
 	const found = new Set([SOURCE_LOCALE]);
 	for (const dir of dirs) {
 		if (!existsSync(dir)) continue;

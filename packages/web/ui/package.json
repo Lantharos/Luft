@@ -14,7 +14,7 @@
 			"default": "./src/code/index.ts"
 		},
 		"./styles.css": "./src/styles/index.css",
-		"./vite": "./vite.js",
+		"./vite": "./vite.ts",
 		"./tsconfig.base.json": "./tsconfig.base.json"
 	},
 	"scripts": {

@@ -1,5 +1,6 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import type { Plugin } from 'vite';
 
 export { luftLocales } from '@luft/i18n/vite';
 
@@ -11,24 +12,21 @@ const FIXED_LENGTH = /^-?[\d.]+(px|rem)$/;
 
 const scaleText = {
 	postcssPlugin: 'luft-text-scale',
-	/** @param {{ prop: string, value: string }} declaration */
-	Declaration(declaration) {
+	Declaration(declaration: { prop: string; value: string }) {
 		if (TEXT_PROPERTIES.has(declaration.prop) && FIXED_LENGTH.test(declaration.value)) {
 			declaration.value = `calc(${declaration.value} * var(--text-scale, 1))`;
 		}
 	}
 };
 
-/** @returns {import('vite').Plugin} */
-export function sabineTarget() {
+export function sabineTarget(): Plugin {
 	return {
 		name: 'sabine-target',
 		config: () => ({ build: { target: SABINE_CHROMIUM, cssTarget: SABINE_CHROMIUM } })
 	};
 }
 
-/** @returns {import('vite').Plugin} */
-export function luftFonts() {
+export function luftFonts(): Plugin {
 	return {
 		name: 'luft-fonts',
 		config: () => ({

@@ -60,6 +60,6 @@ export class BackgroundPortal {
     const visible = new Set(sandboxedApps().keys());
     const changed = visible.size !== this.visible.size || [...visible].some(id => !this.visible.has(id));
     this.visible = visible;
-    if (changed) this.dbus.emit_signal('RunningApplicationsChanged', null as unknown as GLib.Variant);
+    if (changed) this.dbus.emit_signal('RunningApplicationsChanged', null);
   }
 }

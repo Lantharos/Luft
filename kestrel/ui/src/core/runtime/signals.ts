@@ -1,4 +1,4 @@
-import type { SignalMethods } from '@girs/gjs/gjs';
+import type { SignalMethods } from '../../../../types/gir/gjs.js';
 import * as SignalTracker from './signalTracker.js';
 
 export interface EventEmitter extends SignalMethods {}

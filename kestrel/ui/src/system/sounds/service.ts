@@ -1,7 +1,7 @@
 import Gio from 'gi://Gio';
+import Shell from 'gi://Shell';
 
 import { refuseSandboxed } from '../../shared/dbus/sandbox.js';
-import { soundPlayer } from './player.js';
 import { onlyErrors } from './situation.js';
 import { playNamedSound } from './sounds.js';
 
@@ -28,7 +28,7 @@ export class SoundService {
   PreviewAsync([name]: [string], invocation: Gio.DBusMethodInvocation): void {
     void refuseSandboxed(invocation, 'play system sounds').then(refused => {
       if (refused) return;
-      if (!onlyErrors()) soundPlayer().play(name);
+      if (!onlyErrors()) Shell.SoundPlayer.get_default().play(name);
       invocation.return_value(null);
     });
   }

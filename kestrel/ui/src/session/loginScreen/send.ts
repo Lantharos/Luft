@@ -37,7 +37,8 @@ export function sendToLoginScreen(method: string, file: Gio.File, recordName: st
     identity = [file.get_uri(), info.get_modification_date_time()?.to_unix(), info.get_size(), ...details.map(detail => detail.print(false))].join(' ');
     if (identity === readRecord(record)) return;
     const stream = file.read(null);
-    descriptors.append((stream as unknown as GioUnix.FileDescriptorBased).get_fd());
+    if (!(stream instanceof GioUnix.FileDescriptorBased)) return;
+    descriptors.append(stream.get_fd());
     stream.close(null);
   } catch {
     return;

@@ -2,11 +2,11 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
+import Shell from 'gi://Shell';
 import type St from 'gi://St';
 
 import * as KestrelUi from '../../kestrelUi.js';
 import { clamp } from '../../shared/math.js';
-import { maxAmplified, mixer, type MixerStream } from '../mediaKeys/mixer.js';
 import * as Main from '../../core/main.js';
 import * as PopupMenu from '../../shared/popups/popupMenu.js';
 import { QuickSlider, SystemIndicator } from '../toggles/quickSettings.js';
@@ -53,14 +53,14 @@ class StreamSlider extends QuickSlider {
 
   private readonly output: boolean;
   private readonly icons: string[];
-  private readonly mixer = mixer();
+  private readonly mixer = Shell.Mixer.get_default();
   private readonly soundSettings = new Gio.Settings({ schema_id: 'org.gnome.desktop.sound' });
   private readonly deviceSection = new PopupMenu.PopupMenuSection();
   private readonly sliderChangedId: number;
   private inDrag = false;
   private notifyVolumeChangeId = 0;
   private allowAmplified = false;
-  protected currentStream: MixerStream | null = null;
+  protected currentStream: Shell.MixerStream | null = null;
 
   constructor({ output, icons }: StreamSliderOptions) {
     super({ icon_reactive: true });
@@ -102,15 +102,15 @@ class StreamSlider extends QuickSlider {
     KestrelUi.localized(this, () => this.syncIconLabel());
   }
 
-  private defaultStream(): MixerStream | null {
+  private defaultStream(): Shell.MixerStream | null {
     return this.output ? this.mixer.output : this.mixer.input;
   }
 
-  get stream(): MixerStream | null {
+  get stream(): Shell.MixerStream | null {
     return this.currentStream;
   }
 
-  set stream(stream: MixerStream | null) {
+  set stream(stream: Shell.MixerStream | null) {
     if (stream === this.currentStream) return;
     this.currentStream?.disconnectObject(this);
     this.currentStream = stream;
@@ -123,7 +123,7 @@ class StreamSlider extends QuickSlider {
     this.visible = stream != null;
   }
 
-  protected connectStream(stream: MixerStream): void {
+  protected connectStream(stream: Shell.MixerStream): void {
     stream.connectObject('notify::muted', () => this.updateVolume(), 'notify::volume', () => this.updateVolume(), this);
   }
 
@@ -211,7 +211,7 @@ class StreamSlider extends QuickSlider {
   }
 
   getMaxLevel(): number {
-    return this.allowAmplified ? maxAmplified() : 1;
+    return this.allowAmplified ? Shell.Mixer.get_max_amplified() : 1;
   }
 
   showOSD(): void {
@@ -232,7 +232,7 @@ const OutputStreamSlider = GObject.registerClass(class OutputStreamSlider extend
     });
   }
 
-  protected connectStream(stream: MixerStream): void {
+  protected connectStream(stream: Shell.MixerStream): void {
     super.connectStream(stream);
     stream.connectObject('notify::port', () => this.portChanged(), this);
     this.portChanged();

@@ -53,6 +53,6 @@ export class OpenWindows {
     const shown = fingerprint(listing());
     if (shown === this.shown) return;
     this.shown = shown;
-    this.dbus.emit_signal('Changed', null as unknown as GLib.Variant);
+    this.dbus.emit_signal('Changed', null);
   }
 }

@@ -6,6 +6,7 @@ import Mtk from 'gi://Mtk';
 import * as KestrelUi from '../../kestrelUi.js';
 import * as Main from '../../core/main.js';
 import type { Monitor } from '../../core/stage/layout.js';
+import { setEdgesTiled } from '../windows/frames.js';
 
 const CORNER_REACH = 96;
 const EDGE_REACH = 4;
@@ -128,7 +129,7 @@ export class CornerSnap {
   private release(window: Meta.Window): Snapped | undefined {
     const snapped = this.snapped.get(window);
     this.snapped.delete(window);
-    window.set_tiled_edges(0);
+    setEdgesTiled(window, false);
     return snapped;
   }
 

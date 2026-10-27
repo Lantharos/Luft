@@ -1,5 +1,4 @@
 import Gio from 'gi://Gio';
-import type GLib from 'gi://GLib';
 
 import { portalObject } from './exported.js';
 
@@ -32,7 +31,7 @@ export abstract class PortalSession {
 
   close(): void {
     if (this.ended) return;
-    this.exported.emit_signal('Closed', null as unknown as GLib.Variant);
+    this.exported.emit_signal('Closed', null);
     this.end();
   }
 

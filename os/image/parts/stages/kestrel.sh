@@ -85,12 +85,16 @@ build_compositor() {
 build_engine() {
   local setup=()
   [[ -f "$work/engine/build.ninja" ]] && setup+=(--reconfigure)
-  (cd "$luft" && bun install --frozen-lockfile --filter @luft/kestrel-ui)
+  (cd "$luft" && bun install --frozen-lockfile --filter @luft/kestrel-ui --filter @luft/kestrel-types)
   export NODE_PATH="$kestrel/ui/node_modules"
   meson setup "${setup[@]}" "$work/engine" "$kestrel/engine" \
     -Dpkg_config_path="$prefix/lib/pkgconfig" --prefix="$prefix" --buildtype=release
   meson compile -C "$work/engine"
   DESTDIR="$destdir" meson install -C "$work/engine" --no-rebuild --quiet
+}
+
+check_types() {
+  bun "$kestrel/types/generate.ts" --check --build "$work/engine" --compositor "$prefix"
 }
 
 build_services() {
@@ -130,6 +134,7 @@ list_typelibs() {
 keep_sources_in_work
 build_compositor
 build_engine
+check_types
 build_services
 stage_service_files
 stage_presets

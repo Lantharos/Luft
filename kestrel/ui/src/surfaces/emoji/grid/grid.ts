@@ -1,11 +1,12 @@
 import Clutter from 'gi://Clutter';
+import Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import { pixelScale, whenPixelScaleChanges } from '../../../shared/display/graphics.js';
 import { animateAdjustment } from '../../../shared/motion/motion.js';
 import { withTone, type Item, type Tab } from '../catalog/catalog.js';
 import { CellView } from './cellView.js';
-import { GlyphImages, GlyphRenderer, type Glyph } from './images.js';
+import { GlyphImages, type Glyph } from './images.js';
 import { CELL_SIZE, COLUMNS, GridLayout, HEADER_HEIGHT, type Cell } from './layout.js';
 import type { Work } from '../../prewarm/queue.js';
 
@@ -33,7 +34,7 @@ export class EmojiGrid {
   private readonly views = new Map<number, CellView>();
   private readonly spareViews: CellView[] = [];
   private readonly reusable = new Map<Item, CellView>();
-  private readonly emojiImages = new GlyphImages(GlyphRenderer.new_for_emoji(), EMOJI_SIZE);
+  private readonly emojiImages = new GlyphImages(Shell.GlyphRenderer.new_for_emoji(), EMOJI_SIZE);
   private characterImages: GlyphImages | null = null;
   private characterInk = '';
   private readonly themeContext = St.ThemeContext.get_for_stage(global.stage);
@@ -185,7 +186,7 @@ export class EmojiGrid {
     if (!this.characterImages) {
       const theme = this.actor.get_theme_node();
       this.characterInk = theme.get_foreground_color().to_string();
-      this.characterImages = new GlyphImages(GlyphRenderer.new_for_text(theme.get_font().get_family()!, theme.get_foreground_color()), CHARACTER_SIZE);
+      this.characterImages = new GlyphImages(Shell.GlyphRenderer.new_for_text(theme.get_font().get_family()!, theme.get_foreground_color()), CHARACTER_SIZE);
     }
     return this.characterImages;
   }

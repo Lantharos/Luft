@@ -8,11 +8,6 @@ import { readText, removeFile, userFile, writeText } from '../files.js';
 import { styledIcon } from './appIcons.js';
 import { GLYPH_PAINT } from './paint.js';
 
-interface GlyphCache extends St.TextureCache {
-  lookup_styled_icon_file(icon: Gio.Icon, size: number): Gio.File | null;
-  save_styled_icon_async(icon: Gio.Icon, size: number, path: string, cancellable: Gio.Cancellable | null): Promise<boolean>;
-}
-
 Gio._promisify(St.TextureCache.prototype, 'save_styled_icon_async');
 Gio._promisify(Gio.File.prototype, 'enumerate_children_async');
 Gio._promisify(Gio.FileEnumerator.prototype, 'next_files_async');
@@ -20,11 +15,11 @@ Gio._promisify(Gio.FileEnumerator.prototype, 'next_files_async');
 const GLYPH_SIZE = 96;
 const SYNC_DELAY = 2000;
 const SOURCES = '.sources.json';
-const cache = St.TextureCache.get_default() as GlyphCache;
+const cache = St.TextureCache.get_default();
 
 const glyphName = (app: Gio.AppInfo) => `${app.get_id()!.replace(/\.desktop$/, '')}.png`;
 
-async function sourceOf(icon: Gio.Icon): Promise<string | null> {
+async function sourceOf(icon: St.StyledIcon): Promise<string | null> {
   const file = cache.lookup_styled_icon_file(icon, GLYPH_SIZE);
   if (!file) return null;
   const [contents] = await file.load_contents_async(null);

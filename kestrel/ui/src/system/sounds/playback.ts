@@ -1,7 +1,5 @@
 import GLib from 'gi://GLib';
-import type Shell from 'gi://Shell';
-
-import { mixer } from '../mediaKeys/mixer.js';
+import Shell from 'gi://Shell';
 
 export interface Sender {
   app: Shell.App | null;
@@ -36,7 +34,7 @@ function lineageOf(pid: number): number[] {
 }
 
 export function followPlayback(): void {
-  mixer().connect('playback-started', (_mixer, pid, appId, binary, name) => {
+  Shell.Mixer.get_default().connect('playback-started', (_mixer, pid, appId, binary, name) => {
     const playback = {
       startedAt: GLib.get_monotonic_time(),
       lineage: lineageOf(pid),

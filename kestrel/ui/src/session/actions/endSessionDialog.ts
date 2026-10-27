@@ -262,13 +262,13 @@ export class EndSessionDialog extends ModalDialog {
   override close(skipSignal = false): void {
     super.close();
 
-    if (!skipSignal) this.dbusImpl.emit_signal('Closed', null as unknown as GLib.Variant);
+    if (!skipSignal) this.dbusImpl.emit_signal('Closed', null);
   }
 
   private cancel(): void {
     this.stopTimer();
     this.stopAltCapture();
-    this.dbusImpl.emit_signal('Canceled', null as unknown as GLib.Variant);
+    this.dbusImpl.emit_signal('Canceled', null);
     this.close();
   }
 
@@ -283,7 +283,7 @@ export class EndSessionDialog extends ModalDialog {
     this.fadeOutDialog();
     this.stopTimer();
     this.stopAltCapture();
-    this.dbusImpl.emit_signal(signal, null as unknown as GLib.Variant);
+    this.dbusImpl.emit_signal(signal, null);
   }
 
   private installsStagedImage(signal: ConfirmSignal): boolean {

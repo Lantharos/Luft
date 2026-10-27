@@ -1,9 +1,9 @@
 import type Meta from 'gi://Meta';
+import Shell from 'gi://Shell';
 import { getGeoclueAgent } from './location.js';
 
 import { ownDictation } from '../dictation/listening.js';
 import { windowAccess } from '../peek/access/grants.js';
-import { mixer } from '../mediaKeys/mixer.js';
 import { cameraMonitor } from './camera.js';
 
 export interface PrivacyState {
@@ -18,7 +18,7 @@ export interface PrivacyState {
 export class PrivacyMonitor {
   readonly handles = new Set<Meta.RemoteAccessHandle>();
   private readonly camera = cameraMonitor();
-  private readonly mixer = mixer();
+  private readonly mixer = Shell.Mixer.get_default();
   private readonly geoclue = getGeoclueAgent();
   private readonly disconnectors: (() => void)[] = [];
   private dictationIsOurs = false;

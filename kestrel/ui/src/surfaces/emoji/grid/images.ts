@@ -1,12 +1,7 @@
 import type Clutter from 'gi://Clutter';
-import type Cogl from 'gi://Cogl';
-import Shell from 'gi://Shell';
+import type Shell from 'gi://Shell';
 
 const CACHE_LIMIT = 512;
-
-export interface GlyphRenderer {
-  render(text: string, size: number, scale: number): Clutter.Content | null;
-}
 
 export interface Glyph {
   readonly content: Clutter.Content;
@@ -14,14 +9,10 @@ export interface Glyph {
   readonly height: number;
 }
 
-export const { GlyphRenderer } = Shell as unknown as {
-  GlyphRenderer: { new_for_emoji(): GlyphRenderer; new_for_text(family: string, color: Cogl.Color): GlyphRenderer };
-};
-
 export class GlyphImages {
   private readonly cache = new Map<string, Glyph | null>();
 
-  constructor(private readonly renderer: GlyphRenderer, private readonly size: number) {}
+  constructor(private readonly renderer: Shell.GlyphRenderer, private readonly size: number) {}
 
   get(text: string, scale: number): Glyph | null {
     const key = `${scale} ${text}`;

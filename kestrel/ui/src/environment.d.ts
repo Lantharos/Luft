@@ -23,8 +23,8 @@ export interface EaseOptions {
 
 export type EaseProperties = EaseOptions & { [property: string]: unknown };
 
-declare module '@girs/gobject-2.0/gobject-2.0' {
-  namespace GObject {
+declare module 'gi://GObject?version=2.0' {
+  export namespace GObject {
     interface Object {
       connectObject(...args: unknown[]): void;
       disconnectObject(owner: object): void;
@@ -36,16 +36,16 @@ declare module '@girs/gobject-2.0/gobject-2.0' {
   }
 }
 
-declare module '@girs/glib-2.0/glib-2.0' {
-  namespace GLib {
+declare module 'gi://GLib?version=2.0' {
+  export namespace GLib {
     function timeout_add_once(priority: number, interval: number, callback: () => void): number;
     function timeout_add_seconds_once(priority: number, interval: number, callback: () => void): number;
     function idle_add_once(priority: number, callback: () => void): number;
   }
 }
 
-declare module '@girs/clutter-51/clutter-51' {
-  namespace Clutter {
+declare module 'gi://Clutter?version=51' {
+  export namespace Clutter {
     interface Actor {
       ease(properties: EaseProperties): void;
       easeAsync(properties: EaseProperties): Promise<void>;
@@ -59,8 +59,8 @@ declare module '@girs/clutter-51/clutter-51' {
   }
 }
 
-declare module '@girs/st-51/st-51' {
-  namespace St {
+declare module 'gi://St?version=51' {
+  export namespace St {
     interface Adjustment {
       ease(target: number, options: EaseOptions): void;
     }

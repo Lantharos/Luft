@@ -1,3 +1,4 @@
+import type Clutter from 'gi://Clutter';
 import Cogl from 'gi://Cogl';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
@@ -14,29 +15,15 @@ export interface IconApp {
   get_icon(): Gio.Icon | null;
 }
 
-interface StyledIconParams {
-  source: Gio.Icon;
-  glyph_names: string[];
-  plate: Cogl.Color;
-  ink: Cogl.Color;
-  shade: Cogl.Color;
-  rim: number;
-}
-
-interface WindowIconApp extends Shell.App {
-  create_window_icon_texture(window: Meta.Window, size: number): St.Widget;
-}
-
-const StyledIcon = (St as unknown as { StyledIcon: new (params: StyledIconParams) => Gio.Icon }).StyledIcon;
-const textureCache = St.TextureCache.get_default() as St.TextureCache & { evict_styled_icons(): void };
+const textureCache = St.TextureCache.get_default();
 const FALLBACK = new Gio.ThemedIcon({ name: 'application-x-executable' });
 const RESTYLE_BATCH = 12;
 
 const color = (hex: string) => Cogl.Color.from_string(hex)[1];
 
-export function styledIcon(app: IconApp, paint: Paint): Gio.Icon {
+export function styledIcon(app: IconApp, paint: Paint): St.StyledIcon {
   const source = app.get_icon() ?? FALLBACK;
-  return new StyledIcon({
+  return new St.StyledIcon({
     source, glyph_names: glyphNames(app.get_id(), source),
     plate: color(paint.plate), ink: color(paint.ink), shade: color(paint.shade), rim: paint.rim,
   });
@@ -155,6 +142,6 @@ export function sourceApp(source: { policy?: { id?: string } }): Shell.App | nul
   return Shell.AppSystem.get_default().lookup_app(`${source.policy?.id}.desktop`);
 }
 
-export function windowIcon(app: Shell.App, window: Meta.Window, size: number): St.Widget {
-  return appIcons.style === 'default' ? (app as WindowIconApp).create_window_icon_texture(window, size) : appIcon(app, size);
+export function windowIcon(app: Shell.App, window: Meta.Window, size: number): Clutter.Actor {
+  return appIcons.style === 'default' ? app.create_window_icon_texture(window, size) : appIcon(app, size);
 }

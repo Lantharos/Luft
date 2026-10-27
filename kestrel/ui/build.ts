@@ -1,6 +1,8 @@
-import { build, type Plugin } from 'esbuild';
+import { build } from 'esbuild';
 import { writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
+
+import { typelibVersions } from './typelibs.js';
 
 const [entry, output, configJson] = process.argv.slice(2);
 
@@ -9,48 +11,6 @@ if (!entry || !output || !configJson) {
 }
 
 const config = JSON.parse(configJson) as Record<string, string>;
-const mutterVersion = config.LIBMUTTER_API_VERSION;
-const MUTTER_NAMESPACES = ['Clutter', 'Cogl', 'Meta', 'Mtk', 'Shell', 'St'];
-const TYPELIB_VERSIONS: Record<string, string> = {
-  AccountsService: '1.0',
-  Atk: '1.0',
-  Atspi: '2.0',
-  cairo: '1.0',
-  GDesktopEnums: '3.0',
-  Gdk: '4.0',
-  GdkPixbuf: '2.0',
-  Gio: '2.0',
-  GioUnix: '2.0',
-  GLib: '2.0',
-  GLibUnix: '2.0',
-  Gly: '2',
-  GObject: '2.0',
-  Graphene: '1.0',
-  Gst: '1.0',
-  Gtk: '4.0',
-  GUdev: '1.0',
-  IBus: '1.0',
-  NM: '1.0',
-  Pango: '1.0',
-  PangoCairo: '1.0',
-  Polkit: '1.0',
-  PolkitAgent: '1.0',
-  Soup: '3.0',
-  UPowerGlib: '1.0',
-};
-
-const typelibVersions: Plugin = {
-  name: 'typelib-versions',
-  setup(builder) {
-    builder.onResolve({ filter: /^gi:\/\// }, ({ path }) => {
-      if (path.includes('?version=')) return { path, external: true };
-      const namespace = path.slice('gi://'.length);
-      const version = MUTTER_NAMESPACES.includes(namespace) ? mutterVersion : TYPELIB_VERSIONS[namespace];
-      if (!version) return { errors: [{ text: `${namespace} needs a typelib version in build.ts` }] };
-      return { path: `gi://${namespace}?version=${version}`, external: true };
-    });
-  },
-};
 
 const result = await build({
   entryPoints: [join(import.meta.dir, 'src', entry)],
@@ -63,7 +23,7 @@ const result = await build({
   nodePaths: [join(import.meta.dir, 'node_modules')],
   external: ['resource:///*', 'cairo', 'gettext', 'console', 'system', 'gi'],
   define: Object.fromEntries(Object.entries(config).map(([key, value]) => [`KESTREL_CONFIG.${key}`, JSON.stringify(value)])),
-  plugins: [typelibVersions],
+  plugins: [typelibVersions(config.LIBMUTTER_API_VERSION)],
   write: false,
 });
 

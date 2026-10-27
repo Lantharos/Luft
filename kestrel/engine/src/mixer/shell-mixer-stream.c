@@ -235,6 +235,12 @@ shell_mixer_stream_get_description (ShellMixerStream *stream)
   return stream->description;
 }
 
+/**
+ * shell_mixer_stream_get_port:
+ * @stream: a #ShellMixerStream
+ *
+ * Returns: (nullable): the name of the active port, if the device has ports
+ */
 const char *
 shell_mixer_stream_get_port (ShellMixerStream *stream)
 {
@@ -243,6 +249,12 @@ shell_mixer_stream_get_port (ShellMixerStream *stream)
   return stream->port;
 }
 
+/**
+ * shell_mixer_stream_get_port_description:
+ * @stream: a #ShellMixerStream
+ *
+ * Returns: (nullable): the readable name of the active port, if the device has ports
+ */
 const char *
 shell_mixer_stream_get_port_description (ShellMixerStream *stream)
 {
@@ -251,6 +263,12 @@ shell_mixer_stream_get_port_description (ShellMixerStream *stream)
   return stream->port_description;
 }
 
+/**
+ * shell_mixer_stream_get_form_factor:
+ * @stream: a #ShellMixerStream
+ *
+ * Returns: (nullable): the kind of device, such as "internal" or "headset", if known
+ */
 const char *
 shell_mixer_stream_get_form_factor (ShellMixerStream *stream)
 {

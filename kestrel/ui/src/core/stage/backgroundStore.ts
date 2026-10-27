@@ -3,8 +3,8 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
 
-declare module '@girs/gio-2.0/gio-2.0' {
-  namespace Gio {
+declare module 'gi://Gio?version=2.0' {
+  export namespace Gio {
     interface File {
       move_async(destination: File, flags: FileCopyFlags, ioPriority: number, cancellable: Cancellable | null, progress: null): Promise<boolean>;
     }

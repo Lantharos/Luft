@@ -379,6 +379,15 @@ shell_mixer_class_init (ShellMixerClass *klass)
   signals[HEADSET_CHANGED] =
     g_signal_new ("headset-changed", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST,
                   0, NULL, NULL, NULL, G_TYPE_NONE, 1, SHELL_TYPE_MIXER_HEADSET);
+
+  /**
+   * ShellMixer::playback-started:
+   * @mixer: the #ShellMixer
+   * @pid: the process that started playing, or 0 if unknown
+   * @app_id: (nullable): the application's ID, if it gave one
+   * @binary: (nullable): the process's executable name, if known
+   * @name: (nullable): the application's name, if it gave one
+   */
   signals[PLAYBACK_STARTED] =
     g_signal_new ("playback-started", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST,
                   0, NULL, NULL, NULL, G_TYPE_NONE, 4,

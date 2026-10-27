@@ -41,7 +41,7 @@ export class ScreenSaverDBus {
       this.dbusImpl.emit_signal('ActiveChanged', GLib.Variant.new('(b)', [screenShield.active]));
     });
     screenShield.connect('wake-up-screen', () => {
-      this.dbusImpl.emit_signal('WakeUpScreen', null as unknown as GLib.Variant);
+      this.dbusImpl.emit_signal('WakeUpScreen', null);
     });
 
     KestrelUi.ownOnItsOwnConnection('org.gnome.ScreenSaver', [[this.dbusImpl, '/org/gnome/ScreenSaver']], () => {});
@@ -90,7 +90,7 @@ export class BrightnessDBus {
 
     manager.connectObject(
       'changed', () => this.sync(),
-      'user-update', () => this.dbusImpl.emit_signal('BrightnessChanged', null as unknown as GLib.Variant),
+      'user-update', () => this.dbusImpl.emit_signal('BrightnessChanged', null),
       this);
     this.sync();
   }

@@ -5,7 +5,7 @@ import * as KestrelUi from '../../../kestrelUi.js';
 
 export const MAX_VISIBLE_NETWORKS = 8;
 
-export const NM80211Mode = (NM as unknown as Record<'80211Mode', typeof NM.__80211Mode>)['80211Mode'];
+export const NM80211Mode = NM['80211Mode'];
 
 const DEVICE_KINDS = new Map<NM.DeviceType, string>([
   [NM.DeviceType.ETHERNET, 'network-device-wired'],

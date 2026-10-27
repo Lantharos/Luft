@@ -206,7 +206,7 @@ shell_texture_file_load_async (GFile               *file,
 /**
  * shell_texture_file_load_finish:
  * @result: the #GAsyncResult passed to the callback
- * @metadata: (out) (optional) (transfer full): the bytes kept next to the pixels
+ * @metadata: (out) (transfer full): the bytes kept next to the pixels
  * @error: return location for a #GError
  *
  * Uploads the pixels read by shell_texture_file_load_async().
@@ -238,8 +238,7 @@ shell_texture_file_load_finish (GAsyncResult  *result,
   if (!cogl_texture_allocate (texture, error))
     return NULL;
 
-  if (metadata)
-    *metadata = g_bytes_new_from_bytes (contents, sizeof *header, header->metadata_size);
+  *metadata = g_bytes_new_from_bytes (contents, sizeof *header, header->metadata_size);
 
   return g_steal_pointer (&texture);
 }

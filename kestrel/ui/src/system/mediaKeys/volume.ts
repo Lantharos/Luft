@@ -1,9 +1,9 @@
 import Gio from 'gi://Gio';
+import Shell from 'gi://Shell';
 import { askForAudioDevice } from '../audio/audioDeviceSelection.js';
 
 import type { Context } from '../../context.js';
 import { playSound } from '../sounds/sounds.js';
-import { maxAmplified, mixer, type MixerHeadset, type MixerStream } from './mixer.js';
 
 type ShowOsd = Context['showOsd'];
 
@@ -27,14 +27,14 @@ function icon(output: boolean, muted: boolean, level: number): string {
   return `${names[index]}-symbolic`;
 }
 
-function deviceLabel(stream: MixerStream): string | null {
+function deviceLabel(stream: Shell.MixerStream): string | null {
   const { port } = stream;
   if (stream.form_factor === 'internal' && (!port || BUILT_IN_PORTS.has(port))) return null;
   return stream.port_description ?? stream.description;
 }
 
 export class VolumeKeys {
-  private readonly mixer = mixer();
+  private readonly mixer = Shell.Mixer.get_default();
   private readonly sound = new Gio.Settings({ schema_id: 'org.gnome.desktop.sound' });
   private readonly headsetId: number;
   private question: ReturnType<typeof askForAudioDevice> = null;
@@ -46,7 +46,7 @@ export class VolumeKeys {
   change(change: VolumeChange, { output, quiet = false, precise = false }: VolumeOptions): void {
     const stream = output ? this.mixer.output : this.mixer.input;
     if (!stream) return;
-    const max = output && this.sound.get_boolean('allow-volume-above-100-percent') ? maxAmplified() : 1;
+    const max = output && this.sound.get_boolean('allow-volume-above-100-percent') ? Shell.Mixer.get_max_amplified() : 1;
     const step = precise ? PRECISE_STEP : STEP;
     const [oldVolume, oldMuted] = [stream.volume, stream.muted];
     let [volume, muted] = [oldVolume, oldMuted];
@@ -67,7 +67,7 @@ export class VolumeKeys {
     if (output && changed && !quiet && !muted && !stream.running) playSound('volume-tick');
   }
 
-  private askForDevice(choices: MixerHeadset | 0): void {
+  private askForDevice(choices: Shell.MixerHeadset | 0): void {
     this.question?.close();
     const question = choices ? askForAudioDevice(choices, choice => this.mixer.choose_headset(choice)) : null;
     question?.connect('closed', () => {

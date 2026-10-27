@@ -1,8 +1,8 @@
 import Gio from 'gi://Gio';
+import Shell from 'gi://Shell';
 
 import { categoryOf, SOUNDS, type Category, type Sound } from './catalog.js';
 import { followPlayback, unlessSenderPlays, type Sender } from './playback.js';
-import { soundPlayer } from './player.js';
 import { busy, followSession, interactingWith, onlyErrors, type SessionMode } from './situation.js';
 
 const desktop = new Gio.Settings({ schema_id: 'org.gnome.desktop.sound' });
@@ -13,7 +13,7 @@ const OWN_SOUND_WAIT_MS = 150;
 
 export function startSounds(session: SessionMode): void {
   followSession(session);
-  soundPlayer().prepare();
+  Shell.SoundPlayer.get_default().prepare();
   followPlayback();
   global.display.connect('bell', () => {
     playSound('error');
@@ -31,11 +31,11 @@ function allowed(category: Category): boolean {
 
 export function playSound(sound: Sound): void {
   const { name, category } = SOUNDS[sound];
-  if (allowed(category)) soundPlayer().play(name);
+  if (allowed(category)) Shell.SoundPlayer.get_default().play(name);
 }
 
 export function playNamedSound(name: string): void {
-  if (!onlyErrors() && allowed(categoryOf(name))) soundPlayer().play(name);
+  if (!onlyErrors() && allowed(categoryOf(name))) Shell.SoundPlayer.get_default().play(name);
 }
 
 export type NotificationSound = { name: string } | { file: Gio.File } | { fds: Gio.UnixFDList; index: number };
@@ -50,9 +50,9 @@ export interface NotificationSoundRequest {
 }
 
 function playFor(sound: NotificationSound): void {
-  if ('fds' in sound) soundPlayer().play_fd(sound.fds.get(sound.index));
-  else if ('file' in sound) soundPlayer().play_file(sound.file);
-  else soundPlayer().play(sound.name);
+  if ('fds' in sound) Shell.SoundPlayer.get_default().play_fd(sound.fds.get(sound.index));
+  else if ('file' in sound) Shell.SoundPlayer.get_default().play_file(sound.file);
+  else Shell.SoundPlayer.get_default().play(sound.name);
 }
 
 export function playNotificationSound({ choice, requested, fallback, sender }: NotificationSoundRequest): void {

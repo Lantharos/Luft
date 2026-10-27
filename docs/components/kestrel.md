@@ -37,6 +37,18 @@ The build runs `annotationData.ts` to turn CLDR's emoji annotations (`cldr-emoji
 
 After sign-in Kestrel reads these files in the background and builds the picker and its search a few milliseconds at a time, along with Start, quick settings and the notification center, so each opens at once the first time without holding up animations or input.
 
+## Types
+
+The TypeScript in `kestrel/ui` and `kestrel/tools` is typed against `kestrel/types/gir`, which ts-for-gir generates from the GIR files of Kestrel's own Mutter, its engine (`Shell` and `St`) and every other library they import, so the types match what Kestrel runs, patches included. Regenerate them after changing API the shell uses, in a patch or in the engine:
+
+```sh
+cd kestrel/types
+bun run generate                                      # builds the compositor and kestrel/build, then writes gir/
+bun generate.ts --build BUILD_DIR --compositor PREFIX # uses an existing build instead
+```
+
+The libraries' GIR files come from the folders in `XDG_DATA_DIRS`, so install the packages in `os/image/packages/build.txt` first. The image build runs `generate.ts --check` after building Kestrel and fails when the checked-in types differ from what its build produces.
+
 ## Settings
 
 Kestrel's settings live in the `com.lantharos.kestrel` schemas, and Settings changes most of them. Keyboard shortcuts are in `com.lantharos.kestrel.keybindings` and `.media-keys`, with window management in GNOME's `org.gnome.desktop.wm.keybindings`; every one is listed in [Keyboard shortcuts](https://docs.luft.computer/desktop/shortcuts/). The wallpaper palette Kestrel shares with apps is described in [Appearance](../appearance.md), and its own dialogs for the keyring and GnuPG in [Prompts](../prompts.md).

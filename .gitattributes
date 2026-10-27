@@ -1,1 +1,2 @@
 *.ftl linguist-detectable=false
+kestrel/types/gir/** linguist-generated

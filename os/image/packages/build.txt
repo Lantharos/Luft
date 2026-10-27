@@ -1,3 +1,4 @@
+accountsservice-devel
 at-spi2-atk-devel
 binutils
 ccache
@@ -17,12 +18,16 @@ glycin-devel
 gsettings-desktop-schemas-devel
 gstreamer1-devel
 gstreamer1-plugins-base-devel
+gtk3-devel
 gtk4-devel
+ibus-devel
 json-glib-devel
 libdrm-devel
+libgudev-devel
 libicu-devel
 libseccomp-devel
 libsecret-devel
+libsoup3-devel
 librsvg2-devel
 libxkbcommon-devel
 libxml2-devel

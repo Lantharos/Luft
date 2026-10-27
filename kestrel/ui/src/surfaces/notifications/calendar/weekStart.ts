@@ -3,7 +3,6 @@ import Shell from 'gi://Shell';
 
 import { formatsLocale, onLocaleChanged } from '../../../shared/i18n/index.js';
 
-const { util_get_week_start: regionWeekStart } = Shell as unknown as { util_get_week_start(locale: string): number };
 const CHOSEN: Record<string, number> = { monday: 1, sunday: 0 };
 
 function posixOf(tag: string): string {
@@ -15,7 +14,7 @@ export class WeekStart {
   private readonly kestrel = new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });
 
   get day(): number {
-    return CHOSEN[this.kestrel.get_string('week-start')] ?? regionWeekStart(posixOf(formatsLocale()));
+    return CHOSEN[this.kestrel.get_string('week-start')] ?? Shell.util_get_week_start(posixOf(formatsLocale()));
   }
 
   watch(changed: () => void): () => void {

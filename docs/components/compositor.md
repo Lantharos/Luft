@@ -54,7 +54,7 @@ kestrel/compositor/build.sh
 - Every commit needs an `Upstream-Status` trailer saying whether it is upstream, forwardable or Luft's own, see [Upstream patches](../upstream.md).
 - `prepare` refuses to replace a checkout with uncommitted or unexported work. The previous head is kept at `refs/kestrel/previous`.
 - `python3 kestrel/compositor/patches.py status` shows the state of the checkout.
-- The shell's TypeScript sees what the patches add through `kestrel/ui/src/compositor.d.ts`. Declare new API there when a patch exposes some to the shell.
+- The shell's TypeScript sees what the patches add through the types generated from the build's GIR files. Run `bun run generate` in `kestrel/types` after a patch changes API the shell uses, see [Kestrel's types](kestrel.md#types).
 
 ## Update Mutter
 

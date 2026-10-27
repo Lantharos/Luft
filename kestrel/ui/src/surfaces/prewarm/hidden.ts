@@ -4,8 +4,6 @@ import St from 'gi://St';
 
 import { inBudget, type Work } from './queue.js';
 
-const { util_paint_offscreen: paintOffscreen } = Shell as unknown as { util_paint_offscreen(actor: Clutter.Actor): void };
-
 const PART_SIZE = 16;
 
 interface Visit {
@@ -23,7 +21,7 @@ function paintHidden(actor: Clutter.Actor): void {
   if (actor.visible) return;
   const translation = actor.translation_y;
   actor.translation_y = 0;
-  paintOffscreen(actor);
+  Shell.util_paint_offscreen(actor);
   actor.translation_y = translation;
 }
 
@@ -103,7 +101,7 @@ function* paintParts(root: Clutter.Actor, interrupted: () => boolean): Work {
     do {
       const next = parts.next();
       done = !!next.done;
-      if (next.value?.part && next.value.shown) paintOffscreen(next.value.actor);
+      if (next.value?.part && next.value.shown) Shell.util_paint_offscreen(next.value.actor);
     } while (!done && inBudget());
     root.uninhibit_culling();
   }

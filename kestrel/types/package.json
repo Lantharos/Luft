@@ -1,0 +1,11 @@
+{
+  "name": "@luft/kestrel-types",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "generate": "bun generate.ts"
+  },
+  "devDependencies": {
+    "@ts-for-gir/cli": "5.6.0"
+  }
+}

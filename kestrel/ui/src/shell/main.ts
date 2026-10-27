@@ -21,13 +21,13 @@ import { initTheme, updateTheme } from './stage/kestrelTheme.js';
 import * as OsdWindow from './stage/osdWindow.js';
 import * as Layout from './stage/layout.js';
 import * as NotificationDaemon from './notifications/notificationDaemon.js';
-import * as Screenshot from './screenshot/screenshot.js';
+import { ScreenshotUI } from './screenshot/ui/screenshotUI.js';
 import * as ScreenShield from './lockScreen/screenShield.js';
 import * as SessionMode from './sessionMode.js';
 import * as ShellDBus from './shellDBus.js';
-import * as ShellMountOperation from './dialogs/shellMountOperation.js';
+import { MountOperationHandler } from './dialogs/mount/mountOpHandler.js';
 import * as WindowManager from './windows/windowManager.js';
-import * as Magnifier from './input/magnifier.js';
+import * as Magnifier from './input/magnifier/magnifier.js';
 import * as XdndHandler from './stage/xdndHandler.js';
 import * as KbdA11yDialog from './dialogs/kbdA11yDialog.js';
 import * as LocatePointer from './stage/locatePointer.js';
@@ -64,10 +64,10 @@ export let notificationDaemon!: NotificationDaemon.NotificationDaemon;
 export let ctrlAltTabManager!: CtrlAltTab.CtrlAltTabManager;
 export let osdWindowManager!: OsdWindow.OsdWindowManager;
 export let sessionMode!: SessionMode.SessionMode;
-export let screenshotUI!: Screenshot.ScreenshotUI;
+export let screenshotUI!: ScreenshotUI;
 export let shellAccessDialogDBusService!: AccessDialog.AccessDialogDBus;
 export let shellDBusService!: ShellDBus.GnomeShell;
-export let shellMountOpDBusService!: ShellMountOperation.GnomeShellMountOpHandler;
+export let shellMountOpDBusService!: MountOperationHandler;
 export let modalCount = 0;
 export let actionMode = Shell.ActionMode.NONE;
 export const modalActorFocusStack: ModalRecord[] = [];
@@ -76,7 +76,7 @@ export let magnifier!: Magnifier.Magnifier;
 export let xdndHandler!: XdndHandler.XdndHandler;
 export let keyboard!: Keyboard.KeyboardManager;
 export let layoutManager!: InstanceType<typeof Layout.LayoutManager>;
-export let kbdA11yDialog!: InstanceType<typeof KbdA11yDialog.KbdA11yDialog>;
+export let kbdA11yDialog!: KbdA11yDialog.KbdA11yDialog;
 export let inputMethod!: InstanceType<typeof InputMethod.InputMethod>;
 export let introspectService!: Introspect.IntrospectService;
 export let locatePointer!: LocatePointer.LocatePointer;
@@ -161,7 +161,7 @@ export async function start(): Promise<void> {
 
   shellAccessDialogDBusService = new AccessDialog.AccessDialogDBus();
   shellDBusService = new ShellDBus.GnomeShell();
-  shellMountOpDBusService = new ShellMountOperation.GnomeShellMountOpHandler();
+  shellMountOpDBusService = new MountOperationHandler();
 
   const watchId = Gio.DBus.session.watch_name('com.lantharos.Kestrel.Notifications',
     Gio.BusNameWatcherFlags.AUTO_START,
@@ -334,7 +334,7 @@ async function initializeUI(): Promise<void> {
 
   startInputMethod();
 
-  screenshotUI = new Screenshot.ScreenshotUI();
+  screenshotUI = new ScreenshotUI();
 
   brightnessManager = new BrightnessManager.BrightnessManager();
   brightnessDBus = new ShellDBus.BrightnessDBus(brightnessManager);

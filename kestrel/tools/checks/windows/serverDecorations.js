@@ -115,9 +115,9 @@ async function checkInput({window, process}) {
   moveTo(titlebarPoint(window));
   pressButton(Clutter.BUTTON_SECONDARY);
   releaseButton(Clutter.BUTTON_SECONDARY);
-  await eventually(() => !!Main.wm._windowMenuManager._manager.activeMenu?.isOpen, 'right-clicking the title bar opens the window menu');
+  await eventually(() => !!Main.wm.windowMenuManager.manager.activeMenu?.isOpen, 'right-clicking the title bar opens the window menu');
   press(Clutter.KEY_Escape);
-  await eventually(() => !Main.wm._windowMenuManager._manager.activeMenu?.isOpen, 'Escape closes the window menu');
+  await eventually(() => !Main.wm.windowMenuManager.manager.activeMenu?.isOpen, 'Escape closes the window menu');
   await settled();
 
   click(buttonOf(window, 'maximize'));

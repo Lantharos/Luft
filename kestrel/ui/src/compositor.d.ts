@@ -69,6 +69,8 @@ declare module '@girs/meta-51/meta-51' {
 declare module '@girs/shell-51/shell-51' {
   namespace Shell {
     function systemd_start_app_scope(name: string, pid: number): void;
+    function systemd_get_oui_vendor(address: string): string | null;
+    function util_paint_offscreen(actor: Clutter.Actor): void;
     function texture_file_paint_actor(actor: Clutter.Actor): Cogl.Texture | null;
     function texture_file_encode(texture: Cogl.Texture, metadata: GLib.Bytes): GLib.Bytes;
     function texture_file_load_async(file: Gio.File, ioPriority: number, cancellable: Gio.Cancellable | null): Promise<[Cogl.Texture, GLib.Bytes]>;
@@ -77,6 +79,13 @@ declare module '@girs/shell-51/shell-51' {
       HEADPHONES = 1,
       HEADSET = 2,
       MICROPHONE = 4,
+    }
+
+    class SpringTransition extends Clutter.PropertyTransition {
+      static new(propertyName: string, target: number, duration: number, bounce: number, velocity: number): SpringTransition;
+      epsilon: number;
+      get_target(): number;
+      get_velocity(): number;
     }
 
     class XkbInfo extends GObject.Object {

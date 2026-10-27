@@ -25,7 +25,7 @@ async function checkMediaControls() {
 }
 
 async function checkLevelOsd(name, icon, level) {
-  const [osd] = Main.osdWindowManager._osdWindows;
+  const [osd] = Main.osdWindowManager.osdWindows;
   Main.osdWindowManager.showAll(new Gio.ThemedIcon({name: icon}), null, level, 1);
   await eventually(() => osd.visible && osd.opacity === 255, `the ${name} level shows on screen`);
   await capture(`${name}-osd`);
@@ -34,7 +34,7 @@ async function checkLevelOsd(name, icon, level) {
 }
 
 async function checkOsdReturnsWhileFading() {
-  const [osd] = Main.osdWindowManager._osdWindows;
+  const [osd] = Main.osdWindowManager.osdWindows;
   const icon = new Gio.ThemedIcon({name: 'audio-volume-high-symbolic'});
   Main.osdWindowManager.showAll(icon, null, 0.5, 1);
   await eventually(() => osd.visible && osd.opacity === 255, 'the volume level shows on screen');

@@ -48,8 +48,15 @@ export async function lookup(connection: Gio.DBusConnection, permission: Permiss
   }
 }
 
-export async function setAnswer({ table, id }: Permission, app: string, answer: Answer): Promise<void> {
-  await Gio.DBus.session.call(STORE, STORE_PATH, STORE, 'SetPermission', new GLib.Variant('(sbssas)', [table, true, id, app, [answer]]),
+export async function setPermission({ table, id }: Permission, app: string, values: string[]): Promise<void> {
+  await Gio.DBus.session.call(STORE, STORE_PATH, STORE, 'SetPermission', new GLib.Variant('(sbssas)', [table, true, id, app, values]),
+    null, Gio.DBusCallFlags.NONE, -1, null);
+}
+
+export const setAnswer = (permission: Permission, app: string, answer: Answer): Promise<void> => setPermission(permission, app, [answer]);
+
+export async function setApps({ table, id }: Permission, apps: Apps): Promise<void> {
+  await Gio.DBus.session.call(STORE, STORE_PATH, STORE, 'Set', new GLib.Variant('(sbsa{sas}v)', [table, true, id, apps, new GLib.Variant('av', [])]),
     null, Gio.DBusCallFlags.NONE, -1, null);
 }
 

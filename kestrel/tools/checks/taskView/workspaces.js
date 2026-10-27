@@ -12,7 +12,7 @@ const {require, eventually} = checks('workspace');
 const manager = global.workspace_manager;
 const SLIDE_PROGRESS = 0.4;
 
-const switchData = () => Main.wm._workspaceAnimation._switchData;
+const switchData = () => Main.wm.workspaceAnimation.switchData;
 const switchedTo = index => manager.get_active_workspace_index() === index && !switchData();
 
 async function openWindows() {
@@ -49,7 +49,7 @@ async function checkSwitcher() {
   hold(Clutter.KEY_Super_L);
   press(Clutter.KEY_Page_Up);
   release(Clutter.KEY_Super_L);
-  await eventually(() => Main.wm._workspaceSwitcherPopup?.visible && switchedTo(0), 'Super+Page Up shows the workspace switcher');
+  await eventually(() => Main.wm.workspaceSwitcherPopup?.visible && switchedTo(0), 'Super+Page Up shows the workspace switcher');
   await capture('workspace-switcher');
 }
 

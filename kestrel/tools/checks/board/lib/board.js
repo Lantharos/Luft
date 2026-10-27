@@ -13,7 +13,7 @@ export const view = () => ({...currentBoard().camera.view});
 export const sameView = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 export const boardWindows = () => windows().filter(window => WINDOWS.some(([title]) => window.get_title()?.startsWith(title)));
 export const windowNamed = title => boardWindows().find(window => window.get_title().startsWith(title));
-export const switching = () => !!Main.wm._workspaceAnimation._switchData;
+export const switching = () => !!Main.wm.workspaceAnimation.switchData;
 
 const onDevicePixel = value => {
   const pixels = value * global.display.get_monitor_scale(Main.layoutManager.primaryIndex);

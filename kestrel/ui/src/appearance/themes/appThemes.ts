@@ -1,5 +1,6 @@
 import type Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
+import Shell from 'gi://Shell';
 
 import { readText, removeBlock, removeFile, userFile, writeBlock, writeText } from '../files.js';
 import type { Palette } from '../palette.js';
@@ -71,6 +72,6 @@ export class AppThemes {
       writeChanged(this.ghosttyThemes.light, ghosttyTheme(palette.light)),
       writeChanged(this.ghosttyThemes.dark, ghosttyTheme(palette.dark)),
     ]);
-    if (light || dark) GLib.spawn_async(null, ['pkill', '--signal', 'USR2', '--exact', 'ghostty'], null, GLib.SpawnFlags.SEARCH_PATH, null);
+    if (light || dark) Shell.util_spawn_async(null, ['pkill', '--signal', 'USR2', '--exact', 'ghostty'], null, GLib.SpawnFlags.SEARCH_PATH);
   }
 }

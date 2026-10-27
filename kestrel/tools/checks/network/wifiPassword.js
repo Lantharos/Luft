@@ -94,7 +94,7 @@ async function checkUnsaved(wifi, toggle) {
 
 export async function run() {
   require(!(await keyringRuns()), 'no keyring runs, as in Try Luft');
-  const wifi = new FakeWifi(Main.componentManager._allComponents.networkAgent._native,
+  const wifi = new FakeWifi(Main.componentManager.allComponents.networkAgent.native,
     {[NEVER_ENTERED]: null, [REJECTED]: 'not-the-password', [UNSAVED]: undefined});
   openQuickSettings();
   await eventually(() => shown(quick()) && wifiToggle(), 'quick settings have a Wi-Fi tile');

@@ -139,10 +139,10 @@ export const Dialog = GObject.registerClass(class Dialog extends St.Widget {
 export type Dialog = InstanceType<typeof Dialog>;
 
 interface MessageDialogContentProps extends Partial<St.BoxLayout.ConstructorProps> {
-  title?: string;
-  description?: string;
-  icon_name?: string;
-  iconName?: string;
+  title?: string | null;
+  description?: string | null;
+  icon_name?: string | null;
+  iconName?: string | null;
 }
 
 export const MessageDialogContent = GObject.registerClass({

@@ -3,7 +3,8 @@ import GObject from 'gi://GObject';
 import Pango from 'gi://Pango';
 import St from 'gi://St';
 
-import { SwitcherList, SwitcherPopup } from '../../switchers/switcherPopup.js';
+import { SwitcherList } from '../../switchers/switcherList.js';
+import { SwitcherPopup } from '../../switchers/switcherPopup.js';
 import type { InputSource } from './inputSource.js';
 
 const InputSourceSwitcher = GObject.registerClass(class InputSourceSwitcher extends SwitcherList {
@@ -31,29 +32,31 @@ interface InputSourcePopupOptions {
   actionBackward: number;
 }
 
-export const InputSourcePopup = GObject.registerClass(class InputSourcePopup extends SwitcherPopup {
+export class InputSourcePopup extends SwitcherPopup<InputSource> {
+  static {
+    GObject.registerClass(this);
+  }
+
   private readonly action: number;
   private readonly actionBackward: number;
 
   constructor({ items, action, actionBackward }: InputSourcePopupOptions) {
-    super(items);
+    super(items, new InputSourceSwitcher(items));
     this.action = action;
     this.actionBackward = actionBackward;
-    this._switcherList = new InputSourceSwitcher(items);
   }
 
-  _keyPressHandler(keysym: number, action: number): boolean {
-    if (action === this.action) this._select(this._next());
-    else if (action === this.actionBackward) this._select(this._previous());
-    else if (keysym === Clutter.KEY_Left) this._select(this._previous());
-    else if (keysym === Clutter.KEY_Right) this._select(this._next());
+  protected keyPressHandler(keysym: number, action: number): boolean {
+    if (action === this.action) this.select(this.next());
+    else if (action === this.actionBackward) this.select(this.previous());
+    else if (keysym === Clutter.KEY_Left) this.select(this.previous());
+    else if (keysym === Clutter.KEY_Right) this.select(this.next());
     else return Clutter.EVENT_PROPAGATE;
     return Clutter.EVENT_STOP;
   }
 
-  _finish(): void {
-    super._finish();
-    this._items[this._selectedIndex].activate(true);
+  protected finish(timestamp: number): void {
+    super.finish(timestamp);
+    this.items[this.selectedIndex].activate(true);
   }
-});
-export type InputSourcePopup = InstanceType<typeof InputSourcePopup>;
+}

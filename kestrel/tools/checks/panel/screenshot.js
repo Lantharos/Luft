@@ -49,7 +49,7 @@ async function showStripes() {
 async function openScreenshotTool() {
   Main.screenshotUI.open();
   await eventually(() => Main.screenshotUI.visible && Main.screenshotUI.opacity === 255, 'the screenshot tool opens');
-  Main.screenshotUI._screenButton.checked = true;
+  Main.screenshotUI.panel.screenButton.checked = true;
   await settled();
 }
 

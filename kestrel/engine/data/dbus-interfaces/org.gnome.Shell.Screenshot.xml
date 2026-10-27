@@ -125,22 +125,6 @@
     </method>
 
     <!--
-        FlashArea:
-        @x: the X coordinate of the area to flash
-        @y: the Y coordinate of the area to flash
-        @width: the width of the area to flash
-        @height: the height of the area to flash
-
-        Renders a flash spot effect in the specified rectangle of the screen.
-    -->
-    <method name="FlashArea">
-      <arg type="i" direction="in" name="x"/>
-      <arg type="i" direction="in" name="y"/>
-      <arg type="i" direction="in" name="width"/>
-      <arg type="i" direction="in" name="height"/>
-    </method>
-
-    <!--
         SelectArea:
         @x: the X coordinate of the selected area
         @y: the Y coordinate of the selected area

@@ -32,7 +32,7 @@ async function checkLockMode(panel, start) {
   }
   await eventually(() => panel.visible, 'the taskbar returns after leaving lock mode');
   for (const name of ['polkitAgent', 'networkAgent', 'automountManager'])
-    require(!!Main.componentManager._allComponents[name], `the ${name} component is loaded`);
+    require(!!Main.componentManager.allComponents[name], `the ${name} component is loaded`);
 }
 
 async function checkHeadset(start) {
@@ -77,7 +77,7 @@ async function checkRestart() {
   const pending = await loadPendingUpdates();
   await call(...END_SESSION, 'Open', new GLib.Variant('(uuuao)', [RESTART, 0, UNHURRIED, []]));
   await eventually(() => Main.modalCount > 0, 'the restart confirmation opens');
-  const checkBox = Main.endSessionDialog._checkBox;
+  const checkBox = Main.endSessionDialog.checkBox;
   require(checkBox.visible === (pending?.prepared ?? false), 'the restart confirmation offers updates exactly when some are waiting');
   if (pending?.version)
     require(checkBox.getLabelActor().text === `Install version ${pending.version}`, 'the restart confirmation names the waiting version');

@@ -46,7 +46,7 @@ async function checkCornerDrag(window, area) {
     moveTo([fromX + (toX - fromX) * step / DRAG_STEPS, fromY + (toY - fromY) * step / DRAG_STEPS]);
     await nextFrame();
   }
-  await eventually(() => Main.wm._tilePreview?._showing, 'dragging a window into a corner previews where it goes');
+  await eventually(() => Main.wm.tilePreview?.showing, 'dragging a window into a corner previews where it goes');
   await capture('corner-snap');
   releaseButton();
   await eventually(() => {

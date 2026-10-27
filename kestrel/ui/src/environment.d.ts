@@ -1,7 +1,7 @@
 import type Clutter from 'gi://Clutter';
 import type St from 'gi://St';
 
-interface EaseSpring {
+export interface EaseSpring {
   duration: number;
   bounce: number;
 }
@@ -50,15 +50,10 @@ declare module '@girs/clutter-51/clutter-51' {
       ease(properties: EaseProperties): void;
       easeAsync(properties: EaseProperties): Promise<void>;
       ease_property(property: string, target: unknown, options: EaseOptions): void;
-      ease_property_async(property: string, target: unknown, options: EaseOptions): Promise<void>;
       [Symbol.iterator](): Generator<Actor, void, undefined>;
     }
 
     interface GridLayout {
-      hookup_style(container: St.Widget): void;
-    }
-
-    interface BoxLayout {
       hookup_style(container: St.Widget): void;
     }
   }
@@ -68,7 +63,6 @@ declare module '@girs/st-51/st-51' {
   namespace St {
     interface Adjustment {
       ease(target: number, options: EaseOptions): void;
-      easeAsync(target: number, options: EaseOptions): Promise<void>;
     }
   }
 }

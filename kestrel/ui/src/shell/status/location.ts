@@ -8,15 +8,14 @@ import St from 'gi://St';
 import { MessageDialogContent } from '../dialogs/dialog.js';
 import * as KestrelUi from '../../kestrelUi.js';
 import { ModalDialog } from '../dialogs/modalDialog.js';
-import * as PermissionStore from '../runtime/permissionStore.js';
 import { loadInterfaceXML } from '../runtime/fileUtils.js';
+import { lookup, setApps, type Apps, type Permission } from '../../shared/dbus/permissionStore.js';
 
 const LOCATION_SCHEMA = 'org.gnome.system.location';
 const MAX_ACCURACY_LEVEL = 'max-accuracy-level';
 const ENABLED = 'enabled';
 
-const APP_PERMISSIONS_TABLE = 'location';
-const APP_PERMISSIONS_ID = 'location';
+const LOCATION_PERMISSION: Permission = { table: 'location', id: 'location' };
 
 const GeoclueAccuracyLevel = {
   NONE: 0,
@@ -28,7 +27,6 @@ const GeoclueAccuracyLevel = {
 } as const;
 
 type AccuracyLevelName = keyof typeof GeoclueAccuracyLevel;
-type Permissions = Record<string, string[]>;
 
 function accuracyLevel(name: string): number {
   return GeoclueAccuracyLevel[name as AccuracyLevelName] || GeoclueAccuracyLevel.NONE;
@@ -44,18 +42,12 @@ interface GeoclueManagerProxy extends Gio.DBusProxy {
   AddAgentAsync(id: string): Promise<[]>;
 }
 
-interface PermissionStoreProxy extends Gio.DBusProxy {
-  LookupAsync(table: string, id: string): Promise<[Permissions, GLib.Variant]>;
-  SetAsync(table: string, create: boolean, id: string, permissions: Permissions, data: GLib.Variant): Promise<[]>;
-}
-
 type ProxyReady<T> = (proxy: T | null, error: GLib.Error | null) => void;
 
 type GeoclueManagerClass = new (bus: Gio.DBusConnection, name: string, path: string, ready: ProxyReady<GeoclueManagerProxy>) => GeoclueManagerProxy;
 
 const GeoclueManager = Gio.DBusProxy.makeProxyWrapper(loadInterfaceXML('org.freedesktop.GeoClue2.Manager')) as unknown as GeoclueManagerClass;
 const AgentIface = loadInterfaceXML('org.freedesktop.GeoClue2.Agent')!;
-const permissionStore = PermissionStore.PermissionStore as unknown as (ready: ProxyReady<PermissionStoreProxy>) => PermissionStoreProxy;
 
 let geoclueAgent: GeoclueAgent | null = null;
 
@@ -74,7 +66,6 @@ const GeoclueAgent = GObject.registerClass({
   private readonly settings = new Gio.Settings({ schema_id: LOCATION_SCHEMA });
   private readonly agent: Gio.DBusExportedObject;
   private managerProxy: GeoclueManagerProxy | null = null;
-  private permStoreProxy: PermissionStoreProxy | null = null;
   private connecting = false;
 
   constructor() {
@@ -95,13 +86,6 @@ const GeoclueAgent = GObject.registerClass({
       () => this.onGeoclueVanished());
     this.onMaxAccuracyLevelChanged();
     this.connectToGeoclue();
-    permissionStore((proxy, error) => {
-      if (error != null) {
-        log(error.message);
-        return;
-      }
-      this.permStoreProxy = proxy;
-    });
   }
 
   get enabled(): boolean {
@@ -122,7 +106,7 @@ const GeoclueAgent = GObject.registerClass({
   }
 
   async AuthorizeAppAsync([desktopId, reqAccuracyLevel]: [string, number], invocation: Gio.DBusMethodInvocation): Promise<void> {
-    const authorizer = new AppAuthorizer(desktopId, reqAccuracyLevel, this.permStoreProxy, this.maxAccuracyLevel);
+    const authorizer = new AppAuthorizer(desktopId, reqAccuracyLevel, this.maxAccuracyLevel);
     const level = await authorizer.authorize();
     invocation.return_value(GLib.Variant.new('(bu)', [level !== GeoclueAccuracyLevel.NONE, level]));
   }
@@ -187,22 +171,21 @@ const GeoclueAgent = GObject.registerClass({
 type GeoclueAgent = InstanceType<typeof GeoclueAgent>;
 
 class AppAuthorizer {
-  private permissions: Permissions = {};
+  private permissions: Apps = {};
   private accuracyLevel: number = GeoclueAccuracyLevel.NONE;
 
   constructor(
     private readonly desktopId: string,
     private readonly reqAccuracyLevel: number,
-    private readonly permStoreProxy: PermissionStoreProxy | null,
     private readonly maxAccuracyLevel: number,
   ) {}
 
   async authorize(): Promise<number> {
     const app = Shell.AppSystem.get_default().lookup_app(`${this.desktopId}.desktop`);
-    if (app == null || this.permStoreProxy == null) return this.completeAuth();
+    if (app == null) return this.completeAuth();
 
     try {
-      [this.permissions] = await this.permStoreProxy.LookupAsync(APP_PERMISSIONS_TABLE, APP_PERMISSIONS_ID);
+      this.permissions = await lookup(Gio.DBus.session, LOCATION_PERMISSION);
     } catch (error) {
       log((error as Error).message);
       this.permissions = {};
@@ -229,13 +212,11 @@ class AppAuthorizer {
   }
 
   private async saveToPermissionStore(): Promise<void> {
-    if (this.permStoreProxy == null) return;
-
     const dateStr = Math.round(Date.now() / 1000).toString();
     this.permissions[this.desktopId] = [accuracyLevelToString(this.accuracyLevel), dateStr];
 
     try {
-      await this.permStoreProxy.SetAsync(APP_PERMISSIONS_TABLE, true, APP_PERMISSIONS_ID, this.permissions, GLib.Variant.new('av', []));
+      await setApps(LOCATION_PERMISSION, this.permissions);
     } catch (error) {
       log((error as Error).message);
     }

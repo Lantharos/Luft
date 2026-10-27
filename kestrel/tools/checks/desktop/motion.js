@@ -10,8 +10,8 @@ import {nextFrame, pause, settled, waitUntil} from '../lib/wait.js';
 
 const {require} = checks('motion');
 const manager = global.workspace_manager;
-const animation = () => Main.wm._workspaceAnimation;
-const switching = () => animation()._switchData !== null;
+const animation = () => Main.wm.workspaceAnimation;
+const switching = () => animation().switchData !== null;
 const a11y = new Gio.Settings({schema_id: 'org.gnome.desktop.a11y.interface'});
 const JUMP = 0.1;
 
@@ -29,7 +29,7 @@ const largestStep = values => Math.max(0, ...steps(values));
 const jumps = values => steps(values).some((step, i, all) => step > JUMP && step > 2 * Math.max(all[i - 1] ?? 0, all[i + 1] ?? 0));
 
 function visibleWorkspace() {
-  const data = animation()._switchData;
+  const data = animation().switchData;
   if (!data) return manager.get_active_workspace_index();
   const group = data.monitors.find(monitor => monitor.index === Main.layoutManager.primaryIndex) ?? data.monitors[0];
   return group.indexAt(group.progress);
@@ -43,7 +43,7 @@ async function settledOn(index, label) {
 async function checkWorkspaceSwitches() {
   const stopWatching = watchFrames(visibleWorkspace);
   switchWorkspace(1);
-  const slide = animation()._switchData.monitors[0].get_transition('progress');
+  const slide = animation().switchData.monitors[0].get_transition('progress');
   require(slide.duration < Spring.snappy.duration * 2, 'a workspace switch settles on the snappy spring');
   await pause(80);
   switchWorkspace(0);
@@ -68,7 +68,7 @@ const touchpadSettings = new Gio.Settings({schema_id: 'org.gnome.desktop.periphe
 
 function swipe(towardsPrevious) {
   const dx = touchpadSettings.get_boolean('natural-scroll') ? towardsPrevious : -towardsPrevious;
-  const gesture = animation()._swipeTracker.touchpadGesture;
+  const gesture = animation().swipeTracker.touchpadGesture;
   const send = event => gesture.handleEvent(global.stage, event);
   return {
     begin: () => send(touchpad.swipe('begin', 3, 0, 0)),
@@ -84,8 +84,8 @@ async function checkWorkspaceSwipe() {
   const pushPast = swipe(40);
   pushPast.begin();
   pushPast.steps(40);
-  const page = animation()._switchData.baseMonitorGroup;
-  const tracked = animation()._swipeTracker.trackedProgress;
+  const page = animation().switchData.baseMonitorGroup;
+  const tracked = animation().swipeTracker.trackedProgress;
   require(tracked < -0.3 && page.progress < 0 && page.progress > tracked,
     'swiping past the first workspace rubber-bands instead of stopping or following');
   pushPast.end();
@@ -94,7 +94,7 @@ async function checkWorkspaceSwipe() {
   const fling = swipe(-60);
   fling.begin();
   fling.steps(12);
-  const early = animation()._switchData.baseMonitorGroup.progress;
+  const early = animation().switchData.baseMonitorGroup.progress;
   require(early > 0.1 && early < 0.5, 'a short swipe follows the fingers part of the way');
   fling.end();
   await settledOn(1, 'a quick swipe lands on the next workspace');
@@ -207,7 +207,7 @@ async function checkReducedWorkspaceSwitch() {
   try {
     switchWorkspace(1);
     await nextFrame();
-    const group = animation()._switchData.monitors[0];
+    const group = animation().switchData.monitors[0];
     require(group.progress === group.getWorkspaceProgress(manager.get_workspace_by_index(1)),
       'with reduced motion a workspace switch shows the new workspace in place');
     await settledOn(1, 'with reduced motion the old workspace fades out');

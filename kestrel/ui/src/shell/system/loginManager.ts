@@ -22,10 +22,12 @@ interface ManagerMethods {
 interface SessionMethods {
   readonly Id: string;
   readonly Active: boolean;
+  readonly LockedHint: boolean;
   SetLockedHintAsync(locked: boolean): Promise<[]>;
+  connectSignal(name: 'Lock' | 'Unlock', callback: () => void): number;
 }
 
-type LoginSession = Gio.DBusProxy & SessionMethods;
+export type LoginSession = Gio.DBusProxy & SessionMethods;
 
 interface ProxyClass<T> {
   new (bus: Gio.DBusConnection, name: string, path: string): Gio.DBusProxy & T;

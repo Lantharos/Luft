@@ -11,8 +11,8 @@ import {lockAndWake, showPrompt, unlock} from '../lockScreen/lib/shield.js';
 
 const {require, eventually} = checks('lock key');
 const keymap = global.stage.context.get_backend().get_default_seat().get_keymap();
-const osd = () => Main.osdWindowManager._osdWindows[0];
-const shows = label => osd().visible && osd().opacity === 255 && osd()._label.text === label;
+const osd = () => Main.osdWindowManager.osdWindows[0];
+const shows = label => osd().visible && osd().opacity === 255 && osd().caption.text === label;
 
 async function hidden() {
   Main.osdWindowManager.hideAll();

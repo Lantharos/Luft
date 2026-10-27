@@ -182,7 +182,7 @@ export class InputSourceManager extends EventEmitter {
     });
     this.switcherPopup = popup;
     popup.connect('destroy', () => (this.switcherPopup = null));
-    if (!popup.show(binding.is_reversed(), binding.get_name(), binding.get_mask())) popup.fadeAndDestroy();
+    if (!popup.open(binding.is_reversed(), binding.get_name(), binding.get_mask())) popup.fadeAndDestroy();
   }
 
   private keyboardOptionsChanged(): void {

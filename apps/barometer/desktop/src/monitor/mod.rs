@@ -1,3 +1,4 @@
+use specta::Type;
 mod sampler;
 
 use std::collections::VecDeque;
@@ -45,7 +46,7 @@ struct Shared {
 #[derive(Clone)]
 pub struct Monitor(Arc<Shared>);
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct View {
     page: String,
     visible: bool,
@@ -55,29 +56,29 @@ pub struct View {
     gpu: bool,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct AppSignal {
     key: String,
     signal: Signal,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct AppKey {
     key: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Configuration {
     interval: u64,
     history: u64,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct SnapshotRequest {
     after: u64,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct Snapshot {
     devices: Devices,
     ticks: Vec<Tick>,

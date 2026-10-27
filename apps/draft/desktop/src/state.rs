@@ -1,5 +1,6 @@
 use luft_app::{Activation, Appearance, Events};
 use serde::Serialize;
+use specta::Type;
 
 use crate::files::watch::Watcher;
 use crate::files::write::Writes;
@@ -13,7 +14,7 @@ pub struct DraftState {
     pub writes: Writes,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct AppState {
     #[serde(flatten)]

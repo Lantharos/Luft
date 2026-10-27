@@ -1,3 +1,4 @@
+use specta::Type;
 use std::fmt::Write;
 use std::fs;
 use std::path::Path;
@@ -13,7 +14,7 @@ const EMPTY_PLACEHOLDER: &str = "custom";
 
 static SYSTEM: OnceLock<Vec<Entry>> = OnceLock::new();
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Entry {
     pub id: String,

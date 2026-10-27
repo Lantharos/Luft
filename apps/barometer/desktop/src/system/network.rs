@@ -1,3 +1,4 @@
+use specta::Type;
 use std::collections::HashMap;
 use std::ffi::CStr;
 use std::fs;
@@ -10,7 +11,7 @@ use super::procfile::{ProcFile, link_name, read_number, read_text, udev_property
 
 const NET: &str = "/sys/class/net";
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct NetworkInfo {
     pub id: String,
@@ -24,7 +25,7 @@ pub struct NetworkInfo {
     mac: Option<String>,
 }
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct NetworkSample {
     id: String,
@@ -36,7 +37,7 @@ pub struct NetworkSample {
     link: Option<Link>,
 }
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
 struct Link {
     connected: bool,

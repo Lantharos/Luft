@@ -1,3 +1,4 @@
+use specta::Type;
 use std::fs;
 
 use serde::Serialize;
@@ -6,7 +7,7 @@ use super::procfile::{ProcFile, read_text};
 
 const KIB: u64 = 1024;
 
-#[derive(Serialize, Clone, Default)]
+#[derive(Serialize, Clone, Default, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct MemorySample {
     pub total: u64,
@@ -29,14 +30,14 @@ pub struct MemorySample {
     pub swaps: Option<Vec<SwapDevice>>,
 }
 
-#[derive(Serialize, Clone, Default)]
+#[derive(Serialize, Clone, Default, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Compressed {
     pub stored: u64,
     pub size: u64,
 }
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct SwapDevice {
     name: String,

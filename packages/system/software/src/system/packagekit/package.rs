@@ -1,6 +1,7 @@
 use serde::Serialize;
+use specta::Type;
 
-#[derive(Serialize, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Serialize, Clone, Debug, PartialEq, Eq, Hash, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct PackageId {
     pub id: String,

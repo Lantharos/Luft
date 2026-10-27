@@ -3,9 +3,10 @@ use std::sync::OnceLock;
 use futures_util::{Stream, StreamExt};
 use luft_app::dbus::{self, failed};
 use serde::Serialize;
+use specta::Type;
 use zbus::Proxy;
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Airplane {
     enabled: bool,

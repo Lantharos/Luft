@@ -1,3 +1,4 @@
+use specta::Type;
 use std::collections::HashMap;
 use std::time::Instant;
 
@@ -7,7 +8,7 @@ use zbus::{ObjectPath, OwnedVariant, Variant};
 
 const MICROSECONDS: f64 = 1_000_000.0;
 
-#[derive(Deserialize, Serialize, Clone, Copy, PartialEq, Eq, Default)]
+#[derive(Deserialize, Serialize, Clone, Copy, PartialEq, Eq, Default, Type)]
 pub enum Status {
     Playing,
     Paused,
@@ -15,7 +16,7 @@ pub enum Status {
     Stopped,
 }
 
-#[derive(Deserialize, Serialize, Clone, Copy, PartialEq, Eq, Default)]
+#[derive(Deserialize, Serialize, Clone, Copy, PartialEq, Eq, Default, Type)]
 pub enum Repeat {
     #[default]
     None,
@@ -51,7 +52,7 @@ impl Repeat {
     }
 }
 
-#[derive(Deserialize, Clone, PartialEq, Default)]
+#[derive(Deserialize, Clone, PartialEq, Default, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Playback {
     pub track: u32,

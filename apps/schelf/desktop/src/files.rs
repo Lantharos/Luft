@@ -1,3 +1,4 @@
+use specta::Type;
 use std::collections::HashMap;
 use std::hash::{DefaultHasher, Hash, Hasher};
 use std::io::Read;
@@ -19,7 +20,7 @@ use crate::catalog::cache;
 use crate::fedora;
 use crate::library::sources::Bundled;
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(
     tag = "kind",
     rename_all = "camelCase",
@@ -97,7 +98,7 @@ pub enum Opened {
 }
 
 /// The same app on Flathub, which installs better than a `.deb` file can.
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct OnFlathub {
     pub id: String,
@@ -107,7 +108,7 @@ pub struct OnFlathub {
     pub verified: bool,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct File {
     path: String,
 }

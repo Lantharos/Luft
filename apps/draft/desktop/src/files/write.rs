@@ -1,3 +1,4 @@
+use specta::Type;
 use std::collections::HashMap;
 use std::fs::{self, File};
 use std::io::Write as _;
@@ -17,13 +18,13 @@ pub struct Writes {
     next: Arc<AtomicU64>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Chunk {
     id: Option<u64>,
     text: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Commit {
     id: u64,
     path: String,
@@ -31,7 +32,7 @@ pub struct Commit {
     bom: bool,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Discard {
     id: u64,
 }

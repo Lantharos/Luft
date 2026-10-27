@@ -1,3 +1,4 @@
+use specta::Type;
 use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
@@ -16,14 +17,14 @@ use crate::{paths, sources};
 
 const LEVEL_THREE: &str = "level3(";
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 #[serde(tag = "kind", rename_all = "lowercase")]
 pub enum Origin {
     System { id: String },
     User { id: String },
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct Viewed {
     #[serde(flatten)]
     layout: Layout,

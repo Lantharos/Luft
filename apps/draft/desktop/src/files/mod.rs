@@ -1,3 +1,4 @@
+use specta::Type;
 pub mod encoding;
 pub mod index;
 pub mod listing;
@@ -10,12 +11,12 @@ use std::time::UNIX_EPOCH;
 
 use serde::{Deserialize, Serialize};
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Target {
     pub path: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct Stat {
     size: u64,
     modified: f64,

@@ -1,3 +1,4 @@
+use specta::Type;
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, OnceLock};
@@ -28,7 +29,7 @@ struct Activation {
     token: Option<String>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct Opening {
     thread: Option<i64>,
 }

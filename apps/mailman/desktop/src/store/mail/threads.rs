@@ -1,11 +1,12 @@
 use rusqlite::{OptionalExtension, Row};
 use serde::Serialize;
 use serde_json::Value;
+use specta::Type;
 
 use super::views::approved;
 use crate::store::{Role, Settings, Store};
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct ConversationMessage {
     pub id: i64,

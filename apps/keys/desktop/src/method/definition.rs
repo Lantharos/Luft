@@ -1,3 +1,4 @@
+use specta::Type;
 use std::fmt::Write;
 use std::fs;
 use std::path::PathBuf;
@@ -16,7 +17,7 @@ fn enabled() -> bool {
     true
 }
 
-#[derive(Serialize, Deserialize, Clone, Default)]
+#[derive(Serialize, Deserialize, Clone, Default, Type)]
 pub struct Rule {
     pub keys: String,
     pub text: String,
@@ -24,13 +25,13 @@ pub struct Rule {
     pub after: String,
 }
 
-#[derive(Serialize, Deserialize, Clone, Default)]
+#[derive(Serialize, Deserialize, Clone, Default, Type)]
 pub struct Entry {
     pub keys: String,
     pub text: String,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Type)]
 pub struct Method {
     pub name: String,
     #[serde(default)]

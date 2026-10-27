@@ -1,5 +1,6 @@
 use mail_parser::{HeaderValue, Message, MessageParser, MimeHeaders};
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 use super::classify::{self, Category};
 
@@ -26,7 +27,7 @@ pub const HEADERS: [&str; 20] = [
     "X-Original-To",
 ];
 
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Address {
     pub name: String,

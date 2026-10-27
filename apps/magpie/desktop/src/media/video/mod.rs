@@ -1,3 +1,4 @@
+use specta::Type;
 mod external;
 mod matroska;
 mod mp4;
@@ -8,14 +9,14 @@ use serde::Serialize;
 
 use crate::folder::kinds::extension;
 
-#[derive(Serialize, Default)]
+#[derive(Serialize, Default, Type)]
 pub struct VideoInfo {
     video: Option<&'static str>,
     audio: Option<&'static str>,
     subtitles: Vec<SubtitleTrack>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct SubtitleTrack {
     id: String,
     label: Option<String>,
@@ -23,7 +24,7 @@ pub struct SubtitleTrack {
     path: Option<String>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct Cue {
     start: f64,
     end: f64,

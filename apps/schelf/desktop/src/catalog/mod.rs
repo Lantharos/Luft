@@ -1,3 +1,4 @@
+use specta::Type;
 pub mod cache;
 pub mod flathub;
 pub mod tools;
@@ -7,12 +8,12 @@ use luft_software::apps::toolbox::Repositories;
 use sabine::SabineWindow;
 use serde::Deserialize;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Path {
     path: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Query {
     query: String,
 }

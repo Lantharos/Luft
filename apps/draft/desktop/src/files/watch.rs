@@ -1,3 +1,4 @@
+use specta::Type;
 use std::path::PathBuf;
 use std::time::Duration;
 
@@ -10,7 +11,7 @@ use crate::events::FILES_CHANGED;
 #[derive(Clone)]
 pub struct Watcher(Option<FolderWatcher>);
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Folders {
     paths: Vec<PathBuf>,
 }

@@ -20,6 +20,7 @@ roxmltree.workspace = true
 sabine.workspace = true
 serde.workspace = true
 serde_json.workspace = true
+specta.workspace = true
 tokio = { workspace = true, features = ["fs", "macros", "rt", "sync", "time"] }
 toml.workspace = true
 xkbcommon.workspace = true

@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use luft_app::dbus::objects::Objects;
 use luft_app::dbus::{self, failed};
 use serde::Deserialize;
+use specta::Type;
 use zbus::{ObjectPath, OwnedObjectPath, Proxy, Variant};
 
 use super::profile::enterprise::Enterprise;
@@ -14,7 +15,7 @@ use super::{DEVICE, MANAGER, MANAGER_PATH, SERVICE, WIRELESS, watch};
 
 const ANY: &str = "/";
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Join {
     device: String,
     ssid: String,
@@ -26,7 +27,7 @@ pub struct Join {
     enterprise: Option<Enterprise>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Activate {
     pub connection: Option<String>,
     pub device: Option<String>,

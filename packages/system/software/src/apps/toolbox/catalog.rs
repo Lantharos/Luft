@@ -1,10 +1,11 @@
 use std::process::{Command, Stdio};
 
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 use super::transaction;
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Available {
     pub package: String,

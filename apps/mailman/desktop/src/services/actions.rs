@@ -1,3 +1,4 @@
+use specta::Type;
 use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
@@ -6,7 +7,7 @@ use crate::state::MailmanState;
 use crate::store::{Flag, Located, Role};
 use crate::sync::{Operation, Target};
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 #[serde(tag = "action", rename_all = "camelCase")]
 pub enum Action {
     Archive,
@@ -24,7 +25,7 @@ pub enum Action {
     Restore { moves: Vec<Placement> },
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Request {
     #[serde(flatten)]
     action: Action,
@@ -34,13 +35,13 @@ pub struct Request {
     ids: Vec<i64>,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize, Type)]
 pub struct Placement {
     id: i64,
     mailbox: i64,
 }
 
-#[derive(Serialize, Default)]
+#[derive(Serialize, Default, Type)]
 pub struct Undo {
     moves: Vec<Placement>,
 }

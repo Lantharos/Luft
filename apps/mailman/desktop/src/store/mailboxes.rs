@@ -1,9 +1,10 @@
 use rusqlite::{OptionalExtension, Row, params};
 use serde::Serialize;
+use specta::Type;
 
 use super::{Role, Store};
 
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Mailbox {
     pub id: i64,

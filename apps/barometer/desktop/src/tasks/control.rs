@@ -1,3 +1,4 @@
+use specta::Type;
 use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
@@ -15,7 +16,7 @@ const SYSTEM_BIN_DIRS: [&str; 2] = ["/usr/bin", "/bin"];
 const STOP_TIMEOUT: Duration = Duration::from_secs(5);
 const STOP_CHECK: Duration = Duration::from_millis(100);
 
-#[derive(Deserialize, Clone, Copy)]
+#[derive(Deserialize, Clone, Copy, Type)]
 #[serde(rename_all = "lowercase")]
 pub enum Signal {
     End,
@@ -44,19 +45,19 @@ impl Signal {
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct SignalRequest {
     pids: Vec<u32>,
     signal: Signal,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct OpenRequest {
     key: String,
     token: Option<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct PriorityRequest {
     pid: u32,
     nice: i32,

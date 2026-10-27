@@ -11,6 +11,7 @@ use zbus::OwnedVariant;
 
 use crate::task::Task;
 use enums::{flag, info};
+use specta::Type;
 use transaction::Details;
 
 pub use enums::filter;
@@ -28,7 +29,7 @@ pub struct Update {
     pub installed_version: Option<String>,
 }
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct PackageDetails {
     pub package: PackageId,

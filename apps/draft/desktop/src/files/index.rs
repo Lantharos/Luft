@@ -1,3 +1,4 @@
+use specta::Type;
 use std::path::Path;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicUsize, Ordering};
@@ -10,7 +11,7 @@ use super::Target;
 
 const LIMIT: usize = 200_000;
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct Index {
     files: Vec<String>,
     truncated: bool,

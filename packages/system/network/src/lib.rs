@@ -9,12 +9,12 @@ mod watch;
 
 use luft_app::dbus;
 use luft_app::dbus::objects::Objects;
-use luft_app::{Commands, Events};
+use luft_app::{Commands, Empty, Events};
 use sabine::SabineWindow;
 use serde::Deserialize;
-use serde_json::Value;
 
 use snapshot::Network;
+use specta::Type;
 
 const SERVICE: &str = "org.freedesktop.NetworkManager";
 const MANAGER_PATH: &str = "/org/freedesktop/NetworkManager";
@@ -28,37 +28,37 @@ const WIRELESS: &str = "org.freedesktop.NetworkManager.Device.Wireless";
 const ACCESS_POINT: &str = "org.freedesktop.NetworkManager.AccessPoint";
 const ACTIVE: &str = "org.freedesktop.NetworkManager.Connection.Active";
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Toggle {
     enabled: bool,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Device {
     device: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Active {
     active: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Ssid {
     ssid: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Connection {
     path: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct PrivateKey {
     key: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Choose {
     purpose: certificate::Purpose,
 }
@@ -73,7 +73,7 @@ async fn network() -> Result<Network, String> {
     Ok(snapshot::build(&objects).await)
 }
 
-async fn open(events: Events, _: Value) -> Result<Network, String> {
+async fn open(events: Events, Empty {}: Empty) -> Result<Network, String> {
     watch::open(&events);
     let network = network().await?;
     if let Some(wifi) = &network.wifi {
@@ -95,8 +95,10 @@ pub async fn store_secrets_system_wide() -> Result<(), String> {
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     window
+        .bridge_event(&watch::CHANGED)
+        .bridge_event(&watch::FAILED)
         .with_async("network_open", events, open)
-        .command("network_close", |_: Value| {
+        .command("network_close", |Empty {}| {
             watch::close();
             Ok(())
         })
@@ -120,8 +122,8 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         .command_async("network_remove", |Connection { path }| async move {
             saved::delete(&path).await
         })
-        .command_async("network_vpn_import", |_: Value| vpn::import())
-        .command("network_wireguard_keys", |_: Value| {
+        .command_async("network_vpn_import", |Empty {}| vpn::import())
+        .command("network_wireguard_keys", |Empty {}| {
             vpn::wireguard::generate()
         })
         .command("network_wireguard_public_key", |PrivateKey { key }| {

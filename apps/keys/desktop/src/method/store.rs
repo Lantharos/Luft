@@ -1,3 +1,4 @@
+use specta::Type;
 use std::fs;
 
 use luft_app::files;
@@ -11,7 +12,7 @@ pub const ENGINE_PREFIX: &str = "keys:";
 
 const SECTIONS: [&str; 3] = ["rules", "words", "sequences"];
 
-#[derive(Serialize, Clone, PartialEq, Eq)]
+#[derive(Serialize, Clone, PartialEq, Eq, Type)]
 pub struct Summary {
     pub id: String,
     pub name: String,
@@ -19,7 +20,7 @@ pub struct Summary {
     pub language: String,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Type)]
 pub struct Stored {
     pub id: String,
     #[serde(flatten)]

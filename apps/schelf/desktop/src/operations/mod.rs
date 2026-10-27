@@ -1,3 +1,4 @@
+use specta::Type;
 pub mod bus;
 mod jobs;
 
@@ -19,7 +20,7 @@ const OPERATIONS: &str = "schelf.operations";
 const LIBRARY: &str = "schelf.library";
 const PROGRESS_INTERVAL: Duration = Duration::from_millis(120);
 
-#[derive(Serialize, Clone, Copy, PartialEq, Eq)]
+#[derive(Serialize, Clone, Copy, PartialEq, Eq, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum State {
     Queued,
@@ -37,7 +38,7 @@ impl State {
     }
 }
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
 struct Operation {
     id: u64,
@@ -64,7 +65,7 @@ struct Finished {
     succeeded: bool,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Type)]
 pub struct Request {
     pub key: String,
     pub title: String,
@@ -85,7 +86,7 @@ pub enum Notice {
     },
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Id {
     id: u64,
 }

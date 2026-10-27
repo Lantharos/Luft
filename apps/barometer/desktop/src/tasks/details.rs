@@ -1,3 +1,4 @@
+use specta::Type;
 use std::fs;
 use std::path::Path;
 
@@ -10,12 +11,12 @@ use super::users::Users;
 
 const KIB: u64 = 1024;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct DetailsRequest {
     pid: u32,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Details {
     pid: u32,

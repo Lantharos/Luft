@@ -1,3 +1,4 @@
+use specta::Type;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
@@ -8,7 +9,7 @@ use super::{plain, sanitize};
 
 const SNIPPET_LENGTH: usize = 180;
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Attachment {
     pub index: u32,
@@ -18,7 +19,7 @@ pub struct Attachment {
     pub inline: bool,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Rendered {
     pub html: String,

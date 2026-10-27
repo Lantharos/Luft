@@ -1,12 +1,13 @@
 use rusqlite::Connection;
 use serde::Serialize;
+use specta::Type;
 
 use super::{FROM, Filter, Scope, View, filter};
 use crate::store::{Settings, Store, now};
 
 const SEARCH_CAP: i64 = 1000;
 
-#[derive(Serialize, Default)]
+#[derive(Serialize, Default, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Counts {
     pub inbox: i64,

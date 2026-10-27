@@ -1,3 +1,4 @@
+use specta::Type;
 use std::fs::{self, File};
 use std::io::{BufWriter, Write};
 use std::path::{Path, PathBuf};
@@ -14,7 +15,7 @@ use crate::cache;
 const BUDGET: u64 = 2 << 30;
 const WRITE_BUFFER: usize = 1 << 20;
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct Pixels {
     path: String,
     width: u32,

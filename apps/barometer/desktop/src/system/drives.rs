@@ -1,3 +1,4 @@
+use specta::Type;
 use std::collections::{HashMap, HashSet};
 use std::ffi::CString;
 use std::fs;
@@ -11,7 +12,7 @@ use super::procfile::{ProcFile, read_number, read_text, udev_property};
 const BLOCK: &str = "/sys/block";
 const SECTOR: u64 = 512;
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct DriveInfo {
     pub id: String,
@@ -25,7 +26,7 @@ pub struct DriveInfo {
     read_only: bool,
 }
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct DriveSample {
     id: String,
@@ -39,7 +40,7 @@ pub struct DriveSample {
     space: Option<Space>,
 }
 
-#[derive(Serialize, Clone, Default)]
+#[derive(Serialize, Clone, Default, Type)]
 #[serde(rename_all = "camelCase")]
 struct Space {
     used: u64,

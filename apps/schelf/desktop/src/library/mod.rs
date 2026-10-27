@@ -1,3 +1,4 @@
+use specta::Type;
 mod appimages;
 mod debian;
 mod flatpaks;
@@ -15,7 +16,7 @@ use serde_json::Value;
 
 use crate::fedora;
 
-#[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Eq, Debug)]
+#[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Eq, Debug, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum Source {
     Flatpak,
@@ -26,7 +27,7 @@ pub enum Source {
     System,
 }
 
-#[derive(Serialize, Clone, Debug)]
+#[derive(Serialize, Clone, Debug, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct InstalledApp {
     pub key: String,
@@ -47,13 +48,13 @@ pub struct InstalledApp {
     pub services: Vec<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Desktop {
     desktop: String,
     token: Option<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 struct FlatpakRef {
     installation: Installation,

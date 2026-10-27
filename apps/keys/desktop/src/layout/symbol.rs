@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use specta::Type;
 use xkbcommon::xkb;
 
 use super::dead::DeadKey;
@@ -40,7 +41,7 @@ const DEAD_KEYS: [(&str, &str); 32] = [
     ("dead_voiced_sound", "゛"),
 ];
 
-#[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Eq, Debug)]
+#[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Eq, Debug, Type)]
 #[serde(rename_all = "lowercase")]
 pub enum Kind {
     Empty,
@@ -50,7 +51,7 @@ pub enum Kind {
     Function,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, Type)]
 pub struct Symbol {
     pub keysym: String,
     pub text: String,

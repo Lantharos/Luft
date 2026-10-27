@@ -2,15 +2,14 @@ use std::sync::{Mutex, OnceLock};
 
 use futures_util::StreamExt;
 use luft_app::dbus;
-use luft_app::{Commands, Events};
-use sabine::SabineWindow;
+use luft_app::{Commands, Empty, Events};
+use sabine::{BridgeEvent, SabineWindow};
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 use zbus::message::Type;
 use zbus::proxy::MethodFlags;
 use zbus::{DynamicType, MatchRule, MessageStream, OwnedObjectPath, Proxy};
 
-pub const PROGRESS: &str = "fingerprint.enroll";
+pub const PROGRESS: BridgeEvent<Progress> = BridgeEvent::new("fingerprint.enroll");
 
 const SERVICE: &str = "net.reactivated.Fprint";
 const MANAGER_PATH: &str = "/net/reactivated/Fprint/Manager";
@@ -18,7 +17,7 @@ const MANAGER: &str = "net.reactivated.Fprint.Manager";
 const DEVICE: &str = "net.reactivated.Fprint.Device";
 const CURRENT_USER: &str = "";
 
-#[derive(Serialize)]
+#[derive(Serialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
 struct Fingerprints {
     swipe: bool,
@@ -26,12 +25,12 @@ struct Fingerprints {
     enrolled: Vec<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, specta::Type)]
 struct Finger {
     finger: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, specta::Type)]
 pub struct Progress {
     pub result: String,
     pub done: bool,
@@ -86,7 +85,7 @@ async fn call(
         .map_err(|error| explain(&error))
 }
 
-async fn list(_: Value) -> Result<Option<Fingerprints>, String> {
+async fn list(Empty {}: Empty) -> Result<Option<Fingerprints>, String> {
     let Some(reader) = reader().await else {
         return Ok(None);
     };
@@ -169,7 +168,7 @@ async fn listen(events: Events) {
 
 pub fn register_reader(window: SabineWindow) -> SabineWindow {
     window
-        .command_async("fingerprint_reader", |_: Value| async {
+        .command_async("fingerprint_reader", |Empty {}| async {
             Ok(reader_present().await)
         })
         .command_async("fingerprint_list", list)
@@ -177,8 +176,9 @@ pub fn register_reader(window: SabineWindow) -> SabineWindow {
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     register_reader(window)
+        .bridge_event(&PROGRESS)
         .with_async("fingerprint_enroll", events, enroll)
-        .command_async("fingerprint_stop", |_: Value| async {
+        .command_async("fingerprint_stop", |Empty {}| async {
             stop().await;
             Ok(())
         })

@@ -1,3 +1,4 @@
+use specta::Type;
 use std::io;
 use std::os::fd::OwnedFd;
 use std::os::unix::process::CommandExt;
@@ -8,7 +9,7 @@ use rustix::pty::{OpenptFlags, grantpt, openpt, ptsname, unlockpt};
 use rustix::termios::{Winsize, tcsetwinsize};
 use serde::Deserialize;
 
-#[derive(Clone, Copy, Deserialize)]
+#[derive(Clone, Copy, Deserialize, Type)]
 pub struct Size {
     pub cols: u16,
     pub rows: u16,

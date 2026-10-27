@@ -1,3 +1,4 @@
+use specta::Type;
 mod data;
 mod faces;
 mod install;
@@ -13,7 +14,7 @@ use faces::Face;
 pub use install::{install, remove, status, use_as};
 pub use preview::source;
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct FontFile {
     format: &'static str,
     faces: Vec<Face>,

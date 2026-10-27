@@ -2,12 +2,13 @@ use luft_app::{Activation, Appearance, Commands, launch};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use specta::Type;
 
 use crate::fedora;
 
 const PAGE_SCHEME: &str = "schelf:";
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 struct AppState {
     #[serde(flatten)]
@@ -25,7 +26,7 @@ fn files(activation: &Activation) -> Vec<String> {
         .collect()
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Link {
     url: String,
     token: Option<String>,

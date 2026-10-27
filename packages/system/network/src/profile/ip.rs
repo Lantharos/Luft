@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::net::IpAddr;
 
 use serde::{Deserialize, Serialize};
+use specta::Type;
 use zbus::Variant;
 
 use super::settings::{Group, put, put_text, read};
@@ -10,7 +11,7 @@ const LEGACY: [&str; 3] = ["addresses", "routes", "dns"];
 
 type Entry = HashMap<String, Variant<'static>>;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Route {
     destination: String,
@@ -18,7 +19,7 @@ pub struct Route {
     metric: Option<u32>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Ip {
     method: String,

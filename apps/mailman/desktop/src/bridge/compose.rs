@@ -2,12 +2,13 @@ use luft_app::Commands;
 use luft_app::portal::FileChooser;
 use sabine::{BridgeCommand, BridgeError, BridgeResponse, BridgeResult, SabineWindow};
 use serde::Serialize;
+use specta::Type;
 
 use super::params::*;
 use crate::services::compose;
 use crate::state::{MailmanState, cache_folder};
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 struct Chosen {
     path: String,
     name: String,

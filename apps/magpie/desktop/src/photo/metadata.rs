@@ -1,3 +1,4 @@
+use specta::Type;
 use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
@@ -7,7 +8,7 @@ use serde::Serialize;
 
 const ROTATED_ORIENTATIONS: [u32; 4] = [5, 6, 7, 8];
 
-#[derive(Serialize, Default)]
+#[derive(Serialize, Default, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Details {
     width: Option<usize>,
@@ -22,7 +23,7 @@ pub struct Details {
     location: Option<Location>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct Location {
     latitude: f64,
     longitude: f64,

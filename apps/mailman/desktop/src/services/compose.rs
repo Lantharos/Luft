@@ -3,6 +3,7 @@ use base64::engine::general_purpose::STANDARD;
 use luft_app::launch;
 use serde::Serialize;
 use serde_json::json;
+use specta::Type;
 
 use crate::mail::compose::{self, Draft, Sender};
 use crate::mail::envelope::{Address, Unsubscribe};
@@ -12,14 +13,14 @@ use crate::state::MailmanState;
 use crate::store::{Identity, Outgoing, Role, now};
 use crate::sync::{Operation, Target};
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Queued {
     id: i64,
     send_at: i64,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum Unsubscribed {
     Done,

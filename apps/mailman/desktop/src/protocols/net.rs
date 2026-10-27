@@ -1,3 +1,4 @@
+use specta::Type;
 use std::io::{Read, Write};
 use std::net::{TcpStream, ToSocketAddrs};
 use std::sync::{Arc, OnceLock};
@@ -16,7 +17,7 @@ const KEEPALIVE: TcpKeepalive = TcpKeepalive::new()
     .with_interval(Duration::from_secs(15))
     .with_retries(3);
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum Security {
     Tls,
@@ -24,7 +25,7 @@ pub enum Security {
     None,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Server {
     pub host: String,

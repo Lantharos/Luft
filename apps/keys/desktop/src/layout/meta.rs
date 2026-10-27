@@ -1,3 +1,4 @@
+use specta::Type;
 use std::fs;
 use std::path::PathBuf;
 
@@ -7,7 +8,7 @@ use serde::{Deserialize, Serialize};
 use super::dead::DeadKey;
 use crate::paths;
 
-#[derive(Serialize, Deserialize, Clone, Copy, Default, PartialEq, Eq, Debug)]
+#[derive(Serialize, Deserialize, Clone, Copy, Default, PartialEq, Eq, Debug, Type)]
 #[serde(rename_all = "lowercase")]
 pub enum AltGr {
     #[default]
@@ -20,7 +21,7 @@ pub enum AltGr {
     Caps,
 }
 
-#[derive(Serialize, Deserialize, Clone, Copy, Default, PartialEq, Eq, Debug)]
+#[derive(Serialize, Deserialize, Clone, Copy, Default, PartialEq, Eq, Debug, Type)]
 #[serde(rename_all = "lowercase")]
 pub enum Compose {
     #[default]
@@ -34,7 +35,7 @@ pub enum Compose {
     Prsc,
 }
 
-#[derive(Serialize, Deserialize, Clone, Copy, Default, PartialEq, Eq, Debug)]
+#[derive(Serialize, Deserialize, Clone, Copy, Default, PartialEq, Eq, Debug, Type)]
 #[serde(rename_all = "lowercase")]
 pub enum Caps {
     #[default]
@@ -47,7 +48,7 @@ pub enum Caps {
     None,
 }
 
-#[derive(Serialize, Deserialize, Clone, Copy, Default, PartialEq, Eq, Debug)]
+#[derive(Serialize, Deserialize, Clone, Copy, Default, PartialEq, Eq, Debug, Type)]
 pub struct Options {
     #[serde(default)]
     pub altgr: AltGr,

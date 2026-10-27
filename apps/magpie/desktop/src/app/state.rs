@@ -1,3 +1,4 @@
+use specta::Type;
 use std::sync::Arc;
 
 use luft_app::thumbnails::Thumbnails;
@@ -18,7 +19,7 @@ pub struct MagpieState {
     launch_paths: Arc<Vec<String>>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct AppState {
     launch_paths: Vec<String>,

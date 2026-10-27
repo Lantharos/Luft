@@ -3,6 +3,7 @@ use std::net::Ipv6Addr;
 
 use luft_app::dbus::objects::{Object, Objects};
 use serde::Serialize;
+use specta::Type;
 use zbus::{OwnedObjectPath, OwnedVariant};
 
 use super::profile::Security;
@@ -25,7 +26,7 @@ const KEY_ENTERPRISE: u32 = 0x200;
 const KEY_SAE: u32 = 0x400;
 const KEY_OWE: u32 = 0x800;
 
-#[derive(Serialize, Clone, Copy, PartialEq)]
+#[derive(Serialize, Clone, Copy, PartialEq, Type)]
 #[serde(rename_all = "lowercase")]
 pub enum Link {
     Connected,
@@ -34,7 +35,7 @@ pub enum Link {
     Unplugged,
 }
 
-#[derive(Serialize, Default)]
+#[derive(Serialize, Default, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Details {
     ipv4: Vec<String>,
@@ -44,7 +45,7 @@ pub struct Details {
     mac: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Radio {
     frequency: u32,
@@ -52,7 +53,7 @@ pub struct Radio {
     bitrate: u32,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct WifiNetwork {
     ssid: String,
@@ -65,7 +66,7 @@ pub struct WifiNetwork {
     radio: Option<Radio>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Wifi {
     pub device: String,
@@ -74,7 +75,7 @@ pub struct Wifi {
     networks: Vec<WifiNetwork>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Wired {
     device: String,
@@ -85,7 +86,7 @@ pub struct Wired {
     details: Option<Details>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Vpn {
     connection: String,
@@ -94,14 +95,14 @@ pub struct Vpn {
     state: Link,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Known {
     connection: String,
     ssid: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Network {
     pub wifi: Option<Wifi>,

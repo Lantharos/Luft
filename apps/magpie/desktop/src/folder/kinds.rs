@@ -1,8 +1,9 @@
+use specta::Type;
 use std::path::Path;
 
 use serde::Serialize;
 
-#[derive(Clone, Copy, PartialEq, Eq, Serialize)]
+#[derive(Clone, Copy, PartialEq, Eq, Serialize, Type)]
 #[serde(rename_all = "lowercase")]
 pub enum Kind {
     Image,

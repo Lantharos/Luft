@@ -1,3 +1,4 @@
+use specta::Type;
 pub mod definition;
 mod host;
 mod import;
@@ -20,12 +21,12 @@ pub use host::SERVE_FLAG;
 use preview::Preview;
 pub use store::{ENGINE_PREFIX, Stored, Summary, engine_name, list};
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Id {
     id: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Create {
     name: String,
 }

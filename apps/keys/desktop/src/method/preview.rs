@@ -1,3 +1,4 @@
+use specta::Type;
 use std::sync::{Arc, Mutex, PoisonError};
 
 use serde::{Deserialize, Serialize};
@@ -16,19 +17,19 @@ struct Typing {
 #[derive(Clone, Default)]
 pub struct Preview(Arc<Mutex<Typing>>);
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Pick {
     index: usize,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Press {
     keysym: Option<String>,
     text: Option<String>,
     before: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct Shown {
     handled: bool,
     commit: String,

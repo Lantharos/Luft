@@ -1,6 +1,7 @@
 use serde::Serialize;
+use specta::Type;
 
-#[derive(Serialize, Clone, Copy, PartialEq, Debug)]
+#[derive(Serialize, Clone, Copy, PartialEq, Debug, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum Stage {
     Waiting,
@@ -37,7 +38,7 @@ impl Stage {
     }
 }
 
-#[derive(Serialize, Clone, Copy, PartialEq, Debug)]
+#[derive(Serialize, Clone, Copy, PartialEq, Debug, Type)]
 pub struct Progress {
     pub stage: Stage,
     pub fraction: Option<f32>,

@@ -1,4 +1,5 @@
 use serde::Serialize;
+use specta::Type;
 
 use super::hwmon::{self, Sensor};
 use super::procfile::ProcFile;
@@ -41,7 +42,7 @@ impl Times {
     }
 }
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct CpuSample {
     usage: f32,

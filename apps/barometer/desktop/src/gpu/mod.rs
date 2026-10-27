@@ -1,3 +1,4 @@
+use specta::Type;
 mod amd;
 mod drm;
 mod intel;
@@ -21,7 +22,7 @@ use nvidia::Nvidia;
 const DRM: &str = "/sys/class/drm";
 const PROCESS_REFRESH: Duration = Duration::from_secs(2);
 
-#[derive(Serialize, Clone, Default)]
+#[derive(Serialize, Clone, Default, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct GpuInfo {
     pub id: String,
@@ -38,7 +39,7 @@ pub struct GpuInfo {
     pub max_memory_clock: Option<u32>,
 }
 
-#[derive(Serialize, Clone, Default)]
+#[derive(Serialize, Clone, Default, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct GpuSample {
     id: String,

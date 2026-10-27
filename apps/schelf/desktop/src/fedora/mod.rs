@@ -1,3 +1,4 @@
+use specta::Type;
 mod appstream;
 mod catalog;
 mod jobs;
@@ -40,17 +41,17 @@ pub async fn updates() -> Result<Vec<AppUpdate>, String> {
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Id {
     id: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Package {
     package: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 struct App {
     #[serde(flatten)]

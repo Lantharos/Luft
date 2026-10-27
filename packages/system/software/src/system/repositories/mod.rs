@@ -6,6 +6,7 @@ use std::collections::BTreeMap;
 use std::fs;
 
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 use crate::http;
 pub use known::KNOWN;
@@ -16,20 +17,20 @@ const FOLDER: &str = "/etc/yum.repos.d";
 
 /// A repository file and the keys it names, by the address `gpgkey` gives each, ready to be
 /// checked and added.
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
 pub struct Draft {
     pub file: String,
     pub text: String,
     pub keys: BTreeMap<String, String>,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, Type)]
 pub struct Key {
     pub fingerprint: String,
     pub user: String,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, Type)]
 pub struct DescribedSource {
     pub id: String,
     pub name: String,
@@ -38,7 +39,7 @@ pub struct DescribedSource {
 
 /// What the system says about a draft: the sources in it and the keys their packages must be
 /// signed with.
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, Type)]
 pub struct Described {
     pub file: String,
     pub sources: Vec<DescribedSource>,

@@ -1,8 +1,9 @@
+use specta::Type;
 use std::path::PathBuf;
 
 use serde::Serialize;
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "lowercase")]
 pub enum Place {
     Pictures,
@@ -11,7 +12,7 @@ pub enum Place {
     Documents,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct Location {
     place: Place,
     path: String,

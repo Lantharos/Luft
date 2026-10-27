@@ -1,3 +1,4 @@
+use specta::Type;
 use std::time::Duration;
 
 use hickory_resolver::TokioResolver;
@@ -17,7 +18,7 @@ const MICROSOFT_DOMAINS: [&str; 5] = [
     "office365.com",
 ];
 
-#[derive(Serialize, Default)]
+#[derive(Serialize, Default, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Discovery {
     pub imap: Option<Server>,

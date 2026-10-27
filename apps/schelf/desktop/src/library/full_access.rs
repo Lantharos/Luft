@@ -1,16 +1,17 @@
 use luft_software::apps::{appimage, flatpak};
 use luft_software::system::System;
 use serde::Deserialize;
+use specta::Type;
 
 use super::Source;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct App {
     id: String,
     source: Source,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Change {
     pub id: String,
     pub source: Source,

@@ -1,7 +1,8 @@
 use parking_lot::RwLock;
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Type)]
 #[serde(rename_all = "lowercase")]
 pub enum CursorStyle {
     Block,
@@ -9,7 +10,7 @@ pub enum CursorStyle {
     Underline,
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Type)]
 #[serde(rename_all = "lowercase")]
 pub enum SchemePreference {
     System,
@@ -17,7 +18,7 @@ pub enum SchemePreference {
     Light,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase", default)]
 pub struct Settings {
     pub font_size: u32,

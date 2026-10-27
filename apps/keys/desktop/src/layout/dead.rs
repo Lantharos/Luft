@@ -1,10 +1,11 @@
 use serde::{Deserialize, Serialize};
+use specta::Type;
 use xkbcommon::xkb;
 
 const FIRST: u32 = 0xec40;
 const LAST: u32 = 0xecff;
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Type)]
 pub struct Pair {
     pub base: String,
     #[serde(default)]
@@ -13,7 +14,7 @@ pub struct Pair {
     pub next: String,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, Type)]
 pub struct DeadKey {
     pub keysym: String,
     pub name: String,

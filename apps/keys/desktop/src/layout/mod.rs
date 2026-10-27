@@ -1,3 +1,4 @@
+use specta::Type;
 pub mod compile;
 pub mod dead;
 pub mod keys;
@@ -29,7 +30,7 @@ use store::{Draft, Origin};
 use symbol::Symbol;
 use tester::Tester;
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Layout {
     pub id: String,
@@ -42,24 +43,24 @@ pub struct Layout {
     pub options: Options,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Id {
     id: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Create {
     name: String,
     from: Origin,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Describe {
     keysym: Option<String>,
     text: Option<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 #[serde(rename_all = "lowercase")]
 enum Format {
     Symbols,
@@ -68,30 +69,30 @@ enum Format {
     Klc,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Export {
     id: String,
     format: Format,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Press {
     key: String,
     down: bool,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct FreeKeysym {
     id: String,
     taken: Vec<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct SystemTable {
     keysym: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 struct Specials {
     dead: Vec<Symbol>,
     compose: Symbol,

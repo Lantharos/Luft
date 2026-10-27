@@ -1,8 +1,9 @@
 use serde::Serialize;
+use specta::Type;
 
 use super::{Installation, query};
 
-#[derive(Serialize, Clone, Default, Debug)]
+#[derive(Serialize, Clone, Default, Debug, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Permissions {
     pub shared: Vec<String>,

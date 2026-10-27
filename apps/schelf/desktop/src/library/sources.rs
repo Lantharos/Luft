@@ -4,9 +4,10 @@ use luft_software::system::system_packages::{self, Origin};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use specta::Type;
 
 /// A repository and what the system said about it, to be trusted before it's added.
-#[derive(Serialize, Clone, Debug)]
+#[derive(Serialize, Clone, Debug, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Bundled {
     pub draft: Draft,
@@ -25,7 +26,7 @@ impl Bundled {
     }
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 struct Added {
     file: String,
@@ -59,12 +60,12 @@ fn list() -> Result<Vec<Added>, String> {
         .collect())
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Fetch {
     source: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Add {
     draft: Draft,
 }

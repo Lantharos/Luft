@@ -1,3 +1,4 @@
+use specta::Type;
 use std::hash::{DefaultHasher, Hash, Hasher};
 use std::path::PathBuf;
 
@@ -16,7 +17,7 @@ use crate::services::actions;
 use crate::state::{MailmanState, cache_folder};
 use crate::store::View;
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 struct Opened {
     subject: String,

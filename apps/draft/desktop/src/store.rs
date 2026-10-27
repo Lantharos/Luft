@@ -1,10 +1,11 @@
+use specta::Type;
 use std::fs;
 use std::path::PathBuf;
 
 use serde::Deserialize;
 use serde_json::Value;
 
-#[derive(Deserialize, Clone, Copy)]
+#[derive(Deserialize, Clone, Copy, Type)]
 #[serde(rename_all = "lowercase")]
 pub enum Name {
     Settings,
@@ -12,18 +13,18 @@ pub enum Name {
     Files,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Read {
     name: Name,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Write {
     name: Name,
     value: Value,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Backup {
     name: String,
 }

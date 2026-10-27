@@ -1,9 +1,10 @@
 use rusqlite::OptionalExtension;
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 use super::Store;
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase", default)]
 pub struct Settings {
     pub screener: bool,

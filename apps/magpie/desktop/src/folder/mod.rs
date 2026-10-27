@@ -1,3 +1,4 @@
+use specta::Type;
 pub mod kinds;
 mod places;
 mod watch;
@@ -12,7 +13,7 @@ use kinds::Kind;
 pub use places::places;
 pub use watch::FolderWatcher;
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct Item {
     path: String,
     name: String,
@@ -22,13 +23,13 @@ pub struct Item {
     size: u64,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct Folder {
     path: String,
     name: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct Listing {
     folder: String,
     items: Vec<Item>,

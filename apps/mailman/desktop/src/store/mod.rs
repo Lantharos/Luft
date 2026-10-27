@@ -1,3 +1,4 @@
+use specta::Type;
 mod accounts;
 mod mail;
 mod mailboxes;
@@ -21,7 +22,7 @@ pub use mailboxes::{Mailbox, RemoteFolder};
 pub use outbox::Outgoing;
 pub use settings::Settings;
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, Type)]
 #[serde(rename_all = "lowercase")]
 pub enum Role {
     Inbox,

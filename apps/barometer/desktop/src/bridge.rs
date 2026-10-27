@@ -2,12 +2,13 @@ use luft_app::{Appearance, Commands};
 use sabine::SabineWindow;
 use serde::Serialize;
 use serde_json::Value;
+use specta::Type;
 
 use crate::monitor::Monitor;
 use crate::settings;
 use crate::tasks::{control, details};
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 struct AppState {
     #[serde(flatten)]
     appearance: Appearance,

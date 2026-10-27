@@ -1,40 +1,41 @@
 use serde::Deserialize;
+use specta::Type;
 
 use crate::accounts::{AccountConfig, Provider};
 use crate::mail::compose::Draft;
 use crate::store::{Cursor, Identity, Settings};
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Empty {}
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Id {
     pub id: i64,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Thread {
     pub thread: i64,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Focus {
     pub focused: bool,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Email {
     pub email: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 #[serde(tag = "kind", rename_all = "camelCase")]
 pub enum NewSecret {
     Password { password: String },
     OAuth { provider: Provider },
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct NewAccount {
     pub email: String,
     pub name: String,
@@ -43,18 +44,18 @@ pub struct NewAccount {
     pub token: Option<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct AccountUpdate {
     pub id: i64,
     pub name: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct SavedIdentity {
     pub identity: Identity,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Page {
     pub view: String,
     pub query: Option<String>,
@@ -62,30 +63,30 @@ pub struct Page {
     pub limit: i64,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Sync {
     pub account: i64,
     pub mailbox: i64,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Urls {
     pub urls: Vec<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Images {
     pub address: String,
     pub allowed: bool,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Verdict {
     pub address: String,
     pub verdict: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Part {
     pub id: Option<i64>,
     pub file: Option<String>,
@@ -93,50 +94,50 @@ pub struct Part {
     pub token: Option<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Path {
     pub path: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Paths {
     pub paths: Vec<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Uri {
     pub uri: String,
     pub token: Option<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Unsubscribe {
     pub id: i64,
     pub token: Option<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Query {
     pub query: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Send {
     pub draft: Draft,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct SaveDraft {
     pub draft: Draft,
     pub replaces: Option<i64>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct SaveSettings {
     pub settings: Settings,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Template {
     pub id: Option<i64>,
     pub name: String,

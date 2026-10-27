@@ -1,3 +1,4 @@
+use specta::Type;
 use std::io::{BufRead, BufReader, Write};
 use std::net::TcpListener;
 use std::time::{Duration, Instant};
@@ -15,7 +16,7 @@ use crate::store::now;
 const SIGN_IN_TIMEOUT: Duration = Duration::from_secs(300);
 const FINISHED_PAGE: &str = "<!doctype html><meta charset=utf-8><title>Mailman</title><body style=\"font:16px system-ui;display:grid;place-items:center;height:90vh;margin:0\"><p>You're signed in. You can close this tab and go back to Mailman.</p>";
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum Provider {
     Google,

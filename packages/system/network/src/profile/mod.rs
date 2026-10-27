@@ -12,6 +12,7 @@ use zbus::proxy::MethodFlags;
 use super::{CONNECTION, SERVICE};
 use ip::Ip;
 use settings::{Settings, get, put, put_text, read};
+use specta::Type;
 use wireless::Wireless;
 
 pub use wireless::Security;
@@ -20,7 +21,7 @@ const GENERAL: &str = "connection";
 const ETHERNET: &str = "802-3-ethernet";
 pub const WIFI: &str = "802-11-wireless";
 
-#[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Type)]
 #[serde(rename_all = "lowercase")]
 enum Kind {
     Wired,
@@ -29,7 +30,7 @@ enum Kind {
     Other,
 }
 
-#[derive(Serialize, Deserialize, Clone, Copy)]
+#[derive(Serialize, Deserialize, Clone, Copy, Type)]
 #[serde(rename_all = "lowercase")]
 enum Metered {
     Automatic = 0,
@@ -37,7 +38,7 @@ enum Metered {
     No = 2,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Profile {
     kind: Kind,
@@ -52,7 +53,7 @@ pub struct Profile {
     wireless: Option<Wireless>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Save {
     path: String,
     profile: Profile,

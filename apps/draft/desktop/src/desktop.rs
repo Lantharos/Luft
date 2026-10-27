@@ -1,3 +1,4 @@
+use specta::Type;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
@@ -8,24 +9,24 @@ use zbus::{OwnedObjectPath, Proxy, Variant};
 
 use crate::files::failed;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Open {
     folder: Option<PathBuf>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Save {
     name: String,
     folder: Option<PathBuf>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Link {
     uri: String,
     token: Option<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 pub struct Handoff {
     path: String,
     token: Option<String>,

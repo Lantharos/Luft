@@ -1,3 +1,4 @@
+use specta::Type;
 use std::cmp::Ordering;
 use std::fs;
 
@@ -7,7 +8,7 @@ use super::{Target, failed};
 
 const SKIPPED: [&str; 1] = [".git"];
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct Entry {
     name: String,
     path: String,

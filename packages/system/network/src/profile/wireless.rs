@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 use super::enterprise::{self, Enterprise};
 use super::settings::{Group, Settings, get, put};
@@ -11,7 +12,7 @@ const SYSTEM_STORED: u32 = 0;
 const AGENT_OWNED: u32 = 1;
 const NOT_SAVED: u32 = 2;
 
-#[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Type)]
 #[serde(rename_all = "lowercase")]
 pub enum Security {
     Open,
@@ -22,7 +23,7 @@ pub enum Security {
     Enterprise,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Wireless {
     pub security: Security,

@@ -1,3 +1,4 @@
+use specta::Type;
 use std::path::PathBuf;
 
 use luft_app::portal;
@@ -11,7 +12,7 @@ use crate::{characters, layout, method, sources};
 
 pub const LINK_SCHEME: &str = "kestrel-keys:";
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 struct AppState {
     #[serde(flatten)]
@@ -20,7 +21,7 @@ struct AppState {
     targets: Targets,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 struct Targets {
     link: Option<String>,
     files: Vec<PathBuf>,
@@ -42,12 +43,12 @@ impl From<&Activation> for Targets {
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct OpenFile {
     path: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(tag = "kind", rename_all = "lowercase")]
 enum Opened {
     Layout { id: String },

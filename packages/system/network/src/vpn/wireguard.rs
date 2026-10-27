@@ -4,6 +4,7 @@ use std::net::IpAddr;
 use gio::glib;
 use luft_app::dbus::{self, failed};
 use serde::{Deserialize, Serialize};
+use specta::Type;
 use x25519_dalek::{X25519_BASEPOINT_BYTES, x25519};
 use zbus::proxy::MethodFlags;
 use zbus::{OwnedObjectPath, OwnedVariant, Proxy, Variant};
@@ -16,7 +17,7 @@ const TYPE: &str = "wireguard";
 const TO_DISK: u32 = 0x1;
 const INTERFACE_LENGTH: usize = 15;
 
-#[derive(Deserialize, Default)]
+#[derive(Deserialize, Default, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Peer {
     public_key: String,
@@ -26,7 +27,7 @@ pub struct Peer {
     keepalive: Option<u32>,
 }
 
-#[derive(Deserialize, Default)]
+#[derive(Deserialize, Default, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct WireGuard {
     name: String,
@@ -38,7 +39,7 @@ pub struct WireGuard {
     peers: Vec<Peer>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Keys {
     private_key: String,

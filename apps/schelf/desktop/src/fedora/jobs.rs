@@ -2,10 +2,11 @@ use luft_app::block_on;
 use luft_software::system::packages;
 use luft_software::task::Task;
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 use crate::operations::Action;
 
-#[derive(Deserialize, Serialize, Clone, Debug)]
+#[derive(Deserialize, Serialize, Clone, Debug, Type)]
 #[serde(
     tag = "kind",
     rename_all = "camelCase",

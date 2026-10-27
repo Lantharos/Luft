@@ -3,6 +3,7 @@ use base64::engine::general_purpose::STANDARD;
 use luft_app::{Activation, Commands};
 use sabine::SabineWindow;
 use serde::Deserialize;
+use specta::Type;
 
 use crate::desktop::links;
 use crate::launch::LaunchRequest;
@@ -10,15 +11,15 @@ use crate::pty::Size;
 use crate::settings::{self, Settings};
 use crate::state::TernState;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Empty {}
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Terminal {
     id: u32,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Spawn {
     #[serde(flatten)]
     size: Size,
@@ -26,25 +27,25 @@ struct Spawn {
     command: Option<Vec<String>>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Input {
     id: u32,
     data: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Resize {
     id: u32,
     #[serde(flatten)]
     size: Size,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct SettingsUpdate {
     settings: Settings,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Type)]
 struct Link {
     uri: String,
     token: Option<String>,

@@ -1,8 +1,9 @@
 use gio::prelude::*;
 use luft_app::portal::{self, Filter};
 use serde::Deserialize;
+use specta::Type;
 
-#[derive(Deserialize, Clone, Copy)]
+#[derive(Deserialize, Clone, Copy, Type)]
 #[serde(rename_all = "lowercase")]
 pub enum Purpose {
     Authority,

@@ -1,3 +1,4 @@
+use specta::Type;
 use std::collections::HashSet;
 use std::fs;
 
@@ -7,7 +8,7 @@ use super::procfile::{read_number, read_text};
 
 const CPUS: &str = "/sys/devices/system/cpu";
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Cache {
     level: u32,
@@ -16,7 +17,7 @@ pub struct Cache {
     instances: usize,
 }
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct CpuInfo {
     name: String,

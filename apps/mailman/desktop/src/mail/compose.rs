@@ -1,3 +1,4 @@
+use specta::Type;
 use std::path::Path;
 
 use mail_builder::MessageBuilder;
@@ -7,7 +8,7 @@ use serde::{Deserialize, Serialize};
 
 use super::envelope::Address;
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Attached {
     pub path: String,
@@ -15,7 +16,7 @@ pub struct Attached {
     pub cid: Option<String>,
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Draft {
     pub account: i64,

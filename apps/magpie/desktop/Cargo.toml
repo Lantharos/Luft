@@ -24,6 +24,7 @@ parking_lot.workspace = true
 sabine.workspace = true
 serde.workspace = true
 skrifa.workspace = true
+specta.workspace = true
 tokio = { workspace = true, features = ["sync"] }
 write-fonts.workspace = true
 wuff.workspace = true

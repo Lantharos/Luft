@@ -10,6 +10,7 @@ mod updates;
 use std::process::Command;
 
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 pub use chromium::integrate;
 #[cfg(feature = "system")]
@@ -20,7 +21,7 @@ pub use remotes::{FLATHUB, ensure_flathub};
 pub use transaction::{add_remote, install, install_bundle, install_ref, uninstall, update};
 pub use updates::{Update, updates};
 
-#[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Eq, Hash, Debug)]
+#[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Eq, Hash, Debug, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum Installation {
     User,

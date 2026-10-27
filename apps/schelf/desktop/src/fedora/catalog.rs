@@ -1,3 +1,4 @@
+use specta::Type;
 use std::collections::HashMap;
 use std::io::Read;
 use std::path::{Path, PathBuf};
@@ -13,7 +14,7 @@ use crate::catalog::cache::Entry;
 const CATALOGS: &str = "/usr/share/swcatalog/xml";
 const ICONS: &str = "/usr/share/swcatalog/icons";
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Summary {
     pub id: String,

@@ -1,3 +1,4 @@
+use specta::Type;
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -9,7 +10,7 @@ use super::faces::{self, Identity};
 
 const MAX_SUFFIX: u32 = 100;
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum Status {
     Missing,

@@ -1,3 +1,4 @@
+use specta::Type;
 use std::collections::HashMap;
 use std::ffi::{CStr, CString, c_char, c_void};
 use std::sync::OnceLock;
@@ -30,7 +31,7 @@ unsafe extern "C" {
     fn xkb_compose_table_entry_utf8(entry: *mut ComposeEntry) -> *const c_char;
 }
 
-#[derive(Serialize, Clone, Default)]
+#[derive(Serialize, Clone, Default, Type)]
 pub struct Effective {
     pub spacing: String,
     pub pairs: Vec<dead::Pair>,

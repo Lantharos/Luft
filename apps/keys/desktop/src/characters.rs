@@ -1,3 +1,4 @@
+use specta::Type;
 use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::sync::OnceLock;
@@ -12,7 +13,7 @@ const VARIATION: char = '\u{fe0f}';
 
 static ALL: OnceLock<Vec<Character>> = OnceLock::new();
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct Character {
     text: String,
     name: String,

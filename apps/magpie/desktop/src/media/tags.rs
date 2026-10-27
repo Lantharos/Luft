@@ -1,3 +1,4 @@
+use specta::Type;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::thread;
@@ -12,7 +13,7 @@ use crate::cache;
 const FOLDER_ART: [&str; 4] = ["cover", "folder", "front", "album"];
 const ART_EXTENSIONS: [&str; 4] = ["jpg", "jpeg", "png", "webp"];
 
-#[derive(Serialize, Default)]
+#[derive(Serialize, Default, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Tags {
     path: String,

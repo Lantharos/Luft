@@ -1,10 +1,11 @@
 use luft_app::Activation;
 use serde::Serialize;
+use specta::Type;
 
 const DIRECTORY_FLAG: &str = "--working-directory";
 const COMMAND_FLAGS: [&str; 3] = ["-e", "-x", "--"];
 
-#[derive(Clone, Default, Serialize)]
+#[derive(Clone, Default, Serialize, Type)]
 pub struct LaunchRequest {
     pub directory: Option<String>,
     pub command: Option<Vec<String>>,

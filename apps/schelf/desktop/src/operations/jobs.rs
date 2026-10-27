@@ -1,3 +1,4 @@
+use specta::Type;
 use std::path::PathBuf;
 
 use luft_app::block_on;
@@ -10,7 +11,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::fedora;
 
-#[derive(Deserialize, Serialize, Clone, Copy, PartialEq, Eq, Debug)]
+#[derive(Deserialize, Serialize, Clone, Copy, PartialEq, Eq, Debug, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum Action {
     Install,
@@ -18,7 +19,7 @@ pub enum Action {
     Update,
 }
 
-#[derive(Deserialize, Serialize, Clone, Debug)]
+#[derive(Deserialize, Serialize, Clone, Debug, Type)]
 #[serde(
     tag = "kind",
     rename_all = "camelCase",

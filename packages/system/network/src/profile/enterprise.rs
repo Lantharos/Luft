@@ -1,11 +1,12 @@
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 use super::settings::{Group, put, put_text, read};
 
 const SCHEME: &str = "file://";
 const SYSTEM_STORED: u32 = 0;
 
-#[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Type)]
 #[serde(rename_all = "lowercase")]
 pub enum Method {
     Peap,
@@ -13,7 +14,7 @@ pub enum Method {
     Tls,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Enterprise {
     method: Method,

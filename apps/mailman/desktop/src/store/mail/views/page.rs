@@ -1,3 +1,4 @@
+use specta::Type;
 use std::collections::HashSet;
 
 use rusqlite::{CachedStatement, Connection, Row, Rows, ToSql};
@@ -13,7 +14,7 @@ const COLUMNS: &str = "m.thread, max(m.date) AS date, m.id, m.account, m.subject
     group_concat(DISTINCT CASE WHEN m.sender_name != '' THEN m.sender_name ELSE m.sender END), m.snoozed_until";
 const BATCH: usize = 24;
 
-#[derive(Clone, Copy, Debug, Deserialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Type)]
 pub struct Cursor {
     pub date: i64,
     pub thread: i64,
@@ -30,7 +31,7 @@ impl Cursor {
     }
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadRow {
     pub thread: i64,
@@ -52,7 +53,7 @@ pub struct ThreadRow {
     pub snoozed_until: Option<i64>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct ThreadPage {
     pub total: Option<i64>,

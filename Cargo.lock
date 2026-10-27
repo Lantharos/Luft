@@ -420,6 +420,7 @@ dependencies = [
  "sabine",
  "serde",
  "serde_json",
+ "specta",
  "zbus 6.0.0",
 ]
 
@@ -1599,6 +1600,7 @@ dependencies = [
  "sabine",
  "serde",
  "serde_json",
+ "specta",
  "zbus 6.0.0",
 ]
 
@@ -3870,6 +3872,7 @@ dependencies = [
  "sabine",
  "serde",
  "serde_json",
+ "specta",
  "tokio",
  "toml",
  "xkbcommon",
@@ -4319,6 +4322,7 @@ dependencies = [
  "sabine",
  "serde",
  "serde_json",
+ "specta",
  "zbus 6.0.0",
 ]
 
@@ -4456,6 +4460,7 @@ dependencies = [
  "sabine",
  "serde",
  "serde_json",
+ "specta",
  "tokio",
  "x25519-dalek",
  "zbus 6.0.0",
@@ -4555,6 +4560,7 @@ dependencies = [
  "serde_json",
  "sha1",
  "sha2",
+ "specta",
  "tar",
  "tokio",
  "ureq",
@@ -4721,6 +4727,7 @@ dependencies = [
  "sabine",
  "serde",
  "skrifa 0.48.0",
+ "specta",
  "tokio",
  "write-fonts",
  "wuff",
@@ -4772,6 +4779,7 @@ dependencies = [
  "serde_json",
  "sha2",
  "socket2",
+ "specta",
  "tokio",
  "ureq",
  "url",
@@ -6953,6 +6961,7 @@ dependencies = [
  "sabine",
  "serde",
  "serde_json",
+ "specta",
  "tokio",
  "zbus 6.0.0",
 ]
@@ -7898,6 +7907,7 @@ dependencies = [
  "sabine",
  "serde",
  "serde_json",
+ "specta",
  "uzers",
 ]
 

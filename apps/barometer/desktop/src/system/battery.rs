@@ -1,3 +1,4 @@
+use specta::Type;
 use std::fs;
 use std::path::PathBuf;
 
@@ -7,7 +8,7 @@ use super::procfile::{read_number, read_text};
 
 const POWER_SUPPLY: &str = "/sys/class/power_supply";
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct BatteryInfo {
     pub id: String,
@@ -17,7 +18,7 @@ pub struct BatteryInfo {
     technology: Option<String>,
 }
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct BatterySample {
     id: String,

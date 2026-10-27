@@ -1,9 +1,10 @@
 use rusqlite::params;
 use serde::Serialize;
+use specta::Type;
 
 use super::Store;
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct Template {
     pub id: i64,
     pub name: String,

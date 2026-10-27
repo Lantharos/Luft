@@ -1,3 +1,4 @@
+use specta::Type;
 mod credentials;
 mod discover;
 mod oauth;
@@ -23,14 +24,14 @@ const SENDS_ONLY_OWN_ADDRESSES: [&str; 10] = [
     "aol.com",
 ];
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, Type)]
 #[serde(tag = "kind", rename_all = "camelCase")]
 pub enum Protocol {
     Imap { imap: Server, smtp: Server },
     Jmap { session: String },
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct AccountConfig {
     pub protocol: Protocol,
@@ -38,7 +39,7 @@ pub struct AccountConfig {
     pub oauth: Option<Provider>,
 }
 
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Account {
     pub id: i64,

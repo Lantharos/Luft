@@ -6,13 +6,15 @@ use futures_util::{StreamExt, stream};
 use luft_app::Events;
 use luft_app::dbus;
 use luft_app::dbus::objects;
+use sabine::BridgeEvent;
 use serde::Serialize;
+use specta::Type;
 use zbus::Message;
 
-use super::{CONNECTION, DEVICE, MANAGER_PATH, SERVICE, airplane, saved, snapshot};
+use super::{CONNECTION, DEVICE, MANAGER_PATH, Network, SERVICE, airplane, saved, snapshot};
 
-pub const CHANGED: &str = "network.changed";
-pub const FAILED: &str = "network.failed";
+pub const CHANGED: BridgeEvent<Network> = BridgeEvent::new("network.changed");
+pub const FAILED: BridgeEvent<Failure> = BridgeEvent::new("network.failed");
 
 const DEVICE_FAILED: u32 = 120;
 const DEVICE_ACTIVATED: u32 = 100;
@@ -21,16 +23,16 @@ const REASON_SUPPLICANT_DISCONNECT: u32 = 8;
 const ACTIVE_DEACTIVATED: u32 = 4;
 const TUNNEL_FAILURE_REASONS: [u32; 6] = [5, 6, 7, 8, 9, 10];
 
-#[derive(Serialize, Clone, Copy)]
+#[derive(Serialize, Clone, Copy, Type)]
 #[serde(rename_all = "lowercase")]
-enum Reason {
+pub enum Reason {
     Password,
     Other,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
-struct Failure {
+pub struct Failure {
     path: String,
     name: String,
     reason: Reason,

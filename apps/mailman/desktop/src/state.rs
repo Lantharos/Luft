@@ -1,3 +1,4 @@
+use specta::Type;
 use std::path::PathBuf;
 
 use luft_app::{Appearance, Events};
@@ -17,7 +18,7 @@ pub struct MailmanState {
     pub notifier: Notifier,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct AppState {
     accounts: Vec<Account>,

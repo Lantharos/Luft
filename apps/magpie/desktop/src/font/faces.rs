@@ -3,12 +3,13 @@ use skrifa::attribute::Style;
 use skrifa::raw::{FileRef, TableProvider};
 use skrifa::string::StringId;
 use skrifa::{FontRef, MetadataProvider};
+use specta::Type;
 
 const FIRST_PRINTABLE: u32 = 0x20;
 const DELETE: u32 = 0x7f;
 const LAST_C1_CONTROL: u32 = 0x9f;
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct Axis {
     tag: String,
     name: String,
@@ -17,20 +18,20 @@ pub struct Axis {
     max: f32,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct Instance {
     name: String,
     coordinates: Vec<(String, f32)>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 pub struct Identity {
     pub family: String,
     pub style: String,
     pub postscript: Option<String>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Face {
     index: u32,

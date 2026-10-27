@@ -1,3 +1,4 @@
+use specta::Type;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use luft_app::Commands;
@@ -13,7 +14,7 @@ use tokio::task::{JoinHandle, spawn_blocking};
 use crate::fedora;
 use crate::library::Source;
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct AppUpdate {
     pub key: String,
@@ -31,7 +32,7 @@ pub struct AppUpdate {
     pub package: Option<String>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 struct Updates {
     apps: Vec<AppUpdate>,

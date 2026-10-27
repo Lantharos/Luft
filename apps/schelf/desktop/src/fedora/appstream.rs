@@ -1,19 +1,20 @@
 use quick_xml::events::{BytesStart, Event};
 use quick_xml::{Reader, XmlVersion};
 use serde::{Deserialize, Serialize};
+use specta::Type;
 
 const DESKTOP_TYPES: [&str; 2] = ["desktop", "desktop-application"];
 const MARKUP: [&str; 6] = ["p", "ul", "ol", "li", "em", "code"];
 const PREFERRED_WIDTH: &str = "752";
 
-#[derive(Serialize, Deserialize, Clone, Default)]
+#[derive(Serialize, Deserialize, Clone, Default, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Screenshot {
     pub url: String,
     pub caption: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Clone, Default)]
+#[derive(Serialize, Deserialize, Clone, Default, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Component {
     pub id: String,

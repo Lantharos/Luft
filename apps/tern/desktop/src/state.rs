@@ -1,3 +1,4 @@
+use specta::Type;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
@@ -19,7 +20,7 @@ pub struct TernState {
     launch: Arc<LaunchRequest>,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct AppState {
     settings: Settings,

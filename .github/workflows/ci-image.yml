@@ -6,6 +6,8 @@ on:
     paths:
       - .github/ci/**
       - .github/workflows/ci-image.yml
+      - os/image/packages/build.txt
+      - os/image/packages/runtime.txt
   schedule:
     - cron: "0 3 * * 1"
   workflow_dispatch:
@@ -18,13 +20,21 @@ permissions:
   contents: read
   packages: write
 
-env:
-  IMAGE: ghcr.io/lantharos/luft-ci
-
 jobs:
   build:
+    name: ${{ matrix.image }}
     runs-on: ubuntu-26.04
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: ghcr.io/lantharos/luft-ci
+            containerfile: .github/ci/Containerfile
+            context: .github/ci
+          - image: ghcr.io/lantharos/luft-ci-kestrel
+            containerfile: .github/ci/kestrel/Containerfile
+            context: os/image/packages
     steps:
       - uses: actions/checkout@v7
 
@@ -33,7 +43,7 @@ jobs:
       - name: Build
         run: >-
           podman build --pull=always --label org.opencontainers.image.source=https://github.com/Lantharos/Luft
-          --tag "$IMAGE:latest" .github/ci
+          --file "${{ matrix.containerfile }}" --tag "${{ matrix.image }}:latest" "${{ matrix.context }}"
 
       - name: Publish
-        run: podman push "$IMAGE:latest"
+        run: podman push "${{ matrix.image }}:latest"

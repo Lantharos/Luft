@@ -3,6 +3,7 @@ import { join, relative } from 'node:path';
 
 import { isUnitPath } from '../units/units';
 import { covers, Graph } from './graph';
+import { touchesKestrel } from './kestrel';
 import { changedFiles, git, resolveRange } from './range';
 import { buildRust, type Crate, packageArguments, workspaceChanges } from './rust';
 import { touchesTranslations } from './translations';
@@ -19,12 +20,13 @@ const graph = new Graph();
 const crates = buildRust(graph, files);
 const webTargets = buildWeb(graph, files);
 
-function plan(changes: { base: string; files: string[] } | undefined): { crates: Crate[]; web: string[]; units: boolean; weblate: boolean; compositor: boolean } {
-	if (!changes || changes.files.some((file) => RUNS_EVERYTHING.some((path) => covers(path, file)))) return { crates, web: webTargets, units: true, weblate: true, compositor: true };
+function plan(changes: { base: string; files: string[] } | undefined): { crates: Crate[]; web: string[]; kestrel: boolean; units: boolean; weblate: boolean; compositor: boolean } {
+	if (!changes || changes.files.some((file) => RUNS_EVERYTHING.some((path) => covers(path, file)))) return { crates, web: webTargets, kestrel: true, units: true, weblate: true, compositor: true };
 	const affected = graph.affected([...changes.files, ...workspaceChanges(crates, changes.files, changes.base)]);
 	return {
 		crates: crates.filter((crate) => affected.has(crate.dir)),
 		web: touchesInstall(changes.files) ? webTargets : webTargets.filter((dir) => affected.has(dir)),
+		kestrel: touchesKestrel(changes.files, affected),
 		units: changes.files.some((file) => isUnitPath(file) || covers(UNIT_CHECK, file)),
 		weblate: touchesTranslations(changes.files),
 		compositor: changes.files.some((file) => COMPOSITOR.some((path) => covers(path, file))),
@@ -42,6 +44,7 @@ const outputs = {
 	uefi: packageArguments(runs.crates.filter((crate) => crate.targetsUefi)),
 	'meet-windows': String(runs.crates.some((crate) => crate.targetsWindows)),
 	web: JSON.stringify(runs.web),
+	kestrel: String(runs.kestrel),
 	units: String(runs.units),
 	weblate: String(runs.weblate),
 	compositor: String(runs.compositor),

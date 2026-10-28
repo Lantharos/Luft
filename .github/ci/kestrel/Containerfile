@@ -1,0 +1,14 @@
+FROM quay.io/fedora/fedora:45
+
+COPY build.txt runtime.txt /tmp/packages/
+RUN dnf install --assumeyes --setopt=install_weak_deps=False dnf5-plugins systemd rust cargo clippy jq \
+      $(cat /tmp/packages/build.txt /tmp/packages/runtime.txt) && \
+    dnf builddep --assumeyes mutter && \
+    dnf clean all && rm -rf /tmp/packages
+
+RUN curl -fsSL https://bun.sh/install | BUN_INSTALL=/usr/local bash
+
+RUN mkdir -p /etc/systemd/system/user@.service.d && \
+    printf '[Service]\nEnvironment=XDG_RUNTIME_DIR=/run/user/%%i\n' > /etc/systemd/system/user@.service.d/runtime.conf && \
+    systemctl mask getty.target console-getty.service systemd-udevd.service polkit.service rtkit-daemon.service \
+      systemd-oomd.service NetworkManager.service ModemManager.service fwupd.service bluetooth.service

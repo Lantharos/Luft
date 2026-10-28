@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
 
 concurrency:
   group: checks-${{ github.ref }}
@@ -27,6 +28,7 @@ jobs:
       uefi: ${{ steps.affected.outputs.uefi }}
       meet-windows: ${{ steps.affected.outputs.meet-windows }}
       web: ${{ steps.affected.outputs.web }}
+      kestrel: ${{ steps.affected.outputs.kestrel }}
       units: ${{ steps.affected.outputs.units }}
       weblate: ${{ steps.affected.outputs.weblate }}
       compositor: ${{ steps.affected.outputs.compositor }}
@@ -149,6 +151,82 @@ jobs:
 
       - run: bun run check
 
+  kestrel:
+    name: Kestrel
+    needs: changes
+    if: needs.changes.outputs.kestrel == 'true'
+    runs-on: ubuntu-26.04
+    timeout-minutes: 60
+    env:
+      LUFT_CI_KESTREL: ghcr.io/lantharos/luft-ci-kestrel:latest
+      CCACHE_DIR: ${{ github.workspace }}/kestrel/run/ccache
+      KESTREL_SESSION_DIR: ${{ github.workspace }}/kestrel/run/smoke
+      KESTREL_CAPTURE_DIR: ${{ github.workspace }}/kestrel/run/smoke/screenshots
+      SMOKE_GROUPS: system:session,start:search,lockScreen:lock,lockScreen:unlock,panel:surfaces,system:watchdog
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ./.github/actions/registry
+
+      - name: Build container
+        id: container
+        run: |
+          podman pull --quiet "$LUFT_CI_KESTREL" > /dev/null
+          echo "digest=$(podman image inspect --format '{{.Digest}}' "$LUFT_CI_KESTREL")" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/cache@v6
+        id: mutter
+        with:
+          path: kestrel/run/mutter-install
+          key: mutter-${{ steps.container.outputs.digest }}-${{ hashFiles('kestrel/compositor/**') }}
+
+      - uses: actions/cache@v6
+        with:
+          path: kestrel/run/ccache
+          key: kestrel-ccache-${{ hashFiles('kestrel/compositor/**', 'kestrel/engine/**') }}
+          restore-keys: kestrel-ccache-
+
+      - uses: actions/cache@v6
+        with:
+          path: |
+            kestrel/run/home/.cargo/registry
+            kestrel/run/home/.bun/install/cache
+            target
+          key: kestrel-cargo-${{ steps.container.outputs.digest }}-${{ hashFiles('Cargo.lock', 'bun.lock') }}
+          restore-keys: kestrel-cargo-${{ steps.container.outputs.digest }}-
+
+      - name: Patch series
+        run: |
+          python3 kestrel/compositor/patches.py prepare
+          python3 kestrel/compositor/patches.py check
+
+      - name: Mutter
+        if: steps.mutter.outputs.cache-hit != 'true'
+        run: .github/scripts/kestrel/container.sh run kestrel/compositor/build.sh
+
+      - name: Engine
+        run: |
+          .github/scripts/kestrel/container.sh run bun install --frozen-lockfile
+          .github/scripts/kestrel/container.sh run meson setup kestrel/build kestrel/engine \
+            "-Dpkg_config_path=$PWD/kestrel/run/mutter-install/lib/pkgconfig" "--prefix=$PWD/kestrel/install"
+          .github/scripts/kestrel/container.sh run meson compile -C kestrel/build
+
+      - name: Headless session
+        run: .github/scripts/kestrel/container.sh run kestrel/tools/session.sh capture --only "$SMOKE_GROUPS"
+
+      - if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: kestrel-session
+          path: |
+            kestrel/run/smoke/capture/logs
+            kestrel/run/smoke/capture/summary.txt
+            kestrel/run/smoke/screenshots
+          if-no-files-found: ignore
+
+      - if: always()
+        run: .github/scripts/kestrel/container.sh stop
+
   units:
     name: Service sandboxing
     needs: changes
@@ -202,7 +280,7 @@ jobs:
 
   checks:
     name: Checks
-    needs: [changes, rust, uefi, meet-windows, web, units, weblate, compositor-identity]
+    needs: [changes, rust, uefi, meet-windows, web, kestrel, units, weblate, compositor-identity]
     if: always()
     runs-on: ubuntu-slim
     steps:

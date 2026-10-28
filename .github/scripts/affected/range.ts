@@ -20,7 +20,7 @@ const hasCommit = (sha: string) => git('cat-file', '-e', `${sha}^{commit}`) !== 
 
 function eventRange(event: Event): Range {
 	if (event.pull_request) return { base: event.pull_request.base.sha, head: event.pull_request.head.sha };
-	const head = event.after!;
+	const head = event.after ?? process.env.GITHUB_SHA!;
 	const before = event.before;
 	if (before && !NO_COMMIT.test(before) && hasCommit(before)) return { base: before, head };
 	return { base: `origin/${event.repository.default_branch}`, head };

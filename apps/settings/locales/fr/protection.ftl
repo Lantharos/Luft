@@ -414,5 +414,15 @@ settings-apps-usb = Appareils USB
 settings-apps-usb-hint = Comme les clés de sécurité, les téléphones et les microcontrôleurs
 settings-apps-serial = Appareils série
 settings-apps-serial-hint = Comme les imprimantes 3D et les cartes connectées en USB
+settings-apps-folder-read-only = Lecture seule
+settings-apps-internet = Internet
+settings-apps-internet-hint = Elle peut aller sur internet dès sa prochaine ouverture.
+settings-apps-service-hint = Un service du bureau avec lequel elle peut communiquer
+settings-apps-service-remove = Retirer
+settings-apps-service-remove-app = Ne plus la laisser communiquer avec { $service }
+settings-apps-services-count = { $count ->
+    [one] { $count } service
+   *[other] { $count } services
+}
 settings-apps-full-access-off = Elle fonctionne dans un bac à sable. L'accès complet retire le bac à sable.
 settings-apps-full-access-give = Donner l'accès complet

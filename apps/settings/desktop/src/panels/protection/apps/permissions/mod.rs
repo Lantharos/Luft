@@ -8,7 +8,9 @@ use std::sync::Once;
 
 use luft_app::apps::App;
 use luft_app::dbus;
-use luft_app::identity::permissions::{self, Apps, DEVICES, FOLDERS};
+use luft_app::identity::permissions::{
+    self, Apps, BUS, DEVICES, FOLDERS, NETWORK, NO, READ_ONLY_FOLDERS,
+};
 use luft_app::{Commands, Empty, Events};
 use luft_i18n::t;
 use luft_software::apps::{appimage, flatpak};
@@ -38,7 +40,10 @@ struct AppAccess {
     passwords: Option<Remembered>,
     full_access: bool,
     folders: Vec<String>,
+    read_only_folders: Vec<String>,
     devices: Vec<String>,
+    online: bool,
+    services: Vec<String>,
 }
 
 #[derive(Deserialize, Type)]
@@ -64,6 +69,18 @@ struct Revoke {
 struct Folder {
     app: String,
     folder: String,
+}
+
+#[derive(Deserialize, Type)]
+struct NetworkChange {
+    app: String,
+    on: bool,
+}
+
+#[derive(Deserialize, Type)]
+struct Service {
+    app: String,
+    service: String,
 }
 
 #[derive(Deserialize, Type)]
@@ -101,7 +118,12 @@ async fn read(connection: &Connection) -> zbus::Result<Vec<AppAccess>> {
     let passwords = passwords::counts(connection).await?;
     let full_access = sandbox::full_access(connection).await?;
     let folders = by_app(permissions::lookup(connection, FOLDERS.table, FOLDERS.id).await?);
+    let read_only_folders = by_app(
+        permissions::lookup(connection, READ_ONLY_FOLDERS.table, READ_ONLY_FOLDERS.id).await?,
+    );
     let devices = by_app(permissions::lookup(connection, DEVICES.table, DEVICES.id).await?);
+    let offline = by_app(permissions::lookup(connection, NETWORK.table, NETWORK.id).await?);
+    let services = by_app(permissions::lookup(connection, BUS.table, BUS.id).await?);
     let app_images: BTreeSet<String> = appimage::list().into_iter().map(|app| app.id).collect();
     let ids: BTreeSet<&String> = location
         .keys()
@@ -110,7 +132,9 @@ async fn read(connection: &Connection) -> zbus::Result<Vec<AppAccess>> {
         .chain(passwords.keys())
         .chain(&full_access)
         .chain(folders.keys())
+        .chain(read_only_folders.keys())
         .chain(devices.keys())
+        .chain(services.keys())
         .chain(&app_images)
         .collect();
     let mut apps: Vec<AppAccess> = ids
@@ -124,7 +148,13 @@ async fn read(connection: &Connection) -> zbus::Result<Vec<AppAccess>> {
             passwords: passwords.get(id).copied(),
             full_access: full_access.contains(id),
             folders: folders.get(id).cloned().unwrap_or_default(),
+            read_only_folders: read_only_folders.get(id).cloned().unwrap_or_default(),
             devices: devices.get(id).cloned().unwrap_or_default(),
+            online: offline
+                .get(id)
+                .and_then(|answer| answer.first())
+                .is_none_or(|answer| answer != NO),
+            services: services.get(id).cloned().unwrap_or_default(),
         })
         .collect();
     apps.sort_by_cached_key(|access| access.app.name.to_lowercase());
@@ -183,6 +213,18 @@ async fn remove_folder(Folder { app, folder }: Folder) -> Result<(), String> {
         .map_err(explain)
 }
 
+async fn set_online(NetworkChange { app, on }: NetworkChange) -> Result<(), String> {
+    sandbox::set_online(dbus::session().await?, &app, on)
+        .await
+        .map_err(explain)
+}
+
+async fn remove_service(Service { app, service }: Service) -> Result<(), String> {
+    sandbox::remove_service(dbus::session().await?, &app, &service)
+        .await
+        .map_err(explain)
+}
+
 async fn set_device(DeviceChange { app, device, on }: DeviceChange) -> Result<(), String> {
     sandbox::set_device(dbus::session().await?, &app, device, on)
         .await
@@ -200,4 +242,6 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         .command_async("apps_folder_add", add_folder)
         .command_async("apps_folder_remove", remove_folder)
         .command_async("apps_device_set", set_device)
+        .command_async("apps_network_set", set_online)
+        .command_async("apps_service_remove", remove_service)
 }

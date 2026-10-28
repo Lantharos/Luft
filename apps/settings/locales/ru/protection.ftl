@@ -438,5 +438,17 @@ settings-apps-usb = USB-устройства
 settings-apps-usb-hint = Например, ключи безопасности, телефоны и микроконтроллеры
 settings-apps-serial = Последовательные устройства
 settings-apps-serial-hint = Например, 3D-принтеры и платы, подключённые по USB
+settings-apps-folder-read-only = Только чтение
+settings-apps-internet = Интернет
+settings-apps-internet-hint = Может выходить в интернет со следующего запуска.
+settings-apps-service-hint = Служба рабочего стола, с которой оно может общаться
+settings-apps-service-remove = Убрать
+settings-apps-service-remove-app = Запретить общение с { $service }
+settings-apps-services-count = { $count ->
+    [one] { $count } служба
+    [few] { $count } службы
+    [many] { $count } служб
+   *[other] { $count } службы
+}
 settings-apps-full-access-off = Работает в песочнице. Полный доступ убирает песочницу.
 settings-apps-full-access-give = Дать полный доступ

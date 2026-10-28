@@ -50,7 +50,10 @@ fn job(opened: &OpenedFile) -> Job {
             repository: repository.as_ref().map(|bundled| bundled.draft.clone()),
         },
         OpenedFile::Package { path, .. } => Job::InstallToolFile { path: path.clone() },
-        OpenedFile::AppImage { path, .. } => Job::InstallAppImage { path: path.into() },
+        OpenedFile::AppImage { path, .. } => Job::InstallAppImage {
+            path: path.into(),
+            full_access: false,
+        },
         OpenedFile::Deb { path, .. } => Job::InstallDeb { path: path.into() },
     }
 }
@@ -90,6 +93,16 @@ pub fn prepare(target: &str) -> Result<Prepared, String> {
         eprintln!(
             "{} is on Flathub too, where it's sandboxed and keeps itself up to date: schelf install {} installs that instead.",
             flathub.name, flathub.id
+        );
+    }
+    if let OpenedFile::AppImage {
+        name,
+        unsandboxed: Some(reason),
+        ..
+    } = &opened
+    {
+        eprintln!(
+            "{name} asks to run outside its sandbox: {reason} It installs in its sandbox, and schelf trust gives it full access if you trust it."
         );
     }
     let verb = if matches!(opened, OpenedFile::FlatpakRepo { .. }) {

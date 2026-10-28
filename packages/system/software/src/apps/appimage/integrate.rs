@@ -5,6 +5,7 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 
 use super::bundle::{self, Bundle};
+use super::declaration::Declaration;
 use super::library::{self, AppImage, IconSize};
 use crate::apps::chromium;
 use crate::progress::Stage;
@@ -80,15 +81,21 @@ fn is_desktop_id(id: &str) -> bool {
             .all(|character| character.is_ascii_alphanumeric() || "._-".contains(character))
 }
 
-pub fn install(source: &Path, task: Task) -> Result<AppImage, String> {
+/// An AppImage just installed, with what it declares about its sandbox.
+pub struct Installed {
+    pub app: AppImage,
+    pub declaration: Option<Declaration>,
+}
+
+pub fn install(source: &Path, task: Task) -> Result<Installed, String> {
     add(source, Transfer::Move, task)
 }
 
-pub fn install_link(source: &Path, task: Task) -> Result<AppImage, String> {
+pub fn install_link(source: &Path, task: Task) -> Result<Installed, String> {
     add(source, Transfer::Link, task)
 }
 
-fn add(source: &Path, transfer: Transfer, task: Task) -> Result<AppImage, String> {
+fn add(source: &Path, transfer: Transfer, task: Task) -> Result<Installed, String> {
     task.progress(Stage::Preparing, None);
     let bundle = bundle::read(source)?;
     let Placement { id, path } = placement(source, &bundle);
@@ -104,7 +111,10 @@ fn add(source: &Path, transfer: Transfer, task: Task) -> Result<AppImage, String
         }
     }
     integrate(&id, &path, &bundle)?;
-    library::find(&id)
+    Ok(Installed {
+        app: library::find(&id)?,
+        declaration: bundle.declaration,
+    })
 }
 
 fn place(source: &Path, destination: &Path, transfer: Transfer, task: Task) -> Result<(), String> {

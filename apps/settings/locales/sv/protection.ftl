@@ -414,5 +414,15 @@ settings-apps-usb = USB-enheter
 settings-apps-usb-hint = Som säkerhetsnycklar, telefoner och mikrokontroller
 settings-apps-serial = Seriella enheter
 settings-apps-serial-hint = Som 3D-skrivare och kort anslutna via USB
+settings-apps-folder-read-only = Skrivskyddad
+settings-apps-internet = Internet
+settings-apps-internet-hint = Den kan gå ut på internet från nästa gång den öppnas.
+settings-apps-service-hint = En tjänst på skrivbordet som den kan prata med
+settings-apps-service-remove = Ta bort
+settings-apps-service-remove-app = Låt den inte längre prata med { $service }
+settings-apps-services-count = { $count ->
+    [one] { $count } tjänst
+   *[other] { $count } tjänster
+}
 settings-apps-full-access-off = Den körs i en sandlåda. Full åtkomst tar bort sandlådan.
 settings-apps-full-access-give = Ge full åtkomst

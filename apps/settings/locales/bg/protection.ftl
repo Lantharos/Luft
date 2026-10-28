@@ -414,5 +414,15 @@ settings-apps-usb = USB устройства
 settings-apps-usb-hint = Например ключове за сигурност, телефони и микроконтролери
 settings-apps-serial = Серийни устройства
 settings-apps-serial-hint = Например 3D принтери и платки, свързани през USB
+settings-apps-folder-read-only = Само за четене
+settings-apps-internet = Интернет
+settings-apps-internet-hint = Може да се свързва с интернет от следващото си отваряне.
+settings-apps-service-hint = Услуга на работния плот, с която може да общува
+settings-apps-service-remove = Премахване
+settings-apps-service-remove-app = Спиране на достъпа до { $service }
+settings-apps-services-count = { $count ->
+    [one] { $count } услуга
+   *[other] { $count } услуги
+}
 settings-apps-full-access-off = Работи в пясъчник. Пълният достъп премахва пясъчника.
 settings-apps-full-access-give = Даване на пълен достъп

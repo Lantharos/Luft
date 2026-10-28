@@ -438,5 +438,17 @@ settings-apps-usb = USB įrenginiai
 settings-apps-usb-hint = Pavyzdžiui, saugos raktai, telefonai ir mikrovaldikliai
 settings-apps-serial = Nuoseklieji įrenginiai
 settings-apps-serial-hint = Pavyzdžiui, 3D spausdintuvai ir USB prijungtos plokštės
+settings-apps-folder-read-only = Tik skaitymui
+settings-apps-internet = Internetas
+settings-apps-internet-hint = Ji gali jungtis prie interneto nuo kito atidarymo.
+settings-apps-service-hint = Darbalaukio paslauga, su kuria ji gali bendrauti
+settings-apps-service-remove = Pašalinti
+settings-apps-service-remove-app = Uždrausti bendrauti su { $service }
+settings-apps-services-count = { $count ->
+    [one] { $count } paslauga
+    [few] { $count } paslaugos
+    [many] { $count } paslaugos
+   *[other] { $count } paslaugų
+}
 settings-apps-full-access-off = Ji veikia smėlio dėžėje. Visa prieiga panaikina smėlio dėžę.
 settings-apps-full-access-give = Suteikti visą prieigą

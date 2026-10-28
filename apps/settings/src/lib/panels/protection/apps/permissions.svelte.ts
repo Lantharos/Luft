@@ -39,4 +39,8 @@ export class Permissions {
 	removeFolder = (app: AppAccess, folder: string) => this.run(() => commands.appsFolderRemove({ app: app.id, folder }));
 
 	setDevice = (app: AppAccess, device: SandboxDevice, on: boolean) => this.run(() => commands.appsDeviceSet({ app: app.id, device, on }));
+
+	setOnline = (app: AppAccess, on: boolean) => this.run(() => commands.appsNetworkSet({ app: app.id, on }));
+
+	removeService = (app: AppAccess, service: string) => this.run(() => commands.appsServiceRemove({ app: app.id, service }));
 }

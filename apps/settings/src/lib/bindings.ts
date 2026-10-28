@@ -120,6 +120,10 @@ export const commands = {
 		appImage: boolean,
 	}, options?: InvokeOptions) => invoke<null>("apps_full_access_revoke", params, options),
 	appsInstalled: (options?: InvokeOptions) => invoke<App[]>("apps_installed", {}, options),
+	appsNetworkSet: (params: {
+		app: string,
+		on: boolean,
+	}, options?: InvokeOptions) => invoke<null>("apps_network_set", params, options),
 	appsPasswordsForget: (params: {
 		app: string,
 	}, options?: InvokeOptions) => invoke<null>("apps_passwords_forget", params, options),
@@ -129,6 +133,10 @@ export const commands = {
 		allowed: boolean,
 	}, options?: InvokeOptions) => invoke<null>("apps_permission_set", params, options),
 	appsPermissions: (options?: InvokeOptions) => invoke<AppAccess[]>("apps_permissions", {}, options),
+	appsServiceRemove: (params: {
+		app: string,
+		service: string,
+	}, options?: InvokeOptions) => invoke<null>("apps_service_remove", params, options),
 	appsSetDefault: (params: {
 		category: AppCategory,
 		app: string,
@@ -603,7 +611,10 @@ export type AppAccess = {
 	passwords: Remembered | null,
 	fullAccess: boolean,
 	folders: string[],
+	readOnlyFolders: string[],
 	devices: string[],
+	online: boolean,
+	services: string[],
 } & App;
 
 export type AppCategory = "browser" | "email" | "calendar" | "music" | "video" | "photos" | "text" | "files" | "archives";

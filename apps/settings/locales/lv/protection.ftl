@@ -426,5 +426,16 @@ settings-apps-usb = USB ierīces
 settings-apps-usb-hint = Piemēram, drošības atslēgas, tālruņi un mikrokontrolleri
 settings-apps-serial = Seriālās ierīces
 settings-apps-serial-hint = Piemēram, 3D printeri un caur USB pievienotas plates
+settings-apps-folder-read-only = Tikai lasīšanai
+settings-apps-internet = Internets
+settings-apps-internet-hint = Tā var piekļūt internetam no nākamās atvēršanas reizes.
+settings-apps-service-hint = Darbvirsmas pakalpojums, ar kuru tā var sazināties
+settings-apps-service-remove = Noņemt
+settings-apps-service-remove-app = Liegt saziņu ar { $service }
+settings-apps-services-count = { $count ->
+    [zero] { $count } pakalpojumu
+    [one] { $count } pakalpojums
+   *[other] { $count } pakalpojumi
+}
 settings-apps-full-access-off = Tā darbojas smilškastē. Pilna piekļuve noņem smilškasti.
 settings-apps-full-access-give = Piešķirt pilnu piekļuvi

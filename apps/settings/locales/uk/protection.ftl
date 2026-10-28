@@ -438,5 +438,17 @@ settings-apps-usb = USB-пристрої
 settings-apps-usb-hint = Наприклад, ключі безпеки, телефони й мікроконтролери
 settings-apps-serial = Послідовні пристрої
 settings-apps-serial-hint = Наприклад, 3D-принтери й плати, під'єднані через USB
+settings-apps-folder-read-only = Лише читання
+settings-apps-internet = Інтернет
+settings-apps-internet-hint = Може виходити в інтернет з наступного запуску.
+settings-apps-service-hint = Служба робочого столу, з якою вона може спілкуватися
+settings-apps-service-remove = Прибрати
+settings-apps-service-remove-app = Заборонити спілкування з { $service }
+settings-apps-services-count = { $count ->
+    [one] { $count } служба
+    [few] { $count } служби
+    [many] { $count } служб
+   *[other] { $count } служби
+}
 settings-apps-full-access-off = Працює в пісочниці. Повний доступ прибирає пісочницю.
 settings-apps-full-access-give = Надати повний доступ

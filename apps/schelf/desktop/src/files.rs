@@ -7,6 +7,7 @@ use std::process::{Command, Stdio};
 use gio::prelude::*;
 use luft_app::portal::{FileChooser, Filter};
 use luft_app::{Commands, Empty, block_on};
+use luft_software::apps::flatpak::Permissions;
 use luft_software::apps::{appimage, debian, toolbox};
 use luft_software::system::repositories;
 use luft_software::system::system_packages;
@@ -92,6 +93,10 @@ pub enum OpenedFile {
         version: Option<String>,
         icon: Option<String>,
         size: u64,
+        /// What it declared it needs, for a Sabine app.
+        permissions: Option<Permissions>,
+        /// Why it asks to run outside a sandbox, when it does.
+        unsandboxed: Option<String>,
     },
 }
 
@@ -424,6 +429,14 @@ fn appimage_file(path: &str) -> Result<OpenedFile, String> {
             .map(|metadata| metadata.len())
             .unwrap_or(0),
         icon,
+        permissions: bundle
+            .declaration
+            .as_ref()
+            .filter(|declaration| declaration.unsandboxed.is_none())
+            .map(|declaration| declaration.permissions()),
+        unsandboxed: bundle
+            .declaration
+            .and_then(|declaration| declaration.unsandboxed),
     })
 }
 

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { commands, type Permissions } from '#lib/bindings.js';
-	import { APPIMAGE_SANDBOX } from '#lib/app/permissions.js';
 	import AccessList from '#lib/components/AccessList.svelte';
 	import AppArt from '#lib/components/AppArt.svelte';
 	import Description from '#lib/components/Description.svelte';
@@ -15,12 +14,13 @@
 
 	let loaded = $state<Loaded | null>(null);
 	let localPermissions = $state<Permissions | null>(null);
+	let unsandboxedReason = $state<string | null>(null);
 	let fullAccess = $state(false);
 	let asking = $state(false);
 
 	const details = $derived(loaded?.details ?? null);
 	const installed = $derived(installedFor(target));
-	const permissions = $derived(installed?.source === 'appImage' ? APPIMAGE_SANDBOX : (localPermissions ?? details?.permissions ?? null));
+	const permissions = $derived(localPermissions ?? details?.permissions ?? null);
 	const title = $derived(details?.name ?? installed?.name ?? name);
 	const summary = $derived(details?.summary ?? installed?.summary ?? '');
 	const sandboxed = $derived(installed?.source === 'appImage' || installed?.source === 'flatpak' ? installed : null);
@@ -40,6 +40,18 @@
 	$effect(() => {
 		const app = installed;
 		localPermissions = null;
+		unsandboxedReason = null;
+		if (app?.source === 'appImage') {
+			void commands
+				.librarySandbox({ id: app.id })
+				.then((result) => {
+					if (installed?.id !== app.id) return;
+					localPermissions = result.permissions;
+					unsandboxedReason = result.unsandboxed;
+				})
+				.catch(() => {});
+			return;
+		}
 		if (app?.source !== 'flatpak' || !app.installation || !app.reference) return;
 		void commands
 			.libraryPermissions({ installation: app.installation, reference: app.reference })
@@ -88,7 +100,7 @@
 			<AppFacts {details} {installed} />
 			{#if sandboxed}
 				<AccessList permissions={fullAccess ? null : permissions}>
-					<FullAccess app={sandboxed} bind:on={fullAccess} bind:asking />
+					<FullAccess app={sandboxed} reason={unsandboxedReason} bind:on={fullAccess} bind:asking />
 				</AccessList>
 			{:else if permissions}
 				<AccessList {permissions} />

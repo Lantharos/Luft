@@ -438,5 +438,17 @@ settings-apps-usb = Naprave USB
 settings-apps-usb-hint = Na primer varnostni ključi, telefoni in mikrokrmilniki
 settings-apps-serial = Serijske naprave
 settings-apps-serial-hint = Na primer 3D-tiskalniki in plošče, povezane prek USB
+settings-apps-folder-read-only = Samo za branje
+settings-apps-internet = Internet
+settings-apps-internet-hint = Od naslednjega odpiranja lahko dostopa do interneta.
+settings-apps-service-hint = Storitev na namizju, s katero lahko komunicira
+settings-apps-service-remove = Odstrani
+settings-apps-service-remove-app = Prepovej komunikacijo s storitvijo { $service }
+settings-apps-services-count = { $count ->
+    [one] { $count } storitev
+    [two] { $count } storitvi
+    [few] { $count } storitve
+   *[other] { $count } storitev
+}
 settings-apps-full-access-off = Deluje v peskovniku. Polni dostop odstrani peskovnik.
 settings-apps-full-access-give = Dovoli polni dostop

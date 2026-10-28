@@ -48,6 +48,9 @@ export const commands = {
 		installation: Installation,
 		reference: string,
 	}, options?: InvokeOptions) => invoke<Permissions>("library_permissions", params, options),
+	librarySandbox: (params: {
+		id: string,
+	}, options?: InvokeOptions) => invoke<Sandbox>("library_sandbox", params, options),
 	librarySetFullAccess: (params: {
 		id: string,
 		source: Source,
@@ -194,7 +197,9 @@ export type InstalledApp = {
 	services: string[],
 };
 
-export type Job = { kind: "installFlathub"; id: string } | { kind: "installFlatpakRef"; path: string } | { kind: "installFlatpakBundle"; path: string } | { kind: "installDeb"; path: string } | { kind: "removeDeb"; package: string } | { kind: "updateDebs"; packages: string[] } | { kind: "addFlatpakRepo"; path: string; name: string } | { kind: "installAppImage"; path: string } | { kind: "installTool"; package: string } | { kind: "installToolFile"; path: string } | { kind: "removeFlatpak"; installation: Installation; reference: string } | { kind: "removeAppImage"; id: string } | { kind: "removeTool"; package: string } | { kind: "updateFlatpaks"; installation: Installation; references: string[] } | { kind: "updateAppImage"; id: string } | { kind: "updateTools"; packages: string[] } | { kind: "installSystemPackages"; packages: string[] } | { kind: "removeSystemPackages"; packages: string[] } | { kind: "installSystemPackageFile"; path: string; package: string; repository?: RepositoryDraft | null } | { kind: "removeRepository"; file: string };
+export type Job = { kind: "installFlathub"; id: string } | { kind: "installFlatpakRef"; path: string } | { kind: "installFlatpakBundle"; path: string } | { kind: "installDeb"; path: string } | { kind: "removeDeb"; package: string } | { kind: "updateDebs"; packages: string[] } | { kind: "addFlatpakRepo"; path: string; name: string } | { kind: "installAppImage"; path: string; 
+/**  Whether you let an app that asks to run unsandboxed do so. */
+fullAccess: boolean } | { kind: "installTool"; package: string } | { kind: "installToolFile"; path: string } | { kind: "removeFlatpak"; installation: Installation; reference: string } | { kind: "removeAppImage"; id: string } | { kind: "removeTool"; package: string } | { kind: "updateFlatpaks"; installation: Installation; references: string[] } | { kind: "updateAppImage"; id: string } | { kind: "updateTools"; packages: string[] } | { kind: "installSystemPackages"; packages: string[] } | { kind: "removeSystemPackages"; packages: string[] } | { kind: "installSystemPackageFile"; path: string; package: string; repository?: RepositoryDraft | null } | { kind: "removeRepository"; file: string };
 
 export type Locale = {
 	languages: string[],
@@ -213,7 +218,11 @@ export type OnFlathub = {
 	verified: boolean,
 };
 
-export type OpenedFile = { kind: "flatpakRef"; path: string; id: string; title: string; branch: string | null; url: string; runtime: boolean; summary: string | null; homepage: string | null; icon: string | null } | { kind: "flatpakBundle"; path: string; id: string; title: string; branch: string; summary: string | null; icon: string | null; size: number; runtime: string | null; origin: string | null } | { kind: "flatpakRepo"; path: string; name: string; title: string; url: string; summary: string | null; homepage: string | null } | { kind: "package"; path: string; package: string; version: string; summary: string; description: string; license: string; homepage: string | null; size: number; installed: boolean; system: boolean; desktop: string | null; repository: CheckedSource | null; repositoryError: string | null; verified: boolean } | { kind: "deb"; path: string; package: string; name: string; version: string; summary: string; description: string; homepage: string | null; size: number; icon: string | null; installed: boolean; runsHere: boolean; flathub: OnFlathub | null } | { kind: "appImage"; path: string; name: string; summary: string | null; version: string | null; icon: string | null; size: number };
+export type OpenedFile = { kind: "flatpakRef"; path: string; id: string; title: string; branch: string | null; url: string; runtime: boolean; summary: string | null; homepage: string | null; icon: string | null } | { kind: "flatpakBundle"; path: string; id: string; title: string; branch: string; summary: string | null; icon: string | null; size: number; runtime: string | null; origin: string | null } | { kind: "flatpakRepo"; path: string; name: string; title: string; url: string; summary: string | null; homepage: string | null } | { kind: "package"; path: string; package: string; version: string; summary: string; description: string; license: string; homepage: string | null; size: number; installed: boolean; system: boolean; desktop: string | null; repository: CheckedSource | null; repositoryError: string | null; verified: boolean } | { kind: "deb"; path: string; package: string; name: string; version: string; summary: string; description: string; homepage: string | null; size: number; icon: string | null; installed: boolean; runsHere: boolean; flathub: OnFlathub | null } | { kind: "appImage"; path: string; name: string; summary: string | null; version: string | null; icon: string | null; size: number; 
+/**  What it declared it needs, for a Sabine app. */
+permissions: Permissions | null; 
+/**  Why it asks to run outside a sandbox, when it does. */
+unsandboxed: string | null };
 
 export type Operation = {
 	id: number,
@@ -260,6 +269,15 @@ export type RepositoryDraft = {
 	file: string,
 	text: string,
 	keys: { [key in string]: string },
+};
+
+/**
+ *  What an installed AppImage's sandbox opens to it, and why it asked to run
+ *  without one, if it did.
+ */
+export type Sandbox = {
+	permissions: Permissions,
+	unsandboxed: string | null,
 };
 
 export type SchemeColors = {

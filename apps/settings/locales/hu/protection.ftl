@@ -414,5 +414,15 @@ settings-apps-usb = USB-eszközök
 settings-apps-usb-hint = Például biztonsági kulcsok, telefonok és mikrovezérlők
 settings-apps-serial = Soros eszközök
 settings-apps-serial-hint = Például 3D-nyomtatók és USB-n csatlakozó panelek
+settings-apps-folder-read-only = Csak olvasható
+settings-apps-internet = Internet
+settings-apps-internet-hint = A következő megnyitástól csatlakozhat az internethez.
+settings-apps-service-hint = Asztali szolgáltatás, amellyel kommunikálhat
+settings-apps-service-remove = Eltávolítás
+settings-apps-service-remove-app = Kommunikáció tiltása ezzel: { $service }
+settings-apps-services-count = { $count ->
+    [one] { $count } szolgáltatás
+   *[other] { $count } szolgáltatás
+}
 settings-apps-full-access-off = Homokozóban fut. A teljes hozzáférés megszünteti a homokozót.
 settings-apps-full-access-give = Teljes hozzáférés megadása

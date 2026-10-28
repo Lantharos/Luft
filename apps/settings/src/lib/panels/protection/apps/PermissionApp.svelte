@@ -18,11 +18,16 @@
 		{ device: 'serial', label: 'settings-apps-serial', hint: 'settings-apps-serial-hint' }
 	];
 
+	const folders = $derived([
+		...app.folders.map((folder) => ({ folder, readOnly: false })),
+		...app.readOnlyFolders.map((folder) => ({ folder, readOnly: true }))
+	]);
 	const granted = $derived([
 		...SWITCHES.filter(({ kind }) => app[kind]).map(({ label }) => t(label)),
 		...(app.passwords?.allowed ? [t('settings-apps-passwords')] : []),
-		...(app.folders.length ? [t('settings-apps-folders-count', { count: app.folders.length })] : []),
+		...(folders.length ? [t('settings-apps-folders-count', { count: folders.length })] : []),
 		...DEVICES.filter(({ device }) => app.devices.includes(device)).map(({ label }) => t(label)),
+		...(app.services.length ? [t('settings-apps-services-count', { count: app.services.length })] : []),
 		...(app.fullAccess ? [t('settings-apps-full-access')] : [])
 	]);
 	const summary = $derived(
@@ -64,8 +69,8 @@
 					{t('settings-apps-folder-add')}
 				</button>
 			</Row>
-			{#each app.folders as folder (folder)}
-				<Row title={folder} truncate>
+			{#each folders as { folder, readOnly } (folder)}
+				<Row title={folder} description={readOnly ? t('settings-apps-folder-read-only') : undefined} truncate>
 					<button
 						type="button"
 						class="button"
@@ -74,6 +79,22 @@
 						onclick={() => permissions.removeFolder(app, folder)}
 					>
 						{t('settings-apps-folder-remove')}
+					</button>
+				</Row>
+			{/each}
+			<Row title={t('settings-apps-internet')} description={t('settings-apps-internet-hint')}>
+				<Switch label={t('settings-apps-internet')} checked={app.online} disabled={permissions.busy} onchange={(on) => permissions.setOnline(app, on)} />
+			</Row>
+			{#each app.services as service (service)}
+				<Row title={service} description={t('settings-apps-service-hint')} truncate>
+					<button
+						type="button"
+						class="button"
+						aria-label={t('settings-apps-service-remove-app', { service })}
+						disabled={permissions.busy}
+						onclick={() => permissions.removeService(app, service)}
+					>
+						{t('settings-apps-service-remove')}
 					</button>
 				</Row>
 			{/each}

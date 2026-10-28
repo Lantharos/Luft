@@ -2,6 +2,7 @@ use std::collections::BTreeSet;
 use std::fs;
 use std::path::{Path, PathBuf};
 
+use luft_app::block_on;
 use luft_software::apps::appimage::{self, Placement};
 use luft_software::apps::{flatpak, toolbox, updates};
 use luft_software::task::{Cancel, Task};
@@ -92,7 +93,11 @@ fn install_seed(seed: &Path) -> Result<(), String> {
     {
         return Ok(());
     }
-    quietly(|task| appimage::install_link(seed, task)).map(drop)
+    let installed = quietly(|task| appimage::install_link(seed, task))?;
+    match installed.declaration {
+        Some(declaration) => block_on(appimage::grant(&installed.app.id, &declaration, false)),
+        None => Ok(()),
+    }
 }
 
 fn update_apps() -> Result<(), String> {

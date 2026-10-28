@@ -482,6 +482,21 @@ settings-apps-usb = USB devices
 settings-apps-usb-hint = Such as security keys, phones and microcontrollers
 settings-apps-serial = Serial devices
 settings-apps-serial-hint = Such as 3D printers and boards connected over USB
+# Shown under a folder an app may only read
+settings-apps-folder-read-only = Read only
+settings-apps-internet = Internet
+settings-apps-internet-hint = It can go online, from the next time it opens.
+# Under the name of a D-Bus service an app may call
+settings-apps-service-hint = A service on your desktop it can talk to
+# Button, verb
+settings-apps-service-remove = Remove
+# Screen reader label of the remove button; $service is a D-Bus service name
+settings-apps-service-remove-app = Stop letting it talk to { $service }
+# $count is a number of desktop services an app may call
+settings-apps-services-count = { $count ->
+    [one] { $count } service
+   *[other] { $count } services
+}
 settings-apps-full-access-off = It runs in a sandbox. Full access takes the sandbox away.
 # Button that opens Schelf to confirm giving the app full access
 settings-apps-full-access-give = Give full access

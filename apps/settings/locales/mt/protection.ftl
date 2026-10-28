@@ -450,5 +450,18 @@ settings-apps-usb = Apparat USB
 settings-apps-usb-hint = Bħal ċwievet tas-sigurtà, telefowns u mikrokontrollers
 settings-apps-serial = Apparat serjali
 settings-apps-serial-hint = Bħal printers 3D u boards imqabbda bl-USB
+settings-apps-folder-read-only = Qari biss
+settings-apps-internet = Internet
+settings-apps-internet-hint = Tista' tmur online mill-darba li jmiss li tinfetaħ.
+settings-apps-service-hint = Servizz fuq id-desktop li tista' titkellem miegħu
+settings-apps-service-remove = Neħħi
+settings-apps-service-remove-app = Twaqqafha milli titkellem ma' { $service }
+settings-apps-services-count = { $count ->
+    [one] { $count } servizz
+    [two] { $count } servizzi
+    [few] { $count } servizzi
+    [many] { $count } servizzi
+   *[other] { $count } servizzi
+}
 settings-apps-full-access-off = Taħdem f'sandbox. L-aċċess sħiħ ineħħi s-sandbox.
 settings-apps-full-access-give = Agħti aċċess sħiħ

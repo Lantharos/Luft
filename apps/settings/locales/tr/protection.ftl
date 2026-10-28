@@ -414,5 +414,15 @@ settings-apps-usb = USB aygıtları
 settings-apps-usb-hint = Güvenlik anahtarları, telefonlar ve mikrodenetleyiciler gibi
 settings-apps-serial = Seri aygıtlar
 settings-apps-serial-hint = 3D yazıcılar ve USB ile bağlanan kartlar gibi
+settings-apps-folder-read-only = Salt okunur
+settings-apps-internet = İnternet
+settings-apps-internet-hint = Bir sonraki açılışından itibaren internete bağlanabilir.
+settings-apps-service-hint = Masaüstünde konuşabildiği bir hizmet
+settings-apps-service-remove = Kaldır
+settings-apps-service-remove-app = { $service } ile konuşmasına artık izin verme
+settings-apps-services-count = { $count ->
+    [one] { $count } hizmet
+   *[other] { $count } hizmet
+}
 settings-apps-full-access-off = Korumalı alanda çalışıyor. Tam erişim korumalı alanı kaldırır.
 settings-apps-full-access-give = Tam erişim ver

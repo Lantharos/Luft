@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { bytes, Row, Section } from '@luft/ui';
+	import { FULL_ACCESS_ABILITIES } from '#lib/app/fullAccess.js';
 	import { commands, type InstalledApp, type Job, type OpenedFile } from '#lib/bindings.js';
+	import AccessList from '#lib/components/AccessList.svelte';
 	import AppArt from '#lib/components/AppArt.svelte';
 	import Description from '#lib/components/Description.svelte';
 	import ProgressButton from '#lib/components/ProgressButton.svelte';
@@ -18,6 +20,8 @@
 	let started = $state(false);
 	let trusting = $state(false);
 	let confirming = $state(false);
+	let unsandboxing = $state(false);
+	let fullAccess = $state(false);
 
 	const key = $derived(`file:${path}`);
 	const operation = $derived(operations.forKey(key));
@@ -57,7 +61,7 @@
 		if (opened.kind === 'package' && opened.system)
 			return { kind: 'installSystemPackageFile', path: opened.path, package: opened.package, repository: opened.repository?.draft ?? null };
 		if (opened.kind === 'package') return { kind: 'installToolFile', path: opened.path };
-		return { kind: 'installAppImage', path: opened.path };
+		return { kind: 'installAppImage', path: opened.path, fullAccess };
 	}
 
 	const unverified = $derived(file?.kind === 'package' && !file.repository && !file.verified);
@@ -84,8 +88,13 @@
 			confirming = true;
 			return;
 		}
+		if (file.kind === 'appImage' && file.unsandboxed && !unsandboxing) {
+			unsandboxing = true;
+			return;
+		}
 		trusting = false;
 		confirming = false;
+		unsandboxing = false;
 		if (operation?.state === 'failed') void operations.cancel(operation.id);
 		started = true;
 		void operations.run(key, name, job(file));
@@ -165,6 +174,10 @@
 				</Section>
 			{/if}
 
+			{#if file.kind === 'appImage' && file.permissions}
+				<AccessList permissions={file.permissions} />
+			{/if}
+
 			{#if (file.kind === 'package' || file.kind === 'deb') && file.description}
 				<Description html={`<p>${file.description.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</p>`} />
 			{/if}
@@ -237,6 +250,20 @@
 	<SourceTrustDialog {source} confirm="Add and install" onconfirm={install} onclose={() => (trusting = false)} />
 {/if}
 
+{#if unsandboxing && file?.kind === 'appImage' && file.unsandboxed}
+	<TrustDialog
+		title="Give {file.name} full access?"
+		description="{file.name} asks to run outside a sandbox: “{file.unsandboxed}” There it can do anything a program you start yourself can, without asking. You can take full access away on its page later."
+		facts={FULL_ACCESS_ABILITIES}
+		confirm="Install with full access"
+		onconfirm={() => {
+			fullAccess = true;
+			install();
+		}}
+		onclose={() => (unsandboxing = false)}
+	/>
+{/if}
+
 {#if confirming && file?.kind === 'package'}
 	<TrustDialog
 		title="Install {file.package} without checking it?"
@@ -249,3 +276,4 @@
 		onclose={() => (confirming = false)}
 	/>
 {/if}
+

@@ -414,5 +414,15 @@ settings-apps-usb = Dispositivos USB
 settings-apps-usb-hint = Como chaves de segurança, celulares e microcontroladores
 settings-apps-serial = Dispositivos seriais
 settings-apps-serial-hint = Como impressoras 3D e placas conectadas por USB
+settings-apps-folder-read-only = Somente leitura
+settings-apps-internet = Internet
+settings-apps-internet-hint = Pode se conectar à internet a partir da próxima vez que abrir.
+settings-apps-service-hint = Um serviço da área de trabalho com o qual pode se comunicar
+settings-apps-service-remove = Remover
+settings-apps-service-remove-app = Não deixar mais se comunicar com { $service }
+settings-apps-services-count = { $count ->
+    [one] { $count } serviço
+   *[other] { $count } serviços
+}
 settings-apps-full-access-off = Ele roda em um ambiente isolado. O acesso total tira o isolamento.
 settings-apps-full-access-give = Dar acesso total

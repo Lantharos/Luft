@@ -414,5 +414,15 @@ settings-apps-usb = Συσκευές USB
 settings-apps-usb-hint = Όπως κλειδιά ασφαλείας, τηλέφωνα και μικροελεγκτές
 settings-apps-serial = Σειριακές συσκευές
 settings-apps-serial-hint = Όπως εκτυπωτές 3D και πλακέτες συνδεδεμένες μέσω USB
+settings-apps-folder-read-only = Μόνο ανάγνωση
+settings-apps-internet = Διαδίκτυο
+settings-apps-internet-hint = Μπορεί να συνδέεται στο διαδίκτυο από το επόμενο άνοιγμα.
+settings-apps-service-hint = Μια υπηρεσία της επιφάνειας εργασίας με την οποία μπορεί να επικοινωνεί
+settings-apps-service-remove = Αφαίρεση
+settings-apps-service-remove-app = Διακοπή επικοινωνίας με { $service }
+settings-apps-services-count = { $count ->
+    [one] { $count } υπηρεσία
+   *[other] { $count } υπηρεσίες
+}
 settings-apps-full-access-off = Εκτελείται σε περιβάλλον απομόνωσης. Η πλήρης πρόσβαση το καταργεί.
 settings-apps-full-access-give = Παροχή πλήρους πρόσβασης

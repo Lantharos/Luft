@@ -14,15 +14,6 @@ import Usb from '@lucide/svelte/icons/usb';
 import Volume2 from '@lucide/svelte/icons/volume-2';
 import type { Permissions } from '#lib/bindings.js';
 
-export const APPIMAGE_SANDBOX: Permissions = {
-	shared: ['network', 'ipc'],
-	sockets: ['wayland', 'fallback-x11', 'pulseaudio'],
-	devices: ['dri'],
-	filesystems: [],
-	sessionBus: [],
-	systemBus: []
-};
-
 export interface Access {
 	icon: Component;
 	title: string;
@@ -63,9 +54,10 @@ function files(filesystems: string[]): Access[] {
 	const home = granted.find((entry) => entry.place === 'home' || entry.place === '~');
 	if (home) access.push({ icon: FolderOpen, title: 'Your home folder', description: mode(home.readOnly), notable: true });
 	const folders = granted.filter((entry) => FOLDERS[entry.place]);
-	if (folders.length) {
-		const readOnly = folders.every((entry) => entry.readOnly);
-		access.push({ icon: Folder, title: `${listing(folders.map((entry) => FOLDERS[entry.place]))} ${folders.length > 1 ? 'folders' : 'folder'}`, description: mode(readOnly), notable: !readOnly });
+	for (const readOnly of [false, true]) {
+		const group = folders.filter((entry) => entry.readOnly === readOnly);
+		if (!group.length) continue;
+		access.push({ icon: Folder, title: `${listing(group.map((entry) => FOLDERS[entry.place]))} ${group.length > 1 ? 'folders' : 'folder'}`, description: mode(readOnly), notable: !readOnly });
 	}
 	const others = granted.filter((entry) => entry !== home && !FOLDERS[entry.place]);
 	if (others.length) {
@@ -84,7 +76,11 @@ export function describe(permissions: Permissions): Access[] {
 	access.push(...files(permissions.filesystems));
 	if (has(permissions.shared, 'network')) access.push({ icon: Globe, title: 'Internet', description: 'It can go online.', notable: false });
 	if (has(permissions.devices, 'all')) access.push({ icon: Usb, title: 'All devices', description: 'Including cameras, microphones and USB devices.', notable: true });
-	else if (has(permissions.devices, 'input')) access.push({ icon: Gamepad2, title: 'Game controllers', description: 'It can read controllers and other input devices.', notable: false });
+	else {
+		if (has(permissions.devices, 'usb')) access.push({ icon: Usb, title: 'USB devices', description: 'It can use the USB devices plugged into this computer.', notable: true });
+		if (has(permissions.devices, 'serial')) access.push({ icon: Usb, title: 'Serial devices', description: 'It can talk to boards and other devices on a serial port.', notable: true });
+		if (has(permissions.devices, 'input')) access.push({ icon: Gamepad2, title: 'Game controllers', description: 'It can read controllers and other input devices.', notable: false });
+	}
 	if (has(permissions.sockets, 'x11') && !has(permissions.sockets, 'fallback-x11') && !has(permissions.sockets, 'wayland')) {
 		access.push({ icon: AppWindow, title: 'Older display system', description: 'It uses X11, which lets it see what other apps show and type.', notable: true });
 	}

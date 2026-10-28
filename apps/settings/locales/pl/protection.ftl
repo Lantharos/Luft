@@ -438,5 +438,17 @@ settings-apps-usb = Urządzenia USB
 settings-apps-usb-hint = Na przykład klucze bezpieczeństwa, telefony i mikrokontrolery
 settings-apps-serial = Urządzenia szeregowe
 settings-apps-serial-hint = Na przykład drukarki 3D i płytki podłączone przez USB
+settings-apps-folder-read-only = Tylko do odczytu
+settings-apps-internet = Internet
+settings-apps-internet-hint = Może łączyć się z internetem od następnego uruchomienia.
+settings-apps-service-hint = Usługa na pulpicie, z którą może się komunikować
+settings-apps-service-remove = Usuń
+settings-apps-service-remove-app = Zabroń komunikacji z { $service }
+settings-apps-services-count = { $count ->
+    [one] { $count } usługa
+    [few] { $count } usługi
+    [many] { $count } usług
+   *[other] { $count } usługi
+}
 settings-apps-full-access-off = Działa w piaskownicy. Pełny dostęp usuwa piaskownicę.
 settings-apps-full-access-give = Daj pełny dostęp

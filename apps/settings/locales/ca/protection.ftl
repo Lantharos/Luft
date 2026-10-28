@@ -414,5 +414,15 @@ settings-apps-usb = Dispositius USB
 settings-apps-usb-hint = Com claus de seguretat, telèfons i microcontroladors
 settings-apps-serial = Dispositius sèrie
 settings-apps-serial-hint = Com impressores 3D i plaques connectades per USB
+settings-apps-folder-read-only = Només lectura
+settings-apps-internet = Internet
+settings-apps-internet-hint = Pot connectar-se a internet a partir de la propera vegada que s'obri.
+settings-apps-service-hint = Un servei de l'escriptori amb què pot parlar
+settings-apps-service-remove = Elimina
+settings-apps-service-remove-app = Deixa de permetre-li parlar amb { $service }
+settings-apps-services-count = { $count ->
+    [one] { $count } servei
+   *[other] { $count } serveis
+}
 settings-apps-full-access-off = Funciona en un entorn aïllat. L'accés complet elimina l'entorn aïllat.
 settings-apps-full-access-give = Dona accés complet

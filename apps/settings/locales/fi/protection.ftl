@@ -414,5 +414,15 @@ settings-apps-usb = USB-laitteet
 settings-apps-usb-hint = Kuten suojausavaimet, puhelimet ja mikro-ohjaimet
 settings-apps-serial = Sarjalaitteet
 settings-apps-serial-hint = Kuten 3D-tulostimet ja USB:llä liitetyt piirilevyt
+settings-apps-folder-read-only = Vain luku
+settings-apps-internet = Internet
+settings-apps-internet-hint = Se voi käyttää verkkoa seuraavasta avauskerrasta alkaen.
+settings-apps-service-hint = Työpöydän palvelu, jonka kanssa se voi viestiä
+settings-apps-service-remove = Poista
+settings-apps-service-remove-app = Estä viestintä palvelun { $service } kanssa
+settings-apps-services-count = { $count ->
+    [one] { $count } palvelu
+   *[other] { $count } palvelua
+}
 settings-apps-full-access-off = Se toimii hiekkalaatikossa. Täysi käyttöoikeus poistaa hiekkalaatikon.
 settings-apps-full-access-give = Anna täysi käyttöoikeus

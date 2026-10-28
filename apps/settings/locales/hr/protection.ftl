@@ -426,5 +426,16 @@ settings-apps-usb = USB uređaji
 settings-apps-usb-hint = Poput sigurnosnih ključeva, telefona i mikrokontrolera
 settings-apps-serial = Serijski uređaji
 settings-apps-serial-hint = Poput 3D pisača i pločica spojenih preko USB-a
+settings-apps-folder-read-only = Samo za čitanje
+settings-apps-internet = Internet
+settings-apps-internet-hint = Može pristupiti internetu od sljedećeg otvaranja.
+settings-apps-service-hint = Usluga na radnoj površini s kojom može komunicirati
+settings-apps-service-remove = Ukloni
+settings-apps-service-remove-app = Zabrani komunikaciju s uslugom { $service }
+settings-apps-services-count = { $count ->
+    [one] { $count } usluga
+    [few] { $count } usluge
+   *[other] { $count } usluga
+}
 settings-apps-full-access-off = Radi u sandboxu. Potpuni pristup uklanja sandbox.
 settings-apps-full-access-give = Daj potpuni pristup

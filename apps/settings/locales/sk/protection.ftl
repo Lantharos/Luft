@@ -438,5 +438,17 @@ settings-apps-usb = Zariadenia USB
 settings-apps-usb-hint = Napríklad bezpečnostné kľúče, telefóny a mikrokontroléry
 settings-apps-serial = Sériové zariadenia
 settings-apps-serial-hint = Napríklad 3D tlačiarne a dosky pripojené cez USB
+settings-apps-folder-read-only = Len na čítanie
+settings-apps-internet = Internet
+settings-apps-internet-hint = Môže sa pripojiť na internet od ďalšieho spustenia.
+settings-apps-service-hint = Služba na ploche, s ktorou môže komunikovať
+settings-apps-service-remove = Odstrániť
+settings-apps-service-remove-app = Zakázať komunikáciu so službou { $service }
+settings-apps-services-count = { $count ->
+    [one] { $count } služba
+    [few] { $count } služby
+    [many] { $count } služby
+   *[other] { $count } služieb
+}
 settings-apps-full-access-off = Beží v sandboxe. Úplný prístup sandbox odstráni.
 settings-apps-full-access-give = Udeliť úplný prístup

@@ -95,6 +95,7 @@ pub fn register(window: SabineWindow) -> SabineWindow {
         .command("library_installed", |Empty {}| Ok(installed()))
         .command("library_launch", launch)
         .command("library_permissions", permissions)
+        .command_async("library_sandbox", appimages::sandbox)
         .command_async("library_full_access", full_access::has)
         .command_async("library_set_full_access", full_access::set)
 }

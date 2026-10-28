@@ -450,5 +450,18 @@ settings-apps-usb = Gléasanna USB
 settings-apps-usb-hint = Mar eochracha slándála, fóin agus micrea-rialaitheoirí
 settings-apps-serial = Gléasanna sraitheacha
 settings-apps-serial-hint = Mar phrintéirí 3D agus cláir atá ceangailte trí USB
+settings-apps-folder-read-only = Inléite amháin
+settings-apps-internet = Idirlíon
+settings-apps-internet-hint = Is féidir leis dul ar líne ón chéad uair eile a osclaítear é.
+settings-apps-service-hint = Seirbhís ar do dheasc ar féidir leis labhairt léi
+settings-apps-service-remove = Bain
+settings-apps-service-remove-app = Ná lig dó labhairt le { $service } a thuilleadh
+settings-apps-services-count = { $count ->
+    [one] Seirbhísí: { $count }
+    [two] Seirbhísí: { $count }
+    [few] Seirbhísí: { $count }
+    [many] Seirbhísí: { $count }
+   *[other] Seirbhísí: { $count }
+}
 settings-apps-full-access-off = Ritheann sé i mbosca gainimh. Baineann lánrochtain an bosca gainimh.
 settings-apps-full-access-give = Tabhair lánrochtain

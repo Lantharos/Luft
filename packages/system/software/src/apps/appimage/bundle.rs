@@ -5,6 +5,7 @@ use std::path::{Component, Path, PathBuf};
 
 use backhand::{FilesystemReader, InnerNode, Node, SquashfsFileReader};
 
+use super::declaration::{self, Declaration};
 use super::elf;
 use super::library::IconSize;
 use crate::apps::chromium;
@@ -29,6 +30,8 @@ pub struct Bundle {
     pub icons: Vec<Icon>,
     pub electron: bool,
     pub chromium: bool,
+    /// What a Sabine app declares about its sandbox; none for other apps.
+    pub declaration: Option<Declaration>,
 }
 
 struct Contents<'a, 'b> {
@@ -195,13 +198,26 @@ pub fn read(path: &Path) -> Result<Bundle, String> {
         String::from_utf8_lossy(&contents.read(&desktop).ok_or_else(unreadable)?).into_owned();
     let entry = DesktopEntry::parse(&entry_text);
     let icons = contents.icons(entry.get("Icon"));
-    let electron = ELECTRON_MARKERS
-        .iter()
-        .any(|marker| contents.nodes.contains_key(Path::new(marker)));
-    let chromium = contents.nodes.keys().any(|path| {
-        path.file_name()
-            .is_some_and(|name| name == chromium::RESOURCES)
-    });
+    let declaration = contents
+        .nodes
+        .keys()
+        .find(|path| declaration::is_manifest(path))
+        .map(|manifest| {
+            let text = contents.read(manifest).ok_or_else(unreadable)?;
+            Declaration::read(&String::from_utf8_lossy(&text))
+                .map_err(|error| format!("What it asks of its sandbox can't be read: {error}"))
+        })
+        .transpose()?;
+    let sabine = declaration.is_some();
+    let electron = !sabine
+        && ELECTRON_MARKERS
+            .iter()
+            .any(|marker| contents.nodes.contains_key(Path::new(marker)));
+    let chromium = !sabine
+        && contents.nodes.keys().any(|path| {
+            path.file_name()
+                .is_some_and(|name| name == chromium::RESOURCES)
+        });
     Ok(Bundle {
         desktop_id: desktop
             .file_stem()
@@ -211,5 +227,6 @@ pub fn read(path: &Path) -> Result<Bundle, String> {
         icons,
         electron,
         chromium,
+        declaration,
     })
 }

@@ -414,5 +414,15 @@ settings-apps-usb = USB-einingar
 settings-apps-usb-hint = Til dømes tryggleiksnøklar, telefonar og mikrokontrollarar
 settings-apps-serial = Serielle einingar
 settings-apps-serial-hint = Til dømes 3D-skrivarar og kort kopla til med USB
+settings-apps-folder-read-only = Skriveverna
+settings-apps-internet = Internett
+settings-apps-internet-hint = Han kan kopla seg til internett frå neste gong han vert opna.
+settings-apps-service-hint = Ei teneste på skrivebordet som han kan snakka med
+settings-apps-service-remove = Fjern
+settings-apps-service-remove-app = Ikkje la han snakka med { $service } lenger
+settings-apps-services-count = { $count ->
+    [one] { $count } teneste
+   *[other] { $count } tenester
+}
 settings-apps-full-access-off = Han køyrer i ei sandkasse. Full tilgang fjernar sandkassa.
 settings-apps-full-access-give = Gje full tilgang

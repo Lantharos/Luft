@@ -414,5 +414,15 @@ settings-apps-usb = USB-tæki
 settings-apps-usb-hint = Til dæmis öryggislyklar, símar og örstýringar
 settings-apps-serial = Raðtengitæki
 settings-apps-serial-hint = Til dæmis þrívíddarprentarar og borð tengd með USB
+settings-apps-folder-read-only = Aðeins lestur
+settings-apps-internet = Internet
+settings-apps-internet-hint = Það getur farið á netið frá því næst þegar það er opnað.
+settings-apps-service-hint = Þjónusta á skjáborðinu sem það getur talað við
+settings-apps-service-remove = Fjarlægja
+settings-apps-service-remove-app = Hætta að leyfa samskipti við { $service }
+settings-apps-services-count = { $count ->
+    [one] { $count } þjónusta
+   *[other] { $count } þjónustur
+}
 settings-apps-full-access-off = Það keyrir í sandkassa. Fullur aðgangur tekur sandkassann burt.
 settings-apps-full-access-give = Veita fullan aðgang

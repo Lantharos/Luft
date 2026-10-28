@@ -414,5 +414,15 @@ settings-apps-usb = USB-apparaten
 settings-apps-usb-hint = Zoals beveiligingssleutels, telefoons en microcontrollers
 settings-apps-serial = Seriële apparaten
 settings-apps-serial-hint = Zoals 3D-printers en via USB verbonden borden
+settings-apps-folder-read-only = Alleen-lezen
+settings-apps-internet = Internet
+settings-apps-internet-hint = Ze kan online vanaf de volgende keer dat ze opent.
+settings-apps-service-hint = Een dienst op je bureaublad waarmee ze kan praten
+settings-apps-service-remove = Verwijderen
+settings-apps-service-remove-app = Niet meer laten praten met { $service }
+settings-apps-services-count = { $count ->
+    [one] { $count } dienst
+   *[other] { $count } diensten
+}
 settings-apps-full-access-off = De app draait in een sandbox. Volledige toegang haalt de sandbox weg.
 settings-apps-full-access-give = Volledige toegang geven

@@ -426,5 +426,16 @@ settings-apps-usb = Dispozitive USB
 settings-apps-usb-hint = Cum ar fi chei de securitate, telefoane și microcontrolere
 settings-apps-serial = Dispozitive seriale
 settings-apps-serial-hint = Cum ar fi imprimante 3D și plăci conectate prin USB
+settings-apps-folder-read-only = Doar citire
+settings-apps-internet = Internet
+settings-apps-internet-hint = Se poate conecta la internet de la următoarea deschidere.
+settings-apps-service-hint = Un serviciu de pe desktop cu care poate comunica
+settings-apps-service-remove = Elimină
+settings-apps-service-remove-app = Nu-i mai permite să comunice cu { $service }
+settings-apps-services-count = { $count ->
+    [one] { $count } serviciu
+    [few] { $count } servicii
+   *[other] { $count } de servicii
+}
 settings-apps-full-access-off = Rulează într-un sandbox. Accesul complet elimină sandboxul.
 settings-apps-full-access-give = Acordă acces complet

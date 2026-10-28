@@ -48,6 +48,8 @@ pub enum Job {
     },
     InstallAppImage {
         path: PathBuf,
+        /// Whether you let an app that asks to run unsandboxed do so.
+        full_access: bool,
     },
     InstallTool {
         package: String,
@@ -150,7 +152,17 @@ impl Job {
             Self::AddFlatpakRepo { path, name } => {
                 flatpak::add_remote(Installation::User, name, path)
             }
-            Self::InstallAppImage { path } => appimage::install(path, task).map(|_| ()),
+            Self::InstallAppImage { path, full_access } => {
+                let installed = appimage::install(path, task)?;
+                match installed.declaration {
+                    Some(declaration) => block_on(appimage::grant(
+                        &installed.app.id,
+                        &declaration,
+                        *full_access,
+                    )),
+                    None => Ok(()),
+                }
+            }
             Self::InstallTool { package } => toolbox::install(package, task),
             Self::InstallToolFile { path } => toolbox::install_file(path, task),
             Self::RemoveFlatpak {

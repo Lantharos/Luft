@@ -1,4 +1,6 @@
-use luft_app::identity::permissions::{self, DEVICES, FOLDERS, FULL_ACCESS, YES};
+use luft_app::identity::permissions::{
+    self, BUS, DEVICES, FOLDERS, FULL_ACCESS, NETWORK, NO, READ_ONLY_FOLDERS, YES,
+};
 use luft_app::portal::FileChooser;
 use luft_app::portal::uri_path;
 use serde::Deserialize;
@@ -66,8 +68,23 @@ pub async fn add_folder(connection: &Connection, app: &str, title: &str) -> Resu
 }
 
 pub async fn remove_folder(connection: &Connection, app: &str, folder: &str) -> zbus::Result<()> {
-    change(connection, &FOLDERS, app, |folders| {
-        folders.retain(|kept| kept != folder);
+    for permission in [&FOLDERS, &READ_ONLY_FOLDERS] {
+        change(connection, permission, app, |folders| {
+            folders.retain(|kept| kept != folder);
+        })
+        .await?;
+    }
+    Ok(())
+}
+
+pub async fn set_online(connection: &Connection, app: &str, on: bool) -> zbus::Result<()> {
+    let answer: &[&str] = if on { &[] } else { &[NO] };
+    permissions::set_values(connection, &NETWORK, app, answer).await
+}
+
+pub async fn remove_service(connection: &Connection, app: &str, service: &str) -> zbus::Result<()> {
+    change(connection, &BUS, app, |services| {
+        services.retain(|kept| kept != service);
     })
     .await
 }

@@ -28,6 +28,7 @@ sha1.workspace = true
 sha2.workspace = true
 specta.workspace = true
 tar.workspace = true
+toml.workspace = true
 tokio = { workspace = true, features = ["rt"], optional = true }
 ureq.workspace = true
 zstd.workspace = true

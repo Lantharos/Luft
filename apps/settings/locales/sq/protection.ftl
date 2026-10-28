@@ -414,5 +414,15 @@ settings-apps-usb = Pajisje USB
 settings-apps-usb-hint = Si çelësa sigurie, telefona dhe mikrokontrollues
 settings-apps-serial = Pajisje serike
 settings-apps-serial-hint = Si printera 3D dhe pllaka të lidhura me USB
+settings-apps-folder-read-only = Vetëm për lexim
+settings-apps-internet = Internet
+settings-apps-internet-hint = Mund të dalë në internet që nga hapja e radhës.
+settings-apps-service-hint = Një shërbim i desktopit me të cilin mund të komunikojë
+settings-apps-service-remove = Hiq
+settings-apps-service-remove-app = Mos e lejo më të komunikojë me { $service }
+settings-apps-services-count = { $count ->
+    [one] { $count } shërbim
+   *[other] { $count } shërbime
+}
 settings-apps-full-access-off = Punon në një kuti izolimi. Qasja e plotë e heq kutinë e izolimit.
 settings-apps-full-access-give = Jep qasje të plotë

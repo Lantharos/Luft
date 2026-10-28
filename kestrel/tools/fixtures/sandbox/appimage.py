@@ -7,26 +7,22 @@ RUNTIME = "/usr/bin/true"
 APPIMAGE_TYPE_2 = b"AI\x02"
 
 
-def app_run(electron, app):
-    return f'#!/bin/sh\nexec "$APPDIR/{os.path.basename(electron)}/electron" "$APPDIR/{os.path.basename(app)}" "$@"\n'
-
-
 def entry(app_id, name):
     return f"[Desktop Entry]\nType=Application\nName={name}\nExec=AppRun %U\nIcon={app_id}\n"
 
 
-def build(output, app_id, name, electron, app):
+def write(path, text, mode=0o644):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w") as file:
+        file.write(text)
+    os.chmod(path, mode)
+
+
+def pack(output, sources):
     with tempfile.TemporaryDirectory() as root:
-        run = os.path.join(root, "AppRun")
-        desktop = os.path.join(root, f"{app_id}.desktop")
         payload = os.path.join(root, "payload")
-        with open(run, "w") as file:
-            file.write(app_run(electron, app))
-        os.chmod(run, 0o755)
-        with open(desktop, "w") as file:
-            file.write(entry(app_id, name))
         subprocess.run(
-            ["mksquashfs", run, desktop, electron, app, payload, "-quiet", "-no-progress", "-noappend", "-all-root", "-comp", "lz4"],
+            ["mksquashfs", *sources, payload, "-quiet", "-no-progress", "-noappend", "-all-root", "-comp", "lz4"],
             check=True,
         )
         with open(RUNTIME, "rb") as file:
@@ -36,6 +32,16 @@ def build(output, app_id, name, electron, app):
             out.write(runtime)
             out.write(squashed.read())
         os.chmod(output, 0o755)
+
+
+def build(output, app_id, name, electron, app):
+    with tempfile.TemporaryDirectory() as root:
+        run = os.path.join(root, "AppRun")
+        desktop = os.path.join(root, f"{app_id}.desktop")
+        launch = f'exec "$APPDIR/{os.path.basename(electron)}/electron" "$APPDIR/{os.path.basename(app)}" "$@"'
+        write(run, f"#!/bin/sh\n{launch}\n", 0o755)
+        write(desktop, entry(app_id, name))
+        pack(output, [run, desktop, electron, app])
 
 
 if __name__ == "__main__":

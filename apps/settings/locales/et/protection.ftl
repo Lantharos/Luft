@@ -426,5 +426,15 @@ settings-apps-usb = USB-seadmed
 settings-apps-usb-hint = Näiteks turvavõtmed, telefonid ja mikrokontrollerid
 settings-apps-serial = Jadaseadmed
 settings-apps-serial-hint = Näiteks 3D-printerid ja USB kaudu ühendatud plaadid
+settings-apps-folder-read-only = Ainult lugemiseks
+settings-apps-internet = Internet
+settings-apps-internet-hint = See saab internetti alates järgmisest avamisest.
+settings-apps-service-hint = Töölaua teenus, millega see saab suhelda
+settings-apps-service-remove = Eemalda
+settings-apps-service-remove-app = Keela suhtlus teenusega { $service }
+settings-apps-services-count = { $count ->
+        [one] { $count } teenus
+       *[other] { $count } teenust
+}
 settings-apps-full-access-off = See töötab liivakastis. Täielik ligipääs eemaldab liivakasti.
 settings-apps-full-access-give = Anna täielik ligipääs

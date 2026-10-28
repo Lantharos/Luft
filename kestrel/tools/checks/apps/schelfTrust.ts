@@ -11,6 +11,7 @@ const SCHELF = repository('target', 'release', 'schelf');
 const BUILDER = fixture('sandbox', 'trust.sh');
 const APPIMAGE_BUILDER = fixture('sandbox', 'appimage.py');
 const SAFE_STORAGE = fixture('sandbox', 'safeStorage');
+const SABINE_BUILDER = fixture('sandbox', 'sabine.py');
 const INSTALL_BUTTON: Point = [1030, 110];
 
 async function saved(app: LuftApp, name: string) {
@@ -37,6 +38,15 @@ export async function run() {
     require((await outcome([SCHELF, 'install', '--yes', image], {env})).ok, 'Schelf installs the AppImage');
     await withApp('schelf', ['schelf:full-access?org.example.Lighthouse'], app => saved(app, 'schelf-trust-appimage'), env);
   }
+
+  const declared = GLib.build_filenamev([folder, 'Tidepool.AppImage']);
+  require((await outcome(['python3', SABINE_BUILDER, declared, 'org.example.Tidepool', 'Tidepool',
+    'filesystems = ["xdg-pictures", "xdg-download:ro"]\ndevices = ["usb"]\n'])).ok, 'a Sabine AppImage that declares what it needs is built');
+  await withApp('schelf', [declared], app => saved(app, 'schelf-trust-declared'), env);
+  const unsandboxed = GLib.build_filenamev([folder, 'Harbor.AppImage']);
+  require((await outcome(['python3', SABINE_BUILDER, unsandboxed, 'org.example.Harbor', 'Harbor',
+    'unsandboxed = true\nreason = "It manages the containers Podman runs for you."\n'])).ok, 'a Sabine AppImage that asks to run unsandboxed is built');
+  await withApp('schelf', [unsandboxed], app => installClicked(app, 'schelf-trust-unsandboxed'), env);
 
   await withApp('schelf', [GLib.build_filenamev([folder, 'vscode-release.rpm'])], app => installClicked(app, 'schelf-trust-source'), env);
   await withApp('schelf', [GLib.build_filenamev([folder, 'lantern-notes.rpm'])], app => installClicked(app, 'schelf-trust-package'), env);

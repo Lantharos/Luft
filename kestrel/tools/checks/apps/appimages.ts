@@ -6,7 +6,7 @@ import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {checks} from '../lib/check.js';
 import {scroll, type Point} from '../lib/input/input.js';
-import {outcome, repository, scratch, spawn, stop, waitForWindow, windows} from '../lib/processes.js';
+import {fixture, outcome, repository, scratch, spawn, stop, waitForWindow, windows} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {pause, waitUntil} from '../lib/wait.js';
 import {withApp} from './lib/apps.js';
@@ -15,6 +15,10 @@ import {showEnd} from './settings/navigation.js';
 const {require} = checks('AppImage sandbox');
 const SCHELF = repository('target', 'release', 'schelf');
 const SANDBOX = '--sandbox';
+const APPIMAGE_BUILDER = fixture('sandbox', 'appimage.py');
+const RENDERER = fixture('sandbox', 'renderer');
+const SABINE_BUILDER = fixture('sandbox', 'sabine.py');
+const ZYPAK = '/usr/lib/zypak/zypak-helper';
 const WINDOW_TIMEOUT = 60000;
 const LOADING = 5000;
 const FIRST_APP: Point = [655, 468];
@@ -100,6 +104,47 @@ async function checkDeviceRequest(path: string) {
   }
 }
 
+interface RendererReport {
+  browser: {namespaces: number};
+  renderer: {seccomp: number; namespaces: number};
+  noSandbox: boolean;
+}
+
+async function checkRendererSandbox(electron: string) {
+  const image = scratch('Renderer.AppImage');
+  require((await outcome(['python3', APPIMAGE_BUILDER, image, 'org.example.Renderer', 'Renderer', GLib.path_get_dirname(electron), RENDERER])).ok,
+    'an Electron AppImage is built');
+  const id = await install(image);
+  const {program, rest} = launchLine(id);
+  const ran = await outcome([program, ...rest]);
+  const line = ran.stdout.split('\n').find(text => text.startsWith('{'));
+  if (!line) console.log(`Kestrel AppImage sandbox: ${id} said\n${ran.stderr}`);
+  require(line, `${id} reports how its renderer runs`);
+  const report = JSON.parse(line!) as RendererReport;
+  require(!report.noSandbox, 'Electron runs in the AppImage sandbox without --no-sandbox');
+  require(report.renderer.seccomp === 2, "Electron's renderer filters its system calls in the AppImage sandbox");
+  require(report.renderer.namespaces > report.browser.namespaces,
+    "Electron's renderer runs in a sandbox of its own, nested in the app's");
+}
+
+async function checkDeclaredAccess() {
+  const image = scratch('Harbor.AppImage');
+  const declared = 'network = false\nfilesystems = ["home:ro"]\n';
+  require((await outcome(['python3', SABINE_BUILDER, image, 'org.example.Harbor', 'Harbor', declared])).ok,
+    'a Sabine AppImage that declares what it needs is built');
+  const id = await install(image);
+  GLib.file_set_contents(GLib.build_filenamev([GLib.get_home_dir(), 'harbor-marker']), 'here');
+  const {program, rest} = launchLine(id);
+  const script = 'cut -d: -f1 /proc/net/dev | tail -n +3 | tr -d " "; test -f "$HOME/harbor-marker" && echo home; ' +
+    'touch "$HOME/written" 2>/dev/null && echo written; mkdir -p "$XDG_DATA_HOME" && touch "$XDG_DATA_HOME/own" && echo own';
+  const lines = (await outcome([program, ...rest, 'sh', '-c', script])).stdout.split('\n');
+  const interfaces = lines.filter(line => line && !['home', 'written', 'own'].includes(line));
+  require(interfaces.join() === 'lo', 'a Sabine app that declares it stays offline gets no network');
+  require(lines.includes('home'), 'a Sabine app sees the folder it declared');
+  require(!lines.includes('written'), 'a folder declared read-only stays read-only');
+  require(lines.includes('own'), 'an app given your home folder still keeps its own files in its folder');
+}
+
 function appImagesIn(folder: string) {
   const found = Gio.File.new_for_path(folder);
   if (!found.query_exists(null)) return [];
@@ -109,9 +154,17 @@ function appImagesIn(folder: string) {
 }
 
 export async function run() {
+  if (!GLib.find_program_in_path('squashfuse_ll')) {
+    console.log('Kestrel AppImage sandbox: skipped without squashfuse');
+    return;
+  }
+  await checkDeclaredAccess();
+  const electron = GLib.getenv('KESTREL_ELECTRON');
+  if (electron && GLib.file_test(ZYPAK, GLib.FileTest.IS_EXECUTABLE)) await checkRendererSandbox(electron);
+  else if (electron) console.log('Kestrel AppImage sandbox: Electron\'s renderer sandbox skipped without Zypak');
   const appImages = GLib.getenv('KESTREL_APPIMAGES');
-  if (!GLib.find_program_in_path('squashfuse_ll') || !appImages) {
-    console.log('Kestrel AppImage sandbox: skipped without squashfuse and KESTREL_APPIMAGES');
+  if (!appImages) {
+    console.log('Kestrel AppImage sandbox: AppImages skipped without KESTREL_APPIMAGES');
     return;
   }
   for (const path of appImagesIn(appImages)) await checkApp(path);

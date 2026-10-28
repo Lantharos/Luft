@@ -1,6 +1,7 @@
 mod access;
 mod daemon;
 mod keyring;
+mod lockdown;
 mod prompter;
 mod requester;
 mod services;
@@ -21,6 +22,10 @@ async fn main() -> ExitCode {
     unsafe {
         libc::setfsgid(libc::getgid());
         libc::prctl(libc::PR_SET_DUMPABLE, 0);
+    }
+    if let Err(error) = lockdown::lock_down() {
+        eprintln!("Luft Keyring couldn't lock itself down: {error}");
+        return ExitCode::FAILURE;
     }
     match run().await {
         Ok(()) => ExitCode::SUCCESS,

@@ -21,6 +21,7 @@ luft-identity.workspace = true
 p256 = { workspace = true, features = ["ecdsa", "std"] }
 postcard.workspace = true
 rustix = { workspace = true, features = ["fs", "mm", "net", "pipe", "process"] }
+seccompiler.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 luft-keyring-vault.workspace = true

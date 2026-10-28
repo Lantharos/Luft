@@ -1,5 +1,6 @@
 polkit.addRule(function(action, subject) {
   if (subject.user == "ada" && (action.id.indexOf("org.freedesktop.udisks2.") == 0 ||
-      action.id == "com.lantharos.trust.remove-other-systems" || action.id == "com.lantharos.windows.status"))
+      action.id == "com.lantharos.trust.check" || action.id == "com.lantharos.trust.remove-other-systems" ||
+      action.id == "com.lantharos.windows.status"))
     return polkit.Result.YES;
 });

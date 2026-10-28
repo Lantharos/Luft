@@ -10,8 +10,8 @@ const DBUS_PROXY: &str = "xdg-dbus-proxy";
 const READY_FD: i32 = 3;
 const SOCKET: &str = "bus";
 
-/// Names every sandboxed app may call besides the desktop portal and its own.
-const TALK: [&str; 4] = [
+/// Names every sandboxed app may call besides its own.
+pub const TALK: [&str; 4] = [
     "org.freedesktop.portal.*",
     "org.freedesktop.Notifications",
     "org.freedesktop.secrets",
@@ -39,18 +39,19 @@ fn session_bus() -> Result<PathBuf, String> {
         .ok_or_else(|| "The session bus isn't at a path this sandbox can reach.".to_owned())
 }
 
-fn rules(id: &str) -> Vec<String> {
+fn rules(id: &str, talk: &[String]) -> Vec<String> {
     let mut rules = vec![
         "--filter".to_owned(),
         format!("--own={id}"),
         format!("--own={id}.*"),
     ];
     rules.extend(TALK.iter().map(|name| format!("--talk={name}")));
+    rules.extend(talk.iter().map(|name| format!("--talk={name}")));
     rules
 }
 
 impl Proxy {
-    pub fn start(folder: &Folder, info: &Path, id: &str) -> Result<Self, String> {
+    pub fn start(folder: &Folder, info: &Path, id: &str, talk: &[String]) -> Result<Self, String> {
         let bus = session_bus()?;
         let socket = folder.proxy().join(SOCKET);
         let (ready, proxy_end) = fds::pipe()?;
@@ -77,7 +78,7 @@ impl Proxy {
             .args(["--", DBUS_PROXY, &format!("--fd={READY_FD}")])
             .arg(format!("unix:path={}", bus.display()))
             .arg(&socket)
-            .args(rules(id))
+            .args(rules(id, talk))
             .stdin(Stdio::null());
         fds::pass(&mut command, &proxy_end, READY_FD);
         let child = command

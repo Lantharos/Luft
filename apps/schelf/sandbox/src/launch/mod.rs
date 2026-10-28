@@ -1,10 +1,10 @@
 mod devices;
-mod fds;
+pub mod fds;
 mod folder;
 mod mount;
 mod profile;
 mod proxy;
-mod seccomp;
+pub mod seccomp;
 mod unsandboxed;
 mod wait;
 mod wayland;
@@ -17,12 +17,13 @@ use zbus::Connection;
 use crate::app::{App, Grants};
 use crate::escalate::{self, Reason};
 use crate::files;
+use crate::portal::Bus;
 use crate::request::Request;
 use folder::{Folder, Lock};
 use profile::Profile;
 use wait::Event;
 
-const BWRAP: &str = "bwrap";
+pub const BWRAP: &str = "bwrap";
 const QUICK_EXIT: Duration = Duration::from_secs(8);
 
 pub fn run(id: &str, arguments: Vec<String>) -> i32 {
@@ -80,22 +81,27 @@ fn sandbox(
     arguments: Vec<String>,
 ) -> Result<(i32, Option<Reason>), String> {
     folder.prepare()?;
-    let info = folder.write_sandbox_info(&app.id)?;
+    let talk = proxy::TALK
+        .into_iter()
+        .chain(grants.bus.iter().map(String::as_str));
+    let info = folder.write_sandbox_info(&app.id, talk)?;
     let mounted = mount::Image::mount(&app.image, &folder.mount_point())?;
-    let proxy = proxy::Proxy::start(folder, &info, &app.id)?;
+    let proxy = proxy::Proxy::start(folder, &info, &app.id, &grants.bus)?;
     let display = wayland::SecurityContext::create(&folder.wayland_socket(), &app.id)?;
     let decoys = devices::Decoys::plant(&folder.decoys(), grants)?;
     let filter = seccomp::filter()?;
+    let relay = folder.relay();
     let profile = Profile {
         app,
         grants,
         folder,
         info: &info,
         mount: mounted.path(),
-        proxy: proxy.socket(),
+        bus: &relay,
         wayland: display.as_ref().map(|_| folder.wayland_socket()),
         decoys: &decoys,
     };
+    let bus = Bus::start(relay.clone(), proxy.socket(), profile.layout()?)?;
     let instance = folder.instance()?;
     std::fs::create_dir_all(&instance).map_err(|error| error.to_string())?;
     let info_file = std::fs::File::create(instance.join("bwrapinfo.json"))
@@ -107,6 +113,9 @@ fn sandbox(
     let started = Instant::now();
     let mut child = command.spawn().map_err(|error| error.to_string())?;
     folder.wait_for_server_or(&mut child);
+    if let Some(pid) = sandbox_pid(&instance) {
+        bus.sandbox_started(pid);
+    }
     decoys.opened();
     let Ok(server) = folder.connect() else {
         let _ = child.kill();
@@ -128,10 +137,26 @@ fn sandbox(
         }
     };
     drop(display);
+    drop(bus);
     drop(proxy);
     drop(mounted);
     let _ = std::fs::remove_dir_all(&instance);
     let quick_failure = !status.success() && started.elapsed() < QUICK_EXIT;
     let code = status.code().unwrap_or(1);
     Ok((code, quick_failure.then_some(Reason::Closed)))
+}
+
+/// The sandbox's first process, from what bubblewrap wrote about it.
+fn sandbox_pid(instance: &std::path::Path) -> Option<u32> {
+    child_pid(&std::fs::read_to_string(instance.join("bwrapinfo.json")).ok()?)
+}
+
+/// The first process of a sandbox, as bubblewrap's `--info-fd` names it.
+pub fn child_pid(info: &str) -> Option<u32> {
+    let (_, rest) = info.split_once("\"child-pid\"")?;
+    rest.trim_start_matches([':', ' ', '\t', '\n'])
+        .split(|character: char| !character.is_ascii_digit())
+        .next()?
+        .parse()
+        .ok()
 }

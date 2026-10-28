@@ -80,15 +80,18 @@ RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
 FROM scratch AS bootc
 COPY --from=bootc-build /out/ /
 
-FROM builder AS libsecret-build
-ARG LIBSECRET
-COPY os/image/patches/libsecret /src/os/image/patches/libsecret
-COPY os/image/parts/stages/rebuild.sh /src/os/image/parts/stages/rebuild.sh
-RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
-    /src/os/image/parts/stages/rebuild.sh libsecret "${LIBSECRET}" /out/rpms
+FROM builder AS zypak-build
+ARG ZYPAK=v2025.09
+RUN git clone --quiet --depth 1 --recurse-submodules --shallow-submodules --branch "${ZYPAK}" \
+      https://github.com/refi64/zypak /var/tmp/zypak && \
+    make -C /var/tmp/zypak -j"$(nproc)" && \
+    install -d /stage/usr/lib/zypak && \
+    install -m 755 /var/tmp/zypak/build/zypak-helper /var/tmp/zypak/build/zypak-sandbox /stage/usr/lib/zypak/ && \
+    install -m 644 /var/tmp/zypak/build/libzypak-preload-*.so /stage/usr/lib/zypak/ && \
+    rm -rf /var/tmp/zypak
 
-FROM scratch AS libsecret
-COPY --from=libsecret-build /out/ /
+FROM scratch AS zypak
+COPY --from=zypak-build /stage /stage
 
 FROM builder AS portal-build
 ARG PORTAL

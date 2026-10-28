@@ -1,6 +1,8 @@
 use std::path::PathBuf;
 
-use luft_identity::permissions::{self, DEVICES, FOLDERS, FULL_ACCESS};
+use luft_identity::permissions::{
+    self, BUS, DEVICES, FOLDERS, FULL_ACCESS, NETWORK, NO, READ_ONLY_FOLDERS,
+};
 use luft_software::apps::appimage;
 use zbus::Connection;
 
@@ -54,27 +56,40 @@ impl Device {
 pub struct Grants {
     pub full_access: bool,
     pub folders: Vec<PathBuf>,
+    pub read_only_folders: Vec<PathBuf>,
     pub devices: Vec<Device>,
+    pub network: bool,
+    pub bus: Vec<String>,
+}
+
+fn existing_folders(paths: Vec<String>) -> Vec<PathBuf> {
+    paths
+        .into_iter()
+        .map(PathBuf::from)
+        .filter(|folder| folder.is_absolute() && folder.is_dir())
+        .collect()
 }
 
 impl Grants {
     pub async fn of(connection: &Connection, id: &str) -> Self {
-        let (full_access, folders, devices) = tokio::join!(
+        let (full_access, folders, read_only_folders, devices, network, bus) = tokio::join!(
             permissions::allowed(connection, &FULL_ACCESS, id),
             permissions::values(connection, &FOLDERS, id),
+            permissions::values(connection, &READ_ONLY_FOLDERS, id),
             permissions::values(connection, &DEVICES, id),
+            permissions::values(connection, &NETWORK, id),
+            permissions::values(connection, &BUS, id),
         );
         Self {
             full_access,
-            folders: folders
-                .into_iter()
-                .map(PathBuf::from)
-                .filter(|folder| folder.is_absolute() && folder.is_dir())
-                .collect(),
+            folders: existing_folders(folders),
+            read_only_folders: existing_folders(read_only_folders),
             devices: devices
                 .iter()
                 .filter_map(|name| Device::parse(name))
                 .collect(),
+            network: network.first().map(String::as_str) != Some(NO),
+            bus,
         }
     }
 

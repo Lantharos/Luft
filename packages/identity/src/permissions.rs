@@ -37,10 +37,29 @@ pub const FOLDERS: Permission = Permission {
     id: "folders",
 };
 
+/// Folders an AppImage's sandbox opens read-only, one path per folder.
+pub const READ_ONLY_FOLDERS: Permission = Permission {
+    table: "sandbox",
+    id: "read-only-folders",
+};
+
 /// Devices an AppImage's sandbox opens: `usb`, `serial` or `all`.
 pub const DEVICES: Permission = Permission {
     table: "sandbox",
     id: "devices",
+};
+
+/// AppImages whose sandbox stays offline, with `no`.
+pub const NETWORK: Permission = Permission {
+    table: "sandbox",
+    id: "network",
+};
+
+/// Session bus names an AppImage's sandbox may call besides those every
+/// sandbox may.
+pub const BUS: Permission = Permission {
+    table: "sandbox",
+    id: "bus",
 };
 
 /// Sandboxed apps' choices about items in Luft Keyring, one entry per item.

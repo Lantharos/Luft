@@ -101,6 +101,11 @@ impl Folder {
         self.path.join("bus")
     }
 
+    /// Where the app's relay to its bus proxy listens.
+    pub fn relay(&self) -> PathBuf {
+        self.proxy().join("app")
+    }
+
     pub fn wayland_socket(&self) -> PathBuf {
         self.path.join("wayland")
     }
@@ -135,16 +140,22 @@ impl Folder {
             .join(std::process::id().to_string()))
     }
 
-    pub fn write_sandbox_info(&self, id: &str) -> Result<PathBuf, String> {
+    /// Writes the sandbox's `.flatpak-info`, which names the app and, as
+    /// Flatpak's does, the session bus names its proxy lets it reach.
+    pub fn write_sandbox_info<'a>(
+        &self,
+        id: &str,
+        talk: impl IntoIterator<Item = &'a str>,
+    ) -> Result<PathBuf, String> {
         let path = self.path.join("flatpak-info");
         let instance = std::process::id();
-        fs::write(
-            &path,
-            format!(
-                "[Application]\nname={id}\n\n[Instance]\ninstance-id={instance}\nsession-bus-proxy=true\n"
-            ),
-        )
-        .map_err(|error| error.to_string())?;
+        let mut info = format!(
+            "[Application]\nname={id}\n\n[Instance]\ninstance-id={instance}\nsession-bus-proxy=true\n\n[Session Bus Policy]\n{id}=own\n{id}.*=own\n"
+        );
+        for name in talk {
+            info.push_str(&format!("{name}=talk\n"));
+        }
+        fs::write(&path, info).map_err(|error| error.to_string())?;
         Ok(path)
     }
 

@@ -37,7 +37,7 @@ ships inside the startup image, so it moves out of the systems into
 localhost/luft-kernel:45, where os/image/seal.sh takes it from.
 
 The image is put together from parts: Kestrel, the boot services, the patched
-bootc, libsecret and xdg-desktop-portal, the web runtime, Helium, the system
+bootc and xdg-desktop-portal, the web runtime, Helium, Zypak, the system
 services, each app and NVIDIA's driver. Each part is an image named after a hash of everything it's built from,
 the Fedora image's digest and the CEF build included, in LUFT_PARTS (default localhost/luft-parts),
 so a build only makes the parts that changed. LUFT_REBUILD=1 makes every part again. Compilers keep their caches in
@@ -108,9 +108,9 @@ is_signed() {
 
 part_names() {
   local app
-  printf '%s\n' kestrel boot bootc libsecret portal
+  printf '%s\n' kestrel boot bootc portal
   [[ "$1" != luft-nvidia ]] || echo nvidia
-  printf '%s\n' runtime helium services
+  printf '%s\n' runtime helium zypak services
   for app in "$luft"/apps/*/; do
     app="$(basename "$app")"
     [[ "$app" == meet ]] || echo "app-$app"
@@ -140,7 +140,6 @@ part_target() {
     app-keys) echo "app APP=keys APP_SOURCES=keys-sources" ;;
     app-*) echo "app APP=${1#app-}" ;;
     bootc) echo "bootc BOOTC=$(bootc_version)" ;;
-    libsecret) echo "libsecret LIBSECRET=$(base_version libsecret)" ;;
     portal) echo "portal PORTAL=$(repo_version xdg-desktop-portal)" ;;
     runtime) echo "runtime CEF=$cef" ;;
     boot | nvidia) echo "$1 SIGNED_BY=$(signed_by)" ;;

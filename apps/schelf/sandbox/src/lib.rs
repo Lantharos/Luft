@@ -5,6 +5,7 @@ mod escalate;
 mod files;
 mod inside;
 mod launch;
+mod portal;
 mod request;
 mod scope;
 

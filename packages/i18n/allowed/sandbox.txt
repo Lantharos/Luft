@@ -8,3 +8,10 @@ apps/schelf/sandbox/src/launch/proxy.rs	The session bus isn't at a path this san
 apps/schelf/sandbox/src/launch/proxy.rs	The app's view of the session bus couldn't be set up.
 apps/schelf/sandbox/src/files.rs	The document portal isn't running.
 apps/schelf/sandbox/src/launch/mod.rs	The sandbox couldn't be set up.
+apps/schelf/sandbox/src/portal/mod.rs	The sandbox is still starting.
+apps/schelf/sandbox/src/portal/mod.rs	No such process
+apps/schelf/sandbox/src/portal/spawn.rs	Unsupported flags enabled: {:#x}
+apps/schelf/sandbox/src/portal/spawn.rs	Unsupported sandbox flags enabled: {:#x}
+apps/schelf/sandbox/src/portal/spawn.rs	No command given
+apps/schelf/sandbox/src/portal/spawn.rs	Invalid environment variable name
+apps/schelf/sandbox/src/portal/spawn.rs	The app's sandbox has ended.

@@ -1,5 +1,5 @@
 use std::io::{Seek, Write};
-use std::os::fd::{FromRawFd, OwnedFd};
+use std::os::fd::{AsRawFd, FromRawFd, OwnedFd, RawFd};
 use std::process::Command;
 
 use super::fds;
@@ -135,6 +135,12 @@ pub fn filter() -> Result<Filter, String> {
     file.write_all(&bytes).map_err(|error| error.to_string())?;
     file.rewind().map_err(|error| error.to_string())?;
     Ok(Filter { file: file.into() })
+}
+
+impl AsRawFd for Filter {
+    fn as_raw_fd(&self) -> RawFd {
+        self.file.as_raw_fd()
+    }
 }
 
 impl Filter {

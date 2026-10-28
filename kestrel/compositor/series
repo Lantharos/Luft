@@ -51,3 +51,4 @@
 0051-compositor-only-cull-with-the-part-of-an-actor-insid.patch
 0052-compositor-shadow-and-outline-Wayland-windows-that-d.patch
 0053-compositor-let-people-turn-rounded-window-corners-of.patch
+0054-wayland-listen-on-an-inherited-socket.patch

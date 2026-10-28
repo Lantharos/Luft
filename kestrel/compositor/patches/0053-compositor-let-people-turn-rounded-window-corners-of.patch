@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Sun, 25 Oct 2026 01:48:12 +0000
-Subject: [PATCH 53/53] compositor: let people turn rounded window corners off
+Subject: [PATCH 53/54] compositor: let people turn rounded window corners off
 
 Follow com.lantharos.kestrel rounded-window-corners. With it off, window
 corners keep a radius of 0, so surfaces, background blur, input regions

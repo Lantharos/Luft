@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Mon, 19 Oct 2026 03:09:02 +0200
-Subject: [PATCH 45/53] keybindings: let shell shortcuts take over keys and
+Subject: [PATCH 45/54] keybindings: let shell shortcuts take over keys and
  finish on release
 
 A shortcut that responds to its release only noticed it while its

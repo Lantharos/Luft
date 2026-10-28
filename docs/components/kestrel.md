@@ -77,6 +77,17 @@ Chromium-based browsers and Electron apps lock their profile with the host name,
 
 greetd reads `/run/greetd/config.toml`, which `kestrel-greeter-service --write-greetd-config` writes before each start from the image's defaults in `/usr/lib/kestrel-greeter/greetd.toml` and the account that signs in by itself, kept in `/var/lib/kestrel-greeter/initial-session.toml`. Nothing in `/etc` holds it, so updates to the defaults always arrive; to change greetd's configuration on one computer, point `greetd.service` at your own file with a drop-in. The `greetd` and `kestrel-unlock` PAM rules are in `/usr/lib/pam.d` for the same reason, and a file of the same name in `/etc/pam.d` takes their place.
 
-If Kestrel crashes, systemd starts it again within a moment, and it comes back on the lock screen when the screen was locked. Apps lose their connection to the display and close, while the session's services keep running. After three crashes within a minute the session ends and the login screen returns.
-
 `kestrel-session --setup` runs Install Luft alone over the blurred wallpaper first ([Install](../install.md)). The session identifies as `Kestrel;GNOME`, so apps that only recognize GNOME keep their keyring, theme and autostart behavior.
+
+## Crash recovery
+
+`kestrel-wrapper` starts Kestrel and starts it again within a moment when it crashes. It creates the session's Wayland socket and keeps it open, and hands it to each Kestrel it starts in `WAYLAND_SOCKET_NAME` and `WAYLAND_SOCKET_FD`, so the display stays where apps connect while Kestrel is away. After three crashes within a minute it stops, the session ends and the login screen returns. Kestrel comes back on the lock screen when the screen was locked, and the session's services keep running throughout.
+
+| Apps | After Kestrel crashes |
+| --- | --- |
+| Sabine apps, which every Luft app is | Reconnect, with their pages as they were |
+| Qt 6 apps | Reconnect, since the session sets `QT_WAYLAND_RECONNECT=1` |
+| GTK 3 and GTK 4 apps, Firefox, Chromium and Electron apps | Close; they can't reconnect to a display |
+| X11 apps | Close with Xwayland, which starts again for the next one |
+
+Kestrel notes where every window is in `$XDG_RUNTIME_DIR/kestrel/DISPLAY/windows.json`. Windows of apps that reconnect within a minute of the restart come back on their workspace with their position, size, maximized, fullscreen, minimized and always-on-top state, in their stacking order, and the one that had focus gets it back. With window tiling on, tiled windows are laid out again with the others in their space.

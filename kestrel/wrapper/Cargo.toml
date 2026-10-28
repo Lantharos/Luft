@@ -1,0 +1,15 @@
+[package]
+name = "kestrel-wrapper"
+version = "0.1.0"
+description = "Holds Kestrel's Wayland socket and starts Kestrel again after a crash, so apps that reconnect keep their windows"
+authors = ["Kristof"]
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+rustix = { workspace = true, features = ["process"] }
+tokio = { workspace = true, features = ["macros", "process", "rt", "signal"] }
+
+[lints]
+workspace = true

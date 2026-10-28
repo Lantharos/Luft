@@ -1,0 +1,137 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Wed, 28 Oct 2026 04:57:27 +0100
+Subject: [PATCH] wayland: Listen on an inherited socket
+
+When WAYLAND_SOCKET_FD names a listening Wayland socket that the parent
+process created and keeps open, use it instead of creating one, with
+WAYLAND_SOCKET_NAME as the display name. When the compositor crashes, the
+parent can start it again while clients still find the socket where they
+connect, and toolkits that reconnect, such as Qt with
+QT_WAYLAND_RECONNECT, carry their windows over to the new instance.
+
+wl-restart passes the socket this way with --env, and kwin_wayland_wrapper
+does the same for KWin on the command line. Both variables are unset, so
+processes the compositor starts don't inherit them.
+---
+ src/core/meta-context-main.c | 31 +++++++++++++++++++++++++++++++
+ src/wayland/meta-wayland.c   | 22 +++++++++++++++++++++-
+ src/wayland/meta-wayland.h   |  2 ++
+ 3 files changed, 54 insertions(+), 1 deletion(-)
+
+diff --git a/src/core/meta-context-main.c b/src/core/meta-context-main.c
+index e40394b..440f405 100644
+--- a/src/core/meta-context-main.c
++++ b/src/core/meta-context-main.c
+@@ -88,6 +88,34 @@ check_configuration (MetaContextMain  *context_main,
+   return TRUE;
+ }
+ 
++static gboolean
++take_inherited_wayland_socket (GError **error)
++{
++  const char *name = g_getenv ("WAYLAND_SOCKET_NAME");
++  const char *fd_string = g_getenv ("WAYLAND_SOCKET_FD");
++  int64_t fd;
++
++  if (!name && !fd_string)
++    return TRUE;
++
++  if (!name || !fd_string)
++    {
++      g_set_error (error, G_IO_ERROR, G_IO_ERROR_INVALID_ARGUMENT,
++                   "An inherited Wayland socket needs both WAYLAND_SOCKET_NAME and WAYLAND_SOCKET_FD");
++      return FALSE;
++    }
++
++  if (!g_ascii_string_to_signed (fd_string, 10, 0, G_MAXINT, &fd, error))
++    return FALSE;
++
++  meta_wayland_override_display_name (name);
++  meta_wayland_override_display_fd ((int) fd);
++  g_unsetenv ("WAYLAND_SOCKET_NAME");
++  g_unsetenv ("WAYLAND_SOCKET_FD");
++
++  return TRUE;
++}
++
+ static gboolean
+ meta_context_main_configure (MetaContext   *context,
+                              int           *argc,
+@@ -107,6 +135,9 @@ meta_context_main_configure (MetaContext   *context,
+   if (!check_configuration (context_main, error))
+     return FALSE;
+ 
++  if (!take_inherited_wayland_socket (error))
++    return FALSE;
++
+   if (wayland_display)
+     meta_wayland_override_display_name (wayland_display);
+ 
+diff --git a/src/wayland/meta-wayland.c b/src/wayland/meta-wayland.c
+index e5b82c0..2f08c11 100644
+--- a/src/wayland/meta-wayland.c
++++ b/src/wayland/meta-wayland.c
+@@ -23,6 +23,7 @@
+ 
+ #include <glib/gstdio.h>
+ 
++#include <fcntl.h>
+ #include <sys/time.h>
+ #include <string.h>
+ #include <stdlib.h>
+@@ -91,6 +92,7 @@ enum
+ static guint signals[N_SIGNALS];
+ 
+ static char *_display_name_override;
++static int _display_fd_override = -1;
+ 
+ typedef struct _MetaWaylandCompositorPrivate
+ {
+@@ -889,6 +891,12 @@ meta_wayland_override_display_name (const char *display_name)
+   g_set_str (&_display_name_override, display_name);
+ }
+ 
++void
++meta_wayland_override_display_fd (int fd)
++{
++  _display_fd_override = fd;
++}
++
+ static void
+ meta_wayland_init_egl (MetaWaylandCompositor *compositor)
+ {
+@@ -1055,7 +1063,19 @@ meta_wayland_compositor_new (MetaContext *context)
+     }
+ #endif
+ 
+-  if (_display_name_override)
++  if (_display_fd_override >= 0)
++    {
++      g_assert (_display_name_override);
++      compositor->display_name = g_steal_pointer (&_display_name_override);
++
++      if (fcntl (_display_fd_override, F_SETFD, FD_CLOEXEC) < 0 ||
++          wl_display_add_socket_fd (compositor->wayland_display,
++                                    _display_fd_override) != 0)
++        g_error ("Failed to listen on the inherited Wayland socket");
++
++      _display_fd_override = -1;
++    }
++  else if (_display_name_override)
+     {
+       compositor->display_name = g_steal_pointer (&_display_name_override);
+ 
+diff --git a/src/wayland/meta-wayland.h b/src/wayland/meta-wayland.h
+index a6c3970..8667a78 100644
+--- a/src/wayland/meta-wayland.h
++++ b/src/wayland/meta-wayland.h
+@@ -31,6 +31,8 @@
+ META_EXPORT_TEST
+ void                    meta_wayland_override_display_name (const char *display_name);
+ 
++void                    meta_wayland_override_display_fd (int fd);
++
+ MetaWaylandCompositor * meta_wayland_compositor_new             (MetaContext *context);
+ 
+ void                    meta_wayland_compositor_update          (MetaWaylandCompositor *compositor,

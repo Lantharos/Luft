@@ -9,20 +9,18 @@ Requires=kestrel-session-manager.service
 After=kestrel-session-manager.service
 Wants=xdg-desktop-autostart.target
 Before=xdg-desktop-autostart.target
-StartLimitIntervalSec=60
-StartLimitBurst=3
 
 AssertEnvironment=XDG_SESSION_TYPE=wayland
 
 [Service]
 Slice=session.slice
 Type=notify
-ExecStart=@bindir@/kestrel
+NotifyAccess=all
+ExecStart=@libexecdir@/kestrel-wrapper @bindir@/kestrel
 Environment=GSETTINGS_SCHEMA_DIR=@schemadir@
 # unset some environment variables that were set by the shell and won't work now that the shell is gone
 ExecStopPost=-systemctl --user unset-environment GNOME_SETUP_DISPLAY WAYLAND_DISPLAY DISPLAY XAUTHORITY
 
-Restart=on-failure
 # Kill any stubborn child processes after this long
 TimeoutStopSec=5
 

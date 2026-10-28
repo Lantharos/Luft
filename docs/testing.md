@@ -29,6 +29,8 @@ The checks, the stand-in services and the test clients are TypeScript in `kestre
 
 The board groups, `input:dictation`, `input:scrolling`, `panel:battery`, `panel:repaints`, `panel:screenshot`, `tablet:keyboard`, `tablet:longPress`, `windows:serverDecorations` and `windows:x11Frames` also run on two laptop panels at their automatic display scale: a 14-inch 1920×1200 panel at 150%, as the groups ending in `+laptop`, and a 15.6-inch 1080p panel at 125%, as the groups ending in `+laptop15`. Their screenshots go to a `laptop` or `laptop15` folder inside the capture folder.
 
+Headless sessions run Kestrel through `kestrel-wrapper`, as the real session does, so a Kestrel that crashes starts again. `system:reconnect` relies on it: it opens Rover and Settings, moves Rover to the second workspace, maximizes Settings and locks the screen, then crashes Kestrel. In the Kestrel that takes over, it checks that the screen is still locked, that both apps reconnect without reloading their pages and that their windows come back where they were. Pointing `KESTREL_QT_APP` at a Qt 6 program adds its window to the check.
+
 `tiling:monitors` always runs with a second 1280×720 display to the right of the first, which the other groups only get from `KESTREL_CAPTURE_SECONDARY_SIZE`.
 
 The `tablet` groups fold the session into a tablet with a virtual tablet mode switch and touchscreen, swipe and tap with a finger, and turn the display through Mutter's display configuration. Their clips of each transition go to `clips` in the capture folder, like those of `motion`.

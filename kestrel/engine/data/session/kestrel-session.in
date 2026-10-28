@@ -15,6 +15,7 @@ case ":$XDG_DATA_DIRS:" in
 esac
 export XDG_DATA_DIRS
 export IBUS_DAEMON_ARGS="--panel disable"
+export QT_WAYLAND_RECONNECT=1 QT_QPA_PLATFORMTHEME=gnome
 
 DCONF_PROFILE="${XDG_RUNTIME_DIR:-/tmp}/kestrel/dconf-profile"
 mkdir -p "${DCONF_PROFILE%/*}"

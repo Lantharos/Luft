@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Sat, 17 Oct 2026 15:19:14 +0200
-Subject: [PATCH 30/53] core: keep late windows from taking focus after newer
+Subject: [PATCH 30/54] core: keep late windows from taking focus after newer
  input
 
 A window that maps after the user moved on to another window opens behind

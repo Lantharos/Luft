@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Sat, 24 Oct 2026 10:40:11 +0000
-Subject: [PATCH 52/53] compositor: shadow and outline Wayland windows that
+Subject: [PATCH 52/54] compositor: shadow and outline Wayland windows that
  draw neither
 
 Wayland clients that don't draw a shadow of their own, like Luft's apps

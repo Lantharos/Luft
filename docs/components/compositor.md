@@ -28,6 +28,7 @@ Kestrel runs on its own build of Mutter 51 ([kestrel/compositor](../../kestrel/c
 - Virtual input devices that flip the tablet mode switch, for driving tablet mode in checks
 - The audible bell from X11 and Wayland apps handed to the shell, which plays it with the rest of its [sounds](kestrel.md#sounds)
 - Modifiers the shell can treat as used up while a shortcut made of them is held, such as the one held to dictate, so apps scroll, click and type as if they weren't held, and shortcuts that react to being let go that still notice it when a modifier comes up first
+- A Wayland socket the process that starts Kestrel made and keeps, passed in `WAYLAND_SOCKET_NAME` and `WAYLAND_SOCKET_FD`, so apps can reconnect after a crash, see [Crash recovery](kestrel.md#crash-recovery)
 - Smaller fixes, each described in its patch
 
 ## App permissions

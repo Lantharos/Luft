@@ -14,7 +14,7 @@
 	"sushi/data/systemd/sushi-switch-root.service": 2.8,
 	"sushi/data/systemd/sushi.service": 7.4,
 	"kestrel/engine/data/kestrel-setup.service.in": 9.2,
-	"kestrel/engine/data/kestrel.service.in": 9.2,
+	"kestrel/engine/data/kestrel.service.in": 9.4,
 	"kestrel/engine/data/session/kestrel-portal.service.in": 5.7,
 	"kestrel/engine/data/session/kestrel-search.service.in": 5.7,
 	"kestrel/engine/data/session/kestrel-session-manager.service.in": 5.6,

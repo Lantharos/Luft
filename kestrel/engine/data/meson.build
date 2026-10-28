@@ -86,6 +86,7 @@ install_data('00_com.lantharos.kestrel.gschema.override', install_dir: schemadir
 
 unitconf = configuration_data()
 unitconf.set('bindir', bindir)
+unitconf.set('libexecdir', libexecdir)
 unitconf.set('schemadir', schemadir)
 foreach unit : ['kestrel.service', 'kestrel-setup.service']
   configure_file(

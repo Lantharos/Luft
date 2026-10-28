@@ -55,6 +55,19 @@ function command(name: string) {
 
 export const appBinary = (name: string) => command(name).path;
 
+/** Starts an app with its output in a file instead of a pipe to Kestrel, so it keeps running when Kestrel stops. */
+export function launchDetached(name: string, log: string): number {
+  const {path, manifest} = command(name);
+  const launcher = new Gio.SubprocessLauncher({flags: Gio.SubprocessFlags.STDOUT_SILENCE});
+  for (const [variable, value] of Object.entries(environment(manifest))) {
+    if (value === null) launcher.unsetenv(variable);
+    else launcher.setenv(variable, value, true);
+  }
+  launcher.set_stderr_file_path(log);
+  launcher.set_cwd(home!);
+  return Number(launcher.spawnv([path]).get_identifier());
+}
+
 function inScope(slice: string, id: string, argv: string[]) {
   const unit = `app-${id}-${GLib.random_int()}.scope`;
   const app = ['env', `XDG_RUNTIME_DIR=${GLib.getenv('KESTREL_APP_RUNTIME_DIR')}`, ...argv];

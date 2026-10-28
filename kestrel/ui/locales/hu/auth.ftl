@@ -78,6 +78,16 @@ auth-prompt-submit = Küldés
 auth-prompt-wrong-password = Ez a jelszó nem működött
 auth-prompt-failed = Ez nem sikerült. Próbálja újra.
 fingerprint-not-recognized = Nem felismert ujjlenyomat
+fingerprint-scanning = Érintse meg az ujjlenyomat-olvasót
+fingerprint-retry-scan = Olvastassa be újra az ujját
+fingerprint-swipe-too-short = Túl rövid volt a húzás, próbálja újra
+fingerprint-finger-not-centered = Helyezze középre az ujját, és próbálja újra
+fingerprint-remove-and-retry = Emelje fel az ujját, és próbálja újra
+fingerprint-unavailable = Az ujjlenyomat nem érhető el, adja meg a jelszavát
+auth-prompt-use-password = Jelszó használata
+auth-prompt-try-fingerprint = Ujjlenyomat újrapróbálása
+auth-prompt-use-fingerprint = Ujjlenyomat használata
+auth-prompt-show-password = Jelszó megjelenítése
 
 ## Administrator authentication
 
@@ -134,8 +144,6 @@ end-session-console-user = { $userName } (konzol)
 
 ## Lock screen clock
 
-lock-clock-swipe-up = Csúsztasson felfelé
-lock-clock-click-or-press = Kattintson, vagy nyomjon le egy billentyűt
 
 ## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
 

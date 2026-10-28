@@ -14,6 +14,7 @@
 
 #define PASSWORD_SERVICE "kestrel-unlock"
 #define FINGERPRINT_SERVICE "kestrel-unlock-fingerprint"
+#define SIGN_IN_FINGERPRINT_SERVICE "fingerprint-auth"
 
 typedef struct
 {
@@ -90,6 +91,39 @@ converse (int                        count,
 
   *result = responses;
   return PAM_SUCCESS;
+}
+
+static int
+tell_listening (int                        count,
+                const struct pam_message **messages,
+                struct pam_response      **result,
+                void                      *data)
+{
+  for (int i = 0; i < count; i++)
+    {
+      if (is_prompt (messages[i]->msg_style))
+        return PAM_CONV_ERR;
+      if (messages[i]->msg_style == PAM_TEXT_INFO && write (STDOUT_FILENO, "l", 1) != 1)
+        return PAM_CONV_ERR;
+    }
+
+  *result = calloc (count, sizeof **result);
+  return *result ? PAM_SUCCESS : PAM_BUF_ERR;
+}
+
+static int
+verify_fingerprint (const char *user)
+{
+  const struct pam_conv conv = { tell_listening, NULL };
+  pam_handle_t *handle;
+  int status;
+
+  if (getuid () != 0 || pam_start (SIGN_IN_FINGERPRINT_SERVICE, user, &conv, &handle) != PAM_SUCCESS)
+    return 1;
+
+  status = pam_authenticate (handle, 0);
+  pam_end (handle, status);
+  return status == PAM_SUCCESS ? 0 : 1;
 }
 
 static gboolean
@@ -171,11 +205,14 @@ exit_when_peer_leaves (gpointer data)
 }
 
 int
-main (void)
+main (int    argc,
+      char **argv)
 {
   g_autofree char *user = NULL;
 
   prctl (PR_SET_DUMPABLE, 0);
+  if (argc == 3 && strcmp (argv[1], "--fingerprint") == 0)
+    return verify_fingerprint (argv[2]);
   user = peer_account ();
   if (!user)
     return 1;

@@ -78,6 +78,16 @@ auth-prompt-submit = Pošlji
 auth-prompt-wrong-password = Geslo ni delovalo
 auth-prompt-failed = To ni uspelo. Poskusite znova.
 fingerprint-not-recognized = Prstni odtis ni prepoznan
+fingerprint-scanning = Dotaknite se bralnika prstnih odtisov
+fingerprint-retry-scan = Znova optično preberite prst
+fingerprint-swipe-too-short = Poteg je bil prekratek, poskusite znova
+fingerprint-finger-not-centered = Postavite prst na sredino in poskusite znova
+fingerprint-remove-and-retry = Dvignite prst in poskusite znova
+fingerprint-unavailable = Prstni odtis ni na voljo, vnesite geslo
+auth-prompt-use-password = Uporabi geslo
+auth-prompt-try-fingerprint = Znova poskusi s prstnim odtisom
+auth-prompt-use-fingerprint = Uporabi prstni odtis
+auth-prompt-show-password = Pokaži geslo
 
 ## Administrator authentication
 
@@ -144,8 +154,6 @@ end-session-console-user = { $userName } (konzola)
 
 ## Lock screen clock
 
-lock-clock-swipe-up = Povlecite navzgor
-lock-clock-click-or-press = Kliknite ali pritisnite tipko
 
 ## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
 

@@ -30,11 +30,13 @@ start() {
 }
 
 rm -rf "$run"
-mkdir -p "$run"/{images,state/users/2001,state/users/2002,data/wayland-sessions,config,cache,state-home}
+mkdir -p "$run"/{images,state/users/2001,state/users/2002,state/users/2003,data/wayland-sessions,config,cache,state-home}
 : > "$events"
 gjs -m "$fixtures/images.js" "$run/images"
 cp "$run/images/mara-wallpaper.png" "$run/state/users/2001/wallpaper.jpg"
 cp "$run/images/theo-wallpaper.png" "$run/state/users/2002/wallpaper.jpg"
+cp "$run/images/ines-wallpaper.png" "$run/state/users/2003/wallpaper.jpg"
+printf light > "$run/state/users/2003/style"
 printf '[Desktop Entry]\nName=Kestrel\nExec=kestrel-session\nDesktopNames=Kestrel;GNOME\n' > "$run/data/wayland-sessions/kestrel.desktop"
 printf '[Desktop Entry]\nName=Sway\nExec=sway\n' > "$run/data/wayland-sessions/sway.desktop"
 

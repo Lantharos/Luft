@@ -12,6 +12,7 @@ const BOOT_LOADER_MENU_TIMEOUT_USEC = 60000000;
 type SessionEntry = [id: string, uid: number, userName: string, seat: string, sessionPath: string];
 
 interface ManagerMethods {
+  readonly LidClosed: boolean;
   GetSessionAsync(sessionId: string): Promise<[string]>;
   CanRebootToBootLoaderMenuAsync(): Promise<[string]>;
   SetRebootToBootLoaderMenuAsync(timeout: number): Promise<[]>;
@@ -39,6 +40,7 @@ const SystemdLoginSession = Gio.DBusProxy.makeProxyWrapper(loadInterfaceXML('org
 
 interface LoginManagerSignals {
   'prepare-for-sleep': (aboutToSuspend: boolean) => void;
+  'lid-changed': (closed: boolean) => void;
 }
 
 let loginManager: LoginManager | null = null;
@@ -62,6 +64,13 @@ class LoginManager extends EventEmitter {
       this.preparing = aboutToSuspend;
       this.emit('prepare-for-sleep', aboutToSuspend);
     });
+    this.proxy.connect('g-properties-changed', (_proxy, changed: GLib.Variant) => {
+      if (changed.lookup_value('LidClosed', null)) this.emit('lid-changed', this.lidClosed);
+    });
+  }
+
+  get lidClosed(): boolean {
+    return this.proxy.LidClosed ?? false;
   }
 
   get preparingForSleep(): boolean {

@@ -78,6 +78,16 @@ auth-prompt-submit = Надіслати
 auth-prompt-wrong-password = Неправильний пароль
 auth-prompt-failed = Не вдалося. Спробуйте ще раз.
 fingerprint-not-recognized = Відбиток пальця не розпізнано
+fingerprint-scanning = Торкніться сканера відбитків
+fingerprint-retry-scan = Проскануйте палець ще раз
+fingerprint-swipe-too-short = Надто короткий рух, спробуйте ще раз
+fingerprint-finger-not-centered = Покладіть палець по центру й спробуйте ще раз
+fingerprint-remove-and-retry = Підніміть палець і спробуйте ще раз
+fingerprint-unavailable = Відбиток недоступний, введіть пароль
+auth-prompt-use-password = Використати пароль
+auth-prompt-try-fingerprint = Спробувати відбиток ще раз
+auth-prompt-use-fingerprint = Використати відбиток
+auth-prompt-show-password = Показати пароль
 
 ## Administrator authentication
 
@@ -144,8 +154,6 @@ end-session-console-user = { $userName } (консоль)
 
 ## Lock screen clock
 
-lock-clock-swipe-up = Проведіть угору
-lock-clock-click-or-press = Клацніть або натисніть будь-яку клавішу
 
 ## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
 

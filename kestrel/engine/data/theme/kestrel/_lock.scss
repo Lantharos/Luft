@@ -1,58 +1,60 @@
-@include scheme(dark) {
-  .unlock-dialog .login-dialog-prompt-entry { @include entry; padding: 13px 46px 13px 18px; background-color: fill(0.14); }
-  .unlock-dialog .login-dialog-prompt-entry:focus { @include entry-focus; background-color: fill(0.20); }
-  .unlock-dialog-clock { spacing: 4px; margin-top: 0; }
-  .unlock-dialog-clock .unlock-dialog-clock-time { font-size: 112px; font-weight: 600; font-feature-settings: "tnum"; }
-  .unlock-dialog-clock .unlock-dialog-clock-date { font-size: 20px; font-weight: 500; color: ink(0.85); }
-  .unlock-dialog-clock .unlock-dialog-clock-hint { margin-top: 48px; padding: 0; font-size: 13px; font-weight: 500; color: ink(0.60); background-color: transparent; }
-  .unlock-dialog .user-widget.vertical { spacing: 16px; }
-  .unlock-dialog .user-widget.vertical .user-icon { icon-size: 96px; }
-  .unlock-dialog .user-widget.vertical .user-widget-label { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
-  .unlock-dialog .login-dialog-default-button-well { margin-right: 6px; }
-  .login-dialog-button.next-button.next-button { width: 32px; height: 32px; padding: 0; border-radius: 999px; transition-duration: $motion-tap; }
-  .login-dialog-button.next-button { background-color: fill(0.16); }
-  .login-dialog-button.next-button:hover { background-color: fill(0.24); }
-  .unlock-dialog .login-dialog-message { margin-top: 4px; font-size: 13px; color: ink(0.78); }
-  .unlock-dialog .login-dialog-message-warning { color: ink(); font-weight: 500; }
-  .kestrel-greeter-users { spacing: 4px; margin: 28px; }
-  .kestrel-greeter-user { padding: 6px 16px 6px 6px; border-radius: 999px; transition-duration: $motion-tap; }
-  .kestrel-greeter-user:hover, .kestrel-greeter-user:focus { background-color: fill(0.10); }
-  .kestrel-greeter-user:checked { background-color: fill(0.16); }
-  .kestrel-greeter-user-content { spacing: 12px; }
-  .kestrel-greeter-user-name { font-size: 14px; font-weight: 500; }
-  .kestrel-greeter-avatar { width: 32px; height: 32px; border-radius: 999px; background-size: cover; background-color: fill(0.12); }
-  .kestrel-login-controls { spacing: 2px; margin: 28px; }
-  .kestrel-login-control { color: ink(0.86); }
-  .kestrel-login-control .kestrel-battery { @include battery-tints; }
-  .kestrel-login-label { font-size: 13px; font-weight: 500; }
-  .unlock-dialog .button, .unlock-dialog .icon-button {
-    background-color: fill(0.10); border-radius: 10px; border-color: transparent; box-shadow: none;
-  }
-  .unlock-dialog .button:hover, .unlock-dialog .button:focus,
-  .unlock-dialog .icon-button:hover, .unlock-dialog .icon-button:focus { background-color: fill(0.20); }
-  .unlock-dialog-notifications-container .unlock-dialog-notification-source.kestrel-glass { background-color: glass(); border-radius: 20px; padding: 12px; }
-  .unlock-dialog-notifications-container { margin: 24px 24px 40px; spacing: 8px; }
-  .unlock-dialog-notification-source StBoxLayout { spacing: 8px; }
-  .unlock-dialog-notification-source .unlock-dialog-notification-label { font-size: 13px; font-weight: 500; color: ink(0.72); }
-  .unlock-dialog-notification-preview { spacing: 2px; padding-left: 12px; }
-  .unlock-dialog-notification-preview-title { font-size: 14px; font-weight: 600; }
-  .unlock-dialog-notification-preview-body { font-size: 13px; color: ink(0.75); }
+.kestrel-lock { color: ink(); background-color: transparent; }
+.kestrel-lock-time { font-weight: 600; font-feature-settings: "tnum"; color: ink(); }
+.kestrel-lock-date { font-size: 20px; font-weight: 500; color: ink(0.85); }
+
+.kestrel-auth-who { width: 76px; height: 76px; }
+.kestrel-auth-avatar { icon-size: 76px; border-radius: 999px; background-color: fill(0.12); color: ink(0.9); }
+.kestrel-auth-avatar StIcon { padding: 16px; }
+.kestrel-auth-ring { width: 94px; height: 94px; color: ink(); }
+.kestrel-auth-ring-pulse { width: 94px; height: 94px; color: $danger; }
+.kestrel-auth-name { font-size: 26px; font-weight: 600; margin: 20px 0 16px; }
+
+.kestrel-auth-fingerprint { spacing: 16px; }
+.kestrel-fingerprint-glyph { width: 56px; height: 56px; color: ink(); -kestrel-danger: $danger; }
+.kestrel-auth-hint { font-size: 14px; font-weight: 500; color: ink(0.78); }
+.kestrel-auth-hint.warning { color: ink(); }
+.kestrel-auth-quiet { padding: 4px 0; font-size: 13px; font-weight: 500; color: ink(0.6); background-color: transparent; transition-duration: $motion-tap; }
+.kestrel-auth-quiet:hover, .kestrel-auth-quiet:focus { color: ink(0.92); }
+
+.kestrel-auth-password { spacing: 10px; }
+.kestrel-auth-field { width: 300px; height: 44px; border-radius: 999px; background-color: fill(0.14); transition-duration: $motion-tap; }
+.kestrel-auth-field:focus { background-color: fill(0.20); }
+.kestrel-auth-entry, .kestrel-auth-entry:focus, .kestrel-auth-entry:hover {
+  padding: 0 8px 0 18px; border: none; box-shadow: none; background-color: transparent;
+  font-size: 15px; font-weight: 500; color: ink(); caret-color: ink(); selection-background-color: fill(0.30); selected-color: ink();
 }
+.kestrel-auth-entry StLabel.hint-text { color: ink(0.55); }
+.kestrel-auth-tool { width: 32px; height: 32px; margin-right: 2px; border-radius: 999px; color: ink(0.8); background-color: transparent; transition-duration: $motion-tap; }
+.kestrel-auth-tool:hover, .kestrel-auth-tool:focus { background-color: fill(0.12); }
+.kestrel-auth-tool StIcon { icon-size: 16px; }
+.kestrel-auth-back { margin: 0 0 0 6px; }
+.kestrel-auth-go { margin-right: 6px; background-color: fill(0.16); }
+.kestrel-auth-go:hover { background-color: fill(0.24); }
+.kestrel-auth-row { spacing: 14px; min-height: 20px; }
+.kestrel-auth-message { font-size: 13px; font-weight: 500; color: ink(0.8); }
+.kestrel-auth-message.warning { color: ink(); }
 
-@if $variant == 'light' {
-  @include scheme(dark) {
-    .unlock-dialog, .kestrel-lock-menu {
-      @include glass-shading;
-      color: ink();
+#unlockDialogNotifications { width: 340px; max-height: 480px; }
+.unlock-dialog-notifications-container { spacing: 8px; }
+.unlock-dialog-notification-source.kestrel-glass { spacing: 10px; padding: 12px; border-radius: 20px; background-color: glass(); }
+.unlock-dialog-notification-icon { icon-size: 24px; color: ink(0.9); }
+.unlock-dialog-notification-source .unlock-dialog-notification-label { font-size: 13px; font-weight: 500; color: ink(0.72); }
+.unlock-dialog-notification-count-text { padding: 0 8px; border-radius: 999px; font-weight: 600; background-color: fill(0.10); }
+.unlock-dialog-notification-preview { spacing: 1px; padding-top: 3px; }
+.unlock-dialog-notification-preview-title { font-size: 14px; font-weight: 600; }
+.unlock-dialog-notification-preview-body { font-size: 13px; color: ink(0.75); }
 
-      StEntry StLabel.hint-text { color: ink(0.65); }
-      StEntry:hover { background-color: fill(0.09); }
-      .kestrel-status-button:hover { background-color: fill(0.10); }
-      .kestrel-status-button:focus { background-color: fill(0.17); }
-      .kestrel-status-button:active { background-color: fill(0.14); }
-      .kestrel-glass { @include glass-surface; }
-    }
+.kestrel-greeter-users { width: 340px; spacing: 4px; }
+.kestrel-greeter-user { padding: 6px 16px 6px 6px; border-radius: 999px; transition-duration: $motion-tap; }
+.kestrel-greeter-user:hover, .kestrel-greeter-user:focus { background-color: fill(0.10); }
+.kestrel-greeter-user:checked { background-color: fill(0.16); }
+.kestrel-greeter-user-content { spacing: 12px; }
+.kestrel-greeter-user-name { font-size: 14px; font-weight: 500; }
+.kestrel-greeter-avatar { width: 32px; height: 32px; border-radius: 999px; background-size: cover; background-color: fill(0.12); color: ink(0.9); }
 
-    .kestrel-context-menu.kestrel-lock-menu { @include context-menu; }
-  }
-}
+.kestrel-login-controls { spacing: 2px; }
+.kestrel-login-control { height: 32px; min-width: 32px; padding: 0 9px; border-radius: 10px; color: ink(0.86); transition-duration: $motion-tap; }
+.kestrel-login-control:hover, .kestrel-login-control:focus, .kestrel-login-control:checked { background-color: fill(0.10); }
+.kestrel-login-control:active { background-color: fill(0.14); }
+.kestrel-login-control .kestrel-battery { @include battery-tints; }
+.kestrel-login-label { font-size: 13px; font-weight: 500; }

@@ -78,6 +78,16 @@ auth-prompt-submit = Senda
 auth-prompt-wrong-password = Lykilorðið virkaði ekki
 auth-prompt-failed = Þetta tókst ekki. Reyndu aftur.
 fingerprint-not-recognized = Fingrafarið þekktist ekki
+fingerprint-scanning = Snertu fingrafaralesarann
+fingerprint-retry-scan = Skannaðu fingurinn aftur
+fingerprint-swipe-too-short = Strokan var of stutt, reyndu aftur
+fingerprint-finger-not-centered = Leggðu fingurinn fyrir miðju og reyndu aftur
+fingerprint-remove-and-retry = Lyftu fingrinum og reyndu aftur
+fingerprint-unavailable = Fingrafar er ekki tiltækt, sláðu inn lykilorðið þitt
+auth-prompt-use-password = Nota lykilorð í staðinn
+auth-prompt-try-fingerprint = Reyna fingrafar aftur
+auth-prompt-use-fingerprint = Nota fingrafar
+auth-prompt-show-password = Sýna lykilorð
 
 ## Administrator authentication
 
@@ -134,8 +144,6 @@ end-session-console-user = { $userName } (textaskjár)
 
 ## Lock screen clock
 
-lock-clock-swipe-up = Strjúktu upp
-lock-clock-click-or-press = Smelltu eða ýttu á lykil
 
 ## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
 

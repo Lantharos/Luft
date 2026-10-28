@@ -78,6 +78,16 @@ auth-prompt-submit = Dërgo
 auth-prompt-wrong-password = Ai fjalëkalim nuk funksionoi
 auth-prompt-failed = Nuk funksionoi. Provo sërish.
 fingerprint-not-recognized = Gjurma e gishtit nuk u njoh
+fingerprint-scanning = Prek lexuesin e gjurmëve të gishtave
+fingerprint-retry-scan = Skano sërish gishtin
+fingerprint-swipe-too-short = Rrëshqitja ishte shumë e shkurtër, provo sërish
+fingerprint-finger-not-centered = Vendose gishtin në mes dhe provo sërish
+fingerprint-remove-and-retry = Ngrije gishtin dhe provo sërish
+fingerprint-unavailable = Gjurma e gishtit nuk është e disponueshme, fut fjalëkalimin
+auth-prompt-use-password = Përdor fjalëkalimin
+auth-prompt-try-fingerprint = Provo sërish gjurmën e gishtit
+auth-prompt-use-fingerprint = Përdor gjurmën e gishtit
+auth-prompt-show-password = Shfaq fjalëkalimin
 
 ## Administrator authentication
 
@@ -134,8 +144,6 @@ end-session-console-user = { $userName } (konsolë)
 
 ## Lock screen clock
 
-lock-clock-swipe-up = Rrëshqit lart
-lock-clock-click-or-press = Kliko ose shtyp një tast
 
 ## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
 

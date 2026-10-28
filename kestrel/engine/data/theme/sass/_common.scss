@@ -289,26 +289,3 @@ stage {
   &:checked { @include button(checked, $tc:$system_fg_color, $c:$system_bg_color);}
 }
 
-/* Lockscreen Elements */
-
-// buttons
-%lockscreen_button {
-  @extend %button_common;
-  @include button(normal, $tc:$system_fg_color, $style: lockscreen);
-  &:focus { @include button(focus, $tc:$system_fg_color, $style: lockscreen);}
-  &:hover { @include button(hover, $tc:$system_fg_color, $style: lockscreen);}
-  &:active { @include button(active, $tc:$system_fg_color, $style: lockscreen);}
-  &:checked { @include button(checked, $tc:$system_fg_color, $style: lockscreen);}
-  &:insensitive { @include button(insensitive, $tc:$system_fg_color, $style: lockscreen);}
-}
-
-// entries
-%lockscreen_entry {
-  @extend %entry_common;
-  @include entry(normal, $c:$system_fg_color, $style: lockscreen, $always_dark: true);
-  &:hover { @include entry(hover, $c:$system_fg_color, $style: lockscreen, $always_dark: true);}
-  &:focus { @include entry(focus, $c:$system_fg_color, $style: lockscreen, $always_dark: true);}
-  &:insensitive { @include entry(insensitive, $c:$system_fg_color, $style: lockscreen, $always_dark: true);}
-
-  StLabel.hint-text { color: transparentize($system_fg_color, 0.3);}
-}

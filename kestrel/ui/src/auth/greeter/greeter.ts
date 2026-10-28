@@ -4,32 +4,29 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
+import type { SignInMethod } from '../lockScreen/signInMethod.js';
 import { Authentication } from '../prompt/authentication.js';
 import { AuthPrompt } from '../prompt/authPrompt.js';
 import { connectGreetd } from '../prompt/greetd.js';
-import { MonitorConstraint } from '../../core/stage/layout.js';
 import { LockBackdrop } from '../lockScreen/backdrop.js';
-import { Clock } from '../lockScreen/clock.js';
-import { LockPages } from '../lockScreen/pages.js';
+import { Monument } from '../monument/monument.js';
 
 import type { Rgb } from '../../appearance/color.js';
 import { ContextMenus } from '../../desktop/menus/contextMenus.js';
 import type { Monitor } from '../../desktop/panel/panel.js';
 import { terminateOnceShown } from '../../shared/apps/handoff.js';
-import { animateActor } from '../../shared/motion/motion.js';
+import { animateActor, Curve, Duration } from '../../shared/motion/motion.js';
 import type { StartupSignals } from '../../system/health/startup.js';
 import { Accounts } from './accounts.js';
 import { LoginAppearance } from './appearance.js';
 import { readConfig } from './config.js';
 import { GreeterControls } from './controls/controls.js';
-import { GreeterLayout } from './layout.js';
 import { availableSessions, sessionCommand, type Session } from './sessions.js';
+import { GreeterSignIn } from './signIn.js';
 import { UserList } from './userList.js';
 
 const IDLE_TIMEOUT = 2 * 60 * 1000;
 const ACCOUNTS_TIMEOUT = 1000;
-const SWITCH_DURATION = 140;
-const FINISH_DURATION = 250;
 
 export interface GreeterContext {
   layoutManager: StartupSignals & {
@@ -41,10 +38,10 @@ export interface GreeterContext {
   pushModal(actor: Clutter.Actor): void;
 }
 
-function rememberSession(user: string, session: string): Promise<void> {
+function rememberSession(user: string, session: string, method: SignInMethod): Promise<void> {
   return new Promise(resolve => Gio.DBus.system.call(
     'com.lantharos.Greeter1', '/com/lantharos/Greeter1', 'com.lantharos.Greeter1', 'RememberSession',
-    new GLib.Variant('(ss)', [user, session]), null, Gio.DBusCallFlags.NONE, 2000, null,
+    new GLib.Variant('(sss)', [user, session, method]), null, Gio.DBusCallFlags.NONE, 2000, null,
     (connection, result) => {
       try {
         connection!.call_finish(result);
@@ -56,20 +53,19 @@ function rememberSession(user: string, session: string): Promise<void> {
 }
 
 export class Greeter {
-  private readonly dialog = new St.Widget({ name: 'kestrel-greeter', style_class: 'unlock-dialog kestrel-greeter', reactive: true, x_expand: true, y_expand: true });
-  private readonly stack = new Shell.Stack();
+  private readonly dialog = new St.Widget({ name: 'kestrel-greeter', style_class: 'kestrel-lock kestrel-greeter', reactive: true, x_expand: true, y_expand: true });
   private readonly promptBox = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL });
-  private readonly main = new St.Widget({ layout_manager: new GreeterLayout(), constraints: new MonitorConstraint({ primary: true }) });
   private readonly appearance = new LoginAppearance();
   private readonly authentication = new Authentication(connectGreetd);
-  private readonly prompt = new AuthPrompt(this.authentication);
+  private readonly signIn = new GreeterSignIn(this.authentication);
+  private readonly prompt = new AuthPrompt(this.signIn);
   private readonly accounts = new Accounts(() => this.showUsers());
   private readonly userList = new UserList(user => this.choose(user));
   private readonly config = readConfig();
   private readonly sessions = availableSessions();
   private readonly menus: ContextMenus;
   private readonly controls: GreeterControls;
-  private readonly pages: LockPages;
+  private readonly monument: Monument;
   private backdrop: LockBackdrop | null = null;
   private showWallpaper!: () => void;
   readonly wallpaperShown = new Promise<void>(resolve => (this.showWallpaper = resolve));
@@ -80,31 +76,24 @@ export class Greeter {
 
   constructor(context: GreeterContext) {
     this.matchNumLock();
+    this.signIn.attach(this.prompt);
     const monitorAt = (x: number, y: number) =>
       context.layoutManager.monitors.find(monitor => x >= monitor.x && y >= monitor.y && x < monitor.x + monitor.width && y < monitor.y + monitor.height) ?? null;
     this.menus = new ContextMenus(monitorAt, () => {}, () => !this.finishing, () => {}, () => {});
     this.controls = new GreeterControls(this.menus, this.sessions, session => this.useSession(session));
 
-    this.main.add_child(this.stack);
-    this.main.add_child(this.userList.actor);
-    this.main.add_child(this.controls.actor);
-    this.dialog.add_child(this.main);
-
     this.promptBox.add_child(this.prompt);
-    this.stack.add_child(this.promptBox);
-    const clock = new Clock();
-    this.stack.add_child(clock);
-
-    this.pages = new LockPages({
-      actor: this.dialog,
-      clock,
-      prompt: this.promptBox,
-      companions: [this.userList.actor, this.controls.actor],
+    this.monument = new Monument({
+      root: this.dialog,
+      auth: this.promptBox,
+      side: this.userList.actor,
+      controls: this.controls.actor,
       actionMode: Shell.ActionMode.LOGIN_SCREEN,
       preparePrompt: () => this.begin(),
-      clockShown: () => this.stop(),
-      focusPrompt: () => this.prompt.focus(),
+      asleep: () => this.stop(),
+      focusPrompt: typed => this.prompt.focus(typed),
     });
+    this.dialog.add_child(this.monument.actor);
 
     this.prompt.connect('user-name', (_prompt, name) => this.enterUserName(name));
     this.prompt.connect('cancelled', () => this.goBack());
@@ -112,7 +101,7 @@ export class Greeter {
     this.prompt.connect('loading', (_prompt, busy) => (this.userList.sensitive = !busy));
 
     const idleMonitor = global.backend.get_core_idle_monitor();
-    idleMonitor.add_idle_watch(IDLE_TIMEOUT, () => this.pages.showClock());
+    idleMonitor.add_idle_watch(IDLE_TIMEOUT, () => this.monument.wake.sleep());
 
     const shield = context.layoutManager.screenShieldGroup;
     shield.add_child(this.dialog);
@@ -165,11 +154,11 @@ export class Greeter {
     const restart = this.started;
     this.stop();
     animateActor(this.prompt, {
-      opacity: 0, duration: SWITCH_DURATION, mode: Clutter.AnimationMode.EASE_IN_QUAD,
+      opacity: 0, duration: Duration.tap, curve: Curve.decelerate,
       onComplete: () => {
         this.prompt.setUser(user);
-        if (restart || this.pages.promptShown) this.begin();
-        animateActor(this.prompt, { opacity: 255, duration: SWITCH_DURATION, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
+        if (restart || this.monument.wake.promptShown) this.begin();
+        animateActor(this.prompt, { opacity: 255, duration: Duration.quick, curve: Curve.decelerate });
       },
     });
   }
@@ -178,13 +167,17 @@ export class Greeter {
     if (this.started) return;
     this.started = true;
     this.prompt.allowGoingBack(false);
-    if (this.selected) this.prompt.begin(this.selected.user_name);
-    else this.prompt.askForUserName();
+    if (!this.selected) {
+      this.prompt.askForUserName();
+      return;
+    }
+    this.signIn.prepare(this.selected.get_uid());
+    this.prompt.begin(this.selected.user_name);
   }
 
   private stop(): void {
     this.started = false;
-    this.authentication.cancel();
+    this.signIn.cancel();
   }
 
   private enterUserName(name: string): void {
@@ -194,6 +187,7 @@ export class Greeter {
     this.useSession(this.preferredSession(known ? user : null));
     this.prompt.setUser(known ? user : null);
     this.prompt.allowGoingBack(true);
+    this.signIn.prepare(known ? user.get_uid() : null);
     this.prompt.begin(name);
   }
 
@@ -205,7 +199,7 @@ export class Greeter {
       this.prompt.askForUserName();
       return;
     }
-    this.pages.showClock();
+    this.monument.wake.sleep();
   }
 
   private preferredSession(user: AccountsService.User | null): Session | null {
@@ -224,7 +218,7 @@ export class Greeter {
     if (!session) return;
     this.finishing = true;
     this.menus.close(true);
-    await rememberSession(user, session.id);
+    await rememberSession(user, session.id, this.signIn.method);
     const { command, environment } = sessionCommand(session, this.accounts.find(user).get_language() ?? '');
     if (!await this.authentication.startSession(command, environment)) {
       this.finishing = false;
@@ -232,8 +226,8 @@ export class Greeter {
       return;
     }
     this.controls.shutdown();
-    animateActor(this.main, {
-      opacity: 0, duration: FINISH_DURATION, mode: Clutter.AnimationMode.EASE_IN_QUAD,
+    animateActor(this.monument.actor, {
+      opacity: 0, duration: Duration.standard, curve: Curve.decelerate,
       onComplete: terminateOnceShown,
     });
   }

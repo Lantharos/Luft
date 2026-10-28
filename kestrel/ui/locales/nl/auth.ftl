@@ -78,6 +78,16 @@ auth-prompt-submit = Versturen
 auth-prompt-wrong-password = Dat wachtwoord werkte niet
 auth-prompt-failed = Dat werkte niet. Probeer het opnieuw.
 fingerprint-not-recognized = Vingerafdruk niet herkend
+fingerprint-scanning = Raak de vingerafdruklezer aan
+fingerprint-retry-scan = Scan je vinger opnieuw
+fingerprint-swipe-too-short = Te korte veegbeweging, probeer het opnieuw
+fingerprint-finger-not-centered = Leg je vinger in het midden en probeer het opnieuw
+fingerprint-remove-and-retry = Til je vinger op en probeer het opnieuw
+fingerprint-unavailable = Vingerafdruk is niet beschikbaar, voer je wachtwoord in
+auth-prompt-use-password = Wachtwoord gebruiken
+auth-prompt-try-fingerprint = Vingerafdruk opnieuw proberen
+auth-prompt-use-fingerprint = Vingerafdruk gebruiken
+auth-prompt-show-password = Wachtwoord tonen
 
 ## Administrator authentication
 
@@ -134,8 +144,6 @@ end-session-console-user = { $userName } (console)
 
 ## Lock screen clock
 
-lock-clock-swipe-up = Veeg omhoog
-lock-clock-click-or-press = Klik of druk op een toets
 
 ## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
 

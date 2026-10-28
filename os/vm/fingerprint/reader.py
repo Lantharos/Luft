@@ -53,7 +53,7 @@ def call(connection, sender, path, interface, method, parameters, invocation):
     elif method == "VerifyStart":
         verifying["sender"] = sender
         invocation.return_value(None)
-        connection.emit_signal(sender, DEVICE, interface, "VerifyFingerSelected", GLib.Variant("(s)", ("any",)))
+        connection.emit_signal(None, DEVICE, interface, "VerifyFingerSelected", GLib.Variant("(s)", ("any",)))
     else:
         if method in ("VerifyStop", "Release"):
             verifying["sender"] = None
@@ -67,7 +67,7 @@ def get_property(connection, sender, path, interface, name):
 def touch(connection) -> bool:
     if verifying["sender"] and (result := RESULTS.get(finger())):
         status = GLib.Variant("(sb)", (result, True))
-        connection.emit_signal(verifying["sender"], DEVICE, "net.reactivated.Fprint.Device", "VerifyStatus", status)
+        connection.emit_signal(None, DEVICE, "net.reactivated.Fprint.Device", "VerifyStatus", status)
         verifying["sender"] = None
     return True
 

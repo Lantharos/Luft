@@ -78,6 +78,16 @@ auth-prompt-submit = Odeslat
 auth-prompt-wrong-password = Heslo není správné
 auth-prompt-failed = Nepodařilo se. Zkuste to znovu.
 fingerprint-not-recognized = Otisk prstu nebyl rozpoznán
+fingerprint-scanning = Dotkněte se čtečky otisků prstů
+fingerprint-retry-scan = Naskenujte prst znovu
+fingerprint-swipe-too-short = Přejetí bylo příliš krátké, zkuste to znovu
+fingerprint-finger-not-centered = Položte prst doprostřed a zkuste to znovu
+fingerprint-remove-and-retry = Zvedněte prst a zkuste to znovu
+fingerprint-unavailable = Otisk prstu není k dispozici, zadejte heslo
+auth-prompt-use-password = Použít heslo
+auth-prompt-try-fingerprint = Zkusit znovu otisk prstu
+auth-prompt-use-fingerprint = Použít otisk prstu
+auth-prompt-show-password = Zobrazit heslo
 
 ## Administrator authentication
 
@@ -144,8 +154,6 @@ end-session-console-user = { $userName } (konzole)
 
 ## Lock screen clock
 
-lock-clock-swipe-up = Přejeďte nahoru
-lock-clock-click-or-press = Klikněte nebo stiskněte klávesu
 
 ## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
 

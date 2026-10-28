@@ -24,6 +24,7 @@
     <method name="SetRebootToBootLoaderMenu">
       <arg type="t" direction="in"/>
     </method>
+    <property name="LidClosed" type="b" access="read"/>
     <signal name="PrepareForSleep">
       <arg type="b" direction="out"/>
     </signal>

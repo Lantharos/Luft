@@ -1,3 +1,4 @@
+mod choices;
 mod config;
 mod displays;
 mod wallpaper;
@@ -6,6 +7,7 @@ use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
 
+pub use choices::{SignInMethod, Style};
 pub use config::Config;
 pub use displays::prepare as prepare_displays;
 pub use wallpaper::{Focus, encode as encode_wallpaper, read as read_wallpaper};
@@ -17,6 +19,8 @@ const WALLPAPER_DETAILS: &str = "wallpaper.json";
 const DISPLAYS: &str = "display/monitors.xml";
 const USER_DISPLAYS: &str = "monitors.xml";
 const USER_NUM_LOCK: &str = "num-lock";
+const USER_SIGN_IN_METHOD: &str = "sign-in-method";
+const USER_STYLE: &str = "style";
 
 pub struct Store {
     root: PathBuf,
@@ -97,6 +101,22 @@ impl Store {
         write_atomically(
             &self.user_folder(uid).join(USER_NUM_LOCK),
             state,
+            Readers::LoginScreen,
+        )
+    }
+
+    pub fn save_user_sign_in_method(&self, uid: u32, method: SignInMethod) -> io::Result<()> {
+        write_atomically(
+            &self.user_folder(uid).join(USER_SIGN_IN_METHOD),
+            method.name().as_bytes(),
+            Readers::LoginScreen,
+        )
+    }
+
+    pub fn save_user_style(&self, uid: u32, style: Style) -> io::Result<()> {
+        write_atomically(
+            &self.user_folder(uid).join(USER_STYLE),
+            style.name().as_bytes(),
             Readers::LoginScreen,
         )
     }

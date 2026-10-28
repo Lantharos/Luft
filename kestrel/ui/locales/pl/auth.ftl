@@ -78,6 +78,16 @@ auth-prompt-submit = Wyślij
 auth-prompt-wrong-password = Nieprawidłowe hasło
 auth-prompt-failed = Nie udało się. Spróbuj ponownie.
 fingerprint-not-recognized = Nie rozpoznano odcisku palca
+fingerprint-scanning = Dotknij czytnika linii papilarnych
+fingerprint-retry-scan = Zeskanuj palec ponownie
+fingerprint-swipe-too-short = Przesunięcie było za krótkie, spróbuj ponownie
+fingerprint-finger-not-centered = Umieść palec na środku i spróbuj ponownie
+fingerprint-remove-and-retry = Unieś palec i spróbuj ponownie
+fingerprint-unavailable = Odcisk palca jest niedostępny, wpisz hasło
+auth-prompt-use-password = Użyj hasła
+auth-prompt-try-fingerprint = Spróbuj ponownie odciskiem palca
+auth-prompt-use-fingerprint = Użyj odcisku palca
+auth-prompt-show-password = Pokaż hasło
 
 ## Administrator authentication
 
@@ -144,8 +154,6 @@ end-session-console-user = { $userName } (konsola)
 
 ## Lock screen clock
 
-lock-clock-swipe-up = Przesuń w górę
-lock-clock-click-or-press = Kliknij lub naciśnij dowolny klawisz
 
 ## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
 

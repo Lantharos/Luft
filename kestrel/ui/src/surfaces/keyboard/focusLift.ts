@@ -19,7 +19,7 @@ function chromeOf(actor: Clutter.Actor): Clutter.Actor | null {
   const uiGroup = Main.layoutManager.uiGroup;
   let chrome: Clutter.Actor | null = actor;
   while (chrome && chrome.get_parent() !== uiGroup) chrome = chrome.get_parent();
-  return chrome;
+  return chrome === Main.layoutManager.screenShieldGroup ? null : chrome;
 }
 
 function easeLift(chrome: Clutter.Actor, translation: number): void {

@@ -50,15 +50,19 @@ const displayFds = new Gio.UnixFDList();
 displayFds.append(descriptorOf(arrangement));
 call('SetDisplays', new GLib.Variant('(h)', [0]), displayFds);
 call('SetNumLock', new GLib.Variant('(b)', [false]));
+call('SetSignInMethod', new GLib.Variant('(s)', ['fingerprint']));
+const signInMethod = () => new TextDecoder().decode(Gio.File.new_for_path(`${folder}/sign-in-method`).load_contents(null)[1]);
+require(signInMethod() === 'fingerprint', 'the way someone last unlocked is kept for the login screen');
 require(Gio.File.new_for_path(`${folder}/monitors.xml`).query_exists(null) && !shownDisplays.query_exists(null)
   && readJson(`${state}/config.json`).numLock, 'displays and keyboard state wait for their owner to sign in');
 
 const [sessionId] = Gio.DBus.system.call_sync('com.lantharos.Greeter1', '/com/lantharos/Greeter1', 'org.freedesktop.DBus.Properties',
   'Get', new GLib.Variant('(ss)', ['com.lantharos.Greeter1', 'Sessions']), null, Gio.DBusCallFlags.NONE, -1, null).recursiveUnpack<[[string, string][]]>()[0][0];
 try {
-  call('RememberSession', new GLib.Variant('(ss)', [user, sessionId]));
+  call('RememberSession', new GLib.Variant('(sss)', [user, sessionId, 'password']));
 } catch {}
 const shown = readJson(`${state}/config.json`);
 require(shown.shownUser === new Gio.Credentials().get_unix_user() && !shown.numLock && shownDisplays.query_exists(null),
   'the login screen follows the last person who signed in');
+require(signInMethod() === 'password', 'signing in on the login screen remembers how');
 call('SetNumLock', new GLib.Variant('(b)', [true]));

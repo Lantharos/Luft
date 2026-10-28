@@ -6,7 +6,7 @@ import {getStyleVariant, battery} from 'resource:///com/lantharos/kestrel/kestre
 import {named, ofType, showsText, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {press} from '../lib/input/input.js';
-import {capture} from '../lib/screenshots.js';
+import {capture, captureFrame} from '../lib/screenshots.js';
 import {settled, waitUntil} from '../lib/wait.js';
 import {lockAndWake, showPrompt, unlock} from './lib/shield.js';
 
@@ -41,10 +41,19 @@ async function checkAccessibility() {
   await close();
 }
 
+async function frostBrightness() {
+  const {pixbuf} = await captureFrame();
+  const offset = Math.floor(pixbuf.get_height() / 2) * pixbuf.get_rowstride() + Math.floor(pixbuf.get_width() / 2) * pixbuf.get_n_channels();
+  const pixels = pixbuf.get_pixels();
+  return pixels[offset] + pixels[offset + 1] + pixels[offset + 2];
+}
+
 async function switchStyle(styles: Gio.Settings, scheme: string) {
+  const before = await frostBrightness();
   styles.set_string('color-scheme', scheme);
   const variant = scheme === 'prefer-dark' ? 'dark' : 'light';
   await eventually(() => getStyleVariant() === variant, `the shell turns ${variant}`);
+  await eventually(async () => (variant === 'light') === (await frostBrightness() > before), `the frost is ${variant} while locked`);
   await settled();
 }
 
@@ -54,7 +63,7 @@ async function checkPower(styles: Gio.Settings, scheme: string) {
   await switchStyle(styles, 'prefer-dark');
   await capture('lock-power-dark');
   await switchStyle(styles, 'prefer-light');
-  require(inksLight(menu), 'the power menu stays dark while the desktop is light');
+  require(!inksLight(menu) && !inksLight(ofType(named('kestrel-lock-time'), St.Widget)), 'the lock screen and its power menu turn light with the desktop');
   await capture('lock-power-light');
   await switchStyle(styles, scheme);
   await close();

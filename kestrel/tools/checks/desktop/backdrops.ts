@@ -7,11 +7,11 @@ import {LockBackdrop, Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {checks} from '../lib/check.js';
 import {scratch} from '../lib/processes.js';
-import {waitUntil} from '../lib/wait.js';
+import {nextFrame, waitUntil} from '../lib/wait.js';
 
 type Rgb = [number, number, number];
 
-const {require, eventually} = checks('backdrop');
+const {require} = checks('backdrop');
 const STORE = GLib.build_filenamev([GLib.get_user_cache_dir(), 'kestrel', 'backgrounds']);
 const STORE_TIMEOUT = 10000;
 const PICTURES: [Rgb, Rgb][] = [
@@ -36,6 +36,7 @@ function writePicture(path: string, [from, to]: [Rgb, Rgb]) {
 }
 
 const pixels = (actor: Clutter.Actor) => Shell.texture_file_encode(Shell.texture_file_paint_actor(actor)!, null);
+const DOWNSCALE = 4;
 const storedPath = (key: string) => GLib.build_filenamev([STORE, GLib.compute_checksum_for_string(GLib.ChecksumType.SHA256, key, -1)!]);
 
 async function stored(uri: string) {
@@ -46,25 +47,29 @@ async function stored(uri: string) {
       return current.every((key): key is string => !!key?.startsWith(`${uri} `)) && current;
     }, 'the backdrop shows the new wallpaper');
     await waitUntil(() => keys.every(key => GLib.file_test(storedPath(key), GLib.FileTest.EXISTS)), 'the blurred wallpaper is stored', STORE_TIMEOUT);
+    return keys;
   } finally {
     probe.actor.destroy();
   }
 }
 
+async function storedWidth(key: string) {
+  const [texture] = await Shell.texture_file_load_async(Gio.File.new_for_path(storedPath(key)), GLib.PRIORITY_DEFAULT, null);
+  return texture.get_width();
+}
+
 async function checkPicture(index: number, uri: string, previous: GLib.Bytes | null) {
-  await stored(uri);
+  const [key] = await stored(uri);
+  const {width} = Main.layoutManager.primaryMonitor!;
+  require(await storedWidth(key) <= Math.ceil(width / DOWNSCALE), `the frost of wallpaper ${index + 1} is kept at a quarter of the display's size`);
   const backdrop = new LockBackdrop();
-  const shown: {first: GLib.Bytes | null} = {first: null};
-  backdrop.actor.connect('child-added', () => (shown.first ??= pixels(backdrop.actor)));
   global.stage.add_child(backdrop.actor);
   try {
     await backdrop.loaded;
-    const first = require(shown.first, `the blurred copy of wallpaper ${index + 1} is stored and shown at once`);
-    await eventually(() => backdrop.actor.get_n_children() === Main.layoutManager.monitors.length, `the live blur of wallpaper ${index + 1} takes over`);
-    const live = pixels(backdrop.actor);
-    require(first.compare(live) === 0, `the stored copy of wallpaper ${index + 1} matches the live blur pixel for pixel`);
-    if (previous) require(previous.compare(live) !== 0, 'a new wallpaper replaces the stored copy of the old one');
-    return live;
+    await nextFrame();
+    const shown = pixels(backdrop.actor);
+    require(previous?.compare(shown) !== 0, 'a new wallpaper replaces the frost of the old one');
+    return shown;
   } finally {
     backdrop.actor.destroy();
   }

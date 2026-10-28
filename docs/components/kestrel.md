@@ -70,7 +70,7 @@ Chromium-based browsers and Electron apps lock their profile with the host name,
 | `kestrel-search` | Indexes the names and text of files in your home folder for Start, at idle priority |
 | `kestrel-portal` | `com.lantharos.Kestrel.Portal`, the portal backend for email, printing, accounts, app choosers, launchers, USB devices, wallpapers and lockdown. Its dialogs still open in Kestrel |
 | `kestrel-greeter-service` | `com.lantharos.Greeter1` on the system bus, the login screen's settings |
-| `kestrel-authenticate` | Checks lock screen passwords and fingerprints through the `kestrel-unlock` PAM rules |
+| `kestrel-authenticate` | Checks lock screen passwords and fingerprints through the `kestrel-unlock` PAM rules, and waits for a fingerprint at the login screen |
 | `kestrel-watchdog` | Restarts the computer when the GPU is stuck ([details](../boot.md#graphics-driver-stopped-responding)) |
 | `kestrel-wallpaper` | Plays live wallpapers |
 | `kestrel-rain` | Makes the sound of rain as it plays, as a `Rain` stream in PipeWire. Kestrel writes `INTENSITY VOLUME` lines to it and closes its input to fade it out. `--render PATH SECONDS:INTENSITY:VOLUME...` writes the same sound to a WAV file instead |
@@ -78,6 +78,14 @@ Chromium-based browsers and Electron apps lock their profile with the host name,
 greetd reads `/run/greetd/config.toml`, which `kestrel-greeter-service --write-greetd-config` writes before each start from the image's defaults in `/usr/lib/kestrel-greeter/greetd.toml` and the account that signs in by itself, kept in `/var/lib/kestrel-greeter/initial-session.toml`. Nothing in `/etc` holds it, so updates to the defaults always arrive; to change greetd's configuration on one computer, point `greetd.service` at your own file with a drop-in. The `greetd` and `kestrel-unlock` PAM rules are in `/usr/lib/pam.d` for the same reason, and a file of the same name in `/etc/pam.d` takes their place.
 
 `kestrel-session --setup` runs Install Luft alone over the blurred wallpaper first ([Install](../install.md)). The session identifies as `Kestrel;GNOME`, so apps that only recognize GNOME keep their keyring, theme and autostart behavior.
+
+## Signing in and unlocking
+
+With a finger enrolled and the lid open, the lock screen and the login screen ask for the fingerprint first, with the password a click or a keystroke away; the key you type stays in the password field. With the lid closed the reader isn't used at all. Each screen remembers how you last got in and starts there next time: the lock screen in `~/.local/state/kestrel/sign-in-method`, the login screen in `/var/lib/kestrel-greeter/users/UID/sign-in-method`, which the session updates through `com.lantharos.Greeter1` along with your style, wallpaper, displays and Num Lock.
+
+The lock screen listens for the finger as soon as it shows, so a recognized finger unlocks from the clock without opening the prompt. When the reader gives up after three unknown fingers, or stops responding, the prompt turns to the password and offers to try the fingerprint again. Results from the reader (`VerifyStatus` from fprintd) only decide what the prompt shows; only the PAM rules decide whether you get in.
+
+At the login screen, the `greetd` PAM rules start with `pam_kestrel_sign_in.so`, which asks the login screen how you sign in. For a fingerprint it runs the system's `fingerprint-auth` rules in `kestrel-authenticate --fingerprint` and keeps asking whether to go on waiting, so typing a password stops the reader at once. Otherwise, or once the reader gives up, the system's `password-auth` rules ask for the password. Either way exactly one of the two sets of rules decides, followed by the same account, keyring and session rules as before.
 
 ## Crash recovery
 

@@ -78,6 +78,16 @@ auth-prompt-submit = Seol
 auth-prompt-wrong-password = Níor oibrigh an pasfhocal sin
 auth-prompt-failed = Níor oibrigh sé sin. Bain triail eile as.
 fingerprint-not-recognized = Níor aithníodh an méarlorg
+fingerprint-scanning = Tadhaill an léitheoir méarloirg
+fingerprint-retry-scan = Scan do mhéar arís
+fingerprint-swipe-too-short = Bhí an svaidhpeáil róghearr, bain triail eile as
+fingerprint-finger-not-centered = Cuir do mhéar sa lár agus bain triail eile as
+fingerprint-remove-and-retry = Tóg do mhéar agus bain triail eile as
+fingerprint-unavailable = Níl an méarlorg ar fáil, cuir isteach do phasfhocal
+auth-prompt-use-password = Úsáid pasfhocal ina ionad
+auth-prompt-try-fingerprint = Bain triail eile as an méarlorg
+auth-prompt-use-fingerprint = Úsáid méarlorg
+auth-prompt-show-password = Taispeáin an pasfhocal
 
 ## Administrator authentication
 
@@ -149,8 +159,6 @@ end-session-console-user = { $userName } (consól)
 
 ## Lock screen clock
 
-lock-clock-swipe-up = Scuab suas
-lock-clock-click-or-press = Cliceáil nó brúigh eochair
 
 ## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
 

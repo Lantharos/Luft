@@ -8,7 +8,6 @@ const SCHEME_SUFFIX = /-(light|dark)\.css$/;
 type StyleVariant = 'light' | 'dark';
 
 interface ThemeSessionMode {
-  readonly colorScheme: string | null;
   readonly stylesheetName: string;
 }
 
@@ -40,7 +39,7 @@ function findStylesheet(name: string): Gio.File {
 
 export function getStyleVariant(): StyleVariant {
   const settings = St.Settings.get();
-  if (settings.high_contrast || sessionMode.colorScheme === 'dark') return 'dark';
+  if (settings.high_contrast) return 'dark';
   return settings.color_scheme === St.SystemColorScheme.PREFER_DARK ? 'dark' : 'light';
 }
 

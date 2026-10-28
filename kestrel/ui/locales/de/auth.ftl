@@ -78,6 +78,16 @@ auth-prompt-submit = Senden
 auth-prompt-wrong-password = Das Passwort hat nicht funktioniert
 auth-prompt-failed = Das hat nicht funktioniert. Versuch es noch einmal.
 fingerprint-not-recognized = Fingerabdruck nicht erkannt
+fingerprint-scanning = Leg den Finger auf den Fingerabdrucksensor
+fingerprint-retry-scan = Scanne deinen Finger noch einmal
+fingerprint-swipe-too-short = Zu kurz gewischt, versuch es noch einmal
+fingerprint-finger-not-centered = Leg den Finger mittig auf und versuch es noch einmal
+fingerprint-remove-and-retry = Heb den Finger an und versuch es noch einmal
+fingerprint-unavailable = Fingerabdruck nicht verfügbar, gib dein Passwort ein
+auth-prompt-use-password = Stattdessen Passwort verwenden
+auth-prompt-try-fingerprint = Fingerabdruck erneut versuchen
+auth-prompt-use-fingerprint = Fingerabdruck verwenden
+auth-prompt-show-password = Passwort anzeigen
 
 ## Administrator authentication
 
@@ -134,8 +144,6 @@ end-session-console-user = { $userName } (Konsole)
 
 ## Lock screen clock
 
-lock-clock-swipe-up = Wisch nach oben
-lock-clock-click-or-press = Klick oder drück eine Taste
 
 ## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
 

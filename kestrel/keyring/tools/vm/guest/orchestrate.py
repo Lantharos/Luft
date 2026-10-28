@@ -13,6 +13,9 @@ STATE = "/var/lib/keyring-test"
 PASSWORD = "luft-vm"
 person = pwd.getpwnam("luft")
 FINGER = "/run/luft-vm-fingerprint/finger"
+METHOD_QUESTION = "Sign in with (fingerprint/password): "
+FINGERPRINT_QUESTION = "Touch the fingerprint reader, or type password: "
+QUICK = 5
 result_path = os.path.join(person.pw_dir, "result.json")
 tally = {"passed": 0, "failed": 0}
 
@@ -52,25 +55,36 @@ def exchange(connection, message):
     return json.loads(connection.recv(size, socket.MSG_WAITALL))
 
 
-def login(method, scenario):
+def answer(message, method):
+    text = message["auth_message"]
+    if text == METHOD_QUESTION:
+        return "password" if method == "password" else "fingerprint"
+    if text == FINGERPRINT_QUESTION:
+        return "password" if method == "switch" else "fingerprint"
+    return PASSWORD if message["auth_message_type"] == "secret" else None
+
+
+def login(method, scenario, finger=None):
     with open(os.path.join(STATE, "scenario.json"), "w") as output:
         json.dump({"name": scenario}, output)
-    with open(FINGER, "w") as finger:
-        finger.write("match" if method == "fingerprint" else "none")
+    with open(FINGER, "w") as reader:
+        reader.write(finger or ("match" if method == "fingerprint" else "none"))
     if os.path.exists(result_path):
         os.remove(result_path)
     messages = []
+    started = time.monotonic()
     with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as connection:
         connection.connect(greetd_socket())
         reply = exchange(connection, {"type": "create_session", "username": person.pw_name})
         while reply["type"] == "auth_message":
-            messages.append(reply["auth_message"])
-            answer = PASSWORD if reply["auth_message_type"] == "secret" else None
-            reply = exchange(connection, {"type": "post_auth_message_response", "response": answer})
+            messages.append(reply)
+            reply = exchange(connection, {"type": "post_auth_message_response", "response": answer(reply, method)})
         signed_in = reply["type"] == "success"
         check(signed_in, f"{scenario}: signing in with a {method} works")
         if method == "fingerprint":
-            check(not any("assword" in message for message in messages), f"{scenario}: no password was asked for")
+            check(not any(message["auth_message_type"] == "secret" for message in messages), f"{scenario}: no password was asked for")
+        else:
+            check(time.monotonic() - started < QUICK, f"{scenario}: the password is checked without waiting for the reader")
         if not signed_in:
             return
         exchange(connection, {"type": "start_session", "cmd": [os.path.join(HERE, "probe.py")], "env": []})
@@ -141,6 +155,9 @@ def main():
             "the unlock socket belongs to the unlock service's own SELinux domain",
         )
         login("fingerprint", "fingerprint sign-in")
+        login("password", "password with a finger enrolled", finger="idle")
+        login("switch", "switching to the password while the reader waits", finger="idle")
+        login("fingerprint", "fingerprint after switching")
         extend_secure_boot_state()
         login("fingerprint", "startup changed")
         login("fingerprint", "fingerprint after resealing")

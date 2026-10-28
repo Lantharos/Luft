@@ -1,7 +1,7 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
-import { sendToLoginScreen } from '../../session/loginScreen/send.js';
+import { sendToLoginScreen, tellLoginScreen } from '../../session/loginScreen/send.js';
 
 const SYNC_DELAY = 1500;
 
@@ -37,6 +37,7 @@ export class LoginWallpaper {
     const file = Gio.File.new_for_uri(this.background.get_string(dark ? 'picture-uri-dark' : 'picture-uri'));
     const focus = this.kestrel.get_value(dark ? 'wallpaper-focus-dark' : 'wallpaper-focus');
     sendToLoginScreen('SetAppearance', file, 'login-wallpaper', 'wallpaper', [focus]);
+    tellLoginScreen('SetStyle', new GLib.Variant('(s)', [dark ? 'dark' : 'light']), 'login-style', 'style');
   }
 
   destroy(): void {

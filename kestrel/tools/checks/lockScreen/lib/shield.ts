@@ -7,15 +7,20 @@ import {moveBy, press} from '../../lib/input/input.js';
 import {settled, waitUntil} from '../../lib/wait.js';
 
 export const darkened = () => styled('lightbox', Main.uiGroup).some(actor => actor.visible);
-const promptShown = () => named('kestrel-lock-controls')?.opacity === 255 && shown(named('kestrel-lock-controls'));
+const promptShown = () => named('kestrel-auth')?.opacity === 255 && shown(named('kestrel-auth'));
 
-const promptEntry = () => {
-  const entry = shownStyled('login-dialog-prompt-entry');
+export const promptEntry = () => {
+  const entry = shownStyled('kestrel-auth-entry');
   return entry instanceof St.Entry ? entry : null;
 };
 
+const promptFocused = () => {
+  const focus = global.stage.key_focus;
+  return !!focus && !!named('kestrel-auth')?.contains(focus);
+};
+
 export const hint = () => {
-  const label = shownStyled('login-dialog-hint');
+  const label = shownStyled('kestrel-auth-hint');
   return label && textOf(label);
 };
 
@@ -38,7 +43,7 @@ export async function lockAndWake() {
 export async function showPrompt() {
   press(Clutter.KEY_space);
   await waitUntil(promptShown, 'a key shows the unlock prompt');
-  await waitUntil(() => promptEntry()?.clutter_text.has_key_focus(), 'the password field takes the keyboard');
+  await waitUntil(promptFocused, 'the unlock prompt takes the keyboard');
   await settled();
 }
 

@@ -31,7 +31,7 @@ const keyboardTop = () => keyboard()!.get_transformed_extents().get_y();
 const bottomOf = (actor: Clutter.Actor) => actor.get_transformed_extents().get_y() + actor.get_transformed_extents().get_height();
 const caret = () => Main.inputMethod.caret;
 const password = () => {
-  const entry = shownStyled('login-dialog-prompt-entry');
+  const entry = shownStyled('kestrel-auth-entry');
   return entry instanceof St.Entry ? entry : null;
 };
 const screenCenter = (): Point => {

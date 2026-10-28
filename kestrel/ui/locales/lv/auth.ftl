@@ -78,6 +78,16 @@ auth-prompt-submit = Iesniegt
 auth-prompt-wrong-password = Parole neder
 auth-prompt-failed = Neizdevās. Mēģiniet vēlreiz.
 fingerprint-not-recognized = Pirksta nospiedums netika atpazīts
+fingerprint-scanning = Pieskarieties pirkstu nospiedumu lasītājam
+fingerprint-retry-scan = Skenējiet pirkstu vēlreiz
+fingerprint-swipe-too-short = Pārvilkums bija pārāk īss, mēģiniet vēlreiz
+fingerprint-finger-not-centered = Novietojiet pirkstu centrā un mēģiniet vēlreiz
+fingerprint-remove-and-retry = Paceliet pirkstu un mēģiniet vēlreiz
+fingerprint-unavailable = Pirksta nospiedums nav pieejams, ievadiet paroli
+auth-prompt-use-password = Izmantot paroli
+auth-prompt-try-fingerprint = Mēģināt pirksta nospiedumu vēlreiz
+auth-prompt-use-fingerprint = Izmantot pirksta nospiedumu
+auth-prompt-show-password = Rādīt paroli
 
 ## Administrator authentication
 
@@ -139,8 +149,6 @@ end-session-console-user = { $userName } (konsole)
 
 ## Lock screen clock
 
-lock-clock-swipe-up = Pavelciet uz augšu
-lock-clock-click-or-press = Noklikšķiniet vai nospiediet taustiņu
 
 ## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
 

@@ -1,21 +1,21 @@
 import type AccountsService from 'gi://AccountsService';
-import Atk from 'gi://Atk';
 import Clutter from 'gi://Clutter';
+import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
-import Pango from 'gi://Pango';
-import Shell from 'gi://Shell';
 import St from 'gi://St';
 
-import * as Animation from '../../shared/widgets/animation.js';
 import * as KestrelUi from '../../kestrelUi.js';
-import * as ShellEntry from '../../shared/widgets/shellEntry.js';
-import * as UserWidget from '../../shared/widgets/userWidget.js';
-import { wiggle } from '../../core/runtime/animationUtils.js';
+import { Avatar } from '../../shared/widgets/userWidget.js';
 import type { Authentication } from './authentication.js';
+import type { FingerprintState } from './fingerprintState.js';
+import { MethodArea } from './methodArea.js';
+import { StatusRing } from './statusRing.js';
 
-const BUTTON_ICON_SIZE = 16;
-const FADE_TIME = 300;
 const PASSWORD_QUESTIONS = ['Password:', 'Password: '];
+const SUCCESS_FILL = 260;
+const SUCCESS_HOLD = 320;
+const RETRY_FILL = 420;
+const AVATAR_SIZE = 76;
 
 type PromptAuthentication = Pick<Authentication, 'begin' | 'answer' | 'cancel' | 'connectObject'>;
 
@@ -30,11 +30,18 @@ interface AuthPromptSignals extends St.BoxLayout.SignalSignatures {
   'succeeded': () => void;
   'user-name': (name: string) => void;
   'loading': (busy: boolean) => void;
+  'use-password': () => void;
+  'use-fingerprint': () => void;
 }
 
 function questionHint(question: string): string {
   if (PASSWORD_QUESTIONS.includes(question)) return KestrelUi.t('auth-prompt-password');
   return question.replace(/[:：] *$/, '').trim();
+}
+
+function displayName(user: AccountsService.User | null): string {
+  if (!user?.is_loaded) return '';
+  return user.get_real_name() || user.get_user_name();
 }
 
 export const AuthPrompt = GObject.registerClass({
@@ -43,6 +50,8 @@ export const AuthPrompt = GObject.registerClass({
     'succeeded': {},
     'user-name': { param_types: [GObject.TYPE_STRING] },
     'loading': { param_types: [GObject.TYPE_BOOLEAN] },
+    'use-password': {},
+    'use-fingerprint': {},
   },
 }, class AuthPrompt extends St.BoxLayout {
   declare connect: GObject.SignalMethods<this, AuthPromptSignals>['connect'];
@@ -56,24 +65,19 @@ export const AuthPrompt = GObject.registerClass({
   private answered = false;
   private stalled = false;
   private retrying = false;
-  private readonly userWell: St.Bin;
-  private readonly backButton: St.Button;
-  private readonly entryArea: St.Widget;
-  private readonly textEntry: St.Entry;
-  private readonly passwordEntry: St.PasswordEntry;
-  private entry: St.Entry;
-  private readonly nextButton: St.Button;
-  private readonly spinner: InstanceType<typeof Animation.Spinner>;
-  private readonly capsLockWarning: St.Label;
-  private readonly message: St.Label;
-  private readonly hint: St.Label;
+  private successId = 0;
+  private user: AccountsService.User | null = null;
+  private readonly avatarWell = new St.Bin({ style_class: 'kestrel-auth-avatar-well' });
+  private readonly ring = new StatusRing(this.avatarWell);
+  private readonly nameLabel = new St.Label({ name: 'kestrel-auth-name', style_class: 'kestrel-auth-name', x_align: Clutter.ActorAlign.START });
+  private readonly method = new MethodArea();
 
   constructor(private readonly authentication: PromptAuthentication) {
     super({
-      style_class: 'login-dialog-prompt-layout',
+      name: 'kestrel-auth',
+      style_class: 'kestrel-auth',
       orientation: Clutter.Orientation.VERTICAL,
-      x_expand: true,
-      x_align: Clutter.ActorAlign.CENTER,
+      x_align: Clutter.ActorAlign.START,
       reactive: true,
     });
 
@@ -84,109 +88,35 @@ export const AuthPrompt = GObject.registerClass({
       'succeeded', () => this.succeed(),
       this);
 
-    this.userWell = new St.Bin({ x_expand: true });
-    this.add_child(this.userWell);
+    this.add_child(this.ring);
+    this.add_child(this.nameLabel);
+    this.add_child(this.method);
 
-    const inputWell = new St.BoxLayout({
-      style_class: 'login-dialog-input-well',
-      orientation: Clutter.Orientation.VERTICAL,
+    const { field } = this.method;
+    field.connect('submit', () => this.submit());
+    field.connect('back', () => this.cancel());
+    field.connect('changed', () => {
+      if (field.text) this.method.fadeMessage();
     });
-    this.add_child(inputWell);
-
-    const row = new St.BoxLayout({ style_class: 'login-dialog-button-box' });
-    inputWell.add_child(row);
-
-    this.backButton = new St.Button({
-      style_class: 'login-dialog-button cancel-button',
-      can_focus: true,
-      y_align: Clutter.ActorAlign.CENTER,
-      icon_name: 'go-previous-symbolic',
-    });
-    KestrelUi.localized(this.backButton, () => (this.backButton.accessible_name = KestrelUi.t('auth-prompt-back')));
-    this.backButton.connect('clicked', () => this.cancel());
-    row.add_child(this.backButton);
-
-    this.entryArea = new St.Widget({
-      style_class: 'login-dialog-prompt-entry-area',
-      layout_manager: new Clutter.BinLayout(),
-      x_expand: true,
-    });
-    row.add_child(this.entryArea);
-
-    row.add_child(new Clutter.Actor({
-      constraints: new Clutter.BindConstraint({
-        source: this.backButton,
-        coordinate: Clutter.BindCoordinate.WIDTH,
-      }),
-    }));
-
-    const entryParams = { style_class: 'login-dialog-prompt-entry', can_focus: true, x_expand: true };
-    this.textEntry = new St.Entry(entryParams);
-    this.passwordEntry = new St.PasswordEntry(entryParams);
-    for (const entry of [this.textEntry, this.passwordEntry]) {
-      ShellEntry.addContextMenu(entry, { actionMode: Shell.ActionMode.NONE });
-      entry.clutter_text.connect('text-changed', () => this.fadeOutMessage());
-      entry.clutter_text.connect('activate', () => this.submit());
-    }
-    this.entry = this.passwordEntry;
-    this.entryArea.add_child(this.entry);
-
-    const buttonWell = new St.Widget({
-      layout_manager: new Clutter.BinLayout(),
-      style_class: 'login-dialog-default-button-well',
-      x_expand: true,
-      x_align: Clutter.ActorAlign.END,
-      y_align: Clutter.ActorAlign.CENTER,
-    });
-    this.entryArea.add_child(buttonWell);
-
-    this.nextButton = new St.Button({
-      style_class: 'login-dialog-button next-button',
-      can_focus: false,
-      icon_name: 'go-next-symbolic',
-    });
-    KestrelUi.localized(this.nextButton, () => (this.nextButton.accessible_name = KestrelUi.t('auth-prompt-submit')));
-    this.nextButton.connect('clicked', () => this.submit());
-    this.nextButton.add_style_pseudo_class('default');
-    buttonWell.add_child(this.nextButton);
-
-    this.spinner = new Animation.Spinner(BUTTON_ICON_SIZE);
-    buttonWell.add_child(this.spinner);
-
-    this.capsLockWarning = new ShellEntry.CapsLockWarning({
-      x_expand: true,
-      x_align: Clutter.ActorAlign.CENTER,
-    });
-    inputWell.add_child(this.capsLockWarning);
-
-    this.message = new St.Label({
-      style_class: 'login-dialog-message',
-      opacity: 0,
-      x_expand: true,
-      x_align: Clutter.ActorAlign.CENTER,
-    });
-    this.message.clutter_text.line_wrap = true;
-    this.message.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
-    inputWell.add_child(this.message);
-
-    this.hint = new St.Label({
-      style_class: 'login-dialog-message login-dialog-hint',
-      visible: false,
-      x_expand: true,
-      x_align: Clutter.ActorAlign.CENTER,
-    });
-    this.hint.clutter_text.line_wrap = true;
-    this.hint.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
-    inputWell.insert_child_above(this.hint, row);
+    this.method.connect('use-password', () => this.usePassword(''));
+    this.method.connect('use-fingerprint', () => this.emit('use-fingerprint'));
 
     this.setBusy(false);
     this.updateBackButton();
-    this.connect('destroy', () => this.clearEntries());
+    this.connect('destroy', () => {
+      if (this.successId) GLib.source_remove(this.successId);
+      field.clear();
+    });
   }
 
   on_key_press_event(event: Clutter.Event): boolean {
     if (event.get_key_symbol() === Clutter.KEY_Escape) {
       this.cancel();
+      return Clutter.EVENT_STOP;
+    }
+    const character = event.get_key_unicode();
+    if (this.method.showsFingerprint && character && GLib.unichar_isgraph(character)) {
+      this.usePassword(character);
       return Clutter.EVENT_STOP;
     }
     return Clutter.EVENT_PROPAGATE;
@@ -202,8 +132,16 @@ export const AuthPrompt = GObject.registerClass({
   }
 
   setUser(user: AccountsService.User | null): void {
-    this.userWell.child?.destroy();
-    this.userWell.child = new UserWidget.UserWidget(user, Clutter.Orientation.VERTICAL);
+    this.user?.disconnectObject(this);
+    this.user = user;
+    const avatar = new Avatar(user, { styleClass: 'kestrel-auth-avatar', iconSize: AVATAR_SIZE });
+    this.avatarWell.child = avatar;
+    const update = () => {
+      avatar.update();
+      this.nameLabel.text = displayName(user);
+    };
+    user?.connectObject('notify::is-loaded', update, 'changed', update, this);
+    update();
   }
 
   askForUserName(): void {
@@ -212,10 +150,10 @@ export const AuthPrompt = GObject.registerClass({
     this.askingUserName = true;
     this.question = null;
     this.preemptiveAnswer = null;
-    this.useEntry(false, KestrelUi.t('auth-prompt-username'));
+    this.method.field.useEntry(false, KestrelUi.t('auth-prompt-username'));
     this.updateBackButton();
     this.setBusy(false);
-    this.setMessage(null);
+    this.method.setMessage(null);
   }
 
   begin(userName: string): void {
@@ -225,8 +163,9 @@ export const AuthPrompt = GObject.registerClass({
     this.answered = false;
     this.stalled = false;
     this.retrying = false;
-    this.clearEntries();
-    this.useEntry(true, '');
+    this.method.setMessage(null);
+    this.method.field.clear();
+    this.method.field.useEntry(true, '');
     this.updateBackButton();
     this.authentication.begin(userName);
   }
@@ -235,59 +174,79 @@ export const AuthPrompt = GObject.registerClass({
     this.authentication.cancel();
     this.question = null;
     this.preemptiveAnswer = null;
-    this.clearEntries();
+    this.method.field.clear();
     this.setBusy(false);
-    this.setMessage(null);
+    this.method.setMessage(null);
     this.emit('cancelled');
   }
 
-  focus(): void {
-    this.entry.grab_key_focus();
+  focus(typed = ''): void {
+    if (typed) this.usePassword(typed);
+    else if (this.method.showsFingerprint) this.method.usePassword.grab_key_focus();
+    else this.method.field.entry.grab_key_focus();
   }
 
-  setHint(hint: string | null): void {
-    this.hint.visible = !!hint;
-    if (!hint) return;
-    this.hint.text = hint;
-    this.get_accessible().emit('notification', hint, Atk.Live.POLITE);
+  setFingerprint(state: FingerprintState, primary: boolean): void {
+    if (primary && !this.method.showsFingerprint && this.method.field.text !== '') {
+      this.emit('use-password');
+      return;
+    }
+    const focus = global.stage.key_focus;
+    const focused = focus !== null && this.contains(focus);
+    this.method.showFingerprint(state, primary);
+    this.showFingerprintOnRing(state);
+    if (focused) this.focus();
   }
 
   succeed(): void {
+    if (this.successId) return;
     this.question = null;
-    this.stopSpinner();
     this.reactive = false;
-    this.entryArea.ease({ opacity: 0, duration: FADE_TIME, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
-    this.emit('succeeded');
+    this.ring.fill(1, SUCCESS_FILL);
+    this.successId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, SUCCESS_HOLD, () => {
+      this.successId = 0;
+      this.emit('succeeded');
+      return GLib.SOURCE_REMOVE;
+    });
+  }
+
+  private showFingerprintOnRing(state: FingerprintState): void {
+    if (this.method.field.waiting) return;
+    switch (state.kind) {
+    case 'retry':
+      this.ring.fill(0.36, RETRY_FILL);
+      break;
+    case 'no-match':
+      this.ring.fail();
+      break;
+    case 'match':
+      break;
+    default:
+      this.ring.clear();
+    }
+  }
+
+  private usePassword(typed: string): void {
+    if (this.method.showsFingerprint) this.emit('use-password');
+    const { field } = this.method;
+    if (typed && !field.waiting) field.insert(typed);
+    this.focus();
   }
 
   private updateBackButton(): void {
-    const visible = this.canGoBack || (this.question?.step ?? 0) > 1;
-    this.backButton.opacity = visible ? 255 : 0;
-    this.backButton.reactive = visible;
-    this.backButton.can_focus = visible;
-  }
-
-  private useEntry(secret: boolean, hint: string): void {
-    const entry = secret ? this.passwordEntry : this.textEntry;
-    if (entry !== this.entry) {
-      const { text, cursorPosition, selectionBound } = this.entry.clutter_text;
-      this.entryArea.replace_child(this.entry, entry);
-      this.entry.text = '';
-      this.entry = entry;
-      this.entry.clutter_text.set({ text, cursorPosition, selectionBound });
-    }
-    this.entry.hint_text = hint;
-    this.capsLockWarning.visible = secret;
+    this.method.field.canGoBack = this.canGoBack || (this.question?.step ?? 0) > 1;
   }
 
   private submit(): void {
-    if (!this.entry.reactive) return;
+    const { field } = this.method;
+    if (field.waiting) return;
 
-    const text = this.entry.text;
+    const text = field.text;
     if (this.askingUserName) {
       if (text.trim()) this.emit('user-name', text.trim());
       return;
     }
+    if (!text && this.question?.secret) return;
 
     this.setBusy(true);
     this.answered = true;
@@ -297,11 +256,11 @@ export const AuthPrompt = GObject.registerClass({
       this.preemptiveAnswer = text;
       if (this.stalled) this.restart();
     }
-    this.clearEntries();
+    field.clear();
   }
 
   private onMessage(text: string, isError: boolean): void {
-    if (!this.retrying) this.setMessage(text, isError);
+    if (!this.retrying) this.method.setMessage(text, isError);
   }
 
   private onQuestion(text: string, secret: boolean): void {
@@ -316,15 +275,16 @@ export const AuthPrompt = GObject.registerClass({
       return;
     }
 
-    this.useEntry(secret, questionHint(text));
+    this.method.field.useEntry(secret, questionHint(text));
     this.setBusy(false);
   }
 
   private onFailed(authError: boolean, description: string): void {
     if (!authError) console.warn(`Authentication did not complete: ${description}`);
     const password = this.question?.secret && PASSWORD_QUESTIONS.includes(this.question.text);
-    this.setMessage(KestrelUi.t(password ? 'auth-prompt-wrong-password' : 'auth-prompt-failed'), true);
-    wiggle(this.entryArea);
+    this.method.setMessage(KestrelUi.t(password ? 'auth-prompt-wrong-password' : 'auth-prompt-failed'), true);
+    this.ring.fail();
+    this.method.field.shake();
     KestrelUi.playSound('error');
     this.question = null;
     this.preemptiveAnswer = null;
@@ -341,46 +301,14 @@ export const AuthPrompt = GObject.registerClass({
   }
 
   private setBusy(busy: boolean): void {
-    this.entry.reactive = !busy;
-    this.nextButton.reactive = !busy;
+    this.method.field.waiting = busy;
     if (busy) {
-      this.passwordEntry.password_visible = false;
-      this.spinner.play();
+      this.ring.sweep();
     } else {
-      this.stopSpinner();
-      this.entry.grab_key_focus();
+      if (!this.successId) this.ring.clear();
+      this.focus();
     }
-    this.nextButton.opacity = busy ? 0 : 255;
-    this.spinner.opacity = busy ? 255 : 0;
     this.emit('loading', busy);
-  }
-
-  private stopSpinner(): void {
-    this.spinner.stop();
-    this.spinner.opacity = 0;
-  }
-
-  private clearEntries(): void {
-    this.textEntry.text = '';
-    this.passwordEntry.text = '';
-  }
-
-  private fadeOutMessage(): void {
-    if (this.message.opacity === 0 || this.entry.text === '') return;
-    this.message.ease({ opacity: 0, duration: FADE_TIME, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
-  }
-
-  private setMessage(message: string | null, isError = false): void {
-    this.message.remove_all_transitions();
-    if (!message) {
-      this.message.opacity = 0;
-      return;
-    }
-    if (isError) this.message.add_style_class_name('login-dialog-message-warning');
-    else this.message.remove_style_class_name('login-dialog-message-warning');
-    this.message.text = message;
-    this.message.opacity = 255;
-    this.get_accessible().emit('notification', message, Atk.Live.ASSERTIVE);
   }
 });
 export type AuthPrompt = InstanceType<typeof AuthPrompt>;

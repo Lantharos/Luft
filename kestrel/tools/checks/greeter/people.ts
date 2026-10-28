@@ -19,15 +19,15 @@ export async function checkPeople() {
   const background = new Gio.Settings({schema_id: 'org.gnome.desktop.background'});
 
   press(Clutter.KEY_space);
-  await eventually(() => shown(named('kestrel-greeter-users')) && shown(named('kestrel-greeter-controls')),
-    'waking the screen shows the people and controls');
+  await eventually(() => shown(named('kestrel-auth')) && shown(named('kestrel-greeter-users')) && shown(named('kestrel-greeter-controls')),
+    'waking the screen raises the prompt next to the people and controls');
   const users = existing('kestrel-greeter-users');
   require(typed(''), 'the key that wakes the screen is not typed into the field');
   require(global.stage.context.get_backend().get_default_seat().get_keymap().get_num_lock_state(), 'Num Lock is on, as the last session left it');
   const rows = styled('kestrel-greeter-user', users).filter((row): row is St.Button => row instanceof St.Button && row.mapped);
-  require(rows.map(row => row.accessible_name).join(', ') === 'Mara Lindqvist, Theo Brandt, Another account',
+  require(rows.map(row => row.accessible_name).join(', ') === 'Ines Okafor, Mara Lindqvist, Theo Brandt, Another account',
     'people are listed by name with a way to type a hidden account');
-  await eventually(() => rows[0].checked && lastSessionStart() === 'mara', 'the person who signed in most recently is ready to sign in');
+  await eventually(() => rows[1].checked && lastSessionStart() === 'mara', 'the person who signed in most recently is ready to sign in');
   await eventually(() => promptState().message === 'Welcome back, Mara' && !promptState().warning,
     'information from the sign-in steps is shown');
   await capture('login-users');
@@ -39,7 +39,7 @@ export async function checkPeople() {
   await eventually(() => typed(''), 'erasing empties the password field');
 
   const firstAccent = accentStylesheet();
-  click(rows[1]);
+  click(rows[2]);
   await eventually(() => background.get_string('picture-uri-dark').endsWith('/users/2002/wallpaper.jpg'),
     'choosing another person crossfades to their wallpaper');
   await eventually(() => accentStylesheet() !== firstAccent, 'the accent color follows the chosen wallpaper');
@@ -56,7 +56,7 @@ export async function checkPeople() {
     'the password field is cleared and ready for another try');
   await capture('login-wrong-password');
 
-  click(rows[2]);
+  click(rows[3]);
   await eventually(() => !promptState().secret && promptState().hint === 'Username', 'another account asks for a username first');
   require(background.get_string('picture-uri-dark') === background.get_default_value('picture-uri-dark')?.unpack(),
     'another account shows Luft’s own wallpaper behind the prompt');
@@ -76,6 +76,6 @@ export async function checkPeople() {
   press(Clutter.KEY_Escape);
   await eventually(() => promptState().hint === 'Username', 'going back returns to the username');
 
-  click(rows[0]);
+  click(rows[1]);
   await eventually(() => lastSessionStart() === 'mara' && promptState().secret, 'choosing a listed person again starts over for them');
 }

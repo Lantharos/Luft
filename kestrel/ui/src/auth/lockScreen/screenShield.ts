@@ -4,7 +4,6 @@ import Gio from 'gi://Gio';
 import type GioUnix from 'gi://GioUnix';
 import GLib from 'gi://GLib';
 import type GObject from 'gi://GObject';
-import Graphene from 'gi://Graphene';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 
@@ -28,8 +27,6 @@ const LOCK_DELAY_KEY = 'lock-delay';
 
 const STANDARD_FADE_TIME = 10000;
 const MANUAL_FADE_TIME = 300;
-const CURTAIN_SLIDE_TIME = 300;
-const SHIELD_ANIMATION_TIME = 250;
 
 interface ScreenShieldSignals {
   'active-changed': () => void;
@@ -45,10 +42,6 @@ interface ResetParams {
 interface ShownParams {
   fadeToBlack: boolean;
   animateFade: boolean;
-}
-
-function useMotion(): boolean {
-  return St.Settings.get().reducedMotion !== St.ReducedMotion.REDUCE;
 }
 
 function defaultSeat(): Clutter.Seat {
@@ -75,7 +68,6 @@ export class ScreenShield extends Signals.EventEmitter {
     y_expand: true,
     reactive: true,
     can_focus: true,
-    pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 }),
     name: 'lockDialogGroup',
   });
 
@@ -284,23 +276,12 @@ export class ScreenShield extends Signals.EventEmitter {
     }
 
     this.lockScreenState = MessageTray.State.HIDING;
-
-    this.lockDialogGroup.remove_all_transitions();
-
-    const height = global.stage.height;
-    const delta = height + this.lockDialogGroup.translation_y;
-    const velocity = height / CURTAIN_SLIDE_TIME;
-    const duration = animate ? delta / velocity : 0;
-
-    this.lockDialogGroup.ease({
-      ...useMotion() ? { translation_y: -height } : { opacity: 0 },
-      duration,
-      mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-      onComplete: () => {
-        this.hideLockScreenComplete();
-        onHidden();
-      },
-    });
+    const hidden = () => {
+      this.hideLockScreenComplete();
+      onHidden();
+    };
+    if (animate && this.dialog) this.dialog.lift(false, hidden);
+    else hidden();
 
     this.showPointer();
   }
@@ -333,20 +314,9 @@ export class ScreenShield extends Signals.EventEmitter {
     this.lockScreenState = MessageTray.State.SHOWING;
 
     if (animateLockScreen) {
-      const motion = useMotion();
-      if (motion) this.lockDialogGroup.translation_y = -global.screen_height;
-      else this.lockDialogGroup.opacity = 0;
-
-      this.lockDialogGroup.remove_all_transitions();
-      this.lockDialogGroup.ease({
-        ...motion ? { translation_y: 0 } : { opacity: 255 },
-        duration: SHIELD_ANIMATION_TIME,
-        mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-        onComplete: () => this.lockScreenShown({ fadeToBlack, animateFade: true }),
-      });
+      this.dialog!.lift(true, () => this.lockScreenShown({ fadeToBlack, animateFade: true }));
     } else {
-      this.lockDialogGroup.translation_y = 0;
-      this.lockDialogGroup.opacity = 255;
+      this.dialog!.rest();
       this.lockScreenShown({ fadeToBlack, animateFade: false });
     }
 
@@ -382,9 +352,7 @@ export class ScreenShield extends Signals.EventEmitter {
   }
 
   private showLockScreenAwake(): void {
-    this.lockDialogGroup.remove_all_transitions();
-    this.lockDialogGroup.translation_y = 0;
-    this.lockDialogGroup.opacity = 255;
+    this.dialog?.rest();
     this.lockScreenShown({ fadeToBlack: false, animateFade: false });
   }
 

@@ -78,6 +78,16 @@ auth-prompt-submit = Envia
 auth-prompt-wrong-password = La contrasenya no ha funcionat
 auth-prompt-failed = No ha funcionat. Torneu-ho a provar.
 fingerprint-not-recognized = No s’ha reconegut l’empremta digital
+fingerprint-scanning = Toqueu el lector d’empremtes
+fingerprint-retry-scan = Torneu a escanejar el dit
+fingerprint-swipe-too-short = El lliscament ha estat massa curt, torneu-ho a provar
+fingerprint-finger-not-centered = Centreu el dit i torneu-ho a provar
+fingerprint-remove-and-retry = Aixequeu el dit i torneu-ho a provar
+fingerprint-unavailable = L’empremta no està disponible, escriviu la contrasenya
+auth-prompt-use-password = Fes servir la contrasenya
+auth-prompt-try-fingerprint = Torna a provar l’empremta
+auth-prompt-use-fingerprint = Fes servir l’empremta
+auth-prompt-show-password = Mostra la contrasenya
 
 ## Administrator authentication
 
@@ -134,8 +144,6 @@ end-session-console-user = { $userName } (consola)
 
 ## Lock screen clock
 
-lock-clock-swipe-up = Llisqueu cap amunt
-lock-clock-click-or-press = Feu clic o premeu una tecla
 
 ## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
 

@@ -187,7 +187,7 @@ def main():
         )
         lock_screen_flows(chip=True)
         sudo_flows()
-    elif scenario in ("fingerprint sign-in", "fingerprint after resealing"):
+    elif scenario in ("fingerprint sign-in", "fingerprint after switching", "fingerprint after resealing"):
         check(not asked, "the fingerprint alone unlocked it")
         check(secret_tool("lookup", "service", "repo").stdout == SECRET, "the saved secret is there")
         check(keyring("FingerprintUnlock") is True, "the keyring says a fingerprint unlocks it")

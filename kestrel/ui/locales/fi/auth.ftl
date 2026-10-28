@@ -78,6 +78,16 @@ auth-prompt-submit = Lähetä
 auth-prompt-wrong-password = Salasana ei kelvannut
 auth-prompt-failed = Se ei onnistunut. Yritä uudelleen.
 fingerprint-not-recognized = Sormenjälkeä ei tunnistettu
+fingerprint-scanning = Kosketa sormenjälkilukijaa
+fingerprint-retry-scan = Skannaa sormesi uudelleen
+fingerprint-swipe-too-short = Pyyhkäisy oli liian lyhyt, yritä uudelleen
+fingerprint-finger-not-centered = Aseta sormi keskelle ja yritä uudelleen
+fingerprint-remove-and-retry = Nosta sormi ja yritä uudelleen
+fingerprint-unavailable = Sormenjälki ei ole käytettävissä, anna salasana
+auth-prompt-use-password = Käytä salasanaa
+auth-prompt-try-fingerprint = Yritä sormenjälkeä uudelleen
+auth-prompt-use-fingerprint = Käytä sormenjälkeä
+auth-prompt-show-password = Näytä salasana
 
 ## Administrator authentication
 
@@ -134,8 +144,6 @@ end-session-console-user = { $userName } (konsoli)
 
 ## Lock screen clock
 
-lock-clock-swipe-up = Pyyhkäise ylös
-lock-clock-click-or-press = Napsauta tai paina näppäintä
 
 ## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
 

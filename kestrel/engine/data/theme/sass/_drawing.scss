@@ -88,15 +88,6 @@
   $entry_bg_color: mix($c, $bc, $background_mix_factor);
   $entry_focus_color: $accent_color;
 
-  // entry color overrides for lockscreen style
-  @if $style == 'lockscreen' {
-    $entry_bg_color: transparentize($c, .9);
-    $entry_focus_color: transparentize($entry_fg_color, 0.6);
-    @if $contrast == 'high' {
-      $entry_focus_color: transparentize($entry_fg_color, 0.3);
-    }
-  }
-
   // background color adjustment factors
   // the % a color is lightened or darkened for button states
   $hover_factor: 4%;
@@ -127,12 +118,6 @@
     @include focus_ring($fc:$entry_focus_color);
     background-color: focus_bg_color($entry_bg_color);
     color: $entry_fg_color;
-
-    // lockscreen style
-    @if $style == 'lockscreen' {
-      @include focus_ring($fc:$entry_focus_color);
-      background-color: focus_bg_color($entry_bg_color, $fc:$entry_focus_color);
-    }
   }
 
   // hover styles
@@ -206,8 +191,8 @@
   }
 
   // background color override for buttons that use transparency
-  // styles: dialogs bubbles, lockscreen
-  @if $style == 'dialog' or $style == 'lockscreen' {
+  // styles: dialogs bubbles
+  @if $style == 'dialog' {
     $button_bg_color: transparentize($tc, .9);
     $hover_button_bg_color: transparentize($tc, .87);
     $active_button_bg_color: transparentize($tc, .84);
@@ -307,10 +292,6 @@
     // use a different focus ring color for default style
     @if $style == 'default' {
       @include focus_ring($fc:$accent_borders_color);
-    }
-    // use the text color for the focus ring in lockscreen
-    @if $style == 'lockscreen' {
-      @include focus_ring($fc: transparentize($tc, if($contrast == 'high', 0.3, 0.6)));
     }
     // change background color if style is flat
     @if $style == 'flat' {

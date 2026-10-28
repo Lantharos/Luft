@@ -3,13 +3,13 @@ import type GObject from 'gi://GObject';
 import * as KestrelUi from '../../kestrelUi.js';
 import * as Signals from '../../core/runtime/signals.js';
 import { Authentication } from './authentication.js';
+import { type FingerprintState, watchVerifyResults } from './fingerprintState.js';
 import { connectAuthenticator } from './greetd.js';
 
-const RESTARTS = 1;
-
 interface FingerprintSignals {
-  succeeded: () => void;
-  hint: (hint: string | null) => void;
+  'state-changed': (state: FingerprintState) => void;
+  'succeeded': () => void;
+  'stopped': (attempted: boolean) => void;
 }
 
 export class FingerprintAuthentication extends Signals.EventEmitter {
@@ -17,77 +17,82 @@ export class FingerprintAuthentication extends Signals.EventEmitter {
   declare emit: GObject.SignalMethods<this, FingerprintSignals>['emit'];
 
   private readonly authentication = new Authentication(connectAuthenticator, { mode: 'fingerprint' });
-  private userName = '';
-  private instruction: string | null = null;
-  private listening = false;
-  private restarts = 0;
+  private stopWatching: (() => void) | null = null;
+  private attempted = false;
+  state: FingerprintState = { kind: 'idle' };
 
   constructor() {
     super();
     this.authentication.connectObject(
-      'question', () => this.stop(null),
-      'message', (_: Authentication, text: string, isError: boolean) => this.onMessage(text, isError),
-      'failed', () => this.onFailed(),
-      'succeeded', () => this.emit('succeeded'),
+      'question', () => this.stop(),
+      'message', (_: Authentication, _text: string, isError: boolean) => this.onMessage(isError),
+      'failed', () => this.stop(),
+      'succeeded', () => this.succeed(),
       this);
   }
 
+  get listening(): boolean {
+    return this.stopWatching !== null && this.state.kind !== 'idle';
+  }
+
+  get running(): boolean {
+    return this.stopWatching !== null;
+  }
+
   begin(userName: string): void {
-    this.userName = userName;
-    this.instruction = null;
-    this.restarts = 0;
-    this.start();
+    this.cancel();
+    this.state = { kind: 'idle' };
+    this.attempted = false;
+    this.stopWatching = watchVerifyResults(state => this.onResult(state));
+    this.authentication.begin(userName);
   }
 
   cancel(): void {
-    this.listening = false;
+    if (!this.running) return;
+    this.unwatch();
     this.authentication.cancel();
+    this.setState({ kind: 'idle' });
   }
 
   destroy(): void {
+    this.unwatch();
     this.authentication.destroy();
   }
 
-  private start(): void {
-    this.listening = false;
-    this.authentication.begin(this.userName);
+  private unwatch(): void {
+    this.stopWatching?.();
+    this.stopWatching = null;
   }
 
-  private stop(hint: string | null): void {
-    this.cancel();
-    this.emit('hint', hint);
+  private onMessage(isError: boolean): void {
+    if (isError || this.state.kind !== 'idle') return;
+    this.setState({ kind: 'scanning' });
   }
 
-  private onMessage(text: string, isError: boolean): void {
-    if (isError) {
-      if (this.listening) {
-        KestrelUi.playSound('error');
-        this.emit('hint', KestrelUi.t('fingerprint-not-recognized'));
-      } else {
-        this.stop(null);
-      }
-      return;
-    }
-
-    this.listening = true;
-    if (text === this.instruction) return;
-    this.instruction = text;
-    this.emit('hint', text);
+  private onResult(state: FingerprintState): void {
+    if (this.state.kind === 'idle') return;
+    this.attempted = true;
+    if (state.kind === 'no-match') KestrelUi.playSound('error');
+    this.setState(state);
   }
 
-  private onFailed(): void {
-    if (!this.listening) {
-      this.stop(null);
-      return;
-    }
+  private succeed(): void {
+    this.unwatch();
+    this.setState({ kind: 'match' });
+    this.emit('succeeded');
+  }
 
-    KestrelUi.playSound('error');
-    if (this.restarts < RESTARTS) {
-      this.restarts++;
-      this.emit('hint', KestrelUi.t('fingerprint-not-recognized'));
-      this.start();
-    } else {
-      this.stop(KestrelUi.t('fingerprint-not-recognized'));
-    }
+  private stop(): void {
+    if (!this.running) return;
+    const listened = this.state.kind !== 'idle';
+    this.unwatch();
+    this.authentication.cancel();
+    this.setState(listened ? { kind: 'unavailable' } : { kind: 'idle' });
+    if (listened) this.emit('stopped', this.attempted);
+  }
+
+  private setState(state: FingerprintState): void {
+    this.state = state;
+    this.emit('state-changed', state);
   }
 }

@@ -9,6 +9,7 @@ import {dismissImmediately, surfacesPrepared, toggleSurface, Main, MessageTray} 
 import {descendants, existing, firstStyled, named, ofType} from '../checks/lib/actors.js';
 import {gjs, stop, stopAll, waitForWindow, waitForWindows} from '../checks/lib/processes.js';
 import {pause, settled, waitUntil} from '../checks/lib/wait.js';
+import {lockAndWake, showPrompt, unlock} from '../checks/lockScreen/lib/shield.js';
 
 const MEASURE_SETTLE = 3000;
 const OPENING = 500_000;
@@ -336,11 +337,28 @@ async function measureIdleWakeups() {
 }
 
 async function measureIdle() {
+  report({idleFramesOverTwoSeconds: await paintsOver(IDLE_SAMPLE)});
+}
+
+async function paintsOver(milliseconds: number) {
   let frames = 0;
   const painted = global.stage.connect('after-paint', () => frames++);
-  await pause(IDLE_SAMPLE);
+  await pause(milliseconds);
   global.stage.disconnect(painted);
-  report({idleFramesOverTwoSeconds: frames});
+  return frames;
+}
+
+async function measureLockScreen() {
+  const before = processMetrics().residentMemoryMb;
+  await lockAndWake();
+  await settled(MEASURE_SETTLE);
+  const lockedIdleFramesOverTwoSeconds = await paintsOver(IDLE_SAMPLE);
+  await showPrompt();
+  await settled(MEASURE_SETTLE);
+  const lockMemoryGrowthMb = processMetrics().residentMemoryMb - before;
+  await unlock();
+  await settled(MEASURE_SETTLE);
+  report({lockedIdleFramesOverTwoSeconds, lockMemoryGrowthMb, memoryAfterUnlockMb: processMetrics().residentMemoryMb - before});
 }
 
 function measureSessionManager() {
@@ -372,5 +390,6 @@ export async function run() {
   await measureTaskViewAdd();
   await measureIdle();
   await measureIdleWakeups();
+  await measureLockScreen();
   measureSessionManager();
 }

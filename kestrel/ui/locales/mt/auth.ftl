@@ -78,6 +78,16 @@ auth-prompt-submit = Ibgħat
 auth-prompt-wrong-password = Il-password ma ħadmitx
 auth-prompt-failed = Ma ħadimx. Erġa’ pprova.
 fingerprint-not-recognized = Il-marka tas-saba’ ma ntgħarfitx
+fingerprint-scanning = Mess il-qarrej tal-marki tas-swaba’
+fingerprint-retry-scan = Erġa’ skennja subgħajk
+fingerprint-swipe-too-short = Il-mogħdija kienet qasira wisq, erġa’ pprova
+fingerprint-finger-not-centered = Poġġi subgħajk fin-nofs u erġa’ pprova
+fingerprint-remove-and-retry = Erfa’ subgħajk u erġa’ pprova
+fingerprint-unavailable = Il-marka tas-saba’ mhix disponibbli, daħħal il-password
+auth-prompt-use-password = Uża l-password minflok
+auth-prompt-try-fingerprint = Erġa’ pprova l-marka tas-saba’
+auth-prompt-use-fingerprint = Uża l-marka tas-saba’
+auth-prompt-show-password = Uri l-password
 
 ## Administrator authentication
 
@@ -149,8 +159,6 @@ end-session-console-user = { $userName } (konsola)
 
 ## Lock screen clock
 
-lock-clock-swipe-up = Swajpja ’l fuq
-lock-clock-click-or-press = Ikklikkja jew agħfas tast
 
 ## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
 

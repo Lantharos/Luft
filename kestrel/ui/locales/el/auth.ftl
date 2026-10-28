@@ -78,6 +78,16 @@ auth-prompt-submit = Υποβολή
 auth-prompt-wrong-password = Ο κωδικός πρόσβασης δεν είναι σωστός
 auth-prompt-failed = Δεν λειτούργησε. Δοκιμάστε ξανά.
 fingerprint-not-recognized = Το δακτυλικό αποτύπωμα δεν αναγνωρίστηκε
+fingerprint-scanning = Αγγίξτε τον αναγνώστη δακτυλικών αποτυπωμάτων
+fingerprint-retry-scan = Σαρώστε ξανά το δάχτυλό σας
+fingerprint-swipe-too-short = Η σάρωση ήταν πολύ σύντομη, δοκιμάστε ξανά
+fingerprint-finger-not-centered = Τοποθετήστε το δάχτυλο στο κέντρο και δοκιμάστε ξανά
+fingerprint-remove-and-retry = Σηκώστε το δάχτυλό σας και δοκιμάστε ξανά
+fingerprint-unavailable = Το δακτυλικό αποτύπωμα δεν είναι διαθέσιμο, εισαγάγετε τον κωδικό πρόσβασης
+auth-prompt-use-password = Χρήση κωδικού πρόσβασης
+auth-prompt-try-fingerprint = Δοκιμάστε ξανά το αποτύπωμα
+auth-prompt-use-fingerprint = Χρήση δακτυλικού αποτυπώματος
+auth-prompt-show-password = Εμφάνιση κωδικού πρόσβασης
 
 ## Administrator authentication
 
@@ -134,8 +144,6 @@ end-session-console-user = { $userName } (κονσόλα)
 
 ## Lock screen clock
 
-lock-clock-swipe-up = Σύρετε προς τα πάνω
-lock-clock-click-or-press = Κάντε κλικ ή πατήστε ένα πλήκτρο
 
 ## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
 

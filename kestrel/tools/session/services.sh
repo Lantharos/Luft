@@ -88,11 +88,11 @@ system_services="$built_fixtures/system/systemBus.js"
 [[ "$mode" == setup ]] && system_services="$built_fixtures/setup/systemBus.js"
 DBUS_SYSTEM_BUS_ADDRESS="$system_bus" start gjs -m "$system_services"
 DBUS_SYSTEM_BUS_ADDRESS="$system_bus" start "$fixtures/session/printServer.sh" "$session/cups" "$CUPS_SERVER"
-start gjs -m "$built_fixtures/auth/authenticator.js" "$KESTREL_AUTHENTICATE_SOCK"
+DBUS_SYSTEM_BUS_ADDRESS="$system_bus" start gjs -m "$built_fixtures/auth/authenticator.js" "$KESTREL_AUTHENTICATE_SOCK"
 start pipewire -c "$fixtures/session/pipewire.conf"
 gdbus wait --session --timeout 10 org.gnome.SessionManager
 gdbus wait --address "$system_bus" --timeout 10 com.lantharos.KestrelChecks
-gdbus wait --session --timeout 10 com.lantharos.KestrelChecks.Authenticator
+wait_until "the authenticator stand-in" test -S "$KESTREL_AUTHENTICATE_SOCK"
 wait_until "the sound server" test -S "$PULSE_RUNTIME_PATH/native"
 start "$fixtures/session/soundDefaults.sh"
 wait_until "the print server" printer_ready

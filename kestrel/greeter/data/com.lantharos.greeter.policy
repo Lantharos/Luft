@@ -6,7 +6,7 @@
   <vendor_url>https://github.com/Lantharos</vendor_url>
 
   <action id="com.lantharos.greeter.set-appearance">
-    <description>Share your wallpaper, displays and keyboard state with the login screen</description>
+    <description>Share your wallpaper, style, displays, keyboard state and way of signing in with the login screen</description>
     <message>Authentication is required to share your settings with the login screen</message>
     <defaults>
       <allow_any>no</allow_any>

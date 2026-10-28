@@ -78,6 +78,16 @@ auth-prompt-submit = Kinnita
 auth-prompt-wrong-password = See salasõna ei sobinud
 auth-prompt-failed = See ei õnnestunud. Proovi uuesti.
 fingerprint-not-recognized = Sõrmejälge ei tuvastatud
+fingerprint-scanning = Puuduta sõrmejäljelugejat
+fingerprint-retry-scan = Skanni sõrm uuesti
+fingerprint-swipe-too-short = Libistus oli liiga lühike, proovi uuesti
+fingerprint-finger-not-centered = Aseta sõrm keskele ja proovi uuesti
+fingerprint-remove-and-retry = Tõsta sõrm üles ja proovi uuesti
+fingerprint-unavailable = Sõrmejälg pole saadaval, sisesta salasõna
+auth-prompt-use-password = Kasuta salasõna
+auth-prompt-try-fingerprint = Proovi sõrmejälge uuesti
+auth-prompt-use-fingerprint = Kasuta sõrmejälge
+auth-prompt-show-password = Näita salasõna
 
 ## Administrator authentication
 
@@ -139,8 +149,6 @@ end-session-console-user = { $userName } (konsool)
 
 ## Lock screen clock
 
-lock-clock-swipe-up = Pühi üles
-lock-clock-click-or-press = Klõpsa või vajuta mõnda klahvi
 
 ## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
 

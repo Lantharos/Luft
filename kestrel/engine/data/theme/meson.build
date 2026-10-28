@@ -21,7 +21,6 @@ theme_sources = files([
   'sass/widgets/_entries.scss',
   'sass/widgets/_ibus-popup.scss',
   'sass/widgets/_keyboard.scss',
-  'sass/widgets/_login-lock.scss',
   'sass/widgets/_message-list.scss',
   'sass/widgets/_misc.scss',
   'sass/widgets/_notifications.scss',

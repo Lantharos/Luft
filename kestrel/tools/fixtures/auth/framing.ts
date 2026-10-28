@@ -1,5 +1,6 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
+import GLibUnix from 'gi://GLibUnix';
 
 export interface Request {
   type: string;
@@ -53,11 +54,18 @@ async function serve(connection: Gio.SocketConnection, respond: Respond) {
   }
 }
 
-export function listen(socketPath: string, name: string, conversation: () => Respond) {
+function closing(connection: Gio.SocketConnection) {
+  return new Promise<void>(resolve => GLibUnix.fd_add_full(GLib.PRIORITY_DEFAULT, connection.get_socket().get_fd(), GLib.IOCondition.HUP, () => {
+    resolve();
+    return GLib.SOURCE_REMOVE;
+  }));
+}
+
+export function listen(socketPath: string, name: string, conversation: (closed: Promise<void>) => Respond) {
   const service = new Gio.SocketService();
   service.add_address(new Gio.UnixSocketAddress({path: socketPath}), Gio.SocketType.STREAM, Gio.SocketProtocol.DEFAULT, null);
   service.connect('incoming', (_service, connection) => {
-    serve(connection, conversation()).catch((e: Error) => console.error(`${name}: ${e.message}`));
+    serve(connection, conversation(closing(connection))).catch((e: Error) => console.error(`${name}: ${e.message}`));
     return true;
   });
   service.start();

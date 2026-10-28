@@ -8,7 +8,6 @@ type ModeName = 'restrictive' | 'greeter' | 'peek' | 'setup' | 'unlock-dialog' |
 interface ModeProperties {
   parentMode: ModeName | null;
   stylesheetName: string;
-  colorScheme: 'dark' | null;
   themeResourceName: string;
   allowSettings: boolean;
   allowScreencast: boolean;
@@ -40,7 +39,6 @@ const modes: Record<ModeName, Partial<ModeProperties>> = {
   'restrictive': {
     parentMode: null,
     stylesheetName: 'base.css',
-    colorScheme: null,
     themeResourceName: 'kestrel-theme.gresource',
     allowSettings: false,
     allowScreencast: false,
@@ -60,7 +58,6 @@ const modes: Record<ModeName, Partial<ModeProperties>> = {
   'greeter': {
     isGreeter: true,
     isPrimary: true,
-    colorScheme: 'dark',
   },
 
   'peek': {

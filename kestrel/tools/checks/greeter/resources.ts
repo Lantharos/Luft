@@ -26,8 +26,8 @@ function residentMegabytes(field: string) {
 export async function reportResources() {
   console.log(`Kestrel login screen ready: ${secondsSinceLaunch()} s after launch, ${residentMegabytes('VmRSS')} MB resident`);
   await settled();
-  require(!shown(named('kestrel-greeter-users')) && !shown(named('kestrel-greeter-controls')),
-    'the login screen opens on the clock alone');
+  require(shown(named('kestrel-lock-time')) && !shown(named('kestrel-auth')),
+    'the login screen opens on the clock, with the prompt tucked away');
   let frames = 0;
   const painted = global.stage.connect('after-paint', () => frames++);
   const cpu = cpuSeconds();

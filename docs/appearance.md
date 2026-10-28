@@ -14,7 +14,7 @@ Luft starts dark, on Fog. The light style has its own wallpaper, Dunes, in `pict
 - The taskbar's text and icons take the light or dark ink, whichever reads better against what sits behind them: the bottom of the wallpaper as the taskbar's look shows it, judged by its darkest and brightest parts as well as its average. A transparent taskbar over a dark wallpaper turns its ink white in the light style, and over a bright one it turns dark in the dark style. Over a busy wallpaper where the ink comes close to unreadable, the glass taskbar takes a slightly stronger tint. Where neither ink is clear enough, the clock and status icons get a halo, a firmer one on a transparent taskbar over a busy wallpaper. The choice is made once per wallpaper, for both styles and every look, so switching style or look adds no extra restyle.
 - The back half of the Start mark takes its shade from what sits behind the taskbar: the bottom of the wallpaper as the taskbar's look shows it. It stays a quieter partner of the front half and keeps clear of the wallpaper in every look. Over a busy wallpaper it also gets a faint edge.
 - Pure black only applies to the dark style. In the light style the shell keeps its glass.
-- The login and lock screens stay dark in both styles, as does high contrast.
+- The lock screen follows the style, and changes with it while locked: the light style gets a lighter frost and dark ink. The login screen takes the style of the person it shows, or of whoever signed in last before anyone is picked, which their session shares with it. High contrast stays dark.
 
 ## Wallpaper position
 

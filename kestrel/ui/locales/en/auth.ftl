@@ -107,6 +107,22 @@ auth-prompt-submit = Submit
 auth-prompt-wrong-password = That password didn’t work
 auth-prompt-failed = That didn’t work. Try again.
 fingerprint-not-recognized = Fingerprint not recognized
+# Shown while the fingerprint reader waits for a finger
+fingerprint-scanning = Touch the fingerprint reader
+fingerprint-retry-scan = Scan your finger again
+fingerprint-swipe-too-short = Swipe was too short, try again
+fingerprint-finger-not-centered = Center your finger and try again
+fingerprint-remove-and-retry = Lift your finger and try again
+# Shown above the password field when the fingerprint stops working
+fingerprint-unavailable = Fingerprint isn’t available, enter your password
+# Link button that swaps the fingerprint request for the password field
+auth-prompt-use-password = Use password instead
+# Link button that starts the fingerprint reader again
+auth-prompt-try-fingerprint = Try fingerprint again
+# Link button that swaps the password field for the fingerprint
+auth-prompt-use-fingerprint = Use fingerprint
+# Screen-reader label of the button that shows the typed password
+auth-prompt-show-password = Show password
 
 ## Administrator authentication
 
@@ -184,10 +200,6 @@ end-session-console-user = { $userName } (console)
 
 ## Lock screen clock
 
-# Hint under the lock screen clock on touch screens
-lock-clock-swipe-up = Swipe up
-# Hint under the lock screen clock with a mouse or keyboard
-lock-clock-click-or-press = Click or press a key
 
 ## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
 

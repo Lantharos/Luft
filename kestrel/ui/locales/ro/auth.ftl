@@ -78,6 +78,16 @@ auth-prompt-submit = Trimite
 auth-prompt-wrong-password = Parola nu a funcționat
 auth-prompt-failed = Nu a funcționat. Încercați din nou.
 fingerprint-not-recognized = Amprenta nu a fost recunoscută
+fingerprint-scanning = Atingeți cititorul de amprente
+fingerprint-retry-scan = Scanați din nou degetul
+fingerprint-swipe-too-short = Glisarea a fost prea scurtă, încercați din nou
+fingerprint-finger-not-centered = Centrați degetul și încercați din nou
+fingerprint-remove-and-retry = Ridicați degetul și încercați din nou
+fingerprint-unavailable = Amprenta nu este disponibilă, introduceți parola
+auth-prompt-use-password = Folosește parola
+auth-prompt-try-fingerprint = Încearcă din nou amprenta
+auth-prompt-use-fingerprint = Folosește amprenta
+auth-prompt-show-password = Afișează parola
 
 ## Administrator authentication
 
@@ -139,8 +149,6 @@ end-session-console-user = { $userName } (consolă)
 
 ## Lock screen clock
 
-lock-clock-swipe-up = Glisați în sus
-lock-clock-click-or-press = Faceți clic sau apăsați o tastă
 
 ## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
 

@@ -1,6 +1,8 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
+import {FINGERPRINT_NAME, publishFingerprint} from '../system/fingerprint.js';
+
 const [images, events] = ARGV;
 const INTERFACES = '/usr/share/dbus-1/interfaces';
 const ACCOUNTS_PATH = '/org/freedesktop/Accounts';
@@ -21,6 +23,7 @@ const people: Person[] = [
   {name: GLib.get_user_name(), realName: 'Sam Rivera', uid: new Gio.Credentials().get_unix_user(), loginTime: now - HOUR, session: 'kestrel'},
   {name: 'mara', realName: 'Mara Lindqvist', uid: 2001, loginTime: now - 30 * HOUR, session: 'sway', language: 'de_DE.UTF-8'},
   {name: 'theo', realName: 'Theo Brandt', uid: 2002, loginTime: now - 90 * HOUR, session: ''},
+  {name: 'ines', realName: 'Ines Okafor', uid: 2003, loginTime: now - 200 * HOUR, session: 'kestrel'},
 ].map(person => ({...person, path: `${ACCOUNTS_PATH}/User${person.uid}`}));
 
 const interfaceXml = (name: string) => Gio.DBusNodeInfo
@@ -126,7 +129,14 @@ publish('org.freedesktop.locale1', {
   X11Options: '',
 }, '/org/freedesktop/locale1');
 
-for (const name of ['org.freedesktop.Accounts', 'org.freedesktop.login1', 'org.freedesktop.locale1'])
+publishFingerprint((xml, implementation, path) => {
+  const exported = Gio.DBusExportedObject.wrapJSObject(xml, implementation);
+  exported.export(Gio.DBus.system, path);
+  published.push(exported);
+  return exported;
+}, []);
+
+for (const name of ['org.freedesktop.Accounts', 'org.freedesktop.login1', 'org.freedesktop.locale1', FINGERPRINT_NAME, 'com.lantharos.KestrelChecks'])
   Gio.bus_own_name_on_connection(Gio.DBus.system, name, Gio.BusNameOwnerFlags.NONE, null, null);
 
 new GLib.MainLoop(null, false).run();

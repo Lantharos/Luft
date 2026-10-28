@@ -23,6 +23,6 @@ Run from `kestrel/keyring`:
 | --- | --- |
 | `cargo test -p luft-keyring -p luft-keyring-vault -p luft-keyring-unlock` | Vault format, and TPM sealing, PIN lockout and chip-held keys against `swtpm` |
 | `python3 tools/session/session.py ../../target/debug/luft-keyring` | The daemon installed as on Luft, setgid to a group of its own, in a user namespace with a private bus and a scratch home: items, app access from sandboxed apps and from programs of yours, portal, SSH agent |
-| `tools/vm/build.sh`, then `tools/vm/run.sh tpm`, `gone` or `none` | Sign-in, lock screen, `sudo`, Secure Boot changes and PINs in a VM of `localhost/luft-system:45` with a stand-in fingerprint reader: with a software TPM, after the TPM is removed, and without one |
+| `tools/vm/build.sh`, then `tools/vm/run.sh tpm`, `gone` or `none` | Sign-in with a password or a fingerprint, switching to the password while the reader waits, lock screen, `sudo`, Secure Boot changes and PINs in a VM of `localhost/luft-system:45` with a stand-in fingerprint reader: with a software TPM, after the TPM is removed, and without one |
 
 Where it keeps its files, how apps are given access, app secrets, the SSH agent and GnuPG are in [the keyring reference](../../docs/components/keyring.md).

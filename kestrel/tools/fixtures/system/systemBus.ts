@@ -3,6 +3,7 @@ import GLib from 'gi://GLib';
 
 import {ACCOUNTS_NAME, publishAccounts} from './accounts.js';
 import {BASIC_NAMES, publishBasics} from './basics.js';
+import {FINGERPRINT_NAME, publishFingerprint} from './fingerprint.js';
 import {NETWORK_MANAGER_NAME, publishNetworkManager} from './network/networkManager.js';
 import {publishSecurity, SECURITY_NAMES} from './security.js';
 import {publishSleep, SLEEP_NAME} from './sleep.js';
@@ -41,7 +42,8 @@ publishSecurity(publish, calls, publishUdisks(calls));
 publishWindows(publish);
 publishSleep(publish, calls);
 publishUpdater(publish, calls);
+publishFingerprint(publish, calls);
 
-for (const name of [...BASIC_NAMES, ACCOUNTS_NAME, NETWORK_MANAGER_NAME, 'com.lantharos.KestrelChecks', 'org.freedesktop.UDisks2', WINDOWS_NAME, SLEEP_NAME, UPDATER_NAME, ...SECURITY_NAMES])
+for (const name of [...BASIC_NAMES, ACCOUNTS_NAME, NETWORK_MANAGER_NAME, 'com.lantharos.KestrelChecks', 'org.freedesktop.UDisks2', WINDOWS_NAME, SLEEP_NAME, UPDATER_NAME, FINGERPRINT_NAME, ...SECURITY_NAMES])
   Gio.bus_own_name_on_connection(Gio.DBus.system, name, Gio.BusNameOwnerFlags.NONE, null, null);
 new GLib.MainLoop(null, false).run();

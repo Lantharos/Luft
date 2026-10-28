@@ -13,7 +13,7 @@ use crate::access::{self, Access, CONFIGURE, SET_APPEARANCE};
 use crate::error::Error;
 use crate::idle::Idle;
 use crate::options::Options;
-use crate::store::{self, Config, Focus, Store};
+use crate::store::{self, Config, Focus, SignInMethod, Store, Style};
 use crate::system::greetd::{Greetd, InitialSession};
 use crate::system::sessions::{self, Session};
 use crate::system::{accounts, users};
@@ -55,11 +55,12 @@ impl Greeter {
             .or_else(|| users::regular_uid(&self.greetd.automatic_login()))
     }
 
-    async fn show_user(&self, name: &str) -> Result<(), Error> {
+    async fn remember_user(&self, name: &str, sign_in_method: SignInMethod) -> Result<(), Error> {
         let Some(uid) = users::regular_uid(name) else {
             return Ok(());
         };
         let _writing = self.writing.lock().await;
+        self.store.save_user_sign_in_method(uid, sign_in_method)?;
         let mut config = self.store.config();
         config.shown_user = Some(uid);
         if let Some(on) = self.store.user_num_lock(uid) {
@@ -217,6 +218,38 @@ impl Greeter {
         Ok(())
     }
 
+    async fn set_sign_in_method(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        method: String,
+    ) -> Result<(), Error> {
+        let _active = self.idle.hold();
+        self.access
+            .authorize(connection, &header, SET_APPEARANCE)
+            .await?;
+        let method = SignInMethod::parse(&method)?;
+        let uid = access::caller_uid(connection, &header).await?;
+        let _writing = self.writing.lock().await;
+        Ok(self.store.save_user_sign_in_method(uid, method)?)
+    }
+
+    async fn set_style(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        style: String,
+    ) -> Result<(), Error> {
+        let _active = self.idle.hold();
+        self.access
+            .authorize(connection, &header, SET_APPEARANCE)
+            .await?;
+        let style = Style::parse(&style)?;
+        let uid = access::caller_uid(connection, &header).await?;
+        let _writing = self.writing.lock().await;
+        Ok(self.store.save_user_style(uid, style)?)
+    }
+
     async fn set_shared_wallpaper(
         &self,
         #[zbus(connection)] connection: &Connection,
@@ -348,12 +381,14 @@ impl Greeter {
         #[zbus(header)] header: Header<'_>,
         username: String,
         session: String,
+        sign_in_method: String,
     ) -> Result<(), Error> {
         let _active = self.idle.hold();
         self.access.authorize_greeter(connection, &header).await?;
         let sessions = sessions::discover();
         let session = session_named(&sessions, &session)?;
-        self.show_user(&username).await?;
+        let sign_in_method = SignInMethod::parse(&sign_in_method)?;
+        self.remember_user(&username, sign_in_method).await?;
         accounts::remember_session(connection, &username, session)
             .await
             .map_err(|error| {

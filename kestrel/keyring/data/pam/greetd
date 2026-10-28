@@ -1,5 +1,7 @@
 #%PAM-1.0
-auth       substack    system-auth
+auth       [success=ok ignore=ignore default=die]  @pamdir@/pam_kestrel_sign_in.so
+auth       [success=1 default=ignore]  @pamdir@/pam_kestrel_sign_in.so verified
+auth       substack    password-auth
 -auth      optional    pam_kwallet5.so
 -auth      optional    pam_kwallet.so
 -auth      optional    @pamdir@/pam_luft_keyring.so

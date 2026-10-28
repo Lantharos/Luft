@@ -11,6 +11,7 @@ interface GreeterEvent {
   type: string;
   action?: string;
   username?: string;
+  method?: string;
 }
 
 export function events() {
@@ -19,14 +20,14 @@ export function events() {
 }
 
 export function promptState() {
-  const entry = styled('login-dialog-prompt-entry').find((actor): actor is St.Entry => actor instanceof St.Entry && actor.mapped) ?? null;
-  const message = styled('login-dialog-message').find(label => label.mapped && label.opacity > 0) ?? null;
+  const entry = styled('kestrel-auth-entry').find((actor): actor is St.Entry => actor instanceof St.Entry && actor.mapped) ?? null;
+  const message = styled('kestrel-auth-message').find(label => label.mapped && label.opacity > 0) ?? null;
   return {
     entry,
     hint: entry?.hint_text ?? null,
     secret: entry instanceof St.PasswordEntry,
     message: message && textOf(message),
-    warning: message?.has_style_class_name('login-dialog-message-warning') ?? false,
+    warning: message?.has_style_class_name('warning') ?? false,
   };
 }
 

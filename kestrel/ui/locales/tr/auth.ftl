@@ -78,6 +78,16 @@ auth-prompt-submit = Gönder
 auth-prompt-wrong-password = Parola işe yaramadı
 auth-prompt-failed = İşe yaramadı. Yeniden deneyin.
 fingerprint-not-recognized = Parmak izi tanınmadı
+fingerprint-scanning = Parmak izi okuyucuya dokunun
+fingerprint-retry-scan = Parmağınızı yeniden taratın
+fingerprint-swipe-too-short = Kaydırma çok kısaydı, yeniden deneyin
+fingerprint-finger-not-centered = Parmağınızı ortalayıp yeniden deneyin
+fingerprint-remove-and-retry = Parmağınızı kaldırıp yeniden deneyin
+fingerprint-unavailable = Parmak izi kullanılamıyor, parolanızı girin
+auth-prompt-use-password = Bunun yerine parola kullan
+auth-prompt-try-fingerprint = Parmak izini yeniden dene
+auth-prompt-use-fingerprint = Parmak izi kullan
+auth-prompt-show-password = Parolayı göster
 
 ## Administrator authentication
 
@@ -134,8 +144,6 @@ end-session-console-user = { $userName } (konsol)
 
 ## Lock screen clock
 
-lock-clock-swipe-up = Yukarı kaydırın
-lock-clock-click-or-press = Tıklayın ya da bir tuşa basın
 
 ## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
 

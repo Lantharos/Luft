@@ -78,6 +78,16 @@ auth-prompt-submit = Pateikti
 auth-prompt-wrong-password = Slaptažodis netinka
 auth-prompt-failed = Nepavyko. Bandykite dar kartą.
 fingerprint-not-recognized = Piršto atspaudas neatpažintas
+fingerprint-scanning = Palieskite piršto atspaudų skaitytuvą
+fingerprint-retry-scan = Nuskaitykite pirštą dar kartą
+fingerprint-swipe-too-short = Perbraukimas buvo per trumpas, bandykite dar kartą
+fingerprint-finger-not-centered = Padėkite pirštą per vidurį ir bandykite dar kartą
+fingerprint-remove-and-retry = Pakelkite pirštą ir bandykite dar kartą
+fingerprint-unavailable = Piršto atspaudas nepasiekiamas, įveskite slaptažodį
+auth-prompt-use-password = Naudoti slaptažodį
+auth-prompt-try-fingerprint = Bandyti piršto atspaudą dar kartą
+auth-prompt-use-fingerprint = Naudoti piršto atspaudą
+auth-prompt-show-password = Rodyti slaptažodį
 
 ## Administrator authentication
 
@@ -144,8 +154,6 @@ end-session-console-user = { $userName } (konsolėje)
 
 ## Lock screen clock
 
-lock-clock-swipe-up = Perbraukite aukštyn
-lock-clock-click-or-press = Spustelėkite arba paspauskite klavišą
 
 ## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
 

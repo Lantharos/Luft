@@ -9,7 +9,7 @@ from pathlib import Path
 
 LUFT = Path(__file__).resolve().parents[4]
 sys.path.insert(0, str(LUFT / "os/vm"))
-from control import Machine  # noqa: E402
+from control import Machine, MachineError  # noqa: E402
 
 USER = "luft"
 PASSWORD = os.environ.get("VM_PASSWORD", "luft-vm")
@@ -37,6 +37,10 @@ class Check:
         self.qemu = subprocess.Popen([str(LUFT / "os/vm/qemu.sh")], env=environment)
         self.machine = Machine(folder, seconds=120)
         self.uid = ""
+        try:
+            self.machine.enroll(PASSWORD, 120)
+        except MachineError:
+            pass
 
     def run(self, command: str, seconds: float = 60) -> str:
         return self.machine.shell(command, seconds)[1]

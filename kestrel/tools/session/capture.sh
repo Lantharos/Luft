@@ -11,6 +11,8 @@ max_startup_failures=3
 inotify_per_session=24
 declare -A laptops=([laptop]=1920x1200:302x189mm [laptop15]=1920x1080:344x194mm)
 laptop_areas=(board input:dictation input:scrolling panel:battery panel:repaints panel:screenshot tablet:keyboard tablet:longPress windows:serverDecorations windows:x11Frames)
+taskbar_positions=(left top right)
+position_areas=(taskbar start panel tiling)
 two_display_groups=(tiling:monitors)
 second_display=1280x720
 
@@ -23,16 +25,23 @@ all_groups() {
   local area laptop
   (cd "$tools/checks" && find . -mindepth 2 -maxdepth 2 -name '*.ts' -not -path './lib/*' -not -path './greeter/*' -not -path './setup/*' -not -path './scaling/*') \
     | sed 's|^\./||; s|\.ts$||; s|/|:|' | sort
-  for laptop in "${!laptops[@]}"; do
-    for area in "${laptop_areas[@]}"; do
-      if [[ "$area" == *:* ]]; then
-        echo "$area+$laptop"
-      else
-        (cd "$tools/checks/$area" && find . -maxdepth 1 -name '*.ts') | sed "s|^\./|$area:|; s|\.ts$|+$laptop|"
-      fi
-    done
-  done | sort
+  {
+    for laptop in "${!laptops[@]}"; do variants "$laptop" "${laptop_areas[@]}"; done
+    for position in "${taskbar_positions[@]}"; do variants "$position" "${position_areas[@]}"; done
+  } | sort
   printf '%s\n' greeter setup scaling
+}
+
+variants() {
+  local variant="$1" area
+  shift
+  for area in "$@"; do
+    if [[ "$area" == *:* ]]; then
+      echo "$area+$variant"
+    else
+      (cd "$tools/checks/$area" && find . -maxdepth 1 -name '*.ts') | sed "s|^\./|$area:|; s|\.ts$|+$variant|"
+    fi
+  done
 }
 
 select_groups() {
@@ -70,7 +79,10 @@ queue_groups() {
       printf -v index '%03d' $((10#$index + 1))
       size=default
       [[ "$group" == *+* ]] && size="${group##*+}"
-      [[ " ${two_display_groups[*]} " == *" $group "* ]] && size=dual
+      if [[ " ${two_display_groups[*]} " == *" ${group%+*} "* ]]; then
+        size=dual
+        [[ "$group" == *+* ]] && size="dual-${group##*+}"
+      fi
       mkdir -p "$out/queue/$size"
       : > "$out/queue/$size/$index-$group"
     fi
@@ -100,18 +112,26 @@ seconds_since() {
 
 start_worker() {
   local name="worker-$((++workers))" size capture_size="${KESTREL_CAPTURE_SIZE:-1440x900}" captures="$KESTREL_CAPTURE_DIR"
-  local secondary="${KESTREL_CAPTURE_SECONDARY_SIZE:-}"
+  local secondary="${KESTREL_CAPTURE_SECONDARY_SIZE:-}" position="" variant
   size=$(next_size)
-  if [[ "$size" == dual ]]; then
+  variant="$size"
+  if [[ "$variant" == dual* ]]; then
     secondary="$second_display"
-  elif [[ "$size" != default ]]; then
-    capture_size="${laptops[$size]}"
-    captures="$KESTREL_CAPTURE_DIR/$size"
+    variant="${variant#dual}"
+    variant="${variant#-}"
+  fi
+  if [[ " ${taskbar_positions[*]} " == *" $variant "* ]]; then
+    position="$variant"
+    captures="$KESTREL_CAPTURE_DIR/taskbar-$variant"
+  elif [[ -n "$variant" && "$variant" != default ]]; then
+    capture_size="${laptops[$variant]}"
+    captures="$KESTREL_CAPTURE_DIR/$variant"
   fi
   mkdir -p "$captures"
   KESTREL_SESSION_DIR="$out/workers/$name" KESTREL_CAPTURE_WORKER="$name" KESTREL_CAPTURE_QUEUE="$out/queue/$size" \
     KESTREL_CAPTURE_CLAIMED="$out/claimed" KESTREL_CAPTURE_RESULTS="$out/results" \
     KESTREL_CAPTURE_SIZE="$capture_size" KESTREL_CAPTURE_SECONDARY_SIZE="$secondary" KESTREL_CAPTURE_DIR="$captures" \
+    KESTREL_CAPTURE_TASKBAR="$position" \
     timeout "$session_timeout" "$tools/session/desktop.sh" capture > "$out/workers/$name.log" 2>&1 &
   running[$!]="$name"
   sizes[$!]="$size"

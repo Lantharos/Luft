@@ -12,6 +12,7 @@ import {pause, settled} from '../lib/wait.js';
 import {lock, unlock} from '../lockScreen/lib/shield.js';
 import {fold} from '../tablet/lib/touch.js';
 import {closeStart, rows, start} from '../start/search/results.js';
+import {beyond, boxOf, farSide, nearSide} from '../lib/edge.js';
 
 const {require, eventually} = checks('Hidden taskbar');
 const shell = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
@@ -26,7 +27,7 @@ const taskbarStart = () => existing('Start', existing('kestrel-panel'));
 function workAreaFillsTheScreen() {
   const monitor = Main.layoutManager.primaryMonitor!;
   const area = Main.layoutManager.getWorkAreaForMonitor(monitor.index);
-  return area.height === monitor.height;
+  return area.width === monitor.width && area.height === monitor.height;
 }
 
 async function open(target: Clutter.Actor, surface: () => Clutter.Actor | null, label: string) {
@@ -48,9 +49,7 @@ async function checkCorner() {
   await open(existing('kestrel-corner-clock'), () => named('kestrel-notifications'), 'the corner clock opens notifications');
   closeStart();
   const startMenu = await open(cornerStart(), start, 'the corner opens Start');
-  const [, startTop] = startMenu.get_transformed_position();
-  const [, cornerTop] = existing('kestrel-status-corner').get_transformed_position();
-  require(startTop + startMenu.height <= cornerTop, 'Start stays clear of the corner');
+  require(!beyond(farSide(boxOf(startMenu)), nearSide(boxOf(existing('kestrel-status-corner')))), 'Start stays clear of the corner');
   await capture('taskbar-hidden-start');
   closeStart();
 }

@@ -46,6 +46,7 @@ export class StripScene {
 
   apply(boxes: Map<Meta.Window, Box>, animate: boolean, velocity = 0): void {
     const home = this.host.monitorBox(this.monitor);
+    const view = this.host.workArea(this.monitor);
     const others = this.others();
     for (const [window, box] of boxes) {
       if (!this.host.ready(window)) continue;
@@ -53,7 +54,7 @@ export class StripScene {
       setEdgesTiled(window, this.host.gap() === 0);
       if (stretched(window)) continue;
       const actor = actorOf(window);
-      const real = parkingSpot(box, home, others);
+      const real = parkingSpot(box, view, home, others);
       const frame = window.get_frame_rect();
       const visualX = frame.x + (actor?.translation_x ?? 0);
       const visualY = frame.y + (actor?.translation_y ?? 0);

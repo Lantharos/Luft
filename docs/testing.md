@@ -29,6 +29,8 @@ The checks, the stand-in services and the test clients are TypeScript in `kestre
 
 The board groups, `input:dictation`, `input:scrolling`, `panel:battery`, `panel:repaints`, `panel:screenshot`, `tablet:keyboard`, `tablet:longPress`, `windows:serverDecorations` and `windows:x11Frames` also run on two laptop panels at their automatic display scale: a 14-inch 1920×1200 panel at 150%, as the groups ending in `+laptop`, and a 15.6-inch 1080p panel at 125%, as the groups ending in `+laptop15`. Their screenshots go to a `laptop` or `laptop15` folder inside the capture folder.
 
+The `taskbar`, `start`, `panel` and `tiling` groups also run with the taskbar on the left, top and right, as the groups ending in `+left`, `+top` and `+right`, with their screenshots in a `taskbar-left`, `taskbar-top` or `taskbar-right` folder.
+
 Headless sessions run Kestrel through `kestrel-wrapper`, as the real session does, so a Kestrel that crashes starts again. `system:reconnect` relies on it: it opens Rover and Settings, moves Rover to the second workspace, maximizes Settings and locks the screen, then crashes Kestrel. In the Kestrel that takes over, it checks that the screen is still locked, that both apps reconnect without reloading their pages and that their windows come back where they were. Pointing `KESTREL_QT_APP` at a Qt 6 program adds its window to the check.
 
 `tiling:monitors` always runs with a second 1280×720 display to the right of the first, which the other groups only get from `KESTREL_CAPTURE_SECONDARY_SIZE`.
@@ -45,6 +47,7 @@ The nested session copies the host's wallpaper, interface settings, keyboard lay
 | `KESTREL_CAPTURE_SECONDARY_SIZE` | none | Adds a second virtual monitor, such as `1280x720` |
 | `KESTREL_CAPTURE_SCHEME` | dark | `light` or `dark`, to capture every surface in one style |
 | `KESTREL_CAPTURE_WALLPAPER` | Luft's default wallpapers | An image used as the wallpaper for both styles, also behind the Luft apps in place of their test gradient, to check the glass on light and dark pictures |
+| `KESTREL_CAPTURE_TASKBAR` | bottom | Starts every session with the taskbar on another edge: `left`, `top` or `right` |
 | `LUFT_LOCALE` | US English | A language for Kestrel and the apps, also used for their dates, numbers and first day of the week, such as `de` or the pseudo-locale `en-XA`. Most checks look for English text, so pair it with `--only system:translations`, which captures Kestrel's surfaces and every Settings page in any language |
 | `KESTREL_BUILD` | `kestrel/build` | Another Kestrel build to run, set up against `KESTREL_COMPOSITOR` |
 | `KESTREL_COMPOSITOR` | `kestrel/run/mutter-install` | Another Mutter install to run on, such as one from `kestrel/compositor/build.sh BUILD_DIR PREFIX` |

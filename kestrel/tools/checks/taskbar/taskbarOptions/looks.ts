@@ -5,13 +5,15 @@ import Shell from 'gi://Shell';
 import {existing} from '../../lib/actors.js';
 import {scratch} from '../../lib/processes.js';
 import {settled} from '../../lib/wait.js';
-import {bottomGap, captureBottom, eventually, FLOATING_MARGIN, HEIGHTS, panel, panelBox, primary, set, settings} from './taskbar.js';
+import {band, captureEdge, edgeGap, eventually, FLOATING_MARGIN, HEIGHTS, panel, panelBox, primary, set, settings, thickness} from './taskbar.js';
+import {boxOf, taskbarEdge, vertical} from '../../lib/edge.js';
 
 const STYLES = ['bar', 'floating'];
 const LOOKS = ['glass', 'solid', 'transparent', 'accent'];
 const SCHEMES = {'prefer-dark': 'dark', default: 'light'};
 const SCHEME_TIMEOUT = 3000;
 const INK_MIDPOINT = 128;
+const IN_BETWEEN = 0.5;
 const PICTURES = ['picture-uri', 'picture-uri-dark'];
 const background = new Gio.Settings({schema_id: 'org.gnome.desktop.background'});
 
@@ -48,7 +50,7 @@ function plainWallpaper(name: string, gray: number) {
   return Gio.File.new_for_path(path).get_uri();
 }
 
-// The taskbar takes its glass from the bottom of the wallpaper when that's
+// The taskbar takes its glass from the wallpaper behind it when that's
 // clearly light or dark, so each style gets the same wallpaper here
 async function withWallpaper(uri: string, action: () => Promise<void>) {
   const saved = PICTURES.map(key => [key, background.get_string(key)]);
@@ -66,23 +68,29 @@ async function checkPureBlack(name: string) {
   const opaque = name === 'dark';
   await eventually(() => panel().has_style_class_name('kestrel-taskbar-opaque') === opaque && backdrop().enabled === !opaque,
     `pure black ${opaque ? 'makes the dark taskbar opaque' : 'leaves the light taskbar glass'}`);
-  await captureBottom(`taskbar-pure-black-${name}`);
+  await captureEdge(`taskbar-pure-black-${name}`);
   settings.reset('pure-black');
 }
 
 export async function checkAlignment() {
   const center = existing('kestrel-panel-center');
+  const along = (box: {x: number; y: number; width: number; height: number}) =>
+    vertical() ? {start: box.y, length: box.height} : {start: box.x, length: box.width};
   set('taskbar-alignment', 'left');
-  await eventually(() => Math.round(center.get_transformed_position()[0] - panel().x) <= 8, 'Start and the apps move to the left edge');
-  await captureBottom('taskbar-left');
+  await eventually(() => Math.round(along(boxOf(center)).start - along(panelBox()).start) <= 8, 'Start and the apps move to the start of the taskbar');
+  await captureEdge('taskbar-left');
   set('taskbar-alignment', 'center');
-  const monitor = primary();
-  await eventually(() => Math.abs(center.get_transformed_position()[0] + center.width / 2 - (monitor.x + monitor.width / 2)) <= 1,
-    'Start and the apps return to the middle');
+  const screen = along(primary());
+  await eventually(() => {
+    const {start, length} = along(boxOf(center));
+    return Math.abs(start + length / 2 - (screen.start + screen.length / 2)) <= 1;
+  }, 'Start and the apps return to the middle');
 }
 
+// Fog is neither light nor dark only along its bottom
 export async function checkLooks() {
-  await withWallpaper(background.get_string('picture-uri'), checkStyles);
+  const inBetween = taskbarEdge() === 'bottom' ? background.get_string('picture-uri') : plainWallpaper('in-between', IN_BETWEEN);
+  await withWallpaper(inBetween, checkStyles);
 }
 
 async function checkStyles() {
@@ -97,7 +105,7 @@ async function checkStyles() {
         set('taskbar-look', look);
         await eventually(() => panel().has_style_class_name(`kestrel-taskbar-${look}`) && backdrop().enabled === ['glass', 'accent'].includes(look),
           `the ${style} taskbar takes the ${look} look and blurs only when it needs to`);
-        await captureBottom(`taskbar-${style}-${look}-${name}`);
+        await captureEdge(`taskbar-${style}-${look}-${name}`);
       }
     }
     await checkPureBlack(name);
@@ -111,28 +119,27 @@ export async function checkWallpaperGlass() {
     styles.set_string('color-scheme', scheme);
     await withWallpaper(plainWallpaper(glass, gray), async () => {
       await checkShading(glass, `over a ${gray ? 'white' : 'black'} wallpaper the ${name} style's taskbar takes ${glass} glass`);
-      await captureBottom(`taskbar-${glass}-wallpaper-${name}`);
+      await captureEdge(`taskbar-${glass}-wallpaper-${name}`);
     });
   }
 }
 
 export async function checkFloating() {
-  const monitor = primary();
   set('taskbar-style', 'floating');
   await eventually(() => {
     const floating = panelBox();
-    return floating.x === monitor.x + FLOATING_MARGIN && floating.width === monitor.width - 2 * FLOATING_MARGIN &&
-      floating.y + floating.height === monitor.y + monitor.height - FLOATING_MARGIN;
+    const expected = band(HEIGHTS.normal, FLOATING_MARGIN);
+    return floating.x === expected.x && floating.y === expected.y && floating.width === expected.width && floating.height === expected.height;
   }, 'the floating taskbar keeps a margin from the screen edges');
-  await eventually(() => bottomGap() === HEIGHTS.normal + FLOATING_MARGIN, 'maximized windows stop above the floating taskbar and its margin');
+  await eventually(() => edgeGap() === HEIGHTS.normal + FLOATING_MARGIN, 'maximized windows stop above the floating taskbar and its margin');
   set('taskbar-style', 'bar');
 }
 
 export async function checkSizes() {
   for (const size of ['compact', 'large', 'normal'] as const) {
     set('taskbar-size', size);
-    await eventually(() => panel().height === HEIGHTS[size] && bottomGap() === HEIGHTS[size],
-      `the ${size} taskbar is ${HEIGHTS[size]} pixels tall and reserves that much`);
-    if (size !== 'normal') await captureBottom(`taskbar-${size}`);
+    await eventually(() => thickness(panel()) === HEIGHTS[size] && edgeGap() === HEIGHTS[size],
+      `the ${size} taskbar is ${HEIGHTS[size]} pixels thick and reserves that much`);
+    if (size !== 'normal') await captureEdge(`taskbar-${size}`);
   }
 }

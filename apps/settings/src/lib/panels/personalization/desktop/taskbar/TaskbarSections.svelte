@@ -6,7 +6,8 @@
 	import type { App, Displays } from '#lib/bindings.js';
 	import { KESTREL_SCHEMA, useSettings } from '#lib/state/gsettings.svelte.js';
 	import { currentWallpaper } from '#lib/panels/personalization/appearance/wallpaper/current.svelte.js';
-	import { ALIGNMENTS, AUTO_HIDE, LOOKS, SIZES, START_STYLES, STYLES, TASKBAR_KEYS, WEB_SEARCH, type TaskbarSettings } from './options';
+	import { alignments, AUTO_HIDE, LOOKS, POSITIONS, SIZES, START_STYLES, STYLES, TASKBAR_KEYS, WEB_SEARCH, type TaskbarSettings } from './options';
+	import PositionGlyph from './PositionGlyph.svelte';
 	import TaskbarPreview from './TaskbarPreview.svelte';
 
 	const PREVIEW_APPS = 5;
@@ -24,6 +25,7 @@
 	let shown = $derived(values['taskbar-shown'] ?? true);
 	let startButton = $derived(values['taskbar-start-button'] ?? true);
 	let startStyle = $derived(values['start-style'] ?? 'menu');
+	let position = $derived(values['taskbar-position'] ?? 'bottom');
 	let everyDisplay = $derived((values['taskbar-displays'] ?? 'all') === 'all');
 	let previewApps = $derived.by(() => {
 		const byId = new Map(installed.map((app) => [app.id, app]));
@@ -36,7 +38,8 @@
 		return options.map((option) => ({ value: option.value, label: t(option.label) }));
 	}
 
-	let alignments = $derived(translated(ALIGNMENTS));
+	let positions = $derived(translated(POSITIONS));
+	let alignmentOptions = $derived(translated(alignments(position)));
 	let looks = $derived(translated(LOOKS));
 	let styles = $derived(translated(STYLES));
 	let sizes = $derived(translated(SIZES));
@@ -56,6 +59,7 @@
 <TaskbarPreview
 	wallpaper={wallpaper.url}
 	apps={previewApps}
+	{position}
 	alignment={values['taskbar-alignment'] ?? 'center'}
 	look={values['taskbar-look'] ?? 'glass'}
 	style={values['taskbar-style'] ?? 'bar'}
@@ -90,8 +94,15 @@
 		<Switch label={t('settings-taskbar-shown')} checked={shown} onchange={(on) => taskbar.set('taskbar-shown', on)} />
 	</Row>
 	{#if shown}
+		<Row title={t('settings-taskbar-position')}>
+			<Segmented label={t('settings-taskbar-position')} options={positions} value={position} onchange={(value) => taskbar.set('taskbar-position', value)}>
+				{#snippet item(option)}
+					<PositionGlyph position={option.value} />
+				{/snippet}
+			</Segmented>
+		</Row>
 		<Row title={t('settings-taskbar-alignment')}>
-			<Segmented label={t('settings-taskbar-alignment')} options={alignments} value={values['taskbar-alignment'] ?? 'center'} onchange={(value) => taskbar.set('taskbar-alignment', value)} />
+			<Segmented label={t('settings-taskbar-alignment')} options={alignmentOptions} value={values['taskbar-alignment'] ?? 'center'} onchange={(value) => taskbar.set('taskbar-alignment', value)} />
 		</Row>
 		<Row title={t('settings-taskbar-look')}>
 			<Segmented label={t('settings-taskbar-look')} options={looks} value={values['taskbar-look'] ?? 'glass'} onchange={(value) => taskbar.set('taskbar-look', value)} />

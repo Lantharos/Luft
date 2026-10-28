@@ -23,6 +23,8 @@
   .kestrel-tablet-strip-handle { background-color: ink(0.4); }
   .kestrel-task-button.drop-before { box-shadow: inset 3px 0 ink(0.75); }
   .kestrel-task-button.drop-after { box-shadow: inset -3px 0 ink(0.75); }
+  &.kestrel-taskbar-vertical .kestrel-task-button.drop-before { box-shadow: inset 0 3px ink(0.75); }
+  &.kestrel-taskbar-vertical .kestrel-task-button.drop-after { box-shadow: inset 0 -3px ink(0.75); }
 }
 
 @function halo-shadows($strength) {

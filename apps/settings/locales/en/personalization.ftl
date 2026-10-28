@@ -114,9 +114,15 @@ settings-start-web = Search the web with
 settings-taskbar-section = Taskbar
 settings-taskbar-shown = Show the taskbar
 settings-taskbar-hidden-description = The clock and status icons stay in a corner, and Super opens Start
+settings-taskbar-position = Position
+settings-taskbar-position-bottom = Bottom
+settings-taskbar-position-left = Left
+settings-taskbar-position-top = Top
+settings-taskbar-position-right = Right
 settings-taskbar-alignment = Alignment
 settings-taskbar-align-center = Center
 settings-taskbar-align-left = Left
+settings-taskbar-align-top = Top
 # How the taskbar background looks
 settings-taskbar-look = Look
 settings-taskbar-look-glass = Glass

@@ -103,6 +103,10 @@ export class AppearanceService {
     this.update();
   }
 
+  repaintTaskbar(): void {
+    this.update();
+  }
+
   private emitChanged(name: string): void {
     const [, signature] = PROPERTIES.find(([property]) => property === name)!;
     this.dbus.emit_property_changed(name, new GLib.Variant(signature, this[name as keyof this]));

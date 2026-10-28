@@ -11,6 +11,12 @@ import { ensureActorVisibleInScrollView } from '../../core/runtime/animationUtil
 import type { Monitor } from './panel.js';
 import { windowIcon } from '../../appearance/icons/appIcons.js';
 import { t } from '../../shared/i18n/index.js';
+import { isVertical, outward, toward, type Edge } from '../../shared/layout/edge.js';
+import { clamp } from '../../shared/math.js';
+
+const POPUP_GAP = 10;
+const SCREEN_MARGIN = 12;
+const OPEN_KEYS: Record<Edge, number> = { bottom: Clutter.KEY_Up, top: Clutter.KEY_Down, left: Clutter.KEY_Right, right: Clutter.KEY_Left };
 
 export class WindowPreviews {
   readonly actor = new St.BoxLayout({ name: 'kestrel-window-previews', style_class: 'kestrel-window-previews', reactive: true, track_hover: true, visible: false });
@@ -41,7 +47,7 @@ export class WindowPreviews {
       else this.schedule(() => this.closeUnlessFocused(), 180);
     });
     button.connect('key-press-event', (_actor, event) => {
-      if (event.get_key_symbol() !== Clutter.KEY_Up || !windows().length) return Clutter.EVENT_PROPAGATE;
+      if (event.get_key_symbol() !== OPEN_KEYS[taskbarPreferences.edge] || !windows().length) return Clutter.EVENT_PROPAGATE;
       this.open(button, app(), windows(), true);
       return Clutter.EVENT_STOP;
     });
@@ -112,20 +118,31 @@ export class WindowPreviews {
     scroll.child = grid;
     this.actor.add_child(scroll);
     this.actor.show();
+    const edge = taskbarPreferences.edge;
     const clearance = taskbarPreferences.clearance;
-    const availableHeight = monitor.height - clearance - 36;
+    const availableHeight = monitor.height - (isVertical(edge) ? 24 : clearance + 36);
     const naturalHeight = grid.get_preferred_height(-1)[1];
     scroll.vscrollbar_policy = naturalHeight > availableHeight ? St.PolicyType.AUTOMATIC : St.PolicyType.NEVER;
     scroll.height = Math.min(naturalHeight, availableHeight);
     const popupWidth = this.actor.get_preferred_width(-1)[1];
     const popupHeight = this.actor.get_preferred_height(popupWidth)[1];
-    const [x] = button.get_transformed_position();
-    this.actor.set_position(Math.round(Math.max(monitor.x + 12, Math.min(x + button.width / 2 - popupWidth / 2, monitor.x + monitor.width - popupWidth - 12))), monitor.y + monitor.height - clearance - popupHeight - 10);
+    this.actor.set_position(...this.beside(button, monitor, edge, popupWidth, popupHeight));
     raiseSurface(this.actor);
     this.actor.opacity = 0;
-    this.actor.translation_y = 8;
-    animateActor(this.actor, { opacity: 255, translation_y: 0, duration: 160, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
+    this.actor.set(toward(edge, 8));
+    animateActor(this.actor, { opacity: 255, ...toward(edge, 0), duration: 160, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
     if (focus && firstWindow) (firstWindow as St.Button).grab_key_focus();
+  }
+
+  private beside(button: St.Button, monitor: Monitor, edge: Edge, width: number, height: number): [number, number] {
+    const [x, y] = button.get_transformed_position();
+    const [buttonWidth, buttonHeight] = button.get_transformed_size();
+    const reach = taskbarPreferences.clearance + POPUP_GAP;
+    const across = (start: number, length: number, size: number) => outward(edge) > 0 ? start + length - reach - size : start + reach;
+    const along = (start: number, length: number, center: number, size: number) =>
+      Math.round(clamp(center - size / 2, start + SCREEN_MARGIN, start + length - size - SCREEN_MARGIN));
+    if (isVertical(edge)) return [across(monitor.x, monitor.width, width), along(monitor.y, monitor.height, y + buttonHeight / 2, height)];
+    return [along(monitor.x, monitor.width, x + buttonWidth / 2, width), across(monitor.y, monitor.height, height)];
   }
 
   contains(actor: Clutter.Actor | null): boolean {
@@ -145,7 +162,7 @@ export class WindowPreviews {
     if (immediate) { this.actor.remove_all_transitions(); finish(); }
     else if (!this.clearSelection) {
       this.clearSelection = freezeSelection(this.actor);
-      animateActor(this.actor, { opacity: 0, translation_y: 6, duration: 100, mode: Clutter.AnimationMode.EASE_IN_QUAD, onComplete: finish });
+      animateActor(this.actor, { opacity: 0, ...toward(taskbarPreferences.edge, 6), duration: 100, mode: Clutter.AnimationMode.EASE_IN_QUAD, onComplete: finish });
     }
   }
 

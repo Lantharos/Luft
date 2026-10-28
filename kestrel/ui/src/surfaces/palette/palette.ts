@@ -10,11 +10,13 @@ import { watchInstalledApps } from '../search/installedApps.js';
 import type { SearchView } from '../search/item.js';
 import { SearchResults } from '../search/results/searchResults.js';
 import type { StartArea, StartSurface } from '../start/startSurface.js';
+import type { Offset } from '../../shared/layout/edge.js';
 import { PalettePreview } from './preview.js';
 
 const WIDTH = 760;
 const EDGE_MARGIN = 12;
 const TOP = 0.18;
+const DROP = -16;
 const PAGE = 5;
 const MINIMUM_LIST = 160;
 
@@ -26,7 +28,6 @@ export class Palette implements StartSurface {
     style_class: 'kestrel-popover kestrel-palette', reactive: true, visible: false,
   });
   readonly search: St.Entry;
-  readonly slideDistance = -16;
   readonly focusOnTouch = true;
   private readonly list = new St.BoxLayout({ name: 'kestrel-search-results', orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-search-results', x_expand: true });
   private readonly scroller = new St.ScrollView({
@@ -76,13 +77,17 @@ export class Palette implements StartSurface {
     this.engine.prepare();
   }
 
-  place({ monitor, bottom }: StartArea): void {
-    const width = Math.min(WIDTH, monitor.width - 2 * EDGE_MARGIN);
-    const y = monitor.y + Math.round(monitor.height * TOP);
+  slideFrom(): Offset {
+    return { translation_x: 0, translation_y: DROP };
+  }
+
+  place({ monitor, area }: StartArea): void {
+    const width = Math.min(WIDTH, area.width - 2 * EDGE_MARGIN);
+    const y = Math.max(area.y, monitor.y + Math.round(monitor.height * TOP));
     this.actor.set_width(width);
-    this.actor.set_position(Math.round(monitor.x + (monitor.width - width) / 2), y);
+    this.actor.set_position(Math.round(area.x + (area.width - width) / 2), y);
     const scale = St.ThemeContext.get_for_stage(global.stage).scale_factor;
-    const limit = Math.max(MINIMUM_LIST, Math.floor((bottom - y - this.search.height - EDGE_MARGIN * 4) / scale));
+    const limit = Math.max(MINIMUM_LIST, Math.floor((area.y + area.height - y - this.search.height - EDGE_MARGIN * 4) / scale));
     if (limit === this.listLimit) return;
     this.listLimit = limit;
     this.scroller.style = `max-height: ${limit}px;`;

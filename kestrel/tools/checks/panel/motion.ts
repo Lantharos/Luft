@@ -6,6 +6,7 @@ import {dismissImmediately, Spring, toggleSurface} from 'resource:///com/lanthar
 
 import {named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
+import {beyond, boxOf, farSide, nearSide, slideProperty, towardEdge} from '../lib/edge.js';
 import {nextFrame, pause, settled, waitUntil} from '../lib/wait.js';
 
 const {require} = checks('motion');
@@ -27,22 +28,22 @@ function sample(actor: Clutter.Actor, frames: number, record: (actor: Clutter.Ac
   });
 }
 
-const resting = (actor: Clutter.Actor) => actor.get_transition('translation-y') === null && actor.get_transition('opacity') === null;
+const resting = (actor: Clutter.Actor) => ['translation-x', 'translation-y', 'opacity'].every(property => actor.get_transition(property) === null);
 
 async function checkInterruptedSurface(surface: Surface, name: string) {
   dismissImmediately();
   await settled();
   const actor = named(name)!;
   toggleSurface(surface);
-  require(actor.get_transition('translation-y')!.duration < Spring.snappy.duration * 2,
+  require(actor.get_transition(slideProperty())!.duration < Spring.snappy.duration * 2,
     `${surface} stops repainting soon after its slide stops moving`);
   await pause(80);
   await nextFrame();
-  const before = actor.translation_y;
+  const before = towardEdge(actor);
   toggleSurface(surface);
-  const heights: number[] = [];
-  await sample(actor, 3, () => heights.push(actor.translation_y));
-  require(heights.some(height => height > before), `${surface} starts back down at once when closed 80 ms into opening`);
+  const offsets: number[] = [];
+  await sample(actor, 3, () => offsets.push(towardEdge(actor)));
+  require(offsets.some(offset => offset > before), `${surface} starts back toward the taskbar at once when closed 80 ms into opening`);
   await waitUntil(() => !actor.visible && resting(actor), `${surface} hides after closing mid-way`, 2000);
 
   toggleSurface(surface);
@@ -51,7 +52,7 @@ async function checkInterruptedSurface(surface: Surface, name: string) {
   await pause(60);
   toggleSurface(surface);
   await waitUntil(() => resting(actor), `${surface} settles after reopening mid-close`, 2000);
-  require(actor.visible && actor.translation_y === 0 && actor.opacity === 255,
+  require(actor.visible && actor.translation_x === 0 && actor.translation_y === 0 && actor.opacity === 255,
     `${surface} ends fully open when reopened 60 ms into closing`);
   toggleSurface(surface);
   await waitUntil(() => !actor.visible, `${surface} closes`, 2000);
@@ -65,33 +66,32 @@ async function checkReducedSurface(surface: Surface, name: string) {
   const opacities: number[] = [];
   toggleSurface(surface);
   await sample(actor, 8, () => {
-    offsets.push(actor.translation_y);
+    offsets.push(towardEdge(actor));
     opacities.push(actor.opacity);
   });
   require(offsets.every(offset => offset === 0) && opacities.some(opacity => opacity > 0 && opacity < 255),
     `with reduced motion ${surface} fades in without sliding`);
   toggleSurface(surface);
   await waitUntil(() => !actor.visible, `${surface} closes with reduced motion`, 2000);
-  require(actor.translation_y === 0, `with reduced motion ${surface} fades out without sliding`);
+  require(towardEdge(actor) === 0, `with reduced motion ${surface} fades out without sliding`);
 }
 
 async function checkClippedAtTaskbar() {
   dismissImmediately();
   await settled();
   const actor = named('kestrel-start')!;
-  const top = named('kestrel-panel')!.get_transformed_position()[1];
+  const boundary = nearSide(boxOf(named('kestrel-panel')!));
   toggleSurface('start');
   await waitUntil(() => resting(actor), 'start opens', 2000);
   toggleSurface('start');
-  const frames: {bottom: number; clip: number}[] = [];
+  const frames: {reach: number; clip: number}[] = [];
   await sample(actor, 6, () => {
-    const [, y] = actor.get_transformed_position();
     const parent = actor.get_parent()!;
-    const [, , , clipHeight] = parent.get_clip();
-    frames.push({bottom: y + actor.height, clip: parent.has_clip ? clipHeight : Infinity});
+    const [x, y, width, height] = parent.get_clip();
+    frames.push({reach: farSide(boxOf(actor)), clip: parent.has_clip ? farSide({x, y, width, height}) : Infinity});
   });
-  require(frames.some(frame => frame.bottom > top) && frames.every(frame => Math.abs(frame.clip - top) < 1),
-    'a closing surface is cut off at the top of the taskbar');
+  require(frames.some(frame => beyond(frame.reach, boundary)) && frames.every(frame => Math.abs(frame.clip - boundary) < 1),
+    'a closing surface is cut off at the edge of the taskbar');
   await waitUntil(() => !actor.visible, 'start closes', 2000);
 }
 

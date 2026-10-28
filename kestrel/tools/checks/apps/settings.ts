@@ -8,7 +8,7 @@ import {checkLive} from './settings/live.js';
 import {checkPages} from './settings/pages.js';
 import {checkTiling} from './settings/desktop/tiling.js';
 import {checkLongSleep} from './settings/system/power.js';
-import {checkTaskbarLooks} from './settings/desktop/taskbar.js';
+import {checkTaskbarLooks, checkTaskbarPositions} from './settings/desktop/taskbar.js';
 import {checkUpdates} from './settings/system/updates.js';
 import {checkWallpaper} from './settings/desktop/wallpaper.js';
 
@@ -18,6 +18,7 @@ export async function run() {
       await checkPalette(app, palette);
       await checkPages(app);
       await checkTaskbarLooks(app);
+      await checkTaskbarPositions(app);
       await checkTiling(app);
       await showDark(app, palette);
       await checkAccessibility(app);

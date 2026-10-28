@@ -80,8 +80,7 @@ export class InputSourceIndicator {
     if (properties.length) entries.push('separator', ...properties);
     const extras = this.extraEntries(this.layout());
     if (extras.length) entries.push('separator', ...extras);
-    const [x, y] = this.actor.get_transformed_position();
-    this.menus.open(this.actor, entries, Math.round(x + this.actor.width / 2), Math.round(y));
+    this.menus.openFrom(this.actor, entries);
   }
 
   private layout(): string | null {

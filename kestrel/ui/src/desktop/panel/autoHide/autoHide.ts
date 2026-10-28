@@ -4,6 +4,7 @@ import Mtk from 'gi://Mtk';
 import St from 'gi://St';
 
 import { animateActor } from '../../../shared/motion/motion.js';
+import { band, toward } from '../../../shared/layout/edge.js';
 import { taskbarPreferences } from '../preferences/taskbarPreferences.js';
 import type { Monitor } from '../panel.js';
 import type { WindowOverlap } from './windowOverlap.js';
@@ -70,9 +71,14 @@ export class AutoHide {
   place(): void {
     const monitor = this.monitor();
     if (!monitor) return;
-    this.edge.set_position(monitor.x, monitor.y + monitor.height - 1);
-    this.edge.set_size(monitor.width, 1);
-    if (!this.revealed) this.panel.translation_y = taskbarPreferences.clearance;
+    const { x, y, width, height } = band(monitor, taskbarPreferences.edge, 1);
+    this.edge.set_position(x, y);
+    this.edge.set_size(width, height);
+    if (!this.revealed) this.panel.set(this.offset(false));
+  }
+
+  private offset(revealed: boolean) {
+    return revealed ? { translation_x: 0, translation_y: this.rest() } : toward(taskbarPreferences.edge, taskbarPreferences.clearance);
   }
 
   sync(immediate = false): void {
@@ -108,8 +114,7 @@ export class AutoHide {
   private touched(): boolean {
     const monitor = this.monitor();
     if (!monitor || !this.overlap) return false;
-    const clearance = taskbarPreferences.clearance;
-    return this.overlap.touches(new Mtk.Rectangle({ x: monitor.x, y: monitor.y + monitor.height - clearance, width: monitor.width, height: clearance }));
+    return this.overlap.touches(new Mtk.Rectangle(band(monitor, taskbarPreferences.edge, taskbarPreferences.clearance)));
   }
 
   private slide(revealed: boolean, immediate: boolean): void {
@@ -122,7 +127,7 @@ export class AutoHide {
     if (!changed) return;
     this.panel.show();
     animateActor(this.panel, {
-      translation_y: revealed ? this.rest() : taskbarPreferences.clearance,
+      ...this.offset(revealed),
       duration: SLIDE_DURATION,
       mode: revealed ? Clutter.AnimationMode.EASE_OUT_QUART : Clutter.AnimationMode.EASE_IN_QUART,
       onComplete: () => { if (!this.revealed) this.panel.hide(); },
@@ -130,8 +135,9 @@ export class AutoHide {
   }
 
   private settle(): void {
+    this.panel.remove_transition('translation-x');
     this.panel.remove_transition('translation-y');
-    this.panel.translation_y = this.revealed ? this.rest() : taskbarPreferences.clearance;
+    this.panel.set(this.offset(this.revealed));
     this.panel.visible = this.allowed && this.revealed;
   }
 

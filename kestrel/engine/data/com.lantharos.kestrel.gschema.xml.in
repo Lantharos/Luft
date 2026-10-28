@@ -59,6 +59,13 @@
     <value nick="at-end" value="1"/>
   </enum>
 
+  <enum id="com.lantharos.kestrel.TaskbarPosition">
+    <value nick="bottom" value="0"/>
+    <value nick="left" value="1"/>
+    <value nick="top" value="2"/>
+    <value nick="right" value="3"/>
+  </enum>
+
   <enum id="com.lantharos.kestrel.TaskbarAlignment">
     <value nick="center" value="0"/>
     <value nick="left" value="1"/>
@@ -356,9 +363,22 @@
         When disabled, Super still opens Start.
       </description>
     </key>
+    <key name="taskbar-position" enum="com.lantharos.kestrel.TaskbarPosition">
+      <default>'bottom'</default>
+      <summary>Which edge of the screen the taskbar runs along</summary>
+      <description>
+        Start, quick settings, notifications and the taskbar's menus open
+        from the same edge. Tablet mode always keeps the taskbar at the
+        bottom.
+      </description>
+    </key>
     <key name="taskbar-alignment" enum="com.lantharos.kestrel.TaskbarAlignment">
       <default>'center'</default>
       <summary>Where Start and the apps sit on the taskbar</summary>
+      <description>
+        'left' puts them at the start of the taskbar: the left end of a
+        horizontal taskbar, or the top of one along the left or right edge.
+      </description>
     </key>
     <key name="taskbar-look" enum="com.lantharos.kestrel.TaskbarLook">
       <default>'glass'</default>
@@ -373,20 +393,20 @@
       <default>'bar'</default>
       <summary>Whether the taskbar spans the screen or floats above its edge</summary>
       <description>
-        'bar' runs along the whole bottom edge. 'floating' leaves a margin
+        'bar' runs along the whole edge. 'floating' leaves a margin
         around the taskbar and rounds its ends.
       </description>
     </key>
     <key name="taskbar-size" enum="com.lantharos.kestrel.TaskbarSize">
       <default>'normal'</default>
-      <summary>Height of the taskbar and size of its icons</summary>
+      <summary>Thickness of the taskbar and size of its icons</summary>
     </key>
     <key name="taskbar-auto-hide" enum="com.lantharos.kestrel.TaskbarAutoHide">
       <default>'never'</default>
       <summary>When the taskbar hides itself</summary>
       <description>
-        'always' keeps the taskbar hidden until the pointer reaches the
-        bottom edge or Start opens. 'windows' hides it only while a window
+        'always' keeps the taskbar hidden until the pointer reaches its
+        edge or Start opens. 'windows' hides it only while a window
         touches it. While the taskbar hides itself, windows can use the
         whole screen.
       </description>

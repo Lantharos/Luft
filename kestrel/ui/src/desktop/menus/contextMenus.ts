@@ -5,12 +5,13 @@ import type Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 import type { Monitor } from '../panel/panel.js';
-import { blurSurface, raiseSurface } from '../../shared/layout/surface.js';
+import { blurSurface, raiseSurface, SURFACE_GAP } from '../../shared/layout/surface.js';
 import { animateActor } from '../../shared/motion/motion.js';
 import { longPress } from '../../shared/input/longPress.js';
 import { menuContent, type MenuEntry, type MenuGroup } from './menuContent.js';
 import { openSettings, type SettingsPageId } from '../../system/settingsPages.js';
 import { taskbarPreferences } from '../panel/preferences/taskbarPreferences.js';
+import { toward, type Edge } from '../../shared/layout/edge.js';
 import { t } from '../../shared/i18n/index.js';
 
 export type { MenuEntry } from './menuContent.js';
@@ -19,6 +20,7 @@ const MIN_WIDTH = 176;
 const MAX_WIDTH = 420;
 const TRAILING_SPACE = 84;
 const SLIDE_DISTANCE = 40;
+const RISE = 6;
 const RESIZE = { duration: 160, mode: Clutter.AnimationMode.EASE_OUT_CUBIC };
 const SLIDE_OUT = { duration: 120, mode: Clutter.AnimationMode.EASE_IN_QUAD };
 const SLIDE_IN = { duration: 200, mode: Clutter.AnimationMode.EASE_OUT_CUBIC };
@@ -32,10 +34,11 @@ export class ContextMenus {
   private sourceDestroy = 0;
   private previousFocus: Clutter.Actor | null = null;
   private clearSelection: (() => void) | null = null;
-  private anchor: { x: number; y: number; monitor: Monitor } | null = null;
+  private anchor: { x: number; y: number; edge: Edge; monitor: Monitor } | null = null;
   private readonly bound = new WeakSet<Clutter.Actor>();
 
-  constructor(private readonly monitor: (x: number, y: number) => Monitor | null, private readonly dismissShell: () => void, private readonly enabled: () => boolean, private readonly beforeOpen: () => void, private readonly activateWindow: (window: Meta.Window) => void) {
+  constructor(private readonly monitor: (x: number, y: number) => Monitor | null, private readonly dismissShell: () => void, private readonly enabled: () => boolean, private readonly beforeOpen: () => void, private readonly activateWindow: (window: Meta.Window) => void,
+    private readonly taskbarEdgeOf: (actor: Clutter.Actor) => Edge | null = () => null) {
     blurSurface(this.actor, 18);
     this.actor.add_child(this.viewport);
     this.actor.connect('destroy', () => {
@@ -72,8 +75,7 @@ export class ContextMenus {
       if (event.get_key_symbol() !== Clutter.KEY_Menu &&
           !(event.get_key_symbol() === Clutter.KEY_F10 && (event.get_state() & Clutter.ModifierType.SHIFT_MASK)))
         return Clutter.EVENT_PROPAGATE;
-      const [x, y] = actor.get_transformed_position();
-      this.open(actor, entries(), x, y);
+      this.openFrom(actor, entries());
       return Clutter.EVENT_STOP;
     });
   }
@@ -120,6 +122,39 @@ export class ContextMenus {
     openSettings(page);
   }
 
+  anchorOf(actor: Clutter.Actor): [number, number] {
+    const [x, y] = actor.get_transformed_position();
+    const [width, height] = actor.get_transformed_size();
+    switch (this.taskbarEdgeOf(actor)) {
+      case 'bottom': return [Math.round(x + width / 2), Math.round(y)];
+      case 'top': return [Math.round(x + width / 2), Math.round(y + height)];
+      case 'left': return [Math.round(x + width), Math.round(y + height / 2)];
+      case 'right': return [Math.round(x), Math.round(y + height / 2)];
+      case null: return [x, y];
+    }
+  }
+
+  private outside(source: Clutter.Actor, edge: Edge, x: number, y: number): { x: number; y: number } {
+    const [sourceX, sourceY] = source.get_transformed_position();
+    const [width, height] = source.get_transformed_size();
+    const along = source instanceof St.Button ? Math.round(sourceY + height / 2) : y;
+    switch (edge) {
+      case 'bottom': return { x, y: Math.min(y, sourceY - SURFACE_GAP) };
+      case 'top': return { x, y: Math.max(y, sourceY + height + SURFACE_GAP) };
+      case 'left': return { x: Math.max(x, sourceX + width + SURFACE_GAP), y: along };
+      case 'right': return { x: Math.min(x, sourceX - SURFACE_GAP), y: along };
+    }
+  }
+
+  private top(edge: Edge, y: number, height: number): number {
+    if (edge === 'bottom') return y - height;
+    return edge === 'top' ? y : y - height / 2;
+  }
+
+  openFrom(source: Clutter.Actor, entries: MenuEntry[]): void {
+    this.open(source, entries, ...this.anchorOf(source));
+  }
+
   open(source: Clutter.Actor, entries: MenuEntry[], x: number, y: number): void {
     if (!this.enabled() || !entries.length) return;
     this.beforeOpen();
@@ -130,7 +165,8 @@ export class ContextMenus {
     this.sourceDestroy = source.connect('destroy', () => { this.source = null; this.sourceDestroy = 0; this.close(); });
     this.clearSelection?.();
     this.clearSelection = null;
-    this.anchor = { x, y, monitor };
+    const edge = this.taskbarEdgeOf(source);
+    this.anchor = edge ? { ...this.outside(source, edge, x, y), edge, monitor } : { x, y, edge: 'bottom', monitor };
     this.previousFocus = global.stage.get_key_focus();
     const stage = global.stage;
     this.shield.set_position(0, 0);
@@ -140,8 +176,8 @@ export class ContextMenus {
     this.present(entries, []);
     this.shield.show();
     this.actor.opacity = 0;
-    this.actor.translation_y = 6;
-    animateActor(this.actor, { opacity: 255, translation_y: 0, duration: 130, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
+    this.actor.set(toward(this.anchor.edge, RISE));
+    animateActor(this.actor, { opacity: 255, ...toward(this.anchor.edge, 0), duration: 130, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
     this.actor.grab_key_focus();
   }
 
@@ -152,7 +188,7 @@ export class ContextMenus {
   }
 
   private present(entries: MenuEntry[], parents: MenuEntry[][], direction = 0): void {
-    const { x, y, monitor } = this.anchor!;
+    const { x, y, edge, monitor } = this.anchor!;
     const content = menuContent(entries, {
       activate: action => { this.close(); action.run(); },
       open: group => void this.openGroup(group, [...parents, entries]),
@@ -176,8 +212,8 @@ export class ContextMenus {
     page.set_size(innerWidth, Math.min(content.get_preferred_height(innerWidth)[1], monitor.height - 40));
     const height = page.height + theme.get_vertical_padding();
     const position = {
-      x: Math.round(Math.max(monitor.x + 8, Math.min(x, monitor.x + monitor.width - width - 8))),
-      y: Math.round(Math.max(monitor.y + 8, Math.min(y - height, monitor.y + monitor.height - height - 8))),
+      x: Math.round(Math.max(monitor.x + 8, Math.min(edge === 'right' ? x - width : x, monitor.x + monitor.width - width - 8))),
+      y: Math.round(Math.max(monitor.y + 8, Math.min(this.top(edge, y, height), monitor.y + monitor.height - height - 8))),
     };
     if (direction) {
       const growing = height >= this.actor.height;
@@ -206,7 +242,7 @@ export class ContextMenus {
     this.sourceDestroy = 0;
     if (immediate) { this.actor.remove_all_transitions(); this.actor.hide(); }
     else if (this.actor.visible) animateActor(this.actor, {
-      opacity: 0, translation_y: 6, duration: 100, mode: Clutter.AnimationMode.EASE_IN_QUAD,
+      opacity: 0, ...toward(this.anchor?.edge ?? 'bottom', RISE), duration: 100, mode: Clutter.AnimationMode.EASE_IN_QUAD,
       onComplete: () => { if (!this.source) this.actor.hide(); },
     });
     this.shield.hide();

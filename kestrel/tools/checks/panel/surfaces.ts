@@ -6,6 +6,7 @@ import {checks} from '../lib/check.js';
 import {click, press, rest} from '../lib/input/input.js';
 import {capture} from '../lib/screenshots.js';
 import {settled} from '../lib/wait.js';
+import {besideItsButton} from '../lib/edge.js';
 
 const {require, eventually} = checks('surface');
 
@@ -18,6 +19,8 @@ async function checkSwitching() {
   const siblings = quick.get_parent()!.get_children();
   require(siblings.indexOf(quick) > siblings.indexOf(notifications), 'the opening surface slides in above the closing one');
   await eventually(() => shown(quick) && !notifications.visible, 'Quick Settings replaces the notification center');
+  await settled();
+  require(besideItsButton(quick, named('Quick settings', named('kestrel-panel')!)!), 'Quick Settings opens beside its button');
   await capture('quick-settings');
   return quick;
 }
@@ -50,12 +53,15 @@ async function checkSelectors(quick: Clutter.Actor) {
 async function checkPowerMenu() {
   toggleSurface('notifications');
   await eventually(() => shown(named('kestrel-notifications')), 'the notification center opens from Quick Settings');
+  await settled();
+  require(besideItsButton(named('kestrel-notifications')!, named('Notifications and date', named('kestrel-panel')!)!), 'the notification center opens beside the clock');
   await capture('notification-center');
 
   toggleSurface('start');
   const start = named('kestrel-start')!;
   await eventually(() => shown(start), 'Start opens from the notification center');
   await settled();
+  require(besideItsButton(start, named('Start', named('kestrel-panel')!)!), 'Start opens beside its button');
   const footer = start.get_last_child()!;
   click(footer.get_last_child()!);
   const sessionActions = () => named('Power off', footer)?.get_parent();

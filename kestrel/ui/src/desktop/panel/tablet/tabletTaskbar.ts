@@ -44,7 +44,7 @@ export class TabletTaskbar {
   }
 
   private get travel(): number {
-    return taskbarPreferences.metrics.height - STRIP_HEIGHT;
+    return taskbarPreferences.metrics.thickness - STRIP_HEIGHT;
   }
 
   private get held(): boolean {
@@ -138,10 +138,10 @@ export class TabletTaskbar {
   }
 
   private anchorBottom(): void {
-    const lift = Math.max(0, -this.panel.translation_y);
+    const lift = this.strip ? Math.max(0, -this.panel.translation_y) : 0;
     if (!lift && !this.stretched) return;
     this.stretched = lift > 0;
-    this.panel.height = taskbarPreferences.metrics.height + lift;
+    this.panel.height = taskbarPreferences.metrics.thickness + lift;
   }
 
   private paint(progress: number): void {

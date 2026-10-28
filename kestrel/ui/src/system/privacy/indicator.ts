@@ -41,6 +41,10 @@ export class PrivacyIndicator {
     localized(this.actor, () => this.sync());
   }
 
+  orient(orientation: Clutter.Orientation): void {
+    this.icons.orientation = orientation;
+  }
+
   shutdown(): void {
     this.monitor.destroy();
   }
@@ -71,8 +75,7 @@ export class PrivacyIndicator {
         run: () => new Gio.Settings({ schema_id: 'org.gnome.system.location' }).set_boolean('enabled', false) });
     entries.push(...this.windowEntries());
     entries.push('separator', { label: t('privacy-settings'), run: () => this.menus.settings('privacy') });
-    const [x, y] = this.actor.get_transformed_position();
-    this.menus.open(this.actor, entries, Math.round(x + this.actor.width / 2), Math.round(y));
+    this.menus.openFrom(this.actor, entries);
   }
 
   private windowEntries(): MenuEntry[] {

@@ -49,7 +49,11 @@ async function apply(state: State) {
 function areaAround(actor: Clutter.Actor) {
   const [x, y] = actor.get_transformed_position();
   const [width, height] = actor.get_transformed_size();
-  return {x: Math.floor(x - PADDING), y: Math.floor(y - PADDING), width: Math.ceil(width + 2 * PADDING), height: Math.ceil(height + 2 * PADDING)};
+  const left = Math.max(0, Math.floor(x - PADDING));
+  const top = Math.max(0, Math.floor(y - PADDING));
+  const right = Math.min(global.stage.width, Math.ceil(x + width + PADDING));
+  const bottom = Math.min(global.stage.height, Math.ceil(y + height + PADDING));
+  return {x: left, y: top, width: right - left, height: bottom - top};
 }
 
 function tint(name: string) {

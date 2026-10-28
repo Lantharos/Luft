@@ -6,6 +6,7 @@ import { WallClock } from '../../../shared/time/wallClock.js';
 import { BatteryIndicator } from '../../../shared/battery/indicator.js';
 import { localized, onLocaleChanged, t } from '../../../shared/i18n/index.js';
 import { blurSurface } from '../../../shared/layout/surface.js';
+import { dock, isVertical } from '../../../shared/layout/edge.js';
 import { createLauncher, type Launcher } from '../launcher/launcher.js';
 import type { Monitor } from '../panel.js';
 import { taskbarPreferences } from '../preferences/taskbarPreferences.js';
@@ -58,12 +59,13 @@ export class StatusCorner {
   }
 
   get clearance(): number {
-    const [, height] = this.actor.get_preferred_height(-1);
-    return MARGIN + height;
+    const [width, height] = this.size();
+    return MARGIN + (isVertical(taskbarPreferences.edge) ? width : height);
   }
 
   place(monitor: Monitor): void {
     this.monitor = monitor;
+    this.actor.orientation = isVertical(taskbarPreferences.edge) ? Clutter.Orientation.VERTICAL : Clutter.Orientation.HORIZONTAL;
     this.reposition();
   }
 
@@ -76,6 +78,10 @@ export class StatusCorner {
       if (opens === surface) button.add_style_pseudo_class('active');
       else button.remove_style_pseudo_class('active');
     }
+  }
+
+  buttonFor(surface: string): Clutter.Actor | null {
+    return this.buttons.find(([button, opens]) => opens === surface && button.visible)?.[0] ?? null;
   }
 
   showStatus(iconNames: string[]): void {
@@ -99,12 +105,17 @@ export class StatusCorner {
     this.launcher.button.visible = taskbarPreferences.startButton;
   }
 
-  private reposition(): void {
-    if (!this.monitor) return;
+  private size(): [number, number] {
     const [, width] = this.actor.get_preferred_width(-1);
     const [, height] = this.actor.get_preferred_height(width);
-    const { x, y, width: monitorWidth, height: monitorHeight } = this.monitor;
-    this.actor.set_position(x + monitorWidth - width - MARGIN, y + monitorHeight - height - MARGIN);
+    return [width, height];
+  }
+
+  private reposition(): void {
+    if (!this.monitor) return;
+    const { x, y, width, height } = this.monitor;
+    const area = { x: x + MARGIN, y: y + MARGIN, width: width - 2 * MARGIN, height: height - 2 * MARGIN };
+    this.actor.set_position(...dock(area, taskbarPreferences.edge, ...this.size(), 'end'));
   }
 
   private tick(now: GLib.DateTime, clock: WallClock): void {

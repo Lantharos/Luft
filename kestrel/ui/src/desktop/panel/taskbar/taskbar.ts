@@ -7,6 +7,7 @@ import St from 'gi://St';
 import type { WindowPreviews } from '../windowPreviews.js';
 import type { ContextMenus } from '../../menus/contextMenus.js';
 import { taskbarPreferences, type TaskbarMetrics } from '../preferences/taskbarPreferences.js';
+import { direction, isVertical, outward, toward, type Edge } from '../../../shared/layout/edge.js';
 import { taskbarAppIcon } from '../../../appearance/icons/appIcons.js';
 import { animateActor, liftIcon } from '../../../shared/motion/motion.js';
 import { TaskbarDrop } from './taskbarDrop.js';
@@ -18,6 +19,7 @@ import * as DND from '../../../shared/popups/dnd.js';
 const DOT_SIZE = 4;
 const DOT_GAP = 3;
 const RESIZE_DURATION = 220;
+const ENTRY_OFFSET = 18;
 
 interface AppItem {
   app: Shell.App;
@@ -39,6 +41,7 @@ export class Taskbar {
   private initialized = false;
   private readonly disconnectors: (() => void)[] = [];
   private metrics: TaskbarMetrics = taskbarPreferences.metrics;
+  private edge: Edge = taskbarPreferences.edge;
 
   constructor(private readonly tracker: Shell.WindowTracker, private readonly menus: ContextMenus, private readonly previews: WindowPreviews,
     private readonly favorites: Gio.Settings, private readonly monitorIndex: () => number,
@@ -73,26 +76,54 @@ export class Taskbar {
     this.metrics = metrics;
     for (const item of this.items.values()) {
       this.layoutItem(item);
-      if (!item.removing) animateActor(item.slot, { width: this.slotWidth, duration: RESIZE_DURATION, mode: Clutter.AnimationMode.EASE_OUT_QUART });
+      if (!item.removing) animateActor(item.slot, { [this.lengthKey]: this.slotLength, duration: RESIZE_DURATION, mode: Clutter.AnimationMode.EASE_OUT_QUART });
       this.updateDots(item);
     }
   }
 
-  private get slotWidth(): number {
+  reorient(edge: Edge): void {
+    this.edge = edge;
+    this.actor.orientation = this.vertical ? Clutter.Orientation.VERTICAL : Clutter.Orientation.HORIZONTAL;
+    for (const item of this.items.values()) {
+      item.slot.remove_all_transitions();
+      item.slot.set_size(this.metrics.button, this.metrics.button);
+      if (!item.removing) item.slot[this.lengthKey] = this.slotLength;
+      this.layoutItem(item);
+      this.updateDots(item);
+    }
+  }
+
+  private get vertical(): boolean {
+    return isVertical(this.edge);
+  }
+
+  private get lengthKey(): 'width' | 'height' {
+    return this.vertical ? 'height' : 'width';
+  }
+
+  private get slotLength(): number {
     return this.metrics.button + this.metrics.gap;
   }
 
   private layoutItem(item: AppItem): void {
     const { button, icon, gap } = this.metrics;
-    item.slot.height = button;
-    item.button.set_position(Math.floor(gap / 2), 0);
+    const vertical = this.vertical;
+    const nudge = -outward(this.edge);
+    const centered = (button - icon) / 2;
+    item.slot[vertical ? 'width' : 'height'] = button;
+    item.button.set_position(vertical ? 0 : Math.floor(gap / 2), vertical ? Math.floor(gap / 2) : 0);
     item.button.set_size(button, button);
     item.button.child.set_size(button, button);
     item.icon.set_size(icon, icon);
-    item.icon.set_position((button - icon) / 2, Math.round((button - icon) / 2) - 1);
+    if (vertical) item.icon.set_position(Math.round(centered) + nudge, centered);
+    else item.icon.set_position(centered, Math.round(centered) + nudge);
     (item.icon.child as St.Icon).icon_size = icon;
-    for (const dot of item.dots) dot.y = button - DOT_SIZE;
-    item.indicators.resize(button);
+    const dotOffset = outward(this.edge) > 0 ? button - DOT_SIZE : 0;
+    for (const dot of item.dots) {
+      if (vertical) dot.set({ x: dotOffset, width: DOT_SIZE });
+      else dot.set({ y: dotOffset, height: DOT_SIZE });
+    }
+    item.indicators.resize(button, this.edge);
   }
 
   private updateIndicators(): void {
@@ -113,9 +144,9 @@ export class Taskbar {
       if (wanted.has(id) || item.removing) continue;
       item.removing = true;
       item.button.reactive = false;
-      animateActor(item.button, { opacity: 0, translation_y: 18, duration: 160 });
+      animateActor(item.button, { opacity: 0, ...toward(this.edge, ENTRY_OFFSET), duration: 160 });
       animateActor(item.slot, {
-        width: 0, duration: 180, mode: Clutter.AnimationMode.EASE_IN_OUT_QUAD,
+        [this.lengthKey]: 0, duration: 180, mode: Clutter.AnimationMode.EASE_IN_OUT_QUAD,
         onComplete: () => {
           if (!item.removing) return;
           this.items.delete(id);
@@ -130,9 +161,9 @@ export class Taskbar {
         this.items.set(app.id, item);
         this.actor.add_child(item.slot);
         if (this.initialized) {
-          item.slot.width = 0;
+          item.slot[this.lengthKey] = 0;
           item.button.opacity = 0;
-          item.button.translation_y = 18;
+          item.button.set(toward(this.edge, ENTRY_OFFSET));
         }
       }
       if (item.app !== app) {
@@ -149,8 +180,8 @@ export class Taskbar {
       item.button.reactive = true;
       this.actor.set_child_at_index(item.slot, index);
       this.windowsChanged(item);
-      animateActor(item.slot, { width: this.slotWidth, duration: this.initialized ? 220 : 0, mode: Clutter.AnimationMode.EASE_OUT_QUART });
-      animateActor(item.button, { opacity: 255, translation_y: 0, duration: this.initialized ? 220 : 0, mode: Clutter.AnimationMode.EASE_OUT_QUART });
+      animateActor(item.slot, { [this.lengthKey]: this.slotLength, duration: this.initialized ? 220 : 0, mode: Clutter.AnimationMode.EASE_OUT_QUART });
+      animateActor(item.button, { opacity: 255, translation_x: 0, translation_y: 0, duration: this.initialized ? 220 : 0, mode: Clutter.AnimationMode.EASE_OUT_QUART });
     });
     this.initialized = true;
     this.updateFocus();
@@ -208,10 +239,11 @@ export class Taskbar {
     const count = item.indicators.showsProgress ? 0 : Math.min(4, this.windowsOf(item.app).filter(window => !window.skip_taskbar).length);
     const width = item.focused ? Math.min(DOT_SIZE * 3, Math.floor((button - 8 - (count - 1) * DOT_GAP) / Math.max(1, count))) : DOT_SIZE;
     const start = (button - (count * width + (count - 1) * DOT_GAP)) / 2;
+    const [position, size] = this.vertical ? ['y', 'height'] as const : ['x', 'width'] as const;
     item.dots.forEach((dot, index) => {
       dot.visible = index < count;
       animateActor(dot, {
-        x: start + index * (width + DOT_GAP), width,
+        [position]: start + index * (width + DOT_GAP), [size]: width,
         duration: animate && dot.visible ? 180 : 0, mode: Clutter.AnimationMode.EASE_OUT_QUART,
       });
     });
@@ -230,16 +262,19 @@ export class Taskbar {
       name: `kestrel-app-${app.id}`, style_class: 'kestrel-task-button', child: content,
       can_focus: true, track_hover: true, accessible_name: app.get_name(),
     });
-    const slot = new St.Widget({ width: this.slotWidth, clip_to_allocation: true });
+    const slot = new St.Widget({ [this.lengthKey]: this.slotLength, clip_to_allocation: true });
     slot.add_child(button);
     const item: AppItem = { app, icon, slot, button, dots, focused: false, iconGeometry: null, removing: false, windowsChanged: 0,
-      draggable: { enabled: false }, indicators: new AppIndicators(content, this.metrics.button) };
+      draggable: { enabled: false }, indicators: new AppIndicators(content, this.metrics.button, this.edge) };
     this.layoutItem(item);
     item.draggable = this.makeDraggable(item);
     item.windowsChanged = app.connect('windows-changed', () => this.windowsChanged(item));
     button.connect('notify::allocation', () => this.syncIconGeometry(item));
     button.connect('destroy', () => item.app.disconnect(item.windowsChanged));
-    liftIcon(button, icon);
+    liftIcon(button, icon, () => {
+      const [x, y] = direction(this.edge);
+      return [-x, -y];
+    });
     this.previews.bind(button, () => item.app, () => this.windowsOf(item.app));
     this.menus.bind(button, () => this.menus.appEntries(item.app, this.windowsOf(item.app), () => this.open(item.app)));
     button.connect('clicked', () => {

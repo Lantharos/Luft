@@ -37,6 +37,9 @@ restore_settings() {
     light) dconf write /org/gnome/desktop/interface/color-scheme "'default'" ;;
     dark) dconf write /org/gnome/desktop/interface/color-scheme "'prefer-dark'" ;;
   esac
+  if [[ -n "${KESTREL_CAPTURE_TASKBAR:-}" ]]; then
+    dconf write /com/lantharos/kestrel/taskbar-position "'$KESTREL_CAPTURE_TASKBAR'"
+  fi
   if [[ -n "${KESTREL_CAPTURE_WALLPAPER:-}" ]]; then
     local uri
     uri="'$(python3 -c 'import pathlib, sys; print(pathlib.Path(sys.argv[1]).resolve().as_uri())' "$KESTREL_CAPTURE_WALLPAPER")'"

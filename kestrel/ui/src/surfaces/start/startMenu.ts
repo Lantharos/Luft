@@ -12,16 +12,17 @@ import { launchApp } from '../search/providers/apps.js';
 import { taskbarPreferences } from '../../desktop/panel/preferences/taskbarPreferences.js';
 import { isControlEnter } from '../../shared/input/keyboardNavigation.js';
 import type { StartArea, StartSurface } from './startSurface.js';
+import { dock, toward, type Edge, type Offset } from '../../shared/layout/edge.js';
 
 const WIDTH = 660;
 const HEIGHT = 600;
 const EDGE_MARGIN = 12;
+const SLIDE = 56;
 
 export class StartMenu implements StartSurface {
   readonly actor: St.BoxLayout;
   readonly search: St.Entry;
   readonly footer: StartFooter;
-  readonly slideDistance = 56;
   readonly focusOnTouch = false;
   private readonly favorites = new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });
   private pinned = this.readPinned();
@@ -96,12 +97,15 @@ export class StartMenu implements StartSurface {
     this.search.grab_key_focus();
   }
 
-  place({ monitor, bottom, available, cornered }: StartArea): void {
-    const width = Math.min(WIDTH, monitor.width - 2 * EDGE_MARGIN);
+  slideFrom(edge: Edge): Offset {
+    return toward(edge, SLIDE);
+  }
+
+  place({ area, edge, available, cornered, anchor }: StartArea): void {
+    const width = Math.min(WIDTH, area.width - 2 * EDGE_MARGIN);
     const height = Math.min(HEIGHT, available);
-    const x = cornered ? monitor.x + monitor.width - EDGE_MARGIN - width : monitor.x + (monitor.width - width) / 2;
     this.actor.set_size(width, height);
-    this.actor.set_position(Math.round(x), bottom - height);
+    this.actor.set_position(...dock(area, edge, width, height, anchor ?? (cornered ? 'end' : 'center'), EDGE_MARGIN));
   }
   private back(): boolean {
     if (this.footer.sessionOpen) { this.footer.setOpen(false); this.focus(); return true; }

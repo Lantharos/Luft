@@ -2,7 +2,7 @@ import type St from 'gi://St';
 
 import type { GlassShading } from '../../../../../packages/web/ui/src/taskbar/looks';
 import type { Rgb } from '../../appearance/color.js';
-import type { WallpaperFloor } from '../wallpaper/floor.js';
+import type { Backdrop } from '../wallpaper/floor.js';
 import { clampUnit } from '../../shared/math.js';
 
 type Channels = [number, number, number];
@@ -48,7 +48,7 @@ export function panelSurface(node: St.ThemeNode, blurred: boolean): PanelSurface
   return { tint: [red, green, blue], opacity: alpha / 255, glass: blurred ? glassShading(node) : null };
 }
 
-export function backdropsBehind({ tint, opacity, glass }: PanelSurface, floor: WallpaperFloor): Rgb[] {
+export function backdropsBehind({ tint, opacity, glass }: PanelSurface, floor: Backdrop): Rgb[] {
   if (!floor.color) return [];
   const over = tint.map(channel => channel / 255) as Channels;
   return [floor.color, ...floor.extremes].map(color => {
@@ -58,7 +58,7 @@ export function backdropsBehind({ tint, opacity, glass }: PanelSurface, floor: W
   });
 }
 
-export function taskbarBackdrops(panel: St.Widget, floor: WallpaperFloor): Rgb[] {
+export function taskbarBackdrops(panel: St.Widget, floor: Backdrop): Rgb[] {
   const node = panel.peek_theme_node();
   return node ? backdropsBehind(panelSurface(node, !!panel.get_effect('backdrop')?.enabled), floor) : [];
 }

@@ -10,6 +10,7 @@ import {centerOf, moveTo, rest} from '../lib/input/input.js';
 import {gjs, spawn, stop, waitForWindow, waitForWindows} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {settled, waitUntil} from '../lib/wait.js';
+import {beyond, boxOf, farSide, nearSide, vertical} from '../lib/edge.js';
 
 const {require, eventually} = checks('taskbar');
 const TITLES = ['Kestrel window check 1', 'Kestrel window check 2'];
@@ -35,7 +36,8 @@ async function checkIndicators(panel: Clutter.Actor, window: Meta.Window) {
   const badge = ofType(firstStyled('kestrel-task-badge', button), St.Label);
   const fill = ofType(firstStyled('kestrel-task-progress-fill', button), St.Widget);
   await eventually(() => badge.visible && badge.text === '3', 'apps show their unread count');
-  await eventually(() => fill.get_parent()!.visible && Math.abs(fill.width - fill.get_parent()!.width / 2) <= 1, 'apps show their progress');
+  const along = (actor: Clutter.Actor) => vertical() ? actor.height : actor.width;
+  await eventually(() => fill.get_parent()!.visible && Math.abs(along(fill) - along(fill.get_parent()!) / 2) <= 1, 'apps show their progress');
   await eventually(() => ofType(firstStyled('kestrel-task-attention', button), St.Widget).visible, 'apps asking for attention are highlighted');
   await capture('taskbar-indicators');
   await stop(launcher);
@@ -88,14 +90,15 @@ async function checkFocus(panel: Clutter.Actor, window: Meta.Window) {
 
 async function checkOpening(panel: Clutter.Actor) {
   const center = existing('kestrel-panel-center');
-  const widths = new Set([center.width]);
-  const sample = global.stage.connect('after-paint', () => widths.add(center.width));
+  const length = () => vertical() ? center.height : center.width;
+  const lengths = new Set([length()]);
+  const sample = global.stage.connect('after-paint', () => lengths.add(length()));
   const app = gjs('clients/windows/window.js');
   try {
     const window = await waitForWindow('Kestrel window check');
     await settled();
     await capture('window');
-    require(widths.size > 2, 'the taskbar animates its width as a window opens');
+    require(lengths.size > 2, 'the taskbar animates its length as a window opens');
 
     toggleSurface('start');
     await eventually(() => shown(named('kestrel-start')), 'Start opens over a window');
@@ -107,8 +110,7 @@ async function checkOpening(panel: Clutter.Actor) {
     await eventually(() => window.is_maximized(), 'the window maximizes');
     await settled();
     await capture('window-maximized');
-    const frame = window.get_frame_rect();
-    require(frame.y + frame.height <= panel.get_transformed_position()[1], 'a maximized window stays clear of the taskbar');
+    require(!beyond(farSide(window.get_frame_rect()), nearSide(boxOf(panel))), 'a maximized window stays clear of the taskbar');
   } finally {
     await stop(app);
     global.stage.disconnect(sample);

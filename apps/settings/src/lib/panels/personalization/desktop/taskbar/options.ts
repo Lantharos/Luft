@@ -1,3 +1,4 @@
+export type Position = 'bottom' | 'left' | 'top' | 'right';
 export type Alignment = 'center' | 'left';
 export type Look = 'glass' | 'solid' | 'transparent' | 'accent';
 export type Style = 'bar' | 'floating';
@@ -8,6 +9,7 @@ export type StartStyle = 'menu' | 'palette';
 export type WebSearch = 'duckduckgo' | 'google' | 'bing' | 'brave' | 'ecosia' | 'startpage' | 'kagi';
 
 export type TaskbarSettings = {
+	'taskbar-position': Position;
 	'taskbar-alignment': Alignment;
 	'taskbar-look': Look;
 	'taskbar-style': Style;
@@ -25,6 +27,7 @@ export type TaskbarSettings = {
 };
 
 export const TASKBAR_KEYS: (keyof TaskbarSettings)[] = [
+	'taskbar-position',
 	'taskbar-alignment',
 	'taskbar-look',
 	'taskbar-style',
@@ -56,10 +59,21 @@ export const WEB_SEARCH: { value: WebSearch; label: string }[] = [
 	{ value: 'kagi', label: 'Kagi' }
 ];
 
-export const ALIGNMENTS: { value: Alignment; label: string }[] = [
-	{ value: 'center', label: 'settings-taskbar-align-center' },
-	{ value: 'left', label: 'settings-taskbar-align-left' }
+export const POSITIONS: { value: Position; label: string }[] = [
+	{ value: 'bottom', label: 'settings-taskbar-position-bottom' },
+	{ value: 'left', label: 'settings-taskbar-position-left' },
+	{ value: 'top', label: 'settings-taskbar-position-top' },
+	{ value: 'right', label: 'settings-taskbar-position-right' }
 ];
+
+export const isVertical = (position: Position) => position === 'left' || position === 'right';
+
+export function alignments(position: Position): { value: Alignment; label: string }[] {
+	return [
+		{ value: 'center', label: 'settings-taskbar-align-center' },
+		{ value: 'left', label: isVertical(position) ? 'settings-taskbar-align-top' : 'settings-taskbar-align-left' }
+	];
+}
 
 export const LOOKS: { value: Look; label: string }[] = [
 	{ value: 'glass', label: 'settings-taskbar-look-glass' },

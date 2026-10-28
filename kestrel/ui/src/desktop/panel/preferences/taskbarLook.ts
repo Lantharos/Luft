@@ -4,6 +4,7 @@ import { blurBackdrop } from '../../../appearance/kestrelGlass.js';
 
 import { isDark, watchScheme } from '../../../shared/display/scheme.js';
 import type { TaskbarLook } from '../../../../../../packages/web/ui/src/taskbar/looks';
+import { rightToLeft } from '../../../shared/layout/edge.js';
 import { taskbarPreferences } from './taskbarPreferences.js';
 
 const BLURRED: TaskbarLook[] = ['glass', 'accent'];
@@ -26,11 +27,12 @@ export class TaskbarSurface {
   }
 
   sync(): void {
-    const { look, size, style, pureBlack, touch } = taskbarPreferences;
+    const { look, size, style, pureBlack, touch, vertical } = taskbarPreferences;
     const opaque = pureBlack && isDark();
     this.actor.style_class = [
       this.baseClasses, `kestrel-taskbar-${look}`, touch ? 'kestrel-taskbar-touch' : `kestrel-taskbar-${size}`,
       ...style === 'floating' ? ['kestrel-taskbar-floating'] : [],
+      ...vertical ? ['kestrel-taskbar-vertical'] : [],
       ...opaque ? ['kestrel-taskbar-opaque'] : [],
     ].join(' ');
     this.blur.enabled = BLURRED.includes(look) && !opaque;
@@ -46,6 +48,11 @@ export class TaskbarSurface {
     const radius = this.radius;
     this.blur.set_property('corner-radius', radius);
     this.actor.style = `border-radius: ${radius}px;`;
-    this.peek.style = radius ? `border-radius: 0 ${radius}px ${radius}px 0;` : null;
+    this.peek.style = radius ? `border-radius: ${this.peekCorners(`${radius}px`)};` : null;
+  }
+
+  private peekCorners(radius: string): string {
+    if (taskbarPreferences.vertical) return `0 0 ${radius} ${radius}`;
+    return rightToLeft() ? `${radius} 0 0 ${radius}` : `0 ${radius} ${radius} 0`;
   }
 }

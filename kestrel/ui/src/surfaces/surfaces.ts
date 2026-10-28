@@ -9,6 +9,8 @@ import type { ContextMenus } from '../desktop/menus/contextMenus.js';
 import type { Monitor } from '../desktop/panel/panel.js';
 import type { PanelSet } from '../desktop/panel/panels.js';
 import { taskbarPreferences } from '../desktop/panel/preferences/taskbarPreferences.js';
+import { dock, gap, inset, isVertical, toward, type Along, type Edge, type Inset, type Offset } from '../shared/layout/edge.js';
+import type { Box } from '../shared/layout/box.js';
 import type { WindowPreviews } from '../desktop/panel/windowPreviews.js';
 import type { TaskView } from '../desktop/taskView/taskView.js';
 import type { SnapLayouts } from '../desktop/windows/snapLayouts.js';
@@ -26,6 +28,7 @@ export type Surface = 'start' | 'quick' | 'notifications' | 'clipboard' | 'emoji
 type PanelSurface = Exclude<Surface, 'tasks'>;
 
 const EDGE_MARGIN = 12;
+const FAR_MARGIN = 14;
 const PANEL_SLIDE = 56;
 
 interface LazySurfaces {
@@ -48,7 +51,7 @@ interface SurfaceParts extends SurfaceFactories {
   taskView: TaskView;
   canInteract: () => boolean;
   syncSession: () => void;
-  bottomClearance: () => number;
+  taskbarInset: () => Inset;
   startReplaced: () => void;
 }
 
@@ -133,25 +136,25 @@ export class Surfaces {
     this.cover.set_position(0, 0);
     const stage = global.stage;
     this.cover.set_size(stage.width, stage.height);
-    const clearance = Math.max(this.parts.bottomClearance(), this.keyboardHeight(monitor));
-    const bottom = monitor.y + monitor.height - clearance - SURFACE_GAP;
-    const available = monitor.height - clearance - 24;
+    const { edge } = this.parts.taskbarInset();
+    const area = this.freeArea(monitor);
+    const available = area.height - FAR_MARGIN;
     const { start, notifications, emoji, snapLayouts } = this.created;
-    start?.place({ monitor, bottom, available, cornered: board.shown });
+    start?.place({ monitor, area, edge, available, cornered: board.shown, anchor: this.besideButton('start', monitor, edge) });
 
-    for (const [actor, width, height] of [
-      [quick.actor, 420, quick.preferredHeight(420, available)],
-      ...notifications ? [[notifications.actor, 380, notifications.preferredHeight(380, available)] as const] : [],
+    for (const [surface, actor, width, height] of [
+      ['quick', quick.actor, 420, quick.preferredHeight(420, available)],
+      ...notifications ? [['notifications', notifications.actor, 380, notifications.preferredHeight(380, available)] as const] : [],
     ] as const) {
       actor.set_size(width, height);
-      actor.set_position(Math.round(monitor.x + monitor.width - EDGE_MARGIN - width), bottom - height);
+      actor.set_position(...dock(area, edge, width, height, this.along(surface, monitor, edge, 'end'), EDGE_MARGIN));
     }
     for (const popup of [clipboard, emoji])
       popup?.place(available, context.layoutManager.getWorkAreaForMonitor(monitor.index));
     if (snapLayouts) {
       const [snapWidth, snapHeight] = snapLayouts.size();
       snapLayouts.actor.set_size(snapWidth, snapHeight);
-      snapLayouts.actor.set_position(Math.round(monitor.x + (monitor.width - snapWidth) / 2), bottom - snapHeight);
+      snapLayouts.actor.set_position(...dock(area, edge, snapWidth, snapHeight, 'center'));
     }
     this.clipToFloor();
   }
@@ -217,7 +220,7 @@ export class Surfaces {
     this.place();
     if (opening) {
       actor.opacity = 0;
-      actor.translation_y = reducedMotion() ? 0 : this.slideDistance(actor);
+      actor.set(reducedMotion() ? { translation_x: 0, translation_y: 0 } : this.slideOffset(actor));
     }
     this.reveal(actor);
 
@@ -263,11 +266,34 @@ export class Surfaces {
   }
 
   private clipToFloor(): void {
-    const width = global.stage.width;
-    const floor = this.floor();
-    const [, , clipWidth, clipHeight] = this.layer.get_clip();
-    if (this.layer.has_clip && clipWidth === width && clipHeight === floor) return;
-    this.layer.set_clip(0, 0, width, floor);
+    const { width, height } = global.stage;
+    const stage = { x: 0, y: 0, width, height };
+    const { edge, depth } = this.parts.taskbarInset();
+    const monitor = this.surfaceMonitor();
+    const { x, y, width: clipWidth, height: clipHeight } = inset(stage, edge, gap(stage, inset(monitor, edge, depth), edge));
+    const [clipX, clipY, currentWidth, currentHeight] = this.layer.get_clip();
+    if (this.layer.has_clip && clipX === x && clipY === y && currentWidth === clipWidth && currentHeight === clipHeight) return;
+    this.layer.set_clip(x, y, clipWidth, clipHeight);
+  }
+
+  private along(surface: Surface, monitor: Monitor, edge: Edge, fallback: Along): Along | number {
+    return this.besideButton(surface, monitor, edge) ?? fallback;
+  }
+
+  private besideButton(surface: Surface, monitor: Monitor, edge: Edge): number | null {
+    if (!isVertical(edge)) return null;
+    const button = this.parts.panels().buttonFor(surface, monitor);
+    if (!button?.mapped) return null;
+    const [, y] = button.get_transformed_position();
+    return y + button.get_transformed_size()[1] / 2;
+  }
+
+  private freeArea(monitor: Monitor): Box {
+    const { edge, depth } = this.parts.taskbarInset();
+    const keyboard = this.keyboardHeight(monitor);
+    if (edge === 'bottom') return inset(monitor, edge, Math.max(depth, keyboard) + SURFACE_GAP);
+    const beside = inset(monitor, edge, depth + SURFACE_GAP);
+    return keyboard ? inset(beside, 'bottom', keyboard + SURFACE_GAP) : beside;
   }
 
   private ensure<Name extends keyof LazySurfaces>(name: Name): LazySurfaces[Name] {
@@ -337,11 +363,6 @@ export class Surfaces {
     return monitor && this.parts.panels().panelOn(monitor) ? monitor : layoutManager.primaryMonitor!;
   }
 
-  private floor(): number {
-    const monitor = this.surfaceMonitor();
-    return monitor.y + monitor.height - this.parts.bottomClearance();
-  }
-
   private popupFor(surface: Surface | null): CaretPopup | null {
     return surface === 'clipboard' ? this.parts.clipboard : surface === 'emoji' ? this.emoji : null;
   }
@@ -362,17 +383,25 @@ export class Surfaces {
   }
 
   private reveal(actor: Clutter.Actor): void {
-    animateActor(actor, { translation_y: 0, spring: Spring.snappy });
+    animateActor(actor, { [this.slideAxis(actor)]: 0, spring: Spring.snappy });
     animateActor(actor, { opacity: 255, duration: Duration.standard, curve: Curve.decelerate });
   }
 
   private conceal(actor: Clutter.Actor, fade: number, onHidden: () => void): void {
-    if (!reducedMotion()) animateActor(actor, { translation_y: this.slideDistance(actor), spring: Spring.snappy });
+    const axis = this.slideAxis(actor);
+    if (!reducedMotion()) animateActor(actor, { [axis]: this.slideOffset(actor)[axis], spring: Spring.snappy });
     animateActor(actor, { opacity: 0, duration: fade, curve: Curve.decelerate, onStopped: onHidden });
   }
 
-  private slideDistance(actor: Clutter.Actor): number {
+  private slideAxis(actor: Clutter.Actor): keyof Offset {
+    return this.slideOffset(actor).translation_x ? 'translation_x' : 'translation_y';
+  }
+
+  private slideOffset(actor: Clutter.Actor): Offset {
+    const popup = this.popupActor(actor);
+    if (popup) return { translation_x: 0, translation_y: popup.slideDistance };
+    const { edge } = this.parts.taskbarInset();
     const start = this.created.start;
-    return this.popupActor(actor)?.slideDistance ?? (actor === start?.actor ? start.slideDistance : PANEL_SLIDE);
+    return actor === start?.actor ? start.slideFrom(edge) : toward(edge, PANEL_SLIDE);
   }
 }

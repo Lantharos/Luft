@@ -6,6 +6,7 @@ import GObject from 'gi://GObject';
 import St from 'gi://St';
 
 import * as BarLevel from '../../shared/widgets/barLevel.js';
+import { isVertical } from '../../shared/layout/edge.js';
 import * as Layout from './layout.js';
 import * as KestrelUi from '../../kestrelUi.js';
 import * as Main from '../main.js';
@@ -90,7 +91,7 @@ export class OsdWindow extends Clutter.Actor {
     if (!this.icon.gicon) return;
 
     if (!this.visible) {
-      this.hbox.style = `margin-bottom: ${KestrelUi.taskbarClearance() + TASKBAR_GAP}px;`;
+      this.hbox.style = this.clearOfTaskbar();
       global.compositor.disable_unredirect();
       super.show();
       this.opacity = 0;
@@ -108,6 +109,12 @@ export class OsdWindow extends Clutter.Actor {
     }
     this.hideTimeoutId = GLib.timeout_add_once(GLib.PRIORITY_DEFAULT, HIDE_TIMEOUT, () => this.fadeOut());
     GLib.Source.set_name_by_id(this.hideTimeoutId, '[kestrel] this._hide');
+  }
+
+  private clearOfTaskbar(): string {
+    const { edge, depth } = KestrelUi.taskbarInset();
+    const bottom = `margin-bottom: ${(edge === 'bottom' ? depth : 0) + TASKBAR_GAP}px;`;
+    return isVertical(edge) ? `${bottom} margin-${edge}: ${depth}px;` : bottom;
   }
 
   cancel(): void {

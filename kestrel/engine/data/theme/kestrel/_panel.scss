@@ -30,6 +30,16 @@
 .kestrel-taskbar-touch .kestrel-taskbar { spacing: 5px; }
 .kestrel-taskbar-touch .kestrel-panel-status { spacing: 6px; }
 
+.kestrel-taskbar-vertical .kestrel-status-button { width: 40px; height: auto; padding: 8px 0; }
+.kestrel-taskbar-vertical.kestrel-taskbar-compact .kestrel-status-button { width: 34px; padding: 6px 0; }
+.kestrel-taskbar-vertical.kestrel-taskbar-large .kestrel-status-button { width: 48px; padding: 10px 0; }
+.kestrel-taskbar-vertical .kestrel-tray-button { padding: 7px 0; }
+.kestrel-taskbar-vertical .kestrel-privacy { width: 28px; padding: 10px 0; margin: 4px 0; }
+.kestrel-taskbar-vertical .kestrel-status-icons { spacing: 10px; }
+.kestrel-taskbar-vertical .kestrel-clock { font-size: 11px; }
+.kestrel-taskbar-vertical.kestrel-taskbar-large .kestrel-clock { font-size: 12px; }
+.kestrel-taskbar-vertical .kestrel-peek { width: auto; height: 8px; }
+
 .kestrel-tablet-strip { padding: 0 12px; border-radius: 0; background-color: transparent; box-shadow: none; }
 .kestrel-tablet-strip-status, .kestrel-tablet-strip-icons { spacing: 10px; }
 .kestrel-tablet-strip .kestrel-clock { font-size: 12px; }
@@ -48,8 +58,7 @@
 .kestrel-running-dot { margin: 0; border-radius: 2px; transition-duration: $motion-quick; }
 .kestrel-task-attention { border-radius: 12px; background-color: rgba(255, 150, 40, 0.62); }
 .kestrel-task-badge { min-width: 16px; height: 16px; padding: 0 4px; border-radius: 999px; background-color: $danger; color: $on_danger; font-size: 10px; font-weight: 700; font-feature-settings: "tnum"; text-align: center; }
-.kestrel-task-progress { height: 3px; border-radius: 999px; }
-.kestrel-task-progress-fill { height: 3px; border-radius: 999px; }
+.kestrel-task-progress, .kestrel-task-progress-fill { border-radius: 999px; }
 .kestrel-peek { width: 8px; padding: 0; border-radius: 0; background-color: transparent; box-shadow: none; transition-duration: $motion-tap; }
 
 .kestrel-status-button {

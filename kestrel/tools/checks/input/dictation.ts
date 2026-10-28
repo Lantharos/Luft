@@ -4,7 +4,7 @@ import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
-import {taskbarClearance, Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
+import {taskbarInset, Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {descendants, existing, firstStyled, named, ofType, shown, textOf} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
@@ -128,7 +128,7 @@ function sitsAboveTaskbar(pill: Clutter.Actor) {
   const [x, y] = pill.get_transformed_position();
   const [width, height] = pill.get_transformed_size();
   const monitor = Main.layoutManager.primaryMonitor!;
-  const taskbarTop = monitor.y + monitor.height - taskbarClearance();
+  const taskbarTop = monitor.y + monitor.height - taskbarInset().depth;
   return Math.abs(x + width / 2 - (monitor.x + monitor.width / 2)) <= 1 && y + height < taskbarTop && y + height > taskbarTop - 40;
 }
 

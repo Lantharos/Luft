@@ -1,6 +1,7 @@
 import Gio from 'gi://Gio';
 
 import type { TaskbarLook } from '../../../../../../packages/web/ui/src/taskbar/looks';
+import { isVertical, type Edge } from '../../../shared/layout/edge.js';
 import { tabletMode } from '../tablet/tabletMode.js';
 
 type TaskbarAlignment = 'center' | 'left';
@@ -11,7 +12,7 @@ type TaskbarDisplays = 'all' | 'primary';
 type StartStyle = 'menu' | 'palette';
 
 export interface TaskbarMetrics {
-  height: number;
+  thickness: number;
   button: number;
   icon: number;
   margin: number;
@@ -20,12 +21,12 @@ export interface TaskbarMetrics {
   gap: number;
 }
 
-const SIZES: Record<TaskbarSize, { height: number; button: number; icon: number }> = {
-  compact: { height: 40, button: 34, icon: 22 },
-  normal: { height: 48, button: 40, icon: 28 },
-  large: { height: 56, button: 48, icon: 34 },
+const SIZES: Record<TaskbarSize, { thickness: number; button: number; icon: number }> = {
+  compact: { thickness: 40, button: 34, icon: 22 },
+  normal: { thickness: 48, button: 40, icon: 28 },
+  large: { thickness: 56, button: 48, icon: 34 },
 };
-const TOUCH = { height: 64, button: 52, icon: 36 };
+const TOUCH = { thickness: 64, button: 52, icon: 36 };
 const FLOATING_MARGIN = 8;
 const BAR_INSET = 4;
 const TOUCH_INSET = 12;
@@ -33,7 +34,7 @@ const SLOT_GAP = 2;
 const TOUCH_SLOT_GAP = 10;
 export const STRIP_HEIGHT = 24;
 
-const KEYS = ['taskbar-alignment', 'taskbar-look', 'taskbar-style', 'taskbar-size', 'taskbar-auto-hide', 'taskbar-show-pinned',
+const KEYS = ['taskbar-position', 'taskbar-alignment', 'taskbar-look', 'taskbar-style', 'taskbar-size', 'taskbar-auto-hide', 'taskbar-show-pinned',
   'taskbar-displays', 'taskbar-windows-per-display', 'taskbar-windows-per-workspace', 'taskbar-shown', 'taskbar-start-button',
   'start-style', 'pure-black'] as const;
 export type TaskbarKey = typeof KEYS[number] | 'tablet';
@@ -53,6 +54,8 @@ class TaskbarPreferences {
 
   get touch(): boolean { return tabletMode.active; }
 
+  get edge(): Edge { return this.touch ? 'bottom' : this.settings.get_string('taskbar-position') as Edge; }
+  get vertical(): boolean { return isVertical(this.edge); }
   get alignment(): TaskbarAlignment { return this.settings.get_string('taskbar-alignment') as TaskbarAlignment; }
   get look(): TaskbarLook { return this.settings.get_string('taskbar-look') as TaskbarLook; }
   get style(): TaskbarStyle { return this.touch ? 'bar' : this.settings.get_string('taskbar-style') as TaskbarStyle; }
@@ -74,16 +77,16 @@ class TaskbarPreferences {
     return {
       ...size,
       margin: floating ? FLOATING_MARGIN : 0,
-      radius: floating ? size.height / 2 : 0,
-      inset: floating ? Math.round(size.height / 4) : BAR_INSET,
+      radius: floating ? size.thickness / 2 : 0,
+      inset: floating ? Math.round(size.thickness / 4) : BAR_INSET,
       gap: SLOT_GAP,
     };
   }
 
   get clearance(): number {
     if (!this.shown) return 0;
-    const { height, margin } = this.metrics;
-    return height + margin;
+    const { thickness, margin } = this.metrics;
+    return thickness + margin;
   }
 
   get reserved(): number {

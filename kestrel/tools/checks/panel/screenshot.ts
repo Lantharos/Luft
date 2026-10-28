@@ -61,8 +61,12 @@ async function closeScreenshotTool() {
   await eventually(() => !Main.screenshotUI.visible && Main.modalCount === 0, 'the screenshot tool closes');
 }
 
-const insideScreenOutline = ({x, y, width, height}: Area): Area =>
-  ({x: x + PAST_SCREEN_OUTLINE, y, width: width - 2 * PAST_SCREEN_OUTLINE, height: height - PAST_SCREEN_OUTLINE});
+function insideScreenOutline({x, y, width, height}: Area): Area {
+  const trim = (touches: boolean) => touches ? PAST_SCREEN_OUTLINE : 0;
+  const [left, top] = [trim(x <= 0), trim(y <= 0)];
+  const [right, bottom] = [trim(x + width >= global.stage.width), trim(y + height >= global.stage.height)];
+  return {x: x + left, y: y + top, width: width - left - right, height: height - top - bottom};
+}
 
 async function checkScheme(scheme: string) {
   await settled();

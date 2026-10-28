@@ -6,6 +6,7 @@ import type { Context } from '../../../context.js';
 import { taskbarPreferences } from '../../../desktop/panel/preferences/taskbarPreferences.js';
 import { animateActor, Curve, Duration, reducedMotion, Spring } from '../../../shared/motion/motion.js';
 import { blurSurface, SURFACE_GAP } from '../../../shared/layout/surface.js';
+import { inset } from '../../../shared/layout/edge.js';
 import { Waveform } from './waveform.js';
 
 const PILL = 999;
@@ -119,9 +120,9 @@ export class DictationPill {
     if (!monitor) return;
     const taskbar = taskbarPreferences.displays === 'all' || monitor.index === this.layoutManager.primaryMonitor?.index;
     const height = this.thickness();
-    const bottom = (taskbar ? taskbarPreferences.reserved : 0) + SURFACE_GAP;
-    this.frame.set_position(monitor.x, monitor.y + monitor.height - bottom - height);
-    this.frame.set_size(monitor.width, height);
+    const free = taskbar ? inset(monitor, taskbarPreferences.edge, taskbarPreferences.reserved) : monitor;
+    this.frame.set_position(free.x, free.y + free.height - SURFACE_GAP - height);
+    this.frame.set_size(free.width, height);
   }
 
   destroy(): void {

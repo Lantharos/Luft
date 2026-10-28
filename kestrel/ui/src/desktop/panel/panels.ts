@@ -61,6 +61,11 @@ export class PanelSet {
     return this.corner.clearance;
   }
 
+  buttonFor(surface: string, monitor: Monitor): Clutter.Actor | null {
+    if (!taskbarPreferences.shown) return this.corner.buttonFor(surface);
+    return this.panelOn(monitor)?.buttonFor(surface) ?? null;
+  }
+
   showCorner(shown: boolean): void {
     this.corner.setShown(shown);
   }
@@ -75,7 +80,7 @@ export class PanelSet {
     if (!primary) return;
     this.primary.monitor = primary;
     this.primary.place();
-    this.corner.place(primary);
+    this.placeCorner();
     for (const panel of this.secondary) {
       this.remove(panel);
       panel.destroy();
@@ -117,11 +122,15 @@ export class PanelSet {
       this.sync();
       this.changed();
     }
+    if (key === 'taskbar-position' || key === 'tablet') this.placeCorner();
     if (key === 'taskbar-auto-hide' || key === 'taskbar-shown' || key === 'tablet') this.syncAutoHide();
-    if (key === 'tablet' || key === 'taskbar-shown') {
-      this.syncEdgeSwipe();
-      this.changed();
-    }
+    if (key === 'tablet' || key === 'taskbar-shown') this.syncEdgeSwipe();
+    if (key === 'tablet' || key === 'taskbar-shown' || key === 'taskbar-position') this.changed();
+  }
+
+  private placeCorner(): void {
+    const primary = this.layoutManager.primaryMonitor;
+    if (primary) this.corner.place(primary);
   }
 
   private syncAutoHide(): void {

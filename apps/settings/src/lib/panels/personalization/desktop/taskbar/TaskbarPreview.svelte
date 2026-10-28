@@ -5,11 +5,12 @@
 	import Wifi from '@lucide/svelte/icons/wifi';
 	import { AppIcon, appearance, MARK_HEIGHT, MARK_LAYERS, MARK_SCALE, MARK_WIDTH, PAINTED_MARK_SCALE, type GlassShading, type Shadow } from '@luft/ui';
 	import type { App } from '#lib/bindings.js';
-	import type { Alignment, AutoHide, Look, Size, Style } from './options';
+	import { isVertical, type Alignment, type AutoHide, type Look, type Position, type Size, type Style } from './options';
 
 	interface Props {
 		wallpaper: string | null;
 		apps: App[];
+		position: Position;
 		alignment: Alignment;
 		look: Look;
 		style: Style;
@@ -19,7 +20,7 @@
 		startButton: boolean;
 	}
 
-	let { wallpaper, apps, alignment, look, style, size, autoHide, shown, startButton }: Props = $props();
+	let { wallpaper, apps, position, alignment, look, style, size, autoHide, shown, startButton }: Props = $props();
 
 	const METRICS: Record<Size, { height: number; button: number; icon: number }> = {
 		compact: { height: 26, button: 22, icon: 14 },
@@ -29,9 +30,12 @@
 	const SCALE = 0.65;
 	const FLOATING_MARGIN = 8;
 	const RUNNING = 2;
+	const VERTICAL_APPS = 3;
 
 	let metrics = $derived(METRICS[size]);
 	let floating = $derived(style === 'floating');
+	let vertical = $derived(isVertical(position));
+	let shownApps = $derived(vertical ? apps.slice(0, VERTICAL_APPS) : apps);
 	let paint = $derived(appearance.taskbar?.[look]);
 	let cornerPaint = $derived(appearance.taskbar?.glass);
 	let markSize = $derived(Math.round(metrics.button * MARK_SCALE));
@@ -60,10 +64,11 @@
 		<img src={wallpaper} alt="" decoding="async" />
 	{/if}
 	<div
-		class="bar"
+		class="bar {position}"
+		class:vertical
 		class:gone={!shown}
 		class:floating
-		class:left={alignment === 'left'}
+		class:aligned={alignment === 'left'}
 		class:hides={autoHide === 'always'}
 		style:--height="{metrics.height}px"
 		style:--button="{metrics.button}px"
@@ -89,7 +94,7 @@
 					{/each}
 				</span>
 			</span>
-			{#each apps as app, index (app.id)}
+			{#each shownApps as app, index (app.id)}
 				<span class="slot" class:focused={index === 0}>
 					<span class="icon"><AppIcon icon={app.icon} id={app.id} size={metrics.icon} /></span>
 					{#if index < RUNNING}
@@ -100,13 +105,16 @@
 		</div>
 		<div class="status">
 			<Wifi size={metrics.icon * 0.62} />
-			<Volume2 size={metrics.icon * 0.62} />
+			{#if !vertical}
+				<Volume2 size={metrics.icon * 0.62} />
+			{/if}
 			<BatteryFull size={metrics.icon * 0.62} />
 			<span class="time">{time}</span>
 		</div>
 	</div>
 	<div
-		class="corner"
+		class="corner {position}"
+		class:vertical
 		class:shown={!shown}
 		style:--surface={cornerPaint?.surface}
 		style:--backdrop={backdrop(cornerPaint?.glass ?? null)}
@@ -150,6 +158,8 @@
 	}
 
 	.bar {
+		--out-x: 0;
+		--out-y: 1;
 		position: absolute;
 		right: var(--margin);
 		bottom: var(--margin);
@@ -162,15 +172,40 @@
 		transition:
 			left var(--spring-snappy-duration) var(--spring-snappy),
 			right var(--spring-snappy-duration) var(--spring-snappy),
+			top var(--spring-snappy-duration) var(--spring-snappy),
 			bottom var(--spring-snappy-duration) var(--spring-snappy),
+			width var(--spring-snappy-duration) var(--spring-snappy),
 			height var(--spring-snappy-duration) var(--spring-snappy),
 			border-radius var(--spring-snappy-duration) var(--spring-snappy),
 			background-color var(--motion-tap) var(--ease-decelerate),
 			transform var(--spring-snappy-duration) var(--spring-snappy);
 	}
 
+	.bar.top {
+		--out-y: -1;
+		top: var(--margin);
+		bottom: auto;
+	}
+
+	.bar.vertical {
+		--out-y: 0;
+		top: var(--margin);
+		width: var(--height);
+		height: auto;
+	}
+
+	.bar.left {
+		--out-x: -1;
+		right: auto;
+	}
+
+	.bar.right {
+		--out-x: 1;
+		left: auto;
+	}
+
 	.bar.gone {
-		transform: translateY(calc(100% + var(--margin) + 4px));
+		transform: translate(calc(var(--out-x) * (100% + var(--margin) + 4px)), calc(var(--out-y) * (100% + var(--margin) + 4px)));
 	}
 
 	.slot.hidden {
@@ -188,6 +223,28 @@
 		transition:
 			opacity var(--motion-tap) var(--ease-decelerate),
 			transform var(--spring-snappy-duration) var(--spring-snappy);
+	}
+
+	.corner.top {
+		top: 8px;
+		bottom: auto;
+		transform: translateY(-8px);
+	}
+
+	.corner.vertical {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
+	.corner.left {
+		right: auto;
+		left: 8px;
+		transform: translateX(-8px);
+	}
+
+	.corner.right {
+		align-items: flex-end;
+		transform: translateX(8px);
 	}
 
 	.corner.shown {
@@ -221,7 +278,7 @@
 	}
 
 	.bar.hides {
-		transform: translateY(calc(100% + var(--margin)));
+		transform: translate(calc(var(--out-x) * (100% + var(--margin))), calc(var(--out-y) * (100% + var(--margin))));
 	}
 
 	.screen:hover .bar.hides {
@@ -240,9 +297,18 @@
 			transform var(--spring-snappy-duration) var(--spring-snappy);
 	}
 
-	.bar.left .apps {
+	.bar.aligned:not(.vertical) .apps {
 		left: calc(var(--height) / 4);
 		transform: translate(0, -50%);
+	}
+
+	.bar.vertical .apps {
+		flex-direction: column;
+	}
+
+	.bar.vertical.aligned .apps {
+		top: calc(var(--height) / 4);
+		transform: translate(-50%, 0);
 	}
 
 	.slot {
@@ -296,6 +362,31 @@
 		background: var(--focused-dot);
 	}
 
+	.top .dot {
+		top: 0;
+		bottom: auto;
+	}
+
+	.vertical .dot {
+		top: 50%;
+		bottom: auto;
+		transform: translateY(-50%);
+	}
+
+	.left .dot {
+		left: 0;
+	}
+
+	.right .dot {
+		right: 0;
+		left: auto;
+	}
+
+	.vertical .focused .dot {
+		width: 3px;
+		height: 8px;
+	}
+
 	.status {
 		position: absolute;
 		top: 50%;
@@ -316,5 +407,23 @@
 
 	.time {
 		margin-left: 2px;
+	}
+
+	.vertical .status {
+		top: auto;
+		right: auto;
+		bottom: calc(var(--height) / 4);
+		left: 50%;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 3px;
+		width: var(--button);
+		transform: translateX(-50%);
+		font-size: 8px;
+		text-align: center;
+	}
+
+	.vertical .time {
+		margin-left: 0;
 	}
 </style>

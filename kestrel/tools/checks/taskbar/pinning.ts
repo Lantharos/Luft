@@ -3,7 +3,7 @@ import Gio from 'gi://Gio';
 
 import {existing, named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {click, press, rest, rightClick} from '../lib/input/input.js';
+import {click, press, rest, restingPoint, rightClick} from '../lib/input/input.js';
 import {capture} from '../lib/screenshots.js';
 
 const {eventually} = checks('pinning');
@@ -22,7 +22,7 @@ export async function run() {
   favorites.set_strv('favorite-apps', saved);
   await eventually(() => named('Rover', panel)?.mapped, 'pinning the app again brings its button back');
 
-  rightClick([20, 20]);
+  rightClick(restingPoint());
   await eventually(() => menu.visible && named('Change wallpaper', menu), 'right-clicking the desktop offers to change the wallpaper');
   press(Clutter.KEY_Escape);
   await eventually(() => !menu.visible, 'Escape closes the desktop menu');

@@ -4,7 +4,8 @@ import {existing} from '../lib/actors.js';
 import {checkAlways, checkWindows} from './taskbarOptions/autoHide.js';
 import {checkDisplays} from './taskbarOptions/displays.js';
 import {checkAlignment, checkFloating, checkLooks, checkSizes, checkWallpaperGlass} from './taskbarOptions/looks.js';
-import {bottomGap, eventually, HEIGHTS, KEYS, panel, require, set, settings} from './taskbarOptions/taskbar.js';
+import {edgeGap, eventually, HEIGHTS, KEYS, panel, require, set, settings} from './taskbarOptions/taskbar.js';
+import {checkPositions} from './taskbarOptions/positions.js';
 import {checkWorkspaceWindows} from './taskbarOptions/workspaces.js';
 
 const slots = () => existing('kestrel-panel-center', panel()).get_children()[1].get_children();
@@ -20,8 +21,9 @@ export async function run() {
   const styles = new Gio.Settings({schema_id: 'org.gnome.desktop.interface'});
   const scheme = styles.get_string('color-scheme');
   try {
-    require(bottomGap() === HEIGHTS.normal, 'the taskbar reserves its height at the bottom of the screen');
+    require(edgeGap() === HEIGHTS.normal, 'the taskbar reserves its thickness along its edge of the screen');
     await checkAlignment();
+    await checkPositions();
     await checkLooks();
     await checkWallpaperGlass();
     styles.set_string('color-scheme', scheme);

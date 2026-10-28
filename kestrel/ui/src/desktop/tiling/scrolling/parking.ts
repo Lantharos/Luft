@@ -14,7 +14,7 @@ function spots(box: Box, home: Box): Box[] {
   ];
 }
 
-export function parkingSpot(box: Box, home: Box, others: readonly Box[]): Box {
-  if (intersects(box, home) && !others.some(other => intersects(box, other))) return box;
+export function parkingSpot(box: Box, view: Box, home: Box, others: readonly Box[]): Box {
+  if (intersects(box, view) && !others.some(other => intersects(box, other))) return box;
   return spots(box, home).find(spot => !others.some(other => intersects(spot, other))) ?? box;
 }

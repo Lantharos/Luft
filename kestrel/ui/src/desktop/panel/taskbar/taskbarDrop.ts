@@ -4,6 +4,7 @@ import St from 'gi://St';
 import * as DND from '../../../shared/popups/dnd.js';
 
 import { taskbarPreferences } from '../preferences/taskbarPreferences.js';
+import { rightToLeft } from '../../../shared/layout/edge.js';
 
 interface TaskbarSlot { id: string; slot: St.Widget; button: St.Button; }
 interface DraggedItem { id?: string; folder?: boolean; }
@@ -28,8 +29,8 @@ export class TaskbarDrop {
     private readonly favorites: Gio.Settings,
   ) {
     (actor as DelegateActor)._delegate = {
-      handleDragOver: (source: DraggedItem, _dragActor: St.Widget, x: number) => this.over(source, x),
-      acceptDrop: (source: DraggedItem, _dragActor: St.Widget, x: number) => this.drop(source, x),
+      handleDragOver: (source: DraggedItem, _dragActor: St.Widget, x: number, y: number) => this.over(source, this.along(x, y)),
+      acceptDrop: (source: DraggedItem, _dragActor: St.Widget, x: number, y: number) => this.drop(source, this.along(x, y)),
     };
     DND.addDragMonitor(this.monitor);
     actor.connect('destroy', () => DND.removeDragMonitor(this.monitor));
@@ -41,15 +42,24 @@ export class TaskbarDrop {
     return !!app && !app.is_window_backed();
   }
 
-  private insertionIndex(slots: TaskbarSlot[], x: number): number {
-    const index = slots.findIndex(({ slot }) => x < slot.x + slot.width / 2);
+  private along(x: number, y: number): number {
+    return taskbarPreferences.vertical ? y : x;
+  }
+
+  private insertionIndex(slots: TaskbarSlot[], position: number): number {
+    const vertical = taskbarPreferences.vertical;
+    const reversed = !vertical && rightToLeft();
+    const index = slots.findIndex(({ slot }) => {
+      const middle = vertical ? slot.y + slot.height / 2 : slot.x + slot.width / 2;
+      return reversed ? position > middle : position < middle;
+    });
     return index < 0 ? slots.length : index;
   }
 
-  private over(source: DraggedItem, x: number): DND.DragMotionResult {
+  private over(source: DraggedItem, position: number): DND.DragMotionResult {
     if (!this.pinnable(source)) return DND.DragMotionResult.CONTINUE;
     const slots = this.slots();
-    const index = this.insertionIndex(slots, x);
+    const index = this.insertionIndex(slots, position);
     const before = index < slots.length;
     const target = before ? slots[index]?.button : slots[slots.length - 1]?.button;
     this.unmark();
@@ -60,11 +70,11 @@ export class TaskbarDrop {
     return slots.some(slot => slot.id === source.id) ? DND.DragMotionResult.MOVE_DROP : DND.DragMotionResult.COPY_DROP;
   }
 
-  private drop(source: DraggedItem, x: number): boolean {
+  private drop(source: DraggedItem, position: number): boolean {
     this.unmark();
     if (!this.pinnable(source)) return false;
     const slots = this.slots();
-    const index = this.insertionIndex(slots, x);
+    const index = this.insertionIndex(slots, position);
     const before = slots.slice(0, index).map(slot => slot.id).filter(id => id !== source.id);
     const after = slots.slice(index).map(slot => slot.id).filter(id => id !== source.id);
     const favorites = this.favorites.get_strv('favorite-apps');

@@ -81,13 +81,8 @@ export class Tray {
     });
   }
 
-  private anchor(): [x: number, y: number] {
-    const [x, y] = this.actor.get_transformed_position();
-    return [Math.round(x + this.actor.width / 2), Math.round(y)];
-  }
-
   private open(): void {
-    const [x, y] = this.anchor();
+    const [x, y] = this.menus.anchorOf(this.actor);
     this.menus.open(this.actor, this.shown.map(item => this.entry(item, x, y)), x, y);
   }
 

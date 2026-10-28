@@ -17,6 +17,7 @@ import { FocusGrabber } from './focusGrabber.js';
 import { Notification, Source } from './notification.js';
 import { NotificationDestroyedReason, State, Urgency } from './notificationEnums.js';
 import type { NotificationPolicy } from './notificationPolicy.js';
+import { direction, toward, type Edge } from '../../../shared/layout/edge.js';
 
 export { Action, Notification, Sound, Source } from './notification.js';
 export { NotificationDestroyedReason, PrivacyScope, State, Urgency } from './notificationEnums.js';
@@ -102,6 +103,7 @@ export class MessageTray extends St.Widget {
   private lastSeenMouseY = 0;
   private updatingState = false;
   private readonly sources = new Set<Source>();
+  private bannerEdge: Edge = 'bottom';
 
   constructor() {
     super({
@@ -416,15 +418,18 @@ export class MessageTray extends St.Widget {
     banner.header.expandButton.visible = false;
     banner.add_style_class_name('notification-banner');
 
+    const edge = this.bannerEdge = KestrelUi.taskbarInset().edge;
+    this.bannerBin.x_align = edge === 'left' ? Clutter.ActorAlign.START : Clutter.ActorAlign.END;
+    this.bannerBin.y_align = edge === 'top' ? Clutter.ActorAlign.START : Clutter.ActorAlign.END;
     this.bannerBin.add_child(banner);
     new KestrelUi.SwipeAway(banner, {
-      downward: true,
+      downward: edge === 'bottom',
       held: held => this.holdBanner(held),
       dismissed: () => this.notification!.destroy(NotificationDestroyedReason.DISMISSED),
     });
 
     this.bannerBin.opacity = 0;
-    this.bannerBin.translation_y = BANNER_SLIDE_DISTANCE;
+    this.bannerBin.set(toward(edge, BANNER_SLIDE_DISTANCE));
     this.show();
 
     global.compositor.disable_unredirect();
@@ -450,6 +455,7 @@ export class MessageTray extends St.Widget {
     this.bannerBin.remove_all_transitions();
     this.bannerBin.ease({
       opacity: 255,
+      translation_x: 0,
       translation_y: 0,
       duration: BANNER_SHOW_TIME,
       mode: Clutter.AnimationMode.EASE_OUT_QUART,
@@ -486,7 +492,8 @@ export class MessageTray extends St.Widget {
 
   private notificationTimeout(): void {
     const [x, y] = global.get_pointer();
-    if (y > this.lastSeenMouseY + 10 && !this.notificationHovered) {
+    const [awayX, awayY] = direction(this.bannerEdge);
+    if ((x - this.lastSeenMouseX) * awayX + (y - this.lastSeenMouseY) * awayY > 10 && !this.notificationHovered) {
       this.updateNotificationTimeout(1000);
     } else if (this.useLongerNotificationLeftTimeout && !this.notificationLeftTimeoutId &&
       (x !== this.lastSeenMouseX || y !== this.lastSeenMouseY)) {
@@ -507,7 +514,7 @@ export class MessageTray extends St.Widget {
     this.notificationState = State.HIDING;
     this.bannerBin.ease({
       opacity: 0,
-      translation_y: BANNER_SLIDE_DISTANCE,
+      ...toward(this.bannerEdge, BANNER_SLIDE_DISTANCE),
       duration: animate ? ANIMATION_TIME : 0,
       mode: Clutter.AnimationMode.EASE_IN_QUAD,
       onComplete: () => {

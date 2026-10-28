@@ -45,6 +45,7 @@ import { CopilotActions } from './system/dictation/copilotActions.js';
 import { startPeekHost, type HostContext } from './system/peek/host/host.js';
 import type { PeekService } from './system/peek/service.js';
 import { followUserLanguage } from './system/language/language.js';
+import type { Inset } from './shared/layout/edge.js';
 import { SystemServices } from './system/services.js';
 
 export { appIcon, appIcons, sourceApp, windowIcon } from './appearance/icons/appIcons.js';
@@ -102,7 +103,8 @@ class KestrelUi {
     const monitorAt = (x: number, y: number) => this.surfaces.monitorAt(x, y);
 
     this.workspaces = new Workspaces(() => this.canInteract(), () => this.dismissImmediately(), context.swipeWorkspaces);
-    this.menus = new ContextMenus(monitorAt, close, () => this.canInteract(), () => this.previews.close(), context.activateWindow);
+    this.menus = new ContextMenus(monitorAt, close, () => this.canInteract(), () => this.previews.close(), context.activateWindow,
+      actor => this.panels?.contains(actor) ? taskbarPreferences.edge : null);
     this.previews = new WindowPreviews(actor => monitorAt(...actor.get_transformed_position()), () => this.canInteract() && !this.menus.actor.visible, close, context.activateWindow);
     context.layoutManager.addTopChrome(this.previews.actor);
     this.board = new Board({
@@ -174,7 +176,7 @@ class KestrelUi {
       taskView: this.taskView,
       canInteract: () => this.canInteract(),
       syncSession: () => this.syncSession(),
-      bottomClearance: () => this.bottomClearance(),
+      taskbarInset: () => this.taskbarInset(),
       startReplaced: () => this.prewarmStart(),
     });
 
@@ -196,6 +198,7 @@ class KestrelUi {
     for (const actor of [this.menus.actor, this.previews.actor]) actor.connect('notify::visible', holdPanels);
     this.disconnectors.push(followUserLanguage());
     this.disconnectors.push(taskbarPreferences.watch(key => {
+      if (key === 'taskbar-position' || key === 'tablet') this.followTaskbarEdge();
       if (key === 'taskbar-style' || key === 'taskbar-size' || key === 'tablet') place();
       if (key === 'start-style') this.surfaces.restyleStart();
     }));
@@ -256,9 +259,11 @@ class KestrelUi {
       this.rain.monitorsChanged();
       this.board.monitorsChanged();
       this.tiling.monitorsChanged();
+      this.followTaskbarEdge();
       place();
       this.syncSession();
     });
+    this.followTaskbarEdge();
     place();
     this.syncSession();
     this.disconnectors.push(prewarmAfterStartup(context.layoutManager, [
@@ -337,9 +342,14 @@ class KestrelUi {
     if (!available) this.dismissImmediately();
   }
 
-  private bottomClearance(): number {
-    if (this.board.shown) return this.board.cornerClearance;
-    return taskbarPreferences.shown ? taskbarPreferences.clearance : this.panels.cornerClearance;
+  private followTaskbarEdge(): void {
+    const primary = this.context.layoutManager.primaryMonitor;
+    if (primary && wallpaperFloor.follow(taskbarPreferences.edge, primary)) this.services.appearance.repaintTaskbar();
+  }
+
+  private taskbarInset(): Inset {
+    if (this.board.shown) return { edge: 'bottom', depth: this.board.cornerClearance };
+    return { edge: taskbarPreferences.edge, depth: taskbarPreferences.shown ? taskbarPreferences.clearance : this.panels.cornerClearance };
   }
 
   private prewarmStart(): void {
@@ -490,7 +500,7 @@ export function switchWorkspace(index: number): void { currentUi?.switchWorkspac
 
 export function openSystemMonitor(): void { systemMonitor()?.activate(); }
 
-export function taskbarClearance(): number { return taskbarPreferences.clearance; }
+export function taskbarInset(): Inset { return { edge: taskbarPreferences.edge, depth: taskbarPreferences.clearance }; }
 
 export function taskbarOwnsBottomEdge(): boolean { return currentUi !== null && taskbarPreferences.touch; }
 

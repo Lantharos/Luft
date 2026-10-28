@@ -4,32 +4,42 @@ import St from 'gi://St';
 import { animateActor } from '../../../shared/motion/motion.js';
 import { clampUnit } from '../../../shared/math.js';
 import type { LauncherEntry } from './launcherEntries.js';
+import { isVertical, outward, type Edge } from '../../../shared/layout/edge.js';
 
-const PROGRESS_WIDTH = 28;
+const PROGRESS_LENGTH = 28;
 const PROGRESS_INSET = 5;
+const PROGRESS_THICKNESS = 3;
 const FLASHES = 3;
 const SETTLED_OPACITY = 190;
 
 export class AppIndicators {
   readonly attention = new St.Widget({ style_class: 'kestrel-task-attention', opacity: 0, visible: false });
   private readonly badge = new St.Label({ style_class: 'kestrel-task-badge', visible: false, y: 1 });
-  private readonly progress = new St.Widget({ style_class: 'kestrel-task-progress', visible: false, width: PROGRESS_WIDTH });
+  private readonly progress = new St.Widget({ style_class: 'kestrel-task-progress', visible: false });
   private readonly fill = new St.Widget({ style_class: 'kestrel-task-progress-fill' });
   private attending = false;
   private size = 0;
+  private vertical = false;
+  private fraction = 0;
 
-  constructor(content: St.Widget, size: number) {
+  constructor(content: St.Widget, size: number, edge: Edge) {
     content.insert_child_at_index(this.attention, 0);
     this.progress.add_child(this.fill);
     content.add_child(this.progress);
     content.add_child(this.badge);
-    this.resize(size);
+    this.resize(size, edge);
   }
 
-  resize(size: number): void {
+  resize(size: number, edge: Edge): void {
     this.size = size;
+    this.vertical = isVertical(edge);
     this.attention.set_size(size, size);
-    this.progress.set_position((size - PROGRESS_WIDTH) / 2, size - PROGRESS_INSET);
+    const along = (size - PROGRESS_LENGTH) / 2;
+    const across = outward(edge) > 0 ? size - PROGRESS_INSET : PROGRESS_INSET - PROGRESS_THICKNESS;
+    if (this.vertical) this.progress.set({ x: across, y: along, width: PROGRESS_THICKNESS, height: PROGRESS_LENGTH });
+    else this.progress.set({ x: along, y: across, width: PROGRESS_LENGTH, height: PROGRESS_THICKNESS });
+    this.fill.set({ x: 0, y: 0, width: PROGRESS_THICKNESS, height: PROGRESS_THICKNESS });
+    this.fillProgress(0);
     this.placeBadge();
   }
 
@@ -47,10 +57,15 @@ export class AppIndicators {
     this.placeBadge();
     this.progress.visible = entry.progressVisible;
     if (this.progress.visible) {
-      this.fill.height = this.progress.get_theme_node().get_height();
-      animateActor(this.fill, { width: Math.round(PROGRESS_WIDTH * clampUnit(entry.progress)), duration: 200, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
+      this.fraction = clampUnit(entry.progress);
+      this.fillProgress(200);
     }
     this.setAttention(attention || entry.urgent);
+  }
+
+  private fillProgress(duration: number): void {
+    const length = Math.round(PROGRESS_LENGTH * this.fraction);
+    animateActor(this.fill, { [this.vertical ? 'height' : 'width']: length, duration, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
   }
 
   private setAttention(attention: boolean): void {

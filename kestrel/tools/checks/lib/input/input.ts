@@ -2,12 +2,14 @@ import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 
 import {nextFrame, pause} from '../wait.js';
+import {taskbarEdge} from '../edge.js';
 
 const DRAG_STEP = 16;
 export type Point = [number, number];
 export type Target = Point | Clutter.Actor;
 
-const REST: Point = [20, 20];
+const REST_CORNER = 20;
+const REST_BESIDE_TASKBAR = 80;
 
 const now = () => GLib.get_monotonic_time();
 const seat = global.stage.context.get_backend().get_default_seat();
@@ -52,8 +54,13 @@ export function moveTo(target: Target) {
   pointer().notify_absolute_motion(now(), x, y);
 }
 
+export function restingPoint(): Point {
+  const edge = taskbarEdge();
+  return [edge === 'left' ? REST_BESIDE_TASKBAR : REST_CORNER, edge === 'top' ? REST_BESIDE_TASKBAR : REST_CORNER];
+}
+
 export function rest() {
-  moveTo(REST);
+  moveTo(restingPoint());
 }
 
 export function moveBy(dx: number, dy: number) {

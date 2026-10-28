@@ -291,7 +291,7 @@ function initializeDesktop(): void {
     },
     showOsd: (icon, label, level, maxLevel) => osdWindowManager.showAll(icon, label, level, maxLevel),
   });
-  screenShield.lockIfWasLocked().catch(logError);
+  screenShield.desktopStarted().catch(logError);
 }
 
 function notifyUnsafeMode(): void {

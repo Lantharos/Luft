@@ -88,6 +88,7 @@ export class ScreenShield extends Signals.EventEmitter {
   private grab: Clutter.Grab | null = null;
   private isActive = false;
   private isLocked = false;
+  private desktopReady = false;
   private inhibited = false;
   private inhibitCancellable: Gio.Cancellable | null = null;
   private inhibitor: GioUnix.InputStream | null = null;
@@ -204,7 +205,7 @@ export class ScreenShield extends Signals.EventEmitter {
   }
 
   private onStatusChanged(status: number): void {
-    if (status !== GnomeSession.PresenceStatus.IDLE) return;
+    if (!this.desktopReady || status !== GnomeSession.PresenceStatus.IDLE) return;
 
     this.dialog?.cancel();
 
@@ -477,8 +478,10 @@ export class ScreenShield extends Signals.EventEmitter {
     this.setLocked(user.password_mode !== AccountsService.UserPasswordMode.NONE);
   }
 
-  async lockIfWasLocked(): Promise<void> {
+  async desktopStarted(): Promise<void> {
     await this.loginSessionReady;
+    this.desktopReady = true;
     if (this.loginSession?.LockedHint) this.lock(false);
+    this.onStatusChanged(this.presence.status);
   }
 }

@@ -34,7 +34,7 @@ const RETRY_HOLD = 520;
 const COLLAPSED = 0.12;
 
 function arc(rx: number, from: Point | null, to: Point | null): Point[] {
-  const angle = ([x, y]: Point) => Math.atan2((y - CENTER[1]) / SQUASH, x - CENTER[0]);
+  const angle = ([x, y]: Point) => (Math.atan2((y - CENTER[1]) / SQUASH, x - CENTER[0]) + 2 * Math.PI) % (2 * Math.PI);
   const start = from ? angle(from) : Math.PI;
   let end = to ? angle(to) : 2 * Math.PI;
   while (end <= start) end += 2 * Math.PI;

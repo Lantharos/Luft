@@ -10,11 +10,13 @@ rust-version.workspace = true
 [dependencies]
 anyhow.workspace = true
 futures-util.workspace = true
+getrandom.workspace = true
 clap.workspace = true
 libc.workspace = true
 luft-dbus.workspace = true
 luft-identity.workspace = true
 luft-installer-contract.workspace = true
+luft-keyring-vault.workspace = true
 luft-disks.workspace = true
 luft-i18n.workspace = true
 luft-meet.workspace = true

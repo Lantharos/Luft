@@ -1,4 +1,5 @@
 mod chip;
+mod handoffs;
 mod peer;
 mod seals;
 mod service;

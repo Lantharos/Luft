@@ -1,9 +1,8 @@
-use std::path::PathBuf;
-
 use anyhow::{Context, Result, bail};
 use luft_i18n::t;
 
 use super::deployment::Deployment;
+use super::keyring;
 use crate::L10N;
 use crate::system::command::Tool;
 
@@ -68,14 +67,17 @@ impl Account {
             .arg(deployment.etc("skel"))
             .arg(&folder)
             .run()?;
+        let ids = self.ids(deployment)?;
+        let uid = ids.split(':').next().unwrap_or_default();
+        let keyring_state = keyring::prepare(deployment, &folder, uid, &self.password)?;
         Tool::new("chown")
-            .args(["--recursive", &self.ids(deployment)?])
+            .args(["--recursive", &ids])
             .arg(&folder)
             .run()?;
         Tool::new("chmod").arg("0700").arg(&folder).run()?;
         deployment
             .relabel(&["passwd", "shadow", "group", "gshadow"].map(|name| deployment.etc(name)))?;
-        deployment.relabel(&[PathBuf::from(&folder)])
+        deployment.relabel(&[folder, keyring_state])
     }
 }
 

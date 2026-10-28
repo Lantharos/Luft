@@ -6,6 +6,7 @@ use std::path::Path;
 use anyhow::Result;
 use luft_disks::systems;
 
+use crate::install::configure::keyring;
 use crate::phase;
 use crate::system::{greetd, wait};
 
@@ -14,6 +15,7 @@ pub fn finish(state_dir: &Path) -> Result<()> {
         eprintln!("The replaced system's start entries weren't removed: {error}");
     }
     greetd::stop_signing_in(&Path::new("/var").join(greetd::INITIAL_SESSION))?;
+    keyring::forget_handoffs()?;
     window::forget(state_dir)?;
     std::fs::remove_file(phase::marker(state_dir))?;
     Ok(())

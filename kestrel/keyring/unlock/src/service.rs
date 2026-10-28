@@ -13,6 +13,7 @@ use tokio::io::AsyncReadExt;
 use tokio::net::UnixStream;
 use tokio::sync::mpsc;
 
+use crate::handoffs::Handoffs;
 use crate::peer::{Peer, Verifier};
 use crate::seals::Seals;
 use crate::slot::ChipSlot;
@@ -24,6 +25,7 @@ const CHIP_KEY_SIZE: usize = 32;
 pub struct Service {
     verifier: Verifier,
     seals: Seals,
+    handoffs: Handoffs,
     chip: ChipSlot,
     users: Mutex<HashMap<u32, User>>,
     attachments: AtomicU64,
@@ -36,10 +38,11 @@ struct User {
 }
 
 impl Service {
-    pub fn new(daemon: PathBuf, seals: PathBuf, tcti: String) -> Self {
+    pub fn new(daemon: PathBuf, state: PathBuf, tcti: String) -> Self {
         Self {
             verifier: Verifier::new(daemon),
-            seals: Seals::new(seals),
+            handoffs: Handoffs::new(state.clone()),
+            seals: Seals::new(state),
             chip: ChipSlot::new(tcti),
             users: Mutex::default(),
             attachments: AtomicU64::new(0),
@@ -116,6 +119,7 @@ impl Service {
         Status {
             chip: self.chip.state(),
             seal,
+            handoff: self.handoffs.waiting(user),
         }
     }
 
@@ -178,9 +182,12 @@ impl Service {
                 problem: None,
             });
         }
-        let key = tokio::task::spawn_blocking(move || self.unseal(user, None))
-            .await
-            .unwrap_or_else(|error| Err(Problem::Failed(error.to_string())));
+        let key = tokio::task::spawn_blocking(move || {
+            self.unseal(user, None)
+                .or_else(|problem| self.handoffs.key(user).ok_or(problem))
+        })
+        .await
+        .unwrap_or_else(|error| Err(Problem::Failed(error.to_string())));
         let (key, problem) = match key {
             Ok(key) => (Some(key), None),
             Err(problem) => (None, Some(problem)),
@@ -205,7 +212,14 @@ impl Service {
             let entry = users.entry(user).or_default();
             entry.listener = Some((id, sender.clone()));
             entry.pending.take().filter(fresh).map(|(grant, _)| grant)
-        };
+        }
+        .or_else(|| {
+            self.handoffs.waiting(user).then_some(Grant {
+                user,
+                password: None,
+                reason: GrantReason::SignIn,
+            })
+        });
         if let Some(grant) = pending {
             let _ = sender.send(self.clone().unlock(grant).await);
         }

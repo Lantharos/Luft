@@ -221,10 +221,13 @@ impl Daemon {
         let Some(status) = self.chip.lock().await.clone() else {
             return;
         };
+        let wrapped = self.keyring.lock().await.has_chip_wrap();
         if status.chip != Chip::Ready {
+            if wrapped && status.seal.is_none() && !status.handoff {
+                let _ = self.keyring.lock().await.set_chip_wrap(None);
+            }
             return;
         }
-        let wrapped = self.keyring.lock().await.has_chip_wrap();
         let stale = self.reseal.load(Ordering::Relaxed);
         match status.seal {
             Some(_) if wrapped && !stale => {}

@@ -66,6 +66,7 @@ pub struct Unlock {
 pub struct Status {
     pub chip: Chip,
     pub seal: Option<Seal>,
+    pub handoff: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

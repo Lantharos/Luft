@@ -49,7 +49,7 @@ finish_setup() {
   mount "$(partition 4f68bce3-e8cd-4db1-96e7-fbcaf984b709)" /run/target
   root="$(dirname "$(compgen -G '/run/target/state/deploy/*/etc' | head -n1)")"
   state=/run/target/state/os/default/var
-  rm -f "$state/lib/luft-installer/first-boot" "$state/lib/kestrel-greeter/initial-session.toml"
+  rm -f "$state/lib/luft-installer/first-boot" "$state/lib/kestrel-greeter/initial-session.toml" "$state"/lib/luft-keyring/*.handoff
   awk -F: -v OFS=: -v hash="$(openssl passwd -6 -stdin <<<"$password")" '$1 == "root" { $2 = hash } 1' \
     "$root/etc/shadow" >/run/shadow
   cat /run/shadow >"$root/etc/shadow"

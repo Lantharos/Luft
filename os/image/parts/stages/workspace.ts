@@ -98,10 +98,23 @@ function pruneLock(lock: string, roots: string[]) {
   return `${LOCK_HEADER}${blocks.map((block) => `\n[[package]]\n${block}`).join('')}`;
 }
 
+function pathDependencies(manifest: string) {
+  const dependencies = (Bun.TOML.parse(manifest) as { workspace?: { dependencies?: Record<string, unknown> } }).workspace?.dependencies ?? {};
+  return new Map(
+    Object.entries(dependencies).flatMap(([name, spec]) => {
+      const path = (spec as { path?: unknown } | undefined)?.path;
+      return typeof path === 'string' ? [[name, path] as const] : [];
+    }),
+  );
+}
+
 export function prunedWorkspace(manifest: string, lock: string, memberManifest: (dir: string) => string | undefined) {
+  const paths = pathDependencies(manifest);
+  const present = (name: string) => !paths.has(name) || memberManifest(paths.get(name)!) !== undefined;
   const members = listed(manifest, 'members').flatMap((dir) => {
     const text = memberManifest(dir);
-    return text ? [{ dir, manifest: Bun.TOML.parse(text) as Manifest }] : [];
+    const parsed = text ? (Bun.TOML.parse(text) as Manifest) : undefined;
+    return parsed && inheritedDependencies(parsed).every(present) ? [{ dir, manifest: parsed }] : [];
   });
   const dirs = members.map((member) => member.dir);
   const used = new Set(members.flatMap((member) => inheritedDependencies(member.manifest)));

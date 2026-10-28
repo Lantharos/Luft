@@ -411,6 +411,7 @@ jobs:
           sudo udevadm trigger --name-match=kvm
           sudo apt-get update --quiet
           sudo apt-get install --yes --quiet --no-install-recommends qemu-system-x86 qemu-utils ovmf swtpm
+          sudo apparmor_parser --remove /etc/apparmor.d/usr.bin.swtpm
 
       - name: Install the new nightly
         run: |

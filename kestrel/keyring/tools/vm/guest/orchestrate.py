@@ -10,8 +10,9 @@ import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 STATE = "/var/lib/keyring-test"
-PASSWORD = "sign-in words"
-person = pwd.getpwnam("person")
+PASSWORD = "luft-vm"
+person = pwd.getpwnam("luft")
+FINGER = "/run/luft-vm-fingerprint/finger"
 result_path = os.path.join(person.pw_dir, "result.json")
 tally = {"passed": 0, "failed": 0}
 
@@ -54,14 +55,14 @@ def exchange(connection, message):
 def login(method, scenario):
     with open(os.path.join(STATE, "scenario.json"), "w") as output:
         json.dump({"name": scenario}, output)
-    with open("/run/keyring-test/finger", "w") as finger:
+    with open(FINGER, "w") as finger:
         finger.write("match" if method == "fingerprint" else "none")
     if os.path.exists(result_path):
         os.remove(result_path)
     messages = []
     with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as connection:
         connection.connect(greetd_socket())
-        reply = exchange(connection, {"type": "create_session", "username": "person"})
+        reply = exchange(connection, {"type": "create_session", "username": person.pw_name})
         while reply["type"] == "auth_message":
             messages.append(reply["auth_message"])
             answer = PASSWORD if reply["auth_message_type"] == "secret" else None
@@ -89,11 +90,7 @@ def login(method, scenario):
 
 
 def extend_secure_boot_state():
-    subprocess.run(
-        ["tpm2_pcrextend", "7:sha256=" + "01" * 32],
-        check=True,
-        env=dict(os.environ, TPM2TOOLS_TCTI="device:/dev/tpmrm0"),
-    )
+    subprocess.run(["/usr/lib/systemd/systemd-pcrextend", "--pcr=7", "keyring-check"], check=True)
 
 
 def unlock_socket_label():
@@ -125,16 +122,13 @@ def diagnose():
 
 
 def main():
-    with open("/proc/cmdline") as cmdline:
-        words = cmdline.read().split()
-    mode = next((word.split("=", 1)[1] for word in words if word.startswith("keyring.test=")), "tpm")
-    os.makedirs("/run/keyring-test", exist_ok=True)
+    if os.path.exists("/dev/tpmrm0"):
+        mode = "tpm"
+    elif os.path.exists(f"/var/lib/luft-keyring/{person.pw_uid}.seal"):
+        mode = "gone"
+    else:
+        mode = "none"
     os.makedirs(STATE, exist_ok=True)
-    with open("/run/keyring-test/finger", "w") as finger:
-        finger.write("none")
-    os.chmod("/run/keyring-test/finger", 0o666)
-    mock = subprocess.Popen(["/usr/bin/python3", os.path.join(HERE, "fprintd.py")])
-    time.sleep(1)
     report(f"LUFT-KEYRING-VM START {mode}")
     if mode == "tpm":
         login("password", "first sign-in")
@@ -164,7 +158,6 @@ def main():
     for line in found:
         report(f"denial: {line}")
     check(not found, "SELinux denied nothing")
-    mock.terminate()
     report(f"LUFT-KEYRING-VM DONE passed={tally['passed']} failed={tally['failed']}")
     subprocess.run(["systemctl", "poweroff"], check=False)
 

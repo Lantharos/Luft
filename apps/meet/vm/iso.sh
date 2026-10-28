@@ -15,7 +15,7 @@ Builds a Luft ISO with this checkout's installer, Install Luft, trustd, live sta
 and Toolbox builder on top of localhost/luft-system:45 and :45-nvidia (made by
 os/image/build.sh, and named after LUFT_IMAGE_NAME like it), so Meet Luft and
 Install Luft can be tried against them without building the whole image. It
-carries the QEMU guest agent, so apps/meet/vm/control.py can run commands in the live
+carries the QEMU guest agent, so os/vm/control.py can run commands in the live
 session and in what it installs. Writes apps/meet/vm/state/luft-meet.iso with a
 .sha256 (MEET_VM picks another folder), signed with the keys os/image/build.sh
 signs with.

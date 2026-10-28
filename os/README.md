@@ -39,24 +39,26 @@ It writes `os/iso/state/luft-VERSION.iso` and its `.sha256`, in a few minutes an
 ## Try it in a VM
 
 ```sh
-os/vm/disk.sh                   # install localhost/luft-system:45 (made by build.sh) onto os/vm/state/disk.qcow2
-SECURE_BOOT=1 os/vm/run.sh      # start it with Secure Boot and a TPM (HEADLESS=1 for no window)
+os/vm/disk.sh                   # install localhost/luft:45 (made by build.sh) onto os/vm/state/disk.qcow2, as Install Luft does
+SECURE_BOOT=1 os/vm/qemu.sh     # start it with Secure Boot and a TPM (HEADLESS=1 for no window)
 ```
 
-The VM's account is `luft` with the password `luft-vm`. While it runs, `os/vm/control.py` takes screenshots, presses keys and runs commands:
+The VM's account is `luft` with the password `luft-vm`, which is also root's on the serial console and the code for adding Luft's key on shim's blue screen at the first start. While it runs, `os/vm/control.py` takes screenshots, presses keys and runs commands:
 
 ```sh
+os/vm/control.py enroll               # add Luft's key on shim's blue screen
 os/vm/control.py screenshot login.png
 os/vm/control.py shell 'bootc status'
-os/vm/control.py enroll-from-disk     # add Luft's key on shim's blue screen at the first start
 ```
 
 To start the stick instead, with an empty `os/vm/state/target.qcow2` to install onto:
 
 ```sh
-ISO=os/iso/state/luft-VERSION.iso os/vm/run.sh                 # as a USB stick
-ISO=... MEDIA=cd SECURE_BOOT=1 NETWORK=0 os/vm/run.sh          # as a DVD, Secure Boot on, offline
-DISK=os/vm/state/target.qcow2 os/vm/run.sh                     # the installed drive afterwards
+ISO=os/iso/state/luft-VERSION.iso os/vm/qemu.sh                # as a USB stick
+ISO=... MEDIA=cd SECURE_BOOT=1 NETWORK=0 os/vm/qemu.sh         # as a DVD, Secure Boot on, offline
+DISK=os/vm/state/target.qcow2 os/vm/qemu.sh                    # the installed drive afterwards
 ```
+
+`os/vm/qemu.sh --help` lists its other options, and [docs/testing.md](../docs/testing.md#vms) the checks that run in VMs.
 
 [docs/hardware-testing.md](../docs/hardware-testing.md) lists what to check on a real computer.

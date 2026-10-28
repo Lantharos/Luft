@@ -1,0 +1,11 @@
+[Unit]
+Description=Fingerprint reader for checks in a VM
+
+[Service]
+Type=dbus
+BusName=net.reactivated.Fprint
+RuntimeDirectory=luft-vm-fingerprint
+ExecStart=/usr/libexec/luft-vm-fingerprint
+
+[Install]
+WantedBy=multi-user.target

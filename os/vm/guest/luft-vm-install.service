@@ -1,0 +1,12 @@
+[Unit]
+Description=Install Luft onto the VM's empty drive
+After=dbus.service local-fs.target systemd-user-sessions.service
+
+[Service]
+Type=oneshot
+ExecStartPre=/usr/bin/mkdir -p /run/luft-source
+ExecStartPre=/usr/bin/mount -o ro LABEL=luft-source /run/luft-source
+ExecStart=/usr/bin/bash /run/luft-source/install.sh
+ExecStopPost=/usr/bin/systemctl poweroff --no-block
+StandardOutput=journal+console
+StandardError=journal+console

@@ -22,12 +22,10 @@ cargo test -p luft-passkeys -p ctap -p luft-passkeys-relay
 cargo clippy -p luft-passkeys -p ctap -p luft-passkeys-relay --all-targets -- -D warnings
 ```
 
-`tools/check` runs Chromium and Firefox against Luft Passkeys in the Sushi VM, with a stand-in fingerprint reader:
+`tools/check` runs Chromium and Firefox against Luft Passkeys in a VM of `localhost/luft-system:45` (from `os/image/build.sh`), with a stand-in fingerprint reader:
 
 ```sh
-export SUSHI_VM=~/.cache/luft-passkeys-vm
-sushi/scripts/vm/tree.sh && sushi/scripts/vm/kestrel.sh
-kestrel/passkeys/tools/check/prepare.sh && sushi/scripts/vm/disk.sh
+kestrel/passkeys/tools/check/prepare.sh                 # installs it onto kestrel/run/passkeys-vm (PASSKEYS_VM)
 kestrel/passkeys/tools/check/run.py                     # with a TPM and a fingerprint
 kestrel/passkeys/tools/check/run.py --no-tpm --password # without a TPM, with the password
 ```

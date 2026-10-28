@@ -22,7 +22,7 @@ members = [
     "sushi/crates/sushiboot",
     "sushi/crates/sushictl",
     "sushi/crates/sushid",
-    "sushi/scripts/vm/display",
+    "os/vm/display",
     "kestrel/greeter",
     "kestrel/keyring/daemon",
     "kestrel/keyring/pam",

@@ -1,6 +1,6 @@
 [package]
 name = "vm-display"
-description = "Plays the part of a graphics card's firmware in the Sushi VM: hands over a chosen framebuffer and describes the monitor"
+description = "Plays the part of a graphics card's firmware in a Luft VM: hands over a chosen framebuffer and describes the monitor before starting Luft"
 version = "0.1.0"
 edition.workspace = true
 license.workspace = true

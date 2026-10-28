@@ -8,7 +8,7 @@ use alloc::string::String;
 use core::mem::MaybeUninit;
 
 use uefi::boot::{
-    self, LoadImageSource, OpenProtocolAttributes, OpenProtocolParams, ScopedProtocol,
+    self, LoadImageSource, OpenProtocolAttributes, OpenProtocolParams, ScopedProtocol, SearchType,
 };
 use uefi::fs::FileSystem;
 use uefi::prelude::*;
@@ -17,11 +17,11 @@ use uefi::proto::ProtocolPointer;
 use uefi::proto::console::gop::GraphicsOutput;
 use uefi::proto::device_path::build::{self, media::FilePath};
 use uefi::proto::device_path::{DevicePath, DeviceSubType, DeviceType};
-use uefi::proto::loaded_image::LoadedImage;
-use uefi::{Guid, Handle, cstr16, guid};
+use uefi::proto::media::fs::SimpleFileSystem;
+use uefi::{Guid, Handle, Identify, cstr16, guid};
 
 const SETTINGS: &uefi::CStr16 = cstr16!("\\vm-display.conf");
-const BOOT_LOADER: &uefi::CStr16 = cstr16!("\\EFI\\sushi\\SushiBoot.efi");
+const BOOT_LOADER: &uefi::CStr16 = cstr16!("\\EFI\\luft\\shimx64.efi");
 const EDID_PROTOCOLS: [Guid; 2] = [
     guid!("1c0c34f6-d380-41fa-a049-8ad06c1a66aa"),
     guid!("bd8c1056-9f36-44ec-92a8-a6337f817986"),
@@ -130,10 +130,23 @@ fn hand_over(gop: &mut GraphicsOutput, wanted: (u32, u32)) {
     }
 }
 
+fn boot_loader_volume() -> uefi::Result<Handle> {
+    let volumes = boot::locate_handle_buffer(SearchType::ByProtocol(&SimpleFileSystem::GUID))?;
+    volumes
+        .iter()
+        .copied()
+        .find(|volume| {
+            shared::<SimpleFileSystem>(*volume).is_ok_and(|file_system| {
+                FileSystem::new(file_system)
+                    .try_exists(BOOT_LOADER)
+                    .unwrap_or(false)
+            })
+        })
+        .ok_or(Status::NOT_FOUND.into())
+}
+
 fn start_boot_loader() -> uefi::Result<()> {
-    let image = shared::<LoadedImage>(boot::image_handle())?;
-    let device = image.device().ok_or(Status::NOT_FOUND)?;
-    let volume = shared::<DevicePath>(device)?;
+    let volume = shared::<DevicePath>(boot_loader_volume()?)?;
     let mut buffer = [MaybeUninit::uninit(); 1024];
     let mut builder = build::DevicePathBuilder::with_buf(&mut buffer);
     for node in volume
@@ -156,7 +169,6 @@ fn start_boot_loader() -> uefi::Result<()> {
         },
     )?;
     drop(volume);
-    drop(image);
     boot::start_image(loader)
 }
 

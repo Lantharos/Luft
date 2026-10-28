@@ -2,25 +2,26 @@
 set -euo pipefail
 
 os="$(cd "$(dirname "$0")/.." && pwd)"
-vm="${LUFT_VM:-$os/vm/state}"
-image_name="${LUFT_IMAGE_NAME:-localhost/luft}"
-system="${1:-$image_name-system:45}"
+image="${1:-${LUFT_IMAGE_NAME:-localhost/luft}:45}"
 user="${VM_USER:-luft}"
 password="${VM_PASSWORD:-luft-vm}"
-vm_system=$image_name-vm-system:latest
-test_image=$image_name-vm:latest
+followed="${VM_FOLLOWS:-ghcr.io/lantharos/luft:1}"
 
 usage() {
   cat <<'USAGE'
-Usage: os/vm/disk.sh [SYSTEM]
+Usage: os/vm/disk.sh [IMAGE]
 
-Installs the system image SYSTEM (default localhost/luft-system:45, from
-os/image/build.sh, or LUFT_IMAGE_NAME-system:45) onto a virtual disk with bootc, the way it lands on a real
-drive, without root on this computer: a helper VM booted from the image itself
-runs `bootc install to-disk` and puts shim and SushiBoot on the EFI system
-partition. Adds the account luft (password luft-vm, also root's) and a serial
-console, then seals the result with os/image/seal.sh and the same keys
-os/image/build.sh signs with.
+Installs the sealed image IMAGE (default localhost/luft:45 from
+os/image/build.sh, or LUFT_IMAGE_NAME:45) onto LUFT_VM/disk.qcow2 (default
+os/vm/state) the way Install Luft does, without root on this computer: a
+helper VM started from the image itself runs the image's own installer onto
+an empty drive and creates the account VM_USER (default luft) with the
+password VM_PASSWORD (default luft-vm).
+
+The installed system is set up and starts at the login screen. root has the
+same password on the serial console, and Luft's Secure Boot key is queued
+for shim with that password as the code, which os/vm/control.py enroll types.
+Updates follow VM_FOLLOWS (default ghcr.io/lantharos/luft:1).
 USAGE
 }
 
@@ -28,89 +29,44 @@ case "${1:-}" in
   -h | --help) usage; exit 0 ;;
 esac
 
-# shellcheck source=os/image/throwaway-keys.sh
-source "$os/image/throwaway-keys.sh"
-use_signing_keys
-require_signed_by_keys "$system"
+mkdir -p "${LUFT_VM:-$os/vm/state}"
+vm="$(cd "${LUFT_VM:-$os/vm/state}" && pwd)"
+work="$vm/install"
+rm -rf "$work"
+mkdir -p "$work/source"
 
-mkdir -p "$vm/share"
+podman save --quiet --format oci-archive --output "$work/source/luft.ociarchive" "$image"
+cp "$os/vm/guest/install.sh" "$work/source/install.sh"
+printf '%s\n%s\n' "$user" "$password" >"$work/source/account"
+mkfs.ext4 -q -L luft-source -d "$work/source" "$work/source.img" "$(($(du -sm "$work/source" | cut -f1) + 256))M"
+rm -rf "$work/source"
 
-podman build --quiet --no-hosts --no-hostname --tag "$vm_system" --build-arg "IMAGE=$system" --build-arg "USER=$user" \
-  --build-arg "PASSWORD=$password" --file - "$os/vm" >/dev/null <<'CONTAINERFILE'
-ARG IMAGE
-FROM ${IMAGE}
-ARG USER PASSWORD
-RUN useradd --create-home --groups wheel "$USER" && \
-    echo "$USER:$PASSWORD" | chpasswd && echo "root:$PASSWORD" | chpasswd && \
-    systemctl enable serial-getty@ttyS0.service && \
-    printf 'kargs = ["console=tty0", "console=ttyS0,115200"]\n' > /usr/lib/bootc/kargs.d/90-vm.toml
-CONTAINERFILE
-"$os/image/seal.sh" "$vm_system" "$test_image"
-rm -f "$vm/share/image.tar"
-podman save --quiet --format oci-archive --output "$vm/share/image.tar" "$test_image"
+podman unshare sh -c '
+  set -e
+  tree="$(podman image mount "$1")"
+  mkfs.ext4 -q -F -L luft-helper -d "$tree" "$2/helper.img" 16G
+  cat "$tree"/boot/EFI/Linux/*.efi >"$2/startup.efi"
+  podman image unmount "$1" >/dev/null
+' sh "$image" "$work"
+objcopy -O binary --only-section=.linux "$work/startup.efi" "$work/vmlinuz"
+objcopy -O binary --only-section=.initrd "$work/startup.efi" "$work/initramfs.img"
 
-{
-  printf '#!/bin/sh\nimage=%s\n' "$test_image"
-  cat <<'SCRIPT'
-set -eux
-podman load --input /mnt/share/image.tar
-podman run --rm --privileged --pid=host --security-opt label=type:unconfined_t \
-  -v /dev:/dev -v /var/lib/containers:/var/lib/containers \
-  -v /sys/firmware/efi/efivars:/sys/firmware/efi/efivars \
-  "$image" sh -c '
-    bootc install to-disk --wipe --target-imgref ghcr.io/lantharos/luft:1 /dev/vdb
-    esp="$(lsblk --list --noheadings --paths --output PATH,PARTTYPE /dev/vdb | grep c12a7328-f81f-11d2-ba4b-00a0c93ec93b | cut -d" " -f1)"
-    mkdir -p /run/esp
-    mount "$esp" /run/esp
-    trustctl startup install --esp /run/esp
-    umount /run/esp'
-echo LUFT-INSTALL-DONE
-SCRIPT
-} >"$vm/share/install.sh"
-
-tree="$(podman unshare podman image mount "$test_image")"
-helper="$vm/helper.img"
-rm -f "$helper"
-truncate -s 64G "$helper"
-podman unshare mkfs.ext4 -q -F -L luft-helper -d "$tree" "$helper"
-podman unshare sh -c "cat '$tree'/boot/EFI/Linux/*.efi" >"$vm/helper-startup.efi"
-podman unshare podman image unmount "$test_image" >/dev/null
-objcopy -O binary --only-section=.linux "$vm/helper-startup.efi" "$vm/helper-vmlinuz"
-objcopy -O binary --only-section=.initrd "$vm/helper-startup.efi" "$vm/helper-initramfs.img"
-
-unit="$vm/luft-vm-install.service"
-cat >"$unit" <<'UNIT'
-[Unit]
-Description=Install Luft onto the second disk
-After=local-fs.target
-
-[Service]
-Type=oneshot
-ExecStartPre=/usr/bin/mkdir -p /mnt/share
-ExecStartPre=/usr/bin/mount -t 9p -o trans=virtio,version=9p2000.L,msize=1048576 share /mnt/share
-ExecStart=/bin/sh /mnt/share/install.sh
-ExecStopPost=/usr/bin/systemctl poweroff
-StandardOutput=journal+console
-StandardError=journal+console
-UNIT
-debugfs -w "$helper" -f - >/dev/null <<COMMANDS
-write $unit /etc/systemd/system/luft-vm-install.service
+printf '[images.default]\nsource = "oci-archive:/run/luft-source/luft.ociarchive"\ntarget = "%s"\nsize = %s\n' \
+  "$followed" "$(podman image inspect --format '{{.Size}}' "$image")" >"$work/install.toml"
+debugfs -w "$work/helper.img" -f - >/dev/null <<COMMANDS
+rm /usr/lib/luft-installer/install.toml
+write $work/install.toml /usr/lib/luft-installer/install.toml
+write $os/vm/guest/luft-vm-install.service /etc/systemd/system/luft-vm-install.service
 symlink /etc/systemd/system/multi-user.target.wants/luft-vm-install.service /etc/systemd/system/luft-vm-install.service
 COMMANDS
-rm "$unit"
 
-rm -rf "$vm/disk.qcow2" "$vm/OVMF_VARS_4M.qcow2" "$vm/tpm"
-cp /usr/share/edk2/ovmf/OVMF_VARS_4M.secboot.qcow2 "$vm/OVMF_VARS_4M.secboot.qcow2"
+rm -rf "$vm/disk.qcow2" "$vm"/vars.* "$vm/tpm" "$vm/second.qcow2"
 qemu-img create -q -f qcow2 "$vm/disk.qcow2" "${DISK_SIZE:-48G}"
-qemu-system-x86_64 -machine q35,accel=kvm -cpu host -smp 4 -m 6144 -nographic \
-  -drive "if=pflash,format=qcow2,readonly=on,file=/usr/share/edk2/ovmf/OVMF_CODE_4M.qcow2" \
-  -drive "if=pflash,format=qcow2,file=$vm/OVMF_VARS_4M.secboot.qcow2" \
-  -kernel "$vm/helper-vmlinuz" -initrd "$vm/helper-initramfs.img" \
-  -append "root=LABEL=luft-helper rw selinux=0 console=ttyS0 systemd.unit=multi-user.target" \
-  -drive "file=$helper,format=raw,if=virtio" \
-  -drive "file=$vm/disk.qcow2,format=qcow2,if=virtio" \
-  -virtfs "local,path=$vm/share,mount_tag=share,security_model=none" >"$vm/install.log"
-grep -q LUFT-INSTALL-DONE "$vm/install.log"
-rm -f "$helper" "$vm/helper-vmlinuz" "$vm/helper-startup.efi" "$vm/helper-initramfs.img" "$vm/share/image.tar"
-echo "Luft is installed on $vm/disk.qcow2. Start it with os/vm/run.sh, or SECURE_BOOT=1 os/vm/run.sh"
-echo "and add Luft's key from disk with os/vm/control.py enroll-from-disk."
+DISK="$work/helper.img" DRIVES="$vm/disk.qcow2 $work/source.img:ro" KERNEL="$work/vmlinuz" INITRD="$work/initramfs.img" \
+  APPEND="root=LABEL=luft-helper rw selinux=0 console=ttyS0 systemd.unit=multi-user.target" \
+  TPM=0 NETWORK=0 HEADLESS=1 MEMORY=6144 SERIAL="$vm/install.log" TIMEOUT=1800 LUFT_VM="$vm" "$os/vm/qemu.sh" -no-reboot
+rm -rf "$work"
+grep -a 'luft-vm-install:' "$vm/install.log"
+grep -qa 'luft-vm-install: DONE' "$vm/install.log" || { echo "Installing failed, see $vm/install.log" >&2; exit 1; }
+echo "Luft is installed on $vm/disk.qcow2. Start it with SECURE_BOOT=1 os/vm/qemu.sh and add Luft's key"
+echo "on shim's blue screen with os/vm/control.py enroll."

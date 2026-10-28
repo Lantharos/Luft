@@ -1,0 +1,12 @@
+[Unit]
+Description=Luft Keyring end-to-end test
+After=greetd.service luft-keyring-unlock.socket kestrel-authenticate.socket luft-vm-fingerprint.service
+ConditionKernelCommandLine=composefs
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/keyring-check/orchestrate.py
+StandardOutput=journal+console
+
+[Install]
+WantedBy=multi-user.target

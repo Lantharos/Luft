@@ -88,9 +88,10 @@ The first build downloads Fedora packages, Mutter's source and the web runtime, 
 Disk, boot and install changes are tested in VMs, never on the host's drives:
 
 ```sh
-os/vm/disk.sh                        # install the image onto a virtual disk
-SECURE_BOOT=1 os/vm/run.sh           # start it with Secure Boot and a TPM
-ISO=os/iso/state/luft-VERSION.iso os/vm/run.sh    # start the stick instead
+os/vm/disk.sh                        # install the image onto a virtual disk, as Install Luft does
+SECURE_BOOT=1 os/vm/qemu.sh          # start it with Secure Boot and a TPM
+os/vm/check.py session               # or check that it starts, signs in and opens Settings
+ISO=os/iso/state/luft-VERSION.iso os/vm/qemu.sh   # start the stick instead
 apps/setup/installer/vm/run.sh       # real installs next to a Windows-like drive
 ```
 

@@ -12,4 +12,4 @@ The system service that looks after a Windows installation on the same computer,
 | `luft-windows-notice.service` | `/usr/lib/systemd/user/` |
 | `com.lantharos.windows.policy` | `/usr/share/polkit-1/actions/` |
 
-`vm/run.sh` checks the service in a VM made from `localhost/luft:45` (built by `os/image/build.sh`): it makes a Windows drive with Fast Startup on and two paired devices, turns Fast Startup off, sets the clock, brings the devices to BlueZ, then hibernates that Windows and checks that it's left alone and that the sound codec is reset. It needs Podman and QEMU with KVM; everything lives in `target/vm`.
+`vm/run.sh` checks this checkout's service in a VM made from `localhost/luft:45` (built by `os/image/build.sh`): it makes a Windows drive with Fast Startup on and two paired devices, turns Fast Startup off, sets the clock, brings the devices to BlueZ, then hibernates that Windows and checks that it's left alone and that the sound codec is reset. It needs Podman and QEMU with KVM; everything lives in `target/vm`.

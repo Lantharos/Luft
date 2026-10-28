@@ -1,13 +1,12 @@
-import gi
+#!/usr/bin/env python3
+from pathlib import Path
 
-gi.require_version("Gio", "2.0")
 from gi.repository import Gio, GLib
 
-CONTROL = "/run/keyring-test/finger"
+FINGER = Path("/run/luft-vm-fingerprint/finger")
 MANAGER = "/net/reactivated/Fprint/Manager"
 DEVICE = "/net/reactivated/Fprint/Device/0"
-XML = """
-<node>
+NODE = """<node>
   <interface name="net.reactivated.Fprint.Manager">
     <method name="GetDevices"><arg type="ao" direction="out"/></method>
     <method name="GetDefaultDevice"><arg type="o" direction="out"/></method>
@@ -26,23 +25,20 @@ XML = """
     <property name="finger-present" type="b" access="read"/>
     <property name="finger-needed" type="b" access="read"/>
   </interface>
-</node>
-"""
+</node>"""
 PROPERTIES = {
-    "name": GLib.Variant("s", "Test reader"),
+    "name": GLib.Variant("s", "VM reader"),
     "num-enroll-stages": GLib.Variant("i", 5),
     "scan-type": GLib.Variant("s", "press"),
     "finger-present": GLib.Variant("b", False),
-    "finger-needed": GLib.Variant("b", False),
+    "finger-needed": GLib.Variant("b", True),
 }
+RESULTS = {"match": "verify-match", "no-match": "verify-no-match"}
+verifying = {"sender": None}
 
 
-def finger():
-    try:
-        with open(CONTROL) as control:
-            return control.read().strip()
-    except OSError:
-        return "match"
+def finger() -> str:
+    return FINGER.read_text().strip()
 
 
 def call(connection, sender, path, interface, method, parameters, invocation):
@@ -50,26 +46,17 @@ def call(connection, sender, path, interface, method, parameters, invocation):
         invocation.return_value(GLib.Variant("(ao)", ([DEVICE],)))
     elif method == "GetDefaultDevice":
         invocation.return_value(GLib.Variant("(o)", (DEVICE,)))
+    elif method == "ListEnrolledFingers" and finger() == "none":
+        invocation.return_dbus_error("net.reactivated.Fprint.Error.NoEnrolledPrints", "No fingerprints enrolled")
     elif method == "ListEnrolledFingers":
-        if finger() == "none":
-            invocation.return_dbus_error("net.reactivated.Fprint.Error.NoEnrolledPrints", "No fingerprints enrolled")
-        else:
-            invocation.return_value(GLib.Variant("(as)", (["right-index-finger"],)))
+        invocation.return_value(GLib.Variant("(as)", (["right-index-finger"],)))
     elif method == "VerifyStart":
+        verifying["sender"] = sender
         invocation.return_value(None)
-        result = "verify-match" if finger() == "match" else "verify-no-match"
-
-        def report():
-            connection.emit_signal(
-                sender, DEVICE, "net.reactivated.Fprint.Device", "VerifyFingerSelected", GLib.Variant("(s)", ("any",))
-            )
-            connection.emit_signal(
-                sender, DEVICE, "net.reactivated.Fprint.Device", "VerifyStatus", GLib.Variant("(sb)", (result, True))
-            )
-            return False
-
-        GLib.timeout_add(300, report)
+        connection.emit_signal(sender, DEVICE, interface, "VerifyFingerSelected", GLib.Variant("(s)", ("any",)))
     else:
+        if method in ("VerifyStop", "Release"):
+            verifying["sender"] = None
         invocation.return_value(None)
 
 
@@ -77,9 +64,22 @@ def get_property(connection, sender, path, interface, name):
     return PROPERTIES[name]
 
 
-bus = Gio.bus_get_sync(Gio.BusType.SYSTEM)
-node = Gio.DBusNodeInfo.new_for_xml(XML)
-bus.register_object(MANAGER, node.interfaces[0], call, None, None)
-bus.register_object(DEVICE, node.interfaces[1], call, get_property, None)
-Gio.bus_own_name_on_connection(bus, "net.reactivated.Fprint", Gio.BusNameOwnerFlags.NONE, None, None)
+def touch(connection) -> bool:
+    if verifying["sender"] and (result := RESULTS.get(finger())):
+        status = GLib.Variant("(sb)", (result, True))
+        connection.emit_signal(verifying["sender"], DEVICE, "net.reactivated.Fprint.Device", "VerifyStatus", status)
+        verifying["sender"] = None
+    return True
+
+
+def acquired(connection, _name):
+    node = Gio.DBusNodeInfo.new_for_xml(NODE)
+    connection.register_object(MANAGER, node.interfaces[0], call)
+    connection.register_object(DEVICE, node.interfaces[1], call, get_property)
+    GLib.timeout_add(150, touch, connection)
+
+
+FINGER.write_text("none\n")
+FINGER.chmod(0o666)
+Gio.bus_own_name(Gio.BusType.SYSTEM, "net.reactivated.Fprint", Gio.BusNameOwnerFlags.NONE, acquired, None, None)
 GLib.MainLoop().run()

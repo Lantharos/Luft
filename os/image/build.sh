@@ -22,6 +22,7 @@ usage() {
 Usage: os/image/build.sh [luft] [luft-nvidia] [PODMAN BUILD OPTIONS...]
        os/image/build.sh plan [luft | luft-nvidia]
        os/image/build.sh part NAME [PODMAN BUILD OPTIONS...]
+       os/image/build.sh stage NAME FOLDER
        os/image/build.sh base
        os/image/build.sh cef
        os/image/build.sh updates IMAGE
@@ -43,7 +44,8 @@ so a build only makes the parts that changed. LUFT_REBUILD=1 makes every part ag
 LUFT_IMAGE_CACHE (default ~/.cache/luft-image), shared by every checkout.
 
 plan lists each part with its image and whether it's missing, part builds one
-part, and base prints the Fedora image the parts are built on (LUFT_BASE, by
+part, stage copies the files one part puts into the image to FOLDER, building
+the part when it's missing, and base prints the Fedora image the parts are built on (LUFT_BASE, by
 digest). cef prints the CEF build the web runtime ships, the newest one Sabine
 would install (LUFT_CEF), so a new CEF build makes the runtime part again. updates lists the packages IMAGE adds to that Fedora image which have
 updates, and exits with 100 when there are some, like dnf check-upgrade.
@@ -330,6 +332,17 @@ build_images() {
   done
 }
 
+stage_part() {
+  local name ref container
+  read -r name ref <<<"$(part_refs "$1")"
+  part_exists "$ref" || build_part "$name" "$ref"
+  podman image exists "$ref" || podman pull "${retries[@]}" --quiet "$ref" >/dev/null
+  mkdir -p "$2"
+  container="$(podman create "$ref" /part)"
+  podman export "$container" | tar -x -p -C "$2" --strip-components=1 stage
+  podman rm "$container" >/dev/null
+}
+
 plan() {
   local name ref presence signing names
   require_keys LUFT_SECUREBOOT_CERT
@@ -374,6 +387,14 @@ case "${1:-luft}" in
     ! is_signed "$2" || require_keys LUFT_SECUREBOOT_KEY LUFT_SECUREBOOT_CERT
     read -r name ref <<<"$(part_refs "$2")"
     build_part "$name" "$ref"
+    ;;
+  stage)
+    (($# == 3)) || { usage >&2; exit 2; }
+    base="$(resolve_base)"
+    [[ "$2" != runtime ]] || cef="$(resolve_cef)"
+    podman_options=()
+    ! is_signed "$2" || require_keys LUFT_SECUREBOOT_KEY LUFT_SECUREBOOT_CERT
+    stage_part "$2" "$3"
     ;;
   luft | luft-nvidia)
     base="$(resolve_base)"

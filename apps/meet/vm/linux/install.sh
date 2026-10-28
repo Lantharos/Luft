@@ -6,7 +6,6 @@ state="${MEET_VM:-$(dirname "$here")/state}"
 layout="${1:-}"
 name="${2:-$layout}"
 vm="$state/$name"
-ovmf=/usr/share/edk2/ovmf
 compose=https://dl.fedoraproject.org/pub/fedora/linux/development/45/Everything/x86_64/iso
 
 usage() {
@@ -54,13 +53,11 @@ kickstart_disk() {
 
 mkdir -p "$state"
 [[ ! -e "$vm/disk.qcow2" ]] || { echo "$vm already has a disk; delete it to install again" >&2; exit 1; }
-mkdir -p "$vm/tpm"
-echo linux > "$vm/guest"
+mkdir -p "$vm"
 iso="$(netinst)"
 kickstart="$(kickstart_disk)"
 qemu-img create -q -f qcow2 "$vm/disk.qcow2" 64G
 qemu-img create -q -f qcow2 "$vm/data.qcow2" 8G
-cp "$ovmf/OVMF_VARS_4M.secboot.qcow2" "$vm/vars.qcow2"
-INSTALL_ISO="$iso" KICKSTART="$kickstart" "$here/run.sh" "$name"
+ISO="$iso" MEDIA=cd KICKSTART="$kickstart" "$here/run.sh" "$name"
 rm -f "$kickstart" "$vm/ks.cfg"
 echo "Fedora is installed in $vm"

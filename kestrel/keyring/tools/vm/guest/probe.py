@@ -16,7 +16,7 @@ from gi.repository import Gio, GLib
 HERE = os.path.dirname(os.path.abspath(__file__))
 HOME = os.path.expanduser("~")
 USER = pwd.getpwuid(os.getuid()).pw_name
-PASSWORD = "sign-in words"
+PASSWORD = "luft-vm"
 SECRET = "repo-token"
 SETTINGS = "/usr/lib/sabine/com.lantharos.settings/settings"
 os.environ.setdefault("DBUS_SESSION_BUS_ADDRESS", f"unix:path=/run/user/{os.getuid()}/bus")
@@ -43,7 +43,7 @@ def requests():
 
 
 def finger(state):
-    with open("/run/keyring-test/finger", "w") as control:
+    with open("/run/luft-vm-fingerprint/finger", "w") as control:
         control.write(state)
 
 

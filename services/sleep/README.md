@@ -17,4 +17,4 @@ It shuts down when the battery falls to 5% or once it has slept on battery for t
 | `systemd-suspend-luft.conf` | `/usr/lib/systemd/system/systemd-suspend.service.d/luft-sleep.conf` |
 | `com.lantharos.sleep.policy` | `/usr/share/polkit-1/actions/` |
 
-`cargo test` here covers reading batteries, the setting and when to check or shut down. `vm/run.sh` sleeps a VM made from `localhost/luft:45` with a stand-in battery: woken by another timer it stays on, without a battery it simply sleeps, and left alone on battery it wakes on its own timer and shuts down through logind. It needs Podman and QEMU with KVM.
+`cargo test` here covers reading batteries, the setting and when to check or shut down. `vm/run.sh` sleeps a VM made from `localhost/luft:45`, with this checkout's system services and a stand-in battery: woken by another timer it stays on, without a battery it simply sleeps, and left alone on battery it wakes on its own timer and shuts down through logind. It needs Podman and QEMU with KVM.

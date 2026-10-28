@@ -1,5 +1,0 @@
-ARG BASE
-FROM ${BASE}
-COPY root/ /
-RUN systemctl enable luft-windows-check.service && \
-    dracut --no-hostonly --force --add-drivers "virtio_blk virtio_pci ext4" /usr/lib/luft-windows-check/initramfs.img "$(ls /usr/lib/modules)"

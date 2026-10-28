@@ -1,6 +1,6 @@
 # Upstream patches
 
-Luft carries changes to software it doesn't own: a Mutter patch series for Kestrel's compositor, an engine forked from GNOME Shell, and patched rebuilds of bootc, libsecret and xdg-desktop-portal in the image. Every carried change costs work on each upstream release, and Fedora moves to new GNOME releases on its own schedule, so each change should either be on its way upstream or have a clear reason to stay.
+Luft carries changes to software it doesn't own: a Mutter patch series for Kestrel's compositor, an engine forked from GNOME Shell, and patched rebuilds of bootc and xdg-desktop-portal in the image. Every carried change costs work on each upstream release, and Fedora moves to new GNOME releases on its own schedule, so each change should either be on its way upstream or have a clear reason to stay.
 
 ## Mutter
 
@@ -48,9 +48,9 @@ python3 kestrel/engine/upstream.py show 8c100ef8fba0 | git apply -3 --directory=
 The patches in [os/image/patches](../os/image/patches) each have a README with the reason for every patch and an Upstream section, and `UPSTREAM.md` where a merge request is drafted. To check them against upstream's main branch:
 
 ```sh
-os/image/patches/trial.sh libsecret https://gitlab.gnome.org/GNOME/libsecret.git
+os/image/patches/trial.sh xdg-desktop-portal https://github.com/flatpak/xdg-desktop-portal.git
 ```
 
 ## Weekly report
 
-The [Upstream patches](../.github/workflows/upstream.yml) workflow runs every Monday and on demand. It applies the Mutter series to Mutter main and its newest release, lists GNOME Shell changes for the engine, and applies the bootc, libsecret and xdg-desktop-portal patches to their main branches. The results are on the run's summary page and attached as artifacts. It never fails because a patch doesn't apply and isn't part of the checks on pushes and pull requests.
+The [Upstream patches](../.github/workflows/upstream.yml) workflow runs every Monday and on demand. It applies the Mutter series to Mutter main and its newest release, lists GNOME Shell changes for the engine, and applies the bootc and xdg-desktop-portal patches to their main branches. The results are on the run's summary page and attached as artifacts. It never fails because a patch doesn't apply and isn't part of the checks on pushes and pull requests.

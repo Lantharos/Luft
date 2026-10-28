@@ -16,8 +16,6 @@ This makes reading the Secret portal's `version` property fail for apps whose Fl
 
 The caller is looked up synchronously in the property getter, which gets no invocation and so none of the app info that method calls get from the registry. If there's a better hook for this, I'm happy to move it.
 
-A libsecret change that lets `SECRET_BACKEND` override the sandbox check is proposed separately. Flatpak apps bundle their own libsecret, though, so this side is what fixes the apps that are out there today.
-
 ## Patch
 
 ```diff

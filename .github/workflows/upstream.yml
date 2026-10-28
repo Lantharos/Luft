@@ -60,8 +60,6 @@ jobs:
         include:
           - package: bootc
             repository: https://github.com/bootc-dev/bootc.git
-          - package: libsecret
-            repository: https://gitlab.gnome.org/GNOME/libsecret.git
           - package: xdg-desktop-portal
             repository: https://github.com/flatpak/xdg-desktop-portal.git
     steps:

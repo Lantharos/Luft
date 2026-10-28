@@ -27,6 +27,7 @@ import * as SessionMode from './sessionMode.js';
 import * as ShellDBus from './shellDBus.js';
 import { MountOperationHandler } from '../system/drives/mountOpHandler.js';
 import * as WindowManager from '../desktop/windowManager/windowManager.js';
+import { WindowRecovery } from '../desktop/windows/recovery/recovery.js';
 import * as Magnifier from '../system/accessibility/magnifier.js';
 import * as XdndHandler from './stage/xdndHandler.js';
 import * as KbdA11yDialog from '../system/accessibility/kbdA11yDialog.js';
@@ -331,6 +332,7 @@ async function initializeUI(): Promise<void> {
   locatePointer = new LocatePointer.LocatePointer();
 
   screenShield = new ScreenShield.ScreenShield();
+  new WindowRecovery(() => screenShield.locked);
 
   startInputMethod();
 

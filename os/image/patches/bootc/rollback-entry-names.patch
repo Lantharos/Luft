@@ -1,0 +1,67 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <imeri@lanth.me>
+Date: Wed, 28 Oct 2026 02:13:13 +0100
+Subject: [PATCH] composefs: Keep the entries' os_id when rolling back
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+A rollback rewrote both Type 1 entries with "bootc" as the os_id, so
+entries named bootc_fedora-… came back as bootc_bootc-… with the sort
+keys bootc-bootc-0 and bootc-bootc-1, unlike every entry an install,
+update or switch writes.
+
+Take the os_id from the sort keys the entries already have, so a
+rollback only swaps their priorities, and fall back to "bootc" for
+entries without one.
+---
+ crates/lib/src/bootc_composefs/rollback.rs | 19 ++++++++++++++++---
+ 1 file changed, 16 insertions(+), 3 deletions(-)
+
+diff --git a/crates/lib/src/bootc_composefs/rollback.rs b/crates/lib/src/bootc_composefs/rollback.rs
+index 30754546..1a486e88 100644
+--- a/crates/lib/src/bootc_composefs/rollback.rs
++++ b/crates/lib/src/bootc_composefs/rollback.rs
+@@ -16,6 +16,7 @@ use crate::composefs_consts::{
+     COMPOSEFS_STAGED_DEPLOYMENT_FNAME, COMPOSEFS_TRANSIENT_STATE_DIR, TYPE1_ENT_PATH_STAGED,
+ };
+ use crate::deploy::ROLLBACK_JOURNAL_ID;
++use crate::parsers::bls_config::BLSConfig;
+ use crate::spec::{Bootloader, BootloaderKind, Host};
+ use crate::store::{BootedComposefs, Storage};
+ use crate::{
+@@ -114,6 +115,19 @@ fn rollback_grub_uki_entries(boot_dir: &Dir) -> Result<()> {
+     rename_exchange_user_cfg(&entries_dir)
+ }
+ 
++/// The os_id the deployments' entries were written with, taken from their
++/// sort keys (`bootc-{os_id}-{priority}`), so the rewritten entries keep
++/// their names. Entries without one fall back to "bootc".
++fn entries_os_id(configs: &[BLSConfig]) -> String {
++    configs
++        .iter()
++        .find_map(|cfg| {
++            let key = cfg.sort_key.as_deref()?.strip_prefix("bootc-")?;
++            key.rsplit_once('-').map(|(os_id, _)| os_id.to_owned())
++        })
++        .unwrap_or_else(|| "bootc".to_owned())
++}
++
+ /// Performs rollback for
+ /// - Grub Type1 boot entries
+ /// - Systemd Typ1 boot entries
+@@ -136,9 +150,8 @@ fn rollback_composefs_entries(host: &Host, boot_dir: &Dir, bootloader: Bootloade
+     assert!(all_configs.len() == 2);
+ 
+     // For rollback: previous gets primary sort-key, booted gets secondary sort-key
+-    // Use "bootc" as default os_id for rollback scenarios
+-    // TODO: Extract actual os_id from deployment
+-    let os_id = "bootc";
++    let os_id = entries_os_id(&all_configs);
++    let os_id = os_id.as_str();
+ 
+     // This is the currently booted deployment - it should become secondary
+     // OR if rollback was queued, it would become primary
+-- 
+2.56.0
+

@@ -59,6 +59,7 @@ pub fn apply(regional: &Regional, deployment: &Deployment) -> Result<()> {
             zone = regional.timezone.as_str()
         ));
     }
+    let keyboards = deployment.etc("X11/xorg.conf.d");
     let files: Vec<(PathBuf, String)> = vec![
         (
             deployment.etc("locale.conf"),
@@ -69,7 +70,7 @@ pub fn apply(regional: &Regional, deployment: &Deployment) -> Result<()> {
             vconsole(&regional.keyboard),
         ),
         (
-            deployment.etc("X11/xorg.conf.d/00-keyboard.conf"),
+            keyboards.join("00-keyboard.conf"),
             keyboard_conf(&regional.keyboard),
         ),
         (
@@ -87,7 +88,7 @@ pub fn apply(regional: &Regional, deployment: &Deployment) -> Result<()> {
         &localtime,
     )?;
     let mut touched: Vec<PathBuf> = files.into_iter().map(|(path, _)| path).collect();
-    touched.push(localtime);
+    touched.extend([localtime, keyboards]);
     deployment.relabel(&touched)
 }
 

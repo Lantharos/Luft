@@ -2,9 +2,9 @@
 	import { t } from '@luft/i18n';
 	import { Row, Section, Select, Switch } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
-	import type { Preferences, Schedule } from '#lib/bindings.js';
+	import type { Schedule, UpdatePolicy } from '#lib/bindings.js';
 
-	let { preferences = $bindable() }: { preferences: Preferences } = $props();
+	let { preferences = $bindable() }: { preferences: UpdatePolicy } = $props();
 
 	let schedules = $derived<{ value: Schedule; label: string }[]>([
 		{ value: 'daily', label: t('settings-updates-schedule-daily') },
@@ -12,9 +12,10 @@
 		{ value: 'never', label: t('settings-updates-schedule-never') }
 	]);
 
-	function change(next: Partial<Preferences>) {
+	async function change(next: Partial<UpdatePolicy>) {
+		const previous = preferences;
 		preferences = { ...preferences, ...next };
-		void commands.updatesSetPreferences(preferences);
+		await commands.updatesSetPreferences(preferences).catch(() => (preferences = previous));
 	}
 </script>
 

@@ -410,3 +410,9 @@ screenshot-screencast-view = Klik hier om de video te bekijken
 screenshot-show-in-rover = Tonen in Rover
 screenshot-captured = Schermafbeelding gemaakt
 screenshot-captured-body = Je kunt de afbeelding plakken vanaf het klembord
+
+## System updates
+updates-available-title = Er zijn systeemupdates beschikbaar
+updates-available-body = Open Instellingen om ze te downloaden en te installeren.
+updates-ready-title = Updates zijn klaar om te installeren
+updates-ready-body = Start opnieuw op wanneer het je uitkomt om ze te installeren.

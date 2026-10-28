@@ -15,13 +15,12 @@ use crate::state::sources::Sources;
 
 const PERSIST: &str = "var/lib/dnf";
 const PACKAGES: &str = "packages";
+const FEDORA: &str = "/usr/share/dnf5/repos.d";
 
-/// Offers the build root the repositories that were added, with their keys, next to Fedora's.
+/// Offers the build root the repositories that were added, with their keys, at the same paths
+/// they have on the computer.
 pub fn offer(root: &Path, sources: &Sources) -> Result<()> {
-    let (folder, keys) = (
-        root.join(FOLDER.trim_start_matches('/')),
-        root.join(KEYS.trim_start_matches('/')),
-    );
+    let (folder, keys) = (inside(root, FOLDER), inside(root, KEYS));
     fs::create_dir_all(&folder)?;
     fs::create_dir_all(&keys)?;
     for file in &sources.repositories {
@@ -35,6 +34,10 @@ pub fn offer(root: &Path, sources: &Sources) -> Result<()> {
         }
     }
     Ok(())
+}
+
+fn inside(root: &Path, path: &str) -> PathBuf {
+    root.join(path.trim_start_matches('/'))
 }
 
 #[derive(Deserialize)]
@@ -137,6 +140,11 @@ pub fn download(
             .arg(format!(
                 "--setopt=persistdir={}",
                 root.join(PERSIST).display()
+            ))
+            .arg(format!(
+                "--setopt=reposdir={},{}",
+                inside(root, FEDORA).display(),
+                inside(root, FOLDER).display()
             ))
             .args([
                 "--setopt=install_weak_deps=False",

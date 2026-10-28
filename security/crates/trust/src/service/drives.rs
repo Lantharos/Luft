@@ -21,6 +21,7 @@ use crate::system::secrets::secret::Secret;
 const CHECK: &str = "com.lantharos.trust.check";
 const MANAGE: &str = "com.lantharos.trust.manage-drive-encryption";
 const RECOVERY_KEY: &str = "com.lantharos.trust.show-recovery-key";
+const UNLOCK: &str = "com.lantharos.trust.unlock-drive";
 const BATTERY_RETRY: Duration = Duration::from_secs(60);
 
 type Dict = HashMap<String, OwnedVariant>;
@@ -360,6 +361,17 @@ impl Drives {
         let record = self.run(move || drives::resume(&uuid, &unlock)).await?;
         start_worker(connection.object_server().interface(PATH).await?, record);
         Ok(())
+    }
+
+    async fn unlock(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        uuid: String,
+    ) -> Result<(), Error> {
+        drive_id(&uuid)?;
+        self.authorize(connection, &header, UNLOCK).await?;
+        self.run(move || drives::unlock(&uuid)).await
     }
 
     async fn show_recovery_key(

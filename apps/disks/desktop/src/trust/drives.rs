@@ -159,6 +159,18 @@ pub async fn resume(uuid: &str, unlock: &str) -> Result<Outcome<()>, String> {
     client::unlocking(&DRIVES, "Resume", &(uuid, unlock)).await
 }
 
+pub async fn unlock_with_kept_key(uuid: &str) -> Result<bool, String> {
+    let kept = super::state()
+        .await?
+        .drives
+        .get(uuid)
+        .is_some_and(|drive| drive.auto_unlock);
+    if kept {
+        client::call::<_, ()>(&DRIVES, "Unlock", &(uuid,)).await?;
+    }
+    Ok(kept)
+}
+
 pub async fn show_recovery_key(uuid: &str) -> Result<String, String> {
     client::call(&DRIVES, "ShowRecoveryKey", &(uuid,)).await
 }

@@ -6,7 +6,7 @@ It shuts down when the battery falls to 5% or once it has slept on battery for t
 
 | Command | Use |
 | --- | --- |
-| `luft-sleep` | `com.lantharos.Sleep1` (see `data/com.lantharos.Sleep1.xml`), started over D-Bus to read and change the setting in `/etc/luft/sleep.conf`; stops when idle |
+| `luft-sleep` | `com.lantharos.Sleep1` (see `data/com.lantharos.Sleep1.xml`), started over D-Bus to read and change the setting in `/var/lib/luft-sleep/sleep.conf`; stops when idle |
 | `luft-sleep suspend` | Replaces `systemd-sleep suspend` in `systemd-suspend.service` and sleeps in a loop until something other than its own timer wakes the computer |
 
 | File in `data` | Goes to |

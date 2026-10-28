@@ -3,8 +3,8 @@
 <node name="/com/lantharos/Packages1">
   <!--
     Packages added to the system as a system extension, rebuilt for every version of Luft on the
-    computer, from Fedora, the repositories that were added in /etc/yum.repos.d, and package files
-    installed by themselves. Started on demand and stops when idle.
+    computer, from Fedora, the repositories that were added in
+    /var/lib/luft/system-packages/repositories, and package files installed by themselves. Started on demand and stops when idle.
 
     Install, InstallFile and Remove need com.lantharos.packages.change, AddRepository and
     RemoveRepository com.lantharos.packages.sources. Those that change the packages return once
@@ -34,9 +34,9 @@
     <method name="Remove">
       <arg name="names" type="as" direction="in"/>
     </method>
-    <!-- Checks a repository file to be kept as /etc/yum.repos.d/FILE.repo, and the keys it names,
-         each given by the address its gpgkey has. Every source that's turned on must check
-         signatures and be reached over HTTPS. JSON: {"file", "sources": [...], "keys":
+    <!-- Checks a repository file to be kept as /var/lib/luft/system-packages/repositories/FILE.repo,
+         and the keys it names, each given by the address its gpgkey has. Every source that's turned
+         on must check signatures and be reached over HTTPS. JSON: {"file", "sources": [...], "keys":
          [{"fingerprint", "user"}]}. -->
     <method name="DescribeRepository">
       <arg name="file" type="s" direction="in"/>
@@ -44,7 +44,8 @@
       <arg name="keys" type="a{ss}" direction="in"/>
       <arg name="repository" type="s" direction="out"/>
     </method>
-    <!-- Adds what DescribeRepository described, with its keys kept in /etc/pki/rpm-gpg. -->
+    <!-- Adds what DescribeRepository described, with its keys kept in
+         /var/lib/luft/system-packages/keys. -->
     <method name="AddRepository">
       <arg name="file" type="s" direction="in"/>
       <arg name="text" type="s" direction="in"/>

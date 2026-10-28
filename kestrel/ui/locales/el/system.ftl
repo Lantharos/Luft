@@ -413,3 +413,9 @@ screenshot-screencast-view = Κάντε κλικ εδώ για να δείτε �
 screenshot-show-in-rover = Εμφάνιση στο Rover
 screenshot-captured = Το στιγμιότυπο οθόνης αποθηκεύτηκε
 screenshot-captured-body = Μπορείτε να επικολλήσετε την εικόνα από το πρόχειρο
+
+## System updates
+updates-available-title = Υπάρχουν διαθέσιμες ενημερώσεις συστήματος
+updates-available-body = Ανοίξτε τις Ρυθμίσεις για λήψη και εγκατάσταση.
+updates-ready-title = Οι ενημερώσεις είναι έτοιμες για εγκατάσταση
+updates-ready-body = Κάντε επανεκκίνηση όποτε σας βολεύει για να εγκατασταθούν.

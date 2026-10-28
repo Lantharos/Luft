@@ -1,6 +1,7 @@
 mod bootc;
 mod command;
 mod progress;
+mod schedule;
 mod service;
 
 use std::process::ExitCode;

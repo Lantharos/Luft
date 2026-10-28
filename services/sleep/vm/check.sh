@@ -40,7 +40,7 @@ sleep_until_woken() {
 
 configure() {
   busctl call "${BUS[@]}" SetPowerOffAfter u 90 || fail "SetPowerOffAfter"
-  grep -qx 'power-off-after = 90' /etc/luft/sleep.conf || fail "the setting wasn't saved: $(cat /etc/luft/sleep.conf)"
+  grep -qx 'power-off-after = 90' /var/lib/luft-sleep/sleep.conf || fail "the setting wasn't saved: $(cat /var/lib/luft-sleep/sleep.conf)"
   [[ "$(busctl get-property "${BUS[@]}" PowerOffAfter)" == "u 90" ]] || fail "PowerOffAfter"
   pass "saves how long to sleep before shutting down"
 }

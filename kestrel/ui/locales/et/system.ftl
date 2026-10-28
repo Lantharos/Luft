@@ -412,3 +412,9 @@ screenshot-screencast-view = Klõpsa video vaatamiseks
 screenshot-show-in-rover = Kuva rakenduses Rover
 screenshot-captured = Kuvatõmmis on tehtud
 screenshot-captured-body = Pildi saad kleepida lõikelaualt
+
+## System updates
+updates-available-title = Saadaval on süsteemivärskendused
+updates-available-body = Nende allalaadimiseks ja installimiseks ava Sätted.
+updates-ready-title = Värskendused on installimiseks valmis
+updates-ready-body = Nende installimiseks taaskäivita arvuti, kui sulle sobib.

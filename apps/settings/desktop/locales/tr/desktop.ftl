@@ -216,10 +216,6 @@ desktop-users-password-failed = Parolanız değiştirilemedi: { $reason }
 desktop-users-password-timed-out = passwd yanıt vermeyi bıraktı
 
 ## Updates
-desktop-updates-available-summary = Sistem güncellemeleri var
-desktop-updates-available-body = İndirip yüklemek için Ayarlar’ı açın.
-desktop-updates-ready-summary = Güncellemeler yüklenmeye hazır
-desktop-updates-ready-body = Yüklemek için size uygun bir zamanda yeniden başlatın.
 desktop-updates-nvidia-summary = NVIDIA ekran kartınızdan en iyi şekilde yararlanın
 desktop-updates-nvidia-body = Ayarlar’dan NVIDIA’nın kendi sürücüsüne geçin.
 desktop-updates-notification-open = Aç

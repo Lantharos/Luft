@@ -410,3 +410,9 @@ screenshot-screencast-view = Kattintson ide a videó megtekintéséhez
 screenshot-show-in-rover = Megjelenítés a Rover alkalmazásban
 screenshot-captured = A képernyőkép elkészült
 screenshot-captured-body = A képet beillesztheti a vágólapról.
+
+## System updates
+updates-available-title = Rendszerfrissítések érhetők el
+updates-available-body = A letöltésükhöz és telepítésükhöz nyissa meg a Beállításokat.
+updates-ready-title = A frissítések készen állnak a telepítésre
+updates-ready-body = A telepítésükhöz indítsa újra a számítógépet, amikor alkalmas.

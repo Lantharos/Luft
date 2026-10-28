@@ -3,7 +3,7 @@ SUBSYSTEM!="block", GOTO="trustd_drives_end"
 ENV{DEVTYPE}!="partition", GOTO="trustd_drives_mask_end"
 ENV{ID_PART_ENTRY_UUID}!="?*", GOTO="trustd_drives_mask_end"
 ENV{ID_PART_ENTRY_UUID}=="*[!0-9a-f-]*", GOTO="trustd_drives_mask_end"
-TEST=="/etc/trustd/decrypting/$env{ID_PART_ENTRY_UUID}", ENV{TRUSTD_MASK}="/etc/trustd/decrypting/$env{ID_PART_ENTRY_UUID}"
+TEST=="/var/lib/trustd/decrypting/$env{ID_PART_ENTRY_UUID}", ENV{TRUSTD_MASK}="/var/lib/trustd/decrypting/$env{ID_PART_ENTRY_UUID}"
 TEST=="/run/trustd/decrypted/$env{ID_PART_ENTRY_UUID}", ENV{TRUSTD_MASK}="/run/trustd/decrypted/$env{ID_PART_ENTRY_UUID}"
 ENV{TRUSTD_MASK}!="?*", GOTO="trustd_drives_mask_end"
 ENV{ID_FS_TYPE}=="?*", TEST!="holders/*/dm", GOTO="trustd_drives_mask_end"
@@ -15,6 +15,8 @@ PROGRAM="/usr/bin/cat $env{TRUSTD_MASK}", RESULT!="*[!0-9a-f-]*", SYMLINK+="disk
 LABEL="trustd_drives_mask_end"
 
 TEST=="/run/trustd/held/%k", ENV{UDISKS_AUTO}="0"
+ENV{ID_FS_TYPE}=="crypto_LUKS", ENV{ID_FS_UUID}=="?*", ENV{ID_FS_UUID}!="*[!0-9a-f-]*", \
+  TEST=="/var/lib/trustd/drives/$env{ID_FS_UUID}.key", ENV{UDISKS_AUTO}="0"
 
 ACTION=="add|change", ENV{DM_UUID}=="CRYPT-LUKS2-*", TEST=="/var/lib/trustd/changing", TAG+="systemd", ENV{SYSTEMD_WANTS}+="trustd-drives.service"
 

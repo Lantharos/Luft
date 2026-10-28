@@ -415,3 +415,9 @@ screenshot-screencast-view = Kliknite ovde da biste pogledali video
 screenshot-show-in-rover = Prikaži u aplikaciji Rover
 screenshot-captured = Snimak ekrana je napravljen
 screenshot-captured-body = Sliku možete da nalepite iz ostave
+
+## System updates
+updates-available-title = Dostupna su ažuriranja sistema
+updates-available-body = Otvorite Podešavanja da biste ih preuzeli i instalirali.
+updates-ready-title = Ažuriranja su spremna za instalaciju
+updates-ready-body = Ponovo pokrenite računar kada vam odgovara da biste ih instalirali.

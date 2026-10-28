@@ -9,6 +9,7 @@ SyslogIdentifier=luft-updater
 KillMode=mixed
 TimeoutStopSec=5min
 UMask=0022
+StateDirectory=luft-updater
 ProtectHome=yes
 PrivateTmp=yes
 ProtectKernelModules=yes

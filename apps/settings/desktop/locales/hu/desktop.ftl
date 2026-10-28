@@ -216,10 +216,6 @@ desktop-users-password-failed = Nem sikerült módosítani a jelszavát: { $reas
 desktop-users-password-timed-out = A passwd nem válaszol
 
 ## Updates
-desktop-updates-available-summary = Rendszerfrissítések érhetők el
-desktop-updates-available-body = A letöltésükhöz és telepítésükhöz nyissa meg a Beállításokat.
-desktop-updates-ready-summary = A frissítések készen állnak a telepítésre
-desktop-updates-ready-body = A telepítésükhöz indítsa újra a számítógépet, amikor alkalmas.
 desktop-updates-nvidia-summary = Hozza ki a legtöbbet NVIDIA-videokártyájából
 desktop-updates-nvidia-body = Váltson az NVIDIA saját illesztőprogramjára a Beállításokban.
 desktop-updates-notification-open = Megnyitás

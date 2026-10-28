@@ -237,10 +237,6 @@ desktop-users-password-timed-out = passwd lakkas vastamast
 
 ## Updates
 
-desktop-updates-available-summary = Saadaval on süsteemivärskendused
-desktop-updates-available-body = Nende allalaadimiseks ja installimiseks ava Sätted.
-desktop-updates-ready-summary = Värskendused on installimiseks valmis
-desktop-updates-ready-body = Nende installimiseks taaskäivita arvuti, kui sulle sobib.
 desktop-updates-nvidia-summary = Kasuta oma NVIDIA graafikakaarti täiel määral
 desktop-updates-nvidia-body = Lülitu Sätetes NVIDIA enda draiverile.
 desktop-updates-notification-open = Ava

@@ -13,6 +13,7 @@ use crate::command::{self, run};
 use crate::progress::Pull;
 
 const BOOTC: &str = "bootc";
+const REGISTRY: &str = "registry";
 const PROGRESS_FD: i32 = 3;
 const SLOTS: [&str; 3] = ["booted", "staged", "rollback"];
 const UNSIGNED: &str = "This update isn't signed by Luft, so it wasn't downloaded.";
@@ -63,6 +64,32 @@ pub fn status() -> Result<String> {
         }
     }
     Ok(json!({ "host": host, "configs": configs }).to_string())
+}
+
+fn layers(config: &Value) -> Option<&Value> {
+    config.pointer("/rootfs/diff_ids")
+}
+
+/// Whether the image this system follows has changed from every version on the computer.
+pub fn available() -> Result<bool> {
+    let Reference { image, transport } = followed()?;
+    if transport != REGISTRY {
+        return Ok(false);
+    }
+    let offered: Value = serde_json::from_slice(&run(Command::new("skopeo")
+        .args(["inspect", "--config"])
+        .arg(format!("docker://{image}")))?)?;
+    let offered = layers(&offered).context("The update server sent no image layers.")?;
+    let host: Value = serde_json::from_slice(&bootc(&["status", "--format=json"])?)?;
+    let present = SLOTS
+        .iter()
+        .filter_map(|slot| {
+            host.pointer(&format!("/status/{slot}/image/imageDigest"))
+                .and_then(Value::as_str)
+        })
+        .filter_map(image_config)
+        .any(|config| layers(&config) == Some(offered));
+    Ok(!present)
 }
 
 pub fn rollback() -> Result<()> {

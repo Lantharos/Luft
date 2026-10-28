@@ -81,7 +81,7 @@ fn finish(record: &mut Record, key: &Secret) -> Result<()> {
             }
         }
         Some(Change::Decrypt) => {
-            unlocking::forget(record)?;
+            unlocking::forget(record);
             unlocking::forget_escrow(record);
             if let Some(header) = record.header.take() {
                 let _ = std::fs::remove_file(header);

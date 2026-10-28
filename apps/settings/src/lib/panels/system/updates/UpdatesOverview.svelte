@@ -3,7 +3,7 @@
 	import Info from '@lucide/svelte/icons/info';
 	import { ActionRow, ProgressBar, Row, Section } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
-	import type { Activity, Firmware, Preferences } from '#lib/bindings.js';
+	import type { Activity, Firmware, UpdatePolicy } from '#lib/bindings.js';
 	import { updates } from '#lib/state/updates.svelte.js';
 	import { downloading, fractionOf } from './activity';
 	import { firmware, openApps, openInstalledApps } from './api';
@@ -18,7 +18,7 @@
 
 	let devices = $state<Firmware[]>([]);
 	let deviceName = $state<string>();
-	let preferences = $state<Preferences | null>(null);
+	let preferences = $state<UpdatePolicy | null>(null);
 	let failure = $state<string | null>(null);
 
 	const info = $derived(updates.overview);

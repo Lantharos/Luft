@@ -216,10 +216,6 @@ desktop-users-password-failed = Salasanaa ei voitu vaihtaa: { $reason }
 desktop-users-password-timed-out = passwd lakkasi vastaamasta
 
 ## Updates
-desktop-updates-available-summary = Järjestelmäpäivityksiä on saatavilla
-desktop-updates-available-body = Lataa ja asenna ne Asetuksissa.
-desktop-updates-ready-summary = Päivitykset ovat valmiita asennettaviksi
-desktop-updates-ready-body = Asenna ne käynnistämällä uudelleen, kun sinulle sopii.
 desktop-updates-nvidia-summary = Ota kaikki irti NVIDIA-näytönohjaimestasi
 desktop-updates-nvidia-body = Vaihda NVIDIAn omaan ohjaimeen Asetuksissa.
 desktop-updates-notification-open = Avaa

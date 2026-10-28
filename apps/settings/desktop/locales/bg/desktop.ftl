@@ -216,10 +216,6 @@ desktop-users-password-failed = Паролата не можа да бъде п�
 desktop-users-password-timed-out = passwd спря да отговаря
 
 ## Updates
-desktop-updates-available-summary = Има системни актуализации
-desktop-updates-available-body = Отворете Настройки, за да ги изтеглите и инсталирате.
-desktop-updates-ready-summary = Актуализациите са готови за инсталиране
-desktop-updates-ready-body = Рестартирайте, когато ви е удобно, за да ги инсталирате.
 desktop-updates-nvidia-summary = Извлечете максимума от графиката NVIDIA
 desktop-updates-nvidia-body = Превключете към собствения драйвер на NVIDIA в Настройки.
 desktop-updates-notification-open = Отвори

@@ -15,7 +15,10 @@ use host::{Deployment, Host, Reference};
 use registry::Image;
 
 pub use config::Release;
-pub use updater::{changes, download, downloading, follow, rollback, switch};
+pub use updater::{
+    Schedule, UpdatePolicy, changes, download, downloading, follow, policy, rollback, set_policy,
+    switch,
+};
 
 const NOT_FROM_AN_IMAGE: &str = "This system doesn't get its updates from an image.";
 

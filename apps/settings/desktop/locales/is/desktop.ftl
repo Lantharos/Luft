@@ -216,10 +216,6 @@ desktop-users-password-failed = Ekki tókst að breyta lykilorðinu: { $reason }
 desktop-users-password-timed-out = passwd hætti að svara
 
 ## Updates
-desktop-updates-available-summary = Kerfisuppfærslur eru í boði
-desktop-updates-available-body = Opnaðu Stillingar til að sækja þær og setja upp.
-desktop-updates-ready-summary = Uppfærslur eru tilbúnar til uppsetningar
-desktop-updates-ready-body = Endurræstu þegar þér hentar til að setja þær upp.
 desktop-updates-nvidia-summary = Fáðu sem mest út úr NVIDIA-skjákortinu
 desktop-updates-nvidia-body = Skiptu yfir í rekil frá NVIDIA í Stillingum.
 desktop-updates-notification-open = Opna

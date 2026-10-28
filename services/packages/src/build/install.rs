@@ -8,10 +8,10 @@ use anyhow::{Context, Result, bail};
 use super::rpm::Rpm;
 use super::selinux;
 use crate::command::run;
+use crate::repositories;
 use crate::state::manifest::Origin;
 
 const KEYS: &str = "usr/share/pki/rpm-gpg";
-const ADDED_KEYS: &str = "etc/pki/rpm-gpg";
 const PACKAGES: &str = "/run/luft-packages";
 const HIDDEN: [&str; 3] = ["/tmp", "/run", "/var/cache/libdnf5"];
 const CAPABILITIES: [&str; 8] = [
@@ -37,11 +37,11 @@ fn keys(root: &Path, release: &str) -> Result<Vec<PathBuf>> {
     if fedora.is_empty() {
         bail!("This system has no keys to check Fedora's packages with.");
     }
-    let added = fs::read_dir(root.join(ADDED_KEYS))
+    let added = fs::read_dir(root.join(repositories::KEYS.trim_start_matches('/')))
         .into_iter()
         .flatten()
         .flatten()
-        .map(|entry| Path::new("/").join(ADDED_KEYS).join(entry.file_name()));
+        .map(|entry| Path::new(repositories::KEYS).join(entry.file_name()));
     Ok(fedora.into_iter().chain(added).collect())
 }
 

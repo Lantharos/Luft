@@ -420,3 +420,9 @@ screenshot-screencast-view = Kliknij, aby obejrzeć nagranie
 screenshot-show-in-rover = Pokaż w aplikacji Rover
 screenshot-captured = Zrobiono zrzut ekranu
 screenshot-captured-body = Obraz możesz wkleić ze schowka
+
+## System updates
+updates-available-title = Dostępne są aktualizacje systemu
+updates-available-body = Otwórz Ustawienia, aby je pobrać i zainstalować.
+updates-ready-title = Aktualizacje są gotowe do instalacji
+updates-ready-body = Uruchom ponownie komputer w dogodnej chwili, aby je zainstalować.

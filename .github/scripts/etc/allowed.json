@@ -1,0 +1,126 @@
+{
+	"apps/meet/desktop/src/linux/helper/machine.rs": {
+		"/etc/os-release": "Reads which Linux Meet Luft runs on"
+	},
+	"apps/meet/desktop/src/linux/regional/keyboards.rs": {
+		"/etc/vconsole.conf": "Reads the keyboard layout of the Linux Meet Luft runs on",
+		"/etc/default/keyboard": "Reads the keyboard layout of the Linux Meet Luft runs on",
+		"/etc/X11/xorg.conf.d/00-keyboard.conf": "Reads the keyboard layout of the Linux Meet Luft runs on"
+	},
+	"apps/schelf/desktop/src/cli/commands/remove.rs": {
+		"/etc": "Tells what removing system packages takes away"
+	},
+	"apps/schelf/sandbox/src/launch/profile.rs": {
+		"/etc": "Shows AppImages the system's configuration read-only"
+	},
+	"apps/settings/desktop/src/panels/protection/apps/startup.rs": {
+		"/etc/xdg": "Reads the apps that start for everyone"
+	},
+	"apps/settings/desktop/src/panels/system/about/mod.rs": {
+		"/etc/os-release": "Reads which system it runs on"
+	},
+	"apps/setup/installer/src/install/configure/networks.rs": {
+		"/etc/NetworkManager/system-connections": "Reads the live system's Wi-Fi networks, to hand them to the installed one as NetworkManager's own configuration"
+	},
+	"apps/tern/desktop/src/shell/mod.rs": {
+		"/etc/shells": "Reads the shells people can pick"
+	},
+	"kestrel/engine/data/session/kestrel-session.in": {
+		"/etc/dconf/profile/user": "Reads the dconf profile an administrator chose"
+	},
+	"kestrel/settings/src/modules/desktop/xsettings/resources.rs": {
+		"/etc/X11/Xresources": "Reads the system's X resources"
+	},
+	"kestrel/settings/src/modules/system/housekeeping/mounts.rs": {
+		"/etc/fstab": "Reads the drives an administrator mounts"
+	},
+	"kestrel/settings/src/shared/location.rs": {
+		"/etc/localtime": "Reads the time zone"
+	},
+	"kestrel/ui/src/shared/time/wallClock.ts": {
+		"/etc/localtime": "Follows the time zone"
+	},
+	"os/dev/merge.sh": {
+		"/etc/selinux/targeted/contexts/files/file_contexts": "Reads SELinux labels for a development build"
+	},
+	"os/iso/live/files/usr/libexec/luft-live-logs": {
+		"/etc/os-release": "Reads which system it runs on"
+	},
+	"packages/app/src/ibus.rs": {
+		"/etc/machine-id": "Reads the machine ID"
+	},
+	"packages/app/src/thumbnails/sandbox.rs": {
+		"/etc/ld.so.cache": "Shows the thumbnailer's sandbox what it needs read-only",
+		"/etc/alternatives": "Shows the thumbnailer's sandbox what it needs read-only",
+		"/etc/fonts": "Shows the thumbnailer's sandbox what it needs read-only"
+	},
+	"packages/system/network/src/vpn/plugins.rs": {
+		"/etc/NetworkManager/VPN": "Reads the VPN plugins installed"
+	},
+	"packages/system/software/src/apps/toolbox/container.rs": {
+		"/etc/os-release": "Reads which system it runs on"
+	},
+	"packages/system/software/src/system/repositories/package.rs": {
+		"/etc/yum.repos.d/": "Finds the repository files inside a package file"
+	},
+	"packages/system/software/src/system/repositories/script.rs": {
+		"/etc/yum.repos.d/": "Finds the repository files a package's scriptlets write"
+	},
+	"security/crates/trust/src/drives/target.rs": {
+		"/etc/fstab": "Reads the drives an administrator mounts"
+	},
+	"services/packages/data/luft-system-packages.conf": {
+		"/etc/yum.repos.d": "Keeps dnf's own folders for an administrator's repositories",
+		"/etc/distro.repos.d": "Keeps dnf's own folders for an administrator's repositories"
+	},
+	"services/packages/src/build/accounts.rs": {
+		"/etc/passwd": "Reads the users the build root gets",
+		"/etc/group": "Reads the groups the build root gets"
+	},
+	"services/packages/src/build/checks.rs": {
+		"/etc/": "Sorts package files by where they go"
+	},
+	"services/packages/src/build/declared.rs": {
+		"/etc": "Names where packages keep their configuration",
+		"/etc/": "Names where packages keep their configuration"
+	},
+	"services/packages/src/build/mod.rs": {
+		"/etc/ld.so.cache": "Made again at every start from the merged packages, as installing them would, and put back as it was without them",
+		"/etc/ld.so.conf.d/": "Tells whether packages bring libraries"
+	},
+	"services/packages/src/build/stage.rs": {
+		"/etc/yum.repos.d/": "Leaves the repository files packages bring out of the extension",
+		"/etc/pki/rpm-gpg/": "Leaves the keys packages bring out of the extension"
+	},
+	"sushi/crates/sushi/src/config.rs": {
+		"/etc/sushi/sushi.conf": "Reads the boot splash settings an administrator chose"
+	},
+	"sushi/crates/sushi/src/display/drivers.rs": {
+		"/etc/modprobe.d/sushi.conf": "Reads the graphics drivers an administrator chose for the boot splash"
+	},
+	"sushi/crates/sushictl/src/failure/mod.rs": {
+		"/etc/initrd-release": "Tells whether it runs in the initramfs"
+	},
+	"sushi/crates/sushictl/src/failure/shell.rs": {
+		"/etc/shadow": "Reads whether root has a password before offering a shell"
+	},
+	"sushi/crates/sushictl/src/failure/situation.rs": {
+		"/etc/os-release": "Reads which system it runs on"
+	},
+	"sushi/crates/sushid/src/activity.rs": {
+		"/etc/os-release": "Reads which system it runs on"
+	},
+	"sushi/data/dracut/module-setup.sh": {
+		"/etc/modprobe.d/sushi.conf": "Copies an administrator's settings into the initramfs",
+		"/etc/sushi/sushi.conf": "Copies an administrator's settings into the initramfs"
+	},
+	"sushi/data/systemd/sushi-drivers.service": {
+		"/etc/initrd-release": "Runs only in the initramfs"
+	},
+	"sushi/data/systemd/sushi-integrity.service": {
+		"/etc/initrd-release": "Runs only in the initramfs"
+	},
+	"sushi/data/systemd/sushi-switch-root.service": {
+		"/etc/initrd-release": "Runs only in the initramfs"
+	}
+}

@@ -9,32 +9,17 @@ use luft_i18n::t;
 use zbus::message::Type;
 use zbus::{MatchRule, MessageStream, Variant};
 
-use super::image;
-use super::schedule;
-use super::store::Preferences;
 use crate::L10N;
 
 const NOTIFICATIONS: &str = "org.freedesktop.Notifications";
 const NOTIFICATIONS_PATH: &str = "/org/freedesktop/Notifications";
 const PAGE: &str = "kestrel-settings:system";
+const SYSTEMD: &str = "org.freedesktop.systemd1";
+const SYSTEMD_PATH: &str = "/org/freedesktop/systemd1";
+const MANAGER: &str = "org.freedesktop.systemd1.Manager";
 const WAIT_FOR_CLICK: Duration = Duration::from_secs(6 * 60 * 60);
 
 type Properties<'a> = Vec<(&'a str, Variant<'a>)>;
-
-pub struct Notice {
-    pub summary: &'static str,
-    pub body: &'static str,
-}
-
-pub const AVAILABLE: Notice = Notice {
-    summary: "desktop-updates-available-summary",
-    body: "desktop-updates-available-body",
-};
-
-pub const READY: Notice = Notice {
-    summary: "desktop-updates-ready-summary",
-    body: "desktop-updates-ready-body",
-};
 
 async fn open_updates() -> Result<(), String> {
     let settings = std::env::current_exe()
@@ -48,7 +33,18 @@ async fn open_updates() -> Result<(), String> {
         ("ExecStart", Variant::from(command)),
     ];
     let auxiliary: Vec<(&str, Properties)> = Vec::new();
-    schedule::call("StartTransientUnit", &(unit, "fail", properties, auxiliary)).await
+    dbus::session()
+        .await?
+        .call_method(
+            Some(SYSTEMD),
+            SYSTEMD_PATH,
+            Some(MANAGER),
+            "StartTransientUnit",
+            &(unit, "fail", properties, auxiliary),
+        )
+        .await
+        .map(|_| ())
+        .map_err(failed)
 }
 
 async fn answered(signals: MessageStream, id: u32) {
@@ -123,20 +119,4 @@ pub async fn notify(summary: &str, body: &str) -> Result<(), String> {
         .map_err(failed)?;
     let _ = tokio::time::timeout(WAIT_FOR_CLICK, answered(signals, id)).await;
     Ok(())
-}
-
-fn check() -> Result<(), String> {
-    match image::check_in_background(Preferences::load().download)? {
-        Some(Notice { summary, body }) => {
-            luft_app::block_on(notify(&t!(L10N, summary), &t!(L10N, body)))
-        }
-        None => Ok(()),
-    }
-}
-
-pub fn run() {
-    if let Err(error) = check() {
-        eprintln!("Checking for updates failed: {error}");
-        std::process::exit(1);
-    }
 }

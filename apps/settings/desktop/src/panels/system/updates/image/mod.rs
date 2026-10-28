@@ -1,13 +1,11 @@
 mod switch;
 mod watch;
 
-use luft_software::progress::Progress;
 use luft_software::system::image::{self, Deployments, Release, Status, Update};
-use luft_software::task::{Cancel, Task};
+use luft_software::task::Task;
 use serde::Serialize;
 use specta::Type;
 
-use super::background::{AVAILABLE, Notice, READY};
 use super::store::{Checked, Found};
 
 pub use switch::run as switch;
@@ -43,6 +41,15 @@ fn expected_size() -> Option<u64> {
     Found::load().update.map(|update| update.size)
 }
 
+/// Whether the system looked for updates on its schedule since this account last did, so what
+/// was found then may be out of date.
+fn checked_on_schedule_since() -> bool {
+    let on_schedule = luft_app::block_on(image::policy())
+        .ok()
+        .and_then(|policy| policy.checked);
+    on_schedule > Checked::load().at
+}
+
 fn follow(task: Task) -> Result<(), String> {
     luft_app::block_on(image::follow(expected_size(), task))
 }
@@ -52,6 +59,11 @@ pub fn load(refresh: Option<Task>) -> Result<ImageOverview, String> {
     let deployments = luft_app::block_on(Deployments::load())?;
     let update = match refresh {
         Some(_) => check(&deployments)?,
+        None if checked_on_schedule_since() => {
+            let update = check(&deployments)?;
+            Checked::now()?;
+            update
+        }
         None => Found::load().update,
     };
     let status = deployments.status();
@@ -74,25 +86,4 @@ pub fn download(task: Task) -> Result<(), String> {
 
 pub fn rollback(_: Task) -> Result<(), String> {
     luft_app::block_on(image::rollback())
-}
-
-pub fn check_in_background(download: bool) -> Result<Option<Notice>, String> {
-    let deployments = luft_app::block_on(Deployments::load())?;
-    let update = check(&deployments)?;
-    Checked::now()?;
-    let Some(update) = update.filter(|update| deployments.lacks(update)) else {
-        return Ok(None);
-    };
-    if !download {
-        return Ok(Some(AVAILABLE));
-    }
-    let quiet = |_: Progress| {};
-    luft_app::block_on(image::download(
-        Some(update.size),
-        Task {
-            report: &quiet,
-            cancel: &Cancel::default(),
-        },
-    ))?;
-    Ok(Some(READY))
 }

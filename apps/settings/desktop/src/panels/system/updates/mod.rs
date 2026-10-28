@@ -1,37 +1,31 @@
-mod background;
 mod firmware;
 mod graphics;
 mod image;
+mod notice;
 mod overview;
-mod waiting;
-mod schedule;
 mod state;
 mod store;
+mod waiting;
 
 use luft_app::dbus::{self, failed};
 use luft_app::launch::{self, Token};
 use luft_app::{Commands, Empty, Events};
+use luft_software::system::image::{self as system_image, UpdatePolicy};
 use luft_software::variant::Variant;
 use sabine::SabineWindow;
 use serde::Deserialize;
 use specta::Type;
-use tokio::sync::OnceCell;
 
 use firmware::Firmware;
 use state::{Activity, UpdateKind, UpdatesStatus};
-use store::Preferences;
 
-pub use background::run as check_in_background;
 pub use graphics::{CHECK_GRAPHICS_ARGUMENT, run as check_graphics};
 use luft_i18n::t;
-pub use schedule::CHECK_ARGUMENT;
 
 use crate::L10N;
 
 const APP_UPDATES: &str = "schelf:updates";
 const INSTALLED_APPS: &str = "schelf:installed";
-
-static FIRST_RUN: OnceCell<()> = OnceCell::const_new();
 
 #[derive(Deserialize, Type)]
 struct FirmwareDevice {
@@ -43,18 +37,7 @@ struct VariantSwitch {
     variant: Variant,
 }
 
-async fn load(Empty {}: Empty) -> Result<(), String> {
-    FIRST_RUN
-        .get_or_init(|| async {
-            if Preferences::exists() {
-                return;
-            }
-            let preferences = Preferences::default();
-            if preferences.save().is_ok() {
-                let _ = schedule::apply(preferences.schedule).await;
-            }
-        })
-        .await;
+fn load(Empty {}: Empty) -> Result<(), String> {
     if state::overview().is_none() {
         overview::reload();
     }
@@ -145,13 +128,8 @@ async fn restart(Empty {}: Empty) -> Result<(), String> {
         .map_err(failed)
 }
 
-async fn set_preferences(preferences: Preferences) -> Result<(), String> {
-    let previous = Preferences::load();
-    preferences.save()?;
-    if previous.schedule != preferences.schedule {
-        schedule::apply(preferences.schedule).await?;
-    }
-    Ok(())
+async fn policy(Empty {}: Empty) -> Result<UpdatePolicy, String> {
+    system_image::policy().await
 }
 
 fn open_apps(Token { token }: Token) -> Result<(), String> {
@@ -171,7 +149,7 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         .command("updates_status", |Empty {}| {
             Ok::<UpdatesStatus, String>(state::status())
         })
-        .command_async("updates_load", load)
+        .command("updates_load", load)
         .command("updates_check", check)
         .command("updates_download", download)
         .command("updates_cancel", |Empty {}| {
@@ -183,10 +161,8 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         .command("updates_rollback", rollback)
         .command("updates_switch", switch)
         .command_async("updates_restart", restart)
-        .command("updates_preferences", |Empty {}| {
-            Ok::<Preferences, String>(Preferences::load())
-        })
-        .command_async("updates_set_preferences", set_preferences)
+        .command_async("updates_preferences", policy)
+        .command_async("updates_set_preferences", system_image::set_policy)
         .command("updates_open_apps", open_apps)
         .command("updates_open_installed_apps", open_installed_apps)
 }

@@ -6,9 +6,14 @@
 
     Downloading: whether an update is being downloaded right now, by anyone.
     Downloaded: bytes of image layers fetched so far by the current download.
+    Schedule: how often luft-updater-check.timer has updates checked for, "daily", "weekly" or
+      "never", kept in /var/lib/luft-updater/schedule.json.
+    DownloadAutomatically: whether an update found on schedule is downloaded and staged too.
+    LastChecked: when an update was last checked for on schedule, in seconds since 1970, or 0.
 
-    Download, SwitchVariant, Cancel and Apply need com.lantharos.updater.download; Rollback needs
-    com.lantharos.updater.rollback. Status needs nothing.
+    Download, SwitchVariant, Cancel and Apply need com.lantharos.updater.download; SetSchedule needs
+    com.lantharos.updater.schedule; Rollback needs com.lantharos.updater.rollback. Status needs
+    nothing. Only root can call RunSchedule.
 
     A finished download also has com.lantharos.Packages1 build the system packages for the version
     it staged, before Finished.
@@ -16,6 +21,9 @@
   <interface name="com.lantharos.Updater1">
     <property name="Downloading" type="b" access="read"/>
     <property name="Downloaded" type="t" access="read"/>
+    <property name="Schedule" type="s" access="read"/>
+    <property name="DownloadAutomatically" type="b" access="read"/>
+    <property name="LastChecked" type="t" access="read"/>
 
     <!-- JSON: {"host": `bootc status` as JSON, "configs": {manifest digest: OCI image config}} for the
          booted, staged and rollback images. -->
@@ -37,9 +45,21 @@
     <method name="Apply"/>
     <!-- Starts the previous version next time, or, when that's already queued, stays on this one. -->
     <method name="Rollback"/>
+    <method name="SetSchedule">
+      <arg name="schedule" type="s" direction="in"/>
+      <arg name="download" type="b" direction="in"/>
+    </method>
+    <!-- Checks for an update when the schedule says one is due, the computer isn't on its battery
+         and the connection isn't metered, and downloads and stages it when DownloadAutomatically
+         says so, reported like any download. -->
+    <method name="RunSchedule"/>
     <!-- Empty when the download succeeded. -->
     <signal name="Finished">
       <arg name="error" type="s"/>
+    </signal>
+    <!-- A check on schedule found an update: ready when it was also downloaded and staged. -->
+    <signal name="UpdateFound">
+      <arg name="ready" type="b"/>
     </signal>
   </interface>
 </node>

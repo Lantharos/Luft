@@ -216,10 +216,6 @@ desktop-users-password-failed = Parola nu a putut fi schimbată: { $reason }
 desktop-users-password-timed-out = passwd nu mai răspunde
 
 ## Updates
-desktop-updates-available-summary = Sunt disponibile actualizări de sistem
-desktop-updates-available-body = Deschideți Setări pentru a le descărca și instala.
-desktop-updates-ready-summary = Actualizările sunt gata de instalare
-desktop-updates-ready-body = Reporniți când vă convine pentru a le instala.
 desktop-updates-nvidia-summary = Profitați la maximum de placa video NVIDIA
 desktop-updates-nvidia-body = Treceți la driverul NVIDIA din Setări.
 desktop-updates-notification-open = Deschide

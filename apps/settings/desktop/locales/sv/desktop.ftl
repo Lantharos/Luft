@@ -216,10 +216,6 @@ desktop-users-password-failed = Det gick inte att ändra lösenordet: { $reason 
 desktop-users-password-timed-out = passwd slutade svara
 
 ## Updates
-desktop-updates-available-summary = Systemuppdateringar är tillgängliga
-desktop-updates-available-body = Öppna Inställningar för att hämta och installera dem.
-desktop-updates-ready-summary = Uppdateringarna är redo att installeras
-desktop-updates-ready-body = Starta om när det passar dig för att installera dem.
 desktop-updates-nvidia-summary = Få ut mesta möjliga av ditt NVIDIA-grafikkort
 desktop-updates-nvidia-body = Byt till NVIDIA:s egen drivrutin i Inställningar.
 desktop-updates-notification-open = Öppna

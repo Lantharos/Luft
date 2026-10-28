@@ -413,3 +413,9 @@ screenshot-screencast-view = Ikklikkja hawn biex tara l-vidjo
 screenshot-show-in-rover = Uri f’Rover
 screenshot-captured = Screenshot meħud
 screenshot-captured-body = Tista’ tippejstja l-istampa mill-klibbord
+
+## System updates
+updates-available-title = Hemm aġġornamenti tas-sistema disponibbli
+updates-available-body = Iftaħ is-Settings biex tniżżilhom u tinstallahom.
+updates-ready-title = L-aġġornamenti huma lesti biex jiġu installati
+updates-ready-body = Irristartja meta jaqbillek biex tinstallahom.

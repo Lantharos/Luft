@@ -13,7 +13,7 @@ pub use known::KNOWN;
 pub use package::{bundled, desktop_entry};
 
 const COPR: &str = "https://copr.fedorainfracloud.org/coprs";
-const FOLDER: &str = "/etc/yum.repos.d";
+const FOLDER: &str = "/var/lib/luft/system-packages/repositories";
 
 /// A repository file and the keys it names, by the address `gpgkey` gives each, ready to be
 /// checked and added.

@@ -420,3 +420,9 @@ screenshot-screencast-view = Kliknutím zobrazíte video
 screenshot-show-in-rover = Zobraziť v aplikácii Rover
 screenshot-captured = Snímka obrazovky bola zachytená
 screenshot-captured-body = Obrázok môžete prilepiť zo schránky
+
+## System updates
+updates-available-title = Sú k dispozícii aktualizácie systému
+updates-available-body = Otvorte Nastavenia a stiahnite ich a nainštalujte.
+updates-ready-title = Aktualizácie sú pripravené na inštaláciu
+updates-ready-body = Nainštalujú sa po reštarte, keď sa vám to bude hodiť.

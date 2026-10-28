@@ -6,17 +6,15 @@ use std::fs;
 use std::io::ErrorKind;
 use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
-use std::process::Command;
 
 use anyhow::{Context, Result, bail};
 use serde::Serialize;
 
-use crate::command::run;
 pub use keys::Key;
 use parse::Section;
 
-pub const FOLDER: &str = "/etc/yum.repos.d";
-pub const KEYS: &str = "/etc/pki/rpm-gpg";
+pub const FOLDER: &str = "/var/lib/luft/system-packages/repositories";
+pub const KEYS: &str = "/var/lib/luft/system-packages/keys";
 const EXTENSION: &str = "repo";
 
 #[derive(Serialize, Clone, Debug)]
@@ -199,8 +197,8 @@ fn write(path: &Path, contents: &str) -> Result<()> {
     Ok(())
 }
 
-/// Adds a repository file with its keys kept beside Fedora's, so packages from it are only
-/// installed when they carry one of these signatures.
+/// Adds a repository file with its keys, so packages from it are only installed when they carry
+/// one of these signatures.
 pub fn add(file: &str, text: &str, keys: &BTreeMap<String, String>) -> Result<Repository> {
     let checked = check(file, text, keys)?;
     if exists(file) {
@@ -226,12 +224,10 @@ pub fn add(file: &str, text: &str, keys: &BTreeMap<String, String>) -> Result<Re
 }
 
 fn store(file: &str, checked: &Checked) -> Result<()> {
+    fs::create_dir_all(FOLDER)?;
     fs::create_dir_all(KEYS)?;
-    let mut written = Vec::new();
     for (number, (_, armored)) in checked.keys.iter().enumerate() {
-        let key = Path::new(KEYS).join(key_name(file, number + 1));
-        write(&key, armored)?;
-        written.push(key);
+        write(&Path::new(KEYS).join(key_name(file, number + 1)), armored)?;
     }
     let local = |address: &str| {
         let number = checked
@@ -241,10 +237,7 @@ fn store(file: &str, checked: &Checked) -> Result<()> {
             .unwrap_or_default();
         format!("file://{KEYS}/{}", key_name(file, number + 1))
     };
-    let repository = path(file);
-    write(&repository, &parse::render(&checked.sections, local))?;
-    written.push(repository);
-    run(Command::new("restorecon").args(&written)).map(drop)
+    write(&path(file), &parse::render(&checked.sections, local))
 }
 
 /// Takes a repository file and its keys away.

@@ -258,12 +258,6 @@ desktop-users-password-failed = Couldn't change your password: { $reason }
 desktop-users-password-timed-out = passwd stopped responding
 
 ## Updates
-# Notification shown when updates were found in the background
-desktop-updates-available-summary = System updates are available
-desktop-updates-available-body = Open Settings to download and install them.
-# Notification shown when downloaded updates wait for a restart
-desktop-updates-ready-summary = Updates are ready to install
-desktop-updates-ready-body = Restart when it suits you to install them.
 # Notification shown once when an NVIDIA graphics card could use NVIDIA's driver
 desktop-updates-nvidia-summary = Get the most out of your NVIDIA graphics
 desktop-updates-nvidia-body = Switch to NVIDIA's own driver in Settings.

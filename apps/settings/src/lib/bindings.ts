@@ -473,7 +473,7 @@ export const commands = {
 	updatesOpenInstalledApps: (params: {
 		token?: string | null,
 	}, options?: InvokeOptions) => invoke<null>("updates_open_installed_apps", params, options),
-	updatesPreferences: (options?: InvokeOptions) => invoke<Preferences>("updates_preferences", {}, options),
+	updatesPreferences: (options?: InvokeOptions) => invoke<UpdatePolicy>("updates_preferences", {}, options),
 	updatesRestart: (options?: InvokeOptions) => invoke<null>("updates_restart", {}, options),
 	updatesRollback: (options?: InvokeOptions) => invoke<null>("updates_rollback", {}, options),
 	updatesSetPreferences: (params: {
@@ -1204,11 +1204,6 @@ export type PowerState = {
 	canHibernate: boolean,
 };
 
-export type Preferences = {
-	schedule: Schedule,
-	download: boolean,
-};
-
 export type Problem = {
 	id: string,
 	time: number,
@@ -1458,6 +1453,12 @@ export type Typography = {
 export type UnlockMethod = "tpm" | "pin" | "passphrase" | "recovery-key" | "security-key";
 
 export type UpdateKind = "check" | "download" | "firmware" | "rollback" | "switch";
+
+/**  How often the system looks for updates by itself, and whether it downloads what it finds. */
+export type UpdatePolicy = {
+	schedule: Schedule,
+	download: boolean,
+};
 
 export type UpdatesOverview = {
 	checked: number | null,

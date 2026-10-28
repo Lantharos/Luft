@@ -410,3 +410,9 @@ screenshot-screencast-view = Feu clic aquí per veure el vídeo
 screenshot-show-in-rover = Mostra a Rover
 screenshot-captured = S’ha fet la captura de pantalla
 screenshot-captured-body = Podeu enganxar la imatge des del porta-retalls
+
+## System updates
+updates-available-title = Hi ha actualitzacions del sistema disponibles
+updates-available-body = Obriu la Configuració per baixar-les i instal·lar-les.
+updates-ready-title = Les actualitzacions estan a punt per instal·lar-se
+updates-ready-body = Reinicieu quan us vagi bé per instal·lar-les.

@@ -410,3 +410,9 @@ screenshot-screencast-view = Щракнете тук, за да видите в�
 screenshot-show-in-rover = Покажи в Rover
 screenshot-captured = Екранната снимка е направена
 screenshot-captured-body = Можете да поставите изображението от клипборда
+
+## System updates
+updates-available-title = Има системни актуализации
+updates-available-body = Отворете Настройки, за да ги изтеглите и инсталирате.
+updates-ready-title = Актуализациите са готови за инсталиране
+updates-ready-body = Рестартирайте, когато ви е удобно, за да ги инсталирате.

@@ -11,9 +11,11 @@ use zbus::{Connection, interface};
 use super::PATH;
 use super::error::Error;
 use crate::bootc::{self, Fetch};
+use crate::schedule::{self, Every, Schedule};
 
 const DOWNLOAD: &str = "com.lantharos.updater.download";
 const ROLLBACK: &str = "com.lantharos.updater.rollback";
+const SCHEDULE: &str = "com.lantharos.updater.schedule";
 const PACKAGES: &str = "com.lantharos.Packages1";
 const PACKAGES_PATH: &str = "/com/lantharos/Packages1";
 
@@ -52,6 +54,7 @@ impl Updater {
     async fn begin(
         &self,
         fetch: impl FnOnce() -> anyhow::Result<Fetch>,
+        scheduled: bool,
         server: &ObjectServer,
         emitter: &SignalEmitter<'_>,
     ) -> Result<(), Error> {
@@ -70,7 +73,7 @@ impl Updater {
         let _ = self.downloaded_changed(emitter).await;
         let _ = self.downloading_changed(emitter).await;
         let updater = server.interface::<_, Updater>(PATH).await?;
-        tokio::spawn(follow(updater, fetch, self.idle.clone()));
+        tokio::spawn(follow(updater, fetch, scheduled, self.idle.clone()));
         Ok(())
     }
 
@@ -93,7 +96,7 @@ impl Updater {
     }
 }
 
-async fn follow(updater: InterfaceRef<Updater>, fetch: Fetch, idle: Arc<Idle>) {
+async fn follow(updater: InterfaceRef<Updater>, fetch: Fetch, scheduled: bool, idle: Arc<Idle>) {
     let _activity = idle.hold();
     let (sender, mut fetched) = mpsc::unbounded_channel();
     let work = tokio::task::spawn_blocking(move || {
@@ -114,6 +117,9 @@ async fn follow(updater: InterfaceRef<Updater>, fetch: Fetch, idle: Arc<Idle>) {
     let error = match result {
         Ok(Ok(())) => {
             build_system_packages(emitter.connection()).await;
+            if scheduled {
+                let _ = Updater::update_found(emitter, true).await;
+            }
             String::new()
         }
         Ok(Err(error)) => format!("{error:#}"),
@@ -151,8 +157,91 @@ impl Updater {
         self.downloaded.load(Ordering::Relaxed)
     }
 
+    #[zbus(property)]
+    fn schedule(&self) -> &'static str {
+        Schedule::load().every.name()
+    }
+
+    #[zbus(property)]
+    fn download_automatically(&self) -> bool {
+        Schedule::load().download
+    }
+
+    #[zbus(property)]
+    fn last_checked(&self) -> u64 {
+        Schedule::load().checked
+    }
+
     #[zbus(signal)]
     async fn finished(emitter: &SignalEmitter<'_>, error: &str) -> zbus::Result<()>;
+
+    #[zbus(signal)]
+    async fn update_found(emitter: &SignalEmitter<'_>, ready: bool) -> zbus::Result<()>;
+
+    async fn set_schedule(
+        &self,
+        schedule: &str,
+        download: bool,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
+    ) -> Result<(), Error> {
+        self.authorize(connection, &header, SCHEDULE).await?;
+        let every = Every::named(schedule)?;
+        self.blocking(move || {
+            Schedule {
+                every,
+                download,
+                ..Schedule::load()
+            }
+            .save()
+        })
+        .await?;
+        let _ = self.schedule_changed(&emitter).await;
+        let _ = self.download_automatically_changed(&emitter).await;
+        Ok(())
+    }
+
+    async fn run_schedule(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        #[zbus(object_server)] server: &ObjectServer,
+        #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
+    ) -> Result<(), Error> {
+        if luft_identity::caller::uid(connection, &header).await? != Some(0) {
+            return Err(Error::not_authorized());
+        }
+        let planned = Schedule::load();
+        if !planned.due(schedule::now()) || self.download_pid().is_some() {
+            return Ok(());
+        }
+        if schedule::on_battery() {
+            eprintln!("Not checking for updates while the computer runs on its battery.");
+            return Ok(());
+        }
+        if schedule::metered(connection).await {
+            eprintln!("Not checking for updates over a metered connection.");
+            return Ok(());
+        }
+        let available = self.blocking(bootc::available).await?;
+        self.blocking(|| {
+            Schedule {
+                checked: schedule::now(),
+                ..Schedule::load()
+            }
+            .save()
+        })
+        .await?;
+        let _ = self.last_checked_changed(&emitter).await;
+        if !available {
+            return Ok(());
+        }
+        if !planned.download {
+            return Ok(Updater::update_found(&emitter, false).await?);
+        }
+        self.begin(Fetch::upgrade, true, server, &emitter).await
+    }
 
     async fn status(&self) -> Result<String, Error> {
         self.blocking(bootc::status).await
@@ -166,7 +255,7 @@ impl Updater {
         #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
     ) -> Result<(), Error> {
         self.authorize(connection, &header, DOWNLOAD).await?;
-        self.begin(Fetch::upgrade, server, &emitter).await
+        self.begin(Fetch::upgrade, false, server, &emitter).await
     }
 
     async fn switch_variant(
@@ -181,7 +270,7 @@ impl Updater {
         self.refuse_while_downloading()?;
         let variant = Variant::named(variant);
         let target = self.blocking(move || bootc::switch_target(variant)).await?;
-        self.begin(|| Fetch::switch(&target), server, &emitter)
+        self.begin(|| Fetch::switch(&target), false, server, &emitter)
             .await
     }
 

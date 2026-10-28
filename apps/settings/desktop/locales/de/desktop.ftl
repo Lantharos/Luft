@@ -223,10 +223,6 @@ desktop-users-password-failed = Dein Passwort konnte nicht geändert werden: { $
 desktop-users-password-timed-out = passwd reagiert nicht mehr
 
 ## Updates
-desktop-updates-available-summary = Systemupdates sind verfügbar
-desktop-updates-available-body = Öffne die Einstellungen, um sie herunterzuladen und zu installieren.
-desktop-updates-ready-summary = Updates sind bereit zur Installation
-desktop-updates-ready-body = Starte neu, wann es dir passt, um sie zu installieren.
 desktop-updates-nvidia-summary = Hol das Beste aus deiner NVIDIA-Grafik heraus
 desktop-updates-nvidia-body = Wechsle in den Einstellungen zum eigenen Treiber von NVIDIA.
 desktop-updates-notification-open = Öffnen

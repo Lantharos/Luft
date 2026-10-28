@@ -410,3 +410,9 @@ screenshot-screencast-view = Smelltu hér til að skoða myndskeiðið
 screenshot-show-in-rover = Sýna í Rover
 screenshot-captured = Skjámynd tekin
 screenshot-captured-body = Þú getur límt myndina af klippiborðinu
+
+## System updates
+updates-available-title = Kerfisuppfærslur eru í boði
+updates-available-body = Opnaðu Stillingar til að sækja þær og setja upp.
+updates-ready-title = Uppfærslur eru tilbúnar til uppsetningar
+updates-ready-body = Endurræstu þegar þér hentar til að setja þær upp.

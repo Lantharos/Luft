@@ -5,34 +5,8 @@ use luft_app::files;
 use luft_software::system::image::Update;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
-use specta::Type;
 
 const FOLDER: &str = "com.lantharos.settings";
-
-#[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Eq, Default, Debug, Type)]
-#[serde(rename_all = "camelCase")]
-pub enum Schedule {
-    #[default]
-    Daily,
-    Weekly,
-    Never,
-}
-
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, Type)]
-#[serde(rename_all = "camelCase")]
-pub struct Preferences {
-    pub schedule: Schedule,
-    pub download: bool,
-}
-
-impl Default for Preferences {
-    fn default() -> Self {
-        Self {
-            schedule: Schedule::Daily,
-            download: true,
-        }
-    }
-}
 
 #[derive(Serialize, Deserialize, Clone, Copy, Default, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -66,24 +40,6 @@ fn load<T: DeserializeOwned + Default>(file: PathBuf) -> T {
 fn save(file: PathBuf, value: &impl Serialize) -> Result<(), String> {
     let text = serde_json::to_vec_pretty(value).map_err(|error| error.to_string())?;
     files::replace(&file, &text).map_err(|error| error.to_string())
-}
-
-impl Preferences {
-    fn file() -> PathBuf {
-        path(dirs::config_dir(), "updates.json")
-    }
-
-    pub fn exists() -> bool {
-        Self::file().exists()
-    }
-
-    pub fn load() -> Self {
-        load(Self::file())
-    }
-
-    pub fn save(&self) -> Result<(), String> {
-        save(Self::file(), self)
-    }
 }
 
 impl Checked {

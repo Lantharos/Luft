@@ -216,10 +216,6 @@ desktop-users-password-failed = Δεν ήταν δυνατή η αλλαγή τ�
 desktop-users-password-timed-out = Το passwd σταμάτησε να αποκρίνεται
 
 ## Updates
-desktop-updates-available-summary = Υπάρχουν διαθέσιμες ενημερώσεις συστήματος
-desktop-updates-available-body = Ανοίξτε τις Ρυθμίσεις για λήψη και εγκατάσταση.
-desktop-updates-ready-summary = Οι ενημερώσεις είναι έτοιμες για εγκατάσταση
-desktop-updates-ready-body = Κάντε επανεκκίνηση όποτε σας βολεύει για να εγκατασταθούν.
 desktop-updates-nvidia-summary = Αξιοποιήστε πλήρως την κάρτα γραφικών NVIDIA
 desktop-updates-nvidia-body = Μεταβείτε στο πρόγραμμα οδήγησης της NVIDIA από τις Ρυθμίσεις.
 desktop-updates-notification-open = Άνοιγμα

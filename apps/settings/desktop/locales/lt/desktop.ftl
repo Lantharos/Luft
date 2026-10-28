@@ -216,10 +216,6 @@ desktop-users-password-failed = Nepavyko pakeisti slaptažodžio: { $reason }
 desktop-users-password-timed-out = passwd nustojo atsakyti
 
 ## Updates
-desktop-updates-available-summary = Yra sistemos naujinimų
-desktop-updates-available-body = Atidarykite Nustatymus, kad juos atsisiųstumėte ir įdiegtumėte.
-desktop-updates-ready-summary = Naujinimai paruošti įdiegti
-desktop-updates-ready-body = Kad juos įdiegtumėte, paleiskite iš naujo, kai jums patogu.
 desktop-updates-nvidia-summary = Išnaudokite visas NVIDIA vaizdo plokštės galimybes
 desktop-updates-nvidia-body = Nustatymuose perjunkite į NVIDIA tvarkyklę.
 desktop-updates-notification-open = Atidaryti

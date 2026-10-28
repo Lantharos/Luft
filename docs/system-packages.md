@@ -19,10 +19,10 @@ When the list becomes empty, everything in them goes. Software sources stay:
 
 | Path | Holds |
 | --- | --- |
-| `/etc/yum.repos.d/FILE.repo` | A software source that was added |
-| `/etc/pki/rpm-gpg/FILE-N.asc` | The keys its packages must be signed with |
+| `/var/lib/luft/system-packages/repositories/FILE.repo` | A software source that was added |
+| `/var/lib/luft/system-packages/keys/FILE-N.asc` | The keys its packages must be signed with |
 
-Luft's image leaves both folders empty, so everything in them was added this way.
+They live in `/var` like the list, so going back to an earlier version keeps them. `/usr/share/dnf5/libdnf.conf.d/50-luft-system-packages.conf` adds the folder to dnf's `reposdir`, so `dnf` on the computer sees the sources too.
 
 ## Who does what
 
@@ -30,7 +30,7 @@ Building runs packages' scriptlets and talks to the network, so it's kept apart 
 
 | Unit | Runs as | Does |
 | --- | --- | --- |
-| `luft-packages.service` | `com.lantharos.Packages1`, started on demand over D-Bus | Builds, and keeps the list, the package files and the software sources. It sees the system read-only, with write access only to its state and cache folders above and the two folders of software sources, a `/tmp` of its own, no devices, and only the capabilities building needs: owners, modes and labels of files, mounting the version's system and the sandbox's namespaces |
+| `luft-packages.service` | `com.lantharos.Packages1`, started on demand over D-Bus | Builds, and keeps the list, the package files and the software sources. It sees the system read-only, with write access only to its state and cache folders above, a `/tmp` of its own, no devices, and only the capabilities building needs: owners, modes and labels of files, mounting the version's system and the sandbox's namespaces |
 | `luft-system-packages-activate@.service` | One instance per request on `/run/luft-system-packages/activate`, a socket only root can open | Brings a finished build into the running system or takes the packages away: merging, settling, starting and stopping services, and removing what the packages made. It reads nothing from the build service but the word asking for one of the two, and answers with `done` or what went wrong |
 
 ## Building
@@ -38,7 +38,7 @@ Building runs packages' scriptlets and talks to the network, so it's kept apart 
 `luft-packages` builds on a thread of its own in a private mount namespace, so nothing it mounts outlives the build:
 
 1. Mount the version's system read-only from the composefs repository with `bootc internals cfs mount`, which checks every file against the digest like the startup image does, and put a writable overlay over it.
-2. Copy the software sources and their keys into the build root, and `dnf --installroot install --store` against that version's own package database, Fedora's repositories in `/usr/share/dnf5/repos.d` and the added ones, without weak dependencies. Package files installed by themselves are named by their path, so dnf brings what they need. The stored transaction names every package and the repository it came from, which `build.json` keeps. Its packages are linked back into dnf's cache and everything else there is deleted, so the next build only downloads what changed; they're checked again when they're installed, like any download.
+2. Copy the software sources and their keys into the build root at the same paths, and `dnf --installroot install --store` against that version's own package database, with `reposdir` naming only the build root's Fedora repositories in `/usr/share/dnf5/repos.d` and its copy of the added ones, without weak dependencies. Package files installed by themselves are named by their path, so dnf brings what they need. The stored transaction names every package and the repository it came from, which `build.json` keeps. Its packages are linked back into dnf's cache and everything else there is deleted, so the next build only downloads what changed; they're checked again when they're installed, like any download.
 3. Refuse what can't be a system package (below).
 4. Give the build root the computer's users and groups from `/etc/passwd` and `/etc/group`, without passwords, so what scriptlets add gets IDs that are free on the computer. Those an earlier build made are renamed, keeping their IDs taken, so the packages make them again and the build learns they're still wanted.
 5. Import Fedora's keys from `/usr/share/pki/rpm-gpg` and the added sources' keys, and install with `rpm --install` and `_pkgverify_level all`, so every package must carry a valid signature from one of them. Package files installed by themselves follow in a second transaction with `_pkgverify_level digest`, like dnf treats a local file. `rpm` runs in a bubblewrap sandbox whose whole filesystem is the build root, so its scriptlets can't reach anything else: no network, their own process, IPC and host name namespaces, a fresh `/tmp` and `/run`, a `/dev` with only the harmless devices, no `/proc` or `/sys`, and only the capabilities that write files (owners, modes, file capabilities, switching users), with the bounding set narrowed to those so a file capability they set can't hand more back.
@@ -88,7 +88,7 @@ Schelf fetches a source as the user, from the address of a `.repo` file, `copr:o
 - Each key is imported into a throwaway rpm database, so a key rpm wouldn't accept, such as one bound with SHA-1, is refused now rather than at the next build. The fingerprints and names rpm reads are what Schelf shows.
 - A section ID another source already uses is refused.
 
-`AddRepository` checks the same file and keys again and writes the file back with only the settings that choose where packages come from, `gpgcheck=1`, and `gpgkey` pointing at the keys as they were shown, kept in `/etc/pki/rpm-gpg`. A source can't change its key later; packages signed with any other key fail at step 5. Both need `com.lantharos.packages.sources`.
+`AddRepository` checks the same file and keys again and writes the file back with only the settings that choose where packages come from, `gpgcheck=1`, and `gpgkey` pointing at the keys as they were shown, kept in `/var/lib/luft/system-packages/keys`. A source can't change its key later; packages signed with any other key fail at step 5. Both need `com.lantharos.packages.sources`.
 
 `RemoveRepository` rebuilds without the source and without the requested packages the merged build says came from it, the same way removing packages does, and only then deletes the file and its keys. A build is current only while every source its packages came from is still there, so the other versions on the computer are built again without it too.
 

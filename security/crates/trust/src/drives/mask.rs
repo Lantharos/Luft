@@ -5,7 +5,7 @@ use anyhow::{Result, ensure};
 use crate::paths;
 use crate::system::host::uuid;
 
-const DECRYPTING: &str = "/etc/trustd/decrypting";
+const DECRYPTING: &str = "/var/lib/trustd/decrypting";
 const DECRYPTED: &str = "/run/trustd/decrypted";
 
 fn write(folder: &str, partuuid: &str, luks_uuid: &str) -> Result<()> {

@@ -415,3 +415,9 @@ screenshot-screencast-view = Faceți clic aici pentru a vedea videoclipul
 screenshot-show-in-rover = Afișează în Rover
 screenshot-captured = Captură de ecran realizată
 screenshot-captured-body = Puteți lipi imaginea din clipboard
+
+## System updates
+updates-available-title = Sunt disponibile actualizări de sistem
+updates-available-body = Deschideți Setări pentru a le descărca și instala.
+updates-ready-title = Actualizările sunt gata de instalare
+updates-ready-body = Reporniți când vă convine pentru a le instala.

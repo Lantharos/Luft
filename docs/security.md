@@ -110,7 +110,7 @@ Disks can encrypt other drives in place through `trustd`. Partitions the system 
 - Room for the 32 MB header comes from free space right after the partition (any file system), shrinking ext2/3/4 while unmounted, or shrinking btrfs while mounted. Otherwise the drive can only be encrypted by formatting it.
 - Encryption runs in the background, can be paused, and continues when the drive is unlocked again.
 - Every drive gets a recovery key; a passphrase is optional.
-- **Unlock automatically on this computer** keeps a random key in `/etc/luks-keys` with an `/etc/crypttab` entry, like BitLocker's automatic unlock. It requires Luft to be encrypted, so the drive's key is protected by the TPM-protected disk.
+- **Unlock automatically on this computer** keeps a random key next to the drive's record in `/var/lib/trustd/drives`, like BitLocker's automatic unlock. It requires Luft to be encrypted, so the drive's key is protected by the TPM-protected disk. `trustd-drives-generator` turns every such record into a `systemd-cryptsetup@` unit at each start and whenever `trustd` changes one, wanted by the drive's device, so the drive unlocks when it's there at startup or plugged in later. The desktop leaves these drives to systemd instead of asking for their passphrase, and Disks unlocks one that was locked by hand with `Unlock` on `com.lantharos.Trust1.Drives`, which any account at the computer may call.
 - Removable drives aren't decrypted in place.
 
 ## Luft Keyring

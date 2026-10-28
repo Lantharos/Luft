@@ -216,10 +216,6 @@ desktop-users-password-failed = Nie udało się zmienić hasła: { $reason }
 desktop-users-password-timed-out = Program passwd przestał odpowiadać
 
 ## Updates
-desktop-updates-available-summary = Dostępne są aktualizacje systemu
-desktop-updates-available-body = Otwórz Ustawienia, aby je pobrać i zainstalować.
-desktop-updates-ready-summary = Aktualizacje są gotowe do instalacji
-desktop-updates-ready-body = Uruchom ponownie komputer w dogodnej chwili, aby je zainstalować.
 desktop-updates-nvidia-summary = Wykorzystaj pełnię możliwości karty graficznej NVIDIA
 desktop-updates-nvidia-body = Przełącz się na sterownik firmy NVIDIA w Ustawieniach.
 desktop-updates-notification-open = Otwórz

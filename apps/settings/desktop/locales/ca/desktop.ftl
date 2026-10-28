@@ -216,10 +216,6 @@ desktop-users-password-failed = No s’ha pogut canviar la contrasenya: { $reaso
 desktop-users-password-timed-out = passwd ha deixat de respondre
 
 ## Updates
-desktop-updates-available-summary = Hi ha actualitzacions del sistema disponibles
-desktop-updates-available-body = Obriu la Configuració per baixar-les i instal·lar-les.
-desktop-updates-ready-summary = Les actualitzacions estan a punt per instal·lar-se
-desktop-updates-ready-body = Reinicieu quan us vagi bé per instal·lar-les.
 desktop-updates-nvidia-summary = Traieu el màxim profit de la targeta gràfica NVIDIA
 desktop-updates-nvidia-body = Passeu al controlador propi de NVIDIA a la Configuració.
 desktop-updates-notification-open = Obre

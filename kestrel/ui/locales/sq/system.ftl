@@ -410,3 +410,9 @@ screenshot-screencast-view = Kliko këtu për të parë videon
 screenshot-show-in-rover = Shfaq në Rover
 screenshot-captured = Foto ekrani u bë
 screenshot-captured-body = Mund ta ngjitësh imazhin nga kujtesa e fragmenteve
+
+## System updates
+updates-available-title = Ka përditësime të sistemit
+updates-available-body = Hap Cilësimet për t’i shkarkuar dhe instaluar.
+updates-ready-title = Përditësimet janë gati për t’u instaluar
+updates-ready-body = Rinis kur të përshtatet për t’i instaluar.

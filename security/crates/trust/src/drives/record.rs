@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 use anyhow::{Result, ensure};
 use serde::{Deserialize, Serialize};
 
-use super::mask;
+use super::{generator, mask};
 use crate::errors::Unsupported;
 use crate::paths;
 use crate::system::host::uuid;
@@ -80,8 +80,10 @@ impl Record {
                     .to_owned()
             )
         );
+        let before = Self::load(&self.uuid);
         paths::ensure_private(FOLDER)?;
-        paths::write_private(&file(&self.uuid), serde_json::to_string(self)?.as_bytes())?;
+        paths::write_private(&self.file(), serde_json::to_string(self)?.as_bytes())?;
+        generator::changed(before.as_ref(), Some(self));
         let marker = Path::new(CHANGING).join(&self.uuid);
         if self.change.is_some() {
             paths::ensure_private(CHANGING)?;
@@ -93,8 +95,14 @@ impl Record {
     }
 
     pub fn forget(&self) {
-        let _ = std::fs::remove_file(file(&self.uuid));
+        let before = Self::load(&self.uuid);
+        let _ = std::fs::remove_file(self.file());
         unmark(&Path::new(CHANGING).join(&self.uuid));
+        generator::changed(before.as_ref(), None);
+    }
+
+    pub fn file(&self) -> PathBuf {
+        file(&self.uuid)
     }
 
     pub fn mapping(&self) -> String {
@@ -138,6 +146,10 @@ impl Record {
 
     pub fn passphrase_file(&self) -> PathBuf {
         Path::new(FOLDER).join(format!("{}.passphrase", self.uuid))
+    }
+
+    pub fn key_file(&self) -> PathBuf {
+        Path::new(FOLDER).join(format!("{}.key", self.uuid))
     }
 
     pub fn escrow_file(&self) -> PathBuf {

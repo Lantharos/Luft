@@ -1,0 +1,10 @@
+[Unit]
+Description=Check for system updates every hour when Luft's schedule says so
+
+[Timer]
+OnBootSec=15min
+OnUnitActiveSec=1h
+RandomizedDelaySec=10min
+
+[Install]
+WantedBy=timers.target

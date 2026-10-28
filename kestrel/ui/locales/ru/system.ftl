@@ -420,3 +420,9 @@ screenshot-screencast-view = Нажмите, чтобы посмотреть в�
 screenshot-show-in-rover = Показать в приложении Rover
 screenshot-captured = Снимок экрана сделан
 screenshot-captured-body = Изображение можно вставить из буфера обмена
+
+## System updates
+updates-available-title = Доступны обновления системы
+updates-available-body = Откройте Настройки, чтобы скачать и установить их.
+updates-ready-title = Обновления готовы к установке
+updates-ready-body = Перезагрузите компьютер в удобное время, чтобы установить их.

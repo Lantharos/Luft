@@ -164,6 +164,11 @@
       <arg name="uuid" type="s" direction="in"/>
       <arg name="unlock" type="s" direction="in"/>
     </method>
+    <!-- Unlocks a drive that unlocks by itself with the key this computer keeps, after it was locked by
+         hand. -->
+    <method name="Unlock">
+      <arg name="uuid" type="s" direction="in"/>
+    </method>
     <method name="ShowRecoveryKey">
       <arg name="uuid" type="s" direction="in"/>
       <arg name="key" type="s" direction="out"/>

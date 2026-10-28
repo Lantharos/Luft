@@ -223,10 +223,6 @@ desktop-users-password-failed = Lozinku nije bilo moguće promijeniti: { $reason
 desktop-users-password-timed-out = Program passwd prestao je reagirati
 
 ## Updates
-desktop-updates-available-summary = Dostupna su ažuriranja sustava
-desktop-updates-available-body = Otvorite Postavke da biste ih preuzeli i instalirali.
-desktop-updates-ready-summary = Ažuriranja su spremna za instalaciju
-desktop-updates-ready-body = Ponovno pokrenite računalo kad vam odgovara da biste ih instalirali.
 desktop-updates-nvidia-summary = Iskoristite svoju NVIDIA grafiku do kraja
 desktop-updates-nvidia-body = Prijeđite na NVIDIA-in upravljački program u Postavkama.
 desktop-updates-notification-open = Otvori

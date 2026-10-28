@@ -410,3 +410,9 @@ screenshot-screencast-view = Katso video napsauttamalla tästä
 screenshot-show-in-rover = Näytä Roverissa
 screenshot-captured = Kuvakaappaus otettu
 screenshot-captured-body = Voit liittää kuvan leikepöydältä
+
+## System updates
+updates-available-title = Järjestelmäpäivityksiä on saatavilla
+updates-available-body = Lataa ja asenna ne Asetuksissa.
+updates-ready-title = Päivitykset ovat valmiita asennettaviksi
+updates-ready-body = Asenna ne käynnistämällä uudelleen, kun sinulle sopii.

@@ -4670,6 +4670,7 @@ dependencies = [
  "anyhow",
  "libc",
  "luft-dbus",
+ "luft-identity",
  "luft-variant",
  "serde",
  "serde_json",

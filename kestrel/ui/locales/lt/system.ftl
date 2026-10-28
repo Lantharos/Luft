@@ -420,3 +420,9 @@ screenshot-screencast-view = Spustelėkite, kad peržiūrėtumėte vaizdo įraš
 screenshot-show-in-rover = Rodyti programoje Rover
 screenshot-captured = Ekrano kopija padaryta
 screenshot-captured-body = Paveikslėlį galite įklijuoti iš iškarpinės
+
+## System updates
+updates-available-title = Yra sistemos naujinimų
+updates-available-body = Atidarykite Nustatymus, kad juos atsisiųstumėte ir įdiegtumėte.
+updates-ready-title = Naujinimai paruošti įdiegti
+updates-ready-body = Kad juos įdiegtumėte, paleiskite iš naujo, kai jums patogu.

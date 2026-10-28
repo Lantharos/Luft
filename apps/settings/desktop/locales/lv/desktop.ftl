@@ -216,10 +216,6 @@ desktop-users-password-failed = Neizdevās mainīt paroli: { $reason }
 desktop-users-password-timed-out = passwd pārstāja atbildēt
 
 ## Updates
-desktop-updates-available-summary = Ir pieejami sistēmas atjauninājumi
-desktop-updates-available-body = Atveriet Iestatījumus, lai tos lejupielādētu un instalētu.
-desktop-updates-ready-summary = Atjauninājumi ir gatavi instalēšanai
-desktop-updates-ready-body = Lai tos instalētu, restartējiet datoru, kad jums ērti.
 desktop-updates-nvidia-summary = Izmantojiet visas NVIDIA grafikas iespējas
 desktop-updates-nvidia-body = Iestatījumos pārslēdzieties uz NVIDIA draiveri.
 desktop-updates-notification-open = Atvērt

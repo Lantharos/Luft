@@ -8,3 +8,5 @@ mod keys;
 mod paths;
 pub mod service;
 mod system;
+
+pub use drives::generator;

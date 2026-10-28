@@ -13,13 +13,14 @@ export const repoDocs: RepoDoc[] = [
 	{ file: 'docs/prompts.md', slug: 'prompts', order: 10 },
 	{ file: 'docs/memory.md', slug: 'memory', order: 11 },
 	{ file: 'docs/system-packages.md', slug: 'system-packages', order: 12 },
-	{ file: 'docs/translations.md', slug: 'translations', order: 13 },
-	{ file: 'docs/components/kestrel.md', slug: 'kestrel', order: 14 },
-	{ file: 'docs/components/compositor.md', slug: 'compositor', order: 15 },
-	{ file: 'docs/components/keyring.md', slug: 'keyring', order: 16 },
-	{ file: 'docs/components/sushi.md', slug: 'sushi', order: 17 },
-	{ file: 'docs/components/app.md', slug: 'app-shell', order: 18 },
-	{ file: 'docs/components/ui.md', slug: 'ui-kit', order: 19 },
-	{ file: 'docs/components/software.md', slug: 'software-library', order: 20 },
-	{ file: 'docs/components/keys.md', slug: 'keys', order: 21 }
+	{ file: 'docs/state.md', slug: 'state', order: 13 },
+	{ file: 'docs/translations.md', slug: 'translations', order: 14 },
+	{ file: 'docs/components/kestrel.md', slug: 'kestrel', order: 15 },
+	{ file: 'docs/components/compositor.md', slug: 'compositor', order: 16 },
+	{ file: 'docs/components/keyring.md', slug: 'keyring', order: 17 },
+	{ file: 'docs/components/sushi.md', slug: 'sushi', order: 18 },
+	{ file: 'docs/components/app.md', slug: 'app-shell', order: 19 },
+	{ file: 'docs/components/ui.md', slug: 'ui-kit', order: 20 },
+	{ file: 'docs/components/software.md', slug: 'software-library', order: 21 },
+	{ file: 'docs/components/keys.md', slug: 'keys', order: 22 }
 ];

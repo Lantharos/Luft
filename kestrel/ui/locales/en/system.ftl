@@ -563,3 +563,11 @@ screenshot-screencast-view = Click here to view the video
 screenshot-show-in-rover = Show in Rover
 screenshot-captured = Screenshot Captured
 screenshot-captured-body = You can paste the image from the clipboard
+
+## System updates
+# Notification shown when the system found updates by itself
+updates-available-title = System updates are available
+updates-available-body = Open Settings to download and install them.
+# Notification shown when the system downloaded updates by itself and they wait for a restart
+updates-ready-title = Updates are ready to install
+updates-ready-body = Restart when it suits you to install them.

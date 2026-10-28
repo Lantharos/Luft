@@ -40,6 +40,7 @@ place "$usb/com.lantharos.usb-protection.policy" /usr/share/polkit-1/actions/com
 trust="$root/data/trust"
 install -Dm755 "$release/trustd" "$destdir$libexecdir/trustd"
 install -Dm755 "$release/trustctl" "$destdir/usr/bin/trustctl"
+install -Dm755 "$release/trustd-drives-generator" "$destdir/usr/lib/systemd/system-generators/trustd-drives-generator"
 for unit in "$trust"/systemd/*; do
   place "$unit" "/usr/lib/systemd/system/$(basename "$unit")"
 done

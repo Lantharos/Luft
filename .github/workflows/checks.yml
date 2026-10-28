@@ -278,9 +278,22 @@ jobs:
 
       - run: python3 kestrel/compositor/patches.py identity
 
+  etc:
+    name: State outside /etc
+    runs-on: ubuntu-slim
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun .github/scripts/etc/index.ts
+
   checks:
     name: Checks
-    needs: [changes, rust, uefi, meet-windows, web, kestrel, units, weblate, compositor-identity]
+    needs: [changes, rust, uefi, meet-windows, web, kestrel, units, weblate, compositor-identity, etc]
     if: always()
     runs-on: ubuntu-slim
     steps:

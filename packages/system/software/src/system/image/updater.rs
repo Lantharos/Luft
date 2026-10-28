@@ -1,6 +1,9 @@
 use futures_util::{Stream, StreamExt};
-use luft_app::dbus::{self, failed, service::Service};
+use luft_app::dbus::service::{Service, get};
+use luft_app::dbus::{self, failed};
 use luft_variant::Variant;
+use serde::{Deserialize, Serialize};
+use specta::Type;
 use zbus::fdo::DBusProxy;
 use zbus::names::BusName;
 use zbus::{MessageStream, OwnedVariant};
@@ -18,6 +21,62 @@ const DOWNLOADED: &str = "Downloaded";
 const STOPPED: &str = "The update service stopped unexpectedly.";
 
 type Changes = std::collections::HashMap<String, OwnedVariant>;
+
+#[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Eq, Debug, Type)]
+#[serde(rename_all = "lowercase")]
+pub enum Schedule {
+    Daily,
+    Weekly,
+    Never,
+}
+
+impl Schedule {
+    fn named(name: &str) -> Option<Self> {
+        match name {
+            "daily" => Some(Self::Daily),
+            "weekly" => Some(Self::Weekly),
+            "never" => Some(Self::Never),
+            _ => None,
+        }
+    }
+
+    fn name(self) -> &'static str {
+        match self {
+            Self::Daily => "daily",
+            Self::Weekly => "weekly",
+            Self::Never => "never",
+        }
+    }
+}
+
+/// How often the system looks for updates by itself, and whether it downloads what it finds.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, Type)]
+pub struct UpdatePolicy {
+    pub schedule: Schedule,
+    pub download: bool,
+    #[serde(skip)]
+    pub checked: Option<u64>,
+}
+
+/// When the update service looks for updates by itself, and what it does with them.
+pub async fn policy() -> Result<UpdatePolicy, String> {
+    let properties = UPDATER.read().await?.ok_or(STOPPED)?;
+    let schedule = get::<String>(&properties, "Schedule")
+        .and_then(|name| Schedule::named(&name))
+        .ok_or(STOPPED)?;
+    Ok(UpdatePolicy {
+        schedule,
+        download: get(&properties, "DownloadAutomatically").unwrap_or(true),
+        checked: get::<u64>(&properties, "LastChecked").filter(|checked| *checked > 0),
+    })
+}
+
+pub async fn set_policy(policy: UpdatePolicy) -> Result<(), String> {
+    UPDATER
+        .change::<_, ()>("SetSchedule", &(policy.schedule.name(), policy.download))
+        .await
+        .map_err(|error| dbus::explain(&error))
+}
 
 async fn change(method: &str) -> Result<(), String> {
     UPDATER

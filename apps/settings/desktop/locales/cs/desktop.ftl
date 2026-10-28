@@ -216,10 +216,6 @@ desktop-users-password-failed = Heslo se nepodařilo změnit: { $reason }
 desktop-users-password-timed-out = Program passwd přestal odpovídat
 
 ## Updates
-desktop-updates-available-summary = Jsou k dispozici aktualizace systému
-desktop-updates-available-body = Stáhnete a nainstalujete je v Nastavení.
-desktop-updates-ready-summary = Aktualizace jsou připravené k instalaci
-desktop-updates-ready-body = Nainstalují se při restartu, až se vám to bude hodit.
 desktop-updates-nvidia-summary = Vytěžte ze své grafiky NVIDIA maximum
 desktop-updates-nvidia-body = V Nastavení přepněte na vlastní ovladač od NVIDIA.
 desktop-updates-notification-open = Otevřít

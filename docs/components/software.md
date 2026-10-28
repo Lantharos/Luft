@@ -61,7 +61,13 @@ Versions and release notes come from the image's labels:
 
 When get.luft.computer is reachable, What's new instead merges the changelogs of every version between the installed one and the offered one.
 
-`services/updater/data` has the service's D-Bus, systemd and polkit files, and `com.lantharos.Updater1.xml` describes its interface. Administrators signed in at the computer can download and install updates, and switch images, without a password, also in the background; going back to the previous version asks. The updater runs `bootc`, which mounts the boot partitions and writes the system's deployments, so its sandbox only keeps it away from home folders, the kernel's modules and logs, and other namespaces than mounts.
+### Schedule
+
+The updater owns when updates are looked for. The schedule, every day, every week or only when someone checks, and whether what's found is downloaded too, is kept in `/var/lib/luft-updater/schedule.json` with the time of the last check, so it's the same for every account and survives going back to an earlier version. Settings reads it from the `Schedule`, `DownloadAutomatically` and `LastChecked` properties and changes it with `SetSchedule`.
+
+`luft-updater-check.timer`, a system timer, comes by every hour and calls `RunSchedule`, which only root may call. The updater checks when the schedule says one is due, the computer isn't running on its battery and NetworkManager doesn't call the connection metered; otherwise it waits for the next hour. It asks the registry for the image's layers with `skopeo` and compares them with every version on the computer, then downloads and stages the update like `Download` does when the schedule says so. Either way it sends `UpdateFound`, and Kestrel shows a notification for it in every session that's open, which opens System in Settings. When Settings opens after a check on schedule that came after the account's own, it checks again, so it shows what was found.
+
+`services/updater/data` has the service's D-Bus, systemd and polkit files, and `com.lantharos.Updater1.xml` describes its interface. Administrators signed in at the computer can download and install updates, switch images and change the schedule without a password, also in the background; going back to the previous version asks. The updater runs `bootc`, which mounts the boot partitions and writes the system's deployments, so its sandbox only keeps it away from home folders, the kernel's modules and logs, and other namespaces than mounts.
 
 ## Thumbnails
 

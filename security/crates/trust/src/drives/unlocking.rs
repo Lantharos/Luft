@@ -1,5 +1,5 @@
 use std::os::unix::fs::PermissionsExt;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use anyhow::{Context, Result, bail};
 
@@ -15,7 +15,6 @@ use crate::system::secrets::creds::{self, Protection};
 use crate::system::secrets::secret::Secret;
 use crate::system::secrets::{keyring, passbox};
 
-const KEYS: &str = "/etc/luks-keys";
 const KEY_BYTES: usize = 64;
 const ESCROW_NAME: &str = "trustd.drive-recovery-key";
 
@@ -32,53 +31,21 @@ pub fn require_system_protected() -> Result<()> {
     Ok(())
 }
 
-fn keyfile(record: &Record) -> PathBuf {
-    Path::new(KEYS).join(format!("{}.key", record.mapping()))
-}
-
-fn key(record: &Record) -> Option<Secret> {
-    std::fs::read(keyfile(record)).ok().map(Secret::new)
+pub fn kept_key(record: &Record) -> Option<Secret> {
+    std::fs::read(record.key_file()).ok().map(Secret::new)
 }
 
 fn size_of(device: &Path) -> u64 {
     blocks::kernel_name(device).map_or(0, |name| blocks::size_bytes(&name))
 }
 
-pub fn write_crypttab(record: &Record) -> Result<()> {
-    if !record.auto_unlock {
-        return Ok(());
-    }
-    let mut options = vec![
-        if record.removable {
-            "noauto,nofail"
-        } else {
-            "nofail,discard"
-        }
-        .to_owned(),
-    ];
-    let source = match (&record.header, &record.partuuid) {
-        (Some(header), Some(partuuid)) => {
-            options.push(format!("header={}", header.display()));
-            format!("PARTUUID={partuuid}")
-        }
-        _ => format!("UUID={}", record.uuid),
-    };
-    set_crypttab(
-        &record.mapping(),
-        Some(format!(
-            "{} {source} {} {}",
-            record.mapping(),
-            keyfile(record).display(),
-            options.join(",")
-        )),
-    )
-}
-
 fn write_keyfile(record: &Record, key: &Secret) -> Result<()> {
-    std::fs::create_dir_all(KEYS)?;
-    std::fs::set_permissions(KEYS, std::fs::Permissions::from_mode(0o700))?;
-    paths::write_private(&keyfile(record), key.bytes())?;
-    std::fs::set_permissions(keyfile(record), std::fs::Permissions::from_mode(0o400))?;
+    let keyfile = record.key_file();
+    if let Some(folder) = keyfile.parent() {
+        paths::ensure_private(folder)?;
+    }
+    paths::write_private(&keyfile, key.bytes())?;
+    std::fs::set_permissions(&keyfile, std::fs::Permissions::from_mode(0o400))?;
     Ok(())
 }
 
@@ -97,18 +64,18 @@ pub fn enable(device: &Path, record: &mut Record, unlock: &Secret) -> Result<()>
     let key = new_key_slot(device, unlock)?;
     write_keyfile(record, &key)?;
     record.auto_unlock = true;
-    write_crypttab(record)
+    Ok(())
 }
 
 pub fn start_auto_unlock(record: &mut Record, recovery: &Secret) -> Result<()> {
     require_system_protected()?;
     write_keyfile(record, recovery)?;
     record.auto_unlock = true;
-    write_crypttab(record)
+    Ok(())
 }
 
 pub fn finish_auto_unlock(device: &Path, record: &Record, recovery: &Secret) -> Result<()> {
-    if record.auto_unlock && key(record).as_ref() == Some(recovery) {
+    if record.auto_unlock && kept_key(record).as_ref() == Some(recovery) {
         let key = new_key_slot(device, recovery)?;
         write_keyfile(record, &key)?;
     }
@@ -116,7 +83,7 @@ pub fn finish_auto_unlock(device: &Path, record: &Record, recovery: &Secret) -> 
 }
 
 pub fn disable(device: &Path, record: &mut Record) -> Result<()> {
-    if let Some(key) = key(record) {
+    if let Some(key) = kept_key(record) {
         Tool::new("cryptsetup")
             .args(["luksRemoveKey", "--batch-mode", "--key-file", "-"])
             .arg(device)
@@ -124,13 +91,13 @@ pub fn disable(device: &Path, record: &mut Record) -> Result<()> {
             .status()
             .context("The key for unlocking automatically couldn't be removed.")?;
     }
-    forget(record)
+    forget(record);
+    Ok(())
 }
 
-pub fn forget(record: &mut Record) -> Result<()> {
-    let _ = std::fs::remove_file(keyfile(record));
+pub fn forget(record: &mut Record) {
+    let _ = std::fs::remove_file(record.key_file());
     record.auto_unlock = false;
-    set_crypttab(&record.mapping(), None)
 }
 
 pub fn keep_passphrase(record: &Record, passphrase: &Secret, recovery: &Secret) -> Result<()> {
@@ -199,25 +166,5 @@ pub fn known_keys(record: &Record) -> impl Iterator<Item = Secret> {
     escrowed(record)
         .into_iter()
         .chain(keyring::take(&hand_over_name(record)))
-        .chain(key(record))
-}
-
-const CRYPTTAB: &str = "/etc/crypttab";
-
-fn set_crypttab(name: &str, entry: Option<String>) -> Result<()> {
-    let existing = std::fs::read_to_string(CRYPTTAB).unwrap_or_default();
-    let mut lines: Vec<String> = existing
-        .lines()
-        .filter(|line| line.split_whitespace().next() != Some(name))
-        .map(str::to_owned)
-        .collect();
-    lines.extend(entry);
-    let text = if lines.is_empty() {
-        String::new()
-    } else {
-        lines.join("\n") + "\n"
-    };
-    paths::write_private(Path::new(CRYPTTAB), text.as_bytes())?;
-    std::fs::set_permissions(CRYPTTAB, std::fs::Permissions::from_mode(0o600))?;
-    Ok(())
+        .chain(kept_key(record))
 }

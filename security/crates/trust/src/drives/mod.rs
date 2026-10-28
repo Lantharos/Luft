@@ -1,3 +1,4 @@
+pub mod generator;
 mod hold;
 mod mask;
 mod record;
@@ -247,7 +248,7 @@ pub fn encrypt(
             .flatten()
             .is_none()
     {
-        let _ = unlocking::forget(&mut record);
+        unlocking::forget(&mut record);
         unlocking::forget_escrow(&record);
         let _ = std::fs::remove_file(record.passphrase_file());
         record.forget();
@@ -330,7 +331,6 @@ pub fn decrypt(device: &str, typed: &Secret) -> Result<Record> {
         }
         return Err(error);
     }
-    unlocking::write_crypttab(&record)?;
     unlocking::hand_over(&record, &key);
     Ok(record)
 }
@@ -412,6 +412,23 @@ pub fn resume(uuid: &str, typed: &Secret) -> Result<Record> {
     record.paused = false;
     record.save()?;
     Ok(record)
+}
+
+pub fn unlock(uuid: &str) -> Result<()> {
+    let record = Record::load(uuid)
+        .filter(|record| record.auto_unlock)
+        .context(Unsupported(
+            "This computer doesn't keep a key for this drive.".to_owned(),
+        ))?;
+    if !record.present() {
+        bail!(Unsupported("Connect the drive first.".to_owned()));
+    }
+    let target = Target::find(&record.device().canonicalize()?.display().to_string())?;
+    if target.active_mapping().is_some() {
+        return Ok(());
+    }
+    let key = unlocking::kept_key(&record).ok_or(NeedsKey)?;
+    open(&target, &record, &key)
 }
 
 pub fn pause(uuid: &str) -> Result<()> {

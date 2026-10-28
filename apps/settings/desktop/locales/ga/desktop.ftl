@@ -216,10 +216,6 @@ desktop-users-password-failed = Níorbh fhéidir do phasfhocal a athrú: { $reas
 desktop-users-password-timed-out = Stop passwd ag freagairt
 
 ## Updates
-desktop-updates-available-summary = Tá nuashonruithe córais ar fáil
-desktop-updates-available-body = Oscail na Socruithe chun iad a íoslódáil agus a shuiteáil.
-desktop-updates-ready-summary = Tá nuashonruithe réidh le suiteáil
-desktop-updates-ready-body = Atosaigh nuair a fheileann sé duit chun iad a shuiteáil.
 desktop-updates-nvidia-summary = Bain an leas is fearr as do chárta grafaice NVIDIA
 desktop-updates-nvidia-body = Athraigh go tiománaí NVIDIA féin sna Socruithe.
 desktop-updates-notification-open = Oscail

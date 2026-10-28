@@ -28,9 +28,11 @@ import { DeviceSounds } from './sounds/devices.js';
 import { RecordingSounds } from './sounds/recording.js';
 import { SoundService } from './sounds/service.js';
 import { playSound } from './sounds/sounds.js';
+import { UpdateNotices } from './updates/updateNotices.js';
 
 export class SystemServices {
   private readonly memoryNotices = new MemoryNotices();
+  private readonly updateNotices = new UpdateNotices();
   private readonly health = new Health();
   private readonly batteryWarnings = new BatteryWarnings();
   private readonly chargerSound = new ChargerSound();
@@ -77,6 +79,7 @@ export class SystemServices {
     this.fontRefresh.destroy();
     this.mediaKeys.destroy();
     this.memoryNotices.destroy();
+    this.updateNotices.destroy();
     this.health.destroy();
     this.batteryWarnings.destroy();
     this.chargerSound.destroy();

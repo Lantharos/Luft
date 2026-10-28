@@ -223,10 +223,6 @@ desktop-users-password-failed = Fjalëkalimi nuk mund të ndryshohej: { $reason 
 desktop-users-password-timed-out = passwd nuk u përgjigj më
 
 ## Updates
-desktop-updates-available-summary = Ka përditësime të sistemit
-desktop-updates-available-body = Hap Cilësimet për t’i shkarkuar dhe instaluar.
-desktop-updates-ready-summary = Përditësimet janë gati për t’u instaluar
-desktop-updates-ready-body = Rinis kur të përshtatet për t’i instaluar.
 desktop-updates-nvidia-summary = Përfito sa më shumë nga grafika jote NVIDIA
 desktop-updates-nvidia-body = Kalo te drajveri i vetë NVIDIA në Cilësimet.
 desktop-updates-notification-open = Hap

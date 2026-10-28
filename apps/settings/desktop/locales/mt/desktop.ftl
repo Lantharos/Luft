@@ -216,10 +216,6 @@ desktop-users-password-failed = Il-password ma setgħetx tinbidel: { $reason }
 desktop-users-password-timed-out = passwd waqaf iwieġeb
 
 ## Updates
-desktop-updates-available-summary = Hemm aġġornamenti tas-sistema disponibbli
-desktop-updates-available-body = Iftaħ is-Settings biex tniżżilhom u tinstallahom.
-desktop-updates-ready-summary = L-aġġornamenti huma lesti biex jiġu installati
-desktop-updates-ready-body = Irristartja meta jaqbillek biex tinstallahom.
 desktop-updates-nvidia-summary = Ikseb l-aħjar mill-grafika NVIDIA
 desktop-updates-nvidia-body = Aqleb għad-drajver ta’ NVIDIA stess fis-Settings.
 desktop-updates-notification-open = Iftaħ

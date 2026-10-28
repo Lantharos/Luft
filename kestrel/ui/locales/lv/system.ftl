@@ -415,3 +415,9 @@ screenshot-screencast-view = Noklikšķiniet, lai skatītu video
 screenshot-show-in-rover = Rādīt lietotnē Rover
 screenshot-captured = Ekrānuzņēmums uzņemts
 screenshot-captured-body = Attēlu var ielīmēt no starpliktuves
+
+## System updates
+updates-available-title = Ir pieejami sistēmas atjauninājumi
+updates-available-body = Atveriet Iestatījumus, lai tos lejupielādētu un instalētu.
+updates-ready-title = Atjauninājumi ir gatavi instalēšanai
+updates-ready-body = Lai tos instalētu, restartējiet datoru, kad jums ērti.

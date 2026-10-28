@@ -410,3 +410,9 @@ screenshot-screencast-view = Klicka här för att visa videon
 screenshot-show-in-rover = Visa i Rover
 screenshot-captured = Skärmbilden har tagits
 screenshot-captured-body = Du kan klistra in bilden från urklipp
+
+## System updates
+updates-available-title = Systemuppdateringar är tillgängliga
+updates-available-body = Öppna Inställningar för att hämta och installera dem.
+updates-ready-title = Uppdateringarna är redo att installeras
+updates-ready-body = Starta om när det passar dig för att installera dem.

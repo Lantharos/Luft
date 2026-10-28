@@ -404,3 +404,9 @@ screenshot-screencast-view = Videoyu görmek için buraya tıklayın
 screenshot-show-in-rover = Rover uygulamasında göster
 screenshot-captured = Ekran görüntüsü alındı
 screenshot-captured-body = Resmi panodan yapıştırabilirsiniz
+
+## System updates
+updates-available-title = Sistem güncellemeleri var
+updates-available-body = İndirip yüklemek için Ayarlar’ı açın.
+updates-ready-title = Güncellemeler yüklenmeye hazır
+updates-ready-body = Yüklemek için size uygun bir zamanda yeniden başlatın.

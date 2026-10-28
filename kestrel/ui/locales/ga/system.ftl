@@ -413,3 +413,9 @@ screenshot-screencast-view = Cliceáil anseo chun an físeán a fheiceáil
 screenshot-show-in-rover = Taispeáin i Rover
 screenshot-captured = Gabhadh an scáileán
 screenshot-captured-body = Is féidir leat an íomhá a ghreamú ón ngearrthaisce
+
+## System updates
+updates-available-title = Tá nuashonruithe córais ar fáil
+updates-available-body = Oscail na Socruithe chun iad a íoslódáil agus a shuiteáil.
+updates-ready-title = Tá nuashonruithe réidh le suiteáil
+updates-ready-body = Atosaigh nuair a fheileann sé duit chun iad a shuiteáil.

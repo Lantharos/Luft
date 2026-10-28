@@ -3,7 +3,7 @@ use std::io::{self, ErrorKind};
 use std::path::Path;
 use std::time::Duration;
 
-const FILE: &str = "/etc/luft/sleep.conf";
+const FILE: &str = "/var/lib/luft-sleep/sleep.conf";
 const KEY: &str = "power-off-after";
 const DAY: Duration = Duration::from_secs(24 * 60 * 60);
 

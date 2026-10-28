@@ -26,6 +26,8 @@ kestrel/compositor/build.sh
 | `kestrel/run/compositor-build` | Build directory |
 | `kestrel/run/mutter-install` | Installed libraries that development sessions load |
 
+With `KESTREL_MUTTER_CACHE` set to a folder, builds go there under the series' fingerprint and `kestrel/run/mutter-install` links to them, so several checkouts of the same series share one build.
+
 What the patches add, editing them, moving to a new Mutter release and the diagnostics logs are in [the compositor reference](../../docs/components/compositor.md). Where each patch stands upstream is in [Upstream patches](../../docs/upstream.md).
 
 ## License

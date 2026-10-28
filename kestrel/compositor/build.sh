@@ -5,12 +5,8 @@ root="$(cd "$(dirname "$0")/../.." && pwd)"
 compositor="$root/kestrel/compositor"
 run="$root/kestrel/run"
 source_dir="$run/mutter-source"
-build_dir="${1:-$run/compositor-build}"
-prefix="${2:-$run/mutter-install}"
-stamp="$build_dir/kestrel-stamp"
 options=(
-  --prefix="$prefix" --libdir=lib --buildtype=release
-  -Dudev_dir="$prefix/lib/udev" -Dtests=disabled
+  --libdir=lib --buildtype=release -Dtests=disabled
   -Dcogl_tests=false -Dclutter_tests=false -Dmutter_tests=false -Dinstalled_tests=false
 )
 
@@ -24,6 +20,21 @@ fingerprint() {
 
 python3 "$compositor/patches.py" prepare
 current="$(fingerprint)"
+
+if [[ $# -eq 0 && -n "${KESTREL_MUTTER_CACHE:-}" ]]; then
+  mkdir -p "$KESTREL_MUTTER_CACHE"
+  exec 9>"$KESTREL_MUTTER_CACHE/$current.lock"
+  flock 9
+  build_dir="$KESTREL_MUTTER_CACHE/$current-build"
+  prefix="$KESTREL_MUTTER_CACHE/$current"
+  rm -rf "$run/mutter-install"
+  ln -s "$prefix" "$run/mutter-install"
+else
+  build_dir="${1:-$run/compositor-build}"
+  prefix="${2:-$run/mutter-install}"
+fi
+stamp="$build_dir/kestrel-stamp"
+options+=(--prefix="$prefix" -Dudev_dir="$prefix/lib/udev")
 if [[ -f "$prefix/lib/pkgconfig/libmutter-51.pc" && "$(cat "$stamp" 2>/dev/null)" == "$current" ]]; then
   echo "Mutter is up to date in $prefix"
   exit 0

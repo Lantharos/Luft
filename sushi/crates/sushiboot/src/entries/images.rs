@@ -3,6 +3,7 @@ use alloc::string::String;
 use alloc::vec::Vec;
 use core::cmp::Ordering;
 
+use super::counter::Counted;
 use super::pe::{self, Uki};
 use super::{Action, BootEntry, Catalog, Origin, Release, Row, newest_first};
 use crate::files::Volume;
@@ -17,6 +18,7 @@ pub struct Image {
     name: String,
     sort_key: Option<String>,
     uki: Uki,
+    counted: Option<Counted>,
 }
 
 impl Image {
@@ -27,6 +29,7 @@ impl Image {
         name: String,
         sort_key: Option<String>,
         image_version: Option<String>,
+        counted: Option<Counted>,
     ) -> Option<Self> {
         let mut uki = pe::uki(&mut volume.file(&path)?)?;
         uki.image_version = uki.image_version.or(image_version);
@@ -36,7 +39,12 @@ impl Image {
             name,
             sort_key,
             uki,
+            counted,
         })
+    }
+
+    fn bad(&self) -> bool {
+        self.counted.as_ref().is_some_and(Counted::bad)
     }
 
     fn version(&self) -> &str {
@@ -104,6 +112,11 @@ impl Image {
                     .clone()
                     .unwrap_or_else(|| self.version().into()),
             }),
+            counted: if profile == 0 {
+                self.counted.clone()
+            } else {
+                None
+            },
         }
     }
 }
@@ -115,7 +128,7 @@ pub fn scan(volume: &mut Volume, origin: &Origin) -> Vec<Image> {
         .filter(|listed| !listed.directory && listed.name.to_ascii_lowercase().ends_with(".efi"))
         .filter_map(|listed| {
             let path = format!("{IMAGES}\\{}", listed.name);
-            Image::open(volume, origin, path, listed.name, None, None)
+            Image::open(volume, origin, path, listed.name, None, None, None)
         })
         .collect()
 }
@@ -136,10 +149,14 @@ fn without_lockdown(command_line: &str) -> String {
 }
 
 pub fn add(catalog: &mut Catalog, mut images: Vec<Image>, secure_boot: bool) {
-    images.sort_by(Image::order);
-    let mut listed: Vec<&str> = Vec::new();
+    images.sort_by(|a, b| a.bad().cmp(&b.bad()).then_with(|| a.order(b)));
+    let mut listed: Vec<&Image> = Vec::new();
     for image in &images {
-        let newest = !listed.contains(&image.uki.os.as_str());
+        let first = listed
+            .iter()
+            .find(|other| other.uki.os == image.uki.os)
+            .copied();
+        let newest = first.is_none();
         let name = image.uki.name.as_deref();
         let title = match name {
             Some(name) if image.uki.image_version.is_none() && newest => name.into(),
@@ -149,11 +166,17 @@ pub fn add(catalog: &mut Catalog, mut images: Vec<Image>, secure_boot: bool) {
             _ => image.release(),
         };
         let main = catalog.push(image.entry(0, title, secure_boot));
-        if newest {
-            listed.push(&image.uki.os);
-            catalog.main.push(Row::Entry(main));
-        } else {
-            catalog.previous.push(main);
+        match first {
+            None => {
+                listed.push(image);
+                catalog.main.push(Row::Entry(main));
+            }
+            Some(first) => {
+                catalog.previous.push(main);
+                if image.bad() && image.order(first).is_lt() {
+                    catalog.failed = Some(main);
+                }
+            }
         }
         for (profile, details) in image.uki.profiles.iter().enumerate().skip(1) {
             let title = details.title.clone().unwrap_or_default();

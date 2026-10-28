@@ -1,7 +1,7 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
-const ON_TRIAL = '/sys/firmware/efi/efivars/LuftBootTrying-b6a4c1e2-3f5d-4c8a-9e71-2d0f6a8b5c3e';
+const ON_TRIAL = '/sys/firmware/efi/efivars/LoaderBootCountPath-4a67b082-0a4c-41cf-b6c7-440b29bb8c4f';
 const SETTLE_SECONDS = 5;
 
 export interface StartupSignals {

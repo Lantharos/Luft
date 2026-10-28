@@ -12,7 +12,7 @@ use super::error::Error;
 use super::properties::{self, Dict};
 use super::shown::Shown;
 use super::status::{self, Status};
-use crate::boot::{attempts, other_systems, startup};
+use crate::boot::{other_systems, started, startup};
 use crate::disk;
 use crate::disk::layout::{self, old_system};
 use crate::disk::unlock::keys;
@@ -267,7 +267,7 @@ impl Trust {
     ) -> Result<(), Error> {
         self.authorize(connection, &header, CONFIRM_STARTUP).await?;
         let _activity = self.idle.hold();
-        tokio::task::spawn_blocking(attempts::mark_good)
+        tokio::task::spawn_blocking(started::confirm)
             .await
             .map_err(|_| Error::Failed("The startup couldn't be confirmed.".to_owned()))??;
         Ok(())

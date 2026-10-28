@@ -1,4 +1,5 @@
 mod bls;
+mod counter;
 mod images;
 mod loaders;
 mod pe;
@@ -13,8 +14,8 @@ use alloc::vec::Vec;
 use uefi::Handle;
 
 use crate::files::Volume;
-use crate::loader::attempts::Attempts;
 use crate::start::firmware;
+use counter::Counted;
 
 pub enum Action {
     Linux {
@@ -35,6 +36,7 @@ pub struct BootEntry {
     pub volume: Handle,
     pub action: Action,
     pub release: Option<Release>,
+    pub counted: Option<Counted>,
 }
 
 pub struct Release {
@@ -63,6 +65,7 @@ pub struct Catalog {
     pub main: Vec<Row>,
     pub previous: Vec<usize>,
     pub others: Vec<usize>,
+    pub failed: Option<usize>,
 }
 
 #[derive(Clone)]
@@ -127,6 +130,7 @@ impl Catalog {
                 volume: boot_device,
                 action: Action::FirmwareSetup,
                 release: None,
+                counted: None,
             });
             catalog.main.push(Row::Entry(index));
         }
@@ -142,12 +146,6 @@ impl Catalog {
         self.main.iter().find_map(|row| match row {
             Row::Entry(index) => Some(*index),
             Row::Previous => self.previous.first().copied(),
-        })
-    }
-
-    pub fn on_trial(&self, index: usize, attempts: &Attempts) -> bool {
-        self.entries[index].image().is_some_and(|(image, release)| {
-            !attempts.is_good(image) && self.good(release, attempts).is_some()
         })
     }
 
@@ -173,22 +171,6 @@ impl Catalog {
                     .is_some_and(|(other, older)| other != path && older.os == release.os)
             })
             .map(|(older, _)| older)
-    }
-
-    pub fn going_back(&self, index: usize, attempts: &Attempts) -> Option<usize> {
-        let (image, release) = self.entries[index].image()?;
-        if attempts.is_good(image) || !attempts.exhausted(image) {
-            return None;
-        }
-        self.good(release, attempts)
-    }
-
-    fn good(&self, release: &Release, attempts: &Attempts) -> Option<usize> {
-        self.entries.iter().position(|entry| {
-            entry
-                .image()
-                .is_some_and(|(image, other)| other.os == release.os && attempts.is_good(image))
-        })
     }
 
     pub fn find(&self, pattern: &str) -> Option<usize> {

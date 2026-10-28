@@ -1,22 +1,39 @@
+use std::mem::MaybeUninit;
+use std::path::{Path, PathBuf};
+
 use anyhow::{Context, Result};
+use rustix::fs::inotify;
 use serde_json::Value;
 
 use crate::paths::RUNTIME;
 use crate::system::firmware::efi;
 use crate::system::host::command::Tool;
 
-const GOOD: &str = "LuftBootGood";
-const TRIED: &str = "LuftBootTried";
-const TRYING: &str = "LuftBootTrying";
 const WENT_BACK: &str = "LuftBootWentBack";
 const NOTICE: &str = "went-back";
+const CONFIRMED: &str = "startup-confirmed";
 
-pub fn mark_good() -> Result<()> {
-    let Some(image) = efi::luft_variable(TRYING) else {
-        return Ok(());
-    };
-    efi::set_luft_variable(GOOD, Some(&image)).context("Remembering the version that started")?;
-    efi::set_luft_variable(TRIED, None).context("Forgetting the startup attempts")?;
+fn confirmed() -> PathBuf {
+    Path::new(RUNTIME).join(CONFIRMED)
+}
+
+pub fn confirm() -> Result<()> {
+    std::fs::create_dir_all(RUNTIME)?;
+    std::fs::write(confirmed(), b"").context("Noting that Luft started")
+}
+
+pub fn wait_until_confirmed() -> Result<()> {
+    let watcher = inotify::init(inotify::CreateFlags::CLOEXEC)?;
+    inotify::add_watch(
+        &watcher,
+        RUNTIME,
+        inotify::WatchFlags::CREATE | inotify::WatchFlags::MOVED_TO,
+    )?;
+    let mut buffer = [MaybeUninit::uninit(); 1024];
+    let mut events = inotify::Reader::new(&watcher, &mut buffer);
+    while !confirmed().exists() {
+        events.next()?;
+    }
     Ok(())
 }
 

@@ -1,4 +1,3 @@
-pub mod attempts;
 mod entry;
 pub mod esp;
 mod fallback;
@@ -7,4 +6,5 @@ mod options;
 pub mod other_systems;
 mod partition;
 mod pe;
+pub mod started;
 pub mod startup;

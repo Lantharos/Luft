@@ -2,6 +2,7 @@ use alloc::format;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
+use super::counter::{self, Counted};
 use super::images::Image;
 use super::{Action, BootEntry, Origin};
 use crate::files::{self, Volume};
@@ -34,15 +35,24 @@ pub fn scan(volume: &mut Volume, origin: &Origin, secure_boot: bool) -> Found {
         else {
             continue;
         };
-        let sort_key = entry.sort_key.unwrap_or_else(|| listed.name.clone());
+        let (name, tries) = counter::split(&listed.name);
+        let sort_key = entry.sort_key.unwrap_or_else(|| name.clone());
+        let counted = tries.map(|(stem, tries)| Counted {
+            volume: origin.handle,
+            directory: ENTRIES,
+            stem,
+            file: listed.name.clone(),
+            tries,
+        });
         if let Action::Efi { path, .. } = &entry.action
             && let Some(image) = Image::open(
                 volume,
                 origin,
                 files::efi_path(path),
-                listed.name.clone(),
+                name.clone(),
                 Some(sort_key.clone()),
                 entry.version.clone(),
+                counted,
             )
         {
             found.images.push(image);
@@ -59,11 +69,12 @@ pub fn scan(volume: &mut Volume, origin: &Origin, secure_boot: bool) -> Found {
         others.push((
             sort_key,
             BootEntry {
-                id: origin.id(&listed.name),
+                id: origin.id(&name),
                 title: origin.title(&entry.title),
                 volume: origin.handle,
                 action,
                 release: None,
+                counted: None,
             },
         ));
     }

@@ -1,0 +1,2 @@
+(allow init_t dosfs_t (dir (getattr search open read write add_name remove_name)))
+(allow init_t dosfs_t (file (getattr open read rename)))

@@ -45,6 +45,7 @@ for unit in "$trust"/systemd/*; do
 done
 place "$trust/trustd.tmpfiles" /usr/lib/tmpfiles.d/trustd.conf
 place "$trust/luft-nvpcr.cil" /usr/share/selinux/packages/luft-nvpcr.cil
+place "$trust/luft-bless-boot.cil" /usr/share/selinux/packages/luft-bless-boot.cil
 place "$trust/com.lantharos.Trust1.service" /usr/share/dbus-1/system-services/com.lantharos.Trust1.service
 place "$trust/com.lantharos.Trust1.conf" /usr/share/dbus-1/system.d/com.lantharos.Trust1.conf
 place "$trust/com.lantharos.Trust1.xml" /usr/share/dbus-1/interfaces/com.lantharos.Trust1.xml

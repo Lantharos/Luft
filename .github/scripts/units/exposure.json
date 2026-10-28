@@ -37,6 +37,7 @@
 	"security/data/trust/systemd/trustd-before-restart.service": 8.7,
 	"security/data/trust/systemd/trustd-drives.service": 0.9,
 	"security/data/trust/systemd/trustd-follow-up.service": 7.9,
+	"security/data/trust/systemd/trustd-startup-check.service": 1.2,
 	"security/data/trust/systemd/trustd-system-disk.service": 7.9,
 	"security/data/trust/systemd/trustd-went-back.service": 8.7,
 	"security/data/trust/systemd/trustd.service": 7.9,

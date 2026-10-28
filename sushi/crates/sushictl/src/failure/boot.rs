@@ -34,13 +34,7 @@ pub fn previous_version() -> Option<String> {
 }
 
 pub fn on_trial() -> bool {
-    match (
-        variable("LuftBootTrying", LUFT),
-        variable("LuftBootGood", LUFT),
-    ) {
-        (Some(trying), Some(good)) => trying != good,
-        _ => false,
-    }
+    variable("LoaderBootCountPath", LOADER).is_some()
 }
 
 pub fn go_back() -> io::Result<()> {

@@ -108,8 +108,8 @@
       <arg name="resized" type="t" direction="out"/>
     </method>
     <!-- Called by the login screen or the desktop once it has been shown for a moment, and accepted from anyone
-         in the session at the screen. Remembers the running version as one that starts, so an update that never
-         gets this far goes back to it. -->
+         in the session at the screen. Completes the start, so systemd-bless-boot marks the running version's
+         boot entry as good, and an update that never gets this far goes back to the version before. -->
     <method name="ConfirmStartup"/>
   </interface>
 

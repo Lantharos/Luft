@@ -10,6 +10,7 @@ use crate::entries::{Catalog, volume};
 const LOADER: VariableVendor = VariableVendor(guid!("4a67b082-0a4c-41cf-b6c7-440b29bb8c4f"));
 const ENTRY_DEFAULT: u64 = 1 << 2;
 const ENTRY_ONESHOT: u64 = 1 << 3;
+const BOOT_COUNTING: u64 = 1 << 4;
 const XBOOTLDR: u64 = 1 << 5;
 const MULTI_PROFILE_UKI: u64 = 1 << 14;
 
@@ -65,7 +66,8 @@ pub fn describe(catalog: &Catalog, boot_device: Handle) {
     );
     announce(
         cstr16!("LoaderFeatures"),
-        &(ENTRY_DEFAULT | ENTRY_ONESHOT | XBOOTLDR | MULTI_PROFILE_UKI).to_le_bytes(),
+        &(ENTRY_DEFAULT | ENTRY_ONESHOT | BOOT_COUNTING | XBOOTLDR | MULTI_PROFILE_UKI)
+            .to_le_bytes(),
     );
     let entries: Vec<u8> = catalog
         .entries
@@ -77,4 +79,8 @@ pub fn describe(catalog: &Catalog, boot_device: Handle) {
 
 pub fn selected(id: &str) {
     announce(cstr16!("LoaderEntrySelected"), &utf16(id));
+}
+
+pub fn boot_count_path(path: &str) {
+    announce(cstr16!("LoaderBootCountPath"), &utf16(path));
 }

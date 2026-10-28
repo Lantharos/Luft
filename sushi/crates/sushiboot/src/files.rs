@@ -12,6 +12,8 @@ use uefi::{CString16, Handle};
 
 use crate::protocol;
 
+const RENAME_STORAGE: usize = 1024;
+
 pub struct Volume {
     _fs: ScopedProtocol<SimpleFileSystem>,
     root: Directory,
@@ -63,6 +65,29 @@ impl Volume {
 
     pub fn read(&mut self, path: &str) -> Option<Vec<u8>> {
         read_to_end(&mut self.file(path)?)
+    }
+
+    pub fn rename(&mut self, path: &str, name: &str) -> Option<()> {
+        let mut file = self
+            .root
+            .open(&path16(path)?, FileMode::ReadWrite, FileAttribute::empty())
+            .ok()?;
+        let info = file.get_boxed_info::<FileInfo>().ok()?;
+        let name = CString16::try_from(name).ok()?;
+        let mut storage = vec![0u8; RENAME_STORAGE];
+        let renamed = FileInfo::new(
+            &mut storage,
+            info.file_size(),
+            info.physical_size(),
+            *info.create_time(),
+            *info.last_access_time(),
+            *info.modification_time(),
+            info.attribute(),
+            &name,
+        )
+        .ok()?;
+        file.set_info(renamed).ok()?;
+        file.flush().ok()
     }
 
     pub fn list(&mut self, path: &str) -> Vec<Listed> {

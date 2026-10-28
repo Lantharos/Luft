@@ -1,0 +1,83 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <imeri@lanth.me>
+Date: Tue, 27 Oct 2026 23:12:22 +0100
+Subject: [PATCH] composefs: Give a new deployment's boot entry tries for boot
+ counting
+
+systemd-boot and other boot loaders count down the tries in a boot
+entry's file name, name+LEFT-DONE.conf, and systemd-bless-boot drops
+the counter once boot-complete.target is reached, so a deployment that
+never starts well enough falls back to the entry before it.
+kernel-install gives new entries tries from /etc/kernel/tries, but the
+entries bootc writes never carried a counter.
+
+When a deployment is staged next to the booted one and
+/etc/kernel/tries or /usr/lib/kernel/tries holds a number, name the new
+primary entry with that many tries. A first install has nothing to fall
+back to and gets none, and a rollback writes its entries without
+counters as before.
+---
+ crates/lib/src/bootc_composefs/boot.rs | 36 ++++++++++++++++++++++++--
+ 1 file changed, 34 insertions(+), 2 deletions(-)
+
+diff --git a/crates/lib/src/bootc_composefs/boot.rs b/crates/lib/src/bootc_composefs/boot.rs
+index ac3f13d6..0d838502 100644
+--- a/crates/lib/src/bootc_composefs/boot.rs
++++ b/crates/lib/src/bootc_composefs/boot.rs
+@@ -524,6 +524,38 @@ pub fn type1_entry_conf_file_name(
+     format!("{BLS_ENTRY_FILE_PREFIX}{os_id_safe}-{version}-{priority}.conf")
+ }
+ 
++/// Where `kernel-install` and bootc look for the number of tries a new
++/// deployment gets before the boot loader stops picking it.
++const BOOT_TRIES: [&str; 2] = ["/etc/kernel/tries", "/usr/lib/kernel/tries"];
++
++fn boot_tries() -> Option<u32> {
++    BOOT_TRIES
++        .iter()
++        .find_map(|path| std::fs::read_to_string(path).ok())
++        .and_then(|text| text.trim().parse().ok())
++        .filter(|tries| *tries > 0)
++}
++
++/// Generate the BLS Type 1 entry filename for a new deployment.
++///
++/// When there is a deployment to go back to and [`BOOT_TRIES`] holds a
++/// number, the name carries that many tries in the boot counting format,
++/// `…+3.conf`: the boot loader counts them down at each start, and
++/// `systemd-bless-boot` drops the counter once the deployment has started
++/// well, or the boot loader falls back to the previous entry once none are
++/// left.
++pub(crate) fn primary_entry_file_name(
++    os_id: &str,
++    version: impl std::fmt::Display,
++    upgrade: bool,
++) -> String {
++    let name = type1_entry_conf_file_name(os_id, version, FILENAME_PRIORITY_PRIMARY);
++    match boot_tries().filter(|_| upgrade) {
++        Some(tries) => format!("{}+{tries}.conf", name.trim_end_matches(".conf")),
++        None => name,
++    }
++}
++
+ /// Generate sort key for the primary (new/upgraded) boot entry.
+ /// Format: bootc-{id}-0
+ /// Systemd-boot sorts ascending by sort-key, so "0" comes first.
+@@ -1036,7 +1068,7 @@ pub(crate) fn setup_composefs_bls_boot(
+         .with_context(|| format!("Opening {config_path:?}"))?;
+ 
+     loader_entries_dir.atomic_write(
+-        type1_entry_conf_file_name(&os_id, &bls_config.version(), FILENAME_PRIORITY_PRIMARY),
++        primary_entry_file_name(&os_id, bls_config.version(), booted_bls.is_some()),
+         bls_config.to_string().as_bytes(),
+     )?;
+ 
+@@ -1746,7 +1778,7 @@ fn write_systemd_uki_config(
+ 
+     entries_dir
+         .atomic_write(
+-            type1_entry_conf_file_name(os_id, &bls_conf.version(), FILENAME_PRIORITY_PRIMARY),
++            primary_entry_file_name(os_id, bls_conf.version(), booted_bls.is_some()),
+             bls_conf.to_string().as_bytes(),
+         )
+         .context("Writing conf file")?;

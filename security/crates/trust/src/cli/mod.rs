@@ -6,7 +6,7 @@ use std::path::PathBuf;
 use anyhow::{Result, bail};
 use clap::{Parser, Subcommand};
 
-use crate::boot::{attempts, startup};
+use crate::boot::{started, startup};
 use crate::disk;
 use crate::keys::{mok, others};
 use crate::service::{actions, status};
@@ -85,6 +85,8 @@ enum StartupAction {
     },
     /// Make the version before the default after an update didn't start, and say so
     WentBack,
+    /// Wait until the login screen or the desktop has worked since the computer started
+    Wait,
 }
 
 #[derive(Subcommand)]
@@ -195,7 +197,8 @@ fn secure_boot(action: SecureBootAction) -> Result<()> {
 fn startup(action: StartupAction) -> Result<()> {
     match action {
         StartupAction::Install { esp } => startup::install(esp.as_deref()),
-        StartupAction::WentBack => attempts::went_back(),
+        StartupAction::WentBack => started::went_back(),
+        StartupAction::Wait => started::wait_until_confirmed(),
     }
 }
 

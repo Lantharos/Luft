@@ -23,8 +23,7 @@ use uefi::proto::loaded_image::LoadedImage;
 use uefi::{Handle, Identify};
 
 use entries::Catalog;
-use loader::attempts::{self, Attempts};
-use loader::{conf, last, vars};
+use loader::{back, conf, last, vars};
 use screen::Screen;
 use start::firmware;
 
@@ -43,15 +42,17 @@ fn graphics_handle() -> Option<Handle> {
         })
 }
 
-fn note_attempt(catalog: &Catalog, chosen: usize, failed: Option<usize>, attempts: &mut Attempts) {
-    if let Some((image, _)) = catalog.entries[chosen].image() {
-        let counted = catalog.on_trial(chosen, attempts);
-        attempts.start(image, counted);
+fn note_start(catalog: &Catalog, chosen: usize) {
+    let entry = &catalog.entries[chosen];
+    if let Some(counted) = &entry.counted {
+        counted.start();
     }
-    if let Some((image, _)) = failed.and_then(|failed| catalog.entries[failed].image())
-        && failed != Some(chosen)
+    if let Some((image, _)) = catalog
+        .failed
+        .filter(|failed| *failed != chosen)
+        .and_then(|failed| catalog.entries[failed].image())
     {
-        attempts::went_back(image);
+        back::went_back(image);
     }
 }
 
@@ -65,7 +66,7 @@ fn efi_main() -> Status {
         return Status::LOAD_ERROR;
     };
 
-    let catalog = Catalog::collect(device, firmware::secure_boot());
+    let mut catalog = Catalog::collect(device, firmware::secure_boot());
     let Some(first) = catalog.first() else {
         return Status::NOT_FOUND;
     };
@@ -81,14 +82,12 @@ fn efi_main() -> Status {
     .flatten()
     .find_map(|pattern| catalog.find(pattern))
     .unwrap_or(first);
-    let mut attempts = Attempts::load();
-    let going_back = match attempts::take_go_back().and_then(|entry| catalog.find(&entry)) {
-        Some(left) => catalog.image_of(left).zip(catalog.older(left)),
-        None => catalog
-            .going_back(default, &attempts)
-            .map(|previous| (default, previous)),
-    };
-    let failed = going_back.map(|(failed, _)| failed);
+    let going_back = back::take_go_back()
+        .and_then(|entry| catalog.find(&entry))
+        .and_then(|left| catalog.image_of(left).zip(catalog.older(left)));
+    if let Some((failed, _)) = going_back {
+        catalog.failed = Some(failed);
+    }
     let default = going_back.map_or(default, |(_, previous)| previous);
     let mut screen = graphics_handle().and_then(|handle| {
         let gop = protocol::shared::<GraphicsOutput>(handle).ok()?;
@@ -104,14 +103,14 @@ fn efi_main() -> Status {
         None => default,
     };
     loop {
-        note_attempt(&catalog, chosen, failed, &mut attempts);
+        note_start(&catalog, chosen);
         last::started(&catalog, chosen);
         let entry = &catalog.entries[chosen];
         vars::selected(&entry.id);
         let previous = catalog
             .older(chosen)
             .and_then(|older| catalog.entries[older].image());
-        attempts::offer_previous(previous.map(|(_, release)| release.version.as_str()));
+        back::offer_previous(previous.map(|(_, release)| release.version.as_str()));
         if start::start(entry).is_ok() {
             return Status::SUCCESS;
         }

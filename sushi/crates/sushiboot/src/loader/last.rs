@@ -2,7 +2,7 @@ use alloc::string::String;
 
 use uefi::{CStr16, cstr16};
 
-use super::attempts::{read, remove, write};
+use super::{read, remove, write};
 use crate::entries::Catalog;
 
 const LAST: &CStr16 = cstr16!("LuftBootLast");

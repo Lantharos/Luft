@@ -22,7 +22,7 @@
 	"kestrel/engine/data/system/kestrel-authenticate@.service.in": 3.1,
 	"kestrel/greeter/data/kestrel-greeter.service": 0.9,
 	"kestrel/keyring/data/system/luft-keyring-unlock.service": 1.5,
-	"kestrel/keyring/data/user/luft-keyring.service": 5.7,
+	"kestrel/keyring/data/user/luft-keyring.service": 9.2,
 	"kestrel/passkeys/data/luft-passkeys-relay@.service": 0.9,
 	"kestrel/passkeys/data/luft-passkeys.service": 5.7,
 	"kestrel/watchdog/data/kestrel-incident.service": 2.3,

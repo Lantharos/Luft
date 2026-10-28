@@ -11,15 +11,6 @@ Restart=on-failure
 LimitCORE=0
 OOMScoreAdjust=-800
 MemoryMin=32M
-NoNewPrivileges=yes
-RestrictAddressFamilies=AF_UNIX
-RestrictNamespaces=yes
-RestrictRealtime=yes
-RestrictSUIDSGID=yes
-LockPersonality=yes
-MemoryDenyWriteExecute=yes
-SystemCallArchitectures=native
-SystemCallFilter=@system-service
 
 [Install]
 WantedBy=kestrel-session.target

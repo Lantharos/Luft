@@ -1,5 +1,2 @@
 (allow systemd_oomd_t self (capability (dac_override)))
-(allow systemd_oomd_t self (cap_userns (kill)))
 (allow systemd_oomd_t cgroup_t (file (write)))
-(allow systemd_oomd_t cgroup_t (dir (setattr)))
-(allow systemd_oomd_t container_domain (process (signull sigkill)))

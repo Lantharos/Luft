@@ -105,6 +105,7 @@ verify_fingerprint (pam_handle_t *handle,
   posix_spawn_file_actions_init (&actions);
   posix_spawn_file_actions_addopen (&actions, STDIN_FILENO, "/dev/null", O_RDONLY, 0);
   posix_spawn_file_actions_adddup2 (&actions, pipe_fds[1], STDOUT_FILENO);
+  posix_spawn_file_actions_addclosefrom_np (&actions, STDERR_FILENO + 1);
   if (posix_spawn (&pid, KESTREL_AUTHENTICATE, &actions, NULL, argv, envp) != 0)
     pid = 0;
   posix_spawn_file_actions_destroy (&actions);
@@ -178,5 +179,5 @@ pam_sm_setcred (pam_handle_t  *handle,
                 int            argc,
                 const char   **argv)
 {
-  return PAM_SUCCESS;
+  return PAM_IGNORE;
 }

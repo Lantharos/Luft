@@ -388,9 +388,54 @@ jobs:
               "localhost/luft:$FEDORA$suffix" "$IMAGE:$VERSION$suffix"
           done
 
-  publish:
+  gate:
+    name: Boot test
     needs: [plan, image]
     if: always() && needs.image.result == 'success'
+    runs-on: ubuntu-26.04
+    timeout-minutes: 75
+    env:
+      VERSION: ${{ needs.plan.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: ./.github/actions/make-room
+
+      - uses: ./.github/actions/registry
+
+      - name: QEMU with KVM
+        run: |
+          echo "LUFT_VM=$RUNNER_TEMP/vm" >> "$GITHUB_ENV"
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm.rules > /dev/null
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+          sudo apt-get update --quiet
+          sudo apt-get install --yes --quiet --no-install-recommends qemu-system-x86 qemu-utils ovmf swtpm
+
+      - name: Install the new nightly
+        run: |
+          password="$(openssl rand -hex 16)"
+          echo "::add-mask::$password"
+          echo "VM_PASSWORD=$password" >> "$GITHUB_ENV"
+          podman pull --quiet "$IMAGE:$VERSION" > /dev/null
+          VM_PASSWORD="$password" VM_FOLLOWS="$IMAGE:$MAJOR-nightly" os/vm/disk.sh "$IMAGE:$VERSION"
+
+      - name: Start it with Secure Boot and sign in
+        run: os/vm/check.py --out "$RUNNER_TEMP/boot-test" session
+
+      - if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: boot-test
+          path: |
+            ${{ runner.temp }}/boot-test
+            ${{ runner.temp }}/vm/install.log
+          if-no-files-found: ignore
+          retention-days: 14
+
+  publish:
+    needs: [plan, image, gate]
+    if: always() && needs.gate.result == 'success'
     runs-on: ubuntu-26.04
     timeout-minutes: 15
     env:

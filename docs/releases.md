@@ -34,6 +34,8 @@ The version is only in the image's labels, the `org.opencontainers.image.version
 
 A nightly is built when `main` has new commits, Fedora published a new base image, or a package the image adds to Fedora's has an update, which happens most days. The build compares the commit and base image recorded in the last nightly's labels and runs `os/image/build.sh updates` on it, which is `dnf check-upgrade` for the packages Luft adds. When all three match, the night is skipped.
 
+Before `:1-nightly` moves, the new image is installed in a VM on the runner the way Install Luft does, started with Secure Boot, signed in to with a password made up for that run, and checked until the desktop and Settings work ([Testing](testing.md#ci)). When that fails, the nightly isn't published, `:1-nightly` stays on the last one that passed, and the run keeps the screenshots and logs.
+
 Helium's newest release is picked up at 01:00, so it lands in that night's build. Sabine has its own releases; a new Sabine version reaches the nightlies first and stable with the next promotion.
 
 A new major version lands on the nightlies first.
@@ -45,7 +47,7 @@ Run the Image workflow with **promote** set to the nightly's version, such as `1
 Before promoting, check that:
 
 - [ ] every check is green on the nightly's commit
-- [ ] a fresh install from it in a VM ([os/vm](../os/vm)) starts and updates
+- [ ] it updates from the release before in a VM ([os/vm](../os/vm))
 - [ ] it has been out for at least two days with no reported regressions
 - [ ] it has run on the maintainer's own laptop
 

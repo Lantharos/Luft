@@ -96,47 +96,42 @@ After signing in again, the session sees an NVIDIA card; removing the file bring
 
 See [Luft Keyring](../kestrel/keyring/README.md#testing) and [Luft Passkeys](../kestrel/passkeys/README.md#development).
 
-## Boot VM
+## VMs
 
-A Fedora system built with Podman, with greetd and Kestrel's login screen, booting through SushiBoot under QEMU and OVMF with SELinux enforcing. It needs no `sudo`. From `sushi`:
+Everything that needs a real computer runs in QEMU VMs from `os/vm`, without `sudo` and without touching the host's drives. They start the same on Fedora and on CI's Ubuntu runners, since the firmware comes from QEMU's firmware descriptors.
 
-```sh
-scripts/vm/tree.sh       # Fedora root tree (first run downloads packages)
-scripts/vm/kestrel.sh    # build Kestrel into the tree
-scripts/vm/security.sh   # build trustd and USB protection into the tree
-scripts/vm/disk.sh       # install Sushi, build the initramfs, root disk and ESP
-scripts/vm/run.sh        # boot it in a window
-```
+| Command | Does |
+| --- | --- |
+| `os/vm/disk.sh [IMAGE]` | Installs a sealed image (default `localhost/luft:45`) onto `os/vm/state/disk.qcow2` with the image's own installer, in a helper VM started from the image itself. The account `luft` gets the password in `VM_PASSWORD` (default `luft-vm`), which is also root's on the serial console and the code that adds Luft's key on shim's blue screen |
+| `os/vm/qemu.sh` | Starts a VM; `--help` lists the options, such as `SECURE_BOOT=1`, `TPM=0`, `ISO=`, extra drives, `HEADLESS=1` and `TIMEOUT=` |
+| `os/vm/control.py` | Screenshots, keys, clicks and root commands over the serial console of a running VM, and `enroll` on shim's blue screen |
+| `os/vm/check.py session` | Starts the installed VM with Secure Boot, adds Luft's key, waits for the login screen, signs in, checks that Kestrel and its settings service stay up and the graphics watchdog saw no problem, and opens Settings |
+| `os/vm/check.py rollback` | Updates the installed VM to a new version and checks that it's marked good once the login screen is up, then to a version whose login screen never starts, and checks that after three tries the computer goes back to the version before |
 
-`make vm-build`, `make vm-build-luks`, `make vm-run` and `make vm-clean` wrap the same steps.
+`LUFT_VM` picks another folder than `os/vm/state`, so VMs can live side by side. `check.py` writes its screenshots, the serial console, the journal and `bootc status` to `check` in that folder, and keeps them when a step fails or times out. Every step has a time limit.
 
-Everything lives in `sushi/vm`; set `SUSHI_VM` to use another folder. The `sushi` account's password, and the disk passphrase, is `sushi-vm`.
+`os/vm/check.sh` holds what the checks of single services share: a check image with the check's files on top of the system, started directly from a drive with the image's kernel, or installed with `disk.sh`. The [installer](#installer), [Luft Keyring and Passkeys](#luft-keyring-and-passkeys), [sleep](../services/sleep/README.md), [Windows](../services/windows/README.md) and [Disks](../apps/disks/README.md) checks use it.
 
-`disk.sh` options:
+SushiBoot and Sushi are tried on the installed image too. `qemu.sh` options that matter for startup:
 
 | Variable | Effect |
 | --- | --- |
-| `LUKS=1` | Encrypts the root disk |
-| `MENU_TIMEOUT=3` | Shows SushiBoot's menu |
-| `DRIVER=initramfs` (default) | Sushi loads the graphics driver itself in the initramfs, as with NVIDIA. Use with `GPU=vga` |
-| `DRIVER=system` | The driver isn't in the initramfs, as right after a kernel update |
-| `DRIVER=udev` | udev loads the driver, which switches the screen off on its own |
-
-`run.sh` options:
-
-| Variable | Effect |
-| --- | --- |
-| `SECURE_BOOT=1` | Secure Boot on, with Microsoft's keys enrolled |
-| `TPM=2` / `TPM=1.2` | A software TPM, kept next to the disk |
+| `TPM=0` / `TPM=1.2` | No TPM, or an old one, instead of a TPM 2.0 kept next to the disk |
 | `XRES=3440 YRES=1440` | Monitor resolution (default 1920×1080) |
 | `GPU=vga` | QEMU's standard VGA instead of virtio |
 | `FRAMEBUFFER=1024x768` | Hands SushiBoot a smaller framebuffer, as some firmware does |
-| `EDID=0` | Doesn't describe the monitor to SushiBoot |
+| `EDID=1` | Describes the monitor to SushiBoot |
 
-Recording boots frame by frame:
+`FRAMEBUFFER` and `EDID` start a small loader from `os/vm/display` before shim, so they need Secure Boot off. Recording boots frame by frame:
 
 ```sh
-scripts/vm/record.py /tmp/frames --seconds 40 --type "16:sushi-vm"   # type the passphrase at 16 s
-scripts/vm/frames.py /tmp/frames                                     # when the screen went black, froze or changed mode
-scripts/vm/journal.sh -b 0 -u sushi                                  # the VM's journal, after it shuts down
+os/vm/record.py /tmp/frames --seconds 40 --type "16:luft-vm"   # type at 16 s
+os/vm/frames.py /tmp/frames                                     # when the screen went black, froze or changed mode
+os/vm/control.py shell 'journalctl -b -1 -u sushi'              # the previous start's journal
 ```
+
+## CI
+
+Every pull request and push to `main`, and a run of the Checks workflow started by hand on a branch, runs, besides the Rust and TypeScript checks above, the Kestrel job when a change can reach Kestrel: its own folders, a crate or interface package it uses, or the build container. In `ghcr.io/lantharos/luft-ci-kestrel`, a Fedora container started with systemd so sessions get a user instance, it checks that Mutter's patch series applies (`patches.py check`), builds Mutter and the engine, and runs the headless session groups `system:session`, `start:search`, `lockScreen:lock`, `lockScreen:unlock`, `panel:surfaces` and `system:watchdog`: the session starts, Start opens and searches, the panel's surfaces open, the lock screen locks and unlocks, and the watchdog's checks pass. Mutter is kept between runs for each patch series and container, and the compilers keep their caches. A failure uploads the session logs and screenshots. `.github/scripts/kestrel/container.sh run COMMAND` runs a command in the same container on any computer with Podman, such as `kestrel/tools/session.sh capture --only lockScreen`.
+
+Before the nightly tag moves, the Image workflow installs the new image in a VM on the runner with `os/vm/disk.sh` and runs `os/vm/check.py session` on it, with a password made up for that run, which also opens Settings in the new session. The tag only moves when it passes; otherwise the screenshots and logs are kept with the run.

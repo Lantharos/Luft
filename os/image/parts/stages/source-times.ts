@@ -37,4 +37,4 @@ function visit(path: string, device: number) {
 }
 
 for (const root of roots) visit(root, lstatSync(root).dev);
-writeFileSync(record, JSON.stringify(seen));
+writeFileSync(record, JSON.stringify({ ...known, ...seen }));

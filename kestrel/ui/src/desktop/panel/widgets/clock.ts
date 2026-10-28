@@ -21,7 +21,6 @@ export class PanelClock {
   setNarrow(narrow: boolean): void {
     if (narrow === this.narrow) return;
     this.narrow = narrow;
-    this.actor.clutter_text.set_line_alignment(narrow ? Pango.Alignment.CENTER : Pango.Alignment.RIGHT);
     this.refresh();
   }
 

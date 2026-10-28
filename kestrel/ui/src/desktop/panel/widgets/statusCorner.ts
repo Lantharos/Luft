@@ -65,7 +65,10 @@ export class StatusCorner {
 
   place(monitor: Monitor): void {
     this.monitor = monitor;
-    this.actor.orientation = isVertical(taskbarPreferences.edge) ? Clutter.Orientation.VERTICAL : Clutter.Orientation.HORIZONTAL;
+    const edge = taskbarPreferences.edge;
+    this.actor.orientation = isVertical(edge) ? Clutter.Orientation.VERTICAL : Clutter.Orientation.HORIZONTAL;
+    const hugged = edge === 'left' ? Clutter.ActorAlign.START : edge === 'right' ? Clutter.ActorAlign.END : Clutter.ActorAlign.FILL;
+    for (const [button] of this.buttons) button.x_align = hugged;
     this.reposition();
   }
 

@@ -40,10 +40,18 @@ function narrowTimeLines(now: GLib.DateTime, twelveHour: boolean, seconds: boole
   return [time.map(part => part.value).join(''), ...second ? [`:${second.value}`] : [], ...period ? [period.value] : []];
 }
 
+function stackedDate(now: GLib.DateTime): string[] {
+  const parts = formatter({ day: 'numeric', month: 'short' }).formatToParts(stamp(now));
+  if (!parts.some(part => /\p{L}/u.test(part.value))) return [parts.map(part => part.value).join('')];
+  const lines: string[] = [];
+  for (const part of parts) {
+    if (part.type !== 'literal') lines.push(part.value);
+    else if (lines.length) lines[lines.length - 1] += part.value.trim();
+  }
+  return lines;
+}
+
 export function narrowText(now: GLib.DateTime, twelveHour: boolean, seconds: boolean, weekday: boolean): string {
-  const date = [
-    ...weekday ? [formatter({ weekday: 'short' }).format(stamp(now))] : [],
-    formatter({ day: 'numeric', month: 'short' }).format(stamp(now)),
-  ];
+  const date = [...weekday ? [formatter({ weekday: 'short' }).format(stamp(now))] : [], ...stackedDate(now)];
   return [...narrowTimeLines(now, twelveHour, seconds), ...date].join('\n');
 }

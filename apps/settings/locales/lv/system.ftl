@@ -161,6 +161,9 @@ settings-updates-apps-count = { $count ->
     [one] Lietotnē Schelf ir atjauninājums { $count } lietotnei
    *[other] Lietotnē Schelf ir atjauninājumi { $count } lietotnēm
 }
+settings-updates-sabine-waiting = Sabine atjauninājums gaida lietotni { $app }
+settings-updates-sabine-update-ready = Lietotnes { $app } atjauninājums ir gatavs lietotnē Schelf
+settings-updates-sabine-update-or-remove = Lai to saņemtu, atjauniniet vai noņemiet lietotni { $app } lietotnē Schelf
 settings-updates-automatic = Automātiskie atjauninājumi
 settings-updates-look = Meklēt atjauninājumus
 settings-updates-look-description = Arī tad, ja Iestatījumi ir aizvērti

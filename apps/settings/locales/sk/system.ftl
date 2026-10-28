@@ -164,6 +164,9 @@ settings-updates-apps-count = { $count ->
     [many] { $count } aplikácie má aktualizácie v aplikácii Schelf
    *[other] { $count } aplikácií má aktualizácie v aplikácii Schelf
 }
+settings-updates-sabine-waiting = Aktualizácia Sabine čaká na { $app }
+settings-updates-sabine-update-ready = V aplikácii Schelf je pripravená aktualizácia pre { $app }
+settings-updates-sabine-update-or-remove = Aktualizáciou alebo odstránením { $app } v aplikácii Schelf ju získate
 settings-updates-automatic = Automatické aktualizácie
 settings-updates-look = Hľadať aktualizácie
 settings-updates-look-description = Aj keď sú Nastavenia zatvorené

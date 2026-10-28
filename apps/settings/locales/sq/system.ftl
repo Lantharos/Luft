@@ -158,6 +158,9 @@ settings-updates-apps-count = { $count ->
     [one] { $count } aplikacion ka përditësim në Schelf
    *[other] { $count } aplikacione kanë përditësime në Schelf
 }
+settings-updates-sabine-waiting = Një përditësim i Sabine pret për { $app }
+settings-updates-sabine-update-ready = Një përditësim për { $app } është gati në Schelf
+settings-updates-sabine-update-or-remove = Përditëso ose hiq { $app } në Schelf për ta marrë
 settings-updates-automatic = Përditësimet automatike
 settings-updates-look = Kërko përditësime
 settings-updates-look-description = Edhe kur Cilësimet janë mbyllur

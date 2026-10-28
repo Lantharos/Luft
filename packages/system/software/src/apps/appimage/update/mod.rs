@@ -127,5 +127,8 @@ pub fn apply(app: &AppImage, task: Task) -> Result<AppImage, String> {
     })?;
     fs::rename(&staging, &app.path).map_err(|error| error.to_string())?;
     integrate::integrate(&app.id, &app.path, &bundle)?;
+    if let Some(sabine_app) = &bundle.sabine_app {
+        sabine_app.record()?;
+    }
     library::find(&app.id)
 }

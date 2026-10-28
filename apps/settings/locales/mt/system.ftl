@@ -167,6 +167,9 @@ settings-updates-apps-count = { $count ->
     [many] { $count } app għandha aġġornamenti f’Schelf
    *[other] { $count } app għandha aġġornamenti f’Schelf
 }
+settings-updates-sabine-waiting = Aġġornament ta’ Sabine qed jistenna lil { $app }
+settings-updates-sabine-update-ready = Aġġornament għal { $app } lest f’Schelf
+settings-updates-sabine-update-or-remove = Aġġorna jew neħħi { $app } f’Schelf biex tiksbu
 settings-updates-automatic = Aġġornamenti awtomatiċi
 settings-updates-look = Fittex aġġornamenti
 settings-updates-look-description = Anke meta s-Settings ikunu magħluqin

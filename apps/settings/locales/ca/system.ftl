@@ -158,6 +158,9 @@ settings-updates-apps-count = { $count ->
     [one] { $count } aplicació té una actualització a Schelf
    *[other] { $count } aplicacions tenen actualitzacions a Schelf
 }
+settings-updates-sabine-waiting = Una actualització de Sabine espera { $app }
+settings-updates-sabine-update-ready = Hi ha una actualització de { $app } a punt a Schelf
+settings-updates-sabine-update-or-remove = Actualitza o elimina { $app } a Schelf per obtenir-la
 settings-updates-automatic = Actualitzacions automàtiques
 settings-updates-look = Cerca actualitzacions
 settings-updates-look-description = Encara que la Configuració estigui tancada

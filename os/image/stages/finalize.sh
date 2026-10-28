@@ -61,6 +61,10 @@ give_keyring_its_group() {
   chmod 2755 /usr/libexec/luft-keyring
 }
 
+check_sabine_apps() {
+  /usr/lib/sabine/bin/current/sabine-service check-apps
+}
+
 write_default_apps() {
   "$(dirname "$0")/default-apps.py" "$(dirname "$0")/../apps" /usr/share/applications/kestrel-mimeapps.list
 }
@@ -111,6 +115,7 @@ enable_units
 configure_toolbox
 configure_security
 check_typelibs
+check_sabine_apps
 write_default_apps
 refresh_caches
 let_line_out_play_beside_headphones

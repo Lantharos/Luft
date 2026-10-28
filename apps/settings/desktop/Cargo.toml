@@ -36,6 +36,7 @@ luft-speech = { workspace = true, features = ["default"] }
 luft-trust.workspace = true
 roxmltree.workspace = true
 sabine.workspace = true
+sabine-service.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 specta.workspace = true

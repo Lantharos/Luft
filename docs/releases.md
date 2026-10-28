@@ -36,7 +36,7 @@ A nightly is built when `main` has new commits, Fedora published a new base imag
 
 Before `:1-nightly` moves, the new image is installed in a VM on the runner the way Install Luft does, started with Secure Boot, signed in to with a password made up for that run, and checked until the desktop and Settings work ([Testing](testing.md#ci)). When that fails, the nightly isn't published, `:1-nightly` stays on the last one that passed, and the run keeps the screenshots and logs.
 
-Helium's newest release is picked up at 01:00, so it lands in that night's build. Sabine has its own releases; a new Sabine version reaches the nightlies first and stable with the next promotion.
+Helium's newest release is picked up at 01:00, so it lands in that night's build. Sabine has its own releases; a new Sabine version reaches the nightlies first and stable with the next promotion. The image build fails when its Sabine would not run one of the image's own apps. On a running system, Sabine holds back an update that would stop an installed app, until a Luft update brings newer apps or, for an app the person installed, they update or remove it; Settings → Updates names those apps.
 
 A new major version lands on the nightlies first.
 

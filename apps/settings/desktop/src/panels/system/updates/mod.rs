@@ -3,6 +3,7 @@ mod firmware;
 mod graphics;
 mod image;
 mod overview;
+mod waiting;
 mod schedule;
 mod state;
 mod store;
@@ -28,6 +29,7 @@ pub use schedule::CHECK_ARGUMENT;
 use crate::L10N;
 
 const APP_UPDATES: &str = "schelf:updates";
+const INSTALLED_APPS: &str = "schelf:installed";
 
 static FIRST_RUN: OnceCell<()> = OnceCell::const_new();
 
@@ -156,6 +158,10 @@ fn open_apps(Token { token }: Token) -> Result<(), String> {
     launch::open(APP_UPDATES, token.as_deref()).map_err(|error| error.to_string())
 }
 
+fn open_installed_apps(Token { token }: Token) -> Result<(), String> {
+    launch::open(INSTALLED_APPS, token.as_deref()).map_err(|error| error.to_string())
+}
+
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     state::attach(events);
     image::watch();
@@ -182,4 +188,5 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         })
         .command_async("updates_set_preferences", set_preferences)
         .command("updates_open_apps", open_apps)
+        .command("updates_open_installed_apps", open_installed_apps)
 }

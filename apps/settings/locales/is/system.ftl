@@ -158,6 +158,9 @@ settings-updates-apps-count = { $count ->
     [one] { $count } forrit er með uppfærslu í Schelf
    *[other] { $count } forrit eru með uppfærslur í Schelf
 }
+settings-updates-sabine-waiting = Sabine-uppfærsla bíður eftir { $app }
+settings-updates-sabine-update-ready = Uppfærsla fyrir { $app } er tilbúin í Schelf
+settings-updates-sabine-update-or-remove = Uppfærðu eða fjarlægðu { $app } í Schelf til að fá hana
 settings-updates-automatic = Sjálfvirkar uppfærslur
 settings-updates-look = Leita að uppfærslum
 settings-updates-look-description = Líka þegar Stillingar eru lokaðar

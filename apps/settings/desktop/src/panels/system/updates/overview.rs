@@ -6,6 +6,7 @@ use serde::Serialize;
 use specta::Type;
 
 use super::image;
+use super::waiting::{self, SabineWait};
 use super::state;
 use super::store::Checked;
 
@@ -14,6 +15,7 @@ use super::store::Checked;
 pub struct UpdatesOverview {
     checked: Option<u64>,
     apps: Option<usize>,
+    sabine: Vec<SabineWait>,
     pub system: image::ImageOverview,
 }
 
@@ -37,11 +39,18 @@ pub fn load(refresh: Option<Task>) -> Result<(), String> {
     state::set_overview(UpdatesOverview {
         checked: checked.at,
         apps: state::overview().and_then(|overview| overview.apps),
+        sabine: state::overview()
+            .map(|overview| overview.sabine)
+            .unwrap_or_default(),
         system,
     });
     std::thread::spawn(move || {
         let apps = updates::count();
-        state::edit_overview(|overview| overview.apps = Some(apps));
+        let waiting = waiting::apps();
+        state::edit_overview(|overview| {
+            overview.apps = Some(apps);
+            overview.sabine = waiting;
+        });
     });
     Ok(())
 }

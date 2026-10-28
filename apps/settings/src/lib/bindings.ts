@@ -470,6 +470,9 @@ export const commands = {
 	updatesOpenApps: (params: {
 		token?: string | null,
 	}, options?: InvokeOptions) => invoke<null>("updates_open_apps", params, options),
+	updatesOpenInstalledApps: (params: {
+		token?: string | null,
+	}, options?: InvokeOptions) => invoke<null>("updates_open_installed_apps", params, options),
 	updatesPreferences: (options?: InvokeOptions) => invoke<Preferences>("updates_preferences", {}, options),
 	updatesRestart: (options?: InvokeOptions) => invoke<null>("updates_restart", {}, options),
 	updatesRollback: (options?: InvokeOptions) => invoke<null>("updates_rollback", {}, options),
@@ -1284,6 +1287,15 @@ export type Route = {
 	metric: number | null,
 };
 
+/**
+ *  An app that a waiting Sabine update would stop, which the user installed
+ *  and so updates or removes themselves.
+ */
+export type SabineWait = {
+	name: string,
+	update: boolean,
+};
+
 export type SandboxDevice = "usb" | "serial";
 
 export type Schedule = "daily" | "weekly" | "never";
@@ -1450,6 +1462,7 @@ export type UpdateKind = "check" | "download" | "firmware" | "rollback" | "switc
 export type UpdatesOverview = {
 	checked: number | null,
 	apps: number | null,
+	sabine: SabineWait[],
 	system: ImageOverview,
 };
 

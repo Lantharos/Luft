@@ -158,6 +158,9 @@ settings-updates-apps-count = { $count ->
     [one] { $count } sovelluksen voi päivittää Schelfissä
    *[other] { $count } sovellusta voi päivittää Schelfissä
 }
+settings-updates-sabine-waiting = Sabine-päivitys odottaa sovellusta { $app }
+settings-updates-sabine-update-ready = Sovelluksen { $app } päivitys on valmiina Schelfissä
+settings-updates-sabine-update-or-remove = Saat sen päivittämällä tai poistamalla sovelluksen { $app } Schelfissä
 settings-updates-automatic = Automaattiset päivitykset
 settings-updates-look = Etsi päivityksiä
 settings-updates-look-description = Myös silloin, kun Asetukset on suljettu

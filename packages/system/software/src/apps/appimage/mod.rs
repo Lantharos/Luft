@@ -7,6 +7,7 @@ mod full_access;
 mod grants;
 mod integrate;
 mod library;
+mod sabine;
 mod update;
 
 pub use bundle::{Bundle, Icon, icons, read as inspect};

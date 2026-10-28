@@ -158,6 +158,9 @@ settings-updates-apps-count = { $count ->
     [one] { $count } alkalmazáshoz van frissítés a Schelf alkalmazásban
    *[other] { $count } alkalmazáshoz van frissítés a Schelf alkalmazásban
 }
+settings-updates-sabine-waiting = Egy Sabine-frissítés erre vár: { $app }
+settings-updates-sabine-update-ready = Frissítés érhető el a Schelfben ehhez: { $app }
+settings-updates-sabine-update-or-remove = A megkapásához frissítse vagy távolítsa el a Schelfben ezt: { $app }
 settings-updates-automatic = Automatikus frissítések
 settings-updates-look = Frissítések keresése
 settings-updates-look-description = Akkor is, ha a Beállítások be van zárva

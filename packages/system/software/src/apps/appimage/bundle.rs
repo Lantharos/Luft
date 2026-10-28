@@ -7,6 +7,7 @@ use backhand::{FilesystemReader, InnerNode, Node, SquashfsFileReader};
 
 use super::declaration::{self, Declaration};
 use super::elf;
+use super::sabine::SabineApp;
 use super::library::IconSize;
 use crate::apps::chromium;
 use crate::apps::desktop::DesktopEntry;
@@ -32,6 +33,8 @@ pub struct Bundle {
     pub chromium: bool,
     /// What a Sabine app declares about its sandbox; none for other apps.
     pub declaration: Option<Declaration>,
+    /// The Sabine app it holds and the Sabine build it was made with.
+    pub sabine_app: Option<SabineApp>,
 }
 
 struct Contents<'a, 'b> {
@@ -198,13 +201,19 @@ pub fn read(path: &Path) -> Result<Bundle, String> {
         String::from_utf8_lossy(&contents.read(&desktop).ok_or_else(unreadable)?).into_owned();
     let entry = DesktopEntry::parse(&entry_text);
     let icons = contents.icons(entry.get("Icon"));
-    let declaration = contents
+    let manifest = contents
         .nodes
         .keys()
         .find(|path| declaration::is_manifest(path))
         .map(|manifest| {
             let text = contents.read(manifest).ok_or_else(unreadable)?;
-            Declaration::read(&String::from_utf8_lossy(&text))
+            Ok::<_, String>(String::from_utf8_lossy(&text).into_owned())
+        })
+        .transpose()?;
+    let declaration = manifest
+        .as_deref()
+        .map(|manifest| {
+            Declaration::read(manifest)
                 .map_err(|error| format!("What it asks of its sandbox can't be read: {error}"))
         })
         .transpose()?;
@@ -228,5 +237,6 @@ pub fn read(path: &Path) -> Result<Bundle, String> {
         electron,
         chromium,
         declaration,
+        sabine_app: manifest.as_deref().and_then(SabineApp::read),
     })
 }

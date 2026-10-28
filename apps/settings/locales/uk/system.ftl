@@ -164,6 +164,9 @@ settings-updates-apps-count = { $count ->
     [many] { $count } програм мають оновлення в магазині Schelf
    *[other] { $count } програми мають оновлення в магазині Schelf
 }
+settings-updates-sabine-waiting = Оновлення Sabine чекає на програму { $app }
+settings-updates-sabine-update-ready = Оновлення програми { $app } готове в магазині Schelf
+settings-updates-sabine-update-or-remove = Щоб отримати його, оновіть або видаліть програму { $app } у магазині Schelf
 settings-updates-automatic = Автоматичні оновлення
 settings-updates-look = Шукати оновлення
 settings-updates-look-description = Навіть коли Параметри закрито

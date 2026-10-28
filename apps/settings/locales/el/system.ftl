@@ -158,6 +158,9 @@ settings-updates-apps-count = { $count ->
     [one] { $count } εφαρμογή έχει ενημέρωση στο Schelf
    *[other] { $count } εφαρμογές έχουν ενημερώσεις στο Schelf
 }
+settings-updates-sabine-waiting = Μια ενημέρωση του Sabine περιμένει την εφαρμογή { $app }
+settings-updates-sabine-update-ready = Μια ενημέρωση για την εφαρμογή { $app } είναι έτοιμη στο Schelf
+settings-updates-sabine-update-or-remove = Ενημερώστε ή αφαιρέστε την εφαρμογή { $app } στο Schelf για να τη λάβετε
 settings-updates-automatic = Αυτόματες ενημερώσεις
 settings-updates-look = Αναζήτηση ενημερώσεων
 settings-updates-look-description = Ακόμη και όταν οι Ρυθμίσεις είναι κλειστές

@@ -167,6 +167,9 @@ settings-updates-apps-count = { $count ->
     [many] Nuashonruithe i Schelf do { $count } n-aip
    *[other] Nuashonruithe i Schelf do { $count } aip
 }
+settings-updates-sabine-waiting = Tá nuashonrú Sabine ag fanacht ar { $app }
+settings-updates-sabine-update-ready = Tá nuashonrú do { $app } réidh i Schelf
+settings-updates-sabine-update-or-remove = Nuashonraigh nó bain { $app } i Schelf chun é a fháil
 settings-updates-automatic = Nuashonruithe uathoibríocha
 settings-updates-look = Lorg nuashonruithe
 settings-updates-look-description = Fiú nuair atá na Socruithe dúnta

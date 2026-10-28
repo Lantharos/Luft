@@ -161,6 +161,9 @@ settings-updates-apps-count =
         [one] { $count } rakendus ootab rakenduses Schelf värskendust
        *[other] { $count } rakendust ootab rakenduses Schelf värskendust
     }
+settings-updates-sabine-waiting = Sabine värskendus ootab rakendust { $app }
+settings-updates-sabine-update-ready = Rakenduse { $app } värskendus on rakenduses Schelf valmis
+settings-updates-sabine-update-or-remove = Selle saamiseks värskenda või eemalda rakendus { $app } rakenduses Schelf
 settings-updates-automatic = Automaatsed värskendused
 settings-updates-look = Otsi värskendusi
 settings-updates-look-description = Ka siis, kui Sätted on suletud

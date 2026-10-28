@@ -3,7 +3,7 @@ use std::io::Write;
 use std::os::unix::fs::{DirBuilderExt, OpenOptionsExt};
 use std::path::{Path, PathBuf};
 
-use anyhow::{Context, Result};
+use anyhow::Result;
 use luft_keyring_vault::{
     CHIP_KEY_SIZE, ChipWrap, Contents, Header, MasterKey, PasswordWrap, Stored,
 };
@@ -17,7 +17,7 @@ const HANDOFF: &str = "handoff";
 pub fn prepare(deployment: &Deployment, home: &Path, uid: &str, password: &str) -> Result<PathBuf> {
     let key = MasterKey::generate()?;
     let mut handoff = [0; CHIP_KEY_SIZE];
-    getrandom::fill(&mut handoff).context("No randomness for the keyring")?;
+    getrandom::fill(&mut handoff)?;
     let header = Header {
         password: Some(PasswordWrap::create(&key, password.as_bytes())?),
         chip: Some(ChipWrap::create(&key, &handoff)?),

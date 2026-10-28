@@ -31,6 +31,7 @@ RUN --mount=type=cache,from=work,target=/var/cache/luft-part,sharing=locked \
     --mount=type=cache,from=cache,source=sccache,target=/var/cache/sccache \
     --mount=type=cache,from=cache,source=ccache,target=/var/cache/ccache \
     --mount=type=cache,from=cache,source=bun,target=/var/cache/bun \
+    exec 9>/var/cache/luft-part/lock && flock 9 && \
     bun /src/os/image/parts/stages/workspace.ts /src && \
     bun /src/os/image/parts/stages/source-times.ts /var/cache/luft-part/sources.json /src && \
     /src/os/image/parts/stages/kestrel.sh /stage /out && \
@@ -60,6 +61,7 @@ RUN --mount=type=cache,from=work,target=/var/cache/luft-part,sharing=locked \
     --mount=type=secret,id=secureboot-key \
     --mount=type=secret,id=secureboot-cert \
     : "signed by ${SIGNED_BY}" && \
+    exec 9>/var/cache/luft-part/lock && flock 9 && \
     bun /src/os/image/parts/stages/workspace.ts /src && \
     bun /src/os/image/parts/stages/source-times.ts /var/cache/luft-part/sources.json /src && \
     /src/os/image/parts/stages/boot.sh /stage /run/secrets/secureboot-key /run/secrets/secureboot-cert && \
@@ -154,6 +156,7 @@ COPY os/image/parts/stages/services.sh os/image/parts/stages/needed.sh os/image/
 RUN --mount=type=cache,from=work,target=/var/cache/luft-part,sharing=locked \
     --mount=type=cache,from=cache,source=cargo,target=/var/cache/cargo \
     --mount=type=cache,from=cache,source=sccache,target=/var/cache/sccache \
+    exec 9>/var/cache/luft-part/lock && flock 9 && \
     bun /src/os/image/parts/stages/workspace.ts /src && \
     bun /src/os/image/parts/stages/source-times.ts /var/cache/luft-part/sources.json /src && \
     /src/os/image/parts/stages/services.sh /stage && \
@@ -180,6 +183,7 @@ RUN --mount=type=cache,from=work,target=/var/cache/luft-part,sharing=locked \
     --mount=type=cache,from=cache,source=cargo,target=/var/cache/cargo \
     --mount=type=cache,from=cache,source=sccache,target=/var/cache/sccache \
     --mount=type=cache,from=cache,source=bun,target=/var/cache/bun \
+    exec 9>/var/cache/luft-part/lock && flock 9 && \
     bun /src/os/image/parts/stages/workspace.ts /src && \
     bun /src/os/image/parts/stages/source-times.ts /var/cache/luft-part/sources.json /src && \
     (cd /src && bun install --frozen-lockfile) && \

@@ -57,7 +57,11 @@ configure_security() {
 }
 
 give_keyring_its_group() {
-  chgrp luft-keyring /usr/libexec/luft-keyring
+  local fixed
+  fixed="$(awk '$1 == "g" {print $3}' /usr/lib/sysusers.d/luft-keyring.conf)"
+  [[ "$(getent group luft-keyring | cut -d: -f3)" == "$fixed" ]] ||
+    { echo "luft-keyring didn't get its fixed group ID $fixed" >&2; exit 1; }
+  chgrp "$fixed" /usr/libexec/luft-keyring
   chmod 2755 /usr/libexec/luft-keyring
 }
 

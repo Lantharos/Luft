@@ -21,6 +21,16 @@ Anything a service writes to `/etc` therefore belongs to one version only. Going
 
 The one place Luft writes into `/etc` itself is settling system packages: the configuration files packages bring are copied there when they're missing, like installing them would, and the library cache is made again. Both happen at every start from the merged packages, so a version that lacks them gets them back.
 
+## Users and groups
+
+`/etc/passwd` and `/etc/group` belong to the computer, and systemd-sysusers gives a new system group the next free ID there, counting down from 999. The image is built with its own copy, so a group the image adds can end up with one ID in the image and another on a computer installed earlier. Image files owned by a group carry its ID, not its name, so every user and group Luft defines in sysusers.d has a fixed ID from 290 to 299, the bottom of the range Fedora hands out from the top. The image build stops when one of them comes out with a different ID.
+
+| Name | ID | Owns |
+| --- | --- | --- |
+| `luft-keyring` group | 290 | `/usr/libexec/luft-keyring`, setgid |
+
+A computer that made the group before it had a fixed ID keeps its old entry in `/etc/group`. Nothing there checks the group by name, so it works as before; the keyring program's group is just shown as 290.
+
 ## The check
 
 The Checks workflow runs `.github/scripts/etc/index.ts`, which looks for `/etc` paths in Luft's code, leaving out tests, VMs, development tools and the image build. Every path it finds has to be listed in `.github/scripts/etc/allowed.json` with the reason it's fine: the code only reads it, or it's configuration an administrator chooses. A new path fails the check until it's listed, and a listed path that's gone from the code fails too, so the list stays true.

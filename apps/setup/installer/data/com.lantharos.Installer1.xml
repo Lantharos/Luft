@@ -8,6 +8,8 @@
     Stage: "idle", "preparing" (making room and partitions), "copying", "waiting" (copied, waiting for the
       account and regional settings), "configuring", "finished" or "failed" (Error says why).
     Progress: 0 to 1 over the whole install.
+    SecureBootCode: once finished, the code to type when the computer next starts so Secure Boot trusts Luft's
+      signing key, or empty when it already does or Secure Boot is off.
 
     Survey, Install, Configure and CreateAccount need com.lantharos.installer.install. The rest only answer the
     account setup is pending for: FinishFirstBoot, and, while setup is still open, the setup steps, which also
@@ -18,6 +20,7 @@
     <property name="Stage" type="s" access="read"/>
     <property name="Progress" type="d" access="read"/>
     <property name="Error" type="s" access="read"/>
+    <property name="SecureBootCode" type="s" access="read"/>
 
     <!-- JSON: drives with their free spaces, EFI system partition and Windows (size, used, smallest it can
          shrink to, room for Luft, version, fast startup, whether its clock is in UTC, how many

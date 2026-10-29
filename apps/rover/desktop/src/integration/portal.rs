@@ -68,11 +68,6 @@ impl FileChooser {
     ) -> zbus::fdo::Result<(u32, Results)> {
         self.choose(title, &options, ChooserMode::SaveFiles).await
     }
-
-    #[zbus(property)]
-    fn version(&self) -> u32 {
-        4
-    }
 }
 
 impl FileChooser {

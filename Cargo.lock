@@ -7303,6 +7303,7 @@ dependencies = [
  "luft-software",
  "luft-speech",
  "luft-trust",
+ "pipewire",
  "roxmltree 0.21.1",
  "sabine",
  "sabine-service",

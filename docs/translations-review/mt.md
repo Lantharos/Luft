@@ -45,6 +45,7 @@ Strings in Luft's Maltese translation that a native speaker should check: places
 - `apps/setup/locales/mt/setup.ftl` `setup-region-intro-guessed`: "Ejja nissettjaw kollox. Għażilna { $guesses }, …" — the list is built from "il-lingwa / it-tastiera / iż-żona tal-ħin" plus "skont il-kompjuter / skont in-netwerk"; check the joined sentence flows.
 - `apps/setup/locales/mt/setup.ftl` `setup-replace-keeps-accounts`: "{ $count } kont ieħor fiha, bil-fajls tagħhom" — singular noun with plural possessive for many/other; check the agreement.
 - `apps/setup/installer/locales/mt/installer.ftl` `installer-box-unopened`: "Il-kaxxa tat-trasferiment ma setgħetx tinfetaħ" — "moving box" rendered as transfer box; check it matches what Meet Luft calls it in Maltese.
+- `kestrel/ui/locales/mt/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 

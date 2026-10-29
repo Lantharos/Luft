@@ -33,6 +33,7 @@ Strings in Luft's European Portuguese translation that a native speaker should c
 - `apps/setup/locales/pt/setup.ftl` `setup-windows-fast-startup`, `setup-windows-bitlocker`: "arranque rápido", "Gestão de Discos" — check these match the names Windows uses in Portugal.
 - `apps/setup/locales/pt/setup.ftl` `setup-meet-room-packed`: "O que empacotou no Windows ({ $size }) é desempacotado na sua nova conta." — should match whatever the Meet Luft app calls packing.
 - `apps/setup/locales/pt/setup.ftl` `setup-region-title`: "Bem-vindo ao Luft" — masculine form, as Windows uses.
+- `kestrel/ui/locales/pt/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 

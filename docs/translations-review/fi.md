@@ -39,6 +39,7 @@ Strings in Luft's Finnish translation that a native speaker should check. Each i
 - `apps/setup/locales/fi/setup.ftl` `setup-destination-alongside-choice`: "{ $windows } -järjestelmän rinnalle" — compound used to keep "Windows 11" in the nominative; check it doesn't feel heavy.
 - `apps/setup/locales/fi/setup.ftl` `setup-region-intro-guessed`: "Valmiiksi pääteltiin { $guesses }, …" with parts like "kieli tietokoneen perusteella" — check that the joined list reads naturally.
 - `apps/setup/locales/fi/setup.ftl` `setup-windows-hibernated`, `setup-windows-fast-startup`: "nopea käynnistys" — Windows' Finnish name for Fast Startup; check it matches current Windows wording.
+- `kestrel/ui/locales/fi/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 

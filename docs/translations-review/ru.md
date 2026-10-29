@@ -36,6 +36,7 @@ Strings in Luft's Russian translation that a native speaker should check, each l
 - `apps/setup/locales/ru/setup.ftl` `setup-account-full-name-example`: "Софья Ковалевская" — a well-known Russian mathematician, the counterpart of Ada Lovelace; check it suits a name placeholder.
 - `apps/setup/locales/ru/setup.ftl` `setup-drive-has-windows`: "На диске { $windows }" — short subtitle under a drive name; check it reads well there.
 - `apps/setup/installer/locales/ru/installer.ftl` `installer-relabel-failed`: "Не удалось подготовить метки ваших файлов для Luft" — the source is about SELinux relabelling; wording may be vague.
+- `kestrel/ui/locales/ru/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 

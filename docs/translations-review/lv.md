@@ -35,6 +35,7 @@ Strings in Luft's Latvian translation that a native speaker should check: terms 
 - `apps/setup/locales/lv/setup.ftl` `setup-region-intro-guessed`: "Mēs noteicām { $guesses }, …" — field names (`setup-region-field-*`) are in the accusative (valodu, tastatūru, laika joslu) to fit this sentence; check the joined list reads well.
 - `apps/setup/locales/lv/setup.ftl` `setup-finishing-installed-title`: "Luft ir instalēta" — Luft is treated as feminine (sistēma) throughout setup and installer; confirm the gender.
 - `apps/setup/locales/lv/setup.ftl` `setup-windows-hibernated`: "…ar ātro startēšanu…" — Windows' Latvian name for Fast Startup; verify.
+- `kestrel/ui/locales/lv/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 

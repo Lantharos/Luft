@@ -31,6 +31,7 @@ Strings in Luft's Swedish translation that a native speaker should check: terms 
 - `apps/setup/locales/sv/setup.ftl` `setup-region-intro-guessed`: "Vi har gissat { $guesses }, så ändra det som inte stämmer." with parts like "tangentbordet utifrån datorn" — check the assembled sentence with two guesses joined by "och".
 - `apps/setup/locales/sv/setup.ftl` `setup-destination-meet-choice-description`: "Använd de { $size } som Meet Luft har gjort plats för bredvid Windows." — check the construction around the size.
 - `apps/setup/installer/locales/sv/installer.ftl` `installer-no-deployment`: "Det nya systemet har ingen driftsättning" — technical ostree term; check whether a plainer word fits better.
+- `kestrel/ui/locales/sv/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 

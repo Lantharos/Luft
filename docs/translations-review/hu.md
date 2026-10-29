@@ -45,6 +45,7 @@ Strings in Luft's Hungarian translation that a native speaker should check: term
 - `apps/setup/locales/hu/setup.ftl` `setup-finishing-trust`: "…kéri, hogy jelölje megbízhatónak a Luftot." — check this wording for trusting Luft's key.
 - `apps/setup/installer/locales/hu/installer.ftl` `installer-no-deployment`: "Az új rendszernek nincs telepített példánya" — "deployment" (ostree) has no settled Hungarian term.
 - `kestrel/ui/locales/hu/auth.ftl` `lock-screen-dwell-click`: "Kattintás a mutató megállításával" — matches the Settings name, but is long for the lock screen's accessibility menu; check it fits.
+- `kestrel/ui/locales/hu/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 

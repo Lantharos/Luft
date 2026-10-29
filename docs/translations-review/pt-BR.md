@@ -28,6 +28,7 @@ Strings in Luft's Brazilian Portuguese translation that a native speaker should 
 - `kestrel/ui/locales/pt-BR/system.ftl` `network-menu-tether`: "Ancoragem" — Android's term for tethering; check it is clear on a quick settings tile.
 - `kestrel/ui/locales/pt-BR/desktop.ftl` `switch-monitor-external-only`: "Só externa" / `switch-monitor-built-in-only`: "Só integrada" — shortened to stay under 15 characters; feminine agreeing with “tela”.
 - `apps/setup/locales/pt-BR/setup.ftl` `setup-account-full-name-example`: "Clarice Lispector" — chosen as a well-known Brazilian name in place of Ada Lovelace.
+- `kestrel/ui/locales/pt-BR/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 

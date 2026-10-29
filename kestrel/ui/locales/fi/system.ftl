@@ -113,6 +113,7 @@ privacy-mute-microphone = Mykistä mikrofoni
 privacy-unmute-microphone = Poista mikrofonin mykistys
 privacy-close-app = Sulje { $app }
 privacy-unknown-app = Sovellus
+privacy-reported-app = ”{ $name }” (nimeä ei ole varmistettu)
 privacy-windows-seeing-programs = { $count ->
     [one] { $count } ohjelma voi nähdä ikkunasi
    *[other] { $count } ohjelmaa voi nähdä ikkunasi
@@ -341,6 +342,7 @@ audio-device-microphone = Mikrofoni
 inhibit-shortcuts-title = Salli pikanäppäinten ohitus
 inhibit-shortcuts-app = Sovellus { $appName } haluaa ohittaa järjestelmän pikanäppäimet
 inhibit-shortcuts-unknown-app = Sovellus haluaa ohittaa järjestelmän pikanäppäimet
+inhibit-shortcuts-titled-app = Sovellus, jonka ikkuna on ”{ $title }”, haluaa ohittaa järjestelmän pikanäppäimet
 inhibit-shortcuts-restore = Voit palauttaa pikanäppäimet painamalla { $shortcut }
 inhibit-shortcuts-deny = Estä
 inhibit-shortcuts-allow = Salli

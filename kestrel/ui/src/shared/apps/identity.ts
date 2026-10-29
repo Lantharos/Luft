@@ -28,9 +28,21 @@ function appRunning(program: string): Shell.App | null {
   return info ? appSystem.lookup_app(info.get_id()!) : null;
 }
 
+export interface VerifiedApp {
+  name: string;
+  app: Shell.App | null;
+}
+
+export function verifiedApp(identity: Identity): VerifiedApp {
+  if ('app' in identity) {
+    const app = Shell.AppSystem.get_default().lookup_app(`${identity.app}.desktop`);
+    return { name: app?.get_name() ?? identity.app, app };
+  }
+  const app = appRunning(identity.program);
+  return { name: app?.get_name() ?? GLib.path_get_basename(identity.program), app };
+}
+
 export function verifiedName(pid: number): string | null {
   const identity = identifyProcess(pid);
-  if (!identity) return null;
-  if ('app' in identity) return Shell.AppSystem.get_default().lookup_app(`${identity.app}.desktop`)?.get_name() ?? identity.app;
-  return appRunning(identity.program)?.get_name() ?? GLib.path_get_basename(identity.program);
+  return identity && verifiedApp(identity).name;
 }

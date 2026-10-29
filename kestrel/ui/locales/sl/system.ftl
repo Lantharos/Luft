@@ -113,6 +113,7 @@ privacy-mute-microphone = Utišaj mikrofon
 privacy-unmute-microphone = Vklopi mikrofon
 privacy-close-app = Zapri { $app }
 privacy-unknown-app = Neka aplikacija
+privacy-reported-app = „{ $name }“ (ime ni preverjeno)
 privacy-windows-seeing-programs = { $count ->
     [one] { $count } program lahko vidi vaša okna
     [two] { $count } programa lahko vidita vaša okna
@@ -351,6 +352,7 @@ audio-device-microphone = Mikrofon
 inhibit-shortcuts-title = Dovoli onemogočanje bližnjic
 inhibit-shortcuts-app = Aplikacija { $appName } želi onemogočiti bližnjice
 inhibit-shortcuts-unknown-app = Neka aplikacija želi onemogočiti bližnjice
+inhibit-shortcuts-titled-app = Aplikacija z oknom „{ $title }“ želi onemogočiti bližnjice
 inhibit-shortcuts-restore = Bližnjice lahko obnovite s pritiskom { $shortcut }
 inhibit-shortcuts-deny = Zavrni
 inhibit-shortcuts-allow = Dovoli

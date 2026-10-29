@@ -38,6 +38,7 @@ Strings in Luft's Turkish translation that a native speaker should check: terms 
 - `apps/setup/locales/tr/setup.ftl` `setup-region-intro-guessed`: "Luft’u kuralım. Bazı seçimleri tahmin ettik: { $guesses }. Yanlış olanı değiştirin." — with guesses like "dil ve klavye bilgisayarınıza göre"; check the assembled sentence with two guesses joined by "ve".
 - `apps/setup/locales/tr/setup.ftl` `setup-account-full-name-example`: "Cahit Arf" — a well-known Turkish mathematician, in the spirit of Ada Lovelace; confirm.
 - `apps/setup/installer/locales/tr/installer.ftl` `installer-no-deployment`: "Yeni sistemde dağıtım yok" — technical ostree term; check dağıtım is understood.
+- `kestrel/ui/locales/tr/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 

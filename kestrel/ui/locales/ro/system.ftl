@@ -113,6 +113,7 @@ privacy-mute-microphone = Dezactivează microfonul
 privacy-unmute-microphone = Activează microfonul
 privacy-close-app = Închide { $app }
 privacy-unknown-app = O aplicație
+privacy-reported-app = „{ $name }” (nume neverificat)
 privacy-windows-seeing-programs = { $count ->
     [one] { $count } program vă poate vedea ferestrele
     [few] { $count } programe vă pot vedea ferestrele
@@ -346,6 +347,7 @@ audio-device-microphone = Microfon
 inhibit-shortcuts-title = Permiteți blocarea comenzilor rapide
 inhibit-shortcuts-app = Aplicația { $appName } vrea să blocheze comenzile rapide
 inhibit-shortcuts-unknown-app = O aplicație vrea să blocheze comenzile rapide
+inhibit-shortcuts-titled-app = O aplicație cu fereastra „{ $title }” vrea să blocheze comenzile rapide
 inhibit-shortcuts-restore = Puteți reactiva comenzile rapide apăsând { $shortcut }
 inhibit-shortcuts-deny = Refuză
 inhibit-shortcuts-allow = Permite

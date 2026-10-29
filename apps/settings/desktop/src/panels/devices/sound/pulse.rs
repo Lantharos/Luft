@@ -301,7 +301,7 @@ impl Pulse {
             *meter = None;
         } else if meter.as_ref().is_none_or(|meter| meter.source() != source) {
             *meter = None;
-            *meter = Meter::start(&mut self.context.borrow_mut(), source, self.events.clone());
+            *meter = Meter::start(source, self.events.clone());
         }
     }
 

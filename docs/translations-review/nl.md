@@ -33,6 +33,7 @@ Strings in Luft's Dutch translation that a native speaker should check: terms wh
 - `apps/setup/locales/nl/setup.ftl` `setup-windows-fast-startup`: "Snel opstarten uitschakelen in Windows" — uses the Dutch Windows name "Snel opstarten"; also used in `setup-windows-hibernated`, along with "Schijfbeheer" for Disk Management.
 - `apps/setup/locales/nl/setup.ftl` `setup-network-unavailable`: "…via de taakbalk." — English says "from the panel"; assumed it means the taskbar network icons.
 - `apps/setup/installer/locales/nl/installer.ftl` `installer-no-deployment`: "Het nieuwe systeem heeft geen deployment" — technical term left in English, no settled Dutch equivalent.
+- `kestrel/ui/locales/nl/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 

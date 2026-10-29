@@ -113,6 +113,7 @@ privacy-mute-microphone = Wycisz mikrofon
 privacy-unmute-microphone = Wyłącz wyciszenie mikrofonu
 privacy-close-app = Zamknij aplikację { $app }
 privacy-unknown-app = Aplikacja
+privacy-reported-app = „{ $name }” (nazwa niezweryfikowana)
 privacy-windows-seeing-programs = { $count ->
     [one] { $count } program może widzieć twoje okna
     [few] { $count } programy mogą widzieć twoje okna
@@ -351,6 +352,7 @@ audio-device-microphone = Mikrofon
 inhibit-shortcuts-title = Zezwolić na przejęcie skrótów?
 inhibit-shortcuts-app = Aplikacja { $appName } chce przejąć skróty klawiaturowe
 inhibit-shortcuts-unknown-app = Aplikacja chce przejąć skróty klawiaturowe
+inhibit-shortcuts-titled-app = Aplikacja z oknem „{ $title }” chce przejąć skróty klawiaturowe
 inhibit-shortcuts-restore = Aby przywrócić skróty, naciśnij { $shortcut }
 inhibit-shortcuts-deny = Odmów
 inhibit-shortcuts-allow = Zezwól

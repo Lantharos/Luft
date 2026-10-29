@@ -35,6 +35,7 @@ luft-network.workspace = true
 luft-software = { workspace = true, features = ["default"] }
 luft-speech = { workspace = true, features = ["default"] }
 luft-trust.workspace = true
+pipewire.workspace = true
 roxmltree.workspace = true
 sabine.workspace = true
 sabine-service.workspace = true

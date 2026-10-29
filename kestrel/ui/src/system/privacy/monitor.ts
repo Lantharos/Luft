@@ -2,6 +2,7 @@ import type Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import { getGeoclueAgent } from './location.js';
 
+import { LEVEL_METERS } from '../../shared/apps/levelMeters.js';
 import { ownDictation } from '../dictation/listening.js';
 import { windowAccess } from '../peek/access/grants.js';
 import { cameraMonitor } from './camera.js';
@@ -23,6 +24,7 @@ export class PrivacyMonitor {
   private readonly disconnectors: (() => void)[] = [];
 
   constructor(changed: () => void) {
+    this.mixer.set_level_meters(LEVEL_METERS);
     const dictationChanged = () => {
       if (!ownDictation.active && !this.mixer.dictating) ownDictation.process = null;
       this.mixer.set_dictation_process(ownDictation.pid);

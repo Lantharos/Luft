@@ -113,6 +113,7 @@ privacy-mute-microphone = Mikrofon némítása
 privacy-unmute-microphone = Mikrofon némításának feloldása
 privacy-close-app = { $app } bezárása
 privacy-unknown-app = Egy alkalmazás
+privacy-reported-app = „{ $name }” (a név nincs ellenőrizve)
 privacy-windows-seeing-programs = { $count ->
     [one] { $count } program láthatja az ablakait
    *[other] { $count } program láthatja az ablakait
@@ -341,6 +342,7 @@ audio-device-microphone = Mikrofon
 inhibit-shortcuts-title = Billentyűparancsok letiltásának engedélyezése
 inhibit-shortcuts-app = { $appName } alkalmazás le szeretné tiltani a billentyűparancsokat
 inhibit-shortcuts-unknown-app = Egy alkalmazás le szeretné tiltani a billentyűparancsokat
+inhibit-shortcuts-titled-app = Egy alkalmazás „{ $title }” ablakkal le szeretné tiltani a billentyűparancsokat
 inhibit-shortcuts-restore = A billentyűparancsokat ezzel állíthatja vissza: { $shortcut }
 inhibit-shortcuts-deny = Elutasítás
 inhibit-shortcuts-allow = Engedélyezés

@@ -113,6 +113,7 @@ privacy-mute-microphone = Nutildyti mikrofoną
 privacy-unmute-microphone = Įjungti mikrofoną
 privacy-close-app = Uždaryti programą { $app }
 privacy-unknown-app = Programa
+privacy-reported-app = „{ $name }“ (pavadinimas nepatikrintas)
 privacy-windows-seeing-programs = { $count ->
     [one] { $count } programa gali matyti jūsų langus
     [few] { $count } programos gali matyti jūsų langus
@@ -351,6 +352,7 @@ audio-device-microphone = Mikrofonas
 inhibit-shortcuts-title = Leisti perimti sparčiuosius klavišus
 inhibit-shortcuts-app = Programa { $appName } nori perimti sparčiuosius klavišus
 inhibit-shortcuts-unknown-app = Programa nori perimti sparčiuosius klavišus
+inhibit-shortcuts-titled-app = Programa su langu „{ $title }“ nori perimti sparčiuosius klavišus
 inhibit-shortcuts-restore = Sparčiuosius klavišus galite grąžinti paspaudę { $shortcut }
 inhibit-shortcuts-deny = Neleisti
 inhibit-shortcuts-allow = Leisti

@@ -33,6 +33,7 @@ Strings in Luft's Italian translation that a native speaker should check: terms 
 - `apps/setup/locales/it/setup.ftl` `setup-network-unavailable`: "Puoi connetterti più tardi dalla barra delle applicazioni." — English says “from the panel”; assumed it means the taskbar's status icons.
 - `apps/setup/locales/it/setup.ftl` `setup-windows-hibernated`: "…tieni premuto Maiusc mentre scegli Arresta il sistema…" — uses Windows' Italian menu item name and “avvio rapido” for Fast Startup; check they match current Windows 11 Italian.
 - `apps/setup/installer/locales/it/installer.ftl` `installer-box-unopened`: "Impossibile aprire lo scatolone del trasloco" — check this matches the moving-box wording in Meet Luft's Italian text, if it gets one.
+- `kestrel/ui/locales/it/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 

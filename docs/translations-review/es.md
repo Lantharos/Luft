@@ -28,6 +28,7 @@ Strings in Luft's Spanish translation that a native speaker should check: terms 
 - `kestrel/ui/locales/es/portal.ftl` `print-paper-statement`: "Media carta" — North American paper names; check they match what Spanish print dialogs show.
 - `apps/setup/locales/es/setup.ftl` `setup-region-guess-from-computer`: "tu { $fields } a partir del ordenador" — "tu" before a joined list ("tu idioma y teclado") is acceptable, but check it reads well with every field combination.
 - `apps/setup/locales/es/setup.ftl` `setup-account-full-name-example`: "Clara Campoamor" — chosen as a well-known Spanish name; confirm.
+- `kestrel/ui/locales/es/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 

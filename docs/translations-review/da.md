@@ -31,6 +31,7 @@ Strings in Luft's Danish translation that a native speaker should check: terms w
 - `apps/setup/locales/da/setup.ftl` `setup-region-guess-from-computer`: "{ $fields } ud fra din computer" — the field names carry their possessive (dit sprog, din tidszone) because sprog/tastatur and tidszone differ in gender; check the joined sentence.
 - `apps/setup/locales/da/setup.ftl` `setup-account-full-name-example`: "Karen Blixen" — chosen as a well-known Danish name.
 - `apps/setup/installer/locales/da/installer.ftl` `installer-no-deployment`: "Det nye system har ingen udrulning" — technical ostree term with no settled Danish word.
+- `kestrel/ui/locales/da/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 

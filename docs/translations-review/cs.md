@@ -29,6 +29,7 @@ Strings in Luft's Czech translation that a native speaker should check: term cho
 - `apps/setup/locales/cs/setup.ftl` `setup-windows-hibernated`: "…vypnutý s rychlým spuštěním…" — Fast Startup as Windows names it in Czech (Rychlé spuštění); check.
 - `apps/setup/desktop/locales/cs/desktop.ftl` `desktop-window-title`: "Nastavit Luft" — infinitive like Instalovat Luft; avoids clashing with Nastavení.
 - `apps/setup/installer/locales/cs/installer.ftl` `installer-box-unopened`: "Stěhovací krabici se nepodařilo otevřít" — the Meet Luft moving box metaphor; check Meet Luft uses the same word.
+- `kestrel/ui/locales/cs/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 

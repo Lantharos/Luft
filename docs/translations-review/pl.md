@@ -32,6 +32,7 @@ Strings in Luft's Polish translation that a native speaker should check, each li
 - `apps/setup/locales/pl/setup.ftl` `setup-network-unavailable`: "Możesz połączyć się później z paska zadań." — English says "from the panel"; check which part of the desktop is meant.
 - `apps/setup/locales/pl/setup.ftl` `setup-windows-hibernated`: "…przytrzymaj Shift i wybierz Zamknij…" — Polish Windows calls Shut down "Zamknij" in the power menu; Fast Startup is "szybkie uruchamianie".
 - `apps/setup/installer/locales/pl/installer.ftl` `installer-box-unopened`: "Nie udało się otworzyć kartonu przeprowadzkowego" — "moving box" metaphor for what Meet Luft packs; check it matches whatever Meet Luft's Polish text calls it.
+- `kestrel/ui/locales/pl/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 

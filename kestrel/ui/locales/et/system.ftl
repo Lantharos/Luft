@@ -109,6 +109,7 @@ privacy-mute-microphone = Vaigista mikrofon
 privacy-unmute-microphone = Tühista mikrofoni vaigistus
 privacy-close-app = Sulge { $app }
 privacy-unknown-app = Rakendus
+privacy-reported-app = „{ $name }“ (nimi pole kontrollitud)
 privacy-windows-seeing-programs =
     { $count ->
         [one] { $count } programm saab sinu aknaid näha
@@ -343,6 +344,7 @@ audio-device-microphone = Mikrofon
 inhibit-shortcuts-title = Kiirklahvide blokeerimine
 inhibit-shortcuts-app = Rakendus { $appName } soovib süsteemi kiirklahvid blokeerida
 inhibit-shortcuts-unknown-app = Üks rakendus soovib süsteemi kiirklahvid blokeerida
+inhibit-shortcuts-titled-app = Rakendus aknaga „{ $title }“ soovib süsteemi kiirklahvid blokeerida
 inhibit-shortcuts-restore = Kiirklahvid saad taastada, kui vajutad { $shortcut }
 inhibit-shortcuts-deny = Keela
 inhibit-shortcuts-allow = Luba

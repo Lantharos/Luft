@@ -113,6 +113,7 @@ privacy-mute-microphone = Slå mikrofonen fra
 privacy-unmute-microphone = Slå mikrofonen til
 privacy-close-app = Luk { $app }
 privacy-unknown-app = En app
+privacy-reported-app = »{ $name }« (navnet er ikke bekræftet)
 privacy-windows-seeing-programs = { $count ->
     [one] { $count } program kan se dine vinduer
    *[other] { $count } programmer kan se dine vinduer
@@ -341,6 +342,7 @@ audio-device-microphone = Mikrofon
 inhibit-shortcuts-title = Tillad overtagelse af genveje
 inhibit-shortcuts-app = Appen { $appName } vil overtage systemets tastaturgenveje
 inhibit-shortcuts-unknown-app = En app vil overtage systemets tastaturgenveje
+inhibit-shortcuts-titled-app = En app med vinduet »{ $title }« vil overtage systemets tastaturgenveje
 inhibit-shortcuts-restore = Du kan få genvejene tilbage ved at trykke på { $shortcut }
 inhibit-shortcuts-deny = Afvis
 inhibit-shortcuts-allow = Tillad

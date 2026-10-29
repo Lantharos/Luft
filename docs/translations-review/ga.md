@@ -46,6 +46,7 @@ Strings in Luft's Irish translation that a native speaker should check: terms wi
 - `apps/setup/locales/ga/setup.ftl` `setup-windows-bitlocker`: "… i mBainistíocht Diosca …" — the Irish Windows name of Disk Management and Fast Startup ("Tosú Tapa") should match Microsoft's Irish UI.
 - `apps/setup/locales/ga/setup.ftl` `setup-replace-keeps-tools`: "{ $count } uirlis líne na n-orduithe …" — check the counting form of uirlis and the "n-" after 7–10.
 - `apps/setup/locales/ga/setup.ftl` `setup-account-full-name-example`: "Peig Sayers" — chosen as a well-known Irish name.
+- `kestrel/ui/locales/ga/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 

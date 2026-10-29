@@ -113,6 +113,7 @@ privacy-mute-microphone = Izslēgt mikrofonu
 privacy-unmute-microphone = Ieslēgt mikrofonu
 privacy-close-app = Aizvērt lietotni { $app }
 privacy-unknown-app = Kāda lietotne
+privacy-reported-app = „{ $name }“ (nosaukums nav pārbaudīts)
 privacy-windows-seeing-programs = { $count ->
     [zero] { $count } programmas var redzēt jūsu logus
     [one] { $count } programma var redzēt jūsu logus
@@ -346,6 +347,7 @@ audio-device-microphone = Mikrofons
 inhibit-shortcuts-title = Atļaut īsinājumtaustiņu pārtveršanu
 inhibit-shortcuts-app = Lietotne { $appName } vēlas pārtvert īsinājumtaustiņus
 inhibit-shortcuts-unknown-app = Kāda lietotne vēlas pārtvert īsinājumtaustiņus
+inhibit-shortcuts-titled-app = Lietotne ar logu „{ $title }“ vēlas pārtvert īsinājumtaustiņus
 inhibit-shortcuts-restore = Īsinājumtaustiņus var atjaunot, nospiežot { $shortcut }
 inhibit-shortcuts-deny = Liegt
 inhibit-shortcuts-allow = Atļaut

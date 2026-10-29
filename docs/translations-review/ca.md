@@ -37,6 +37,7 @@ Strings in Luft’s Catalan translation that a native speaker should check: term
 - `kestrel/ui/locales/ca/shell.ftl` `ctrl-alt-tab-panel`: "Barra de tasques" — English says Panel but the comment says it is the taskbar.
 - `kestrel/ui/locales/ca/system.ftl` `inhibit-shortcuts-title`: "Permet inhibir les dreceres" — GNOME's wording; «inhibir» may feel technical.
 - `kestrel/ui/locales/ca/portal.ftl` `print-paper-statement`: "Statement" — kept in English, there's no common Catalan name for this paper size.
+- `kestrel/ui/locales/ca/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 

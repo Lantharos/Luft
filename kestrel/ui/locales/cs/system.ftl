@@ -113,6 +113,7 @@ privacy-mute-microphone = Ztlumit mikrofon
 privacy-unmute-microphone = Zrušit ztlumení mikrofonu
 privacy-close-app = Zavřít { $app }
 privacy-unknown-app = Neznámá aplikace
+privacy-reported-app = „{ $name }“ (název neověřen)
 privacy-windows-seeing-programs = { $count ->
     [one] { $count } program může vidět vaše okna
     [few] { $count } programy mohou vidět vaše okna
@@ -351,6 +352,7 @@ audio-device-microphone = Mikrofon
 inhibit-shortcuts-title = Povolit blokování zkratek
 inhibit-shortcuts-app = Aplikace { $appName } chce blokovat systémové zkratky
 inhibit-shortcuts-unknown-app = Aplikace chce blokovat systémové zkratky
+inhibit-shortcuts-titled-app = Aplikace s oknem „{ $title }“ chce blokovat systémové zkratky
 inhibit-shortcuts-restore = Zkratky obnovíte stisknutím { $shortcut }
 inhibit-shortcuts-deny = Odepřít
 inhibit-shortcuts-allow = Povolit

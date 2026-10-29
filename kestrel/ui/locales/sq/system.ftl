@@ -113,6 +113,7 @@ privacy-mute-microphone = Hesht mikrofonin
 privacy-unmute-microphone = Aktivizo mikrofonin
 privacy-close-app = Mbyll { $app }
 privacy-unknown-app = Një aplikacion
+privacy-reported-app = “{ $name }” (emër i paverifikuar)
 privacy-windows-seeing-programs = { $count ->
     [one] { $count } program mund të shohë dritaret e tua
    *[other] { $count } programe mund të shohin dritaret e tua
@@ -341,6 +342,7 @@ audio-device-microphone = Mikrofon
 inhibit-shortcuts-title = Lejo çaktivizimin e shkurtoreve
 inhibit-shortcuts-app = Aplikacioni { $appName } kërkon të çaktivizojë shkurtoret
 inhibit-shortcuts-unknown-app = Një aplikacion kërkon të çaktivizojë shkurtoret
+inhibit-shortcuts-titled-app = Një aplikacion me dritaren “{ $title }” kërkon të çaktivizojë shkurtoret
 inhibit-shortcuts-restore = Mund t’i rikthesh shkurtoret duke shtypur { $shortcut }
 inhibit-shortcuts-deny = Refuzo
 inhibit-shortcuts-allow = Lejo

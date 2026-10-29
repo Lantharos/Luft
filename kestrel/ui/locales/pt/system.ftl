@@ -114,6 +114,7 @@ privacy-mute-microphone = Silenciar microfone
 privacy-unmute-microphone = Reativar microfone
 privacy-close-app = Fechar { $app }
 privacy-unknown-app = Uma aplicação
+privacy-reported-app = «{ $name }» (nome não verificado)
 privacy-windows-seeing-programs = { $count ->
     [one] { $count } programa pode ver as suas janelas
    *[other] { $count } programas podem ver as suas janelas
@@ -345,6 +346,7 @@ audio-device-microphone = Microfone
 inhibit-shortcuts-title = Permitir o bloqueio de atalhos
 inhibit-shortcuts-app = A aplicação { $appName } quer bloquear os atalhos do sistema
 inhibit-shortcuts-unknown-app = Uma aplicação quer bloquear os atalhos do sistema
+inhibit-shortcuts-titled-app = Uma aplicação com a janela «{ $title }» quer bloquear os atalhos do sistema
 inhibit-shortcuts-restore = Pode repor os atalhos premindo { $shortcut }
 inhibit-shortcuts-deny = Recusar
 inhibit-shortcuts-allow = Permitir

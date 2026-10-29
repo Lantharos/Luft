@@ -1,6 +1,7 @@
 /* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
 #include "config.h"
 
+#include <meta/meta-context.h>
 #include <string.h>
 
 #include "shell-enum-types.h"
@@ -119,6 +120,36 @@ dictates (ShellMixer *mixer,
          (pid == mixer->dictation_pid || parent_of (pid) == mixer->dictation_pid);
 }
 
+static gboolean
+runs_level_meter (ShellMixer *mixer,
+                  guint       pid)
+{
+  g_autofree char *app_id = NULL;
+  g_autofree char *executable = NULL;
+  char **program;
+
+  if (!pid || !mixer->level_meters || !meta_process_identify_pid (pid, &app_id, &executable) || !executable)
+    return FALSE;
+
+  for (program = mixer->level_meters; *program; program++)
+    if (g_str_equal (executable, *program) ||
+        (g_str_has_suffix (*program, "/") && g_str_has_prefix (executable, *program)))
+      return TRUE;
+
+  return FALSE;
+}
+
+static void
+sync_level_meter (ShellMixer *mixer,
+                  gpointer    client,
+                  guint       pid)
+{
+  if (runs_level_meter (mixer, pid))
+    g_hash_table_add (mixer->level_meter_clients, client);
+  else
+    g_hash_table_remove (mixer->level_meter_clients, client);
+}
+
 static void
 sync_recording (ShellMixer *mixer)
 {
@@ -130,6 +161,8 @@ sync_recording (ShellMixer *mixer)
   g_hash_table_iter_init (&iter, mixer->recorders);
   while (g_hash_table_iter_next (&iter, NULL, &client))
     {
+      if (g_hash_table_contains (mixer->level_meter_clients, client))
+        continue;
       if (dictates (mixer, GPOINTER_TO_UINT (g_hash_table_lookup (mixer->clients, client))))
         dictating = TRUE;
       else
@@ -261,6 +294,7 @@ _shell_mixer_update_client (ShellMixer *mixer,
                             guint       pid)
 {
   g_hash_table_insert (mixer->clients, GUINT_TO_POINTER (index), GUINT_TO_POINTER (pid));
+  sync_level_meter (mixer, GUINT_TO_POINTER (index), pid);
   sync_recording (mixer);
 }
 
@@ -268,6 +302,7 @@ void
 _shell_mixer_remove_client (ShellMixer *mixer,
                             guint32     index)
 {
+  g_hash_table_remove (mixer->level_meter_clients, GUINT_TO_POINTER (index));
   if (g_hash_table_remove (mixer->clients, GUINT_TO_POINTER (index)))
     sync_recording (mixer);
 }
@@ -308,6 +343,7 @@ _shell_mixer_forget (ShellMixer *mixer)
   g_hash_table_remove_all (mixer->cards);
   g_hash_table_remove_all (mixer->recorders);
   g_hash_table_remove_all (mixer->clients);
+  g_hash_table_remove_all (mixer->level_meter_clients);
   g_hash_table_remove_all (mixer->players);
   g_clear_pointer (&mixer->default_sink, g_free);
   g_clear_pointer (&mixer->default_source, g_free);
@@ -359,6 +395,8 @@ shell_mixer_finalize (GObject *object)
   g_hash_table_unref (mixer->cards);
   g_hash_table_unref (mixer->recorders);
   g_hash_table_unref (mixer->clients);
+  g_hash_table_unref (mixer->level_meter_clients);
+  g_strfreev (mixer->level_meters);
   g_hash_table_unref (mixer->players);
   g_ptr_array_unref (mixer->devices[0]);
   g_ptr_array_unref (mixer->devices[1]);
@@ -421,6 +459,7 @@ shell_mixer_init (ShellMixer *mixer)
   mixer->cards = g_hash_table_new_full (NULL, NULL, NULL, (GDestroyNotify) _shell_mixer_card_free);
   mixer->recorders = g_hash_table_new (NULL, NULL);
   mixer->clients = g_hash_table_new (NULL, NULL);
+  mixer->level_meter_clients = g_hash_table_new (NULL, NULL);
   mixer->players = g_hash_table_new (NULL, NULL);
   mixer->devices[0] = g_ptr_array_new_with_free_func (g_object_unref);
   mixer->devices[1] = g_ptr_array_new_with_free_func (g_object_unref);
@@ -523,5 +562,33 @@ shell_mixer_set_dictation_process (ShellMixer *mixer,
   g_return_if_fail (SHELL_IS_MIXER (mixer));
 
   mixer->dictation_pid = pid;
+  sync_recording (mixer);
+}
+
+/**
+ * shell_mixer_set_level_meters:
+ * @mixer: a #ShellMixer
+ * @programs: (array zero-terminated=1) (nullable): the programs whose
+ *   recording only shows the input level, each a path or a folder ending in /
+ *
+ * Leaves out of recording what those programs record when they run outside
+ * a sandbox, judged from the credentials the sound server took from their
+ * connection, which only clients that connect to PipeWire directly carry.
+ */
+void
+shell_mixer_set_level_meters (ShellMixer         *mixer,
+                              const char * const *programs)
+{
+  GHashTableIter iter;
+  gpointer client, pid;
+
+  g_return_if_fail (SHELL_IS_MIXER (mixer));
+
+  g_strfreev (mixer->level_meters);
+  mixer->level_meters = g_strdupv ((char **) programs);
+
+  g_hash_table_iter_init (&iter, mixer->clients);
+  while (g_hash_table_iter_next (&iter, &client, &pid))
+    sync_level_meter (mixer, client, GPOINTER_TO_UINT (pid));
   sync_recording (mixer);
 }

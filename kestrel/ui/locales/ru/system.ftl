@@ -113,6 +113,7 @@ privacy-mute-microphone = Отключить микрофон
 privacy-unmute-microphone = Включить микрофон
 privacy-close-app = Закрыть { $app }
 privacy-unknown-app = Неизвестное приложение
+privacy-reported-app = «{ $name }» (название не проверено)
 privacy-windows-seeing-programs = { $count ->
     [one] { $count } программа может видеть ваши окна
     [few] { $count } программы могут видеть ваши окна
@@ -351,6 +352,7 @@ audio-device-microphone = Микрофон
 inhibit-shortcuts-title = Разрешить перехват сочетаний клавиш
 inhibit-shortcuts-app = Приложение { $appName } хочет перехватывать сочетания клавиш
 inhibit-shortcuts-unknown-app = Приложение хочет перехватывать сочетания клавиш
+inhibit-shortcuts-titled-app = Приложение с окном «{ $title }» хочет перехватывать сочетания клавиш
 inhibit-shortcuts-restore = Чтобы вернуть сочетания клавиш, нажмите { $shortcut }
 inhibit-shortcuts-deny = Запретить
 inhibit-shortcuts-allow = Разрешить

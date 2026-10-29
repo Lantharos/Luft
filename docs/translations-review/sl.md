@@ -33,6 +33,7 @@ Strings in Luft's Slovenian translation that a native speaker should check: term
 - `kestrel/ui/locales/sl/system.ftl` `display-change-title`: "Ohranim nastavitve zaslona?" — must stay under 30 characters; check the first-person form is acceptable.
 - `apps/setup/locales/sl/setup.ftl` `setup-region-intro-guessed`: "Začnimo z nastavitvijo. Nekaj smo že izpolnili: { $guesses }. Popravite, kar ni prav." — $guesses joins pieces like "jezik in tipkovnica glede na računalnik"; check it reads well with the list formatter.
 - `apps/setup/locales/sl/setup.ftl` `setup-network-unavailable`: "Povežete se lahko pozneje prek opravilne vrstice." — English says "from the panel"; assumed it means the taskbar.
+- `kestrel/ui/locales/sl/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 

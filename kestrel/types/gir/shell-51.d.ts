@@ -939,6 +939,8 @@ export namespace Shell {
         get_recording(): boolean;
 
         set_dictation_process(pid: number): void;
+
+        set_level_meters(programs: string[] | null): void;
     }
 
 

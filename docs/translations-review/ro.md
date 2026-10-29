@@ -35,6 +35,7 @@ Strings in Luft's Romanian translation that a native speaker should check. Each 
 - `apps/setup/locales/ro/setup.ftl` `setup-account-full-name-example`: "Ana Aslan" — chosen as a well-known Romanian name.
 - `apps/setup/locales/ro/setup.ftl` `setup-replace-erases-system`: "Partiția de sistem din { $system } se șterge." — avoids declining the system name.
 - `apps/setup/installer/locales/ro/installer.ftl` `installer-no-deployment`: "Noul sistem nu are nicio implementare" — "deployment" (ostree) has no settled term.
+- `kestrel/ui/locales/ro/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 

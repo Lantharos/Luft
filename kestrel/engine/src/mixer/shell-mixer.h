@@ -27,6 +27,8 @@ gboolean          shell_mixer_get_recording     (ShellMixer *mixer);
 gboolean          shell_mixer_get_dictating     (ShellMixer *mixer);
 void              shell_mixer_set_dictation_process (ShellMixer *mixer,
                                                      guint       pid);
+void              shell_mixer_set_level_meters  (ShellMixer         *mixer,
+                                                 const char * const *programs);
 
 GPtrArray *shell_mixer_get_devices     (ShellMixer       *mixer,
                                         gboolean          output);

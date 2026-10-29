@@ -31,6 +31,7 @@ Strings in Luft's Norwegian Bokmål translation that a native speaker should che
 - `apps/setup/locales/nb/setup.ftl` `setup-region-intro-guessed`: "Vi har gjettet { $guesses }" — relies on the joined list ("tastaturet ut fra datamaskinen og tidssonen ut fra nettverket") using «og»; check the list joiner.
 - `kestrel/ui/locales/nb/system.ftl` `network-menu-hotspot`: "Trådløssone på { $name }" — $name is the Wi-Fi device sharing the connection; check it reads well with the device names people see, and against Windows' «mobilt tilkoblingspunkt».
 - `kestrel/ui/locales/nb/system.ftl` `screenshot-source`: "Skjermbilder og opptak" — notification source for the screenshot and recording tool; «skjermopptak» alone would mean only recordings.
+- `kestrel/ui/locales/nb/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 

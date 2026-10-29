@@ -42,6 +42,7 @@ Strings in Luft's Lithuanian translation that a native speaker should check: ter
 - `apps/setup/locales/lt/setup.ftl` `setup-replace-keeps-tools`: "… – prisijungus, Toolbox aplinkoje" — Toolbox kept as a name; check phrasing.
 - `apps/setup/locales/lt/setup.ftl` `setup-account-full-name-example`: "Jonas Jonaitis" — the standard Lithuanian placeholder name.
 - `apps/setup/locales/lt/setup.ftl` `setup-windows-hibernated`: "… naudojant spartųjį paleidimą …" and `setup-windows-bitlocker` "Disko tvarkymą": check these match current Windows Lithuanian names (Spartusis paleidimas, Disko tvarkymas).
+- `kestrel/ui/locales/lt/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 

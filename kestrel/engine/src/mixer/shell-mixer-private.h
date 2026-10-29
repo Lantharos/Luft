@@ -70,6 +70,8 @@ struct _ShellMixer
   GHashTable *cards;
   GHashTable *recorders;
   GHashTable *clients;
+  GHashTable *level_meter_clients;
+  GStrv level_meters;
   GHashTable *players;
   char *default_sink;
   char *default_source;

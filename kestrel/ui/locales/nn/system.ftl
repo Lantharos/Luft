@@ -113,6 +113,7 @@ privacy-mute-microphone = Demp mikrofonen
 privacy-unmute-microphone = Slå på mikrofonen
 privacy-close-app = Lukk { $app }
 privacy-unknown-app = Ein app
+privacy-reported-app = «{ $name }» (namnet er ikkje stadfesta)
 privacy-windows-seeing-programs = { $count ->
     [one] { $count } program kan sjå vindauga dine
    *[other] { $count } program kan sjå vindauga dine
@@ -341,6 +342,7 @@ audio-device-microphone = Mikrofon
 inhibit-shortcuts-title = Tillat å blokkere snarvegar
 inhibit-shortcuts-app = Appen { $appName } vil blokkere snarvegar
 inhibit-shortcuts-unknown-app = Ein app vil blokkere snarvegar
+inhibit-shortcuts-titled-app = Ein app med vindauget «{ $title }» vil blokkere snarvegar
 inhibit-shortcuts-restore = Du kan få snarvegane tilbake ved å trykkje { $shortcut }
 inhibit-shortcuts-deny = Nekt
 inhibit-shortcuts-allow = Tillat

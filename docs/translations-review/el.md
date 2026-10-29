@@ -36,6 +36,7 @@ Strings in Luft's Greek translation that a native speaker should check: terms wi
 - `apps/setup/locales/el/setup.ftl` `setup-destination-replace-title`: "Αντικατάσταση του { $system }" — assumes a Latin system name (neuter).
 - `apps/setup/locales/el/setup.ftl` `setup-windows-hibernated`: "…τερματίστηκαν με γρήγορη εκκίνηση…" — assumes Greek Windows calls Fast Startup «Γρήγορη εκκίνηση».
 - `apps/setup/installer/locales/el/installer.ftl` `installer-no-deployment`: "Το νέο σύστημα δεν έχει ανάπτυξη" — ostree "deployment" has no settled Greek term.
+- `kestrel/ui/locales/el/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 

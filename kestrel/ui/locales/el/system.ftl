@@ -114,6 +114,7 @@ privacy-mute-microphone = Σίγαση μικροφώνου
 privacy-unmute-microphone = Κατάργηση σίγασης μικροφώνου
 privacy-close-app = Κλείσιμο: { $app }
 privacy-unknown-app = Μια εφαρμογή
+privacy-reported-app = «{ $name }» (το όνομα δεν επαληθεύτηκε)
 privacy-windows-seeing-programs = { $count ->
     [one] { $count } πρόγραμμα μπορεί να βλέπει τα παράθυρά σας
    *[other] { $count } προγράμματα μπορούν να βλέπουν τα παράθυρά σας
@@ -344,6 +345,7 @@ audio-device-microphone = Μικρόφωνο
 inhibit-shortcuts-title = Παράκαμψη συντομεύσεων
 inhibit-shortcuts-app = Η εφαρμογή { $appName } θέλει να λαμβάνει η ίδια τις συντομεύσεις του συστήματος
 inhibit-shortcuts-unknown-app = Μια εφαρμογή θέλει να λαμβάνει η ίδια τις συντομεύσεις του συστήματος
+inhibit-shortcuts-titled-app = Μια εφαρμογή με το παράθυρο «{ $title }» θέλει να λαμβάνει η ίδια τις συντομεύσεις του συστήματος
 inhibit-shortcuts-restore = Μπορείτε να επαναφέρετε τις συντομεύσεις πατώντας { $shortcut }
 inhibit-shortcuts-deny = Άρνηση
 inhibit-shortcuts-allow = Να επιτρέπεται

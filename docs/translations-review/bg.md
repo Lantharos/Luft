@@ -36,6 +36,7 @@ Strings in Luft's Bulgarian translation that a native speaker should check. Each
 - `apps/setup/locales/bg/setup.ftl` `setup-region-intro-guessed`: "Да започнем с настройката. Определихме { $guesses }, затова променете каквото не е вярно." — guesses expand to "езика и клавиатурата по компютъра ви и часовата зона по мрежата ви"; check the joined sentence.
 - `apps/setup/locales/bg/setup.ftl` `setup-account-user-name-invalid`: "Използвайте малки латински букви, цифри, - и _" — added "латински", assuming user names are ASCII only.
 - `apps/setup/locales/bg/setup.ftl` `setup-windows-hibernated`: "…изключен с Бързо стартиране…" — Fast Startup and Disk Management (Управление на дискове) named as Bulgarian Windows does; verify.
+- `kestrel/ui/locales/bg/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 

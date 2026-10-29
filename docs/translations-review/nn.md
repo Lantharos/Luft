@@ -37,6 +37,7 @@ Strings in Luft's Nynorsk translation that a native speaker should check: terms 
 - `apps/setup/locales/nn/setup.ftl` `setup-windows-hibernated`: "… Rask oppstart … hald inne Skift medan du vel Avslutt …" — names taken from Norwegian Windows (Rask oppstart, Avslutt, and Diskbehandling in `setup-windows-bitlocker`); verify against a Norwegian Windows.
 - `apps/setup/locales/nn/setup.ftl` `setup-region-intro-guessed`: "Vi har gjetta { $guesses }, …" with parts like "tastaturet ut frå datamaskinen" — check the joined sentence reads naturally.
 - `apps/setup/locales/nn/setup.ftl` `setup-network-unavailable`: "… frå oppgåvelinja." — English says "the panel", read here as the taskbar.
+- `kestrel/ui/locales/nn/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 

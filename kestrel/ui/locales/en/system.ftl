@@ -149,6 +149,8 @@ privacy-unmute-microphone = Unmute microphone
 privacy-close-app = Close { $app }
 # Used in place of an app's name when it isn't known
 privacy-unknown-app = An app
+# $name is the name an app gave itself, which Kestrel couldn't check, such as for apps that use sound through PulseAudio
+privacy-reported-app = “{ $name }” (name not verified)
 # Menu items for programs you let see your windows, or see and use them. $count is how many
 privacy-windows-seeing-programs = { $count ->
     [one] A program can see your windows

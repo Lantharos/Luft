@@ -39,6 +39,7 @@ Strings in Luft's Macedonian translation that a native speaker should check. Eac
 - `apps/setup/locales/mk/setup.ftl` `setup-account-full-name-example`: "Блаже Конески" — a well-known Macedonian name as the placeholder.
 - `apps/setup/locales/mk/setup.ftl` `setup-windows-fast-startup`: "Исклучи го Брзо стартување во Windows" — assumes Windows calls Fast Startup „Брзо стартување“ in Macedonian; same for „Управување со дискови“ (Disk Management) in `setup-windows-bitlocker`.
 - `apps/setup/installer/locales/mk/installer.ftl` `installer-no-deployment`: "Новиот систем нема распоредување" — technical term for a system deployment; check the wording.
+- `kestrel/ui/locales/mk/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 

@@ -113,6 +113,7 @@ privacy-mute-microphone = Stäng av mikrofonen
 privacy-unmute-microphone = Slå på mikrofonen
 privacy-close-app = Stäng { $app }
 privacy-unknown-app = En app
+privacy-reported-app = ”{ $name }” (namnet är inte bekräftat)
 privacy-windows-seeing-programs = { $count ->
     [one] { $count } program kan se dina fönster
    *[other] { $count } program kan se dina fönster
@@ -341,6 +342,7 @@ audio-device-microphone = Mikrofon
 inhibit-shortcuts-title = Tillåt att kortkommandon blockeras
 inhibit-shortcuts-app = Appen { $appName } vill blockera kortkommandon
 inhibit-shortcuts-unknown-app = En app vill blockera kortkommandon
+inhibit-shortcuts-titled-app = En app med fönstret ”{ $title }” vill blockera kortkommandon
 inhibit-shortcuts-restore = Du kan återställa kortkommandona genom att trycka på { $shortcut }
 inhibit-shortcuts-deny = Neka
 inhibit-shortcuts-allow = Tillåt

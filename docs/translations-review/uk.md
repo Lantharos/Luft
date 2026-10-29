@@ -43,6 +43,7 @@ Strings in Luft's Ukrainian translation that a native speaker should check, each
 - `apps/setup/locales/uk/setup.ftl` `setup-windows-bitlocker`: "…у програмі «Керування дисками»…" — Windows' Ukrainian name for Disk Management.
 - `apps/setup/locales/uk/setup.ftl` `setup-account-user-name-invalid`: "Використовуйте малі латинські літери, цифри, - і _" — added «латинські» since Cyrillic isn't allowed; confirm.
 - `apps/setup/locales/uk/setup.ftl` `setup-protect-kept`: "Ключ відновлення збережено" — impersonal to avoid the gendered «Я зберіг/зберегла».
+- `kestrel/ui/locales/uk/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 

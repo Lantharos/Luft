@@ -28,6 +28,7 @@ Strings in Luft's Slovak translation that a native speaker should check, each li
 - `kestrel/ui/locales/sk/auth.ftl` `ctrl-alt-tab-unlock`: "Okno odomknutia" — unclear English source ("Unlock Window" as a noun); check wording.
 - `kestrel/ui/locales/sk/desktop.ftl` `task-view-desktop`: "Pracovný priestor { $number }" — workspace name in the task view, matching Settings; check it fits under each workspace thumbnail.
 - `apps/setup/locales/sk/setup.ftl` `setup-windows-hibernated` / `setup-windows-fast-startup`: "rýchle spustenie" — check the name Slovak Windows uses for Fast Startup (rýchle spúšťanie?) and whether it should be capitalized.
+- `kestrel/ui/locales/sk/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 

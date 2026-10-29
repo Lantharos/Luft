@@ -113,6 +113,7 @@ privacy-mute-microphone = Demp mikrofonen
 privacy-unmute-microphone = Slå på mikrofonen
 privacy-close-app = Lukk { $app }
 privacy-unknown-app = En app
+privacy-reported-app = «{ $name }» (navnet er ikke bekreftet)
 privacy-windows-seeing-programs = { $count ->
     [one] { $count } program kan se vinduene dine
    *[other] { $count } programmer kan se vinduene dine
@@ -341,6 +342,7 @@ audio-device-microphone = Mikrofon
 inhibit-shortcuts-title = Tillat at hurtigtaster overstyres
 inhibit-shortcuts-app = Appen { $appName } vil overstyre systemets hurtigtaster
 inhibit-shortcuts-unknown-app = En app vil overstyre systemets hurtigtaster
+inhibit-shortcuts-titled-app = En app med vinduet «{ $title }» vil overstyre systemets hurtigtaster
 inhibit-shortcuts-restore = Du kan få hurtigtastene tilbake ved å trykke på { $shortcut }
 inhibit-shortcuts-deny = Avslå
 inhibit-shortcuts-allow = Tillat

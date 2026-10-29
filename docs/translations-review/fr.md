@@ -32,6 +32,7 @@ Strings in Luft's French translation that a native speaker should check: terms w
 - `apps/setup/locales/fr/setup.ftl` `setup-region-intro-guessed`: "Nous avons déduit { $guesses }, modifiez ce qui ne convient pas." — the guess fragments carry their own articles (« la langue et le clavier d’après votre ordinateur »); check the joined sentence with both sources.
 - `apps/setup/locales/fr/setup.ftl` `setup-destination-meet-choice-description`: "Utiliser les { $size } préparés par Meet Luft à côté de Windows." — agreement assumes a size such as « 120 Go »; check it reads well.
 - `apps/setup/locales/fr/setup.ftl` `setup-meet-room-packed`: "Ce que vous avez préparé dans Windows ({ $size }) sera déballé dans votre nouveau compte." — should match how Meet Luft's French names packing.
+- `kestrel/ui/locales/fr/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 

@@ -40,6 +40,7 @@ Strings in Luft's Estonian translation that a native speaker should check. Each 
 - `apps/setup/locales/et/setup.ftl` `setup-destination-alongside-choice`: "Koos süsteemiga { $windows }" — built to keep "Windows 11" uninflected; check it reads well as an option title.
 - `apps/setup/locales/et/setup.ftl` `setup-network-unavailable`: "Ühenduse saad luua hiljem paneelilt." — unclear which panel the English means; check in context.
 - `kestrel/ui/locales/et/system.ftl` `backlight-title`: "Klaviatuuri taustvalgustus" — matches the Power page in Settings but may clip on a Quick settings tile.
+- `kestrel/ui/locales/et/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 

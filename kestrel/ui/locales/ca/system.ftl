@@ -113,6 +113,7 @@ privacy-mute-microphone = Silencia el micròfon
 privacy-unmute-microphone = Activa el micròfon
 privacy-close-app = Tanca { $app }
 privacy-unknown-app = Una aplicació
+privacy-reported-app = «{ $name }» (nom no verificat)
 privacy-windows-seeing-programs = { $count ->
     [one] { $count } programa pot veure les vostres finestres
    *[other] { $count } programes poden veure les vostres finestres
@@ -341,6 +342,7 @@ audio-device-microphone = Micròfon
 inhibit-shortcuts-title = Permet inhibir les dreceres
 inhibit-shortcuts-app = L’aplicació { $appName } vol inhibir les dreceres del sistema
 inhibit-shortcuts-unknown-app = Una aplicació vol inhibir les dreceres del sistema
+inhibit-shortcuts-titled-app = Una aplicació amb la finestra «{ $title }» vol inhibir les dreceres del sistema
 inhibit-shortcuts-restore = Podeu restaurar les dreceres prement { $shortcut }
 inhibit-shortcuts-deny = Denega
 inhibit-shortcuts-allow = Permet

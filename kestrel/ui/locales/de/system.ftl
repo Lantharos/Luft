@@ -113,6 +113,7 @@ privacy-mute-microphone = Mikrofon stummschalten
 privacy-unmute-microphone = Stummschaltung aufheben
 privacy-close-app = { $app } schließen
 privacy-unknown-app = Eine App
+privacy-reported-app = „{ $name }“ (Name nicht überprüft)
 privacy-windows-seeing-programs = { $count ->
     [one] { $count } Programm kann deine Fenster sehen
    *[other] { $count } Programme können deine Fenster sehen
@@ -341,6 +342,7 @@ audio-device-microphone = Mikrofon
 inhibit-shortcuts-title = Tastenkürzel übernehmen lassen
 inhibit-shortcuts-app = Die App { $appName } möchte die Tastenkürzel des Systems übernehmen
 inhibit-shortcuts-unknown-app = Eine App möchte die Tastenkürzel des Systems übernehmen
+inhibit-shortcuts-titled-app = Eine App mit dem Fenster „{ $title }“ möchte die Tastenkürzel des Systems übernehmen
 inhibit-shortcuts-restore = Mit { $shortcut } bekommst du die Tastenkürzel zurück
 inhibit-shortcuts-deny = Verweigern
 inhibit-shortcuts-allow = Zulassen

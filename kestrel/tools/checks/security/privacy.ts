@@ -1,18 +1,34 @@
-import type Clutter from 'gi://Clutter';
+import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
 
-import {descendants, named} from '../lib/actors.js';
+import {descendants, labelOf, named, textOf} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {call} from '../lib/dbus.js';
-import {click} from '../lib/input/input.js';
-import {spawn, stop} from '../lib/processes.js';
+import {click, press} from '../lib/input/input.js';
+import {outcome, spawn, stop} from '../lib/processes.js';
+import {pause, settled} from '../lib/wait.js';
+import {followLink, openApp} from '../apps/lib/apps.js';
 import {capture} from '../lib/screenshots.js';
 import {startSessionClient} from '../system/lib/sessionClient.js';
 
 const {require, eventually} = checks('panel status');
 const SCREEN_CAST = 'org.gnome.Mutter.ScreenCast';
 const LEVEL_METER_NAMES = ['com.lantharos.settings', 'org.PulseAudio.pavucontrol'];
+const SETTLE_MS = 1000;
+
+interface DumpObject {
+  type: string;
+  info?: {props?: Record<string, string | number>};
+}
+
+const pipewireObjects = async () => JSON.parse((await outcome(['pw-dump'])).stdout) as DumpObject[];
+const isNode = (object: DumpObject, key: string, value: string) => object.type === 'PipeWire:Interface:Node' && object.info?.props?.[key] === value;
+
+async function settingsMeters() {
+  return (await pipewireObjects()).filter(object => isNode(object, 'application.id', 'com.lantharos.settings')
+    && object.info?.props?.['media.class'] === 'Stream/Input/Audio').length;
+}
 
 async function shareScreen() {
   const reply = await call(SCREEN_CAST, '/org/gnome/Mutter/ScreenCast', SCREEN_CAST, 'CreateSession', new GLib.Variant('(a{sv})', [{}]), '(o)');
@@ -47,7 +63,24 @@ export async function run() {
     const recorder = spawn(['parecord', '--device=microphone', `--property=application.id=${meter}`, '/dev/null']);
     await eventually(() => privacy.visible && showsIcon(privacy, 'audio-input-microphone-symbolic'),
       `an app recording under the name ${meter} still shows the microphone`);
+    await settled();
+    click(privacy);
+    await eventually(() => named('kestrel-context-menu')?.visible && descendants(named('kestrel-context-menu')!).some(entry => [textOf(entry), labelOf(entry), entry.accessible_name].some(text => text?.includes('(name not verified)'))),
+      'the menu marks the name an app recording through PulseAudio gave itself as not verified');
+    press(Clutter.KEY_Escape);
+    await eventually(() => !named('kestrel-context-menu')?.visible, 'the menu closes');
     await stop(recorder);
     await eventually(() => !privacy.visible, 'the microphone goes once it stops');
+  }
+
+  const settings = await openApp('settings', ['kestrel-settings:sound']);
+  try {
+    await eventually(async () => await settingsMeters() === 1, 'the Sound page measures the input level');
+    await pause(SETTLE_MS);
+    require(!privacy.visible, 'Settings measuring the input level leaves the privacy indicator hidden');
+    await followLink('settings', 'kestrel-settings:display');
+    await eventually(async () => await settingsMeters() === 0, 'leaving the Sound page stops measuring the input level');
+  } finally {
+    await settings.close();
   }
 }

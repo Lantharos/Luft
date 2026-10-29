@@ -113,6 +113,7 @@ privacy-mute-microphone = Заглуши микрофона
 privacy-unmute-microphone = Включи микрофона
 privacy-close-app = Затвори { $app }
 privacy-unknown-app = Приложение
+privacy-reported-app = „{ $name }“ (името не е проверено)
 privacy-windows-seeing-programs = { $count ->
     [one] { $count } програма може да вижда вашите прозорци
    *[other] { $count } програми могат да виждат вашите прозорци
@@ -341,6 +342,7 @@ audio-device-microphone = Микрофон
 inhibit-shortcuts-title = Разрешаване на блокирането на клавишни комбинации
 inhibit-shortcuts-app = Приложението { $appName } иска да блокира клавишните комбинации
 inhibit-shortcuts-unknown-app = Приложение иска да блокира клавишните комбинации
+inhibit-shortcuts-titled-app = Приложение с прозореца „{ $title }“ иска да блокира клавишните комбинации
 inhibit-shortcuts-restore = Можете да възстановите клавишните комбинации, като натиснете { $shortcut }
 inhibit-shortcuts-deny = Откажи
 inhibit-shortcuts-allow = Разреши

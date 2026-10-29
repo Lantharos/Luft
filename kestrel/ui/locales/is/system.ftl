@@ -113,6 +113,7 @@ privacy-mute-microphone = Þagga hljóðnema
 privacy-unmute-microphone = Kveikja á hljóðnema
 privacy-close-app = Loka { $app }
 privacy-unknown-app = Forrit
+privacy-reported-app = „{ $name }“ (nafn ekki staðfest)
 privacy-windows-seeing-programs = { $count ->
     [one] { $count } forrit getur séð gluggana þína
    *[other] { $count } forrit geta séð gluggana þína
@@ -341,6 +342,7 @@ audio-device-microphone = Hljóðnemi
 inhibit-shortcuts-title = Leyfa forriti að taka yfir flýtilykla
 inhibit-shortcuts-app = Forritið { $appName } vill taka yfir flýtilykla kerfisins
 inhibit-shortcuts-unknown-app = Forrit vill taka yfir flýtilykla kerfisins
+inhibit-shortcuts-titled-app = Forrit með gluggann „{ $title }“ vill taka yfir flýtilykla kerfisins
 inhibit-shortcuts-restore = Þú getur endurheimt flýtilyklana með því að ýta á { $shortcut }
 inhibit-shortcuts-deny = Hafna
 inhibit-shortcuts-allow = Leyfa

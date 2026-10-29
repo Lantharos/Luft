@@ -113,6 +113,7 @@ privacy-mute-microphone = Microfoon dempen
 privacy-unmute-microphone = Microfoon niet meer dempen
 privacy-close-app = { $app } sluiten
 privacy-unknown-app = Een app
+privacy-reported-app = “{ $name }” (naam niet gecontroleerd)
 privacy-windows-seeing-programs = { $count ->
     [one] { $count } programma kan je vensters zien
    *[other] { $count } programma’s kunnen je vensters zien
@@ -341,6 +342,7 @@ audio-device-microphone = Microfoon
 inhibit-shortcuts-title = Sneltoetsen laten blokkeren
 inhibit-shortcuts-app = De app { $appName } wil de systeemsneltoetsen blokkeren
 inhibit-shortcuts-unknown-app = Een app wil de systeemsneltoetsen blokkeren
+inhibit-shortcuts-titled-app = Een app met het venster “{ $title }” wil de systeemsneltoetsen blokkeren
 inhibit-shortcuts-restore = Je kunt de sneltoetsen herstellen door op { $shortcut } te drukken
 inhibit-shortcuts-deny = Weigeren
 inhibit-shortcuts-allow = Toestaan

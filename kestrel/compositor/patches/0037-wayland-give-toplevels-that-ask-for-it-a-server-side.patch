@@ -74,7 +74,7 @@ index 540975a6a3e63d65abbc3d7a8766e9c172d3b745..cd4db8a290b2b2425ce3a8c0edee6634
      }
  
 diff --git a/src/compositor/meta-window-corners.c b/src/compositor/meta-window-corners.c
-index 8bff38280715c589a245911fd8ba206d56a4e0fc..4dc55ae0dde04bd47973ea032712aead3b71aeea 100644
+index 2583ef5fcab08ba093e1e7b6b334d009fd02b6a3..89057dcd2003f1672da4dc46839d1bc2713ba1af 100644
 --- a/src/compositor/meta-window-corners.c
 +++ b/src/compositor/meta-window-corners.c
 @@ -10,14 +10,32 @@

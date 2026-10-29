@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
-Date: Sun, 25 Oct 2026 01:48:12 +0000
+Date: Thu, 29 Oct 2026 05:47:22 +0100
 Subject: [PATCH 53/54] compositor: let people turn rounded window corners off
 
 Follow com.lantharos.kestrel rounded-window-corners. With it off, window
@@ -8,18 +8,19 @@ corners keep a radius of 0, so surfaces, background blur, input regions
 and outlines stay square, and meta_window_has_rounded_corners() returns
 FALSE so the shell squares its title bars too.
 
-Floating Wayland windows keep the compositor's shadow and outline with
-square corners, since those no longer follow the rounded corners. When
-the setting changes, every window is redrawn and X11 windows are
-reshaped so their shadows follow.
+Floating windows keep the compositor's shadow and outline with square
+corners, since those no longer follow the rounded corners. When the
+setting changes, every window is redrawn and X11 windows are reshaped
+so their shadows follow.
 
 Upstream-Status: luft-only follows Kestrel's rounded corners setting
 ---
- src/compositor/compositor.c                | 35 +++++++++++++
- src/compositor/meta-window-actor-wayland.c |  5 +-
- src/compositor/meta-window-corners.c       | 57 ++++++++++++++++------
- src/compositor/meta-window-corners.h       |  2 +
- 4 files changed, 82 insertions(+), 17 deletions(-)
+ src/compositor/compositor.c          | 35 ++++++++++++++++++
+ src/compositor/meta-window-corners.c | 55 +++++++++++++++++++++-------
+ src/compositor/meta-window-corners.h |  2 +
+ src/compositor/meta-window-shadow.c  |  4 +-
+ src/compositor/meta-window-shadow.h  |  1 +
+ 5 files changed, 82 insertions(+), 15 deletions(-)
 
 diff --git a/src/compositor/compositor.c b/src/compositor/compositor.c
 index 2595e31bf28b3712e159f78003e875bcdc035e99..49c17af0f12342247228b27f4af1072520541b3d 100644
@@ -95,48 +96,11 @@ index 2595e31bf28b3712e159f78003e875bcdc035e99..49c17af0f12342247228b27f4af10725
  
    g_clear_signal_handler (&priv->stage_presented_id, stage);
    g_clear_signal_handler (&priv->before_update_handler_id, stage);
-diff --git a/src/compositor/meta-window-actor-wayland.c b/src/compositor/meta-window-actor-wayland.c
-index b99bdad2619d896c7f0deece89b8d059c6e47ae4..d491ee06475a278093cc88d01ded2411df605716 100644
---- a/src/compositor/meta-window-actor-wayland.c
-+++ b/src/compositor/meta-window-actor-wayland.c
-@@ -66,6 +66,7 @@ struct _MetaWindowActorWayland
-   MtkRegion *shadow_hole;
-   int shadow_width;
-   int shadow_height;
-+  float shadow_radius;
-   gboolean shadow_focused;
- #endif
- };
-@@ -589,7 +590,7 @@ ensure_shadow (MetaWindowActorWayland *self,
-   MtkRectangle rect = { 0, 0, frame->width, frame->height };
-   MetaWindowCorners corners = {
-     .bounds = GRAPHENE_RECT_INIT (0, 0, frame->width, frame->height),
--    .radius = MIN (META_WINDOW_CORNER_RADIUS,
-+    .radius = MIN (meta_window_corners_get_radius (),
-                    MIN (frame->width, frame->height) / 2.0f),
-   };
-   g_autoptr (MtkRegion) region = NULL;
-@@ -598,6 +599,7 @@ ensure_shadow (MetaWindowActorWayland *self,
-   if (self->shadow &&
-       self->shadow_width == frame->width &&
-       self->shadow_height == frame->height &&
-+      self->shadow_radius == corners.radius &&
-       self->shadow_focused == focused)
-     return self->shadow;
- 
-@@ -615,6 +617,7 @@ ensure_shadow (MetaWindowActorWayland *self,
-   meta_window_shape_unref (shape);
-   self->shadow_width = frame->width;
-   self->shadow_height = frame->height;
-+  self->shadow_radius = corners.radius;
-   self->shadow_focused = focused;
-   return self->shadow;
- }
 diff --git a/src/compositor/meta-window-corners.c b/src/compositor/meta-window-corners.c
-index 863d5ee4fb364aba0e9061757ea48f7ae598cceb..e34439acfe290a507edbf41bcceb5ce62a6b7368 100644
+index a6bbab0bd9bc247f25d09a4e3d1ddb0616f2df05..d55efef771d0bfa505b2a47b2012fdf76ad98dfd 100644
 --- a/src/compositor/meta-window-corners.c
 +++ b/src/compositor/meta-window-corners.c
-@@ -10,16 +10,26 @@
+@@ -11,16 +11,26 @@
  #include "meta/meta-window-actor.h"
  #include "meta/window.h"
  
@@ -173,13 +137,10 @@ index 863d5ee4fb364aba0e9061757ea48f7ae598cceb..e34439acfe290a507edbf41bcceb5ce6
  {
    switch (meta_window_get_window_type (window))
      {
-@@ -38,16 +48,31 @@ meta_window_has_rounded_corners (MetaWindow *window)
+@@ -39,12 +49,26 @@ meta_window_has_rounded_corners (MetaWindow *window)
           window->edge_constraints.left == META_EDGE_CONSTRAINT_NONE;
  }
  
--/* Whether the compositor gives @window its shadow and outline: Wayland
-- * windows with rounded corners whose buffer doesn't reach past their frame,
-- * where a client would draw a shadow of its own. */
 +/**
 + * meta_window_has_rounded_corners:
 + * @window: a #MetaWindow
@@ -194,49 +155,104 @@ index 863d5ee4fb364aba0e9061757ea48f7ae598cceb..e34439acfe290a507edbf41bcceb5ce6
 +  return corners_rounded && is_floating (window);
 +}
 +
-+/* Whether the compositor gives @window its shadow and outline: floating
-+ * Wayland windows whose buffer doesn't reach past their frame, where a
-+ * client would draw a shadow of its own. They keep both when rounded
-+ * corners are turned off. */
- gboolean
- meta_window_corners_casts_shadow (MetaWindow *window)
+ static gboolean
+ is_outlined (MetaWindow *window)
  {
-   MtkRectangle frame, buffer;
- 
-   if (meta_window_get_client_type (window) != META_WINDOW_CLIENT_TYPE_WAYLAND ||
+   if (window->unmanaging ||
+       meta_window_is_override_redirect (window) ||
 -      !meta_window_has_rounded_corners (window))
 +      !is_floating (window))
      return FALSE;
  
    switch (meta_window_get_window_type (window))
-@@ -118,7 +143,7 @@ meta_window_corners_for_actor (ClutterActor *actor)
+@@ -123,7 +147,7 @@ meta_window_corners_for_actor (ClutterActor *actor)
+   MetaWindow *window;
+   graphene_matrix_t transform, inverse;
+   graphene_rect_t bounds;
+-  float scale, border;
++  float scale, border, radius;
+ 
+   while (ancestor && !META_IS_WINDOW_ACTOR (ancestor))
+     ancestor = clutter_actor_get_parent (ancestor);
+@@ -136,6 +160,9 @@ meta_window_corners_for_actor (ClutterActor *actor)
+     return corners;
+ 
+   graphene_rect_inset (&bounds, -border, -border);
++  radius = meta_window_corners_get_radius ();
++  if (radius > 0)
++    radius += border;
+ 
+   clutter_actor_get_relative_transformation_matrix (actor, ancestor, &transform);
+   if (!graphene_matrix_inverse (&transform, &inverse))
+@@ -157,7 +184,7 @@ meta_window_corners_for_actor (ClutterActor *actor)
                                             bounds.size.width * x_scale,
                                             bounds.size.height * y_scale);
      }
--  corners.radius = MIN (META_WINDOW_CORNER_RADIUS * scale,
-+  corners.radius = MIN (meta_window_corners_get_radius () * scale,
+-  corners.radius = MIN ((META_WINDOW_CORNER_RADIUS + border) * scale,
++  corners.radius = MIN (radius * scale,
                           MIN (corners.bounds.size.width,
                                corners.bounds.size.height) / 2.0f);
    return corners;
-@@ -393,7 +418,7 @@ meta_window_corners_paint_outline (CoglFramebuffer    *framebuffer,
+@@ -437,7 +464,7 @@ meta_window_corners_paint_outline (CoglFramebuffer       *framebuffer,
    g_autoptr (CoglPipeline) pipeline = NULL;
-   float x1 = frame->x, y1 = frame->y;
-   float x2 = x1 + frame->width, y2 = y1 + frame->height;
+   float x1 = bounds->origin.x, y1 = bounds->origin.y;
+   float x2 = x1 + bounds->size.width, y2 = y1 + bounds->size.height;
 -  float radius = MIN (META_WINDOW_CORNER_RADIUS,
 +  float radius = MIN (meta_window_corners_get_radius (),
-                       MIN (frame->width, frame->height) / 2.0f);
-   float band = ceilf (radius) + 1.0f;
-   float side = OUTLINE_WIDTH + 1.0f;
+                       MIN (bounds->size.width, bounds->size.height) / 2.0f);
+   float band = MAX (ceilf (radius), OUTLINE_MIN_BAND) + 1.0f;
+   float rect[4] = { x1, y1, bounds->size.width, bounds->size.height };
 diff --git a/src/compositor/meta-window-corners.h b/src/compositor/meta-window-corners.h
-index 3d39602d060d3b34ea475c03f2c768cdf8bff3f1..918abcc28869a593e161d0bbf938c2997113f31a 100644
+index 2642508148dda07a02f7d96ee5b85cb03f41aafd..bb876637970b91c37a1a5001b7277a96928491b6 100644
 --- a/src/compositor/meta-window-corners.h
 +++ b/src/compositor/meta-window-corners.h
-@@ -19,6 +19,8 @@ typedef enum
+@@ -20,6 +20,8 @@ typedef enum
    META_WINDOW_CORNER_FILL_SHADOW,
  } MetaWindowCornerFill;
  
 +void meta_window_corners_set_rounded (gboolean rounded);
 +float meta_window_corners_get_radius (void);
  MetaWindowCorners meta_window_corners_for_actor (ClutterActor *actor);
- gboolean meta_window_corners_casts_shadow (MetaWindow *window);
- void meta_window_corners_paint_outline (CoglFramebuffer    *framebuffer,
+ gboolean meta_window_corners_get_outline (MetaWindowActor *window_actor,
+                                           graphene_rect_t *bounds);
+diff --git a/src/compositor/meta-window-shadow.c b/src/compositor/meta-window-shadow.c
+index 6fc6fc17975c245cbfe5682b9162d22c8611161a..a4bd2165b9cef4add22bf548a6eabeb8c83bd81c 100644
+--- a/src/compositor/meta-window-shadow.c
++++ b/src/compositor/meta-window-shadow.c
+@@ -33,7 +33,7 @@ ensure_shadow (MetaWindowShadow   *shadow,
+   MtkRectangle rect = { 0, 0, frame->width, frame->height };
+   MetaWindowCorners corners = {
+     .bounds = GRAPHENE_RECT_INIT (0, 0, frame->width, frame->height),
+-    .radius = MIN (META_WINDOW_CORNER_RADIUS,
++    .radius = MIN (meta_window_corners_get_radius (),
+                    MIN (frame->width, frame->height) / 2.0f),
+   };
+   g_autoptr (MtkRegion) region = NULL;
+@@ -42,6 +42,7 @@ ensure_shadow (MetaWindowShadow   *shadow,
+   if (shadow->shadow &&
+       shadow->width == frame->width &&
+       shadow->height == frame->height &&
++      shadow->radius == corners.radius &&
+       shadow->focused == focused)
+     return;
+ 
+@@ -58,6 +59,7 @@ ensure_shadow (MetaWindowShadow   *shadow,
+   meta_window_shape_unref (shape);
+   shadow->width = frame->width;
+   shadow->height = frame->height;
++  shadow->radius = corners.radius;
+   shadow->focused = focused;
+ }
+ 
+diff --git a/src/compositor/meta-window-shadow.h b/src/compositor/meta-window-shadow.h
+index 2411c41b06b855f3421434cdadfbf7e524fe9a75..7fdf9bfc85af684ce9ffb72a211f533973768321 100644
+--- a/src/compositor/meta-window-shadow.h
++++ b/src/compositor/meta-window-shadow.h
+@@ -11,6 +11,7 @@ typedef struct
+   MtkRegion *hole;
+   int width;
+   int height;
++  float radius;
+   gboolean focused;
+ } MetaWindowShadow;
+ 

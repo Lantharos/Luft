@@ -1,8 +1,9 @@
+import GLib from 'gi://GLib';
 import type Meta from 'gi://Meta';
 
 import {withScheme} from '../apps/lib/palette.js';
 import {checks} from '../lib/check.js';
-import {fixture, spawn, waitForWindow} from '../lib/processes.js';
+import {fixture, gjs, scratch, spawn, waitForWindow} from '../lib/processes.js';
 import {capture, captureFrame} from '../lib/screenshots.js';
 import {settled} from '../lib/wait.js';
 
@@ -12,6 +13,12 @@ const NOTES = ['Notes', '1b1b1b', [200, 180, 420, 300]] as const;
 const FILES = ['Files', '242424', [540, 110, 520, 360]] as const;
 const FRAMED = ['Framed', '2e3a46', [700, 500, 360, 200]] as const;
 const GLASS = ['Glass', 360, 220, [1000, 160]] as const;
+const GTK4 = ['Sketches', '242424', [1160, 400, 260, 150]] as const;
+const GTK3 = ['Ledger', '242424', [1160, 600, 260, 150]] as const;
+const UNDECORATED = ['Radio', '313338', [80, 560, 300, 140]] as const;
+const ELECTRON_X11 = ['Chat', '313338', [400, 540, 260, 140]] as const;
+const ELECTRON_WAYLAND = ['Calls', '313338', [700, 720, 300, 110]] as const;
+const ELECTRON_OPEN_TIMEOUT = 60000;
 const BELOW = 8;
 const INSIDE = 4;
 const SHADOW_DEPTH = 12;
@@ -24,13 +31,22 @@ interface Opened {
   color: number[];
 }
 
-async function open(mode: string, [title, color, [x, y, width, height]]: Client): Promise<Opened> {
-  spawn(['python3', fixture('clients', 'wayland', 'decorationClient.py'), mode, title, color]);
-  const window = await waitForWindow(title, `the ${title} client opens`);
+async function open(start: (title: string, color: string) => void, [title, color, [x, y, width, height]]: Client, timeout?: number): Promise<Opened> {
+  start(title, color);
+  const window = await waitForWindow(title, `the ${title} client opens`, timeout);
   window.move_resize_frame(true, x, y, width, height);
   await eventually(() => window.get_frame_rect().width === width, `the ${title} client takes its size`);
   return {window, color: channels(color)};
 }
+
+const decorationClient = (mode: string) => (title: string, color: string) =>
+  spawn(['python3', fixture('clients', 'wayland', 'decorationClient.py'), mode, title, color]);
+const gtk4 = (title: string, color: string) => gjs('clients/windows/gtk4Window.js', [title, `#${color}`]);
+const gtk3 = (decorations: string) => (title: string, color: string) =>
+  gjs('clients/windows/gtk3Window.js', [title, `#${color}`, 'x11', decorations]);
+const electron = (binary: string, platform: string) => (title: string, color: string) =>
+  spawn([binary, `--user-data-dir=${scratch(`kestrel-electron-${title}`)}`, `--ozone-platform=${platform}`,
+    fixture('clients', 'electron'), title, `#${color}`, 'frameless']);
 
 async function openGlass([title, width, height, [x, y]]: readonly [string, number, number, readonly [number, number]]) {
   spawn(['python3', fixture('clients', 'wayland', 'blurClient.py'), title, `${width}`, `${height}`]);
@@ -61,6 +77,13 @@ async function checkOutline({window, color}: Opened, label: string, shifted: (ed
   require(same(await topEdge(window, INSIDE), color), `${label}'s outline stays on its edge`);
 }
 
+async function checkSideOutline({window, color}: Opened, label: string) {
+  const frame = window.get_frame_rect();
+  const y = frame.y + Math.round(frame.height / 2);
+  require(lighter(await pixel(frame.x, y), color), `${label} gets an outline along its edge`);
+  require(same(await pixel(frame.x + INSIDE, y), color), `${label}'s outline stays on its edge`);
+}
+
 async function checkShadow({window}: Opened, backdrop: Opened, label: string) {
   const frame = window.get_frame_rect();
   const below = await pixel(frame.x + Math.round(frame.width / 2), frame.y + frame.height + BELOW);
@@ -72,12 +95,24 @@ async function checkSquare({window, color}: Opened, label: string) {
   require(same(await topEdge(window), color), `${label} has no outline`);
 }
 
+async function checkElectron(binary: string) {
+  const wayland = await open(electron(binary, 'wayland'), ELECTRON_WAYLAND, ELECTRON_OPEN_TIMEOUT);
+  const x11 = await open(electron(binary, 'x11'), ELECTRON_X11, ELECTRON_OPEN_TIMEOUT);
+  require(wayland.window.get_buffer_rect().width > wayland.window.get_frame_rect().width, 'frameless Electron draws its own shadow on Wayland');
+  await settled();
+  await checkSideOutline(wayland, 'a frameless Electron window on Wayland');
+  await checkSideOutline(x11, 'a frameless Electron window on Xwayland');
+}
+
 export async function run() {
-  const backdrop = await open('client', BACKDROP);
-  const notes = await open('client', NOTES);
-  const files = await open('client', FILES);
-  const framed = await open('server', FRAMED);
+  const backdrop = await open(decorationClient('client'), BACKDROP);
+  const notes = await open(decorationClient('client'), NOTES);
+  const files = await open(decorationClient('client'), FILES);
+  const framed = await open(decorationClient('server'), FRAMED);
   await openGlass(GLASS);
+  const sketches = await open(gtk4, GTK4);
+  const ledger = await open(gtk3('headerbar'), GTK3);
+  const radio = await open(gtk3('none'), UNDECORATED);
 
   notes.window.activate(global.get_current_time());
   await settled();
@@ -87,6 +122,15 @@ export async function run() {
   framed.window.activate(global.get_current_time());
   await settled();
   await checkShadow(framed, backdrop, 'a window with Kestrel\'s title bar');
+  await checkSideOutline(sketches, 'a GTK 4 window that draws its own shadow');
+  await checkSideOutline(ledger, 'an X11 window that draws its own shadow');
+  radio.window.activate(global.get_current_time());
+  await settled();
+  await checkSideOutline(radio, 'an undecorated X11 window');
+  await checkShadow(radio, backdrop, 'an undecorated X11 window');
+  const electronBinary = GLib.getenv('KESTREL_ELECTRON');
+  if (electronBinary) await checkElectron(electronBinary);
+  else console.log('Kestrel window shadows: Electron skipped without KESTREL_ELECTRON');
 
   files.window.activate(global.get_current_time());
   await withScheme('dark', () => capture('window-shadows-dark'));
@@ -102,6 +146,12 @@ export async function run() {
   await eventually(() => notes.window.is_fullscreen(), 'the window goes fullscreen');
   await checkSquare(notes, 'a fullscreen window');
   await capture('window-shadows-fullscreen');
+  radio.window.activate(global.get_current_time());
+  radio.window.maximize();
+  await eventually(() => radio.window.is_maximized(), 'the X11 window maximizes');
+  await checkSquare(radio, 'a maximized X11 window');
+  radio.window.unmaximize();
+  await eventually(() => !radio.window.is_maximized(), 'the X11 window restores');
   notes.window.unmake_fullscreen();
   await eventually(() => !notes.window.is_fullscreen(), 'the window leaves fullscreen');
   await settled();

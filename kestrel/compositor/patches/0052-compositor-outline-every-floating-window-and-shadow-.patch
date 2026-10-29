@@ -1,0 +1,931 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Thu, 29 Oct 2026 05:48:18 +0100
+Subject: [PATCH 52/54] compositor: outline every floating window and shadow
+ those that draw none
+
+Windows used to blend into whatever was behind them, most of all dark
+windows over other dark windows, and only Wayland windows that drew no
+shadow of their own got an outline. Like on Windows 11, give every
+floating normal window, dialog and utility window a thin neutral line
+along the inside of its frame's rounded edge that lightens dark windows
+and darkens light ones, whether it is a Wayland or an X11 window, draws
+its own title bar and shadow or has Kestrel's. Popups, menus, tooltips,
+override-redirect and shaped X11 windows, the desktop, and maximized,
+tiled and fullscreen windows go without.
+
+Windows whose buffer doesn't reach past their frame, where a client
+would draw a shadow of its own, also get a shadow from the shadow
+factory, the same one for Wayland and X11 windows, in place of the
+shadow Mutter gave opaque undecorated X11 windows. It is never painted
+under the window, so translucent and blurred parts of it stay clear,
+and it reaches undecorated translucent X11 windows such as Electron's,
+which had none. The default shadows grow a little softer and wider for
+every window.
+
+The line is as many whole device pixels wide as fit in a logical pixel,
+so it stays crisp at fractional scales, and its outer edge is
+antialiased exactly like the rounded corners' clip, so it meets the
+window's edge without a gap or halo. It is drawn in
+bands along the edges, so it costs no full-size pass. Window actors
+drop their shadows when they're unrealized, since the shadows' textures
+belong to the graphics context that a GPU reset replaces, and the
+shadow factory shares one shadow between every window of the same
+shape. A window's paint volume is recomputed when it gains or loses
+focus, since its shadow changes size.
+
+Upstream-Status: luft-only Kestrel's window shadows and outline
+---
+ src/compositor/meta-window-actor-wayland.c | 105 ++++++++++
+ src/compositor/meta-window-actor-x11.c     |  80 +++++++-
+ src/compositor/meta-window-actor.c         |   1 +
+ src/compositor/meta-window-corners.c       | 223 +++++++++++++++++++--
+ src/compositor/meta-window-corners.h       |  12 ++
+ src/compositor/meta-window-shadow.c        | 119 +++++++++++
+ src/compositor/meta-window-shadow.h        |  26 +++
+ src/meson.build                            |   2 +
+ src/x11/meta-shadow-factory.c              |  14 +-
+ 9 files changed, 552 insertions(+), 30 deletions(-)
+ create mode 100644 src/compositor/meta-window-shadow.c
+ create mode 100644 src/compositor/meta-window-shadow.h
+
+diff --git a/src/compositor/meta-window-actor-wayland.c b/src/compositor/meta-window-actor-wayland.c
+index cd4db8a290b2b2425ce3a8c0edee6634b516b116..7b12ef66a0f4b5e79486e2848a813a1daec64124 100644
+--- a/src/compositor/meta-window-actor-wayland.c
++++ b/src/compositor/meta-window-actor-wayland.c
+@@ -24,6 +24,7 @@
+ #include "compositor/meta-cullable.h"
+ #include "compositor/meta-surface-actor-wayland.h"
+ #include "compositor/meta-window-actor-wayland.h"
++#include "compositor/meta-window-corners.h"
+ #include "meta/meta-window-actor.h"
+ #include "wayland/meta-wayland-actor-surface.h"
+ #include "wayland/meta-wayland-buffer.h"
+@@ -31,6 +32,10 @@
+ #include "wayland/meta-wayland-surface-private.h"
+ #include "wayland/meta-window-wayland.h"
+ 
++#ifdef HAVE_XWAYLAND
++#include "compositor/meta-window-shadow.h"
++#endif
++
+ struct _MetaSurfaceContainerActorWayland
+ {
+   ClutterActor parent;
+@@ -53,6 +58,10 @@ struct _MetaWindowActorWayland
+   MetaSurfaceContainerActorWayland *surface_container;
+   gulong highest_scale_monitor_handler_id;
+   gboolean needs_sync;
++
++#ifdef HAVE_XWAYLAND
++  MetaWindowShadow shadow;
++#endif
+ };
+ 
+ static void cullable_iface_init (MetaCullableInterface *iface);
+@@ -534,6 +543,80 @@ meta_window_actor_wayland_is_single_surface_actor (MetaWindowActor *actor)
+          clutter_actor_get_n_children (CLUTTER_ACTOR (self)) == 1;
+ }
+ 
++#ifdef HAVE_XWAYLAND
++static gboolean
++get_shadow_frame (MetaWindowActorWayland *self,
++                  const graphene_rect_t  *outline,
++                  MtkRectangle           *frame)
++{
++  MetaWindow *window = meta_window_actor_get_meta_window (META_WINDOW_ACTOR (self));
++
++  if (!meta_window_corners_casts_shadow (window))
++    return FALSE;
++
++  mtk_rectangle_from_graphene_rect (outline, MTK_ROUNDING_STRATEGY_ROUND, frame);
++  return TRUE;
++}
++#endif
++
++static void
++meta_window_actor_wayland_paint (ClutterActor        *actor,
++                                 ClutterPaintContext *paint_context)
++{
++  MetaWindowActorWayland *self = META_WINDOW_ACTOR_WAYLAND (actor);
++  CoglFramebuffer *framebuffer = clutter_paint_context_get_framebuffer (paint_context);
++  guint8 opacity = clutter_actor_get_paint_opacity (actor);
++  graphene_rect_t outline;
++  gboolean outlined =
++    meta_window_corners_get_outline (META_WINDOW_ACTOR (self), &outline);
++#ifdef HAVE_XWAYLAND
++  MtkRectangle frame;
++
++  if (outlined && get_shadow_frame (self, &outline, &frame))
++    meta_window_shadow_paint (&self->shadow, actor, framebuffer, &frame, opacity);
++#endif
++
++  CLUTTER_ACTOR_CLASS (meta_window_actor_wayland_parent_class)->paint (actor,
++                                                                       paint_context);
++
++  if (outlined)
++    meta_window_corners_paint_outline (framebuffer, &outline, opacity);
++}
++
++static gboolean
++meta_window_actor_wayland_get_paint_volume (ClutterActor       *actor,
++                                            ClutterPaintVolume *volume)
++{
++  ClutterActorClass *parent_class =
++    CLUTTER_ACTOR_CLASS (meta_window_actor_wayland_parent_class);
++#ifdef HAVE_XWAYLAND
++  MetaWindowActorWayland *self = META_WINDOW_ACTOR_WAYLAND (actor);
++  graphene_rect_t outline;
++  MtkRectangle frame;
++#endif
++
++  if (!parent_class->get_paint_volume (actor, volume))
++    return FALSE;
++
++#ifdef HAVE_XWAYLAND
++  if (meta_window_corners_get_outline (META_WINDOW_ACTOR (self), &outline) &&
++      get_shadow_frame (self, &outline, &frame))
++    {
++      MtkRectangle bounds;
++
++      meta_window_shadow_get_bounds (&self->shadow, actor, &frame, &bounds);
++      clutter_paint_volume_union_box (volume,
++                                      &(ClutterActorBox) {
++                                        bounds.x, bounds.y,
++                                        bounds.x + bounds.width,
++                                        bounds.y + bounds.height,
++                                      });
++    }
++#endif
++
++  return TRUE;
++}
++
+ static gboolean
+ maybe_configure_black_background (MetaWindowActorWayland *self,
+                                   float                  *surfaces_width,
+@@ -677,6 +760,20 @@ meta_window_actor_wayland_map (ClutterActor *actor)
+     }
+ }
+ 
++#ifdef HAVE_XWAYLAND
++/* The shadow's texture belongs to the graphics context, which is replaced
++ * when the GPU resets */
++static void
++meta_window_actor_wayland_unrealize (ClutterActor *actor)
++{
++  MetaWindowActorWayland *self = META_WINDOW_ACTOR_WAYLAND (actor);
++
++  meta_window_shadow_clear (&self->shadow);
++
++  CLUTTER_ACTOR_CLASS (meta_window_actor_wayland_parent_class)->unrealize (actor);
++}
++#endif
++
+ static void
+ meta_window_actor_wayland_dispose (GObject *object)
+ {
+@@ -687,6 +784,9 @@ meta_window_actor_wayland_dispose (GObject *object)
+ 
+   g_clear_signal_handler (&self->highest_scale_monitor_handler_id,
+                           window);
++#ifdef HAVE_XWAYLAND
++  meta_window_shadow_clear (&self->shadow);
++#endif
+ 
+   parent_class->dispose (object);
+ }
+@@ -726,6 +826,11 @@ meta_window_actor_wayland_class_init (MetaWindowActorWaylandClass *klass)
+   window_actor_class->is_single_surface_actor = meta_window_actor_wayland_is_single_surface_actor;
+ 
+   clutter_actor_class->map = meta_window_actor_wayland_map;
++  clutter_actor_class->paint = meta_window_actor_wayland_paint;
++  clutter_actor_class->get_paint_volume = meta_window_actor_wayland_get_paint_volume;
++#ifdef HAVE_XWAYLAND
++  clutter_actor_class->unrealize = meta_window_actor_wayland_unrealize;
++#endif
+ 
+   object_class->constructed = meta_window_actor_wayland_constructed;
+   object_class->dispose = meta_window_actor_wayland_dispose;
+diff --git a/src/compositor/meta-window-actor-x11.c b/src/compositor/meta-window-actor-x11.c
+index ac370b22aa8f89425efe8f2e702282f1833763c3..168c61ca2154b5c137d0df2ee26a8b75c7407e2c 100644
+--- a/src/compositor/meta-window-actor-x11.c
++++ b/src/compositor/meta-window-actor-x11.c
+@@ -21,6 +21,7 @@
+ #include "config.h"
+ 
+ #include "compositor/meta-window-corners.h"
++#include "compositor/meta-window-shadow.h"
+ 
+ #include "compositor/meta-window-actor-x11.h"
+ 
+@@ -81,6 +82,7 @@ struct _MetaWindowActorX11
+   MetaWindowShape *shadow_shape;
+ 
+   MetaShadowFactory *shadow_factory;
++  MetaWindowShadow window_shadow;
+ 
+   gboolean needs_reshape;
+   gboolean recompute_focused_shadow;
+@@ -372,6 +374,22 @@ meta_window_actor_x11_queue_frame_drawn (MetaWindowActor *actor,
+     }
+ }
+ 
++/* Unshaped floating windows get the outline Wayland windows get, and its
++ * shadow when they draw neither a frame nor a shadow of their own, see
++ * meta_window_corners_casts_shadow() */
++static gboolean
++get_outline (MetaWindowActorX11 *actor_x11,
++             graphene_rect_t    *outline)
++{
++  MetaWindow *window =
++    meta_window_actor_get_meta_window (META_WINDOW_ACTOR (actor_x11));
++  MetaWindowX11Private *priv =
++    meta_window_x11_get_private (META_WINDOW_X11 (window));
++
++  return !priv->shape_region &&
++         meta_window_corners_get_outline (META_WINDOW_ACTOR (actor_x11), outline);
++}
++
+ static gboolean
+ has_shadow (MetaWindowActorX11 *actor_x11)
+ {
+@@ -380,6 +398,7 @@ has_shadow (MetaWindowActorX11 *actor_x11)
+   MetaWindowX11 *x11_window = META_WINDOW_X11 (window);
+   MetaWindowX11Private *priv =
+     meta_window_x11_get_private (x11_window);
++  graphene_rect_t outline;
+ 
+   /* Leaving out shadows for maximized and fullscreen windows is an efficiency
+    * win and also prevents the unsightly effect of the shadow of maximized
+@@ -395,6 +414,10 @@ has_shadow (MetaWindowActorX11 *actor_x11)
+   if (meta_window_get_tile_match (window))
+     return FALSE;
+ 
++  if (get_outline (actor_x11, &outline) &&
++      meta_window_corners_casts_shadow (window))
++    return FALSE;
++
+   /*
+    * Let the frames client put a shadow around frames - This should override
+    * the restriction about not putting a shadow around ARGB windows.
+@@ -1138,9 +1161,13 @@ meta_window_actor_x11_paint (ClutterActor        *actor,
+                              ClutterPaintContext *paint_context)
+ {
+   MetaWindowActorX11 *actor_x11 = META_WINDOW_ACTOR_X11 (actor);
++  CoglFramebuffer *framebuffer = clutter_paint_context_get_framebuffer (paint_context);
++  guint8 opacity = clutter_actor_get_paint_opacity (actor);
+   MetaWindow *window;
+   gboolean appears_focused;
+   MetaShadow *shadow;
++  graphene_rect_t outline;
++  gboolean outlined;
+ 
+  /* This window got damage when obscured; we set up a timer
+   * to send frame completion events, but since we're drawing
+@@ -1162,7 +1189,6 @@ meta_window_actor_x11_paint (ClutterActor        *actor,
+       MetaShadowParams params;
+       MtkRectangle shape_bounds;
+       MtkRegion *clip = actor_x11->shadow_clip;
+-      CoglFramebuffer *framebuffer;
+ 
+       get_shape_bounds (actor_x11, &shape_bounds);
+       get_shadow_params (actor_x11, appears_focused, &params);
+@@ -1181,15 +1207,13 @@ meta_window_actor_x11_paint (ClutterActor        *actor,
+             mtk_region_subtract (clip, actor_x11->frame_bounds);
+         }
+ 
+-      framebuffer = clutter_paint_context_get_framebuffer (paint_context);
+       meta_shadow_paint (shadow,
+                          framebuffer,
+                          params.x_offset + shape_bounds.x,
+                          params.y_offset + shape_bounds.y,
+                          shape_bounds.width,
+                          shape_bounds.height,
+-                         (clutter_actor_get_paint_opacity (actor) *
+-                          params.opacity * window->opacity) / (255 * 255),
++                         (opacity * params.opacity * window->opacity) / (255 * 255),
+                          clip,
+                          clip_shadow_under_window (actor_x11));
+ 
+@@ -1197,8 +1221,21 @@ meta_window_actor_x11_paint (ClutterActor        *actor,
+         mtk_region_unref (clip);
+     }
+ 
++  outlined = get_outline (actor_x11, &outline);
++  if (outlined && meta_window_corners_casts_shadow (window))
++    {
++      MtkRectangle frame;
++
++      mtk_rectangle_from_graphene_rect (&outline, MTK_ROUNDING_STRATEGY_ROUND, &frame);
++      meta_window_shadow_paint (&actor_x11->window_shadow, actor, framebuffer,
++                                &frame, opacity);
++    }
++
+   CLUTTER_ACTOR_CLASS (meta_window_actor_x11_parent_class)->paint (actor,
+                                                                    paint_context);
++
++  if (outlined)
++    meta_window_corners_paint_outline (framebuffer, &outline, opacity);
+ }
+ 
+ static void
+@@ -1260,6 +1297,7 @@ meta_window_actor_x11_get_paint_volume (ClutterActor       *actor,
+   MetaWindow *window;
+   gboolean appears_focused;
+   MetaSurfaceActor *surface;
++  graphene_rect_t outline;
+ 
+   /* The paint volume is computed before paint functions are called
+    * so our bounds might not be updated yet. Force an update. */
+@@ -1288,6 +1326,21 @@ meta_window_actor_x11_get_paint_volume (ClutterActor       *actor,
+       clutter_paint_volume_union_box (volume, &shadow_box);
+     }
+ 
++  if (get_outline (actor_x11, &outline) &&
++      meta_window_corners_casts_shadow (window))
++    {
++      MtkRectangle frame, bounds;
++
++      mtk_rectangle_from_graphene_rect (&outline, MTK_ROUNDING_STRATEGY_ROUND, &frame);
++      meta_window_shadow_get_bounds (&actor_x11->window_shadow, actor, &frame, &bounds);
++      clutter_paint_volume_union_box (volume,
++                                      &(ClutterActorBox) {
++                                        bounds.x, bounds.y,
++                                        bounds.x + bounds.width,
++                                        bounds.y + bounds.height,
++                                      });
++    }
++
+   surface = meta_window_actor_get_surface (META_WINDOW_ACTOR (actor_x11));
+   if (surface)
+     {
+@@ -1436,10 +1489,28 @@ meta_window_actor_x11_dispose (GObject *object)
+   g_clear_pointer (&actor_x11->focused_shadow, meta_shadow_unref);
+   g_clear_pointer (&actor_x11->unfocused_shadow, meta_shadow_unref);
+   g_clear_pointer (&actor_x11->shadow_shape, meta_window_shape_unref);
++  meta_window_shadow_clear (&actor_x11->window_shadow);
+ 
+   G_OBJECT_CLASS (meta_window_actor_x11_parent_class)->dispose (object);
+ }
+ 
++/* The shadows' textures belong to the graphics context, which is replaced
++ * when the GPU resets, and the shadow factory hands the same shadow to
++ * every window of the same shape */
++static void
++meta_window_actor_x11_unrealize (ClutterActor *actor)
++{
++  MetaWindowActorX11 *actor_x11 = META_WINDOW_ACTOR_X11 (actor);
++
++  g_clear_pointer (&actor_x11->focused_shadow, meta_shadow_unref);
++  g_clear_pointer (&actor_x11->unfocused_shadow, meta_shadow_unref);
++  actor_x11->recompute_focused_shadow = TRUE;
++  actor_x11->recompute_unfocused_shadow = TRUE;
++  meta_window_shadow_clear (&actor_x11->window_shadow);
++
++  CLUTTER_ACTOR_CLASS (meta_window_actor_x11_parent_class)->unrealize (actor);
++}
++
+ static void
+ meta_window_actor_x11_class_init (MetaWindowActorX11Class *klass)
+ {
+@@ -1461,6 +1532,7 @@ meta_window_actor_x11_class_init (MetaWindowActorX11Class *klass)
+   window_actor_class->is_single_surface_actor = meta_window_actor_x11_is_single_surface_actor;
+ 
+   actor_class->paint = meta_window_actor_x11_paint;
++  actor_class->unrealize = meta_window_actor_x11_unrealize;
+   actor_class->get_paint_volume = meta_window_actor_x11_get_paint_volume;
+ 
+   object_class->constructed = meta_window_actor_x11_constructed;
+diff --git a/src/compositor/meta-window-actor.c b/src/compositor/meta-window-actor.c
+index c82a0924e2a5bb14f1e7f7f53de71b369be63db8..4a242c7b75d84a84f678bfcf925b425467acdebd 100644
+--- a/src/compositor/meta-window-actor.c
++++ b/src/compositor/meta-window-actor.c
+@@ -302,6 +302,7 @@ window_appears_focused_notify (MetaWindow *mw,
+                                GParamSpec *arg1,
+                                gpointer    data)
+ {
++  clutter_actor_invalidate_paint_volume (CLUTTER_ACTOR (data));
+   clutter_actor_queue_redraw (CLUTTER_ACTOR (data));
+ }
+ 
+diff --git a/src/compositor/meta-window-corners.c b/src/compositor/meta-window-corners.c
+index 89057dcd2003f1672da4dc46839d1bc2713ba1af..a6bbab0bd9bc247f25d09a4e3d1ddb0616f2df05 100644
+--- a/src/compositor/meta-window-corners.c
++++ b/src/compositor/meta-window-corners.c
+@@ -6,6 +6,7 @@
+ #include "clutter/clutter-mutter.h"
+ #include "compositor/meta-window-corners.h"
+ #include "compositor/meta-shaped-texture-private.h"
++#include "compositor/meta-window-actor-private.h"
+ #include "core/window-private.h"
+ #include "meta/meta-window-actor.h"
+ #include "meta/window.h"
+@@ -38,17 +39,91 @@ meta_window_has_rounded_corners (MetaWindow *window)
+          window->edge_constraints.left == META_EDGE_CONSTRAINT_NONE;
+ }
+ 
++static gboolean
++is_outlined (MetaWindow *window)
++{
++  if (window->unmanaging ||
++      meta_window_is_override_redirect (window) ||
++      !meta_window_has_rounded_corners (window))
++    return FALSE;
++
++  switch (meta_window_get_window_type (window))
++    {
++    case META_WINDOW_NORMAL:
++    case META_WINDOW_DIALOG:
++    case META_WINDOW_MODAL_DIALOG:
++    case META_WINDOW_UTILITY:
++      return TRUE;
++    default:
++      return FALSE;
++    }
++}
++
++/* @window's frame in the coordinates of @window_actor, and how far past it
++ * the window shows, 1 for clients that draw their own shadow and the line
++ * along their edge just outside their frame, 0 for others */
++static gboolean
++get_frame_bounds (MetaWindowActor *window_actor,
++                  graphene_rect_t *bounds,
++                  float           *border)
++{
++  MetaWindow *window = meta_window_actor_get_meta_window (window_actor);
++  int geometry_scale = meta_window_actor_get_geometry_scale (window_actor);
++  MtkRectangle frame, buffer;
++
++  meta_window_get_frame_rect (window, &frame);
++  meta_window_get_buffer_rect (window, &buffer);
++  if (frame.width <= 0 || frame.height <= 0 ||
++      buffer.width <= 0 || buffer.height <= 0)
++    return FALSE;
++
++  *border = (float) CLAMP (MIN (MIN (frame.x - buffer.x, frame.y - buffer.y),
++                               MIN (buffer.x + buffer.width - frame.x - frame.width,
++                                    buffer.y + buffer.height - frame.y - frame.height)),
++                          0, 1) / geometry_scale;
++  *bounds = GRAPHENE_RECT_INIT ((float) (frame.x - buffer.x) / geometry_scale,
++                                (float) (frame.y - buffer.y) / geometry_scale,
++                                (float) frame.width / geometry_scale,
++                                (float) frame.height / geometry_scale);
++  return TRUE;
++}
++
++/* Whether the compositor outlines @window like every floating top-level
++ * window, and where, in the coordinates of @window_actor. Clients that draw
++ * their own shadow get the outline along their frame too. */
++gboolean
++meta_window_corners_get_outline (MetaWindowActor *window_actor,
++                                 graphene_rect_t *bounds)
++{
++  MetaWindow *window = meta_window_actor_get_meta_window (window_actor);
++  float border;
++
++  return window && is_outlined (window) &&
++         get_frame_bounds (window_actor, bounds, &border);
++}
++
++/* Whether the compositor draws @window's shadow too, because its buffer
++ * doesn't reach past its frame, where a client would draw a shadow of its
++ * own */
++gboolean
++meta_window_corners_casts_shadow (MetaWindow *window)
++{
++  MtkRectangle frame, buffer;
++
++  meta_window_get_frame_rect (window, &frame);
++  meta_window_get_buffer_rect (window, &buffer);
++  return mtk_rectangle_contains_rect (&frame, &buffer);
++}
++
+ MetaWindowCorners
+ meta_window_corners_for_actor (ClutterActor *actor)
+ {
+   MetaWindowCorners corners = { 0 };
+   ClutterActor *ancestor = clutter_actor_get_parent (actor);
+   MetaWindow *window;
+-  MtkRectangle frame, buffer;
+   graphene_matrix_t transform, inverse;
+   graphene_rect_t bounds;
+-  float scale;
+-  int border;
++  float scale, border;
+ 
+   while (ancestor && !META_IS_WINDOW_ACTOR (ancestor))
+     ancestor = clutter_actor_get_parent (ancestor);
+@@ -56,40 +131,33 @@ meta_window_corners_for_actor (ClutterActor *actor)
+     return corners;
+ 
+   window = meta_window_actor_get_meta_window (META_WINDOW_ACTOR (ancestor));
+-  if (!window || !meta_window_has_rounded_corners (window))
++  if (!window || !meta_window_has_rounded_corners (window) ||
++      !get_frame_bounds (META_WINDOW_ACTOR (ancestor), &bounds, &border))
+     return corners;
+ 
+-  meta_window_get_frame_rect (window, &frame);
+-  meta_window_get_buffer_rect (window, &buffer);
+-  if (frame.width <= 0 || frame.height <= 0 ||
+-      buffer.width <= 0 || buffer.height <= 0)
+-    return corners;
++  graphene_rect_inset (&bounds, -border, -border);
+ 
+   clutter_actor_get_relative_transformation_matrix (actor, ancestor, &transform);
+   if (!graphene_matrix_inverse (&transform, &inverse))
+     return corners;
+-  border = MIN (1, MIN (MIN (frame.x - buffer.x, frame.y - buffer.y),
+-                         MIN (buffer.x + buffer.width - frame.x - frame.width,
+-                              buffer.y + buffer.height - frame.y - frame.height)));
+-  border = MAX (border, 0);
+-  bounds = GRAPHENE_RECT_INIT (frame.x - buffer.x - border,
+-                               frame.y - buffer.y - border,
+-                               frame.width + 2 * border, frame.height + 2 * border);
+   graphene_matrix_transform_bounds (&inverse, &bounds, &corners.bounds);
+   scale = corners.bounds.size.width / bounds.size.width;
+   if (meta_window_get_client_type (window) == META_WINDOW_CLIENT_TYPE_X11)
+     {
+       MetaShapedTexture *texture =
+         meta_window_actor_get_texture (META_WINDOW_ACTOR (ancestor));
+-      float x_scale = (float) meta_shaped_texture_get_width (texture) / buffer.width;
+-      float y_scale = (float) meta_shaped_texture_get_height (texture) / buffer.height;
++      MtkRectangle buffer;
++      float x_scale, y_scale;
+ 
++      meta_window_get_buffer_rect (window, &buffer);
++      x_scale = (float) meta_shaped_texture_get_width (texture) / buffer.width;
++      y_scale = (float) meta_shaped_texture_get_height (texture) / buffer.height;
+       corners.bounds = GRAPHENE_RECT_INIT (bounds.origin.x * x_scale,
+                                            bounds.origin.y * y_scale,
+                                            bounds.size.width * x_scale,
+                                            bounds.size.height * y_scale);
+     }
+-  corners.radius = MIN ((15.0f + border) * scale,
++  corners.radius = MIN ((META_WINDOW_CORNER_RADIUS + border) * scale,
+                          MIN (corners.bounds.size.width,
+                               corners.bounds.size.height) / 2.0f);
+   return corners;
+@@ -268,6 +336,24 @@ meta_window_corners_subtract_opaque (const MetaWindowCorners *corners,
+     subtract_corners (corners, region, 0, corners->radius, corners->radius);
+ }
+ 
++/* Leave only the pixels that lie wholly inside the rounded corners, so
++ * whatever goes under the window's antialiased edge stays there */
++void
++meta_window_corners_clip_inside (const MetaWindowCorners *corners,
++                                 MtkRegion               *region)
++{
++  float radius = corners->radius;
++
++  for (int y = 0; y < ceilf (radius); y++)
++    {
++      float distance = radius - y;
++      float width = ceilf (radius - sqrtf (MAX (radius * radius - distance * distance, 0)));
++
++      if (width > 0)
++        subtract_corners (corners, region, y, y + 1, width);
++    }
++}
++
+ void
+ meta_window_corners_clip_input (const MetaWindowCorners *corners,
+                                 MtkRegion               *region)
+@@ -283,3 +369,102 @@ meta_window_corners_clip_input (const MetaWindowCorners *corners,
+         subtract_corners (corners, region, y, y + 1, width);
+     }
+ }
++
++#define OUTLINE_GRAY 0.5f
++#define OUTLINE_ALPHA 0.3f
++#define OUTLINE_MIN_BAND 12.0f
++
++static CoglPipeline *
++get_outline_pipeline (CoglContext *context)
++{
++  static CoglPipelineKey key = "kestrel-window-outline";
++  CoglPipeline *pipeline = cogl_context_get_named_pipeline (context, &key);
++
++  if (!pipeline)
++    {
++      g_autoptr (CoglSnippet) vertex = NULL;
++      g_autoptr (CoglSnippet) fragment = NULL;
++
++      /* Positions reach the shader already transformed, so the actor
++       * coordinates come in as texture coordinates of a blank layer */
++      pipeline = cogl_pipeline_new (context);
++      cogl_pipeline_set_layer_null_texture (pipeline, 0);
++      vertex = cogl_snippet_new (COGL_SNIPPET_HOOK_VERTEX,
++        "varying vec2 kestrel_position;\n",
++        "kestrel_position = cogl_tex_coord0_in.xy;\n");
++      fragment = cogl_snippet_new (COGL_SNIPPET_HOOK_FRAGMENT,
++        CORNER_DECLARATIONS,
++        "float pixel = kestrel_pixel_size ();\n"
++        "vec2 half_size = kestrel_bounds.zw * 0.5;\n"
++        "vec2 q = abs(kestrel_position - kestrel_bounds.xy - half_size) - half_size + kestrel_radius;\n"
++        "float distance = (length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - kestrel_radius) / pixel;\n"
++        "float width = max(floor(1.0 / pixel + 0.01), 1.0);\n"
++        "float outside = clamp(0.5 + distance, 0.0, 1.0);\n"
++        "float inside = clamp(0.5 + distance + width, 0.0, 1.0);\n"
++        "cogl_color_out *= inside - outside;\n");
++      cogl_pipeline_add_snippet (pipeline, vertex);
++      cogl_pipeline_add_snippet (pipeline, fragment);
++      cogl_context_set_named_pipeline (context, &key, pipeline);
++    }
++
++  return pipeline;
++}
++
++static void
++draw_band (CoglFramebuffer *framebuffer,
++           CoglPipeline    *pipeline,
++           float            x1,
++           float            y1,
++           float            x2,
++           float            y2)
++{
++  cogl_framebuffer_draw_textured_rectangle (framebuffer, pipeline,
++                                            x1, y1, x2, y2,
++                                            x1, y1, x2, y2);
++}
++
++/* Paint a line one whole device pixel per logical pixel wide along the
++ * inside of @bounds' rounded edge, where window corners clip windows, so it
++ * meets their antialiased edge without a gap. It lightens dark windows and
++ * darkens light ones, so windows stay apart from each other and from the
++ * wallpaper in either style. */
++void
++meta_window_corners_paint_outline (CoglFramebuffer       *framebuffer,
++                                   const graphene_rect_t *bounds,
++                                   guint8                 opacity)
++{
++  CoglContext *context = cogl_framebuffer_get_context (framebuffer);
++  g_autoptr (CoglPipeline) pipeline = NULL;
++  float x1 = bounds->origin.x, y1 = bounds->origin.y;
++  float x2 = x1 + bounds->size.width, y2 = y1 + bounds->size.height;
++  float radius = MIN (META_WINDOW_CORNER_RADIUS,
++                      MIN (bounds->size.width, bounds->size.height) / 2.0f);
++  float band = MAX (ceilf (radius), OUTLINE_MIN_BAND) + 1.0f;
++  float rect[4] = { x1, y1, bounds->size.width, bounds->size.height };
++  float alpha = OUTLINE_ALPHA * opacity / 255.0f;
++  CoglColor color;
++
++  if (opacity == 0)
++    return;
++
++  pipeline = cogl_pipeline_copy (get_outline_pipeline (context));
++  cogl_color_init_from_4f (&color, OUTLINE_GRAY * alpha, OUTLINE_GRAY * alpha,
++                           OUTLINE_GRAY * alpha, alpha);
++  cogl_pipeline_set_color (pipeline, &color);
++  cogl_pipeline_set_uniform_float (pipeline,
++                                   cogl_pipeline_get_uniform_location (pipeline, "kestrel_bounds"),
++                                   4, 1, rect);
++  cogl_pipeline_set_uniform_1f (pipeline,
++                                cogl_pipeline_get_uniform_location (pipeline, "kestrel_radius"),
++                                radius);
++
++  /* Only the bands along the edges, so the line doesn't cost a full-size pass */
++  band = MIN (band, MIN (bounds->size.width, bounds->size.height) / 2.0f);
++  draw_band (framebuffer, pipeline, x1, y1, x2, y1 + band);
++  draw_band (framebuffer, pipeline, x1, y2 - band, x2, y2);
++  if (y2 - band > y1 + band)
++    {
++      draw_band (framebuffer, pipeline, x1, y1 + band, x1 + band, y2 - band);
++      draw_band (framebuffer, pipeline, x2 - band, y1 + band, x2, y2 - band);
++    }
++}
+diff --git a/src/compositor/meta-window-corners.h b/src/compositor/meta-window-corners.h
+index c4e3f17de1102d9149e27b2f11aabd461362baab..2642508148dda07a02f7d96ee5b85cb03f41aafd 100644
+--- a/src/compositor/meta-window-corners.h
++++ b/src/compositor/meta-window-corners.h
+@@ -2,8 +2,12 @@
+ #pragma once
+ 
+ #include "clutter/clutter.h"
++#include "meta/meta-window-actor.h"
++#include "meta/window.h"
+ #include "mtk/mtk.h"
+ 
++#define META_WINDOW_CORNER_RADIUS 15.0f
++
+ typedef struct
+ {
+   graphene_rect_t bounds;
+@@ -17,6 +21,12 @@ typedef enum
+ } MetaWindowCornerFill;
+ 
+ MetaWindowCorners meta_window_corners_for_actor (ClutterActor *actor);
++gboolean meta_window_corners_get_outline (MetaWindowActor *window_actor,
++                                          graphene_rect_t *bounds);
++gboolean meta_window_corners_casts_shadow (MetaWindow *window);
++void meta_window_corners_paint_outline (CoglFramebuffer       *framebuffer,
++                                        const graphene_rect_t *bounds,
++                                        guint8                 opacity);
+ void meta_window_corners_apply (const MetaWindowCorners *corners,
+                                 MetaWindowCornerFill     fill,
+                                 CoglPipeline            *pipeline,
+@@ -26,3 +36,5 @@ void meta_window_corners_subtract_opaque (const MetaWindowCorners *corners,
+                                           MtkRegion               *region);
+ void meta_window_corners_clip_input (const MetaWindowCorners *corners,
+                                      MtkRegion               *region);
++void meta_window_corners_clip_inside (const MetaWindowCorners *corners,
++                                      MtkRegion               *region);
+diff --git a/src/compositor/meta-window-shadow.c b/src/compositor/meta-window-shadow.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..6fc6fc17975c245cbfe5682b9162d22c8611161a
+--- /dev/null
++++ b/src/compositor/meta-window-shadow.c
+@@ -0,0 +1,119 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++#include "config.h"
++
++#include "compositor/meta-window-corners.h"
++#include "compositor/meta-window-shadow.h"
++#include "meta/meta-window-actor.h"
++#include "x11/meta-window-shape.h"
++
++void
++meta_window_shadow_clear (MetaWindowShadow *shadow)
++{
++  g_clear_pointer (&shadow->shadow, meta_shadow_unref);
++  g_clear_pointer (&shadow->hole, mtk_region_unref);
++}
++
++static gboolean
++appears_focused (ClutterActor *actor)
++{
++  MetaWindow *window = meta_window_actor_get_meta_window (META_WINDOW_ACTOR (actor));
++
++  return meta_window_appears_focused (window);
++}
++
++static void
++ensure_shadow (MetaWindowShadow   *shadow,
++               ClutterActor       *actor,
++               const MtkRectangle *frame,
++               gboolean            focused)
++{
++  ClutterContext *clutter_context = clutter_actor_get_context (actor);
++  CoglContext *cogl_context =
++    clutter_backend_get_cogl_context (clutter_context_get_backend (clutter_context));
++  MtkRectangle rect = { 0, 0, frame->width, frame->height };
++  MetaWindowCorners corners = {
++    .bounds = GRAPHENE_RECT_INIT (0, 0, frame->width, frame->height),
++    .radius = MIN (META_WINDOW_CORNER_RADIUS,
++                   MIN (frame->width, frame->height) / 2.0f),
++  };
++  g_autoptr (MtkRegion) region = NULL;
++  MetaWindowShape *shape;
++
++  if (shadow->shadow &&
++      shadow->width == frame->width &&
++      shadow->height == frame->height &&
++      shadow->focused == focused)
++    return;
++
++  meta_window_shadow_clear (shadow);
++
++  region = mtk_region_create_rectangle (&rect);
++  meta_window_corners_clip_input (&corners, region);
++  shape = meta_window_shape_new (region);
++  shadow->hole = mtk_region_create_rectangle (&rect);
++  meta_window_corners_clip_inside (&corners, shadow->hole);
++  shadow->shadow = meta_shadow_factory_get_shadow (meta_shadow_factory_get_default (),
++                                                   shape, frame->width, frame->height,
++                                                   "normal", focused, cogl_context);
++  meta_window_shape_unref (shape);
++  shadow->width = frame->width;
++  shadow->height = frame->height;
++  shadow->focused = focused;
++}
++
++static void
++get_bounds (MetaWindowShadow   *shadow,
++            ClutterActor       *actor,
++            const MtkRectangle *frame,
++            MetaShadowParams   *params,
++            MtkRectangle       *bounds)
++{
++  gboolean focused = appears_focused (actor);
++
++  ensure_shadow (shadow, actor, frame, focused);
++  meta_shadow_factory_get_params (meta_shadow_factory_get_default (),
++                                  "normal", focused, params);
++  meta_shadow_get_bounds (shadow->shadow,
++                          frame->x + params->x_offset,
++                          frame->y + params->y_offset,
++                          frame->width, frame->height,
++                          bounds);
++}
++
++void
++meta_window_shadow_get_bounds (MetaWindowShadow   *shadow,
++                               ClutterActor       *actor,
++                               const MtkRectangle *frame,
++                               MtkRectangle       *bounds)
++{
++  MetaShadowParams params;
++
++  get_bounds (shadow, actor, frame, &params, bounds);
++}
++
++/* Like the shadows of X11 windows, but never under the window, where it
++ * would darken translucent and blurred parts of it */
++void
++meta_window_shadow_paint (MetaWindowShadow   *shadow,
++                          ClutterActor       *actor,
++                          CoglFramebuffer    *framebuffer,
++                          const MtkRectangle *frame,
++                          guint8              opacity)
++{
++  MetaShadowParams params;
++  MtkRectangle bounds;
++  g_autoptr (MtkRegion) clip = NULL;
++
++  get_bounds (shadow, actor, frame, &params, &bounds);
++  clip = mtk_region_create_rectangle (&bounds);
++  mtk_region_translate (shadow->hole, frame->x, frame->y);
++  mtk_region_subtract (clip, shadow->hole);
++  mtk_region_translate (shadow->hole, -frame->x, -frame->y);
++
++  meta_shadow_paint (shadow->shadow, framebuffer,
++                     frame->x + params.x_offset,
++                     frame->y + params.y_offset,
++                     frame->width, frame->height,
++                     opacity * params.opacity / 255,
++                     clip, TRUE);
++}
+diff --git a/src/compositor/meta-window-shadow.h b/src/compositor/meta-window-shadow.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..2411c41b06b855f3421434cdadfbf7e524fe9a75
+--- /dev/null
++++ b/src/compositor/meta-window-shadow.h
+@@ -0,0 +1,26 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++#pragma once
++
++#include "clutter/clutter.h"
++#include "mtk/mtk.h"
++#include "x11/meta-shadow-factory.h"
++
++typedef struct
++{
++  MetaShadow *shadow;
++  MtkRegion *hole;
++  int width;
++  int height;
++  gboolean focused;
++} MetaWindowShadow;
++
++void meta_window_shadow_clear (MetaWindowShadow *shadow);
++void meta_window_shadow_get_bounds (MetaWindowShadow   *shadow,
++                                    ClutterActor       *actor,
++                                    const MtkRectangle *frame,
++                                    MtkRectangle       *bounds);
++void meta_window_shadow_paint (MetaWindowShadow   *shadow,
++                               ClutterActor       *actor,
++                               CoglFramebuffer    *framebuffer,
++                               const MtkRectangle *frame,
++                               guint8              opacity);
+diff --git a/src/meson.build b/src/meson.build
+index 3ba3a6ef88e9872292641465ed624e7694811a9e..ee989caca38846f3aaaba046b151fcc6c580e9f9 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -385,6 +385,8 @@ if have_xwayland
+   mutter_sources += [
+     'compositor/meta-window-actor-x11.c',
+     'compositor/meta-window-actor-x11.h',
++    'compositor/meta-window-shadow.c',
++    'compositor/meta-window-shadow.h',
+     'x11/atomnames.h',
+     'x11/events.c',
+     'x11/events.h',
+diff --git a/src/x11/meta-shadow-factory.c b/src/x11/meta-shadow-factory.c
+index d050d841f6c75a2727c859049b283a97536d0d49..10c10043a4cf65f490e9fdf8afda104aaf6f6427 100644
+--- a/src/x11/meta-shadow-factory.c
++++ b/src/x11/meta-shadow-factory.c
+@@ -103,17 +103,17 @@ struct _MetaShadowFactory
+ /* The first element in this array also defines the default parameters
+  * for newly created classes */
+ MetaShadowClassInfo default_shadow_classes[] = {
+-  { "normal",       { 10, -1, 0, 3, 128 }, { 8, -1, 0, 2, 64 } },
+-  { "dialog",       { 10, -1, 0, 3, 128 }, { 8, -1, 0, 2, 64 } },
+-  { "modal_dialog", { 10, -1, 0, 3, 128 }, { 8, -1, 0, 2, 64 } },
+-  { "utility",      { 10, -1, 0, 3, 128 }, { 8, -1, 0, 2, 64 } },
+-  { "border",       { 10, -1, 0, 3, 128 }, { 8, -1, 0, 2, 64 } },
+-  { "menu",         { 10, -1, 0, 3, 128 }, { 8, -1, 0, 2, 64 } },
++  { "normal",       { 24, -1, 0, 8, 150 }, { 14, -1, 0, 4, 90 } },
++  { "dialog",       { 24, -1, 0, 8, 150 }, { 14, -1, 0, 4, 90 } },
++  { "modal_dialog", { 24, -1, 0, 8, 150 }, { 14, -1, 0, 4, 90 } },
++  { "utility",      { 24, -1, 0, 8, 150 }, { 14, -1, 0, 4, 90 } },
++  { "border",       { 24, -1, 0, 8, 150 }, { 14, -1, 0, 4, 90 } },
++  { "menu",         { 24, -1, 0, 8, 150 }, { 14, -1, 0, 4, 90 } },
+ 
+   { "popup-menu",    { 1, -1, 0, 0, 128 }, { 1, -1, 0, 0, 128 } },
+   { "dropdown-menu", { 1, -1, 0, 0, 128 }, { 1, -1, 0, 0, 128 } },
+ 
+-  { "attached",      { 10, -1, 0, 3, 128 }, { 8, -1, 0, 2, 64 } }
++  { "attached",      { 24, -1, 0, 8, 150 }, { 14, -1, 0, 4, 90 } }
+ };
+ 
+ G_DEFINE_TYPE (MetaShadowFactory, meta_shadow_factory, G_TYPE_OBJECT);

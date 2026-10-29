@@ -49,6 +49,6 @@
 0049-wayland-deliver-the-cursor-rectangle-of-text-inputs-.patch
 0050-x11-stop-waiting-forever-on-X11-selection-owners.patch
 0051-compositor-only-cull-with-the-part-of-an-actor-insid.patch
-0052-compositor-shadow-and-outline-Wayland-windows-that-d.patch
+0052-compositor-outline-every-floating-window-and-shadow-.patch
 0053-compositor-let-people-turn-rounded-window-corners-of.patch
 0054-wayland-listen-on-an-inherited-socket.patch

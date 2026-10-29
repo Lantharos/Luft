@@ -190,7 +190,7 @@ cache_dirs() {
 }
 
 build_part() {
-  local name="$1" ref="$2" target rest argument work sources options=() arguments=()
+  local name="$1" ref="$2" target rest argument work sources status=0 options=() arguments=()
   read -r target rest <<<"$(part_target "$name")"
   read -ra arguments <<<"$rest"
   work="$name"
@@ -209,8 +209,9 @@ build_part() {
   podman build "${retries[@]}" --layers --security-opt label=disable --file "$image/parts/Containerfile" --target "$target" \
     --build-context "cache=$cache" --build-context "work=$cache/work/$work" --build-context "sources=$sources" \
     --build-arg "BASE=$base" --build-arg "SABINE=$(sabine_tag)" "${options[@]}" "${podman_options[@]}" \
-    --tag "$ref" "$luft"
+    --tag "$ref" "$luft" || status=$?
   rm -rf "$sources"
+  ((status == 0)) || return "$status"
   [[ "$ref" == localhost/* ]] || podman push "${retries[@]}" --quiet "$ref"
 }
 

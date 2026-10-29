@@ -13,10 +13,10 @@ Upstream-Status: luft-only Kestrel's window shape; GNOME leaves corners to clien
  src/compositor/meta-shaped-texture.c         |  54 +++-
  src/compositor/meta-surface-actor.c          |  52 +++-
  src/compositor/meta-window-actor-x11.c       |  15 +-
- src/compositor/meta-window-corners.c         | 271 +++++++++++++++++++
+ src/compositor/meta-window-corners.c         | 277 +++++++++++++++++++
  src/compositor/meta-window-corners.h         |  28 ++
  src/meson.build                              |   2 +
- 10 files changed, 445 insertions(+), 15 deletions(-)
+ 10 files changed, 451 insertions(+), 15 deletions(-)
  create mode 100644 src/compositor/meta-window-corners.c
  create mode 100644 src/compositor/meta-window-corners.h
 
@@ -437,10 +437,10 @@ index 9e16b2682ab6db61106a6b1cd86b9d6691d3fda5..ac370b22aa8f89425efe8f2e702282f1
        get_shape_bounds (actor_x11, &shape_bounds);
 diff --git a/src/compositor/meta-window-corners.c b/src/compositor/meta-window-corners.c
 new file mode 100644
-index 0000000000000000000000000000000000000000..8bff38280715c589a245911fd8ba206d56a4e0fc
+index 0000000000000000000000000000000000000000..2583ef5fcab08ba093e1e7b6b334d009fd02b6a3
 --- /dev/null
 +++ b/src/compositor/meta-window-corners.c
-@@ -0,0 +1,271 @@
+@@ -0,0 +1,277 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
 +#include "config.h"
 +
@@ -524,7 +524,7 @@ index 0000000000000000000000000000000000000000..8bff38280715c589a245911fd8ba206d
 +                                           bounds.size.width * x_scale,
 +                                           bounds.size.height * y_scale);
 +    }
-+  corners.radius = MIN (15.0f * scale,
++  corners.radius = MIN ((15.0f + border) * scale,
 +                         MIN (corners.bounds.size.width,
 +                              corners.bounds.size.height) / 2.0f);
 +  return corners;
@@ -533,17 +533,23 @@ index 0000000000000000000000000000000000000000..8bff38280715c589a245911fd8ba206d
 +#define CORNER_DECLARATIONS \
 +  "varying vec2 kestrel_position;\n" \
 +  "uniform vec4 kestrel_bounds;\n" \
-+  "uniform float kestrel_radius;\n"
++  "uniform float kestrel_radius;\n" \
++  "float kestrel_pixel_size ()\n" \
++  "{\n" \
++  "  vec2 dx = dFdx(kestrel_position);\n" \
++  "  vec2 dy = dFdy(kestrel_position);\n" \
++  "  return sqrt(max(abs(dx.x * dy.y - dx.y * dy.x), 1e-6));\n" \
++  "}\n"
 +
 +#define CORNER_COVERAGE \
++  "float pixel = kestrel_pixel_size ();\n" \
 +  "vec2 half_size = kestrel_bounds.zw * 0.5;\n" \
 +  "vec2 center = kestrel_bounds.xy + half_size;\n" \
 +  "vec2 p = abs(kestrel_position - center);\n" \
 +  "vec2 q = p - half_size + kestrel_radius;\n" \
 +  "if (all(greaterThan(q, vec2(0.0))) && all(lessThan(p, half_size))) {\n" \
 +  "  float distance = length(q) - kestrel_radius;\n" \
-+  "  float aa = max(fwidth(distance), 0.001);\n" \
-+  "  float coverage = 1.0 - smoothstep(-aa * 0.5, aa * 0.5, distance);\n"
++  "  float coverage = clamp(0.5 - distance / pixel, 0.0, 1.0);\n"
 +
 +static CoglSnippet *
 +get_vertex_snippet (void)
@@ -609,7 +615,7 @@ index 0000000000000000000000000000000000000000..8bff38280715c589a245911fd8ba206d
 +        "}\n",
 +        CORNER_COVERAGE
 +        "  vec2 side = sign(kestrel_position - center);\n"
-+        "  float outside = max(distance, 0.0);\n"
++        "  float outside = max(distance, 0.0) + 0.5;\n"
 +        "  vec2 straight = half_size - kestrel_radius;\n"
 +        "  float edge_x = kestrel_shadow_alpha (center + side * vec2(half_size.x + outside, straight.y));\n"
 +        "  float edge_y = kestrel_shadow_alpha (center + side * vec2(straight.x, half_size.y + outside));\n"

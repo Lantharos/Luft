@@ -42,6 +42,13 @@ pub struct NewAccount {
 }
 
 #[derive(Deserialize, Type)]
+pub struct SignInAgain {
+    pub id: i64,
+    pub secret: NewSecret,
+    pub token: Option<String>,
+}
+
+#[derive(Deserialize, Type)]
 pub struct AccountUpdate {
     pub id: i64,
     pub name: String,

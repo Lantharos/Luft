@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use specta::Type;
 
+use super::SignInError;
 use crate::protocols::net;
 use crate::store::now;
 
@@ -123,11 +124,17 @@ fn identity(id_token: Option<&str>) -> Identity {
         .unwrap_or_default()
 }
 
-fn exchange(provider: Provider, form: &[(&str, &str)]) -> Result<Tokens, String> {
+fn exchange(provider: Provider, form: &[(&str, &str)]) -> Result<Tokens, SignInError> {
     let response: TokenResponse = net::http()
         .post(provider.endpoints().token)
         .send_form(form.iter().copied())
-        .map_err(|error| format!("Signing in failed: {error}"))?
+        .map_err(|error| {
+            let message = format!("Signing in failed: {error}");
+            match error {
+                ureq::Error::StatusCode(400 | 401) => SignInError::Refused(message),
+                _ => SignInError::Failed(message),
+            }
+        })?
         .body_mut()
         .read_json()
         .map_err(|error| error.to_string())?;
@@ -144,7 +151,7 @@ fn exchange(provider: Provider, form: &[(&str, &str)]) -> Result<Tokens, String>
     })
 }
 
-pub fn refresh(provider: Provider, refresh_token: &str) -> Result<Tokens, String> {
+pub fn refresh(provider: Provider, refresh_token: &str) -> Result<Tokens, SignInError> {
     let (client_id, secret) = provider
         .client()
         .ok_or("Signing in with this provider isn't set up")?;
@@ -207,7 +214,7 @@ pub fn sign_in(
     if let Some(secret) = secret.as_deref() {
         form.push(("client_secret", secret));
     }
-    exchange(provider, &form)
+    Ok(exchange(provider, &form)?)
 }
 
 fn wait_for_code(listener: &TcpListener, state: &str) -> Result<String, String> {

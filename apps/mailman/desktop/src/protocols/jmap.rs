@@ -5,7 +5,7 @@ use base64::engine::general_purpose::STANDARD;
 use serde::Deserialize;
 use serde_json::{Value, json};
 
-use crate::accounts::Login;
+use crate::accounts::{Login, SignInError};
 
 const TIMEOUT: Duration = Duration::from_secs(60);
 const MAX_REDIRECTS: usize = 5;
@@ -49,7 +49,7 @@ pub fn authorization(login: &Login) -> String {
 }
 
 impl Client {
-    pub fn connect(session_url: &str, login: &Login) -> Result<Self, String> {
+    pub fn connect(session_url: &str, login: &Login) -> Result<Self, SignInError> {
         let agent: ureq::Agent = ureq::Agent::config_builder()
             .timeout_global(Some(TIMEOUT))
             .max_redirects(0)
@@ -81,8 +81,13 @@ impl Client {
                 .call()
                 .map_err(|error| error.to_string())?;
         }
-        if !response.status().is_success() {
-            return Err(format!("Signing in failed ({})", response.status()));
+        let status = response.status();
+        if !status.is_success() {
+            let failed = format!("Signing in failed ({status})");
+            return Err(match status.as_u16() {
+                401 | 403 => SignInError::Refused(failed),
+                _ => SignInError::Failed(failed),
+            });
         }
         let session: Session = response
             .body_mut()

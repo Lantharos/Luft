@@ -11,7 +11,7 @@ use serde_json::{Map, Value, json};
 
 use super::ops::{self, Operation};
 use super::remote::{Context, Remote};
-use crate::accounts::Login;
+use crate::accounts::{Login, SignInError};
 use crate::protocols::jmap::{CORE, Client, MAIL, SUBMISSION};
 use crate::store::{Flag, Mailbox, Outgoing, RemoteFolder, Role};
 use mail::Changes;
@@ -29,7 +29,7 @@ fn role(role: Option<&str>) -> Option<Role> {
 }
 
 impl JmapRemote {
-    pub fn connect(session: &str, login: &Login) -> Result<Self, String> {
+    pub fn connect(session: &str, login: &Login) -> Result<Self, SignInError> {
         Ok(Self {
             client: Client::connect(session, login)?,
             state: None,

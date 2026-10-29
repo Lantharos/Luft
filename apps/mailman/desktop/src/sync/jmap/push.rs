@@ -43,7 +43,7 @@ fn open(
     account: &Account,
     credentials: &Credentials,
 ) -> Result<Option<Source>, String> {
-    let (url, expires) = signed_in(account, credentials, |login| {
+    let (url, expires) = signed_in(account, credentials, |login| -> Result<_, String> {
         Ok(Client::connect(session, &login)?
             .event_source()
             .map(|url| (url, jmap::authorization(&login))))

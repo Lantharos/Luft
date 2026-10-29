@@ -24,7 +24,7 @@ fn session(
     let Protocol::Imap { imap, .. } = &account.config.protocol else {
         return Ok(Ended::Unsupported);
     };
-    let (mut client, expires) = signed_in(account, credentials, |login| {
+    let (mut client, expires) = signed_in(account, credentials, |login| -> Result<_, String> {
         let mut client = Client::connect(imap)?;
         client.login(&login)?;
         Ok(client)

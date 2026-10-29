@@ -10,7 +10,7 @@ use specta::Type;
 use super::Shared;
 use super::ops::Operation;
 use super::remote::{self, Connection, Context, Remote};
-use crate::accounts::{Account, Protocol};
+use crate::accounts::{Account, Protocol, SignInError};
 use crate::events::{CHANGED, IDENTITIES, OUTBOX, STATUS};
 use crate::mail::{envelope, render};
 use crate::store::Store;
@@ -79,6 +79,7 @@ pub struct SyncStatus {
     account: i64,
     state: SyncState,
     message: Option<String>,
+    signed_out: bool,
 }
 
 #[derive(Serialize, Type)]
@@ -99,6 +100,7 @@ pub fn spawn(account: Account, shared: Shared) -> Queue {
         arrived,
         refreshing: refreshing.clone(),
         connection: None,
+        signed_out: false,
         prefetch: VecDeque::new(),
         backfill: VecDeque::new(),
         backfilling: false,
@@ -123,6 +125,7 @@ struct Worker {
     arrived: Receiver<()>,
     refreshing: Arc<AtomicBool>,
     connection: Option<Connection>,
+    signed_out: bool,
     prefetch: VecDeque<Mailbox>,
     backfill: VecDeque<i64>,
     backfilling: bool,
@@ -183,6 +186,7 @@ impl Worker {
             STATUS,
             SyncStatus {
                 account: self.account.id,
+                signed_out: self.signed_out && matches!(state, SyncState::Error),
                 state,
                 message,
             },
@@ -195,7 +199,9 @@ impl Worker {
 
     fn connect(&mut self) -> Result<&mut Box<dyn Remote>, String> {
         if !self.connection.as_ref().is_some_and(Connection::current) {
-            self.connection = Some(remote::connect(&self.account, &self.shared.credentials)?);
+            let connected = remote::connect(&self.account, &self.shared.credentials);
+            self.signed_out = matches!(connected, Err(SignInError::Refused(_)));
+            self.connection = Some(connected?);
         }
         Ok(&mut self.connection.as_mut().expect("connected above").remote)
     }

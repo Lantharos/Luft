@@ -6,6 +6,7 @@
 	import * as api from '#lib/bridge/index.js';
 	import { mail } from '#lib/mail/mail.svelte.js';
 	import { toasts } from '#lib/shell/toasts.svelte.js';
+	import { PROVIDER_NAMES } from './providers.js';
 	import ServerFields from './ServerFields.svelte';
 
 	interface Props {
@@ -14,7 +15,6 @@
 
 	let { onclose }: Props = $props();
 
-	const PROVIDER_NAMES: Record<Provider, string> = { google: 'Google', microsoft: 'Microsoft' };
 	const VALID = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 	let step = $state<'email' | 'sign-in'>('email');

@@ -77,6 +77,31 @@ pub enum Login {
     },
 }
 
+pub enum SignInError {
+    Refused(String),
+    Failed(String),
+}
+
+impl From<String> for SignInError {
+    fn from(error: String) -> Self {
+        Self::Failed(error)
+    }
+}
+
+impl From<&str> for SignInError {
+    fn from(error: &str) -> Self {
+        Self::Failed(error.to_owned())
+    }
+}
+
+impl From<SignInError> for String {
+    fn from(error: SignInError) -> Self {
+        match error {
+            SignInError::Refused(error) | SignInError::Failed(error) => error,
+        }
+    }
+}
+
 impl Login {
     pub fn expires(&self) -> Option<i64> {
         match self {

@@ -14,7 +14,7 @@ use crossbeam_channel::Sender;
 use luft_app::Events;
 use parking_lot::Mutex;
 
-use crate::accounts::{Account, Credentials, Login, Protocol};
+use crate::accounts::{Account, Credentials, Login, Protocol, SignInError};
 use crate::services::notify::Notifier;
 use crate::store::Store;
 pub use fetcher::BodyArrived;
@@ -35,6 +35,13 @@ struct Running {
     queue: Queue,
     bodies: Sender<i64>,
     push: remote::Push,
+}
+
+impl Running {
+    fn refresh(&self) {
+        self.push.kick();
+        self.queue.refresh();
+    }
 }
 
 #[derive(Clone)]
@@ -100,8 +107,13 @@ impl Engine {
 
     pub fn refresh(&self) {
         for running in self.running.lock().values() {
-            running.push.kick();
-            running.queue.refresh();
+            running.refresh();
+        }
+    }
+
+    pub fn reconnect(&self, account: i64) {
+        if let Some(running) = self.running.lock().get(&account) {
+            running.refresh();
         }
     }
 
@@ -134,7 +146,7 @@ impl Engine {
         schedule::wake();
     }
 
-    pub fn verify(account: &Account, login: Login) -> Result<(), String> {
+    pub fn verify(account: &Account, login: Login) -> Result<(), SignInError> {
         match &account.config.protocol {
             Protocol::Imap { .. } => imap::connect(account, login).map(drop),
             Protocol::Jmap { session } => jmap::JmapRemote::connect(session, &login).map(drop),

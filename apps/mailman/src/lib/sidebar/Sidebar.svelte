@@ -4,6 +4,7 @@
 	import PenLine from '@lucide/svelte/icons/pen-line';
 	import Search from '@lucide/svelte/icons/search';
 	import Settings from '@lucide/svelte/icons/settings-2';
+	import type { Account } from '#lib/bindings.js';
 	import { composer } from '#lib/compose/composer.svelte.js';
 	import { list } from '#lib/mail/list.svelte.js';
 	import { mail } from '#lib/mail/mail.svelte.js';
@@ -17,9 +18,10 @@
 		rail: boolean;
 		onsettings: () => void;
 		onsearch: () => void;
+		onsignin: (account: Account) => void;
 	}
 
-	let { rail, onsettings, onsearch }: Props = $props();
+	let { rail, onsettings, onsearch, onsignin }: Props = $props();
 
 	let search = $state<{ focus: () => void }>();
 	let query = $state('');
@@ -120,7 +122,7 @@
 			</button>
 		</div>
 	{/if}
-	<AccountStatus {rail} />
+	<AccountStatus {rail} {onsignin} />
 </aside>
 
 <style>

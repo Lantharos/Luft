@@ -4,7 +4,7 @@ use std::time::Duration;
 
 use parking_lot::{Condvar, Mutex};
 
-use crate::accounts::{Account, Credentials, Login, Protocol};
+use crate::accounts::{Account, Credentials, Login, Protocol, SignInError};
 use crate::store::{Inserted, Mailbox, Outgoing, Store, now};
 
 use super::ops::Operation;
@@ -49,18 +49,18 @@ pub fn renewal(expires: Option<i64>) -> Option<i64> {
     expires.map(|expires| expires - RENEW_BEFORE)
 }
 
-fn open(account: &Account, login: Login) -> Result<Box<dyn Remote>, String> {
+fn open(account: &Account, login: Login) -> Result<Box<dyn Remote>, SignInError> {
     Ok(match &account.config.protocol {
         Protocol::Imap { .. } => Box::new(super::imap::connect(account, login)?),
         Protocol::Jmap { session } => Box::new(super::jmap::JmapRemote::connect(session, &login)?),
     })
 }
 
-pub fn signed_in<T>(
+pub fn signed_in<T, E: From<SignInError>>(
     account: &Account,
     credentials: &Credentials,
-    mut attempt: impl FnMut(Login) -> Result<T, String>,
-) -> Result<(T, Option<i64>), String> {
+    mut attempt: impl FnMut(Login) -> Result<T, E>,
+) -> Result<(T, Option<i64>), E> {
     let login = credentials.login(account)?;
     let expires = login.expires();
     let token = match &login {
@@ -78,7 +78,7 @@ pub fn signed_in<T>(
     }
 }
 
-pub fn connect(account: &Account, credentials: &Credentials) -> Result<Connection, String> {
+pub fn connect(account: &Account, credentials: &Credentials) -> Result<Connection, SignInError> {
     let (remote, expires) = signed_in(account, credentials, |login| open(account, login))?;
     Ok(Connection { remote, expires })
 }

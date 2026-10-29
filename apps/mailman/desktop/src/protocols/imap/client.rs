@@ -6,7 +6,7 @@ use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
 
 use super::response::{self, Response, Status, Untagged};
-use crate::accounts::Login;
+use crate::accounts::{Login, SignInError};
 use crate::protocols::net::{Security, Server, Stream};
 
 const READ_TIMEOUT: Duration = Duration::from_secs(90);
@@ -87,7 +87,7 @@ impl Client {
         Ok(())
     }
 
-    pub fn login(&mut self, login: &Login) -> Result<(), String> {
+    pub fn login(&mut self, login: &Login) -> Result<(), SignInError> {
         let reply = match login {
             Login::Password { username, password } => {
                 if self.has("AUTH=PLAIN") {
@@ -170,14 +170,20 @@ impl Client {
         self.finish(&tag, command)
     }
 
-    fn run_sensitive(&mut self, command: &str) -> Result<Reply, String> {
+    fn run_sensitive(&mut self, command: &str) -> Result<Reply, SignInError> {
         let tag = self.tag();
         self.send(format!("{tag} {command}\r\n").as_bytes())?;
-        self.finish(&tag, "sign in")
-            .map_err(|error| format!("Signing in failed: {error}"))
+        let failed = |error| format!("Signing in failed: {error}");
+        self.outcome(&tag, "sign in")
+            .map_err(failed)?
+            .map_err(|refused| SignInError::Refused(failed(refused)))
     }
 
     fn finish(&mut self, tag: &str, command: &str) -> Result<Reply, String> {
+        self.outcome(tag, command)?
+    }
+
+    fn outcome(&mut self, tag: &str, command: &str) -> Result<Result<Reply, String>, String> {
         let mut untagged = Vec::new();
         loop {
             match self.read()? {
@@ -187,14 +193,14 @@ impl Client {
                     code,
                     text,
                 } if done == tag => {
-                    return match status {
+                    return Ok(match status {
                         Status::Ok => Ok(Reply { untagged, code }),
                         _ => Err(if text.is_empty() {
                             format!("{command} was refused")
                         } else {
                             text
                         }),
-                    };
+                    });
                 }
                 Response::Untagged(Untagged::Status {
                     status: Status::Bye,

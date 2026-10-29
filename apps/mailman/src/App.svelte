@@ -4,6 +4,7 @@
 	import { appearance, basename, CommandPalette, GlassShell, PaletteState, plural, Toast, tooltip } from '@luft/ui';
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import { commands, events } from '#lib/bindings.js';
+	import type { Account } from '#lib/bindings.js';
 	import * as api from '#lib/bridge/index.js';
 	import { paletteSource, shellCommands, type Shell } from '#lib/app/commands.js';
 	import { handleKeydown } from '#lib/app/keyboard.js';
@@ -25,6 +26,7 @@
 	import { remoteImages } from '#lib/reader/images.svelte.js';
 	import AddAccount from '#lib/settings/AddAccount.svelte';
 	import SettingsDialog from '#lib/settings/SettingsDialog.svelte';
+	import SignInAgain from '#lib/settings/SignInAgain.svelte';
 	import Shortcuts from '#lib/shell/Shortcuts.svelte';
 	import { toasts } from '#lib/shell/toasts.svelte.js';
 	import CheckMail from '#lib/shell/CheckMail.svelte';
@@ -40,6 +42,7 @@
 	const palette = new PaletteState();
 	let settings = $state(false);
 	let adding = $state(false);
+	let signingIn = $state<Account | null>(null);
 	let shortcuts = $state(false);
 	let refreshing = false;
 	let refreshAgain = false;
@@ -154,7 +157,7 @@
 <div class="h-[100dvh] w-screen overflow-hidden" style:--sidebar-width="{layout.sidebarWidth}px">
 	<GlassShell class="h-full select-none">
 		{#if layout.sidebar !== 'none'}
-			<Sidebar bind:this={sidebar} rail={layout.sidebar === 'rail'} onsettings={() => (settings = true)} onsearch={showPalette} />
+			<Sidebar bind:this={sidebar} rail={layout.sidebar === 'rail'} onsettings={() => (settings = true)} onsearch={showPalette} onsignin={(account) => (signingIn = account)} />
 		{/if}
 		<main class="glass-content relative isolate">
 			{#if opened.file}
@@ -225,6 +228,9 @@
 {/if}
 {#if adding}
 	<AddAccount onclose={() => (adding = false)} />
+{/if}
+{#if signingIn}
+	<SignInAgain account={signingIn} onclose={() => (signingIn = null)} />
 {/if}
 {#if shortcuts}
 	<Shortcuts commands={shellCommands(shell)} onclose={() => (shortcuts = false)} />

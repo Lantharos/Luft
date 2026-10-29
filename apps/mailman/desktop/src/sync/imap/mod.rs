@@ -8,7 +8,7 @@ pub mod idle;
 
 use super::ops::{self, Operation};
 use super::remote::{Context, Remote};
-use crate::accounts::{Account, Login, Provider};
+use crate::accounts::{Account, Login, Provider, SignInError};
 use crate::mail::envelope;
 use crate::protocols::imap::{Client, Header, Selected, uid_set};
 use crate::protocols::net::Server;
@@ -40,7 +40,7 @@ fn uids(context: &Context, messages: &[ops::Target]) -> Result<Vec<u32>, String>
 }
 
 impl ImapRemote {
-    pub fn connect(imap: &Server, smtp: &Server, login: Login) -> Result<Self, String> {
+    pub fn connect(imap: &Server, smtp: &Server, login: Login) -> Result<Self, SignInError> {
         let mut client = Client::connect(imap)?;
         client.login(&login)?;
         let qresync = client.enable_sync_extensions()?;
@@ -418,7 +418,7 @@ impl Remote for ImapRemote {
     }
 }
 
-pub fn connect(account: &Account, login: Login) -> Result<ImapRemote, String> {
+pub fn connect(account: &Account, login: Login) -> Result<ImapRemote, SignInError> {
     match &account.config.protocol {
         crate::accounts::Protocol::Imap { imap, smtp } => ImapRemote::connect(imap, smtp, login),
         crate::accounts::Protocol::Jmap { .. } => Err("This account doesn't use IMAP".into()),

@@ -112,6 +112,11 @@ export const commands = {
 	setFocused: (params: {
 		focused: boolean,
 	}, options?: InvokeOptions) => invoke<null>("set_focused", params, options),
+	signInAgain: (params: {
+		id: number,
+		secret: NewSecret,
+		token?: string | null,
+	}, options?: InvokeOptions) => invoke<null>("sign_in_again", params, options),
 	syncMailbox: (params: {
 		account: number,
 		mailbox: number,
@@ -418,6 +423,7 @@ export type SyncStatus = {
 	account: number,
 	state: SyncState,
 	message: string | null,
+	signedOut: boolean,
 };
 
 export type Template = {

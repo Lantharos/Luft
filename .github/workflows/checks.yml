@@ -221,6 +221,7 @@ jobs:
           name: kestrel-session
           path: |
             kestrel/run/smoke/capture/logs
+            kestrel/run/smoke/capture/workers
             kestrel/run/smoke/capture/summary.txt
             kestrel/run/smoke/screenshots
           if-no-files-found: ignore

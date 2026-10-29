@@ -7,13 +7,13 @@ pub struct Profile {
 }
 
 pub fn all() -> impl Iterator<Item = Profile> {
-    let config = subdirectories(&glib::user_config_dir())
-        .flat_map(|directory| subdirectories(&directory).chain([directory]));
     let sabine = subdirectories(&glib::user_cache_dir().join("sabine/profiles"));
-    let host = config.chain(sabine).map(|directory| Profile {
-        directory,
-        flatpak: None,
-    });
+    let host = app_folders(&glib::user_config_dir(), &glib::user_cache_dir())
+        .chain(sabine)
+        .map(|directory| Profile {
+            directory,
+            flatpak: None,
+        });
     host.chain(flatpak())
 }
 
@@ -22,11 +22,19 @@ fn flatpak() -> impl Iterator<Item = Profile> {
         let id = app
             .file_name()
             .map(|name| name.to_string_lossy().into_owned());
-        subdirectories(&app.join("config")).map(move |directory| Profile {
+        app_folders(&app.join("config"), &app.join("cache")).map(move |directory| Profile {
             directory,
             flatpak: id.clone(),
         })
     })
+}
+
+fn app_folders(config: &Path, cache: &Path) -> impl Iterator<Item = PathBuf> + use<> {
+    [config, cache]
+        .map(subdirectories)
+        .into_iter()
+        .flatten()
+        .flat_map(|directory| subdirectories(&directory).chain([directory]))
 }
 
 fn subdirectories(path: &Path) -> impl Iterator<Item = PathBuf> + use<> {

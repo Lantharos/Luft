@@ -1,0 +1,2 @@
+part = "app-keys"
+sources = ["kestrel/engine/data/characters.json", "kestrel/engine/data/emoji.json"]

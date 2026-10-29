@@ -3,7 +3,8 @@
 packages = -p sushi -p sushi-scene -p sushid -p sushictl
 
 build:
-	./scripts/build.sh
+	cargo build --profile release-abort -p sushid -p sushictl
+	cargo build --release -p sushiboot --target x86_64-unknown-uefi
 
 check:
 	cargo fmt --check $(packages) -p sushiboot

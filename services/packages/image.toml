@@ -1,0 +1,21 @@
+part = "services"
+
+[programs]
+"/usr/libexec/" = ["luft-packages"]
+
+[files]
+"/usr/share/dbus-1/system.d/" = ["data/com.lantharos.Packages1.conf"]
+"/usr/share/dbus-1/system-services/" = ["data/com.lantharos.Packages1.service"]
+"/usr/lib/systemd/system/" = [
+    "data/luft-packages.service",
+    "data/luft-system-packages-activate.socket",
+    "data/luft-system-packages-activate@.service",
+    "data/luft-system-packages-link.service",
+    "data/luft-system-packages-settle.service",
+    "data/luft-system-packages-rebuild.service",
+]
+"/usr/share/polkit-1/actions/" = ["data/com.lantharos.packages.policy"]
+"/usr/share/dnf5/libdnf.conf.d/50-luft-system-packages.conf" = "data/luft-system-packages.conf"
+
+[enable]
+system = ["luft-system-packages-link.service", "luft-system-packages-settle.service"]

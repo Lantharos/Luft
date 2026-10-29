@@ -1,0 +1,7 @@
+part = "services"
+
+[programs]
+"/usr/libexec/" = ["luft-thumbnailer"]
+
+[files]
+"/usr/share/thumbnailers/" = ["data/luft-apps.thumbnailer"]

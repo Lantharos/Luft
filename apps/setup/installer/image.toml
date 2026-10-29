@@ -1,0 +1,15 @@
+part = "services"
+
+[programs]
+"/usr/libexec/" = ["luft-installer"]
+
+[files]
+"/usr/lib/luft-installer/" = ["data/install.toml"]
+"/usr/share/dbus-1/system.d/" = ["data/com.lantharos.Installer1.conf"]
+"/usr/share/dbus-1/system-services/" = ["data/com.lantharos.Installer1.service"]
+"/usr/lib/systemd/system/" = ["data/luft-installer.service", "data/luft-installer-expire-setup.service"]
+"/usr/share/polkit-1/actions/" = ["data/com.lantharos.installer.policy"]
+"/usr/share/selinux/packages/" = ["data/luft-installer.cil"]
+
+[enable]
+system = ["luft-installer-expire-setup.service"]

@@ -8,7 +8,7 @@ const UNSEEN = [
 	/^os\/dev\//,
 	/^kestrel\/(tools|peek)\//,
 	/^os\/image\/(build|throwaway-keys)\.sh$/,
-	/^os\/image\/parts\/(key\.ts|stages\/workspace)/,
+	/^os\/image\/parts\/(key\.ts|components\/|stages\/workspace)/,
 	/(^|\/)(vm|tests?)(\/|\.rs$)/,
 	/\.(test|spec)\.[cm]?[jt]s$/,
 	/\.md$/,

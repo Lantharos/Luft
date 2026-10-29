@@ -1,0 +1,5 @@
+part = "app-rover"
+
+[files]
+"/usr/share/xdg-desktop-portal/portals/" = ["data/rover.portal"]
+"/usr/share/dbus-1/services/" = ["data/dbus/org.freedesktop.FileManager1.service", "data/dbus/org.freedesktop.impl.portal.desktop.rover.service"]

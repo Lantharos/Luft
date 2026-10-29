@@ -1,0 +1,8 @@
+part = "services"
+
+[programs]
+"/usr/libexec/" = ["luft-accounts"]
+
+[files]
+"/usr/share/dbus-1/services/" = ["data/com.lantharos.Accounts1.service"]
+"/usr/lib/systemd/user/" = ["data/luft-accounts.service"]

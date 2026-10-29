@@ -1,0 +1,13 @@
+part = "kestrel"
+
+[programs]
+"/usr/libexec/" = ["luft-passkeys", "luft-passkeys-relay"]
+
+[files]
+"/usr/lib/systemd/system/" = ["data/luft-passkeys-relay.socket", "data/luft-passkeys-relay@.service"]
+"/usr/lib/systemd/user/" = ["data/luft-passkeys.service"]
+"/usr/share/dbus-1/services/" = ["data/com.lantharos.Passkeys.service"]
+
+[enable]
+system = ["luft-passkeys-relay.socket"]
+user = ["luft-passkeys.service"]

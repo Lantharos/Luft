@@ -1,0 +1,19 @@
+part = "kestrel"
+
+[programs]
+"/usr/libexec/" = ["luft-keyring", "luft-keyring-unlock", "luft-pinentry"]
+"/usr/lib64/security/pam_luft_keyring.so" = "libpam_luft_keyring.so"
+
+[files]
+"/usr/lib/sysusers.d/luft-keyring.conf" = "data/system/luft-keyring.sysusers"
+"/usr/lib/systemd/system/" = ["data/system/luft-keyring-unlock.socket", "data/system/luft-keyring-unlock.service"]
+"/usr/lib/systemd/user/" = ["data/user/luft-keyring.service", "data/user/luft-keyring.socket"]
+"/usr/share/dbus-1/services/" = ["data/dbus/org.freedesktop.secrets.service", "data/dbus/com.lantharos.Keyring1.service"]
+"/usr/share/xdg-desktop-portal/portals/" = ["data/dbus/luft-keyring.portal"]
+"/usr/lib/pam.d/" = ["data/pam/kestrel-unlock", "data/pam/kestrel-unlock-fingerprint", "data/pam/greetd"]
+"/usr/share/selinux/packages/" = ["data/selinux/luft-keyring.cil"]
+"/etc/gnupg/gpg-agent.conf" = "data/gpg-agent.conf"
+
+[enable]
+system = ["luft-keyring-unlock.socket"]
+user = ["luft-keyring.socket", "luft-keyring.service"]

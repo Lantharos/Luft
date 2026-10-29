@@ -1,0 +1,15 @@
+part = "services"
+
+[programs]
+"/usr/libexec/" = ["luft-windows"]
+
+[files]
+"/usr/share/dbus-1/system.d/" = ["data/com.lantharos.Windows1.conf"]
+"/usr/share/dbus-1/system-services/" = ["data/com.lantharos.Windows1.service"]
+"/usr/lib/systemd/system/" = ["data/luft-windows.service", "data/luft-windows-boot.service"]
+"/usr/lib/systemd/user/" = ["data/luft-windows-notice.service"]
+"/usr/share/polkit-1/actions/" = ["data/com.lantharos.windows.policy"]
+
+[enable]
+system = ["luft-windows-boot.service"]
+user = ["luft-windows-notice.service"]

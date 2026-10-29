@@ -1,0 +1,12 @@
+part = "app-schelf"
+
+[files]
+"/usr/lib/systemd/user/" = [
+    "data/luft-app-updates.service",
+    "data/luft-app-updates.timer",
+    "data/luft-integrate-apps.service",
+    "data/luft-preinstall.service",
+]
+
+[enable]
+user = ["luft-integrate-apps.service", "luft-preinstall.service", "luft-app-updates.timer"]

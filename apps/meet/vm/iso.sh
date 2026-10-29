@@ -30,13 +30,9 @@ esac
 source "$luft/os/image/throwaway-keys.sh"
 
 stage_changes() {
-  local installer="$luft/apps/setup/installer"
-  cargo build --release --manifest-path "$installer/Cargo.toml"
   rm -rf "$stage"
   mkdir -p "$stage/root"
-  install -Dm755 "${CARGO_TARGET_DIR:-$luft/target}/release/luft-installer" "$stage/root/usr/libexec/luft-installer"
-  install -Dm644 -t "$stage/root/usr/lib/systemd/system" "$installer"/data/luft-installer*.service
-  "$luft/security/scripts/build.sh" "$stage/root"
+  bun "$luft/os/image/parts/components/install.ts" "$stage/root" apps/setup/installer security
   (cd "$luft" && bun install --frozen-lockfile)
   sabine install --bundle --system-wide --root "$stage/root" "$luft/apps/setup"
   install -Dm755 "$luft/os/image/files/usr/libexec/luft-carried-tools" "$stage/root/usr/libexec/luft-carried-tools"

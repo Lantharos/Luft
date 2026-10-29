@@ -321,9 +321,22 @@ jobs:
 
       - run: bun .github/scripts/etc/index.ts
 
+  image-sources:
+    name: Image part sources
+    runs-on: ubuntu-slim
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun os/image/parts/components/check.ts
+
   checks:
     name: Checks
-    needs: [changes, rust, uefi, meet-windows, web, kestrel, units, weblate, compositor-identity, dbus, etc]
+    needs: [changes, rust, uefi, meet-windows, web, kestrel, units, weblate, compositor-identity, dbus, etc, image-sources]
     if: always()
     runs-on: ubuntu-slim
     steps:

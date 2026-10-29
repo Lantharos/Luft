@@ -1,0 +1,17 @@
+part = "kestrel"
+
+[programs]
+"/usr/libexec/" = ["kestrel-greeter-service"]
+
+[files]
+"/usr/share/dbus-1/system.d/" = ["data/com.lantharos.Greeter1.conf"]
+"/usr/share/dbus-1/system-services/" = ["data/com.lantharos.Greeter1.service"]
+"/usr/lib/systemd/system/" = ["data/kestrel-greeter.service"]
+"/usr/lib/systemd/system/greetd.service.d/kestrel-greeter.conf" = "data/greetd.service.conf"
+"/usr/share/polkit-1/actions/" = ["data/com.lantharos.greeter.policy"]
+"/usr/lib/tmpfiles.d/kestrel-greeter.conf" = "data/kestrel-greeter.tmpfiles"
+"/usr/lib/kestrel-greeter/" = ["data/greetd.toml"]
+"/usr/share/selinux/packages/" = ["data/luft-greeter.cil"]
+
+[enable]
+system = ["greetd.service"]

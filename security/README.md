@@ -11,7 +11,7 @@ How the pieces protect the computer is in [docs/security.md](../docs/security.md
 
 ## Build
 
-`security/scripts/build.sh DESTDIR` builds the services and stages their files the way the [Luft image](../os/README.md) installs them. [os/vm](../os/README.md#try-it-in-a-vm) starts the image with Secure Boot and a TPM, which covers key enrollment, the startup and TPM unlock.
+`bun os/image/parts/components/install.ts DESTDIR security` builds the services and stages their files the way the [Luft image](../os/README.md) installs them, as `image.toml` lists them. [os/vm](../os/README.md#try-it-in-a-vm) starts the image with Secure Boot and a TPM, which covers key enrollment, the startup and TPM unlock.
 
 ## trustctl
 

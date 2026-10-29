@@ -1,0 +1,14 @@
+part = "services"
+
+[programs]
+"/usr/libexec/" = ["luft-updater"]
+
+[files]
+"/usr/share/dbus-1/system.d/" = ["data/com.lantharos.Updater1.conf"]
+"/usr/share/dbus-1/system-services/" = ["data/com.lantharos.Updater1.service"]
+"/usr/lib/systemd/system/" = ["data/luft-updater.service", "data/luft-updater-check.service", "data/luft-updater-check.timer"]
+"/usr/share/polkit-1/actions/" = ["data/com.lantharos.updater.policy"]
+"/usr/share/polkit-1/rules.d/" = ["data/50-luft-updater.rules"]
+
+[enable]
+system = ["luft-updater-check.timer"]

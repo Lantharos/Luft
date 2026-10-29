@@ -1,0 +1,11 @@
+part = "services"
+
+[programs]
+"/usr/libexec/" = ["luft-sleep"]
+
+[files]
+"/usr/share/dbus-1/system.d/" = ["data/com.lantharos.Sleep1.conf"]
+"/usr/share/dbus-1/system-services/" = ["data/com.lantharos.Sleep1.service"]
+"/usr/lib/systemd/system/" = ["data/luft-sleep.service", "data/luft-sleep-power-off.service"]
+"/usr/lib/systemd/system/systemd-suspend.service.d/luft-sleep.conf" = "data/systemd-suspend-luft.conf"
+"/usr/share/polkit-1/actions/" = ["data/com.lantharos.sleep.policy"]

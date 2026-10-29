@@ -1,0 +1,7 @@
+part = "boot"
+
+[cargo]
+target = "x86_64-unknown-uefi"
+
+[programs]
+"/usr/lib/sushi/efi/SushiBoot.efi" = { from = "sushiboot.efi", mode = "644" }

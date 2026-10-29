@@ -1,0 +1,36 @@
+part = "boot"
+
+[programs]
+"/usr/libexec/" = ["luft-usb-protection", "trustd"]
+"/usr/bin/" = ["trustctl"]
+"/usr/lib/systemd/system-generators/" = ["trustd-drives-generator"]
+
+[files]
+"/usr/lib/systemd/system/" = ["data/usb/luft-usb-protection.service", "data/trust/systemd/*"]
+"/usr/share/dbus-1/system-services/" = ["data/usb/com.lantharos.UsbProtection1.service", "data/trust/com.lantharos.Trust1.service"]
+"/usr/share/dbus-1/system.d/" = ["data/usb/com.lantharos.UsbProtection1.conf", "data/trust/com.lantharos.Trust1.conf"]
+"/usr/share/dbus-1/interfaces/" = ["data/usb/com.lantharos.UsbProtection1.xml", "data/trust/com.lantharos.Trust1.xml"]
+"/usr/share/polkit-1/actions/" = ["data/usb/com.lantharos.usb-protection.policy", "data/trust/com.lantharos.trust.policy"]
+"/usr/lib/tmpfiles.d/trustd.conf" = "data/trust/trustd.tmpfiles"
+"/usr/share/selinux/packages/" = ["data/trust/luft-nvpcr.cil", "data/trust/luft-bless-boot.cil"]
+"/usr/lib/udev/rules.d/" = ["data/trust/61-trustd-drives.rules"]
+"/usr/lib/dracut/dracut.conf.d/" = ["data/trust/90-trustd.conf"]
+"/usr/lib/dracut/modules.d/90trustd/" = [
+    "data/trust/dracut/90-luft-root-partition.rules",
+    "data/trust/dracut/cryptsetup-after-pcrphase.conf",
+    "data/trust/dracut/cryptsetup-root-retries.conf",
+    { from = "data/trust/dracut/module-setup.sh", mode = "755" },
+    "data/trust/dracut/root-waits-for-unlock.conf",
+    "data/trust/dracut/trustd-move.service",
+]
+
+[enable]
+system = [
+    "trustd.service",
+    "trustd-follow-up.service",
+    "trustd-system-disk.service",
+    "trustd-went-back.service",
+    "trustd-startup-check.service",
+    "trustd-before-restart.service",
+    "luft-usb-protection.service",
+]

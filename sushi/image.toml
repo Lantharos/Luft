@@ -1,0 +1,25 @@
+part = "boot"
+sources = ["kestrel/engine/data/fonts/OpenRunde-Medium.otf"]
+
+[cargo]
+profile = "release-abort"
+
+[programs]
+"/usr/bin/" = ["sushid", "sushictl"]
+
+[files]
+"/usr/lib/systemd/system/" = ["data/systemd/*.service"]
+"/usr/lib/systemd/system/emergency.service.d/" = ["data/drop-ins/emergency.service.d/sushi.conf"]
+"/usr/lib/systemd/system/greetd.service.d/" = ["data/drop-ins/greetd.service.d/sushi.conf"]
+"/usr/lib/systemd/system/plymouth-quit.service.d/" = ["data/drop-ins/plymouth-quit.service.d/sushi.conf"]
+"/usr/lib/systemd/system/plymouth-quit-wait.service.d/" = ["data/drop-ins/plymouth-quit-wait.service.d/sushi.conf"]
+"/usr/lib/systemd/system/rescue.service.d/" = ["data/drop-ins/rescue.service.d/sushi.conf"]
+"/usr/lib/systemd/system/systemd-ask-password-console.path.d/" = ["data/drop-ins/systemd-ask-password-console.path.d/sushi.conf"]
+"/usr/lib/dracut/modules.d/90sushi/" = [{ from = "data/dracut/module-setup.sh", mode = "755" }]
+"/usr/lib/dracut/dracut.conf.d/" = ["data/dracut/90-sushi.conf"]
+"/usr/lib/bootc/kargs.d/10-sushi.toml" = "data/kargs.toml"
+"/usr/lib/modprobe.d/" = ["data/modprobe/sushi.conf"]
+"/etc/sushi/" = ["data/sushi.conf"]
+
+[enable]
+system = ["sushi.service", "sushi-quit.service", "sushi-shutdown.service", "sushi-drivers.service", "sushi-integrity.service"]

@@ -12,7 +12,7 @@ os/image/build.sh luft-nvidia        # localhost/luft:45-nvidia
 os/image/build.sh luft luft-nvidia   # both
 ```
 
-The image is put together from parts (Kestrel, the boot and security services, the apps, NVIDIA's driver and so on), each cached by a hash of its sources, so later builds only remake what changed. For the Rust in a part, that's the workspace crates it copies in and the locked packages they build on, so a dependency one app adds doesn't remake Kestrel. The web runtime is also remade when a newer CEF build comes out. `LUFT_REBUILD=1` makes them all again. The first build takes about an hour.
+The image is put together from parts (Kestrel, the boot and security services, the apps, NVIDIA's driver and so on), each cached by a hash of its sources, so later builds only remake what changed. Each app, service and Kestrel piece lists its part, what it needs and what it installs in an `image.toml` next to it ([Image components](../docs/image-components.md)). For the Rust in a part, that's the workspace crates it copies in and the locked packages they build on, so a dependency one app adds doesn't remake Kestrel. The web runtime is also remade when a newer CEF build comes out. `LUFT_REBUILD=1` makes them all again. The first build takes about an hour.
 
 Builds sign SushiBoot, the startup image and NVIDIA's driver with the keys in `LUFT_SECUREBOOT_KEY`, `LUFT_SECUREBOOT_CERT` and `LUFT_PCR_KEY` (PEM). Without them they make throwaway keys that every local build and test VM shares. The public halves of the real keys are in `image/keys`.
 

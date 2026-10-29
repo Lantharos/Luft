@@ -1,0 +1,7 @@
+part = "app-settings"
+
+[files]
+"/usr/lib/systemd/user/" = ["data/luft-graphics-notice.service"]
+
+[enable]
+user = ["luft-graphics-notice.service"]

@@ -1,0 +1,13 @@
+part = "kestrel"
+
+[programs]
+"/usr/libexec/" = ["kestrel-watchdog"]
+
+[files]
+"/usr/share/dbus-1/system.d/" = ["data/com.lantharos.Kestrel.Watchdog1.conf"]
+"/usr/share/dbus-1/system-services/" = ["data/com.lantharos.Kestrel.Watchdog1.service"]
+"/usr/lib/systemd/system/" = ["data/kestrel-watchdog.service", "data/kestrel-incident.service"]
+"/usr/lib/udev/rules.d/" = ["data/70-kestrel-power-buttons.rules"]
+
+[enable]
+system = ["kestrel-incident.service"]

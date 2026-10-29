@@ -107,14 +107,13 @@ is_signed() {
 }
 
 part_names() {
-  local app
-  printf '%s\n' kestrel boot bootc portal
+  local components
+  components="$(in_bun /luft/os/image/parts/components/parts.ts /tree /luft names)"
+  grep -v '^app-' <<<"$components"
+  printf '%s\n' bootc portal
   [[ "$1" != luft-nvidia ]] || echo nvidia
-  printf '%s\n' runtime helium zypak services
-  for app in "$luft"/apps/*/; do
-    app="$(basename "$app")"
-    [[ "$app" == meet ]] || echo "app-$app"
-  done
+  printf '%s\n' runtime helium zypak
+  grep '^app-' <<<"$components"
 }
 
 pull_base() {
@@ -137,7 +136,6 @@ bootc_version() {
 
 part_target() {
   case "$1" in
-    app-keys) echo "app APP=keys APP_SOURCES=keys-sources" ;;
     app-*) echo "app APP=${1#app-}" ;;
     bootc) echo "bootc BOOTC=$(bootc_version)" ;;
     portal) echo "portal PORTAL=$(repo_version xdg-desktop-portal)" ;;
@@ -147,26 +145,36 @@ part_target() {
   esac
 }
 
-working_tree() {
+snapshot_tree() {
   local index
   index="$(mktemp)"
   cp "$(git -C "$luft" rev-parse --path-format=absolute --git-path index)" "$index"
   GIT_INDEX_FILE="$index" git -C "$luft" add --all
-  GIT_INDEX_FILE="$index" git -C "$luft" write-tree
+  tree="$(GIT_INDEX_FILE="$index" git -C "$luft" write-tree)"
   rm "$index"
+  tree_listing="$(mktemp)"
+  trap 'rm -f "$tree_listing"' EXIT
+  git -C "$luft" ls-tree -r -t -z "$tree" >"$tree_listing"
+}
+
+in_bun() {
+  podman run "${retries[@]}" --quiet --rm --interactive --network none --security-opt label=disable \
+    --volume "$luft:/luft:ro" --volume "$tree_listing:/tree:ro" "$bun" "$@"
 }
 
 part_refs() {
-  local name tree globals=(BASE="$base" SABINE="$(sabine_tag)")
-  tree="$(mktemp)"
-  git -C "$luft" ls-tree -r -t -z "$(working_tree)" >"$tree"
+  local name globals=(BASE="$base" SABINE="$(sabine_tag)")
   for name in "$@"; do
     echo "$name $(part_target "$name")"
-  done | podman run "${retries[@]}" --quiet --rm --interactive --network none --security-opt label=disable \
-    --volume "$luft:/luft:ro" --volume "$tree:/tree:ro" \
-    "$bun" /luft/os/image/parts/key.ts /luft/os/image/parts/Containerfile /tree /luft "${globals[@]}" |
+  done | in_bun /luft/os/image/parts/key.ts /luft/os/image/parts/Containerfile /tree /luft "${globals[@]}" |
     while read -r name key; do echo "$name $registry:$name-$key"; done
-  rm "$tree"
+}
+
+part_sources() {
+  local dir="$1" paths
+  mapfile -t paths < <(in_bun /luft/os/image/parts/components/parts.ts /tree /luft sources "$2")
+  ((${#paths[@]})) || return 0
+  git -C "$luft" archive --format=tar "$tree" -- "${paths[@]}" | tar -x -C "$dir"
 }
 
 part_exists() {
@@ -182,7 +190,7 @@ cache_dirs() {
 }
 
 build_part() {
-  local name="$1" ref="$2" target rest argument work options=() arguments=()
+  local name="$1" ref="$2" target rest argument work sources options=() arguments=()
   read -r target rest <<<"$(part_target "$name")"
   read -ra arguments <<<"$rest"
   work="$name"
@@ -196,10 +204,13 @@ build_part() {
   fi
   [[ "$ref" == localhost/* ]] || options+=(--label org.opencontainers.image.source=https://github.com/Lantharos/Luft)
   cache_dirs "$cache/work/$work"
+  sources="$(mktemp -d "${TMPDIR:-/var/tmp}/luft-sources.XXXXXX")"
+  part_sources "$sources" "$name"
   podman build "${retries[@]}" --layers --security-opt label=disable --file "$image/parts/Containerfile" --target "$target" \
-    --build-context "cache=$cache" --build-context "work=$cache/work/$work" \
+    --build-context "cache=$cache" --build-context "work=$cache/work/$work" --build-context "sources=$sources" \
     --build-arg "BASE=$base" --build-arg "SABINE=$(sabine_tag)" "${options[@]}" "${podman_options[@]}" \
     --tag "$ref" "$luft"
+  rm -rf "$sources"
   [[ "$ref" == localhost/* ]] || podman push "${retries[@]}" --quiet "$ref"
 }
 
@@ -372,7 +383,7 @@ case "${1:-luft}" in
   -h | --help) usage ;;
   base) resolve_base ;;
   cef) resolve_cef ;;
-  plan) base="$(resolve_base)"; cef="$(resolve_cef)"; plan "${@:2}" ;;
+  plan) base="$(resolve_base)"; cef="$(resolve_cef)"; snapshot_tree; plan "${@:2}" ;;
   updates)
     (($# == 2)) || { usage >&2; exit 2; }
     base="$(resolve_base)"
@@ -384,6 +395,7 @@ case "${1:-luft}" in
     [[ "$2" != runtime ]] || cef="$(resolve_cef)"
     podman_options=("${@:3}")
     ! is_signed "$2" || require_keys LUFT_SECUREBOOT_KEY LUFT_SECUREBOOT_CERT
+    snapshot_tree
     read -r name ref <<<"$(part_refs "$2")"
     build_part "$name" "$ref"
     ;;
@@ -393,6 +405,7 @@ case "${1:-luft}" in
     [[ "$2" != runtime ]] || cef="$(resolve_cef)"
     podman_options=()
     ! is_signed "$2" || require_keys LUFT_SECUREBOOT_KEY LUFT_SECUREBOOT_CERT
+    snapshot_tree
     stage_part "$2" "$3"
     ;;
   luft | luft-nvidia)
@@ -404,6 +417,7 @@ case "${1:-luft}" in
       shift
     done
     podman_options=("$@")
+    snapshot_tree
     build_images "${variants[@]:-luft}"
     ;;
   *) usage >&2; exit 2 ;;

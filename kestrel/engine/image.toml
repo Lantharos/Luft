@@ -1,0 +1,16 @@
+part = "kestrel"
+sources = [
+    "kestrel/compositor",
+    "kestrel/tools/unicode",
+    "kestrel/ui",
+    "packages/i18n/tools",
+    "packages/web/motion",
+    "packages/web/settings-pages",
+    "packages/web/ui/src/taskbar",
+]
+
+[links]
+"/usr/share/fonts/luft" = "../kestrel/fonts"
+
+[enable]
+system = ["kestrel-authenticate.socket"]

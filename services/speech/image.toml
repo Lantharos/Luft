@@ -1,0 +1,9 @@
+part = "services"
+
+[programs]
+"/usr/libexec/" = ["luft-speech"]
+
+[files]
+"/usr/share/dbus-1/services/" = ["data/com.lantharos.Speech1.service"]
+"/usr/lib/systemd/user/" = ["data/luft-speech.service"]
+"/usr/share/licenses/luft-speech/" = ["data/silero-vad-LICENSE"]

@@ -11,8 +11,9 @@ libexec=/usr/libexec
 export CARGO_TARGET_DIR="${CARGO_TARGET_DIR:-$work/cargo}"
 release="$CARGO_TARGET_DIR/release"
 compositor_extras=(
-  bin/mutter share/GConf/gsettings/mutter-schemas.convert share/man/man1/gdctl.1
-  share/man/man1/gnome-service-client.1 share/man/man1/mutter.1
+  bin/gdctl bin/gnome-service-client bin/mutter include lib/pkgconfig lib/mutter-51/{Clutter,Cogl,Meta,Mtk}-51.gir
+  share/GConf/gsettings/mutter-schemas.convert share/man/man1/gdctl.1 share/man/man1/gnome-service-client.1
+  share/man/man1/mutter.1
 )
 
 greeter_files() {
@@ -79,7 +80,7 @@ build_compositor() {
   local extra
   "$kestrel/compositor/build.sh" "$work/compositor" "$prefix"
   DESTDIR="$destdir" meson install -C "$work/compositor" --no-rebuild --quiet
-  for extra in "${compositor_extras[@]}"; do rm -f "$destdir$prefix/$extra"; done
+  for extra in "${compositor_extras[@]}"; do rm -rf "${destdir:?}$prefix/$extra"; done
 }
 
 build_engine() {

@@ -18,6 +18,7 @@ dbus-daemon
 dconf
 ddcutil
 desktop-file-utils
+efibootmgr
 egl-utils
 erofs-utils
 fastfetch
@@ -26,7 +27,6 @@ fprintd
 fprintd-pam
 fuse3
 fwupd
-gcr
 gdk-pixbuf2-modules-extra
 geoclue2
 geoclue2-libs
@@ -45,7 +45,6 @@ greetd
 greetd-selinux
 gsettings-desktop-schemas
 gstreamer1-plugin-dav1d
-gstreamer1-plugin-gtk4
 gstreamer1-plugin-libav
 gstreamer1-plugins-bad-free
 gstreamer1-plugins-good
@@ -61,7 +60,6 @@ liberation-mono-fonts
 liberation-sans-fonts
 liberation-serif-fonts
 libgudev
-libnma-gtk4
 librsvg2
 libsoup3
 libva-intel-media-driver
@@ -69,6 +67,7 @@ libva-utils
 mesa-dri-drivers
 mesa-vulkan-drivers
 ModemManager
+mokutil
 NetworkManager-bluetooth
 NetworkManager-openconnect
 NetworkManager-openvpn
@@ -87,7 +86,6 @@ plymouth
 polkit
 power-profiles-daemon
 pulseaudio-utils
-python3-gobject
 rclone
 shared-mime-info
 skopeo

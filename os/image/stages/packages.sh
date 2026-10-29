@@ -15,20 +15,35 @@ forget_rpmfusion
 
 mapfile -t unwanted < <(cat "$image/packages/replaced.txt" "$image/packages/unused.txt")
 mapfile -t removed < <(rpm -qa --qf '%{NAME}\n' "${unwanted[@]}")
-((${#removed[@]} == 0)) || dnf remove -y "${removed[@]}"
+((${#removed[@]} == 0)) || dnf remove -y --setopt=protected_packages= "${removed[@]}"
 dnf autoremove -y
 dnf clean all
 
+leave_out_python() {
+  mapfile -t python < <(rpm -qa --qf '%{NAME}\n' 'python*')
+  rpm -e --nodeps "${python[@]}"
+  rm -rf /usr/libexec/bootc-base-imagectl /usr/lib64/python3*
+}
+
 leave_out_documentation() {
   rm -rf /usr/share/man /usr/share/info
-  find /usr/share/doc -type f -not -path '/usr/share/doc/bootc/*' \
+  find /usr/share/doc -not -type d -not -path '/usr/share/doc/bootc/*' \
     -not -iregex '.*/\(copying\|copyright\|licen[cs]e\|notice\)[^/]*' -delete
   find /usr/share/doc -type d -empty -not -path '/usr/share/doc/bootc/*' -delete
 }
 
 leave_out_unused_data() {
   rm -f /usr/share/ibus/dicts/emoji-*.dict
+  rm -rf /usr/lib/sysimage/rpm-ostree-base-db /usr/share/rpm-ostree
 }
 
+leave_out_arm_firmware() {
+  local firmware=/usr/lib/firmware
+  rm -rf "$firmware"/{amlogic,amphion,arm,cnm,dpaa2,meson,powervr} "$firmware"/s5p-mfc* \
+    "$firmware"/nvidia/{gk20a,gm20b,gp10b,tegra*}
+}
+
+leave_out_python
 leave_out_documentation
 leave_out_unused_data
+leave_out_arm_firmware

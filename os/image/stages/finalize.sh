@@ -66,7 +66,18 @@ check_sabine_apps() {
 }
 
 write_default_apps() {
-  "$(dirname "$0")/default-apps.py" "$(dirname "$0")/../apps" /usr/share/applications/kestrel-mimeapps.list
+  "$(dirname "$0")/default-apps.sh" /usr/share/applications
+}
+
+leave_out_other_languages() {
+  local languages folder language
+  languages=" $(sed -n "s/.*posix: '\([a-z]*\)_.*/\1/p" "$(dirname "$0")/../locales.ts" | xargs) "
+  for folder in /usr/share/locale/*/; do
+    folder="${folder%/}"
+    language="${folder##*/}"
+    language="${language%%[_@.]*}"
+    [[ "$languages" == *" $language "* ]] || rm -rf "$folder"
+  done
 }
 
 refresh_caches() {
@@ -117,6 +128,7 @@ configure_security
 check_typelibs
 check_sabine_apps
 write_default_apps
+leave_out_other_languages
 refresh_caches
 let_line_out_play_beside_headphones
 make_efi_mountpoint

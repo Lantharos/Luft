@@ -7,7 +7,7 @@ FROM ${IMAGE} AS system
 
 FROM ${IMAGE} AS startup
 RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
-    dnf install -y --setopt=keepcache=True systemd-ukify sbsigntools
+    dnf install -y --setopt=keepcache=True python3 systemd-ukify sbsigntools
 COPY build.sh /usr/local/bin/luft-startup-image
 COPY check-policy.py /usr/local/lib/luft-check-policy.py
 ARG SIGNED_BY

@@ -30,14 +30,14 @@ Apps can keep tokens of their own, on `com.lantharos.Keyring1.AppSecrets` at `/c
 
 `app` is the caller's app ID. A sandboxed app can only name its own; programs outside a sandbox keep each app's secrets apart by the ID they name, which separates them but doesn't keep one from another, since they are all you.
 
-Luft apps use them through `luft-app`:
+Luft apps use them through `luft-app`, naming their own app ID:
 
 ```rust
 use luft_app::secrets;
 
-secrets::store("account-token", token.as_bytes()).await?;
-let token: Option<Vec<u8>> = secrets::load("account-token").await?;
-secrets::delete("account-token").await?;
+secrets::store(APP_ID, "account-token", token.as_bytes()).await?;
+let token: Option<Vec<u8>> = secrets::load(APP_ID, "account-token").await?;
+secrets::delete(APP_ID, "account-token").await?;
 ```
 
 ## SSH agent

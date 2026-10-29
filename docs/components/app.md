@@ -100,9 +100,9 @@ let chosen = portal::open_file("Open", Filter { name: "Images", patterns: vec!["
 ```rust
 use luft_app::secrets;
 
-secrets::store("account-token", token.as_bytes()).await?;
-let token: Option<Vec<u8>> = secrets::load("account-token").await?;
-secrets::delete("account-token").await?;
+secrets::store(APP_ID, "account-token", token.as_bytes()).await?;
+let token: Option<Vec<u8>> = secrets::load(APP_ID, "account-token").await?;
+secrets::delete(APP_ID, "account-token").await?;
 ```
 
 Each app keeps its own secrets without prompts, under its app ID. A sandboxed app, a Flatpak or an AppImage, can only name its own ID, so other sandboxed apps can't read its secrets. Apps outside a sandbox run as you, so any program you run could read theirs; see [Who an app is](../security.md#who-an-app-is).

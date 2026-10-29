@@ -1,6 +1,5 @@
 use std::io::{Read, Write};
 use std::os::fd::OwnedFd;
-use std::sync::LazyLock;
 
 use tokio::task::spawn_blocking;
 use zbus::Fd;
@@ -11,14 +10,6 @@ use crate::dbus::{self, failed};
 const NAME: &str = "com.lantharos.Keyring1";
 const PATH: &str = "/com/lantharos/Keyring1";
 const INTERFACE: &str = "com.lantharos.Keyring1.AppSecrets";
-
-static APP_ID: LazyLock<Option<String>> = LazyLock::new(|| std::env::var("SABINE_APP_ID").ok());
-
-fn app_id() -> Result<&'static str, String> {
-    APP_ID
-        .as_deref()
-        .ok_or_else(|| "This app wasn't started by Sabine, so it has no app ID".to_owned())
-}
 
 async fn call<R>(
     method: &str,
@@ -35,12 +26,12 @@ where
         .map_err(failed)
 }
 
-pub async fn store(name: &str, secret: &[u8]) -> Result<(), String> {
+pub async fn store(app: &str, name: &str, secret: &[u8]) -> Result<(), String> {
     let (reader, mut writer) = std::io::pipe().map_err(failed)?;
     let reader = OwnedFd::from(reader);
     let secret = secret.to_vec();
     let feeding = spawn_blocking(move || writer.write_all(&secret));
-    let stored = call::<()>("Store", &(app_id()?, name, Fd::from(&reader))).await;
+    let stored = call::<()>("Store", &(app, name, Fd::from(&reader))).await;
     drop(reader);
     let fed = feeding
         .await
@@ -49,14 +40,14 @@ pub async fn store(name: &str, secret: &[u8]) -> Result<(), String> {
     fed.map_err(failed)
 }
 
-pub async fn load(name: &str) -> Result<Option<Vec<u8>>, String> {
+pub async fn load(app: &str, name: &str) -> Result<Option<Vec<u8>>, String> {
     let (mut reader, writer) = std::io::pipe().map_err(failed)?;
     let writer = OwnedFd::from(writer);
     let draining = spawn_blocking(move || {
         let mut secret = Vec::new();
         reader.read_to_end(&mut secret).map(|_| secret)
     });
-    let found = call::<bool>("Load", &(app_id()?, name, Fd::from(&writer))).await;
+    let found = call::<bool>("Load", &(app, name, Fd::from(&writer))).await;
     drop(writer);
     let secret = draining
         .await
@@ -65,6 +56,6 @@ pub async fn load(name: &str) -> Result<Option<Vec<u8>>, String> {
     Ok(found?.then_some(secret))
 }
 
-pub async fn delete(name: &str) -> Result<bool, String> {
-    call("Delete", &(app_id()?, name)).await
+pub async fn delete(app: &str, name: &str) -> Result<bool, String> {
+    call("Delete", &(app, name)).await
 }

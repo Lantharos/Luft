@@ -15,24 +15,26 @@ const descriptor = (invocation: Gio.DBusMethodInvocation, index: number) => invo
 
 export class ScratchAppSecrets {
   readonly secrets: Map<string, string>;
+  private readonly _app: string;
   private readonly _connection: Gio.DBusConnection;
   private readonly _exported: Gio.DBusExportedObject;
 
-  constructor(secrets: Record<string, string>) {
+  constructor(app: string, secrets: Record<string, string>) {
+    this._app = app;
     this.secrets = new Map(Object.entries(secrets));
     this._connection = Gio.DBusConnection.new_for_address_sync(Gio.dbus_address_get_for_bus_sync(Gio.BusType.SESSION, null),
       Gio.DBusConnectionFlags.AUTHENTICATION_CLIENT | Gio.DBusConnectionFlags.MESSAGE_BUS_CONNECTION, null, null);
     this._exported = Gio.DBusExportedObject.wrapJSObject(INTERFACE, {
-      StoreAsync: ([, name, index]: [string, string, number], invocation: Gio.DBusMethodInvocation) => {
+      StoreAsync: ([app, name, index]: [string, string, number], invocation: Gio.DBusMethodInvocation) => {
         const input = new GioUnix.InputStream({fd: descriptor(invocation, index), close_fd: true});
         const bytes = input.read_bytes(1 << 20, null);
         input.close(null);
-        this.secrets.set(name, new TextDecoder().decode(bytes.toArray()));
+        if (app === this._app) this.secrets.set(name, new TextDecoder().decode(bytes.toArray()));
         invocation.return_value(null);
       },
-      LoadAsync: ([, name, index]: [string, string, number], invocation: Gio.DBusMethodInvocation) => {
+      LoadAsync: ([app, name, index]: [string, string, number], invocation: Gio.DBusMethodInvocation) => {
         const output = new GioUnix.OutputStream({fd: descriptor(invocation, index), close_fd: true});
-        const secret = this.secrets.get(name);
+        const secret = app === this._app ? this.secrets.get(name) : undefined;
         if (secret !== undefined) output.write_all(new TextEncoder().encode(secret), null);
         output.close(null);
         invocation.return_value(new GLib.Variant('(b)', [secret !== undefined]));

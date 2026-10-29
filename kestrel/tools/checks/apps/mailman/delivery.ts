@@ -132,7 +132,7 @@ export async function checkDelivery(stalwart: string) {
   try {
     await server.start();
     await server.startRelay(fixture('services', 'tcpRelay.py'));
-    keyring = new ScratchAppSecrets(seed(server.ports));
+    keyring = new ScratchAppSecrets('com.lantharos.mailman', seed(server.ports));
     require(await keyring.own(), 'a scratch keyring hands Mailman the test passwords');
     server.deliver('bob', 'alice', 'welcome-alice');
     server.deliver('alice', 'bob', 'welcome-bob');

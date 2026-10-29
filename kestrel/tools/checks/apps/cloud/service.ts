@@ -61,7 +61,7 @@ export async function startCloud(rclone: string) {
   const ports = freePorts('dav');
   spawn([rclone, 'serve', 'webdav', folder('server'), '--addr', `127.0.0.1:${ports.dav}`, '--user', USER, '--pass', PASSWORD], {flags: QUIET});
   await waitUntil(() => listening(ports.dav), 'the WebDAV server starts');
-  const keyring = new ScratchAppSecrets({});
+  const keyring = new ScratchAppSecrets('com.lantharos.accounts', {});
   require(await keyring.own(), 'a scratch keyring stands in for Luft Keyring');
   const userManager = new ScratchUserManager();
   require(await userManager.own(), 'a scratch user manager stands in for systemd');

@@ -5,7 +5,8 @@ use luft_app::{block_on, secrets};
 use parking_lot::Mutex;
 use serde::{Deserialize, Serialize};
 
-use super::{Account, Login, oauth};
+use super::{Account, Login, SignInError, oauth};
+use crate::APP_ID;
 use crate::store::now;
 
 const REFRESH_MARGIN: i64 = 120;
@@ -36,17 +37,17 @@ fn key(account: i64) -> String {
 impl Credentials {
     pub fn save(&self, account: i64, secret: Secret) -> Result<(), String> {
         let encoded = serde_json::to_vec(&secret).map_err(|error| error.to_string())?;
-        block_on(secrets::store(&key(account), &encoded))?;
+        block_on(secrets::store(APP_ID, &key(account), &encoded))?;
         self.cache.lock().insert(account, secret);
         Ok(())
     }
 
     pub fn forget(&self, account: i64) {
         self.cache.lock().remove(&account);
-        let _ = block_on(secrets::delete(&key(account)));
+        let _ = block_on(secrets::delete(APP_ID, &key(account)));
     }
 
-    pub fn renew(&self, account: &Account, rejected: &str) -> Result<Login, String> {
+    pub fn renew(&self, account: &Account, rejected: &str) -> Result<Login, SignInError> {
         if let Some(Secret::OAuth {
             access, expires, ..
         }) = self.cache.lock().get_mut(&account.id)
@@ -57,7 +58,7 @@ impl Credentials {
         self.login(account)
     }
 
-    pub fn login(&self, account: &Account) -> Result<Login, String> {
+    pub fn login(&self, account: &Account) -> Result<Login, SignInError> {
         if let Some(login) = self.current(account)? {
             return Ok(login);
         }
@@ -89,18 +90,19 @@ impl Credentials {
         Ok(login)
     }
 
-    fn secret(&self, account: i64) -> Result<Secret, String> {
+    fn secret(&self, account: i64) -> Result<Secret, SignInError> {
         if let Some(secret) = self.cache.lock().get(&account) {
             return Ok(secret.clone());
         }
-        let stored = block_on(secrets::load(&key(account)))?
-            .ok_or("The password for this account is missing from the keyring")?;
+        let stored = block_on(secrets::load(APP_ID, &key(account)))?.ok_or_else(|| {
+            SignInError::Refused("The keyring has no password for this account".into())
+        })?;
         let secret: Secret = serde_json::from_slice(&stored).map_err(|error| error.to_string())?;
         self.cache.lock().insert(account, secret.clone());
         Ok(secret)
     }
 
-    fn current(&self, account: &Account) -> Result<Option<Login>, String> {
+    fn current(&self, account: &Account) -> Result<Option<Login>, SignInError> {
         let username = account.config.username.clone();
         Ok(match self.secret(account.id)? {
             Secret::Password { password } => Some(Login::Password { username, password }),

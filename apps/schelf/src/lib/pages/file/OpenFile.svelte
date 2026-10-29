@@ -203,18 +203,15 @@
 					{#if file.origin}
 						<Row title="Updates from" description={file.origin}><span>{new URL(file.origin).host}</span></Row>
 					{:else}
-						<Row title="Updates" description="It doesn't update by itself. Install a newer file when one comes out."><span>From newer files</span></Row>
+						<Row title="Updates" description="It doesn't update by itself. Install a newer file when one comes out." />
 					{/if}
 				{/if}
 				{#if file.kind === 'deb'}
 					<Row
 						title="Installs to"
 						description="A container with Ubuntu's software, which shares your home folder. Installing the first app downloads Ubuntu itself, a few hundred megabytes."
-						><span>Ubuntu container</span></Row
-					>
-					<Row title="Updates" description="From its maker's software source when the package adds one, as many do. Otherwise, install a newer file when one comes out."
-						><span>When its maker has them</span></Row
-					>
+					/>
+					<Row title="Updates" description="From its maker's software source when the package adds one, as many do. Otherwise, install a newer file when one comes out." />
 				{/if}
 				{#if file.kind === 'appImage'}
 					<Row title="Installs to" description="It gets a place in your app menu, and Schelf keeps it up to date when it can."><span>Applications folder</span></Row>

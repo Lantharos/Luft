@@ -206,7 +206,11 @@ pub fn inspect(path: &Path) -> Result<Deb, String> {
     let summary = match description.split_once('\n') {
         Some((summary, rest)) => {
             let summary = summary.to_owned();
-            description = rest.trim().to_owned();
+            description = if rest.trim() == summary.trim() {
+                String::new()
+            } else {
+                rest.trim().to_owned()
+            };
             summary
         }
         None => std::mem::take(&mut description),

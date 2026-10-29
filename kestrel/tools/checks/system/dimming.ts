@@ -170,8 +170,8 @@ async function checkBacklight(dimmedLuminance: number) {
     backlight.writes.length = 0;
     backlight.changeByHardware(700);
     await pause(300);
-    require(backlight.writes.length === 0 && !Main.brightnessManager.dimming && Math.abs(Main.brightnessManager.scales[0].value - 0.7) < 0.01,
-      'a brightness change from the hardware ends the dim where it is');
+    require(backlight.writes.length === 0 && !Main.brightnessManager.dimming && Math.abs(brightness.value - 0.7) < 0.01,
+      'a brightness change from the hardware ends the dim and moves the brightness slider');
   } finally {
     restore();
   }

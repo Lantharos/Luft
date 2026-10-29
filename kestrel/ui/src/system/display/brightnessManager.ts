@@ -272,7 +272,9 @@ export class BrightnessManager extends GObject.Object {
     this.inhibitUpdates = true;
 
     for (const scale of this.monitorScales.values()) {
-      if (scale.syncWithBacklight()) this.dimmingEnabled = false;
+      if (!scale.syncWithBacklight()) continue;
+      scale.scaleChanged = true;
+      this.dimmingEnabled = false;
     }
 
     const changedScales = this.scales.filter(s => {

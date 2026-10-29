@@ -143,19 +143,26 @@ verify_fingerprint (pam_handle_t *handle,
   return status;
 }
 
+static int
+verified (pam_handle_t *handle)
+{
+  const void *data = NULL;
+
+  return pam_get_data (handle, VERIFIED, &data) == PAM_SUCCESS ? PAM_SUCCESS : PAM_IGNORE;
+}
+
 PAM_EXTERN int
 pam_sm_authenticate (pam_handle_t  *handle,
                      int            flags,
                      int            argc,
                      const char   **argv)
 {
-  const void *verified = NULL;
   const char *user = NULL;
   char *answer;
   int status;
 
   if (argc == 1 && strcmp (argv[0], "verified") == 0)
-    return pam_get_data (handle, VERIFIED, &verified) == PAM_SUCCESS ? PAM_SUCCESS : PAM_IGNORE;
+    return verified (handle);
   if (argc != 0)
     return PAM_SERVICE_ERR;
 
@@ -179,5 +186,5 @@ pam_sm_setcred (pam_handle_t  *handle,
                 int            argc,
                 const char   **argv)
 {
-  return PAM_IGNORE;
+  return verified (handle);
 }

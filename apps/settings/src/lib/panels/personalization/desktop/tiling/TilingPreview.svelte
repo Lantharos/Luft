@@ -91,8 +91,6 @@
 		display: grid;
 		place-items: center;
 		height: 260px;
-		border-radius: 16px;
-		background: var(--group);
 	}
 
 	.screen {

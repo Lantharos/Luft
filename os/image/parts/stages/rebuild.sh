@@ -10,7 +10,8 @@ spec="$top/SPECS/$package.spec"
 
 mkdir -p "$top"
 dnf install -y --setopt=keepcache=True rpm-build
-dnf download --source --enablerepo=updates-testing --destdir "$top" "$package-$version"
+curl -fsSL --retry 5 --output "$top/$package-$version.src.rpm" \
+  "https://kojipkgs.fedoraproject.org/packages/$package/${version%-*}/${version##*-}/src/$package-$version.src.rpm"
 rpm --define "_topdir $top" -i "$top/$package"-*.src.rpm
 cp "$patches"/*.patch "$top/SOURCES/"
 sed -i -e 's/^Release:\(\s*\)%{\?autorelease}\?$/Release:\1%{autorelease -e luft}/' "$spec"

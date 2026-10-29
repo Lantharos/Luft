@@ -9,7 +9,7 @@ registry="${LUFT_PARTS:-localhost/luft-parts}"
 image_name="${LUFT_IMAGE_NAME:-localhost/luft}"
 fedora=45
 signed_parts=(boot nvidia)
-bootc_minimum=1.17.1-1.fc45
+bootc_minimum=1.17.3-1.fc45
 chunkah=quay.io/coreos/chunkah:v0.7.1
 bun="docker.io/oven/bun:$(sed -n 's/^ARG BUN_VERSION=//p' "$image/parts/Containerfile")-distroless"
 retries=(--retry 6 --retry-delay 20s)

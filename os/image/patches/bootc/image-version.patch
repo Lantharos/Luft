@@ -14,15 +14,15 @@ Use the image's org.opencontainers.image.version annotation, the
 version bootc status shows, when the image has one, and the UKI's
 os-release otherwise.
 ---
- crates/lib/src/bootc_composefs/boot.rs   | 21 ++++++++++++++++++++-
- crates/lib/src/bootc_composefs/update.rs |  5 +++--
- 2 files changed, 23 insertions(+), 3 deletions(-)
+ crates/lib/src/bootc_composefs/boot.rs   | 20 ++++++++++++++++++++
+ crates/lib/src/bootc_composefs/update.rs |  3 ++-
+ 2 files changed, 22 insertions(+), 1 deletion(-)
 
 diff --git a/crates/lib/src/bootc_composefs/boot.rs b/crates/lib/src/bootc_composefs/boot.rs
-index decec798..ac3f13d6 100644
+index e8aa73f8..3bfda35d 100644
 --- a/crates/lib/src/bootc_composefs/boot.rs
 +++ b/crates/lib/src/bootc_composefs/boot.rs
-@@ -1775,6 +1775,22 @@ fn write_systemd_uki_config(
+@@ -1939,6 +1939,22 @@ fn write_systemd_uki_config(
      Ok(())
  }
  
@@ -45,26 +45,24 @@ index decec798..ac3f13d6 100644
  #[context("Setting up UKI boot")]
  pub(crate) fn setup_composefs_uki_boot(
      setup_type: BootSetupType,
-@@ -1782,6 +1798,7 @@ pub(crate) fn setup_composefs_uki_boot(
+@@ -1946,6 +1962,7 @@ pub(crate) fn setup_composefs_uki_boot(
      id: &Sha512HashValue,
      boot_ids: &ExpectedBootImageIds,
      entries: Vec<ComposefsBootEntry<Sha512HashValue>>,
 +    version: Option<String>,
  ) -> Result<(String, Sha512HashValue)> {
-     let (boot_partition, bootloader, missing_fsverity_allowed, uki_addons) = match setup_type {
-         BootSetupType::Setup((root_setup, state, postfetch, allow_missing_fsverity)) => {
-@@ -1873,8 +1890,9 @@ pub(crate) fn setup_composefs_uki_boot(
-         };
+     let (
+         boot_partition,
+@@ -2183,6 +2200,8 @@ pub(crate) fn setup_composefs_uki_boot(
+         anyhow::bail!("Failed to get boot label from UKI");
      }
  
--    let uki_info =
-+    let mut uki_info =
-         uki_info.ok_or_else(|| anyhow::anyhow!("Failed to get version and boot label from UKI"))?;
 +    uki_info.version = version.or(uki_info.version);
- 
++
      let UKIInfo {
          boot_label,
-@@ -2252,6 +2270,7 @@ pub(crate) async fn setup_composefs_boot(
+         version,
+@@ -2922,6 +2941,7 @@ pub(crate) async fn setup_composefs_boot(
                  &provisional_deploy_id,
                  &boot_ids,
                  entries,
@@ -73,21 +71,19 @@ index decec798..ac3f13d6 100644
              &repo,
              &fs,
 diff --git a/crates/lib/src/bootc_composefs/update.rs b/crates/lib/src/bootc_composefs/update.rs
-index c0dcafe3..a08a120b 100644
+index 7fc373d9..be525a19 100644
 --- a/crates/lib/src/bootc_composefs/update.rs
 +++ b/crates/lib/src/bootc_composefs/update.rs
-@@ -19,8 +19,8 @@ use crate::spec::BootloaderKind;
- use crate::{
+@@ -22,7 +22,7 @@ use crate::{
      bootc_composefs::{
+         aboot,
          boot::{
--            BootSetupType, BootType, print_uki_dumpfile_diff_on_mismatch, setup_composefs_bls_boot,
--            setup_composefs_uki_boot,
-+            BootSetupType, BootType, image_version, print_uki_dumpfile_diff_on_mismatch,
-+            setup_composefs_bls_boot, setup_composefs_uki_boot,
+-            BootSetupType, BootType, prepare_composefs_aboot_artifacts,
++            BootSetupType, BootType, image_version, prepare_composefs_aboot_artifacts,
+             print_uki_dumpfile_diff_on_mismatch, setup_composefs_bls_boot,
+             setup_composefs_uki_boot,
          },
-         gc::composefs_gc,
-         repo::pull_composefs_repo,
-@@ -352,6 +352,7 @@ pub(crate) async fn do_upgrade(
+@@ -425,6 +425,7 @@ pub(crate) async fn do_upgrade(
                  &provisional_deploy_id,
                  &boot_ids,
                  entries,

@@ -22,7 +22,7 @@ The major version follows Fedora: Luft 1 is Fedora 45, and Luft 2 moves to Fedor
 
 The release count comes from the `v1.N` tags, and the nightly count from the version of the newest nightly. Nothing else keeps them.
 
-The version is only in the image's labels, the `org.opencontainers.image.version` label of its configuration and annotation of its manifest, which is what `bootc status` shows; the system inside has none, and `/etc/os-release` says `VERSION="1"` and Fedora's `VERSION_ID`. That's what lets a promotion rename a nightly without touching its layers. Settings › About and Updates, and the restart dialog, read the version from `bootc status` through the updater, and About shows the day the image was built next to it. bootc writes it into each version's boot entry too, which is where SushiBoot's menu gets it from.
+The version is only in the image's labels, the `org.opencontainers.image.version` label of its configuration and annotation of its manifest, which is what `bootc status` shows; the system inside has none, and `/etc/os-release` says `VERSION="1"` and Fedora's `VERSION_ID`. That's what lets a promotion rename a nightly without touching its layers. Settings › About and Updates, and the restart dialog, read the version from `bootc status` through the updater, and About shows the day the image was built next to it. bootc writes it into each version's boot entry too, which is where SushiBoot's menu gets it from. Moving from a nightly to the release made from it keeps the running version and renames its boot entry, so the menu shows the release's version straight away.
 
 ## Schedule
 

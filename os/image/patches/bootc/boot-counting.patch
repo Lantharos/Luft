@@ -21,10 +21,10 @@ counters as before.
  1 file changed, 34 insertions(+), 2 deletions(-)
 
 diff --git a/crates/lib/src/bootc_composefs/boot.rs b/crates/lib/src/bootc_composefs/boot.rs
-index ac3f13d6..0d838502 100644
+index 12d6d18b..68738651 100644
 --- a/crates/lib/src/bootc_composefs/boot.rs
 +++ b/crates/lib/src/bootc_composefs/boot.rs
-@@ -524,6 +524,38 @@ pub fn type1_entry_conf_file_name(
+@@ -546,6 +546,38 @@ pub fn type1_entry_conf_file_name(
      format!("{BLS_ENTRY_FILE_PREFIX}{os_id_safe}-{version}-{priority}.conf")
  }
  
@@ -63,7 +63,7 @@ index ac3f13d6..0d838502 100644
  /// Generate sort key for the primary (new/upgraded) boot entry.
  /// Format: bootc-{id}-0
  /// Systemd-boot sorts ascending by sort-key, so "0" comes first.
-@@ -1036,7 +1068,7 @@ pub(crate) fn setup_composefs_bls_boot(
+@@ -1101,7 +1133,7 @@ pub(crate) fn setup_composefs_bls_boot(
          .with_context(|| format!("Opening {config_path:?}"))?;
  
      loader_entries_dir.atomic_write(
@@ -72,7 +72,7 @@ index ac3f13d6..0d838502 100644
          bls_config.to_string().as_bytes(),
      )?;
  
-@@ -1746,7 +1778,7 @@ fn write_systemd_uki_config(
+@@ -1923,7 +1955,7 @@ fn write_systemd_uki_config(
  
      entries_dir
          .atomic_write(
@@ -81,3 +81,6 @@ index ac3f13d6..0d838502 100644
              bls_conf.to_string().as_bytes(),
          )
          .context("Writing conf file")?;
+-- 
+2.56.0
+

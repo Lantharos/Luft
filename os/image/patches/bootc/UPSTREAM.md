@@ -1,6 +1,6 @@
 # Upstream pull requests
 
-Drafts for [bootc-dev/bootc](https://github.com/bootc-dev/bootc), not submitted yet. Both are against main at e1860b4 (1.17.2), so they differ slightly from `image-version.patch` and `follow-same-root.patch`, which are against 1.17.1. The second builds on the first.
+Drafts for [bootc-dev/bootc](https://github.com/bootc-dev/bootc), not submitted yet. Both are against main at e1860b4 (1.17.2), so they differ slightly from `image-version.patch` and `follow-same-root.patch`, which are against 1.17.3. The second builds on the first.
 
 ## Boot entry version
 
@@ -127,7 +127,7 @@ composefs: Let the booted deployment follow an image with its root
 
 `bootc switch` to an image whose root filesystem is the booted one fails with "Target image has the same fs-verity digest as the existing Some(Booted) deployment", and so does `bootc upgrade` when the followed reference starts pointing at such an image. That happens whenever a build is published under a second reference, as when a tested nightly is promoted to the release tag: a machine on that nightly can't move to the release channel until the next release, and keeps following the nightly tag.
 
-When the target's root is the booted deployment's, this pulls the target, which only adds its manifest and config to the repository, and points the booted deployment's origin at the new reference and manifest instead of deploying the same root again. `bootc status` then shows the new image and its version. A collision with the staged or rollback deployment is still an error, as before, since their `/etc` came from another image.
+When the target's root is the booted deployment's, this pulls the target, which only adds its manifest and config to the repository, and points the booted deployment's origin at the new reference and manifest instead of deploying the same root again. `bootc status` then shows the new image and its version. With the first patch, a UKI's boot entry carries the image's version, so the booted deployment's entry gets the new image's version too, in `loader/entries` and in `loader/entries.staged` when an update is staged; the entry keeps its sort key, and only the version in its file name changes. Without this the boot menu would keep showing the old version until the next update. A collision with the staged or rollback deployment is still an error, as before, since their `/etc` came from another image.
 
 I left out the rollback case on purpose: switching to the rollback deployment's root could reasonably mean `bootc rollback`, but that changes which deployment boots, which seems like a decision for the caller.
 
@@ -149,17 +149,101 @@ to such an image failed the same way.
 Pull the target, which only adds its manifest and config, and point the
 booted deployment's origin at it instead of deploying the same root again.
 A collision with the staged or rollback deployment is still an error.
----
- crates/lib/src/bootc_composefs/state.rs  | 22 ++++++++++++++++++++++
- crates/lib/src/bootc_composefs/switch.rs |  2 +-
- crates/lib/src/bootc_composefs/update.rs | 24 ++++++++++++++++++++----
- 3 files changed, 43 insertions(+), 5 deletions(-)
 
+A UKI's boot entry carries the image's version, so give the booted
+deployment's entry the new image's version too, in the entries in use and
+in any staged for the next boot, keeping its sort key and the rest of its
+file name.
+---
+ crates/lib/src/bootc_composefs/boot.rs   | 33 +++++++++
+ crates/lib/src/bootc_composefs/state.rs  | 88 ++++++++++++++++++++++--
+ crates/lib/src/bootc_composefs/switch.rs |  2 +-
+ crates/lib/src/bootc_composefs/update.rs | 35 ++++++++--
+ 4 files changed, 149 insertions(+), 9 deletions(-)
+
+diff --git a/crates/lib/src/bootc_composefs/boot.rs b/crates/lib/src/bootc_composefs/boot.rs
+index 9b5dc308..0007024a 100644
+--- a/crates/lib/src/bootc_composefs/boot.rs
++++ b/crates/lib/src/bootc_composefs/boot.rs
+@@ -548,6 +548,19 @@ pub(crate) fn secondary_sort_key(os_id: &str) -> String {
+     format!("bootc-{os_id}-{SORTKEY_PRIORITY_SECONDARY}")
+ }
+ 
++/// The Type 1 entry filename `file_name`, written for `old_version`, with
++/// `new_version` in its place and the rest of the name, such as the priority,
++/// kept.
++pub(crate) fn type1_entry_conf_file_name_with_version(
++    file_name: &str,
++    old_version: &str,
++    new_version: &str,
++) -> Option<String> {
++    let (name, rest) = file_name.split_once('-')?;
++    let rest = rest.strip_prefix(old_version)?;
++    Some(format!("{name}-{new_version}{rest}"))
++}
++
+ /// Returns the name of the directory where we store Type1 boot entries
+ pub(crate) fn get_type1_dir_name(depl_verity: &str) -> String {
+     format!("{TYPE1_BOOT_DIR_PREFIX}{depl_verity}")
+@@ -3041,6 +3054,26 @@ mod tests {
+         assert_eq!(filename, "bootc_rhel-9.3.0-0.conf");
+     }
+ 
++    #[test]
++    fn test_type1_filename_with_new_version() {
++        assert_eq!(
++            type1_entry_conf_file_name_with_version(
++                "bootc_fedora_coreos-41.20251125.0-0.conf",
++                "41.20251125.0",
++                "41.20251125.1"
++            ),
++            Some("bootc_fedora_coreos-41.20251125.1-0.conf".to_owned())
++        );
++        assert_eq!(
++            type1_entry_conf_file_name_with_version("bootc_rhel-9.3.0-1+2-1.conf", "9.3.0", "9.3"),
++            Some("bootc_rhel-9.3-1+2-1.conf".to_owned())
++        );
++        assert_eq!(
++            type1_entry_conf_file_name_with_version("bootc_rhel-9.3.0-1.conf", "9.4.0", "9.5.0"),
++            None
++        );
++    }
++
+     #[test]
+     fn test_grub_filename_parsing() {
+         // Verify our filename format works correctly with Grub's parsing logic
 diff --git a/crates/lib/src/bootc_composefs/state.rs b/crates/lib/src/bootc_composefs/state.rs
-index 57055a3d..cd44f1fc 100644
+index 57055a3d..8bc3de37 100644
 --- a/crates/lib/src/bootc_composefs/state.rs
 +++ b/crates/lib/src/bootc_composefs/state.rs
-@@ -212,6 +212,28 @@ fn add_update_in_origin(
+@@ -20,12 +20,12 @@ use linux_kernel_cmdline::utf8::Cmdline;
+ use ostree_ext::container::deploy::ORIGIN_CONTAINER;
+ use rustix::{
+     fd::AsFd,
+-    fs::{Mode, OFlags, StatVfsMountFlags, open},
++    fs::{Mode, OFlags, StatVfsMountFlags, fsync, open, renameat},
+     mount::MountAttrFlags,
+     path::Arg,
+ };
+ 
+-use crate::bootc_composefs::boot::BootType;
++use crate::bootc_composefs::boot::{BootType, type1_entry_conf_file_name_with_version};
+ use crate::bootc_composefs::status::{
+     ComposefsCmdline, StagedDeployment, get_sorted_type1_boot_entries,
+ };
+@@ -35,9 +35,9 @@ use crate::{
+     composefs_consts::{
+         COMPOSEFS_STAGED_DEPLOYMENT_FNAME, COMPOSEFS_TRANSIENT_STATE_DIR, ORIGIN_KEY_BOOT,
+         ORIGIN_KEY_BOOT_DIGEST, ORIGIN_KEY_BOOT_TYPE, ORIGIN_KEY_IMAGE, ORIGIN_KEY_MANIFEST_DIGEST,
+-        SHARED_VAR_PATH, STATE_DIR_RELATIVE,
++        SHARED_VAR_PATH, STATE_DIR_RELATIVE, TYPE1_ENT_PATH, TYPE1_ENT_PATH_STAGED,
+     },
+-    parsers::bls_config::BLSConfig,
++    parsers::bls_config::{BLSConfig, parse_bls_config},
+     spec::ImageReference,
+     spec::{FilesystemOverlay, FilesystemOverlayAccessMode, FilesystemOverlayPersistence},
+     utils::path_relative_to,
+@@ -212,6 +212,86 @@ fn add_update_in_origin(
      Ok(())
  }
  
@@ -185,6 +269,64 @@ index 57055a3d..cd44f1fc 100644
 +    )
 +}
 +
++/// Gives the booted deployment's Type 1 entry `version`, in the entries the
++/// boot loader reads now and in those staged for the next boot. The entry
++/// keeps its sort key, and its file name keeps everything but the version.
++#[context("Updating the booted deployment's boot entry version")]
++pub(crate) fn update_booted_entry_version(
++    boot_dir: &Dir,
++    booted_cfs: &BootedComposefs,
++    version: &str,
++) -> Result<()> {
++    for path in [TYPE1_ENT_PATH, TYPE1_ENT_PATH_STAGED] {
++        let Some(entries_dir) = boot_dir.open_dir_optional(path)? else {
++            continue;
++        };
++
++        let Some((file_name, mut config)) = booted_entry(&entries_dir, booted_cfs)? else {
++            continue;
++        };
++
++        let new_file_name = type1_entry_conf_file_name_with_version(
++            &file_name,
++            &config.version().to_string(),
++            version,
++        )
++        .ok_or_else(|| anyhow::anyhow!("{file_name} doesn't carry its entry's version"))?;
++
++        config.with_version(version.to_owned());
++        entries_dir
++            .atomic_write(&file_name, config.to_string())
++            .with_context(|| format!("Writing to {file_name}"))?;
++        renameat(&entries_dir, &file_name, &entries_dir, &new_file_name)
++            .with_context(|| format!("Renaming {file_name} to {new_file_name}"))?;
++        fsync(entries_dir.reopen_as_ownedfd()?).context("fsync")?;
++    }
++
++    Ok(())
++}
++
++fn booted_entry(
++    entries_dir: &Dir,
++    booted_cfs: &BootedComposefs,
++) -> Result<Option<(String, BLSConfig)>> {
++    for entry in entries_dir.entries()? {
++        let file_name = entry?.file_name();
++        let Some(file_name) = file_name.to_str().filter(|name| name.ends_with(".conf")) else {
++            continue;
++        };
++
++        let config = parse_bls_config(&entries_dir.read_to_string(file_name)?)
++            .with_context(|| format!("Parsing {file_name}"))?;
++
++        if config.get_verity()? == *booted_cfs.cmdline.digest {
++            return Ok(Some((file_name.to_owned(), config)));
++        }
++    }
++
++    Ok(None)
++}
++
  pub(crate) fn update_boot_digest_in_origin(
      storage: &Storage,
      digest: &str,
@@ -202,19 +344,22 @@ index 3a580a62..3e2656ef 100644
                      storage,
                      booted_cfs,
 diff --git a/crates/lib/src/bootc_composefs/update.rs b/crates/lib/src/bootc_composefs/update.rs
-index 038b744a..471b4170 100644
+index 038b744a..eaa259e4 100644
 --- a/crates/lib/src/bootc_composefs/update.rs
 +++ b/crates/lib/src/bootc_composefs/update.rs
-@@ -29,7 +29,7 @@ use crate::{
+@@ -29,7 +29,10 @@ use crate::{
          repo::pull_composefs_repo,
          service::start_finalize_stated_svc,
          soft_reboot::prepare_soft_reboot_composefs,
 -        state::{write_composefs_state, write_staged_deployment},
-+        state::{update_image_in_origin, write_composefs_state, write_staged_deployment},
++        state::{
++            update_booted_entry_version, update_image_in_origin, write_composefs_state,
++            write_staged_deployment,
++        },
          status::{
              ImgConfigManifest, StagedDeployment, get_bootloader, get_composefs_status,
              get_container_manifest_and_config, get_imginfo,
-@@ -126,6 +126,9 @@ pub(crate) enum UpdateAction {
+@@ -126,6 +129,9 @@ pub(crate) enum UpdateAction {
      Skip,
      /// Proceed with the update
      Proceed,
@@ -224,7 +369,7 @@ index 038b744a..471b4170 100644
  }
  
  /// Determines what action should be taken for the update
-@@ -164,6 +167,7 @@ pub(crate) enum UpdateAction {
+@@ -164,6 +170,7 @@ pub(crate) enum UpdateAction {
  /// # Returns
  /// * UpdateAction::Skip    - Skip the update/switch as we have it as a deployment
  /// * UpdateAction::Proceed - Proceed with the update
@@ -232,7 +377,7 @@ index 038b744a..471b4170 100644
  pub(crate) fn validate_update(
      storage: &Storage,
      booted_cfs: &BootedComposefs,
-@@ -199,6 +203,11 @@ pub(crate) fn validate_update(
+@@ -199,6 +206,11 @@ pub(crate) fn validate_update(
      });
  
      if let Some(collision) = found_depl {
@@ -244,7 +389,7 @@ index 038b744a..471b4170 100644
          if is_switch {
              // For `bootc switch`, any digest collision is an error: two images
              // from different sources can produce identical composefs roots and we
-@@ -356,14 +365,21 @@ pub(crate) async fn do_upgrade(
+@@ -356,14 +368,29 @@ pub(crate) async fn do_upgrade(
      }
  
      // If the target image produces the same fs-verity digest as any existing
@@ -261,13 +406,21 @@ index 038b744a..471b4170 100644
      {
 +        if matches!(collision.ty, Some(crate::status::Slot::Booted)) {
 +            update_image_in_origin(storage, &id.to_hex(), imgref, &manifest_digest)?;
++            let booted = host.require_composefs_booted()?;
++            if let (BootType::Uki, BootloaderKind::BLSCompatible, Some(version)) = (
++                booted.boot_type,
++                booted.bootloader.kind()?,
++                image_version(&repo, &manifest_digest),
++            ) {
++                update_booted_entry_version(storage.require_boot_dir()?, booted_cfs, &version)?;
++            }
 +            println!("The booted deployment now follows {imgref:#}");
 +            return Ok(());
 +        }
          anyhow::bail!(
              "Target image has the same fs-verity digest as the existing {:?} deployment.",
              collision.ty,
-@@ -675,7 +691,7 @@ pub(crate) async fn upgrade_composefs(
+@@ -675,7 +702,7 @@ pub(crate) async fn upgrade_composefs(
              )?;
  
              match action {
@@ -276,7 +429,7 @@ index 038b744a..471b4170 100644
                      println!("No changes in staged image: {booted_imgref:#}");
                      return Ok(());
                  }
-@@ -707,7 +723,7 @@ pub(crate) async fn upgrade_composefs(
+@@ -707,7 +734,7 @@ pub(crate) async fn upgrade_composefs(
          )?;
  
          match action {

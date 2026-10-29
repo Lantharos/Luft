@@ -1,3 +1,4 @@
+use luft_dbus_macros::introspect;
 use zbus::proxy;
 
 use crate::context::Context;
@@ -5,6 +6,7 @@ use crate::context::Context;
 const INPUT_SOURCES: &str = "org.gnome.desktop.input-sources";
 const DEFAULT_LAYOUT: &str = "us";
 
+#[introspect]
 #[proxy(
     interface = "org.freedesktop.locale1",
     default_service = "org.freedesktop.locale1",

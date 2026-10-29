@@ -1,3 +1,4 @@
+use luft_dbus_macros::introspect;
 use zbus::ObjectPath;
 use zbus::message::Header;
 use zbus::{fdo, interface};
@@ -9,6 +10,7 @@ struct Request {
     context: Context,
 }
 
+#[introspect]
 #[interface(name = "org.freedesktop.impl.portal.Request")]
 impl Request {
     async fn close(&self, #[zbus(header)] header: Header<'_>) -> fdo::Result<()> {

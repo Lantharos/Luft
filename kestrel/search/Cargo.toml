@@ -9,6 +9,7 @@ license.workspace = true
 [dependencies]
 futures-util = { workspace = true, features = ["std"] }
 ignore.workspace = true
+luft-dbus-macros.workspace = true
 memchr.workspace = true
 rusqlite.workspace = true
 rustix = { workspace = true, features = ["fs"] }

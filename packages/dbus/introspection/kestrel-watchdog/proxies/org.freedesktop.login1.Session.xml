@@ -1,0 +1,6 @@
+<node>
+  <interface name="org.freedesktop.login1.Session">
+    <property name="Active" type="b" access="read"/>
+    <property name="Seat" type="(so)" access="read"/>
+  </interface>
+</node>

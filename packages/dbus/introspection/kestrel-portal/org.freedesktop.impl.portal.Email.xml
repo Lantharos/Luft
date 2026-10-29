@@ -1,0 +1,11 @@
+<node>
+  <interface name="org.freedesktop.impl.portal.Email">
+    <method name="ComposeEmail">
+      <arg name="_handle" type="o" direction="in"/>
+      <arg name="_app_id" type="s" direction="in"/>
+      <arg name="_parent_window" type="s" direction="in"/>
+      <arg name="options" type="a{sv}" direction="in"/>
+      <arg type="(ua{sv})" direction="out"/>
+    </method>
+  </interface>
+</node>

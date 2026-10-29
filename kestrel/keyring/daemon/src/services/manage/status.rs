@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use luft_dbus_macros::introspect;
 use luft_keyring_wire::{Chip, Problem};
 use zbus::message::Header;
 use zbus::{fdo, interface};
@@ -71,6 +72,7 @@ impl Status {
     }
 }
 
+#[introspect]
 #[interface(name = "com.lantharos.Keyring1")]
 impl Status {
     async fn lock(&self) {

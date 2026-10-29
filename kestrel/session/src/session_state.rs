@@ -1,10 +1,12 @@
 use std::sync::Arc;
 
 use futures_util::StreamExt;
+use luft_dbus_macros::introspect;
 use zbus::{Connection, proxy};
 
 use crate::manager::{Session, SessionState};
 
+#[introspect]
 #[proxy(
     interface = "org.freedesktop.login1.Session",
     default_service = "org.freedesktop.login1",

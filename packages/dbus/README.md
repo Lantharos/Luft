@@ -17,3 +17,5 @@ luft-dbus.workspace = true
 | `error_name`, `error_message`, `explain` | Read a D-Bus error reply, standard or not |
 
 Every call is async. Apps run them on Sabine's runtime, through async bridge commands or `luft_app::spawn`.
+
+`macros` holds `luft-dbus-macros`, whose `#[introspect]` goes above every zbus `#[interface]` and `#[proxy]` and keeps what each one exports or calls in `introspection`. See [D-Bus interfaces](../../docs/testing.md#d-bus-interfaces).

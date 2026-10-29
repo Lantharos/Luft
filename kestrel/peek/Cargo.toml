@@ -8,6 +8,7 @@ license.workspace = true
 
 [dependencies]
 clap = { workspace = true, features = ["wrap_help"] }
+luft-dbus-macros.workspace = true
 rustix = { workspace = true, features = ["event", "fs", "pipe", "process", "stdio"] }
 serde_json.workspace = true
 signal-hook.workspace = true

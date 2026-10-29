@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use luft_accounts::types::{Account, Answer, Credentials, Provider};
+use luft_dbus_macros::introspect;
 use zbus::interface;
 use zbus::object_server::SignalEmitter;
 
@@ -19,6 +20,7 @@ impl Accounts {
     }
 }
 
+#[introspect]
 #[interface(name = "com.lantharos.Accounts1")]
 impl Accounts {
     fn accounts(&self) -> String {

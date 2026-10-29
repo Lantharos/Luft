@@ -2,6 +2,7 @@ use std::sync::{Arc, Mutex as SyncMutex};
 use std::time::{Duration, Instant};
 
 use luft_dbus::idle::Idle;
+use luft_dbus_macros::introspect;
 use tokio::sync::Mutex;
 use zbus::message::Header;
 use zbus::object_server::SignalEmitter;
@@ -105,6 +106,7 @@ impl Trust {
 
 type OtherStartup = (String, String, String, Vec<(u16, String)>, Vec<String>);
 
+#[introspect]
 #[interface(name = "com.lantharos.Trust1")]
 impl Trust {
     #[zbus(property)]

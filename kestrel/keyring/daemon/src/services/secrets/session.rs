@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Arc, Mutex, PoisonError};
 
+use luft_dbus_macros::introspect;
 use zbus::interface;
 use zbus::object_server::ObjectServer;
 use zbus::{ObjectPath, OwnedObjectPath};
@@ -71,6 +72,7 @@ pub struct Session {
     pub daemon: Arc<crate::daemon::Daemon>,
 }
 
+#[introspect]
 #[interface(name = "org.freedesktop.Secret.Session")]
 impl Session {
     async fn close(&self, #[zbus(object_server)] server: &ObjectServer) {

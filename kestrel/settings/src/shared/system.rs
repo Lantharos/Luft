@@ -1,6 +1,8 @@
+use luft_dbus_macros::introspect;
 use zbus::proxy;
 use zbus::{OwnedFd, OwnedObjectPath};
 
+#[introspect]
 #[proxy(
     interface = "org.freedesktop.login1.Manager",
     default_service = "org.freedesktop.login1",
@@ -20,6 +22,7 @@ pub trait Login {
     fn prepare_for_sleep(&self, start: bool) -> zbus::Result<()>;
 }
 
+#[introspect]
 #[proxy(
     interface = "org.freedesktop.hostname1",
     default_service = "org.freedesktop.hostname1",
@@ -30,6 +33,7 @@ pub trait Hostname {
     fn chassis(&self) -> zbus::Result<String>;
 }
 
+#[introspect]
 #[proxy(
     interface = "org.freedesktop.systemd1.Manager",
     default_service = "org.freedesktop.systemd1",

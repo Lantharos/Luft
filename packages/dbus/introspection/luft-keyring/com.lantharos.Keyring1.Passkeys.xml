@@ -1,0 +1,34 @@
+<node>
+  <interface name="com.lantharos.Keyring1.Passkeys">
+    <method name="List">
+      <arg type="aa{sv}" direction="out"/>
+    </method>
+    <method name="Create">
+      <arg name="fields" type="a{sv}" direction="in"/>
+      <arg type="a{sv}" direction="out"/>
+    </method>
+    <method name="Count">
+      <arg name="id" type="ay" direction="in"/>
+      <arg type="u" direction="out"/>
+    </method>
+    <method name="Sign">
+      <arg name="id" type="ay" direction="in"/>
+      <arg name="message" type="ay" direction="in"/>
+      <arg type="ay" direction="out"/>
+    </method>
+    <method name="HmacSecret">
+      <arg name="id" type="ay" direction="in"/>
+      <arg name="verified" type="b" direction="in"/>
+      <arg name="salts" type="ay" direction="in"/>
+      <arg type="ay" direction="out"/>
+    </method>
+    <method name="Update">
+      <arg name="id" type="ay" direction="in"/>
+      <arg name="changes" type="a{sv}" direction="in"/>
+    </method>
+    <method name="Delete">
+      <arg name="id" type="ay" direction="in"/>
+    </method>
+    <property name="Chip" type="b" access="read"/>
+  </interface>
+</node>

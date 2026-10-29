@@ -1,0 +1,14 @@
+<node>
+  <interface name="org.gnome.ScreenSaver">
+    <method name="Lock">
+    </method>
+    <method name="SetActive">
+      <arg type="b" direction="in"/>
+    </method>
+    <signal name="ActiveChanged">
+      <arg type="b"/>
+    </signal>
+    <signal name="WakeUpScreen">
+    </signal>
+  </interface>
+</node>

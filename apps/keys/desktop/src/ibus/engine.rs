@@ -1,6 +1,7 @@
 use std::fs;
 use std::time::SystemTime;
 
+use luft_dbus_macros::introspect;
 use xkbcommon::xkb::Keysym;
 use zbus::object_server::SignalEmitter;
 use zbus::{Variant, fdo, interface};
@@ -126,6 +127,7 @@ impl InputMethod {
     }
 }
 
+#[introspect]
 #[interface(name = "org.freedesktop.IBus.Engine", spawn = false)]
 impl InputMethod {
     async fn process_key_event(

@@ -1,0 +1,5 @@
+<node>
+  <interface name="org.freedesktop.hostname1">
+    <property name="Chassis" type="s" access="read"/>
+  </interface>
+</node>

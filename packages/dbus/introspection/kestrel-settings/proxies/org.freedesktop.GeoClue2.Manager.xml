@@ -1,0 +1,10 @@
+<node>
+  <interface name="org.freedesktop.GeoClue2.Manager">
+    <method name="CreateClient">
+      <arg type="o" direction="out"/>
+    </method>
+    <method name="DeleteClient">
+      <arg type="o" direction="in"/>
+    </method>
+  </interface>
+</node>

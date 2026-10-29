@@ -1,0 +1,43 @@
+<node>
+  <interface name="org.mpris.MediaPlayer2.Player">
+    <method name="Next">
+    </method>
+    <method name="Previous">
+    </method>
+    <method name="Pause">
+    </method>
+    <method name="PlayPause">
+    </method>
+    <method name="Stop">
+    </method>
+    <method name="Play">
+    </method>
+    <method name="Seek">
+      <arg name="offset" type="x" direction="in"/>
+    </method>
+    <method name="SetPosition">
+      <arg name="track" type="o" direction="in"/>
+      <arg name="position" type="x" direction="in"/>
+    </method>
+    <method name="OpenUri">
+      <arg name="_uri" type="s" direction="in"/>
+    </method>
+    <property name="CanControl" type="b" access="read"/>
+    <property name="CanGoNext" type="b" access="read"/>
+    <property name="CanGoPrevious" type="b" access="read"/>
+    <property name="CanPause" type="b" access="read"/>
+    <property name="CanPlay" type="b" access="read"/>
+    <property name="CanSeek" type="b" access="read"/>
+    <property name="LoopStatus" type="s" access="readwrite"/>
+    <property name="MaximumRate" type="d" access="read"/>
+    <property name="Metadata" type="a{sv}" access="read"/>
+    <property name="MinimumRate" type="d" access="read"/>
+    <property name="PlaybackStatus" type="s" access="read"/>
+    <property name="Position" type="x" access="read">
+      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/>
+    </property>
+    <property name="Rate" type="d" access="readwrite"/>
+    <property name="Shuffle" type="b" access="readwrite"/>
+    <property name="Volume" type="d" access="readwrite"/>
+  </interface>
+</node>

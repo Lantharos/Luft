@@ -2,6 +2,7 @@ use std::io::{Read, Write};
 use std::os::fd::AsFd;
 use std::sync::Arc;
 
+use luft_dbus_macros::introspect;
 use luft_keyring_vault::{Action, Secret};
 use zbus::Fd;
 use zbus::message::Header;
@@ -50,6 +51,7 @@ fn valid(name: &str, what: &str) -> fdo::Result<()> {
     Ok(())
 }
 
+#[introspect]
 #[interface(name = "com.lantharos.Keyring1.AppSecrets")]
 impl AppSecrets {
     async fn store(

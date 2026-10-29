@@ -1,0 +1,44 @@
+<node>
+  <interface name="com.lantharos.Trust1.Drives">
+    <method name="Check">
+      <arg name="device" type="s" direction="in"/>
+      <arg type="s" direction="out"/>
+      <arg type="a(sbs)" direction="out"/>
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="Encrypt">
+      <arg name="device" type="s" direction="in"/>
+      <arg name="recovery_key" type="s" direction="in"/>
+      <arg name="passphrase" type="s" direction="in"/>
+      <arg name="auto_unlock" type="b" direction="in"/>
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="Decrypt">
+      <arg name="device" type="s" direction="in"/>
+      <arg name="unlock" type="s" direction="in"/>
+    </method>
+    <method name="SetUpUnlocking">
+      <arg name="device" type="s" direction="in"/>
+      <arg name="unlock" type="s" direction="in"/>
+      <arg name="recovery_key" type="s" direction="in"/>
+      <arg name="auto_unlock" type="b" direction="in"/>
+    </method>
+    <method name="Pause">
+      <arg name="uuid" type="s" direction="in"/>
+    </method>
+    <method name="Resume">
+      <arg name="uuid" type="s" direction="in"/>
+      <arg name="unlock" type="s" direction="in"/>
+    </method>
+    <method name="Unlock">
+      <arg name="uuid" type="s" direction="in"/>
+    </method>
+    <method name="ShowRecoveryKey">
+      <arg name="uuid" type="s" direction="in"/>
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="Continue">
+    </method>
+    <property name="Drives" type="a{sa{sv}}" access="read"/>
+  </interface>
+</node>

@@ -1,0 +1,27 @@
+<node>
+  <interface name="com.lantharos.Keyring1.Ssh">
+    <method name="Keys">
+      <arg type="a(sssbbt)" direction="out"/>
+    </method>
+    <method name="Generate">
+      <arg name="name" type="s" direction="in"/>
+      <arg name="chip" type="b" direction="in"/>
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="PublicKey">
+      <arg name="fingerprint_wanted" type="s" direction="in"/>
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="SetConfirm">
+      <arg name="fingerprint_wanted" type="s" direction="in"/>
+      <arg name="confirm" type="b" direction="in"/>
+    </method>
+    <method name="Remove">
+      <arg name="fingerprint_wanted" type="s" direction="in"/>
+    </method>
+    <signal name="Changed">
+    </signal>
+    <property name="ChipKeys" type="b" access="read"/>
+    <property name="Socket" type="s" access="read"/>
+  </interface>
+</node>

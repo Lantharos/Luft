@@ -1,4 +1,5 @@
 use futures_util::StreamExt;
+use luft_dbus_macros::introspect;
 use tokio::sync::watch;
 use zbus::Variant;
 use zbus::object_server::{InterfaceRef, SignalEmitter};
@@ -18,6 +19,7 @@ pub struct Presence {
     status_text: String,
 }
 
+#[introspect]
 #[interface(name = "org.gnome.SessionManager.Presence")]
 impl Presence {
     #[zbus(name = "SetStatus")]
@@ -107,6 +109,7 @@ impl Presence {
     }
 }
 
+#[introspect]
 #[proxy(
     interface = "org.gnome.Mutter.IdleMonitor",
     default_service = "org.gnome.Mutter.IdleMonitor",

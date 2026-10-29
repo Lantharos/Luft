@@ -18,6 +18,7 @@ futures-util.workspace = true
 inotify = { workspace = true, features = ["default"] }
 libc.workspace = true
 luft-accounts.workspace = true
+luft-dbus-macros.workspace = true
 rand.workspace = true
 serde.workspace = true
 serde_json.workspace = true

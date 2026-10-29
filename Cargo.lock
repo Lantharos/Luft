@@ -415,6 +415,7 @@ dependencies = [
  "gio-unix",
  "libc",
  "luft-app",
+ "luft-dbus-macros",
  "nvml-wrapper",
  "parking_lot 0.13.0",
  "sabine",
@@ -3770,6 +3771,7 @@ dependencies = [
  "jpeg-encoder",
  "jxl-oxide",
  "luft-dbus",
+ "luft-dbus-macros",
  "nix",
  "serde",
  "serde_json",
@@ -3796,6 +3798,7 @@ dependencies = [
  "gio",
  "gio-unix",
  "glib",
+ "luft-dbus-macros",
  "luft-i18n",
  "rustix",
  "sha2",
@@ -3809,6 +3812,7 @@ version = "0.1.0"
 dependencies = [
  "futures-util",
  "ignore",
+ "luft-dbus-macros",
  "memchr",
  "rusqlite",
  "rustix",
@@ -3824,6 +3828,7 @@ dependencies = [
  "gio",
  "glib",
  "luft-dbus",
+ "luft-dbus-macros",
  "luft-identity",
  "tokio",
  "zbus 6.0.0",
@@ -3837,6 +3842,7 @@ dependencies = [
  "gio",
  "glib",
  "luft-dbus",
+ "luft-dbus-macros",
  "luft-i18n",
  "pulseaudio",
  "rustix",
@@ -3854,6 +3860,7 @@ version = "0.1.0"
 dependencies = [
  "futures-util",
  "jiff",
+ "luft-dbus-macros",
  "luft-identity",
  "rustix",
  "serde",
@@ -3889,6 +3896,7 @@ dependencies = [
  "gio",
  "libc",
  "luft-app",
+ "luft-dbus-macros",
  "roxmltree 0.21.1",
  "sabine",
  "serde",
@@ -4281,6 +4289,7 @@ dependencies = [
  "inotify",
  "libc",
  "luft-accounts",
+ "luft-dbus-macros",
  "rand",
  "serde",
  "serde_json",
@@ -4326,9 +4335,20 @@ name = "luft-dbus"
 version = "0.1.0"
 dependencies = [
  "futures-util",
+ "luft-dbus-macros",
  "serde",
  "tokio",
  "zbus 6.0.0",
+]
+
+[[package]]
+name = "luft-dbus-macros"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 3.0.9",
+ "zbus_utils",
 ]
 
 [[package]]
@@ -4375,6 +4395,7 @@ dependencies = [
  "glib",
  "libc",
  "luft-dbus",
+ "luft-dbus-macros",
  "tempfile",
  "zbus 6.0.0",
 ]
@@ -4389,6 +4410,7 @@ dependencies = [
  "getrandom 0.4.3",
  "libc",
  "luft-dbus",
+ "luft-dbus-macros",
  "luft-disks",
  "luft-i18n",
  "luft-identity",
@@ -4429,6 +4451,7 @@ dependencies = [
  "hkdf",
  "hmac",
  "libc",
+ "luft-dbus-macros",
  "luft-identity",
  "luft-keyring-vault",
  "luft-keyring-wire",
@@ -4523,6 +4546,7 @@ dependencies = [
  "anyhow",
  "libc",
  "luft-dbus",
+ "luft-dbus-macros",
  "serde",
  "serde_json",
  "tokio",
@@ -4536,6 +4560,7 @@ version = "0.1.0"
 dependencies = [
  "ctap",
  "libc",
+ "luft-dbus-macros",
  "serde",
  "serde_json",
  "tokio",
@@ -4570,6 +4595,7 @@ dependencies = [
  "futures-util",
  "landlock",
  "libc",
+ "luft-dbus-macros",
  "luft-i18n",
  "luft-identity",
  "luft-software",
@@ -4587,6 +4613,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "luft-dbus",
+ "luft-dbus-macros",
  "rustix",
  "tempfile",
  "tokio",
@@ -4640,6 +4667,7 @@ dependencies = [
  "anyhow",
  "gio",
  "libc",
+ "luft-dbus-macros",
  "luft-speech",
  "ort",
  "pipewire",
@@ -4684,6 +4712,7 @@ dependencies = [
  "anyhow",
  "libc",
  "luft-dbus",
+ "luft-dbus-macros",
  "luft-identity",
  "luft-variant",
  "serde",
@@ -4699,6 +4728,7 @@ dependencies = [
  "anyhow",
  "futures-util",
  "luft-dbus",
+ "luft-dbus-macros",
  "luft-identity",
  "rustix",
  "tokio",
@@ -4733,6 +4763,7 @@ dependencies = [
  "futures-util",
  "libc",
  "luft-dbus",
+ "luft-dbus-macros",
  "luft-windows",
  "serde",
  "serde_json",
@@ -4779,6 +4810,7 @@ dependencies = [
  "kamadak-exif",
  "lofty",
  "luft-app",
+ "luft-dbus-macros",
  "matroska-demuxer",
  "parking_lot 0.13.0",
  "sabine",
@@ -5759,6 +5791,7 @@ name = "peek"
 version = "0.1.0"
 dependencies = [
  "clap",
+ "luft-dbus-macros",
  "rustix",
  "serde_json",
  "signal-hook",
@@ -6660,6 +6693,7 @@ dependencies = [
  "liblzma",
  "luft-accounts",
  "luft-app",
+ "luft-dbus-macros",
  "memchr",
  "parking_lot 0.13.0",
  "percent-encoding",
@@ -7023,6 +7057,7 @@ dependencies = [
  "gio-unix",
  "libc",
  "luft-app",
+ "luft-dbus-macros",
  "luft-sandbox",
  "luft-software",
  "quick-xml 0.42.0",
@@ -7260,6 +7295,7 @@ dependencies = [
  "libpulse-binding",
  "luft-accounts",
  "luft-app",
+ "luft-dbus-macros",
  "luft-disks",
  "luft-fingerprint",
  "luft-i18n",
@@ -8273,6 +8309,7 @@ dependencies = [
  "getrandom 0.4.3",
  "libc",
  "luft-dbus",
+ "luft-dbus-macros",
  "luft-disks",
  "luft-identity",
  "luft-meet",

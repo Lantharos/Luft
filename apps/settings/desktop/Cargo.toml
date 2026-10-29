@@ -27,6 +27,7 @@ liblzma.workspace = true
 libpulse-binding.workspace = true
 luft-accounts = { workspace = true, features = ["default"] }
 luft-app = { workspace = true, features = ["apps", "fonts", "ibus", "launch", "recovery", "watch"] }
+luft-dbus-macros.workspace = true
 luft-disks.workspace = true
 luft-fingerprint.workspace = true
 luft-i18n.workspace = true

@@ -2,8 +2,10 @@ use std::collections::HashMap;
 use std::fmt;
 use std::path::Path;
 
+use luft_dbus_macros::introspect;
 use zbus::{Connection, Fd, OwnedVariant};
 
+#[introspect]
 #[zbus::proxy(
     interface = "com.lantharos.Kestrel.Peek",
     default_service = "com.lantharos.Kestrel.Peek",

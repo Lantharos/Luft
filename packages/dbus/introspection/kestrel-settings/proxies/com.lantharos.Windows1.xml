@@ -1,0 +1,7 @@
+<node>
+  <interface name="com.lantharos.Windows1">
+    <method name="Drives">
+      <arg type="s" direction="out"/>
+    </method>
+  </interface>
+</node>

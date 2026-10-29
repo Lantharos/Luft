@@ -1,0 +1,28 @@
+<node>
+  <interface name="org.freedesktop.login1.Manager">
+    <method name="Inhibit">
+      <arg type="s" direction="in"/>
+      <arg type="s" direction="in"/>
+      <arg type="s" direction="in"/>
+      <arg type="s" direction="in"/>
+      <arg type="h" direction="out"/>
+    </method>
+    <method name="Suspend">
+      <arg type="b" direction="in"/>
+    </method>
+    <method name="Hibernate">
+      <arg type="b" direction="in"/>
+    </method>
+    <method name="PowerOff">
+      <arg type="b" direction="in"/>
+    </method>
+    <method name="GetUser">
+      <arg type="u" direction="in"/>
+      <arg type="o" direction="out"/>
+    </method>
+    <signal name="PrepareForSleep">
+      <arg type="b"/>
+    </signal>
+    <property name="LidClosed" type="b" access="read"/>
+  </interface>
+</node>

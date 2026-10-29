@@ -1,0 +1,16 @@
+<node>
+  <interface name="com.lantharos.UsbProtection1">
+    <method name="SetEnabled">
+      <arg name="enabled" type="b" direction="in"/>
+    </method>
+    <method name="TakeReleased">
+      <arg type="a(ss)" direction="out"/>
+    </method>
+    <signal name="Released">
+      <arg name="devices" type="a(ss)"/>
+    </signal>
+    <property name="Enabled" type="b" access="read"/>
+    <property name="Guarding" type="b" access="read"/>
+    <property name="Held" type="a(ss)" access="read"/>
+  </interface>
+</node>

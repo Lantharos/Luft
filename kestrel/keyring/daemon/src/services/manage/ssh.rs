@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use luft_dbus_macros::introspect;
 use luft_keyring_vault::SshPrivate;
 use luft_keyring_wire::Chip;
 use zbus::message::Header;
@@ -50,6 +51,7 @@ impl Daemon {
     }
 }
 
+#[introspect]
 #[interface(name = "com.lantharos.Keyring1.Ssh")]
 impl Ssh {
     async fn keys(&self, #[zbus(header)] header: Header<'_>) -> fdo::Result<Vec<Key>> {

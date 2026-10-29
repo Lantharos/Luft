@@ -1,0 +1,16 @@
+<node>
+  <interface name="org.freedesktop.impl.portal.AppChooser">
+    <method name="ChooseApplication">
+      <arg name="handle" type="o" direction="in"/>
+      <arg name="_app_id" type="s" direction="in"/>
+      <arg name="_parent_window" type="s" direction="in"/>
+      <arg name="choices" type="as" direction="in"/>
+      <arg name="options" type="a{sv}" direction="in"/>
+      <arg type="(ua{sv})" direction="out"/>
+    </method>
+    <method name="UpdateChoices">
+      <arg name="handle" type="o" direction="in"/>
+      <arg name="choices" type="as" direction="in"/>
+    </method>
+  </interface>
+</node>

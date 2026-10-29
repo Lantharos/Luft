@@ -1,0 +1,5 @@
+<node>
+  <interface name="org.gnome.Mutter.DisplayConfig">
+    <property name="PowerSaveMode" type="i" access="write"/>
+  </interface>
+</node>

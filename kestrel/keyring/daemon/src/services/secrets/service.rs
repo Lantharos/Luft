@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
+use luft_dbus_macros::introspect;
 use luft_keyring_vault::{Action as Logged, DEFAULT_ALIAS, LOGIN};
 use zbus::message::Header;
 use zbus::object_server::{ObjectServer, SignalEmitter};
@@ -44,6 +45,7 @@ impl Daemon {
     }
 }
 
+#[introspect]
 #[interface(name = "org.freedesktop.Secret.Service")]
 impl Service {
     async fn open_session(

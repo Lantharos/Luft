@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { basename, dirname, join } from 'node:path';
 
 import { lockedPackages } from '../../../os/image/parts/stages/workspace';
+import { INTROSPECTION } from '../dbus/sources';
 import { Graph } from './graph';
 import { git } from './range';
 
@@ -39,12 +40,14 @@ export function buildRust(graph: Graph, files: string[]): Crate[] {
 	);
 
 	const lock = readFileSync('Cargo.lock', 'utf8');
+	graph.add(INTROSPECTION, []);
 	const crates = root.workspace!.members.map((dir) => {
 		const manifest = parse(readFileSync(join(dir, 'Cargo.toml'), 'utf8'));
 		const inherits = dependencyNames(manifest);
 		const node = graph.add(dir, inherits.flatMap((name) => paths.get(name) ?? []));
 		const bindings = manifest.package!.metadata?.bindings;
 		if (bindings) graph.link(node, join(dir, bindings.path), false);
+		graph.link(node, join(INTROSPECTION, manifest.package!.name), false);
 		return {
 			dir,
 			name: manifest.package!.name,

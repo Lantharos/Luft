@@ -1,0 +1,12 @@
+<node>
+  <interface name="com.lantharos.Kestrel.Brightness">
+    <method name="SetDimming">
+      <arg type="b" direction="in"/>
+    </method>
+    <method name="SetAutoBrightnessTarget">
+      <arg type="d" direction="in"/>
+    </method>
+    <signal name="BrightnessChanged">
+    </signal>
+  </interface>
+</node>

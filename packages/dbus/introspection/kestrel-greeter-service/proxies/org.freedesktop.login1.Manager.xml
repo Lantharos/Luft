@@ -1,0 +1,8 @@
+<node>
+  <interface name="org.freedesktop.login1.Manager">
+    <method name="GetSessionByPID">
+      <arg type="u" direction="in"/>
+      <arg type="o" direction="out"/>
+    </method>
+  </interface>
+</node>

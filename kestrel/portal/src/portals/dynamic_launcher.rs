@@ -1,3 +1,4 @@
+use luft_dbus_macros::introspect;
 use zbus::message::Header;
 use zbus::{ObjectPath, OwnedVariant as OwnedValue, Variant as Value};
 use zbus::{fdo, interface};
@@ -22,6 +23,7 @@ impl DynamicLauncher {
     }
 }
 
+#[introspect]
 #[interface(name = "org.freedesktop.impl.portal.DynamicLauncher")]
 impl DynamicLauncher {
     #[allow(clippy::too_many_arguments)]

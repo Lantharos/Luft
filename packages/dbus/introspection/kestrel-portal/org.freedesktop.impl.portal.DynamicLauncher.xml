@@ -1,0 +1,20 @@
+<node>
+  <interface name="org.freedesktop.impl.portal.DynamicLauncher">
+    <method name="PrepareInstall">
+      <arg name="handle" type="o" direction="in"/>
+      <arg name="app_id" type="s" direction="in"/>
+      <arg name="_parent_window" type="s" direction="in"/>
+      <arg name="name" type="s" direction="in"/>
+      <arg name="icon" type="v" direction="in"/>
+      <arg name="options" type="a{sv}" direction="in"/>
+      <arg type="(ua{sv})" direction="out"/>
+    </method>
+    <method name="RequestInstallToken">
+      <arg name="app_id" type="s" direction="in"/>
+      <arg name="_options" type="a{sv}" direction="in"/>
+      <arg type="u" direction="out"/>
+    </method>
+    <property name="SupportedLauncherTypes" type="u" access="read"/>
+    <property name="version" type="u" access="read"/>
+  </interface>
+</node>

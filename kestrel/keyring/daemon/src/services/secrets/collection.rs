@@ -1,6 +1,7 @@
 use std::collections::{BTreeMap, HashMap};
 use std::sync::Arc;
 
+use luft_dbus_macros::introspect;
 use luft_keyring_vault::{Action, Item as StoredItem, Secret as Stored};
 use zbus::message::Header;
 use zbus::object_server::SignalEmitter;
@@ -69,6 +70,7 @@ impl Collection {
     }
 }
 
+#[introspect]
 #[interface(name = "org.freedesktop.Secret.Collection")]
 impl Collection {
     async fn delete(

@@ -1,0 +1,13 @@
+<node>
+  <interface name="org.freedesktop.impl.portal.Usb">
+    <method name="AcquireDevices">
+      <arg name="handle" type="o" direction="in"/>
+      <arg name="_parent_window" type="s" direction="in"/>
+      <arg name="app_id" type="s" direction="in"/>
+      <arg name="devices" type="a(sa{sv}a{sv})" direction="in"/>
+      <arg name="_options" type="a{sv}" direction="in"/>
+      <arg type="(ua{sv})" direction="out"/>
+    </method>
+    <property name="version" type="u" access="read"/>
+  </interface>
+</node>

@@ -19,6 +19,7 @@ imagesize.workspace = true
 kamadak-exif.workspace = true
 lofty.workspace = true
 luft-app = { workspace = true, features = ["apps", "fonts", "launch", "thumbnails", "watch"] }
+luft-dbus-macros.workspace = true
 matroska-demuxer.workspace = true
 parking_lot.workspace = true
 sabine.workspace = true

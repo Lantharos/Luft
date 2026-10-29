@@ -6,6 +6,7 @@ use std::process::ExitCode;
 use std::time::Duration;
 
 use futures_util::StreamExt;
+use luft_dbus_macros::introspect;
 use luft_identity::caller::{self, Caller};
 use tokio::process::Command;
 use tokio::signal::unix::{SignalKind, signal};
@@ -74,6 +75,7 @@ impl Watchdog {
     }
 }
 
+#[introspect]
 #[interface(name = "com.lantharos.Kestrel.Watchdog1")]
 impl Watchdog {
     async fn report(

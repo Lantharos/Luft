@@ -4,6 +4,7 @@ use std::os::fd::{FromRawFd, OwnedFd};
 use std::os::unix::ffi::OsStrExt;
 use std::path::{Path, PathBuf};
 
+use luft_dbus_macros::introspect;
 use luft_software::apps::appimage::{FILES, URIS};
 use zbus::{Connection, Fd, OwnedVariant, proxy};
 
@@ -11,6 +12,7 @@ const FILE_SCHEME: &str = "file://";
 const REUSE_EXISTING: u32 = 1;
 const PERMISSIONS: [&str; 3] = ["read", "write", "grant-permissions"];
 
+#[introspect]
 #[proxy(
     interface = "org.freedesktop.portal.Documents",
     default_service = "org.freedesktop.portal.Documents",

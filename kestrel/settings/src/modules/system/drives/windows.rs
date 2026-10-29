@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 
+use luft_dbus_macros::introspect;
 use luft_i18n::t;
 use serde::Deserialize;
 use zbus::proxy::CacheProperties;
@@ -10,6 +11,7 @@ use crate::shared::notify::{Notification, URGENCY_NORMAL};
 
 const TOLD: &str = "luft/windows-read-only";
 
+#[introspect]
 #[proxy(
     interface = "com.lantharos.Windows1",
     default_service = "com.lantharos.Windows1",

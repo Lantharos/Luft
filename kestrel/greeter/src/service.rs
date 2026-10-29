@@ -1,6 +1,7 @@
 use std::sync::Arc;
 use std::time::Duration;
 
+use luft_dbus_macros::introspect;
 use tokio::sync::Mutex;
 use tokio::task::spawn_blocking;
 use tokio::time::timeout;
@@ -121,6 +122,7 @@ fn session_named<'a>(sessions: &'a [Session], id: &str) -> Result<&'a Session, E
         .ok_or_else(|| Error::InvalidArgs(format!("There's no session called {id}")))
 }
 
+#[introspect]
 #[interface(name = "com.lantharos.Greeter1")]
 impl Greeter {
     #[zbus(property)]

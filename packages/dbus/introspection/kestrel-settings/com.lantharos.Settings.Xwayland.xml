@@ -1,0 +1,8 @@
+<node>
+  <interface name="com.lantharos.Settings.Xwayland">
+    <method name="Start">
+      <arg name="display" type="s" direction="in"/>
+      <arg name="authority" type="s" direction="in"/>
+    </method>
+  </interface>
+</node>

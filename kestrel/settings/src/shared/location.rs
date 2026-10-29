@@ -1,6 +1,7 @@
 use std::time::Duration;
 
 use futures_util::StreamExt;
+use luft_dbus_macros::introspect;
 use zbus::OwnedObjectPath;
 use zbus::{Connection, proxy};
 
@@ -17,6 +18,7 @@ pub struct Coordinates {
     pub longitude: f64,
 }
 
+#[introspect]
 #[proxy(
     interface = "org.freedesktop.GeoClue2.Manager",
     default_service = "org.freedesktop.GeoClue2",
@@ -27,6 +29,7 @@ trait Manager {
     fn delete_client(&self, client: &OwnedObjectPath) -> zbus::Result<()>;
 }
 
+#[introspect]
 #[proxy(
     interface = "org.freedesktop.GeoClue2.Client",
     default_service = "org.freedesktop.GeoClue2"
@@ -45,6 +48,7 @@ trait Client {
     fn location_updated(&self, old: OwnedObjectPath, new: OwnedObjectPath) -> zbus::Result<()>;
 }
 
+#[introspect]
 #[proxy(
     interface = "org.freedesktop.GeoClue2.Location",
     default_service = "org.freedesktop.GeoClue2"

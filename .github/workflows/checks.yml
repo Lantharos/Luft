@@ -32,6 +32,7 @@ jobs:
       units: ${{ steps.affected.outputs.units }}
       weblate: ${{ steps.affected.outputs.weblate }}
       compositor: ${{ steps.affected.outputs.compositor }}
+      dbus: ${{ steps.affected.outputs.dbus }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -278,6 +279,35 @@ jobs:
 
       - run: python3 kestrel/compositor/patches.py identity
 
+  dbus:
+    name: D-Bus interfaces
+    needs: changes
+    if: needs.changes.outputs.dbus == 'true'
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+    container:
+      image: quay.io/fedora/fedora:45
+    steps:
+      - run: dnf install --assumeyes --setopt=install_weak_deps=False git unzip cpio tar gzip bzip2 xz
+
+      - uses: actions/checkout@v7
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      - id: week
+        run: echo "week=$(date +%G-%V)" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/cache@v6
+        with:
+          path: target/dbus-references
+          key: dbus-references-${{ hashFiles('.github/scripts/dbus/references.ts', 'kestrel/compositor/upstream.json') }}-${{ steps.week.outputs.week }}
+
+      - run: bun .github/scripts/dbus/index.ts
+
   etc:
     name: State outside /etc
     runs-on: ubuntu-slim
@@ -293,7 +323,7 @@ jobs:
 
   checks:
     name: Checks
-    needs: [changes, rust, uefi, meet-windows, web, kestrel, units, weblate, compositor-identity, etc]
+    needs: [changes, rust, uefi, meet-windows, web, kestrel, units, weblate, compositor-identity, dbus, etc]
     if: always()
     runs-on: ubuntu-slim
     steps:

@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use futures_util::StreamExt;
+use luft_dbus_macros::introspect;
 use zbus::OwnedVariant;
 use zbus::proxy::CacheProperties;
 use zbus::{Connection, proxy};
@@ -10,6 +11,7 @@ use crate::shared::notify::{self, Notification, NotificationsProxy, URGENCY_NORM
 
 const SETTINGS_ACTION: &str = "settings";
 
+#[introspect]
 #[proxy(
     interface = "com.lantharos.Trust1",
     default_service = "com.lantharos.Trust1",

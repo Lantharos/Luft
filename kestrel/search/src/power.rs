@@ -3,10 +3,12 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc::Sender;
 
 use futures_util::StreamExt;
+use luft_dbus_macros::introspect;
 use zbus::{Connection, proxy};
 
 use crate::index::Wake;
 
+#[introspect]
 #[proxy(
     interface = "org.freedesktop.UPower",
     default_service = "org.freedesktop.UPower",

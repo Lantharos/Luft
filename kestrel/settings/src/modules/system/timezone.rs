@@ -1,4 +1,5 @@
 use futures_util::StreamExt;
+use luft_dbus_macros::introspect;
 use tzf_rs::EmbeddedFinder;
 use zbus::{Connection, proxy};
 
@@ -13,6 +14,7 @@ const LOCATION: &str = "org.gnome.system.location";
 const DESKTOP_ID: &str = "com.lantharos.Settings.TimeZone";
 const SETTINGS_ACTION: &str = "settings";
 
+#[introspect]
 #[proxy(
     interface = "org.freedesktop.timedate1",
     default_service = "org.freedesktop.timedate1",

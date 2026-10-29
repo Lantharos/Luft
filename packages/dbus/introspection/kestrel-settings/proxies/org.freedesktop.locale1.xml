@@ -1,0 +1,7 @@
+<node>
+  <interface name="org.freedesktop.locale1">
+    <property name="X11Layout" type="s" access="read"/>
+    <property name="X11Options" type="s" access="read"/>
+    <property name="X11Variant" type="s" access="read"/>
+  </interface>
+</node>

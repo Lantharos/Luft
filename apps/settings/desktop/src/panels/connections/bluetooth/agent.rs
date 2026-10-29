@@ -4,6 +4,7 @@ use std::sync::{LazyLock, Mutex};
 
 use luft_app::Events;
 use luft_app::dbus::{self, failed};
+use luft_dbus_macros::introspect;
 use sabine::BridgeEvent;
 use serde::Serialize;
 use specta::Type;
@@ -116,6 +117,7 @@ impl Agent {
     }
 }
 
+#[introspect]
 #[zbus::interface(name = "org.bluez.Agent1")]
 impl Agent {
     fn release(&self) {

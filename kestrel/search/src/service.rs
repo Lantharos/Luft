@@ -3,6 +3,7 @@ use std::sync::mpsc::Sender;
 use std::sync::{Arc, Mutex};
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use luft_dbus_macros::introspect;
 use zbus::{fdo, interface};
 
 use crate::contents::{Store, snippet, words};
@@ -24,6 +25,7 @@ fn now() -> i64 {
         .map_or(0, |since| since.as_secs() as i64)
 }
 
+#[introspect]
 #[interface(name = "com.lantharos.Search")]
 impl Search {
     fn find(&self, query: &str, limit: u32) -> Vec<(String, bool, f64)> {

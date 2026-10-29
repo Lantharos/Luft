@@ -1,0 +1,20 @@
+<node>
+  <interface name="org.gnome.Mutter.IdleMonitor">
+    <method name="AddIdleWatch">
+      <arg type="t" direction="in"/>
+      <arg type="u" direction="out"/>
+    </method>
+    <method name="AddUserActiveWatch">
+      <arg type="u" direction="out"/>
+    </method>
+    <method name="RemoveWatch">
+      <arg type="u" direction="in"/>
+    </method>
+    <method name="GetIdletime">
+      <arg type="t" direction="out"/>
+    </method>
+    <signal name="WatchFired">
+      <arg type="u"/>
+    </signal>
+  </interface>
+</node>

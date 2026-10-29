@@ -1,0 +1,8 @@
+<node>
+  <interface name="com.lantharos.Sleep1">
+    <method name="SetPowerOffAfter">
+      <arg name="seconds" type="u" direction="in"/>
+    </method>
+    <property name="PowerOffAfter" type="u" access="read"/>
+  </interface>
+</node>

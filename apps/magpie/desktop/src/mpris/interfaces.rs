@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 
 use luft_app::Events;
+use luft_dbus_macros::introspect;
 use parking_lot::Mutex;
 use serde::Serialize;
 use specta::Type;
@@ -45,6 +46,7 @@ pub struct Root {
     pub events: Events,
 }
 
+#[introspect]
 #[interface(name = "org.mpris.MediaPlayer2")]
 impl Root {
     fn raise(&self) {
@@ -100,6 +102,7 @@ impl Player {
     }
 }
 
+#[introspect]
 #[interface(name = "org.mpris.MediaPlayer2.Player")]
 impl Player {
     fn next(&self) {

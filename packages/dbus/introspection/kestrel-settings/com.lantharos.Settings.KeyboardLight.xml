@@ -1,0 +1,19 @@
+<node>
+  <interface name="com.lantharos.Settings.KeyboardLight">
+    <method name="StepUp">
+      <arg type="i" direction="out"/>
+    </method>
+    <method name="StepDown">
+      <arg type="i" direction="out"/>
+    </method>
+    <method name="Toggle">
+      <arg type="i" direction="out"/>
+    </method>
+    <signal name="BrightnessChanged">
+      <arg name="brightness" type="i"/>
+      <arg name="source" type="s"/>
+    </signal>
+    <property name="Brightness" type="i" access="readwrite"/>
+    <property name="Steps" type="i" access="read"/>
+  </interface>
+</node>

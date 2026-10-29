@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::sync::atomic::{AtomicU32, Ordering};
 
 use futures_util::StreamExt;
+use luft_dbus_macros::introspect;
 use zbus::Variant;
 use zbus::fdo::DBusProxy;
 use zbus::{Connection, proxy};
@@ -12,6 +13,7 @@ const SETTINGS_APP: &str = "com.lantharos.settings";
 
 static LAUNCHES: AtomicU32 = AtomicU32::new(0);
 
+#[introspect]
 #[proxy(
     interface = "org.freedesktop.Notifications",
     default_service = "org.freedesktop.Notifications",

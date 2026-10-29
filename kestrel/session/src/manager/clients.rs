@@ -3,6 +3,7 @@ use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
 use futures_util::future::join_all;
+use luft_dbus_macros::introspect;
 use tokio::sync::oneshot;
 use zbus::object_server::SignalEmitter;
 use zbus::{Connection, interface};
@@ -31,6 +32,7 @@ struct Client {
     registry: Shared,
 }
 
+#[introspect]
 #[interface(name = "org.gnome.SessionManager.ClientPrivate")]
 impl Client {
     fn end_session_response(&self, _is_ok: bool, _reason: &str) {

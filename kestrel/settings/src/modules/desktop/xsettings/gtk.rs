@@ -1,3 +1,4 @@
+use luft_dbus_macros::introspect;
 use zbus::interface;
 
 pub const NAME: &str = "org.gtk.Settings";
@@ -10,6 +11,7 @@ pub struct GtkSettings {
     pub enable_animations: bool,
 }
 
+#[introspect]
 #[interface(name = "org.gtk.Settings")]
 impl GtkSettings {
     #[zbus(property)]

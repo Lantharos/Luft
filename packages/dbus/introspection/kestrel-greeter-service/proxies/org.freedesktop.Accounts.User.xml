@@ -1,0 +1,10 @@
+<node>
+  <interface name="org.freedesktop.Accounts.User">
+    <method name="SetSession">
+      <arg type="s" direction="in"/>
+    </method>
+    <method name="SetSessionType">
+      <arg type="s" direction="in"/>
+    </method>
+  </interface>
+</node>

@@ -1,0 +1,16 @@
+<node>
+  <interface name="com.lantharos.Search">
+    <method name="Find">
+      <arg name="query" type="s" direction="in"/>
+      <arg name="limit" type="u" direction="in"/>
+      <arg type="a(sbd)" direction="out"/>
+    </method>
+    <method name="FindText">
+      <arg name="query" type="s" direction="in"/>
+      <arg name="limit" type="u" direction="in"/>
+      <arg type="a(ss)" direction="out"/>
+    </method>
+    <method name="Refresh">
+    </method>
+  </interface>
+</node>

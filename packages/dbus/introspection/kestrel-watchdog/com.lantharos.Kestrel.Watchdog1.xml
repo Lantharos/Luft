@@ -1,0 +1,8 @@
+<node>
+  <interface name="com.lantharos.Kestrel.Watchdog1">
+    <method name="Report">
+      <arg name="stalled_ms" type="t" direction="in"/>
+      <arg name="compositor" type="u" direction="in"/>
+    </method>
+  </interface>
+</node>

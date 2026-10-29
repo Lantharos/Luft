@@ -1,0 +1,60 @@
+<node>
+  <interface name="com.lantharos.Kestrel.PortalDialogs">
+    <method name="ShareAccount">
+      <arg type="s" direction="in"/>
+      <arg type="s" direction="in"/>
+      <arg type="s" direction="in"/>
+      <arg type="u" direction="out"/>
+      <arg type="a{sv}" direction="out"/>
+    </method>
+    <method name="ChooseApplication">
+      <arg type="s" direction="in"/>
+      <arg type="as" direction="in"/>
+      <arg type="a{sv}" direction="in"/>
+      <arg type="u" direction="out"/>
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="UpdateChoices">
+      <arg type="s" direction="in"/>
+      <arg type="as" direction="in"/>
+    </method>
+    <method name="AddLauncher">
+      <arg type="s" direction="in"/>
+      <arg type="s" direction="in"/>
+      <arg type="s" direction="in"/>
+      <arg type="v" direction="in"/>
+      <arg type="a{sv}" direction="in"/>
+      <arg type="u" direction="out"/>
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="ChooseDevices">
+      <arg type="s" direction="in"/>
+      <arg type="s" direction="in"/>
+      <arg type="a(sa{sv})" direction="in"/>
+      <arg type="u" direction="out"/>
+      <arg type="as" direction="out"/>
+    </method>
+    <method name="ConfirmWallpaper">
+      <arg type="s" direction="in"/>
+      <arg type="s" direction="in"/>
+      <arg type="h" direction="in"/>
+      <arg type="u" direction="out"/>
+    </method>
+    <method name="ChoosePrint">
+      <arg type="s" direction="in"/>
+      <arg type="s" direction="in"/>
+      <arg type="aa{sv}" direction="in"/>
+      <arg type="a{sv}" direction="in"/>
+      <arg type="a{sv}" direction="in"/>
+      <arg type="u" direction="out"/>
+      <arg type="a{sv}" direction="out"/>
+    </method>
+    <method name="Launch">
+      <arg type="s" direction="in"/>
+      <arg type="as" direction="in"/>
+    </method>
+    <method name="Dismiss">
+      <arg type="s" direction="in"/>
+    </method>
+  </interface>
+</node>

@@ -135,8 +135,16 @@ os/vm/frames.py /tmp/frames                                     # when the scree
 os/vm/control.py shell 'journalctl -b -1 -u sushi'              # the previous start's journal
 ```
 
+## D-Bus interfaces
+
+Every D-Bus interface has one source of truth: the XML its Fedora package ships (or its source package, or Mutter at the revision Kestrel builds), the introspection of a Luft service written in Rust, or the XML a Kestrel service exports. `bun .github/scripts/dbus/index.ts` compares everything else that describes an interface against it: the interface files in `data` folders must match it member for member, while Kestrel's copies in `kestrel/engine/data/dbus-interfaces`, the XML in clients, Rust proxies and the stand-ins in `kestrel/tools/fixtures` may only use members that exist, with the same signatures and property access. Bus policies may only name interfaces and methods that exist. It downloads the reference XML into `target/dbus-references` with `dnf`, and refreshes it weekly.
+
+Put `#[introspect]` from `luft-dbus-macros` above every zbus `#[interface]` and `#[proxy]`. `cargo test` then checks that `packages/dbus/introspection` holds what zbus exports or what the proxy calls; after changing one, run `LUFT_DBUS_UPDATE=1 cargo test -p NAME introspection` and commit the result.
+
 ## CI
 
 Every pull request and push to `main`, and a run of the Checks workflow started by hand on a branch, runs, besides the Rust and TypeScript checks above, the Kestrel job when a change can reach Kestrel: its own folders, a crate or interface package it uses, or the build container. In `ghcr.io/lantharos/luft-ci-kestrel`, a Fedora container started with systemd so sessions get a user instance, it checks that Mutter's patch series applies (`patches.py check`), builds Mutter and the engine, and runs the headless session groups `system:session`, `start:search`, `lockScreen:lock`, `lockScreen:unlock`, `panel:surfaces` and `system:watchdog`: the session starts, Start opens and searches, the panel's surfaces open, the lock screen locks and unlocks, and the watchdog's checks pass. Mutter is kept between runs for each patch series and container, and the compilers keep their caches. A failure uploads the session logs and screenshots. `.github/scripts/kestrel/container.sh run COMMAND` runs a command in the same container on any computer with Podman, such as `kestrel/tools/session.sh capture --only lockScreen`.
+
+A change to anything that describes a D-Bus interface, from interface files and policies to Rust interfaces, proxies and stand-ins, runs the D-Bus interface check in a Fedora container, which keeps the downloaded reference XML for a week.
 
 Before the nightly tag moves, the Image workflow installs the new image in a VM on the runner with `os/vm/disk.sh` and runs `os/vm/check.py session` on it, with a password made up for that run, which also opens Settings in the new session. The tag only moves when it passes; otherwise the screenshots and logs are kept with the run.

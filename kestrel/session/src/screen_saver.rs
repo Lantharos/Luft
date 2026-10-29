@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use futures_util::StreamExt;
+use luft_dbus_macros::introspect;
 use zbus::message::Header;
 use zbus::object_server::SignalEmitter;
 use zbus::proxy::CacheProperties;
@@ -13,6 +14,7 @@ use crate::presence::IdleMonitorProxy;
 pub const NAME: &str = "org.freedesktop.ScreenSaver";
 pub const PATHS: [&str; 2] = ["/org/freedesktop/ScreenSaver", "/ScreenSaver"];
 
+#[introspect]
 #[proxy(
     interface = "org.gnome.ScreenSaver",
     default_service = "org.gnome.ScreenSaver",
@@ -37,6 +39,7 @@ pub struct ScreenSaver {
     idle_monitor: IdleMonitorProxy<'static>,
 }
 
+#[introspect]
 #[interface(name = "org.freedesktop.ScreenSaver")]
 impl ScreenSaver {
     async fn inhibit(

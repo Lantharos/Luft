@@ -1,8 +1,10 @@
+use luft_dbus_macros::introspect;
 use zbus::OwnedObjectPath;
 use zbus::{Connection, proxy};
 
 use super::sessions::Session;
 
+#[introspect]
 #[proxy(
     interface = "org.freedesktop.Accounts",
     default_service = "org.freedesktop.Accounts",
@@ -12,6 +14,7 @@ trait Accounts {
     fn find_user_by_name(&self, name: &str) -> zbus::Result<OwnedObjectPath>;
 }
 
+#[introspect]
 #[proxy(
     interface = "org.freedesktop.Accounts.User",
     default_service = "org.freedesktop.Accounts"

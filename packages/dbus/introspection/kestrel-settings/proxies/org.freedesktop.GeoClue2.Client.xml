@@ -1,0 +1,14 @@
+<node>
+  <interface name="org.freedesktop.GeoClue2.Client">
+    <method name="Start">
+    </method>
+    <method name="Stop">
+    </method>
+    <signal name="LocationUpdated">
+      <arg type="o"/>
+      <arg type="o"/>
+    </signal>
+    <property name="DesktopId" type="s" access="write"/>
+    <property name="RequestedAccuracyLevel" type="u" access="write"/>
+  </interface>
+</node>

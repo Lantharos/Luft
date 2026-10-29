@@ -1,0 +1,14 @@
+<node>
+  <interface name="org.freedesktop.PolicyKit1.Authority">
+    <method name="CheckAuthorization">
+      <arg type="(sa{sv})" direction="in"/>
+      <arg type="s" direction="in"/>
+      <arg type="a{ss}" direction="in"/>
+      <arg type="u" direction="in"/>
+      <arg type="s" direction="in"/>
+      <arg type="b" direction="out"/>
+      <arg type="b" direction="out"/>
+      <arg type="a{ss}" direction="out"/>
+    </method>
+  </interface>
+</node>

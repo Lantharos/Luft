@@ -3,9 +3,11 @@ use std::sync::Arc;
 
 use futures_util::StreamExt;
 use luft_app::dbus;
+use luft_dbus_macros::introspect;
 use parking_lot::{Mutex, MutexGuard};
 use zbus::proxy;
 
+#[introspect]
 #[proxy(
     interface = "com.lantharos.Kestrel.OpenWindows",
     default_service = "com.lantharos.Kestrel",

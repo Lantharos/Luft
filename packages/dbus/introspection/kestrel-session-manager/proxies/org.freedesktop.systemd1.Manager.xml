@@ -1,0 +1,12 @@
+<node>
+  <interface name="org.freedesktop.systemd1.Manager">
+    <method name="StopUnit">
+      <arg type="s" direction="in"/>
+      <arg type="s" direction="in"/>
+      <arg type="o" direction="out"/>
+    </method>
+    <method name="SetEnvironment">
+      <arg type="as" direction="in"/>
+    </method>
+  </interface>
+</node>

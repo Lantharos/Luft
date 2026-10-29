@@ -7,6 +7,7 @@ use std::collections::HashSet;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 
+use luft_dbus_macros::introspect;
 use luft_identity::caller::{self, Caller};
 use zbus::message::Header;
 use zbus::names::UniqueName;
@@ -153,6 +154,7 @@ impl Session {
 
 pub struct Manager(pub Arc<Session>);
 
+#[introspect]
 #[interface(name = "org.gnome.SessionManager")]
 impl Manager {
     async fn setenv(

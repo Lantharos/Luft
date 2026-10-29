@@ -1,0 +1,6 @@
+<node>
+  <interface name="org.freedesktop.IBus.Service">
+    <method name="Destroy">
+    </method>
+  </interface>
+</node>

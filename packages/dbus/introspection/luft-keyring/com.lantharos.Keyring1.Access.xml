@@ -1,0 +1,18 @@
+<node>
+  <interface name="com.lantharos.Keyring1.Access">
+    <method name="AppStores">
+      <arg type="a(sssu)" direction="out"/>
+    </method>
+    <method name="ForgetApp">
+      <arg name="app" type="s" direction="in"/>
+    </method>
+    <method name="History">
+      <arg name="limit" type="u" direction="in"/>
+      <arg type="a(tssss)" direction="out"/>
+    </method>
+    <method name="ClearHistory">
+    </method>
+    <signal name="Changed">
+    </signal>
+  </interface>
+</node>

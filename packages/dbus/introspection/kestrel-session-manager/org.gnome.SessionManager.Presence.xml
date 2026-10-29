@@ -1,0 +1,22 @@
+<node>
+  <interface name="org.gnome.SessionManager.Presence">
+    <method name="SetStatus">
+      <arg name="status" type="u" direction="in"/>
+    </method>
+    <method name="SetStatusText">
+      <arg name="text" type="s" direction="in"/>
+    </method>
+    <signal name="StatusChanged">
+      <arg name="status" type="u"/>
+    </signal>
+    <signal name="StatusTextChanged">
+      <arg name="text" type="s"/>
+    </signal>
+    <property name="status" type="u" access="readwrite">
+      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/>
+    </property>
+    <property name="status-text" type="s" access="readwrite">
+      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/>
+    </property>
+  </interface>
+</node>

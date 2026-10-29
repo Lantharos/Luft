@@ -16,6 +16,7 @@ anyhow.workspace = true
 futures-util.workspace = true
 libc.workspace = true
 luft-dbus.workspace = true
+luft-dbus-macros.workspace = true
 luft-windows.workspace = true
 serde.workspace = true
 serde_json.workspace = true

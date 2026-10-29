@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use luft_dbus_macros::introspect;
 use tokio::sync::Mutex;
 use zbus::message::Header;
 use zbus::object_server::SignalEmitter;
@@ -39,6 +40,7 @@ impl UsbProtection {
     }
 }
 
+#[introspect]
 #[interface(name = "com.lantharos.UsbProtection1")]
 impl UsbProtection {
     #[zbus(property)]

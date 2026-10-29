@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use luft_dbus_macros::introspect;
 use tokio::sync::mpsc;
 use zbus::interface;
 
@@ -78,6 +79,7 @@ pub struct Radios {
     pub requests: mpsc::UnboundedSender<Request>,
 }
 
+#[introspect]
 #[interface(name = "com.lantharos.Settings.Rfkill")]
 impl Radios {
     #[zbus(property)]

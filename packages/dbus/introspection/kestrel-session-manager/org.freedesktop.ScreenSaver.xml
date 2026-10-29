@@ -1,0 +1,24 @@
+<node>
+  <interface name="org.freedesktop.ScreenSaver">
+    <method name="Inhibit">
+      <arg name="app_id" type="s" direction="in"/>
+      <arg name="reason" type="s" direction="in"/>
+      <arg type="u" direction="out"/>
+    </method>
+    <method name="UnInhibit">
+      <arg name="cookie" type="u" direction="in"/>
+    </method>
+    <method name="GetActive">
+      <arg type="b" direction="out"/>
+    </method>
+    <method name="GetActiveTime">
+      <arg type="u" direction="out"/>
+    </method>
+    <method name="GetSessionIdleTime">
+      <arg type="u" direction="out"/>
+    </method>
+    <signal name="ActiveChanged">
+      <arg name="active" type="b"/>
+    </signal>
+  </interface>
+</node>

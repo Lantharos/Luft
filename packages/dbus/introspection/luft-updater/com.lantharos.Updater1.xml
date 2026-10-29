@@ -1,0 +1,35 @@
+<node>
+  <interface name="com.lantharos.Updater1">
+    <signal name="Finished">
+      <arg name="error" type="s"/>
+    </signal>
+    <signal name="UpdateFound">
+      <arg name="ready" type="b"/>
+    </signal>
+    <method name="SetSchedule">
+      <arg name="schedule" type="s" direction="in"/>
+      <arg name="download" type="b" direction="in"/>
+    </method>
+    <method name="RunSchedule">
+    </method>
+    <method name="Status">
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="Download">
+    </method>
+    <method name="SwitchVariant">
+      <arg name="variant" type="s" direction="in"/>
+    </method>
+    <method name="Cancel">
+    </method>
+    <method name="Apply">
+    </method>
+    <method name="Rollback">
+    </method>
+    <property name="DownloadAutomatically" type="b" access="read"/>
+    <property name="Downloaded" type="t" access="read"/>
+    <property name="Downloading" type="b" access="read"/>
+    <property name="LastChecked" type="t" access="read"/>
+    <property name="Schedule" type="s" access="read"/>
+  </interface>
+</node>

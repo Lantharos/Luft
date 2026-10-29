@@ -1,0 +1,91 @@
+<node>
+  <interface name="org.freedesktop.IBus.Engine">
+    <method name="ProcessKeyEvent">
+      <arg name="keyval" type="u" direction="in"/>
+      <arg name="_keycode" type="u" direction="in"/>
+      <arg name="state" type="u" direction="in"/>
+      <arg type="b" direction="out"/>
+    </method>
+    <method name="CandidateClicked">
+      <arg name="index" type="u" direction="in"/>
+      <arg name="_button" type="u" direction="in"/>
+      <arg name="_state" type="u" direction="in"/>
+    </method>
+    <method name="FocusIn">
+    </method>
+    <method name="FocusInId">
+      <arg name="_object_path" type="s" direction="in"/>
+      <arg name="_client" type="s" direction="in"/>
+    </method>
+    <method name="FocusOut">
+    </method>
+    <method name="FocusOutId">
+      <arg name="_object_path" type="s" direction="in"/>
+    </method>
+    <method name="Reset">
+    </method>
+    <method name="Enable">
+    </method>
+    <method name="Disable">
+    </method>
+    <method name="PageUp">
+    </method>
+    <method name="PageDown">
+    </method>
+    <method name="CursorUp">
+    </method>
+    <method name="CursorDown">
+    </method>
+    <method name="SetSurroundingText">
+      <arg name="text" type="v" direction="in"/>
+      <arg name="cursor_pos" type="u" direction="in"/>
+      <arg name="_anchor_pos" type="u" direction="in"/>
+    </method>
+    <method name="SetCursorLocation">
+      <arg name="_x" type="i" direction="in"/>
+      <arg name="_y" type="i" direction="in"/>
+      <arg name="_w" type="i" direction="in"/>
+      <arg name="_h" type="i" direction="in"/>
+    </method>
+    <method name="SetCapabilities">
+      <arg name="_caps" type="u" direction="in"/>
+    </method>
+    <method name="PropertyActivate">
+      <arg name="_name" type="s" direction="in"/>
+      <arg name="_state" type="u" direction="in"/>
+    </method>
+    <method name="PropertyShow">
+      <arg name="_name" type="s" direction="in"/>
+    </method>
+    <method name="PropertyHide">
+      <arg name="_name" type="s" direction="in"/>
+    </method>
+    <method name="ProcessHandWritingEvent">
+      <arg name="_coordinates" type="ad" direction="in"/>
+    </method>
+    <method name="CancelHandWriting">
+      <arg name="_n_strokes" type="u" direction="in"/>
+    </method>
+    <method name="PanelExtensionReceived">
+      <arg name="_event" type="v" direction="in"/>
+    </method>
+    <method name="PanelExtensionRegisterKeys">
+      <arg name="_data" type="v" direction="in"/>
+    </method>
+    <signal name="CommitText">
+      <arg name="text" type="v"/>
+    </signal>
+    <signal name="UpdatePreeditText">
+      <arg name="text" type="v"/>
+      <arg name="cursor_pos" type="u"/>
+      <arg name="visible" type="b"/>
+      <arg name="mode" type="u"/>
+    </signal>
+    <signal name="UpdateLookupTable">
+      <arg name="table" type="v"/>
+      <arg name="visible" type="b"/>
+    </signal>
+    <property name="ActiveSurroundingText" type="b" access="read"/>
+    <property name="FocusId" type="b" access="read"/>
+  </interface>
+</node>

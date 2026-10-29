@@ -1,0 +1,8 @@
+<node>
+  <interface name="org.freedesktop.timedate1">
+    <method name="SetTimezone">
+      <arg type="s" direction="in"/>
+      <arg type="b" direction="in"/>
+    </method>
+  </interface>
+</node>

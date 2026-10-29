@@ -14,6 +14,7 @@ getrandom.workspace = true
 clap.workspace = true
 libc.workspace = true
 luft-dbus.workspace = true
+luft-dbus-macros.workspace = true
 luft-identity.workspace = true
 luft-installer-contract.workspace = true
 luft-keyring-vault.workspace = true

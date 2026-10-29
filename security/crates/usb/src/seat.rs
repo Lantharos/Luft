@@ -1,4 +1,5 @@
 use futures_util::StreamExt;
+use luft_dbus_macros::introspect;
 use tokio::sync::watch;
 use zbus::OwnedObjectPath;
 use zbus::fdo::{PropertiesChangedStream, PropertiesProxy};
@@ -8,6 +9,7 @@ use zbus::{Connection, proxy};
 const UNLOCKED_CLASSES: [&str; 2] = ["user", "user-early"];
 const NO_SESSION: &str = "/";
 
+#[introspect]
 #[proxy(
     interface = "org.freedesktop.login1.Seat",
     default_service = "org.freedesktop.login1",
@@ -18,6 +20,7 @@ trait Seat {
     fn active_session(&self) -> zbus::Result<(String, OwnedObjectPath)>;
 }
 
+#[introspect]
 #[proxy(
     interface = "org.freedesktop.login1.Session",
     default_service = "org.freedesktop.login1"

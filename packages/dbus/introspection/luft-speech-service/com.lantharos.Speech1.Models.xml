@@ -1,0 +1,18 @@
+<node>
+  <interface name="com.lantharos.Speech1.Models">
+    <method name="Overview">
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="Install">
+      <arg name="model" type="s" direction="in"/>
+    </method>
+    <method name="CancelInstall">
+      <arg name="model" type="s" direction="in"/>
+    </method>
+    <method name="Remove">
+      <arg name="model" type="s" direction="in"/>
+    </method>
+    <signal name="Changed">
+    </signal>
+  </interface>
+</node>

@@ -1,6 +1,7 @@
 use std::io;
 use std::os::fd::OwnedFd;
 
+use luft_dbus_macros::introspect;
 use tokio::fs::File;
 use zbus::{DeserializeDict, SerializeDict, Type, fdo, interface};
 
@@ -128,6 +129,7 @@ fn failed(error: io::Error) -> fdo::Error {
     fdo::Error::Failed(error.to_string())
 }
 
+#[introspect]
 #[interface(name = "com.lantharos.Settings.Printing")]
 impl Printing {
     async fn printers(&self) -> fdo::Result<Vec<Printer>> {

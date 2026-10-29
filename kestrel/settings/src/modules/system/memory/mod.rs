@@ -3,6 +3,7 @@ pub mod pressure;
 
 use std::time::Duration;
 
+use luft_dbus_macros::introspect;
 use tokio::time::Instant;
 use zbus::{Connection, proxy};
 
@@ -16,6 +17,7 @@ const BETWEEN_WARNINGS: Duration = Duration::from_secs(120);
 const STARVED_SHARE: f64 = 10.0;
 const SETTLE: Duration = Duration::from_secs(10);
 
+#[introspect]
 #[proxy(
     interface = "com.lantharos.Kestrel.Memory",
     default_service = "com.lantharos.Kestrel",

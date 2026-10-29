@@ -1,0 +1,8 @@
+<node>
+  <interface name="net.hadess.SensorProxy">
+    <method name="ClaimLight">
+    </method>
+    <method name="ReleaseLight">
+    </method>
+  </interface>
+</node>

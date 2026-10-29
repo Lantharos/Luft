@@ -4,6 +4,7 @@ use std::io::{Seek, Write};
 use std::path::{Path, PathBuf};
 
 use gio::prelude::*;
+use luft_dbus_macros::introspect;
 use rustix::fs::{MemfdFlags, memfd_create};
 use sha2::{Digest, Sha256};
 use zbus::message::Header;
@@ -111,6 +112,7 @@ fn use_wallpaper(uri: &str) {
     gio::Settings::sync();
 }
 
+#[introspect]
 #[interface(name = "org.freedesktop.impl.portal.Wallpaper")]
 impl Wallpaper {
     #[zbus(name = "SetWallpaperURI")]

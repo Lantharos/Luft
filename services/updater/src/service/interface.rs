@@ -2,6 +2,7 @@ use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Arc, Mutex};
 
 use luft_dbus::idle::Idle;
+use luft_dbus_macros::introspect;
 use luft_variant::Variant;
 use tokio::sync::mpsc;
 use zbus::message::Header;
@@ -145,6 +146,7 @@ async fn build_system_packages(connection: &Connection) {
     }
 }
 
+#[introspect]
 #[interface(name = "com.lantharos.Updater1")]
 impl Updater {
     #[zbus(property)]

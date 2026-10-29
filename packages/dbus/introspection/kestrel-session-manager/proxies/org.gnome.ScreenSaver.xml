@@ -1,0 +1,13 @@
+<node>
+  <interface name="org.gnome.ScreenSaver">
+    <method name="GetActive">
+      <arg type="b" direction="out"/>
+    </method>
+    <method name="GetActiveTime">
+      <arg type="u" direction="out"/>
+    </method>
+    <signal name="ActiveChanged">
+      <arg type="b"/>
+    </signal>
+  </interface>
+</node>

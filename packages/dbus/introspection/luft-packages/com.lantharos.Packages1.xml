@@ -1,0 +1,36 @@
+<node>
+  <interface name="com.lantharos.Packages1">
+    <signal name="Step">
+      <arg name="step" type="s"/>
+    </signal>
+    <method name="List">
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="Rebuild">
+    </method>
+    <method name="Install">
+      <arg name="names" type="as" direction="in"/>
+    </method>
+    <method name="InstallFile">
+      <arg name="package" type="h" direction="in"/>
+    </method>
+    <method name="Remove">
+      <arg name="names" type="as" direction="in"/>
+    </method>
+    <method name="DescribeRepository">
+      <arg name="file" type="s" direction="in"/>
+      <arg name="text" type="s" direction="in"/>
+      <arg name="keys" type="a{ss}" direction="in"/>
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="AddRepository">
+      <arg name="file" type="s" direction="in"/>
+      <arg name="text" type="s" direction="in"/>
+      <arg name="keys" type="a{ss}" direction="in"/>
+    </method>
+    <method name="RemoveRepository">
+      <arg name="file" type="s" direction="in"/>
+    </method>
+    <property name="Busy" type="b" access="read"/>
+  </interface>
+</node>

@@ -1,0 +1,22 @@
+<node>
+  <interface name="com.lantharos.Keyring1">
+    <method name="Lock">
+    </method>
+    <method name="Unlock">
+      <arg type="b" direction="out"/>
+    </method>
+    <method name="SetPin">
+      <arg name="enabled" type="b" direction="in"/>
+      <arg type="b" direction="out"/>
+    </method>
+    <method name="Reseal">
+    </method>
+    <property name="Chip" type="s" access="read"/>
+    <property name="FingerprintUnlock" type="b" access="read"/>
+    <property name="ItemCount" type="u" access="read"/>
+    <property name="LockWithScreen" type="b" access="readwrite"/>
+    <property name="Locked" type="b" access="read"/>
+    <property name="Pin" type="b" access="read"/>
+    <property name="TpmSealed" type="b" access="read"/>
+  </interface>
+</node>

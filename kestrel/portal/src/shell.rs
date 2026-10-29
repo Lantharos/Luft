@@ -1,9 +1,11 @@
+use luft_dbus_macros::introspect;
 use zbus::proxy::CacheProperties;
 use zbus::{Connection, proxy};
 use zbus::{Fd, Variant as Value};
 
 use crate::portals::Options;
 
+#[introspect]
 #[proxy(
     interface = "com.lantharos.Kestrel.PortalDialogs",
     default_service = "com.lantharos.Kestrel",

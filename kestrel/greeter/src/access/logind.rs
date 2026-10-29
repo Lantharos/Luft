@@ -1,6 +1,7 @@
 use std::fs;
 use std::os::fd::{AsFd, AsRawFd};
 
+use luft_dbus_macros::introspect;
 use zbus::proxy::CacheProperties;
 use zbus::{Connection, proxy};
 use zbus::{OwnedFd, OwnedObjectPath};
@@ -9,6 +10,7 @@ use crate::error::Error;
 
 const GREETER_CLASS: &str = "greeter";
 
+#[introspect]
 #[proxy(
     interface = "org.freedesktop.login1.Manager",
     default_service = "org.freedesktop.login1",
@@ -19,6 +21,7 @@ trait Manager {
     fn get_session_by_pid(&self, pid: u32) -> zbus::Result<OwnedObjectPath>;
 }
 
+#[introspect]
 #[proxy(
     interface = "org.freedesktop.login1.Session",
     default_service = "org.freedesktop.login1"

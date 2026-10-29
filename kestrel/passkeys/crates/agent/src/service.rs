@@ -1,3 +1,4 @@
+use luft_dbus_macros::introspect;
 use serde::Serialize;
 use zbus::Type;
 use zbus::object_server::SignalEmitter;
@@ -38,6 +39,7 @@ impl Service {
     }
 }
 
+#[introspect]
 #[interface(name = "com.lantharos.Passkeys1")]
 impl Service {
     async fn list(&self) -> fdo::Result<Vec<Entry>> {

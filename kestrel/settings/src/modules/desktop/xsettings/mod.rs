@@ -8,6 +8,7 @@ mod wire;
 
 use std::path::{Path, PathBuf};
 
+use luft_dbus_macros::introspect;
 use tokio::process::Command;
 use tokio::sync::watch;
 use zbus::object_server::InterfaceRef;
@@ -77,6 +78,7 @@ struct Xwayland {
     snapshots: watch::Receiver<Snapshot>,
 }
 
+#[introspect]
 #[interface(name = "com.lantharos.Settings.Xwayland")]
 impl Xwayland {
     async fn start(&self, display: &str, authority: &str) -> fdo::Result<()> {

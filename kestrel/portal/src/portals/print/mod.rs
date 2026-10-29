@@ -6,6 +6,7 @@ use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
+use luft_dbus_macros::introspect;
 use luft_i18n::t;
 use zbus::message::Header;
 use zbus::{Connection, fdo, interface};
@@ -189,6 +190,7 @@ async fn notify_failure(connection: &Connection, printer: &str, app: Option<&str
     }
 }
 
+#[introspect]
 #[interface(name = "org.freedesktop.impl.portal.Print")]
 impl Print {
     #[allow(clippy::too_many_arguments)]

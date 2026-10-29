@@ -4,6 +4,7 @@ use std::sync::Arc;
 
 use anyhow::{Context, bail};
 use luft_dbus::idle::Idle;
+use luft_dbus_macros::introspect;
 use luft_windows::bluetooth::bluez;
 use luft_windows::change::{self, Change};
 use serde::Serialize;
@@ -86,6 +87,7 @@ fn import_bluetooth() -> anyhow::Result<u32> {
     Ok(imported as u32)
 }
 
+#[introspect]
 #[interface(name = "com.lantharos.Windows1")]
 impl Windows {
     async fn status(

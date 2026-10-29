@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use luft_dbus_macros::introspect;
 use tokio::sync::Mutex;
 use zbus::object_server::{InterfaceRef, SignalEmitter};
 use zbus::{Connection, fdo, interface};
@@ -151,6 +152,7 @@ impl Keyboard {
     }
 }
 
+#[introspect]
 #[interface(name = "com.lantharos.Settings.KeyboardLight")]
 impl Keyboard {
     #[zbus(property)]

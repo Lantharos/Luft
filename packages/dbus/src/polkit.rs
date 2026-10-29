@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use luft_dbus_macros::introspect;
 use zbus::Variant;
 use zbus::message::{Flags, Header};
 use zbus::{Connection, proxy};
@@ -8,6 +9,7 @@ const ALLOW_USER_INTERACTION: u32 = 1;
 
 type Subject<'a> = (&'a str, HashMap<&'a str, Variant<'a>>);
 
+#[introspect]
 #[proxy(
     interface = "org.freedesktop.PolicyKit1.Authority",
     default_service = "org.freedesktop.PolicyKit1",

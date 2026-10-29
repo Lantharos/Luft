@@ -15,6 +15,7 @@ path = "src/main.rs"
 anyhow.workspace = true
 gio.workspace = true
 libc.workspace = true
+luft-dbus-macros.workspace = true
 luft-speech.workspace = true
 ort = { workspace = true, features = ["api-24", "std"] }
 pipewire.workspace = true

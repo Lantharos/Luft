@@ -4,6 +4,7 @@ mod record;
 use std::collections::HashMap;
 use std::sync::Arc;
 
+use luft_dbus_macros::introspect;
 use luft_keyring_vault::now;
 use luft_keyring_wire::{Chip, Problem};
 use zbus::message::Header;
@@ -119,6 +120,7 @@ impl Passkeys {
     }
 }
 
+#[introspect]
 #[interface(name = "com.lantharos.Keyring1.Passkeys")]
 impl Passkeys {
     async fn list(

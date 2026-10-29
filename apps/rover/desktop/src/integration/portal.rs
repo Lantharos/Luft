@@ -6,6 +6,7 @@ use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use luft_dbus_macros::introspect;
 use tokio::process::Command;
 use url::Url;
 use zbus::interface;
@@ -31,6 +32,7 @@ struct FileChooser {
     next_request: AtomicU64,
 }
 
+#[introspect]
 #[interface(interface = "org.freedesktop.impl.portal.FileChooser")]
 impl FileChooser {
     #[zbus(out_args("response", "results"))]

@@ -1,0 +1,8 @@
+<node>
+  <interface name="com.lantharos.Kestrel.Health">
+    <method name="Check">
+      <arg type="t" direction="out"/>
+      <arg type="b" direction="out"/>
+    </method>
+  </interface>
+</node>

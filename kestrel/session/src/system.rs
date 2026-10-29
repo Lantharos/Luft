@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use luft_dbus_macros::introspect;
 use zbus::OwnedObjectPath;
 use zbus::fdo::DBusProxy;
 use zbus::{Connection, proxy};
@@ -16,6 +17,7 @@ pub enum Power {
     Suspend,
 }
 
+#[introspect]
 #[proxy(
     interface = "org.freedesktop.login1.Manager",
     default_service = "org.freedesktop.login1",
@@ -30,6 +32,7 @@ trait Login {
     fn suspend(&self, interactive: bool) -> zbus::Result<()>;
 }
 
+#[introspect]
 #[proxy(
     interface = "org.freedesktop.systemd1.Manager",
     default_service = "org.freedesktop.systemd1",

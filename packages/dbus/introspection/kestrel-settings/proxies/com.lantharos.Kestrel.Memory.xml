@@ -1,0 +1,12 @@
+<node>
+  <interface name="com.lantharos.Kestrel.Memory">
+    <method name="RunningLow">
+      <arg type="s" direction="in"/>
+      <arg type="t" direction="in"/>
+    </method>
+    <method name="Closed">
+      <arg type="s" direction="in"/>
+      <arg type="t" direction="in"/>
+    </method>
+  </interface>
+</node>

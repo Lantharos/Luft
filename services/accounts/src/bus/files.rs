@@ -1,6 +1,7 @@
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
+use luft_dbus_macros::introspect;
 use zbus::interface;
 use zbus::object_server::SignalEmitter;
 
@@ -22,6 +23,7 @@ fn paths(paths: Vec<String>) -> Vec<PathBuf> {
     paths.into_iter().map(PathBuf::from).collect()
 }
 
+#[introspect]
 #[interface(name = "com.lantharos.Accounts1.Files")]
 impl Files {
     fn drives(&self) -> String {

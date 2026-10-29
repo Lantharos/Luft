@@ -43,6 +43,7 @@ members = [
     "kestrel/wrapper",
     "packages/app",
     "packages/dbus",
+    "packages/dbus/macros",
     "packages/i18n",
     "packages/identity",
     "packages/system/accounts",
@@ -106,6 +107,7 @@ default-members = [
     "kestrel/wrapper",
     "packages/app",
     "packages/dbus",
+    "packages/dbus/macros",
     "packages/i18n",
     "packages/identity",
     "packages/system/accounts",
@@ -141,6 +143,7 @@ ctap = { path = "kestrel/passkeys/crates/ctap" }
 luft-accounts = { path = "packages/system/accounts" }
 luft-app = { path = "packages/app" }
 luft-dbus = { path = "packages/dbus" }
+luft-dbus-macros = { path = "packages/dbus/macros" }
 luft-disks = { path = "packages/system/disks" }
 luft-fingerprint = { path = "packages/system/fingerprint" }
 luft-i18n = { path = "packages/i18n" }
@@ -236,8 +239,10 @@ pipewire = "0.10.1"
 png = "0.18.1"
 pollster = "1.0.1"
 postcard = { version = "1.1.3", default-features = false, features = ["use-std"] }
+proc-macro2 = "1.0.107"
 pulseaudio = "0.3.2"
 quick-xml = "0.42.0"
+quote = "1.0.47"
 rand = "0.10.3"
 raw-window-handle = "0.6.2"
 rayon = "1.12.0"
@@ -265,6 +270,7 @@ skrifa = "0.48.0"
 socket2 = "0.6.5"
 specta = { version = "=2.0.0-rc.27", features = ["derive", "serde_json"] }
 specta-typescript = "0.0.14"
+syn = "3.0.9"
 tar = "0.4.46"
 tempfile = "3.27.0"
 time = "0.3.55"
@@ -291,6 +297,7 @@ x11rb = "0.14.0"
 x25519-dalek = { version = "3.0.0", default-features = false }
 xkbcommon = { version = "0.9.0", default-features = false }
 zbus = { version = "6.0.0", default-features = false }
+zbus_utils = "6.0.0"
 zeroize = "1.9.1"
 zip = { version = "9.0.5", default-features = false, features = ["deflate-flate2-zlib-rs", "deflate64"] }
 zstd = "0.14.3"

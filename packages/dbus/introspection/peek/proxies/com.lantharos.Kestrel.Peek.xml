@@ -1,0 +1,66 @@
+<node>
+  <interface name="com.lantharos.Kestrel.Peek">
+    <method name="List">
+      <arg type="s" direction="in"/>
+      <arg type="aa{sv}" direction="out"/>
+    </method>
+    <method name="HandleWindow">
+      <arg type="s" direction="in"/>
+      <arg type="a{sv}" direction="out"/>
+    </method>
+    <method name="CaptureWindow">
+      <arg type="t" direction="in"/>
+      <arg type="h" direction="in"/>
+    </method>
+    <method name="CaptureScreen">
+      <arg type="h" direction="in"/>
+    </method>
+    <method name="Launch">
+      <arg type="h" direction="in"/>
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="WaitForWindow">
+      <arg type="s" direction="in"/>
+      <arg type="u" direction="in"/>
+      <arg type="a{sv}" direction="out"/>
+    </method>
+    <method name="Move">
+      <arg type="t" direction="in"/>
+      <arg type="d" direction="in"/>
+      <arg type="d" direction="in"/>
+    </method>
+    <method name="Click">
+      <arg type="t" direction="in"/>
+      <arg type="d" direction="in"/>
+      <arg type="d" direction="in"/>
+      <arg type="u" direction="in"/>
+      <arg type="u" direction="in"/>
+    </method>
+    <method name="Drag">
+      <arg type="t" direction="in"/>
+      <arg type="d" direction="in"/>
+      <arg type="d" direction="in"/>
+      <arg type="d" direction="in"/>
+      <arg type="d" direction="in"/>
+      <arg type="u" direction="in"/>
+    </method>
+    <method name="Scroll">
+      <arg type="t" direction="in"/>
+      <arg type="d" direction="in"/>
+      <arg type="d" direction="in"/>
+      <arg type="i" direction="in"/>
+      <arg type="i" direction="in"/>
+    </method>
+    <method name="Type">
+      <arg type="t" direction="in"/>
+      <arg type="s" direction="in"/>
+    </method>
+    <method name="Key">
+      <arg type="t" direction="in"/>
+      <arg type="s" direction="in"/>
+    </method>
+    <method name="Stop">
+      <arg type="s" direction="in"/>
+    </method>
+  </interface>
+</node>

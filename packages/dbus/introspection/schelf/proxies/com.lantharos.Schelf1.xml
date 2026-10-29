@@ -1,0 +1,21 @@
+<node>
+  <interface name="com.lantharos.Schelf1">
+    <method name="Start">
+      <arg type="s" direction="in"/>
+      <arg type="t" direction="out"/>
+    </method>
+    <method name="Cancel">
+      <arg type="t" direction="in"/>
+    </method>
+    <signal name="Changed">
+      <arg type="t"/>
+      <arg type="s"/>
+      <arg type="s"/>
+      <arg type="d"/>
+    </signal>
+    <signal name="Finished">
+      <arg type="t"/>
+      <arg type="s"/>
+    </signal>
+  </interface>
+</node>

@@ -1,5 +1,6 @@
 use std::fmt::Write;
 
+use luft_dbus_macros::introspect;
 use zbus::ObjectPath;
 use zbus::message::Header;
 use zbus::{fdo, interface};
@@ -20,6 +21,7 @@ impl Email {
     }
 }
 
+#[introspect]
 #[interface(name = "org.freedesktop.impl.portal.Email")]
 impl Email {
     async fn compose_email(

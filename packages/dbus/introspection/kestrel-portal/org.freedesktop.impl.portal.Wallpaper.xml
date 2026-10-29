@@ -1,0 +1,12 @@
+<node>
+  <interface name="org.freedesktop.impl.portal.Wallpaper">
+    <method name="SetWallpaperURI">
+      <arg name="handle" type="o" direction="in"/>
+      <arg name="app_id" type="s" direction="in"/>
+      <arg name="_parent_window" type="s" direction="in"/>
+      <arg name="uri" type="s" direction="in"/>
+      <arg name="options" type="a{sv}" direction="in"/>
+      <arg type="u" direction="out"/>
+    </method>
+  </interface>
+</node>

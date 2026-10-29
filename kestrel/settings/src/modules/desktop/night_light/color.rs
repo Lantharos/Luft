@@ -1,3 +1,4 @@
+use luft_dbus_macros::introspect;
 use tokio::sync::mpsc;
 use zbus::interface;
 
@@ -17,6 +18,7 @@ pub struct Color {
     pub commands: mpsc::UnboundedSender<Command>,
 }
 
+#[introspect]
 #[interface(name = "com.lantharos.Settings.NightLight")]
 impl Color {
     #[zbus(property)]

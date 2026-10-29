@@ -1,8 +1,10 @@
+use luft_dbus_macros::introspect;
 use zbus::Fd;
 use zbus::{Connection, proxy};
 
 use crate::portals::Options;
 
+#[introspect]
 #[proxy(
     interface = "com.lantharos.Settings.Printing",
     default_service = "com.lantharos.Settings",

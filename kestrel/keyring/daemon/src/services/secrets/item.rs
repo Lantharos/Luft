@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
+use luft_dbus_macros::introspect;
 use luft_keyring_vault::{Action, now};
 use zbus::message::Header;
 use zbus::{ObjectPath, OwnedObjectPath};
@@ -74,6 +75,7 @@ impl Item {
     }
 }
 
+#[introspect]
 #[interface(name = "org.freedesktop.Secret.Item")]
 impl Item {
     async fn delete(

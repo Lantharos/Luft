@@ -1,3 +1,4 @@
+use luft_dbus_macros::introspect;
 use zbus::ObjectPath;
 use zbus::message::Header;
 use zbus::{fdo, interface};
@@ -18,6 +19,7 @@ impl AppChooser {
     }
 }
 
+#[introspect]
 #[interface(name = "org.freedesktop.impl.portal.AppChooser")]
 impl AppChooser {
     async fn choose_application(

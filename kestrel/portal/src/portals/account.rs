@@ -1,3 +1,4 @@
+use luft_dbus_macros::introspect;
 use zbus::ObjectPath;
 use zbus::message::Header;
 use zbus::{fdo, interface};
@@ -18,6 +19,7 @@ impl Account {
     }
 }
 
+#[introspect]
 #[interface(name = "org.freedesktop.impl.portal.Account")]
 impl Account {
     async fn get_user_information(

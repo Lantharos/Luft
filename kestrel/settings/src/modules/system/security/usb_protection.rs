@@ -1,4 +1,5 @@
 use futures_util::StreamExt;
+use luft_dbus_macros::introspect;
 use zbus::{Connection, proxy};
 
 use crate::context::Context;
@@ -6,6 +7,7 @@ use crate::shared::notify::{self, Notification, NotificationsProxy, URGENCY_NORM
 
 const SETTINGS_ACTION: &str = "settings";
 
+#[introspect]
 #[proxy(
     interface = "com.lantharos.UsbProtection1",
     default_service = "com.lantharos.UsbProtection1",

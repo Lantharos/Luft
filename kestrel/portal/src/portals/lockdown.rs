@@ -4,6 +4,7 @@ use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 
 use gio::prelude::*;
+use luft_dbus_macros::introspect;
 use tokio::sync::mpsc;
 use zbus::Variant as Value;
 use zbus::fdo::Properties;
@@ -85,6 +86,7 @@ impl Lockdown {
     }
 }
 
+#[introspect]
 #[interface(name = "org.freedesktop.impl.portal.Lockdown")]
 impl Lockdown {
     #[zbus(property, name = "disable-printing")]

@@ -1,0 +1,14 @@
+<node>
+  <interface name="com.lantharos.Settings.Printing">
+    <method name="Printers">
+      <arg type="aa{sv}" direction="out"/>
+    </method>
+    <method name="Print">
+      <arg type="s" direction="in"/>
+      <arg type="h" direction="in"/>
+      <arg type="s" direction="in"/>
+      <arg type="a{sv}" direction="in"/>
+      <arg type="u" direction="out"/>
+    </method>
+  </interface>
+</node>

@@ -17,6 +17,7 @@ getrandom.workspace = true
 hkdf.workspace = true
 hmac.workspace = true
 libc.workspace = true
+luft-dbus-macros.workspace = true
 luft-identity.workspace = true
 p256 = { workspace = true, features = ["ecdsa", "std"] }
 postcard.workspace = true

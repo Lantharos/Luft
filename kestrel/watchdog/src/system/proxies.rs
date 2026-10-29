@@ -1,8 +1,10 @@
+use luft_dbus_macros::introspect;
 use zbus::OwnedObjectPath;
 use zbus::proxy;
 
 pub const SKIP_INHIBITORS: u64 = 1 << 4;
 
+#[introspect]
 #[proxy(
     interface = "org.freedesktop.login1.Manager",
     default_service = "org.freedesktop.login1",
@@ -22,6 +24,7 @@ pub trait Login {
     fn prepare_for_sleep(&self, start: bool) -> zbus::Result<()>;
 }
 
+#[introspect]
 #[proxy(
     interface = "org.freedesktop.login1.User",
     default_service = "org.freedesktop.login1"
@@ -31,6 +34,7 @@ pub trait User {
     fn display(&self) -> zbus::Result<(String, OwnedObjectPath)>;
 }
 
+#[introspect]
 #[proxy(
     interface = "org.freedesktop.login1.Session",
     default_service = "org.freedesktop.login1"
@@ -43,6 +47,7 @@ pub trait Session {
     fn seat(&self) -> zbus::Result<(String, OwnedObjectPath)>;
 }
 
+#[introspect]
 #[proxy(
     interface = "org.freedesktop.systemd1.Manager",
     default_service = "org.freedesktop.systemd1",

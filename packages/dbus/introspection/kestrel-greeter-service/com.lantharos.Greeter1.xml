@@ -1,0 +1,49 @@
+<node>
+  <interface name="com.lantharos.Greeter1">
+    <method name="SetAppearance">
+      <arg name="wallpaper" type="h" direction="in"/>
+      <arg name="focus" type="(dd)" direction="in"/>
+    </method>
+    <method name="SetDisplays">
+      <arg name="arrangement" type="h" direction="in"/>
+    </method>
+    <method name="SetNumLock">
+      <arg name="on" type="b" direction="in"/>
+    </method>
+    <method name="SetSignInMethod">
+      <arg name="method" type="s" direction="in"/>
+    </method>
+    <method name="SetStyle">
+      <arg name="style" type="s" direction="in"/>
+    </method>
+    <method name="SetSharedWallpaper">
+      <arg name="wallpaper" type="h" direction="in"/>
+      <arg name="focus" type="(dd)" direction="in"/>
+    </method>
+    <method name="ClearSharedWallpaper">
+    </method>
+    <method name="SetShowUsers">
+      <arg name="show" type="b" direction="in"/>
+    </method>
+    <method name="SetHiddenUsers">
+      <arg name="users" type="as" direction="in"/>
+    </method>
+    <method name="SetDefaultSession">
+      <arg name="session" type="s" direction="in"/>
+    </method>
+    <method name="SetAutomaticLogin">
+      <arg name="user" type="s" direction="in"/>
+    </method>
+    <method name="RememberSession">
+      <arg name="username" type="s" direction="in"/>
+      <arg name="session" type="s" direction="in"/>
+      <arg name="sign_in_method" type="s" direction="in"/>
+    </method>
+    <property name="AutomaticLogin" type="s" access="read"/>
+    <property name="DefaultSession" type="s" access="read"/>
+    <property name="HiddenUsers" type="as" access="read"/>
+    <property name="Sessions" type="a(ss)" access="read"/>
+    <property name="SharedWallpaper" type="s" access="read"/>
+    <property name="ShowUsers" type="b" access="read"/>
+  </interface>
+</node>

@@ -1,0 +1,62 @@
+<node>
+  <interface name="com.lantharos.Trust1">
+    <method name="GenerateRecoveryKey">
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="SetUpTpmUnlock">
+      <arg name="unlock" type="s" direction="in"/>
+      <arg name="pin" type="s" direction="in"/>
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="RemoveTpmUnlock">
+      <arg name="unlock" type="s" direction="in"/>
+    </method>
+    <method name="AcceptSecureBootChange">
+    </method>
+    <method name="ShowRecoveryKey">
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="ReplaceRecoveryKey">
+      <arg name="unlock" type="s" direction="in"/>
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="EnrollSigningKey">
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="CancelSigningKeyEnrollment">
+    </method>
+    <method name="RemoveOtherKeys">
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="KeepOtherKeys">
+    </method>
+    <method name="InstallSignedStartup">
+    </method>
+    <method name="ConfirmStartup">
+    </method>
+    <method name="OtherStartups">
+      <arg type="a(sssa(qs)as)" direction="out"/>
+    </method>
+    <method name="RemoveStartups">
+      <arg name="folders" type="a(ss)" direction="in"/>
+      <arg name="partitions" type="as" direction="in"/>
+    </method>
+    <method name="RemoveOldSystem">
+    </method>
+    <method name="GrowSystem">
+      <arg name="unlock" type="s" direction="in"/>
+      <arg type="t" direction="out"/>
+    </method>
+    <method name="ResizeSystem">
+      <arg name="size" type="t" direction="in"/>
+      <arg name="unlock" type="s" direction="in"/>
+      <arg type="t" direction="out"/>
+    </method>
+    <property name="AntiCheat" type="a{sv}" access="read"/>
+    <property name="Disk" type="a{sv}" access="read"/>
+    <property name="SecureBoot" type="s" access="read"/>
+    <property name="SigningKey" type="a{sv}" access="read"/>
+    <property name="Startup" type="a{sv}" access="read"/>
+    <property name="Tpm" type="a{sv}" access="read"/>
+  </interface>
+</node>

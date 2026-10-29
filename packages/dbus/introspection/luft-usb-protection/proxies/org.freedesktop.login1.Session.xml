@@ -1,0 +1,7 @@
+<node>
+  <interface name="org.freedesktop.login1.Session">
+    <property name="Class" type="s" access="read"/>
+    <property name="LockedHint" type="b" access="read"/>
+    <property name="User" type="(uo)" access="read"/>
+  </interface>
+</node>

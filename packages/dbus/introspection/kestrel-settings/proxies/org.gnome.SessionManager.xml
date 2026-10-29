@@ -1,0 +1,9 @@
+<node>
+  <interface name="org.gnome.SessionManager">
+    <method name="Shutdown">
+    </method>
+    <method name="Logout">
+      <arg type="u" direction="in"/>
+    </method>
+  </interface>
+</node>

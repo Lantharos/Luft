@@ -1,0 +1,80 @@
+<node>
+  <interface name="org.gnome.SessionManager">
+    <method name="Setenv">
+      <arg name="name" type="s" direction="in"/>
+      <arg name="value" type="s" direction="in"/>
+    </method>
+    <method name="GetLocale">
+      <arg name="_category" type="i" direction="in"/>
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="RegisterClient">
+      <arg name="_app_id" type="s" direction="in"/>
+      <arg name="_startup_id" type="s" direction="in"/>
+      <arg type="o" direction="out"/>
+    </method>
+    <method name="UnregisterClient">
+      <arg name="path" type="o" direction="in"/>
+    </method>
+    <method name="Inhibit">
+      <arg name="app_id" type="s" direction="in"/>
+      <arg name="_toplevel_xid" type="u" direction="in"/>
+      <arg name="reason" type="s" direction="in"/>
+      <arg name="flags" type="u" direction="in"/>
+      <arg type="u" direction="out"/>
+    </method>
+    <method name="Uninhibit">
+      <arg name="cookie" type="u" direction="in"/>
+    </method>
+    <method name="IsInhibited">
+      <arg name="flags" type="u" direction="in"/>
+      <arg type="b" direction="out"/>
+    </method>
+    <method name="GetInhibitors">
+      <arg type="ao" direction="out"/>
+    </method>
+    <method name="IsSessionRunning">
+      <arg type="b" direction="out"/>
+    </method>
+    <method name="Logout">
+      <arg name="mode" type="u" direction="in"/>
+    </method>
+    <method name="Shutdown">
+    </method>
+    <method name="Reboot">
+    </method>
+    <method name="Suspend">
+    </method>
+    <method name="CanShutdown">
+      <arg type="u" direction="out"/>
+    </method>
+    <method name="CanReboot">
+      <arg type="u" direction="out"/>
+    </method>
+    <method name="CanSuspend">
+      <arg type="u" direction="out"/>
+    </method>
+    <signal name="ClientAdded">
+      <arg name="path" type="o"/>
+    </signal>
+    <signal name="ClientRemoved">
+      <arg name="path" type="o"/>
+    </signal>
+    <signal name="InhibitorAdded">
+      <arg name="path" type="o"/>
+    </signal>
+    <signal name="InhibitorRemoved">
+      <arg name="path" type="o"/>
+    </signal>
+    <signal name="SessionRunning">
+    </signal>
+    <signal name="SessionOver">
+    </signal>
+    <property name="InhibitedActions" type="u" access="read"/>
+    <property name="RestoreSupported" type="b" access="read"/>
+    <property name="SessionClass" type="s" access="read"/>
+    <property name="SessionIsActive" type="b" access="read"/>
+    <property name="SessionIsLocked" type="b" access="read"/>
+    <property name="SessionName" type="s" access="read"/>
+  </interface>
+</node>

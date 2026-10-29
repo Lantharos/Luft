@@ -1,0 +1,10 @@
+<node>
+  <interface name="com.lantharos.UsbProtection1">
+    <method name="TakeReleased">
+      <arg type="a(ss)" direction="out"/>
+    </method>
+    <signal name="Released">
+      <arg type="a(ss)"/>
+    </signal>
+  </interface>
+</node>

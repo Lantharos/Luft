@@ -4,6 +4,7 @@ use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 
 use luft_dbus::idle::Idle;
+use luft_dbus_macros::introspect;
 use tokio::sync::mpsc;
 use zbus::OwnedFd;
 use zbus::message::Header;
@@ -84,6 +85,7 @@ impl Packages {
     }
 }
 
+#[introspect]
 #[interface(name = "com.lantharos.Packages1")]
 impl Packages {
     #[zbus(property)]

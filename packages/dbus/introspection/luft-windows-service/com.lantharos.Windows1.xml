@@ -1,0 +1,17 @@
+<node>
+  <interface name="com.lantharos.Windows1">
+    <method name="Status">
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="Drives">
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="Change">
+      <arg name="device" type="s" direction="in"/>
+      <arg name="changes" type="as" direction="in"/>
+    </method>
+    <method name="ImportBluetooth">
+      <arg type="u" direction="out"/>
+    </method>
+  </interface>
+</node>

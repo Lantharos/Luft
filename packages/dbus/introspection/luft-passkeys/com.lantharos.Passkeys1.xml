@@ -1,0 +1,18 @@
+<node>
+  <interface name="com.lantharos.Passkeys1">
+    <method name="List">
+      <arg type="a(aysssssttb)" direction="out"/>
+    </method>
+    <method name="Rename">
+      <arg name="id" type="ay" direction="in"/>
+      <arg name="nickname" type="s" direction="in"/>
+    </method>
+    <method name="Delete">
+      <arg name="id" type="ay" direction="in"/>
+    </method>
+    <signal name="Changed">
+    </signal>
+    <property name="Protection" type="s" access="read"/>
+    <property name="Ready" type="b" access="read"/>
+  </interface>
+</node>

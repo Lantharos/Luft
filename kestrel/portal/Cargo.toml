@@ -12,6 +12,7 @@ futures-util.workspace = true
 gio.workspace = true
 gio-unix.workspace = true
 glib.workspace = true
+luft-dbus-macros.workspace = true
 luft-i18n.workspace = true
 rustix = { workspace = true, features = ["fs", "rand"] }
 sha2.workspace = true

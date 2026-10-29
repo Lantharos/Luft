@@ -1,0 +1,9 @@
+<node>
+  <interface name="org.freedesktop.systemd1.Manager">
+    <method name="StartUnit">
+      <arg type="s" direction="in"/>
+      <arg type="s" direction="in"/>
+      <arg type="o" direction="out"/>
+    </method>
+  </interface>
+</node>

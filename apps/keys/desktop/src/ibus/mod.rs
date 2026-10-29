@@ -8,6 +8,7 @@ use std::time::Duration;
 
 use futures_util::StreamExt;
 use luft_app::watch::{FolderWatcher, Report, Watch, WatchMask};
+use luft_dbus_macros::introspect;
 use tokio::sync::mpsc::{self, UnboundedReceiver};
 use zbus::object_server::ObjectServer;
 use zbus::{Connection, MessageStream, OwnedObjectPath, connection, fdo, interface};
@@ -38,6 +39,7 @@ enum Ended {
     Disconnected,
 }
 
+#[introspect]
 #[interface(name = "org.freedesktop.IBus.Factory")]
 impl Factory {
     async fn create_engine(
@@ -58,6 +60,7 @@ impl Factory {
     }
 }
 
+#[introspect]
 #[interface(name = "org.freedesktop.IBus.Service")]
 impl Service {
     async fn destroy(

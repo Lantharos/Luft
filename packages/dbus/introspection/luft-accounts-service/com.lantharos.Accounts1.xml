@@ -1,0 +1,41 @@
+<node>
+  <interface name="com.lantharos.Accounts1">
+    <method name="Accounts">
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="SignIn">
+      <arg name="provider" type="s" direction="in"/>
+      <arg name="credentials" type="s" direction="in"/>
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="SignInAgain">
+      <arg name="account" type="s" direction="in"/>
+      <arg name="credentials" type="s" direction="in"/>
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="Step">
+      <arg name="session" type="s" direction="in"/>
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="Answer">
+      <arg name="session" type="s" direction="in"/>
+      <arg name="answer" type="s" direction="in"/>
+    </method>
+    <method name="Cancel">
+      <arg name="session" type="s" direction="in"/>
+    </method>
+    <method name="Rename">
+      <arg name="account" type="s" direction="in"/>
+      <arg name="name" type="s" direction="in"/>
+    </method>
+    <method name="Remove">
+      <arg name="account" type="s" direction="in"/>
+    </method>
+    <signal name="Changed">
+    </signal>
+    <signal name="SignInStep">
+      <arg name="session" type="s"/>
+      <arg name="step" type="s"/>
+    </signal>
+  </interface>
+</node>

@@ -1,0 +1,8 @@
+<node>
+  <interface name="com.lantharos.Kestrel.Watchdog1">
+    <method name="Report">
+      <arg type="t" direction="in"/>
+      <arg type="u" direction="in"/>
+    </method>
+  </interface>
+</node>

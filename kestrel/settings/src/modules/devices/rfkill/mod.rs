@@ -5,6 +5,7 @@ use std::borrow::Cow;
 use std::collections::HashMap;
 
 use futures_util::StreamExt;
+use luft_dbus_macros::introspect;
 use tokio::sync::mpsc;
 use zbus::Variant;
 use zbus::fdo::{ObjectManagerProxy, Properties};
@@ -30,6 +31,7 @@ const SESSION_MANAGER: Endpoint = Endpoint {
     interface: "org.gnome.SessionManager",
 };
 
+#[introspect]
 #[proxy(
     interface = "org.freedesktop.NetworkManager",
     default_service = "org.freedesktop.NetworkManager",

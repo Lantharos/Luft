@@ -1,0 +1,16 @@
+<node>
+  <interface name="org.freedesktop.login1.Manager">
+    <method name="RebootWithFlags">
+      <arg type="t" direction="in"/>
+    </method>
+    <method name="GetUser">
+      <arg type="u" direction="in"/>
+      <arg type="o" direction="out"/>
+    </method>
+    <signal name="PrepareForSleep">
+      <arg type="b"/>
+    </signal>
+    <property name="PreparingForShutdown" type="b" access="read"/>
+    <property name="PreparingForSleep" type="b" access="read"/>
+  </interface>
+</node>

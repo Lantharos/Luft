@@ -16,6 +16,7 @@ gio.workspace = true
 gio-unix.workspace = true
 libc.workspace = true
 luft-app = { workspace = true, features = ["apps", "launch", "settings"] }
+luft-dbus-macros.workspace = true
 nvml-wrapper.workspace = true
 parking_lot.workspace = true
 sabine.workspace = true

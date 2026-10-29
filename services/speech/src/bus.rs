@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use luft_dbus_macros::introspect;
 use luft_speech::types::{Download, Language, Model, Overview};
 use zbus::fdo::DBusProxy;
 use zbus::interface;
@@ -69,6 +70,7 @@ pub fn serve(hub: &Arc<Hub>, bus: DBusProxy<'static>) -> (Dictation, Models) {
     )
 }
 
+#[introspect]
 #[interface(name = "com.lantharos.Speech1")]
 impl Dictation {
     async fn start(&self, #[zbus(header)] header: Header<'_>, layout: String) -> Result<(), Error> {
@@ -123,6 +125,7 @@ impl Dictation {
     pub async fn level(emitter: &SignalEmitter<'_>, level: f64) -> zbus::Result<()>;
 }
 
+#[introspect]
 #[interface(name = "com.lantharos.Speech1.Models")]
 impl Models {
     fn overview(&self) -> String {

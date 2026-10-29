@@ -1,0 +1,5 @@
+<node>
+  <interface name="org.freedesktop.login1.Seat">
+    <property name="ActiveSession" type="(so)" access="read"/>
+  </interface>
+</node>

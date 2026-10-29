@@ -10,6 +10,7 @@ futures-util = { workspace = true, features = ["std"] }
 gio.workspace = true
 glib = { workspace = true, features = ["v2_72"] }
 luft-dbus.workspace = true
+luft-dbus-macros.workspace = true
 luft-i18n.workspace = true
 pulseaudio.workspace = true
 rustix = { workspace = true, features = ["fs", "process"] }

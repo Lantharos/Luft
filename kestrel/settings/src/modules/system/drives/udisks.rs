@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use luft_dbus::objects::Object;
+use luft_dbus_macros::introspect;
 use zbus::proxy::CacheProperties;
 use zbus::{Connection, Variant, proxy};
 
@@ -11,6 +12,7 @@ pub const DRIVE: &str = "org.freedesktop.UDisks2.Drive";
 pub const FILESYSTEM: &str = "org.freedesktop.UDisks2.Filesystem";
 pub const PARTITION: &str = "org.freedesktop.UDisks2.Partition";
 
+#[introspect]
 #[proxy(
     interface = "org.freedesktop.UDisks2.Filesystem",
     default_service = "org.freedesktop.UDisks2"

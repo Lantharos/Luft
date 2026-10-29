@@ -1,0 +1,5 @@
+<node>
+  <interface name="org.freedesktop.login1.Session">
+    <property name="Class" type="s" access="read"/>
+  </interface>
+</node>

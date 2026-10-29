@@ -12,6 +12,7 @@ futures-util = { workspace = true, features = ["std"] }
 gio.workspace = true
 glib.workspace = true
 luft-dbus.workspace = true
+luft-dbus-macros.workspace = true
 luft-identity.workspace = true
 tokio = { workspace = true, features = ["macros", "rt", "signal", "sync", "time"] }
 zbus = { workspace = true, features = ["proxy", "service", "tokio"] }

@@ -1,5 +1,6 @@
 use luft_app::dbus::{self, failed};
 use luft_app::identity::caller;
+use luft_dbus_macros::introspect;
 use luft_software::progress::Progress;
 use zbus::fdo::{self, RequestNameFlags};
 use zbus::message::Header;
@@ -12,6 +13,7 @@ pub const NAME: &str = "com.lantharos.Schelf";
 pub const PATH: &str = "/com/lantharos/Schelf";
 pub const UNKNOWN_FRACTION: f64 = -1.0;
 
+#[introspect]
 #[proxy(
     interface = "com.lantharos.Schelf1",
     default_service = "com.lantharos.Schelf",
@@ -33,6 +35,7 @@ struct Operations {
     queue: Queue,
 }
 
+#[introspect]
 #[interface(name = "com.lantharos.Schelf1")]
 impl Operations {
     async fn start(

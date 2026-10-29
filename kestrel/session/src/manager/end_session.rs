@@ -2,6 +2,7 @@ use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
 use futures_util::StreamExt;
+use luft_dbus_macros::introspect;
 use tokio::task::AbortHandle;
 use zbus::OwnedObjectPath;
 use zbus::proxy::CacheProperties;
@@ -39,6 +40,7 @@ impl Action {
     }
 }
 
+#[introspect]
 #[proxy(
     interface = "org.gnome.SessionManager.EndSessionDialog",
     default_service = "org.gnome.Shell",

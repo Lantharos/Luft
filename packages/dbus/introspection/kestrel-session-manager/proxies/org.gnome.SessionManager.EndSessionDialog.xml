@@ -1,0 +1,10 @@
+<node>
+  <interface name="org.gnome.SessionManager.EndSessionDialog">
+    <method name="Open">
+      <arg type="u" direction="in"/>
+      <arg type="u" direction="in"/>
+      <arg type="u" direction="in"/>
+      <arg type="ao" direction="in"/>
+    </method>
+  </interface>
+</node>

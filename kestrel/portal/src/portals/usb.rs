@@ -1,3 +1,4 @@
+use luft_dbus_macros::introspect;
 use zbus::message::Header;
 use zbus::{ObjectPath, OwnedVariant as OwnedValue};
 use zbus::{fdo, interface};
@@ -29,6 +30,7 @@ fn granted(devices: Vec<Device>, chosen: &[String]) -> OwnedValue {
     owned(granted)
 }
 
+#[introspect]
 #[interface(name = "org.freedesktop.impl.portal.Usb")]
 impl Usb {
     async fn acquire_devices(

@@ -11,6 +11,7 @@ rust-version.workspace = true
 futures-util.workspace = true
 libc.workspace = true
 luft-dbus.workspace = true
+luft-dbus-macros.workspace = true
 zbus = { workspace = true, features = ["proxy", "tokio"] }
 
 [dev-dependencies]

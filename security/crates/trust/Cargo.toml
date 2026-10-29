@@ -15,6 +15,7 @@ clap.workspace = true
 getrandom.workspace = true
 libc.workspace = true
 luft-dbus.workspace = true
+luft-dbus-macros.workspace = true
 luft-identity.workspace = true
 luft-disks.workspace = true
 luft-meet.workspace = true

@@ -1,0 +1,40 @@
+<node>
+  <interface name="com.lantharos.Installer1">
+    <method name="Survey">
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="Install">
+      <arg name="request" type="s" direction="in"/>
+    </method>
+    <method name="Configure">
+      <arg name="regional" type="s" direction="in"/>
+    </method>
+    <method name="CreateAccount">
+      <arg name="name" type="s" direction="in"/>
+      <arg name="full_name" type="s" direction="in"/>
+      <arg name="password" type="s" direction="in"/>
+    </method>
+    <method name="FinishFirstBoot">
+    </method>
+    <method name="EnrollSigningKey">
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="EnrollFingerprint">
+      <arg name="finger" type="s" direction="in"/>
+    </method>
+    <method name="StopFingerprint">
+    </method>
+    <method name="UseLanguage">
+      <arg name="language" type="s" direction="in"/>
+    </method>
+    <signal name="FingerprintStatus">
+      <arg name="result" type="s"/>
+      <arg name="done" type="b"/>
+    </signal>
+    <property name="Error" type="s" access="read"/>
+    <property name="Phase" type="s" access="read"/>
+    <property name="Progress" type="d" access="read"/>
+    <property name="SecureBootCode" type="s" access="read"/>
+    <property name="Stage" type="s" access="read"/>
+  </interface>
+</node>

@@ -10,9 +10,10 @@ rust-version.workspace = true
 [dependencies]
 anyhow.workspace = true
 luft-dbus.workspace = true
+luft-dbus-macros.workspace = true
 rustix = { workspace = true, features = ["time"] }
 tokio = { workspace = true, features = ["macros", "rt", "sync", "time"] }
-zbus = { workspace = true, features = ["tokio"] }
+zbus = { workspace = true, features = ["service", "tokio"] }
 
 [dev-dependencies]
 tempfile.workspace = true

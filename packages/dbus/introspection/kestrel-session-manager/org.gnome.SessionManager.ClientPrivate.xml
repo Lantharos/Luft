@@ -1,0 +1,18 @@
+<node>
+  <interface name="org.gnome.SessionManager.ClientPrivate">
+    <method name="EndSessionResponse">
+      <arg name="_is_ok" type="b" direction="in"/>
+      <arg name="_reason" type="s" direction="in"/>
+    </method>
+    <signal name="Stop">
+    </signal>
+    <signal name="QueryEndSession">
+      <arg name="flags" type="u"/>
+    </signal>
+    <signal name="EndSession">
+      <arg name="flags" type="u"/>
+    </signal>
+    <signal name="CancelEndSession">
+    </signal>
+  </interface>
+</node>

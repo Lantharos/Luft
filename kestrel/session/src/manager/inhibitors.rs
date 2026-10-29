@@ -2,6 +2,7 @@ use std::collections::BTreeMap;
 use std::sync::Mutex;
 use std::sync::atomic::{AtomicU32, Ordering};
 
+use luft_dbus_macros::introspect;
 use zbus::object_server::SignalEmitter;
 use zbus::{Connection, interface};
 use zbus::{ObjectPath, OwnedObjectPath, Variant};
@@ -16,6 +17,7 @@ struct Inhibitor {
     flags: u32,
 }
 
+#[introspect]
 #[interface(name = "org.gnome.SessionManager.Inhibitor")]
 impl Inhibitor {
     fn get_app_id(&self) -> &str {

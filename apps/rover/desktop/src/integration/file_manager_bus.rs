@@ -1,5 +1,6 @@
 use std::env;
 
+use luft_dbus_macros::introspect;
 use tokio::process::Command;
 use url::Url;
 use zbus::interface;
@@ -12,6 +13,7 @@ const SERVICE_PATH: &str = "/org/freedesktop/FileManager1";
 
 struct FileManager;
 
+#[introspect]
 #[interface(interface = "org.freedesktop.FileManager1")]
 impl FileManager {
     async fn show_items(&self, uris: Vec<String>, startup_id: String) {

@@ -1,0 +1,31 @@
+<node>
+  <interface name="com.lantharos.Accounts1.Files">
+    <method name="Drives">
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="States">
+      <arg name="folder" type="s" direction="in"/>
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="Keep">
+      <arg name="paths_to_keep" type="as" direction="in"/>
+    </method>
+    <method name="Free">
+      <arg name="paths_to_free" type="as" direction="in"/>
+    </method>
+    <method name="ShareLink">
+      <arg name="path" type="s" direction="in"/>
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="WebAddress">
+      <arg name="path" type="s" direction="in"/>
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="DismissConflict">
+      <arg name="account" type="s" direction="in"/>
+      <arg name="copy" type="s" direction="in"/>
+    </method>
+    <signal name="DrivesChanged">
+    </signal>
+  </interface>
+</node>

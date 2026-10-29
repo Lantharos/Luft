@@ -3,6 +3,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 
 use luft_dbus::idle::Idle;
+use luft_dbus_macros::introspect;
 use luft_i18n::t;
 use luft_installer_contract::{InstallPlan, Regional};
 use luft_meet::Handoff;
@@ -119,6 +120,7 @@ async fn forward(installer: InterfaceRef<Installer>, mut updates: watch::Receive
     }
 }
 
+#[introspect]
 #[interface(name = "com.lantharos.Installer1")]
 impl Installer {
     #[zbus(property)]

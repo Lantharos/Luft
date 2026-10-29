@@ -1,6 +1,7 @@
 use std::sync::Arc;
 use std::sync::atomic::{AtomicU64, Ordering};
 
+use luft_dbus_macros::introspect;
 use tokio::sync::Mutex;
 use zbus::object_server::{ObjectServer, SignalEmitter};
 use zbus::{OwnedObjectPath, Variant};
@@ -74,6 +75,7 @@ async fn run(daemon: &Arc<Daemon>, action: Action) -> (bool, Variant<'static>) {
     (unlocked.is_empty(), Variant::from(unlocked))
 }
 
+#[introspect]
 #[interface(name = "org.freedesktop.Secret.Prompt")]
 impl PromptObject {
     async fn prompt(&self, _window_id: &str) {

@@ -9,6 +9,7 @@ rust-version.workspace = true
 
 [dependencies]
 futures-util.workspace = true
+luft-dbus-macros.workspace = true
 serde.workspace = true
 tokio = { workspace = true, features = ["sync", "time"] }
 zbus = { workspace = true, features = ["proxy", "tokio"] }

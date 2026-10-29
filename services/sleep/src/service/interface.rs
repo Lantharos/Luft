@@ -2,6 +2,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use luft_dbus::idle::Idle;
+use luft_dbus_macros::introspect;
 use zbus::message::Header;
 use zbus::object_server::SignalEmitter;
 use zbus::{Connection, interface};
@@ -21,6 +22,7 @@ impl Sleep {
     }
 }
 
+#[introspect]
 #[interface(name = "com.lantharos.Sleep1")]
 impl Sleep {
     async fn set_power_off_after(

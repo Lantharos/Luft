@@ -1,0 +1,6 @@
+<node>
+  <interface name="org.freedesktop.GeoClue2.Location">
+    <property name="Latitude" type="d" access="read"/>
+    <property name="Longitude" type="d" access="read"/>
+  </interface>
+</node>

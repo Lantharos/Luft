@@ -1,0 +1,8 @@
+<node>
+  <interface name="org.freedesktop.IBus.Factory">
+    <method name="CreateEngine">
+      <arg name="name" type="s" direction="in"/>
+      <arg type="o" direction="out"/>
+    </method>
+  </interface>
+</node>

@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use luft_dbus_macros::introspect;
 use luft_keyring_vault::Action;
 use zbus::message::Header;
 use zbus::object_server::SignalEmitter;
@@ -35,6 +36,7 @@ fn action_name(action: Action) -> &'static str {
     }
 }
 
+#[introspect]
 #[interface(name = "com.lantharos.Keyring1.Access")]
 impl Access {
     async fn app_stores(&self, #[zbus(header)] header: Header<'_>) -> fdo::Result<Vec<Store>> {

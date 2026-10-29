@@ -1,0 +1,37 @@
+<node>
+  <interface name="org.freedesktop.impl.portal.PermissionStore">
+    <method name="Lookup">
+      <arg type="s" direction="in"/>
+      <arg type="s" direction="in"/>
+      <arg type="a{sas}" direction="out"/>
+      <arg type="v" direction="out"/>
+    </method>
+    <method name="SetPermission">
+      <arg type="s" direction="in"/>
+      <arg type="b" direction="in"/>
+      <arg type="s" direction="in"/>
+      <arg type="s" direction="in"/>
+      <arg type="as" direction="in"/>
+    </method>
+    <method name="DeletePermission">
+      <arg type="s" direction="in"/>
+      <arg type="s" direction="in"/>
+      <arg type="s" direction="in"/>
+    </method>
+    <method name="Delete">
+      <arg type="s" direction="in"/>
+      <arg type="s" direction="in"/>
+    </method>
+    <method name="List">
+      <arg type="s" direction="in"/>
+      <arg type="as" direction="out"/>
+    </method>
+    <signal name="Changed">
+      <arg type="s"/>
+      <arg type="s"/>
+      <arg type="b"/>
+      <arg type="v"/>
+      <arg type="a{sas}"/>
+    </signal>
+  </interface>
+</node>

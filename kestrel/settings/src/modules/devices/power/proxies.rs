@@ -1,5 +1,7 @@
+use luft_dbus_macros::introspect;
 use zbus::proxy;
 
+#[introspect]
 #[proxy(
     interface = "org.gnome.Mutter.IdleMonitor",
     default_service = "org.gnome.Mutter.IdleMonitor",
@@ -14,6 +16,7 @@ pub trait IdleMonitor {
     fn watch_fired(&self, id: u32) -> zbus::Result<()>;
 }
 
+#[introspect]
 #[proxy(
     interface = "org.gnome.Mutter.DisplayConfig",
     default_service = "org.gnome.Mutter.DisplayConfig",
@@ -24,6 +27,7 @@ pub trait DisplayConfig {
     fn set_power_save_mode(&self, mode: i32) -> zbus::Result<()>;
 }
 
+#[introspect]
 #[proxy(
     interface = "com.lantharos.Kestrel.Brightness",
     default_service = "com.lantharos.Kestrel.Brightness",
@@ -37,6 +41,7 @@ pub trait ShellBrightness {
     fn brightness_changed(&self) -> zbus::Result<()>;
 }
 
+#[introspect]
 #[proxy(
     interface = "org.gnome.ScreenSaver",
     default_service = "org.gnome.ScreenSaver",
@@ -53,6 +58,7 @@ pub trait ScreenSaver {
     fn wake_up_screen(&self) -> zbus::Result<()>;
 }
 
+#[introspect]
 #[proxy(
     interface = "org.gnome.SessionManager",
     default_service = "org.gnome.SessionManager",
@@ -63,6 +69,7 @@ pub trait SessionManager {
     fn logout(&self, mode: u32) -> zbus::Result<()>;
 }
 
+#[introspect]
 #[proxy(
     interface = "org.freedesktop.UPower.KbdBacklight",
     default_service = "org.freedesktop.UPower",
@@ -77,6 +84,7 @@ pub trait KbdBacklight {
     fn brightness_changed_with_source(&self, value: i32, source: String) -> zbus::Result<()>;
 }
 
+#[introspect]
 #[proxy(
     interface = "org.freedesktop.UPower.PowerProfiles",
     default_service = "org.freedesktop.UPower.PowerProfiles",
@@ -87,6 +95,7 @@ pub trait PowerProfiles {
     fn release_profile(&self, cookie: u32) -> zbus::Result<()>;
 }
 
+#[introspect]
 #[proxy(
     interface = "net.hadess.SensorProxy",
     default_service = "net.hadess.SensorProxy",

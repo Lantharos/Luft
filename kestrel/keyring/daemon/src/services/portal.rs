@@ -3,6 +3,7 @@ use std::io::Write;
 use std::os::fd::AsFd;
 use std::sync::Arc;
 
+use luft_dbus_macros::introspect;
 use luft_keyring_vault::{Action, DEFAULT_ALIAS, Item, LOGIN, Secret};
 use zbus::message::Header;
 use zbus::{Fd, ObjectPath, OwnedVariant};
@@ -92,6 +93,7 @@ fn kept_for(item: &Item, requester: &Requester, app_id: &str) -> bool {
         && sandboxed_owner(item) == requester.sandboxed_app()
 }
 
+#[introspect]
 #[interface(name = "org.freedesktop.impl.portal.Secret")]
 impl Portal {
     async fn retrieve_secret(

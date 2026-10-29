@@ -1,0 +1,7 @@
+<node>
+  <interface name="org.gtk.Settings">
+    <property name="EnableAnimations" type="b" access="read"/>
+    <property name="FontconfigTimestamp" type="x" access="read"/>
+    <property name="Modules" type="s" access="read"/>
+  </interface>
+</node>

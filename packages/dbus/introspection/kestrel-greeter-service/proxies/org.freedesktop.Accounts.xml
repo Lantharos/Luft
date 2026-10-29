@@ -1,0 +1,8 @@
+<node>
+  <interface name="org.freedesktop.Accounts">
+    <method name="FindUserByName">
+      <arg type="s" direction="in"/>
+      <arg type="o" direction="out"/>
+    </method>
+  </interface>
+</node>

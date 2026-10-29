@@ -3,6 +3,7 @@
 use std::collections::HashMap;
 
 use futures_util::{Stream, StreamExt};
+use luft_dbus_macros::introspect;
 use zbus::OwnedVariant;
 use zbus::{Connection, proxy};
 
@@ -65,6 +66,7 @@ pub const BUS: Permission = Permission {
 /// Sandboxed apps' choices about items in Luft Keyring, one entry per item.
 pub const KEYRING_ITEMS: &str = "keyring-items";
 
+#[introspect]
 #[proxy(
     interface = "org.freedesktop.impl.portal.PermissionStore",
     default_service = "org.freedesktop.impl.portal.PermissionStore",

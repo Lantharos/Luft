@@ -4,6 +4,7 @@ use std::process::{Command, Stdio};
 use crate::app::App;
 
 pub const NO_SANDBOX: &str = "--no-sandbox";
+const SABINE_FULL_ACCESS: &str = "SABINE_FULL_ACCESS";
 
 fn namespace_sandbox_works() -> bool {
     Command::new("unshare")
@@ -26,7 +27,9 @@ fn namespace_sandbox_works() -> bool {
 /// Returns only when it can't be started.
 pub fn exec(app: &App, arguments: Vec<String>) -> String {
     let mut command = Command::new(&app.image);
-    command.env("DESKTOPINTEGRATION", "1");
+    command
+        .env("DESKTOPINTEGRATION", "1")
+        .env(SABINE_FULL_ACCESS, "1");
     if app.chromium
         && !arguments.iter().any(|argument| argument == NO_SANDBOX)
         && !namespace_sandbox_works()

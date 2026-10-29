@@ -2,6 +2,7 @@ use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 
 use super::devices::Decoys;
+use super::display::x11;
 use super::folder::{self, Folder, INSIDE_SERVER, SERVER_SOCKET};
 use super::seccomp::FILTER_FD;
 use super::unsandboxed::NO_SANDBOX;
@@ -10,8 +11,9 @@ use crate::portal::Layout;
 
 pub const INFO_FD: i32 = 5;
 const INSIDE_APP: &str = "/app";
-const INSIDE_LAUNCHER: &str = "/run/luft-sandbox-server";
+pub const INSIDE_LAUNCHER: &str = "/run/luft-sandbox-server";
 const OUTER_USER_NAMESPACE: &str = "/run/.userns";
+const X11_AUTHORITY: &str = "Xauthority";
 const APP_RUN: &str = "/app/AppRun";
 const SYSTEMD_RUN: &str = "/usr/bin/systemd-run";
 const ZYPAK: &str = "/usr/lib/zypak";
@@ -56,6 +58,7 @@ pub struct Profile<'a> {
     pub mount: &'a Path,
     pub bus: &'a Path,
     pub wayland: Option<PathBuf>,
+    pub x11: Option<&'a x11::Display>,
     pub decoys: &'a Decoys,
 }
 
@@ -126,12 +129,6 @@ fn nvidia_devices() -> Vec<PathBuf> {
         .collect()
 }
 
-fn x11_socket() -> Option<PathBuf> {
-    let display = std::env::var("DISPLAY").ok()?;
-    let number = display.strip_prefix(':')?.split('.').next()?;
-    Some(PathBuf::from(format!("/tmp/.X11-unix/X{number}")))
-}
-
 fn zypak() -> Option<&'static Path> {
     let zypak = Path::new(ZYPAK);
     zypak.join(ZYPAK_HELPER).exists().then_some(zypak)
@@ -168,6 +165,7 @@ impl Profile<'_> {
         arguments
             .flag("--tmpfs")
             .flag("/run")
+            .bind("--ro-bind", launcher, INSIDE_LAUNCHER)
             .same("--ro-bind-try", "/run/systemd/resolve")
             .same("--ro-bind-try", "/run/udev")
             .bind("--ro-bind-try", "/proc/self/ns/user", OUTER_USER_NAMESPACE)
@@ -212,11 +210,15 @@ impl Profile<'_> {
         if let Some(wayland) = &self.wayland {
             arguments.bind("--bind", wayland, folder::runtime_dir()?.join("wayland-0"));
         }
-        if let Some(socket) = x11_socket() {
-            arguments.same("--ro-bind-try", socket);
-        }
-        if let Some(authority) = std::env::var_os("XAUTHORITY") {
-            arguments.same("--ro-bind-try", PathBuf::from(authority));
+        if let Some(x11) = self.x11 {
+            arguments.bind("--ro-bind-try", &x11.socket, x11::SOCKET);
+            if let Some(authority) = &x11.authority {
+                arguments.bind(
+                    "--ro-bind",
+                    authority,
+                    folder::runtime_dir()?.join(X11_AUTHORITY),
+                );
+            }
         }
         Ok(arguments)
     }
@@ -327,7 +329,13 @@ impl Profile<'_> {
         if self.wayland.is_some() {
             arguments.set("WAYLAND_DISPLAY", "wayland-0");
         }
-        for name in ["DISPLAY", "XAUTHORITY"].into_iter().chain(PASSED_ON) {
+        if let Some(x11) = self.x11 {
+            arguments.set("DISPLAY", x11::DISPLAY);
+            if x11.authority.is_some() {
+                arguments.set("XAUTHORITY", runtime.join(X11_AUTHORITY));
+            }
+        }
+        for name in PASSED_ON {
             if let Some(value) = std::env::var_os(name) {
                 arguments.set(name, value);
             }
@@ -395,7 +403,6 @@ impl Profile<'_> {
         arguments.0.extend(self.mounts(&home, &launcher)?.0);
         arguments
             .bind("--bind", self.folder.server(), INSIDE_SERVER)
-            .bind("--ro-bind", &launcher, INSIDE_LAUNCHER)
             .flag("--seccomp")
             .flag(&FILTER_FD.to_string())
             .flag("--info-fd")

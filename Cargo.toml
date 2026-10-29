@@ -207,6 +207,7 @@ jiff = "0.2.38"
 jpeg-encoder = "0.7.1"
 jxl-oxide = { version = "0.12.6", features = ["image"] }
 kamadak-exif = "0.6.1"
+landlock = "0.4.7"
 lettre = { version = "0.11.23", default-features = false }
 libc = "0.2.191"
 libloading = "0.9.0"

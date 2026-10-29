@@ -1,4 +1,5 @@
 mod devices;
+mod display;
 pub mod fds;
 mod folder;
 mod mount;
@@ -7,7 +8,6 @@ mod proxy;
 pub mod seccomp;
 mod unsandboxed;
 mod wait;
-mod wayland;
 
 use std::process::Command;
 use std::time::{Duration, Instant};
@@ -19,7 +19,9 @@ use crate::escalate::{self, Reason};
 use crate::files;
 use crate::portal::Bus;
 use crate::request::Request;
+use display::{wayland, x11};
 use folder::{Folder, Lock};
+pub use profile::INSIDE_LAUNCHER;
 use profile::Profile;
 use wait::Event;
 
@@ -88,6 +90,7 @@ fn sandbox(
     let mounted = mount::Image::mount(&app.image, &folder.mount_point())?;
     let proxy = proxy::Proxy::start(folder, &info, &app.id, &grants.bus)?;
     let display = wayland::SecurityContext::create(&folder.wayland_socket(), &app.id)?;
+    let x11 = x11::Display::of_session(&folder.x11_authority());
     let decoys = devices::Decoys::plant(&folder.decoys(), grants)?;
     let filter = seccomp::filter()?;
     let relay = folder.relay();
@@ -99,6 +102,7 @@ fn sandbox(
         mount: mounted.path(),
         bus: &relay,
         wayland: display.as_ref().map(|_| folder.wayland_socket()),
+        x11: x11.as_ref(),
         decoys: &decoys,
     };
     let bus = Bus::start(relay.clone(), proxy.socket(), profile.layout()?)?;

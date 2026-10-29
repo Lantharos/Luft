@@ -49,7 +49,7 @@ impl SecurityContext {
             return Ok(None);
         };
         let listener = UnixListener::bind(socket).map_err(|error| error.to_string())?;
-        let (close_read, close_write) = super::fds::pipe()?;
+        let (close_read, close_write) = crate::launch::fds::pipe()?;
         let context = manager.create_listener(listener.as_fd(), close_read.as_fd(), &handle, ());
         context.set_sandbox_engine(ENGINE.to_owned());
         context.set_app_id(id.to_owned());

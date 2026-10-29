@@ -110,6 +110,10 @@ impl Folder {
         self.path.join("wayland")
     }
 
+    pub fn x11_authority(&self) -> PathBuf {
+        self.path.join("Xauthority")
+    }
+
     pub fn decoys(&self) -> PathBuf {
         self.path.join("devices")
     }
@@ -163,7 +167,14 @@ impl Folder {
     /// shared temporary files.
     pub fn clean(&self) {
         super::mount::unmount_leftover(&self.mount_point());
-        for name in ["bus", "server", "devices", "wayland", "flatpak-info"] {
+        for name in [
+            "bus",
+            "server",
+            "devices",
+            "wayland",
+            "Xauthority",
+            "flatpak-info",
+        ] {
             let path = self.path.join(name);
             let _ = fs::remove_dir_all(&path).or_else(|_| fs::remove_file(&path));
         }

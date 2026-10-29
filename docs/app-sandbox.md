@@ -51,7 +51,7 @@ Schelf reads the declaration from the AppImage before it installs it and shows i
 | `sandbox` / `bus` | The extra session bus names it can call |
 | `full-access` / `full-access` | It runs outside the sandbox |
 
-An app that asks to run unsandboxed gets Schelf's full access confirmation, with its reason, before it installs; cancelling installs nothing. `schelf install` installs it in its sandbox and says what it asked for, and `schelf trust` gives it full access. Its page in Schelf keeps the full access switch with its reason, and Settings → Apps lists everything in the store, its folders, network, devices and bus names included, so anything can be taken back later. An AppImage without a declaration gets the sandbox every AppImage gets, with network and nothing else.
+An app that asks to run unsandboxed gets Schelf's full access confirmation, with its reason, before it installs; cancelling installs nothing. `schelf install` installs it in its sandbox and says what it asked for, and `schelf trust` gives it full access. Its page in Schelf keeps the full access switch with its reason, and Settings → Apps lists everything in the store, its folders, network, devices and bus names included, so anything can be taken back later. An AppImage without a declaration gets the sandbox every AppImage gets, with network and nothing else. Outside a sandbox, a Sabine app holds itself to its declaration with Landlock; Schelf starts an app you gave full access with `SABINE_FULL_ACCESS` set, so it doesn't.
 
 ## One Chromium for Luft, one each for everyone else
 
@@ -63,7 +63,7 @@ Chromium sandboxes its renderers with user namespaces, which the AppImage sandbo
 
 - The image ships Zypak. The sandbox starts Chromium and Electron apps through it, and tells Sabine where it is, which starts its own Chromium through it.
 - The sandbox serves `org.freedesktop.portal.Flatpak` itself. The app's bus goes through a relay that answers that one name and passes everything else to `xdg-dbus-proxy` unchanged.
-- `Spawn` starts the process in a sandbox that joins the app's user and process namespaces, so it can't create namespaces either, with the same system call filter. It never gets more than the app: with the sandbox flag it gets only `/usr`, the app's files and what the caller exposes read-only, without home, devices, display, sound or bus unless asked for, and `NoNetwork` takes the network away. `SpawnSignal`, `SpawnStarted`, `SpawnExited` and the bus watch work as in Flatpak.
+- `Spawn` starts the process in a sandbox that joins the app's user and process namespaces, so it can't create namespaces either, with the same system call filter, and confined by Landlock to its own mounts as the app is. It never gets more than the app: with the sandbox flag it gets only `/usr`, the app's files and what the caller exposes read-only, without home, devices, display, sound or bus unless asked for, and `NoNetwork` takes the network away. `SpawnSignal`, `SpawnStarted`, `SpawnExited` and the bus watch work as in Flatpak.
 
 Renderers then run in their own namespaces with Chromium's system call filter, as in a Flatpak, and the apps no longer need `--no-sandbox`.
 

@@ -19,6 +19,10 @@ pub fn serve(arguments: Vec<String>) -> i32 {
             return 1;
         }
     };
+    if let Err(error) = crate::confine::confine() {
+        eprintln!("The sandbox couldn't be confined: {error}");
+        return 1;
+    }
     let running = Arc::new(Mutex::new(0usize));
     let first = listener
         .accept()

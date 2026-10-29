@@ -14,7 +14,7 @@ use zbus::{Fd, Variant as Value};
 use super::PATH;
 use super::message::Outgoing;
 use super::relay::{Client, PORTAL_NAME};
-use crate::launch::{BWRAP, child_pid, fds, seccomp};
+use crate::launch::{BWRAP, INSIDE_LAUNCHER, child_pid, fds, seccomp};
 
 const SANDBOX: u32 = 1 << 2;
 const NO_NETWORK: u32 = 1 << 3;
@@ -306,7 +306,7 @@ pub fn start(layout: &Layout, sandbox: u32, request: Request) -> Result<Started,
     }
     arguments.push("--chdir".into());
     arguments.push(request.directory.clone().into_os_string());
-    arguments.push("--".into());
+    arguments.extend(["--", INSIDE_LAUNCHER, crate::CONFINE].map(OsString::from));
     arguments.extend(request.argv.iter().cloned());
     let mut command = Command::new(BWRAP);
     command.args(arguments).stdin(Stdio::null());

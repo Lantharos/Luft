@@ -13,7 +13,7 @@ declare -A laptops=([laptop]=1920x1200:302x189mm [laptop15]=1920x1080:344x194mm)
 laptop_areas=(board input:dictation input:scrolling panel:battery panel:repaints panel:screenshot tablet:keyboard tablet:longPress windows:serverDecorations windows:x11Frames)
 taskbar_positions=(left top right)
 position_areas=(taskbar start panel tiling)
-two_display_groups=(tiling:monitors)
+two_display_groups=(tiling:monitors system:dimming)
 second_display=1280x720
 
 usage() {

@@ -13,7 +13,7 @@ Build Kestrel first (see [Building Luft](https://docs.luft.computer/developers/b
 | `kestrel/tools/session.sh greeter` | Only the login screen checks, against a stand-in greetd |
 | `kestrel/tools/session.sh setup` | Only the first-run setup checks, in Kestrel's setup mode with Install Luft |
 | `kestrel/tools/session.sh scaling` | The default display scale for laptop panels and monitors of different sizes, as virtual monitors |
-| `kestrel/tools/session.sh performance` | Startup memory, the longest stall while Kestrel prepares its surfaces after startup, search, notification bursts, actor reuse, memory after a burst of copied pictures, CPU while a tray icon animates, the cost of a window opening under the task view, idle paints, idle wakeups and CPU of Kestrel and its settings service, paints and memory while the screen is locked, and the session manager's memory, CPU time and idle wakeups |
+| `kestrel/tools/session.sh performance` | Startup memory, the longest stall while Kestrel prepares its surfaces after startup, search, notification bursts, actor reuse, memory after a burst of copied pictures, CPU while a tray icon animates, the cost of a window opening under the task view, idle paints, idle wakeups and CPU of Kestrel and its settings service, paints and wakeups while the screen is dimmed, paints and memory while the screen is locked, and the session manager's memory, CPU time and idle wakeups |
 | `kestrel/tools/session.sh frames` | Frame times of animations and gestures, see [Frame timing](#frame-timing) |
 | `kestrel/tools/session.sh motion` | Every painted frame of animations, see [Motion clips](#motion-clips) |
 
@@ -33,7 +33,7 @@ The `taskbar`, `start`, `panel` and `tiling` groups also run with the taskbar on
 
 Headless sessions run Kestrel through `kestrel-wrapper`, as the real session does, so a Kestrel that crashes starts again. `system:reconnect` relies on it: it opens Rover and Settings, moves Rover to the second workspace, maximizes Settings and locks the screen, then crashes Kestrel. In the Kestrel that takes over, it checks that the screen is still locked, that both apps reconnect without reloading their pages and that their windows come back where they were. Pointing `KESTREL_QT_APP` at a Qt 6 program adds its window to the check.
 
-`tiling:monitors` always runs with a second 1280×720 display to the right of the first, which the other groups only get from `KESTREL_CAPTURE_SECONDARY_SIZE`.
+`tiling:monitors` and `system:dimming` always run with a second 1280×720 display to the right of the first, which the other groups only get from `KESTREL_CAPTURE_SECONDARY_SIZE`. `system:dimming` lets the screen go idle until it dims, saving `dimming-fading` and `dimming-dimmed`, and gives the first display a stand-in backlight to check how a built-in panel dims and comes back.
 
 The `tablet` groups fold the session into a tablet with a virtual tablet mode switch and touchscreen, swipe and tap with a finger, and turn the display through Mutter's display configuration. Their clips of each transition go to `clips` in the capture folder, like those of `motion`.
 

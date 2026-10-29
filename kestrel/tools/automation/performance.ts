@@ -319,6 +319,20 @@ const perSecond = (count: number) => Number((count / (WAKEUP_SAMPLE / 1000)).toF
 
 const cpuTicks = (pid: number | 'self' = 'self') => read(`/proc/${pid}/stat`).split(') ')[1].split(' ').slice(11, 13).map(Number).reduce((a, b) => a + b);
 
+async function measureDimmed() {
+  Main.brightnessManager.dimming = true;
+  try {
+    await settled(MEASURE_SETTLE);
+    const dimmedIdleFramesOverTwoSeconds = await paintsOver(IDLE_SAMPLE);
+    const before = threadSwitches();
+    await pause(WAKEUP_SAMPLE);
+    report({dimmedIdleFramesOverTwoSeconds, dimmedIdleWakeupsPerSecond: perSecond(switchesSince(before, threadSwitches()))});
+  } finally {
+    Main.brightnessManager.dimming = false;
+    await settled(MEASURE_SETTLE);
+  }
+}
+
 async function measureIdleWakeups() {
   const settings = sessionPidOf(SETTINGS_COMMAND);
   const before = threadSwitches();
@@ -390,6 +404,7 @@ export async function run() {
   await measureTaskViewAdd();
   await measureIdle();
   await measureIdleWakeups();
+  await measureDimmed();
   await measureLockScreen();
   measureSessionManager();
 }

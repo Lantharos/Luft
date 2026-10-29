@@ -4,7 +4,7 @@ import St from 'gi://St';
 import type { EaseOptions, EaseProperties } from '../../environment.js';
 import { Spring } from '../../../../../packages/web/motion/src/index';
 
-export { Curve, Duration, Gesture, projection, rubberband, Spring, type SpringToken } from '../../../../../packages/web/motion/src/index';
+export { cubicBezier, Curve, Duration, Gesture, projection, rubberband, Spring, type SpringToken } from '../../../../../packages/web/motion/src/index';
 
 export function reducedMotion(): boolean {
   return St.Settings.get().reducedMotion === St.ReducedMotion.REDUCE;

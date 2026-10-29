@@ -1,6 +1,7 @@
 import tokens from '../tokens.json' with { type: 'json' };
 import type { SpringToken } from './spring';
 
+export { cubicBezier } from './bezier';
 export { DampedSpring, type SpringState, type SpringToken } from './spring';
 
 export const Duration: Readonly<Record<keyof typeof tokens.duration, number>> = tokens.duration;

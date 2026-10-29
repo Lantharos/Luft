@@ -7,6 +7,8 @@ import Shell from 'gi://Shell';
 import { clamp } from '../../shared/math.js';
 import * as Main from '../../core/main.js';
 import { DdcDisplays } from './ddcutil.js';
+import { DimOverlay } from './dimOverlay.js';
+import { dimTransition } from './dimming.js';
 import {
   activeBacklights,
   BacklightBrightnessScale,
@@ -117,6 +119,8 @@ export class BrightnessManager extends GObject.Object {
   private readonly monitorScales = new Map<Meta.LogicalMonitor, MonitorScale>();
   private readonly dimmingTarget: number;
   private dimmingEnabled = false;
+  private dimmingApplied = false;
+  private readonly dimOverlay: DimOverlay;
   private abTarget = -1.0;
   private readonly ddc: DdcDisplays;
   private saveBrightnessId = 0;
@@ -128,6 +132,7 @@ export class BrightnessManager extends GObject.Object {
 
     const powerSettings = new Gio.Settings({ schema_id: POWER_SCHEMA });
     this.dimmingTarget = powerSettings.get_int('idle-brightness') / 100;
+    this.dimOverlay = new DimOverlay(this.dimmingTarget);
 
     const keybindings: [string, () => void][] = [
       ['screen-brightness-up', () => this.globalScaleValue?.stepUp()],
@@ -250,12 +255,18 @@ export class BrightnessManager extends GObject.Object {
       });
     }
 
+    this.dimOverlay.cover(monitors.filter(monitor => !(this.monitorScales.get(monitor) instanceof BacklightBrightnessScale)));
     this.sync({ showOSD: false });
 
     this.emit('changed');
   }
 
   private sync({ showOSD = true } = {}): void {
+    this.syncScales(showOSD);
+    this.dimOverlay.dim(this.dimmingEnabled);
+  }
+
+  private syncScales(showOSD: boolean): void {
     if (!this.globalScaleValue) return;
     if (this.inhibitUpdates) return;
     this.inhibitUpdates = true;
@@ -292,13 +303,19 @@ export class BrightnessManager extends GObject.Object {
       scalesUpdated = false;
     }
 
+    const transition = this.dimmingEnabled === this.dimmingApplied ? undefined : dimTransition(this.dimmingEnabled);
+    this.dimmingApplied = this.dimmingEnabled;
+
     for (const scale of this.monitorScales.values()) {
       const target = this.abTarget >= 0.0
         ? clamp(this.abTarget + scale.value - 0.5, 0.0, 1.0)
         : scale.value;
 
-      const max = this.dimmingEnabled ? this.dimmingTarget : 1.0;
-      scale.setBacklight(Math.min(max, target));
+      if (scale instanceof BacklightBrightnessScale) {
+        scale.setBacklight(this.dimmingEnabled ? Math.min(this.dimmingTarget, target) : target, transition);
+      } else {
+        scale.setBacklight(target);
+      }
     }
 
     if (scalesUpdated) this.saveBrightnesses();

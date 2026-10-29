@@ -3,7 +3,9 @@ import type Meta from 'gi://Meta';
 
 import { clamp } from '../../shared/math.js';
 import * as SignalTracker from '../../core/runtime/signalTracker.js';
+import { BrightnessRamp } from './brightnessRamp.js';
 import type { DdcDisplay } from './ddcutil.js';
+import type { DimTransition } from './dimming.js';
 
 export const SCALE_VALUE_N_STEPS = 20;
 const SCALE_VALUE_CHANGE_EPSILON = 0.001;
@@ -114,9 +116,8 @@ function relativeBrightness({ brightness, brightness_min: min, brightness_max: m
   return (brightness - min) / (max - min);
 }
 
-function setRelativeBrightness(backlight: Meta.Backlight, brightness: number): void {
-  const { brightness_min: min, brightness_max: max } = backlight;
-  backlight.brightness = min + ((max - min) * brightness);
+function absoluteBrightness({ brightness_min: min, brightness_max: max }: Meta.Backlight, brightness: number): number {
+  return Math.round(min + ((max - min) * brightness));
 }
 
 export class BacklightBrightnessScale extends MonitorBrightnessScale {
@@ -125,6 +126,7 @@ export class BacklightBrightnessScale extends MonitorBrightnessScale {
   }
 
   private currentBacklightBrightness = -1;
+  private readonly ramp = new BrightnessRamp(brightness => this.applyBacklight(brightness));
 
   constructor(monitor: Meta.LogicalMonitor, initialValue = -1.0) {
     const maxSteps = Math.max(...activeBacklights(monitor).map(b => b.brightness_max - b.brightness_min));
@@ -132,28 +134,51 @@ export class BacklightBrightnessScale extends MonitorBrightnessScale {
 
     super(monitor, initialValue >= 0 ? initialValue : 1.0, nSteps);
 
-    if (initialValue >= 0) this.setBacklight(initialValue);
+    if (initialValue >= 0) this.currentBacklightBrightness = activeBacklights(monitor)[0].brightness;
     else this.syncWithBacklight();
 
-    for (const backlight of activeBacklights(monitor))
-      backlight.connectObject('notify::brightness', () => this.emit('backlights-changed'), this);
+    for (const backlight of activeBacklights(monitor)) {
+      backlight.connectObject('notify::brightness', () => {
+        if (backlight.brightness !== this.currentBacklightBrightness) this.emit('backlights-changed');
+      }, this);
+    }
   }
 
   syncWithBacklight(): boolean {
     const [backlight] = activeBacklights(this.monitor);
 
     if (backlight.brightness === this.currentBacklightBrightness) return false;
+    this.ramp.stop();
     this.currentBacklightBrightness = backlight.brightness;
 
     this.value = relativeBrightness(backlight);
     return true;
   }
 
-  setBacklight(brightness: number): void {
-    const backlights = activeBacklights(this.monitor);
-    for (const backlight of backlights) setRelativeBrightness(backlight, brightness);
+  setBacklight(brightness: number, transition?: DimTransition): void {
+    const [backlight] = activeBacklights(this.monitor);
+    if (transition && absoluteBrightness(backlight, brightness) !== backlight.brightness) {
+      this.ramp.start(relativeBrightness(backlight), brightness, transition);
+    } else if (this.ramp.running && !transition) {
+      this.ramp.retarget(brightness);
+    } else {
+      this.ramp.stop();
+      this.applyBacklight(brightness);
+    }
+  }
 
-    this.currentBacklightBrightness = backlights[0].brightness;
+  private applyBacklight(brightness: number): void {
+    const backlights = activeBacklights(this.monitor);
+    this.currentBacklightBrightness = absoluteBrightness(backlights[0], brightness);
+    for (const backlight of backlights) {
+      const level = absoluteBrightness(backlight, brightness);
+      if (backlight.brightness !== level) backlight.brightness = level;
+    }
+  }
+
+  destroy(): void {
+    this.ramp.stop();
+    super.destroy();
   }
 }
 

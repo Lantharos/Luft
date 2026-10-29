@@ -7,8 +7,8 @@ use backhand::{FilesystemReader, InnerNode, Node, SquashfsFileReader};
 
 use super::declaration::{self, Declaration};
 use super::elf;
-use super::sabine::SabineApp;
 use super::library::IconSize;
+use super::sabine::SabineApp;
 use crate::apps::chromium;
 use crate::apps::desktop::DesktopEntry;
 

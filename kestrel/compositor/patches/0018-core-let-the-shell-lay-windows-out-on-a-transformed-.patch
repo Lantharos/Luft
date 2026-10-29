@@ -428,7 +428,7 @@ index 4d37e81398f5508e5b9a0633b19657af0d648b27..c88c475840b558d29ae8cdb75aa7fb74
    if (g_set_object (&window->highest_scale_monitor, new_highest_scale_monitor))
      g_signal_emit (window, window_signals[HIGHEST_SCALE_MONITOR_CHANGED], 0);
 diff --git a/src/meta/window.h b/src/meta/window.h
-index 0e4ff0c97c47b13cae561438520bc9bf973f367a..45e04d99fcc75ebdb636695dd54a7a70b7b36bbf 100644
+index 44efe194d8c5a635a140e26d61ab27c5d363297e..7378569a6a4c37c006a44edc4606c89d1695463a 100644
 --- a/src/meta/window.h
 +++ b/src/meta/window.h
 @@ -123,6 +123,13 @@ META_EXPORT

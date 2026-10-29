@@ -27,6 +27,11 @@ meta_context_is_app_permitted() answers for one app. Apps given
 "full-access" count as unsandboxed. Connections keep how they were
 sorted when the list changes.
 
+meta_window_is_unsandboxed() tells the shell whether a window belongs
+to an unsandboxed client. X11 windows never do: they all come through
+Xwayland's one connection, so nothing vouches for the process behind
+them.
+
 Only unsandboxed clients see the manager, so sandboxed apps can neither
 nest security contexts nor claim another app's ID. Protocols that should
 stay out of sandboxes filter their globals with
@@ -36,15 +41,16 @@ Upstream-Status: luft-only Luft's sandbox model and permission API; upstream's s
 ---
  src/core/meta-process-identity.c    |  91 ++++++
  src/core/meta-process-identity.h    |   7 +
- src/core/meta-sandbox.c             |  95 +++++++
+ src/core/meta-sandbox.c             |  95 ++++++
  src/core/meta-sandbox.h             |  13 +
  src/meson.build                     |   7 +
  src/meta/meta-context.h             |  10 +
- src/wayland/meta-wayland-sandbox.c  | 423 ++++++++++++++++++++++++++++
+ src/meta/window.h                   |   3 +
+ src/wayland/meta-wayland-sandbox.c  | 448 ++++++++++++++++++++++++++++
  src/wayland/meta-wayland-sandbox.h  |  18 ++
  src/wayland/meta-wayland-versions.h |   1 +
  src/wayland/meta-wayland.c          |   2 +
- 10 files changed, 667 insertions(+)
+ 11 files changed, 695 insertions(+)
  create mode 100644 src/core/meta-process-identity.c
  create mode 100644 src/core/meta-process-identity.h
  create mode 100644 src/core/meta-sandbox.c
@@ -336,12 +342,26 @@ index a9c7b53959cf0367a5d84d117f7cc35c67984f18..4ea9e47a41d5ccd43ac8c87d445ae2e8
  META_EXPORT
  void meta_context_add_option_entries (MetaContext        *context,
                                        const GOptionEntry *entries,
+diff --git a/src/meta/window.h b/src/meta/window.h
+index 0e4ff0c97c47b13cae561438520bc9bf973f367a..44efe194d8c5a635a140e26d61ab27c5d363297e 100644
+--- a/src/meta/window.h
++++ b/src/meta/window.h
+@@ -202,6 +202,9 @@ gboolean    meta_window_showing_on_its_workspace (MetaWindow *window);
+ META_EXPORT
+ const char * meta_window_get_sandboxed_app_id (MetaWindow *window);
+ 
++META_EXPORT
++gboolean meta_window_is_unsandboxed (MetaWindow *window);
++
+ META_EXPORT
+ const char * meta_window_get_gtk_application_id (MetaWindow *window);
+ 
 diff --git a/src/wayland/meta-wayland-sandbox.c b/src/wayland/meta-wayland-sandbox.c
 new file mode 100644
-index 0000000000000000000000000000000000000000..950f4c52c09bbe621c478b14004bf49f06f09bfb
+index 0000000000000000000000000000000000000000..60d0f71214df6857a2caee4da26951fcb1bfd70c
 --- /dev/null
 +++ b/src/wayland/meta-wayland-sandbox.c
-@@ -0,0 +1,423 @@
+@@ -0,0 +1,448 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
 +#include "config.h"
 +
@@ -353,8 +373,10 @@ index 0000000000000000000000000000000000000000..950f4c52c09bbe621c478b14004bf49f
 +#include <unistd.h>
 +
 +#include "core/meta-sandbox.h"
++#include "core/window-private.h"
 +#include "meta/meta-context.h"
 +#include "wayland/meta-wayland-private.h"
++#include "wayland/meta-wayland-surface-private.h"
 +#include "wayland/meta-wayland-versions.h"
 +
 +#include "security-context-v1-server-protocol.h"
@@ -422,6 +444,29 @@ index 0000000000000000000000000000000000000000..950f4c52c09bbe621c478b14004bf49f
 +meta_wayland_client_get_sandboxed_app_id (const struct wl_client *client)
 +{
 +  return sandbox_of (client)->app_id;
++}
++
++/**
++ * meta_window_is_unsandboxed:
++ * @window: a #MetaWindow
++ *
++ * Returns: whether @window belongs to a Wayland client outside a sandbox,
++ *   counting apps with full access. X11 windows all come through Xwayland,
++ *   so they never do.
++ */
++gboolean
++meta_window_is_unsandboxed (MetaWindow *window)
++{
++  MetaWaylandSurface *surface;
++
++  g_return_val_if_fail (META_IS_WINDOW (window), FALSE);
++
++  if (meta_window_get_client_type (window) != META_WINDOW_CLIENT_TYPE_WAYLAND)
++    return FALSE;
++
++  surface = meta_window_get_wayland_surface (window);
++  return surface &&
++         !meta_wayland_client_is_sandboxed (wl_resource_get_client (surface->resource));
 +}
 +
 +MetaWaylandAccess

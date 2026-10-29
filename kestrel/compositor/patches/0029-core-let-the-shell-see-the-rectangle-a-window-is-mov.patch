@@ -56,7 +56,7 @@ index ab606c8c328b3ad3e99ae740bdb571a9f52c4ade..34f925c5d856018d04343430a11593da
   * meta_window_get_client_area_rect:
   * @window: a #MetaWindow
 diff --git a/src/meta/window.h b/src/meta/window.h
-index 01ff51d918eaf78fef7c87e6a9e10daec15ce305..75d2d8a4fa7545b7a1783288681b218bc7b73d6f 100644
+index 14580e415ec72d9ba6079d3e58ac14a10f28795a..a1ecad3b54534ee2301d1040f1fc5fe607b480fa 100644
 --- a/src/meta/window.h
 +++ b/src/meta/window.h
 @@ -157,6 +157,10 @@ META_EXPORT

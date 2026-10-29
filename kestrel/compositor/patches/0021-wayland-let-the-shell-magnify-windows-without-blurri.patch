@@ -125,7 +125,7 @@ index 7b6879c16e13108f873c795ac992e6a4f4614f5b..6d93a6328a8463440532c5abe8650b81
    window->is_alive = TRUE;
    priv->external_constraints =
 diff --git a/src/meta/window.h b/src/meta/window.h
-index ff96506aaeddaa47153fefafbcc01245fef01bfb..8e684a1a0c5b986a8a6feaad33ccdbf90e2c2ce0 100644
+index 4c653105cbfec58ff1923751d31052c7c21fbb95..cf8c63f3e3c7c6c11dd7794cf1cf76aeb528a4de 100644
 --- a/src/meta/window.h
 +++ b/src/meta/window.h
 @@ -126,6 +126,13 @@ void meta_window_set_variable_refresh (MetaWindow *window,

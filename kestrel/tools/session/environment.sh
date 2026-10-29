@@ -84,7 +84,7 @@ use_fixture_desktop() {
   printf '%s\n' "['com.lantharos.rover.desktop', 'com.lantharos.draft.desktop', 'com.lantharos.mailman.desktop', 'com.lantharos.tern.desktop', 'com.lantharos.schelf.desktop', 'com.lantharos.settings.desktop']" > "$session/favorites.txt"
   printf '/dev/luft/system / btrfs rw 0 0\n/dev/luft/travel %s exfat rw 0 0\n' "$drives/TRAVEL" > "$fixture/mounts"
   mkdir -p "$fixture/flatpak"
-  export LUFT_MOUNTS="$fixture/mounts" LUFT_SAMPLE_SYSTEM=1 FLATPAK_SYSTEM_DIR="$fixture/flatpak"
+  export LUFT_MOUNTS="$fixture/mounts" LUFT_SAMPLE_SYSTEM=1 FLATPAK_SYSTEM_DIR="$fixture/flatpak" KESTREL_LUFT_APPS="$(realpath -m "$root/target/release")"
 }
 
 export_build_paths() {

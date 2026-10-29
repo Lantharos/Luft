@@ -4225,6 +4225,8 @@ export namespace Meta {
 
         is_unconstrained(): boolean;
 
+        is_unsandboxed(): boolean;
+
         kill(): void;
 
         located_on_workspace(workspace: Workspace): boolean;

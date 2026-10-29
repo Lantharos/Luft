@@ -1,10 +1,11 @@
 import Gdk from 'gi://Gdk?version=3.0';
 import Gtk from 'gi://Gtk?version=3.0';
 
-const [title, background, copied] = ARGV;
+const [title, background, copied, wmClass] = ARGV;
 
 Gdk.set_allowed_backends('x11');
 Gtk.init(null);
+if (wmClass) Gdk.set_program_class(wmClass);
 
 const css = new Gtk.CssProvider();
 css.load_from_data(`window { background: ${background}; }`);

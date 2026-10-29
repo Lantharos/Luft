@@ -9,9 +9,9 @@ import St from 'gi://St';
 import * as Dialog from '../../shared/dialogs/dialog.js';
 import * as KestrelUi from '../../kestrelUi.js';
 import { ModalDialog } from '../../shared/dialogs/modalDialog.js';
+import { isLuftAppWindow } from '../../shared/apps/luftApps.js';
 import { lookup, setPermission, type Permission } from '../../shared/dbus/permissionStore.js';
 
-const LUFT_APP_PREFIX = 'com.lantharos.';
 const SHORTCUTS_INHIBITOR: Permission = { table: 'gnome', id: 'shortcuts-inhibitor' };
 const GRANTED = 'GRANTED';
 const DENIED = 'DENIED';
@@ -49,20 +49,20 @@ export const InhibitShortcutsDialog = GObject.registerClass({
     return Shell.WindowTracker.get_default().get_window_app(this.currentWindow);
   }
 
-  private get trusted(): boolean {
-    const appId = this.app?.get_id();
-    return [appId, this.currentWindow.get_wm_class()].some(id => id?.startsWith(LUFT_APP_PREFIX));
-  }
-
-  private shouldUsePermStore(): boolean {
-    return !!this.app && !this.app.is_window_backed();
+  private get permissionId(): string | null {
+    const window = this.currentWindow;
+    if (window.get_client_type() !== Meta.WindowClientType.WAYLAND) return null;
+    const sandboxed = window.get_sandboxed_app_id();
+    if (sandboxed) return `${sandboxed}.desktop`;
+    return window.is_unsandboxed() && this.app && !this.app.is_window_backed() ? this.app.get_id() : null;
   }
 
   private async saveToPermissionStore(grant: string): Promise<void> {
-    if (!this.shouldUsePermStore()) return;
+    const appId = this.permissionId;
+    if (!appId) return;
 
     try {
-      await setPermission(SHORTCUTS_INHIBITOR, this.app!.get_id(), [grant]);
+      await setPermission(SHORTCUTS_INHIBITOR, appId, [grant]);
     } catch (error) {
       log((error as Error).message);
     }
@@ -117,17 +117,17 @@ export const InhibitShortcutsDialog = GObject.registerClass({
   }
 
   vfunc_show(): void {
-    if (this.trusted) {
+    if (isLuftAppWindow(this.currentWindow)) {
       this.emitResponse(DialogResponse.ALLOW);
       return;
     }
 
-    if (!this.shouldUsePermStore()) {
+    const appId = this.permissionId;
+    if (!appId) {
       this.dialog.open();
       return;
     }
 
-    const appId = this.app!.get_id();
     lookup(Gio.DBus.session, SHORTCUTS_INHIBITOR).then(apps => {
       const permission = apps[appId];
       if (permission === undefined)

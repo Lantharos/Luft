@@ -175,6 +175,8 @@ Some things are sensitive no matter which of your programs asks, because they wo
 
 Peek, which lets programs see and use your windows, isn't open to sandboxed apps at all. For programs of yours it asks before they first touch a window you opened yourself, and the answer lasts until that program quits. That keeps an agent from working in your windows without you noticing; it isn't a boundary between your programs, which are all you.
 
+An app that wants to take over the keyboard shortcuts asks too, unless it's one of Luft's own apps: a Wayland window from a program outside a sandbox that runs from where Luft installs its apps, `/usr/lib/sabine/com.lantharos.*`. An app ID, desktop entry or X11 window class never counts, and neither does any X11 window, since every X11 app reaches Kestrel through Xwayland's one connection and can name itself anything. Kestrel remembers the answer for a sandboxed app by its sandbox's app ID and for a Wayland program outside a sandbox by its app, but asks an X11 window every time. Like Peek's prompt, this keeps apps from taking the keyboard unnoticed rather than telling your programs apart.
+
 Things that aren't sensitive never ask: using what you saved, adding keys, locking the keyring, or making something stricter.
 
 These prompts can't stop malware that already runs as you, which could act on the screen as you do. They stop a program from doing these things quietly, and stop someone at your unlocked computer from opening your passwords.

@@ -259,7 +259,7 @@ index def63c3b9ce2e16d3cb636d61571065a9c485c0b..43e6c97c5b0c4a731f307e65b61adcd2
    ['xdg-foreign', 'unstable', 1, ],
    ['xdg-foreign', 'unstable', 2, ],
 diff --git a/src/meta/window.h b/src/meta/window.h
-index 75d2d8a4fa7545b7a1783288681b218bc7b73d6f..826b420c0cf17a5b71d4556835f4f9e3f747c19b 100644
+index a1ecad3b54534ee2301d1040f1fc5fe607b480fa..b8ff0cf1767d00f3f02e26045267fa2a0c289ff4 100644
 --- a/src/meta/window.h
 +++ b/src/meta/window.h
 @@ -113,6 +113,12 @@ GType meta_window_get_type (void);

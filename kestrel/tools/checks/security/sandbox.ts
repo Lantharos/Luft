@@ -1,15 +1,18 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
+import type GObject from 'gi://GObject';
+import Meta from 'gi://Meta';
 import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {checks} from '../lib/check.js';
 import {failureOf} from '../lib/errors.js';
 import {withFullAccess} from '../lib/access/permissions.js';
 import {call, ownName, privateConnection, subscribe} from '../lib/dbus.js';
-import {outcome} from '../lib/processes.js';
+import {fixture, gjs, outcome, spawn, stop, waitForWindow} from '../lib/processes.js';
 import {pause} from '../lib/wait.js';
 import {lock, unlock} from '../lockScreen/lib/shield.js';
-import {SANDBOXED_APP, inAppScope, onSessionBus, sandboxedApp} from '../lib/access/sandbox.js';
+import {SANDBOXED_APP, inAppScope, onSessionBus, openSecurityContext, sandboxedApp, through} from '../lib/access/sandbox.js';
+import {openApp} from '../apps/lib/apps.js';
 
 const {require, eventually} = checks('sandbox');
 const MANAGER = ['/org/gnome/SessionManager', 'org.gnome.SessionManager'] as const;
@@ -23,8 +26,13 @@ const PASSKEYS = ['/com/lantharos/Kestrel/Passkeys', 'com.lantharos.Kestrel.Pass
 const PASSKEYS_AGENT = 'com.lantharos.Passkeys';
 const SETTINGS_APP = 'com.lantharos.settings';
 const PRELOADED = 'libm.so.6';
+const NAMED_CLIENT = fixture('clients', 'wayland', 'blurClient.py');
 
 type SandboxedApp = Awaited<ReturnType<typeof sandboxedApp>>;
+type ShortcutsDialog = Meta.InhibitShortcutsDialog & GObject.SignalMethods<Meta.InhibitShortcutsDialog, Meta.InhibitShortcutsDialog.SignalSignatures>;
+
+const shortcutsDialogFor = (window: Meta.Window) =>
+  global.window_manager.emit('create-inhibit-shortcuts-dialog', window) as unknown as ShortcutsDialog;
 
 const gdbus = (dest: string, [path, iface]: readonly [string, string], method: string, ...args: string[]) =>
   ['gdbus', 'call', '--session', '--dest', dest, '--object-path', path, '--method', `${iface}.${method}`, ...args];
@@ -225,6 +233,42 @@ async function checkFullAccess() {
   }
 }
 
+async function shortcutsAnswer(window: Meta.Window) {
+  const dialog = shortcutsDialogFor(window);
+  const answers: Meta.InhibitShortcutsDialogResponse[] = [];
+  dialog.connect('response', (_dialog, response) => answers.push(response));
+  dialog.show();
+  await eventually(() => answers.length > 0 || Main.modalCount > 0, `Kestrel answers or asks when ${window.get_title()} inhibits shortcuts`);
+  dialog.hide();
+  await eventually(() => Main.modalCount === 0, 'the shortcuts prompt closes');
+  return answers.at(0) ?? 'asked';
+}
+
+async function checkWindowImpostors() {
+  const x11 = gjs('clients/x11/x11Window.js', ['Kestrel impostor: X11', '#2f5d8a', '', SETTINGS_APP]);
+  const unsandboxed = spawn(['python3', NAMED_CLIENT, 'Kestrel impostor: Wayland', '320', '200']);
+  const sandbox = await openSecurityContext(SANDBOXED_APP);
+  const sandboxed = spawn(['python3', NAMED_CLIENT, 'Kestrel impostor: sandboxed', '320', '200'], {env: through(sandbox.socket)});
+  try {
+    const x11Window = await waitForWindow('Kestrel impostor: X11');
+    require(x11Window.get_wm_class() === SETTINGS_APP, 'an X11 window can name itself after Settings');
+    require(await shortcutsAnswer(x11Window) === 'asked', 'an X11 window named after Settings asks before it inhibits shortcuts');
+    require(await shortcutsAnswer(await waitForWindow('Kestrel impostor: Wayland')) === 'asked',
+      'a program outside Luft\'s apps with a Luft app ID asks before it inhibits shortcuts');
+    require(await shortcutsAnswer(await waitForWindow('Kestrel impostor: sandboxed')) === 'asked',
+      'a sandboxed app with a Luft app ID asks before it inhibits shortcuts');
+  } finally {
+    await Promise.all([stop(x11), stop(unsandboxed), stop(sandboxed)]);
+    await stop(sandbox.process);
+  }
+  const settings = await openApp('settings');
+  try {
+    require(await shortcutsAnswer(settings.window) === Meta.InhibitShortcutsDialogResponse.ALLOW, 'Settings inhibits shortcuts without asking');
+  } finally {
+    await settings.close();
+  }
+}
+
 export async function run() {
   await checkSessionManager();
   await checkShellConnection();
@@ -233,5 +277,6 @@ export async function run() {
   await checkMutter();
   await checkFullAccess();
   await checkHostImpostors();
+  await checkWindowImpostors();
   await checkScreencastImpostor();
 }

@@ -124,10 +124,10 @@ index 6d93a6328a8463440532c5abe8650b8150c04377..ab606c8c328b3ad3e99ae740bdb571a9
  meta_window_tile (MetaWindow   *window,
                    MetaTileMode  tile_mode)
 diff --git a/src/meta/window.h b/src/meta/window.h
-index 8e684a1a0c5b986a8a6feaad33ccdbf90e2c2ce0..01ff51d918eaf78fef7c87e6a9e10daec15ce305 100644
+index cf8c63f3e3c7c6c11dd7794cf1cf76aeb528a4de..14580e415ec72d9ba6079d3e58ac14a10f28795a 100644
 --- a/src/meta/window.h
 +++ b/src/meta/window.h
-@@ -379,6 +379,13 @@ MetaFrameType meta_window_get_frame_type (MetaWindow *window);
+@@ -382,6 +382,13 @@ MetaFrameType meta_window_get_frame_type (MetaWindow *window);
  META_EXPORT
  MetaWindow *meta_window_get_tile_match (MetaWindow *window);
  

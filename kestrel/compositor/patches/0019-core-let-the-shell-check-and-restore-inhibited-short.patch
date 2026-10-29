@@ -66,10 +66,10 @@ index c88c475840b558d29ae8cdb75aa7fb746376cd50..79012c12d37da3339bd9265bb2e9da0c
  meta_window_shortcuts_inhibited (MetaWindow         *window,
                                   ClutterInputDevice *source)
 diff --git a/src/meta/window.h b/src/meta/window.h
-index 45e04d99fcc75ebdb636695dd54a7a70b7b36bbf..ff96506aaeddaa47153fefafbcc01245fef01bfb 100644
+index 7378569a6a4c37c006a44edc4606c89d1695463a..4c653105cbfec58ff1923751d31052c7c21fbb95 100644
 --- a/src/meta/window.h
 +++ b/src/meta/window.h
-@@ -511,3 +511,11 @@ META_EXPORT
+@@ -514,3 +514,11 @@ META_EXPORT
  gboolean meta_window_get_max_size (MetaWindow *window,
                                     int        *width,
                                     int        *height);

@@ -7,8 +7,7 @@ Gdk.set_allowed_backends(backend);
 Gtk.init(null);
 
 const css = new Gtk.CssProvider();
-css.load_from_data(`window, headerbar { background: ${background}; }
-decoration { box-shadow: 0 0 0 1px ${background}, 0 4px 16px rgba(0, 0, 0, 0.4); }`);
+css.load_from_data(`window, headerbar { background: ${background}; }`);
 Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default()!, css, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
 
 const window = new Gtk.Window({title, default_width: 400, default_height: 240});

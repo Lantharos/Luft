@@ -15,6 +15,7 @@ import {contrast} from '../lib/colors.js';
 const {require, eventually} = checks('appearance');
 const ROLES = ['primary', 'onPrimary', 'secondary', 'tertiary', 'error', 'surface', 'onSurface', 'surfaceContainerHighest', 'onSurfaceVariant', 'outline'];
 const USER_CSS = 'window { opacity: 1; }\n';
+const WINDOW_EDGES = 'Kestrel window edges';
 const THEME_QUIET = 500;
 const WALLPAPERS = [['teal', 0x1f8a8aff], ['orange', 0xd8641eff]] as const;
 
@@ -66,8 +67,10 @@ async function checkAppColors(settings: Gio.Settings) {
       read(gtk3)?.includes('@define-color accent_bg_color') && generated.every(file => file.query_exists(null)),
     'other apps get wallpaper colors next to their own styles');
     settings.set_boolean('theme-apps', false);
-    await eventually(() => read(gtk4) === USER_CSS && !gtk3.query_exists(null) && !generated.some(file => file.query_exists(null)),
-      'turning app colors off removes only what was generated');
+    const onlyEdges = (css: string | null) => !!css?.includes(WINDOW_EDGES) && !css.includes('--accent-bg-color') && !css.includes('@define-color');
+    await eventually(() => onlyEdges(read(gtk4)) && read(gtk4)!.endsWith(USER_CSS) && onlyEdges(read(gtk3)) &&
+      !generated.some(file => file.query_exists(null)),
+    'turning app colors off removes only the colors, and GTK windows keep one outline');
   } finally {
     settings.reset('theme-apps');
     gtk4.delete(null);

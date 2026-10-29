@@ -5,12 +5,16 @@ import Shell from 'gi://Shell';
 import { readText, removeBlock, removeFile, userFile, writeBlock, writeText } from '../files.js';
 import type { Palette } from '../palette.js';
 import { GHOSTTY_THEMES, ghosttyInclude, ghosttyTheme } from './ghostty.js';
-import { gtk3Css, gtk4Css } from './gtk.js';
+import { gtk3Css, gtk3WindowCss, gtk4Css, gtk4WindowCss } from './gtk.js';
 import { QT_SCHEME_NAME, kdeColorScheme, qtPalette } from './qt.js';
 
 const CSS_MARKERS = {
   start: '/* Kestrel wallpaper colors: generated, edits inside this block are replaced */',
   end: '/* End of Kestrel wallpaper colors */',
+};
+const WINDOW_MARKERS = {
+  start: '/* Kestrel window edges: generated, edits inside this block are replaced */',
+  end: '/* End of Kestrel window edges */',
 };
 const CONFIG_MARKERS = {
   start: '# Kestrel wallpaper colors: generated, edits inside this block are replaced',
@@ -39,8 +43,8 @@ export class AppThemes {
   async apply(palette: Palette, dark: boolean): Promise<void> {
     const { colors } = dark ? palette.dark : palette.light;
     await Promise.all([
-      writeBlock(this.gtk4, CSS_MARKERS, gtk4Css(palette)),
-      writeBlock(this.gtk3, CSS_MARKERS, gtk3Css(colors, dark)),
+      this.writeGtk(this.gtk4, gtk4Css(palette), gtk4WindowCss),
+      this.writeGtk(this.gtk3, gtk3Css(colors, dark), gtk3WindowCss),
       writeChanged(this.qt6ct, qtPalette(colors)),
       writeChanged(this.kde, kdeColorScheme(colors)),
       ...GLib.find_program_in_path('ghostty') ? [this.applyGhostty(palette)] : [],
@@ -49,12 +53,17 @@ export class AppThemes {
 
   async remove(): Promise<void> {
     await Promise.all([
-      removeBlock(this.gtk4, CSS_MARKERS),
-      removeBlock(this.gtk3, CSS_MARKERS),
+      this.writeGtk(this.gtk4, null, gtk4WindowCss),
+      this.writeGtk(this.gtk3, null, gtk3WindowCss),
       removeFile(this.qt6ct),
       removeFile(this.kde),
       this.removeGhostty(),
     ]);
+  }
+
+  private async writeGtk(file: Gio.File, colors: string | null, windows: string): Promise<void> {
+    await (colors === null ? removeBlock(file, CSS_MARKERS) : writeBlock(file, CSS_MARKERS, colors));
+    await writeBlock(file, WINDOW_MARKERS, windows);
   }
 
   private async removeGhostty(): Promise<void> {

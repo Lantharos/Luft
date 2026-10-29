@@ -86,3 +86,5 @@ With Match other apps to the wallpaper on (`theme-apps` in `com.lantharos.kestre
 | GTK 3 | Block at the top of `~/.config/gtk-3.0/gtk.css`, for themes such as adw-gtk3 |
 | Qt | `~/.config/qt6ct/colors/Kestrel.conf` (with `QT_QPA_PLATFORMTHEME=qt6ct`) and `~/.local/share/color-schemes/Kestrel.colors` for KDE |
 | Ghostty 1.2+ | `Kestrel Light` and `Kestrel Dark` in `~/.config/ghostty/themes`, selected at the top of the config |
+
+Whether this is on or not, a block marked `Kestrel window edges` in both GTK files takes the line GTK draws along the edge of its windows, and the highlight along the top of GTK 3 title bars, off floating windows, since Kestrel already outlines every window. GTK windows keep their shadow.

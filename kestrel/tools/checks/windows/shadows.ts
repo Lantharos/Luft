@@ -77,11 +77,12 @@ async function checkOutline({window, color}: Opened, label: string, shifted: (ed
   require(same(await topEdge(window, INSIDE), color), `${label}'s outline stays on its edge`);
 }
 
-async function checkSideOutline({window, color}: Opened, label: string) {
+async function checkEdgeOutline({window, color}: Opened, label: string) {
   const frame = window.get_frame_rect();
   const y = frame.y + Math.round(frame.height / 2);
   require(lighter(await pixel(frame.x, y), color), `${label} gets an outline along its edge`);
   require(same(await pixel(frame.x + INSIDE, y), color), `${label}'s outline stays on its edge`);
+  require(same(await pixel(frame.x + Math.round(frame.width / 2), frame.y), await pixel(frame.x, y)), `${label}'s outline is the same along its top`);
 }
 
 async function checkShadow({window}: Opened, backdrop: Opened, label: string) {
@@ -100,8 +101,8 @@ async function checkElectron(binary: string) {
   const x11 = await open(electron(binary, 'x11'), ELECTRON_X11, ELECTRON_OPEN_TIMEOUT);
   require(wayland.window.get_buffer_rect().width > wayland.window.get_frame_rect().width, 'frameless Electron draws its own shadow on Wayland');
   await settled();
-  await checkSideOutline(wayland, 'a frameless Electron window on Wayland');
-  await checkSideOutline(x11, 'a frameless Electron window on Xwayland');
+  await checkEdgeOutline(wayland, 'a frameless Electron window on Wayland');
+  await checkEdgeOutline(x11, 'a frameless Electron window on Xwayland');
 }
 
 export async function run() {
@@ -122,11 +123,11 @@ export async function run() {
   framed.window.activate(global.get_current_time());
   await settled();
   await checkShadow(framed, backdrop, 'a window with Kestrel\'s title bar');
-  await checkSideOutline(sketches, 'a GTK 4 window that draws its own shadow');
-  await checkSideOutline(ledger, 'an X11 window that draws its own shadow');
+  await checkEdgeOutline(sketches, 'a GTK 4 window that draws its own shadow');
+  await checkEdgeOutline(ledger, 'an X11 window that draws its own shadow');
   radio.window.activate(global.get_current_time());
   await settled();
-  await checkSideOutline(radio, 'an undecorated X11 window');
+  await checkEdgeOutline(radio, 'an undecorated X11 window');
   await checkShadow(radio, backdrop, 'an undecorated X11 window');
   const electronBinary = GLib.getenv('KESTREL_ELECTRON');
   if (electronBinary) await checkElectron(electronBinary);

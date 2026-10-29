@@ -62,3 +62,17 @@ export function gtk3Css(colors: Colors, dark: boolean): string {
   const legacy = LEGACY_NAMES.map(([name, source]) => `@define-color ${name} ${named[source]};\n`);
   return [...modern, ...legacy].join('');
 }
+
+const FLOATING_STATES = [
+  'popup', 'maximized', 'fullscreen', 'tiled', 'tiled-top', 'tiled-right', 'tiled-bottom', 'tiled-left',
+].map(state => `:not(.${state})`).join('');
+
+export const gtk3WindowCss = `headerbar, headerbar:backdrop, .titlebar:not(headerbar), .titlebar:backdrop:not(headerbar) { box-shadow: none; }
+window.csd${FLOATING_STATES} decoration { box-shadow: 0 3px 9px 1px rgba(0, 0, 0, 0.5); }
+window.csd${FLOATING_STATES} decoration:backdrop { box-shadow: 0 3px 9px 1px transparent, 0 2px 6px 2px rgba(0, 0, 0, 0.2); }
+messagedialog.csd decoration { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); }
+`;
+
+export const gtk4WindowCss = `window.csd${FLOATING_STATES} { outline: none; box-shadow: 0 0 14px 5px rgba(0, 0, 0, 0.15), 0 0 5px 2px rgba(0, 0, 0, 0.1); }
+window.csd${FLOATING_STATES}:backdrop { box-shadow: 0 0 14px 5px transparent, 0 0 10px 5px rgba(0, 0, 0, 0.08); }
+`;

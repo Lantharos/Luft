@@ -19,12 +19,6 @@ mapfile -t removed < <(rpm -qa --qf '%{NAME}\n' "${unwanted[@]}")
 dnf autoremove -y
 dnf clean all
 
-leave_out_python() {
-  mapfile -t python < <(rpm -qa --qf '%{NAME}\n' 'python*')
-  rpm -e --nodeps "${python[@]}"
-  rm -rf /usr/libexec/bootc-base-imagectl /usr/lib64/python3*
-}
-
 leave_out_documentation() {
   rm -rf /usr/share/man /usr/share/info
   find /usr/share/doc -not -type d -not -path '/usr/share/doc/bootc/*' \
@@ -34,7 +28,7 @@ leave_out_documentation() {
 
 leave_out_unused_data() {
   rm -f /usr/share/ibus/dicts/emoji-*.dict
-  rm -rf /usr/lib/sysimage/rpm-ostree-base-db /usr/share/rpm-ostree
+  rm -rf /usr/lib/sysimage/rpm-ostree-base-db /usr/share/rpm-ostree /usr/libexec/bootc-base-imagectl
 }
 
 leave_out_arm_firmware() {
@@ -43,7 +37,6 @@ leave_out_arm_firmware() {
     "$firmware"/nvidia/{gk20a,gm20b,gp10b,tegra*}
 }
 
-leave_out_python
 leave_out_documentation
 leave_out_unused_data
 leave_out_arm_firmware

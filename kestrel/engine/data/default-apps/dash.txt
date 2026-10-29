@@ -1,4 +1,4 @@
-helium.desktop
+net.imput.helium.desktop
 org.gnome.Calendar.desktop
 com.lantharos.rover.desktop
 com.lantharos.schelf.desktop

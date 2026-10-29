@@ -11,7 +11,9 @@ use crate::apps::chromium;
 use crate::progress::Stage;
 use crate::task::{CANCELLED, Task};
 
-const PREFIX: &str = "appimage-";
+const GENERATED_NAMESPACE: &str = "org.appimage";
+const MAX_APP_ID: usize = 255;
+const LUFT_NAMESPACE: &str = "com.lantharos.";
 const CHUNK: usize = 1 << 20;
 const MAIN_GROUP: &str = "[Desktop Entry]";
 pub const SANDBOX: &str = "--sandbox";
@@ -66,19 +68,52 @@ pub fn placement(source: &Path, bundle: &Bundle) -> Placement {
         });
     let slug = slug(&name);
     let path = library::folder().join(format!("{slug}.AppImage"));
-    let id = bundle
-        .desktop_id
-        .clone()
-        .filter(|id| is_desktop_id(id) && library::desktop_id_free(id, &path))
-        .unwrap_or_else(|| format!("{PREFIX}{slug}"));
+    let stem = source
+        .file_stem()
+        .map(|stem| stem.to_string_lossy().into_owned());
+    let id = [bundle.desktop_id.clone(), stem]
+        .into_iter()
+        .flatten()
+        .find(|id| is_app_id(id) && library::desktop_id_free(id, &path))
+        .unwrap_or_else(|| generated_id(&slug));
     Placement { id, path }
 }
 
-fn is_desktop_id(id: &str) -> bool {
-    !id.is_empty()
-        && id
+fn is_app_id(id: &str) -> bool {
+    let Some((domain, rest)) = id.split_once('.') else {
+        return false;
+    };
+    id.len() <= MAX_APP_ID
+        && !id.starts_with(LUFT_NAMESPACE)
+        && !domain.is_empty()
+        && domain
             .chars()
-            .all(|character| character.is_ascii_alphanumeric() || "._-".contains(character))
+            .all(|character| character.is_ascii_lowercase())
+        && rest.split('.').all(is_id_element)
+}
+
+fn is_id_element(element: &str) -> bool {
+    element
+        .chars()
+        .next()
+        .is_some_and(|first| !first.is_ascii_digit())
+        && element
+            .chars()
+            .all(|character| character.is_ascii_alphanumeric() || "_-".contains(character))
+}
+
+fn generated_id(slug: &str) -> String {
+    let element: String = slug
+        .replace('-', "_")
+        .chars()
+        .take(MAX_APP_ID - GENERATED_NAMESPACE.len() - 2)
+        .collect();
+    let element = if element.starts_with(|first: char| first.is_ascii_digit()) {
+        format!("_{element}")
+    } else {
+        element
+    };
+    format!("{GENERATED_NAMESPACE}.{element}")
 }
 
 /// An AppImage just installed, with what it declares about its sandbox.

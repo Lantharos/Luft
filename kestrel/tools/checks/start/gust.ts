@@ -75,7 +75,7 @@ async function checkResults() {
   search('settings');
   await eventually(() => keyed('app:'), 'apps are found');
   search('private window');
-  await eventually(() => row('command:helium.desktop:new-private-window'), 'an app action from its desktop file is found');
+  await eventually(() => row('command:net.imput.helium.desktop:new-private-window'), 'an app action from its desktop file is found');
   search(WINDOW.toLowerCase());
   await eventually(() => keyed('window:'), 'open windows are found by title');
   await eventually(() => shown(preview()), 'a window shows a preview');

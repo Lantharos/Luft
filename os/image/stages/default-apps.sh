@@ -9,7 +9,7 @@ claimed_types() {
   for entry in "$applications"/com.lantharos.*.desktop; do
     sed -n 's/^MimeType=//p' "$entry" | tr ';' '\n' | sed "/^$/d; s/$/=${entry##*/};/"
   done
-  printf '%s=helium.desktop;\n' "${browser_types[@]}"
+  printf '%s=net.imput.helium.desktop;\n' "${browser_types[@]}"
 }
 
 {

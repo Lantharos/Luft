@@ -4,7 +4,7 @@ import type { Usage } from '../rows';
 const MIB = 1024 ** 2;
 
 export const apps: AppInfo[] = [
-	{ key: 'helium.desktop', name: 'Helium', icon: null },
+	{ key: 'net.imput.helium.desktop', name: 'Helium', icon: null },
 	{ key: 'com.lantharos.tern.desktop', name: 'Tern', icon: null },
 	{ key: 'com.lantharos.rover.desktop', name: 'Rover', icon: null },
 	{ key: 'com.lantharos.draft.desktop', name: 'Draft', icon: null },
@@ -43,9 +43,9 @@ const templates: Template[] = [
 	{ name: 'ollama', command: '/usr/local/bin/ollama serve', user: 'ollama', cpu: 0.1, memory: 64 },
 	{ name: 'sshd', command: 'sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups', user: 'root', cpu: 0, memory: 8 },
 	{ name: 'containerd', command: '/usr/bin/containerd', user: 'root', cpu: 0.3, memory: 48 },
-	{ name: 'helium', command: '/opt/helium/helium', app: 'helium.desktop', cpu: 4.1, memory: 612, gpu: 3, vram: 360 },
-	{ name: 'helium', command: '/opt/helium/helium --type=renderer --crashpad-handler-pid=5406 --enable-crash-reporter', app: 'helium.desktop', count: 11, cpu: 1.6, memory: 190 },
-	{ name: 'helium', command: '/opt/helium/helium --type=gpu-process --crashpad-handler-pid=5406', app: 'helium.desktop', cpu: 2.3, memory: 240, gpu: 8, vram: 520 },
+	{ name: 'helium', command: '/opt/helium/helium', app: 'net.imput.helium.desktop', cpu: 4.1, memory: 612, gpu: 3, vram: 360 },
+	{ name: 'helium', command: '/opt/helium/helium --type=renderer --crashpad-handler-pid=5406 --enable-crash-reporter', app: 'net.imput.helium.desktop', count: 11, cpu: 1.6, memory: 190 },
+	{ name: 'helium', command: '/opt/helium/helium --type=gpu-process --crashpad-handler-pid=5406', app: 'net.imput.helium.desktop', cpu: 2.3, memory: 240, gpu: 8, vram: 520 },
 	{ name: 'tern', command: '/home/mara/.local/share/sabine/apps/com.lantharos.tern/tern', app: 'com.lantharos.tern.desktop', cpu: 0.4, memory: 38 },
 	{ name: 'sabine-host', command: 'sabine-host --type=renderer --lang=en-US', app: 'com.lantharos.tern.desktop', count: 3, cpu: 0.6, memory: 120 },
 	{ name: 'fish', command: '/usr/bin/fish', app: 'com.lantharos.tern.desktop', count: 3, cpu: 0, memory: 12 },

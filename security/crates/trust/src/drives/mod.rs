@@ -13,7 +13,7 @@ use anyhow::{Context, Result, bail};
 use crate::disk::unlock::{keys, luks};
 use crate::errors::{Busy, NeedsKey, Unsupported};
 use crate::system::host::command::Tool;
-use crate::system::host::{power, uuid};
+use crate::system::host::uuid;
 use crate::system::secrets::secret::Secret;
 use hold::Hold;
 pub use record::{Change, Record};
@@ -89,15 +89,15 @@ fn tools(room: Option<&Room>) -> std::result::Result<String, String> {
     }
 }
 
-fn plugged_in() -> std::result::Result<String, String> {
-    if power::on_battery() {
+fn plugged_in(on_battery: bool) -> std::result::Result<String, String> {
+    if on_battery {
         Err("Plug the computer in. Encrypting takes a while and shouldn't run out of power partway.".to_owned())
     } else {
         Ok("The computer is plugged in.".to_owned())
     }
 }
 
-pub fn check(device: &str) -> Result<Assessment> {
+pub fn check(device: &str, on_battery: bool) -> Result<Assessment> {
     let target = Target::find(device)?;
     if target.encrypted() {
         bail!(Unsupported("It's already encrypted.".to_owned()));
@@ -121,7 +121,7 @@ pub fn check(device: &str) -> Result<Assessment> {
             room.as_ref().map(room_sentence).map_err(Clone::clone),
         ),
         verdict("tools", tools(room.as_ref().ok())),
-        verdict("power", plugged_in()),
+        verdict("power", plugged_in(on_battery)),
     ];
     Ok(Assessment {
         method,
@@ -223,6 +223,7 @@ pub fn encrypt(
     recovery: &Secret,
     passphrase: &Secret,
     auto_unlock: bool,
+    on_battery: bool,
 ) -> Result<Record> {
     let target = Target::find(device)?;
     if target.encrypted() {
@@ -234,7 +235,7 @@ pub fn encrypt(
     if auto_unlock {
         unlocking::require_system_protected()?;
     }
-    plugged_in().map_err(Unsupported)?;
+    plugged_in(on_battery).map_err(Unsupported)?;
     let room = room::plan(&target).map_err(Unsupported)?;
     let _held = Hold::new(&target.name)?;
     room::make(&target, &room)?;
@@ -281,7 +282,7 @@ fn encrypted(target: &Target) -> Result<(luks::Header, Record)> {
     Ok((header, record))
 }
 
-pub fn decrypt(device: &str, typed: &Secret) -> Result<Record> {
+pub fn decrypt(device: &str, typed: &Secret, on_battery: bool) -> Result<Record> {
     let target = Target::find(device)?;
     let (_, mut record) = encrypted(&target)?;
     if target.removable {
@@ -297,7 +298,7 @@ pub fn decrypt(device: &str, typed: &Secret) -> Result<Record> {
             "Only partitions can be decrypted in place.".to_owned()
         ));
     }
-    plugged_in().map_err(Unsupported)?;
+    plugged_in(on_battery).map_err(Unsupported)?;
     let key = unlock_key(&target, &record, typed)?;
     if target.active_mapping().is_none() {
         open(&target, &record, &key)?;

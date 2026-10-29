@@ -4,17 +4,15 @@ use std::path::Path;
 use std::process::{Child, Command, Stdio};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::mpsc::RecvTimeoutError;
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 use anyhow::{Context, Result};
 use serde::Deserialize;
 
-use crate::system::host::power;
 use crate::system::secrets::secret::Secret;
 
 const IDLE_IO: libc::c_int = 3 << 13;
 const TICK: Duration = Duration::from_secs(1);
-const BATTERY_CHECK: Duration = Duration::from_secs(20);
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct Progress {
@@ -67,7 +65,12 @@ fn interrupt(child: &mut Child) {
     let _ = child.wait();
 }
 
-fn follow(child: &mut Child, stop: &AtomicBool, report: &mut impl FnMut(Progress)) -> bool {
+fn follow(
+    child: &mut Child,
+    stop: &AtomicBool,
+    on_battery: &AtomicBool,
+    report: &mut impl FnMut(Progress),
+) -> bool {
     let Some(output) = child.stdout.take() else {
         return false;
     };
@@ -79,7 +82,6 @@ fn follow(child: &mut Child, stop: &AtomicBool, report: &mut impl FnMut(Progress
             }
         }
     });
-    let mut checked = Instant::now();
     loop {
         match receiver.recv_timeout(TICK) {
             Ok(line) => {
@@ -97,16 +99,9 @@ fn follow(child: &mut Child, stop: &AtomicBool, report: &mut impl FnMut(Progress
                 return child.wait().is_ok_and(|status| status.success());
             }
         }
-        if stop.load(Ordering::Relaxed) {
+        if stop.load(Ordering::Relaxed) || on_battery.load(Ordering::Relaxed) {
             interrupt(child);
             return false;
-        }
-        if checked.elapsed() >= BATTERY_CHECK {
-            checked = Instant::now();
-            if power::on_battery() {
-                interrupt(child);
-                return false;
-            }
         }
     }
 }
@@ -116,8 +111,9 @@ pub fn run(
     header: Option<&Path>,
     key: &Secret,
     stop: &AtomicBool,
+    on_battery: &AtomicBool,
     report: &mut impl FnMut(Progress),
 ) -> Result<bool> {
     let mut child = spawn(device, header, key)?;
-    Ok(follow(&mut child, stop, report))
+    Ok(follow(&mut child, stop, on_battery, report))
 }

@@ -16,13 +16,14 @@ use super::error::Error;
 use super::shown::Shown;
 use crate::drives::reencrypt::Progress;
 use crate::drives::{self, Change, DriveStatus, Record};
-use crate::system::host::{power, uuid};
+use crate::system::host::uuid;
 use crate::system::secrets::secret::Secret;
 
 const CHECK: &str = "com.lantharos.trust.check";
 const MANAGE: &str = "com.lantharos.trust.manage-drive-encryption";
 const RECOVERY_KEY: &str = "com.lantharos.trust.show-recovery-key";
 const UNLOCK: &str = "com.lantharos.trust.unlock-drive";
+const BATTERY_CHECK: Duration = Duration::from_secs(20);
 const BATTERY_RETRY: Duration = Duration::from_secs(60);
 
 type Dict = HashMap<String, OwnedVariant>;
@@ -194,6 +195,16 @@ async fn announce(drives: &InterfaceRef<Drives>) {
         .await;
 }
 
+async fn follow_battery(connection: Connection, on_battery: Arc<AtomicBool>) {
+    loop {
+        on_battery.store(
+            luft_dbus::power::on_battery(&connection).await,
+            Ordering::Relaxed,
+        );
+        tokio::time::sleep(BATTERY_CHECK).await;
+    }
+}
+
 fn start_worker(drives: InterfaceRef<Drives>, record: Record) {
     tokio::spawn(async move {
         let (idle, workers) = {
@@ -205,6 +216,11 @@ fn start_worker(drives: InterfaceRef<Drives>, record: Record) {
             return;
         };
         let _activity = idle.hold();
+        let on_battery = Arc::new(AtomicBool::default());
+        let battery = tokio::spawn(follow_battery(
+            drives.signal_emitter().connection().clone(),
+            on_battery.clone(),
+        ));
         let (sender, mut receiver) = tokio::sync::watch::channel(Progress::default());
         let forward = {
             let (drives, workers, uuid) = (drives.clone(), workers.clone(), uuid.clone());
@@ -218,16 +234,18 @@ fn start_worker(drives: InterfaceRef<Drives>, record: Record) {
         announce(&drives).await;
         let mut next = Some(record);
         while let Some(mut record) = next.take() {
-            let (sender, flag) = (sender.clone(), stop.clone());
+            let (sender, flag, unplugged) = (sender.clone(), stop.clone(), on_battery.clone());
             let finished = tokio::task::spawn_blocking(move || {
-                drives::work::run(&mut record, &flag, &mut |update| {
+                drives::work::run(&mut record, &flag, &unplugged, &mut |update| {
                     let _ = sender.send(update);
                 })
                 .map(|done| (done, record))
             })
             .await;
             match finished {
-                Ok(Ok((false, record))) if !stop.load(Ordering::Relaxed) && power::on_battery() => {
+                Ok(Ok((false, record)))
+                    if !stop.load(Ordering::Relaxed) && on_battery.load(Ordering::Relaxed) =>
+                {
                     tokio::time::sleep(BATTERY_RETRY).await;
                     next = Some(record);
                 }
@@ -237,6 +255,7 @@ fn start_worker(drives: InterfaceRef<Drives>, record: Record) {
                 _ => {}
             }
         }
+        battery.abort();
         drop(sender);
         let _ = forward.await;
         workers.release(&uuid);
@@ -271,7 +290,8 @@ impl Drives {
     ) -> Result<(String, Vec<(String, bool, String)>, String), Error> {
         self.authorize(connection, &header, CHECK).await?;
         let _activity = self.idle.hold();
-        let assessment = tokio::task::spawn_blocking(move || drives::check(&device))
+        let on_battery = luft_dbus::power::on_battery(connection).await;
+        let assessment = tokio::task::spawn_blocking(move || drives::check(&device, on_battery))
             .await
             .map_err(|_| Error::Failed("The checks stopped unexpectedly.".to_owned()))??;
         Ok((
@@ -296,8 +316,11 @@ impl Drives {
     ) -> Result<String, Error> {
         self.authorize(connection, &header, MANAGE).await?;
         let (recovery_key, passphrase) = (Secret::from(recovery_key), Secret::from(passphrase));
+        let on_battery = luft_dbus::power::on_battery(connection).await;
         let record = self
-            .run(move || drives::encrypt(&device, &recovery_key, &passphrase, auto_unlock))
+            .run(move || {
+                drives::encrypt(&device, &recovery_key, &passphrase, auto_unlock, on_battery)
+            })
             .await?;
         let uuid = record.uuid.clone();
         start_worker(connection.object_server().interface(PATH).await?, record);
@@ -313,7 +336,10 @@ impl Drives {
     ) -> Result<(), Error> {
         self.authorize(connection, &header, MANAGE).await?;
         let unlock = Secret::from(unlock);
-        let record = self.run(move || drives::decrypt(&device, &unlock)).await?;
+        let on_battery = luft_dbus::power::on_battery(connection).await;
+        let record = self
+            .run(move || drives::decrypt(&device, &unlock, on_battery))
+            .await?;
         start_worker(connection.object_server().interface(PATH).await?, record);
         Ok(())
     }

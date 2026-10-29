@@ -109,12 +109,20 @@ fn reencrypting(record: &Record) -> Result<bool> {
 pub fn run(
     record: &mut Record,
     stop: &AtomicBool,
+    on_battery: &AtomicBool,
     report: &mut impl FnMut(Progress),
 ) -> Result<bool> {
     let device = record.device();
     let key = key_for(record)?;
     if reencrypting(record)?
-        && !reencrypt::run(&device, record.header.as_deref(), &key, stop, report)?
+        && !reencrypt::run(
+            &device,
+            record.header.as_deref(),
+            &key,
+            stop,
+            on_battery,
+            report,
+        )?
         && reencrypting(record)?
     {
         return Ok(false);

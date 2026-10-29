@@ -218,7 +218,7 @@ impl Updater {
         if !planned.due(schedule::now()) || self.download_pid().is_some() {
             return Ok(());
         }
-        if schedule::on_battery() {
+        if luft_dbus::power::on_battery(connection).await {
             eprintln!("Not checking for updates while the computer runs on its battery.");
             return Ok(());
         }

@@ -1,6 +1,7 @@
 pub mod idle;
 pub mod objects;
 pub mod polkit;
+pub mod power;
 pub mod service;
 
 use tokio::sync::OnceCell;

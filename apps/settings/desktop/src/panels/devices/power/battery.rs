@@ -1,5 +1,6 @@
 use std::path::{Path, PathBuf};
 
+use luft_app::dbus;
 use serde::Serialize;
 use specta::Type;
 use zbus::{Connection, OwnedObjectPath};
@@ -255,10 +256,7 @@ pub async fn devices(
 pub async fn read(connection: &Connection) -> Result<(Option<Battery>, Vec<PowerDevice>), String> {
     let devices = devices(connection).await?;
     let display = Properties::read(connection, DESTINATION, DISPLAY_DEVICE, DEVICE).await?;
-    let on_battery = Properties::read(connection, DESTINATION, PATH, DESTINATION)
-        .await?
-        .get::<bool>("OnBattery")
-        .unwrap_or(true);
+    let on_battery = dbus::power::on_battery(connection).await;
     Ok((
         battery(&display, on_battery, &packs(&devices)),
         devices.iter().filter_map(peripheral).collect(),

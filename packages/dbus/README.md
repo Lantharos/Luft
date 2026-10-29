@@ -12,6 +12,7 @@ luft-dbus.workspace = true
 | `at(address)` | A connection to any other bus |
 | `objects::Objects` | A snapshot of an `ObjectManager` tree; `signals` streams what a service sends and `settle` waits out a burst of them |
 | `service::Service` | A system service's name, path and interface: `read` its properties, `change` calls a method allowing a password prompt, `changes` streams its property changes |
+| `power::on_battery` | Whether the computer runs on its battery, as UPower sees it |
 | `polkit::is_authorized` | Whether polkit lets a service's caller take an action, asking for a password when the caller allows it |
 | `idle::Idle` | Holds a service up while calls are running, and tells it when it has been idle long enough to exit |
 | `error_name`, `error_message`, `explain` | Read a D-Bus error reply, standard or not |

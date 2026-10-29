@@ -63,15 +63,6 @@ vpn-field-group-password = Rühma salasõna
 ## Battery notifications
 
 battery-left = { $percent } jäänud.
-battery-left-with-time = { $percent } jäänud, umbes { $duration }.
-battery-low-title = Aku tase on madal
-battery-very-low-title = Aku tase on väga madal
-battery-almost-empty-title = Aku on peaaegu tühi
-battery-ups-low-title = UPS-i aku tase on madal
-battery-ups-very-low-title = UPS-i aku tase on väga madal
-battery-ups-almost-empty-title = UPS-i aku on peaaegu tühi
-battery-very-low-body = { $left } Ühenda arvuti peagi vooluvõrku.
-battery-almost-empty-body = { $left } Ühenda arvuti kohe vooluvõrku, et salvestamata töö ei kaoks.
 battery-device-low-title = { $device }: aku tase on madal
 battery-device-very-low-title = { $device }: aku tase on väga madal
 battery-device-low-body = { $left } Laadi seadet peagi.

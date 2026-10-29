@@ -17,6 +17,7 @@ pub struct Inhibitors {
     lid_check_at: Option<Instant>,
     sleep: Option<OwnedFd>,
     power_saver: Option<u32>,
+    power_saver_wanted: bool,
 }
 
 impl Inhibitors {
@@ -28,6 +29,7 @@ impl Inhibitors {
             lid_check_at: None,
             sleep: None,
             power_saver: None,
+            power_saver_wanted: false,
         }
     }
 
@@ -84,7 +86,25 @@ impl Inhibitors {
         }
     }
 
+    pub fn holds_power_saver(&self) -> bool {
+        self.power_saver.is_some()
+    }
+
+    pub fn wants_power_saver(&self) -> bool {
+        self.power_saver_wanted
+    }
+
+    pub fn power_saver_released(&mut self, cookie: u32) -> bool {
+        let ours = self.power_saver == Some(cookie);
+        if ours {
+            self.power_saver = None;
+            self.power_saver_wanted = false;
+        }
+        ours
+    }
+
     pub async fn hold_power_saver(&mut self, wanted: bool) {
+        self.power_saver_wanted = wanted;
         if wanted == self.power_saver.is_some() {
             return;
         }
@@ -94,7 +114,7 @@ impl Inhibitors {
                 Some(cookie) => profiles.release_profile(cookie).await,
                 None => {
                     let cookie = profiles
-                        .hold_profile("power-saver", "The battery is low", APPLICATION)
+                        .hold_profile("power-saver", "Making the battery last", APPLICATION)
                         .await?;
                     self.power_saver = Some(cookie);
                     Ok(())

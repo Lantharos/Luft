@@ -9,5 +9,8 @@
     <method name="ReleaseProfile">
       <arg type="u" direction="in"/>
     </method>
+    <signal name="ProfileReleased">
+      <arg type="u"/>
+    </signal>
   </interface>
 </node>

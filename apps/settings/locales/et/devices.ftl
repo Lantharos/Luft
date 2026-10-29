@@ -202,6 +202,7 @@ settings-power-limited-hot = Jõudlus on piiratud, sest arvuti on liiga kuum
 settings-power-limited-lap-hot = Jõudlus on piiratud, sest arvuti on sinu sülle asetatud ja liiga kuum
 settings-power-saver-low-battery = Energiasääst tühjeneva aku korral
 settings-power-saver-low-battery-description = Lülitub energiasäästule, kui aku hakkab tühjaks saama
+settings-power-saver-level = Energiasäästu akutase
 
 ## Keyboard backlight
 

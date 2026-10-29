@@ -197,6 +197,7 @@ settings-power-limited-hot = A teljesítmény korlátozva van, mert a számító
 settings-power-limited-lap-hot = A teljesítmény korlátozva van, mert a számítógép az ölében van, és túlmelegedett
 settings-power-saver-low-battery = Energiatakarékos mód alacsony töltöttségnél
 settings-power-saver-low-battery-description = Energiatakarékos módra vált, ha az akkumulátor lemerülőben van
+settings-power-saver-level = Akkumulátorszint az energiatakarékos módhoz
 
 ## Keyboard backlight
 

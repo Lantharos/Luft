@@ -64,15 +64,6 @@ vpn-field-group-password = Ryhmän salasana
 ## Battery notifications
 
 battery-left = { $percent } jäljellä.
-battery-left-with-time = { $percent } jäljellä, noin { $duration }.
-battery-low-title = Akku vähissä
-battery-very-low-title = Akku erittäin vähissä
-battery-almost-empty-title = Akku melkein tyhjä
-battery-ups-low-title = UPS-akku vähissä
-battery-ups-very-low-title = UPS-akku erittäin vähissä
-battery-ups-almost-empty-title = UPS-akku melkein tyhjä
-battery-very-low-body = { $left } Kytke laturi pian.
-battery-almost-empty-body = { $left } Kytke laturi nyt, ettei tallentamaton työ katoa.
 
 battery-device-low-title = { $device }: akku vähissä
 battery-device-very-low-title = { $device }: akku erittäin vähissä

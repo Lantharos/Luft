@@ -39,6 +39,12 @@ pub trait Notifications {
     fn action_invoked(&self, id: u32, action_key: String) -> zbus::Result<()>;
 }
 
+pub enum Sound<'a> {
+    Usual,
+    Named(&'a str),
+    Silent,
+}
+
 pub struct Notification<'a> {
     pub app: &'a str,
     pub icon: &'a str,
@@ -47,6 +53,8 @@ pub struct Notification<'a> {
     pub actions: &'a [(&'a str, &'a str)],
     pub urgency: u8,
     pub transient: bool,
+    pub sound: Sound<'a>,
+    pub shows_when_locked: bool,
 }
 
 impl Notification<'_> {
@@ -62,6 +70,18 @@ impl Notification<'_> {
         ]);
         if self.transient {
             hints.insert("transient", Variant::from(true));
+        }
+        match self.sound {
+            Sound::Usual => {}
+            Sound::Named(name) => {
+                hints.insert("sound-name", Variant::from(name));
+            }
+            Sound::Silent => {
+                hints.insert("suppress-sound", Variant::from(true));
+            }
+        }
+        if self.shows_when_locked {
+            hints.insert("x-gnome-privacy-scope", Variant::from("system"));
         }
         NotificationsProxy::new(session)
             .await?

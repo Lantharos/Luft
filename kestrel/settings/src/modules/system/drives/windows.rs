@@ -7,7 +7,7 @@ use zbus::proxy::CacheProperties;
 use zbus::{Connection, proxy};
 
 use crate::L10N;
-use crate::shared::notify::{Notification, URGENCY_NORMAL};
+use crate::shared::notify::{Notification, Sound, URGENCY_NORMAL};
 
 const TOLD: &str = "luft/windows-read-only";
 
@@ -55,6 +55,8 @@ pub async fn tell_read_only(session: &Connection) {
         actions: &[],
         urgency: URGENCY_NORMAL,
         transient: false,
+        sound: Sound::Usual,
+        shows_when_locked: false,
     }
     .show(session, 0)
     .await;

@@ -50,6 +50,11 @@
       <default>true</default>
       <summary>Switch to the power saver mode when the battery is low</summary>
     </key>
+    <key name="power-saver-battery-level" type="i">
+      <range min="20" max="50"/>
+      <default>30</default>
+      <summary>Battery percentage at which the power saver mode turns on</summary>
+    </key>
     <key name="ambient-enabled" type="b">
       <default>true</default>
       <summary>Follow the light around the computer with the screen brightness</summary>

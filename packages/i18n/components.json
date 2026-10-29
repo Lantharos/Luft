@@ -5,7 +5,7 @@
 	{"name": "kestrel-system", "bundle": "kestrel", "mask": "kestrel/ui/locales/*/system.ftl", "sources": ["kestrel/ui/src/system"]},
 	{"name": "kestrel-auth", "bundle": "kestrel", "mask": "kestrel/ui/locales/*/auth.ftl", "sources": ["kestrel/ui/src/auth", "kestrel/ui/src/session"]},
 	{"name": "kestrel-portal", "bundle": "kestrel", "mask": "kestrel/ui/locales/*/portal.ftl", "sources": ["kestrel/ui/src/portal"]},
-	{"name": "kestrel-settings", "bundle": "kestrel-settings", "mask": "kestrel/settings/locales/*/settings.ftl", "sources": ["kestrel/settings/src/modules/system/drives"]},
+	{"name": "kestrel-settings", "bundle": "kestrel-settings", "mask": "kestrel/settings/locales/*/settings.ftl", "sources": ["kestrel/settings/src/modules/system/drives", "kestrel/settings/src/modules/devices/power/discharge.rs"]},
 	{"name": "kestrel-portal-service", "bundle": "kestrel-portal", "mask": "kestrel/portal/locales/*/portal.ftl", "sources": ["kestrel/portal/src"]},
 	{"name": "ui", "bundle": "ui", "mask": "packages/web/ui/locales/*/ui.ftl", "sources": ["packages/web/ui/src"]},
 	{"name": "settings", "bundle": "settings", "mask": "apps/settings/locales/*/settings.ftl", "sources": ["apps/settings/src/App.svelte", "apps/settings/src/lib/components", "apps/settings/src/lib/state", "apps/settings/src/lib/panels/registry.ts", "apps/settings/src/lib/format.ts", "apps/settings/src/lib/bridge"]},

@@ -64,15 +64,6 @@ vpn-field-group-password = Csoportjelszó
 ## Battery notifications
 
 battery-left = Töltöttség: { $percent }.
-battery-left-with-time = Töltöttség: { $percent }, még körülbelül { $duration }.
-battery-low-title = Az akkumulátor töltöttsége alacsony
-battery-very-low-title = Az akkumulátor töltöttsége nagyon alacsony
-battery-almost-empty-title = Az akkumulátor majdnem lemerült
-battery-ups-low-title = A szünetmentes táp töltöttsége alacsony
-battery-ups-very-low-title = A szünetmentes táp töltöttsége nagyon alacsony
-battery-ups-almost-empty-title = A szünetmentes táp majdnem lemerült
-battery-very-low-body = { $left } Hamarosan csatlakoztassa a töltőt.
-battery-almost-empty-body = { $left } Csatlakoztassa most a töltőt, hogy ne vesszen el a nem mentett munka.
 
 battery-device-low-title = Alacsony töltöttség: { $device }
 battery-device-very-low-title = Nagyon alacsony töltöttség: { $device }

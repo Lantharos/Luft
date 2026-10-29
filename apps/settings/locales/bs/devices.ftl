@@ -203,6 +203,7 @@ settings-power-limited-hot = Performanse su ograničene jer je računar previše
 settings-power-limited-lap-hot = Performanse su ograničene jer je računar u vašem krilu i previše je vruć
 settings-power-saver-low-battery = Ušteda energije pri slaboj bateriji
 settings-power-saver-low-battery-description = Prelazi na uštedu energije kada se baterija isprazni
+settings-power-saver-level = Nivo baterije za uštedu energije
 
 ## Keyboard backlight
 

@@ -64,15 +64,6 @@ vpn-field-group-password = Lykilorð hóps
 ## Battery notifications
 
 battery-left = { $percent } eftir.
-battery-left-with-time = { $percent } eftir, um { $duration }.
-battery-low-title = Lítil hleðsla á rafhlöðu
-battery-very-low-title = Mjög lítil hleðsla á rafhlöðu
-battery-almost-empty-title = Rafhlaðan er nánast tóm
-battery-ups-low-title = Lítil hleðsla á varaaflgjafa
-battery-ups-very-low-title = Mjög lítil hleðsla á varaaflgjafa
-battery-ups-almost-empty-title = Varaaflgjafinn er nánast tómur
-battery-very-low-body = { $left } Tengdu tölvuna við rafmagn fljótlega.
-battery-almost-empty-body = { $left } Tengdu tölvuna við rafmagn núna svo óvistuð vinna tapist ekki.
 
 battery-device-low-title = { $device }: lítil hleðsla
 battery-device-very-low-title = { $device }: mjög lítil hleðsla

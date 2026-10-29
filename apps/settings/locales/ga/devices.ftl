@@ -215,6 +215,7 @@ settings-power-limited-hot = Tá teorainn leis an bhfeidhmíocht mar go bhfuil a
 settings-power-limited-lap-hot = Tá teorainn leis an bhfeidhmíocht mar go bhfuil an ríomhaire ar d’ucht agus róthe
 settings-power-saver-low-battery = Coigilteoir cumhachta nuair atá an ceallra íseal
 settings-power-saver-low-battery-description = Aistrítear go coigilteoir cumhachta nuair a bhíonn an ceallra ag éirí íseal
+settings-power-saver-level = Leibhéal ceallra don choigilteoir cumhachta
 
 ## Keyboard backlight
 

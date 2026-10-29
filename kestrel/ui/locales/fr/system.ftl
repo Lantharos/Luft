@@ -64,15 +64,6 @@ vpn-field-group-password = Mot de passe du groupe
 ## Battery notifications
 
 battery-left = { $percent } restants.
-battery-left-with-time = { $percent } restants, environ { $duration }.
-battery-low-title = Batterie faible
-battery-very-low-title = Batterie très faible
-battery-almost-empty-title = Batterie presque vide
-battery-ups-low-title = Batterie de l’onduleur faible
-battery-ups-very-low-title = Batterie de l’onduleur très faible
-battery-ups-almost-empty-title = Batterie de l’onduleur presque vide
-battery-very-low-body = { $left } Branchez l’ordinateur bientôt.
-battery-almost-empty-body = { $left } Branchez l’ordinateur maintenant pour ne pas perdre votre travail non enregistré.
 
 battery-device-low-title = Batterie faible : { $device }
 battery-device-very-low-title = Batterie très faible : { $device }

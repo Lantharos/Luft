@@ -197,6 +197,7 @@ settings-power-limited-hot = Ytinga er avgrensa fordi datamaskinen er for varm
 settings-power-limited-lap-hot = Ytinga er avgrensa fordi datamaskinen ligg på fanget ditt og er for varm
 settings-power-saver-low-battery = Straumsparing ved lågt batteri
 settings-power-saver-low-battery-description = Byter til straumsparing når batteriet byrjar å bli lågt
+settings-power-saver-level = Batterinivå for straumsparing
 
 ## Keyboard backlight
 

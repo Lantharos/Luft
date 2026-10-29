@@ -64,15 +64,6 @@ vpn-field-group-password = Groepswachtwoord
 ## Battery notifications
 
 battery-left = Nog { $percent }.
-battery-left-with-time = Nog { $percent }, ongeveer { $duration }.
-battery-low-title = Batterij bijna leeg
-battery-very-low-title = Batterij erg leeg
-battery-almost-empty-title = Batterij vrijwel leeg
-battery-ups-low-title = UPS-batterij bijna leeg
-battery-ups-very-low-title = UPS-batterij erg leeg
-battery-ups-almost-empty-title = UPS-batterij vrijwel leeg
-battery-very-low-body = { $left } Sluit de lader binnenkort aan.
-battery-almost-empty-body = { $left } Sluit de lader nu aan, zodat je geen niet-opgeslagen werk verliest.
 
 battery-device-low-title = Batterij van { $device } bijna leeg
 battery-device-very-low-title = Batterij van { $device } erg leeg

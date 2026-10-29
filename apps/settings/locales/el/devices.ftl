@@ -197,6 +197,7 @@ settings-power-limited-hot = Οι επιδόσεις είναι περιορισ
 settings-power-limited-lap-hot = Οι επιδόσεις είναι περιορισμένες επειδή ο υπολογιστής βρίσκεται στα πόδια σας και έχει ζεσταθεί υπερβολικά
 settings-power-saver-low-battery = Εξοικονόμηση ενέργειας με χαμηλή μπαταρία
 settings-power-saver-low-battery-description = Ενεργοποιεί την εξοικονόμηση ενέργειας όταν η μπαταρία πέφτει χαμηλά
+settings-power-saver-level = Επίπεδο μπαταρίας για εξοικονόμηση ενέργειας
 
 ## Keyboard backlight
 

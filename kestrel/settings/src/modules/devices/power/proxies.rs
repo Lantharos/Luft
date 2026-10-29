@@ -93,6 +93,20 @@ pub trait KbdBacklight {
 pub trait PowerProfiles {
     fn hold_profile(&self, profile: &str, reason: &str, application_id: &str) -> zbus::Result<u32>;
     fn release_profile(&self, cookie: u32) -> zbus::Result<()>;
+
+    #[zbus(signal)]
+    fn profile_released(&self, cookie: u32) -> zbus::Result<()>;
+}
+
+#[introspect]
+#[proxy(
+    interface = "org.freedesktop.UPower.Device",
+    default_service = "org.freedesktop.UPower",
+    default_path = "/org/freedesktop/UPower/devices/DisplayDevice"
+)]
+pub trait BatteryDevice {
+    #[zbus(property, name = "Type")]
+    fn kind(&self) -> zbus::Result<u32>;
 }
 
 #[introspect]

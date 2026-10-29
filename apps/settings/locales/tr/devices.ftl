@@ -197,6 +197,7 @@ settings-power-limited-hot = Bilgisayar çok ısındığı için performans sın
 settings-power-limited-lap-hot = Bilgisayar kucağınızda olduğu ve çok ısındığı için performans sınırlı
 settings-power-saver-low-battery = Pil azken güç tasarrufu
 settings-power-saver-low-battery-description = Pil azaldığında güç tasarrufuna geçer
+settings-power-saver-level = Güç tasarrufu için pil düzeyi
 
 ## Keyboard backlight
 

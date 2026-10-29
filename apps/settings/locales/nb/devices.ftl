@@ -197,6 +197,7 @@ settings-power-limited-hot = Ytelsen er begrenset fordi datamaskinen er for varm
 settings-power-limited-lap-hot = Ytelsen er begrenset fordi datamaskinen ligger på fanget ditt og er for varm
 settings-power-saver-low-battery = Strømsparing ved lavt batterinivå
 settings-power-saver-low-battery-description = Bytter til strømsparing når batteriet begynner å bli tomt
+settings-power-saver-level = Batterinivå for strømsparing
 
 ## Keyboard backlight
 

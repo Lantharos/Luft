@@ -209,6 +209,7 @@ settings-power-limited-hot = Wydajność jest ograniczona, bo komputer jest zbyt
 settings-power-limited-lap-hot = Wydajność jest ograniczona, bo komputer leży na kolanach i jest zbyt gorący
 settings-power-saver-low-battery = Oszczędzanie energii przy niskim poziomie baterii
 settings-power-saver-low-battery-description = Włącza oszczędzanie energii, gdy bateria się wyczerpuje
+settings-power-saver-level = Poziom baterii dla oszczędzania energii
 
 ## Keyboard backlight
 

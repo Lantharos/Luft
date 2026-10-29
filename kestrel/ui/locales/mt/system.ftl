@@ -64,15 +64,6 @@ vpn-field-group-password = Password tal-grupp
 ## Battery notifications
 
 battery-left = Fadal { $percent }.
-battery-left-with-time = Fadal { $percent }, madwar { $duration }.
-battery-low-title = Batterija baxxa
-battery-very-low-title = Batterija baxxa ħafna
-battery-almost-empty-title = Batterija kważi vojta
-battery-ups-low-title = Batterija tal-UPS baxxa
-battery-ups-very-low-title = Batterija tal-UPS baxxa ħafna
-battery-ups-almost-empty-title = Batterija tal-UPS kważi vojta
-battery-very-low-body = { $left } Qabbad mal-elettriku dalwaqt.
-battery-almost-empty-body = { $left } Qabbad mal-elettriku issa biex ma titlifx xogħol mhux issejvjat.
 
 battery-device-low-title = { $device }: batterija baxxa
 battery-device-very-low-title = { $device }: batterija baxxa ħafna

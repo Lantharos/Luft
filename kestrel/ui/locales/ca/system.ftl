@@ -64,15 +64,6 @@ vpn-field-group-password = Contrasenya del grup
 ## Battery notifications
 
 battery-left = Queda un { $percent }.
-battery-left-with-time = Queda un { $percent }, uns { $duration }.
-battery-low-title = Bateria baixa
-battery-very-low-title = Bateria molt baixa
-battery-almost-empty-title = Bateria gairebé esgotada
-battery-ups-low-title = Bateria del SAI baixa
-battery-ups-very-low-title = Bateria del SAI molt baixa
-battery-ups-almost-empty-title = Bateria del SAI gairebé esgotada
-battery-very-low-body = { $left } Endolleu l’ordinador aviat.
-battery-almost-empty-body = { $left } Endolleu l’ordinador ara per no perdre la feina sense desar.
 
 battery-device-low-title = Bateria baixa: { $device }
 battery-device-very-low-title = Bateria molt baixa: { $device }

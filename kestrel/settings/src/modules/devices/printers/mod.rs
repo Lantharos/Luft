@@ -12,7 +12,7 @@ use zbus::message::Type;
 use zbus::{Connection, MatchRule, Message, MessageStream};
 
 use crate::context::Context;
-use crate::shared::notify::{self, Notification, URGENCY_CRITICAL, URGENCY_NORMAL};
+use crate::shared::notify::{self, Notification, Sound, URGENCY_CRITICAL, URGENCY_NORMAL};
 use cups::{Cups, LEASE_SECONDS};
 use messages::{CONNECTING, PROCESSING};
 use printing::Printing;
@@ -256,6 +256,8 @@ impl Printers {
             actions: &[],
             urgency,
             transient: false,
+            sound: Sound::Usual,
+            shows_when_locked: false,
         }
         .show(&self.session, replaces)
         .await;

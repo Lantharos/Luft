@@ -64,15 +64,6 @@ vpn-field-group-password = Grup parolası
 ## Battery notifications
 
 battery-left = { $percent } kaldı.
-battery-left-with-time = { $percent } kaldı, yaklaşık { $duration }.
-battery-low-title = Pil zayıf
-battery-very-low-title = Pil çok zayıf
-battery-almost-empty-title = Pil bitmek üzere
-battery-ups-low-title = UPS pili zayıf
-battery-ups-very-low-title = UPS pili çok zayıf
-battery-ups-almost-empty-title = UPS pili bitmek üzere
-battery-very-low-body = { $left } Yakında prize takın.
-battery-almost-empty-body = { $left } Kaydedilmemiş çalışmalarınızı kaybetmemek için şimdi prize takın.
 
 battery-device-low-title = { $device }: pil zayıf
 battery-device-very-low-title = { $device }: pil çok zayıf

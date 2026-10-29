@@ -197,6 +197,7 @@ settings-power-limited-hot = Prestandan är begränsad eftersom datorn är för 
 settings-power-limited-lap-hot = Prestandan är begränsad eftersom datorn ligger i ditt knä och är för varm
 settings-power-saver-low-battery = Energisparläge vid låg batterinivå
 settings-power-saver-low-battery-description = Byter till energisparläge när batteriet börjar ta slut
+settings-power-saver-level = Batterinivå för energisparläge
 
 ## Keyboard backlight
 

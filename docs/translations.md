@@ -14,7 +14,7 @@ Luft is translated into Albanian, Bosnian, Bulgarian, Catalan, Croatian, Czech, 
 | kestrel-system | `kestrel/ui/locales/*/system.ftl` | network menus and sign-in, VPNs, Bluetooth, sound, power, displays, drives, accessibility, screenshots, dictation, system notices |
 | kestrel-auth | `kestrel/ui/locales/*/auth.ftl` | login screen, lock screen, sign-in and administrator prompts, keyring and passkey prompts, signing out and powering off |
 | kestrel-portal | `kestrel/ui/locales/*/portal.ftl` | printing, screen sharing, shortcuts and other app requests |
-| kestrel-settings | `kestrel/settings/locales/*/settings.ftl` | notifications from `kestrel-settings` about drives |
+| kestrel-settings | `kestrel/settings/locales/*/settings.ftl` | notifications from `kestrel-settings` about drives and the battery |
 | kestrel-portal-service | `kestrel/portal/locales/*/portal.ftl` | print job names and printing failures from `kestrel-portal` |
 | ui | `packages/web/ui/locales/*/ui.ftl` | the UI kit every app shares |
 | settings | `apps/settings/locales/*/settings.ftl` | Settings' window, sidebar and its groups, and search |

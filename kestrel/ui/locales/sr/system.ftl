@@ -64,15 +64,6 @@ vpn-field-group-password = Лозинка групе
 ## Battery notifications
 
 battery-left = Преостало је { $percent }.
-battery-left-with-time = Преостало је { $percent }, отприлике { $duration }.
-battery-low-title = Батерија је слаба
-battery-very-low-title = Батерија је веома слаба
-battery-almost-empty-title = Батерија је скоро празна
-battery-ups-low-title = Батерија UPS-а је слаба
-battery-ups-very-low-title = Батерија UPS-а је веома слаба
-battery-ups-almost-empty-title = Батерија UPS-а је скоро празна
-battery-very-low-body = { $left } Ускоро прикључите пуњач.
-battery-almost-empty-body = { $left } Прикључите пуњач одмах да не бисте изгубили несачувани рад.
 
 battery-device-low-title = Слаба батерија: { $device }
 battery-device-very-low-title = Веома слаба батерија: { $device }

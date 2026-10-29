@@ -64,15 +64,6 @@ vpn-field-group-password = Grupas parole
 ## Battery notifications
 
 battery-left = Atlikuši { $percent }.
-battery-left-with-time = Atlikuši { $percent }, aptuveni { $duration }.
-battery-low-title = Zems akumulatora līmenis
-battery-very-low-title = Ļoti zems akumulatora līmenis
-battery-almost-empty-title = Akumulators gandrīz tukšs
-battery-ups-low-title = Zems UPS akumulatora līmenis
-battery-ups-very-low-title = Ļoti zems UPS akumulatora līmenis
-battery-ups-almost-empty-title = UPS akumulators gandrīz tukšs
-battery-very-low-body = { $left } Drīz pievienojiet lādētāju.
-battery-almost-empty-body = { $left } Pievienojiet lādētāju tūlīt, lai nezaudētu nesaglabāto darbu.
 
 battery-device-low-title = { $device }: zems akumulatora līmenis
 battery-device-very-low-title = { $device }: ļoti zems akumulatora līmenis

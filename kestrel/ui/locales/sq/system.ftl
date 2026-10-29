@@ -64,15 +64,6 @@ vpn-field-group-password = Fjalëkalimi i grupit
 ## Battery notifications
 
 battery-left = Ka mbetur { $percent }.
-battery-left-with-time = Ka mbetur { $percent }, rreth { $duration }.
-battery-low-title = Bateria e ulët
-battery-very-low-title = Bateria shumë e ulët
-battery-almost-empty-title = Bateria pothuajse bosh
-battery-ups-low-title = Bateria e UPS-it e ulët
-battery-ups-very-low-title = Bateria e UPS-it shumë e ulët
-battery-ups-almost-empty-title = Bateria e UPS-it pothuajse bosh
-battery-very-low-body = { $left } Lidhe me karikuesin së shpejti.
-battery-almost-empty-body = { $left } Lidhe me karikuesin tani që të mos humbasësh punën e paruajtur.
 
 battery-device-low-title = { $device }: bateria e ulët
 battery-device-very-low-title = { $device }: bateria shumë e ulët

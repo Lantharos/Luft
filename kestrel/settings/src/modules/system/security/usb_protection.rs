@@ -3,7 +3,7 @@ use luft_dbus_macros::introspect;
 use zbus::{Connection, proxy};
 
 use crate::context::Context;
-use crate::shared::notify::{self, Notification, NotificationsProxy, URGENCY_NORMAL};
+use crate::shared::notify::{self, Notification, NotificationsProxy, Sound, URGENCY_NORMAL};
 
 const SETTINGS_ACTION: &str = "settings";
 
@@ -87,6 +87,8 @@ async fn announce(session: &Connection, devices: &[(String, String)], replaces: 
         actions: &[(SETTINGS_ACTION, "Settings")],
         urgency: URGENCY_NORMAL,
         transient: true,
+        sound: Sound::Usual,
+        shows_when_locked: false,
     }
     .show(session, replaces)
     .await;

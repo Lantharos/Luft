@@ -209,6 +209,7 @@ settings-power-limited-hot = Производительность огранич
 settings-power-limited-lap-hot = Производительность ограничена, потому что компьютер у вас на коленях и перегрелся
 settings-power-saver-low-battery = Энергосбережение при низком заряде
 settings-power-saver-low-battery-description = Включает энергосбережение, когда батарея садится
+settings-power-saver-level = Уровень заряда для энергосбережения
 
 ## Keyboard backlight
 

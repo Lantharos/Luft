@@ -64,15 +64,6 @@ vpn-field-group-password = Password del gruppo
 ## Battery notifications
 
 battery-left = { $percent } rimanente.
-battery-left-with-time = { $percent } rimanente, circa { $duration }.
-battery-low-title = Batteria scarica
-battery-very-low-title = Batteria molto scarica
-battery-almost-empty-title = Batteria quasi esaurita
-battery-ups-low-title = Batteria dell’UPS scarica
-battery-ups-very-low-title = Batteria dell’UPS molto scarica
-battery-ups-almost-empty-title = Batteria dell’UPS quasi esaurita
-battery-very-low-body = { $left } Collega presto l’alimentatore.
-battery-almost-empty-body = { $left } Collega subito l’alimentatore per non perdere il lavoro non salvato.
 
 battery-device-low-title = Batteria scarica: { $device }
 battery-device-very-low-title = Batteria molto scarica: { $device }

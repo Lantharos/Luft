@@ -88,18 +88,6 @@ vpn-field-group-password = Group password
 
 # $percent is a formatted percentage, for example "8%"
 battery-left = { $percent } left.
-# $percent is a formatted percentage, $duration a formatted time span, for example "25 min"
-battery-left-with-time = { $percent } left, about { $duration }.
-battery-low-title = Battery low
-battery-very-low-title = Battery very low
-battery-almost-empty-title = Battery almost empty
-battery-ups-low-title = UPS battery low
-battery-ups-very-low-title = UPS battery very low
-battery-ups-almost-empty-title = UPS battery almost empty
-# $left is the battery-left or battery-left-with-time sentence
-battery-very-low-body = { $left } Plug in soon.
-# $left is the battery-left or battery-left-with-time sentence
-battery-almost-empty-body = { $left } Plug in now to avoid losing unsaved work.
 
 # $device is a product name such as "MX Master 3" or one of the battery-device names below
 battery-device-low-title = { $device } battery low

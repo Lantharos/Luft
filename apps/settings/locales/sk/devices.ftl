@@ -209,6 +209,7 @@ settings-power-limited-hot = Výkon je obmedzený, pretože počítač je príli
 settings-power-limited-lap-hot = Výkon je obmedzený, pretože počítač máte na kolenách a je príliš horúci
 settings-power-saver-low-battery = Šetrenie energie pri slabej batérii
 settings-power-saver-low-battery-description = Keď sa batéria vybíja, prepne na šetrenie energie
+settings-power-saver-level = Úroveň batérie pre šetrenie energie
 
 ## Keyboard backlight
 

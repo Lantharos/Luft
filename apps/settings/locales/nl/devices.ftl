@@ -197,6 +197,7 @@ settings-power-limited-hot = De prestaties zijn beperkt omdat de computer te war
 settings-power-limited-lap-hot = De prestaties zijn beperkt omdat de computer op je schoot ligt en te warm is
 settings-power-saver-low-battery = Energiebesparing bij bijna lege batterij
 settings-power-saver-low-battery-description = Schakelt over op energiebesparing wanneer de batterij bijna leeg is
+settings-power-saver-level = Batterijniveau voor energiebesparing
 
 ## Keyboard backlight
 

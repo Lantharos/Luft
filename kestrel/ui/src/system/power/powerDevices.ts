@@ -4,17 +4,14 @@ import GLib from 'gi://GLib';
 const UPOWER = 'org.freedesktop.UPower';
 const UPOWER_PATH = '/org/freedesktop/UPower';
 const DEVICE = 'org.freedesktop.UPower.Device';
-const DISPLAY_DEVICE = `${UPOWER_PATH}/devices/DisplayDevice`;
 const NOT_DISCHARGING = new Set([1, 4, 5]);
 
 export interface PowerDevice {
   path: string;
-  system: boolean;
   kind: number;
   model: string;
   percentage: number;
   discharging: boolean;
-  secondsLeft: number;
 }
 
 type Listener = (device: PowerDevice) => void;
@@ -32,7 +29,6 @@ export class PowerDevices {
       bus.signal_subscribe(UPOWER, UPOWER, 'DeviceRemoved', UPOWER_PATH, null, Gio.DBusSignalFlags.NONE,
         (_connection, _sender, _path, _iface, _signal, parameters) => this.forget((parameters.deep_unpack() as [string])[0])),
     ];
-    this.watch(DISPLAY_DEVICE);
     bus.call(UPOWER, UPOWER_PATH, UPOWER, 'EnumerateDevices', null, null, Gio.DBusCallFlags.NONE, -1, this.cancellable, (_bus, result) => {
       try {
         const [paths] = bus.call_finish(result).deep_unpack() as [string[]];
@@ -55,18 +51,16 @@ export class PowerDevices {
           return;
         }
         const property = <T>(name: string) => proxy.get_cached_property(name)?.deepUnpack() as T;
-        const system = path === DISPLAY_DEVICE;
-        if (!system && property<boolean>('PowerSupply')) return;
+        if (property<boolean>('PowerSupply')) return;
         this.proxies.set(path, proxy);
         const report = () => {
           if (!property<boolean>('IsPresent')) return;
           this.changed({
-            path, system,
+            path,
             kind: property<number>('Type'),
             model: property<string>('Model') ?? '',
             percentage: property<number>('Percentage'),
             discharging: !NOT_DISCHARGING.has(property<number>('State')),
-            secondsLeft: Number(property<number | bigint>('TimeToEmpty')),
           });
         };
         proxy.connect('g-properties-changed', report);

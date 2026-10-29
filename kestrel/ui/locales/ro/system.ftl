@@ -64,15 +64,6 @@ vpn-field-group-password = Parola grupului
 ## Battery notifications
 
 battery-left = Baterie rămasă: { $percent }.
-battery-left-with-time = Baterie rămasă: { $percent }, aproximativ { $duration }.
-battery-low-title = Baterie descărcată
-battery-very-low-title = Baterie foarte descărcată
-battery-almost-empty-title = Baterie aproape goală
-battery-ups-low-title = Bateria UPS-ului este descărcată
-battery-ups-very-low-title = Bateria UPS-ului este foarte descărcată
-battery-ups-almost-empty-title = Bateria UPS-ului este aproape goală
-battery-very-low-body = { $left } Conectați curând încărcătorul.
-battery-almost-empty-body = { $left } Conectați acum încărcătorul ca să nu pierdeți lucrul nesalvat.
 
 battery-device-low-title = Baterie descărcată: { $device }
 battery-device-very-low-title = Baterie foarte descărcată: { $device }

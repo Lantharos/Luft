@@ -7,7 +7,7 @@ use zbus::proxy::CacheProperties;
 use zbus::{Connection, proxy};
 
 use crate::context::Context;
-use crate::shared::notify::{self, Notification, NotificationsProxy, URGENCY_NORMAL};
+use crate::shared::notify::{self, Notification, NotificationsProxy, Sound, URGENCY_NORMAL};
 
 const SETTINGS_ACTION: &str = "settings";
 
@@ -61,6 +61,8 @@ impl Missed {
             actions: &[(SETTINGS_ACTION, "Settings")],
             urgency: URGENCY_NORMAL,
             transient: false,
+            sound: Sound::Usual,
+            shows_when_locked: false,
         }
     }
 }

@@ -237,6 +237,7 @@ settings-power-limited-hot = Performance is limited because the computer is too 
 settings-power-limited-lap-hot = Performance is limited because the computer is on your lap and too hot
 settings-power-saver-low-battery = Power saver on low battery
 settings-power-saver-low-battery-description = Switches to power saver when the battery runs low
+settings-power-saver-level = Battery level for power saver
 
 ## Keyboard backlight
 

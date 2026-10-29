@@ -215,6 +215,7 @@ settings-power-limited-hot = Il-prestazzjoni hija limitata għax il-kompjuter s�
 settings-power-limited-lap-hot = Il-prestazzjoni hija limitata għax il-kompjuter qiegħed fuq ħoġrok u sħun wisq
 settings-power-saver-low-battery = Iffrankar tal-enerġija meta l-batterija tkun baxxa
 settings-power-saver-low-battery-description = Jaqleb għall-iffrankar tal-enerġija meta l-batterija tibda tbaxxi
+settings-power-saver-level = Livell tal-batterija għall-iffrankar tal-enerġija
 
 ## Keyboard backlight
 

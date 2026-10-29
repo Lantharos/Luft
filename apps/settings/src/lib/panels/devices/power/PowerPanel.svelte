@@ -3,6 +3,7 @@
 	import { Row, Section, Segmented, Select, Switch } from '@luft/ui';
 	import { commands, events } from '#lib/bindings.js';
 	import type { PowerState } from '#lib/bindings.js';
+	import { percent } from '#lib/format.js';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import BatterySection from './BatterySection.svelte';
 	import DevicesSection from './DevicesSection.svelte';
@@ -18,6 +19,7 @@
 		'sleep-inactive-battery-timeout': number;
 		'power-button-action': string;
 		'power-saver-profile-on-low-battery': boolean;
+		'power-saver-battery-level': number;
 	};
 	type Source = 'ac' | 'battery';
 
@@ -29,6 +31,7 @@
 		{ value: 'balanced', label: 'settings-power-profile-balanced', description: 'settings-power-profile-balanced.description' },
 		{ value: 'performance', label: 'settings-power-profile-performance', description: 'settings-power-profile-performance.description' }
 	];
+	const SAVER_LEVELS = [20, 30, 40, 50];
 	const LAP = 'lap-detected';
 	const HOT = 'high-operating-temperature';
 
@@ -40,12 +43,14 @@
 		'sleep-inactive-battery-type',
 		'sleep-inactive-battery-timeout',
 		'power-button-action',
-		'power-saver-profile-on-low-battery'
+		'power-saver-profile-on-low-battery',
+		'power-saver-battery-level'
 	]);
 
 	let state = $state<PowerState | null>(null);
 
 	let profiles = $derived(state?.profiles ?? null);
+	let saverLevels = $derived(SAVER_LEVELS.map((level) => ({ value: level, label: percent(level / 100) })));
 	let profileOptions = $derived(
 		PROFILES.filter((profile) => profiles?.available.includes(profile.value)).map((profile) => ({ value: profile.value, label: t(profile.label) }))
 	);
@@ -117,6 +122,14 @@
 		</Row>
 		{#if state?.battery}
 			<Row title={t('settings-power-saver-low-battery')} description={t('settings-power-saver-low-battery-description')}>
+				{#if power.values['power-saver-profile-on-low-battery'] ?? true}
+					<Segmented
+						label={t('settings-power-saver-level')}
+						options={saverLevels}
+						value={power.values['power-saver-battery-level'] ?? 30}
+						onchange={(level) => power.set('power-saver-battery-level', level)}
+					/>
+				{/if}
 				<Switch
 					label={t('settings-power-saver-low-battery')}
 					checked={power.values['power-saver-profile-on-low-battery'] ?? true}

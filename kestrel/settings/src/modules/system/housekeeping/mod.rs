@@ -12,7 +12,7 @@ use tokio::time::{Instant, interval, interval_at, sleep_until};
 use zbus::Connection;
 
 use crate::context::Context;
-use crate::shared::notify::{self, Notification, NotificationsProxy, URGENCY_CRITICAL};
+use crate::shared::notify::{self, Notification, NotificationsProxy, Sound, URGENCY_CRITICAL};
 use crate::shared::settings::Schemas;
 use disk_space::{DiskSpace, Low};
 
@@ -170,6 +170,8 @@ async fn warn(session: &Connection, low: &Low, replaces: u32) -> u32 {
         actions: &actions,
         urgency: URGENCY_CRITICAL,
         transient: true,
+        sound: Sound::Usual,
+        shows_when_locked: false,
     }
     .show(session, replaces)
     .await;

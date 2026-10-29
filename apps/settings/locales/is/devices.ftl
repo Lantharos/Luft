@@ -197,6 +197,7 @@ settings-power-limited-hot = Afköst eru takmörkuð af því að tölvan er of 
 settings-power-limited-lap-hot = Afköst eru takmörkuð af því að tölvan er í kjöltunni á þér og of heit
 settings-power-saver-low-battery = Orkusparnaður þegar rafhlaðan er lág
 settings-power-saver-low-battery-description = Skiptir yfir í orkusparnað þegar rafhlaðan er að tæmast
+settings-power-saver-level = Hleðsla rafhlöðu fyrir orkusparnað
 
 ## Keyboard backlight
 

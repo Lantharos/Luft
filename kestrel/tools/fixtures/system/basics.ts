@@ -16,6 +16,7 @@ const LOGIN = `<node><interface name="org.freedesktop.login1.Manager">
   <method name="CanPowerOff"><arg type="s" direction="out"/></method>
   <method name="CanReboot"><arg type="s" direction="out"/></method>
   <method name="CanSuspend"><arg type="s" direction="out"/></method>
+  <method name="CanHibernate"><arg type="s" direction="out"/></method>
   <method name="GetUser"><arg type="u" direction="in"/><arg type="o" direction="out"/></method>
   <method name="GetSession"><arg type="s" direction="in"/><arg type="o" direction="out"/></method>
   <property name="LidClosed" type="b" access="read"/>
@@ -24,6 +25,7 @@ const LOGIN = `<node><interface name="org.freedesktop.login1.Manager">
 const LOGIN_CONTROL = `<node><interface name="com.lantharos.KestrelChecks.Login">
   <method name="SetLidClosed"><arg type="b" direction="in"/></method>
   <method name="PrepareForSleep"><arg type="b" direction="in"/></method>
+  <method name="SetCanHibernate"><arg type="s" direction="in"/></method>
 </interface></node>`;
 const LOGIN_USER = `<node><interface name="org.freedesktop.login1.User">
   <property name="Display" type="(so)" access="read"/>
@@ -117,6 +119,7 @@ function followRelease(held: Gio.Socket, released: () => void) {
 
 export function publishBasics(publish: Publish, calls: string[]) {
   let lidClosed = false;
+  let canHibernate = 'na';
   const login = publish(LOGIN, {
     InhibitAsync([what, , , mode]: string[], invocation: Gio.DBusMethodInvocation) {
       calls.push(`Inhibit ${what} ${mode}`);
@@ -133,6 +136,7 @@ export function publishBasics(publish: Publish, calls: string[]) {
     CanPowerOff: () => 'yes',
     CanReboot: () => 'yes',
     CanSuspend: () => 'yes',
+    CanHibernate: () => canHibernate,
     GetUser: () => '/org/freedesktop/login1/user/self',
     GetSession: () => SESSION_PATH,
     get LidClosed() { return lidClosed; },
@@ -143,6 +147,9 @@ export function publishBasics(publish: Publish, calls: string[]) {
       login.emit_property_changed('LidClosed', new GLib.Variant('b', closed));
     },
     PrepareForSleep: (sleeping: boolean) => login.emit_signal('PrepareForSleep', new GLib.Variant('(b)', [sleeping])),
+    SetCanHibernate: (answer: string) => {
+      canHibernate = answer;
+    },
   }, '/com/lantharos/KestrelChecks/Login');
   publish(LOGIN_USER, {Display: [SESSION_ID, SESSION_PATH]}, '/org/freedesktop/login1/user/self');
   let lockedHint = false;

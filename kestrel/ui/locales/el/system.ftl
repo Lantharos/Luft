@@ -65,15 +65,6 @@ vpn-field-group-password = Κωδικός ομάδας
 ## Battery notifications
 
 battery-left = Απομένει { $percent }.
-battery-left-with-time = Απομένει { $percent }, περίπου { $duration }.
-battery-low-title = Χαμηλή μπαταρία
-battery-very-low-title = Πολύ χαμηλή μπαταρία
-battery-almost-empty-title = Η μπαταρία σχεδόν άδειασε
-battery-ups-low-title = Χαμηλή μπαταρία UPS
-battery-ups-very-low-title = Πολύ χαμηλή μπαταρία UPS
-battery-ups-almost-empty-title = Η μπαταρία του UPS σχεδόν άδειασε
-battery-very-low-body = { $left } Συνδέστε σύντομα τον φορτιστή.
-battery-almost-empty-body = { $left } Συνδέστε τώρα τον φορτιστή για να μη χάσετε εργασία που δεν έχει αποθηκευτεί.
 
 battery-device-low-title = { $device }: χαμηλή μπαταρία
 battery-device-very-low-title = { $device }: πολύ χαμηλή μπαταρία

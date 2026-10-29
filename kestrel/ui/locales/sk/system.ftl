@@ -64,15 +64,6 @@ vpn-field-group-password = Heslo skupiny
 ## Battery notifications
 
 battery-left = Zostáva { $percent }.
-battery-left-with-time = Zostáva { $percent }, približne { $duration }.
-battery-low-title = Slabá batéria
-battery-very-low-title = Veľmi slabá batéria
-battery-almost-empty-title = Batéria je takmer vybitá
-battery-ups-low-title = Slabá batéria UPS
-battery-ups-very-low-title = Veľmi slabá batéria UPS
-battery-ups-almost-empty-title = Batéria UPS je takmer vybitá
-battery-very-low-body = { $left } Čoskoro pripojte napájanie.
-battery-almost-empty-body = { $left } Pripojte napájanie hneď, aby ste neprišli o neuloženú prácu.
 
 battery-device-low-title = { $device }: slabá batéria
 battery-device-very-low-title = { $device }: veľmi slabá batéria

@@ -197,6 +197,7 @@ settings-power-limited-hot = Suorituskykyä on rajoitettu, koska tietokone on li
 settings-power-limited-lap-hot = Suorituskykyä on rajoitettu, koska tietokone on sylissäsi ja liian kuuma
 settings-power-saver-low-battery = Virransäästö, kun akku on vähissä
 settings-power-saver-low-battery-description = Siirtyy virransäästöön, kun akun varaus käy vähiin
+settings-power-saver-level = Virransäästön akun varaustaso
 
 ## Keyboard backlight
 

@@ -64,15 +64,6 @@ vpn-field-group-password = Gruppeadgangskode
 ## Battery notifications
 
 battery-left = { $percent } tilbage.
-battery-left-with-time = { $percent } tilbage, cirka { $duration }.
-battery-low-title = Lavt batteriniveau
-battery-very-low-title = Meget lavt batteriniveau
-battery-almost-empty-title = Batteriet er næsten tomt
-battery-ups-low-title = Lavt batteriniveau i UPS
-battery-ups-very-low-title = Meget lavt batteriniveau i UPS
-battery-ups-almost-empty-title = UPS-batteriet er næsten tomt
-battery-very-low-body = { $left } Tilslut strøm snart.
-battery-almost-empty-body = { $left } Tilslut strøm nu, så du ikke mister arbejde, der ikke er gemt.
 
 battery-device-low-title = Lavt batteriniveau: { $device }
 battery-device-very-low-title = Meget lavt batteriniveau: { $device }

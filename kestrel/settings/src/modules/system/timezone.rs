@@ -5,7 +5,7 @@ use zbus::{Connection, proxy};
 
 use crate::context::Context;
 use crate::shared::location::{self, Coordinates};
-use crate::shared::notify::{self, Notification, NotificationsProxy, URGENCY_NORMAL};
+use crate::shared::notify::{self, Notification, NotificationsProxy, Sound, URGENCY_NORMAL};
 use crate::shared::settings::Schemas;
 use crate::shared::system::LoginProxy;
 
@@ -120,6 +120,8 @@ async fn announce(session: &Connection, zone: &str, replaces: u32) -> u32 {
         actions: &[(SETTINGS_ACTION, "Settings")],
         urgency: URGENCY_NORMAL,
         transient: false,
+        sound: Sound::Usual,
+        shows_when_locked: false,
     }
     .show(session, replaces)
     .await;

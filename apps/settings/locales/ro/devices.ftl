@@ -203,6 +203,7 @@ settings-power-limited-hot = Performanța este limitată, deoarece computerul es
 settings-power-limited-lap-hot = Performanța este limitată, deoarece computerul este pe genunchi și este prea fierbinte
 settings-power-saver-low-battery = Economisire energie la baterie descărcată
 settings-power-saver-low-battery-description = Trece la Economisire energie când bateria se descarcă
+settings-power-saver-level = Nivelul bateriei pentru economisirea energiei
 
 ## Keyboard backlight
 

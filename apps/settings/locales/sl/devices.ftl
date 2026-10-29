@@ -209,6 +209,7 @@ settings-power-limited-hot = Zmogljivost je omejena, ker je računalnik prevroč
 settings-power-limited-lap-hot = Zmogljivost je omejena, ker je računalnik v vašem naročju in prevroč
 settings-power-saver-low-battery = Varčevanje ob skoraj prazni bateriji
 settings-power-saver-low-battery-description = Ko je baterija skoraj prazna, preklopi na varčevanje z energijo
+settings-power-saver-level = Raven baterije za varčevanje z energijo
 
 ## Keyboard backlight
 

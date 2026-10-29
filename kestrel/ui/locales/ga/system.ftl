@@ -64,15 +64,6 @@ vpn-field-group-password = Pasfhocal an ghrúpa
 ## Battery notifications
 
 battery-left = { $percent } fágtha.
-battery-left-with-time = { $percent } fágtha, timpeall { $duration }.
-battery-low-title = Ceallra íseal
-battery-very-low-title = Ceallra an-íseal
-battery-almost-empty-title = Ceallra beagnach folamh
-battery-ups-low-title = Ceallra UPS íseal
-battery-ups-very-low-title = Ceallra UPS an-íseal
-battery-ups-almost-empty-title = Ceallra UPS beagnach folamh
-battery-very-low-body = { $left } Plugáil isteach go luath.
-battery-almost-empty-body = { $left } Plugáil isteach anois ionas nach gcaillfidh tú obair nach bhfuil sábháilte.
 
 battery-device-low-title = { $device }: ceallra íseal
 battery-device-very-low-title = { $device }: ceallra an-íseal

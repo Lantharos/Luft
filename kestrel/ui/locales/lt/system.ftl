@@ -64,15 +64,6 @@ vpn-field-group-password = Grupės slaptažodis
 ## Battery notifications
 
 battery-left = Liko { $percent }.
-battery-left-with-time = Liko { $percent }, maždaug { $duration }.
-battery-low-title = Akumuliatorius senka
-battery-very-low-title = Akumuliatorius beveik išsikrovęs
-battery-almost-empty-title = Akumuliatorius tuoj išsikraus
-battery-ups-low-title = UPS akumuliatorius senka
-battery-ups-very-low-title = UPS akumuliatorius beveik išsikrovęs
-battery-ups-almost-empty-title = UPS akumuliatorius tuoj išsikraus
-battery-very-low-body = { $left } Netrukus prijunkite maitinimą.
-battery-almost-empty-body = { $left } Prijunkite maitinimą dabar, kad neprarastumėte neįrašytų darbų.
 
 battery-device-low-title = { $device }: akumuliatorius senka
 battery-device-very-low-title = { $device }: akumuliatorius beveik išsikrovęs

@@ -64,15 +64,6 @@ vpn-field-group-password = Gruppenpasswort
 ## Battery notifications
 
 battery-left = Noch { $percent }.
-battery-left-with-time = Noch { $percent }, etwa { $duration }.
-battery-low-title = Akku schwach
-battery-very-low-title = Akku sehr schwach
-battery-almost-empty-title = Akku fast leer
-battery-ups-low-title = USV-Akku schwach
-battery-ups-very-low-title = USV-Akku sehr schwach
-battery-ups-almost-empty-title = USV-Akku fast leer
-battery-very-low-body = { $left } Schließ bald das Ladegerät an.
-battery-almost-empty-body = { $left } Schließ jetzt das Ladegerät an, damit keine ungespeicherte Arbeit verloren geht.
 
 battery-device-low-title = { $device }: Akku schwach
 battery-device-very-low-title = { $device }: Akku sehr schwach

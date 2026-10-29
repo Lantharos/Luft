@@ -203,6 +203,7 @@ settings-power-limited-hot = Veiktspēja ir ierobežota, jo dators ir pārāk ka
 settings-power-limited-lap-hot = Veiktspēja ir ierobežota, jo dators atrodas uz jūsu ceļgaliem un ir pārāk karsts
 settings-power-saver-low-battery = Enerģijas taupīšana, kad akumulators ir gandrīz tukšs
 settings-power-saver-low-battery-description = Ieslēdz enerģijas taupīšanu, kad akumulatora uzlādes līmenis kļūst zems
+settings-power-saver-level = Akumulatora līmenis enerģijas taupīšanai
 
 ## Keyboard backlight
 

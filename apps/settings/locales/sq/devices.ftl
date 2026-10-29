@@ -197,6 +197,7 @@ settings-power-limited-hot = Performanca është e kufizuar sepse kompjuteri ës
 settings-power-limited-lap-hot = Performanca është e kufizuar sepse kompjuteri është në prehrin tënd dhe shumë i nxehtë
 settings-power-saver-low-battery = Kursim energjie kur bateria është e ulët
 settings-power-saver-low-battery-description = Kalon në kursim energjie kur bateria po mbaron
+settings-power-saver-level = Niveli i baterisë për kursimin e energjisë
 
 ## Keyboard backlight
 

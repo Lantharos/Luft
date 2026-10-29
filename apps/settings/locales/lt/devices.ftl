@@ -209,6 +209,7 @@ settings-power-limited-hot = Našumas ribojamas, nes kompiuteris per daug įkait
 settings-power-limited-lap-hot = Našumas ribojamas, nes kompiuteris laikomas ant kelių ir per daug įkaito
 settings-power-saver-low-battery = Energijos taupymas, kai akumuliatorius senka
 settings-power-saver-low-battery-description = Įjungia energijos taupymą, kai akumuliatorius beveik išsikrauna
+settings-power-saver-level = Akumuliatoriaus lygis energijos taupymui
 
 ## Keyboard backlight
 

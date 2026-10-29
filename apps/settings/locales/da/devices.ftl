@@ -197,6 +197,7 @@ settings-power-limited-hot = Ydeevnen er begrænset, fordi computeren er for var
 settings-power-limited-lap-hot = Ydeevnen er begrænset, fordi computeren ligger på dit skød og er for varm
 settings-power-saver-low-battery = Strømbesparelse ved lavt batteri
 settings-power-saver-low-battery-description = Skifter til Strømbesparelse, når batteriniveauet bliver lavt
+settings-power-saver-level = Batteriniveau for strømbesparelse
 
 ## Keyboard backlight
 

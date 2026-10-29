@@ -197,6 +197,7 @@ settings-power-limited-hot = El rendiment està limitat perquè l’ordinador es
 settings-power-limited-lap-hot = El rendiment està limitat perquè l’ordinador és sobre la falda i està massa calent
 settings-power-saver-low-battery = Estalvi d’energia amb la bateria baixa
 settings-power-saver-low-battery-description = Passa a estalvi d’energia quan la bateria s’esgota
+settings-power-saver-level = Nivell de bateria per a l’estalvi d’energia
 
 ## Keyboard backlight
 

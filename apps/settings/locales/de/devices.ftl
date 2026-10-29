@@ -197,6 +197,7 @@ settings-power-limited-hot = Die Leistung ist eingeschränkt, weil der Computer 
 settings-power-limited-lap-hot = Die Leistung ist eingeschränkt, weil der Computer auf deinem Schoß liegt und zu heiß ist
 settings-power-saver-low-battery = Energie sparen bei niedrigem Akkustand
 settings-power-saver-low-battery-description = Wechselt zu „Energie sparen“, wenn der Akku fast leer ist
+settings-power-saver-level = Akkustand für Energie sparen
 
 ## Keyboard backlight
 

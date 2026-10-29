@@ -7,14 +7,16 @@ use zbus::Connection;
 use zbus::object_server::InterfaceRef;
 
 use super::ambient::Ambient;
+use super::battery::{Discharge, Reading};
 use super::idle::{self, Action, SCREEN_OFF_AFTER_LOCK, Situation};
 use super::inhibitors::Inhibitors;
 use super::keyboard::{self, Backlight, IdleChange, Keyboard};
 use super::proxies::{
-    self, DisplayConfigProxy, ScreenSaverProxy, SessionManagerProxy, ShellBrightnessProxy,
+    self, BatteryDeviceProxy, DisplayConfigProxy, ScreenSaverProxy, SessionManagerProxy,
+    ShellBrightnessProxy,
 };
 use super::watches::{Watch, Watches};
-use crate::shared::notify::{self, Notification, URGENCY_CRITICAL};
+use crate::shared::notify::{self, Notification, Sound, URGENCY_CRITICAL};
 use crate::shared::settings::Schemas;
 use crate::shared::system::LoginProxy;
 
@@ -23,7 +25,6 @@ pub const SESSION: &str = "org.gnome.desktop.session";
 pub const SCREENSAVER: &str = "org.gnome.desktop.screensaver";
 const IDLE_INHIBITED: u32 = 8;
 const SUSPEND_INHIBITED: u32 = 4;
-pub const LOW_WARNING_LEVEL: u32 = 3;
 const SCREEN_ON: i32 = 0;
 const SCREEN_OFF: i32 = 3;
 const AWAKE_AFTER_PLUGGING_IN: Duration = Duration::from_secs(15);
@@ -46,7 +47,9 @@ pub struct Power {
     pub inhibited: u32,
     pub screen_locked: bool,
     pub on_battery: bool,
-    pub battery_low: bool,
+    pub battery: Reading,
+    pub discharge: Option<Discharge>,
+    pub battery_device: BatteryDeviceProxy<'static>,
     pub profile: Option<String>,
     pub lid_closed: bool,
     pub sleeping: bool,
@@ -87,13 +90,14 @@ impl Power {
     fn saving_power(&self) -> bool {
         match &self.profile {
             Some(profile) => profile == "power-saver",
-            None => self.battery_low,
+            None => self.power_saver_wanted(),
         }
     }
 
     pub async fn setting_changed(&mut self, schema: &str, key: &str) {
         match key {
             "power-saver-profile-on-low-battery" => self.hold_power_saver().await,
+            "power-saver-battery-level" => self.power_saver_level_changed().await,
             "ambient-enabled" => self.claim_light().await,
             _ if schema == SESSION || key.starts_with("sleep-inactive") || key == "idle-dim" => {
                 self.configure().await
@@ -371,14 +375,6 @@ impl Power {
         }
     }
 
-    pub async fn hold_power_saver(&mut self) {
-        let wanted = self.battery_low
-            && self
-                .settings
-                .get::<bool>(POWER, "power-saver-profile-on-low-battery");
-        self.inhibitors.hold_power_saver(wanted).await;
-    }
-
     pub async fn warn_about_sleep(&mut self) {
         let (summary, body) = match self.warned_action {
             Action::Logout => (
@@ -402,6 +398,8 @@ impl Power {
             actions: &[],
             urgency: URGENCY_CRITICAL,
             transient: false,
+            sound: Sound::Usual,
+            shows_when_locked: false,
         }
         .show(&self.session, self.warning)
         .await;

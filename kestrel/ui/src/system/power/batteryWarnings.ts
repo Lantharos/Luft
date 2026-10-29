@@ -1,15 +1,12 @@
 import Gio from 'gi://Gio';
 import * as MessageTray from '../../surfaces/notifications/tray/messageTray.js';
 
-import { shortDuration } from '../../shared/time/duration.js';
 import { formatsLocale, t } from '../../shared/i18n/index.js';
 import { playSound } from '../sounds/sounds.js';
 import { PowerDevices, type PowerDevice } from './powerDevices.js';
 
-const SYSTEM_THRESHOLDS = [20, 10, 5];
-const ACCESSORY_THRESHOLDS = [20, 10];
+const THRESHOLDS = [20, 10];
 const RECHARGED_MARGIN = 5;
-const UPS = 3;
 
 const ACCESSORIES: Record<number, [name: string, icon: string]> = {
   5: ['battery-device-mouse', 'input-mouse-symbolic'],
@@ -38,33 +35,15 @@ interface Warning {
   urgency: MessageTray.Urgency;
 }
 
-function reached(thresholds: number[], percentage: number): number | null {
-  return thresholds.filter(threshold => percentage <= threshold).at(-1) ?? null;
+function reached(percentage: number): number | null {
+  return THRESHOLDS.filter(threshold => percentage <= threshold).at(-1) ?? null;
 }
 
 function percent(percentage: number): string {
   return new Intl.NumberFormat(formatsLocale(), { style: 'percent' }).format(Math.round(percentage) / 100);
 }
 
-function systemWarning({ kind, percentage, secondsLeft }: PowerDevice, threshold: number): Warning {
-  const ups = kind === UPS;
-  const left = secondsLeft > 0
-    ? t('battery-left-with-time', { percent: percent(percentage), duration: shortDuration(secondsLeft) })
-    : t('battery-left', { percent: percent(percentage) });
-  if (threshold === 5)
-    return {
-      title: t(ups ? 'battery-ups-almost-empty-title' : 'battery-almost-empty-title'), body: t('battery-almost-empty-body', { left }),
-      icon: 'battery-caution-symbolic', urgency: MessageTray.Urgency.CRITICAL,
-    };
-  if (threshold === 10)
-    return {
-      title: t(ups ? 'battery-ups-very-low-title' : 'battery-very-low-title'), body: t('battery-very-low-body', { left }),
-      icon: 'battery-caution-symbolic', urgency: MessageTray.Urgency.HIGH,
-    };
-  return { title: t(ups ? 'battery-ups-low-title' : 'battery-low-title'), body: left, icon: 'battery-low-symbolic', urgency: MessageTray.Urgency.NORMAL };
-}
-
-function accessoryWarning({ kind, model, percentage }: PowerDevice, threshold: number): Warning {
+function warning({ kind, model, percentage }: PowerDevice, threshold: number): Warning {
   const [kindName, icon] = ACCESSORIES[kind] ?? UNKNOWN_ACCESSORY;
   const device = model.trim() || t(kindName);
   const left = t('battery-left', { percent: percent(percentage) });
@@ -82,18 +61,17 @@ export class BatteryWarnings {
       this.clear(device.path);
       return;
     }
-    const thresholds = device.system ? SYSTEM_THRESHOLDS : ACCESSORY_THRESHOLDS;
     let warned = this.warned.get(device.path);
     if (!warned) {
       warned = { threshold: null, notification: null };
       this.warned.set(device.path, warned);
     }
     if (warned.threshold !== null && device.percentage >= warned.threshold + RECHARGED_MARGIN)
-      warned.threshold = reached(thresholds, device.percentage);
-    const threshold = reached(thresholds, device.percentage);
+      warned.threshold = reached(device.percentage);
+    const threshold = reached(device.percentage);
     if (threshold === null || (warned.threshold !== null && threshold >= warned.threshold)) return;
     warned.threshold = threshold;
-    this.show(warned, device.system ? systemWarning(device, threshold) : accessoryWarning(device, threshold));
+    this.show(warned, warning(device, threshold));
   }
 
   private show(warned: Warned, { title, body, icon, urgency }: Warning): void {

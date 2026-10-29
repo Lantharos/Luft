@@ -100,14 +100,17 @@ export function publishUpower(publish: Publish, calls: string[]) {
     Reset: () => changed({...NO_BATTERY, OnBattery: false}),
   }, '/com/lantharos/KestrelChecks/Battery');
 
-  publishPowerProfiles(publish);
+  publishPowerProfiles(publish, calls);
 }
 
-function publishPowerProfiles(publish: Publish) {
+function publishPowerProfiles(publish: Publish, calls: string[]) {
   let active = 'balanced';
   const profiles = publish(POWER_PROFILES, {
-    HoldProfile: () => 1,
-    ReleaseProfile() {},
+    HoldProfile: (profile: string) => {
+      calls.push(`HoldProfile ${profile}`);
+      return 1;
+    },
+    ReleaseProfile: () => calls.push('ReleaseProfile'),
     get ActiveProfile() { return active; },
     set ActiveProfile(profile: string) {
       active = profile;

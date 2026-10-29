@@ -16,7 +16,9 @@ use std::time::Duration;
 use anyhow::Result;
 use tokio::signal::unix::{SignalKind, signal};
 use tokio::sync::mpsc;
+use zbus::object_server::SignalEmitter;
 
+use bus::{Dictation, Models};
 use hub::{Event, Hub, NAME, PATH};
 use models::Store;
 
@@ -24,19 +26,12 @@ const WARM_FOR: Duration = Duration::from_secs(180);
 const EXIT_WHEN_IDLE_FOR: Duration = Duration::from_secs(30);
 const CHECK_EVERY: Duration = Duration::from_secs(5);
 
-async fn to_shell<B>(
+async fn to_shell(
     connection: &zbus::Connection,
     names: &zbus::fdo::DBusProxy<'_>,
-    member: &str,
-    body: &B,
-) -> zbus::Result<()>
-where
-    B: serde::Serialize + zbus::zvariant::DynamicType,
-{
+) -> zbus::Result<SignalEmitter<'static>> {
     let shell = names.get_name_owner(bus::SHELL).await?;
-    connection
-        .emit_signal(Some(shell.as_ref()), PATH, NAME, member, body)
-        .await
+    Ok(SignalEmitter::new(connection, PATH)?.set_destination(shell.into_inner().into()))
 }
 
 fn main() -> Result<()> {
@@ -59,31 +54,29 @@ async fn serve() -> Result<()> {
     connection.object_server().at(PATH, dictation).await?;
     connection.object_server().at(PATH, models).await?;
     connection.request_name(NAME).await?;
-    let emitter = connection.clone();
+    let everyone = SignalEmitter::new(&connection, PATH)?;
     tokio::spawn(async move {
         while let Some(event) = received.recv().await {
-            let sent = match event {
-                Event::Partial(text) => to_shell(&emitter, &names, "Partial", &(text,)).await,
-                Event::Typed(text) => to_shell(&emitter, &names, "Typed", &(text,)).await,
-                Event::Sent(done) => {
-                    let _ = done.send(());
-                    Ok(())
-                }
-                Event::Level(level) => to_shell(&emitter, &names, "Level", &(level,)).await,
-                Event::Quiet => to_shell(&emitter, &names, "Quiet", &()).await,
-                Event::Changed => {
-                    emitter
-                        .emit_signal(
-                            None::<&str>,
-                            PATH,
-                            "com.lantharos.Speech1.Models",
-                            "Changed",
-                            &(),
-                        )
-                        .await
+            let sent = async {
+                match event {
+                    Event::Partial(text) => {
+                        Dictation::partial(&to_shell(&connection, &names).await?, &text).await
+                    }
+                    Event::Typed(text) => {
+                        Dictation::typed(&to_shell(&connection, &names).await?, &text).await
+                    }
+                    Event::Sent(done) => {
+                        let _ = done.send(());
+                        Ok(())
+                    }
+                    Event::Level(level) => {
+                        Dictation::level(&to_shell(&connection, &names).await?, level).await
+                    }
+                    Event::Quiet => Dictation::quiet(&to_shell(&connection, &names).await?).await,
+                    Event::Changed => Models::changed(&everyone).await,
                 }
             };
-            if let Err(error) = sent {
+            if let Err(error) = sent.await {
                 eprintln!("Couldn't send a signal: {error}");
             }
         }

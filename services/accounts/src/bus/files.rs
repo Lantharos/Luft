@@ -2,6 +2,7 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 use zbus::interface;
+use zbus::object_server::SignalEmitter;
 
 use super::{Error, json};
 use crate::drives;
@@ -58,4 +59,7 @@ impl Files {
         self.hub.drives_changed().await;
         Ok(())
     }
+
+    #[zbus(signal)]
+    pub async fn drives_changed(emitter: &SignalEmitter<'_>) -> zbus::Result<()>;
 }

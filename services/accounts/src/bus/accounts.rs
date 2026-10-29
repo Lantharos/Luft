@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use luft_accounts::types::{Account, Answer, Credentials, Provider};
 use zbus::interface;
+use zbus::object_server::SignalEmitter;
 
 use super::{Error, json, parse};
 use crate::accounts;
@@ -74,4 +75,14 @@ impl Accounts {
     async fn remove(&self, account: String) -> Result<(), Error> {
         Ok(accounts::remove(&self.hub, &account).await?)
     }
+
+    #[zbus(signal)]
+    pub async fn changed(emitter: &SignalEmitter<'_>) -> zbus::Result<()>;
+
+    #[zbus(signal)]
+    pub async fn sign_in_step(
+        emitter: &SignalEmitter<'_>,
+        session: &str,
+        step: &str,
+    ) -> zbus::Result<()>;
 }

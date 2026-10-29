@@ -2,8 +2,10 @@ use std::sync::{Mutex, MutexGuard};
 
 use luft_accounts::types::Step;
 use tokio::sync::{Notify, broadcast, watch};
-use zbus::Connection;
+use zbus::object_server::SignalEmitter;
+use zbus::{Connection, ObjectPath};
 
+use crate::bus::{Accounts, Files};
 use crate::conditions::Conditions;
 use crate::drives::Drives;
 use crate::lifetime;
@@ -15,8 +17,6 @@ use crate::store::{Keyring, Records};
 
 pub const NAME: &str = "com.lantharos.Accounts1";
 pub const PATH: &str = "/com/lantharos/Accounts1";
-pub const ACCOUNTS: &str = "com.lantharos.Accounts1";
-pub const FILES: &str = "com.lantharos.Accounts1.Files";
 
 pub struct Hub {
     pub paths: Paths,
@@ -76,30 +76,36 @@ impl Hub {
     pub async fn accounts_changed(&self) {
         let any = !self.records().all().is_empty();
         self.demand.notify_one();
-        self.signal(ACCOUNTS, "Changed", &()).await;
+        announced("Changed", Accounts::changed(&self.emitter()).await);
         lifetime::follow_accounts(&self.session, any).await;
     }
 
     pub async fn drives_changed(&self) {
-        self.signal(FILES, "DrivesChanged", &()).await;
+        announced(
+            "DrivesChanged",
+            Files::drives_changed(&self.emitter()).await,
+        );
     }
 
     pub async fn step_changed(&self, session: &str, step: &Step) {
         self.demand.notify_one();
         let step = serde_json::to_string(step).expect("steps always serialize");
-        self.signal(ACCOUNTS, "SignInStep", &(session, step)).await;
+        announced(
+            "SignInStep",
+            Accounts::sign_in_step(&self.emitter(), session, &step).await,
+        );
     }
 
-    async fn signal<B>(&self, interface: &str, name: &str, body: &B)
-    where
-        B: serde::Serialize + zbus::DynamicType,
-    {
-        if let Err(error) = self
-            .session
-            .emit_signal(None::<&str>, PATH, interface, name, body)
-            .await
-        {
-            eprintln!("Couldn't announce {name}: {error}");
-        }
+    fn emitter(&self) -> SignalEmitter<'static> {
+        SignalEmitter::from_parts(
+            self.session.clone(),
+            ObjectPath::from_static_str_unchecked(PATH),
+        )
+    }
+}
+
+fn announced(name: &str, sent: zbus::Result<()>) {
+    if let Err(error) = sent {
+        eprintln!("Couldn't announce {name}: {error}");
     }
 }

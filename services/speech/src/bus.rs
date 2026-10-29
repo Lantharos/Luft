@@ -5,6 +5,7 @@ use zbus::fdo::DBusProxy;
 use zbus::interface;
 use zbus::message::Header;
 use zbus::names::BusName;
+use zbus::object_server::SignalEmitter;
 
 use crate::dictation::Session;
 use crate::hub::Hub;
@@ -108,6 +109,18 @@ impl Dictation {
         }
         Ok(())
     }
+
+    #[zbus(signal)]
+    pub async fn typed(emitter: &SignalEmitter<'_>, text: &str) -> zbus::Result<()>;
+
+    #[zbus(signal)]
+    pub async fn partial(emitter: &SignalEmitter<'_>, text: &str) -> zbus::Result<()>;
+
+    #[zbus(signal)]
+    pub async fn quiet(emitter: &SignalEmitter<'_>) -> zbus::Result<()>;
+
+    #[zbus(signal)]
+    pub async fn level(emitter: &SignalEmitter<'_>, level: f64) -> zbus::Result<()>;
 }
 
 #[interface(name = "com.lantharos.Speech1.Models")]
@@ -174,4 +187,7 @@ impl Models {
         self.hub.changed();
         Ok(())
     }
+
+    #[zbus(signal)]
+    pub async fn changed(emitter: &SignalEmitter<'_>) -> zbus::Result<()>;
 }

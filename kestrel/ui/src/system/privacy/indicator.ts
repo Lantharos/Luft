@@ -61,7 +61,7 @@ export class PrivacyIndicator {
 
   private async open(): Promise<void> {
     const state = this.monitor.state;
-    const users = state.camera || state.microphone ? await mediaUsers(this.monitor.ownDictation) : [];
+    const users = state.camera || state.microphone ? await mediaUsers(this.monitor.dictationPid) : [];
     const entries: MenuEntry[] = [];
     for (const user of users) entries.push(this.userEntry(user));
     if (state.camera && !users.some(user => user.kind === 'camera'))

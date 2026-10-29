@@ -1,8 +1,8 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import Shell from 'gi://Shell';
 
 import type { Context } from '../../context.js';
+import { verifiedName } from '../../shared/apps/identity.js';
 import { refuseSandboxed } from '../../shared/dbus/sandbox.js';
 import type { Account, Purpose, Request } from './copy.js';
 import { PasskeyPrompt } from './prompt.js';
@@ -26,17 +26,12 @@ async function isAgent(invocation: Gio.DBusMethodInvocation): Promise<boolean> {
   }
 }
 
-function appName(pid: number | undefined): string | null {
-  if (!pid) return null;
-  return Shell.WindowTracker.get_default().get_app_from_pid(pid)?.get_name() ?? null;
-}
-
 function parse(details: Record<string, GLib.Variant>): Request {
   const value = <T>(key: string): T | undefined => details[key]?.deepUnpack() as T | undefined;
   const purpose = value<string>('purpose') as Purpose;
   if (!PURPOSES.includes(purpose)) throw new Error(`Unknown purpose ${purpose}`);
   const accounts = (value<[string, string][]>('accounts') ?? []).map(([name, displayName]): Account => ({ name, displayName }));
-  return { purpose, site: value<string>('site') ?? '', app: appName(value<number>('requester')), accounts, fingerprint: value<string>('fingerprint') ?? null };
+  return { purpose, site: value<string>('site') ?? '', app: verifiedName(value<number>('requester') ?? 0), accounts, fingerprint: value<string>('fingerprint') ?? null };
 }
 
 export class PasskeyPrompts {

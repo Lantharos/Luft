@@ -69,6 +69,7 @@ struct _ShellMixer
   GHashTable *sources;
   GHashTable *cards;
   GHashTable *recorders;
+  GHashTable *clients;
   GHashTable *players;
   char *default_sink;
   char *default_source;
@@ -76,6 +77,7 @@ struct _ShellMixer
   ShellMixerStream *input;
   gboolean recording;
   gboolean dictating;
+  guint dictation_pid;
 
   GPtrArray *devices[2];
   guint devices_idle_id;
@@ -120,7 +122,12 @@ void        _shell_mixer_remove_card      (ShellMixer                 *mixer,
                                            guint32                     index);
 void        _shell_mixer_update_recorder  (ShellMixer                 *mixer,
                                            guint32                     index,
-                                           const char                 *app_id);
+                                           guint32                     client);
+void        _shell_mixer_update_client    (ShellMixer                 *mixer,
+                                           guint32                     index,
+                                           guint                       pid);
+void        _shell_mixer_remove_client    (ShellMixer                 *mixer,
+                                           guint32                     index);
 void        _shell_mixer_remove_recorder  (ShellMixer                 *mixer,
                                            guint32                     index);
 void        _shell_mixer_update_player    (ShellMixer                 *mixer,

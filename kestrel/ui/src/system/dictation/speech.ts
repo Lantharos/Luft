@@ -1,6 +1,8 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
+import { ownerProcess, type PidFd } from '../../shared/dbus/processes.js';
+
 const NAME = 'com.lantharos.Speech1';
 const PATH = '/com/lantharos/Speech1';
 const NOT_INSTALLED = 'com.lantharos.Speech1.Error.NotInstalled';
@@ -51,6 +53,10 @@ export class Speech {
       }
       throw error;
     }
+  }
+
+  service(): Promise<PidFd | null> {
+    return ownerProcess(NAME);
   }
 
   async start(layout: string): Promise<void> {

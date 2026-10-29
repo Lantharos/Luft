@@ -177,6 +177,10 @@ Peek, which lets programs see and use your windows, isn't open to sandboxed apps
 
 An app that wants to take over the keyboard shortcuts asks too, unless it's one of Luft's own apps: a Wayland window from a program outside a sandbox that runs from where Luft installs its apps, `/usr/lib/sabine/com.lantharos.*`. An app ID, desktop entry or X11 window class never counts, and neither does any X11 window, since every X11 app reaches Kestrel through Xwayland's one connection and can name itself anything. Kestrel remembers the answer for a sandboxed app by its sandbox's app ID and for a Wayland program outside a sandbox by its app, but asks an X11 window every time. Like Peek's prompt, this keeps apps from taking the keyboard unnoticed rather than telling your programs apart.
 
+Kestrel's prompts name an app only by what it can check: a sandboxed app by its sandbox's app ID and that app's name, a program outside a sandbox by the program it runs, or the app whose launcher starts that program. A name, app ID or window class the app chose itself never shows. When nothing can be checked, the prompt says "An app" with the window's title in quotes.
+
+The privacy indicator shows every program that records, whatever it calls itself. The only recording it leaves out is the dictation Kestrel started itself, recognized by the process that owns the dictation service's bus name, or a program it started, as the sound server saw it connect. Programs that record through the PulseAudio protocol all reach PipeWire through `pipewire-pulse`, so the indicator can't tell them apart and shows them all, Settings' input level meter among them.
+
 Things that aren't sensitive never ask: using what you saved, adding keys, locking the keyring, or making something stricter.
 
 These prompts can't stop malware that already runs as you, which could act on the screen as you do. They stop a program from doing these things quietly, and stop someone at your unlocked computer from opening your passwords.

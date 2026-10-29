@@ -937,6 +937,8 @@ export namespace Shell {
         get_output(): MixerStream | null;
 
         get_recording(): boolean;
+
+        set_dictation_process(pid: number): void;
     }
 
 

@@ -1,25 +1,12 @@
 /* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
 #include "config.h"
 
+#include <string.h>
+
 #include "shell-enum-types.h"
 #include "shell-mixer-private.h"
 
 #define AMPLIFIED_DB 11.0
-
-static const char * const level_meters[] = {
-  "org.gnome.VolumeControl",
-  "org.PulseAudio.pavucontrol",
-  NULL,
-};
-
-static const char dictation_app_id[] = "com.lantharos.Speech";
-
-typedef enum
-{
-  RECORDER_LEVEL_METER,
-  RECORDER_APP,
-  RECORDER_DICTATION,
-} RecorderKind;
 
 enum
 {
@@ -110,19 +97,43 @@ sync_defaults (ShellMixer *mixer)
   _shell_mixer_queue_devices (mixer);
 }
 
+static guint
+parent_of (guint pid)
+{
+  g_autofree char *path = g_strdup_printf ("/proc/%u/stat", pid);
+  g_autofree char *stat = NULL;
+  const char *end_of_name;
+
+  if (!g_file_get_contents (path, &stat, NULL, NULL))
+    return 0;
+
+  end_of_name = strrchr (stat, ')');
+  return end_of_name ? (guint) g_ascii_strtoull (end_of_name + strlen (") S "), NULL, 10) : 0;
+}
+
+static gboolean
+dictates (ShellMixer *mixer,
+          guint       pid)
+{
+  return mixer->dictation_pid && pid &&
+         (pid == mixer->dictation_pid || parent_of (pid) == mixer->dictation_pid);
+}
+
 static void
 sync_recording (ShellMixer *mixer)
 {
   gboolean recording = FALSE;
   gboolean dictating = FALSE;
   GHashTableIter iter;
-  gpointer value;
+  gpointer client;
 
   g_hash_table_iter_init (&iter, mixer->recorders);
-  while (g_hash_table_iter_next (&iter, NULL, &value))
+  while (g_hash_table_iter_next (&iter, NULL, &client))
     {
-      recording |= GPOINTER_TO_INT (value) == RECORDER_APP;
-      dictating |= GPOINTER_TO_INT (value) == RECORDER_DICTATION;
+      if (dictates (mixer, GPOINTER_TO_UINT (g_hash_table_lookup (mixer->clients, client))))
+        dictating = TRUE;
+      else
+        recording = TRUE;
     }
 
   if (mixer->recording != recording)
@@ -135,16 +146,6 @@ sync_recording (ShellMixer *mixer)
       mixer->dictating = dictating;
       g_object_notify_by_pspec (G_OBJECT (mixer), props[PROP_DICTATING]);
     }
-}
-
-static RecorderKind
-recorder_kind (const char *app_id)
-{
-  if (g_strcmp0 (app_id, dictation_app_id) == 0)
-    return RECORDER_DICTATION;
-  if (app_id && g_strv_contains (level_meters, app_id))
-    return RECORDER_LEVEL_METER;
-  return RECORDER_APP;
 }
 
 void
@@ -248,11 +249,27 @@ _shell_mixer_remove_card (ShellMixer *mixer,
 void
 _shell_mixer_update_recorder (ShellMixer *mixer,
                               guint32     index,
-                              const char *app_id)
+                              guint32     client)
 {
-  g_hash_table_insert (mixer->recorders, GUINT_TO_POINTER (index),
-                       GINT_TO_POINTER (recorder_kind (app_id)));
+  g_hash_table_insert (mixer->recorders, GUINT_TO_POINTER (index), GUINT_TO_POINTER (client));
   sync_recording (mixer);
+}
+
+void
+_shell_mixer_update_client (ShellMixer *mixer,
+                            guint32     index,
+                            guint       pid)
+{
+  g_hash_table_insert (mixer->clients, GUINT_TO_POINTER (index), GUINT_TO_POINTER (pid));
+  sync_recording (mixer);
+}
+
+void
+_shell_mixer_remove_client (ShellMixer *mixer,
+                            guint32     index)
+{
+  if (g_hash_table_remove (mixer->clients, GUINT_TO_POINTER (index)))
+    sync_recording (mixer);
 }
 
 void
@@ -290,6 +307,7 @@ _shell_mixer_forget (ShellMixer *mixer)
   g_hash_table_remove_all (mixer->sources);
   g_hash_table_remove_all (mixer->cards);
   g_hash_table_remove_all (mixer->recorders);
+  g_hash_table_remove_all (mixer->clients);
   g_hash_table_remove_all (mixer->players);
   g_clear_pointer (&mixer->default_sink, g_free);
   g_clear_pointer (&mixer->default_source, g_free);
@@ -340,6 +358,7 @@ shell_mixer_finalize (GObject *object)
   g_hash_table_unref (mixer->sources);
   g_hash_table_unref (mixer->cards);
   g_hash_table_unref (mixer->recorders);
+  g_hash_table_unref (mixer->clients);
   g_hash_table_unref (mixer->players);
   g_ptr_array_unref (mixer->devices[0]);
   g_ptr_array_unref (mixer->devices[1]);
@@ -401,6 +420,7 @@ shell_mixer_init (ShellMixer *mixer)
   mixer->sources = g_hash_table_new_full (NULL, NULL, NULL, g_object_unref);
   mixer->cards = g_hash_table_new_full (NULL, NULL, NULL, (GDestroyNotify) _shell_mixer_card_free);
   mixer->recorders = g_hash_table_new (NULL, NULL);
+  mixer->clients = g_hash_table_new (NULL, NULL);
   mixer->players = g_hash_table_new (NULL, NULL);
   mixer->devices[0] = g_ptr_array_new_with_free_func (g_object_unref);
   mixer->devices[1] = g_ptr_array_new_with_free_func (g_object_unref);
@@ -484,4 +504,24 @@ shell_mixer_get_dictating (ShellMixer *mixer)
   g_return_val_if_fail (SHELL_IS_MIXER (mixer), FALSE);
 
   return mixer->dictating;
+}
+
+/**
+ * shell_mixer_set_dictation_process:
+ * @mixer: a #ShellMixer
+ * @pid: the process that dictates for the shell, or 0 for none
+ *
+ * Counts what that process, or a program it started, records as dictation
+ * rather than recording.
+ * The process is known by the credentials the sound server took from its
+ * connection, which only clients that connect to PipeWire directly carry.
+ */
+void
+shell_mixer_set_dictation_process (ShellMixer *mixer,
+                                   guint       pid)
+{
+  g_return_if_fail (SHELL_IS_MIXER (mixer));
+
+  mixer->dictation_pid = pid;
+  sync_recording (mixer);
 }

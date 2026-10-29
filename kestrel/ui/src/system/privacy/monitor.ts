@@ -21,11 +21,11 @@ export class PrivacyMonitor {
   private readonly mixer = Shell.Mixer.get_default();
   private readonly geoclue = getGeoclueAgent();
   private readonly disconnectors: (() => void)[] = [];
-  private dictationIsOurs = false;
 
   constructor(changed: () => void) {
     const dictationChanged = () => {
-      this.dictationIsOurs = ownDictation.active || (this.dictationIsOurs && this.mixer.dictating);
+      if (!ownDictation.active && !this.mixer.dictating) ownDictation.process = null;
+      this.mixer.set_dictation_process(ownDictation.pid);
       changed();
     };
     const camera = this.camera.connect('notify::cameras-in-use', changed);
@@ -52,14 +52,14 @@ export class PrivacyMonitor {
     this.disconnectors.push(() => this.geoclue.disconnect(location));
   }
 
-  get ownDictation(): boolean {
-    return this.dictationIsOurs;
+  get dictationPid(): number {
+    return ownDictation.pid;
   }
 
   get state(): PrivacyState {
     return {
       camera: this.camera.cameras_in_use,
-      microphone: this.mixer.recording || (this.mixer.dictating && !this.dictationIsOurs),
+      microphone: this.mixer.recording,
       sharing: [...this.handles].some(handle => !handle.is_recording),
       recording: [...this.handles].some(handle => handle.is_recording),
       location: this.geoclue.inUse,

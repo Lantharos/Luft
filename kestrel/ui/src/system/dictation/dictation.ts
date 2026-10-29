@@ -82,7 +82,15 @@ export class Dictation {
     playSound('recording-started');
     this.pill.listen();
     this.listenForEscape();
-    this.started = this.speech.start(currentLayout()).then(() => true, error => {
+    this.started = this.speech.service().then(async service => {
+      if (session !== this.session) {
+        service?.close();
+        return false;
+      }
+      ownDictation.process = service;
+      await this.speech.start(currentLayout());
+      return true;
+    }).catch(error => {
       if (session !== this.session) return false;
       this.finish();
       if (error instanceof NotInstalled) this.offerSetup();

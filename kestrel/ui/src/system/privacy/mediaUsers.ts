@@ -2,6 +2,7 @@ import Gio from 'gi://Gio';
 import Shell from 'gi://Shell';
 
 import { t } from '../../shared/i18n/index.js';
+import { statOf } from '../peek/access/processes.js';
 
 type MediaKind = 'camera' | 'microphone';
 
@@ -25,8 +26,6 @@ interface DumpObject {
 }
 
 const SOURCES: Record<string, MediaKind> = { 'Video/Source': 'camera', 'Audio/Source': 'microphone' };
-const LEVEL_METERS = ['com.lantharos.settings', 'org.gnome.VolumeControl', 'org.PulseAudio.pavucontrol'];
-const DICTATION = 'com.lantharos.Speech';
 
 function appFor(props: Record<string, string | number | boolean>): Shell.App | null {
   const portalId = props['pipewire.access.portal.app_id'];
@@ -36,7 +35,11 @@ function appFor(props: Record<string, string | number | boolean>): Shell.App | n
   return pid ? Shell.WindowTracker.get_default().get_app_from_pid(pid) : null;
 }
 
-export async function mediaUsers(ownDictation: boolean): Promise<MediaUser[]> {
+function dictates(pid: number, dictationPid: number): boolean {
+  return !!dictationPid && !!pid && (pid === dictationPid || statOf(pid)?.parent === dictationPid);
+}
+
+export async function mediaUsers(dictationPid: number): Promise<MediaUser[]> {
   const process = Gio.Subprocess.new(['pw-dump'], Gio.SubprocessFlags.STDOUT_PIPE | Gio.SubprocessFlags.STDERR_SILENCE);
   const [, stdout] = await new Promise<[boolean, string | null, string | null]>((resolve, reject) =>
     process.communicate_utf8_async(null, null, (_process, result) => {
@@ -44,14 +47,16 @@ export async function mediaUsers(ownDictation: boolean): Promise<MediaUser[]> {
     }));
   const objects = JSON.parse(stdout ?? '[]') as DumpObject[];
   const nodes = new Map(objects.filter(object => object.type === 'PipeWire:Interface:Node').map(node => [node.id, node]));
+  const clientPids = new Map(objects.filter(object => object.type === 'PipeWire:Interface:Client')
+    .map(client => [client.id, Number(client.info?.props?.['pipewire.sec.pid'] ?? 0)]));
   const users = new Map<string, MediaUser>();
   for (const link of objects.filter(object => object.type === 'PipeWire:Interface:Link')) {
     const source = nodes.get(link.info?.['output-node-id'] ?? -1);
     const consumer = nodes.get(link.info?.['input-node-id'] ?? -1);
     const kind = SOURCES[String(source?.info?.props?.['media.class'])];
     const props = consumer?.info?.props;
-    const id = String(props?.['application.id']);
-    if (!kind || !consumer || !props || LEVEL_METERS.includes(id) || (ownDictation && id === DICTATION)) continue;
+    if (!kind || !consumer || !props) continue;
+    if (dictates(clientPids.get(Number(props['client.id'])) ?? 0, dictationPid)) continue;
     const app = appFor(props);
     users.set(`${kind}:${consumer.id}`, {
       kind, node: consumer.id, app,

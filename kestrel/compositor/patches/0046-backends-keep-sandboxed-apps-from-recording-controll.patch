@@ -18,7 +18,9 @@ service's name, so that name only counts when the caller also runs
 outside a sandbox, judged from the process that owns the calling
 connection the same way Wayland clients are.
 meta_context_identify_sender() lets the shell identify its own
-D-Bus callers the same way.
+D-Bus callers the same way, and meta_process_identify_pid() any process
+it knows by its ID, such as the one behind an X11 window or a sound
+stream, pinned by a pidfd while it is read.
 
 DisplayConfig methods and property writes that change displays, such as
 ApplyMonitorsConfig, SetBacklight and PowerSaveMode, refuse sandboxed
@@ -27,15 +29,15 @@ subclass checks them before the generated setter runs.
 
 Upstream-Status: luft-only Kestrel owns names sandboxed apps may talk to, which GNOME Shell keeps in separate services
 ---
- src/backends/meta-dbus-session-manager.c    |  46 ++++++
- src/backends/meta-display-config-skeleton.c | 113 ++++++++++++++
+ src/backends/meta-dbus-session-manager.c    |  46 +++++
+ src/backends/meta-display-config-skeleton.c | 113 +++++++++++
  src/backends/meta-display-config-skeleton.h |  13 ++
  src/backends/meta-monitor-manager.c         |   4 +-
- src/core/meta-sandbox.c                     | 155 ++++++++++++++++++++
+ src/core/meta-sandbox.c                     | 210 ++++++++++++++++++++
  src/core/meta-sandbox.h                     |   6 +-
  src/meson.build                             |   2 +
- src/meta/meta-context.h                     |  15 +-
- 8 files changed, 351 insertions(+), 3 deletions(-)
+ src/meta/meta-context.h                     |  20 +-
+ 8 files changed, 411 insertions(+), 3 deletions(-)
  create mode 100644 src/backends/meta-display-config-skeleton.c
  create mode 100644 src/backends/meta-display-config-skeleton.h
 
@@ -285,22 +287,77 @@ index 6bc7b4f321dd7a18ac191e760ce2c842f7f73c3f..4fd0f8937c506e69422544f8e2df6d12
    g_signal_connect_object (settings,
                             "privacy-screen-changed",
 diff --git a/src/core/meta-sandbox.c b/src/core/meta-sandbox.c
-index 034b2b79d1120659ac12a95d88cb03a555a6557a..f9c164c5c09896a43ef790ad4e1ab453f9af96ff 100644
+index 034b2b79d1120659ac12a95d88cb03a555a6557a..ac866cdda39b66a900780857f870093fc03559e7 100644
 --- a/src/core/meta-sandbox.c
 +++ b/src/core/meta-sandbox.c
-@@ -4,6 +4,8 @@
+@@ -4,6 +4,9 @@
  #include "core/meta-sandbox.h"
  
  #include <fcntl.h>
++#include <limits.h>
 +#include <gio/gio.h>
 +#include <gio/gunixfdlist.h>
  #include <glib/gstdio.h>
  #include <sys/pidfd.h>
  
-@@ -93,3 +95,156 @@ meta_process_identify (int     pidfd,
+@@ -93,3 +96,210 @@ meta_process_identify (int     pidfd,
    g_clear_pointer (app_id, g_free);
    return FALSE;
  }
++
++static gboolean
++identify_open_process (int    process_fd,
++                       char **app_id,
++                       char **executable)
++{
++  char target[PATH_MAX];
++  ssize_t length;
++
++  if (!meta_process_identify_at (process_fd, app_id))
++    return FALSE;
++  if (*app_id)
++    return TRUE;
++
++  length = readlinkat (process_fd, "exe", target, sizeof (target));
++  if (length <= 0 || length == sizeof (target))
++    return FALSE;
++
++  *executable = g_strndup (target, length);
++  return TRUE;
++}
++
++/**
++ * meta_process_identify_pid:
++ * @pid: the ID of a running process
++ * @app_id: (out) (transfer full) (nullable): the app ID its sandbox names
++ * @executable: (out) (transfer full) (nullable): the program it runs, when
++ *   it runs outside a sandbox
++ *
++ * Judges a process by the same rules as Wayland clients, pinned by a pidfd
++ * while it is read. Full access is not taken into account.
++ *
++ * Returns: whether the process could be judged
++ */
++gboolean
++meta_process_identify_pid (int    pid,
++                           char **app_id,
++                           char **executable)
++{
++  g_autofd int pidfd = pidfd_open (pid, 0);
++  g_autofree char *path = g_strdup_printf ("/proc/%d", pid);
++  g_autofd int process_fd = open (path, O_PATH | O_DIRECTORY | O_CLOEXEC);
++
++  *app_id = NULL;
++  *executable = NULL;
++  if (pidfd >= 0 && process_fd >= 0 &&
++      identify_open_process (process_fd, app_id, executable) &&
++      pidfd_send_signal (pidfd, 0, NULL, 0) == 0)
++    return TRUE;
++
++  g_clear_pointer (app_id, g_free);
++  g_clear_pointer (executable, g_free);
++  return FALSE;
++}
 +
 +static gboolean
 +pidfd_of_credentials (GVariant     *reply,
@@ -489,7 +546,7 @@ index fb92374479b5125e91695a3c0904eb5f07cc8602..3ba3a6ef88e9872292641465ed624e76
    'backends/meta-dbus-session-manager.h',
    'backends/meta-dbus-session-watcher.c',
 diff --git a/src/meta/meta-context.h b/src/meta/meta-context.h
-index 4ea9e47a41d5ccd43ac8c87d445ae2e878a1bca4..d17e73cd60275b726a4809d0894506cb92b3cb9b 100644
+index 4ea9e47a41d5ccd43ac8c87d445ae2e878a1bca4..f9090fdc392c5697584e21918b3bb7acacb5883a 100644
 --- a/src/meta/meta-context.h
 +++ b/src/meta/meta-context.h
 @@ -18,7 +18,7 @@
@@ -501,10 +558,15 @@ index 4ea9e47a41d5ccd43ac8c87d445ae2e878a1bca4..d17e73cd60275b726a4809d0894506cb
  
  #include "meta/common.h"
  #include "meta/types.h"
-@@ -43,6 +43,19 @@ gboolean meta_context_is_app_permitted (MetaContext *context,
+@@ -43,6 +43,24 @@ gboolean meta_context_is_app_permitted (MetaContext *context,
                                          const char  *permission,
                                          const char  *app_id);
  
++META_EXPORT
++gboolean meta_process_identify_pid (int    pid,
++                                    char **app_id,
++                                    char **executable);
++
 +META_EXPORT
 +void meta_context_identify_sender (MetaContext         *context,
 +                                   GDBusConnection     *connection,

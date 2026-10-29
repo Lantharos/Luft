@@ -159,8 +159,8 @@ async function checkPill() {
   require(!privacy().visible, 'the privacy indicator stays hidden for dictation the person is holding');
   await capture('dictation-listening');
 
-  const recorder = spawn(['parecord', '--device=microphone', '/dev/null']);
-  await eventually(usesMicrophone, 'an app recording at the same time still shows the microphone in the privacy indicator');
+  const recorder = spawn(['parecord', '--device=microphone', '--property=application.id=com.lantharos.Speech', '/dev/null']);
+  await eventually(usesMicrophone, 'an app recording at the same time, even named after the dictation service, still shows the microphone in the privacy indicator');
   await stop(recorder);
   await eventually(() => !privacy().visible, 'the privacy indicator goes once that app stops');
 

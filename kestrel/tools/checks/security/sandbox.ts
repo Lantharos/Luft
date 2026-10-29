@@ -4,6 +4,7 @@ import type GObject from 'gi://GObject';
 import Meta from 'gi://Meta';
 import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
+import {descendants, textOf} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {failureOf} from '../lib/errors.js';
 import {withFullAccess} from '../lib/access/permissions.js';
@@ -11,7 +12,7 @@ import {call, ownName, privateConnection, subscribe} from '../lib/dbus.js';
 import {fixture, gjs, outcome, spawn, stop, waitForWindow} from '../lib/processes.js';
 import {pause} from '../lib/wait.js';
 import {lock, unlock} from '../lockScreen/lib/shield.js';
-import {SANDBOXED_APP, inAppScope, onSessionBus, openSecurityContext, sandboxedApp, through} from '../lib/access/sandbox.js';
+import {SANDBOXED_APP, bubblewrapped, inAppScope, onSessionBus, sandboxedApp} from '../lib/access/sandbox.js';
 import {openApp} from '../apps/lib/apps.js';
 
 const {require, eventually} = checks('sandbox');
@@ -233,33 +234,37 @@ async function checkFullAccess() {
   }
 }
 
+const shortcutsPrompt = () => descendants(global.stage).filter(actor => actor.mapped).map(textOf).find(text => text?.includes('wants to inhibit shortcuts'))?.replace(/[\u2068\u2069]/g, '') ?? null;
+
 async function shortcutsAnswer(window: Meta.Window) {
   const dialog = shortcutsDialogFor(window);
   const answers: Meta.InhibitShortcutsDialogResponse[] = [];
   dialog.connect('response', (_dialog, response) => answers.push(response));
   dialog.show();
   await eventually(() => answers.length > 0 || Main.modalCount > 0, `Kestrel answers or asks when ${window.get_title()} inhibits shortcuts`);
+  const prompt = shortcutsPrompt();
   dialog.hide();
-  await eventually(() => Main.modalCount === 0, 'the shortcuts prompt closes');
-  return answers.at(0) ?? 'asked';
+  await eventually(() => Main.modalCount === 0 && !shortcutsPrompt(), 'the shortcuts prompt closes');
+  return answers.at(0) ?? prompt;
 }
 
 async function checkWindowImpostors() {
   const x11 = gjs('clients/x11/x11Window.js', ['Kestrel impostor: X11', '#2f5d8a', '', SETTINGS_APP]);
   const unsandboxed = spawn(['python3', NAMED_CLIENT, 'Kestrel impostor: Wayland', '320', '200']);
-  const sandbox = await openSecurityContext(SANDBOXED_APP);
-  const sandboxed = spawn(['python3', NAMED_CLIENT, 'Kestrel impostor: sandboxed', '320', '200'], {env: through(sandbox.socket)});
+  const sandboxed = spawn([...bubblewrapped(SANDBOXED_APP), 'python3', NAMED_CLIENT, 'Kestrel impostor: sandboxed', '320', '200']);
   try {
     const x11Window = await waitForWindow('Kestrel impostor: X11');
     require(x11Window.get_wm_class() === SETTINGS_APP, 'an X11 window can name itself after Settings');
-    require(await shortcutsAnswer(x11Window) === 'asked', 'an X11 window named after Settings asks before it inhibits shortcuts');
-    require(await shortcutsAnswer(await waitForWindow('Kestrel impostor: Wayland')) === 'asked',
-      'a program outside Luft\'s apps with a Luft app ID asks before it inhibits shortcuts');
-    require(await shortcutsAnswer(await waitForWindow('Kestrel impostor: sandboxed')) === 'asked',
-      'a sandboxed app with a Luft app ID asks before it inhibits shortcuts');
+    const x11Prompt = await shortcutsAnswer(x11Window);
+    require(typeof x11Prompt === 'string', 'an X11 window named after Settings asks before it inhibits shortcuts');
+    require(x11Prompt === 'The app gjs-console wants to inhibit shortcuts', `the prompt names the program behind the X11 window, not the name it chose (${x11Prompt})`);
+    const waylandPrompt = await shortcutsAnswer(await waitForWindow('Kestrel impostor: Wayland'));
+    require(typeof waylandPrompt === 'string', 'a program outside Luft\'s apps with a Luft app ID asks before it inhibits shortcuts');
+    require(typeof waylandPrompt === 'string' && waylandPrompt.startsWith('The app python'), `the prompt names the program, not its app ID (${waylandPrompt})`);
+    require(await shortcutsAnswer(await waitForWindow('Kestrel impostor: sandboxed')) === `The app ${SANDBOXED_APP} wants to inhibit shortcuts`,
+      'a sandboxed app with a Luft app ID asks before it inhibits shortcuts, named by its sandbox');
   } finally {
     await Promise.all([stop(x11), stop(unsandboxed), stop(sandboxed)]);
-    await stop(sandbox.process);
   }
   const settings = await openApp('settings');
   try {

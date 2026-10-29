@@ -6,6 +6,7 @@
 #include "shell-mixer-private.h"
 
 #define RECONNECT_DELAY_SECONDS 1
+#define PROP_SECURE_PID "pipewire.sec.pid"
 
 struct _ShellMixerServer
 {
@@ -114,8 +115,23 @@ on_source_output_info (pa_context                  *context,
   ShellMixerServer *server = user_data;
 
   if (!eol)
-    _shell_mixer_update_recorder (server->mixer, info->index,
-                                  pa_proplist_gets (info->proplist, PA_PROP_APPLICATION_ID));
+    _shell_mixer_update_recorder (server->mixer, info->index, info->client);
+}
+
+static void
+on_client_info (pa_context           *context,
+                const pa_client_info *info,
+                int                   eol,
+                gpointer              user_data)
+{
+  ShellMixerServer *server = user_data;
+  const char *pid;
+
+  if (eol)
+    return;
+
+  pid = pa_proplist_gets (info->proplist, PROP_SECURE_PID);
+  _shell_mixer_update_client (server->mixer, info->index, pid ? (guint) g_ascii_strtoull (pid, NULL, 10) : 0);
 }
 
 static void
@@ -194,6 +210,12 @@ on_event (pa_context                   *context,
       else
         drop_operation (pa_context_get_source_output_info (context, index, on_source_output_info, server));
       break;
+    case PA_SUBSCRIPTION_EVENT_CLIENT:
+      if (removed)
+        _shell_mixer_remove_client (mixer, index);
+      else
+        drop_operation (pa_context_get_client_info (context, index, on_client_info, server));
+      break;
     case PA_SUBSCRIPTION_EVENT_SINK_INPUT:
       if (removed)
         _shell_mixer_remove_player (mixer, index);
@@ -238,6 +260,7 @@ on_state (pa_context *context,
                                             PA_SUBSCRIPTION_MASK_SINK |
                                             PA_SUBSCRIPTION_MASK_SOURCE |
                                             PA_SUBSCRIPTION_MASK_SOURCE_OUTPUT |
+                                            PA_SUBSCRIPTION_MASK_CLIENT |
                                             PA_SUBSCRIPTION_MASK_SINK_INPUT |
                                             PA_SUBSCRIPTION_MASK_CARD |
                                             PA_SUBSCRIPTION_MASK_SERVER,
@@ -245,6 +268,7 @@ on_state (pa_context *context,
       drop_operation (pa_context_get_card_info_list (context, on_card_info, server));
       drop_operation (pa_context_get_sink_info_list (context, on_sink_info, server));
       drop_operation (pa_context_get_source_info_list (context, on_source_info, server));
+      drop_operation (pa_context_get_client_info_list (context, on_client_info, server));
       drop_operation (pa_context_get_source_output_info_list (context, on_source_output_info, server));
       drop_operation (pa_context_get_sink_input_info_list (context, on_existing_sink_input_info, server));
       drop_operation (pa_context_get_server_info (context, on_server_info, server));

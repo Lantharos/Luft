@@ -779,6 +779,8 @@ export namespace Meta {
 
     function prefs_set_show_fallback_app_menu(whether: boolean): void;
 
+    function process_identify_pid(pid: number): [boolean, string, string];
+
     function read_bytes(fd: number, offset: number, length: number): globalThis.Promise<boolean>;
     function read_bytes(fd: number, offset: number, length: number, callback: Gio.AsyncReadyCallback<number> | null): void;
     function read_bytes(fd: number, offset: number, length: number, callback: Gio.AsyncReadyCallback<number> | null): globalThis.Promise<boolean> | void;

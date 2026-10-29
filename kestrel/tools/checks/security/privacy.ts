@@ -6,12 +6,13 @@ import {descendants, named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {call} from '../lib/dbus.js';
 import {click} from '../lib/input/input.js';
-import {stop} from '../lib/processes.js';
+import {spawn, stop} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {startSessionClient} from '../system/lib/sessionClient.js';
 
 const {require, eventually} = checks('panel status');
 const SCREEN_CAST = 'org.gnome.Mutter.ScreenCast';
+const LEVEL_METER_NAMES = ['com.lantharos.settings', 'org.PulseAudio.pavucontrol'];
 
 async function shareScreen() {
   const reply = await call(SCREEN_CAST, '/org/gnome/Mutter/ScreenCast', SCREEN_CAST, 'CreateSession', new GLib.Variant('(a{sv})', [{}]), '(o)');
@@ -41,4 +42,12 @@ export async function run() {
 
   await stop(inhibitor);
   await eventually(() => !showsIcon(panel, 'view-reveal-symbolic'), 'the eye goes away when the app lets the screen sleep');
+
+  for (const meter of LEVEL_METER_NAMES) {
+    const recorder = spawn(['parecord', '--device=microphone', `--property=application.id=${meter}`, '/dev/null']);
+    await eventually(() => privacy.visible && showsIcon(privacy, 'audio-input-microphone-symbolic'),
+      `an app recording under the name ${meter} still shows the microphone`);
+    await stop(recorder);
+    await eventually(() => !privacy.visible, 'the microphone goes once it stops');
+  }
 }

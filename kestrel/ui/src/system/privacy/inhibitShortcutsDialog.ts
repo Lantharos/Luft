@@ -9,6 +9,7 @@ import St from 'gi://St';
 import * as Dialog from '../../shared/dialogs/dialog.js';
 import * as KestrelUi from '../../kestrelUi.js';
 import { ModalDialog } from '../../shared/dialogs/modalDialog.js';
+import { verifiedName } from '../../shared/apps/identity.js';
 import { isLuftAppWindow } from '../../shared/apps/luftApps.js';
 import { lookup, setPermission, type Permission } from '../../shared/dbus/permissionStore.js';
 
@@ -68,15 +69,18 @@ export const InhibitShortcutsDialog = GObject.registerClass({
     }
   }
 
-  private buildLayout(): void {
-    const name = this.app?.get_name() ?? this.currentWindow.title;
+  private get description(): string {
+    const name = verifiedName(this.currentWindow.get_pid() as number);
+    if (name) return KestrelUi.t('inhibit-shortcuts-app', { appName: name });
+    const title = this.currentWindow.title;
+    return title ? KestrelUi.t('inhibit-shortcuts-titled-app', { title }) : KestrelUi.t('inhibit-shortcuts-unknown-app');
+  }
 
+  private buildLayout(): void {
     const content = new Dialog.MessageDialogContent({
       title: KestrelUi.t('inhibit-shortcuts-title'),
       iconName: 'input-keyboard-symbolic',
-      description: name
-        ? KestrelUi.t('inhibit-shortcuts-app', { appName: name })
-        : KestrelUi.t('inhibit-shortcuts-unknown-app'),
+      description: this.description,
     });
 
     const restoreAccel = Meta.prefs_get_keybinding_label('restore-shortcuts');

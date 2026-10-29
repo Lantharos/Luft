@@ -37,8 +37,8 @@ const service = Gio.DBusExportedObject.wrapJSObject(INTERFACE, {
   Start() {
     stopListening();
     const started = GLib.get_monotonic_time();
-    const recorder = Gio.Subprocess.new(['parecord', '--device=microphone', '--property=application.id=com.lantharos.Speech', '/dev/null'],
-      Gio.SubprocessFlags.NONE);
+    const recorder = Gio.Subprocess.new(['pw-record', '--raw', '--target=microphone', '--properties={ application.id = com.lantharos.Speech }', '-'],
+      Gio.SubprocessFlags.STDOUT_SILENCE);
     listening = {recorder, words: 0, sources: []};
     const state = listening;
     state.sources.push(GLib.timeout_add(GLib.PRIORITY_DEFAULT, LEVEL_MS, () => {

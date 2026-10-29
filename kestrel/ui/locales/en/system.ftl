@@ -464,6 +464,8 @@ inhibit-shortcuts-title = Allow inhibiting shortcuts
 # $appName is an app name like "Settings"
 inhibit-shortcuts-app = The app { $appName } wants to inhibit shortcuts
 inhibit-shortcuts-unknown-app = An app wants to inhibit shortcuts
+# $title is the title an app gave its window
+inhibit-shortcuts-titled-app = An app showing “{ $title }” wants to inhibit shortcuts
 # $shortcut is a keyboard shortcut like "Super+Escape"
 inhibit-shortcuts-restore = You can restore shortcuts by pressing { $shortcut }
 inhibit-shortcuts-deny = Deny

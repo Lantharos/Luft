@@ -81,7 +81,7 @@ jobs:
           tagged="$(git ls-remote --tags --refs origin "v$version" | cut -f1)"
           if [[ -z "$tagged" ]]; then
             last="$(git ls-remote --tags --refs origin "v$MAJOR.*" | sed -nE "s|.*refs/tags/v$MAJOR\.([0-9]+)$|\1|p" | sort -n | tail -n 1)"
-            (( release == ${last:-0} + 1 )) || { echo "$NIGHTLY leads to $version, but Luft $MAJOR.$(( ${last:-0} + 1 )) is next." >&2; exit 1; }
+            (( release == ${last:--1} + 1 )) || { echo "$NIGHTLY leads to $version, but Luft $MAJOR.$(( ${last:--1} + 1 )) is next." >&2; exit 1; }
             gh api "repos/$GITHUB_REPOSITORY/git/refs" -f "ref=refs/tags/v$version" -f "sha=$revision" > /dev/null
           elif [[ "$tagged" != "$revision" ]]; then
             echo "v$version is already out, from $tagged." >&2
@@ -243,7 +243,7 @@ jobs:
             exit 0
           fi
           last="$(git tag --list "v$MAJOR.*" | sed -nE "s/^v$MAJOR\.([0-9]+)$/\1/p" | sort -n | tail -n 1)"
-          target="$MAJOR.$(( ${last:-0} + 1 ))"
+          target="$MAJOR.$(( ${last:--1} + 1 ))"
           current="$(jq -r '."org.opencontainers.image.version" // empty' <<<"$nightly")"
           number=1
           [[ "$current" =~ ^"$target"-nightly\.([0-9]+)$ ]] && number=$(( BASH_REMATCH[1] + 1 ))

@@ -15,10 +15,10 @@ Nightlies are `:1-nightly` and `:1-nightly-nvidia`, each also tagged with its ve
 
 | Version | Shown as | Is |
 | --- | --- | --- |
-| `1.1` | Luft 1.1 | A stable release: the major version and the release count |
+| `1.1` | Luft 1.1 | A stable release: the major version and how many releases came before it, so 1.0 is the first |
 | `1.2-nightly.21` | Luft 1.2 Nightly 21 | The 21st nightly on the way to 1.2 |
 
-The major version follows Fedora: Luft 1 is Fedora 45, and Luft 2 moves to Fedora 46 after its release around April, with releases counting from 1 again. Nightlies count toward the next release: the count starts at 1 after each release and goes up with every nightly published, so a run that's tried again keeps its number. Versions sort the way they're released, with each nightly before the release it leads to.
+The major version follows Fedora: Luft 1 is Fedora 45, and Luft 2 moves to Fedora 46 after its release around April, starting again at 2.0. Nightlies count toward the next release: the count starts at 1 after each release and goes up with every nightly published, so a run that's tried again keeps its number. Versions sort the way they're released, with each nightly before the release it leads to.
 
 The release count comes from the `v1.N` tags, and the nightly count from the version of the newest nightly. Nothing else keeps them.
 

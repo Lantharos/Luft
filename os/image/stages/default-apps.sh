@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
+shopt -s nullglob
 
 applications="$1"
 browser_types=(x-scheme-handler/http x-scheme-handler/https text/html application/xhtml+xml)

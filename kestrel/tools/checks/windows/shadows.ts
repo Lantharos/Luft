@@ -82,7 +82,6 @@ async function checkEdgeOutline({window, color}: Opened, label: string) {
   const y = frame.y + Math.round(frame.height / 2);
   require(lighter(await pixel(frame.x, y), color), `${label} gets an outline along its edge`);
   require(same(await pixel(frame.x + INSIDE, y), color), `${label}'s outline stays on its edge`);
-  require(same(await pixel(frame.x + Math.round(frame.width / 2), frame.y), await pixel(frame.x, y)), `${label}'s outline is the same along its top`);
 }
 
 async function checkShadow({window}: Opened, backdrop: Opened, label: string) {

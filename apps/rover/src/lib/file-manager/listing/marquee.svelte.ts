@@ -21,7 +21,7 @@ export class Marquee {
 	#pointerId = -1;
 	#client: Point = { x: 0, y: 0 };
 	#base = new Set<string>();
-	#signature = '';
+	#signature: string | null = null;
 
 	constructor(
 		surface: () => MarqueeSurface | undefined,
@@ -42,7 +42,7 @@ export class Marquee {
 		this.#client = { x: event.clientX, y: event.clientY };
 		const point = surface.contentPoint(event.clientX, event.clientY);
 		this.box = { start: point, current: point };
-		this.#signature = '';
+		this.#signature = null;
 		this.#select();
 		(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
 		event.preventDefault();

@@ -135,6 +135,7 @@ export class Screencaster {
       title,
       body: this.path ? KestrelUi.t('screenshot-screencast-view') : '',
       isTransient: true,
+      forFeedback: true,
     });
 
     if (this.path) {

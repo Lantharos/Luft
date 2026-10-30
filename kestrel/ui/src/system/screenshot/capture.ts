@@ -103,6 +103,7 @@ function storeScreenshot(bytes: GLib.Bytes, pixbuf: GdkPixbuf.Pixbuf): Gio.File 
     datetime: time,
     gicon: thumbnail(pixbuf),
     isTransient: true,
+    forFeedback: true,
   });
 
   if (file) {

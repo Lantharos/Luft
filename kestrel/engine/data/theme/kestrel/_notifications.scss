@@ -15,7 +15,7 @@
 .kestrel-calendar-day:insensitive { color: ink(0.30); }
 
 .message.kestrel-glass { border-radius: 20px; background-color: glass(); }
-.notification-banner.kestrel-glass { width: 380px; min-height: 0; margin: 0 12px 12px 0; padding: 12px; box-shadow: none; }
+.notification-banner.kestrel-glass { width: 380px; min-height: 0; margin: 12px; padding: 12px; box-shadow: none; }
 .notification-banner .message-header { padding: 0 0 8px; }
 .notification-banner .message-header .message-header-content { min-height: 0; padding-bottom: 0; }
 .notification-banner .message-box { padding: 0; }

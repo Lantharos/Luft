@@ -8,7 +8,7 @@ use tokio::time::{Instant, sleep_until};
 
 use super::attach::{self, is_stale};
 use super::keep::{self, sync};
-use super::{conflicts, filters, remote, union};
+use super::{conflicts, filters, remote, reports_usage, union};
 use crate::hub::Hub;
 use crate::providers::trouble::{self, Trouble};
 
@@ -237,15 +237,19 @@ pub async fn check(hub: &Hub, account: &str) {
         return;
     }
     let fs = remote(account);
-    let usage = match hub.rclone.about(&fs).await {
-        Ok(about) => Ok(about["total"]
-            .as_u64()
-            .zip(about["used"].as_u64())
-            .map(|(total, used)| Usage { used, total })),
-        Err(error) if error.to_string().contains("doesn't support about") => {
-            hub.rclone.list_top(&fs).await.map(|_| None)
+    let usage = if reports_usage(record.provider) {
+        match hub.rclone.about(&fs).await {
+            Ok(about) => Ok(about["total"]
+                .as_u64()
+                .zip(about["used"].as_u64())
+                .map(|(total, used)| Usage { used, total })),
+            Err(error) if error.to_string().contains("doesn't support about") => {
+                hub.rclone.list_top(&fs).await.map(|_| None)
+            }
+            Err(error) => Err(error),
         }
-        Err(error) => Err(error),
+    } else {
+        hub.rclone.list_top(&fs).await.map(|_| None)
     };
     match usage {
         Ok(usage) => {

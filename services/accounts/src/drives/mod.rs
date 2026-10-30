@@ -108,6 +108,10 @@ pub fn union(account: &str) -> String {
     format!("{}:", union_name(account))
 }
 
+pub fn reports_usage(provider: Provider) -> bool {
+    provider != Provider::Icloud
+}
+
 pub fn offers_links(provider: Provider) -> bool {
     matches!(
         provider,

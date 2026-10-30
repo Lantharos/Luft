@@ -75,3 +75,4 @@ install_data('session-slice.conf', install_dir: systemduserunitdir / 'session.sl
 foreach service : ['dbus-broker', 'pipewire', 'pipewire-pulse', 'wireplumber', 'xdg-desktop-portal']
   install_data('session-service.conf', install_dir: systemduserunitdir / service + '.service.d', rename: '50-kestrel-session.conf')
 endforeach
+install_data('portal-after-setup.conf', install_dir: systemduserunitdir / 'xdg-desktop-portal.service.d', rename: '50-kestrel-setup.conf')

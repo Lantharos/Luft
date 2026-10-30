@@ -1,12 +1,10 @@
-import Clutter from 'gi://Clutter';
+import type Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import * as Main from '../../main.js';
 import { BackgroundManager } from '../background.js';
 import type { LayoutManager } from '../layout.js';
-
-const BACKGROUND_FADE_ANIMATION_TIME = 1000;
 
 function waitLoaded(bgManager: BackgroundManager, cancellable: Gio.Cancellable): Promise<void> {
   const { promise, resolve, reject } = Promise.withResolvers<void>();
@@ -46,7 +44,7 @@ export class MonitorBackgrounds {
       const manager = this.create(i);
       this.managers.push(manager);
 
-      if (i !== primaryIndex && startingUp) manager.backgroundActor.hide();
+      if (i !== primaryIndex && startingUp) this.holdInPlace(manager.backgroundActor);
     }
 
     this.updateResolvers ??= Promise.withResolvers<void>();
@@ -62,19 +60,19 @@ export class MonitorBackgrounds {
     return promise;
   }
 
-  showSecondary(): void {
-    const { primaryIndex } = this.layoutManager;
-    for (let i = 0; i < this.layoutManager.monitors.length; i++) {
-      if (i === primaryIndex) continue;
-      const backgroundActor = this.managers[i].backgroundActor;
-      backgroundActor.show();
-      backgroundActor.opacity = 0;
-      backgroundActor.ease({
-        opacity: 255,
-        duration: BACKGROUND_FADE_ANIMATION_TIME,
-        mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-      });
-    }
+  release(): void {
+    for (const manager of this.managers) this.layoutManager.uiGroup.disconnectObject(manager.backgroundActor);
+  }
+
+  private holdInPlace(actor: Clutter.Actor): void {
+    const group = this.layoutManager.uiGroup;
+    const counterScale = () => {
+      const { x, y } = group.pivot_point;
+      actor.set_pivot_point((x * group.width - actor.x) / actor.width, (y * group.height - actor.y) / actor.height);
+      actor.set_scale(1 / group.scale_x, 1 / group.scale_y);
+    };
+    group.connectObject('notify::scale-x', counterScale, actor);
+    counterScale();
   }
 
   private create(monitorIndex: number): BackgroundManager {

@@ -393,8 +393,6 @@ export const LayoutManager = GObject.registerClass({
     this.uiGroup.scale_x = this.uiGroup.scale_y = STARTUP_SCALE;
     this.uiGroup.opacity = 0;
 
-    global.window_group.set_clip(monitor.x, monitor.y, monitor.width, monitor.height);
-
     await this.backgrounds.update(this.startingUp);
 
     this.emit('startup-prepared');
@@ -431,8 +429,7 @@ export const LayoutManager = GObject.registerClass({
 
     this.keyboardBox.show();
 
-    this.backgrounds.showSecondary();
-    global.window_group.remove_clip();
+    this.backgrounds.release();
 
     this.chrome.queueUpdateRegions();
 

@@ -1,6 +1,7 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import { setSolidSurfaces, setSquareSurfaces } from './kestrelGlass.js';
+import { setSquareCorners } from './kestrelTheme.js';
 
 import { accentColor, namedAccent, NEUTRAL, seedFromSamples, toHex, type Rgb, type Seed } from './color.js';
 import { appearanceCss, appearanceJson, type Appearance } from './exports.js';
@@ -75,7 +76,9 @@ export class AppearanceService {
   }
 
   private followCorners(): void {
-    setSquareSurfaces(!this.settings.get_boolean('rounded-window-corners'));
+    const square = !this.settings.get_boolean('rounded-window-corners');
+    setSquareSurfaces(square);
+    setSquareCorners(square);
   }
 
   private get palette(): Palette | null {

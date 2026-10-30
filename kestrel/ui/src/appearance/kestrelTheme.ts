@@ -4,6 +4,7 @@ import GLib from 'gi://GLib';
 import St from 'gi://St';
 
 const SCHEME_SUFFIX = /-(light|dark)\.css$/;
+const SQUARE_CORNERS = 'square-corners.css';
 
 type StyleVariant = 'light' | 'dark';
 
@@ -79,6 +80,15 @@ export function setAccent(stylesheet: Gio.File, color: Cogl.Color, fgColor: Cogl
   const current = themeContext.get_theme().get_custom_stylesheets().reverse();
   const stylesheets = current.some(file => file.equal(stylesheet)) ? current : [...current, stylesheet];
   themeContext.set_theme_and_accent_color(buildTheme(stylesheets), color, fgColor);
+}
+
+export function setSquareCorners(square: boolean): void {
+  const themeContext = St.ThemeContext.get_for_stage(global.stage);
+  const stylesheet = findStylesheet(SQUARE_CORNERS);
+  const current = themeContext.get_theme().get_custom_stylesheets().reverse();
+  if (current.some(file => file.equal(stylesheet)) === square) return;
+  const others = current.filter(file => !file.equal(stylesheet));
+  themeContext.set_theme(buildTheme(square ? [...others, stylesheet] : others));
 }
 
 export function updateTheme(): void {

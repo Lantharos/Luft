@@ -8,5 +8,6 @@
     <file>kestrel-light.css</file>
     <file>panel-ink-dark.css</file>
     <file>panel-ink-light.css</file>
+    <file>square-corners.css</file>
   </gresource>
 </gresources>

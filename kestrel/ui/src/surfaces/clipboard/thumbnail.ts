@@ -4,6 +4,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Gly from 'gi://Gly';
 import St from 'gi://St';
+import { cornerRadius } from '../../appearance/kestrelGlass.js';
 
 Gio._promisify(Gly.Loader.prototype, 'load_async');
 Gio._promisify(Gly.Image.prototype, 'next_frame_async');
@@ -69,7 +70,7 @@ function render(frame: Gly.Frame, bounds: ThumbnailBounds): Thumbnail {
   pipeline.set_blend('RGBA = ADD (SRC_COLOR, 0)');
   pipeline.add_snippet(ROUNDED_CORNERS);
   pipeline.set_uniform_float(pipeline.get_uniform_location('thumbnail_size'), 2, 1, [pixelWidth, pixelHeight]);
-  pipeline.set_uniform_1f(pipeline.get_uniform_location('corner_radius'), Math.min(bounds.radius * scale, pixelWidth / 2, pixelHeight / 2));
+  pipeline.set_uniform_1f(pipeline.get_uniform_location('corner_radius'), Math.min(cornerRadius(bounds.radius) * scale, pixelWidth / 2, pixelHeight / 2));
   framebuffer.draw_rectangle(pipeline, 0, 0, pixelWidth, pixelHeight);
   framebuffer.flush();
   source.get_texture()!.run_dispose();

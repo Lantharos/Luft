@@ -49,6 +49,10 @@ export function setSquareSurfaces(enabled: boolean): void {
   for (const surface of [...surfaces, ...cornered]) followCorners(surface);
 }
 
+export function cornerRadius(radius: number): number {
+  return square ? 0 : radius;
+}
+
 export function followWindowCorners(actor: St.Widget, effect: Shell.BlurEffect, corners: number): void {
   const backdrop = { actor, effect, corners };
   cornered.add(backdrop);

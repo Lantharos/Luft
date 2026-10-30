@@ -6,6 +6,7 @@ theme_sources = files([
   'kestrel-light.scss',
   'panel-ink-dark.scss',
   'panel-ink-light.scss',
+  'square-corners.scss',
   'sass/_colors.scss',
   'sass/_common.scss',
   'sass/_default-colors.scss',
@@ -56,6 +57,7 @@ stylesheets = [
   'kestrel-light.css',
   'panel-ink-dark.css',
   'panel-ink-light.css',
+  'square-corners.css',
 ]
 
 sassc = find_program('sassc')

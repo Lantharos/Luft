@@ -100,6 +100,7 @@ export class TitleBar {
     const press = { x, y, time: event.get_time() };
     switch (event.get_button()) {
       case Clutter.BUTTON_PRIMARY:
+        this.window.activate(press.time);
         if (this.isDoubleClick(press)) {
           this.lastPress = null;
           this.press = null;
@@ -110,6 +111,7 @@ export class TitleBar {
         }
         return Clutter.EVENT_STOP;
       case Clutter.BUTTON_SECONDARY:
+        this.window.activate(press.time);
         this.showMenu(this.window, x, y);
         return Clutter.EVENT_STOP;
       default:

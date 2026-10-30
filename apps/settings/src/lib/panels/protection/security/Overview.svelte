@@ -3,17 +3,16 @@
 	import KeyRound from '@lucide/svelte/icons/key-round';
 	import ShieldAlert from '@lucide/svelte/icons/shield-alert';
 	import ShieldCheck from '@lucide/svelte/icons/shield-check';
-	import ShieldEllipsis from '@lucide/svelte/icons/shield-ellipsis';
 	import { t } from '@luft/i18n';
 	import { ActionRow, Section } from '@luft/ui';
 	import { encryptionSummary } from './encryption/describe';
 	import { protection } from './keyring/describe';
 	import type { KeyringState } from './keyring/state.svelte';
-	import { levelSentence } from './protections/hsi';
+	import ProtectionsSection from './protections/ProtectionsSection.svelte';
 	import type { SecurityState } from './state.svelte';
 	import { summarize } from './summary';
 
-	type Page = 'protections' | 'encryption' | 'keyring';
+	type Page = 'encryption' | 'keyring';
 
 	interface Props {
 		security: SecurityState;
@@ -25,11 +24,6 @@
 
 	let summary = $derived(security.trust && summarize(security.trust, security.firmwareUpdates));
 	let protections = $derived(Boolean(security.trust || security.host || security.firmwareUpdates || security.usb));
-
-	function protectionsSummary() {
-		if (security.host) return levelSentence(security.host);
-		return security.trust?.secureBoot === 'on' ? t('settings-security-secure-boot-description') : undefined;
-	}
 
 	function keyringSummary() {
 		const current = keyring.current;
@@ -56,10 +50,10 @@
 			<ActionRow title={t('settings-encryption')} icon={HardDrive} description={encryptionSummary(security.trust.disk)} onclick={() => onopen('encryption')} />
 		{/if}
 		<ActionRow title={t('settings-passwords-title')} icon={KeyRound} description={keyringSummary()} onclick={() => onopen('keyring')} />
-		{#if protections}
-			<ActionRow title={t('settings-page-protections')} icon={ShieldEllipsis} description={protectionsSummary()} onclick={() => onopen('protections')} />
-		{/if}
 	</Section>
+	{#if protections}
+		<ProtectionsSection {security} />
+	{/if}
 {/if}
 
 <style>

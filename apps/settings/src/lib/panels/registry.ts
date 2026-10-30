@@ -21,7 +21,6 @@ import Palette from '@lucide/svelte/icons/palette';
 import Plus from '@lucide/svelte/icons/plus';
 import Shield from '@lucide/svelte/icons/shield';
 import ShieldCheck from '@lucide/svelte/icons/shield-check';
-import ShieldEllipsis from '@lucide/svelte/icons/shield-ellipsis';
 import UserRound from '@lucide/svelte/icons/user-round';
 import Volume2 from '@lucide/svelte/icons/volume-2';
 import Wifi from '@lucide/svelte/icons/wifi';
@@ -83,7 +82,6 @@ const VIEWS: Record<PageId, View> = {
 	'network/proxy': { icon: Globe, load: network },
 	'input/shortcuts': { icon: Keyboard, load: input },
 	'input/dictation': { icon: Mic, load: input },
-	'security/protections': { icon: ShieldEllipsis, load: security },
 	'security/encryption': { icon: HardDrive, load: security },
 	'security/keyring': { icon: KeyRound, load: security },
 	'accounts/login': { icon: LogIn, load: accounts },

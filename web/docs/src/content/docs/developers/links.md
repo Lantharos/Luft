@@ -20,7 +20,6 @@ Apps and scripts can open Settings and Keys at a specific page with a link, thro
 | `kestrel-settings:input/dictation` | Dictation |
 | `kestrel-settings:appearance/fonts` | All fonts |
 | `kestrel-settings:appearance/cursors` | Cursor themes |
-| `kestrel-settings:security/protections` | Protections such as Secure Boot and USB protection |
 | `kestrel-settings:security/encryption` | Device encryption |
 | `kestrel-settings:security/keyring` | Passwords and keys |
 | `kestrel-settings:accounts/login` | The login screen |

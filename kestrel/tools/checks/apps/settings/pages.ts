@@ -3,7 +3,7 @@ import {useScheme, type Scheme} from '../lib/palette.js';
 import {show} from './navigation.js';
 
 const PAGES = ['bluetooth', 'network', 'network/ethernet', 'network/vpn', 'network/proxy', 'display', 'sound', 'power', 'input', 'input/shortcuts',
-  'input/dictation', 'appearance', 'appearance/fonts', 'desktop', 'notifications', 'accessibility', 'apps', 'privacy', 'security', 'security/protections',
+  'input/dictation', 'appearance', 'appearance/fonts', 'desktop', 'notifications', 'accessibility', 'apps', 'privacy', 'security',
   'security/encryption', 'security/keyring', 'accounts', 'accounts/login', 'language', 'system', 'system/about'];
 
 async function visit(app: LuftApp, scheme: Scheme) {

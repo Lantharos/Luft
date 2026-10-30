@@ -7,7 +7,6 @@
 	import KeyringPage from './keyring/KeyringPage.svelte';
 	import { KeyringState } from './keyring/state.svelte';
 	import Overview from './Overview.svelte';
-	import ProtectionsPage from './protections/ProtectionsPage.svelte';
 	import { SecurityState } from './state.svelte';
 
 	const security = new SecurityState();
@@ -23,9 +22,7 @@
 	});
 </script>
 
-{#if security.loaded && app.section === 'protections'}
-	<ProtectionsPage {security} onclose={close} />
-{:else if security.trust && app.section === 'encryption'}
+{#if security.trust && app.section === 'encryption'}
 	<EncryptionPage trust={security.trust} onclose={close} />
 {:else if app.section === 'keyring'}
 	<KeyringPage {keyring} fingerprintReader={security.fingerprintReader} onclose={close} />

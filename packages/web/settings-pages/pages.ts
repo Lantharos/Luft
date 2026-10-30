@@ -23,7 +23,6 @@ export type SubpageId =
 	| 'network/proxy'
 	| 'input/shortcuts'
 	| 'input/dictation'
-	| 'security/protections'
 	| 'security/encryption'
 	| 'security/keyring'
 	| 'accounts/login'
@@ -93,7 +92,6 @@ export const SUBPAGES: Page<SubpageId>[] = [
 	page('network/proxy', 'settings-page-proxy', 'preferences-system-network-proxy-symbolic', { keywords: [] }),
 	page('input/shortcuts', 'settings-page-shortcuts', 'preferences-desktop-keyboard-shortcuts-symbolic', { keywords: [] }),
 	page('input/dictation', 'settings-page-dictation', 'audio-input-microphone-symbolic', { copilotKey: 'settings-page-dictation' }),
-	page('security/protections', 'settings-page-protections', 'security-high-symbolic', { keywords: [] }),
 	page('security/encryption', 'settings-page-encryption', 'drive-harddisk-symbolic', { keywords: [] }),
 	page('security/keyring', 'settings-page-keyring', 'dialog-password-symbolic', { keywords: [] }),
 	page('accounts/login', 'settings-page-login', 'system-lock-screen-symbolic'),

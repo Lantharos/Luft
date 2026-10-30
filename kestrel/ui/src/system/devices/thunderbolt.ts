@@ -201,7 +201,7 @@ export const Indicator = GObject.registerClass(class Indicator extends SystemInd
     notification.connect('destroy', () => {
       this.notification = null;
     });
-    notification.connect('activated', () => Util.openSettings('security/protections'));
+    notification.connect('activated', () => Util.openSettings('security'));
     source.addNotification(notification);
   }
 

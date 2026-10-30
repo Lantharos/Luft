@@ -216,14 +216,13 @@ jobs:
         run: .github/scripts/kestrel/container.sh run kestrel/tools/session.sh capture --only "$SMOKE_GROUPS"
 
       - if: failure()
+        run: tar -czf kestrel-session.tar.gz --ignore-failed-read -C kestrel/run/smoke capture/logs capture/workers capture/summary.txt screenshots
+
+      - if: failure()
         uses: actions/upload-artifact@v7
         with:
           name: kestrel-session
-          path: |
-            kestrel/run/smoke/capture/logs
-            kestrel/run/smoke/capture/workers
-            kestrel/run/smoke/capture/summary.txt
-            kestrel/run/smoke/screenshots
+          path: kestrel-session.tar.gz
           if-no-files-found: ignore
 
       - if: always()

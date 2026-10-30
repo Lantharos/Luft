@@ -164,15 +164,18 @@ async function checkDisabledAnimations() {
 }
 
 export async function run() {
-  await checkSpring();
-  await checkRetarget();
-  await checkDisabledAnimations();
-  for (const [surface, name] of SURFACES) await checkInterruptedSurface(surface, name);
-  await checkClippedAtTaskbar();
-  a11y.set_string('reduced-motion', 'reduce');
+  const forced = global.force_animations;
+  global.force_animations = true;
   try {
+    await checkSpring();
+    await checkRetarget();
+    await checkDisabledAnimations();
+    for (const [surface, name] of SURFACES) await checkInterruptedSurface(surface, name);
+    await checkClippedAtTaskbar();
+    a11y.set_string('reduced-motion', 'reduce');
     for (const [surface, name] of SURFACES) await checkReducedSurface(surface, name);
   } finally {
     a11y.reset('reduced-motion');
+    global.force_animations = forced;
   }
 }

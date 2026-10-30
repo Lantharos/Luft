@@ -233,6 +233,8 @@ export async function run() {
   await waitForWindow(window => window.get_title()?.startsWith('Second'), 'a second window opens');
   first.change_workspace_by_index(1, false);
   await settled();
+  const forced = global.force_animations;
+  global.force_animations = true;
   try {
     await checkWorkspaceSwitches();
     await checkWorkspaceSwipe();
@@ -243,6 +245,7 @@ export async function run() {
     await checkTaskView();
     await checkTaskViewGesture();
   } finally {
+    global.force_animations = forced;
     for (const client of clients) await stop(client);
   }
 }

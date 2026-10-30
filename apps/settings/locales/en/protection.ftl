@@ -512,6 +512,8 @@ settings-apps-serial = Serial devices
 settings-apps-serial-hint = Such as 3D printers and boards connected over USB
 # Shown under a folder an app may only read
 settings-apps-folder-read-only = Read only
+settings-apps-downloads = Downloads folder
+settings-apps-downloads-hint = It can save files to your Downloads folder and open the ones there, from the next time it opens.
 settings-apps-internet = Internet
 settings-apps-internet-hint = It can go online, from the next time it opens.
 # Under the name of a D-Bus service an app may call

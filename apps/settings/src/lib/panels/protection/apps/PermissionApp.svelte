@@ -82,8 +82,11 @@
 					</button>
 				</Row>
 			{/each}
+			<Row title={t('settings-apps-downloads')} description={t('settings-apps-downloads-hint')}>
+				<Switch label={t('settings-apps-downloads')} checked={app.downloads} disabled={permissions.busy} onchange={(on) => permissions.setSwitch(app, 'downloads', on)} />
+			</Row>
 			<Row title={t('settings-apps-internet')} description={t('settings-apps-internet-hint')}>
-				<Switch label={t('settings-apps-internet')} checked={app.online} disabled={permissions.busy} onchange={(on) => permissions.setOnline(app, on)} />
+				<Switch label={t('settings-apps-internet')} checked={app.online} disabled={permissions.busy} onchange={(on) => permissions.setSwitch(app, 'internet', on)} />
 			</Row>
 			{#each app.services as service (service)}
 				<Row title={service} description={t('settings-apps-service-hint')} truncate>

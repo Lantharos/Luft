@@ -1,5 +1,5 @@
 use luft_app::identity::permissions::{
-    self, BUS, DEVICES, FOLDERS, FULL_ACCESS, NETWORK, NO, READ_ONLY_FOLDERS, YES,
+    self, BUS, DEVICES, DOWNLOADS, FOLDERS, FULL_ACCESS, NETWORK, NO, READ_ONLY_FOLDERS, YES,
 };
 use luft_app::portal::FileChooser;
 use luft_app::portal::uri_path;
@@ -12,6 +12,22 @@ use zbus::Connection;
 pub enum SandboxDevice {
     Usb,
     Serial,
+}
+
+#[derive(Deserialize, Clone, Copy, PartialEq, Eq, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum SandboxSwitch {
+    Internet,
+    Downloads,
+}
+
+impl SandboxSwitch {
+    fn permission(self) -> &'static permissions::Permission {
+        match self {
+            Self::Internet => &NETWORK,
+            Self::Downloads => &DOWNLOADS,
+        }
+    }
 }
 
 impl SandboxDevice {
@@ -77,9 +93,14 @@ pub async fn remove_folder(connection: &Connection, app: &str, folder: &str) -> 
     Ok(())
 }
 
-pub async fn set_online(connection: &Connection, app: &str, on: bool) -> zbus::Result<()> {
+pub async fn set_switch(
+    connection: &Connection,
+    app: &str,
+    switch: SandboxSwitch,
+    on: bool,
+) -> zbus::Result<()> {
     let answer: &[&str] = if on { &[] } else { &[NO] };
-    permissions::set_values(connection, &NETWORK, app, answer).await
+    permissions::set_values(connection, switch.permission(), app, answer).await
 }
 
 pub async fn remove_service(connection: &Connection, app: &str, service: &str) -> zbus::Result<()> {

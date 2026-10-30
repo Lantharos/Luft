@@ -4592,6 +4592,7 @@ dependencies = [
 name = "luft-sandbox"
 version = "0.1.0"
 dependencies = [
+ "dirs",
  "futures-util",
  "landlock",
  "libc",

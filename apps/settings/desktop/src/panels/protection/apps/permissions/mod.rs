@@ -9,7 +9,7 @@ use std::sync::Once;
 use luft_app::apps::App;
 use luft_app::dbus;
 use luft_app::identity::permissions::{
-    self, Apps, BUS, DEVICES, FOLDERS, NETWORK, NO, READ_ONLY_FOLDERS,
+    self, Apps, BUS, DEVICES, DOWNLOADS, FOLDERS, NETWORK, NO, READ_ONLY_FOLDERS,
 };
 use luft_app::{Commands, Empty, Events};
 use luft_i18n::t;
@@ -21,7 +21,7 @@ use zbus::Connection;
 use crate::L10N;
 use grants::{SWITCHES, Switchable};
 use passwords::Remembered;
-use sandbox::SandboxDevice;
+use sandbox::{SandboxDevice, SandboxSwitch};
 use specta::Type;
 
 const FULL_ACCESS_LINK: &str = "schelf:full-access?";
@@ -43,6 +43,7 @@ struct AppAccess {
     read_only_folders: Vec<String>,
     devices: Vec<String>,
     online: bool,
+    downloads: bool,
     services: Vec<String>,
 }
 
@@ -72,8 +73,9 @@ struct Folder {
 }
 
 #[derive(Deserialize, Type)]
-struct NetworkChange {
+struct SwitchChange {
     app: String,
+    switch: SandboxSwitch,
     on: bool,
 }
 
@@ -103,6 +105,13 @@ fn identify(id: &str) -> App {
         })
 }
 
+fn open(closed: &HashMap<String, Vec<String>>, id: &str) -> bool {
+    closed
+        .get(id)
+        .and_then(|answer| answer.first())
+        .is_none_or(|answer| answer != NO)
+}
+
 fn by_app(apps: Apps) -> HashMap<String, Vec<String>> {
     apps.into_iter()
         .filter(|(app, _)| !app.is_empty())
@@ -123,6 +132,8 @@ async fn read(connection: &Connection) -> zbus::Result<Vec<AppAccess>> {
     );
     let devices = by_app(permissions::lookup(connection, DEVICES.table, DEVICES.id).await?);
     let offline = by_app(permissions::lookup(connection, NETWORK.table, NETWORK.id).await?);
+    let without_downloads =
+        by_app(permissions::lookup(connection, DOWNLOADS.table, DOWNLOADS.id).await?);
     let services = by_app(permissions::lookup(connection, BUS.table, BUS.id).await?);
     let app_images: BTreeSet<String> = appimage::list().into_iter().map(|app| app.id).collect();
     let ids: BTreeSet<&String> = location
@@ -150,10 +161,8 @@ async fn read(connection: &Connection) -> zbus::Result<Vec<AppAccess>> {
             folders: folders.get(id).cloned().unwrap_or_default(),
             read_only_folders: read_only_folders.get(id).cloned().unwrap_or_default(),
             devices: devices.get(id).cloned().unwrap_or_default(),
-            online: offline
-                .get(id)
-                .and_then(|answer| answer.first())
-                .is_none_or(|answer| answer != NO),
+            online: open(&offline, id),
+            downloads: open(&without_downloads, id),
             services: services.get(id).cloned().unwrap_or_default(),
         })
         .collect();
@@ -213,8 +222,8 @@ async fn remove_folder(Folder { app, folder }: Folder) -> Result<(), String> {
         .map_err(explain)
 }
 
-async fn set_online(NetworkChange { app, on }: NetworkChange) -> Result<(), String> {
-    sandbox::set_online(dbus::session().await?, &app, on)
+async fn set_switch(SwitchChange { app, switch, on }: SwitchChange) -> Result<(), String> {
+    sandbox::set_switch(dbus::session().await?, &app, switch, on)
         .await
         .map_err(explain)
 }
@@ -242,6 +251,6 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         .command_async("apps_folder_add", add_folder)
         .command_async("apps_folder_remove", remove_folder)
         .command_async("apps_device_set", set_device)
-        .command_async("apps_network_set", set_online)
+        .command_async("apps_sandbox_set", set_switch)
         .command_async("apps_service_remove", remove_service)
 }

@@ -56,6 +56,12 @@ pub const NETWORK: Permission = Permission {
     id: "network",
 };
 
+/// AppImages whose sandbox keeps your Downloads folder out, with `no`.
+pub const DOWNLOADS: Permission = Permission {
+    table: "sandbox",
+    id: "downloads",
+};
+
 /// Session bus names an AppImage's sandbox may call besides those every
 /// sandbox may.
 pub const BUS: Permission = Permission {

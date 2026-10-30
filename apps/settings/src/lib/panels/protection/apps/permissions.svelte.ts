@@ -1,6 +1,6 @@
 import { errorText } from '@luft/ui';
 import { commands, events } from '#lib/bindings.js';
-import type { AppAccess, SandboxDevice, Switchable } from '#lib/bindings.js';
+import type { AppAccess, SandboxDevice, SandboxSwitch, Switchable } from '#lib/bindings.js';
 
 export class Permissions {
 	apps = $state<AppAccess[]>([]);
@@ -40,7 +40,7 @@ export class Permissions {
 
 	setDevice = (app: AppAccess, device: SandboxDevice, on: boolean) => this.run(() => commands.appsDeviceSet({ app: app.id, device, on }));
 
-	setOnline = (app: AppAccess, on: boolean) => this.run(() => commands.appsNetworkSet({ app: app.id, on }));
+	setSwitch = (app: AppAccess, sandboxSwitch: SandboxSwitch, on: boolean) => this.run(() => commands.appsSandboxSet({ app: app.id, switch: sandboxSwitch, on }));
 
 	removeService = (app: AppAccess, service: string) => this.run(() => commands.appsServiceRemove({ app: app.id, service }));
 }

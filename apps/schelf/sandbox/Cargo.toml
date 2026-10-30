@@ -8,6 +8,7 @@ edition.workspace = true
 rust-version.workspace = true
 
 [dependencies]
+dirs.workspace = true
 futures-util.workspace = true
 landlock.workspace = true
 libc.workspace = true

@@ -120,10 +120,6 @@ export const commands = {
 		appImage: boolean,
 	}, options?: InvokeOptions) => invoke<null>("apps_full_access_revoke", params, options),
 	appsInstalled: (options?: InvokeOptions) => invoke<App[]>("apps_installed", {}, options),
-	appsNetworkSet: (params: {
-		app: string,
-		on: boolean,
-	}, options?: InvokeOptions) => invoke<null>("apps_network_set", params, options),
 	appsPasswordsForget: (params: {
 		app: string,
 	}, options?: InvokeOptions) => invoke<null>("apps_passwords_forget", params, options),
@@ -133,6 +129,11 @@ export const commands = {
 		allowed: boolean,
 	}, options?: InvokeOptions) => invoke<null>("apps_permission_set", params, options),
 	appsPermissions: (options?: InvokeOptions) => invoke<AppAccess[]>("apps_permissions", {}, options),
+	appsSandboxSet: (params: {
+		app: string,
+		switch: SandboxSwitch,
+		on: boolean,
+	}, options?: InvokeOptions) => invoke<null>("apps_sandbox_set", params, options),
 	appsServiceRemove: (params: {
 		app: string,
 		service: string,
@@ -624,6 +625,7 @@ export type AppAccess = {
 	readOnlyFolders: string[],
 	devices: string[],
 	online: boolean,
+	downloads: boolean,
 	services: string[],
 } & App;
 
@@ -1305,6 +1307,8 @@ export type SabineWait = {
 };
 
 export type SandboxDevice = "usb" | "serial";
+
+export type SandboxSwitch = "internet" | "downloads";
 
 export type Schedule = "daily" | "weekly" | "never";
 

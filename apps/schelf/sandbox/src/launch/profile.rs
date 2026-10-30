@@ -270,6 +270,8 @@ impl Profile<'_> {
         }
         if self.shares_home(home) {
             arguments.same("--bind", &data);
+        } else if let Some(downloads) = dirs::download_dir().filter(|_| self.grants.downloads) {
+            arguments.same("--bind-try", downloads);
         }
         for folder in HOME_READ_ONLY {
             arguments.same("--ro-bind-try", home.join(folder));

@@ -42,12 +42,12 @@ Open an `.AppImage` file and Schelf offers to install it. It moves it into `~/Ap
 
 AppImages run in a sandbox, like Flatpak apps:
 
-- They get the internet, the graphics card, sound, notifications and windows, and keep their settings and data in a folder of their own, `~/.var/app/` followed by the app's ID.
+- They get the internet, your Downloads folder, the graphics card, sound, notifications and windows, and keep their settings and data in a folder of their own, `~/.var/app/` followed by the app's ID.
 - Your files reach them through the file chooser: what you pick is shared with the app, nothing else. Files you open with the app from Rover are shared the same way.
 - Secrets they save, such as an app's sign-in, are theirs. Other sandboxed apps can't read them without you confirming.
-- In Settings → Apps you can give one a folder, or USB or serial devices, from the next time it opens.
+- In Settings → Apps you can give one a folder, or USB or serial devices, or take away its Downloads folder or the internet, from the next time it opens.
 
-An AppImage that closes right after it starts, or looks for a USB or serial device, may need more. Luft then tells you, and **Review access** opens Schelf, where you can give it full access. With full access it runs as it would without Luft, and keeps its data where it always did, outside its sandbox's folder, so it starts without the settings it had in its sandbox.
+An AppImage that closes right after it starts, or looks for a USB or serial device, may need more. Luft then tells you, and **Review access** opens Schelf, where you can give it full access. With full access it runs as it would without Luft, with the same settings and data it had in its sandbox.
 
 ## Apps from .deb files
 

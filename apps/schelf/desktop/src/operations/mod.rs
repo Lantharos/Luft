@@ -189,17 +189,23 @@ impl Queue {
             let last = Mutex::new(Instant::now() - PROGRESS_INTERVAL);
             let report = |progress: Progress| {
                 let mut last = last.lock().unwrap_or_else(|poisoned| poisoned.into_inner());
-                if last.elapsed() < PROGRESS_INTERVAL {
-                    return;
-                }
-                *last = Instant::now();
-                if let Some(entry) = self
-                    .entries()
-                    .iter_mut()
-                    .find(|entry| entry.operation.id == id)
-                {
+                let progress = {
+                    let mut entries = self.entries();
+                    let Some(entry) = entries.iter_mut().find(|entry| entry.operation.id == id)
+                    else {
+                        return;
+                    };
+                    let previous = entry.operation.progress;
+                    let progress = steady(previous, progress);
+                    let same_stage =
+                        previous.is_some_and(|previous| previous.stage == progress.stage);
+                    if same_stage && last.elapsed() < PROGRESS_INTERVAL {
+                        return;
+                    }
                     entry.operation.progress = Some(progress);
-                }
+                    progress
+                };
+                *last = Instant::now();
                 self.publish();
                 self.notify(Notice::Changed {
                     id,
@@ -310,6 +316,19 @@ impl Queue {
             cancel.cancel();
         }
         self.publish();
+    }
+}
+
+fn steady(previous: Option<Progress>, next: Progress) -> Progress {
+    match previous {
+        Some(previous) if previous.stage == next.stage => {
+            let fraction = match (previous.fraction, next.fraction) {
+                (Some(before), Some(now)) => Some(before.max(now)),
+                (before, now) => now.or(before),
+            };
+            Progress::new(next.stage, fraction)
+        }
+        _ => next,
     }
 }
 

@@ -12,7 +12,7 @@ import {lock, unlock} from '../lockScreen/lib/shield.js';
 
 const {require, eventually} = checks('reconnect');
 const STATE = scratch('reconnect.json');
-const REQUEUED = '0000-system:reconnect';
+const REQUEUED = `0000~${GLib.getenv('KESTREL_CAPTURE_WORKER')}-system:reconnect`;
 const RETURN_TIMEOUT = 30000;
 const NOTED_AFTER = 1500;
 const TOLERANCE = 2;

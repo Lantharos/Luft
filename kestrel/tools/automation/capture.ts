@@ -9,14 +9,19 @@ import {endSession, runGroup} from './runner.js';
 
 const FILE_MANAGER = 'com.lantharos.rover.desktop';
 
+const QUEUED = /^\d+(?:~(worker-\d+))?-(.+)$/;
+
 function claim() {
+  const worker = GLib.getenv('KESTREL_CAPTURE_WORKER')!;
   const queue = Gio.File.new_for_path(GLib.getenv('KESTREL_CAPTURE_QUEUE')!);
   const claimed = Gio.File.new_for_path(GLib.getenv('KESTREL_CAPTURE_CLAIMED')!);
   const names = [...queue.enumerate_children('standard::name', Gio.FileQueryInfoFlags.NONE, null)].map(info => info.get_name()).sort();
   for (const name of names) {
+    const [, addressee, group] = QUEUED.exec(name)!;
+    if (addressee && addressee !== worker) continue;
     try {
-      queue.get_child(name).move(claimed.get_child(`${name}@${GLib.getenv('KESTREL_CAPTURE_WORKER')}`), Gio.FileCopyFlags.NO_FALLBACK_FOR_MOVE, null, null);
-      return name.replace(/^\d+-/, '');
+      queue.get_child(name).move(claimed.get_child(`${name}@${worker}`), Gio.FileCopyFlags.NO_FALLBACK_FOR_MOVE, null, null);
+      return group;
     } catch {
       continue;
     }

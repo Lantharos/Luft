@@ -89,15 +89,19 @@ queue_groups() {
   done < <(select_groups | longest_first)
 }
 
+open_groups() {
+  find "$out/queue/${1:-}" -type f ! -name '*~*'
+}
+
 queued() {
-  compgen -G "$out/queue/*/*" > /dev/null
+  [[ -n "$(open_groups)" ]]
 }
 
 next_size() {
   local queue best="" best_share=-1 serving share
   for queue in "$out"/queue/*; do
     serving=$(printf '%s\n' "${sizes[@]}" | grep -c "^${queue##*/}$" || true)
-    share=$(($(find "$queue" -type f | wc -l) * 100 / (serving + 1)))
+    share=$(($(open_groups "${queue##*/}" | wc -l) * 100 / (serving + 1)))
     if ((share > best_share)); then
       best="${queue##*/}"
       best_share=$share
@@ -161,7 +165,7 @@ record_standalone() {
 }
 
 finished_worker() {
-  if compgen -G "$out/queue/$2/*" > /dev/null && ! compgen -G "$out/claimed/*@$1" > /dev/null && ((++startup_failures >= max_startup_failures)); then
+  if [[ -n "$(open_groups "$2")" ]] && ! compgen -G "$out/claimed/*@$1" > /dev/null && ((++startup_failures >= max_startup_failures)); then
     echo "Sessions keep ending before running a check, see $out/workers/$1.log" >&2
     exit 1
   fi
@@ -169,7 +173,7 @@ finished_worker() {
 
 run_sessions() {
   local pid status queued_groups group
-  queued_groups=$(find "$out/queue" -type f | wc -l)
+  queued_groups=$(open_groups | wc -l)
   for group in "${separate[@]}"; do start_standalone "$group"; done
   while ((${#running[@]} < jobs && workers < queued_groups)); do start_worker; done
   while ((${#running[@]} > 0)); do

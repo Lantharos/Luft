@@ -1,7 +1,8 @@
 use specta::Type;
 use std::collections::HashMap;
 
-use luft_app::apps::App;
+use gio::prelude::*;
+use luft_app::apps::{App, icon_path};
 use serde::Serialize;
 
 use crate::system::procfile::unescape_hex;
@@ -119,7 +120,7 @@ impl Apps {
                     .or_insert_with(|| AppInfo {
                         key: SABINE_RUNTIME.to_owned(),
                         name: "Sabine".to_owned(),
-                        icon: Some(SABINE_ICON.to_owned()),
+                        icon: icon_path(&gio::ThemedIcon::new(SABINE_ICON).upcast()),
                     });
                 SABINE_RUNTIME.to_owned()
             })

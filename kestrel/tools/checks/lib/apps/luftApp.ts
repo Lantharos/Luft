@@ -5,6 +5,7 @@ import IBus from 'gi://IBus';
 import type Meta from 'gi://Meta';
 
 import {atSessionEnd} from '../../../automation/runner.js';
+import {requireFresh} from './freshness.js';
 import {prepareHome} from './home.js';
 import {click, type Point} from '../input/input.js';
 import {repository, spawn, type Process} from '../processes.js';
@@ -49,6 +50,7 @@ function environment(manifest: string | null = null): Record<string, string | nu
 }
 
 function command(name: string) {
+  requireFresh(name);
   const app = repository('apps', name);
   return {path: repository('target/release', name), manifest: GLib.build_filenamev([app, 'Sabine.toml'])};
 }

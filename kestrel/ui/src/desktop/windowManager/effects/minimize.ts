@@ -3,6 +3,7 @@ import type Shell from 'gi://Shell';
 
 import * as KestrelUi from '../../../kestrelUi.js';
 import * as Main from '../../../core/main.js';
+import { holdPicture, releasePicture } from './iconicPicture.js';
 import { transitionVelocity } from './velocity.js';
 
 const MINIMIZE_PROPERTIES = ['x', 'y', 'scale_x', 'scale_y', 'opacity'] as const;
@@ -58,6 +59,7 @@ export class MinimizeEffects {
   constructor(private readonly shellwm: Shell.WM, private readonly shouldAnimate: (actor: Meta.WindowActor) => boolean) {}
 
   minimize(actor: Meta.WindowActor): void {
+    holdPicture(actor);
     const motion = this.resume(actor);
     if (!this.shouldAnimate(actor)) {
       this.shellwm.completed_minimize(actor);
@@ -93,6 +95,7 @@ export class MinimizeEffects {
       actor.set_position(rect.x, rect.y);
       actor.set_scale(1, 1);
       actor.opacity = 255;
+      releasePicture(actor);
       this.shellwm.completed_unminimize(actor);
       return;
     }
@@ -171,6 +174,7 @@ export class MinimizeEffects {
 
   private unminimizeDone(actor: Meta.WindowActor): void {
     if (!this.unminimizing.delete(actor)) return;
+    releasePicture(actor);
     reset(actor);
     this.shellwm.completed_unminimize(actor);
   }

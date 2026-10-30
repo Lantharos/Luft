@@ -5,6 +5,7 @@
 	import EntryIcon from '#lib/components/pane/EntryIcon.svelte';
 	import { dialogs } from '#lib/features/dialogs.svelte.js';
 	import EmptyState from '#lib/components/pane/EmptyState.svelte';
+	import LoadingRows from '#lib/components/pane/LoadingRows.svelte';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
 
 	interface Props {
@@ -33,8 +34,12 @@
 	}
 </script>
 
-{#if items.length === 0 && !manager.loading.active}
-	<EmptyState icon={Trash} title="Trash is empty" />
+{#if items.length === 0}
+	{#if manager.loading.skeleton}
+		<LoadingRows />
+	{:else if !manager.loading.active}
+		<EmptyState icon={Trash} title="Trash is empty" />
+	{/if}
 {:else}
 	<div class="trash-bar">
 		{#if locationOptions.length > 1 && activeLocation}

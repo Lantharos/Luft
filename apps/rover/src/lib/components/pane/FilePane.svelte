@@ -3,6 +3,7 @@
 	import { fade } from '@luft/ui';
 	import type { FileEntry } from '#lib/bindings.js';
 	import EmptyState from '#lib/components/pane/EmptyState.svelte';
+	import LoadingRows from '#lib/components/pane/LoadingRows.svelte';
 	import TrashPane from '#lib/components/pane/TrashPane.svelte';
 	import ColumnsView from '#lib/components/views/ColumnsView.svelte';
 	import GridView from '#lib/components/views/GridView.svelte';
@@ -66,11 +67,7 @@
 				{#if empty}
 					<EmptyState {...empty} />
 				{:else if manager.loading.skeleton}
-					<div class="loading-rows" aria-hidden="true">
-						{#each { length: 10 }, index (index)}
-							<span style:opacity={0.5 - index * 0.04}></span>
-						{/each}
-					</div>
+					<LoadingRows />
 				{:else}
 					{#key listingKey}
 						{#if mode === 'grid'}
@@ -102,25 +99,5 @@
 		min-width: 0;
 		flex-direction: column;
 		grid-area: 1 / 1;
-	}
-
-	.loading-rows {
-		display: grid;
-		gap: 8px;
-		padding: 40px 20px 0;
-		animation: empty-in var(--motion-standard) var(--ease-decelerate) both;
-	}
-
-	.loading-rows span {
-		height: 26px;
-		border-radius: 8px;
-		background: var(--surface-hover);
-	}
-
-	@keyframes empty-in {
-		from {
-			opacity: 0;
-			scale: 0.98;
-		}
 	}
 </style>

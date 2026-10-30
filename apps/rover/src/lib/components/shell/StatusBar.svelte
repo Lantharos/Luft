@@ -17,6 +17,7 @@
 		manager.selection.size === 0 ? 0 : manager.selectedEntries.reduce((total, entry) => total + (entry.isDir ? 0 : entry.size), 0)
 	);
 	let summary = $derived.by(() => {
+		if (count === 0 && manager.loading.active) return '';
 		if (manager.selection.size === 0) return plural(count, 'item');
 		const selected = `${manager.selection.size} of ${plural(count, 'item')} selected`;
 		return selectedSize > 0 ? `${selected} · ${bytes(selectedSize)}` : selected;

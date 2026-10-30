@@ -1,7 +1,7 @@
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 
-use crate::apps::toolbox::pull;
+use crate::apps::toolbox::{pull, root};
 use crate::progress::Stage;
 use crate::task::Task;
 
@@ -11,7 +11,6 @@ pub const NAME: &str = "luft-ubuntu";
 const IMAGE: &str = "quay.io/toolbx/ubuntu-toolbox:26.04";
 // The host's files show inside a toolbox container here, besides the home folder, which shows as itself
 const HOST: &str = "/run/host";
-const SET_UP: &str = "/usr/local/share/luft-set-up";
 // Graphics drivers for apps drawn with the GPU, and links and mail opened by the desktop rather than inside
 const BASICS: [&str; 4] = [
     "libgl1-mesa-dri",
@@ -19,9 +18,6 @@ const BASICS: [&str; 4] = [
     "mesa-vulkan-drivers",
     "flatpak-xdg-utils",
 ];
-const HAND_OFF: &str = "for tool in xdg-open xdg-email; do \
-    [ -x /usr/libexec/flatpak-xdg-utils/$tool ] && ln -sf /usr/libexec/flatpak-xdg-utils/$tool /usr/local/bin/$tool; \
-done";
 
 pub fn exists() -> bool {
     Command::new("podman")
@@ -51,15 +47,14 @@ pub fn ready(task: Task) -> Result<(), String> {
             task,
         )?;
     }
-    if query(&["test", "-e", SET_UP]).is_ok() {
+    if root::set_up(NAME) {
         return Ok(());
     }
     apt::run(&mut apt::apt_get(&["update"]), Stage::Preparing, task)?;
     let mut basics = vec!["install", "--no-install-recommends", "--"];
     basics.extend(BASICS);
     apt::run(&mut apt::apt_get(&basics), Stage::Preparing, task)?;
-    query(&["sudo", "sh", "-c", HAND_OFF])?;
-    query(&["sudo", "touch", SET_UP]).map(drop)
+    root::finish_setting_up(NAME)
 }
 
 pub fn run(program: &[&str]) -> Command {

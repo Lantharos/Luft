@@ -1,13 +1,13 @@
 use std::io::{BufRead, BufReader};
 use std::process::{Command, Stdio};
 
+use crate::apps::toolbox::root;
 use crate::progress::Stage;
 use crate::task::{CANCELLED, Task};
 
 /// apt-get, with its progress written as status lines to standard error.
 pub fn apt_get(arguments: &[&str]) -> Command {
     let mut program = vec![
-        "sudo",
         "env",
         "DEBIAN_FRONTEND=noninteractive",
         "apt-get",
@@ -19,7 +19,7 @@ pub fn apt_get(arguments: &[&str]) -> Command {
         "Dpkg::Use-Pty=0",
     ];
     program.extend_from_slice(arguments);
-    super::container::run(&program)
+    root::command(super::container::NAME, &program)
 }
 
 /// Runs apt-get without reporting progress, for checks no one waits on.

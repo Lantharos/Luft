@@ -3,6 +3,7 @@ mod commands;
 mod container;
 mod installed;
 pub(crate) mod pull;
+pub(crate) mod root;
 mod transaction;
 mod updates;
 
@@ -19,18 +20,28 @@ pub use updates::{Update, updates};
 
 const NOTHING_TO_REMOVE: &str = "No packages to remove";
 
+const DESKTOP_HAND_OFF: &str = "flatpak-xdg-utils";
+
 fn dnf(arguments: &[&str]) -> Command {
-    let mut program = vec!["sudo", "dnf", "--assumeyes"];
+    let mut program = vec!["dnf", "--assumeyes"];
     program.extend_from_slice(arguments);
-    container::run(&program)
+    root::command(&container::name(), &program)
 }
 
 fn ready(task: Task) -> Result<(), String> {
-    if container::exists() {
-        Ok(())
-    } else {
-        container::create(task)
+    if !container::exists() {
+        container::create(task)?;
     }
+    let name = container::name();
+    if root::set_up(&name) {
+        return Ok(());
+    }
+    transaction::run(
+        &mut dnf(&["install", "--", DESKTOP_HAND_OFF]),
+        Stage::Preparing,
+        task,
+    )?;
+    root::finish_setting_up(&name)
 }
 
 fn record(package: &str) -> Result<(), String> {

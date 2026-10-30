@@ -27,12 +27,16 @@ export function filesystemName(volume: Volume) {
 	return FILESYSTEM_NAMES[volume.fsType] ?? volume.fsType;
 }
 
+export function folderName(path: string) {
+	return path.replace(/^\/var\/(mnt|home|srv|opt)(?=\/|$)/, '/$1');
+}
+
 export function volumeName(volume: Volume) {
 	const contents = inner(volume);
 	if (volume.label || contents.label) return volume.label || contents.label;
 	if (volume.partitionName) return volume.partitionName;
 	if (isEfiSystem(volume)) return 'EFI system';
-	if (contents.mountPoints[0]) return contents.mountPoints[0];
+	if (contents.mountPoints[0]) return folderName(contents.mountPoints[0]);
 	const type = partitionType(volume.partitionType);
 	if (type && type.role !== 'data') return type.label;
 	return volume.number ? `Partition ${volume.number}` : volume.device.replace('/dev/', '');

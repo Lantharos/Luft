@@ -125,6 +125,8 @@ enum SystemDiskAction {
     Continue,
     /// The step at startup that opens the other half of an encrypted system disk while Luft moves it
     OpenHalves,
+    /// The step at startup that starts encrypting Luft's partition once Settings asked for it, and opens it while it's being encrypted
+    StartEncrypting,
 }
 
 impl Command {
@@ -254,5 +256,6 @@ fn system_disk(action: SystemDiskAction) -> Result<()> {
                 tokio::task::spawn_blocking(disk::layout::continue_at_start).await
             })?,
         SystemDiskAction::OpenHalves => disk::layout::open_in_initrd(),
+        SystemDiskAction::StartEncrypting => disk::encrypting::open_in_initrd(),
     }
 }

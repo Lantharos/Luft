@@ -11,6 +11,10 @@ export const removeTpmUnlock = (unlock: string) => commands.securityRemoveTpm({ 
 export const showRecoveryKey = () => commands.securityShowKey(WAIT_FOR_PERMISSION);
 export const acceptSecureBootChange = () => commands.securityAcceptSecureBoot(WAIT_FOR_PERMISSION);
 export const replaceRecoveryKey = (unlock: string) => commands.securityReplaceKey({ unlock }, WAIT_FOR_PERMISSION);
+export const generateRecoveryKey = () => commands.securityGenerateKey();
+export const onBattery = () => commands.securityOnBattery();
+export const encryptDisk = (recoveryKey: string, passphrase: string) => commands.securityEncryptDisk({ recoveryKey, passphrase }, WAIT_FOR_PERMISSION);
+export const cancelEncryption = () => commands.securityCancelEncryption(WAIT_FOR_PERMISSION);
 
 export const enrollSigningKey = () => commands.securityEnrollKey(WAIT_FOR_PERMISSION);
 export const cancelSigningKey = () => commands.securityCancelEnrollment(WAIT_FOR_PERMISSION);

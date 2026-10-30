@@ -24,7 +24,7 @@ const MANAGE: &str = "com.lantharos.trust.manage-drive-encryption";
 const RECOVERY_KEY: &str = "com.lantharos.trust.show-recovery-key";
 const UNLOCK: &str = "com.lantharos.trust.unlock-drive";
 const BATTERY_CHECK: Duration = Duration::from_secs(20);
-const BATTERY_RETRY: Duration = Duration::from_secs(60);
+pub(super) const BATTERY_RETRY: Duration = Duration::from_secs(60);
 
 type Dict = HashMap<String, OwnedVariant>;
 
@@ -195,7 +195,7 @@ async fn announce(drives: &InterfaceRef<Drives>) {
         .await;
 }
 
-async fn follow_battery(connection: Connection, on_battery: Arc<AtomicBool>) {
+pub(super) async fn follow_battery(connection: Connection, on_battery: Arc<AtomicBool>) {
     loop {
         on_battery.store(
             luft_dbus::power::on_battery(&connection).await,

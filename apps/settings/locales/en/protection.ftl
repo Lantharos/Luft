@@ -183,7 +183,35 @@ settings-usb-hold-back-description = Ones plugged in while locked wait until you
 ## Device encryption
 
 settings-encryption = Device encryption
-settings-encryption-not-encrypted = Off, and it can only be turned on while installing Luft
+settings-encryption-not-encrypted = Off
+settings-encryption-not-encrypted-reinstall = Off, and this computer can only be encrypted by installing Luft again
+# Button that opens the steps to encrypt this computer
+settings-encryption-turn-on = Turn on
+settings-encryption-after-restart = Starts encrypting when you restart
+settings-encryption-encrypting = Encrypting, { $percent } done
+settings-encryption-encrypting-paused = Encrypting, paused at { $percent } until the computer is plugged in
+# Button that takes back the request to encrypt before the computer restarts
+settings-encryption-dont-encrypt = Don’t encrypt
+settings-encryption-turn-on-title = Encrypt this computer
+settings-encryption-turn-on-blocked = This computer can’t be encrypted right now
+settings-encryption-turn-on-description = Your files stay where they are.
+settings-encryption-check-in-place = Luft can encrypt its partition where it is.
+settings-encryption-check-not-in-place = Luft’s partition can’t be encrypted where it is. Install Luft again to encrypt it.
+settings-encryption-check-plugged-in = The computer is plugged in.
+settings-encryption-check-on-battery = Plug the computer in. Encrypting takes a while and shouldn’t run out of power partway.
+settings-encryption-save-key-title = Save the recovery key
+settings-encryption-save-key-description = Keep it somewhere other than this computer.
+settings-encryption-unlock-title = How it unlocks
+settings-encryption-unlock-chip = The security chip unlocks it by itself when the computer starts, as long as nothing changes how it starts.
+settings-encryption-unlock-passphrase = Choose a passphrase to type each time the computer starts.
+settings-encryption-ready-title = Ready to encrypt
+settings-encryption-summary-room = Luft makes room on its partition now, and starts encrypting when you restart.
+settings-encryption-summary-background = It then encrypts in the background while you use the computer. Keep it plugged in. An interruption only pauses it.
+settings-encryption-summary-chip = Until it’s done, the security chip keeps the recovery key, so restarting doesn’t ask for anything.
+settings-encryption-summary-recovery-key = Until it’s done, it asks for the recovery key at startup instead of your passphrase.
+# Button, verb: starts encrypting this computer
+settings-encryption-encrypt = Encrypt
+settings-encryption-making-room = Making room…
 settings-encryption-unlocks-chip-pin = Unlocks with the security chip and your PIN
 settings-encryption-unlocks-chip = Unlocks by itself with the security chip
 settings-encryption-unlocks-passphrase = Asks for your passphrase at startup

@@ -148,7 +148,35 @@ settings-usb-hold-back-description = Apparaten die worden aangesloten terwijl de
 ## Device encryption
 
 settings-encryption = Apparaatversleuteling
-settings-encryption-not-encrypted = Uit, en kan alleen worden aangezet tijdens het installeren van Luft
+settings-encryption-not-encrypted = Uit
+settings-encryption-not-encrypted-reinstall = Uit, en deze computer kan alleen worden versleuteld door Luft opnieuw te installeren
+# Button that opens the steps to encrypt this computer
+settings-encryption-turn-on = Aanzetten
+settings-encryption-after-restart = Begint met versleutelen als je opnieuw opstart
+settings-encryption-encrypting = Versleutelen, { $percent } klaar
+settings-encryption-encrypting-paused = Versleutelen, gepauzeerd bij { $percent } tot de computer is aangesloten
+# Button that takes back the request to encrypt before the computer restarts
+settings-encryption-dont-encrypt = Niet versleutelen
+settings-encryption-turn-on-title = Deze computer versleutelen
+settings-encryption-turn-on-blocked = Deze computer kan nu niet worden versleuteld
+settings-encryption-turn-on-description = Je bestanden blijven waar ze zijn.
+settings-encryption-check-in-place = Luft kan zijn partitie versleutelen waar die nu staat.
+settings-encryption-check-not-in-place = De partitie van Luft kan niet worden versleuteld waar die nu staat. Installeer Luft opnieuw om die te versleutelen.
+settings-encryption-check-plugged-in = De computer is aangesloten.
+settings-encryption-check-on-battery = Sluit de computer aan. Versleutelen duurt even en de stroom mag halverwege niet uitvallen.
+settings-encryption-save-key-title = Bewaar de herstelsleutel
+settings-encryption-save-key-description = Bewaar hem ergens anders dan op deze computer.
+settings-encryption-unlock-title = Hoe de schijf ontgrendelt
+settings-encryption-unlock-chip = De beveiligingschip ontgrendelt de schijf vanzelf als de computer opstart, zolang niets verandert aan hoe die opstart.
+settings-encryption-unlock-passphrase = Kies een wachtwoordzin die je typt telkens als de computer opstart.
+settings-encryption-ready-title = Klaar om te versleutelen
+settings-encryption-summary-room = Luft maakt nu ruimte op zijn partitie en begint met versleutelen als je opnieuw opstart.
+settings-encryption-summary-background = Daarna versleutelt het op de achtergrond terwijl je de computer gebruikt. Laat hem aangesloten. Een onderbreking pauzeert het alleen.
+settings-encryption-summary-chip = Tot het klaar is, bewaart de beveiligingschip de herstelsleutel, dus opnieuw opstarten vraagt nergens om.
+settings-encryption-summary-recovery-key = Tot het klaar is, wordt bij het opstarten om de herstelsleutel gevraagd in plaats van om je wachtwoordzin.
+# Button, verb: starts encrypting this computer
+settings-encryption-encrypt = Versleutel
+settings-encryption-making-room = Ruimte maken…
 settings-encryption-unlocks-chip-pin = Ontgrendelt met de beveiligingschip en je pincode
 settings-encryption-unlocks-chip = Ontgrendelt vanzelf met de beveiligingschip
 settings-encryption-unlocks-passphrase = Vraagt bij het opstarten om je wachtwoordzin

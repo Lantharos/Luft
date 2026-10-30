@@ -148,7 +148,35 @@ settings-usb-hold-back-description = Enheter som ansluts medan datorn är låst 
 ## Device encryption
 
 settings-encryption = Enhetskryptering
-settings-encryption-not-encrypted = Av, och kan bara slås på medan Luft installeras
+settings-encryption-not-encrypted = Av
+settings-encryption-not-encrypted-reinstall = Av, och den här datorn kan bara krypteras genom att installera Luft igen
+# Button that opens the steps to encrypt this computer
+settings-encryption-turn-on = Slå på
+settings-encryption-after-restart = Börjar kryptera när du startar om
+settings-encryption-encrypting = Krypterar, { $percent } klart
+settings-encryption-encrypting-paused = Krypterar, pausad vid { $percent } tills datorn är ansluten
+# Button that takes back the request to encrypt before the computer restarts
+settings-encryption-dont-encrypt = Kryptera inte
+settings-encryption-turn-on-title = Kryptera den här datorn
+settings-encryption-turn-on-blocked = Den här datorn kan inte krypteras just nu
+settings-encryption-turn-on-description = Dina filer ligger kvar där de är.
+settings-encryption-check-in-place = Luft kan kryptera sin partition där den är.
+settings-encryption-check-not-in-place = Lufts partition kan inte krypteras där den är. Installera Luft igen för att kryptera den.
+settings-encryption-check-plugged-in = Datorn är ansluten.
+settings-encryption-check-on-battery = Anslut datorn. Krypteringen tar en stund och strömmen ska inte ta slut halvvägs.
+settings-encryption-save-key-title = Spara återställningsnyckeln
+settings-encryption-save-key-description = Förvara den någon annanstans än på den här datorn.
+settings-encryption-unlock-title = Så låses disken upp
+settings-encryption-unlock-chip = Säkerhetschippet låser upp disken av sig själv när datorn startar, så länge inget ändrar hur den startar.
+settings-encryption-unlock-passphrase = Välj en lösenfras som du skriver varje gång datorn startar.
+settings-encryption-ready-title = Redo att kryptera
+settings-encryption-summary-room = Luft gör plats på sin partition nu och börjar kryptera när du startar om.
+settings-encryption-summary-background = Sedan krypterar den i bakgrunden medan du använder datorn. Låt den vara ansluten. Ett avbrott pausar den bara.
+settings-encryption-summary-chip = Tills det är klart förvarar säkerhetschippet återställningsnyckeln, så omstart frågar inte efter något.
+settings-encryption-summary-recovery-key = Tills det är klart frågar den efter återställningsnyckeln vid start i stället för din lösenfras.
+# Button, verb: starts encrypting this computer
+settings-encryption-encrypt = Kryptera
+settings-encryption-making-room = Gör plats…
 settings-encryption-unlocks-chip-pin = Låses upp med säkerhetschippet och din PIN-kod
 settings-encryption-unlocks-chip = Låses upp av sig själv med säkerhetschippet
 settings-encryption-unlocks-passphrase = Frågar efter din lösenfras vid start

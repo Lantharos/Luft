@@ -3,6 +3,12 @@
     <method name="GenerateRecoveryKey">
       <arg type="s" direction="out"/>
     </method>
+    <method name="EncryptSystemDisk">
+      <arg name="recovery_key" type="s" direction="in"/>
+      <arg name="passphrase" type="s" direction="in"/>
+    </method>
+    <method name="CancelSystemDiskEncryption">
+    </method>
     <method name="SetUpTpmUnlock">
       <arg name="unlock" type="s" direction="in"/>
       <arg name="pin" type="s" direction="in"/>

@@ -13,6 +13,7 @@ use super::error::Error;
 use super::properties::{self, Dict};
 use super::shown::Shown;
 use super::status::{self, Status};
+use super::system_disk::Encryption;
 use crate::boot::{other_systems, started, startup};
 use crate::disk;
 use crate::disk::layout::{self, old_system};
@@ -31,7 +32,8 @@ const RESIZE_SYSTEM: &str = "com.lantharos.trust.resize-system";
 const FRESH: Duration = Duration::from_secs(2);
 
 pub struct Trust {
-    idle: Arc<Idle>,
+    pub(super) idle: Arc<Idle>,
+    pub(super) encryption: Encryption,
     busy: Arc<Mutex<()>>,
     snapshot: SyncMutex<Option<(Instant, Arc<Status>)>>,
 }
@@ -40,6 +42,7 @@ impl Trust {
     pub fn new(idle: Arc<Idle>) -> Self {
         Self {
             idle,
+            encryption: Encryption::default(),
             busy: Arc::default(),
             snapshot: SyncMutex::default(),
         }
@@ -60,7 +63,20 @@ impl Trust {
         status
     }
 
-    fn forget_status(&self) {
+    async fn latest_status(&self) -> Arc<Status> {
+        let latest = self
+            .snapshot
+            .lock()
+            .expect("status lock")
+            .as_ref()
+            .map(|(_, status)| status.clone());
+        match latest {
+            Some(status) => status,
+            None => self.status().await,
+        }
+    }
+
+    pub(super) fn forget_status(&self) {
         *self.snapshot.lock().expect("status lock") = None;
     }
 
@@ -136,11 +152,44 @@ impl Trust {
 
     #[zbus(property)]
     async fn disk(&self) -> Dict {
-        properties::disk(self.status().await.disk.as_ref())
+        let running = self.encryption.running();
+        let status = if running.is_some() {
+            self.latest_status().await
+        } else {
+            self.status().await
+        };
+        properties::disk(status.disk.as_ref(), running)
     }
 
     async fn generate_recovery_key(&self) -> Result<Shown, Error> {
         Ok(Shown(keys::generate_recovery_key()?))
+    }
+
+    async fn encrypt_system_disk(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
+        recovery_key: String,
+        passphrase: String,
+    ) -> Result<(), Error> {
+        self.authorize(connection, &header, ENCRYPTION).await?;
+        let (recovery_key, passphrase) = (Secret::from(recovery_key), Secret::from(passphrase));
+        let on_battery = luft_dbus::power::on_battery(connection).await;
+        self.run(&emitter, move || {
+            disk::encrypting::request(&recovery_key, &passphrase, on_battery)
+        })
+        .await
+    }
+
+    async fn cancel_system_disk_encryption(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
+    ) -> Result<(), Error> {
+        self.authorize(connection, &header, ENCRYPTION).await?;
+        self.run(&emitter, disk::encrypting::cancel).await
     }
 
     async fn set_up_tpm_unlock(

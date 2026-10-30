@@ -148,7 +148,35 @@ settings-usb-hold-back-description = Ceux branchés pendant le verrouillage atte
 ## Device encryption
 
 settings-encryption = Chiffrement de l’appareil
-settings-encryption-not-encrypted = Désactivé, et il ne peut être activé que pendant l’installation de Luft
+settings-encryption-not-encrypted = Désactivé
+settings-encryption-not-encrypted-reinstall = Désactivé, et cet ordinateur ne peut être chiffré qu’en réinstallant Luft
+# Button that opens the steps to encrypt this computer
+settings-encryption-turn-on = Activer
+settings-encryption-after-restart = Le chiffrement commence au redémarrage
+settings-encryption-encrypting = Chiffrement en cours, terminé à { $percent }
+settings-encryption-encrypting-paused = Chiffrement en pause à { $percent } jusqu’à ce que l’ordinateur soit branché
+# Button that takes back the request to encrypt before the computer restarts
+settings-encryption-dont-encrypt = Ne pas chiffrer
+settings-encryption-turn-on-title = Chiffrer cet ordinateur
+settings-encryption-turn-on-blocked = Cet ordinateur ne peut pas être chiffré pour le moment
+settings-encryption-turn-on-description = Vos fichiers restent où ils sont.
+settings-encryption-check-in-place = Luft peut chiffrer sa partition sur place.
+settings-encryption-check-not-in-place = La partition de Luft ne peut pas être chiffrée sur place. Réinstallez Luft pour la chiffrer.
+settings-encryption-check-plugged-in = L’ordinateur est branché.
+settings-encryption-check-on-battery = Branchez l’ordinateur. Le chiffrement prend un moment et ne doit pas s’interrompre faute de courant.
+settings-encryption-save-key-title = Enregistrez la clé de récupération
+settings-encryption-save-key-description = Conservez-la ailleurs que sur cet ordinateur.
+settings-encryption-unlock-title = Déverrouillage
+settings-encryption-unlock-chip = La puce de sécurité déverrouille le disque toute seule au démarrage de l’ordinateur, tant que rien ne change la façon dont il démarre.
+settings-encryption-unlock-passphrase = Choisissez une phrase secrète à taper à chaque démarrage de l’ordinateur.
+settings-encryption-ready-title = Prêt à chiffrer
+settings-encryption-summary-room = Luft fait de la place sur sa partition maintenant, et le chiffrement commence au redémarrage.
+settings-encryption-summary-background = Ensuite, le chiffrement se poursuit en arrière-plan pendant que vous utilisez l’ordinateur. Gardez-le branché. Une interruption ne fait que le mettre en pause.
+settings-encryption-summary-chip = Tant qu’il n’est pas terminé, la puce de sécurité garde la clé de récupération, donc le redémarrage ne demande rien.
+settings-encryption-summary-recovery-key = Tant qu’il n’est pas terminé, la clé de récupération est demandée au démarrage à la place de votre phrase secrète.
+# Button, verb: starts encrypting this computer
+settings-encryption-encrypt = Chiffrer
+settings-encryption-making-room = Libération d’espace…
 settings-encryption-unlocks-chip-pin = Se déverrouille avec la puce de sécurité et votre code PIN
 settings-encryption-unlocks-chip = Se déverrouille tout seul avec la puce de sécurité
 settings-encryption-unlocks-passphrase = Demande votre phrase secrète au démarrage

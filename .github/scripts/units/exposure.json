@@ -32,6 +32,7 @@
 	"os/iso/live/files/usr/lib/dracut/modules.d/90luft-live/luft-live-root.service": 9.1,
 	"os/iso/live/files/usr/lib/systemd/system/luft-live-logs-shutdown.service": 7.4,
 	"os/iso/live/files/usr/lib/systemd/system/luft-live-logs.service": 7.4,
+	"security/data/trust/dracut/trustd-encrypt.service": 8.6,
 	"security/data/trust/dracut/trustd-move.service": 8.6,
 	"security/data/trust/systemd/trustd-before-restart.service": 8.7,
 	"security/data/trust/systemd/trustd-drives.service": 0.9,

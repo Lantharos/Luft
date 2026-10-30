@@ -251,7 +251,6 @@ setup-protect-passphrase-label = Paroolifraas
 setup-protect-repeat = Tipi uuesti
 setup-protect-mismatch = Need ei ühti
 setup-protect-kept = Olen taastevõtme talletanud
-setup-protect-only-now = Krüptimise saab sisse lülitada ainult praegu, Lufti paigaldamise ajal.
 setup-protect-skip = Ära krüpti
 setup-protect-encrypt = Krüpti
 

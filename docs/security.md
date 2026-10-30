@@ -85,13 +85,24 @@ Until a rotation is needed, every Luft-signed image keeps unlocking the disk.
 
 ## Device encryption
 
-Luft is encrypted while it's installed, never afterwards. Install Luft asks right after choosing where Luft goes, and shows the recovery key there. The installer formats Luft's partition as LUKS2 with `trustctl encryption format`, keyed by the recovery key and, without a TPM, a passphrase of at least eight characters, and installs into it. Replacing a Linux system while keeping its files next to Luft can't be encrypted, since those files stay on the same unencrypted partition.
+Luft can be encrypted while it's installed, or later from Settings. Install Luft asks right after choosing where Luft goes, and shows the recovery key there. The installer formats Luft's partition as LUKS2 with `trustctl encryption format`, keyed by the recovery key and, without a TPM, a passphrase of at least eight characters, and installs into it. Replacing a Linux system while keeping its files next to Luft can't be encrypted while installing, since those files stay on the same unencrypted partition.
 
 Before the first start, `trustctl encryption seal` links the TPM with the signed policy for the startup image. PCR 7 isn't sealed to what the live system measured, since the live system started through Fedora's shim and GRUB, but to what it measures once Luft's key is in shim: trustd replays the TPM's event log without the authorities shim measured for the live system's loader and adds Luft's key from `MokListRT`, the same replay `tpm before-restart` uses. The recovery key is also sealed to the TPM in `/var/lib/trustd`, inside the encryption, so Settings can show it again and trustd can open the disk for itself, to move it.
 
 If the prediction misses, for example because the firmware measures something the live system didn't, the first start asks once for the recovery key that was just saved, and trustd seals the disk key to what that start measured. From then on it unlocks without a prompt.
 
-Turning encryption on or off on an installed system isn't possible. Settings shows whether the disk is encrypted, its recovery key, and whether the TPM unlocks it.
+Settings shows whether the disk is encrypted, its recovery key, and whether the TPM unlocks it. Turning encryption off isn't offered.
+
+### Encrypting an installed Luft
+
+Settings, under **Device encryption**, encrypts an unencrypted Luft in place, with `EncryptSystemDisk`. It needs Luft's own btrfs partition (the Luft root partition type), the computer plugged in, a recovery key and, without a TPM that can unlock it, a passphrase of at least eight characters.
+
+- **Before the restart.** trustd shrinks the btrfs by the 32 MB the LUKS2 header needs, while it's mounted. It keeps the recovery key and passphrase as systemd credentials in `luft-encrypting` at the top of the btrfs, sealed to the TPM when there is one, and marks the request in the EFI variable `EncryptingSystemDisk`, which holds the partition's PARTUUID. With a TPM, `EncryptingSystemDiskKey` holds another copy of the recovery key, sealed to PCR 7. Until the restart, **Don't encrypt** takes all of it back and grows the btrfs again.
+- **At the restart.** `trustd-encrypt.service` runs in the startup image only while `EncryptingSystemDisk` exists. While the partition is still plain, it reads the request, starts the encryption with `cryptsetup reencrypt --encrypt --init-only --reduce-device-size 32M`, and opens the partition as `root` through `systemd-cryptsetup`, so the volume key is measured into PCR 15 as at every later start. The startup then mounts Luft from the opened partition as usual.
+- **While it encrypts.** trustd carries on with `cryptsetup reencrypt --resume-only` in the background, at the lowest priority, the same way Disks encrypts other drives, and pauses while the computer is on battery. Settings shows how far it is. LUKS2 allows no new keyslots or tokens until it's done, so the recovery key is the only key. With a TPM, `trustd-encrypt.service` opens the partition at each restart with the copy in `EncryptingSystemDiskKey`; without one, the startup asks for the recovery key. Moving or resizing Luft waits until it's done.
+- **Once it's done.** trustd adds the recovery key's token and the passphrase, keeps the recovery key sealed to the TPM in `/var/lib/trustd` and links the TPM with the signed policy, as after installing. It then deletes the request and both EFI variables. The first restart measures the volume key into PCR 15 for the first time, so Luft Keyring asks for your password once.
+
+The old blocks are encrypted where they are. A drive that keeps copies of blocks after they're rewritten, as SSDs can, may still hold earlier unencrypted data, as with any encryption that starts after the data is written.
 
 ### Moving the encrypted system
 

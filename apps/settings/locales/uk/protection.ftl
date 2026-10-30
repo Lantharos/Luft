@@ -158,7 +158,35 @@ settings-usb-hold-back-description = Під’єднані під час бло�
 ## Device encryption
 
 settings-encryption = Шифрування пристрою
-settings-encryption-not-encrypted = Вимкнено, увімкнути можна лише під час встановлення Luft
+settings-encryption-not-encrypted = Вимкнено
+settings-encryption-not-encrypted-reinstall = Вимкнено, а цей комп’ютер можна зашифрувати лише перевстановленням Luft
+# Button that opens the steps to encrypt this computer
+settings-encryption-turn-on = Увімкнути
+settings-encryption-after-restart = Шифрування почнеться після перезавантаження
+settings-encryption-encrypting = Шифрування, виконано { $percent }
+settings-encryption-encrypting-paused = Шифрування призупинено на { $percent }, доки комп’ютер не під’єднано до живлення
+# Button that takes back the request to encrypt before the computer restarts
+settings-encryption-dont-encrypt = Не шифрувати
+settings-encryption-turn-on-title = Зашифрувати цей комп’ютер
+settings-encryption-turn-on-blocked = Зараз цей комп’ютер не можна зашифрувати
+settings-encryption-turn-on-description = Ваші файли залишаються там, де є.
+settings-encryption-check-in-place = Luft може зашифрувати свій розділ на місці.
+settings-encryption-check-not-in-place = Розділ Luft не можна зашифрувати на місці. Встановіть Luft заново, щоб зашифрувати його.
+settings-encryption-check-plugged-in = Комп’ютер під’єднано до живлення.
+settings-encryption-check-on-battery = Під’єднайте комп’ютер до живлення. Шифрування триває певний час, і живлення не повинно зникнути посередині.
+settings-encryption-save-key-title = Збережіть ключ відновлення
+settings-encryption-save-key-description = Зберігайте його деінде, а не на цьому комп’ютері.
+settings-encryption-unlock-title = Розблокування
+settings-encryption-unlock-chip = Процесор безпеки сам розблоковує диск під час запуску комп’ютера, доки ніщо не змінює спосіб запуску.
+settings-encryption-unlock-passphrase = Виберіть парольну фразу, яку ви вводитимете під час кожного запуску комп’ютера.
+settings-encryption-ready-title = Готово до шифрування
+settings-encryption-summary-room = Luft зараз звільняє місце на своєму розділі, а шифрування почнеться після перезавантаження.
+settings-encryption-summary-background = Потім шифрування триває у фоновому режимі, поки ви користуєтеся комп’ютером. Не відключайте його від живлення. Переривання лише призупиняє процес.
+settings-encryption-summary-chip = Доки шифрування не завершено, процесор безпеки зберігає ключ відновлення, тож перезавантаження нічого не запитує.
+settings-encryption-summary-recovery-key = Доки шифрування не завершено, під час запуску запитується ключ відновлення замість парольної фрази.
+# Button, verb: starts encrypting this computer
+settings-encryption-encrypt = Зашифрувати
+settings-encryption-making-room = Звільнення місця…
 settings-encryption-unlocks-chip-pin = Розблоковується процесором безпеки й вашим PIN-кодом
 settings-encryption-unlocks-chip = Розблоковується автоматично процесором безпеки
 settings-encryption-unlocks-passphrase = Під час запуску запитує парольну фразу

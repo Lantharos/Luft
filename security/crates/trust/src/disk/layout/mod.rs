@@ -9,7 +9,8 @@ mod top_level;
 use anyhow::{Context, Result, bail, ensure};
 use luft_meet::resize::needed;
 
-use crate::errors::Busy;
+use super::encrypting;
+use crate::errors::{Busy, Unsupported};
 use crate::system::host::command::Tool;
 use crate::system::secrets::secret::Secret;
 use journal::{Journal, Working};
@@ -18,6 +19,7 @@ use parts::{btrfs, halves};
 use plan::Step;
 
 pub use halves::open_in_initrd;
+pub(crate) use top_level::TopLevel;
 
 const ATTEMPTS: u32 = 3;
 
@@ -72,6 +74,9 @@ fn requested() -> Result<Option<Journal>> {
 }
 
 pub fn continue_at_start() -> Result<()> {
+    if encrypting::underway() {
+        return Ok(());
+    }
     let _working = Working::wait()?;
     if let Err(error) = requests::windows::report() {
         eprintln!("Luft couldn't tell Windows how full it is: {error:#}");
@@ -87,6 +92,11 @@ fn change_in_place(
     typed: &Secret,
     step: impl FnOnce(&Disk, &Part) -> Result<Option<Step>>,
 ) -> Result<(u64, u64)> {
+    if encrypting::underway() {
+        bail!(Unsupported(
+            "Luft is being encrypted. Change its size once that's done.".to_owned()
+        ));
+    }
     let _working = claim()?;
     let key = halves::system_key(typed)?;
     let device = drive::system_partition()?;

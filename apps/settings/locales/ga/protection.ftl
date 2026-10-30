@@ -163,7 +163,35 @@ settings-usb-hold-back-description = Fanann gléasanna a phlugáiltear isteach a
 ## Device encryption
 
 settings-encryption = Criptiú gléis
-settings-encryption-not-encrypted = As, agus ní féidir é a chasadh air ach agus Luft á shuiteáil
+settings-encryption-not-encrypted = As
+settings-encryption-not-encrypted-reinstall = As, agus ní féidir an ríomhaire seo a chriptiú ach trí Luft a shuiteáil arís
+# Button that opens the steps to encrypt this computer
+settings-encryption-turn-on = Cas air
+settings-encryption-after-restart = Tosaíonn sé ag criptiú nuair a atosaíonn tú
+settings-encryption-encrypting = Á chriptiú, { $percent } déanta
+settings-encryption-encrypting-paused = Á chriptiú, ar sos ag { $percent } go dtí go bhfuil an ríomhaire plugáilte isteach
+# Button that takes back the request to encrypt before the computer restarts
+settings-encryption-dont-encrypt = Ná criptigh
+settings-encryption-turn-on-title = Criptigh an ríomhaire seo
+settings-encryption-turn-on-blocked = Ní féidir an ríomhaire seo a chriptiú anois
+settings-encryption-turn-on-description = Fanann do chuid comhad mar atá.
+settings-encryption-check-in-place = Is féidir le Luft a dheighilt a chriptiú mar atá sí.
+settings-encryption-check-not-in-place = Ní féidir deighilt Luft a chriptiú mar atá sí. Suiteáil Luft arís chun í a chriptiú.
+settings-encryption-check-plugged-in = Tá an ríomhaire plugáilte isteach.
+settings-encryption-check-on-battery = Plugáil an ríomhaire isteach. Tógann an criptiú tamall agus níor chóir go rithfeadh sé as cumhacht i lár an phróisis.
+settings-encryption-save-key-title = Sábháil an eochair athshlánaithe
+settings-encryption-save-key-description = Coinnigh in áit éigin eile seachas an ríomhaire seo í.
+settings-encryption-unlock-title = Conas a dhíghlasálann sé
+settings-encryption-unlock-chip = Díghlasálann an tslis slándála an diosca léi féin nuair a thosaíonn an ríomhaire, fad is nach n-athraíonn aon rud an chaoi a dtosaíonn sé.
+settings-encryption-unlock-passphrase = Roghnaigh frása faire le clóscríobh gach uair a thosaíonn an ríomhaire.
+settings-encryption-ready-title = Réidh le criptiú
+settings-encryption-summary-room = Déanann Luft spás ar a dheighilt anois, agus tosaíonn sé ag criptiú nuair a atosaíonn tú.
+settings-encryption-summary-background = Ansin criptíonn sé sa chúlra agus tú ag úsáid an ríomhaire. Coinnigh plugáilte isteach é. Ní dhéanann briseadh ach é a chur ar sos.
+settings-encryption-summary-chip = Go dtí go mbeidh sé déanta, coinníonn an tslis slándála an eochair athshlánaithe, mar sin ní iarrann atosú aon rud.
+settings-encryption-summary-recovery-key = Go dtí go mbeidh sé déanta, iarrann sé an eochair athshlánaithe ag an tosú in ionad do fhrása faire.
+# Button, verb: starts encrypting this computer
+settings-encryption-encrypt = Criptigh
+settings-encryption-making-room = Spás á dhéanamh…
 settings-encryption-unlocks-chip-pin = Díghlasálann sé leis an tslis slándála agus le d’UAP
 settings-encryption-unlocks-chip = Díghlasálann sé leis féin leis an tslis slándála
 settings-encryption-unlocks-passphrase = Iarrann sé d’fhrása faire ag an tosú

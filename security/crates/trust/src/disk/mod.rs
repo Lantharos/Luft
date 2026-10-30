@@ -1,3 +1,4 @@
+pub mod encrypting;
 pub mod encryption;
 pub mod layout;
 pub mod unlock;
@@ -60,6 +61,9 @@ impl SystemDisk {
 pub struct DiskStatus {
     pub device: String,
     pub encrypted: bool,
+    pub encrypting: Option<encrypting::Encrypting>,
+    pub can_encrypt: bool,
+    pub tpm_unlocks: bool,
     pub unlock: Vec<&'static str>,
     pub recovery_key_stored: bool,
     pub tpm_refused: bool,
@@ -89,9 +93,13 @@ fn unlock_methods(header: &Header) -> Vec<&'static str> {
 pub fn status() -> Option<DiskStatus> {
     let disk = SystemDisk::find().ok()?;
     let header = disk.header().ok().flatten();
+    let encrypting = encrypting::state(&disk, header.as_ref());
     Some(DiskStatus {
         device: disk.device().display().to_string(),
-        encrypted: header.is_some(),
+        encrypted: header.is_some() && encrypting.is_none(),
+        encrypting,
+        can_encrypt: encrypting::possible(&disk),
+        tpm_unlocks: encrypting::tpm_unlocks(),
         unlock: header.as_ref().map(unlock_methods).unwrap_or_default(),
         recovery_key_stored: keys::has_escrow(),
         tpm_refused: header.as_ref().is_some_and(|header| header.has(luks::TPM2))

@@ -149,7 +149,35 @@ settings-usb-hold-back-description = Uređaji priključeni dok je ekran zaključ
 ## Device encryption
 
 settings-encryption = Šifrovanje uređaja
-settings-encryption-not-encrypted = Isključeno, a može se uključiti samo dok se Luft instalira
+settings-encryption-not-encrypted = Isključeno
+settings-encryption-not-encrypted-reinstall = Isključeno, a ovaj računar može da se šifruje samo ako ponovo instalirate Luft
+# Button that opens the steps to encrypt this computer
+settings-encryption-turn-on = Uključi
+settings-encryption-after-restart = Šifrovanje počinje pri ponovnom pokretanju
+settings-encryption-encrypting = Šifrovanje, gotovo { $percent }
+settings-encryption-encrypting-paused = Šifrovanje pauzirano na { $percent } dok se računar ne priključi na napajanje
+# Button that takes back the request to encrypt before the computer restarts
+settings-encryption-dont-encrypt = Ne šifruj
+settings-encryption-turn-on-title = Šifruj ovaj računar
+settings-encryption-turn-on-blocked = Ovaj računar trenutno ne može da se šifruje
+settings-encryption-turn-on-description = Vaše datoteke ostaju gde jesu.
+settings-encryption-check-in-place = Luft može da šifruje svoju particiju na mestu.
+settings-encryption-check-not-in-place = Particija koju koristi Luft ne može da se šifruje na mestu. Ponovo instalirajte Luft da biste je šifrovali.
+settings-encryption-check-plugged-in = Računar je priključen na napajanje.
+settings-encryption-check-on-battery = Priključite računar na napajanje. Šifrovanje traje neko vreme i ne treba da ostane bez struje na pola puta.
+settings-encryption-save-key-title = Sačuvajte ključ za oporavak
+settings-encryption-save-key-description = Čuvajte ga negde drugde, a ne na ovom računaru.
+settings-encryption-unlock-title = Kako se otključava
+settings-encryption-unlock-chip = Bezbednosni čip sam otključava disk pri pokretanju računara, sve dok ništa ne promeni način na koji se pokreće.
+settings-encryption-unlock-passphrase = Izaberite pristupnu frazu koju ćete unositi pri svakom pokretanju računara.
+settings-encryption-ready-title = Spremno za šifrovanje
+settings-encryption-summary-room = Luft sada oslobađa prostor na svojoj particiji, a šifrovanje počinje pri ponovnom pokretanju.
+settings-encryption-summary-background = Zatim šifruje u pozadini dok koristite računar. Neka ostane priključen na napajanje. Prekid ga samo pauzira.
+settings-encryption-summary-chip = Dok se ne završi, bezbednosni čip čuva ključ za oporavak, pa ponovno pokretanje ništa ne traži.
+settings-encryption-summary-recovery-key = Dok se ne završi, pri pokretanju traži ključ za oporavak umesto vaše pristupne fraze.
+# Button, verb: starts encrypting this computer
+settings-encryption-encrypt = Šifruj
+settings-encryption-making-room = Oslobađanje prostora…
 settings-encryption-unlocks-chip-pin = Otključava se bezbednosnim čipom i vašim PIN-om
 settings-encryption-unlocks-chip = Otključava se sam pomoću bezbednosnog čipa
 settings-encryption-unlocks-passphrase = Pri pokretanju traži vašu pristupnu frazu

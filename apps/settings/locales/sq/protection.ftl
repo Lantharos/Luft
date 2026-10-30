@@ -148,7 +148,35 @@ settings-usb-hold-back-description = Ato që lidhen kur je i bllokuar presin der
 ## Device encryption
 
 settings-encryption = Enkriptimi i pajisjes
-settings-encryption-not-encrypted = Joaktiv, mund të aktivizohet vetëm gjatë instalimit të Luft
+settings-encryption-not-encrypted = Joaktiv
+settings-encryption-not-encrypted-reinstall = Joaktiv, dhe ky kompjuter mund të enkriptohet vetëm duke instaluar Luft sërish
+# Button that opens the steps to encrypt this computer
+settings-encryption-turn-on = Aktivizo
+settings-encryption-after-restart = Fillon enkriptimin kur të rinisësh
+settings-encryption-encrypting = Po enkriptohet, { $percent } kryer
+settings-encryption-encrypting-paused = Po enkriptohet, ndalur në { $percent } derisa kompjuteri të lidhet në prizë
+# Button that takes back the request to encrypt before the computer restarts
+settings-encryption-dont-encrypt = Mos enkripto
+settings-encryption-turn-on-title = Enkripto këtë kompjuter
+settings-encryption-turn-on-blocked = Ky kompjuter nuk mund të enkriptohet tani
+settings-encryption-turn-on-description = Skedarët e tu mbeten aty ku janë.
+settings-encryption-check-in-place = Luft mund ta enkriptojë ndarjen e vet aty ku është.
+settings-encryption-check-not-in-place = Ndarja e Luft nuk mund të enkriptohet aty ku është. Instaloje Luft sërish që ta enkriptosh.
+settings-encryption-check-plugged-in = Kompjuteri është lidhur në prizë.
+settings-encryption-check-on-battery = Lidhe kompjuterin në prizë. Enkriptimi zgjat pak dhe nuk duhet të mbetet pa energji në mes.
+settings-encryption-save-key-title = Ruaje çelësin e rikuperimit
+settings-encryption-save-key-description = Mbaje diku tjetër, jo në këtë kompjuter.
+settings-encryption-unlock-title = Si zhbllokohet
+settings-encryption-unlock-chip = Çipi i sigurisë e zhbllokon diskun vetë kur niset kompjuteri, për sa kohë asgjë nuk e ndryshon mënyrën si niset.
+settings-encryption-unlock-passphrase = Zgjidh një frazëkalim që do ta shkruash sa herë niset kompjuteri.
+settings-encryption-ready-title = Gati për enkriptim
+settings-encryption-summary-room = Luft tani bën vend në ndarjen e vet dhe fillon enkriptimin kur të rinisësh.
+settings-encryption-summary-background = Pastaj enkripton në sfond ndërsa ti e përdor kompjuterin. Mbaje në prizë. Një ndërprerje vetëm e ndalon përkohësisht.
+settings-encryption-summary-chip = Derisa të mbarojë, çipi i sigurisë e ruan çelësin e rikuperimit, ndaj rinisja nuk kërkon asgjë.
+settings-encryption-summary-recovery-key = Derisa të mbarojë, në nisje kërkon çelësin e rikuperimit në vend të frazëkalimit tënd.
+# Button, verb: starts encrypting this computer
+settings-encryption-encrypt = Enkripto
+settings-encryption-making-room = Po krijohet vend…
 settings-encryption-unlocks-chip-pin = Zhbllokohet me çipin e sigurisë dhe PIN-in tënd
 settings-encryption-unlocks-chip = Zhbllokohet vetë me çipin e sigurisë
 settings-encryption-unlocks-passphrase = Kërkon frazëkalimin tënd në nisje

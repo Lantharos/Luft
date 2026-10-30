@@ -46,6 +46,13 @@ struct RecoveryKey {
 }
 
 #[derive(Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+struct DiskEncryption {
+    recovery_key: String,
+    passphrase: String,
+}
+
+#[derive(Deserialize, Type)]
 struct UsbEnabled {
     enabled: bool,
 }
@@ -83,6 +90,10 @@ async fn usb_protection(events: Events, Empty {}: Empty) -> Result<Option<UsbPro
     Ok(state)
 }
 
+async fn on_battery(Empty {}: Empty) -> Result<bool, String> {
+    Ok(luft_app::dbus::power::on_battery(luft_app::dbus::system().await?).await)
+}
+
 async fn restart(Empty {}: Empty) -> Result<(), String> {
     LOGIN
         .change::<_, ()>("Reboot", &true)
@@ -108,6 +119,23 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         )
         .command_async("security_remove_tpm", |Unlock { unlock }| async move {
             luft_trust::unlocking::<_, ()>(&TRUST, "RemoveTpmUnlock", &unlock).await
+        })
+        .command_async("security_on_battery", on_battery)
+        .command_async("security_generate_key", |Empty {}| {
+            luft_trust::call::<_, String>(&TRUST, "GenerateRecoveryKey", &())
+        })
+        .command_async(
+            "security_encrypt_disk",
+            |DiskEncryption {
+                 recovery_key,
+                 passphrase,
+             }| async move {
+                luft_trust::call::<_, ()>(&TRUST, "EncryptSystemDisk", &(recovery_key, passphrase))
+                    .await
+            },
+        )
+        .command_async("security_cancel_encryption", |Empty {}| {
+            luft_trust::call::<_, ()>(&TRUST, "CancelSystemDiskEncryption", &())
         })
         .command_async("security_show_key", |Empty {}| {
             luft_trust::call::<_, String>(&TRUST, "ShowRecoveryKey", &())

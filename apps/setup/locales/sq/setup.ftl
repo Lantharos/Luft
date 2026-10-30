@@ -248,7 +248,6 @@ setup-protect-passphrase-label = Frazëkalimi
 setup-protect-repeat = Shkruaje sërish
 setup-protect-mismatch = Nuk përputhen
 setup-protect-kept = E kam ruajtur çelësin e rikuperimit
-setup-protect-only-now = Enkriptimin mund ta aktivizosh vetëm tani, gjatë instalimit të Luft.
 setup-protect-skip = Mos enkripto
 setup-protect-encrypt = Enkripto
 

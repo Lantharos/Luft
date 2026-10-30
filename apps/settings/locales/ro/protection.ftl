@@ -153,7 +153,35 @@ settings-usb-hold-back-description = Cele conectate cât timp ecranul este bloca
 ## Device encryption
 
 settings-encryption = Criptarea dispozitivului
-settings-encryption-not-encrypted = Dezactivată, poate fi activată doar la instalarea Luft
+settings-encryption-not-encrypted = Dezactivată
+settings-encryption-not-encrypted-reinstall = Dezactivată, iar acest computer poate fi criptat doar prin reinstalarea Luft
+# Button that opens the steps to encrypt this computer
+settings-encryption-turn-on = Activează
+settings-encryption-after-restart = Începe criptarea când reporniți
+settings-encryption-encrypting = Se criptează, finalizat: { $percent }
+settings-encryption-encrypting-paused = Criptare întreruptă la { $percent } până când computerul este conectat la priză
+# Button that takes back the request to encrypt before the computer restarts
+settings-encryption-dont-encrypt = Nu cripta
+settings-encryption-turn-on-title = Criptează acest computer
+settings-encryption-turn-on-blocked = Acest computer nu poate fi criptat acum
+settings-encryption-turn-on-description = Fișierele rămân unde sunt.
+settings-encryption-check-in-place = Luft își poate cripta partiția pe loc.
+settings-encryption-check-not-in-place = Partiția Luft nu poate fi criptată pe loc. Reinstalați Luft pentru a o cripta.
+settings-encryption-check-plugged-in = Computerul este conectat la priză.
+settings-encryption-check-on-battery = Conectați computerul la priză. Criptarea durează o vreme și nu trebuie să rămână fără energie pe parcurs.
+settings-encryption-save-key-title = Salvați cheia de recuperare
+settings-encryption-save-key-description = Păstrați-o altundeva decât pe acest computer.
+settings-encryption-unlock-title = Cum se deblochează
+settings-encryption-unlock-chip = Cipul de securitate deblochează singur discul la pornirea computerului, atât timp cât nimic nu schimbă modul în care pornește.
+settings-encryption-unlock-passphrase = Alegeți o frază de acces pe care o veți tasta la fiecare pornire a computerului.
+settings-encryption-ready-title = Gata de criptat
+settings-encryption-summary-room = Luft face acum loc pe partiția sa și începe criptarea când reporniți.
+settings-encryption-summary-background = Apoi criptează în fundal cât timp folosiți computerul. Țineți-l conectat la priză. O întrerupere doar o pune pe pauză.
+settings-encryption-summary-chip = Până se termină, cipul de securitate păstrează cheia de recuperare, așa că repornirea nu cere nimic.
+settings-encryption-summary-recovery-key = Până se termină, la pornire se cere cheia de recuperare în locul frazei de acces.
+# Button, verb: starts encrypting this computer
+settings-encryption-encrypt = Criptează
+settings-encryption-making-room = Se face loc…
 settings-encryption-unlocks-chip-pin = Se deblochează cu cipul de securitate și PIN-ul
 settings-encryption-unlocks-chip = Se deblochează singur cu cipul de securitate
 settings-encryption-unlocks-passphrase = Cere fraza de acces la pornire

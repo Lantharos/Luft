@@ -1,1 +1,1 @@
-SUBSYSTEM=="block", ENV{DEVTYPE}=="partition", ENV{ID_PART_GPT_AUTO_ROOT}=="1", SYMLINK+="luft-root-partition", ENV{SYSTEMD_WANTS}+="trustd-move.service"
+SUBSYSTEM=="block", ENV{DEVTYPE}=="partition", ENV{ID_PART_GPT_AUTO_ROOT}=="1", SYMLINK+="luft-root-partition", ENV{SYSTEMD_WANTS}+="trustd-move.service", ENV{SYSTEMD_WANTS}+="trustd-encrypt.service"

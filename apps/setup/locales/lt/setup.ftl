@@ -261,7 +261,6 @@ setup-protect-passphrase-label = Slaptafrazė
 setup-protect-repeat = Pakartokite
 setup-protect-mismatch = Nesutampa
 setup-protect-kept = Atkūrimo raktą išsaugojau
-setup-protect-only-now = Šifravimą galite įjungti tik dabar, diegdami Luft.
 setup-protect-skip = Nešifruoti
 setup-protect-encrypt = Šifruoti
 

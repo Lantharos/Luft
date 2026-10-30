@@ -153,7 +153,35 @@ settings-usb-hold-back-description = Lukustatud olekus ühendatud seadmed ootava
 ## Device encryption
 
 settings-encryption = Seadme krüptimine
-settings-encryption-not-encrypted = Väljas, selle saab sisse lülitada ainult Lufti paigaldamise ajal
+settings-encryption-not-encrypted = Väljas
+settings-encryption-not-encrypted-reinstall = Väljas, ja selle arvuti saab krüptida ainult Lufti uuesti paigaldades
+# Button that opens the steps to encrypt this computer
+settings-encryption-turn-on = Lülita sisse
+settings-encryption-after-restart = Hakkab krüptima taaskäivitamisel
+settings-encryption-encrypting = Krüptimine, valmis { $percent }
+settings-encryption-encrypting-paused = Krüptimine, peatatud { $percent } juures, kuni arvuti ühendatakse vooluvõrku
+# Button that takes back the request to encrypt before the computer restarts
+settings-encryption-dont-encrypt = Ära krüpti
+settings-encryption-turn-on-title = Krüpti see arvuti
+settings-encryption-turn-on-blocked = Seda arvutit ei saa praegu krüptida
+settings-encryption-turn-on-description = Sinu failid jäävad sinna, kus nad on.
+settings-encryption-check-in-place = Luft saab oma partitsiooni krüptida kohapeal.
+settings-encryption-check-not-in-place = Lufti partitsiooni ei saa kohapeal krüptida. Paigalda Luft uuesti, et seda krüptida.
+settings-encryption-check-plugged-in = Arvuti on vooluvõrku ühendatud.
+settings-encryption-check-on-battery = Ühenda arvuti vooluvõrku. Krüptimine võtab aega ega tohiks poole peal vooluta jääda.
+settings-encryption-save-key-title = Salvesta taastevõti
+settings-encryption-save-key-description = Hoia seda mujal kui selles arvutis.
+settings-encryption-unlock-title = Kuidas see avatakse
+settings-encryption-unlock-chip = Turvakiip avab ketta arvuti käivitamisel iseenesest, kui miski ei muuda käivitamise viisi.
+settings-encryption-unlock-passphrase = Vali paroolifraas, mille tipid iga kord arvuti käivitamisel.
+settings-encryption-ready-title = Valmis krüptimiseks
+settings-encryption-summary-room = Luft teeb oma partitsioonil nüüd ruumi ja hakkab taaskäivitamisel krüptima.
+settings-encryption-summary-background = Seejärel krüptitakse taustal, kui sa arvutit kasutad. Hoia arvuti vooluvõrgus. Katkestus peatab krüptimise vaid ajutiselt.
+settings-encryption-summary-chip = Kuni see valmis pole, hoiab turvakiip taastevõtit, nii et taaskäivitamisel ei küsita midagi.
+settings-encryption-summary-recovery-key = Kuni see valmis pole, küsitakse käivitamisel sinu paroolifraasi asemel taastevõtit.
+# Button, verb: starts encrypting this computer
+settings-encryption-encrypt = Krüpti
+settings-encryption-making-room = Ruumi tegemine…
 settings-encryption-unlocks-chip-pin = Avaneb turvakiibi ja PIN-koodiga
 settings-encryption-unlocks-chip = Avaneb turvakiibiga iseenesest
 settings-encryption-unlocks-passphrase = Küsib käivitamisel paroolifraasi

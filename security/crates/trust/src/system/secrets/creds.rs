@@ -11,6 +11,8 @@ pub enum Protection {
     HostAndTpm,
     Host,
     Tpm,
+    TpmWhileSecureBootUnchanged,
+    Unencrypted,
 }
 
 impl Protection {
@@ -18,7 +20,15 @@ impl Protection {
         match self {
             Self::HostAndTpm => "host+tpm2",
             Self::Host => "host",
-            Self::Tpm => "tpm2",
+            Self::Tpm | Self::TpmWhileSecureBootUnchanged => "tpm2",
+            Self::Unencrypted => "null",
+        }
+    }
+
+    fn pcrs(self) -> &'static str {
+        match self {
+            Self::TpmWhileSecureBootUnchanged => "7",
+            _ => "",
         }
     }
 }
@@ -33,7 +43,8 @@ pub fn seal(name: &str, secret: &Secret, protection: Protection, path: &Path) ->
         .arg("encrypt")
         .arg(format!("--name={name}"))
         .arg(format!("--with-key={}", protection.key()))
-        .arg("--tpm2-pcrs=")
+        .arg(format!("--tpm2-pcrs={}", protection.pcrs()))
+        .arg("--tpm2-public-key-pcrs=")
         .arg("-")
         .arg(path)
         .input(secret)
@@ -41,12 +52,21 @@ pub fn seal(name: &str, secret: &Secret, protection: Protection, path: &Path) ->
     private(path)
 }
 
-pub fn unseal(name: &str, path: &Path) -> Result<Secret> {
+fn decrypt(name: &str, path: &Path, allow_null: bool) -> Result<Secret> {
     Tool::new("systemd-creds")
         .arg("decrypt")
         .arg(format!("--name={name}"))
+        .args(allow_null.then_some("--allow-null"))
         .arg(path)
         .arg("-")
         .output_bytes()
         .map(Secret::new)
+}
+
+pub fn unseal(name: &str, path: &Path) -> Result<Secret> {
+    decrypt(name, path, false)
+}
+
+pub fn unseal_allowing_null(name: &str, path: &Path) -> Result<Secret> {
+    decrypt(name, path, true)
 }

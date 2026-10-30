@@ -158,7 +158,35 @@ settings-usb-hold-back-description = Urządzenia podłączone przy zablokowanym 
 ## Device encryption
 
 settings-encryption = Szyfrowanie urządzenia
-settings-encryption-not-encrypted = Wyłączone, a włączyć je można tylko podczas instalacji systemu Luft
+settings-encryption-not-encrypted = Wyłączone
+settings-encryption-not-encrypted-reinstall = Wyłączone, a ten komputer można zaszyfrować tylko przez ponowną instalację systemu Luft
+# Button that opens the steps to encrypt this computer
+settings-encryption-turn-on = Włącz
+settings-encryption-after-restart = Szyfrowanie zacznie się po ponownym uruchomieniu
+settings-encryption-encrypting = Szyfrowanie, ukończono { $percent }
+settings-encryption-encrypting-paused = Szyfrowanie wstrzymane przy { $percent }, dopóki komputer nie zostanie podłączony do zasilania
+# Button that takes back the request to encrypt before the computer restarts
+settings-encryption-dont-encrypt = Nie szyfruj
+settings-encryption-turn-on-title = Zaszyfruj ten komputer
+settings-encryption-turn-on-blocked = Tego komputera nie można teraz zaszyfrować
+settings-encryption-turn-on-description = Twoje pliki zostają tam, gdzie są.
+settings-encryption-check-in-place = Luft może zaszyfrować swoją partycję w miejscu.
+settings-encryption-check-not-in-place = Partycji systemu Luft nie można zaszyfrować w miejscu. Zainstaluj Luft ponownie, aby ją zaszyfrować.
+settings-encryption-check-plugged-in = Komputer jest podłączony do zasilania.
+settings-encryption-check-on-battery = Podłącz komputer do zasilania. Szyfrowanie trwa dłuższą chwilę i nie powinno się przerwać z powodu braku prądu.
+settings-encryption-save-key-title = Zapisz klucz odzyskiwania
+settings-encryption-save-key-description = Przechowuj go gdzie indziej niż na tym komputerze.
+settings-encryption-unlock-title = Jak się odblokowuje
+settings-encryption-unlock-chip = Procesor zabezpieczeń odblokowuje dysk sam przy uruchamianiu komputera, o ile nic nie zmienia sposobu jego uruchamiania.
+settings-encryption-unlock-passphrase = Wybierz frazę hasła, którą będziesz wpisywać przy każdym uruchomieniu komputera.
+settings-encryption-ready-title = Gotowe do szyfrowania
+settings-encryption-summary-room = Luft robi teraz miejsce na swojej partycji i zaczyna szyfrować po ponownym uruchomieniu.
+settings-encryption-summary-background = Potem szyfruje w tle, gdy korzystasz z komputera. Zostaw go podłączonego do zasilania. Przerwa tylko wstrzymuje szyfrowanie.
+settings-encryption-summary-chip = Do czasu zakończenia procesor zabezpieczeń przechowuje klucz odzyskiwania, więc ponowne uruchomienie o nic nie pyta.
+settings-encryption-summary-recovery-key = Do czasu zakończenia przy uruchamianiu pyta o klucz odzyskiwania zamiast o frazę hasła.
+# Button, verb: starts encrypting this computer
+settings-encryption-encrypt = Zaszyfruj
+settings-encryption-making-room = Robienie miejsca…
 settings-encryption-unlocks-chip-pin = Odblokowywany procesorem zabezpieczeń i kodem PIN
 settings-encryption-unlocks-chip = Odblokowywany samodzielnie przez procesor zabezpieczeń
 settings-encryption-unlocks-passphrase = Prosi o frazę hasła przy uruchamianiu

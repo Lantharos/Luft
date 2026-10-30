@@ -20,7 +20,11 @@
     Startup: Installed (b, shim and Luft's boot menu are on the EFI system partition),
       Measured (b, this boot came through them and recorded what started), Available (b), Reason (s).
 
-    Disk: Device (s), Encrypted (b, chosen when Luft was installed),
+    Disk: Device (s), Encrypted (b),
+      Encrypting (s: "" when nothing is changing, "after-restart" once EncryptSystemDisk asked for it,
+      "encrypting" while it runs, "waiting" while it's stopped, such as on battery), Progress (d, 0 to 1),
+      Remaining (t, seconds), CanEncrypt (b, Luft's partition can be encrypted in place),
+      TpmUnlocks (b, the TPM can unlock the disk, so a passphrase is optional),
       Unlock (as, any of "tpm", "pin", "passphrase", "recovery-key", "security-key"),
       RecoveryKeyStored (b, the recovery key can be shown again), TpmRefused (b, the TPM didn't unlock the disk
       at the last startup, so the recovery key or passphrase was needed), SecureBootChanged (b, the Secure Boot
@@ -46,6 +50,15 @@
     <method name="GenerateRecoveryKey">
       <arg name="key" type="s" direction="out"/>
     </method>
+    <!-- Makes room for the encryption header and encrypts Luft's partition in place from the next restart.
+         Until it's done, the recovery key is the only key, kept sealed by the TPM so restarts don't ask for it.
+         The passphrase (required without a TPM) and the TPM are added once it's done. -->
+    <method name="EncryptSystemDisk">
+      <arg name="recovery_key" type="s" direction="in"/>
+      <arg name="passphrase" type="s" direction="in"/>
+    </method>
+    <!-- Takes back an EncryptSystemDisk request before the restart that starts it. -->
+    <method name="CancelSystemDiskEncryption"/>
     <!-- Links the TPM again, adds, changes or removes the PIN (pin ""). Returns a new recovery key when the disk had none. -->
     <method name="SetUpTpmUnlock">
       <arg name="unlock" type="s" direction="in"/>

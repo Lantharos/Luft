@@ -248,7 +248,6 @@ setup-protect-passphrase-label = Tunnuslause
 setup-protect-repeat = Kirjoita se uudelleen
 setup-protect-mismatch = Ne eivät täsmää
 setup-protect-kept = Olen tallentanut palautusavaimeni
-setup-protect-only-now = Salauksen voi ottaa käyttöön vain nyt, kun Luftia asennetaan.
 setup-protect-skip = Älä salaa
 setup-protect-encrypt = Salaa
 

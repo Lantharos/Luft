@@ -158,7 +158,35 @@ settings-usb-hold-back-description = Zariadenia pripojené počas uzamknutia po�
 ## Device encryption
 
 settings-encryption = Šifrovanie zariadenia
-settings-encryption-not-encrypted = Vypnuté, zapnúť ho možno len pri inštalácii Luftu
+settings-encryption-not-encrypted = Vypnuté
+settings-encryption-not-encrypted-reinstall = Vypnuté, tento počítač možno zašifrovať len opätovnou inštaláciou Luftu
+# Button that opens the steps to encrypt this computer
+settings-encryption-turn-on = Zapnúť
+settings-encryption-after-restart = Šifrovanie sa začne po reštarte
+settings-encryption-encrypting = Šifrovanie, hotovo: { $percent }
+settings-encryption-encrypting-paused = Šifrovanie pozastavené na { $percent }, kým sa počítač nepripojí k napájaniu
+# Button that takes back the request to encrypt before the computer restarts
+settings-encryption-dont-encrypt = Nešifrovať
+settings-encryption-turn-on-title = Zašifrovať tento počítač
+settings-encryption-turn-on-blocked = Tento počítač sa momentálne nedá zašifrovať
+settings-encryption-turn-on-description = Vaše súbory ostanú tam, kde sú.
+settings-encryption-check-in-place = Luft dokáže zašifrovať svoj oddiel tam, kde je.
+settings-encryption-check-not-in-place = Oddiel Luftu sa nedá zašifrovať tam, kde je. Nainštalujte Luft znova, aby ste ho zašifrovali.
+settings-encryption-check-plugged-in = Počítač je pripojený k napájaniu.
+settings-encryption-check-on-battery = Pripojte počítač k napájaniu. Šifrovanie chvíľu trvá a v polovici by nemalo dôjsť k strate napájania.
+settings-encryption-save-key-title = Uložte si kľúč na obnovenie
+settings-encryption-save-key-description = Uchovajte ho niekde inde než v tomto počítači.
+settings-encryption-unlock-title = Ako sa odomyká
+settings-encryption-unlock-chip = Bezpečnostný čip odomkne disk sám pri spustení počítača, ak nič nezmení spôsob, akým sa spúšťa.
+settings-encryption-unlock-passphrase = Vyberte si prístupovú frázu, ktorú budete zadávať pri každom spustení počítača.
+settings-encryption-ready-title = Pripravené na šifrovanie
+settings-encryption-summary-room = Luft teraz uvoľní miesto na svojom oddiele a po reštarte začne šifrovať.
+settings-encryption-summary-background = Potom šifruje na pozadí, kým počítač používate. Nechajte ho pripojený k napájaniu. Prerušenie šifrovanie len pozastaví.
+settings-encryption-summary-chip = Kým sa nedokončí, bezpečnostný čip uchováva kľúč na obnovenie, takže reštart o nič nežiada.
+settings-encryption-summary-recovery-key = Kým sa nedokončí, pri spustení sa namiesto prístupovej frázy žiada kľúč na obnovenie.
+# Button, verb: starts encrypting this computer
+settings-encryption-encrypt = Zašifrovať
+settings-encryption-making-room = Uvoľňovanie miesta…
 settings-encryption-unlocks-chip-pin = Odomyká sa bezpečnostným čipom a kódom PIN
 settings-encryption-unlocks-chip = Odomyká sa sám bezpečnostným čipom
 settings-encryption-unlocks-passphrase = Pri spustení vyžaduje prístupovú frázu

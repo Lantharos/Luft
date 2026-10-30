@@ -266,7 +266,6 @@ setup-protect-passphrase-label = Passphrase
 setup-protect-repeat = Erġa’ ttajpjaha
 setup-protect-mismatch = Ma jaqblux
 setup-protect-kept = Żammejt iċ-ċavetta tal-irkupru
-setup-protect-only-now = Iċ-ċifrar jista’ jinxtegħel biss issa, waqt l-installazzjoni ta’ Luft.
 setup-protect-skip = Iċċifrax
 setup-protect-encrypt = Iċċifra
 

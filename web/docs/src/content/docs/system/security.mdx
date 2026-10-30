@@ -26,7 +26,7 @@ Secure Boot stays optional. With it off, Luft still starts, and nothing is locke
 
 ## Device encryption
 
-Install Luft asks whether to encrypt Luft right after you choose where it goes, and shows its recovery key. Save the key somewhere other than this computer. Encryption can only be chosen then: an installed Luft can't be encrypted or decrypted later, so Settings, under Security, **Device encryption**, shows whether it is.
+Install Luft asks whether to encrypt Luft right after you choose where it goes, and shows its recovery key. Save the key somewhere other than this computer. If you skipped it, Settings, under Security, **Device encryption**, can encrypt Luft later with **Turn on**. Your files stay where they are: Luft makes room, starts encrypting when you restart, and then encrypts in the background while you use the computer. Keep it plugged in until it's done. Encryption can't be turned off again.
 
 With a TPM, the disk unlocks by itself when the computer started the way it should. Install Luft links it before the first start; if the computer measures its startup differently than expected, the first start asks once for the recovery key you just saved, and unlocks by itself from then on. An optional PIN of 6 to 20 digits adds something only you know. Without a TPM, a passphrase is asked at every start.
 

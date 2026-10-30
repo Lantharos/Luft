@@ -248,7 +248,6 @@ setup-protect-passphrase-label = Тајна фраза
 setup-protect-repeat = Внесете ја повторно
 setup-protect-mismatch = Не се совпаѓаат
 setup-protect-kept = Го зачував клучот за обновување
-setup-protect-only-now = Шифрирањето може да го вклучите само сега, додека се инсталира Luft.
 setup-protect-skip = Не шифрирај
 setup-protect-encrypt = Шифрирај
 

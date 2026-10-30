@@ -148,7 +148,35 @@ settings-usb-hold-back-description = Los que se conecten con la sesión bloquead
 ## Device encryption
 
 settings-encryption = Cifrado de dispositivo
-settings-encryption-not-encrypted = Desactivado; solo se puede activar al instalar Luft
+settings-encryption-not-encrypted = Desactivado
+settings-encryption-not-encrypted-reinstall = Desactivado; este ordenador solo se puede cifrar volviendo a instalar Luft
+# Button that opens the steps to encrypt this computer
+settings-encryption-turn-on = Activar
+settings-encryption-after-restart = Empieza a cifrar al reiniciar
+settings-encryption-encrypting = Cifrando, { $percent } completado
+settings-encryption-encrypting-paused = Cifrando, en pausa al { $percent } hasta que conectes el ordenador a la corriente
+# Button that takes back the request to encrypt before the computer restarts
+settings-encryption-dont-encrypt = No cifrar
+settings-encryption-turn-on-title = Cifrar este ordenador
+settings-encryption-turn-on-blocked = Este ordenador no se puede cifrar ahora mismo
+settings-encryption-turn-on-description = Tus archivos se quedan donde están.
+settings-encryption-check-in-place = Luft puede cifrar su partición donde está.
+settings-encryption-check-not-in-place = La partición de Luft no se puede cifrar donde está. Vuelve a instalar Luft para cifrarla.
+settings-encryption-check-plugged-in = El ordenador está enchufado.
+settings-encryption-check-on-battery = Enchufa el ordenador. Cifrar tarda un rato y no debería quedarse sin energía a medias.
+settings-encryption-save-key-title = Guarda la clave de recuperación
+settings-encryption-save-key-description = Guárdala en un lugar distinto a este ordenador.
+settings-encryption-unlock-title = Cómo se desbloquea
+settings-encryption-unlock-chip = El chip de seguridad desbloquea el disco solo cuando el ordenador arranca, mientras nada cambie la forma en que arranca.
+settings-encryption-unlock-passphrase = Elige una frase de contraseña para escribirla cada vez que arranque el ordenador.
+settings-encryption-ready-title = Listo para cifrar
+settings-encryption-summary-room = Luft hace sitio ahora en su partición y empieza a cifrar al reiniciar.
+settings-encryption-summary-background = Después cifra en segundo plano mientras usas el ordenador. Mantenlo enchufado. Una interrupción solo lo pausa.
+settings-encryption-summary-chip = Hasta que termine, el chip de seguridad guarda la clave de recuperación, así que reiniciar no pide nada.
+settings-encryption-summary-recovery-key = Hasta que termine, pide la clave de recuperación al arrancar en lugar de tu frase de contraseña.
+# Button, verb: starts encrypting this computer
+settings-encryption-encrypt = Cifrar
+settings-encryption-making-room = Haciendo sitio…
 settings-encryption-unlocks-chip-pin = Se desbloquea con el chip de seguridad y tu PIN
 settings-encryption-unlocks-chip = Se desbloquea solo con el chip de seguridad
 settings-encryption-unlocks-passphrase = Pide tu frase de contraseña al arrancar

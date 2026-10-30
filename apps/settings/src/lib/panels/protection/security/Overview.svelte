@@ -6,8 +6,7 @@
 	import ShieldEllipsis from '@lucide/svelte/icons/shield-ellipsis';
 	import { t } from '@luft/i18n';
 	import { ActionRow, Section } from '@luft/ui';
-	import type { Disk } from '#lib/bindings.js';
-	import { unlockSummary } from './encryption/describe';
+	import { encryptionSummary } from './encryption/describe';
 	import { protection } from './keyring/describe';
 	import type { KeyringState } from './keyring/state.svelte';
 	import { levelSentence } from './protections/hsi';
@@ -30,10 +29,6 @@
 	function protectionsSummary() {
 		if (security.host) return levelSentence(security.host);
 		return security.trust?.secureBoot === 'on' ? t('settings-security-secure-boot-description') : undefined;
-	}
-
-	function encryptionSummary(disk: Disk) {
-		return disk.encrypted ? unlockSummary(disk) : t('settings-encryption-not-encrypted');
 	}
 
 	function keyringSummary() {

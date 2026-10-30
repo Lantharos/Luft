@@ -5,6 +5,8 @@ use zbus::{OwnedVariant, Variant};
 use super::status::{SigningKey, Startup};
 use crate::anticheat::Readiness;
 use crate::disk::DiskStatus;
+use crate::disk::encrypting::Encrypting;
+use crate::drives::reencrypt::Progress;
 use crate::system::firmware::tpm::Tpm;
 
 pub type Dict = HashMap<String, OwnedVariant>;
@@ -64,13 +66,39 @@ pub fn startup(startup: &Startup) -> Dict {
     ])
 }
 
-pub fn disk(disk: Option<&DiskStatus>) -> Dict {
+fn encrypting(
+    state: Option<Encrypting>,
+    running: Option<Option<Progress>>,
+) -> (&'static str, f64, u64) {
+    let live = running.flatten();
+    match state {
+        None => ("", 0.0, 0),
+        Some(Encrypting::AfterRestart) => ("after-restart", 0.0, 0),
+        Some(Encrypting::Underway(done)) => (
+            if running.is_some() {
+                "encrypting"
+            } else {
+                "waiting"
+            },
+            live.map_or(done, |live| live.done),
+            live.map_or(0, |live| live.remaining_seconds),
+        ),
+    }
+}
+
+pub fn disk(disk: Option<&DiskStatus>, running: Option<Option<Progress>>) -> Dict {
     let Some(disk) = disk else {
         return dict([("Encrypted", false.into())]);
     };
+    let (state, progress, remaining) = encrypting(disk.encrypting, running);
     dict([
         ("Device", disk.device.as_str().into()),
         ("Encrypted", disk.encrypted.into()),
+        ("Encrypting", state.into()),
+        ("Progress", progress.into()),
+        ("Remaining", remaining.into()),
+        ("CanEncrypt", disk.can_encrypt.into()),
+        ("TpmUnlocks", disk.tpm_unlocks.into()),
         ("Unlock", disk.unlock.clone().into()),
         ("RecoveryKeyStored", disk.recovery_key_stored.into()),
         ("TpmRefused", disk.tpm_refused.into()),

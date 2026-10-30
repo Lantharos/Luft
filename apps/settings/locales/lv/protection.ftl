@@ -153,7 +153,35 @@ settings-usb-hold-back-description = Bloķēšanas laikā pievienotās ierīces 
 ## Device encryption
 
 settings-encryption = Ierīces šifrēšana
-settings-encryption-not-encrypted = Izslēgta, to var ieslēgt tikai, instalējot Luft
+settings-encryption-not-encrypted = Izslēgta
+settings-encryption-not-encrypted-reinstall = Izslēgta, un šo datoru var šifrēt tikai, no jauna instalējot Luft
+# Button that opens the steps to encrypt this computer
+settings-encryption-turn-on = Ieslēgt
+settings-encryption-after-restart = Šifrēšana sāksies pēc restartēšanas
+settings-encryption-encrypting = Notiek šifrēšana, { $percent } pabeigti
+settings-encryption-encrypting-paused = Šifrēšana pauzēta pie { $percent }, līdz dators tiek pievienots barošanai
+# Button that takes back the request to encrypt before the computer restarts
+settings-encryption-dont-encrypt = Nešifrēt
+settings-encryption-turn-on-title = Šifrēt šo datoru
+settings-encryption-turn-on-blocked = Šo datoru pašlaik nevar šifrēt
+settings-encryption-turn-on-description = Jūsu faili paliek tur, kur ir.
+settings-encryption-check-in-place = Luft var šifrēt savu nodalījumu tur, kur tas atrodas.
+settings-encryption-check-not-in-place = Luft nodalījumu nevar šifrēt tur, kur tas atrodas. Instalējiet Luft no jauna, lai to šifrētu.
+settings-encryption-check-plugged-in = Dators ir pievienots barošanai.
+settings-encryption-check-on-battery = Pievienojiet datoru barošanai. Šifrēšana ilgst kādu laiku, un tai nevajadzētu pārtrūkt, ja pietrūkst strāvas.
+settings-encryption-save-key-title = Saglabājiet atkopšanas atslēgu
+settings-encryption-save-key-description = Glabājiet to citur, nevis šajā datorā.
+settings-encryption-unlock-title = Kā notiek atbloķēšana
+settings-encryption-unlock-chip = Drošības mikroshēma disku atbloķē pati, kad dators startē, ja vien nekas nemaina tā startēšanas veidu.
+settings-encryption-unlock-passphrase = Izvēlieties paroles frāzi, ko ievadīsiet katru reizi, kad dators startē.
+settings-encryption-ready-title = Gatavs šifrēšanai
+settings-encryption-summary-room = Luft tagad atbrīvo vietu savā nodalījumā, un šifrēšana sāksies pēc restartēšanas.
+settings-encryption-summary-background = Pēc tam šifrēšana notiek fonā, kamēr lietojat datoru. Turiet to pievienotu barošanai. Pārtraukums šifrēšanu tikai pauzē.
+settings-encryption-summary-chip = Līdz tas ir pabeigts, drošības mikroshēma glabā atkopšanas atslēgu, tāpēc restartēšana neko neprasa.
+settings-encryption-summary-recovery-key = Līdz tas ir pabeigts, startējot tiek prasīta atkopšanas atslēga paroles frāzes vietā.
+# Button, verb: starts encrypting this computer
+settings-encryption-encrypt = Šifrēt
+settings-encryption-making-room = Tiek atbrīvota vieta…
 settings-encryption-unlocks-chip-pin = Atbloķē ar drošības mikroshēmu un jūsu PIN
 settings-encryption-unlocks-chip = Atbloķējas automātiski ar drošības mikroshēmu
 settings-encryption-unlocks-passphrase = Startējot prasa jūsu paroles frāzi

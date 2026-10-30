@@ -21,6 +21,7 @@ part = "boot"
     "data/trust/dracut/cryptsetup-root-retries.conf",
     { from = "data/trust/dracut/module-setup.sh", mode = "755" },
     "data/trust/dracut/root-waits-for-unlock.conf",
+    "data/trust/dracut/trustd-encrypt.service",
     "data/trust/dracut/trustd-move.service",
 ]
 

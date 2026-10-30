@@ -148,7 +148,35 @@ settings-usb-hold-back-description = Enheder, der tilsluttes, mens computeren er
 ## Device encryption
 
 settings-encryption = Enhedskryptering
-settings-encryption-not-encrypted = Slået fra, og det kan kun slås til, mens Luft installeres
+settings-encryption-not-encrypted = Slået fra
+settings-encryption-not-encrypted-reinstall = Slået fra, og computeren kan kun krypteres ved at installere Luft igen
+# Button that opens the steps to encrypt this computer
+settings-encryption-turn-on = Slå til
+settings-encryption-after-restart = Begynder at kryptere, når du genstarter
+settings-encryption-encrypting = Krypterer, { $percent } færdig
+settings-encryption-encrypting-paused = Krypterer, sat på pause ved { $percent }, indtil computeren er sluttet til strøm
+# Button that takes back the request to encrypt before the computer restarts
+settings-encryption-dont-encrypt = Krypter ikke
+settings-encryption-turn-on-title = Krypter denne computer
+settings-encryption-turn-on-blocked = Denne computer kan ikke krypteres lige nu
+settings-encryption-turn-on-description = Dine filer bliver, hvor de er.
+settings-encryption-check-in-place = Luft kan kryptere sin partition, hvor den er.
+settings-encryption-check-not-in-place = Lufts partition kan ikke krypteres, hvor den er. Installer Luft igen for at kryptere den.
+settings-encryption-check-plugged-in = Computeren er sluttet til strøm.
+settings-encryption-check-on-battery = Slut computeren til strøm. Kryptering tager lidt tid og bør ikke løbe tør for strøm undervejs.
+settings-encryption-save-key-title = Gem genoprettelsesnøglen
+settings-encryption-save-key-description = Opbevar den et andet sted end på denne computer.
+settings-encryption-unlock-title = Sådan låses den op
+settings-encryption-unlock-chip = Sikkerhedschippen låser disken op af sig selv, når computeren starter, så længe intet ændrer, hvordan den starter.
+settings-encryption-unlock-passphrase = Vælg en adgangsfrase, som du skriver, hver gang computeren starter.
+settings-encryption-ready-title = Klar til at kryptere
+settings-encryption-summary-room = Luft gør plads på sin partition nu og begynder at kryptere, når du genstarter.
+settings-encryption-summary-background = Derefter krypterer den i baggrunden, mens du bruger computeren. Hold den sluttet til strøm. En afbrydelse sætter den kun på pause.
+settings-encryption-summary-chip = Indtil den er færdig, opbevarer sikkerhedschippen genoprettelsesnøglen, så genstart beder ikke om noget.
+settings-encryption-summary-recovery-key = Indtil den er færdig, beder den om genoprettelsesnøglen ved opstart i stedet for din adgangsfrase.
+# Button, verb: starts encrypting this computer
+settings-encryption-encrypt = Krypter
+settings-encryption-making-room = Gør plads…
 settings-encryption-unlocks-chip-pin = Låses op med sikkerhedschippen og din pinkode
 settings-encryption-unlocks-chip = Låses op af sig selv med sikkerhedschippen
 settings-encryption-unlocks-passphrase = Beder om din adgangsfrase ved opstart

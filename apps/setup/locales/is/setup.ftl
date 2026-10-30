@@ -248,7 +248,6 @@ setup-protect-passphrase-label = Lykilsetning
 setup-protect-repeat = Sláðu hana inn aftur
 setup-protect-mismatch = Lykilsetningarnar passa ekki saman
 setup-protect-kept = Ég hef geymt endurheimtarlykilinn
-setup-protect-only-now = Aðeins er hægt að kveikja á dulritun núna, á meðan Luft er sett upp.
 setup-protect-skip = Ekki dulrita
 setup-protect-encrypt = Dulrita
 

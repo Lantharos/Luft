@@ -372,11 +372,18 @@ export const commands = {
 		language: string,
 	}, options?: InvokeOptions) => invoke<null>("region_set_language", params, options),
 	securityAcceptSecureBoot: (options?: InvokeOptions) => invoke<null>("security_accept_secure_boot", {}, options),
+	securityCancelEncryption: (options?: InvokeOptions) => invoke<null>("security_cancel_encryption", {}, options),
 	securityCancelEnrollment: (options?: InvokeOptions) => invoke<null>("security_cancel_enrollment", {}, options),
+	securityEncryptDisk: (params: {
+		recoveryKey: string,
+		passphrase: string,
+	}, options?: InvokeOptions) => invoke<null>("security_encrypt_disk", params, options),
 	securityEnrollKey: (options?: InvokeOptions) => invoke<string>("security_enroll_key", {}, options),
+	securityGenerateKey: (options?: InvokeOptions) => invoke<string>("security_generate_key", {}, options),
 	securityHost: (options?: InvokeOptions) => invoke<HostSecurity | null>("security_host", {}, options),
 	securityInstallStartup: (options?: InvokeOptions) => invoke<null>("security_install_startup", {}, options),
 	securityKeepOtherKeys: (options?: InvokeOptions) => invoke<null>("security_keep_other_keys", {}, options),
+	securityOnBattery: (options?: InvokeOptions) => invoke<boolean>("security_on_battery", {}, options),
 	securityPrintKey: (params: {
 		key: string,
 	}, options?: InvokeOptions) => invoke<boolean>("security_print_key", params, options),
@@ -792,6 +799,10 @@ export type Direction = "output" | "input";
 export type Disk = {
 	device: string,
 	encrypted: boolean,
+	encrypting: EncryptingState,
+	progress: number,
+	canEncrypt: boolean,
+	tpmUnlocks: boolean,
 	unlock: UnlockMethod[],
 	recoveryKeyStored: boolean,
 	tpmRefused: boolean,
@@ -840,6 +851,8 @@ export type Drives = {
 };
 
 export type EapMethod = "peap" | "ttls" | "tls";
+
+export type EncryptingState = "no" | "after-restart" | "encrypting" | "waiting";
 
 export type EncryptionChange = "encrypt" | "decrypt";
 

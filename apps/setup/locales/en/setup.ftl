@@ -120,7 +120,6 @@ setup-protect-passphrase-label = Passphrase
 setup-protect-repeat = Type it again
 setup-protect-mismatch = They don’t match
 setup-protect-kept = I’ve kept my recovery key
-setup-protect-only-now = You can only turn encryption on now, while installing Luft.
 # Button: installs Luft without encrypting it
 setup-protect-skip = Don’t encrypt
 # Button, verb: installs Luft encrypted

@@ -148,7 +148,35 @@ settings-usb-hold-back-description = Geräte, die im gesperrten Zustand angestec
 ## Device encryption
 
 settings-encryption = Geräteverschlüsselung
-settings-encryption-not-encrypted = Aus, und sie lässt sich nur bei der Installation von Luft einschalten
+settings-encryption-not-encrypted = Aus
+settings-encryption-not-encrypted-reinstall = Aus, und dieser Computer lässt sich nur durch eine erneute Installation von Luft verschlüsseln
+# Button that opens the steps to encrypt this computer
+settings-encryption-turn-on = Einschalten
+settings-encryption-after-restart = Beginnt mit dem Verschlüsseln, wenn du neu startest
+settings-encryption-encrypting = Wird verschlüsselt, { $percent } erledigt
+settings-encryption-encrypting-paused = Wird verschlüsselt, bei { $percent } angehalten, bis der Computer angeschlossen ist
+# Button that takes back the request to encrypt before the computer restarts
+settings-encryption-dont-encrypt = Nicht verschlüsseln
+settings-encryption-turn-on-title = Diesen Computer verschlüsseln
+settings-encryption-turn-on-blocked = Dieser Computer lässt sich gerade nicht verschlüsseln
+settings-encryption-turn-on-description = Deine Dateien bleiben, wo sie sind.
+settings-encryption-check-in-place = Luft kann seine Partition an Ort und Stelle verschlüsseln.
+settings-encryption-check-not-in-place = Die Partition von Luft lässt sich nicht an Ort und Stelle verschlüsseln. Installiere Luft erneut, um sie zu verschlüsseln.
+settings-encryption-check-plugged-in = Der Computer ist angeschlossen.
+settings-encryption-check-on-battery = Schließe den Computer an. Das Verschlüsseln dauert eine Weile, und der Strom sollte nicht mittendrin ausgehen.
+settings-encryption-save-key-title = Wiederherstellungsschlüssel speichern
+settings-encryption-save-key-description = Bewahre ihn an einem anderen Ort als diesem Computer auf.
+settings-encryption-unlock-title = So wird entsperrt
+settings-encryption-unlock-chip = Der Sicherheitschip entsperrt den Datenträger beim Start des Computers von selbst, solange sich nichts daran ändert, wie er startet.
+settings-encryption-unlock-passphrase = Wähle eine Passphrase, die du bei jedem Start des Computers eingibst.
+settings-encryption-ready-title = Bereit zum Verschlüsseln
+settings-encryption-summary-room = Luft schafft jetzt Platz auf seiner Partition und beginnt beim Neustart mit dem Verschlüsseln.
+settings-encryption-summary-background = Danach verschlüsselt es im Hintergrund, während du den Computer benutzt. Lass ihn angeschlossen. Eine Unterbrechung hält es nur an.
+settings-encryption-summary-chip = Bis es fertig ist, verwahrt der Sicherheitschip den Wiederherstellungsschlüssel, sodass beim Neustart nichts abgefragt wird.
+settings-encryption-summary-recovery-key = Bis es fertig ist, wird beim Start der Wiederherstellungsschlüssel statt deiner Passphrase abgefragt.
+# Button, verb: starts encrypting this computer
+settings-encryption-encrypt = Verschlüsseln
+settings-encryption-making-room = Platz wird geschaffen…
 settings-encryption-unlocks-chip-pin = Entsperrt mit dem Sicherheitschip und deiner PIN
 settings-encryption-unlocks-chip = Entsperrt von selbst mit dem Sicherheitschip
 settings-encryption-unlocks-passphrase = Fragt beim Start nach deiner Passphrase

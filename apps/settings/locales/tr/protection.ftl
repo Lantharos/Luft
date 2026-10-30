@@ -148,7 +148,35 @@ settings-usb-hold-back-description = Kilitliyken takılanlar, kilidi açana kada
 ## Device encryption
 
 settings-encryption = Cihaz şifreleme
-settings-encryption-not-encrypted = Kapalı, yalnızca Luft yüklenirken açılabilir
+settings-encryption-not-encrypted = Kapalı
+settings-encryption-not-encrypted-reinstall = Kapalı, bu bilgisayar yalnızca Luft yeniden yüklenerek şifrelenebilir
+# Button that opens the steps to encrypt this computer
+settings-encryption-turn-on = Aç
+settings-encryption-after-restart = Yeniden başlattığınızda şifrelemeye başlar
+settings-encryption-encrypting = Şifreleniyor, { $percent } tamamlandı
+settings-encryption-encrypting-paused = Şifreleniyor, bilgisayar prize takılana kadar { $percent } noktasında duraklatıldı
+# Button that takes back the request to encrypt before the computer restarts
+settings-encryption-dont-encrypt = Şifrelemeyi iptal et
+settings-encryption-turn-on-title = Bu bilgisayarı şifrele
+settings-encryption-turn-on-blocked = Bu bilgisayar şu anda şifrelenemiyor
+settings-encryption-turn-on-description = Dosyalarınız olduğu yerde kalır.
+settings-encryption-check-in-place = Luft kendi bölümünü olduğu yerde şifreleyebilir.
+settings-encryption-check-not-in-place = Luft’ın bölümü olduğu yerde şifrelenemez. Şifrelemek için Luft’ı yeniden yükleyin.
+settings-encryption-check-plugged-in = Bilgisayar prize takılı.
+settings-encryption-check-on-battery = Bilgisayarı prize takın. Şifreleme biraz sürer, bilgisayarın yarıda gücü kesilmemeli.
+settings-encryption-save-key-title = Kurtarma anahtarını kaydedin
+settings-encryption-save-key-description = Bunu bu bilgisayar dışında bir yerde saklayın.
+settings-encryption-unlock-title = Kilidin nasıl açıldığı
+settings-encryption-unlock-chip = Güvenlik çipi, bilgisayar başlarken diski kendiliğinden açar; yeter ki bilgisayarın başlama şeklini hiçbir şey değiştirmesin.
+settings-encryption-unlock-passphrase = Bilgisayar her başladığında yazacağınız bir disk parolası seçin.
+settings-encryption-ready-title = Şifrelemeye hazır
+settings-encryption-summary-room = Luft şimdi kendi bölümünde yer açar ve yeniden başlattığınızda şifrelemeye başlar.
+settings-encryption-summary-background = Ardından siz bilgisayarı kullanırken arka planda şifreler. Prize takılı tutun. Kesinti yalnızca duraklatır.
+settings-encryption-summary-chip = İş bitene kadar güvenlik çipi kurtarma anahtarını saklar, bu yüzden yeniden başlatma hiçbir şey sormaz.
+settings-encryption-summary-recovery-key = İş bitene kadar başlangıçta disk parolanız yerine kurtarma anahtarı istenir.
+# Button, verb: starts encrypting this computer
+settings-encryption-encrypt = Şifrele
+settings-encryption-making-room = Yer açılıyor…
 settings-encryption-unlocks-chip-pin = Güvenlik çipi ve PIN’inizle açılır
 settings-encryption-unlocks-chip = Güvenlik çipiyle kendiliğinden açılır
 settings-encryption-unlocks-passphrase = Başlangıçta disk parolanızı ister

@@ -248,7 +248,6 @@ setup-protect-passphrase-label = Φράση πρόσβασης
 setup-protect-repeat = Πληκτρολογήστε την ξανά
 setup-protect-mismatch = Δεν ταιριάζουν
 setup-protect-kept = Φύλαξα το κλειδί αποκατάστασης
-setup-protect-only-now = Μπορείτε να ενεργοποιήσετε την κρυπτογράφηση μόνο τώρα, κατά την εγκατάσταση του Luft.
 setup-protect-skip = Χωρίς κρυπτογράφηση
 setup-protect-encrypt = Κρυπτογράφηση
 

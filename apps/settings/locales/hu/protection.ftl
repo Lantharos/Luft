@@ -148,7 +148,35 @@ settings-usb-hold-back-description = A zárolt állapotban csatlakoztatott eszk�
 ## Device encryption
 
 settings-encryption = Eszköztitkosítás
-settings-encryption-not-encrypted = Kikapcsolva, és csak a Luft telepítésekor kapcsolható be
+settings-encryption-not-encrypted = Kikapcsolva
+settings-encryption-not-encrypted-reinstall = Kikapcsolva, és ez a számítógép csak a Luft újratelepítésével titkosítható
+# Button that opens the steps to encrypt this computer
+settings-encryption-turn-on = Bekapcsolás
+settings-encryption-after-restart = Újraindításkor elkezdi a titkosítást
+settings-encryption-encrypting = Titkosítás folyamatban, { $percent } kész
+settings-encryption-encrypting-paused = Titkosítás szüneteltetve, { $percent } kész, amíg a számítógép nincs csatlakoztatva
+# Button that takes back the request to encrypt before the computer restarts
+settings-encryption-dont-encrypt = Ne titkosítsa
+settings-encryption-turn-on-title = A számítógép titkosítása
+settings-encryption-turn-on-blocked = Ez a számítógép most nem titkosítható
+settings-encryption-turn-on-description = A fájlok a helyükön maradnak.
+settings-encryption-check-in-place = A Luft a saját partícióját a helyén titkosíthatja.
+settings-encryption-check-not-in-place = A Luft partíciója nem titkosítható a helyén. Telepítse újra a Luftot a titkosításhoz.
+settings-encryption-check-plugged-in = A számítógép csatlakoztatva van.
+settings-encryption-check-on-battery = Csatlakoztassa a számítógépet. A titkosítás eltart egy ideig, és nem szabad, hogy félúton elfogyjon az áram.
+settings-encryption-save-key-title = Mentse el a helyreállítási kulcsot
+settings-encryption-save-key-description = Tárolja máshol, ne ezen a számítógépen.
+settings-encryption-unlock-title = Hogyan oldódik fel
+settings-encryption-unlock-chip = A biztonsági chip a számítógép indításakor magától feloldja a lemezt, amíg semmi nem változtatja meg az indítás módját.
+settings-encryption-unlock-passphrase = Válasszon jelmondatot, amelyet a számítógép minden indításakor meg kell adnia.
+settings-encryption-ready-title = Készen áll a titkosításra
+settings-encryption-summary-room = A Luft most helyet csinál a partícióján, és újraindításkor elkezdi a titkosítást.
+settings-encryption-summary-background = Ezután a háttérben titkosít, miközben Ön használja a számítógépet. Hagyja csatlakoztatva. Egy megszakítás csak szünetelteti.
+settings-encryption-summary-chip = Amíg el nem készül, a biztonsági chip őrzi a helyreállítási kulcsot, így az újraindítás nem kér semmit.
+settings-encryption-summary-recovery-key = Amíg el nem készül, indításkor a jelmondat helyett a helyreállítási kulcsot kéri.
+# Button, verb: starts encrypting this computer
+settings-encryption-encrypt = Titkosítás
+settings-encryption-making-room = Hely felszabadítása…
 settings-encryption-unlocks-chip-pin = A biztonsági chippel és a PIN-kóddal oldódik fel
 settings-encryption-unlocks-chip = A biztonsági chippel magától oldódik fel
 settings-encryption-unlocks-passphrase = Indításkor a jelmondatot kéri

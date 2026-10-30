@@ -148,7 +148,35 @@ settings-usb-hold-back-description = Όσες συνδέονται ενώ είν
 ## Device encryption
 
 settings-encryption = Κρυπτογράφηση συσκευής
-settings-encryption-not-encrypted = Ανενεργή, ενεργοποιείται μόνο κατά την εγκατάσταση του Luft
+settings-encryption-not-encrypted = Ανενεργή
+settings-encryption-not-encrypted-reinstall = Ανενεργή, και ο υπολογιστής μπορεί να κρυπτογραφηθεί μόνο με νέα εγκατάσταση του Luft
+# Button that opens the steps to encrypt this computer
+settings-encryption-turn-on = Ενεργοποίηση
+settings-encryption-after-restart = Ξεκινά η κρυπτογράφηση όταν κάνετε επανεκκίνηση
+settings-encryption-encrypting = Κρυπτογράφηση, ολοκληρώθηκε { $percent }
+settings-encryption-encrypting-paused = Κρυπτογράφηση, σε παύση στο { $percent } μέχρι να συνδεθεί ο υπολογιστής στην πρίζα
+# Button that takes back the request to encrypt before the computer restarts
+settings-encryption-dont-encrypt = Να μην κρυπτογραφηθεί
+settings-encryption-turn-on-title = Κρυπτογράφηση αυτού του υπολογιστή
+settings-encryption-turn-on-blocked = Αυτός ο υπολογιστής δεν μπορεί να κρυπτογραφηθεί αυτή τη στιγμή
+settings-encryption-turn-on-description = Τα αρχεία σας μένουν εκεί που είναι.
+settings-encryption-check-in-place = Το Luft μπορεί να κρυπτογραφήσει το διαμέρισμά του στη θέση του.
+settings-encryption-check-not-in-place = Το διαμέρισμα του Luft δεν μπορεί να κρυπτογραφηθεί στη θέση του. Εγκαταστήστε ξανά το Luft για να το κρυπτογραφήσετε.
+settings-encryption-check-plugged-in = Ο υπολογιστής είναι συνδεδεμένος στην πρίζα.
+settings-encryption-check-on-battery = Συνδέστε τον υπολογιστή στην πρίζα. Η κρυπτογράφηση διαρκεί λίγο και δεν πρέπει να μείνει από ρεύμα στη μέση.
+settings-encryption-save-key-title = Αποθηκεύστε το κλειδί αποκατάστασης
+settings-encryption-save-key-description = Φυλάξτε το κάπου αλλού, όχι σε αυτόν τον υπολογιστή.
+settings-encryption-unlock-title = Πώς ξεκλειδώνει
+settings-encryption-unlock-chip = Το τσιπ ασφαλείας ξεκλειδώνει τον δίσκο αυτόματα όταν ξεκινά ο υπολογιστής, εφόσον τίποτα δεν αλλάζει τον τρόπο εκκίνησής του.
+settings-encryption-unlock-passphrase = Επιλέξτε μια φράση πρόσβασης που θα πληκτρολογείτε κάθε φορά που ξεκινά ο υπολογιστής.
+settings-encryption-ready-title = Έτοιμο για κρυπτογράφηση
+settings-encryption-summary-room = Το Luft δημιουργεί τώρα χώρο στο διαμέρισμά του και ξεκινά την κρυπτογράφηση όταν κάνετε επανεκκίνηση.
+settings-encryption-summary-background = Μετά κρυπτογραφεί στο παρασκήνιο όσο χρησιμοποιείτε τον υπολογιστή. Κρατήστε τον συνδεδεμένο στην πρίζα. Μια διακοπή απλώς την σταματά προσωρινά.
+settings-encryption-summary-chip = Μέχρι να ολοκληρωθεί, το τσιπ ασφαλείας φυλάσσει το κλειδί αποκατάστασης, οπότε η επανεκκίνηση δεν ζητά τίποτα.
+settings-encryption-summary-recovery-key = Μέχρι να ολοκληρωθεί, ζητά το κλειδί αποκατάστασης κατά την εκκίνηση αντί για τη φράση πρόσβασής σας.
+# Button, verb: starts encrypting this computer
+settings-encryption-encrypt = Κρυπτογράφηση
+settings-encryption-making-room = Δημιουργία χώρου…
 settings-encryption-unlocks-chip-pin = Ξεκλειδώνει με το τσιπ ασφαλείας και το PIN σας
 settings-encryption-unlocks-chip = Ξεκλειδώνει αυτόματα με το τσιπ ασφαλείας
 settings-encryption-unlocks-passphrase = Ζητά τη φράση πρόσβασης κατά την εκκίνηση

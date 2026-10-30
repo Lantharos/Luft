@@ -163,7 +163,35 @@ settings-usb-hold-back-description = Dawk imqabbda waqt li l-iskrin huwa msakkar
 ## Device encryption
 
 settings-encryption = Ċċifrar tal-apparat
-settings-encryption-not-encrypted = Mitfi, u jista’ jinxtegħel biss waqt l-installazzjoni ta’ Luft
+settings-encryption-not-encrypted = Mitfi
+settings-encryption-not-encrypted-reinstall = Mitfi, u dan il-kompjuter jista’ jiġi ċċifrat biss billi terġa’ tinstalla Luft
+# Button that opens the steps to encrypt this computer
+settings-encryption-turn-on = Ixgħel
+settings-encryption-after-restart = Jibda jiċċifra meta tirristartja
+settings-encryption-encrypting = Qed jiġi ċċifrat, { $percent } lest
+settings-encryption-encrypting-paused = Iċċifrar waqaf f’{ $percent } sakemm il-kompjuter jitqabbad mal-elettriku
+# Button that takes back the request to encrypt before the computer restarts
+settings-encryption-dont-encrypt = Tiċċifrax
+settings-encryption-turn-on-title = Iċċifra dan il-kompjuter
+settings-encryption-turn-on-blocked = Dan il-kompjuter ma jistax jiġi ċċifrat bħalissa
+settings-encryption-turn-on-description = Il-fajls tiegħek jibqgħu fejn huma.
+settings-encryption-check-in-place = Luft jista’ jiċċifra l-partizzjoni tiegħu fejn hi.
+settings-encryption-check-not-in-place = Il-partizzjoni ta’ Luft ma tistax tiġi ċċifrata fejn hi. Erġa’ installa Luft biex tiċċifraha.
+settings-encryption-check-plugged-in = Il-kompjuter huwa mqabbad mal-elettriku.
+settings-encryption-check-on-battery = Qabbad il-kompjuter mal-elettriku. L-iċċifrar jieħu ftit żmien u m’għandux jispiċċa mingħajr elettriku f’nofs triq.
+settings-encryption-save-key-title = Issejvja ċ-ċavetta tal-irkupru
+settings-encryption-save-key-description = Żommha x’imkien ieħor, mhux fuq dan il-kompjuter.
+settings-encryption-unlock-title = Kif tiżblokka
+settings-encryption-unlock-chip = Iċ-ċippa tas-sigurtà tiżblokka d-diska waħedha meta jistartja l-kompjuter, sakemm xejn ma jbiddel kif jistartja.
+settings-encryption-unlock-passphrase = Agħżel passphrase li tittajpja kull darba li jistartja l-kompjuter.
+settings-encryption-ready-title = Lest biex jiġi ċċifrat
+settings-encryption-summary-room = Luft issa jagħmel spazju fuq il-partizzjoni tiegħu, u jibda jiċċifra meta tirristartja.
+settings-encryption-summary-background = Imbagħad jiċċifra fl-isfond waqt li tuża l-kompjuter. Żommu mqabbad mal-elettriku. Interruzzjoni twaqqfu biss għal ftit.
+settings-encryption-summary-chip = Sakemm jitlesta, iċ-ċippa tas-sigurtà żżomm iċ-ċavetta tal-irkupru, għalhekk ir-ristart ma jitlob xejn.
+settings-encryption-summary-recovery-key = Sakemm jitlesta, jitlob iċ-ċavetta tal-irkupru meta jistartja minflok il-passphrase tiegħek.
+# Button, verb: starts encrypting this computer
+settings-encryption-encrypt = Iċċifra
+settings-encryption-making-room = Qed jinħoloq l-ispazju…
 settings-encryption-unlocks-chip-pin = Tiżblokka biċ-ċippa tas-sigurtà u l-PIN
 settings-encryption-unlocks-chip = Tiżblokka waħedha biċ-ċippa tas-sigurtà
 settings-encryption-unlocks-passphrase = Titlob il-passphrase meta tistartja

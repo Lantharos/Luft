@@ -158,7 +158,35 @@ settings-usb-hold-back-description = Устройства, подключённ�
 ## Device encryption
 
 settings-encryption = Шифрование устройства
-settings-encryption-not-encrypted = Выключено, включить можно только при установке Luft
+settings-encryption-not-encrypted = Выключено
+settings-encryption-not-encrypted-reinstall = Выключено, зашифровать этот компьютер можно только при повторной установке Luft
+# Button that opens the steps to encrypt this computer
+settings-encryption-turn-on = Включить
+settings-encryption-after-restart = Шифрование начнётся после перезагрузки
+settings-encryption-encrypting = Шифрование, готово { $percent }
+settings-encryption-encrypting-paused = Шифрование приостановлено на { $percent }, пока компьютер не подключён к питанию
+# Button that takes back the request to encrypt before the computer restarts
+settings-encryption-dont-encrypt = Не шифровать
+settings-encryption-turn-on-title = Зашифровать этот компьютер
+settings-encryption-turn-on-blocked = Сейчас этот компьютер нельзя зашифровать
+settings-encryption-turn-on-description = Ваши файлы останутся на месте.
+settings-encryption-check-in-place = Luft может зашифровать свой раздел на месте.
+settings-encryption-check-not-in-place = Раздел Luft нельзя зашифровать на месте. Установите Luft заново, чтобы зашифровать его.
+settings-encryption-check-plugged-in = Компьютер подключён к питанию.
+settings-encryption-check-on-battery = Подключите компьютер к питанию. Шифрование занимает время, и питание не должно пропасть посреди процесса.
+settings-encryption-save-key-title = Сохраните ключ восстановления
+settings-encryption-save-key-description = Храните его не на этом компьютере.
+settings-encryption-unlock-title = Разблокировка
+settings-encryption-unlock-chip = Чип безопасности разблокирует диск сам при запуске компьютера, пока ничто не меняет способ его запуска.
+settings-encryption-unlock-passphrase = Выберите парольную фразу, которую вы будете вводить при каждом запуске компьютера.
+settings-encryption-ready-title = Всё готово к шифрованию
+settings-encryption-summary-room = Luft сейчас освобождает место на своём разделе, а шифрование начнётся после перезагрузки.
+settings-encryption-summary-background = Затем шифрование идёт в фоне, пока вы пользуетесь компьютером. Не отключайте его от питания. Прерывание лишь приостанавливает процесс.
+settings-encryption-summary-chip = Пока шифрование не завершено, чип безопасности хранит ключ восстановления, поэтому при перезагрузке ничего не запрашивается.
+settings-encryption-summary-recovery-key = Пока шифрование не завершено, при запуске запрашивается ключ восстановления вместо парольной фразы.
+# Button, verb: starts encrypting this computer
+settings-encryption-encrypt = Зашифровать
+settings-encryption-making-room = Освобождение места…
 settings-encryption-unlocks-chip-pin = Разблокируется чипом безопасности и PIN-кодом
 settings-encryption-unlocks-chip = Разблокируется чипом безопасности автоматически
 settings-encryption-unlocks-passphrase = При запуске запрашивается парольная фраза

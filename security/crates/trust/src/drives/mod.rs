@@ -3,7 +3,7 @@ mod hold;
 mod mask;
 mod record;
 pub mod reencrypt;
-mod room;
+pub(crate) mod room;
 mod target;
 mod unlocking;
 pub mod work;

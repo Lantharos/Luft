@@ -52,7 +52,6 @@
 			</div>
 		{/if}
 		<Checkbox checked={kept} label={t('setup-protect-kept')} onchange={(checked) => (kept = checked)}>{t('setup-protect-kept')}</Checkbox>
-		<p class="text-[13.5px] text-[var(--text-muted)]">{t('setup-protect-only-now')}</p>
 	</div>
 	{#if problem || install.startError}
 		<p class="mt-4 text-[13.5px] text-[var(--danger)]">{problem || install.startError}</p>

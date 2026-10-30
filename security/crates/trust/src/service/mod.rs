@@ -5,6 +5,7 @@ mod interface;
 mod properties;
 mod shown;
 pub(crate) mod status;
+mod system_disk;
 
 use std::sync::Arc;
 use std::time::Duration;
@@ -34,6 +35,7 @@ async fn serve() -> zbus::Result<()> {
         .build()
         .await?;
     drives::continue_work(&connection).await?;
+    system_disk::continue_work(&connection).await?;
     idle.wait(IDLE_TIMEOUT).await;
     connection.release_name(NAME).await?;
     Ok(())

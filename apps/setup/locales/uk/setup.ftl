@@ -260,7 +260,6 @@ setup-protect-passphrase-label = Парольна фраза
 setup-protect-repeat = Введіть ще раз
 setup-protect-mismatch = Значення не збігаються
 setup-protect-kept = Ключ відновлення збережено
-setup-protect-only-now = Шифрування можна ввімкнути лише зараз, під час встановлення Luft.
 setup-protect-skip = Не шифрувати
 setup-protect-encrypt = Зашифрувати
 

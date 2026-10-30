@@ -248,7 +248,6 @@ setup-protect-passphrase-label = Frase de contraseña
 setup-protect-repeat = Vuelve a escribirla
 setup-protect-mismatch = No coinciden
 setup-protect-kept = He guardado mi clave de recuperación
-setup-protect-only-now = El cifrado solo se puede activar ahora, mientras se instala Luft.
 setup-protect-skip = No cifrar
 setup-protect-encrypt = Cifrar
 

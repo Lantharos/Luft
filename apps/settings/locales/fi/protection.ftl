@@ -148,7 +148,35 @@ settings-usb-hold-back-description = Lukituksen aikana liitetyt odottavat, kunne
 ## Device encryption
 
 settings-encryption = Laitteen salaus
-settings-encryption-not-encrypted = Pois päältä, ja sen voi ottaa käyttöön vain Luftia asennettaessa
+settings-encryption-not-encrypted = Pois päältä
+settings-encryption-not-encrypted-reinstall = Pois päältä, ja tämän tietokoneen voi salata vain asentamalla Luftin uudelleen
+# Button that opens the steps to encrypt this computer
+settings-encryption-turn-on = Ota käyttöön
+settings-encryption-after-restart = Salaus alkaa, kun käynnistät uudelleen
+settings-encryption-encrypting = Salataan, { $percent } valmiina
+settings-encryption-encrypting-paused = Salataan, keskeytetty kohdassa { $percent }, kunnes tietokone kytketään virtaan
+# Button that takes back the request to encrypt before the computer restarts
+settings-encryption-dont-encrypt = Älä salaa
+settings-encryption-turn-on-title = Salaa tämä tietokone
+settings-encryption-turn-on-blocked = Tätä tietokonetta ei voi salata juuri nyt
+settings-encryption-turn-on-description = Tiedostosi pysyvät paikoillaan.
+settings-encryption-check-in-place = Luft voi salata osionsa paikallaan.
+settings-encryption-check-not-in-place = Luftin osiota ei voi salata paikallaan. Asenna Luft uudelleen, jotta se voidaan salata.
+settings-encryption-check-plugged-in = Tietokone on kytketty virtaan.
+settings-encryption-check-on-battery = Kytke tietokone virtaan. Salaus kestää hetken, eikä virran pitäisi loppua kesken.
+settings-encryption-save-key-title = Tallenna palautusavain
+settings-encryption-save-key-description = Säilytä sitä jossain muualla kuin tällä tietokoneella.
+settings-encryption-unlock-title = Näin lukitus avataan
+settings-encryption-unlock-chip = Suojaussiru avaa levyn lukituksen itsestään, kun tietokone käynnistyy, kunhan mikään ei muuta käynnistystapaa.
+settings-encryption-unlock-passphrase = Valitse tunnuslause, jonka kirjoitat aina, kun tietokone käynnistyy.
+settings-encryption-ready-title = Valmis salattavaksi
+settings-encryption-summary-room = Luft tekee nyt tilaa osiossaan ja aloittaa salauksen, kun käynnistät uudelleen.
+settings-encryption-summary-background = Sen jälkeen salaus jatkuu taustalla, kun käytät tietokonetta. Pidä tietokone kytkettynä virtaan. Keskeytys vain pysäyttää salauksen hetkeksi.
+settings-encryption-summary-chip = Siihen asti suojaussiru säilyttää palautusavainta, joten uudelleenkäynnistys ei kysy mitään.
+settings-encryption-summary-recovery-key = Siihen asti käynnistyksessä kysytään palautusavainta tunnuslauseen sijaan.
+# Button, verb: starts encrypting this computer
+settings-encryption-encrypt = Salaa
+settings-encryption-making-room = Tehdään tilaa…
 settings-encryption-unlocks-chip-pin = Lukitus avataan suojaussirulla ja PIN-koodilla
 settings-encryption-unlocks-chip = Lukitus avautuu itsestään suojaussirulla
 settings-encryption-unlocks-passphrase = Kysyy tunnuslausetta käynnistyksessä

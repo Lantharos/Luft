@@ -158,7 +158,35 @@ settings-usb-hold-back-description = Prijungti užrakinus laukia, kol atrakinsit
 ## Device encryption
 
 settings-encryption = Įrenginio šifravimas
-settings-encryption-not-encrypted = Išjungta, įjungti galima tik diegiant Luft
+settings-encryption-not-encrypted = Išjungta
+settings-encryption-not-encrypted-reinstall = Išjungta, o šį kompiuterį galima užšifruoti tik iš naujo įdiegus Luft
+# Button that opens the steps to encrypt this computer
+settings-encryption-turn-on = Įjungti
+settings-encryption-after-restart = Šifravimas prasidės iš naujo paleidus
+settings-encryption-encrypting = Šifruojama, atlikta { $percent }
+settings-encryption-encrypting-paused = Šifravimas pristabdytas ties { $percent }, kol kompiuteris bus prijungtas prie maitinimo
+# Button that takes back the request to encrypt before the computer restarts
+settings-encryption-dont-encrypt = Nešifruoti
+settings-encryption-turn-on-title = Užšifruoti šį kompiuterį
+settings-encryption-turn-on-blocked = Šio kompiuterio dabar neįmanoma užšifruoti
+settings-encryption-turn-on-description = Jūsų failai lieka ten, kur yra.
+settings-encryption-check-in-place = Luft gali užšifruoti savo skaidinį ten, kur jis yra.
+settings-encryption-check-not-in-place = Luft skaidinio negalima užšifruoti ten, kur jis yra. Įdiekite Luft iš naujo, kad jį užšifruotumėte.
+settings-encryption-check-plugged-in = Kompiuteris prijungtas prie maitinimo.
+settings-encryption-check-on-battery = Prijunkite kompiuterį prie maitinimo. Šifravimas trunka kurį laiką, o viduryje energija neturėtų pasibaigti.
+settings-encryption-save-key-title = Išsaugokite atkūrimo raktą
+settings-encryption-save-key-description = Laikykite jį kitur, ne šiame kompiuteryje.
+settings-encryption-unlock-title = Kaip atrakinama
+settings-encryption-unlock-chip = Saugos lustas atrakina diską savaime, kai paleidžiamas kompiuteris, jei niekas nepakeičia jo paleidimo būdo.
+settings-encryption-unlock-passphrase = Pasirinkite slaptafrazę, kurią įvesite kaskart paleidžiant kompiuterį.
+settings-encryption-ready-title = Paruošta šifruoti
+settings-encryption-summary-room = Luft dabar atlaisvina vietos savo skaidinyje, o šifravimas prasidės iš naujo paleidus.
+settings-encryption-summary-background = Vėliau šifruoja fone, kol naudojatės kompiuteriu. Laikykite jį prijungtą prie maitinimo. Pertrauka šifravimą tik pristabdo.
+settings-encryption-summary-chip = Kol nebaigta, saugos lustas saugo atkūrimo raktą, todėl paleidžiant iš naujo nieko neprašoma.
+settings-encryption-summary-recovery-key = Kol nebaigta, paleidžiant prašoma atkūrimo rakto, o ne jūsų slaptafrazės.
+# Button, verb: starts encrypting this computer
+settings-encryption-encrypt = Užšifruoti
+settings-encryption-making-room = Atlaisvinama vietos…
 settings-encryption-unlocks-chip-pin = Atrakinamas saugos lustu ir jūsų PIN kodu
 settings-encryption-unlocks-chip = Atrakinamas savaime saugos lustu
 settings-encryption-unlocks-passphrase = Paleidžiant prašoma jūsų slaptafrazės

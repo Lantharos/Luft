@@ -148,7 +148,35 @@ settings-usb-hold-back-description = Els que es connecten amb la sessió bloquej
 ## Device encryption
 
 settings-encryption = Xifratge del dispositiu
-settings-encryption-not-encrypted = Desactivat, i només es pot activar en instal·lar Luft
+settings-encryption-not-encrypted = Desactivat
+settings-encryption-not-encrypted-reinstall = Desactivat, i aquest ordinador només es pot xifrar instal·lant Luft de nou
+# Button that opens the steps to encrypt this computer
+settings-encryption-turn-on = Activa
+settings-encryption-after-restart = Comença a xifrar quan reinicieu
+settings-encryption-encrypting = S’està xifrant, { $percent } completat
+settings-encryption-encrypting-paused = S’està xifrant, en pausa al { $percent } fins que s’endolli l’ordinador
+# Button that takes back the request to encrypt before the computer restarts
+settings-encryption-dont-encrypt = No xifris
+settings-encryption-turn-on-title = Xifra aquest ordinador
+settings-encryption-turn-on-blocked = Ara mateix aquest ordinador no es pot xifrar
+settings-encryption-turn-on-description = Els fitxers es queden on són.
+settings-encryption-check-in-place = Luft pot xifrar la seva partició on és.
+settings-encryption-check-not-in-place = La partició de Luft no es pot xifrar on és. Torneu a instal·lar Luft per xifrar-la.
+settings-encryption-check-plugged-in = L’ordinador està endollat.
+settings-encryption-check-on-battery = Endolleu l’ordinador. Xifrar triga una estona i no s’hauria de quedar sense corrent a mitges.
+settings-encryption-save-key-title = Deseu la clau de recuperació
+settings-encryption-save-key-description = Guardeu-la en un lloc que no sigui aquest ordinador.
+settings-encryption-unlock-title = Com es desbloqueja
+settings-encryption-unlock-chip = El xip de seguretat desbloqueja el disc sol quan l’ordinador s’inicia, sempre que res no canviï com s’inicia.
+settings-encryption-unlock-passphrase = Trieu una frase de pas que escriureu cada vegada que s’iniciï l’ordinador.
+settings-encryption-ready-title = A punt per xifrar
+settings-encryption-summary-room = Luft fa lloc a la seva partició ara i comença a xifrar quan reinicieu.
+settings-encryption-summary-background = Després xifra en segon pla mentre feu servir l’ordinador. Mantingueu-lo endollat. Una interrupció només el posa en pausa.
+settings-encryption-summary-chip = Fins que acabi, el xip de seguretat guarda la clau de recuperació, de manera que reiniciar no demana res.
+settings-encryption-summary-recovery-key = Fins que acabi, en arrencar demana la clau de recuperació en lloc de la frase de pas.
+# Button, verb: starts encrypting this computer
+settings-encryption-encrypt = Xifra
+settings-encryption-making-room = Fent lloc…
 settings-encryption-unlocks-chip-pin = Es desbloqueja amb el xip de seguretat i el PIN
 settings-encryption-unlocks-chip = Es desbloqueja sol amb el xip de seguretat
 settings-encryption-unlocks-passphrase = Demana la frase de pas en arrencar

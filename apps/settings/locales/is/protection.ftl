@@ -148,7 +148,35 @@ settings-usb-hold-back-description = Tæki sem eru tengd á meðan tölvan er l�
 ## Device encryption
 
 settings-encryption = Dulritun tækis
-settings-encryption-not-encrypted = Slökkt, og aðeins er hægt að kveikja á því við uppsetningu Luft
+settings-encryption-not-encrypted = Slökkt
+settings-encryption-not-encrypted-reinstall = Slökkt, og aðeins er hægt að dulrita þessa tölvu með því að setja Luft upp aftur
+# Button that opens the steps to encrypt this computer
+settings-encryption-turn-on = Kveikja
+settings-encryption-after-restart = Byrjar að dulrita þegar þú endurræsir
+settings-encryption-encrypting = Dulritar, { $percent } lokið
+settings-encryption-encrypting-paused = Dulritar, hlé við { $percent } þar til tölvan er tengd við rafmagn
+# Button that takes back the request to encrypt before the computer restarts
+settings-encryption-dont-encrypt = Ekki dulrita
+settings-encryption-turn-on-title = Dulrita þessa tölvu
+settings-encryption-turn-on-blocked = Ekki er hægt að dulrita þessa tölvu núna
+settings-encryption-turn-on-description = Skrárnar þínar verða þar sem þær eru.
+settings-encryption-check-in-place = Luft getur dulritað disksneiðina sína þar sem hún er.
+settings-encryption-check-not-in-place = Ekki er hægt að dulrita disksneið Luft þar sem hún er. Settu Luft upp aftur til að dulrita hana.
+settings-encryption-check-plugged-in = Tölvan er tengd við rafmagn.
+settings-encryption-check-on-battery = Tengdu tölvuna við rafmagn. Dulritun tekur nokkra stund og tölvan ætti ekki að verða rafmagnslaus á miðri leið.
+settings-encryption-save-key-title = Vistaðu endurheimtarlykilinn
+settings-encryption-save-key-description = Geymdu hann annars staðar en á þessari tölvu.
+settings-encryption-unlock-title = Hvernig diskurinn opnast
+settings-encryption-unlock-chip = Öryggiskubburinn opnar diskinn sjálfkrafa þegar tölvan ræsist, svo lengi sem ekkert breytir því hvernig hún ræsist.
+settings-encryption-unlock-passphrase = Veldu lykilsetningu til að slá inn í hvert sinn sem tölvan ræsist.
+settings-encryption-ready-title = Tilbúið til að dulrita
+settings-encryption-summary-room = Luft býr núna til pláss á disksneiðinni sinni og byrjar að dulrita þegar þú endurræsir.
+settings-encryption-summary-background = Síðan dulritar það í bakgrunni á meðan þú notar tölvuna. Hafðu hana í sambandi. Truflun setur það aðeins á bið.
+settings-encryption-summary-chip = Þar til það er búið geymir öryggiskubburinn endurheimtarlykilinn, svo endurræsing biður ekki um neitt.
+settings-encryption-summary-recovery-key = Þar til það er búið biður það um endurheimtarlykilinn við ræsingu í stað lykilsetningarinnar þinnar.
+# Button, verb: starts encrypting this computer
+settings-encryption-encrypt = Dulrita
+settings-encryption-making-room = Býr til pláss…
 settings-encryption-unlocks-chip-pin = Opnast með öryggiskubbnum og PIN-númerinu þínu
 settings-encryption-unlocks-chip = Opnast sjálfkrafa með öryggiskubbnum
 settings-encryption-unlocks-passphrase = Biður um lykilsetninguna þína við ræsingu

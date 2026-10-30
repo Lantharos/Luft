@@ -248,7 +248,6 @@ setup-protect-passphrase-label = Passphrase
 setup-protect-repeat = Erneut eingeben
 setup-protect-mismatch = Sie stimmen nicht überein
 setup-protect-kept = Ich habe meinen Wiederherstellungsschlüssel aufbewahrt
-setup-protect-only-now = Die Verschlüsselung lässt sich nur jetzt einschalten, während Luft installiert wird.
 setup-protect-skip = Nicht verschlüsseln
 setup-protect-encrypt = Verschlüsseln
 

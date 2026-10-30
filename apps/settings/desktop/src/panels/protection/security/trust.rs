@@ -63,11 +63,25 @@ enum UnlockMethod {
     SecurityKey,
 }
 
+#[derive(Serialize, Deserialize, Default, Type)]
+#[serde(rename_all = "kebab-case")]
+enum EncryptingState {
+    #[default]
+    No,
+    AfterRestart,
+    Encrypting,
+    Waiting,
+}
+
 #[derive(Serialize, Default, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Disk {
     device: String,
     encrypted: bool,
+    encrypting: EncryptingState,
+    progress: f64,
+    can_encrypt: bool,
+    tpm_unlocks: bool,
     unlock: Vec<UnlockMethod>,
     recovery_key_stored: bool,
     tpm_refused: bool,
@@ -166,6 +180,10 @@ fn disk(map: &Map) -> Disk {
     Disk {
         device: text(map, "Device"),
         encrypted: flag(map, "Encrypted"),
+        encrypting: parse(text(map, "Encrypting")).unwrap_or_default(),
+        progress: get(map, "Progress").unwrap_or_default(),
+        can_encrypt: flag(map, "CanEncrypt"),
+        tpm_unlocks: flag(map, "TpmUnlocks"),
         unlock: get::<Vec<String>>(map, "Unlock")
             .unwrap_or_default()
             .into_iter()

@@ -5,6 +5,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include <systemd/sd-login.h>
+
 #include <meta/display.h>
 #include <meta/util.h>
 #include <meta/window.h>
@@ -374,6 +376,76 @@ get_app_from_window_pid (ShellWindowTracker  *tracker,
   return result;
 }
 
+static char *
+unescape_unit_name (const char *name)
+{
+  GString *unescaped = g_string_sized_new (strlen (name));
+
+  for (; *name; name++)
+    {
+      if (name[0] == '\\' && name[1] == 'x' && g_ascii_isxdigit (name[2]) && g_ascii_isxdigit (name[3]))
+        {
+          g_string_append_c (unescaped, g_ascii_xdigit_value (name[2]) * 16 + g_ascii_xdigit_value (name[3]));
+          name += 3;
+        }
+      else
+        {
+          g_string_append_c (unescaped, *name);
+        }
+    }
+
+  return g_string_free (unescaped, FALSE);
+}
+
+/*
+ * get_app_from_window_scope:
+ * @window: a #MetaWindow
+ *
+ * Finds the app whose systemd scope the window's process runs in, named
+ * app-[LAUNCHER-]APP-ID-RANDOM.scope as the XDG convention has it, for
+ * apps that don't name themselves after their .desktop file.
+ *
+ * Return value: (transfer full): A newly-referenced #ShellApp, or %NULL
+ */
+static ShellApp *
+get_app_from_window_scope (MetaWindow *window)
+{
+  g_autofree char *unit = NULL;
+  g_autofree char *named = NULL;
+  g_autofree char *id = NULL;
+  ShellApp *app;
+  const char *launched;
+  char *end;
+  pid_t pid;
+
+  if (meta_window_is_remote (window))
+    return NULL;
+
+  pid = meta_window_get_pid (window);
+  if (pid < 1 || sd_pid_get_user_unit (pid, &unit) < 0 || !g_str_has_prefix (unit, "app-"))
+    return NULL;
+
+  end = strchr (unit, '@');
+  if (end == NULL)
+    end = strrchr (unit, '-');
+  if (end == NULL || end < unit + strlen ("app-"))
+    return NULL;
+
+  named = g_strndup (unit + strlen ("app-"), end - unit - strlen ("app-"));
+  id = unescape_unit_name (named);
+  app = get_app_from_id (window, id);
+  if (app != NULL)
+    return app;
+
+  launched = strchr (named, '-');
+  if (launched == NULL)
+    return NULL;
+
+  g_free (id);
+  id = unescape_unit_name (launched + 1);
+  return get_app_from_id (window, id);
+}
+
 /**
  * get_app_for_window:
  *
@@ -465,6 +537,9 @@ get_app_for_window (ShellWindowTracker    *tracker,
    */
   if (result == NULL)
     result = get_app_from_window_group (tracker, window);
+
+  if (result == NULL)
+    result = get_app_from_window_scope (window);
 
   /* Our last resort - we create a fake app from the window */
   if (result == NULL)

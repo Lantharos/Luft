@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Sun, 18 Oct 2026 14:32:37 +0200
-Subject: [PATCH 39/54] backends: tell the shell before a monitor turns
+Subject: [PATCH 39/55] backends: tell the shell before a monitor turns
 
 Emit MetaMonitorManager::rotating for each monitor whose transform a new
 configuration changes, before the configuration is applied. The screen

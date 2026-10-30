@@ -1,4 +1,5 @@
 import Clutter from 'gi://Clutter';
+import Gio from 'gi://Gio';
 import Meta from 'gi://Meta';
 import St from 'gi://St';
 import {toggleSurface, Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
@@ -11,10 +12,13 @@ import {capture, captureFrame, type Area} from '../lib/screenshots.js';
 import {nextFrame, settled} from '../lib/wait.js';
 
 const {require, eventually} = checks('tiled');
+const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 const COLOR = '#bf3070';
 const TOLERANCE = 12;
 const DRAG_STEPS = 16;
 const GRAB_HEIGHT = 16;
+// Past the outline floating windows keep, but inside where a rounded corner would cut
+const OUTLINE_INSET = 3;
 const EDGES = [
   [Meta.Direction.TOP, 'top'],
   [Meta.Direction.RIGHT, 'right'],
@@ -27,12 +31,12 @@ const THIRDS: Point = [0, 2];
 const flags = (names: string[]) => EDGES.filter(([, name]) => names.includes(name)).reduce((all, [flag]) => all | flag, 0);
 const reported = (window: Meta.Window) => window.get_title().split(': ')[1];
 
-async function cornersSquare(window: Meta.Window) {
+async function cornersSquare(window: Meta.Window, inset = 0) {
   const frame = window.get_frame_rect();
   const shot = await captureFrame(frame);
-  const right = frame.width - 1;
-  const bottom = frame.height - 1;
-  return [[0, 0], [right, 0], [0, bottom], [right, bottom]].map(([x, y]) => shot.near(x, y, COLOR, TOLERANCE));
+  const right = frame.width - 1 - inset;
+  const bottom = frame.height - 1 - inset;
+  return [[inset, inset], [right, inset], [inset, bottom], [right, bottom]].map(([x, y]) => shot.near(x, y, COLOR, TOLERANCE));
 }
 
 async function expectTiled(window: Meta.Window, names: string[], how: string) {
@@ -120,6 +124,19 @@ async function checkKeyboardMove(window: Meta.Window, backend: string) {
   press(Clutter.KEY_Return);
 }
 
+async function checkSquareCorners(window: Meta.Window) {
+  kestrel.set_boolean('rounded-window-corners', false);
+  try {
+    await eventually(() => reported(window) === 'top right bottom left',
+      'with rounded corners off, a floating window is told it is tiled, so it draws square corners');
+    await settled();
+    require((await cornersSquare(window, OUTLINE_INSET)).every(Boolean), 'and its own corners are square');
+  } finally {
+    kestrel.reset('rounded-window-corners');
+  }
+  await eventually(() => reported(window) === 'floating', 'turning rounded corners back on makes it floating again');
+}
+
 async function checkBackend(backend: string) {
   const client = gjs('clients/windows/tiledWindow.js', [], {env: {GDK_BACKEND: backend}});
   const window = await waitForWindow(candidate => candidate.get_title()?.startsWith(`Kestrel tiled ${backend}:`));
@@ -127,6 +144,7 @@ async function checkBackend(backend: string) {
     window.move_to_monitor(global.display.get_primary_monitor());
     const area = Main.layoutManager.getWorkAreaForMonitor(window.get_monitor());
     await eventually(() => reported(window) === 'floating', `a new ${backend} window floats`);
+    if (backend === 'wayland') await checkSquareCorners(window);
     await checkLayouts(window, backend);
     await checkCorner(window, backend, area);
     await checkKeyboardMove(window, backend);

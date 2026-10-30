@@ -1,0 +1,164 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Fri, 30 Oct 2026 15:16:36 +0100
+Subject: [PATCH 55/55] wayland: tell floating windows they are tiled while
+ corners are square
+
+With Kestrel's rounded corners off, the compositor squares the windows it
+rounds itself, but toolkits that draw their own corners and shadow, such
+as GTK, libadwaita, Chromium and Electron, kept theirs round. Report
+floating Wayland windows as tiled on every edge while corners are square,
+which is what makes those toolkits draw square corners without a shadow
+of their own, and give them the compositor's shadow instead. They aren't
+reported as constrained, so they keep their resize edges.
+
+When the setting changes, Wayland windows get their states again.
+
+Upstream-Status: luft-only follows Kestrel's rounded corners setting
+---
+ src/compositor/compositor.c          |  4 ++++
+ src/compositor/meta-window-corners.c | 13 +++++++++++++
+ src/compositor/meta-window-corners.h |  1 +
+ src/wayland/meta-wayland-xdg-shell.c | 11 +++++++----
+ src/wayland/meta-window-wayland.c    |  9 +++++++++
+ src/wayland/meta-window-wayland.h    |  2 ++
+ 6 files changed, 36 insertions(+), 4 deletions(-)
+
+diff --git a/src/compositor/compositor.c b/src/compositor/compositor.c
+index 49c17af0f12342247228b27f4af1072520541b3d..4daa9076c26084a218f47f1501de96822573edc7 100644
+--- a/src/compositor/compositor.c
++++ b/src/compositor/compositor.c
+@@ -73,6 +73,7 @@
+ #include "meta/prefs.h"
+ #include "meta/window.h"
+ #include "wayland/meta-wayland-private.h"
++#include "wayland/meta-window-wayland.h"
+ 
+ #ifdef HAVE_XWAYLAND
+ #include <X11/extensions/Xcomposite.h>
+@@ -1263,7 +1264,10 @@ on_rounded_corners_changed (MetaCompositor *compositor)
+   for (l = priv->windows; l; l = l->next)
+     {
+       MetaWindowActor *window_actor = l->data;
++      MetaWindow *window = meta_window_actor_get_meta_window (window_actor);
+ 
++      if (META_IS_WINDOW_WAYLAND (window))
++        meta_window_wayland_refresh_states (window);
+ #ifdef HAVE_XWAYLAND
+       if (META_IS_WINDOW_ACTOR_X11 (window_actor))
+         meta_window_actor_x11_update_shape (META_WINDOW_ACTOR_X11 (window_actor));
+diff --git a/src/compositor/meta-window-corners.c b/src/compositor/meta-window-corners.c
+index d55efef771d0bfa505b2a47b2012fdf76ad98dfd..c2ae1746a2b3d876be0bb815165758957b2a4f62 100644
+--- a/src/compositor/meta-window-corners.c
++++ b/src/compositor/meta-window-corners.c
+@@ -10,6 +10,7 @@
+ #include "core/window-private.h"
+ #include "meta/meta-window-actor.h"
+ #include "meta/window.h"
++#include "wayland/meta-window-wayland.h"
+ 
+ static gboolean corners_rounded = TRUE;
+ 
+@@ -63,6 +64,15 @@ meta_window_has_rounded_corners (MetaWindow *window)
+   return corners_rounded && is_floating (window);
+ }
+ 
++/* Whether @window should draw square corners of its own: with rounded
++ * corners off, floating windows are told they are tiled, which is what
++ * makes toolkits that round their own corners draw them square */
++gboolean
++meta_window_corners_square_client (MetaWindow *window)
++{
++  return !corners_rounded && is_floating (window);
++}
++
+ static gboolean
+ is_outlined (MetaWindow *window)
+ {
+@@ -134,6 +144,9 @@ meta_window_corners_casts_shadow (MetaWindow *window)
+ {
+   MtkRectangle frame, buffer;
+ 
++  if (META_IS_WINDOW_WAYLAND (window) && meta_window_corners_square_client (window))
++    return TRUE;
++
+   meta_window_get_frame_rect (window, &frame);
+   meta_window_get_buffer_rect (window, &buffer);
+   return mtk_rectangle_contains_rect (&frame, &buffer);
+diff --git a/src/compositor/meta-window-corners.h b/src/compositor/meta-window-corners.h
+index bb876637970b91c37a1a5001b7277a96928491b6..d2ad05b9edffccea5da2a89c1e3935611e6f347e 100644
+--- a/src/compositor/meta-window-corners.h
++++ b/src/compositor/meta-window-corners.h
+@@ -26,6 +26,7 @@ MetaWindowCorners meta_window_corners_for_actor (ClutterActor *actor);
+ gboolean meta_window_corners_get_outline (MetaWindowActor *window_actor,
+                                           graphene_rect_t *bounds);
+ gboolean meta_window_corners_casts_shadow (MetaWindow *window);
++gboolean meta_window_corners_square_client (MetaWindow *window);
+ void meta_window_corners_paint_outline (CoglFramebuffer       *framebuffer,
+                                         const graphene_rect_t *bounds,
+                                         guint8                 opacity);
+diff --git a/src/wayland/meta-wayland-xdg-shell.c b/src/wayland/meta-wayland-xdg-shell.c
+index d72cc6229e199b1bb1e1a40f81e982c06a738f12..2eecdd428f91c6d0c8aa1b4bf808fd2432ee415b 100644
+--- a/src/wayland/meta-wayland-xdg-shell.c
++++ b/src/wayland/meta-wayland-xdg-shell.c
+@@ -25,6 +25,7 @@
+ 
+ #include "backends/meta-logical-monitor-private.h"
+ #include "compositor/compositor-private.h"
++#include "compositor/meta-window-corners.h"
+ #include "core/boxes-private.h"
+ #include "core/meta-window-config-private.h"
+ #include "core/window-private.h"
+@@ -742,13 +743,15 @@ fill_states (MetaWaylandXdgToplevel         *xdg_toplevel,
+   if (wl_resource_get_version (xdg_toplevel->resource) >=
+       XDG_TOPLEVEL_STATE_TILED_LEFT_SINCE_VERSION)
+     {
+-      if (window->edge_constraints.top != META_EDGE_CONSTRAINT_NONE)
++      gboolean square = meta_window_corners_square_client (window);
++
++      if (square || window->edge_constraints.top != META_EDGE_CONSTRAINT_NONE)
+         add_state_value (states, XDG_TOPLEVEL_STATE_TILED_TOP);
+-      if (window->edge_constraints.right != META_EDGE_CONSTRAINT_NONE)
++      if (square || window->edge_constraints.right != META_EDGE_CONSTRAINT_NONE)
+         add_state_value (states, XDG_TOPLEVEL_STATE_TILED_RIGHT);
+-      if (window->edge_constraints.bottom != META_EDGE_CONSTRAINT_NONE)
++      if (square || window->edge_constraints.bottom != META_EDGE_CONSTRAINT_NONE)
+         add_state_value (states, XDG_TOPLEVEL_STATE_TILED_BOTTOM);
+-      if (window->edge_constraints.left != META_EDGE_CONSTRAINT_NONE)
++      if (square || window->edge_constraints.left != META_EDGE_CONSTRAINT_NONE)
+         add_state_value (states, XDG_TOPLEVEL_STATE_TILED_LEFT);
+     }
+ 
+diff --git a/src/wayland/meta-window-wayland.c b/src/wayland/meta-window-wayland.c
+index 8e75e288b5da5dbcfcdc1bfb6683ef04c4d0a57e..c5f33b8e3c6c67ecaccd8150818bc60ac29c2b5c 100644
+--- a/src/wayland/meta-window-wayland.c
++++ b/src/wayland/meta-window-wayland.c
+@@ -308,6 +308,15 @@ surface_state_changed (MetaWindow *window)
+   meta_window_wayland_configure (wl_window, configuration);
+ }
+ 
++void
++meta_window_wayland_refresh_states (MetaWindow *window)
++{
++  if (window->placement.rule)
++    return;
++
++  surface_state_changed (window);
++}
++
+ static void
+ meta_window_wayland_grab_op_began (MetaWindow *window,
+                                    MetaGrabOp  op)
+diff --git a/src/wayland/meta-window-wayland.h b/src/wayland/meta-window-wayland.h
+index 38e17b2462f89f4e15e2ae1654f51814346972b1..ab7600482847a7a3abcf08e5e9052cf31137d2ef 100644
+--- a/src/wayland/meta-window-wayland.h
++++ b/src/wayland/meta-window-wayland.h
+@@ -54,6 +54,8 @@ MetaWaylandWindowConfiguration *
+   meta_window_wayland_peek_configuration (MetaWindowWayland *wl_window,
+                                           uint32_t           serial);
+ 
++void meta_window_wayland_refresh_states (MetaWindow *window);
++
+ void meta_window_wayland_configure (MetaWindowWayland              *wl_window,
+                                     MetaWaylandWindowConfiguration *configuration);
+ 

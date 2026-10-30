@@ -30,6 +30,6 @@ bun run deploy       # builds, then uploads dist/ to luft.computer
 
 ## Pictures and clips
 
-Screenshots in `src/assets/shots` and the clip in `src/assets/clips` are captured from headless Kestrel sessions at twice the screen's density. A screenshot with both a `-dark` and a `-light` version follows the visitor's style; one with only `-dark` is shown either way. Astro turns them into AVIF and WebP at several widths when building.
+Screenshots in `src/assets/shots` and the clip in `src/assets/clips` are captured from headless Kestrel sessions at twice the screen's density: a virtual monitor with a physical size, such as `KESTREL_CAPTURE_SIZE=3840x2400:443x277mm`, starts at 200%. A screenshot with both a `-dark` and a `-light` version follows the visitor's style; one with only `-dark` is shown either way. Astro turns them into AVIF and WebP at several widths when building.
 
 Wallpapers come straight from `os/image/files/usr/share/backgrounds/luft`, with their photographers credited in the footer.

@@ -76,9 +76,9 @@ pub async fn set_startup(
         return Err("This volume has no identifier to mount it by".to_owned());
     }
     let options = if read_only {
-        "nofail,x-gvfs-show,ro"
+        "nofail,x-gvfs-show,x-mount.mkdir,ro"
     } else {
-        "nofail,x-gvfs-show"
+        "nofail,x-gvfs-show,x-mount.mkdir"
     };
     let mut entry: HashMap<&str, Variant> = HashMap::new();
     entry.insert("fsname", Variant::from(text_bytes(&format!("UUID={uuid}"))));

@@ -30,6 +30,7 @@ fn command(app: &App, arguments: Vec<String>) -> Result<Command, String> {
     let mut command = Command::new(&app.image);
     command
         .env("DESKTOPINTEGRATION", "1")
+        .env("CHROME_DESKTOP", format!("{}.desktop", app.id))
         .env(SABINE_FULL_ACCESS, "1")
         .env("XDG_CONFIG_HOME", data.join(".config"))
         .env("XDG_DATA_HOME", data.join(".local/share"))

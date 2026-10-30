@@ -1,0 +1,37 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <imeri@lanth.me>
+Date: Fri, 30 Oct 2026 21:40:00 +0100
+Subject: [PATCH] composefs: Replace a staged UKI's boot entries instead of
+ adding to them
+
+Staging a UKI deployment wrote its entries into loader/entries.staged
+next to whatever an earlier staged deployment left there. The entry's
+file name carries the version, so staging a newer image over a staged
+one of another version kept the old entry. Status then listed that
+deployment without counting it as staged or rollback, garbage
+collection dropped its image's tag and objects while its entry and
+state stayed, and every later status failed to open its manifest.
+
+Remove the staged entries before writing the new ones, as Type 1
+entries for a kernel and initrd already do.
+---
+ crates/lib/src/bootc_composefs/boot.rs | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/crates/lib/src/bootc_composefs/boot.rs b/crates/lib/src/bootc_composefs/boot.rs
+index e8aa73f..818f24e 100644
+--- a/crates/lib/src/bootc_composefs/boot.rs
++++ b/crates/lib/src/bootc_composefs/boot.rs
+@@ -1897,6 +1897,9 @@ fn write_systemd_uki_config(
+         }
+ 
+         BootSetupType::Upgrade((_, booted_cfs, ..)) => {
++            esp_dir
++                .remove_all_optional(TYPE1_ENT_PATH_STAGED)
++                .with_context(|| format!("Removing {TYPE1_ENT_PATH_STAGED}"))?;
+             esp_dir
+                 .create_dir_all(TYPE1_ENT_PATH_STAGED)
+                 .with_context(|| format!("Creating {TYPE1_ENT_PATH_STAGED}"))?;
+-- 
+2.53.0
+

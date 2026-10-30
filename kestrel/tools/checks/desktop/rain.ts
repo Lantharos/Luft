@@ -1,7 +1,7 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 
-import {named} from '../lib/actors.js';
+import {descendants} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {hold, press, release} from '../lib/input/input.js';
 import {stopAll} from '../lib/processes.js';
@@ -11,11 +11,16 @@ const {eventually} = checks('rain');
 const settings = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 const KEYS = ['rain', 'rain-visible', 'rain-sound'];
 
+function primarySheet() {
+  const monitor = global.display.get_monitor_geometry(global.display.get_primary_monitor());
+  return descendants(global.stage).find(actor => actor.name === 'kestrel-rain' && actor.x === monitor.x && actor.y === monitor.y);
+}
+
 const raining = () => {
-  const sheet = named('kestrel-rain');
+  const sheet = primarySheet();
   return !!sheet?.visible && sheet.opacity === 255;
 };
-const dry = () => !named('kestrel-rain')?.visible;
+const dry = () => !primarySheet()?.visible;
 
 // Super+number slides between workspaces like people switch
 async function activate(index: number) {

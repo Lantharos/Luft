@@ -69,3 +69,7 @@ pub fn reset(location: &Location, key: &str) -> Result<(), String> {
     gio::Settings::sync();
     Ok(())
 }
+
+pub fn follow_time_locale() {
+    unsafe { libc::setlocale(libc::LC_TIME, c"".as_ptr()) };
+}

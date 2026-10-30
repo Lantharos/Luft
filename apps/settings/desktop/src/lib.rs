@@ -21,6 +21,7 @@ pub fn run() {
 }
 
 fn run_app() -> ! {
+    gsettings::follow_time_locale();
     let events = Events::default();
     let watcher = Watcher::start();
     luft_app::run(

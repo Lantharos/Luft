@@ -49,6 +49,11 @@ gstreamer1-plugin-libav
 gstreamer1-plugins-bad-free
 gstreamer1-plugins-good
 gtk4
+gvfs
+gvfs-fuse
+gvfs-mtp
+gvfs-nfs
+gvfs-smb
 hicolor-icon-theme
 ibus
 ibus-gtk4

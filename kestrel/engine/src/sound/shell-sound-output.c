@@ -37,6 +37,7 @@ struct _ShellSoundOutput
   struct spa_hook core_listener;
   struct spa_hook stream_listener;
   struct spa_source *idle_timer;
+  gboolean idle_armed;
 
   GArray *voices;
   gboolean active;
@@ -141,12 +142,13 @@ on_process (void *data)
   block->chunk->size = frames * stride;
   pw_stream_queue_buffer (output->stream, buffer);
 
-  if (output->voices->len == 0)
+  if (output->voices->len == 0 && !output->idle_armed)
     {
       struct timespec timeout = { 0, IDLE_TIMEOUT_NS };
 
       pw_loop_update_timer (pw_thread_loop_get_loop (output->loop),
                             output->idle_timer, &timeout, NULL, false);
+      output->idle_armed = TRUE;
     }
 }
 
@@ -156,6 +158,7 @@ on_idle (void     *data,
 {
   ShellSoundOutput *output = data;
 
+  output->idle_armed = FALSE;
   if (output->voices->len > 0 || !output->stream)
     return;
 

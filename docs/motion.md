@@ -137,7 +137,7 @@ offset.to(0, { velocity: releaseSpeed, spring: Spring.thrown });
 
 A few helpers cover the rest:
 
-- `selectionPill()` attaches to a sidebar's list and slides one highlight to the item marked `aria-current="page"`, so selected items need no background of their own.
+- `selectionPill()` attaches to a sidebar's list and slides one highlight to the item marked `aria-current="page"`, taking that item's size and corner radius, so selected items need no background of their own.
 - The `progress-fill` class draws a progress bar's fill from `--progress`, between 0 and 1, and moves it with a translation on `smooth` instead of changing its width.
 - `springTiming(Spring.snappy)` gives Web Animations the timing of a spring from rest, for one-off animations such as a panel that changes size.
 

@@ -28,6 +28,7 @@ export function selectionPill(selector = '[aria-current="page"]'): Attachment<HT
 			pill.style.left = `${box.left - bounds.left + list.scrollLeft}px`;
 			pill.style.width = `${box.width}px`;
 			pill.style.height = `${box.height}px`;
+			pill.style.borderRadius = getComputedStyle(item).borderRadius;
 			if (animate && shown) void offset.to(top);
 			else offset.set(top);
 			shown = true;

@@ -12,12 +12,17 @@
 		trailing?: Snippet;
 	}
 
-	let { icon: Icon, label, active = false, dropping = false, spinning = false, detail, trailing, class: className, ...rest }: Props =
+	let { icon: Icon, label, active = false, dropping = false, spinning = false, detail, trailing, class: className, onclick, ...rest }: Props =
 		$props();
+
+	function click(event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }) {
+		if (event.detail > 0) event.currentTarget.blur();
+		onclick?.(event);
+	}
 </script>
 
 <div class={['sidebar-item', active && 'is-active', dropping && 'is-drop-target', className]}>
-	<button class="sidebar-item__main" type="button" aria-current={active ? 'page' : undefined} {...rest}>
+	<button class="sidebar-item__main" type="button" aria-current={active ? 'page' : undefined} {...rest} onclick={click}>
 		<Icon size={18} class={spinning ? 'animate-spin' : ''} />
 		<span class="sidebar-item__text">
 			<span class="truncate">{label}</span>

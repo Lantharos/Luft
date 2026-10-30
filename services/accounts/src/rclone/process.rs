@@ -82,6 +82,7 @@ impl Process {
                 "--config=/notfound",
                 "--log-level=INFO",
                 "--use-mmap",
+                "--default-time=1970-01-01T00:00:00Z",
             ])
             .arg(format!("--cache-dir={}", self.cache.display()))
             .stdin(Stdio::null())

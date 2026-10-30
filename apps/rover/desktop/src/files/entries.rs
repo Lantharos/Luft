@@ -206,6 +206,7 @@ pub(crate) fn file_entry(path: &Path) -> std::io::Result<FileEntry> {
             .modified()
             .ok()
             .and_then(|time| time.duration_since(SystemTime::UNIX_EPOCH).ok())
+            .filter(|duration| !duration.is_zero())
             .map(|duration| duration.as_secs() as i64),
         mime_type,
         extension: is_file

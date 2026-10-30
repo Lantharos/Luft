@@ -6,8 +6,9 @@ import {dismissImmediately, Spring, toggleSurface} from 'resource:///com/lanthar
 
 import {named} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
+import {hold} from '../lib/frameClock.js';
 import {beyond, boxOf, farSide, nearSide, slideProperty, towardEdge} from '../lib/edge.js';
-import {nextFrame, pause, settled, waitUntil} from '../lib/wait.js';
+import {pause, settled, waitUntil} from '../lib/wait.js';
 
 const {require} = checks('motion');
 type Surface = Parameters<typeof toggleSurface>[0];
@@ -35,14 +36,15 @@ async function checkInterruptedSurface(surface: Surface, name: string) {
   await settled();
   const actor = named(name)!;
   toggleSurface(surface);
-  require(actor.get_transition(slideProperty())!.duration < Spring.snappy.duration * 2,
-    `${surface} stops repainting soon after its slide stops moving`);
-  await pause(80);
-  await nextFrame();
+  const opening = hold([actor.get_transition(slideProperty())!]);
+  require(opening.duration < Spring.snappy.duration * 2, `${surface} stops repainting soon after its slide stops moving`);
+  opening.step(5);
   const before = towardEdge(actor);
   toggleSurface(surface);
+  const closing = hold([actor.get_transition(slideProperty())!]);
   const offsets: number[] = [];
-  await sample(actor, 3, () => offsets.push(towardEdge(actor)));
+  closing.step(3, () => offsets.push(towardEdge(actor)));
+  closing.release();
   require(offsets.some(offset => offset > before), `${surface} starts back toward the taskbar at once when closed 80 ms into opening`);
   await waitUntil(() => !actor.visible && resting(actor), `${surface} hides after closing mid-way`, 2000);
 
@@ -128,17 +130,17 @@ async function checkRetarget() {
   const actor = testActor();
   try {
     actor.ease({translation_x: 600, spring: Spring.smooth});
-    await pause(90);
-    await nextFrame();
+    hold([springOf(actor)]).step(6);
     const moving = springOf(actor).get_velocity();
     const position = actor.translation_x;
     require(moving > 0 && position > 0 && position < 600, 'a spring is under way');
     actor.ease({translation_x: 0, spring: Spring.smooth});
     const reversed = springOf(actor);
     require(Math.abs(reversed.velocity - moving) < 1, 'a spring replacing another starts with its velocity');
-    await nextFrame();
-    await nextFrame();
+    const returning = hold([reversed]);
+    returning.step(2);
     require(actor.translation_x > position, 'the replaced spring keeps moving forward before it turns back');
+    returning.release();
     await waitUntil(() => !actor.get_transition('translation-x'), 'the reversed spring settles', 2000);
     require(actor.translation_x === 0, 'the reversed spring ends at its new target');
   } finally {

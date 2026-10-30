@@ -7,6 +7,7 @@ import {openBoardWindow} from '../board/lib/board.js';
 import {touchpad} from '../board/lib/touchpad.js';
 import {existing} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
+import {hold} from '../lib/frameClock.js';
 import {stop, waitForWindow} from '../lib/processes.js';
 import {nextFrame, pause, settled, waitUntil} from '../lib/wait.js';
 
@@ -42,24 +43,30 @@ async function settledOn(index: number, label: string) {
   await settled();
 }
 
+const holdSlides = () => hold(animation().currentSwitch!.monitors.map(group => group.get_transition('progress')!));
+
+function switchMidWay(toward: number, instead: number) {
+  const path = [visibleWorkspace()];
+  const record = () => path.push(visibleWorkspace());
+  switchWorkspace(toward);
+  const first = holdSlides();
+  first.step(5, record);
+  switchWorkspace(instead);
+  const second = holdSlides();
+  while (!second.done) second.step(1, record);
+  second.release();
+  return {path, duration: first.duration};
+}
+
 async function checkWorkspaceSwitches() {
-  const stopWatching = watchFrames(visibleWorkspace);
-  switchWorkspace(1);
-  const slide = animation().currentSwitch!.monitors[0].get_transition('progress')!;
-  require(slide.duration < Spring.snappy.duration * 2, 'a workspace switch settles on the snappy spring');
-  await pause(80);
-  switchWorkspace(0);
+  let {path, duration} = switchMidWay(1, 0);
+  require(duration < Spring.snappy.duration * 2, 'a workspace switch settles on the snappy spring');
   await settledOn(0, 'switching back mid-way ends on the first workspace');
-  let path = stopWatching();
   require(path.some(index => index > 0.05) && !jumps(path),
     'switching back mid-way turns around without jumping');
 
-  const chained = watchFrames(visibleWorkspace);
-  switchWorkspace(1);
-  await pause(80);
-  switchWorkspace(2);
+  ({path} = switchMidWay(1, 2));
   await settledOn(2, 'a second switch mid-way carries on to the third workspace');
-  path = chained();
   require(!jumps(path) && path.every((index, i) => i === 0 || index >= path[i - 1] - 0.01),
     'chained switches flow across without jumping back');
   switchWorkspace(0);

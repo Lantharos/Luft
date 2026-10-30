@@ -16,11 +16,17 @@ pub enum Peer {
 
 pub struct Verifier {
     daemon: PathBuf,
+    at_start: Option<(u64, u64)>,
+}
+
+fn identity(metadata: &fs::Metadata) -> (u64, u64) {
+    (metadata.dev(), metadata.ino())
 }
 
 impl Verifier {
     pub fn new(daemon: PathBuf) -> Self {
-        Self { daemon }
+        let at_start = fs::metadata(&daemon).ok().map(|metadata| identity(&metadata));
+        Self { daemon, at_start }
     }
 
     pub fn identify(&self, socket: RawFd) -> Peer {
@@ -86,8 +92,9 @@ impl Verifier {
         let running = open_at(Some(&process), "exe", libc::O_PATH)
             .and_then(|exe| File::from(exe).metadata().ok())
             .ok_or("its program can't be read")?;
+        let running = identity(&running);
         check(
-            running.dev() == binary.dev() && running.ino() == binary.ino(),
+            running == identity(&binary) || Some(running) == self.at_start,
             "it isn't the keyring program",
         )?;
 

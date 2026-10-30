@@ -30,7 +30,7 @@ import { band, isVertical, type Edge } from '../../shared/layout/edge.js';
 const KEYS_APP = 'com.lantharos.keys.desktop';
 const RESIZE_DURATION = 240;
 const SHAPE_KEYS: TaskbarKey[] = ['taskbar-style', 'taskbar-size'];
-const LOOK_KEYS: TaskbarKey[] = ['taskbar-look', 'taskbar-style', 'taskbar-size', 'pure-black'];
+const LOOK_KEYS: TaskbarKey[] = ['taskbar-look', 'taskbar-style', 'taskbar-size', 'pure-black', 'rounded-window-corners'];
 const APP_KEYS: TaskbarKey[] = ['taskbar-show-pinned', 'taskbar-windows-per-display', 'taskbar-windows-per-workspace'];
 
 function showLayout(keys: Shell.App, layout: string): void {

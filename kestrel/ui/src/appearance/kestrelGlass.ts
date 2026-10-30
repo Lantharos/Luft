@@ -39,9 +39,8 @@ export function setSolidSurfaces(enabled: boolean): void {
 }
 
 function followCorners({ actor, effect, corners }: Backdrop): void {
-  const squared = square && corners !== PILL;
-  effect.set_property('corner-radius', squared ? 0 : corners);
-  toggleStyleClass(actor, 'kestrel-square-surface', squared);
+  effect.set_property('corner-radius', square ? 0 : corners);
+  toggleStyleClass(actor, 'kestrel-square-surface', square);
 }
 
 export function setSquareSurfaces(enabled: boolean): void {

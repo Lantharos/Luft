@@ -36,7 +36,7 @@ export const STRIP_HEIGHT = 24;
 
 const KEYS = ['taskbar-position', 'taskbar-alignment', 'taskbar-look', 'taskbar-style', 'taskbar-size', 'taskbar-auto-hide', 'taskbar-show-pinned',
   'taskbar-displays', 'taskbar-windows-per-display', 'taskbar-windows-per-workspace', 'taskbar-shown', 'taskbar-start-button',
-  'start-style', 'pure-black'] as const;
+  'start-style', 'pure-black', 'rounded-window-corners'] as const;
 export type TaskbarKey = typeof KEYS[number] | 'tablet';
 
 class TaskbarPreferences {
@@ -77,7 +77,7 @@ class TaskbarPreferences {
     return {
       ...size,
       margin: floating ? FLOATING_MARGIN : 0,
-      radius: floating ? size.thickness / 2 : 0,
+      radius: floating && this.settings.get_boolean('rounded-window-corners') ? size.thickness / 2 : 0,
       inset: floating ? Math.round(size.thickness / 4) : BAR_INSET,
       gap: SLOT_GAP,
     };

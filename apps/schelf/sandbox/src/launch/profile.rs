@@ -107,13 +107,13 @@ impl Arguments {
     }
 }
 
-fn home() -> Result<PathBuf, String> {
+pub(super) fn home() -> Result<PathBuf, String> {
     std::env::var_os("HOME")
         .map(PathBuf::from)
         .ok_or_else(|| "There's no home folder.".to_owned())
 }
 
-fn data_folder(home: &Path, id: &str) -> Result<PathBuf, String> {
+pub(super) fn data_folder(home: &Path, id: &str) -> Result<PathBuf, String> {
     let folder = home.join(".var/app").join(id);
     std::fs::create_dir_all(&folder).map_err(|error| error.to_string())?;
     Ok(folder)

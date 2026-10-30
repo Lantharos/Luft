@@ -94,14 +94,14 @@ fn change(app: &InstalledApp, on: bool, yes: bool) -> Exit {
         on,
     };
     match block_on(full_access::set(change)) {
-        Ok(()) if on => {
+        Ok(_) if on => {
             println!(
                 "{} has full access from the next time it opens.",
                 ink.bold(&app.name)
             );
             Exit::Done
         }
-        Ok(()) => {
+        Ok(_) => {
             println!(
                 "{} is back in its sandbox from the next time it opens.",
                 ink.bold(&app.name)

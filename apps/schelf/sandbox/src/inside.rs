@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::os::unix::net::UnixListener;
 use std::process::Command;
 use std::sync::{Arc, Mutex};
@@ -23,11 +24,14 @@ pub fn serve(arguments: Vec<String>) -> i32 {
         eprintln!("The sandbox couldn't be confined: {error}");
         return 1;
     }
-    let running = Arc::new(Mutex::new(0usize));
+    let running = Arc::new(Mutex::new(HashSet::new()));
     let first = listener
         .accept()
         .and_then(|(stream, _)| Request::receive(stream))
-        .and_then(|request| start(&command, &request.arguments, &running));
+        .and_then(|request| match request {
+            Request::Launch { arguments } => start(&command, &arguments, &running),
+            Request::Quit => Err(std::io::ErrorKind::InvalidInput.into()),
+        });
     let first = match first {
         Ok(pid) => pid,
         Err(error) => {
@@ -39,11 +43,12 @@ pub fn serve(arguments: Vec<String>) -> i32 {
     std::thread::spawn(move || {
         for stream in listener.incoming().flatten() {
             match Request::receive(stream) {
-                Ok(request) => {
-                    if let Err(error) = start(&command, &request.arguments, &accepting) {
+                Ok(Request::Launch { arguments }) => {
+                    if let Err(error) = start(&command, &arguments, &accepting) {
                         eprintln!("Couldn't start another window of the app: {error}");
                     }
                 }
+                Ok(Request::Quit) => quit(&accepting),
                 Err(error) => eprintln!("Couldn't read a launch: {error}"),
             }
         }
@@ -51,7 +56,11 @@ pub fn serve(arguments: Vec<String>) -> i32 {
     reap(first, &running)
 }
 
-fn start(command: &[String], arguments: &[String], running: &Mutex<usize>) -> std::io::Result<u32> {
+fn start(
+    command: &[String],
+    arguments: &[String],
+    running: &Mutex<HashSet<u32>>,
+) -> std::io::Result<u32> {
     let [program, options @ ..] = command else {
         return Err(std::io::ErrorKind::InvalidInput.into());
     };
@@ -60,8 +69,14 @@ fn start(command: &[String], arguments: &[String], running: &Mutex<usize>) -> st
         .args(options)
         .args(arguments)
         .spawn()?;
-    *running += 1;
+    running.insert(child.id());
     Ok(child.id())
+}
+
+fn quit(running: &Mutex<HashSet<u32>>) {
+    for pid in running.lock().expect("running apps").iter() {
+        unsafe { libc::kill(*pid as libc::pid_t, libc::SIGTERM) };
+    }
 }
 
 fn exit_code(status: libc::c_int) -> u8 {
@@ -72,7 +87,7 @@ fn exit_code(status: libc::c_int) -> u8 {
     }
 }
 
-fn reap(first: u32, running: &Mutex<usize>) -> i32 {
+fn reap(first: u32, running: &Mutex<HashSet<u32>>) -> i32 {
     let mut code = 0;
     loop {
         let mut status = 0;
@@ -87,8 +102,8 @@ fn reap(first: u32, running: &Mutex<usize>) -> i32 {
             code = exit_code(status);
         }
         let mut running = running.lock().expect("running apps");
-        *running -= 1;
-        if *running == 0 {
+        running.remove(&(pid as u32));
+        if running.is_empty() {
             std::process::exit(code.into());
         }
     }

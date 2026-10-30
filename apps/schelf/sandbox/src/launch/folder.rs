@@ -8,6 +8,8 @@ use std::thread::sleep;
 use std::time::{Duration, Instant};
 
 const SERVER_WAIT: Duration = Duration::from_secs(10);
+const QUIT_WAIT: Duration = Duration::from_secs(20);
+const UNSANDBOXED_APP: &str = "app";
 const SERVER_POLL: Duration = Duration::from_millis(50);
 pub const INSIDE_SERVER: &str = "/run/luft-sandbox";
 pub const SERVER_SOCKET: &str = "launch";
@@ -87,6 +89,36 @@ impl Folder {
         while !socket.exists() {
             if started.elapsed() > SERVER_WAIT {
                 return Err("The app is still starting.".into());
+            }
+            sleep(SERVER_POLL);
+        }
+        Ok(())
+    }
+
+    /// Remembers the app a launch started without a sandbox, so later
+    /// launches and Schelf can tell it's running and ask it to quit.
+    pub fn record_unsandboxed(&self, pid: u32) -> Result<(), String> {
+        fs::write(self.path.join(UNSANDBOXED_APP), pid.to_string())
+            .map_err(|error| error.to_string())
+    }
+
+    pub fn forget_unsandboxed(&self) {
+        let _ = fs::remove_file(self.path.join(UNSANDBOXED_APP));
+    }
+
+    pub fn unsandboxed(&self) -> Option<libc::pid_t> {
+        fs::read_to_string(self.path.join(UNSANDBOXED_APP))
+            .ok()?
+            .trim()
+            .parse()
+            .ok()
+    }
+
+    pub fn wait_until_closed(&self) -> Result<(), String> {
+        let started = Instant::now();
+        while matches!(self.lock()?, Lock::Running) {
+            if started.elapsed() > QUIT_WAIT {
+                return Err("The app didn't quit.".into());
             }
             sleep(SERVER_POLL);
         }
@@ -174,6 +206,7 @@ impl Folder {
             "wayland",
             "Xauthority",
             "flatpak-info",
+            UNSANDBOXED_APP,
         ] {
             let path = self.path.join(name);
             let _ = fs::remove_dir_all(&path).or_else(|_| fs::remove_file(&path));

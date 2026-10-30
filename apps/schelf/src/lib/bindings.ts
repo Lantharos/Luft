@@ -60,6 +60,11 @@ export const commands = {
 	libraryResetIcons: (params: {
 		desktop: string,
 	}, options?: InvokeOptions) => invoke<null>("library_reset_icons", params, options),
+	libraryRestart: (params: {
+		id: string,
+		desktop: string,
+		token?: string | null,
+	}, options?: InvokeOptions) => invoke<null>("library_restart", params, options),
 	librarySandbox: (params: {
 		id: string,
 	}, options?: InvokeOptions) => invoke<Sandbox>("library_sandbox", params, options),
@@ -67,7 +72,7 @@ export const commands = {
 		id: string,
 		source: Source,
 		on: boolean,
-	}, options?: InvokeOptions) => invoke<null>("library_set_full_access", params, options),
+	}, options?: InvokeOptions) => invoke<boolean>("library_set_full_access", params, options),
 	operationsCancel: (params: {
 		id: number,
 	}, options?: InvokeOptions) => invoke<null>("operations_cancel", params, options),

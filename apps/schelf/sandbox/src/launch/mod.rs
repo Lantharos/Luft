@@ -48,17 +48,22 @@ fn start(id: &str, arguments: Vec<String>) -> Result<i32, String> {
         .block_on(Connection::session())
         .map_err(|error| error.to_string())?;
     let grants = runtime.block_on(Grants::of(&session, id));
-    if grants.full_access {
-        let arguments = files::unmarked(arguments);
-        return Err(unsandboxed::exec(&app, arguments));
+    let folder = Folder::of(id)?;
+    let lock = folder.lock()?;
+    if matches!(lock, Lock::Running) && folder.unsandboxed().is_some() {
+        return Err(unsandboxed::hand_over(&app, files::unmarked(arguments)));
+    }
+    if let Lock::Ours(_) = lock
+        && grants.full_access
+    {
+        return unsandboxed::run(&app, &folder, files::unmarked(arguments));
     }
     runtime.block_on(files::mount_point(&session));
     let arguments = runtime.block_on(files::forward(&session, id, arguments))?;
-    let folder = Folder::of(id)?;
-    match folder.lock()? {
+    match lock {
         Lock::Running => {
             folder.wait_for_server()?;
-            Request { arguments }
+            Request::Launch { arguments }
                 .send(folder.connect()?)
                 .map_err(|error| error.to_string())?;
             Ok(0)
@@ -74,6 +79,30 @@ fn start(id: &str, arguments: Vec<String>) -> Result<i32, String> {
             Ok(code)
         }
     }
+}
+
+/// Whether a copy of the app is running, in its sandbox or not.
+pub fn running(id: &str) -> Result<bool, String> {
+    Ok(matches!(Folder::of(id)?.lock()?, Lock::Running))
+}
+
+/// Asks the running app to quit, as closing it would, and waits until it
+/// has. Returns whether it was running.
+pub fn quit(id: &str) -> Result<bool, String> {
+    let folder = Folder::of(id)?;
+    if !matches!(folder.lock()?, Lock::Running) {
+        return Ok(false);
+    }
+    match folder.unsandboxed() {
+        Some(pid) => {
+            unsafe { libc::kill(pid, libc::SIGTERM) };
+        }
+        None => Request::Quit
+            .send(folder.connect()?)
+            .map_err(|error| error.to_string())?,
+    }
+    folder.wait_until_closed()?;
+    Ok(true)
 }
 
 fn sandbox(
@@ -126,7 +155,7 @@ fn sandbox(
         let _ = child.wait();
         return Err("The sandbox couldn't be set up.".into());
     };
-    Request { arguments }
+    Request::Launch { arguments }
         .send(server)
         .map_err(|error| error.to_string())?;
     let mut device_offered = false;

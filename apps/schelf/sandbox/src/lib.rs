@@ -15,6 +15,8 @@ use luft_software::apps::appimage::SANDBOX;
 
 static L10N: Localizer = localizer!("locales", ["sandbox"]);
 
+pub use launch::{quit, running};
+
 const SERVE: &str = "--sandbox-serve";
 const CONFINE: &str = "--sandbox-confine";
 

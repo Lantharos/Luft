@@ -3,10 +3,11 @@ use std::os::unix::net::UnixStream;
 
 use serde::{Deserialize, Serialize};
 
-/// What a later launch asks the app's running sandbox to start.
+/// What a later launch, or Schelf, asks the app's running sandbox to do.
 #[derive(Serialize, Deserialize)]
-pub struct Request {
-    pub arguments: Vec<String>,
+pub enum Request {
+    Launch { arguments: Vec<String> },
+    Quit,
 }
 
 impl Request {

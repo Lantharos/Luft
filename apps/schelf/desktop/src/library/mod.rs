@@ -81,10 +81,13 @@ pub fn installed() -> Vec<InstalledApp> {
 }
 
 fn launch(Desktop { desktop, token }: Desktop) -> Result<(), String> {
+    launch_desktop(&desktop, token.as_deref())
+}
+
+fn launch_desktop(desktop: &str, token: Option<&str>) -> Result<(), String> {
     let info =
-        gio_unix::DesktopAppInfo::new(&desktop).ok_or("That app isn't installed any more.")?;
-    luft_app::launch::start(info.upcast_ref(), &[], token.as_deref())
-        .map_err(|error| error.to_string())
+        gio_unix::DesktopAppInfo::new(desktop).ok_or("That app isn't installed any more.")?;
+    luft_app::launch::start(info.upcast_ref(), &[], token).map_err(|error| error.to_string())
 }
 
 fn permissions(
@@ -104,6 +107,7 @@ pub fn register(window: SabineWindow) -> SabineWindow {
         .command_async("library_sandbox", appimages::sandbox)
         .command_async("library_full_access", full_access::has)
         .command_async("library_set_full_access", full_access::set)
+        .command_async("library_restart", full_access::restart)
         .command("library_custom_icons", icons::state)
         .command_async("library_choose_icon", icons::choose)
         .command_async("library_choose_symbolic_icon", icons::choose_symbolic)

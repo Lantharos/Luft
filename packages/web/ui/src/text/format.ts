@@ -69,12 +69,12 @@ function formatDuration(style: Intl.DurationFormatOptions['style'], seconds: num
 	return formatter.format(Object.fromEntries(shown));
 }
 
-function numberFormatter(fractionDigits: number, unit?: string) {
+function numberFormatter(fractionDigits: number, unit?: string, unitDisplay: 'short' | 'long' = 'short') {
 	const locale = currentLocale();
-	const key = `${unit ?? ''}:${fractionDigits}`;
+	const key = `${unit ?? ''}:${unitDisplay}:${fractionDigits}`;
 	let formatter = numberFormatters.get(key);
 	if (!formatter) {
-		formatter = new Intl.NumberFormat(locale, { style: unit ? 'unit' : 'decimal', unit, minimumFractionDigits: fractionDigits, maximumFractionDigits: fractionDigits });
+		formatter = new Intl.NumberFormat(locale, { style: unit ? 'unit' : 'decimal', unit, unitDisplay, minimumFractionDigits: fractionDigits, maximumFractionDigits: fractionDigits });
 		numberFormatters.set(key, formatter);
 	}
 	return formatter;
@@ -87,7 +87,7 @@ function scaled(value: number, base: number) {
 		size /= base;
 		unit += 1;
 	}
-	return numberFormatter(size >= 100 || unit === 0 ? 0 : 1, BYTE_UNITS[unit]).format(size);
+	return numberFormatter(size >= 100 || unit === 0 ? 0 : 1, BYTE_UNITS[unit], unit === 0 ? 'long' : 'short').format(size);
 }
 
 export function bytes(value: number) {

@@ -2,6 +2,7 @@ mod appimages;
 mod debian;
 mod flatpaks;
 pub mod full_access;
+mod icons;
 pub mod sources;
 mod system;
 mod tools;
@@ -70,6 +71,11 @@ pub fn installed() -> Vec<InstalledApp> {
         apps.extend(system.join().unwrap_or_default());
         apps
     });
+    for app in &mut apps {
+        if let Some(icon) = app.desktop.as_deref().and_then(luft_app::apps::custom_icon) {
+            app.icon = Some(icon.to_string_lossy().into_owned());
+        }
+    }
     apps.sort_by_cached_key(|app| app.name.to_lowercase());
     apps
 }
@@ -98,4 +104,8 @@ pub fn register(window: SabineWindow) -> SabineWindow {
         .command_async("library_sandbox", appimages::sandbox)
         .command_async("library_full_access", full_access::has)
         .command_async("library_set_full_access", full_access::set)
+        .command("library_custom_icons", icons::state)
+        .command_async("library_choose_icon", icons::choose)
+        .command_async("library_choose_symbolic_icon", icons::choose_symbolic)
+        .command("library_reset_icons", icons::reset)
 }

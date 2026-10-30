@@ -14,6 +14,7 @@
 #include <meta/meta-context.h>
 #include <meta/meta-workspace-manager.h>
 
+#include "shell-app-cache-private.h"
 #include "shell-app-private.h"
 #include "shell-app-scope-private.h"
 #include "shell-enum-types.h"
@@ -187,7 +188,12 @@ shell_app_get_icon (ShellApp *app)
   g_return_val_if_fail (SHELL_IS_APP (app), NULL);
 
   if (app->info)
-    return g_app_info_get_icon (G_APP_INFO (app->info));
+    {
+      GIcon *custom = shell_app_cache_get_custom_icon (shell_app_cache_get_default (),
+                                                       shell_app_get_id (app));
+
+      return custom ? custom : g_app_info_get_icon (G_APP_INFO (app->info));
+    }
 
   MetaWindow *window = window_backed_app_get_window (app);
   if (window && meta_window_get_toplevel_icon (window))

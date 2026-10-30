@@ -35,6 +35,15 @@ export const commands = {
 	flathubSummary: (params: {
 		id: string,
 	}, options?: InvokeOptions) => invoke<import("#lib/catalog/flathub.js").Summary>("flathub_summary", params, options),
+	libraryChooseIcon: (params: {
+		desktop: string,
+	}, options?: InvokeOptions) => invoke<boolean>("library_choose_icon", params, options),
+	libraryChooseSymbolicIcon: (params: {
+		desktop: string,
+	}, options?: InvokeOptions) => invoke<boolean>("library_choose_symbolic_icon", params, options),
+	libraryCustomIcons: (params: {
+		desktop: string,
+	}, options?: InvokeOptions) => invoke<CustomIcons>("library_custom_icons", params, options),
 	libraryFullAccess: (params: {
 		id: string,
 		source: Source,
@@ -48,6 +57,9 @@ export const commands = {
 		installation: Installation,
 		reference: string,
 	}, options?: InvokeOptions) => invoke<Permissions>("library_permissions", params, options),
+	libraryResetIcons: (params: {
+		desktop: string,
+	}, options?: InvokeOptions) => invoke<null>("library_reset_icons", params, options),
 	librarySandbox: (params: {
 		id: string,
 	}, options?: InvokeOptions) => invoke<Sandbox>("library_sandbox", params, options),
@@ -146,6 +158,11 @@ export type CheckedSource = {
 };
 
 export type Corners = "rounded" | "square";
+
+export type CustomIcons = {
+	icon: boolean,
+	symbolic: boolean,
+};
 
 /**
  *  What the system says about a draft: the sources in it and the keys their packages must be

@@ -16,13 +16,19 @@ export interface IconApp {
 }
 
 const textureCache = St.TextureCache.get_default();
+const appSystem = Shell.AppSystem.get_default();
 const FALLBACK = new Gio.ThemedIcon({ name: 'application-x-executable' });
 const RESTYLE_BATCH = 12;
 
 const color = (hex: string) => Cogl.Color.from_string(hex)[1];
 
+export function sourceIcon(app: IconApp): Gio.Icon {
+  const id = app.get_id();
+  return (id ? appSystem.lookup_app(id)?.get_icon() : null) ?? app.get_icon() ?? FALLBACK;
+}
+
 export function styledIcon(app: IconApp, paint: Paint): St.StyledIcon {
-  const source = app.get_icon() ?? FALLBACK;
+  const source = sourceIcon(app);
   return new St.StyledIcon({
     source, glyph_names: glyphNames(app.get_id(), source),
     plate: color(paint.plate), ink: color(paint.ink), shade: color(paint.shade), rim: paint.rim,
@@ -45,6 +51,9 @@ class AppIcons {
   constructor() {
     this.settings.connect('changed::app-icon-style', () => this.refresh());
     this.settings.connect('changed::app-icon-tint', () => this.refresh());
+    appSystem.connect('installed-changed', () => {
+      for (const icon of this.bound.keys()) icon.gicon = this.iconOf(icon);
+    });
   }
 
   setAccent(seed: Seed, dark: boolean, taskbarDark: boolean): void {
@@ -66,7 +75,7 @@ class AppIcons {
   }
 
   gicon(app: IconApp, paint = this.paint): Gio.Icon {
-    return paint ? styledIcon(app, paint) : app.get_icon() ?? FALLBACK;
+    return paint ? styledIcon(app, paint) : sourceIcon(app);
   }
 
   private iconOf(icon: St.Icon): Gio.Icon {

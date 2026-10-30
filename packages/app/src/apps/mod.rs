@@ -1,4 +1,9 @@
+mod custom_icons;
 mod icons;
+
+pub use custom_icons::{
+    custom_icon, has_custom_symbolic, reset_custom_icons, set_custom_icon, set_custom_symbolic,
+};
 
 use gio::prelude::*;
 use serde::Serialize;
@@ -13,10 +18,13 @@ pub struct App {
 
 impl App {
     pub fn new(id: String, info: &impl IsA<gio::AppInfo>) -> Self {
+        let icon = custom_icon(&id)
+            .map(|path| path.to_string_lossy().into_owned())
+            .or_else(|| info.icon().and_then(|icon| icon_path(&icon)));
         Self {
             id,
             name: info.name().to_string(),
-            icon: info.icon().and_then(|icon| icon_path(&icon)),
+            icon,
         }
     }
 

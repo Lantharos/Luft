@@ -171,6 +171,10 @@ Luft installs this with Schelf, into your account. Install ripgrep? [Y/n]
 
 Removing and searching work the same way. `dnf copr enable` and `dnf config-manager addrepo --from-repofile` add a [software source](#software-sources) with Schelf. Asking to upgrade the system points to Settings, and read-only commands such as `dnf info`, `dnf list` and `dnf provides` work normally.
 
+## App icons
+
+Any installed app can have an icon of your own. Open the app in Schelf and choose **Change** next to **Icon** to pick a PNG or SVG image. Luft draws the monochrome version that the Tinted and Clear icon styles use from it, or you can choose **Change** next to **Symbolic icon** to give it an SVG of your own. **Reset** puts back the icons the app came with. Your icons are kept in `~/.local/share/luft/app-icons`, and app updates don't replace them.
+
 ## Fonts and cursors
 
 - Fonts install from [Magpie](/apps/magpie/) into `~/.local/share/fonts`.

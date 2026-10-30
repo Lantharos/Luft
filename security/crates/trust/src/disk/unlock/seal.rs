@@ -18,6 +18,7 @@ const SEALED_FORBIDDEN: &str = "tpm-sealed-forbidden";
 const PREDICTED: &str = "tpm-predicted";
 const CHANGED: &str = "tpm-secure-boot-changed";
 const INSTALLED: &str = "tpm-sealed-when-installed";
+const SEALED_THIS_START: &str = "tpm-sealed";
 
 fn read(name: &str) -> Option<String> {
     std::fs::read_to_string(paths::state(name))
@@ -77,8 +78,13 @@ fn remember_seal(state: &Path, secure_boot_pcr: &str) -> Result<()> {
     )
 }
 
+pub fn sealed_this_start() -> bool {
+    Path::new(paths::RUNTIME).join(SEALED_THIS_START).exists()
+}
+
 fn seal_to(device: &Path, unlock: &Secret, pin: &Secret, secure_boot_pcr: &str) -> Result<()> {
     keys::enroll_tpm(device, unlock, pin, secure_boot_pcr)?;
+    write_in(Path::new(paths::RUNTIME), SEALED_THIS_START, "")?;
     remember_seal(Path::new(paths::STATE), secure_boot_pcr)?;
     forget(CHANGED);
     forget(INSTALLED);

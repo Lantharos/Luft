@@ -95,6 +95,7 @@ pub fn status() -> Option<DiskStatus> {
         unlock: header.as_ref().map(unlock_methods).unwrap_or_default(),
         recovery_key_stored: keys::has_escrow(),
         tpm_refused: header.as_ref().is_some_and(|header| header.has(luks::TPM2))
+            && !seal::sealed_this_start()
             && journal::tpm_refused_this_boot(),
         secure_boot_changed: seal::secure_boot_changed(),
     })

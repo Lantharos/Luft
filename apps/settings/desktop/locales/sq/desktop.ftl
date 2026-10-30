@@ -180,7 +180,6 @@ desktop-cursors-nothing-to-preview = Kjo temë nuk ka kursorë për të shfaqur
 desktop-fonts-magpie-missing = Magpie nuk është i instaluar
 
 ## Wallpaper
-desktop-wallpaper-no-pictures-folder = Nuk ka dosje Figura
 desktop-wallpaper-unopenable = Ky skedar nuk mund të hapet
 desktop-wallpaper-add-title = Shto sfonde
 desktop-wallpaper-add-filter = Figura dhe video

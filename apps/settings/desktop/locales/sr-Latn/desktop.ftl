@@ -180,7 +180,6 @@ desktop-cursors-nothing-to-preview = Ova tema nema pokazivače za prikaz
 desktop-fonts-magpie-missing = Aplikacija Magpie nije instalirana
 
 ## Wallpaper
-desktop-wallpaper-no-pictures-folder = Nema fascikle Slike
 desktop-wallpaper-unopenable = Ova datoteka ne može da se otvori
 desktop-wallpaper-add-title = Dodaj pozadine
 desktop-wallpaper-add-filter = Slike i video-snimci

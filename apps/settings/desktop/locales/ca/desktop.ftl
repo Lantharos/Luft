@@ -173,7 +173,6 @@ desktop-cursors-nothing-to-preview = Aquest tema no té cursors per mostrar
 desktop-fonts-magpie-missing = Magpie no està instal·lat
 
 ## Wallpaper
-desktop-wallpaper-no-pictures-folder = No hi ha cap carpeta Imatges
 desktop-wallpaper-unopenable = Aquest fitxer no es pot obrir
 desktop-wallpaper-add-title = Afegiu fons de pantalla
 desktop-wallpaper-add-filter = Imatges i vídeos

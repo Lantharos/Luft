@@ -173,7 +173,6 @@ desktop-cursors-nothing-to-preview = Dette temaet har ingen peikarar å vise
 desktop-fonts-magpie-missing = Magpie er ikkje installert
 
 ## Wallpaper
-desktop-wallpaper-no-pictures-folder = Det finst inga biletmappe
 desktop-wallpaper-unopenable = Denne fila kan ikkje opnast
 desktop-wallpaper-add-title = Legg til bakgrunnsbilete
 desktop-wallpaper-add-filter = Bilete og videoar

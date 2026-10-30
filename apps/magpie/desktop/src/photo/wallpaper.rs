@@ -17,9 +17,7 @@ fn failed(error: impl std::fmt::Display) -> String {
 }
 
 fn library_copy(source: &Path) -> Result<PathBuf, String> {
-    let folder = dirs::picture_dir()
-        .ok_or("There is no Pictures folder")?
-        .join("Wallpapers");
+    let folder = luft_app::folders::wallpapers();
     if source.parent() == Some(folder.as_path()) {
         return Ok(source.to_path_buf());
     }

@@ -173,7 +173,6 @@ desktop-cursors-nothing-to-preview = Ebben a témában nincsenek megjeleníthet�
 desktop-fonts-magpie-missing = A Magpie alkalmazás nincs telepítve
 
 ## Wallpaper
-desktop-wallpaper-no-pictures-folder = Nincs Képek mappa
 desktop-wallpaper-unopenable = Ez a fájl nem nyitható meg
 desktop-wallpaper-add-title = Háttérképek hozzáadása
 desktop-wallpaper-add-filter = Képek és videók

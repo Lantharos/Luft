@@ -173,7 +173,6 @@ desktop-cursors-nothing-to-preview = Dette tema har ingen markører at vise
 desktop-fonts-magpie-missing = Magpie er ikke installeret
 
 ## Wallpaper
-desktop-wallpaper-no-pictures-folder = Der er ingen billedmappe
 desktop-wallpaper-unopenable = Denne fil kan ikke åbnes
 desktop-wallpaper-add-title = Tilføj baggrundsbilleder
 desktop-wallpaper-add-filter = Billeder og videoer

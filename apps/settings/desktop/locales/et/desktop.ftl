@@ -184,7 +184,6 @@ desktop-fonts-magpie-missing = Rakendus Magpie pole installitud
 
 ## Wallpaper
 
-desktop-wallpaper-no-pictures-folder = Kausta Pildid pole
 desktop-wallpaper-unopenable = Seda faili ei saa avada
 desktop-wallpaper-add-title = Taustapiltide lisamine
 desktop-wallpaper-add-filter = Pildid ja videod

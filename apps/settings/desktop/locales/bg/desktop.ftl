@@ -173,7 +173,6 @@ desktop-cursors-nothing-to-preview = Тази тема няма курсори �
 desktop-fonts-magpie-missing = Приложението Magpie не е инсталирано
 
 ## Wallpaper
-desktop-wallpaper-no-pictures-folder = Няма папка Снимки
 desktop-wallpaper-unopenable = Този файл не може да бъде отворен
 desktop-wallpaper-add-title = Добавяне на тапети
 desktop-wallpaper-add-filter = Изображения и видеоклипове

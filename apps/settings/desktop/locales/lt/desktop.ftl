@@ -173,7 +173,6 @@ desktop-cursors-nothing-to-preview = Šioje temoje nėra žymiklių, kuriuos bū
 desktop-fonts-magpie-missing = Programa Magpie neįdiegta
 
 ## Wallpaper
-desktop-wallpaper-no-pictures-folder = Aplanko Paveikslėliai nėra
 desktop-wallpaper-unopenable = Šio failo atidaryti negalima
 desktop-wallpaper-add-title = Pridėti fono paveikslėlių
 desktop-wallpaper-add-filter = Paveikslėliai ir vaizdo įrašai

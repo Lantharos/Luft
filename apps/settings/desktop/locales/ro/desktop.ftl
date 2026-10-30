@@ -173,7 +173,6 @@ desktop-cursors-nothing-to-preview = Această temă nu are cursoare de afișat
 desktop-fonts-magpie-missing = Aplicația Magpie nu este instalată
 
 ## Wallpaper
-desktop-wallpaper-no-pictures-folder = Nu există un folder Imagini
 desktop-wallpaper-unopenable = Acest fișier nu poate fi deschis
 desktop-wallpaper-add-title = Adaugă imagini de fundal
 desktop-wallpaper-add-filter = Imagini și videoclipuri

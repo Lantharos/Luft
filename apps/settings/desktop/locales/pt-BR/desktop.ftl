@@ -173,7 +173,6 @@ desktop-cursors-nothing-to-preview = Este tema não tem cursores para mostrar
 desktop-fonts-magpie-missing = O Magpie não está instalado
 
 ## Wallpaper
-desktop-wallpaper-no-pictures-folder = Não há pasta Imagens
 desktop-wallpaper-unopenable = Não é possível abrir este arquivo
 desktop-wallpaper-add-title = Adicionar papéis de parede
 desktop-wallpaper-add-filter = Imagens e vídeos

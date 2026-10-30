@@ -173,7 +173,6 @@ desktop-cursors-nothing-to-preview = Din it-tema m’għandhiex kersers x’turi
 desktop-fonts-magpie-missing = Magpie mhux installat
 
 ## Wallpaper
-desktop-wallpaper-no-pictures-folder = M’hemm l-ebda fowlder tal-Istampi
 desktop-wallpaper-unopenable = Dan il-fajl ma jistax jinfetaħ
 desktop-wallpaper-add-title = Żid sfondi
 desktop-wallpaper-add-filter = Stampi u vidjows

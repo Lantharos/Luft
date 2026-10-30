@@ -12,6 +12,7 @@ path = "../web/ui/src/bindings/appearance.ts"
 
 [features]
 apps = ["dep:dirs", "dep:gio", "dep:gio-unix"]
+folders = ["dep:dirs"]
 fonts = ["dep:dirs", "dep:gio", "dep:memmap2", "dep:skrifa"]
 ibus = ["dep:dirs"]
 launch = ["dep:gio"]

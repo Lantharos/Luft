@@ -173,7 +173,6 @@ desktop-cursors-nothing-to-preview = Þetta þema hefur enga bendla til að sýn
 desktop-fonts-magpie-missing = Forritið Magpie er ekki uppsett
 
 ## Wallpaper
-desktop-wallpaper-no-pictures-folder = Engin myndamappa er til
 desktop-wallpaper-unopenable = Ekki er hægt að opna þessa skrá
 desktop-wallpaper-add-title = Bæta við bakgrunnsmyndum
 desktop-wallpaper-add-filter = Myndir og myndskeið

@@ -173,7 +173,6 @@ desktop-cursors-nothing-to-preview = У цій темі немає курсор�
 desktop-fonts-magpie-missing = Програму Magpie не встановлено
 
 ## Wallpaper
-desktop-wallpaper-no-pictures-folder = Немає папки «Зображення»
 desktop-wallpaper-unopenable = Цей файл не вдається відкрити
 desktop-wallpaper-add-title = Додати шпалери
 desktop-wallpaper-add-filter = Зображення й відео

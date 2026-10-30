@@ -173,7 +173,6 @@ desktop-cursors-nothing-to-preview = Tässä teemassa ei ole näytettäviä osoi
 desktop-fonts-magpie-missing = Magpie-sovellusta ei ole asennettu
 
 ## Wallpaper
-desktop-wallpaper-no-pictures-folder = Kuvat-kansiota ei ole
 desktop-wallpaper-unopenable = Tätä tiedostoa ei voi avata
 desktop-wallpaper-add-title = Lisää taustakuvia
 desktop-wallpaper-add-filter = Kuvat ja videot

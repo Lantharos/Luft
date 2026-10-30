@@ -173,7 +173,6 @@ desktop-cursors-nothing-to-preview = Šim motīvam nav kursoru, ko parādīt
 desktop-fonts-magpie-missing = Lietotne Magpie nav instalēta
 
 ## Wallpaper
-desktop-wallpaper-no-pictures-folder = Nav mapes Attēli
 desktop-wallpaper-unopenable = Šo failu nevar atvērt
 desktop-wallpaper-add-title = Pievienot fona attēlus
 desktop-wallpaper-add-filter = Attēli un video

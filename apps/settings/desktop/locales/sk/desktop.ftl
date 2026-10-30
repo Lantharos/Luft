@@ -173,7 +173,6 @@ desktop-cursors-nothing-to-preview = Tento motív nemá žiadne kurzory na zobra
 desktop-fonts-magpie-missing = Aplikácia Magpie nie je nainštalovaná
 
 ## Wallpaper
-desktop-wallpaper-no-pictures-folder = Neexistuje priečinok Obrázky
 desktop-wallpaper-unopenable = Tento súbor sa nedá otvoriť
 desktop-wallpaper-add-title = Pridať pozadia
 desktop-wallpaper-add-filter = Obrázky a videá

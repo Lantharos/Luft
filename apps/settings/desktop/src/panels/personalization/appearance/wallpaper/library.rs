@@ -7,7 +7,7 @@ use std::time::Duration;
 use gio::glib;
 use gio::prelude::*;
 use luft_app::watch::{FolderWatcher, Report, Watch, WatchMask};
-use luft_app::{Events, launch};
+use luft_app::{Events, folders, launch};
 use luft_i18n::t;
 use serde::Serialize;
 use specta::Type;
@@ -58,12 +58,6 @@ fn display_name(path: &Path) -> String {
         .unwrap_or_default()
 }
 
-fn folder() -> Result<PathBuf, String> {
-    dirs::picture_dir()
-        .map(|pictures| pictures.join("Wallpapers"))
-        .ok_or_else(|| t!(L10N, "desktop-wallpaper-no-pictures-folder"))
-}
-
 fn system_folders() -> Vec<PathBuf> {
     let mut folders: Vec<PathBuf> = Vec::new();
     for folder in glib::system_data_dirs()
@@ -80,7 +74,7 @@ fn system_folders() -> Vec<PathBuf> {
 pub fn list() -> Result<Vec<Wallpaper>, String> {
     let mut wallpapers: Vec<Wallpaper> = system_folders()
         .into_iter()
-        .chain([folder()?])
+        .chain([folders::wallpapers()])
         .filter_map(|folder| fs::read_dir(folder).ok())
         .flat_map(|entries| entries.flatten().map(|entry| entry.path()))
         .filter(|path| is_wallpaper(path))
@@ -108,7 +102,7 @@ fn free_path(folder: &Path, source: &Path) -> PathBuf {
 }
 
 pub fn add(uris: &[String]) -> Result<(), String> {
-    let folder = folder()?;
+    let folder = folders::wallpapers();
     fs::create_dir_all(&folder).map_err(failed)?;
     for uri in uris {
         let source = gio::File::for_uri(uri)
@@ -122,15 +116,13 @@ pub fn add(uris: &[String]) -> Result<(), String> {
 }
 
 pub fn open_folder(token: Option<&str>) -> Result<(), String> {
-    let folder = folder()?;
+    let folder = folders::wallpapers();
     fs::create_dir_all(&folder).map_err(failed)?;
     launch::open(&gio::File::for_path(&folder).uri(), token).map_err(failed)
 }
 
 pub fn watch(events: Events) {
-    let Ok(folder) = folder() else {
-        return;
-    };
+    let folder = folders::wallpapers();
     let watch = Watch {
         events: WatchMask::CLOSE_WRITE
             | WatchMask::CREATE

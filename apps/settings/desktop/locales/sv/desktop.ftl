@@ -173,7 +173,6 @@ desktop-cursors-nothing-to-preview = Temat har inga pekare att visa
 desktop-fonts-magpie-missing = Magpie är inte installerad
 
 ## Wallpaper
-desktop-wallpaper-no-pictures-folder = Mappen Bilder finns inte
 desktop-wallpaper-unopenable = Det går inte att öppna filen
 desktop-wallpaper-add-title = Lägg till bakgrundsbilder
 desktop-wallpaper-add-filter = Bilder och videor

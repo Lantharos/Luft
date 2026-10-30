@@ -173,7 +173,6 @@ desktop-cursors-nothing-to-preview = Bu temada gösterilecek imleç yok
 desktop-fonts-magpie-missing = Magpie uygulaması yüklü değil
 
 ## Wallpaper
-desktop-wallpaper-no-pictures-folder = Resimler klasörü yok
 desktop-wallpaper-unopenable = Bu dosya açılamıyor
 desktop-wallpaper-add-title = Duvar kâğıdı ekle
 desktop-wallpaper-add-filter = Resimler ve videolar

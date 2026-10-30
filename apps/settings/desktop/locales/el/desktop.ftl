@@ -173,7 +173,6 @@ desktop-cursors-nothing-to-preview = Αυτό το θέμα δεν έχει δρ
 desktop-fonts-magpie-missing = Το Magpie δεν είναι εγκατεστημένο
 
 ## Wallpaper
-desktop-wallpaper-no-pictures-folder = Δεν υπάρχει φάκελος Εικόνες
 desktop-wallpaper-unopenable = Δεν είναι δυνατό το άνοιγμα αυτού του αρχείου
 desktop-wallpaper-add-title = Προσθήκη ταπετσαριών
 desktop-wallpaper-add-filter = Εικόνες και βίντεο

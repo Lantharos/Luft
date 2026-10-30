@@ -180,7 +180,6 @@ desktop-cursors-nothing-to-preview = Dieses Design hat keine Mauszeiger zum Anze
 desktop-fonts-magpie-missing = Magpie ist nicht installiert
 
 ## Wallpaper
-desktop-wallpaper-no-pictures-folder = Es gibt keinen Bilderordner
 desktop-wallpaper-unopenable = Diese Datei kann nicht geöffnet werden
 desktop-wallpaper-add-title = Hintergrundbilder hinzufügen
 desktop-wallpaper-add-filter = Bilder und Videos

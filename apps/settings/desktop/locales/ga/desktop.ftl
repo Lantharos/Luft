@@ -173,7 +173,6 @@ desktop-cursors-nothing-to-preview = Níl aon chúrsóirí le taispeáint sa té
 desktop-fonts-magpie-missing = Níl Magpie suiteáilte
 
 ## Wallpaper
-desktop-wallpaper-no-pictures-folder = Níl an fillteán Pictiúir ann
 desktop-wallpaper-unopenable = Ní féidir an comhad seo a oscailt
 desktop-wallpaper-add-title = Cuir cúlbhrait leis
 desktop-wallpaper-add-filter = Íomhánna agus físeáin

@@ -173,7 +173,6 @@ desktop-cursors-nothing-to-preview = Ten motyw nie ma kursorów do pokazania
 desktop-fonts-magpie-missing = Aplikacja Magpie nie jest zainstalowana
 
 ## Wallpaper
-desktop-wallpaper-no-pictures-folder = Brak folderu Obrazy
 desktop-wallpaper-unopenable = Nie można otworzyć tego pliku
 desktop-wallpaper-add-title = Dodaj tapety
 desktop-wallpaper-add-filter = Obrazy i filmy

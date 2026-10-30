@@ -43,10 +43,10 @@ The nested session copies the host's wallpaper, interface settings, keyboard lay
 | --- | --- | --- |
 | `KESTREL_SESSION_DIR` | `kestrel/run` | Settings, caches and app data of the test session. Point it at an empty folder for a clean profile or to run sessions side by side |
 | `KESTREL_CAPTURE_DIR` | `kestrel/run/screenshots` | Where captures are saved |
-| `KESTREL_CAPTURE_SIZE` | `1440x900` | Size of the virtual monitor |
+| `KESTREL_CAPTURE_SIZE` | `1440x900` | Size of the virtual monitor, optionally with a physical size that sets its display scale, such as `3840x2400:443x277mm` for 200% |
 | `KESTREL_CAPTURE_SECONDARY_SIZE` | none | Adds a second virtual monitor, such as `1280x720` |
 | `KESTREL_CAPTURE_SCHEME` | dark | `light` or `dark`, to capture every surface in one style |
-| `KESTREL_CAPTURE_WALLPAPER` | Luft's default wallpapers | An image used as the wallpaper for both styles, also behind the Luft apps in place of their test gradient, to check the glass on light and dark pictures |
+| `KESTREL_CAPTURE_WALLPAPER` | Luft's default wallpapers | An image used as the wallpaper for both styles, also behind the Luft apps in place of their test gradient and as Mara’s on the login screen, to check the glass on light and dark pictures |
 | `KESTREL_CAPTURE_TASKBAR` | bottom | Starts every session with the taskbar on another edge: `left`, `top` or `right` |
 | `LUFT_LOCALE` | US English | A language for Kestrel and the apps, also used for their dates, numbers and first day of the week, such as `de` or the pseudo-locale `en-XA`. Most checks look for English text, so pair it with `--only system:translations`, which captures Kestrel's surfaces and every Settings page in any language |
 | `KESTREL_BUILD` | `kestrel/build` | Another Kestrel build to run, set up against `KESTREL_COMPOSITOR` |

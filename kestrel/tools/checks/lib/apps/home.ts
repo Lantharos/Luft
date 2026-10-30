@@ -2,7 +2,11 @@ import GdkPixbuf from 'gi://GdkPixbuf';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
-const INSTALLED = GLib.build_filenamev([GLib.get_home_dir(), '.local/share/sabine']);
+const USER_INSTALL = GLib.build_filenamev([GLib.get_home_dir(), '.local/share/sabine']);
+const SYSTEM_INSTALL = '/usr/lib/sabine';
+const INSTALLED_BY_USER = GLib.file_test(GLib.build_filenamev([USER_INSTALL, 'bin/current.json']), GLib.FileTest.EXISTS);
+const INSTALLED = INSTALLED_BY_USER ? USER_INSTALL : SYSTEM_INSTALL;
+const SHARED = INSTALLED_BY_USER ? ['bin/versions', 'runtimes/cef'] : ['bin/versions'];
 const FOLDERS = ['Desktop', 'Documents', 'Downloads', 'Music', 'Pictures', 'Videos'];
 const DOCUMENTS = {
   'Documents/Trip to Lisbon.md': '# Lisbon\n\n- Tram 28 early, before the crowds\n- Pastéis in Belém\n- Sunset at Miradouro da Senhora do Monte\n',
@@ -22,7 +26,7 @@ function link(target: string, location: string) {
 }
 
 function shareRuntime(sabine: string) {
-  for (const folder of ['bin/versions', 'runtimes/cef']) {
+  for (const folder of SHARED) {
     GLib.mkdir_with_parents(path(sabine, folder), 0o755);
     const children = Gio.File.new_for_path(path(INSTALLED, folder)).enumerate_children('standard::name', Gio.FileQueryInfoFlags.NONE, null);
     for (const info of children)

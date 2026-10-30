@@ -2,6 +2,8 @@ import type Clutter from 'gi://Clutter';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 
+import { toggleStyleClass } from '../shared/widgets/styleClass.js';
+
 export const PILL = 999;
 const THEMED_PROPERTIES = [
   ['-kestrel-glass-dim', 'bright-dim'],
@@ -20,11 +22,6 @@ const surfaces = new Set<Backdrop>();
 const cornered = new Set<Backdrop>();
 let solid = false;
 let square = false;
-
-function toggleStyleClass(actor: St.Widget, name: string, enabled: boolean): void {
-  if (enabled) actor.add_style_class_name(name);
-  else actor.remove_style_class_name(name);
-}
 
 function makeSolid({ actor, effect, corners }: Backdrop, enabled: boolean): void {
   effect.enabled = !enabled;

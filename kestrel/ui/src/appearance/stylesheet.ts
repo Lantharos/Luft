@@ -46,7 +46,8 @@ function accentStylesheet(seed: Seed, palette: Palette, variant: Variant): strin
   const solid = dark ? darkSolid : palette.light.colors;
   const highlight = neutral && !dark ? scheme.primary : accent;
   const tiles = activeTiles(dark ? accent : scheme.primary, dark && !neutral ? GLASSY_TILE : SOLID_TILE, scheme.surface);
-  return `${tiles}${lockScreen(accent, darkSolid)}.kestrel-calendar-day.kestrel-calendar-day:selected { background-color: ${solid.primary}; color: ${solid.onPrimary}; }
+  return `${tiles}${lockScreen(accent, darkSolid)}.kestrel-calendar-day.kestrel-calendar-today { color: ${scheme.primary}; }
+.kestrel-calendar-day.kestrel-calendar-day:checked { background-color: ${solid.primary}; color: ${solid.onPrimary}; }
 .kestrel-slider.kestrel-slider { -barlevel-active-background-color: ${scheme.primary}; }
 .osd-window.osd-window.kestrel-glass .level { -barlevel-active-background-color: ${scheme.primary}; }
 .kestrel-app-focused.kestrel-app-focused .kestrel-running-dot { background-color: ${scheme.primary}; }

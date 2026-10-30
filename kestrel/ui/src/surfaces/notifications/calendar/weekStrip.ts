@@ -8,13 +8,22 @@ function homogeneousRow(styleClass: string): St.Widget {
   return new St.Widget({ style_class: styleClass, x_expand: true, layout_manager: new Clutter.BoxLayout({ homogeneous: true }) });
 }
 
-export function weekRow(styleClass: string, cellClass: string): St.Label[] {
+function weekRow<Cell extends St.Widget>(styleClass: string, create: () => Cell): Cell[] {
   const row = homogeneousRow(styleClass);
   return Array.from({ length: 7 }, () => {
-    const cell = new St.Label({ style_class: cellClass, x_expand: true, x_align: Clutter.ActorAlign.CENTER });
+    const cell = create();
     row.add_child(cell);
     return cell;
   });
+}
+
+export function weekdayHeadings(): St.Label[] {
+  return weekRow('kestrel-calendar-headings', () =>
+    new St.Label({ style_class: 'kestrel-calendar-heading', x_expand: true, x_align: Clutter.ActorAlign.CENTER }));
+}
+
+function dayCell(): St.Button {
+  return new St.Button({ style_class: 'kestrel-calendar-day', can_focus: true, track_hover: true, x_expand: true, x_align: Clutter.ActorAlign.CENTER });
 }
 
 export const WeekStrip = GObject.registerClass({
@@ -22,7 +31,7 @@ export const WeekStrip = GObject.registerClass({
     'week': GObject.ParamSpec.double('week', null, null, GObject.ParamFlags.READWRITE, -Number.MAX_VALUE, Number.MAX_VALUE, 0),
   },
 }, class WeekStrip extends St.Widget {
-  readonly rows: St.Label[][];
+  readonly rows: St.Button[][];
   private readonly strip = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-calendar-weeks' });
   private value = 0;
   private pitchValue = 0;
@@ -30,7 +39,7 @@ export const WeekStrip = GObject.registerClass({
   constructor() {
     super({ style_class: 'kestrel-calendar-viewport', clip_to_allocation: true });
     this.rows = Array.from({ length: ROWS }, () => {
-      const cells = weekRow('kestrel-calendar-week', 'kestrel-calendar-day');
+      const cells = weekRow('kestrel-calendar-week', dayCell);
       this.strip.add_child(cells[0].get_parent()!);
       return cells;
     });

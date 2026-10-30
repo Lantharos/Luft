@@ -180,6 +180,14 @@ async function checkCalendar() {
     settings.set_string('week-start', 'monday');
     await eventually(() => firstHeading() === shortDay(1), 'the week can start on Monday');
     await capture('notification-calendar');
+    const days = styled('kestrel-calendar-day', center).map(day => ofType(day, St.Button));
+    const header = () => ofType(firstStyled('kestrel-calendar-month', center), St.Button).label;
+    const today = days.findIndex(day => day.checked);
+    const other = days.findIndex((day, index) => index < 35 && Math.abs(index - today) >= 7 && !day.has_style_class_name('kestrel-calendar-outside'));
+    const week = header();
+    click(days[other]);
+    await eventually(() => days[other].checked && !days[today].checked, 'clicking a day selects it');
+    require(header() !== week, 'the week number follows the selected day');
   } finally {
     settings.reset('week-start');
     locale.reset('region');
@@ -471,6 +479,8 @@ export async function run() {
     subscribe<[number, number]>({...notifications, member: 'NotificationClosed'}, (_signal, [id, reason]) => closed.set(id, reason)),
     subscribe<Reply>({...notifications, member: 'ActionInvoked'}, (_signal, action) => invoked.push(action)),
   ];
+  const forced = global.force_animations;
+  global.force_animations = true;
   try {
     clearAll();
     await checkCenter(replies);
@@ -484,6 +494,7 @@ export async function run() {
     await checkCenterSwipes(closed);
     await checkActivation();
   } finally {
+    global.force_animations = forced;
     for (const unsubscribe of unsubscribes) unsubscribe();
     clearAll();
   }

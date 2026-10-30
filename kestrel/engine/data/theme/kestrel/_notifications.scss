@@ -10,9 +10,11 @@
 .kestrel-calendar-month:hover, .kestrel-calendar-month:focus { background-color: fill(0.10); }
 .kestrel-calendar-page { padding: 8px; }
 .kestrel-calendar-heading { padding: 2px 0 6px; font-size: 11px; font-weight: 500; text-align: center; color: ink(0.50); }
-.kestrel-calendar-day { width: 34px; padding: 8px 0; border-radius: 17px; font-size: 13px; text-align: center; }
-.kestrel-calendar-day:selected { background-color: ink(0.94); color: paper(); font-weight: 600; }
-.kestrel-calendar-day:insensitive { color: ink(0.30); }
+.kestrel-calendar-day { width: 34px; padding: 8px 0; border-radius: 17px; font-size: 13px; text-align: center; transition-duration: $motion-tap; }
+.kestrel-calendar-day:hover, .kestrel-calendar-day:focus { background-color: fill(0.10); }
+.kestrel-calendar-today { font-weight: 600; }
+.kestrel-calendar-outside { color: ink(0.30); }
+.kestrel-calendar-day:checked { background-color: ink(0.94); color: paper(); font-weight: 600; }
 
 .message.kestrel-glass { border-radius: 20px; background-color: glass(); }
 .notification-banner.kestrel-glass { width: 380px; min-height: 0; margin: 12px; padding: 12px; box-shadow: none; }

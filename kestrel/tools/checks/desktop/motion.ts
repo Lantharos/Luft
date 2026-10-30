@@ -18,15 +18,6 @@ const switching = () => animation().currentSwitch !== null;
 const a11y = new Gio.Settings({schema_id: 'org.gnome.desktop.a11y.interface'});
 const JUMP = 0.1;
 
-function watchFrames(read: () => number) {
-  const values: number[] = [];
-  const id = global.stage.connect_after('after-paint', () => values.push(read()));
-  return () => {
-    global.stage.disconnect(id);
-    return values;
-  };
-}
-
 const steps = (values: number[]) => values.slice(1).map((value, i) => Math.abs(value - values[i]));
 const largestStep = (values: number[]) => Math.max(0, ...steps(values));
 const jumps = (values: number[]) => steps(values).some((step, i, all) => step > JUMP && step > 2 * Math.max(all[i - 1] ?? 0, all[i + 1] ?? 0));
@@ -121,18 +112,26 @@ async function checkWorkspaceSwipe() {
   await settledOn(0, 'the first workspace comes back after swiping');
 }
 
+const WINDOW_MOTION = ['scale-x', 'scale-y', 'x', 'y', 'opacity'];
+
+async function holdWindowMotion(actor: Meta.WindowActor, label: string) {
+  await waitUntil(() => actor.get_transition('scale-x'), label, 3000);
+  return hold(WINDOW_MOTION.map(property => actor.get_transition(property)).filter(transition => transition !== null));
+}
+
 async function checkMinimizeRestore(window: Meta.Window) {
   const actor = window.get_compositor_private<Meta.WindowActor>();
-  const scales = watchFrames(() => actor.scale_x);
   window.minimize();
-  await pause(80);
-  await nextFrame();
+  (await holdWindowMotion(actor, 'the window starts minimising')).step(5);
   const shrunk = actor.scale_x;
   window.unminimize();
+  const growing = await holdWindowMotion(actor, 'the window starts restoring');
+  const path = [shrunk];
+  while (!growing.done) growing.step(1, () => path.push(actor.scale_x));
+  growing.release();
   await waitUntil(() => !window.minimized && actor.get_transition('scale-x') === null && actor.get_transition('x') === null,
     'restoring mid-minimise finishes', 3000);
   await settled();
-  const path = scales();
   const rect = window.get_buffer_rect();
   require(shrunk < 1 && largestStep(path) < 0.35, 'restoring mid-minimise grows back from where the window was');
   require(actor.scale_x === 1 && actor.opacity === 255 && actor.x === rect.x && actor.y === rect.y,

@@ -13,6 +13,8 @@ interface PanelLayoutManager {
   monitors: Monitor[];
   addChrome(actor: Clutter.Actor, params?: Record<string, boolean>): void;
   removeChrome(actor: Clutter.Actor): void;
+  connect(signal: 'startup-complete', callback: () => void): number;
+  disconnect(id: number): void;
 }
 
 export class PanelSet {
@@ -22,6 +24,7 @@ export class PanelSet {
   private overlap: WindowOverlap | null = null;
   private edgeSwipe: EdgeSwipe | null = null;
   private suppressed = false;
+  private arriving = true;
   private readonly unwatchPreferences: () => void;
 
   constructor(
@@ -39,6 +42,10 @@ export class PanelSet {
     this.syncAutoHide();
     this.syncEdgeSwipe();
     this.sync();
+    const startup = layoutManager.connect('startup-complete', () => {
+      layoutManager.disconnect(startup);
+      this.arrive();
+    });
   }
 
   get all(): KestrelPanel[] {
@@ -117,6 +124,11 @@ export class PanelSet {
     for (const panel of this.all) panel.shutdown();
   }
 
+  private arrive(): void {
+    this.arriving = false;
+    for (const panel of this.all) panel.autoHide.arrive();
+  }
+
   private preferenceChanged(key: TaskbarKey): void {
     if (key === 'taskbar-displays') {
       this.sync();
@@ -179,6 +191,7 @@ export class PanelSet {
     this.syncStrut(panel);
     panel.autoHide.watch(this.overlap);
     panel.autoHide.suppress(this.suppressed);
+    if (this.arriving) panel.autoHide.holdBack();
     navigateWithKeyboard(panel.actor);
     return panel;
   }

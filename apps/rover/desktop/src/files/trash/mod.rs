@@ -7,7 +7,8 @@ use std::path::{Path, PathBuf};
 use serde::Serialize;
 
 use super::operations::{OperationPhase, OperationType, OperationsQueue};
-use super::privileged::{os, remove_path, run_pkexec};
+use super::privileged::{is_permission_error, os, remove_path, run_pkexec};
+use crate::locations::cloud::is_cloud;
 use crate::files::text::{items, subject};
 use crate::history::{History, Step};
 pub use locations::TrashLocation;
@@ -69,13 +70,21 @@ pub fn move_to_trash(
         OperationType::Trash,
         OperationPhase::Moving,
         paths,
-        |path| match put(Path::new(&path)) {
-            Ok(trashed) => {
-                steps.push(Step::Trashed(trashed));
-                Ok(())
+        |path| {
+            if is_cloud(&path) {
+                return delete_in_cloud(Path::new(&path));
             }
-            Err(error) => run_pkexec("gio", &[os("trash"), os("--"), path.into()])
-                .map_err(|fallback| format!("{error}; {fallback}")),
+            match put(Path::new(&path)) {
+                Ok(trashed) => {
+                    steps.push(Step::Trashed(trashed));
+                    Ok(())
+                }
+                Err(error) if is_permission_error(&error) => {
+                    run_pkexec("gio", &[os("trash"), os("--"), path.into()])
+                        .map_err(|fallback| format!("{error}; {fallback}"))
+                }
+                Err(error) => Err(error.to_string()),
+            }
         },
     );
     history.record(label, undo_label, steps, true);
@@ -132,6 +141,15 @@ pub fn empty_trash(trash_path: Option<String>) -> Result<(), String> {
         remove_contents(&target.join("info"))?;
     }
     Ok(())
+}
+
+fn delete_in_cloud(path: &Path) -> Result<(), String> {
+    let removed = if path.is_dir() {
+        fs::remove_dir_all(path)
+    } else {
+        fs::remove_file(path)
+    };
+    removed.map_err(|error| error.to_string())
 }
 
 fn run_batch(

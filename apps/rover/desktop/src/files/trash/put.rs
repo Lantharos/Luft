@@ -17,19 +17,18 @@ pub struct Trashed {
     pub info: PathBuf,
 }
 
-pub fn put(path: &Path) -> Result<Trashed, String> {
+pub fn put(path: &Path) -> io::Result<Trashed> {
     let name = path
         .file_name()
-        .ok_or("This item can't be moved to the trash")?;
-    let target = trash_for(path)?;
+        .ok_or_else(|| io::Error::other("This item can't be moved to the trash"))?;
+    let target = trash_for(path).map_err(io::Error::other)?;
     let files = target.trash.join("files");
     let info = target.trash.join("info");
     for folder in [&files, &info] {
         fs::DirBuilder::new()
             .recursive(true)
             .mode(0o700)
-            .create(folder)
-            .map_err(|error| error.to_string())?;
+            .create(folder)?;
     }
     let recorded = match &target.top_dir {
         Some(top) => path.strip_prefix(top).unwrap_or(path),
@@ -54,11 +53,9 @@ pub fn put(path: &Path) -> Result<Trashed, String> {
             .create_new(true)
             .open(&info_path)
         {
-            Ok(mut file) => file
-                .write_all(contents.as_bytes())
-                .map_err(|error| error.to_string())?,
+            Ok(mut file) => file.write_all(contents.as_bytes())?,
             Err(error) if error.kind() == io::ErrorKind::AlreadyExists => continue,
-            Err(error) => return Err(error.to_string()),
+            Err(error) => return Err(error),
         }
         let file_path = files.join(&unique);
         match rename_no_replace(path, &file_path) {
@@ -72,7 +69,7 @@ pub fn put(path: &Path) -> Result<Trashed, String> {
             Err(error) => {
                 let _ = fs::remove_file(&info_path);
                 if error.kind() != io::ErrorKind::AlreadyExists {
-                    return Err(error.to_string());
+                    return Err(error);
                 }
             }
         }

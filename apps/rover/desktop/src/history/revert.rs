@@ -29,7 +29,9 @@ fn revert_step(step: Step, queue: &OperationsQueue, id: &str) -> Result<Step, St
             Ok(Step::Moved { from: to, to: from })
         }
         Step::Trashed(item) => trash::restore_item(&item).map(Step::Created),
-        Step::Created(path) => trash::put(&path).map(Step::Trashed),
+        Step::Created(path) => trash::put(&path)
+            .map(Step::Trashed)
+            .map_err(|error| error.to_string()),
     }
 }
 

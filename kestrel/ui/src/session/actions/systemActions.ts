@@ -9,6 +9,7 @@ const LOCKDOWN_SCHEMA = 'org.gnome.desktop.lockdown';
 const SCREENSAVER_SCHEMA = 'org.gnome.desktop.screensaver';
 const DISABLE_LOG_OUT_KEY = 'disable-log-out';
 const RESTART_ENABLED_KEY = 'restart-enabled';
+const SESSION_MANAGER = 'org.gnome.SessionManager';
 
 type ActionId = 'power-off' | 'restart' | 'lock-screen' | 'logout' | 'suspend';
 
@@ -76,9 +77,11 @@ const SystemActions = GObject.registerClass({
       void this.updateHaveReboot();
     });
 
-    void this.updateHaveShutdown();
-    void this.updateHaveReboot();
-    void this.updateHaveSuspend();
+    Gio.bus_watch_name(Gio.BusType.SESSION, SESSION_MANAGER, Gio.BusNameWatcherFlags.NONE, () => {
+      void this.updateHaveShutdown();
+      void this.updateHaveReboot();
+      void this.updateHaveSuspend();
+    }, null);
 
     Main.sessionMode.connect('updated', () => this.sessionUpdated());
     this.sessionUpdated();

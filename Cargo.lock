@@ -6881,8 +6881,8 @@ checksum = "cf54715a573b99ac80df0bc206da022bcd442c974952c7b9720069370852e21f"
 
 [[package]]
 name = "sabine"
-version = "0.63.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.63#482c2afe17dc5e4ac175fb5e1d26868cfd7a8b5b"
+version = "0.64.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.64#8972be61c2de6f8d594d454d51f1bb717b77a686"
 dependencies = [
  "base64",
  "block2",
@@ -6917,6 +6917,7 @@ dependencies = [
  "raw-window-handle",
  "rfd",
  "sabine-bridge",
+ "sabine-dialog",
  "sabine-host",
  "sabine-platform",
  "sabine-runtime",
@@ -6924,7 +6925,6 @@ dependencies = [
  "serde",
  "serde_json",
  "shell-words",
- "softbuffer",
  "specta",
  "thiserror 2.0.21",
  "tokio",
@@ -6944,8 +6944,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-bridge"
-version = "0.63.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.63#482c2afe17dc5e4ac175fb5e1d26868cfd7a8b5b"
+version = "0.64.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.64#8972be61c2de6f8d594d454d51f1bb717b77a686"
 dependencies = [
  "serde",
  "serde_json",
@@ -6955,9 +6955,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "sabine-dialog"
+version = "0.64.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.64#8972be61c2de6f8d594d454d51f1bb717b77a686"
+dependencies = [
+ "bytemuck",
+ "glyphon",
+ "image",
+ "sabine-platform",
+ "sabine-runtime",
+ "serde_json",
+ "softbuffer",
+ "windows",
+ "winit",
+]
+
+[[package]]
 name = "sabine-host"
-version = "0.63.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.63#482c2afe17dc5e4ac175fb5e1d26868cfd7a8b5b"
+version = "0.64.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.64#8972be61c2de6f8d594d454d51f1bb717b77a686"
 dependencies = [
  "sabine-bridge",
  "sabine-runtime",
@@ -6968,8 +6984,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-platform"
-version = "0.63.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.63#482c2afe17dc5e4ac175fb5e1d26868cfd7a8b5b"
+version = "0.64.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.64#8972be61c2de6f8d594d454d51f1bb717b77a686"
 dependencies = [
  "block2",
  "futures-util",
@@ -6988,8 +7004,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-runtime"
-version = "0.63.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.63#482c2afe17dc5e4ac175fb5e1d26868cfd7a8b5b"
+version = "0.64.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.64#8972be61c2de6f8d594d454d51f1bb717b77a686"
 dependencies = [
  "bzip2",
  "libc",
@@ -7005,16 +7021,18 @@ dependencies = [
 
 [[package]]
 name = "sabine-service"
-version = "0.63.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.63#482c2afe17dc5e4ac175fb5e1d26868cfd7a8b5b"
+version = "0.64.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.64#8972be61c2de6f8d594d454d51f1bb717b77a686"
 dependencies = [
  "base64",
  "clap",
+ "dirs",
  "ed25519-dalek",
  "embed-resource",
  "flate2",
  "getrandom 0.4.3",
  "libc",
+ "sabine-dialog",
  "sabine-host",
  "sabine-runtime",
  "self-replace",

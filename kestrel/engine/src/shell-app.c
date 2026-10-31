@@ -232,7 +232,12 @@ const char *
 shell_app_get_name (ShellApp *app)
 {
   if (app->info)
-    return g_app_info_get_name (G_APP_INFO (app->info));
+    {
+      const char *custom = shell_app_cache_get_custom_name (shell_app_cache_get_default (),
+                                                            shell_app_get_id (app));
+
+      return custom ? custom : g_app_info_get_name (G_APP_INFO (app->info));
+    }
   else
     {
       MetaWindow *window = window_backed_app_get_window (app);

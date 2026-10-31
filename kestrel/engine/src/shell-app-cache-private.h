@@ -15,3 +15,5 @@ GDesktopAppInfo *shell_app_cache_get_info         (ShellAppCache *cache,
                                                    const char    *id);
 GIcon           *shell_app_cache_get_custom_icon  (ShellAppCache *cache,
                                                    const char    *id);
+const char      *shell_app_cache_get_custom_name  (ShellAppCache *cache,
+                                                   const char    *id);

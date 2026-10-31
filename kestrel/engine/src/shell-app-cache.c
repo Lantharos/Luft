@@ -31,9 +31,11 @@ struct _ShellAppCache
   GAppInfoMonitor *monitor;
   GFileMonitor    *custom_icons_monitor;
   GFileMonitor    *custom_glyphs_monitor;
+  GFileMonitor    *custom_names_monitor;
   GCancellable    *cancellable;
   GList           *app_infos;
   GHashTable      *custom_icons;
+  GHashTable      *custom_names;
 
   gboolean         glyphs_changed;
   guint            queued_update;
@@ -53,6 +55,7 @@ typedef struct
 {
   GList      *app_infos;
   GHashTable *custom_icons;
+  GHashTable *custom_names;
 } Snapshot;
 
 static void
@@ -68,6 +71,7 @@ snapshot_free (gpointer data)
 
   free_app_infos (snapshot->app_infos);
   g_hash_table_unref (snapshot->custom_icons);
+  g_hash_table_unref (snapshot->custom_names);
   g_free (snapshot);
 }
 
@@ -120,6 +124,35 @@ load_custom_icons (void)
   return icons;
 }
 
+static GFile *
+custom_names_file (void)
+{
+  return g_file_new_build_filename (g_get_user_data_dir (), "luft", "app-names", NULL);
+}
+
+static GHashTable *
+load_custom_names (void)
+{
+  g_autoptr (GFile) file = custom_names_file ();
+  g_autoptr (GKeyFile) key_file = g_key_file_new ();
+  g_auto (GStrv) ids = NULL;
+  GHashTable *names = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
+
+  if (!g_key_file_load_from_file (key_file, g_file_peek_path (file), G_KEY_FILE_NONE, NULL))
+    return names;
+
+  ids = g_key_file_get_keys (key_file, "Names", NULL, NULL);
+  for (char **id = ids; id && *id; id++)
+    {
+      char *name = g_key_file_get_string (key_file, "Names", *id, NULL);
+
+      if (name)
+        g_hash_table_replace (names, g_strdup (*id), name);
+    }
+
+  return names;
+}
+
 static Snapshot *
 take_snapshot (void)
 {
@@ -127,6 +160,7 @@ take_snapshot (void)
 
   snapshot->app_infos = g_app_info_get_all ();
   snapshot->custom_icons = load_custom_icons ();
+  snapshot->custom_names = load_custom_names ();
   return snapshot;
 }
 
@@ -177,6 +211,8 @@ apply_update_cb (GObject      *object,
   g_hash_table_unref (cache->custom_icons);
   cache->app_infos = snapshot->app_infos;
   cache->custom_icons = snapshot->custom_icons;
+  g_hash_table_unref (cache->custom_names);
+  cache->custom_names = snapshot->custom_names;
   g_free (snapshot);
 
   if (cache->glyphs_changed)
@@ -237,7 +273,9 @@ shell_app_cache_finalize (GObject *object)
   g_clear_object (&self->monitor);
   g_clear_object (&self->custom_icons_monitor);
   g_clear_object (&self->custom_glyphs_monitor);
+  g_clear_object (&self->custom_names_monitor);
   g_clear_pointer (&self->custom_icons, g_hash_table_unref);
+  g_clear_pointer (&self->custom_names, g_hash_table_unref);
 
   g_clear_handle_id (&self->queued_update, g_source_remove);
 
@@ -279,6 +317,7 @@ shell_app_cache_init (ShellAppCache *self)
 {
   g_autoptr (GFile) folder = custom_icons_folder ();
   g_autoptr (GFile) glyphs = custom_glyphs_folder ();
+  g_autoptr (GFile) names = custom_names_file ();
 
   self->monitor = g_app_info_monitor_get ();
   g_signal_connect_object (self->monitor,
@@ -288,6 +327,7 @@ shell_app_cache_init (ShellAppCache *self)
                            G_CONNECT_SWAPPED);
   self->app_infos = g_app_info_get_all ();
   self->custom_icons = load_custom_icons ();
+  self->custom_names = load_custom_names ();
   self->custom_icons_monitor = g_file_monitor_directory (folder, G_FILE_MONITOR_WATCH_MOVES, NULL, NULL);
   if (self->custom_icons_monitor)
     g_signal_connect_object (self->custom_icons_monitor,
@@ -300,6 +340,13 @@ shell_app_cache_init (ShellAppCache *self)
     g_signal_connect_object (self->custom_glyphs_monitor,
                              "changed",
                              G_CALLBACK (on_custom_glyphs_changed),
+                             self,
+                             G_CONNECT_SWAPPED);
+  self->custom_names_monitor = g_file_monitor_file (names, G_FILE_MONITOR_WATCH_MOVES, NULL, NULL);
+  if (self->custom_names_monitor)
+    g_signal_connect_object (self->custom_names_monitor,
+                             "changed",
+                             G_CALLBACK (shell_app_cache_queue_update),
                              self,
                              G_CONNECT_SWAPPED);
 }
@@ -365,4 +412,19 @@ shell_app_cache_get_custom_icon (ShellAppCache *cache,
                                  const char    *id)
 {
   return g_hash_table_lookup (cache->custom_icons, id);
+}
+
+/**
+ * shell_app_cache_get_custom_name:
+ * @cache: a #ShellAppCache
+ * @id: the application id
+ *
+ * Returns: (transfer none) (nullable): the name the person gave the
+ *   application in place of its own, if any
+ */
+const char *
+shell_app_cache_get_custom_name (ShellAppCache *cache,
+                                 const char    *id)
+{
+  return g_hash_table_lookup (cache->custom_names, id);
 }

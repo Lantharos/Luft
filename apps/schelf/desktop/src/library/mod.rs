@@ -3,6 +3,7 @@ mod debian;
 mod flatpaks;
 pub mod full_access;
 mod icons;
+mod names;
 pub mod sources;
 mod system;
 mod tools;
@@ -112,4 +113,6 @@ pub fn register(window: SabineWindow) -> SabineWindow {
         .command_async("library_choose_icon", icons::choose)
         .command_async("library_choose_symbolic_icon", icons::choose_symbolic)
         .command("library_reset_icons", icons::reset)
+        .command("library_names", names::state)
+        .command("library_rename", names::rename)
 }

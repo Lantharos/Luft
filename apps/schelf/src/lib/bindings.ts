@@ -53,10 +53,17 @@ export const commands = {
 		desktop: string,
 		token?: string | null,
 	}, options?: InvokeOptions) => invoke<null>("library_launch", params, options),
+	libraryNames: (params: {
+		desktop: string,
+	}, options?: InvokeOptions) => invoke<Names>("library_names", params, options),
 	libraryPermissions: (params: {
 		installation: Installation,
 		reference: string,
 	}, options?: InvokeOptions) => invoke<Permissions>("library_permissions", params, options),
+	libraryRename: (params: {
+		desktop: string,
+		name: string,
+	}, options?: InvokeOptions) => invoke<null>("library_rename", params, options),
 	libraryResetIcons: (params: {
 		desktop: string,
 	}, options?: InvokeOptions) => invoke<null>("library_reset_icons", params, options),
@@ -230,6 +237,11 @@ export type Locale = {
 };
 
 export type Motion = "full" | "reduced" | "off";
+
+export type Names = {
+	own: string,
+	custom: string | null,
+};
 
 /**  The same app on Flathub, which installs better than a `.deb` file can. */
 export type OnFlathub = {

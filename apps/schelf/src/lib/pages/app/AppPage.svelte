@@ -8,7 +8,7 @@
 	import AppActions from './AppActions.svelte';
 	import AppFacts from './AppFacts.svelte';
 	import FullAccess from './FullAccess.svelte';
-	import IconSection from './IconSection.svelte';
+	import NameAndIcon from './NameAndIcon.svelte';
 	import { installedFor, load, type Loaded } from './load';
 
 	let { target, name, askFullAccess = false }: { target: AppTarget; name: string; askFullAccess?: boolean } = $props();
@@ -100,7 +100,7 @@
 			{/if}
 			<AppFacts {details} {installed} />
 			{#if installed?.desktop}
-				<IconSection desktop={installed.desktop} />
+				<NameAndIcon desktop={installed.desktop} />
 			{/if}
 			{#if sandboxed}
 				<AccessList permissions={fullAccess ? null : permissions}>

@@ -11,6 +11,7 @@ import { animateActor, liftIcon } from '../../shared/motion/motion.js';
 import { appIcon } from '../../appearance/icons/appIcons.js';
 import type { ContextMenus } from '../../desktop/menus/contextMenus.js';
 import { t } from '../../shared/i18n/index.js';
+import { appName } from '../../shared/apps/names.js';
 
 export class StartGrid {
   readonly header = new St.BoxLayout({ style_class: 'kestrel-grid-header' });
@@ -213,7 +214,7 @@ export class StartGrid {
   private button(id: string): { actor: St.Button; draggable: { enabled: boolean } } {
     const folder = this.layout.folder(id);
     const app = this.apps.get(id);
-    const label = folder?.name ?? app!.get_display_name();
+    const label = folder?.name ?? appName(app!);
     const content = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-app-content', x_align: Clutter.ActorAlign.CENTER });
     const icon = this.icon(id, 36);
     icon.x_align = Clutter.ActorAlign.CENTER;

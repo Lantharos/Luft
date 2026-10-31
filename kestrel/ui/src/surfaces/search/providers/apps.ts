@@ -7,6 +7,7 @@ import { t } from '../../../shared/i18n/index.js';
 import { appKey, launchHistory } from '../../../shared/apps/launchHistory.js';
 import type { Ranked, SearchItem } from '../item.js';
 import { rank, searchable, type Query, type Searchable } from '../ranking.js';
+import { appName } from '../../../shared/apps/names.js';
 
 const LIMIT = 8;
 
@@ -34,7 +35,7 @@ export class AppResults {
   constructor(private readonly menus: ContextMenus, private readonly close: () => void) {}
 
   update(apps: Gio.AppInfo[]): void {
-    this.entries = apps.map(app => searchable({ app }, appKey(app.get_id()!), app.get_display_name(), searchTerms(app)));
+    this.entries = apps.map(app => searchable({ app }, appKey(app.get_id()!), appName(app), searchTerms(app)));
   }
 
   find(search: Query, launches: (key: string) => number): Ranked[] {
@@ -56,7 +57,7 @@ export class AppResults {
 
   private item({ app, key }: AppEntry): SearchItem {
     return {
-      key, title: app.get_display_name(), description: app.get_description() ?? '',
+      key, title: appName(app), description: app.get_description() ?? '',
       icon: app,
       activate: () => this.launch(app),
       menu: () => {

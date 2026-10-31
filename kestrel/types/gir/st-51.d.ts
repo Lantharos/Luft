@@ -2003,6 +2003,8 @@ export namespace St {
 
         prepend_search_path(path: string): void;
 
+        reload(): void;
+
         rescan_if_needed(): boolean;
 
         set_search_path(path: string[]): void;
@@ -3263,6 +3265,8 @@ export namespace St {
         lookup_styled_icon_file(icon: StyledIcon, size: number): Gio.File | null;
 
         preload_file_to_cairo_surface(file: Gio.File, paint_scale: number, resource_scale: number): void;
+
+        reload_icon_theme(): void;
 
         rescan_icon_theme(): boolean;
 

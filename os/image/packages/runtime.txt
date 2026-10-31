@@ -74,6 +74,7 @@ mesa-vulkan-drivers
 ModemManager
 mokutil
 NetworkManager-bluetooth
+NetworkManager-config-connectivity-fedora
 NetworkManager-openconnect
 NetworkManager-openvpn
 NetworkManager-wifi

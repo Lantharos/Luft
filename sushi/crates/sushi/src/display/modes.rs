@@ -116,10 +116,11 @@ impl ModeHints {
 }
 
 const HDMI_SCRAMBLING_ABOVE_KHZ: u32 = 340_000;
+const WAKE_RATE: f64 = 60.0;
 
 /// Some monitors stay black when the first picture after standby already needs
-/// HDMI scrambling, so the splash wakes them in the fastest mode of the same size
-/// that doesn't before switching to `mode`.
+/// HDMI scrambling, so the splash wakes them in the mode of the same size closest
+/// to 60 Hz, which every HDMI input takes, before switching to `mode`.
 pub fn hdmi_wake_mode(mode: &Mode, modes: &[Mode]) -> Option<Mode> {
     if mode.clock() <= HDMI_SCRAMBLING_ABOVE_KHZ {
         return None;
@@ -131,7 +132,11 @@ pub fn hdmi_wake_mode(mode: &Mode, modes: &[Mode]) -> Option<Mode> {
                 && candidate.clock() <= HDMI_SCRAMBLING_ABOVE_KHZ
                 && !candidate.flags().contains(ModeFlags::INTERLACE)
         })
-        .max_by(|a, b| refresh_rate(a).total_cmp(&refresh_rate(b)))
+        .min_by(|a, b| {
+            (refresh_rate(a) - WAKE_RATE)
+                .abs()
+                .total_cmp(&(refresh_rate(b) - WAKE_RATE).abs())
+        })
         .copied()
 }
 
@@ -207,11 +212,11 @@ mod tests {
     }
 
     #[test]
-    fn hdmi_modes_needing_scrambling_wake_in_the_fastest_one_without() {
+    fn hdmi_modes_needing_scrambling_wake_at_sixty_hertz() {
         let fast = mode(380_930, 2080, 1110);
-        let modes = [fast, mode(148_500, 2200, 1125), mode(297_000, 2200, 1125)];
+        let modes = [fast, mode(297_000, 2200, 1125), mode(148_500, 2200, 1125)];
         let waking = hdmi_wake_mode(&fast, &modes).unwrap();
-        assert_eq!(waking.clock(), 297_000);
+        assert_eq!(waking.clock(), 148_500);
         assert_eq!(hdmi_wake_mode(&waking, &modes), None);
     }
 

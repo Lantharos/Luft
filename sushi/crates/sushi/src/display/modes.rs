@@ -119,10 +119,10 @@ const HDMI_SCRAMBLING_ABOVE_KHZ: u32 = 340_000;
 
 /// Some monitors stay black when the first picture after standby already needs
 /// HDMI scrambling, so the splash wakes them in the fastest mode of the same size
-/// that doesn't, and the desktop switches up once they're awake.
-pub fn without_hdmi_scrambling(mode: Mode, modes: &[Mode]) -> Mode {
+/// that doesn't before switching to `mode`.
+pub fn hdmi_wake_mode(mode: &Mode, modes: &[Mode]) -> Option<Mode> {
     if mode.clock() <= HDMI_SCRAMBLING_ABOVE_KHZ {
-        return mode;
+        return None;
     }
     modes
         .iter()
@@ -133,7 +133,6 @@ pub fn without_hdmi_scrambling(mode: Mode, modes: &[Mode]) -> Mode {
         })
         .max_by(|a, b| refresh_rate(a).total_cmp(&refresh_rate(b)))
         .copied()
-        .unwrap_or(mode)
 }
 
 pub fn refresh_rate(mode: &Mode) -> f64 {
@@ -208,12 +207,12 @@ mod tests {
     }
 
     #[test]
-    fn hdmi_modes_needing_scrambling_start_in_the_fastest_one_without() {
+    fn hdmi_modes_needing_scrambling_wake_in_the_fastest_one_without() {
         let fast = mode(380_930, 2080, 1110);
         let modes = [fast, mode(148_500, 2200, 1125), mode(297_000, 2200, 1125)];
-        let chosen = without_hdmi_scrambling(fast, &modes);
-        assert_eq!(chosen.clock(), 297_000);
-        assert_eq!(without_hdmi_scrambling(chosen, &modes), chosen);
+        let waking = hdmi_wake_mode(&fast, &modes).unwrap();
+        assert_eq!(waking.clock(), 297_000);
+        assert_eq!(hdmi_wake_mode(&waking, &modes), None);
     }
 
     #[test]

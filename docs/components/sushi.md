@@ -9,7 +9,7 @@ Sushi ([`sushi`](../../sushi)) is Luft's boot splash, and SushiBoot the UEFI boo
 | `monitors` in `/etc/sushi/sushi.conf` | `/var/lib/kestrel-greeter/display/monitors.xml` | Display arrangement to start in, that of whoever signed in last |
 | `/usr/lib/modprobe.d/sushi.conf` | NVIDIA's display driver | Drivers Sushi loads itself; a file with the same name in `/etc/modprobe.d` replaces it |
 
-Each screen starts in the mode from that arrangement, or else in its preferred mode. On HDMI, a mode faster than 340 MHz needs the monitor to turn on scrambling, which some monitors miss straight out of standby and stay black. So the splash uses the fastest mode of the same size that doesn't need it, and the desktop switches to the faster mode once the monitor is awake.
+Each screen starts in the mode from that arrangement, or else in its preferred mode. On HDMI, a mode faster than 340 MHz needs the monitor to turn on scrambling, which some monitors miss straight out of standby and stay black. So the splash wakes such a monitor in the fastest mode of the same size that doesn't need it, and switches to the faster mode itself two seconds later, or right before handing over if startup is quicker.
 
 ## sushictl
 

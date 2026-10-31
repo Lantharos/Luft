@@ -89,6 +89,7 @@ pub struct Output {
     pub connector: connector::Handle,
     pub crtc: crtc::Handle,
     pub mode: Mode,
+    waking: Option<Mode>,
     pub framebuffer: framebuffer::Handle,
     pub inherited: Option<Mode>,
     pub internal: bool,
@@ -117,6 +118,7 @@ impl Output {
             connector,
             crtc,
             mode,
+            waking: None,
             framebuffer,
             inherited: None,
             internal: false,
@@ -132,20 +134,43 @@ impl Output {
         }
     }
 
+    pub fn waking_in(self, waking: Option<Mode>) -> Self {
+        Self { waking, ..self }
+    }
+
     pub fn size(&self) -> (u32, u32) {
         self.buffer.size
     }
 
+    pub fn first_mode(&self) -> Mode {
+        self.waking.unwrap_or(self.mode)
+    }
+
+    pub fn is_waking(&self) -> bool {
+        self.waking.is_some()
+    }
+
     pub fn show(&self, card: &Card) -> io::Result<()> {
+        self.set_mode(card, self.first_mode())?;
+        self.hide_other_planes(card);
+        Ok(())
+    }
+
+    pub fn finish_waking(&mut self, card: &Card) -> io::Result<()> {
+        match self.waking.take() {
+            Some(_) => self.set_mode(card, self.mode),
+            None => Ok(()),
+        }
+    }
+
+    fn set_mode(&self, card: &Card, mode: Mode) -> io::Result<()> {
         card.set_crtc(
             self.crtc,
             Some(self.framebuffer),
             (0, 0),
             &[self.connector],
-            Some(self.mode),
-        )?;
-        self.hide_other_planes(card);
-        Ok(())
+            Some(mode),
+        )
     }
 
     fn hide_other_planes(&self, card: &Card) {

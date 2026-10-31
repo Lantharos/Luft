@@ -3,6 +3,7 @@ pub mod firmware;
 
 use std::io;
 use std::path::Path;
+use std::time::{Duration, Instant};
 
 use rustix::fs::{XattrFlags, getxattr, setxattr};
 use sushi::display::{Card, Display, ModeHints};
@@ -17,6 +18,7 @@ use firmware::Firmware;
 
 const SELINUX_LABEL: &str = "security.selinux";
 const LOGIN_SCREEN_RUNTIME_TYPE: &str = "xdm_var_run_t";
+const MONITOR_WAKE_TIME: Duration = Duration::from_secs(2);
 
 #[derive(Clone, Copy, Debug)]
 pub struct Fader {
@@ -103,6 +105,7 @@ pub struct Screen {
     scenes: Vec<Scene>,
     shown: Option<Shown>,
     crossfade: Option<Crossfade>,
+    lit_at: Option<Instant>,
 }
 
 impl Screen {
@@ -120,6 +123,7 @@ impl Screen {
             scenes,
             shown: None,
             crossfade,
+            lit_at: None,
         }
     }
 
@@ -226,8 +230,24 @@ impl Screen {
         self.shown = Some(next);
         if first {
             self.display.show()?;
+            self.lit_at.get_or_insert_with(Instant::now);
         }
         Ok(())
+    }
+
+    pub fn wake_remaining(&self) -> Option<Duration> {
+        self.lit_at
+            .filter(|_| self.display.is_waking())
+            .map(|lit_at| MONITOR_WAKE_TIME.saturating_sub(lit_at.elapsed()))
+    }
+
+    pub fn finish_waking(&mut self, now: bool) {
+        if !now && self.wake_remaining() != Some(Duration::ZERO) {
+            return;
+        }
+        if let Err(error) = self.display.finish_waking() {
+            eprintln!("Couldn't switch to the saved mode: {error}");
+        }
     }
 
     pub fn share_logo_placement(&self) {

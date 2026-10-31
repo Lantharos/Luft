@@ -27,8 +27,16 @@ struct Planned {
     connector: connector::Handle,
     crtc: crtc::Handle,
     mode: Mode,
+    waking: Option<Mode>,
     inherited: Option<Mode>,
     internal: bool,
+}
+
+fn is_hdmi(interface: connector::Interface) -> bool {
+    matches!(
+        interface,
+        connector::Interface::HDMIA | connector::Interface::HDMIB
+    )
 }
 
 const DRIVERS_READING_BACK_THE_FIRMWARE_PICTURE: [&str; 2] = ["i915", "xe"];
@@ -73,19 +81,15 @@ fn plan(card: &Card, hints: &ModeHints) -> io::Result<Vec<Planned>> {
     for info in &connected {
         let taken: Vec<crtc::Handle> = plan.iter().map(|planned| planned.crtc).collect();
         let crtc = pick_crtc(card, &resources, info, &taken);
-        let mode = hints
-            .choose(&info.to_string(), &names, info.modes())
-            .map(|mode| match info.interface() {
-                connector::Interface::HDMIA | connector::Interface::HDMIB => {
-                    modes::without_hdmi_scrambling(mode, info.modes())
-                }
-                _ => mode,
-            });
+        let mode = hints.choose(&info.to_string(), &names, info.modes());
         if let (Some(crtc), Some(mode)) = (crtc, mode) {
             plan.push(Planned {
                 connector: info.handle(),
                 crtc,
                 mode,
+                waking: is_hdmi(info.interface())
+                    .then(|| modes::hdmi_wake_mode(&mode, info.modes()))
+                    .flatten(),
                 inherited: shown_mode(card, crtc),
                 internal: is_internal(info.interface()),
             });
@@ -167,8 +171,11 @@ impl Display {
         let outputs = plan
             .into_iter()
             .map(|planned| {
-                Output::create(&card, planned.connector, planned.crtc, planned.mode)
-                    .map(|output| output.inheriting(planned.inherited, planned.internal))
+                Output::create(&card, planned.connector, planned.crtc, planned.mode).map(|output| {
+                    output
+                        .waking_in(planned.waking)
+                        .inheriting(planned.inherited, planned.internal)
+                })
             })
             .collect::<io::Result<Vec<_>>>()?;
         Ok(Self { card, outputs })
@@ -181,7 +188,7 @@ impl Display {
             return self.outputs.iter().all(|output| {
                 output
                     .inherited
-                    .is_some_and(|inherited| same_timing(&inherited, &output.mode))
+                    .is_some_and(|inherited| same_timing(&inherited, &output.first_mode()))
             });
         }
         let framebuffer = boot::framebuffer();
@@ -219,6 +226,16 @@ impl Display {
         self.outputs
             .iter()
             .try_for_each(|output| output.show(&self.card))
+    }
+
+    pub fn is_waking(&self) -> bool {
+        self.outputs.iter().any(Output::is_waking)
+    }
+
+    pub fn finish_waking(&mut self) -> io::Result<()> {
+        self.outputs
+            .iter_mut()
+            .try_for_each(|output| output.finish_waking(&self.card))
     }
 
     pub fn blit(&mut self, output: usize, area: Rect, pixmap: &Pixmap) {

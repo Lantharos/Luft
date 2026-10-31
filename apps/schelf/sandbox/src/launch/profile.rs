@@ -194,7 +194,11 @@ impl Profile<'_> {
         arguments
             .bind("--ro-bind", self.mount, INSIDE_APP)
             .bind("--ro-bind", self.info, "/.flatpak-info")
-            .bind("--ro-bind", self.info, folder::runtime_dir()?.join("flatpak-info"));
+            .bind(
+                "--ro-bind",
+                self.info,
+                folder::runtime_dir()?.join("flatpak-info"),
+            );
         Ok(arguments)
     }
 

@@ -181,6 +181,11 @@ impl Daemon {
     }
 
     fn next_wakeup(&self) -> Option<Duration> {
+        let waking = self.screen.as_ref().and_then(Screen::wake_remaining);
+        [self.next_frame(), waking].into_iter().flatten().min()
+    }
+
+    fn next_frame(&self) -> Option<Duration> {
         let now = self.now();
         if self.takeover.is_animating(now) {
             return Some(FRAME);
@@ -379,13 +384,17 @@ impl Daemon {
             self.fading_failure = None;
         }
         self.advance_takeover(now);
+        if let Some(screen) = &mut self.screen {
+            screen.finish_waking(false);
+        }
         match std::mem::replace(&mut self.phase, Phase::Holding) {
             Phase::Leaving(pending)
                 if !self.takeover.is_active()
                     && (self.look.settled(now) || self.screen.is_none()) =>
             {
                 self.draw();
-                if let Some(screen) = &self.screen {
+                if let Some(screen) = &mut self.screen {
+                    screen.finish_waking(true);
                     screen.share_logo_placement();
                     screen.release_master();
                 }

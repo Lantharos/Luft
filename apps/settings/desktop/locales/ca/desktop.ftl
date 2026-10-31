@@ -36,6 +36,7 @@ desktop-shortcut-board-zoom-in = Apropa el tauler
 desktop-shortcut-board-zoom-out = Allunya el tauler
 desktop-shortcut-board-enter-window = Entra a la finestra activa del tauler
 desktop-shortcut-system-monitor = Obre el monitor del sistema per veure què s’està executant
+desktop-shortcut-relight-displays = Torna a encendre les pantalles quan una no mostra imatge
 desktop-shortcut-screen-brightness-up = Apuja la brillantor de la pantalla
 desktop-shortcut-screen-brightness-down = Abaixa la brillantor de la pantalla
 desktop-shortcut-screen-brightness-cycle = Alterna els nivells de brillantor de la pantalla

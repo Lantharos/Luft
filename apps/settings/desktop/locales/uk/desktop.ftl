@@ -36,6 +36,7 @@ desktop-shortcut-board-zoom-in = Збільшити масштаб дошки
 desktop-shortcut-board-zoom-out = Зменшити масштаб дошки
 desktop-shortcut-board-enter-window = Відкрити активне вікно на дошці
 desktop-shortcut-system-monitor = Відкрити системний монітор, щоб побачити, що запущено
+desktop-shortcut-relight-displays = Знову увімкнути екрани, коли один із них не показує зображення
 desktop-shortcut-screen-brightness-up = Збільшити яскравість екрана
 desktop-shortcut-screen-brightness-down = Зменшити яскравість екрана
 desktop-shortcut-screen-brightness-cycle = Перемикати рівні яскравості екрана по колу

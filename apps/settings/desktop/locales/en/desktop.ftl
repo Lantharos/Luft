@@ -43,6 +43,7 @@ desktop-shortcut-board-zoom-in = Zoom in on the board
 desktop-shortcut-board-zoom-out = Zoom out of the board
 desktop-shortcut-board-enter-window = Enter the focused window on the board
 desktop-shortcut-system-monitor = Open the system monitor to see what's running
+desktop-shortcut-relight-displays = Light the displays again when one shows no picture
 desktop-shortcut-screen-brightness-up = Increase screen brightness
 desktop-shortcut-screen-brightness-down = Decrease screen brightness
 # Steps through brightness levels, starting over after the brightest

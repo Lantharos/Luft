@@ -36,6 +36,7 @@ desktop-shortcut-board-zoom-in = Przybliż tablicę
 desktop-shortcut-board-zoom-out = Oddal tablicę
 desktop-shortcut-board-enter-window = Przejdź do aktywnego okna na tablicy
 desktop-shortcut-system-monitor = Otwórz monitor systemu, aby zobaczyć, co jest uruchomione
+desktop-shortcut-relight-displays = Włącz ponownie ekrany, gdy któryś nie pokazuje obrazu
 desktop-shortcut-screen-brightness-up = Zwiększ jasność ekranu
 desktop-shortcut-screen-brightness-down = Zmniejsz jasność ekranu
 desktop-shortcut-screen-brightness-cycle = Przełączaj poziomy jasności ekranu

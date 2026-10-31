@@ -36,6 +36,7 @@ desktop-shortcut-board-zoom-in = Зумирај ја таблата
 desktop-shortcut-board-zoom-out = Одзумирај ја таблата
 desktop-shortcut-board-enter-window = Влези во активниот прозорец на таблата
 desktop-shortcut-system-monitor = Отвори го мониторот на системот за да видите што работи
+desktop-shortcut-relight-displays = Повторно вклучи ги екраните кога некој не прикажува слика
 desktop-shortcut-screen-brightness-up = Зголеми ја осветленоста на екранот
 desktop-shortcut-screen-brightness-down = Намали ја осветленоста на екранот
 desktop-shortcut-screen-brightness-cycle = Менувај ја осветленоста на екранот по нивоа

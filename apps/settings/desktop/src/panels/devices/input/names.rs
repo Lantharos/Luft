@@ -20,6 +20,7 @@ fn message(key: &str) -> Option<&'static str> {
         "board-zoom-out" => "desktop-shortcut-board-zoom-out",
         "board-enter-window" => "desktop-shortcut-board-enter-window",
         "system-monitor" => "desktop-shortcut-system-monitor",
+        "relight-displays" => "desktop-shortcut-relight-displays",
         "screen-brightness-up" => "desktop-shortcut-screen-brightness-up",
         "screen-brightness-down" => "desktop-shortcut-screen-brightness-down",
         "screen-brightness-cycle" => "desktop-shortcut-screen-brightness-cycle",

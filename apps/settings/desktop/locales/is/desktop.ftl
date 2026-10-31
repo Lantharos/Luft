@@ -36,6 +36,7 @@ desktop-shortcut-board-zoom-in = Auka aðdrátt á töflunni
 desktop-shortcut-board-zoom-out = Minnka aðdrátt á töflunni
 desktop-shortcut-board-enter-window = Fara inn í virka gluggann á töflunni
 desktop-shortcut-system-monitor = Opna kerfisvaktina til að sjá hvað er í gangi
+desktop-shortcut-relight-displays = Kveikja aftur á skjánum þegar einn sýnir enga mynd
 desktop-shortcut-screen-brightness-up = Auka birtu skjásins
 desktop-shortcut-screen-brightness-down = Minnka birtu skjásins
 desktop-shortcut-screen-brightness-cycle = Fletta í gegnum birtustig skjásins

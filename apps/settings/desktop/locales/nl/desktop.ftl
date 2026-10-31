@@ -36,6 +36,7 @@ desktop-shortcut-board-zoom-in = Inzoomen op het board
 desktop-shortcut-board-zoom-out = Uitzoomen op het board
 desktop-shortcut-board-enter-window = Actieve venster op het board openen
 desktop-shortcut-system-monitor = Systeemmonitor openen om te zien wat er actief is
+desktop-shortcut-relight-displays = Schermen opnieuw aanzetten als er een geen beeld toont
 desktop-shortcut-screen-brightness-up = Schermhelderheid verhogen
 desktop-shortcut-screen-brightness-down = Schermhelderheid verlagen
 desktop-shortcut-screen-brightness-cycle = Schermhelderheid doorlopen

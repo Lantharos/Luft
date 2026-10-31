@@ -36,6 +36,7 @@ desktop-shortcut-board-zoom-in = Ikber il-bord
 desktop-shortcut-board-zoom-out = Iċċekken il-bord
 desktop-shortcut-board-enter-window = Idħol fit-tieqa attiva fuq il-bord
 desktop-shortcut-system-monitor = Iftaħ il-monitor tas-sistema biex tara x’qed jaħdem
+desktop-shortcut-relight-displays = Erġa’ ixgħel l-iskrins meta wieħed ma juri l-ebda stampa
 desktop-shortcut-screen-brightness-up = Żid il-luminożità tal-iskrin
 desktop-shortcut-screen-brightness-down = Naqqas il-luminożità tal-iskrin
 desktop-shortcut-screen-brightness-cycle = Dawwar bejn il-livelli tal-luminożità tal-iskrin

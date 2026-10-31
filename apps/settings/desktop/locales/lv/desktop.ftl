@@ -36,6 +36,7 @@ desktop-shortcut-board-zoom-in = Tuvināt tāfeli
 desktop-shortcut-board-zoom-out = Tālināt tāfeli
 desktop-shortcut-board-enter-window = Atvērt aktīvo logu uz tāfeles
 desktop-shortcut-system-monitor = Atvērt sistēmas pārraugu, lai redzētu, kas darbojas
+desktop-shortcut-relight-displays = Atkal ieslēgt ekrānus, ja kāds no tiem nerāda attēlu
 desktop-shortcut-screen-brightness-up = Palielināt ekrāna spilgtumu
 desktop-shortcut-screen-brightness-down = Samazināt ekrāna spilgtumu
 desktop-shortcut-screen-brightness-cycle = Pārslēgt ekrāna spilgtuma līmeņus

@@ -42,6 +42,7 @@ desktop-shortcut-board-zoom-in = Suurenda tahvlit
 desktop-shortcut-board-zoom-out = Vähenda tahvlit
 desktop-shortcut-board-enter-window = Ava tahvlil aktiivne aken
 desktop-shortcut-system-monitor = Ava süsteemimonitor, et näha, mis töötab
+desktop-shortcut-relight-displays = Lülita ekraanid uuesti sisse, kui mõni ei näita pilti
 desktop-shortcut-screen-brightness-up = Suurenda ekraani heledust
 desktop-shortcut-screen-brightness-down = Vähenda ekraani heledust
 desktop-shortcut-screen-brightness-cycle = Vaheta ekraani heledustasemeid

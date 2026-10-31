@@ -36,6 +36,7 @@ desktop-shortcut-board-zoom-in = Zmadho tabelën
 desktop-shortcut-board-zoom-out = Zvogëlo tabelën
 desktop-shortcut-board-enter-window = Hyr te dritarja në fokus në tabelë
 desktop-shortcut-system-monitor = Hap monitorin e sistemit për të parë çfarë po punon
+desktop-shortcut-relight-displays = Ndiz përsëri ekranet kur njëri nuk shfaq figurë
 desktop-shortcut-screen-brightness-up = Rrit ndriçimin e ekranit
 desktop-shortcut-screen-brightness-down = Ul ndriçimin e ekranit
 desktop-shortcut-screen-brightness-cycle = Kalo nëpër nivelet e ndriçimit të ekranit

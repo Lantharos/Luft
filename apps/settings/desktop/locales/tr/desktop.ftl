@@ -36,6 +36,7 @@ desktop-shortcut-board-zoom-in = Tahtayı yakınlaştır
 desktop-shortcut-board-zoom-out = Tahtayı uzaklaştır
 desktop-shortcut-board-enter-window = Tahtada odaktaki pencereye gir
 desktop-shortcut-system-monitor = Çalışanları görmek için sistem izleyiciyi aç
+desktop-shortcut-relight-displays = Biri görüntü vermediğinde ekranları yeniden aç
 desktop-shortcut-screen-brightness-up = Ekran parlaklığını artır
 desktop-shortcut-screen-brightness-down = Ekran parlaklığını azalt
 desktop-shortcut-screen-brightness-cycle = Ekran parlaklık düzeyleri arasında geçiş yap

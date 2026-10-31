@@ -36,6 +36,7 @@ desktop-shortcut-board-zoom-in = Aumenta lo zoom della lavagna
 desktop-shortcut-board-zoom-out = Riduci lo zoom della lavagna
 desktop-shortcut-board-enter-window = Entra nella finestra attiva della lavagna
 desktop-shortcut-system-monitor = Apri il monitor di sistema per vedere cosa è in esecuzione
+desktop-shortcut-relight-displays = Riaccendi gli schermi quando uno non mostra l’immagine
 desktop-shortcut-screen-brightness-up = Aumenta la luminosità dello schermo
 desktop-shortcut-screen-brightness-down = Diminuisci la luminosità dello schermo
 desktop-shortcut-screen-brightness-cycle = Cambia a ciclo la luminosità dello schermo

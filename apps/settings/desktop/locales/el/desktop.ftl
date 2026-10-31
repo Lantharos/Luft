@@ -36,6 +36,7 @@ desktop-shortcut-board-zoom-in = Μεγέθυνση στον πίνακα
 desktop-shortcut-board-zoom-out = Σμίκρυνση στον πίνακα
 desktop-shortcut-board-enter-window = Μετάβαση στο ενεργό παράθυρο του πίνακα
 desktop-shortcut-system-monitor = Άνοιγμα της παρακολούθησης συστήματος για να δείτε τι εκτελείται
+desktop-shortcut-relight-displays = Άναψε ξανά τις οθόνες όταν κάποια δεν δείχνει εικόνα
 desktop-shortcut-screen-brightness-up = Αύξηση φωτεινότητας οθόνης
 desktop-shortcut-screen-brightness-down = Μείωση φωτεινότητας οθόνης
 desktop-shortcut-screen-brightness-cycle = Κυκλική εναλλαγή φωτεινότητας οθόνης

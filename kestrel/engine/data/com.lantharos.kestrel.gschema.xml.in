@@ -684,6 +684,10 @@
       <default>["&lt;Control&gt;&lt;Shift&gt;Escape"]</default>
       <summary>Open the system monitor</summary>
     </key>
+    <key name="relight-displays" type="as">
+      <default>["&lt;Super&gt;&lt;Control&gt;&lt;Shift&gt;b"]</default>
+      <summary>Light the displays again when one shows no picture</summary>
+    </key>
     <key name="workspace-1" type="as">
       <default>["&lt;Super&gt;1"]</default>
       <summary>Switch to workspace 1</summary>

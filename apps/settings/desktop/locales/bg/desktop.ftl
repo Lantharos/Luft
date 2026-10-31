@@ -36,6 +36,7 @@ desktop-shortcut-board-zoom-in = Увеличаване на таблото
 desktop-shortcut-board-zoom-out = Намаляване на таблото
 desktop-shortcut-board-enter-window = Влизане в активния прозорец на таблото
 desktop-shortcut-system-monitor = Отваряне на системния монитор, за да видите какво работи
+desktop-shortcut-relight-displays = Включи отново екраните, когато някой не показва картина
 desktop-shortcut-screen-brightness-up = Увеличаване на яркостта на екрана
 desktop-shortcut-screen-brightness-down = Намаляване на яркостта на екрана
 desktop-shortcut-screen-brightness-cycle = Превключване на нивата на яркост на екрана

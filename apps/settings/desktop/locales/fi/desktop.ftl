@@ -36,6 +36,7 @@ desktop-shortcut-board-zoom-in = Lähennä taulua
 desktop-shortcut-board-zoom-out = Loitonna taulua
 desktop-shortcut-board-enter-window = Siirry taulun aktiiviseen ikkunaan
 desktop-shortcut-system-monitor = Avaa järjestelmän valvonta ja katso, mitä on käynnissä
+desktop-shortcut-relight-displays = Sytytä näytöt uudelleen, kun jokin ei näytä kuvaa
 desktop-shortcut-screen-brightness-up = Lisää näytön kirkkautta
 desktop-shortcut-screen-brightness-down = Vähennä näytön kirkkautta
 desktop-shortcut-screen-brightness-cycle = Kierrätä näytön kirkkaustasoja

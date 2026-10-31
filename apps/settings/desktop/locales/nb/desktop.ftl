@@ -36,6 +36,7 @@ desktop-shortcut-board-zoom-in = Zoom inn på tavlen
 desktop-shortcut-board-zoom-out = Zoom ut av tavlen
 desktop-shortcut-board-enter-window = Gå inn i vinduet i fokus på tavlen
 desktop-shortcut-system-monitor = Åpne systemovervåkeren for å se hva som kjører
+desktop-shortcut-relight-displays = Slå på skjermene igjen når en av dem ikke viser bilde
 desktop-shortcut-screen-brightness-up = Øk lysstyrken på skjermen
 desktop-shortcut-screen-brightness-down = Senk lysstyrken på skjermen
 desktop-shortcut-screen-brightness-cycle = Bla gjennom lysstyrkenivåer

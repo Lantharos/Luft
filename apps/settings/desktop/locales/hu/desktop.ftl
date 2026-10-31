@@ -36,6 +36,7 @@ desktop-shortcut-board-zoom-in = Nagyítás a táblán
 desktop-shortcut-board-zoom-out = Kicsinyítés a táblán
 desktop-shortcut-board-enter-window = Belépés az aktív ablakba a táblán
 desktop-shortcut-system-monitor = Rendszerfigyelő megnyitása a futó folyamatok megtekintéséhez
+desktop-shortcut-relight-displays = Kijelzők újraindítása, ha valamelyik nem mutat képet
 desktop-shortcut-screen-brightness-up = Képernyő fényerejének növelése
 desktop-shortcut-screen-brightness-down = Képernyő fényerejének csökkentése
 desktop-shortcut-screen-brightness-cycle = Képernyő fényerejének léptetése

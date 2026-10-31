@@ -41,6 +41,9 @@
 	<KeyListEntry name="system-monitor"
                       description="Open the system monitor to see what's running"/>
 
+	<KeyListEntry name="relight-displays"
+                      description="Light the displays again when one shows no picture"/>
+
 	<KeyListEntry name="screen-brightness-up"
                       description="Increase screen brightness"/>
 

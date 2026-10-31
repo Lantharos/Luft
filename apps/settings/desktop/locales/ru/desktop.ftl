@@ -36,6 +36,7 @@ desktop-shortcut-board-zoom-in = Приблизить доску
 desktop-shortcut-board-zoom-out = Отдалить доску
 desktop-shortcut-board-enter-window = Перейти в активное окно на доске
 desktop-shortcut-system-monitor = Открыть системный монитор, чтобы увидеть запущенные процессы
+desktop-shortcut-relight-displays = Заново включить экраны, если один из них не показывает изображение
 desktop-shortcut-screen-brightness-up = Увеличить яркость экрана
 desktop-shortcut-screen-brightness-down = Уменьшить яркость экрана
 desktop-shortcut-screen-brightness-cycle = Переключать уровни яркости экрана

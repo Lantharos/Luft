@@ -36,6 +36,7 @@ desktop-shortcut-board-zoom-in = Zoomer sur le tableau
 desktop-shortcut-board-zoom-out = Dézoomer le tableau
 desktop-shortcut-board-enter-window = Entrer dans la fenêtre active du tableau
 desktop-shortcut-system-monitor = Ouvrir le moniteur système pour voir ce qui est en cours d’exécution
+desktop-shortcut-relight-displays = Rallumer les écrans quand l’un d’eux n’affiche rien
 desktop-shortcut-screen-brightness-up = Augmenter la luminosité de l’écran
 desktop-shortcut-screen-brightness-down = Diminuer la luminosité de l’écran
 desktop-shortcut-screen-brightness-cycle = Faire défiler les niveaux de luminosité de l’écran

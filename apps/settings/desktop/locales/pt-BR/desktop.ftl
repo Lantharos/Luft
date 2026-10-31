@@ -36,6 +36,7 @@ desktop-shortcut-board-zoom-in = Aproximar o quadro
 desktop-shortcut-board-zoom-out = Afastar o quadro
 desktop-shortcut-board-enter-window = Entrar na janela em foco no quadro
 desktop-shortcut-system-monitor = Abrir o monitor do sistema para ver o que está em execução
+desktop-shortcut-relight-displays = Religar as telas quando uma não mostra imagem
 desktop-shortcut-screen-brightness-up = Aumentar o brilho da tela
 desktop-shortcut-screen-brightness-down = Diminuir o brilho da tela
 desktop-shortcut-screen-brightness-cycle = Alternar entre os níveis de brilho da tela

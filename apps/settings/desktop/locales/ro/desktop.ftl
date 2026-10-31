@@ -36,6 +36,7 @@ desktop-shortcut-board-zoom-in = Apropie tabla
 desktop-shortcut-board-zoom-out = Depărtează tabla
 desktop-shortcut-board-enter-window = Intră în fereastra activă de pe tablă
 desktop-shortcut-system-monitor = Deschide monitorul de sistem pentru a vedea ce rulează
+desktop-shortcut-relight-displays = Reaprinde ecranele când unul nu afișează imagine
 desktop-shortcut-screen-brightness-up = Mărește luminozitatea ecranului
 desktop-shortcut-screen-brightness-down = Reduce luminozitatea ecranului
 desktop-shortcut-screen-brightness-cycle = Parcurge nivelurile de luminozitate a ecranului

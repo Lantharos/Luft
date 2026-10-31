@@ -36,6 +36,7 @@ desktop-shortcut-board-zoom-in = Priartinti lentą
 desktop-shortcut-board-zoom-out = Nutolinti lentą
 desktop-shortcut-board-enter-window = Atidaryti aktyvų lentos langą
 desktop-shortcut-system-monitor = Atidaryti sistemos monitorių ir pamatyti, kas veikia
+desktop-shortcut-relight-displays = Vėl įjungti ekranus, kai kuris nors nerodo vaizdo
 desktop-shortcut-screen-brightness-up = Padidinti ekrano šviesumą
 desktop-shortcut-screen-brightness-down = Sumažinti ekrano šviesumą
 desktop-shortcut-screen-brightness-cycle = Perjungti ekrano šviesumo lygius

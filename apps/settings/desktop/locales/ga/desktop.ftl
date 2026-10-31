@@ -36,6 +36,7 @@ desktop-shortcut-board-zoom-in = Súmáil isteach ar an gclár
 desktop-shortcut-board-zoom-out = Súmáil amach ón gclár
 desktop-shortcut-board-enter-window = Téigh isteach san fhuinneog fhócasaithe ar an gclár
 desktop-shortcut-system-monitor = Oscail monatóir an chórais chun a bhfuil ag rith a fheiceáil
+desktop-shortcut-relight-displays = Las na scáileáin arís nuair nach dtaispeánann ceann acu pictiúr
 desktop-shortcut-screen-brightness-up = Méadaigh gile an scáileáin
 desktop-shortcut-screen-brightness-down = Laghdaigh gile an scáileáin
 desktop-shortcut-screen-brightness-cycle = Téigh trí leibhéil ghile an scáileáin

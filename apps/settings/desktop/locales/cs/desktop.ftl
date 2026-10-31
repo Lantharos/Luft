@@ -36,6 +36,7 @@ desktop-shortcut-board-zoom-in = Přiblížit tabuli
 desktop-shortcut-board-zoom-out = Oddálit tabuli
 desktop-shortcut-board-enter-window = Přejít do aktivního okna na tabuli
 desktop-shortcut-system-monitor = Otevřít sledování systému a zjistit, co běží
+desktop-shortcut-relight-displays = Znovu rozsvítit obrazovky, když některá nezobrazuje obraz
 desktop-shortcut-screen-brightness-up = Zvýšit jas obrazovky
 desktop-shortcut-screen-brightness-down = Snížit jas obrazovky
 desktop-shortcut-screen-brightness-cycle = Přepínat úrovně jasu obrazovky

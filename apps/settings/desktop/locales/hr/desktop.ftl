@@ -36,6 +36,7 @@ desktop-shortcut-board-zoom-in = Približi ploču
 desktop-shortcut-board-zoom-out = Udalji ploču
 desktop-shortcut-board-enter-window = Uđi u fokusirani prozor na ploči
 desktop-shortcut-system-monitor = Otvori nadzor sustava i prikaži što je pokrenuto
+desktop-shortcut-relight-displays = Ponovno upali zaslone kada jedan ne prikazuje sliku
 desktop-shortcut-screen-brightness-up = Povećaj svjetlinu zaslona
 desktop-shortcut-screen-brightness-down = Smanji svjetlinu zaslona
 desktop-shortcut-screen-brightness-cycle = Kruži kroz razine svjetline zaslona

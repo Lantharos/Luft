@@ -1,0 +1,198 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Sat, 31 Oct 2026 17:19:18 +0100
+Subject: [PATCH 56/56] backends: tell which logical monitors have a
+ touchscreen or pen display
+
+Kestrel lays the taskbar out for touch on screens people touch or draw
+on, and keeps the layout people chose on the others. The input mapper
+already attaches touchscreens and pen displays (libwacom's integrated
+devices) to their monitors; this exposes that per logical monitor, and
+announces when it changes.
+
+Upstream-Status: luft-only for Kestrel's per-screen touch layout
+---
+ src/backends/meta-backend.c              | 45 ++++++++++++++++++++++++
+ src/backends/meta-input-mapper-private.h |  3 ++
+ src/backends/meta-input-mapper.c         | 34 ++++++++++++++++++
+ src/meta/meta-backend.h                  |  4 +++
+ 4 files changed, 86 insertions(+)
+
+diff --git a/src/backends/meta-backend.c b/src/backends/meta-backend.c
+index b80e485fd021e290e884b2dc2ccfc733a11d88b8..0d7f84c7164ad9495570f6c9b75cdf0889a4fe3d 100644
+--- a/src/backends/meta-backend.c
++++ b/src/backends/meta-backend.c
+@@ -119,6 +119,7 @@ enum
+   OVERRIDE_CURSOR,
+   RESET_KEYMAP_DESCRIPTION,
+   RESET_KEYMAP_LAYOUT_INDEX,
++  DIRECT_INPUT_CHANGED,
+ 
+   N_SIGNALS
+ };
+@@ -511,6 +512,7 @@ on_device_removed (ClutterSeat        *seat,
+   g_warn_if_fail (!priv->in_init);
+ 
+   meta_input_mapper_remove_device (priv->input_mapper, device);
++  g_signal_emit (backend, signals[DIRECT_INPUT_CHANGED], 0);
+ 
+   /* If the device the user last interacted goes away, check again pointer
+    * visibility.
+@@ -555,6 +557,15 @@ input_mapper_device_aspect_ratio_cb (MetaInputMapper    *mapper,
+   meta_input_settings_set_device_aspect_ratio (input_settings, device, aspect_ratio);
+ }
+ 
++static void
++input_mapper_direct_input_changed_cb (MetaInputMapper    *mapper,
++                                      ClutterInputDevice *device,
++                                      float               matrix[6],
++                                      MetaBackend        *backend)
++{
++  g_signal_emit (backend, signals[DIRECT_INPUT_CHANGED], 0);
++}
++
+ static MetaInputMapper *
+ meta_backend_create_input_mapper (MetaBackend *backend)
+ {
+@@ -562,6 +573,9 @@ meta_backend_create_input_mapper (MetaBackend *backend)
+   MetaInputMapper *input_mapper;
+ 
+   input_mapper = meta_input_mapper_new (backend);
++  g_signal_connect (input_mapper, "device-mapped",
++                    G_CALLBACK (input_mapper_direct_input_changed_cb),
++                    backend);
+ 
+   if (input_settings)
+     {
+@@ -884,6 +898,19 @@ meta_backend_class_init (MetaBackendClass *klass)
+                   0,
+                   NULL, NULL, NULL,
+                   G_TYPE_NONE, 1, CLUTTER_TYPE_INPUT_DEVICE);
++  /**
++   * MetaBackend::direct-input-changed:
++   *
++   * Emitted when a touchscreen or pen display is attached to a logical
++   * monitor or taken from one.
++   */
++  signals[DIRECT_INPUT_CHANGED] =
++    g_signal_new ("direct-input-changed",
++                  G_TYPE_FROM_CLASS (object_class),
++                  G_SIGNAL_RUN_LAST,
++                  0,
++                  NULL, NULL, NULL,
++                  G_TYPE_NONE, 0);
+   signals[LID_IS_CLOSED_CHANGED] =
+     g_signal_new ("lid-is-closed-changed",
+                   G_TYPE_FROM_CLASS (object_class),
+@@ -1763,6 +1790,24 @@ meta_backend_get_current_logical_monitor (MetaBackend *backend)
+   return META_BACKEND_GET_CLASS (backend)->get_current_logical_monitor (backend);
+ }
+ 
++/**
++ * meta_backend_has_direct_input:
++ * @backend: A #MetaBackend
++ * @logical_monitor: A #MetaLogicalMonitor
++ *
++ * Returns: Whether a touchscreen or a pen display is attached to
++ *   @logical_monitor, so it's used by touching or drawing on it.
++ */
++gboolean
++meta_backend_has_direct_input (MetaBackend        *backend,
++                               MetaLogicalMonitor *logical_monitor)
++{
++  MetaBackendPrivate *priv = meta_backend_get_instance_private (backend);
++
++  return meta_input_mapper_has_direct_input (priv->input_mapper,
++                                             logical_monitor);
++}
++
+ gboolean
+ meta_backend_set_keymap_finish (MetaBackend   *backend,
+                                 GAsyncResult  *result,
+diff --git a/src/backends/meta-input-mapper-private.h b/src/backends/meta-input-mapper-private.h
+index ddf7eb73cc0afd01bdfeaf6d6d6959563f9918de..077e7917fb33143bad3cde279f066dd24817e000 100644
+--- a/src/backends/meta-input-mapper-private.h
++++ b/src/backends/meta-input-mapper-private.h
+@@ -42,6 +42,9 @@ ClutterInputDevice *
+ meta_input_mapper_get_logical_monitor_device (MetaInputMapper        *mapper,
+                                               MetaLogicalMonitor     *logical_monitor,
+                                               ClutterInputDeviceType  device_type);
++gboolean meta_input_mapper_has_direct_input (MetaInputMapper    *mapper,
++                                             MetaLogicalMonitor *logical_monitor);
++
+ MetaLogicalMonitor *
+ meta_input_mapper_get_device_logical_monitor (MetaInputMapper *mapper,
+                                               ClutterInputDevice *device);
+diff --git a/src/backends/meta-input-mapper.c b/src/backends/meta-input-mapper.c
+index f88c00304f904ac3aced270e1566d31def0db5d0..d7bf11dcbf1b87b1e6b92b1810237d3e1751ade9 100644
+--- a/src/backends/meta-input-mapper.c
++++ b/src/backends/meta-input-mapper.c
+@@ -79,6 +79,7 @@ struct _MetaMapperInputInfo
+   MetaInputMapper *mapper;
+   MetaMapperOutputInfo *output;
+   GSettings *settings;
++  gboolean integrated;
+ };
+ 
+ struct _MetaMapperOutputInfo
+@@ -496,6 +497,7 @@ guess_candidates (MetaInputMapper     *mapper,
+     }
+ #endif
+ 
++  input->integrated = integrated;
+   user_value = g_settings_get_user_value (input->settings, "output");
+   automatic = user_value == NULL;
+ 
+@@ -1065,6 +1067,38 @@ meta_input_mapper_get_logical_monitor_device (MetaInputMapper        *mapper,
+   return NULL;
+ }
+ 
++gboolean
++meta_input_mapper_has_direct_input (MetaInputMapper    *mapper,
++                                    MetaLogicalMonitor *logical_monitor)
++{
++  MetaMapperOutputInfo *output;
++  GList *l;
++
++  output = g_hash_table_lookup (mapper->output_devices, logical_monitor);
++  if (!output)
++    return FALSE;
++
++  for (l = output->input_devices; l; l = l->next)
++    {
++      MetaMapperInputInfo *input = l->data;
++
++      switch (clutter_input_device_get_device_type (input->device))
++        {
++        case CLUTTER_TOUCHSCREEN_DEVICE:
++          return TRUE;
++        case CLUTTER_TABLET_DEVICE:
++        case CLUTTER_PEN_DEVICE:
++          if (input->integrated)
++            return TRUE;
++          break;
++        default:
++          break;
++        }
++    }
++
++  return FALSE;
++}
++
+ static ClutterInputDevice *
+ find_grouped_pen (ClutterInputDevice *device)
+ {
+diff --git a/src/meta/meta-backend.h b/src/meta/meta-backend.h
+index 47a634b0826ef667951ced61f223409c67805dda..827c21576466e8680e1a1f534c8c6129e9808b7a 100644
+--- a/src/meta/meta-backend.h
++++ b/src/meta/meta-backend.h
+@@ -104,5 +104,9 @@ MetaLogicalMonitor * meta_backend_get_current_logical_monitor (MetaBackend *back
+ META_EXPORT
+ ClutterInputDevice * meta_backend_get_last_input_device (MetaBackend *backend);
+ 
++META_EXPORT
++gboolean meta_backend_has_direct_input (MetaBackend        *backend,
++                                        MetaLogicalMonitor *logical_monitor);
++
+ META_EXPORT
+ int64_t meta_backend_get_presentation_wait_us (MetaBackend *backend);

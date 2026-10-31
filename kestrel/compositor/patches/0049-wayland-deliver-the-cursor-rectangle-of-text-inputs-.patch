@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Tue, 20 Oct 2026 17:49:41 +0200
-Subject: [PATCH 49/55] wayland: deliver the cursor rectangle of text inputs
+Subject: [PATCH 49/56] wayland: deliver the cursor rectangle of text inputs
  focused after another
 
 A cursor rectangle waits for the surface's next state before it reaches

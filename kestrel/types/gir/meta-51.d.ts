@@ -994,6 +994,8 @@ export namespace Meta {
         // Signal signatures
         interface SignalSignatures extends GObject.Object.SignalSignatures {
             /** @signal */
+            "direct-input-changed": () => void;
+            /** @signal */
             "gpu-added": (gpu: null) => void;
             /** @signal */
             "keymap-changed": () => void;
@@ -1087,6 +1089,8 @@ export namespace Meta {
         get_remote_access_controller(): RemoteAccessController;
 
         get_stage(): Clutter.Actor;
+
+        has_direct_input(logical_monitor: LogicalMonitor): boolean;
 
         is_headless(): boolean;
 

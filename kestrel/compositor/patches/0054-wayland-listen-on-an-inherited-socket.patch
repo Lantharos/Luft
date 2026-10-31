@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Wed, 28 Oct 2026 04:57:27 +0100
-Subject: [PATCH 54/55] wayland: listen on an inherited socket
+Subject: [PATCH 54/56] wayland: listen on an inherited socket
 
 WAYLAND_SOCKET_FD hands Mutter a listening Wayland socket that a parent
 process made and keeps open, and WAYLAND_SOCKET_NAME names it for

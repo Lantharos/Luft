@@ -27,6 +27,12 @@ const TIMEOUT = 8000;
 const PADDING = 6;
 
 const settings = new Gio.Settings({schema_id: 'org.gnome.desktop.interface'});
+const TERN_SETTINGS = GLib.build_filenamev([GLib.get_user_config_dir(), 'tern', 'settings.json']);
+
+function startTernOpaque() {
+  GLib.mkdir_with_parents(GLib.path_get_dirname(TERN_SETTINGS), 0o755);
+  GLib.file_set_contents(TERN_SETTINGS, '{"translucent": false}');
+}
 const textWindow = (version: string) => (window: Meta.Window) => window.get_title()?.startsWith(`Kestrel text ${version}:`);
 const chosen = (key: string) => `${CHOSEN[key]} ${SIZE}`;
 
@@ -147,6 +153,7 @@ async function checkTextSize(surfaces: Surfaces, clock: St.Label, defaults: Fram
 export async function checkFonts(app: LuftApp) {
   GLib.mkdir_with_parents(GLib.path_get_dirname(output('fonts/shell-default')), 0o755);
   let windows: Process[] = [];
+  startTernOpaque();
   try {
     await show(app, 'appearance/text');
     windows = [gjs('clients/windows/textWindow.js', ['4.0']), gjs('clients/windows/textWindow.js', ['3.0'], {env: {GDK_BACKEND: 'x11'}})];
@@ -159,5 +166,6 @@ export async function checkFonts(app: LuftApp) {
   } finally {
     for (const key of [...Object.keys(CHOSEN), 'text-scaling-factor']) settings.reset(key);
     await Promise.all(windows.map(stop));
+    GLib.unlink(TERN_SETTINGS);
   }
 }

@@ -33,7 +33,7 @@ export class OsdWindow extends Clutter.Actor {
   private readonly level = new BarLevel.BarLevel({ style_class: 'level' });
   private hideTimeoutId = 0;
 
-  constructor(monitorIndex: number) {
+  constructor(private readonly monitorIndex: number) {
     super({
       x_expand: true,
       y_expand: true,
@@ -112,7 +112,7 @@ export class OsdWindow extends Clutter.Actor {
   }
 
   private clearOfTaskbar(): string {
-    const { edge, depth } = KestrelUi.taskbarInset();
+    const { edge, depth } = KestrelUi.taskbarInset(this.monitorIndex);
     const bottom = `margin-bottom: ${(edge === 'bottom' ? depth : 0) + TASKBAR_GAP}px;`;
     return isVertical(edge) ? `${bottom} margin-${edge}: ${depth}px;` : bottom;
   }

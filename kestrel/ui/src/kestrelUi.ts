@@ -104,7 +104,7 @@ class KestrelUi {
 
     this.workspaces = new Workspaces(() => this.canInteract(), () => this.dismissImmediately(), context.swipeWorkspaces);
     this.menus = new ContextMenus(monitorAt, close, () => this.canInteract(), () => this.previews.close(), context.activateWindow,
-      actor => this.panels?.contains(actor) ? taskbarPreferences.edge : null);
+      actor => this.panels?.containing(actor)?.screen.edge ?? null);
     this.previews = new WindowPreviews(actor => monitorAt(...actor.get_transformed_position()), () => this.canInteract() && !this.menus.actor.visible, close, context.activateWindow);
     context.layoutManager.addTopChrome(this.previews.actor);
     this.board = new Board({
@@ -176,7 +176,7 @@ class KestrelUi {
       taskView: this.taskView,
       canInteract: () => this.canInteract(),
       syncSession: () => this.syncSession(),
-      taskbarInset: () => this.taskbarInset(),
+      taskbarInset: monitor => this.taskbarInset(monitor),
       startReplaced: () => this.prewarmStart(),
     });
 
@@ -333,9 +333,9 @@ class KestrelUi {
     const available = this.desktopAvailable();
     const covered = coveredMonitors(this.context.layoutManager.monitors);
     for (const panel of this.panels.all)
-      panel.autoHide.setAllowed(taskbarPreferences.shown && !!panel.monitor && available && !this.taskView.visible && !covered.has(panel.monitor.index));
+      panel.autoHide.setAllowed(panel.screen.shown && !!panel.monitor && available && !this.taskView.visible && !covered.has(panel.monitor.index));
     const primary = this.context.layoutManager.primaryMonitor;
-    this.panels.showCorner(!taskbarPreferences.shown && !!primary && available && !this.taskView.visible && !this.board.shown && !covered.has(primary.index));
+    this.panels.showCorner(!!primary && !taskbarPreferences.on(primary.index).shown && available && !this.taskView.visible && !this.board.shown && !covered.has(primary.index));
     this.liveWallpaper.sync(available && !this.taskView.visible && !this.board.shown);
     this.rain.sync(available && !this.taskView.visible && !this.board.shown);
     this.rainSound.sync(available);
@@ -344,12 +344,13 @@ class KestrelUi {
 
   private followTaskbarEdge(): void {
     const primary = this.context.layoutManager.primaryMonitor;
-    if (primary && wallpaperFloor.follow(taskbarPreferences.edge, primary)) this.services.appearance.repaintTaskbar();
+    if (primary && wallpaperFloor.follow(taskbarPreferences.on(primary.index).edge, primary)) this.services.appearance.repaintTaskbar();
   }
 
-  private taskbarInset(): Inset {
+  private taskbarInset(monitor: Monitor): Inset {
     if (this.board.shown) return { edge: 'bottom', depth: this.board.cornerClearance };
-    return { edge: taskbarPreferences.edge, depth: taskbarPreferences.shown ? taskbarPreferences.clearance : this.panels.cornerClearance };
+    const screen = taskbarPreferences.on(monitor.index);
+    return { edge: screen.edge, depth: screen.shown ? screen.clearance : this.panels.cornerClearance };
   }
 
   private prewarmStart(): void {
@@ -500,9 +501,14 @@ export function switchWorkspace(index: number): void { currentUi?.switchWorkspac
 
 export function openSystemMonitor(): void { systemMonitor()?.activate(); }
 
-export function taskbarInset(): Inset { return { edge: taskbarPreferences.edge, depth: taskbarPreferences.clearance }; }
+export function taskbarInset(monitorIndex = global.display.get_primary_monitor()): Inset {
+  const screen = taskbarPreferences.on(monitorIndex);
+  return { edge: screen.edge, depth: screen.clearance };
+}
 
-export function taskbarOwnsBottomEdge(): boolean { return currentUi !== null && taskbarPreferences.touch; }
+export function taskbarOwnsBottomEdge(): boolean {
+  return currentUi !== null && Array.from({ length: global.display.get_n_monitors() }, (_, index) => index).some(index => taskbarPreferences.on(index).touch);
+}
 
 export function taskViewOpen(): boolean { return currentUi?.taskViewOpen() ?? false; }
 

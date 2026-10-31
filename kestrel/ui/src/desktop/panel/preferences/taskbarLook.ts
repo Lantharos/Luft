@@ -5,7 +5,7 @@ import { blurBackdrop } from '../../../appearance/kestrelGlass.js';
 import { isDark, watchScheme } from '../../../shared/display/scheme.js';
 import type { TaskbarLook } from '../../../../../../packages/web/ui/src/taskbar/looks';
 import { rightToLeft } from '../../../shared/layout/edge.js';
-import { taskbarPreferences } from './taskbarPreferences.js';
+import { taskbarPreferences, type TaskbarLayout } from './taskbarPreferences.js';
 
 const BLURRED: TaskbarLook[] = ['glass', 'accent'];
 
@@ -20,7 +20,7 @@ export class TaskbarSurface {
   private readonly islands: Island[];
   private shaped: number | null = null;
 
-  constructor(private readonly actor: St.Widget, private readonly peek: St.Widget, islands: St.Widget[]) {
+  constructor(private readonly actor: St.Widget, private readonly peek: St.Widget, islands: St.Widget[], private readonly screen: () => TaskbarLayout) {
     this.baseClasses = actor.style_class;
     this.blur = blurBackdrop(actor, 0);
     this.islands = islands.map(island => ({ actor: island, blur: blurBackdrop(island, 0) }));
@@ -30,11 +30,11 @@ export class TaskbarSurface {
   }
 
   get radius(): number {
-    return this.shaped ?? taskbarPreferences.metrics.radius;
+    return this.shaped ?? this.screen().metrics.radius;
   }
 
   get separate(): boolean {
-    return taskbarPreferences.style === 'separate';
+    return this.screen().style === 'separate';
   }
 
   behind(island: St.Widget): St.Widget {
@@ -42,7 +42,8 @@ export class TaskbarSurface {
   }
 
   sync(): void {
-    const { look, size, style, pureBlack, touch, vertical } = taskbarPreferences;
+    const { look, pureBlack } = taskbarPreferences;
+    const { size, style, touch, vertical } = this.screen();
     const opaque = pureBlack && isDark();
     const separate = this.separate;
     const surface = [
@@ -67,7 +68,7 @@ export class TaskbarSurface {
   }
 
   syncPeek(): void {
-    this.peek.visible = !taskbarPreferences.touch && !this.separate;
+    this.peek.visible = !this.screen().touch && !this.separate;
   }
 
   shape(radius: number | null): void {
@@ -81,7 +82,7 @@ export class TaskbarSurface {
     this.blur.set_property('corner-radius', radius);
     this.actor.style = `border-radius: ${radius}px;`;
     this.peek.style = radius ? `border-radius: ${this.peekCorners(`${radius}px`)};` : null;
-    const { thickness, button, radius: islandRadius } = taskbarPreferences.metrics;
+    const { thickness, button, radius: islandRadius } = this.screen().metrics;
     for (const { actor, blur } of this.islands) {
       blur.set_property('corner-radius', separate ? islandRadius : 0);
       actor.style = separate ? `border-radius: ${islandRadius}px; padding: ${(thickness - button) / 2}px;` : null;
@@ -89,7 +90,7 @@ export class TaskbarSurface {
   }
 
   private peekCorners(radius: string): string {
-    if (taskbarPreferences.vertical) return `0 0 ${radius} ${radius}`;
+    if (this.screen().vertical) return `0 0 ${radius} ${radius}`;
     return rightToLeft() ? `${radius} 0 0 ${radius}` : `0 ${radius} ${radius} 0`;
   }
 }

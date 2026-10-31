@@ -61,7 +61,11 @@ export class PanelSet {
   }
 
   contains(actor: Clutter.Actor | null): boolean {
-    return !!actor && this.all.some(panel => panel.actor.contains(actor));
+    return this.containing(actor) !== null;
+  }
+
+  containing(actor: Clutter.Actor | null): KestrelPanel | null {
+    return actor ? this.all.find(panel => panel.actor.contains(actor)) ?? null : null;
   }
 
   get cornerClearance(): number {
@@ -69,7 +73,7 @@ export class PanelSet {
   }
 
   buttonFor(surface: string, monitor: Monitor): Clutter.Actor | null {
-    if (!taskbarPreferences.shown) return this.corner.buttonFor(surface);
+    if (!taskbarPreferences.on(monitor.index).shown) return this.corner.buttonFor(surface);
     return this.panelOn(monitor)?.buttonFor(surface) ?? null;
   }
 
@@ -85,8 +89,7 @@ export class PanelSet {
   sync(): void {
     const primary = this.layoutManager.primaryMonitor;
     if (!primary) return;
-    this.primary.monitor = primary;
-    this.primary.place();
+    this.primary.follow(primary);
     this.placeCorner();
     for (const panel of this.secondary) {
       this.remove(panel);
@@ -146,8 +149,7 @@ export class PanelSet {
   }
 
   private syncAutoHide(): void {
-    const mode = taskbarPreferences.autoHide;
-    if (mode === 'windows') this.overlap ??= new WindowOverlap(() => this.all.forEach(panel => panel.autoHide.sync()));
+    if (this.all.some(panel => panel.screen.autoHide === 'windows')) this.overlap ??= new WindowOverlap(() => this.all.forEach(panel => panel.autoHide.sync()));
     else {
       this.overlap?.destroy();
       this.overlap = null;
@@ -159,7 +161,7 @@ export class PanelSet {
   }
 
   private syncEdgeSwipe(): void {
-    if (taskbarPreferences.touch) this.edgeSwipe ??= new EdgeSwipe((x, y) => this.panelAt(x, y)?.tablet ?? null);
+    if (this.all.some(panel => panel.screen.touch)) this.edgeSwipe ??= new EdgeSwipe((x, y) => this.panelAt(x, y)?.tablet ?? null);
     else {
       this.edgeSwipe?.destroy();
       this.edgeSwipe = null;
@@ -173,7 +175,7 @@ export class PanelSet {
 
   private syncStrut(panel: KestrelPanel): void {
     const reserved = panel.strut.get_parent() !== null;
-    const wanted = taskbarPreferences.shown && taskbarPreferences.autoHide === 'never';
+    const wanted = panel.screen.shown && panel.screen.autoHide === 'never';
     if (wanted && !reserved) this.layoutManager.addChrome(panel.strut, { affectsStruts: true });
     if (!wanted && reserved) this.layoutManager.removeChrome(panel.strut);
   }

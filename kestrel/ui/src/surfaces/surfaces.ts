@@ -51,7 +51,7 @@ interface SurfaceParts extends SurfaceFactories {
   taskView: TaskView;
   canInteract: () => boolean;
   syncSession: () => void;
-  taskbarInset: () => Inset;
+  taskbarInset: (monitor: Monitor) => Inset;
   startReplaced: () => void;
 }
 
@@ -136,7 +136,7 @@ export class Surfaces {
     this.cover.set_position(0, 0);
     const stage = global.stage;
     this.cover.set_size(stage.width, stage.height);
-    const { edge } = this.parts.taskbarInset();
+    const { edge } = this.parts.taskbarInset(monitor);
     const area = this.freeArea(monitor);
     const available = area.height - FAR_MARGIN;
     const { start, notifications, emoji, snapLayouts } = this.created;
@@ -224,7 +224,7 @@ export class Surfaces {
     }
     this.reveal(actor);
 
-    if (surface === 'start' && (!taskbarPreferences.touch || this.start.focusOnTouch)) this.start.focus();
+    if (surface === 'start' && (!taskbarPreferences.on(this.surfaceMonitor().index).touch || this.start.focusOnTouch)) this.start.focus();
     else if (!popup) actor.grab_key_focus();
   }
 
@@ -268,8 +268,8 @@ export class Surfaces {
   private clipToFloor(): void {
     const { width, height } = global.stage;
     const stage = { x: 0, y: 0, width, height };
-    const { edge, depth } = this.parts.taskbarInset();
     const monitor = this.surfaceMonitor();
+    const { edge, depth } = this.parts.taskbarInset(monitor);
     const { x, y, width: clipWidth, height: clipHeight } = inset(stage, edge, gap(stage, inset(monitor, edge, depth), edge));
     const [clipX, clipY, currentWidth, currentHeight] = this.layer.get_clip();
     if (this.layer.has_clip && clipX === x && clipY === y && currentWidth === clipWidth && currentHeight === clipHeight) return;
@@ -289,7 +289,7 @@ export class Surfaces {
   }
 
   private freeArea(monitor: Monitor): Box {
-    const { edge, depth } = this.parts.taskbarInset();
+    const { edge, depth } = this.parts.taskbarInset(monitor);
     const keyboard = this.keyboardHeight(monitor);
     if (edge === 'bottom') return inset(monitor, edge, Math.max(depth, keyboard) + SURFACE_GAP);
     const beside = inset(monitor, edge, depth + SURFACE_GAP);
@@ -400,7 +400,7 @@ export class Surfaces {
   private slideOffset(actor: Clutter.Actor): Offset {
     const popup = this.popupActor(actor);
     if (popup) return { translation_x: 0, translation_y: popup.slideDistance };
-    const { edge } = this.parts.taskbarInset();
+    const { edge } = this.parts.taskbarInset(this.surfaceMonitor());
     const start = this.created.start;
     return actor === start?.actor ? start.slideFrom(edge) : toward(edge, PANEL_SLIDE);
   }

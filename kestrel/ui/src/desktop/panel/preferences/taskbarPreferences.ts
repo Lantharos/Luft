@@ -2,6 +2,7 @@ import Gio from 'gi://Gio';
 
 import type { TaskbarLook } from '../../../../../../packages/web/ui/src/taskbar/looks';
 import { isVertical, type Edge } from '../../../shared/layout/edge.js';
+import { directInput } from '../tablet/directInput.js';
 import { tabletMode } from '../tablet/tabletMode.js';
 
 type TaskbarAlignment = 'center' | 'left';
@@ -42,33 +43,57 @@ export type TaskbarKey = typeof KEYS[number] | 'tablet';
 class TaskbarPreferences {
   private readonly settings = new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });
   private readonly watchers = new Set<(key: TaskbarKey) => void>();
+  private readonly screens = new Map<number, TaskbarLayout>();
+  readonly desktop = new TaskbarLayout(this.settings, () => tabletMode.active);
 
   constructor() {
     for (const key of KEYS) this.settings.connect(`changed::${key}`, () => this.notify(key));
     tabletMode.watch(() => this.notify('tablet'));
+    directInput.watch(() => this.notify('tablet'));
   }
 
   private notify(key: TaskbarKey): void {
     this.watchers.forEach(watcher => watcher(key));
   }
 
-  get touch(): boolean { return tabletMode.active; }
+  /** The taskbar as it's laid out on the screen with this index: for touch on screens people touch or draw on, as chosen on the others. */
+  on(monitorIndex: number | undefined): TaskbarLayout {
+    if (monitorIndex === undefined || monitorIndex < 0) return this.desktop;
+    let layout = this.screens.get(monitorIndex);
+    if (!layout) {
+      layout = new TaskbarLayout(this.settings, () => tabletMode.active || directInput.on(monitorIndex));
+      this.screens.set(monitorIndex, layout);
+    }
+    return layout;
+  }
 
-  get edge(): Edge { return this.touch ? 'bottom' : this.settings.get_string('taskbar-position') as Edge; }
-  get vertical(): boolean { return isVertical(this.edge); }
   get alignment(): TaskbarAlignment { return this.settings.get_string('taskbar-alignment') as TaskbarAlignment; }
   get look(): TaskbarLook { return this.settings.get_string('taskbar-look') as TaskbarLook; }
-  get style(): TaskbarStyle { return this.touch ? 'bar' : this.settings.get_string('taskbar-style') as TaskbarStyle; }
-  get size(): TaskbarSize { return this.settings.get_string('taskbar-size') as TaskbarSize; }
-  get autoHide(): TaskbarAutoHide { return this.touch ? 'never' : this.settings.get_string('taskbar-auto-hide') as TaskbarAutoHide; }
-  get shown(): boolean { return this.touch || this.settings.get_boolean('taskbar-shown'); }
-  get startButton(): boolean { return this.touch || this.settings.get_boolean('taskbar-start-button'); }
   get startStyle(): StartStyle { return this.settings.get_string('start-style') as StartStyle; }
   get showPinned(): boolean { return this.settings.get_boolean('taskbar-show-pinned'); }
   get displays(): TaskbarDisplays { return this.settings.get_string('taskbar-displays') as TaskbarDisplays; }
   get windowsPerDisplay(): boolean { return this.settings.get_boolean('taskbar-windows-per-display'); }
   get windowsPerWorkspace(): boolean { return this.settings.get_boolean('taskbar-windows-per-workspace'); }
   get pureBlack(): boolean { return this.settings.get_boolean('pure-black'); }
+
+  watch(watcher: (key: TaskbarKey) => void): () => void {
+    this.watchers.add(watcher);
+    return () => this.watchers.delete(watcher);
+  }
+}
+
+export class TaskbarLayout {
+  constructor(private readonly settings: Gio.Settings, private readonly touchHere: () => boolean) {}
+
+  get touch(): boolean { return this.touchHere(); }
+
+  get edge(): Edge { return this.touch ? 'bottom' : this.settings.get_string('taskbar-position') as Edge; }
+  get vertical(): boolean { return isVertical(this.edge); }
+  get style(): TaskbarStyle { return this.touch ? 'bar' : this.settings.get_string('taskbar-style') as TaskbarStyle; }
+  get size(): TaskbarSize { return this.settings.get_string('taskbar-size') as TaskbarSize; }
+  get autoHide(): TaskbarAutoHide { return this.touch ? 'never' : this.settings.get_string('taskbar-auto-hide') as TaskbarAutoHide; }
+  get shown(): boolean { return this.touch || this.settings.get_boolean('taskbar-shown'); }
+  get startButton(): boolean { return this.touch || this.settings.get_boolean('taskbar-start-button'); }
 
   get metrics(): TaskbarMetrics {
     if (this.touch) return { ...TOUCH, margin: 0, radius: 0, inset: TOUCH_INSET, gap: TOUCH_SLOT_GAP };
@@ -92,11 +117,6 @@ class TaskbarPreferences {
 
   get reserved(): number {
     return this.touch ? STRIP_HEIGHT : this.clearance;
-  }
-
-  watch(watcher: (key: TaskbarKey) => void): () => void {
-    this.watchers.add(watcher);
-    return () => this.watchers.delete(watcher);
   }
 }
 

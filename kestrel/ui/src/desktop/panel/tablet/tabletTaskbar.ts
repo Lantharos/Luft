@@ -3,7 +3,7 @@ import GLib from 'gi://GLib';
 import type St from 'gi://St';
 
 import { animateActor, Curve, Duration, rubberband, Spring, type SpringToken } from '../../../shared/motion/motion.js';
-import { STRIP_HEIGHT, taskbarPreferences } from '../preferences/taskbarPreferences.js';
+import { STRIP_HEIGHT, type TaskbarLayout } from '../preferences/taskbarPreferences.js';
 import { clampUnit } from '../../../shared/math.js';
 import { TabletStrip } from './strip.js';
 
@@ -26,7 +26,7 @@ export class TabletTaskbar {
   private stretched = false;
 
   constructor(private readonly panel: St.Widget, private readonly layers: Clutter.Actor[], private readonly primary: boolean,
-    private readonly available: () => boolean) {
+    private readonly available: () => boolean, private readonly screen: () => TaskbarLayout) {
     for (const layer of layers) layer.set_pivot_point(0.5, 0.5);
     panel.connect('notify::translation-y', () => this.anchorBottom());
   }
@@ -44,7 +44,7 @@ export class TabletTaskbar {
   }
 
   private get travel(): number {
-    return taskbarPreferences.metrics.thickness - STRIP_HEIGHT;
+    return this.screen().metrics.thickness - STRIP_HEIGHT;
   }
 
   private get held(): boolean {
@@ -141,7 +141,7 @@ export class TabletTaskbar {
     const lift = this.strip ? Math.max(0, -this.panel.translation_y) : 0;
     if (!lift && !this.stretched) return;
     this.stretched = lift > 0;
-    this.panel.height = taskbarPreferences.metrics.thickness + lift;
+    this.panel.height = this.screen().metrics.thickness + lift;
   }
 
   private paint(progress: number): void {

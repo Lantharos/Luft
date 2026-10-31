@@ -120,7 +120,8 @@ export class DictationPill {
     if (!monitor) return;
     const taskbar = taskbarPreferences.displays === 'all' || monitor.index === this.layoutManager.primaryMonitor?.index;
     const height = this.thickness();
-    const free = taskbar ? inset(monitor, taskbarPreferences.edge, taskbarPreferences.reserved) : monitor;
+    const screen = taskbarPreferences.on(monitor.index);
+    const free = taskbar ? inset(monitor, screen.edge, screen.reserved) : monitor;
     this.frame.set_position(free.x, free.y + free.height - SURFACE_GAP - height);
     this.frame.set_size(free.width, height);
   }

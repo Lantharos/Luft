@@ -4,7 +4,7 @@ import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 import { blurSurface, raiseSurface } from '../../shared/layout/surface.js';
-import { taskbarPreferences } from './preferences/taskbarPreferences.js';
+import { taskbarPreferences, type TaskbarLayout } from './preferences/taskbarPreferences.js';
 import { animateActor } from '../../shared/motion/motion.js';
 import { freezeSelection } from '../../appearance/kestrelGlass.js';
 import { ensureActorVisibleInScrollView } from '../../core/runtime/animationUtils.js';
@@ -24,6 +24,7 @@ export class WindowPreviews {
   private source: St.Button | null = null;
   private windowSignals: [Meta.Window | Clutter.Actor, number][] = [];
   private clearSelection: (() => void) | null = null;
+  private edge: Edge = 'bottom';
 
   constructor(private readonly monitorFor: (actor: Clutter.Actor) => Monitor | null, private readonly enabled: () => boolean, private readonly beforeOpen: () => void, private readonly activateWindow: (window: Meta.Window) => void) {
     blurSurface(this.actor, 20);
@@ -41,13 +42,17 @@ export class WindowPreviews {
     this.actor.connect('destroy', () => { this.cleanup(); this.source = null; });
   }
 
+  private screenOf(button: St.Button): TaskbarLayout {
+    return taskbarPreferences.on(this.monitorFor(button)?.index);
+  }
+
   bind(button: St.Button, app: () => Shell.App, windows: () => Meta.Window[]): void {
     button.connect('notify::hover', () => {
       if (button.hover) this.schedule(() => this.open(button, app(), windows()), 280);
       else this.schedule(() => this.closeUnlessFocused(), 180);
     });
     button.connect('key-press-event', (_actor, event) => {
-      if (event.get_key_symbol() !== OPEN_KEYS[taskbarPreferences.edge] || !windows().length) return Clutter.EVENT_PROPAGATE;
+      if (event.get_key_symbol() !== OPEN_KEYS[this.screenOf(button).edge] || !windows().length) return Clutter.EVENT_PROPAGATE;
       this.open(button, app(), windows(), true);
       return Clutter.EVENT_STOP;
     });
@@ -118,8 +123,8 @@ export class WindowPreviews {
     scroll.child = grid;
     this.actor.add_child(scroll);
     this.actor.show();
-    const edge = taskbarPreferences.edge;
-    const clearance = taskbarPreferences.clearance;
+    const { edge, clearance } = this.screenOf(button);
+    this.edge = edge;
     const availableHeight = monitor.height - (isVertical(edge) ? 24 : clearance + 36);
     const naturalHeight = grid.get_preferred_height(-1)[1];
     scroll.vscrollbar_policy = naturalHeight > availableHeight ? St.PolicyType.AUTOMATIC : St.PolicyType.NEVER;
@@ -137,7 +142,7 @@ export class WindowPreviews {
   private beside(button: St.Button, monitor: Monitor, edge: Edge, width: number, height: number): [number, number] {
     const [x, y] = button.get_transformed_position();
     const [buttonWidth, buttonHeight] = button.get_transformed_size();
-    const reach = taskbarPreferences.clearance + POPUP_GAP;
+    const reach = this.screenOf(button).clearance + POPUP_GAP;
     const across = (start: number, length: number, size: number) => outward(edge) > 0 ? start + length - reach - size : start + reach;
     const along = (start: number, length: number, center: number, size: number) =>
       Math.round(clamp(center - size / 2, start + SCREEN_MARGIN, start + length - size - SCREEN_MARGIN));
@@ -162,7 +167,7 @@ export class WindowPreviews {
     if (immediate) { this.actor.remove_all_transitions(); finish(); }
     else if (!this.clearSelection) {
       this.clearSelection = freezeSelection(this.actor);
-      animateActor(this.actor, { opacity: 0, ...toward(taskbarPreferences.edge, 6), duration: 100, mode: Clutter.AnimationMode.EASE_IN_QUAD, onComplete: finish });
+      animateActor(this.actor, { opacity: 0, ...toward(this.edge, 6), duration: 100, mode: Clutter.AnimationMode.EASE_IN_QUAD, onComplete: finish });
     }
   }
 

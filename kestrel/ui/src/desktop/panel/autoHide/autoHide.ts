@@ -5,7 +5,7 @@ import St from 'gi://St';
 
 import { animateActor } from '../../../shared/motion/motion.js';
 import { band, toward } from '../../../shared/layout/edge.js';
-import { taskbarPreferences } from '../preferences/taskbarPreferences.js';
+import { taskbarPreferences, type TaskbarLayout } from '../preferences/taskbarPreferences.js';
 import type { Monitor } from '../panel.js';
 import type { WindowOverlap } from './windowOverlap.js';
 
@@ -79,21 +79,25 @@ export class AutoHide {
     this.sync();
   }
 
+  private get screen(): TaskbarLayout {
+    return taskbarPreferences.on(this.monitor()?.index);
+  }
+
   place(): void {
     const monitor = this.monitor();
     if (!monitor) return;
-    const { x, y, width, height } = band(monitor, taskbarPreferences.edge, 1);
+    const { x, y, width, height } = band(monitor, this.screen.edge, 1);
     this.edge.set_position(x, y);
     this.edge.set_size(width, height);
     if (!this.revealed) this.panel.set(this.offset(false));
   }
 
   private offset(revealed: boolean) {
-    return revealed ? { translation_x: 0, translation_y: this.rest() } : toward(taskbarPreferences.edge, taskbarPreferences.clearance);
+    return revealed ? { translation_x: 0, translation_y: this.rest() } : toward(this.screen.edge, this.screen.clearance);
   }
 
   sync(immediate = false): void {
-    const mode = taskbarPreferences.autoHide;
+    const mode = this.screen.autoHide;
     this.panel.track_hover = mode !== 'never';
     const reveal = !this.suppressed && !this.arriving && (mode === 'never' || this.wanted(mode === 'windows'));
     this.edge.visible = this.allowed && !this.suppressed && !this.arriving && mode !== 'never' && !reveal;
@@ -109,7 +113,7 @@ export class AutoHide {
     } else if (this.revealed && !this.timer) {
       this.timer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, HIDE_DELAY, () => {
         this.timer = 0;
-        if (!this.wanted(taskbarPreferences.autoHide === 'windows')) this.slide(false, false);
+        if (!this.wanted(this.screen.autoHide === 'windows')) this.slide(false, false);
         return GLib.SOURCE_REMOVE;
       });
     }
@@ -125,7 +129,7 @@ export class AutoHide {
   private touched(): boolean {
     const monitor = this.monitor();
     if (!monitor || !this.overlap) return false;
-    return this.overlap.touches(new Mtk.Rectangle(band(monitor, taskbarPreferences.edge, taskbarPreferences.clearance)));
+    return this.overlap.touches(new Mtk.Rectangle(band(monitor, this.screen.edge, this.screen.clearance)));
   }
 
   private slide(revealed: boolean, immediate: boolean): void {

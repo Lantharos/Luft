@@ -9,7 +9,7 @@ import { taskbarBackdrops } from '../backdrop.js';
 import { appIcons } from '../../../appearance/icons/appIcons.js';
 import { animateActor, Spring } from '../../../shared/motion/motion.js';
 import { wallpaperFloor, type Backdrop } from '../../wallpaper/floor.js';
-import { taskbarPreferences } from '../preferences/taskbarPreferences.js';
+import type { TaskbarLayout } from '../preferences/taskbarPreferences.js';
 import { clampUnit } from '../../../shared/math.js';
 import { localized, t } from '../../../shared/i18n/index.js';
 
@@ -27,9 +27,9 @@ type BackdropOf = (button: St.Button) => Backdrop;
 
 const wholeFloor: BackdropOf = () => wallpaperFloor;
 
-export function floorAlong(panel: St.Widget): BackdropOf {
+export function floorAlong(panel: St.Widget, screen: () => TaskbarLayout): BackdropOf {
   return button => {
-    if (!taskbarPreferences.vertical || !panel.height) return wallpaperFloor;
+    if (!screen().vertical || !panel.height) return wallpaperFloor;
     const [, y] = button.get_transformed_position();
     const [, panelY] = panel.get_transformed_position();
     return wallpaperFloor.around(clampUnit((y - panelY + button.height / 2) / panel.height));

@@ -3,7 +3,7 @@ import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 
 import { rightToLeft } from '../../shared/layout/edge.js';
-import { STRIP_HEIGHT, taskbarPreferences } from './preferences/taskbarPreferences.js';
+import { STRIP_HEIGHT, taskbarPreferences, type TaskbarLayout } from './preferences/taskbarPreferences.js';
 
 const EASE_DURATION = 260;
 
@@ -21,6 +21,7 @@ function naturalSize(child: Clutter.Actor): [number, number] {
 export const PanelLayout = GObject.registerClass(
   class PanelLayout extends Clutter.LayoutManager {
     private easeUntil = 0;
+    screen: () => TaskbarLayout = () => taskbarPreferences.desktop;
 
     ease(): void {
       this.easeUntil = GLib.get_monotonic_time() + EASE_DURATION * 1000;
@@ -32,7 +33,8 @@ export const PanelLayout = GObject.registerClass(
     vfunc_get_preferred_height(): [number, number] { return this.across(false); }
 
     private across(vertical: boolean): [number, number] {
-      const thickness = taskbarPreferences.vertical === vertical ? taskbarPreferences.metrics.thickness : 0;
+      const screen = this.screen();
+      const thickness = screen.vertical === vertical ? screen.metrics.thickness : 0;
       return [thickness, thickness];
     }
 
@@ -40,11 +42,12 @@ export const PanelLayout = GObject.registerClass(
       const [center, status, peek, ...strips] = container.get_children();
       const width = allocation.get_width();
       const height = allocation.get_height();
-      const vertical = taskbarPreferences.vertical;
+      const screen = this.screen();
+      const vertical = screen.vertical;
       const length = vertical ? height : width;
       const across = vertical ? width : height;
       const reversed = !vertical && rightToLeft();
-      const { inset } = taskbarPreferences.metrics;
+      const { inset } = screen.metrics;
       const atStart = taskbarPreferences.alignment === 'left';
       const easing = GLib.get_monotonic_time() < this.easeUntil;
       const peekLength = !peek.visible ? 0 : vertical ? peek.get_preferred_height(width)[1] : peek.get_preferred_width(height)[1];

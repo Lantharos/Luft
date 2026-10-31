@@ -40,8 +40,8 @@ export class Taskbar {
   private readonly items = new Map<string, AppItem>();
   private initialized = false;
   private readonly disconnectors: (() => void)[] = [];
-  private metrics: TaskbarMetrics = taskbarPreferences.metrics;
-  private edge: Edge = taskbarPreferences.edge;
+  private metrics: TaskbarMetrics = taskbarPreferences.desktop.metrics;
+  private edge: Edge = taskbarPreferences.desktop.edge;
 
   constructor(private readonly tracker: Shell.WindowTracker, private readonly menus: ContextMenus, private readonly previews: WindowPreviews,
     private readonly favorites: Gio.Settings, private readonly monitorIndex: () => number,
@@ -53,7 +53,7 @@ export class Taskbar {
         .map(slot => [...this.items.values()].find(item => item.slot === slot && !item.removing))
         .filter((item): item is AppItem => !!item && pinned.has(item.app.id))
         .map(item => ({ id: item.app.id, slot: item.slot, button: item.button }));
-    }, favorites);
+    }, favorites, () => isVertical(this.edge));
     const display = global.display;
     const refresh = () => this.updateIndicators();
     const signals = [display.connect('window-demands-attention', refresh), display.connect('window-marked-urgent', refresh)];

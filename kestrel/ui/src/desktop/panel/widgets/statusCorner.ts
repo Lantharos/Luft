@@ -9,7 +9,7 @@ import { blurSurface } from '../../../shared/layout/surface.js';
 import { dock, isVertical } from '../../../shared/layout/edge.js';
 import { createLauncher, type Launcher } from '../launcher/launcher.js';
 import type { Monitor } from '../panel.js';
-import { taskbarPreferences } from '../preferences/taskbarPreferences.js';
+import { taskbarPreferences, type TaskbarLayout } from '../preferences/taskbarPreferences.js';
 import { timeText } from './clockText.js';
 
 const MARGIN = 12;
@@ -58,14 +58,18 @@ export class StatusCorner {
     this.actor.connect('notify::height', () => this.reposition());
   }
 
+  private get screen(): TaskbarLayout {
+    return taskbarPreferences.on(this.monitor?.index);
+  }
+
   get clearance(): number {
     const [width, height] = this.size();
-    return MARGIN + (isVertical(taskbarPreferences.edge) ? width : height);
+    return MARGIN + (isVertical(this.screen.edge) ? width : height);
   }
 
   place(monitor: Monitor): void {
     this.monitor = monitor;
-    const edge = taskbarPreferences.edge;
+    const edge = this.screen.edge;
     this.actor.orientation = isVertical(edge) ? Clutter.Orientation.VERTICAL : Clutter.Orientation.HORIZONTAL;
     const hugged = edge === 'left' ? Clutter.ActorAlign.START : edge === 'right' ? Clutter.ActorAlign.END : Clutter.ActorAlign.FILL;
     for (const [button] of this.buttons) button.x_align = hugged;
@@ -105,7 +109,7 @@ export class StatusCorner {
   }
 
   private syncStartButton(): void {
-    this.launcher.button.visible = taskbarPreferences.startButton;
+    this.launcher.button.visible = this.screen.startButton;
   }
 
   private size(): [number, number] {
@@ -118,7 +122,7 @@ export class StatusCorner {
     if (!this.monitor) return;
     const { x, y, width, height } = this.monitor;
     const area = { x: x + MARGIN, y: y + MARGIN, width: width - 2 * MARGIN, height: height - 2 * MARGIN };
-    this.actor.set_position(...dock(area, taskbarPreferences.edge, ...this.size(), 'end'));
+    this.actor.set_position(...dock(area, this.screen.edge, ...this.size(), 'end'));
   }
 
   private tick(now: GLib.DateTime, clock: WallClock): void {

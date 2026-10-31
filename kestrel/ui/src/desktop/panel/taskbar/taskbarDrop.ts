@@ -27,6 +27,7 @@ export class TaskbarDrop {
     private readonly actor: St.BoxLayout,
     private readonly slots: () => TaskbarSlot[],
     private readonly favorites: Gio.Settings,
+    private readonly vertical: () => boolean,
   ) {
     (actor as DelegateActor)._delegate = {
       handleDragOver: (source: DraggedItem, _dragActor: St.Widget, x: number, y: number) => this.over(source, this.along(x, y)),
@@ -43,11 +44,11 @@ export class TaskbarDrop {
   }
 
   private along(x: number, y: number): number {
-    return taskbarPreferences.vertical ? y : x;
+    return this.vertical() ? y : x;
   }
 
   private insertionIndex(slots: TaskbarSlot[], position: number): number {
-    const vertical = taskbarPreferences.vertical;
+    const vertical = this.vertical();
     const reversed = !vertical && rightToLeft();
     const index = slots.findIndex(({ slot }) => {
       const middle = vertical ? slot.y + slot.height / 2 : slot.x + slot.width / 2;

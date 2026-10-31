@@ -2,6 +2,7 @@
 
 #include "config.h"
 
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -397,32 +398,17 @@ unescape_unit_name (const char *name)
   return g_string_free (unescaped, FALSE);
 }
 
-/*
- * get_app_from_window_scope:
- * @window: a #MetaWindow
- *
- * Finds the app whose systemd scope the window's process runs in, named
- * app-[LAUNCHER-]APP-ID-RANDOM.scope as the XDG convention has it, for
- * apps that don't name themselves after their .desktop file.
- *
- * Return value: (transfer full): A newly-referenced #ShellApp, or %NULL
- */
 static ShellApp *
-get_app_from_window_scope (MetaWindow *window)
+get_app_from_unit (MetaWindow *window,
+                   const char *unit)
 {
-  g_autofree char *unit = NULL;
   g_autofree char *named = NULL;
   g_autofree char *id = NULL;
   ShellApp *app;
   const char *launched;
-  char *end;
-  pid_t pid;
+  const char *end;
 
-  if (meta_window_is_remote (window))
-    return NULL;
-
-  pid = meta_window_get_pid (window);
-  if (pid < 1 || sd_pid_get_user_unit (pid, &unit) < 0 || !g_str_has_prefix (unit, "app-"))
+  if (!g_str_has_prefix (unit, "app-"))
     return NULL;
 
   end = strchr (unit, '@');
@@ -444,6 +430,60 @@ get_app_from_window_scope (MetaWindow *window)
   g_free (id);
   id = unescape_unit_name (launched + 1);
   return get_app_from_id (window, id);
+}
+
+static pid_t
+get_parent_pid (pid_t pid)
+{
+  g_autofree char *path = g_strdup_printf ("/proc/%d/stat", pid);
+  g_autofree char *stat = NULL;
+  const char *after_name;
+  int parent;
+
+  if (!g_file_get_contents (path, &stat, NULL, NULL))
+    return 0;
+
+  after_name = strrchr (stat, ')');
+  if (after_name == NULL || sscanf (after_name, ") %*c %d", &parent) != 1)
+    return 0;
+
+  return parent;
+}
+
+/*
+ * get_app_from_window_scope:
+ * @window: a #MetaWindow
+ *
+ * Finds the app whose systemd scope the window's process, or the process
+ * that started it, runs in, named app-[LAUNCHER-]APP-ID-RANDOM.scope as the
+ * XDG convention has it, for apps that don't name themselves after their
+ * .desktop file. Chromium moves itself into a scope of its own, under a name
+ * of its build's choosing, while what launched it stays in the app's.
+ *
+ * Return value: (transfer full): A newly-referenced #ShellApp, or %NULL
+ */
+static ShellApp *
+get_app_from_window_scope (MetaWindow *window)
+{
+  pid_t pid;
+
+  if (meta_window_is_remote (window))
+    return NULL;
+
+  for (pid = meta_window_get_pid (window); pid > 1; pid = get_parent_pid (pid))
+    {
+      g_autofree char *unit = NULL;
+      ShellApp *app;
+
+      if (sd_pid_get_user_unit (pid, &unit) < 0)
+        return NULL;
+
+      app = get_app_from_unit (window, unit);
+      if (app != NULL)
+        return app;
+    }
+
+  return NULL;
 }
 
 /**

@@ -8,6 +8,7 @@ import Shell from 'gi://Shell';
 
 import * as KestrelUi from '../../kestrelUi.js';
 import * as Main from '../../core/main.js';
+import { t } from '../../shared/i18n/index.js';
 import { SwitcherList } from './switcherList.js';
 import { SwitcherPopup } from './switcherPopup.js';
 
@@ -34,6 +35,7 @@ class WindowCard extends St.BoxLayout {
   }
 
   readonly titleLabel: St.Label;
+  private readonly close: St.Button;
 
   constructor(readonly window: Meta.Window) {
     super({ style_class: 'kestrel-switcher-window', orientation: Clutter.Orientation.VERTICAL });
@@ -54,6 +56,14 @@ class WindowCard extends St.BoxLayout {
     });
     this.titleLabel.clutter_text.ellipsize = Pango.EllipsizeMode.END;
     header.add_child(this.titleLabel);
+    this.close = new St.Button({
+      style_class: 'kestrel-switcher-close',
+      opacity: 0,
+      reactive: false,
+      child: new St.Icon({ icon_name: 'window-close-symbolic', icon_size: TITLE_ICON_SIZE }),
+    });
+    this.close.connect('clicked', () => window.delete(global.get_current_time()));
+    header.add_child(this.close);
     this.add_child(header);
 
     const preview = new St.Widget({
@@ -76,9 +86,20 @@ class WindowCard extends St.BoxLayout {
     }));
     this.add_child(preview);
 
+    this.nameClose();
     window.connectObject('notify::title', () => {
       this.titleLabel.text = window.get_title() ?? '';
+      this.nameClose();
     }, this);
+  }
+
+  showClose(shown: boolean): void {
+    this.close.opacity = shown ? 255 : 0;
+    this.close.reactive = shown;
+  }
+
+  private nameClose(): void {
+    this.close.accessible_name = t('previews-close-window', { title: this.titleLabel.text });
   }
 }
 
@@ -102,6 +123,11 @@ class WindowSwitcher extends SwitcherList {
     this.connect('destroy', () => {
       for (const card of this.cards) card.window.disconnectObject(this);
     });
+  }
+
+  highlight(index: number, justOutline = false): void {
+    super.highlight(index, justOutline);
+    this.cards.forEach((card, cardIndex) => card.showClose(cardIndex === index));
   }
 
   private removeWindow(window: Meta.Window): void {

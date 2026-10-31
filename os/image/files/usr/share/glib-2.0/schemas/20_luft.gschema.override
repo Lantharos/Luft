@@ -7,6 +7,7 @@ color-scheme='prefer-dark'
 font-name='Open Runde 11'
 document-font-name='Open Runde 12'
 monospace-font-name='Maple Mono NF 11'
+gtk-enable-primary-paste=false
 
 [org.gnome.desktop.sound]
 theme-name='luft'

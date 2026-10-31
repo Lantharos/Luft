@@ -246,6 +246,16 @@ settings-tiling-shortcuts = Döşeme kısayolları
 settings-tiling-shortcuts-description = Döşenmiş pencereleri klavyeyle etkinleştirin, taşıyın ve yeniden boyutlandırın
 settings-board = Tahta
 settings-board-description = Çalışma alanının pencerelerini yan yana dizmek için Super tuşuna iki kez basın veya dört parmakla yukarı kaydırın
+settings-see-through = Yarı saydam pencereler
+settings-see-through-description = Masaüstünün bu uygulamaların pencerelerinden görünmesini sağlar. Bunu bir pencerenin başlık çubuğu menüsünden de açabilirsiniz.
+settings-see-through-app = { $app } yarı saydam
+settings-see-through-add = Uygulama ekle
+settings-see-through-add-title = Bir uygulamayı yarı saydam yap
+settings-see-through-add-description = Pencereleri arkalarındakini gösterir.
+settings-see-through-amount = Ne kadar saydam
+settings-see-through-blur = Arkadakini bulanıklaştır
+settings-see-through-text = Metni katı tut
+settings-see-through-text-description = Yalnızca pencerenin arka planı saydamlaşır
 
 ## Accessibility
 

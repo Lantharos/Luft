@@ -93,6 +93,7 @@ title-bar-menu-maximize = Maksimizo
 title-bar-menu-move = Lëviz
 title-bar-menu-resize = Ndrysho përmasat
 title-bar-menu-always-on-top = Gjithmonë sipër
+title-bar-menu-see-through = E tejdukshme
 title-bar-menu-always-on-visible-workspace = Gjithmonë në hapësirën e dukshme të punës
 title-bar-menu-workspace-left = Zhvendos në hapësirën e punës majtas
 title-bar-menu-workspace-right = Zhvendos në hapësirën e punës djathtas

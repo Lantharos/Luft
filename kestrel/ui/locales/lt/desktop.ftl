@@ -93,6 +93,7 @@ title-bar-menu-maximize = Maksimizuoti
 title-bar-menu-move = Perkelti
 title-bar-menu-resize = Keisti dydį
 title-bar-menu-always-on-top = Visada viršuje
+title-bar-menu-see-through = Permatomas
 title-bar-menu-always-on-visible-workspace = Visose darbo srityse
 title-bar-menu-workspace-left = Perkelti į kairiąją darbo sritį
 title-bar-menu-workspace-right = Perkelti į dešiniąją darbo sritį

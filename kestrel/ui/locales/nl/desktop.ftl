@@ -93,6 +93,7 @@ title-bar-menu-maximize = Maximaliseren
 title-bar-menu-move = Verplaatsen
 title-bar-menu-resize = Formaat wijzigen
 title-bar-menu-always-on-top = Altijd bovenop
+title-bar-menu-see-through = Doorschijnend
 title-bar-menu-always-on-visible-workspace = Altijd op zichtbaar werkblad
 title-bar-menu-workspace-left = Naar werkblad links verplaatsen
 title-bar-menu-workspace-right = Naar werkblad rechts verplaatsen

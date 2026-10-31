@@ -218,6 +218,23 @@
       <default>7.0</default>
       <summary>Hour, in local time, when a custom schedule turns the dark style off</summary>
     </key>
+    <key name="see-through-apps" type="as">
+      <default>[]</default>
+      <summary>Apps whose windows let what's behind them show through</summary>
+    </key>
+    <key name="see-through-opacity" type="d">
+      <range min="0.2" max="0.95"/>
+      <default>0.7</default>
+      <summary>How much of a see-through window's background stays</summary>
+    </key>
+    <key name="see-through-blur" type="b">
+      <default>true</default>
+      <summary>Whether what's behind see-through windows is blurred</summary>
+    </key>
+    <key name="see-through-keep-text" type="b">
+      <default>true</default>
+      <summary>Whether only the background of see-through windows lets what's behind show, keeping text and icons solid</summary>
+    </key>
     <key name="board" type="b">
       <default>true</default>
       <summary>Whether pressing Super twice or swiping up with four fingers turns a workspace into a board</summary>

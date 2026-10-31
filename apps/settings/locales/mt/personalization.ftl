@@ -252,6 +252,16 @@ settings-tiling-shortcuts = Shortcuts għat-twieqi ħdejn xulxin
 settings-tiling-shortcuts-description = Attiva, ċaqlaq u biddel id-daqs tat-twieqi ħdejn xulxin bit-tastiera
 settings-board = Bord
 settings-board-description = Agħfas Super darbtejn jew żerżaq ’il fuq b’erba’ swaba’ biex tqiegħed it-twieqi tal-ispazju tax-xogħol ħdejn xulxin
+settings-see-through = Twieqi trasparenti
+settings-see-through-description = Ħalli d-desktop jidher minn ġot-twieqi ta’ dawn l-apps. Tista’ tixgħelha wkoll mill-menu tal-bar tat-titlu ta’ tieqa.
+settings-see-through-app = { $app } trasparenti
+settings-see-through-add = Żid app
+settings-see-through-add-title = Agħmel app trasparenti
+settings-see-through-add-description = It-twieqi tagħha jħallu dak li hemm warajhom jidher.
+settings-see-through-amount = Kemm trasparenti
+settings-see-through-blur = Ċajpar dak li hemm wara
+settings-see-through-text = Żomm it-test solidu
+settings-see-through-text-description = L-isfond tat-tieqa biss isir trasparenti
 
 ## Accessibility
 

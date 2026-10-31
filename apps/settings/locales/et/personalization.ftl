@@ -248,6 +248,16 @@ settings-tiling-shortcuts = Paanimise kiirklahvid
 settings-tiling-shortcuts-description = Paanitud akende aktiveerimine, liigutamine ja suuruse muutmine klaviatuuriga
 settings-board = Tahvel
 settings-board-description = Vajutage kaks korda Super või libistage nelja sõrmega üles, et paigutada tööala aknad kõrvuti
+settings-see-through = Läbipaistvad aknad
+settings-see-through-description = Töölaud paistab nende rakenduste akende kaudu läbi. Selle saab sisse lülitada ka akna tiitliriba menüüst.
+settings-see-through-app = Läbipaistev { $app }
+settings-see-through-add = Lisa rakendus
+settings-see-through-add-title = Muuda rakendus läbipaistvaks
+settings-see-through-add-description = Selle aknad lasevad tagapoolse läbi paista.
+settings-see-through-amount = Kui läbipaistev
+settings-see-through-blur = Hägusta tagapoolset
+settings-see-through-text = Hoia tekst täis
+settings-see-through-text-description = Läbipaistvaks muutub ainult akna taust
 
 ## Accessibility
 

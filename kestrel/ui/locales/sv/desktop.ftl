@@ -93,6 +93,7 @@ title-bar-menu-maximize = Maximera
 title-bar-menu-move = Flytta
 title-bar-menu-resize = Ändra storlek
 title-bar-menu-always-on-top = Alltid överst
+title-bar-menu-see-through = Genomskinligt
 title-bar-menu-always-on-visible-workspace = Visa på alla arbetsytor
 title-bar-menu-workspace-left = Flytta till arbetsytan till vänster
 title-bar-menu-workspace-right = Flytta till arbetsytan till höger

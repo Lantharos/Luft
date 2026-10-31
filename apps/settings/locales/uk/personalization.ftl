@@ -250,6 +250,16 @@ settings-tiling-shortcuts = Клавіатурні скорочення моза
 settings-tiling-shortcuts-description = Перемикайтеся між вікнами мозаїки, переміщуйте їх і змінюйте їхній розмір з клавіатури
 settings-board = Дошка
 settings-board-description = Двічі натисніть Super або проведіть угору чотирма пальцями, щоб розкласти вікна робочого простору поруч
+settings-see-through = Напівпрозорі вікна
+settings-see-through-description = Робочий стіл просвічує крізь вікна цих застосунків. Це можна ввімкнути й у меню заголовка вікна.
+settings-see-through-app = Напівпрозоре: { $app }
+settings-see-through-add = Додати застосунок
+settings-see-through-add-title = Зробити застосунок напівпрозорим
+settings-see-through-add-description = Його вікна пропускають те, що за ними.
+settings-see-through-amount = Наскільки прозоро
+settings-see-through-blur = Розмивати те, що позаду
+settings-see-through-text = Залишати текст чітким
+settings-see-through-text-description = Напівпрозорим стає лише тло вікна
 
 ## Accessibility
 

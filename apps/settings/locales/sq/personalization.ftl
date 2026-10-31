@@ -257,6 +257,16 @@ settings-tiling-shortcuts = Shkurtore për renditjen krah për krah
 settings-tiling-shortcuts-description = Aktivizoni, lëvizni dhe ndryshoni madhësinë e dritareve krah për krah me tastierë
 settings-board = Tabelë
 settings-board-description = Shtypni dy herë Super ose rrëshqitni lart me katër gishta për të vendosur dritaret e hapësirës së punës krah njëra-tjetrës
+settings-see-through = Dritare të tejdukshme
+settings-see-through-description = Lëre desktopin të duket përmes dritareve të këtyre aplikacioneve. Mund ta aktivizoni edhe nga menyja e shiritit të titullit të një dritareje.
+settings-see-through-app = { $app } e tejdukshme
+settings-see-through-add = Shto një aplikacion
+settings-see-through-add-title = Bëje një aplikacion të tejdukshëm
+settings-see-through-add-description = Dritaret e tij lënë të duket ajo që është pas tyre.
+settings-see-through-amount = Sa e tejdukshme
+settings-see-through-blur = Turbullo atë që është pas
+settings-see-through-text = Mbaje tekstin të plotë
+settings-see-through-text-description = Vetëm sfondi i dritares bëhet i tejdukshëm
 
 ## Accessibility
 

@@ -96,6 +96,7 @@ title-bar-menu-maximize = Immassimizza
 title-bar-menu-move = Ċaqlaq
 title-bar-menu-resize = Ibdel id-daqs
 title-bar-menu-always-on-top = Dejjem fuq kollox
+title-bar-menu-see-through = Trasparenti
 title-bar-menu-always-on-visible-workspace = Dejjem fuq l-ispazju tax-xogħol viżibbli
 title-bar-menu-workspace-left = Ressaq lejn l-ispazju tax-xogħol fuq ix-xellug
 title-bar-menu-workspace-right = Ressaq lejn l-ispazju tax-xogħol fuq il-lemin

@@ -246,6 +246,16 @@ settings-tiling-shortcuts = Kortkommandon för plattor
 settings-tiling-shortcuts-description = Aktivera, flytta och ändra storlek på fönster som plattor med tangentbordet
 settings-board = Tavla
 settings-board-description = Tryck två gånger på Super eller svep uppåt med fyra fingrar för att lägga arbetsytans fönster sida vid sida
+settings-see-through = Genomskinliga fönster
+settings-see-through-description = Låt skrivbordet synas genom fönstren i de här apparna. Du kan också slå på det från menyn i ett fönsters namnlist.
+settings-see-through-app = Genomskinlig { $app }
+settings-see-through-add = Lägg till en app
+settings-see-through-add-title = Gör en app genomskinlig
+settings-see-through-add-description = Dess fönster släpper igenom det som finns bakom.
+settings-see-through-amount = Hur genomskinlig
+settings-see-through-blur = Gör det bakomliggande suddigt
+settings-see-through-text = Behåll texten heltäckande
+settings-see-through-text-description = Bara fönstrets bakgrund blir genomskinlig
 
 ## Accessibility
 

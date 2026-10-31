@@ -246,6 +246,16 @@ settings-tiling-shortcuts = Sneltoetsen voor tegelen
 settings-tiling-shortcuts-description = Getegelde vensters met het toetsenbord activeren, verplaatsen en van grootte veranderen
 settings-board = Board
 settings-board-description = Druk twee keer op Super of veeg met vier vingers omhoog om de vensters van een werkblad naast elkaar te leggen
+settings-see-through = Doorschijnende vensters
+settings-see-through-description = Laat het bureaublad door de vensters van deze apps heen schijnen. Je kunt het ook aanzetten via het menu in de titelbalk van een venster.
+settings-see-through-app = { $app } doorschijnend
+settings-see-through-add = App toevoegen
+settings-see-through-add-title = Een app doorschijnend maken
+settings-see-through-add-description = De vensters laten zien wat erachter ligt.
+settings-see-through-amount = Hoe doorschijnend
+settings-see-through-blur = Wat erachter ligt vervagen
+settings-see-through-text = Tekst dekkend houden
+settings-see-through-text-description = Alleen de achtergrond van het venster wordt doorschijnend
 
 ## Accessibility
 

@@ -93,6 +93,7 @@ title-bar-menu-maximize = Hámarka
 title-bar-menu-move = Færa
 title-bar-menu-resize = Breyta stærð
 title-bar-menu-always-on-top = Alltaf efst
+title-bar-menu-see-through = Gegnsær
 title-bar-menu-always-on-visible-workspace = Alltaf á sýnilegu vinnusvæði
 title-bar-menu-workspace-left = Færa á vinnusvæði til vinstri
 title-bar-menu-workspace-right = Færa á vinnusvæði til hægri

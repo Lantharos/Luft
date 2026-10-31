@@ -96,6 +96,7 @@ title-bar-menu-maximize = Uasmhéadaigh
 title-bar-menu-move = Bog
 title-bar-menu-resize = Athraigh an méid
 title-bar-menu-always-on-top = I gcónaí ar barr
+title-bar-menu-see-through = Tréshoilseach
 title-bar-menu-always-on-visible-workspace = I gcónaí ar an spás oibre infheicthe
 title-bar-menu-workspace-left = Bog chuig an spás oibre ar chlé
 title-bar-menu-workspace-right = Bog chuig an spás oibre ar dheis

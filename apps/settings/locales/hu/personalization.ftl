@@ -246,6 +246,16 @@ settings-tiling-shortcuts = Csempézés billentyűparancsai
 settings-tiling-shortcuts-description = Csempézett ablakok aktiválása, áthelyezése és átméretezése billentyűzettel
 settings-board = Tábla
 settings-board-description = Nyomja meg kétszer a Super billentyűt, vagy húzzon felfelé négy ujjal, hogy a munkaterület ablakai egymás mellé kerüljenek
+settings-see-through = Áttetsző ablakok
+settings-see-through-description = Az asztal átlátszik ezeknek az alkalmazásoknak az ablakain. Az ablak címsorának menüjéből is bekapcsolható.
+settings-see-through-app = Áttetsző: { $app }
+settings-see-through-add = Alkalmazás hozzáadása
+settings-see-through-add-title = Alkalmazás áttetszővé tétele
+settings-see-through-add-description = Az ablakain átlátszik, ami mögöttük van.
+settings-see-through-amount = Mennyire áttetsző
+settings-see-through-blur = A mögötte lévő elmosása
+settings-see-through-text = Tömör szöveg
+settings-see-through-text-description = Csak az ablak háttere lesz áttetsző
 
 ## Accessibility
 

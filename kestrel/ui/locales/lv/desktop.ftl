@@ -94,6 +94,7 @@ title-bar-menu-maximize = Maksimizēt
 title-bar-menu-move = Pārvietot
 title-bar-menu-resize = Mainīt izmēru
 title-bar-menu-always-on-top = Vienmēr virspusē
+title-bar-menu-see-through = Caurspīdīgs
 title-bar-menu-always-on-visible-workspace = Vienmēr redzamajā darbvietā
 title-bar-menu-workspace-left = Pārvietot uz darbvietu pa kreisi
 title-bar-menu-workspace-right = Pārvietot uz darbvietu pa labi

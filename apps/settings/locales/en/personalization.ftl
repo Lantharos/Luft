@@ -293,6 +293,16 @@ settings-tiling-shortcuts = Tiling shortcuts
 settings-tiling-shortcuts-description = Focus, move and resize tiled windows from the keyboard
 settings-board = Board
 settings-board-description = Press Super twice or swipe up with four fingers to lay out a workspace's windows side by side
+settings-see-through = See-through windows
+settings-see-through-description = Let the desktop show through these apps' windows. You can also turn it on from a window's title bar menu.
+settings-see-through-app = See-through { $app }
+settings-see-through-add = Add an app
+settings-see-through-add-title = Make an app see-through
+settings-see-through-add-description = Its windows let what's behind them show through.
+settings-see-through-amount = How see-through
+settings-see-through-blur = Blur what's behind
+settings-see-through-text = Keep text solid
+settings-see-through-text-description = Only the window's background turns see-through
 
 ## Accessibility
 

@@ -246,6 +246,16 @@ settings-tiling-shortcuts = Atalhos do mosaico
 settings-tiling-shortcuts-description = Ative, mova e redimensione janelas em mosaico pelo teclado
 settings-board = Quadro
 settings-board-description = Pressione Super duas vezes ou deslize para cima com quatro dedos para organizar as janelas do espaço de trabalho lado a lado
+settings-see-through = Janelas translúcidas
+settings-see-through-description = Deixa a área de trabalho aparecer através das janelas destes apps. Você também pode ativar pelo menu da barra de título de uma janela.
+settings-see-through-app = { $app } translúcido
+settings-see-through-add = Adicionar um app
+settings-see-through-add-title = Deixar um app translúcido
+settings-see-through-add-description = As janelas deixam aparecer o que está atrás.
+settings-see-through-amount = Quão translúcido
+settings-see-through-blur = Desfocar o que está atrás
+settings-see-through-text = Manter o texto sólido
+settings-see-through-text-description = Só o fundo da janela fica translúcido
 
 ## Accessibility
 

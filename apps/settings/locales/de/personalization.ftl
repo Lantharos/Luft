@@ -257,6 +257,16 @@ settings-tiling-shortcuts = Tastenkürzel zum Kacheln
 settings-tiling-shortcuts-description = Gekachelte Fenster mit der Tastatur fokussieren, verschieben und in der Größe ändern
 settings-board = Board
 settings-board-description = Zweimal Super drücken oder mit vier Fingern nach oben wischen, um die Fenster eines Arbeitsbereichs nebeneinander anzuordnen
+settings-see-through = Durchscheinende Fenster
+settings-see-through-description = Lässt den Schreibtisch durch die Fenster dieser Apps scheinen. Lässt sich auch im Menü der Titelleiste eines Fensters einschalten.
+settings-see-through-app = { $app } durchscheinend
+settings-see-through-add = App hinzufügen
+settings-see-through-add-title = App durchscheinend machen
+settings-see-through-add-description = Ihre Fenster lassen durchscheinen, was dahinter liegt.
+settings-see-through-amount = Wie durchscheinend
+settings-see-through-blur = Dahinterliegendes weichzeichnen
+settings-see-through-text = Text deckend lassen
+settings-see-through-text-description = Nur der Hintergrund des Fensters scheint durch
 
 ## Accessibility
 

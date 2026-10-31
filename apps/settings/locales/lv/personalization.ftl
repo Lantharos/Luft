@@ -248,6 +248,16 @@ settings-tiling-shortcuts = Flīzēšanas īsinājumtaustiņi
 settings-tiling-shortcuts-description = Aktivizējiet, pārvietojiet un mainiet flīzēto logu izmēru ar tastatūru
 settings-board = Tāfele
 settings-board-description = Divreiz nospiediet Super vai pavelciet uz augšu ar četriem pirkstiem, lai darbvietas logus izkārtotu blakus
+settings-see-through = Caurspīdīgi logi
+settings-see-through-description = Darbvirsma redzama cauri šo lietotņu logiem. To var ieslēgt arī loga virsrakstjoslas izvēlnē.
+settings-see-through-app = Caurspīdīgs: { $app }
+settings-see-through-add = Pievienot lietotni
+settings-see-through-add-title = Padarīt lietotni caurspīdīgu
+settings-see-through-add-description = Tās logi ļauj redzēt to, kas aiz tiem.
+settings-see-through-amount = Cik caurspīdīgs
+settings-see-through-blur = Aizmiglot to, kas aizmugurē
+settings-see-through-text = Saglabāt tekstu necaurspīdīgu
+settings-see-through-text-description = Caurspīdīgs kļūst tikai loga fons
 
 ## Accessibility
 

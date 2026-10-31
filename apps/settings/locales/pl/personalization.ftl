@@ -250,6 +250,16 @@ settings-tiling-shortcuts = Skróty kafelkowania
 settings-tiling-shortcuts-description = Aktywuj, przenoś i zmieniaj rozmiar kafelkowanych okien z klawiatury
 settings-board = Tablica
 settings-board-description = Naciśnij dwukrotnie Super lub przesuń w górę czterema palcami, aby ułożyć okna obszaru roboczego obok siebie
+settings-see-through = Przezroczyste okna
+settings-see-through-description = Pulpit prześwituje przez okna tych aplikacji. Możesz to też włączyć z menu paska tytułu okna.
+settings-see-through-app = Przezroczyste: { $app }
+settings-see-through-add = Dodaj aplikację
+settings-see-through-add-title = Uczyń aplikację przezroczystą
+settings-see-through-add-description = Jej okna przepuszczają to, co jest za nimi.
+settings-see-through-amount = Stopień przezroczystości
+settings-see-through-blur = Rozmyj to, co z tyłu
+settings-see-through-text = Zachowaj pełny tekst
+settings-see-through-text-description = Przezroczyste staje się tylko tło okna
 
 ## Accessibility
 

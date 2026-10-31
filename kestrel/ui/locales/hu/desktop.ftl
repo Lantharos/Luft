@@ -93,6 +93,7 @@ title-bar-menu-maximize = Teljes méret
 title-bar-menu-move = Áthelyezés
 title-bar-menu-resize = Átméretezés
 title-bar-menu-always-on-top = Mindig felül
+title-bar-menu-see-through = Áttetsző
 title-bar-menu-always-on-visible-workspace = Minden munkaterületen
 title-bar-menu-workspace-left = Áthelyezés a bal oldali munkaterületre
 title-bar-menu-workspace-right = Áthelyezés a jobb oldali munkaterületre

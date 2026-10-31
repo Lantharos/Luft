@@ -250,6 +250,16 @@ settings-tiling-shortcuts = Сочетания клавиш для мозаик�
 settings-tiling-shortcuts-description = Переключайтесь между окнами мозаики, перемещайте их и меняйте их размер с клавиатуры
 settings-board = Доска
 settings-board-description = Дважды нажмите Super или проведите вверх четырьмя пальцами, чтобы разложить окна рабочего пространства рядом
+settings-see-through = Полупрозрачные окна
+settings-see-through-description = Рабочий стол просвечивает сквозь окна этих приложений. Это можно включить и в меню заголовка окна.
+settings-see-through-app = Полупрозрачное: { $app }
+settings-see-through-add = Добавить приложение
+settings-see-through-add-title = Сделать приложение полупрозрачным
+settings-see-through-add-description = Его окна пропускают то, что за ними.
+settings-see-through-amount = Насколько прозрачно
+settings-see-through-blur = Размывать то, что позади
+settings-see-through-text = Оставлять текст чётким
+settings-see-through-text-description = Полупрозрачным становится только фон окна
 
 ## Accessibility
 

@@ -246,6 +246,16 @@ settings-tiling-shortcuts = Dreceres del mosaic
 settings-tiling-shortcuts-description = Activa, mou i canvia la mida de les finestres en mosaic amb el teclat
 settings-board = Tauler
 settings-board-description = Premeu Super dues vegades o llisqueu cap amunt amb quatre dits per posar les finestres de l'espai de treball una al costat de l'altra
+settings-see-through = Finestres translúcides
+settings-see-through-description = Deixa veure l'escriptori a través de les finestres d'aquestes aplicacions. També ho podeu activar des del menú de la barra de títol d'una finestra.
+settings-see-through-app = { $app } translúcida
+settings-see-through-add = Afegeix una aplicació
+settings-see-through-add-title = Fes translúcida una aplicació
+settings-see-through-add-description = Les seves finestres deixen veure el que hi ha al darrere.
+settings-see-through-amount = Com de translúcides
+settings-see-through-blur = Difumina el que hi ha al darrere
+settings-see-through-text = Mantén el text sòlid
+settings-see-through-text-description = Només el fons de la finestra es torna translúcid
 
 ## Accessibility
 

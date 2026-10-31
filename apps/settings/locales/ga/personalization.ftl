@@ -252,6 +252,16 @@ settings-tiling-shortcuts = Aicearraí tíleála
 settings-tiling-shortcuts-description = Gníomhachtaigh, bog agus athraigh méid fuinneog tíleáilte leis an méarchlár
 settings-board = Clár
 settings-board-description = Brúigh Super faoi dhó nó svaidhpeáil suas le ceithre mhéar chun fuinneoga an spáis oibre a leagan amach taobh le taobh
+settings-see-through = Fuinneoga tréshoilseacha
+settings-see-through-description = Lig don deasc taispeáint trí fhuinneoga na n-aipeanna seo. Is féidir é a chur ar siúl freisin ó roghchlár bharra teidil fuinneoige.
+settings-see-through-app = { $app } tréshoilseach
+settings-see-through-add = Cuir aip leis
+settings-see-through-add-title = Déan aip tréshoilseach
+settings-see-through-add-description = Ligeann a fuinneoga don rud atá taobh thiar díobh taispeáint tríd.
+settings-see-through-amount = Cé chomh tréshoilseach
+settings-see-through-blur = Doiléirigh a bhfuil taobh thiar
+settings-see-through-text = Coinnigh an téacs soladach
+settings-see-through-text-description = Ní théann ach cúlra na fuinneoige tréshoilseach
 
 ## Accessibility
 

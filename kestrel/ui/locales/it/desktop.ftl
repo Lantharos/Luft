@@ -93,6 +93,7 @@ title-bar-menu-maximize = Ingrandisci
 title-bar-menu-move = Sposta
 title-bar-menu-resize = Ridimensiona
 title-bar-menu-always-on-top = Sempre in primo piano
+title-bar-menu-see-through = Traslucida
 title-bar-menu-always-on-visible-workspace = Su tutti gli spazi di lavoro
 title-bar-menu-workspace-left = Sposta nello spazio di lavoro a sinistra
 title-bar-menu-workspace-right = Sposta nello spazio di lavoro a destra

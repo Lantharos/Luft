@@ -246,6 +246,16 @@ settings-tiling-shortcuts = Flýtileiðir fyrir flísar
 settings-tiling-shortcuts-description = Virkja, færa og breyta stærð flísalagðra glugga með lyklaborðinu
 settings-board = Tafla
 settings-board-description = Ýttu tvisvar á Super eða strjúktu upp með fjórum fingrum til að raða gluggum vinnusvæðisins hlið við hlið
+settings-see-through = Gegnsæir gluggar
+settings-see-through-description = Láttu skjáborðið sjást í gegnum glugga þessara forrita. Þú getur líka kveikt á því úr valmynd titilstikunnar.
+settings-see-through-app = Gegnsætt { $app }
+settings-see-through-add = Bæta við forriti
+settings-see-through-add-title = Gera forrit gegnsætt
+settings-see-through-add-description = Gluggar þess hleypa því sem er á bak við í gegn.
+settings-see-through-amount = Hversu gegnsætt
+settings-see-through-blur = Móða það sem er á bak við
+settings-see-through-text = Halda texta heilum
+settings-see-through-text-description = Aðeins bakgrunnur gluggans verður gegnsær
 
 ## Accessibility
 

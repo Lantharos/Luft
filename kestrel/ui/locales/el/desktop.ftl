@@ -93,6 +93,7 @@ title-bar-menu-maximize = Μεγιστοποίηση
 title-bar-menu-move = Μετακίνηση
 title-bar-menu-resize = Αλλαγή μεγέθους
 title-bar-menu-always-on-top = Πάντα σε πρώτο πλάνο
+title-bar-menu-see-through = Διαφανές
 title-bar-menu-always-on-visible-workspace = Πάντα στον ορατό χώρο εργασίας
 title-bar-menu-workspace-left = Μετακίνηση στον χώρο εργασίας αριστερά
 title-bar-menu-workspace-right = Μετακίνηση στον χώρο εργασίας δεξιά

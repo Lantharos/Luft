@@ -246,6 +246,16 @@ settings-tiling-shortcuts = Snarvegar for fliser
 settings-tiling-shortcuts-description = Aktiver, flytt og endra storleik på flislagde vindauge med tastaturet
 settings-board = Tavle
 settings-board-description = Trykk Super to gonger eller sveip opp med fire fingrar for å leggje vindauga i arbeidsområdet side om side
+settings-see-through = Gjennomsiktige vindauge
+settings-see-through-description = La skrivebordet synast gjennom vindauga til desse appane. Du kan òg slå det på frå menyen i tittellinja til eit vindauge.
+settings-see-through-app = Gjennomsiktig { $app }
+settings-see-through-add = Legg til ein app
+settings-see-through-add-title = Gjer ein app gjennomsiktig
+settings-see-through-add-description = Vindauga slepper gjennom det som er bak dei.
+settings-see-through-amount = Kor gjennomsiktig
+settings-see-through-blur = Gjer det bakanforliggjande uskarpt
+settings-see-through-text = Hald teksten heildekkjande
+settings-see-through-text-description = Berre bakgrunnen i vindauget blir gjennomsiktig
 
 ## Accessibility
 

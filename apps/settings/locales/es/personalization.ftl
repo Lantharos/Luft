@@ -246,6 +246,16 @@ settings-tiling-shortcuts = Atajos del mosaico
 settings-tiling-shortcuts-description = Activa, mueve y cambia el tamaño de las ventanas en mosaico con el teclado
 settings-board = Tablero
 settings-board-description = Pulsa Super dos veces o desliza hacia arriba con cuatro dedos para colocar las ventanas del espacio de trabajo una al lado de otra
+settings-see-through = Ventanas translúcidas
+settings-see-through-description = Deja ver el escritorio a través de las ventanas de estas aplicaciones. También puedes activarlo desde el menú de la barra de título de una ventana.
+settings-see-through-app = { $app } translúcida
+settings-see-through-add = Añadir una aplicación
+settings-see-through-add-title = Hacer translúcida una aplicación
+settings-see-through-add-description = Sus ventanas dejan ver lo que hay detrás.
+settings-see-through-amount = Cuánta translucidez
+settings-see-through-blur = Desenfocar lo de detrás
+settings-see-through-text = Mantener el texto sólido
+settings-see-through-text-description = Solo el fondo de la ventana se vuelve translúcido
 
 ## Accessibility
 

@@ -7,6 +7,7 @@ import * as KestrelUi from '../../kestrelUi.js';
 import * as Main from '../../core/main.js';
 import * as PopupMenu from '../../shared/popups/popupMenu.js';
 import { captureScreenshot } from '../../system/screenshot/capture.js';
+import { canBeSeeThrough, isSeeThrough, toggleSeeThrough } from '../windows/seeThrough/seeThrough.js';
 
 const WORKSPACE_MOVES = [
   [Meta.MotionDirection.LEFT, 'title-bar-menu-workspace-left'],
@@ -73,6 +74,11 @@ class WindowMenu extends PopupMenu.PopupMenu {
       () => window.is_above() ? window.unmake_above() : window.make_above());
     if (window.is_above()) onTop.setOrnament(PopupMenu.Ornament.CHECK);
     if (maximized || UNPINNABLE_TYPES.includes(window.get_window_type())) onTop.setSensitive(false);
+
+    if (canBeSeeThrough(window)) {
+      const seeThrough = this.addAction(KestrelUi.t('title-bar-menu-see-through'), () => toggleSeeThrough(window));
+      if (isSeeThrough(window)) seeThrough.setOrnament(PopupMenu.Ornament.CHECK);
+    }
 
     if (Main.sessionMode.hasWorkspaces && (!Meta.prefs_get_workspaces_only_on_primary() || window.is_on_primary_monitor()))
       this.addWorkspaceActions(window);

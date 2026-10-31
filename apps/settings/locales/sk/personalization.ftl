@@ -250,6 +250,16 @@ settings-tiling-shortcuts = Skratky dlaždíc
 settings-tiling-shortcuts-description = Aktivácia, presun a zmena veľkosti dlaždicových okien z klávesnice
 settings-board = Tabuľa
 settings-board-description = Dvojitým stlačením Super alebo potiahnutím štyrmi prstami nahor rozložíte okná pracovnej plochy vedľa seba
+settings-see-through = Priehľadné okná
+settings-see-through-description = Plocha presvitá oknami týchto aplikácií. Zapnúť to môžete aj z ponuky v záhlaví okna.
+settings-see-through-app = Priehľadné: { $app }
+settings-see-through-add = Pridať aplikáciu
+settings-see-through-add-title = Spraviť aplikáciu priehľadnou
+settings-see-through-add-description = Jej okná nechajú presvitať to, čo je za nimi.
+settings-see-through-amount = Miera priehľadnosti
+settings-see-through-blur = Rozmazať pozadie
+settings-see-through-text = Ponechať text plný
+settings-see-through-text-description = Priehľadné bude len pozadie okna
 
 ## Accessibility
 

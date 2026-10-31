@@ -246,6 +246,16 @@ settings-tiling-shortcuts = Συντομεύσεις παράθεσης
 settings-tiling-shortcuts-description = Ενεργοποίηση, μετακίνηση και αλλαγή μεγέθους παραθύρων σε παράθεση από το πληκτρολόγιο
 settings-board = Πίνακας
 settings-board-description = Πατήστε δύο φορές Super ή σύρετε προς τα πάνω με τέσσερα δάχτυλα για να απλώσετε τα παράθυρα του χώρου εργασίας δίπλα δίπλα
+settings-see-through = Διαφανή παράθυρα
+settings-see-through-description = Η επιφάνεια εργασίας φαίνεται μέσα από τα παράθυρα αυτών των εφαρμογών. Μπορείτε επίσης να το ενεργοποιήσετε από το μενού της γραμμής τίτλου ενός παραθύρου.
+settings-see-through-app = Διαφανές { $app }
+settings-see-through-add = Προσθήκη εφαρμογής
+settings-see-through-add-title = Διαφανής εφαρμογή
+settings-see-through-add-description = Τα παράθυρά της αφήνουν να φαίνεται ό,τι είναι πίσω τους.
+settings-see-through-amount = Πόσο διαφανή
+settings-see-through-blur = Θόλωμα του φόντου
+settings-see-through-text = Συμπαγές κείμενο
+settings-see-through-text-description = Μόνο το φόντο του παραθύρου γίνεται διαφανές
 
 ## Accessibility
 

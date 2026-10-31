@@ -246,6 +246,16 @@ settings-tiling-shortcuts = Snarveier for fliser
 settings-tiling-shortcuts-description = Aktiver, flytt og endre størrelse på flislagte vinduer med tastaturet
 settings-board = Tavle
 settings-board-description = Trykk Super to ganger eller sveip opp med fire fingre for å legge arbeidsområdets vinduer side om side
+settings-see-through = Gjennomsiktige vinduer
+settings-see-through-description = La skrivebordet synes gjennom vinduene til disse appene. Du kan også slå det på fra menyen i et vindus tittellinje.
+settings-see-through-app = Gjennomsiktig { $app }
+settings-see-through-add = Legg til en app
+settings-see-through-add-title = Gjør en app gjennomsiktig
+settings-see-through-add-description = Vinduene slipper gjennom det som er bak dem.
+settings-see-through-amount = Hvor gjennomsiktig
+settings-see-through-blur = Gjør det bakenforliggende uskarpt
+settings-see-through-text = Hold teksten heldekkende
+settings-see-through-text-description = Bare bakgrunnen i vinduet blir gjennomsiktig
 
 ## Accessibility
 

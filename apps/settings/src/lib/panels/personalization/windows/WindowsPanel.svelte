@@ -2,6 +2,7 @@
 	import { t } from '@luft/i18n';
 	import { Row, Section, Segmented, Select, Switch } from '@luft/ui';
 	import PreviewCard from '#lib/components/PreviewCard.svelte';
+	import SeeThroughSection from './SeeThroughSection.svelte';
 	import { app } from '#lib/state/app.svelte.js';
 	import { KESTREL_SCHEMA, useSettings } from '#lib/state/gsettings.svelte.js';
 	import { currentWallpaper } from '../wallpaper/current.svelte';
@@ -63,6 +64,8 @@
 		<Row title={t('settings-tiling-shortcuts')} description={t('settings-tiling-shortcuts-description')} onclick={() => app.open('input/shortcuts')} />
 	</Section>
 {/if}
+
+<SeeThroughSection />
 
 <Section>
 	<Row title={t('settings-board')} description={t('settings-board-description')}>

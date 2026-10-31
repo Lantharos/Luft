@@ -95,6 +95,7 @@ title-bar-menu-maximize = Maksimiraj
 title-bar-menu-move = Premakni
 title-bar-menu-resize = Spremeni velikost
 title-bar-menu-always-on-top = Vedno na vrhu
+title-bar-menu-see-through = Prosojno
 title-bar-menu-always-on-visible-workspace = Vedno na vidni delovni površini
 title-bar-menu-workspace-left = Premakni na levo delovno površino
 title-bar-menu-workspace-right = Premakni na desno delovno površino

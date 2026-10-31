@@ -94,6 +94,7 @@ title-bar-menu-maximize = Maximizează
 title-bar-menu-move = Mută
 title-bar-menu-resize = Redimensionează
 title-bar-menu-always-on-top = Mereu deasupra
+title-bar-menu-see-through = Translucidă
 title-bar-menu-always-on-visible-workspace = Pe toate spațiile de lucru
 title-bar-menu-workspace-left = Mută în spațiul de lucru din stânga
 title-bar-menu-workspace-right = Mută în spațiul de lucru din dreapta

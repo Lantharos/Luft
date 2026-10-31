@@ -246,6 +246,16 @@ settings-tiling-shortcuts = Клавишни комбинации за плоч�
 settings-tiling-shortcuts-description = Активиране, преместване и преоразмеряване на прозорците в плочки от клавиатурата
 settings-board = Табло
 settings-board-description = Натиснете Super два пъти или плъзнете нагоре с четири пръста, за да подредите прозорците на работното пространство един до друг
+settings-see-through = Прозрачни прозорци
+settings-see-through-description = Работният плот прозира през прозорците на тези приложения. Можете да го включите и от менюто на заглавната лента на прозореца.
+settings-see-through-app = Прозрачно { $app }
+settings-see-through-add = Добавяне на приложение
+settings-see-through-add-title = Прозрачно приложение
+settings-see-through-add-description = Прозорците му пропускат това, което е зад тях.
+settings-see-through-amount = Колко прозрачно
+settings-see-through-blur = Размазване на фона
+settings-see-through-text = Плътен текст
+settings-see-through-text-description = Само фонът на прозореца става прозрачен
 
 ## Accessibility
 

@@ -250,6 +250,16 @@ settings-tiling-shortcuts = Išklotinės spartieji klavišai
 settings-tiling-shortcuts-description = Aktyvinkite, perkelkite ir keiskite išklotinės langų dydį klaviatūra
 settings-board = Lenta
 settings-board-description = Du kartus paspauskite Super arba perbraukite aukštyn keturiais pirštais, kad darbo srities langai išsidėstytų greta
+settings-see-through = Permatomi langai
+settings-see-through-description = Darbalaukis matosi pro šių programų langus. Tai galima įjungti ir lango pavadinimo juostos meniu.
+settings-see-through-app = Permatoma: { $app }
+settings-see-through-add = Pridėti programą
+settings-see-through-add-title = Padaryti programą permatomą
+settings-see-through-add-description = Jos langai praleidžia tai, kas už jų.
+settings-see-through-amount = Kiek permatoma
+settings-see-through-blur = Sulieti tai, kas už
+settings-see-through-text = Palikti tekstą ryškų
+settings-see-through-text-description = Permatomas tampa tik lango fonas
 
 ## Accessibility
 

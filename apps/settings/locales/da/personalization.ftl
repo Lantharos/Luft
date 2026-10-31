@@ -246,6 +246,16 @@ settings-tiling-shortcuts = Genveje til fliser
 settings-tiling-shortcuts-description = Aktivér, flyt og tilpas fliselagte vinduer med tastaturet
 settings-board = Tavle
 settings-board-description = Tryk to gange på Super, eller stryg op med fire fingre for at lægge arbejdsområdets vinduer side om side
+settings-see-through = Gennemsigtige vinduer
+settings-see-through-description = Lad skrivebordet skinne igennem disse apps' vinduer. Du kan også slå det til fra menuen i et vindues titellinje.
+settings-see-through-app = Gennemsigtig { $app }
+settings-see-through-add = Tilføj en app
+settings-see-through-add-title = Gør en app gennemsigtig
+settings-see-through-add-description = Dens vinduer lader det bagvedliggende skinne igennem.
+settings-see-through-amount = Hvor gennemsigtig
+settings-see-through-blur = Slør det bagvedliggende
+settings-see-through-text = Bevar teksten fast
+settings-see-through-text-description = Kun vinduets baggrund bliver gennemsigtig
 
 ## Accessibility
 

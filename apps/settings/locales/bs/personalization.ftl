@@ -259,6 +259,16 @@ settings-tiling-shortcuts = Prečice za popločavanje
 settings-tiling-shortcuts-description = Aktivirajte, pomjerajte i mijenjajte veličinu popločanih prozora tastaturom
 settings-board = Tabla
 settings-board-description = Pritisnite Super dvaput ili prevucite nagore s četiri prsta da poredate prozore radnog prostora jedan pored drugog
+settings-see-through = Providni prozori
+settings-see-through-description = Radna površina se vidi kroz prozore ovih aplikacija. Možete to uključiti i iz menija naslovne trake prozora.
+settings-see-through-app = Providno: { $app }
+settings-see-through-add = Dodaj aplikaciju
+settings-see-through-add-title = Učini aplikaciju providnom
+settings-see-through-add-description = Njeni prozori propuštaju ono što je iza njih.
+settings-see-through-amount = Koliko providno
+settings-see-through-blur = Zamuti ono iza
+settings-see-through-text = Zadrži tekst punim
+settings-see-through-text-description = Samo pozadina prozora postaje providna
 
 ## Accessibility
 

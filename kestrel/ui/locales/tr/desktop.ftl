@@ -93,6 +93,7 @@ title-bar-menu-maximize = Ekranı kapla
 title-bar-menu-move = Taşı
 title-bar-menu-resize = Yeniden boyutlandır
 title-bar-menu-always-on-top = Her zaman üstte
+title-bar-menu-see-through = Yarı Saydam
 title-bar-menu-always-on-visible-workspace = Her zaman görünür çalışma alanında
 title-bar-menu-workspace-left = Soldaki çalışma alanına taşı
 title-bar-menu-workspace-right = Sağdaki çalışma alanına taşı

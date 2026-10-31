@@ -246,6 +246,16 @@ settings-tiling-shortcuts = Кратенки за поплочување
 settings-tiling-shortcuts-description = Активирајте, преместувајте и менувајте ја големината на поплочените прозорци со тастатурата
 settings-board = Табла
 settings-board-description = Притиснете Super двапати или повлечете нагоре со четири прста за да ги наредите прозорците на работниот простор еден до друг
+settings-see-through = Проѕирни прозорци
+settings-see-through-description = Работната површина се гледа низ прозорците на овие апликации. Може да го вклучите и од менито на насловната лента на прозорецот.
+settings-see-through-app = Проѕирно: { $app }
+settings-see-through-add = Додај апликација
+settings-see-through-add-title = Направи ја апликацијата проѕирна
+settings-see-through-add-description = Нејзините прозорци го пропуштаат она што е зад нив.
+settings-see-through-amount = Колку проѕирно
+settings-see-through-blur = Замати го она зад
+settings-see-through-text = Задржи го текстот полн
+settings-see-through-text-description = Проѕирна станува само позадината на прозорецот
 
 ## Accessibility
 

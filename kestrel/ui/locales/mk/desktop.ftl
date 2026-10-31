@@ -93,6 +93,7 @@ title-bar-menu-maximize = Максимизирај
 title-bar-menu-move = Премести
 title-bar-menu-resize = Промени големина
 title-bar-menu-always-on-top = Секогаш најгоре
+title-bar-menu-see-through = Проѕирен
 title-bar-menu-always-on-visible-workspace = Секогаш на видливиот работен простор
 title-bar-menu-workspace-left = Премести во работниот простор лево
 title-bar-menu-workspace-right = Премести во работниот простор десно

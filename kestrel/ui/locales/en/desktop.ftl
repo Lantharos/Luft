@@ -128,6 +128,7 @@ title-bar-menu-move = Move
 # Verb: starts resizing the window with the keyboard or mouse
 title-bar-menu-resize = Resize
 title-bar-menu-always-on-top = Always on Top
+title-bar-menu-see-through = See-Through
 # Keeps the window on every workspace
 title-bar-menu-always-on-visible-workspace = Always on Visible Workspace
 title-bar-menu-workspace-left = Move to Workspace Left

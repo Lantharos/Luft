@@ -246,6 +246,16 @@ settings-tiling-shortcuts = Laatoituksen pikanäppäimet
 settings-tiling-shortcuts-description = Aktivoi, siirrä ja muuta laatoitettujen ikkunoiden kokoa näppäimistöllä
 settings-board = Taulu
 settings-board-description = Paina Superia kahdesti tai pyyhkäise ylös neljällä sormella asettaaksesi työtilan ikkunat rinnakkain
+settings-see-through = Läpikuultavat ikkunat
+settings-see-through-description = Työpöytä näkyy näiden sovellusten ikkunoiden läpi. Voit ottaa sen käyttöön myös ikkunan otsikkopalkin valikosta.
+settings-see-through-app = Läpikuultava { $app }
+settings-see-through-add = Lisää sovellus
+settings-see-through-add-title = Tee sovelluksesta läpikuultava
+settings-see-through-add-description = Sen ikkunoiden läpi näkyy, mitä niiden takana on.
+settings-see-through-amount = Kuinka läpikuultava
+settings-see-through-blur = Sumenna taustalla oleva
+settings-see-through-text = Pidä teksti kiinteänä
+settings-see-through-text-description = Vain ikkunan tausta muuttuu läpikuultavaksi
 
 ## Accessibility
 

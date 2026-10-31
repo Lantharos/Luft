@@ -246,6 +246,16 @@ settings-tiling-shortcuts = Raccourcis de pavage
 settings-tiling-shortcuts-description = Activer, déplacer et redimensionner les fenêtres pavées au clavier
 settings-board = Tableau
 settings-board-description = Appuyez deux fois sur Super ou balayez vers le haut avec quatre doigts pour disposer les fenêtres de l’espace de travail côte à côte
+settings-see-through = Fenêtres translucides
+settings-see-through-description = Laisse voir le bureau à travers les fenêtres de ces applications. Vous pouvez aussi l’activer depuis le menu de la barre de titre d’une fenêtre.
+settings-see-through-app = { $app } translucide
+settings-see-through-add = Ajouter une application
+settings-see-through-add-title = Rendre une application translucide
+settings-see-through-add-description = Ses fenêtres laissent voir ce qui se trouve derrière.
+settings-see-through-amount = Degré de translucidité
+settings-see-through-blur = Flouter ce qui est derrière
+settings-see-through-text = Garder le texte opaque
+settings-see-through-text-description = Seul le fond de la fenêtre devient translucide
 
 ## Accessibility
 

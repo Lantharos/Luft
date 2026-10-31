@@ -250,6 +250,16 @@ settings-tiling-shortcuts = Bližnjice za tlakovanje
 settings-tiling-shortcuts-description = Aktivirajte, premikajte in spreminjajte velikost tlakovanih oken s tipkovnico
 settings-board = Tabla
 settings-board-description = Dvakrat pritisnite Super ali podrsajte navzgor s štirimi prsti, da razporedite okna delovne površine drugo ob drugem
+settings-see-through = Prosojna okna
+settings-see-through-description = Namizje se vidi skozi okna teh aplikacij. Vklopite ga lahko tudi v meniju naslovne vrstice okna.
+settings-see-through-app = Prosojno: { $app }
+settings-see-through-add = Dodaj aplikacijo
+settings-see-through-add-title = Naredi aplikacijo prosojno
+settings-see-through-add-description = Njena okna prepuščajo tisto, kar je za njimi.
+settings-see-through-amount = Kako prosojno
+settings-see-through-blur = Zamegli tisto zadaj
+settings-see-through-text = Ohrani polno besedilo
+settings-see-through-text-description = Prosojno postane le ozadje okna
 
 ## Accessibility
 

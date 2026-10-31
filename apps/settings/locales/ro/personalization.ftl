@@ -248,6 +248,16 @@ settings-tiling-shortcuts = Scurtături pentru mozaic
 settings-tiling-shortcuts-description = Activează, mută și redimensionează ferestrele în mozaic de la tastatură
 settings-board = Tablă
 settings-board-description = Apăsați de două ori Super sau glisați în sus cu patru degete pentru a așeza ferestrele spațiului de lucru una lângă alta
+settings-see-through = Ferestre translucide
+settings-see-through-description = Lasă desktopul să se vadă prin ferestrele acestor aplicații. Poți activa asta și din meniul barei de titlu a unei ferestre.
+settings-see-through-app = { $app } translucidă
+settings-see-through-add = Adaugă o aplicație
+settings-see-through-add-title = Fă o aplicație translucidă
+settings-see-through-add-description = Ferestrele ei lasă să se vadă ce e în spate.
+settings-see-through-amount = Cât de translucidă
+settings-see-through-blur = Estompează ce e în spate
+settings-see-through-text = Păstrează textul opac
+settings-see-through-text-description = Doar fundalul ferestrei devine translucid
 
 ## Accessibility
 

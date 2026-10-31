@@ -93,6 +93,7 @@ title-bar-menu-maximize = Maximitza
 title-bar-menu-move = Mou
 title-bar-menu-resize = Canvia la mida
 title-bar-menu-always-on-top = Sempre al davant
+title-bar-menu-see-through = Translúcida
 title-bar-menu-always-on-visible-workspace = Sempre a l’espai de treball visible
 title-bar-menu-workspace-left = Mou a l’espai de treball de l’esquerra
 title-bar-menu-workspace-right = Mou a l’espai de treball de la dreta

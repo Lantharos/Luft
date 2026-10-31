@@ -93,6 +93,7 @@ title-bar-menu-maximize = Розгорнути
 title-bar-menu-move = Перемістити
 title-bar-menu-resize = Змінити розмір
 title-bar-menu-always-on-top = Поверх інших вікон
+title-bar-menu-see-through = Напівпрозоре
 title-bar-menu-always-on-visible-workspace = На всіх робочих просторах
 title-bar-menu-workspace-left = Перемістити на робочий простір ліворуч
 title-bar-menu-workspace-right = Перемістити на робочий простір праворуч

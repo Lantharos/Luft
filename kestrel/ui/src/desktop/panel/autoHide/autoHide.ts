@@ -22,6 +22,7 @@ export class AutoHide {
   private arriving = false;
   private overlap: WindowOverlap | null = null;
   private timer = 0;
+  private islands: St.Widget[] = [];
   private readonly focusSignal: number;
 
   constructor(private readonly panel: St.Widget, private readonly monitor: () => Monitor | null, private readonly rest: () => number) {
@@ -33,6 +34,12 @@ export class AutoHide {
       this.cancel();
       stage.disconnect(this.focusSignal);
     });
+  }
+
+  /** Parts of the taskbar that take the pointer when the taskbar itself lets it through, as its separate islands do. */
+  trackIslands(islands: St.Widget[]): void {
+    this.islands = islands;
+    for (const island of islands) island.connect('notify::hover', () => this.sync());
   }
 
   get hidden(): boolean {
@@ -99,6 +106,7 @@ export class AutoHide {
   sync(immediate = false): void {
     const mode = this.screen.autoHide;
     this.panel.track_hover = mode !== 'never';
+    for (const island of this.islands) island.track_hover = mode !== 'never';
     const reveal = !this.suppressed && !this.arriving && (mode === 'never' || this.wanted(mode === 'windows'));
     this.edge.visible = this.allowed && !this.suppressed && !this.arriving && mode !== 'never' && !reveal;
     if (reveal) {
@@ -112,8 +120,13 @@ export class AutoHide {
       this.slide(false, false);
     } else if (this.revealed && !this.timer) {
       this.timer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, HIDE_DELAY, () => {
+        if (this.wanted(this.screen.autoHide === 'windows')) {
+          this.timer = 0;
+          return GLib.SOURCE_REMOVE;
+        }
+        if (this.pointerWithin()) return GLib.SOURCE_CONTINUE;
         this.timer = 0;
-        if (!this.wanted(this.screen.autoHide === 'windows')) this.slide(false, false);
+        this.slide(false, false);
         return GLib.SOURCE_REMOVE;
       });
     }
@@ -122,8 +135,15 @@ export class AutoHide {
   private wanted(whenClear: boolean): boolean {
     const stage = global.stage;
     const focus = stage.get_key_focus();
-    return this.active || this.panel.hover || this.edge.hover || (!!focus && this.panel.contains(focus)) ||
+    return this.active || this.panel.hover || this.islands.some(island => island.hover) || this.edge.hover || (!!focus && this.panel.contains(focus)) ||
       (this.held && this.revealed) || (whenClear && !this.touched());
+  }
+
+  private pointerWithin(): boolean {
+    const [x, y] = global.get_pointer();
+    const [left, top] = this.panel.get_transformed_position();
+    const [width, height] = this.panel.get_transformed_size();
+    return x >= left && x < left + width && y >= top && y < top + height;
   }
 
   private touched(): boolean {

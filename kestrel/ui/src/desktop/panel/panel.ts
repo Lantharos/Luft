@@ -151,6 +151,7 @@ export class KestrelPanel {
     this.actor.add_child(status);
     this.actor.add_child(this.peek.actor);
     this.surface = new TaskbarSurface(this.actor, this.peek.actor, [apps, status], () => this.screen);
+    this.autoHide.trackIslands([apps, status]);
     this.tablet = new TabletTaskbar(this.actor, [apps, status], primary, () => this.autoHide.shown, () => this.screen);
     this.orient();
 

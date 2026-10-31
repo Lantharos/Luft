@@ -53,4 +53,3 @@
 0053-compositor-let-people-turn-rounded-window-corners-of.patch
 0054-wayland-listen-on-an-inherited-socket.patch
 0055-wayland-tell-floating-windows-they-are-tiled-while-c.patch
-0056-backends-start-HDMI-monitors-in-a-mode-within-their-.patch

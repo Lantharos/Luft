@@ -1,29 +1,22 @@
 ## Appearance: style
 
 settings-appearance-style = Style
-settings-appearance-style-title = Apparence
-settings-appearance-style-description = Les applications qui suivent le système changent avec lui
 settings-appearance-style-light = Clair
 settings-appearance-style-dark = Sombre
+settings-appearance-style-auto = Automatique
 settings-appearance-schedule = Passer en sombre automatiquement
-settings-appearance-schedule-off = Jamais
 settings-appearance-schedule-sunset = Du coucher au lever du soleil
 settings-appearance-schedule-custom = Personnalisé
-settings-appearance-schedule-sunset-description = Suit le coucher et le lever du soleil là où vous êtes
-settings-appearance-schedule-custom-description = Le style choisi reste actif jusqu’au prochain changement
 settings-appearance-dark-from = Sombre à partir de
 settings-appearance-light-from = Clair à partir de
 settings-appearance-corners = Coins
 settings-appearance-corners-rounded = Arrondis
 settings-appearance-corners-square = Carrés
-settings-appearance-corners-description = Les fenêtres, les applications, la barre des tâches et les menus prennent cette forme
+settings-appearance-text = Texte et polices
 settings-appearance-pure-black = Noir pur
-settings-appearance-pure-black-description = Arrière-plans sombres entièrement noirs, qui économisent l’énergie sur les écrans OLED
 settings-appearance-accent = Couleur d’accentuation
 settings-appearance-accent-wallpaper = Fond d’écran
 settings-appearance-accent-white = Blanc
-settings-appearance-accent-white-description = Blanc en mode sombre, noir en mode clair
-settings-appearance-accent-wallpaper-description = Tirée de votre fond d’écran
 settings-appearance-theme-apps = Accorder les autres applications au fond d’écran
 settings-appearance-theme-apps-description = Les autres applications et les terminaux prennent les mêmes couleurs
 
@@ -71,11 +64,8 @@ settings-appearance-tint-slate = Ardoise
 
 ## Appearance: text and motion
 
-settings-appearance-text-and-motion = Texte et animations
 settings-appearance-text-size = Taille du texte
 settings-appearance-text-size-description = Agrandit ou réduit le texte dans les applications
-settings-appearance-animations = Animations
-settings-appearance-animations-description = Les fenêtres et les menus se déplacent au lieu d’apparaître d’un coup
 
 ## Taskbar
 
@@ -89,10 +79,9 @@ settings-start-style-palette-description = Une barre de recherche au milieu de l
 settings-start-button = Afficher le bouton Start
 settings-start-button-description = Super ouvre Start dans tous les cas
 settings-start-web = Rechercher sur le Web avec
-settings-taskbar-section = Barre des tâches
 settings-taskbar-shown = Afficher la barre des tâches
+settings-taskbar-hidden = Masquée
 settings-taskbar-hidden-description = L’horloge et les icônes d’état restent dans un coin, et Super ouvre Start
-settings-taskbar-position = Position
 settings-taskbar-position-bottom = En bas
 settings-taskbar-position-left = À gauche
 settings-taskbar-position-top = En haut
@@ -135,7 +124,6 @@ settings-fonts-monospace-description = Terminaux, code et tout ce qui s’aligne
 settings-fonts-monospace-label = Police à chasse fixe
 settings-fonts-all = Toutes les polices
 settings-fonts-all-description = Prévisualisez les polices de cet ordinateur, utilisez-en une ou supprimez celles que vous avez ajoutées
-settings-fonts-back = Apparence
 settings-fonts-search = Rechercher des polices
 settings-fonts-no-match = Aucune police ne porte ce nom
 settings-fonts-default = Par défaut
@@ -171,7 +159,6 @@ settings-cursors-cancel = Annuler
 settings-cursors-remove = Supprimer
 settings-cursors-remove-theme = Supprimer { $theme }
 settings-cursors-store = Obtenir des curseurs
-settings-cursors-back = Apparence
 settings-cursors-search = Rechercher des curseurs
 settings-cursors-order = Trier par
 settings-cursors-order-popular = Populaires
@@ -237,8 +224,6 @@ settings-notifications-done = Terminé
 
 ## Window tiling
 
-settings-tiling-preview = Aperçu de la disposition des fenêtres
-settings-tiling-title = Pavage des fenêtres
 settings-tiling-mode = Disposer les fenêtres
 settings-tiling-mode-off = Désactivé
 settings-tiling-mode-tiling = Pavage
@@ -249,8 +234,6 @@ settings-tiling-mode-scrolling-description = Chaque fenêtre s’ouvre comme une
 settings-tiling-layout = Disposition
 settings-tiling-layout-dwindle = Spirale
 settings-tiling-layout-master = Principale et pile
-settings-tiling-layout-dwindle-description = Chaque nouvelle fenêtre partage en deux la fenêtre active
-settings-tiling-layout-master-description = Une grande fenêtre à gauche, les autres empilées à droite
 settings-tiling-gaps = Espacement
 settings-tiling-gaps-none = Aucun
 settings-tiling-gaps-small = Petit
@@ -273,6 +256,8 @@ settings-accessibility-large-text = Grand texte
 settings-accessibility-high-contrast = Contraste élevé
 settings-accessibility-reduce-motion = Réduire les animations
 settings-accessibility-reduce-motion-description = Fondu au lieu de glissements et de zooms
+settings-accessibility-animations = Animations
+settings-accessibility-animations-description = Les fenêtres et les menus se déplacent au lieu d’apparaître d’un coup
 settings-accessibility-cursor-size = Taille du curseur
 settings-accessibility-typing = Saisie
 settings-accessibility-osk = Clavier visuel

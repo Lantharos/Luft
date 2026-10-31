@@ -13,7 +13,9 @@ settings-page-power = Napájení a baterie
 settings-page-input = Vstup
 settings-page-appearance = Vzhled
     .keywords = tapeta, pozadí, tmavý, světlý, tmavý režim, styl, barva zvýraznění, ikony aplikací, tónované ikony, kurzor, ukazatel, ukazatel myši, velikost kurzoru, velikost textu, animace, písma, fonty, instalovat písma
-settings-page-desktop = Plocha
+settings-page-taskbar = Hlavní panel a nabídka Start
+    .keywords = panel, lišta, dok, dock, automaticky skrývat, skrývání, skrýt hlavní panel, plovoucí, průhledný, připnuté aplikace, zarovnání, tlačítko start, nabídka start, start menu, gust, vyhledávací pole, spouštěč, launcher, hledání na webu, vyhledávač, search engine, displeje, pracovní prostor, plocha, virtuální plocha
+settings-page-windows = Okna
 settings-page-notifications = Oznámení
     .keywords = nerušit, bannery, upozornění, zamykací obrazovka, aplikace
 settings-page-accessibility = Přístupnost
@@ -51,6 +53,8 @@ settings-page-about = O počítači
 
 ## Search terms for parts of pages
 
+settings-page-wallpaper = Tapeta
+    .keywords = pozadí, obrázek, fotka, video tapeta, živá tapeta, déšť, pozadí plochy
 settings-page-keyboard = Klávesnice
     .keywords = vstupní zdroje, rozložení, klávesové zkratky, zkratky, opakování, jazyk, diktování, metoda zadávání
     .copilot-key = klávesa copilot
@@ -60,8 +64,6 @@ settings-page-fonts = Písma
     .keywords = všechna písma, fonty, rodiny písem, instalovat písma, odebrat písma
 settings-page-cursors = Motivy kurzoru
     .keywords = kurzory, ukazatel, ukazatel myši, další kurzory, stáhnout kurzory
-settings-page-taskbar = Hlavní panel a nabídka Start
-    .keywords = panel, lišta, dok, dock, automaticky skrývat, skrývání, skrýt hlavní panel, plovoucí, průhledný, připnuté aplikace, zarovnání, tlačítko start, nabídka start, start menu, gust, vyhledávací pole, spouštěč, launcher, hledání na webu, vyhledávač, search engine, displeje, pracovní prostor, plocha, virtuální plocha
 settings-page-tiling = Dlaždicové uspořádání oken
     .keywords = dlaždice, dlaždicová okna, tiling, posouvání, sloupce, mezery, spirála, dwindle, hlavní a zásobník, master, plovoucí okna, rozvržení oken, multitasking
 settings-page-region = Jazyk a oblast

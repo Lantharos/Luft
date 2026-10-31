@@ -13,7 +13,9 @@ settings-page-power = Strøm og batteri
 settings-page-input = Inndata
 settings-page-appearance = Utseende
     .keywords = bakgrunnsbilde, bakgrunn, mørk, lys, mørk modus, stil, tema, aksentfarge, farge, appikoner, ikoner, fargetonet, markør, peker, musepeker, markørstørrelse, tekststørrelse, animasjoner, skrift, skrifter, fonter, installer skrifter
-settings-page-desktop = Skrivebord
+settings-page-taskbar = Oppgavelinje og Start
+    .keywords = panel, dokk, skjul automatisk, autoskjul, skjul oppgavelinjen, flytende, gjennomsiktig, festede apper, justering, plassering, startknapp, start-menyen, startmeny, gust, søkefelt, søkelinje, launcher, appstarter, nettsøk, søk på nettet, søkemotor, skjermer, arbeidsområde, skrivebord, virtuelt skrivebord
+settings-page-windows = Vinduer
 settings-page-notifications = Varsler
     .keywords = ikke forstyrr, varslinger, bannere, låseskjerm, apper
 settings-page-accessibility = Tilgjengelighet
@@ -51,6 +53,8 @@ settings-page-about = Om
 
 ## Search terms for parts of pages
 
+settings-page-wallpaper = Bakgrunnsbilde
+    .keywords = bakgrunn, bilde, foto, videobakgrunn, levende bakgrunn, regn, skrivebordsbakgrunn
 settings-page-keyboard = Tastatur
     .keywords = inndatakilder, inndatametode, tastaturoppsett, oppsett, hurtigtaster, snarveier, gjentakelse, tastegjentakelse, språk, diktering
     .copilot-key = copilot-tast
@@ -60,8 +64,6 @@ settings-page-fonts = Skrifter
     .keywords = alle skrifter, fonter, skrifttyper, skriftfamilier, installer skrifter, fjern skrifter
 settings-page-cursors = Markørtemaer
     .keywords = markører, peker, musepeker, pekertema, hent flere markører
-settings-page-taskbar = Oppgavelinje og Start
-    .keywords = panel, dokk, skjul automatisk, autoskjul, skjul oppgavelinjen, flytende, gjennomsiktig, festede apper, justering, plassering, startknapp, start-menyen, startmeny, gust, søkefelt, søkelinje, launcher, appstarter, nettsøk, søk på nettet, søkemotor, skjermer, arbeidsområde, skrivebord, virtuelt skrivebord
 settings-page-tiling = Flislegging av vinduer
     .keywords = fliser, flislagte vinduer, tiling, rulling, kolonner, mellomrom, spiral, dwindle, hoved og stabel, master, flytende vinduer, vindusoppsett, multitasking, fleroppgavekjøring
 settings-page-region = Språk og område

@@ -1,29 +1,22 @@
 ## Appearance: style
 
 settings-appearance-style = Stil
-settings-appearance-style-title = Aspect
-settings-appearance-style-description = Aplicațiile care urmează sistemul se schimbă odată cu el
 settings-appearance-style-light = Luminos
 settings-appearance-style-dark = Întunecat
+settings-appearance-style-auto = Automat
 settings-appearance-schedule = Comută automat la întunecat
-settings-appearance-schedule-off = Dezactivat
 settings-appearance-schedule-sunset = De la apus la răsărit
 settings-appearance-schedule-custom = Personalizat
-settings-appearance-schedule-sunset-description = Urmează apusul și răsăritul din locul în care vă aflați
-settings-appearance-schedule-custom-description = Stilul ales rămâne până la următoarea comutare
 settings-appearance-dark-from = Întunecat de la
 settings-appearance-light-from = Luminos de la
 settings-appearance-corners = Colțuri
 settings-appearance-corners-rounded = Rotunjite
 settings-appearance-corners-square = Drepte
-settings-appearance-corners-description = Ferestrele, aplicațiile, bara de activități și meniurile iau această formă
+settings-appearance-text = Text și fonturi
 settings-appearance-pure-black = Negru pur
-settings-appearance-pure-black-description = Fundaluri întunecate complet negre, care economisesc energie pe ecranele OLED
 settings-appearance-accent = Culoare de accent
 settings-appearance-accent-wallpaper = Imagine de fundal
 settings-appearance-accent-white = Alb
-settings-appearance-accent-white-description = Alb în stilul întunecat, negru în stilul luminos
-settings-appearance-accent-wallpaper-description = Preluată din imaginea de fundal
 settings-appearance-theme-apps = Potrivește alte aplicații cu imaginea de fundal
 settings-appearance-theme-apps-description = Celelalte aplicații și terminalele preiau aceleași culori
 
@@ -71,11 +64,8 @@ settings-appearance-tint-slate = Ardezie
 
 ## Appearance: text and motion
 
-settings-appearance-text-and-motion = Text și mișcare
 settings-appearance-text-size = Mărime text
 settings-appearance-text-size-description = Mărește sau micșorează textul în toate aplicațiile
-settings-appearance-animations = Animații
-settings-appearance-animations-description = Ferestrele și meniurile se mișcă în loc să apară instantaneu
 
 ## Taskbar
 
@@ -89,10 +79,9 @@ settings-start-style-palette-description = O bară de căutare în mijlocul ecra
 settings-start-button = Afișează butonul Start
 settings-start-button-description = Super deschide oricum meniul Start
 settings-start-web = Caută pe web cu
-settings-taskbar-section = Bara de activități
 settings-taskbar-shown = Afișează bara de activități
+settings-taskbar-hidden = Ascunsă
 settings-taskbar-hidden-description = Ceasul și pictogramele de stare rămân într-un colț, iar Super deschide meniul Start
-settings-taskbar-position = Poziție
 settings-taskbar-position-bottom = Jos
 settings-taskbar-position-left = Stânga
 settings-taskbar-position-top = Sus
@@ -135,7 +124,6 @@ settings-fonts-monospace-description = Terminale, cod și tot ce se aliniază î
 settings-fonts-monospace-label = Font monospațiat
 settings-fonts-all = Toate fonturile
 settings-fonts-all-description = Previzualizați fonturile de pe acest computer, folosiți unul sau eliminați-le pe cele adăugate
-settings-fonts-back = Aspect
 settings-fonts-search = Caută fonturi
 settings-fonts-no-match = Niciun font nu are acest nume
 settings-fonts-default = Implicit
@@ -172,7 +160,6 @@ settings-cursors-cancel = Anulează
 settings-cursors-remove = Elimină
 settings-cursors-remove-theme = Elimină { $theme }
 settings-cursors-store = Obține cursoare
-settings-cursors-back = Aspect
 settings-cursors-search = Caută cursoare
 settings-cursors-order = Ordine
 settings-cursors-order-popular = Populare
@@ -239,8 +226,6 @@ settings-notifications-done = Gata
 
 ## Window tiling
 
-settings-tiling-preview = Previzualizarea aranjării ferestrelor
-settings-tiling-title = Așezarea ferestrelor în mozaic
 settings-tiling-mode = Aranjează ferestrele
 settings-tiling-mode-off = Dezactivat
 settings-tiling-mode-tiling = Mozaic
@@ -251,8 +236,6 @@ settings-tiling-mode-scrolling-description = Fiecare fereastră se deschide ca o
 settings-tiling-layout = Aranjament
 settings-tiling-layout-dwindle = Spirală
 settings-tiling-layout-master = Principală și stivă
-settings-tiling-layout-dwindle-description = Fiecare fereastră nouă împarte în două fereastra activă
-settings-tiling-layout-master-description = O fereastră mare în stânga, celelalte stivuite în dreapta
 settings-tiling-gaps = Spații
 settings-tiling-gaps-none = Fără
 settings-tiling-gaps-small = Mici
@@ -275,6 +258,8 @@ settings-accessibility-large-text = Text mare
 settings-accessibility-high-contrast = Contrast ridicat
 settings-accessibility-reduce-motion = Mișcare redusă
 settings-accessibility-reduce-motion-description = Estompare în loc de glisare și zoom
+settings-accessibility-animations = Animații
+settings-accessibility-animations-description = Ferestrele și meniurile se mișcă în loc să apară instantaneu
 settings-accessibility-cursor-size = Mărime cursor
 settings-accessibility-typing = Tastare
 settings-accessibility-osk = Tastatură pe ecran

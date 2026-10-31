@@ -22,7 +22,7 @@ interface Change {
 }
 
 const CHANGES: Change[] = [
-  {name: 'taskbar-alignment', page: 'desktop', schema: 'com.lantharos.kestrel', key: 'taskbar-alignment', value: new GLib.Variant('s', 'left'),
+  {name: 'taskbar-alignment', page: 'taskbar', schema: 'com.lantharos.kestrel', key: 'taskbar-alignment', value: new GLib.Variant('s', 'left'),
     ignore: PREVIEW_CLOCK},
   {name: 'dark-style', page: 'appearance', schema: 'org.gnome.desktop.interface', key: 'color-scheme', value: new GLib.Variant('s', 'prefer-light')},
   {name: 'reduce-motion', page: 'accessibility', schema: 'org.gnome.desktop.a11y.interface', key: 'reduced-motion', value: new GLib.Variant('s', 'reduce')},

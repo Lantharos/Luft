@@ -1,18 +1,15 @@
-import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import type {LuftApp} from '../../../lib/apps/luftApp.js';
 import {checks} from '../../../lib/check.js';
-import {drag, moveTo, scroll, type Point} from '../../../lib/input/input.js';
+import {drag, moveTo, type Point} from '../../../lib/input/input.js';
 import {repository} from '../../../lib/processes.js';
 import {capture} from '../../../lib/screenshots.js';
 import {show} from '../navigation.js';
 
 const {eventually} = checks('Luft app');
-const SCROLL_POINT: Point = [650, 400];
-const SCROLL_STEPS = 3;
 const PREVIEW: Point = [655, 330];
 const DRAG = 60;
 const GRID = {left: 328, top: 430, width: 654, gap: 12};
@@ -56,9 +53,7 @@ export async function checkWallpaper(app: LuftApp) {
     background.set_string('picture-options', 'zoom');
     for (const key of ['wallpaper-focus', 'wallpaper-focus-dark']) kestrel.set_value(key, new GLib.Variant('(dd)', [0.5, 0.5]));
     await show(app, 'system/about');
-    const top = await show(app, 'appearance');
-    for (let step = 0; step < SCROLL_STEPS; step++) scroll(Clutter.ScrollDirection.DOWN, app.at(SCROLL_POINT));
-    await app.settle(frame => !frame.looksLike(top));
+    await show(app, 'appearance/wallpaper');
     moveTo(app.at(PREVIEW));
     (await app.settle(() => true)).save('settings-wallpaper');
 

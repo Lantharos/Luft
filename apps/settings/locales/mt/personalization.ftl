@@ -1,29 +1,22 @@
 ## Appearance: style
 
 settings-appearance-style = Stil
-settings-appearance-style-title = Dehra
-settings-appearance-style-description = L-apps li jsegwu s-sistema jaqilbu magħha
 settings-appearance-style-light = Ċar
 settings-appearance-style-dark = Skur
+settings-appearance-style-auto = Awtomatiku
 settings-appearance-schedule = Aqleb għal skur awtomatikament
-settings-appearance-schedule-off = Mitfi
 settings-appearance-schedule-sunset = Minn nżul ix-xemx sa tlugħ ix-xemx
 settings-appearance-schedule-custom = Personalizzat
-settings-appearance-schedule-sunset-description = Isegwi nżul u tlugħ ix-xemx fejn tinsab
-settings-appearance-schedule-custom-description = Stil li tagħżel jibqa’ sal-qalba li jmiss
 settings-appearance-dark-from = Skur minn
 settings-appearance-light-from = Ċar minn
 settings-appearance-corners = Kantunieri
 settings-appearance-corners-rounded = Fit-tond
 settings-appearance-corners-square = Kwadri
-settings-appearance-corners-description = It-twieqi, l-apps, it-taskbar u l-menus jieħdu din il-forma
+settings-appearance-text = Test u fonts
 settings-appearance-pure-black = Iswed għal kollox
-settings-appearance-pure-black-description = Sfondi skuri suwed għal kollox, li jiffrankaw l-enerġija fuq OLED
 settings-appearance-accent = Kulur ta’ aċċent
 settings-appearance-accent-wallpaper = Sfond
 settings-appearance-accent-white = Abjad
-settings-appearance-accent-white-description = Abjad fil-modalità skura, iswed fil-modalità ċara
-settings-appearance-accent-wallpaper-description = Meħud mill-isfond
 settings-appearance-theme-apps = Qabbel apps oħra mal-isfond
 settings-appearance-theme-apps-description = Apps u terminals oħra jieħdu l-istess kuluri
 
@@ -71,11 +64,8 @@ settings-appearance-tint-slate = Griż blu
 
 ## Appearance: text and motion
 
-settings-appearance-text-and-motion = Test u moviment
 settings-appearance-text-size = Daqs tat-test
 settings-appearance-text-size-description = Ikabbar jew iċekken it-test fl-apps kollha
-settings-appearance-animations = Animazzjonijiet
-settings-appearance-animations-description = It-twieqi u l-menus jiċċaqilqu minflok jidhru f’daqqa
 
 ## Taskbar
 
@@ -89,10 +79,9 @@ settings-start-style-palette-description = Bar tat-tiftix f’nofs l-iskrin għa
 settings-start-button = Uri l-buttuna Start
 settings-start-button-description = Super jiftaħ Start xorta waħda
 settings-start-web = Fittex fuq il-web permezz ta’
-settings-taskbar-section = Taskbar
 settings-taskbar-shown = Uri t-taskbar
+settings-taskbar-hidden = Moħbija
 settings-taskbar-hidden-description = L-arloġġ u l-ikoni tal-istatus jibqgħu f’kantuniera, u Super jiftaħ Start
-settings-taskbar-position = Pożizzjoni
 settings-taskbar-position-bottom = Isfel
 settings-taskbar-position-left = Xellug
 settings-taskbar-position-top = Fuq
@@ -135,7 +124,6 @@ settings-fonts-monospace-description = Terminals, kodiċi u kull ma jinġabar f�
 settings-fonts-monospace-label = Font monospace
 settings-fonts-all = Il-fonts kollha
 settings-fonts-all-description = Ara l-fonts f’dan il-kompjuter, uża wieħed jew neħħi dawk li żidt
-settings-fonts-back = Dehra
 settings-fonts-search = Fittex fonts
 settings-fonts-no-match = L-ebda font ma jismu hekk
 settings-fonts-default = Default
@@ -174,7 +162,6 @@ settings-cursors-cancel = Ikkanċella
 settings-cursors-remove = Neħħi
 settings-cursors-remove-theme = Neħħi { $theme }
 settings-cursors-store = Ikseb kersers
-settings-cursors-back = Dehra
 settings-cursors-search = Fittex kersers
 settings-cursors-order = Ordni
 settings-cursors-order-popular = Popolari
@@ -243,8 +230,6 @@ settings-notifications-done = Lest
 
 ## Window tiling
 
-settings-tiling-preview = Dehra minn qabel tal-arranġament tat-twieqi
-settings-tiling-title = Tqegħid tat-twieqi ħdejn xulxin
 settings-tiling-mode = Irranġa t-twieqi
 settings-tiling-mode-off = Mitfi
 settings-tiling-mode-tiling = Ħdejn xulxin
@@ -255,8 +240,6 @@ settings-tiling-mode-scrolling-description = Kull tieqa tinfetaħ bħala kolonna
 settings-tiling-layout = Tqassim
 settings-tiling-layout-dwindle = Spirali
 settings-tiling-layout-master = Prinċipali u munzell
-settings-tiling-layout-dwindle-description = Kull tieqa ġdida taqsam it-tieqa attiva fi tnejn
-settings-tiling-layout-master-description = Tieqa waħda kbira fuq ix-xellug, il-bqija f’munzell fuq il-lemin
 settings-tiling-gaps = Spazji
 settings-tiling-gaps-none = Xejn
 settings-tiling-gaps-small = Żgħar
@@ -279,6 +262,8 @@ settings-accessibility-large-text = Test kbir
 settings-accessibility-high-contrast = Kuntrast għoli
 settings-accessibility-reduce-motion = Naqqas il-moviment
 settings-accessibility-reduce-motion-description = Fade minflok żerżiq u zoom
+settings-accessibility-animations = Animazzjonijiet
+settings-accessibility-animations-description = It-twieqi u l-menus jiċċaqilqu minflok jidhru f’daqqa
 settings-accessibility-cursor-size = Daqs tal-kerser
 settings-accessibility-typing = Tajpjar
 settings-accessibility-osk = Tastiera fuq l-iskrin

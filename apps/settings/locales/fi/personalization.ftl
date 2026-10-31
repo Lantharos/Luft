@@ -1,29 +1,22 @@
 ## Appearance: style
 
 settings-appearance-style = Tyyli
-settings-appearance-style-title = Ulkoasu
-settings-appearance-style-description = Järjestelmää seuraavat sovellukset vaihtuvat sen mukana
 settings-appearance-style-light = Vaalea
 settings-appearance-style-dark = Tumma
+settings-appearance-style-auto = Automaattinen
 settings-appearance-schedule = Vaihda tummaan automaattisesti
-settings-appearance-schedule-off = Pois
 settings-appearance-schedule-sunset = Auringonlaskusta auringonnousuun
 settings-appearance-schedule-custom = Mukautettu
-settings-appearance-schedule-sunset-description = Seuraa auringonlaskua ja -nousua sijaintisi mukaan
-settings-appearance-schedule-custom-description = Valittu tyyli pysyy seuraavaan vaihtoon asti
 settings-appearance-dark-from = Tumma alkaen
 settings-appearance-light-from = Vaalea alkaen
 settings-appearance-corners = Kulmat
 settings-appearance-corners-rounded = Pyöristetyt
 settings-appearance-corners-square = Suorat
-settings-appearance-corners-description = Ikkunat, sovellukset, tehtäväpalkki ja valikot saavat tämän muodon
+settings-appearance-text = Teksti ja fontit
 settings-appearance-pure-black = Täysi musta
-settings-appearance-pure-black-description = Täysin mustat tummat taustat säästävät virtaa OLED-näytöissä
 settings-appearance-accent = Korostusväri
 settings-appearance-accent-wallpaper = Taustakuva
 settings-appearance-accent-white = Valkoinen
-settings-appearance-accent-white-description = Valkoinen tummassa tilassa, musta vaaleassa
-settings-appearance-accent-wallpaper-description = Poimittu taustakuvastasi
 settings-appearance-theme-apps = Sovita muut sovellukset taustakuvaan
 settings-appearance-theme-apps-description = Muut sovellukset ja päätteet saavat samat värit
 
@@ -71,11 +64,8 @@ settings-appearance-tint-slate = Siniharmaa
 
 ## Appearance: text and motion
 
-settings-appearance-text-and-motion = Teksti ja liike
 settings-appearance-text-size = Tekstin koko
 settings-appearance-text-size-description = Suurentaa tai pienentää tekstiä kaikissa sovelluksissa
-settings-appearance-animations = Animaatiot
-settings-appearance-animations-description = Ikkunat ja valikot liukuvat esiin eivätkä ilmesty heti
 
 ## Taskbar
 
@@ -89,10 +79,9 @@ settings-start-style-palette-description = Hakupalkki näytön keskellä sovellu
 settings-start-button = Näytä Start-painike
 settings-start-button-description = Super avaa Start-valikon joka tapauksessa
 settings-start-web = Hae verkosta hakukoneella
-settings-taskbar-section = Tehtäväpalkki
 settings-taskbar-shown = Näytä tehtäväpalkki
+settings-taskbar-hidden = Piilotettu
 settings-taskbar-hidden-description = Kello ja tilakuvakkeet pysyvät kulmassa, ja Super avaa Start-valikon
-settings-taskbar-position = Sijainti
 settings-taskbar-position-bottom = Alhaalla
 settings-taskbar-position-left = Vasemmalla
 settings-taskbar-position-top = Ylhäällä
@@ -135,7 +124,6 @@ settings-fonts-monospace-description = Päätteet, koodi ja kaikki, minkä pitä
 settings-fonts-monospace-label = Tasalevyinen fontti
 settings-fonts-all = Kaikki fontit
 settings-fonts-all-description = Esikatsele tietokoneen fontteja, ota niitä käyttöön tai poista lisäämiäsi
-settings-fonts-back = Ulkoasu
 settings-fonts-search = Hae fontteja
 settings-fonts-no-match = Tämännimistä fonttia ei ole
 settings-fonts-default = Oletus
@@ -171,7 +159,6 @@ settings-cursors-cancel = Peruuta
 settings-cursors-remove = Poista
 settings-cursors-remove-theme = Poista { $theme }
 settings-cursors-store = Hae osoittimia
-settings-cursors-back = Ulkoasu
 settings-cursors-search = Hae osoittimista
 settings-cursors-order = Järjestys
 settings-cursors-order-popular = Suosituimmat
@@ -237,8 +224,6 @@ settings-notifications-done = Valmis
 
 ## Window tiling
 
-settings-tiling-preview = Ikkunoiden järjestelyn esikatselu
-settings-tiling-title = Ikkunoiden laatoitus
 settings-tiling-mode = Järjestä ikkunat
 settings-tiling-mode-off = Pois
 settings-tiling-mode-tiling = Laatoitus
@@ -249,8 +234,6 @@ settings-tiling-mode-scrolling-description = Jokainen ikkuna avautuu sarakkeeksi
 settings-tiling-layout = Asettelu
 settings-tiling-layout-dwindle = Spiraali
 settings-tiling-layout-master = Pää- ja pinoalue
-settings-tiling-layout-dwindle-description = Jokainen uusi ikkuna jakaa aktiivisen ikkunan kahtia
-settings-tiling-layout-master-description = Yksi suuri ikkuna vasemmalla, muut pinottuina oikealla
 settings-tiling-gaps = Välit
 settings-tiling-gaps-none = Ei välejä
 settings-tiling-gaps-small = Pienet
@@ -273,6 +256,8 @@ settings-accessibility-large-text = Suuri teksti
 settings-accessibility-high-contrast = Suuri kontrasti
 settings-accessibility-reduce-motion = Vähennä liikettä
 settings-accessibility-reduce-motion-description = Häivytys liukumisen ja zoomauksen sijaan
+settings-accessibility-animations = Animaatiot
+settings-accessibility-animations-description = Ikkunat ja valikot liukuvat esiin eivätkä ilmesty heti
 settings-accessibility-cursor-size = Osoittimen koko
 settings-accessibility-typing = Kirjoittaminen
 settings-accessibility-osk = Näyttönäppäimistö

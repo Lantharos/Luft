@@ -13,7 +13,9 @@ settings-page-power = Maitinimas ir akumuliatorius
 settings-page-input = Įvestis
 settings-page-appearance = Išvaizda
     .keywords = fono paveikslėlis, fonas, ekrano fonas, darbalaukio fonas, tamsus, šviesus, tamsusis režimas, stilius, akcentas, akcento spalva, programų piktogramos, atspalvis, žymiklis, kursorius, pelės žymiklis, žymiklio dydis, teksto dydis, animacija, šriftai, šriftų diegimas, įdiegti šriftus
-settings-page-desktop = Darbalaukis
+settings-page-taskbar = Užduočių juosta ir Pradžia
+    .keywords = skydelis, dokas, automatiškai slėpti, slėpti automatiškai, slėpti užduočių juostą, plaukiojanti, permatoma, skaidri, prisegtos programos, lygiuotė, lygiavimas, mygtukas pradžia, pradžios mygtukas, start, meniu pradžia, start meniu, gust, paieškos juosta, paleidyklė, launcher, žiniatinklio paieška, paieška internete, paieškos sistema, search engine, ekranai, darbo sritis, darbalaukis, virtualus darbalaukis
+settings-page-windows = Langai
 settings-page-notifications = Pranešimai
     .keywords = netrukdyti, iššokantieji pranešimai, reklamjuostės, užrakinimo ekranas, programos
 settings-page-accessibility = Prieinamumas
@@ -51,6 +53,8 @@ settings-page-about = Apie
 
 ## Search terms for parts of pages
 
+settings-page-wallpaper = Ekrano fonas
+    .keywords = fonas, paveikslėlis, nuotrauka, vaizdo fonas, gyvas fonas, lietus, darbalaukio fonas
 settings-page-keyboard = Klaviatūra
     .keywords = įvesties šaltiniai, įvesties kalba, išdėstymas, klaviatūros išdėstymas, spartieji klavišai, kartojimas, klavišų kartojimas, kalba, diktavimas
     .copilot-key = copilot klavišas, copilot
@@ -60,8 +64,6 @@ settings-page-fonts = Šriftai
     .keywords = visi šriftai, garnitūros, šriftų šeimos, įdiegti šriftus, šriftų diegimas, pašalinti šriftus
 settings-page-cursors = Žymiklių temos
     .keywords = žymikliai, žymiklis, kursorius, kursoriai, pelės žymiklis, gauti daugiau žymiklių
-settings-page-taskbar = Užduočių juosta ir Pradžia
-    .keywords = skydelis, dokas, automatiškai slėpti, slėpti automatiškai, slėpti užduočių juostą, plaukiojanti, permatoma, skaidri, prisegtos programos, lygiuotė, lygiavimas, mygtukas pradžia, pradžios mygtukas, start, meniu pradžia, start meniu, gust, paieškos juosta, paleidyklė, launcher, žiniatinklio paieška, paieška internete, paieškos sistema, search engine, ekranai, darbo sritis, darbalaukis, virtualus darbalaukis
 settings-page-tiling = Langų išklotinė
     .keywords = išklotinė, išklotinės langai, tiling, slinkimas, stulpeliai, tarpai, spiralė, dwindle, pagrindinis ir krūva, master, slankieji langai, langų išdėstymas, multitasking, daugiaprogramis darbas
 settings-page-region = Kalba ir regionas

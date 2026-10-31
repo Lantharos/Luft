@@ -13,13 +13,13 @@ import {gjs, stop, waitForWindow, type Process} from '../../../lib/processes.js'
 import {captureFrame, output, type Area, type Frame} from '../../../lib/screenshots.js';
 import {settled, waitUntil} from '../../../lib/wait.js';
 import {changes, withApp} from '../../lib/apps.js';
-import {showEnd} from '../navigation.js';
+import {show} from '../navigation.js';
 
 const {require, eventually} = checks('Luft app');
 const DEFAULTS: Record<string, string> = {'font-name': 'Open Runde', 'monospace-font-name': 'Maple Mono NF'};
 const CHOSEN: Record<string, string> = {'font-name': 'Noto Serif', 'monospace-font-name': 'Noto Sans Mono'};
 const SIZE = 11;
-const PICKERS: Record<string, Point> = {'font-name': [900, 275], 'monospace-font-name': [900, 343]};
+const PICKERS: Record<string, Point> = {'font-name': [900, 183], 'monospace-font-name': [900, 252]};
 const LARGER_TEXT = 1.25;
 const TERMINAL_TEXT = 'fn main() -> Result<(), Error> { 0x1F != 0o17 }  The quick brown fox 0123456789';
 const ZOOM = 4;
@@ -148,7 +148,7 @@ export async function checkFonts(app: LuftApp) {
   GLib.mkdir_with_parents(GLib.path_get_dirname(output('fonts/shell-default')), 0o755);
   let windows: Process[] = [];
   try {
-    await showEnd(app, 'appearance');
+    await show(app, 'appearance/text');
     windows = [gjs('clients/windows/textWindow.js', ['4.0']), gjs('clients/windows/textWindow.js', ['3.0'], {env: {GDK_BACKEND: 'x11'}})];
     await withApp('tern', ['-e', 'sh', '-c', `printf '%s\\n' '${TERMINAL_TEXT}'; sleep 600`], async tern => {
       const [gtk4, xwayland] = await Promise.all(['4.0', '3.0'].map(version => waitForWindow(textWindow(version), `the GTK ${version} text window opens`)));

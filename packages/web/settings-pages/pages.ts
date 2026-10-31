@@ -6,7 +6,8 @@ export type PanelId =
 	| 'power'
 	| 'input'
 	| 'appearance'
-	| 'desktop'
+	| 'taskbar'
+	| 'windows'
 	| 'notifications'
 	| 'accessibility'
 	| 'apps'
@@ -67,9 +68,10 @@ export const PANEL_PAGES: Page<PanelId>[][] = [
 	],
 	[
 		page('appearance', 'settings-page-appearance', 'preferences-desktop-appearance-symbolic', {
-			keywords: ['settings-page-appearance', 'settings-page-fonts', 'settings-page-cursors']
+			keywords: ['settings-page-appearance', 'settings-page-wallpaper', 'settings-page-corners', 'settings-page-fonts', 'settings-page-cursors']
 		}),
-		page('desktop', 'settings-page-desktop', 'user-desktop-symbolic', { keywords: ['settings-page-taskbar', 'settings-page-windows', 'settings-page-tiling'] }),
+		page('taskbar', 'settings-page-taskbar', 'user-desktop-symbolic'),
+		page('windows', 'settings-page-windows', 'focus-windows-symbolic', { keywords: ['settings-page-windows', 'settings-page-tiling'] }),
 		page('notifications', 'settings-page-notifications', 'preferences-system-notifications-symbolic'),
 		page('accessibility', 'settings-page-accessibility', 'preferences-desktop-accessibility-symbolic')
 	],

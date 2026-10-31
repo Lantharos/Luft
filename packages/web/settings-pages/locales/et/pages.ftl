@@ -13,7 +13,9 @@ settings-page-power = Toide ja aku
 settings-page-input = Sisestus
 settings-page-appearance = Välimus
     .keywords = taustapilt, taust, tume, hele, tume režiim, stiil, rõhuvärv, rakenduste ikoonid, toonitud, kursor, osuti, hiirekursor, kursori suurus, teksti suurus, kirja suurus, animatsioonid, fondid, kirjatüübid, šriftid, fontide installimine
-settings-page-desktop = Töölaud
+settings-page-taskbar = Tegumiriba ja Start
+    .keywords = paneel, riba, dokk, automaatne peitmine, peida automaatselt, peida tegumiriba, hõljuv, läbipaistev, kinnitatud rakendused, joondus, start-nupp, nupp start, menüü start, start-menüü, start menu, gust, otsinguriba, käivitaja, launcher, veebiotsing, otsingumootor, search engine, kuvarid, tööala, töölaud, virtuaalne töölaud
+settings-page-windows = Aknad
 settings-page-notifications = Teavitused
     .keywords = ära sega, bännerid, hüpikteated, teated, märguanded, lukustuskuva, rakendused
 settings-page-accessibility = Hõlbustus
@@ -51,6 +53,8 @@ settings-page-about = Teave
 
 ## Search terms for parts of pages
 
+settings-page-wallpaper = Taustapilt
+    .keywords = taust, pilt, foto, videotaust, elav taust, vihm, töölaua taust
 settings-page-keyboard = Klaviatuur
     .keywords = sisendallikad, klaviatuuripaigutus, paigutus, kiirklahvid, klahvikombinatsioonid, kordus, klahvikordus, keel, dikteerimine
     .copilot-key = copiloti klahv, copilot-klahv
@@ -60,8 +64,6 @@ settings-page-fonts = Fondid
     .keywords = kõik fondid, kirjatüübid, šriftid, fondiperekonnad, fontide installimine, fontide eemaldamine
 settings-page-cursors = Kursoriteemad
     .keywords = kursorid, osuti, hiirekursor, rohkem kursoreid, hangi kursoreid
-settings-page-taskbar = Tegumiriba ja Start
-    .keywords = paneel, riba, dokk, automaatne peitmine, peida automaatselt, peida tegumiriba, hõljuv, läbipaistev, kinnitatud rakendused, joondus, start-nupp, nupp start, menüü start, start-menüü, start menu, gust, otsinguriba, käivitaja, launcher, veebiotsing, otsingumootor, search engine, kuvarid, tööala, töölaud, virtuaalne töölaud
 settings-page-tiling = Akende paanimine
     .keywords = paanimine, paanitud aknad, tiling, kerimine, veerud, vahed, spiraal, dwindle, põhiaken ja virn, master, ujuvad aknad, akende paigutus, multitegumtöö
 settings-page-region = Keel ja piirkond
@@ -72,5 +74,5 @@ settings-page-users = Kasutajad
     .keywords = konto, kasutajakonto, nimi, pilt, profiilipilt, avatar, salasõna, parool, sõrmejälg
 settings-page-updates = Värskendused
     .keywords = uuendused, tarkvaravärskendused, süsteemivärskendused, uuendamine, versiooniuuendus, upgrade, püsivara, tuum, kernel, taaskäivita ja installi, paketid, automaatsed värskendused, turbevärskendused
-settings-page-windows = Aknad
+settings-page-corners = Nurgad
     .keywords = ümarad nurgad, ümar nurk, kandilised nurgad, kandiline nurk, aknanurk, nurgaraadius

@@ -13,7 +13,9 @@ settings-page-power = Güç ve pil
 settings-page-input = Giriş
 settings-page-appearance = Görünüm
     .keywords = duvar kâğıdı, duvar kağıdı, arka plan, koyu, açık, stil, tema, vurgu rengi, uygulama simgeleri, renklendirilmiş, imleç, işaretçi, fare işaretçisi, imleç boyutu, metin boyutu, yazı boyutu, animasyonlar, yazı tipleri, fontlar, yazı tipi yükle
-settings-page-desktop = Masaüstü
+settings-page-taskbar = Görev çubuğu ve Başlat
+    .keywords = panel, dock, otomatik gizle, otomatik gizleme, görev çubuğunu gizle, kayan, saydam, sabitlenmiş uygulamalar, hizalama, başlat düğmesi, başlat menüsü, start menü, gust, arama çubuğu, başlatıcı, launcher, web araması, internette ara, arama motoru, ekranlar, çalışma alanı, masaüstü, sanal masaüstü
+settings-page-windows = Pencereler
 settings-page-notifications = Bildirimler
     .keywords = rahatsız etmeyin, başlıklar, açılır bildirimler, kilit ekranı, uygulamalar
 settings-page-accessibility = Erişilebilirlik
@@ -51,6 +53,8 @@ settings-page-about = Hakkında
 
 ## Search terms for parts of pages
 
+settings-page-wallpaper = Duvar kâğıdı
+    .keywords = arka plan, resim, fotoğraf, video duvar kâğıdı, canlı duvar kâğıdı, yağmur, masaüstü arka planı
 settings-page-keyboard = Klavye
     .keywords = giriş kaynakları, giriş yöntemleri, düzen, klavye düzeni, kısayollar, tekrarlama, dil, dikte
     .copilot-key = copilot tuşu
@@ -60,8 +64,6 @@ settings-page-fonts = Yazı tipleri
     .keywords = tüm yazı tipleri, fontlar, yazı tipi aileleri, yazı tipi yükle, yazı tipi kaldır
 settings-page-cursors = İmleç temaları
     .keywords = imleçler, işaretçi, fare işaretçisi, daha fazla imleç
-settings-page-taskbar = Görev çubuğu ve Başlat
-    .keywords = panel, dock, otomatik gizle, otomatik gizleme, görev çubuğunu gizle, kayan, saydam, sabitlenmiş uygulamalar, hizalama, başlat düğmesi, başlat menüsü, start menü, gust, arama çubuğu, başlatıcı, launcher, web araması, internette ara, arama motoru, ekranlar, çalışma alanı, masaüstü, sanal masaüstü
 settings-page-tiling = Pencere döşeme
     .keywords = döşeme, döşenmiş pencereler, tiling, kaydırma, sütunlar, boşluklar, spiral, dwindle, ana ve yığın, master, yüzen pencereler, pencere düzeni, multitasking, çoklu görev
 settings-page-region = Dil ve bölge

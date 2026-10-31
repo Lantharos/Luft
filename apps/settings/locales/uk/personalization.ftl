@@ -1,29 +1,22 @@
 ## Appearance: style
 
 settings-appearance-style = Стиль
-settings-appearance-style-title = Вигляд
-settings-appearance-style-description = Програми, що наслідують систему, перемикаються разом із нею
 settings-appearance-style-light = Світлий
 settings-appearance-style-dark = Темний
+settings-appearance-style-auto = Автоматично
 settings-appearance-schedule = Автоматично перемикати на темний
-settings-appearance-schedule-off = Вимкнено
 settings-appearance-schedule-sunset = Від заходу до світанку
 settings-appearance-schedule-custom = Власний розклад
-settings-appearance-schedule-sunset-description = За заходом і сходом сонця у вашій місцевості
-settings-appearance-schedule-custom-description = Вибраний вручну стиль діє до наступного перемикання
 settings-appearance-dark-from = Темний з
 settings-appearance-light-from = Світлий з
 settings-appearance-corners = Кути
 settings-appearance-corners-rounded = Заокруглені
 settings-appearance-corners-square = Прямі
-settings-appearance-corners-description = Цю форму набувають вікна, застосунки, панель завдань і меню
+settings-appearance-text = Текст і шрифти
 settings-appearance-pure-black = Чистий чорний
-settings-appearance-pure-black-description = Повністю чорне тло в темному стилі заощаджує енергію на OLED-екранах
 settings-appearance-accent = Колір акценту
 settings-appearance-accent-wallpaper = Шпалери
 settings-appearance-accent-white = Білий
-settings-appearance-accent-white-description = Білий у темному стилі, чорний у світлому
-settings-appearance-accent-wallpaper-description = Береться з ваших шпалер
 settings-appearance-theme-apps = Підлаштовувати інші програми під шпалери
 settings-appearance-theme-apps-description = Інші програми й термінали отримують ті самі кольори
 
@@ -71,11 +64,8 @@ settings-appearance-tint-slate = Сланцевий
 
 ## Appearance: text and motion
 
-settings-appearance-text-and-motion = Текст і рух
 settings-appearance-text-size = Розмір тексту
 settings-appearance-text-size-description = Збільшує або зменшує текст у всіх програмах
-settings-appearance-animations = Анімація
-settings-appearance-animations-description = Вікна й меню рухаються, а не з’являються миттєво
 
 ## Taskbar
 
@@ -89,10 +79,9 @@ settings-start-style-palette-description = Рядок пошуку посере�
 settings-start-button = Показувати кнопку Пуск
 settings-start-button-description = Super у будь-якому разі відкриває меню „Пуск“
 settings-start-web = Шукати в інтернеті за допомогою
-settings-taskbar-section = Панель завдань
 settings-taskbar-shown = Показувати панель завдань
+settings-taskbar-hidden = Прихована
 settings-taskbar-hidden-description = Годинник і значки стану лишаються в кутку, а Super відкриває меню „Пуск“
-settings-taskbar-position = Розташування
 settings-taskbar-position-bottom = Знизу
 settings-taskbar-position-left = Ліворуч
 settings-taskbar-position-top = Угорі
@@ -135,7 +124,6 @@ settings-fonts-monospace-description = Термінали, код і все, щ�
 settings-fonts-monospace-label = Моноширинний шрифт
 settings-fonts-all = Усі шрифти
 settings-fonts-all-description = Переглядайте шрифти цього комп’ютера, вибирайте потрібний або вилучайте додані вами
-settings-fonts-back = Вигляд
 settings-fonts-search = Пошук шрифтів
 settings-fonts-no-match = Немає шрифту з такою назвою
 settings-fonts-default = За замовчуванням
@@ -173,7 +161,6 @@ settings-cursors-cancel = Скасувати
 settings-cursors-remove = Вилучити
 settings-cursors-remove-theme = Вилучити тему { $theme }
 settings-cursors-store = Отримати курсори
-settings-cursors-back = Вигляд
 settings-cursors-search = Пошук курсорів
 settings-cursors-order = Порядок
 settings-cursors-order-popular = Популярні
@@ -241,8 +228,6 @@ settings-notifications-done = Готово
 
 ## Window tiling
 
-settings-tiling-preview = Попередній перегляд розташування вікон
-settings-tiling-title = Мозаїчне розташування вікон
 settings-tiling-mode = Розташування вікон
 settings-tiling-mode-off = Вимкнено
 settings-tiling-mode-tiling = Мозаїка
@@ -253,8 +238,6 @@ settings-tiling-mode-scrolling-description = Кожне вікно відкри�
 settings-tiling-layout = Розкладка
 settings-tiling-layout-dwindle = Спіраль
 settings-tiling-layout-master = Головне і стос
-settings-tiling-layout-dwindle-description = Кожне нове вікно ділить активне вікно навпіл
-settings-tiling-layout-master-description = Одне велике вікно ліворуч, решта стосом праворуч
 settings-tiling-gaps = Проміжки
 settings-tiling-gaps-none = Немає
 settings-tiling-gaps-small = Малі
@@ -277,6 +260,8 @@ settings-accessibility-large-text = Великий текст
 settings-accessibility-high-contrast = Висока контрастність
 settings-accessibility-reduce-motion = Менше руху
 settings-accessibility-reduce-motion-description = Плавна поява замість ковзання й масштабування
+settings-accessibility-animations = Анімація
+settings-accessibility-animations-description = Вікна й меню рухаються, а не з’являються миттєво
 settings-accessibility-cursor-size = Розмір курсора
 settings-accessibility-typing = Введення
 settings-accessibility-osk = Екранна клавіатура

@@ -13,7 +13,9 @@ settings-page-power = Napajanje i baterija
 settings-page-input = Unos
 settings-page-appearance = Izgled
     .keywords = pozadina, tamno, svijetlo, tamni način rada, stil, boja za isticanje, ikone aplikacija, obojene ikone, pokazivač, kursor, pokazivač miša, veličina pokazivača, veličina teksta, animacije, fontovi, pisma, instaliraj fontove
-settings-page-desktop = Radna površina
+settings-page-taskbar = Programska traka i Start
+    .keywords = traka, panel, dock, automatsko skrivanje, automatski sakrij, sakrij programsku traku, plutajuća, prozirna, prikvačene aplikacije, poravnanje, gumb start, izbornik start, start menu, gust, traka za pretraživanje, pokretač, launcher, pretraživanje weba, web-pretraživanje, tražilica, zasloni, radni prostor, radna površina, virtualna radna površina
+settings-page-windows = Prozori
 settings-page-notifications = Obavijesti
     .keywords = ne ometaj, natpisi, skočne obavijesti, zaključani zaslon, aplikacije
 settings-page-accessibility = Pristupačnost
@@ -51,6 +53,8 @@ settings-page-about = O računalu
 
 ## Search terms for parts of pages
 
+settings-page-wallpaper = Pozadina
+    .keywords = pozadinska slika, slika, fotografija, video pozadina, živa pozadina, kiša, pozadina radne površine
 settings-page-keyboard = Tipkovnica
     .keywords = izvori unosa, raspored, prečaci, ponavljanje, jezik, diktiranje, način unosa
     .copilot-key = tipka copilot
@@ -60,9 +64,7 @@ settings-page-fonts = Fontovi
     .keywords = svi fontovi, pisma, obitelji fontova, instaliraj fontove, ukloni fontove
 settings-page-cursors = Teme pokazivača
     .keywords = pokazivači, kursori, pokazivač miša, više pokazivača, preuzmi pokazivače
-settings-page-taskbar = Programska traka i Start
-    .keywords = traka, panel, dock, automatsko skrivanje, automatski sakrij, sakrij programsku traku, plutajuća, prozirna, prikvačene aplikacije, poravnanje, gumb start, izbornik start, start menu, gust, traka za pretraživanje, pokretač, launcher, pretraživanje weba, web-pretraživanje, tražilica, zasloni, radni prostor, radna površina, virtualna radna površina
-settings-page-windows = Prozori
+settings-page-corners = Kutovi
     .keywords = zaobljeni kutovi, četvrtasti kutovi, oštri kutovi, kutovi prozora, rounded corners
 settings-page-tiling = Popločavanje prozora
     .keywords = popločavanje, popločani prozori, tiling, pomicanje, stupci, razmaci, spirala, dwindle, glavni i hrpa, master, plutajući prozori, raspored prozora, višezadaćnost

@@ -13,7 +13,9 @@ settings-page-power = Zasilanie i bateria
 settings-page-input = Wprowadzanie
 settings-page-appearance = Wygląd
     .keywords = tapeta, tło, ciemny, jasny, tryb ciemny, styl, motyw, akcent, kolor akcentu, ikony aplikacji, zabarwione ikony, kursor, wskaźnik, wskaźnik myszy, rozmiar kursora, rozmiar tekstu, animacje, czcionki, kroje pisma, instaluj czcionki
-settings-page-desktop = Pulpit
+settings-page-taskbar = Pasek zadań i menu Start
+    .keywords = panel, dok, dock, autoukrywanie, automatyczne ukrywanie, ukryj pasek zadań, pływający, przezroczysty, przezroczystość, przypięte aplikacje, wyrównanie, przycisk start, menu start, start menu, gust, pasek wyszukiwania, program uruchamiający, launcher, wyszukiwanie w internecie, wyszukiwarka, search engine, ekrany, obszar roboczy, pulpit, pulpit wirtualny
+settings-page-windows = Okna
 settings-page-notifications = Powiadomienia
     .keywords = nie przeszkadzać, banery, dymki, ekran blokady, aplikacje
 settings-page-accessibility = Ułatwienia dostępu
@@ -51,6 +53,8 @@ settings-page-about = Informacje
 
 ## Search terms for parts of pages
 
+settings-page-wallpaper = Tapeta
+    .keywords = tło, obraz, zdjęcie, tapeta wideo, tapeta animowana, deszcz, tło pulpitu
 settings-page-keyboard = Klawiatura
     .keywords = źródła wprowadzania, metody wprowadzania, układ, układ klawiatury, skróty, skróty klawiaturowe, powtarzanie, język, dyktowanie
     .copilot-key = klawisz copilot, copilot
@@ -60,8 +64,6 @@ settings-page-fonts = Czcionki
     .keywords = wszystkie czcionki, kroje pisma, rodziny czcionek, instaluj czcionki, usuń czcionki
 settings-page-cursors = Motywy kursora
     .keywords = kursory, wskaźnik, wskaźnik myszy, więcej kursorów, pobierz kursory
-settings-page-taskbar = Pasek zadań i menu Start
-    .keywords = panel, dok, dock, autoukrywanie, automatyczne ukrywanie, ukryj pasek zadań, pływający, przezroczysty, przezroczystość, przypięte aplikacje, wyrównanie, przycisk start, menu start, start menu, gust, pasek wyszukiwania, program uruchamiający, launcher, wyszukiwanie w internecie, wyszukiwarka, search engine, ekrany, obszar roboczy, pulpit, pulpit wirtualny
 settings-page-tiling = Kafelkowanie okien
     .keywords = kafelkowanie, kafelki, tiling, przewijanie, kolumny, odstępy, spirala, dwindle, główne i stos, master, pływające okna, układ okien, wielozadaniowość
 settings-page-region = Język i region

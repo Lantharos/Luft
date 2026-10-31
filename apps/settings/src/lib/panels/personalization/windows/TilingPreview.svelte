@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { t } from '@luft/i18n';
 	import type { TilingLayout, TilingMode } from './options';
 
 	interface Props {
@@ -63,8 +62,7 @@
 	const percent = (value: number, of: number) => `${(value / of) * 100}%`;
 </script>
 
-<div class="stage">
-<div class="screen" role="img" aria-label={t('settings-tiling-preview')}>
+<div class="screen" aria-hidden="true">
 	{#if wallpaper}
 		<img src={wallpaper} alt="" decoding="async" />
 	{/if}
@@ -84,25 +82,17 @@
 	{/each}
 	<span class="taskbar" style:height={percent(TASKBAR, HEIGHT)}></span>
 </div>
-</div>
 
 <style>
-	.stage {
-		display: grid;
-		place-items: center;
-		height: 260px;
-	}
-
 	.screen {
 		position: relative;
 		overflow: hidden;
-		height: 212px;
+		width: 100%;
 		aspect-ratio: 16 / 10;
 		border-radius: 10px;
 		/* overflow alone lets composited children, such as the taskbar, keep square corners */
 		clip-path: inset(0 round 10px);
 		background: var(--control);
-		box-shadow: 0 8px 24px var(--shadow-faint);
 	}
 
 	:global(:root[data-corners='square']) .screen {

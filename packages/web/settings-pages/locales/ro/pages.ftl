@@ -13,7 +13,9 @@ settings-page-power = Alimentare și baterie
 settings-page-input = Intrare
 settings-page-appearance = Aspect
     .keywords = imagine de fundal, fundal, tapet, întunecat, luminos, mod întunecat, stil, temă, culoare de accent, pictograme aplicații, pictograme colorate, cursor, indicator, indicatorul mouse-ului, mărime cursor, mărime text, dimensiune text, animații, fonturi, caractere, instalare fonturi
-settings-page-desktop = Desktop
+settings-page-taskbar = Bara de activități și Start
+    .keywords = bară, panou, dock, ascundere automată, ascunde automat, ascunde bara de activități, plutitoare, transparentă, aplicații fixate, aliniere, butonul start, meniul start, meniu start, gust, bară de căutare, lansator, launcher, căutare pe web, căutare web, motor de căutare, ecrane, spațiu de lucru, desktop, desktop virtual
+settings-page-windows = Ferestre
 settings-page-notifications = Notificări
     .keywords = nu deranjați, bannere, ferestre pop-up, ecran de blocare, aplicații
 settings-page-accessibility = Accesibilitate
@@ -51,6 +53,8 @@ settings-page-about = Despre
 
 ## Search terms for parts of pages
 
+settings-page-wallpaper = Imagine de fundal
+    .keywords = fundal, imagine, fotografie, fundal video, fundal animat, ploaie, fundalul desktopului
 settings-page-keyboard = Tastatură
     .keywords = surse de introducere, aranjament, aspect tastatură, comenzi rapide, scurtături, repetare, limbă, dictare, metodă de introducere
     .copilot-key = tasta copilot
@@ -60,8 +64,6 @@ settings-page-fonts = Fonturi
     .keywords = toate fonturile, caractere, familii de fonturi, instalare fonturi, eliminare fonturi
 settings-page-cursors = Teme de cursor
     .keywords = cursoare, cursor, indicator, indicatorul mouse-ului, mai multe cursoare, descărcare cursoare
-settings-page-taskbar = Bara de activități și Start
-    .keywords = bară, panou, dock, ascundere automată, ascunde automat, ascunde bara de activități, plutitoare, transparentă, aplicații fixate, aliniere, butonul start, meniul start, meniu start, gust, bară de căutare, lansator, launcher, căutare pe web, căutare web, motor de căutare, ecrane, spațiu de lucru, desktop, desktop virtual
 settings-page-tiling = Așezarea ferestrelor în mozaic
     .keywords = mozaic, ferestre în mozaic, tiling, derulare, coloane, spații, spirală, dwindle, principală și stivă, master, ferestre flotante, aranjarea ferestrelor, multitasking
 settings-page-region = Limbă și regiune

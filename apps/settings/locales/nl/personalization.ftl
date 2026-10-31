@@ -1,29 +1,22 @@
 ## Appearance: style
 
 settings-appearance-style = Stijl
-settings-appearance-style-title = Uiterlijk
-settings-appearance-style-description = Apps die het systeem volgen, wisselen mee
 settings-appearance-style-light = Licht
 settings-appearance-style-dark = Donker
+settings-appearance-style-auto = Automatisch
 settings-appearance-schedule = Automatisch naar donker wisselen
-settings-appearance-schedule-off = Uit
 settings-appearance-schedule-sunset = Zonsondergang tot zonsopgang
 settings-appearance-schedule-custom = Aangepast
-settings-appearance-schedule-sunset-description = Volgt zonsondergang en zonsopgang waar je bent
-settings-appearance-schedule-custom-description = Een gekozen stijl blijft tot de volgende wissel
 settings-appearance-dark-from = Donker vanaf
 settings-appearance-light-from = Licht vanaf
 settings-appearance-corners = Hoeken
 settings-appearance-corners-rounded = Afgerond
 settings-appearance-corners-square = Vierkant
-settings-appearance-corners-description = Vensters, apps, de taakbalk en menu’s krijgen deze vorm
+settings-appearance-text = Tekst en lettertypen
 settings-appearance-pure-black = Puur zwart
-settings-appearance-pure-black-description = Volledig zwarte donkere achtergronden, wat energie bespaart op oled-schermen
 settings-appearance-accent = Accentkleur
 settings-appearance-accent-wallpaper = Achtergrond
 settings-appearance-accent-white = Wit
-settings-appearance-accent-white-description = Wit in de donkere stijl, zwart in de lichte stijl
-settings-appearance-accent-wallpaper-description = Gekozen uit je achtergrond
 settings-appearance-theme-apps = Andere apps aanpassen aan de achtergrond
 settings-appearance-theme-apps-description = Andere apps en terminals krijgen dezelfde kleuren
 
@@ -71,11 +64,8 @@ settings-appearance-tint-slate = Leisteen
 
 ## Appearance: text and motion
 
-settings-appearance-text-and-motion = Tekst en beweging
 settings-appearance-text-size = Tekstgrootte
 settings-appearance-text-size-description = Maakt tekst in alle apps groter of kleiner
-settings-appearance-animations = Animaties
-settings-appearance-animations-description = Vensters en menu’s bewegen in plaats van meteen te verschijnen
 
 ## Taskbar
 
@@ -89,10 +79,9 @@ settings-start-style-palette-description = Een zoekbalk midden in het scherm voo
 settings-start-button = Startknop tonen
 settings-start-button-description = Super opent Start in beide gevallen
 settings-start-web = Op het web zoeken met
-settings-taskbar-section = Taakbalk
 settings-taskbar-shown = Taakbalk tonen
+settings-taskbar-hidden = Verborgen
 settings-taskbar-hidden-description = De klok en statuspictogrammen blijven in een hoek, en Super opent Start
-settings-taskbar-position = Positie
 settings-taskbar-position-bottom = Onder
 settings-taskbar-position-left = Links
 settings-taskbar-position-top = Boven
@@ -135,7 +124,6 @@ settings-fonts-monospace-description = Terminals, code en alles wat in kolommen 
 settings-fonts-monospace-label = Lettertype met vaste breedte
 settings-fonts-all = Alle lettertypen
 settings-fonts-all-description = Bekijk de lettertypen op deze computer, gebruik er een of verwijder lettertypen die je hebt toegevoegd
-settings-fonts-back = Uiterlijk
 settings-fonts-search = Lettertypen zoeken
 settings-fonts-no-match = Geen lettertype met die naam
 settings-fonts-default = Standaard
@@ -171,7 +159,6 @@ settings-cursors-cancel = Annuleren
 settings-cursors-remove = Verwijderen
 settings-cursors-remove-theme = { $theme } verwijderen
 settings-cursors-store = Cursors downloaden
-settings-cursors-back = Uiterlijk
 settings-cursors-search = Cursors zoeken
 settings-cursors-order = Volgorde
 settings-cursors-order-popular = Populair
@@ -237,8 +224,6 @@ settings-notifications-done = Klaar
 
 ## Window tiling
 
-settings-tiling-preview = Voorbeeld van de vensterindeling
-settings-tiling-title = Vensters tegelen
 settings-tiling-mode = Vensters indelen
 settings-tiling-mode-off = Uit
 settings-tiling-mode-tiling = Tegelen
@@ -249,8 +234,6 @@ settings-tiling-mode-scrolling-description = Elk venster opent als kolom op een 
 settings-tiling-layout = Indeling
 settings-tiling-layout-dwindle = Spiraal
 settings-tiling-layout-master = Hoofdvenster en stapel
-settings-tiling-layout-dwindle-description = Elk nieuw venster deelt het actieve venster in tweeën
-settings-tiling-layout-master-description = Eén groot venster links, de rest rechts gestapeld
 settings-tiling-gaps = Tussenruimte
 settings-tiling-gaps-none = Geen
 settings-tiling-gaps-small = Klein
@@ -273,6 +256,8 @@ settings-accessibility-large-text = Grote tekst
 settings-accessibility-high-contrast = Hoog contrast
 settings-accessibility-reduce-motion = Beweging beperken
 settings-accessibility-reduce-motion-description = Vervagen in plaats van schuiven en zoomen
+settings-accessibility-animations = Animaties
+settings-accessibility-animations-description = Vensters en menu’s bewegen in plaats van meteen te verschijnen
 settings-accessibility-cursor-size = Cursorgrootte
 settings-accessibility-typing = Typen
 settings-accessibility-osk = Schermtoetsenbord

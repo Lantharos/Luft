@@ -2,17 +2,13 @@
 
 settings-appearance-style = Style
 # Row title for choosing between the light and dark style
-settings-appearance-style-title = Appearance
-settings-appearance-style-description = Apps that follow the system switch with it
 settings-appearance-style-light = Light
 settings-appearance-style-dark = Dark
+settings-appearance-style-auto = Auto
 settings-appearance-schedule = Switch to dark automatically
 # Choice for the dark style schedule: never switch automatically
-settings-appearance-schedule-off = Off
 settings-appearance-schedule-sunset = Sunset to sunrise
 settings-appearance-schedule-custom = Custom
-settings-appearance-schedule-sunset-description = Follows sunset and sunrise where you are
-settings-appearance-schedule-custom-description = Picking a style lasts until the next switch
 # Followed by a time picker
 settings-appearance-dark-from = Dark from
 # Followed by a time picker
@@ -20,15 +16,12 @@ settings-appearance-light-from = Light from
 settings-appearance-corners = Corners
 settings-appearance-corners-rounded = Rounded
 settings-appearance-corners-square = Square
-settings-appearance-corners-description = Windows, apps, the taskbar and menus all take this shape
+settings-appearance-text = Text and fonts
 settings-appearance-pure-black = Pure black
-settings-appearance-pure-black-description = Fully black dark backgrounds, which save power on OLED
 settings-appearance-accent = Accent color
 # Accent color taken from the wallpaper
 settings-appearance-accent-wallpaper = Wallpaper
 settings-appearance-accent-white = White
-settings-appearance-accent-white-description = White in the dark style, black in the light style
-settings-appearance-accent-wallpaper-description = Picked from your wallpaper
 settings-appearance-theme-apps = Match other apps to the wallpaper
 settings-appearance-theme-apps-description = Other apps and terminals take on the same colors
 
@@ -93,11 +86,8 @@ settings-appearance-tint-slate = Slate
 
 ## Appearance: text and motion
 
-settings-appearance-text-and-motion = Text and motion
 settings-appearance-text-size = Text size
 settings-appearance-text-size-description = Makes text larger or smaller across apps
-settings-appearance-animations = Animations
-settings-appearance-animations-description = Windows and menus move instead of appearing instantly
 
 ## Taskbar
 
@@ -115,10 +105,9 @@ settings-start-button = Show the Start button
 settings-start-button-description = Super opens Start either way
 # Followed by a list of search engines
 settings-start-web = Search the web with
-settings-taskbar-section = Taskbar
 settings-taskbar-shown = Show the taskbar
+settings-taskbar-hidden = Hidden
 settings-taskbar-hidden-description = The clock and status icons stay in a corner, and Super opens Start
-settings-taskbar-position = Position
 settings-taskbar-position-bottom = Bottom
 settings-taskbar-position-left = Left
 settings-taskbar-position-top = Top
@@ -164,7 +153,6 @@ settings-fonts-monospace-label = Monospace font
 settings-fonts-all = All fonts
 settings-fonts-all-description = Preview the fonts on this computer, use one or remove ones you added
 # Back button to the Appearance page
-settings-fonts-back = Appearance
 settings-fonts-search = Search fonts
 settings-fonts-no-match = No font is called that
 # Shown next to the font the system uses by default
@@ -210,7 +198,6 @@ settings-cursors-remove = Remove
 settings-cursors-remove-theme = Remove { $theme }
 settings-cursors-store = Get cursors
 # Back button to the Appearance page
-settings-cursors-back = Appearance
 settings-cursors-search = Search cursors
 # Label of the sort order choice
 settings-cursors-order = Order
@@ -284,8 +271,6 @@ settings-notifications-done = Done
 
 ## Window tiling
 
-settings-tiling-preview = Window arrangement preview
-settings-tiling-title = Window tiling
 settings-tiling-mode = Arrange windows
 settings-tiling-mode-off = Off
 settings-tiling-mode-tiling = Tiling
@@ -296,8 +281,6 @@ settings-tiling-mode-scrolling-description = Each window opens as a column on a 
 settings-tiling-layout = Layout
 settings-tiling-layout-dwindle = Spiral
 settings-tiling-layout-master = Main and stack
-settings-tiling-layout-dwindle-description = Each new window splits the focused one in two
-settings-tiling-layout-master-description = One large window on the left, the rest stacked on the right
 settings-tiling-gaps = Gaps
 settings-tiling-gaps-none = None
 settings-tiling-gaps-small = Small
@@ -321,6 +304,8 @@ settings-accessibility-large-text = Large text
 settings-accessibility-high-contrast = High contrast
 settings-accessibility-reduce-motion = Reduce motion
 settings-accessibility-reduce-motion-description = Fade instead of sliding and zooming
+settings-accessibility-animations = Animations
+settings-accessibility-animations-description = Windows and menus move instead of appearing instantly
 settings-accessibility-cursor-size = Cursor size
 settings-accessibility-typing = Typing
 settings-accessibility-osk = On-screen keyboard

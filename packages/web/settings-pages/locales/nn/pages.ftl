@@ -13,7 +13,9 @@ settings-page-power = Straum og batteri
 settings-page-input = Inndata
 settings-page-appearance = Utsjånad
     .keywords = bakgrunnsbilete, bakgrunn, mørk, lys, stil, tema, aksentfarge, appikon, ikon, farga, peikar, musepeikar, markør, peikarstorleik, tekststorleik, animasjonar, skrifter, skrifttypar, installer skrifter
-settings-page-desktop = Skrivebord
+settings-page-taskbar = Oppgåvelinje og Start
+    .keywords = panel, dokk, gøym automatisk, skjul automatisk, gøym oppgåvelinja, flytande, gjennomsiktig, festa appar, justering, startknapp, start, startmeny, gust, søkjefelt, søkefelt, launcher, appstartar, nettsøk, søk på nettet, søkjemotor, søkemotor, skjermar, arbeidsområde, skrivebord, virtuelt skrivebord
+settings-page-windows = Vindauge
 settings-page-notifications = Varslingar
     .keywords = ikkje forstyrr, varsel, banner, låseskjerm, appar
 settings-page-accessibility = Tilgjenge
@@ -51,6 +53,8 @@ settings-page-about = Om
 
 ## Search terms for parts of pages
 
+settings-page-wallpaper = Bakgrunnsbilete
+    .keywords = bakgrunn, bilete, foto, videobakgrunn, levande bakgrunn, regn, skrivebordsbakgrunn
 settings-page-keyboard = Tastatur
     .keywords = inndatakjelder, inndatametode, oppsett, tastaturoppsett, snarvegar, hurtigtastar, repetisjon, språk, diktering
     .copilot-key = copilot-tast, copilot
@@ -60,8 +64,6 @@ settings-page-fonts = Skrifttypar
     .keywords = alle skrifter, skrifter, skrifttypar, skriftfamiliar, installer skrifter, fjern skrifter
 settings-page-cursors = Peikartema
     .keywords = peikarar, peikar, musepeikar, markør, fleire peikarar, hent fleire peikarar
-settings-page-taskbar = Oppgåvelinje og Start
-    .keywords = panel, dokk, gøym automatisk, skjul automatisk, gøym oppgåvelinja, flytande, gjennomsiktig, festa appar, justering, startknapp, start, startmeny, gust, søkjefelt, søkefelt, launcher, appstartar, nettsøk, søk på nettet, søkjemotor, søkemotor, skjermar, arbeidsområde, skrivebord, virtuelt skrivebord
 settings-page-tiling = Flislegging av vindauge
     .keywords = fliser, flislagde vindauge, tiling, rulling, kolonnar, mellomrom, spiral, dwindle, hovud og stabel, master, flytande vindauge, vindaugsoppsett, multitasking, fleiroppgåvekøyring
 settings-page-region = Språk og region

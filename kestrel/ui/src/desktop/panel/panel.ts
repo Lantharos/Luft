@@ -172,7 +172,7 @@ export class KestrelPanel {
       return [
         { label: t('taskbar-show-desktop'), run: () => this.peek.toggleDesktop() },
         ...monitor ? [{ label: t('taskbar-system-monitor'), run: () => monitor.activate() }] : [],
-        { label: t('taskbar-settings'), run: () => menus.settings('desktop') },
+        { label: t('taskbar-settings'), run: () => menus.settings('taskbar') },
       ];
     });
     menus.bind(this.clockButton, () => [

@@ -1,29 +1,22 @@
 ## Appearance: style
 
 settings-appearance-style = Στυλ
-settings-appearance-style-title = Εμφάνιση
-settings-appearance-style-description = Οι εφαρμογές που ακολουθούν το σύστημα αλλάζουν μαζί του
 settings-appearance-style-light = Φωτεινό
 settings-appearance-style-dark = Σκοτεινό
+settings-appearance-style-auto = Αυτόματα
 settings-appearance-schedule = Αυτόματη μετάβαση σε σκοτεινή λειτουργία
-settings-appearance-schedule-off = Ανενεργή
 settings-appearance-schedule-sunset = Από τη δύση ως την ανατολή
 settings-appearance-schedule-custom = Προσαρμογή
-settings-appearance-schedule-sunset-description = Ακολουθεί τη δύση και την ανατολή του ηλίου στην περιοχή σας
-settings-appearance-schedule-custom-description = Το στυλ που επιλέγετε ισχύει ως την επόμενη αλλαγή
 settings-appearance-dark-from = Σκοτεινό από
 settings-appearance-light-from = Φωτεινό από
 settings-appearance-corners = Γωνίες
 settings-appearance-corners-rounded = Στρογγυλεμένες
 settings-appearance-corners-square = Τετράγωνες
-settings-appearance-corners-description = Τα παράθυρα, οι εφαρμογές, η γραμμή εργασιών και τα μενού παίρνουν αυτό το σχήμα
+settings-appearance-text = Κείμενο και γραμματοσειρές
 settings-appearance-pure-black = Απόλυτο μαύρο
-settings-appearance-pure-black-description = Εντελώς μαύρο φόντο στη σκοτεινή λειτουργία, που εξοικονομεί ενέργεια σε οθόνες OLED
 settings-appearance-accent = Χρώμα έμφασης
 settings-appearance-accent-wallpaper = Ταπετσαρία
 settings-appearance-accent-white = Λευκό
-settings-appearance-accent-white-description = Λευκό στη σκοτεινή λειτουργία, μαύρο στη φωτεινή
-settings-appearance-accent-wallpaper-description = Επιλέγεται από την ταπετσαρία σας
 settings-appearance-theme-apps = Χρώματα ταπετσαρίας και σε άλλες εφαρμογές
 settings-appearance-theme-apps-description = Οι άλλες εφαρμογές και τα τερματικά παίρνουν τα ίδια χρώματα
 
@@ -71,11 +64,8 @@ settings-appearance-tint-slate = Γκρι
 
 ## Appearance: text and motion
 
-settings-appearance-text-and-motion = Κείμενο και κίνηση
 settings-appearance-text-size = Μέγεθος κειμένου
 settings-appearance-text-size-description = Μεγαλώνει ή μικραίνει το κείμενο σε όλες τις εφαρμογές
-settings-appearance-animations = Κινούμενα εφέ
-settings-appearance-animations-description = Τα παράθυρα και τα μενού κινούνται αντί να εμφανίζονται αμέσως
 
 ## Taskbar
 
@@ -89,10 +79,9 @@ settings-start-style-palette-description = Μια γραμμή αναζήτησ�
 settings-start-button = Εμφάνιση κουμπιού Start
 settings-start-button-description = Το Super ανοίγει το Start σε κάθε περίπτωση
 settings-start-web = Αναζήτηση στο διαδίκτυο με
-settings-taskbar-section = Γραμμή εργασιών
 settings-taskbar-shown = Εμφάνιση γραμμής εργασιών
+settings-taskbar-hidden = Κρυφή
 settings-taskbar-hidden-description = Το ρολόι και τα εικονίδια κατάστασης μένουν σε μια γωνία και το Super ανοίγει το Start
-settings-taskbar-position = Θέση
 settings-taskbar-position-bottom = Κάτω
 settings-taskbar-position-left = Αριστερά
 settings-taskbar-position-top = Πάνω
@@ -135,7 +124,6 @@ settings-fonts-monospace-description = Τερματικά, κώδικας και
 settings-fonts-monospace-label = Γραμματοσειρά σταθερού πλάτους
 settings-fonts-all = Όλες οι γραμματοσειρές
 settings-fonts-all-description = Προεπισκόπηση των γραμματοσειρών του υπολογιστή, χρήση μίας ή αφαίρεση όσων προσθέσατε
-settings-fonts-back = Εμφάνιση
 settings-fonts-search = Αναζήτηση γραμματοσειρών
 settings-fonts-no-match = Δεν υπάρχει γραμματοσειρά με αυτό το όνομα
 settings-fonts-default = Προεπιλογή
@@ -171,7 +159,6 @@ settings-cursors-cancel = Ακύρωση
 settings-cursors-remove = Αφαίρεση
 settings-cursors-remove-theme = Αφαίρεση του θέματος { $theme }
 settings-cursors-store = Λήψη δρομέων
-settings-cursors-back = Εμφάνιση
 settings-cursors-search = Αναζήτηση δρομέων
 settings-cursors-order = Ταξινόμηση
 settings-cursors-order-popular = Δημοφιλή
@@ -237,8 +224,6 @@ settings-notifications-done = Τέλος
 
 ## Window tiling
 
-settings-tiling-preview = Προεπισκόπηση διάταξης παραθύρων
-settings-tiling-title = Παράθεση παραθύρων
 settings-tiling-mode = Τακτοποίηση παραθύρων
 settings-tiling-mode-off = Ανενεργό
 settings-tiling-mode-tiling = Παράθεση
@@ -249,8 +234,6 @@ settings-tiling-mode-scrolling-description = Κάθε παράθυρο ανοί�
 settings-tiling-layout = Διάταξη
 settings-tiling-layout-dwindle = Σπιράλ
 settings-tiling-layout-master = Κύριο και στοίβα
-settings-tiling-layout-dwindle-description = Κάθε νέο παράθυρο χωρίζει στα δύο το ενεργό παράθυρο
-settings-tiling-layout-master-description = Ένα μεγάλο παράθυρο αριστερά, τα υπόλοιπα στοιβαγμένα δεξιά
 settings-tiling-gaps = Κενά
 settings-tiling-gaps-none = Κανένα
 settings-tiling-gaps-small = Μικρά
@@ -273,6 +256,8 @@ settings-accessibility-large-text = Μεγάλο κείμενο
 settings-accessibility-high-contrast = Υψηλή αντίθεση
 settings-accessibility-reduce-motion = Μείωση κίνησης
 settings-accessibility-reduce-motion-description = Σταδιακή εμφάνιση αντί για ολίσθηση και μεγέθυνση
+settings-accessibility-animations = Κινούμενα εφέ
+settings-accessibility-animations-description = Τα παράθυρα και τα μενού κινούνται αντί να εμφανίζονται αμέσως
 settings-accessibility-cursor-size = Μέγεθος δρομέα
 settings-accessibility-typing = Πληκτρολόγηση
 settings-accessibility-osk = Πληκτρολόγιο οθόνης

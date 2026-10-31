@@ -18,7 +18,9 @@ settings-page-power = Power & Battery
 settings-page-input = Input
 settings-page-appearance = Appearance
     .keywords = wallpaper, background, dark, light, style, accent, app icons, tinted, cursor, pointer, mouse pointer, cursor size, text size, animations, fonts, typefaces, install fonts
-settings-page-desktop = Desktop
+settings-page-taskbar = Taskbar and Start
+    .keywords = panel, dock, auto-hide, hide automatically, hide taskbar, floating, transparent, pinned apps, alignment, start button, start menu, gust, search bar, launcher, web search, search engine, displays, workspace, desktop, virtual desktop
+settings-page-windows = Windows
 settings-page-notifications = Notifications
     .keywords = do not disturb, banners, lock screen, apps
 settings-page-accessibility = Accessibility
@@ -57,6 +59,8 @@ settings-page-about = About
 ## Search terms for parts of pages
 # These names never show as titles. They and their .keywords help search find the page that holds these settings.
 
+settings-page-wallpaper = Wallpaper
+    .keywords = background, picture, photo, video wallpaper, live wallpaper, rain, desktop background
 settings-page-keyboard = Keyboard
     .keywords = input sources, layout, shortcuts, repeat, language, dictation
     .copilot-key = copilot key
@@ -66,9 +70,7 @@ settings-page-fonts = Fonts
     .keywords = all fonts, typefaces, font families, install fonts, remove fonts
 settings-page-cursors = Cursor themes
     .keywords = cursors, pointer, mouse pointer, get more cursors
-settings-page-taskbar = Taskbar and Start
-    .keywords = panel, dock, auto-hide, hide automatically, hide taskbar, floating, transparent, pinned apps, alignment, start button, start menu, gust, search bar, launcher, web search, search engine, displays, workspace, desktop, virtual desktop
-settings-page-windows = Windows
+settings-page-corners = Corners
     .keywords = rounded corners, round corners, square corners, sharp corners, window corners, corner radius
 settings-page-tiling = Window tiling
     .keywords = tiling, tiled windows, window tiling, scrolling, columns, gaps, spiral, dwindle, main and stack, master, floating windows, window layout, multitasking

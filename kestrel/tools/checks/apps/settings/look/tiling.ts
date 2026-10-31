@@ -2,13 +2,13 @@ import Gio from 'gi://Gio';
 
 import type {LuftApp} from '../../../lib/apps/luftApp.js';
 import {settled} from '../../../lib/wait.js';
-import {showEnd} from '../navigation.js';
+import {show} from '../navigation.js';
 
 const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 const SHOWN = [['tiling', 'dwindle'], ['tiling', 'master'], ['scrolling', 'dwindle']];
 
 export async function checkTiling(app: LuftApp) {
-  await showEnd(app, 'desktop');
+  await show(app, 'windows');
   try {
     for (const [mode, layout] of SHOWN) {
       kestrel.set_string('tiling-layout', layout);

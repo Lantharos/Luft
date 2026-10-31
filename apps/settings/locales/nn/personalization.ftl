@@ -1,29 +1,22 @@
 ## Appearance: style
 
 settings-appearance-style = Modus
-settings-appearance-style-title = Utsjånad
-settings-appearance-style-description = Appar som følgjer systemet, byter saman med det
 settings-appearance-style-light = Lys
 settings-appearance-style-dark = Mørk
+settings-appearance-style-auto = Automatisk
 settings-appearance-schedule = Byt til mørk modus automatisk
-settings-appearance-schedule-off = Av
 settings-appearance-schedule-sunset = Solnedgang til soloppgang
 settings-appearance-schedule-custom = Eigendefinert
-settings-appearance-schedule-sunset-description = Følgjer solnedgang og soloppgang der du er
-settings-appearance-schedule-custom-description = Valet ditt gjeld til neste byte
 settings-appearance-dark-from = Mørk frå
 settings-appearance-light-from = Lys frå
 settings-appearance-corners = Hjørne
 settings-appearance-corners-rounded = Avrunda
 settings-appearance-corners-square = Firkanta
-settings-appearance-corners-description = Vindauge, appar, oppgåvelinja og menyar får denne forma
+settings-appearance-text = Tekst og skrifttypar
 settings-appearance-pure-black = Heilt svart
-settings-appearance-pure-black-description = Heilt svarte mørke bakgrunnar, som sparer straum på OLED
 settings-appearance-accent = Aksentfarge
 settings-appearance-accent-wallpaper = Bakgrunnsbilete
 settings-appearance-accent-white = Kvit
-settings-appearance-accent-white-description = Kvit i mørk modus, svart i lys modus
-settings-appearance-accent-wallpaper-description = Henta frå bakgrunnsbiletet ditt
 settings-appearance-theme-apps = Tilpass andre appar til bakgrunnsbiletet
 settings-appearance-theme-apps-description = Andre appar og terminalar får dei same fargane
 
@@ -71,11 +64,8 @@ settings-appearance-tint-slate = Skifergrå
 
 ## Appearance: text and motion
 
-settings-appearance-text-and-motion = Tekst og rørsle
 settings-appearance-text-size = Tekststorleik
 settings-appearance-text-size-description = Gjer teksten større eller mindre i alle appar
-settings-appearance-animations = Animasjonar
-settings-appearance-animations-description = Vindauge og menyar glir fram i staden for å dukke opp brått
 
 ## Taskbar
 
@@ -89,10 +79,9 @@ settings-start-style-palette-description = Eit søkjefelt midt på skjermen for 
 settings-start-button = Vis Start-knappen
 settings-start-button-description = Super opnar Start uansett
 settings-start-web = Søk på nettet med
-settings-taskbar-section = Oppgåvelinje
 settings-taskbar-shown = Vis oppgåvelinja
+settings-taskbar-hidden = Gøymd
 settings-taskbar-hidden-description = Klokka og statusikona blir verande i eit hjørne, og Super opnar Start
-settings-taskbar-position = Plassering
 settings-taskbar-position-bottom = Nedst
 settings-taskbar-position-left = Venstre
 settings-taskbar-position-top = Øvst
@@ -135,7 +124,6 @@ settings-fonts-monospace-description = Terminalar, kode og alt som står i kolon
 settings-fonts-monospace-label = Skrifttype med fast breidd
 settings-fonts-all = Alle skrifttypar
 settings-fonts-all-description = Førehandsvis skrifttypane på denne datamaskinen, bruk ein eller fjern dei du har lagt til
-settings-fonts-back = Utsjånad
 settings-fonts-search = Søk i skrifttypar
 settings-fonts-no-match = Ingen skrifttype heiter det
 settings-fonts-default = Standard
@@ -171,7 +159,6 @@ settings-cursors-cancel = Avbryt
 settings-cursors-remove = Fjern
 settings-cursors-remove-theme = Fjern { $theme }
 settings-cursors-store = Hent peikarar
-settings-cursors-back = Utsjånad
 settings-cursors-search = Søk i peikarar
 settings-cursors-order = Rekkjefølgje
 settings-cursors-order-popular = Populære
@@ -237,8 +224,6 @@ settings-notifications-done = Ferdig
 
 ## Window tiling
 
-settings-tiling-preview = Førehandsvising av vindaugsoppsett
-settings-tiling-title = Flislegging av vindauge
 settings-tiling-mode = Ordne vindauge
 settings-tiling-mode-off = Av
 settings-tiling-mode-tiling = Fliser
@@ -249,8 +234,6 @@ settings-tiling-mode-scrolling-description = Kvart vindauge opnar seg som ein ko
 settings-tiling-layout = Oppsett
 settings-tiling-layout-dwindle = Spiral
 settings-tiling-layout-master = Hovud og stabel
-settings-tiling-layout-dwindle-description = Kvart nytt vindauge deler det aktive vindauget i to
-settings-tiling-layout-master-description = Eitt stort vindauge til venstre, resten stabla til høgre
 settings-tiling-gaps = Mellomrom
 settings-tiling-gaps-none = Ingen
 settings-tiling-gaps-small = Små
@@ -273,6 +256,8 @@ settings-accessibility-large-text = Stor tekst
 settings-accessibility-high-contrast = Høg kontrast
 settings-accessibility-reduce-motion = Mindre rørsle
 settings-accessibility-reduce-motion-description = Ton inn og ut i staden for å gli og zoome
+settings-accessibility-animations = Animasjonar
+settings-accessibility-animations-description = Vindauge og menyar glir fram i staden for å dukke opp brått
 settings-accessibility-cursor-size = Peikarstorleik
 settings-accessibility-typing = Skriving
 settings-accessibility-osk = Skjermtastatur

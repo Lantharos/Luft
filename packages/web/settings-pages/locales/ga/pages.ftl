@@ -13,7 +13,9 @@ settings-page-power = Cumhacht agus ceallra
 settings-page-input = Ionchur
 settings-page-appearance = Cuma
     .keywords = cúlbhrat, cúlra, páipéar balla, dorcha, geal, stíl dhorcha, mód dorcha, stíl, dath béime, deilbhíní aipeanna, tinte, cúrsóir, pointeoir, pointeoir luiche, méid an chúrsóra, méid téacs, beochan, clónna, clófhoirne, suiteáil clónna
-settings-page-desktop = Deasc
+settings-page-taskbar = Tascbharra agus Tosaigh
+    .keywords = painéal, duga, dock, folaigh go huathoibríoch, folaigh an tascbharra, ar snámh, trédhearcach, aipeanna pionnáilte, ailíniú, cnaipe tosaigh, tosaigh, start, roghchlár tosaigh, start menu, gust, barra cuardaigh, lainseálaí, launcher, cuardach gréasáin, inneall cuardaigh, search engine, scáileáin, spás oibre, deasc, deasc fhíorúil
+settings-page-windows = Fuinneoga
 settings-page-notifications = Fógraí
     .keywords = ná cuir isteach orm, meirgí, scáileán glasála, aipeanna
 settings-page-accessibility = Inrochtaineacht
@@ -51,6 +53,8 @@ settings-page-about = Eolas
 
 ## Search terms for parts of pages
 
+settings-page-wallpaper = Cúlbhrat
+    .keywords = cúlra, pictiúr, grianghraf, cúlbhrat físe, cúlbhrat beo, báisteach, cúlra deisce
 settings-page-keyboard = Méarchlár
     .keywords = foinsí ionchurtha, leagan amach, aicearraí, athdhéanamh, teanga, deachtú
     .copilot-key = eochair copilot, copilot
@@ -60,8 +64,6 @@ settings-page-fonts = Clónna
     .keywords = gach cló, clófhoirne, teaghlaigh clónna, suiteáil clónna, bain clónna
 settings-page-cursors = Téamaí cúrsóra
     .keywords = cúrsóirí, pointeoir, pointeoir luiche, faigh tuilleadh cúrsóirí
-settings-page-taskbar = Tascbharra agus Tosaigh
-    .keywords = painéal, duga, dock, folaigh go huathoibríoch, folaigh an tascbharra, ar snámh, trédhearcach, aipeanna pionnáilte, ailíniú, cnaipe tosaigh, tosaigh, start, roghchlár tosaigh, start menu, gust, barra cuardaigh, lainseálaí, launcher, cuardach gréasáin, inneall cuardaigh, search engine, scáileáin, spás oibre, deasc, deasc fhíorúil
 settings-page-tiling = Tíleáil fuinneog
     .keywords = tíleáil, fuinneoga tíleáilte, tiling, scrollú, colúin, bearnaí, bíseach, dwindle, príomhfhuinneog agus cruach, master, fuinneoga ar snámh, leagan amach fuinneog, iltascáil
 settings-page-region = Teanga agus réigiún

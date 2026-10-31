@@ -46,7 +46,7 @@
 
 <svelte:window onfocus={() => fontLibrary.load()} />
 
-<SubPage title={t('settings-fonts-all')} back={t('settings-fonts-back')} {onclose}>
+<SubPage title={t('settings-fonts-all')} back={t('settings-appearance-text')} {onclose}>
 	<SearchField bind:value={search} label={t('settings-fonts-search')} />
 	{#if problem}
 		<p class="-my-3 px-1.5 text-[13px] text-[var(--danger)]">{problem}</p>

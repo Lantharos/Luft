@@ -1,29 +1,22 @@
 ## Appearance: style
 
 settings-appearance-style = Stílus
-settings-appearance-style-title = Megjelenés
-settings-appearance-style-description = A rendszert követő alkalmazások vele együtt váltanak
 settings-appearance-style-light = Világos
 settings-appearance-style-dark = Sötét
+settings-appearance-style-auto = Automatikus
 settings-appearance-schedule = Automatikus váltás sötétre
-settings-appearance-schedule-off = Ki
 settings-appearance-schedule-sunset = Napnyugtától napkeltéig
 settings-appearance-schedule-custom = Egyéni
-settings-appearance-schedule-sunset-description = A napnyugtát és a napkeltét követi a tartózkodási helye szerint
-settings-appearance-schedule-custom-description = A kiválasztott stílus a következő váltásig marad érvényben
 settings-appearance-dark-from = Sötét mód kezdete
 settings-appearance-light-from = Világos mód kezdete
 settings-appearance-corners = Sarkok
 settings-appearance-corners-rounded = Lekerekített
 settings-appearance-corners-square = Szögletes
-settings-appearance-corners-description = Az ablakok, az alkalmazások, a tálca és a menük is ezt az alakot veszik fel
+settings-appearance-text = Szöveg és betűtípusok
 settings-appearance-pure-black = Tiszta fekete
-settings-appearance-pure-black-description = Teljesen fekete sötét háttér, amely OLED-kijelzőn energiát takarít meg
 settings-appearance-accent = Kiemelőszín
 settings-appearance-accent-wallpaper = Háttérkép
 settings-appearance-accent-white = Fehér
-settings-appearance-accent-white-description = Sötét módban fehér, világos módban fekete
-settings-appearance-accent-wallpaper-description = A háttérképből kiválasztva
 settings-appearance-theme-apps = Más alkalmazások igazítása a háttérképhez
 settings-appearance-theme-apps-description = Más alkalmazások és terminálok is ugyanazokat a színeket veszik fel
 
@@ -71,11 +64,8 @@ settings-appearance-tint-slate = Palaszürke
 
 ## Appearance: text and motion
 
-settings-appearance-text-and-motion = Szöveg és mozgás
 settings-appearance-text-size = Szövegméret
 settings-appearance-text-size-description = Nagyobbá vagy kisebbé teszi a szöveget az alkalmazásokban
-settings-appearance-animations = Animációk
-settings-appearance-animations-description = Az ablakok és menük mozgással jelennek meg, nem azonnal
 
 ## Taskbar
 
@@ -89,10 +79,9 @@ settings-start-style-palette-description = Keresősáv a képernyő közepén al
 settings-start-button = Start gomb megjelenítése
 settings-start-button-description = A Super billentyű így is megnyitja a Start menüt
 settings-start-web = Webes keresőmotor
-settings-taskbar-section = Tálca
 settings-taskbar-shown = Tálca megjelenítése
+settings-taskbar-hidden = Elrejtve
 settings-taskbar-hidden-description = Az óra és az állapotikonok egy sarokban maradnak, a Super billentyű pedig megnyitja a Start menüt
-settings-taskbar-position = Elhelyezés
 settings-taskbar-position-bottom = Lent
 settings-taskbar-position-left = Balra
 settings-taskbar-position-top = Fent
@@ -135,7 +124,6 @@ settings-fonts-monospace-description = Terminálok, kód és minden, ami oszlopo
 settings-fonts-monospace-label = Rögzített szélességű betűtípus
 settings-fonts-all = Összes betűtípus
 settings-fonts-all-description = A számítógépen lévő betűtípusok előnézete, használata vagy a hozzáadottak eltávolítása
-settings-fonts-back = Megjelenés
 settings-fonts-search = Betűtípusok keresése
 settings-fonts-no-match = Nincs ilyen nevű betűtípus
 settings-fonts-default = Alapértelmezett
@@ -171,7 +159,6 @@ settings-cursors-cancel = Mégse
 settings-cursors-remove = Eltávolítás
 settings-cursors-remove-theme = Eltávolítás: { $theme }
 settings-cursors-store = Kurzorok beszerzése
-settings-cursors-back = Megjelenés
 settings-cursors-search = Kurzorok keresése
 settings-cursors-order = Sorrend
 settings-cursors-order-popular = Népszerű
@@ -237,8 +224,6 @@ settings-notifications-done = Kész
 
 ## Window tiling
 
-settings-tiling-preview = Az ablakelrendezés előnézete
-settings-tiling-title = Ablakok csempézése
 settings-tiling-mode = Ablakok elrendezése
 settings-tiling-mode-off = Ki
 settings-tiling-mode-tiling = Csempézés
@@ -249,8 +234,6 @@ settings-tiling-mode-scrolling-description = Minden ablak oszlopként nyílik me
 settings-tiling-layout = Elrendezés
 settings-tiling-layout-dwindle = Spirál
 settings-tiling-layout-master = Fő és halom
-settings-tiling-layout-dwindle-description = Minden új ablak kettéosztja az aktív ablakot
-settings-tiling-layout-master-description = Egy nagy ablak bal oldalon, a többi egymás alatt jobb oldalon
 settings-tiling-gaps = Térközök
 settings-tiling-gaps-none = Nincs
 settings-tiling-gaps-small = Kicsi
@@ -273,6 +256,8 @@ settings-accessibility-large-text = Nagy szöveg
 settings-accessibility-high-contrast = Nagy kontraszt
 settings-accessibility-reduce-motion = Mozgás csökkentése
 settings-accessibility-reduce-motion-description = Csúszás és nagyítás helyett áttűnés
+settings-accessibility-animations = Animációk
+settings-accessibility-animations-description = Az ablakok és menük mozgással jelennek meg, nem azonnal
 settings-accessibility-cursor-size = Kurzorméret
 settings-accessibility-typing = Gépelés
 settings-accessibility-osk = Képernyő-billentyűzet

@@ -13,7 +13,9 @@ settings-page-power = Alimentazione e batteria
 settings-page-input = Input
 settings-page-appearance = Aspetto
     .keywords = sfondo, sfondo del desktop, scuro, chiaro, modalità scura, tema, stile, colore principale, colore, accento, icone delle app, icone colorate, tinta, cursore, puntatore, puntatore del mouse, dimensione cursore, dimensione testo, animazioni, font, caratteri, tipi di carattere, installa font
-settings-page-desktop = Desktop
+settings-page-taskbar = Barra delle applicazioni e Start
+    .keywords = pannello, dock, nascondi automaticamente, nascondi, nascondi la barra delle applicazioni, mobile, flottante, trasparente, app aggiunte, allineamento, pulsante start, menu start, gust, barra di ricerca, avvio app, launcher, ricerca web, cerca sul web, motore di ricerca, schermi, spazio di lavoro, desktop, desktop virtuale
+settings-page-windows = Finestre
 settings-page-notifications = Notifiche
     .keywords = non disturbare, banner, avvisi, schermata di blocco, app
 settings-page-accessibility = Accessibilità
@@ -51,6 +53,8 @@ settings-page-about = Informazioni
 
 ## Search terms for parts of pages
 
+settings-page-wallpaper = Sfondo
+    .keywords = immagine, foto, sfondo video, sfondo animato, pioggia, sfondo della scrivania
 settings-page-keyboard = Tastiera
     .keywords = sorgenti di input, metodi di input, lingue di input, layout, scorciatoie, tasti di scelta rapida, ripetizione tasti, lingua, dettatura
     .copilot-key = tasto copilot
@@ -60,8 +64,6 @@ settings-page-fonts = Font
     .keywords = tutti i font, caratteri, tipi di carattere, famiglie di caratteri, installa font, rimuovi font
 settings-page-cursors = Temi del cursore
     .keywords = cursori, puntatore, puntatore del mouse, altri cursori, scarica cursori
-settings-page-taskbar = Barra delle applicazioni e Start
-    .keywords = pannello, dock, nascondi automaticamente, nascondi, nascondi la barra delle applicazioni, mobile, flottante, trasparente, app aggiunte, allineamento, pulsante start, menu start, gust, barra di ricerca, avvio app, launcher, ricerca web, cerca sul web, motore di ricerca, schermi, spazio di lavoro, desktop, desktop virtuale
 settings-page-tiling = Affiancamento delle finestre
     .keywords = affiancamento, finestre affiancate, tiling, scorrimento, colonne, spaziatura, spirale, dwindle, principale e pila, master, finestre mobili, disposizione delle finestre, multitasking
 settings-page-region = Lingua e regione

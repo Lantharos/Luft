@@ -9,7 +9,7 @@ import { blurSurface, raiseSurface, SURFACE_GAP } from '../../shared/layout/surf
 import { animateActor } from '../../shared/motion/motion.js';
 import { longPress } from '../../shared/input/longPress.js';
 import { menuContent, type MenuEntry, type MenuGroup } from './menuContent.js';
-import { openSettings, type SettingsPageId } from '../../system/settingsPages.js';
+import { openSettings, type SettingsLink } from '../../system/settingsPages.js';
 import { taskbarPreferences } from '../panel/preferences/taskbarPreferences.js';
 import { toward, type Edge } from '../../shared/layout/edge.js';
 import { t } from '../../shared/i18n/index.js';
@@ -117,7 +117,7 @@ export class ContextMenus {
     return entries;
   }
 
-  settings(page: SettingsPageId | null = null): void {
+  settings(page: SettingsLink | null = null): void {
     this.dismissShell();
     openSettings(page);
   }

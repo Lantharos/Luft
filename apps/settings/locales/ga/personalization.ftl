@@ -1,29 +1,22 @@
 ## Appearance: style
 
 settings-appearance-style = Stíl
-settings-appearance-style-title = Cuma
-settings-appearance-style-description = Athraíonn aipeanna a leanann an córas in éineacht leis
 settings-appearance-style-light = Geal
 settings-appearance-style-dark = Dorcha
+settings-appearance-style-auto = Uathoibríoch
 settings-appearance-schedule = Athraigh go dorcha go huathoibríoch
-settings-appearance-schedule-off = As
 settings-appearance-schedule-sunset = Ó luí go héirí na gréine
 settings-appearance-schedule-custom = Saincheaptha
-settings-appearance-schedule-sunset-description = Leanann sé luí agus éirí na gréine san áit a bhfuil tú
-settings-appearance-schedule-custom-description = Maireann stíl a roghnaíonn tú go dtí an chéad athrú eile
 settings-appearance-dark-from = Dorcha ó
 settings-appearance-light-from = Geal ó
 settings-appearance-corners = Coirnéil
 settings-appearance-corners-rounded = Cruinn
 settings-appearance-corners-square = Cearnógach
-settings-appearance-corners-description = Glacann fuinneoga, aipeanna, an tascbharra agus roghchláir an cruth seo
+settings-appearance-text = Téacs agus clónna
 settings-appearance-pure-black = Dubh glan
-settings-appearance-pure-black-description = Cúlraí dorcha atá go hiomlán dubh, a choigleann cumhacht ar OLED
 settings-appearance-accent = Dath béime
 settings-appearance-accent-wallpaper = Cúlbhrat
 settings-appearance-accent-white = Bán
-settings-appearance-accent-white-description = Bán sa stíl dhorcha, dubh sa stíl gheal
-settings-appearance-accent-wallpaper-description = Roghnaithe ó do chúlbhrat
 settings-appearance-theme-apps = Dathanna an chúlbhrait in aipeanna eile
 settings-appearance-theme-apps-description = Glacann aipeanna agus teirminéil eile leis na dathanna céanna
 
@@ -71,11 +64,8 @@ settings-appearance-tint-slate = Slinn
 
 ## Appearance: text and motion
 
-settings-appearance-text-and-motion = Téacs agus gluaiseacht
 settings-appearance-text-size = Méid an téacs
 settings-appearance-text-size-description = Déanann sé an téacs níos mó nó níos lú sna haipeanna go léir
-settings-appearance-animations = Beochan
-settings-appearance-animations-description = Bogann fuinneoga agus roghchláir in áit láithriú ar an toirt
 
 ## Taskbar
 
@@ -89,10 +79,9 @@ settings-start-style-palette-description = Barra cuardaigh i lár an scáileáin
 settings-start-button = Taispeáin an cnaipe Tosaigh
 settings-start-button-description = Osclaíonn Super an roghchlár Tosaigh pé scéal é
 settings-start-web = Cuardaigh an gréasán le
-settings-taskbar-section = Tascbharra
 settings-taskbar-shown = Taispeáin an tascbharra
+settings-taskbar-hidden = I bhfolach
 settings-taskbar-hidden-description = Fanann an clog agus na deilbhíní stádais i gcúinne, agus osclaíonn Super an roghchlár Tosaigh
-settings-taskbar-position = Suíomh
 settings-taskbar-position-bottom = Bun
 settings-taskbar-position-left = Clé
 settings-taskbar-position-top = Barr
@@ -135,7 +124,6 @@ settings-fonts-monospace-description = Teirminéil, cód agus aon rud a ailíní
 settings-fonts-monospace-label = Cló aonspásáilte
 settings-fonts-all = Gach cló
 settings-fonts-all-description = Féach ar na clónna ar an ríomhaire seo, úsáid ceann acu nó bain na cinn a chuir tú leis
-settings-fonts-back = Cuma
 settings-fonts-search = Cuardaigh clónna
 settings-fonts-no-match = Níl aon chló leis an ainm sin
 settings-fonts-default = Réamhshocrú
@@ -174,7 +162,6 @@ settings-cursors-cancel = Cealaigh
 settings-cursors-remove = Bain
 settings-cursors-remove-theme = Bain { $theme }
 settings-cursors-store = Faigh cúrsóirí
-settings-cursors-back = Cuma
 settings-cursors-search = Cuardaigh cúrsóirí
 settings-cursors-order = Ord
 settings-cursors-order-popular = Is coitianta
@@ -243,8 +230,6 @@ settings-notifications-done = Déanta
 
 ## Window tiling
 
-settings-tiling-preview = Réamhamharc ar shocrú na bhfuinneog
-settings-tiling-title = Tíleáil fuinneog
 settings-tiling-mode = Socraigh fuinneoga
 settings-tiling-mode-off = As
 settings-tiling-mode-tiling = Tíleáil
@@ -255,8 +240,6 @@ settings-tiling-mode-scrolling-description = Osclaíonn gach fuinneog mar cholú
 settings-tiling-layout = Leagan amach
 settings-tiling-layout-dwindle = Bíseach
 settings-tiling-layout-master = Príomhfhuinneog agus cruach
-settings-tiling-layout-dwindle-description = Roinneann gach fuinneog nua an fhuinneog ghníomhach ina dhá leath
-settings-tiling-layout-master-description = Fuinneog mhór amháin ar chlé, an chuid eile i gcruach ar dheis
 settings-tiling-gaps = Bearnaí
 settings-tiling-gaps-none = Gan bhearnaí
 settings-tiling-gaps-small = Beag
@@ -279,6 +262,8 @@ settings-accessibility-large-text = Téacs mór
 settings-accessibility-high-contrast = Codarsnacht ard
 settings-accessibility-reduce-motion = Laghdaigh gluaiseacht
 settings-accessibility-reduce-motion-description = Céimnítear isteach agus amach in áit sleamhnú agus súmáil
+settings-accessibility-animations = Beochan
+settings-accessibility-animations-description = Bogann fuinneoga agus roghchláir in áit láithriú ar an toirt
 settings-accessibility-cursor-size = Méid an chúrsóra
 settings-accessibility-typing = Clóscríobh
 settings-accessibility-osk = Méarchlár ar an scáileán

@@ -1,29 +1,22 @@
 ## Appearance: style
 
 settings-appearance-style = Stil
-settings-appearance-style-title = Izgled
-settings-appearance-style-description = Aplikacije koje prate sistem menjaju se zajedno s njim
 settings-appearance-style-light = Svetli
 settings-appearance-style-dark = Tamni
+settings-appearance-style-auto = Automatski
 settings-appearance-schedule = Automatski pređi na tamni
-settings-appearance-schedule-off = Isključeno
 settings-appearance-schedule-sunset = Od zalaska do izlaska sunca
 settings-appearance-schedule-custom = Prilagođeno
-settings-appearance-schedule-sunset-description = Prati zalazak i izlazak sunca na mestu gde se nalazite
-settings-appearance-schedule-custom-description = Izabrani stil ostaje do sledeće promene
 settings-appearance-dark-from = Tamni od
 settings-appearance-light-from = Svetli od
 settings-appearance-corners = Uglovi
 settings-appearance-corners-rounded = Zaobljeni
 settings-appearance-corners-square = Četvrtasti
-settings-appearance-corners-description = Prozori, aplikacije, traka zadataka i meniji dobijaju ovaj oblik
+settings-appearance-text = Tekst i fontovi
 settings-appearance-pure-black = Potpuno crna
-settings-appearance-pure-black-description = Potpuno crne tamne pozadine, koje štede energiju na OLED ekranima
 settings-appearance-accent = Boja za isticanje
 settings-appearance-accent-wallpaper = Pozadina
 settings-appearance-accent-white = Bela
-settings-appearance-accent-white-description = Bela u tamnom stilu, crna u svetlom
-settings-appearance-accent-wallpaper-description = Uzeta sa vaše pozadine
 settings-appearance-theme-apps = Uskladi druge aplikacije s pozadinom
 settings-appearance-theme-apps-description = Druge aplikacije i terminali dobijaju iste boje
 
@@ -82,11 +75,8 @@ settings-appearance-tint-slate = Sivoplava
 
 ## Appearance: text and motion
 
-settings-appearance-text-and-motion = Tekst i pokret
 settings-appearance-text-size = Veličina teksta
 settings-appearance-text-size-description = Povećava ili smanjuje tekst u aplikacijama
-settings-appearance-animations = Animacije
-settings-appearance-animations-description = Prozori i meniji se pokreću umesto da se odmah pojave
 
 ## Taskbar
 
@@ -100,10 +90,9 @@ settings-start-style-palette-description = Traka za pretragu na sredini ekrana z
 settings-start-button = Prikaži dugme Start
 settings-start-button-description = Super svejedno otvara Start
 settings-start-web = Pretraži veb pomoću
-settings-taskbar-section = Traka zadataka
 settings-taskbar-shown = Prikaži traku zadataka
+settings-taskbar-hidden = Skrivena
 settings-taskbar-hidden-description = Sat i ikone statusa ostaju u uglu, a Super otvara Start
-settings-taskbar-position = Položaj
 settings-taskbar-position-bottom = Dole
 settings-taskbar-position-left = Levo
 settings-taskbar-position-top = Gore
@@ -146,7 +135,6 @@ settings-fonts-monospace-description = Terminali, kod i sve što se ređa u kolo
 settings-fonts-monospace-label = Font fiksne širine
 settings-fonts-all = Svi fontovi
 settings-fonts-all-description = Pregledajte fontove na ovom računaru, koristite neki ili uklonite one koje ste dodali
-settings-fonts-back = Izgled
 settings-fonts-search = Pretraži fontove
 settings-fonts-no-match = Nijedan font se tako ne zove
 settings-fonts-default = Podrazumevani
@@ -183,7 +171,6 @@ settings-cursors-cancel = Otkaži
 settings-cursors-remove = Ukloni
 settings-cursors-remove-theme = Ukloni { $theme }
 settings-cursors-store = Nabavi pokazivače
-settings-cursors-back = Izgled
 settings-cursors-search = Pretraži pokazivače
 settings-cursors-order = Redosled
 settings-cursors-order-popular = Popularni
@@ -250,8 +237,6 @@ settings-notifications-done = Gotovo
 
 ## Window tiling
 
-settings-tiling-preview = Pregled rasporeda prozora
-settings-tiling-title = Popločavanje prozora
 settings-tiling-mode = Raspored prozora
 settings-tiling-mode-off = Isključeno
 settings-tiling-mode-tiling = Popločavanje
@@ -262,8 +247,6 @@ settings-tiling-mode-scrolling-description = Svaki prozor se otvara kao kolona n
 settings-tiling-layout = Raspored
 settings-tiling-layout-dwindle = Spirala
 settings-tiling-layout-master = Glavni i gomila
-settings-tiling-layout-dwindle-description = Svaki novi prozor deli aktivni prozor na dva dela
-settings-tiling-layout-master-description = Jedan veliki prozor levo, ostali složeni desno
 settings-tiling-gaps = Razmaci
 settings-tiling-gaps-none = Bez razmaka
 settings-tiling-gaps-small = Mali
@@ -286,6 +269,8 @@ settings-accessibility-large-text = Veliki tekst
 settings-accessibility-high-contrast = Visok kontrast
 settings-accessibility-reduce-motion = Smanji pokrete
 settings-accessibility-reduce-motion-description = Utapanje umesto klizanja i zumiranja
+settings-accessibility-animations = Animacije
+settings-accessibility-animations-description = Prozori i meniji se pokreću umesto da se odmah pojave
 settings-accessibility-cursor-size = Veličina pokazivača
 settings-accessibility-typing = Kucanje
 settings-accessibility-osk = Tastatura na ekranu

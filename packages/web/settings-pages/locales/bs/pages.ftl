@@ -13,7 +13,9 @@ settings-page-power = Napajanje i baterija
 settings-page-input = Unos
 settings-page-appearance = Izgled
     .keywords = pozadina, tamno, svijetlo, tamni način rada, stil, boja za isticanje, ikone aplikacija, obojene ikone, kursor, pokazivač, pokazivač miša, veličina kursora, veličina teksta, animacije, fontovi, pisma, instaliraj fontove
-settings-page-desktop = Radna površina
+settings-page-taskbar = Programska traka i Start
+    .keywords = panel, dok, automatsko skrivanje, sakrij automatski, sakrij programsku traku, plutajuća, prozirna, zakačene aplikacije, poravnanje, dugme start, meni start, start menu, gust, traka za pretragu, pokretač, launcher, web pretraga, pretraživač, ekrani, radni prostor, radna površina, virtuelna radna površina
+settings-page-windows = Prozori
 settings-page-notifications = Obavještenja
     .keywords = ne uznemiravaj, baneri, zaključani ekran, aplikacije
 settings-page-accessibility = Pristupačnost
@@ -51,6 +53,8 @@ settings-page-about = O sistemu
 
 ## Search terms for parts of pages
 
+settings-page-wallpaper = Pozadina
+    .keywords = pozadinska slika, slika, fotografija, video pozadina, živa pozadina, kiša, pozadina radne površine
 settings-page-keyboard = Tastatura
     .keywords = izvori unosa, raspored, prečice, ponavljanje, jezik, diktiranje
     .copilot-key = tipka copilot
@@ -60,9 +64,7 @@ settings-page-fonts = Fontovi
     .keywords = svi fontovi, pisma, porodice fontova, instaliraj fontove, ukloni fontove
 settings-page-cursors = Teme kursora
     .keywords = kursori, pokazivač, pokazivač miša, još kursora, preuzmi kursore
-settings-page-taskbar = Programska traka i Start
-    .keywords = panel, dok, automatsko skrivanje, sakrij automatski, sakrij programsku traku, plutajuća, prozirna, zakačene aplikacije, poravnanje, dugme start, meni start, start menu, gust, traka za pretragu, pokretač, launcher, web pretraga, pretraživač, ekrani, radni prostor, radna površina, virtuelna radna površina
-settings-page-windows = Prozori
+settings-page-corners = Uglovi
     .keywords = zaobljeni uglovi, četvrtasti uglovi, oštri uglovi, uglovi prozora, rounded corners
 settings-page-tiling = Popločavanje prozora
     .keywords = popločavanje, popločani prozori, tiling, pomjeranje, kolone, razmaci, spirala, dwindle, glavni i hrpa, master, plutajući prozori, raspored prozora, multitasking, više zadataka

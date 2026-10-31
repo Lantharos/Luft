@@ -85,7 +85,7 @@
 	onDestroy(events.appearanceWallpapers((list) => (found = list)));
 </script>
 
-<Section title={t('settings-appearance-wallpaper')} description={dark ? t('settings-appearance-wallpaper-dark-description') : t('settings-appearance-wallpaper-light-description')}>
+<Section description={dark ? t('settings-appearance-wallpaper-dark-description') : t('settings-appearance-wallpaper-light-description')}>
 	{#if current}
 		<div class="px-4 pt-4">
 			<WallpaperPreview path={current} {focus} {fill} shape={screen.aspect} onchange={reposition} />
@@ -103,11 +103,17 @@
 			<span>{t('settings-appearance-wallpaper-add')}</span>
 		</button>
 	</div>
+</Section>
+
+<Section>
 	<Row title={t('settings-appearance-wallpaper-folder')} description={t('settings-appearance-wallpaper-folder-description')} icon={FolderOpen} onclick={openFolder} />
 	<Row title={t('settings-appearance-wallpaper-fit-title')} description={t('settings-appearance-wallpaper-fit-description')}>
 		<Select label={t('settings-appearance-wallpaper-fit-title')} options={fitOptions} value={background.values['picture-options'] ?? 'zoom'} onchange={(value) => background.set('picture-options', value)} />
 	</Row>
 	<LiveWallpaperOnBattery />
+</Section>
+
+<Section>
 	<Rain />
 </Section>
 

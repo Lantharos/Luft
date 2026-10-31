@@ -58,7 +58,7 @@
 
 <svelte:window onfocus={() => cursors.load()} />
 
-<Section title={t('settings-cursors')}>
+<Section>
 	{#if problem}
 		<p class="px-4 pt-3.5 text-[13px] text-[var(--danger)]">{problem}</p>
 	{/if}

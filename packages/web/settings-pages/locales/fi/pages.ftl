@@ -13,7 +13,9 @@ settings-page-power = Virta ja akku
 settings-page-input = Syöttö
 settings-page-appearance = Ulkoasu
     .keywords = taustakuva, tausta, tumma, vaalea, tumma tila, teema, tyyli, korostusväri, sovelluskuvakkeet, kuvakkeet, sävytetty, osoitin, kohdistin, hiiren osoitin, osoittimen koko, tekstin koko, fonttikoko, animaatiot, fontit, kirjasimet, asenna fontteja, mukauttaminen
-settings-page-desktop = Työpöytä
+settings-page-taskbar = Tehtäväpalkki ja Start
+    .keywords = paneeli, telakka, dock, piilota automaattisesti, automaattinen piilotus, piilota tehtäväpalkki, kelluva, läpinäkyvä, kiinnitetyt sovellukset, tasaus, start-painike, start-valikko, aloitusvalikko, gust, hakupalkki, hakukenttä, käynnistin, launcher, verkkohaku, hae verkosta, hakukone, näytöt, työtila, työpöytä, virtuaalityöpöytä
+settings-page-windows = Ikkunat
 settings-page-notifications = Ilmoitukset
     .keywords = älä häiritse, bannerit, ilmoitusbannerit, lukitusnäyttö, sovellukset
 settings-page-accessibility = Helppokäyttöisyys
@@ -51,6 +53,8 @@ settings-page-about = Tietoja
 
 ## Search terms for parts of pages
 
+settings-page-wallpaper = Taustakuva
+    .keywords = tausta, kuva, valokuva, videotaustakuva, elävä taustakuva, sade, työpöydän tausta
 settings-page-keyboard = Näppäimistö
     .keywords = syöttölähteet, syöttötavat, asettelu, näppäimistöasettelu, pikanäppäimet, näppäinyhdistelmät, toisto, näppäintoisto, kieli, sanelu
     .copilot-key = copilot-näppäin
@@ -60,8 +64,6 @@ settings-page-fonts = Fontit
     .keywords = kaikki fontit, kirjasimet, kirjasintyypit, fonttiperheet, asenna fontteja, poista fontteja
 settings-page-cursors = Osoitinteemat
     .keywords = osoittimet, kohdistimet, osoitin, hiiren osoitin, kohdistinteemat, hae lisää osoittimia
-settings-page-taskbar = Tehtäväpalkki ja Start
-    .keywords = paneeli, telakka, dock, piilota automaattisesti, automaattinen piilotus, piilota tehtäväpalkki, kelluva, läpinäkyvä, kiinnitetyt sovellukset, tasaus, start-painike, start-valikko, aloitusvalikko, gust, hakupalkki, hakukenttä, käynnistin, launcher, verkkohaku, hae verkosta, hakukone, näytöt, työtila, työpöytä, virtuaalityöpöytä
 settings-page-tiling = Ikkunoiden laatoitus
     .keywords = laatoitus, laatoitetut ikkunat, tiling, vieritys, sarakkeet, välit, spiraali, dwindle, pää- ja pinoalue, master, kelluvat ikkunat, ikkunoiden asettelu, moniajo
 settings-page-region = Kieli ja alue

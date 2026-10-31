@@ -13,7 +13,9 @@ settings-page-power = Strøm og batteri
 settings-page-input = Input
 settings-page-appearance = Udseende
     .keywords = baggrundsbillede, baggrund, mørk, lys, mørk tilstand, stil, tema, accentfarve, appikoner, farvetonet, markør, musemarkør, pil, markørstørrelse, tekststørrelse, skriftstørrelse, animationer, skrifttyper, fonte, installer skrifttyper
-settings-page-desktop = Skrivebord
+settings-page-taskbar = Proceslinje og Start
+    .keywords = panel, dock, skjul automatisk, automatisk skjul, skjul proceslinjen, flydende, gennemsigtig, fastgjorte apps, justering, placering, startknap, start, startmenu, gust, søgelinje, søgefelt, launcher, programstarter, websøgning, søg på nettet, søgemaskine, skærme, arbejdsområde, skrivebord, virtuelt skrivebord
+settings-page-windows = Vinduer
 settings-page-notifications = Notifikationer
     .keywords = forstyr ikke, meddelelser, bannere, låseskærm, apps, beskeder
 settings-page-accessibility = Tilgængelighed
@@ -51,6 +53,8 @@ settings-page-about = Om
 
 ## Search terms for parts of pages
 
+settings-page-wallpaper = Baggrund
+    .keywords = baggrundsbillede, billede, foto, videobaggrund, levende baggrund, regn, skrivebordsbaggrund
 settings-page-keyboard = Tastatur
     .keywords = inputkilder, inputmetoder, tastaturlayout, layout, tastaturgenveje, genveje, gentagelse, tastgentagelse, sprog, diktering
     .copilot-key = copilot-tast
@@ -60,8 +64,6 @@ settings-page-fonts = Skrifttyper
     .keywords = alle skrifttyper, fonte, skrifttypefamilier, installer skrifttyper, fjern skrifttyper
 settings-page-cursors = Markørtemaer
     .keywords = markører, musemarkør, pil, flere markører, hent markører
-settings-page-taskbar = Proceslinje og Start
-    .keywords = panel, dock, skjul automatisk, automatisk skjul, skjul proceslinjen, flydende, gennemsigtig, fastgjorte apps, justering, placering, startknap, start, startmenu, gust, søgelinje, søgefelt, launcher, programstarter, websøgning, søg på nettet, søgemaskine, skærme, arbejdsområde, skrivebord, virtuelt skrivebord
 settings-page-tiling = Fliselægning af vinduer
     .keywords = fliser, fliselagte vinduer, tiling, rulning, kolonner, mellemrum, spiral, dwindle, hoved og stak, master, flydende vinduer, vinduesarrangement, multitasking
 settings-page-region = Sprog og område

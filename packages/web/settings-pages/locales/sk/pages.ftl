@@ -13,7 +13,9 @@ settings-page-power = Napájanie a batéria
 settings-page-input = Vstup
 settings-page-appearance = Vzhľad
     .keywords = pozadie, tapeta, tmavý, svetlý, tmavý režim, štýl, farba zvýraznenia, ikony aplikácií, tónované, kurzor, ukazovateľ, ukazovateľ myši, veľkosť kurzora, veľkosť textu, veľkosť písma, animácie, písma, písmo, fonty, inštalovať písma
-settings-page-desktop = Pracovná plocha
+settings-page-taskbar = Panel úloh a ponuka Start
+    .keywords = panel, lišta, dok, automatické skrývanie, automaticky skryť, skryť panel úloh, plávajúci, priehľadný, pripnuté aplikácie, zarovnanie, tlačidlo start, tlačidlo štart, ponuka start, ponuka štart, start menu, gust, vyhľadávacie pole, spúšťač, launcher, vyhľadávanie na webe, vyhľadávač, search engine, obrazovky, pracovný priestor, pracovná plocha, virtuálna plocha
+settings-page-windows = Okná
 settings-page-notifications = Oznámenia
     .keywords = nerušiť, bannery, upozornenia, hlásenia, uzamknutá obrazovka, aplikácie
 settings-page-accessibility = Prístupnosť
@@ -51,6 +53,8 @@ settings-page-about = Informácie
 
 ## Search terms for parts of pages
 
+settings-page-wallpaper = Tapeta
+    .keywords = pozadie, obrázok, fotka, video tapeta, živá tapeta, dážď, pozadie plochy
 settings-page-keyboard = Klávesnica
     .keywords = vstupné zdroje, rozloženie, jazyk klávesnice, skratky, klávesové skratky, opakovanie, jazyk, diktovanie
     .copilot-key = kláves copilot, copilot
@@ -60,8 +64,6 @@ settings-page-fonts = Písma
     .keywords = všetky písma, písmo, fonty, rodiny písiem, inštalovať písma, odstrániť písma
 settings-page-cursors = Motívy kurzora
     .keywords = kurzory, ukazovateľ, ukazovateľ myši, ďalšie kurzory, získať kurzory
-settings-page-taskbar = Panel úloh a ponuka Start
-    .keywords = panel, lišta, dok, automatické skrývanie, automaticky skryť, skryť panel úloh, plávajúci, priehľadný, pripnuté aplikácie, zarovnanie, tlačidlo start, tlačidlo štart, ponuka start, ponuka štart, start menu, gust, vyhľadávacie pole, spúšťač, launcher, vyhľadávanie na webe, vyhľadávač, search engine, obrazovky, pracovný priestor, pracovná plocha, virtuálna plocha
 settings-page-tiling = Dlaždicové usporiadanie okien
     .keywords = dlaždice, dlaždicové okná, tiling, posúvanie, stĺpce, medzery, špirála, dwindle, hlavné a zásobník, master, plávajúce okná, rozloženie okien, multitasking
 settings-page-region = Jazyk a oblasť

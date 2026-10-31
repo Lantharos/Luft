@@ -13,7 +13,9 @@ settings-page-power = Enerġija u batterija
 settings-page-input = Input
 settings-page-appearance = Dehra
     .keywords = sfond, wallpaper, skur, ċar, modalità skura, dark, light, stil, aċċent, kulur, ikoni tal-apps, ikoni, ikkulurit, kerser, kursur, pointer, pointer tal-maws, daqs tal-kerser, daqs tat-test, animazzjonijiet, fonts, tipi ta’ ittri, installa fonts
-settings-page-desktop = Desktop
+settings-page-taskbar = Taskbar u Start
+    .keywords = panew, dock, aħbi awtomatikament, auto-hide, moħbi, aħbi t-taskbar, hide taskbar, floating, trasparenti, apps imwaħħla, allinjament, buttuna Start, menù Start, start menu, gust, bar tat-tiftix, search bar, launcher, tiftix fuq il-web, web search, magna tat-tiftix, search engine, skrins, spazju tax-xogħol, desktop, desktop virtwali
+settings-page-windows = Twieqi
 settings-page-notifications = Notifiki
     .keywords = tiddisturbax, banners, skrin imsakkar, apps, twissijiet
 settings-page-accessibility = Aċċessibilità
@@ -51,6 +53,8 @@ settings-page-about = Dwar
 
 ## Search terms for parts of pages
 
+settings-page-wallpaper = Wallpaper
+    .keywords = sfond, stampa, ritratt, wallpaper tal-vidjo, wallpaper ħaj, xita, sfond tad-desktop
 settings-page-keyboard = Tastiera
     .keywords = sorsi tal-input, metodu tal-input, tqassim, layout, shortcuts, tasti, ripetizzjoni, lingwa, dettatura
     .copilot-key = tast copilot, buttuna copilot, copilot
@@ -60,8 +64,6 @@ settings-page-fonts = Fonts
     .keywords = il-fonts kollha, tipi ta’ ittri, familji tal-fonts, installa fonts, neħħi fonts
 settings-page-cursors = Temi tal-kerser
     .keywords = kerser, kursur, cursors, pointer, pointer tal-maws, ikseb aktar, kerser ieħor
-settings-page-taskbar = Taskbar u Start
-    .keywords = panew, dock, aħbi awtomatikament, auto-hide, moħbi, aħbi t-taskbar, hide taskbar, floating, trasparenti, apps imwaħħla, allinjament, buttuna Start, menù Start, start menu, gust, bar tat-tiftix, search bar, launcher, tiftix fuq il-web, web search, magna tat-tiftix, search engine, skrins, spazju tax-xogħol, desktop, desktop virtwali
 settings-page-tiling = Tqegħid tat-twieqi ħdejn xulxin
     .keywords = ħdejn xulxin, twieqi ħdejn xulxin, tiling, scrolling, kolonni, spazji, spirali, dwindle, prinċipali u munzell, master, twieqi f’wiċċ l-ilma, tqassim tat-twieqi, multitasking
 settings-page-region = Lingwa u reġjun

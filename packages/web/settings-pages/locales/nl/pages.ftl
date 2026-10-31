@@ -13,7 +13,9 @@ settings-page-power = Energie & batterij
 settings-page-input = Invoer
 settings-page-appearance = Uiterlijk
     .keywords = weergave, achtergrond, bureaubladachtergrond, donker, licht, donkere modus, stijl, accentkleur, app-pictogrammen, pictogrammen, getint, cursor, aanwijzer, muisaanwijzer, cursorgrootte, tekstgrootte, lettergrootte, animaties, lettertypen, lettertypes, lettertypen installeren, thema
-settings-page-desktop = Bureaublad
+settings-page-taskbar = Taakbalk en Start
+    .keywords = paneel, dock, automatisch verbergen, verbergen, taakbalk verbergen, zwevend, transparant, vastgemaakte apps, uitlijning, startknop, startmenu, menu Start, gust, zoekbalk, launcher, starter, op het web zoeken, webzoekopdracht, zoekmachine, beeldschermen, werkblad, werkbladen, bureaublad, virtueel bureaublad
+settings-page-windows = Vensters
 settings-page-notifications = Meldingen
     .keywords = niet storen, banners, meldingen, vergrendelscherm, apps, berichten
 settings-page-accessibility = Toegankelijkheid
@@ -51,6 +53,8 @@ settings-page-about = Info
 
 ## Search terms for parts of pages
 
+settings-page-wallpaper = Achtergrond
+    .keywords = achtergrondafbeelding, afbeelding, foto, video-achtergrond, bewegende achtergrond, regen, bureaubladachtergrond
 settings-page-keyboard = Toetsenbord
     .keywords = invoerbronnen, toetsenbordindeling, indeling, sneltoetsen, toetscombinaties, herhalen, toetsherhaling, taal, dicteren
     .copilot-key = copilot-toets
@@ -60,8 +64,6 @@ settings-page-fonts = Lettertypen
     .keywords = alle lettertypen, lettertypes, fonts, lettertypefamilies, lettertypen installeren, lettertypen verwijderen
 settings-page-cursors = Cursorthema’s
     .keywords = cursors, aanwijzer, muisaanwijzer, meer cursors downloaden
-settings-page-taskbar = Taakbalk en Start
-    .keywords = paneel, dock, automatisch verbergen, verbergen, taakbalk verbergen, zwevend, transparant, vastgemaakte apps, uitlijning, startknop, startmenu, menu Start, gust, zoekbalk, launcher, starter, op het web zoeken, webzoekopdracht, zoekmachine, beeldschermen, werkblad, werkbladen, bureaublad, virtueel bureaublad
 settings-page-tiling = Vensters tegelen
     .keywords = tegelen, getegelde vensters, tiling, scrollen, kolommen, tussenruimte, spiraal, dwindle, hoofdvenster en stapel, master, zwevende vensters, vensterindeling, multitasken
 settings-page-region = Taal & regio

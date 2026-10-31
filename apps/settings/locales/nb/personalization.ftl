@@ -1,29 +1,22 @@
 ## Appearance: style
 
 settings-appearance-style = Stil
-settings-appearance-style-title = Utseende
-settings-appearance-style-description = Apper som følger systemet, bytter samtidig
 settings-appearance-style-light = Lys
 settings-appearance-style-dark = Mørk
+settings-appearance-style-auto = Automatisk
 settings-appearance-schedule = Bytt til mørk modus automatisk
-settings-appearance-schedule-off = Av
 settings-appearance-schedule-sunset = Solnedgang til soloppgang
 settings-appearance-schedule-custom = Egendefinert
-settings-appearance-schedule-sunset-description = Følger solnedgang og soloppgang der du er
-settings-appearance-schedule-custom-description = Stilen du velger, gjelder til neste bytte
 settings-appearance-dark-from = Mørk fra
 settings-appearance-light-from = Lys fra
 settings-appearance-corners = Hjørner
 settings-appearance-corners-rounded = Avrundede
 settings-appearance-corners-square = Firkantede
-settings-appearance-corners-description = Vinduer, apper, oppgavelinjen og menyer får denne formen
+settings-appearance-text = Tekst og skrifttyper
 settings-appearance-pure-black = Helt svart
-settings-appearance-pure-black-description = Helt svarte mørke bakgrunner, som sparer strøm på OLED
 settings-appearance-accent = Aksentfarge
 settings-appearance-accent-wallpaper = Bakgrunnsbilde
 settings-appearance-accent-white = Hvit
-settings-appearance-accent-white-description = Hvit i mørk modus, svart i lys modus
-settings-appearance-accent-wallpaper-description = Hentet fra bakgrunnsbildet ditt
 settings-appearance-theme-apps = Tilpass andre apper til bakgrunnsbildet
 settings-appearance-theme-apps-description = Andre apper og terminaler får de samme fargene
 
@@ -71,11 +64,8 @@ settings-appearance-tint-slate = Skifergrå
 
 ## Appearance: text and motion
 
-settings-appearance-text-and-motion = Tekst og bevegelse
 settings-appearance-text-size = Tekststørrelse
 settings-appearance-text-size-description = Gjør teksten større eller mindre i alle apper
-settings-appearance-animations = Animasjoner
-settings-appearance-animations-description = Vinduer og menyer glir frem i stedet for å dukke opp med en gang
 
 ## Taskbar
 
@@ -89,10 +79,9 @@ settings-start-style-palette-description = Et søkefelt midt på skjermen for ap
 settings-start-button = Vis Start-knappen
 settings-start-button-description = Super åpner Start uansett
 settings-start-web = Søk på nettet med
-settings-taskbar-section = Oppgavelinje
 settings-taskbar-shown = Vis oppgavelinjen
+settings-taskbar-hidden = Skjult
 settings-taskbar-hidden-description = Klokken og statusikonene blir i et hjørne, og Super åpner Start
-settings-taskbar-position = Plassering
 settings-taskbar-position-bottom = Nederst
 settings-taskbar-position-left = Venstre
 settings-taskbar-position-top = Øverst
@@ -135,7 +124,6 @@ settings-fonts-monospace-description = Terminaler, kode og alt som står i kolon
 settings-fonts-monospace-label = Skrift med fast bredde
 settings-fonts-all = Alle skrifter
 settings-fonts-all-description = Forhåndsvis skriftene på denne datamaskinen, bruk en av dem eller fjern de du har lagt til
-settings-fonts-back = Utseende
 settings-fonts-search = Søk i skrifter
 settings-fonts-no-match = Ingen skrift heter det
 settings-fonts-default = Standard
@@ -171,7 +159,6 @@ settings-cursors-cancel = Avbryt
 settings-cursors-remove = Fjern
 settings-cursors-remove-theme = Fjern { $theme }
 settings-cursors-store = Hent markører
-settings-cursors-back = Utseende
 settings-cursors-search = Søk i markører
 settings-cursors-order = Rekkefølge
 settings-cursors-order-popular = Populære
@@ -237,8 +224,6 @@ settings-notifications-done = Ferdig
 
 ## Window tiling
 
-settings-tiling-preview = Forhåndsvisning av vindusoppsett
-settings-tiling-title = Flislegging av vinduer
 settings-tiling-mode = Ordne vinduer
 settings-tiling-mode-off = Av
 settings-tiling-mode-tiling = Fliser
@@ -249,8 +234,6 @@ settings-tiling-mode-scrolling-description = Hvert vindu åpnes som en kolonne p
 settings-tiling-layout = Oppsett
 settings-tiling-layout-dwindle = Spiral
 settings-tiling-layout-master = Hoved og stabel
-settings-tiling-layout-dwindle-description = Hvert nytt vindu deler det aktive vinduet i to
-settings-tiling-layout-master-description = Ett stort vindu til venstre, resten stablet til høyre
 settings-tiling-gaps = Mellomrom
 settings-tiling-gaps-none = Ingen
 settings-tiling-gaps-small = Små
@@ -273,6 +256,8 @@ settings-accessibility-large-text = Stor tekst
 settings-accessibility-high-contrast = Høy kontrast
 settings-accessibility-reduce-motion = Reduser bevegelse
 settings-accessibility-reduce-motion-description = Tone inn og ut i stedet for å gli og zoome
+settings-accessibility-animations = Animasjoner
+settings-accessibility-animations-description = Vinduer og menyer glir frem i stedet for å dukke opp med en gang
 settings-accessibility-cursor-size = Markørstørrelse
 settings-accessibility-typing = Skriving
 settings-accessibility-osk = Skjermtastatur

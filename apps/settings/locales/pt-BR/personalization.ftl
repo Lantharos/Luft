@@ -1,29 +1,22 @@
 ## Appearance: style
 
 settings-appearance-style = Estilo
-settings-appearance-style-title = Aparência
-settings-appearance-style-description = Os apps que seguem o sistema mudam junto
 settings-appearance-style-light = Claro
 settings-appearance-style-dark = Escuro
+settings-appearance-style-auto = Automático
 settings-appearance-schedule = Mudar para o escuro automaticamente
-settings-appearance-schedule-off = Desativado
 settings-appearance-schedule-sunset = Do pôr ao nascer do sol
 settings-appearance-schedule-custom = Personalizado
-settings-appearance-schedule-sunset-description = Segue o pôr e o nascer do sol onde você está
-settings-appearance-schedule-custom-description = O estilo escolhido vale até a próxima mudança
 settings-appearance-dark-from = Escuro a partir de
 settings-appearance-light-from = Claro a partir de
 settings-appearance-corners = Cantos
 settings-appearance-corners-rounded = Arredondados
 settings-appearance-corners-square = Quadrados
-settings-appearance-corners-description = Janelas, aplicativos, a barra de tarefas e os menus assumem esta forma
+settings-appearance-text = Texto e fontes
 settings-appearance-pure-black = Preto puro
-settings-appearance-pure-black-description = Fundos totalmente pretos no modo escuro, que economizam energia em telas OLED
 settings-appearance-accent = Cor de destaque
 settings-appearance-accent-wallpaper = Papel de parede
 settings-appearance-accent-white = Branco
-settings-appearance-accent-white-description = Branco no modo escuro, preto no modo claro
-settings-appearance-accent-wallpaper-description = Tirada do papel de parede
 settings-appearance-theme-apps = Combinar outros apps com o papel de parede
 settings-appearance-theme-apps-description = Outros apps e terminais usam as mesmas cores
 
@@ -71,11 +64,8 @@ settings-appearance-tint-slate = Ardósia
 
 ## Appearance: text and motion
 
-settings-appearance-text-and-motion = Texto e movimento
 settings-appearance-text-size = Tamanho do texto
 settings-appearance-text-size-description = Aumenta ou diminui o texto em todos os apps
-settings-appearance-animations = Animações
-settings-appearance-animations-description = Janelas e menus se movem em vez de aparecerem de uma vez
 
 ## Taskbar
 
@@ -89,10 +79,9 @@ settings-start-style-palette-description = Uma barra de pesquisa no meio da tela
 settings-start-button = Mostrar o botão Start
 settings-start-button-description = Super abre o Start de qualquer forma
 settings-start-web = Pesquisar na web com
-settings-taskbar-section = Barra de tarefas
 settings-taskbar-shown = Mostrar a barra de tarefas
+settings-taskbar-hidden = Oculta
 settings-taskbar-hidden-description = O relógio e os ícones de status ficam em um canto, e Super abre o Start
-settings-taskbar-position = Posição
 settings-taskbar-position-bottom = Embaixo
 settings-taskbar-position-left = Esquerda
 settings-taskbar-position-top = Em cima
@@ -135,7 +124,6 @@ settings-fonts-monospace-description = Terminais, código e tudo o que se alinha
 settings-fonts-monospace-label = Fonte monoespaçada
 settings-fonts-all = Todas as fontes
 settings-fonts-all-description = Veja as fontes deste computador, use uma ou remova as que você adicionou
-settings-fonts-back = Aparência
 settings-fonts-search = Pesquisar fontes
 settings-fonts-no-match = Nenhuma fonte com esse nome
 settings-fonts-default = Padrão
@@ -171,7 +159,6 @@ settings-cursors-cancel = Cancelar
 settings-cursors-remove = Remover
 settings-cursors-remove-theme = Remover { $theme }
 settings-cursors-store = Obter cursores
-settings-cursors-back = Aparência
 settings-cursors-search = Pesquisar cursores
 settings-cursors-order = Ordem
 settings-cursors-order-popular = Populares
@@ -237,8 +224,6 @@ settings-notifications-done = Concluído
 
 ## Window tiling
 
-settings-tiling-preview = Prévia da disposição das janelas
-settings-tiling-title = Mosaico de janelas
 settings-tiling-mode = Organizar janelas
 settings-tiling-mode-off = Desligado
 settings-tiling-mode-tiling = Mosaico
@@ -249,8 +234,6 @@ settings-tiling-mode-scrolling-description = Cada janela abre como uma coluna em
 settings-tiling-layout = Disposição
 settings-tiling-layout-dwindle = Espiral
 settings-tiling-layout-master = Principal e pilha
-settings-tiling-layout-dwindle-description = Cada nova janela divide em duas a janela ativa
-settings-tiling-layout-master-description = Uma janela grande à esquerda e as demais empilhadas à direita
 settings-tiling-gaps = Espaçamento
 settings-tiling-gaps-none = Nenhum
 settings-tiling-gaps-small = Pequeno
@@ -273,6 +256,8 @@ settings-accessibility-large-text = Texto grande
 settings-accessibility-high-contrast = Alto contraste
 settings-accessibility-reduce-motion = Reduzir movimento
 settings-accessibility-reduce-motion-description = Esmaecer em vez de deslizar e ampliar
+settings-accessibility-animations = Animações
+settings-accessibility-animations-description = Janelas e menus se movem em vez de aparecerem de uma vez
 settings-accessibility-cursor-size = Tamanho do cursor
 settings-accessibility-typing = Digitação
 settings-accessibility-osk = Teclado virtual

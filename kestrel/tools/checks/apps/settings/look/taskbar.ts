@@ -1,24 +1,18 @@
-import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 
 import type {LuftApp} from '../../../lib/apps/luftApp.js';
 import {captureEdge} from '../../../taskbar/taskbarOptions/taskbar.js';
 import {settled} from '../../../lib/wait.js';
 import {capture} from '../../../lib/screenshots.js';
-import {scroll, type Point} from '../../../lib/input/input.js';
 import {useScheme} from '../../lib/palette.js';
 import {show} from '../navigation.js';
 
 const LOOKS = ['glass', 'solid', 'transparent', 'accent'];
 const POSITIONS = ['left', 'top', 'right'];
-const TASKBAR_SECTION: Point = [650, 400];
-const TO_TASKBAR_SECTION = 4;
 const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 
 export async function checkTaskbarPositions(app: LuftApp) {
-  const top = await show(app, 'desktop');
-  for (let step = 0; step < TO_TASKBAR_SECTION; step++) scroll(Clutter.ScrollDirection.DOWN, app.at(TASKBAR_SECTION));
-  await app.settle(frame => !frame.looksLike(top));
+  await show(app, 'taskbar');
   try {
     for (const position of POSITIONS) {
       kestrel.set_string('taskbar-position', position);
@@ -32,7 +26,7 @@ export async function checkTaskbarPositions(app: LuftApp) {
 }
 
 export async function checkTaskbarLooks(app: LuftApp) {
-  await show(app, 'desktop');
+  await show(app, 'taskbar');
   try {
     for (const scheme of ['light', 'dark'] as const) {
       useScheme(scheme);

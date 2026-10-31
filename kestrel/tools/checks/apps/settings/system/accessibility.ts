@@ -9,7 +9,7 @@ import {show} from '../navigation.js';
 
 const {require, eventually} = checks('Luft app');
 const SWITCH_X = 959;
-const TYPING_ASSIST: Point = [SWITCH_X, 582];
+const TYPING_ASSIST: Point = [SWITCH_X, 607];
 interface Switch {
   name: string;
   y: number;
@@ -20,10 +20,10 @@ interface Switch {
 }
 
 const SWITCHES: Switch[] = [
-  {name: 'reduce-motion', y: 349, schema: 'org.gnome.desktop.a11y.interface', key: 'reduced-motion', on: value => value.get_string()[0] === 'reduce'},
-  {name: 'high-contrast', y: 293, schema: 'org.gnome.desktop.a11y.interface', key: 'high-contrast', on: value => value.get_boolean()},
-  {name: 'large-text', y: 237, schema: 'org.gnome.desktop.interface', key: 'text-scaling-factor', on: value => value.get_double() > 1},
-  {name: 'sticky-keys', y: 638, schema: 'org.gnome.desktop.a11y.keyboard', key: 'stickykeys-enable', on: value => value.get_boolean(), expand: true},
+  {name: 'reduce-motion', y: 299, schema: 'org.gnome.desktop.a11y.interface', key: 'reduced-motion', on: value => value.get_string()[0] === 'reduce'},
+  {name: 'high-contrast', y: 237, schema: 'org.gnome.desktop.a11y.interface', key: 'high-contrast', on: value => value.get_boolean()},
+  {name: 'large-text', y: 181, schema: 'org.gnome.desktop.interface', key: 'text-scaling-factor', on: value => value.get_double() > 1},
+  {name: 'sticky-keys', y: 663, schema: 'org.gnome.desktop.a11y.keyboard', key: 'stickykeys-enable', on: value => value.get_boolean(), expand: true},
 ];
 
 async function toggle(app: LuftApp, {name, y, schema, key, on, expand}: Switch) {

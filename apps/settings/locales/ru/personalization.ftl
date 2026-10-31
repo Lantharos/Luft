@@ -1,29 +1,22 @@
 ## Appearance: style
 
 settings-appearance-style = Стиль
-settings-appearance-style-title = Оформление
-settings-appearance-style-description = Приложения, которые следуют системе, переключаются вместе с ней
 settings-appearance-style-light = Светлый
 settings-appearance-style-dark = Тёмный
+settings-appearance-style-auto = Авто
 settings-appearance-schedule = Включать тёмный режим автоматически
-settings-appearance-schedule-off = Никогда
 settings-appearance-schedule-sunset = От заката до рассвета
 settings-appearance-schedule-custom = По расписанию
-settings-appearance-schedule-sunset-description = По времени заката и рассвета в вашем местоположении
-settings-appearance-schedule-custom-description = Выбранный вручную режим действует до следующего переключения
 settings-appearance-dark-from = Тёмный с
 settings-appearance-light-from = Светлый с
 settings-appearance-corners = Углы
 settings-appearance-corners-rounded = Скруглённые
 settings-appearance-corners-square = Прямые
-settings-appearance-corners-description = Эту форму принимают окна, приложения, панель задач и меню
+settings-appearance-text = Текст и шрифты
 settings-appearance-pure-black = Чистый чёрный
-settings-appearance-pure-black-description = Полностью чёрный фон в тёмном режиме экономит энергию на OLED-экранах
 settings-appearance-accent = Цвет акцента
 settings-appearance-accent-wallpaper = Из обоев
 settings-appearance-accent-white = Белый
-settings-appearance-accent-white-description = Белый в тёмном режиме, чёрный в светлом
-settings-appearance-accent-wallpaper-description = Подбирается по вашим обоям
 settings-appearance-theme-apps = Подстраивать другие приложения под обои
 settings-appearance-theme-apps-description = Другие приложения и терминалы получают те же цвета
 
@@ -71,11 +64,8 @@ settings-appearance-tint-slate = Сланцевый
 
 ## Appearance: text and motion
 
-settings-appearance-text-and-motion = Текст и анимация
 settings-appearance-text-size = Размер текста
 settings-appearance-text-size-description = Увеличивает или уменьшает текст во всех приложениях
-settings-appearance-animations = Анимация
-settings-appearance-animations-description = Окна и меню плавно появляются, а не возникают мгновенно
 
 ## Taskbar
 
@@ -89,10 +79,9 @@ settings-start-style-palette-description = Строка поиска в цент
 settings-start-button = Показывать кнопку «Пуск»
 settings-start-button-description = Super в любом случае открывает меню «Пуск»
 settings-start-web = Искать в интернете с помощью
-settings-taskbar-section = Панель задач
 settings-taskbar-shown = Показывать панель задач
+settings-taskbar-hidden = Скрыта
 settings-taskbar-hidden-description = Часы и значки состояния остаются в углу, а Super открывает меню «Пуск»
-settings-taskbar-position = Расположение
 settings-taskbar-position-bottom = Снизу
 settings-taskbar-position-left = Слева
 settings-taskbar-position-top = Сверху
@@ -135,7 +124,6 @@ settings-fonts-monospace-description = Терминалы, код и всё, ч�
 settings-fonts-monospace-label = Моноширинный шрифт
 settings-fonts-all = Все шрифты
 settings-fonts-all-description = Просматривайте шрифты на этом компьютере, выбирайте их или удаляйте добавленные
-settings-fonts-back = Оформление
 settings-fonts-search = Поиск шрифтов
 settings-fonts-no-match = Шрифтов с таким названием нет
 settings-fonts-default = По умолчанию
@@ -173,7 +161,6 @@ settings-cursors-cancel = Отмена
 settings-cursors-remove = Удалить
 settings-cursors-remove-theme = Удалить { $theme }
 settings-cursors-store = Скачать курсоры
-settings-cursors-back = Оформление
 settings-cursors-search = Поиск курсоров
 settings-cursors-order = Сортировка
 settings-cursors-order-popular = Популярные
@@ -241,8 +228,6 @@ settings-notifications-done = Готово
 
 ## Window tiling
 
-settings-tiling-preview = Предпросмотр расположения окон
-settings-tiling-title = Мозаичное расположение окон
 settings-tiling-mode = Расположение окон
 settings-tiling-mode-off = Выключено
 settings-tiling-mode-tiling = Мозаика
@@ -253,8 +238,6 @@ settings-tiling-mode-scrolling-description = Каждое окно открыв�
 settings-tiling-layout = Раскладка
 settings-tiling-layout-dwindle = Спираль
 settings-tiling-layout-master = Главное и стопка
-settings-tiling-layout-dwindle-description = Каждое новое окно делит активное окно надвое
-settings-tiling-layout-master-description = Одно большое окно слева, остальные стопкой справа
 settings-tiling-gaps = Отступы
 settings-tiling-gaps-none = Нет
 settings-tiling-gaps-small = Маленькие
@@ -277,6 +260,8 @@ settings-accessibility-large-text = Крупный текст
 settings-accessibility-high-contrast = Высокая контрастность
 settings-accessibility-reduce-motion = Уменьшить движение
 settings-accessibility-reduce-motion-description = Плавное появление вместо сдвига и масштабирования
+settings-accessibility-animations = Анимация
+settings-accessibility-animations-description = Окна и меню плавно появляются, а не возникают мгновенно
 settings-accessibility-cursor-size = Размер курсора
 settings-accessibility-typing = Ввод текста
 settings-accessibility-osk = Экранная клавиатура

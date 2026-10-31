@@ -287,7 +287,7 @@ class KestrelUi {
 
   private desktopMenu(): MenuEntry[] {
     return [
-      { label: t('desktop-menu-wallpaper'), run: () => this.menus.settings('appearance') },
+      { label: t('desktop-menu-wallpaper'), run: () => this.menus.settings('appearance/wallpaper') },
       { label: t('desktop-menu-display-settings'), run: () => this.menus.settings('display') },
       { label: t('desktop-menu-settings'), run: () => this.menus.settings() },
     ];

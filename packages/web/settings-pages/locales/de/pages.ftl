@@ -13,7 +13,9 @@ settings-page-power = Energie & Akku
 settings-page-input = Eingabe
 settings-page-appearance = Darstellung
     .keywords = hintergrundbild, hintergrund, dunkel, hell, dunkler modus, stil, akzentfarbe, app-symbole, getönt, mauszeiger, zeiger, cursor, zeigergröße, textgröße, schriftgröße, animationen, schriftarten, schriften, schriftarten installieren
-settings-page-desktop = Desktop
+settings-page-taskbar = Taskleiste und Start
+    .keywords = leiste, dock, automatisch ausblenden, ausblenden, taskleiste ausblenden, schwebend, transparent, angeheftete apps, ausrichtung, startschaltfläche, start-schaltfläche, startmenü, start menu, gust, suchleiste, launcher, websuche, im web suchen, suchmaschine, bildschirme, arbeitsfläche, desktop, virtueller desktop
+settings-page-windows = Fenster
 settings-page-notifications = Benachrichtigungen
     .keywords = nicht stören, banner, sperrbildschirm, apps, mitteilungen
 settings-page-accessibility = Barrierefreiheit
@@ -51,6 +53,8 @@ settings-page-about = Info
 
 ## Search terms for parts of pages
 
+settings-page-wallpaper = Hintergrundbild
+    .keywords = hintergrund, bild, foto, videohintergrund, live-hintergrund, regen, desktophintergrund
 settings-page-keyboard = Tastatur
     .keywords = eingabequellen, tastaturlayout, layout, tastenkürzel, tastenkombinationen, wiederholung, tastenwiederholung, sprache, diktieren
     .copilot-key = copilot-taste
@@ -60,9 +64,7 @@ settings-page-fonts = Schriftarten
     .keywords = alle schriftarten, schriften, schriftfamilien, schriftarten installieren, schriftarten entfernen
 settings-page-cursors = Zeigerdesigns
     .keywords = mauszeiger, zeiger, cursor, weitere zeiger herunterladen, mehr zeiger
-settings-page-taskbar = Taskleiste und Start
-    .keywords = leiste, dock, automatisch ausblenden, ausblenden, taskleiste ausblenden, schwebend, transparent, angeheftete apps, ausrichtung, startschaltfläche, start-schaltfläche, startmenü, start menu, gust, suchleiste, launcher, websuche, im web suchen, suchmaschine, bildschirme, arbeitsfläche, desktop, virtueller desktop
-settings-page-windows = Fenster
+settings-page-corners = Ecken
     .keywords = abgerundete ecken, runde ecken, eckige ecken, spitze ecken, fensterecken, eckenradius, rounded corners
 settings-page-tiling = Fenster kacheln
     .keywords = kacheln, gekachelte fenster, fensterkacheln, tiling, scrollen, spalten, abstände, spirale, dwindle, haupt- und stapelbereich, master, schwebende fenster, fensteranordnung, multitasking

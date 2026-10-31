@@ -13,7 +13,9 @@ settings-page-power = Napajanje in baterija
 settings-page-input = Vnos
 settings-page-appearance = Videz
     .keywords = ozadje, temno, svetlo, temni način, svetli način, slog, barva poudarka, poudarek, ikone aplikacij, obarvane ikone, kazalec, kazalec miške, velikost kazalca, velikost besedila, animacije, pisave, namestitev pisav
-settings-page-desktop = Namizje
+settings-page-taskbar = Opravilna vrstica in meni Start
+    .keywords = plošča, panel, dok, samodejno skrivanje, samodejno skrij, skrij opravilno vrstico, plavajoča, prosojna, pripete aplikacije, poravnava, gumb start, meni start, start menu, gust, iskalna vrstica, zaganjalnik, launcher, spletno iskanje, iskalnik, search engine, zasloni, delovna površina, namizje, navidezno namizje
+settings-page-windows = Okna
 settings-page-notifications = Obvestila
     .keywords = ne moti, pasice, zaklenjen zaslon, aplikacije, opozorila
 settings-page-accessibility = Dostopnost
@@ -51,6 +53,8 @@ settings-page-about = O sistemu
 
 ## Search terms for parts of pages
 
+settings-page-wallpaper = Ozadje
+    .keywords = slika ozadja, slika, fotografija, video ozadje, živo ozadje, dež, ozadje namizja
 settings-page-keyboard = Tipkovnica
     .keywords = viri vnosa, način vnosa, razporeditev, jezik, bližnjice, ponavljanje tipk, narekovanje
     .copilot-key = tipka copilot, copilot
@@ -60,8 +64,6 @@ settings-page-fonts = Pisave
     .keywords = vse pisave, družine pisav, tipografija, črke, namestitev pisav, odstranitev pisav
 settings-page-cursors = Teme kazalca
     .keywords = kazalci, kazalec, kazalec miške, več kazalcev, prenos kazalcev
-settings-page-taskbar = Opravilna vrstica in meni Start
-    .keywords = plošča, panel, dok, samodejno skrivanje, samodejno skrij, skrij opravilno vrstico, plavajoča, prosojna, pripete aplikacije, poravnava, gumb start, meni start, start menu, gust, iskalna vrstica, zaganjalnik, launcher, spletno iskanje, iskalnik, search engine, zasloni, delovna površina, namizje, navidezno namizje
 settings-page-tiling = Tlakovanje oken
     .keywords = tlakovanje, tlakovana okna, tiling, drsenje, stolpci, razmiki, spirala, dwindle, glavno in sklad, master, plavajoča okna, postavitev oken, večopravilnost
 settings-page-region = Jezik in regija

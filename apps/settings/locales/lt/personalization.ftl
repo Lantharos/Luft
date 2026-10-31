@@ -1,29 +1,22 @@
 ## Appearance: style
 
 settings-appearance-style = Režimas
-settings-appearance-style-title = Išvaizda
-settings-appearance-style-description = Programos, kurios vadovaujasi sistema, persijungia kartu
 settings-appearance-style-light = Šviesus
 settings-appearance-style-dark = Tamsus
+settings-appearance-style-auto = Automatiškai
 settings-appearance-schedule = Automatiškai įjungti tamsųjį režimą
-settings-appearance-schedule-off = Išjungta
 settings-appearance-schedule-sunset = Nuo saulėlydžio iki saulėtekio
 settings-appearance-schedule-custom = Pasirinktinis
-settings-appearance-schedule-sunset-description = Pagal saulėlydį ir saulėtekį jūsų vietovėje
-settings-appearance-schedule-custom-description = Pasirinktas režimas išlieka iki kito perjungimo
 settings-appearance-dark-from = Tamsus nuo
 settings-appearance-light-from = Šviesus nuo
 settings-appearance-corners = Kampai
 settings-appearance-corners-rounded = Suapvalinti
 settings-appearance-corners-square = Kampuoti
-settings-appearance-corners-description = Šią formą įgauna langai, programos, užduočių juosta ir meniu
+settings-appearance-text = Tekstas ir šriftai
 settings-appearance-pure-black = Gryna juoda
-settings-appearance-pure-black-description = Visiškai juodas tamsiojo režimo fonas, taupantis energiją OLED ekranuose
 settings-appearance-accent = Akcento spalva
 settings-appearance-accent-wallpaper = Fono paveikslėlis
 settings-appearance-accent-white = Balta
-settings-appearance-accent-white-description = Balta tamsiajame režime, juoda šviesiajame
-settings-appearance-accent-wallpaper-description = Paimta iš jūsų fono paveikslėlio
 settings-appearance-theme-apps = Derinti kitas programas prie fono paveikslėlio
 settings-appearance-theme-apps-description = Kitos programos ir terminalai įgauna tas pačias spalvas
 
@@ -71,11 +64,8 @@ settings-appearance-tint-slate = Pilkšva
 
 ## Appearance: text and motion
 
-settings-appearance-text-and-motion = Tekstas ir judesys
 settings-appearance-text-size = Teksto dydis
 settings-appearance-text-size-description = Padidina arba sumažina tekstą visose programose
-settings-appearance-animations = Animacija
-settings-appearance-animations-description = Langai ir meniu atsiranda judėdami, o ne iš karto
 
 ## Taskbar
 
@@ -89,10 +79,9 @@ settings-start-style-palette-description = Paieškos juosta ekrano viduryje prog
 settings-start-button = Rodyti mygtuką Pradžia
 settings-start-button-description = Super bet kuriuo atveju atidaro meniu Pradžia
 settings-start-web = Žiniatinklio paieškos sistema
-settings-taskbar-section = Užduočių juosta
 settings-taskbar-shown = Rodyti užduočių juostą
+settings-taskbar-hidden = Paslėpta
 settings-taskbar-hidden-description = Laikrodis ir būsenos piktogramos lieka kampe, o Super atidaro meniu Pradžia
-settings-taskbar-position = Padėtis
 settings-taskbar-position-bottom = Apačioje
 settings-taskbar-position-left = Kairėje
 settings-taskbar-position-top = Viršuje
@@ -135,7 +124,6 @@ settings-fonts-monospace-description = Terminalai, kodas ir viskas, kas lygiuoja
 settings-fonts-monospace-label = Lygiaplotis šriftas
 settings-fonts-all = Visi šriftai
 settings-fonts-all-description = Peržiūrėkite šiame kompiuteryje esančius šriftus, naudokite vieną iš jų arba pašalinkite pridėtus
-settings-fonts-back = Išvaizda
 settings-fonts-search = Ieškoti šriftų
 settings-fonts-no-match = Tokio šrifto nėra
 settings-fonts-default = Numatytasis
@@ -173,7 +161,6 @@ settings-cursors-cancel = Atšaukti
 settings-cursors-remove = Pašalinti
 settings-cursors-remove-theme = Pašalinti temą { $theme }
 settings-cursors-store = Gauti žymiklių
-settings-cursors-back = Išvaizda
 settings-cursors-search = Ieškoti žymiklių
 settings-cursors-order = Rikiavimas
 settings-cursors-order-popular = Populiarūs
@@ -241,8 +228,6 @@ settings-notifications-done = Atlikta
 
 ## Window tiling
 
-settings-tiling-preview = Langų išdėstymo peržiūra
-settings-tiling-title = Langų išklotinė
 settings-tiling-mode = Langų išdėstymas
 settings-tiling-mode-off = Išjungta
 settings-tiling-mode-tiling = Išklotinė
@@ -253,8 +238,6 @@ settings-tiling-mode-scrolling-description = Kiekvienas langas atsiveria kaip st
 settings-tiling-layout = Išdėstymas
 settings-tiling-layout-dwindle = Spiralė
 settings-tiling-layout-master = Pagrindinis ir krūva
-settings-tiling-layout-dwindle-description = Kiekvienas naujas langas padalija aktyvų langą pusiau
-settings-tiling-layout-master-description = Vienas didelis langas kairėje, kiti sukrauti dešinėje
 settings-tiling-gaps = Tarpai
 settings-tiling-gaps-none = Nėra
 settings-tiling-gaps-small = Maži
@@ -277,6 +260,8 @@ settings-accessibility-large-text = Didelis tekstas
 settings-accessibility-high-contrast = Didelis kontrastas
 settings-accessibility-reduce-motion = Mažiau judesio
 settings-accessibility-reduce-motion-description = Išblukimas vietoj slinkimo ir didinimo
+settings-accessibility-animations = Animacija
+settings-accessibility-animations-description = Langai ir meniu atsiranda judėdami, o ne iš karto
 settings-accessibility-cursor-size = Žymiklio dydis
 settings-accessibility-typing = Rašymas
 settings-accessibility-osk = Ekrano klaviatūra

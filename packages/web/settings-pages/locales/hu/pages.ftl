@@ -13,7 +13,9 @@ settings-page-power = Tápellátás és akkumulátor
 settings-page-input = Bevitel
 settings-page-appearance = Megjelenés
     .keywords = háttérkép, háttér, sötét, világos, sötét mód, stílus, kiemelőszín, alkalmazásikonok, színezett, kurzor, mutató, egérmutató, kurzorméret, szövegméret, betűméret, animációk, betűtípusok, betűk, betűtípus telepítése
-settings-page-desktop = Asztal
+settings-page-taskbar = Tálca és Start menü
+    .keywords = panel, dokk, dock, automatikus elrejtés, elrejtés, tálca elrejtése, lebegő, átlátszó, rögzített alkalmazások, igazítás, start gomb, start menü, start menu, gust, keresősáv, indító, launcher, webes keresés, keresőmotor, search engine, kijelzők, munkaterület, asztal, virtuális asztal
+settings-page-windows = Ablakok
 settings-page-notifications = Értesítések
     .keywords = ne zavarjanak, szalagcímek, értesítési szalag, zárolási képernyő, alkalmazások
 settings-page-accessibility = Akadálymentesség
@@ -51,6 +53,8 @@ settings-page-about = Névjegy
 
 ## Search terms for parts of pages
 
+settings-page-wallpaper = Háttérkép
+    .keywords = háttér, kép, fénykép, videós háttérkép, élő háttérkép, eső, asztali háttér
 settings-page-keyboard = Billentyűzet
     .keywords = beviteli források, kiosztás, billentyűzetkiosztás, billentyűparancsok, gyorsbillentyűk, ismétlés, billentyűismétlés, nyelv, diktálás
     .copilot-key = copilot billentyű, copilot gomb
@@ -60,8 +64,6 @@ settings-page-fonts = Betűtípusok
     .keywords = összes betűtípus, betűk, betűcsaládok, betűtípus telepítése, betűtípus eltávolítása, fontok
 settings-page-cursors = Kurzortémák
     .keywords = kurzorok, mutató, egérmutató, további kurzorok, kurzorok letöltése
-settings-page-taskbar = Tálca és Start menü
-    .keywords = panel, dokk, dock, automatikus elrejtés, elrejtés, tálca elrejtése, lebegő, átlátszó, rögzített alkalmazások, igazítás, start gomb, start menü, start menu, gust, keresősáv, indító, launcher, webes keresés, keresőmotor, search engine, kijelzők, munkaterület, asztal, virtuális asztal
 settings-page-tiling = Ablakok csempézése
     .keywords = csempézés, csempézett ablakok, tiling, görgetés, oszlopok, térközök, spirál, dwindle, fő és halom, master, lebegő ablakok, ablakelrendezés, multitasking, többfeladatos munka
 settings-page-region = Nyelv és régió

@@ -13,7 +13,9 @@ settings-page-power = Energia e bateria
 settings-page-input = Entrada
 settings-page-appearance = Aparência
     .keywords = imagem de fundo, fundo, papel de parede, escuro, claro, modo escuro, estilo, tema, cor de destaque, destaque, ícones das aplicações, tonalidade, cursor, ponteiro, ponteiro do rato, tamanho do cursor, tamanho do texto, animações, tipos de letra, fontes, instalar tipos de letra, personalização
-settings-page-desktop = Ambiente de trabalho
+settings-page-taskbar = Barra de tarefas e Start
+    .keywords = painel, dock, ocultar automaticamente, ocultar a barra de tarefas, flutuante, transparente, aplicações afixadas, alinhamento, botão start, botão iniciar, menu start, menu iniciar, gust, barra de pesquisa, iniciador, launcher, pesquisa na web, pesquisa web, motor de pesquisa, ecrãs, área de trabalho, ambiente de trabalho, ambiente de trabalho virtual
+settings-page-windows = Janelas
 settings-page-notifications = Notificações
     .keywords = não incomodar, faixas, banners, avisos, alertas, ecrã de bloqueio, aplicações
 settings-page-accessibility = Acessibilidade
@@ -51,6 +53,8 @@ settings-page-about = Acerca de
 
 ## Search terms for parts of pages
 
+settings-page-wallpaper = Imagem de fundo
+    .keywords = fundo, imagem, fotografia, fundo de vídeo, fundo animado, chuva, fundo do ambiente de trabalho
 settings-page-keyboard = Teclado
     .keywords = fontes de introdução, métodos de introdução, esquema, esquema de teclado, layout, atalhos, atalhos de teclado, repetição, idioma, ditado
     .copilot-key = tecla copilot
@@ -60,8 +64,6 @@ settings-page-fonts = Tipos de letra
     .keywords = todos os tipos de letra, fontes, famílias de tipos de letra, instalar tipos de letra, remover tipos de letra
 settings-page-cursors = Temas de cursor
     .keywords = cursores, ponteiro, ponteiro do rato, obter mais cursores
-settings-page-taskbar = Barra de tarefas e Start
-    .keywords = painel, dock, ocultar automaticamente, ocultar a barra de tarefas, flutuante, transparente, aplicações afixadas, alinhamento, botão start, botão iniciar, menu start, menu iniciar, gust, barra de pesquisa, iniciador, launcher, pesquisa na web, pesquisa web, motor de pesquisa, ecrãs, área de trabalho, ambiente de trabalho, ambiente de trabalho virtual
 settings-page-tiling = Mosaico de janelas
     .keywords = mosaico, janelas em mosaico, tiling, deslocamento, colunas, espaços, espiral, dwindle, principal e pilha, master, janelas flutuantes, disposição das janelas, multitarefa
 settings-page-region = Idioma e região

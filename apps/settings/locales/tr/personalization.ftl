@@ -1,29 +1,22 @@
 ## Appearance: style
 
 settings-appearance-style = Stil
-settings-appearance-style-title = Görünüm
-settings-appearance-style-description = Sistemi izleyen uygulamalar da onunla birlikte değişir
 settings-appearance-style-light = Açık
 settings-appearance-style-dark = Koyu
+settings-appearance-style-auto = Otomatik
 settings-appearance-schedule = Otomatik olarak koyu moda geç
-settings-appearance-schedule-off = Kapalı
 settings-appearance-schedule-sunset = Gün batımından gün doğumuna
 settings-appearance-schedule-custom = Özel
-settings-appearance-schedule-sunset-description = Bulunduğunuz yerdeki gün batımını ve gün doğumunu izler
-settings-appearance-schedule-custom-description = Seçtiğiniz stil bir sonraki geçişe kadar geçerli kalır
 settings-appearance-dark-from = Koyu moda geçiş
 settings-appearance-light-from = Açık moda geçiş
 settings-appearance-corners = Köşeler
 settings-appearance-corners-rounded = Yuvarlak
 settings-appearance-corners-square = Köşeli
-settings-appearance-corners-description = Pencereler, uygulamalar, görev çubuğu ve menüler bu şekli alır
+settings-appearance-text = Metin ve yazı tipleri
 settings-appearance-pure-black = Saf siyah
-settings-appearance-pure-black-description = Tamamen siyah koyu arka planlar, OLED ekranlarda güç tasarrufu sağlar
 settings-appearance-accent = Vurgu rengi
 settings-appearance-accent-wallpaper = Duvar kâğıdı
 settings-appearance-accent-white = Beyaz
-settings-appearance-accent-white-description = Koyu modda beyaz, açık modda siyah
-settings-appearance-accent-wallpaper-description = Duvar kâğıdınızdan alınır
 settings-appearance-theme-apps = Diğer uygulamaları duvar kâğıdına uydur
 settings-appearance-theme-apps-description = Diğer uygulamalar ve terminaller aynı renkleri alır
 
@@ -71,11 +64,8 @@ settings-appearance-tint-slate = Arduvaz
 
 ## Appearance: text and motion
 
-settings-appearance-text-and-motion = Metin ve hareket
 settings-appearance-text-size = Metin boyutu
 settings-appearance-text-size-description = Uygulamalardaki metni büyütür ya da küçültür
-settings-appearance-animations = Animasyonlar
-settings-appearance-animations-description = Pencereler ve menüler bir anda belirmek yerine hareket ederek açılır
 
 ## Taskbar
 
@@ -89,10 +79,9 @@ settings-start-style-palette-description = Ekranın ortasında uygulamalar, penc
 settings-start-button = Başlat düğmesini göster
 settings-start-button-description = Super her durumda Başlat menüsünü açar
 settings-start-web = Web arama motoru
-settings-taskbar-section = Görev çubuğu
 settings-taskbar-shown = Görev çubuğunu göster
+settings-taskbar-hidden = Gizli
 settings-taskbar-hidden-description = Saat ve durum simgeleri bir köşede kalır, Super de Başlat menüsünü açar
-settings-taskbar-position = Konum
 settings-taskbar-position-bottom = Alt
 settings-taskbar-position-left = Sol
 settings-taskbar-position-top = Üst
@@ -135,7 +124,6 @@ settings-fonts-monospace-description = Terminaller, kod ve sütunlar halinde hiz
 settings-fonts-monospace-label = Eş aralıklı yazı tipi
 settings-fonts-all = Tüm yazı tipleri
 settings-fonts-all-description = Bu bilgisayardaki yazı tiplerini önizleyin, birini kullanın ya da eklediklerinizi kaldırın
-settings-fonts-back = Görünüm
 settings-fonts-search = Yazı tiplerinde ara
 settings-fonts-no-match = Bu adda bir yazı tipi yok
 settings-fonts-default = Varsayılan
@@ -171,7 +159,6 @@ settings-cursors-cancel = İptal
 settings-cursors-remove = Kaldır
 settings-cursors-remove-theme = Kaldır: { $theme }
 settings-cursors-store = İmleç edin
-settings-cursors-back = Görünüm
 settings-cursors-search = İmleçlerde ara
 settings-cursors-order = Sıralama
 settings-cursors-order-popular = Popüler
@@ -237,8 +224,6 @@ settings-notifications-done = Bitti
 
 ## Window tiling
 
-settings-tiling-preview = Pencere düzeni önizlemesi
-settings-tiling-title = Pencere döşeme
 settings-tiling-mode = Pencereleri düzenle
 settings-tiling-mode-off = Kapalı
 settings-tiling-mode-tiling = Döşeme
@@ -249,8 +234,6 @@ settings-tiling-mode-scrolling-description = Her pencere yana kayan bir şeritte
 settings-tiling-layout = Düzen
 settings-tiling-layout-dwindle = Spiral
 settings-tiling-layout-master = Ana ve yığın
-settings-tiling-layout-dwindle-description = Her yeni pencere etkin pencereyi ikiye böler
-settings-tiling-layout-master-description = Solda büyük bir pencere, diğerleri sağda yığın halinde
 settings-tiling-gaps = Boşluklar
 settings-tiling-gaps-none = Yok
 settings-tiling-gaps-small = Küçük
@@ -273,6 +256,8 @@ settings-accessibility-large-text = Büyük metin
 settings-accessibility-high-contrast = Yüksek karşıtlık
 settings-accessibility-reduce-motion = Hareketi azalt
 settings-accessibility-reduce-motion-description = Kaydırma ve yakınlaştırma yerine solarak geçiş
+settings-accessibility-animations = Animasyonlar
+settings-accessibility-animations-description = Pencereler ve menüler bir anda belirmek yerine hareket ederek açılır
 settings-accessibility-cursor-size = İmleç boyutu
 settings-accessibility-typing = Yazma
 settings-accessibility-osk = Ekran klavyesi

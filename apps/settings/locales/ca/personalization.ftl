@@ -1,29 +1,22 @@
 ## Appearance: style
 
 settings-appearance-style = Estil
-settings-appearance-style-title = Aparença
-settings-appearance-style-description = Les aplicacions que segueixen el sistema canvien amb ell
 settings-appearance-style-light = Clar
 settings-appearance-style-dark = Fosc
+settings-appearance-style-auto = Automàtic
 settings-appearance-schedule = Canvia a fosc automàticament
-settings-appearance-schedule-off = Mai
 settings-appearance-schedule-sunset = De la posta a la sortida del sol
 settings-appearance-schedule-custom = Personalitzat
-settings-appearance-schedule-sunset-description = Segueix la posta i la sortida del sol on sou
-settings-appearance-schedule-custom-description = El mode que trieu es manté fins al canvi següent
 settings-appearance-dark-from = Fosc a partir de
 settings-appearance-light-from = Clar a partir de
 settings-appearance-corners = Cantonades
 settings-appearance-corners-rounded = Arrodonides
 settings-appearance-corners-square = Quadrades
-settings-appearance-corners-description = Les finestres, les aplicacions, la barra de tasques i els menús prenen aquesta forma
+settings-appearance-text = Text i tipus de lletra
 settings-appearance-pure-black = Negre pur
-settings-appearance-pure-black-description = Fons completament negres en el mode fosc, que estalvien energia en pantalles OLED
 settings-appearance-accent = Color d’èmfasi
 settings-appearance-accent-wallpaper = Fons de pantalla
 settings-appearance-accent-white = Blanc
-settings-appearance-accent-white-description = Blanc en el mode fosc, negre en el mode clar
-settings-appearance-accent-wallpaper-description = Agafat del fons de pantalla
 settings-appearance-theme-apps = Adapta les altres aplicacions al fons de pantalla
 settings-appearance-theme-apps-description = Les altres aplicacions i els terminals prenen els mateixos colors
 
@@ -71,11 +64,8 @@ settings-appearance-tint-slate = Pissarra
 
 ## Appearance: text and motion
 
-settings-appearance-text-and-motion = Text i moviment
 settings-appearance-text-size = Mida del text
 settings-appearance-text-size-description = Fa el text més gran o més petit a totes les aplicacions
-settings-appearance-animations = Animacions
-settings-appearance-animations-description = Les finestres i els menús es mouen en lloc d’aparèixer de cop
 
 ## Taskbar
 
@@ -89,10 +79,9 @@ settings-start-style-palette-description = Una barra de cerca al mig de la panta
 settings-start-button = Mostra el botó Inici
 settings-start-button-description = Super obre Inici igualment
 settings-start-web = Cerca al web amb
-settings-taskbar-section = Barra de tasques
 settings-taskbar-shown = Mostra la barra de tasques
+settings-taskbar-hidden = Amagada
 settings-taskbar-hidden-description = El rellotge i les icones d’estat es queden en un racó, i Super obre Inici
-settings-taskbar-position = Posició
 settings-taskbar-position-bottom = A baix
 settings-taskbar-position-left = A l’esquerra
 settings-taskbar-position-top = A dalt
@@ -135,7 +124,6 @@ settings-fonts-monospace-description = Terminals, codi i tot el que s’alinea e
 settings-fonts-monospace-label = Tipus de lletra monoespaiat
 settings-fonts-all = Tots els tipus de lletra
 settings-fonts-all-description = Previsualitzeu els tipus de lletra d’aquest ordinador, feu-ne servir un o suprimiu els que hàgiu afegit
-settings-fonts-back = Aparença
 settings-fonts-search = Cerca tipus de lletra
 settings-fonts-no-match = Cap tipus de lletra no es diu així
 settings-fonts-default = Predeterminat
@@ -171,7 +159,6 @@ settings-cursors-cancel = Cancel·la
 settings-cursors-remove = Suprimeix
 settings-cursors-remove-theme = Suprimeix { $theme }
 settings-cursors-store = Aconsegueix cursors
-settings-cursors-back = Aparença
 settings-cursors-search = Cerca cursors
 settings-cursors-order = Ordre
 settings-cursors-order-popular = Populars
@@ -237,8 +224,6 @@ settings-notifications-done = Fet
 
 ## Window tiling
 
-settings-tiling-preview = Previsualització de la disposició de finestres
-settings-tiling-title = Mosaic de finestres
 settings-tiling-mode = Organitza les finestres
 settings-tiling-mode-off = Desactivat
 settings-tiling-mode-tiling = Mosaic
@@ -249,8 +234,6 @@ settings-tiling-mode-scrolling-description = Cada finestra s’obre com una colu
 settings-tiling-layout = Disposició
 settings-tiling-layout-dwindle = Espiral
 settings-tiling-layout-master = Principal i pila
-settings-tiling-layout-dwindle-description = Cada finestra nova divideix en dos la finestra activa
-settings-tiling-layout-master-description = Una finestra gran a l’esquerra i la resta apilades a la dreta
 settings-tiling-gaps = Espais
 settings-tiling-gaps-none = Cap
 settings-tiling-gaps-small = Petit
@@ -273,6 +256,8 @@ settings-accessibility-large-text = Text gran
 settings-accessibility-high-contrast = Contrast alt
 settings-accessibility-reduce-motion = Redueix el moviment
 settings-accessibility-reduce-motion-description = Esvaeix en lloc de lliscar i ampliar
+settings-accessibility-animations = Animacions
+settings-accessibility-animations-description = Les finestres i els menús es mouen en lloc d’aparèixer de cop
 settings-accessibility-cursor-size = Mida del cursor
 settings-accessibility-typing = Escriptura
 settings-accessibility-osk = Teclat en pantalla

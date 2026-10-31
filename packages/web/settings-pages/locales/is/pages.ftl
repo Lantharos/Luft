@@ -13,7 +13,9 @@ settings-page-power = Orka og rafhlaða
 settings-page-input = Inntak
 settings-page-appearance = Útlit
     .keywords = bakgrunnsmynd, bakgrunnur, dökkt, ljóst, stíll, þema, áherslulitur, forritatákn, litað, bendill, músarbendill, stærð bendils, textastærð, hreyfingar, hreyfimyndir, letur, leturgerðir, setja upp letur
-settings-page-desktop = Skjáborð
+settings-page-taskbar = Verkstika og Upphaf
+    .keywords = spjald, dokka, fela sjálfkrafa, fela verkstiku, fljótandi, gegnsæ, fest forrit, jöfnun, staðsetning, upphafshnappur, upphaf, upphafsvalmynd, start, start menu, gust, leitarstika, leitarreitur, ræsiforrit, launcher, vefleit, leita á vefnum, leitarvél, skjáir, vinnusvæði, skjáborð, sýndarskjáborð
+settings-page-windows = Gluggar
 settings-page-notifications = Tilkynningar
     .keywords = ekki trufla, borðar, sprettitilkynningar, læsiskjár, forrit
 settings-page-accessibility = Aðgengi
@@ -51,6 +53,8 @@ settings-page-about = Um tölvuna
 
 ## Search terms for parts of pages
 
+settings-page-wallpaper = Bakgrunnsmynd
+    .keywords = bakgrunnur, mynd, ljósmynd, myndbandsbakgrunnur, lifandi bakgrunnur, rigning, skjáborðsbakgrunnur
 settings-page-keyboard = Lyklaborð
     .keywords = inntaksgjafar, innsláttaraðferðir, innsláttur, uppsetning, lyklaborðsuppsetning, flýtilyklar, endurtekning, tungumál, raddinnsláttur, tal í texta
     .copilot-key = copilot-lykill, copilot
@@ -60,8 +64,6 @@ settings-page-fonts = Letur
     .keywords = öll letur, leturgerðir, leturfjölskyldur, setja upp letur, fjarlægja letur
 settings-page-cursors = Bendlaþemu
     .keywords = bendlar, bendill, músarbendill, sækja fleiri bendla
-settings-page-taskbar = Verkstika og Upphaf
-    .keywords = spjald, dokka, fela sjálfkrafa, fela verkstiku, fljótandi, gegnsæ, fest forrit, jöfnun, staðsetning, upphafshnappur, upphaf, upphafsvalmynd, start, start menu, gust, leitarstika, leitarreitur, ræsiforrit, launcher, vefleit, leita á vefnum, leitarvél, skjáir, vinnusvæði, skjáborð, sýndarskjáborð
 settings-page-tiling = Flísalagning glugga
     .keywords = flísar, flísalagðir gluggar, tiling, skrun, dálkar, bil, spírall, dwindle, aðalgluggi og stafli, master, fljótandi gluggar, gluggaröðun, fjölverkavinnsla
 settings-page-region = Tungumál og svæði

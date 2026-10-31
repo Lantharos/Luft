@@ -1,29 +1,22 @@
 ## Appearance: style
 
 settings-appearance-style = Styl
-settings-appearance-style-title = Vzhled
-settings-appearance-style-description = Aplikace, které se řídí systémem, se přepnou s ním
 settings-appearance-style-light = Světlý
 settings-appearance-style-dark = Tmavý
+settings-appearance-style-auto = Automaticky
 settings-appearance-schedule = Automaticky přepínat na tmavý
-settings-appearance-schedule-off = Vypnuto
 settings-appearance-schedule-sunset = Od západu do východu slunce
 settings-appearance-schedule-custom = Vlastní
-settings-appearance-schedule-sunset-description = Řídí se západem a východem slunce ve vaší poloze
-settings-appearance-schedule-custom-description = Ručně zvolený styl platí do dalšího přepnutí
 settings-appearance-dark-from = Tmavý od
 settings-appearance-light-from = Světlý od
 settings-appearance-corners = Rohy
 settings-appearance-corners-rounded = Zaoblené
 settings-appearance-corners-square = Hranaté
-settings-appearance-corners-description = Tento tvar převezmou okna, aplikace, hlavní panel i nabídky
+settings-appearance-text = Text a písma
 settings-appearance-pure-black = Čistě černá
-settings-appearance-pure-black-description = Zcela černá tmavá pozadí, která na displejích OLED šetří energii
 settings-appearance-accent = Barva zvýraznění
 settings-appearance-accent-wallpaper = Tapeta
 settings-appearance-accent-white = Bílá
-settings-appearance-accent-white-description = V tmavém stylu bílá, ve světlém černá
-settings-appearance-accent-wallpaper-description = Vybraná podle vaší tapety
 settings-appearance-theme-apps = Přizpůsobit ostatní aplikace tapetě
 settings-appearance-theme-apps-description = Ostatní aplikace a terminály převezmou stejné barvy
 
@@ -71,11 +64,8 @@ settings-appearance-tint-slate = Břidlicová
 
 ## Appearance: text and motion
 
-settings-appearance-text-and-motion = Text a pohyb
 settings-appearance-text-size = Velikost textu
 settings-appearance-text-size-description = Zvětší nebo zmenší text ve všech aplikacích
-settings-appearance-animations = Animace
-settings-appearance-animations-description = Okna a nabídky se plynule pohybují, místo aby se objevily okamžitě
 
 ## Taskbar
 
@@ -89,10 +79,9 @@ settings-start-style-palette-description = Vyhledávací pole uprostřed obrazov
 settings-start-button = Zobrazovat tlačítko Start
 settings-start-button-description = Klávesa Super otevře nabídku Start v každém případě
 settings-start-web = Webový vyhledávač
-settings-taskbar-section = Hlavní panel
 settings-taskbar-shown = Zobrazovat hlavní panel
+settings-taskbar-hidden = Skrytý
 settings-taskbar-hidden-description = Hodiny a stavové ikony zůstanou v rohu a klávesa Super otevře nabídku Start
-settings-taskbar-position = Umístění
 settings-taskbar-position-bottom = Dole
 settings-taskbar-position-left = Vlevo
 settings-taskbar-position-top = Nahoře
@@ -135,7 +124,6 @@ settings-fonts-monospace-description = Terminály, kód a vše, co se zarovnáv�
 settings-fonts-monospace-label = Neproporcionální písmo
 settings-fonts-all = Všechna písma
 settings-fonts-all-description = Náhled písem v tomto počítači, jejich použití nebo odebrání přidaných
-settings-fonts-back = Vzhled
 settings-fonts-search = Hledat písma
 settings-fonts-no-match = Žádné písmo se tak nejmenuje
 settings-fonts-default = Výchozí
@@ -173,7 +161,6 @@ settings-cursors-cancel = Zrušit
 settings-cursors-remove = Odebrat
 settings-cursors-remove-theme = Odebrat { $theme }
 settings-cursors-store = Získat kurzory
-settings-cursors-back = Vzhled
 settings-cursors-search = Hledat kurzory
 settings-cursors-order = Řazení
 settings-cursors-order-popular = Oblíbené
@@ -241,8 +228,6 @@ settings-notifications-done = Hotovo
 
 ## Window tiling
 
-settings-tiling-preview = Náhled uspořádání oken
-settings-tiling-title = Dlaždicové uspořádání oken
 settings-tiling-mode = Uspořádání oken
 settings-tiling-mode-off = Vypnuto
 settings-tiling-mode-tiling = Dlaždice
@@ -253,8 +238,6 @@ settings-tiling-mode-scrolling-description = Každé okno se otevře jako sloupe
 settings-tiling-layout = Rozvržení
 settings-tiling-layout-dwindle = Spirála
 settings-tiling-layout-master = Hlavní a zásobník
-settings-tiling-layout-dwindle-description = Každé nové okno rozdělí aktivní okno na dvě poloviny
-settings-tiling-layout-master-description = Jedno velké okno vlevo, ostatní naskládaná vpravo
 settings-tiling-gaps = Mezery
 settings-tiling-gaps-none = Žádné
 settings-tiling-gaps-small = Malé
@@ -277,6 +260,8 @@ settings-accessibility-large-text = Velký text
 settings-accessibility-high-contrast = Vysoký kontrast
 settings-accessibility-reduce-motion = Omezit pohyb
 settings-accessibility-reduce-motion-description = Prolínání místo posouvání a přibližování
+settings-accessibility-animations = Animace
+settings-accessibility-animations-description = Okna a nabídky se plynule pohybují, místo aby se objevily okamžitě
 settings-accessibility-cursor-size = Velikost kurzoru
 settings-accessibility-typing = Psaní
 settings-accessibility-osk = Klávesnice na obrazovce

@@ -1,29 +1,22 @@
 ## Appearance: style
 
 settings-appearance-style = Stil
-settings-appearance-style-title = Utseende
-settings-appearance-style-description = Appar som följer systemet byter samtidigt
 settings-appearance-style-light = Ljust
 settings-appearance-style-dark = Mörkt
+settings-appearance-style-auto = Automatiskt
 settings-appearance-schedule = Byt till mörkt automatiskt
-settings-appearance-schedule-off = Av
 settings-appearance-schedule-sunset = Solnedgång till soluppgång
 settings-appearance-schedule-custom = Anpassat
-settings-appearance-schedule-sunset-description = Följer solnedgång och soluppgång där du är
-settings-appearance-schedule-custom-description = Stilen du väljer gäller till nästa byte
 settings-appearance-dark-from = Mörkt från
 settings-appearance-light-from = Ljust från
 settings-appearance-corners = Hörn
 settings-appearance-corners-rounded = Rundade
 settings-appearance-corners-square = Fyrkantiga
-settings-appearance-corners-description = Fönster, appar, aktivitetsfältet och menyer får den här formen
+settings-appearance-text = Text och typsnitt
 settings-appearance-pure-black = Helsvart
-settings-appearance-pure-black-description = Helt svarta bakgrunder i mörkt läge, vilket sparar energi på OLED
 settings-appearance-accent = Accentfärg
 settings-appearance-accent-wallpaper = Bakgrundsbild
 settings-appearance-accent-white = Vit
-settings-appearance-accent-white-description = Vit i mörkt läge, svart i ljust läge
-settings-appearance-accent-wallpaper-description = Hämtas från din bakgrundsbild
 settings-appearance-theme-apps = Anpassa andra appar efter bakgrundsbilden
 settings-appearance-theme-apps-description = Andra appar och terminaler får samma färger
 
@@ -71,11 +64,8 @@ settings-appearance-tint-slate = Skiffergrå
 
 ## Appearance: text and motion
 
-settings-appearance-text-and-motion = Text och rörelse
 settings-appearance-text-size = Textstorlek
 settings-appearance-text-size-description = Gör texten större eller mindre i alla appar
-settings-appearance-animations = Animationer
-settings-appearance-animations-description = Fönster och menyer glider fram i stället för att dyka upp direkt
 
 ## Taskbar
 
@@ -89,10 +79,9 @@ settings-start-style-palette-description = Ett sökfält mitt på skärmen för 
 settings-start-button = Visa Start-knappen
 settings-start-button-description = Super öppnar Start i båda fallen
 settings-start-web = Sök på webben med
-settings-taskbar-section = Aktivitetsfält
 settings-taskbar-shown = Visa aktivitetsfältet
+settings-taskbar-hidden = Dold
 settings-taskbar-hidden-description = Klockan och statusikonerna stannar i ett hörn, och Super öppnar Start
-settings-taskbar-position = Placering
 settings-taskbar-position-bottom = Nederst
 settings-taskbar-position-left = Vänster
 settings-taskbar-position-top = Överst
@@ -135,7 +124,6 @@ settings-fonts-monospace-description = Terminaler, kod och allt som ställs upp 
 settings-fonts-monospace-label = Teckensnitt med fast breddsteg
 settings-fonts-all = Alla teckensnitt
 settings-fonts-all-description = Förhandsgranska teckensnitten på datorn, använd ett eller ta bort sådana du har lagt till
-settings-fonts-back = Utseende
 settings-fonts-search = Sök efter teckensnitt
 settings-fonts-no-match = Inget teckensnitt heter så
 settings-fonts-default = Standard
@@ -171,7 +159,6 @@ settings-cursors-cancel = Avbryt
 settings-cursors-remove = Ta bort
 settings-cursors-remove-theme = Ta bort { $theme }
 settings-cursors-store = Hämta pekare
-settings-cursors-back = Utseende
 settings-cursors-search = Sök efter pekare
 settings-cursors-order = Ordning
 settings-cursors-order-popular = Populära
@@ -237,8 +224,6 @@ settings-notifications-done = Klar
 
 ## Window tiling
 
-settings-tiling-preview = Förhandsvisning av fönsterarrangemang
-settings-tiling-title = Fönsterplattor
 settings-tiling-mode = Ordna fönster
 settings-tiling-mode-off = Av
 settings-tiling-mode-tiling = Plattor
@@ -249,8 +234,6 @@ settings-tiling-mode-scrolling-description = Varje fönster öppnas som en kolum
 settings-tiling-layout = Layout
 settings-tiling-layout-dwindle = Spiral
 settings-tiling-layout-master = Huvud och stapel
-settings-tiling-layout-dwindle-description = Varje nytt fönster delar det aktiva fönstret i två
-settings-tiling-layout-master-description = Ett stort fönster till vänster, resten staplade till höger
 settings-tiling-gaps = Mellanrum
 settings-tiling-gaps-none = Inga
 settings-tiling-gaps-small = Små
@@ -273,6 +256,8 @@ settings-accessibility-large-text = Stor text
 settings-accessibility-high-contrast = Hög kontrast
 settings-accessibility-reduce-motion = Minska rörelse
 settings-accessibility-reduce-motion-description = Tona in i stället för att glida och zooma
+settings-accessibility-animations = Animationer
+settings-accessibility-animations-description = Fönster och menyer glider fram i stället för att dyka upp direkt
 settings-accessibility-cursor-size = Pekarstorlek
 settings-accessibility-typing = Skrivning
 settings-accessibility-osk = Skärmtangentbord

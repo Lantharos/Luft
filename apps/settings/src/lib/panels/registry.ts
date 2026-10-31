@@ -18,6 +18,7 @@ import Mic from '@lucide/svelte/icons/mic';
 import Monitor from '@lucide/svelte/icons/monitor';
 import MonitorCog from '@lucide/svelte/icons/monitor-cog';
 import Palette from '@lucide/svelte/icons/palette';
+import PanelBottom from '@lucide/svelte/icons/panel-bottom';
 import Plus from '@lucide/svelte/icons/plus';
 import Shield from '@lucide/svelte/icons/shield';
 import ShieldCheck from '@lucide/svelte/icons/shield-check';
@@ -67,7 +68,8 @@ const VIEWS: Record<PageId, View> = {
 	},
 	input: { icon: Keyboard, load: input },
 	appearance: { icon: Palette, load: () => import('./personalization/appearance/AppearancePanel.svelte') },
-	desktop: { icon: AppWindow, load: () => import('./personalization/desktop/DesktopPanel.svelte') },
+	taskbar: { icon: PanelBottom, load: () => import('./personalization/taskbar/TaskbarPanel.svelte') },
+	windows: { icon: AppWindow, load: () => import('./personalization/windows/WindowsPanel.svelte') },
 	notifications: { icon: Bell, load: () => import('./personalization/notifications/NotificationsPanel.svelte') },
 	accessibility: { icon: Accessibility, load: () => import('./personalization/accessibility/AccessibilityPanel.svelte') },
 	apps: { icon: LayoutGrid, load: () => import('./protection/apps/AppsPanel.svelte') },

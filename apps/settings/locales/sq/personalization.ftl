@@ -1,29 +1,22 @@
 ## Appearance: style
 
 settings-appearance-style = Stili
-settings-appearance-style-title = Pamja
-settings-appearance-style-description = Aplikacionet që ndjekin sistemin ndryshojnë bashkë me të
 settings-appearance-style-light = I çelët
 settings-appearance-style-dark = I errët
+settings-appearance-style-auto = Automatik
 settings-appearance-schedule = Kalo automatikisht te stili i errët
-settings-appearance-schedule-off = Joaktiv
 settings-appearance-schedule-sunset = Nga perëndimi në lindje të diellit
 settings-appearance-schedule-custom = I personalizuar
-settings-appearance-schedule-sunset-description = Ndjek perëndimin dhe lindjen e diellit aty ku je
-settings-appearance-schedule-custom-description = Stili që zgjedh vlen deri në kalimin e ardhshëm
 settings-appearance-dark-from = I errët nga
 settings-appearance-light-from = I çelët nga
 settings-appearance-corners = Qoshet
 settings-appearance-corners-rounded = Të rrumbullakëta
 settings-appearance-corners-square = Katrore
-settings-appearance-corners-description = Dritaret, aplikacionet, shiriti i detyrave dhe menytë marrin këtë formë
+settings-appearance-text = Teksti dhe shkronjat
 settings-appearance-pure-black = E zezë e plotë
-settings-appearance-pure-black-description = Sfonde krejt të zeza në stilin e errët, që kursejnë energji në OLED
 settings-appearance-accent = Ngjyra e theksimit
 settings-appearance-accent-wallpaper = Sfondi
 settings-appearance-accent-white = E bardhë
-settings-appearance-accent-white-description = E bardhë në stilin e errët, e zezë në stilin e çelët
-settings-appearance-accent-wallpaper-description = Merret nga sfondi yt
 settings-appearance-theme-apps = Përshtat aplikacionet e tjera me sfondin
 settings-appearance-theme-apps-description = Aplikacionet e tjera dhe terminalet marrin të njëjtat ngjyra
 
@@ -82,11 +75,8 @@ settings-appearance-tint-slate = Gri plumbi
 
 ## Appearance: text and motion
 
-settings-appearance-text-and-motion = Teksti dhe lëvizja
 settings-appearance-text-size = Madhësia e tekstit
 settings-appearance-text-size-description = Zmadhon ose zvogëlon tekstin në të gjitha aplikacionet
-settings-appearance-animations = Animacionet
-settings-appearance-animations-description = Dritaret dhe menytë lëvizin në vend që të shfaqen menjëherë
 
 ## Taskbar
 
@@ -100,10 +90,9 @@ settings-start-style-palette-description = Një shirit kërkimi në mes të ekra
 settings-start-button = Shfaq butonin e Fillimit
 settings-start-button-description = Super e hap Fillimin gjithsesi
 settings-start-web = Kërko në ueb me
-settings-taskbar-section = Shiriti i detyrave
 settings-taskbar-shown = Shfaq shiritin e detyrave
+settings-taskbar-hidden = E fshehur
 settings-taskbar-hidden-description = Ora dhe ikonat e gjendjes mbeten në një qoshe, dhe Super hap Fillimin
-settings-taskbar-position = Pozicioni
 settings-taskbar-position-bottom = Poshtë
 settings-taskbar-position-left = Majtas
 settings-taskbar-position-top = Lart
@@ -146,7 +135,6 @@ settings-fonts-monospace-description = Terminalet, kodi dhe gjithçka që rresht
 settings-fonts-monospace-label = Fonti monohapësinor
 settings-fonts-all = Të gjitha fontet
 settings-fonts-all-description = Shih fontet në këtë kompjuter, përdor njërin ose hiq ato që ke shtuar
-settings-fonts-back = Pamja
 settings-fonts-search = Kërko fonte
 settings-fonts-no-match = Asnjë font nuk quhet kështu
 settings-fonts-default = Parazgjedhje
@@ -182,7 +170,6 @@ settings-cursors-cancel = Anulo
 settings-cursors-remove = Hiq
 settings-cursors-remove-theme = Hiq { $theme }
 settings-cursors-store = Merr kursorë
-settings-cursors-back = Pamja
 settings-cursors-search = Kërko kursorë
 settings-cursors-order = Renditja
 settings-cursors-order-popular = Të njohura
@@ -248,8 +235,6 @@ settings-notifications-done = U krye
 
 ## Window tiling
 
-settings-tiling-preview = Paraparje e renditjes së dritareve
-settings-tiling-title = Renditja e dritareve krah për krah
 settings-tiling-mode = Rendit dritaret
 settings-tiling-mode-off = Joaktive
 settings-tiling-mode-tiling = Krah për krah
@@ -260,8 +245,6 @@ settings-tiling-mode-scrolling-description = Çdo dritare hapet si kolonë në n
 settings-tiling-layout = Skema
 settings-tiling-layout-dwindle = Spirale
 settings-tiling-layout-master = Kryesore dhe pirg
-settings-tiling-layout-dwindle-description = Çdo dritare e re e ndan në dysh dritaren aktive
-settings-tiling-layout-master-description = Një dritare e madhe majtas, të tjerat në pirg djathtas
 settings-tiling-gaps = Hapësira
 settings-tiling-gaps-none = Pa hapësira
 settings-tiling-gaps-small = Të vogla
@@ -284,6 +267,8 @@ settings-accessibility-large-text = Tekst i madh
 settings-accessibility-high-contrast = Kontrast i lartë
 settings-accessibility-reduce-motion = Pakëso lëvizjen
 settings-accessibility-reduce-motion-description = Zbehje në vend të rrëshqitjes dhe zmadhimit
+settings-accessibility-animations = Animacionet
+settings-accessibility-animations-description = Dritaret dhe menytë lëvizin në vend që të shfaqen menjëherë
 settings-accessibility-cursor-size = Madhësia e kursorit
 settings-accessibility-typing = Shkrimi
 settings-accessibility-osk = Tastiera në ekran

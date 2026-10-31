@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { appearance, Row, Section } from '@luft/ui';
+	import { appearance, Row, Section, Slider } from '@luft/ui';
+	import { percent } from '#lib/format.js';
+	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import FontPicker from './FontPicker.svelte';
 	import { fontLibrary } from './library.svelte';
 
@@ -9,6 +11,8 @@
 	}
 
 	let { onbrowse }: Props = $props();
+
+	const desktop = useSettings<{ 'text-scaling-factor': number }>('org.gnome.desktop.interface', ['text-scaling-factor']);
 
 	let problem = $state('');
 
@@ -21,6 +25,20 @@
 	</Row>
 	<Row title={t('settings-fonts-monospace')} description={t('settings-fonts-monospace-description')}>
 		<FontPicker role="monospace" label={t('settings-fonts-monospace-label')} family={appearance.typography.monospace ?? fontLibrary.defaults?.monospace ?? ''} onerror={(message) => (problem = message)} />
+	</Row>
+	<Row title={t('settings-appearance-text-size')} description={t('settings-appearance-text-size-description')}>
+		<span class="w-12 text-right tabular-nums">{percent(desktop.values['text-scaling-factor'] ?? 1)}</span>
+		{#snippet below()}
+			<Slider
+				label={t('settings-appearance-text-size')}
+				min={0.8}
+				max={1.6}
+				step={0.05}
+				value={desktop.values['text-scaling-factor'] ?? 1}
+				format={percent}
+				onchange={(value) => desktop.set('text-scaling-factor', value)}
+			/>
+		{/snippet}
 	</Row>
 	<Row title={t('settings-fonts-all')} description={t('settings-fonts-all-description')} onclick={onbrowse} />
 </Section>

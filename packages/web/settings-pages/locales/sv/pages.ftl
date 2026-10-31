@@ -13,7 +13,9 @@ settings-page-power = Energi och batteri
 settings-page-input = Inmatning
 settings-page-appearance = Utseende
     .keywords = bakgrundsbild, bakgrund, skrivbordsbakgrund, mörkt, ljust, mörkt läge, stil, tema, accentfärg, appikoner, tonade, pekare, muspekare, markör, pekarstorlek, textstorlek, teckenstorlek, animationer, teckensnitt, typsnitt, installera teckensnitt
-settings-page-desktop = Skrivbord
+settings-page-taskbar = Aktivitetsfält och Start
+    .keywords = panel, docka, dölj automatiskt, autodölj, dölj aktivitetsfältet, flytande, genomskinlig, transparent, fästa appar, justering, centrera, startknapp, start-knapp, startmeny, start-menyn, gust, sökfält, launcher, programstartare, webbsökning, sök på webben, sökmotor, skärmar, arbetsyta, skrivbord, virtuellt skrivbord
+settings-page-windows = Fönster
 settings-page-notifications = Notiser
     .keywords = stör ej, aviseringar, meddelanden, banderoller, låsskärm, appar
 settings-page-accessibility = Hjälpmedel
@@ -51,6 +53,8 @@ settings-page-about = Om
 
 ## Search terms for parts of pages
 
+settings-page-wallpaper = Bakgrundsbild
+    .keywords = bakgrund, bild, foto, videobakgrund, levande bakgrund, regn, skrivbordsbakgrund
 settings-page-keyboard = Tangentbord
     .keywords = inmatningskällor, tangentbordslayout, layout, kortkommandon, snabbtangenter, upprepning, tangentupprepning, språk, diktering
     .copilot-key = copilot-tangent
@@ -60,8 +64,6 @@ settings-page-fonts = Teckensnitt
     .keywords = alla teckensnitt, typsnitt, typsnittsfamiljer, teckensnittsfamiljer, installera teckensnitt, ta bort teckensnitt
 settings-page-cursors = Pekarteman
     .keywords = pekare, muspekare, markör, markörer, fler pekare, hämta pekare
-settings-page-taskbar = Aktivitetsfält och Start
-    .keywords = panel, docka, dölj automatiskt, autodölj, dölj aktivitetsfältet, flytande, genomskinlig, transparent, fästa appar, justering, centrera, startknapp, start-knapp, startmeny, start-menyn, gust, sökfält, launcher, programstartare, webbsökning, sök på webben, sökmotor, skärmar, arbetsyta, skrivbord, virtuellt skrivbord
 settings-page-tiling = Fönsterplattor
     .keywords = plattor, fönsterplattor, tiling, rullning, kolumner, mellanrum, spiral, dwindle, huvud och stapel, master, flytande fönster, fönsterlayout, multitasking
 settings-page-region = Språk och region

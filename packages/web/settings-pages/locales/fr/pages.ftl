@@ -13,7 +13,9 @@ settings-page-power = Alimentation et batterie
 settings-page-input = Saisie
 settings-page-appearance = Apparence
     .keywords = fond d’écran, arrière-plan, sombre, clair, mode sombre, style, thème, couleur d’accentuation, accent, icônes des applications, teinté, curseur, pointeur, pointeur de la souris, taille du curseur, taille du texte, animations, polices, polices de caractères, installer des polices
-settings-page-desktop = Bureau
+settings-page-taskbar = Barre des tâches et Start
+    .keywords = barre, panneau, dock, masquer automatiquement, masquage automatique, masquer la barre des tâches, flottante, transparente, applications épinglées, alignement, bouton start, bouton démarrer, menu start, menu démarrer, gust, barre de recherche, lanceur, launcher, recherche web, rechercher sur le web, moteur de recherche, écrans, espace de travail, bureau, bureau virtuel
+settings-page-windows = Fenêtres
 settings-page-notifications = Notifications
     .keywords = ne pas déranger, bannières, alertes, écran de verrouillage, applications
 settings-page-accessibility = Accessibilité
@@ -51,6 +53,8 @@ settings-page-about = À propos
 
 ## Search terms for parts of pages
 
+settings-page-wallpaper = Fond d’écran
+    .keywords = arrière-plan, image, photo, fond d’écran vidéo, fond d’écran animé, pluie, fond du bureau
 settings-page-keyboard = Clavier
     .keywords = sources de saisie, méthodes de saisie, disposition, azerty, raccourcis, raccourcis clavier, répétition, répétition des touches, langue, dictée
     .copilot-key = touche copilot
@@ -60,8 +64,6 @@ settings-page-fonts = Polices
     .keywords = toutes les polices, polices de caractères, familles de polices, typographie, installer des polices, supprimer des polices
 settings-page-cursors = Thèmes de curseur
     .keywords = curseurs, pointeur, pointeur de la souris, obtenir d’autres curseurs, plus de curseurs
-settings-page-taskbar = Barre des tâches et Start
-    .keywords = barre, panneau, dock, masquer automatiquement, masquage automatique, masquer la barre des tâches, flottante, transparente, applications épinglées, alignement, bouton start, bouton démarrer, menu start, menu démarrer, gust, barre de recherche, lanceur, launcher, recherche web, rechercher sur le web, moteur de recherche, écrans, espace de travail, bureau, bureau virtuel
 settings-page-tiling = Pavage des fenêtres
     .keywords = pavage, fenêtres pavées, tiling, défilement, colonnes, espacement, spirale, dwindle, principale et pile, master, fenêtres flottantes, disposition des fenêtres, multitâche
 settings-page-region = Langue et région

@@ -13,7 +13,9 @@ settings-page-power = Energjia dhe bateria
 settings-page-input = Hyrja
 settings-page-appearance = Pamja
     .keywords = sfond, sfondi, i errët, i çelët, stil, ngjyra e theksimit, theksim, ikonat e aplikacioneve, të ngjyrosura, kursor, tregues, treguesi i miut, madhësia e kursorit, madhësia e tekstit, animacione, shkronja, fonte, lloje shkronjash, instalo shkronja
-settings-page-desktop = Desktopi
+settings-page-taskbar = Shiriti i detyrave dhe Fillimi
+    .keywords = panel, dok, fshihe automatikisht, fshihu automatikisht, fshih shiritin e detyrave, pluskues, i tejdukshëm, transparent, aplikacione të fiksuara, rreshtim, butoni i fillimit, fillimi, menyja e fillimit, start menu, gust, shiriti i kërkimit, nisës, launcher, kërkim në ueb, motor kërkimi, ekranet, hapësirë pune, desktop, desktop virtual
+settings-page-windows = Dritaret
 settings-page-notifications = Njoftimet
     .keywords = mos shqetëso, banera, ekrani i bllokimit, aplikacione
 settings-page-accessibility = Qasshmëria
@@ -51,6 +53,8 @@ settings-page-about = Rreth
 
 ## Search terms for parts of pages
 
+settings-page-wallpaper = Sfondi
+    .keywords = sfond, figurë, foto, sfond video, sfond i gjallë, shi, sfondi i desktopit
 settings-page-keyboard = Tastiera
     .keywords = burime hyrjeje, skemë, skema e tastierës, shkurtore, përsëritje, gjuhë, diktim
     .copilot-key = tasti copilot
@@ -60,9 +64,7 @@ settings-page-fonts = Shkronjat
     .keywords = të gjitha shkronjat, fonte, lloje shkronjash, familje shkronjash, instalo shkronja, hiq shkronja
 settings-page-cursors = Temat e kursorit
     .keywords = kursorë, tregues, treguesi i miut, merr më shumë kursorë
-settings-page-taskbar = Shiriti i detyrave dhe Fillimi
-    .keywords = panel, dok, fshihe automatikisht, fshihu automatikisht, fshih shiritin e detyrave, pluskues, i tejdukshëm, transparent, aplikacione të fiksuara, rreshtim, butoni i fillimit, fillimi, menyja e fillimit, start menu, gust, shiriti i kërkimit, nisës, launcher, kërkim në ueb, motor kërkimi, ekranet, hapësirë pune, desktop, desktop virtual
-settings-page-windows = Dritaret
+settings-page-corners = Qoshet
     .keywords = qoshe të rrumbullakëta, qoshe katrore, qoshe të mprehta, qoshet e dritareve, rounded corners
 settings-page-tiling = Renditja e dritareve krah për krah
     .keywords = krah për krah, dritare krah për krah, tiling, rrëshqitje, kolona, hapësira, spirale, dwindle, kryesore dhe pirg, master, dritare pluskuese, renditja e dritareve, multitasking, shumë detyra

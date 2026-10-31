@@ -23,7 +23,7 @@ Everything here is in Settings, under **Accessibility**. The lock and login scre
 Luft has two separate choices:
 
 - **Reduce motion**, here, keeps animation but takes out the movement. Slides and zooms become fades, springs lose their bounce, and minimized windows don't fly to the taskbar. Gestures still follow your fingers.
-- **Animations**, under Appearance, turns animation off entirely, so everything changes at once.
+- **Animations** turns animation off entirely, so everything changes at once.
 
 Apps are told about either one, so they can follow it too.
 

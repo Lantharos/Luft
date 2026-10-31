@@ -1,29 +1,22 @@
 ## Appearance: style
 
 settings-appearance-style = Režīms
-settings-appearance-style-title = Izskats
-settings-appearance-style-description = Lietotnes, kas seko sistēmai, pārslēdzas līdz ar to
 settings-appearance-style-light = Gaišs
 settings-appearance-style-dark = Tumšs
+settings-appearance-style-auto = Automātiski
 settings-appearance-schedule = Automātiski pārslēgt uz tumšo režīmu
-settings-appearance-schedule-off = Izslēgts
 settings-appearance-schedule-sunset = No saulrieta līdz saullēktam
 settings-appearance-schedule-custom = Pielāgots
-settings-appearance-schedule-sunset-description = Seko saulrietam un saullēktam jūsu atrašanās vietā
-settings-appearance-schedule-custom-description = Izvēlētais režīms paliek spēkā līdz nākamajai pārslēgšanai
 settings-appearance-dark-from = Tumšs no
 settings-appearance-light-from = Gaišs no
 settings-appearance-corners = Stūri
 settings-appearance-corners-rounded = Noapaļoti
 settings-appearance-corners-square = Taisnstūra
-settings-appearance-corners-description = Šo formu iegūst logi, lietotnes, uzdevumjosla un izvēlnes
+settings-appearance-text = Teksts un fonti
 settings-appearance-pure-black = Tīri melns
-settings-appearance-pure-black-description = Pilnīgi melns tumšais fons, kas OLED ekrānos taupa enerģiju
 settings-appearance-accent = Akcenta krāsa
 settings-appearance-accent-wallpaper = Fona attēls
 settings-appearance-accent-white = Balta
-settings-appearance-accent-white-description = Balta tumšajā režīmā, melna gaišajā režīmā
-settings-appearance-accent-wallpaper-description = Ņemta no jūsu fona attēla
 settings-appearance-theme-apps = Saskaņot citas lietotnes ar fona attēlu
 settings-appearance-theme-apps-description = Citas lietotnes un termināļi iegūst tās pašas krāsas
 
@@ -71,11 +64,8 @@ settings-appearance-tint-slate = Šīferpelēka
 
 ## Appearance: text and motion
 
-settings-appearance-text-and-motion = Teksts un kustība
 settings-appearance-text-size = Teksta lielums
 settings-appearance-text-size-description = Palielina vai samazina tekstu visās lietotnēs
-settings-appearance-animations = Animācijas
-settings-appearance-animations-description = Logi un izvēlnes kustas, nevis parādās uzreiz
 
 ## Taskbar
 
@@ -89,10 +79,9 @@ settings-start-style-palette-description = Meklēšanas josla ekrāna vidū liet
 settings-start-button = Rādīt pogu Start
 settings-start-button-description = Taustiņš Super jebkurā gadījumā atver izvēlni Start
 settings-start-web = Tīmekļa meklētājs
-settings-taskbar-section = Uzdevumjosla
 settings-taskbar-shown = Rādīt uzdevumjoslu
+settings-taskbar-hidden = Paslēpta
 settings-taskbar-hidden-description = Pulkstenis un statusa ikonas paliek stūrī, un taustiņš Super atver izvēlni Start
-settings-taskbar-position = Novietojums
 settings-taskbar-position-bottom = Apakšā
 settings-taskbar-position-left = Pa kreisi
 settings-taskbar-position-top = Augšā
@@ -135,7 +124,6 @@ settings-fonts-monospace-description = Termināļi, kods un viss, kam jāsakrīt
 settings-fonts-monospace-label = Vienplatuma fonts
 settings-fonts-all = Visi fonti
 settings-fonts-all-description = Priekšskatiet šī datora fontus, izmantojiet kādu no tiem vai noņemiet pievienotos
-settings-fonts-back = Izskats
 settings-fonts-search = Meklēt fontus
 settings-fonts-no-match = Nav fonta ar tādu nosaukumu
 settings-fonts-default = Noklusējuma
@@ -172,7 +160,6 @@ settings-cursors-cancel = Atcelt
 settings-cursors-remove = Noņemt
 settings-cursors-remove-theme = Noņemt motīvu { $theme }
 settings-cursors-store = Iegūt kursorus
-settings-cursors-back = Izskats
 settings-cursors-search = Meklēt kursorus
 settings-cursors-order = Secība
 settings-cursors-order-popular = Populārie
@@ -239,8 +226,6 @@ settings-notifications-done = Gatavs
 
 ## Window tiling
 
-settings-tiling-preview = Logu izkārtojuma priekšskatījums
-settings-tiling-title = Logu flīzēšana
 settings-tiling-mode = Kārtot logus
 settings-tiling-mode-off = Izslēgts
 settings-tiling-mode-tiling = Flīzes
@@ -251,8 +236,6 @@ settings-tiling-mode-scrolling-description = Katrs logs atveras kā kolonna uz j
 settings-tiling-layout = Izkārtojums
 settings-tiling-layout-dwindle = Spirāle
 settings-tiling-layout-master = Galvenais un kaudze
-settings-tiling-layout-dwindle-description = Katrs jauns logs sadala aktīvo logu uz pusēm
-settings-tiling-layout-master-description = Viens liels logs kreisajā pusē, pārējie kaudzē labajā pusē
 settings-tiling-gaps = Atstarpes
 settings-tiling-gaps-none = Nav
 settings-tiling-gaps-small = Mazas
@@ -275,6 +258,8 @@ settings-accessibility-large-text = Liels teksts
 settings-accessibility-high-contrast = Augsts kontrasts
 settings-accessibility-reduce-motion = Samazināt kustību
 settings-accessibility-reduce-motion-description = Izgaišana slīdēšanas un tālummaiņas vietā
+settings-accessibility-animations = Animācijas
+settings-accessibility-animations-description = Logi un izvēlnes kustas, nevis parādās uzreiz
 settings-accessibility-cursor-size = Kursora lielums
 settings-accessibility-typing = Rakstīšana
 settings-accessibility-osk = Ekrāntastatūra

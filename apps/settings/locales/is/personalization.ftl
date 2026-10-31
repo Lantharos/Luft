@@ -1,29 +1,22 @@
 ## Appearance: style
 
 settings-appearance-style = Stíll
-settings-appearance-style-title = Útlit
-settings-appearance-style-description = Forrit sem fylgja kerfinu skipta með því
 settings-appearance-style-light = Ljóst
 settings-appearance-style-dark = Dökkt
+settings-appearance-style-auto = Sjálfvirkt
 settings-appearance-schedule = Skipta sjálfkrafa yfir í dökkt
-settings-appearance-schedule-off = Slökkt
 settings-appearance-schedule-sunset = Frá sólsetri til sólarupprásar
 settings-appearance-schedule-custom = Sérsniðið
-settings-appearance-schedule-sunset-description = Fylgir sólsetri og sólarupprás þar sem þú ert
-settings-appearance-schedule-custom-description = Stíll sem þú velur gildir fram að næstu skiptingu
 settings-appearance-dark-from = Dökkt frá
 settings-appearance-light-from = Ljóst frá
 settings-appearance-corners = Horn
 settings-appearance-corners-rounded = Ávöl
 settings-appearance-corners-square = Ferköntuð
-settings-appearance-corners-description = Gluggar, forrit, verkstikan og valmyndir fá þessa lögun
+settings-appearance-text = Texti og letur
 settings-appearance-pure-black = Alsvart
-settings-appearance-pure-black-description = Alveg svartur dökkur bakgrunnur, sem sparar orku á OLED-skjám
 settings-appearance-accent = Áherslulitur
 settings-appearance-accent-wallpaper = Bakgrunnsmynd
 settings-appearance-accent-white = Hvítur
-settings-appearance-accent-white-description = Hvítur í dökku útliti, svartur í ljósu
-settings-appearance-accent-wallpaper-description = Valinn úr bakgrunnsmyndinni þinni
 settings-appearance-theme-apps = Laga önnur forrit að bakgrunnsmyndinni
 settings-appearance-theme-apps-description = Önnur forrit og skipanagluggar fá sömu liti
 
@@ -71,11 +64,8 @@ settings-appearance-tint-slate = Grár
 
 ## Appearance: text and motion
 
-settings-appearance-text-and-motion = Texti og hreyfing
 settings-appearance-text-size = Textastærð
 settings-appearance-text-size-description = Stækkar eða minnkar texta í öllum forritum
-settings-appearance-animations = Hreyfimyndir
-settings-appearance-animations-description = Gluggar og valmyndir hreyfast í stað þess að birtast samstundis
 
 ## Taskbar
 
@@ -89,10 +79,9 @@ settings-start-style-palette-description = Leitarstika á miðjum skjánum fyrir
 settings-start-button = Sýna upphafshnapp
 settings-start-button-description = Super opnar upphafsvalmyndina hvort sem er
 settings-start-web = Leita á vefnum með
-settings-taskbar-section = Verkstika
 settings-taskbar-shown = Sýna verkstiku
+settings-taskbar-hidden = Falin
 settings-taskbar-hidden-description = Klukkan og stöðutáknin haldast í horni og Super opnar upphafsvalmyndina
-settings-taskbar-position = Staðsetning
 settings-taskbar-position-bottom = Neðst
 settings-taskbar-position-left = Vinstri
 settings-taskbar-position-top = Efst
@@ -135,7 +124,6 @@ settings-fonts-monospace-description = Skipanagluggar, kóði og allt sem raðas
 settings-fonts-monospace-label = Jafnbreitt letur
 settings-fonts-all = Öll letur
 settings-fonts-all-description = Forskoðaðu letrin á þessari tölvu, notaðu eitt þeirra eða fjarlægðu letur sem þú bættir við
-settings-fonts-back = Útlit
 settings-fonts-search = Leita að letri
 settings-fonts-no-match = Ekkert letur heitir þetta
 settings-fonts-default = Sjálfgefið
@@ -171,7 +159,6 @@ settings-cursors-cancel = Hætta við
 settings-cursors-remove = Fjarlægja
 settings-cursors-remove-theme = Fjarlægja { $theme }
 settings-cursors-store = Sækja bendla
-settings-cursors-back = Útlit
 settings-cursors-search = Leita að bendlum
 settings-cursors-order = Röðun
 settings-cursors-order-popular = Vinsælast
@@ -237,8 +224,6 @@ settings-notifications-done = Lokið
 
 ## Window tiling
 
-settings-tiling-preview = Forskoðun gluggaröðunar
-settings-tiling-title = Flísalagning glugga
 settings-tiling-mode = Raða gluggum
 settings-tiling-mode-off = Slökkt
 settings-tiling-mode-tiling = Flísar
@@ -249,8 +234,6 @@ settings-tiling-mode-scrolling-description = Hver gluggi opnast sem dálkur á b
 settings-tiling-layout = Uppsetning
 settings-tiling-layout-dwindle = Spírall
 settings-tiling-layout-master = Aðalgluggi og stafli
-settings-tiling-layout-dwindle-description = Hver nýr gluggi skiptir virka glugganum í tvennt
-settings-tiling-layout-master-description = Einn stór gluggi til vinstri, hinir í stafla til hægri
 settings-tiling-gaps = Bil
 settings-tiling-gaps-none = Engin
 settings-tiling-gaps-small = Lítil
@@ -273,6 +256,8 @@ settings-accessibility-large-text = Stór texti
 settings-accessibility-high-contrast = Mikil birtuskil
 settings-accessibility-reduce-motion = Draga úr hreyfingu
 settings-accessibility-reduce-motion-description = Dofna í stað þess að renna og þysja
+settings-accessibility-animations = Hreyfimyndir
+settings-accessibility-animations-description = Gluggar og valmyndir hreyfast í stað þess að birtast samstundis
 settings-accessibility-cursor-size = Stærð bendils
 settings-accessibility-typing = Innsláttur
 settings-accessibility-osk = Skjályklaborð

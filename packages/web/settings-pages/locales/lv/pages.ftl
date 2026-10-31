@@ -13,7 +13,9 @@ settings-page-power = Barošana un akumulators
 settings-page-input = Ievade
 settings-page-appearance = Izskats
     .keywords = fona attēls, fons, tapete, tumšs, gaišs, tumšais režīms, stils, akcenta krāsa, lietotņu ikonas, tonētas, kursors, rādītājs, peles rādītājs, kursora izmērs, teksta izmērs, burtu lielums, animācijas, fonti, šrifti, burtveidoli, instalēt fontus
-settings-page-desktop = Darbvirsma
+settings-page-taskbar = Uzdevumjosla un izvēlne Start
+    .keywords = panelis, josla, dock, automātiski paslēpt, paslēpt, paslēpt uzdevumjoslu, peldoša, caurspīdīga, piespraustās lietotnes, līdzinājums, start poga, izvēlne start, start izvēlne, start menu, gust, meklēšanas josla, palaidējs, launcher, meklēšana tīmeklī, meklētājs, search engine, displeji, darbvieta, darbvirsma, virtuālā darbvirsma
+settings-page-windows = Logi
 settings-page-notifications = Paziņojumi
     .keywords = netraucēt, reklāmkarogi, baneri, bloķēšanas ekrāns, lietotnes, brīdinājumi
 settings-page-accessibility = Pieejamība
@@ -51,6 +53,8 @@ settings-page-about = Par sistēmu
 
 ## Search terms for parts of pages
 
+settings-page-wallpaper = Fona attēls
+    .keywords = fons, attēls, fotogrāfija, video fons, dzīvais fons, lietus, darbvirsmas fons
 settings-page-keyboard = Tastatūra
     .keywords = ievades avoti, izkārtojums, tastatūras izkārtojums, īsinājumtaustiņi, taustiņu kombinācijas, atkārtošana, taustiņu atkārtošana, valoda, diktēšana
     .copilot-key = copilot taustiņš
@@ -60,8 +64,6 @@ settings-page-fonts = Fonti
     .keywords = visi fonti, šrifti, burtveidoli, fontu saimes, instalēt fontus, noņemt fontus
 settings-page-cursors = Kursoru motīvi
     .keywords = kursori, rādītājs, peles rādītājs, motīvs, iegūt vairāk kursoru
-settings-page-taskbar = Uzdevumjosla un izvēlne Start
-    .keywords = panelis, josla, dock, automātiski paslēpt, paslēpt, paslēpt uzdevumjoslu, peldoša, caurspīdīga, piespraustās lietotnes, līdzinājums, start poga, izvēlne start, start izvēlne, start menu, gust, meklēšanas josla, palaidējs, launcher, meklēšana tīmeklī, meklētājs, search engine, displeji, darbvieta, darbvirsma, virtuālā darbvirsma
 settings-page-tiling = Logu flīzēšana
     .keywords = flīzes, flīzēti logi, tiling, ritināšana, kolonnas, atstarpes, spirāle, dwindle, galvenais un kaudze, master, peldoši logi, logu izkārtojums, multitasking, daudzuzdevumu režīms
 settings-page-region = Valoda un reģions

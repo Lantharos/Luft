@@ -176,7 +176,7 @@ Keyboard switches, Super and the wheel, and swipes all drive the same spring, so
 
 Settings has two separate choices:
 
-- **Appearance → Animations** turns animation off entirely. Everything changes at once.
+- **Accessibility → Animations** turns animation off entirely. Everything changes at once.
 - **Accessibility → Reduce motion** keeps animation but takes out the movement. Slides and zooms become fades, springs lose their bounce, and gestures still follow the fingers and settle.
 
 Kestrel reads them from `org.gnome.desktop.interface enable-animations` and `org.gnome.desktop.a11y.interface reduced-motion`, and its settings portal reports either as reduced motion to other apps. In Kestrel, workspace switches become a crossfade and surfaces fade in place. The apps see them as `data-motion="off"` or `data-motion="reduced"` on the root element, and `motionPreference()` returns `full`, `reduced` or `off`. `SpringValue` changes at once under reduced motion unless it settles a gesture.

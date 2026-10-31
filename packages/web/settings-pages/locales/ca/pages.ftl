@@ -13,7 +13,9 @@ settings-page-power = Energia i bateria
 settings-page-input = Entrada
 settings-page-appearance = Aparença
     .keywords = fons de pantalla, fons, fosc, clar, mode fosc, estil, tema, èmfasi, color d’èmfasi, icones, icones tenyides, cursor, punter, punter del ratolí, mida del cursor, mida del text, animacions, tipus de lletra, lletres, fonts, instal·lar tipus de lletra
-settings-page-desktop = Escriptori
+settings-page-taskbar = Barra de tasques i Inici
+    .keywords = tauler, dock, amagar automàticament, ocultació automàtica, amagar la barra de tasques, flotant, transparent, aplicacions fixades, alineació, botó d’inici, inici, menú inici, gust, barra de cerca, llançador, launcher, cerca al web, cerca web, motor de cerca, cercador, pantalles, espai de treball, escriptori, escriptori virtual
+settings-page-windows = Finestres
 settings-page-notifications = Notificacions
     .keywords = no molestis, bàners, avisos, pantalla de bloqueig, aplicacions
 settings-page-accessibility = Accessibilitat
@@ -51,6 +53,8 @@ settings-page-about = Quant a
 
 ## Search terms for parts of pages
 
+settings-page-wallpaper = Fons de pantalla
+    .keywords = fons, imatge, foto, fons de vídeo, fons animat, pluja, fons de l’escriptori
 settings-page-keyboard = Teclat
     .keywords = fonts d’entrada, mètodes d’entrada, disposició, distribució, dreceres, dreceres de teclat, repetició, llengua, idioma, dictat
     .copilot-key = tecla copilot
@@ -60,8 +64,6 @@ settings-page-fonts = Tipus de lletra
     .keywords = tots els tipus de lletra, lletres, fonts, famílies tipogràfiques, instal·lar tipus de lletra, suprimir tipus de lletra
 settings-page-cursors = Temes de cursor
     .keywords = cursors, punter, punter del ratolí, aconseguir més cursors, més cursors
-settings-page-taskbar = Barra de tasques i Inici
-    .keywords = tauler, dock, amagar automàticament, ocultació automàtica, amagar la barra de tasques, flotant, transparent, aplicacions fixades, alineació, botó d’inici, inici, menú inici, gust, barra de cerca, llançador, launcher, cerca al web, cerca web, motor de cerca, cercador, pantalles, espai de treball, escriptori, escriptori virtual
 settings-page-tiling = Mosaic de finestres
     .keywords = mosaic, finestres en mosaic, tiling, desplaçament, columnes, espais, espiral, dwindle, principal i pila, master, finestres flotants, disposició de finestres, multitasca
 settings-page-region = Llengua i regió

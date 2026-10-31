@@ -1,29 +1,22 @@
 ## Appearance: style
 
 settings-appearance-style = Režiim
-settings-appearance-style-title = Välimus
-settings-appearance-style-description = Süsteemi järgivad rakendused vahetuvad koos sellega
 settings-appearance-style-light = Hele
 settings-appearance-style-dark = Tume
+settings-appearance-style-auto = Automaatne
 settings-appearance-schedule = Automaatne üleminek tumedale
-settings-appearance-schedule-off = Väljas
 settings-appearance-schedule-sunset = Päikeseloojangust tõusuni
 settings-appearance-schedule-custom = Kohandatud
-settings-appearance-schedule-sunset-description = Järgib päikeseloojangut ja -tõusu sinu asukohas
-settings-appearance-schedule-custom-description = Valitud režiim kehtib järgmise vahetuseni
 settings-appearance-dark-from = Tume alates
 settings-appearance-light-from = Hele alates
 settings-appearance-corners = Nurgad
 settings-appearance-corners-rounded = Ümarad
 settings-appearance-corners-square = Kandilised
-settings-appearance-corners-description = Aknad, rakendused, tegumiriba ja menüüd võtavad selle kuju
+settings-appearance-text = Tekst ja fondid
 settings-appearance-pure-black = Puhas must
-settings-appearance-pure-black-description = Täiesti mustad tumedad taustad, mis säästavad OLED-ekraanil energiat
 settings-appearance-accent = Rõhuvärv
 settings-appearance-accent-wallpaper = Taustapilt
 settings-appearance-accent-white = Valge
-settings-appearance-accent-white-description = Tumedas režiimis valge, heledas režiimis must
-settings-appearance-accent-wallpaper-description = Võetud sinu taustapildilt
 settings-appearance-theme-apps = Sobita teised rakendused taustapildiga
 settings-appearance-theme-apps-description = Teised rakendused ja terminalid võtavad samad värvid
 
@@ -71,11 +64,8 @@ settings-appearance-tint-slate = Hallikassinine
 
 ## Appearance: text and motion
 
-settings-appearance-text-and-motion = Tekst ja liikumine
 settings-appearance-text-size = Teksti suurus
 settings-appearance-text-size-description = Muudab teksti rakendustes suuremaks või väiksemaks
-settings-appearance-animations = Animatsioonid
-settings-appearance-animations-description = Aknad ja menüüd liiguvad, selle asemel et kohe ilmuda
 
 ## Taskbar
 
@@ -89,10 +79,9 @@ settings-start-style-palette-description = Otsinguriba ekraani keskel rakenduste
 settings-start-button = Kuva nupp Start
 settings-start-button-description = Klahv Super avab menüü Start igal juhul
 settings-start-web = Otsingumootor
-settings-taskbar-section = Tegumiriba
 settings-taskbar-shown = Kuva tegumiriba
+settings-taskbar-hidden = Peidetud
 settings-taskbar-hidden-description = Kell ja olekuikoonid jäävad nurka ning klahv Super avab menüü Start
-settings-taskbar-position = Asukoht
 settings-taskbar-position-bottom = All
 settings-taskbar-position-left = Vasakul
 settings-taskbar-position-top = Üleval
@@ -135,7 +124,6 @@ settings-fonts-monospace-description = Terminalid, kood ja kõik, mis joondub ve
 settings-fonts-monospace-label = Püsisammuga font
 settings-fonts-all = Kõik fondid
 settings-fonts-all-description = Vaata selle arvuti fonte, võta üks kasutusele või eemalda lisatud fonte
-settings-fonts-back = Välimus
 settings-fonts-search = Otsi fonte
 settings-fonts-no-match = Sellenimelist fonti pole
 settings-fonts-default = Vaikimisi
@@ -172,7 +160,6 @@ settings-cursors-cancel = Loobu
 settings-cursors-remove = Eemalda
 settings-cursors-remove-theme = Eemalda { $theme }
 settings-cursors-store = Hangi kursoreid
-settings-cursors-back = Välimus
 settings-cursors-search = Otsi kursoreid
 settings-cursors-order = Järjestus
 settings-cursors-order-popular = Populaarsed
@@ -239,8 +226,6 @@ settings-notifications-done = Valmis
 
 ## Window tiling
 
-settings-tiling-preview = Akende paigutuse eelvaade
-settings-tiling-title = Akende paanimine
 settings-tiling-mode = Akende paigutus
 settings-tiling-mode-off = Väljas
 settings-tiling-mode-tiling = Paanid
@@ -251,8 +236,6 @@ settings-tiling-mode-scrolling-description = Iga aken avaneb veeruna ribal, mis 
 settings-tiling-layout = Paigutus
 settings-tiling-layout-dwindle = Spiraal
 settings-tiling-layout-master = Põhiaken ja virn
-settings-tiling-layout-dwindle-description = Iga uus aken jagab aktiivse akna kaheks
-settings-tiling-layout-master-description = Üks suur aken vasakul, ülejäänud virnas paremal
 settings-tiling-gaps = Vahed
 settings-tiling-gaps-none = Puuduvad
 settings-tiling-gaps-small = Väikesed
@@ -275,6 +258,8 @@ settings-accessibility-large-text = Suur tekst
 settings-accessibility-high-contrast = Kõrge kontrast
 settings-accessibility-reduce-motion = Vähenda liikumist
 settings-accessibility-reduce-motion-description = Libisemise ja suumimise asemel hajutus
+settings-accessibility-animations = Animatsioonid
+settings-accessibility-animations-description = Aknad ja menüüd liiguvad, selle asemel et kohe ilmuda
 settings-accessibility-cursor-size = Kursori suurus
 settings-accessibility-typing = Tippimine
 settings-accessibility-osk = Ekraaniklaviatuur

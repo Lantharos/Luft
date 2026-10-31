@@ -50,7 +50,7 @@
 	});
 </script>
 
-<Section title={t('settings-appearance-icons')}>
+<Section>
 	<div class="grid grid-cols-3 gap-3 px-4 py-3.5">
 		{#each STYLES as option (option.value)}
 			<button type="button" class="choice" class:selected={style === option.value} aria-pressed={style === option.value} onclick={() => kestrel.set('app-icon-style', option.value)}>

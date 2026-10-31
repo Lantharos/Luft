@@ -14,14 +14,14 @@ function systemHeadline({ returning, switching, staged, available }: ImageOvervi
 	if (switching) return switching === 'nvidia' ? t('settings-updates-nvidia-ready') : t('settings-updates-standard-ready');
 	if (available) return named(available, 'settings-updates-version-available', 'settings-updates-version-available-new');
 	if (staged) return named(staged, 'settings-updates-version-staged', 'settings-updates-version-staged-new');
-	return t('settings-updates-up-to-date');
+	return null;
 }
 
 export function headline(overview: UpdatesOverview | null, activity: Activity) {
 	const running = describe(activity);
 	if (running) return running;
 	if (!overview) return t('settings-updates-checking');
-	return systemHeadline(overview.system);
+	return systemHeadline(overview.system) ?? t(overview.checked ? 'settings-updates-up-to-date' : 'settings-updates-never-checked');
 }
 
 function waiting({ system }: UpdatesOverview) {
@@ -36,5 +36,5 @@ export function subline(overview: UpdatesOverview | null, activity: Activity, fa
 	if (!overview) return '';
 	const restart = waiting(overview);
 	if (restart) return restart;
-	return overview.checked ? t('settings-updates-last-checked', { when: ago(overview.checked) }) : t('settings-updates-never-checked');
+	return overview.checked ? t('settings-updates-last-checked', { when: ago(overview.checked) }) : '';
 }

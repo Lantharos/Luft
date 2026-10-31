@@ -1,31 +1,29 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import Info from '@lucide/svelte/icons/info';
-	import { ActionRow, ProgressBar, Row, Section } from '@luft/ui';
+	import { Row, Section } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { Activity, Firmware, UpdatePolicy } from '#lib/bindings.js';
 	import { updates } from '#lib/state/updates.svelte.js';
-	import { downloading, fractionOf } from './activity';
 	import { firmware, openApps, openInstalledApps } from './api';
-	import AutomaticSection from './AutomaticSection.svelte';
+	import AutomaticRows from './AutomaticRows.svelte';
 	import FirmwareSection from './FirmwareSection.svelte';
-	import { headline, subline } from './headline';
 	import PendingImage from './image/PendingImage.svelte';
 	import VersionRows from './image/VersionRows.svelte';
-	import { percent } from '#lib/format.js';
+	import StatusCard from './StatusCard.svelte';
 
 	let { onabout }: { onabout: () => void } = $props();
 
 	let devices = $state<Firmware[]>([]);
 	let deviceName = $state<string>();
+	let systemName = $state<string | null>(null);
 	let preferences = $state<UpdatePolicy | null>(null);
 	let failure = $state<string | null>(null);
 
 	const info = $derived(updates.overview);
 	const activity = $derived(updates.activity);
-	const busy = $derived(activity.running !== null);
-	const fraction = $derived(fractionOf(activity));
 	const apps = $derived(info?.apps ?? null);
+	const system = $derived(info?.system ?? null);
+	const versionRows = $derived(!!system && (!!system.switching || ((!!system.offer || !!system.previous) && !system.returning)));
 
 	async function attempt(action: () => Promise<unknown>) {
 		failure = null;
@@ -46,45 +44,20 @@
 	void attempt(commands.updatesLoad);
 	void loadDevices();
 	void commands.updatesPreferences().then((loaded) => (preferences = loaded));
-	void commands.about().then((info) => (deviceName = info.deviceName));
+	void commands.about().then((about) => {
+		deviceName = about.deviceName;
+		systemName = about.system;
+	});
 </script>
 
-<div class="flex flex-col gap-3 px-2 pb-1">
-	<div class="flex items-center gap-4">
-		<div class="flex min-w-0 flex-1 flex-col gap-1">
-			<span class="truncate text-[26px] font-semibold">{headline(info, activity)}</span>
-			<span class="truncate text-[14px] text-[var(--text-muted)]">{subline(info, activity, failure)}</span>
-		</div>
-		{#if downloading(activity)}
-			<button type="button" class="button" onclick={() => attempt(commands.updatesCancel)}>{t('settings-updates-stop')}</button>
-		{:else}
-			<button type="button" class="button" disabled={busy} onclick={() => attempt(commands.updatesCheck)}>{activity.running === 'check' ? t('settings-updates-checking-button') : t('settings-updates-check')}</button>
-		{/if}
-	</div>
-	{#if downloading(activity)}
-		<div class="flex items-center gap-3">
-			<ProgressBar {fraction} class="flex-1" />
-			<span class="w-10 text-right text-[12.5px] text-[var(--text-muted)] tabular-nums">{fraction === null ? '' : percent(fraction)}</span>
-		</div>
-	{/if}
-</div>
+<StatusCard system={systemName} overview={info} {activity} {failure} {attempt} />
 
 {#if info}
 	<PendingImage overview={info.system} {activity} {attempt} />
 {/if}
 
-<Section title={t('settings-updates-this-computer')}>
-	{#if info}
-		<VersionRows overview={info.system} {activity} {attempt} />
-	{/if}
-	<ActionRow title={t('settings-page-about')} icon={Info} description={deviceName} onclick={onabout} />
-</Section>
-
-{#if devices.length}
-	<FirmwareSection {devices} {activity} />
-{/if}
-
-<Section title={t('settings-updates-apps')}>
+<Section>
+	<Row title={t('settings-page-about')} description={deviceName} onclick={onabout} />
 	<Row
 		title={t('settings-updates-app-updates')}
 		description={apps === null ? t('settings-updates-apps-checking') : t('settings-updates-apps-count', { count: apps })}
@@ -99,6 +72,17 @@
 	{/each}
 </Section>
 
-{#if preferences}
-	<AutomaticSection bind:preferences />
+{#if devices.length}
+	<FirmwareSection {devices} {activity} />
+{/if}
+
+{#if preferences || versionRows}
+	<Section title={t('settings-updates-automatic')}>
+		{#if preferences}
+			<AutomaticRows bind:preferences />
+		{/if}
+		{#if system && versionRows}
+			<VersionRows overview={system} {activity} {attempt} />
+		{/if}
+	</Section>
 {/if}

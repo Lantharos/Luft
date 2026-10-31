@@ -169,7 +169,6 @@ settings-updates-never-checked = Not checked yet
 settings-updates-stop = Stop
 settings-updates-check = Check now
 settings-updates-checking-button = Checking…
-settings-updates-apps = Apps
 settings-updates-app-updates = App updates
 settings-updates-apps-checking = Looking for updates to your apps…
 settings-updates-apps-count = { $count ->
@@ -213,9 +212,6 @@ settings-updates-stay-unversioned = Stay on this version
 settings-updates-restart = Restart
 settings-updates-restart-to-install = Restart to install
 settings-updates-see-new = See what’s new
-settings-updates-this-computer = This computer
-settings-updates-installed-version = Installed version
-settings-updates-unknown = Unknown
 # Button
 settings-updates-whats-new = What’s new
 settings-updates-go-back-title = Go back to the previous version

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { Row, Section, Select, Switch } from '@luft/ui';
+	import { Row, Select, Switch } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { Schedule, UpdatePolicy } from '#lib/bindings.js';
 
@@ -19,11 +19,10 @@
 	}
 </script>
 
-<Section title={t('settings-updates-automatic')}>
-	<Row title={t('settings-updates-look')} description={t('settings-updates-look-description')}>
-		<Select label={t('settings-updates-look')} options={schedules} value={preferences.schedule} onchange={(schedule) => change({ schedule })} />
-	</Row>
-	<Row title={t('settings-updates-background')} description={t('settings-updates-background-description')}>
-		<Switch label={t('settings-updates-background-label')} checked={preferences.download} disabled={preferences.schedule === 'never'} onchange={(download) => change({ download })} />
-	</Row>
-</Section>
+<Row title={t('settings-updates-look')} description={t('settings-updates-look-description')}>
+	<Select label={t('settings-updates-look')} options={schedules} value={preferences.schedule} onchange={(schedule) => change({ schedule })} />
+</Row>
+<Row title={t('settings-updates-background')} description={t('settings-updates-background-description')}>
+	<Switch label={t('settings-updates-background-label')} checked={preferences.download} disabled={preferences.schedule === 'never'} onchange={(download) => change({ download })} />
+</Row>
+

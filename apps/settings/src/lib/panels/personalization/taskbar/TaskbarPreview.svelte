@@ -5,6 +5,7 @@
 	import Wifi from '@lucide/svelte/icons/wifi';
 	import { AppIcon, appearance, MARK_HEIGHT, MARK_LAYERS, MARK_SCALE, MARK_WIDTH, PAINTED_MARK_SCALE, type GlassShading, type Shadow } from '@luft/ui';
 	import type { App } from '#lib/bindings.js';
+	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import { isVertical, type Alignment, type AutoHide, type Look, type Position, type Size, type Style } from './options';
 
 	interface Props {
@@ -41,7 +42,19 @@
 	let cornerPaint = $derived(appearance.taskbar?.glass);
 	let markSize = $derived(Math.round(metrics.button * MARK_SCALE));
 	let markIcon = $derived(Math.round(markSize * ((appearance.appIcons?.style ?? 'default') === 'default' ? 1 : PAINTED_MARK_SCALE)));
-	let time = $state(clock());
+	const CLOCK_TICK = 30_000;
+
+	type Clock = { 'clock-format': string; 'clock-show-weekday': boolean };
+	const clock = useSettings<Clock>('org.gnome.desktop.interface', ['clock-format', 'clock-show-weekday']);
+
+	let now = $state(new Date());
+	let twelveHour = $derived(clock.values['clock-format'] === '12h');
+	let time = $derived(
+		new Intl.DateTimeFormat(i18n.formats, twelveHour ? { hour: 'numeric', minute: '2-digit', hourCycle: 'h12' } : { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(now)
+	);
+	let date = $derived(
+		new Intl.DateTimeFormat(i18n.formats, { ...(clock.values['clock-show-weekday'] ? { weekday: 'short' } : {}), day: 'numeric', month: 'short' }).format(now)
+	);
 
 	const px = (value: number) => `${value * SCALE}px`;
 	const dropShadow = (shadow: Shadow | null) => (shadow ? `drop-shadow(${px(shadow.x)} ${px(shadow.y)} ${px(shadow.blur)} ${shadow.color})` : 'none');
@@ -50,12 +63,8 @@
 	const backdrop = (glass: GlassShading | null) =>
 		glass ? `blur(14px) saturate(${glass.saturation}) contrast(${1 - glass.lift * 0.8}) brightness(${1 + glass.lift * 0.8 - glass.dim / 10})` : 'none';
 
-	function clock() {
-		return new Intl.DateTimeFormat(i18n.formats, { hour: 'numeric', minute: '2-digit' }).format(new Date());
-	}
-
 	$effect(() => {
-		const timer = setInterval(() => (time = clock()), 30_000);
+		const timer = setInterval(() => (now = new Date()), CLOCK_TICK);
 		return () => clearInterval(timer);
 	});
 </script>
@@ -111,7 +120,11 @@
 				<Volume2 size={metrics.icon * 0.62} />
 			{/if}
 			<BatteryFull size={metrics.icon * 0.62} />
-			<span class="time">{time}</span>
+			{#if vertical}
+				<span class="time">{time}</span>
+			{:else}
+				<span class="time stacked"><span>{date}</span><span>{time}</span></span>
+			{/if}
 		</div>
 	</div>
 	<div
@@ -160,6 +173,7 @@
 	}
 
 	.bar {
+		--slot-radius: 8px;
 		--out-x: 0;
 		--out-y: 1;
 		position: absolute;
@@ -276,7 +290,7 @@
 	}
 
 	.bar.floating {
-		border-radius: calc(var(--height) / 2);
+		border-radius: calc(var(--slot-radius) + (var(--height) - var(--button)) / 2);
 	}
 
 	.bar.hides {
@@ -304,6 +318,14 @@
 		transform: translate(0, -50%);
 	}
 
+	.bar.floating.aligned:not(.vertical) .apps {
+		left: calc((var(--height) - var(--button)) / 2);
+	}
+
+	.bar.floating:not(.vertical) .status {
+		right: calc((var(--height) - var(--button)) / 2 + 4px);
+	}
+
 	.bar.vertical .apps {
 		flex-direction: column;
 	}
@@ -319,7 +341,7 @@
 		width: var(--button);
 		height: var(--button);
 		place-items: center;
-		border-radius: 8px;
+		border-radius: var(--slot-radius);
 		transition:
 			width var(--spring-snappy-duration) var(--spring-snappy),
 			height var(--spring-snappy-duration) var(--spring-snappy);
@@ -411,6 +433,14 @@
 		margin-left: 2px;
 	}
 
+	.stacked {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		font-size: 7.5px;
+		line-height: 1.2;
+	}
+
 	.vertical .status {
 		top: auto;
 		right: auto;
@@ -438,7 +468,7 @@
 	.bar.separate .status {
 		box-sizing: border-box;
 		padding: calc((var(--height) - var(--button)) / 2);
-		border-radius: calc(var(--height) / 2);
+		border-radius: calc(var(--slot-radius) + (var(--height) - var(--button)) / 2);
 		background: var(--surface);
 		backdrop-filter: var(--backdrop);
 	}

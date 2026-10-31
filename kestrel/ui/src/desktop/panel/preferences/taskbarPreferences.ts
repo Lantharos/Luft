@@ -22,10 +22,10 @@ export interface TaskbarMetrics {
   gap: number;
 }
 
-const SIZES: Record<TaskbarSize, { thickness: number; button: number; icon: number }> = {
-  compact: { thickness: 40, button: 34, icon: 22 },
-  normal: { thickness: 48, button: 40, icon: 28 },
-  large: { thickness: 56, button: 48, icon: 34 },
+const SIZES: Record<TaskbarSize, { thickness: number; button: number; icon: number; buttonRadius: number }> = {
+  compact: { thickness: 40, button: 34, icon: 22, buttonRadius: 10 },
+  normal: { thickness: 48, button: 40, icon: 28, buttonRadius: 12 },
+  large: { thickness: 56, button: 48, icon: 34, buttonRadius: 14 },
 };
 const TOUCH = { thickness: 64, button: 52, icon: 36 };
 const FLOATING_MARGIN = 8;
@@ -97,14 +97,15 @@ export class TaskbarLayout {
 
   get metrics(): TaskbarMetrics {
     if (this.touch) return { ...TOUCH, margin: 0, radius: 0, inset: TOUCH_INSET, gap: TOUCH_SLOT_GAP };
-    const size = SIZES[this.size];
+    const { buttonRadius, ...size } = SIZES[this.size];
     const style = this.style;
     const lifted = style !== 'bar';
+    const around = (size.thickness - size.button) / 2;
     return {
       ...size,
       margin: lifted ? FLOATING_MARGIN : 0,
-      radius: lifted && this.settings.get_boolean('rounded-window-corners') ? size.thickness / 2 : 0,
-      inset: style === 'floating' ? Math.round(size.thickness / 4) : style === 'separate' ? 0 : BAR_INSET,
+      radius: lifted && this.settings.get_boolean('rounded-window-corners') ? buttonRadius + around : 0,
+      inset: style === 'floating' ? around : style === 'separate' ? 0 : BAR_INSET,
       gap: SLOT_GAP,
     };
   }

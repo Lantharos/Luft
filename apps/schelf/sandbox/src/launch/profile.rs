@@ -186,14 +186,16 @@ impl Profile<'_> {
         Ok(arguments)
     }
 
-    fn app_files(&self) -> Arguments {
+    /// The app, and the `.flatpak-info` at both places tools look for it to
+    /// know they're in a sandbox and go through portals: `xdg-open` reads the
+    /// one in the runtime folder, GLib the one at the root.
+    fn app_files(&self) -> Result<Arguments, String> {
         let mut arguments = Arguments::default();
-        arguments.bind("--ro-bind", self.mount, INSIDE_APP).bind(
-            "--ro-bind",
-            self.info,
-            "/.flatpak-info",
-        );
         arguments
+            .bind("--ro-bind", self.mount, INSIDE_APP)
+            .bind("--ro-bind", self.info, "/.flatpak-info")
+            .bind("--ro-bind", self.info, folder::runtime_dir()?.join("flatpak-info"));
+        Ok(arguments)
     }
 
     fn gpu(&self) -> Arguments {
@@ -297,7 +299,7 @@ impl Profile<'_> {
         arguments.0.extend(self.sound()?.0);
         arguments.0.extend(self.session_bus()?.0);
         self.files(&mut arguments, home)?;
-        arguments.0.extend(self.app_files().0);
+        arguments.0.extend(self.app_files()?.0);
         Ok(arguments)
     }
 
@@ -377,7 +379,7 @@ impl Profile<'_> {
         let launcher = std::env::current_exe().map_err(|error| error.to_string())?;
         Ok(Layout {
             app: self.mounts(&home, &launcher)?.0,
-            app_files: self.app_files().0,
+            app_files: self.app_files()?.0,
             floor: self.floor(&home, &launcher, Temporary::Own)?.0,
             gpu: self.gpu().0,
             display: self.display()?.0,

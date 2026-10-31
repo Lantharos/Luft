@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Fri, 30 Oct 2026 15:16:36 +0100
-Subject: [PATCH 55/55] wayland: tell floating windows they are tiled while
+Subject: [PATCH 55/56] wayland: tell floating windows they are tiled while
  corners are square
 
 With Kestrel's rounded corners off, the compositor squares the windows it

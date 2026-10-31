@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Tue, 20 Oct 2026 21:38:11 +0200
-Subject: [PATCH 50/55] x11: stop waiting forever on X11 selection owners
+Subject: [PATCH 50/56] x11: stop waiting forever on X11 selection owners
 
 Reading an X11 selection waited for the owner's SelectionNotify and for
 each INCR chunk while ignoring its cancellable, so an owner that froze

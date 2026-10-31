@@ -1,0 +1,131 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Sat, 31 Oct 2026 16:26:30 +0100
+Subject: [PATCH 56/56] backends: start HDMI monitors in a mode within their
+ EDID's pixel clock limit
+
+Some monitors list modes over HDMI that only their DisplayPort input can
+show, past the maximum pixel clock in their EDID's range limits, and mark
+one of them preferred. Starting in that mode leaves the monitor without a
+picture. Parse the EDID before choosing the preferred mode, and on HDMI
+connectors pick the fastest mode of the same size within the limit
+instead.
+
+Upstream-Status: forwardable
+---
+ src/backends/edid-parse.c             |  1 +
+ src/backends/edid.h                   |  1 +
+ src/backends/native/meta-output-kms.c | 55 +++++++++++++++++++++++++--
+ 3 files changed, 54 insertions(+), 3 deletions(-)
+
+diff --git a/src/backends/edid-parse.c b/src/backends/edid-parse.c
+index 121bba731cb19000558300be05cc8d321985275f..833e6c7a7e728478d5ad1b5331cdc8196dc4f1a9 100644
+--- a/src/backends/edid-parse.c
++++ b/src/backends/edid-parse.c
+@@ -89,6 +89,7 @@ meta_edid_info_new_parse (const uint8_t *edid,
+         case DI_EDID_DISPLAY_DESCRIPTOR_RANGE_LIMITS:
+           range_limits = di_edid_display_descriptor_get_range_limits (desc);
+           info->min_vert_rate_hz = range_limits->min_vert_rate_hz;
++          info->max_pixel_clock_khz = range_limits->max_pixel_clock_hz / 1000;
+           break;
+         default:
+             break;
+diff --git a/src/backends/edid.h b/src/backends/edid.h
+index ead8cc4902d891951a05b769d0c56407fec850cd..4327e4c43a6b4337b99249b4ff7dadb6d170a322 100644
+--- a/src/backends/edid.h
++++ b/src/backends/edid.h
+@@ -42,6 +42,7 @@ typedef struct _MetaEdidInfo
+   double default_gamma; /* -1.0 if not specified FIXME, now 0 */
+ 
+   int32_t min_vert_rate_hz;
++  int32_t max_pixel_clock_khz; /* 0 if not specified */
+ 
+   struct di_supported_signal_colorimetry colorimetry;
+   struct di_hdr_static_metadata hdr_static_metadata;
+diff --git a/src/backends/native/meta-output-kms.c b/src/backends/native/meta-output-kms.c
+index 3e341481b716b53c05a174095c1a77f8e6510612..93f5f72bbf4060df6ff281c68d58faeabfc8aa9d 100644
+--- a/src/backends/native/meta-output-kms.c
++++ b/src/backends/native/meta-output-kms.c
+@@ -315,6 +315,52 @@ maybe_add_fallback_modes (const MetaKmsConnectorState *connector_state,
+   add_common_modes (output_info, gpu_kms, add_vrr_modes);
+ }
+ 
++static gboolean
++is_hdmi (MetaOutputInfo *output_info)
++{
++  return output_info->connector_type == DRM_MODE_CONNECTOR_HDMIA ||
++         output_info->connector_type == DRM_MODE_CONNECTOR_HDMIB;
++}
++
++/* Some monitors list modes over HDMI that only their other inputs can show,
++ * past the pixel clock their EDID's range limits allow. Picking one of those
++ * leaves the monitor without a picture, so start in the fastest mode of the
++ * same size that stays within the limit instead. */
++static MetaCrtcMode *
++mode_within_pixel_clock (MetaOutputInfo *output_info,
++                         MetaCrtcMode   *preferred)
++{
++  const MetaCrtcModeInfo *preferred_info = meta_crtc_mode_get_info (preferred);
++  int32_t max_khz;
++  MetaCrtcMode *best = NULL;
++  float best_rate = 0;
++  int i;
++
++  if (!is_hdmi (output_info) || !output_info->edid_info)
++    return preferred;
++
++  max_khz = output_info->edid_info->max_pixel_clock_khz;
++  if (max_khz <= 0 || preferred_info->pixel_clock_khz <= (uint32_t) max_khz)
++    return preferred;
++
++  for (i = 0; i < output_info->n_modes; i++)
++    {
++      const MetaCrtcModeInfo *info = meta_crtc_mode_get_info (output_info->modes[i]);
++
++      if (info->width != preferred_info->width ||
++          info->height != preferred_info->height ||
++          info->refresh_rate_mode != preferred_info->refresh_rate_mode ||
++          info->pixel_clock_khz > (uint32_t) max_khz ||
++          info->refresh_rate <= best_rate)
++        continue;
++
++      best = output_info->modes[i];
++      best_rate = info->refresh_rate;
++    }
++
++  return best ? best : preferred;
++}
++
+ static gboolean
+ init_output_modes (MetaOutputInfo    *output_info,
+                    MetaGpuKms        *gpu_kms,
+@@ -383,6 +429,9 @@ init_output_modes (MetaOutputInfo    *output_info,
+   if (!output_info->preferred_mode)
+     output_info->preferred_mode = output_info->modes[0];
+ 
++  output_info->preferred_mode =
++    mode_within_pixel_clock (output_info, output_info->preferred_mode);
++
+   return TRUE;
+ }
+ 
+@@ -533,6 +582,9 @@ meta_output_kms_new (MetaGpuKms        *gpu_kms,
+         }
+     }
+ 
++  if (connector_state->edid_data)
++    meta_output_info_parse_edid (output_info, connector_state->edid_data);
++
+   if (!init_output_modes (output_info, gpu_kms, kms_connector, error))
+     return NULL;
+ 
+@@ -550,9 +602,6 @@ meta_output_kms_new (MetaGpuKms        *gpu_kms,
+       output_info->max_bpc_max = connector_state->max_bpc.max_value;
+     }
+ 
+-  if (connector_state->edid_data)
+-    meta_output_info_parse_edid (output_info, connector_state->edid_data);
+-
+   output_info->tile_info = connector_state->tile_info;
+ 
+   if ((device_flags & META_KMS_DEVICE_FLAG_SUPPORTS_COLOR_MODES) &&

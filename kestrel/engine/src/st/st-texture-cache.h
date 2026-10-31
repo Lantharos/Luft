@@ -97,6 +97,8 @@ CoglTexture * st_texture_cache_load (StTextureCache       *cache,
 
 gboolean st_texture_cache_rescan_icon_theme (StTextureCache *cache);
 
+void st_texture_cache_reload_icon_theme (StTextureCache *cache);
+
 void st_texture_cache_evict_styled_icons (StTextureCache *cache);
 
 GFile *  st_texture_cache_lookup_styled_icon_file (StTextureCache *cache,

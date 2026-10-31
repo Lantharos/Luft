@@ -1632,6 +1632,17 @@ st_texture_cache_rescan_icon_theme (StTextureCache *cache)
   return st_icon_theme_rescan_if_needed (cache->icon_theme);
 }
 
+/**
+ * st_texture_cache_reload_icon_theme:
+ *
+ * Reload the current icon theme, such as after an icon in it was replaced.
+ */
+void
+st_texture_cache_reload_icon_theme (StTextureCache *cache)
+{
+  st_icon_theme_reload (cache->icon_theme);
+}
+
 void
 st_texture_cache_evict_styled_icons (StTextureCache *cache)
 {

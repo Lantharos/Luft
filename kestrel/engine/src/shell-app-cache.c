@@ -7,6 +7,7 @@
 #include "shell-app-cache-private.h"
 
 #include "shell-global-private.h"
+#include "st.h"
 
 /**
  * ShellAppCache:
@@ -29,10 +30,12 @@ struct _ShellAppCache
 
   GAppInfoMonitor *monitor;
   GFileMonitor    *custom_icons_monitor;
+  GFileMonitor    *custom_glyphs_monitor;
   GCancellable    *cancellable;
   GList           *app_infos;
   GHashTable      *custom_icons;
 
+  gboolean         glyphs_changed;
   guint            queued_update;
   gint64           first_queued;
 };
@@ -72,6 +75,14 @@ static GFile *
 custom_icons_folder (void)
 {
   return g_file_new_build_filename (g_get_user_data_dir (), "luft", "app-icons", NULL);
+}
+
+/* Custom symbolic icons go into the user's icon theme as APP_ID-symbolic.svg,
+ * the glyph the tinted styles look up, so a replaced one keeps its name */
+static GFile *
+custom_glyphs_folder (void)
+{
+  return g_file_new_build_filename (g_get_user_data_dir (), "icons", "hicolor", "symbolic", "apps", NULL);
 }
 
 /* Custom icons are named APP_ID~VERSION.png or .svg, so a replaced icon gets
@@ -168,6 +179,12 @@ apply_update_cb (GObject      *object,
   cache->custom_icons = snapshot->custom_icons;
   g_free (snapshot);
 
+  if (cache->glyphs_changed)
+    {
+      cache->glyphs_changed = FALSE;
+      st_texture_cache_reload_icon_theme (st_texture_cache_get_default ());
+    }
+
   g_signal_emit (cache, signals[CHANGED], 0);
 }
 
@@ -219,6 +236,7 @@ shell_app_cache_finalize (GObject *object)
 
   g_clear_object (&self->monitor);
   g_clear_object (&self->custom_icons_monitor);
+  g_clear_object (&self->custom_glyphs_monitor);
   g_clear_pointer (&self->custom_icons, g_hash_table_unref);
 
   g_clear_handle_id (&self->queued_update, g_source_remove);
@@ -250,9 +268,17 @@ shell_app_cache_class_init (ShellAppCacheClass *klass)
 }
 
 static void
+on_custom_glyphs_changed (ShellAppCache *self)
+{
+  self->glyphs_changed = TRUE;
+  shell_app_cache_queue_update (self);
+}
+
+static void
 shell_app_cache_init (ShellAppCache *self)
 {
   g_autoptr (GFile) folder = custom_icons_folder ();
+  g_autoptr (GFile) glyphs = custom_glyphs_folder ();
 
   self->monitor = g_app_info_monitor_get ();
   g_signal_connect_object (self->monitor,
@@ -267,6 +293,13 @@ shell_app_cache_init (ShellAppCache *self)
     g_signal_connect_object (self->custom_icons_monitor,
                              "changed",
                              G_CALLBACK (shell_app_cache_queue_update),
+                             self,
+                             G_CONNECT_SWAPPED);
+  self->custom_glyphs_monitor = g_file_monitor_directory (glyphs, G_FILE_MONITOR_WATCH_MOVES, NULL, NULL);
+  if (self->custom_glyphs_monitor)
+    g_signal_connect_object (self->custom_glyphs_monitor,
+                             "changed",
+                             G_CALLBACK (on_custom_glyphs_changed),
                              self,
                              G_CONNECT_SWAPPED);
 }

@@ -168,6 +168,8 @@ GList * st_icon_theme_list_contexts (StIconTheme *icon_theme);
 
 gboolean st_icon_theme_rescan_if_needed (StIconTheme *icon_theme);
 
+void     st_icon_theme_reload            (StIconTheme *icon_theme);
+
 StIconInfo * st_icon_info_new_for_pixbuf (StIconTheme *icon_theme,
                                           GdkPixbuf   *pixbuf);
 

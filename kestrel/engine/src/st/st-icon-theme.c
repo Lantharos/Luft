@@ -2160,6 +2160,21 @@ st_icon_theme_rescan_if_needed (StIconTheme *icon_theme)
   return retval;
 }
 
+/**
+ * st_icon_theme_reload:
+ * @icon_theme: a #StIconTheme
+ *
+ * Discards everything known about @icon_theme, for a change inside one of
+ * its folders that leaves the folders themselves as they were.
+ */
+void
+st_icon_theme_reload (StIconTheme *icon_theme)
+{
+  g_return_if_fail (ST_IS_ICON_THEME (icon_theme));
+
+  do_theme_change (icon_theme);
+}
+
 static void
 theme_destroy (IconTheme *theme)
 {

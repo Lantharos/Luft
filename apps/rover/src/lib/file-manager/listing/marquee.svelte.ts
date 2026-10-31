@@ -44,7 +44,10 @@ export class Marquee {
 		this.box = { start: point, current: point };
 		this.#signature = null;
 		this.#select();
-		(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+		const view = event.currentTarget as HTMLElement;
+		const focused = document.activeElement;
+		if (focused instanceof HTMLElement && view.contains(focused)) focused.blur();
+		view.setPointerCapture(event.pointerId);
 		event.preventDefault();
 	};
 

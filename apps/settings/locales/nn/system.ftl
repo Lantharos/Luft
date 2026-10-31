@@ -47,7 +47,6 @@ settings-users-change = Endre
 settings-users-password = Passord
 settings-users-password-description = Blir brukt til å logge inn og låse opp denne datamaskinen
 settings-users-password-set = Set passord
-settings-users-account-type = Kontotype
 settings-users-administrator = Administrator
 settings-users-standard = Standardkonto
 settings-users-others = Andre på denne datamaskinen
@@ -204,7 +203,6 @@ settings-updates-done = Ferdig
 ## About
 
 settings-about-device-name = Einingsnamn
-settings-about-device-name-description = Korleis andre einingar ser denne datamaskinen
 settings-about-rename = Gje nytt namn
 settings-about-rename-title = Gje denne eininga nytt namn
 settings-about-rename-description = Andre einingar i nærleiken ser dette namnet.

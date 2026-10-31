@@ -47,7 +47,6 @@ settings-users-change = Ibdel
 settings-users-password = Password
 settings-users-password-description = Tintuża biex tidħol u tiżblokka dan il-kompjuter
 settings-users-password-set = Issettja password
-settings-users-account-type = Tip ta’ kont
 settings-users-administrator = Amministratur
 settings-users-standard = Kont standard
 settings-users-others = Persuni oħra fuq dan il-kompjuter
@@ -213,7 +212,6 @@ settings-updates-done = Lest
 ## About
 
 settings-about-device-name = Isem l-apparat
-settings-about-device-name-description = Kif l-apparati l-oħra jaraw dan il-kompjuter
 settings-about-rename = Semmi mill-ġdid
 settings-about-rename-title = Semmi mill-ġdid dan l-apparat
 settings-about-rename-description = L-apparati l-oħra fil-qrib jaraw dan l-isem.

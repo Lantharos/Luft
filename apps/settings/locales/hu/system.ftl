@@ -47,7 +47,6 @@ settings-users-change = Módosítás
 settings-users-password = Jelszó
 settings-users-password-description = A bejelentkezéshez és a számítógép feloldásához
 settings-users-password-set = Jelszó beállítása
-settings-users-account-type = Fióktípus
 settings-users-administrator = Rendszergazda
 settings-users-standard = Normál fiók
 settings-users-others = Más felhasználók ezen a számítógépen
@@ -204,7 +203,6 @@ settings-updates-done = Kész
 ## About
 
 settings-about-device-name = Eszköznév
-settings-about-device-name-description = Így látják ezt a számítógépet más eszközök
 settings-about-rename = Átnevezés
 settings-about-rename-title = Az eszköz átnevezése
 settings-about-rename-description = A közeli eszközök ezt a nevet látják.

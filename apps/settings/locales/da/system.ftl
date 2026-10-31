@@ -47,7 +47,6 @@ settings-users-change = Skift
 settings-users-password = Adgangskode
 settings-users-password-description = Bruges til at logge ind og låse denne computer op
 settings-users-password-set = Angiv adgangskode
-settings-users-account-type = Kontotype
 settings-users-administrator = Administrator
 settings-users-standard = Standardkonto
 settings-users-others = Andre personer på denne computer
@@ -204,7 +203,6 @@ settings-updates-done = Udført
 ## About
 
 settings-about-device-name = Enhedsnavn
-settings-about-device-name-description = Sådan ser andre enheder denne computer
 settings-about-rename = Omdøb
 settings-about-rename-title = Omdøb denne enhed
 settings-about-rename-description = Andre enheder i nærheden ser dette navn.

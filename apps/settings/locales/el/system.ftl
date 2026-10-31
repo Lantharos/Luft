@@ -47,7 +47,6 @@ settings-users-change = Αλλαγή
 settings-users-password = Κωδικός πρόσβασης
 settings-users-password-description = Χρησιμοποιείται για σύνδεση και ξεκλείδωμα του υπολογιστή
 settings-users-password-set = Ορισμός κωδικού πρόσβασης
-settings-users-account-type = Τύπος λογαριασμού
 settings-users-administrator = Διαχειριστής
 settings-users-standard = Τυπικός λογαριασμός
 settings-users-others = Άλλα άτομα σε αυτόν τον υπολογιστή
@@ -204,7 +203,6 @@ settings-updates-done = Τέλος
 ## About
 
 settings-about-device-name = Όνομα συσκευής
-settings-about-device-name-description = Πώς βλέπουν αυτόν τον υπολογιστή οι άλλες συσκευές
 settings-about-rename = Μετονομασία
 settings-about-rename-title = Μετονομασία αυτής της συσκευής
 settings-about-rename-description = Οι άλλες συσκευές κοντά σας βλέπουν αυτό το όνομα.

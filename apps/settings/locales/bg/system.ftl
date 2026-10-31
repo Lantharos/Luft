@@ -47,7 +47,6 @@ settings-users-change = Промени
 settings-users-password = Парола
 settings-users-password-description = Използва се за вход и отключване на този компютър
 settings-users-password-set = Задай парола
-settings-users-account-type = Тип акаунт
 settings-users-administrator = Администратор
 settings-users-standard = Стандартен акаунт
 settings-users-others = Други хора на този компютър
@@ -204,7 +203,6 @@ settings-updates-done = Готово
 ## About
 
 settings-about-device-name = Име на устройството
-settings-about-device-name-description = Как другите устройства виждат този компютър
 settings-about-rename = Преименувай
 settings-about-rename-title = Преименуване на устройството
 settings-about-rename-description = Устройствата наблизо виждат това име.

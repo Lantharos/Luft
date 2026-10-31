@@ -47,7 +47,6 @@ settings-users-change = Wijzigen
 settings-users-password = Wachtwoord
 settings-users-password-description = Gebruikt om je aan te melden en deze computer te ontgrendelen
 settings-users-password-set = Wachtwoord instellen
-settings-users-account-type = Accounttype
 settings-users-administrator = Beheerder
 settings-users-standard = Standaardaccount
 settings-users-others = Andere personen op deze computer
@@ -204,7 +203,6 @@ settings-updates-done = Klaar
 ## About
 
 settings-about-device-name = Apparaatnaam
-settings-about-device-name-description = Hoe andere apparaten deze computer zien
 settings-about-rename = Naam wijzigen
 settings-about-rename-title = Naam van dit apparaat wijzigen
 settings-about-rename-description = Andere apparaten in de buurt zien deze naam.

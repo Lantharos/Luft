@@ -47,7 +47,6 @@ settings-users-change = Промени
 settings-users-password = Лозинка
 settings-users-password-description = Се користи за најава и отклучување на овој компјутер
 settings-users-password-set = Постави лозинка
-settings-users-account-type = Тип на сметка
 settings-users-administrator = Администратор
 settings-users-standard = Стандардна сметка
 settings-users-others = Други луѓе на овој компјутер
@@ -204,7 +203,6 @@ settings-updates-done = Готово
 ## About
 
 settings-about-device-name = Име на уредот
-settings-about-device-name-description = Како другите уреди го гледаат овој компјутер
 settings-about-rename = Преименувај
 settings-about-rename-title = Преименување на уредот
 settings-about-rename-description = Блиските уреди го гледаат ова име.

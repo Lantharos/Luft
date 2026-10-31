@@ -5,6 +5,7 @@
 	import ShieldCheck from '@lucide/svelte/icons/shield-check';
 	import { t } from '@luft/i18n';
 	import { ActionRow, Section } from '@luft/ui';
+	import HeroCard from '#lib/components/HeroCard.svelte';
 	import { encryptionSummary } from './encryption/describe';
 	import { protection } from './keyring/describe';
 	import type { KeyringState } from './keyring/state.svelte';
@@ -34,14 +35,7 @@
 </script>
 
 {#if summary}
-	{@const Icon = summary.safe ? ShieldCheck : ShieldAlert}
-	<div class="flex items-center gap-4 px-2 pb-1">
-		<span class="plate" class:safe={summary.safe}><Icon size={26} strokeWidth={1.75} /></span>
-		<div class="flex min-w-0 flex-1 flex-col gap-1">
-			<span class="truncate text-[26px] font-semibold">{summary.headline}</span>
-			<span class="truncate text-[14px] text-[var(--text-muted)]">{summary.sentence}</span>
-		</div>
-	</div>
+	<HeroCard title={summary.headline} status={summary.sentence} icon={summary.safe ? ShieldCheck : ShieldAlert} good={summary.safe} />
 {/if}
 
 {#if security.loaded}
@@ -55,20 +49,3 @@
 		<ProtectionsSection {security} />
 	{/if}
 {/if}
-
-<style>
-	.plate {
-		display: grid;
-		height: 56px;
-		width: 56px;
-		flex: none;
-		place-items: center;
-		border-radius: var(--radius-pill);
-		background: var(--surface);
-		color: var(--text-soft);
-	}
-
-	.plate.safe {
-		color: var(--success);
-	}
-</style>

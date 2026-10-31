@@ -47,7 +47,6 @@ settings-users-change = Изменить
 settings-users-password = Пароль
 settings-users-password-description = Для входа в систему и разблокировки компьютера
 settings-users-password-set = Задать пароль
-settings-users-account-type = Тип учётной записи
 settings-users-administrator = Администратор
 settings-users-standard = Обычная учётная запись
 settings-users-others = Другие пользователи этого компьютера
@@ -210,7 +209,6 @@ settings-updates-done = Готово
 ## About
 
 settings-about-device-name = Имя устройства
-settings-about-device-name-description = Под этим именем компьютер видят другие устройства
 settings-about-rename = Переименовать
 settings-about-rename-title = Переименовать устройство
 settings-about-rename-description = Это имя видят другие устройства поблизости.

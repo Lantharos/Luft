@@ -47,7 +47,6 @@ settings-users-change = Spremeni
 settings-users-password = Geslo
 settings-users-password-description = Za prijavo in odklepanje tega računalnika
 settings-users-password-set = Nastavi geslo
-settings-users-account-type = Vrsta računa
 settings-users-administrator = Skrbnik
 settings-users-standard = Standardni račun
 settings-users-others = Drugi uporabniki tega računalnika
@@ -210,7 +209,6 @@ settings-updates-done = Končano
 ## About
 
 settings-about-device-name = Ime naprave
-settings-about-device-name-description = Kako druge naprave vidijo ta računalnik
 settings-about-rename = Preimenuj
 settings-about-rename-title = Preimenujte to napravo
 settings-about-rename-description = To ime vidijo druge naprave v bližini.

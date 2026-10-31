@@ -15,17 +15,18 @@ Everything here is in Settings, under **Accessibility**. The lock and login scre
 | Zoom | Magnifies the screen, from 1.25 to 8 times. <kbd>Alt</kbd>+<kbd>Super</kbd>+<kbd>8</kbd> turns it on, and <kbd>Alt</kbd>+<kbd>Super</kbd>+<kbd>=</kbd> and <kbd>-</kbd> zoom |
 | Large text | Makes text 125% |
 | High contrast | Stronger edges and colours across the desktop and apps |
-| Reduce motion | Fades instead of sliding and zooming |
+| Motion | Full, reduced or off |
 | Cursor size | Up to four times the usual size |
 
-## Reduced motion
+## Motion
 
-Luft has two separate choices:
+**Motion** has three choices:
 
-- **Reduce motion**, here, keeps animation but takes out the movement. Slides and zooms become fades, springs lose their bounce, and minimized windows don't fly to the taskbar. Gestures still follow your fingers.
-- **Animations** turns animation off entirely, so everything changes at once.
+- **Full** moves windows, menus and pages as they open and close.
+- **Reduced** keeps animation but takes out the movement. Slides and zooms become fades, springs lose their bounce, and minimized windows don't fly to the taskbar. Gestures still follow your fingers.
+- **Off** turns animation off entirely, so everything changes at once.
 
-Apps are told about either one, so they can follow it too.
+Apps are told which you chose, so they can follow it too.
 
 ## Typing
 

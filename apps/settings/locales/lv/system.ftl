@@ -47,7 +47,6 @@ settings-users-change = Mainīt
 settings-users-password = Parole
 settings-users-password-description = Tiek izmantota, lai pierakstītos šajā datorā un to atbloķētu
 settings-users-password-set = Iestatīt paroli
-settings-users-account-type = Konta veids
 settings-users-administrator = Administrators
 settings-users-standard = Standarta konts
 settings-users-others = Citi šī datora lietotāji
@@ -207,7 +206,6 @@ settings-updates-done = Gatavs
 ## About
 
 settings-about-device-name = Ierīces nosaukums
-settings-about-device-name-description = Kā citas ierīces redz šo datoru
 settings-about-rename = Pārdēvēt
 settings-about-rename-title = Pārdēvēt šo ierīci
 settings-about-rename-description = Šo nosaukumu redz citas tuvumā esošās ierīces.

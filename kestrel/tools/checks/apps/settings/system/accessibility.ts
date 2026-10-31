@@ -9,10 +9,12 @@ import {show} from '../navigation.js';
 
 const {require, eventually} = checks('Luft app');
 const SWITCH_X = 959;
-const TYPING_ASSIST: Point = [SWITCH_X, 607];
+const TYPING_ASSIST: Point = [SWITCH_X, 556];
+const REDUCED_MOTION_X = 853;
 interface Switch {
   name: string;
   y: number;
+  x?: number;
   schema: string;
   key: string;
   on: (value: GLib.Variant) => boolean;
@@ -20,18 +22,18 @@ interface Switch {
 }
 
 const SWITCHES: Switch[] = [
-  {name: 'reduce-motion', y: 299, schema: 'org.gnome.desktop.a11y.interface', key: 'reduced-motion', on: value => value.get_string()[0] === 'reduce'},
+  {name: 'reduce-motion', y: 307, x: REDUCED_MOTION_X, schema: 'org.gnome.desktop.a11y.interface', key: 'reduced-motion', on: value => value.get_string()[0] === 'reduce'},
   {name: 'high-contrast', y: 237, schema: 'org.gnome.desktop.a11y.interface', key: 'high-contrast', on: value => value.get_boolean()},
   {name: 'large-text', y: 181, schema: 'org.gnome.desktop.interface', key: 'text-scaling-factor', on: value => value.get_double() > 1},
-  {name: 'sticky-keys', y: 663, schema: 'org.gnome.desktop.a11y.keyboard', key: 'stickykeys-enable', on: value => value.get_boolean(), expand: true},
+  {name: 'sticky-keys', y: 612, schema: 'org.gnome.desktop.a11y.keyboard', key: 'stickykeys-enable', on: value => value.get_boolean(), expand: true},
 ];
 
-async function toggle(app: LuftApp, {name, y, schema, key, on, expand}: Switch) {
+async function toggle(app: LuftApp, {name, y, x = SWITCH_X, schema, key, on, expand}: Switch) {
   const settings = new Gio.Settings({schema_id: schema});
   require(!on(settings.get_value(key)), `${name} starts off`);
   if (expand) await changes(app, 'Typing assist opens', () => app.click(TYPING_ASSIST));
   const off = await app.frame();
-  app.click([SWITCH_X, y]);
+  app.click([x, y]);
   let turnedOn = off;
   try {
     await eventually(() => on(settings.get_value(key)), `the ${name} switch sets ${schema} ${key}`);

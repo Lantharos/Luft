@@ -4,6 +4,7 @@
 	import { Avatar, Dialog, ItemRow, Row, Section, TextField, tooltip } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { Users } from '#lib/bindings.js';
+	import HeroCard from '#lib/components/HeroCard.svelte';
 	import FingerprintSection from './FingerprintSection.svelte';
 	import PasswordDialog from './PasswordDialog.svelte';
 	import { accountType, choosePicture, displayName } from './api';
@@ -52,17 +53,15 @@
 
 {#if accounts}
 	{@const me = accounts.me}
-	<div class="flex items-center gap-5 px-2 pb-2">
-		<button type="button" class="picture" aria-label={t('settings-users-picture')} {@attach tooltip(t('settings-users-picture'))} onclick={() => attempt(choosePicture)}>
-			<Avatar picture={me.picture} name={displayName(me)} size={76} {version} />
-			<span class="overlay">{t('settings-users-picture-edit')}</span>
-			<span class="puck"><Camera size={13} /></span>
-		</button>
-		<div class="flex min-w-0 flex-col gap-1">
-			<span class="truncate text-[26px] font-semibold">{displayName(me)}</span>
-			<span class="text-[14px] text-[var(--text-muted)]">{me.userName}</span>
-		</div>
-	</div>
+	<HeroCard title={displayName(me)} detail={me.userName} status={accountType(me)}>
+		{#snippet leading()}
+			<button type="button" class="picture" aria-label={t('settings-users-picture')} {@attach tooltip(t('settings-users-picture'))} onclick={() => attempt(choosePicture)}>
+				<Avatar picture={me.picture} name={displayName(me)} size={52} {version} />
+				<span class="overlay">{t('settings-users-picture-edit')}</span>
+				<span class="puck"><Camera size={12} /></span>
+			</button>
+		{/snippet}
+	</HeroCard>
 
 	<Section title={t('settings-users-account')}>
 		<Row title={t('settings-users-name')} description={t('settings-users-name-description')}>
@@ -72,7 +71,6 @@
 		<Row title={t('settings-users-password')} description={t('settings-users-password-description')}>
 			<button type="button" class="button" onclick={() => (changingPassword = true)}>{me.hasPassword ? t('settings-users-change') : t('settings-users-password-set')}</button>
 		</Row>
-		<Row title={t('settings-users-account-type')}><span>{accountType(me)}</span></Row>
 	</Section>
 
 	{#if problem}
@@ -127,7 +125,7 @@
 		place-items: center;
 		border-radius: var(--radius-pill);
 		background: rgba(8, 8, 7, 0.5);
-		font-size: 13px;
+		font-size: 11px;
 		font-weight: 600;
 		color: var(--text);
 		opacity: 0;
@@ -139,10 +137,10 @@
 		right: -2px;
 		bottom: -2px;
 		display: grid;
-		height: 26px;
-		width: 26px;
+		height: 20px;
+		width: 20px;
 		place-items: center;
-		border: 3px solid var(--content);
+		border: 2px solid var(--group);
 		border-radius: var(--radius-pill);
 		background: var(--control-hover);
 		color: var(--text);

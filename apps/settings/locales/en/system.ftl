@@ -55,7 +55,6 @@ settings-users-change = Change
 settings-users-password = Password
 settings-users-password-description = Used to sign in and unlock this computer
 settings-users-password-set = Set password
-settings-users-account-type = Account type
 settings-users-administrator = Administrator
 settings-users-standard = Standard account
 settings-users-others = Other people on this computer
@@ -232,7 +231,6 @@ settings-updates-done = Done
 ## About
 
 settings-about-device-name = Device name
-settings-about-device-name-description = How other devices see this computer
 # Button, verb
 settings-about-rename = Rename
 settings-about-rename-title = Rename this device

@@ -47,7 +47,6 @@ settings-users-change = Değiştir
 settings-users-password = Parola
 settings-users-password-description = Oturum açmak ve bu bilgisayarın kilidini açmak için kullanılır
 settings-users-password-set = Parola belirle
-settings-users-account-type = Hesap türü
 settings-users-administrator = Yönetici
 settings-users-standard = Standart hesap
 settings-users-others = Bu bilgisayardaki diğer kişiler
@@ -204,7 +203,6 @@ settings-updates-done = Bitti
 ## About
 
 settings-about-device-name = Cihaz adı
-settings-about-device-name-description = Diğer cihazların bu bilgisayarı nasıl gördüğü
 settings-about-rename = Yeniden adlandır
 settings-about-rename-title = Bu cihazı yeniden adlandır
 settings-about-rename-description = Yakındaki diğer cihazlar bu adı görür.

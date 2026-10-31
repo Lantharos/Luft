@@ -19,6 +19,7 @@
 
 	const route = $derived(navigation.route);
 	const depth = $derived(navigation.stack.length);
+	const heading = $derived(route.page !== 'app' ? title(route) : depth > 1 ? title(navigation.stack[depth - 2]) : '');
 
 	onMount(() => {
 		void start().then(() => (ready = true));
@@ -44,7 +45,7 @@
 					<ArrowLeft size={18} />
 				</button>
 			{/if}
-			<h1 class="min-w-0 flex-1 truncate pl-2 text-[20px] font-semibold">{title(route)}</h1>
+			<h1 class="min-w-0 flex-1 truncate pl-2 text-[20px] font-semibold">{heading}</h1>
 			<WindowControls />
 		</header>
 		<div class="min-h-0 flex-1">

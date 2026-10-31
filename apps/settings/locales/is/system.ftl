@@ -47,7 +47,6 @@ settings-users-change = Breyta
 settings-users-password = Lykilorð
 settings-users-password-description = Notað til að skrá sig inn og taka þessa tölvu úr lás
 settings-users-password-set = Setja lykilorð
-settings-users-account-type = Tegund aðgangs
 settings-users-administrator = Stjórnandi
 settings-users-standard = Venjulegur aðgangur
 settings-users-others = Annað fólk á þessari tölvu
@@ -204,7 +203,6 @@ settings-updates-done = Lokið
 ## About
 
 settings-about-device-name = Heiti tækis
-settings-about-device-name-description = Hvernig önnur tæki sjá þessa tölvu
 settings-about-rename = Endurnefna
 settings-about-rename-title = Endurnefna þetta tæki
 settings-about-rename-description = Önnur tæki í nágrenninu sjá þetta heiti.

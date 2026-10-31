@@ -47,7 +47,6 @@ settings-users-change = Muuda
 settings-users-password = Salasõna
 settings-users-password-description = Kasutatakse selle arvutisse sisselogimiseks ja selle lukust avamiseks
 settings-users-password-set = Määra salasõna
-settings-users-account-type = Konto tüüp
 settings-users-administrator = Administraator
 settings-users-standard = Tavakonto
 settings-users-others = Teised selle arvuti kasutajad
@@ -207,7 +206,6 @@ settings-updates-done = Valmis
 ## About
 
 settings-about-device-name = Seadme nimi
-settings-about-device-name-description = Nii näevad teised seadmed seda arvutit
 settings-about-rename = Nimeta ümber
 settings-about-rename-title = Seadme ümbernimetamine
 settings-about-rename-description = Seda nime näevad läheduses olevad teised seadmed.

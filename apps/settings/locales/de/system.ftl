@@ -47,7 +47,6 @@ settings-users-change = Ändern
 settings-users-password = Passwort
 settings-users-password-description = Zum Anmelden und Entsperren dieses Computers
 settings-users-password-set = Passwort festlegen
-settings-users-account-type = Kontotyp
 settings-users-administrator = Administrator
 settings-users-standard = Standardkonto
 settings-users-others = Andere Personen auf diesem Computer
@@ -204,7 +203,6 @@ settings-updates-done = Fertig
 ## About
 
 settings-about-device-name = Gerätename
-settings-about-device-name-description = So sehen andere Geräte diesen Computer
 settings-about-rename = Umbenennen
 settings-about-rename-title = Dieses Gerät umbenennen
 settings-about-rename-description = Andere Geräte in der Nähe sehen diesen Namen.

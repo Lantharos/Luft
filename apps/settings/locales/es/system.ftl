@@ -47,7 +47,6 @@ settings-users-change = Cambiar
 settings-users-password = Contraseña
 settings-users-password-description = Se usa para iniciar sesión y desbloquear este ordenador
 settings-users-password-set = Establecer contraseña
-settings-users-account-type = Tipo de cuenta
 settings-users-administrator = Administrador
 settings-users-standard = Cuenta estándar
 settings-users-others = Otras personas en este ordenador
@@ -204,7 +203,6 @@ settings-updates-done = Listo
 ## About
 
 settings-about-device-name = Nombre del dispositivo
-settings-about-device-name-description = Cómo ven este ordenador otros dispositivos
 settings-about-rename = Cambiar nombre
 settings-about-rename-title = Cambiar el nombre de este dispositivo
 settings-about-rename-description = Los dispositivos cercanos ven este nombre.

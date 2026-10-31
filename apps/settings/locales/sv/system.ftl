@@ -47,7 +47,6 @@ settings-users-change = Ändra
 settings-users-password = Lösenord
 settings-users-password-description = Används för att logga in och låsa upp datorn
 settings-users-password-set = Ange lösenord
-settings-users-account-type = Kontotyp
 settings-users-administrator = Administratör
 settings-users-standard = Standardkonto
 settings-users-others = Andra personer på den här datorn
@@ -204,7 +203,6 @@ settings-updates-done = Klar
 ## About
 
 settings-about-device-name = Enhetsnamn
-settings-about-device-name-description = Hur andra enheter ser den här datorn
 settings-about-rename = Byt namn
 settings-about-rename-title = Byt namn på enheten
 settings-about-rename-description = Andra enheter i närheten ser det här namnet.

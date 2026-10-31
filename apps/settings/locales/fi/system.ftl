@@ -47,7 +47,6 @@ settings-users-change = Vaihda
 settings-users-password = Salasana
 settings-users-password-description = Käytetään kirjautumiseen ja tietokoneen lukituksen avaamiseen
 settings-users-password-set = Aseta salasana
-settings-users-account-type = Tilin tyyppi
 settings-users-administrator = Järjestelmänvalvoja
 settings-users-standard = Vakiotili
 settings-users-others = Muut tämän tietokoneen käyttäjät
@@ -204,7 +203,6 @@ settings-updates-done = Valmis
 ## About
 
 settings-about-device-name = Laitteen nimi
-settings-about-device-name-description = Nimi, jolla muut laitteet näkevät tämän tietokoneen
 settings-about-rename = Nimeä uudelleen
 settings-about-rename-title = Nimeä tämä laite uudelleen
 settings-about-rename-description = Lähellä olevat laitteet näkevät tämän nimen.

@@ -47,7 +47,6 @@ settings-users-change = Ndrysho
 settings-users-password = Fjalëkalimi
 settings-users-password-description = Përdoret për të hyrë dhe për të zhbllokuar këtë kompjuter
 settings-users-password-set = Cakto fjalëkalim
-settings-users-account-type = Lloji i llogarisë
 settings-users-administrator = Administrator
 settings-users-standard = Llogari standarde
 settings-users-others = Persona të tjerë në këtë kompjuter
@@ -204,7 +203,6 @@ settings-updates-done = U krye
 ## About
 
 settings-about-device-name = Emri i pajisjes
-settings-about-device-name-description = Si e shohin pajisjet e tjera këtë kompjuter
 settings-about-rename = Riemërto
 settings-about-rename-title = Riemërto këtë pajisje
 settings-about-rename-description = Pajisjet e tjera aty pranë e shohin këtë emër.

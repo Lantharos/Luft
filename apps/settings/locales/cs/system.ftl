@@ -47,7 +47,6 @@ settings-users-change = Změnit
 settings-users-password = Heslo
 settings-users-password-description = Slouží k přihlášení a odemknutí tohoto počítače
 settings-users-password-set = Nastavit heslo
-settings-users-account-type = Typ účtu
 settings-users-administrator = Správce
 settings-users-standard = Standardní účet
 settings-users-others = Další lidé na tomto počítači
@@ -210,7 +209,6 @@ settings-updates-done = Hotovo
 ## About
 
 settings-about-device-name = Název zařízení
-settings-about-device-name-description = Jak tento počítač vidí ostatní zařízení
 settings-about-rename = Přejmenovat
 settings-about-rename-title = Přejmenovat toto zařízení
 settings-about-rename-description = Tento název uvidí ostatní zařízení v okolí.

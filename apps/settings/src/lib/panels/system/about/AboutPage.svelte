@@ -1,8 +1,10 @@
 <script lang="ts">
+	import Laptop from '@lucide/svelte/icons/laptop';
 	import { t } from '@luft/i18n';
 	import { bytes, Dialog, Row, Section, Switch, TextField } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { About, OtherSystem } from '#lib/bindings.js';
+	import HeroCard from '#lib/components/HeroCard.svelte';
 	import SubPage from '#lib/components/SubPage.svelte';
 	import { binaryBytes } from '#lib/format.js';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
@@ -51,17 +53,11 @@
 
 <SubPage title={t('settings-page-about')} {onclose}>
 	{#if info}
-		<div class="flex flex-col gap-1 px-2 pb-2">
-			<span class="truncate text-[26px] font-semibold">{info.deviceName}</span>
-			<span class="truncate text-[14px] text-[var(--text-muted)]">{info.system}</span>
-		</div>
-
-		<Section>
-			<Row title={t('settings-about-device-name')} description={t('settings-about-device-name-description')}>
-				<span class="max-w-[220px] truncate">{info.deviceName}</span>
+		<HeroCard title={info.deviceName} status={info.system} icon={Laptop}>
+			{#snippet actions()}
 				<button type="button" class="button" onclick={startRename}>{t('settings-about-rename')}</button>
-			</Row>
-		</Section>
+			{/snippet}
+		</HeroCard>
 
 		<Section title={t('settings-about-hardware')}>
 			{#if info.processor}

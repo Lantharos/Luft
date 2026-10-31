@@ -47,7 +47,6 @@ settings-users-change = Keisti
 settings-users-password = Slaptažodis
 settings-users-password-description = Naudojamas prisijungti ir atrakinti šį kompiuterį
 settings-users-password-set = Nustatyti slaptažodį
-settings-users-account-type = Paskyros tipas
 settings-users-administrator = Administratorius
 settings-users-standard = Standartinė paskyra
 settings-users-others = Kiti šio kompiuterio naudotojai
@@ -210,7 +209,6 @@ settings-updates-done = Atlikta
 ## About
 
 settings-about-device-name = Įrenginio pavadinimas
-settings-about-device-name-description = Kaip šį kompiuterį mato kiti įrenginiai
 settings-about-rename = Pervardyti
 settings-about-rename-title = Pervardyti šį įrenginį
 settings-about-rename-description = Šį pavadinimą mato kiti netoliese esantys įrenginiai.

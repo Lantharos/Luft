@@ -47,7 +47,6 @@ settings-users-change = Canvia
 settings-users-password = Contrasenya
 settings-users-password-description = Serveix per iniciar la sessió i desbloquejar aquest ordinador
 settings-users-password-set = Defineix una contrasenya
-settings-users-account-type = Tipus de compte
 settings-users-administrator = Administrador
 settings-users-standard = Compte estàndard
 settings-users-others = Altres persones d’aquest ordinador
@@ -204,7 +203,6 @@ settings-updates-done = Fet
 ## About
 
 settings-about-device-name = Nom del dispositiu
-settings-about-device-name-description = Com veuen aquest ordinador els altres dispositius
 settings-about-rename = Canvia el nom
 settings-about-rename-title = Canvieu el nom d’aquest dispositiu
 settings-about-rename-description = Els altres dispositius propers veuen aquest nom.

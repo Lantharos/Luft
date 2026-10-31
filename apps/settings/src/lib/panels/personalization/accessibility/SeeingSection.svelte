@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { Row, Section, Select, Slider, Switch } from '@luft/ui';
+	import { Row, Section, Segmented, Select, Slider, Switch } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import { cursorSizes } from '../appearance/cursors/sizes';
@@ -28,7 +28,22 @@
 	const a11y = useSettings<A11yInterface>('org.gnome.desktop.a11y.interface', ['high-contrast', 'reduced-motion']);
 	const desktop = useSettings<Interface>('org.gnome.desktop.interface', ['text-scaling-factor', 'cursor-size', 'enable-animations']);
 
+	type Motion = 'full' | 'reduced' | 'off';
+
 	let readerInstalled = $state(false);
+	let motion = $derived<Motion>(
+		!(desktop.values['enable-animations'] ?? true) ? 'off' : a11y.values['reduced-motion'] === 'reduce' ? 'reduced' : 'full'
+	);
+	let motions = $derived<{ value: Motion; label: string }[]>([
+		{ value: 'full', label: t('settings-accessibility-motion-full') },
+		{ value: 'reduced', label: t('settings-accessibility-motion-reduced') },
+		{ value: 'off', label: t('settings-accessibility-motion-off') }
+	]);
+
+	function chooseMotion(choice: Motion) {
+		desktop.set('enable-animations', choice !== 'off');
+		if (choice !== 'off') a11y.set('reduced-motion', choice === 'reduced' ? 'reduce' : 'no-preference');
+	}
 	let zoomed = $derived(applications.values['screen-magnifier-enabled'] ?? false);
 
 	let sizes = $derived(cursorSizes());
@@ -77,15 +92,8 @@
 	<Row title={t('settings-accessibility-high-contrast')}>
 		<Switch label={t('settings-accessibility-high-contrast')} checked={a11y.values['high-contrast'] ?? false} onchange={(on) => a11y.set('high-contrast', on)} />
 	</Row>
-	<Row title={t('settings-accessibility-reduce-motion')} description={t('settings-accessibility-reduce-motion-description')}>
-		<Switch
-			label={t('settings-accessibility-reduce-motion')}
-			checked={a11y.values['reduced-motion'] === 'reduce'}
-			onchange={(on) => a11y.set('reduced-motion', on ? 'reduce' : 'no-preference')}
-		/>
-	</Row>
-	<Row title={t('settings-accessibility-animations')} description={t('settings-accessibility-animations-description')}>
-		<Switch label={t('settings-accessibility-animations')} checked={desktop.values['enable-animations'] ?? true} onchange={(on) => desktop.set('enable-animations', on)} />
+	<Row title={t('settings-accessibility-motion')} description={t('settings-accessibility-motion-description')}>
+		<Segmented label={t('settings-accessibility-motion')} options={motions} value={motion} onchange={chooseMotion} />
 	</Row>
 	<Row title={t('settings-accessibility-cursor-size')}>
 		<Select label={t('settings-accessibility-cursor-size')} options={sizes} value={desktop.values['cursor-size'] ?? 24} onchange={(size) => desktop.set('cursor-size', size)} />

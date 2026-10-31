@@ -47,7 +47,6 @@ settings-users-change = Athraigh
 settings-users-password = Pasfhocal
 settings-users-password-description = Úsáidtear é chun síniú isteach agus an ríomhaire seo a dhíghlasáil
 settings-users-password-set = Socraigh pasfhocal
-settings-users-account-type = Cineál cuntais
 settings-users-administrator = Riarthóir
 settings-users-standard = Cuntas caighdeánach
 settings-users-others = Daoine eile ar an ríomhaire seo
@@ -213,7 +212,6 @@ settings-updates-done = Déanta
 ## About
 
 settings-about-device-name = Ainm an ghléis
-settings-about-device-name-description = Mar a fheiceann gléasanna eile an ríomhaire seo
 settings-about-rename = Athainmnigh
 settings-about-rename-title = Athainmnigh an gléas seo
 settings-about-rename-description = Feiceann gléasanna eile in aice láimhe an t-ainm seo.

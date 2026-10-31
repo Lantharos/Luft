@@ -47,7 +47,6 @@ settings-users-change = Schimbă
 settings-users-password = Parolă
 settings-users-password-description = Folosită pentru conectare și pentru deblocarea acestui computer
 settings-users-password-set = Setează parola
-settings-users-account-type = Tip de cont
 settings-users-administrator = Administrator
 settings-users-standard = Cont standard
 settings-users-others = Alte persoane de pe acest computer
@@ -207,7 +206,6 @@ settings-updates-done = Gata
 ## About
 
 settings-about-device-name = Numele dispozitivului
-settings-about-device-name-description = Cum văd acest computer celelalte dispozitive
 settings-about-rename = Redenumește
 settings-about-rename-title = Redenumiți acest dispozitiv
 settings-about-rename-description = Dispozitivele din apropiere văd acest nume.

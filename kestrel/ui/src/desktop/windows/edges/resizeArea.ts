@@ -29,7 +29,7 @@ function side(position: number, length: number): '' | 'start' | 'end' {
 }
 
 export class ResizeArea {
-  readonly actor = new St.Widget({ reactive: true });
+  readonly actor = new St.Widget({ reactive: true, style_class: 'kestrel-resize-edge' });
 
   constructor(private readonly window: Meta.Window) {
     this.actor.connect('motion-event', (_actor, event: Clutter.Event) => {

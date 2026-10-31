@@ -52,6 +52,8 @@ function buttonOf(window: Meta.Window, name: string) {
   return find(actor)[0];
 }
 
+const isResizeEdge = (actor: Clutter.Actor) => actor instanceof St.Widget && actor.has_style_class_name('kestrel-resize-edge');
+
 function checkGeometry({window, mode}: Client, decorated: boolean) {
   const frame = window.get_frame_rect();
   const buffer = window.get_buffer_rect();
@@ -60,7 +62,7 @@ function checkGeometry({window, mode}: Client, decorated: boolean) {
   require(frame.width === CLIENT_SIZE[0] && frame.height === CLIENT_SIZE[1] + titlebar,
     `the ${mode} client's frame is ${frame.width} × ${frame.height}`);
   require(buffer.y === frame.y, `the ${mode} client's title bar sits inside its window`);
-  const extra = window.get_compositor_private<Meta.WindowActor>().get_n_children();
+  const extra = window.get_compositor_private<Meta.WindowActor>().get_children().filter(child => !isResizeEdge(child)).length;
   require(decorated ? extra > 1 : extra === 1, `the ${mode} client has ${decorated ? 'one' : 'no'} title bar from Kestrel`);
 }
 

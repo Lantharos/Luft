@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Tue, 20 Oct 2026 15:10:25 +0200
-Subject: [PATCH 47/56] wayland: show the input panel as soon as a text input
+Subject: [PATCH 47/57] wayland: show the input panel as soon as a text input
  asks or is tapped
 
 show_input_panel and hide_input_panel aren't double-buffered in

@@ -1,0 +1,52 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Sat, 31 Oct 2026 19:51:04 +0100
+Subject: [PATCH 57/57] wayland: tell clients Kestrel resizes their toplevels
+ from outside
+
+Kestrel lets people resize windows that draw nothing outside their
+window geometry from a band just outside their edges. Version 2 of
+kestrel_window_manager_v1 says so, so such clients can leave their own
+edges to their content, such as scrollbars.
+
+Upstream-Status: luft-only Kestrel's private kestrel_window_v1 protocol
+---
+ src/wayland/meta-wayland-versions.h        | 2 +-
+ src/wayland/protocol/kestrel-window-v1.xml | 6 +++++-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/src/wayland/meta-wayland-versions.h b/src/wayland/meta-wayland-versions.h
+index a9847dbcdf32344fe4aa864d2d798ea6b8a77e95..36891f7e2d8827aa76ad5dca62333a1253b2e1a5 100644
+--- a/src/wayland/meta-wayland-versions.h
++++ b/src/wayland/meta-wayland-versions.h
+@@ -73,7 +73,7 @@
+ #define META_WL_FIXES_VERSION 1
+ #define META_WP_POINTER_WARP_VERSION 1
+ #define META_EXT_BACKGROUND_EFFECT_V1_VERSION 1
+-#define META_KESTREL_WINDOW_V1_VERSION 1
++#define META_KESTREL_WINDOW_V1_VERSION 2
+ #define META_ZXDG_DECORATION_MANAGER_V1_VERSION 2
+ #define META_EXT_IDLE_NOTIFIER_V1_VERSION 2
+ #define META_EXT_DATA_CONTROL_MANAGER_V1_VERSION 1
+diff --git a/src/wayland/protocol/kestrel-window-v1.xml b/src/wayland/protocol/kestrel-window-v1.xml
+index b9b7365aa9310472a38f1269c4a7e1bed80dd5d2..ed1e55719e64a0144d46ef3ed2f399acfddc3d3e 100644
+--- a/src/wayland/protocol/kestrel-window-v1.xml
++++ b/src/wayland/protocol/kestrel-window-v1.xml
+@@ -23,12 +23,16 @@
+     DEALINGS IN THE SOFTWARE.
+   </copyright>
+ 
+-  <interface name="kestrel_window_manager_v1" version="1">
++  <interface name="kestrel_window_manager_v1" version="2">
+     <description summary="window placement requests for toplevels">
+       Lets a client keep a toplevel out of the desktop's window lists, such as
+       the taskbar and the window switcher, and keep it above other windows.
+       Palettes, launchers and tray popups use these. Sandboxed clients do not
+       see this global.
++
++      From version 2, the compositor lets people resize a toplevel that draws
++      nothing outside its window geometry from just outside its edges, so such
++      clients need no resize area of their own over their content.
+     </description>
+ 
+     <enum name="error">

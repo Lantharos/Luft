@@ -1,5 +1,6 @@
 import GLib from 'gi://GLib';
 import type Meta from 'gi://Meta';
+import St from 'gi://St';
 
 import {withScheme} from '../apps/lib/palette.js';
 import {checks} from '../lib/check.js';
@@ -157,5 +158,7 @@ export async function run() {
   await settled();
   await checkOutline(notes, 'a window back from fullscreen', lighter);
   await checkShadow(notes, backdrop, 'a window back from fullscreen');
-  require(notes.window.get_compositor_private<Meta.WindowActor>().get_n_children() === 1, 'the shadow and outline add no actors to the window');
+  const children = notes.window.get_compositor_private<Meta.WindowActor>().get_children();
+  require(children.filter(child => !(child instanceof St.Widget && child.has_style_class_name('kestrel-resize-edge'))).length === 1,
+    'the shadow and outline add no actors to the window');
 }

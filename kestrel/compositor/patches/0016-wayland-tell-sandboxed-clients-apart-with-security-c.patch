@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Mon, 19 Oct 2026 07:16:35 +0200
-Subject: [PATCH 16/56] wayland: tell sandboxed clients apart with
+Subject: [PATCH 16/57] wayland: tell sandboxed clients apart with
  security-context-v1
 
 Implement wp_security_context_manager_v1 so sandbox engines such as

@@ -12,6 +12,7 @@ import { OpenWindows } from '../desktop/windows/openWindows.js';
 import { TitleBars } from '../desktop/windows/titleBars/titleBars.js';
 import { VariableRefresh } from '../desktop/windows/variableRefresh.js';
 import { SeeThroughWindows } from '../desktop/windows/seeThrough/seeThrough.js';
+import { OuterEdges } from '../desktop/windows/edges/outerEdges.js';
 import { PortalBackend } from '../portal/backend.js';
 import { Farewell } from '../session/farewell.js';
 import { LoginDisplays } from '../session/loginScreen/displays.js';
@@ -46,6 +47,7 @@ export class SystemServices {
   private readonly variableRefresh = new VariableRefresh();
   private readonly monitorWake = new MonitorWake();
   private readonly seeThrough = new SeeThroughWindows();
+  private readonly outerEdges = new OuterEdges();
   private readonly titleBars: TitleBars;
   private readonly loginScreen = [new LoginWallpaper(), new LoginDisplays(), new LoginNumLock()];
   private readonly farewell = new Farewell();
@@ -95,6 +97,7 @@ export class SystemServices {
     this.variableRefresh.destroy();
     this.monitorWake.destroy();
     this.seeThrough.destroy();
+    this.outerEdges.destroy();
     this.titleBars.destroy();
     this.portal.destroy();
     this.passkeys.destroy();

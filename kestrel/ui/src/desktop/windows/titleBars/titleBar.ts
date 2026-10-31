@@ -6,7 +6,7 @@ import St from 'gi://St';
 
 import { animateActor, Duration } from '../../../shared/motion/motion.js';
 import { localized, t } from '../../../shared/i18n/index.js';
-import { ResizeArea } from './resizeArea.js';
+import { ResizeArea } from '../edges/resizeArea.js';
 
 export type ShowWindowMenu = (window: Meta.Window, x: number, y: number) => void;
 

@@ -21,7 +21,8 @@ settings-bluetooth-missing = Denne computer har ingen Bluetooth-adapter
 
 ## Shared pieces
 
-settings-subpage-back = Tilbage til { $page }
+settings-navigate-back = Tilbage
+settings-navigate-forward = Frem
 settings-more-show = { $count ->
         [one] Vis { $count } mere
        *[other] Vis { $count } mere

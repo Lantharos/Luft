@@ -69,7 +69,7 @@
 	});
 </script>
 
-<SubPage bind:this={subPage} title={t('settings-cursors-store')} back={t('settings-cursors')} {onclose}>
+<SubPage bind:this={subPage} title={t('settings-cursors-store')} {onclose}>
 	<div class="flex items-center gap-3">
 		<div class="min-w-0 flex-1">
 			<SearchField bind:value={search} label={t('settings-cursors-search')} />

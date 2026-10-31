@@ -19,7 +19,7 @@ const {require, eventually} = checks('Luft app');
 const DEFAULTS: Record<string, string> = {'font-name': 'Open Runde', 'monospace-font-name': 'Maple Mono NF'};
 const CHOSEN: Record<string, string> = {'font-name': 'Noto Serif', 'monospace-font-name': 'Noto Sans Mono'};
 const SIZE = 11;
-const PICKERS: Record<string, Point> = {'font-name': [900, 183], 'monospace-font-name': [900, 252]};
+const PICKERS: Record<string, Point> = {'font-name': [900, 131], 'monospace-font-name': [900, 200]};
 const LARGER_TEXT = 1.25;
 const TERMINAL_TEXT = 'fn main() -> Result<(), Error> { 0x1F != 0o17 }  The quick brown fox 0123456789';
 const ZOOM = 4;
@@ -76,7 +76,7 @@ class Surfaces {
       shell: {area: () => actorArea(clock)},
       gtk4: surface(gtk4, {x: 0, y: 40, width: 440, height: 140}),
       xwayland: surface(xwayland, {x: 0, y: 0, width: 440, height: 130}),
-      settings: surface(app.window, {x: 296, y: 8, width: 360, height: 48}),
+      settings: surface(app.window, {x: 380, y: 8, width: 360, height: 48}),
       sidebar: surface(app.window, {x: 12, y: 116, width: 256, height: 200}),
       tern: surface(tern.window, {x: 0, y: 36, width: 560, height: 28}),
     };

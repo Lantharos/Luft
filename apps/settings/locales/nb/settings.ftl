@@ -21,7 +21,8 @@ settings-bluetooth-missing = Denne datamaskinen har ingen Bluetooth-adapter
 
 ## Shared pieces
 
-settings-subpage-back = Tilbake til { $page }
+settings-navigate-back = Tilbake
+settings-navigate-forward = Fremover
 settings-more-show = { $count ->
         [one] Vis { $count } til
        *[other] Vis { $count } til

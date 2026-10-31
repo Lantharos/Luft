@@ -35,7 +35,6 @@
 
 	let font = $derived(appearance.typography.interface ?? fontLibrary.defaults?.interface ?? '');
 	let text = $derived([font, percent(desktop.values['text-scaling-factor'] ?? 1)].filter(Boolean).join(', '));
-	let page = $derived(t('settings-page-appearance'));
 
 	const open = (section: string | null) => (app.section = section);
 
@@ -47,11 +46,11 @@
 {:else if app.section === 'fonts'}
 	<FontsPage onclose={() => open('text')} />
 {:else if app.section === 'wallpaper'}
-	<SubPage title={t('settings-appearance-wallpaper')} back={page} onclose={() => open(null)}>
+	<SubPage title={t('settings-appearance-wallpaper')} onclose={() => open(null)}>
 		<WallpaperPanel />
 	</SubPage>
 {:else if app.section === 'icons'}
-	<SubPage title={t('settings-appearance-icons')} back={page} onclose={() => open(null)}>
+	<SubPage title={t('settings-appearance-icons')} onclose={() => open(null)}>
 		<AppIconsSection />
 		<Section>
 			<Row title={t('settings-appearance-theme-apps')} description={t('settings-appearance-theme-apps-description')}>
@@ -60,11 +59,11 @@
 		</Section>
 	</SubPage>
 {:else if app.section === 'text'}
-	<SubPage title={t('settings-appearance-text')} back={page} onclose={() => open(null)}>
+	<SubPage title={t('settings-appearance-text')} onclose={() => open(null)}>
 		<FontsSection onbrowse={() => open('fonts')} />
 	</SubPage>
 {:else if app.section === 'cursor'}
-	<SubPage title={t('settings-cursors')} back={page} onclose={() => open(null)}>
+	<SubPage title={t('settings-cursors')} onclose={() => open(null)}>
 		<CursorSection onbrowse={() => open('cursors')} />
 	</SubPage>
 {:else}

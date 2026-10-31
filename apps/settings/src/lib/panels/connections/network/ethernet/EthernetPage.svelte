@@ -23,7 +23,7 @@
 	}
 </script>
 
-<SubPage title={t('settings-page-ethernet')} back={t('settings-page-network')} {onclose}>
+<SubPage title={t('settings-page-ethernet')} {onclose}>
 	{#each wired as device (device.device)}
 		<Section title={wired.length > 1 ? connections.wiredTitle(device) : undefined}>
 			<Row title={connections.wiredTitle(device)} icon={EthernetPort} description={connections.wiredSummary(device)}>

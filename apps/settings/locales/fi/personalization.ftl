@@ -195,7 +195,6 @@ settings-notifications-content-description = Kun tämä ei ole käytössä, näy
 settings-notifications-content-lock-screen = Näytä viestin sisältö lukitusnäytössä
 settings-notifications-apps = Sovellusten ilmoitukset
 settings-notifications-apps-description = Valitse, miten kukin sovellus ilmoittaa sinulle
-settings-notifications-back = Ilmoitukset
 settings-notifications-search = Hae sovelluksia
 settings-notifications-no-match = Haulla ei löytynyt sovelluksia
 settings-notifications-from = { $app } -sovelluksen ilmoitukset

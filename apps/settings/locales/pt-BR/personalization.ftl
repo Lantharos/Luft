@@ -195,7 +195,6 @@ settings-notifications-content-description = Quando desativado, só o nome do ap
 settings-notifications-content-lock-screen = Mostrar conteúdo das mensagens na tela de bloqueio
 settings-notifications-apps = Notificações de apps
 settings-notifications-apps-description = Escolha como cada app notifica você
-settings-notifications-back = Notificações
 settings-notifications-search = Pesquisar apps
 settings-notifications-no-match = Nenhum app corresponde à pesquisa
 settings-notifications-from = Notificações do { $app }

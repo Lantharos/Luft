@@ -195,7 +195,6 @@ settings-notifications-content-description = Kikapcsolva csak az alkalmazás nev
 settings-notifications-content-lock-screen = Üzenet tartalmának megjelenítése a zárolási képernyőn
 settings-notifications-apps = Alkalmazásértesítések
 settings-notifications-apps-description = Az egyes alkalmazások értesítési módjának beállítása
-settings-notifications-back = Értesítések
 settings-notifications-search = Alkalmazások keresése
 settings-notifications-no-match = Egy alkalmazás sem felel meg a keresésnek
 settings-notifications-from = Értesítések innen: { $app }

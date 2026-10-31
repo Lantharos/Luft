@@ -195,7 +195,6 @@ settings-notifications-content-description = Кога е исклучено, с�
 settings-notifications-content-lock-screen = Прикажи ја содржината на пораките на заклучениот екран
 settings-notifications-apps = Известувања од апликации
 settings-notifications-apps-description = Изберете како ве известува секоја апликација
-settings-notifications-back = Известувања
 settings-notifications-search = Пребарај апликации
 settings-notifications-no-match = Ниедна апликација не одговара на пребарувањето
 settings-notifications-from = Известувања од { $app }

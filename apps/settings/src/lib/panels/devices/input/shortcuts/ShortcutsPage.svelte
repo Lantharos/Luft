@@ -17,7 +17,7 @@
 	let query = $state('');
 </script>
 
-<SubPage title={t('settings-shortcuts-title')} back={t('settings-page-input')} {onclose}>
+<SubPage title={t('settings-shortcuts-title')} {onclose}>
 	{#snippet actions()}
 		<div class="w-[260px]">
 			<SearchField label={t('settings-shortcuts-search')} bind:value={query} />

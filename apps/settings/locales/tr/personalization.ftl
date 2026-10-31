@@ -195,7 +195,6 @@ settings-notifications-content-description = Kapalıyken yalnızca uygulamanın 
 settings-notifications-content-lock-screen = İleti içeriğini kilit ekranında göster
 settings-notifications-apps = Uygulama bildirimleri
 settings-notifications-apps-description = Her uygulamanın size nasıl bildirim göndereceğini seçin
-settings-notifications-back = Bildirimler
 settings-notifications-search = Uygulamalarda ara
 settings-notifications-no-match = Aramanızla eşleşen uygulama yok
 settings-notifications-from = Bildirimler: { $app }

@@ -49,7 +49,7 @@
 	commands.aboutOtherSystems().then((list) => (others = list));
 </script>
 
-<SubPage title={t('settings-page-about')} back={t('settings-page-system')} {onclose}>
+<SubPage title={t('settings-page-about')} {onclose}>
 	{#if info}
 		<div class="flex flex-col gap-1 px-2 pb-2">
 			<span class="truncate text-[26px] font-semibold">{info.deviceName}</span>

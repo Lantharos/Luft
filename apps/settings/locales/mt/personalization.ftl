@@ -201,7 +201,6 @@ settings-notifications-content-description = Meta jkun mitfi, jidher biss l-isem
 settings-notifications-content-lock-screen = Uri l-kontenut tal-messaġġi fuq l-iskrin imsakkar
 settings-notifications-apps = Notifiki tal-apps
 settings-notifications-apps-description = Agħżel kif kull app tinnotifikak
-settings-notifications-back = Notifiki
 settings-notifications-search = Fittex apps
 settings-notifications-no-match = L-ebda app ma taqbel mat-tfittxija
 settings-notifications-from = Notifiki minn { $app }

@@ -109,7 +109,7 @@
 	});
 </script>
 
-<SubPage title={t('settings-dictation-title')} back={t('settings-page-input')} {onclose}>
+<SubPage title={t('settings-dictation-title')} {onclose}>
 	<Section
 		description={holdWith ? t('settings-dictation-description', { keys: holdWith }) : t('settings-dictation-description-no-shortcut')}
 	>

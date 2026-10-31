@@ -195,7 +195,6 @@ settings-notifications-content-description = Als dit uit staat, wordt alleen de 
 settings-notifications-content-lock-screen = Inhoud van berichten tonen op het vergrendelscherm
 settings-notifications-apps = Meldingen van apps
 settings-notifications-apps-description = Kies hoe elke app je een melding geeft
-settings-notifications-back = Meldingen
 settings-notifications-search = Apps zoeken
 settings-notifications-no-match = Geen apps gevonden
 settings-notifications-from = Meldingen van { $app }

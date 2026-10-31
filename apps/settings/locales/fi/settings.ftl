@@ -21,7 +21,8 @@ settings-bluetooth-missing = Tässä tietokoneessa ei ole Bluetooth-sovitinta
 
 ## Shared pieces
 
-settings-subpage-back = Takaisin sivulle { $page }
+settings-navigate-back = Takaisin
+settings-navigate-forward = Eteenpäin
 settings-more-show = { $count ->
         [one] Näytä { $count } lisää
        *[other] Näytä { $count } lisää

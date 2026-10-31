@@ -21,7 +21,8 @@ settings-bluetooth-missing = Αυτός ο υπολογιστής δεν δια�
 
 ## Shared pieces
 
-settings-subpage-back = Επιστροφή στη σελίδα { $page }
+settings-navigate-back = Πίσω
+settings-navigate-forward = Εμπρός
 settings-more-show = { $count ->
         [one] Εμφάνιση { $count } ακόμη
        *[other] Εμφάνιση { $count } ακόμη

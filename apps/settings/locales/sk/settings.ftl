@@ -21,7 +21,8 @@ settings-bluetooth-missing = Tento počítač nemá adaptér Bluetooth
 
 ## Shared pieces
 
-settings-subpage-back = Späť na stránku { $page }
+settings-navigate-back = Späť
+settings-navigate-forward = Dopredu
 settings-more-show = { $count ->
         [one] Zobraziť ešte { $count }
         [few] Zobraziť ešte { $count }

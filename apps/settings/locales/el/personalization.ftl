@@ -195,7 +195,6 @@ settings-notifications-content-description = Όταν είναι ανενεργ�
 settings-notifications-content-lock-screen = Εμφάνιση περιεχομένου μηνυμάτων στην οθόνη κλειδώματος
 settings-notifications-apps = Ειδοποιήσεις εφαρμογών
 settings-notifications-apps-description = Επιλέξτε πώς σας ειδοποιεί κάθε εφαρμογή
-settings-notifications-back = Ειδοποιήσεις
 settings-notifications-search = Αναζήτηση εφαρμογών
 settings-notifications-no-match = Καμία εφαρμογή δεν ταιριάζει με την αναζήτηση
 settings-notifications-from = Ειδοποιήσεις από την εφαρμογή { $app }

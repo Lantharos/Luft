@@ -21,7 +21,8 @@ settings-bluetooth-missing = Cet ordinateur n’a pas d’adaptateur Bluetooth
 
 ## Shared pieces
 
-settings-subpage-back = Retour à { $page }
+settings-navigate-back = Précédent
+settings-navigate-forward = Suivant
 settings-more-show = { $count ->
         [one] Afficher { $count } de plus
        *[other] Afficher { $count } de plus

@@ -21,7 +21,8 @@ settings-bluetooth-missing = Níl cuibheoir Bluetooth ar an ríomhaire seo
 
 ## Shared pieces
 
-settings-subpage-back = Ar ais chuig { $page }
+settings-navigate-back = Siar
+settings-navigate-forward = Ar aghaidh
 settings-more-show = { $count ->
         [one] Taispeáin { $count } eile
         [two] Taispeáin { $count } eile

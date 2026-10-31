@@ -21,7 +21,8 @@ settings-bluetooth-missing = Този компютър няма Bluetooth ада
 
 ## Shared pieces
 
-settings-subpage-back = Назад към { $page }
+settings-navigate-back = Назад
+settings-navigate-forward = Напред
 settings-more-show = { $count ->
         [one] Покажи още { $count }
        *[other] Покажи още { $count }

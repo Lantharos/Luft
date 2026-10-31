@@ -26,7 +26,8 @@ settings-bluetooth-missing = This computer has no Bluetooth adapter
 ## Shared pieces
 
 # Screen-reader label of the back button on a page inside a panel. $page is the panel's title, like "Network".
-settings-subpage-back = Back to { $page }
+settings-navigate-back = Back
+settings-navigate-forward = Forward
 # Last row of a shortened list; it shows the rest of the list
 settings-more-show = { $count ->
         [one] Show { $count } more

@@ -42,7 +42,7 @@
 {#if access && unlocked}
 	<AccessPage {access} refresh={loadAccess} onclose={closeAccess} />
 {:else}
-	<SubPage title={t('settings-passwords-title')} back={t('settings-page-security')} {onclose}>
+	<SubPage title={t('settings-passwords-title')} {onclose}>
 		{#if keyring.current === null}
 			<Section>
 				<Row title={t('settings-passwords-not-running')} description={t('settings-passwords-not-running-description')} />

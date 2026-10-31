@@ -199,7 +199,6 @@ settings-notifications-content-description = Якщо вимкнено, пока
 settings-notifications-content-lock-screen = Показувати вміст повідомлень на екрані блокування
 settings-notifications-apps = Сповіщення програм
 settings-notifications-apps-description = Виберіть, як кожна програма сповіщає вас
-settings-notifications-back = Сповіщення
 settings-notifications-search = Пошук програм
 settings-notifications-no-match = Немає програм, що відповідають запиту
 settings-notifications-from = Сповіщення від { $app }

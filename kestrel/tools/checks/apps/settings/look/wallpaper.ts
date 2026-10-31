@@ -10,9 +10,9 @@ import {capture} from '../../../lib/screenshots.js';
 import {show} from '../navigation.js';
 
 const {eventually} = checks('Luft app');
-const PREVIEW: Point = [655, 330];
+const PREVIEW: Point = [655, 278];
 const DRAG = 60;
-const GRID = {left: 328, top: 430, width: 654, gap: 12};
+const GRID = {left: 328, top: 378, width: 654, gap: 12};
 const FOG_FOCUS = [0.5, 0.768];
 const FOG_SHAPE = 5899 / 3933;
 const BACKGROUNDS = repository('os', 'image', 'files', 'usr', 'share', 'backgrounds', 'luft');

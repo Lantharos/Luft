@@ -199,7 +199,6 @@ settings-notifications-content-description = Išjungus rodomas tik programos pav
 settings-notifications-content-lock-screen = Rodyti pranešimų turinį užrakinimo ekrane
 settings-notifications-apps = Programų pranešimai
 settings-notifications-apps-description = Pasirinkite, kaip kiekviena programa jus informuoja
-settings-notifications-back = Pranešimai
 settings-notifications-search = Ieškoti programų
 settings-notifications-no-match = Nerasta jokių programų
 settings-notifications-from = Programos { $app } pranešimai

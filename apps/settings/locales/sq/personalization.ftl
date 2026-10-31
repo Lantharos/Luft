@@ -206,7 +206,6 @@ settings-notifications-content-description = Kur është joaktive, shfaqet vetë
 settings-notifications-content-lock-screen = Shfaq përmbajtjen e mesazheve në ekranin e bllokimit
 settings-notifications-apps = Njoftimet e aplikacioneve
 settings-notifications-apps-description = Zgjidh si të njofton çdo aplikacion
-settings-notifications-back = Njoftimet
 settings-notifications-search = Kërko aplikacione
 settings-notifications-no-match = Asnjë aplikacion nuk përputhet me kërkimin
 settings-notifications-from = Njoftimet nga { $app }

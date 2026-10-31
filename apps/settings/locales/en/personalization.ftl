@@ -240,7 +240,6 @@ settings-notifications-content-lock-screen = Show message content on the lock sc
 settings-notifications-apps = App notifications
 settings-notifications-apps-description = Choose how each app notifies you
 # Back button to the Notifications page
-settings-notifications-back = Notifications
 settings-notifications-search = Search apps
 settings-notifications-no-match = No apps match your search
 # Screen-reader label of a switch; $app is an app name

@@ -54,7 +54,7 @@
 	{/if}
 {/snippet}
 
-<SubPage title={t('settings-page-login')} back={t('settings-page-accounts')} {onclose}>
+<SubPage title={t('settings-page-login')} {onclose}>
 	{#if screen === null}
 		<p class="px-2 text-[14px] text-[var(--text-muted)]">{t('settings-login-unavailable')}</p>
 	{:else if screen}

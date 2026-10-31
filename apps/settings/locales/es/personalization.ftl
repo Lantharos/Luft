@@ -195,7 +195,6 @@ settings-notifications-content-description = Si está desactivado, solo se muest
 settings-notifications-content-lock-screen = Mostrar el contenido de los mensajes en la pantalla de bloqueo
 settings-notifications-apps = Notificaciones de aplicaciones
 settings-notifications-apps-description = Elige cómo te avisa cada aplicación
-settings-notifications-back = Notificaciones
 settings-notifications-search = Buscar aplicaciones
 settings-notifications-no-match = Ninguna aplicación coincide con tu búsqueda
 settings-notifications-from = Notificaciones de { $app }

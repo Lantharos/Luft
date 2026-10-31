@@ -199,7 +199,6 @@ settings-notifications-content-description = Если отключено, пок
 settings-notifications-content-lock-screen = Показывать текст сообщений на экране блокировки
 settings-notifications-apps = Уведомления приложений
 settings-notifications-apps-description = Выберите, как уведомляет каждое приложение
-settings-notifications-back = Уведомления
 settings-notifications-search = Поиск приложений
 settings-notifications-no-match = Приложения не найдены
 settings-notifications-from = Уведомления от приложения { $app }

@@ -21,7 +21,8 @@ settings-bluetooth-missing = Ebben a számítógépben nincs Bluetooth-adapter
 
 ## Shared pieces
 
-settings-subpage-back = Vissza ide: { $page }
+settings-navigate-back = Vissza
+settings-navigate-forward = Előre
 settings-more-show = { $count ->
         [one] Még { $count } megjelenítése
        *[other] Még { $count } megjelenítése

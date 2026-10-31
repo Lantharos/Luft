@@ -195,7 +195,6 @@ settings-notifications-content-description = Þegar slökkt er á þessu sést a
 settings-notifications-content-lock-screen = Sýna efni skilaboða á læsiskjánum
 settings-notifications-apps = Tilkynningar forrita
 settings-notifications-apps-description = Veldu hvernig hvert forrit lætur þig vita
-settings-notifications-back = Tilkynningar
 settings-notifications-search = Leita að forritum
 settings-notifications-no-match = Engin forrit passa við leitina
 settings-notifications-from = Tilkynningar frá { $app }

@@ -199,7 +199,6 @@ settings-notifications-content-description = Keď je vypnuté, zobrazí sa len n
 settings-notifications-content-lock-screen = Zobrazovať obsah správ na uzamknutej obrazovke
 settings-notifications-apps = Oznámenia aplikácií
 settings-notifications-apps-description = Vyberte, ako vás jednotlivé aplikácie upozorňujú
-settings-notifications-back = Oznámenia
 settings-notifications-search = Hľadať aplikácie
 settings-notifications-no-match = Hľadaniu nezodpovedajú žiadne aplikácie
 settings-notifications-from = Oznámenia z aplikácie { $app }

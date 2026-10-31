@@ -197,7 +197,6 @@ settings-notifications-content-description = Când este dezactivat, se afișeaz�
 settings-notifications-content-lock-screen = Afișează conținutul mesajelor pe ecranul de blocare
 settings-notifications-apps = Notificări de la aplicații
 settings-notifications-apps-description = Alegeți cum vă notifică fiecare aplicație
-settings-notifications-back = Notificări
 settings-notifications-search = Caută aplicații
 settings-notifications-no-match = Nicio aplicație nu corespunde căutării
 settings-notifications-from = Notificări de la { $app }

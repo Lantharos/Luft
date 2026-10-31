@@ -21,7 +21,8 @@ settings-bluetooth-missing = Šiame kompiuteryje nėra Bluetooth adapterio
 
 ## Shared pieces
 
-settings-subpage-back = Atgal: { $page }
+settings-navigate-back = Atgal
+settings-navigate-forward = Pirmyn
 settings-more-show = { $count ->
         [one] Rodyti dar { $count }
         [few] Rodyti dar { $count }

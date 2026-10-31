@@ -197,7 +197,6 @@ settings-notifications-content-description = Ja izslēgts, tiek rādīts tikai l
 settings-notifications-content-lock-screen = Rādīt ziņojumu saturu bloķēšanas ekrānā
 settings-notifications-apps = Lietotņu paziņojumi
 settings-notifications-apps-description = Izvēlieties, kā katra lietotne jums paziņo
-settings-notifications-back = Paziņojumi
 settings-notifications-search = Meklēt lietotnes
 settings-notifications-no-match = Neviena lietotne neatbilst meklētajam
 settings-notifications-from = Paziņojumi no lietotnes { $app }

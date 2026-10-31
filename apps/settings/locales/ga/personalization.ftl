@@ -201,7 +201,6 @@ settings-notifications-content-description = Nuair atá sé seo as, ní thaispe�
 settings-notifications-content-lock-screen = Taispeáin ábhar teachtaireachtaí ar an scáileán glasála
 settings-notifications-apps = Fógraí aipeanna
 settings-notifications-apps-description = Roghnaigh conas a thugann gach aip fógra duit
-settings-notifications-back = Fógraí
 settings-notifications-search = Cuardaigh aipeanna
 settings-notifications-no-match = Níl aon aip ag teacht le do chuardach
 settings-notifications-from = Fógraí ón aip { $app }

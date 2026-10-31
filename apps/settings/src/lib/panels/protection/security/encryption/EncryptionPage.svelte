@@ -12,7 +12,7 @@
 	let disk = $derived(trust.disk);
 </script>
 
-<SubPage title={t('settings-encryption')} back={t('settings-page-security')} {onclose}>
+<SubPage title={t('settings-encryption')} {onclose}>
 	<Section>
 		<EncryptionRow {disk} />
 		{#if trust.drives.available}

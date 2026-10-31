@@ -21,7 +21,8 @@ settings-bluetooth-missing = Dan il-kompjuter m’għandux adapter tal-Bluetooth
 
 ## Shared pieces
 
-settings-subpage-back = Lura għal { $page }
+settings-navigate-back = Lura
+settings-navigate-forward = ’Il quddiem
 settings-more-show = { $count ->
         [one] Uri { $count } aktar
         [two] Uri { $count } aktar

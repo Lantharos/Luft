@@ -21,7 +21,8 @@ settings-bluetooth-missing = Šim datoram nav Bluetooth adaptera
 
 ## Shared pieces
 
-settings-subpage-back = Atpakaļ: { $page }
+settings-navigate-back = Atpakaļ
+settings-navigate-forward = Uz priekšu
 settings-more-show = { $count ->
         [zero] Rādīt vēl { $count }
         [one] Rādīt vēl { $count }

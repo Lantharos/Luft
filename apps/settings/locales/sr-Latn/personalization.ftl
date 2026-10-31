@@ -208,7 +208,6 @@ settings-notifications-content-description = Kad je isključeno, prikazuje se sa
 settings-notifications-content-lock-screen = Prikaži sadržaj poruka na zaključanom ekranu
 settings-notifications-apps = Obaveštenja aplikacija
 settings-notifications-apps-description = Izaberite kako vas svaka aplikacija obaveštava
-settings-notifications-back = Obaveštenja
 settings-notifications-search = Pretraži aplikacije
 settings-notifications-no-match = Nijedna aplikacija ne odgovara pretrazi
 settings-notifications-from = Obaveštenja iz aplikacije { $app }

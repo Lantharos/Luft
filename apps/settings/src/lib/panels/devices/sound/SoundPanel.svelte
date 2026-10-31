@@ -78,11 +78,11 @@
 {/snippet}
 
 {#if sound && page === 'apps'}
-	<SubPage title={t('settings-sound-apps')} back={t('settings-page-sound')} onclose={() => (page = null)}>
+	<SubPage title={t('settings-sound-apps')} onclose={() => (page = null)}>
 		<AppsSection apps={sound.apps} outputs={sound.outputs} {max} />
 	</SubPage>
 {:else if sound && page === 'devices'}
-	<SubPage title={t('settings-sound-profiles')} back={t('settings-page-sound')} onclose={() => (page = null)}>
+	<SubPage title={t('settings-sound-profiles')} onclose={() => (page = null)}>
 		<DevicesSection cards={sound.cards} />
 	</SubPage>
 {:else if sound}

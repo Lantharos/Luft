@@ -16,7 +16,7 @@
 	let { access, refresh, onclose }: Props = $props();
 </script>
 
-<SubPage title={t('settings-passwords-apps')} back={t('settings-passwords-title')} {onclose}>
+<SubPage title={t('settings-passwords-apps')} {onclose}>
 	<Section>
 		<Row title={t('settings-passwords-apps-allowed')} description={t('settings-passwords-apps-allowed-hint')} onclick={() => app.open('apps')} />
 	</Section>

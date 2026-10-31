@@ -21,7 +21,8 @@ settings-bluetooth-missing = Selles arvutis pole Bluetoothi adapterit
 
 ## Shared pieces
 
-settings-subpage-back = Tagasi: { $page }
+settings-navigate-back = Tagasi
+settings-navigate-forward = Edasi
 settings-more-show = { $count ->
         [one] Kuva veel { $count }
        *[other] Kuva veel { $count }

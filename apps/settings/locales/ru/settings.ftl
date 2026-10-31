@@ -21,7 +21,8 @@ settings-bluetooth-missing = На этом компьютере нет адап�
 
 ## Shared pieces
 
-settings-subpage-back = Назад: { $page }
+settings-navigate-back = Назад
+settings-navigate-forward = Вперёд
 settings-more-show = { $count ->
         [one] Показать ещё { $count }
         [few] Показать ещё { $count }

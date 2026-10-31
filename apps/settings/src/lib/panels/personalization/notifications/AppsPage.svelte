@@ -21,7 +21,7 @@
 	let shown = $derived(apps.filter((app) => matches(app, query)));
 </script>
 
-<SubPage title={t('settings-notifications-apps')} back={t('settings-notifications-back')} {onclose}>
+<SubPage title={t('settings-notifications-apps')} {onclose}>
 	{#if apps.length > SEARCH_THRESHOLD}
 		<SearchField label={t('settings-notifications-search')} bind:value={query} />
 	{/if}

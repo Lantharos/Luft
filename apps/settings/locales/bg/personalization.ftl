@@ -195,7 +195,6 @@ settings-notifications-content-description = Когато е изключено,
 settings-notifications-content-lock-screen = Показване на съдържанието на заключения екран
 settings-notifications-apps = Известия от приложения
 settings-notifications-apps-description = Изберете как всяко приложение ви известява
-settings-notifications-back = Известия
 settings-notifications-search = Търсене на приложения
 settings-notifications-no-match = Няма приложения, които отговарят на търсенето
 settings-notifications-from = Известия от { $app }

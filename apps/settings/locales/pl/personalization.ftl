@@ -199,7 +199,6 @@ settings-notifications-content-description = Po wyłączeniu widoczna jest tylko
 settings-notifications-content-lock-screen = Pokazuj treść wiadomości na ekranie blokady
 settings-notifications-apps = Powiadomienia aplikacji
 settings-notifications-apps-description = Wybierz, jak każda aplikacja ma cię powiadamiać
-settings-notifications-back = Powiadomienia
 settings-notifications-search = Szukaj aplikacji
 settings-notifications-no-match = Brak aplikacji pasujących do wyszukiwania
 settings-notifications-from = Powiadomienia z aplikacji { $app }

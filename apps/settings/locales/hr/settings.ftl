@@ -21,7 +21,8 @@ settings-bluetooth-missing = Ovo računalo nema Bluetooth adapter
 
 ## Shared pieces
 
-settings-subpage-back = Natrag na { $page }
+settings-navigate-back = Natrag
+settings-navigate-forward = Naprijed
 settings-more-show = { $count ->
         [one] Prikaži još { $count }
         [few] Prikaži još { $count }

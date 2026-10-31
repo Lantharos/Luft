@@ -23,7 +23,7 @@
 	let known = $derived(connections.network?.known.length ?? 0);
 </script>
 
-<SubPage title={t('settings-page-wifi')} back={t('settings-page-network')} {onclose}>
+<SubPage title={t('settings-page-wifi')} {onclose}>
 	<Section>
 		<Row title={t('settings-network-wifi')} icon={WifiIcon} description={connections.wifiSummary(wifi)} truncate>
 			<Switch label={t('settings-network-wifi')} checked={wifi.enabled} disabled={!wifi.hardwareEnabled} onchange={(enabled) => commands.networkSetWifi({ enabled })} />

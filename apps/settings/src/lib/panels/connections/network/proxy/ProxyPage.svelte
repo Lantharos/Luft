@@ -89,7 +89,7 @@
 	}
 </script>
 
-<SubPage title={t('settings-page-proxy')} back={t('settings-page-network')} {onclose}>
+<SubPage title={t('settings-page-proxy')} {onclose}>
 	{#snippet actions()}
 		<button type="button" class="button primary" disabled={!ready} onclick={save}>{saving ? t('settings-network-saving') : t('settings-network-save')}</button>
 	{/snippet}

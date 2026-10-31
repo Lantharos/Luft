@@ -21,7 +21,8 @@ settings-bluetooth-missing = Bu bilgisayarda Bluetooth bağdaştırıcısı yok
 
 ## Shared pieces
 
-settings-subpage-back = { $page } sayfasına dön
+settings-navigate-back = Geri
+settings-navigate-forward = İleri
 settings-more-show = { $count ->
         [one] { $count } tane daha göster
        *[other] { $count } tane daha göster

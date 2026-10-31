@@ -206,7 +206,6 @@ settings-notifications-content-description = Wenn aus, wird nur der Name der App
 settings-notifications-content-lock-screen = Nachrichteninhalt auf dem Sperrbildschirm anzeigen
 settings-notifications-apps = App-Benachrichtigungen
 settings-notifications-apps-description = Wähl, wie dich jede App benachrichtigt
-settings-notifications-back = Benachrichtigungen
 settings-notifications-search = Apps suchen
 settings-notifications-no-match = Keine Apps passen zu deiner Suche
 settings-notifications-from = Benachrichtigungen von { $app }

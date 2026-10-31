@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { t } from '@luft/i18n';
 	import { app } from '#lib/state/app.svelte.js';
 	import ConnectionPage from './connection/ConnectionPage.svelte';
 	import type { Target } from './connection/profile';
@@ -18,12 +17,6 @@
 		title: string;
 	}
 
-	const PAGE_TITLES: Record<string, string> = {
-		wifi: 'settings-page-wifi',
-		ethernet: 'settings-page-ethernet',
-		vpn: 'settings-page-vpn'
-	};
-
 	const connections = new NetworkState();
 	const proxy = useProxy();
 
@@ -32,7 +25,6 @@
 
 	let network = $derived(connections.network);
 	let section = $derived(app.section);
-	let back = $derived(browsingKnown ? t('settings-network-known') : section && PAGE_TITLES[section] ? t(PAGE_TITLES[section]) : t('settings-page-network'));
 
 	const close = () => (app.section = null);
 	const configure = (target: Target, title: string) => (editing = { target, title });
@@ -41,7 +33,7 @@
 </script>
 
 {#if network && editing}
-	<ConnectionPage target={editing.target} title={editing.title} {back} {network} onclose={() => (editing = null)} />
+	<ConnectionPage target={editing.target} title={editing.title} {network} onclose={() => (editing = null)} />
 {:else if network && browsingKnown}
 	<KnownNetworks {network} onconfigure={configure} onclose={() => (browsingKnown = false)} />
 {:else if network?.wifi && section === 'wifi'}

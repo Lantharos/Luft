@@ -21,7 +21,8 @@ settings-bluetooth-missing = Ky kompjuter nuk ka përshtatës Bluetooth
 
 ## Shared pieces
 
-settings-subpage-back = Kthehu te { $page }
+settings-navigate-back = Prapa
+settings-navigate-forward = Përpara
 settings-more-show = { $count ->
         [one] Shfaq edhe { $count }
        *[other] Shfaq edhe { $count }

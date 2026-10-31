@@ -195,7 +195,6 @@ settings-notifications-content-description = Når dette er av, vises bare navnet
 settings-notifications-content-lock-screen = Vis innholdet i varsler på låseskjermen
 settings-notifications-apps = Appvarsler
 settings-notifications-apps-description = Velg hvordan hver app varsler deg
-settings-notifications-back = Varsler
 settings-notifications-search = Søk i apper
 settings-notifications-no-match = Ingen apper samsvarer med søket
 settings-notifications-from = Varsler fra { $app }

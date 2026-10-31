@@ -21,7 +21,8 @@ settings-bluetooth-missing = Ta računalnik nima vmesnika Bluetooth
 
 ## Shared pieces
 
-settings-subpage-back = Nazaj na stran { $page }
+settings-navigate-back = Nazaj
+settings-navigate-forward = Naprej
 settings-more-show = { $count ->
         [one] Pokaži še { $count }
         [two] Pokaži še { $count }

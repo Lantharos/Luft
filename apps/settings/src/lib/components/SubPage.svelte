@@ -1,18 +1,15 @@
 <script lang="ts">
-	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import { onMount, type Snippet } from 'svelte';
-	import { t } from '@luft/i18n';
-	import { IconButton } from '@luft/ui';
+	import { app } from '#lib/state/app.svelte.js';
 
 	interface Props {
 		title: string;
-		back: string;
 		onclose: () => void;
 		actions?: Snippet;
 		children: Snippet;
 	}
 
-	let { title, back, onclose, actions, children }: Props = $props();
+	let { title, onclose, actions, children }: Props = $props();
 
 	let root = $state<HTMLDivElement>();
 
@@ -20,14 +17,17 @@
 		root?.scrollIntoView({ block: 'start' });
 	}
 
+	$effect(() =>
+		app.showPage({
+			title,
+			actions,
+			close: () => onclose()
+		})
+	);
+
 	onMount(reveal);
 </script>
 
 <div bind:this={root} class="flex scroll-mt-4 flex-col gap-7">
-	<div class="-mb-2 flex items-center gap-3">
-		<IconButton icon={ArrowLeft} label={t('settings-subpage-back', { page: back })} onclick={onclose} />
-		<h2 class="min-w-0 flex-1 truncate text-[17px] font-semibold">{title}</h2>
-		{@render actions?.()}
-	</div>
 	{@render children()}
 </div>

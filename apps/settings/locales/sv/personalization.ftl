@@ -195,7 +195,6 @@ settings-notifications-content-description = När det är av visas bara appens n
 settings-notifications-content-lock-screen = Visa meddelandets innehåll på låsskärmen
 settings-notifications-apps = Appnotiser
 settings-notifications-apps-description = Välj hur varje app meddelar dig
-settings-notifications-back = Notiser
 settings-notifications-search = Sök efter appar
 settings-notifications-no-match = Inga appar matchar sökningen
 settings-notifications-from = Notiser från { $app }

@@ -197,7 +197,6 @@ settings-notifications-content-description = Kui see on väljas, kuvatakse ainul
 settings-notifications-content-lock-screen = Kuva sõnumi sisu lukustuskuval
 settings-notifications-apps = Rakenduste teavitused
 settings-notifications-apps-description = Vali, kuidas iga rakendus sind teavitab
-settings-notifications-back = Teavitused
 settings-notifications-search = Otsi rakendusi
 settings-notifications-no-match = Otsingule ei vasta ükski rakendus
 settings-notifications-from = Teavitused: { $app }

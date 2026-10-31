@@ -22,12 +22,10 @@ export function selectionPill(selector = '[aria-current="page"]'): Attachment<HT
 				shown = false;
 				return;
 			}
-			const bounds = list.getBoundingClientRect();
-			const box = item.getBoundingClientRect();
-			const top = box.top - bounds.top + list.scrollTop;
-			pill.style.left = `${box.left - bounds.left + list.scrollLeft}px`;
-			pill.style.width = `${box.width}px`;
-			pill.style.height = `${box.height}px`;
+			const top = item.offsetTop;
+			pill.style.left = `${item.offsetLeft}px`;
+			pill.style.width = `${item.offsetWidth}px`;
+			pill.style.height = `${item.offsetHeight}px`;
 			pill.style.borderRadius = getComputedStyle(item).borderRadius;
 			if (animate && shown) void offset.to(top);
 			else offset.set(top);

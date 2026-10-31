@@ -42,7 +42,7 @@
 	<p class="pl-[34px] text-[12.5px] text-[var(--danger)]">{importProblem}</p>
 {/snippet}
 
-<SubPage title={t('settings-page-vpn')} back={t('settings-page-network')} {onclose}>
+<SubPage title={t('settings-page-vpn')} {onclose}>
 	<Section>
 		{#each vpns as vpn (vpn.connection)}
 			<Row title={vpn.name} icon={Shield} description={connections.vpnSummary(vpn)}>

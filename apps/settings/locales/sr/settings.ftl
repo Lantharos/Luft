@@ -21,7 +21,8 @@ settings-bluetooth-missing = Овај рачунар нема Bluetooth адап
 
 ## Shared pieces
 
-settings-subpage-back = Назад на страницу { $page }
+settings-navigate-back = Назад
+settings-navigate-forward = Напред
 settings-more-show = { $count ->
         [one] Прикажи још { $count }
         [few] Прикажи још { $count }

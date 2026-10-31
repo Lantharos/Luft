@@ -21,7 +21,8 @@ settings-bluetooth-missing = Acest computer nu are adaptor Bluetooth
 
 ## Shared pieces
 
-settings-subpage-back = Înapoi la { $page }
+settings-navigate-back = Înapoi
+settings-navigate-forward = Înainte
 settings-more-show = { $count ->
         [one] Afișează încă { $count }
         [few] Afișează încă { $count }

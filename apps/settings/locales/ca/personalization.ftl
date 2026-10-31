@@ -195,7 +195,6 @@ settings-notifications-content-description = Si està desactivat, només es most
 settings-notifications-content-lock-screen = Mostra el contingut dels missatges a la pantalla de bloqueig
 settings-notifications-apps = Notificacions de les aplicacions
 settings-notifications-apps-description = Trieu com us avisa cada aplicació
-settings-notifications-back = Notificacions
 settings-notifications-search = Cerca aplicacions
 settings-notifications-no-match = Cap aplicació no coincideix amb la cerca
 settings-notifications-from = Notificacions de { $app }

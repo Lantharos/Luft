@@ -92,10 +92,14 @@
 		<div class="context">
 			<Segmented label={t('settings-appearance-schedule')} options={schedules} value={schedule === 'custom' ? 'custom' : 'sunset'} onchange={(value) => kestrel.set('dark-schedule', value)} />
 			{#if schedule === 'custom'}
-				<span>{t('settings-appearance-dark-from')}</span>
-				<TimePicker label={t('settings-appearance-dark-from')} {twelveHour} value={kestrel.values['dark-schedule-from'] ?? 20} onchange={(hours) => kestrel.set('dark-schedule-from', hours)} />
-				<span>{t('settings-appearance-light-from')}</span>
-				<TimePicker label={t('settings-appearance-light-from')} {twelveHour} value={kestrel.values['dark-schedule-to'] ?? 7} onchange={(hours) => kestrel.set('dark-schedule-to', hours)} />
+				<span class="time">
+					<span>{t('settings-appearance-dark-from')}</span>
+					<TimePicker label={t('settings-appearance-dark-from')} {twelveHour} value={kestrel.values['dark-schedule-from'] ?? 20} onchange={(hours) => kestrel.set('dark-schedule-from', hours)} />
+				</span>
+				<span class="time">
+					<span>{t('settings-appearance-light-from')}</span>
+					<TimePicker label={t('settings-appearance-light-from')} {twelveHour} value={kestrel.values['dark-schedule-to'] ?? 7} onchange={(hours) => kestrel.set('dark-schedule-to', hours)} />
+				</span>
 			{/if}
 		</div>
 	{:else if mode === 'dark'}
@@ -107,6 +111,13 @@
 </section>
 
 <style>
+	.time {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		white-space: nowrap;
+	}
+
 	.context {
 		display: flex;
 		flex-wrap: wrap;

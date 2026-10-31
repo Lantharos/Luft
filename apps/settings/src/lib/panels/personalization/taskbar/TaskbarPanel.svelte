@@ -56,7 +56,6 @@
 	let startSummary = $derived(
 		[t(START_STYLES.find((option) => option.value === (values['start-style'] ?? 'menu'))!.label), WEB_SEARCH.find((option) => option.value === (values['search-web-engine'] ?? 'duckduckgo'))!.label].join(', ')
 	);
-	let page = $derived(t('settings-page-taskbar'));
 
 	const receiveDisplays = (state: Displays) => (displays = state.logical.length);
 	const open = (section: string | null) => (app.section = section);
@@ -70,11 +69,11 @@
 </script>
 
 {#if app.section === 'start'}
-	<SubPage title={t('settings-start-section')} back={page} onclose={() => open(null)}>
+	<SubPage title={t('settings-start-section')} onclose={() => open(null)}>
 		<StartOptions settings={taskbar} />
 	</SubPage>
 {:else if app.section === 'more'}
-	<SubPage title={t('settings-taskbar-more')} back={page} onclose={() => open(null)}>
+	<SubPage title={t('settings-taskbar-more')} onclose={() => open(null)}>
 		<MoreOptions settings={taskbar} {displays} />
 	</SubPage>
 {:else}

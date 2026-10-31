@@ -21,7 +21,8 @@ settings-bluetooth-missing = Þessi tölva er ekki með Bluetooth-millistykki
 
 ## Shared pieces
 
-settings-subpage-back = Til baka á síðuna { $page }
+settings-navigate-back = Til baka
+settings-navigate-forward = Áfram
 settings-more-show = { $count ->
         [one] Sýna { $count } í viðbót
        *[other] Sýna { $count } í viðbót

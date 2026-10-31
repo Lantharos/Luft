@@ -73,7 +73,14 @@ fn plan(card: &Card, hints: &ModeHints) -> io::Result<Vec<Planned>> {
     for info in &connected {
         let taken: Vec<crtc::Handle> = plan.iter().map(|planned| planned.crtc).collect();
         let crtc = pick_crtc(card, &resources, info, &taken);
-        let mode = hints.choose(&info.to_string(), &names, info.modes());
+        let mode = hints
+            .choose(&info.to_string(), &names, info.modes())
+            .map(|mode| match info.interface() {
+                connector::Interface::HDMIA | connector::Interface::HDMIB => {
+                    modes::without_hdmi_scrambling(mode, info.modes())
+                }
+                _ => mode,
+            });
         if let (Some(crtc), Some(mode)) = (crtc, mode) {
             plan.push(Planned {
                 connector: info.handle(),

@@ -115,6 +115,27 @@ impl ModeHints {
     }
 }
 
+const HDMI_SCRAMBLING_ABOVE_KHZ: u32 = 340_000;
+
+/// Some monitors stay black when the first picture after standby already needs
+/// HDMI scrambling, so the splash wakes them in the fastest mode of the same size
+/// that doesn't, and the desktop switches up once they're awake.
+pub fn without_hdmi_scrambling(mode: Mode, modes: &[Mode]) -> Mode {
+    if mode.clock() <= HDMI_SCRAMBLING_ABOVE_KHZ {
+        return mode;
+    }
+    modes
+        .iter()
+        .filter(|candidate| {
+            candidate.size() == mode.size()
+                && candidate.clock() <= HDMI_SCRAMBLING_ABOVE_KHZ
+                && !candidate.flags().contains(ModeFlags::INTERLACE)
+        })
+        .max_by(|a, b| refresh_rate(a).total_cmp(&refresh_rate(b)))
+        .copied()
+        .unwrap_or(mode)
+}
+
 pub fn refresh_rate(mode: &Mode) -> f64 {
     let (_, _, htotal) = mode.hsync();
     let (_, _, vtotal) = mode.vsync();
@@ -173,6 +194,26 @@ mod tests {
             .wanted("DP-1", &["DP-1".into(), "HDMI-A-1".into()])
             .unwrap();
         assert_eq!((paired.width, paired.height), (2560, 1080));
+    }
+
+    fn mode(clock: u32, htotal: u16, vtotal: u16) -> Mode {
+        Mode::from(drm_ffi::drm_mode_modeinfo {
+            clock,
+            hdisplay: 1920,
+            htotal,
+            vdisplay: 1080,
+            vtotal,
+            ..Default::default()
+        })
+    }
+
+    #[test]
+    fn hdmi_modes_needing_scrambling_start_in_the_fastest_one_without() {
+        let fast = mode(380_930, 2080, 1110);
+        let modes = [fast, mode(148_500, 2200, 1125), mode(297_000, 2200, 1125)];
+        let chosen = without_hdmi_scrambling(fast, &modes);
+        assert_eq!(chosen.clock(), 297_000);
+        assert_eq!(without_hdmi_scrambling(chosen, &modes), chosen);
     }
 
     #[test]

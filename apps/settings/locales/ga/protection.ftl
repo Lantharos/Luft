@@ -440,6 +440,7 @@ settings-apps-choose = Roghnaigh
 settings-apps-startup = Tosú
 settings-apps-startup-description = Osclaítear na haipeanna seo nuair a shíníonn tú isteach
 settings-apps-startup-app = Oscail { $app } nuair a shíníonn tú isteach
+settings-apps-startup-remove = Bain { $app } den tosú
 settings-apps-startup-add = Cuir aip leis
 settings-apps-startup-add-title = Cuir aip tosaithe leis
 settings-apps-startup-add-description = Roghnaigh aip le hoscailt gach uair a shíníonn tú isteach.

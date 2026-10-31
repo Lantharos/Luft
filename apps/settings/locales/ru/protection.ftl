@@ -429,6 +429,7 @@ settings-apps-choose = Выберите
 settings-apps-startup = Автозапуск
 settings-apps-startup-description = Эти приложения открываются при входе в систему
 settings-apps-startup-app = Открывать приложение { $app } при входе
+settings-apps-startup-remove = Убрать { $app } из автозапуска
 settings-apps-startup-add = Добавить приложение
 settings-apps-startup-add-title = Добавить приложение в автозапуск
 settings-apps-startup-add-description = Выберите приложение, которое будет открываться при каждом входе в систему.

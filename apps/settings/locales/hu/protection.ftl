@@ -407,6 +407,7 @@ settings-apps-choose = Válasszon
 settings-apps-startup = Indítás
 settings-apps-startup-description = Ezek az alkalmazások bejelentkezéskor megnyílnak
 settings-apps-startup-app = Megnyitás bejelentkezéskor: { $app }
+settings-apps-startup-remove = { $app } eltávolítása az indításból
 settings-apps-startup-add = Alkalmazás hozzáadása
 settings-apps-startup-add-title = Indítási alkalmazás hozzáadása
 settings-apps-startup-add-description = Válassza ki, melyik alkalmazás nyíljon meg minden bejelentkezéskor.

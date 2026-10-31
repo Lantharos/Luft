@@ -418,6 +418,7 @@ settings-apps-choose = Alege
 settings-apps-startup = Pornire
 settings-apps-startup-description = Aceste aplicații se deschid când vă conectați
 settings-apps-startup-app = Deschide { $app } la conectare
+settings-apps-startup-remove = Elimină { $app } de la pornire
 settings-apps-startup-add = Adaugă o aplicație
 settings-apps-startup-add-title = Adăugați o aplicație la pornire
 settings-apps-startup-add-description = Alegeți o aplicație care să se deschidă de fiecare dată când vă conectați.

@@ -429,6 +429,7 @@ settings-apps-choose = Pasirinkite
 settings-apps-startup = Paleidimas
 settings-apps-startup-description = Šios programos atsidaro jums prisijungus
 settings-apps-startup-app = Atidaryti programą { $app } prisijungus
+settings-apps-startup-remove = Pašalinti { $app } iš paleisties
 settings-apps-startup-add = Pridėti programą
 settings-apps-startup-add-title = Pridėti paleidžiamą programą
 settings-apps-startup-add-description = Pasirinkite programą, kuri atsidarys kaskart jums prisijungus.

@@ -407,6 +407,7 @@ settings-apps-choose = Επιλογή
 settings-apps-startup = Εκκίνηση
 settings-apps-startup-description = Αυτές οι εφαρμογές ανοίγουν όταν συνδέεστε
 settings-apps-startup-app = Άνοιγμα της εφαρμογής { $app } κατά τη σύνδεση
+settings-apps-startup-remove = Αφαίρεση του { $app } από την εκκίνηση
 settings-apps-startup-add = Προσθήκη εφαρμογής
 settings-apps-startup-add-title = Προσθήκη εφαρμογής εκκίνησης
 settings-apps-startup-add-description = Επιλέξτε μια εφαρμογή που θα ανοίγει κάθε φορά που συνδέεστε.

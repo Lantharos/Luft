@@ -429,6 +429,7 @@ settings-apps-choose = Vyberte
 settings-apps-startup = Po spuštění
 settings-apps-startup-description = Tyto aplikace se otevřou po přihlášení
 settings-apps-startup-app = Otevřít aplikaci { $app } po přihlášení
+settings-apps-startup-remove = Odebrat { $app } ze spouštění
 settings-apps-startup-add = Přidat aplikaci
 settings-apps-startup-add-title = Přidat aplikaci po spuštění
 settings-apps-startup-add-description = Vyberte aplikaci, která se otevře při každém přihlášení.

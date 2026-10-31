@@ -429,6 +429,7 @@ settings-apps-choose = Вибрати
 settings-apps-startup = Автозапуск
 settings-apps-startup-description = Ці програми відкриваються, коли ви входите в систему
 settings-apps-startup-app = Відкривати { $app } під час входу
+settings-apps-startup-remove = Прибрати { $app } з автозапуску
 settings-apps-startup-add = Додати програму
 settings-apps-startup-add-title = Додати програму до автозапуску
 settings-apps-startup-add-description = Виберіть програму, яка відкриватиметься щоразу, коли ви входите в систему.

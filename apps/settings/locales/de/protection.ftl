@@ -407,6 +407,7 @@ settings-apps-choose = Auswählen
 settings-apps-startup = Autostart
 settings-apps-startup-description = Diese Apps öffnen sich, wenn du dich anmeldest
 settings-apps-startup-app = { $app } bei der Anmeldung öffnen
+settings-apps-startup-remove = { $app } aus dem Autostart entfernen
 settings-apps-startup-add = App hinzufügen
 settings-apps-startup-add-title = Autostart-App hinzufügen
 settings-apps-startup-add-description = Wähl eine App, die sich bei jeder Anmeldung öffnet.

@@ -105,6 +105,12 @@ fn identify(id: &str) -> App {
         })
 }
 
+fn installed(id: &str, app_images: &BTreeSet<String>) -> bool {
+    app_images.contains(id)
+        || App::by_id(&format!("{id}.desktop")).is_some()
+        || super::startup::flatpak_installed(id)
+}
+
 fn open(closed: &HashMap<String, Vec<String>>, id: &str) -> bool {
     closed
         .get(id)
@@ -147,6 +153,7 @@ async fn read(connection: &Connection) -> zbus::Result<Vec<AppAccess>> {
         .chain(devices.keys())
         .chain(services.keys())
         .chain(&app_images)
+        .filter(|id| installed(id, &app_images))
         .collect();
     let mut apps: Vec<AppAccess> = ids
         .into_iter()

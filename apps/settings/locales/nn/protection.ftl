@@ -407,6 +407,7 @@ settings-apps-choose = Vel
 settings-apps-startup = Oppstart
 settings-apps-startup-description = Desse appane blir opna når du loggar inn
 settings-apps-startup-app = Opne { $app } når du loggar inn
+settings-apps-startup-remove = Fjern { $app } frå oppstart
 settings-apps-startup-add = Legg til app
 settings-apps-startup-add-title = Legg til ein oppstartsapp
 settings-apps-startup-add-description = Vel ein app som skal opnast kvar gong du loggar inn.

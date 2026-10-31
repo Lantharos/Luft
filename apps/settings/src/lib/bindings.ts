@@ -146,6 +146,9 @@ export const commands = {
 	appsStartupAdd: (params: {
 		app: string,
 	}, options?: InvokeOptions) => invoke<null>("apps_startup_add", params, options),
+	appsStartupRemove: (params: {
+		id: string,
+	}, options?: InvokeOptions) => invoke<null>("apps_startup_remove", params, options),
 	appsStartupSet: (params: {
 		id: string,
 		enabled: boolean,
@@ -879,6 +882,7 @@ export type Enterprise = {
 
 export type Entry = {
 	enabled: boolean,
+	removable: boolean,
 } & App;
 
 export type ExternalBrightness = "checking" | "ready" | "missing-tool" | "needs-restart" | "no-access";

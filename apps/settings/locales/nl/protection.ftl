@@ -407,6 +407,7 @@ settings-apps-choose = Kiezen
 settings-apps-startup = Opstarten
 settings-apps-startup-description = Deze apps openen als je je aanmeldt
 settings-apps-startup-app = { $app } openen als je je aanmeldt
+settings-apps-startup-remove = { $app } uit opstarten verwijderen
 settings-apps-startup-add = App toevoegen
 settings-apps-startup-add-title = Opstart-app toevoegen
 settings-apps-startup-add-description = Kies een app die elke keer opent als je je aanmeldt.

@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import Plus from '@lucide/svelte/icons/plus';
-	import { AppIcon, ItemRow, Row, Section, Switch } from '@luft/ui';
+	import X from '@lucide/svelte/icons/x';
+	import { AppIcon, IconButton, ItemRow, Row, Section, Switch } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { Entry } from '#lib/bindings.js';
 	import ChooseAppDialog from './ChooseAppDialog.svelte';
@@ -22,6 +23,11 @@
 		}
 	}
 
+	async function remove(app: Entry) {
+		await commands.appsStartupRemove({ id: app.id });
+		await load();
+	}
+
 	async function add(id: string) {
 		adding = false;
 		await commands.appsStartupAdd({ app: id });
@@ -38,6 +44,9 @@
 				<AppIcon icon={app.icon} id={app.id} />
 			{/snippet}
 			<Switch label={t('settings-apps-startup-app', { app: app.name })} checked={app.enabled} onchange={(enabled) => toggle(app, enabled)} />
+			{#if app.removable}
+				<IconButton icon={X} label={t('settings-apps-startup-remove', { app: app.name })} onclick={() => remove(app)} />
+			{/if}
 		</ItemRow>
 	{/each}
 	<Row title={t('settings-apps-startup-add')} icon={Plus} onclick={() => (adding = true)} />

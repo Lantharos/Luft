@@ -407,6 +407,7 @@ settings-apps-choose = Trieu
 settings-apps-startup = Arrencada
 settings-apps-startup-description = Aquestes aplicacions s’obren quan inicieu la sessió
 settings-apps-startup-app = Obre { $app } en iniciar la sessió
+settings-apps-startup-remove = Treu { $app } de l’inici
 settings-apps-startup-add = Afegeix una aplicació
 settings-apps-startup-add-title = Afegiu una aplicació d’arrencada
 settings-apps-startup-add-description = Trieu una aplicació que s’obri cada vegada que inicieu la sessió.

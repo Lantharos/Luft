@@ -28,6 +28,7 @@ pub struct Entry {
     #[serde(flatten)]
     app: App,
     enabled: bool,
+    removable: bool,
 }
 
 #[derive(Deserialize, Type)]
@@ -39,6 +40,11 @@ pub struct Toggle {
 #[derive(Deserialize, Type)]
 pub struct Addition {
     app: String,
+}
+
+#[derive(Deserialize, Type)]
+pub struct Removal {
+    id: String,
 }
 
 fn failed(error: impl std::fmt::Display) -> String {
@@ -104,7 +110,7 @@ fn program(info: &gio_unix::DesktopAppInfo) -> Option<OsString> {
     glib::shell_parse_argv(line).ok()?.into_iter().next()
 }
 
-fn flatpak_installed(id: &str) -> bool {
+pub(super) fn flatpak_installed(id: &str) -> bool {
     [
         glib::user_data_dir().join("flatpak"),
         PathBuf::from("/var/lib/flatpak"),
@@ -115,6 +121,7 @@ fn flatpak_installed(id: &str) -> bool {
 
 fn entry(user: &Path, name: OsString) -> Option<Entry> {
     let system = system_file(&name);
+    let removable = system.is_none();
     if let Some(system) = &system
         && !listed_by_system(&gio_unix::DesktopAppInfo::from_filename(system)?)
     {
@@ -129,6 +136,7 @@ fn entry(user: &Path, name: OsString) -> Option<Entry> {
     Some(Entry {
         app: App::new(name.to_string_lossy().into_owned(), &info),
         enabled: runs(&info),
+        removable,
     })
 }
 
@@ -201,6 +209,10 @@ pub fn add(Addition { app }: Addition) -> Result<(), String> {
     file.set_boolean(GROUP, ENABLED, true);
     start_as_declared(&file);
     save(&file, &user_directory()?, &app)
+}
+
+pub fn remove(Removal { id }: Removal) -> Result<(), String> {
+    fs::remove_file(user_directory()?.join(id)).map_err(failed)
 }
 
 fn start_as_declared(file: &glib::KeyFile) {

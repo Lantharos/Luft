@@ -429,6 +429,7 @@ settings-apps-choose = Izberite
 settings-apps-startup = Zagon
 settings-apps-startup-description = Te aplikacije se odprejo, ko se prijavite
 settings-apps-startup-app = Odpri aplikacijo { $app } ob prijavi
+settings-apps-startup-remove = Odstrani { $app } iz zagona
 settings-apps-startup-add = Dodaj aplikacijo
 settings-apps-startup-add-title = Dodajte aplikacijo ob zagonu
 settings-apps-startup-add-description = Izberite aplikacijo, ki se bo odprla ob vsaki prijavi.

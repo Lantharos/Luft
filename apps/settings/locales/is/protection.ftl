@@ -407,6 +407,7 @@ settings-apps-choose = Veldu
 settings-apps-startup = Ræsing
 settings-apps-startup-description = Þessi forrit opnast þegar þú skráir þig inn
 settings-apps-startup-app = Opna { $app } við innskráningu
+settings-apps-startup-remove = Fjarlægja { $app } úr ræsingu
 settings-apps-startup-add = Bæta við forriti
 settings-apps-startup-add-title = Bæta við ræsiforriti
 settings-apps-startup-add-description = Veldu forrit sem opnast í hvert sinn sem þú skráir þig inn.

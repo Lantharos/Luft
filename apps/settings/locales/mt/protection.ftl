@@ -440,6 +440,7 @@ settings-apps-choose = Agħżel
 settings-apps-startup = Startjar
 settings-apps-startup-description = Dawn l-apps jinfetħu meta tidħol
 settings-apps-startup-app = Iftaħ { $app } meta tidħol
+settings-apps-startup-remove = Neħħi { $app } mill-bidu
 settings-apps-startup-add = Żid app
 settings-apps-startup-add-title = Żid app tal-istartjar
 settings-apps-startup-add-description = Agħżel app li tinfetaħ kull darba li tidħol.

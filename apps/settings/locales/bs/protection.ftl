@@ -414,6 +414,7 @@ settings-apps-choose = Odaberi
 settings-apps-startup = Pokretanje
 settings-apps-startup-description = Ove aplikacije se otvaraju kad se prijavite
 settings-apps-startup-app = Otvori aplikaciju { $app } pri prijavi
+settings-apps-startup-remove = Ukloni { $app } iz pokretanja
 settings-apps-startup-add = Dodaj aplikaciju
 settings-apps-startup-add-title = Dodajte aplikaciju pri pokretanju
 settings-apps-startup-add-description = Odaberite aplikaciju koja će se otvarati pri svakoj prijavi.

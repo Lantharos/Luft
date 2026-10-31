@@ -407,6 +407,7 @@ settings-apps-choose = Изберете
 settings-apps-startup = Стартување
 settings-apps-startup-description = Овие апликации се отвораат кога ќе се најавите
 settings-apps-startup-app = Отвори { $app } при најава
+settings-apps-startup-remove = Отстрани ја { $app } од стартувањето
 settings-apps-startup-add = Додај апликација
 settings-apps-startup-add-title = Додавање апликација при стартување
 settings-apps-startup-add-description = Изберете апликација што ќе се отвора секогаш кога ќе се најавите.

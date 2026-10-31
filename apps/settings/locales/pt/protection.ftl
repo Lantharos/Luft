@@ -409,6 +409,7 @@ settings-apps-choose = Escolher
 settings-apps-startup = Arranque
 settings-apps-startup-description = Estas aplicações abrem quando inicia sessão
 settings-apps-startup-app = Abrir { $app } ao iniciar sessão
+settings-apps-startup-remove = Remover { $app } do arranque
 settings-apps-startup-add = Adicionar aplicação
 settings-apps-startup-add-title = Adicionar uma aplicação de arranque
 settings-apps-startup-add-description = Escolha uma aplicação para abrir sempre que iniciar sessão.

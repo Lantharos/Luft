@@ -429,6 +429,7 @@ settings-apps-choose = Wybierz
 settings-apps-startup = Autostart
 settings-apps-startup-description = Te aplikacje otwierają się po zalogowaniu
 settings-apps-startup-app = Otwieraj aplikację { $app } po zalogowaniu
+settings-apps-startup-remove = Usuń { $app } z autostartu
 settings-apps-startup-add = Dodaj aplikację
 settings-apps-startup-add-title = Dodaj aplikację do autostartu
 settings-apps-startup-add-description = Wybierz aplikację, która będzie się otwierać po każdym zalogowaniu.

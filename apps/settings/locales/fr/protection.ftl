@@ -407,6 +407,7 @@ settings-apps-choose = Choisir
 settings-apps-startup = Démarrage
 settings-apps-startup-description = Ces applications s’ouvrent quand vous vous connectez
 settings-apps-startup-app = Ouvrir { $app } à la connexion
+settings-apps-startup-remove = Retirer { $app } du démarrage
 settings-apps-startup-add = Ajouter une application
 settings-apps-startup-add-title = Ajouter une application au démarrage
 settings-apps-startup-add-description = Choisissez une application à ouvrir à chaque connexion.

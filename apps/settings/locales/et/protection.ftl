@@ -418,6 +418,7 @@ settings-apps-choose = Vali
 settings-apps-startup = Käivitus
 settings-apps-startup-description = Need rakendused avatakse sisselogimisel
 settings-apps-startup-app = Ava { $app } sisselogimisel
+settings-apps-startup-remove = Eemalda { $app } käivitusest
 settings-apps-startup-add = Lisa rakendus
 settings-apps-startup-add-title = Käivitusrakenduse lisamine
 settings-apps-startup-add-description = Vali rakendus, mis avatakse igal sisselogimisel.

@@ -407,6 +407,7 @@ settings-apps-choose = Escolher
 settings-apps-startup = Inicialização
 settings-apps-startup-description = Estes apps abrem quando você entra
 settings-apps-startup-app = Abrir { $app } quando você entrar
+settings-apps-startup-remove = Remover { $app } da inicialização
 settings-apps-startup-add = Adicionar app
 settings-apps-startup-add-title = Adicionar um app de inicialização
 settings-apps-startup-add-description = Escolha um app para abrir sempre que você entrar.

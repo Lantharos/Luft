@@ -407,6 +407,7 @@ settings-apps-choose = Valitse
 settings-apps-startup = Käynnistys
 settings-apps-startup-description = Nämä sovellukset avautuvat, kun kirjaudut sisään
 settings-apps-startup-app = Avaa { $app } kirjautuessa
+settings-apps-startup-remove = Poista { $app } käynnistyksestä
 settings-apps-startup-add = Lisää sovellus
 settings-apps-startup-add-title = Lisää käynnistyssovellus
 settings-apps-startup-add-description = Valitse sovellus, joka avautuu aina, kun kirjaudut sisään.

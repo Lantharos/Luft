@@ -407,6 +407,7 @@ settings-apps-choose = Välj
 settings-apps-startup = Autostart
 settings-apps-startup-description = De här apparna öppnas när du loggar in
 settings-apps-startup-app = Öppna { $app } när du loggar in
+settings-apps-startup-remove = Ta bort { $app } från autostart
 settings-apps-startup-add = Lägg till app
 settings-apps-startup-add-title = Lägg till en autostartapp
 settings-apps-startup-add-description = Välj en app som ska öppnas varje gång du loggar in.

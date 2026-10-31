@@ -12,6 +12,7 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         .command("apps_installed", |Empty {}| Ok(startup::installed_apps()))
         .command("apps_startup", |Empty {}| startup::list())
         .command("apps_startup_set", startup::set)
-        .command("apps_startup_add", startup::add);
+        .command("apps_startup_add", startup::add)
+        .command("apps_startup_remove", startup::remove);
     permissions::register(window, events)
 }

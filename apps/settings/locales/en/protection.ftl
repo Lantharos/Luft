@@ -467,6 +467,7 @@ settings-apps-startup = Startup
 settings-apps-startup-description = These apps open when you sign in
 # Screen-reader label of a switch; $app is an app name
 settings-apps-startup-app = Open { $app } when you sign in
+settings-apps-startup-remove = Remove { $app } from startup
 settings-apps-startup-add = Add app
 settings-apps-startup-add-title = Add a startup app
 settings-apps-startup-add-description = Choose an app to open every time you sign in.

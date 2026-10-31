@@ -407,6 +407,7 @@ settings-apps-choose = Seçin
 settings-apps-startup = Başlangıç
 settings-apps-startup-description = Bu uygulamalar oturum açtığınızda açılır
 settings-apps-startup-app = Oturum açınca { $app } uygulamasını aç
+settings-apps-startup-remove = { $app } uygulamasını başlangıçtan kaldır
 settings-apps-startup-add = Uygulama ekle
 settings-apps-startup-add-title = Başlangıç uygulaması ekle
 settings-apps-startup-add-description = Her oturum açtığınızda açılacak bir uygulama seçin.

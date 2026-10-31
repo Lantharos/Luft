@@ -418,6 +418,7 @@ settings-apps-choose = Izvēlēties
 settings-apps-startup = Palaišana
 settings-apps-startup-description = Šīs lietotnes tiek atvērtas, kad pierakstāties
 settings-apps-startup-app = Atvērt lietotni { $app }, kad pierakstāties
+settings-apps-startup-remove = Noņemt { $app } no palaišanas
 settings-apps-startup-add = Pievienot lietotni
 settings-apps-startup-add-title = Pievienot palaišanas lietotni
 settings-apps-startup-add-description = Izvēlieties lietotni, kas tiks atvērta katru reizi, kad pierakstāties.

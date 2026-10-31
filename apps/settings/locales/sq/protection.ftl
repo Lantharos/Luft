@@ -407,6 +407,7 @@ settings-apps-choose = Zgjidh
 settings-apps-startup = Nisja
 settings-apps-startup-description = Këto aplikacione hapen kur hyn
 settings-apps-startup-app = Hap { $app } kur hyn
+settings-apps-startup-remove = Hiq { $app } nga nisja
 settings-apps-startup-add = Shto aplikacion
 settings-apps-startup-add-title = Shto një aplikacion në nisje
 settings-apps-startup-add-description = Zgjidh një aplikacion që hapet sa herë hyn.

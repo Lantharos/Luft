@@ -51,6 +51,7 @@ settings-privacy-delete-after-hint = Cât timp rămân fișierele înainte de a 
 
 ## Security: summary at the top of the page
 
+settings-security-protections = Protecții
 settings-security-protected = Dispozitivul este protejat
 settings-security-could-be-safer = Dispozitivul ar putea fi mai sigur
 settings-security-not-encrypted-description = Discul său nu este criptat, așa că oricine îl scoate poate citi fișierele.

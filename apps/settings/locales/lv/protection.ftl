@@ -51,6 +51,7 @@ settings-privacy-delete-after-hint = Cik ilgi faili tiek glabāti, pirms tos no�
 
 ## Security: summary at the top of the page
 
+settings-security-protections = Aizsardzības
 settings-security-protected = Ierīce ir aizsargāta
 settings-security-could-be-safer = Ierīce varētu būt drošāka
 settings-security-not-encrypted-description = Tās disks nav šifrēts, tāpēc ikviens, kas to izņem, var lasīt jūsu failus.

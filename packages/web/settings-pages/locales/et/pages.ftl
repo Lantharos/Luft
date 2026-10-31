@@ -41,7 +41,6 @@ settings-page-shortcuts = Kiirklahvid
 settings-page-dictation = Dikteerimine
     .keywords = kõne, häälsisestus, kõnesisestus, kõne tekstiks, kõnetuvastus, rääkimine, mikrofon, parakeet, whisper, kõnemudelid, super alt
     .copilot-key = copiloti klahv, copilot-klahv
-settings-page-protections = Kaitsed
 settings-page-encryption = Seadme krüptimine
 settings-page-keyring = Salasõnad ja võtmed
 settings-page-login = Sisselogimiskuva

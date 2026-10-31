@@ -41,7 +41,6 @@ settings-page-shortcuts = Tastenkürzel
 settings-page-dictation = Diktieren
     .keywords = sprache, spracheingabe, sprechen, sprache zu text, spracherkennung, mikrofon, parakeet, whisper, sprachmodelle, super alt
     .copilot-key = copilot-taste
-settings-page-protections = Schutzfunktionen
 settings-page-encryption = Geräteverschlüsselung
 settings-page-keyring = Passwörter und Schlüssel
 settings-page-login = Anmeldebildschirm

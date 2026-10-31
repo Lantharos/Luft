@@ -41,7 +41,6 @@ settings-page-shortcuts = Сочетания клавиш
 settings-page-dictation = Диктовка
     .keywords = речь, голосовой ввод, голос, распознавание речи, речь в текст, говорить, микрофон, parakeet, whisper, речевые модели, super alt
     .copilot-key = клавиша copilot, копилот
-settings-page-protections = Средства защиты
 settings-page-encryption = Шифрование устройства
 settings-page-keyring = Пароли и ключи
 settings-page-login = Экран входа

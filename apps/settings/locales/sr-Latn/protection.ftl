@@ -51,6 +51,7 @@ settings-privacy-delete-after-hint = Koliko dugo datoteke ostaju pre nego što s
 
 ## Security: summary at the top of the page
 
+settings-security-protections = Zaštite
 settings-security-protected = Vaš uređaj je zaštićen
 settings-security-could-be-safer = Vaš uređaj može biti bezbedniji
 settings-security-not-encrypted-description = Njegov disk nije šifrovan, pa svako ko ga izvadi može da čita vaše datoteke.

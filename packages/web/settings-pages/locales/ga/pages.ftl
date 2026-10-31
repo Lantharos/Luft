@@ -41,7 +41,6 @@ settings-page-shortcuts = Aicearraí méarchláir
 settings-page-dictation = Deachtú
     .keywords = caint, urlabhra, clóscríobh le guth, urlabhra go téacs, caint go téacs, labhair, micreafón, parakeet, whisper, samhlacha urlabhra, super alt
     .copilot-key = eochair copilot, copilot
-settings-page-protections = Cosaintí
 settings-page-encryption = Criptiú gléis
 settings-page-keyring = Pasfhocail agus eochracha
 settings-page-login = Scáileán sínithe isteach

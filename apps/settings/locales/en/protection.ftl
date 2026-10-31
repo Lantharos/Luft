@@ -71,6 +71,7 @@ settings-privacy-delete-after-hint = How long files stay before they’re remove
 
 ## Security: summary at the top of the page
 
+settings-security-protections = Protections
 settings-security-protected = Your device is protected
 settings-security-could-be-safer = Your device could be safer
 settings-security-not-encrypted-description = Its disk isn’t encrypted, so anyone who takes it out can read your files.

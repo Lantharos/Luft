@@ -51,6 +51,7 @@ settings-privacy-delete-after-hint = Hvor længe filer bliver liggende, før de 
 
 ## Security: summary at the top of the page
 
+settings-security-protections = Beskyttelser
 settings-security-protected = Din enhed er beskyttet
 settings-security-could-be-safer = Din enhed kunne være bedre beskyttet
 settings-security-not-encrypted-description = Dens disk er ikke krypteret, så alle, der tager den ud, kan læse dine filer.

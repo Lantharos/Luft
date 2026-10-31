@@ -51,6 +51,7 @@ settings-privacy-delete-after-hint = Hve lengi skrár eru geymdar áður en þæ
 
 ## Security: summary at the top of the page
 
+settings-security-protections = Varnir
 settings-security-protected = Tækið þitt er varið
 settings-security-could-be-safer = Tækið þitt gæti verið öruggara
 settings-security-not-encrypted-description = Diskurinn í því er ekki dulritaður, svo hver sem tekur hann út getur lesið skrárnar þínar.

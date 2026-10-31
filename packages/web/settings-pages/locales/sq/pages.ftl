@@ -41,7 +41,6 @@ settings-page-shortcuts = Shkurtoret e tastierës
 settings-page-dictation = Diktimi
     .keywords = të folur, shkrim me zë, nga zëri në tekst, fol, mikrofon, parakeet, whisper, modele të të folurit, super alt
     .copilot-key = tasti copilot
-settings-page-protections = Mbrojtjet
 settings-page-encryption = Enkriptimi i pajisjes
 settings-page-keyring = Fjalëkalimet dhe çelësat
 settings-page-login = Ekrani i hyrjes

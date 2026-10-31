@@ -51,6 +51,7 @@ settings-privacy-delete-after-hint = Kiek laiko failai laikomi, kol bus pašalin
 
 ## Security: summary at the top of the page
 
+settings-security-protections = Apsaugos
 settings-security-protected = Jūsų įrenginys apsaugotas
 settings-security-could-be-safer = Jūsų įrenginys galėtų būti saugesnis
 settings-security-not-encrypted-description = Jo diskas nešifruotas, todėl bet kas, jį išėmęs, gali skaityti jūsų failus.

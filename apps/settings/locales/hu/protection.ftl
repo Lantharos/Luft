@@ -51,6 +51,7 @@ settings-privacy-delete-after-hint = Mennyi ideig maradnak meg a fájlok az elt�
 
 ## Security: summary at the top of the page
 
+settings-security-protections = Védelmek
 settings-security-protected = Az eszköz védett
 settings-security-could-be-safer = Az eszköz lehetne biztonságosabb
 settings-security-not-encrypted-description = A lemeze nincs titkosítva, így bárki, aki kiveszi, elolvashatja a fájlokat.

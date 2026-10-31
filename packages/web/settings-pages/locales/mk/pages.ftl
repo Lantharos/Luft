@@ -41,7 +41,6 @@ settings-page-shortcuts = Кратенки на тастатура
 settings-page-dictation = Диктирање
     .keywords = говор, внесување со глас, говор во текст, зборување, микрофон, parakeet, whisper, говорни модели, super alt
     .copilot-key = копче copilot, тастер copilot
-settings-page-protections = Заштити
 settings-page-encryption = Шифрирање на уредот
 settings-page-keyring = Лозинки и клучеви
 settings-page-login = Екран за најава

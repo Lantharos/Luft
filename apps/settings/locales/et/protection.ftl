@@ -51,6 +51,7 @@ settings-privacy-delete-after-hint = Kui kaua faile hoitakse enne eemaldamist
 
 ## Security: summary at the top of the page
 
+settings-security-protections = Kaitsed
 settings-security-protected = Sinu seade on kaitstud
 settings-security-could-be-safer = Sinu seade võiks olla turvalisem
 settings-security-not-encrypted-description = Selle ketas pole krüptitud, nii et igaüks, kes selle välja võtab, saab sinu faile lugeda.

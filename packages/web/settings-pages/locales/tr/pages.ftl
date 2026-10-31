@@ -41,7 +41,6 @@ settings-page-shortcuts = Klavye kısayolları
 settings-page-dictation = Dikte
     .keywords = konuşma, sesle yazma, konuşmayı metne dönüştürme, ses, konuş, mikrofon, parakeet, whisper, konuşma modelleri, super alt
     .copilot-key = copilot tuşu
-settings-page-protections = Korumalar
 settings-page-encryption = Cihaz şifreleme
 settings-page-keyring = Parolalar ve anahtarlar
 settings-page-login = Oturum açma ekranı

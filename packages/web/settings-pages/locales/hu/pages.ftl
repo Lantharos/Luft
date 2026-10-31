@@ -41,7 +41,6 @@ settings-page-shortcuts = Billentyűparancsok
 settings-page-dictation = Diktálás
     .keywords = beszéd, hangalapú gépelés, beszédfelismerés, beszéd szöveggé, beszélni, mikrofon, parakeet, whisper, beszédmodellek, super alt
     .copilot-key = copilot billentyű, copilot gomb
-settings-page-protections = Védelmek
 settings-page-encryption = Eszköztitkosítás
 settings-page-keyring = Jelszavak és kulcsok
 settings-page-login = Bejelentkezési képernyő

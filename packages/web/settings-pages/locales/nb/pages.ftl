@@ -41,7 +41,6 @@ settings-page-shortcuts = Hurtigtaster
 settings-page-dictation = Diktering
     .keywords = tale, stemme, taleskriving, tale til tekst, snakke, mikrofon, parakeet, whisper, talemodeller, super alt
     .copilot-key = copilot-tast
-settings-page-protections = Beskyttelser
 settings-page-encryption = Enhetskryptering
 settings-page-keyring = Passord og nøkler
 settings-page-login = Påloggingsskjerm

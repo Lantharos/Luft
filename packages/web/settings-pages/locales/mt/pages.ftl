@@ -41,7 +41,6 @@ settings-page-shortcuts = Shortcuts tat-tastiera
 settings-page-dictation = Dettatura
     .keywords = diskors, vuċi, ittajpjar bil-vuċi, minn diskors għal test, speech to text, tkellem, mikrofonu, parakeet, whisper, mudelli tad-diskors, super alt
     .copilot-key = tast copilot, buttuna copilot, copilot
-settings-page-protections = Protezzjonijiet
 settings-page-encryption = Ċċifrar tal-apparat
 settings-page-keyring = Passwords u ċwievet
 settings-page-login = Skrin tad-dħul

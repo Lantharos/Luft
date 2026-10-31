@@ -41,7 +41,6 @@ settings-page-shortcuts = Atalhos de teclado
 settings-page-dictation = Ditado
     .keywords = fala, digitação por voz, voz, fala para texto, conversão de fala em texto, falar, microfone, parakeet, whisper, modelos de fala, super alt
     .copilot-key = tecla copilot
-settings-page-protections = Proteções
 settings-page-encryption = Criptografia do dispositivo
 settings-page-keyring = Senhas e chaves
 settings-page-login = Tela de login

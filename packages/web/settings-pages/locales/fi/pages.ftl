@@ -41,7 +41,6 @@ settings-page-shortcuts = Pikanäppäimet
 settings-page-dictation = Sanelu
     .keywords = puhe, puhekirjoitus, äänikirjoitus, puheentunnistus, puhe tekstiksi, puhu, mikrofoni, parakeet, whisper, puhemallit, super alt
     .copilot-key = copilot-näppäin
-settings-page-protections = Suojaukset
 settings-page-encryption = Laitteen salaus
 settings-page-keyring = Salasanat ja avaimet
 settings-page-login = Kirjautumisnäyttö

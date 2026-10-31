@@ -51,6 +51,7 @@ settings-privacy-delete-after-hint = Jak długo pliki pozostają przed usunięci
 
 ## Security: summary at the top of the page
 
+settings-security-protections = Zabezpieczenia
 settings-security-protected = Urządzenie jest chronione
 settings-security-could-be-safer = Urządzenie mogłoby być lepiej chronione
 settings-security-not-encrypted-description = Jego dysk nie jest zaszyfrowany, więc każdy, kto go wyjmie, może odczytać pliki.

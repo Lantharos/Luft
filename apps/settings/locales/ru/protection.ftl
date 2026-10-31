@@ -51,6 +51,7 @@ settings-privacy-delete-after-hint = Сколько файлы хранятся 
 
 ## Security: summary at the top of the page
 
+settings-security-protections = Средства защиты
 settings-security-protected = Устройство защищено
 settings-security-could-be-safer = Устройство можно защитить лучше
 settings-security-not-encrypted-description = Его диск не зашифрован, поэтому любой, кто его извлечёт, сможет прочитать ваши файлы.

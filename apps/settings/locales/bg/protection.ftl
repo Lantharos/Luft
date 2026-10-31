@@ -51,6 +51,7 @@ settings-privacy-delete-after-hint = Колко време остават фай
 
 ## Security: summary at the top of the page
 
+settings-security-protections = Защити
 settings-security-protected = Устройството ви е защитено
 settings-security-could-be-safer = Устройството ви може да е по-защитено
 settings-security-not-encrypted-description = Дискът му не е шифрован, така че всеки, който го извади, може да чете файловете ви.

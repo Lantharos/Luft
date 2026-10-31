@@ -51,6 +51,7 @@ settings-privacy-delete-after-hint = Quanto restano i file prima di essere rimos
 
 ## Security: summary at the top of the page
 
+settings-security-protections = Protezioni
 settings-security-protected = Il dispositivo è protetto
 settings-security-could-be-safer = Il dispositivo potrebbe essere più sicuro
 settings-security-not-encrypted-description = Il suo disco non è crittografato, quindi chiunque lo estragga può leggerne i file.

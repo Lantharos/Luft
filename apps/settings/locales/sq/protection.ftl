@@ -51,6 +51,7 @@ settings-privacy-delete-after-hint = Sa qëndrojnë skedarët para se të hiqen
 
 ## Security: summary at the top of the page
 
+settings-security-protections = Mbrojtjet
 settings-security-protected = Pajisja jote është e mbrojtur
 settings-security-could-be-safer = Pajisja jote mund të ishte më e sigurt
 settings-security-not-encrypted-description = Disku i saj nuk është i enkriptuar, ndaj kushdo që e nxjerr mund të lexojë skedarët e tu.

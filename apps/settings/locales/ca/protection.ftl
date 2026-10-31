@@ -51,6 +51,7 @@ settings-privacy-delete-after-hint = Quant de temps es conserven els fitxers aba
 
 ## Security: summary at the top of the page
 
+settings-security-protections = Proteccions
 settings-security-protected = El dispositiu està protegit
 settings-security-could-be-safer = El dispositiu podria estar més protegit
 settings-security-not-encrypted-description = El disc no està xifrat, així que qualsevol que el tregui pot llegir els fitxers.

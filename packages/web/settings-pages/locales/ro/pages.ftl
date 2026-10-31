@@ -41,7 +41,6 @@ settings-page-shortcuts = Comenzi rapide
 settings-page-dictation = Dictare
     .keywords = vorbire, voce, tastare vocală, scriere prin voce, transcriere, vorbire în text, microfon, parakeet, whisper, modele de vorbire, super alt
     .copilot-key = tasta copilot
-settings-page-protections = Protecții
 settings-page-encryption = Criptarea dispozitivului
 settings-page-keyring = Parole și chei
 settings-page-login = Ecran de conectare

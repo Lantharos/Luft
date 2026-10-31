@@ -41,7 +41,6 @@ settings-page-shortcuts = Klávesové skratky
 settings-page-dictation = Diktovanie
     .keywords = reč, hlasové písanie, hlasový vstup, prevod reči na text, hovoriť, mikrofón, parakeet, whisper, rečové modely, super alt
     .copilot-key = kláves copilot, copilot
-settings-page-protections = Ochrany
 settings-page-encryption = Šifrovanie zariadenia
 settings-page-keyring = Heslá a kľúče
 settings-page-login = Prihlasovacia obrazovka

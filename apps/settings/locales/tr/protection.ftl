@@ -51,6 +51,7 @@ settings-privacy-delete-after-hint = Dosyaların kaldırılmadan önce ne kadar 
 
 ## Security: summary at the top of the page
 
+settings-security-protections = Korumalar
 settings-security-protected = Cihazınız korunuyor
 settings-security-could-be-safer = Cihazınız daha güvenli olabilir
 settings-security-not-encrypted-description = Diski şifrelenmemiş, bu yüzden onu çıkaran herkes dosyalarınızı okuyabilir.

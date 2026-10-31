@@ -51,6 +51,7 @@ settings-privacy-delete-after-hint = Kuinka kauan tiedostot säilyvät ennen poi
 
 ## Security: summary at the top of the page
 
+settings-security-protections = Suojaukset
 settings-security-protected = Laitteesi on suojattu
 settings-security-could-be-safer = Laitteesi voisi olla paremmin suojattu
 settings-security-not-encrypted-description = Sen levyä ei ole salattu, joten kuka tahansa sen irrottava voi lukea tiedostosi.

@@ -20,7 +20,7 @@
 	let updates = $derived(security.firmwareUpdates);
 </script>
 
-<Section title={t('settings-page-protections')}>
+<Section title={t('settings-security-protections')}>
 	{#if security.trust}
 		{@const trust = security.trust}
 		{#if trust.secureBoot === 'on'}

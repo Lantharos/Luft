@@ -51,6 +51,7 @@ settings-privacy-delete-after-hint = Durée de conservation des fichiers avant l
 
 ## Security: summary at the top of the page
 
+settings-security-protections = Protections
 settings-security-protected = Votre appareil est protégé
 settings-security-could-be-safer = Votre appareil pourrait être mieux protégé
 settings-security-not-encrypted-description = Son disque n’est pas chiffré, donc quiconque le retire peut lire vos fichiers.

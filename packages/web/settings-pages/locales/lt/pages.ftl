@@ -41,7 +41,6 @@ settings-page-shortcuts = Spartieji klavišai
 settings-page-dictation = Diktavimas
     .keywords = kalba, šneka, rinkimas balsu, balsas, kalbos atpažinimas, kalba į tekstą, kalbėti, mikrofonas, parakeet, whisper, kalbos modeliai, super alt
     .copilot-key = copilot klavišas, copilot
-settings-page-protections = Apsaugos
 settings-page-encryption = Įrenginio šifravimas
 settings-page-keyring = Slaptažodžiai ir raktai
 settings-page-login = Prisijungimo ekranas

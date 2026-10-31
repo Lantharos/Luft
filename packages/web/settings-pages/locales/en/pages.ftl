@@ -46,7 +46,6 @@ settings-page-shortcuts = Keyboard shortcuts
 settings-page-dictation = Dictation
     .keywords = speech, voice typing, speech to text, talk, microphone, parakeet, whisper, speech models, super alt
     .copilot-key = copilot key
-settings-page-protections = Protections
 settings-page-encryption = Device encryption
 settings-page-keyring = Passwords and keys
 settings-page-login = Login Screen

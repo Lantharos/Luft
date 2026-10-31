@@ -41,7 +41,6 @@ settings-page-shortcuts = Prečice na tastaturi
 settings-page-dictation = Diktiranje
     .keywords = govor, glasovno kucanje, govor u tekst, pričanje, mikrofon, parakeet, whisper, modeli govora, super alt
     .copilot-key = tipka copilot
-settings-page-protections = Zaštite
 settings-page-encryption = Šifriranje uređaja
 settings-page-keyring = Lozinke i ključevi
 settings-page-login = Ekran za prijavu

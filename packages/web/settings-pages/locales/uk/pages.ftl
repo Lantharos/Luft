@@ -41,7 +41,6 @@ settings-page-shortcuts = Сполучення клавіш
 settings-page-dictation = Диктування
     .keywords = мовлення, голосове введення, голос, розпізнавання мовлення, мовлення в текст, говорити, мікрофон, parakeet, whisper, мовні моделі, super alt
     .copilot-key = клавіша copilot, копайлот
-settings-page-protections = Засоби захисту
 settings-page-encryption = Шифрування пристрою
 settings-page-keyring = Паролі й ключі
 settings-page-login = Екран входу

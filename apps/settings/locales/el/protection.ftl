@@ -51,6 +51,7 @@ settings-privacy-delete-after-hint = Πόσο μένουν τα αρχεία π�
 
 ## Security: summary at the top of the page
 
+settings-security-protections = Προστασίες
 settings-security-protected = Η συσκευή σας προστατεύεται
 settings-security-could-be-safer = Η συσκευή σας θα μπορούσε να είναι πιο ασφαλής
 settings-security-not-encrypted-description = Ο δίσκος της δεν είναι κρυπτογραφημένος, οπότε όποιος τον αφαιρέσει μπορεί να διαβάσει τα αρχεία σας.

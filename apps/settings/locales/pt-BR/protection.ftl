@@ -51,6 +51,7 @@ settings-privacy-delete-after-hint = Quanto tempo os arquivos ficam antes de ser
 
 ## Security: summary at the top of the page
 
+settings-security-protections = Proteções
 settings-security-protected = Seu dispositivo está protegido
 settings-security-could-be-safer = Seu dispositivo poderia estar mais seguro
 settings-security-not-encrypted-description = O disco não está criptografado, então qualquer pessoa que o retirar pode ler seus arquivos.

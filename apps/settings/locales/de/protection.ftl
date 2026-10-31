@@ -51,6 +51,7 @@ settings-privacy-delete-after-hint = Wie lange Dateien bleiben, bevor sie entfer
 
 ## Security: summary at the top of the page
 
+settings-security-protections = Schutzfunktionen
 settings-security-protected = Dein Gerät ist geschützt
 settings-security-could-be-safer = Dein Gerät könnte sicherer sein
 settings-security-not-encrypted-description = Sein Datenträger ist nicht verschlüsselt, daher kann jeder, der ihn ausbaut, deine Dateien lesen.

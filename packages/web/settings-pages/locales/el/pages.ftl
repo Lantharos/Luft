@@ -41,7 +41,6 @@ settings-page-shortcuts = Συντομεύσεις πληκτρολογίου
 settings-page-dictation = Υπαγόρευση
     .keywords = ομιλία, φωνή, φωνητική πληκτρολόγηση, ομιλία σε κείμενο, μιλώ, μικρόφωνο, parakeet, whisper, μοντέλα ομιλίας, super alt
     .copilot-key = copilot, πλήκτρο copilot
-settings-page-protections = Προστασίες
 settings-page-encryption = Κρυπτογράφηση συσκευής
 settings-page-keyring = Κωδικοί πρόσβασης και κλειδιά
 settings-page-login = Οθόνη σύνδεσης

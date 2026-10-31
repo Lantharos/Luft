@@ -41,7 +41,6 @@ settings-page-shortcuts = Sneltoetsen
 settings-page-dictation = Dicteren
     .keywords = spraak, spraakinvoer, spreken, spraak naar tekst, spraakherkenning, praten, microfoon, parakeet, whisper, spraakmodellen, super alt
     .copilot-key = copilot-toets
-settings-page-protections = Beveiligingen
 settings-page-encryption = Apparaatversleuteling
 settings-page-keyring = Wachtwoorden en sleutels
 settings-page-login = Aanmeldscherm

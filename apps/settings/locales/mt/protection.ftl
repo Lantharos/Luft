@@ -51,6 +51,7 @@ settings-privacy-delete-after-hint = Kemm jibqgħu l-fajls qabel jitneħħew
 
 ## Security: summary at the top of the page
 
+settings-security-protections = Protezzjonijiet
 settings-security-protected = L-apparat huwa protett
 settings-security-could-be-safer = L-apparat jista’ jkun aktar sigur
 settings-security-not-encrypted-description = Id-diska tiegħu mhix iċċifrata, għalhekk kulmin joħroġha jista’ jaqra l-fajls tiegħek.

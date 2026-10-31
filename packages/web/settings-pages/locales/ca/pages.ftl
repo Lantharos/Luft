@@ -41,7 +41,6 @@ settings-page-shortcuts = Dreceres de teclat
 settings-page-dictation = Dictat
     .keywords = veu, parla, escriptura per veu, de veu a text, parlar, micròfon, parakeet, whisper, models de veu, super alt
     .copilot-key = tecla copilot
-settings-page-protections = Proteccions
 settings-page-encryption = Xifratge del dispositiu
 settings-page-keyring = Contrasenyes i claus
 settings-page-login = Pantalla d’inici de sessió

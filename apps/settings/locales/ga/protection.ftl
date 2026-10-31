@@ -51,6 +51,7 @@ settings-privacy-delete-after-hint = Cé chomh fada a fhanann comhaid sula mbain
 
 ## Security: summary at the top of the page
 
+settings-security-protections = Cosaintí
 settings-security-protected = Tá do ghléas cosanta
 settings-security-could-be-safer = D’fhéadfadh do ghléas a bheith níos sábháilte
 settings-security-not-encrypted-description = Níl a dhiosca criptithe, mar sin is féidir le duine ar bith a bhaineann amach é do chuid comhad a léamh.

@@ -41,7 +41,6 @@ settings-page-shortcuts = Īsinājumtaustiņi
 settings-page-dictation = Diktēšana
     .keywords = runa, balss ievade, runa tekstā, runāt, mikrofons, runas atpazīšana, parakeet, whisper, runas modeļi, super alt
     .copilot-key = copilot taustiņš
-settings-page-protections = Aizsardzības
 settings-page-encryption = Ierīces šifrēšana
 settings-page-keyring = Paroles un atslēgas
 settings-page-login = Pierakstīšanās ekrāns

@@ -51,6 +51,7 @@ settings-privacy-delete-after-hint = Колико дуго датотеке ос
 
 ## Security: summary at the top of the page
 
+settings-security-protections = Заштите
 settings-security-protected = Ваш уређај је заштићен
 settings-security-could-be-safer = Ваш уређај може бити безбеднији
 settings-security-not-encrypted-description = Његов диск није шифрован, па свако ко га извади може да чита ваше датотеке.

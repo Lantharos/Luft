@@ -51,6 +51,7 @@ settings-privacy-delete-after-hint = Hoelang bestanden blijven voordat ze worden
 
 ## Security: summary at the top of the page
 
+settings-security-protections = Beveiligingen
 settings-security-protected = Je apparaat is beveiligd
 settings-security-could-be-safer = Je apparaat kan veiliger
 settings-security-not-encrypted-description = De schijf is niet versleuteld, dus iedereen die hem eruit haalt, kan je bestanden lezen.

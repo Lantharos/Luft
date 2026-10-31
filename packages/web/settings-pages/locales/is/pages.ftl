@@ -41,7 +41,6 @@ settings-page-shortcuts = Flýtilyklar
 settings-page-dictation = Raddinnsláttur
     .keywords = tal, rödd, tal í texta, tala, hljóðnemi, parakeet, whisper, talgreining, talmálslíkön, super alt
     .copilot-key = copilot-lykill, copilot
-settings-page-protections = Varnir
 settings-page-encryption = Dulritun tækis
 settings-page-keyring = Lykilorð og lyklar
 settings-page-login = Innskráningarskjár

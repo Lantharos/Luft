@@ -41,7 +41,6 @@ settings-page-shortcuts = Snarvegar
 settings-page-dictation = Diktering
     .keywords = tale, talestyring, taleinntasting, tale til tekst, snakke, mikrofon, parakeet, whisper, talemodellar, super alt
     .copilot-key = copilot-tast, copilot
-settings-page-protections = Vern
 settings-page-encryption = Einingskryptering
 settings-page-keyring = Passord og nøklar
 settings-page-login = Innloggingsskjerm

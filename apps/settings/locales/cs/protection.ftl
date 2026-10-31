@@ -51,6 +51,7 @@ settings-privacy-delete-after-hint = Jak dlouho soubory zůstanou, než se odstr
 
 ## Security: summary at the top of the page
 
+settings-security-protections = Ochrany
 settings-security-protected = Vaše zařízení je chráněné
 settings-security-could-be-safer = Vaše zařízení by mohlo být lépe chráněné
 settings-security-not-encrypted-description = Jeho disk není šifrovaný, takže kdokoli, kdo ho vyjme, si může přečíst vaše soubory.

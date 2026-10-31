@@ -51,6 +51,7 @@ settings-privacy-delete-after-hint = Kor lenge filene blir liggjande før dei bl
 
 ## Security: summary at the top of the page
 
+settings-security-protections = Vern
 settings-security-protected = Eininga di er verna
 settings-security-could-be-safer = Eininga di kunne vore tryggare
 settings-security-not-encrypted-description = Disken er ikkje kryptert, så alle som tek han ut, kan lese filene dine.

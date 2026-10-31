@@ -27,11 +27,12 @@ export function sourceIcon(app: IconApp): Gio.Icon {
   return (id ? appSystem.lookup_app(id)?.get_icon() : null) ?? app.get_icon() ?? FALLBACK;
 }
 
-export function styledIcon(app: IconApp, paint: Paint): St.StyledIcon {
+export function styledIcon(app: IconApp, paint: Paint, square = false): St.StyledIcon {
   const source = sourceIcon(app);
   return new St.StyledIcon({
     source, glyph_names: glyphNames(app.get_id(), source),
     plate: color(paint.plate), ink: color(paint.ink), shade: color(paint.shade), rim: paint.rim,
+    ...square ? { corner: 0 } : {},
   });
 }
 
@@ -44,6 +45,7 @@ class AppIcons {
   private accent: { seed: Seed; dark: boolean; taskbarDark: boolean } | null = null;
   private restyleId = 0;
   style = this.settings.get_string('app-icon-style') as IconStyle;
+  private square = !this.settings.get_boolean('rounded-window-corners');
   paints: Record<PaintedStyle, Paint> | null = null;
   // The taskbar's glass can be light or dark apart from the style, see taskbarScheme()
   taskbarPaints: Record<PaintedStyle, Paint> | null = null;
@@ -51,6 +53,7 @@ class AppIcons {
   constructor() {
     this.settings.connect('changed::app-icon-style', () => this.refresh());
     this.settings.connect('changed::app-icon-tint', () => this.refresh());
+    this.settings.connect('changed::rounded-window-corners', () => this.refresh());
     appSystem.connect('installed-changed', () => {
       for (const icon of this.bound.keys()) icon.gicon = this.iconOf(icon);
     });
@@ -75,7 +78,7 @@ class AppIcons {
   }
 
   gicon(app: IconApp, paint = this.paint): Gio.Icon {
-    return paint ? styledIcon(app, paint) : sourceIcon(app);
+    return paint ? styledIcon(app, paint, this.square) : sourceIcon(app);
   }
 
   private iconOf(icon: St.Icon): Gio.Icon {
@@ -102,9 +105,11 @@ class AppIcons {
     const seed = tint ? seedFromColor(fromHex(tint)) : this.accent?.seed;
     const painted = seed ? paints(seed, this.accent?.dark ?? true) : null;
     const taskbarPainted = seed ? paints(seed, this.accent?.taskbarDark ?? true) : null;
-    if (style === this.style && JSON.stringify([painted, taskbarPainted]) === JSON.stringify([this.paints, this.taskbarPaints])) return;
+    const square = !this.settings.get_boolean('rounded-window-corners');
+    if (style === this.style && square === this.square && JSON.stringify([painted, taskbarPainted]) === JSON.stringify([this.paints, this.taskbarPaints])) return;
     const restyle = style !== 'default' || this.style !== 'default';
     this.style = style;
+    this.square = square;
     this.paints = painted;
     this.taskbarPaints = taskbarPainted;
     for (const listener of this.listeners) listener();

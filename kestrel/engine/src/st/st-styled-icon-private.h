@@ -12,6 +12,7 @@ typedef struct
   CoglColor ink;
   CoglColor shade;
   float rim;
+  float corner;
 } StStyledIconPaint;
 
 StIconInfo *_st_styled_icon_lookup (StStyledIcon *icon,

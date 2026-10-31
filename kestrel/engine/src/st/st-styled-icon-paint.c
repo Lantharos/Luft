@@ -6,7 +6,6 @@
 
 #include "st-styled-icon-private.h"
 
-#define PLATE_RADIUS 0.225
 #define DERIVED_FILL 0.86
 #define OPAQUE 230
 #define VISIBLE 8
@@ -304,6 +303,11 @@ rounded_rectangle (cairo_t *cr,
   double far = size - inset;
 
   radius -= inset;
+  if (radius <= 0)
+    {
+      cairo_rectangle (cr, inset, inset, far - inset, far - inset);
+      return;
+    }
   cairo_new_sub_path (cr);
   cairo_arc (cr, far - radius, inset + radius, radius, -G_PI / 2, 0);
   cairo_arc (cr, far - radius, far - radius, radius, 0, G_PI / 2);
@@ -319,7 +323,7 @@ draw_plate (cairo_t                 *cr,
             float                    scale)
 {
   const CoglColor *plate = &paint->plate;
-  double radius = size * PLATE_RADIUS;
+  double radius = size * paint->corner;
   cairo_pattern_t *highlight;
 
   rounded_rectangle (cr, 0, size, radius);

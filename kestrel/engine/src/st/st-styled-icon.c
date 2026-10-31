@@ -27,6 +27,7 @@ enum
   PROP_INK,
   PROP_SHADE,
   PROP_RIM,
+  PROP_CORNER,
   N_PROPS
 };
 
@@ -65,7 +66,8 @@ st_styled_icon_hash (GIcon *icon)
   hash ^= color_hash (&self->paint.plate);
   hash = hash * 31 + color_hash (&self->paint.ink);
   hash = hash * 31 + color_hash (&self->paint.shade);
-  return hash * 31 + (guint) (self->paint.rim * 1000);
+  hash = hash * 31 + (guint) (self->paint.rim * 1000);
+  return hash * 31 + (guint) (self->paint.corner * 1000);
 }
 
 static gboolean
@@ -81,7 +83,8 @@ st_styled_icon_equal (GIcon *icon,
          cogl_color_equal (&self->paint.plate, &that->paint.plate) &&
          cogl_color_equal (&self->paint.ink, &that->paint.ink) &&
          cogl_color_equal (&self->paint.shade, &that->paint.shade) &&
-         self->paint.rim == that->paint.rim;
+         self->paint.rim == that->paint.rim &&
+         self->paint.corner == that->paint.corner;
 }
 
 static char *
@@ -108,6 +111,7 @@ st_styled_icon_to_tokens (GIcon     *icon,
   g_ptr_array_add (tokens, color_token (&self->paint.ink));
   g_ptr_array_add (tokens, color_token (&self->paint.shade));
   g_ptr_array_add (tokens, g_strdup_printf ("%d", (int) roundf (self->paint.rim * 1000)));
+  g_ptr_array_add (tokens, g_strdup_printf ("%d", (int) roundf (self->paint.corner * 1000)));
   *out_version = 0;
   return TRUE;
 }
@@ -158,6 +162,9 @@ st_styled_icon_set_property (GObject      *object,
     case PROP_RIM:
       self->paint.rim = g_value_get_float (value);
       break;
+    case PROP_CORNER:
+      self->paint.corner = g_value_get_float (value);
+      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
       break;
@@ -191,6 +198,9 @@ st_styled_icon_get_property (GObject    *object,
       break;
     case PROP_RIM:
       g_value_set_float (value, self->paint.rim);
+      break;
+    case PROP_CORNER:
+      g_value_set_float (value, self->paint.corner);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -236,6 +246,9 @@ st_styled_icon_class_init (StStyledIconClass *klass)
 
   props[PROP_RIM] =
     g_param_spec_float ("rim", NULL, NULL, 0.f, 1.f, 0.f, flags);
+
+  props[PROP_CORNER] =
+    g_param_spec_float ("corner", NULL, NULL, 0.f, 0.5f, 0.225f, flags);
 
   g_object_class_install_properties (object_class, N_PROPS, props);
 }

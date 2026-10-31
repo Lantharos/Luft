@@ -18,6 +18,7 @@
 		'dark-schedule-to': number;
 		'pure-black': boolean;
 		'theme-apps': boolean;
+		'rounded-window-corners': boolean;
 	};
 
 	const SCHEDULE_NOTES: Record<Schedule, string | undefined> = {
@@ -27,7 +28,7 @@
 	};
 
 	const desktop = useSettings<Interface>('org.gnome.desktop.interface', ['color-scheme', 'clock-format']);
-	const kestrel = useSettings<Kestrel>(KESTREL_SCHEMA, ['accent', 'dark-schedule', 'dark-schedule-from', 'dark-schedule-to', 'pure-black', 'theme-apps']);
+	const kestrel = useSettings<Kestrel>(KESTREL_SCHEMA, ['accent', 'dark-schedule', 'dark-schedule-from', 'dark-schedule-to', 'pure-black', 'theme-apps', 'rounded-window-corners']);
 
 	let dark = $derived(desktop.values['color-scheme'] === 'prefer-dark');
 	let schedule = $derived(kestrel.values['dark-schedule'] ?? 'off');
@@ -71,6 +72,17 @@
 			<TimePicker label={t('settings-appearance-light-from')} {twelveHour} value={kestrel.values['dark-schedule-to'] ?? 7} onchange={(hours) => kestrel.set('dark-schedule-to', hours)} />
 		</Row>
 	{/if}
+	<Row title={t('settings-appearance-corners')} description={t('settings-appearance-corners-description')}>
+		<Segmented
+			label={t('settings-appearance-corners')}
+			options={[
+				{ value: 'rounded', label: t('settings-appearance-corners-rounded') },
+				{ value: 'square', label: t('settings-appearance-corners-square') }
+			]}
+			value={(kestrel.values['rounded-window-corners'] ?? true) ? 'rounded' : 'square'}
+			onchange={(corners) => kestrel.set('rounded-window-corners', corners === 'rounded')}
+		/>
+	</Row>
 	<Row title={t('settings-appearance-pure-black')} description={t('settings-appearance-pure-black-description')}>
 		<Switch label={t('settings-appearance-pure-black')} checked={kestrel.values['pure-black'] ?? false} onchange={(on) => kestrel.set('pure-black', on)} />
 	</Row>

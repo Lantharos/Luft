@@ -59,3 +59,11 @@
 		transition-duration: 1ms !important;
 	}
 }
+
+:root[data-corners='square'] {
+	*,
+	::before,
+	::after {
+		border-radius: 0 !important;
+	}
+}

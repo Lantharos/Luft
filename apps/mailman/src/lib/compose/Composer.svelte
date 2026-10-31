@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { bytes, MenuButton, MenuItem, MenuSeparator, Spring, springTiming, tooltip, weekdayTime } from '@luft/ui';
+	import { appearance, bytes, MenuButton, MenuItem, MenuSeparator, Spring, springTiming, tooltip, weekdayTime } from '@luft/ui';
 	import Bell from '@lucide/svelte/icons/bell';
 	import Bold from '@lucide/svelte/icons/bold';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
@@ -49,7 +49,8 @@
 		surface.animate({ scale: [`${before.width / after.width} ${before.height / after.height}`, '1 1'] }, timing);
 		const top = Math.max(0, after.height - before.height);
 		const left = Math.max(0, after.width - before.width);
-		sheet.animate({ clipPath: [`inset(${top}px 0 0 ${left}px round 24px)`, 'inset(0 round 24px)'] }, timing);
+		const round = appearance.corners === 'square' ? 0 : 24;
+		sheet.animate({ clipPath: [`inset(${top}px 0 0 ${left}px round ${round}px)`, `inset(0 round ${round}px)`] }, timing);
 	});
 
 	let editor = $state<Editor>();

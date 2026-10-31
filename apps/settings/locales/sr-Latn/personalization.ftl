@@ -13,6 +13,10 @@ settings-appearance-schedule-sunset-description = Prati zalazak i izlazak sunca 
 settings-appearance-schedule-custom-description = Izabrani stil ostaje do sledeće promene
 settings-appearance-dark-from = Tamni od
 settings-appearance-light-from = Svetli od
+settings-appearance-corners = Uglovi
+settings-appearance-corners-rounded = Zaobljeni
+settings-appearance-corners-square = Četvrtasti
+settings-appearance-corners-description = Prozori, aplikacije, traka zadataka i meniji dobijaju ovaj oblik
 settings-appearance-pure-black = Potpuno crna
 settings-appearance-pure-black-description = Potpuno crne tamne pozadine, koje štede energiju na OLED ekranima
 settings-appearance-accent = Boja za isticanje
@@ -242,12 +246,6 @@ settings-notifications-keep = Zadrži u listi obaveštenja
 settings-notifications-keep-description = U suprotnom nestaju čim se njihov baner zatvori
 settings-notifications-app-lock-screen = Prikaži na zaključanom ekranu
 settings-notifications-done = Gotovo
-
-## Windows
-
-settings-windows-title = Prozori
-settings-windows-rounded-corners = Zaobljeni uglovi
-settings-windows-rounded-corners-description = Uvećani i popločani prozori su ionako četvrtasti, a neke aplikacije same zaobljavaju svoje uglove
 
 ## Window tiling
 

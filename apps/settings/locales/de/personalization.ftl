@@ -13,6 +13,10 @@ settings-appearance-schedule-sunset-description = Richtet sich nach Sonnenunterg
 settings-appearance-schedule-custom-description = Ein gewählter Stil gilt bis zum nächsten Wechsel
 settings-appearance-dark-from = Dunkel ab
 settings-appearance-light-from = Hell ab
+settings-appearance-corners = Ecken
+settings-appearance-corners-rounded = Abgerundet
+settings-appearance-corners-square = Eckig
+settings-appearance-corners-description = Fenster, Apps, die Taskleiste und Menüs nehmen diese Form an
 settings-appearance-pure-black = Reines Schwarz
 settings-appearance-pure-black-description = Ganz schwarze dunkle Hintergründe, die auf OLED-Bildschirmen Energie sparen
 settings-appearance-accent = Akzentfarbe
@@ -240,12 +244,6 @@ settings-notifications-keep = In der Benachrichtigungsliste behalten
 settings-notifications-keep-description = Sonst verschwinden sie, sobald ihr Banner schließt
 settings-notifications-app-lock-screen = Auf dem Sperrbildschirm anzeigen
 settings-notifications-done = Fertig
-
-## Windows
-
-settings-windows-title = Fenster
-settings-windows-rounded-corners = Abgerundete Ecken
-settings-windows-rounded-corners-description = Maximierte und gekachelte Fenster sind sowieso eckig, und manche Apps runden ihre Ecken selbst ab
 
 ## Window tiling
 

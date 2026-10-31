@@ -105,6 +105,10 @@
 		box-shadow: 0 8px 24px var(--shadow-faint);
 	}
 
+	:global(:root[data-corners='square']) .screen {
+		clip-path: inset(0);
+	}
+
 	img {
 		position: absolute;
 		inset: 0;

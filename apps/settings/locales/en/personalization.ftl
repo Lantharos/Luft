@@ -17,6 +17,10 @@ settings-appearance-schedule-custom-description = Picking a style lasts until th
 settings-appearance-dark-from = Dark from
 # Followed by a time picker
 settings-appearance-light-from = Light from
+settings-appearance-corners = Corners
+settings-appearance-corners-rounded = Rounded
+settings-appearance-corners-square = Square
+settings-appearance-corners-description = Windows, apps, the taskbar and menus all take this shape
 settings-appearance-pure-black = Pure black
 settings-appearance-pure-black-description = Fully black dark backgrounds, which save power on OLED
 settings-appearance-accent = Accent color
@@ -276,12 +280,6 @@ settings-notifications-keep = Keep in the notification list
 settings-notifications-keep-description = Otherwise they go once their banner closes
 settings-notifications-app-lock-screen = Show on the lock screen
 settings-notifications-done = Done
-
-## Windows
-
-settings-windows-title = Windows
-settings-windows-rounded-corners = Rounded corners
-settings-windows-rounded-corners-description = Maximized and tiled windows are square either way, and some apps round their own corners
 
 ## Window tiling
 

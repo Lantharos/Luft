@@ -434,14 +434,14 @@
     </key>
     <key name="rounded-window-corners" type="b">
       <default>true</default>
-      <summary>Round the corners of windows</summary>
+      <summary>Round corners across the desktop</summary>
       <description>
-        When disabled, windows keep square corners even when they float,
-        and so do Kestrel's panels and menus, such as Quick Settings and
-        Start; pill-shaped ones and the controls inside them keep their
-        shape. Maximized, tiled and fullscreen windows are always square.
-        Apps that draw their own rounded corners, such as GTK apps, keep
-        them.
+        When disabled, everything is square: windows even when they float,
+        Kestrel's taskbar, panels and menus, such as Quick Settings and
+        Start, and the Luft apps along with their controls. Apps that draw
+        their own corners, such as GTK and Chromium apps, are told to draw
+        them square. Maximized, tiled and fullscreen windows are always
+        square.
       </description>
     </key>
     <key name="window-tiling" enum="com.lantharos.kestrel.WindowTiling">

@@ -13,6 +13,10 @@ settings-appearance-schedule-sunset-description = Ndjek perëndimin dhe lindjen 
 settings-appearance-schedule-custom-description = Stili që zgjedh vlen deri në kalimin e ardhshëm
 settings-appearance-dark-from = I errët nga
 settings-appearance-light-from = I çelët nga
+settings-appearance-corners = Qoshet
+settings-appearance-corners-rounded = Të rrumbullakëta
+settings-appearance-corners-square = Katrore
+settings-appearance-corners-description = Dritaret, aplikacionet, shiriti i detyrave dhe menytë marrin këtë formë
 settings-appearance-pure-black = E zezë e plotë
 settings-appearance-pure-black-description = Sfonde krejt të zeza në stilin e errët, që kursejnë energji në OLED
 settings-appearance-accent = Ngjyra e theksimit
@@ -240,12 +244,6 @@ settings-notifications-keep = Mbaji në listën e njoftimeve
 settings-notifications-keep-description = Përndryshe largohen sapo mbyllet baneri i tyre
 settings-notifications-app-lock-screen = Shfaq në ekranin e bllokimit
 settings-notifications-done = U krye
-
-## Windows
-
-settings-windows-title = Dritaret
-settings-windows-rounded-corners = Qoshe të rrumbullakëta
-settings-windows-rounded-corners-description = Dritaret e maksimizuara dhe ato krah për krah janë gjithsesi katrore, dhe disa aplikacione i rrumbullakosin vetë qoshet
 
 ## Window tiling
 

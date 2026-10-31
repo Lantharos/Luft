@@ -21,6 +21,7 @@ import { MemoryNotices } from './health/memoryNotices.js';
 import { confirmStartupOnceSettled } from './health/startup.js';
 import { DesktopPolicy } from './peek/access/desktop.js';
 import { PeekService } from './peek/service.js';
+import { MonitorWake } from './display/relight/monitorWake.js';
 import { MediaKeys } from './mediaKeys/mediaKeys.js';
 import { BatteryWarnings } from './power/batteryWarnings.js';
 import { ChargerSound } from './sounds/charger.js';
@@ -42,6 +43,7 @@ export class SystemServices {
   private readonly launchFeedback = new LaunchFeedback();
   private readonly openWindows = new OpenWindows();
   private readonly variableRefresh = new VariableRefresh();
+  private readonly monitorWake = new MonitorWake();
   private readonly titleBars: TitleBars;
   private readonly loginScreen = [new LoginWallpaper(), new LoginDisplays(), new LoginNumLock()];
   private readonly farewell = new Farewell();
@@ -89,6 +91,7 @@ export class SystemServices {
     this.launchFeedback.destroy();
     this.openWindows.destroy();
     this.variableRefresh.destroy();
+    this.monitorWake.destroy();
     this.titleBars.destroy();
     this.portal.destroy();
     this.passkeys.destroy();

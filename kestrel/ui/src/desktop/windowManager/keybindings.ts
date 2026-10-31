@@ -3,7 +3,7 @@ import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 
 import * as KestrelUi from '../../kestrelUi.js';
-import { relight } from '../../system/display/relight/relight.js';
+import { recoverDisplays } from '../../system/display/relight/monitorWake.js';
 import type { WindowManager } from './windowManager.js';
 
 const SHELL_KEYBINDINGS_SCHEMA = 'com.lantharos.kestrel.keybindings';
@@ -42,7 +42,7 @@ const SURFACE_KEYS: [string, Shell.ActionMode, () => void][] = [
   ['emoji-picker', NORMAL, () => KestrelUi.toggleSurface('emoji')],
   ['snap-layouts', NORMAL, () => KestrelUi.toggleSurface('snap')],
   ['system-monitor', DESKTOP_AND_POPUPS, () => KestrelUi.openSystemMonitor()],
-  ['relight-displays', EVERYWHERE_BUT_SYSTEM_MODALS, () => relight().catch(logError)],
+  ['relight-displays', EVERYWHERE_BUT_SYSTEM_MODALS, () => recoverDisplays().catch(logError)],
 ];
 
 export interface KeyHandlers {

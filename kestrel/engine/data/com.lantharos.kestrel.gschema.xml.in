@@ -218,6 +218,15 @@
       <default>7.0</default>
       <summary>Hour, in local time, when a custom schedule turns the dark style off</summary>
     </key>
+    <key name="monitors-needing-wake" type="as">
+      <default>[]</default>
+      <summary>Monitors that show no picture unless woken through a slower mode</summary>
+      <description>
+        Monitors, as vendor:product:serial, that came back after lighting
+        the displays again. They're woken through a slower mode whenever
+        they're plugged in or wake from sleep.
+      </description>
+    </key>
     <key name="variable-refresh" enum="com.lantharos.kestrel.VariableRefresh">
       <default>'games'</default>
       <summary>Which fullscreen windows displays with variable refresh follow</summary>

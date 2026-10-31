@@ -18,7 +18,7 @@ type State = [serial: number, monitors: MonitorState[], logicalMonitors: Logical
 type Applied = Record<string, GLib.Variant>;
 type AppliedLogical = [number, number, number, number, boolean, [string, string, Applied][]];
 
-let relighting: Promise<void> | null = null;
+let relighting: Promise<string[]> | null = null;
 
 async function currentState(): Promise<State> {
   return (await mutterCall(DISPLAY_CONFIG, 'GetCurrentState', null, STATE)).recursiveUnpack() as State;
@@ -60,19 +60,21 @@ function wait(milliseconds: number): Promise<void> {
   }));
 }
 
-async function relightIn(connectors: string[] | null): Promise<void> {
+async function relightIn(connectors: string[] | null): Promise<string[]> {
   const before = await currentState();
   const target = (monitor: MonitorState) => connectors === null || connectors.includes(monitor[0][0]);
-  if (!before[1].some(monitor => target(monitor) && wakeMode(monitor))) return;
+  const relit = before[1].filter(monitor => target(monitor) && wakeMode(monitor)).map(([[connector]]) => connector);
+  if (!relit.length) return relit;
   const restored = layout(before, currentMode);
   await apply(before[0], layout(before, monitor => (target(monitor) && wakeMode(monitor)) || currentMode(monitor)), before[3]);
   await wait(WAKE_MS);
   const [serial] = await currentState();
   await apply(serial, restored, before[3]);
+  return relit;
 }
 
 /** Lights the given screens, or all of them, again through a slower mode of the same size, which brings back monitors that missed the first picture. */
-export function relight(connectors: string[] | null = null): Promise<void> {
+export function relight(connectors: string[] | null = null): Promise<string[]> {
   relighting ??= relightIn(connectors).finally(() => { relighting = null; });
   return relighting;
 }

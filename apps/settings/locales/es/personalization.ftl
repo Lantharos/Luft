@@ -244,6 +244,8 @@ settings-tiling-new-beside = Junto a la ventana activa
 settings-tiling-new-at-end = Al final
 settings-tiling-shortcuts = Atajos del mosaico
 settings-tiling-shortcuts-description = Activa, mueve y cambia el tamaño de las ventanas en mosaico con el teclado
+settings-board = Tablero
+settings-board-description = Pulsa Super dos veces o desliza hacia arriba con cuatro dedos para colocar las ventanas del espacio de trabajo una al lado de otra
 
 ## Accessibility
 

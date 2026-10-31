@@ -246,6 +246,8 @@ settings-tiling-new-beside = Lângă fereastra activă
 settings-tiling-new-at-end = La sfârșit
 settings-tiling-shortcuts = Scurtături pentru mozaic
 settings-tiling-shortcuts-description = Activează, mută și redimensionează ferestrele în mozaic de la tastatură
+settings-board = Tablă
+settings-board-description = Apăsați de două ori Super sau glisați în sus cu patru degete pentru a așeza ferestrele spațiului de lucru una lângă alta
 
 ## Accessibility
 

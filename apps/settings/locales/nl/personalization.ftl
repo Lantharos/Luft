@@ -244,6 +244,8 @@ settings-tiling-new-beside = Naast het actieve venster
 settings-tiling-new-at-end = Aan het einde
 settings-tiling-shortcuts = Sneltoetsen voor tegelen
 settings-tiling-shortcuts-description = Getegelde vensters met het toetsenbord activeren, verplaatsen en van grootte veranderen
+settings-board = Board
+settings-board-description = Druk twee keer op Super of veeg met vier vingers omhoog om de vensters van een werkblad naast elkaar te leggen
 
 ## Accessibility
 

@@ -255,6 +255,8 @@ settings-tiling-new-beside = Pranë dritares aktive
 settings-tiling-new-at-end = Në fund
 settings-tiling-shortcuts = Shkurtore për renditjen krah për krah
 settings-tiling-shortcuts-description = Aktivizoni, lëvizni dhe ndryshoni madhësinë e dritareve krah për krah me tastierë
+settings-board = Tabelë
+settings-board-description = Shtypni dy herë Super ose rrëshqitni lart me katër gishta për të vendosur dritaret e hapësirës së punës krah njëra-tjetrës
 
 ## Accessibility
 

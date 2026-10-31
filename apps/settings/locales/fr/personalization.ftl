@@ -244,6 +244,8 @@ settings-tiling-new-beside = À côté de la fenêtre active
 settings-tiling-new-at-end = À la fin
 settings-tiling-shortcuts = Raccourcis de pavage
 settings-tiling-shortcuts-description = Activer, déplacer et redimensionner les fenêtres pavées au clavier
+settings-board = Tableau
+settings-board-description = Appuyez deux fois sur Super ou balayez vers le haut avec quatre doigts pour disposer les fenêtres de l’espace de travail côte à côte
 
 ## Accessibility
 

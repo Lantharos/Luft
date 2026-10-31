@@ -244,6 +244,8 @@ settings-tiling-new-beside = Bredvid det aktiva fönstret
 settings-tiling-new-at-end = Sist
 settings-tiling-shortcuts = Kortkommandon för plattor
 settings-tiling-shortcuts-description = Aktivera, flytta och ändra storlek på fönster som plattor med tangentbordet
+settings-board = Tavla
+settings-board-description = Tryck två gånger på Super eller svep uppåt med fyra fingrar för att lägga arbetsytans fönster sida vid sida
 
 ## Accessibility
 

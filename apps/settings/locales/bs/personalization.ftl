@@ -257,6 +257,8 @@ settings-tiling-new-beside = Pored aktivnog prozora
 settings-tiling-new-at-end = Na kraju
 settings-tiling-shortcuts = Prečice za popločavanje
 settings-tiling-shortcuts-description = Aktivirajte, pomjerajte i mijenjajte veličinu popločanih prozora tastaturom
+settings-board = Tabla
+settings-board-description = Pritisnite Super dvaput ili prevucite nagore s četiri prsta da poredate prozore radnog prostora jedan pored drugog
 
 ## Accessibility
 

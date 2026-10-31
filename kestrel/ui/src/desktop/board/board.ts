@@ -1,4 +1,5 @@
 import Clutter from 'gi://Clutter';
+import Gio from 'gi://Gio';
 import Meta from 'gi://Meta';
 import type Shell from 'gi://Shell';
 import type St from 'gi://St';
@@ -74,6 +75,8 @@ export class Board implements BoardActions {
   ownSize: (window: Meta.Window) => Pick<Box, 'width' | 'height'> | null = () => null;
 
   private readonly unwatchScheme: () => void;
+  private readonly settings = new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });
+  private readonly settingsSignal: number;
 
   constructor(private readonly host: BoardHost) {
     this.backdrop = new Backdrop(host.createBackground, !isDark());
@@ -115,6 +118,11 @@ export class Board implements BoardActions {
     host.addChrome(this.corner.actor);
     const manager = global.workspace_manager;
     this.managerSignal = manager.connect('active-workspace-changed', () => this.syncWorkspace());
+    this.settingsSignal = this.settings.connect('changed::board', () => { if (!this.enabled && this.presented) this.exit(); });
+  }
+
+  get enabled(): boolean {
+    return this.settings.get_boolean('board');
   }
 
   get shown(): boolean {
@@ -176,7 +184,7 @@ export class Board implements BoardActions {
   }
 
   doubleTapped(): boolean {
-    return this.keys.doubleTapped();
+    return this.keys.doubleTapped() && this.enabled;
   }
 
   toggle(): void {
@@ -391,6 +399,7 @@ export class Board implements BoardActions {
 
   destroy(): void {
     global.workspace_manager.disconnect(this.managerSignal);
+    this.settings.disconnect(this.settingsSignal);
     this.unwatchScheme();
     this.cancelRestore?.();
     this.present(null);

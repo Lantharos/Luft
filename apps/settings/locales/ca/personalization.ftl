@@ -244,6 +244,8 @@ settings-tiling-new-beside = Al costat de la finestra activa
 settings-tiling-new-at-end = Al final
 settings-tiling-shortcuts = Dreceres del mosaic
 settings-tiling-shortcuts-description = Activa, mou i canvia la mida de les finestres en mosaic amb el teclat
+settings-board = Tauler
+settings-board-description = Premeu Super dues vegades o llisqueu cap amunt amb quatre dits per posar les finestres de l'espai de treball una al costat de l'altra
 
 ## Accessibility
 

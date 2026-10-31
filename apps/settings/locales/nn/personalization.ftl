@@ -244,6 +244,8 @@ settings-tiling-new-beside = Ved sida av det aktive vindauget
 settings-tiling-new-at-end = Til slutt
 settings-tiling-shortcuts = Snarvegar for fliser
 settings-tiling-shortcuts-description = Aktiver, flytt og endra storleik på flislagde vindauge med tastaturet
+settings-board = Tavle
+settings-board-description = Trykk Super to gonger eller sveip opp med fire fingrar for å leggje vindauga i arbeidsområdet side om side
 
 ## Accessibility
 

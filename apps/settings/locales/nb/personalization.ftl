@@ -244,6 +244,8 @@ settings-tiling-new-beside = Ved siden av det aktive vinduet
 settings-tiling-new-at-end = Til slutt
 settings-tiling-shortcuts = Snarveier for fliser
 settings-tiling-shortcuts-description = Aktiver, flytt og endre størrelse på flislagte vinduer med tastaturet
+settings-board = Tavle
+settings-board-description = Trykk Super to ganger eller sveip opp med fire fingre for å legge arbeidsområdets vinduer side om side
 
 ## Accessibility
 

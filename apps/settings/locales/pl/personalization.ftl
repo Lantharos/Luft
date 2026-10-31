@@ -248,6 +248,8 @@ settings-tiling-new-beside = Obok aktywnego okna
 settings-tiling-new-at-end = Na końcu
 settings-tiling-shortcuts = Skróty kafelkowania
 settings-tiling-shortcuts-description = Aktywuj, przenoś i zmieniaj rozmiar kafelkowanych okien z klawiatury
+settings-board = Tablica
+settings-board-description = Naciśnij dwukrotnie Super lub przesuń w górę czterema palcami, aby ułożyć okna obszaru roboczego obok siebie
 
 ## Accessibility
 

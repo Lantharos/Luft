@@ -244,6 +244,8 @@ settings-tiling-new-beside = До активния прозорец
 settings-tiling-new-at-end = В края
 settings-tiling-shortcuts = Клавишни комбинации за плочки
 settings-tiling-shortcuts-description = Активиране, преместване и преоразмеряване на прозорците в плочки от клавиатурата
+settings-board = Табло
+settings-board-description = Натиснете Super два пъти или плъзнете нагоре с четири пръста, за да подредите прозорците на работното пространство един до друг
 
 ## Accessibility
 

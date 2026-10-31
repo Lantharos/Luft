@@ -245,6 +245,8 @@ settings-tiling-new-beside = Ao lado da janela ativa
 settings-tiling-new-at-end = No fim
 settings-tiling-shortcuts = Atalhos do mosaico
 settings-tiling-shortcuts-description = Ativar, mover e redimensionar janelas em mosaico com o teclado
+settings-board = Quadro
+settings-board-description = Prima Super duas vezes ou deslize para cima com quatro dedos para dispor as janelas da área de trabalho lado a lado
 
 ## Accessibility
 

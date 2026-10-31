@@ -379,7 +379,8 @@ class KestrelUi {
     if (this.surfaces.active === 'tasks') return up ? this.surfaces.followTasks() : null;
     if (!this.canInteract() || this.surfaces.active) return null;
     if (this.board.shown) return up ? null : this.board.track(false);
-    return up ? this.board.track(true) : this.surfaces.followTasks();
+    if (up) return this.board.enabled ? this.board.track(true) : null;
+    return this.surfaces.followTasks();
   }
 
   private takeScreenshot(): void {

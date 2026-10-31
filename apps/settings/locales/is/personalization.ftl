@@ -244,6 +244,8 @@ settings-tiling-new-beside = Við hlið virka gluggans
 settings-tiling-new-at-end = Aftast
 settings-tiling-shortcuts = Flýtileiðir fyrir flísar
 settings-tiling-shortcuts-description = Virkja, færa og breyta stærð flísalagðra glugga með lyklaborðinu
+settings-board = Tafla
+settings-board-description = Ýttu tvisvar á Super eða strjúktu upp með fjórum fingrum til að raða gluggum vinnusvæðisins hlið við hlið
 
 ## Accessibility
 

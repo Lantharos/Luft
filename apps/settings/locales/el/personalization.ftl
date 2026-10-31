@@ -244,6 +244,8 @@ settings-tiling-new-beside = Δίπλα στο ενεργό παράθυρο
 settings-tiling-new-at-end = Στο τέλος
 settings-tiling-shortcuts = Συντομεύσεις παράθεσης
 settings-tiling-shortcuts-description = Ενεργοποίηση, μετακίνηση και αλλαγή μεγέθους παραθύρων σε παράθεση από το πληκτρολόγιο
+settings-board = Πίνακας
+settings-board-description = Πατήστε δύο φορές Super ή σύρετε προς τα πάνω με τέσσερα δάχτυλα για να απλώσετε τα παράθυρα του χώρου εργασίας δίπλα δίπλα
 
 ## Accessibility
 

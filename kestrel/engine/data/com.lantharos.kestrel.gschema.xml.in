@@ -218,6 +218,10 @@
       <default>7.0</default>
       <summary>Hour, in local time, when a custom schedule turns the dark style off</summary>
     </key>
+    <key name="board" type="b">
+      <default>true</default>
+      <summary>Whether pressing Super twice or swiping up with four fingers turns a workspace into a board</summary>
+    </key>
     <key name="monitors-needing-wake" type="as">
       <default>[]</default>
       <summary>Monitors that show no picture unless woken through a slower mode</summary>

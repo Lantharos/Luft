@@ -250,6 +250,8 @@ settings-tiling-new-beside = Ħdejn it-tieqa attiva
 settings-tiling-new-at-end = Fl-aħħar
 settings-tiling-shortcuts = Shortcuts għat-twieqi ħdejn xulxin
 settings-tiling-shortcuts-description = Attiva, ċaqlaq u biddel id-daqs tat-twieqi ħdejn xulxin bit-tastiera
+settings-board = Bord
+settings-board-description = Agħfas Super darbtejn jew żerżaq ’il fuq b’erba’ swaba’ biex tqiegħed it-twieqi tal-ispazju tax-xogħol ħdejn xulxin
 
 ## Accessibility
 

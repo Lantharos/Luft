@@ -248,6 +248,8 @@ settings-tiling-new-beside = Šalia aktyvaus lango
 settings-tiling-new-at-end = Pabaigoje
 settings-tiling-shortcuts = Išklotinės spartieji klavišai
 settings-tiling-shortcuts-description = Aktyvinkite, perkelkite ir keiskite išklotinės langų dydį klaviatūra
+settings-board = Lenta
+settings-board-description = Du kartus paspauskite Super arba perbraukite aukštyn keturiais pirštais, kad darbo srities langai išsidėstytų greta
 
 ## Accessibility
 

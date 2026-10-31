@@ -244,6 +244,8 @@ settings-tiling-new-beside = Accanto alla finestra attiva
 settings-tiling-new-at-end = In fondo
 settings-tiling-shortcuts = Scorciatoie per l’affiancamento
 settings-tiling-shortcuts-description = Attiva, sposta e ridimensiona le finestre affiancate con la tastiera
+settings-board = Lavagna
+settings-board-description = Premi Super due volte o scorri verso l’alto con quattro dita per affiancare le finestre dell’area di lavoro
 
 ## Accessibility
 

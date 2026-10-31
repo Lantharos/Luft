@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { Row, Section, Segmented, Select } from '@luft/ui';
+	import { Row, Section, Segmented, Select, Switch } from '@luft/ui';
 	import PreviewCard from '#lib/components/PreviewCard.svelte';
 	import { app } from '#lib/state/app.svelte.js';
 	import { KESTREL_SCHEMA, useSettings } from '#lib/state/gsettings.svelte.js';
@@ -9,6 +9,7 @@
 	import TilingPreview from './TilingPreview.svelte';
 
 	const tiling = useSettings<TilingSettings>(KESTREL_SCHEMA, TILING_KEYS);
+	const board = useSettings<{ board: boolean }>(KESTREL_SCHEMA, ['board']);
 	const wallpaper = currentWallpaper();
 
 	let mode = $derived(tiling.values['window-tiling'] ?? 'off');
@@ -62,6 +63,12 @@
 		<Row title={t('settings-tiling-shortcuts')} description={t('settings-tiling-shortcuts-description')} onclick={() => app.open('input/shortcuts')} />
 	</Section>
 {/if}
+
+<Section>
+	<Row title={t('settings-board')} description={t('settings-board-description')}>
+		<Switch label={t('settings-board')} checked={board.values.board ?? true} onchange={(on) => board.set('board', on)} />
+	</Row>
+</Section>
 
 <style>
 	.cards {

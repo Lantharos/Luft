@@ -255,6 +255,8 @@ settings-tiling-new-beside = Neben dem fokussierten Fenster
 settings-tiling-new-at-end = Am Ende
 settings-tiling-shortcuts = Tastenkürzel zum Kacheln
 settings-tiling-shortcuts-description = Gekachelte Fenster mit der Tastatur fokussieren, verschieben und in der Größe ändern
+settings-board = Board
+settings-board-description = Zweimal Super drücken oder mit vier Fingern nach oben wischen, um die Fenster eines Arbeitsbereichs nebeneinander anzuordnen
 
 ## Accessibility
 

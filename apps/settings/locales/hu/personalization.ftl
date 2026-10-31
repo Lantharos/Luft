@@ -244,6 +244,8 @@ settings-tiling-new-beside = Az aktív ablak mellett
 settings-tiling-new-at-end = A végén
 settings-tiling-shortcuts = Csempézés billentyűparancsai
 settings-tiling-shortcuts-description = Csempézett ablakok aktiválása, áthelyezése és átméretezése billentyűzettel
+settings-board = Tábla
+settings-board-description = Nyomja meg kétszer a Super billentyűt, vagy húzzon felfelé négy ujjal, hogy a munkaterület ablakai egymás mellé kerüljenek
 
 ## Accessibility
 

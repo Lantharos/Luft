@@ -248,6 +248,8 @@ settings-tiling-new-beside = Vedľa aktívneho okna
 settings-tiling-new-at-end = Na konci
 settings-tiling-shortcuts = Skratky dlaždíc
 settings-tiling-shortcuts-description = Aktivácia, presun a zmena veľkosti dlaždicových okien z klávesnice
+settings-board = Tabuľa
+settings-board-description = Dvojitým stlačením Super alebo potiahnutím štyrmi prstami nahor rozložíte okná pracovnej plochy vedľa seba
 
 ## Accessibility
 

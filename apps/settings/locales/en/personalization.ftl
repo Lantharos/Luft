@@ -291,6 +291,8 @@ settings-tiling-new-beside = Next to the focused window
 settings-tiling-new-at-end = At the end
 settings-tiling-shortcuts = Tiling shortcuts
 settings-tiling-shortcuts-description = Focus, move and resize tiled windows from the keyboard
+settings-board = Board
+settings-board-description = Press Super twice or swipe up with four fingers to lay out a workspace's windows side by side
 
 ## Accessibility
 

@@ -248,6 +248,8 @@ settings-tiling-new-beside = Рядом с активным окном
 settings-tiling-new-at-end = В конце
 settings-tiling-shortcuts = Сочетания клавиш для мозаики
 settings-tiling-shortcuts-description = Переключайтесь между окнами мозаики, перемещайте их и меняйте их размер с клавиатуры
+settings-board = Доска
+settings-board-description = Дважды нажмите Super или проведите вверх четырьмя пальцами, чтобы разложить окна рабочего пространства рядом
 
 ## Accessibility
 

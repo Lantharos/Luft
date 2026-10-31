@@ -248,6 +248,8 @@ settings-tiling-new-beside = Ob dejavnem oknu
 settings-tiling-new-at-end = Na koncu
 settings-tiling-shortcuts = Bližnjice za tlakovanje
 settings-tiling-shortcuts-description = Aktivirajte, premikajte in spreminjajte velikost tlakovanih oken s tipkovnico
+settings-board = Tabla
+settings-board-description = Dvakrat pritisnite Super ali podrsajte navzgor s štirimi prsti, da razporedite okna delovne površine drugo ob drugem
 
 ## Accessibility
 

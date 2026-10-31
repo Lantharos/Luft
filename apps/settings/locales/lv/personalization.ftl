@@ -246,6 +246,8 @@ settings-tiling-new-beside = Blakus aktīvajam logam
 settings-tiling-new-at-end = Beigās
 settings-tiling-shortcuts = Flīzēšanas īsinājumtaustiņi
 settings-tiling-shortcuts-description = Aktivizējiet, pārvietojiet un mainiet flīzēto logu izmēru ar tastatūru
+settings-board = Tāfele
+settings-board-description = Divreiz nospiediet Super vai pavelciet uz augšu ar četriem pirkstiem, lai darbvietas logus izkārtotu blakus
 
 ## Accessibility
 

@@ -244,6 +244,8 @@ settings-tiling-new-beside = Ved siden af det aktive vindue
 settings-tiling-new-at-end = Til sidst
 settings-tiling-shortcuts = Genveje til fliser
 settings-tiling-shortcuts-description = Aktivér, flyt og tilpas fliselagte vinduer med tastaturet
+settings-board = Tavle
+settings-board-description = Tryk to gange på Super, eller stryg op med fire fingre for at lægge arbejdsområdets vinduer side om side
 
 ## Accessibility
 

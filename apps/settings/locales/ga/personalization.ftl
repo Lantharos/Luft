@@ -250,6 +250,8 @@ settings-tiling-new-beside = In aice leis an bhfuinneog ghníomhach
 settings-tiling-new-at-end = Ag an deireadh
 settings-tiling-shortcuts = Aicearraí tíleála
 settings-tiling-shortcuts-description = Gníomhachtaigh, bog agus athraigh méid fuinneog tíleáilte leis an méarchlár
+settings-board = Clár
+settings-board-description = Brúigh Super faoi dhó nó svaidhpeáil suas le ceithre mhéar chun fuinneoga an spáis oibre a leagan amach taobh le taobh
 
 ## Accessibility
 

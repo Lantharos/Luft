@@ -244,6 +244,8 @@ settings-tiling-new-beside = Aktiivisen ikkunan viereen
 settings-tiling-new-at-end = Loppuun
 settings-tiling-shortcuts = Laatoituksen pikanäppäimet
 settings-tiling-shortcuts-description = Aktivoi, siirrä ja muuta laatoitettujen ikkunoiden kokoa näppäimistöllä
+settings-board = Taulu
+settings-board-description = Paina Superia kahdesti tai pyyhkäise ylös neljällä sormella asettaaksesi työtilan ikkunat rinnakkain
 
 ## Accessibility
 

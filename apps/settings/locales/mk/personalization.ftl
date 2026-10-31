@@ -244,6 +244,8 @@ settings-tiling-new-beside = До активниот прозорец
 settings-tiling-new-at-end = На крајот
 settings-tiling-shortcuts = Кратенки за поплочување
 settings-tiling-shortcuts-description = Активирајте, преместувајте и менувајте ја големината на поплочените прозорци со тастатурата
+settings-board = Табла
+settings-board-description = Притиснете Super двапати или повлечете нагоре со четири прста за да ги наредите прозорците на работниот простор еден до друг
 
 ## Accessibility
 

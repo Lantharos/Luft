@@ -8,8 +8,8 @@ import {checks} from '../lib/check.js';
 import {hold, moveTo, pressButton, release, releaseButton, scroll, type Point} from '../lib/input/input.js';
 import {stop, waitForWindow} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
-import {nextFrame, pause} from '../lib/wait.js';
-import {board, boardResting, boardWindows, fourFingerSwipe, leaveBoard, noOverlap, onWholePixels, openBoardWindow, openWindows, sameView, showBoard, switching, view, windowNamed} from './lib/board.js';
+import {nextFrame, pause, settled} from '../lib/wait.js';
+import {board, boardResting, boardWindows, doubleTapSuper, fourFingerSwipe, leaveBoard, noOverlap, onWholePixels, openBoardWindow, openWindows, sameView, showBoard, switching, view, windowNamed} from './lib/board.js';
 import {screenPoint} from './lib/pointer.js';
 import {touchpad} from './lib/touchpad.js';
 
@@ -18,6 +18,23 @@ const manager = global.workspace_manager;
 const group = global.window_group;
 const DOUBLE_CLICK_TIME = new Gio.Settings({schema_id: 'org.gnome.desktop.peripherals.mouse'}).get_int('double-click');
 const panel = () => named('kestrel-panel')!;
+
+async function checkTurnedOff() {
+  const settings = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
+  settings.set_boolean('board', false);
+  try {
+    doubleTapSuper();
+    await pause(300);
+    require(!board().shown, 'with the board turned off in Settings, double-tapping Super leaves the desktop as it is');
+    settings.set_boolean('board', true);
+    await showBoard();
+    settings.set_boolean('board', false);
+    await eventually(() => !board().shown, 'turning the board off in Settings leaves a board that is on');
+    await settled();
+  } finally {
+    settings.reset('board');
+  }
+}
 
 async function checkEntering() {
   require(boardWindows().length === 4, 'four windows open on the first desktop');
@@ -178,6 +195,7 @@ async function checkLeaving() {
 export async function run() {
   await openWindows();
   try {
+    await checkTurnedOff();
     await checkEntering();
     await checkDesktops();
     checkGestures();

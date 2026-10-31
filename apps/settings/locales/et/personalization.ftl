@@ -246,6 +246,8 @@ settings-tiling-new-beside = Aktiivse akna kõrval
 settings-tiling-new-at-end = Lõpus
 settings-tiling-shortcuts = Paanimise kiirklahvid
 settings-tiling-shortcuts-description = Paanitud akende aktiveerimine, liigutamine ja suuruse muutmine klaviatuuriga
+settings-board = Tahvel
+settings-board-description = Vajutage kaks korda Super või libistage nelja sõrmega üles, et paigutada tööala aknad kõrvuti
 
 ## Accessibility
 

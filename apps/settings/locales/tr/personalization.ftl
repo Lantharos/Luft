@@ -244,6 +244,8 @@ settings-tiling-new-beside = Etkin pencerenin yanında
 settings-tiling-new-at-end = Sonda
 settings-tiling-shortcuts = Döşeme kısayolları
 settings-tiling-shortcuts-description = Döşenmiş pencereleri klavyeyle etkinleştirin, taşıyın ve yeniden boyutlandırın
+settings-board = Tahta
+settings-board-description = Çalışma alanının pencerelerini yan yana dizmek için Super tuşuna iki kez basın veya dört parmakla yukarı kaydırın
 
 ## Accessibility
 

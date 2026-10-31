@@ -118,8 +118,6 @@ async function checkSession() {
   await unlock();
 
   await openStart();
-  const shell = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
-  shell.set_boolean('always-show-log-out', true);
   search('sign out');
   await eventually(() => row('action:can-logout') && titleOf(row('action:can-logout')!) === 'Log out', 'sign out finds Log out');
   row('action:can-logout')!.emit('clicked', 1);
@@ -127,7 +125,6 @@ async function checkSession() {
     await eventually(() => Main.modalCount > 0, 'logging out from search still asks first');
   } finally {
     await call(...END_SESSION, 'Close').catch(() => {});
-    shell.reset('always-show-log-out');
   }
   await eventually(() => Main.modalCount === 0, 'cancelling keeps the session running');
 }

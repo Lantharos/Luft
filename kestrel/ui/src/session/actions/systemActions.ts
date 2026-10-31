@@ -1,6 +1,4 @@
-import AccountsService from 'gi://AccountsService';
 import Gio from 'gi://Gio';
-import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 
 import { logErrorUnlessCancelled } from '../../core/runtime/errorUtils.js';
@@ -11,7 +9,6 @@ const LOCKDOWN_SCHEMA = 'org.gnome.desktop.lockdown';
 const SCREENSAVER_SCHEMA = 'org.gnome.desktop.screensaver';
 const DISABLE_LOG_OUT_KEY = 'disable-log-out';
 const RESTART_ENABLED_KEY = 'restart-enabled';
-const ALWAYS_SHOW_LOG_OUT_KEY = 'always-show-log-out';
 
 type ActionId = 'power-off' | 'restart' | 'lock-screen' | 'logout' | 'suspend';
 
@@ -62,21 +59,12 @@ const SystemActions = GObject.registerClass({
   private readonly lockdownSettings = new Gio.Settings({ schema_id: LOCKDOWN_SCHEMA });
   private readonly screenSaverSettings = new Gio.Settings({ schema_id: SCREENSAVER_SCHEMA });
   private readonly session = (GnomeSession.SessionManager as unknown as () => SessionManagerProxy)();
-  private readonly userManager = AccountsService.UserManager.get_default();
-  private readonly user = this.userManager.get_user(GLib.get_user_name());
 
   constructor() {
     super();
 
     const updateLogout = () => this.updateLogout();
-    this.userManager.connect('notify::is-loaded', updateLogout);
-    this.userManager.connect('notify::has-multiple-users', updateLogout);
-    this.userManager.connect('user-added', updateLogout);
-    this.userManager.connect('user-removed', updateLogout);
-    this.user.connect('notify::is-loaded', updateLogout);
-
     this.lockdownSettings.connect(`changed::${DISABLE_LOG_OUT_KEY}`, updateLogout);
-    global.settings.connect(`changed::${ALWAYS_SHOW_LOG_OUT_KEY}`, updateLogout);
 
     this.lockdownSettings.connect(`changed::${DISABLE_LOG_OUT_KEY}`, () => {
       void this.updateHaveShutdown();
@@ -179,12 +167,7 @@ const SystemActions = GObject.registerClass({
 
   private updateLogout(): void {
     const allowLogout = !this.lockdownSettings.get_boolean(DISABLE_LOG_OUT_KEY);
-    const alwaysShow = global.settings.get_boolean(ALWAYS_SHOW_LOG_OUT_KEY);
-    const { systemAccount, localAccount } = this.user;
-    const multiUser = this.userManager.has_multiple_users;
-    const shouldShowInMode = !Main.sessionMode.isLocked;
-
-    this.setAvailable('logout', allowLogout && (alwaysShow || multiUser || systemAccount || !localAccount) && shouldShowInMode);
+    this.setAvailable('logout', allowLogout && !Main.sessionMode.isLocked);
   }
 
   private require(id: ActionId): void {

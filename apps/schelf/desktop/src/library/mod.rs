@@ -2,8 +2,7 @@ mod appimages;
 mod debian;
 mod flatpaks;
 pub mod full_access;
-mod icons;
-mod names;
+mod settings;
 pub mod sources;
 mod system;
 mod tools;
@@ -109,10 +108,15 @@ pub fn register(window: SabineWindow) -> SabineWindow {
         .command_async("library_full_access", full_access::has)
         .command_async("library_set_full_access", full_access::set)
         .command_async("library_restart", full_access::restart)
-        .command("library_custom_icons", icons::state)
-        .command_async("library_choose_icon", icons::choose)
-        .command_async("library_choose_symbolic_icon", icons::choose_symbolic)
-        .command("library_reset_icons", icons::reset)
-        .command("library_names", names::state)
-        .command("library_rename", names::rename)
+        .command("library_custom_icons", settings::icons::state)
+        .command_async("library_choose_icon", settings::icons::choose)
+        .command_async(
+            "library_choose_symbolic_icon",
+            settings::icons::choose_symbolic,
+        )
+        .command("library_reset_icons", settings::icons::reset)
+        .command("library_names", settings::names::state)
+        .command("library_rename", settings::names::rename)
+        .command("library_notifications", settings::notifications::state)
+        .command("library_set_notification", settings::notifications::set)
 }

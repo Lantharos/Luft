@@ -190,43 +190,6 @@ settings-cursors-get = Ikseb
 settings-cursors-choose-download = Agħżel download għal { $name }
 settings-cursors-view-online = Ara online
 
-## Notifications
-
-settings-notifications-dnd = Tiddisturbax
-settings-notifications-dnd-description = Il-banners u l-ħsejjes jibqgħu mitfija, ħlief għall-apps li tippermetti
-settings-notifications-lock-screen = Skrin imsakkar
-settings-notifications-show-lock-screen = Uri n-notifiki fuq l-iskrin imsakkar
-settings-notifications-content = Uri l-kontenut tal-messaġġi
-settings-notifications-content-description = Meta jkun mitfi, jidher biss l-isem tal-app
-settings-notifications-content-lock-screen = Uri l-kontenut tal-messaġġi fuq l-iskrin imsakkar
-settings-notifications-apps = Notifiki tal-apps
-settings-notifications-apps-description = Agħżel kif kull app tinnotifikak
-settings-notifications-search = Fittex apps
-settings-notifications-no-match = L-ebda app ma taqbel mat-tfittxija
-settings-notifications-from = Notifiki minn { $app }
-settings-notifications-summary-both = Banners u skrin imsakkar
-settings-notifications-summary-banners = Banners
-settings-notifications-summary-lock-screen = Skrin imsakkar
-settings-notifications-summary-list = Lista tan-notifiki biss
-settings-notifications-allow = Ippermetti n-notifiki
-settings-notifications-banners = Banners
-settings-notifications-banners-description = Jidhru fuq l-iskrin meta jaslu
-settings-notifications-sound = Ħoss
-settings-notifications-sound-description = B’mod awtomatiku ma jindaqq xejn meta l-app iddoqq il-ħoss tagħha
-settings-notifications-sound-automatic = Awtomatiku
-settings-notifications-sound-luft = Il-ħoss ta’ Luft
-settings-notifications-sound-app = Il-ħoss tal-app
-settings-notifications-sound-none = Xejn
-settings-notifications-dnd-allow = Ippermetti waqt Tiddisturbax
-settings-notifications-dnd-allow-description = Urġenti jfisser allarmi u telefonati
-settings-notifications-dnd-never = Qatt
-settings-notifications-dnd-urgent = Urġenti biss
-settings-notifications-dnd-always = Dejjem
-settings-notifications-keep = Żomm fil-lista tan-notifiki
-settings-notifications-keep-description = Inkella jmorru hekk kif jingħalaq il-banner tagħhom
-settings-notifications-app-lock-screen = Uri fuq l-iskrin imsakkar
-settings-notifications-done = Lest
-
 ## Window tiling
 
 settings-tiling-mode = Irranġa t-twieqi

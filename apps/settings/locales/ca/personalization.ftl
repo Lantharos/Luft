@@ -184,43 +184,6 @@ settings-cursors-get = Obtén
 settings-cursors-choose-download = Trieu una baixada per a { $name }
 settings-cursors-view-online = Mostra en línia
 
-## Notifications
-
-settings-notifications-dnd = No molestis
-settings-notifications-dnd-description = Els bàners i els sons queden desactivats, tret de les aplicacions que permeteu
-settings-notifications-lock-screen = Pantalla de bloqueig
-settings-notifications-show-lock-screen = Mostra les notificacions a la pantalla de bloqueig
-settings-notifications-content = Mostra el contingut dels missatges
-settings-notifications-content-description = Si està desactivat, només es mostra el nom de l’aplicació
-settings-notifications-content-lock-screen = Mostra el contingut dels missatges a la pantalla de bloqueig
-settings-notifications-apps = Notificacions de les aplicacions
-settings-notifications-apps-description = Trieu com us avisa cada aplicació
-settings-notifications-search = Cerca aplicacions
-settings-notifications-no-match = Cap aplicació no coincideix amb la cerca
-settings-notifications-from = Notificacions de { $app }
-settings-notifications-summary-both = Bàners i pantalla de bloqueig
-settings-notifications-summary-banners = Bàners
-settings-notifications-summary-lock-screen = Pantalla de bloqueig
-settings-notifications-summary-list = Només a la llista de notificacions
-settings-notifications-allow = Permet les notificacions
-settings-notifications-banners = Bàners
-settings-notifications-banners-description = Apareixen a la pantalla quan arriben
-settings-notifications-sound = So
-settings-notifications-sound-description = En mode automàtic no sona res quan l’aplicació reprodueix el seu propi so
-settings-notifications-sound-automatic = Automàtic
-settings-notifications-sound-luft = El so del Luft
-settings-notifications-sound-app = El so de l’aplicació
-settings-notifications-sound-none = Cap
-settings-notifications-dnd-allow = Permet-les amb No molestis
-settings-notifications-dnd-allow-description = Les urgents són les alarmes i les trucades
-settings-notifications-dnd-never = Mai
-settings-notifications-dnd-urgent = Només les urgents
-settings-notifications-dnd-always = Sempre
-settings-notifications-keep = Conserva-les a la llista de notificacions
-settings-notifications-keep-description = Si no, desapareixen quan es tanca el bàner
-settings-notifications-app-lock-screen = Mostra-les a la pantalla de bloqueig
-settings-notifications-done = Fet
-
 ## Window tiling
 
 settings-tiling-mode = Organitza les finestres

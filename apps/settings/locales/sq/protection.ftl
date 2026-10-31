@@ -18,6 +18,10 @@ settings-privacy-screen-off-never = Asnjëherë
 settings-privacy-lock-when-off = Blloko ekranin kur fiket
 settings-privacy-lock-after = Blloko pas
 settings-privacy-lock-after-hint = Sa të pritet pasi fiket ekrani
+settings-notifications-show-lock-screen = Shfaq njoftimet në ekranin e bllokimit
+settings-notifications-content = Shfaq përmbajtjen e mesazheve
+settings-notifications-content-description = Kur është joaktive, shfaqet vetëm emri i aplikacionit
+settings-notifications-content-lock-screen = Shfaq përmbajtjen e mesazheve në ekranin e bllokimit
 settings-privacy-lock-immediately = Menjëherë
 
 ## Privacy: location, camera and microphone

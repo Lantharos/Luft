@@ -22,7 +22,6 @@ Strings in Luft's Estonian translation that a native speaker should check. Each 
 - `packages/web/ui/locales/et/ui.ftl` `ui-split-windows-size`: "{ $size }, kasutusel { $used }" — check word order.
 - `kestrel/ui/locales/et/shell.ftl` `keys-backspace`, `keys-delete`, `keys-page-up`: English names kept — check what keyboards sold in Estonia print (possibly Del, PgUp).
 - `kestrel/ui/locales/et/shell.ftl` `battery-level`: "Aku { $percentage }%, laeb" — check "laeb" versus "laadimisel".
-- `apps/settings/locales/et/settings.ftl` `settings-subpage-back`: "Tagasi: { $page }" — colon keeps the page name in the nominative; check for screen readers.
 
 ## Kestrel and setup
 

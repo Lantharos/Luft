@@ -15,7 +15,6 @@ Strings in Luft's Greek translation that a native speaker should check: terms wi
 - `packages/web/ui/locales/el/ui.ftl` `ui-finger-*` `.inline`: "τον δεξιό δείκτη", "το δεξί μικρό δάχτυλο" — the article is part of `.inline`; check it reads well in "Τοποθετήστε { $finger } στον αισθητήρα." and in any later sentence using these forms.
 - `packages/web/ui/locales/el/ui.ftl` `ui-toast-dismiss`: "Απόρριψη" — check whether "Κλείσιμο" is the more natural screen-reader label for closing a notification.
 - `packages/web/ui/locales/el/ui.ftl` `ui-select-placeholder`: "Επιλογή" — check it reads as a prompt in an empty dropdown.
-- `apps/settings/locales/el/settings.ftl` `settings-subpage-back`: "Επιστροφή στη σελίδα { $page }" — "σελίδα" is there so the article doesn't depend on the page name's gender.
 - `kestrel/ui/locales/el/shell.ftl` `keys-*`: English key names kept, only "Διάστημα" translated — check against what Greek keyboards and Windows shortcut lists print.
 
 ## Kestrel and setup

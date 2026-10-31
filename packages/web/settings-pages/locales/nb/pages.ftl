@@ -16,7 +16,6 @@ settings-page-appearance = Utseende
 settings-page-taskbar = Oppgavelinje og Start
     .keywords = panel, dokk, skjul automatisk, autoskjul, skjul oppgavelinjen, flytende, gjennomsiktig, festede apper, justering, plassering, startknapp, start-menyen, startmeny, gust, søkefelt, søkelinje, launcher, appstarter, nettsøk, søk på nettet, søkemotor, skjermer, arbeidsområde, skrivebord, virtuelt skrivebord
 settings-page-windows = Vinduer
-settings-page-notifications = Varsler
     .keywords = ikke forstyrr, varslinger, bannere, låseskjerm, apper
 settings-page-accessibility = Tilgjengelighet
     .keywords = a11y, universell utforming, hjelpemidler, skjermleser, orca, zoom, forstørrelse, lupe, stor tekst, høy kontrast, kontrast, færre animasjoner, reduser bevegelse, markørstørrelse, skjermtastatur, trege taster, tregtaster, låsetaster, filtertaster, avvisningstaster, musetaster, hvileklikk, klikk ved hvile, høyreklikk, finn pekeren, visuelle varsler, blink, hørsel, syn

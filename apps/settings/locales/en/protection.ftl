@@ -35,6 +35,10 @@ settings-privacy-screen-off-never = Never
 settings-privacy-lock-when-off = Lock the screen when it turns off
 settings-privacy-lock-after = Lock after
 settings-privacy-lock-after-hint = How long to wait once the screen is off
+settings-notifications-show-lock-screen = Show notifications on the lock screen
+settings-notifications-content = Show message content
+settings-notifications-content-description = When off, only the app name is shown
+settings-notifications-content-lock-screen = Show message content on the lock screen
 # Lock delay option: lock as soon as the screen turns off
 settings-privacy-lock-immediately = Immediately
 

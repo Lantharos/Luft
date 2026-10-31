@@ -184,43 +184,6 @@ settings-cursors-get = Hent
 settings-cursors-choose-download = Velg en nedlasting for { $name }
 settings-cursors-view-online = Vis på nett
 
-## Notifications
-
-settings-notifications-dnd = Ikke forstyrr
-settings-notifications-dnd-description = Bannere og lyder er av, unntatt for apper du tillater
-settings-notifications-lock-screen = Låseskjerm
-settings-notifications-show-lock-screen = Vis varsler på låseskjermen
-settings-notifications-content = Vis innholdet i varsler
-settings-notifications-content-description = Når dette er av, vises bare navnet på appen
-settings-notifications-content-lock-screen = Vis innholdet i varsler på låseskjermen
-settings-notifications-apps = Appvarsler
-settings-notifications-apps-description = Velg hvordan hver app varsler deg
-settings-notifications-search = Søk i apper
-settings-notifications-no-match = Ingen apper samsvarer med søket
-settings-notifications-from = Varsler fra { $app }
-settings-notifications-summary-both = Bannere og låseskjerm
-settings-notifications-summary-banners = Bannere
-settings-notifications-summary-lock-screen = Låseskjerm
-settings-notifications-summary-list = Bare i varsellisten
-settings-notifications-allow = Tillat varsler
-settings-notifications-banners = Bannere
-settings-notifications-banners-description = Dukker opp på skjermen når de kommer
-settings-notifications-sound = Lyd
-settings-notifications-sound-description = Automatisk er stille når appen spiller sin egen lyd
-settings-notifications-sound-automatic = Automatisk
-settings-notifications-sound-luft = Lufts lyd
-settings-notifications-sound-app = Appens egen lyd
-settings-notifications-sound-none = Ingen
-settings-notifications-dnd-allow = Tillat i Ikke forstyrr
-settings-notifications-dnd-allow-description = Viktige betyr alarmer og anrop
-settings-notifications-dnd-never = Aldri
-settings-notifications-dnd-urgent = Bare viktige
-settings-notifications-dnd-always = Alltid
-settings-notifications-keep = Behold i varsellisten
-settings-notifications-keep-description = Ellers forsvinner de når banneret lukkes
-settings-notifications-app-lock-screen = Vis på låseskjermen
-settings-notifications-done = Ferdig
-
 ## Window tiling
 
 settings-tiling-mode = Ordne vinduer

@@ -14,7 +14,6 @@ Strings in Luft's European Portuguese translation that a native speaker should c
 - `packages/web/ui/locales/pt/ui.ftl` `ui-recovery-key-saved`: "Guardada" — feminine to agree with "chave"; check it reads right where it appears.
 - `packages/web/ui/locales/pt/ui.ftl` `ui-finger-right-little`: "Mindinho direito" — "Dedo mínimo direito" is more formal; check the register.
 - `packages/web/ui/locales/pt/ui.ftl` `ui-media-pause`: "Pausa" — noun, as Windows uses; "Pausar" is the alternative.
-- `apps/settings/locales/pt/settings.ftl` `settings-subpage-back`: "Voltar à página { $page }" — avoids the article before the page name; check it doesn't sound heavy.
 - `kestrel/ui/locales/pt/shell.ftl` `battery-level`: "Bateria a { $percentage }%" — no space before %, following Windows; some style guides in Portugal prefer "57 %".
 - `kestrel/ui/locales/pt/shell.ftl` `keys-backspace`: "Retrocesso" — Portuguese keyboards print an arrow; check whether "Backspace" is more familiar.
 
@@ -49,7 +48,6 @@ Strings in Luft's European Portuguese translation that a native speaker should c
 - `apps/settings/locales/pt/personalization.ftl` `settings-appearance-wallpaper-folder`: "Pasta Wallpapers" — the folder inside Pictures is really named Wallpapers, so the name stays in English; check it reads well next to «Imagens».
 - `apps/settings/locales/pt/personalization.ftl` `settings-fonts-sample`: "Um pequeno jabuti xereta viu dez cegonhas felizes" — a well-known pangram, but Brazilian in origin (jabuti, xereta); a more European sentence may be preferable.
 - `apps/settings/locales/pt/personalization.ftl` `settings-appearance-icons-clear`: "Transparentes" — the glass-like "Clear" icon style; confirm against the actual look.
-- `apps/settings/locales/pt/personalization.ftl` `settings-notifications-banners`: "Faixas" — Windows' word for notification banners; check it is understood.
 - `apps/settings/locales/pt/personalization.ftl` `settings-accessibility-zoom`: "Lupa" — Windows' name for the screen magnifier, also used on the lock screen; "Zoom" is the alternative.
 - `apps/settings/locales/pt/personalization.ftl` `settings-accessibility-dwell`: "Clicar ao repousar o ponteiro" — no settled term for dwell click; the lock screen's shorter label is «Clique por permanência».
 - `apps/settings/locales/pt/protection.ftl` `settings-passwords-stores`: "Credenciais das aplicações" — the sign-ins apps store, rendered as credenciais.

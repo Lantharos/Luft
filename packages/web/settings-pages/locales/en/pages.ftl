@@ -21,7 +21,6 @@ settings-page-appearance = Appearance
 settings-page-taskbar = Taskbar and Start
     .keywords = panel, dock, auto-hide, hide automatically, hide taskbar, floating, transparent, pinned apps, alignment, start button, start menu, gust, search bar, launcher, web search, search engine, displays, workspace, desktop, virtual desktop
 settings-page-windows = Windows
-settings-page-notifications = Notifications
     .keywords = do not disturb, banners, lock screen, apps
 settings-page-accessibility = Accessibility
     .keywords = a11y, universal access, screen reader, orca, zoom, magnifier, large text, high contrast, contrast, reduce animations, reduce motion, cursor size, on-screen keyboard, screen keyboard, sticky keys, slow keys, bounce keys, mouse keys, dwell click, hover click, right-click, locate pointer, find pointer, visual alerts, flash, hearing, vision

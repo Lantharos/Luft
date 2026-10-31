@@ -16,7 +16,6 @@ settings-page-appearance = Izgled
 settings-page-taskbar = Programska traka i Start
     .keywords = traka, panel, dock, automatsko skrivanje, automatski sakrij, sakrij programsku traku, plutajuća, prozirna, prikvačene aplikacije, poravnanje, gumb start, izbornik start, start menu, gust, traka za pretraživanje, pokretač, launcher, pretraživanje weba, web-pretraživanje, tražilica, zasloni, radni prostor, radna površina, virtualna radna površina
 settings-page-windows = Prozori
-settings-page-notifications = Obavijesti
     .keywords = ne ometaj, natpisi, skočne obavijesti, zaključani zaslon, aplikacije
 settings-page-accessibility = Pristupačnost
     .keywords = pristupačnost, univerzalni pristup, čitač zaslona, orca, zumiranje, povećalo, veliki tekst, visoki kontrast, kontrast, smanji animacije, smanji pokrete, veličina pokazivača, zaslonska tipkovnica, tipkovnica na zaslonu, ljepljive tipke, spore tipke, odbijajuće tipke, tipke miša, klik zadržavanjem, klik lebdenjem, desni klik, pronađi pokazivač, vizualna upozorenja, bljeskanje, sluh, vid

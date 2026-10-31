@@ -20,7 +20,6 @@ Strings in Luft's Hungarian translation that a native speaker should check: term
 - `packages/web/ui/locales/hu/ui.ftl` `ui-select-placeholder`: "Válasszon" — the only imperative used as a label; "Kiválasztás" is the alternative.
 - `packages/web/ui/locales/hu/ui.ftl` `ui-finger-right-index` .inline: "a jobb mutatóujját" — the inline forms carry the article and the accusative possessive for „Helyezze { $finger } az érzékelőre.” and „Húzza végig { $finger } az érzékelőn.”; check both sentences with every finger.
 - `packages/web/ui/locales/hu/ui.ftl` `ui-time-just-now`: "épp most" — check it fits wherever relative times show; "az imént" is the alternative.
-- `apps/settings/locales/hu/settings.ftl` `settings-subpage-back`: "Vissza ide: { $page }" — avoids a suffix on the page name; check it doesn't sound stiff for a screen reader.
 - `kestrel/ui/locales/hu/shell.ftl` `battery-level`: "Akkumulátor: { $percentage }%, töltő csatlakoztatva" — for the plugged-in-but-not-charging state.
 
 ## Kestrel and setup

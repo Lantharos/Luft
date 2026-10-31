@@ -58,7 +58,7 @@ export class NotificationGroup {
     const card: NotificationCard = new NotificationCard(notification, this.menus, this.changed, this.close, this.reveal, {
       moved: () => this.source.notifications.length === 1 ? this.actor : card.actor,
       dismissed: actor => collapse(actor, this.resized, () => notification.destroy()),
-    });
+    }, this.source.policy?.id ?? null);
     return card;
   }
 

@@ -13,7 +13,6 @@ Strings in Luft's Czech translation that a native speaker should check: term cho
 - `packages/i18n/glossary/cs.tbx` `USB stick`: "flash disk" — check against jednotka USB flash used by Windows.
 - `packages/web/ui/locales/cs/ui.ftl` `ui-fingerprint-place`: "Dotkněte se snímače { $finger }." — .inline finger names are in the instrumental so they fit both this and the swipe sentence; check it reads naturally for placing a finger.
 - `packages/web/ui/locales/cs/ui.ftl` `ui-toast-dismiss`: "Zavřít" — dismissing a notification bubble; Skrýt would also work.
-- `apps/settings/locales/cs/settings.ftl` `settings-subpage-back`: "Zpět na stránku { $page }" — the page title stays in the nominative as an apposition; check it doesn't sound stiff to screen-reader users.
 - `packages/web/settings-pages/locales/cs/pages.ftl` `settings-page-display`: "Displeje" — Windows uses the singular Displej; plural follows the English page name.
 
 ## Kestrel and setup

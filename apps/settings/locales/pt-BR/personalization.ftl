@@ -184,43 +184,6 @@ settings-cursors-get = Obter
 settings-cursors-choose-download = Escolha um download para { $name }
 settings-cursors-view-online = Ver online
 
-## Notifications
-
-settings-notifications-dnd = Não perturbe
-settings-notifications-dnd-description = Banners e sons ficam desativados, exceto para os apps que você permitir
-settings-notifications-lock-screen = Tela de bloqueio
-settings-notifications-show-lock-screen = Mostrar notificações na tela de bloqueio
-settings-notifications-content = Mostrar conteúdo das mensagens
-settings-notifications-content-description = Quando desativado, só o nome do app aparece
-settings-notifications-content-lock-screen = Mostrar conteúdo das mensagens na tela de bloqueio
-settings-notifications-apps = Notificações de apps
-settings-notifications-apps-description = Escolha como cada app notifica você
-settings-notifications-search = Pesquisar apps
-settings-notifications-no-match = Nenhum app corresponde à pesquisa
-settings-notifications-from = Notificações do { $app }
-settings-notifications-summary-both = Banners e tela de bloqueio
-settings-notifications-summary-banners = Banners
-settings-notifications-summary-lock-screen = Tela de bloqueio
-settings-notifications-summary-list = Só na lista de notificações
-settings-notifications-allow = Permitir notificações
-settings-notifications-banners = Banners
-settings-notifications-banners-description = Aparecem na tela quando chegam
-settings-notifications-sound = Som
-settings-notifications-sound-description = No automático, nada toca se o app reproduzir o próprio som
-settings-notifications-sound-automatic = Automático
-settings-notifications-sound-luft = O som do Luft
-settings-notifications-sound-app = O do app
-settings-notifications-sound-none = Nenhum
-settings-notifications-dnd-allow = Permitir no Não perturbe
-settings-notifications-dnd-allow-description = Urgentes são alarmes e chamadas
-settings-notifications-dnd-never = Nunca
-settings-notifications-dnd-urgent = Só urgentes
-settings-notifications-dnd-always = Sempre
-settings-notifications-keep = Manter na lista de notificações
-settings-notifications-keep-description = Caso contrário, elas somem quando o banner fecha
-settings-notifications-app-lock-screen = Mostrar na tela de bloqueio
-settings-notifications-done = Concluído
-
 ## Window tiling
 
 settings-tiling-mode = Organizar janelas

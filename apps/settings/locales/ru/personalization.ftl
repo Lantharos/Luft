@@ -188,43 +188,6 @@ settings-cursors-get = Скачать
 settings-cursors-choose-download = Выберите файл для { $name }
 settings-cursors-view-online = Открыть на сайте
 
-## Notifications
-
-settings-notifications-dnd = Не беспокоить
-settings-notifications-dnd-description = Баннеры и звуки отключены, кроме разрешённых приложений
-settings-notifications-lock-screen = Экран блокировки
-settings-notifications-show-lock-screen = Показывать уведомления на экране блокировки
-settings-notifications-content = Показывать текст сообщений
-settings-notifications-content-description = Если отключено, показывается только название приложения
-settings-notifications-content-lock-screen = Показывать текст сообщений на экране блокировки
-settings-notifications-apps = Уведомления приложений
-settings-notifications-apps-description = Выберите, как уведомляет каждое приложение
-settings-notifications-search = Поиск приложений
-settings-notifications-no-match = Приложения не найдены
-settings-notifications-from = Уведомления от приложения { $app }
-settings-notifications-summary-both = Баннеры и экран блокировки
-settings-notifications-summary-banners = Баннеры
-settings-notifications-summary-lock-screen = Экран блокировки
-settings-notifications-summary-list = Только в списке уведомлений
-settings-notifications-allow = Разрешить уведомления
-settings-notifications-banners = Баннеры
-settings-notifications-banners-description = Появляются на экране при получении
-settings-notifications-sound = Звук
-settings-notifications-sound-description = В автоматическом режиме ничего не звучит, если приложение воспроизводит свой звук
-settings-notifications-sound-automatic = Автоматически
-settings-notifications-sound-luft = Звук Luft
-settings-notifications-sound-app = Звук приложения
-settings-notifications-sound-none = Нет
-settings-notifications-dnd-allow = Разрешить в режиме «Не беспокоить»
-settings-notifications-dnd-allow-description = Срочные — это будильники и звонки
-settings-notifications-dnd-never = Никогда
-settings-notifications-dnd-urgent = Только срочные
-settings-notifications-dnd-always = Всегда
-settings-notifications-keep = Оставлять в списке уведомлений
-settings-notifications-keep-description = Иначе уведомления исчезают, когда закрывается баннер
-settings-notifications-app-lock-screen = Показывать на экране блокировки
-settings-notifications-done = Готово
-
 ## Window tiling
 
 settings-tiling-mode = Расположение окон

@@ -184,43 +184,6 @@ settings-cursors-get = Hent
 settings-cursors-choose-download = Vel ei nedlasting for { $name }
 settings-cursors-view-online = Vis på nett
 
-## Notifications
-
-settings-notifications-dnd = Ikkje forstyrr
-settings-notifications-dnd-description = Banner og lydar er av, bortsett frå for appar du tillèt
-settings-notifications-lock-screen = Låseskjerm
-settings-notifications-show-lock-screen = Vis varslingar på låseskjermen
-settings-notifications-content = Vis innhaldet i meldingar
-settings-notifications-content-description = Når dette er av, blir berre namnet på appen vist
-settings-notifications-content-lock-screen = Vis innhaldet i meldingar på låseskjermen
-settings-notifications-apps = Appvarslingar
-settings-notifications-apps-description = Vel korleis kvar app varslar deg
-settings-notifications-search = Søk i appar
-settings-notifications-no-match = Ingen appar passar til søket
-settings-notifications-from = Varslingar frå { $app }
-settings-notifications-summary-both = Banner og låseskjerm
-settings-notifications-summary-banners = Banner
-settings-notifications-summary-lock-screen = Låseskjerm
-settings-notifications-summary-list = Berre i varslingslista
-settings-notifications-allow = Tillat varslingar
-settings-notifications-banners = Banner
-settings-notifications-banners-description = Dukkar opp på skjermen når dei kjem
-settings-notifications-sound = Lyd
-settings-notifications-sound-description = Automatisk er stille når appen spelar sin eigen lyd
-settings-notifications-sound-automatic = Automatisk
-settings-notifications-sound-luft = Lyden til Luft
-settings-notifications-sound-app = Appen sin eigen lyd
-settings-notifications-sound-none = Ingen
-settings-notifications-dnd-allow = Tillat under Ikkje forstyrr
-settings-notifications-dnd-allow-description = Viktige tyder alarmar og samtalar
-settings-notifications-dnd-never = Aldri
-settings-notifications-dnd-urgent = Berre viktige
-settings-notifications-dnd-always = Alltid
-settings-notifications-keep = Behald i varslingslista
-settings-notifications-keep-description = Elles forsvinn dei når banneret blir lukka
-settings-notifications-app-lock-screen = Vis på låseskjermen
-settings-notifications-done = Ferdig
-
 ## Window tiling
 
 settings-tiling-mode = Ordne vindauge

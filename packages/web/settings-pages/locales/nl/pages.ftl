@@ -16,7 +16,6 @@ settings-page-appearance = Uiterlijk
 settings-page-taskbar = Taakbalk en Start
     .keywords = paneel, dock, automatisch verbergen, verbergen, taakbalk verbergen, zwevend, transparant, vastgemaakte apps, uitlijning, startknop, startmenu, menu Start, gust, zoekbalk, launcher, starter, op het web zoeken, webzoekopdracht, zoekmachine, beeldschermen, werkblad, werkbladen, bureaublad, virtueel bureaublad
 settings-page-windows = Vensters
-settings-page-notifications = Meldingen
     .keywords = niet storen, banners, meldingen, vergrendelscherm, apps, berichten
 settings-page-accessibility = Toegankelijkheid
     .keywords = a11y, universele toegang, schermlezer, voorlezen, orca, zoomen, vergrootglas, schermvergroting, grote tekst, hoog contrast, contrast, animaties beperken, beweging beperken, cursorgrootte, schermtoetsenbord, toetsenbord op scherm, plaktoetsen, langzame toetsen, filtertoetsen, muistoetsen, klikken door stil te houden, aanwijzer zoeken, aanwijzer vinden, rechtsklikken, visuele waarschuwingen, knipperen, gehoor, slechthorend, zicht, slechtziend

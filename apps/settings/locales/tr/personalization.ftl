@@ -184,43 +184,6 @@ settings-cursors-get = Yükle
 settings-cursors-choose-download = İndirilecek dosyayı seçin: { $name }
 settings-cursors-view-online = Çevrimiçi görüntüle
 
-## Notifications
-
-settings-notifications-dnd = Rahatsız etmeyin
-settings-notifications-dnd-description = İzin verdiğiniz uygulamalar dışında başlıklar ve sesler kapalı kalır
-settings-notifications-lock-screen = Kilit ekranı
-settings-notifications-show-lock-screen = Bildirimleri kilit ekranında göster
-settings-notifications-content = İleti içeriğini göster
-settings-notifications-content-description = Kapalıyken yalnızca uygulamanın adı gösterilir
-settings-notifications-content-lock-screen = İleti içeriğini kilit ekranında göster
-settings-notifications-apps = Uygulama bildirimleri
-settings-notifications-apps-description = Her uygulamanın size nasıl bildirim göndereceğini seçin
-settings-notifications-search = Uygulamalarda ara
-settings-notifications-no-match = Aramanızla eşleşen uygulama yok
-settings-notifications-from = Bildirimler: { $app }
-settings-notifications-summary-both = Başlıklar ve kilit ekranı
-settings-notifications-summary-banners = Başlıklar
-settings-notifications-summary-lock-screen = Kilit ekranı
-settings-notifications-summary-list = Yalnızca bildirim listesi
-settings-notifications-allow = Bildirimlere izin ver
-settings-notifications-banners = Başlıklar
-settings-notifications-banners-description = Geldiklerinde ekranda açılır
-settings-notifications-sound = Ses
-settings-notifications-sound-description = Otomatik modda uygulama kendi sesini çaldığında hiçbir şey çalmaz
-settings-notifications-sound-automatic = Otomatik
-settings-notifications-sound-luft = Luft sesi
-settings-notifications-sound-app = Uygulamanın kendi sesi
-settings-notifications-sound-none = Yok
-settings-notifications-dnd-allow = Rahatsız etmeyin açıkken izin ver
-settings-notifications-dnd-allow-description = Acil olanlar alarmlar ve aramalardır
-settings-notifications-dnd-never = Hiçbir zaman
-settings-notifications-dnd-urgent = Yalnızca acil olanlar
-settings-notifications-dnd-always = Her zaman
-settings-notifications-keep = Bildirim listesinde tut
-settings-notifications-keep-description = Kapalıyken bildirimler, başlıkları kapanınca kaybolur
-settings-notifications-app-lock-screen = Kilit ekranında göster
-settings-notifications-done = Bitti
-
 ## Window tiling
 
 settings-tiling-mode = Pencereleri düzenle

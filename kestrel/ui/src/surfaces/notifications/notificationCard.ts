@@ -1,5 +1,5 @@
 import Clutter from 'gi://Clutter';
-import type Gio from 'gi://Gio';
+import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Pango from 'gi://Pango';
 import St from 'gi://St';
@@ -38,6 +38,10 @@ export interface CardMotion {
   dismissed: (actor: Clutter.Actor) => void;
 }
 
+function openNotificationSettings(appId: string): void {
+  Gio.AppInfo.launch_default_for_uri(`schelf:app?${GLib.uri_escape_string(appId, null, false)}`, global.create_app_launch_context(0, -1));
+}
+
 export class NotificationCard {
   readonly actor = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-notification' });
   readonly open: St.Button;
@@ -46,7 +50,8 @@ export class NotificationCard {
   private readonly actions = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-notification-actions', visible: false });
 
   constructor(private readonly notification: Notification, menus: ContextMenus,
-    changed: () => void, private readonly close: () => void, private readonly reveal: (actor: Clutter.Actor) => void, motion: CardMotion) {
+    changed: () => void, private readonly close: () => void, private readonly reveal: (actor: Clutter.Actor) => void, motion: CardMotion,
+    appId: string | null) {
     this.swipe = new SwipeAway(this.actor, { downward: false, ...motion });
     const header = new St.BoxLayout();
     const title = new St.Label({ text: notification.title ?? '', style_class: 'kestrel-section-title', x_expand: true, y_align: Clutter.ActorAlign.CENTER });
@@ -93,7 +98,7 @@ export class NotificationCard {
       'notify::title', changed, 'notify::body', changed, this.actor);
     menus.bind(this.actor, () => [{ label: t('notifications-open'), run: () => { close(); notification.activate(); } },
       { label: t('notifications-dismiss'), run: () => this.swipe.dismiss() },
-      { label: t('notifications-settings'), run: () => menus.settings('notifications') }]);
+      ...appId ? [{ label: t('notifications-settings'), run: () => openNotificationSettings(appId) }] : []]);
   }
 
   private button(label: string, activate: () => void): St.Button {

@@ -228,46 +228,6 @@ settings-cursors-get = Get
 settings-cursors-choose-download = Choose a download for { $name }
 settings-cursors-view-online = View online
 
-## Notifications
-
-settings-notifications-dnd = Do not disturb
-settings-notifications-dnd-description = Banners and sounds stay off, except for apps you allow
-settings-notifications-lock-screen = Lock screen
-settings-notifications-show-lock-screen = Show notifications on the lock screen
-settings-notifications-content = Show message content
-settings-notifications-content-description = When off, only the app name is shown
-settings-notifications-content-lock-screen = Show message content on the lock screen
-settings-notifications-apps = App notifications
-settings-notifications-apps-description = Choose how each app notifies you
-# Back button to the Notifications page
-settings-notifications-search = Search apps
-settings-notifications-no-match = No apps match your search
-# Screen-reader label of a switch; $app is an app name
-settings-notifications-from = Notifications from { $app }
-# Summary under an app's name: how its notifications show up
-settings-notifications-summary-both = Banners and lock screen
-settings-notifications-summary-banners = Banners
-settings-notifications-summary-lock-screen = Lock screen
-settings-notifications-summary-list = Notification list only
-settings-notifications-allow = Allow notifications
-settings-notifications-banners = Banners
-settings-notifications-banners-description = Pop up on screen when they arrive
-settings-notifications-sound = Sound
-settings-notifications-sound-description = Automatic stays quiet when the app plays its own sound
-settings-notifications-sound-automatic = Automatic
-settings-notifications-sound-luft = Luft’s sound
-settings-notifications-sound-app = The app’s own
-settings-notifications-sound-none = None
-settings-notifications-dnd-allow = Allow during Do Not Disturb
-settings-notifications-dnd-allow-description = Urgent means alarms and calls
-settings-notifications-dnd-never = Never
-settings-notifications-dnd-urgent = Urgent only
-settings-notifications-dnd-always = Always
-settings-notifications-keep = Keep in the notification list
-settings-notifications-keep-description = Otherwise they go once their banner closes
-settings-notifications-app-lock-screen = Show on the lock screen
-settings-notifications-done = Done
-
 ## Window tiling
 
 settings-tiling-mode = Arrange windows

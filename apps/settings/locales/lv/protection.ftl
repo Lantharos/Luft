@@ -18,6 +18,10 @@ settings-privacy-screen-off-never = Nekad
 settings-privacy-lock-when-off = Bloķēt ekrānu, kad tas izslēdzas
 settings-privacy-lock-after = Bloķēšanas aizture
 settings-privacy-lock-after-hint = Cik ilgi gaidīt pēc ekrāna izslēgšanās
+settings-notifications-show-lock-screen = Rādīt paziņojumus bloķēšanas ekrānā
+settings-notifications-content = Rādīt ziņojumu saturu
+settings-notifications-content-description = Ja izslēgts, tiek rādīts tikai lietotnes nosaukums
+settings-notifications-content-lock-screen = Rādīt ziņojumu saturu bloķēšanas ekrānā
 settings-privacy-lock-immediately = Uzreiz
 
 ## Privacy: location, camera and microphone

@@ -184,43 +184,6 @@ settings-cursors-get = Hämta
 settings-cursors-choose-download = Välj en hämtning för { $name }
 settings-cursors-view-online = Visa online
 
-## Notifications
-
-settings-notifications-dnd = Stör ej
-settings-notifications-dnd-description = Banderoller och ljud är avstängda, utom för appar du tillåter
-settings-notifications-lock-screen = Låsskärm
-settings-notifications-show-lock-screen = Visa notiser på låsskärmen
-settings-notifications-content = Visa meddelandets innehåll
-settings-notifications-content-description = När det är av visas bara appens namn
-settings-notifications-content-lock-screen = Visa meddelandets innehåll på låsskärmen
-settings-notifications-apps = Appnotiser
-settings-notifications-apps-description = Välj hur varje app meddelar dig
-settings-notifications-search = Sök efter appar
-settings-notifications-no-match = Inga appar matchar sökningen
-settings-notifications-from = Notiser från { $app }
-settings-notifications-summary-both = Banderoller och låsskärm
-settings-notifications-summary-banners = Banderoller
-settings-notifications-summary-lock-screen = Låsskärm
-settings-notifications-summary-list = Bara i notislistan
-settings-notifications-allow = Tillåt notiser
-settings-notifications-banners = Banderoller
-settings-notifications-banners-description = Visas på skärmen när de kommer
-settings-notifications-sound = Ljud
-settings-notifications-sound-description = Automatiskt är tyst när appen spelar sitt eget ljud
-settings-notifications-sound-automatic = Automatiskt
-settings-notifications-sound-luft = Lufts ljud
-settings-notifications-sound-app = Appens eget ljud
-settings-notifications-sound-none = Inget
-settings-notifications-dnd-allow = Tillåt under Stör ej
-settings-notifications-dnd-allow-description = Brådskande betyder alarm och samtal
-settings-notifications-dnd-never = Aldrig
-settings-notifications-dnd-urgent = Bara brådskande
-settings-notifications-dnd-always = Alltid
-settings-notifications-keep = Behåll i notislistan
-settings-notifications-keep-description = Annars försvinner de när banderollen stängs
-settings-notifications-app-lock-screen = Visa på låsskärmen
-settings-notifications-done = Klar
-
 ## Window tiling
 
 settings-tiling-mode = Ordna fönster

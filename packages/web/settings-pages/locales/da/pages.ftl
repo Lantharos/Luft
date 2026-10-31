@@ -16,7 +16,6 @@ settings-page-appearance = Udseende
 settings-page-taskbar = Proceslinje og Start
     .keywords = panel, dock, skjul automatisk, automatisk skjul, skjul proceslinjen, flydende, gennemsigtig, fastgjorte apps, justering, placering, startknap, start, startmenu, gust, søgelinje, søgefelt, launcher, programstarter, websøgning, søg på nettet, søgemaskine, skærme, arbejdsområde, skrivebord, virtuelt skrivebord
 settings-page-windows = Vinduer
-settings-page-notifications = Notifikationer
     .keywords = forstyr ikke, meddelelser, bannere, låseskærm, apps, beskeder
 settings-page-accessibility = Tilgængelighed
     .keywords = a11y, hjælpemidler, skærmlæser, oplæsning, orca, zoom, forstørrelse, lup, stor tekst, høj kontrast, kontrast, reducer animationer, reducer bevægelse, markørstørrelse, skærmtastatur, klæbende taster, klæbrige taster, langsomme taster, træge taster, afvisningstaster, filtertaster, gentagne taster, musetaster, dvæleklik, hold for at klikke, højreklik, find markøren, vis markøren, visuelle advarsler, blink, hørelse, høretab, syn, synshandicap

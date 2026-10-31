@@ -184,43 +184,6 @@ settings-cursors-get = Obtenir
 settings-cursors-choose-download = Choisir un téléchargement pour { $name }
 settings-cursors-view-online = Voir en ligne
 
-## Notifications
-
-settings-notifications-dnd = Ne pas déranger
-settings-notifications-dnd-description = Pas de bannières ni de sons, sauf pour les applications que vous autorisez
-settings-notifications-lock-screen = Écran de verrouillage
-settings-notifications-show-lock-screen = Afficher les notifications sur l’écran de verrouillage
-settings-notifications-content = Afficher le contenu des messages
-settings-notifications-content-description = Si désactivé, seul le nom de l’application s’affiche
-settings-notifications-content-lock-screen = Afficher le contenu des messages sur l’écran de verrouillage
-settings-notifications-apps = Notifications des applications
-settings-notifications-apps-description = Choisissez comment chaque application vous avertit
-settings-notifications-search = Rechercher des applications
-settings-notifications-no-match = Aucune application ne correspond à votre recherche
-settings-notifications-from = Notifications de { $app }
-settings-notifications-summary-both = Bannières et écran de verrouillage
-settings-notifications-summary-banners = Bannières
-settings-notifications-summary-lock-screen = Écran de verrouillage
-settings-notifications-summary-list = Liste des notifications uniquement
-settings-notifications-allow = Autoriser les notifications
-settings-notifications-banners = Bannières
-settings-notifications-banners-description = S’affichent à l’écran à leur arrivée
-settings-notifications-sound = Son
-settings-notifications-sound-description = En automatique, rien ne sonne si l’application joue son propre son
-settings-notifications-sound-automatic = Automatique
-settings-notifications-sound-luft = Le son de Luft
-settings-notifications-sound-app = Celui de l’application
-settings-notifications-sound-none = Aucun
-settings-notifications-dnd-allow = Autoriser en mode Ne pas déranger
-settings-notifications-dnd-allow-description = Urgentes : alarmes et appels
-settings-notifications-dnd-never = Jamais
-settings-notifications-dnd-urgent = Urgentes uniquement
-settings-notifications-dnd-always = Toujours
-settings-notifications-keep = Conserver dans la liste des notifications
-settings-notifications-keep-description = Sinon, elles disparaissent dès que leur bannière se ferme
-settings-notifications-app-lock-screen = Afficher sur l’écran de verrouillage
-settings-notifications-done = Terminé
-
 ## Window tiling
 
 settings-tiling-mode = Disposer les fenêtres

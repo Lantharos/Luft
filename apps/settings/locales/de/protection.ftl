@@ -18,6 +18,10 @@ settings-privacy-screen-off-never = Nie
 settings-privacy-lock-when-off = Bildschirm sperren, wenn er sich ausschaltet
 settings-privacy-lock-after = Sperren nach
 settings-privacy-lock-after-hint = Wie lange gewartet wird, nachdem der Bildschirm aus ist
+settings-notifications-show-lock-screen = Benachrichtigungen auf dem Sperrbildschirm anzeigen
+settings-notifications-content = Nachrichteninhalt anzeigen
+settings-notifications-content-description = Wenn aus, wird nur der Name der App angezeigt
+settings-notifications-content-lock-screen = Nachrichteninhalt auf dem Sperrbildschirm anzeigen
 settings-privacy-lock-immediately = Sofort
 
 ## Privacy: location, camera and microphone

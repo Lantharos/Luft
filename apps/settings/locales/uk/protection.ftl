@@ -18,6 +18,10 @@ settings-privacy-screen-off-never = Ніколи
 settings-privacy-lock-when-off = Блокувати екран, коли він вимикається
 settings-privacy-lock-after = Блокувати через
 settings-privacy-lock-after-hint = Скільки чекати після вимкнення екрана
+settings-notifications-show-lock-screen = Показувати сповіщення на екрані блокування
+settings-notifications-content = Показувати вміст повідомлень
+settings-notifications-content-description = Якщо вимкнено, показується лише назва програми
+settings-notifications-content-lock-screen = Показувати вміст повідомлень на екрані блокування
 settings-privacy-lock-immediately = Одразу
 
 ## Privacy: location, camera and microphone

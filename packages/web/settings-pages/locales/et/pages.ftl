@@ -16,7 +16,6 @@ settings-page-appearance = Välimus
 settings-page-taskbar = Tegumiriba ja Start
     .keywords = paneel, riba, dokk, automaatne peitmine, peida automaatselt, peida tegumiriba, hõljuv, läbipaistev, kinnitatud rakendused, joondus, start-nupp, nupp start, menüü start, start-menüü, start menu, gust, otsinguriba, käivitaja, launcher, veebiotsing, otsingumootor, search engine, kuvarid, tööala, töölaud, virtuaalne töölaud
 settings-page-windows = Aknad
-settings-page-notifications = Teavitused
     .keywords = ära sega, bännerid, hüpikteated, teated, märguanded, lukustuskuva, rakendused
 settings-page-accessibility = Hõlbustus
     .keywords = juurdepääsetavus, ligipääsetavus, erivajadused, ekraanilugeja, orca, suum, suurendus, luup, suur tekst, suur kiri, kõrge kontrast, kontrast, vähenda animatsioone, vähenda liikumist, kursori suurus, ekraaniklaviatuur, kleepklahvid, aeglased klahvid, põrkeklahvid, hiireklahvid, viibimisklõps, hõljumisklõps, paremklõps, osuti leidmine, kursori leidmine, visuaalsed märguanded, vilkumine, kuulmine, nägemine

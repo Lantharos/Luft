@@ -12,7 +12,6 @@ Strings in Luft's Slovak translation that a native speaker should check, each li
 - `packages/i18n/glossary/sk.tbx` `remove` / `delete`: "odstrániť" / "vymazať" — Windows uses „odstrániť“ for both; check the split feels natural.
 - `packages/i18n/glossary/sk.tbx` `board`: "tabuľa" — new feature with no existing term.
 - `packages/i18n/glossary/sk.tbx` `Start`: "Start" — Slovak Windows writes „Štart“; Luft keeps the name unchanged.
-- `apps/settings/locales/sk/settings.ftl` `settings-subpage-back`: "Späť na stránku { $page }" — page titles stay in the nominative after „stránku“; check it sounds natural with titles like „Klávesnica“.
 - `apps/settings/locales/sk/settings.ftl` `settings-more-show`: "Zobraziť ešte { $count }" — identical in every plural form to avoid guessing the hidden noun's gender.
 - `packages/web/ui/locales/sk/ui.ftl` `ui-select-placeholder`: "Vybrať" — infinitive like buttons; „Vyberte“ might read better as a placeholder.
 - `packages/web/ui/locales/sk/ui.ftl` `ui-split-windows-size`: "{ $size }, využité { $used }" — check the word order reads well.

@@ -184,43 +184,6 @@ settings-cursors-get = Hent
 settings-cursors-choose-download = Vælg en download til { $name }
 settings-cursors-view-online = Se online
 
-## Notifications
-
-settings-notifications-dnd = Forstyr ikke
-settings-notifications-dnd-description = Bannere og lyde er slået fra, undtagen for apps, du tillader
-settings-notifications-lock-screen = Låseskærm
-settings-notifications-show-lock-screen = Vis notifikationer på låseskærmen
-settings-notifications-content = Vis beskedens indhold
-settings-notifications-content-description = Når det er slået fra, vises kun appens navn
-settings-notifications-content-lock-screen = Vis beskedens indhold på låseskærmen
-settings-notifications-apps = Appnotifikationer
-settings-notifications-apps-description = Vælg, hvordan hver app giver dig besked
-settings-notifications-search = Søg efter apps
-settings-notifications-no-match = Ingen apps matcher din søgning
-settings-notifications-from = Notifikationer fra { $app }
-settings-notifications-summary-both = Bannere og låseskærm
-settings-notifications-summary-banners = Bannere
-settings-notifications-summary-lock-screen = Låseskærm
-settings-notifications-summary-list = Kun notifikationslisten
-settings-notifications-allow = Tillad notifikationer
-settings-notifications-banners = Bannere
-settings-notifications-banners-description = Vises på skærmen, når de kommer
-settings-notifications-sound = Lyd
-settings-notifications-sound-description = Automatisk er stille, når appen afspiller sin egen lyd
-settings-notifications-sound-automatic = Automatisk
-settings-notifications-sound-luft = Lufts lyd
-settings-notifications-sound-app = Appens egen lyd
-settings-notifications-sound-none = Ingen
-settings-notifications-dnd-allow = Tillad under Forstyr ikke
-settings-notifications-dnd-allow-description = Vigtige betyder alarmer og opkald
-settings-notifications-dnd-never = Aldrig
-settings-notifications-dnd-urgent = Kun vigtige
-settings-notifications-dnd-always = Altid
-settings-notifications-keep = Behold i notifikationslisten
-settings-notifications-keep-description = Ellers forsvinder de, når deres banner lukkes
-settings-notifications-app-lock-screen = Vis på låseskærmen
-settings-notifications-done = Udført
-
 ## Window tiling
 
 settings-tiling-mode = Arranger vinduer

@@ -190,43 +190,6 @@ settings-cursors-get = Faigh
 settings-cursors-choose-download = Roghnaigh íoslódáil le haghaidh { $name }
 settings-cursors-view-online = Féach ar líne
 
-## Notifications
-
-settings-notifications-dnd = Ná cuir isteach orm
-settings-notifications-dnd-description = Fanann meirgí agus fuaimeanna as, ach amháin d’aipeanna a cheadaíonn tú
-settings-notifications-lock-screen = Scáileán glasála
-settings-notifications-show-lock-screen = Taispeáin fógraí ar an scáileán glasála
-settings-notifications-content = Taispeáin ábhar teachtaireachtaí
-settings-notifications-content-description = Nuair atá sé seo as, ní thaispeántar ach ainm na haipe
-settings-notifications-content-lock-screen = Taispeáin ábhar teachtaireachtaí ar an scáileán glasála
-settings-notifications-apps = Fógraí aipeanna
-settings-notifications-apps-description = Roghnaigh conas a thugann gach aip fógra duit
-settings-notifications-search = Cuardaigh aipeanna
-settings-notifications-no-match = Níl aon aip ag teacht le do chuardach
-settings-notifications-from = Fógraí ón aip { $app }
-settings-notifications-summary-both = Meirgí agus scáileán glasála
-settings-notifications-summary-banners = Meirgí
-settings-notifications-summary-lock-screen = Scáileán glasála
-settings-notifications-summary-list = Liosta fógraí amháin
-settings-notifications-allow = Ceadaigh fógraí
-settings-notifications-banners = Meirgí
-settings-notifications-banners-description = Taispeántar ar an scáileán iad nuair a thagann siad
-settings-notifications-sound = Fuaim
-settings-notifications-sound-description = Ar uathoibríoch, ní sheinntear faic nuair a sheinneann an aip a fuaim féin
-settings-notifications-sound-automatic = Uathoibríoch
-settings-notifications-sound-luft = Fuaim Luft
-settings-notifications-sound-app = Fuaim na haipe
-settings-notifications-sound-none = Dada
-settings-notifications-dnd-allow = Ceadaigh le linn Ná cuir isteach orm
-settings-notifications-dnd-allow-description = Ciallaíonn práinneach aláraim agus glaonna
-settings-notifications-dnd-never = Riamh
-settings-notifications-dnd-urgent = Práinneach amháin
-settings-notifications-dnd-always = I gcónaí
-settings-notifications-keep = Coinnigh sa liosta fógraí
-settings-notifications-keep-description = Seachas sin, imíonn siad nuair a dhúntar a meirge
-settings-notifications-app-lock-screen = Taispeáin ar an scáileán glasála
-settings-notifications-done = Déanta
-
 ## Window tiling
 
 settings-tiling-mode = Socraigh fuinneoga

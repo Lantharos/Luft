@@ -16,7 +16,6 @@ settings-page-appearance = Útlit
 settings-page-taskbar = Verkstika og Upphaf
     .keywords = spjald, dokka, fela sjálfkrafa, fela verkstiku, fljótandi, gegnsæ, fest forrit, jöfnun, staðsetning, upphafshnappur, upphaf, upphafsvalmynd, start, start menu, gust, leitarstika, leitarreitur, ræsiforrit, launcher, vefleit, leita á vefnum, leitarvél, skjáir, vinnusvæði, skjáborð, sýndarskjáborð
 settings-page-windows = Gluggar
-settings-page-notifications = Tilkynningar
     .keywords = ekki trufla, borðar, sprettitilkynningar, læsiskjár, forrit
 settings-page-accessibility = Aðgengi
     .keywords = a11y, aðgengi, skjálesari, orca, aðdráttur, stækkun, stækkunargler, stór texti, mikil birtuskil, birtuskil, draga úr hreyfingum, minni hreyfing, stærð bendils, skjályklaborð, lyklaborð á skjá, klístraðir lyklar, hægir lyklar, endurkastslyklar, músarlyklar, smella með bið, sveimsmellur, hægrismella, finna bendil, sýnilegar viðvaranir, blikk, heyrn, sjón

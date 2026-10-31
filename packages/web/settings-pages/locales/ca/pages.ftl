@@ -16,7 +16,6 @@ settings-page-appearance = Aparença
 settings-page-taskbar = Barra de tasques i Inici
     .keywords = tauler, dock, amagar automàticament, ocultació automàtica, amagar la barra de tasques, flotant, transparent, aplicacions fixades, alineació, botó d’inici, inici, menú inici, gust, barra de cerca, llançador, launcher, cerca al web, cerca web, motor de cerca, cercador, pantalles, espai de treball, escriptori, escriptori virtual
 settings-page-windows = Finestres
-settings-page-notifications = Notificacions
     .keywords = no molestis, bàners, avisos, pantalla de bloqueig, aplicacions
 settings-page-accessibility = Accessibilitat
     .keywords = a11y, accés universal, lector de pantalla, orca, zoom, ampliació, lupa, text gran, contrast alt, contrast, reduir animacions, reduir moviment, mida del cursor, teclat en pantalla, teclat virtual, tecles enganxoses, tecles lentes, tecles de rebot, tecles del ratolí, clic en espera, clic en passar, clic dret, localitzar el punter, trobar el punter, alertes visuals, parpelleig, oïda, audició, visió

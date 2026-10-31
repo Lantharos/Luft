@@ -18,6 +18,10 @@ settings-privacy-screen-off-never = Aldrei
 settings-privacy-lock-when-off = Læsa skjánum þegar slokknar á honum
 settings-privacy-lock-after = Læsa eftir
 settings-privacy-lock-after-hint = Hve lengi á að bíða eftir að slokknar á skjánum
+settings-notifications-show-lock-screen = Sýna tilkynningar á læsiskjánum
+settings-notifications-content = Sýna efni skilaboða
+settings-notifications-content-description = Þegar slökkt er á þessu sést aðeins heiti forritsins
+settings-notifications-content-lock-screen = Sýna efni skilaboða á læsiskjánum
 settings-privacy-lock-immediately = Strax
 
 ## Privacy: location, camera and microphone

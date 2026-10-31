@@ -188,43 +188,6 @@ settings-cursors-get = Gauti
 settings-cursors-choose-download = Pasirinkite, ką atsisiųsti: { $name }
 settings-cursors-view-online = Peržiūrėti internete
 
-## Notifications
-
-settings-notifications-dnd = Netrukdyti
-settings-notifications-dnd-description = Iššokantieji pranešimai ir garsai išjungti, išskyrus leidžiamas programas
-settings-notifications-lock-screen = Užrakinimo ekranas
-settings-notifications-show-lock-screen = Rodyti pranešimus užrakinimo ekrane
-settings-notifications-content = Rodyti pranešimų turinį
-settings-notifications-content-description = Išjungus rodomas tik programos pavadinimas
-settings-notifications-content-lock-screen = Rodyti pranešimų turinį užrakinimo ekrane
-settings-notifications-apps = Programų pranešimai
-settings-notifications-apps-description = Pasirinkite, kaip kiekviena programa jus informuoja
-settings-notifications-search = Ieškoti programų
-settings-notifications-no-match = Nerasta jokių programų
-settings-notifications-from = Programos { $app } pranešimai
-settings-notifications-summary-both = Iššokantieji pranešimai ir užrakinimo ekranas
-settings-notifications-summary-banners = Iššokantieji pranešimai
-settings-notifications-summary-lock-screen = Užrakinimo ekranas
-settings-notifications-summary-list = Tik pranešimų sąraše
-settings-notifications-allow = Leisti pranešimus
-settings-notifications-banners = Iššokantieji pranešimai
-settings-notifications-banners-description = Atsiranda ekrane, kai gaunami
-settings-notifications-sound = Garsas
-settings-notifications-sound-description = Automatiniu režimu nieko negroja, kai programa groja savo garsą
-settings-notifications-sound-automatic = Automatiškai
-settings-notifications-sound-luft = Luft garsas
-settings-notifications-sound-app = Programos garsas
-settings-notifications-sound-none = Jokio
-settings-notifications-dnd-allow = Leisti, kai įjungta Netrukdyti
-settings-notifications-dnd-allow-description = Skubūs – tai žadintuvai ir skambučiai
-settings-notifications-dnd-never = Niekada
-settings-notifications-dnd-urgent = Tik skubius
-settings-notifications-dnd-always = Visada
-settings-notifications-keep = Palikti pranešimų sąraše
-settings-notifications-keep-description = Kitaip jie dingsta užsidarius iššokančiajam pranešimui
-settings-notifications-app-lock-screen = Rodyti užrakinimo ekrane
-settings-notifications-done = Atlikta
-
 ## Window tiling
 
 settings-tiling-mode = Langų išdėstymas

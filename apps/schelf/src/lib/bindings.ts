@@ -56,6 +56,9 @@ export const commands = {
 	libraryNames: (params: {
 		desktop: string,
 	}, options?: InvokeOptions) => invoke<Names>("library_names", params, options),
+	libraryNotifications: (params: {
+		desktop: string,
+	}, options?: InvokeOptions) => invoke<Notifications>("library_notifications", params, options),
 	libraryPermissions: (params: {
 		installation: Installation,
 		reference: string,
@@ -80,6 +83,10 @@ export const commands = {
 		source: Source,
 		on: boolean,
 	}, options?: InvokeOptions) => invoke<boolean>("library_set_full_access", params, options),
+	librarySetNotification: (params: {
+		desktop: string,
+		setting: Setting,
+	}, options?: InvokeOptions) => invoke<null>("library_set_notification", params, options),
 	operationsCancel: (params: {
 		id: number,
 	}, options?: InvokeOptions) => invoke<null>("operations_cancel", params, options),
@@ -243,6 +250,17 @@ export type Names = {
 	custom: string | null,
 };
 
+export type Notifications = {
+	allowed: boolean,
+	banners: boolean,
+	lockScreen: boolean,
+	detailsOnLockScreen: boolean,
+	shownOnLockScreen: boolean,
+	sound: string,
+	duringDoNotDisturb: string,
+	keptInList: boolean,
+};
+
 /**  The same app on Flathub, which installs better than a `.deb` file can. */
 export type OnFlathub = {
 	id: string,
@@ -318,6 +336,8 @@ export type SchemeColors = {
 	light: { [key in string]: string },
 	dark: { [key in string]: string },
 };
+
+export type Setting = { setting: "allowed"; value: boolean } | { setting: "banners"; value: boolean } | { setting: "lockScreen"; value: boolean } | { setting: "detailsOnLockScreen"; value: boolean } | { setting: "sound"; value: string } | { setting: "duringDoNotDisturb"; value: string } | { setting: "keptInList"; value: boolean };
 
 export type Source = "flatpak" | "appImage" | "tool" | "debian" | "system";
 

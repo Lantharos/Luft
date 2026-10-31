@@ -184,43 +184,6 @@ settings-cursors-get = Изтегли
 settings-cursors-choose-download = Изберете файл за изтегляне за { $name }
 settings-cursors-view-online = Отвори в интернет
 
-## Notifications
-
-settings-notifications-dnd = Не безпокойте
-settings-notifications-dnd-description = Без банери и звуци, освен от разрешените от вас приложения
-settings-notifications-lock-screen = Заключен екран
-settings-notifications-show-lock-screen = Показване на известия на заключения екран
-settings-notifications-content = Показване на съдържанието
-settings-notifications-content-description = Когато е изключено, се показва само името на приложението
-settings-notifications-content-lock-screen = Показване на съдържанието на заключения екран
-settings-notifications-apps = Известия от приложения
-settings-notifications-apps-description = Изберете как всяко приложение ви известява
-settings-notifications-search = Търсене на приложения
-settings-notifications-no-match = Няма приложения, които отговарят на търсенето
-settings-notifications-from = Известия от { $app }
-settings-notifications-summary-both = Банери и заключен екран
-settings-notifications-summary-banners = Банери
-settings-notifications-summary-lock-screen = Заключен екран
-settings-notifications-summary-list = Само в списъка с известия
-settings-notifications-allow = Разрешаване на известията
-settings-notifications-banners = Банери
-settings-notifications-banners-description = Изскачат на екрана, когато пристигнат
-settings-notifications-sound = Звук
-settings-notifications-sound-description = В автоматичен режим не звучи нищо, когато приложението пусне свой звук
-settings-notifications-sound-automatic = Автоматично
-settings-notifications-sound-luft = Звукът на Luft
-settings-notifications-sound-app = Звукът на приложението
-settings-notifications-sound-none = Без звук
-settings-notifications-dnd-allow = Разрешаване при Не безпокойте
-settings-notifications-dnd-allow-description = Спешни са алармите и обажданията
-settings-notifications-dnd-never = Никога
-settings-notifications-dnd-urgent = Само спешните
-settings-notifications-dnd-always = Винаги
-settings-notifications-keep = Запазване в списъка с известия
-settings-notifications-keep-description = Иначе изчезват, щом банерът им се затвори
-settings-notifications-app-lock-screen = Показване на заключения екран
-settings-notifications-done = Готово
-
 ## Window tiling
 
 settings-tiling-mode = Подреждане на прозорците

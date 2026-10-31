@@ -16,7 +16,6 @@ settings-page-appearance = Ulkoasu
 settings-page-taskbar = Tehtäväpalkki ja Start
     .keywords = paneeli, telakka, dock, piilota automaattisesti, automaattinen piilotus, piilota tehtäväpalkki, kelluva, läpinäkyvä, kiinnitetyt sovellukset, tasaus, start-painike, start-valikko, aloitusvalikko, gust, hakupalkki, hakukenttä, käynnistin, launcher, verkkohaku, hae verkosta, hakukone, näytöt, työtila, työpöytä, virtuaalityöpöytä
 settings-page-windows = Ikkunat
-settings-page-notifications = Ilmoitukset
     .keywords = älä häiritse, bannerit, ilmoitusbannerit, lukitusnäyttö, sovellukset
 settings-page-accessibility = Helppokäyttöisyys
     .keywords = a11y, esteettömyys, saavutettavuus, näytönlukuohjelma, ruudunlukija, orca, zoomaus, suurennus, suurennuslasi, suuri teksti, suurempi teksti, suuri kontrasti, kontrasti, vähennä animaatioita, vähennä liikettä, osoittimen koko, näyttönäppäimistö, kosketusnäppäimistö, alas jäävät näppäimet, hitaat näppäimet, suodatinnäppäimet, toistuvat painallukset, hiirinäppäimet, viivenapsautus, pysähdysnapsautus, oikea napsautus, hiiren oikea painike, paikanna osoitin, etsi osoitin, visuaaliset hälytykset, välähdys, kuulo, kuulovamma, näkö, näkövamma

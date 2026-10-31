@@ -18,6 +18,10 @@ settings-privacy-screen-off-never = Hiçbir zaman
 settings-privacy-lock-when-off = Ekran kapanınca kilitle
 settings-privacy-lock-after = Kilitleme süresi
 settings-privacy-lock-after-hint = Ekran kapandıktan sonra ne kadar beklenecek
+settings-notifications-show-lock-screen = Bildirimleri kilit ekranında göster
+settings-notifications-content = İleti içeriğini göster
+settings-notifications-content-description = Kapalıyken yalnızca uygulamanın adı gösterilir
+settings-notifications-content-lock-screen = İleti içeriğini kilit ekranında göster
 settings-privacy-lock-immediately = Hemen
 
 ## Privacy: location, camera and microphone

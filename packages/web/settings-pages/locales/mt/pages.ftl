@@ -16,7 +16,6 @@ settings-page-appearance = Dehra
 settings-page-taskbar = Taskbar u Start
     .keywords = panew, dock, aħbi awtomatikament, auto-hide, moħbi, aħbi t-taskbar, hide taskbar, floating, trasparenti, apps imwaħħla, allinjament, buttuna Start, menù Start, start menu, gust, bar tat-tiftix, search bar, launcher, tiftix fuq il-web, web search, magna tat-tiftix, search engine, skrins, spazju tax-xogħol, desktop, desktop virtwali
 settings-page-windows = Twieqi
-settings-page-notifications = Notifiki
     .keywords = tiddisturbax, banners, skrin imsakkar, apps, twissijiet
 settings-page-accessibility = Aċċessibilità
     .keywords = a11y, aċċess universali, qarrej tal-iskrin, screen reader, orca, zoom, kabbar, lenti, test kbir, kuntrast għoli, kuntrast, naqqas l-animazzjonijiet, naqqas il-moviment, daqs tal-kerser, tastiera fuq l-iskrin, tastiera tal-iskrin, tasti permanenti, sticky keys, tasti bil-mod, slow keys, bounce keys, tasti tal-maws, mouse keys, klikk bil-waqfien, dwell click, klikk bil-hover, klikk tal-lemin, right-click, sib il-pointer, uri l-pointer, allerti viżivi, teptip, flash, smigħ, vista, nuqqas ta’ smigħ, nuqqas ta’ vista

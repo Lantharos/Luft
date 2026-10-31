@@ -186,43 +186,6 @@ settings-cursors-get = Hangi
 settings-cursors-choose-download = Vali allalaaditav fail: { $name }
 settings-cursors-view-online = Vaata veebis
 
-## Notifications
-
-settings-notifications-dnd = Ära sega
-settings-notifications-dnd-description = Bännerid ja helid on välja lülitatud, välja arvatud lubatud rakendustel
-settings-notifications-lock-screen = Lukustuskuva
-settings-notifications-show-lock-screen = Kuva teavitused lukustuskuval
-settings-notifications-content = Kuva sõnumi sisu
-settings-notifications-content-description = Kui see on väljas, kuvatakse ainult rakenduse nimi
-settings-notifications-content-lock-screen = Kuva sõnumi sisu lukustuskuval
-settings-notifications-apps = Rakenduste teavitused
-settings-notifications-apps-description = Vali, kuidas iga rakendus sind teavitab
-settings-notifications-search = Otsi rakendusi
-settings-notifications-no-match = Otsingule ei vasta ükski rakendus
-settings-notifications-from = Teavitused: { $app }
-settings-notifications-summary-both = Bännerid ja lukustuskuva
-settings-notifications-summary-banners = Bännerid
-settings-notifications-summary-lock-screen = Lukustuskuva
-settings-notifications-summary-list = Ainult teavituste loend
-settings-notifications-allow = Luba teavitused
-settings-notifications-banners = Bännerid
-settings-notifications-banners-description = Ilmuvad saabumisel ekraanile
-settings-notifications-sound = Heli
-settings-notifications-sound-description = Automaatselt jääb vaikseks, kui rakendus mängib oma heli
-settings-notifications-sound-automatic = Automaatne
-settings-notifications-sound-luft = Lufti heli
-settings-notifications-sound-app = Rakenduse oma heli
-settings-notifications-sound-none = Puudub
-settings-notifications-dnd-allow = Luba režiimis Ära sega
-settings-notifications-dnd-allow-description = Kiireloomulised on äratused ja kõned
-settings-notifications-dnd-never = Mitte kunagi
-settings-notifications-dnd-urgent = Ainult kiireloomulised
-settings-notifications-dnd-always = Alati
-settings-notifications-keep = Hoia teavituste loendis
-settings-notifications-keep-description = Muidu kaovad need, kui nende bänner sulgub
-settings-notifications-app-lock-screen = Kuva lukustuskuval
-settings-notifications-done = Valmis
-
 ## Window tiling
 
 settings-tiling-mode = Akende paigutus

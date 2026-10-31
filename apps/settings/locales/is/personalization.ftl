@@ -184,43 +184,6 @@ settings-cursors-get = Sækja
 settings-cursors-choose-download = Veldu niðurhal fyrir { $name }
 settings-cursors-view-online = Skoða á netinu
 
-## Notifications
-
-settings-notifications-dnd = Ekki trufla
-settings-notifications-dnd-description = Borðar og hljóð eru óvirk, nema fyrir forrit sem þú leyfir
-settings-notifications-lock-screen = Læsiskjár
-settings-notifications-show-lock-screen = Sýna tilkynningar á læsiskjánum
-settings-notifications-content = Sýna efni skilaboða
-settings-notifications-content-description = Þegar slökkt er á þessu sést aðeins heiti forritsins
-settings-notifications-content-lock-screen = Sýna efni skilaboða á læsiskjánum
-settings-notifications-apps = Tilkynningar forrita
-settings-notifications-apps-description = Veldu hvernig hvert forrit lætur þig vita
-settings-notifications-search = Leita að forritum
-settings-notifications-no-match = Engin forrit passa við leitina
-settings-notifications-from = Tilkynningar frá { $app }
-settings-notifications-summary-both = Borðar og læsiskjár
-settings-notifications-summary-banners = Borðar
-settings-notifications-summary-lock-screen = Læsiskjár
-settings-notifications-summary-list = Aðeins í tilkynningalista
-settings-notifications-allow = Leyfa tilkynningar
-settings-notifications-banners = Borðar
-settings-notifications-banners-description = Birtast á skjánum þegar þær berast
-settings-notifications-sound = Hljóð
-settings-notifications-sound-description = Sjálfvirkt er hljótt þegar forritið spilar sitt eigið hljóð
-settings-notifications-sound-automatic = Sjálfvirkt
-settings-notifications-sound-luft = Hljóð Luft
-settings-notifications-sound-app = Hljóð forritsins
-settings-notifications-sound-none = Ekkert
-settings-notifications-dnd-allow = Leyfa þegar kveikt er á Ekki trufla
-settings-notifications-dnd-allow-description = Áríðandi á við vekjara og símtöl
-settings-notifications-dnd-never = Aldrei
-settings-notifications-dnd-urgent = Aðeins áríðandi
-settings-notifications-dnd-always = Alltaf
-settings-notifications-keep = Geyma í tilkynningalistanum
-settings-notifications-keep-description = Annars hverfa þær þegar borðinn þeirra lokast
-settings-notifications-app-lock-screen = Sýna á læsiskjánum
-settings-notifications-done = Lokið
-
 ## Window tiling
 
 settings-tiling-mode = Raða gluggum

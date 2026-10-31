@@ -184,43 +184,6 @@ settings-cursors-get = Downloaden
 settings-cursors-choose-download = Kies een download voor { $name }
 settings-cursors-view-online = Online bekijken
 
-## Notifications
-
-settings-notifications-dnd = Niet storen
-settings-notifications-dnd-description = Banners en geluiden blijven uit, behalve voor apps die je toestaat
-settings-notifications-lock-screen = Vergrendelscherm
-settings-notifications-show-lock-screen = Meldingen tonen op het vergrendelscherm
-settings-notifications-content = Inhoud van berichten tonen
-settings-notifications-content-description = Als dit uit staat, wordt alleen de naam van de app getoond
-settings-notifications-content-lock-screen = Inhoud van berichten tonen op het vergrendelscherm
-settings-notifications-apps = Meldingen van apps
-settings-notifications-apps-description = Kies hoe elke app je een melding geeft
-settings-notifications-search = Apps zoeken
-settings-notifications-no-match = Geen apps gevonden
-settings-notifications-from = Meldingen van { $app }
-settings-notifications-summary-both = Banners en vergrendelscherm
-settings-notifications-summary-banners = Banners
-settings-notifications-summary-lock-screen = Vergrendelscherm
-settings-notifications-summary-list = Alleen in de meldingenlijst
-settings-notifications-allow = Meldingen toestaan
-settings-notifications-banners = Banners
-settings-notifications-banners-description = Verschijnen op het scherm zodra ze binnenkomen
-settings-notifications-sound = Geluid
-settings-notifications-sound-description = Automatisch blijft stil als de app zelf een geluid afspeelt
-settings-notifications-sound-automatic = Automatisch
-settings-notifications-sound-luft = Geluid van Luft
-settings-notifications-sound-app = Eigen geluid van de app
-settings-notifications-sound-none = Geen
-settings-notifications-dnd-allow = Toestaan tijdens Niet storen
-settings-notifications-dnd-allow-description = Dringend betekent wekkers en oproepen
-settings-notifications-dnd-never = Nooit
-settings-notifications-dnd-urgent = Alleen dringend
-settings-notifications-dnd-always = Altijd
-settings-notifications-keep = Bewaren in de meldingenlijst
-settings-notifications-keep-description = Anders verdwijnen ze zodra hun banner sluit
-settings-notifications-app-lock-screen = Tonen op het vergrendelscherm
-settings-notifications-done = Klaar
-
 ## Window tiling
 
 settings-tiling-mode = Vensters indelen

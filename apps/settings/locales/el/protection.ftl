@@ -18,6 +18,10 @@ settings-privacy-screen-off-never = Ποτέ
 settings-privacy-lock-when-off = Κλείδωμα της οθόνης όταν σβήνει
 settings-privacy-lock-after = Κλείδωμα μετά από
 settings-privacy-lock-after-hint = Πόσο να περιμένει αφού σβήσει η οθόνη
+settings-notifications-show-lock-screen = Εμφάνιση ειδοποιήσεων στην οθόνη κλειδώματος
+settings-notifications-content = Εμφάνιση περιεχομένου μηνυμάτων
+settings-notifications-content-description = Όταν είναι ανενεργό, εμφανίζεται μόνο το όνομα της εφαρμογής
+settings-notifications-content-lock-screen = Εμφάνιση περιεχομένου μηνυμάτων στην οθόνη κλειδώματος
 settings-privacy-lock-immediately = Αμέσως
 
 ## Privacy: location, camera and microphone

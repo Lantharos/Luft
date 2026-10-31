@@ -18,6 +18,10 @@ settings-privacy-screen-off-never = Aldrig
 settings-privacy-lock-when-off = Lås skærmen, når den slukkes
 settings-privacy-lock-after = Lås efter
 settings-privacy-lock-after-hint = Hvor længe der ventes, når skærmen er slukket
+settings-notifications-show-lock-screen = Vis notifikationer på låseskærmen
+settings-notifications-content = Vis beskedens indhold
+settings-notifications-content-description = Når det er slået fra, vises kun appens navn
+settings-notifications-content-lock-screen = Vis beskedens indhold på låseskærmen
 settings-privacy-lock-immediately = Med det samme
 
 ## Privacy: location, camera and microphone

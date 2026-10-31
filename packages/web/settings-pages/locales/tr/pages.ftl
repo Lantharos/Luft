@@ -16,7 +16,6 @@ settings-page-appearance = Görünüm
 settings-page-taskbar = Görev çubuğu ve Başlat
     .keywords = panel, dock, otomatik gizle, otomatik gizleme, görev çubuğunu gizle, kayan, saydam, sabitlenmiş uygulamalar, hizalama, başlat düğmesi, başlat menüsü, start menü, gust, arama çubuğu, başlatıcı, launcher, web araması, internette ara, arama motoru, ekranlar, çalışma alanı, masaüstü, sanal masaüstü
 settings-page-windows = Pencereler
-settings-page-notifications = Bildirimler
     .keywords = rahatsız etmeyin, başlıklar, açılır bildirimler, kilit ekranı, uygulamalar
 settings-page-accessibility = Erişilebilirlik
     .keywords = a11y, evrensel erişim, ekran okuyucu, orca, yakınlaştırma, büyüteç, büyük metin, yüksek karşıtlık, karşıtlık, kontrast, animasyonları azalt, hareketi azalt, imleç boyutu, ekran klavyesi, dokunmatik klavye, yapışkan tuşlar, yavaş tuşlar, sıçrama tuşları, fare tuşları, bekleterek tıklama, bekleyerek tıklama, üzerine gelerek tıklama, sağ tıklama, işaretçiyi bul, işaretçiyi göster, görsel uyarılar, yanıp sönme, işitme, görme

@@ -188,43 +188,6 @@ settings-cursors-get = Získat
 settings-cursors-choose-download = Vyberte soubor ke stažení pro { $name }
 settings-cursors-view-online = Zobrazit online
 
-## Notifications
-
-settings-notifications-dnd = Nerušit
-settings-notifications-dnd-description = Bannery a zvuky jsou vypnuté, kromě aplikací, kterým to povolíte
-settings-notifications-lock-screen = Zamykací obrazovka
-settings-notifications-show-lock-screen = Zobrazovat oznámení na zamykací obrazovce
-settings-notifications-content = Zobrazovat obsah zpráv
-settings-notifications-content-description = Když je vypnuto, zobrazí se jen název aplikace
-settings-notifications-content-lock-screen = Zobrazovat obsah zpráv na zamykací obrazovce
-settings-notifications-apps = Oznámení aplikací
-settings-notifications-apps-description = Zvolte, jak vás jednotlivé aplikace upozorňují
-settings-notifications-search = Hledat aplikace
-settings-notifications-no-match = Hledání neodpovídají žádné aplikace
-settings-notifications-from = Oznámení z aplikace { $app }
-settings-notifications-summary-both = Bannery a zamykací obrazovka
-settings-notifications-summary-banners = Bannery
-settings-notifications-summary-lock-screen = Zamykací obrazovka
-settings-notifications-summary-list = Jen v seznamu oznámení
-settings-notifications-allow = Povolit oznámení
-settings-notifications-banners = Bannery
-settings-notifications-banners-description = Po doručení se zobrazí na obrazovce
-settings-notifications-sound = Zvuk
-settings-notifications-sound-description = V automatickém režimu nic nezazní, když aplikace přehraje vlastní zvuk
-settings-notifications-sound-automatic = Automaticky
-settings-notifications-sound-luft = Zvuk Luftu
-settings-notifications-sound-app = Vlastní zvuk aplikace
-settings-notifications-sound-none = Žádný
-settings-notifications-dnd-allow = Povolit v režimu Nerušit
-settings-notifications-dnd-allow-description = Za naléhavé se považují budíky a hovory
-settings-notifications-dnd-never = Nikdy
-settings-notifications-dnd-urgent = Jen naléhavá
-settings-notifications-dnd-always = Vždy
-settings-notifications-keep = Ponechat v seznamu oznámení
-settings-notifications-keep-description = Jinak zmizí, jakmile se zavře jejich banner
-settings-notifications-app-lock-screen = Zobrazovat na zamykací obrazovce
-settings-notifications-done = Hotovo
-
 ## Window tiling
 
 settings-tiling-mode = Uspořádání oken

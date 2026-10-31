@@ -17,7 +17,6 @@ Strings in Luft's Finnish translation that a native speaker should check. Each i
 - `packages/web/ui/locales/fi/ui.ftl` `ui-media-pause`: "Keskeytä" — some players say "Tauko"; check which is expected.
 - `packages/web/ui/locales/fi/ui.ftl` `ui-split-space`: "Tila Luftille" — slider label for disk space; check against "Luftin tila", which may read as a status.
 - `packages/web/ui/locales/fi/ui.ftl` `ui-recovery-key-label`: "Palautusavain { $key }" — read out by screen readers before the key itself.
-- `apps/settings/locales/fi/settings.ftl` `settings-subpage-back`: "Takaisin sivulle { $page }" — keeps the page name in the nominative; check it reads naturally with every panel title.
 - `apps/settings/locales/fi/settings.ftl` `settings-more-show`: "Näytä { $count } lisää" — same in both plural forms; check it fits every list it ends.
 - `packages/web/settings-pages/locales/fi/pages.ftl` `settings-page-appearance`: "Ulkoasu" — GNOME's word; Windows says Mukauttaminen.
 - `packages/web/settings-pages/locales/fi/pages.ftl` `settings-page-security`: "Suojaus" — see the glossary note on security.

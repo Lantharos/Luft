@@ -18,6 +18,10 @@ settings-privacy-screen-off-never = Mitte kunagi
 settings-privacy-lock-when-off = Lukusta ekraan, kui see välja lülitub
 settings-privacy-lock-after = Lukusta pärast
 settings-privacy-lock-after-hint = Kui kaua oodata pärast ekraani väljalülitumist
+settings-notifications-show-lock-screen = Kuva teavitused lukustuskuval
+settings-notifications-content = Kuva sõnumi sisu
+settings-notifications-content-description = Kui see on väljas, kuvatakse ainult rakenduse nimi
+settings-notifications-content-lock-screen = Kuva sõnumi sisu lukustuskuval
 settings-privacy-lock-immediately = Kohe
 
 ## Privacy: location, camera and microphone

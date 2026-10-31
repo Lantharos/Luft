@@ -18,6 +18,10 @@ settings-privacy-screen-off-never = Soha
 settings-privacy-lock-when-off = Képernyő zárolása kikapcsoláskor
 settings-privacy-lock-after = Zárolás ennyi idő után
 settings-privacy-lock-after-hint = Mennyi ideig várjon a képernyő kikapcsolása után
+settings-notifications-show-lock-screen = Értesítések megjelenítése a zárolási képernyőn
+settings-notifications-content = Üzenet tartalmának megjelenítése
+settings-notifications-content-description = Kikapcsolva csak az alkalmazás neve látszik
+settings-notifications-content-lock-screen = Üzenet tartalmának megjelenítése a zárolási képernyőn
 settings-privacy-lock-immediately = Azonnal
 
 ## Privacy: location, camera and microphone

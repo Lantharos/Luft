@@ -184,43 +184,6 @@ settings-cursors-get = Λήψη
 settings-cursors-choose-download = Επιλογή λήψης για το θέμα { $name }
 settings-cursors-view-online = Προβολή στο διαδίκτυο
 
-## Notifications
-
-settings-notifications-dnd = Μην ενοχλείτε
-settings-notifications-dnd-description = Χωρίς πλαίσια και ήχους, εκτός από τις εφαρμογές που επιτρέπετε
-settings-notifications-lock-screen = Οθόνη κλειδώματος
-settings-notifications-show-lock-screen = Εμφάνιση ειδοποιήσεων στην οθόνη κλειδώματος
-settings-notifications-content = Εμφάνιση περιεχομένου μηνυμάτων
-settings-notifications-content-description = Όταν είναι ανενεργό, εμφανίζεται μόνο το όνομα της εφαρμογής
-settings-notifications-content-lock-screen = Εμφάνιση περιεχομένου μηνυμάτων στην οθόνη κλειδώματος
-settings-notifications-apps = Ειδοποιήσεις εφαρμογών
-settings-notifications-apps-description = Επιλέξτε πώς σας ειδοποιεί κάθε εφαρμογή
-settings-notifications-search = Αναζήτηση εφαρμογών
-settings-notifications-no-match = Καμία εφαρμογή δεν ταιριάζει με την αναζήτηση
-settings-notifications-from = Ειδοποιήσεις από την εφαρμογή { $app }
-settings-notifications-summary-both = Πλαίσια και οθόνη κλειδώματος
-settings-notifications-summary-banners = Πλαίσια
-settings-notifications-summary-lock-screen = Οθόνη κλειδώματος
-settings-notifications-summary-list = Μόνο στη λίστα ειδοποιήσεων
-settings-notifications-allow = Να επιτρέπονται οι ειδοποιήσεις
-settings-notifications-banners = Πλαίσια
-settings-notifications-banners-description = Εμφανίζονται στην οθόνη μόλις φτάσουν
-settings-notifications-sound = Ήχος
-settings-notifications-sound-description = Στην αυτόματη λειτουργία δεν ακούγεται τίποτα όταν η εφαρμογή παίζει δικό της ήχο
-settings-notifications-sound-automatic = Αυτόματα
-settings-notifications-sound-luft = Ο ήχος του Luft
-settings-notifications-sound-app = Ο ήχος της εφαρμογής
-settings-notifications-sound-none = Κανένας
-settings-notifications-dnd-allow = Να επιτρέπονται στο «Μην ενοχλείτε»
-settings-notifications-dnd-allow-description = Επείγουσες είναι οι ειδοποιήσεις για ξυπνητήρια και κλήσεις
-settings-notifications-dnd-never = Ποτέ
-settings-notifications-dnd-urgent = Μόνο επείγουσες
-settings-notifications-dnd-always = Πάντα
-settings-notifications-keep = Διατήρηση στη λίστα ειδοποιήσεων
-settings-notifications-keep-description = Διαφορετικά, φεύγουν μόλις κλείσει το πλαίσιό τους
-settings-notifications-app-lock-screen = Εμφάνιση στην οθόνη κλειδώματος
-settings-notifications-done = Τέλος
-
 ## Window tiling
 
 settings-tiling-mode = Τακτοποίηση παραθύρων

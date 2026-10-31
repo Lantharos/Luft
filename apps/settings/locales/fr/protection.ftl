@@ -18,6 +18,10 @@ settings-privacy-screen-off-never = Jamais
 settings-privacy-lock-when-off = Verrouiller l’écran quand il s’éteint
 settings-privacy-lock-after = Verrouiller après
 settings-privacy-lock-after-hint = Délai après l’extinction de l’écran
+settings-notifications-show-lock-screen = Afficher les notifications sur l’écran de verrouillage
+settings-notifications-content = Afficher le contenu des messages
+settings-notifications-content-description = Si désactivé, seul le nom de l’application s’affiche
+settings-notifications-content-lock-screen = Afficher le contenu des messages sur l’écran de verrouillage
 settings-privacy-lock-immediately = Immédiatement
 
 ## Privacy: location, camera and microphone

@@ -5,10 +5,12 @@
 	import { app } from '#lib/state/app.svelte.js';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import { days, including } from './format';
+	import MessageContent from './MessageContent.svelte';
 
 	type Screensaver = { 'lock-enabled': boolean; 'lock-delay': number };
 	type Session = { 'idle-delay': number };
 	type Location = { enabled: boolean };
+	type Notifications = { 'show-in-lock-screen': boolean };
 	type Privacy = {
 		'disable-camera': boolean;
 		'disable-microphone': boolean;
@@ -22,6 +24,7 @@
 	const screensaver = useSettings<Screensaver>('org.gnome.desktop.screensaver', ['lock-enabled', 'lock-delay']);
 	const session = useSettings<Session>('org.gnome.desktop.session', ['idle-delay']);
 	const location = useSettings<Location>('org.gnome.system.location', ['enabled']);
+	const notifications = useSettings<Notifications>('org.gnome.desktop.notifications', ['show-in-lock-screen']);
 	const privacy = useSettings<Privacy>('org.gnome.desktop.privacy', [
 		'disable-camera',
 		'disable-microphone',
@@ -46,6 +49,7 @@
 
 	let idle = $derived(session.values['idle-delay'] ?? 0);
 	let locking = $derived(screensaver.values['lock-enabled'] ?? true);
+	let lockScreen = $derived(notifications.values['show-in-lock-screen'] ?? true);
 	let locating = $derived(location.values.enabled ?? false);
 	let camera = $derived(!(privacy.values['disable-camera'] ?? false));
 	let remembering = $derived(privacy.values['remember-recent-files'] ?? true);
@@ -73,6 +77,10 @@
 			onchange={(seconds) => screensaver.set('lock-delay', seconds)}
 		/>
 	</Row>
+	<Row title={t('settings-notifications-show-lock-screen')}>
+		<Switch label={t('settings-notifications-show-lock-screen')} checked={lockScreen} onchange={(on) => notifications.set('show-in-lock-screen', on)} />
+	</Row>
+	<MessageContent {lockScreen} />
 </Section>
 
 <Section>

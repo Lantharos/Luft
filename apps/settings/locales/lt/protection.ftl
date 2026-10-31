@@ -18,6 +18,10 @@ settings-privacy-screen-off-never = Niekada
 settings-privacy-lock-when-off = Užrakinti ekraną, kai jis išsijungia
 settings-privacy-lock-after = Užrakinti po
 settings-privacy-lock-after-hint = Kiek laukti, kai ekranas išsijungia
+settings-notifications-show-lock-screen = Rodyti pranešimus užrakinimo ekrane
+settings-notifications-content = Rodyti pranešimų turinį
+settings-notifications-content-description = Išjungus rodomas tik programos pavadinimas
+settings-notifications-content-lock-screen = Rodyti pranešimų turinį užrakinimo ekrane
 settings-privacy-lock-immediately = Iš karto
 
 ## Privacy: location, camera and microphone

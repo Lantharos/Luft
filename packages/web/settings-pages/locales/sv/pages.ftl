@@ -16,7 +16,6 @@ settings-page-appearance = Utseende
 settings-page-taskbar = Aktivitetsfält och Start
     .keywords = panel, docka, dölj automatiskt, autodölj, dölj aktivitetsfältet, flytande, genomskinlig, transparent, fästa appar, justering, centrera, startknapp, start-knapp, startmeny, start-menyn, gust, sökfält, launcher, programstartare, webbsökning, sök på webben, sökmotor, skärmar, arbetsyta, skrivbord, virtuellt skrivbord
 settings-page-windows = Fönster
-settings-page-notifications = Notiser
     .keywords = stör ej, aviseringar, meddelanden, banderoller, låsskärm, appar
 settings-page-accessibility = Hjälpmedel
     .keywords = tillgänglighet, a11y, skärmläsare, orca, zoom, förstoring, förstoringsglas, stor text, hög kontrast, kontrast, minska animationer, minska rörelse, pekarstorlek, skärmtangentbord, tröga tangenter, långsamma tangenter, studsande tangenter, studstangenter, mustangenter, vilande klick, hovringsklick, högerklick, hitta pekaren, visa pekaren, visuella varningar, blinka, hörsel, hörselnedsättning, syn, synnedsättning

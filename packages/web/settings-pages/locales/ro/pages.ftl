@@ -16,7 +16,6 @@ settings-page-appearance = Aspect
 settings-page-taskbar = Bara de activități și Start
     .keywords = bară, panou, dock, ascundere automată, ascunde automat, ascunde bara de activități, plutitoare, transparentă, aplicații fixate, aliniere, butonul start, meniul start, meniu start, gust, bară de căutare, lansator, launcher, căutare pe web, căutare web, motor de căutare, ecrane, spațiu de lucru, desktop, desktop virtual
 settings-page-windows = Ferestre
-settings-page-notifications = Notificări
     .keywords = nu deranjați, bannere, ferestre pop-up, ecran de blocare, aplicații
 settings-page-accessibility = Accesibilitate
     .keywords = a11y, acces universal, cititor de ecran, orca, zoom, lupă, mărire, text mare, contrast ridicat, contrast, reducere animații, reducere mișcare, mărime cursor, tastatură pe ecran, tastatură virtuală, taste adezive, taste lente, taste de respingere, taste mouse, clic prin staționare, clic la trecerea cursorului, clic dreapta, localizare cursor, găsire cursor, alerte vizuale, clipire, auz, vedere

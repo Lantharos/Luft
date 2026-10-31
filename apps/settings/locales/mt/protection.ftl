@@ -18,6 +18,10 @@ settings-privacy-screen-off-never = Qatt
 settings-privacy-lock-when-off = Sakkar l-iskrin meta jintefa
 settings-privacy-lock-after = Sakkar wara
 settings-privacy-lock-after-hint = Kemm jistenna ladarba l-iskrin jintefa
+settings-notifications-show-lock-screen = Uri n-notifiki fuq l-iskrin imsakkar
+settings-notifications-content = Uri l-kontenut tal-messaġġi
+settings-notifications-content-description = Meta jkun mitfi, jidher biss l-isem tal-app
+settings-notifications-content-lock-screen = Uri l-kontenut tal-messaġġi fuq l-iskrin imsakkar
 settings-privacy-lock-immediately = Minnufih
 
 ## Privacy: location, camera and microphone

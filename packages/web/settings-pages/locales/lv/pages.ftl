@@ -16,7 +16,6 @@ settings-page-appearance = Izskats
 settings-page-taskbar = Uzdevumjosla un izvēlne Start
     .keywords = panelis, josla, dock, automātiski paslēpt, paslēpt, paslēpt uzdevumjoslu, peldoša, caurspīdīga, piespraustās lietotnes, līdzinājums, start poga, izvēlne start, start izvēlne, start menu, gust, meklēšanas josla, palaidējs, launcher, meklēšana tīmeklī, meklētājs, search engine, displeji, darbvieta, darbvirsma, virtuālā darbvirsma
 settings-page-windows = Logi
-settings-page-notifications = Paziņojumi
     .keywords = netraucēt, reklāmkarogi, baneri, bloķēšanas ekrāns, lietotnes, brīdinājumi
 settings-page-accessibility = Pieejamība
     .keywords = a11y, universālā piekļuve, ekrāna lasītājs, orca, tālummaiņa, palielinātājs, lupa, liels teksts, augsts kontrasts, kontrasts, samazināt animācijas, samazināt kustību, kursora izmērs, ekrāntastatūra, ekrāna tastatūra, taustiņu fiksācija, lēnie taustiņi, atlecošie taustiņi, peles taustiņi, klikšķis ar aizturi, klikšķis ar novietošanu, labais klikšķis, atrast rādītāju, vizuālie brīdinājumi, mirgošana, dzirde, redze

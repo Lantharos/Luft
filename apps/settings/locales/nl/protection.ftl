@@ -18,6 +18,10 @@ settings-privacy-screen-off-never = Nooit
 settings-privacy-lock-when-off = Scherm vergrendelen als het uitgaat
 settings-privacy-lock-after = Vergrendelen na
 settings-privacy-lock-after-hint = Hoelang er gewacht wordt nadat het scherm uit is gegaan
+settings-notifications-show-lock-screen = Meldingen tonen op het vergrendelscherm
+settings-notifications-content = Inhoud van berichten tonen
+settings-notifications-content-description = Als dit uit staat, wordt alleen de naam van de app getoond
+settings-notifications-content-lock-screen = Inhoud van berichten tonen op het vergrendelscherm
 settings-privacy-lock-immediately = Meteen
 
 ## Privacy: location, camera and microphone

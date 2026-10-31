@@ -52,7 +52,6 @@ export class NotificationCenter {
       { label: t('notifications-clear-everything'), enabled: this.tray.getSources().some(source => source.notifications.length > 0), run: () => this.clear() },
       { label: t('notifications-lock-screen-content'), checked: this.shellSettings.get_boolean(LOCK_SCREEN_CONTENT),
         run: () => this.shellSettings.set_boolean(LOCK_SCREEN_CONTENT, !this.shellSettings.get_boolean(LOCK_SCREEN_CONTENT)) },
-      { label: t('notifications-settings'), run: () => menus.settings('notifications') },
     ]);
 
     this.media = new MediaCard(() => { if (this.actor.visible) this.layoutChanged(); });

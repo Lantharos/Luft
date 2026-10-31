@@ -188,43 +188,6 @@ settings-cursors-get = Отримати
 settings-cursors-choose-download = Виберіть файл для завантаження: { $name }
 settings-cursors-view-online = Переглянути в інтернеті
 
-## Notifications
-
-settings-notifications-dnd = Не турбувати
-settings-notifications-dnd-description = Банери й звуки вимкнено, крім дозволених вами програм
-settings-notifications-lock-screen = Екран блокування
-settings-notifications-show-lock-screen = Показувати сповіщення на екрані блокування
-settings-notifications-content = Показувати вміст повідомлень
-settings-notifications-content-description = Якщо вимкнено, показується лише назва програми
-settings-notifications-content-lock-screen = Показувати вміст повідомлень на екрані блокування
-settings-notifications-apps = Сповіщення програм
-settings-notifications-apps-description = Виберіть, як кожна програма сповіщає вас
-settings-notifications-search = Пошук програм
-settings-notifications-no-match = Немає програм, що відповідають запиту
-settings-notifications-from = Сповіщення від { $app }
-settings-notifications-summary-both = Банери й екран блокування
-settings-notifications-summary-banners = Банери
-settings-notifications-summary-lock-screen = Екран блокування
-settings-notifications-summary-list = Лише в списку сповіщень
-settings-notifications-allow = Дозволяти сповіщення
-settings-notifications-banners = Банери
-settings-notifications-banners-description = Спливають на екрані, коли надходять
-settings-notifications-sound = Звук
-settings-notifications-sound-description = В автоматичному режимі нічого не звучить, якщо програма відтворює власний звук
-settings-notifications-sound-automatic = Автоматично
-settings-notifications-sound-luft = Звук Luft
-settings-notifications-sound-app = Звук програми
-settings-notifications-sound-none = Немає
-settings-notifications-dnd-allow = Дозволяти в режимі «Не турбувати»
-settings-notifications-dnd-allow-description = Термінові — це будильники й дзвінки
-settings-notifications-dnd-never = Ніколи
-settings-notifications-dnd-urgent = Лише термінові
-settings-notifications-dnd-always = Завжди
-settings-notifications-keep = Залишати в списку сповіщень
-settings-notifications-keep-description = Інакше вони зникають, щойно закривається банер
-settings-notifications-app-lock-screen = Показувати на екрані блокування
-settings-notifications-done = Готово
-
 ## Window tiling
 
 settings-tiling-mode = Розташування вікон

@@ -16,7 +16,6 @@ settings-page-appearance = Megjelenés
 settings-page-taskbar = Tálca és Start menü
     .keywords = panel, dokk, dock, automatikus elrejtés, elrejtés, tálca elrejtése, lebegő, átlátszó, rögzített alkalmazások, igazítás, start gomb, start menü, start menu, gust, keresősáv, indító, launcher, webes keresés, keresőmotor, search engine, kijelzők, munkaterület, asztal, virtuális asztal
 settings-page-windows = Ablakok
-settings-page-notifications = Értesítések
     .keywords = ne zavarjanak, szalagcímek, értesítési szalag, zárolási képernyő, alkalmazások
 settings-page-accessibility = Akadálymentesség
     .keywords = kisegítő lehetőségek, akadálymentes, képernyőolvasó, orca, nagyítás, nagyító, nagy szöveg, nagy betűk, nagy kontraszt, kontraszt, animációk csökkentése, mozgás csökkentése, kurzorméret, képernyő-billentyűzet, virtuális billentyűzet, beragadó billentyűk, lassú billentyűk, billentyűvisszapattanás, egérbillentyűk, várakozó kattintás, kattintás rámutatással, jobb kattintás, mutató megkeresése, egérmutató megkeresése, vizuális figyelmeztetések, villogás, hallás, hallássérült, látás, látássérült

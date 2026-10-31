@@ -32,7 +32,7 @@ The play button next to each kind plays it once, so you can hear it before choos
 - Notification sounds also stay quiet while a game is fullscreen or while you share your screen.
 - The lock screen only plays errors, such as a wrong password.
 - When an app such as Discord plays its own sound as a notification arrives, Luft's stays quiet so you don't hear two. A call or music the app was already playing doesn't count.
-- Each app's notifications can play something else: in Settings, under Notifications, choose the app and set **Sound** to **Luft's sound**, **The app's own** or **None**.
+- Each app's notifications can play something else: on the app's page in Schelf, under Notifications, set **Sound** to **Luft's sound**, **The app's own** or **None**.
 
 ## When nothing plays
 

@@ -13,7 +13,6 @@ Strings in Luft's French translation that a native speaker should check: terms w
 - `packages/i18n/glossary/fr.tbx` `undo`: "Annuler" — same word as cancel; check no screen shows both side by side.
 - `packages/web/ui/locales/fr/ui.ftl` `ui-split-windows-size`: "{ $size }, dont { $used } utilisés" — "utilisés" is plural; reads oddly for values under 2 GB.
 - `packages/web/ui/locales/fr/ui.ftl` `ui-toast-dismiss`: "Ignorer" — Windows' word for closing a notification; "Fermer" is the alternative.
-- `apps/settings/locales/fr/settings.ftl` `settings-subpage-back`: "Retour à { $page }" — page titles without article, like "Retour à Réseau"; check it reads naturally as a screen-reader label.
 - `kestrel/ui/locales/fr/shell.ftl` `keys-page-up`, `keys-page-down`, `keys-home`, `keys-print-screen`: "Pg préc", "Pg suiv", "Origine", "Impr écran" — keyboards print these inconsistently (often arrows); check they are the names people recognize.
 - `kestrel/ui/locales/fr/shell.ftl` `battery-level` `[plugged]`: "Batterie { $percentage } %, sur secteur" — check it conveys plugged in but not charging.
 

@@ -16,7 +16,6 @@ settings-page-appearance = Videz
 settings-page-taskbar = Opravilna vrstica in meni Start
     .keywords = plošča, panel, dok, samodejno skrivanje, samodejno skrij, skrij opravilno vrstico, plavajoča, prosojna, pripete aplikacije, poravnava, gumb start, meni start, start menu, gust, iskalna vrstica, zaganjalnik, launcher, spletno iskanje, iskalnik, search engine, zasloni, delovna površina, namizje, navidezno namizje
 settings-page-windows = Okna
-settings-page-notifications = Obvestila
     .keywords = ne moti, pasice, zaklenjen zaslon, aplikacije, opozorila
 settings-page-accessibility = Dostopnost
     .keywords = a11y, univerzalni dostop, bralnik zaslona, orca, povečava, povečevalnik, lupa, veliko besedilo, visok kontrast, kontrast, manj animacij, zmanjšanje gibanja, velikost kazalca, zaslonska tipkovnica, lepljive tipke, počasne tipke, odbojne tipke, tipke miške, klik z zadržanjem, klik ob lebdenju, desni klik, iskanje kazalca, poišči kazalec, vidna opozorila, utripanje, sluh, vid

@@ -347,7 +347,6 @@ export const commands = {
 	networkWireguardPublicKey: (params: {
 		key: string,
 	}, options?: InvokeOptions) => invoke<string>("network_wireguard_public_key", params, options),
-	notificationsApps: (options?: InvokeOptions) => invoke<NotifyingApp[]>("notifications_apps", {}, options),
 	passkeys: (options?: InvokeOptions) => invoke<Passkeys | null>("passkeys", {}, options),
 	passkeysDelete: (params: {
 		id: string,
@@ -1114,11 +1113,6 @@ export type Network = {
 	vpns: Vpn[],
 	airplane: Airplane | null,
 };
-
-export type NotifyingApp = {
-	path: string,
-	rulesPath: string,
-} & App;
 
 export type Offer = {
 	to: Variant,

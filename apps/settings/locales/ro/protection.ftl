@@ -18,6 +18,10 @@ settings-privacy-screen-off-never = Niciodată
 settings-privacy-lock-when-off = Blochează ecranul când se oprește
 settings-privacy-lock-after = Blochează după
 settings-privacy-lock-after-hint = Cât timp se așteaptă după oprirea ecranului
+settings-notifications-show-lock-screen = Afișează notificările pe ecranul de blocare
+settings-notifications-content = Afișează conținutul mesajelor
+settings-notifications-content-description = Când este dezactivat, se afișează doar numele aplicației
+settings-notifications-content-lock-screen = Afișează conținutul mesajelor pe ecranul de blocare
 settings-privacy-lock-immediately = Imediat
 
 ## Privacy: location, camera and microphone

@@ -14,7 +14,6 @@ Strings in Luft's Slovenian translation that a native speaker should check: term
 - `packages/i18n/glossary/sl.tbx` `emoji`: "emodži" — check that this spelling is preferred over emoji in Slovenian software.
 - `packages/i18n/glossary/sl.tbx` `firmware`: "vdelana programska oprema" — long for labels; check whether a shorter form is acceptable where space is tight.
 - `docs/translations/sl.md` Address and tone: says macOS uses vi in Slovenian — confirm how Apple's Slovenian addresses the reader.
-- `apps/settings/locales/sl/settings.ftl` `settings-subpage-back`: "Nazaj na stran { $page }" — stran keeps the page name in the nominative; check it reads naturally for every panel.
 - `packages/web/settings-pages/locales/sl/pages.ftl` `settings-page-about`: "O sistemu" — Windows says Vizitka; check which fits a Settings sidebar better.
 - `packages/web/ui/locales/sl/ui.ftl` `ui-media-pause`: "Začasno ustavi" — Windows' wording; "Premor" is shorter if this ever shows as a visible label.
 - `kestrel/ui/locales/sl/shell.ftl` `battery-level`: "Baterija { $percentage } %, priključena na napajanje" — check the plugged-in but not charging state reads clearly.

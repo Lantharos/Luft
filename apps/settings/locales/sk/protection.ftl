@@ -18,6 +18,10 @@ settings-privacy-screen-off-never = Nikdy
 settings-privacy-lock-when-off = Zamknúť obrazovku, keď sa vypne
 settings-privacy-lock-after = Zamknúť po
 settings-privacy-lock-after-hint = Ako dlho čakať po vypnutí obrazovky
+settings-notifications-show-lock-screen = Zobrazovať oznámenia na uzamknutej obrazovke
+settings-notifications-content = Zobrazovať obsah správ
+settings-notifications-content-description = Keď je vypnuté, zobrazí sa len názov aplikácie
+settings-notifications-content-lock-screen = Zobrazovať obsah správ na uzamknutej obrazovke
 settings-privacy-lock-immediately = Okamžite
 
 ## Privacy: location, camera and microphone

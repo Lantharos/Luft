@@ -195,43 +195,6 @@ settings-cursors-get = Merr
 settings-cursors-choose-download = Zgjidh një shkarkim për { $name }
 settings-cursors-view-online = Shiko në internet
 
-## Notifications
-
-settings-notifications-dnd = Mos shqetëso
-settings-notifications-dnd-description = Banerat dhe tingujt qëndrojnë të fikur, përveç aplikacioneve që lejon
-settings-notifications-lock-screen = Ekrani i bllokimit
-settings-notifications-show-lock-screen = Shfaq njoftimet në ekranin e bllokimit
-settings-notifications-content = Shfaq përmbajtjen e mesazheve
-settings-notifications-content-description = Kur është joaktive, shfaqet vetëm emri i aplikacionit
-settings-notifications-content-lock-screen = Shfaq përmbajtjen e mesazheve në ekranin e bllokimit
-settings-notifications-apps = Njoftimet e aplikacioneve
-settings-notifications-apps-description = Zgjidh si të njofton çdo aplikacion
-settings-notifications-search = Kërko aplikacione
-settings-notifications-no-match = Asnjë aplikacion nuk përputhet me kërkimin
-settings-notifications-from = Njoftimet nga { $app }
-settings-notifications-summary-both = Banerat dhe ekrani i bllokimit
-settings-notifications-summary-banners = Banerat
-settings-notifications-summary-lock-screen = Ekrani i bllokimit
-settings-notifications-summary-list = Vetëm lista e njoftimeve
-settings-notifications-allow = Lejo njoftimet
-settings-notifications-banners = Banerat
-settings-notifications-banners-description = Shfaqen në ekran kur mbërrijnë
-settings-notifications-sound = Zëri
-settings-notifications-sound-description = Në mënyrën automatike nuk luhet asgjë kur aplikacioni luan zërin e vet
-settings-notifications-sound-automatic = Automatik
-settings-notifications-sound-luft = Zëri i Luft
-settings-notifications-sound-app = Zëri i aplikacionit
-settings-notifications-sound-none = Asnjë
-settings-notifications-dnd-allow = Lejo gjatë Mos shqetëso
-settings-notifications-dnd-allow-description = Urgjente janë alarmet dhe thirrjet
-settings-notifications-dnd-never = Asnjëherë
-settings-notifications-dnd-urgent = Vetëm urgjentet
-settings-notifications-dnd-always = Gjithmonë
-settings-notifications-keep = Mbaji në listën e njoftimeve
-settings-notifications-keep-description = Përndryshe largohen sapo mbyllet baneri i tyre
-settings-notifications-app-lock-screen = Shfaq në ekranin e bllokimit
-settings-notifications-done = U krye
-
 ## Window tiling
 
 settings-tiling-mode = Rendit dritaret

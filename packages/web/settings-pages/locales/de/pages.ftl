@@ -16,7 +16,6 @@ settings-page-appearance = Darstellung
 settings-page-taskbar = Taskleiste und Start
     .keywords = leiste, dock, automatisch ausblenden, ausblenden, taskleiste ausblenden, schwebend, transparent, angeheftete apps, ausrichtung, startschaltfläche, start-schaltfläche, startmenü, start menu, gust, suchleiste, launcher, websuche, im web suchen, suchmaschine, bildschirme, arbeitsfläche, desktop, virtueller desktop
 settings-page-windows = Fenster
-settings-page-notifications = Benachrichtigungen
     .keywords = nicht stören, banner, sperrbildschirm, apps, mitteilungen
 settings-page-accessibility = Barrierefreiheit
     .keywords = bedienungshilfen, eingabehilfen, screenreader, bildschirmleser, orca, zoom, lupe, bildschirmlupe, große schrift, hoher kontrast, kontrast, animationen reduzieren, bewegung reduzieren, zeigergröße, bildschirmtastatur, einrastfunktion, anschlagverzögerung, tastenverzögerung, prellfunktion, maustasten, verweilklick, klicken durch verweilen, rechtsklick, zeiger finden, zeiger anzeigen, visuelle hinweise, blinken, hören, hörbehinderung, sehen, sehbehinderung

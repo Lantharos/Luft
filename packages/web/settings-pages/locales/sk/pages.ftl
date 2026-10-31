@@ -16,7 +16,6 @@ settings-page-appearance = Vzhľad
 settings-page-taskbar = Panel úloh a ponuka Start
     .keywords = panel, lišta, dok, automatické skrývanie, automaticky skryť, skryť panel úloh, plávajúci, priehľadný, pripnuté aplikácie, zarovnanie, tlačidlo start, tlačidlo štart, ponuka start, ponuka štart, start menu, gust, vyhľadávacie pole, spúšťač, launcher, vyhľadávanie na webe, vyhľadávač, search engine, obrazovky, pracovný priestor, pracovná plocha, virtuálna plocha
 settings-page-windows = Okná
-settings-page-notifications = Oznámenia
     .keywords = nerušiť, bannery, upozornenia, hlásenia, uzamknutá obrazovka, aplikácie
 settings-page-accessibility = Prístupnosť
     .keywords = a11y, zjednodušenie prístupu, čítačka obrazovky, orca, lupa, zväčšenie, priblíženie, veľký text, vysoký kontrast, kontrast, obmedziť animácie, obmedziť pohyb, veľkosť kurzora, klávesnica na obrazovke, dotyková klávesnica, lepiace klávesy, jedným prstom, pomalé klávesy, filtrovanie klávesov, ovládanie myši klávesnicou, klávesy myši, kliknutie zotrvaním, kliknutie pri ukázaní, kliknutie pravým tlačidlom, nájsť ukazovateľ, zobraziť ukazovateľ, vizuálne upozornenia, blikanie, sluch, zrak

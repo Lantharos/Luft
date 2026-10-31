@@ -18,6 +18,10 @@ settings-privacy-screen-off-never = Ei koskaan
 settings-privacy-lock-when-off = Lukitse näyttö, kun se sammuu
 settings-privacy-lock-after = Lukitusviive
 settings-privacy-lock-after-hint = Kuinka kauan odotetaan näytön sammumisen jälkeen
+settings-notifications-show-lock-screen = Näytä ilmoitukset lukitusnäytössä
+settings-notifications-content = Näytä viestin sisältö
+settings-notifications-content-description = Kun tämä ei ole käytössä, näytetään vain sovelluksen nimi
+settings-notifications-content-lock-screen = Näytä viestin sisältö lukitusnäytössä
 settings-privacy-lock-immediately = Heti
 
 ## Privacy: location, camera and microphone

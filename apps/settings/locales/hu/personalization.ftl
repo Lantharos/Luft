@@ -184,43 +184,6 @@ settings-cursors-get = Letöltés
 settings-cursors-choose-download = Letöltés kiválasztása: { $name }
 settings-cursors-view-online = Megtekintés online
 
-## Notifications
-
-settings-notifications-dnd = Ne zavarjanak
-settings-notifications-dnd-description = A szalagcímek és a hangok kikapcsolva maradnak, kivéve az engedélyezett alkalmazásoknál
-settings-notifications-lock-screen = Zárolási képernyő
-settings-notifications-show-lock-screen = Értesítések megjelenítése a zárolási képernyőn
-settings-notifications-content = Üzenet tartalmának megjelenítése
-settings-notifications-content-description = Kikapcsolva csak az alkalmazás neve látszik
-settings-notifications-content-lock-screen = Üzenet tartalmának megjelenítése a zárolási képernyőn
-settings-notifications-apps = Alkalmazásértesítések
-settings-notifications-apps-description = Az egyes alkalmazások értesítési módjának beállítása
-settings-notifications-search = Alkalmazások keresése
-settings-notifications-no-match = Egy alkalmazás sem felel meg a keresésnek
-settings-notifications-from = Értesítések innen: { $app }
-settings-notifications-summary-both = Szalagcímek és zárolási képernyő
-settings-notifications-summary-banners = Szalagcímek
-settings-notifications-summary-lock-screen = Zárolási képernyő
-settings-notifications-summary-list = Csak az értesítési listában
-settings-notifications-allow = Értesítések engedélyezése
-settings-notifications-banners = Szalagcímek
-settings-notifications-banners-description = Megérkezéskor felugranak a képernyőn
-settings-notifications-sound = Hang
-settings-notifications-sound-description = Automatikus módban nem szól semmi, ha az alkalmazás saját hangot játszik le
-settings-notifications-sound-automatic = Automatikus
-settings-notifications-sound-luft = A Luft hangja
-settings-notifications-sound-app = Az alkalmazás saját hangja
-settings-notifications-sound-none = Nincs
-settings-notifications-dnd-allow = Engedélyezés Ne zavarjanak módban
-settings-notifications-dnd-allow-description = Sürgős: ébresztők és hívások
-settings-notifications-dnd-never = Soha
-settings-notifications-dnd-urgent = Csak a sürgősek
-settings-notifications-dnd-always = Mindig
-settings-notifications-keep = Megtartás az értesítési listában
-settings-notifications-keep-description = Különben eltűnnek, amint a szalagcímük bezárul
-settings-notifications-app-lock-screen = Megjelenítés a zárolási képernyőn
-settings-notifications-done = Kész
-
 ## Window tiling
 
 settings-tiling-mode = Ablakok elrendezése

@@ -16,7 +16,6 @@ settings-page-appearance = Cuma
 settings-page-taskbar = Tascbharra agus Tosaigh
     .keywords = painéal, duga, dock, folaigh go huathoibríoch, folaigh an tascbharra, ar snámh, trédhearcach, aipeanna pionnáilte, ailíniú, cnaipe tosaigh, tosaigh, start, roghchlár tosaigh, start menu, gust, barra cuardaigh, lainseálaí, launcher, cuardach gréasáin, inneall cuardaigh, search engine, scáileáin, spás oibre, deasc, deasc fhíorúil
 settings-page-windows = Fuinneoga
-settings-page-notifications = Fógraí
     .keywords = ná cuir isteach orm, meirgí, scáileán glasála, aipeanna
 settings-page-accessibility = Inrochtaineacht
     .keywords = a11y, rochtain uilíoch, léitheoir scáileáin, orca, súmáil, formhéadaitheoir, téacs mór, codarsnacht ard, codarsnacht, laghdaigh beochan, laghdaigh gluaiseacht, méid an chúrsóra, méarchlár ar an scáileán, méarchlár scáileáin, eochracha greamaitheacha, eochracha malla, eochracha preabtha, eochracha luiche, cliceáil fanachta, cliceáil ar foluain, deaschliceáil, aimsigh an pointeoir, foláirimh amhairc, splanc, éisteacht, radharc

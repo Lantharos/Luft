@@ -18,6 +18,10 @@ settings-privacy-screen-off-never = Nunca
 settings-privacy-lock-when-off = Bloquear la pantalla cuando se apague
 settings-privacy-lock-after = Bloquear tras
 settings-privacy-lock-after-hint = Cuánto esperar después de que se apague la pantalla
+settings-notifications-show-lock-screen = Mostrar notificaciones en la pantalla de bloqueo
+settings-notifications-content = Mostrar el contenido de los mensajes
+settings-notifications-content-description = Si está desactivado, solo se muestra el nombre de la aplicación
+settings-notifications-content-lock-screen = Mostrar el contenido de los mensajes en la pantalla de bloqueo
 settings-privacy-lock-immediately = Inmediatamente
 
 ## Privacy: location, camera and microphone

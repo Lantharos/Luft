@@ -14,7 +14,6 @@ Strings in Luft's Latvian translation that a native speaker should check: terms 
 - `packages/i18n/glossary/lv.tbx` `firmware`: "aparātprogrammatūra" — long; check it fits in labels
 - `packages/web/ui/locales/lv/ui.ftl` `ui-fingerprint-swipe`: "Pārvelciet ar { $finger } pāri sensoram." — relies on the .inline accusative doubling as the instrumental after "ar"
 - `packages/web/ui/locales/lv/ui.ftl` `ui-split-space`: "Vieta sistēmai Luft" — added "sistēmai" so Luft needn't decline; check it isn't too stiff
-- `apps/settings/locales/lv/settings.ftl` `settings-subpage-back`: "Atpakaļ: { $page }" — avoids declining the page name after "uz"; check it sounds right to screen-reader users
 - `kestrel/ui/locales/lv/shell.ftl` `battery-level`: "Akumulators { $percentage } %, …" — percent with a space, per the Latvian standard; Windows Latvian writes it without
 - `kestrel/ui/locales/lv/shell.ftl` `keys-space`: "Atstarpe" — every other key keeps its printed English label; confirm this mix is what Latvian users expect
 - `packages/web/settings-pages/locales/lv/pages.ftl` `settings-page-about`: "Par sistēmu" — Windows says just "Par"; check which reads better as a sidebar entry

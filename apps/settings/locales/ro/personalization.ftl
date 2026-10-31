@@ -186,43 +186,6 @@ settings-cursors-get = Obține
 settings-cursors-choose-download = Alegeți o descărcare pentru { $name }
 settings-cursors-view-online = Vezi online
 
-## Notifications
-
-settings-notifications-dnd = Nu deranjați
-settings-notifications-dnd-description = Bannerele și sunetele rămân oprite, cu excepția aplicațiilor permise
-settings-notifications-lock-screen = Ecran de blocare
-settings-notifications-show-lock-screen = Afișează notificările pe ecranul de blocare
-settings-notifications-content = Afișează conținutul mesajelor
-settings-notifications-content-description = Când este dezactivat, se afișează doar numele aplicației
-settings-notifications-content-lock-screen = Afișează conținutul mesajelor pe ecranul de blocare
-settings-notifications-apps = Notificări de la aplicații
-settings-notifications-apps-description = Alegeți cum vă notifică fiecare aplicație
-settings-notifications-search = Caută aplicații
-settings-notifications-no-match = Nicio aplicație nu corespunde căutării
-settings-notifications-from = Notificări de la { $app }
-settings-notifications-summary-both = Bannere și ecran de blocare
-settings-notifications-summary-banners = Bannere
-settings-notifications-summary-lock-screen = Ecran de blocare
-settings-notifications-summary-list = Doar în lista de notificări
-settings-notifications-allow = Permite notificările
-settings-notifications-banners = Bannere
-settings-notifications-banners-description = Apar pe ecran când sosesc
-settings-notifications-sound = Sunet
-settings-notifications-sound-description = În modul automat nu se aude nimic dacă aplicația redă propriul sunet
-settings-notifications-sound-automatic = Automat
-settings-notifications-sound-luft = Sunetul Luft
-settings-notifications-sound-app = Sunetul aplicației
-settings-notifications-sound-none = Niciunul
-settings-notifications-dnd-allow = Permite în modul Nu deranjați
-settings-notifications-dnd-allow-description = Urgente înseamnă alarme și apeluri
-settings-notifications-dnd-never = Niciodată
-settings-notifications-dnd-urgent = Doar urgente
-settings-notifications-dnd-always = Întotdeauna
-settings-notifications-keep = Păstrează în lista de notificări
-settings-notifications-keep-description = Altfel dispar după ce li se închide bannerul
-settings-notifications-app-lock-screen = Afișează pe ecranul de blocare
-settings-notifications-done = Gata
-
 ## Window tiling
 
 settings-tiling-mode = Aranjează ferestrele

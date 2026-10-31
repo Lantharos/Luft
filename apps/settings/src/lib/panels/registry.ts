@@ -1,7 +1,6 @@
 import type { Component } from 'svelte';
 import Accessibility from '@lucide/svelte/icons/accessibility';
 import AppWindow from '@lucide/svelte/icons/app-window';
-import Bell from '@lucide/svelte/icons/bell';
 import BatteryCharging from '@lucide/svelte/icons/battery-charging';
 import Bluetooth from '@lucide/svelte/icons/bluetooth';
 import EthernetPort from '@lucide/svelte/icons/ethernet-port';
@@ -70,7 +69,6 @@ const VIEWS: Record<PageId, View> = {
 	appearance: { icon: Palette, load: () => import('./personalization/appearance/AppearancePanel.svelte') },
 	taskbar: { icon: PanelBottom, load: () => import('./personalization/taskbar/TaskbarPanel.svelte') },
 	windows: { icon: AppWindow, load: () => import('./personalization/windows/WindowsPanel.svelte') },
-	notifications: { icon: Bell, load: () => import('./personalization/notifications/NotificationsPanel.svelte') },
 	accessibility: { icon: Accessibility, load: () => import('./personalization/accessibility/AccessibilityPanel.svelte') },
 	apps: { icon: LayoutGrid, load: () => import('./protection/apps/AppsPanel.svelte') },
 	privacy: { icon: Hand, load: () => import('./protection/privacy/PrivacyPanel.svelte') },

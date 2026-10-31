@@ -18,6 +18,10 @@ settings-privacy-screen-off-never = Riamh
 settings-privacy-lock-when-off = Glasáil an scáileán nuair a mhúchtar é
 settings-privacy-lock-after = Glasáil tar éis
 settings-privacy-lock-after-hint = Cé chomh fada is a fhanfar nuair atá an scáileán múchta
+settings-notifications-show-lock-screen = Taispeáin fógraí ar an scáileán glasála
+settings-notifications-content = Taispeáin ábhar teachtaireachtaí
+settings-notifications-content-description = Nuair atá sé seo as, ní thaispeántar ach ainm na haipe
+settings-notifications-content-lock-screen = Taispeáin ábhar teachtaireachtaí ar an scáileán glasála
 settings-privacy-lock-immediately = Láithreach
 
 ## Privacy: location, camera and microphone

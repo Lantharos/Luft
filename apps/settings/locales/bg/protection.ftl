@@ -18,6 +18,10 @@ settings-privacy-screen-off-never = Никога
 settings-privacy-lock-when-off = Заключване на екрана, когато се изключи
 settings-privacy-lock-after = Заключване след
 settings-privacy-lock-after-hint = Колко време да се изчака, след като екранът се изключи
+settings-notifications-show-lock-screen = Показване на известия на заключения екран
+settings-notifications-content = Показване на съдържанието
+settings-notifications-content-description = Когато е изключено, се показва само името на приложението
+settings-notifications-content-lock-screen = Показване на съдържанието на заключения екран
 settings-privacy-lock-immediately = Веднага
 
 ## Privacy: location, camera and microphone

@@ -20,7 +20,6 @@ Strings in Luft's Lithuanian translation that a native speaker should check: ter
 - `packages/web/ui/locales/lt/ui.ftl` `ui-window-maximize`: "Maksimizuoti" — check against Windows' title bar tooltips ("Padidinti" is also seen); same for "Minimizuoti"
 - `packages/web/ui/locales/lt/ui.ftl` `ui-fingerprint-swipe`: "Perbraukite { $finger } per jutiklį." — check the accusative .inline forms fit this verb as well as "Uždėkite"
 - `packages/web/ui/locales/lt/ui.ftl` `ui-fingerprint-duplicate`: "Šis pirštas skaitytuve jau įrašytas, tikriausiai per Windows ar kitą paskyrą." — check the "per" construction reads naturally
-- `apps/settings/locales/lt/settings.ftl` `settings-subpage-back`: "Atgal: { $page }" — avoids declining the page name after "į"; check it sounds right to screen-reader users
 - `packages/web/settings-pages/locales/lt/pages.ftl` `settings-page-power`: "Maitinimas ir akumuliatorius" — Windows' title, but long for the sidebar
 - `packages/web/settings-pages/locales/lt/pages.ftl` `settings-page-mouse`: "Pelė ir jutiklinis kilimėlis" — long for the sidebar
 - `kestrel/ui/locales/lt/shell.ftl` `keys-space`: "Tarpas" — every other key keeps its printed English label; confirm this mix is what Lithuanian users expect

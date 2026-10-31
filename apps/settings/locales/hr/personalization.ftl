@@ -197,43 +197,6 @@ settings-cursors-get = Nabavi
 settings-cursors-choose-download = Odaberite preuzimanje za { $name }
 settings-cursors-view-online = Prikaži na mreži
 
-## Notifications
-
-settings-notifications-dnd = Ne ometaj
-settings-notifications-dnd-description = Natpisi i zvukovi ostaju isključeni, osim za aplikacije kojima to dopustite
-settings-notifications-lock-screen = Zaključani zaslon
-settings-notifications-show-lock-screen = Prikaži obavijesti na zaključanom zaslonu
-settings-notifications-content = Prikaži sadržaj poruka
-settings-notifications-content-description = Kad je isključeno, prikazuje se samo naziv aplikacije
-settings-notifications-content-lock-screen = Prikaži sadržaj poruka na zaključanom zaslonu
-settings-notifications-apps = Obavijesti aplikacija
-settings-notifications-apps-description = Odaberite kako vas svaka aplikacija obavještava
-settings-notifications-search = Pretraži aplikacije
-settings-notifications-no-match = Nijedna aplikacija ne odgovara pretraživanju
-settings-notifications-from = Obavijesti aplikacije { $app }
-settings-notifications-summary-both = Natpisi i zaključani zaslon
-settings-notifications-summary-banners = Natpisi
-settings-notifications-summary-lock-screen = Zaključani zaslon
-settings-notifications-summary-list = Samo popis obavijesti
-settings-notifications-allow = Dopusti obavijesti
-settings-notifications-banners = Natpisi
-settings-notifications-banners-description = Pojavljuju se na zaslonu kad stignu
-settings-notifications-sound = Zvuk
-settings-notifications-sound-description = U automatskom načinu ništa se ne čuje kada aplikacija pusti svoj zvuk
-settings-notifications-sound-automatic = Automatski
-settings-notifications-sound-luft = Luftov zvuk
-settings-notifications-sound-app = Zvuk aplikacije
-settings-notifications-sound-none = Bez zvuka
-settings-notifications-dnd-allow = Dopusti tijekom načina Ne ometaj
-settings-notifications-dnd-allow-description = Hitno znači alarmi i pozivi
-settings-notifications-dnd-never = Nikad
-settings-notifications-dnd-urgent = Samo hitno
-settings-notifications-dnd-always = Uvijek
-settings-notifications-keep = Zadrži na popisu obavijesti
-settings-notifications-keep-description = Inače nestaju čim se njihov natpis zatvori
-settings-notifications-app-lock-screen = Prikaži na zaključanom zaslonu
-settings-notifications-done = Gotovo
-
 ## Window tiling
 
 settings-tiling-mode = Raspored prozora

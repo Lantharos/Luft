@@ -184,43 +184,6 @@ settings-cursors-get = Hanki
 settings-cursors-choose-download = Valitse ladattava versio: { $name }
 settings-cursors-view-online = Näytä verkossa
 
-## Notifications
-
-settings-notifications-dnd = Älä häiritse
-settings-notifications-dnd-description = Bannerit ja äänet eivät ole käytössä, paitsi sallimillasi sovelluksilla
-settings-notifications-lock-screen = Lukitusnäyttö
-settings-notifications-show-lock-screen = Näytä ilmoitukset lukitusnäytössä
-settings-notifications-content = Näytä viestin sisältö
-settings-notifications-content-description = Kun tämä ei ole käytössä, näytetään vain sovelluksen nimi
-settings-notifications-content-lock-screen = Näytä viestin sisältö lukitusnäytössä
-settings-notifications-apps = Sovellusten ilmoitukset
-settings-notifications-apps-description = Valitse, miten kukin sovellus ilmoittaa sinulle
-settings-notifications-search = Hae sovelluksia
-settings-notifications-no-match = Haulla ei löytynyt sovelluksia
-settings-notifications-from = { $app } -sovelluksen ilmoitukset
-settings-notifications-summary-both = Bannerit ja lukitusnäyttö
-settings-notifications-summary-banners = Bannerit
-settings-notifications-summary-lock-screen = Lukitusnäyttö
-settings-notifications-summary-list = Vain ilmoitusluettelo
-settings-notifications-allow = Salli ilmoitukset
-settings-notifications-banners = Bannerit
-settings-notifications-banners-description = Ilmestyvät näytölle saapuessaan
-settings-notifications-sound = Ääni
-settings-notifications-sound-description = Automaattinen on hiljaa, kun sovellus soittaa oman äänensä
-settings-notifications-sound-automatic = Automaattinen
-settings-notifications-sound-luft = Luftin ääni
-settings-notifications-sound-app = Sovelluksen oma ääni
-settings-notifications-sound-none = Ei ääntä
-settings-notifications-dnd-allow = Salli Älä häiritse -tilassa
-settings-notifications-dnd-allow-description = Kiireellisiä ovat hälytykset ja puhelut
-settings-notifications-dnd-never = Ei koskaan
-settings-notifications-dnd-urgent = Vain kiireelliset
-settings-notifications-dnd-always = Aina
-settings-notifications-keep = Säilytä ilmoitusluettelossa
-settings-notifications-keep-description = Muuten ilmoitus poistuu, kun sen banneri sulkeutuu
-settings-notifications-app-lock-screen = Näytä lukitusnäytössä
-settings-notifications-done = Valmis
-
 ## Window tiling
 
 settings-tiling-mode = Järjestä ikkunat

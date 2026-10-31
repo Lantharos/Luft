@@ -16,7 +16,6 @@ settings-page-appearance = Išvaizda
 settings-page-taskbar = Užduočių juosta ir Pradžia
     .keywords = skydelis, dokas, automatiškai slėpti, slėpti automatiškai, slėpti užduočių juostą, plaukiojanti, permatoma, skaidri, prisegtos programos, lygiuotė, lygiavimas, mygtukas pradžia, pradžios mygtukas, start, meniu pradžia, start meniu, gust, paieškos juosta, paleidyklė, launcher, žiniatinklio paieška, paieška internete, paieškos sistema, search engine, ekranai, darbo sritis, darbalaukis, virtualus darbalaukis
 settings-page-windows = Langai
-settings-page-notifications = Pranešimai
     .keywords = netrukdyti, iššokantieji pranešimai, reklamjuostės, užrakinimo ekranas, programos
 settings-page-accessibility = Prieinamumas
     .keywords = a11y, pritaikymas neįgaliesiems, neįgaliesiems, universalioji prieiga, ekrano skaitytuvas, orca, didinimas, didintuvas, lupa, didelis tekstas, didelis kontrastas, kontrastas, mažinti animaciją, mažiau judesio, žymiklio dydis, ekrano klaviatūra, ekraninė klaviatūra, lipnieji klavišai, lėtieji klavišai, atmetimo klavišai, pelės klavišai, spustelėjimas užlaikius, spustelėjimas užvedus, dešinysis spustelėjimas, rasti žymiklį, žymiklio radimas, vaizdiniai įspėjimai, mirksėjimas, klausa, rega

@@ -195,43 +195,6 @@ settings-cursors-get = Laden
 settings-cursors-choose-download = Download für { $name } wählen
 settings-cursors-view-online = Online ansehen
 
-## Notifications
-
-settings-notifications-dnd = Nicht stören
-settings-notifications-dnd-description = Banner und Töne bleiben aus, außer für Apps, die du zulässt
-settings-notifications-lock-screen = Sperrbildschirm
-settings-notifications-show-lock-screen = Benachrichtigungen auf dem Sperrbildschirm anzeigen
-settings-notifications-content = Nachrichteninhalt anzeigen
-settings-notifications-content-description = Wenn aus, wird nur der Name der App angezeigt
-settings-notifications-content-lock-screen = Nachrichteninhalt auf dem Sperrbildschirm anzeigen
-settings-notifications-apps = App-Benachrichtigungen
-settings-notifications-apps-description = Wähl, wie dich jede App benachrichtigt
-settings-notifications-search = Apps suchen
-settings-notifications-no-match = Keine Apps passen zu deiner Suche
-settings-notifications-from = Benachrichtigungen von { $app }
-settings-notifications-summary-both = Banner und Sperrbildschirm
-settings-notifications-summary-banners = Banner
-settings-notifications-summary-lock-screen = Sperrbildschirm
-settings-notifications-summary-list = Nur in der Benachrichtigungsliste
-settings-notifications-allow = Benachrichtigungen zulassen
-settings-notifications-banners = Banner
-settings-notifications-banners-description = Erscheinen beim Eintreffen auf dem Bildschirm
-settings-notifications-sound = Sound
-settings-notifications-sound-description = Automatisch bleibt still, wenn die App ihren eigenen Sound abspielt
-settings-notifications-sound-automatic = Automatisch
-settings-notifications-sound-luft = Sound von Luft
-settings-notifications-sound-app = Eigener Sound der App
-settings-notifications-sound-none = Keiner
-settings-notifications-dnd-allow = Bei „Nicht stören“ zulassen
-settings-notifications-dnd-allow-description = Dringend heißt Wecker und Anrufe
-settings-notifications-dnd-never = Nie
-settings-notifications-dnd-urgent = Nur dringende
-settings-notifications-dnd-always = Immer
-settings-notifications-keep = In der Benachrichtigungsliste behalten
-settings-notifications-keep-description = Sonst verschwinden sie, sobald ihr Banner schließt
-settings-notifications-app-lock-screen = Auf dem Sperrbildschirm anzeigen
-settings-notifications-done = Fertig
-
 ## Window tiling
 
 settings-tiling-mode = Fenster anordnen

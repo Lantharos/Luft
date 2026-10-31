@@ -16,7 +16,6 @@ settings-page-appearance = Pamja
 settings-page-taskbar = Shiriti i detyrave dhe Fillimi
     .keywords = panel, dok, fshihe automatikisht, fshihu automatikisht, fshih shiritin e detyrave, pluskues, i tejdukshëm, transparent, aplikacione të fiksuara, rreshtim, butoni i fillimit, fillimi, menyja e fillimit, start menu, gust, shiriti i kërkimit, nisës, launcher, kërkim në ueb, motor kërkimi, ekranet, hapësirë pune, desktop, desktop virtual
 settings-page-windows = Dritaret
-settings-page-notifications = Njoftimet
     .keywords = mos shqetëso, banera, ekrani i bllokimit, aplikacione
 settings-page-accessibility = Qasshmëria
     .keywords = a11y, qasje universale, lexues ekrani, orca, zmadhim, zmadhues, lupë, tekst i madh, kontrast i lartë, kontrast, pakëso animacionet, pakëso lëvizjet, madhësia e kursorit, tastierë në ekran, tastierë ekrani, taste ngjitëse, taste të ngadalta, taste kërcyese, tastet e miut, klikim me qëndrim, klikim me vendosje, klikim i djathtë, gjej treguesin, sinjalizime pamore, pulsim, dëgjim, shikim

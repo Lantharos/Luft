@@ -186,43 +186,6 @@ settings-cursors-get = Iegūt
 settings-cursors-choose-download = Izvēlieties lejupielādi motīvam { $name }
 settings-cursors-view-online = Skatīt tiešsaistē
 
-## Notifications
-
-settings-notifications-dnd = Netraucēt
-settings-notifications-dnd-description = Reklāmkarogi un skaņas ir izslēgti, izņemot atļautās lietotnes
-settings-notifications-lock-screen = Bloķēšanas ekrāns
-settings-notifications-show-lock-screen = Rādīt paziņojumus bloķēšanas ekrānā
-settings-notifications-content = Rādīt ziņojumu saturu
-settings-notifications-content-description = Ja izslēgts, tiek rādīts tikai lietotnes nosaukums
-settings-notifications-content-lock-screen = Rādīt ziņojumu saturu bloķēšanas ekrānā
-settings-notifications-apps = Lietotņu paziņojumi
-settings-notifications-apps-description = Izvēlieties, kā katra lietotne jums paziņo
-settings-notifications-search = Meklēt lietotnes
-settings-notifications-no-match = Neviena lietotne neatbilst meklētajam
-settings-notifications-from = Paziņojumi no lietotnes { $app }
-settings-notifications-summary-both = Reklāmkarogi un bloķēšanas ekrāns
-settings-notifications-summary-banners = Reklāmkarogi
-settings-notifications-summary-lock-screen = Bloķēšanas ekrāns
-settings-notifications-summary-list = Tikai paziņojumu sarakstā
-settings-notifications-allow = Atļaut paziņojumus
-settings-notifications-banners = Reklāmkarogi
-settings-notifications-banners-description = Parādās ekrānā, kad pienāk
-settings-notifications-sound = Skaņa
-settings-notifications-sound-description = Automātiskajā režīmā nekas neskan, ja lietotne atskaņo savu skaņu
-settings-notifications-sound-automatic = Automātiski
-settings-notifications-sound-luft = Luft skaņa
-settings-notifications-sound-app = Lietotnes skaņa
-settings-notifications-sound-none = Nav
-settings-notifications-dnd-allow = Atļaut režīmā Netraucēt
-settings-notifications-dnd-allow-description = Steidzami ir modinātāji un zvani
-settings-notifications-dnd-never = Nekad
-settings-notifications-dnd-urgent = Tikai steidzamos
-settings-notifications-dnd-always = Vienmēr
-settings-notifications-keep = Paturēt paziņojumu sarakstā
-settings-notifications-keep-description = Citādi tie pazūd, tiklīdz aizveras to reklāmkarogs
-settings-notifications-app-lock-screen = Rādīt bloķēšanas ekrānā
-settings-notifications-done = Gatavs
-
 ## Window tiling
 
 settings-tiling-mode = Kārtot logus

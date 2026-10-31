@@ -16,7 +16,6 @@ settings-page-appearance = Apariencia
 settings-page-taskbar = Barra de tareas e Inicio
     .keywords = panel, dock, ocultar automáticamente, autoocultar, ocultar barra de tareas, flotante, transparente, aplicaciones ancladas, alineación, botón inicio, menú inicio, gust, barra de búsqueda, lanzador, launcher, búsqueda web, buscar en la web, motor de búsqueda, buscador, pantallas, área de trabajo, escritorio, escritorio virtual
 settings-page-windows = Ventanas
-settings-page-notifications = Notificaciones
     .keywords = no molestar, avisos, banners, pantalla de bloqueo, aplicaciones, alertas
 settings-page-accessibility = Accesibilidad
     .keywords = a11y, acceso universal, lector de pantalla, orca, zoom, lupa, ampliación, texto grande, alto contraste, contraste, reducir animaciones, reducir movimiento, tamaño del cursor, teclado en pantalla, teclado virtual, teclas especiales, teclas persistentes, teclas lentas, teclas de rebote, teclas del ratón, clic por permanencia, clic al pasar el ratón, clic derecho, localizar puntero, encontrar puntero, alertas visuales, destello, audición, visión

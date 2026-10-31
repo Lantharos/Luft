@@ -14,7 +14,6 @@ Strings in Luft's Polish translation that a native speaker should check, each li
 - `packages/i18n/glossary/pl.tbx` `remove`, `delete`: both "usunąć" — Polish has no common pair; check the cases where both appear on one screen.
 - `packages/web/ui/locales/pl/ui.ftl` `ui-fingerprint-place`: "Przyłóż { $finger } do czytnika." — relies on .inline being accusative, which equals the nominative for every finger name; check it reads naturally.
 - `packages/web/ui/locales/pl/ui.ftl` `ui-toast-dismiss`: "Odrzuć" — Windows' word for dismissing a notification; "Zamknij" is the alternative.
-- `apps/settings/locales/pl/settings.ftl` `settings-subpage-back`: "Wróć do strony { $page }" — $page stays in the nominative after "strony"; check it reads well with titles like "Zasilanie i bateria".
 - `packages/web/settings-pages/locales/pl/pages.ftl` `settings-page-display`: "Ekrany" — plural because there can be several; Windows says "Ekran".
 - `kestrel/ui/locales/pl/shell.ftl` `keys-delete`: "Delete" — many Polish keyboards print "Del"; check which is more familiar in shortcut labels.
 

@@ -35,6 +35,7 @@ function hide() {
 	fade.finished.then(
 		() => {
 			bubble?.remove();
+			fade.cancel();
 			fading = null;
 		},
 		() => {}

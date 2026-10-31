@@ -1,6 +1,6 @@
 [package]
 name = "meet"
-version = "0.1.0"
+version = "0.1.1"
 description = "Meet Luft: gets a Windows or Linux computer ready for Luft and starts it without a USB stick"
 authors = ["Kristof"]
 license.workspace = true

@@ -109,6 +109,7 @@ settings-taskbar-look-accent = Èmfasi
 settings-taskbar-shape = Forma
 settings-taskbar-shape-bar = D’un costat a l’altre
 settings-taskbar-shape-floating = Flotant
+settings-taskbar-shape-separate = Separada
 settings-taskbar-size = Mida
 settings-taskbar-size-small = Petita
 settings-taskbar-size-medium = Mitjana

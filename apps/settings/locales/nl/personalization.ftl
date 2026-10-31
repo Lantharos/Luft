@@ -109,6 +109,7 @@ settings-taskbar-look-accent = Accent
 settings-taskbar-shape = Vorm
 settings-taskbar-shape-bar = Van rand tot rand
 settings-taskbar-shape-floating = Zwevend
+settings-taskbar-shape-separate = Gescheiden
 settings-taskbar-size = Grootte
 settings-taskbar-size-small = Klein
 settings-taskbar-size-medium = Middel

@@ -109,6 +109,7 @@ settings-taskbar-look-accent = Kiemelőszín
 settings-taskbar-shape = Forma
 settings-taskbar-shape-bar = Széltől szélig
 settings-taskbar-shape-floating = Lebegő
+settings-taskbar-shape-separate = Különálló
 settings-taskbar-size = Méret
 settings-taskbar-size-small = Kicsi
 settings-taskbar-size-medium = Közepes

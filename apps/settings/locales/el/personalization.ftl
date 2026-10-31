@@ -109,6 +109,7 @@ settings-taskbar-look-accent = Χρώμα έμφασης
 settings-taskbar-shape = Σχήμα
 settings-taskbar-shape-bar = Από άκρη σε άκρη
 settings-taskbar-shape-floating = Αιωρούμενη
+settings-taskbar-shape-separate = Χωριστά
 settings-taskbar-size = Μέγεθος
 settings-taskbar-size-small = Μικρή
 settings-taskbar-size-medium = Μεσαία

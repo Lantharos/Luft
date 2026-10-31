@@ -109,6 +109,7 @@ settings-taskbar-look-accent = Колір акценту
 settings-taskbar-shape = Форма
 settings-taskbar-shape-bar = Від краю до краю
 settings-taskbar-shape-floating = Плаваюча
+settings-taskbar-shape-separate = Окрема
 settings-taskbar-size = Розмір
 settings-taskbar-size-small = Мала
 settings-taskbar-size-medium = Середня

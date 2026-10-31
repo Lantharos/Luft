@@ -132,6 +132,12 @@ export async function checkFloating() {
     return floating.x === expected.x && floating.y === expected.y && floating.width === expected.width && floating.height === expected.height;
   }, 'the floating taskbar keeps a margin from the screen edges');
   await eventually(() => edgeGap() === HEIGHTS.normal + FLOATING_MARGIN, 'maximized windows stop above the floating taskbar and its margin');
+  set('taskbar-style', 'separate');
+  const pieces = () => panel().get_children().slice(0, 2);
+  await eventually(() => !panel().reactive && pieces().every(piece => piece.reactive && thickness(piece) === HEIGHTS.normal),
+    'the separate taskbar takes clicks only on its two pieces, each as thick as the taskbar');
+  await eventually(() => edgeGap() === HEIGHTS.normal + FLOATING_MARGIN, 'maximized windows stop above the separate taskbar and its margin');
+  await captureEdge('taskbar-separate');
   set('taskbar-style', 'bar');
 }
 

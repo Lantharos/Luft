@@ -109,6 +109,7 @@ settings-taskbar-look-accent = Korostusväri
 settings-taskbar-shape = Muoto
 settings-taskbar-shape-bar = Reunasta reunaan
 settings-taskbar-shape-floating = Kelluva
+settings-taskbar-shape-separate = Erillinen
 settings-taskbar-size = Koko
 settings-taskbar-size-small = Pieni
 settings-taskbar-size-medium = Keskikokoinen

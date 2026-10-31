@@ -81,6 +81,7 @@
   <enum id="com.lantharos.kestrel.TaskbarStyle">
     <value nick="bar" value="0"/>
     <value nick="floating" value="1"/>
+    <value nick="separate" value="2"/>
   </enum>
 
   <enum id="com.lantharos.kestrel.TaskbarSize">
@@ -394,7 +395,9 @@
       <summary>Whether the taskbar spans the screen or floats above its edge</summary>
       <description>
         'bar' runs along the whole edge. 'floating' leaves a margin
-        around the taskbar and rounds its ends.
+        around the taskbar and rounds its ends. 'separate' floats the
+        Start button and apps, and the status icons and clock, as two
+        pieces of their own with nothing between them.
       </description>
     </key>
     <key name="taskbar-size" enum="com.lantharos.kestrel.TaskbarSize">

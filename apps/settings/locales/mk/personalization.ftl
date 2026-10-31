@@ -109,6 +109,7 @@ settings-taskbar-look-accent = Акцентна
 settings-taskbar-shape = Облик
 settings-taskbar-shape-bar = Од раб до раб
 settings-taskbar-shape-floating = Лебдечка
+settings-taskbar-shape-separate = Одвоено
 settings-taskbar-size = Големина
 settings-taskbar-size-small = Мала
 settings-taskbar-size-medium = Средна

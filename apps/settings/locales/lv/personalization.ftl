@@ -109,6 +109,7 @@ settings-taskbar-look-accent = Akcenta krāsa
 settings-taskbar-shape = Forma
 settings-taskbar-shape-bar = No malas līdz malai
 settings-taskbar-shape-floating = Peldoša
+settings-taskbar-shape-separate = Atdalīta
 settings-taskbar-size = Lielums
 settings-taskbar-size-small = Mazs
 settings-taskbar-size-medium = Vidējs

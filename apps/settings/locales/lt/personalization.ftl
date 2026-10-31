@@ -109,6 +109,7 @@ settings-taskbar-look-accent = Akcentas
 settings-taskbar-shape = Forma
 settings-taskbar-shape-bar = Per visą plotį
 settings-taskbar-shape-floating = Plaukiojanti
+settings-taskbar-shape-separate = Atskira
 settings-taskbar-size = Dydis
 settings-taskbar-size-small = Maža
 settings-taskbar-size-medium = Vidutinė

@@ -109,6 +109,7 @@ settings-taskbar-look-accent = Aċċent
 settings-taskbar-shape = Forma
 settings-taskbar-shape-bar = Minn tarf għal tarf
 settings-taskbar-shape-floating = Fil-wiċċ
+settings-taskbar-shape-separate = Separata
 settings-taskbar-size = Daqs
 settings-taskbar-size-small = Żgħir
 settings-taskbar-size-medium = Medju

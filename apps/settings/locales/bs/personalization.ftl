@@ -120,6 +120,7 @@ settings-taskbar-look-accent = Boja za isticanje
 settings-taskbar-shape = Oblik
 settings-taskbar-shape-bar = Od ruba do ruba
 settings-taskbar-shape-floating = Plutajuća
+settings-taskbar-shape-separate = Odvojeno
 settings-taskbar-size = Veličina
 settings-taskbar-size-small = Mala
 settings-taskbar-size-medium = Srednja

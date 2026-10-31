@@ -109,6 +109,7 @@ settings-taskbar-look-accent = Vurgu
 settings-taskbar-shape = Biçim
 settings-taskbar-shape-bar = Kenardan kenara
 settings-taskbar-shape-floating = Kayan
+settings-taskbar-shape-separate = Ayrık
 settings-taskbar-size = Boyut
 settings-taskbar-size-small = Küçük
 settings-taskbar-size-medium = Orta

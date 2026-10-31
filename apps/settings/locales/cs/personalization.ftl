@@ -109,6 +109,7 @@ settings-taskbar-look-accent = Barva zvýraznění
 settings-taskbar-shape = Tvar
 settings-taskbar-shape-bar = Od okraje k okraji
 settings-taskbar-shape-floating = Plovoucí
+settings-taskbar-shape-separate = Oddělený
 settings-taskbar-size = Velikost
 settings-taskbar-size-small = Malý
 settings-taskbar-size-medium = Střední

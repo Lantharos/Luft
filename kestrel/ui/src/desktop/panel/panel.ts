@@ -106,11 +106,13 @@ export class KestrelPanel {
       name: primary ? 'kestrel-panel-center' : null,
       style_class: 'kestrel-taskbar',
     });
-    this.launcher = createLauncher(actions.start, taskbarPreferences.metrics.button, this.actor, floorAlong(this.actor));
+    const apps = new St.Bin({ child: center });
+    this.launcher = createLauncher(actions.start, taskbarPreferences.metrics.button,
+      () => this.surface?.behind(apps) ?? this.actor, floorAlong(this.actor));
     this.launcher.button.visible = taskbarPreferences.startButton;
     center.add_child(this.launcher.button);
     center.add_child(this.taskbar.actor);
-    this.actor.add_child(center);
+    this.actor.add_child(apps);
 
     const right = this.status = new St.BoxLayout({
       name: primary ? 'kestrel-panel-status' : null,
@@ -144,10 +146,11 @@ export class KestrelPanel {
     localized(this.clockButton, () => (this.clockButton.accessible_name = t('taskbar-notifications-and-date')));
     this.clockButton.connect('clicked', actions.notifications);
     right.add_child(this.clockButton);
-    this.actor.add_child(right);
+    const status = new St.Bin({ child: right });
+    this.actor.add_child(status);
     this.actor.add_child(this.peek.actor);
-    this.surface = new TaskbarSurface(this.actor, this.peek.actor);
-    this.tablet = new TabletTaskbar(this.actor, [center, right], primary, () => this.autoHide.shown);
+    this.surface = new TaskbarSurface(this.actor, this.peek.actor, [apps, status]);
+    this.tablet = new TabletTaskbar(this.actor, [apps, status], primary, () => this.autoHide.shown);
     this.orient();
 
     this.externalSignals.push(
@@ -348,7 +351,7 @@ export class KestrelPanel {
   private syncTablet(immediate = false): void {
     if (taskbarPreferences.touch === this.tablet.shown) return;
     this.stopWaiting();
-    this.peek.actor.visible = !taskbarPreferences.touch;
+    this.surface.syncPeek();
     if (immediate || !this.monitor) this.switchTablet();
     else if (reducedMotion() || taskbarPreferences.edge !== this.edge) this.fadeTablet();
     else this.morphTablet();

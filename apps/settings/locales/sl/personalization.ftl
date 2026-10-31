@@ -109,6 +109,7 @@ settings-taskbar-look-accent = Poudarek
 settings-taskbar-shape = Oblika
 settings-taskbar-shape-bar = Od roba do roba
 settings-taskbar-shape-floating = Plavajoča
+settings-taskbar-shape-separate = Ločeno
 settings-taskbar-size = Velikost
 settings-taskbar-size-small = Majhna
 settings-taskbar-size-medium = Srednja

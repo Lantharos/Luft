@@ -136,6 +136,7 @@ settings-taskbar-look-accent = Accent
 settings-taskbar-shape = Shape
 settings-taskbar-shape-bar = Edge to edge
 settings-taskbar-shape-floating = Floating
+settings-taskbar-shape-separate = Separate
 settings-taskbar-size = Size
 settings-taskbar-size-small = Small
 settings-taskbar-size-medium = Medium

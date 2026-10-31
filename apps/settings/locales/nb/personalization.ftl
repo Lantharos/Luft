@@ -109,6 +109,7 @@ settings-taskbar-look-accent = Aksent
 settings-taskbar-shape = Form
 settings-taskbar-shape-bar = Kant til kant
 settings-taskbar-shape-floating = Flytende
+settings-taskbar-shape-separate = Delt
 settings-taskbar-size = Størrelse
 settings-taskbar-size-small = Liten
 settings-taskbar-size-medium = Middels

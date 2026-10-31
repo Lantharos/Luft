@@ -40,7 +40,7 @@ export class StatusCorner {
   private monitor: Monitor | null = null;
 
   constructor(actions: CornerActions) {
-    this.launcher = createLauncher(actions.start, MARK_SIZE, this.actor);
+    this.launcher = createLauncher(actions.start, MARK_SIZE, () => this.actor);
     this.launcher.button.add_style_class_name('kestrel-corner-start kestrel-glass');
     blurSurface(this.launcher.button, 999);
     const statusBox = new St.BoxLayout({ style_class: 'kestrel-corner-status' });

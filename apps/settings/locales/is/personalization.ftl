@@ -109,6 +109,7 @@ settings-taskbar-look-accent = Áherslulitur
 settings-taskbar-shape = Lögun
 settings-taskbar-shape-bar = Út í jaðra
 settings-taskbar-shape-floating = Fljótandi
+settings-taskbar-shape-separate = Aðskilin
 settings-taskbar-size = Stærð
 settings-taskbar-size-small = Lítil
 settings-taskbar-size-medium = Miðlungs

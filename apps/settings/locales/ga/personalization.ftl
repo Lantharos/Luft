@@ -109,6 +109,7 @@ settings-taskbar-look-accent = Dath béime
 settings-taskbar-shape = Cruth
 settings-taskbar-shape-bar = Ó imeall go himeall
 settings-taskbar-shape-floating = Ar snámh
+settings-taskbar-shape-separate = Scartha
 settings-taskbar-size = Méid
 settings-taskbar-size-small = Beag
 settings-taskbar-size-medium = Meánach

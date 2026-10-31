@@ -1,7 +1,7 @@
 export type Position = 'bottom' | 'left' | 'top' | 'right';
 export type Alignment = 'center' | 'left';
 export type Look = 'glass' | 'solid' | 'transparent' | 'accent';
-export type Style = 'bar' | 'floating';
+export type Style = 'bar' | 'floating' | 'separate';
 export type Size = 'compact' | 'normal' | 'large';
 export type AutoHide = 'never' | 'always' | 'windows';
 export type Displays = 'all' | 'primary';
@@ -84,7 +84,8 @@ export const LOOKS: { value: Look; label: string }[] = [
 
 export const STYLES: { value: Style; label: string }[] = [
 	{ value: 'bar', label: 'settings-taskbar-shape-bar' },
-	{ value: 'floating', label: 'settings-taskbar-shape-floating' }
+	{ value: 'floating', label: 'settings-taskbar-shape-floating' },
+	{ value: 'separate', label: 'settings-taskbar-shape-separate' }
 ];
 
 export const SIZES: { value: Size; label: string }[] = [

@@ -34,6 +34,7 @@
 
 	let metrics = $derived(METRICS[size]);
 	let floating = $derived(style === 'floating');
+	let separate = $derived(style === 'separate');
 	let vertical = $derived(isVertical(position));
 	let shownApps = $derived(vertical ? apps.slice(0, VERTICAL_APPS) : apps);
 	let paint = $derived(appearance.taskbar?.[look]);
@@ -68,11 +69,12 @@
 		class:vertical
 		class:gone={!shown}
 		class:floating
+		class:separate
 		class:aligned={alignment === 'left'}
 		class:hides={autoHide === 'always'}
 		style:--height="{metrics.height}px"
 		style:--button="{metrics.button}px"
-		style:--margin="{floating ? FLOATING_MARGIN : 0}px"
+		style:--margin="{style === 'bar' ? 0 : FLOATING_MARGIN}px"
 		style:--surface={paint?.surface}
 		style:--backdrop={backdrop(paint?.glass ?? null)}
 		style:--ink={paint?.ink}
@@ -425,5 +427,40 @@
 
 	.vertical .time {
 		margin-left: 0;
+	}
+
+	.bar.separate {
+		background: transparent;
+		backdrop-filter: none;
+	}
+
+	.bar.separate .apps,
+	.bar.separate .status {
+		box-sizing: border-box;
+		padding: calc((var(--height) - var(--button)) / 2);
+		border-radius: calc(var(--height) / 2);
+		background: var(--surface);
+		backdrop-filter: var(--backdrop);
+	}
+
+	.bar.separate .status {
+		right: 0;
+		height: var(--height);
+		padding-inline: calc(var(--height) / 3);
+	}
+
+	.bar.separate.aligned:not(.vertical) .apps {
+		left: 0;
+	}
+
+	.bar.separate.vertical .status {
+		bottom: 0;
+		width: var(--height);
+		height: auto;
+		padding: calc(var(--height) / 3) 0;
+	}
+
+	.bar.separate.vertical.aligned .apps {
+		top: 0;
 	}
 </style>

@@ -109,6 +109,7 @@ settings-taskbar-look-accent = Colore principale
 settings-taskbar-shape = Forma
 settings-taskbar-shape-bar = Da bordo a bordo
 settings-taskbar-shape-floating = Flottante
+settings-taskbar-shape-separate = Separata
 settings-taskbar-size = Dimensione
 settings-taskbar-size-small = Piccola
 settings-taskbar-size-medium = Media

@@ -109,6 +109,7 @@ settings-taskbar-look-accent = Accentuation
 settings-taskbar-shape = Forme
 settings-taskbar-shape-bar = Bord à bord
 settings-taskbar-shape-floating = Flottante
+settings-taskbar-shape-separate = Séparée
 settings-taskbar-size = Taille
 settings-taskbar-size-small = Petite
 settings-taskbar-size-medium = Moyenne

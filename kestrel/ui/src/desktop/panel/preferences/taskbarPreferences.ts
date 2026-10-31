@@ -5,7 +5,7 @@ import { isVertical, type Edge } from '../../../shared/layout/edge.js';
 import { tabletMode } from '../tablet/tabletMode.js';
 
 type TaskbarAlignment = 'center' | 'left';
-type TaskbarStyle = 'bar' | 'floating';
+type TaskbarStyle = 'bar' | 'floating' | 'separate';
 type TaskbarSize = 'compact' | 'normal' | 'large';
 type TaskbarAutoHide = 'never' | 'always' | 'windows';
 type TaskbarDisplays = 'all' | 'primary';
@@ -73,12 +73,13 @@ class TaskbarPreferences {
   get metrics(): TaskbarMetrics {
     if (this.touch) return { ...TOUCH, margin: 0, radius: 0, inset: TOUCH_INSET, gap: TOUCH_SLOT_GAP };
     const size = SIZES[this.size];
-    const floating = this.style === 'floating';
+    const style = this.style;
+    const lifted = style !== 'bar';
     return {
       ...size,
-      margin: floating ? FLOATING_MARGIN : 0,
-      radius: floating && this.settings.get_boolean('rounded-window-corners') ? size.thickness / 2 : 0,
-      inset: floating ? Math.round(size.thickness / 4) : BAR_INSET,
+      margin: lifted ? FLOATING_MARGIN : 0,
+      radius: lifted && this.settings.get_boolean('rounded-window-corners') ? size.thickness / 2 : 0,
+      inset: style === 'floating' ? Math.round(size.thickness / 4) : style === 'separate' ? 0 : BAR_INSET,
       gap: SLOT_GAP,
     };
   }

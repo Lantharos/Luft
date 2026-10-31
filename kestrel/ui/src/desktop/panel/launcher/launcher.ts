@@ -36,19 +36,19 @@ export function floorAlong(panel: St.Widget): BackdropOf {
   };
 }
 
-function markPaint(button: St.Button, panel: St.Widget, backdropOf: BackdropOf): () => MarkFills {
+function markPaint(button: St.Button, surface: () => St.Widget, backdropOf: BackdropOf): () => MarkFills {
   let painted = { key: '', fills: { shade: WHITE, ink: WHITE } };
   return () => {
     const foreground = button.peek_theme_node()?.get_foreground_color().to_string() ?? WHITE;
     const paint = appIcons.taskbarPaint;
-    const backdrops = taskbarBackdrops(panel, backdropOf(button));
+    const backdrops = taskbarBackdrops(surface(), backdropOf(button));
     const key = [foreground, paint?.ink, paint?.shade, ...backdrops].join();
     if (key !== painted.key) painted = { key, fills: markFills(foreground, paint, backdrops) };
     return painted.fills;
   };
 }
 
-function animatedMark(button: St.Button, panel: St.Widget, backdropOf: BackdropOf): [St.Widget, (size: number) => void] {
+function animatedMark(button: St.Button, surface: () => St.Widget, backdropOf: BackdropOf): [St.Widget, (size: number) => void] {
   const mark = new St.Widget({ layout_manager: new Clutter.BinLayout() });
   let size = 0;
   const icons = MARK_LAYERS.map(({ direction, pivot: [pivotX, pivotY], halo }) => {
@@ -68,7 +68,7 @@ function animatedMark(button: St.Button, panel: St.Widget, backdropOf: BackdropO
     button.connect('notify::pressed', update);
     return icon;
   });
-  const current = markPaint(button, panel, backdropOf);
+  const current = markPaint(button, surface, backdropOf);
   let painted: MarkFills | null = null;
   const paint = () => {
     const fills = painted = current();
@@ -91,13 +91,13 @@ function animatedMark(button: St.Button, panel: St.Widget, backdropOf: BackdropO
   }];
 }
 
-export function createLauncher(activate: () => void, size: number, panel: St.Widget, backdropOf = wholeFloor): Launcher {
+export function createLauncher(activate: () => void, size: number, surface: () => St.Widget, backdropOf = wholeFloor): Launcher {
   const button = new St.Button({
     style_class: 'kestrel-task-button', clip_to_allocation: true,
     can_focus: true, track_hover: true,
   });
   localized(button, () => (button.accessible_name = t('taskbar-start')));
-  const [mark, resizeMark] = animatedMark(button, panel, backdropOf);
+  const [mark, resizeMark] = animatedMark(button, surface, backdropOf);
   button.child = mark;
   button.connect('clicked', activate);
   const resize = (buttonSize: number) => {

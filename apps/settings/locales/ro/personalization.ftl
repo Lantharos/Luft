@@ -109,6 +109,7 @@ settings-taskbar-look-accent = Accent
 settings-taskbar-shape = Formă
 settings-taskbar-shape-bar = De la margine la margine
 settings-taskbar-shape-floating = Plutitoare
+settings-taskbar-shape-separate = Separată
 settings-taskbar-size = Mărime
 settings-taskbar-size-small = Mică
 settings-taskbar-size-medium = Medie

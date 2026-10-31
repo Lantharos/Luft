@@ -120,6 +120,7 @@ settings-taskbar-look-accent = Theksim
 settings-taskbar-shape = Forma
 settings-taskbar-shape-bar = Nga skaji në skaj
 settings-taskbar-shape-floating = Pezull
+settings-taskbar-shape-separate = E ndarë
 settings-taskbar-size = Madhësia
 settings-taskbar-size-small = I vogël
 settings-taskbar-size-medium = Mesatar

@@ -109,6 +109,7 @@ settings-taskbar-look-accent = Rõhuvärv
 settings-taskbar-shape = Kuju
 settings-taskbar-shape-bar = Servast servani
 settings-taskbar-shape-floating = Hõljuv
+settings-taskbar-shape-separate = Eraldi
 settings-taskbar-size = Suurus
 settings-taskbar-size-small = Väike
 settings-taskbar-size-medium = Keskmine

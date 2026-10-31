@@ -14,6 +14,9 @@ import { connectionName, deviceKind } from './nmUtils.js';
 import { NMVpnToggle } from './vpn.js';
 
 Gio._promisify(NM.Client, 'new_async');
+Gio._promisify(NM.Client.prototype, 'check_connectivity_async');
+
+const RECHECK_SECONDS = [3, 10, 30, 60];
 
 interface AsyncClient {
   new_async(cancellable: Gio.Cancellable | null): Promise<NM.Client>;
@@ -44,6 +47,8 @@ export class Indicator extends SystemIndicator {
   private portalHandler: CaptivePortalHandler | null = null;
   private mainConnection: NM.ActiveConnection | null = null;
   private notification: MessageTray.Notification | null = null;
+  private recheckTimer = 0;
+  private rechecks = 0;
 
   constructor() {
     super();
@@ -113,21 +118,25 @@ export class Indicator extends SystemIndicator {
     if (this.mainConnection) {
       this.mainConnection.connectObject('notify::state', () => this.mainConnectionStateChanged(), this);
       this.mainConnectionStateChanged();
+    } else {
+      this.syncConnectivity();
     }
-
-    this.syncConnectivity();
   }
 
   private mainConnectionStateChanged(): void {
     if (this.mainConnection!.state === NM.ActiveConnectionState.ACTIVATED) this.notification?.destroy();
+    this.syncConnectivity();
   }
 
   private syncConnectivity(): void {
     this.updateIcon();
     if (this.mainConnection == null || this.mainConnection.state !== NM.ActiveConnectionState.ACTIVATED) {
       this.portalHandler!.clear();
+      this.stopRechecking();
       return;
     }
+    if (this.client!.connectivity === NM.ConnectivityState.FULL) this.stopRechecking();
+    else this.recheckLater();
 
     let isPortal = this.client!.connectivity === NM.ConnectivityState.PORTAL;
     if (GLib.getenv('KESTREL_CONNECTIVITY_TEST') != null) isPortal ||= this.client!.connectivity < NM.ConnectivityState.FULL;
@@ -140,6 +149,22 @@ export class Indicator extends SystemIndicator {
     } else {
       this.portalHandler!.clear();
     }
+  }
+
+  /** Connectivity found while a connection is still settling, such as before its default route is set at startup, stays until something changes, so look again a few times. */
+  private recheckLater(): void {
+    if (this.recheckTimer || this.rechecks >= RECHECK_SECONDS.length) return;
+    this.recheckTimer = GLib.timeout_add_seconds(GLib.PRIORITY_LOW, RECHECK_SECONDS[this.rechecks++], () => {
+      this.recheckTimer = 0;
+      this.client!.check_connectivity_async(null).catch(logError);
+      return GLib.SOURCE_REMOVE;
+    });
+  }
+
+  private stopRechecking(): void {
+    if (this.recheckTimer) GLib.source_remove(this.recheckTimer);
+    this.recheckTimer = 0;
+    this.rechecks = 0;
   }
 
   private updateIcon(): void {

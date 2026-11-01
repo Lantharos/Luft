@@ -15,7 +15,7 @@ const CHECKS = 'com.lantharos.KestrelChecks';
 const DOWNLOAD_TIMEOUT = 45000;
 const ACCENT_TOLERANCE = 6;
 const DOWNLOAD: Point = [1146, 198];
-const HEADER_PROGRESS = {x: 510, y: 130, width: 590, height: 45};
+const ROW_PROGRESS = {x: 510, y: 228, width: 690, height: 50};
 const SIDEBAR = {x: 12, y: 60, width: 256};
 const SIDEBAR_POINT: Point = [140, 500];
 const SIDEBAR_STEPS = 10;
@@ -63,7 +63,7 @@ async function checkDownload(updates: Updates) {
 
   updates.app.click(DOWNLOAD);
   let started = 0;
-  await eventually(async () => (started = await updates.progress(HEADER_PROGRESS)) > 0, 'Updates shows the download progress');
+  await eventually(async () => (started = await updates.progress(ROW_PROGRESS)) > 0, 'Updates shows the download progress');
   (await updates.app.frame()).save('settings-updates-downloading');
 
   await followLink('settings', 'kestrel-settings:accounts');
@@ -77,9 +77,9 @@ async function checkDownload(updates: Updates) {
   await followLink('settings', 'kestrel-settings:system');
   await eventually(async () => await updates.progress(SIDEBAR) === 0, 'the sidebar leaves the progress to the Updates page while it is open');
   let back = 0;
-  await eventually(async () => (back = await updates.progress(HEADER_PROGRESS)) > started, 'coming back to Updates shows the download where it is');
+  await eventually(async () => (back = await updates.progress(ROW_PROGRESS)) > started, 'coming back to Updates shows the download where it is');
   (await updates.app.frame()).save('settings-updates-back');
-  await eventually(async () => await updates.progress(HEADER_PROGRESS) > back, 'the download keeps advancing after coming back to Updates');
+  await eventually(async () => await updates.progress(ROW_PROGRESS) > back, 'the download keeps advancing after coming back to Updates');
   require(await updates.downloads() === 1, 'navigating during the download starts no second download');
   return back;
 }
@@ -87,10 +87,10 @@ async function checkDownload(updates: Updates) {
 async function checkReopening(updates: Updates, back: number) {
   await updates.app.close();
   await updates.open({ready: false});
-  await eventually(async () => await updates.progress(HEADER_PROGRESS) > back, 'reopening Settings picks up the running download');
+  await eventually(async () => await updates.progress(ROW_PROGRESS) > back, 'reopening Settings picks up the running download');
   (await updates.app.frame()).save('settings-updates-reopened');
   require(await updates.downloads() === 0, 'reopening Settings during the download starts no second download');
-  await eventually(async () => await updates.progress(HEADER_PROGRESS) === 0, 'the download finishes', DOWNLOAD_TIMEOUT);
+  await eventually(async () => await updates.progress(ROW_PROGRESS) === 0, 'the download finishes', DOWNLOAD_TIMEOUT);
   (await updates.app.settle(() => true)).save('settings-updates-ready');
 }
 

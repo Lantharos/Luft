@@ -18,5 +18,3 @@ export function describe(activity: Activity) {
 
 export const fractionOf = (activity: Activity) => activity.progress?.fraction ?? null;
 
-export const downloading = (activity: Activity) => activity.running === 'download' || activity.running === 'switch';
-

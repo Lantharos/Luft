@@ -5,6 +5,7 @@
 	import type { Activity, ImageOverview, Release } from '#lib/bindings.js';
 	import { named, versionName } from '../headline';
 	import NotesDialog from './NotesDialog.svelte';
+	import Progress from './Progress.svelte';
 
 	interface Props {
 		overview: ImageOverview;
@@ -33,6 +34,10 @@
 	}
 </script>
 
+{#snippet progress()}
+	<Progress {activity} />
+{/snippet}
+
 {#if overview.returning}
 	<Section>
 		<Row title={versionName(overview.returning)} description={t('settings-updates-returning-description')}>
@@ -42,10 +47,12 @@
 	</Section>
 {:else if next}
 	<Section>
-		<Row title={versionName(next)} description={describeNext(next)} truncate>
+		<Row title={versionName(next)} description={describeNext(next)} truncate below={activity.running === 'download' ? progress : undefined}>
 			{#if ready}
 				<button type="button" class="button primary" disabled={busy} onclick={() => attempt(commands.updatesRestart)}>{t('settings-updates-restart-to-install')}</button>
-			{:else if activity.running !== 'download'}
+			{:else if activity.running === 'download'}
+				<button type="button" class="button" onclick={() => attempt(commands.updatesCancel)}>{t('settings-updates-stop')}</button>
+			{:else}
 				<button type="button" class="button primary" disabled={busy} onclick={() => attempt(commands.updatesDownload)}>{t('settings-updates-download')}</button>
 			{/if}
 		</Row>

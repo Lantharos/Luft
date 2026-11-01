@@ -3,6 +3,7 @@
 	import { bytes, Row } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { Activity, ImageOverview, Offer, Variant } from '#lib/bindings.js';
+	import Progress from './Progress.svelte';
 
 	interface Props {
 		overview: ImageOverview;
@@ -32,14 +33,20 @@
 	const describe = (offer: Offer) => [t(REASONS[offer.to]), offer.size ? t('settings-updates-download-size', { size: bytes(offer.size) }) : null].filter(Boolean).join(' · ');
 </script>
 
+{#snippet progress()}
+	<Progress {activity} />
+{/snippet}
+
 {#if overview.switching}
 	<Row title={t(TITLES[overview.switching])} description={t(READY[overview.switching])}>
 		<button type="button" class="button primary" disabled={busy} onclick={() => attempt(commands.updatesRestart)}>{t('settings-updates-restart')}</button>
 	</Row>
 {:else if overview.offer && !overview.returning}
 	{@const offer = overview.offer}
-	<Row title={t(TITLES[offer.to])} description={describe(offer)} truncate>
-		{#if activity.running !== 'switch'}
+	<Row title={t(TITLES[offer.to])} description={describe(offer)} truncate below={activity.running === 'switch' ? progress : undefined}>
+		{#if activity.running === 'switch'}
+			<button type="button" class="button" onclick={() => attempt(commands.updatesCancel)}>{t('settings-updates-stop')}</button>
+		{:else}
 			<button type="button" class="button" disabled={busy} onclick={() => attempt(() => commands.updatesSwitch({ variant: offer.to }))}>{t('settings-updates-switch')}</button>
 		{/if}
 	</Row>

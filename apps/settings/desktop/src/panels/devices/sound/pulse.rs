@@ -4,29 +4,26 @@ use std::rc::Rc;
 
 use libpulse_binding::callbacks::ListResult;
 use libpulse_binding::context::Context;
-use libpulse_binding::context::ext_stream_restore::{self, StreamRestore};
 use libpulse_binding::context::introspect::Introspector;
 use libpulse_binding::context::subscribe::{Facility, InterestMaskSet, Operation};
-use libpulse_binding::proplist::UpdateMode;
 use libpulse_binding::volume::ChannelVolumes;
 use luft_app::Events;
 use sabine::BridgeEvent;
 
 use super::card::Card;
 use super::meter::Meter;
-use super::model::{ALERT_STREAM, Alert, App, Device, SoundSnapshot, State, scaled};
+use super::model::{App, Device, SoundSnapshot, State, scaled};
 use super::service::Command;
 use super::{Direction, Target};
 
 pub const SOUND_CHANGED: BridgeEvent<SoundSnapshot<'static>> = BridgeEvent::new("sound.changed");
-const INITIAL_QUERIES: usize = 6;
+const INITIAL_QUERIES: usize = 5;
 
 type Done = Box<dyn FnOnce(&Pulse)>;
 
 #[derive(Clone)]
 pub struct Pulse {
     context: Rc<RefCell<Context>>,
-    restore: Rc<RefCell<Option<StreamRestore>>>,
     state: Rc<RefCell<State>>,
     meter: Rc<RefCell<Option<Meter>>>,
     metering: Rc<Cell<bool>>,
@@ -46,7 +43,6 @@ impl Pulse {
     pub fn new(context: Rc<RefCell<Context>>, events: Events) -> Self {
         Self {
             context,
-            restore: Rc::default(),
             state: Rc::default(),
             meter: Rc::default(),
             metering: Rc::default(),
@@ -74,12 +70,7 @@ impl Pulse {
                 | InterestMaskSet::SERVER,
             |_| {},
         );
-        let mut restore = context.stream_restore();
-        let pulse = self.clone();
-        restore.set_subscribe_cb(move || pulse.load_alert(Box::new(Pulse::publish)));
-        restore.subscribe(true, |_| {});
         drop(context);
-        *self.restore.borrow_mut() = Some(restore);
         self.load_all();
     }
 
@@ -101,7 +92,6 @@ impl Pulse {
         self.load_inputs(finish());
         self.load_apps(finish());
         self.load_cards(finish());
-        self.load_alert(finish());
     }
 
     fn publish(&self) {
@@ -221,27 +211,6 @@ impl Pulse {
             });
     }
 
-    fn load_alert(&self, done: Done) {
-        let mut restore = self.restore.borrow_mut();
-        let Some(restore) = restore.as_mut() else {
-            return done(self);
-        };
-        let pulse = self.clone();
-        let mut done = once(done);
-        let mut alert = None;
-        restore.read(move |result| match result {
-            ListResult::Item(info) if info.name.as_deref() == Some(ALERT_STREAM) => {
-                alert = Some(Alert::from_restore(info));
-            }
-            ListResult::Item(_) => {}
-            ListResult::End => {
-                pulse.state.borrow_mut().alert = Some(alert.take().unwrap_or_else(Alert::fallback));
-                done(&pulse);
-            }
-            ListResult::Error => done(&pulse),
-        });
-    }
-
     fn update_output(&self, index: u32) {
         let pulse = self.clone();
         self.introspect()
@@ -359,24 +328,6 @@ impl Pulse {
         }
     }
 
-    fn set_alert_volume(&self, fraction: f64) {
-        let state = self.state.borrow();
-        let Some(alert) = &state.alert else {
-            return;
-        };
-        let info = ext_stream_restore::Info {
-            name: Some(ALERT_STREAM.into()),
-            channel_map: alert.map,
-            volume: scaled(&alert.volume, fraction),
-            device: alert.device.clone().map(Into::into),
-            mute: alert.muted,
-        };
-        drop(state);
-        if let Some(restore) = self.restore.borrow_mut().as_mut() {
-            restore.write(UpdateMode::Replace, &[&info], true, |_| {});
-        }
-    }
-
     pub fn handle(&self, command: Command) {
         match command {
             Command::Publish => self.publish(),
@@ -405,7 +356,6 @@ impl Pulse {
                 self.introspect()
                     .move_sink_input_by_index(request.index, request.output, None);
             }
-            Command::SetAlertVolume(request) => self.set_alert_volume(request.volume),
             Command::Meter(request) => {
                 self.metering.set(request.enabled);
                 self.sync_meter();

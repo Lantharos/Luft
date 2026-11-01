@@ -73,11 +73,6 @@ pub struct MoveApp {
 }
 
 #[derive(Deserialize, Type)]
-pub struct AlertVolume {
-    volume: f64,
-}
-
-#[derive(Deserialize, Type)]
 pub struct Meter {
     enabled: bool,
 }
@@ -109,9 +104,6 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         })
         .with("sound_move_app", events, |events, request| {
             service::send(events, Command::MoveApp(request))
-        })
-        .with("sound_set_alert_volume", events, |events, request| {
-            service::send(events, Command::SetAlertVolume(request))
         })
         .with("sound_meter", events, |events, request| {
             service::send(events, Command::Meter(request))

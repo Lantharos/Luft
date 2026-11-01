@@ -20,6 +20,7 @@ struct _ShellSoundPlayer
   GObject parent;
 
   GSettings *settings;
+  GSettings *sounds;
   ShellSoundTheme *theme;
   ShellSoundOutput *output;
   GCancellable *cancellable;
@@ -198,6 +199,12 @@ load_theme (ShellSoundPlayer *player)
 }
 
 static void
+load_volume (ShellSoundPlayer *player)
+{
+  _shell_sound_output_set_volume (player->output, g_settings_get_double (player->sounds, "volume"));
+}
+
+static void
 shell_sound_player_init (ShellSoundPlayer *player)
 {
   player->clips = g_hash_table_new_full (g_str_hash, g_str_equal, g_free,
@@ -207,6 +214,10 @@ shell_sound_player_init (ShellSoundPlayer *player)
   player->settings = g_settings_new ("org.gnome.desktop.sound");
   g_signal_connect_swapped (player->settings, "changed::theme-name", G_CALLBACK (load_theme), player);
   load_theme (player);
+
+  player->sounds = g_settings_new ("com.lantharos.kestrel.sounds");
+  g_signal_connect_swapped (player->sounds, "changed::volume", G_CALLBACK (load_volume), player);
+  load_volume (player);
 }
 
 static void
@@ -217,6 +228,7 @@ shell_sound_player_finalize (GObject *object)
   g_cancellable_cancel (player->cancellable);
   g_clear_object (&player->cancellable);
   g_clear_object (&player->settings);
+  g_clear_object (&player->sounds);
   g_clear_pointer (&player->theme, _shell_sound_theme_free);
   g_clear_pointer (&player->clips, g_hash_table_unref);
   g_clear_pointer (&player->pending, g_hash_table_unref);

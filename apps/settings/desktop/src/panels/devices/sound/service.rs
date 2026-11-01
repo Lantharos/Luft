@@ -16,8 +16,7 @@ use luft_i18n::t;
 
 use super::pulse::Pulse;
 use super::{
-    AlertVolume, Balance, DefaultDevice, Meter, MoveApp, Mute, PortSelection, ProfileSelection,
-    Volume,
+    Balance, DefaultDevice, Meter, MoveApp, Mute, PortSelection, ProfileSelection, Volume,
 };
 use crate::L10N;
 
@@ -32,7 +31,6 @@ pub enum Command {
     SetPort(PortSelection),
     SetProfile(ProfileSelection),
     MoveApp(MoveApp),
-    SetAlertVolume(AlertVolume),
     Meter(Meter),
 }
 

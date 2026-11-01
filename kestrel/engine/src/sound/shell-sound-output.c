@@ -40,6 +40,7 @@ struct _ShellSoundOutput
   gboolean idle_armed;
 
   GArray *voices;
+  float gain;
   gboolean active;
   gboolean broken;
 };
@@ -95,7 +96,7 @@ mix (ShellSoundOutput *output,
 
       source += voice->position * SHELL_SOUND_CHANNELS;
       for (gsize sample = 0; sample < count * SHELL_SOUND_CHANNELS; sample++)
-        destination[sample] += source[sample] * SAMPLE_SCALE;
+        destination[sample] += source[sample] * SAMPLE_SCALE * output->gain;
 
       if (!voice->started)
         {
@@ -326,6 +327,15 @@ _shell_sound_output_play (ShellSoundOutput *output,
   pw_thread_loop_unlock (output->loop);
 }
 
+void
+_shell_sound_output_set_volume (ShellSoundOutput *output,
+                                double            volume)
+{
+  pw_thread_loop_lock (output->loop);
+  output->gain = (float) (volume * volume * volume);
+  pw_thread_loop_unlock (output->loop);
+}
+
 ShellSoundOutput *
 _shell_sound_output_new (ShellSoundStartedFunc started,
                          gpointer              user_data)
@@ -336,6 +346,7 @@ _shell_sound_output_new (ShellSoundStartedFunc started,
 
   output->started = started;
   output->user_data = user_data;
+  output->gain = 1.0f;
   output->voices = g_array_new (FALSE, TRUE, sizeof (Voice));
   g_array_set_clear_func (output->voices, (GDestroyNotify) voice_clear);
 

@@ -1,5 +1,11 @@
 <schemalist>
   <schema id="com.lantharos.kestrel.sounds" path="/com/lantharos/kestrel/sounds/">
+    <key name="volume" type="d">
+      <range min="0" max="1"/>
+      <default>1</default>
+      <summary>Volume of the system sounds</summary>
+      <description>Scales every system sound, on top of the output's own volume.</description>
+    </key>
     <key name="notifications" type="b">
       <default>true</default>
       <summary>Notification sounds</summary>

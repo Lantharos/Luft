@@ -1,7 +1,6 @@
 use std::collections::BTreeMap;
 
 use libpulse_binding::channelmap::Map;
-use libpulse_binding::context::ext_stream_restore;
 use libpulse_binding::context::introspect::{SinkInfo, SinkInputInfo, SourceInfo};
 use libpulse_binding::proplist::properties;
 use libpulse_binding::volume::{ChannelVolumes, Volume};
@@ -9,8 +8,6 @@ use serde::Serialize;
 use specta::Type;
 
 use super::card::{Card, CardView, Port, Ports};
-
-pub const ALERT_STREAM: &str = "sink-input-by-media-role:event";
 
 pub struct Device {
     name: String,
@@ -28,13 +25,6 @@ pub struct App {
     output: u32,
 }
 
-pub struct Alert {
-    pub volume: ChannelVolumes,
-    pub map: Map,
-    pub device: Option<String>,
-    pub muted: bool,
-}
-
 #[derive(Default)]
 pub struct State {
     pub ready: bool,
@@ -44,7 +34,6 @@ pub struct State {
     pub cards: BTreeMap<u32, Card>,
     pub default_output: String,
     pub default_input: String,
-    pub alert: Option<Alert>,
 }
 
 #[derive(Serialize, Type)]
@@ -56,7 +45,6 @@ pub struct SoundSnapshot<'a> {
     cards: Vec<CardView<'a>>,
     default_output: &'a str,
     default_input: &'a str,
-    alert_volume: Option<f64>,
 }
 
 #[derive(Serialize, Type)]
@@ -164,30 +152,6 @@ impl App {
     }
 }
 
-impl Alert {
-    pub fn from_restore(info: &ext_stream_restore::Info) -> Self {
-        Self {
-            volume: info.volume,
-            map: info.channel_map,
-            device: info.device.as_deref().map(str::to_owned),
-            muted: info.mute,
-        }
-    }
-
-    pub fn fallback() -> Self {
-        let mut map = Map::default();
-        map.init_mono();
-        let mut volume = ChannelVolumes::default();
-        volume.set(1, Volume::NORMAL);
-        Self {
-            volume,
-            map,
-            device: None,
-            muted: false,
-        }
-    }
-}
-
 impl State {
     pub fn snapshot(&self) -> SoundSnapshot<'_> {
         SoundSnapshot {
@@ -214,7 +178,6 @@ impl State {
                 .collect(),
             default_output: &self.default_output,
             default_input: &self.default_input,
-            alert_volume: self.alert.as_ref().map(|alert| fraction(&alert.volume)),
         }
     }
 }

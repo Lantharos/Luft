@@ -55,3 +55,5 @@ void              _shell_sound_output_free    (ShellSoundOutput      *output);
 void              _shell_sound_output_connect (ShellSoundOutput      *output);
 void              _shell_sound_output_play    (ShellSoundOutput      *output,
                                                ShellSoundClip        *clip);
+void              _shell_sound_output_set_volume (ShellSoundOutput   *output,
+                                                  double              volume);

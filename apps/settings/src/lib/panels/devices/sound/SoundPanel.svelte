@@ -143,5 +143,5 @@
 		</Section>
 	{/if}
 
-	<SystemSounds volume={sound.alertVolume} />
+	<SystemSounds />
 {/if}

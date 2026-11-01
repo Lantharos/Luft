@@ -16,10 +16,6 @@
 		keyboard: boolean;
 	};
 
-	interface Props {
-		volume: number | null;
-	}
-
 	const KINDS: { key: keyof Kinds; title: string; description: string; preview: string; sound: string }[] = [
 		{ key: 'notifications', title: 'settings-sound-kind-notifications', description: 'settings-sound-kind-notifications.description', preview: 'settings-sound-kind-notifications.preview', sound: 'message-new-instant' },
 		{ key: 'devices', title: 'settings-sound-kind-devices', description: 'settings-sound-kind-devices.description', preview: 'settings-sound-kind-devices.preview', sound: 'device-added' },
@@ -30,12 +26,11 @@
 		{ key: 'keyboard', title: 'settings-sound-kind-keyboard', description: 'settings-sound-kind-keyboard.description', preview: 'settings-sound-kind-keyboard.preview', sound: 'keyboard-tap' }
 	];
 
-	let { volume }: Props = $props();
-
 	const sound = useSettings<{ 'event-sounds': boolean }>('org.gnome.desktop.sound', ['event-sounds']);
-	const kinds = useSettings<Kinds>('com.lantharos.kestrel.sounds', KINDS.map((kind) => kind.key));
+	const kinds = useSettings<Kinds & { volume: number }>('com.lantharos.kestrel.sounds', [...KINDS.map((kind) => kind.key), 'volume']);
 
 	let on = $derived(sound.values['event-sounds'] ?? true);
+	let volume = $derived(kinds.values.volume ?? 1);
 </script>
 
 <Section title={t('settings-sound-system')}>
@@ -43,14 +38,12 @@
 		<Switch label={t('settings-sound-system')} checked={on} onchange={(checked) => sound.set('event-sounds', checked)} />
 	</Row>
 	{#if on}
-		{#if volume !== null}
-			<Row title={t('settings-sound-volume')}>
-				<span class="w-11 text-right tabular-nums">{percent(volume)}</span>
-				{#snippet below()}
-					<Slider label={t('settings-sound-system-volume')} value={volume!} format={percent} onchange={(volume) => commands.soundSetAlertVolume({ volume })} />
-				{/snippet}
-			</Row>
-		{/if}
+		<Row title={t('settings-sound-volume')}>
+			<span class="w-11 text-right tabular-nums">{percent(volume)}</span>
+			{#snippet below()}
+				<Slider label={t('settings-sound-system-volume')} value={volume} format={percent} onchange={(volume) => kinds.set('volume', volume)} />
+			{/snippet}
+		</Row>
 		{#each KINDS as kind (kind.key)}
 			<Row title={t(kind.title)} description={t(kind.description)}>
 				<IconButton icon={Play} label={t(kind.preview)} onclick={() => commands.soundPreview({ name: kind.sound })} />

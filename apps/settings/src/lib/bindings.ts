@@ -438,9 +438,6 @@ export const commands = {
 	soundPreview: (params: {
 		name: string,
 	}, options?: InvokeOptions) => invoke<null>("sound_preview", params, options),
-	soundSetAlertVolume: (params: {
-		volume: number,
-	}, options?: InvokeOptions) => invoke<null>("sound_set_alert_volume", params, options),
 	soundSetBalance: (params: {
 		index: number,
 		balance: number,
@@ -1361,7 +1358,6 @@ export type SoundSnapshot = {
 	cards: CardView[],
 	defaultOutput: string,
 	defaultInput: string,
-	alertVolume: number | null,
 };
 
 export type Ssh = {

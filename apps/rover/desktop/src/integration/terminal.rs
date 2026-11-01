@@ -47,7 +47,7 @@ pub fn open(path: &str, token: Option<&str>) -> Result<(), String> {
 
 fn candidates() -> Vec<PathBuf> {
     let mut programs: Vec<PathBuf> = gio_unix::DesktopAppInfo::new(TERN)
-        .map(|tern| tern.executable())
+        .and_then(|tern| program(&tern))
         .into_iter()
         .collect();
     programs.extend(env::var_os("TERMINAL").map(PathBuf::from));
@@ -63,7 +63,7 @@ fn candidates() -> Vec<PathBuf> {
                         .any(|category| category == TERMINAL_CATEGORY)
                 })
             })
-            .map(|app| app.executable()),
+            .filter_map(|app| program(&app)),
     );
     programs.extend(KNOWN.iter().map(PathBuf::from));
     let mut unique = Vec::with_capacity(programs.len());
@@ -75,6 +75,11 @@ fn candidates() -> Vec<PathBuf> {
         }
     }
     unique
+}
+
+fn program(app: &gio_unix::DesktopAppInfo) -> Option<PathBuf> {
+    let argv = gio::glib::shell_parse_argv(app.commandline()?).ok()?;
+    argv.into_iter().next().map(PathBuf::from)
 }
 
 fn resolve(program: &Path) -> Option<PathBuf> {

@@ -48,13 +48,12 @@ async function unmount(scheme: string) {
   await waitUntil(() => !mounted(scheme), `${scheme} unmounts`);
 }
 
+const enter = () => press(Clutter.KEY_Return);
+
 async function acceptCertificate(app: LuftApp, name: string, act: () => unknown) {
   await changes(app, 'Rover asks whether to trust the certificate', act, DIALOG);
   (await app.frame()).save(`rover-network-${name}-dark`);
-  await changes(app, 'trusting the certificate asks for a password', () => {
-    press(Clutter.KEY_Shift_L, Clutter.KEY_Tab);
-    press(Clutter.KEY_Return);
-  }, DIALOG);
+  await changes(app, 'trusting the certificate asks for a password', enter, DIALOG);
   (await app.frame()).save('rover-network-sign-in-dark');
 }
 
@@ -76,8 +75,6 @@ async function typeAddress(app: LuftApp, address: string, focus: () => unknown) 
   await changes(app, 'Rover lets its path be typed over', focus);
   type(address);
 }
-
-const enter = () => press(Clutter.KEY_Return);
 
 async function checkConnections(app: LuftApp, keyring: ScratchKeyring, ports: Ports) {
   await acceptCertificate(app, 'certificate', () => {});

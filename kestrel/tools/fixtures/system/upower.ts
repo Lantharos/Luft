@@ -83,15 +83,14 @@ export function publishUpower(publish: Publish, calls: string[]) {
     get OnBattery() { return onBattery; },
   }, '/org/freedesktop/UPower');
 
-  function changed(values: Record<string, Value>) {
+  function changed({OnBattery: switched, ...values}: Record<string, Value>) {
     for (const [name, value] of Object.entries(values)) {
-      if (name === 'OnBattery' && typeof value === 'boolean') {
-        onBattery = value;
-        upower.emit_property_changed(name, new GLib.Variant('b', value));
-        continue;
-      }
       device[name] = value;
       for (const exported of [display, battery]) exported.emit_property_changed(name, new GLib.Variant(TYPES[name], value));
+    }
+    if (typeof switched === 'boolean') {
+      onBattery = switched;
+      upower.emit_property_changed('OnBattery', new GLib.Variant('b', switched));
     }
   }
 

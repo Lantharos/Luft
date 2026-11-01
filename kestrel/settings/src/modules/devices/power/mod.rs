@@ -248,6 +248,11 @@ pub async fn start(context: &Context) -> zbus::Result<()> {
                 Some(_) = wake_ups.next() => power.keep_awake_on_power().await,
                 battery = on_battery.changed() => {
                     power.on_battery = battery.unwrap_or(false);
+                    let (charge, left) = tokio::join!(percentage.get(), time_to_empty.get());
+                    power.battery = Reading {
+                        percentage: charge.unwrap_or(power.battery.percentage),
+                        time_to_empty: left.unwrap_or(power.battery.time_to_empty),
+                    };
                     power.configure().await;
                     power.keep_awake_on_power().await;
                     power.battery_changed().await;

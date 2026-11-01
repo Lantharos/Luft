@@ -121,7 +121,7 @@ function stripShift(before: Frame, after: Frame, strip: Area) {
 
 async function checkSabine() {
   await withApp('settings', [], async app => {
-    await show(app, 'appearance');
+    await show(app, 'accessibility');
     const strip = pageStrip(app.window.get_frame_rect());
     const before = await app.frame(strip);
     await scrollOver([strip.x + strip.width / 2, strip.y + strip.height / 2]);

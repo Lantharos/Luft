@@ -12,7 +12,7 @@ settings-protection-set-up = Stilla
 
 settings-privacy-screen-lock = Skjálás
 settings-privacy-screen-off = Slökkt á skjánum
-settings-privacy-screen-off-hint = Stillt á síðunni Orka og rafhlaða
+settings-privacy-screen-off-hint = Stillt í { $page }
 settings-privacy-screen-off-after = Eftir { $duration }
 settings-privacy-screen-off-never = Aldrei
 settings-privacy-lock-when-off = Læsa skjánum þegar slokknar á honum
@@ -26,6 +26,7 @@ settings-privacy-lock-immediately = Strax
 
 ## Privacy: location, camera and microphone
 
+settings-privacy-app-access = Aðgangur forrita
 settings-privacy-location-services = Staðsetningarþjónusta
 settings-privacy-location-services-hint = Leyfir forritum að finna hvar þú ert, fyrir kort, veður og tímabelti
 settings-privacy-camera-allow = Leyfa forritum að nota myndavélina

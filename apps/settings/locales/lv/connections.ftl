@@ -245,6 +245,8 @@ settings-network-proxy-save-failed = Neizdevās saglabāt starpniekservera iesta
 ## Network: VPN
 
 settings-network-vpn = VPN
+settings-network-vpn-off = Izslēgts
+settings-network-vpn-none = Nav iestatīts
 settings-network-vpn-import = Importēt no faila
     .description = WireGuard, OpenVPN un citi VPN konfigurācijas faili
 settings-network-vpn-importing = Importē…

@@ -243,6 +243,8 @@ settings-network-proxy-save-failed = Cilësimet e proxy-t nuk u ruajtën dot
 ## Network: VPN
 
 settings-network-vpn = VPN
+settings-network-vpn-off = Joaktiv
+settings-network-vpn-none = Pa konfiguruar
 settings-network-vpn-import = Importo nga një skedar
     .description = WireGuard, OpenVPN dhe skedarë të tjerë konfigurimi VPN
 settings-network-vpn-importing = Po importohet…

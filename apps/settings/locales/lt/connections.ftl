@@ -247,6 +247,8 @@ settings-network-proxy-save-failed = Nepavyko įrašyti tarpinio serverio nustat
 ## Network: VPN
 
 settings-network-vpn = VPN
+settings-network-vpn-off = Išjungta
+settings-network-vpn-none = Nenustatyta
 settings-network-vpn-import = Importuoti iš failo
     .description = WireGuard, OpenVPN ir kiti VPN konfigūracijos failai
 settings-network-vpn-importing = Importuojama…

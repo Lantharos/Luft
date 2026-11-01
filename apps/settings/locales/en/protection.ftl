@@ -27,8 +27,8 @@ settings-protection-set-up = Set up
 
 settings-privacy-screen-lock = Screen lock
 settings-privacy-screen-off = Screen turns off
-# "Power & Battery" is the name of another Settings page
-settings-privacy-screen-off-hint = Set in Power & Battery
+# $page is the name of the Settings page with the power options
+settings-privacy-screen-off-hint = Set in { $page }
 # $duration is a length of time, such as "5 minutes"
 settings-privacy-screen-off-after = After { $duration }
 settings-privacy-screen-off-never = Never
@@ -44,6 +44,7 @@ settings-privacy-lock-immediately = Immediately
 
 ## Privacy: location, camera and microphone
 
+settings-privacy-app-access = App access
 settings-privacy-location-services = Location services
 settings-privacy-location-services-hint = Lets apps find where you are, for maps, weather and time zones
 settings-privacy-camera-allow = Allow apps to use the camera

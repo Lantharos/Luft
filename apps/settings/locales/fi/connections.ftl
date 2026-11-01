@@ -243,6 +243,8 @@ settings-network-proxy-save-failed = Välityspalvelimen asetuksia ei voitu talle
 ## Network: VPN
 
 settings-network-vpn = VPN
+settings-network-vpn-off = Pois
+settings-network-vpn-none = Ei määritetty
 settings-network-vpn-import = Tuo tiedostosta
     .description = WireGuard-, OpenVPN- ja muut VPN-määritystiedostot
 settings-network-vpn-importing = Tuodaan…

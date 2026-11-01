@@ -12,7 +12,7 @@ settings-protection-set-up = Seadista
 
 settings-privacy-screen-lock = Ekraanilukk
 settings-privacy-screen-off = Ekraan lülitub välja
-settings-privacy-screen-off-hint = Määratakse lehel Toide ja aku
+settings-privacy-screen-off-hint = Määratakse jaotises { $page }
 settings-privacy-screen-off-after = Pärast { $duration }
 settings-privacy-screen-off-never = Mitte kunagi
 settings-privacy-lock-when-off = Lukusta ekraan, kui see välja lülitub
@@ -26,6 +26,7 @@ settings-privacy-lock-immediately = Kohe
 
 ## Privacy: location, camera and microphone
 
+settings-privacy-app-access = Rakenduste juurdepääs
 settings-privacy-location-services = Asukohateenused
 settings-privacy-location-services-hint = Rakendused saavad sinu asukoha teada kaartide, ilma ja ajavööndite jaoks
 settings-privacy-camera-allow = Luba rakendustel kaamerat kasutada

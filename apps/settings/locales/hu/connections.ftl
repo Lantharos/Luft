@@ -243,6 +243,8 @@ settings-network-proxy-save-failed = Nem sikerült menteni a proxybeállítások
 ## Network: VPN
 
 settings-network-vpn = VPN
+settings-network-vpn-off = Ki
+settings-network-vpn-none = Nincs beállítva
 settings-network-vpn-import = Importálás fájlból
     .description = WireGuard-, OpenVPN- és egyéb VPN-konfigurációs fájlok
 settings-network-vpn-importing = Importálás…

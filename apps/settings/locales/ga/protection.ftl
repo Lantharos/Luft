@@ -12,7 +12,7 @@ settings-protection-set-up = Socraigh
 
 settings-privacy-screen-lock = Glas scáileáin
 settings-privacy-screen-off = Múchtar an scáileán
-settings-privacy-screen-off-hint = Socraigh é ar an leathanach Cumhacht agus ceallra
+settings-privacy-screen-off-hint = Socraítear é in { $page }
 settings-privacy-screen-off-after = Tar éis { $duration }
 settings-privacy-screen-off-never = Riamh
 settings-privacy-lock-when-off = Glasáil an scáileán nuair a mhúchtar é
@@ -26,6 +26,7 @@ settings-privacy-lock-immediately = Láithreach
 
 ## Privacy: location, camera and microphone
 
+settings-privacy-app-access = Rochtain aipeanna
 settings-privacy-location-services = Seirbhísí suímh
 settings-privacy-location-services-hint = Ligeann sé d’aipeanna d’áit a aimsiú, le haghaidh léarscáileanna, na haimsire agus criosanna ama
 settings-privacy-camera-allow = Lig d’aipeanna an ceamara a úsáid

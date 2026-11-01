@@ -12,7 +12,7 @@ settings-protection-set-up = Konfiguro
 
 settings-privacy-screen-lock = Bllokimi i ekranit
 settings-privacy-screen-off = Ekrani fiket
-settings-privacy-screen-off-hint = Caktohet te Energjia dhe bateria
+settings-privacy-screen-off-hint = Caktohet te { $page }
 settings-privacy-screen-off-after = Pas { $duration }
 settings-privacy-screen-off-never = Asnjëherë
 settings-privacy-lock-when-off = Blloko ekranin kur fiket
@@ -26,6 +26,7 @@ settings-privacy-lock-immediately = Menjëherë
 
 ## Privacy: location, camera and microphone
 
+settings-privacy-app-access = Qasja e aplikacioneve
 settings-privacy-location-services = Shërbimet e vendndodhjes
 settings-privacy-location-services-hint = U lejon aplikacioneve të gjejnë ku je, për hartat, motin dhe zonat kohore
 settings-privacy-camera-allow = Lejo aplikacionet të përdorin kamerën

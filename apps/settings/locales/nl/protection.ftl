@@ -12,7 +12,7 @@ settings-protection-set-up = Instellen
 
 settings-privacy-screen-lock = Schermvergrendeling
 settings-privacy-screen-off = Scherm gaat uit
-settings-privacy-screen-off-hint = In te stellen bij Energie & batterij
+settings-privacy-screen-off-hint = In te stellen bij { $page }
 settings-privacy-screen-off-after = Na { $duration }
 settings-privacy-screen-off-never = Nooit
 settings-privacy-lock-when-off = Scherm vergrendelen als het uitgaat
@@ -26,6 +26,7 @@ settings-privacy-lock-immediately = Meteen
 
 ## Privacy: location, camera and microphone
 
+settings-privacy-app-access = Toegang voor apps
 settings-privacy-location-services = Locatievoorzieningen
 settings-privacy-location-services-hint = Laat apps zien waar je bent, voor kaarten, weer en tijdzones
 settings-privacy-camera-allow = Apps toegang geven tot de camera

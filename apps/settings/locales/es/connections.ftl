@@ -243,6 +243,8 @@ settings-network-proxy-save-failed = No se ha podido guardar la configuración d
 ## Network: VPN
 
 settings-network-vpn = VPN
+settings-network-vpn-off = Desactivado
+settings-network-vpn-none = Sin configurar
 settings-network-vpn-import = Importar desde un archivo
     .description = Archivos de configuración de WireGuard, OpenVPN y otras VPN
 settings-network-vpn-importing = Importando…

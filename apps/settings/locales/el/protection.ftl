@@ -12,7 +12,7 @@ settings-protection-set-up = Ρύθμιση
 
 settings-privacy-screen-lock = Κλείδωμα οθόνης
 settings-privacy-screen-off = Σβήσιμο οθόνης
-settings-privacy-screen-off-hint = Ορίζεται στη σελίδα «Ενέργεια και μπαταρία»
+settings-privacy-screen-off-hint = Ρυθμίζεται στην ενότητα { $page }
 settings-privacy-screen-off-after = Μετά από { $duration }
 settings-privacy-screen-off-never = Ποτέ
 settings-privacy-lock-when-off = Κλείδωμα της οθόνης όταν σβήνει
@@ -26,6 +26,7 @@ settings-privacy-lock-immediately = Αμέσως
 
 ## Privacy: location, camera and microphone
 
+settings-privacy-app-access = Πρόσβαση εφαρμογών
 settings-privacy-location-services = Υπηρεσίες τοποθεσίας
 settings-privacy-location-services-hint = Οι εφαρμογές μπορούν να βρουν πού βρίσκεστε, για χάρτες, καιρό και ζώνες ώρας
 settings-privacy-camera-allow = Να επιτρέπεται στις εφαρμογές η χρήση της κάμερας

@@ -249,6 +249,8 @@ settings-network-proxy-save-failed = Níorbh fhéidir socruithe an tseachfhreast
 ## Network: VPN
 
 settings-network-vpn = VPN
+settings-network-vpn-off = As
+settings-network-vpn-none = Gan socrú
 settings-network-vpn-import = Iompórtáil ó chomhad
     .description = Comhaid chumraíochta WireGuard, OpenVPN agus VPN eile
 settings-network-vpn-importing = Á iompórtáil…

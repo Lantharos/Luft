@@ -243,6 +243,8 @@ settings-network-proxy-save-failed = Чување подешавања прок�
 ## Network: VPN
 
 settings-network-vpn = VPN
+settings-network-vpn-off = Искључено
+settings-network-vpn-none = Није подешено
 settings-network-vpn-import = Увези из датотеке
     .description = WireGuard, OpenVPN и друге датотеке са VPN конфигурацијом
 settings-network-vpn-importing = Увожење…

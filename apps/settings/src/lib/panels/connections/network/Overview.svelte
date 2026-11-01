@@ -23,6 +23,13 @@
 	let { connections, network, proxy, onopen }: Props = $props();
 
 	let activeVpn = $derived(network.vpns.find((vpn) => vpn.state !== 'disconnected'));
+	let vpnSummary = $derived(
+		activeVpn
+			? (connections.problems[activeVpn.connection] ?? t('settings-network-wifi-connected', { network: activeVpn.name }))
+			: network.vpns.length
+				? t('settings-network-vpn-off')
+				: t('settings-network-vpn-none')
+	);
 	let empty = $derived(!network.wifi && !network.airplane && !network.wired.length);
 </script>
 
@@ -47,12 +54,7 @@
 			{/snippet}
 		</ActionRow>
 	{/each}
-	<ActionRow
-		title={t('settings-network-vpn')}
-		icon={Shield}
-		description={activeVpn && (connections.problems[activeVpn.connection] ?? t('settings-network-wifi-connected', { network: activeVpn.name }))}
-		onclick={() => onopen('vpn')}
-	/>
+	<Row title={t('settings-network-vpn')} icon={Shield} description={vpnSummary} onclick={() => onopen('vpn')} />
 	{#if network.airplane}
 		{@const airplane = network.airplane}
 		<Row title={t('settings-network-airplane')} icon={Plane} description={airplane.hardware ? t('settings-network-airplane-hardware') : t('settings-network-airplane.description')}>
@@ -60,7 +62,12 @@
 		</Row>
 	{/if}
 	{#if proxy.available}
-		<ActionRow title={t('settings-network-proxy')} icon={Globe} description={proxy.mode === 'none' ? undefined : proxyLabel(proxy.mode)} onclick={() => onopen('proxy')} />
+		<Row
+			title={t('settings-network-proxy')}
+			icon={Globe}
+			description={proxy.mode === 'none' ? t('settings-network-proxy-off') : proxyLabel(proxy.mode)}
+			onclick={() => onopen('proxy')}
+		/>
 	{/if}
 </Section>
 

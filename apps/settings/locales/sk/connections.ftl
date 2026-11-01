@@ -247,6 +247,8 @@ settings-network-proxy-save-failed = Nastavenia proxy sa nepodarilo uložiť
 ## Network: VPN
 
 settings-network-vpn = VPN
+settings-network-vpn-off = Vypnuté
+settings-network-vpn-none = Nenastavené
 settings-network-vpn-import = Importovať zo súboru
     .description = Konfiguračné súbory WireGuard, OpenVPN a iných VPN
 settings-network-vpn-importing = Importuje sa…

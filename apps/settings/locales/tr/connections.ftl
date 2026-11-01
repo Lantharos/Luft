@@ -243,6 +243,8 @@ settings-network-proxy-save-failed = Ara sunucu ayarları kaydedilemedi
 ## Network: VPN
 
 settings-network-vpn = VPN
+settings-network-vpn-off = Kapalı
+settings-network-vpn-none = Ayarlanmadı
 settings-network-vpn-import = Dosyadan içe aktar
     .description = WireGuard, OpenVPN ve diğer VPN yapılandırma dosyaları
 settings-network-vpn-importing = İçe aktarılıyor…

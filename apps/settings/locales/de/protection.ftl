@@ -12,7 +12,7 @@ settings-protection-set-up = Einrichten
 
 settings-privacy-screen-lock = Bildschirmsperre
 settings-privacy-screen-off = Bildschirm schaltet sich aus
-settings-privacy-screen-off-hint = Unter „Energie und Akku“ einstellen
+settings-privacy-screen-off-hint = Festgelegt unter { $page }
 settings-privacy-screen-off-after = Nach { $duration }
 settings-privacy-screen-off-never = Nie
 settings-privacy-lock-when-off = Bildschirm sperren, wenn er sich ausschaltet
@@ -26,6 +26,7 @@ settings-privacy-lock-immediately = Sofort
 
 ## Privacy: location, camera and microphone
 
+settings-privacy-app-access = App-Zugriff
 settings-privacy-location-services = Ortungsdienste
 settings-privacy-location-services-hint = Lässt Apps herausfinden, wo du bist – für Karten, Wetter und Zeitzonen
 settings-privacy-camera-allow = Apps die Kamera verwenden lassen

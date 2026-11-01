@@ -5,7 +5,7 @@
 	import SubPage from '#lib/components/SubPage.svelte';
 	import type { Wired } from '@luft/network';
 	import type { Target } from '../connection/profile';
-	import { detailRows, speedLabel } from '../describe';
+	import { detailRows } from '../describe';
 	import type { NetworkState } from '../state.svelte';
 
 	interface Props {
@@ -18,8 +18,7 @@
 	let { connections, wired, onconfigure, onclose }: Props = $props();
 
 	function details(wired: Wired) {
-		const speed: [string, string][] = wired.speed ? [[t('settings-network-detail-speed'), speedLabel(wired.speed)]] : [];
-		return wired.details ? [...speed, ...detailRows(wired.details)] : speed;
+		return wired.details ? detailRows(wired.details) : [];
 	}
 </script>
 

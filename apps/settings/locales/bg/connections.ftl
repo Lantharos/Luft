@@ -243,6 +243,8 @@ settings-network-proxy-save-failed = Настройките за прокси н
 ## Network: VPN
 
 settings-network-vpn = VPN
+settings-network-vpn-off = Изключено
+settings-network-vpn-none = Не е настроена
 settings-network-vpn-import = Импортиране от файл
     .description = Конфигурационни файлове за WireGuard, OpenVPN и други VPN
 settings-network-vpn-importing = Импортиране…

@@ -12,7 +12,7 @@ settings-protection-set-up = Konfigurer
 
 settings-privacy-screen-lock = Skjermlås
 settings-privacy-screen-off = Skjermen slås av
-settings-privacy-screen-off-hint = Angis i Strøm og batteri
+settings-privacy-screen-off-hint = Angis under { $page }
 settings-privacy-screen-off-after = Etter { $duration }
 settings-privacy-screen-off-never = Aldri
 settings-privacy-lock-when-off = Lås skjermen når den slås av
@@ -26,6 +26,7 @@ settings-privacy-lock-immediately = Med en gang
 
 ## Privacy: location, camera and microphone
 
+settings-privacy-app-access = Apptilgang
 settings-privacy-location-services = Posisjonstjenester
 settings-privacy-location-services-hint = Lar apper finne ut hvor du er, for kart, vær og tidssoner
 settings-privacy-camera-allow = Tillat at apper bruker kameraet

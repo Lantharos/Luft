@@ -243,6 +243,8 @@ settings-network-proxy-save-failed = Ekki tókst að vista stillingar milliþjó
 ## Network: VPN
 
 settings-network-vpn = VPN
+settings-network-vpn-off = Slökkt
+settings-network-vpn-none = Ekki uppsett
 settings-network-vpn-import = Flytja inn úr skrá
     .description = WireGuard, OpenVPN og aðrar VPN-stillingaskrár
 settings-network-vpn-importing = Flytur inn…

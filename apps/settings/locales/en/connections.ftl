@@ -277,6 +277,8 @@ settings-network-proxy-save-failed = Couldn't save the proxy settings
 ## Network: VPN
 
 settings-network-vpn = VPN
+settings-network-vpn-off = Off
+settings-network-vpn-none = Not set up
 settings-network-vpn-import = Import from a file
     .description = WireGuard, OpenVPN and other VPN configuration files
 settings-network-vpn-importing = Importing…

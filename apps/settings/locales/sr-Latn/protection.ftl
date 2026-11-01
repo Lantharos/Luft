@@ -12,7 +12,7 @@ settings-protection-set-up = Podesi
 
 settings-privacy-screen-lock = Zaključavanje ekrana
 settings-privacy-screen-off = Ekran se isključuje
-settings-privacy-screen-off-hint = Podešava se u odeljku Napajanje i baterija
+settings-privacy-screen-off-hint = Podešava se u odeljku { $page }
 settings-privacy-screen-off-after = { $duration } neaktivnosti
 settings-privacy-screen-off-never = Nikad
 settings-privacy-lock-when-off = Zaključaj ekran kad se isključi
@@ -26,6 +26,7 @@ settings-privacy-lock-immediately = Odmah
 
 ## Privacy: location, camera and microphone
 
+settings-privacy-app-access = Pristup aplikacija
 settings-privacy-location-services = Usluge lokacije
 settings-privacy-location-services-hint = Omogućava aplikacijama da utvrde gde ste, za mape, vremensku prognozu i vremenske zone
 settings-privacy-camera-allow = Dozvoli aplikacijama da koriste kameru

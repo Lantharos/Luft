@@ -12,7 +12,7 @@ settings-protection-set-up = Iestatīt
 
 settings-privacy-screen-lock = Ekrāna bloķēšana
 settings-privacy-screen-off = Ekrāns izslēdzas
-settings-privacy-screen-off-hint = Iestatāms sadaļā Barošana un akumulators
+settings-privacy-screen-off-hint = Iestata sadaļā { $page }
 settings-privacy-screen-off-after = { $duration } bez darbības
 settings-privacy-screen-off-never = Nekad
 settings-privacy-lock-when-off = Bloķēt ekrānu, kad tas izslēdzas
@@ -26,6 +26,7 @@ settings-privacy-lock-immediately = Uzreiz
 
 ## Privacy: location, camera and microphone
 
+settings-privacy-app-access = Lietotņu piekļuve
 settings-privacy-location-services = Atrašanās vietas pakalpojumi
 settings-privacy-location-services-hint = Ļauj lietotnēm noteikt jūsu atrašanās vietu kartēm, laikapstākļiem un laika joslām
 settings-privacy-camera-allow = Atļaut lietotnēm izmantot kameru

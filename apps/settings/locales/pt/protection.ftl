@@ -12,7 +12,7 @@ settings-protection-set-up = Configurar
 
 settings-privacy-screen-lock = Bloqueio do ecrã
 settings-privacy-screen-off = O ecrã desliga-se
-settings-privacy-screen-off-hint = Definido em Energia e bateria
+settings-privacy-screen-off-hint = Definido em { $page }
 settings-privacy-screen-off-after = Após { $duration }
 settings-privacy-screen-off-never = Nunca
 settings-privacy-lock-when-off = Bloquear o ecrã quando se desliga
@@ -26,6 +26,7 @@ settings-privacy-lock-immediately = Imediatamente
 
 ## Privacy: location, camera and microphone
 
+settings-privacy-app-access = Acesso das apps
 settings-privacy-location-services = Serviços de localização
 settings-privacy-location-services-hint = Permite que as aplicações saibam onde está, para mapas, meteorologia e fusos horários
 settings-privacy-camera-allow = Permitir que as aplicações utilizem a câmara

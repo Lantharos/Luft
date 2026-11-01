@@ -12,7 +12,7 @@ settings-protection-set-up = Nastavit
 
 settings-privacy-screen-lock = Zámek obrazovky
 settings-privacy-screen-off = Vypnutí obrazovky
-settings-privacy-screen-off-hint = Nastavuje se na stránce Napájení a baterie
+settings-privacy-screen-off-hint = Nastavuje se v části { $page }
 settings-privacy-screen-off-after = { $duration } nečinnosti
 settings-privacy-screen-off-never = Nikdy
 settings-privacy-lock-when-off = Zamknout obrazovku, když se vypne
@@ -26,6 +26,7 @@ settings-privacy-lock-immediately = Okamžitě
 
 ## Privacy: location, camera and microphone
 
+settings-privacy-app-access = Přístup aplikací
 settings-privacy-location-services = Služby určování polohy
 settings-privacy-location-services-hint = Aplikace můžou zjistit, kde jste, kvůli mapám, počasí a časovým pásmům
 settings-privacy-camera-allow = Povolit aplikacím používat kameru

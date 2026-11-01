@@ -243,6 +243,8 @@ settings-network-proxy-save-failed = Kunne ikkje lagre proxyinnstillingane
 ## Network: VPN
 
 settings-network-vpn = VPN
+settings-network-vpn-off = Av
+settings-network-vpn-none = Ikkje sett opp
 settings-network-vpn-import = Importer frå ei fil
     .description = Konfigurasjonsfiler for WireGuard, OpenVPN og andre VPN-ar
 settings-network-vpn-importing = Importerer …

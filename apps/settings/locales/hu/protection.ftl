@@ -12,7 +12,7 @@ settings-protection-set-up = Beállítás
 
 settings-privacy-screen-lock = Képernyőzár
 settings-privacy-screen-off = Képernyő kikapcsolása
-settings-privacy-screen-off-hint = A Tápellátás és akkumulátor oldalon állítható be
+settings-privacy-screen-off-hint = Beállítás: { $page }
 settings-privacy-screen-off-after = { $duration } után
 settings-privacy-screen-off-never = Soha
 settings-privacy-lock-when-off = Képernyő zárolása kikapcsoláskor
@@ -26,6 +26,7 @@ settings-privacy-lock-immediately = Azonnal
 
 ## Privacy: location, camera and microphone
 
+settings-privacy-app-access = Alkalmazások hozzáférése
 settings-privacy-location-services = Helymeghatározás
 settings-privacy-location-services-hint = Az alkalmazások megtudhatják, hol tartózkodik, például térképekhez, időjáráshoz és időzónákhoz
 settings-privacy-camera-allow = Kamerahasználat engedélyezése az alkalmazásoknak

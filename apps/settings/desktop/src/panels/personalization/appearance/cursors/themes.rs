@@ -50,7 +50,8 @@ fn title(dir: &Path, name: &str) -> String {
         .and_then(|_| index.string("Icon Theme", "Name").ok())
         .map(|title| title.trim().to_string())
         .filter(|title| !title.is_empty())
-        .unwrap_or_else(|| name.replace(['-', '_'], " "))
+        .unwrap_or_else(|| name.to_owned())
+        .replace(['-', '_'], " ")
 }
 
 pub fn list() -> Vec<CursorTheme> {

@@ -3,6 +3,7 @@
 	import { Dialog, longDuration, Row, Section, Select, Switch } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import { app } from '#lib/state/app.svelte.js';
+	import { hardware } from '#lib/state/hardware.svelte.js';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import { days, including } from './format';
 	import MessageContent from './MessageContent.svelte';
@@ -62,7 +63,7 @@
 </script>
 
 <Section title={t('settings-privacy-screen-lock')}>
-	<Row title={t('settings-privacy-screen-off')} description={t('settings-privacy-screen-off-hint')} onclick={() => app.open('power')}>
+	<Row title={t('settings-privacy-screen-off')} description={t('settings-privacy-screen-off-hint', { page: t(hardware.present?.battery ? 'settings-page-power' : 'settings-power-title') })} onclick={() => app.open('power')}>
 		<span>{idle ? t('settings-privacy-screen-off-after', { duration: longDuration(idle) }) : t('settings-privacy-screen-off-never')}</span>
 	</Row>
 	<Row title={t('settings-privacy-lock-when-off')}>
@@ -83,7 +84,7 @@
 	<MessageContent {lockScreen} />
 </Section>
 
-<Section>
+<Section title={t('settings-privacy-app-access')}>
 	<Row title={t('settings-privacy-location-services')} description={t('settings-privacy-location-services-hint')}>
 		<Switch label={t('settings-privacy-location-services')} checked={locating} onchange={(on) => location.set('enabled', on)} />
 	</Row>

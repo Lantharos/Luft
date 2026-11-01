@@ -243,6 +243,8 @@ settings-network-proxy-save-failed = Δεν ήταν δυνατή η αποθή�
 ## Network: VPN
 
 settings-network-vpn = VPN
+settings-network-vpn-off = Ανενεργό
+settings-network-vpn-none = Δεν έχει ρυθμιστεί
 settings-network-vpn-import = Εισαγωγή από αρχείο
     .description = Αρχεία ρυθμίσεων WireGuard, OpenVPN και άλλων VPN
 settings-network-vpn-importing = Εισαγωγή…

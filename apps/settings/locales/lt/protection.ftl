@@ -12,7 +12,7 @@ settings-protection-set-up = Nustatyti
 
 settings-privacy-screen-lock = Ekrano užrakinimas
 settings-privacy-screen-off = Ekrano išjungimas
-settings-privacy-screen-off-hint = Nustatoma skiltyje Maitinimas ir akumuliatorius
+settings-privacy-screen-off-hint = Nustatoma skyriuje „{ $page }“
 settings-privacy-screen-off-after = Po: { $duration }
 settings-privacy-screen-off-never = Niekada
 settings-privacy-lock-when-off = Užrakinti ekraną, kai jis išsijungia
@@ -26,6 +26,7 @@ settings-privacy-lock-immediately = Iš karto
 
 ## Privacy: location, camera and microphone
 
+settings-privacy-app-access = Programų prieiga
 settings-privacy-location-services = Vietos nustatymo paslaugos
 settings-privacy-location-services-hint = Leidžia programoms nustatyti, kur esate, žemėlapiams, orams ir laiko juostoms
 settings-privacy-camera-allow = Leisti programoms naudoti kamerą

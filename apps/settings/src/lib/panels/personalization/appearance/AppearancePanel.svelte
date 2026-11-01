@@ -13,6 +13,7 @@
 	import { wallpaperName } from '../wallpaper/current.svelte';
 	import WallpaperPanel from '../wallpaper/WallpaperPanel.svelte';
 	import AppIconsSection from './AppIconsSection.svelte';
+	import { cursors } from './cursors/cursors.svelte';
 	import CursorSection from './cursors/CursorSection.svelte';
 	import CursorStore from './cursors/CursorStore.svelte';
 	import FontsPage from './fonts/FontsPage.svelte';
@@ -35,6 +36,10 @@
 
 	let font = $derived(appearance.typography.interface ?? fontLibrary.defaults?.interface ?? '');
 	let text = $derived([font, percent(desktop.values['text-scaling-factor'] ?? 1)].filter(Boolean).join(', '));
+	let cursorName = $derived(desktop.values['cursor-theme'] ?? '');
+	let cursorTitle = $derived(cursors.themes?.find((theme) => theme.name === cursorName)?.title ?? cursorName.replace(/[-_]/g, ' '));
+
+	if (!cursors.themes) void cursors.load();
 
 	const open = (section: string | null) => (app.section = section);
 
@@ -80,7 +85,7 @@
 			<RowValue {text} />
 		</Row>
 		<Row title={t('settings-cursors')} icon={MousePointer2} onclick={() => open('cursor')}>
-			<RowValue text={desktop.values['cursor-theme'] ?? 'Adwaita'} />
+			<RowValue text={cursorTitle} />
 		</Row>
 	</Section>
 {/if}

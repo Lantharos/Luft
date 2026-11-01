@@ -12,7 +12,7 @@ settings-protection-set-up = Kur
 
 settings-privacy-screen-lock = Ekran kilidi
 settings-privacy-screen-off = Ekranın kapanması
-settings-privacy-screen-off-hint = Güç ve pil sayfasından ayarlanır
+settings-privacy-screen-off-hint = { $page } bölümünden ayarlanır
 settings-privacy-screen-off-after = { $duration } sonra
 settings-privacy-screen-off-never = Hiçbir zaman
 settings-privacy-lock-when-off = Ekran kapanınca kilitle
@@ -26,6 +26,7 @@ settings-privacy-lock-immediately = Hemen
 
 ## Privacy: location, camera and microphone
 
+settings-privacy-app-access = Uygulama erişimi
 settings-privacy-location-services = Konum hizmetleri
 settings-privacy-location-services-hint = Uygulamaların haritalar, hava durumu ve saat dilimleri için konumunuzu bulmasını sağlar
 settings-privacy-camera-allow = Uygulamaların kamerayı kullanmasına izin ver

@@ -12,7 +12,7 @@ settings-protection-set-up = Configura
 
 settings-privacy-screen-lock = Bloqueig de pantalla
 settings-privacy-screen-off = La pantalla s’apaga
-settings-privacy-screen-off-hint = Es defineix a Energia i bateria
+settings-privacy-screen-off-hint = Es configura a { $page }
 settings-privacy-screen-off-after = Després de { $duration }
 settings-privacy-screen-off-never = Mai
 settings-privacy-lock-when-off = Bloqueja la pantalla quan s’apaga
@@ -26,6 +26,7 @@ settings-privacy-lock-immediately = Immediatament
 
 ## Privacy: location, camera and microphone
 
+settings-privacy-app-access = Accés de les aplicacions
 settings-privacy-location-services = Serveis d’ubicació
 settings-privacy-location-services-hint = Permet que les aplicacions sàpiguen on sou, per als mapes, el temps i la zona horària
 settings-privacy-camera-allow = Permet que les aplicacions facin servir la càmera

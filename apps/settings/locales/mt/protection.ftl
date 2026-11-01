@@ -12,7 +12,7 @@ settings-protection-set-up = Issettja
 
 settings-privacy-screen-lock = Sakkar l-iskrin
 settings-privacy-screen-off = L-iskrin jintefa
-settings-privacy-screen-off-hint = Issettjat f’Enerġija u batterija
+settings-privacy-screen-off-hint = Jiġi ssettjat f’{ $page }
 settings-privacy-screen-off-after = Wara { $duration }
 settings-privacy-screen-off-never = Qatt
 settings-privacy-lock-when-off = Sakkar l-iskrin meta jintefa
@@ -26,6 +26,7 @@ settings-privacy-lock-immediately = Minnufih
 
 ## Privacy: location, camera and microphone
 
+settings-privacy-app-access = Aċċess tal-apps
 settings-privacy-location-services = Servizzi tal-post
 settings-privacy-location-services-hint = Iħalli l-apps isibu fejn tinsab, għall-mapep, it-temp u ż-żoni tal-ħin
 settings-privacy-camera-allow = Ħalli l-apps jużaw il-kamera

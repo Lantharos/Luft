@@ -12,7 +12,7 @@ settings-protection-set-up = Configurează
 
 settings-privacy-screen-lock = Blocarea ecranului
 settings-privacy-screen-off = Oprirea ecranului
-settings-privacy-screen-off-hint = Se setează în Alimentare și baterie
+settings-privacy-screen-off-hint = Se setează în { $page }
 settings-privacy-screen-off-after = După { $duration }
 settings-privacy-screen-off-never = Niciodată
 settings-privacy-lock-when-off = Blochează ecranul când se oprește
@@ -26,6 +26,7 @@ settings-privacy-lock-immediately = Imediat
 
 ## Privacy: location, camera and microphone
 
+settings-privacy-app-access = Accesul aplicațiilor
 settings-privacy-location-services = Servicii de localizare
 settings-privacy-location-services-hint = Permite aplicațiilor să afle unde vă aflați, pentru hărți, vreme și fusuri orare
 settings-privacy-camera-allow = Permite aplicațiilor să folosească camera

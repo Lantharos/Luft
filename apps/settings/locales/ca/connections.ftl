@@ -243,6 +243,8 @@ settings-network-proxy-save-failed = No s’ha pogut desar la configuració del 
 ## Network: VPN
 
 settings-network-vpn = VPN
+settings-network-vpn-off = Desactivat
+settings-network-vpn-none = Sense configurar
 settings-network-vpn-import = Importa des d’un fitxer
     .description = Fitxers de configuració de WireGuard, OpenVPN i altres VPN
 settings-network-vpn-importing = S’està important…

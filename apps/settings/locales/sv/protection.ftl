@@ -12,7 +12,7 @@ settings-protection-set-up = Konfigurera
 
 settings-privacy-screen-lock = Skärmlås
 settings-privacy-screen-off = Skärmen släcks
-settings-privacy-screen-off-hint = Ställs in i Energi och batteri
+settings-privacy-screen-off-hint = Ställs in under { $page }
 settings-privacy-screen-off-after = Efter { $duration }
 settings-privacy-screen-off-never = Aldrig
 settings-privacy-lock-when-off = Lås skärmen när den släcks
@@ -26,6 +26,7 @@ settings-privacy-lock-immediately = Direkt
 
 ## Privacy: location, camera and microphone
 
+settings-privacy-app-access = Appåtkomst
 settings-privacy-location-services = Platstjänster
 settings-privacy-location-services-hint = Låter appar se var du är, för kartor, väder och tidszoner
 settings-privacy-camera-allow = Tillåt att appar använder kameran

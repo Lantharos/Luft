@@ -249,6 +249,8 @@ settings-network-proxy-save-failed = Is-settings tal-proxy ma setgħux jiġu sse
 ## Network: VPN
 
 settings-network-vpn = VPN
+settings-network-vpn-off = Mitfi
+settings-network-vpn-none = Mhux issettjat
 settings-network-vpn-import = Importa minn fajl
     .description = Fajls tal-konfigurazzjoni ta’ WireGuard, OpenVPN u VPNs oħra
 settings-network-vpn-importing = Qed jimporta…

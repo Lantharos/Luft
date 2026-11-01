@@ -243,6 +243,8 @@ settings-network-proxy-save-failed = Kan de proxy-instellingen niet opslaan
 ## Network: VPN
 
 settings-network-vpn = VPN
+settings-network-vpn-off = Uit
+settings-network-vpn-none = Niet ingesteld
 settings-network-vpn-import = Importeren uit een bestand
     .description = Configuratiebestanden van WireGuard, OpenVPN en andere VPN’s
 settings-network-vpn-importing = Importeren…

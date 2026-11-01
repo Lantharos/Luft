@@ -12,7 +12,7 @@ settings-protection-set-up = Määritä
 
 settings-privacy-screen-lock = Näytön lukitus
 settings-privacy-screen-off = Näyttö sammuu
-settings-privacy-screen-off-hint = Määritetään sivulla Virta ja akku
+settings-privacy-screen-off-hint = Asetetaan kohdassa { $page }
 settings-privacy-screen-off-after = Kun { $duration } on kulunut
 settings-privacy-screen-off-never = Ei koskaan
 settings-privacy-lock-when-off = Lukitse näyttö, kun se sammuu
@@ -26,6 +26,7 @@ settings-privacy-lock-immediately = Heti
 
 ## Privacy: location, camera and microphone
 
+settings-privacy-app-access = Sovellusten käyttöoikeudet
 settings-privacy-location-services = Sijaintipalvelut
 settings-privacy-location-services-hint = Sovellukset voivat selvittää sijaintisi karttoja, säätä ja aikavyöhykkeitä varten
 settings-privacy-camera-allow = Salli sovellusten käyttää kameraa

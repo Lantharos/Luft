@@ -243,6 +243,8 @@ settings-network-proxy-save-failed = Puhverserveri sätteid ei õnnestunud salve
 ## Network: VPN
 
 settings-network-vpn = VPN
+settings-network-vpn-off = Väljas
+settings-network-vpn-none = Seadistamata
 settings-network-vpn-import = Impordi failist
     .description = WireGuardi, OpenVPN-i ja muud VPN-i konfiguratsioonifailid
 settings-network-vpn-importing = Importimine…

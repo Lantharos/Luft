@@ -247,6 +247,8 @@ settings-network-proxy-save-failed = Nastavitev posredniškega strežnika ni bil
 ## Network: VPN
 
 settings-network-vpn = VPN
+settings-network-vpn-off = Izklopljeno
+settings-network-vpn-none = Ni nastavljeno
 settings-network-vpn-import = Uvozi iz datoteke
     .description = Datoteke z nastavitvami za WireGuard, OpenVPN in druge VPN-je
 settings-network-vpn-importing = Uvažanje …

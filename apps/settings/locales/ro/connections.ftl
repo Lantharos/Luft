@@ -245,6 +245,8 @@ settings-network-proxy-save-failed = Setările proxy nu au putut fi salvate
 ## Network: VPN
 
 settings-network-vpn = VPN
+settings-network-vpn-off = Dezactivat
+settings-network-vpn-none = Neconfigurat
 settings-network-vpn-import = Importă dintr-un fișier
     .description = Fișiere de configurare WireGuard, OpenVPN și alte fișiere VPN
 settings-network-vpn-importing = Se importă…

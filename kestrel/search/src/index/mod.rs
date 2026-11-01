@@ -65,13 +65,15 @@ impl Indexer {
         } else {
             ON_POWER
         };
-        let deadline = since + interval;
+        let mut deadline = since + interval;
         loop {
             match self
                 .wake
                 .recv_timeout(deadline.saturating_duration_since(Instant::now()))
             {
-                Ok(Wake::Searching) if since.elapsed() < SHORTEST_GAP => continue,
+                Ok(Wake::Searching) if since.elapsed() < SHORTEST_GAP => {
+                    deadline = deadline.min(since + SHORTEST_GAP)
+                }
                 Ok(_) | Err(RecvTimeoutError::Timeout) => return true,
                 Err(RecvTimeoutError::Disconnected) => return false,
             }

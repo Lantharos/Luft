@@ -46,8 +46,12 @@ async function installed(entries: Entry[]) {
 }
 
 const onTop = (window: Meta.Window, other: Meta.Window) => global.display.sort_windows_by_stacking([window, other]).at(-1) === window;
-const taskbarButton = (window: Meta.Window) => named(`kestrel-app-${Shell.WindowTracker.get_default().get_window_app(window).id}`, named('kestrel-panel')!)!;
-const asksForAttention = (window: Meta.Window) => !!firstStyled('kestrel-task-attention', taskbarButton(window))?.visible;
+const taskbarButton = (window: Meta.Window) => named(`kestrel-app-${Shell.WindowTracker.get_default().get_window_app(window).id}`, named('kestrel-panel')!);
+
+function asksForAttention(window: Meta.Window) {
+  const button = taskbarButton(window);
+  return !!button && !!firstStyled('kestrel-task-attention', button)?.visible;
+}
 
 async function focus(window: Meta.Window) {
   window.activate(global.get_current_time());

@@ -1,0 +1,49 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Sun, 1 Nov 2026 20:09:02 +0100
+Subject: [PATCH 59/59] display: finish startups of X11 windows launched before
+ Xwayland ran
+
+When Xwayland starts on demand, a launch made before it ran gets a
+startup sequence Mutter keeps for itself, which is never announced over
+X11. The window's remove message then matches nothing libstartup-notification
+knows, so the app stays starting until the sequence times out and has no
+taskbar entry meanwhile. Finish such a sequence once its window appears.
+
+Upstream-Status: luft-only (pending a look at sending these upstream)
+---
+ src/core/display.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/src/core/display.c b/src/core/display.c
+index f6ddcade6887a366a8527045b58f3ac036f95f53..222054e8fc62d3c842bc9c0750b345e199083555 100644
+--- a/src/core/display.c
++++ b/src/core/display.c
+@@ -2700,6 +2700,16 @@ find_startup_sequence_by_wmclass (MetaDisplay *display,
+   return NULL;
+ }
+ 
++static gboolean
++completes_over_x11 (MetaStartupSequence *sequence)
++{
++#ifdef HAVE_STARTUP_NOTIFICATION
++  return META_IS_STARTUP_SEQUENCE_X11 (sequence);
++#else
++  return FALSE;
++#endif
++}
++
+ /* Sets the initial_timestamp and initial_workspace properties
+  * of a window according to information given us by the
+  * startup-notification library.
+@@ -2796,6 +2806,10 @@ meta_display_apply_startup_properties (MetaDisplay *display,
+           changed_something = TRUE;
+         }
+ 
++      if (window->client_type == META_WINDOW_CLIENT_TYPE_X11 &&
++          !completes_over_x11 (sequence))
++        meta_startup_sequence_complete (sequence);
++
+       return changed_something;
+     }
+   else

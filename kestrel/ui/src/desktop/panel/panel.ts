@@ -63,6 +63,8 @@ export class KestrelPanel {
   private readonly peek = new DesktopPeek();
   private readonly layout = new PanelLayout();
   private readonly surface: TaskbarSurface;
+  private readonly appsIsland: St.Bin;
+  private readonly statusIsland: St.Bin;
   private readonly launcher: Launcher;
   private readonly appSystem = Shell.AppSystem.get_default();
   private readonly tracker = Shell.WindowTracker.get_default();
@@ -107,7 +109,7 @@ export class KestrelPanel {
       name: primary ? 'kestrel-panel-center' : null,
       style_class: 'kestrel-taskbar',
     });
-    const apps = new St.Bin({ child: center });
+    const apps = this.appsIsland = new St.Bin({ child: center });
     this.launcher = createLauncher(actions.start, this.screen.metrics.button,
       () => this.surface?.behind(apps) ?? this.actor, floorAlong(this.actor, () => this.screen));
     this.launcher.button.visible = this.screen.startButton;
@@ -147,7 +149,7 @@ export class KestrelPanel {
     localized(this.clockButton, () => (this.clockButton.accessible_name = t('taskbar-notifications-and-date')));
     this.clockButton.connect('clicked', actions.notifications);
     right.add_child(this.clockButton);
-    const status = new St.Bin({ child: right });
+    const status = this.statusIsland = new St.Bin({ child: right });
     this.actor.add_child(status);
     this.actor.add_child(this.peek.actor);
     this.surface = new TaskbarSurface(this.actor, this.peek.actor, [apps, status], () => this.screen);
@@ -286,6 +288,12 @@ export class KestrelPanel {
         animateActor(this.actor, { opacity: 255, duration: Duration.standard, curve: Curve.decelerate });
       },
     });
+  }
+
+  /** What people see around a surface's button: its island, or the whole taskbar when the islands are joined. */
+  islandFor(surface: string): Clutter.Actor | null {
+    if (!this.buttonFor(surface)) return null;
+    return this.surface.behind(surface === 'start' ? this.appsIsland : this.statusIsland);
   }
 
   buttonFor(surface: string): Clutter.Actor | null {

@@ -77,6 +77,11 @@ export class PanelSet {
     return this.panelOn(monitor)?.buttonFor(surface) ?? null;
   }
 
+  islandFor(surface: string, monitor: Monitor): Clutter.Actor | null {
+    if (!taskbarPreferences.on(monitor.index).shown) return null;
+    return this.panelOn(monitor)?.islandFor(surface) ?? null;
+  }
+
   showCorner(shown: boolean): void {
     this.corner.setShown(shown);
   }

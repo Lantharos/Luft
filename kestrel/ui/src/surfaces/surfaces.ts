@@ -9,7 +9,7 @@ import type { ContextMenus } from '../desktop/menus/contextMenus.js';
 import type { Monitor } from '../desktop/panel/panel.js';
 import type { PanelSet } from '../desktop/panel/panels.js';
 import { taskbarPreferences } from '../desktop/panel/preferences/taskbarPreferences.js';
-import { dock, gap, inset, isVertical, toward, type Along, type Edge, type Inset, type Offset } from '../shared/layout/edge.js';
+import { dock, gap, inset, isVertical, rightToLeft, toward, type Along, type Edge, type Inset, type Offset } from '../shared/layout/edge.js';
 import type { Box } from '../shared/layout/box.js';
 import type { WindowPreviews } from '../desktop/panel/windowPreviews.js';
 import type { TaskView } from '../desktop/taskView/taskView.js';
@@ -147,7 +147,7 @@ export class Surfaces {
       ...notifications ? [['notifications', notifications.actor, 380, notifications.preferredHeight(380, available)] as const] : [],
     ] as const) {
       actor.set_size(width, height);
-      actor.set_position(...dock(area, edge, width, height, this.along(surface, monitor, edge, 'end'), EDGE_MARGIN));
+      actor.set_position(...dock(area, edge, width, height, this.along(surface, monitor, edge, 'end'), this.endMargin(surface, monitor, edge)));
     }
     for (const popup of [clipboard, emoji])
       popup?.place(available, context.layoutManager.getWorkAreaForMonitor(monitor.index));
@@ -278,6 +278,18 @@ export class Surfaces {
 
   private along(surface: Surface, monitor: Monitor, edge: Edge, fallback: Along): Along | number {
     return this.besideButton(surface, monitor, edge) ?? fallback;
+  }
+
+  /** How far a surface stays from the screen's end: level with its taskbar island, or EDGE_MARGIN beside a taskbar that runs to the edge. */
+  private endMargin(surface: Surface, monitor: Monitor, edge: Edge): number {
+    const island = this.parts.panels().islandFor(surface, monitor);
+    if (!island?.mapped) return EDGE_MARGIN;
+    const [x, y] = island.get_transformed_position();
+    const [width, height] = island.get_transformed_size();
+    const gap = isVertical(edge)
+      ? monitor.y + monitor.height - (y + height)
+      : rightToLeft() ? x - monitor.x : monitor.x + monitor.width - (x + width);
+    return gap > 0 ? Math.round(gap) : EDGE_MARGIN;
   }
 
   private besideButton(surface: Surface, monitor: Monitor, edge: Edge): number | null {

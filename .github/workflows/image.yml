@@ -472,3 +472,15 @@ jobs:
               skopeo copy --retry-times 3 --preserve-digests "docker://$IMAGE:$VERSION$suffix" "docker://$IMAGE:$tag$suffix"
             done
           done
+
+  nightly-stick:
+    name: Nightly stick
+    needs: publish
+    if: always() && needs.publish.result == 'success'
+    uses: ./.github/workflows/iso.yml
+    with:
+      channel: nightly
+    secrets: inherit
+    permissions:
+      contents: read
+      packages: read

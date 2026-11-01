@@ -29,7 +29,7 @@ The version is only in the image's labels, the `org.opencontainers.image.version
 | What | When (UTC) |
 | --- | --- |
 | Nightly images | Every day at 02:00, when something changed |
-| Nightly stick | Sundays at 06:00, from the newest nightly |
+| Nightly stick | After every nightly, from that nightly |
 | Stable images and stick | Only when promoted by hand |
 
 A nightly is built when `main` has new commits, Fedora published a new base image, or a package the image adds to Fedora's has an update, which happens most days. The build compares the commit and base image recorded in the last nightly's labels and runs `os/image/build.sh updates` on it, which is `dnf check-upgrade` for the packages Luft adds. When all three match, the night is skipped.
@@ -69,7 +69,7 @@ The stick starts through Fedora's signed shim and GRUB, carries its images so in
 
 | Published at get.luft.computer | Holds |
 | --- | --- |
-| `nightly/luft-VERSION.iso` | The three newest weekly nightly sticks, such as `luft-1.1-nightly.21.iso` |
+| `nightly/luft-VERSION.iso` | The three newest nightly sticks, such as `luft-1.1-nightly.21.iso` |
 | `1/luft-VERSION.iso` | Stable releases, from the first one on |
 | `…/latest.json` | The newest stick in that folder: its `name`, `version`, `size` and `sha256` |
 | `nightly/notes/VERSION.json` | That nightly's changelog |

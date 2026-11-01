@@ -33,3 +33,5 @@ settings-more-fewer = Zobraziť menej
 settings-time-picker = { $label }, { $time }
 settings-time-picker-hour = Hodina
 settings-time-picker-minute = Minúta
+
+settings-color-lightness = Svetlosť

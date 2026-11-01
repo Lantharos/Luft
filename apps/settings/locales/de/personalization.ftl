@@ -17,6 +17,7 @@ settings-appearance-pure-black = Reines Schwarz
 settings-appearance-accent = Akzentfarbe
 settings-appearance-accent-wallpaper = Hintergrundbild
 settings-appearance-accent-white = Weiß
+settings-appearance-accent-custom = Eigene
 settings-appearance-theme-apps = Andere Apps an das Hintergrundbild anpassen
 settings-appearance-theme-apps-description = Andere Apps und Terminals übernehmen dieselben Farben
 
@@ -49,10 +50,14 @@ settings-appearance-rain-intensity = Wie stark es regnet
 settings-appearance-rain-drizzle = Nieselregen
 settings-appearance-rain-rain = Regen
 settings-appearance-rain-storm = Sturm
+settings-appearance-rain-color = Farbe
+settings-appearance-rain-water = Wasser
+settings-appearance-rain-accent = Akzentfarbe
+settings-appearance-rain-custom = Eigene
 settings-appearance-rain-visible = Auf dem Desktop zeigen
 settings-appearance-rain-visible-description = Tropfen landen auf Fenstern und der Taskleiste
 settings-appearance-rain-sound = Ton
-settings-appearance-rain-sound-description = Wird beim Abspielen erzeugt und wiederholt sich nie. Spielt auch hinter Fenstern weiter
+settings-appearance-rain-sound-description = Aufgenommener Regen, bei Gewitter mit Donner. Spielt auch hinter Fenstern weiter
 settings-appearance-rain-volume = Lautstärke des Regens
 
 ## Appearance: app icons

@@ -32,3 +32,5 @@ settings-more-fewer = Afișează mai puține
 settings-time-picker = { $label }, { $time }
 settings-time-picker-hour = Oră
 settings-time-picker-minute = Minut
+
+settings-color-lightness = Luminozitate

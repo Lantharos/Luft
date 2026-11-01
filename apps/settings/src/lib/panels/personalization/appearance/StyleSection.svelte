@@ -7,12 +7,18 @@
 	import TimePicker from '#lib/components/TimePicker.svelte';
 	import { KESTREL_SCHEMA, useSettings } from '#lib/state/gsettings.svelte.js';
 	import { currentWallpaper } from '../wallpaper/current.svelte';
+	import ColorPicker from '#lib/components/color/ColorPicker.svelte';
 	import CornerGlyph from './CornerGlyph.svelte';
 	import MiniDesktop from './MiniDesktop.svelte';
 
+	const HUES = 'conic-gradient(#e5484d, #f5a524, #46a758, #12a5b0, #3e63dd, #8e4ec6, #e5484d)';
+	const FALLBACK_ACCENT = '#3584e4';
+	const ACCENT_LIGHTNESS = 0.72;
+	const ACCENT_CHROMA = { min: 0.03, max: 0.2 };
+
 	type Mode = 'light' | 'dark' | 'auto';
 	type Schedule = 'off' | 'sunset' | 'custom';
-	type Accent = 'wallpaper' | 'white';
+	type Accent = 'wallpaper' | 'white' | 'custom';
 	type Corners = 'rounded' | 'square';
 	type Interface = {
 		'color-scheme': string;
@@ -20,6 +26,7 @@
 	};
 	type Kestrel = {
 		accent: Accent;
+		'accent-color': string;
 		'dark-schedule': Schedule;
 		'dark-schedule-from': number;
 		'dark-schedule-to': number;
@@ -28,7 +35,7 @@
 	};
 
 	const desktop = useSettings<Interface>('org.gnome.desktop.interface', ['color-scheme', 'clock-format']);
-	const kestrel = useSettings<Kestrel>(KESTREL_SCHEMA, ['accent', 'dark-schedule', 'dark-schedule-from', 'dark-schedule-to', 'pure-black', 'rounded-window-corners']);
+	const kestrel = useSettings<Kestrel>(KESTREL_SCHEMA, ['accent', 'accent-color', 'dark-schedule', 'dark-schedule-from', 'dark-schedule-to', 'pure-black', 'rounded-window-corners']);
 	const wallpaper = currentWallpaper();
 
 	let dark = $derived(desktop.values['color-scheme'] === 'prefer-dark');
@@ -47,8 +54,18 @@
 	]);
 	let accents = $derived<{ value: Accent; label: string; color: string }[]>([
 		{ value: 'wallpaper', label: t('settings-appearance-accent-wallpaper'), color: appearance.wallpaperAccent ?? 'var(--accent)' },
-		{ value: 'white', label: t('settings-appearance-accent-white'), color: '#ffffff' }
+		{ value: 'white', label: t('settings-appearance-accent-white'), color: '#ffffff' },
+		{ value: 'custom', label: t('settings-appearance-accent-custom'), color: kestrel.values['accent-color'] || HUES }
 	]);
+	let picking = $state<HTMLElement | null>(null);
+
+	function chooseAccent(accent: Accent, swatch: HTMLElement) {
+		if (accent === 'custom') {
+			if (!kestrel.values['accent-color']) kestrel.set('accent-color', appearance.accent ?? FALLBACK_ACCENT);
+			picking = swatch;
+		}
+		kestrel.set('accent', accent);
+	}
 	let cornerOptions = $derived<{ value: Corners; label: string }[]>([
 		{ value: 'rounded', label: t('settings-appearance-corners-rounded') },
 		{ value: 'square', label: t('settings-appearance-corners-square') }
@@ -76,7 +93,7 @@
 		<div>
 			<span class="caption">{t('settings-appearance-accent')}</span>
 			<span class="flex h-10 items-center">
-				<Swatches label={t('settings-appearance-accent')} options={accents} value={kestrel.values.accent ?? 'wallpaper'} onchange={(value) => kestrel.set('accent', value)} />
+				<Swatches label={t('settings-appearance-accent')} options={accents} value={kestrel.values.accent ?? 'wallpaper'} onchange={chooseAccent} />
 			</span>
 		</div>
 		<div>
@@ -109,6 +126,18 @@
 		</div>
 	{/if}
 </section>
+
+{#if picking}
+	<ColorPicker
+		anchor={picking}
+		label={t('settings-appearance-accent-custom')}
+		color={kestrel.values['accent-color'] || FALLBACK_ACCENT}
+		lightness={ACCENT_LIGHTNESS}
+		chroma={ACCENT_CHROMA}
+		onpick={(color) => kestrel.set('accent-color', color)}
+		onclose={() => (picking = null)}
+	/>
+{/if}
 
 <style>
 	.time {

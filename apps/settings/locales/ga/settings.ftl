@@ -34,3 +34,5 @@ settings-more-fewer = Taispeáin níos lú
 settings-time-picker = { $label }, { $time }
 settings-time-picker-hour = Uair
 settings-time-picker-minute = Nóiméad
+
+settings-color-lightness = Gile

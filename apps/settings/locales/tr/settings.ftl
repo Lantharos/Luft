@@ -31,3 +31,5 @@ settings-more-fewer = Daha az göster
 settings-time-picker = { $label }, { $time }
 settings-time-picker-hour = Saat
 settings-time-picker-minute = Dakika
+
+settings-color-lightness = Açıklık

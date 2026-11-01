@@ -17,6 +17,7 @@ settings-appearance-pure-black = E zezë e plotë
 settings-appearance-accent = Ngjyra e theksimit
 settings-appearance-accent-wallpaper = Sfondi
 settings-appearance-accent-white = E bardhë
+settings-appearance-accent-custom = E personalizuar
 settings-appearance-theme-apps = Përshtat aplikacionet e tjera me sfondin
 settings-appearance-theme-apps-description = Aplikacionet e tjera dhe terminalet marrin të njëjtat ngjyra
 
@@ -49,10 +50,14 @@ settings-appearance-rain-intensity = Sa fort bie shiu
 settings-appearance-rain-drizzle = Vesë
 settings-appearance-rain-rain = Shi
 settings-appearance-rain-storm = Stuhi
+settings-appearance-rain-color = Ngjyra
+settings-appearance-rain-water = Ujë
+settings-appearance-rain-accent = Ngjyra e theksit
+settings-appearance-rain-custom = E personalizuar
 settings-appearance-rain-visible = Shfaqe në desktop
 settings-appearance-rain-visible-description = Pikat bien mbi dritaret dhe shiritin e detyrave
 settings-appearance-rain-sound = Zëri
-settings-appearance-rain-sound-description = Krijohet ndërsa luhet, ndaj nuk përsëritet kurrë. Vazhdon edhe pas dritareve
+settings-appearance-rain-sound-description = Shi i regjistruar, me bubullima në stuhi. Vazhdon edhe pas dritareve
 settings-appearance-rain-volume = Volumi i shiut
 
 ## Appearance: app icons

@@ -31,3 +31,5 @@ settings-more-fewer = Shfaq më pak
 settings-time-picker = { $label }, { $time }
 settings-time-picker-hour = Ora
 settings-time-picker-minute = Minuta
+
+settings-color-lightness = Çelësia

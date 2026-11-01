@@ -17,6 +17,11 @@ settings-appearance-pure-black = Heilt svart
 settings-appearance-accent = Aksentfarge
 settings-appearance-accent-wallpaper = Bakgrunnsbilete
 settings-appearance-accent-white = Kvit
+settings-appearance-accent-custom = Eigendefinert
+settings-appearance-rain-color = Farge
+settings-appearance-rain-water = Vatn
+settings-appearance-rain-accent = Aksentfarge
+settings-appearance-rain-custom = Eigendefinert
 settings-appearance-theme-apps = Tilpass andre appar til bakgrunnsbiletet
 settings-appearance-theme-apps-description = Andre appar og terminalar får dei same fargane
 

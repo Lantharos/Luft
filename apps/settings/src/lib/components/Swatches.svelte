@@ -11,7 +11,7 @@
 		options: Option[];
 		value: T;
 		label: string;
-		onchange: (value: T) => void;
+		onchange: (value: T, swatch: HTMLElement) => void;
 	}
 
 	let { options, value, label, onchange }: Props = $props();
@@ -27,7 +27,7 @@
 			aria-checked={option.value === value}
 			aria-label={option.label}
 			style:background={option.color}
-			onclick={() => onchange(option.value)}
+			onclick={(event) => onchange(option.value, event.currentTarget)}
 			{@attach tooltip(option.label)}
 		></button>
 	{/each}

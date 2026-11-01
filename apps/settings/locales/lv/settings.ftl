@@ -32,3 +32,5 @@ settings-more-fewer = Rādīt mazāk
 settings-time-picker = { $label }, { $time }
 settings-time-picker-hour = Stunda
 settings-time-picker-minute = Minūte
+
+settings-color-lightness = Gaišums

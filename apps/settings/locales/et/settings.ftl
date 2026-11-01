@@ -31,3 +31,5 @@ settings-more-fewer = Kuva vähem
 settings-time-picker = { $label }, { $time }
 settings-time-picker-hour = Tund
 settings-time-picker-minute = Minut
+
+settings-color-lightness = Heledus

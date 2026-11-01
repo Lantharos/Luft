@@ -12,13 +12,20 @@ import { PlaybackConditions } from '../wallpaper/conditions.js';
 import { animateActor, reducedMotion } from '../../shared/motion/motion.js';
 import { DECLARATIONS, MAIN, MAX_SURFACES } from './shader.js';
 import { WEATHER, type Intensity } from './weather.js';
+import { fromHex, type Rgb } from '../../appearance/color.js';
 
 export type Rect = Omit<Monitor, 'index'>;
 
 export interface RainHost {
   monitors(): Monitor[];
   taskbar(monitor: Monitor): Rect | null;
+  accent(): Rgb;
 }
+
+type RainColor = 'water' | 'accent' | 'custom';
+
+const WATER: Rgb = [219, 230, 247];
+const CUSTOM_COLOR = /^#[0-9a-f]{6}$/i;
 
 const SURFACE_TYPES = [Meta.WindowType.NORMAL, Meta.WindowType.DIALOG, Meta.WindowType.MODAL_DIALOG, Meta.WindowType.UTILITY];
 const FADE_DURATION = 600;
@@ -96,7 +103,7 @@ class Sheet {
     this.actor.uniform('rain_size', [monitor.width, monitor.height]);
   }
 
-  paint(time: number, density: number, wind: number, windows: Rect[], taskbar: Rect | null): void {
+  paint(time: number, density: number, wind: number, tint: Rgb, windows: Rect[], taskbar: Rect | null): void {
     const { x, y, width, height } = this.monitor;
     const rects = fitSurfaces(windows
       .filter(rect => rect.x < x + width && rect.x + rect.width > x && rect.y < y + height && rect.y + rect.height > y));
@@ -105,6 +112,7 @@ class Sheet {
     this.actor.uniform('rain_time', [time]);
     this.actor.uniform('rain_density', [density]);
     this.actor.uniform('rain_wind', [wind]);
+    this.actor.uniform('rain_tint', tint.map(channel => channel / 255));
     this.actor.uniform('rain_count', [rects.length]);
     this.actor.uniform('rain_rects', values, 4);
     this.actor.uniform('rain_bar', taskbar ? [taskbar.x - x, taskbar.y - y, taskbar.width, taskbar.height] : [0, 0, 0, 0]);
@@ -195,6 +203,8 @@ export class Rain {
     const time = ((GLib.get_monotonic_time() - this.started) / GLib.USEC_PER_SEC) % TIME_WRAP_S;
     const weather = WEATHER[this.settings.get_string('rain-intensity') as Intensity] ?? WEATHER.rain;
     this.ease(this.raining ? weather.density : 0);
+    const color = this.settings.get_string('rain-color') as RainColor;
+    const tint = color === 'accent' ? this.host.accent() : color === 'custom' ? this.customTint() : WATER;
     const gust = 1 + 0.35 * Math.sin(time * 0.21) + 0.15 * Math.sin(time * 0.73 + 1.3);
     const workspace = global.workspace_manager.get_active_workspace();
     const windows = global.display.sort_windows_by_stacking(workspace.list_windows().filter(window => onScreen(window, workspace)))
@@ -204,8 +214,13 @@ export class Rain {
         return { x, y, width, height };
       });
     for (const sheet of this.sheets) {
-      if (!sheet.destroyed && sheet.actor.visible) sheet.paint(time, this.density, weather.wind * gust, windows, this.host.taskbar(sheet.monitor));
+      if (!sheet.destroyed && sheet.actor.visible) sheet.paint(time, this.density, weather.wind * gust, tint, windows, this.host.taskbar(sheet.monitor));
     }
+  }
+
+  private customTint(): Rgb {
+    const custom = this.settings.get_string('rain-custom-color');
+    return CUSTOM_COLOR.test(custom) ? fromHex(custom) : WATER;
   }
 
   private ease(target: number): void {

@@ -17,6 +17,11 @@ settings-appearance-pure-black = Preto puro
 settings-appearance-accent = Cor de destaque
 settings-appearance-accent-wallpaper = Papel de parede
 settings-appearance-accent-white = Branco
+settings-appearance-accent-custom = Personalizada
+settings-appearance-rain-color = Cor
+settings-appearance-rain-water = Água
+settings-appearance-rain-accent = Cor de destaque
+settings-appearance-rain-custom = Personalizada
 settings-appearance-theme-apps = Combinar outros apps com o papel de parede
 settings-appearance-theme-apps-description = Outros apps e terminais usam as mesmas cores
 

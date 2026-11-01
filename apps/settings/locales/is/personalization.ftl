@@ -17,6 +17,11 @@ settings-appearance-pure-black = Alsvart
 settings-appearance-accent = Áherslulitur
 settings-appearance-accent-wallpaper = Bakgrunnsmynd
 settings-appearance-accent-white = Hvítur
+settings-appearance-accent-custom = Sérsniðinn
+settings-appearance-rain-color = Litur
+settings-appearance-rain-water = Vatn
+settings-appearance-rain-accent = Áherslulitur
+settings-appearance-rain-custom = Sérsniðinn
 settings-appearance-theme-apps = Laga önnur forrit að bakgrunnsmyndinni
 settings-appearance-theme-apps-description = Önnur forrit og skipanagluggar fá sömu liti
 

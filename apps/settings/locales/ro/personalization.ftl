@@ -17,6 +17,11 @@ settings-appearance-pure-black = Negru pur
 settings-appearance-accent = Culoare de accent
 settings-appearance-accent-wallpaper = Imagine de fundal
 settings-appearance-accent-white = Alb
+settings-appearance-accent-custom = Personalizată
+settings-appearance-rain-color = Culoare
+settings-appearance-rain-water = Apă
+settings-appearance-rain-accent = Culoare de accent
+settings-appearance-rain-custom = Personalizată
 settings-appearance-theme-apps = Potrivește alte aplicații cu imaginea de fundal
 settings-appearance-theme-apps-description = Celelalte aplicații și terminalele preiau aceleași culori
 

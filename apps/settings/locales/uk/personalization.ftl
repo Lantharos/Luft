@@ -17,6 +17,11 @@ settings-appearance-pure-black = Чистий чорний
 settings-appearance-accent = Колір акценту
 settings-appearance-accent-wallpaper = Шпалери
 settings-appearance-accent-white = Білий
+settings-appearance-accent-custom = Власний
+settings-appearance-rain-color = Колір
+settings-appearance-rain-water = Вода
+settings-appearance-rain-accent = Колір акценту
+settings-appearance-rain-custom = Власний
 settings-appearance-theme-apps = Підлаштовувати інші програми під шпалери
 settings-appearance-theme-apps-description = Інші програми й термінали отримують ті самі кольори
 

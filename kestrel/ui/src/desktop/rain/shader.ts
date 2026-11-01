@@ -8,6 +8,7 @@ uniform float rain_wind;
 uniform float rain_count;
 uniform vec4 rain_rects[${MAX_SURFACES}];
 uniform vec4 rain_bar;
+uniform vec3 rain_tint;
 
 float rain_hash(vec2 p) {
   vec3 q = fract(vec3(p.xyx) * 0.1031);
@@ -159,5 +160,5 @@ if (p.y <= surf + 6.0 || sheltered < 0.5) {
 }
 float alpha = clamp(rain, 0.0, 1.0);
 float dark = clamp(0.3 * shadow, 0.0, 1.0) * (1.0 - alpha);
-cogl_color_out = vec4(vec3(0.86, 0.9, 0.97) * alpha, alpha + dark);
+cogl_color_out = vec4(rain_tint * alpha, alpha + dark);
 `;

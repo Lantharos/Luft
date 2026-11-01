@@ -31,3 +31,5 @@ settings-more-fewer = Visa färre
 settings-time-picker = { $label }, { $time }
 settings-time-picker-hour = Timme
 settings-time-picker-minute = Minut
+
+settings-color-lightness = Ljushet

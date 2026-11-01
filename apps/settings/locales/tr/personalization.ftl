@@ -17,6 +17,11 @@ settings-appearance-pure-black = Saf siyah
 settings-appearance-accent = Vurgu rengi
 settings-appearance-accent-wallpaper = Duvar kâğıdı
 settings-appearance-accent-white = Beyaz
+settings-appearance-accent-custom = Özel
+settings-appearance-rain-color = Renk
+settings-appearance-rain-water = Su
+settings-appearance-rain-accent = Vurgu rengi
+settings-appearance-rain-custom = Özel
 settings-appearance-theme-apps = Diğer uygulamaları duvar kâğıdına uydur
 settings-appearance-theme-apps-description = Diğer uygulamalar ve terminaller aynı renkleri alır
 

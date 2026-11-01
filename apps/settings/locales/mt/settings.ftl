@@ -34,3 +34,5 @@ settings-more-fewer = Uri inqas
 settings-time-picker = { $label }, { $time }
 settings-time-picker-hour = Siegħa
 settings-time-picker-minute = Minuta
+
+settings-color-lightness = Dawl

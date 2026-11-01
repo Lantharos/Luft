@@ -22,6 +22,7 @@ settings-appearance-accent = Accent color
 # Accent color taken from the wallpaper
 settings-appearance-accent-wallpaper = Wallpaper
 settings-appearance-accent-white = White
+settings-appearance-accent-custom = Custom
 settings-appearance-theme-apps = Match other apps to the wallpaper
 settings-appearance-theme-apps-description = Other apps and terminals take on the same colors
 
@@ -60,10 +61,14 @@ settings-appearance-rain-intensity = How hard it rains
 settings-appearance-rain-drizzle = Drizzle
 settings-appearance-rain-rain = Rain
 settings-appearance-rain-storm = Storm
+settings-appearance-rain-color = Color
+settings-appearance-rain-water = Water
+settings-appearance-rain-accent = Accent color
+settings-appearance-rain-custom = Custom
 settings-appearance-rain-visible = Show on the desktop
 settings-appearance-rain-visible-description = Drops land on windows and the taskbar
 settings-appearance-rain-sound = Sound
-settings-appearance-rain-sound-description = Made as it plays, so it never loops. Keeps playing behind windows
+settings-appearance-rain-sound-description = Recorded rain, with thunder in storms. Keeps playing behind windows
 settings-appearance-rain-volume = Rain volume
 
 ## Appearance: app icons

@@ -17,6 +17,7 @@ settings-appearance-pure-black = Потпуно црна
 settings-appearance-accent = Боја за истицање
 settings-appearance-accent-wallpaper = Позадина
 settings-appearance-accent-white = Бела
+settings-appearance-accent-custom = Прилагођена
 settings-appearance-theme-apps = Усклади друге апликације с позадином
 settings-appearance-theme-apps-description = Друге апликације и терминали добијају исте боје
 
@@ -49,10 +50,14 @@ settings-appearance-rain-intensity = Колико јако пада киша
 settings-appearance-rain-drizzle = Росуља
 settings-appearance-rain-rain = Киша
 settings-appearance-rain-storm = Олуја
+settings-appearance-rain-color = Боја
+settings-appearance-rain-water = Вода
+settings-appearance-rain-accent = Боја истицања
+settings-appearance-rain-custom = Прилагођена
 settings-appearance-rain-visible = Прикажи на радној површини
 settings-appearance-rain-visible-description = Капи падају на прозоре и траку задатака
 settings-appearance-rain-sound = Звук
-settings-appearance-rain-sound-description = Настаје док свира па се никад не понавља. Свира и иза прозора
+settings-appearance-rain-sound-description = Снимљена киша, уз грмљавину у олујама. Свира и иза прозора
 settings-appearance-rain-volume = Јачина кише
 
 ## Appearance: app icons

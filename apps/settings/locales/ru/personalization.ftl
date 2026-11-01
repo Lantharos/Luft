@@ -17,6 +17,11 @@ settings-appearance-pure-black = Чистый чёрный
 settings-appearance-accent = Цвет акцента
 settings-appearance-accent-wallpaper = Из обоев
 settings-appearance-accent-white = Белый
+settings-appearance-accent-custom = Свой
+settings-appearance-rain-color = Цвет
+settings-appearance-rain-water = Вода
+settings-appearance-rain-accent = Акцентный цвет
+settings-appearance-rain-custom = Свой
 settings-appearance-theme-apps = Подстраивать другие приложения под обои
 settings-appearance-theme-apps-description = Другие приложения и терминалы получают те же цвета
 

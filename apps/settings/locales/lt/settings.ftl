@@ -33,3 +33,5 @@ settings-more-fewer = Rodyti mažiau
 settings-time-picker = { $label }, { $time }
 settings-time-picker-hour = Valanda
 settings-time-picker-minute = Minutė
+
+settings-color-lightness = Šviesumas

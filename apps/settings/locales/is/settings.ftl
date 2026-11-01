@@ -31,3 +31,5 @@ settings-more-fewer = Sýna færri
 settings-time-picker = { $label }, { $time }
 settings-time-picker-hour = Klukkustund
 settings-time-picker-minute = Mínúta
+
+settings-color-lightness = Ljósleiki

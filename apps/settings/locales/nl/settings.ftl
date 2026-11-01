@@ -31,3 +31,5 @@ settings-more-fewer = Minder tonen
 settings-time-picker = { $label }, { $time }
 settings-time-picker-hour = Uur
 settings-time-picker-minute = Minuut
+
+settings-color-lightness = Helderheid

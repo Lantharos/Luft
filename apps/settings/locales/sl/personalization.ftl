@@ -17,6 +17,11 @@ settings-appearance-pure-black = Čisto črna
 settings-appearance-accent = Barva poudarka
 settings-appearance-accent-wallpaper = Ozadje
 settings-appearance-accent-white = Bela
+settings-appearance-accent-custom = Po meri
+settings-appearance-rain-color = Barva
+settings-appearance-rain-water = Voda
+settings-appearance-rain-accent = Barva poudarka
+settings-appearance-rain-custom = Po meri
 settings-appearance-theme-apps = Prilagodi druge aplikacije ozadju
 settings-appearance-theme-apps-description = Druge aplikacije in terminali prevzamejo enake barve
 

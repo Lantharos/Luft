@@ -3,7 +3,7 @@ import Meta from 'gi://Meta';
 import type St from 'gi://St';
 
 import type { Context } from './context.js';
-import type { Rgb } from './appearance/color.js';
+import { fromHex, type Rgb } from './appearance/color.js';
 import type { AppearanceService } from './appearance/service.js';
 import { Greeter, type GreeterContext } from './auth/greeter/greeter.js';
 import { LockControls } from './auth/lockScreen/controls.js';
@@ -159,6 +159,7 @@ class KestrelUi {
         const [width, height] = actor.get_transformed_size();
         return { x, y, width, height };
       },
+      accent: () => fromHex(this.services.appearance.AccentColor || '#ffffff'),
     });
     this.rotation = new RotationAnimation(context.layoutManager, context.createBackground);
     this.surfaces = new Surfaces({

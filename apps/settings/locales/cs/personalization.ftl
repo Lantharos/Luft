@@ -17,6 +17,11 @@ settings-appearance-pure-black = Čistě černá
 settings-appearance-accent = Barva zvýraznění
 settings-appearance-accent-wallpaper = Tapeta
 settings-appearance-accent-white = Bílá
+settings-appearance-accent-custom = Vlastní
+settings-appearance-rain-color = Barva
+settings-appearance-rain-water = Voda
+settings-appearance-rain-accent = Barva zvýraznění
+settings-appearance-rain-custom = Vlastní
 settings-appearance-theme-apps = Přizpůsobit ostatní aplikace tapetě
 settings-appearance-theme-apps-description = Ostatní aplikace a terminály převezmou stejné barvy
 

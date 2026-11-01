@@ -31,3 +31,5 @@ settings-more-fewer = Εμφάνιση λιγότερων
 settings-time-picker = { $label }, { $time }
 settings-time-picker-hour = Ώρα
 settings-time-picker-minute = Λεπτό
+
+settings-color-lightness = Φωτεινότητα

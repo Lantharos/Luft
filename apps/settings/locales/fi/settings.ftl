@@ -31,3 +31,5 @@ settings-more-fewer = Näytä vähemmän
 settings-time-picker = { $label }, { $time }
 settings-time-picker-hour = Tunti
 settings-time-picker-minute = Minuutti
+
+settings-color-lightness = Vaaleus

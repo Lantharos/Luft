@@ -17,6 +17,11 @@ settings-appearance-pure-black = Tiszta fekete
 settings-appearance-accent = Kiemelőszín
 settings-appearance-accent-wallpaper = Háttérkép
 settings-appearance-accent-white = Fehér
+settings-appearance-accent-custom = Egyéni
+settings-appearance-rain-color = Szín
+settings-appearance-rain-water = Víz
+settings-appearance-rain-accent = Kiemelőszín
+settings-appearance-rain-custom = Egyéni
 settings-appearance-theme-apps = Más alkalmazások igazítása a háttérképhez
 settings-appearance-theme-apps-description = Más alkalmazások és terminálok is ugyanazokat a színeket veszik fel
 

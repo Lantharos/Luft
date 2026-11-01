@@ -17,6 +17,7 @@ settings-appearance-pure-black = Potpuno crna
 settings-appearance-accent = Boja za isticanje
 settings-appearance-accent-wallpaper = Pozadina
 settings-appearance-accent-white = Bela
+settings-appearance-accent-custom = Prilagođena
 settings-appearance-theme-apps = Uskladi druge aplikacije s pozadinom
 settings-appearance-theme-apps-description = Druge aplikacije i terminali dobijaju iste boje
 
@@ -49,10 +50,14 @@ settings-appearance-rain-intensity = Koliko jako pada kiša
 settings-appearance-rain-drizzle = Rosulja
 settings-appearance-rain-rain = Kiša
 settings-appearance-rain-storm = Oluja
+settings-appearance-rain-color = Boja
+settings-appearance-rain-water = Voda
+settings-appearance-rain-accent = Boja isticanja
+settings-appearance-rain-custom = Prilagođena
 settings-appearance-rain-visible = Prikaži na radnoj površini
 settings-appearance-rain-visible-description = Kapi padaju na prozore i traku zadataka
 settings-appearance-rain-sound = Zvuk
-settings-appearance-rain-sound-description = Nastaje dok svira pa se nikad ne ponavlja. Svira i iza prozora
+settings-appearance-rain-sound-description = Snimljena kiša, uz grmljavinu u olujama. Svira i iza prozora
 settings-appearance-rain-volume = Jačina kiše
 
 ## Appearance: app icons

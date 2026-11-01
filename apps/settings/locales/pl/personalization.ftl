@@ -17,6 +17,11 @@ settings-appearance-pure-black = Czysta czerń
 settings-appearance-accent = Kolor akcentu
 settings-appearance-accent-wallpaper = Tapeta
 settings-appearance-accent-white = Biały
+settings-appearance-accent-custom = Własny
+settings-appearance-rain-color = Kolor
+settings-appearance-rain-water = Woda
+settings-appearance-rain-accent = Kolor akcentu
+settings-appearance-rain-custom = Własny
 settings-appearance-theme-apps = Dopasuj inne aplikacje do tapety
 settings-appearance-theme-apps-description = Inne aplikacje i terminale przyjmują te same kolory
 

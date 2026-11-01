@@ -3,7 +3,7 @@ import GLib from 'gi://GLib';
 import { setSolidSurfaces, setSquareSurfaces } from './kestrelGlass.js';
 import { setSquareCorners } from './kestrelTheme.js';
 
-import { accentColor, namedAccent, NEUTRAL, seedFromSamples, toHex, type Rgb, type Seed } from './color.js';
+import { accentColor, fromHex, namedAccent, NEUTRAL, seedFromColor, seedFromSamples, toHex, type Rgb, type Seed } from './color.js';
 import { appearanceCss, appearanceJson, type Appearance } from './exports.js';
 import { userFile, writeText } from './files.js';
 import { buildPalette, type Palette } from './palette.js';
@@ -37,6 +37,7 @@ const PROPERTIES: [string, string][] = [
   ['LightTerminalColors', 'a{ss}'], ['DarkTerminalColors', 'a{ss}'], ['AppIcons', 'a{ss}'], ['Taskbar', 's'],
 ];
 const PERSIST_DELAY = 400;
+const CUSTOM_COLOR = /^#[0-9a-f]{6}$/i;
 
 export class AppearanceService {
   private readonly stylesheet = new AccentStylesheet('accent', (seed, palette, variant) =>
@@ -68,6 +69,7 @@ export class AppearanceService {
       [this.interfaceSettings, this.interfaceSettings.connect('changed::color-scheme', () => this.update())],
       [this.settings, this.settings.connect('changed::pure-black', () => this.update())],
       [this.settings, this.settings.connect('changed::accent', () => this.update())],
+      [this.settings, this.settings.connect('changed::accent-color', () => this.update())],
       [this.settings, this.settings.connect('changed::theme-apps', () => this.schedulePersist())],
       [this.settings, this.settings.connect('changed::rounded-window-corners', () => this.followCorners())],
     ];
@@ -115,8 +117,20 @@ export class AppearanceService {
     this.dbus.emit_property_changed(name, new GLib.Variant(signature, this[name as keyof this]));
   }
 
+  private get customSeed(): Seed | null {
+    const color = this.settings.get_string('accent-color');
+    return CUSTOM_COLOR.test(color) ? seedFromColor(fromHex(color)) : null;
+  }
+
   private get seed(): Seed | null {
-    return this.settings.get_string('accent') === 'white' ? NEUTRAL : this.wallpaperSeed;
+    switch (this.settings.get_string('accent')) {
+      case 'white':
+        return NEUTRAL;
+      case 'custom':
+        return this.customSeed ?? this.wallpaperSeed;
+      default:
+        return this.wallpaperSeed;
+    }
   }
 
   private paintTaskbar(): boolean {

@@ -17,6 +17,11 @@ settings-appearance-pure-black = Чисто черно
 settings-appearance-accent = Акцентен цвят
 settings-appearance-accent-wallpaper = Тапет
 settings-appearance-accent-white = Бяло
+settings-appearance-accent-custom = Персонализиран
+settings-appearance-rain-color = Цвят
+settings-appearance-rain-water = Вода
+settings-appearance-rain-accent = Акцентен цвят
+settings-appearance-rain-custom = Персонализиран
 settings-appearance-theme-apps = Цветове от тапета и за другите приложения
 settings-appearance-theme-apps-description = Другите приложения и терминалите получават същите цветове
 

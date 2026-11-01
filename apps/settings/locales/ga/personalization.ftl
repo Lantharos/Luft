@@ -17,6 +17,11 @@ settings-appearance-pure-black = Dubh glan
 settings-appearance-accent = Dath béime
 settings-appearance-accent-wallpaper = Cúlbhrat
 settings-appearance-accent-white = Bán
+settings-appearance-accent-custom = Saincheaptha
+settings-appearance-rain-color = Dath
+settings-appearance-rain-water = Uisce
+settings-appearance-rain-accent = Dath aibhsithe
+settings-appearance-rain-custom = Saincheaptha
 settings-appearance-theme-apps = Dathanna an chúlbhrait in aipeanna eile
 settings-appearance-theme-apps-description = Glacann aipeanna agus teirminéil eile leis na dathanna céanna
 

@@ -31,3 +31,5 @@ settings-more-fewer = Покажи по-малко
 settings-time-picker = { $label }, { $time }
 settings-time-picker-hour = Час
 settings-time-picker-minute = Минута
+
+settings-color-lightness = Светлота

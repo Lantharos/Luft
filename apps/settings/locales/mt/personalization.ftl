@@ -17,6 +17,11 @@ settings-appearance-pure-black = Iswed għal kollox
 settings-appearance-accent = Kulur ta’ aċċent
 settings-appearance-accent-wallpaper = Sfond
 settings-appearance-accent-white = Abjad
+settings-appearance-accent-custom = Personalizzat
+settings-appearance-rain-color = Kulur
+settings-appearance-rain-water = Ilma
+settings-appearance-rain-accent = Kulur tal-enfasi
+settings-appearance-rain-custom = Personalizzat
 settings-appearance-theme-apps = Qabbel apps oħra mal-isfond
 settings-appearance-theme-apps-description = Apps u terminals oħra jieħdu l-istess kuluri
 

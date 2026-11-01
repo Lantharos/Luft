@@ -32,3 +32,5 @@ settings-more-fewer = Prikaži manje
 settings-time-picker = { $label }, { $time }
 settings-time-picker-hour = Sat
 settings-time-picker-minute = Minuta
+
+settings-color-lightness = Svjetlina

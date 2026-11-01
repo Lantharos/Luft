@@ -17,6 +17,11 @@ settings-appearance-pure-black = Negro puro
 settings-appearance-accent = Color de énfasis
 settings-appearance-accent-wallpaper = Fondo de pantalla
 settings-appearance-accent-white = Blanco
+settings-appearance-accent-custom = Personalizado
+settings-appearance-rain-color = Color
+settings-appearance-rain-water = Agua
+settings-appearance-rain-accent = Color de acento
+settings-appearance-rain-custom = Personalizado
 settings-appearance-theme-apps = Adaptar otras aplicaciones al fondo
 settings-appearance-theme-apps-description = Otras aplicaciones y terminales adoptan los mismos colores
 

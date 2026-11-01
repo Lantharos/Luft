@@ -17,6 +17,11 @@ settings-appearance-pure-black = Puur zwart
 settings-appearance-accent = Accentkleur
 settings-appearance-accent-wallpaper = Achtergrond
 settings-appearance-accent-white = Wit
+settings-appearance-accent-custom = Eigen kleur
+settings-appearance-rain-color = Kleur
+settings-appearance-rain-water = Water
+settings-appearance-rain-accent = Accentkleur
+settings-appearance-rain-custom = Eigen kleur
 settings-appearance-theme-apps = Andere apps aanpassen aan de achtergrond
 settings-appearance-theme-apps-description = Andere apps en terminals krijgen dezelfde kleuren
 

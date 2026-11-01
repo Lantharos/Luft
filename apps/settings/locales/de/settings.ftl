@@ -31,3 +31,5 @@ settings-more-fewer = Weniger anzeigen
 settings-time-picker = { $label }, { $time }
 settings-time-picker-hour = Stunde
 settings-time-picker-minute = Minute
+
+settings-color-lightness = Helligkeit

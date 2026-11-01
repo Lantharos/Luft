@@ -40,3 +40,5 @@ settings-time-picker = { $label }, { $time }
 settings-time-picker-hour = Hour
 # Screen-reader label of the list of minutes in a time picker
 settings-time-picker-minute = Minute
+
+settings-color-lightness = Lightness

@@ -58,14 +58,18 @@ fn locate_at(
     channel: Channel,
 ) -> io::Result<Located> {
     let folder = format!("{downloads}/{}", channel.folder());
-    let pointer: Pointer =
-        serde_json::from_str(&text(agent, &format!("{folder}/{POINTER}")).map_err(Fetch::into_io)?)
-            .map_err(|_| {
-                io::Error::new(
-                    io::ErrorKind::InvalidData,
-                    t!(L10N, "live-pointer-unreadable"),
-                )
-            })?;
+    let pointer = match text(agent, &format!("{folder}/{POINTER}")) {
+        Err(Fetch::Missing) if channel == Channel::Latest => {
+            return locate_at(agent, downloads, key, Channel::Nightly);
+        }
+        fetched => fetched.map_err(Fetch::into_io)?,
+    };
+    let pointer: Pointer = serde_json::from_str(&pointer).map_err(|_| {
+        io::Error::new(
+            io::ErrorKind::InvalidData,
+            t!(L10N, "live-pointer-unreadable"),
+        )
+    })?;
     let iso = format!("{folder}/{}", pointer.name);
     let checksum = checksum(agent, key, &iso).map_err(Fetch::into_io)?;
     if parse_checksum(&pointer.sha256) != Some(checksum) {

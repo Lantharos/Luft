@@ -176,6 +176,7 @@ settings-updates-firmware-update = Opdater
 settings-updates-firmware-failed = Firmwaren kunne ikke opdateres
 settings-updates-download = Hent
 settings-updates-released = Udgivet { $when }
+settings-updates-changes = Ændringer i { $areas }
 settings-updates-improvements = Rettelser og forbedringer i hele systemet
 settings-updates-download-size = { $size } skal hentes
 settings-updates-replaces = Erstatter version { $version }, som venter på at blive installeret

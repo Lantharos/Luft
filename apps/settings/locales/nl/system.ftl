@@ -176,6 +176,7 @@ settings-updates-firmware-update = Bijwerken
 settings-updates-firmware-failed = De firmware kon niet worden bijgewerkt
 settings-updates-download = Downloaden
 settings-updates-released = Uitgebracht: { $when }
+settings-updates-changes = Wijzigingen in { $areas }
 settings-updates-improvements = Oplossingen en verbeteringen in het hele systeem
 settings-updates-download-size = { $size } te downloaden
 settings-updates-replaces = Vervangt versie { $version }, die wacht op installatie

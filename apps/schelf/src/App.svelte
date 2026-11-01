@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
-	import { appearance, GlassShell, tooltip, WindowControls } from '@luft/ui';
+	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
+	import { appearance, GlassShell, IconButton, WindowControls } from '@luft/ui';
 	import Sidebar from '#lib/components/Sidebar.svelte';
 	import AppPage from '#lib/pages/app/AppPage.svelte';
 	import Browse from '#lib/pages/browse/Browse.svelte';
@@ -41,9 +41,7 @@
 	<main class="glass-content">
 		<header class="drag-region flex h-[60px] flex-none items-center gap-3 pr-4 pl-6">
 			{#if depth > 1}
-				<button type="button" class="icon-button" aria-label="Back" {@attach tooltip('Back')} onclick={() => navigation.back()}>
-					<ArrowLeft size={18} />
-				</button>
+				<IconButton icon={ChevronLeft} label="Back" large onclick={() => navigation.back()} />
 			{/if}
 			<h1 class="min-w-0 flex-1 truncate pl-2 text-[20px] font-semibold">{heading}</h1>
 			<WindowControls />

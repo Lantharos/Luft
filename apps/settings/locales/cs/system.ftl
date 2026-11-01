@@ -182,6 +182,7 @@ settings-updates-firmware-update = Aktualizovat
 settings-updates-firmware-failed = Firmware se nepodařilo aktualizovat
 settings-updates-download = Stáhnout
 settings-updates-released = Vydáno { $when }
+settings-updates-changes = Změny v: { $areas }
 settings-updates-improvements = Opravy a vylepšení v celém systému
 settings-updates-download-size = Ke stažení: { $size }
 settings-updates-replaces = Nahradí verzi { $version }, která čeká na instalaci

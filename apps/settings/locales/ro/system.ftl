@@ -179,6 +179,7 @@ settings-updates-firmware-update = Actualizează
 settings-updates-firmware-failed = Firmware-ul nu a putut fi actualizat
 settings-updates-download = Descarcă
 settings-updates-released = Publicată: { $when }
+settings-updates-changes = Modificări la { $areas }
 settings-updates-improvements = Remedieri și îmbunătățiri în tot sistemul
 settings-updates-download-size = De descărcat: { $size }
 settings-updates-replaces = Înlocuiește versiunea { $version }, care așteaptă să fie instalată

@@ -179,6 +179,7 @@ settings-updates-firmware-update = Värskenda
 settings-updates-firmware-failed = Püsivara ei õnnestunud värskendada
 settings-updates-download = Laadi alla
 settings-updates-released = Avaldatud { $when }
+settings-updates-changes = Muudatused: { $areas }
 settings-updates-improvements = Parandused ja täiustused kogu süsteemis
 settings-updates-download-size = Allalaadimise maht: { $size }
 settings-updates-replaces = Asendab installimist ootava versiooni { $version }

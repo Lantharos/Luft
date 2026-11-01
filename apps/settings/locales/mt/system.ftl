@@ -185,6 +185,7 @@ settings-updates-firmware-update = Aġġorna
 settings-updates-firmware-failed = Il-firmware ma setax jiġi aġġornat
 settings-updates-download = Niżżel
 settings-updates-released = Ħareġ: { $when }
+settings-updates-changes = Bidliet f'{ $areas }
 settings-updates-improvements = Tiswijiet u titjib fis-sistema kollha
 settings-updates-download-size = { $size } biex jitniżżlu
 settings-updates-replaces = Tieħu post il-verżjoni { $version }, li qed tistenna biex tiġi installata

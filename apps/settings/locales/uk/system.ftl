@@ -182,6 +182,7 @@ settings-updates-firmware-update = Оновити
 settings-updates-firmware-failed = Не вдалося оновити мікропрограму
 settings-updates-download = Завантажити
 settings-updates-released = Випущено { $when }
+settings-updates-changes = Зміни: { $areas }
 settings-updates-improvements = Виправлення й удосконалення в усій системі
 settings-updates-download-size = Обсяг завантаження: { $size }
 settings-updates-replaces = Замінює версію { $version }, яка очікує встановлення

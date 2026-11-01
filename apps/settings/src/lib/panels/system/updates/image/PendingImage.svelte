@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { t } from '@luft/i18n';
+	import { i18n, t } from '@luft/i18n';
 	import { ago, bytes, Row, Section } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { Activity, ImageOverview, Release } from '#lib/bindings.js';
@@ -20,13 +20,16 @@
 	const next = $derived(overview.switching ? null : (overview.available ?? overview.staged));
 	const ready = $derived(next !== null && next === overview.staged);
 
-	const summary = (release: Release) => release.notes?.[0].changes[0] ?? t('settings-updates-improvements');
+	const areas = $derived(new Intl.ListFormat(i18n.formats, { type: 'conjunction' }));
+
+	const changes = (release: Release) =>
+		release.notes?.length ? t('settings-updates-changes', { areas: areas.format(release.notes.map((section) => section.title)) }) : t('settings-updates-improvements');
 
 	function describeNext(release: Release) {
 		const released = release.released ? t('settings-updates-released', { when: ago(release.released) }) : null;
 		const size = ready || !overview.available?.size ? null : t('settings-updates-download-size', { size: bytes(overview.available.size) });
 		const replaces = !ready && overview.staged ? named(overview.staged, 'settings-updates-replaces', 'settings-updates-replaces-new') : null;
-		return [versionName(release), released, size, replaces].filter(Boolean).join(' · ');
+		return [changes(release), released, size, replaces].filter(Boolean).join(' · ');
 	}
 </script>
 
@@ -39,7 +42,7 @@
 	</Section>
 {:else if next}
 	<Section>
-		<Row title={summary(next)} description={describeNext(next)} truncate>
+		<Row title={versionName(next)} description={describeNext(next)} truncate>
 			{#if ready}
 				<button type="button" class="button primary" disabled={busy} onclick={() => attempt(commands.updatesRestart)}>{t('settings-updates-restart-to-install')}</button>
 			{:else if activity.running !== 'download'}

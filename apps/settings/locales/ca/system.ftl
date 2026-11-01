@@ -176,6 +176,7 @@ settings-updates-firmware-update = Actualitza
 settings-updates-firmware-failed = No s’ha pogut actualitzar el microprogramari
 settings-updates-download = Baixa
 settings-updates-released = Publicada { $when }
+settings-updates-changes = Canvis a { $areas }
 settings-updates-improvements = Correccions i millores a tot el sistema
 settings-updates-download-size = { $size } per baixar
 settings-updates-replaces = Substitueix la versió { $version }, que està pendent d’instal·lar

@@ -176,6 +176,7 @@ settings-updates-firmware-update = Päivitä
 settings-updates-firmware-failed = Laiteohjelmistoa ei voitu päivittää
 settings-updates-download = Lataa
 settings-updates-released = Julkaistu { $when }
+settings-updates-changes = Muutoksia: { $areas }
 settings-updates-improvements = Korjauksia ja parannuksia koko järjestelmään
 settings-updates-download-size = Ladattavaa { $size }
 settings-updates-replaces = Korvaa asennusta odottavan version { $version }

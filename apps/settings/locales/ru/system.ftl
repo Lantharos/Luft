@@ -182,6 +182,7 @@ settings-updates-firmware-update = Обновить
 settings-updates-firmware-failed = Не удалось обновить прошивку
 settings-updates-download = Скачать
 settings-updates-released = Выпущено { $when }
+settings-updates-changes = Изменения: { $areas }
 settings-updates-improvements = Исправления и улучшения во всей системе
 settings-updates-download-size = Размер загрузки: { $size }
 settings-updates-replaces = Заменяет версию { $version }, которая ожидает установки

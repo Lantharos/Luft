@@ -199,6 +199,7 @@ settings-updates-firmware-failed = The firmware couldn’t be updated
 settings-updates-download = Download
 # $when is a relative time, like 3 days ago
 settings-updates-released = Released { $when }
+settings-updates-changes = Changes to { $areas }
 settings-updates-improvements = Fixes and improvements across the system
 # $size is a download size, like 1.2 GB
 settings-updates-download-size = { $size } to download

@@ -176,6 +176,7 @@ settings-updates-firmware-update = Güncelle
 settings-updates-firmware-failed = Üretici yazılımı güncellenemedi
 settings-updates-download = İndir
 settings-updates-released = Yayımlanma: { $when }
+settings-updates-changes = Değişiklikler: { $areas }
 settings-updates-improvements = Sistem genelinde düzeltmeler ve iyileştirmeler
 settings-updates-download-size = İndirme boyutu: { $size }
 settings-updates-replaces = Yüklenmeyi bekleyen { $version } sürümünün yerini alır

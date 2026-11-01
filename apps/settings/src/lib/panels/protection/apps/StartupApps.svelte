@@ -43,10 +43,10 @@
 			{#snippet leading()}
 				<AppIcon icon={app.icon} id={app.id} />
 			{/snippet}
-			<Switch label={t('settings-apps-startup-app', { app: app.name })} checked={app.enabled} onchange={(enabled) => toggle(app, enabled)} />
 			{#if app.removable}
 				<IconButton icon={X} label={t('settings-apps-startup-remove', { app: app.name })} onclick={() => remove(app)} />
 			{/if}
+			<Switch label={t('settings-apps-startup-app', { app: app.name })} checked={app.enabled} onchange={(enabled) => toggle(app, enabled)} />
 		</ItemRow>
 	{/each}
 	<Row title={t('settings-apps-startup-add')} icon={Plus} onclick={() => (adding = true)} />

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
-	import { appearance, GlassShell, Toast, WindowControls } from '@luft/ui';
+	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
+	import { appearance, GlassShell, IconButton, Toast, WindowControls } from '@luft/ui';
 	import DriveView from '#lib/components/drive/DriveView.svelte';
 	import EditorActions from '#lib/components/editor/EditorActions.svelte';
 	import EditorView from '#lib/components/editor/EditorView.svelte';
@@ -34,9 +34,9 @@
 <GlassShell class="[--sidebar-width:260px]">
 	<Sidebar />
 	<main class="glass-content">
-		<header class="drag-region flex h-[60px] flex-none items-center gap-2 pr-4 pl-8">
+		<header class="drag-region flex h-[60px] flex-none items-center gap-2 pr-4 {space.root || editing ? 'pl-6' : 'pl-8'}">
 			{#if space.root || editing}
-				<button type="button" class="icon-button -ml-2" aria-label="Back" disabled={editor.running} onclick={back}><ArrowLeft size={18} /></button>
+				<IconButton icon={ChevronLeft} label="Back" large disabled={editor.running} onclick={back} />
 			{/if}
 			<h1 class="min-w-0 flex-1 truncate text-[20px] font-semibold">{title}</h1>
 			{#if editing}

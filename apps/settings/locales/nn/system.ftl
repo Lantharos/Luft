@@ -176,6 +176,7 @@ settings-updates-firmware-update = Oppdater
 settings-updates-firmware-failed = Kunne ikkje oppdatere fastvara
 settings-updates-download = Last ned
 settings-updates-released = Gjeven ut { $when }
+settings-updates-changes = Endringar i { $areas }
 settings-updates-improvements = Rettingar og forbetringar i heile systemet
 settings-updates-download-size = { $size } å laste ned
 settings-updates-replaces = Erstattar versjon { $version }, som ventar på å bli installert

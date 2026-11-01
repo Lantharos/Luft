@@ -179,6 +179,7 @@ settings-updates-firmware-update = Atjaunināt
 settings-updates-firmware-failed = Aparātprogrammatūru neizdevās atjaunināt
 settings-updates-download = Lejupielādēt
 settings-updates-released = Izlaists: { $when }
+settings-updates-changes = Izmaiņas: { $areas }
 settings-updates-improvements = Labojumi un uzlabojumi visā sistēmā
 settings-updates-download-size = Lejupielādējams apjoms: { $size }
 settings-updates-replaces = Aizstāj versiju { $version }, kas gaida instalēšanu

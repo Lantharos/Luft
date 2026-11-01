@@ -176,6 +176,7 @@ settings-updates-firmware-update = Актуализирай
 settings-updates-firmware-failed = Фърмуерът не можа да бъде актуализиран
 settings-updates-download = Изтегли
 settings-updates-released = Издадена: { $when }
+settings-updates-changes = Промени в { $areas }
 settings-updates-improvements = Поправки и подобрения в цялата система
 settings-updates-download-size = За изтегляне: { $size }
 settings-updates-replaces = Заменя версия { $version }, която чака инсталиране

@@ -176,6 +176,7 @@ settings-updates-firmware-update = Ενημέρωση
 settings-updates-firmware-failed = Δεν ήταν δυνατή η ενημέρωση του υλικολογισμικού
 settings-updates-download = Λήψη
 settings-updates-released = Κυκλοφόρησε { $when }
+settings-updates-changes = Αλλαγές σε { $areas }
 settings-updates-improvements = Διορθώσεις και βελτιώσεις σε όλο το σύστημα
 settings-updates-download-size = Μέγεθος λήψης: { $size }
 settings-updates-replaces = Αντικαθιστά την έκδοση { $version }, που περιμένει να εγκατασταθεί

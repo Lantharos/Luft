@@ -179,6 +179,7 @@ settings-updates-firmware-update = Ažuriraj
 settings-updates-firmware-failed = Firmver nije mogao da se ažurira
 settings-updates-download = Preuzmi
 settings-updates-released = Objavljeno { $when }
+settings-updates-changes = Izmene: { $areas }
 settings-updates-improvements = Ispravke i poboljšanja u celom sistemu
 settings-updates-download-size = Za preuzimanje: { $size }
 settings-updates-replaces = Zamenjuje verziju { $version }, koja čeka na instalaciju

@@ -182,6 +182,7 @@ settings-updates-firmware-update = Zaktualizuj
 settings-updates-firmware-failed = Nie udało się zaktualizować oprogramowania układowego
 settings-updates-download = Pobierz
 settings-updates-released = Wydano { $when }
+settings-updates-changes = Zmiany w: { $areas }
 settings-updates-improvements = Poprawki i ulepszenia w całym systemie
 settings-updates-download-size = Do pobrania: { $size }
 settings-updates-replaces = Zastępuje wersję { $version }, która czeka na instalację

@@ -176,6 +176,7 @@ settings-updates-firmware-update = Përditëso
 settings-updates-firmware-failed = Firmware nuk mund të përditësohej
 settings-updates-download = Shkarko
 settings-updates-released = Publikuar { $when }
+settings-updates-changes = Ndryshime në { $areas }
 settings-updates-improvements = Rregullime dhe përmirësime në gjithë sistemin
 settings-updates-download-size = { $size } për t’u shkarkuar
 settings-updates-replaces = Zëvendëson versionin { $version }, që pret të instalohet

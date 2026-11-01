@@ -5,6 +5,7 @@ export interface PipelineConfig {
   readonly id: string;
   readonly fileExtension: string;
   readonly pipelineString: string;
+  readonly sound?: boolean;
 }
 
 const FRAMERATE = 30;
@@ -91,12 +92,23 @@ export function canScreencast(): boolean {
   return fallbackElements.every(e => Gst.ElementFactory.find(e) !== null);
 }
 
+const DESKTOP_SOUND = `
+    pulsesrc device=@DEFAULT_MONITOR@ do-timestamp=true provide-clock=false !
+    queue !
+    audioconvert ! audioresample ! audio/x-raw,channels=2 !
+    opusenc bitrate=160000 !
+    queue !
+    mux.`;
+
+const canRecordSound = () => ['pulsesrc', 'opusenc'].every(e => Gst.ElementFactory.find(e) !== null);
+
 export function* pipelineConfigs(): Generator<PipelineConfig, void> {
-  if (Gst.Registry.get().check_feature_version('pipewiresrc', 0, 3, 67)) yield* PIPELINES;
-  else yield FALLBACK_PIPELINE;
+  const configs = Gst.Registry.get().check_feature_version('pipewiresrc', 0, 3, 67) ? PIPELINES : [FALLBACK_PIPELINE];
+  if (canRecordSound()) yield* configs.map(config => ({...config, sound: true}));
+  yield* configs;
 }
 
-export function createPipeline(nodeId: number, { pipelineString }: PipelineConfig, filePath: string): Gst.Element {
+export function createPipeline(nodeId: number, { pipelineString, sound }: PipelineConfig, filePath: string): Gst.Element {
   const numThreads = String(Math.min(Math.max(1, GLib.get_num_processors()), 64));
   const encoder = pipelineString.replaceAll('%T', numThreads).replaceAll('%F', String(FRAMERATE));
 
@@ -105,6 +117,7 @@ export function createPipeline(nodeId: number, { pipelineString }: PipelineConfi
                 do-timestamp=true
                 keepalive-time=1000
                 resend-last=true !
-    ${encoder} !
-    filesink location="${filePath}"`, null, Gst.ParseFlags.FATAL_ERRORS);
+    ${encoder} name=mux !
+    filesink location="${filePath}"
+    ${sound ? DESKTOP_SOUND : ''}`, null, Gst.ParseFlags.FATAL_ERRORS);
 }

@@ -3,7 +3,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import {labelled, named} from '../lib/actors.js';
-import {resetBattery, setBattery} from '../lib/battery.js';
+import {resetBattery, setBattery, UPOWER_STATE} from '../lib/battery.js';
 import {sabineService} from '../lib/apps/luftApp.js';
 import {checks} from '../lib/check.js';
 import {call} from '../lib/dbus.js';
@@ -138,7 +138,7 @@ async function checkContents() {
   await capture('search-contents');
   closeStart();
 
-  await setBattery({OnBattery: true});
+  await setBattery({IsPresent: true, OnBattery: true, State: UPOWER_STATE.discharging, Percentage: 80});
   try {
     write(UNPLUGGED, 'The marram grass holds the dunes.');
     await indexed(async () => (await withName('written unplugged')).includes(UNPLUGGED), 'names stay current on battery');

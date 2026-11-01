@@ -55,7 +55,7 @@ jobs:
         working-directory: apps/meet
         run: |
           $ErrorActionPreference = 'Stop'
-          $bundle = sabine bundle . --target exe --release --out $env:RUNNER_TEMP/meet --json | Select-Object -Last 1
+          $bundle = sabine bundle . --target exe --out $env:RUNNER_TEMP/meet --json | Select-Object -Last 1
           if ($LASTEXITCODE -ne 0) { throw 'Bundling failed' }
           $artifacts = @(($bundle | ConvertFrom-Json).artifacts)
           if ($artifacts.Count -ne 1) { throw "Bundling made no setup program: $bundle" }
@@ -97,7 +97,7 @@ jobs:
       - name: Bundle
         working-directory: apps/meet
         run: |
-          bundle="$(sabine bundle . --target appimage --release --out "$RUNNER_TEMP/meet" --json | tail -n 1)"
+          bundle="$(sabine bundle . --target appimage --out "$RUNNER_TEMP/meet" --json | tail -n 1)"
           mapfile -t artifacts < <(jq -r '.artifacts[]' <<<"$bundle")
           [[ ${#artifacts[@]} -eq 1 ]] || { echo "Bundling made no AppImage: $bundle"; exit 1; }
           mkdir -p out

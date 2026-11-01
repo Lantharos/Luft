@@ -22,7 +22,7 @@ Install dependencies once from the repository root with `bun install`, then from
 bun run check
 bun run build
 cargo build --release --target x86_64-pc-windows-gnu --manifest-path desktop/Cargo.toml   # Windows, with MinGW
-sabine bundle . --target appimage --release                                               # Linux, needs appimagetool
+sabine bundle . --target appimage                                                         # Linux, needs appimagetool
 ```
 
 To run the Windows build, put `meet.exe` in a folder with a `resources` folder holding `Sabine.toml`, `dist` and `public`. The [Meet Luft workflow](../../.github/workflows/meet.yml) builds the Windows setup program and the AppImage and publishes them to get.luft.computer.

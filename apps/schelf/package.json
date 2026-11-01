@@ -9,7 +9,7 @@
 		"check": "svelte-check --tsconfig ./tsconfig.json",
 		"desktop:dev": "sabine dev .",
 		"desktop:build": "bun run build && cargo build --manifest-path desktop/Cargo.toml --release",
-		"desktop:bundle": "sabine bundle . --release"
+		"desktop:bundle": "sabine bundle ."
 	},
 	"dependencies": {
 		"@lantharos/sabine": "github:Lantharos/Sabine#v0.68"

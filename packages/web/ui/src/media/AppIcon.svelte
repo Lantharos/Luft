@@ -12,11 +12,21 @@
 
 	let { icon, id, size = 32, style }: Props = $props();
 	let broken = $state(false);
+	let missingGlyph = $state<string | null>(null);
 
 	const icons = $derived(appearance.appIcons);
 	const chosen = $derived(style ?? icons?.style ?? 'default');
 	const paint = $derived(icons && id && chosen !== 'default' ? icons[chosen] : null);
-	const glyph = $derived(icons && id ? `url("${fileUrl(`${icons.glyphs}/${id.replace(/\.desktop$/, '')}.png`)}")` : null);
+	const glyphUrl = $derived(paint && icons && id ? fileUrl(`${icons.glyphs}/${id.replace(/\.desktop$/, '')}.png`) : null);
+	const glyph = $derived(glyphUrl && glyphUrl !== missingGlyph ? `url("${glyphUrl}")` : null);
+
+	$effect(() => {
+		const url = glyphUrl;
+		if (!url) return;
+		const probe = new Image();
+		probe.onerror = () => (missingGlyph = url);
+		probe.src = url;
+	});
 </script>
 
 {#if paint && glyph}

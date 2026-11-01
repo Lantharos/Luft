@@ -10,9 +10,9 @@ export const apps: AppInfo[] = [
 	{ key: 'com.lantharos.draft.desktop', name: 'Draft', icon: null },
 	{ key: 'com.lantharos.barometer.desktop', name: 'Barometer', icon: null },
 	{ key: 'com.lantharos.mailman.desktop', name: 'Mailman', icon: null },
-	{ key: 'discord.desktop', name: 'Discord', icon: null },
+	{ key: 'com.discordapp.Discord.desktop', name: 'Discord', icon: null },
 	{ key: 'com.spotify.Client.desktop', name: 'Spotify', icon: null },
-	{ key: 'steam.desktop', name: 'Steam', icon: null },
+	{ key: 'com.valvesoftware.Steam.desktop', name: 'Steam', icon: null },
 	{ key: 'dev.zed.Zed.desktop', name: 'Zed', icon: null }
 ];
 
@@ -58,12 +58,12 @@ const templates: Template[] = [
 	{ name: 'barometer', command: '/home/mara/.local/share/sabine/apps/com.lantharos.barometer/barometer', app: 'com.lantharos.barometer.desktop', cpu: 0.3, memory: 21 },
 	{ name: 'sabine-host', command: 'sabine-host --type=renderer', app: 'com.lantharos.barometer.desktop', count: 2, cpu: 0.4, memory: 96 },
 	{ name: 'mailman', command: '/home/mara/.local/share/sabine/apps/com.lantharos.mailman/mailman', app: 'com.lantharos.mailman.desktop', cpu: 0.1, memory: 19 },
-	{ name: 'Discord', command: '/usr/lib64/discord/Discord', app: 'discord.desktop', cpu: 1.2, memory: 310, gpu: 1, vram: 120 },
-	{ name: 'Discord', command: '/usr/lib64/discord/Discord --type=renderer', app: 'discord.desktop', count: 3, cpu: 0.9, memory: 240 },
+	{ name: 'Discord', command: '/usr/lib64/discord/Discord', app: 'com.discordapp.Discord.desktop', cpu: 1.2, memory: 310, gpu: 1, vram: 120 },
+	{ name: 'Discord', command: '/usr/lib64/discord/Discord --type=renderer', app: 'com.discordapp.Discord.desktop', count: 3, cpu: 0.9, memory: 240 },
 	{ name: 'spotify', command: '/app/extra/share/spotify/spotify', app: 'com.spotify.Client.desktop', cpu: 1.8, memory: 280, gpu: 1, vram: 90 },
 	{ name: 'spotify', command: '/app/extra/share/spotify/spotify --type=renderer', app: 'com.spotify.Client.desktop', count: 2, cpu: 0.7, memory: 160 },
-	{ name: 'steam', command: '/home/mara/.local/share/Steam/ubuntu12_32/steam -srt-logger-opened', app: 'steam.desktop', cpu: 0.6, memory: 220 },
-	{ name: 'steamwebhelper', command: './steamwebhelper -lang=en_US -cachedir=/home/mara/.local/share/Steam/config/htmlcache', app: 'steam.desktop', count: 4, cpu: 0.3, memory: 140 },
+	{ name: 'steam', command: '/home/mara/.local/share/Steam/ubuntu12_32/steam -srt-logger-opened', app: 'com.valvesoftware.Steam.desktop', cpu: 0.6, memory: 220 },
+	{ name: 'steamwebhelper', command: './steamwebhelper -lang=en_US -cachedir=/home/mara/.local/share/Steam/config/htmlcache', app: 'com.valvesoftware.Steam.desktop', count: 4, cpu: 0.3, memory: 140 },
 	{ name: 'zed-editor', command: '/usr/lib/zed/zed-editor', app: 'dev.zed.Zed.desktop', cpu: 1.1, memory: 460, gpu: 2, vram: 180 },
 	{ name: 'rust-analyzer', command: '/home/mara/.local/share/zed/languages/rust-analyzer/rust-analyzer', app: 'dev.zed.Zed.desktop', cpu: 6.2, memory: 1850 }
 ];

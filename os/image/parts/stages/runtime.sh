@@ -21,7 +21,7 @@ share_resources() {
   for asset in "${shared_assets[@]}"; do
     ln -f "$runtime/Resources/$asset" "$runtime/Release/$asset"
   done
-  rm -r "$runtime/Release/locales"
+  rm -rf "$runtime/Release/locales"
   cp -al "$runtime/Resources/locales" "$runtime/Release/locales"
 }
 

@@ -9,7 +9,7 @@
 		loop?: boolean;
 		muted?: boolean;
 		volume?: number;
-		cutout?: Element;
+		cutout?: HTMLElement;
 		player?: NativeVideo | null;
 		class?: ClassValue;
 		children?: Snippet;

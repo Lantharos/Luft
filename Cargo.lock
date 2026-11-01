@@ -6881,9 +6881,10 @@ checksum = "cf54715a573b99ac80df0bc206da022bcd442c974952c7b9720069370852e21f"
 
 [[package]]
 name = "sabine"
-version = "0.65.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.65#12270b03c0cb285c782dc95651550555056d9bcc"
+version = "0.68.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.68#cead31b96bf7b8d953a321c9cc7d9a6f47966dde"
 dependencies = [
+ "ash",
  "base64",
  "block2",
  "bytemuck",
@@ -6892,7 +6893,6 @@ dependencies = [
  "dispatch2",
  "dunce",
  "futures-util",
- "getrandom 0.4.3",
  "global-hotkey",
  "glow",
  "glyphon",
@@ -6944,8 +6944,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-bridge"
-version = "0.65.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.65#12270b03c0cb285c782dc95651550555056d9bcc"
+version = "0.68.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.68#cead31b96bf7b8d953a321c9cc7d9a6f47966dde"
 dependencies = [
  "serde",
  "serde_json",
@@ -6956,8 +6956,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-dialog"
-version = "0.65.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.65#12270b03c0cb285c782dc95651550555056d9bcc"
+version = "0.68.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.68#cead31b96bf7b8d953a321c9cc7d9a6f47966dde"
 dependencies = [
  "bytemuck",
  "glyphon",
@@ -6972,8 +6972,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-host"
-version = "0.65.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.65#12270b03c0cb285c782dc95651550555056d9bcc"
+version = "0.68.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.68#cead31b96bf7b8d953a321c9cc7d9a6f47966dde"
 dependencies = [
  "sabine-bridge",
  "sabine-runtime",
@@ -6984,10 +6984,11 @@ dependencies = [
 
 [[package]]
 name = "sabine-platform"
-version = "0.65.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.65#12270b03c0cb285c782dc95651550555056d9bcc"
+version = "0.68.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.68#cead31b96bf7b8d953a321c9cc7d9a6f47966dde"
 dependencies = [
  "block2",
+ "dunce",
  "futures-util",
  "objc2",
  "objc2-app-kit",
@@ -6996,7 +6997,12 @@ dependencies = [
  "objc2-foundation",
  "objc2-user-notifications",
  "raw-window-handle",
+ "sabine-runtime",
  "tokio",
+ "wayland-backend",
+ "wayland-client",
+ "wayland-protocols",
+ "wayland-scanner",
  "windows",
  "winit",
  "zbus 6.0.0",
@@ -7004,10 +7010,11 @@ dependencies = [
 
 [[package]]
 name = "sabine-runtime"
-version = "0.65.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.65#12270b03c0cb285c782dc95651550555056d9bcc"
+version = "0.68.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.68#cead31b96bf7b8d953a321c9cc7d9a6f47966dde"
 dependencies = [
  "bzip2",
+ "getrandom 0.4.3",
  "libc",
  "serde",
  "serde_json",
@@ -7021,8 +7028,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-service"
-version = "0.65.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.65#12270b03c0cb285c782dc95651550555056d9bcc"
+version = "0.68.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.68#cead31b96bf7b8d953a321c9cc7d9a6f47966dde"
 dependencies = [
  "base64",
  "clap",
@@ -7038,6 +7045,7 @@ dependencies = [
  "self-replace",
  "semver",
  "serde",
+ "serde_ignored",
  "serde_json",
  "sha2",
  "thiserror 2.0.21",
@@ -7240,6 +7248,16 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 3.0.9",
+]
+
+[[package]]
+name = "serde_ignored"
+version = "0.1.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "115dffd5f3853e06e746965a20dcbae6ee747ae30b543d91b0e089668bb07798"
+dependencies = [
+ "serde",
+ "serde_core",
 ]
 
 [[package]]

@@ -30,7 +30,7 @@ fn build_window(window: SabineWindow, state: &TernState) -> SabineWindow {
     let window = glass.apply(window);
     let window = if state.glass {
         window
-            .blur_region(WindowRegion::adaptive_rounded_rect(WINDOW_RADIUS))
+            .blur_region(WindowRegion::rounded_rect(WINDOW_RADIUS))
             .opaque_region(WindowRegion::empty())
     } else {
         window

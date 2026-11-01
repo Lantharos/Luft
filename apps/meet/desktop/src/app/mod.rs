@@ -114,9 +114,7 @@ pub fn run() {
     SabineWindow::main_with_process(
         move |built| Ok(window(built, &events)),
         move |process| {
-            if let Some(emitter) = process.bridge_event_emitter() {
-                let _ = attached.0.set(emitter);
-            }
+            let _ = attached.0.set(process.bridge_event_emitter());
         },
     );
 }

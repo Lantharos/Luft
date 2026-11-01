@@ -10,6 +10,9 @@ cargo_manifest = "desktop/Cargo.toml"
 mime_types = ["x-scheme-handler/mailto", "message/rfc822"]
 autostart_arguments = "--background"
 
+[app.extensions]
+"message/rfc822" = ["eml"]
+
 [install]
 command = "cargo run --manifest-path desktop/Cargo.toml --"
 

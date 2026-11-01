@@ -39,8 +39,8 @@ fn window(window: SabineWindow) -> SabineWindow {
         .frameless()
         .glass()
         .lifecycle_policy(SabineLifecyclePolicy::browser_tab())
-        .blur_region(WindowRegion::adaptive_rounded_rect(RADIUS))
-        .input_region(WindowRegion::adaptive_rounded_rect(RADIUS))
+        .blur_region(WindowRegion::rounded_rect(RADIUS))
+        .input_region(WindowRegion::rounded_rect(RADIUS))
         .single_instance_id(APP_ID)
         .single_instance(SingleInstancePolicy::FocusExisting)
 }

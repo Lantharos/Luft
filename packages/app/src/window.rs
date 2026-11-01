@@ -48,16 +48,16 @@ impl GlassWindow<'_> {
             .frameless()
             .glass()
             .lifecycle_policy(SabineLifecyclePolicy::browser_tab())
-            .blur_region(WindowRegion::adaptive_rounded_left(
+            .blur_region(WindowRegion::rounded_left(
                 self.sidebar_width,
                 WINDOW_RADIUS,
             ))
-            .opaque_region(WindowRegion::adaptive_content_after_sidebar_rounded_right(
+            .opaque_region(WindowRegion::content_after_sidebar_rounded_right(
                 self.sidebar_width,
                 0,
                 WINDOW_RADIUS,
             ))
-            .input_region(WindowRegion::adaptive_rounded_rect(WINDOW_RADIUS));
+            .input_region(WindowRegion::rounded_rect(WINDOW_RADIUS));
 
         for &(action, offset) in controls {
             window = window.control_region(
@@ -116,9 +116,7 @@ pub fn run(
     SabineWindow::main_with_process(
         move |window| Ok(desktop::declare_appearance(build(window))),
         move |process| {
-            if let Some(emitter) = process.bridge_event_emitter() {
-                events.attach(emitter);
-            }
+            events.attach(process.bridge_event_emitter());
             crate::spawn(palette::watch_palette(events.clone()));
             crate::spawn(desktop::watch(events.clone()));
             started(events);

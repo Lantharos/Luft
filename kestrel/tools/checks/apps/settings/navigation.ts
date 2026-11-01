@@ -13,8 +13,10 @@ export async function show(app: LuftApp, page: string, label = `settings shows $
   return app.settle(() => true);
 }
 
-export async function showEnd(app: LuftApp, page: string) {
-  let after = await show(app, page);
+export const showEnd = async (app: LuftApp, page: string) => scrollToEnd(app, await show(app, page));
+
+export async function scrollToEnd(app: LuftApp, shown: Frame) {
+  let after = shown;
   let before: Frame;
   do {
     before = after;

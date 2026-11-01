@@ -12,6 +12,7 @@ data_resources = [
 
 install_subdir('sounds/luft', install_dir: datadir / 'sounds')
 subdir('fonts')
+subdir('rain')
 subdir('dconf')
 data_resources_targets = []
 foreach resource : data_resources

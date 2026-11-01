@@ -6,7 +6,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "synth.h"
+#include <gst/gst.h>
+
+#include "clips.h"
+#include "mix.h"
 
 #define QUANTUM "1024/48000"
 #define COMMAND_LIMIT 256
@@ -17,7 +20,7 @@ typedef struct
   struct pw_main_loop *loop;
   struct pw_stream *stream;
   struct spa_hook stream_listener;
-  RainSynth *synth;
+  RainMix *mix;
   GString *pending;
   struct spa_source *deadline;
   gboolean closing;
@@ -46,13 +49,13 @@ on_process (void *data)
   if (buffer->requested)
     frames = MIN (buffer->requested, frames);
 
-  rain_synth_render (rain->synth, block->data, frames);
+  rain_mix_render (rain->mix, block->data, frames);
   block->chunk->offset = 0;
   block->chunk->stride = stride;
   block->chunk->size = frames * stride;
   pw_stream_queue_buffer (rain->stream, buffer);
 
-  if (rain->closing && rain_synth_silent (rain->synth))
+  if (rain->closing && rain_mix_silent (rain->mix))
     pw_main_loop_quit (rain->loop);
 }
 
@@ -84,7 +87,7 @@ apply (Rain       *rain,
   float intensity, volume;
 
   if (sscanf (line, "%f %f", &intensity, &volume) == 2)
-    rain_synth_set (rain->synth, intensity, volume);
+    rain_mix_set (rain->mix, intensity, volume);
 }
 
 static void
@@ -104,7 +107,7 @@ close_softly (Rain *rain)
   if (rain->closing)
     return;
   rain->closing = TRUE;
-  rain_synth_set (rain->synth, 0.0f, 0.0f);
+  rain_mix_set (rain->mix, 0.0f, 0.0f);
   pw_loop_update_timer (pw_main_loop_get_loop (rain->loop), rain->deadline, &timeout, NULL, false);
 }
 
@@ -154,7 +157,7 @@ stream_properties (void)
 }
 
 static int
-play (void)
+play (RainMix *mix)
 {
   uint8_t pod[512];
   struct spa_pod_builder builder = SPA_POD_BUILDER_INIT (pod, sizeof (pod));
@@ -165,8 +168,7 @@ play (void)
     .channels = RAIN_CHANNELS,
     .position = { SPA_AUDIO_CHANNEL_FL, SPA_AUDIO_CHANNEL_FR },
   };
-  g_autoptr (RainSynth) synth = rain_synth_new (g_random_int ());
-  Rain rain = { .synth = synth, .pending = g_string_new (NULL) };
+  Rain rain = { .mix = mix, .pending = g_string_new (NULL) };
   struct spa_source *commands;
 
   pw_init (NULL, NULL);
@@ -207,10 +209,10 @@ parse_step (const char *step,
 }
 
 static int
-render (const char  *path,
+render (RainMix     *mix,
+        const char  *path,
         char       **steps)
 {
-  g_autoptr (RainSynth) synth = rain_synth_new (1);
   g_autoptr (GArray) samples = g_array_new (FALSE, FALSE, sizeof (float));
   g_autoptr (GByteArray) wav = g_byte_array_new ();
   g_autoptr (GError) error = NULL;
@@ -228,13 +230,13 @@ render (const char  *path,
           g_printerr ("kestrel-rain: steps look like SECONDS:INTENSITY:VOLUME, not %s\n", *steps);
           return EXIT_FAILURE;
         }
-      rain_synth_set (synth, intensity, volume);
+      rain_mix_set (mix, intensity, volume);
       if (first)
-        rain_synth_jump (synth);
+        rain_mix_jump (mix);
       first = FALSE;
       frames = (gsize) (seconds * RAIN_RATE);
       g_array_set_size (samples, offset + frames * RAIN_CHANNELS);
-      rain_synth_render (synth, &g_array_index (samples, float, offset), frames);
+      rain_mix_render (mix, &g_array_index (samples, float, offset), frames);
     }
 
   data_size = samples->len * sizeof (gint16);
@@ -279,10 +281,11 @@ int
 main (int    argc,
       char **argv)
 {
-  if (argc >= 4 && g_str_equal (argv[1], "--render"))
-    return render (argv[2], argv + 3);
+  gboolean rendering = argc >= 4 && g_str_equal (argv[1], "--render");
+  g_autoptr (RainMix) mix = NULL;
+  g_autoptr (GError) error = NULL;
 
-  if (argc != 1)
+  if (argc != 1 && !rendering)
     {
       g_printerr ("Usage: kestrel-rain\n"
                   "       kestrel-rain --render PATH SECONDS:INTENSITY:VOLUME...\n"
@@ -291,5 +294,13 @@ main (int    argc,
       return EXIT_FAILURE;
     }
 
-  return play ();
+  gst_init (NULL, NULL);
+  mix = rain_mix_new (rendering ? 1 : g_random_int (), &error);
+  if (!mix)
+    {
+      g_printerr ("kestrel-rain: %s\n", error->message);
+      return EXIT_FAILURE;
+    }
+
+  return rendering ? render (mix, argv[2], argv + 3) : play (mix);
 }

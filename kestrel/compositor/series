@@ -56,3 +56,4 @@
 0056-backends-tell-which-logical-monitors-have-a-touchscr.patch
 0057-wayland-tell-clients-Kestrel-resizes-their-toplevels.patch
 0058-wayland-drop-the-primary-selection.patch
+0059-display-finish-startups-of-X11-windows-launched-befo.patch

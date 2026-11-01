@@ -1,7 +1,7 @@
 import { events as sabineEvents } from '@lantharos/sabine';
 import { appearance } from '@luft/ui';
 import { commands } from '#lib/bindings.js';
-import type { LayoutEntry, Summary, Targets } from '#lib/bindings.js';
+import type { Launch, LayoutEntry, Summary, Targets } from '#lib/bindings.js';
 import { toast } from './toast.svelte';
 
 const LINK_SCHEME = 'kestrel-keys:';
@@ -21,8 +21,9 @@ class AppStore {
 	async start() {
 		const [state] = await Promise.all([commands.appState(), this.refresh()]);
 		appearance.start(state);
+		if (state.opened.length) await this.refresh();
 		this.selection ??= this.first();
-		await this.arrive(state);
+		this.launched(state);
 		this.focused = this.selection?.kind === 'view';
 		sabineEvents.singleInstance(async (activation) => void this.arrive(await commands.activationTargets(activation)));
 		window.addEventListener('focus', () => void this.refreshSources());
@@ -56,6 +57,13 @@ class AppStore {
 	async removed() {
 		await this.refresh();
 		this.selection = this.first();
+	}
+
+	launched({ link, opened, failed }: Launch) {
+		if (link) this.follow(link.slice(LINK_SCHEME.length));
+		const last = opened.at(-1);
+		if (last) this.select(last);
+		for (const error of failed) toast.fail(error);
 	}
 
 	async arrive({ link, files }: Targets) {

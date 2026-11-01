@@ -131,7 +131,7 @@ export type AppIcons = {
 	clear: IconPaint,
 };
 
-export type AppState = Appearance & Targets;
+export type AppState = Appearance & Launch;
 
 export type Appearance = {
 	palette: Palette | null,
@@ -175,6 +175,12 @@ export type IconPaint = {
 };
 
 export type Kind = "empty" | "character" | "dead" | "compose" | "function";
+
+export type Launch = {
+	link: string | null,
+	opened: Opened[],
+	failed: string[],
+};
 
 export type Layout = {
 	id: string,

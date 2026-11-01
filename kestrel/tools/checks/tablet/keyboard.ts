@@ -149,7 +149,7 @@ async function checkChromium(label: string, argv: string[], clientType: Meta.Win
     await capture(`tablet-keyboard-${label.replace(/\W+/g, '-').toLowerCase()}`);
     await hide(`its hide key is tapped over ${label}`, () => tap(centerOf(hideKey()!)));
     await tapsOpen(`the focused field in ${label} again`, centerOf(window.get_compositor_private<Meta.WindowActor>()));
-    await hide(`${label} closes`, () => stop(process));
+    await hide(`${label} closes`, () => window.delete(global.get_current_time()));
   } finally {
     await stop(process);
   }

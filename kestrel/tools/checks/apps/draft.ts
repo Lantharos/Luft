@@ -66,7 +66,9 @@ async function thaw(draft: LuftApp, typed: Frame) {
 
 async function checkFreezing(draft: LuftApp, palette: Palette) {
   const session = new Gio.Settings({schema_id: 'org.gnome.desktop.session'});
+  const power = new Gio.Settings({schema_id: 'com.lantharos.kestrel.power'});
   session.set_uint('idle-delay', 0);
+  power.set_boolean('idle-dim', false);
   let tern: LuftApp | null = null;
   try {
     await showDark(draft, palette);
@@ -80,6 +82,7 @@ async function checkFreezing(draft: LuftApp, palette: Palette) {
   } finally {
     await tern?.close();
     session.reset('idle-delay');
+    power.reset('idle-dim');
   }
 }
 

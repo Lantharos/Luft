@@ -117,6 +117,7 @@ jobs:
         run: |
           endpoint="https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com"
           s3() { aws s3 "$@" --endpoint-url "$endpoint" --only-show-errors; }
+          aws configure set default.s3.multipart_threshold 4GB
           for file in "$ISO_NAME" "$ISO_NAME.sha256" "$ISO_NAME.sha256.minisig"; do
             s3 cp "$file" "s3://$R2_BUCKET/$FOLDER/$file"
           done

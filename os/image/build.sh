@@ -112,7 +112,7 @@ part_names() {
   grep -v '^app-' <<<"$components"
   printf '%s\n' bootc portal
   [[ "$1" != luft-nvidia ]] || echo nvidia
-  printf '%s\n' runtime helium zypak
+  printf '%s\n' runtime helium cursors zypak
   grep '^app-' <<<"$components"
 }
 

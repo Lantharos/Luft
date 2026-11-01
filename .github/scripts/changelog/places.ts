@@ -35,6 +35,7 @@ export function place(path: string): Place | undefined {
 	const folder = /^apps\/([^/]+)\//.exec(path)?.[1];
 	if (folder) return app(folder);
 	if (path.startsWith('os/image/parts/helium/')) return { area: 'apps', title: 'Helium' };
+	if (path.startsWith('os/image/parts/cursors/')) return DESKTOP;
 	if (/^(services|security|os|boot|packages)\//.test(path) || path === 'Cargo.toml') return SYSTEM;
 	return undefined;
 }

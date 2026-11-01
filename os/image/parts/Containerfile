@@ -123,6 +123,14 @@ RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
 FROM scratch AS helium
 COPY --from=helium-build /stage /stage
 
+FROM ${BASE} AS cursors-build
+COPY os/image/parts/cursors /src/os/image/parts/cursors
+COPY os/image/parts/stages/cursors.sh /src/os/image/parts/stages/cursors.sh
+RUN /src/os/image/parts/stages/cursors.sh /stage
+
+FROM scratch AS cursors
+COPY --from=cursors-build /stage /stage
+
 FROM builder AS services-build
 COPY --from=sources . /src/
 COPY os/image/parts/components /src/os/image/parts/components/

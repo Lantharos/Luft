@@ -8,6 +8,7 @@ font-name='Open Runde 11'
 document-font-name='Open Runde 12'
 monospace-font-name='Maple Mono NF 11'
 gtk-enable-primary-paste=false
+cursor-theme='Bibata-Modern-Classic'
 
 [org.gnome.desktop.sound]
 theme-name='luft'

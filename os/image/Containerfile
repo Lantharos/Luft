@@ -19,6 +19,7 @@ COPY --from=parts kestrel/stage/ /
 COPY --from=parts boot/stage/ /
 COPY --from=parts runtime/stage/ /
 COPY --from=parts helium/stage/ /
+COPY --from=parts cursors/stage/ /
 COPY --from=parts zypak/stage/ /
 COPY --from=parts apps/ /
 COPY os/image/files/ /

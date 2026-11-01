@@ -2,6 +2,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import {dismissImmediately, Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
+import {activateInAppRuntime} from '../checks/lib/apps/luftApp.js';
 import {rest} from '../checks/lib/input/input.js';
 import {stopAll} from '../checks/lib/processes.js';
 import {settled} from '../checks/lib/wait.js';
@@ -47,6 +48,7 @@ async function reset() {
 
 export async function run() {
   pinFileManager();
+  await activateInAppRuntime();
   await settled();
   try {
     for (let group = claim(); group; group = claim()) {

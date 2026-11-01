@@ -7,6 +7,7 @@ import type Meta from 'gi://Meta';
 import {atSessionEnd} from '../../../automation/runner.js';
 import {requireFresh} from './freshness.js';
 import {prepareHome} from './home.js';
+import {call} from '../dbus.js';
 import {click, type Point} from '../input/input.js';
 import {repository, spawn, type Process} from '../processes.js';
 import {captureFrame, type Area, type Frame} from '../screenshots.js';
@@ -34,6 +35,15 @@ interface LifecycleChange {
 let home: string | null = null;
 let service: Promise<Service> | null = null;
 
+const runtime = () => ({
+  XDG_RUNTIME_DIR: GLib.getenv('KESTREL_APP_RUNTIME_DIR')!,
+  WAYLAND_DISPLAY: GLib.build_filenamev([GLib.get_user_runtime_dir(), GLib.getenv('WAYLAND_DISPLAY')!]),
+});
+
+/** Starts the services D-Bus activates, such as Rover's file manager service, in the apps' runtime folder instead of the host's. */
+export const activateInAppRuntime = () => call('org.freedesktop.DBus', '/org/freedesktop/DBus', 'org.freedesktop.DBus', 'UpdateActivationEnvironment',
+  new GLib.Variant('(a{ss})', [runtime()]));
+
 function environment(manifest: string | null = null): Record<string, string | null> {
   home ??= prepareHome();
   const ibus = IBus.get_address();
@@ -42,8 +52,7 @@ function environment(manifest: string | null = null): Record<string, string | nu
     GI_TYPELIB_PATH: null,
     HOME: home,
     SABINE_TRACE: '1',
-    XDG_RUNTIME_DIR: GLib.getenv('KESTREL_APP_RUNTIME_DIR'),
-    WAYLAND_DISPLAY: GLib.build_filenamev([GLib.get_user_runtime_dir(), GLib.getenv('WAYLAND_DISPLAY')!]),
+    ...runtime(),
     ...manifest && {SABINE_MANIFEST_PATH: manifest},
     ...ibus && {IBUS_ADDRESS: ibus},
   };

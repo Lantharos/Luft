@@ -6,9 +6,9 @@ use serde::Serialize;
 use specta::Type;
 
 use super::image;
-use super::waiting::{self, SabineWait};
 use super::state;
 use super::store::Checked;
+use super::waiting::{self, SabineWait};
 
 #[derive(Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]

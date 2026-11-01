@@ -77,14 +77,24 @@ foreach service, entry : dbus_services
     install_dir: pkgdatadir,
   )
 
+endforeach
+
+activated_names = {
+  'com.lantharos.Kestrel.Notifications': 'com.lantharos.Kestrel.Notifications',
+  'org.freedesktop.Notifications': 'com.lantharos.Kestrel.Notifications',
+  'com.lantharos.Kestrel.Screencast': 'com.lantharos.Kestrel.Screencast',
+}
+
+foreach name, service : activated_names
   serviceconf = configuration_data()
+  serviceconf.set('name', name)
   serviceconf.set('service', service)
   serviceconf.set('gjs', gjs.full_path())
   serviceconf.set('pkgdatadir', pkgdatadir)
 
   configure_file(
     input: 'dbus-service.service.in',
-    output: service + '.service',
+    output: name + '.service',
     configuration: serviceconf,
     install_dir: servicedir,
   )

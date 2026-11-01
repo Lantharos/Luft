@@ -51,6 +51,7 @@ write_dbus_services() {
   for name in com.lantharos.Kestrel.Notifications com.lantharos.Kestrel.Screencast; do
     dbus_service "$name" "$(command -v gjs)" -m "$build/ui/$name"
   done
+  dbus_service org.freedesktop.Notifications "$(command -v gjs)" -m "$build/ui/com.lantharos.Kestrel.Notifications"
   dbus_service com.lantharos.Kestrel.HotplugSniffer "$build/src/hotplug-sniffer/kestrel-hotplug-sniffer"
   dbus_service com.lantharos.Kestrel.Portal "$root/target/release/kestrel-portal"
   for name in com.lantharos.Keyring1 org.freedesktop.secrets org.freedesktop.portal.IBus org.freedesktop.portal.Desktop \

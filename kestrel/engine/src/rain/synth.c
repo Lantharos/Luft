@@ -9,6 +9,8 @@
 #define FDN 4
 #define STORM_FROM 0.75f
 #define GAIN 1.12f
+#define BUILD_UP_S 1.4f
+#define WIND_DOWN_S 1.0f
 
 /* Mix levels. Small laptop speakers play roughly 200 Hz to 10 kHz, so the bed carries
  * the body, the crackle stays below the fizzy top octave, and the low end starts above
@@ -82,6 +84,10 @@ struct _RainSynth
   float volume;
   float target_volume;
   float fade;
+  float presence;
+  float target_presence;
+  float build_up;
+  float wind_down;
   float gust;
   float gust_target;
   gsize gust_hold;
@@ -478,7 +484,9 @@ rain_synth_render (RainSynth *synth,
 
       /* Volume glides every sample, so moving the slider never steps in 64-sample stairs. */
       synth->volume += (synth->target_volume - synth->volume) * synth->fade;
-      gain = GAIN * (1.0f - 0.45f * intensity) * synth->volume;
+      synth->presence += (synth->target_presence - synth->presence) *
+                         (synth->target_presence > synth->presence ? synth->build_up : synth->wind_down);
+      gain = GAIN * (1.0f - 0.45f * intensity) * synth->volume * synth->presence;
       for (guint c = 0; c < RAIN_CHANNELS; c++)
         {
           float sample = dry[c] + drops[c] + 0.3f * wet[c];
@@ -497,7 +505,9 @@ rain_synth_set (RainSynth *synth,
                 float      volume)
 {
   synth->target_intensity = CLAMP (intensity, 0.0f, 1.0f);
-  synth->target_volume = CLAMP (volume, 0.0f, 1.0f);
+  synth->target_presence = volume > 0.0f ? 1.0f : 0.0f;
+  if (volume > 0.0f)
+    synth->target_volume = CLAMP (volume, 0.0f, 1.0f);
 }
 
 void
@@ -505,12 +515,13 @@ rain_synth_jump (RainSynth *synth)
 {
   synth->intensity = synth->target_intensity;
   synth->volume = synth->target_volume;
+  synth->presence = synth->target_presence;
 }
 
 gboolean
 rain_synth_silent (RainSynth *synth)
 {
-  return synth->target_volume == 0.0f && synth->volume < 1e-4f;
+  return synth->target_presence == 0.0f && synth->presence < 1e-4f;
 }
 
 RainSynth *
@@ -522,6 +533,8 @@ rain_synth_new (guint32 seed)
   synth->gust = 1.0f;
   synth->gust_target = 1.0f;
   synth->fade = 1.0f - expf (-1.0f / (0.25f * RAIN_RATE));
+  synth->build_up = 1.0f - expf (-1.0f / (BUILD_UP_S * RAIN_RATE));
+  synth->wind_down = 1.0f - expf (-1.0f / (WIND_DOWN_S * RAIN_RATE));
   synth->thunder_wait = (gsize) (between (synth, 6.0f, 15.0f) * RAIN_RATE);
 
   for (guint c = 0; c < RAIN_CHANNELS; c++)

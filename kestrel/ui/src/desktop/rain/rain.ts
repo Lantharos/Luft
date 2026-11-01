@@ -22,6 +22,9 @@ export interface RainHost {
 
 const SURFACE_TYPES = [Meta.WindowType.NORMAL, Meta.WindowType.DIALOG, Meta.WindowType.MODAL_DIALOG, Meta.WindowType.UTILITY];
 const FADE_DURATION = 600;
+const BUILD_UP_S = 1.6;
+const WIND_DOWN_S = 1.2;
+const DRY = 0.002;
 const TIME_WRAP_S = 3600;
 const SNIPPET = (() => {
   const snippet = Cogl.Snippet.new(Cogl.SnippetHook.FRAGMENT, DECLARATIONS, null);
@@ -123,6 +126,8 @@ export class Rain {
   private readonly timeline = new Clutter.Timeline({ actor: global.stage, duration: 1000, repeat_count: -1 });
   private sheets: Sheet[] = [];
   private desktopVisible = false;
+  private density = 0;
+  private lastFrame = 0;
 
   constructor(private readonly host: RainHost) {
     this.settingsSignals = ['rain', 'rain-visible', 'rain-intensity'].map(key => this.settings.connect(`changed::${key}`, () => this.sync()));
@@ -133,8 +138,12 @@ export class Rain {
     this.timeline.connect('new-frame', () => this.frame());
   }
 
+  private get raining(): boolean {
+    return this.settings.get_boolean('rain') && this.settings.get_boolean('rain-visible');
+  }
+
   private get allowed(): boolean {
-    return this.settings.get_boolean('rain') && this.settings.get_boolean('rain-visible') && this.desktopVisible && this.conditions.allowed &&
+    return (this.raining || this.density > DRY) && this.desktopVisible && this.conditions.allowed &&
       this.shell.enable_animations && !reducedMotion();
   }
 
@@ -144,6 +153,7 @@ export class Rain {
     if (visible.size && !this.sheets.length) this.build();
     for (const sheet of this.sheets.filter(sheet => !sheet.destroyed)) this.show(sheet, visible.has(sheet.monitor.index));
     if (visible.size && !this.timeline.is_playing()) {
+      this.lastFrame = 0;
       this.frame();
       this.timeline.start();
     }
@@ -184,6 +194,7 @@ export class Rain {
   private frame(): void {
     const time = ((GLib.get_monotonic_time() - this.started) / GLib.USEC_PER_SEC) % TIME_WRAP_S;
     const weather = WEATHER[this.settings.get_string('rain-intensity') as Intensity] ?? WEATHER.rain;
+    this.ease(this.raining ? weather.density : 0);
     const gust = 1 + 0.35 * Math.sin(time * 0.21) + 0.15 * Math.sin(time * 0.73 + 1.3);
     const workspace = global.workspace_manager.get_active_workspace();
     const windows = global.display.sort_windows_by_stacking(workspace.list_windows().filter(window => onScreen(window, workspace)))
@@ -193,7 +204,19 @@ export class Rain {
         return { x, y, width, height };
       });
     for (const sheet of this.sheets) {
-      if (!sheet.destroyed && sheet.actor.visible) sheet.paint(time, weather.density, weather.wind * gust, windows, this.host.taskbar(sheet.monitor));
+      if (!sheet.destroyed && sheet.actor.visible) sheet.paint(time, this.density, weather.wind * gust, windows, this.host.taskbar(sheet.monitor));
+    }
+  }
+
+  private ease(target: number): void {
+    const now = GLib.get_monotonic_time();
+    const elapsed = this.lastFrame ? (now - this.lastFrame) / GLib.USEC_PER_SEC : 0;
+    this.lastFrame = now;
+    const seconds = target > this.density ? BUILD_UP_S : WIND_DOWN_S;
+    this.density += (target - this.density) * (1 - Math.exp(-elapsed / seconds));
+    if (!this.raining && this.density > 0 && this.density <= DRY) {
+      this.density = 0;
+      this.sync();
     }
   }
 

@@ -15,6 +15,8 @@ settings-display-resolution-title = Ανάλυση
 settings-display-resolution = { $width } × { $height }
 settings-display-refresh-rate-title = Ρυθμός ανανέωσης
 settings-display-refresh-rate = { NUMBER($rate, maximumFractionDigits: 2) } Hz
+settings-display-touch-taskbar = Γραμμή εργασιών αφής
+settings-display-touch-taskbar-description = Εμφανίζει σε αυτή την οθόνη γραμμή εργασιών στο μέγεθος των δαχτύλων και των γραφίδων
 settings-display-variable-refresh = Μεταβλητός ρυθμός ανανέωσης
 settings-display-variable-refresh-description = Η οθόνη ακολουθεί τον ρυθμό καρέ των παιχνιδιών σε πλήρη οθόνη για πιο ομαλή κίνηση
 settings-display-variable-refresh-off = Ανενεργός
@@ -391,8 +393,6 @@ settings-shortcuts-add-button = Προσθήκη
 ## Dictation
 
 settings-dictation-title = Υπαγόρευση
-settings-dictation-description = Κρατήστε πατημένο { $keys } και μιλήστε για να πληκτρολογηθούν όσα λέτε, σε οποιαδήποτε εφαρμογή. Αφήστε το για να τελειώσετε ή πατήστε Esc για ακύρωση. Όλα γίνονται σε αυτόν τον υπολογιστή: η φωνή σας δεν φεύγει ποτέ από αυτόν και δεν αποθηκεύεται.
-settings-dictation-description-no-shortcut = Επιλέξτε μια συντόμευση παρακάτω για υπαγόρευση. Όλα γίνονται σε αυτόν τον υπολογιστή: η φωνή σας δεν φεύγει ποτέ από αυτόν και δεν αποθηκεύεται.
 settings-dictation-not-installed = Η υπαγόρευση δεν είναι εγκατεστημένη σε αυτόν τον υπολογιστή
 settings-dictation-hold = Κρατήστε πατημένο { $keys } για υπαγόρευση
 settings-dictation-needs-shortcut = Ανενεργή μέχρι να οριστεί συντόμευση

@@ -15,6 +15,8 @@ settings-display-resolution-title = Tarkkuus
 settings-display-resolution = { $width } × { $height }
 settings-display-refresh-rate-title = Virkistystaajuus
 settings-display-refresh-rate = { NUMBER($rate, maximumFractionDigits: 2) } Hz
+settings-display-touch-taskbar = Kosketustehtäväpalkki
+settings-display-touch-taskbar-description = Näyttää tällä näytöllä sormille ja kynille mitoitetun tehtäväpalkin
 settings-display-variable-refresh = Vaihteleva virkistystaajuus
 settings-display-variable-refresh-description = Näyttö seuraa koko näytön pelien kuvataajuutta, jolloin liike on sulavampaa
 settings-display-variable-refresh-off = Pois
@@ -391,8 +393,6 @@ settings-shortcuts-add-button = Lisää
 ## Dictation
 
 settings-dictation-title = Sanelu
-settings-dictation-description = Pidä { $keys } painettuna ja puhu, niin puheesi kirjoitetaan missä tahansa sovelluksessa. Lopeta päästämällä irti tai peruuta painamalla Esc. Kaikki tapahtuu tässä tietokoneessa: äänesi ei lähde siitä eikä sitä tallenneta.
-settings-dictation-description-no-shortcut = Valitse alta pikanäppäin, niin voit sanella. Kaikki tapahtuu tässä tietokoneessa: äänesi ei lähde siitä eikä sitä tallenneta.
 settings-dictation-not-installed = Sanelua ei ole asennettu tähän tietokoneeseen
 settings-dictation-hold = Sanele pitämällä { $keys } painettuna
 settings-dictation-needs-shortcut = Pois, kunnes sille on asetettu pikanäppäin

@@ -15,6 +15,8 @@ settings-display-resolution-title = Резолуција
 settings-display-resolution = { $width } × { $height }
 settings-display-refresh-rate-title = Стапка на освежување
 settings-display-refresh-rate = { NUMBER($rate, maximumFractionDigits: 2) } Hz
+settings-display-touch-taskbar = Лента со задачи за допир
+settings-display-touch-taskbar-description = На овој екран прикажува лента со задачи прилагодена за прсти и пенкала
 settings-display-variable-refresh = Променлива стапка на освежување
 settings-display-variable-refresh-description = Екранот ја следи брзината на сликите во игрите на цел екран, за помазно движење
 settings-display-variable-refresh-off = Исклучено
@@ -391,8 +393,6 @@ settings-shortcuts-add-button = Додај
 ## Dictation
 
 settings-dictation-title = Диктирање
-settings-dictation-description = Држете { $keys } и зборувајте, а она што го кажувате ќе се внесе како текст во која било апликација. Пуштете за да завршите или притиснете Esc за да откажете. Сè се случува на овој компјутер: вашиот глас никогаш не го напушта и не се зачувува.
-settings-dictation-description-no-shortcut = Изберете кратенка подолу за да диктирате. Сè се случува на овој компјутер: вашиот глас никогаш не го напушта и не се зачувува.
 settings-dictation-not-installed = Диктирањето не е инсталирано на овој компјутер
 settings-dictation-hold = Држете { $keys } за да диктирате
 settings-dictation-needs-shortcut = Исклучено додека нема кратенка

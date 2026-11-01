@@ -1054,6 +1054,7 @@ export type LogicalMonitor = {
 	transform: number,
 	primary: boolean,
 	monitors: string[],
+	directInput: boolean,
 };
 
 export type LoginScreen = {
@@ -1099,6 +1100,7 @@ export type Model = {
 
 export type Monitor = {
 	connector: string,
+	key: string,
 	name: string,
 	builtin: boolean,
 	modes: Mode[],
@@ -1142,8 +1144,6 @@ export type Overview = {
 	engine: Engine,
 	/**  The engines this computer's processor can run. */
 	engines: Engine[],
-	/**  The model dictation listens with now, unless the processor can't run it. */
-	model: string | null,
 };
 
 export type PairingKind = "confirm" | "authorize" | "pin" | "passkey" | "display";

@@ -387,6 +387,15 @@
         Tablet mode always shows the taskbar.
       </description>
     </key>
+    <key name="touch-taskbar-off" type="as">
+      <default>[]</default>
+      <summary>Touch screens that keep the regular taskbar</summary>
+      <description>
+        Screens with a touchscreen or pen, named as vendor:product:serial,
+        that show the taskbar chosen for the other screens instead of the
+        touch taskbar. Mirrored screens always keep the regular taskbar.
+      </description>
+    </key>
     <key name="taskbar-start-button" type="b">
       <default>true</default>
       <summary>Show the Start button</summary>

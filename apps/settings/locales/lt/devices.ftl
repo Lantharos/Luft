@@ -15,6 +15,8 @@ settings-display-resolution-title = Skyra
 settings-display-resolution = { $width } × { $height }
 settings-display-refresh-rate-title = Atnaujinimo dažnis
 settings-display-refresh-rate = { NUMBER($rate, maximumFractionDigits: 2) } Hz
+settings-display-touch-taskbar = Liečiamoji užduočių juosta
+settings-display-touch-taskbar-description = Šiame ekrane rodo pirštams ir rašikliams pritaikytą užduočių juostą
 settings-display-variable-refresh = Kintamas atnaujinimo dažnis
 settings-display-variable-refresh-description = Ekranas prisitaiko prie viso ekrano žaidimų kadrų dažnio, todėl judesys sklandesnis
 settings-display-variable-refresh-off = Išjungta
@@ -409,8 +411,6 @@ settings-shortcuts-add-button = Pridėti
 ## Dictation
 
 settings-dictation-title = Diktavimas
-settings-dictation-description = Bet kurioje programoje laikykite { $keys } ir kalbėkite – tai, ką sakote, bus parašyta. Atleiskite, kad baigtumėte, arba paspauskite Esc, kad atšauktumėte. Viskas vyksta šiame kompiuteryje: jūsų balsas iš jo niekur nesiunčiamas ir neįrašomas.
-settings-dictation-description-no-shortcut = Kad galėtumėte diktuoti, toliau pasirinkite spartųjį klavišą. Viskas vyksta šiame kompiuteryje: jūsų balsas iš jo niekur nesiunčiamas ir neįrašomas.
 settings-dictation-not-installed = Diktavimas šiame kompiuteryje neįdiegtas
 settings-dictation-hold = Diktuokite laikydami { $keys }
 settings-dictation-needs-shortcut = Išjungta, kol nepriskirtas spartusis klavišas

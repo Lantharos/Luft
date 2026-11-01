@@ -15,6 +15,8 @@ settings-display-resolution-title = Resolutie
 settings-display-resolution = { $width } × { $height }
 settings-display-refresh-rate-title = Vernieuwingsfrequentie
 settings-display-refresh-rate = { NUMBER($rate, maximumFractionDigits: 2) } Hz
+settings-display-touch-taskbar = Aanraaktaakbalk
+settings-display-touch-taskbar-description = Toont op dit scherm een taakbalk op maat van vingers en pennen
 settings-display-variable-refresh = Variabele vernieuwingsfrequentie
 settings-display-variable-refresh-description = Laat het beeldscherm de framerate van games op volledig scherm volgen, voor vloeiendere beweging
 settings-display-variable-refresh-off = Uit
@@ -391,8 +393,6 @@ settings-shortcuts-add-button = Toevoegen
 ## Dictation
 
 settings-dictation-title = Dicteren
-settings-dictation-description = Houd { $keys } ingedrukt en praat om te typen wat je zegt, in elke app. Laat los om af te ronden, of druk op Esc om te annuleren. Alles gebeurt op deze computer: je stem verlaat hem nooit en wordt niet bewaard.
-settings-dictation-description-no-shortcut = Kies hieronder een sneltoets om te dicteren. Alles gebeurt op deze computer: je stem verlaat hem nooit en wordt niet bewaard.
 settings-dictation-not-installed = Dicteren is niet geïnstalleerd op deze computer
 settings-dictation-hold = Houd { $keys } ingedrukt om te dicteren
 settings-dictation-needs-shortcut = Uit totdat er een sneltoets is ingesteld

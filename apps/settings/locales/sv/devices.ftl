@@ -15,6 +15,8 @@ settings-display-resolution-title = Upplösning
 settings-display-resolution = { $width } × { $height }
 settings-display-refresh-rate-title = Uppdateringsfrekvens
 settings-display-refresh-rate = { NUMBER($rate, maximumFractionDigits: 2) } Hz
+settings-display-touch-taskbar = Pekaktivitetsfält
+settings-display-touch-taskbar-description = Visar ett aktivitetsfält anpassat för fingrar och pennor på den här skärmen
 settings-display-variable-refresh = Variabel uppdateringsfrekvens
 settings-display-variable-refresh-description = Låter skärmen följa bildfrekvensen i spel i helskärm för jämnare rörelser
 settings-display-variable-refresh-off = Av
@@ -391,8 +393,6 @@ settings-shortcuts-add-button = Lägg till
 ## Dictation
 
 settings-dictation-title = Diktering
-settings-dictation-description = Håll ned { $keys } och prata för att skriva det du säger, i vilken app som helst. Släpp för att avsluta eller tryck på Esc för att avbryta. Allt sker på den här datorn: din röst lämnar den aldrig och sparas inte.
-settings-dictation-description-no-shortcut = Välj ett kortkommando nedan för att diktera. Allt sker på den här datorn: din röst lämnar den aldrig och sparas inte.
 settings-dictation-not-installed = Diktering är inte installerat på den här datorn
 settings-dictation-hold = Håll ned { $keys } för att diktera
 settings-dictation-needs-shortcut = Av tills ett kortkommando har valts

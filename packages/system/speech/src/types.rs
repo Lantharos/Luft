@@ -57,6 +57,4 @@ pub struct Overview {
     pub engine: Engine,
     /// The engines this computer's processor can run.
     pub engines: Vec<Engine>,
-    /// The model dictation listens with now, unless the processor can't run it.
-    pub model: Option<String>,
 }

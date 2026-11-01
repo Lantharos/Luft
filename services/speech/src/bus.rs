@@ -164,7 +164,6 @@ impl Models {
             },
             engine: plan.engine,
             engines: processor.engines(),
-            model: processor.runs(plan.engine).then(|| plan.model.id.clone()),
         };
         serde_json::to_string(&overview).expect("the overview always serializes")
     }

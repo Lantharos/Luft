@@ -15,6 +15,8 @@ settings-display-resolution-title = Taifeach
 settings-display-resolution = { $width } × { $height }
 settings-display-refresh-rate-title = Ráta athnuachana
 settings-display-refresh-rate = { NUMBER($rate, maximumFractionDigits: 2) } Hz
+settings-display-touch-taskbar = Tascbharra tadhaill
+settings-display-touch-taskbar-description = Taispeánann sé tascbharra atá oiriúnach do mhéara agus do pheann ar an scáileán seo
 settings-display-variable-refresh = Ráta athnuachana athraitheach
 settings-display-variable-refresh-description = Leanann an scáileán ráta frámaí cluichí lánscáileáin ionas go mbíonn an ghluaiseacht níos míne
 settings-display-variable-refresh-off = As
@@ -418,8 +420,6 @@ settings-shortcuts-add-button = Cuir leis
 ## Dictation
 
 settings-dictation-title = Deachtú
-settings-dictation-description = Coinnigh { $keys } síos agus labhair chun a ndeir tú a chlóscríobh, in aip ar bith. Scaoil chun críochnú, nó brúigh Esc chun cealú. Tarlaíonn sé ar fad ar an ríomhaire seo: ní fhágann do ghuth riamh é agus ní shábháiltear é.
-settings-dictation-description-no-shortcut = Roghnaigh aicearra thíos chun deachtú. Tarlaíonn sé ar fad ar an ríomhaire seo: ní fhágann do ghuth riamh é agus ní shábháiltear é.
 settings-dictation-not-installed = Níl deachtú suiteáilte ar an ríomhaire seo
 settings-dictation-hold = Coinnigh { $keys } síos chun deachtú
 settings-dictation-needs-shortcut = As go dtí go mbíonn aicearra aige

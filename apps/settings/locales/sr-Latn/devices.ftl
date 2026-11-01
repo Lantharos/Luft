@@ -15,6 +15,8 @@ settings-display-resolution-title = Rezolucija
 settings-display-resolution = { $width } × { $height }
 settings-display-refresh-rate-title = Učestalost osvežavanja
 settings-display-refresh-rate = { NUMBER($rate, maximumFractionDigits: 2) } Hz
+settings-display-touch-taskbar = Traka zadataka za dodir
+settings-display-touch-taskbar-description = Na ovom ekranu prikazuje traku zadataka prilagođenu prstima i olovkama
 settings-display-variable-refresh = Promenljiva učestalost osvežavanja
 settings-display-variable-refresh-description = Ekran prati broj sličica u igrama preko celog ekrana, za glatkiji pokret
 settings-display-variable-refresh-off = Isključeno
@@ -400,8 +402,6 @@ settings-shortcuts-add-button = Dodaj
 ## Dictation
 
 settings-dictation-title = Diktiranje
-settings-dictation-description = Držite { $keys } i govorite da biste otkucali ono što kažete, u bilo kojoj aplikaciji. Pustite da biste završili ili pritisnite Escape da biste otkazali. Sve se dešava na ovom računaru: vaš glas ga nikada ne napušta i ne čuva se.
-settings-dictation-description-no-shortcut = Izaberite prečicu ispod da biste diktirali. Sve se dešava na ovom računaru: vaš glas ga nikada ne napušta i ne čuva se.
 settings-dictation-not-installed = Diktiranje nije instalirano na ovom računaru
 settings-dictation-hold = Držite { $keys } za diktiranje
 settings-dictation-needs-shortcut = Isključeno dok nema prečicu

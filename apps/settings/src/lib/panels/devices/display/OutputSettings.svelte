@@ -34,7 +34,10 @@
 	type VariableRefresh = 'off' | 'games' | 'fullscreen';
 
 
-	const kestrel = useSettings<{ 'variable-refresh': Exclude<VariableRefresh, 'off'> }>(KESTREL_SCHEMA, ['variable-refresh']);
+	const kestrel = useSettings<{ 'variable-refresh': Exclude<VariableRefresh, 'off'>; 'touch-taskbar-off': string[] }>(KESTREL_SCHEMA, [
+		'variable-refresh',
+		'touch-taskbar-off'
+	]);
 
 	let monitor = $derived(monitorOf(displays, output.connector));
 	let mode = $derived(modeOf(displays, output));
@@ -49,6 +52,15 @@
 		{ value: 'fullscreen', label: t('settings-display-variable-refresh-fullscreen') }
 	]);
 	let orientable = $derived(!(monitor.builtin && displays.orientationManaged));
+	let touch = $derived(
+		!draft.mirrored && !monitor.builtin && displays.logical.some((logical) => logical.directInput && logical.monitors.includes(output.connector))
+	);
+	let touchOff = $derived(kestrel.values['touch-taskbar-off'] ?? []);
+
+	function setTouchTaskbar(on: boolean) {
+		const others = touchOff.filter((key) => key !== monitor.key);
+		kestrel.set('touch-taskbar-off', on ? others : [...others, monitor.key]);
+	}
 
 	function setSize(key: string) {
 		const size = sizes.find((option) => option.value === key)!.size;
@@ -109,6 +121,11 @@
 	{#if scales.length > 1}
 		<Row title={t('settings-display-scale')} description={t('settings-display-scale-description')}>
 			<Select label={t('settings-display-scale')} options={scales} value={output.scale} onchange={(scale) => setScale(displays, draft, output, scale)} />
+		</Row>
+	{/if}
+	{#if touch}
+		<Row title={t('settings-display-touch-taskbar')} description={t('settings-display-touch-taskbar-description')}>
+			<Switch label={t('settings-display-touch-taskbar')} checked={!touchOff.includes(monitor.key)} onchange={setTouchTaskbar} />
 		</Row>
 	{/if}
 	{#if orientable}

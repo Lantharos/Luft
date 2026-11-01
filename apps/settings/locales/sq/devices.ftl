@@ -15,6 +15,8 @@ settings-display-resolution-title = Rezolucioni
 settings-display-resolution = { $width } × { $height }
 settings-display-refresh-rate-title = Shpejtësia e rifreskimit
 settings-display-refresh-rate = { NUMBER($rate, maximumFractionDigits: 2) } Hz
+settings-display-touch-taskbar = Shiriti i detyrave me prekje
+settings-display-touch-taskbar-description = Shfaq në këtë ekran një shirit detyrash të përshtatur për gishtat dhe lapsat
 settings-display-variable-refresh = Shpejtësi rifreskimi e ndryshueshme
 settings-display-variable-refresh-description = Lejon ekranin të ndjekë shpejtësinë e kuadrove të lojërave në ekran të plotë për lëvizje më të butë
 settings-display-variable-refresh-off = Joaktive
@@ -391,8 +393,6 @@ settings-shortcuts-add-button = Shto
 ## Dictation
 
 settings-dictation-title = Diktimi
-settings-dictation-description = Mbaj { $keys } dhe fol për të shkruar atë që thua, në çdo aplikacion. Lësho për të përfunduar ose shtyp Escape për të anuluar. Gjithçka ndodh në këtë kompjuter: zëri yt nuk largohet kurrë prej tij dhe nuk ruhet.
-settings-dictation-description-no-shortcut = Zgjidh më poshtë një shkurtore për të diktuar. Gjithçka ndodh në këtë kompjuter: zëri yt nuk largohet kurrë prej tij dhe nuk ruhet.
 settings-dictation-not-installed = Diktimi nuk është instaluar në këtë kompjuter
 settings-dictation-hold = Mbaj { $keys } për të diktuar
 settings-dictation-needs-shortcut = Joaktiv derisa të ketë një shkurtore

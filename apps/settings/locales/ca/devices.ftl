@@ -15,6 +15,8 @@ settings-display-resolution-title = Resolució
 settings-display-resolution = { $width } × { $height }
 settings-display-refresh-rate-title = Freqüència d’actualització
 settings-display-refresh-rate = { NUMBER($rate, maximumFractionDigits: 2) } Hz
+settings-display-touch-taskbar = Barra de tasques tàctil
+settings-display-touch-taskbar-description = Mostra en aquesta pantalla una barra de tasques pensada per a dits i llapis
 settings-display-variable-refresh = Freqüència d’actualització variable
 settings-display-variable-refresh-description = La pantalla segueix la freqüència de fotogrames dels jocs a pantalla completa perquè el moviment sigui més fluid
 settings-display-variable-refresh-off = Desactivada
@@ -391,8 +393,6 @@ settings-shortcuts-add-button = Afegeix
 ## Dictation
 
 settings-dictation-title = Dictat
-settings-dictation-description = Manteniu premut { $keys } i parleu per escriure el que dieu, en qualsevol aplicació. Deixeu-ho anar per acabar, o premeu Esc per cancel·lar. Tot passa en aquest ordinador: la vostra veu no en surt mai i no es desa.
-settings-dictation-description-no-shortcut = Trieu una drecera a sota per dictar. Tot passa en aquest ordinador: la vostra veu no en surt mai i no es desa.
 settings-dictation-not-installed = El dictat no està instal·lat en aquest ordinador
 settings-dictation-hold = Manteniu premut { $keys } per dictar
 settings-dictation-needs-shortcut = Desactivat fins que tingui una drecera

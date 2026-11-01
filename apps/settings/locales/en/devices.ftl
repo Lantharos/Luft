@@ -22,6 +22,8 @@ settings-display-resolution = { $width } × { $height }
 settings-display-refresh-rate-title = Refresh rate
 # $rate is in hertz, for example 59.95 or 144
 settings-display-refresh-rate = { NUMBER($rate, maximumFractionDigits: 2) } Hz
+settings-display-touch-taskbar = Touch taskbar
+settings-display-touch-taskbar-description = Shows a taskbar sized for fingers and pens on this screen
 settings-display-variable-refresh = Variable refresh rate
 settings-display-variable-refresh-description = Lets the display follow the frame rate of fullscreen games for smoother motion
 settings-display-variable-refresh-off = Off
@@ -457,8 +459,6 @@ settings-shortcuts-add-button = Add
 
 settings-dictation-title = Dictation
 # $keys is one or more shortcuts or keys, already joined, such as "Super+Alt or the Copilot key"
-settings-dictation-description = Hold { $keys } and talk to type what you say, in any app. Let go to finish, or press Escape to cancel. It all happens on this computer: your voice never leaves it and isn’t saved.
-settings-dictation-description-no-shortcut = Choose a shortcut below to dictate. It all happens on this computer: your voice never leaves it and isn’t saved.
 settings-dictation-not-installed = Dictation isn’t installed on this computer
 # $keys is one or more shortcuts or keys, already joined, such as "Super+Alt or the Copilot key"
 settings-dictation-hold = Hold { $keys } to dictate

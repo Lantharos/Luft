@@ -15,6 +15,8 @@ settings-display-resolution-title = Felbontás
 settings-display-resolution = { $width } × { $height }
 settings-display-refresh-rate-title = Frissítési gyakoriság
 settings-display-refresh-rate = { NUMBER($rate, maximumFractionDigits: 2) } Hz
+settings-display-touch-taskbar = Érintőképernyős tálca
+settings-display-touch-taskbar-description = Ujjakhoz és tollakhoz méretezett tálcát jelenít meg ezen a képernyőn
 settings-display-variable-refresh = Változó frissítési gyakoriság
 settings-display-variable-refresh-description = A kijelző követi a teljes képernyős játékok képkockasebességét, így a mozgás egyenletesebb
 settings-display-variable-refresh-off = Ki
@@ -391,8 +393,6 @@ settings-shortcuts-add-button = Hozzáadás
 ## Dictation
 
 settings-dictation-title = Diktálás
-settings-dictation-description = Bármely alkalmazásban gépelhet beszéddel, ha beszéd közben lenyomva tartja ezt: { $keys }. A befejezéshez engedje fel, a megszakításhoz nyomja meg az Esc billentyűt. Minden ezen a számítógépen történik: a hangja nem hagyja el, és nem is tárolódik.
-settings-dictation-description-no-shortcut = A diktáláshoz válasszon alább egy billentyűparancsot. Minden ezen a számítógépen történik: a hangja nem hagyja el, és nem is tárolódik.
 settings-dictation-not-installed = A diktálás nincs telepítve ezen a számítógépen
 settings-dictation-hold = Diktáláshoz tartsa lenyomva: { $keys }
 settings-dictation-needs-shortcut = Ki, amíg nincs billentyűparancsa

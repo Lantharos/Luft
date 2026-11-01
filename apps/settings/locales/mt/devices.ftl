@@ -15,6 +15,8 @@ settings-display-resolution-title = Riżoluzzjoni
 settings-display-resolution = { $width } × { $height }
 settings-display-refresh-rate-title = Rata ta’ aġġornament
 settings-display-refresh-rate = { NUMBER($rate, maximumFractionDigits: 2) } Hz
+settings-display-touch-taskbar = Taskbar tal-mess
+settings-display-touch-taskbar-description = Turi taskbar daqs is-swaba' u l-pinen fuq dan l-iskrin
 settings-display-variable-refresh = Rata ta’ aġġornament varjabbli
 settings-display-variable-refresh-description = Iħalli lill-iskrin isegwi l-frame rate tal-logħob fuq skrin sħiħ, għal moviment aktar bla xkiel
 settings-display-variable-refresh-off = Mitfija
@@ -418,8 +420,6 @@ settings-shortcuts-add-button = Żid
 ## Dictation
 
 settings-dictation-title = Dettatura
-settings-dictation-description = Żomm { $keys } u tkellem biex tittajpja dak li tgħid, fi kwalunkwe app. Erħi biex tlesti, jew agħfas Escape biex tikkanċella. Kollox jiġri f’dan il-kompjuter: il-vuċi qatt ma toħroġ minnu u ma tiġix issejvjata.
-settings-dictation-description-no-shortcut = Agħżel shortcut hawn taħt biex tiddetta. Kollox jiġri f’dan il-kompjuter: il-vuċi qatt ma toħroġ minnu u ma tiġix issejvjata.
 settings-dictation-not-installed = Id-dettatura mhix installata f’dan il-kompjuter
 settings-dictation-hold = Żomm { $keys } biex tiddetta
 settings-dictation-needs-shortcut = Mitfija sakemm ikollha shortcut

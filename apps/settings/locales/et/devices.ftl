@@ -15,6 +15,8 @@ settings-display-resolution-title = Eraldusvõime
 settings-display-resolution = { $width } × { $height }
 settings-display-refresh-rate-title = Värskendussagedus
 settings-display-refresh-rate = { NUMBER($rate, maximumFractionDigits: 2) } Hz
+settings-display-touch-taskbar = Puutetegumiriba
+settings-display-touch-taskbar-description = Näitab sellel ekraanil sõrmede ja pliiatsite jaoks mõõdetud tegumiriba
 settings-display-variable-refresh = Muutuv värskendussagedus
 settings-display-variable-refresh-description = Kuvar järgib täisekraanmängude kaadrisagedust, et liikumine oleks sujuvam
 settings-display-variable-refresh-off = Väljas
@@ -399,8 +401,6 @@ settings-shortcuts-add-button = Lisa
 ## Dictation
 
 settings-dictation-title = Dikteerimine
-settings-dictation-description = Hoia all { $keys } ja räägi – öeldu kirjutatakse mis tahes rakendusse. Lõpetamiseks lase lahti, loobumiseks vajuta Esc. Kõik toimub selles arvutis: sinu häält ei saadeta kuhugi ega salvestata.
-settings-dictation-description-no-shortcut = Dikteerimiseks vali allpool kiirklahv. Kõik toimub selles arvutis: sinu häält ei saadeta kuhugi ega salvestata.
 settings-dictation-not-installed = Dikteerimine pole sellesse arvutisse installitud
 settings-dictation-hold = Dikteerimiseks hoia all { $keys }
 settings-dictation-needs-shortcut = Väljas, kuni sellele on määratud kiirklahv

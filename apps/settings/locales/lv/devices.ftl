@@ -15,6 +15,8 @@ settings-display-resolution-title = Izšķirtspēja
 settings-display-resolution = { $width } × { $height }
 settings-display-refresh-rate-title = Atsvaidzes intensitāte
 settings-display-refresh-rate = { NUMBER($rate, maximumFractionDigits: 2) } Hz
+settings-display-touch-taskbar = Skārienuzdevumjosla
+settings-display-touch-taskbar-description = Šajā ekrānā rāda uzdevumjoslu, kas piemērota pirkstiem un pildspalvām
 settings-display-variable-refresh = Mainīga atsvaidzes intensitāte
 settings-display-variable-refresh-description = Ļauj displejam sekot pilnekrāna spēļu kadru nomaiņas ātrumam, lai kustība būtu plūdenāka
 settings-display-variable-refresh-off = Izslēgta
@@ -400,8 +402,6 @@ settings-shortcuts-add-button = Pievienot
 ## Dictation
 
 settings-dictation-title = Diktēšana
-settings-dictation-description = Turiet nospiestu { $keys } un runājiet, lai jebkurā lietotnē rakstītu sacīto. Atlaidiet, lai pabeigtu, vai nospiediet Esc, lai atceltu. Viss notiek šajā datorā: jūsu balss to nekad nepamet un netiek saglabāta.
-settings-dictation-description-no-shortcut = Lai diktētu, zemāk izvēlieties īsinājumtaustiņu. Viss notiek šajā datorā: jūsu balss to nekad nepamet un netiek saglabāta.
 settings-dictation-not-installed = Diktēšana šajā datorā nav instalēta
 settings-dictation-hold = Lai diktētu, turiet nospiestu { $keys }
 settings-dictation-needs-shortcut = Izslēgta, līdz tiks iestatīts īsinājumtaustiņš

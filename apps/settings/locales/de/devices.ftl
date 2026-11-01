@@ -15,6 +15,8 @@ settings-display-resolution-title = Auflösung
 settings-display-resolution = { $width } × { $height }
 settings-display-refresh-rate-title = Bildwiederholrate
 settings-display-refresh-rate = { NUMBER($rate, maximumFractionDigits: 2) } Hz
+settings-display-touch-taskbar = Touch-Taskleiste
+settings-display-touch-taskbar-description = Zeigt auf diesem Bildschirm eine Taskleiste in der Größe für Finger und Stifte
 settings-display-variable-refresh = Variable Bildwiederholrate
 settings-display-variable-refresh-description = Lässt den Bildschirm der Bildrate von Spielen im Vollbild folgen, für flüssigere Bewegungen
 settings-display-variable-refresh-off = Aus
@@ -391,8 +393,6 @@ settings-shortcuts-add-button = Hinzufügen
 ## Dictation
 
 settings-dictation-title = Diktieren
-settings-dictation-description = Halt { $keys } gedrückt und sprich, um in jeder App zu tippen, was du sagst. Lass los, um fertig zu werden, oder drück Esc zum Abbrechen. Alles passiert auf diesem Computer: Deine Stimme verlässt ihn nie und wird nicht gespeichert.
-settings-dictation-description-no-shortcut = Wähl unten ein Tastenkürzel zum Diktieren. Alles passiert auf diesem Computer: Deine Stimme verlässt ihn nie und wird nicht gespeichert.
 settings-dictation-not-installed = Diktieren ist auf diesem Computer nicht installiert
 settings-dictation-hold = Zum Diktieren { $keys } gedrückt halten
 settings-dictation-needs-shortcut = Aus, bis ein Tastenkürzel festgelegt ist

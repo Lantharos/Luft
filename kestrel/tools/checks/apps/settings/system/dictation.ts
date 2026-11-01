@@ -22,15 +22,15 @@ interface Model {
 }
 
 interface Models {
-  model: string;
+  engine: string;
   models: Model[];
 }
 
 async function overview() {
   const reply = await Gio.DBus.session.call(SPEECH, '/com/lantharos/Speech1', `${SPEECH}.Models`, 'Overview', null,
     new GLib.VariantType('(s)'), Gio.DBusCallFlags.NONE, -1, null);
-  const {models, model}: Models = JSON.parse(reply.deepUnpack<[string]>()[0]);
-  return {model, models: Object.fromEntries(models.map(entry => [entry.id, entry]))};
+  const {models, engine}: Models = JSON.parse(reply.deepUnpack<[string]>()[0]);
+  return {engine, models: Object.fromEntries(models.map(entry => [entry.id, entry]))};
 }
 
 type Overview = Awaited<ReturnType<typeof overview>>;
@@ -53,7 +53,7 @@ export async function checkDictation(app: LuftApp) {
     await eventually(() => listening(port), 'the stand-in model mirror is up');
     preferences.set_string('language', 'ja');
     await show(app, 'input/dictation');
-    await eventually(async () => (await overview()).model === WHISPER, 'Japanese needs Whisper', 15000);
+    await eventually(async () => (await overview()).engine === 'whisper', 'Japanese needs Whisper', 15000);
     require(!(await overview()).models[WHISPER].download, 'nothing downloads while dictation is off');
     await saved(app, 'off', () => true);
 
@@ -64,7 +64,7 @@ export async function checkDictation(app: LuftApp) {
     preferences.set_string('language', 'en');
     await eventually(async () => {
       const state = await overview();
-      return state.model === PARAKEET && downloading(state, PARAKEET) && !state.models[WHISPER].download;
+      return state.engine === 'parakeet' && downloading(state, PARAKEET) && !state.models[WHISPER].download;
     }, 'picking English downloads Parakeet instead and stops downloading Whisper');
     const kept = (await overview()).models[WHISPER].usage;
     require(kept > 0, 'what Whisper already downloaded stays');

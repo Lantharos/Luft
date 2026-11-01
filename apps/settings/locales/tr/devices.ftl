@@ -15,6 +15,8 @@ settings-display-resolution-title = Çözünürlük
 settings-display-resolution = { $width } × { $height }
 settings-display-refresh-rate-title = Yenileme hızı
 settings-display-refresh-rate = { NUMBER($rate, maximumFractionDigits: 2) } Hz
+settings-display-touch-taskbar = Dokunmatik görev çubuğu
+settings-display-touch-taskbar-description = Bu ekranda parmaklara ve kalemlere göre boyutlandırılmış bir görev çubuğu gösterir
 settings-display-variable-refresh = Değişken yenileme hızı
 settings-display-variable-refresh-description = Daha akıcı hareket için ekranın tam ekran oyunların kare hızını izlemesini sağlar
 settings-display-variable-refresh-off = Kapalı
@@ -391,8 +393,6 @@ settings-shortcuts-add-button = Ekle
 ## Dictation
 
 settings-dictation-title = Dikte
-settings-dictation-description = Herhangi bir uygulamada söylediklerinizi yazmak için şunu basılı tutup konuşun: { $keys }. Bitirmek için bırakın, iptal etmek için Esc tuşuna basın. Her şey bu bilgisayarda gerçekleşir: sesiniz bilgisayardan çıkmaz ve kaydedilmez.
-settings-dictation-description-no-shortcut = Dikte için aşağıdan bir kısayol seçin. Her şey bu bilgisayarda gerçekleşir: sesiniz bilgisayardan çıkmaz ve kaydedilmez.
 settings-dictation-not-installed = Dikte bu bilgisayarda yüklü değil
 settings-dictation-hold = Dikte için basılı tutun: { $keys }
 settings-dictation-needs-shortcut = Bir kısayol atanana kadar kapalı

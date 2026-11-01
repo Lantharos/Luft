@@ -56,7 +56,6 @@ Strings in Luft's Hungarian translation that a native speaker should check: term
 - `apps/settings/locales/hu/system.ftl` `settings-accounts-approve`: "…be van kapcsolva a Speciális adatvédelem." — check this matches Apple's Hungarian name for Advanced Data Protection.
 - `apps/settings/locales/hu/connections.ftl` `settings-network-security-psk`: "WPA2 Személyes" — Windows writes "WPA2-Personal" in some versions; check the preferred form.
 - `apps/settings/locales/hu/connections.ftl` `settings-bluetooth-windows`: "A Windowsban párosított eszközök: { $devices }. …" — $devices is a joined list; check the list joiner ("és még 3") fits.
-- `apps/settings/locales/hu/devices.ftl` `settings-dictation-description`: "…ha beszéd közben lenyomva tartja ezt: { $keys }." — $keys may be "Super+Alt vagy Copilot billentyű"; check it reads naturally.
 - `apps/settings/locales/hu/devices.ftl` `settings-sound-app-output`: "{ $app } hangkimenete" — picker label for "Play { $app } on"; check it fits the UI.
 - `apps/settings/locales/hu/devices.ftl` `settings-power-limit-stops-at`: "A töltés { $level } töltöttségnél leáll" — avoids "80%-nál"; check it isn't too wordy.
 - `apps/settings/locales/hu/devices.ftl` `settings-keys-keypad`: "Num { $key }" — no settled Hungarian label for keypad keys.

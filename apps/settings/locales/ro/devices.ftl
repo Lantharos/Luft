@@ -15,6 +15,8 @@ settings-display-resolution-title = Rezoluție
 settings-display-resolution = { $width } × { $height }
 settings-display-refresh-rate-title = Rată de reîmprospătare
 settings-display-refresh-rate = { NUMBER($rate, maximumFractionDigits: 2) } Hz
+settings-display-touch-taskbar = Bară de activități tactilă
+settings-display-touch-taskbar-description = Afișează pe acest ecran o bară de activități potrivită pentru degete și creioane
 settings-display-variable-refresh = Rată de reîmprospătare variabilă
 settings-display-variable-refresh-description = Ecranul urmează rata de cadre a jocurilor pe ecran complet, pentru o mișcare mai fluidă
 settings-display-variable-refresh-off = Dezactivată
@@ -400,8 +402,6 @@ settings-shortcuts-add-button = Adaugă
 ## Dictation
 
 settings-dictation-title = Dictare
-settings-dictation-description = Țineți apăsat { $keys } și vorbiți pentru a scrie ce spuneți, în orice aplicație. Eliberați pentru a termina sau apăsați Esc pentru a anula. Totul se petrece pe acest computer: vocea nu părăsește niciodată computerul și nu este salvată.
-settings-dictation-description-no-shortcut = Alegeți mai jos o comandă rapidă pentru dictare. Totul se petrece pe acest computer: vocea nu părăsește niciodată computerul și nu este salvată.
 settings-dictation-not-installed = Dictarea nu este instalată pe acest computer
 settings-dictation-hold = Țineți apăsat { $keys } pentru dictare
 settings-dictation-needs-shortcut = Dezactivată până când are o comandă rapidă

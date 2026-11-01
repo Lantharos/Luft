@@ -15,6 +15,8 @@ settings-display-resolution-title = Upplausn
 settings-display-resolution = { $width } × { $height }
 settings-display-refresh-rate-title = Endurnýjunartíðni
 settings-display-refresh-rate = { NUMBER($rate, maximumFractionDigits: 2) } Hz
+settings-display-touch-taskbar = Snertiverkstika
+settings-display-touch-taskbar-description = Sýnir verkstiku í stærð fyrir fingur og penna á þessum skjá
 settings-display-variable-refresh = Breytileg endurnýjunartíðni
 settings-display-variable-refresh-description = Lætur skjáinn fylgja rammatíðni leikja á fullum skjá svo hreyfingar verði mýkri
 settings-display-variable-refresh-off = Slökkt
@@ -391,8 +393,6 @@ settings-shortcuts-add-button = Bæta við
 ## Dictation
 
 settings-dictation-title = Raddinnsláttur
-settings-dictation-description = Haltu { $keys } inni og talaðu til að skrifa það sem þú segir, í hvaða forriti sem er. Slepptu til að ljúka eða ýttu á Esc til að hætta við. Allt gerist á þessari tölvu: röddin þín fer aldrei út úr henni og er ekki vistuð.
-settings-dictation-description-no-shortcut = Veldu flýtilykil hér fyrir neðan til að nota raddinnslátt. Allt gerist á þessari tölvu: röddin þín fer aldrei út úr henni og er ekki vistuð.
 settings-dictation-not-installed = Raddinnsláttur er ekki uppsettur á þessari tölvu
 settings-dictation-hold = Haltu { $keys } inni til að tala inn texta
 settings-dictation-needs-shortcut = Slökkt þar til flýtilykill er valinn

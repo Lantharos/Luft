@@ -15,6 +15,8 @@ settings-display-resolution-title = Rozlíšenie
 settings-display-resolution = { $width } × { $height }
 settings-display-refresh-rate-title = Obnovovacia frekvencia
 settings-display-refresh-rate = { NUMBER($rate, maximumFractionDigits: 2) } Hz
+settings-display-touch-taskbar = Dotykový panel úloh
+settings-display-touch-taskbar-description = Zobrazí na tejto obrazovke panel úloh prispôsobený prstom a perám
 settings-display-variable-refresh = Premenlivá obnovovacia frekvencia
 settings-display-variable-refresh-description = Obrazovka sa prispôsobí snímkovej frekvencii hier na celej obrazovke, takže pohyb je plynulejší
 settings-display-variable-refresh-off = Vypnutá
@@ -409,8 +411,6 @@ settings-shortcuts-add-button = Pridať
 ## Dictation
 
 settings-dictation-title = Diktovanie
-settings-dictation-description = Podržte { $keys } a hovorte, napíše sa, čo poviete, v ľubovoľnej aplikácii. Pustením diktovanie dokončíte, klávesom Esc ho zrušíte. Všetko prebieha v tomto počítači: váš hlas ho nikdy neopustí a neukladá sa.
-settings-dictation-description-no-shortcut = Na diktovanie vyberte nižšie skratku. Všetko prebieha v tomto počítači: váš hlas ho nikdy neopustí a neukladá sa.
 settings-dictation-not-installed = Diktovanie nie je v tomto počítači nainštalované
 settings-dictation-hold = Na diktovanie podržte { $keys }
 settings-dictation-needs-shortcut = Vypnuté, kým nemá skratku

@@ -15,8 +15,9 @@ Upstream-Status: luft-only for Kestrel's per-screen touch layout
  src/backends/meta-backend.c              | 45 ++++++++++++++++++++++++
  src/backends/meta-input-mapper-private.h |  3 ++
  src/backends/meta-input-mapper.c         | 34 ++++++++++++++++++
+ src/backends/meta-monitor-manager.c      | 15 +++++++-
  src/meta/meta-backend.h                  |  4 +++
- 4 files changed, 86 insertions(+)
+ 5 files changed, 100 insertions(+), 1 deletion(-)
 
 diff --git a/src/backends/meta-backend.c b/src/backends/meta-backend.c
 index b80e485fd021e290e884b2dc2ccfc733a11d88b8..0d7f84c7164ad9495570f6c9b75cdf0889a4fe3d 100644
@@ -182,6 +183,53 @@ index f88c00304f904ac3aced270e1566d31def0db5d0..d7bf11dcbf1b87b1e6b92b1810237d3e
  static ClutterInputDevice *
  find_grouped_pen (ClutterInputDevice *device)
  {
+diff --git a/src/backends/meta-monitor-manager.c b/src/backends/meta-monitor-manager.c
+index 4fd0f8937c506e69422544f8e2df6d122260d2d3..e2257abe7ebe6e73c189464c03f91e2ca8883db1 100644
+--- a/src/backends/meta-monitor-manager.c
++++ b/src/backends/meta-monitor-manager.c
+@@ -1491,6 +1491,11 @@ meta_monitor_manager_constructed (GObject *object)
+                            G_CALLBACK (lid_is_closed_changed),
+                            manager, G_CONNECT_DEFAULT);
+ 
++  g_signal_connect_object (backend,
++                           "direct-input-changed",
++                           G_CALLBACK (meta_dbus_display_config_emit_monitors_changed),
++                           manager->display_config, G_CONNECT_SWAPPED);
++
+   g_signal_connect (context, "started", G_CALLBACK (on_started), manager);
+   g_signal_connect (backend, "prepare-shutdown",
+                     G_CALLBACK (prepare_shutdown),
+@@ -2400,6 +2405,7 @@ meta_monitor_manager_handle_get_current_state (MetaDBusDisplayConfig *skeleton,
+     {
+       MetaLogicalMonitor *logical_monitor = l->data;
+       GVariantBuilder logical_monitor_monitors_builder;
++      GVariantBuilder logical_monitor_properties_builder;
+       GList *k;
+ 
+       g_variant_builder_init (&logical_monitor_monitors_builder,
+@@ -2418,6 +2424,13 @@ meta_monitor_manager_handle_get_current_state (MetaDBusDisplayConfig *skeleton,
+                                  monitor_spec->serial);
+         }
+ 
++      g_variant_builder_init (&logical_monitor_properties_builder,
++                              G_VARIANT_TYPE ("a{sv}"));
++      g_variant_builder_add (&logical_monitor_properties_builder, "{sv}",
++                             "direct-input",
++                             g_variant_new_boolean (meta_backend_has_direct_input (manager->backend,
++                                                                                   logical_monitor)));
++
+       g_variant_builder_add (&logical_monitors_builder,
+                              LOGICAL_MONITOR_FORMAT,
+                              logical_monitor->rect.x,
+@@ -2426,7 +2439,7 @@ meta_monitor_manager_handle_get_current_state (MetaDBusDisplayConfig *skeleton,
+                              logical_monitor->transform,
+                              logical_monitor->is_primary,
+                              &logical_monitor_monitors_builder,
+-                             NULL);
++                             &logical_monitor_properties_builder);
+     }
+ 
+   g_variant_builder_init (&properties_builder, G_VARIANT_TYPE ("a{sv}"));
 diff --git a/src/meta/meta-backend.h b/src/meta/meta-backend.h
 index 47a634b0826ef667951ced61f223409c67805dda..827c21576466e8680e1a1f534c8c6129e9808b7a 100644
 --- a/src/meta/meta-backend.h

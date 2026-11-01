@@ -63,8 +63,9 @@
 		return chosen && chosen !== 'automatic' && usable.includes(chosen) ? chosen : spoken?.engine;
 	});
 	let available = $derived(!spoken || usable.includes(spoken.engine));
-	let model = $derived(info?.models.find((model) => model.id === info?.model));
-	let downloaded = $derived(info?.models.filter((other) => other !== model && (other.usage > 0 || other.download)) ?? []);
+	let model = $derived(engine && usable.includes(engine) ? info?.models.find((model) => model.engine === engine) : undefined);
+	let missing = $derived(model && !model.installed ? model : undefined);
+	let downloaded = $derived(info?.models.filter((other) => other !== missing && (other.usage > 0 || other.download)) ?? []);
 	let languages = $derived([
 		{
 			value: '',
@@ -110,9 +111,7 @@
 </script>
 
 <SubPage title={t('settings-dictation-title')} {onclose}>
-	<Section
-		description={holdWith ? t('settings-dictation-description', { keys: holdWith }) : t('settings-dictation-description-no-shortcut')}
-	>
+	<Section>
 		<Row
 			title={t('settings-dictation-title')}
 			description={unavailable
@@ -124,8 +123,8 @@
 		>
 			<Switch label={t('settings-dictation-title')} checked={enabled} disabled={unavailable} onchange={(on) => settings.set('enabled', on)} />
 		</Row>
-		{#if model && !unavailable}
-			<ModelRow {model} />
+		{#if missing && !unavailable}
+			<ModelRow model={missing} />
 		{/if}
 	</Section>
 

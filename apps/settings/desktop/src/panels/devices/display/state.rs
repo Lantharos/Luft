@@ -30,6 +30,7 @@ pub struct Displays {
 #[serde(rename_all = "camelCase")]
 struct Monitor {
     connector: String,
+    key: String,
     name: String,
     builtin: bool,
     modes: Vec<Mode>,
@@ -50,6 +51,7 @@ struct Mode {
 }
 
 #[derive(Serialize, Type)]
+#[serde(rename_all = "camelCase")]
 struct LogicalMonitor {
     x: i32,
     y: i32,
@@ -57,6 +59,7 @@ struct LogicalMonitor {
     transform: u32,
     primary: bool,
     monitors: Vec<String>,
+    direct_input: bool,
 }
 
 pub async fn proxy() -> Result<Proxy<'static>, String> {
@@ -110,8 +113,9 @@ fn mode((id, width, height, refresh, preferred_scale, scales, properties): ModeI
     }
 }
 
-fn monitor(((connector, vendor, product, _), modes, properties): MonitorInfo) -> Monitor {
+fn monitor(((connector, vendor, product, serial), modes, properties): MonitorInfo) -> Monitor {
     Monitor {
+        key: format!("{vendor}:{product}:{serial}"),
         name: text(&properties, "display-name").unwrap_or_else(|| format!("{vendor} {product}")),
         builtin: flag(&properties, "is-builtin"),
         modes: modes.into_iter().map(mode).collect(),
@@ -119,8 +123,9 @@ fn monitor(((connector, vendor, product, _), modes, properties): MonitorInfo) ->
     }
 }
 
-fn logical((x, y, scale, transform, primary, monitors, _): LogicalInfo) -> LogicalMonitor {
+fn logical((x, y, scale, transform, primary, monitors, properties): LogicalInfo) -> LogicalMonitor {
     LogicalMonitor {
+        direct_input: flag(&properties, "direct-input"),
         x,
         y,
         scale,

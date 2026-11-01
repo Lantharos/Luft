@@ -15,6 +15,8 @@ settings-display-resolution-title = Роздільна здатність
 settings-display-resolution = { $width } × { $height }
 settings-display-refresh-rate-title = Частота оновлення
 settings-display-refresh-rate = { NUMBER($rate, maximumFractionDigits: 2) } Гц
+settings-display-touch-taskbar = Сенсорна панель завдань
+settings-display-touch-taskbar-description = Показує на цьому екрані панель завдань під пальці й пера
 settings-display-variable-refresh = Змінна частота оновлення
 settings-display-variable-refresh-description = Дисплей підлаштовується під частоту кадрів повноекранних ігор, тож рух плавніший
 settings-display-variable-refresh-off = Вимкнено
@@ -409,8 +411,6 @@ settings-shortcuts-add-button = Додати
 ## Dictation
 
 settings-dictation-title = Диктування
-settings-dictation-description = Утримуйте { $keys } і говоріть, щоб вводити сказане в будь-якій програмі. Відпустіть, щоб завершити, або натисніть Esc, щоб скасувати. Усе відбувається на цьому комп’ютері: ваш голос не залишає його і не зберігається.
-settings-dictation-description-no-shortcut = Виберіть нижче сполучення клавіш для диктування. Усе відбувається на цьому комп’ютері: ваш голос не залишає його і не зберігається.
 settings-dictation-not-installed = Диктування не встановлено на цьому комп’ютері
 settings-dictation-hold = Утримуйте { $keys }, щоб диктувати
 settings-dictation-needs-shortcut = Вимкнено, доки не задано сполучення клавіш

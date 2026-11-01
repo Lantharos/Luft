@@ -15,6 +15,8 @@ settings-display-resolution-title = Risoluzione
 settings-display-resolution = { $width } × { $height }
 settings-display-refresh-rate-title = Frequenza di aggiornamento
 settings-display-refresh-rate = { NUMBER($rate, maximumFractionDigits: 2) } Hz
+settings-display-touch-taskbar = Barra delle applicazioni touch
+settings-display-touch-taskbar-description = Mostra su questo schermo una barra delle applicazioni adatta a dita e penne
 settings-display-variable-refresh = Frequenza di aggiornamento variabile
 settings-display-variable-refresh-description = Lo schermo segue la frequenza dei fotogrammi dei giochi a schermo intero per movimenti più fluidi
 settings-display-variable-refresh-off = Disattivata
@@ -391,8 +393,6 @@ settings-shortcuts-add-button = Aggiungi
 ## Dictation
 
 settings-dictation-title = Dettatura
-settings-dictation-description = Tieni premuto { $keys } e parla per scrivere ciò che dici, in qualsiasi app. Rilascia per finire o premi Esc per annullare. Tutto avviene su questo computer: la tua voce non lo lascia mai e non viene salvata.
-settings-dictation-description-no-shortcut = Scegli una scorciatoia qui sotto per dettare. Tutto avviene su questo computer: la tua voce non lo lascia mai e non viene salvata.
 settings-dictation-not-installed = La dettatura non è installata su questo computer
 settings-dictation-hold = Tieni premuto { $keys } per dettare
 settings-dictation-needs-shortcut = Disattivata finché non ha una scorciatoia

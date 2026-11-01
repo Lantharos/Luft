@@ -15,6 +15,8 @@ settings-display-resolution-title = Resolución
 settings-display-resolution = { $width } × { $height }
 settings-display-refresh-rate-title = Frecuencia de actualización
 settings-display-refresh-rate = { NUMBER($rate, maximumFractionDigits: 2) } Hz
+settings-display-touch-taskbar = Barra de tareas táctil
+settings-display-touch-taskbar-description = Muestra en esta pantalla una barra de tareas pensada para dedos y lápices
 settings-display-variable-refresh = Frecuencia de actualización variable
 settings-display-variable-refresh-description = Permite que la pantalla siga la velocidad de fotogramas de los juegos a pantalla completa para un movimiento más fluido
 settings-display-variable-refresh-off = Desactivada
@@ -391,8 +393,6 @@ settings-shortcuts-add-button = Añadir
 ## Dictation
 
 settings-dictation-title = Dictado
-settings-dictation-description = Pulsa y mantén { $keys } mientras hablas para escribir lo que dices, en cualquier aplicación. Suelta para terminar o pulsa Esc para cancelar. Todo ocurre en este ordenador: tu voz nunca sale de él y no se guarda.
-settings-dictation-description-no-shortcut = Elige un atajo abajo para dictar. Todo ocurre en este ordenador: tu voz nunca sale de él y no se guarda.
 settings-dictation-not-installed = El dictado no está instalado en este ordenador
 settings-dictation-hold = Pulsa y mantén { $keys } para dictar
 settings-dictation-needs-shortcut = Desactivado hasta que tenga un atajo

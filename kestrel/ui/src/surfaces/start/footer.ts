@@ -8,6 +8,7 @@ import { t } from '../../shared/i18n/index.js';
 import { animateActor } from '../../shared/motion/motion.js';
 import type { ContextMenus } from '../../desktop/menus/contextMenus.js';
 import { LOCK, POWER_ACTIONS, bindAvailability, type SessionAction } from '../quickSettings/sessionActions.js';
+import * as SystemActions from '../../session/actions/systemActions.js';
 
 const SWAP_DURATION = 180;
 const SWAP_DISTANCE = 16;
@@ -44,7 +45,10 @@ export class StartFooter {
       style_class: 'kestrel-icon-button', child: this.toggleIcon,
       accessible_name: t('start-power'), can_focus: true, track_hover: true,
     });
-    this.powerButton.connect('clicked', () => this.setOpen(!this.open));
+    this.powerButton.connect('clicked', () => {
+      if (!this.open) SystemActions.getDefault().refresh();
+      this.setOpen(!this.open);
+    });
     this.actor.add_child(this.powerButton);
 
     menus.bind(this.account, () => [{ label: t('start-account-settings'), run: () => menus.settings('accounts') }]);

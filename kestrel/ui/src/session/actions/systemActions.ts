@@ -77,11 +77,7 @@ const SystemActions = GObject.registerClass({
       void this.updateHaveReboot();
     });
 
-    Gio.bus_watch_name(Gio.BusType.SESSION, SESSION_MANAGER, Gio.BusNameWatcherFlags.NONE, () => {
-      void this.updateHaveShutdown();
-      void this.updateHaveReboot();
-      void this.updateHaveSuspend();
-    }, null);
+    Gio.bus_watch_name(Gio.BusType.SESSION, SESSION_MANAGER, Gio.BusNameWatcherFlags.NONE, () => this.refresh(), null);
 
     Main.sessionMode.connect('updated', () => this.sessionUpdated());
     this.sessionUpdated();
@@ -107,6 +103,12 @@ const SystemActions = GObject.registerClass({
     return this.actions.get('logout')!;
   }
 
+  refresh(): void {
+    void this.updateHaveShutdown();
+    void this.updateHaveReboot();
+    void this.updateHaveSuspend();
+  }
+
   private sessionUpdated(): void {
     this.updateLockScreen();
     this.updatePowerOff();
@@ -127,7 +129,8 @@ const SystemActions = GObject.registerClass({
         canHave: availability !== GnomeSession.ActionAvailability.UNAVAILABLE,
         needsAuth: availability === GnomeSession.ActionAvailability.CHALLENGE,
       };
-    } catch {
+    } catch (error) {
+      console.warn(`Kestrel couldn't ask the session manager which power actions it allows: ${error}`);
       return { canHave: false, needsAuth: false };
     }
   }

@@ -49,7 +49,7 @@ Strings in Luft's Lithuanian translation that a native speaker should check: ter
 - `apps/settings/locales/lt/connections.ftl` `settings-network-security-owe`: "Patobulintas atviras" — no settled Lithuanian term for Enhanced Open (OWE); check against Windows/Android.
 - `apps/settings/locales/lt/connections.ftl` `settings-network-ip-link-local`: "Tik vietinis saitas" — check against GNOME/NetworkManager Lithuanian wording for link-local.
 - `apps/settings/locales/lt/connections.ftl` `settings-network-router`: "Maršruto parinktuvas" — Windows' term, long for a field label; may clip.
-- `apps/settings/locales/lt/system.ftl` `settings-accounts-online` `.description`: "…aplankas, esantis aplanke Cloud jūsų namų aplanke…" — assumes the folder is literally named Cloud; three "aplankas" in a row is heavy.
+- `apps/settings/locales/lt/system.ftl` `settings-accounts-online` `.description`: "Kiekviena paskyra tampa aplanku Cloud…" — assumes the folder is literally named Cloud.
 - `apps/settings/locales/lt/system.ftl` `settings-accounts-approve`: "išplėstinė duomenų apsauga" — check Apple's official Lithuanian name for Advanced Data Protection.
 - `apps/settings/locales/lt/connections.ftl` `settings-bluetooth-visible-for`: "{ $minutes } minutę" (accusative of duration) — check it reads right as a standalone menu option.
 - `apps/settings/locales/lt/system.ftl` `settings-accounts-remove-note`: "Jūsų failai lieka tarnyboje { $provider }." — "tarnyboje" for a cloud service; check it sounds natural for OneDrive, iCloud Drive etc.

@@ -254,7 +254,7 @@ settings-region-formats-next-sign-in = { $sample }, од следната нај
 settings-accounts-unavailable = Сметките не се достапни
     .description = Услугата за сметки не е инсталирана на овој компјутер
 settings-accounts-online = Онлајн сметки
-    .description = Секоја сметка е папка во Cloud, во вашата домашна папка, што секоја апликација може да ја отвори. Датотеките се преземаат кога ќе ги отворите.
+    .description = Секоја сметка станува папка во Cloud, а датотеките се преземаат кога ќе ги отворите.
 settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud или WebDAV
 
 ## Accounts: an account's row

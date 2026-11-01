@@ -254,7 +254,7 @@ settings-region-formats-next-sign-in = { $sample }, bir sonraki oturum açmadan 
 settings-accounts-unavailable = Hesaplar kullanılamıyor
     .description = Hesaplar hizmeti bu bilgisayarda yüklü değil
 settings-accounts-online = Çevrimiçi hesaplar
-    .description = Her hesap, ev klasörünüzdeki Cloud klasöründe bir klasördür ve her uygulama onu açabilir. Dosyalar, açtığınızda indirilir.
+    .description = Her hesap Cloud içinde bir klasör olur ve dosyalar açtığınızda indirilir.
 settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud ya da WebDAV
 
 ## Accounts: an account's row

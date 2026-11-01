@@ -294,7 +294,7 @@ settings-region-formats-next-sign-in = { $sample }, from the next sign-in
 settings-accounts-unavailable = Accounts aren’t available
     .description = The accounts service isn’t installed on this computer
 settings-accounts-online = Online accounts
-    .description = Each account is a folder in Cloud, in your home folder, that every app can open. Files download when you open them.
+    .description = Each account becomes a folder in Cloud, and files download when you open them.
 settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud or WebDAV
 
 ## Accounts: an account's row

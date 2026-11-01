@@ -260,7 +260,7 @@ settings-region-formats-next-sign-in = { $sample }, з наступного вх
 settings-accounts-unavailable = Облікові записи недоступні
     .description = Службу облікових записів не встановлено на цьому комп’ютері
 settings-accounts-online = Онлайн-облікові записи
-    .description = Кожен обліковий запис — це папка всередині Cloud у вашій домашній папці, яку може відкрити будь-яка програма. Файли завантажуються, коли ви їх відкриваєте.
+    .description = Кожен обліковий запис стає текою в Cloud, а файли завантажуються, коли ви їх відкриваєте.
 settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud або WebDAV
 
 ## Accounts: an account's row

@@ -254,7 +254,7 @@ settings-region-formats-next-sign-in = { $sample }, ab der nächsten Anmeldung
 settings-accounts-unavailable = Konten sind nicht verfügbar
     .description = Der Kontodienst ist auf diesem Computer nicht installiert
 settings-accounts-online = Onlinekonten
-    .description = Jedes Konto ist ein Ordner unter Cloud in deinem persönlichen Ordner, den jede App öffnen kann. Dateien werden heruntergeladen, wenn du sie öffnest.
+    .description = Jedes Konto wird zu einem Ordner in Cloud, und Dateien werden beim Öffnen geladen.
 settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud oder WebDAV
 
 ## Accounts: an account's row

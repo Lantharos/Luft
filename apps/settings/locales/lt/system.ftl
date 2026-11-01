@@ -260,7 +260,7 @@ settings-region-formats-next-sign-in = { $sample }, nuo kito prisijungimo
 settings-accounts-unavailable = Paskyros nepasiekiamos
     .description = Paskyrų tarnyba šiame kompiuteryje neįdiegta
 settings-accounts-online = Internetinės paskyros
-    .description = Kiekviena paskyra – tai aplankas, esantis aplanke Cloud jūsų namų aplanke, ir jį gali atidaryti bet kuri programa. Failai atsisiunčiami, kai juos atidarote.
+    .description = Kiekviena paskyra tampa aplanku Cloud, o failai atsisiunčiami, kai juos atidarote.
 settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud arba WebDAV
 
 ## Accounts: an account's row

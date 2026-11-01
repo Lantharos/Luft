@@ -260,7 +260,7 @@ settings-region-formats-next-sign-in = { $sample }, od następnego logowania
 settings-accounts-unavailable = Konta są niedostępne
     .description = Usługa kont nie jest zainstalowana na tym komputerze
 settings-accounts-online = Konta online
-    .description = Każde konto ma swój folder w folderze Cloud w folderze domowym i każda aplikacja może go otworzyć. Pliki pobierają się, gdy je otwierasz.
+    .description = Każde konto staje się folderem w Cloud, a pliki pobierają się, gdy je otworzysz.
 settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud lub WebDAV
 
 ## Accounts: an account's row

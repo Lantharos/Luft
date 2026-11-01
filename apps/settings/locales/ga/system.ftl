@@ -263,7 +263,7 @@ settings-region-formats-next-sign-in = { $sample }, ón gcéad síniú isteach e
 settings-accounts-unavailable = Níl cuntais ar fáil
     .description = Níl an tseirbhís cuntas suiteáilte ar an ríomhaire seo
 settings-accounts-online = Cuntais ar líne
-    .description = Is fillteán san fhillteán Cloud i d’fhillteán baile é gach cuntas, agus is féidir le gach aip é a oscailt. Íoslódáiltear comhaid nuair a osclaíonn tú iad.
+    .description = Déantar fillteán in Cloud de gach cuntas, agus íoslódáiltear comhaid nuair a osclaíonn tú iad.
 settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud nó WebDAV
 
 ## Accounts: an account's row

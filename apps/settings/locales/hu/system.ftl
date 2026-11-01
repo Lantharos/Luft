@@ -254,7 +254,7 @@ settings-region-formats-next-sign-in = { $sample }, a következő bejelentkezés
 settings-accounts-unavailable = A fiókok nem érhetők el
     .description = A fiókszolgáltatás nincs telepítve ezen a számítógépen
 settings-accounts-online = Online fiókok
-    .description = Minden fiók egy mappa a Saját mappában lévő Cloud mappán belül, amelyet bármely alkalmazás megnyithat. A fájlok megnyitáskor töltődnek le.
+    .description = Minden fiókból mappa lesz a Cloudban, a fájlok pedig megnyitáskor töltődnek le.
 settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud vagy WebDAV
 
 ## Accounts: an account's row

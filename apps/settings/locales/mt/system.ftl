@@ -263,7 +263,7 @@ settings-region-formats-next-sign-in = { $sample }, mid-dħul li jmiss
 settings-accounts-unavailable = Il-kontijiet mhumiex disponibbli
     .description = Is-servizz tal-kontijiet mhuwiex installat f’dan il-kompjuter
 settings-accounts-online = Kontijiet online
-    .description = Kull kont huwa fowlder f’Cloud, fil-fowlder personali, li kull app tista’ tiftaħ. Il-fajls jitniżżlu meta tiftaħhom.
+    .description = Kull kont isir folder f’Cloud, u l-fajls jitniżżlu meta tiftaħhom.
 settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud jew WebDAV
 
 ## Accounts: an account's row

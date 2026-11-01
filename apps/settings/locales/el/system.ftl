@@ -254,7 +254,7 @@ settings-region-formats-next-sign-in = { $sample }, από την επόμενη
 settings-accounts-unavailable = Οι λογαριασμοί δεν είναι διαθέσιμοι
     .description = Η υπηρεσία λογαριασμών δεν είναι εγκατεστημένη σε αυτόν τον υπολογιστή
 settings-accounts-online = Διαδικτυακοί λογαριασμοί
-    .description = Κάθε λογαριασμός είναι ένας φάκελος μέσα στον φάκελο Cloud του προσωπικού σας φακέλου, που μπορεί να ανοίξει κάθε εφαρμογή. Τα αρχεία λαμβάνονται όταν τα ανοίγετε.
+    .description = Κάθε λογαριασμός γίνεται φάκελος στο Cloud και τα αρχεία λαμβάνονται όταν τα ανοίγετε.
 settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud ή WebDAV
 
 ## Accounts: an account's row

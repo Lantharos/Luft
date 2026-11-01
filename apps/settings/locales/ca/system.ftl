@@ -254,7 +254,7 @@ settings-region-formats-next-sign-in = { $sample }, a partir del pròxim inici d
 settings-accounts-unavailable = Els comptes no estan disponibles
     .description = El servei de comptes no està instal·lat en aquest ordinador
 settings-accounts-online = Comptes en línia
-    .description = Cada compte és una carpeta dins de Cloud, a la vostra carpeta personal, que qualsevol aplicació pot obrir. Els fitxers es baixen quan els obriu.
+    .description = Cada compte es converteix en una carpeta de Cloud i els fitxers es baixen quan els obriu.
 settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud o WebDAV
 
 ## Accounts: an account's row

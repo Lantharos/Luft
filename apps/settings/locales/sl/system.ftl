@@ -260,7 +260,7 @@ settings-region-formats-next-sign-in = { $sample }, od naslednje prijave
 settings-accounts-unavailable = Računi niso na voljo
     .description = Storitev za račune v tem računalniku ni nameščena
 settings-accounts-online = Spletni računi
-    .description = Vsak račun je mapa v mapi Cloud v vaši domači mapi in jo lahko odpre vsaka aplikacija. Datoteke se prenesejo, ko jih odprete.
+    .description = Vsak račun postane mapa v Cloud, datoteke pa se prenesejo, ko jih odprete.
 settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud ali WebDAV
 
 ## Accounts: an account's row

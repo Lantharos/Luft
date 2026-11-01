@@ -254,7 +254,7 @@ settings-region-formats-next-sign-in = { $sample }, a partir do próximo início
 settings-accounts-unavailable = As contas não estão disponíveis
     .description = O serviço de contas não está instalado neste computador
 settings-accounts-online = Contas online
-    .description = Cada conta é uma pasta em Cloud, na sua pasta pessoal, que todas as aplicações podem abrir. Os ficheiros são transferidos quando os abre.
+    .description = Cada conta torna-se uma pasta em Cloud e os ficheiros são transferidos quando os abre.
 settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud ou WebDAV
 
 ## Accounts: an account's row

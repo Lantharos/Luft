@@ -257,7 +257,7 @@ settings-region-formats-next-sign-in = { $sample }, de la următoarea conectare
 settings-accounts-unavailable = Conturile nu sunt disponibile
     .description = Serviciul de conturi nu este instalat pe acest computer
 settings-accounts-online = Conturi online
-    .description = Fiecare cont este un folder în Cloud, în folderul personal, pe care îl poate deschide orice aplicație. Fișierele se descarcă atunci când le deschideți.
+    .description = Fiecare cont devine un dosar în Cloud, iar fișierele se descarcă atunci când le deschideți.
 settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud sau WebDAV
 
 ## Accounts: an account's row

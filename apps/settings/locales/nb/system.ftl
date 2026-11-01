@@ -254,7 +254,7 @@ settings-region-formats-next-sign-in = { $sample }, fra neste pålogging
 settings-accounts-unavailable = Kontoer er ikke tilgjengelige
     .description = Kontotjenesten er ikke installert på denne datamaskinen
 settings-accounts-online = Nettkontoer
-    .description = Hver konto er en mappe i Cloud i hjemmemappen din, og alle apper kan åpne den. Filene lastes ned når du åpner dem.
+    .description = Hver konto blir en mappe i Cloud, og filer lastes ned når du åpner dem.
 settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud eller WebDAV
 
 ## Accounts: an account's row

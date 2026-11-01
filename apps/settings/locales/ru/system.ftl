@@ -260,7 +260,7 @@ settings-region-formats-next-sign-in = { $sample }, со следующего в
 settings-accounts-unavailable = Учётные записи недоступны
     .description = Служба учётных записей не установлена на этом компьютере
 settings-accounts-online = Сетевые учётные записи
-    .description = Каждая учётная запись — это папка внутри Cloud в домашней папке, и её может открыть любое приложение. Файлы скачиваются, когда вы их открываете.
+    .description = Каждая учётная запись становится папкой в Cloud, а файлы загружаются при открытии.
 settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud или WebDAV
 
 ## Accounts: an account's row

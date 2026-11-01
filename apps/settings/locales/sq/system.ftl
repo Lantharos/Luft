@@ -254,7 +254,7 @@ settings-region-formats-next-sign-in = { $sample }, nga hyrja e ardhshme
 settings-accounts-unavailable = Llogaritë nuk janë të disponueshme
     .description = Shërbimi i llogarive nuk është instaluar në këtë kompjuter
 settings-accounts-online = Llogaritë në internet
-    .description = Çdo llogari është një dosje te Cloud, në dosjen tënde kryesore, që mund ta hapë çdo aplikacion. Skedarët shkarkohen kur i hap.
+    .description = Çdo llogari bëhet dosje në Cloud dhe skedarët shkarkohen kur i hapni.
 settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud ose WebDAV
 
 ## Accounts: an account's row

@@ -254,7 +254,7 @@ settings-region-formats-next-sign-in = { $sample }, frá næstu innskráningu
 settings-accounts-unavailable = Aðgangar eru ekki í boði
     .description = Aðgangaþjónustan er ekki uppsett á þessari tölvu
 settings-accounts-online = Netaðgangar
-    .description = Hver aðgangur er mappa í Cloud, í heimamöppunni þinni, sem öll forrit geta opnað. Skrár eru sóttar þegar þú opnar þær.
+    .description = Hver aðgangur verður mappa í Cloud og skrár sækjast þegar þú opnar þær.
 settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud eða WebDAV
 
 ## Accounts: an account's row

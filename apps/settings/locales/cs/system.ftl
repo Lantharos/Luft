@@ -260,7 +260,7 @@ settings-region-formats-next-sign-in = { $sample }, od příštího přihlášen
 settings-accounts-unavailable = Účty nejsou k dispozici
     .description = Služba účtů není v tomto počítači nainstalovaná
 settings-accounts-online = Online účty
-    .description = Každý účet má vlastní složku ve složce Cloud ve vaší domovské složce a otevře ji každá aplikace. Soubory se stáhnou, až je otevřete.
+    .description = Každý účet se stane složkou v Cloud a soubory se stáhnou, když je otevřete.
 settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud nebo WebDAV
 
 ## Accounts: an account's row

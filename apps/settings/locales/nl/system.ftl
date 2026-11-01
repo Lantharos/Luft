@@ -254,7 +254,7 @@ settings-region-formats-next-sign-in = { $sample }, vanaf de volgende aanmelding
 settings-accounts-unavailable = Accounts zijn niet beschikbaar
     .description = De accountservice is niet geïnstalleerd op deze computer
 settings-accounts-online = Onlineaccounts
-    .description = Elk account is een map in Cloud, in je persoonlijke map, die elke app kan openen. Bestanden worden gedownload wanneer je ze opent.
+    .description = Elk account wordt een map in Cloud, en bestanden worden gedownload als je ze opent.
 settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud of WebDAV
 
 ## Accounts: an account's row

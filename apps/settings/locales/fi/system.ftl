@@ -254,7 +254,7 @@ settings-region-formats-next-sign-in = { $sample }, seuraavasta kirjautumisesta 
 settings-accounts-unavailable = Tilit eivät ole käytettävissä
     .description = Tilipalvelua ei ole asennettu tähän tietokoneeseen
 settings-accounts-online = Verkkotilit
-    .description = Jokainen tili on kansio kotikansiosi Cloud-kansiossa, ja kaikki sovellukset voivat avata sen. Tiedostot ladataan, kun avaat ne.
+    .description = Jokaisesta tilistä tulee kansio Cloudiin, ja tiedostot ladataan, kun avaat ne.
 settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud tai WebDAV
 
 ## Accounts: an account's row

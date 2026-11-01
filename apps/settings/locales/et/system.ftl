@@ -257,7 +257,7 @@ settings-region-formats-next-sign-in = { $sample }, alates järgmisest sisselogi
 settings-accounts-unavailable = Kontod pole saadaval
     .description = Kontode teenust pole sellesse arvutisse installitud
 settings-accounts-online = Võrgukontod
-    .description = Iga konto on kaust sinu kodukaustas olevas kaustas Cloud ja seda saab avada iga rakendus. Failid laaditakse alla, kui need avad.
+    .description = Igast kontost saab kaust Cloudis ja failid laaditakse alla, kui need avad.
 settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud või WebDAV
 
 ## Accounts: an account's row

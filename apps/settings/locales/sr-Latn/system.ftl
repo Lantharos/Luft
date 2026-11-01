@@ -257,7 +257,7 @@ settings-region-formats-next-sign-in = { $sample }, od sledeće prijave
 settings-accounts-unavailable = Nalozi nisu dostupni
     .description = Usluga za naloge nije instalirana na ovom računaru
 settings-accounts-online = Onlajn nalozi
-    .description = Svaki nalog je fascikla u fascikli Cloud u vašoj ličnoj fascikli, koju svaka aplikacija može da otvori. Datoteke se preuzimaju kada ih otvorite.
+    .description = Svaki nalog postaje fascikla u Cloud, a datoteke se preuzimaju kada ih otvorite.
 settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud ili WebDAV
 
 ## Accounts: an account's row

@@ -257,7 +257,7 @@ settings-region-formats-next-sign-in = { $sample }, no nākamās pierakstīšan�
 settings-accounts-unavailable = Konti nav pieejami
     .description = Šajā datorā nav instalēts kontu pakalpojums
 settings-accounts-online = Tiešsaistes konti
-    .description = Katrs konts ir mape Cloud jūsu mājas mapē, ko var atvērt jebkura lietotne. Faili tiek lejupielādēti, kad tos atverat.
+    .description = Katrs konts kļūst par mapi Cloud, un faili tiek lejupielādēti, kad tos atverat.
 settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud vai WebDAV
 
 ## Accounts: an account's row

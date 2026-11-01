@@ -43,7 +43,7 @@ Strings in Luft's Estonian translation that a native speaker should check. Each 
 
 ## Settings
 
-- `apps/settings/locales/et/system.ftl` `settings-accounts-online`: "Iga konto on kaust sinu kodukaustas olevas kaustas Cloud …" — kept the folder name Cloud in English; check whether the folder is localized on disk and whether the double "kaust" reads well.
+- `apps/settings/locales/et/system.ftl` `settings-accounts-online`: "Igast kontost saab kaust Cloudis ja failid laaditakse alla,…" — kept the folder name Cloud in English; check whether the folder is localized on disk.
 - `apps/settings/locales/et/connections.ftl` `settings-bluetooth-request-authorize`: "Kas lubada, et { $name } seotakse?" — built so the unnamed fallback „seade“ works; check it reads naturally with real device names.
 - `apps/settings/locales/et/connections.ftl` `settings-bluetooth-request-display`: "Sidumine: { $name }" / "Koodi ootab { $name }. Tipi see seal sisse ja vajuta Enter." — rephrased to keep the name in the nominative; check fluency.
 - `apps/settings/locales/et/connections.ftl` `settings-bluetooth-windows`: "Windowsis on seotud { $devices }." — $devices is a list ending in "ja veel 3"; check agreement with a single device vs. a list.

@@ -10,12 +10,12 @@ interface Origin {
   y: number;
 }
 
-const VIDEO = 'num-buffers=90 ! video/x-raw,width=1280,height=720,framerate=30/1 ! x264enc ! mp4mux';
+const VIDEO = 'num-buffers=90 ! video/x-raw,width=1280,height=720,framerate=30/1 ! vp8enc deadline=1 ! webmmux';
 
 export const wallpapers = () => global.get_window_actors().filter(actor => actor.meta_window?.get_window_type() === Meta.WindowType.DESKTOP);
 
 export async function makeVideo(pattern: string, name: string) {
-  const file = Gio.File.new_for_path(scratch(`live-wallpaper-${name}.mp4`));
+  const file = Gio.File.new_for_path(scratch(`live-wallpaper-${name}.webm`));
   const encoder = spawn(['gst-launch-1.0', '-q', 'videotestsrc', `pattern=${pattern}`, ...VIDEO.split(' '), '!', 'filesink', `location=${file.get_path()}`]);
   await encoder.exited;
   if (!encoder.get_successful()) throw new Error(`The ${name} test video could not be made`);

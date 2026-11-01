@@ -12,7 +12,6 @@ export const commands = {
 		token?: string | null,
 	}, options?: InvokeOptions) => invoke<null>("app_open_url", params, options),
 	appState: (options?: InvokeOptions) => invoke<AppState>("app_state", {}, options),
-	filesChooseAppimage: (options?: InvokeOptions) => invoke<string | null>("files_choose_appimage", {}, options),
 	filesInspect: (params: {
 		path: string,
 	}, options?: InvokeOptions) => invoke<OpenedFile>("files_inspect", params, options),

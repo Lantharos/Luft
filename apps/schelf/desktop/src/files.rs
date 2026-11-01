@@ -4,9 +4,7 @@ use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 
-use gio::prelude::*;
-use luft_app::portal::{FileChooser, Filter};
-use luft_app::{Commands, Empty, block_on};
+use luft_app::{Commands, block_on};
 use luft_software::apps::flatpak::Permissions;
 use luft_software::apps::{appimage, debian, toolbox};
 use luft_software::system::repositories;
@@ -459,25 +457,7 @@ pub fn inspect(path: &str) -> Result<OpenedFile, String> {
     }
 }
 
-async fn choose(Empty {}: Empty) -> Result<Option<String>, String> {
-    let chosen = FileChooser {
-        title: "Add an AppImage",
-        filters: vec![Filter {
-            name: "AppImages",
-            patterns: vec!["*.AppImage".into(), "*.appimage".into()],
-        }],
-        ..FileChooser::default()
-    }
-    .open()
-    .await?;
-    Ok(chosen
-        .first()
-        .and_then(|uri| gio::File::for_uri(uri).path())
-        .map(|path| path.to_string_lossy().into_owned()))
-}
-
 pub fn register(window: SabineWindow) -> SabineWindow {
     window
         .command("files_inspect", |File { path }| inspect(&path))
-        .command_async("files_choose_appimage", choose)
 }

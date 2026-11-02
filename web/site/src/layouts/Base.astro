@@ -17,7 +17,7 @@ interface Props {
 
 const { title, description, page, credits = [], overFog = false } = Astro.props;
 const { locale, t } = localize(Astro);
-const canonical = new URL(Astro.url.pathname, Astro.site);
+const canonical = new URL(Astro.url.pathname.replace(/(\/index)?\.html$/, '') || '/', Astro.site);
 const translations = page === undefined ? [] : alternates(page);
 const fallback = translations.find(({ tag }) => tag === SOURCE_LOCALE);
 const absolute = (href: string) => new URL(href, Astro.site);

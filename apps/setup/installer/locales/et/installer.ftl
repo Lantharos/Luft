@@ -3,7 +3,7 @@
 installer-not-allowed = Sul pole lubatud seda teha.
 installer-stopped = Installer peatus ootamatult.
 installer-request-invalid = Taotlus pole sobiv: { $error }
-installer-settings-invalid = Sätted pole sobivad: { $error }
+installer-settings-invalid = Seadistused pole korrektsed: { $error }
 installer-busy = Lufti juba installitakse.
 installer-account-exists = Konto on juba loodud.
 
@@ -31,7 +31,7 @@ installer-full-name-invalid = Nimi ei tohi sisaldada kooloneid, komasid ega reav
 installer-password-missing = Vali salasõna.
 installer-account-not-saved = Uut kontot ei salvestatud
 installer-account-missing = Uus konto puudub
-installer-regional-invalid = Need piirkonnasätted pole sobivad.
+installer-regional-invalid = Need piirkonnaseadistused pole sobivad.
 installer-unknown-zone = Uus süsteem ei tunne ajavööndit { $zone }.
 
 ## Installing

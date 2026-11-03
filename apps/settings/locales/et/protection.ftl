@@ -60,7 +60,7 @@ settings-security-protections = Kaitsed
 settings-security-protected = Sinu seade on kaitstud
 settings-security-could-be-safer = Sinu seade võiks olla turvalisem
 settings-security-not-encrypted-description = Selle ketas pole krüptitud, nii et igaüks, kes selle välja võtab, saab sinu faile lugeda.
-settings-security-starts-differently-description = Kui muutsid selle Secure Booti sätteid, kinnita muudatus, et ketas avaneks taas iseenesest.
+settings-security-starts-differently-description = Kui muutsid selle Secure Booti seadistusi, kinnita muudatus, et ketas avaneks taas iseenesest.
 settings-security-needed-recovery-key = Sinu ketas vajas taastevõtit
 settings-security-needed-recovery-key-description = Seo turvakiip uuesti, et ketas avaneks iseenesest.
 settings-security-firmware-ready-description = Sinu riistvara püsivaravärskendused on lehel Värskendused valmis.
@@ -213,7 +213,7 @@ settings-encryption-drives-auto-unlock =
 
 settings-encryption-unlocking = Ketta avamine
 settings-encryption-starts-differently = See arvuti käivitub nüüd teisiti
-settings-encryption-starts-differently-description = Selle Secure Booti sätted muutusid, mistõttu küsis ketas taastevõtit. Kui tegid muudatuse ise, kinnita see, et ketas avaneks taas iseenesest
+settings-encryption-starts-differently-description = Selle Secure Booti seadistused muutusid, mistõttu küsis ketas taastevõtit. Kui tegid muudatuse ise, kinnita see, et ketas avaneks taas iseenesest
 settings-encryption-confirm = Kinnita
 settings-encryption-asked-recovery-key = Sinu ketas küsis taastevõtit
 settings-encryption-relink-description = Seo turvakiip uuesti, et ketas avaneks iseenesest
@@ -469,9 +469,10 @@ settings-apps-internet-hint = See saab internetti alates järgmisest avamisest.
 settings-apps-service-hint = Töölaua teenus, millega see saab suhelda
 settings-apps-service-remove = Eemalda
 settings-apps-service-remove-app = Keela suhtlus teenusega { $service }
-settings-apps-services-count = { $count ->
+settings-apps-services-count =
+    { $count ->
         [one] { $count } teenus
        *[other] { $count } teenust
-}
+    }
 settings-apps-full-access-off = See töötab liivakastis. Täielik ligipääs eemaldab liivakasti.
 settings-apps-full-access-give = Anna täielik ligipääs

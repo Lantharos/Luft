@@ -21,9 +21,12 @@
 	let adding = $state(false);
 
 	let ids = $derived(look.values['see-through-apps'] ?? []);
+	let amount = $derived(1 - (look.values['see-through-opacity'] ?? 0.7));
 	let apps = $derived(ids.map((id) => installed.find((app) => app.id === id) ?? { id, name: id, icon: null }));
 
 	void commands.appsInstalled().then((list) => (installed = list));
+
+	const opacityFor = (seeThrough: number) => Math.round((1 - seeThrough) * 100) / 100;
 
 	function add(id: string) {
 		adding = false;
@@ -50,14 +53,17 @@
 {#if apps.length}
 	<Section>
 		<Row title={t('settings-see-through-amount')}>
-			<Slider
-				label={t('settings-see-through-amount')}
-				min={0.05}
-				max={0.8}
-				value={1 - (look.values['see-through-opacity'] ?? 0.7)}
-				format={percent}
-				onchange={(amount) => look.set('see-through-opacity', 1 - amount)}
-			/>
+			<span class="w-11 text-right tabular-nums">{percent(amount)}</span>
+			{#snippet below()}
+				<Slider
+					label={t('settings-see-through-amount')}
+					min={0.05}
+					max={0.8}
+					value={amount}
+					format={percent}
+					onchange={(next) => look.set('see-through-opacity', opacityFor(next))}
+				/>
+			{/snippet}
 		</Row>
 		<Row title={t('settings-see-through-blur')}>
 			<Switch label={t('settings-see-through-blur')} checked={look.values['see-through-blur'] ?? true} onchange={(on) => look.set('see-through-blur', on)} />

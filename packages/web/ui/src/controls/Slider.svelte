@@ -55,17 +55,30 @@
 		if (dragging) update(fromPointer(event));
 	}
 
-	function pointerUp() {
-		if (!dragging) return;
+	function release() {
 		dragging = false;
 		commit();
 	}
 
+	function keyTarget(key: string) {
+		const page = Math.max(step, (max - min) / 10);
+		return {
+			ArrowRight: current + step,
+			ArrowUp: current + step,
+			ArrowLeft: current - step,
+			ArrowDown: current - step,
+			PageUp: current + page,
+			PageDown: current - page,
+			Home: min,
+			End: max
+		}[key];
+	}
+
 	function keydown(event: KeyboardEvent) {
-		const delta = { ArrowRight: step, ArrowUp: step, ArrowLeft: -step, ArrowDown: -step }[event.key];
-		if (delta === undefined || disabled) return;
+		const target = keyTarget(event.key);
+		if (target === undefined || disabled) return;
 		event.preventDefault();
-		update(snap(current + delta));
+		update(snap(target));
 		commit();
 	}
 </script>
@@ -87,8 +100,7 @@
 	class:disabled
 	onpointerdown={pointerDown}
 	onpointermove={pointerMove}
-	onpointerup={pointerUp}
-	onpointercancel={pointerUp}
+	onlostpointercapture={release}
 	onkeydown={keydown}
 >
 	<div class="rail">

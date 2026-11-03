@@ -12,8 +12,9 @@ const RAIN_SWITCH: Point = [972, 239];
 const VISUALIZER = 'com.lantharos.Visualizer';
 const NOW_PLAYING = 'com.lantharos.NowPlaying';
 const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
+const SOUNDSCAPES = 'com.lantharos.Soundscapes';
 
-async function checkOwnPage(app: LuftApp) {
+async function checkOwnPages(app: LuftApp) {
   await installBuilt(VISUALIZER);
   await installBuilt(NOW_PLAYING);
   try {
@@ -30,6 +31,12 @@ async function checkOwnPage(app: LuftApp) {
     await request('Remove', VISUALIZER);
     await request('Remove', NOW_PLAYING);
   }
+  await installBuilt(SOUNDSCAPES);
+  try {
+    (await show(app, `extensions/${SOUNDSCAPES.toLowerCase()}`)).save('settings-extension-soundscapes');
+  } finally {
+    await request('Remove', SOUNDSCAPES);
+  }
 }
 
 export async function checkExtensions(app: LuftApp) {
@@ -42,7 +49,7 @@ export async function checkExtensions(app: LuftApp) {
     (await app.settle(() => true)).save('settings-extension-rain-on');
     app.click(RAIN_SWITCH);
     await eventually(async () => await setting(RAIN, 'rain') === false, 'the switch in Settings turns rain off in Kestrel');
-    await checkOwnPage(app);
+    await checkOwnPages(app);
   } finally {
     await setSetting(RAIN, 'rain', new GLib.Variant('b', false));
   }

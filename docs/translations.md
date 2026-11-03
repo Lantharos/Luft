@@ -15,6 +15,7 @@ Luft is translated into Albanian, Bosnian, Bulgarian, Catalan, Croatian, Czech, 
 | kestrel-auth | `kestrel/ui/locales/*/auth.ftl` | login screen, lock screen, sign-in and administrator prompts, keyring and passkey prompts, signing out and powering off |
 | kestrel-portal | `kestrel/ui/locales/*/portal.ftl` | printing, screen sharing, shortcuts and other app requests |
 | extension-rain | `extensions/rain/locales/*/rain.ftl` | the Rain extension: its name, tile and settings |
+| extension-soundscapes | `extensions/soundscapes/locales/*/soundscapes.ftl` | the Soundscapes extension: its sounds, mixes, tile, mixer and settings |
 | kestrel-settings | `kestrel/settings/locales/*/settings.ftl` | notifications from `kestrel-settings` about drives and the battery |
 | kestrel-portal-service | `kestrel/portal/locales/*/portal.ftl` | print job names and printing failures from `kestrel-portal` |
 | ui | `packages/web/ui/locales/*/ui.ftl` | the UI kit every app shares |

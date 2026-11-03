@@ -1,0 +1,36 @@
+id = "com.lantharos.Soundscapes"
+name = "Soundscapes"
+description = "Forest, café, fire, waves, rain and soft noise, mixed the way you like them, to focus or fall asleep to."
+version = "1.0.0"
+api = 1
+permissions = ["sounds", "media", "quick-settings", "popups"]
+
+[[settings]]
+key = "volume"
+type = "slider"
+label = "volume"
+default = 0.8
+min = 0
+max = 1
+step = 0.05
+unit = "percent"
+page = "sound"
+
+[[settings]]
+key = "sleep-timer"
+type = "choice"
+label = "sleep-timer"
+default = "off"
+options = [
+  { value = "off", label = "sleep-off" },
+  { value = "15", label = "sleep-15" },
+  { value = "30", label = "sleep-30" },
+  { value = "60", label = "sleep-60" },
+  { value = "90", label = "sleep-90" },
+]
+
+[[settings]]
+key = "pause-for-media"
+type = "switch"
+label = "pause-for-media"
+default = true

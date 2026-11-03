@@ -159,6 +159,14 @@ Kestrel keeps what the person decided in `com.lantharos.kestrel`: `disabled-exte
 - A turned off extension costs nothing: its module is never loaded. A wallpaper layer has no actors while it's inactive and stops its frame clock while nothing shows, and its shader only runs over the area it asks for.
 - Modules load once per path in GJS, so Kestrel copies `extension.js` to a temporary file for each load. That's what lets `Reload` run new code without restarting Kestrel.
 
+## Wanted
+
+What extensions need that the API doesn't offer yet:
+
+- **Whether other apps play sound.** `audioLevels.playing` counts the extension's own sounds too, so an extension that plays sounds can't tell when another app starts. Soundscapes pauses for media players instead, which misses apps without one, such as games.
+- **Calls.** Nothing tells an extension that a call is going on, such as an app recording from the microphone, for Soundscapes to pause during it.
+- **Sounds while the screen is locked.** Every extension's sounds go quiet while it's locked, which stops sleep sounds once the screen locks by itself. A sound could ask to keep playing.
+
 ## Adding an API version
 
 Version 1 grows in place while there are no extensions outside Luft's own: add to it, never take away or change what's there. When a change can't keep old extensions working, copy `api/v1` to `api/v2`, change the copy, add it to `API_VERSIONS` in `api/versions.ts` and to `extensionApi.ts`, and keep `v1` working. Extensions keep targeting the version they were written for.

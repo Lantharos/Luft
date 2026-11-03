@@ -11,7 +11,7 @@ permissions:
   contents: read
 
 env:
-  SABINE: v0.69
+  SABINE: v0.72
 
 jobs:
   windows:

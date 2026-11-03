@@ -82,7 +82,7 @@ The toggle has `update(changes)`.
 | `onClick()`, `menu` | A click outside its controls, and a menu on a right click |
 | `onExpandedChanged(expanded)` | It grew under the pointer or shrank back, for what only needs updating while it's grown |
 
-The element has `update(changes)`, `refresh()` to ask for its views again, and `dispose()`. Pop-ups can be anchored to it.
+The element has `update(changes)`, `refresh()` to ask for its views again, and `dispose()`. Pop-ups can be anchored to it. Make every `content` fit both directions and a narrow island; to let people choose where it sits on a one-bar taskbar, put a `taskbar-place` item on the extension's Settings page.
 
 ## popups
 
@@ -104,7 +104,7 @@ Content is a tree of Luft's own controls, so a pop-up looks and behaves like the
 | `{ type: 'column' \| 'row', children, spacing?, align? }` | Children one under or beside the other. `align` is `start`, `center`, `end` or `fill` |
 | `{ type: 'text', text, style?, maxWidth?, marquee? }` | `title`, `body`, `caption`, or `number` for digits that keep their width. Text wider than `maxWidth` ends in an ellipsis, or with `marquee` slides along once when it changes and while the pointer is over it |
 | `{ type: 'icon', icon, size? }` | An icon |
-| `{ type: 'image', path, width, height, radius? }` | A picture from the extension's folders, or a player's artwork, with rounded corners |
+| `{ type: 'image', path, width, height, radius?, progress? }` | A picture from the extension's folders, or a player's artwork, with rounded corners. `progress`, 0 to 1, draws a thin ring around a round picture, such as how far along a track is |
 | `{ type: 'button', label?, icon?, iconOnly?, style?, disabled?, onActivate }` | `style` is `default`, `primary` or `flat` |
 | `{ type: 'switch', label, checked, onToggled(checked) }` | A switch with its label |
 | `{ type: 'slider', label, value, onChanged(value) }` | A slider from 0 to 1 |
@@ -183,6 +183,7 @@ Without anything else, an extension's page in Settings → Extensions lists the 
 | `{ type: 'preview', image, description }` | A picture across the page |
 | `{ type: 'list', items, empty? }` | Rows of `{ title, description?, image?, actions? }`, where actions are `{ label, danger?, onActivate() }` |
 | `{ type: 'text', text }` | A paragraph |
+| `{ type: 'taskbar-place', element }` | Where one of its taskbar elements sits, by its key. People choose it there on a taskbar that's one bar; with separate islands it points them to editing the taskbar |
 
 Images are files in the extension's folder or data folder. Callbacks run in the extension like any other.
 

@@ -8,7 +8,7 @@ import {checks} from '../lib/check.js';
 import {call} from '../lib/dbus.js';
 import {click, moveTo, rest} from '../lib/input/input.js';
 import {fixture, gjs, stop, stopAll, type Process} from '../lib/processes.js';
-import {capture} from '../lib/screenshots.js';
+import {capture, captureArea} from '../lib/screenshots.js';
 import {pause} from '../lib/wait.js';
 import {installBuilt, listed, request, setSetting} from '../extensions/lib/extensions.js';
 
@@ -16,6 +16,9 @@ const {require, eventually} = checks('Now Playing');
 const NOW_PLAYING = 'com.lantharos.NowPlaying';
 const ELEMENT = `extension-element:${NOW_PLAYING}/now-playing`;
 const LENGTH_S = 214;
+const LAYOUTS = ['compact', 'full', 'no-controls', 'cover'];
+const PREVIEW_MARGIN = 36;
+const MAX_WIDTH = 200;
 const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 
 const element = () => descendants(global.stage).find(actor => actor.name === ELEMENT) ?? null;
@@ -30,6 +33,37 @@ const buttonNamed = (root: Clutter.Actor, name: string) => descendants(root).fin
 
 function player(name: string, identity: string, title: string, artist: string, cover: string): Process {
   return gjs('clients/apps/musicPlayer.js', [name, identity, title, artist, fixture('media', cover)]);
+}
+
+/** A 3:2 picture of the element where it sits on the taskbar, for the layout's preview in Settings. */
+async function preview(name: string) {
+  const [x] = element()!.get_transformed_position();
+  const width = MAX_WIDTH + 2 * PREVIEW_MARGIN;
+  const height = Math.round(width * 2 / 3);
+  const left = Math.max(0, Math.min(global.stage.width - width, Math.round(x + element()!.width / 2 - width / 2)));
+  await captureArea(name, {x: left, y: global.stage.height - height, width, height});
+}
+
+const titleWidth = () => descendants(element()!).find(actor => actor instanceof St.Label && actor.mapped && actor.text.startsWith('I like'))!.get_parent()!.width;
+
+async function checkLayouts() {
+  const widths: Record<string, number> = {};
+  const titles: Record<string, number> = {};
+  for (const layout of LAYOUTS) {
+    await setSetting(NOW_PLAYING, 'layout', new GLib.Variant('s', layout));
+    await pause(700);
+    widths[layout] = element()!.width;
+    if (layout !== 'cover') titles[layout] = titleWidth();
+    await capture(`now-playing-${layout}`);
+    await preview(`now-playing-preview-${layout}`);
+  }
+  require(Object.values(widths).every(width => width <= MAX_WIDTH + 2), `every layout stays within the widest width people chose (${Object.values(widths).join(', ')} pixels)`);
+  require(titles.compact > titles.full + 40, `with the controls under it the title gets far more room (${titles.compact} and ${titles.full} pixels)`);
+  require(widths.cover <= element()!.height + 8, 'just the cover is a small square');
+  await setSetting(NOW_PLAYING, 'max-width', new GLib.Variant('d', 140));
+  await setSetting(NOW_PLAYING, 'layout', new GLib.Variant('s', 'compact'));
+  await eventually(() => element()!.width <= 150, 'a smaller widest width keeps it inside it');
+  await setSetting(NOW_PLAYING, 'max-width', new GLib.Variant('d', 200));
 }
 
 async function playerProperty(name: string, property: string) {
@@ -49,10 +83,13 @@ export async function run() {
     players.push(player('KestrelCheckMusic', 'Tunes', 'I like the way it moves when the light comes through', 'Ocean Glass', 'cover.png'));
     await eventually(shown, 'something playing brings it into the taskbar');
     const actor = element()!;
-    await eventually(() => showsText('Ocean Glass', actor), 'it shows the artist, and the cover once it’s read');
+    await eventually(() => showsText('I like the way it moves when the light comes through', actor), 'it shows the title, with the controls under it');
     await pause(400);
     await capture('now-playing-taskbar');
 
+    await checkLayouts();
+    await setSetting(NOW_PLAYING, 'layout', new GLib.Variant('s', 'compact'));
+    await pause(600);
     const compact = actor.width;
     moveTo([actor.get_transformed_position()[0] + 14, actor.get_transformed_position()[1] + actor.height / 2]);
     await eventually(() => actor.width > compact + 40, 'it grows under the pointer');
@@ -79,19 +116,22 @@ export async function run() {
     await pause(300);
     await capture('now-playing-popup');
     (descendants(popup()!).find(child => child instanceof St.Button && child.accessible_name?.startsWith('Radio')) as St.Button).emit('clicked', 1);
-    await eventually(() => showsText('Station Nine', element()!), 'choosing it makes the taskbar follow it');
+    await eventually(() => showsText('Evening Edition', element()!), 'choosing it makes the taskbar follow it');
     rest();
     await pause(300);
     if (popup()) click([20, 20]);
 
     await setSetting(NOW_PLAYING, 'hide-paused', new GLib.Variant('b', true));
     await call('org.mpris.MediaPlayer2.KestrelCheckRadio', '/org/mpris/MediaPlayer2', 'org.mpris.MediaPlayer2.Player', 'PlayPause', null);
-    await eventually(() => showsText('Ocean Glass', element()!), 'pausing the one it follows moves on to the one still playing');
+    await eventually(() => showsText('I like the way it moves when the light comes through', element()!), 'pausing the one it follows moves on to the one still playing');
 
     kestrel.set_string('taskbar-position', 'left');
     await eventually(() => element()?.mapped && element()!.height > element()!.width, 'on a side of the display it stands upright');
     await pause(500);
     await capture('now-playing-vertical');
+    await setSetting(NOW_PLAYING, 'layout', new GLib.Variant('s', 'cover'));
+    await pause(600);
+    await capture('now-playing-vertical-cover');
     kestrel.reset('taskbar-position');
 
     for (const process of players.splice(0)) await stop(process);

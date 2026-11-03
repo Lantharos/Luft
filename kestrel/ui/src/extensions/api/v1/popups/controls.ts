@@ -95,15 +95,50 @@ export function iconControl(node: IconView, host: ControlHost): Control<IconView
   return { actor: icon, update };
 }
 
+const RING_WIDTH = 2;
+
+function ring(area: St.DrawingArea, value: () => number): void {
+  area.connect('repaint', () => {
+    const cr = area.get_context();
+    const [width, height] = area.get_surface_size();
+    const color = area.get_theme_node().get_foreground_color();
+    const radius = Math.min(width, height) / 2 - RING_WIDTH / 2;
+    cr.setLineWidth(RING_WIDTH);
+    cr.setSourceRGBA(color.red / 255, color.green / 255, color.blue / 255, 0.22);
+    cr.arc(width / 2, height / 2, radius, 0, 2 * Math.PI);
+    cr.stroke();
+    cr.setSourceRGBA(color.red / 255, color.green / 255, color.blue / 255, 0.9);
+    cr.arc(width / 2, height / 2, radius, -Math.PI / 2, -Math.PI / 2 + 2 * Math.PI * value());
+    cr.stroke();
+    cr.$dispose();
+  });
+}
+
 export function imageControl(node: ImageView, host: ControlHost): Control<ImageView> {
-  const picture = new St.Widget({ y_align: Clutter.ActorAlign.CENTER });
+  const holder = new St.Widget({ layout_manager: new Clutter.BinLayout(), y_align: Clutter.ActorAlign.CENTER });
+  const picture = new St.Widget({ x_align: Clutter.ActorAlign.CENTER, y_align: Clutter.ActorAlign.CENTER });
+  const progress = new St.DrawingArea({ style_class: 'kestrel-extension-ring', x_expand: true, y_expand: true, visible: false });
+  holder.add_child(picture);
+  holder.add_child(progress);
+  let value = 0;
+  ring(progress, () => value);
   const update = (next: ImageView) => {
-    picture.set_size(next.width, next.height);
+    const ringed = next.progress !== undefined;
+    const inset = ringed ? (RING_WIDTH + 2) * 2 : 0;
+    holder.set_size(next.width, next.height);
+    picture.set_size(next.width - inset, next.height - inset);
     const uri = imageFile(host, next.path).get_uri();
-    picture.style = `background-image: url("${uri}"); background-size: cover; border-radius: ${Math.max(0, next.radius ?? 0)}px;`;
+    const radius = Math.max(0, ringed ? (next.width - inset) / 2 : next.radius ?? 0);
+    picture.style = `background-image: url("${uri}"); background-size: cover; border-radius: ${radius}px;`;
+    progress.visible = ringed;
+    const target = Math.min(1, Math.max(0, next.progress ?? 0));
+    if (ringed && Math.abs(target - value) > 1e-3) {
+      value = target;
+      progress.queue_repaint();
+    }
   };
   update(node);
-  return { actor: picture, update };
+  return { actor: holder, update };
 }
 
 export function buttonControl(node: ButtonView, host: ControlHost): Control<ButtonView> {

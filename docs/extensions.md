@@ -121,6 +121,18 @@ An extension's `taskbar.addElement` puts an element in `taskbarElements` (`kestr
 
 The actor's `relayout(layout)` follows the island to another edge or size, and `destroy()` takes it away. The actor sizes itself: its natural size along the taskbar animates as it grows under the pointer, shrinks, and shows or hides, so the layout just allocates natural sizes, and a hidden element takes no room. Until the islands land, the primary taskbar shows elements next to the extensions' buttons.
 
+Where an element sits is the person's choice, never the extension's. With separate islands they move it while editing the taskbar. On a taskbar that's one bar (edge to edge, or islands joined), the extension's Settings page offers a place through a `taskbar-place` page item, which Settings keeps in `taskbar-element-places` (`a{ss}`, element id to place):
+
+| Place | In the arrangement |
+| --- | --- |
+| `before-apps` | In the island holding Start and the dock, before the first of them |
+| `after-apps` | In that island, after the dock |
+| `beside-tray` | Before the tray, where a new element goes; also what a missing entry means |
+| `start` | First in the island at the start of the bar's edge, made if there's none |
+| `end` | Last in the island at the end of the bar's edge, made if there's none |
+
+This is meant as the arrangement's own place for the element: the islands layout reads the key, moves each element accordingly, and from then on Settings writes the arrangement directly in place of the key.
+
 ## Typing
 
 `typing.type` commits text through the input method into the focused field, or pastes it where nothing takes typed text, after any held modifiers are released. It only works within ten seconds of the person using the extension; Kestrel counts its shortcut, its pop-ups, taskbar items, quick settings tiles, notifications and search results. The privacy indicator shows a keyboard for a few seconds after an extension typed, and its menu names it.

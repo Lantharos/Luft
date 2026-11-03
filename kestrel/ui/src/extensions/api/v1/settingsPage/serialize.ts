@@ -30,7 +30,9 @@ function finite(value: unknown, what: string): number {
   return value;
 }
 
-export function pageBuilder(folders: readonly string[], extensionPath: string, settings: ReadonlySet<string>) {
+const ELEMENT_KEY = /^[a-z][a-z0-9-]*$/;
+
+export function pageBuilder(folders: readonly string[], extensionPath: string, settings: ReadonlySet<string>, id: string) {
   const callbacks = new Map<string, Callback>();
   const callback = (run: unknown, what: string): string => {
     if (typeof run !== 'function') throw new Error(`${what} must be a function`);
@@ -56,6 +58,11 @@ export function pageBuilder(folders: readonly string[], extensionPath: string, s
     }
     switch (item.type) {
       case 'text': return { type: 'text', text: text(item.text, `${where}.text`) };
+      case 'taskbar-place': {
+        const key = text(item.element, `${where}.element`);
+        if (!ELEMENT_KEY.test(key)) throw new Error(`${where}.element must be an element's key`);
+        return { type: 'taskbar-place', element: `${id}/${key}` };
+      }
       case 'row': return { type: 'row', ...control(item, where), value: optionalText(item.value, `${where}.value`), action: item.onActivate ? callback(item.onActivate, `${where}.onActivate`) : undefined };
       case 'switch': return { type: 'switch', ...control(item, where), checked: !!item.checked, action: callback(item.onToggled, `${where}.onToggled`) };
       case 'choice': return {

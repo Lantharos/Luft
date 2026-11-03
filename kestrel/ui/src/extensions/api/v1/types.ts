@@ -427,6 +427,8 @@ export interface ImageView {
   height: number;
   /** Rounded corners, in pixels. */
   radius?: number;
+  /** A thin ring around the picture, filled this far from 0 to 1, such as how far along a track is. */
+  progress?: number;
 }
 
 export interface ButtonView {
@@ -814,7 +816,18 @@ export interface PageSection {
  */
 export type PageItem =
   | { setting: string }
-  | PageRow | PageSwitch | PageChoice | PageSlider | PageButton | PageEntry | PagePreview | PageList | { type: 'text'; text: string };
+  | PageRow | PageSwitch | PageChoice | PageSlider | PageButton | PageEntry | PagePreview | PageList | PageTaskbarPlace | { type: 'text'; text: string };
+
+/**
+ * Where one of the extension's taskbar elements sits, chosen by people, never by the extension. On a taskbar that's
+ * one bar, Settings offers places such as beside the apps or next to the tray; with separate islands, it points to
+ * editing the taskbar, where people move elements themselves.
+ */
+export interface PageTaskbarPlace {
+  type: 'taskbar-place';
+  /** The element's key, as given to {@link Taskbar.addElement}. */
+  element: string;
+}
 
 interface PageControl {
   title: string;

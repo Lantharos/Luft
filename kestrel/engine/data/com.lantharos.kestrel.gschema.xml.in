@@ -349,6 +349,16 @@
         the key the manifest declares. Shortcuts left at their default are left out.
       </description>
     </key>
+    <key name="taskbar-element-places" type="a{ss}">
+      <default>{}</default>
+      <summary>Where extensions' taskbar elements sit on a taskbar that's one bar</summary>
+      <description>
+        By element, named extension-id/element: 'before-apps' or 'after-apps'
+        in the island with Start and the apps, 'beside-tray' before the tray,
+        or 'start' or 'end' of the taskbar. An element left out sits beside
+        the tray. With separate islands, people move elements themselves.
+      </description>
+    </key>
     <key name="extension-problems" type="a{s(ss)}">
       <default>{}</default>
       <summary>Why Kestrel turned extensions off</summary>

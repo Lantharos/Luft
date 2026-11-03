@@ -7,6 +7,7 @@
 	import { extensions, shown } from './extensions.svelte';
 	import ImageChoice from './ImageChoice.svelte';
 	import SettingRow from './SettingRow.svelte';
+	import TaskbarPlace from './TaskbarPlace.svelte';
 
 	const SEGMENTS = 3;
 
@@ -88,6 +89,8 @@
 	</Row>
 {:else if item.type === 'preview'}
 	<img class="preview" src={fileUrl(item.image)} alt={item.description} decoding="async" />
+{:else if item.type === 'taskbar-place'}
+	<TaskbarPlace element={item.element} />
 {:else if item.type === 'list'}
 	{#each item.items as row, index (index)}
 		<Row title={row.title} description={row.description ?? undefined}>

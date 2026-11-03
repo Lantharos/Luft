@@ -82,6 +82,10 @@ pub enum PageItem {
         empty: Option<String>,
         items: Vec<PageListItem>,
     },
+    #[serde(rename = "taskbar-place")]
+    TaskbarPlace {
+        element: String,
+    },
 }
 
 /// A section of an extension's own Settings page, as the extension describes it while it runs.

@@ -1,0 +1,7 @@
+id = "com.lantharos.mailman"
+kind = "app"
+format = "sabine"
+permissions = "Sabine.toml"
+
+[requires]
+sabine = "0.73"

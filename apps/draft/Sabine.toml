@@ -56,5 +56,12 @@ entry = "dist/index.html"
 build = "bun run build"
 local_files = true
 
+[updates]
+provider = "schelf"
+
+[sandbox]
+unsandboxed = true
+reason = "It opens, watches and saves files and folders anywhere you point it at, as a text editor does."
+
 [bindings]
 path = "src/lib/bindings.ts"

@@ -1,0 +1,109 @@
+name: Store
+
+on:
+  push:
+    tags:
+      - "*/v*"
+
+concurrency:
+  group: store-${{ github.ref }}
+
+permissions:
+  contents: read
+
+jobs:
+  plan:
+    runs-on: ubuntu-24.04
+    outputs:
+      kind: ${{ steps.plan.outputs.kind }}
+      folder: ${{ steps.plan.outputs.folder }}
+      sabine: ${{ steps.plan.outputs.sabine }}
+      platforms: ${{ steps.plan.outputs.platforms }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - id: plan
+        run: bun .github/scripts/store/plan.ts "$GITHUB_REF_NAME" >> "$GITHUB_OUTPUT"
+
+  app:
+    needs: plan
+    if: needs.plan.outputs.kind == 'app'
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    uses: Lantharos/Sabine/.github/workflows/release-app.yml@dfca5d18f21b036f04ddd32f228cc83e533a37fd
+    with:
+      sabine_version: ${{ needs.plan.outputs.sabine }}
+      app: ${{ needs.plan.outputs.folder }}
+      platforms: ${{ needs.plan.outputs.platforms }}
+      linux_packages: libglib2.0-dev libseccomp-dev
+      # Building the MSI package accepts the WiX 7 licence: https://docs.firegiant.com/wix/osmf/
+      accept_wix_eula: true
+    secrets: inherit
+
+  extension:
+    needs: plan
+    if: needs.plan.outputs.kind == 'extension'
+    strategy:
+      matrix:
+        runner: [ubuntu-24.04, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install --frozen-lockfile
+
+      - name: Install the helper's libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes libglib2.0-dev libgstreamer1.0-dev libpipewire-0.3-dev zstd
+
+      - run: '"${{ needs.plan.outputs.folder }}/pack.sh" dist'
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: extension-${{ matrix.runner }}
+          path: dist
+          if-no-files-found: error
+
+  publish:
+    needs: [plan, app, extension]
+    if: ${{ !cancelled() && !contains(needs.*.result, 'failure') }}
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: ${{ needs.plan.outputs.kind == 'app' && 'release-*' || 'extension-*' }}
+          path: dist
+          merge-multiple: true
+
+      - id: notes
+        name: Read the release notes from the tag
+        run: |
+          git fetch --force origin "refs/tags/$GITHUB_REF_NAME:refs/tags/$GITHUB_REF_NAME"
+          {
+            echo "notes<<NOTES"
+            git tag --list --format='%(contents:subject)%0a%0a%(contents:body)' "$GITHUB_REF_NAME"
+            echo "NOTES"
+          } >> "$GITHUB_OUTPUT"
+
+      - uses: Lantharos/Store/publish@v1
+        with:
+          files: dist/**
+          schelf-toml: ${{ needs.plan.outputs.folder }}/schelf.toml
+          notes: ${{ steps.notes.outputs.notes }}

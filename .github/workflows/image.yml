@@ -80,9 +80,9 @@ jobs:
           version="${BASH_REMATCH[1]}" release="${BASH_REMATCH[2]}"
           revision="$(skopeo inspect --retry-times 3 --format '{{index .Labels "org.opencontainers.image.revision"}}' "docker://$IMAGE:$NIGHTLY")"
           [[ -n "$revision" ]] || { echo "$NIGHTLY doesn't say which commit it was built from." >&2; exit 1; }
-          tagged="$(git ls-remote --tags --refs origin "v$version" | cut -f1)"
+          tagged="$(git ls-remote --tags --refs origin "refs/tags/v$version" | cut -f1)"
           if [[ -z "$tagged" ]]; then
-            last="$(git ls-remote --tags --refs origin "v$MAJOR.*" | sed -nE "s|.*refs/tags/v$MAJOR\.([0-9]+)$|\1|p" | sort -n | tail -n 1)"
+            last="$(git ls-remote --tags --refs origin "refs/tags/v$MAJOR.*" | sed -nE "s|.*refs/tags/v$MAJOR\.([0-9]+)$|\1|p" | sort -n | tail -n 1)"
             (( release == ${last:--1} + 1 )) || { echo "$NIGHTLY leads to $version, but Luft $MAJOR.$(( ${last:--1} + 1 )) is next." >&2; exit 1; }
             gh api "repos/$GITHUB_REPOSITORY/git/refs" -f "ref=refs/tags/v$version" -f "sha=$revision" > /dev/null
           elif [[ "$tagged" != "$revision" ]]; then

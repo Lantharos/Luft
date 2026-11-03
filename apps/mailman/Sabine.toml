@@ -23,5 +23,12 @@ entry = "dist/index.html"
 build = "bun run build"
 local_files = true
 
+[updates]
+provider = "schelf"
+
+[sandbox]
+unsandboxed = true
+reason = "It keeps your accounts' passwords in Luft Keyring and listens on the system bus for the computer waking up and the network coming back."
+
 [bindings]
 path = "src/lib/bindings.ts"

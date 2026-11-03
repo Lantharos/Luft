@@ -17,9 +17,12 @@ build = "bun run build"
 local_files = true
 
 [updates]
-provider = "github"
-repository = "Lantharos/Luft"
+provider = "schelf"
 policy = "disabled"
+
+[sandbox]
+unsandboxed = true
+reason = "It checks and resizes disks and prepares the computer to start Luft."
 
 [bindings]
 path = "src/lib/bindings.ts"

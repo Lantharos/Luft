@@ -37,5 +37,12 @@ entry = "dist/index.html"
 build = "bun run build"
 local_files = true
 
+[updates]
+provider = "schelf"
+
+[sandbox]
+unsandboxed = true
+reason = "It's a file manager: it reads, moves and deletes files anywhere, mounts drives and network shares, and opens archives."
+
 [bindings]
 path = "src/lib/bindings.ts"

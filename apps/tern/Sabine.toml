@@ -17,5 +17,12 @@ dist = "dist"
 entry = "dist/index.html"
 build = "bun run build"
 
+[updates]
+provider = "schelf"
+
+[sandbox]
+unsandboxed = true
+reason = "It's a terminal: the shells and programs it starts run as you."
+
 [bindings]
 path = "src/lib/bindings.ts"

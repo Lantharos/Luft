@@ -73,5 +73,12 @@ entry = "dist/index.html"
 build = "bun run build"
 local_files = true
 
+[updates]
+provider = "schelf"
+
+[sandbox]
+unsandboxed = true
+reason = "It reads photos, videos, music and fonts wherever they are, and decodes images in sandboxes of its own, which can't start inside another one."
+
 [bindings]
 path = "src/lib/bindings.ts"

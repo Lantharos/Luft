@@ -58,6 +58,7 @@ export interface PanelActions {
 export class KestrelPanel {
   readonly actor: St.Widget;
   readonly strut = new St.Widget();
+  private gapMonitor: number | null = null;
   readonly autoHide: AutoHide;
   readonly tablet: TabletTaskbar;
   private readonly peek = new DesktopPeek();
@@ -219,6 +220,7 @@ export class KestrelPanel {
     this.actor.destroy();
     this.strut.destroy();
     this.autoHide.edge.destroy();
+    this.markGap(null);
   }
 
   handlesScroll(actor: Clutter.Actor | null): boolean {
@@ -258,6 +260,13 @@ export class KestrelPanel {
     const { x, y, width, height } = band(this.monitor!, this.edge, this.screen.reserved);
     this.strut.set_position(x, y);
     this.strut.set_size(width, height);
+    this.markGap(this.monitor!.index);
+  }
+
+  private markGap(index: number | null): void {
+    if (this.gapMonitor !== null && this.gapMonitor !== index) global.compositor.set_monitor_gap(this.gapMonitor, false);
+    this.gapMonitor = index;
+    if (index !== null) global.compositor.set_monitor_gap(index, this.screen.gap > 0);
   }
 
   private orient(): void {

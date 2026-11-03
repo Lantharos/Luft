@@ -1,0 +1,431 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Tue, 3 Nov 2026 07:46:35 +0100
+Subject: [PATCH 60/60] compositor: round the corners of maximized and tiled
+ windows that face open space
+
+Maximized and tiled windows lost all their rounding. When the shell keeps
+a gap between a display's work area and its edge, as a floating taskbar
+does, the corners facing that gap now stay rounded, while corners that
+meet the screen or another window stay square. Each corner is clipped on
+its own, and the shell says which displays leave a gap with
+meta_compositor_set_monitor_gap().
+
+Upstream-Status: luft-only Kestrel's floating taskbar
+---
+ src/compositor/compositor.c          |  35 ++++++-
+ src/compositor/meta-shaped-texture.c |   3 +-
+ src/compositor/meta-surface-actor.c  |   3 +-
+ src/compositor/meta-window-corners.c | 148 +++++++++++++++++++++++++--
+ src/compositor/meta-window-corners.h |  14 +++
+ src/compositor/meta-window-shadow.c  |   1 +
+ src/meta/compositor.h                |   5 +
+ 7 files changed, 190 insertions(+), 19 deletions(-)
+
+diff --git a/src/compositor/compositor.c b/src/compositor/compositor.c
+index 4daa9076c26084a218f47f1501de96822573edc7..b036568c0735dd46502e9d2bc475dbb637eba5fd 100644
+--- a/src/compositor/compositor.c
++++ b/src/compositor/compositor.c
+@@ -1250,15 +1250,12 @@ meta_compositor_init (MetaCompositor *compositor)
+ }
+ 
+ static void
+-on_rounded_corners_changed (MetaCompositor *compositor)
++refresh_window_corners (MetaCompositor *compositor)
+ {
+   MetaCompositorPrivate *priv =
+     meta_compositor_get_instance_private (compositor);
+   GList *l;
+ 
+-  meta_window_corners_set_rounded (g_settings_get_boolean (priv->kestrel_settings,
+-                                                           "rounded-window-corners"));
+-
+   /* Corners are synced lazily while windows paint and pick, but X11 shadow
+    * shapes are kept until the window is reshaped */
+   for (l = priv->windows; l; l = l->next)
+@@ -1276,6 +1273,36 @@ on_rounded_corners_changed (MetaCompositor *compositor)
+     }
+ }
+ 
++static void
++on_rounded_corners_changed (MetaCompositor *compositor)
++{
++  MetaCompositorPrivate *priv =
++    meta_compositor_get_instance_private (compositor);
++
++  meta_window_corners_set_rounded (g_settings_get_boolean (priv->kestrel_settings,
++                                                           "rounded-window-corners"));
++  refresh_window_corners (compositor);
++}
++
++/**
++ * meta_compositor_set_monitor_gap:
++ * @compositor: a #MetaCompositor
++ * @monitor: index of the monitor
++ * @gap: whether the shell leaves a gap between the monitor's work area and its edge
++ *
++ * Tells the compositor that windows filling @monitor's work area don't meet
++ * the screen edge where its work area ends, so their corners facing that gap
++ * stay rounded.
++ */
++void
++meta_compositor_set_monitor_gap (MetaCompositor *compositor,
++                                 int             monitor,
++                                 gboolean        gap)
++{
++  if (meta_window_corners_set_monitor_gap (monitor, gap))
++    refresh_window_corners (compositor);
++}
++
+ static void
+ meta_compositor_constructed (GObject *object)
+ {
+diff --git a/src/compositor/meta-shaped-texture.c b/src/compositor/meta-shaped-texture.c
+index 8d191be632affa004990408ac0ad147c66a0baf6..76cf5d772979f8384b92b33003378e6ac0f5a5d6 100644
+--- a/src/compositor/meta-shaped-texture.c
++++ b/src/compositor/meta-shaped-texture.c
+@@ -1325,8 +1325,7 @@ meta_shaped_texture_sync_window_corners (MetaShapedTexture *stex,
+ {
+   MetaWindowCorners corners = meta_window_corners_for_actor (actor);
+ 
+-  if (corners.radius == stex->corners.radius &&
+-      graphene_rect_equal (&corners.bounds, &stex->corners.bounds))
++  if (meta_window_corners_equal (&corners, &stex->corners))
+     return;
+ 
+   stex->corners = corners;
+diff --git a/src/compositor/meta-surface-actor.c b/src/compositor/meta-surface-actor.c
+index 1eb3c23235fb8dc2acb97ef365f788d61552e690..a0def345969dc41827028d4585e6f7afbdf0d55b 100644
+--- a/src/compositor/meta-surface-actor.c
++++ b/src/compositor/meta-surface-actor.c
+@@ -194,8 +194,7 @@ get_rounded_input_region (MetaSurfaceActor *self)
+   if (corners.radius == 0)
+     return priv->input_region;
+ 
+-  if (corners.radius != priv->input_corners.radius ||
+-      !graphene_rect_equal (&corners.bounds, &priv->input_corners.bounds) ||
++  if (!meta_window_corners_equal (&corners, &priv->input_corners) ||
+       !mtk_rectangle_equal (&bounds, &priv->input_bounds))
+     g_clear_pointer (&priv->rounded_input_region, mtk_region_unref);
+ 
+diff --git a/src/compositor/meta-window-corners.c b/src/compositor/meta-window-corners.c
+index c2ae1746a2b3d876be0bb815165758957b2a4f62..4d51e1602015767b67e80830815ee9a4e453a859 100644
+--- a/src/compositor/meta-window-corners.c
++++ b/src/compositor/meta-window-corners.c
+@@ -8,11 +8,13 @@
+ #include "compositor/meta-shaped-texture-private.h"
+ #include "compositor/meta-window-actor-private.h"
+ #include "core/window-private.h"
++#include "meta/display.h"
+ #include "meta/meta-window-actor.h"
+ #include "meta/window.h"
+ #include "wayland/meta-window-wayland.h"
+ 
+ static gboolean corners_rounded = TRUE;
++static guint64 gapped_monitors;
+ 
+ /* Whether people want rounded window corners, from the Kestrel setting the
+  * compositor follows */
+@@ -22,6 +24,24 @@ meta_window_corners_set_rounded (gboolean rounded)
+   corners_rounded = rounded;
+ }
+ 
++/* Whether the shell leaves a gap between @monitor's work area and its edge,
++ * as a floating taskbar does, so windows filling the work area keep the
++ * corners that face it rounded */
++gboolean
++meta_window_corners_set_monitor_gap (int      monitor,
++                                     gboolean gap)
++{
++  guint64 before = gapped_monitors;
++
++  if (monitor < 0 || monitor >= 64)
++    return FALSE;
++  if (gap)
++    gapped_monitors |= G_GUINT64_CONSTANT (1) << monitor;
++  else
++    gapped_monitors &= ~(G_GUINT64_CONSTANT (1) << monitor);
++  return gapped_monitors != before;
++}
++
+ float
+ meta_window_corners_get_radius (void)
+ {
+@@ -50,6 +70,90 @@ is_floating (MetaWindow *window)
+          window->edge_constraints.left == META_EDGE_CONSTRAINT_NONE;
+ }
+ 
++typedef enum
++{
++  EDGE_FREE,
++  EDGE_AGAINST_SCREEN,
++  EDGE_AGAINST_WINDOW,
++} EdgeContact;
++
++/* Only an edge left short of the screen edge by the shell's gap faces open
++ * space; the free edges of a snapped window lead on to where other windows go */
++static EdgeContact
++edge_contact (MetaEdgeConstraint constraint,
++              gboolean           at_monitor_edge,
++              gboolean           gapped)
++{
++  if (constraint != META_EDGE_CONSTRAINT_MONITOR)
++    return EDGE_AGAINST_WINDOW;
++  if (at_monitor_edge || !gapped)
++    return EDGE_AGAINST_SCREEN;
++  return EDGE_FREE;
++}
++
++static gboolean
++corner_rounded (EdgeContact one,
++                EdgeContact other)
++{
++  return one != EDGE_AGAINST_WINDOW && other != EDGE_AGAINST_WINDOW &&
++         (one == EDGE_FREE || other == EDGE_FREE);
++}
++
++/* Which corners of @window face open space: a corner stays square where the
++ * window meets another one, or where both its edges meet the screen */
++static MetaWindowCornerMask
++rounded_corners (MetaWindow *window)
++{
++  int monitor = meta_window_get_monitor (window);
++  gboolean gapped = monitor >= 0 && monitor < 64 &&
++                    (gapped_monitors & (G_GUINT64_CONSTANT (1) << monitor));
++  MtkRectangle frame, area;
++  EdgeContact top, right, bottom, left;
++  MetaWindowCornerMask mask = 0;
++
++  if (!corners_rounded || meta_window_is_fullscreen (window) || monitor < 0)
++    return 0;
++  if (is_floating (window))
++    return META_WINDOW_CORNERS_ALL;
++
++  switch (meta_window_get_window_type (window))
++    {
++    case META_WINDOW_DESKTOP:
++    case META_WINDOW_DOCK:
++    case META_WINDOW_DND:
++      return 0;
++    default:
++      break;
++    }
++
++  meta_window_get_frame_rect (window, &frame);
++  meta_display_get_monitor_geometry (meta_window_get_display (window), monitor, &area);
++  top = edge_contact (window->edge_constraints.top, frame.y <= area.y, gapped);
++  right = edge_contact (window->edge_constraints.right,
++                        frame.x + frame.width >= area.x + area.width, gapped);
++  bottom = edge_contact (window->edge_constraints.bottom,
++                         frame.y + frame.height >= area.y + area.height, gapped);
++  left = edge_contact (window->edge_constraints.left, frame.x <= area.x, gapped);
++
++  if (corner_rounded (top, left))
++    mask |= META_WINDOW_CORNER_TOP_LEFT;
++  if (corner_rounded (top, right))
++    mask |= META_WINDOW_CORNER_TOP_RIGHT;
++  if (corner_rounded (bottom, right))
++    mask |= META_WINDOW_CORNER_BOTTOM_RIGHT;
++  if (corner_rounded (bottom, left))
++    mask |= META_WINDOW_CORNER_BOTTOM_LEFT;
++  return mask;
++}
++
++gboolean
++meta_window_corners_equal (const MetaWindowCorners *a,
++                           const MetaWindowCorners *b)
++{
++  return a->radius == b->radius && a->rounded == b->rounded &&
++         graphene_rect_equal (&a->bounds, &b->bounds);
++}
++
+ /**
+  * meta_window_has_rounded_corners:
+  * @window: a #MetaWindow
+@@ -161,6 +265,7 @@ meta_window_corners_for_actor (ClutterActor *actor)
+   graphene_matrix_t transform, inverse;
+   graphene_rect_t bounds;
+   float scale, border, radius;
++  MetaWindowCornerMask rounded;
+ 
+   while (ancestor && !META_IS_WINDOW_ACTOR (ancestor))
+     ancestor = clutter_actor_get_parent (ancestor);
+@@ -168,7 +273,8 @@ meta_window_corners_for_actor (ClutterActor *actor)
+     return corners;
+ 
+   window = meta_window_actor_get_meta_window (META_WINDOW_ACTOR (ancestor));
+-  if (!window || !meta_window_has_rounded_corners (window) ||
++  rounded = window ? rounded_corners (window) : 0;
++  if (!rounded ||
+       !get_frame_bounds (META_WINDOW_ACTOR (ancestor), &bounds, &border))
+     return corners;
+ 
+@@ -200,13 +306,13 @@ meta_window_corners_for_actor (ClutterActor *actor)
+   corners.radius = MIN (radius * scale,
+                          MIN (corners.bounds.size.width,
+                               corners.bounds.size.height) / 2.0f);
++  corners.rounded = rounded;
+   return corners;
+ }
+ 
+ #define CORNER_DECLARATIONS \
+   "varying vec2 kestrel_position;\n" \
+   "uniform vec4 kestrel_bounds;\n" \
+-  "uniform float kestrel_radius;\n" \
+   "float kestrel_pixel_size ()\n" \
+   "{\n" \
+   "  vec2 dx = dFdx(kestrel_position);\n" \
+@@ -218,10 +324,14 @@ meta_window_corners_for_actor (ClutterActor *actor)
+   "float pixel = kestrel_pixel_size ();\n" \
+   "vec2 half_size = kestrel_bounds.zw * 0.5;\n" \
+   "vec2 center = kestrel_bounds.xy + half_size;\n" \
+-  "vec2 p = abs(kestrel_position - center);\n" \
+-  "vec2 q = p - half_size + kestrel_radius;\n" \
+-  "if (all(greaterThan(q, vec2(0.0))) && all(lessThan(p, half_size))) {\n" \
+-  "  float distance = length(q) - kestrel_radius;\n" \
++  "vec2 offset = kestrel_position - center;\n" \
++  "float radius = offset.y < 0.0 ?\n" \
++  "  (offset.x < 0.0 ? kestrel_radii.x : kestrel_radii.y) :\n" \
++  "  (offset.x < 0.0 ? kestrel_radii.w : kestrel_radii.z);\n" \
++  "vec2 p = abs(offset);\n" \
++  "vec2 q = p - half_size + radius;\n" \
++  "if (radius > 0.0 && all(greaterThan(q, vec2(0.0))) && all(lessThan(p, half_size))) {\n" \
++  "  float distance = length(q) - radius;\n" \
+   "  float coverage = clamp(0.5 - distance / pixel, 0.0, 1.0);\n"
+ 
+ static CoglSnippet *
+@@ -254,7 +364,8 @@ get_clear_snippet (void)
+   if (!snippet)
+     {
+       snippet = cogl_snippet_new (COGL_SNIPPET_HOOK_FRAGMENT,
+-        CORNER_DECLARATIONS,
++        CORNER_DECLARATIONS
++        "uniform vec4 kestrel_radii;\n",
+         CORNER_COVERAGE
+         "  cogl_color_out *= coverage;\n"
+         "}\n");
+@@ -272,6 +383,7 @@ get_shadow_snippet (void)
+     {
+       snippet = cogl_snippet_new (COGL_SNIPPET_HOOK_FRAGMENT,
+         CORNER_DECLARATIONS
++        "uniform vec4 kestrel_radii;\n"
+         "varying vec2 kestrel_texture_origin;\n"
+         "varying vec2 kestrel_texture_x;\n"
+         "varying vec2 kestrel_texture_y;\n"
+@@ -289,7 +401,7 @@ get_shadow_snippet (void)
+         CORNER_COVERAGE
+         "  vec2 side = sign(kestrel_position - center);\n"
+         "  float outside = max(distance, 0.0) + 0.5;\n"
+-        "  vec2 straight = half_size - kestrel_radius;\n"
++        "  vec2 straight = half_size - radius;\n"
+         "  float edge_x = kestrel_shadow_alpha (center + side * vec2(half_size.x + outside, straight.y));\n"
+         "  float edge_y = kestrel_shadow_alpha (center + side * vec2(straight.x, half_size.y + outside));\n"
+         "  float around = mix(edge_x, edge_y, q.y * q.y / dot(q, q));\n"
+@@ -334,8 +446,12 @@ meta_window_corners_apply (const MetaWindowCorners *corners,
+   bounds[3] = corners->bounds.size.height;
+   location = cogl_pipeline_get_uniform_location (pipeline, "kestrel_bounds");
+   cogl_pipeline_set_uniform_float (pipeline, location, 4, 1, bounds);
+-  location = cogl_pipeline_get_uniform_location (pipeline, "kestrel_radius");
+-  cogl_pipeline_set_uniform_1f (pipeline, location, corners->radius);
++  bounds[0] = corners->rounded & META_WINDOW_CORNER_TOP_LEFT ? corners->radius : 0;
++  bounds[1] = corners->rounded & META_WINDOW_CORNER_TOP_RIGHT ? corners->radius : 0;
++  bounds[2] = corners->rounded & META_WINDOW_CORNER_BOTTOM_RIGHT ? corners->radius : 0;
++  bounds[3] = corners->rounded & META_WINDOW_CORNER_BOTTOM_LEFT ? corners->radius : 0;
++  location = cogl_pipeline_get_uniform_location (pipeline, "kestrel_radii");
++  cogl_pipeline_set_uniform_float (pipeline, location, 4, 1, bounds);
+ }
+ 
+ static void
+@@ -355,9 +471,18 @@ subtract_corners (const MetaWindowCorners *corners,
+     { x1, y2 - bottom, x1 + width, y2 - top },
+     { x2 - width, y2 - bottom, x2, y2 - top },
+   };
++  MetaWindowCornerMask masks[4] = {
++    META_WINDOW_CORNER_TOP_LEFT,
++    META_WINDOW_CORNER_TOP_RIGHT,
++    META_WINDOW_CORNER_BOTTOM_LEFT,
++    META_WINDOW_CORNER_BOTTOM_RIGHT,
++  };
+ 
+   for (int i = 0; i < 4; i++)
+     {
++      if (!(corners->rounded & masks[i]))
++        continue;
++
+       MtkRectangle rect = {
+         .x = (int) floorf (positions[i][0]),
+         .y = (int) floorf (positions[i][1]),
+@@ -433,7 +558,8 @@ get_outline_pipeline (CoglContext *context)
+         "varying vec2 kestrel_position;\n",
+         "kestrel_position = cogl_tex_coord0_in.xy;\n");
+       fragment = cogl_snippet_new (COGL_SNIPPET_HOOK_FRAGMENT,
+-        CORNER_DECLARATIONS,
++        CORNER_DECLARATIONS
++        "uniform float kestrel_radius;\n",
+         "float pixel = kestrel_pixel_size ();\n"
+         "vec2 half_size = kestrel_bounds.zw * 0.5;\n"
+         "vec2 q = abs(kestrel_position - kestrel_bounds.xy - half_size) - half_size + kestrel_radius;\n"
+diff --git a/src/compositor/meta-window-corners.h b/src/compositor/meta-window-corners.h
+index d2ad05b9edffccea5da2a89c1e3935611e6f347e..fe871eedb0280cd05cb83e4bf246db0526fd39d2 100644
+--- a/src/compositor/meta-window-corners.h
++++ b/src/compositor/meta-window-corners.h
+@@ -8,10 +8,20 @@
+ 
+ #define META_WINDOW_CORNER_RADIUS 15.0f
+ 
++typedef enum
++{
++  META_WINDOW_CORNER_TOP_LEFT = 1 << 0,
++  META_WINDOW_CORNER_TOP_RIGHT = 1 << 1,
++  META_WINDOW_CORNER_BOTTOM_RIGHT = 1 << 2,
++  META_WINDOW_CORNER_BOTTOM_LEFT = 1 << 3,
++  META_WINDOW_CORNERS_ALL = 0xf,
++} MetaWindowCornerMask;
++
+ typedef struct
+ {
+   graphene_rect_t bounds;
+   float radius;
++  MetaWindowCornerMask rounded;
+ } MetaWindowCorners;
+ 
+ typedef enum
+@@ -21,6 +31,10 @@ typedef enum
+ } MetaWindowCornerFill;
+ 
+ void meta_window_corners_set_rounded (gboolean rounded);
++gboolean meta_window_corners_set_monitor_gap (int      monitor,
++                                              gboolean gap);
++gboolean meta_window_corners_equal (const MetaWindowCorners *a,
++                                    const MetaWindowCorners *b);
+ float meta_window_corners_get_radius (void);
+ MetaWindowCorners meta_window_corners_for_actor (ClutterActor *actor);
+ gboolean meta_window_corners_get_outline (MetaWindowActor *window_actor,
+diff --git a/src/compositor/meta-window-shadow.c b/src/compositor/meta-window-shadow.c
+index a4bd2165b9cef4add22bf548a6eabeb8c83bd81c..a515f4605e7871a886c18b5746be899561ebbbf8 100644
+--- a/src/compositor/meta-window-shadow.c
++++ b/src/compositor/meta-window-shadow.c
+@@ -35,6 +35,7 @@ ensure_shadow (MetaWindowShadow   *shadow,
+     .bounds = GRAPHENE_RECT_INIT (0, 0, frame->width, frame->height),
+     .radius = MIN (meta_window_corners_get_radius (),
+                    MIN (frame->width, frame->height) / 2.0f),
++    .rounded = META_WINDOW_CORNERS_ALL,
+   };
+   g_autoptr (MtkRegion) region = NULL;
+   MetaWindowShape *shape;
+diff --git a/src/meta/compositor.h b/src/meta/compositor.h
+index 98be9e1524497c33a5ce923f20fbc31f484d823b..aba0a0aad3aba1bfaec92360404b45a1a8060386 100644
+--- a/src/meta/compositor.h
++++ b/src/meta/compositor.h
+@@ -90,6 +90,11 @@ ClutterActor * meta_compositor_get_top_window_group (MetaCompositor *compositor)
+ META_EXPORT
+ ClutterActor * meta_compositor_get_input_panel_group (MetaCompositor *compositor);
+ 
++META_EXPORT
++void meta_compositor_set_monitor_gap (MetaCompositor *compositor,
++                                      int             monitor,
++                                      gboolean        gap);
++
+ META_EXPORT
+ void meta_compositor_disable_unredirect (MetaCompositor *compositor);
+ 

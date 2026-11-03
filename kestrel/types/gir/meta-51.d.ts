@@ -1828,6 +1828,8 @@ export namespace Meta {
         get_window_group(): Clutter.Actor;
 
         set_background_blur_params(blur_radius: number, saturation: number, noise: number): void;
+
+        set_monitor_gap(monitor: number, gap: boolean): void;
     }
 
 

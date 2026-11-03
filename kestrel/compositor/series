@@ -57,3 +57,4 @@
 0057-wayland-tell-clients-Kestrel-resizes-their-toplevels.patch
 0058-wayland-drop-the-primary-selection.patch
 0059-display-finish-startups-of-X11-windows-launched-befo.patch
+0060-compositor-round-the-corners-of-maximized-and-tiled-.patch

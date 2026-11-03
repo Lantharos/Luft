@@ -116,8 +116,13 @@ export class TaskbarLayout {
     return thickness + margin;
   }
 
+  /** Space a lifted taskbar keeps between itself and windows filling the rest of the screen. */
+  get gap(): number {
+    return this.shown && !this.touch ? this.metrics.margin : 0;
+  }
+
   get reserved(): number {
-    return this.touch ? STRIP_HEIGHT : this.clearance;
+    return this.touch ? STRIP_HEIGHT : this.clearance + this.gap;
   }
 }
 

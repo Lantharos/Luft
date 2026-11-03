@@ -7,7 +7,7 @@ on:
       app:
         description: App or extension
         type: choice
-        options: [draft, magpie, mailman, meet, rover, tern, rain, visualizer]
+        options: [draft, magpie, mailman, meet, rover, tern, rain, visualizer, now-playing]
       channel:
         description: Channel
         type: choice

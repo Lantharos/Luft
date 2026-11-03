@@ -163,6 +163,10 @@ pub fn extension_access(access: &ExtensionAccess) -> Vec<String> {
                 "weather" => "See the weather where you are",
                 "location" => "See roughly where you are",
                 "media" => "See and control what's playing",
+                "popups" => "Show panels and small windows",
+                "typing" => "Type into other apps",
+                "sounds" => "Play sounds",
+                "audio-levels" => "Follow the beat of what's playing",
                 other => other,
             }
             .to_owned()

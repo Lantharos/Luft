@@ -2,7 +2,6 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import type GObject from 'gi://GObject';
 import Gst from 'gi://Gst';
-import Gtk from 'gi://Gtk';
 
 import { ScreencastErrors, ScreencastError } from '../../core/runtime/dbusErrors.js';
 import { loadSubInterfaceXML } from '../../core/runtime/dbusUtils.js';
@@ -119,10 +118,6 @@ export class Recorder extends EventEmitter {
       this.pipelineState = 'FLUSHING';
       this.pipeline!.send_event(Gst.Event.new_eos());
     });
-  }
-
-  private addRecentItem(): void {
-    Gtk.RecentManager.get_default().add_item(Gio.File.new_for_path(this.filePath!).get_uri());
   }
 
   private unwatchSender(): void {
@@ -256,12 +251,10 @@ export class Recorder extends EventEmitter {
         this.tryNextPipeline();
         break;
       case 'PLAYING':
-        this.addRecentItem();
         this.handleFatalPipelineError('Unexpected EOS message', ScreencastError.PIPELINE_ERROR);
         break;
       case 'FLUSHING':
         this.blocklist.restore();
-        this.addRecentItem();
         this.teardownPipeline();
         this.unwatchSender();
         this.stopSession();

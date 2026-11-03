@@ -28,27 +28,6 @@ export interface CursorCapture {
 
 const NO_CURSOR: CursorCapture = { texture: null, x: 0, y: 0, scale: 1 };
 
-function saveRecentFile(file: Gio.File): void {
-  const recentFile = GLib.build_filenamev([GLib.get_user_data_dir(), 'recently-used.xbel']);
-  const uri = file.get_uri();
-  const bookmarks = new GLib.BookmarkFile();
-  try {
-    bookmarks.load_from_file(recentFile);
-  } catch (e) {
-    if (!(e as GLib.Error).matches(GLib.FileError, GLib.FileError.NOENT)) {
-      log(`Could not open recent file ${uri}: ${(e as GLib.Error).message}`);
-      return;
-    }
-  }
-
-  try {
-    bookmarks.add_application(uri, GLib.get_prgname(), 'gio open %u');
-    bookmarks.to_file(recentFile);
-  } catch (e) {
-    log(`Could not save recent file ${uri}: ${(e as GLib.Error).message}`);
-  }
-}
-
 function makeScreenshotsFolder(): Gio.File {
   const dir = Gio.File.new_for_path(GLib.build_filenamev([
     GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_PICTURES) || GLib.get_home_dir(),
@@ -93,7 +72,6 @@ function storeScreenshot(bytes: GLib.Bytes, pixbuf: GdkPixbuf.Pixbuf): Gio.File 
   const time = GLib.DateTime.new_now_local();
   const lockdown = new Gio.Settings({ schema_id: 'org.gnome.desktop.lockdown' });
   const file = lockdown.get_boolean('disable-save-to-disk') ? null : writeScreenshot(bytes, time);
-  if (file) saveRecentFile(file);
 
   const source = screenshotNotificationSource();
   const notification = new MessageTray.Notification({

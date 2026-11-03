@@ -1,5 +1,6 @@
 use std::fs;
 use std::hash::{DefaultHasher, Hash, Hasher};
+use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::time::UNIX_EPOCH;
 
@@ -30,11 +31,12 @@ pub fn cached_path(source: &Path, folder: &str, extension: &str) -> Result<PathB
 }
 
 pub fn store(target: &Path, contents: &[u8]) -> Result<(), String> {
-    fs::create_dir_all(
-        target
-            .parent()
-            .ok_or_else(|| t!(L10N, "desktop-no-cache-folder"))?,
-    )
-    .map_err(failed)?;
-    fs::write(target, contents).map_err(failed)
+    let folder = target
+        .parent()
+        .ok_or_else(|| t!(L10N, "desktop-no-cache-folder"))?;
+    fs::create_dir_all(folder).map_err(failed)?;
+    let mut written = tempfile::NamedTempFile::new_in(folder).map_err(failed)?;
+    written.write_all(contents).map_err(failed)?;
+    written.persist(target).map_err(failed)?;
+    Ok(())
 }

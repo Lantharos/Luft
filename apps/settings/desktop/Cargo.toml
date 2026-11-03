@@ -43,13 +43,11 @@ serde.workspace = true
 serde_json.workspace = true
 specta.workspace = true
 tar.workspace = true
+tempfile.workspace = true
 tokio = { workspace = true, features = ["net", "rt", "sync", "time"] }
 ureq.workspace = true
 zbus = { workspace = true, features = ["proxy", "service", "tokio"] }
 zip.workspace = true
-
-[dev-dependencies]
-tempfile.workspace = true
 
 [lints]
 workspace = true

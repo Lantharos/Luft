@@ -1,14 +1,15 @@
 use std::fs;
+use std::io::Cursor;
 use std::path::{Path, PathBuf};
 
 use gstreamer as gst;
 use gstreamer::prelude::*;
-use image::{DynamicImage, RgbImage};
+use image::{DynamicImage, ImageFormat, RgbImage};
 use luft_i18n::t;
 use serde::Deserialize;
 use specta::Type;
 
-use super::cache::{cached_path, failed};
+use super::cache::{cached_path, failed, store};
 use super::library::{extension, is_video};
 use crate::L10N;
 
@@ -97,13 +98,11 @@ pub fn preview(source: &Path) -> Result<PathBuf, String> {
         } else {
             shrink(decode_image(source)?)
         };
-        fs::create_dir_all(
-            target
-                .parent()
-                .ok_or_else(|| t!(L10N, "desktop-no-cache-folder"))?,
-        )
-        .map_err(failed)?;
-        preview.save(&target).map_err(failed)?;
+        let mut encoded = Cursor::new(Vec::new());
+        preview
+            .write_to(&mut encoded, ImageFormat::Jpeg)
+            .map_err(failed)?;
+        store(&target, encoded.get_ref())?;
     }
     Ok(target)
 }

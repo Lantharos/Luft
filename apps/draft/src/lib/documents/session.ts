@@ -1,3 +1,4 @@
+import { commands } from '#lib/bindings.js';
 import { writeStore } from '#lib/bridge/index.js';
 import type { Cursor } from '#lib/editor/editor.js';
 import { debounce } from '#lib/utils/debounce.js';
@@ -51,7 +52,7 @@ export function sessionWriter(workspace: Workspace) {
 
 async function restoreDocument(workspace: Workspace, saved: SessionDocument) {
 	const options: OpenOptions = { activate: false, id: saved.id, cursor: saved.cursor, top: saved.top, backup: saved.backup };
-	if (saved.path) {
+	if (saved.path && (await commands.fileStat({ path: saved.path }))) {
 		const document = await openPath(workspace, saved.path, options);
 		if (document || !saved.backup) return document;
 	}

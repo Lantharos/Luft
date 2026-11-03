@@ -2,12 +2,14 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
-import type {LuftApp} from '../lib/apps/luftApp.js';
+import {launchAgain, type LuftApp} from '../lib/apps/luftApp.js';
 import {checks} from '../lib/check.js';
 import {press, type} from '../lib/input/input.js';
 import type {Frame} from '../lib/screenshots.js';
 import {changes, openApp, withApp} from './lib/apps.js';
+import {write} from './lib/files.js';
 import {checkPalette, showDark, useScheme, withPalette, type Palette} from './lib/palette.js';
+import {scratch} from '../lib/processes.js';
 
 export const timeout = 420000;
 
@@ -21,6 +23,9 @@ const FIRST_LINE = {x: 310, y: 62, width: 250, height: 24};
 const PROMPT_LINE = {x: 0, y: 50, width: 400, height: 22};
 const TEXT_TOLERANCE = 40;
 const TERMINAL_TOLERANCE = 40;
+const EDITOR = {x: 60, y: 120, width: 600, height: 300};
+const TEXT_PIXELS = 400;
+const PACKING = Array.from({length: 12}, (_, line) => `Pack the charger, the map and spare socks for day ${line + 1}`).join('\n');
 
 const firstLine = (app: LuftApp) => app.frame(app.area(FIRST_LINE));
 
@@ -86,7 +91,32 @@ async function checkFreezing(draft: LuftApp, palette: Palette) {
   }
 }
 
+const showsText = (app: LuftApp, blank: Frame) =>
+  app.settle(frame => frame.pixelsApart(blank, TEXT_TOLERANCE) > TEXT_PIXELS, app.area(EDITOR));
+
+async function checkOpeningFiles() {
+  const folder = scratch('draft-opening');
+  const blank = GLib.build_filenamev([folder, 'blank.txt']);
+  const list = GLib.build_filenamev([folder, 'Packing list']);
+  const notes = GLib.build_filenamev([folder, 'trip.conf']);
+  write(blank, '');
+  write(list, `${PACKING}\n`);
+  write(notes, `${PACKING}\n`);
+  const empty = await withApp('draft', [blank], async draft => {
+    const shown = await draft.settle(() => true, draft.area(EDITOR));
+    require((await launchAgain('draft', [Gio.File.new_for_path(notes).get_uri()])).ok, 'a second launch of Draft hands its file to the running Draft');
+    require((await showsText(draft, shown)).pixelsApart(shown, TEXT_TOLERANCE) > TEXT_PIXELS,
+      'the running Draft shows the text of a file URL a second launch hands it');
+    return shown;
+  });
+  await withApp('draft', [list], async draft => {
+    require((await showsText(draft, empty)).pixelsApart(empty, TEXT_TOLERANCE) > TEXT_PIXELS,
+      'Draft shows the text of a file without an extension it starts with');
+  });
+}
+
 export async function run() {
+  await checkOpeningFiles();
   await withPalette(palette => withApp('draft', [], async draft => {
     await checkPalette(draft, palette);
     await checkFreezing(draft, palette);

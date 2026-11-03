@@ -9,7 +9,7 @@ import {requireFresh} from './freshness.js';
 import {prepareHome} from './home.js';
 import {call} from '../dbus.js';
 import {click, type Point} from '../input/input.js';
-import {repository, spawn, type Process} from '../processes.js';
+import {outcome, repository, spawn, type Process} from '../processes.js';
 import {captureFrame, type Area, type Frame} from '../screenshots.js';
 import {pause, settled, Timeout, waitUntil, type Truthy} from '../wait.js';
 
@@ -65,6 +65,12 @@ function command(name: string) {
 }
 
 export const appBinary = (name: string) => command(name).path;
+
+/** Starts an app again with `args`, as the desktop does, so it hands them to the copy already running. */
+export function launchAgain(name: string, args: string[]) {
+  const {path, manifest} = command(name);
+  return outcome([path, ...args], {env: environment(manifest), cwd: home});
+}
 
 /** Starts an app with its output in a file instead of a pipe to Kestrel, so it keeps running when Kestrel stops. */
 export function launchDetached(name: string, log: string): number {

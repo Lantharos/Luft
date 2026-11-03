@@ -1,12 +1,16 @@
 import Clutter from 'gi://Clutter';
+import Gio from 'gi://Gio';
+import GioUnix from 'gi://GioUnix';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
 
 import type {LuftApp} from '../lib/apps/luftApp.js';
 import {checks} from '../lib/check.js';
-import {press, type Point} from '../lib/input/input.js';
+import {click, hold, moveTo, press, release, type Point} from '../lib/input/input.js';
 import {scratch} from '../lib/processes.js';
 import {changes, withApp} from './lib/apps.js';
+import {write} from './lib/files.js';
+import {pause} from '../lib/wait.js';
 import {checkPalette, withPalette} from './lib/palette.js';
 
 const {require, eventually} = checks('Luft app');
@@ -22,6 +26,11 @@ const PRINTED = 'tern-copy-check';
 const MENU_PASTE = 'menu-paste';
 const CANCELLED = 'cancelled\nwith escape\n';
 const CONFIRMED = 'alpha\nbravo\n';
+const LINK = 'https://example.test/harbour-photos-from-saturday';
+const ON_LINK: Point = [60, 61];
+const HOVER = 500;
+const BROWSER = 'com.lantharos.KestrelChecks.LinkBrowser';
+const WEB_LINKS = ['x-scheme-handler/http', 'x-scheme-handler/https'];
 
 const promptScript = (result: string) => `printf '${PRINTED}\\n'
 read -r typed
@@ -78,7 +87,41 @@ async function checkPasting(app: LuftApp, result: string) {
   require(first === 'alpha' && second === 'bravo', 'Enter confirms the paste dialog at a password prompt, after Escape cancelled the one before');
 }
 
+function installBrowser(record: string) {
+  const path = GLib.build_filenamev([GLib.get_user_data_dir(), 'applications', `${BROWSER}.desktop`]);
+  const script = scratch('link-browser.sh');
+  write(script, `printf '%s' "$1" > ${GLib.shell_quote(record)}\n`);
+  write(path, `[Desktop Entry]\nType=Application\nName=Link browser\nExec=sh ${script} %u\nMimeType=${WEB_LINKS.join(';')};\n`);
+  const browser = GioUnix.DesktopAppInfo.new_from_filename(path)!;
+  WEB_LINKS.forEach(scheme => browser.set_as_default_for_type(scheme));
+  return () => {
+    WEB_LINKS.forEach(scheme => Gio.AppInfo.reset_type_associations(scheme));
+    GLib.unlink(path);
+  };
+}
+
+async function checkLinks() {
+  const record = scratch('tern-link-opened');
+  GLib.unlink(record);
+  const uninstall = installBrowser(record);
+  try {
+    await withApp('tern', ['-e', 'sh', '-c', `printf '%s\\n' '${LINK}'; sleep 60`], async app => {
+      await app.settle(() => true, app.area(FIRST_LINE));
+      moveTo(app.at(ON_LINK));
+      await pause(HOVER);
+      hold(Clutter.KEY_Control_L);
+      click(app.at(ON_LINK));
+      release(Clutter.KEY_Control_L);
+      await eventually(() => readResult(record) === LINK, 'Ctrl-clicking a link in Tern opens it in the default browser');
+    });
+  } finally {
+    uninstall();
+    GLib.unlink(record);
+  }
+}
+
 export async function run() {
+  await checkLinks();
   const result = scratch('tern-paste-check.txt');
   GLib.unlink(result);
   try {

@@ -1,4 +1,5 @@
 use std::collections::BTreeMap;
+use std::path::Path;
 
 use luft_software::apps::appimage::Declaration;
 use luft_software::apps::flatpak::Permissions;
@@ -221,6 +222,12 @@ pub struct Listing {
 }
 
 impl Listing {
+    /// A copy of a listing on disk, such as one shipped with the system.
+    pub fn read(path: &Path) -> Result<Self, String> {
+        let bytes = std::fs::read(path).map_err(|error| error.to_string())?;
+        serde_json::from_slice(&bytes).map_err(|error| error.to_string())
+    }
+
     fn text(&self) -> Option<&Text> {
         self.listing
             .get(LOCALE)
@@ -238,6 +245,14 @@ impl Listing {
                 artifact.platform == *platform && artifact.kind == self.format.installs()
             })
         })
+    }
+
+    /// The newest release with a file for this device, whatever its rollout:
+    /// the one a listing shipped with the system holds.
+    pub fn shipped(&self) -> Option<&Release> {
+        self.releases
+            .iter()
+            .find(|release| self.artifact(release).is_some())
     }
 
     /// The newest release this device may have: one for its platform, whose

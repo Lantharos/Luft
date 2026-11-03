@@ -66,7 +66,7 @@ fn agreed(listing: &Listing, release: &Release, consent: &Consent) -> Result<(),
     Ok(())
 }
 
-fn full_access() -> Declared {
+fn full_access_declared() -> Declared {
     Declared {
         network: true,
         filesystems: Vec::new(),
@@ -78,18 +78,21 @@ fn full_access() -> Declared {
 
 fn install_appimage(
     release: &Release,
-    consent: &Consent,
+    full_access: bool,
     granting: bool,
     file: &Path,
     task: Task,
 ) -> Result<String, String> {
     let installed = appimage::install(file, task)?;
     if granting {
-        let declared = release.permissions.clone().unwrap_or_else(full_access);
+        let declared = release
+            .permissions
+            .clone()
+            .unwrap_or_else(full_access_declared);
         block_on(appimage::grant(
             &installed.app.id,
             &declared.declaration(),
-            consent.full_access,
+            full_access,
         ))?;
     }
     Ok(installed.app.id)
@@ -106,6 +109,37 @@ fn install_sabine(id: &str, archive: &Path, task: Task) -> Result<String, String
         .map_err(|error| error.to_string())
 }
 
+/// Installs `file`, the artifact of `release`, and records it with the
+/// access it was installed with.
+fn place(
+    listing: &Listing,
+    release: &Release,
+    file: &Path,
+    full_access: bool,
+    task: Task,
+) -> Result<(), String> {
+    let granting =
+        record::get(&listing.id).is_none_or(|previous| previous.agreed != release.permissions);
+    let local = match listing.format {
+        Format::Appimage => install_appimage(release, full_access, granting, file, task),
+        Format::Sabine => install_sabine(&listing.id, file, task),
+        Format::LuftExtension => extensions::install(&listing.id, file, task),
+    }?;
+    record::put(
+        &listing.id,
+        Installed {
+            kind: listing.kind,
+            format: listing.format,
+            name: listing.name().to_owned(),
+            icon: listing.icon.clone(),
+            version: release.version.clone(),
+            local,
+            agreed: release.permissions.clone(),
+            agreed_extension: release.extension.clone(),
+        },
+    )
+}
+
 /// Installs or updates `id` from schelf.store, as you agreed to in `consent`.
 pub fn install(id: &str, consent: &Consent, reason: Reason, task: Task) -> Result<(), String> {
     let listing = listing::fetch(id, Age::Current)?;
@@ -117,30 +151,32 @@ pub fn install(id: &str, consent: &Consent, reason: Reason, task: Task) -> Resul
     let artifact = listing
         .artifact(release)
         .ok_or_else(|| format!("{} isn't available for this computer.", listing.name()))?;
-    let previous = record::get(&listing.id);
-    let granting = previous
-        .as_ref()
-        .is_none_or(|previous| previous.agreed != release.permissions);
     let file = download::verified(&listing.id, artifact, reason.query(), task)?;
-    let local = match listing.format {
-        Format::Appimage => install_appimage(release, consent, granting, &file, task),
-        Format::Sabine => install_sabine(&listing.id, &file, task),
-        Format::LuftExtension => extensions::install(&listing.id, &file, task),
-    };
+    let placed = place(&listing, release, &file, consent.full_access, task);
     let _ = std::fs::remove_file(&file);
-    record::put(
-        &listing.id,
-        Installed {
-            kind: listing.kind,
-            format: listing.format,
-            name: listing.name().to_owned(),
-            icon: listing.icon.clone(),
-            version: release.version.clone(),
-            local: local?,
-            agreed: release.permissions.clone(),
-            agreed_extension: release.extension.clone(),
-        },
-    )
+    placed
+}
+
+/// Installs a store app or extension from the copy of its listing and its
+/// file that came with the system, next to each other in one folder, unless
+/// it's already installed from the store. Nothing goes online.
+pub fn install_shipped(path: &Path, task: Task) -> Result<(), String> {
+    let listing = Listing::read(path)?;
+    if record::get(&listing.id).is_some() {
+        return Ok(());
+    }
+    let release = listing
+        .shipped()
+        .ok_or_else(|| format!("{} came without a file for this computer.", listing.name()))?;
+    let artifact = listing
+        .artifact(release)
+        .ok_or_else(|| format!("{} came without a file for this computer.", listing.name()))?;
+    let file = download::shipped(path, artifact)?;
+    let full_access = release
+        .permissions
+        .as_ref()
+        .is_none_or(|declared| declared.unsandboxed.is_some());
+    place(&listing, release, &file, full_access, task)
 }
 
 pub fn remove(id: &str) -> Result<(), String> {

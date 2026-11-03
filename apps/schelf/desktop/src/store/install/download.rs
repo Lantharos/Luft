@@ -44,11 +44,28 @@ pub fn verified(
     fs::create_dir_all(&folder).map_err(|error| error.to_string())?;
     let path = folder.join(format!("{id}.download"));
     http::download(&format!("{}?reason={reason}", artifact.url), &path, task)?;
-    let matches = fs::metadata(&path).is_ok_and(|metadata| metadata.len() == artifact.size)
-        && sha256(&path)? == artifact.sha256.to_ascii_lowercase();
-    if !matches {
+    if !published(&path, artifact)? {
         let _ = fs::remove_file(&path);
         return Err(CHANGED.into());
     }
     Ok(path)
+}
+
+/// The artifact's file shipped with the system next to `listing`'s copy,
+/// when it's exactly the file the store signed for.
+pub fn shipped(listing: &Path, artifact: &Artifact) -> Result<PathBuf, String> {
+    let name = artifact.url.rsplit('/').next().unwrap_or_default();
+    let path = listing.with_file_name(name);
+    if !published(&path, artifact)? {
+        return Err(format!(
+            "{} isn't the file schelf.store published.",
+            path.display()
+        ));
+    }
+    Ok(path)
+}
+
+fn published(path: &Path, artifact: &Artifact) -> Result<bool, String> {
+    let sized = fs::metadata(path).is_ok_and(|metadata| metadata.len() == artifact.size);
+    Ok(sized && sha256(path)? == artifact.sha256.to_ascii_lowercase())
 }

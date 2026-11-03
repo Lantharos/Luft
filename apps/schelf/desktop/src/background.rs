@@ -48,6 +48,11 @@ fn record() -> PathBuf {
         .join("luft/preinstalled")
 }
 
+fn is_store_listing(path: &Path) -> bool {
+    path.extension()
+        .is_some_and(|extension| extension == "json")
+}
+
 fn seeds() -> Vec<PathBuf> {
     let Ok(entries) = fs::read_dir(SEEDS) else {
         return Vec::new();
@@ -55,7 +60,7 @@ fn seeds() -> Vec<PathBuf> {
     let mut seeds: Vec<PathBuf> = entries
         .flatten()
         .map(|entry| entry.path())
-        .filter(|path| appimage::is_appimage(path))
+        .filter(|path| appimage::is_appimage(path) || is_store_listing(path))
         .collect();
     seeds.sort();
     seeds
@@ -68,6 +73,7 @@ fn preinstall() -> Result<(), String> {
         .lines()
         .map(str::to_owned)
         .collect();
+    let mut failures = Vec::new();
     for seed in seeds() {
         let Some(name) = seed
             .file_name()
@@ -78,17 +84,27 @@ fn preinstall() -> Result<(), String> {
         if done.contains(&name) {
             continue;
         }
-        install_seed(&seed)?;
+        if let Err(error) = install_seed(&seed) {
+            failures.push(format!("{name}: {error}"));
+            continue;
+        }
         done.insert(name);
         fs::create_dir_all(record.parent().unwrap_or(Path::new("/")))
             .map_err(|error| error.to_string())?;
         let lines: Vec<&str> = done.iter().map(String::as_str).collect();
         fs::write(&record, lines.join("\n") + "\n").map_err(|error| error.to_string())?;
     }
-    Ok(())
+    if failures.is_empty() {
+        Ok(())
+    } else {
+        Err(failures.join("\n"))
+    }
 }
 
 fn install_seed(seed: &Path) -> Result<(), String> {
+    if is_store_listing(seed) {
+        return quietly(|task| store::install::install_shipped(seed, task));
+    }
     let bundle = appimage::inspect(seed)?;
     let Placement { id, path } = appimage::placement(seed, &bundle);
     if appimage::list()

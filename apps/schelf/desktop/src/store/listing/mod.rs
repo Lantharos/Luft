@@ -35,6 +35,13 @@ pub struct Screenshot {
     pub caption: Option<String>,
 }
 
+/// The app schelf.store says takes this one's place.
+#[derive(Deserialize)]
+pub struct Replacement {
+    pub id: String,
+    pub note: String,
+}
+
 /// A release this computer may install, the file it installs and how.
 #[derive(Clone, Copy)]
 pub struct Offer<'a> {
@@ -66,6 +73,7 @@ pub struct Listing {
     pub publisher: Publisher,
     pub homepage: Option<String>,
     pub licence: Option<String>,
+    pub replaced_by: Option<Replacement>,
     releases: Vec<Release>,
 }
 

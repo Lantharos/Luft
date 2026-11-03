@@ -167,7 +167,10 @@ fn from_store(updates: Vec<StoreUpdate>) -> Vec<AppUpdate> {
                 name: update.name.clone(),
                 icon: update.icon.clone(),
                 from: Some(update.from.clone()),
-                to: Some(update.to.clone()),
+                to: Some(match &update.replacement {
+                    Some(replacement) => format!("{replacement} {}", update.to),
+                    None => update.to.clone(),
+                }),
                 size: update.size,
                 platform: false,
                 installation: None,

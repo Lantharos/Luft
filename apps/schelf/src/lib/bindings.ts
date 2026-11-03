@@ -424,6 +424,12 @@ export type Provenance = {
 	run: string | null,
 };
 
+/**  The listed app that took a delisted one's place, and why. */
+export type ReplacedBy = {
+	app: CatalogApp,
+	note: string,
+};
+
 /**
  *  A repository file and the keys it names, by the address `gpgkey` gives each, ready to be
  *  checked and added.
@@ -497,6 +503,7 @@ export type StoreDetails = {
 	 *  releases of it any more. A copy you have keeps working.
 	 */
 	withdrawn: boolean,
+	replacedBy: ReplacedBy | null,
 };
 
 export type StoreState = {
@@ -518,6 +525,11 @@ export type StoreUpdate = {
 	consent: Consent,
 	/**  Whether it asks for more than you agreed to, so it waits for you. */
 	widens: boolean,
+	/**
+	 *  The name of the app that took this one's place, which the update
+	 *  moves you to.
+	 */
+	replacement: string | null,
 };
 
 export type ToolSummary = {

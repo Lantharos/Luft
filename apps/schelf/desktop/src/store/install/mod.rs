@@ -159,9 +159,22 @@ fn place(
     }
 }
 
+/// Moves you from `id` to the app that took its place: installs that one as
+/// you agreed to in `consent`, unless you have it already, and removes `id`.
+fn replace(id: &str, replacement: &str, consent: &Consent, task: Task) -> Result<(), String> {
+    if record::get(replacement).is_none() {
+        install(replacement, consent, Reason::Install, task)?;
+    }
+    remove(id)
+}
+
 /// Installs or updates `id` from schelf.store, as you agreed to in `consent`.
+/// Updating an app another took the place of moves you to that one.
 pub fn install(id: &str, consent: &Consent, reason: Reason, task: Task) -> Result<(), String> {
     let listing = listing::fetch(id, Age::Current)?;
+    if let (Reason::Update, Some(replacement)) = (reason, &listing.replaced_by) {
+        return replace(id, &replacement.id, consent, task);
+    }
     let offer = listing
         .release(&channel::followed(id))
         .ok_or_else(|| format!("{} isn't available for this computer.", listing.name()))?;

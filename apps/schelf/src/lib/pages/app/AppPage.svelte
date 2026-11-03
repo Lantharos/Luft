@@ -18,6 +18,7 @@
 	import Notifications from './Notifications.svelte';
 	import Provenance from './Provenance.svelte';
 	import PulledNotice from './PulledNotice.svelte';
+	import ReplacedNotice from './ReplacedNotice.svelte';
 	import { installedFor, load, type Loaded } from './load';
 
 	let { target, name, askFullAccess = false }: { target: AppTarget; name: string; askFullAccess?: boolean } = $props();
@@ -100,6 +101,10 @@
 
 		{#if block && installed}
 			<PulledNotice name={title} {block} app={installed} />
+		{/if}
+
+		{#if store?.replacedBy}
+			<ReplacedNotice replacement={store.replacedBy} />
 		{/if}
 
 		{#if !loaded}

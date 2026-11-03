@@ -2,8 +2,11 @@ use luft_software::apps::flatpak::Permissions;
 use serde::Serialize;
 use specta::Type;
 
-use super::{Declared, ExtensionAccess, Format, Listing, Provenance, Release, Screenshot, channel};
-use crate::store::catalog::Kind;
+use super::{
+    Declared, ExtensionAccess, Format, Listing, Provenance, Release, Replacement, Screenshot,
+    channel,
+};
+use crate::store::catalog::{self, CatalogApp, Kind};
 use crate::store::device;
 use crate::store::record::Installed;
 
@@ -13,6 +16,23 @@ pub struct Download {
     pub url: String,
     pub name: String,
     pub size: u64,
+}
+
+/// The listed app that took a delisted one's place, and why.
+#[derive(Serialize, Type)]
+pub struct ReplacedBy {
+    pub app: CatalogApp,
+    pub note: String,
+}
+
+impl ReplacedBy {
+    fn listed(replacement: Replacement) -> Option<Self> {
+        let catalog = catalog::current().ok()?;
+        Some(Self {
+            app: CatalogApp::from(catalog.find(&replacement.id)?),
+            note: replacement.note,
+        })
+    }
 }
 
 /// A store app's page, for the channel you follow.
@@ -46,6 +66,7 @@ pub struct StoreDetails {
     /// Whether its publisher took it off schelf.store, which offers no
     /// releases of it any more. A copy you have keeps working.
     pub withdrawn: bool,
+    pub replaced_by: Option<ReplacedBy>,
 }
 
 impl StoreDetails {
@@ -76,6 +97,7 @@ impl StoreDetails {
             access: None,
             provenance: None,
             withdrawn: true,
+            replaced_by: None,
         }
     }
 }
@@ -145,6 +167,7 @@ impl From<Listing> for StoreDetails {
             homepage: listing.homepage,
             license: listing.licence,
             withdrawn,
+            replaced_by: listing.replaced_by.and_then(ReplacedBy::listed),
         }
     }
 }

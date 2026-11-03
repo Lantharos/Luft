@@ -126,8 +126,13 @@ fn update_store_apps(failures: &mut Vec<String>) {
         Err(error) => return failures.push(error),
     };
     for update in found.into_iter().filter(|update| !update.widens) {
-        match quietly(|task| store::install::install(&update.id, &update.consent, Reason::Update, task)) {
-            Ok(()) => eprintln!("Updated {} to {}", update.name, update.to),
+        match quietly(|task| {
+            store::install::install(&update.id, &update.consent, Reason::Update, task)
+        }) {
+            Ok(()) => match &update.replacement {
+                Some(replacement) => eprintln!("Replaced {} with {replacement}", update.name),
+                None => eprintln!("Updated {} to {}", update.name, update.to),
+            },
             Err(error) => failures.push(format!("{}: {error}", update.name)),
         }
     }

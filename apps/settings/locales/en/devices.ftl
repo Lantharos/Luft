@@ -423,6 +423,7 @@ settings-shortcuts-category-media = Media
 settings-shortcuts-reset = Reset to default
 settings-shortcuts-apps = App shortcuts
 settings-shortcuts-apps-description = Ones apps asked for, which work even when the app isn’t in front
+settings-shortcuts-extensions = Extensions
 settings-shortcuts-no-match = No shortcuts match “{ $query }”
 # Button label for screen readers. $name is the shortcut's name.
 settings-shortcuts-change = Change shortcut for { $name }

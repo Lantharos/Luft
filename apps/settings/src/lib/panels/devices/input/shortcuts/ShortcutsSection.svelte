@@ -41,6 +41,11 @@
 	let apps = $derived(
 		store.apps.filter((binding) => matches(binding, binding.appName)).sort((left, right) => collator.compare(left.appName, right.appName))
 	);
+	let ofExtensions = $derived(
+		store.ofExtensions
+			.filter((binding) => matches(binding, binding.extensionName))
+			.sort((left, right) => collator.compare(left.extensionName, right.extensionName) || collator.compare(left.name, right.name))
+	);
 
 	function matches(binding: Binding, ...extra: string[]) {
 		return !needle || [binding.name, ...extra, ...binding.accelerators.flatMap(labels)].some((text) => text.toLowerCase().includes(needle));
@@ -70,6 +75,19 @@
 	</Section>
 {/if}
 
-{#if needle && !categories.length && !apps.length}
+{#if ofExtensions.length}
+	<Section title={t('settings-shortcuts-extensions')}>
+		{#each ofExtensions as binding (binding.id)}
+			<Row title={binding.name} description={binding.extensionName}>
+				{#if binding.changed}
+					<IconButton icon={RotateCcw} label={t('settings-shortcuts-reset')} onclick={() => store.reset(binding)} />
+				{/if}
+				<ShortcutButton accelerators={binding.accelerators} label={binding.name} onclick={() => onrecord(binding)} />
+			</Row>
+		{/each}
+	</Section>
+{/if}
+
+{#if needle && !categories.length && !apps.length && !ofExtensions.length}
 	<p class="px-2 text-[14px] text-[var(--text-muted)]">{t('settings-shortcuts-no-match', { query: query.trim() })}</p>
 {/if}

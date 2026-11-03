@@ -1,4 +1,5 @@
 <script lang="ts">
+	import ExtensionRows from '#lib/panels/personalization/extensions/ExtensionRows.svelte';
 	import { t } from '@luft/i18n';
 	import { onDestroy } from 'svelte';
 	import Mic from '@lucide/svelte/icons/mic';
@@ -144,4 +145,6 @@
 	{/if}
 
 	<SystemSounds />
+
+	<ExtensionRows page="sound" />
 {/if}

@@ -1,6 +1,7 @@
 import { onDestroy, untrack } from 'svelte';
 import { commands } from '#lib/bindings.js';
 import type { Category, Shortcut } from '#lib/bindings.js';
+import { extensions } from '#lib/panels/personalization/extensions/extensions.svelte.js';
 import { KESTREL_SCHEMA, SettingsGroup } from '#lib/state/gsettings.svelte.js';
 import { canonical, sameAccelerators } from './keys/accelerator';
 
@@ -33,7 +34,8 @@ interface Base {
 export type SystemBinding = Base & { kind: 'system'; schema: string; key: string; category: Category; defaults: string[]; changed: boolean };
 export type AppBinding = Base & { kind: 'app'; app: string; appName: string; shortcut: string };
 export type CustomBinding = Base & { kind: 'custom'; path: string; command: string };
-export type Binding = SystemBinding | AppBinding | CustomBinding;
+export type ExtensionBinding = Base & { kind: 'extension'; extension: string; extensionName: string; shortcut: string; changed: boolean };
+export type Binding = SystemBinding | AppBinding | CustomBinding | ExtensionBinding;
 
 function takeTurns(a: Binding, b: Binding) {
 	if (a.kind !== 'system' || b.kind !== 'system') return false;
@@ -101,10 +103,26 @@ export class ShortcutStore {
 		})
 	);
 
-	all = $derived<Binding[]>([...this.system, ...this.apps, ...this.custom]);
+	ofExtensions = $derived<ExtensionBinding[]>(
+		(extensions.list ?? []).flatMap((extension) =>
+			extension.shortcuts.map((shortcut) => ({
+				kind: 'extension' as const,
+				id: `${extension.id}/${shortcut.key}`,
+				name: shortcut.label,
+				accelerators: shortcut.accelerators,
+				extension: extension.id,
+				extensionName: extension.name,
+				shortcut: shortcut.key,
+				changed: shortcut.changed
+			}))
+		)
+	);
+
+	all = $derived<Binding[]>([...this.system, ...this.apps, ...this.custom, ...this.ofExtensions]);
 
 	constructor() {
 		void this.load();
+		void extensions.load();
 		$effect(() => {
 			const paths = this.customPaths;
 			untrack(() => this.syncCustom(paths));
@@ -148,6 +166,7 @@ export class ShortcutStore {
 	async assign(binding: Binding, accelerators: string[]) {
 		if (binding.kind === 'system') return this.groups[binding.schema].set(binding.key, accelerators);
 		if (binding.kind === 'custom') return this.customs[binding.path].set('binding', accelerators[0] ?? '');
+		if (binding.kind === 'extension') return extensions.setShortcut(binding.extension, binding.shortcut, accelerators);
 		const shortcuts = this.registered[binding.app];
 		const next: Registered = {
 			...this.registered,
@@ -161,8 +180,9 @@ export class ShortcutStore {
 		await this.assign(binding, binding.accelerators.filter((existing) => canonical(existing) !== wanted));
 	}
 
-	async reset(binding: SystemBinding) {
-		await this.groups[binding.schema].reset(binding.key);
+	async reset(binding: SystemBinding | ExtensionBinding) {
+		if (binding.kind === 'extension') await extensions.setShortcut(binding.extension, binding.shortcut, null);
+		else await this.groups[binding.schema].reset(binding.key);
 	}
 
 	async addCustom(values: Custom) {

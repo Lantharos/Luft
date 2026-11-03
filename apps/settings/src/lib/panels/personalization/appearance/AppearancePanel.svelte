@@ -1,4 +1,5 @@
 <script lang="ts">
+	import ExtensionRows from '#lib/panels/personalization/extensions/ExtensionRows.svelte';
 	import { t } from '@luft/i18n';
 	import Image from '@lucide/svelte/icons/image';
 	import LayoutGrid from '@lucide/svelte/icons/layout-grid';
@@ -92,4 +93,6 @@
 			<RowValue text={cursorTitle} />
 		</Row>
 	</Section>
+
+	<ExtensionRows page="appearance" />
 {/if}

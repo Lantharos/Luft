@@ -337,6 +337,10 @@ settings-extensions-permission-notifications = Send notifications
 settings-extensions-permission-weather = See the weather where you are
 settings-extensions-permission-location = See roughly where you are
 settings-extensions-permission-media = See and control what's playing
+settings-extensions-permission-popups = Show panels and small windows
+settings-extensions-permission-typing = Type into other apps
+settings-extensions-permission-sounds = Play sounds
+settings-extensions-permission-audio-levels = Follow the beat of what's playing
 settings-extensions-remove = Remove
 # $version is the extension's version
 settings-extensions-installed = Version { $version }

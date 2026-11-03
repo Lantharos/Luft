@@ -4,6 +4,7 @@
 	import type { Extension } from '#lib/bindings.js';
 	import SubPage from '#lib/components/SubPage.svelte';
 	import { extensions, shown } from './extensions.svelte';
+	import PageView from './PageView.svelte';
 	import SettingRow from './SettingRow.svelte';
 	import { PERMISSIONS, summary, usage } from './status';
 
@@ -29,7 +30,9 @@
 		{/if}
 	</Section>
 
-	{#if visible.length}
+	{#if extension.page && extension.state === 'running'}
+		<PageView {extension} />
+	{:else if visible.length}
 		<Section title={t('settings-extensions-settings')}>
 			{#each visible as setting (setting.key)}
 				<SettingRow {extension} {setting} />

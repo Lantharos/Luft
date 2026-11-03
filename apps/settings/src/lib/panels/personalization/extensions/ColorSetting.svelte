@@ -23,7 +23,7 @@
 		...setting.swatches.map((swatch) => ({
 			value: swatch.value,
 			label: swatch.label,
-			color: swatch.value === 'accent' ? (appearance.accent ?? 'var(--accent)') : swatch.value
+			color: swatch.value === 'accent' ? (appearance.accent ?? 'var(--accent)') : swatch.value === 'wallpaper' ? (appearance.wallpaperAccent ?? appearance.accent ?? 'var(--accent)') : swatch.value
 		})),
 		{ value: CUSTOM, label: t('settings-extensions-custom-color'), color: offered ? HUES : value }
 	]);

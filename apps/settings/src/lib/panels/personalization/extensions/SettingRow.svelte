@@ -4,6 +4,7 @@
 	import { percent } from '#lib/format.js';
 	import ColorSetting from './ColorSetting.svelte';
 	import { extensions } from './extensions.svelte';
+	import ImageChoice from './ImageChoice.svelte';
 
 	const SEGMENTS = 3;
 
@@ -13,14 +14,17 @@
 	let format = $derived(
 		setting.unit === 'percent' ? (value: number) => percent((value - (setting.min ?? 0)) / ((setting.max ?? 1) - (setting.min ?? 0))) : undefined
 	);
+	let pictures = $derived(
+		setting.images.length === setting.options.length ? setting.options.map((option, index) => ({ ...option, image: setting.images[index] })) : []
+	);
 </script>
 
 <Row title={setting.label} description={setting.description || undefined}>
 	{#if setting.kind === 'switch'}
 		<Switch label={setting.label} checked={setting.value === true} onchange={set} />
-	{:else if setting.kind === 'choice' && setting.options.length <= SEGMENTS}
+	{:else if setting.kind === 'choice' && !pictures.length && setting.options.length <= SEGMENTS}
 		<Segmented label={setting.label} options={setting.options} value={String(setting.value)} onchange={set} />
-	{:else if setting.kind === 'choice'}
+	{:else if setting.kind === 'choice' && !pictures.length}
 		<Select label={setting.label} options={setting.options} value={String(setting.value)} onchange={set} />
 	{:else if setting.kind === 'color'}
 		<ColorSetting {setting} value={String(setting.value)} onchange={set} />
@@ -36,6 +40,8 @@
 				{format}
 				onchange={set}
 			/>
+		{:else if pictures.length}
+			<ImageChoice label={setting.label} options={pictures} value={String(setting.value)} onchange={set} />
 		{/if}
 	{/snippet}
 </Row>

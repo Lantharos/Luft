@@ -1,18 +1,5 @@
-use std::sync::Once;
-
-use futures_util::StreamExt;
-use luft_app::{Commands, Empty, Events, dbus};
-use sabine::{BridgeEvent, SabineWindow};
 use serde::{Deserialize, Serialize};
-use zbus::{DeserializeDict, OwnedVariant, Proxy, Type, Variant};
-
-const KESTREL: &str = "com.lantharos.Kestrel";
-const PATH: &str = "/com/lantharos/Kestrel/Extensions";
-const INTERFACE: &str = "com.lantharos.Kestrel.Extensions";
-
-const CHANGED: BridgeEvent<Vec<Extension>> = BridgeEvent::new("extensions.changed");
-
-static WATCH: Once = Once::new();
+use zbus::{DeserializeDict, OwnedVariant, Type, Variant};
 
 #[derive(Deserialize, Serialize, Clone, specta::Type)]
 #[serde(untagged)]
@@ -57,11 +44,23 @@ struct ListedSetting {
     max: Option<f64>,
     step: Option<f64>,
     unit: Option<String>,
+    page: Option<String>,
+    images: Option<Vec<String>>,
 }
 
 #[derive(DeserializeDict, Type)]
 #[zbus(signature = "a{sv}")]
-struct Listed {
+struct ListedShortcut {
+    key: String,
+    label: String,
+    accelerators: Vec<String>,
+    default: String,
+    changed: bool,
+}
+
+#[derive(DeserializeDict, Type)]
+#[zbus(signature = "a{sv}")]
+pub(super) struct Listed {
     id: String,
     name: String,
     description: Option<String>,
@@ -73,6 +72,8 @@ struct Listed {
     cpu: Option<f64>,
     memory: Option<u64>,
     settings: Option<Vec<ListedSetting>>,
+    shortcuts: Option<Vec<ListedShortcut>>,
+    page: Option<bool>,
 }
 
 #[derive(Serialize, specta::Type)]
@@ -96,6 +97,18 @@ pub struct ExtensionSetting {
     max: Option<f64>,
     step: Option<f64>,
     unit: Option<String>,
+    page: Option<String>,
+    images: Vec<String>,
+}
+
+#[derive(Serialize, specta::Type)]
+#[serde(rename_all = "camelCase")]
+pub struct ExtensionShortcut {
+    key: String,
+    label: String,
+    accelerators: Vec<String>,
+    default: String,
+    changed: bool,
 }
 
 #[derive(Serialize, specta::Type)]
@@ -112,6 +125,8 @@ pub struct Extension {
     cpu: Option<f64>,
     memory: Option<u64>,
     settings: Vec<ExtensionSetting>,
+    shortcuts: Vec<ExtensionShortcut>,
+    page: bool,
 }
 
 fn choices(pairs: Option<Vec<(String, String)>>) -> Vec<ExtensionChoice> {
@@ -136,7 +151,19 @@ fn setting(listed: ListedSetting) -> Option<ExtensionSetting> {
         max: listed.max,
         step: listed.step,
         unit: listed.unit,
+        page: listed.page,
+        images: listed.images.unwrap_or_default(),
     })
+}
+
+fn shortcut(listed: ListedShortcut) -> ExtensionShortcut {
+    ExtensionShortcut {
+        key: listed.key,
+        label: listed.label,
+        accelerators: listed.accelerators,
+        default: listed.default,
+        changed: listed.changed,
+    }
 }
 
 impl From<Listed> for Extension {
@@ -158,80 +185,13 @@ impl From<Listed> for Extension {
                 .into_iter()
                 .filter_map(setting)
                 .collect(),
+            shortcuts: listed
+                .shortcuts
+                .unwrap_or_default()
+                .into_iter()
+                .map(shortcut)
+                .collect(),
+            page: listed.page.unwrap_or_default(),
         }
     }
-}
-
-async fn proxy() -> Result<Proxy<'static>, String> {
-    Proxy::new(dbus::session().await?, KESTREL, PATH, INTERFACE)
-        .await
-        .map_err(dbus::failed)
-}
-
-async fn list() -> Result<Vec<Extension>, String> {
-    let listed: Vec<Listed> = proxy()
-        .await?
-        .call("List", &())
-        .await
-        .map_err(dbus::failed)?;
-    Ok(listed.into_iter().map(Extension::from).collect())
-}
-
-async fn watch(events: Events) {
-    let Ok(proxy) = proxy().await else {
-        return;
-    };
-    let Ok(mut changes) = proxy.receive_signal("ExtensionsChanged").await else {
-        return;
-    };
-    while changes.next().await.is_some() {
-        if let Ok(extensions) = list().await {
-            events.emit(CHANGED, extensions);
-        }
-    }
-}
-
-async fn extensions(events: Events, Empty {}: Empty) -> Result<Vec<Extension>, String> {
-    WATCH.call_once(|| {
-        luft_app::spawn(watch(events));
-    });
-    list().await
-}
-
-#[derive(Deserialize, specta::Type)]
-struct ExtensionTarget {
-    id: String,
-}
-
-async fn request(method: &str, ExtensionTarget { id }: ExtensionTarget) -> Result<(), String> {
-    proxy()
-        .await?
-        .call::<_, _, ()>(method, &(id,))
-        .await
-        .map_err(dbus::failed)
-}
-
-#[derive(Deserialize, specta::Type)]
-struct ExtensionSettingChange {
-    id: String,
-    key: String,
-    value: ExtensionSettingValue,
-}
-
-async fn set(ExtensionSettingChange { id, key, value }: ExtensionSettingChange) -> Result<(), String> {
-    proxy()
-        .await?
-        .call::<_, _, ()>("SetSetting", &(id, key, Variant::from(value)))
-        .await
-        .map_err(dbus::failed)
-}
-
-pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
-    window
-        .bridge_event(&CHANGED)
-        .with_async("extensions", events, extensions)
-        .command_async("extensions_enable", |target| request("Enable", target))
-        .command_async("extensions_disable", |target| request("Disable", target))
-        .command_async("extensions_remove", |target| request("Remove", target))
-        .command_async("extensions_set", set)
 }

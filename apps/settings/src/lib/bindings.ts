@@ -223,12 +223,20 @@ export const commands = {
 	}, options?: CallOptions) => invoke<null>("display_set_brightness", params, options),
 	displayState: (options?: CallOptions) => invoke<Displays>("display_state", {}, options),
 	extensions: (options?: CallOptions) => invoke<Extension[]>("extensions", {}, options),
+	extensionsAct: (params: {
+		id: string,
+		control: string,
+		value: ExtensionSettingValue,
+	}, options?: CallOptions) => invoke<null>("extensions_act", params, options),
 	extensionsDisable: (params: {
 		id: string,
 	}, options?: CallOptions) => invoke<null>("extensions_disable", params, options),
 	extensionsEnable: (params: {
 		id: string,
 	}, options?: CallOptions) => invoke<null>("extensions_enable", params, options),
+	extensionsPage: (params: {
+		id: string,
+	}, options?: CallOptions) => invoke<PageSection[]>("extensions_page", params, options),
 	extensionsRemove: (params: {
 		id: string,
 	}, options?: CallOptions) => invoke<null>("extensions_remove", params, options),
@@ -237,6 +245,11 @@ export const commands = {
 		key: string,
 		value: ExtensionSettingValue,
 	}, options?: CallOptions) => invoke<null>("extensions_set", params, options),
+	extensionsSetShortcut: (params: {
+		id: string,
+		key: string,
+		accelerators?: string[] | null,
+	}, options?: CallOptions) => invoke<null>("extensions_set_shortcut", params, options),
 	fingerprintDelete: (params: {
 		finger: string,
 	}, options?: CallOptions) => invoke<null>("fingerprint_delete", params, options),
@@ -534,6 +547,7 @@ export const events = {
 	displayBrightness: (callback: (payload: Brightness) => void) => listen<Brightness>("display.brightness", callback),
 	displayChanged: (callback: (payload: Displays) => void) => listen<Displays>("display.changed", callback),
 	extensionsChanged: (callback: (payload: Extension[]) => void) => listen<Extension[]>("extensions.changed", callback),
+	extensionsPageChanged: (callback: (payload: string) => void) => listen<string>("extensions.page-changed", callback),
 	fingerprintEnroll: (callback: (payload: EnrollProgress) => void) => listen<EnrollProgress>("fingerprint.enroll", callback),
 	hardwareChanged: (callback: (payload: Hardware) => void) => listen<Hardware>("hardware.changed", callback),
 	kestrelPalette: (callback: (payload: Palette) => void) => listen<Palette>("kestrel.palette", callback),
@@ -909,6 +923,8 @@ export type Extension = {
 	cpu: number | null,
 	memory: number | null,
 	settings: ExtensionSetting[],
+	shortcuts: ExtensionShortcut[],
+	page: boolean,
 };
 
 export type ExtensionChoice = {
@@ -929,9 +945,19 @@ export type ExtensionSetting = {
 	max: number | null,
 	step: number | null,
 	unit: string | null,
+	page: string | null,
+	images: string[],
 };
 
 export type ExtensionSettingValue = boolean | number | string;
+
+export type ExtensionShortcut = {
+	key: string,
+	label: string,
+	accelerators: string[],
+	default: string,
+	changed: boolean,
+};
 
 export type ExternalBrightness = "checking" | "ready" | "missing-tool" | "needs-restart" | "no-access";
 
@@ -1199,6 +1225,34 @@ export type Overview = {
 	engine: Engine,
 	/**  The engines this computer's processor can run. */
 	engines: Engine[],
+};
+
+export type PageAction = {
+	label: string,
+	danger: boolean,
+	action: string,
+};
+
+export type PageItem = { type: "setting"; key: string } | { type: "text"; text: string } | { type: "row"; title: string; description: string | null; value: string | null; action: string | null } | { type: "switch"; title: string; description: string | null; checked: boolean; action: string } | { type: "choice"; title: string; description: string | null; value: string; options: PageOption[]; action: string } | { type: "slider"; title: string; description: string | null; value: number; min: number; max: number; step: number | null; unit: string | null; action: string } | { type: "button"; title: string; description: string | null; label: string; danger: boolean; action: string } | { type: "entry"; title: string; description: string | null; value: string; placeholder: string | null; action: string } | { type: "preview"; image: string; description: string } | { type: "list"; empty: string | null; items: PageListItem[] };
+
+export type PageListItem = {
+	title: string,
+	description: string | null,
+	image: string | null,
+	actions: PageAction[],
+};
+
+export type PageOption = {
+	value: string,
+	label: string,
+	image: string | null,
+};
+
+/**  A section of an extension's own Settings page, as the extension describes it while it runs. */
+export type PageSection = {
+	title: string | null,
+	description: string | null,
+	items: PageItem[],
 };
 
 export type PairingKind = "confirm" | "authorize" | "pin" | "passkey" | "display";

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import ExtensionRows from '#lib/panels/personalization/extensions/ExtensionRows.svelte';
 	import { t } from '@luft/i18n';
 	import LayoutGrid from '@lucide/svelte/icons/layout-grid';
 	import SlidersHorizontal from '@lucide/svelte/icons/sliders-horizontal';
@@ -133,6 +134,8 @@
 			{/if}
 		</Row>
 	</Section>
+
+	<ExtensionRows page="taskbar" />
 {/if}
 
 <style>

@@ -18,7 +18,11 @@ export const PERMISSIONS: Record<string, string> = {
 	notifications: 'settings-extensions-permission-notifications',
 	weather: 'settings-extensions-permission-weather',
 	location: 'settings-extensions-permission-location',
-	media: 'settings-extensions-permission-media'
+	media: 'settings-extensions-permission-media',
+	popups: 'settings-extensions-permission-popups',
+	typing: 'settings-extensions-permission-typing',
+	sounds: 'settings-extensions-permission-sounds',
+	'audio-levels': 'settings-extensions-permission-audio-levels'
 };
 
 export function summary(extension: Extension): string {

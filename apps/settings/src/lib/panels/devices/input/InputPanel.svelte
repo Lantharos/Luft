@@ -1,4 +1,5 @@
 <script lang="ts">
+	import ExtensionRows from '#lib/panels/personalization/extensions/ExtensionRows.svelte';
 	import { t } from '@luft/i18n';
 	import { Row, Section } from '@luft/ui';
 	import { app } from '#lib/state/app.svelte.js';
@@ -46,6 +47,8 @@
 		<CopilotKeySection />
 	{/if}
 	<OwnLayouts />
+
+	<ExtensionRows page="input" />
 {/if}
 
 {#if recording}

@@ -11,7 +11,7 @@ Schelf carries extensions next to apps, with `kind = "extension"` and `format = 
 
 ## Where Luft keeps them
 
-Every extension lives in `~/.local/share/luft/extensions/<id>/`. The ones Luft comes with, such as Rain, are installed there from the store when you first sign in, and update and remove like any other.
+Every extension lives in `~/.local/share/luft/extensions/<id>/`. The ones Luft comes with, such as Seasons, are installed there from the store when you first sign in, and update and remove like any other.
 
 ## The D-Bus interface
 

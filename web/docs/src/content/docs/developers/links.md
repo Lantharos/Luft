@@ -25,7 +25,7 @@ Apps and scripts can open Settings and Keys at a specific page with a link, thro
 | `kestrel-settings:accounts/login` | The login screen |
 | `kestrel-settings:accounts/add` | Adding an account |
 | `kestrel-settings:system/about` | About this computer |
-| `kestrel-settings:extensions/<id>` | One extension, such as `extensions/com.lantharos.Rain` |
+| `kestrel-settings:extensions/<id>` | One extension, such as `extensions/com.lantharos.Seasons` |
 
 A link to a page for missing hardware, such as Bluetooth without an adapter, explains that instead.
 

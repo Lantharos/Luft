@@ -29,9 +29,20 @@ const SheetActor = GObject.registerClass(class ExtensionLayerSheet extends Clutt
     this.pipeline.add_snippet(snippet);
   }
 
-  uniform(name: string, components: number, values: readonly number[]): void {
+  /** Shows `texture` to the shader as the sampler `name`, on its own texture unit after the first. */
+  picture(name: string, unit: number, texture: Cogl.Texture): void {
+    this.pipeline.set_layer_texture(unit, texture);
+    this.pipeline.set_uniform_1i(this.location(name), unit);
+  }
+
+  private location(name: string): number {
     let location = this.locations.get(name);
     if (location === undefined) this.locations.set(name, location = this.pipeline.get_uniform_location(name));
+    return location;
+  }
+
+  uniform(name: string, components: number, values: readonly number[]): void {
+    const location = this.location(name);
     if (components === 1 && values.length === 1) this.pipeline.set_uniform_1f(location, values[0]);
     else this.pipeline.set_uniform_float(location, components, values.length / components, [...values]);
   }

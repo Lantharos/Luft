@@ -16,6 +16,7 @@ import { shortcutsApi } from './shortcuts.js';
 import { desktopApi, powerApi } from './system.js';
 import { taskbarApi } from './taskbar/taskbar.js';
 import type { Basics, Capabilities, Capability } from './types.js';
+import { deleteFile, pickFiles } from './picking.js';
 import { typingApi } from './typing.js';
 import { wallpaperApi } from './wallpaper/wallpaper.js';
 import { weatherApi } from './weather.js';
@@ -59,6 +60,8 @@ export function createApi(context: ApiContext): Readonly<Basics & Record<string,
     t: (id, args) => translations.t(id, args),
     open,
     openSettings: () => context.openSettings(),
+    pickFiles: options => pickFiles(context, options),
+    deleteFile: path => deleteFile(context, path),
     onDisable: cleanup => scope.onDisable(cleanup),
   };
   const granted: Capability[] = [

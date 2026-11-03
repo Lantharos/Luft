@@ -20,6 +20,7 @@ sidebar:
 | `[helper]` | `path` names a program in the folder that the API can start |
 | `[[settings]]` | Settings people change in Settings → Extensions, see below |
 | `[[shortcuts]]` | Keyboard shortcuts people can change in Settings → Keyboard, see below |
+| `replaces` | The id of an extension this one takes over from, see [Taking over from another extension](#taking-over-from-another-extension) |
 
 ## Permissions
 
@@ -107,3 +108,30 @@ key = "show"
 label = "shortcut-show"
 default = "<Super><Alt>v"
 ```
+
+## Taking over from another extension
+
+An extension that grows out of another, or replaces it, names it with `replaces`. Once both are installed, Luft carries the person's choices over: each setting takes the value of the old extension's setting with the same key, or of the key its own `replaces` names, and each choice option can name the old value it stands for. The new extension stays off if the person had turned the old one off, and the old one is removed with its settings and files.
+
+```toml
+id = "com.example.Weather"
+replaces = "com.example.Rain"
+
+[[settings]]
+key = "on"
+type = "switch"
+label = "on"
+default = false
+replaces = "rain"                 # the old extension's key
+
+[[settings]]
+key = "intensity"
+type = "choice"
+label = "intensity"
+default = "steady"
+options = [
+  { value = "light", label = "light", replaces = "drizzle" },
+  { value = "steady", label = "steady" },
+]
+```
+

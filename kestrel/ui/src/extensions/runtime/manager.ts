@@ -11,6 +11,7 @@ import { dataFolder, discover, findOne, type Installed } from './folders.js';
 import { ExtensionInstance, type RuntimeServices } from './instance.js';
 import { noticeTurnedOff } from './notices.js';
 import { ExtensionStore, type Problem, type ProblemKind } from './store.js';
+import { inherit } from './succession.js';
 
 const hasManifest = (installed: Installed): installed is Installed & { manifest: NonNullable<Installed['manifest']> } => !!installed.manifest;
 
@@ -76,6 +77,7 @@ export class ExtensionManager {
 
   rescan(): void {
     this.installed = discover();
+    this.succeed();
     for (const id of [...this.instances.keys()].filter(id => !this.installed.some(installed => installed.id === id))) this.drop(id);
     for (const installed of this.installed.filter(hasManifest)) {
       const instance = this.instances.get(installed.id);
@@ -93,7 +95,9 @@ export class ExtensionManager {
       this.store.setDisabled(id, false);
     }
     this.installed = [...this.installed.filter(installed => installed.id !== id), ...found ? [found] : []].sort((a, b) => a.id.localeCompare(b.id));
-    if (found && hasManifest(found)) this.replace(found);
+    this.succeed();
+    const current = this.installed.find(installed => installed.id === id);
+    if (current && hasManifest(current)) this.replace(current);
     else this.drop(id);
     this.sync();
   }
@@ -110,15 +114,30 @@ export class ExtensionManager {
   remove(id: string): void {
     const installed = this.installed.find(candidate => candidate.id === id);
     if (!installed) return;
+    this.erase(installed);
+    this.rescan();
+  }
+
+  private erase({ id, path }: Installed): void {
     this.instances.get(id)?.stored.forget();
     this.drop(id);
-    removeFolder(installed.path);
+    removeFolder(path);
     if (GLib.file_test(dataFolder(id), GLib.FileTest.IS_DIR)) removeFolder(dataFolder(id));
     this.store.forgetValues(id);
     this.store.forgetShortcuts(id);
     this.store.setProblem(id, null);
     this.store.setDisabled(id, false);
-    this.rescan();
+  }
+
+  /** Hands what the person chose in an extension over to the one that replaces it, once both are installed, and removes it. */
+  private succeed(): void {
+    for (const successor of this.installed.filter(hasManifest)) {
+      const replaced = this.installed.find(installed => installed.id === successor.manifest.replaces);
+      if (!replaced) continue;
+      inherit(successor.manifest, replaced.id, this.store);
+      this.erase(replaced);
+      this.installed = this.installed.filter(installed => installed !== replaced);
+    }
   }
 
   setSetting(id: string, key: string, value: SettingValue): void {

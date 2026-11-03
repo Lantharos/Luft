@@ -85,8 +85,11 @@ export class ExtensionStore {
   }
 
   setValue(id: string, key: string, value: SettingValue): void {
-    const own = { ...this.values[id], [key]: value };
-    this.writeValues({ ...this.values, [id]: own });
+    this.setValues(id, { [key]: value });
+  }
+
+  setValues(id: string, values: Record<string, SettingValue>): void {
+    this.writeValues({ ...this.values, [id]: { ...this.values[id], ...values } });
   }
 
   forgetShortcuts(id: string): void {

@@ -25,10 +25,11 @@ function addToggle(context: ApiContext, options: ToggleOptions, ordinal: number)
     actor.menuEnabled = !!state.menu?.length;
     syncing = false;
   };
+  const header = () => actor.menu.setHeader(resolveIcon(context.path, state.icon), state.title);
   const rebuildMenu = () => {
     forgetMenu();
     actor.menu.removeAll();
-    actor.menu.setHeader(resolveIcon(context.path, state.icon), state.title);
+    header();
     forgetMenu = state.menu?.length ? fillMenu(actor.menu, state.menu, context, options.setting) : () => {};
   };
   actor.connect('notify::checked', () => {
@@ -52,7 +53,8 @@ function addToggle(context: ApiContext, options: ToggleOptions, ordinal: number)
     update: changes => {
       state = { ...state, ...changes };
       apply();
-      if ('menu' in changes || 'title' in changes || 'icon' in changes) rebuildMenu();
+      if ('menu' in changes) rebuildMenu();
+      else if ('title' in changes || 'icon' in changes) header();
     },
     dispose: () => disposable.dispose(),
   };

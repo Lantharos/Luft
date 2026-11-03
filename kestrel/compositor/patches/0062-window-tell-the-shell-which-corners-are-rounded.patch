@@ -1,0 +1,65 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Tue, 3 Nov 2026 20:45:09 +0100
+Subject: [PATCH 62/62] window: tell the shell which corners are rounded
+
+Expose meta_window_get_rounded_corners(), which returns the corners the
+compositor rounds for a window and their radius, so the shell can follow
+a window's real outline, such as wallpaper effects that land on windows
+and bump into their sides.
+
+Upstream-Status: luft-only exposes Kestrel's rounded corner rules
+---
+ src/compositor/meta-window-corners.c | 23 +++++++++++++++++++++++
+ src/meta/window.h                    |  4 ++++
+ 2 files changed, 27 insertions(+)
+
+diff --git a/src/compositor/meta-window-corners.c b/src/compositor/meta-window-corners.c
+index 4d51e1602015767b67e80830815ee9a4e453a859..8f707f86860d0ff4841fafb04548a0304b278c4c 100644
+--- a/src/compositor/meta-window-corners.c
++++ b/src/compositor/meta-window-corners.c
+@@ -168,6 +168,29 @@ meta_window_has_rounded_corners (MetaWindow *window)
+   return corners_rounded && is_floating (window);
+ }
+ 
++/**
++ * meta_window_get_rounded_corners:
++ * @window: a #MetaWindow
++ * @radius: (out): how far the rounded corners reach, in logical pixels
++ *
++ * Which corners of @window the compositor rounds, and by how much, so the
++ * shell can follow the shape it shows.
++ *
++ * Returns: the rounded corners, with top left 1, top right 2, bottom right 4
++ *   and bottom left 8
++ */
++guint
++meta_window_get_rounded_corners (MetaWindow *window,
++                                 float      *radius)
++{
++  MtkRectangle frame;
++
++  meta_window_get_frame_rect (window, &frame);
++  *radius = MIN (meta_window_corners_get_radius (),
++                 MIN (frame.width, frame.height) / 2.0f);
++  return rounded_corners (window);
++}
++
+ /* Whether @window should draw square corners of its own: with rounded
+  * corners off, floating windows are told they are tiled, which is what
+  * makes toolkits that round their own corners draw them square */
+diff --git a/src/meta/window.h b/src/meta/window.h
+index b8ff0cf1767d00f3f02e26045267fa2a0c289ff4..b8b011e003ea51b00fa74b6446544d4a3f4dcc1c 100644
+--- a/src/meta/window.h
++++ b/src/meta/window.h
+@@ -119,6 +119,10 @@ int meta_window_get_titlebar_height (MetaWindow *window);
+ META_EXPORT
+ gboolean meta_window_has_rounded_corners (MetaWindow *window);
+ 
++META_EXPORT
++guint meta_window_get_rounded_corners (MetaWindow *window,
++                                       float      *radius);
++
+ META_EXPORT
+ MetaWindowContentType meta_window_get_content_type (MetaWindow *window);
+ 

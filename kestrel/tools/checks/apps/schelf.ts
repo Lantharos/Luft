@@ -9,7 +9,7 @@ const PAGES = {
   discover: [],
   search: ['schelf:search?gcompris'],
   extensions: ['schelf:extensions'],
-  extension: ['schelf:app/com.lantharos.Rain'],
+  extension: ['schelf:app/com.lantharos.Seasons'],
 };
 const CONTENT: Point = [700, 400];
 const SCROLL_STEPS = 40;

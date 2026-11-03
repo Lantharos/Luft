@@ -8,7 +8,7 @@ import {checks} from '../lib/check.js';
 import {capture} from '../lib/screenshots.js';
 import {pause} from '../lib/wait.js';
 import {closeStart, groupTitles, openStart, rows, search, titleOf} from '../start/search/results.js';
-import {copyFolder, install, layerSheets, listed, RAIN, request, rewrite, setSetting, userFolder} from './lib/extensions.js';
+import {copyFolder, install, layerSheets, listed, RAIN, request, rewrite, SEASONS, setSetting, setting, userFolder} from './lib/extensions.js';
 
 const {require, eventually} = checks('extensions');
 const PROBE = 'com.example.Probe';
@@ -27,10 +27,10 @@ const taskbarItem = () => descendants(named('kestrel-extension-items')!).find(ac
 const probeTile = () => descendants(named('kestrel-quick-settings')!).find(actor => actor instanceof QuickMenuToggle && actor.title === 'Probe') ?? null;
 const notified = (title: string) => Main.messageTray.getSources().some(source => source.notifications.some(notification => notification.title === title));
 
-async function checkRain() {
-  const rain = await eventually(() => listed(RAIN), 'Rain is preinstalled for a new account and listed');
-  require(rain.state === 'running' && rain.version === '1.0.0', 'Rain runs from the copy in the account');
-  require(layerSheets(RAIN).length === 0, 'Rain draws nothing while it is off: its layer has no actors');
+async function checkSeasons() {
+  const seasons = await eventually(() => listed(SEASONS), 'Seasons is preinstalled for a new account and listed');
+  require(seasons.state === 'running' && seasons.version === '1.0.0', 'Seasons runs from the copy in the account');
+  require(layerSheets(SEASONS).length === 0, 'Seasons draws nothing while it is off: its layers have no actors');
 }
 
 async function checkDisabledCostsNothing() {
@@ -95,31 +95,62 @@ async function checkThrowing() {
   await capture('extension-turned-off');
 }
 
-async function checkRemovingRain() {
-  const kept = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_user_data_dir(), `kept-${RAIN}`]));
-  copyFolder(Gio.File.new_for_path(userFolder(RAIN)), kept);
+function keep(id: string) {
+  const kept = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_user_data_dir(), `kept-${id}`]));
+  copyFolder(Gio.File.new_for_path(userFolder(id)), kept);
+  return {
+    async restore() {
+      kept.move(Gio.File.new_for_path(userFolder(id)), Gio.FileCopyFlags.NONE, null, null);
+      await request('Reload', id);
+    },
+  };
+}
+
+async function checkRemovingSeasons() {
+  const kept = keep(SEASONS);
   try {
-    await request('Remove', RAIN);
-    await eventually(async () => !await listed(RAIN), 'removing Rain takes it away');
-    require(!GLib.file_test(userFolder(RAIN), GLib.FileTest.EXISTS), 'and deletes its folder');
-    await request('Reload', RAIN);
-    require(!await listed(RAIN), 'no other copy of Rain comes back');
+    await request('Remove', SEASONS);
+    await eventually(async () => !await listed(SEASONS), 'removing Seasons takes it away');
+    require(!GLib.file_test(userFolder(SEASONS), GLib.FileTest.EXISTS), 'and deletes its folder');
+    await request('Reload', SEASONS);
+    require(!await listed(SEASONS), 'no other copy of Seasons comes back');
   } finally {
-    kept.move(Gio.File.new_for_path(userFolder(RAIN)), Gio.FileCopyFlags.NONE, null, null);
-    await request('Reload', RAIN);
+    await kept.restore();
   }
-  await eventually(async () => (await listed(RAIN))?.state === 'running', 'installing Rain again runs it');
+  await eventually(async () => (await listed(SEASONS))?.state === 'running', 'installing Seasons again runs it');
+}
+
+async function checkTakingOverFromRain() {
+  const kept = keep(SEASONS);
+  await request('Remove', SEASONS);
+  install('rain', RAIN);
+  await request('Reload', RAIN);
+  await eventually(async () => (await listed(RAIN))?.state === 'running', 'an account that still has Rain runs it');
+  for (const [key, value] of [['rain', GLib.Variant.new_boolean(true)], ['intensity', GLib.Variant.new_string('storm')], ['sound', GLib.Variant.new_boolean(true)], ['volume', GLib.Variant.new_double(0.3)]] as const)
+    await setSetting(RAIN, key, value);
+
+  await kept.restore();
+  await eventually(async () => (await listed(SEASONS))?.state === 'running', 'Seasons runs once it arrives');
+  await eventually(async () => !await listed(RAIN), 'and takes Rain away');
+  require(!GLib.file_test(userFolder(RAIN), GLib.FileTest.EXISTS), "Rain's folder is gone");
+  require(await setting(SEASONS, 'on') === true && await setting(SEASONS, 'effect') === 'rain', 'Seasons comes on with rain, since Rain was on');
+  require(await setting(SEASONS, 'intensity') === 'heavy' && await setting(SEASONS, 'sound') === true && await setting(SEASONS, 'volume') === 0.3,
+    "Rain's storm, sound and volume carry over");
+  require(!(kestrel.get_value('extension-settings').recursiveUnpack() as Record<string, unknown>)[RAIN], "Rain's own settings are forgotten");
+  await eventually(() => layerSheets(SEASONS).length > 0, 'and it rains right away');
+  await setSetting(SEASONS, 'on', GLib.Variant.new_boolean(false));
 }
 
 export async function run() {
   try {
-    await checkRain();
+    await checkSeasons();
     await checkDisabledCostsNothing();
     await checkEnabled();
     await checkDisabledCleansUp();
     await checkReload();
     await checkThrowing();
-    await checkRemovingRain();
+    await checkRemovingSeasons();
+    await checkTakingOverFromRain();
   } finally {
     for (const id of [PROBE, BROKEN]) await request('Remove', id);
     for (const key of ['disabled-extensions', 'extension-settings', 'extension-problems']) kestrel.reset(key);

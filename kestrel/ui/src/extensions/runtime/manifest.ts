@@ -73,6 +73,8 @@ function options(source: Table, key: string, where: string): ChoiceOption[] {
     const described: ChoiceOption = { value: text(option, 'value', at), label: text(option, 'label', at, MESSAGE) };
     const picture = image(option, at);
     if (picture) described.image = picture;
+    const replaces = optionalText(option, 'replaces', at);
+    if (replaces) described.replaces = replaces;
     return described;
   });
 }
@@ -101,6 +103,7 @@ function setting(entry: unknown, index: number, permissions: readonly Permission
   const base = {
     key: text(source, 'key', where, KEY), label: text(source, 'label', where, MESSAGE), depends: optionalText(source, 'depends', where),
     page: page(source, where, permissions),
+    replaces: source.replaces === undefined ? undefined : text(source, 'replaces', where, KEY),
   };
   const type = source.type;
   let described: SettingDescription;
@@ -192,5 +195,6 @@ export function parseManifest(source: string): Manifest {
     settings,
     shortcuts: shortcuts(document),
     helper: helper(document),
+    replaces: document.replaces === undefined ? undefined : text(document, 'replaces', 'manifest', ID),
   };
 }

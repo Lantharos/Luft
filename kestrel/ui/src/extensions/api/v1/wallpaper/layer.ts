@@ -5,7 +5,8 @@ import GLib from 'gi://GLib';
 import { animateActor } from '../../../../shared/motion/motion.js';
 import type { Scope } from '../../../runtime/scope.js';
 import type { Monitor } from '../../../../desktop/panel/panel.js';
-import type { LayerDisplay, LayerOptions, Rect } from '../types.js';
+import type { LayerDisplay, LayerOptions, Outline, Rect } from '../types.js';
+import { type Atlas, atlasDeclarations, packAtlas } from './atlas.js';
 import { layerSnippet, Sheet } from './sheet.js';
 import { type LayerStage, stackedWindows } from './stage.js';
 
@@ -22,8 +23,8 @@ function clamped(area: Rect, monitor: { width: number; height: number }): Rect {
   };
 }
 
-function relative(rect: Rect, sheet: Sheet): Rect {
-  return { x: rect.x - sheet.monitor.x, y: rect.y - sheet.monitor.y, width: rect.width, height: rect.height };
+function relative<Shape extends Rect>(shape: Shape, sheet: Sheet): Shape {
+  return { ...shape, x: shape.x - sheet.monitor.x, y: shape.y - sheet.monitor.y };
 }
 
 function overlaps(rect: Rect, { x, y, width, height }: Rect): boolean {
@@ -40,9 +41,10 @@ export class WallpaperLayer {
   private wanted: boolean;
   private gone = false;
   private lastFrame = 0;
+  private readonly atlases = new Map<string, Atlas>();
 
   constructor(private readonly options: LayerOptions, private readonly stage: LayerStage, private readonly scope: Scope, private readonly name: string) {
-    this.snippet = layerSnippet(options.declarations ?? '', options.shader);
+    this.snippet = layerSnippet(atlasDeclarations(options.atlases ?? []) + (options.declarations ?? ''), options.shader);
     this.wanted = options.active ?? true;
     this.timeline.connect('new-frame', () => this.frame());
     this.unstage = stage.add(this);
@@ -81,6 +83,21 @@ export class WallpaperLayer {
     this.monitorsChanged();
   }
 
+  setPictures(name: string, paths: readonly string[]): number {
+    if (!this.options.atlases?.includes(name)) throw new Error(`${name} isn't one of the layer's atlases`);
+    const atlas = packAtlas(paths);
+    this.atlases.set(name, atlas);
+    for (const sheet of this.sheets.filter(sheet => !sheet.destroyed)) this.applyAtlas(sheet, name, atlas);
+    return atlas.count;
+  }
+
+  private applyAtlas(sheet: Sheet, name: string, atlas: Atlas): void {
+    sheet.actor.picture(name, this.options.atlases!.indexOf(name) + 1, atlas.texture);
+    sheet.actor.uniform(`${name}_grid`, 2, atlas.grid);
+    sheet.actor.uniform(`${name}_count`, 1, [atlas.count]);
+    sheet.actor.uniform(`${name}_pictures`, 4, atlas.pictures);
+  }
+
   private areaOf(monitor: Monitor, primary: boolean): Rect | null {
     const full = { x: 0, y: 0, width: monitor.width, height: monitor.height };
     if (!this.options.area) return full;
@@ -95,6 +112,7 @@ export class WallpaperLayer {
       const area = this.areaOf(monitor, monitor.index === primary);
       if (!area) return [];
       const sheet = new Sheet(monitor, monitor.index === primary, area, this.snippet, this.name);
+      for (const [name, atlas] of this.atlases) this.applyAtlas(sheet, name, atlas);
       sheet.actor.opacity = 0;
       sheet.actor.visible = false;
       this.stage.place(sheet.actor, this.options.depth ?? 'above-windows');
@@ -109,8 +127,8 @@ export class WallpaperLayer {
       opacity: shown ? 255 : 0,
       duration: FADE_DURATION,
       mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-      onStopped: () => {
-        if (actor.opacity !== 0) return;
+      onStopped: (finished: boolean) => {
+        if (!finished || actor.opacity !== 0) return;
         actor.hide();
         if (this.sheets.some(other => !other.destroyed && other.actor.visible)) return;
         this.timeline.stop();
@@ -124,7 +142,7 @@ export class WallpaperLayer {
     const elapsed = this.lastFrame ? (now - this.lastFrame) / GLib.USEC_PER_SEC : 0;
     this.lastFrame = now;
     const shown = this.sheets.filter(sheet => !sheet.destroyed && sheet.actor.visible);
-    let windows: Rect[] | null = null;
+    let windows: Outline[] | null = null;
     const displays = shown.map((sheet): LayerDisplay => ({
       index: sheet.monitor.index,
       primary: sheet.primary,
@@ -135,6 +153,7 @@ export class WallpaperLayer {
         return windows.filter(rect => overlaps(rect, sheet.monitor)).map(rect => relative(rect, sheet));
       },
       taskbar: (rect => rect && relative(rect, sheet))(this.stage.taskbar(sheet.monitor)),
+      taskbarOutlines: this.stage.taskbarOutlines(sheet.monitor).map(outline => relative(outline, sheet)),
       uniform: (name, ...values) => sheet.actor.uniform(name, values.length, values),
       uniformArray: (name, components, values) => sheet.actor.uniform(name, components, values),
     }));

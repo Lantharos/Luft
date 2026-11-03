@@ -1,11 +1,11 @@
 ---
 title: Extensions
-description: Rain, Soundscapes and other extensions that add to the desktop, and how to turn them off, set them up or remove them.
+description: Seasons, Soundscapes and other extensions that add to the desktop, and how to turn them off, set them up or remove them.
 sidebar:
   order: 5
 ---
 
-Extensions add to the desktop: something on the wallpaper, a tile in quick settings, a button on the taskbar, results in search. Luft comes with one, Rain, and you can find more in [Schelf](/apps/schelf/).
+Extensions add to the desktop: something on the wallpaper, a tile in quick settings, a button on the taskbar, results in search. Luft comes with one, Seasons, and you can find more in [Schelf](/apps/schelf/).
 
 **Settings → Extensions** lists them. The switch next to each turns it on or off; opening one shows what it can do, its own settings and **Remove**. An extension only gets what it says it needs, and the list under **What it can do** is exactly that.
 
@@ -13,13 +13,17 @@ If an extension stops working, Luft turns it off by itself and tells you. The sa
 
 Removing an extension that came with Luft removes it for your account only; Schelf can bring it back.
 
-## Rain
+## Seasons
 
-Rain falls over the wallpaper, as drizzle, rain or a storm. It lands on the tops of windows and on the taskbar, splashes there and drips off window corners, and windows keep the rain off whatever is under them. It stops while a window covers the wallpaper, animations are off or reduced, or the power saver is on. The drops look like water by default, can take the accent colour, or any colour you pick.
+Seasons lets rain, snow, autumn leaves, fireflies or mist fall over the wallpaper. They land on windows and the taskbar the way they look, rounded corners and all: rain splashes on their tops and, in the wind, against their sides, snow settles on top, and leaves bump off. Nothing ever falls over what's inside a window, and windows keep whatever is under them dry. With the taskbar in islands, things fall past the gaps between them.
 
-Rain can also play as **sound**, on its own or with the drops, to work to. The sound is recorded rain, from a light drizzle to a downpour, and a storm brings the odd roll of thunder. It builds up when you turn it on and dies away when you turn it off, and the drops on the desktop do the same. It keeps playing behind windows and stops while the screen is locked.
+Pick what falls, or let Seasons follow **the weather where you are**: rain, snow or mist when there's some outside, as heavy and as windy as it is. **Follow the season** does the same and, when it's calm, picks by the time of year: snow in winter, showers in spring, fireflies on summer nights and leaves in autumn. Both need location services on to know the weather.
 
-The Rain tile in [quick settings](/desktop/quick-settings/) switches it on and off, and its arrow picks how hard it rains, whether it shows on the desktop, and its sound. Everything else is in Settings → Extensions → Rain.
+Rain can also play as **sound**, recorded rain from a drizzle to a downpour with the odd roll of thunder in a storm, and keeps playing behind windows. Everything builds up when you turn it on and dies away when you turn it off. Seasons stops drawing while a window covers the wallpaper, animations are off or reduced, or the power saver is on.
+
+**My pictures** lets things of your own fall, such as petals, stars or shells. In Settings → Extensions → Seasons, make a set, add up to eight pictures with see-through backgrounds, or short animated GIF or WebP pictures, and choose how many fall, how big and fast they are, the wind, how much they spin, whether they bounce off windows or settle on them for a moment, and a sound for when they land. Seasons keeps its own copies of what you pick, and you can keep several sets.
+
+The Seasons tile in [quick settings](/desktop/quick-settings/) switches it on and off, and its arrow picks what falls, whether it shows on the desktop, and its sound. If you used Rain, Seasons takes its place with your rain settings.
 
 ## Soundscapes
 

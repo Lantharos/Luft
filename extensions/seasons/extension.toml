@@ -1,0 +1,79 @@
+id = "com.lantharos.Seasons"
+name = "Seasons"
+description = "Rain, snow, autumn leaves, fireflies, mist or pictures of your own falling over the wallpaper, as you choose or as the weather and season are where you are."
+version = "1.0.0"
+api = 1
+permissions = ["wallpaper", "quick-settings", "weather", "sounds"]
+replaces = "com.lantharos.Rain"
+
+[[settings]]
+key = "on"
+type = "switch"
+label = "seasons"
+default = false
+replaces = "rain"
+
+[[settings]]
+key = "effect"
+depends = "on"
+type = "choice"
+label = "effect"
+default = "rain"
+options = [
+  { value = "rain", label = "rain" },
+  { value = "snow", label = "snow" },
+  { value = "leaves", label = "leaves" },
+  { value = "fireflies", label = "fireflies" },
+  { value = "fog", label = "fog" },
+  { value = "custom", label = "custom" },
+  { value = "weather", label = "follow-weather" },
+  { value = "season", label = "follow-season" },
+]
+
+[[settings]]
+key = "intensity"
+depends = "on"
+type = "choice"
+label = "intensity"
+default = "steady"
+options = [
+  { value = "light", label = "light", replaces = "drizzle" },
+  { value = "steady", label = "steady", replaces = "rain" },
+  { value = "heavy", label = "heavy", replaces = "storm" },
+]
+
+[[settings]]
+key = "color"
+depends = "on"
+type = "color"
+label = "color"
+default = "#dbe6f7"
+swatches = [
+  { value = "#dbe6f7", label = "water" },
+  { value = "accent", label = "accent" },
+]
+
+[[settings]]
+key = "visible"
+depends = "on"
+type = "switch"
+label = "visible"
+default = true
+
+[[settings]]
+key = "sound"
+depends = "on"
+type = "switch"
+label = "sound"
+default = false
+
+[[settings]]
+key = "volume"
+type = "slider"
+label = "volume"
+default = 0.6
+min = 0
+max = 1
+step = 0.05
+unit = "percent"
+depends = "sound"

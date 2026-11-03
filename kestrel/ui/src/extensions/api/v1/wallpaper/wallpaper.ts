@@ -1,8 +1,9 @@
+import { extensionFile } from '../audio/files.js';
 import type { ApiContext } from '../context.js';
 import type { Layer, LayerOptions, Wallpaper } from '../types.js';
 import { WallpaperLayer } from './layer.js';
 
-export function wallpaperApi({ layers, scope, manifest }: ApiContext): Wallpaper {
+export function wallpaperApi({ layers, scope, manifest, path, dataPath }: ApiContext): Wallpaper {
   return {
     addLayer: (options: LayerOptions): Layer => {
       const layer = new WallpaperLayer(options, layers, scope, `extension-layer:${manifest.id}`);
@@ -15,6 +16,7 @@ export function wallpaperApi({ layers, scope, manifest }: ApiContext): Wallpaper
           layer.active = active;
         },
         reshape: () => layer.reshape(),
+        setPictures: (name, files) => layer.setPictures(name, files.map(file => extensionFile([path, dataPath], file).get_path()!)),
         dispose: () => handle.dispose(),
       };
     },

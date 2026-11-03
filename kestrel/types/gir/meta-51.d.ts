@@ -4149,6 +4149,8 @@ export namespace Meta {
 
         get_role(): string;
 
+        get_rounded_corners(): [number, number];
+
         get_sandboxed_app_id(): string | null;
 
         get_stable_sequence(): number;

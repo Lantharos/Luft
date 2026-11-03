@@ -4,7 +4,7 @@ import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {checks} from '../lib/check.js';
 import {scratch} from '../lib/processes.js';
-import {install, listed, RAIN, request} from './lib/extensions.js';
+import {install, listed, request, SEASONS} from './lib/extensions.js';
 
 const {require, eventually} = checks('extension crashes');
 const STATE = scratch('extension-crashes.json');
@@ -40,11 +40,11 @@ export async function run() {
     await crashAgain(2);
   }
   try {
-    for (const id of [PROBE, RAIN]) {
+    for (const id of [PROBE, SEASONS]) {
       const after = await eventually(() => listed(id), `${id} is still listed after the second crash`);
       require(after.state === 'crashed' && !after.enabled, `${id}, running through two crashes in a row, is kept off`);
     }
-    await eventually(() => notified('Probe was turned off') && notified('Rain was turned off'), 'the person is told which extensions were turned off');
+    await eventually(() => notified('Probe was turned off') && notified('Seasons was turned off'), 'the person is told which extensions were turned off');
     await request('Enable', PROBE);
     await eventually(() => running(PROBE), 'turning it on again in Settings brings it back');
   } finally {

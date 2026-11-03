@@ -78,6 +78,14 @@ export interface Basics {
   open(uri: string): void;
   /** Opens the extension's page in Settings. */
   openSettings(): void;
+  /**
+   * Asks people to pick files with the file chooser, right after they used the extension, such as from a button on
+   * its Settings page. Kestrel copies what they picked into {@link dataPath} and returns the copies' paths, or none
+   * when they cancel, so the extension never depends on where the files were.
+   */
+  pickFiles(options: PickOptions): Promise<string[]>;
+  /** Deletes a file in {@link dataPath}, such as a picked file people no longer use. */
+  deleteFile(path: string): void;
   /** Runs `cleanup` when the extension is turned off, after everything it made through this API is gone. */
   onDisable(cleanup: () => void): Disposable;
 }
@@ -148,6 +156,15 @@ export interface Appearance {
   onChanged(changed: () => void): Disposable;
 }
 
+export interface PickOptions {
+  /** What the file chooser says it's for, in the language Kestrel uses. */
+  title: string;
+  /** Pictures (PNG, WebP, SVG, GIF or JPEG) or sounds (Ogg, FLAC, WAV or MP3). */
+  kind: 'images' | 'sounds';
+  /** Lets people pick several at once. */
+  multiple?: boolean;
+}
+
 /** What {@link Storage} keeps: anything JSON can hold. */
 export type Stored = null | boolean | number | string | readonly Stored[] | { readonly [key: string]: Stored };
 
@@ -166,6 +183,12 @@ export interface Rect {
   y: number;
   width: number;
   height: number;
+}
+
+/** A window or a piece of the taskbar the way it shows: its rectangle with its rounded corners. */
+export interface Outline extends Rect {
+  /** How far each corner is rounded in pixels, top left, top right, bottom right and bottom left; 0 for a square corner. */
+  radii: readonly [number, number, number, number];
 }
 
 export interface Wallpaper {
@@ -197,6 +220,13 @@ export interface LayerOptions {
    * covers every display whole without this. Kestrel asks again when displays change and after {@link Layer.reshape}.
    */
   area?(display: LayerArea): Rect | null;
+  /**
+   * Names of picture atlases the shader samples, filled with {@link Layer.setPictures}. Each name declares
+   * `sampler2D name`, `vec2 name_grid` (columns and rows of cells, each square), `float name_count` (how many pictures)
+   * and `vec4 name_pictures[8]`: for each picture its first cell, how many frames it has, frames a second and its width
+   * over its height. Cells count from the top left, row by row, and a picture's frames take the cells after its first.
+   */
+  atlases?: readonly string[];
 }
 
 export interface LayerArea {
@@ -224,9 +254,11 @@ export interface LayerDisplay {
   readonly width: number;
   readonly height: number;
   /** Windows on this display, topmost first, relative to its top left corner. */
-  readonly windows: readonly Rect[];
+  readonly windows: readonly Outline[];
   /** The taskbar on this display, relative to its top left corner. */
   readonly taskbar: Rect | null;
+  /** What shows of the taskbar, relative to the display's top left corner: the bar, or each island of a taskbar in islands. */
+  readonly taskbarOutlines: readonly Outline[];
   /** Sets a `float`, `vec2`, `vec3` or `vec4` uniform, by how many values it gets. */
   uniform(name: string, ...values: number[]): void;
   /** Sets a uniform array, such as `vec4 rects[16]` with `components` 4. */
@@ -241,6 +273,12 @@ export interface Layer extends Disposable {
   active: boolean;
   /** Asks {@link LayerOptions.area} again for every display, after what it depends on changed. */
   reshape(): void;
+  /**
+   * Fills one of the layer's {@link LayerOptions.atlases} with up to 8 pictures from the extension's folders, PNG,
+   * WebP, SVG, GIF or JPEG, each scaled to fit 128 pixels. Animated GIF and WebP keep up to 16 frames, 64 in all.
+   * Returns how many pictures it took.
+   */
+  setPictures(atlas: string, paths: readonly string[]): number;
 }
 
 /** A menu entry that runs something. */
@@ -740,6 +778,8 @@ interface SettingBase {
   depends?: string;
   /** Also shows the setting on this page of Settings, under the extension's name. */
   page?: SettingsPageId;
+  /** The key of the setting it takes its value from in the extension this one {@link Manifest.replaces}, when that key differs. */
+  replaces?: string;
 }
 
 export interface SwitchSetting extends SettingBase {
@@ -753,6 +793,8 @@ export interface ChoiceOption {
   label: string;
   /** A picture of the option, a PNG, JPEG, WebP or SVG in the extension's folder. When every option has one, Settings offers them as pictures. */
   image?: string;
+  /** The value of the replaced extension's setting that becomes this option, when it differs. */
+  replaces?: string;
 }
 
 export interface ChoiceSetting extends SettingBase {
@@ -914,4 +956,9 @@ export interface Manifest {
   shortcuts?: ShortcutDescription[];
   /** A native program in the extension's folder that {@link Helper} starts. */
   helper?: { path: string };
+  /**
+   * The id of an extension this one takes the place of. Once both are installed, Kestrel carries that one's settings
+   * over to this one's, keeps this one off if that one was, and removes that one.
+   */
+  replaces?: string;
 }

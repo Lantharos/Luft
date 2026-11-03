@@ -19,6 +19,8 @@ Everything an extension adds returns a `Disposable` with `dispose()`, to take it
 | `t(id, args?)` | A message from its translations, in the desktop's language |
 | `open(uri)` | Opens a web link in the browser, or a file or folder in the app that opens it |
 | `openSettings()` | Opens the extension's page in Settings |
+| `pickFiles({ title, kind, multiple? })` | Lets people pick pictures (`images`) or sounds (`sounds`) with the file chooser, right after they used the extension, such as from a button on its Settings page. Luft keeps copies in `dataPath` and returns their paths, or none when they cancel |
+| `deleteFile(path)` | Deletes a file in `dataPath`, such as a picked picture no longer used |
 | `onDisable(cleanup)` | Runs `cleanup` when the extension is turned off, after everything it made is gone |
 | `settings.get(key)` | A declared setting's value |
 | `settings.set(key, value)` | Changes a declared setting; Settings shows the change at once. A value that doesn't fit throws |
@@ -41,9 +43,10 @@ Everything an extension adds returns a `Disposable` with `dispose()`, to take it
 | `frame(frame)` | Runs before every frame it draws |
 | `active` | Whether it starts active; it does unless `false` |
 | `depth` | `above-windows`, the default, also draws over windows, so drops can land on them; leave the windows' rectangles clear to keep them readable. `below-windows` draws between the wallpaper and the windows |
+| `atlases` | Names of picture atlases the shader samples, filled with `setPictures`, see below |
 | `area(display)` | The part of each display to cover, such as a band along the bottom, or `null` to leave a display out. `display` has `index`, `primary`, `width` and `height`. The shader only runs there, which costs far less than the whole display |
 
-`frame` has `time` (seconds, wrapping every hour), `elapsed` (seconds since the last frame, 0 after a pause) and `displays`. Each display has `index`, `primary`, `width`, `height`, `windows` (rectangles topmost first, relative to the display, for drops and snow that land on window tops), `taskbar`, `uniform(name, ...values)` for `float` to `vec4`, and `uniformArray(name, components, values)` for arrays. The layer has `active`, to start and stop it, and `reshape()`, to ask for `area` again after what it depends on changed.
+`frame` has `time` (seconds, wrapping every hour), `elapsed` (seconds since the last frame, 0 after a pause) and `displays`. Each display has `index`, `primary`, `width`, `height`, `windows` (outlines topmost first, relative to the display: each window's rectangle and the `radii` of its corners, top left, top right, bottom right and bottom left, 0 where it's square), `taskbar` (the taskbar's rectangle), `taskbarOutlines` (the taskbar's own shape: the bar, or each island when it floats in islands, with their rounded ends), `uniform(name, ...values)` for `float` to `vec4`, and `uniformArray(name, components, values)` for arrays. The layer has `active`, to start and stop it, `reshape()`, to ask for `area` again after what it depends on changed, and `setPictures(atlas, paths)`, which packs up to eight pictures from the extension's folders into one of its atlases, each scaled to fit 128 pixels, keeping up to 16 frames of animated GIF and WebP pictures, 64 in all. An atlas named `pictures` declares `sampler2D pictures`, `vec2 pictures_grid` (its columns and rows of square cells), `float pictures_count` and `vec4 pictures_pictures[8]`: each picture's first cell, frame count, frames a second, and width over height.
 
 ```js
 const layer = ext.wallpaper.addLayer({

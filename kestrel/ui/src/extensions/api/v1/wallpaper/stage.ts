@@ -7,7 +7,7 @@ import type { Monitor } from '../../../../desktop/panel/panel.js';
 import { PlaybackConditions } from '../../../../desktop/wallpaper/conditions.js';
 import { reducedMotion } from '../../../../shared/motion/motion.js';
 import type { ExtensionHost } from '../../../host.js';
-import type { LayerOptions, Rect } from '../types.js';
+import type { LayerOptions, Outline, Rect } from '../types.js';
 
 const SURFACE_TYPES = [Meta.WindowType.NORMAL, Meta.WindowType.DIALOG, Meta.WindowType.MODAL_DIALOG, Meta.WindowType.UTILITY];
 
@@ -17,14 +17,18 @@ function onScreen(window: Meta.Window, workspace: Meta.Workspace): boolean {
     SURFACE_TYPES.includes(window.window_type) && !!actor?.visible && actor.opacity > 0;
 }
 
-export function stackedWindows(): Rect[] {
+function outline(window: Meta.Window): Outline {
+  const { x, y, width, height } = window.get_frame_rect();
+  const [rounded, radius] = window.get_rounded_corners();
+  const corner = (bit: number) => rounded & bit ? radius : 0;
+  return { x, y, width, height, radii: [corner(1), corner(2), corner(4), corner(8)] };
+}
+
+export function stackedWindows(): Outline[] {
   const workspace = global.workspace_manager.get_active_workspace();
   return global.display.sort_windows_by_stacking(workspace.list_windows().filter(window => onScreen(window, workspace)))
     .reverse()
-    .map(window => {
-      const { x, y, width, height } = window.get_frame_rect();
-      return { x, y, width, height };
-    });
+    .map(outline);
 }
 
 export interface StagedLayer {
@@ -87,5 +91,9 @@ export class LayerStage {
 
   taskbar(monitor: Monitor): Rect | null {
     return this.host.taskbar(monitor);
+  }
+
+  taskbarOutlines(monitor: Monitor): Outline[] {
+    return this.host.taskbarIslands(monitor).map(({ x, y, width, height, radius }) => ({ x, y, width, height, radii: [radius, radius, radius, radius] }));
   }
 }

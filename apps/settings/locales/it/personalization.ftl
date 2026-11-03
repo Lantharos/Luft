@@ -18,10 +18,6 @@ settings-appearance-accent = Colore principale
 settings-appearance-accent-wallpaper = Sfondo
 settings-appearance-accent-white = Bianco
 settings-appearance-accent-custom = Personalizzato
-settings-appearance-rain-color = Colore
-settings-appearance-rain-water = Acqua
-settings-appearance-rain-accent = Colore principale
-settings-appearance-rain-custom = Personalizzato
 settings-appearance-theme-apps = Adatta le altre app allo sfondo
 settings-appearance-theme-apps-description = Le altre app e i terminali assumono gli stessi colori
 
@@ -264,3 +260,7 @@ settings-accessibility-flash = Lampeggia con i suoni di avviso
 settings-accessibility-flash-type = Lampeggio
 settings-accessibility-flash-window = Finestra
 settings-accessibility-flash-screen = Schermo
+
+## Extensions
+
+settings-extensions-custom-color = Personalizzato

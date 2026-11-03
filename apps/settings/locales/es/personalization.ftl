@@ -18,10 +18,6 @@ settings-appearance-accent = Color de énfasis
 settings-appearance-accent-wallpaper = Fondo de pantalla
 settings-appearance-accent-white = Blanco
 settings-appearance-accent-custom = Personalizado
-settings-appearance-rain-color = Color
-settings-appearance-rain-water = Agua
-settings-appearance-rain-accent = Color de acento
-settings-appearance-rain-custom = Personalizado
 settings-appearance-theme-apps = Adaptar otras aplicaciones al fondo
 settings-appearance-theme-apps-description = Otras aplicaciones y terminales adoptan los mismos colores
 
@@ -264,3 +260,7 @@ settings-accessibility-flash = Destello con los sonidos de alerta
 settings-accessibility-flash-type = Destello
 settings-accessibility-flash-window = Ventana
 settings-accessibility-flash-screen = Pantalla
+
+## Extensions
+
+settings-extensions-custom-color = Personalizado

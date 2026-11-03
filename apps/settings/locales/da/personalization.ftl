@@ -18,10 +18,6 @@ settings-appearance-accent = Accentfarve
 settings-appearance-accent-wallpaper = Baggrundsbillede
 settings-appearance-accent-white = Hvid
 settings-appearance-accent-custom = Brugerdefineret
-settings-appearance-rain-color = Farve
-settings-appearance-rain-water = Vand
-settings-appearance-rain-accent = Accentfarve
-settings-appearance-rain-custom = Brugerdefineret
 settings-appearance-theme-apps = Tilpas andre apps til baggrundsbilledet
 settings-appearance-theme-apps-description = Andre apps og terminaler får de samme farver
 
@@ -264,3 +260,7 @@ settings-accessibility-flash = Blink ved advarselslyde
 settings-accessibility-flash-type = Blink
 settings-accessibility-flash-window = Vindue
 settings-accessibility-flash-screen = Skærm
+
+## Extensions
+
+settings-extensions-custom-color = Brugerdefineret

@@ -55,21 +55,6 @@ settings-appearance-wallpaper-tile = Tile
 settings-appearance-wallpaper-span = Span displays
 settings-appearance-wallpaper-battery = Play videos on battery
 settings-appearance-wallpaper-battery-description = Otherwise video wallpapers pause until you plug in
-settings-appearance-rain = Rain
-settings-appearance-rain-description = Rain falls over the wallpaper and splashes on windows and the taskbar, or plays as sound while you work
-settings-appearance-rain-intensity = How hard it rains
-settings-appearance-rain-drizzle = Drizzle
-settings-appearance-rain-rain = Rain
-settings-appearance-rain-storm = Storm
-settings-appearance-rain-color = Color
-settings-appearance-rain-water = Water
-settings-appearance-rain-accent = Accent color
-settings-appearance-rain-custom = Custom
-settings-appearance-rain-visible = Show on the desktop
-settings-appearance-rain-visible-description = Drops land on windows and the taskbar
-settings-appearance-rain-sound = Sound
-settings-appearance-rain-sound-description = Recorded rain, with thunder in storms. Keeps playing behind windows
-settings-appearance-rain-volume = Rain volume
 
 ## Appearance: app icons
 
@@ -314,3 +299,43 @@ settings-accessibility-flash = Flash for alert sounds
 settings-accessibility-flash-type = Flash
 settings-accessibility-flash-window = Window
 settings-accessibility-flash-screen = Screen
+
+## Extensions
+
+settings-extensions-description = Extensions add to the desktop. Turn them off here, change how they work, or remove them.
+settings-extensions-none = No extensions are installed
+settings-extensions-unavailable = Extensions can't be shown while the desktop isn't running.
+# Screen-reader label of the switch that turns an extension on; $name is the extension's name
+settings-extensions-on = Turn on { $name }
+# Title of the switch that turns an extension on, on its own page
+settings-extensions-enabled = Turned on
+settings-extensions-failed = Turned off because it stopped working
+settings-extensions-crashed = Turned off because the desktop restarted twice while it ran
+settings-extensions-invalid = Can't run on this version of Luft
+settings-extensions-problem = What went wrong
+settings-extensions-usage-title = Uses
+settings-extensions-usage-little = Hardly any of the processor
+# $cpu is a percentage of one processor
+settings-extensions-usage = { $cpu } of the processor
+# $cpu is a percentage of one processor, $memory an amount of memory such as 12 MB
+settings-extensions-usage-helper = { $cpu } of the processor and { $memory } of memory
+settings-extensions-settings = Settings
+settings-extensions-permissions = What it can do
+settings-extensions-permission-wallpaper = Draw over the wallpaper
+settings-extensions-permission-quick-settings = Add tiles to quick settings
+settings-extensions-permission-taskbar = Add buttons to the taskbar
+settings-extensions-permission-search = Add results to search
+settings-extensions-permission-notifications = Send notifications
+settings-extensions-permission-weather = See the weather where you are
+settings-extensions-permission-location = See roughly where you are
+settings-extensions-permission-media = See and control what's playing
+settings-extensions-remove = Remove
+# $version is the extension's version
+settings-extensions-from-luft = Comes with Luft, version { $version }
+settings-extensions-updated = Updated to version { $version }
+settings-extensions-installed = Version { $version }
+# $name is the extension's name
+settings-extensions-remove-title = Remove { $name }?
+settings-extensions-remove-description = It's removed for good, along with its settings.
+settings-extensions-remove-shipped = It's removed for your account, along with its settings. You can get it back from Schelf.
+settings-extensions-custom-color = Custom

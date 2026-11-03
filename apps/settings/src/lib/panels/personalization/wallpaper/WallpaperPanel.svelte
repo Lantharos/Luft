@@ -9,7 +9,6 @@
 	import { KESTREL_SCHEMA, useSettings } from '#lib/state/gsettings.svelte.js';
 	import { CENTER, openFolder, pathToUri, uriToPath } from './api';
 	import LiveWallpaperOnBattery from './LiveWallpaperOnBattery.svelte';
-	import Rain from './Rain.svelte';
 	import { useScreenShape } from './screen.svelte.js';
 	import WallpaperPreview from './WallpaperPreview.svelte';
 	import WallpaperTile from './WallpaperTile.svelte';
@@ -111,10 +110,6 @@
 		<Select label={t('settings-appearance-wallpaper-fit-title')} options={fitOptions} value={background.values['picture-options'] ?? 'zoom'} onchange={(value) => background.set('picture-options', value)} />
 	</Row>
 	<LiveWallpaperOnBattery />
-</Section>
-
-<Section>
-	<Rain />
 </Section>
 
 <style>

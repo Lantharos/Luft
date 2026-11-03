@@ -18,10 +18,6 @@ settings-appearance-accent = Χρώμα έμφασης
 settings-appearance-accent-wallpaper = Ταπετσαρία
 settings-appearance-accent-white = Λευκό
 settings-appearance-accent-custom = Προσαρμοσμένο
-settings-appearance-rain-color = Χρώμα
-settings-appearance-rain-water = Νερό
-settings-appearance-rain-accent = Χρώμα έμφασης
-settings-appearance-rain-custom = Προσαρμοσμένο
 settings-appearance-theme-apps = Χρώματα ταπετσαρίας και σε άλλες εφαρμογές
 settings-appearance-theme-apps-description = Οι άλλες εφαρμογές και τα τερματικά παίρνουν τα ίδια χρώματα
 
@@ -264,3 +260,7 @@ settings-accessibility-flash = Αναλαμπή για ηχητικές ειδο
 settings-accessibility-flash-type = Αναλαμπή
 settings-accessibility-flash-window = Παράθυρο
 settings-accessibility-flash-screen = Οθόνη
+
+## Extensions
+
+settings-extensions-custom-color = Προσαρμοσμένο

@@ -18,10 +18,6 @@ settings-appearance-accent = Akcento spalva
 settings-appearance-accent-wallpaper = Fono paveikslėlis
 settings-appearance-accent-white = Balta
 settings-appearance-accent-custom = Pasirinkta
-settings-appearance-rain-color = Spalva
-settings-appearance-rain-water = Vanduo
-settings-appearance-rain-accent = Akcento spalva
-settings-appearance-rain-custom = Pasirinkta
 settings-appearance-theme-apps = Derinti kitas programas prie fono paveikslėlio
 settings-appearance-theme-apps-description = Kitos programos ir terminalai įgauna tas pačias spalvas
 
@@ -270,3 +266,7 @@ settings-accessibility-flash = Mirksėti įspėjamųjų garsų metu
 settings-accessibility-flash-type = Mirksėjimas
 settings-accessibility-flash-window = Langas
 settings-accessibility-flash-screen = Ekranas
+
+## Extensions
+
+settings-extensions-custom-color = Pasirinkta

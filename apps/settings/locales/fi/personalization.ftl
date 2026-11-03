@@ -18,10 +18,6 @@ settings-appearance-accent = Korostusväri
 settings-appearance-accent-wallpaper = Taustakuva
 settings-appearance-accent-white = Valkoinen
 settings-appearance-accent-custom = Oma
-settings-appearance-rain-color = Väri
-settings-appearance-rain-water = Vesi
-settings-appearance-rain-accent = Korostusväri
-settings-appearance-rain-custom = Oma
 settings-appearance-theme-apps = Sovita muut sovellukset taustakuvaan
 settings-appearance-theme-apps-description = Muut sovellukset ja päätteet saavat samat värit
 
@@ -264,3 +260,7 @@ settings-accessibility-flash = Välähdys äänimerkeistä
 settings-accessibility-flash-type = Välähdys
 settings-accessibility-flash-window = Ikkuna
 settings-accessibility-flash-screen = Näyttö
+
+## Extensions
+
+settings-extensions-custom-color = Oma

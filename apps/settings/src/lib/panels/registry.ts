@@ -19,6 +19,7 @@ import MonitorCog from '@lucide/svelte/icons/monitor-cog';
 import Palette from '@lucide/svelte/icons/palette';
 import PanelBottom from '@lucide/svelte/icons/panel-bottom';
 import Plus from '@lucide/svelte/icons/plus';
+import Puzzle from '@lucide/svelte/icons/puzzle';
 import Shield from '@lucide/svelte/icons/shield';
 import ShieldCheck from '@lucide/svelte/icons/shield-check';
 import UserRound from '@lucide/svelte/icons/user-round';
@@ -69,6 +70,7 @@ const VIEWS: Record<PageId, View> = {
 	appearance: { icon: Palette, load: () => import('./personalization/appearance/AppearancePanel.svelte') },
 	taskbar: { icon: PanelBottom, load: () => import('./personalization/taskbar/TaskbarPanel.svelte') },
 	windows: { icon: AppWindow, load: () => import('./personalization/windows/WindowsPanel.svelte') },
+	extensions: { icon: Puzzle, load: () => import('./personalization/extensions/ExtensionsPanel.svelte') },
 	accessibility: { icon: Accessibility, load: () => import('./personalization/accessibility/AccessibilityPanel.svelte') },
 	apps: { icon: LayoutGrid, load: () => import('./protection/apps/AppsPanel.svelte') },
 	privacy: { icon: Hand, load: () => import('./protection/privacy/PrivacyPanel.svelte') },

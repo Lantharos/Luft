@@ -18,10 +18,6 @@ settings-appearance-accent = Акцентна боја
 settings-appearance-accent-wallpaper = Позадина
 settings-appearance-accent-white = Бела
 settings-appearance-accent-custom = Прилагодена
-settings-appearance-rain-color = Боја
-settings-appearance-rain-water = Вода
-settings-appearance-rain-accent = Боја за нагласување
-settings-appearance-rain-custom = Прилагодена
 settings-appearance-theme-apps = Усогласи ги другите апликации со позадината
 settings-appearance-theme-apps-description = Другите апликации и терминалите ги добиваат истите бои
 
@@ -264,3 +260,7 @@ settings-accessibility-flash = Трепкање при звучни предуп
 settings-accessibility-flash-type = Трепкање
 settings-accessibility-flash-window = Прозорец
 settings-accessibility-flash-screen = Екран
+
+## Extensions
+
+settings-extensions-custom-color = Прилагодена

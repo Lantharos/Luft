@@ -18,10 +18,6 @@ settings-appearance-accent = Kolor akcentu
 settings-appearance-accent-wallpaper = Tapeta
 settings-appearance-accent-white = Biały
 settings-appearance-accent-custom = Własny
-settings-appearance-rain-color = Kolor
-settings-appearance-rain-water = Woda
-settings-appearance-rain-accent = Kolor akcentu
-settings-appearance-rain-custom = Własny
 settings-appearance-theme-apps = Dopasuj inne aplikacje do tapety
 settings-appearance-theme-apps-description = Inne aplikacje i terminale przyjmują te same kolory
 
@@ -270,3 +266,7 @@ settings-accessibility-flash = Błysk przy dźwiękach alertów
 settings-accessibility-flash-type = Błysk
 settings-accessibility-flash-window = Okno
 settings-accessibility-flash-screen = Ekran
+
+## Extensions
+
+settings-extensions-custom-color = Własny

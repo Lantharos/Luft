@@ -44,21 +44,6 @@ settings-appearance-wallpaper-tile = Kacheln
 settings-appearance-wallpaper-span = Über alle Bildschirme
 settings-appearance-wallpaper-battery = Videos im Akkubetrieb abspielen
 settings-appearance-wallpaper-battery-description = Sonst pausieren Video-Hintergrundbilder, bis du das Netzteil ansteckst
-settings-appearance-rain = Regen
-settings-appearance-rain-description = Regen fällt über das Hintergrundbild und spritzt auf Fenster und die Taskleiste, oder ist beim Arbeiten zu hören
-settings-appearance-rain-intensity = Wie stark es regnet
-settings-appearance-rain-drizzle = Nieselregen
-settings-appearance-rain-rain = Regen
-settings-appearance-rain-storm = Sturm
-settings-appearance-rain-color = Farbe
-settings-appearance-rain-water = Wasser
-settings-appearance-rain-accent = Akzentfarbe
-settings-appearance-rain-custom = Eigene
-settings-appearance-rain-visible = Auf dem Desktop zeigen
-settings-appearance-rain-visible-description = Tropfen landen auf Fenstern und der Taskleiste
-settings-appearance-rain-sound = Ton
-settings-appearance-rain-sound-description = Aufgenommener Regen, bei Gewitter mit Donner. Spielt auch hinter Fenstern weiter
-settings-appearance-rain-volume = Lautstärke des Regens
 
 ## Appearance: app icons
 
@@ -275,3 +260,7 @@ settings-accessibility-flash = Bei Warntönen aufblinken
 settings-accessibility-flash-type = Aufblinken
 settings-accessibility-flash-window = Fenster
 settings-accessibility-flash-screen = Bildschirm
+
+## Extensions
+
+settings-extensions-custom-color = Eigene

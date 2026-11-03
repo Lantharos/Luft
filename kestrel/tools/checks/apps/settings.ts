@@ -2,6 +2,7 @@ import {withApp} from './lib/apps.js';
 import {checkPalette, showDark, withPalette} from './lib/palette.js';
 import {checkAccessibility} from './settings/system/accessibility.js';
 import {checkDictation} from './settings/system/dictation.js';
+import {checkExtensions} from './settings/look/extensions.js';
 import {checkFonts} from './settings/look/fonts.js';
 import {checkHardware} from './settings/system/hardware.js';
 import {checkLive} from './settings/live.js';
@@ -15,6 +16,7 @@ import {checkWallpaper} from './settings/look/wallpaper.js';
 export async function run() {
   await withPalette(async palette => {
     await withApp('settings', [], async app => {
+      await checkExtensions(app);
       await checkPalette(app, palette);
       await checkPages(app);
       await checkTaskbarLooks(app);

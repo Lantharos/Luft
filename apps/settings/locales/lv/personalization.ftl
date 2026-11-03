@@ -18,10 +18,6 @@ settings-appearance-accent = Akcenta krāsa
 settings-appearance-accent-wallpaper = Fona attēls
 settings-appearance-accent-white = Balta
 settings-appearance-accent-custom = Pielāgota
-settings-appearance-rain-color = Krāsa
-settings-appearance-rain-water = Ūdens
-settings-appearance-rain-accent = Akcenta krāsa
-settings-appearance-rain-custom = Pielāgota
 settings-appearance-theme-apps = Saskaņot citas lietotnes ar fona attēlu
 settings-appearance-theme-apps-description = Citas lietotnes un termināļi iegūst tās pašas krāsas
 
@@ -267,3 +263,7 @@ settings-accessibility-flash = Mirgot brīdinājuma skaņu laikā
 settings-accessibility-flash-type = Mirgo
 settings-accessibility-flash-window = Logs
 settings-accessibility-flash-screen = Ekrāns
+
+## Extensions
+
+settings-extensions-custom-color = Pielāgota

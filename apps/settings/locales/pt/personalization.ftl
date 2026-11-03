@@ -18,10 +18,6 @@ settings-appearance-accent = Cor de destaque
 settings-appearance-accent-wallpaper = Imagem de fundo
 settings-appearance-accent-white = Branco
 settings-appearance-accent-custom = Personalizada
-settings-appearance-rain-color = Cor
-settings-appearance-rain-water = Água
-settings-appearance-rain-accent = Cor de destaque
-settings-appearance-rain-custom = Personalizada
 settings-appearance-theme-apps = Adaptar outras aplicações à imagem de fundo
 settings-appearance-theme-apps-description = As outras aplicações e os terminais adotam as mesmas cores
 
@@ -265,3 +261,7 @@ settings-accessibility-flash = Piscar com sons de alerta
 settings-accessibility-flash-type = Piscar
 settings-accessibility-flash-window = Janela
 settings-accessibility-flash-screen = Ecrã
+
+## Extensions
+
+settings-extensions-custom-color = Personalizada

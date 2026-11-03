@@ -18,10 +18,6 @@ settings-appearance-accent = Kulur ta’ aċċent
 settings-appearance-accent-wallpaper = Sfond
 settings-appearance-accent-white = Abjad
 settings-appearance-accent-custom = Personalizzat
-settings-appearance-rain-color = Kulur
-settings-appearance-rain-water = Ilma
-settings-appearance-rain-accent = Kulur tal-enfasi
-settings-appearance-rain-custom = Personalizzat
 settings-appearance-theme-apps = Qabbel apps oħra mal-isfond
 settings-appearance-theme-apps-description = Apps u terminals oħra jieħdu l-istess kuluri
 
@@ -273,3 +269,7 @@ settings-accessibility-flash = Teptip għall-ħsejjes tal-allerti
 settings-accessibility-flash-type = Teptip
 settings-accessibility-flash-window = Tieqa
 settings-accessibility-flash-screen = Skrin
+
+## Extensions
+
+settings-extensions-custom-color = Personalizzat

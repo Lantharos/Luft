@@ -222,6 +222,21 @@ export const commands = {
 		level: number,
 	}, options?: CallOptions) => invoke<null>("display_set_brightness", params, options),
 	displayState: (options?: CallOptions) => invoke<Displays>("display_state", {}, options),
+	extensions: (options?: CallOptions) => invoke<Extension[]>("extensions", {}, options),
+	extensionsDisable: (params: {
+		id: string,
+	}, options?: CallOptions) => invoke<null>("extensions_disable", params, options),
+	extensionsEnable: (params: {
+		id: string,
+	}, options?: CallOptions) => invoke<null>("extensions_enable", params, options),
+	extensionsRemove: (params: {
+		id: string,
+	}, options?: CallOptions) => invoke<null>("extensions_remove", params, options),
+	extensionsSet: (params: {
+		id: string,
+		key: string,
+		value: ExtensionSettingValue,
+	}, options?: CallOptions) => invoke<null>("extensions_set", params, options),
 	fingerprintDelete: (params: {
 		finger: string,
 	}, options?: CallOptions) => invoke<null>("fingerprint_delete", params, options),
@@ -518,6 +533,7 @@ export const events = {
 	dictationChanged: (callback: (payload: Overview) => void) => listen<Overview>("dictation.changed", callback),
 	displayBrightness: (callback: (payload: Brightness) => void) => listen<Brightness>("display.brightness", callback),
 	displayChanged: (callback: (payload: Displays) => void) => listen<Displays>("display.changed", callback),
+	extensionsChanged: (callback: (payload: Extension[]) => void) => listen<Extension[]>("extensions.changed", callback),
 	fingerprintEnroll: (callback: (payload: EnrollProgress) => void) => listen<EnrollProgress>("fingerprint.enroll", callback),
 	hardwareChanged: (callback: (payload: Hardware) => void) => listen<Hardware>("hardware.changed", callback),
 	kestrelPalette: (callback: (payload: Palette) => void) => listen<Palette>("kestrel.palette", callback),
@@ -880,6 +896,44 @@ export type Entry = {
 	enabled: boolean,
 	removable: boolean,
 } & App;
+
+export type Extension = {
+	id: string,
+	name: string,
+	description: string,
+	version: string,
+	origin: string,
+	overrides: boolean,
+	enabled: boolean,
+	state: string,
+	problem: string,
+	permissions: string[],
+	cpu: number | null,
+	memory: number | null,
+	settings: ExtensionSetting[],
+};
+
+export type ExtensionChoice = {
+	value: string,
+	label: string,
+};
+
+export type ExtensionSetting = {
+	key: string,
+	kind: string,
+	label: string,
+	description: string,
+	value: ExtensionSettingValue,
+	depends: string | null,
+	options: ExtensionChoice[],
+	swatches: ExtensionChoice[],
+	min: number | null,
+	max: number | null,
+	step: number | null,
+	unit: string | null,
+};
+
+export type ExtensionSettingValue = boolean | number | string;
 
 export type ExternalBrightness = "checking" | "ready" | "missing-tool" | "needs-restart" | "no-access";
 

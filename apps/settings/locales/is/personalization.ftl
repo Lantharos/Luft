@@ -18,10 +18,6 @@ settings-appearance-accent = Áherslulitur
 settings-appearance-accent-wallpaper = Bakgrunnsmynd
 settings-appearance-accent-white = Hvítur
 settings-appearance-accent-custom = Sérsniðinn
-settings-appearance-rain-color = Litur
-settings-appearance-rain-water = Vatn
-settings-appearance-rain-accent = Áherslulitur
-settings-appearance-rain-custom = Sérsniðinn
 settings-appearance-theme-apps = Laga önnur forrit að bakgrunnsmyndinni
 settings-appearance-theme-apps-description = Önnur forrit og skipanagluggar fá sömu liti
 
@@ -264,3 +260,7 @@ settings-accessibility-flash = Blikka við viðvörunarhljóð
 settings-accessibility-flash-type = Blikk
 settings-accessibility-flash-window = Gluggi
 settings-accessibility-flash-screen = Skjár
+
+## Extensions
+
+settings-extensions-custom-color = Sérsniðinn

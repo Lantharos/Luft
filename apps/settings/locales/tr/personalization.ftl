@@ -18,10 +18,6 @@ settings-appearance-accent = Vurgu rengi
 settings-appearance-accent-wallpaper = Duvar kâğıdı
 settings-appearance-accent-white = Beyaz
 settings-appearance-accent-custom = Özel
-settings-appearance-rain-color = Renk
-settings-appearance-rain-water = Su
-settings-appearance-rain-accent = Vurgu rengi
-settings-appearance-rain-custom = Özel
 settings-appearance-theme-apps = Diğer uygulamaları duvar kâğıdına uydur
 settings-appearance-theme-apps-description = Diğer uygulamalar ve terminaller aynı renkleri alır
 
@@ -264,3 +260,7 @@ settings-accessibility-flash = Uyarı seslerinde yanıp sön
 settings-accessibility-flash-type = Yanıp sönen
 settings-accessibility-flash-window = Pencere
 settings-accessibility-flash-screen = Ekran
+
+## Extensions
+
+settings-extensions-custom-color = Özel

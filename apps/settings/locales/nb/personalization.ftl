@@ -18,10 +18,6 @@ settings-appearance-accent = Aksentfarge
 settings-appearance-accent-wallpaper = Bakgrunnsbilde
 settings-appearance-accent-white = Hvit
 settings-appearance-accent-custom = Egendefinert
-settings-appearance-rain-color = Farge
-settings-appearance-rain-water = Vann
-settings-appearance-rain-accent = Aksentfarge
-settings-appearance-rain-custom = Egendefinert
 settings-appearance-theme-apps = Tilpass andre apper til bakgrunnsbildet
 settings-appearance-theme-apps-description = Andre apper og terminaler får de samme fargene
 
@@ -264,3 +260,7 @@ settings-accessibility-flash = Blink ved varsellyder
 settings-accessibility-flash-type = Blink
 settings-accessibility-flash-window = Vindu
 settings-accessibility-flash-screen = Skjerm
+
+## Extensions
+
+settings-extensions-custom-color = Egendefinert

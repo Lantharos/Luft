@@ -44,21 +44,6 @@ settings-appearance-wallpaper-tile = Popločaj
 settings-appearance-wallpaper-span = Preko svih zaslona
 settings-appearance-wallpaper-battery = Reproduciraj videozapise na bateriji
 settings-appearance-wallpaper-battery-description = Inače se videopozadine pauziraju dok ne priključite napajanje
-settings-appearance-rain = Kiša
-settings-appearance-rain-description = Kiša pada preko pozadine i prska po prozorima i traci zadataka, ili se čuje dok radiš
-settings-appearance-rain-intensity = Koliko jako pada kiša
-settings-appearance-rain-drizzle = Rosulja
-settings-appearance-rain-rain = Kiša
-settings-appearance-rain-storm = Oluja
-settings-appearance-rain-color = Boja
-settings-appearance-rain-water = Voda
-settings-appearance-rain-accent = Boja isticanja
-settings-appearance-rain-custom = Prilagođena
-settings-appearance-rain-visible = Prikaži na radnoj površini
-settings-appearance-rain-visible-description = Kapi padaju na prozore i traku zadataka
-settings-appearance-rain-sound = Zvuk
-settings-appearance-rain-sound-description = Snimljena kiša, uz grmljavinu u olujama. Svira i iza prozora
-settings-appearance-rain-volume = Glasnoća kiše
 
 ## Appearance: app icons
 
@@ -278,3 +263,7 @@ settings-accessibility-flash = Bljesak za zvučna upozorenja
 settings-accessibility-flash-type = Bljesak
 settings-accessibility-flash-window = Prozor
 settings-accessibility-flash-screen = Zaslon
+
+## Extensions
+
+settings-extensions-custom-color = Prilagođena

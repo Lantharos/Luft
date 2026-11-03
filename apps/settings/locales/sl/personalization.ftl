@@ -18,10 +18,6 @@ settings-appearance-accent = Barva poudarka
 settings-appearance-accent-wallpaper = Ozadje
 settings-appearance-accent-white = Bela
 settings-appearance-accent-custom = Po meri
-settings-appearance-rain-color = Barva
-settings-appearance-rain-water = Voda
-settings-appearance-rain-accent = Barva poudarka
-settings-appearance-rain-custom = Po meri
 settings-appearance-theme-apps = Prilagodi druge aplikacije ozadju
 settings-appearance-theme-apps-description = Druge aplikacije in terminali prevzamejo enake barve
 
@@ -270,3 +266,7 @@ settings-accessibility-flash = Utripanje ob opozorilnih zvokih
 settings-accessibility-flash-type = Utripa
 settings-accessibility-flash-window = Okno
 settings-accessibility-flash-screen = Zaslon
+
+## Extensions
+
+settings-extensions-custom-color = Po meri

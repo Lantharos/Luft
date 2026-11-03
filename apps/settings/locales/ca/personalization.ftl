@@ -18,10 +18,6 @@ settings-appearance-accent = Color d’èmfasi
 settings-appearance-accent-wallpaper = Fons de pantalla
 settings-appearance-accent-white = Blanc
 settings-appearance-accent-custom = Personalitzat
-settings-appearance-rain-color = Color
-settings-appearance-rain-water = Aigua
-settings-appearance-rain-accent = Color d’èmfasi
-settings-appearance-rain-custom = Personalitzat
 settings-appearance-theme-apps = Adapta les altres aplicacions al fons de pantalla
 settings-appearance-theme-apps-description = Les altres aplicacions i els terminals prenen els mateixos colors
 
@@ -264,3 +260,7 @@ settings-accessibility-flash = Parpelleig amb els sons d’alerta
 settings-accessibility-flash-type = Parpelleig
 settings-accessibility-flash-window = Finestra
 settings-accessibility-flash-screen = Pantalla
+
+## Extensions
+
+settings-extensions-custom-color = Personalitzat

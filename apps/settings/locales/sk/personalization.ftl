@@ -18,10 +18,6 @@ settings-appearance-accent = Farba zvýraznenia
 settings-appearance-accent-wallpaper = Pozadie
 settings-appearance-accent-white = Biela
 settings-appearance-accent-custom = Vlastná
-settings-appearance-rain-color = Farba
-settings-appearance-rain-water = Voda
-settings-appearance-rain-accent = Farba zvýraznenia
-settings-appearance-rain-custom = Vlastná
 settings-appearance-theme-apps = Prispôsobiť ostatné aplikácie pozadiu
 settings-appearance-theme-apps-description = Ostatné aplikácie a terminály prevezmú rovnaké farby
 
@@ -270,3 +266,7 @@ settings-accessibility-flash = Bliknúť pri zvukových upozorneniach
 settings-accessibility-flash-type = Bliká
 settings-accessibility-flash-window = Okno
 settings-accessibility-flash-screen = Obrazovka
+
+## Extensions
+
+settings-extensions-custom-color = Vlastná

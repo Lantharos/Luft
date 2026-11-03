@@ -44,21 +44,6 @@ settings-appearance-wallpaper-tile = Pllaka
 settings-appearance-wallpaper-span = Shtrij në të gjitha ekranet
 settings-appearance-wallpaper-battery = Luaj videot me bateri
 settings-appearance-wallpaper-battery-description = Përndryshe sfondet video ndalen derisa ta lidhësh në korrent
-settings-appearance-rain = Shi
-settings-appearance-rain-description = Shiu bie mbi sfondin dhe spërkat mbi dritaret dhe shiritin e detyrave, ose dëgjohet ndërsa punon
-settings-appearance-rain-intensity = Sa fort bie shiu
-settings-appearance-rain-drizzle = Vesë
-settings-appearance-rain-rain = Shi
-settings-appearance-rain-storm = Stuhi
-settings-appearance-rain-color = Ngjyra
-settings-appearance-rain-water = Ujë
-settings-appearance-rain-accent = Ngjyra e theksit
-settings-appearance-rain-custom = E personalizuar
-settings-appearance-rain-visible = Shfaqe në desktop
-settings-appearance-rain-visible-description = Pikat bien mbi dritaret dhe shiritin e detyrave
-settings-appearance-rain-sound = Zëri
-settings-appearance-rain-sound-description = Shi i regjistruar, me bubullima në stuhi. Vazhdon edhe pas dritareve
-settings-appearance-rain-volume = Volumi i shiut
 
 ## Appearance: app icons
 
@@ -275,3 +260,7 @@ settings-accessibility-flash = Ndriço për tingujt e sinjalizimit
 settings-accessibility-flash-type = Ndriçimi
 settings-accessibility-flash-window = Dritarja
 settings-accessibility-flash-screen = Ekrani
+
+## Extensions
+
+settings-extensions-custom-color = E personalizuar

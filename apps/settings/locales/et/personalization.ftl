@@ -263,18 +263,7 @@ settings-accessibility-flash = Vilkumine märguandehelide korral
 settings-accessibility-flash-type = Vilkumine
 settings-accessibility-flash-window = Aken
 settings-accessibility-flash-screen = Ekraan
-settings-appearance-rain = Vihm
-settings-appearance-rain-description = Vihm sajab taustapildile ja protsib akendele ja tegumiribale või sinu töötamise ajal esitab heli
-settings-appearance-rain-intensity = Kui tugev peaks vihm olema
-settings-appearance-rain-drizzle = Uduvihm
-settings-appearance-rain-rain = Vihm
-settings-appearance-rain-storm = Torm
-settings-appearance-rain-color = Värv
-settings-appearance-rain-water = Vesi
-settings-appearance-rain-accent = Rõhuvärv
-settings-appearance-rain-custom = Kohandatud
-settings-appearance-rain-visible = Näita töölaual
-settings-appearance-rain-visible-description = Vihmapiisad sajavad akendele ja tegumiribale
-settings-appearance-rain-sound = Heli
-settings-appearance-rain-sound-description = Salvestatud vihm, tormis ka äikesega. Jätkab esitamist ka avatud akende taga
-settings-appearance-rain-volume = Vihma valjus
+
+## Extensions
+
+settings-extensions-custom-color = Kohandatud

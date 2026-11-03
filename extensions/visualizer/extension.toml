@@ -1,0 +1,49 @@
+id = "com.lantharos.Visualizer"
+name = "Visualizer"
+description = "A soft glow along the bottom of the desktop that moves with whatever is playing."
+version = "1.0.0"
+api = 1
+permissions = ["wallpaper", "audio-levels"]
+
+[[settings]]
+key = "style"
+type = "choice"
+label = "style"
+default = "glow"
+page = "appearance"
+options = [
+  { value = "glow", label = "glow", image = "previews/glow.webp" },
+  { value = "wave", label = "wave", image = "previews/wave.webp" },
+  { value = "bars", label = "bars", image = "previews/bars.webp" },
+]
+
+[[settings]]
+key = "color"
+type = "color"
+label = "color"
+default = "wallpaper"
+swatches = [
+  { value = "wallpaper", label = "wallpaper" },
+  { value = "accent", label = "accent" },
+  { value = "#f4ede2", label = "warm-white" },
+]
+
+[[settings]]
+key = "intensity"
+type = "slider"
+label = "intensity"
+default = 0.6
+min = 0.1
+max = 1
+step = 0.05
+unit = "percent"
+
+[[settings]]
+key = "displays"
+type = "choice"
+label = "displays"
+default = "all"
+options = [
+  { value = "all", label = "every-display" },
+  { value = "primary", label = "main-display" },
+]

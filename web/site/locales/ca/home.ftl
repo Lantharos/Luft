@@ -1,3 +1,4 @@
+home-title = Luft OS – un escriptori tranquil i ràpid per al vostre PC
 home-description = Un escriptori tranquil i ràpid per al vostre PC. Proveu-lo des de Windows o Linux amb un sol reinici, sense memòria USB.
 home-get = Obtén Luft
 home-look = Fes-hi una ullada

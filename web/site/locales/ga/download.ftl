@@ -1,4 +1,4 @@
-download-title = Íoslódáil Luft
+download-title = Íoslódáil Luft OS
 download-description = Bain triail as Luft nó suiteáil é ó Windows nó Linux le Meet Luft, nó íoslódáil an ISO do chipín USB.
 download-heading = Faigh Luft
 download-lede = Saor in aisce, d’aon ríomhaire 64-giotán. Tosaigh ón gcóras atá agat, nó ó chipín USB.

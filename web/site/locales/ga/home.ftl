@@ -1,3 +1,4 @@
+home-title = Luft OS – deasc shocair, sciobtha do do ríomhaire
 home-description = Deasc shocair, sciobtha do do ríomhaire. Bain triail as ó Windows nó Linux le hatosú amháin, gan chipín USB.
 home-get = Faigh Luft
 home-look = Féach air

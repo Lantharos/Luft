@@ -1,6 +1,6 @@
 ## The download page, and the download buttons on the home page
 
-download-title = Luft downloaden
+download-title = Luft OS downloaden
 download-description = Probeer of installeer Luft vanuit Windows of Linux met Meet Luft, of download de iso voor een usb-stick.
 download-heading = Luft downloaden
 download-lede = Gratis, voor elke 64-bit-pc. Begin vanuit het systeem dat je hebt, of vanaf een usb-stick.

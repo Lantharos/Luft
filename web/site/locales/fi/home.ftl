@@ -1,5 +1,6 @@
 ## The home page of luft.computer
 
+home-title = Luft OS – rauhallinen ja nopea työpöytä PC:llesi
 home-description = Rauhallinen ja nopea työpöytä PC:llesi. Kokeile sitä Windowsista tai Linuxista yhdellä uudelleenkäynnistyksellä, ilman USB-tikkua.
 home-get = Hanki Luft
 home-look = Katso lähemmin

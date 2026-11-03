@@ -1,6 +1,6 @@
 ## The download page, and the download buttons on the home page
 
-download-title = Luft’u indir
+download-title = Luft OS’u indir
 download-description = Luft’u Meet Luft ile Windows’tan ya da Linux’tan deneyin veya yükleyin, ya da USB bellek için ISO’yu indirin.
 download-heading = Luft’u edinin
 download-lede = Ücretsiz, her 64 bit bilgisayar için. Mevcut sisteminizden ya da bir USB bellekten başlayın.

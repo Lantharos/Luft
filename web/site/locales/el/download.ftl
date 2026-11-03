@@ -1,6 +1,6 @@
 ## The download page, and the download buttons on the home page
 
-download-title = Λήψη του Luft
+download-title = Λήψη του Luft OS
 download-description = Δοκιμάστε ή εγκαταστήστε το Luft από τα Windows ή το Linux με το Meet Luft, ή κατεβάστε το ISO για ένα στικ USB.
 download-heading = Αποκτήστε το Luft
 download-lede = Δωρεάν, για κάθε υπολογιστή 64 bit. Ξεκινήστε από το σύστημα που έχετε ή από ένα στικ USB.

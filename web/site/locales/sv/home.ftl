@@ -1,5 +1,6 @@
 ## The home page of luft.computer
 
+home-title = Luft OS – ett lugnt, snabbt skrivbord för din dator
 home-description = Ett lugnt, snabbt skrivbord för din dator. Prova det från Windows eller Linux med en omstart, inget USB-minne behövs.
 home-get = Hämta Luft
 home-look = Ta en titt

@@ -41,7 +41,7 @@ const { t, href } = localize(Astro);
 		<h1 class="enter text-display font-semibold">Luft</h1>
 		<p class="enter mt-6 max-w-xl text-lede text-ink-soft" style="--order: 1">{t('home-description')}</p>
 		<div class="enter mt-9 flex flex-wrap justify-center gap-3" style="--order: 2">
-			<a href={href('download')} class="button bg-ink text-canvas hover:bg-ink/88">{t('home-get')}</a>
+			<a href={href('download')} class="button bg-ink text-canvas hover:bg-ink/88">{t('home-get')}</a>{' '}
 			<a href="#tour" class="button button-quiet">{t('home-look')}</a>
 		</div>
 	</div>

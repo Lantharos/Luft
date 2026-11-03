@@ -1,5 +1,6 @@
 ## The home page of luft.computer
 
+home-title = Luft OS – nyugodt, gyors asztali környezet a számítógépére
 home-description = Nyugodt, gyors asztali környezet a számítógépére. Próbálja ki Windowsról vagy Linuxról egyetlen újraindítással, pendrive nélkül.
 home-get = A Luft beszerzése
 home-look = Körülnézés

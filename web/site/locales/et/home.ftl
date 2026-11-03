@@ -1,5 +1,6 @@
 ## The home page of luft.computer
 
+home-title = Luft OS – rahulik ja kiire töölaud sinu arvutile
 home-description = Rahulik ja kiire töölaud sinu arvutile. Proovi seda Windowsist või Linuxist ühe taaskäivitusega, ilma USB-mälupulgata.
 home-get = Hangi Luft
 home-look = Vaata lähemalt

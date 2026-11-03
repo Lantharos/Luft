@@ -1,6 +1,6 @@
 ## The download page, and the download buttons on the home page
 
-download-title = Lataa Luft
+download-title = Lataa Luft OS
 download-description = Kokeile tai asenna Luft Windowsista tai Linuxista Meet Luftilla, tai lataa ISO-tiedosto USB-tikkua varten.
 download-heading = Hanki Luft
 download-lede = Ilmainen, mille tahansa 64-bittiselle PC:lle. Aloita nykyisestä järjestelmästäsi tai USB-tikulta.

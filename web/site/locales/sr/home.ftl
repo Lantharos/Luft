@@ -1,5 +1,6 @@
 ## The home page of luft.computer
 
+home-title = Luft OS – мирна и брза радна површина за ваш рачунар
 home-description = Мирна и брза радна површина за ваш рачунар. Испробајте је из система Windows или Linux уз једно поновно покретање, без USB флеша.
 home-get = Преузми Luft
 home-look = Погледај

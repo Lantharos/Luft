@@ -1,5 +1,6 @@
 ## The home page of luft.computer
 
+home-title = Luft OS – spokojny, szybki pulpit dla twojego komputera
 home-description = Spokojny, szybki pulpit dla twojego komputera. Wypróbuj go z systemu Windows lub Linux po jednym ponownym uruchomieniu, bez pamięci USB.
 home-get = Pobierz Luft
 home-look = Zobacz, jak wygląda

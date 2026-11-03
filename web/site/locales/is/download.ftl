@@ -1,4 +1,4 @@
-download-title = Sækja Luft
+download-title = Sækja Luft OS
 download-description = Prófaðu eða settu upp Luft úr Windows eða Linux með Meet Luft, eða sæktu ISO-skrána fyrir USB-lykil.
 download-heading = Náðu í Luft
 download-lede = Ókeypis, fyrir allar 64 bita tölvur. Byrjaðu í kerfinu sem þú ert með, eða á USB-lykli.

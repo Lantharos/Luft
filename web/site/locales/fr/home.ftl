@@ -1,3 +1,4 @@
+home-title = Luft OS – un bureau calme et rapide pour votre PC
 home-description = Un bureau calme et rapide pour votre PC. Essayez-le depuis Windows ou Linux en un seul redémarrage, sans clé USB.
 home-get = Obtenir Luft
 home-look = Découvrir

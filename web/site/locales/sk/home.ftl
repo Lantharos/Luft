@@ -1,5 +1,6 @@
 ## The home page of luft.computer
 
+home-title = Luft OS – pokojné a rýchle prostredie pre váš počítač
 home-description = Pokojné a rýchle prostredie pre váš počítač. Vyskúšajte ho z Windows alebo Linuxu po jednom reštarte, bez USB kľúča.
 home-get = Stiahnuť Luft
 home-look = Pozrieť sa

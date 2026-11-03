@@ -1,6 +1,7 @@
 ## The home page of luft.computer
 
 # Shown under the big "Luft" and in search results
+home-title = Luft OS – a calm, quick desktop for your PC
 home-description = A calm, quick desktop for your PC. Try it from Windows or Linux with one restart, no USB stick needed.
 home-get = Get Luft
 # Scrolls down to the screenshots

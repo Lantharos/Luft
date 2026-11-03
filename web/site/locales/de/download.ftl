@@ -1,6 +1,6 @@
 ## The download page, and the download buttons on the home page
 
-download-title = Luft herunterladen
+download-title = Luft OS herunterladen
 download-description = Probier Luft unter Windows oder Linux mit Meet Luft aus oder installier es, oder lade die ISO für einen USB-Stick herunter.
 download-heading = Luft holen
 download-lede = Kostenlos, für jeden 64-Bit-PC. Starte mit dem System, das du hast, oder von einem USB-Stick.

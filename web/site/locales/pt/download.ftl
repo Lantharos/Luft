@@ -1,4 +1,4 @@
-download-title = Transferir o Luft
+download-title = Transferir o Luft OS
 download-description = Experimente ou instale o Luft a partir do Windows ou do Linux com o Meet Luft, ou transfira a ISO para uma pen USB.
 download-heading = Obter o Luft
 download-lede = Gratuito, para qualquer PC de 64 bits. Comece a partir do sistema que já tem, ou de uma pen USB.

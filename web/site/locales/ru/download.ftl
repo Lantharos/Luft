@@ -1,6 +1,6 @@
 ## The download page, and the download buttons on the home page
 
-download-title = Скачать Luft
+download-title = Скачать Luft OS
 download-description = Попробуйте или установите Luft из Windows или Linux с помощью Meet Luft либо скачайте ISO-образ для USB-накопителя.
 download-heading = Получите Luft
 download-lede = Бесплатно, для любого 64-битного ПК. Начните с системы, которая у вас есть, или с USB-накопителя.

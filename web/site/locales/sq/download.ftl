@@ -1,6 +1,6 @@
 ## The download page, and the download buttons on the home page
 
-download-title = Shkarko Luft
+download-title = Shkarko Luft OS
 download-description = Provo ose instalo Luft nga Windows ose Linux me Meet Luft, ose shkarko ISO-n për një memorie USB.
 download-heading = Merr Luft
 download-lede = Falas, për çdo PC 64-bit. Nis nga sistemi që ke, ose nga një memorie USB.

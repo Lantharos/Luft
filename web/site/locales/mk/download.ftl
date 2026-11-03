@@ -1,6 +1,6 @@
 ## The download page, and the download buttons on the home page
 
-download-title = Преземете Luft
+download-title = Преземете Luft OS
 download-description = Пробајте го или инсталирајте го Luft од Windows или Linux со Meet Luft, или преземете ISO за USB-меморија.
 download-heading = Преземете Luft
 download-lede = Бесплатно, за секој 64-битен компјутер. Почнете од системот што го имате или од USB-меморија.

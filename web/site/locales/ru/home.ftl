@@ -1,5 +1,6 @@
 ## The home page of luft.computer
 
+home-title = Luft OS – спокойная и быстрая среда для вашего ПК
 home-description = Спокойная и быстрая среда для вашего ПК. Попробуйте её прямо из Windows или Linux после одной перезагрузки, без USB-накопителя.
 home-get = Скачать Luft
 home-look = Посмотреть

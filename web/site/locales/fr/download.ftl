@@ -1,4 +1,4 @@
-download-title = Télécharger Luft
+download-title = Télécharger Luft OS
 download-description = Essayez ou installez Luft depuis Windows ou Linux avec Meet Luft, ou téléchargez l’ISO pour une clé USB.
 download-heading = Obtenir Luft
 download-lede = Gratuit, pour tout PC 64 bits. Partez du système que vous avez, ou d’une clé USB.

@@ -1,6 +1,6 @@
 ## The download page, and the download buttons on the home page
 
-download-title = Завантажити Luft
+download-title = Завантажити Luft OS
 download-description = Спробуйте або встановіть Luft з Windows чи Linux за допомогою Meet Luft або завантажте ISO-образ для USB-накопичувача.
 download-heading = Отримайте Luft
 download-lede = Безкоштовно, для будь-якого 64-розрядного ПК. Почніть із системи, яку маєте, або з USB-накопичувача.

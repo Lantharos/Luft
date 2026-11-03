@@ -1,7 +1,7 @@
 ## The download page, and the download buttons on the home page
 
 # Browser tab title
-download-title = Download Luft
+download-title = Download Luft OS
 download-description = Try or install Luft from Windows or Linux with Meet Luft, or download the ISO for a USB stick.
 download-heading = Get Luft
 download-lede = Free, for any 64-bit PC. Start from the system you have, or from a USB stick.

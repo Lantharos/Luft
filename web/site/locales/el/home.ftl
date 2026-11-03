@@ -1,5 +1,6 @@
 ## The home page of luft.computer
 
+home-title = Luft OS – μια ήρεμη, γρήγορη επιφάνεια εργασίας για τον υπολογιστή σας
 home-description = Μια ήρεμη, γρήγορη επιφάνεια εργασίας για τον υπολογιστή σας. Δοκιμάστε την από τα Windows ή το Linux με μία επανεκκίνηση, χωρίς στικ USB.
 home-get = Λήψη Luft
 home-look = Ρίξτε μια ματιά

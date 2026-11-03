@@ -1,5 +1,6 @@
 ## The home page of luft.computer
 
+home-title = Luft OS – mierīga, ātra darbvirsma jūsu datoram
 home-description = Mierīga, ātra darbvirsma jūsu datoram. Izmēģiniet to no Windows vai Linux ar vienu restartēšanu, bez USB zibatmiņas.
 home-get = Iegūt Luft
 home-look = Apskatīt

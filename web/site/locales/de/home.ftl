@@ -1,5 +1,6 @@
 ## The home page of luft.computer
 
+home-title = Luft OS – ein ruhiger, schneller Desktop für deinen PC
 home-description = Ein ruhiger, schneller Desktop für deinen PC. Probier ihn unter Windows oder Linux mit einem Neustart aus, ganz ohne USB-Stick.
 home-get = Luft holen
 home-look = Ansehen

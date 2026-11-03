@@ -1,6 +1,6 @@
 ## The download page, and the download buttons on the home page
 
-download-title = Lejupielādēt Luft
+download-title = Lejupielādēt Luft OS
 download-description = Izmēģiniet vai instalējiet Luft no Windows vai Linux ar Meet Luft vai lejupielādējiet ISO USB zibatmiņai.
 download-heading = Iegūt Luft
 download-lede = Bezmaksas, jebkuram 64 bitu datoram. Sāciet no esošās sistēmas vai no USB zibatmiņas.

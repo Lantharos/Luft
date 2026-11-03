@@ -1,6 +1,6 @@
 ## The download page, and the download buttons on the home page
 
-download-title = A Luft letöltése
+download-title = A Luft OS letöltése
 download-description = Próbálja ki vagy telepítse a Luftot Windowsról vagy Linuxról a Meet Lufttal, vagy töltse le az ISO-t egy pendrive-hoz.
 download-heading = A Luft beszerzése
 download-lede = Ingyenes, bármilyen 64 bites PC-re. Induljon a meglévő rendszeréből vagy pendrive-ról.

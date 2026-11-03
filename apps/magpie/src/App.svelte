@@ -17,11 +17,14 @@
 	import { library } from '#lib/library/library.svelte.js';
 	import { folderTitle } from '#lib/library/places.js';
 	import { thumbnails } from '#lib/library/thumbnails.svelte.js';
+	import MusicActions from '#lib/music/MusicActions.svelte';
 	import MusicView from '#lib/music/MusicView.svelte';
 	import NowPlaying from '#lib/music/NowPlaying.svelte';
 	import { player } from '#lib/music/player.svelte.js';
 	import { trackTitle } from '#lib/music/queue.js';
 	import QueueList from '#lib/music/QueueList.svelte';
+	import { visualizer } from '#lib/music/visualizer/settings.svelte.js';
+	import Visualizer from '#lib/music/visualizer/Visualizer.svelte';
 	import PhotoActions from '#lib/photo/PhotoActions.svelte';
 	import { slideshow } from '#lib/photo/slideshow.svelte.js';
 	import { mediaSession } from '#lib/playback/session.js';
@@ -36,6 +39,7 @@
 	let item = $derived(library.current);
 	let viewer = $derived(chrome.mode === 'viewer');
 	let immersive = $derived(chrome.fullscreen || slideshow.running || chrome.watching);
+	let listening = $derived(library.group === 'audio' && chrome.fullscreen);
 	let browsing = $derived(!item && chrome.mode === 'library' && library.folder !== null);
 	let title = $derived.by(() => {
 		if (library.group === 'audio' && player.track) return player.track.album ?? trackTitle(player.track);
@@ -52,6 +56,7 @@
 
 	onMount(() => {
 		volume.start();
+		visualizer.start();
 		chrome.wake();
 		const stops = [
 			events.magpieFolder(library.receive),
@@ -93,16 +98,19 @@
 		<main
 			class={[
 				'glass-content relative isolate',
-				library.group === 'visual' && 'stage',
+				(library.group === 'visual' || listening) && 'stage',
 				chrome.seeThrough && 'see-through',
 				chrome.idle && 'idle',
 				immersive && 'immersive'
 			]}
 		>
+			{#if item && library.group === 'audio' && visualizer.on}
+				<Visualizer />
+			{/if}
 			<Header {title} {subtitle} overlay={chrome.fullscreen}>
 				{#snippet actions()}
 					<NowPlaying />
-					{#if viewer && library.group && library.group !== 'font'}
+					{#if viewer && library.group && library.group !== 'font' && !listening}
 						<PanelToggle group={library.group} />
 					{/if}
 					{#if item?.kind === 'image'}
@@ -111,6 +119,8 @@
 						<DocumentActions />
 					{:else if library.group === 'font'}
 						<FontActions />
+					{:else if library.group === 'audio'}
+						<MusicActions />
 					{:else if item}
 						<MoreMenu />
 					{/if}
@@ -120,7 +130,7 @@
 				{#if item && library.group === 'visual'}
 					<VisualStage {item} />
 				{:else if item && library.group === 'audio'}
-					{#if viewer && chrome.panel}
+					{#if viewer && chrome.panel && !listening}
 						<SidePanel label="Queue"><QueueList /></SidePanel>
 					{/if}
 					<div class="min-w-0 flex-1"><MusicView {item} /></div>

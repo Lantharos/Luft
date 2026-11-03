@@ -17,7 +17,7 @@ export { default as TextField } from './controls/TextField.svelte';
 export { default as ConfirmDialog } from './dialogs/ConfirmDialog.svelte';
 export { default as Dialog } from './dialogs/Dialog.svelte';
 
-export { Curve, Gesture, projection, rubberband, Spring, SpringValue, type SpringToken } from './motion';
+export { Curve, Gesture, motionPreference, projection, rubberband, Spring, SpringValue, type SpringToken } from './motion';
 
 export { default as AppIcon } from './media/AppIcon.svelte';
 export { default as Avatar } from './media/Avatar.svelte';

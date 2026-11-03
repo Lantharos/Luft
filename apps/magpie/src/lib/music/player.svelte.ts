@@ -32,6 +32,11 @@ class Player implements MediaOwner {
 	#handoff: ReturnType<typeof setTimeout> | undefined;
 	#serial = 0;
 
+	get decks(): readonly HTMLAudioElement[] {
+		this.#ensureDecks();
+		return this.#decks;
+	}
+
 	get #current() {
 		return this.#decks[this.#active];
 	}
@@ -185,6 +190,7 @@ class Player implements MediaOwner {
 		this.#decks = [new Audio(), new Audio()];
 		this.#decks.forEach((deck, index) => {
 			deck.preload = 'auto';
+			deck.crossOrigin = 'anonymous';
 			for (const event of EVENTS) deck.addEventListener(event, () => index === this.#active && this.#event(event));
 		});
 		this.applyVolume();

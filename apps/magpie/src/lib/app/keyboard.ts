@@ -1,6 +1,7 @@
 import { documentState } from '#lib/document/state.svelte.js';
 import { library } from '#lib/library/library.svelte.js';
 import { player } from '#lib/music/player.svelte.js';
+import { visualizer } from '#lib/music/visualizer/settings.svelte.js';
 import { activePhoto } from '#lib/photo/active.svelte.js';
 import { copyImage } from '#lib/photo/clipboard.js';
 import { slideshow } from '#lib/photo/slideshow.svelte.js';
@@ -72,6 +73,7 @@ function music(event: KeyboardEvent, primary: boolean) {
 	else if (key === 'ArrowDown') volume.level = Math.max(0, volume.level - VOLUME_STEP);
 	else if (key === 'm') volume.muted = !volume.muted;
 	else if (key === 's') player.setShuffle(!player.shuffle);
+	else if (key === 'v') visualizer.toggle();
 	else return false;
 	return true;
 }

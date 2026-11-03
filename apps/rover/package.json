@@ -2,7 +2,7 @@
 	"name": "rover",
 	"version": "0.1.0",
 	"dependencies": {
-		"@lantharos/sabine": "github:Lantharos/Sabine#v0.73"
+		"@lantharos/sabine": "github:Lantharos/Sabine#v0.74"
 	},
 	"devDependencies": {
 		"@lucide/svelte": "^1.51.0",

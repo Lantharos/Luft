@@ -53,10 +53,10 @@ build_layer_parts() {
   base="$(</usr/share/luft/base-image)"
   podman_options=()
   snapshot_tree
-  while read -r name ref; do
+  while read -r -u 3 name ref; do
     part_exists "$ref" || build_part "$name" "$ref"
     extract_part "$name" "$ref"
-  done < <(part_refs "$@")
+  done 3< <(part_refs "$@")
 }
 
 missing_libraries() {

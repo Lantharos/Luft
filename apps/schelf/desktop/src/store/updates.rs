@@ -1,5 +1,6 @@
 use luft_app::block_on;
 use luft_software::apps::flatpak;
+use luft_software::http::MISSING;
 use serde::Serialize;
 use specta::Type;
 
@@ -55,7 +56,10 @@ async fn full_access(installed: &Installed) -> bool {
 }
 
 fn update(id: String, installed: Installed) -> Result<Option<StoreUpdate>, String> {
-    let listing = listing::fetch(&id, Age::Current)?;
+    let listing = match listing::fetch(&id, Age::Current) {
+        Err(error) if error == MISSING => return Ok(None),
+        listing => listing?,
+    };
     let Some(Offer { release, artifact, .. }) = listing.release(&channel::followed(&id)) else {
         return Ok(None);
     };

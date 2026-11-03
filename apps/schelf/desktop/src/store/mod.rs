@@ -13,6 +13,7 @@ use std::collections::BTreeMap;
 
 use luft_app::{Commands, Empty, block_on};
 use luft_software::apps::appimage;
+use luft_software::http::MISSING;
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use specta::Type;
@@ -127,7 +128,13 @@ fn refresh() -> Result<StoreState, String> {
 }
 
 fn details(id: &str) -> Result<StoreDetails, String> {
-    listing::fetch(id, Age::Within(std::time::Duration::from_secs(60))).map(StoreDetails::from)
+    match listing::fetch(id, Age::Within(std::time::Duration::from_secs(60))) {
+        Ok(listing) => Ok(StoreDetails::from(listing)),
+        Err(error) if error == MISSING => record::get(id)
+            .map(|installed| StoreDetails::gone(id, installed))
+            .ok_or(error),
+        Err(error) => Err(error),
+    }
 }
 
 fn entry(id: &str) -> Result<Option<CatalogApp>, String> {

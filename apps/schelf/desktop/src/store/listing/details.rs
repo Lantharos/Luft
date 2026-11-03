@@ -5,6 +5,7 @@ use specta::Type;
 use super::{Declared, ExtensionAccess, Format, Listing, Provenance, Release, Screenshot, channel};
 use crate::store::catalog::Kind;
 use crate::store::device;
+use crate::store::record::Installed;
 
 /// A file to download for an app this computer can't install itself.
 #[derive(Serialize, Type)]
@@ -42,6 +43,41 @@ pub struct StoreDetails {
     pub extension: Option<ExtensionAccess>,
     pub access: Option<Permissions>,
     pub provenance: Option<Provenance>,
+    /// Whether its publisher took it off schelf.store, which offers no
+    /// releases of it any more. A copy you have keeps working.
+    pub withdrawn: bool,
+}
+
+impl StoreDetails {
+    /// The page of an app you have that schelf.store no longer has at all.
+    pub fn gone(id: &str, installed: Installed) -> Self {
+        Self {
+            id: id.to_owned(),
+            kind: installed.kind,
+            installer: None,
+            name: installed.name,
+            summary: String::new(),
+            description: String::new(),
+            icon: installed.icon,
+            screenshots: Vec::new(),
+            developer: String::new(),
+            verified: false,
+            homepage: None,
+            license: None,
+            channel: channel::followed(id),
+            channels: Vec::new(),
+            version: None,
+            published: None,
+            notes: String::new(),
+            size: None,
+            download: None,
+            declared: None,
+            extension: None,
+            access: None,
+            provenance: None,
+            withdrawn: true,
+        }
+    }
 }
 
 impl From<Listing> for StoreDetails {
@@ -68,6 +104,7 @@ impl From<Listing> for StoreDetails {
         if !channels.contains(&followed) {
             channels.push(followed.clone());
         }
+        let withdrawn = listing.releases.is_empty();
         let text = listing.text();
         let declared = release
             .as_ref()
@@ -107,6 +144,7 @@ impl From<Listing> for StoreDetails {
             screenshots: listing.screenshots,
             homepage: listing.homepage,
             license: listing.licence,
+            withdrawn,
         }
     }
 }

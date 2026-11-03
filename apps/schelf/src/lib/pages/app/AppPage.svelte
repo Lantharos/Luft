@@ -36,6 +36,7 @@
 	const summary = $derived(details?.summary ?? installed?.summary ?? known?.summary ?? '');
 	const sandboxed = $derived(installed?.source === 'appImage' || installed?.source === 'flatpak' ? installed : null);
 	const store = $derived(details?.store ?? null);
+	const withdrawn = $derived(installed !== null && store?.withdrawn === true);
 	const listing = $derived(loaded?.listing ?? known);
 	const block = $derived(installed?.listing ? (catalog.installed(installed.listing)?.block ?? null) : null);
 	const extension = $derived(store?.kind === 'extension' || installed?.source === 'extension' || known?.kind === 'extension');
@@ -87,8 +88,8 @@
 			{/if}
 			<div class="flex min-w-0 flex-1 flex-col gap-1">
 				<h2 class="truncate text-[26px] font-semibold">{title}</h2>
-				{#if details?.developer || from}
-					<span class="truncate text-[13px] text-[var(--text-muted)]">{[details?.developer, from].filter(Boolean).join(' · ')}</span>
+				{#if details?.developer || from || withdrawn}
+					<span class="truncate text-[13px] text-[var(--text-muted)]">{[details?.developer, from, withdrawn && 'No longer available on Schelf'].filter(Boolean).join(' · ')}</span>
 				{/if}
 				{#if summary}
 					<p class="text-[14px] text-[var(--text-soft)]">{summary}</p>

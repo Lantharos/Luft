@@ -492,6 +492,11 @@ export type StoreDetails = {
 	extension: ExtensionAccess | null,
 	access: Permissions | null,
 	provenance: Provenance | null,
+	/**
+	 *  Whether its publisher took it off schelf.store, which offers no
+	 *  releases of it any more. A copy you have keeps working.
+	 */
+	withdrawn: boolean,
 };
 
 export type StoreState = {

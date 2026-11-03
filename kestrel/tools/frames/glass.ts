@@ -44,9 +44,7 @@ async function openBlurredWindow() {
 
 const titled = (prefix: string) => (window: Meta.Window) => window.get_title()?.startsWith(prefix);
 
-const slide = (title: string) => async (recorder: FrameRecorder) => {
-  const window = findWindow(titled(title));
-  if (!window) throw new Error(`No window titled ${title} is open`);
+export async function slideWindow(window: Meta.Window, recorder: FrameRecorder) {
   const area = Main.layoutManager.getWorkAreaForMonitor(Main.layoutManager.primaryIndex);
   const frame = window.get_frame_rect();
   const travel = area.width - frame.width;
@@ -54,6 +52,12 @@ const slide = (title: string) => async (recorder: FrameRecorder) => {
   recorder.start();
   await eachFrame(MOVE_FRAMES, step => window.move_frame(true, area.x + Math.round(travel * (0.5 - 0.5 * Math.cos(2 * Math.PI * step / MOVE_FRAMES))), y));
   await recorder.quiet();
+}
+
+const slide = (title: string) => (recorder: FrameRecorder) => {
+  const window = findWindow(titled(title));
+  if (!window) throw new Error(`No window titled ${title} is open`);
+  return slideWindow(window, recorder);
 };
 
 export const glassInteractions: Interaction[] = [

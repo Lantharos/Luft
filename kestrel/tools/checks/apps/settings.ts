@@ -7,6 +7,7 @@ import {checkFonts} from './settings/look/fonts.js';
 import {checkHardware} from './settings/system/hardware.js';
 import {checkLive} from './settings/live.js';
 import {checkPages} from './settings/pages.js';
+import {checkSeeThrough} from './settings/look/seeThrough.js';
 import {checkTiling} from './settings/look/tiling.js';
 import {checkLongSleep} from './settings/system/power.js';
 import {checkTaskbarLooks, checkTaskbarPositions} from './settings/look/taskbar.js';
@@ -22,6 +23,7 @@ export async function run() {
       await checkTaskbarLooks(app);
       await checkTaskbarPositions(app);
       await checkTiling(app);
+      await checkSeeThrough(app);
       await showDark(app, palette);
       await checkAccessibility(app);
       await checkLive(app);

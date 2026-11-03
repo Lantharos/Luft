@@ -11,6 +11,7 @@ import {boardInteractions} from '../frames/board.js';
 import {glassInteractions} from '../frames/glass.js';
 import {FrameRecorder, summarize, summarizeGpu, timelines, type Interaction, type Summary} from '../frames/recorder.js';
 import {popupInteractions} from '../frames/popups.js';
+import {seeThroughInteractions} from '../frames/seeThrough.js';
 import {printReport, saveReport, type Display, type Result} from '../frames/report.js';
 import {surfaceInteractions} from '../frames/surfaces.js';
 import {tilingInteractions} from '../frames/tiling.js';
@@ -89,7 +90,7 @@ export async function run() {
   interfaceSettings.set_boolean('cursor-blink', false);
   await openWindows();
   try {
-    const interactions: Interaction[] = [...surfaceInteractions, ...popupInteractions, ...glassInteractions, ...windowInteractions, ...boardInteractions, ...tilingInteractions];
+    const interactions: Interaction[] = [...surfaceInteractions, ...popupInteractions, ...glassInteractions, ...seeThroughInteractions, ...windowInteractions, ...boardInteractions, ...tilingInteractions];
     for (const interaction of selected(interactions.filter(measuredFirst), ({first}) => first))
       results[interaction.first] = await measure(interaction.first, () => measureRounds(interaction, screen.refreshRate, 1, 0));
     for (const interaction of selected(interactions, ({name}) => name))

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import Plus from '@lucide/svelte/icons/plus';
-	import { AppIcon, ItemRow, Row, Section, Slider, Switch } from '@luft/ui';
+	import { AppIcon, ItemRow, Row, Section, Segmented, Slider, Switch } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { App } from '#lib/bindings.js';
 	import { percent } from '#lib/format.js';
@@ -11,17 +11,22 @@
 	type SeeThrough = {
 		'see-through-apps': string[];
 		'see-through-opacity': number;
+		'see-through-shows': 'everything' | 'wallpaper';
 		'see-through-blur': boolean;
 		'see-through-keep-text': boolean;
 	};
 
-	const look = useSettings<SeeThrough>(KESTREL_SCHEMA, ['see-through-apps', 'see-through-opacity', 'see-through-blur', 'see-through-keep-text']);
+	const look = useSettings<SeeThrough>(KESTREL_SCHEMA, ['see-through-apps', 'see-through-opacity', 'see-through-shows', 'see-through-blur', 'see-through-keep-text']);
 
 	let installed = $state<App[]>([]);
 	let adding = $state(false);
 
 	let ids = $derived(look.values['see-through-apps'] ?? []);
 	let amount = $derived(1 - (look.values['see-through-opacity'] ?? 0.7));
+	let shows = $derived([
+		{ value: 'everything' as const, label: t('settings-see-through-shows-everything') },
+		{ value: 'wallpaper' as const, label: t('settings-see-through-shows-wallpaper') }
+	]);
 	let apps = $derived(ids.map((id) => installed.find((app) => app.id === id) ?? { id, name: id, icon: null }));
 
 	void commands.appsInstalled().then((list) => (installed = list));
@@ -52,6 +57,9 @@
 
 {#if apps.length}
 	<Section>
+		<Row title={t('settings-see-through-shows')}>
+			<Segmented label={t('settings-see-through-shows')} options={shows} value={look.values['see-through-shows'] ?? 'everything'} onchange={(value) => look.set('see-through-shows', value)} />
+		</Row>
 		<Row title={t('settings-see-through-amount')}>
 			<span class="w-11 text-right tabular-nums">{percent(amount)}</span>
 			{#snippet below()}

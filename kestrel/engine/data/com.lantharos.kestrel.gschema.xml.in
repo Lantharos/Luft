@@ -31,6 +31,11 @@
     <value nick="fullscreen" value="1"/>
   </enum>
 
+  <enum id="com.lantharos.kestrel.SeeThroughShows">
+    <value nick="everything" value="0"/>
+    <value nick="wallpaper" value="1"/>
+  </enum>
+
   <enum id="com.lantharos.kestrel.WeekStart">
     <value nick="automatic" value="0"/>
     <value nick="monday" value="1"/>
@@ -221,6 +226,10 @@
       <range min="0.2" max="0.95"/>
       <default>0.7</default>
       <summary>How much of a see-through window's background stays</summary>
+    </key>
+    <key name="see-through-shows" enum="com.lantharos.kestrel.SeeThroughShows">
+      <default>'everything'</default>
+      <summary>Whether see-through windows show everything behind them or only the desktop wallpaper</summary>
     </key>
     <key name="see-through-blur" type="b">
       <default>true</default>

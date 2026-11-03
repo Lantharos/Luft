@@ -32,6 +32,10 @@ settings-appearance-wallpaper-video = { $name }, vidéo
 settings-appearance-wallpaper-current = Fond d’écran actuel
 settings-appearance-wallpaper-empty = Les images et vidéos du dossier Wallpapers, dans vos Images, apparaissent ici.
 settings-appearance-wallpaper-add = Ajouter des fonds d’écran
+settings-appearance-wallpaper-count = { $count ->
+    [one] { $count } fond d’écran
+   *[other] { $count } fonds d’écran
+}
 settings-appearance-wallpaper-folder = Dossier Wallpapers
 settings-appearance-wallpaper-folder-description = Images › Wallpapers
 settings-appearance-wallpaper-fit-title = Ajustement

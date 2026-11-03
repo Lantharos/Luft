@@ -98,7 +98,7 @@ export const commands = {
 	appearanceWallpaperFocus: (params: {
 		path: string,
 	}, options?: CallOptions) => invoke<Focus>("appearance_wallpaper_focus", params, options),
-	appearanceWallpapers: (options?: CallOptions) => invoke<Wallpaper[]>("appearance_wallpapers", {}, options),
+	appearanceWallpapers: (options?: CallOptions) => invoke<Library>("appearance_wallpapers", {}, options),
 	appsDefaults: (options?: CallOptions) => invoke<Handler[]>("apps_defaults", {}, options),
 	appsDeviceSet: (params: {
 		app: string,
@@ -524,7 +524,7 @@ export const events = {
 	appearanceCursorInstall: (callback: (payload: InstallEvent) => void) => listen<InstallEvent>("appearance.cursorInstall", callback),
 	appearanceMotion: (callback: (payload: Motion) => void) => listen<Motion>("appearance.motion", callback),
 	appearanceTypography: (callback: (payload: Typography) => void) => listen<Typography>("appearance.typography", callback),
-	appearanceWallpapers: (callback: (payload: Wallpaper[]) => void) => listen<Wallpaper[]>("appearance.wallpapers", callback),
+	appearanceWallpapers: (callback: (payload: Library) => void) => listen<Library>("appearance.wallpapers", callback),
 	appsPermissions: (callback: (payload: AppAccess[]) => void) => listen<AppAccess[]>("apps.permissions", callback),
 	bluetoothCancel: (callback: (payload: null) => void) => listen<null>("bluetooth.cancel", callback),
 	bluetoothChanged: (callback: (payload: Bluetooth) => void) => listen<Bluetooth>("bluetooth.changed", callback),
@@ -1076,6 +1076,12 @@ export type Layout = {
 	custom: boolean,
 };
 
+export type Library = {
+	system: Wallpaper[],
+	wallpapers: Wallpaper[],
+	groups: WallpaperGroup[],
+};
+
 export type Link = "connected" | "connecting" | "disconnected" | "unplugged";
 
 export type Locale = {
@@ -1581,6 +1587,11 @@ export type Wallpaper = {
 	path: string,
 	name: string,
 	live: boolean,
+};
+
+export type WallpaperGroup = {
+	name: string,
+	wallpapers: Wallpaper[],
 };
 
 export type Wifi = {

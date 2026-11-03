@@ -32,6 +32,10 @@ settings-appearance-wallpaper-video = { $name }, videó
 settings-appearance-wallpaper-current = Jelenlegi háttérkép
 settings-appearance-wallpaper-empty = A Képek mappán belüli Wallpapers mappában lévő képek és videók itt jelennek meg.
 settings-appearance-wallpaper-add = Háttérképek hozzáadása
+settings-appearance-wallpaper-count = { $count ->
+    [one] { $count } háttérkép
+   *[other] { $count } háttérkép
+}
 settings-appearance-wallpaper-folder = Wallpapers mappa
 settings-appearance-wallpaper-folder-description = Képek › Wallpapers
 settings-appearance-wallpaper-fit-title = Igazítás

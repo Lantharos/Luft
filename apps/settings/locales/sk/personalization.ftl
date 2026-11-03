@@ -32,6 +32,12 @@ settings-appearance-wallpaper-video = { $name }, video
 settings-appearance-wallpaper-current = Aktuálne pozadie
 settings-appearance-wallpaper-empty = Tu sa zobrazia obrázky a videá z priečinka Wallpapers v priečinku Obrázky.
 settings-appearance-wallpaper-add = Pridať pozadia
+settings-appearance-wallpaper-count = { $count ->
+    [one] { $count } pozadie
+    [few] { $count } pozadia
+    [many] { $count } pozadia
+   *[other] { $count } pozadí
+}
 settings-appearance-wallpaper-folder = Priečinok Wallpapers
 settings-appearance-wallpaper-folder-description = Obrázky › Wallpapers
 settings-appearance-wallpaper-fit-title = Prispôsobenie
@@ -219,6 +225,9 @@ settings-see-through-app = Priehľadné: { $app }
 settings-see-through-add = Pridať aplikáciu
 settings-see-through-add-title = Spraviť aplikáciu priehľadnou
 settings-see-through-add-description = Jej okná nechajú presvitať to, čo je za nimi.
+settings-see-through-shows = Čo presvitá
+settings-see-through-shows-everything = Všetko za oknom
+settings-see-through-shows-wallpaper = Len pozadie
 settings-see-through-amount = Miera priehľadnosti
 settings-see-through-blur = Rozmazať pozadie
 settings-see-through-text = Ponechať text plný

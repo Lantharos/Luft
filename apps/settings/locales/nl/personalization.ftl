@@ -32,6 +32,10 @@ settings-appearance-wallpaper-video = { $name }, video
 settings-appearance-wallpaper-current = Huidige achtergrond
 settings-appearance-wallpaper-empty = Afbeeldingen en video’s in de map Wallpapers in je map Afbeeldingen verschijnen hier.
 settings-appearance-wallpaper-add = Achtergronden toevoegen
+settings-appearance-wallpaper-count = { $count ->
+    [one] { $count } achtergrond
+   *[other] { $count } achtergronden
+}
 settings-appearance-wallpaper-folder = Map Wallpapers
 settings-appearance-wallpaper-folder-description = Afbeeldingen › Wallpapers
 settings-appearance-wallpaper-fit-title = Passend maken

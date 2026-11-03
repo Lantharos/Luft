@@ -32,6 +32,10 @@ settings-appearance-wallpaper-video = { $name }, video
 settings-appearance-wallpaper-current = Gjeldande bakgrunnsbilete
 settings-appearance-wallpaper-empty = Bilete og videoar i mappa Wallpapers i Bilete blir viste her.
 settings-appearance-wallpaper-add = Legg til bakgrunnsbilete
+settings-appearance-wallpaper-count = { $count ->
+    [one] { $count } bakgrunnsbilete
+   *[other] { $count } bakgrunnsbilete
+}
 settings-appearance-wallpaper-folder = Mappa Wallpapers
 settings-appearance-wallpaper-folder-description = Bilete › Wallpapers
 settings-appearance-wallpaper-fit-title = Tilpassing

@@ -32,6 +32,11 @@ settings-appearance-wallpaper-video = { $name }, video
 settings-appearance-wallpaper-current = Imaginea de fundal actuală
 settings-appearance-wallpaper-empty = Imaginile și videoclipurile din folderul Wallpapers din Imagini apar aici.
 settings-appearance-wallpaper-add = Adaugă imagini de fundal
+settings-appearance-wallpaper-count = { $count ->
+    [one] { $count } imagine de fundal
+    [few] { $count } imagini de fundal
+   *[other] { $count } de imagini de fundal
+}
 settings-appearance-wallpaper-folder = Folderul Wallpapers
 settings-appearance-wallpaper-folder-description = Imagini › Wallpapers
 settings-appearance-wallpaper-fit-title = Încadrare

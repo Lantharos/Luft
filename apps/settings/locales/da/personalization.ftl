@@ -32,6 +32,10 @@ settings-appearance-wallpaper-video = { $name }, video
 settings-appearance-wallpaper-current = Nuværende baggrundsbillede
 settings-appearance-wallpaper-empty = Billeder og videoer i mappen Wallpapers i Billeder vises her.
 settings-appearance-wallpaper-add = Tilføj baggrundsbilleder
+settings-appearance-wallpaper-count = { $count ->
+    [one] { $count } baggrundsbillede
+   *[other] { $count } baggrundsbilleder
+}
 settings-appearance-wallpaper-folder = Mappen Wallpapers
 settings-appearance-wallpaper-folder-description = Billeder › Wallpapers
 settings-appearance-wallpaper-fit-title = Tilpasning
@@ -215,6 +219,9 @@ settings-see-through-app = Gennemsigtig { $app }
 settings-see-through-add = Tilføj en app
 settings-see-through-add-title = Gør en app gennemsigtig
 settings-see-through-add-description = Dens vinduer lader det bagvedliggende skinne igennem.
+settings-see-through-shows = Vis igennem
+settings-see-through-shows-everything = Alt bagved
+settings-see-through-shows-wallpaper = Kun baggrundsbilledet
 settings-see-through-amount = Hvor gennemsigtig
 settings-see-through-blur = Slør det bagvedliggende
 settings-see-through-text = Bevar teksten fast

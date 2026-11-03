@@ -32,6 +32,10 @@ settings-appearance-wallpaper-video = { $name }, myndskeið
 settings-appearance-wallpaper-current = Núverandi bakgrunnsmynd
 settings-appearance-wallpaper-empty = Myndir og myndskeið í möppunni Wallpapers undir Myndum birtast hér.
 settings-appearance-wallpaper-add = Bæta við bakgrunnsmyndum
+settings-appearance-wallpaper-count = { $count ->
+    [one] { $count } bakgrunnsmynd
+   *[other] { $count } bakgrunnsmyndir
+}
 settings-appearance-wallpaper-folder = Mappan Wallpapers
 settings-appearance-wallpaper-folder-description = Myndir › Wallpapers
 settings-appearance-wallpaper-fit-title = Aðlögun

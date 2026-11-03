@@ -39,6 +39,11 @@ settings-appearance-wallpaper-video = { $name }, video
 settings-appearance-wallpaper-current = Current wallpaper
 settings-appearance-wallpaper-empty = Images and videos in the Wallpapers folder in your Pictures show up here.
 settings-appearance-wallpaper-add = Add wallpapers
+# How many wallpapers a folder of wallpapers holds
+settings-appearance-wallpaper-count = { $count ->
+    [one] { $count } wallpaper
+   *[other] { $count } wallpapers
+}
 settings-appearance-wallpaper-folder = Wallpapers folder
 # Where the folder is; use the names your language gives the Pictures folder
 settings-appearance-wallpaper-folder-description = Pictures › Wallpapers

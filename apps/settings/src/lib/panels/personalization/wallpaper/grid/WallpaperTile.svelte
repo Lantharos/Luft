@@ -4,7 +4,7 @@
 	import Film from '@lucide/svelte/icons/film';
 	import { commands } from '#lib/bindings.js';
 	import type { Focus, Wallpaper } from '#lib/bindings.js';
-	import { CENTER, objectPosition } from './api';
+	import { CENTER, objectPosition } from '../api';
 
 	interface Props {
 		wallpaper: Wallpaper;

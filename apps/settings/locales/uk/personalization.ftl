@@ -32,6 +32,12 @@ settings-appearance-wallpaper-video = { $name }, відео
 settings-appearance-wallpaper-current = Поточні шпалери
 settings-appearance-wallpaper-empty = Тут з’являться зображення й відео з папки Wallpapers у папці «Зображення».
 settings-appearance-wallpaper-add = Додати шпалери
+settings-appearance-wallpaper-count = { $count ->
+    [one] { $count } шпалера
+    [few] { $count } шпалери
+    [many] { $count } шпалер
+   *[other] { $count } шпалери
+}
 settings-appearance-wallpaper-folder = Папка шпалер
 settings-appearance-wallpaper-folder-description = Зображення › Wallpapers
 settings-appearance-wallpaper-fit-title = Розміщення

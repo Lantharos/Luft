@@ -32,6 +32,13 @@ settings-appearance-wallpaper-video = { $name }, físeán
 settings-appearance-wallpaper-current = An cúlbhrat reatha
 settings-appearance-wallpaper-empty = Taispeántar anseo na híomhánna agus na físeáin atá san fhillteán Pictiúir › Wallpapers.
 settings-appearance-wallpaper-add = Cuir cúlbhrait leis
+settings-appearance-wallpaper-count = { $count ->
+    [one] { $count } cúlbhrat
+    [two] { $count } chúlbhrat
+    [few] { $count } chúlbhrat
+    [many] { $count } gcúlbhrat
+   *[other] { $count } cúlbhrat
+}
 settings-appearance-wallpaper-folder = Fillteán Wallpapers
 settings-appearance-wallpaper-folder-description = Pictiúir › Wallpapers
 settings-appearance-wallpaper-fit-title = Oiriúint

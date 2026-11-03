@@ -32,6 +32,12 @@ settings-appearance-wallpaper-video = { $name }, wideo
 settings-appearance-wallpaper-current = Bieżąca tapeta
 settings-appearance-wallpaper-empty = Tutaj pojawiają się obrazy i filmy z folderu Wallpapers w folderze Obrazy.
 settings-appearance-wallpaper-add = Dodaj tapety
+settings-appearance-wallpaper-count = { $count ->
+    [one] { $count } tapeta
+    [few] { $count } tapety
+    [many] { $count } tapet
+   *[other] { $count } tapety
+}
 settings-appearance-wallpaper-folder = Folder Wallpapers
 settings-appearance-wallpaper-folder-description = Obrazy › Wallpapers
 settings-appearance-wallpaper-fit-title = Dopasowanie

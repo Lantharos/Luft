@@ -32,6 +32,10 @@ settings-appearance-wallpaper-video = { $name }, video
 settings-appearance-wallpaper-current = Geçerli duvar kâğıdı
 settings-appearance-wallpaper-empty = Resimler klasörünüzdeki Wallpapers klasöründe bulunan resimler ve videolar burada görünür.
 settings-appearance-wallpaper-add = Duvar kâğıdı ekle
+settings-appearance-wallpaper-count = { $count ->
+    [one] { $count } duvar kâğıdı
+   *[other] { $count } duvar kâğıdı
+}
 settings-appearance-wallpaper-folder = Wallpapers klasörü
 settings-appearance-wallpaper-folder-description = Resimler › Wallpapers
 settings-appearance-wallpaper-fit-title = Sığdırma

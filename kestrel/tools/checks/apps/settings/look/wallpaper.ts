@@ -13,6 +13,9 @@ const {eventually} = checks('Luft app');
 const PREVIEW: Point = [655, 278];
 const DRAG = 60;
 const GRID = {left: 328, top: 378, width: 654, gap: 12};
+const GROUP_ROW = {left: 40, below: 80};
+const GROUP_PAGE_TOP = 120;
+const GROUP = 'Coast';
 const FOG_FOCUS = [0.5, 0.768];
 const FOG_SHAPE = 5899 / 3933;
 const BACKGROUNDS = repository('os', 'image', 'files', 'usr', 'share', 'backgrounds', 'luft');
@@ -22,20 +25,43 @@ const USER_DIRS = GLib.build_filenamev([GLib.get_user_config_dir(), 'user-dirs.d
 type Focus = [number, number];
 type Saved = [Gio.Settings, string, GLib.Variant];
 
-function secondTile(shape: number): Point {
+function tileWidth(shape: number) {
   const smallest = Math.round(120 * Math.sqrt(shape));
   const columns = Math.floor((GRID.width + GRID.gap) / (smallest + GRID.gap));
-  const width = (GRID.width - GRID.gap * (columns - 1)) / columns;
-  return [Math.round(GRID.left + width * 1.5 + GRID.gap), Math.round(GRID.top + width / shape / 2)];
+  return (GRID.width - GRID.gap * (columns - 1)) / columns;
+}
+
+function tile(index: number, shape: number, top = GRID.top): Point {
+  const width = tileWidth(shape);
+  return [Math.round(GRID.left + (width + GRID.gap) * index + width / 2), Math.round(top + width / shape / 2)];
+}
+
+function firstGroupRow(shape: number): Point {
+  return [GRID.left + GROUP_ROW.left, Math.round(GRID.top + tileWidth(shape) / shape + GROUP_ROW.below)];
+}
+
+function copyWallpaper(name: string, folder: Gio.File) {
+  for (const file of [`${name}.jpg`, `${name}.json`])
+    Gio.File.new_for_path(GLib.build_filenamev([BACKGROUNDS, file])).copy(folder.get_child(file), Gio.FileCopyFlags.OVERWRITE, null, null);
+  return folder.get_child(`${name}.jpg`);
 }
 
 function shareWallpapers() {
   const folder = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_user_state_dir(), 'luft-home', 'Pictures', 'Wallpapers']));
   GLib.mkdir_with_parents(folder.get_path()!, 0o755);
-  for (const name of ['Fog.jpg', 'Fog.json'])
-    Gio.File.new_for_path(GLib.build_filenamev([BACKGROUNDS, name])).copy(folder.get_child(name), Gio.FileCopyFlags.OVERWRITE, null, null);
   GLib.file_set_contents(USER_DIRS, 'XDG_PICTURES_DIR="$HOME/Pictures"\n');
-  return folder.get_child('Fog.jpg').get_uri();
+  return {fog: copyWallpaper('Fog', folder).get_uri(), folder};
+}
+
+function addGroup(folder: Gio.File) {
+  const group = folder.get_child(GROUP);
+  group.make_directory(null);
+  return copyWallpaper('Dunes', group).get_uri();
+}
+
+function remove(folder: Gio.File) {
+  for (const file of [`${GROUP}/Dunes.jpg`, `${GROUP}/Dunes.json`, GROUP, 'Fog.jpg', 'Fog.json'].map(name => folder.get_child(name)))
+    if (file.query_exists(null)) file.delete(null);
 }
 
 export async function checkWallpaper(app: LuftApp) {
@@ -46,8 +72,8 @@ export async function checkWallpaper(app: LuftApp) {
     ...['wallpaper-focus', 'wallpaper-focus-dark', 'wallpaper-focus-chosen'].map((key): Saved => [kestrel, key, kestrel.get_value(key)]),
   ];
   const focus = () => kestrel.get_value('wallpaper-focus-dark').deepUnpack<Focus>();
+  const shared = shareWallpapers();
   try {
-    const libraryFog = shareWallpapers();
     const uri = Gio.File.new_for_path(FOG).get_uri();
     for (const key of ['picture-uri', 'picture-uri-dark']) background.set_string(key, uri);
     background.set_string('picture-options', 'zoom');
@@ -67,11 +93,23 @@ export async function checkWallpaper(app: LuftApp) {
     await eventually(() => chosen()?.[axis] === focus()[axis], 'the chosen position is remembered for that wallpaper');
     await capture('settings-wallpaper-moved');
 
-    app.click(secondTile(shape));
-    await eventually(() => background.get_string('picture-uri-dark') === libraryFog && focus().every((value, axis) => value === FOG_FOCUS[axis]),
+    app.click(tile(1, shape));
+    await eventually(() => background.get_string('picture-uri-dark') === shared.fog && focus().every((value, axis) => value === FOG_FOCUS[axis]),
       'picking a wallpaper uses the focus stored next to it');
+
+    const panel = await app.settle(() => true);
+    const dunes = addGroup(shared.folder);
+    await app.changes(panel, 'a folder added to the wallpapers folder shows up as a group');
+    const grouped = await app.settle(() => true);
+    grouped.save('settings-wallpaper-groups');
+    app.click(firstGroupRow(shape));
+    await app.changes(grouped, 'the group opens');
+    (await app.settle(() => true)).save('settings-wallpaper-group');
+    app.click(tile(0, shape, GROUP_PAGE_TOP));
+    await eventually(() => background.get_string('picture-uri-dark') === dunes, 'picking a wallpaper from a group sets it');
   } finally {
     for (const [settings, key, value] of saved) settings.set_value(key, value);
+    remove(shared.folder);
     GLib.unlink(USER_DIRS);
   }
 }

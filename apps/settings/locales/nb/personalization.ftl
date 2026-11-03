@@ -32,6 +32,10 @@ settings-appearance-wallpaper-video = { $name }, video
 settings-appearance-wallpaper-current = Nåværende bakgrunnsbilde
 settings-appearance-wallpaper-empty = Bilder og videoer i mappen Wallpapers i Bilder vises her.
 settings-appearance-wallpaper-add = Legg til bakgrunnsbilder
+settings-appearance-wallpaper-count = { $count ->
+    [one] { $count } bakgrunnsbilde
+   *[other] { $count } bakgrunnsbilder
+}
 settings-appearance-wallpaper-folder = Mappen Wallpapers
 settings-appearance-wallpaper-folder-description = Bilder › Wallpapers
 settings-appearance-wallpaper-fit-title = Tilpasning

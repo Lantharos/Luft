@@ -32,6 +32,13 @@ settings-appearance-wallpaper-video = { $name }, vidjo
 settings-appearance-wallpaper-current = Sfond attwali
 settings-appearance-wallpaper-empty = L-istampi u l-vidjows fil-fowlder Wallpapers fi Stampi jidhru hawn.
 settings-appearance-wallpaper-add = Żid sfondi
+settings-appearance-wallpaper-count = { $count ->
+    [one] { $count } sfond
+    [two] { $count } sfondi
+    [few] { $count } sfondi
+    [many] { $count } sfond
+   *[other] { $count } sfond
+}
 settings-appearance-wallpaper-folder = Fowlder tas-sfondi
 settings-appearance-wallpaper-folder-description = Stampi › Wallpapers
 settings-appearance-wallpaper-fit-title = Daqs

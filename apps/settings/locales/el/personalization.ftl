@@ -32,6 +32,10 @@ settings-appearance-wallpaper-video = { $name }, βίντεο
 settings-appearance-wallpaper-current = Τρέχουσα ταπετσαρία
 settings-appearance-wallpaper-empty = Οι εικόνες και τα βίντεο του φακέλου Wallpapers στις Εικόνες σας εμφανίζονται εδώ.
 settings-appearance-wallpaper-add = Προσθήκη ταπετσαριών
+settings-appearance-wallpaper-count = { $count ->
+    [one] { $count } ταπετσαρία
+   *[other] { $count } ταπετσαρίες
+}
 settings-appearance-wallpaper-folder = Φάκελος ταπετσαριών
 settings-appearance-wallpaper-folder-description = Εικόνες › Wallpapers
 settings-appearance-wallpaper-fit-title = Προσαρμογή

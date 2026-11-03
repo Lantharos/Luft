@@ -1,38 +1,24 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { onDestroy } from 'svelte';
 	import FolderOpen from '@lucide/svelte/icons/folder-open';
 	import ImagePlus from '@lucide/svelte/icons/image-plus';
 	import { Row, Section, Select } from '@luft/ui';
-	import { commands, events } from '#lib/bindings.js';
-	import type { Focus, Wallpaper } from '#lib/bindings.js';
-	import { KESTREL_SCHEMA, useSettings } from '#lib/state/gsettings.svelte.js';
-	import { CENTER, openFolder, pathToUri, uriToPath } from './api';
+	import { commands } from '#lib/bindings.js';
+	import { openFolder } from './api';
+	import type { WallpaperChoice } from './choice.svelte';
+	import GroupRow from './grid/GroupRow.svelte';
+	import WallpaperGrid from './grid/WallpaperGrid.svelte';
 	import LiveWallpaperOnBattery from './LiveWallpaperOnBattery.svelte';
-	import { useScreenShape } from './screen.svelte.js';
+	import { wallpaperLibrary } from './library.svelte';
 	import WallpaperPreview from './WallpaperPreview.svelte';
-	import WallpaperTile from './WallpaperTile.svelte';
 
-	type Background = {
-		'picture-uri': string;
-		'picture-uri-dark': string;
-		'picture-options': string;
-	};
-	type Kestrel = {
-		'live-wallpaper': string;
-		'live-wallpaper-dark': string;
-		'wallpaper-focus': Focus;
-		'wallpaper-focus-dark': Focus;
-		'wallpaper-focus-chosen': Record<string, Focus>;
-	};
+	interface Props {
+		choice: WallpaperChoice;
+		shape: number;
+		onopen: (group: string) => void;
+	}
 
-
-	const background = useSettings<Background>('org.gnome.desktop.background', ['picture-uri', 'picture-uri-dark', 'picture-options']);
-	const kestrel = useSettings<Kestrel>(KESTREL_SCHEMA, ['live-wallpaper', 'live-wallpaper-dark', 'wallpaper-focus', 'wallpaper-focus-dark', 'wallpaper-focus-chosen']);
-	const screen = useScreenShape();
-	const desktop = useSettings<{ 'color-scheme': string }>('org.gnome.desktop.interface', ['color-scheme']);
-
-	let found = $state<Wallpaper[] | null>(null);
+	let { choice, shape, onopen }: Props = $props();
 
 	let fitOptions = $derived([
 		{ value: 'zoom', label: t('settings-appearance-wallpaper-fill') },
@@ -43,71 +29,40 @@
 		{ value: 'spanned', label: t('settings-appearance-wallpaper-span') }
 	]);
 
-	let dark = $derived(desktop.values['color-scheme'] === 'prefer-dark');
-	let pictureKey = $derived<'picture-uri' | 'picture-uri-dark'>(dark ? 'picture-uri-dark' : 'picture-uri');
-	let liveKey = $derived<'live-wallpaper' | 'live-wallpaper-dark'>(dark ? 'live-wallpaper-dark' : 'live-wallpaper');
-	let focusKey = $derived<'wallpaper-focus' | 'wallpaper-focus-dark'>(dark ? 'wallpaper-focus-dark' : 'wallpaper-focus');
-	let live = $derived(kestrel.values[liveKey] ?? '');
-	let currentUri = $derived(live || (background.values[pictureKey] ?? ''));
-	let current = $derived(uriToPath(currentUri));
-	let focus = $derived(kestrel.values[focusKey] ?? CENTER);
-	let chosen = $derived(kestrel.values['wallpaper-focus-chosen'] ?? {});
-	let fill = $derived((background.values['picture-options'] ?? 'zoom') === 'zoom');
 	let available = $derived(
-		current && found && !found.some((wallpaper) => wallpaper.path === current)
-			? [{ path: current, name: t('settings-appearance-wallpaper-current'), live: !!live }, ...found]
-			: (found ?? [])
+		choice.current && wallpaperLibrary.loaded && !wallpaperLibrary.includes(choice.current) ? [choice.currentWallpaper, ...wallpaperLibrary.loose] : wallpaperLibrary.loose
 	);
-
-	async function choose(wallpaper: Wallpaper) {
-		const uri = pathToUri(wallpaper.path);
-		const position = chosen[uri] ?? (await commands.appearanceWallpaperFocus({ path: wallpaper.path }));
-		if (wallpaper.live) {
-			await kestrel.set(liveKey, uri);
-		} else {
-			await background.set(pictureKey, uri);
-			await kestrel.set(liveKey, '');
-		}
-		await kestrel.set(focusKey, position);
-	}
-
-	async function reposition(position: Focus) {
-		await kestrel.set(focusKey, position);
-		await kestrel.set('wallpaper-focus-chosen', { ...chosen, [currentUri]: position });
-	}
-
-	function tileFocus(wallpaper: Wallpaper) {
-		return wallpaper.path === current ? focus : chosen[pathToUri(wallpaper.path)];
-	}
-
-	void commands.appearanceWallpapers().then((list) => (found = list));
-	onDestroy(events.appearanceWallpapers((list) => (found = list)));
 </script>
 
-<Section description={dark ? t('settings-appearance-wallpaper-dark-description') : t('settings-appearance-wallpaper-light-description')}>
-	{#if current}
+<Section description={choice.dark ? t('settings-appearance-wallpaper-dark-description') : t('settings-appearance-wallpaper-light-description')}>
+	{#if choice.current}
 		<div class="px-4 pt-4">
-			<WallpaperPreview path={current} {focus} {fill} shape={screen.aspect} onchange={reposition} />
+			<WallpaperPreview path={choice.current} focus={choice.focus} fill={choice.fit === 'zoom'} {shape} onchange={choice.reposition} />
 		</div>
 	{/if}
-	{#if found?.length === 0}
+	{#if wallpaperLibrary.empty}
 		<p class="empty">{t('settings-appearance-wallpaper-empty')}</p>
 	{/if}
-	<div class="grid grid-cols-[repeat(auto-fill,minmax(var(--tile),1fr))] gap-3 p-4" style:--tile="{Math.round(120 * Math.sqrt(screen.aspect))}px">
-		{#each available as wallpaper (wallpaper.path)}
-			<WallpaperTile {wallpaper} selected={wallpaper.path === current} focus={tileFocus(wallpaper)} shape={screen.aspect} onselect={() => choose(wallpaper)} />
-		{/each}
-		<button type="button" class="add-tile" style:aspect-ratio={screen.aspect} onclick={() => commands.appearanceAddWallpapers()}>
+	<WallpaperGrid wallpapers={available} {choice} {shape}>
+		<button type="button" class="add-tile" style:aspect-ratio={shape} onclick={() => commands.appearanceAddWallpapers()}>
 			<ImagePlus size={22} />
 			<span>{t('settings-appearance-wallpaper-add')}</span>
 		</button>
-	</div>
+	</WallpaperGrid>
 </Section>
+
+{#if wallpaperLibrary.groups.length}
+	<Section>
+		{#each wallpaperLibrary.groups as group (group.id)}
+			<GroupRow {group} current={choice.current} {shape} onopen={() => onopen(group.id)} />
+		{/each}
+	</Section>
+{/if}
 
 <Section>
 	<Row title={t('settings-appearance-wallpaper-folder')} description={t('settings-appearance-wallpaper-folder-description')} icon={FolderOpen} onclick={openFolder} />
 	<Row title={t('settings-appearance-wallpaper-fit-title')} description={t('settings-appearance-wallpaper-fit-description')}>
-		<Select label={t('settings-appearance-wallpaper-fit-title')} options={fitOptions} value={background.values['picture-options'] ?? 'zoom'} onchange={(value) => background.set('picture-options', value)} />
+		<Select label={t('settings-appearance-wallpaper-fit-title')} options={fitOptions} value={choice.fit} onchange={choice.setFit} />
 	</Row>
 	<LiveWallpaperOnBattery />
 </Section>

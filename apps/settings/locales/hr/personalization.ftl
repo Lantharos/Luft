@@ -32,6 +32,11 @@ settings-appearance-wallpaper-video = { $name }, videozapis
 settings-appearance-wallpaper-current = Trenutačna pozadina
 settings-appearance-wallpaper-empty = Ovdje se prikazuju slike i videozapisi iz mape Pozadine u vašim Slikama.
 settings-appearance-wallpaper-add = Dodaj pozadine
+settings-appearance-wallpaper-count = { $count ->
+    [one] { $count } pozadina
+    [few] { $count } pozadine
+   *[other] { $count } pozadina
+}
 settings-appearance-wallpaper-folder = Mapa Pozadine
 settings-appearance-wallpaper-folder-description = Slike › Pozadine
 settings-appearance-wallpaper-fit-title = Prilagodba

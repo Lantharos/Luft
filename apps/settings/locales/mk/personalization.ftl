@@ -32,6 +32,10 @@ settings-appearance-wallpaper-video = { $name }, видео
 settings-appearance-wallpaper-current = Тековна позадина
 settings-appearance-wallpaper-empty = Сликите и видеата од папката Wallpapers во Слики се прикажуваат тука.
 settings-appearance-wallpaper-add = Додај позадини
+settings-appearance-wallpaper-count = { $count ->
+    [one] { $count } позадина
+   *[other] { $count } позадини
+}
 settings-appearance-wallpaper-folder = Папка Wallpapers
 settings-appearance-wallpaper-folder-description = Слики › Wallpapers
 settings-appearance-wallpaper-fit-title = Приспособување

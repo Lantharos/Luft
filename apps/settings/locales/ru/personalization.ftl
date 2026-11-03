@@ -32,6 +32,12 @@ settings-appearance-wallpaper-video = { $name }, видео
 settings-appearance-wallpaper-current = Текущие обои
 settings-appearance-wallpaper-empty = Здесь появляются изображения и видео из папки «Wallpapers» в папке «Изображения».
 settings-appearance-wallpaper-add = Добавить обои
+settings-appearance-wallpaper-count = { $count ->
+    [one] { $count } фон
+    [few] { $count } фона
+    [many] { $count } фонов
+   *[other] { $count } фона
+}
 settings-appearance-wallpaper-folder = Папка «Wallpapers»
 settings-appearance-wallpaper-folder-description = Изображения › Wallpapers
 settings-appearance-wallpaper-fit-title = Расположение

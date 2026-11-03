@@ -15,7 +15,7 @@ use specta::Type;
 use super::cache::failed;
 use crate::L10N;
 
-pub const WALLPAPERS_CHANGED: BridgeEvent<Vec<Wallpaper>> =
+pub const WALLPAPERS_CHANGED: BridgeEvent<Library> =
     BridgeEvent::new("appearance.wallpapers");
 const IMAGE_EXTENSIONS: [&str; 6] = ["jpg", "jpeg", "png", "webp", "jxl", "avif"];
 const VIDEO_EXTENSIONS: [&str; 4] = ["mp4", "webm", "mkv", "mov"];
@@ -26,6 +26,21 @@ pub struct Wallpaper {
     path: String,
     name: String,
     live: bool,
+}
+
+#[derive(Serialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct WallpaperGroup {
+    name: String,
+    wallpapers: Vec<Wallpaper>,
+}
+
+#[derive(Serialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct Library {
+    system: Vec<Wallpaper>,
+    wallpapers: Vec<Wallpaper>,
+    groups: Vec<WallpaperGroup>,
 }
 
 pub fn extensions() -> impl Iterator<Item = &'static str> {
@@ -43,13 +58,25 @@ pub fn is_video(path: &Path) -> bool {
     VIDEO_EXTENSIONS.contains(&extension(path).as_str())
 }
 
+fn is_hidden(path: &Path) -> bool {
+    path.file_name()
+        .is_none_or(|name| name.to_string_lossy().starts_with('.'))
+}
+
 fn is_wallpaper(path: &Path) -> bool {
-    let visible = path
-        .file_name()
-        .is_some_and(|name| !name.to_string_lossy().starts_with('.'));
-    visible
+    !is_hidden(path)
         && path.is_file()
         && (is_video(path) || IMAGE_EXTENSIONS.contains(&extension(path).as_str()))
+}
+
+fn is_group(path: &Path) -> bool {
+    !is_hidden(path) && path.is_dir()
+}
+
+fn entries(folder: &Path) -> impl Iterator<Item = PathBuf> {
+    fs::read_dir(folder)
+        .into_iter()
+        .flat_map(|entries| entries.flatten().map(|entry| entry.path()))
 }
 
 fn display_name(path: &Path) -> String {
@@ -71,21 +98,48 @@ fn system_folders() -> Vec<PathBuf> {
     folders
 }
 
-pub fn list() -> Result<Vec<Wallpaper>, String> {
-    let mut wallpapers: Vec<Wallpaper> = system_folders()
-        .into_iter()
-        .chain([folders::wallpapers()])
-        .filter_map(|folder| fs::read_dir(folder).ok())
-        .flat_map(|entries| entries.flatten().map(|entry| entry.path()))
-        .filter(|path| is_wallpaper(path))
-        .map(|path| Wallpaper {
-            name: display_name(&path),
-            live: is_video(&path),
-            path: path.to_string_lossy().into_owned(),
-        })
-        .collect();
+fn wallpaper(path: &Path) -> Wallpaper {
+    Wallpaper {
+        name: display_name(path),
+        live: is_video(path),
+        path: path.to_string_lossy().into_owned(),
+    }
+}
+
+fn sorted(mut wallpapers: Vec<Wallpaper>) -> Vec<Wallpaper> {
     wallpapers.sort_by_cached_key(|wallpaper| wallpaper.name.to_lowercase());
-    Ok(wallpapers)
+    wallpapers
+}
+
+fn wallpapers_in(folder: &Path) -> impl Iterator<Item = Wallpaper> {
+    entries(folder)
+        .filter(|path| is_wallpaper(path))
+        .map(|path| wallpaper(&path))
+}
+
+fn group(folder: &Path) -> Option<WallpaperGroup> {
+    let name = folder.file_name()?.to_string_lossy().into_owned();
+    let wallpapers = sorted(wallpapers_in(folder).collect());
+    (!wallpapers.is_empty()).then_some(WallpaperGroup { name, wallpapers })
+}
+
+pub fn list() -> Result<Library, String> {
+    let own = folders::wallpapers();
+    let mut groups: Vec<WallpaperGroup> = entries(&own)
+        .filter(|path| is_group(path))
+        .filter_map(|path| group(&path))
+        .collect();
+    groups.sort_by_cached_key(|group| group.name.to_lowercase());
+    Ok(Library {
+        system: sorted(
+            system_folders()
+                .iter()
+                .flat_map(|folder| wallpapers_in(folder))
+                .collect(),
+        ),
+        wallpapers: sorted(wallpapers_in(&own).collect()),
+        groups,
+    })
 }
 
 fn free_path(folder: &Path, source: &Path) -> PathBuf {
@@ -152,7 +206,13 @@ pub fn watch(events: Events) {
 }
 
 fn follow(watcher: &FolderWatcher, folder: &Path) {
-    if let Some(existing) = folder.ancestors().find(|path| path.is_dir()) {
-        let _ = watcher.watch([existing.to_path_buf()]);
-    }
+    let Some(existing) = folder.ancestors().find(|path| path.is_dir()) else {
+        return;
+    };
+    let groups = if existing == folder {
+        entries(folder).filter(|path| is_group(path)).collect()
+    } else {
+        Vec::new()
+    };
+    let _ = watcher.watch([existing.to_path_buf()].into_iter().chain(groups));
 }

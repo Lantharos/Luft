@@ -32,6 +32,10 @@ settings-appearance-wallpaper-video = { $name }, video
 settings-appearance-wallpaper-current = Sfondi aktual
 settings-appearance-wallpaper-empty = Figurat dhe videot në dosjen Wallpapers brenda Figura shfaqen këtu.
 settings-appearance-wallpaper-add = Shto sfonde
+settings-appearance-wallpaper-count = { $count ->
+    [one] { $count } sfond
+   *[other] { $count } sfonde
+}
 settings-appearance-wallpaper-folder = Dosja e sfondeve
 settings-appearance-wallpaper-folder-description = Figura › Wallpapers
 settings-appearance-wallpaper-fit-title = Përshtatja

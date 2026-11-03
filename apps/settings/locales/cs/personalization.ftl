@@ -32,6 +32,12 @@ settings-appearance-wallpaper-video = { $name }, video
 settings-appearance-wallpaper-current = Aktuální tapeta
 settings-appearance-wallpaper-empty = Zde se zobrazí obrázky a videa ze složky Wallpapers ve složce Obrázky.
 settings-appearance-wallpaper-add = Přidat tapety
+settings-appearance-wallpaper-count = { $count ->
+    [one] { $count } tapeta
+    [few] { $count } tapety
+    [many] { $count } tapety
+   *[other] { $count } tapet
+}
 settings-appearance-wallpaper-folder = Složka Wallpapers
 settings-appearance-wallpaper-folder-description = Obrázky › Wallpapers
 settings-appearance-wallpaper-fit-title = Přizpůsobení

@@ -32,6 +32,12 @@ settings-appearance-wallpaper-video = { $name }, vaizdo įrašas
 settings-appearance-wallpaper-current = Dabartinis fono paveikslėlis
 settings-appearance-wallpaper-empty = Čia rodomi paveikslėliai ir vaizdo įrašai iš aplanko Wallpapers, esančio aplanke Paveikslėliai.
 settings-appearance-wallpaper-add = Pridėti fono paveikslėlių
+settings-appearance-wallpaper-count = { $count ->
+    [one] { $count } fono paveikslėlis
+    [few] { $count } fono paveikslėliai
+    [many] { $count } fono paveikslėlio
+   *[other] { $count } fono paveikslėlių
+}
 settings-appearance-wallpaper-folder = Aplankas Wallpapers
 settings-appearance-wallpaper-folder-description = Paveikslėliai › Wallpapers
 settings-appearance-wallpaper-fit-title = Talpinimas
@@ -219,6 +225,9 @@ settings-see-through-app = Permatoma: { $app }
 settings-see-through-add = Pridėti programą
 settings-see-through-add-title = Padaryti programą permatomą
 settings-see-through-add-description = Jos langai praleidžia tai, kas už jų.
+settings-see-through-shows = Kas matosi kiaurai
+settings-see-through-shows-everything = Viskas, kas už
+settings-see-through-shows-wallpaper = Tik fono paveikslėlis
 settings-see-through-amount = Kiek permatoma
 settings-see-through-blur = Sulieti tai, kas už
 settings-see-through-text = Palikti tekstą ryškų

@@ -32,6 +32,10 @@ settings-appearance-wallpaper-video = { $name }, vídeo
 settings-appearance-wallpaper-current = Fons de pantalla actual
 settings-appearance-wallpaper-empty = Aquí apareixen les imatges i els vídeos de la carpeta Wallpapers, dins d’Imatges.
 settings-appearance-wallpaper-add = Afegeix fons de pantalla
+settings-appearance-wallpaper-count = { $count ->
+    [one] { $count } fons de pantalla
+   *[other] { $count } fons de pantalla
+}
 settings-appearance-wallpaper-folder = Carpeta Wallpapers
 settings-appearance-wallpaper-folder-description = Imatges › Wallpapers
 settings-appearance-wallpaper-fit-title = Encaix

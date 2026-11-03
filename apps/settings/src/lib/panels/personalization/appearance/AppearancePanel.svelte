@@ -11,7 +11,7 @@
 	import { app } from '#lib/state/app.svelte.js';
 	import { KESTREL_SCHEMA, useSettings } from '#lib/state/gsettings.svelte.js';
 	import { wallpaperName } from '../wallpaper/current.svelte';
-	import WallpaperPanel from '../wallpaper/WallpaperPanel.svelte';
+	import WallpaperPage from '../wallpaper/WallpaperPage.svelte';
 	import AppIconsSection from './AppIconsSection.svelte';
 	import { cursors } from './cursors/cursors.svelte';
 	import CursorSection from './cursors/CursorSection.svelte';
@@ -23,6 +23,9 @@
 
 	type Kestrel = { 'app-icon-style': string; 'theme-apps': boolean };
 	type Interface = { 'text-scaling-factor': number; 'cursor-theme': string };
+
+	const WALLPAPER = 'wallpaper';
+	const WALLPAPER_GROUP = 'wallpaper/';
 
 	const ICON_STYLES: Record<string, string> = {
 		default: 'settings-appearance-icons-original',
@@ -50,10 +53,11 @@
 	<CursorStore onclose={() => open('cursor')} />
 {:else if app.section === 'fonts'}
 	<FontsPage onclose={() => open('text')} />
-{:else if app.section === 'wallpaper'}
-	<SubPage title={t('settings-appearance-wallpaper')} onclose={() => open(null)}>
-		<WallpaperPanel />
-	</SubPage>
+{:else if app.section === WALLPAPER || app.section?.startsWith(WALLPAPER_GROUP)}
+	<WallpaperPage
+		group={app.section.startsWith(WALLPAPER_GROUP) ? app.section.slice(WALLPAPER_GROUP.length) : null}
+		onopen={(group) => open(group ? WALLPAPER_GROUP + group : WALLPAPER)}
+		onclose={() => open(null)} />
 {:else if app.section === 'icons'}
 	<SubPage title={t('settings-appearance-icons')} onclose={() => open(null)}>
 		<AppIconsSection />
@@ -75,7 +79,7 @@
 	<StyleSection />
 
 	<Section>
-		<Row title={t('settings-appearance-wallpaper')} icon={Image} onclick={() => open('wallpaper')}>
+		<Row title={t('settings-appearance-wallpaper')} icon={Image} onclick={() => open(WALLPAPER)}>
 			<RowValue text={wallpaper.name} />
 		</Row>
 		<Row title={t('settings-appearance-icons')} icon={LayoutGrid} onclick={() => open('icons')}>

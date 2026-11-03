@@ -32,6 +32,11 @@ settings-appearance-wallpaper-video = { $name }, video
 settings-appearance-wallpaper-current = Pašreizējais fona attēls
 settings-appearance-wallpaper-empty = Šeit parādās attēli un video no mapes Wallpapers, kas atrodas jūsu mapē Attēli.
 settings-appearance-wallpaper-add = Pievienot fona attēlus
+settings-appearance-wallpaper-count = { $count ->
+    [zero] { $count } fona attēlu
+    [one] { $count } fona attēls
+   *[other] { $count } fona attēli
+}
 settings-appearance-wallpaper-folder = Mape Wallpapers
 settings-appearance-wallpaper-folder-description = Attēli › Wallpapers
 settings-appearance-wallpaper-fit-title = Ietilpināšana

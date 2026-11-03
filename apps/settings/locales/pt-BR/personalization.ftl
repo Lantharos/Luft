@@ -32,6 +32,10 @@ settings-appearance-wallpaper-video = { $name }, vídeo
 settings-appearance-wallpaper-current = Papel de parede atual
 settings-appearance-wallpaper-empty = As imagens e os vídeos da pasta Wallpapers, dentro de Imagens, aparecem aqui.
 settings-appearance-wallpaper-add = Adicionar papéis de parede
+settings-appearance-wallpaper-count = { $count ->
+    [one] { $count } papel de parede
+   *[other] { $count } papéis de parede
+}
 settings-appearance-wallpaper-folder = Pasta Wallpapers
 settings-appearance-wallpaper-folder-description = Imagens › Wallpapers
 settings-appearance-wallpaper-fit-title = Ajuste

@@ -32,6 +32,10 @@ settings-appearance-wallpaper-video = { $name }, видео
 settings-appearance-wallpaper-current = Текущ тапет
 settings-appearance-wallpaper-empty = Тук се показват изображенията и видеоклиповете от папката Wallpapers в Снимки.
 settings-appearance-wallpaper-add = Добави тапети
+settings-appearance-wallpaper-count = { $count ->
+    [one] { $count } тапет
+   *[other] { $count } тапета
+}
 settings-appearance-wallpaper-folder = Папка Wallpapers
 settings-appearance-wallpaper-folder-description = Снимки › Wallpapers
 settings-appearance-wallpaper-fit-title = Побиране

@@ -32,6 +32,10 @@ settings-appearance-wallpaper-video = { $name }, video
 settings-appearance-wallpaper-current = Nykyinen taustakuva
 settings-appearance-wallpaper-empty = Kuvat-kansion Wallpapers-kansiossa olevat kuvat ja videot näkyvät tässä.
 settings-appearance-wallpaper-add = Lisää taustakuvia
+settings-appearance-wallpaper-count = { $count ->
+    [one] { $count } taustakuva
+   *[other] { $count } taustakuvaa
+}
 settings-appearance-wallpaper-folder = Wallpapers-kansio
 settings-appearance-wallpaper-folder-description = Kuvat › Wallpapers
 settings-appearance-wallpaper-fit-title = Sovitus

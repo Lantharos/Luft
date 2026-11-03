@@ -32,6 +32,10 @@ settings-appearance-wallpaper-video = { $name }, video
 settings-appearance-wallpaper-current = Sfondo attuale
 settings-appearance-wallpaper-empty = Le immagini e i video nella cartella Wallpapers dentro Immagini compaiono qui.
 settings-appearance-wallpaper-add = Aggiungi sfondi
+settings-appearance-wallpaper-count = { $count ->
+    [one] { $count } sfondo
+   *[other] { $count } sfondi
+}
 settings-appearance-wallpaper-folder = Cartella Wallpapers
 settings-appearance-wallpaper-folder-description = Immagini › Wallpapers
 settings-appearance-wallpaper-fit-title = Adattamento

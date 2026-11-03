@@ -32,6 +32,11 @@ settings-appearance-wallpaper-video = { $name }, video
 settings-appearance-wallpaper-current = Trenutna pozadina
 settings-appearance-wallpaper-empty = Slike i video-snimci iz fascikle Pozadine u vašim Slikama prikazuju se ovde.
 settings-appearance-wallpaper-add = Dodaj pozadine
+settings-appearance-wallpaper-count = { $count ->
+    [one] { $count } pozadina
+    [few] { $count } pozadine
+   *[other] { $count } pozadina
+}
 settings-appearance-wallpaper-folder = Fascikla Pozadine
 settings-appearance-wallpaper-folder-description = Slike › Pozadine
 settings-appearance-wallpaper-fit-title = Uklapanje

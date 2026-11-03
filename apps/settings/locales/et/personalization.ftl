@@ -32,6 +32,10 @@ settings-appearance-wallpaper-video = { $name }, video
 settings-appearance-wallpaper-current = Praegune taustapilt
 settings-appearance-wallpaper-empty = Siin kuvatakse pildid ja videod, mis on kaustas Pildid › Wallpapers.
 settings-appearance-wallpaper-add = Lisa taustapilte
+settings-appearance-wallpaper-count = { $count ->
+    [one] { $count } taustapilt
+   *[other] { $count } taustapilti
+}
 settings-appearance-wallpaper-folder = Kaust Wallpapers
 settings-appearance-wallpaper-folder-description = Pildid › Wallpapers
 settings-appearance-wallpaper-fit-title = Sobitus

@@ -13,13 +13,13 @@ use luft_i18n::t;
 use sabine::SabineWindow;
 
 use cache::failed;
-use library::Wallpaper;
+use library::Library;
 
 use crate::L10N;
 
 static WATCH: Once = Once::new();
 
-fn wallpapers(events: &Events, Empty {}: Empty) -> Result<Vec<Wallpaper>, String> {
+fn wallpapers(events: &Events, Empty {}: Empty) -> Result<Library, String> {
     WATCH.call_once(|| library::watch(events.clone()));
     library::list()
 }

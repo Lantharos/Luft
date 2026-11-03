@@ -32,6 +32,12 @@ settings-appearance-wallpaper-video = { $name }, videoposnetek
 settings-appearance-wallpaper-current = Trenutno ozadje
 settings-appearance-wallpaper-empty = Tu se prikažejo slike in videoposnetki iz mape Wallpapers v mapi Slike.
 settings-appearance-wallpaper-add = Dodaj ozadja
+settings-appearance-wallpaper-count = { $count ->
+    [one] { $count } ozadje
+    [two] { $count } ozadji
+    [few] { $count } ozadja
+   *[other] { $count } ozadij
+}
 settings-appearance-wallpaper-folder = Mapa Wallpapers
 settings-appearance-wallpaper-folder-description = Slike › Wallpapers
 settings-appearance-wallpaper-fit-title = Prileganje

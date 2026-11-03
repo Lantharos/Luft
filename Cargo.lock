@@ -3048,6 +3048,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6dbf3de79e51f3d586ab4cb9d5c3e2c14aa28ed23d180cf89b4df0454a69cc87"
 
 [[package]]
+name = "humantime"
+version = "2.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "15cdd26707701c53297e2fa6afb323d55fbc1d0810c3aec078ae3ef0424c3c15"
+
+[[package]]
 name = "hybrid-array"
 version = "0.4.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6881,8 +6887,8 @@ checksum = "cf54715a573b99ac80df0bc206da022bcd442c974952c7b9720069370852e21f"
 
 [[package]]
 name = "sabine"
-version = "0.68.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.68#cead31b96bf7b8d953a321c9cc7d9a6f47966dde"
+version = "0.69.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.69#7371a57040d9a49bd6ed0a3c3b0dc05d30e07527"
 dependencies = [
  "ash",
  "base64",
@@ -6944,8 +6950,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-bridge"
-version = "0.68.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.68#cead31b96bf7b8d953a321c9cc7d9a6f47966dde"
+version = "0.69.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.69#7371a57040d9a49bd6ed0a3c3b0dc05d30e07527"
 dependencies = [
  "serde",
  "serde_json",
@@ -6956,8 +6962,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-dialog"
-version = "0.68.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.68#cead31b96bf7b8d953a321c9cc7d9a6f47966dde"
+version = "0.69.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.69#7371a57040d9a49bd6ed0a3c3b0dc05d30e07527"
 dependencies = [
  "bytemuck",
  "glyphon",
@@ -6972,8 +6978,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-host"
-version = "0.68.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.68#cead31b96bf7b8d953a321c9cc7d9a6f47966dde"
+version = "0.69.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.69#7371a57040d9a49bd6ed0a3c3b0dc05d30e07527"
 dependencies = [
  "sabine-bridge",
  "sabine-runtime",
@@ -6984,8 +6990,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-platform"
-version = "0.68.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.68#cead31b96bf7b8d953a321c9cc7d9a6f47966dde"
+version = "0.69.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.69#7371a57040d9a49bd6ed0a3c3b0dc05d30e07527"
 dependencies = [
  "block2",
  "dunce",
@@ -7010,8 +7016,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-runtime"
-version = "0.68.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.68#cead31b96bf7b8d953a321c9cc7d9a6f47966dde"
+version = "0.69.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.69#7371a57040d9a49bd6ed0a3c3b0dc05d30e07527"
 dependencies = [
  "bzip2",
  "getrandom 0.4.3",
@@ -7028,8 +7034,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-service"
-version = "0.68.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.68#cead31b96bf7b8d953a321c9cc7d9a6f47966dde"
+version = "0.69.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.69#7371a57040d9a49bd6ed0a3c3b0dc05d30e07527"
 dependencies = [
  "base64",
  "clap",
@@ -7038,6 +7044,7 @@ dependencies = [
  "embed-resource",
  "flate2",
  "getrandom 0.4.3",
+ "humantime",
  "libc",
  "sabine-dialog",
  "sabine-host",

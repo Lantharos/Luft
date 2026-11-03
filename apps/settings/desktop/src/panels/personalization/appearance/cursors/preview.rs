@@ -3,7 +3,7 @@ use std::hash::{DefaultHasher, Hash, Hasher};
 use std::path::{Path, PathBuf};
 use std::time::UNIX_EPOCH;
 
-use image::RgbaImage;
+use image::{ImageFormat, RgbaImage};
 use image::imageops::{self, FilterType};
 use luft_i18n::t;
 use serde::Deserialize;
@@ -109,13 +109,15 @@ pub fn preview(ThemePath { path }: ThemePath) -> Result<String, String> {
     let target = cached_path(theme)?;
     if !target.exists() {
         let strip = render(theme).ok_or_else(|| t!(L10N, "desktop-cursors-nothing-to-preview"))?;
-        fs::create_dir_all(
-            target
-                .parent()
-                .ok_or_else(|| t!(L10N, "desktop-no-cache-folder"))?,
-        )
-        .map_err(failed)?;
-        strip.save(&target).map_err(failed)?;
+        let folder = target
+            .parent()
+            .ok_or_else(|| t!(L10N, "desktop-no-cache-folder"))?;
+        fs::create_dir_all(folder).map_err(failed)?;
+        let written = tempfile::NamedTempFile::new_in(folder).map_err(failed)?;
+        strip
+            .save_with_format(written.path(), ImageFormat::Png)
+            .map_err(failed)?;
+        written.persist(&target).map_err(failed)?;
     }
     Ok(target.to_string_lossy().into_owned())
 }

@@ -1,24 +1,79 @@
-name: Store
+name: Publish to Schelf
+run-name: ${{ github.event_name == 'workflow_dispatch' && format('Publish {0} to {1}', inputs.app, inputs.channel) || github.event_name == 'schedule' && 'Publish nightlies' || 'Publish changed versions' }}
 
 on:
+  workflow_dispatch:
+    inputs:
+      app:
+        description: App or extension
+        type: choice
+        options: [draft, magpie, mailman, meet, rover, tern, rain]
+      channel:
+        description: Channel
+        type: choice
+        options: [stable, beta, nightly]
+        default: stable
   push:
-    tags:
-      - "*/v*"
+    branches: [main]
+    paths:
+      - apps/*/Sabine.toml
+      - extensions/*/extension.toml
+  schedule:
+    - cron: "17 2 * * *"
 
 concurrency:
-  group: store-${{ github.ref }}
+  group: store-${{ github.event_name == 'workflow_dispatch' && format('{0}-{1}', inputs.app, inputs.channel) || github.event_name }}
 
 permissions:
   contents: read
 
 jobs:
+  changes:
+    if: github.event_name != 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          filter: blob:none
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - id: plan
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = schedule ]; then
+            bun .github/scripts/store/plan.ts nightly >> "$GITHUB_OUTPUT"
+          else
+            bun .github/scripts/store/plan.ts changed "${{ github.event.before }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish each one in a run of its own
+        env:
+          GH_TOKEN: ${{ github.token }}
+          APPS: ${{ steps.plan.outputs.apps }}
+          CHANNEL: ${{ github.event_name == 'schedule' && 'nightly' || 'stable' }}
+        run: |
+          for app in $(jq -r '.[]' <<< "$APPS"); do
+            gh workflow run store.yml --ref "$GITHUB_REF_NAME" -f app="$app" -f channel="$CHANNEL"
+            echo "Started $app on $CHANNEL" >> "$GITHUB_STEP_SUMMARY"
+          done
+
   plan:
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-24.04
     outputs:
       kind: ${{ steps.plan.outputs.kind }}
       folder: ${{ steps.plan.outputs.folder }}
       sabine: ${{ steps.plan.outputs.sabine }}
       platforms: ${{ steps.plan.outputs.platforms }}
+      version: ${{ steps.plan.outputs.version }}
     steps:
       - uses: actions/checkout@v7
 
@@ -27,7 +82,7 @@ jobs:
           bun-version: latest
 
       - id: plan
-        run: bun .github/scripts/store/plan.ts "$GITHUB_REF_NAME" >> "$GITHUB_OUTPUT"
+        run: bun .github/scripts/store/plan.ts build "${{ inputs.app }}" "${{ inputs.channel }}" >> "$GITHUB_OUTPUT"
 
   app:
     needs: plan
@@ -36,11 +91,12 @@ jobs:
       contents: write
       id-token: write
       attestations: write
-    uses: Lantharos/Sabine/.github/workflows/release-app.yml@3508740c4146580168c0a7afd65db6e08641b357
+    uses: Lantharos/Sabine/.github/workflows/release-app.yml@537718548bbb66489fe00ae557fd52228a20248c
     with:
       sabine_version: ${{ needs.plan.outputs.sabine }}
       app: ${{ needs.plan.outputs.folder }}
       platforms: ${{ needs.plan.outputs.platforms }}
+      version: ${{ needs.plan.outputs.version }}
       linux_packages: libglib2.0-dev libseccomp-dev
       # Building the MSI package accepts the WiX 7 licence: https://docs.firegiant.com/wix/osmf/
       accept_wix_eula: true
@@ -67,6 +123,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install --yes libglib2.0-dev libgstreamer1.0-dev libpipewire-0.3-dev zstd
 
+      - name: Use the version being released
+        run: sed -i 's/^version = ".*"$/version = "${{ needs.plan.outputs.version }}"/' "${{ needs.plan.outputs.folder }}/extension.toml"
+
       - run: extensions/pack.sh "${{ needs.plan.outputs.folder }}" dist
 
       - uses: actions/upload-artifact@v7
@@ -77,7 +136,7 @@ jobs:
 
   publish:
     needs: [plan, app, extension]
-    if: ${{ !cancelled() && !contains(needs.*.result, 'failure') }}
+    if: ${{ !cancelled() && needs.plan.result == 'success' && !contains(needs.*.result, 'failure') }}
     runs-on: ubuntu-24.04
     permissions:
       contents: read
@@ -85,6 +144,9 @@ jobs:
       attestations: write
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          filter: blob:none
 
       - uses: actions/download-artifact@v8
         with:
@@ -93,12 +155,13 @@ jobs:
           merge-multiple: true
 
       - id: notes
-        name: Read the release notes from the tag
+        if: inputs.channel != 'nightly'
+        name: Take the release notes from the commit that set the version
         run: |
-          git fetch --force origin "refs/tags/$GITHUB_REF_NAME:refs/tags/$GITHUB_REF_NAME"
+          manifest="${{ needs.plan.outputs.folder }}/${{ needs.plan.outputs.kind == 'app' && 'Sabine.toml' || 'extension.toml' }}"
           {
             echo "notes<<NOTES"
-            git tag --list --format='%(contents:subject)%0a%0a%(contents:body)' "$GITHUB_REF_NAME"
+            git log -1 --format=%B -- "$manifest"
             echo "NOTES"
           } >> "$GITHUB_OUTPUT"
 
@@ -106,4 +169,6 @@ jobs:
         with:
           files: dist/**
           schelf-toml: ${{ needs.plan.outputs.folder }}/schelf.toml
+          version: ${{ needs.plan.outputs.version }}
+          channel: ${{ inputs.channel }}
           notes: ${{ steps.notes.outputs.notes }}

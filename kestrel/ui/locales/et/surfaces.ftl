@@ -7,7 +7,7 @@ start-search-paste = Kleebi
 start-search-select-all = Vali kõik
 start-power = Toide ja seanss
 start-power-close = Sulge toitevalikud
-start-account-settings = Kontosätted
+start-account-settings = Konto seadistused
 start-apps = Rakendused
 start-folder-default-name = Kaust
 start-folder-open = Ava kaust
@@ -23,7 +23,7 @@ start-search-group-apps = Rakendused
 start-search-group-commands = Rakenduste toimingud
 start-search-group-windows = Avatud aknad
 start-search-group-actions = Toimingud
-start-search-group-settings = Sätted
+start-search-group-settings = Seadistused
 start-search-group-clipboard = Lõikelaud
 start-search-group-emoji = Emojid
 start-search-group-files = Failid
@@ -33,8 +33,8 @@ start-search-web = Otsi veebist „{ $query }“
 start-search-clipboard-text = Lõikelaua ajaloost
 start-search-clipboard-keywords = lõikelaud, kopeeritud, lõikelaua ajalugu, kleebi, kleepimine, clipboard
 start-search-emoji-insert = Sisesta
-start-search-settings-page = Sätted
-start-search-settings-section = Sätted: { $page }
+start-search-settings-page = Seadistused
+start-search-settings-section = Seadistused: { $page }
 start-search-file-reveal = Kuva rakenduses { $fileManager }
 start-search-file-copy-path = Kopeeri asukoht
 start-search-conversion = { $amount } { $from } → { $to }
@@ -100,7 +100,7 @@ quick-settings-log-out = Logi välja
 quick-settings-restart = Taaskäivita
 quick-settings-power-off = Lülita välja
 quick-settings-screenshot = Kuvatõmmis
-quick-settings-settings = Sätted
+quick-settings-settings = Seadistused
 quick-settings-battery = Aku
 quick-settings-battery-level = { $percent }
 quick-settings-battery-charging = Laeb
@@ -113,7 +113,7 @@ quick-settings-on = Sees
 quick-settings-off = Väljas
 quick-settings-show-options = Kuva valikud
 quick-settings-slider-value = { $percent }
-quick-settings-tile-settings = Sätted
+quick-settings-tile-settings = Seadistused
 quick-settings-tile-remove = Eemalda
 quick-settings-add = Lisa
 quick-settings-reset = Lähtesta
@@ -124,7 +124,7 @@ notifications-title = Teavitused
 notifications-clear-all = Tühjenda kõik
 notifications-clear-everything = Tühjenda kõik teavitused
 notifications-lock-screen-content = Kuva sõnumite sisu lukustuskuval
-notifications-settings = Teavituste sätted
+notifications-settings = Teavituste seadistused
 notifications-clear-app = Tühjenda rakenduse { $app } teavitused
 notifications-more =
     { $count ->
@@ -188,7 +188,7 @@ messages-system-source = Süsteem
 
 ## On-screen keyboard
 
-osk-keyboard-settings = Klaviatuurisätted
+osk-keyboard-settings = Klahvistiku seadistused
 osk-letters-key = ABC
 
 ## Media player controls

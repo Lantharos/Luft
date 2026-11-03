@@ -1,16 +1,16 @@
 ## Taskbar
 
 taskbar-start = Start
-taskbar-quick-settings = Kiirsätted
+taskbar-quick-settings = Kiirseadistused
 taskbar-notifications-and-date = Teavitused ja kuupäev
 taskbar-show-desktop = Kuva töölaud
 taskbar-system-monitor = Süsteemimonitor
-taskbar-settings = Tegumiriba sätted
+taskbar-settings = Tegumiriba seadistused
 taskbar-show-keyboard-layout = Kuva klaviatuuripaigutus
-taskbar-keyboard-settings = Klaviatuurisätted
-taskbar-network-settings = Võrgusätted
-taskbar-sound-settings = Helisätted
-taskbar-date-time-settings = Kuupäeva ja kellaaja sätted
+taskbar-keyboard-settings = Klahvistiku seadistused
+taskbar-network-settings = Võrguseadistused
+taskbar-sound-settings = Heliseadistused
+taskbar-date-time-settings = Kuupäeva ja kellaaja seadistused
 taskbar-show-taskbar = Kuva tegumiriba
 
 ## App menu (right-click on a taskbar app)
@@ -23,10 +23,11 @@ window-menu-maximize = Maksimeeri
 window-menu-unmaximize = Taasta suurus
 window-menu-pin = Kinnita tegumiribale
 window-menu-unpin = Vabasta tegumiribalt
-window-menu-close = { $count ->
-    [one] Sulge aken
-   *[other] Sulge kõik aknad
-}
+window-menu-close =
+    { $count ->
+        [one] Sulge aken
+       *[other] Sulge kõik aknad
+    }
 
 ## Context menus
 
@@ -45,7 +46,7 @@ tray-open-app = Ava { $appName }
 
 board-open-start = Ava Start
 board-show-all-windows = Kuva kõik aknad
-board-quick-settings = Kiirsätted
+board-quick-settings = Kiirseadistused
 
 ## Task view
 
@@ -104,3 +105,9 @@ title-bar-menu-monitor-down = Teisalda alumisele kuvarile
 title-bar-menu-monitor-left = Teisalda vasakpoolsele kuvarile
 title-bar-menu-monitor-right = Teisalda parempoolsele kuvarile
 title-bar-menu-close = Sulge
+taskbar-arrange = Muuda tegumiriba
+taskbar-arrange-title = Tegumiriba muutmine
+taskbar-arrange-done = Valmis
+taskbar-arrange-reset = Lähtesta vaikimisi väärtusteks
+taskbar-arrange-dock = Rakendused
+taskbar-arrange-hint = Lohista seda saarekest tema hoidikust või tema seest muule saarekesele või tühjale kohale

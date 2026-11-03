@@ -1,17 +1,18 @@
 ## Desktop
 
 desktop-menu-wallpaper = Muuda taustapilti
-desktop-menu-display-settings = Kuvasätted
-desktop-menu-settings = Sätted
+desktop-menu-display-settings = Ekraani seadistused
+desktop-menu-settings = Seadistused
 
 ## Battery
 
-battery-level = { $status ->
-    [charging] Aku { $percentage }%, laeb
-    [full] Aku { $percentage }%, täis laetud
-    [plugged] Aku { $percentage }%, vooluvõrgus
-   *[discharging] Aku { $percentage }%
-}
+battery-level =
+    { $status ->
+        [charging] Aku { $percentage }%, laeb
+        [full] Aku { $percentage }%, täis laetud
+        [plugged] Aku { $percentage }%, vooluvõrgus
+       *[discharging] Aku { $percentage }%
+    }
 
 ## Key names
 ## Used to build keyboard shortcut labels such as "Ctrl+Alt+T". Use the names printed on keyboards in your language.
@@ -34,7 +35,6 @@ keys-end = End
 keys-page-up = Page Up
 keys-page-down = Page Down
 keys-print-screen = Print Screen
-
 date-just-now = Äsja
 
 ## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop

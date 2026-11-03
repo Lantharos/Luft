@@ -1,8 +1,8 @@
-desktop-app-name = Sätted
+desktop-app-name = Seadistused
 
 ## Settings storage
 
-desktop-gsettings-none-installed = Sätteid pole installitud
+desktop-gsettings-none-installed = Seadistused pole paigaldatud
 desktop-gsettings-not-installed = { $schema } pole installitud
 desktop-gsettings-no-schema = Sätetel pole skeemi
 desktop-gsettings-watcher-stopped = Sätete jälgija peatus
@@ -32,7 +32,7 @@ desktop-dictation-not-web-address = See pole veebiaadress
 
 desktop-shortcut-toggle-message-tray = Kuva teavituste loend
 desktop-shortcut-toggle-start = Ava menüü Start
-desktop-shortcut-toggle-quick-settings = Ava kiirsätted
+desktop-shortcut-toggle-quick-settings = Ava kiirseadistused
 desktop-shortcut-focus-active-notification = Fookusta aktiivne teavitus
 desktop-shortcut-clipboard-history = Kuva lõikelaua ajalugu
 desktop-shortcut-emoji-picker = Sisesta emoji
@@ -89,7 +89,7 @@ desktop-shortcut-calculator = Ava kalkulaator
 desktop-shortcut-media = Ava muusikamängija
 desktop-shortcut-home = Ava kodukaust
 desktop-shortcut-search = Otsi
-desktop-shortcut-control-center = Ava Sätted
+desktop-shortcut-control-center = Ava seadistused
 desktop-shortcut-volume-mute = Vaigista heli või tühista vaigistus
 desktop-shortcut-volume-down = Vähenda helitugevust
 desktop-shortcut-volume-up = Suurenda helitugevust
@@ -171,8 +171,8 @@ desktop-cursors-download-refused = GNOME-Look ei saanud seda allalaadimist saata
 desktop-cursors-download-too-large = See allalaadimine on suurem, kui kursoriteema olla võiks
 desktop-cursors-download-interrupted = Allalaadimine katkes enne lõppu. Proovi uuesti.
 desktop-cursors-unpacks-too-large = Lahtipakituna võtab see allalaadimine rohkem ruumi, kui kursoriteema vajama peaks
-desktop-cursors-archive-damaged = See allalaadimine on rikutud või pole arhiiv, mida Sätted avada saab
-desktop-cursors-not-an-archive = See allalaadimine pole arhiiv, mida Sätted avada saab
+desktop-cursors-archive-damaged = See allalaaditud fail on vigane või pole arhiiv, mida Seadistused avada saaks
+desktop-cursors-not-an-archive = See allalaaditud fail pole arhiiv, mida Seadistused avada saaks
 desktop-cursors-no-linux-theme = See allalaadimine ei sisalda Linuxi kursoriteemat
 desktop-cursors-theme-unnamed = Sellel teemal pole nime
 desktop-cursors-not-removable = Seda teemat ei saa eemaldada
@@ -193,7 +193,7 @@ desktop-wallpaper-video-no-picture = Selles videos pole pilti
 ## Keyring
 
 desktop-keyring-not-running = Võtmerõngas ei tööta
-desktop-keyring-denied = Seda saab muuta ainult installitud rakendus Sätted
+desktop-keyring-denied = Seda saab muuta ainult paigaldatud rakendus Seadistused
 desktop-keyring-unsupported = Võtmerõngas ei oska seda veel teha
 desktop-keyring-reseal-failed = Turvakiip ei saanud praegu võtmerõngast kaitsta
 

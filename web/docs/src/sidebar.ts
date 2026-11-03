@@ -22,5 +22,6 @@ export const sidebar: Sidebar = [
 	group('Files and accounts', 'files'),
 	group('System', 'system'),
 	group('For developers', 'developers'),
+	group('Extensions', 'extensions'),
 	group('Reference', 'reference', true)
 ];

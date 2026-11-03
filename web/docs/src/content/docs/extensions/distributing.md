@@ -1,0 +1,35 @@
+---
+title: Sharing an extension
+description: Packaging an extension for Schelf, where Luft installs it, and the D-Bus interface that manages extensions.
+sidebar:
+  order: 4
+---
+
+## In Schelf
+
+Schelf carries extensions next to apps, with `kind = "extension"` and `format = "luft-extension"` in `schelf.toml`. The artifact is a `.tar.zst` of the extension's folder, one for every computer, or one per architecture when it ships a native helper. Schelf checks that the manifest's id matches the listing, that it targets an API version Luft has shipped, and that the permissions it lists are the ones the listing shows, and offers each computer the newest release whose API version it runs.
+
+## Where Luft keeps them
+
+| Folder | Holds |
+| --- | --- |
+| `/usr/share/luft/extensions/<id>/` | Extensions that come with Luft, such as Rain |
+| `~/.local/share/luft/extensions/<id>/` | Extensions you installed |
+
+An installed copy with the same id as one that comes with Luft replaces it, which is how the store updates Rain between Luft releases. Removing it removes the extension for that account.
+
+## The D-Bus interface
+
+Settings and Schelf manage extensions through `com.lantharos.Kestrel.Extensions` at `/com/lantharos/Kestrel/Extensions` on the session bus name `com.lantharos.Kestrel`. Sandboxed apps can't use it.
+
+| Member | Does |
+| --- | --- |
+| `List() → aa{sv}` | Every installed extension: `id`, `name`, `description`, `version`, `api`, `path`, `origin` (`system` or `user`), `overrides`, `permissions`, `helper`, `enabled`, `state` (`running`, `off`, `failed`, `crashed`, `invalid`), `problem`, `cpu` and `memory` while it runs, and `settings` |
+| `Enable(s id)`, `Disable(s id)` | Turns it on or off |
+| `Reload(s id)` | Reads its folder again. A new extension starts, an updated one restarts with its new code, a deleted one stops |
+| `Remove(s id)` | Deletes an installed copy and its settings, and hides one that comes with Luft for this account |
+| `SetSetting(s id, s key, v value)` | Changes a declared setting; a value that doesn't fit is refused |
+| `ApiVersions` | Property: the API versions this Luft runs |
+| `ExtensionsChanged` | Signal: something in `List` changed |
+
+To install, unpack the folder into `~/.local/share/luft/extensions/<id>/` and call `Reload(id)`. To update, replace the folder and call `Reload(id)` again; an update to an extension Luft turned off after a problem runs again.

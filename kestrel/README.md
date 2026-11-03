@@ -12,6 +12,7 @@ Kestrel is Luft's desktop and login screen. It runs on its own patched Mutter 51
 | [`engine`](engine/README.md) | The native shell in C, started from GNOME Shell 51.0 |
 | `ui` | Everything the shell does on top of the engine, in TypeScript: window management, the lock screen, notifications, the taskbar, Start, quick settings and every other surface |
 | [`compositor`](compositor/README.md) | Mutter patch series |
+| `extensions` | Extensions that come with Luft, such as Rain ([how extensions work](../docs/extensions.md)) |
 | `types` | TypeScript types generated from the GIR files of the compositor, the engine and the libraries they use |
 | `settings` | `kestrel-settings`: XSETTINGS, night light, power, printing, housekeeping, time zone, browser profile locks, memory warnings |
 | `search` | `kestrel-search`, the file index behind Start's search |

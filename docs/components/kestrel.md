@@ -73,11 +73,14 @@ Chromium-based browsers and Electron apps lock their profile with the host name,
 | `kestrel-authenticate` | Checks lock screen passwords and fingerprints through the `kestrel-unlock` PAM rules, and waits for a fingerprint at the login screen |
 | `kestrel-watchdog` | Restarts the computer when the GPU is stuck ([details](../boot.md#graphics-driver-stopped-responding)) |
 | `kestrel-wallpaper` | Plays live wallpapers |
-| `kestrel-rain` | Plays recorded rain, mixing drizzle, rain and downpour loops by intensity with thunder in storms, as a `Rain` stream in PipeWire. Kestrel writes `INTENSITY VOLUME` lines to it and closes its input to fade it out. `--render PATH SECONDS:INTENSITY:VOLUME...` writes the same sound to a WAV file instead |
 
 greetd reads `/run/greetd/config.toml`, which `kestrel-greeter-service --write-greetd-config` writes before each start from the image's defaults in `/usr/lib/kestrel-greeter/greetd.toml` and the account that signs in by itself, kept in `/var/lib/kestrel-greeter/initial-session.toml`. Nothing in `/etc` holds it, so updates to the defaults always arrive; to change greetd's configuration on one computer, point `greetd.service` at your own file with a drop-in. The `greetd` and `kestrel-unlock` PAM rules are in `/usr/lib/pam.d` for the same reason, and a file of the same name in `/etc/pam.d` takes their place.
 
 `kestrel-session --setup` runs Install Luft alone over the blurred wallpaper first ([Install](../install.md)). The session identifies as `Kestrel;GNOME`, so apps that only recognize GNOME keep their keyring, theme and autostart behavior.
+
+## Extensions
+
+Kestrel runs extensions: Rain is the first, and ships with Luft. How they load, what they may use, their D-Bus interface and the crash guard are in [Extensions](../extensions.md).
 
 ## Signing in and unlocking
 

@@ -8,12 +8,13 @@ Luft is translated into Albanian, Bosnian, Bulgarian, Catalan, Croatian, Czech, 
 
 | Component | Files | English source |
 | --- | --- | --- |
-| kestrel-desktop | `kestrel/ui/locales/*/desktop.ftl` | taskbar, tray, board, task view, snapping, title bars, window menus, switchers, rain |
+| kestrel-desktop | `kestrel/ui/locales/*/desktop.ftl` | taskbar, tray, board, task view, snapping, title bars, window menus, switchers |
 | kestrel-surfaces | `kestrel/ui/locales/*/surfaces.ftl` | Start, quick settings, notifications, calendar, clipboard, emoji, the on-screen keyboard |
 | kestrel-shell | `kestrel/ui/locales/*/shell.ftl` | shared pieces such as key names, durations and text field menus |
 | kestrel-system | `kestrel/ui/locales/*/system.ftl` | network menus and sign-in, VPNs, Bluetooth, sound, power, displays, drives, accessibility, screenshots, dictation, system notices |
 | kestrel-auth | `kestrel/ui/locales/*/auth.ftl` | login screen, lock screen, sign-in and administrator prompts, keyring and passkey prompts, signing out and powering off |
 | kestrel-portal | `kestrel/ui/locales/*/portal.ftl` | printing, screen sharing, shortcuts and other app requests |
+| extension-rain | `kestrel/extensions/rain/locales/*/rain.ftl` | the Rain extension: its name, tile and settings |
 | kestrel-settings | `kestrel/settings/locales/*/settings.ftl` | notifications from `kestrel-settings` about drives and the battery |
 | kestrel-portal-service | `kestrel/portal/locales/*/portal.ftl` | print job names and printing failures from `kestrel-portal` |
 | ui | `packages/web/ui/locales/*/ui.ftl` | the UI kit every app shares |

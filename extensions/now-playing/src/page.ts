@@ -10,7 +10,10 @@ export function describePage(extension: Extension<Granted>, following: Following
     const ignored = following.ignored;
     const seen = following.seen;
     return [
-      { items: [{ setting: 'show' }, { setting: 'controls' }, { setting: 'hide-paused' }] },
+      {
+        title: t('look'),
+        items: [{ setting: 'layout' }, { setting: 'second-line' }, { setting: 'max-width' }, { setting: 'hide-paused' }, { type: 'taskbar-place', element: 'now-playing' }],
+      },
       {
         title: t('players'),
         description: t('players-description'),

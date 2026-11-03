@@ -1,6 +1,6 @@
 import type { Enable, Popup } from '@luft/extension-api';
 
-import { compact, expanded } from './element.js';
+import { compact, expanded, type Layout } from './element.js';
 import { Following } from './following.js';
 import { describePage } from './page.js';
 import { nowPlaying } from './popup.js';
@@ -11,12 +11,22 @@ const enable: Enable<Granted> = extension => {
   const { media, settings } = extension;
   let popup: Popup | null = null;
   let stopWatching: (() => void) | null = null;
+  let stopRing: (() => void) | null = null;
 
   const shown = () => {
     const player = following.player;
     return !!player && (player.playing || !settings.get<boolean>('hide-paused'));
   };
+  const keepCoverRingMoving = () => {
+    const wanted = settings.get<Layout>('layout') === 'cover' && !!following.player?.playing;
+    if (wanted && !stopRing) stopRing = following.watch();
+    else if (!wanted && stopRing) {
+      stopRing();
+      stopRing = null;
+    }
+  };
   const changed = () => {
+    keepCoverRingMoving();
     element.update({ shown: shown() });
     if (popup?.open) popup.update(nowPlaying(extension, following));
   };

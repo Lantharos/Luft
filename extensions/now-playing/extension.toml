@@ -6,21 +6,36 @@ api = 1
 permissions = ["taskbar", "media", "popups"]
 
 [[settings]]
-key = "show"
+key = "layout"
 type = "choice"
-label = "show"
-default = "everything"
+label = "layout"
+default = "compact"
 options = [
-  { value = "everything", label = "show-everything" },
-  { value = "title", label = "show-title" },
-  { value = "cover", label = "show-cover" },
+  { value = "compact", label = "layout-compact", image = "previews/compact.webp" },
+  { value = "full", label = "layout-full", image = "previews/full.webp" },
+  { value = "no-controls", label = "layout-no-controls", image = "previews/no-controls.webp" },
+  { value = "cover", label = "layout-cover", image = "previews/cover.webp" },
 ]
 
 [[settings]]
-key = "controls"
-type = "switch"
-label = "controls"
-default = true
+key = "second-line"
+type = "choice"
+label = "second-line"
+default = "controls"
+options = [
+  { value = "controls", label = "second-line-controls" },
+  { value = "artist", label = "second-line-artist" },
+  { value = "album", label = "second-line-album" },
+]
+
+[[settings]]
+key = "max-width"
+type = "slider"
+label = "max-width"
+default = 200
+min = 140
+max = 420
+step = 10
 
 [[settings]]
 key = "hide-paused"

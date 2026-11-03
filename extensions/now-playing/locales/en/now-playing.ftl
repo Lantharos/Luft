@@ -1,12 +1,19 @@
 # The name of the extension in Settings and the store
 extension-name = Now Playing
 extension-description = What's playing, in the taskbar, with its cover and controls
-show = Shows
-show-everything = Cover, title and artist
-show-title = Title and artist
-show-cover = Just the cover
-controls = Controls
-    .description = Previous, play and pause, and next, next to the title
+layout = Layout
+layout-compact = Compact
+layout-full = Wide
+layout-no-controls = No controls
+layout-cover = Just the cover
+second-line = Under the title
+    .description = The controls only fit there in the compact layout; the others show the artist instead
+second-line-controls = Controls
+second-line-artist = Artist
+second-line-album = Album
+max-width = Widest it gets
+    .description = How much of the taskbar the title can take
+look = Look
 hide-paused = Hide when paused
     .description = Show it only while something plays
 players = Players

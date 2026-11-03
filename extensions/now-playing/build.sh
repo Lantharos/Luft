@@ -6,4 +6,4 @@ destination="$1"
 
 mkdir -p "$destination"
 bun "$source/../build.ts" "$source/src/extension.ts" "$destination/extension.js"
-cp -r "$source/extension.toml" "$source/locales" "$destination/"
+cp -r "$source/extension.toml" "$source/locales" "$source/previews" "$destination/"

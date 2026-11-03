@@ -321,12 +321,6 @@ settings-extensions-failed = Turned off because it stopped working
 settings-extensions-crashed = Turned off because the desktop restarted twice while it ran
 settings-extensions-invalid = Can't run on this version of Luft
 settings-extensions-problem = What went wrong
-settings-extensions-usage-title = Uses
-settings-extensions-usage-little = Hardly any of the processor
-# $cpu is a percentage of one processor
-settings-extensions-usage = { $cpu } of the processor
-# $cpu is a percentage of one processor, $memory an amount of memory such as 12 MB
-settings-extensions-usage-helper = { $cpu } of the processor and { $memory } of memory
 settings-extensions-settings = Settings
 settings-extensions-permissions = What it can do
 settings-extensions-permission-wallpaper = Draw over the wallpaper

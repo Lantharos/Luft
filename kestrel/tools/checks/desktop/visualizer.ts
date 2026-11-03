@@ -15,7 +15,6 @@ import {installBuilt, layerSheets, listed, request, setSetting} from '../extensi
 const {require, eventually} = checks('visualizer');
 const VISUALIZER = 'com.lantharos.Visualizer';
 const STYLES = ['glow', 'wave', 'bars'];
-const MOST_CPU_WHILE_PLAYING = 0.03;
 const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 const monitor = Shell.AudioMonitor.get_default();
 
@@ -75,8 +74,6 @@ export async function run() {
       await capture('visualizer-window');
       await setSetting(VISUALIZER, 'displays', new GLib.Variant('s', 'primary'));
       await eventually(showing, 'it shows again after choosing where');
-      const {cpu} = (await listed(VISUALIZER)) as unknown as {cpu: number};
-      require(cpu < MOST_CPU_WHILE_PLAYING, `following the music costs little of the processor (${(cpu * 100).toFixed(1)} %)`);
       swept.unminimize();
       swept.raise();
       await pause(700);

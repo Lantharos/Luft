@@ -8,7 +8,7 @@ import {installBuilt, RAIN, request, setSetting, setting} from '../../../extensi
 import {show, showEnd} from '../navigation.js';
 
 const {eventually} = checks('Luft app');
-const RAIN_SWITCH: Point = [972, 308];
+const RAIN_SWITCH: Point = [972, 239];
 const VISUALIZER = 'com.lantharos.Visualizer';
 const NOW_PLAYING = 'com.lantharos.NowPlaying';
 const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});

@@ -920,8 +920,6 @@ export type Extension = {
 	state: string,
 	problem: string,
 	permissions: string[],
-	cpu: number | null,
-	memory: number | null,
 	settings: ExtensionSetting[],
 	shortcuts: ExtensionShortcut[],
 	page: boolean,

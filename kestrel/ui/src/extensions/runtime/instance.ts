@@ -15,7 +15,6 @@ import type { GrabbedShortcuts } from './shortcuts.js';
 import { StoredValues } from './storage.js';
 import type { ExtensionStore } from './store.js';
 import { Translations } from './translations.js';
-import { measure, type Usage } from './usage.js';
 import { SettingValues } from './values.js';
 
 export interface RuntimeServices {
@@ -41,7 +40,6 @@ export class ExtensionInstance {
   readonly page: ExtensionPage;
   private scope: Scope | null = null;
   private readonly helpers = new Set<Gio.Subprocess>();
-  private startedAt = 0;
 
   constructor(readonly installed: Installed & { manifest: Manifest }, private readonly services: RuntimeServices) {
     this.values = new SettingValues(installed.id, installed.manifest.settings ?? [], services.store);
@@ -70,14 +68,9 @@ export class ExtensionInstance {
     return this.scope !== null;
   }
 
-  usage(): Usage | null {
-    return this.scope ? measure(this.scope.cpuMicros, this.startedAt, this.helpers) : null;
-  }
-
   async start(): Promise<void> {
     if (this.scope) return;
     const scope = this.scope = new Scope(error => this.services.failed(this.id, error));
-    this.startedAt = GLib.get_monotonic_time();
     try {
       const enable = await this.load();
       if (this.scope !== scope) return;

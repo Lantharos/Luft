@@ -7,7 +7,7 @@ sidebar:
 
 Extensions add to the desktop: something on the wallpaper, a tile in quick settings, a button on the taskbar, results in search. Luft comes with one, Rain, and you can find more in [Schelf](/apps/schelf/).
 
-**Settings → Extensions** lists them. The switch next to each turns it on or off; opening one shows what it can do, its own settings, how much of the processor it uses, and **Remove**. An extension only gets what it says it needs, and the list under **What it can do** is exactly that.
+**Settings → Extensions** lists them. The switch next to each turns it on or off; opening one shows what it can do, its own settings and **Remove**. An extension only gets what it says it needs, and the list under **What it can do** is exactly that.
 
 If an extension stops working, Luft turns it off by itself and tells you. The same happens to the extensions that were running when the desktop restarted twice in a row after a problem. Turn it back on in Settings once you've updated it, or leave it off.
 

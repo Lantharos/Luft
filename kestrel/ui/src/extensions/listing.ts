@@ -72,7 +72,6 @@ export function listed(installed: Installed, manager: ExtensionManager): Fields 
   };
   if (!instance) return { ...fields, name: text(installed.id) };
   const { manifest } = instance;
-  const usage = instance.usage();
   return {
     ...fields,
     name: text(instance.name),
@@ -84,6 +83,5 @@ export function listed(installed: Installed, manager: ExtensionManager): Fields 
     settings: new GLib.Variant('aa{sv}', instance.values.descriptions.map(setting => described(setting, instance))),
     shortcuts: shortcuts(instance, manager),
     page: GLib.Variant.new_boolean(instance.page.described),
-    ...usage ? { cpu: GLib.Variant.new_double(usage.cpu), memory: GLib.Variant.new_uint64(usage.memory) } : {},
   };
 }

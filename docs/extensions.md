@@ -95,7 +95,7 @@ Kestrel serves `com.lantharos.Kestrel.Extensions` at `/com/lantharos/Kestrel/Ext
 | `ExtensionsChanged` (signal) | Something in `List` changed |
 | `PageChanged(s id)` (signal) | The extension's page should be built again: it asked, or a setting changed |
 
-Each entry of `List` has `id`, `name` and `description` (translated), `version`, `api`, `path`, `permissions`, `helper`, `enabled`, `state` (`running`, `off`, `failed`, `crashed` or `invalid`) and `problem` (why it isn't running), `cpu` (share of one processor since it started, counting its helper) and `memory` (its helper's resident memory) while it runs, `settings`: for each setting its `key`, `type`, translated `label` and `description`, `value`, `default`, `depends`, `page`, and `options` or `swatches` as `a(ss)` of value and label, `images` with the full path of each option's picture, or `min`, `max`, `step` and `unit`; `shortcuts`: for each its `key`, translated `label`, the `accelerators` it's bound to, its `default` and whether it `changed`; and `page`, whether it describes a page of its own.
+Each entry of `List` has `id`, `name` and `description` (translated), `version`, `api`, `path`, `permissions`, `helper`, `enabled`, `state` (`running`, `off`, `failed`, `crashed` or `invalid`) and `problem` (why it isn't running), `settings`: for each setting its `key`, `type`, translated `label` and `description`, `value`, `default`, `depends`, `page`, and `options` or `swatches` as `a(ss)` of value and label, `images` with the full path of each option's picture, or `min`, `max`, `step` and `unit`; `shortcuts`: for each its `key`, translated `label`, the `accelerators` it's bound to, its `default` and whether it `changed`; and `page`, whether it describes a page of its own.
 
 ## Settings pages
 

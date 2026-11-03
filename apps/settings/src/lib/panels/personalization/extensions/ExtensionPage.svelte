@@ -6,12 +6,11 @@
 	import { extensions, shown } from './extensions.svelte';
 	import PageView from './PageView.svelte';
 	import SettingRow from './SettingRow.svelte';
-	import { PERMISSIONS, summary, usage } from './status';
+	import { PERMISSIONS, summary } from './status';
 
 	let { extension, onclose }: { extension: Extension; onclose: () => void } = $props();
 
 	let removing = $state(false);
-	let cost = $derived(usage(extension));
 	let visible = $derived(extension.settings.filter((setting) => shown(extension, setting)));
 </script>
 
@@ -24,9 +23,6 @@
 		</Row>
 		{#if extension.problem && extension.state !== 'running'}
 			<Row title={t('settings-extensions-problem')} description={extension.problem} />
-		{/if}
-		{#if cost}
-			<Row title={t('settings-extensions-usage-title')} description={cost} />
 		{/if}
 	</Section>
 

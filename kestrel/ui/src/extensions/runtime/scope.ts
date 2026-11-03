@@ -1,22 +1,15 @@
-import GLib from 'gi://GLib';
-
 import type { Disposable } from '../api/v1/types.js';
 
 /**
  * Everything one run of an extension made through the API. Disposing the scope takes it all away, and every call into
- * the extension's code goes through `run`, which times it and turns an exception into the extension being switched off.
+ * the extension's code goes through `run`, which turns an exception into the extension being switched off.
  */
 export class Scope {
   private readonly owned = new Set<Disposable>();
   private readonly cleanups: (() => void)[] = [];
-  private busyMicros = 0;
   private closed = false;
 
   constructor(private readonly failed: (error: unknown) => void) {}
-
-  get cpuMicros(): number {
-    return this.busyMicros;
-  }
 
   get open(): boolean {
     return !this.closed;
@@ -44,7 +37,6 @@ export class Scope {
 
   run<Result>(callback: () => Result): Result | undefined {
     if (this.closed) return undefined;
-    const started = GLib.get_monotonic_time();
     try {
       const result = callback();
       if (result instanceof Promise) result.catch(error => this.fail(error));
@@ -52,8 +44,6 @@ export class Scope {
     } catch (error) {
       this.fail(error);
       return undefined;
-    } finally {
-      this.busyMicros += GLib.get_monotonic_time() - started;
     }
   }
 

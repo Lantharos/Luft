@@ -9,34 +9,30 @@ import type { WindowPreviews } from './windowPreviews.js';
 import { Taskbar } from './taskbar/taskbar.js';
 import type { ContextMenus } from '../menus/contextMenus.js';
 import { createLauncher, floorAlong, type Launcher } from './launcher/launcher.js';
-import { Tray } from '../tray/tray.js';
 import { DesktopPeek } from './widgets/desktopPeek.js';
-import { ExtensionItems } from './widgets/extensionItems.js';
-import { PanelClock } from './widgets/clock.js';
-import { BatteryIndicator } from '../../shared/battery/indicator.js';
-import { PrivacyIndicator } from '../../system/privacy/indicator.js';
-import { InputSourceIndicator } from '../../system/inputSources/indicator.js';
 import { systemMonitor } from './widgets/systemMonitor.js';
 import { taskbarPreferences, type TaskbarKey, type TaskbarLayout } from './preferences/taskbarPreferences.js';
+import { taskbarArrangement } from './preferences/arrangement.js';
 import { TaskbarSurface } from './preferences/taskbarLook.js';
-import { AutoHide } from './autoHide/autoHide.js';
+import { AutoHide, type Slider } from './autoHide/autoHide.js';
 import { afterMotion, dropAfterMotion } from '../../shared/motion/afterMotion.js';
-import { animateActor, Curve, Duration, reducedMotion, Spring } from '../../shared/motion/motion.js';
+import { animateActor, Curve, Duration, reducedMotion } from '../../shared/motion/motion.js';
 import { activeWorkspace, WorkspaceWindows } from './taskbar/workspaceWindows.js';
 import { TabletTaskbar } from './tablet/tabletTaskbar.js';
-import { afterWindowsReach } from './tablet/windowsReach.js';
-import { localized, t } from '../../shared/i18n/index.js';
-import { band, isVertical, type Edge } from '../../shared/layout/edge.js';
+import { band, isVertical, rightToLeft, type Edge } from '../../shared/layout/edge.js';
+import { EDGE_MARGIN, NO_DEPTHS, type Anchor, type Depths } from '../../shared/layout/anchor.js';
+import { t } from '../../shared/i18n/index.js';
+import { TaskbarElements } from './elements/panelElements.js';
+import { IslandSet, type Island } from './islands/islandSet.js';
+import { IslandShapes, type IslandShape } from './islands/shapes.js';
+import { PanelTablet } from './tablet/panelTablet.js';
+import { alongOf, moveBar } from '../../../../../packages/web/ui/src/taskbar/arrangement/index';
 
-const KEYS_APP = 'com.lantharos.keys.desktop';
 const RESIZE_DURATION = 240;
 const SHAPE_KEYS: TaskbarKey[] = ['taskbar-style', 'taskbar-size'];
 const LOOK_KEYS: TaskbarKey[] = ['taskbar-look', 'taskbar-style', 'taskbar-size', 'pure-black', 'rounded-window-corners'];
 const APP_KEYS: TaskbarKey[] = ['taskbar-show-pinned', 'taskbar-windows-per-display', 'taskbar-windows-per-workspace'];
-
-function showLayout(keys: Shell.App, layout: string): void {
-  keys.get_app_info().launch_uris([`kestrel-keys:view/${encodeURIComponent(layout)}`], global.create_app_launch_context(0, -1));
-}
+const SURFACE_ELEMENTS: Record<string, string> = { start: 'start', quick: 'status', notifications: 'clock' };
 
 export interface Monitor {
   index: number;
@@ -54,41 +50,36 @@ export interface PanelActions {
   notifications(): void;
   activateWindow(window: Meta.Window): void;
   stopScreencast(): void;
+  arrange(): void;
 }
 
 export class KestrelPanel {
   readonly actor: St.Widget;
-  readonly strut = new St.Widget();
-  private gapMonitor: number | null = null;
+  readonly struts = new Map<Edge, St.Widget>();
   readonly autoHide: AutoHide;
   readonly tablet: TabletTaskbar;
+  readonly elements: TaskbarElements;
+  readonly islandSet: IslandSet;
+  readonly shapes: IslandShapes;
+  private gapMonitor: number | null = null;
   private readonly peek = new DesktopPeek();
-  private readonly layout = new PanelLayout();
+  readonly layout = new PanelLayout();
+  /** Runs once the panel shows a new arrangement, so what depends on its edges can follow. */
+  arranged = () => {};
   private readonly surface: TaskbarSurface;
-  private readonly appsIsland: St.Bin;
-  private readonly statusIsland: St.Bin;
   private readonly launcher: Launcher;
+  private readonly morph: PanelTablet;
   private readonly appSystem = Shell.AppSystem.get_default();
   private readonly tracker = Shell.WindowTracker.get_default();
   private readonly favorites = new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });
   private readonly taskbar: Taskbar;
-  private readonly clock = new PanelClock();
-  private readonly center: St.BoxLayout;
-  private readonly status: St.BoxLayout;
-  private readonly statusIcons = new St.BoxLayout({ style_class: 'kestrel-status-icons', x_align: Clutter.ActorAlign.CENTER, y_align: Clutter.ActorAlign.CENTER });
   private edge: Edge = 'bottom';
+  private joined = true;
   private readonly externalSignals: [Gio.Settings | Shell.AppSystem | Shell.WindowTracker | Meta.Display, number][] = [];
   private readonly unwatchPreferences: () => void;
   private workspaceWindows: WorkspaceWindows | null = null;
-  private readonly quickButton: St.Button | null = null;
-  private readonly clockButton: St.Button;
-  private readonly tray: Tray | null = null;
-  private readonly extensionItems: ExtensionItems | null = null;
-  private readonly privacy: PrivacyIndicator | null = null;
-  private readonly inputSource: InputSourceIndicator | null = null;
   private readonly refreshAfterMotion = () => this.refreshApps();
   private readonly updateFocusAfterMotion = () => this.taskbar.updateFocus();
-  private stopWaiting = () => {};
 
   constructor(actions: PanelActions, menus: ContextMenus, previews: WindowPreviews, public monitor: Monitor | null, readonly primary: boolean) {
     this.taskbar = new Taskbar(this.tracker, menus, previews, this.favorites, () => this.monitor?.index ?? -1,
@@ -100,69 +91,33 @@ export class KestrelPanel {
         this.tablet.collapse();
       });
     this.layout.screen = () => this.screen;
+    this.layout.islands = () => this.islandSet.islands;
+    this.layout.peek = this.peek.actor;
     this.actor = new St.Widget({
       name: primary ? 'kestrel-panel' : 'kestrel-secondary-panel',
       style_class: 'kestrel-panel',
       reactive: true,
       layout_manager: this.layout,
     });
-    this.autoHide = new AutoHide(this.actor, () => this.monitor, () => this.tablet.rest);
-
-    const center = this.center = new St.BoxLayout({
-      name: primary ? 'kestrel-panel-center' : null,
-      style_class: 'kestrel-taskbar',
-    });
-    const apps = this.appsIsland = new St.Bin({ child: center });
-    this.launcher = createLauncher(actions.start, this.screen.metrics.button,
-      () => this.surface?.behind(apps) ?? this.actor, floorAlong(this.actor, () => this.screen));
-    this.launcher.button.visible = this.screen.startButton;
-    center.add_child(this.launcher.button);
-    center.add_child(this.taskbar.actor);
-    this.actor.add_child(apps);
-
-    const right = this.status = new St.BoxLayout({
-      name: primary ? 'kestrel-panel-status' : null,
-      style_class: 'kestrel-panel-status',
-    });
-    if (primary) {
-      this.privacy = new PrivacyIndicator(menus, actions.stopScreencast);
-      right.add_child(this.privacy.actor);
-      this.tray = new Tray(menus);
-      this.inputSource = new InputSourceIndicator(menus, layout => {
-        const keys = this.appSystem.lookup_app(KEYS_APP);
-        return [
-          ...keys && layout ? [{ label: t('taskbar-show-keyboard-layout'), run: () => showLayout(keys, layout) }] : [],
-          { label: t('taskbar-keyboard-settings'), run: () => menus.settings('input') },
-        ];
-      });
-      right.add_child(this.inputSource.actor);
-      this.extensionItems = new ExtensionItems(() => ({
-        vertical: this.screen.vertical, thickness: this.screen.metrics.button, button: this.screen.metrics.button,
-      }));
-      right.add_child(this.extensionItems.actor);
-      right.add_child(this.tray.actor);
-      this.statusIcons.add_child(new BatteryIndicator(16).actor);
-      const quickButton = new St.Button({ style_class: 'kestrel-status-button', child: this.statusIcons, can_focus: true });
-      localized(quickButton, () => (quickButton.accessible_name = t('taskbar-quick-settings')));
-      quickButton.connect('clicked', actions.quickSettings);
-      right.add_child(quickButton);
-      this.quickButton = quickButton;
-      menus.bind(quickButton, () => [
-        { label: t('taskbar-network-settings'), run: () => menus.settings('network') },
-        { label: t('taskbar-sound-settings'), run: () => menus.settings('sound') },
-      ]);
-    }
-    this.clockButton = new St.Button({ style_class: 'kestrel-status-button', child: this.clock.actor, can_focus: true });
-    localized(this.clockButton, () => (this.clockButton.accessible_name = t('taskbar-notifications-and-date')));
-    this.clockButton.connect('clicked', actions.notifications);
-    right.add_child(this.clockButton);
-    const status = this.statusIsland = new St.Bin({ child: right });
-    this.actor.add_child(status);
     this.actor.add_child(this.peek.actor);
-    this.surface = new TaskbarSurface(this.actor, this.peek.actor, [apps, status], () => this.screen);
-    this.autoHide.trackIslands([apps, status]);
-    this.tablet = new TabletTaskbar(this.actor, [apps, status], primary, () => this.autoHide.shown, () => this.screen);
-    this.orient();
+    this.actor.add_child(this.layout.glide);
+    for (const edge of ['bottom', 'left', 'top', 'right'] as const) this.struts.set(edge, new St.Widget());
+    this.autoHide = new AutoHide(this.actor, () => this.monitor, () => this.tablet.rest, () => this.sliders);
+    this.launcher = createLauncher(actions.start, this.screen.metrics.button,
+      () => this.surface?.behind(this.islandSet.islandOf('start')?.actor ?? this.actor) ?? this.actor, floorAlong(this.actor, () => this.screen));
+    this.launcher.button.visible = this.screen.startButton;
+    this.elements = new TaskbarElements(this.launcher.button, this.taskbar, menus, actions, primary, edge => ({
+      vertical: isVertical(edge), thickness: this.screen.metrics.button, button: this.screen.metrics.button,
+    }));
+    this.islandSet = new IslandSet(this.actor, this.elements, islands => {
+      this.surface?.sync();
+      for (const island of islands) this.autoHide.follow(island.actor);
+    });
+    this.surface = new TaskbarSurface(this.actor, this.peek.actor, () => this.islandSet.islands, () => this.screen);
+    this.shapes = new IslandShapes(this.actor, this.islandSet, () => this.screen, () => this.surface.radius);
+    this.tablet = new TabletTaskbar(this.actor, () => this.islandSet.islands.map(island => island.actor), primary, () => this.autoHide.shown, () => this.screen);
+    this.morph = new PanelTablet(this, this.surface, this.launcher, this.taskbar);
+    this.arrange();
 
     this.externalSignals.push(
       [this.appSystem, this.appSystem.connect('app-state-changed', () => afterMotion(this.refreshAfterMotion))],
@@ -183,15 +138,13 @@ export class KestrelPanel {
       return [
         { label: t('taskbar-show-desktop'), run: () => this.peek.toggleDesktop() },
         ...monitor ? [{ label: t('taskbar-system-monitor'), run: () => monitor.activate() }] : [],
+        ...this.screen.touch ? [] : [{ label: t('taskbar-arrange'), run: actions.arrange }],
         { label: t('taskbar-settings'), run: () => menus.settings('taskbar') },
       ];
     });
-    menus.bind(this.clockButton, () => [
-      { label: t('taskbar-date-time-settings'), run: () => menus.settings('language') },
-    ]);
     this.syncWorkspaceWindows();
     this.refreshApps();
-    this.syncTablet(true);
+    this.morph.sync(true);
   }
 
   /** The taskbar's layout on this panel's screen, which is laid out for touch on screens people touch or draw on. */
@@ -199,25 +152,52 @@ export class KestrelPanel {
     return taskbarPreferences.on(this.monitor?.index);
   }
 
+  /** The edge the bar runs along as shown now, which can lag behind the preferences while it moves. */
+  get shownEdge(): Edge {
+    return this.edge;
+  }
+
+  get shownJoined(): boolean {
+    return this.joined;
+  }
+
+  /** The edges this panel's islands sit on. */
+  get edges(): Edge[] {
+    return [...new Set(this.islandSet.islands.map(island => island.edge))];
+  }
+
+  /** The edge an element's island sits on, such as the clock's for notifications. */
+  edgeOf(actor: Clutter.Actor): Edge {
+    return this.joined ? this.edge : this.islandSet.containing(actor)?.edge ?? this.edge;
+  }
+
+  /** How far the taskbar reaches in from each edge it uses. */
+  get depths(): Depths {
+    const depths = { ...NO_DEPTHS };
+    for (const edge of this.edges) depths[edge] = this.screen.clearance;
+    return depths;
+  }
+
+  private get sliders(): Slider[] {
+    if (this.joined) return [{ actor: this.actor, edge: this.edge }];
+    return this.islandSet.islands.map(({ actor, edge }) => ({ actor, edge }));
+  }
+
   follow(monitor: Monitor): void {
     this.monitor = monitor;
-    this.syncTablet(true);
+    this.morph.sync(true);
     this.place();
   }
 
   shutdown(): void {
     dropAfterMotion(this.refreshAfterMotion, this.updateFocusAfterMotion);
-    this.stopWaiting();
+    this.morph.stop();
     this.unwatchPreferences();
     this.workspaceWindows?.destroy();
     this.workspaceWindows = null;
-    this.tray?.shutdown();
-    this.extensionItems?.shutdown();
-    this.privacy?.shutdown();
-    this.inputSource?.shutdown();
+    this.elements.shutdown();
     this.taskbar.shutdown();
     this.tablet.destroy();
-    this.clock.destroy();
     for (const [object, signal] of this.externalSignals) object.disconnect(signal);
     this.externalSignals.length = 0;
   }
@@ -225,49 +205,53 @@ export class KestrelPanel {
   destroy(): void {
     this.shutdown();
     this.actor.destroy();
-    this.strut.destroy();
-    this.autoHide.edge.destroy();
+    for (const strut of this.struts.values()) strut.destroy();
     this.markGap(null);
   }
 
   handlesScroll(actor: Clutter.Actor | null): boolean {
-    return !!this.tray?.contains(actor) || !!this.inputSource?.contains(actor);
+    return this.elements.handlesScroll(actor);
   }
 
   updateStatus(iconNames: string[]): void {
-    const icons = this.statusIcons.get_children().filter(child => child instanceof St.Icon);
-    iconNames.forEach((iconName, index) => {
-      const icon = icons[index] ?? new St.Icon({ icon_size: 16 });
-      if (!icon.get_parent()) this.statusIcons.insert_child_at_index(icon, index);
-      icon.icon_name = iconName;
-    });
-    for (const icon of icons.slice(iconNames.length)) icon.destroy();
+    this.elements.updateStatus(iconNames);
     this.tablet.updateStatus(iconNames);
   }
 
   place(animate = false): void {
     if (!this.monitor) return;
     this.reserve();
-    const bar = this.bar;
-    if (animate) animateActor(this.actor, { ...bar, duration: RESIZE_DURATION, mode: Clutter.AnimationMode.EASE_OUT_QUART });
+    const frame = this.frame;
+    if (animate) animateActor(this.actor, { ...frame, duration: RESIZE_DURATION, mode: Clutter.AnimationMode.EASE_OUT_QUART });
     else {
-      this.actor.set_position(bar.x, bar.y);
-      this.actor.set_size(bar.width, bar.height);
+      for (const property of ['x', 'y', 'width', 'height']) this.actor.remove_transition(property);
+      this.actor.set_position(frame.x, frame.y);
+      this.actor.set_size(frame.width, frame.height);
     }
     this.autoHide.place();
   }
 
-  private get bar(): Rect {
+  /** The bar along its edge, or the whole screen that separate islands sit on. */
+  get frame(): Rect {
     const { x, y, width, height } = this.monitor!;
+    if (!this.joined) return { x, y, width, height };
     const { thickness, margin } = this.screen.metrics;
     return band({ x: x + margin, y: y + margin, width: width - 2 * margin, height: height - 2 * margin }, this.edge, thickness);
   }
 
-  private reserve(): void {
-    const { x, y, width, height } = band(this.monitor!, this.edge, this.screen.reserved);
-    this.strut.set_position(x, y);
-    this.strut.set_size(width, height);
+  reserve(): void {
+    const edges = this.edges;
+    for (const [edge, strut] of this.struts) {
+      const { x, y, width, height } = band(this.monitor!, edge, edges.includes(edge) ? this.screen.reserved : 0);
+      strut.set_position(x, y);
+      strut.set_size(width, height);
+    }
     this.markGap(this.monitor!.index);
+  }
+
+  /** The struts windows keep clear of: one along each edge with an island. */
+  get wantedStruts(): St.Widget[] {
+    return this.edges.map(edge => this.struts.get(edge)!);
   }
 
   private markGap(index: number | null): void {
@@ -276,48 +260,85 @@ export class KestrelPanel {
     if (index !== null) global.compositor.set_monitor_gap(index, this.screen.gap > 0);
   }
 
-  private orient(): void {
+  /** Shows the arrangement as it is now, the taskbar running as one bar or as separate islands. */
+  arrange(): void {
     this.edge = this.screen.edge;
-    const vertical = isVertical(this.edge);
-    const orientation = vertical ? Clutter.Orientation.VERTICAL : Clutter.Orientation.HORIZONTAL;
-    for (const box of [this.center, this.status, this.statusIcons]) box.orientation = orientation;
-    this.privacy?.orient(orientation);
-    this.extensionItems?.relayout();
-    this.clock.setNarrow(vertical);
-    this.taskbar.reorient(this.edge);
+    this.joined = this.screen.joined;
+    const arrangement = this.screen.touch ? moveBar(taskbarArrangement.current, 'bottom')
+      : this.joined ? moveBar(taskbarArrangement.current, this.edge) : taskbarArrangement.current;
+    this.islandSet.sync(arrangement, this.peek.actor);
     this.surface.sync();
+    this.autoHide.sync(true);
+    this.arranged();
   }
 
-  private moveEdge(): void {
-    const move = () => {
-      if (this.edge === this.screen.edge) return;
-      this.orient();
+  private rearrange(): void {
+    const edge = this.screen.edge;
+    const joined = this.screen.joined;
+    if (!this.monitor || (joined === this.joined && (!joined || edge === this.edge))) {
+      this.layout.ease();
+      this.arrange();
+      if (this.monitor) this.place();
+      return;
+    }
+    this.fade(() => {
+      this.arrange();
       this.place();
-    };
+    });
+  }
+
+  fade(change: () => void): void {
     if (!this.monitor || reducedMotion() || !this.actor.visible) {
-      move();
+      change();
       return;
     }
     animateActor(this.actor, {
       opacity: 0, duration: Duration.quick, curve: Curve.decelerate,
       onStopped: () => {
-        move();
+        change();
         animateActor(this.actor, { opacity: 255, duration: Duration.standard, curve: Curve.decelerate });
       },
     });
   }
 
-  /** What people see around a surface's button: its island, or the whole taskbar when the islands are joined. */
-  islandFor(surface: string): Clutter.Actor | null {
-    if (!this.buttonFor(surface)) return null;
-    return this.surface.behind(surface === 'start' ? this.appsIsland : this.statusIsland);
+  islandShapes(): IslandShape[] {
+    return this.shapes.shapes();
+  }
+
+  /** The island a surface's button sits in, which the surface opens beside. */
+  islandOf(surface: string): Island | null {
+    const element = SURFACE_ELEMENTS[surface];
+    return element ? this.islandSet.islandOf(element) : null;
+  }
+
+  /** Where a surface opens beside its button: from its island's edge, lined up with the island's end or its middle. */
+  anchorFor(surface: string): Anchor | null {
+    const island = this.islandOf(surface);
+    const button = this.buttonFor(surface);
+    if (!island || !button?.mapped || !this.monitor) return null;
+    const edge = this.edgeOf(button);
+    const along = alongOf(island.spot);
+    const reference = this.joined && along !== 'center' ? this.actor : island.actor;
+    const [x] = reference.get_transformed_position();
+    const [width] = reference.get_transformed_size();
+    if (isVertical(edge)) {
+      const [, buttonY] = button.get_transformed_position();
+      return { edge, target: buttonY + button.get_transformed_size()[1] / 2, align: 0 };
+    }
+    if (along === 'center') return { edge, target: x + width / 2, align: 0 };
+    const side = (along === 'end') !== rightToLeft() ? 1 : -1;
+    const { x: screenX, width: screenWidth } = this.monitor;
+    const end = side > 0
+      ? x + width < screenX + screenWidth ? x + width : screenX + screenWidth - EDGE_MARGIN
+      : x > screenX ? x : screenX + EDGE_MARGIN;
+    return { edge, target: Math.round(end), align: side };
   }
 
   buttonFor(surface: string): Clutter.Actor | null {
     switch (surface) {
       case 'start': return this.launcher.button.visible ? this.launcher.button : null;
-      case 'quick': return this.quickButton;
-      case 'notifications': return this.clockButton;
+      case 'quick': return this.elements.quickButton;
+      case 'notifications': return this.elements.clockButton;
       default: return null;
     }
   }
@@ -328,14 +349,11 @@ export class KestrelPanel {
   }
 
   setActive(surface: string | null): void {
-    this.autoHide.setActive(surface !== null);
+    const button = surface ? this.buttonFor(surface) : null;
+    this.autoHide.setActive(button ? this.edgeOf(button) : null);
     this.tablet.setActive(surface !== null);
-    for (const [button, active] of [
-      [this.launcher.button, surface === 'start'],
-      [this.quickButton, surface === 'quick'],
-      [this.clockButton, surface === 'notifications'],
-    ] as const) {
-      if (active) button?.add_style_pseudo_class('active');
+    for (const [name, button] of [['start', this.launcher.button], ['quick', this.elements.quickButton], ['notifications', this.elements.clockButton]] as const) {
+      if (surface === name) button?.add_style_pseudo_class('active');
       else button?.remove_style_pseudo_class('active');
     }
   }
@@ -371,98 +389,24 @@ export class KestrelPanel {
 
   private preferenceChanged(key: TaskbarKey): void {
     if (LOOK_KEYS.includes(key)) this.surface.sync();
-    if (SHAPE_KEYS.includes(key)) {
+    if (key === 'taskbar-style' && this.screen.joined !== this.joined) this.rearrange();
+    else if (SHAPE_KEYS.includes(key)) {
       const metrics = this.screen.metrics;
       this.launcher.resize(metrics.button);
       this.taskbar.resize(metrics);
-      this.extensionItems?.relayout();
+      this.elements.resize();
       this.place(true);
+      this.layout.ease();
     }
-    if (key === 'taskbar-position' && this.screen.edge !== this.edge) this.moveEdge();
+    if (key === 'taskbar-arrangement') this.rearrange();
     if (key === 'taskbar-shown' && this.monitor) this.reserve();
-    if (key === 'taskbar-alignment' || SHAPE_KEYS.includes(key)) this.layout.ease();
-    if (key === 'tablet') this.syncTablet();
+    if (key === 'tablet') this.morph.sync();
     if (key === 'taskbar-windows-per-workspace') this.syncWorkspaceWindows();
-    if (key === 'taskbar-start-button' || key === 'tablet') this.launcher.button.visible = this.screen.startButton;
+    if (key === 'taskbar-start-button') {
+      this.launcher.button.visible = this.screen.startButton;
+      this.rearrange();
+    }
     if (APP_KEYS.includes(key)) this.refreshApps();
-  }
-
-  private syncTablet(immediate = false): void {
-    if (this.screen.touch === this.tablet.shown) return;
-    this.stopWaiting();
-    this.surface.syncPeek();
-    if (immediate || !this.monitor) this.switchTablet();
-    else if (reducedMotion() || this.screen.edge !== this.edge) this.fadeTablet();
-    else this.morphTablet();
-  }
-
-  private fit(): void {
-    const metrics = this.screen.metrics;
-    this.surface.sync();
-    this.launcher.resize(metrics.button);
-    this.taskbar.resize(metrics);
-  }
-
-  private switchTablet(): void {
-    if (this.screen.edge !== this.edge) this.orient();
-    if (this.screen.touch) this.tablet.enter(() => this.fit(), true);
-    else {
-      this.fit();
-      this.tablet.leave(true);
-      if (this.autoHide.shown) this.actor.translation_y = 0;
-    }
-    this.place();
-  }
-
-  private fadeTablet(): void {
-    animateActor(this.actor, {
-      opacity: 0, duration: Duration.quick, curve: Curve.decelerate,
-      onStopped: () => {
-        if (this.screen.touch !== this.tablet.shown) this.switchTablet();
-        animateActor(this.actor, { opacity: 255, duration: Duration.standard, curve: Curve.decelerate });
-      },
-    });
-  }
-
-  private morphTablet(): void {
-    const from = { width: this.actor.width, radius: this.surface.radius };
-    if (this.screen.touch) {
-      this.tablet.enter(() => this.fit(), false);
-      this.reserve();
-      const strut = band(this.monitor!, this.edge, this.screen.reserved);
-      this.stopWaiting = afterWindowsReach(this.monitor!, strut.y, () => {
-        if (this.autoHide.shown) animateActor(this.actor, { translation_y: this.tablet.rest, spring: Spring.smooth });
-        this.morphTo(from);
-      });
-    } else {
-      this.fit();
-      this.tablet.leave(false);
-      if (this.autoHide.shown) {
-        animateActor(this.actor, {
-          translation_y: 0, spring: Spring.smooth,
-          onStopped: () => { if (!this.tablet.shown) this.reserve(); },
-        });
-      } else this.reserve();
-      this.morphTo(from);
-    }
-  }
-
-  private morphTo(from: { width: number; radius: number }): void {
-    const to = { ...this.bar, radius: this.screen.metrics.radius };
-    animateActor(this.actor, { x: to.x, y: to.y, width: to.width, height: to.height, spring: Spring.smooth });
-    this.morphRadius(from, to);
-    this.autoHide.place();
-  }
-
-  private morphRadius(from: { width: number; radius: number }, to: { width: number; radius: number }): void {
-    const width = this.actor.get_transition('width');
-    if (from.radius === to.radius || !width) return;
-    this.surface.shape(from.radius);
-    width.connect('new-frame', () => {
-      const progress = (this.actor.width - from.width) / (to.width - from.width);
-      this.surface.shape(from.radius + (to.radius - from.radius) * progress);
-    });
-    width.connect('stopped', () => this.surface.shape(null));
   }
 
   private refreshApps(): void {

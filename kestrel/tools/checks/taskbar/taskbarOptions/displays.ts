@@ -8,7 +8,7 @@ import {gjs, stop, waitForWindow} from '../../lib/processes.js';
 import {capture} from '../../lib/screenshots.js';
 import {settled} from '../../lib/wait.js';
 import {edgeGap, eventually, HEIGHTS, otherMonitor, panel, set, settings} from './taskbar.js';
-import {boxOf, farSide} from '../../lib/edge.js';
+import {alongEdge, arrange, boxOf, farSide} from '../../lib/edge.js';
 
 const within = (actor: Clutter.Actor, monitor: Monitor) => actor.x >= monitor.x && actor.x + actor.width <= monitor.x + monitor.width;
 
@@ -57,7 +57,7 @@ function pretendPenDisplay(monitor: Monitor | null) {
 }
 
 async function checkPenDisplay(monitor: Monitor) {
-  set('taskbar-position', 'left');
+  arrange(alongEdge('left'));
   const secondary = existing('kestrel-secondary-panel');
   await eventually(() => panel().height > panel().width && secondary.height > secondary.width, 'both taskbars start on the chosen edge');
   pretendPenDisplay(monitor);
@@ -72,7 +72,7 @@ async function checkPenDisplay(monitor: Monitor) {
   }
   await eventually(() => !firstStyled('kestrel-tablet-strip', secondary)?.visible && secondary.height > secondary.width,
     'the taskbar goes back to the chosen edge once the pen display is gone');
-  settings.reset('taskbar-position');
+  settings.reset('taskbar-arrangement');
 }
 
 export async function checkDisplays() {

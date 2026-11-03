@@ -32,7 +32,7 @@ const layout = (): Layout => JSON.parse(settings.get_string('start-layout'));
 const items = () => descendants(existing('kestrel-start')).filter((actor): actor is Item => !!actor.name?.startsWith(ITEM) && actor.mapped);
 const apps = () => items().filter(button => !button.name.includes('folder:'));
 const idOf = (button: Item) => button.name.replace(ITEM, '');
-const panelApps = () => named('kestrel-panel-center')?.get_last_child()?.get_children().map(slot => slot.get_first_child()) ?? [];
+const panelApps = () => named('kestrel-taskbar-dock')?.get_children().map(slot => slot.get_first_child()) ?? [];
 
 async function dragOnto(sourceOf: Target, targetOf: Target, fraction = 0.5) {
   await settled();

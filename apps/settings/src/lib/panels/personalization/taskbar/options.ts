@@ -1,5 +1,5 @@
-export type Position = 'bottom' | 'left' | 'top' | 'right';
-export type Alignment = 'center' | 'left';
+import type { PresetName, StoredArrangement } from '@luft/ui/taskbar';
+
 export type Look = 'glass' | 'solid' | 'transparent' | 'accent';
 export type Style = 'bar' | 'floating' | 'separate';
 export type Size = 'compact' | 'normal' | 'large';
@@ -9,8 +9,7 @@ export type StartStyle = 'menu' | 'palette';
 export type WebSearch = 'duckduckgo' | 'google' | 'bing' | 'brave' | 'ecosia' | 'startpage' | 'kagi';
 
 export type TaskbarSettings = {
-	'taskbar-position': Position;
-	'taskbar-alignment': Alignment;
+	'taskbar-arrangement': StoredArrangement;
 	'taskbar-look': Look;
 	'taskbar-style': Style;
 	'taskbar-size': Size;
@@ -27,8 +26,7 @@ export type TaskbarSettings = {
 };
 
 export const TASKBAR_KEYS: (keyof TaskbarSettings)[] = [
-	'taskbar-position',
-	'taskbar-alignment',
+	'taskbar-arrangement',
 	'taskbar-look',
 	'taskbar-style',
 	'taskbar-size',
@@ -59,21 +57,12 @@ export const WEB_SEARCH: { value: WebSearch; label: string }[] = [
 	{ value: 'kagi', label: 'Kagi' }
 ];
 
-export const POSITIONS: { value: Position; label: string }[] = [
-	{ value: 'bottom', label: 'settings-taskbar-position-bottom' },
-	{ value: 'left', label: 'settings-taskbar-position-left' },
-	{ value: 'top', label: 'settings-taskbar-position-top' },
-	{ value: 'right', label: 'settings-taskbar-position-right' }
+export const PRESETS: { value: PresetName; label: string }[] = [
+	{ value: 'classic', label: 'settings-taskbar-preset-classic' },
+	{ value: 'centered', label: 'settings-taskbar-preset-centered' },
+	{ value: 'mac', label: 'settings-taskbar-preset-mac' },
+	{ value: 'side', label: 'settings-taskbar-preset-side' }
 ];
-
-export const isVertical = (position: Position) => position === 'left' || position === 'right';
-
-export function alignments(position: Position): { value: Alignment; label: string }[] {
-	return [
-		{ value: 'center', label: 'settings-taskbar-align-center' },
-		{ value: 'left', label: isVertical(position) ? 'settings-taskbar-align-top' : 'settings-taskbar-align-left' }
-	];
-}
 
 export const LOOKS: { value: Look; label: string }[] = [
 	{ value: 'glass', label: 'settings-taskbar-look-glass' },

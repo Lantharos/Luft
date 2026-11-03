@@ -155,6 +155,7 @@ $effect(() => {
 | `canPlayNatively()`, `decodeFailed(media)` | Whether native video is available, and whether a `<video>` failed to decode |
 | `MediaState` | A native player's state as reactive fields with setters, for `MediaControls` |
 | `MARK_LAYERS`, `MARK_SCALE`, `PAINTED_MARK_SCALE` | The Start mark's two layers, which color each takes and which one carries the taskbar's halo, shared with Kestrel's Start button |
+| `@luft/ui/taskbar` | The taskbar's arrangement, shared with Kestrel: islands at twelve spots, reading and storing `taskbar-arrangement`, moving islands and elements, presets, and `layIslands`, which places islands on a screen and settles who keeps each corner |
 | `FingerprintEnrollment`, `fingerprints()`, `fingerprintReader()`, `deleteFingerprint(finger)` | Enrolling and managing fingerprints through `luft-fingerprint`; `FINGERS` and `fingerLabel` name the fingers |
 
 Types: `Appearance`, `AppIconStyle`, `Palette`, `PaletteItem`, `PaletteSource`, `FuzzyMatch`, `Scheme`, `SchemeColors`, `MarkLayer`, `MarkFills`, `TaskbarLook`, `TaskbarLooks`, `TaskbarLookPaint`, `Shadow`, `VirtualRect`, `VirtualHandle`, `VirtualLayout`.

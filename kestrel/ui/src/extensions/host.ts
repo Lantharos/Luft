@@ -3,6 +3,7 @@ import type Clutter from 'gi://Clutter';
 import type { Keybindings } from '../context.js';
 import type { ContextMenus } from '../desktop/menus/contextMenus.js';
 import type { Monitor } from '../desktop/panel/panel.js';
+import type { IslandShape } from '../desktop/panel/islands/shapes.js';
 import type { Rect } from './api/v1/types.js';
 
 /** What the desktop is doing, as far as extensions care. It tells its listeners whenever windows or surfaces may have moved. */
@@ -36,6 +37,8 @@ export interface ExtensionHost {
   /** Where windows go on a display, without the taskbar. */
   workArea(index: number): Rect;
   taskbar(monitor: Monitor): Rect | null;
+  /** Each part of the taskbar on a display as people see it, in stage coordinates: the bar, or every separate island with its edge and rounding. */
+  taskbarIslands(monitor: Monitor): IslandShape[];
   accent(): string;
   wallpaperAccent(): string;
   watchAccent(changed: () => void): () => void;

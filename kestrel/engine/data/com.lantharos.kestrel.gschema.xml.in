@@ -349,16 +349,6 @@
         the key the manifest declares. Shortcuts left at their default are left out.
       </description>
     </key>
-    <key name="taskbar-element-places" type="a{ss}">
-      <default>{}</default>
-      <summary>Where extensions' taskbar elements sit on a taskbar that's one bar</summary>
-      <description>
-        By element, named extension-id/element: 'before-apps' or 'after-apps'
-        in the island with Start and the apps, 'beside-tray' before the tray,
-        or 'start' or 'end' of the taskbar. An element left out sits beside
-        the tray. With separate islands, people move elements themselves.
-      </description>
-    </key>
     <key name="extension-problems" type="a{s(ss)}">
       <default>{}</default>
       <summary>Why Kestrel turned extensions off</summary>
@@ -424,21 +414,18 @@
         When disabled, Super still opens Start.
       </description>
     </key>
-    <key name="taskbar-position" enum="com.lantharos.kestrel.TaskbarPosition">
-      <default>'bottom'</default>
-      <summary>Which edge of the screen the taskbar runs along</summary>
+    <key name="taskbar-arrangement" type="a(sas)">
+      <default>[('bottom-center', ['start', 'dock']), ('bottom-end', ['tray', 'status', 'clock'])]</default>
+      <summary>Where the taskbar's islands sit and what each holds</summary>
       <description>
-        Start, quick settings, notifications and the taskbar's menus open
-        from the same edge. Tablet mode always keeps the taskbar at the
-        bottom.
-      </description>
-    </key>
-    <key name="taskbar-alignment" enum="com.lantharos.kestrel.TaskbarAlignment">
-      <default>'center'</default>
-      <summary>Where Start and the apps sit on the taskbar</summary>
-      <description>
-        'left' puts them at the start of the taskbar: the left end of a
-        horizontal taskbar, or the top of one along the left or right edge.
+        Each island sits at a spot named by a screen edge and a place along
+        it, such as 'bottom-center' or 'left-start', and holds taskbar
+        elements in order: 'start', 'dock', 'tray', 'status', 'clock', and
+        those of extensions, named as extension-id/element. Islands along
+        the top and bottom run across, those on the left and right run
+        down. Separate islands sit where they are placed; a taskbar joined
+        into one bar runs along the dock's edge and keeps each island's
+        place along it. Tablet mode always keeps the taskbar at the bottom.
       </description>
     </key>
     <key name="taskbar-look" enum="com.lantharos.kestrel.TaskbarLook">
@@ -581,6 +568,17 @@
     <child name="keybindings" schema="com.lantharos.kestrel.keybindings"/>
     <child name="app-switcher" schema="com.lantharos.kestrel.app-switcher"/>
     <child name="window-switcher" schema="com.lantharos.kestrel.window-switcher"/>
+  </schema>
+
+  <schema id="com.lantharos.kestrel.legacy-taskbar" path="/com/lantharos/kestrel/">
+    <key name="taskbar-position" enum="com.lantharos.kestrel.TaskbarPosition">
+      <default>'bottom'</default>
+      <summary>The taskbar's edge before taskbar-arrangement, read once to carry it over</summary>
+    </key>
+    <key name="taskbar-alignment" enum="com.lantharos.kestrel.TaskbarAlignment">
+      <default>'center'</default>
+      <summary>The taskbar's alignment before taskbar-arrangement, read once to carry it over</summary>
+    </key>
   </schema>
 
   <schema id="com.lantharos.kestrel.keybindings" path="/com/lantharos/kestrel/keybindings/"

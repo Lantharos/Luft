@@ -1,0 +1,19 @@
+.kestrel-arrange-backdrop { background-color: rgba(0, 0, 0, 0.3); }
+
+.kestrel-arrange-target { background-color: rgba(255, 255, 255, 0.09); transition-duration: $motion-tap; }
+.kestrel-arrange-target:hover { background-color: rgba(255, 255, 255, 0.26); }
+
+.kestrel-arrange-handle-grip { border-radius: 999px; background-color: rgba(255, 255, 255, 0.72); box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35); transition-duration: $motion-tap; }
+.kestrel-arrange-handle:hover .kestrel-arrange-handle-grip { background-color: white; }
+
+.kestrel-arrange-focus { border: 2px solid rgba(255, 255, 255, 0.9); }
+
+.kestrel-arrange-bar { padding: 14px 14px 14px 22px; spacing: 28px; border-radius: 26px; }
+.kestrel-arrange-text { spacing: 2px; }
+.kestrel-arrange-title { font-size: 15px; font-weight: 600; }
+.kestrel-arrange-hint { font-size: 13px; color: ink(0.7); }
+.kestrel-arrange-button { margin-left: 6px; padding: 10px 18px; border-radius: 999px; font-size: 14px; font-weight: 500; background-color: fill(0.08); transition-duration: $motion-tap; }
+.kestrel-arrange-button:hover { background-color: fill(0.14); }
+.kestrel-arrange-button:focus { box-shadow: inset 0 0 0 1px ink(0.4); }
+.kestrel-arrange-done { background-color: fill(0.24); font-weight: 600; }
+.kestrel-arrange-done:hover { background-color: fill(0.32); }

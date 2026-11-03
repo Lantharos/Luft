@@ -3,7 +3,6 @@ import type Gio from 'gi://Gio';
 import St from 'gi://St';
 
 import { Registry } from '../../../shared/registry.js';
-import { type ElementActor, type ElementLayout, type TaskbarElementEntry, taskbarElements } from './extensionElements.js';
 
 /** A button an extension placed on the taskbar. */
 export interface TaskbarEntry {
@@ -20,37 +19,15 @@ export const taskbarEntries = new Registry<TaskbarEntry>();
 
 const ICON_SIZE = 16;
 
-/** The extensions' buttons and elements on the primary taskbar, next to the tray. */
+/** The extensions' buttons on the primary taskbar, next to the tray. */
 export class ExtensionItems {
   readonly actor = new St.BoxLayout({ name: 'kestrel-extension-items' });
   private readonly buttons = new Map<TaskbarEntry, { button: St.Button; unwatch: () => void }>();
-  private readonly elements = new Map<TaskbarElementEntry, ElementActor>();
   private readonly unwatch: () => void;
-  private readonly unwatchElements: () => void;
 
-  constructor(private readonly layout: () => ElementLayout) {
+  constructor() {
     for (const entry of taskbarEntries.items) this.add(entry);
-    for (const entry of taskbarElements.items) this.addElement(entry);
     this.unwatch = taskbarEntries.watch((entry, added) => added ? this.add(entry) : this.remove(entry));
-    this.unwatchElements = taskbarElements.watch((entry, added) => added ? this.addElement(entry) : this.removeElement(entry));
-  }
-
-  private addElement(entry: TaskbarElementEntry): void {
-    const element = entry.create(this.layout());
-    this.actor.insert_child_at_index(element.actor, 0);
-    this.elements.set(entry, element);
-  }
-
-  private removeElement(entry: TaskbarElementEntry): void {
-    this.elements.get(entry)?.destroy();
-    this.elements.delete(entry);
-  }
-
-  /** The taskbar moved to another edge or changed size. */
-  relayout(): void {
-    const layout = this.layout();
-    this.actor.orientation = layout.vertical ? Clutter.Orientation.VERTICAL : Clutter.Orientation.HORIZONTAL;
-    for (const element of this.elements.values()) element.relayout(layout);
   }
 
   private add(entry: TaskbarEntry): void {
@@ -81,8 +58,6 @@ export class ExtensionItems {
 
   shutdown(): void {
     this.unwatch();
-    this.unwatchElements();
     for (const entry of [...this.buttons.keys()]) this.remove(entry);
-    for (const entry of [...this.elements.keys()]) this.removeElement(entry);
   }
 }

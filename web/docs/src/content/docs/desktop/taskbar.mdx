@@ -7,7 +7,7 @@ sidebar:
 
 import Shot from '../../../components/Shot.astro';
 
-The taskbar sits along the bottom of the screen, or along whichever edge you choose in its [options](#options). From left to right in its middle are the Luft mark, which opens [Start](/desktop/start-and-search/), and your apps. On the right are the tray, the status icons that open [Quick settings](/desktop/quick-settings/), and the clock, which opens [Notifications](/desktop/notifications/).
+The taskbar sits along the bottom of the screen, or wherever you [arrange it](#arranging-the-taskbar). From left to right in its middle are the Luft mark, which opens [Start](/desktop/start-and-search/), and your apps. On the right are the tray, the status icons that open [Quick settings](/desktop/quick-settings/), and the clock, which opens [Notifications](/desktop/notifications/).
 
 <Shot name="taskbar" alt="The taskbar with pinned apps, status icons and the clock" />
 
@@ -37,7 +37,7 @@ On a touchscreen, touch and hold for the same menu.
 | Where | What's in it |
 | --- | --- |
 | An app | Open, New window, the app's own actions, each of its windows, minimize and maximize, pin or unpin, and close |
-| The taskbar | Show desktop, System monitor, and Taskbar settings |
+| The taskbar | Show desktop, System monitor, Edit taskbar, and Taskbar settings |
 | The status icons | Network and Sound settings |
 | The clock | Date and time settings |
 
@@ -49,13 +49,41 @@ Apps that live in the background, such as chat or sync apps, show up in the tray
 
 The far end of the taskbar, past the clock, is a thin strip. Hover over it to fade every window away for a look at the desktop, and click it to minimize everything; click again to bring them back.
 
+## Arranging the taskbar
+
+The taskbar is made of parts: Start, your apps, the tray, the status icons, the clock, and anything extensions add, such as what's playing. Parts sit together in islands, and each island goes to one of twelve spots: the start, middle or end of any edge of the screen. Islands along the top and bottom run across, those on the left and right run down.
+
+Right-click the taskbar and choose **Edit taskbar**, or choose **Edit on the desktop** in Settings. The desktop dims and the twelve spots show.
+
+- Drag an island by the small handle beside it to move it to another spot. Dropping it on another island swaps the two.
+- Drag a part, such as Start or the clock, into another island, or onto an empty spot to give it an island of its own. Drag it back to put them together again.
+- Drag a part along its island to change the order.
+- With the keyboard, <kbd>Tab</kbd> picks an island or one of its parts, and the arrow keys move it.
+
+The taskbar shows every change as you make it. **Done** or <kbd>Enter</kbd> keeps it, **Reset to default** brings back the taskbar Luft starts with, and <kbd>Esc</kbd> puts everything back as it was.
+
+<Shot name="taskbar-edit" alt="Editing the taskbar, with the desktop dimmed and the spots along the edges" />
+
+Settings has the same arrangement on its preview, where you can drag islands and parts too, and a few layouts to start from:
+
+| Layout | What you get |
+| --- | --- |
+| Classic | One bar along the bottom, with Start and your apps on the left |
+| Centered dock | Start and your apps in the middle of the bottom, the clock at its end |
+| macOS-like | A dock at the bottom and the status icons and clock at the top right |
+| Side dock | Your apps down the left edge and the clock at the bottom right |
+
+Islands next to the same corner never overlap: the one on the top or bottom keeps the corner, and the one on the side moves along its edge to make room. Maximized windows keep a gap from every edge with an island, and their corners facing an island stay rounded. Start, quick settings and notifications open beside the island their button is in, and notification banners appear next to the clock.
+
+The arrangement shines with the Separate shape. Edge to edge and Floating keep the taskbar as one bar, along the edge of your apps, with every island at its place along it; moving an island to another edge in Edit taskbar moves the whole bar there.
+
 ## Options
 
 Right-click the taskbar and choose **Taskbar settings**, or open Settings, Taskbar and Start.
 
 <Shot name="settings-taskbar" alt="The taskbar's options in Settings, with a preview" />
 
-The page opens on a preview of your taskbar. Click one of the handles on its other edges to move the taskbar there. Shape, look and size sit under the preview; **Start** and **More options** hold the rest.
+The page opens on a preview of your taskbar, which you can arrange right there. Shape, look, size and layouts sit under the preview; **Start** and **More options** hold the rest.
 
 | Option | Choices |
 | --- | --- |
@@ -63,10 +91,8 @@ The page opens on a preview of your taskbar. Click one of the handles on its oth
 | Show the Start button | When off, <kbd>Super</kbd> still opens Start |
 | Search the web with | DuckDuckGo, Google, Bing, Brave Search, Ecosia, Startpage or Kagi |
 | Show the taskbar | When off, the clock and status icons stay in a corner, see [without the taskbar](/desktop/gust/#without-the-taskbar) |
-| Position | Bottom, Left, Top or Right, picked on the preview |
-| Alignment | Center, or Left (Top on a taskbar along the left or right edge) |
 | Look | Glass (blurred), Solid, Transparent, or Accent (tinted glass) |
-| Shape | Edge to edge; Floating, with rounded ends and a gap around it; or Separate, where Start and your apps float apart from the status icons and clock. Maximized windows keep the same gap from a floating or separate taskbar |
+| Shape | Edge to edge; Floating, with rounded ends and a gap around it; or Separate, where each island floats on its own. Maximized windows keep the same gap from a floating or separate taskbar |
 | Size | Small, Medium or Large |
 | Hide automatically | Never, Always, or When a window touches it |
 | Show pinned apps | When off, pinned apps move into Start instead |
@@ -78,8 +104,8 @@ The page opens on a preview of your taskbar. Click one of the handles on its oth
 
 The taskbar sits on your wallpaper, so it takes its light or dark look from the part of the wallpaper behind it: light over a bright beach or snow, dark over a night sky, and your light or dark style when the wallpaper is in between. Start, quick settings and your apps keep following your style. The clock and status icons pick a light or dark ink, whichever reads better against what's behind the taskbar, so they stay clear on any wallpaper.
 
-On the left or right, apps stack from the top and the clock shows the time over the date. Start, quick settings, notifications and the taskbar's menus open beside the button you used, and notification banners appear in the corner next to the clock.
+On the left or right, apps stack from the top and the clock shows the time over the date. The taskbar's menus open beside the button you used.
 
 On a convertible folded into a tablet, and on a pen display or touch monitor, the taskbar moves to the bottom and becomes a thin strip that you swipe up for a touch-sized taskbar, see [Tablet mode](/desktop/tablet-mode/).
 
-With several displays, each one gets its own taskbar with Start, its apps and the clock. The tray, status icons and privacy indicator stay on the main display. A taskbar steps aside on a display where an app is full screen.
+With several displays, each one gets its own taskbar with Start, its apps and the clock, arranged the same way. The tray, status icons and privacy indicator stay on the main display. A taskbar steps aside on a display where an app is full screen.

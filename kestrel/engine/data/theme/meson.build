@@ -34,6 +34,7 @@ theme_sources = files([
   'sass/widgets/_switcher-popup.scss',
   'sass/widgets/_switches.scss',
   'sass/widgets/_workspace-switcher.scss',
+  'kestrel/_arrange.scss',
   'kestrel/_base.scss',
   'kestrel/_dialogs.scss',
   'kestrel/_extensions.scss',

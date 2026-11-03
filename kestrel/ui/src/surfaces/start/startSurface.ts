@@ -2,15 +2,16 @@ import type St from 'gi://St';
 
 import type { Monitor } from '../../desktop/panel/panel.js';
 import type { Box } from '../../shared/layout/box.js';
+import type { Anchor } from '../../shared/layout/anchor.js';
 import type { Edge, Offset } from '../../shared/layout/edge.js';
 
 export interface StartArea {
   monitor: Monitor;
   area: Box;
-  edge: Edge;
   available: number;
   cornered: boolean;
-  anchor: number | null;
+  /** Where Start opens beside its button. */
+  anchor: Anchor;
 }
 
 export interface StartSurface {

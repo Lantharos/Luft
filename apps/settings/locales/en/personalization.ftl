@@ -103,16 +103,29 @@ settings-start-web = Search the web with
 settings-taskbar-shown = Show the taskbar
 settings-taskbar-hidden = Hidden
 settings-taskbar-hidden-description = The clock and status icons stay in a corner, and Super opens Start
-settings-taskbar-position-bottom = Bottom
-settings-taskbar-position-left = Left
-settings-taskbar-position-top = Top
-settings-taskbar-position-right = Right
-settings-taskbar-alignment = Alignment
-settings-taskbar-align-center = Center
-settings-taskbar-align-left = Left
-settings-taskbar-align-top = Top
 # How the taskbar background looks
 settings-taskbar-look = Look
+# Caption above one-click arrangements of the taskbar's parts.
+settings-taskbar-presets = Layouts
+# Start and the apps at the left of a bar along the bottom, status and clock at the right.
+settings-taskbar-preset-classic = Classic
+settings-taskbar-preset-centered = Centered dock
+# Apps in a dock at the bottom, the status icons and clock at the top right, as on a Mac.
+settings-taskbar-preset-mac = macOS-like
+settings-taskbar-preset-side = Side dock
+# Opens a mode on the desktop for moving the taskbar's parts around the screen.
+settings-taskbar-edit = Edit on the desktop
+settings-taskbar-edit-description = Drag the taskbar's islands and their parts to any edge of the screen
+# Screen-reader label of a group of taskbar parts in the preview. $parts lists them, such as "Start, Apps".
+settings-taskbar-island = Island with { $parts }
+settings-taskbar-island-move = Drag to move this island
+settings-taskbar-element-start = Start
+# The part of the taskbar with pinned and running apps.
+settings-taskbar-element-dock = Apps
+# The part of the taskbar with icons of apps running in the background.
+settings-taskbar-element-tray = Tray
+settings-taskbar-element-status = Network, sound and battery
+settings-taskbar-element-clock = Clock and notifications
 settings-taskbar-look-glass = Glass
 settings-taskbar-look-solid = Solid
 settings-taskbar-look-transparent = Transparent
@@ -350,3 +363,5 @@ settings-extensions-place-after-apps = Right of the apps
 settings-extensions-place-beside-tray = Next to the tray
 settings-extensions-place-start = At the start of the taskbar
 settings-extensions-place-end = At the end of the taskbar
+# Shown when the element sits somewhere else, where it was put while editing the taskbar.
+settings-extensions-place-elsewhere = Elsewhere

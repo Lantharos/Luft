@@ -11,6 +11,15 @@ taskbar-show-desktop = Show desktop
 # Taskbar right-click menu item that opens the system monitor app.
 taskbar-system-monitor = System monitor
 taskbar-settings = Taskbar settings
+# Taskbar right-click menu item that lets people move the taskbar's islands around the screen. "Edit" is a verb.
+taskbar-arrange = Edit taskbar
+# Title shown in the middle of the screen while people move the taskbar's islands around.
+taskbar-arrange-title = Edit taskbar
+taskbar-arrange-hint = Drag an island by its handle, or anything in it to another island or an empty spot
+taskbar-arrange-reset = Reset to default
+taskbar-arrange-done = Done
+# Name of the part of the taskbar that holds pinned and running apps, read out while people move it.
+taskbar-arrange-dock = Apps
 # Menu of the keyboard layout indicator. "Show" is a verb.
 taskbar-show-keyboard-layout = Show keyboard layout
 taskbar-keyboard-settings = Keyboard settings

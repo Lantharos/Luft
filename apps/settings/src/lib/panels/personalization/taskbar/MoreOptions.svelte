@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { Row, Section, Segmented, Select, Switch } from '@luft/ui';
+	import { Row, Section, Select, Switch } from '@luft/ui';
 	import type { SettingsGroup } from '#lib/state/gsettings.svelte.js';
-	import { alignments, AUTO_HIDE, type TaskbarSettings } from './options';
+	import { AUTO_HIDE, type TaskbarSettings } from './options';
 
 	interface Props {
 		settings: SettingsGroup<TaskbarSettings>;
@@ -14,7 +14,6 @@
 	let values = $derived(settings.values);
 	let shown = $derived(values['taskbar-shown'] ?? true);
 	let everyDisplay = $derived((values['taskbar-displays'] ?? 'all') === 'all');
-	let alignmentOptions = $derived(alignments(values['taskbar-position'] ?? 'bottom').map((option) => ({ value: option.value, label: t(option.label) })));
 	let autoHide = $derived(AUTO_HIDE.map((option) => ({ value: option.value, label: t(option.label) })));
 </script>
 
@@ -23,9 +22,6 @@
 		<Switch label={t('settings-taskbar-shown')} checked={shown} onchange={(on) => settings.set('taskbar-shown', on)} />
 	</Row>
 	{#if shown}
-		<Row title={t('settings-taskbar-alignment')}>
-			<Segmented label={t('settings-taskbar-alignment')} options={alignmentOptions} value={values['taskbar-alignment'] ?? 'center'} onchange={(value) => settings.set('taskbar-alignment', value)} />
-		</Row>
 		<Row title={t('settings-taskbar-auto-hide')}>
 			<Select label={t('settings-taskbar-auto-hide')} options={autoHide} value={values['taskbar-auto-hide'] ?? 'never'} onchange={(value) => settings.set('taskbar-auto-hide', value)} />
 		</Row>

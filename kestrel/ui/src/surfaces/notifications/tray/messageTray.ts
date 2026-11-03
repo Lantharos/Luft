@@ -17,7 +17,7 @@ import { FocusGrabber } from './focusGrabber.js';
 import { Notification, Source } from './notification.js';
 import { NotificationDestroyedReason, State, Urgency } from './notificationEnums.js';
 import type { NotificationPolicy } from './notificationPolicy.js';
-import { direction, toward, type Edge } from '../../../shared/layout/edge.js';
+import { direction, isVertical, toward, type Edge } from '../../../shared/layout/edge.js';
 
 export { Action, Notification, Sound, Source } from './notification.js';
 export { NotificationDestroyedReason, PrivacyScope, State, Urgency } from './notificationEnums.js';
@@ -418,9 +418,13 @@ export class MessageTray extends St.Widget {
     banner.header.expandButton.visible = false;
     banner.add_style_class_name('notification-banner');
 
-    const edge = this.bannerEdge = KestrelUi.taskbarInset().edge;
-    this.bannerBin.x_align = edge === 'left' ? Clutter.ActorAlign.START : Clutter.ActorAlign.END;
-    this.bannerBin.y_align = edge === 'top' ? Clutter.ActorAlign.START : Clutter.ActorAlign.END;
+    const { edge, target, align } = KestrelUi.taskbarAnchor('notifications');
+    this.bannerEdge = edge;
+    const monitor = global.display.get_monitor_geometry(global.display.get_primary_monitor());
+    const towardEnd = isVertical(edge) ? target > monitor.y + monitor.height / 2 : align >= 0;
+    const near = (start: boolean) => start ? Clutter.ActorAlign.START : Clutter.ActorAlign.END;
+    this.bannerBin.x_align = isVertical(edge) ? near(edge === 'left') : near(!towardEnd);
+    this.bannerBin.y_align = isVertical(edge) ? near(!towardEnd) : near(edge === 'top');
     this.bannerBin.add_child(banner);
     new KestrelUi.SwipeAway(banner, {
       downward: edge === 'bottom',

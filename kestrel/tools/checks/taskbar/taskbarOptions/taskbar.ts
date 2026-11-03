@@ -12,12 +12,14 @@ import {reservedGap, taskbarEdge, vertical, type Edge} from '../../lib/edge.js';
 export const {require, eventually} = checks('taskbar option');
 export const HEIGHTS = {compact: 40, normal: 48, large: 56};
 export const FLOATING_MARGIN = 8;
-export const KEYS = ['taskbar-alignment', 'taskbar-look', 'taskbar-style', 'taskbar-size', 'taskbar-auto-hide',
+export const KEYS = ['taskbar-arrangement', 'taskbar-look', 'taskbar-style', 'taskbar-size', 'taskbar-auto-hide',
   'taskbar-show-pinned', 'taskbar-displays', 'taskbar-windows-per-display', 'taskbar-windows-per-workspace'];
 const CROP_DEPTH = 120;
 
 export const settings = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 export const panel = () => ofType(named('kestrel-panel'), St.Widget);
+/** The island an element of the primary taskbar sits in, such as `clock`. */
+export const islandOf = (element: string) => ofType(named(`kestrel-taskbar-${element}`)!.get_parent()!.get_parent(), St.Widget);
 export const primary = () => Main.layoutManager.primaryMonitor!;
 export const otherMonitor = () => Main.layoutManager.monitors.find(monitor => monitor !== primary()) ?? null;
 

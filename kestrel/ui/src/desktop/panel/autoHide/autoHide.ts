@@ -4,7 +4,8 @@ import Mtk from 'gi://Mtk';
 import St from 'gi://St';
 
 import { animateActor } from '../../../shared/motion/motion.js';
-import { band, toward } from '../../../shared/layout/edge.js';
+import { band, toward, type Edge } from '../../../shared/layout/edge.js';
+import { EDGES } from '../../../../../../packages/web/ui/src/taskbar/arrangement/index';
 import { taskbarPreferences, type TaskbarLayout } from '../preferences/taskbarPreferences.js';
 import type { Monitor } from '../panel.js';
 import type { WindowOverlap } from './windowOverlap.js';
@@ -12,42 +13,60 @@ import type { WindowOverlap } from './windowOverlap.js';
 const HIDE_DELAY = 450;
 const SLIDE_DURATION = 220;
 
+/** What slides away to one edge when the taskbar hides: the whole bar, or each separate island on its own edge. */
+export interface Slider {
+  actor: St.Widget;
+  edge: Edge;
+}
+
+class EdgeState {
+  revealed = true;
+  timer = 0;
+
+  cancel(): void {
+    if (this.timer) GLib.Source.remove(this.timer);
+    this.timer = 0;
+  }
+}
+
+/** Hides the taskbar on each edge it uses, until the pointer reaches that edge or something there needs it. */
 export class AutoHide {
-  readonly edge = new St.Widget({ name: 'kestrel-taskbar-edge', reactive: true, track_hover: true, visible: false });
-  private revealed = true;
+  readonly sensors = new Map<Edge, St.Widget>(EDGES.map(edge =>
+    [edge, new St.Widget({ name: `kestrel-taskbar-edge-${edge}`, reactive: true, track_hover: true, visible: false })]));
+  private readonly states = new Map<Edge, EdgeState>(EDGES.map(edge => [edge, new EdgeState()]));
   private allowed = false;
-  private active = false;
+  private activeEdge: Edge | null = null;
   private held = false;
   private suppressed = false;
   private arriving = false;
+  private arranging = false;
   private overlap: WindowOverlap | null = null;
-  private timer = 0;
-  private islands: St.Widget[] = [];
+  private readonly hovered = new WeakSet<St.Widget>();
   private readonly focusSignal: number;
 
-  constructor(private readonly panel: St.Widget, private readonly monitor: () => Monitor | null, private readonly rest: () => number) {
+  constructor(private readonly panel: St.Widget, private readonly monitor: () => Monitor | null, private readonly rest: () => number,
+    private readonly sliders: () => Slider[]) {
     panel.connect('notify::hover', () => this.sync());
-    this.edge.connect('notify::hover', () => this.sync());
+    for (const sensor of this.sensors.values()) sensor.connect('notify::hover', () => this.sync());
     const stage = global.stage;
     this.focusSignal = stage.connect('notify::key-focus', () => this.sync());
     panel.connect('destroy', () => {
-      this.cancel();
+      for (const state of this.states.values()) state.cancel();
       stage.disconnect(this.focusSignal);
+      for (const sensor of this.sensors.values()) sensor.destroy();
     });
   }
 
-  /** Parts of the taskbar that take the pointer when the taskbar itself lets it through, as its separate islands do. */
-  trackIslands(islands: St.Widget[]): void {
-    this.islands = islands;
-    for (const island of islands) island.connect('notify::hover', () => this.sync());
+  /** Islands take the pointer themselves when the taskbar lets it through, as separate islands do. */
+  follow(island: St.Widget): void {
+    if (this.hovered.has(island)) return;
+    this.hovered.add(island);
+    island.connect('notify::hover', () => this.sync());
   }
 
-  get hidden(): boolean {
-    return !this.revealed;
-  }
-
+  /** Whether the dock's edge shows. */
   get shown(): boolean {
-    return this.allowed && this.revealed;
+    return this.allowed && this.states.get(this.screen.edge)!.revealed;
   }
 
   setAllowed(allowed: boolean): void {
@@ -56,8 +75,15 @@ export class AutoHide {
     this.sync(true);
   }
 
-  setActive(active: boolean): void {
-    this.active = active;
+  /** Keeps the edge with an open surface's button revealed. */
+  setActive(edge: Edge | null): void {
+    this.activeEdge = edge;
+    this.sync();
+  }
+
+  /** Keeps every edge revealed while people arrange the taskbar. */
+  arrange(arranging: boolean): void {
+    this.arranging = arranging;
     this.sync();
   }
 
@@ -90,94 +116,113 @@ export class AutoHide {
     return taskbarPreferences.on(this.monitor()?.index);
   }
 
+  private get edges(): Map<Edge, St.Widget[]> {
+    const edges = new Map<Edge, St.Widget[]>();
+    for (const { actor, edge } of this.sliders()) edges.set(edge, [...edges.get(edge) ?? [], actor]);
+    return edges;
+  }
+
   place(): void {
     const monitor = this.monitor();
     if (!monitor) return;
-    const { x, y, width, height } = band(monitor, this.screen.edge, 1);
-    this.edge.set_position(x, y);
-    this.edge.set_size(width, height);
-    if (!this.revealed) this.panel.set(this.offset(false));
+    for (const [edge, sensor] of this.sensors) {
+      const { x, y, width, height } = band(monitor, edge, 1);
+      sensor.set_position(x, y);
+      sensor.set_size(width, height);
+    }
+    for (const [edge, actors] of this.edges) {
+      if (this.states.get(edge)!.revealed) continue;
+      for (const actor of actors) actor.set(this.offset(edge, false));
+    }
   }
 
-  private offset(revealed: boolean) {
-    return revealed ? { translation_x: 0, translation_y: this.rest() } : toward(this.screen.edge, this.screen.clearance);
+  private offset(edge: Edge, revealed: boolean) {
+    return revealed ? { translation_x: 0, translation_y: this.rest() } : toward(edge, this.screen.clearance);
   }
 
   sync(immediate = false): void {
     const mode = this.screen.autoHide;
     this.panel.track_hover = mode !== 'never';
-    for (const island of this.islands) island.track_hover = mode !== 'never';
-    const reveal = !this.suppressed && !this.arriving && (mode === 'never' || this.wanted(mode === 'windows'));
-    this.edge.visible = this.allowed && !this.suppressed && !this.arriving && mode !== 'never' && !reveal;
-    if (reveal) {
-      this.cancel();
-      this.slide(true, immediate);
-    } else if (immediate || !this.allowed) {
-      this.cancel();
-      this.slide(false, true);
-    } else if (this.suppressed) {
-      this.cancel();
-      this.slide(false, false);
-    } else if (this.revealed && !this.timer) {
-      this.timer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, HIDE_DELAY, () => {
-        if (this.wanted(this.screen.autoHide === 'windows')) {
-          this.timer = 0;
+    const edges = this.edges;
+    for (const [edge, sensor] of this.sensors) {
+      const actors = edges.get(edge);
+      const state = this.states.get(edge)!;
+      for (const actor of actors ?? []) actor.track_hover = mode !== 'never';
+      const reveal = !this.suppressed && !this.arriving && (mode === 'never' || this.wanted(edge, actors ?? [], mode === 'windows'));
+      sensor.visible = !!actors && this.allowed && !this.suppressed && !this.arriving && mode !== 'never' && !reveal;
+      if (!actors) {
+        state.cancel();
+        state.revealed = true;
+      } else if (reveal) {
+        state.cancel();
+        this.slide(edge, actors, true, immediate);
+      } else if (immediate || !this.allowed) {
+        state.cancel();
+        this.slide(edge, actors, false, true);
+      } else if (this.suppressed) {
+        state.cancel();
+        this.slide(edge, actors, false, false);
+      } else if (state.revealed && !state.timer) {
+        state.timer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, HIDE_DELAY, () => {
+          const now = this.edges.get(edge) ?? [];
+          if (this.wanted(edge, now, this.screen.autoHide === 'windows')) {
+            state.timer = 0;
+            return GLib.SOURCE_REMOVE;
+          }
+          if (this.pointerWithin(edge)) return GLib.SOURCE_CONTINUE;
+          state.timer = 0;
+          this.slide(edge, now, false, false);
           return GLib.SOURCE_REMOVE;
-        }
-        if (this.pointerWithin()) return GLib.SOURCE_CONTINUE;
-        this.timer = 0;
-        this.slide(false, false);
-        return GLib.SOURCE_REMOVE;
+        });
+      }
+    }
+  }
+
+  private wanted(edge: Edge, actors: St.Widget[], whenClear: boolean): boolean {
+    const focus = global.stage.get_key_focus();
+    const state = this.states.get(edge)!;
+    return this.arranging || this.activeEdge === edge || actors.some(actor => actor.hover || (!!focus && actor.contains(focus))) || this.sensors.get(edge)!.hover ||
+      (this.held && state.revealed) || (whenClear && !this.touched(edge));
+  }
+
+  private pointerWithin(edge: Edge): boolean {
+    const monitor = this.monitor();
+    if (!monitor) return false;
+    const [x, y] = global.get_pointer();
+    const area = band(monitor, edge, this.screen.clearance + this.screen.gap);
+    return x >= area.x && x < area.x + area.width && y >= area.y && y < area.y + area.height;
+  }
+
+  private touched(edge: Edge): boolean {
+    const monitor = this.monitor();
+    if (!monitor || !this.overlap) return false;
+    return this.overlap.touches(new Mtk.Rectangle(band(monitor, edge, this.screen.clearance)));
+  }
+
+  private slide(edge: Edge, actors: St.Widget[], revealed: boolean, immediate: boolean): void {
+    const state = this.states.get(edge)!;
+    const changed = revealed !== state.revealed;
+    state.revealed = revealed;
+    if (immediate || !this.allowed) {
+      for (const actor of actors) this.settle(edge, actor);
+      return;
+    }
+    if (!changed) return;
+    for (const actor of actors) {
+      actor.show();
+      animateActor(actor, {
+        ...this.offset(edge, revealed),
+        duration: SLIDE_DURATION,
+        mode: revealed ? Clutter.AnimationMode.EASE_OUT_QUART : Clutter.AnimationMode.EASE_IN_QUART,
+        onComplete: () => { if (!this.states.get(edge)!.revealed) actor.hide(); },
       });
     }
   }
 
-  private wanted(whenClear: boolean): boolean {
-    const stage = global.stage;
-    const focus = stage.get_key_focus();
-    return this.active || this.panel.hover || this.islands.some(island => island.hover) || this.edge.hover || (!!focus && this.panel.contains(focus)) ||
-      (this.held && this.revealed) || (whenClear && !this.touched());
-  }
-
-  private pointerWithin(): boolean {
-    const [x, y] = global.get_pointer();
-    const [left, top] = this.panel.get_transformed_position();
-    const [width, height] = this.panel.get_transformed_size();
-    return x >= left && x < left + width && y >= top && y < top + height;
-  }
-
-  private touched(): boolean {
-    const monitor = this.monitor();
-    if (!monitor || !this.overlap) return false;
-    return this.overlap.touches(new Mtk.Rectangle(band(monitor, this.screen.edge, this.screen.clearance)));
-  }
-
-  private slide(revealed: boolean, immediate: boolean): void {
-    const changed = revealed !== this.revealed;
-    this.revealed = revealed;
-    if (immediate || !this.allowed) {
-      this.settle();
-      return;
-    }
-    if (!changed) return;
-    this.panel.show();
-    animateActor(this.panel, {
-      ...this.offset(revealed),
-      duration: SLIDE_DURATION,
-      mode: revealed ? Clutter.AnimationMode.EASE_OUT_QUART : Clutter.AnimationMode.EASE_IN_QUART,
-      onComplete: () => { if (!this.revealed) this.panel.hide(); },
-    });
-  }
-
-  private settle(): void {
-    this.panel.remove_transition('translation-x');
-    this.panel.remove_transition('translation-y');
-    this.panel.set(this.offset(this.revealed));
-    this.panel.visible = this.allowed && this.revealed;
-  }
-
-  private cancel(): void {
-    if (this.timer) GLib.Source.remove(this.timer);
-    this.timer = 0;
+  private settle(edge: Edge, actor: St.Widget): void {
+    actor.remove_transition('translation-x');
+    actor.remove_transition('translation-y');
+    actor.set(this.offset(edge, this.states.get(edge)!.revealed));
+    actor.visible = this.allowed && this.states.get(edge)!.revealed;
   }
 }

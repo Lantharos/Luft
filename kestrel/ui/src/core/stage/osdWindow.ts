@@ -6,7 +6,6 @@ import GObject from 'gi://GObject';
 import St from 'gi://St';
 
 import * as BarLevel from '../../shared/widgets/barLevel.js';
-import { isVertical } from '../../shared/layout/edge.js';
 import * as Layout from './layout.js';
 import * as KestrelUi from '../../kestrelUi.js';
 import * as Main from '../main.js';
@@ -112,9 +111,8 @@ export class OsdWindow extends Clutter.Actor {
   }
 
   private clearOfTaskbar(): string {
-    const { edge, depth } = KestrelUi.taskbarInset(this.monitorIndex);
-    const bottom = `margin-bottom: ${(edge === 'bottom' ? depth : 0) + TASKBAR_GAP}px;`;
-    return isVertical(edge) ? `${bottom} margin-${edge}: ${depth}px;` : bottom;
+    const depths = KestrelUi.taskbarDepths(this.monitorIndex);
+    return `margin-bottom: ${depths.bottom + TASKBAR_GAP}px; margin-left: ${depths.left}px; margin-right: ${depths.right}px;`;
   }
 
   cancel(): void {

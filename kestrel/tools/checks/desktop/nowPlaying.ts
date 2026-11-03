@@ -5,6 +5,7 @@ import St from 'gi://St';
 
 import {descendants, showsText} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
+import {alongEdge, arrange} from '../lib/edge.js';
 import {call} from '../lib/dbus.js';
 import {click, moveTo, rest} from '../lib/input/input.js';
 import {fixture, gjs, stop, stopAll, type Process} from '../lib/processes.js';
@@ -136,14 +137,14 @@ export async function run() {
     await call('org.mpris.MediaPlayer2.KestrelCheckRadio', '/org/mpris/MediaPlayer2', 'org.mpris.MediaPlayer2.Player', 'PlayPause', null);
     await eventually(() => showsText('I like the way it moves when the light comes through', element()!), 'pausing the one it follows moves on to the one still playing');
 
-    kestrel.set_string('taskbar-position', 'left');
+    arrange(alongEdge('left'));
     await eventually(() => element()?.mapped && element()!.height > element()!.width, 'on a side of the display it stands upright');
     await pause(500);
     await capture('now-playing-vertical');
     await setSetting(NOW_PLAYING, 'layout', new GLib.Variant('s', 'cover'));
     await pause(600);
     await capture('now-playing-vertical-cover');
-    kestrel.reset('taskbar-position');
+    kestrel.reset('taskbar-arrangement');
 
     for (const process of players.splice(0)) await stop(process);
     await eventually(gone, 'when nothing plays any more it leaves the taskbar', 6000);
@@ -151,6 +152,6 @@ export async function run() {
     for (const process of players) await stop(process);
     await request('Remove', NOW_PLAYING);
     await stopAll();
-    for (const key of ['extension-settings', 'taskbar-position']) kestrel.reset(key);
+    for (const key of ['extension-settings', 'taskbar-arrangement']) kestrel.reset(key);
   }
 }

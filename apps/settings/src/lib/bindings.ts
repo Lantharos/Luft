@@ -494,6 +494,7 @@ export const commands = {
 		volume: number,
 	}, options?: CallOptions) => invoke<null>("sound_set_volume", params, options),
 	soundStart: (options?: CallOptions) => invoke<null>("sound_start", {}, options),
+	taskbarArrange: (options?: CallOptions) => invoke<null>("taskbar_arrange", {}, options),
 	updatesCancel: (options?: CallOptions) => invoke<null>("updates_cancel", {}, options),
 	updatesCheck: (options?: CallOptions) => invoke<null>("updates_check", {}, options),
 	updatesDownload: (options?: CallOptions) => invoke<null>("updates_download", {}, options),

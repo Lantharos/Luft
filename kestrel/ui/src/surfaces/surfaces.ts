@@ -9,7 +9,8 @@ import type { ContextMenus } from '../desktop/menus/contextMenus.js';
 import type { Monitor } from '../desktop/panel/panel.js';
 import type { PanelSet } from '../desktop/panel/panels.js';
 import { taskbarPreferences } from '../desktop/panel/preferences/taskbarPreferences.js';
-import { dock, gap, inset, isVertical, rightToLeft, toward, type Along, type Edge, type Inset, type Offset } from '../shared/layout/edge.js';
+import { dock, gap, isVertical, toward, type Edge, type Offset } from '../shared/layout/edge.js';
+import { EDGE_MARGIN, insetBy, middleAt, type Anchor, type Depths } from '../shared/layout/anchor.js';
 import type { Box } from '../shared/layout/box.js';
 import type { WindowPreviews } from '../desktop/panel/windowPreviews.js';
 import type { TaskView } from '../desktop/taskView/taskView.js';
@@ -27,7 +28,6 @@ import type { StartSurface } from './start/startSurface.js';
 export type Surface = 'start' | 'quick' | 'notifications' | 'clipboard' | 'emoji' | 'snap' | 'tasks';
 type PanelSurface = Exclude<Surface, 'tasks'>;
 
-const EDGE_MARGIN = 12;
 const FAR_MARGIN = 14;
 const PANEL_SLIDE = 56;
 
@@ -51,8 +51,14 @@ interface SurfaceParts extends SurfaceFactories {
   taskView: TaskView;
   canInteract: () => boolean;
   syncSession: () => void;
-  taskbarInset: (monitor: Monitor) => Inset;
+  taskbar: TaskbarPlacement;
   startReplaced: () => void;
+}
+
+/** Where the taskbar is on a display, for surfaces to open beside it. */
+export interface TaskbarPlacement {
+  depths(monitor: Monitor): Depths;
+  anchor(surface: 'start' | 'quick' | 'notifications', monitor: Monitor): Anchor;
 }
 
 export class Surfaces {
@@ -136,25 +142,26 @@ export class Surfaces {
     this.cover.set_position(0, 0);
     const stage = global.stage;
     this.cover.set_size(stage.width, stage.height);
-    const { edge } = this.parts.taskbarInset(monitor);
     const area = this.freeArea(monitor);
     const available = area.height - FAR_MARGIN;
     const { start, notifications, emoji, snapLayouts } = this.created;
-    start?.place({ monitor, area, edge, available, cornered: board.shown, anchor: this.besideButton('start', monitor, edge) });
+    start?.place({ monitor, area, available, cornered: board.shown, anchor: this.parts.taskbar.anchor('start', monitor) });
 
     for (const [surface, actor, width, height] of [
       ['quick', quick.actor, 420, quick.preferredHeight(420, available)],
       ...notifications ? [['notifications', notifications.actor, 380, notifications.preferredHeight(380, available)] as const] : [],
     ] as const) {
+      const anchor = this.parts.taskbar.anchor(surface, monitor);
+      const length = isVertical(anchor.edge) ? height : width;
       actor.set_size(width, height);
-      actor.set_position(...dock(area, edge, width, height, this.along(surface, monitor, edge, 'end'), this.endMargin(surface, monitor, edge)));
+      actor.set_position(...dock(area, anchor.edge, width, height, middleAt(anchor, length), anchor.align ? 0 : EDGE_MARGIN));
     }
     for (const popup of [clipboard, emoji])
       popup?.place(available, context.layoutManager.getWorkAreaForMonitor(monitor.index));
     if (snapLayouts) {
       const [snapWidth, snapHeight] = snapLayouts.size();
       snapLayouts.actor.set_size(snapWidth, snapHeight);
-      snapLayouts.actor.set_position(...dock(area, edge, snapWidth, snapHeight, 'center'));
+      snapLayouts.actor.set_position(...dock(area, this.parts.taskbar.anchor('start', monitor).edge, snapWidth, snapHeight, 'center'));
     }
     this.clipToFloor();
   }
@@ -267,45 +274,23 @@ export class Surfaces {
 
   private clipToFloor(): void {
     const { width, height } = global.stage;
-    const stage = { x: 0, y: 0, width, height };
     const monitor = this.surfaceMonitor();
-    const { edge, depth } = this.parts.taskbarInset(monitor);
-    const { x, y, width: clipWidth, height: clipHeight } = inset(stage, edge, gap(stage, inset(monitor, edge, depth), edge));
+    const depths = this.parts.taskbar.depths(monitor);
+    const free = insetBy(monitor, depths);
+    const reach = (edge: Edge) => depths[edge] ? gap(monitor, free, edge) + gap({ x: 0, y: 0, width, height }, monitor, edge) : 0;
+    const { x, y, width: clipWidth, height: clipHeight } = insetBy({ x: 0, y: 0, width, height },
+      { bottom: reach('bottom'), left: reach('left'), top: reach('top'), right: reach('right') });
     const [clipX, clipY, currentWidth, currentHeight] = this.layer.get_clip();
     if (this.layer.has_clip && clipX === x && clipY === y && currentWidth === clipWidth && currentHeight === clipHeight) return;
     this.layer.set_clip(x, y, clipWidth, clipHeight);
   }
 
-  private along(surface: Surface, monitor: Monitor, edge: Edge, fallback: Along): Along | number {
-    return this.besideButton(surface, monitor, edge) ?? fallback;
-  }
-
-  /** How far a surface stays from the screen's end: level with its taskbar island, or EDGE_MARGIN beside a taskbar that runs to the edge. */
-  private endMargin(surface: Surface, monitor: Monitor, edge: Edge): number {
-    const island = this.parts.panels().islandFor(surface, monitor);
-    if (!island?.mapped) return EDGE_MARGIN;
-    const [x, y] = island.get_transformed_position();
-    const [width, height] = island.get_transformed_size();
-    const gap = isVertical(edge)
-      ? monitor.y + monitor.height - (y + height)
-      : rightToLeft() ? x - monitor.x : monitor.x + monitor.width - (x + width);
-    return gap > 0 ? Math.round(gap) : EDGE_MARGIN;
-  }
-
-  private besideButton(surface: Surface, monitor: Monitor, edge: Edge): number | null {
-    if (!isVertical(edge)) return null;
-    const button = this.parts.panels().buttonFor(surface, monitor);
-    if (!button?.mapped) return null;
-    const [, y] = button.get_transformed_position();
-    return y + button.get_transformed_size()[1] / 2;
-  }
-
   private freeArea(monitor: Monitor): Box {
-    const { edge, depth } = this.parts.taskbarInset(monitor);
+    const depths = this.parts.taskbar.depths(monitor);
     const keyboard = this.keyboardHeight(monitor);
-    if (edge === 'bottom') return inset(monitor, edge, Math.max(depth, keyboard) + SURFACE_GAP);
-    const beside = inset(monitor, edge, depth + SURFACE_GAP);
-    return keyboard ? inset(beside, 'bottom', keyboard + SURFACE_GAP) : beside;
+    const clear = (edge: Edge) => depths[edge] ? depths[edge] + SURFACE_GAP : 0;
+    const bottom = Math.max(depths.bottom, keyboard);
+    return insetBy(monitor, { left: clear('left'), top: clear('top'), right: clear('right'), bottom: bottom ? bottom + SURFACE_GAP : 0 });
   }
 
   private ensure<Name extends keyof LazySurfaces>(name: Name): LazySurfaces[Name] {
@@ -412,8 +397,9 @@ export class Surfaces {
   private slideOffset(actor: Clutter.Actor): Offset {
     const popup = this.popupActor(actor);
     if (popup) return { translation_x: 0, translation_y: popup.slideDistance };
-    const { edge } = this.parts.taskbarInset(this.surfaceMonitor());
     const start = this.created.start;
+    const surface = actor === this.parts.quick.actor ? 'quick' : actor === this.created.notifications?.actor ? 'notifications' : 'start';
+    const { edge } = this.parts.taskbar.anchor(surface, this.surfaceMonitor());
     return actor === start?.actor ? start.slideFrom(edge) : toward(edge, PANEL_SLIDE);
   }
 }

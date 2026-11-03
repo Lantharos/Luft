@@ -6,7 +6,9 @@ import type { Context } from '../../../context.js';
 import { taskbarPreferences } from '../../../desktop/panel/preferences/taskbarPreferences.js';
 import { animateActor, Curve, Duration, reducedMotion, Spring } from '../../../shared/motion/motion.js';
 import { blurSurface, SURFACE_GAP } from '../../../shared/layout/surface.js';
-import { inset } from '../../../shared/layout/edge.js';
+import { insetBy } from '../../../shared/layout/anchor.js';
+import type { Edge } from '../../../shared/layout/edge.js';
+import { taskbarDepths } from '../../../kestrelUi.js';
 import { Waveform } from './waveform.js';
 
 const PILL = 999;
@@ -120,8 +122,10 @@ export class DictationPill {
     if (!monitor) return;
     const taskbar = taskbarPreferences.displays === 'all' || monitor.index === this.layoutManager.primaryMonitor?.index;
     const height = this.thickness();
-    const screen = taskbarPreferences.on(monitor.index);
-    const free = taskbar ? inset(monitor, screen.edge, screen.reserved) : monitor;
+    const { gap } = taskbarPreferences.on(monitor.index);
+    const depths = taskbarDepths(monitor.index);
+    const reserved = (edge: Edge) => depths[edge] && depths[edge] + gap;
+    const free = taskbar ? insetBy(monitor, { bottom: reserved('bottom'), left: reserved('left'), top: reserved('top'), right: reserved('right') }) : monitor;
     this.frame.set_position(free.x, free.y + free.height - SURFACE_GAP - height);
     this.frame.set_size(free.width, height);
   }

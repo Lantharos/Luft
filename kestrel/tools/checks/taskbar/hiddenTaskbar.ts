@@ -22,7 +22,7 @@ const PAST_DOUBLE_TAP = 600;
 const panel = () => named('kestrel-panel');
 const corner = () => named('kestrel-status-corner');
 const cornerStart = () => ofType(existing('kestrel-status-corner').get_first_child(), St.Button);
-const taskbarStart = () => existing('Start', existing('kestrel-panel'));
+const taskbarStart = () => named('Start', existing('kestrel-panel'));
 
 function workAreaFillsTheScreen() {
   const monitor = Main.layoutManager.primaryMonitor!;
@@ -62,9 +62,9 @@ async function checkStartButton() {
   closeStart();
   shell.set_boolean('taskbar-shown', true);
   await eventually(() => shown(panel()) && !shown(corner()), 'the taskbar comes back');
-  require(!taskbarStart().visible, 'the taskbar leaves out the Start button too');
+  require(!taskbarStart()?.visible, 'the taskbar leaves out the Start button too');
   shell.reset('taskbar-start-button');
-  await eventually(() => taskbarStart().visible, 'and shows it again');
+  await eventually(() => !!taskbarStart()?.visible, 'and shows it again');
   shell.set_boolean('taskbar-shown', false);
   await eventually(() => shown(corner()), 'the corner is back');
 }
@@ -87,7 +87,7 @@ async function checkTablet() {
   shell.set_boolean('taskbar-start-button', false);
   await fold(true);
   await eventually(() => shown(panel()) && !shown(corner()), 'tablet mode brings the taskbar back');
-  await eventually(() => taskbarStart().visible, 'with its Start button');
+  await eventually(() => !!taskbarStart()?.visible, 'with its Start button');
   await fold(false);
   await eventually(() => !shown(panel()) && shown(corner()), 'and the corner returns when unfolded');
   shell.reset('taskbar-start-button');

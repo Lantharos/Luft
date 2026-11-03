@@ -1,11 +1,12 @@
 import Gio from 'gi://Gio';
 
 import type { TaskbarLook } from '../../../../../../packages/web/ui/src/taskbar/looks';
+import { mainEdge } from '../../../../../../packages/web/ui/src/taskbar/arrangement/index';
 import { isVertical, type Edge } from '../../../shared/layout/edge.js';
+import { taskbarArrangement } from './arrangement.js';
 import { directInput } from '../tablet/directInput.js';
 import { tabletMode } from '../tablet/tabletMode.js';
 
-type TaskbarAlignment = 'center' | 'left';
 type TaskbarStyle = 'bar' | 'floating' | 'separate';
 type TaskbarSize = 'compact' | 'normal' | 'large';
 type TaskbarAutoHide = 'never' | 'always' | 'windows';
@@ -35,10 +36,10 @@ const SLOT_GAP = 2;
 const TOUCH_SLOT_GAP = 10;
 export const STRIP_HEIGHT = 24;
 
-const KEYS = ['taskbar-position', 'taskbar-alignment', 'taskbar-look', 'taskbar-style', 'taskbar-size', 'taskbar-auto-hide', 'taskbar-show-pinned',
+const KEYS = ['taskbar-look', 'taskbar-style', 'taskbar-size', 'taskbar-auto-hide', 'taskbar-show-pinned',
   'taskbar-displays', 'taskbar-windows-per-display', 'taskbar-windows-per-workspace', 'taskbar-shown', 'taskbar-start-button',
   'start-style', 'pure-black', 'rounded-window-corners'] as const;
-export type TaskbarKey = typeof KEYS[number] | 'tablet';
+export type TaskbarKey = typeof KEYS[number] | 'taskbar-arrangement' | 'tablet';
 
 class TaskbarPreferences {
   private readonly settings = new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });
@@ -48,6 +49,7 @@ class TaskbarPreferences {
 
   constructor() {
     for (const key of KEYS) this.settings.connect(`changed::${key}`, () => this.notify(key));
+    taskbarArrangement.watch(() => this.notify('taskbar-arrangement'));
     tabletMode.watch(() => this.notify('tablet'));
     directInput.watch(() => this.notify('tablet'));
   }
@@ -67,7 +69,6 @@ class TaskbarPreferences {
     return layout;
   }
 
-  get alignment(): TaskbarAlignment { return this.settings.get_string('taskbar-alignment') as TaskbarAlignment; }
   get look(): TaskbarLook { return this.settings.get_string('taskbar-look') as TaskbarLook; }
   get startStyle(): StartStyle { return this.settings.get_string('start-style') as StartStyle; }
   get showPinned(): boolean { return this.settings.get_boolean('taskbar-show-pinned'); }
@@ -87,9 +88,12 @@ export class TaskbarLayout {
 
   get touch(): boolean { return this.touchHere(); }
 
-  get edge(): Edge { return this.touch ? 'bottom' : this.settings.get_string('taskbar-position') as Edge; }
+  /** The edge the dock sits on, which a taskbar joined into one bar runs along. */
+  get edge(): Edge { return this.touch ? 'bottom' : mainEdge(taskbarArrangement.current); }
   get vertical(): boolean { return isVertical(this.edge); }
   get style(): TaskbarStyle { return this.touch ? 'bar' : this.settings.get_string('taskbar-style') as TaskbarStyle; }
+  /** Whether the taskbar runs as one bar along an edge, instead of as islands placed one by one. */
+  get joined(): boolean { return this.style !== 'separate'; }
   get size(): TaskbarSize { return this.settings.get_string('taskbar-size') as TaskbarSize; }
   get autoHide(): TaskbarAutoHide { return this.touch ? 'never' : this.settings.get_string('taskbar-auto-hide') as TaskbarAutoHide; }
   get shown(): boolean { return this.touch || this.settings.get_boolean('taskbar-shown'); }

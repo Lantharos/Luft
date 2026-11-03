@@ -38,7 +38,8 @@ restore_settings() {
     dark) dconf write /org/gnome/desktop/interface/color-scheme "'prefer-dark'" ;;
   esac
   if [[ -n "${KESTREL_CAPTURE_TASKBAR:-}" ]]; then
-    dconf write /com/lantharos/kestrel/taskbar-position "'$KESTREL_CAPTURE_TASKBAR'"
+    dconf write /com/lantharos/kestrel/taskbar-arrangement \
+      "[('$KESTREL_CAPTURE_TASKBAR-center', ['start', 'dock']), ('$KESTREL_CAPTURE_TASKBAR-end', ['tray', 'status', 'clock'])]"
   fi
   if [[ -n "${KESTREL_CAPTURE_WALLPAPER:-}" ]]; then
     local uri

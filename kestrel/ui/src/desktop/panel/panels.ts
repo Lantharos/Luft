@@ -7,6 +7,9 @@ import { taskbarPreferences, type TaskbarKey } from './preferences/taskbarPrefer
 import { WindowOverlap } from './autoHide/windowOverlap.js';
 import { EdgeSwipe } from './tablet/edgeSwipe.js';
 import { StatusCorner } from './widgets/statusCorner.js';
+import { EDGE_MARGIN, NO_DEPTHS, type Anchor, type Depths } from '../../shared/layout/anchor.js';
+import { isVertical, rightToLeft } from '../../shared/layout/edge.js';
+
 
 interface PanelLayoutManager {
   primaryMonitor: Monitor | null;
@@ -68,18 +71,26 @@ export class PanelSet {
     return actor ? this.all.find(panel => panel.actor.contains(actor)) ?? null : null;
   }
 
-  get cornerClearance(): number {
-    return this.corner.clearance;
+  /** How far the taskbar, or the corner that stands in for it, reaches in from each edge of a display. */
+  depthsOn(monitor: Monitor): Depths {
+    const screen = taskbarPreferences.on(monitor.index);
+    if (screen.shown) return this.panelOn(monitor)?.depths ?? NO_DEPTHS;
+    return { ...NO_DEPTHS, [screen.edge]: this.corner.clearance };
   }
 
-  buttonFor(surface: string, monitor: Monitor): Clutter.Actor | null {
-    if (!taskbarPreferences.on(monitor.index).shown) return this.corner.buttonFor(surface);
-    return this.panelOn(monitor)?.buttonFor(surface) ?? null;
-  }
-
-  islandFor(surface: string, monitor: Monitor): Clutter.Actor | null {
-    if (!taskbarPreferences.on(monitor.index).shown) return null;
-    return this.panelOn(monitor)?.islandFor(surface) ?? null;
+  /** Where a surface opens on a display: beside its button's island, or from the corner when the taskbar is hidden. */
+  anchorFor(surface: string, monitor: Monitor): Anchor {
+    const screen = taskbarPreferences.on(monitor.index);
+    const anchor = screen.shown ? this.panelOn(monitor)?.anchorFor(surface) : null;
+    if (anchor) return anchor;
+    const edge = screen.edge;
+    const button = screen.shown ? null : this.corner.buttonFor(surface);
+    if (isVertical(edge) && button?.mapped) {
+      const [, y] = button.get_transformed_position();
+      return { edge, target: y + button.get_transformed_size()[1] / 2, align: 0 };
+    }
+    if (surface === 'start') return { edge, target: monitor.x + monitor.width / 2, align: 0 };
+    return rightToLeft() ? { edge, target: monitor.x + EDGE_MARGIN, align: -1 } : { edge, target: monitor.x + monitor.width - EDGE_MARGIN, align: 1 };
   }
 
   showCorner(shown: boolean): void {
@@ -142,10 +153,10 @@ export class PanelSet {
       this.sync();
       this.changed();
     }
-    if (key === 'taskbar-position' || key === 'tablet') this.placeCorner();
+    if (key === 'tablet') this.placeCorner();
     if (key === 'taskbar-auto-hide' || key === 'taskbar-shown' || key === 'tablet') this.syncAutoHide();
     if (key === 'tablet' || key === 'taskbar-shown') this.syncEdgeSwipe();
-    if (key === 'tablet' || key === 'taskbar-shown' || key === 'taskbar-position') this.changed();
+    if (key === 'tablet' || key === 'taskbar-shown') this.changed();
   }
 
   private placeCorner(): void {
@@ -179,21 +190,28 @@ export class PanelSet {
   }
 
   private syncStrut(panel: KestrelPanel): void {
-    const reserved = panel.strut.get_parent() !== null;
-    const wanted = panel.screen.shown && panel.screen.autoHide === 'never';
-    if (wanted && !reserved) this.layoutManager.addChrome(panel.strut, { affectsStruts: true });
-    if (!wanted && reserved) this.layoutManager.removeChrome(panel.strut);
+    const wanted = panel.screen.shown && panel.screen.autoHide === 'never' ? panel.wantedStruts : [];
+    for (const strut of panel.struts.values()) {
+      const reserved = strut.get_parent() !== null;
+      if (wanted.includes(strut) && !reserved) this.layoutManager.addChrome(strut, { affectsStruts: true });
+      if (!wanted.includes(strut) && reserved) this.layoutManager.removeChrome(strut);
+    }
   }
 
   private remove(panel: KestrelPanel): void {
     this.layoutManager.removeChrome(panel.actor);
-    this.layoutManager.removeChrome(panel.autoHide.edge);
-    if (panel.strut.get_parent()) this.layoutManager.removeChrome(panel.strut);
+    for (const sensor of panel.autoHide.sensors.values()) this.layoutManager.removeChrome(sensor);
+    for (const strut of panel.struts.values()) if (strut.get_parent()) this.layoutManager.removeChrome(strut);
   }
 
   private create(monitor: () => Monitor, initial: Monitor | null, primary: boolean): KestrelPanel {
     const panel = new KestrelPanel(this.actions(monitor), this.menus, this.previews, initial, primary);
-    this.layoutManager.addChrome(panel.autoHide.edge);
+    panel.arranged = () => {
+      this.syncStrut(panel);
+      if (panel === this.primary) this.placeCorner();
+      this.changed();
+    };
+    for (const sensor of panel.autoHide.sensors.values()) this.layoutManager.addChrome(sensor);
     this.layoutManager.addChrome(panel.actor);
     this.syncStrut(panel);
     panel.autoHide.watch(this.overlap);

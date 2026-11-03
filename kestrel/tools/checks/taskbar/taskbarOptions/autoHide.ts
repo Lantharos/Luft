@@ -6,7 +6,9 @@ import {gjs, stop, waitForWindow} from '../../lib/processes.js';
 import {edgeGap, eventually, FLOATING_MARGIN, HEIGHTS, panel, panelBox, primary, set} from './taskbar.js';
 import {farSide, outward, vertical} from '../../lib/edge.js';
 
-const revealed = () => panel().visible && panel().translation_x === 0 && panel().translation_y === 0;
+const islands = () => panel().get_children().filter(child => child.name?.startsWith('kestrel-island-'));
+const revealed = () => panel().visible && [panel(), ...islands()].every(part => part.visible && part.translation_x === 0 && part.translation_y === 0);
+const hidden = () => !panel().visible || islands().every(island => !island.visible);
 
 function pointAtEdge() {
   const monitor = primary();
@@ -23,15 +25,15 @@ export async function checkAlways() {
   pointAway();
   set('taskbar-auto-hide', 'always');
   await eventually(() => edgeGap() === 0, 'windows can use the whole screen while the taskbar hides itself');
-  await eventually(() => !panel().visible, 'the taskbar hides itself');
+  await eventually(hidden, 'the taskbar hides itself');
   pointAtEdge();
   await eventually(revealed, 'pointing at the taskbar\'s edge brings the taskbar back');
   pointAway();
-  await eventually(() => !panel().visible, 'the taskbar hides again once the pointer leaves');
+  await eventually(hidden, 'the taskbar hides again once the pointer leaves');
   global.display.emit('overlay-key');
   await eventually(revealed, 'opening Start with Super brings the taskbar back');
   toggleSurface('start');
-  await eventually(() => !panel().visible, 'the taskbar hides once Start closes');
+  await eventually(hidden, 'the taskbar hides once Start closes');
 
   set('taskbar-style', 'floating');
   await eventually(() => edgeGap() === 0, 'a floating taskbar that hides itself leaves the whole screen to windows');
@@ -48,10 +50,10 @@ export async function checkAlways() {
 
 async function checkSeparateHover() {
   set('taskbar-style', 'separate');
-  await eventually(() => !panel().visible, 'the separate taskbar hides itself');
+  await eventually(hidden, 'the separate taskbar hides itself');
   pointAtEdge();
   await eventually(revealed, 'pointing at the edge brings the separate taskbar back');
-  const [apps, status] = panel().get_children();
+  const [apps, status] = islands();
   const [appsX, appsY] = centerOf(apps);
   const [statusX] = centerOf(status);
   const appsEnd = apps.get_transformed_position()[0] + apps.width;
@@ -61,7 +63,7 @@ async function checkSeparateHover() {
     if (!revealed()) throw new Error(`the separate taskbar stays while the pointer rests on ${label}`);
   }
   pointAway();
-  await eventually(() => !panel().visible, 'the separate taskbar hides once the pointer leaves');
+  await eventually(hidden, 'the separate taskbar hides once the pointer leaves');
 }
 
 export async function checkWindows() {
@@ -72,7 +74,7 @@ export async function checkWindows() {
   await eventually(() => panel().visible && edgeGap() === 0, 'the taskbar stays while no window touches it');
   window.maximize();
   await eventually(() => farSide(window.get_frame_rect()) === farSide(monitor), 'a maximized window fills the screen up to the taskbar\'s edge');
-  await eventually(() => !panel().visible, 'the taskbar hides while a window touches it');
+  await eventually(hidden, 'the taskbar hides while a window touches it');
   window.unmaximize();
   await eventually(() => panel().visible, 'the taskbar returns once the window moves away');
   await stop(app);

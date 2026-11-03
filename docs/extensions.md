@@ -111,27 +111,19 @@ Pop-ups are drawn by Kestrel from a tree of its own controls, not by the extensi
 
 ## Taskbar elements
 
-An extension's `taskbar.addElement` puts an element in `taskbarElements` (`kestrel/ui/src/desktop/panel/widgets/extensionElements.ts`), the contract between extensions and the taskbar's layout. The layout decides where every element goes, by its `id` (`extension-id/key`, kept across versions): an island of its own, or inside another island next to Start, the dock, the tray, the status or the clock, on any edge. The extension never places itself.
+An extension's `taskbar.addElement` puts an element in `taskbarElements` (`kestrel/ui/src/desktop/panel/elements/extensionElements.ts`), the contract between extensions and the taskbar's islands. The arrangement in `com.lantharos.kestrel taskbar-arrangement` decides where every element goes, by its `id` (`extension-id/key`, kept across versions): an island of its own, or inside another island next to Start, the dock, the tray, the status or the clock, on any edge. The extension never places itself. The first time an element appears it goes in front of the tray, and its place is kept while the extension is off.
 
 | Member | Is |
 | --- | --- |
 | `id`, `label` | What the arrangement is kept by, and the element's name where people arrange the taskbar |
-| `create(layout)` | Makes this taskbar's actor for it. `layout` has `vertical`, `thickness` (the room across the island it sits in) and `button` (a taskbar button's size) |
+| `create(layout)` | Makes an actor for it on one display's taskbar. `layout` has `vertical`, `thickness` (the room across the island it sits in) and `button` (a taskbar button's size) |
 | `watch(changed)` | Its label changed |
 
-The actor's `relayout(layout)` follows the island to another edge or size, and `destroy()` takes it away. The actor sizes itself: its natural size along the taskbar animates as it grows under the pointer, shrinks, and shows or hides, so the layout just allocates natural sizes, and a hidden element takes no room. Until the islands land, the primary taskbar shows elements next to the extensions' buttons.
+The actor's `relayout(layout)` follows its island to another edge or size, and `destroy()` takes it away. The actor sizes itself: its natural size along the taskbar animates as it grows under the pointer, shrinks, and shows or hides, so the islands just allocate natural sizes, and a hidden element takes no room.
 
-Where an element sits is the person's choice, never the extension's. With separate islands they move it while editing the taskbar. On a taskbar that's one bar (edge to edge, or islands joined), the extension's Settings page offers a place through a `taskbar-place` page item, which Settings keeps in `taskbar-element-places` (`a{ss}`, element id to place):
+Where an element sits is the person's choice, never the extension's. They drag it while editing the taskbar, and on a taskbar that's one bar (edge to edge, or floating) the extension's Settings page also offers a place through a `taskbar-place` page item: before or after the apps, next to the tray, or at the start or end of the bar. Settings writes that choice into the arrangement with `placeElement` from `@luft/ui/taskbar`.
 
-| Place | In the arrangement |
-| --- | --- |
-| `before-apps` | In the island holding Start and the dock, before the first of them |
-| `after-apps` | In that island, after the dock |
-| `beside-tray` | Before the tray, where a new element goes; also what a missing entry means |
-| `start` | First in the island at the start of the bar's edge, made if there's none |
-| `end` | Last in the island at the end of the bar's edge, made if there's none |
-
-This is meant as the arrangement's own place for the element: the islands layout reads the key, moves each element accordingly, and from then on Settings writes the arrangement directly in place of the key.
+`ExtensionHost.taskbarIslands(monitor)` is the one place that says where the taskbar is on a display: the bar, or each separate island, with its edge and corner radius in stage coordinates, following islands as they move and hide. `taskbar(monitor)` is the box around the parts along the dock's edge, which layers get as `display.taskbar`. Pop-ups opened from a taskbar item open beside the island that holds it.
 
 ## Typing
 

@@ -10,7 +10,7 @@ import {checkPages} from './settings/pages.js';
 import {checkSeeThrough} from './settings/look/seeThrough.js';
 import {checkTiling} from './settings/look/tiling.js';
 import {checkLongSleep} from './settings/system/power.js';
-import {checkTaskbarLooks, checkTaskbarPositions} from './settings/look/taskbar.js';
+import {checkTaskbarLooks, checkTaskbarLayouts} from './settings/look/taskbar.js';
 import {checkUpdates} from './settings/system/updates.js';
 import {checkWallpaper} from './settings/look/wallpaper.js';
 
@@ -21,7 +21,7 @@ export async function run() {
       await checkPalette(app, palette);
       await checkPages(app);
       await checkTaskbarLooks(app);
-      await checkTaskbarPositions(app);
+      await checkTaskbarLayouts(app);
       await checkTiling(app);
       await checkSeeThrough(app);
       await showDark(app, palette);

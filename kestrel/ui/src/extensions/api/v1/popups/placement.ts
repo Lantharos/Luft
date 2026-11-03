@@ -24,17 +24,18 @@ function inside(area: Rect, x: number, y: number, width: number, height: number)
   };
 }
 
-function taskbarEdge(monitor: Monitor, bar: Rect): Edge {
-  if (bar.height > bar.width) return bar.x + bar.width / 2 < monitor.x + monitor.width / 2 ? 'left' : 'right';
-  return bar.y + bar.height / 2 < monitor.y + monitor.height / 2 ? 'top' : 'bottom';
+function islandAround(host: ExtensionHost, monitor: Monitor, x: number, y: number): { bar: Rect; edge: Edge } {
+  const islands = host.taskbarIslands(monitor);
+  const island = islands.find(shape => x >= shape.x && x < shape.x + shape.width && y >= shape.y && y < shape.y + shape.height) ?? islands[0];
+  if (island) return { bar: island, edge: island.edge };
+  return { bar: { x: monitor.x, y: monitor.y + monitor.height, width: monitor.width, height: 0 }, edge: 'bottom' };
 }
 
 export function besideTaskbar(host: ExtensionHost, monitor: Monitor, button: { x: number; y: number; width: number; height: number }): Placement {
-  const bar = host.taskbar(monitor) ?? { x: monitor.x, y: monitor.y + monitor.height, width: monitor.width, height: 0 };
-  const edge = taskbarEdge(monitor, bar);
-  const area = { x: monitor.x, y: monitor.y, width: monitor.width, height: monitor.height };
   const middleX = button.x + button.width / 2;
   const middleY = button.y + button.height / 2;
+  const { bar, edge } = islandAround(host, monitor, middleX, middleY);
+  const area = { x: monitor.x, y: monitor.y, width: monitor.width, height: monitor.height };
   return {
     monitor, area, edge,
     place: (width, height) => {

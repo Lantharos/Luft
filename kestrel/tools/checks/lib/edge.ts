@@ -1,5 +1,6 @@
 import type Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
+import GLib from 'gi://GLib';
 import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 export type Edge = 'bottom' | 'left' | 'top' | 'right';
@@ -13,7 +14,21 @@ interface Box {
 
 const shell = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 
-export const taskbarEdge = () => shell.get_string('taskbar-position') as Edge;
+/** The taskbar's islands as stored: each spot, such as 'bottom-end', with the elements it holds. */
+export type Arrangement = [string, string[]][];
+
+export const arrangement = () => shell.get_value('taskbar-arrangement').deepUnpack() as Arrangement;
+
+export function arrange(islands: Arrangement) {
+  shell.set_value('taskbar-arrangement', new GLib.Variant('a(sas)', islands));
+}
+
+/** Start and the apps in the middle of an edge, or at its start, and the tray, status icons and clock at its end. */
+export function alongEdge(edge: Edge, apps: 'center' | 'start' = 'center'): Arrangement {
+  return [[`${edge}-${apps}`, ['start', 'dock']], [`${edge}-end`, ['tray', 'status', 'clock']]];
+}
+
+export const taskbarEdge = () => (arrangement().find(([, elements]) => elements.includes('dock'))?.[0].split('-')[0] ?? 'bottom') as Edge;
 export const vertical = (edge = taskbarEdge()) => edge === 'left' || edge === 'right';
 export const outward = (edge = taskbarEdge()) => edge === 'bottom' || edge === 'right' ? 1 : -1;
 export const slideProperty = (edge = taskbarEdge()) => vertical(edge) ? 'translation-x' : 'translation-y';

@@ -6,7 +6,7 @@ import {existing} from '../../lib/actors.js';
 import {scratch} from '../../lib/processes.js';
 import {settled} from '../../lib/wait.js';
 import {band, captureEdge, edgeGap, eventually, FLOATING_MARGIN, HEIGHTS, panel, panelBox, primary, set, settings, thickness} from './taskbar.js';
-import {boxOf, taskbarEdge, vertical} from '../../lib/edge.js';
+import {alongEdge, arrange, boxOf, taskbarEdge, vertical} from '../../lib/edge.js';
 
 const STYLES = ['bar', 'floating'];
 const LOOKS = ['glass', 'solid', 'transparent', 'accent'];
@@ -73,16 +73,16 @@ async function checkPureBlack(name: string) {
 }
 
 export async function checkAlignment() {
-  const center = existing('kestrel-panel-center');
+  const center = () => existing('kestrel-taskbar-dock').get_parent()!;
   const along = (box: {x: number; y: number; width: number; height: number}) =>
     vertical() ? {start: box.y, length: box.height} : {start: box.x, length: box.width};
-  set('taskbar-alignment', 'left');
-  await eventually(() => Math.round(along(boxOf(center)).start - along(panelBox()).start) <= 8, 'Start and the apps move to the start of the taskbar');
+  arrange(alongEdge(taskbarEdge(), 'start'));
+  await eventually(() => Math.round(along(boxOf(center())).start - along(panelBox()).start) <= 8, 'Start and the apps move to the start of the taskbar');
   await captureEdge('taskbar-left');
-  set('taskbar-alignment', 'center');
+  arrange(alongEdge(taskbarEdge()));
   const screen = along(primary());
   await eventually(() => {
-    const {start, length} = along(boxOf(center));
+    const {start, length} = along(boxOf(center()));
     return Math.abs(start + length / 2 - (screen.start + screen.length / 2)) <= 1;
   }, 'Start and the apps return to the middle');
 }
@@ -133,8 +133,8 @@ export async function checkFloating() {
   }, 'the floating taskbar keeps a margin from the screen edges');
   await eventually(() => edgeGap() === HEIGHTS.normal + 2 * FLOATING_MARGIN, 'maximized windows keep a margin away from the floating taskbar');
   set('taskbar-style', 'separate');
-  const pieces = () => panel().get_children().slice(0, 2);
-  await eventually(() => !panel().reactive && pieces().every(piece => piece.reactive && thickness(piece) === HEIGHTS.normal),
+  const pieces = () => panel().get_children().filter(child => child.name?.startsWith('kestrel-island-'));
+  await eventually(() => !panel().reactive && pieces().length === 2 && pieces().every(piece => piece.reactive && thickness(piece) === HEIGHTS.normal),
     'the separate taskbar takes clicks only on its two pieces, each as thick as the taskbar');
   await eventually(() => edgeGap() === HEIGHTS.normal + 2 * FLOATING_MARGIN, 'maximized windows keep a margin away from the separate taskbar');
   await captureEdge('taskbar-separate');

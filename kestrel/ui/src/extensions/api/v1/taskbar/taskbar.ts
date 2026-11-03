@@ -2,7 +2,7 @@ import type Clutter from 'gi://Clutter';
 import type St from 'gi://St';
 
 import type { MenuEntry } from '../../../../desktop/menus/contextMenus.js';
-import { taskbarElements } from '../../../../desktop/panel/widgets/extensionElements.js';
+import { taskbarElements } from '../../../../desktop/panel/elements/extensionElements.js';
 import { type TaskbarEntry, taskbarEntries } from '../../../../desktop/panel/widgets/extensionItems.js';
 import { t } from '../../../../shared/i18n/index.js';
 import type { ApiContext } from '../context.js';

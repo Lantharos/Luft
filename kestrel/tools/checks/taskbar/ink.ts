@@ -1,7 +1,8 @@
 import St from 'gi://St';
 import {battery} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
-import {existing, named, ofType, styled} from '../lib/actors.js';
+import {named, ofType, styled} from '../lib/actors.js';
+import {islandOf} from './taskbarOptions/taskbar.js';
 import {checks} from '../lib/check.js';
 import {gjs, stop} from '../lib/processes.js';
 import {renderedFrame} from '../lib/screenshots.js';
@@ -31,7 +32,7 @@ function trayIcon() {
 
 async function measure(label: string) {
   await settled();
-  const status = existing('kestrel-panel-status');
+  const status = islandOf('clock');
   (await renderedFrame(areaOf(status))).saveZoomed(`ink-${label}`, CROP_ZOOM);
   const failures: string[] = [];
   const readings = [];

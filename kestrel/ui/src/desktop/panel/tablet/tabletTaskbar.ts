@@ -25,10 +25,15 @@ export class TabletTaskbar {
   private fit: (() => void) | null = null;
   private stretched = false;
 
-  constructor(private readonly panel: St.Widget, private readonly layers: Clutter.Actor[], private readonly primary: boolean,
+  constructor(private readonly panel: St.Widget, private readonly islands: () => Clutter.Actor[], private readonly primary: boolean,
     private readonly available: () => boolean, private readonly screen: () => TaskbarLayout) {
-    for (const layer of layers) layer.set_pivot_point(0.5, 0.5);
     panel.connect('notify::translation-y', () => this.anchorBottom());
+  }
+
+  private get layers(): Clutter.Actor[] {
+    const layers = this.islands();
+    for (const layer of layers) layer.set_pivot_point(0.5, 0.5);
+    return layers;
   }
 
   get shown(): boolean {

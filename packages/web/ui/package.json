@@ -13,6 +13,10 @@
 			"types": "./src/code/index.ts",
 			"default": "./src/code/index.ts"
 		},
+		"./taskbar": {
+			"types": "./src/taskbar/arrangement/index.ts",
+			"default": "./src/taskbar/arrangement/index.ts"
+		},
 		"./styles.css": "./src/styles/index.css",
 		"./vite": "./vite.ts",
 		"./tsconfig.base.json": "./tsconfig.base.json"

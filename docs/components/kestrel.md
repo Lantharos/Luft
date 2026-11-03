@@ -24,6 +24,14 @@ peek stop $h
 
 Kestrel plays the `luft` sound theme from `kestrel/engine/data/sounds/luft`, which `kestrel/tools/sounds` renders. Each sound is decoded once, the first time it plays, and kept in memory; all of them play through one PipeWire stream with the Notification role, which keeps its own volume (the System sounds volume in Settings). A sound that plays again before it ends starts over instead of doubling up, so the volume tick keeps up with a held key. `com.lantharos.Kestrel.Sounds` at `/com/lantharos/Kestrel/Sounds` plays theme sounds for apps outside a sandbox: `Play` follows the switches in `com.lantharos.kestrel.sounds` and `org.gnome.desktop.sound event-sounds`, and `Preview`, which Settings uses, plays regardless of them. The headless `system:sounds` check follows what plays through the player's `played` signal.
 
+## Taskbar
+
+The taskbar is a set of islands, each a group of elements: Start, the dock, the tray, the status icons, the clock, and elements extensions add through `taskbarElements` in `kestrel/ui/src/desktop/panel/elements/extensionElements.ts`. `com.lantharos.kestrel taskbar-arrangement` keeps them as one `a(sas)` value, each island a spot such as `bottom-end` with its elements in order. The model, its geometry and the presets live in `packages/web/ui/src/taskbar/arrangement` and are shared with Settings; Kestrel reads them in `preferences/arrangement.ts`, which also carries over the `taskbar-position` and `taskbar-alignment` of older versions once, through the `com.lantharos.kestrel.legacy-taskbar` schema.
+
+Separate islands each sit at their own spot; a joined taskbar runs along the dock's edge and keeps every island's place along it. Islands on the top and bottom keep the corners, and one on a side that would run into them moves along its edge. Every edge with an island gets a strut and its own auto-hide, Mutter is told the display leaves a gap so maximized windows keep their rounded corners there, and Start, quick settings and notifications open beside the island of the element that opens them. `IslandShapes` in `islands/shapes.ts` is the one place that says where the taskbar is: the bar or every separate island, with its edge and rounding, in stage coordinates.
+
+The taskbar's menu and Settings open Edit taskbar (`TaskbarEditor`), which previews every change live and saves only on Done. Settings starts it through `Arrange` on `com.lantharos.Kestrel.Taskbar` at `/com/lantharos/Kestrel/Taskbar`; sandboxed apps are refused.
+
 ## Emoji and characters
 
 The emoji picker reads its emoji and symbols from `emoji.json` and `characters.json` in `kestrel/engine/data`. Both are generated from Unicode's data and checked in; regenerate them when Unicode publishes a new version:

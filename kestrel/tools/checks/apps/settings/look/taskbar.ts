@@ -1,4 +1,5 @@
 import Gio from 'gi://Gio';
+import GLib from 'gi://GLib';
 
 import type {LuftApp} from '../../../lib/apps/luftApp.js';
 import {captureEdge} from '../../../taskbar/taskbarOptions/taskbar.js';
@@ -8,20 +9,25 @@ import {useScheme} from '../../lib/palette.js';
 import {show} from '../navigation.js';
 
 const LOOKS = ['glass', 'solid', 'transparent', 'accent'];
-const POSITIONS = ['left', 'top', 'right'];
+const LAYOUTS: [string, string, [string, string[]][]][] = [
+  ['side', 'separate', [['left-center', ['start', 'dock']], ['bottom-end', ['tray', 'status', 'clock']]]],
+  ['mac', 'separate', [['bottom-center', ['start', 'dock']], ['top-end', ['tray', 'status', 'clock']]]],
+  ['start-alone', 'separate', [['bottom-start', ['start']], ['bottom-center', ['dock']], ['bottom-end', ['tray', 'status', 'clock']]]],
+];
 const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 
-export async function checkTaskbarPositions(app: LuftApp) {
+export async function checkTaskbarLayouts(app: LuftApp) {
   await show(app, 'taskbar');
   try {
-    for (const position of POSITIONS) {
-      kestrel.set_string('taskbar-position', position);
+    for (const [name, style, islands] of LAYOUTS) {
+      kestrel.set_string('taskbar-style', style);
+      kestrel.set_value('taskbar-arrangement', new GLib.Variant('a(sas)', islands));
       await settled();
-      (await app.settle(() => true)).save(`settings-taskbar-position-${position}`);
-      await capture(`settings-taskbar-position-${position}-desktop`);
+      (await app.settle(() => true)).save(`settings-taskbar-layout-${name}`);
+      await capture(`settings-taskbar-layout-${name}-desktop`);
     }
   } finally {
-    kestrel.reset('taskbar-position');
+    for (const key of ['taskbar-style', 'taskbar-arrangement']) kestrel.reset(key);
   }
 }
 

@@ -8,7 +8,7 @@ import {edgeGap, eventually, HEIGHTS, KEYS, panel, require, set, settings} from 
 import {checkPositions} from './taskbarOptions/positions.js';
 import {checkWorkspaceWindows} from './taskbarOptions/workspaces.js';
 
-const slots = () => existing('kestrel-panel-center', panel()).get_children()[1].get_children();
+const slots = () => existing('kestrel-taskbar-dock', panel()).get_children();
 
 async function checkPinned() {
   const pinned = settings.get_strv('favorite-apps').length;

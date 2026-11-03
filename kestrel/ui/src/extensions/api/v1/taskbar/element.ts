@@ -2,7 +2,7 @@ import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
 
-import type { ElementActor, ElementLayout } from '../../../../desktop/panel/widgets/extensionElements.js';
+import type { ElementActor, ElementLayout } from '../../../../desktop/panel/elements/extensionElements.js';
 import { animateActor } from '../../../../shared/motion/motion.js';
 import type { ControlHost } from '../popups/controls.js';
 import { RenderedView } from '../popups/render.js';

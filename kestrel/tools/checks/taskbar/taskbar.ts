@@ -5,6 +5,7 @@ import St from 'gi://St';
 import {dismissImmediately, toggleSurface} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {existing, firstStyled, named, ofType, shown} from '../lib/actors.js';
+import {islandOf} from './taskbarOptions/taskbar.js';
 import {checks} from '../lib/check.js';
 import {centerOf, moveTo, rest} from '../lib/input/input.js';
 import {gjs, spawn, stop, waitForWindow, waitForWindows} from '../lib/processes.js';
@@ -89,7 +90,7 @@ async function checkFocus(panel: Clutter.Actor, window: Meta.Window) {
 }
 
 async function checkOpening(panel: Clutter.Actor) {
-  const center = existing('kestrel-panel-center');
+  const center = islandOf('dock');
   const length = () => vertical() ? center.height : center.width;
   const lengths = new Set([length()]);
   const sample = global.stage.connect('after-paint', () => lengths.add(length()));

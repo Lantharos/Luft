@@ -55,9 +55,9 @@ function accentStylesheet(seed: Seed, palette: Palette, variant: Variant): strin
 .modal-dialog.modal-dialog .modal-dialog-button:default { background-color: ${rgba(solid.primary, 0.9)}; color: ${solid.onPrimary}; }
 .modal-dialog.modal-dialog .modal-dialog-button:default:hover { background-color: ${solid.primary}; }
 .modal-dialog.modal-dialog .check-box:checked StIcon { background-color: ${solid.primary}; color: ${solid.onPrimary}; }
-.kestrel-extension-popup .kestrel-extension-button.primary { background-color: ${rgba(solid.primary, 0.9)}; color: ${solid.onPrimary}; }
-.kestrel-extension-popup .kestrel-extension-button.primary:hover { background-color: ${solid.primary}; }
-.kestrel-extension-popup .kestrel-extension-switch:checked { background-color: ${solid.primary}; }
+.kestrel-extension-button.kestrel-extension-button.primary { background-color: ${rgba(solid.primary, 0.9)}; color: ${solid.onPrimary}; }
+.kestrel-extension-button.kestrel-extension-button.primary:hover { background-color: ${solid.primary}; }
+.kestrel-extension-switch.kestrel-extension-switch:checked { background-color: ${solid.primary}; }
 .kestrel-snap-zone.kestrel-snap-zone:hover, .kestrel-snap-zone.kestrel-snap-zone:focus { background-color: ${rgba(highlight, 0.75)}; }
 `;
 }

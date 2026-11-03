@@ -1,6 +1,6 @@
-import { taskbarButtons } from '../taskbar.js';
+import { taskbarAnchors } from '../taskbar/taskbar.js';
 import type { ApiContext } from '../context.js';
-import type { Popup, PopupAnchor, PopupOptions, Popups, TaskbarItem } from '../types.js';
+import type { Popup, PopupAnchor, PopupOptions, Popups, TaskbarElement, TaskbarItem } from '../types.js';
 import { PopupFrame } from './frame.js';
 import { atPoint, atPosition, besideTaskbar, type Placement } from './placement.js';
 
@@ -28,13 +28,14 @@ function placementFor(context: ApiContext, anchor: PopupAnchor): Placement {
   const pointerMonitor = host.monitorAt(pointerX, pointerY) ?? host.monitors()[host.primaryIndex()];
   if (anchor === 'pointer') return atPoint(host, pointerMonitor, { x: pointerX, y: pointerY });
   if (typeof anchor === 'string') return atPosition(host, pointerMonitor, anchor);
-  const button = taskbarButtons.get(anchor as TaskbarItem)?.();
+  const anchored = anchor as TaskbarItem | TaskbarElement;
+  const button = taskbarAnchors.get(anchored)?.();
   if (button?.mapped) {
     const [x, y] = button.get_transformed_position();
     const [width, height] = button.get_transformed_size();
     return besideTaskbar(host, host.monitorAt(x + width / 2, y + height / 2) ?? pointerMonitor, { x, y, width, height });
   }
-  if (taskbarButtons.has(anchor as TaskbarItem)) return atPoint(host, pointerMonitor, { x: pointerX, y: pointerY });
+  if (taskbarAnchors.has(anchored)) return atPoint(host, pointerMonitor, { x: pointerX, y: pointerY });
   const { x, y } = anchor as { x: number; y: number };
   return atPoint(host, host.monitorAt(x, y) ?? pointerMonitor, { x, y });
 }

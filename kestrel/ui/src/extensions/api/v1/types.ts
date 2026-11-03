@@ -286,6 +286,49 @@ export interface Toggle extends Disposable {
 export interface Taskbar {
   /** Adds a button next to the clock. */
   addItem(item: TaskbarItemOptions): TaskbarItem;
+  /**
+   * Adds an element to the taskbar, drawn by Kestrel from views the extension gives. People decide where it goes: an
+   * island of its own or part of another one, on any edge, so it can be laid out across or along the taskbar.
+   */
+  addElement(element: TaskbarElementOptions): TaskbarElement;
+}
+
+/** How an element is laid out where people put it. */
+export interface ElementLayout {
+  /** Whether the taskbar runs up and down a side of the display, so the element is laid out along it. */
+  readonly vertical: boolean;
+  /** How thick the taskbar is, in pixels: the element's height, or its width when vertical. */
+  readonly thickness: number;
+  /** The size of a taskbar button, in pixels, which pictures and controls should match. */
+  readonly button: number;
+}
+
+export interface TaskbarElementOptions {
+  /**
+   * Names the element among the extension's elements, lowercase with dashes. Where people put it is kept by this
+   * key, so keep it the same across versions.
+   */
+  key: string;
+  /** What screen readers call it, and its name where people arrange the taskbar. */
+  label: string;
+  /** What it shows. Kestrel calls it again when the element moves to another edge or size, and after {@link TaskbarElement.refresh}. */
+  content(layout: ElementLayout): View;
+  /** What it grows to while the pointer is over it. It grows and shrinks smoothly. */
+  expanded?(layout: ElementLayout): View;
+  /** Whether it shows. A hidden element takes no room, and showing and hiding it is animated. It shows unless this is `false`. */
+  shown?: boolean;
+  /** Runs on a click on the element, outside its buttons and other controls. */
+  onClick?(): void;
+  /** Runs when it grows under the pointer and when it shrinks back, for what only needs updating while it's grown, such as a track's progress. */
+  onExpandedChanged?(expanded: boolean): void;
+  /** A menu that opens on a right click. */
+  menu?: ActionItem[];
+}
+
+export interface TaskbarElement extends Disposable {
+  update(changes: Partial<Omit<TaskbarElementOptions, 'key'>>): void;
+  /** Asks for `content` and `expanded` again, when what they show has changed. */
+  refresh(): void;
 }
 
 export interface TaskbarItemOptions {
@@ -315,8 +358,8 @@ export interface Point {
 /** A place on the display the pointer is on, inside the area windows use. */
 export type ScreenPosition = 'top-left' | 'top' | 'top-right' | 'left' | 'center' | 'right' | 'bottom-left' | 'bottom' | 'bottom-right';
 
-/** Where a pop-up appears: next to one of the extension's taskbar items, at the pointer, at a place on the display, or at a point. */
-export type PopupAnchor = TaskbarItem | 'pointer' | ScreenPosition | Point;
+/** Where a pop-up appears: next to one of the extension's taskbar items or elements, at the pointer, at a place on the display, or at a point. */
+export type PopupAnchor = TaskbarItem | TaskbarElement | 'pointer' | ScreenPosition | Point;
 
 export interface PopupOptions {
   anchor: PopupAnchor;
@@ -364,6 +407,9 @@ export interface TextView {
   text: string;
   /** `body` without it. `number` keeps digits the same width, for clocks and counters. */
   style?: 'title' | 'body' | 'caption' | 'number';
+  /** The widest it gets, in pixels. Longer text ends in an ellipsis, or with `marquee` slides along once when it changes and while the pointer is over it. */
+  maxWidth?: number;
+  marquee?: boolean;
 }
 
 export interface IconView {
@@ -375,10 +421,12 @@ export interface IconView {
 
 export interface ImageView {
   type: 'image';
-  /** A PNG, JPEG, WebP or SVG in the extension's folder or data folder. */
+  /** A PNG, JPEG, WebP or SVG in the extension's folder or data folder, or {@link MediaPlayer.artwork}. */
   path: string;
   width: number;
   height: number;
+  /** Rounded corners, in pixels. */
+  radius?: number;
 }
 
 export interface ButtonView {
@@ -608,20 +656,65 @@ export interface Weather {
 }
 
 export interface MediaPlayer {
+  /** Stays the same while the player runs, to tell players apart. */
+  readonly id: string;
   /** The app that plays, as its desktop file id when known. */
   readonly app: string | null;
+  /** The player's name as people know it, such as the app's name. */
+  readonly appName: string;
   readonly title: string;
   readonly artist: string;
+  readonly album: string;
+  /**
+   * A picture of what plays, as a file Kestrel keeps that views can show by its path, or `null` while there's none or
+   * it's still being fetched. {@link Media.onChanged} runs once it's there.
+   */
+  readonly artwork: string | null;
   readonly playing: boolean;
+  /** The track's length in seconds, or 0 when the player doesn't say. */
+  readonly length: number;
+  readonly canGoNext: boolean;
+  readonly canGoPrevious: boolean;
+  readonly canSeek: boolean;
+  /** Where the track is, in seconds. Players don't announce it as it moves, so ask while showing it. */
+  position(): Promise<number>;
+  /** Jumps to `seconds` into the track, when {@link canSeek}. */
+  seek(seconds: number): void;
   playPause(): void;
   next(): void;
   previous(): void;
+  /** Brings the player's window to the front. */
+  raise(): void;
 }
 
 export interface Media {
   /** The player people would control with their media keys, if anything plays or paused. */
   readonly player: MediaPlayer | null;
+  /** Every player there is, such as a music app and a browser tab. */
+  readonly players: readonly MediaPlayer[];
+  /** Where sound goes. */
+  readonly output: AudioOutput;
+  /** Runs `changed` when a player comes or goes, what it plays changes, it jumps within a track, or artwork arrives. */
   onChanged(changed: () => void): Disposable;
+}
+
+export interface AudioOutput {
+  /** The volume of the sound output, 0 to 1. */
+  volume: number;
+  muted: boolean;
+  /** Speakers, headphones and other outputs people can choose. */
+  readonly devices: readonly OutputDevice[];
+  /** Sends sound to the device with this {@link OutputDevice.id}. */
+  choose(id: string): void;
+  onChanged(changed: () => void): Disposable;
+}
+
+export interface OutputDevice {
+  readonly id: string;
+  readonly name: string;
+  /** Where it is, such as the card it belongs to, or `null`. */
+  readonly detail: string | null;
+  readonly active: boolean;
 }
 
 /** Which extension API a manifest targets. Kestrel keeps every version it shipped working. */

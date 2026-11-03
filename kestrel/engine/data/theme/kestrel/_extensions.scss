@@ -1,3 +1,21 @@
+.kestrel-extension-text-title { font-size: 15px; font-weight: 600; }
+.kestrel-extension-text-body { font-size: 13px; }
+.kestrel-extension-text-caption { font-size: 12px; }
+.kestrel-extension-text-number { font-size: 22px; font-weight: 600; font-feature-settings: "tnum"; }
+
+.kestrel-extension-button { padding: 7px 14px; font-size: 13px; font-weight: 500; }
+.kestrel-extension-button-box { spacing: 6px; }
+.kestrel-extension-button.icon-only { padding: 7px; }
+.kestrel-extension-button.flat { background-color: transparent; }
+.kestrel-extension-button.primary { font-weight: 600; }
+
+.kestrel-extension-row { padding: 7px 4px; border-radius: 10px; font-size: 13px; transition-duration: $motion-tap; }
+.kestrel-extension-switch-row { spacing: 12px; }
+.kestrel-extension-switch { width: 36px; height: 20px; padding: 2px; border-radius: 999px; transition-duration: $motion-tap; }
+.kestrel-extension-switch-knob { width: 16px; height: 16px; border-radius: 999px; background-color: pick(#ffffff, #f2f2f4); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25); }
+.kestrel-extension-entry { min-height: 20px; }
+.kestrel-extension-progress { height: 6px; }
+
 .kestrel-extension-popup {
   @include context-menu;
   padding: 12px;
@@ -6,25 +24,14 @@
   &.window { padding: 6px 12px 12px; }
   .kestrel-extension-popup-header { spacing: 8px; padding: 0 0 6px 4px; }
   .kestrel-extension-popup-title { font-size: 13px; font-weight: 600; color: ink(0.75); }
-
-  .kestrel-extension-text-title { font-size: 15px; font-weight: 600; color: ink(); }
-  .kestrel-extension-text-body { font-size: 13px; }
-  .kestrel-extension-text-caption { font-size: 12px; color: ink(0.6); }
-  .kestrel-extension-text-number { font-size: 22px; font-weight: 600; font-feature-settings: "tnum"; color: ink(); }
-
-  .kestrel-extension-button { padding: 7px 14px; font-size: 13px; font-weight: 500; }
-  .kestrel-extension-button-box { spacing: 6px; }
-  .kestrel-extension-button.icon-only { padding: 7px; }
-  .kestrel-extension-button.flat { background-color: transparent; }
+  .kestrel-extension-text-title, .kestrel-extension-text-number { color: ink(); }
+  .kestrel-extension-text-caption { color: ink(0.6); }
   .kestrel-extension-button.flat:hover, .kestrel-extension-button.flat:focus { background-color: fill(0.14); }
-  .kestrel-extension-button.primary { font-weight: 600; }
-
-  .kestrel-extension-row { padding: 7px 4px; border-radius: 10px; font-size: 13px; transition-duration: $motion-tap; }
   .kestrel-extension-row:hover, .kestrel-extension-row:focus { background-color: fill(0.1); }
-  .kestrel-extension-switch-row { spacing: 12px; }
-  .kestrel-extension-switch { width: 36px; height: 20px; padding: 2px; border-radius: 999px; background-color: fill(0.2); transition-duration: $motion-tap; }
-  .kestrel-extension-switch-knob { width: 16px; height: 16px; border-radius: 999px; background-color: pick(#ffffff, #f2f2f4); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25); }
+  .kestrel-extension-switch { background-color: fill(0.2); }
+}
 
-  .kestrel-extension-entry { min-height: 20px; }
-  .kestrel-extension-progress { height: 6px; }
+.kestrel-extension-element {
+  .kestrel-extension-text-title { font-size: 13px; }
+  .kestrel-extension-button { padding: 5px; border-radius: 8px; }
 }

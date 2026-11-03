@@ -109,6 +109,18 @@ While an extension runs, Kestrel grabs its shortcuts from the compositor: what t
 
 Pop-ups are drawn by Kestrel from a tree of its own controls, not by the extension, so they look and move like the rest of Luft and can't reach Kestrel's internals. A panel takes the keyboard and closes when it loses it; a window floats above windows and leaves the keyboard alone until clicked. Updates keep each control that stayed in place, so drags and typing carry on.
 
+## Taskbar elements
+
+An extension's `taskbar.addElement` puts an element in `taskbarElements` (`kestrel/ui/src/desktop/panel/widgets/extensionElements.ts`), the contract between extensions and the taskbar's layout. The layout decides where every element goes, by its `id` (`extension-id/key`, kept across versions): an island of its own, or inside another island next to Start, the dock, the tray, the status or the clock, on any edge. The extension never places itself.
+
+| Member | Is |
+| --- | --- |
+| `id`, `label` | What the arrangement is kept by, and the element's name where people arrange the taskbar |
+| `create(layout)` | Makes this taskbar's actor for it. `layout` has `vertical`, `thickness` (the room across the island it sits in) and `button` (a taskbar button's size) |
+| `watch(changed)` | Its label changed |
+
+The actor's `relayout(layout)` follows the island to another edge or size, and `destroy()` takes it away. The actor sizes itself: its natural size along the taskbar animates as it grows under the pointer, shrinks, and shows or hides, so the layout just allocates natural sizes, and a hidden element takes no room. Until the islands land, the primary taskbar shows elements next to the extensions' buttons.
+
 ## Typing
 
 `typing.type` commits text through the input method into the focused field, or pastes it where nothing takes typed text, after any held modifiers are released. It only works within ten seconds of the person using the extension; Kestrel counts its shortcut, its pop-ups, taskbar items, quick settings tiles, notifications and search results. The privacy indicator shows a keyboard for a few seconds after an extension typed, and its menu names it.
@@ -116,6 +128,10 @@ Pop-ups are drawn by Kestrel from a tree of its own controls, not by the extensi
 ## Sound
 
 Each extension that plays sounds gets one `ShellSoundMix`: a PipeWire playback stream named after it, made when it first plays, with sounds decoded once into memory, mixed with per-sound volume and fades and gapless loops, and silenced while the session isn't active. `ShellAudioMonitor` listens to the default output's monitor with a passive capture stream, but only while some extension holds a listener and `ShellMixer:playing` says an app plays; reading it runs an FFT of the latest samples on demand. Kestrel's own capture doesn't count as recording for the privacy indicator.
+
+## Media
+
+`media` builds on Kestrel's MPRIS client: every player, its album, length, position and seeking, and artwork as a local file. Art a player gives as a web address is downloaded once into `~/.cache/kestrel/media-art`, which keeps the last 64 pictures, and views may show files from there. `media.output` sets the output's volume and device through `ShellMixer`.
 
 To install an extension, unpack it into `~/.local/share/luft/extensions/<id>/` and call `Reload(id)`; to update, replace the folder and call `Reload(id)` again.
 

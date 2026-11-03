@@ -70,6 +70,20 @@ The toggle has `update(changes)`.
 
 `taskbar.addItem({ icon, label, onClick?, menu? })` adds a button next to the clock. `menu` takes the same entries as a quick settings menu, without settings; it opens on a right click, or on any click without `onClick`. The item has `update(changes)`.
 
+`taskbar.addElement(options)` adds an element that Kestrel draws from views, like a pop-up's. People decide where it goes: an island of its own, or inside another island, on any edge of the display. The extension never places it; it describes what it shows for wherever it is.
+
+| Option | Is |
+| --- | --- |
+| `key` | Names it among the extension's elements, lowercase with dashes. Where people put it is kept by this, so keep it across versions |
+| `label` | What screen readers call it, and its name where people arrange the taskbar |
+| `content(layout)` | The view it shows. `layout` has `vertical` (it runs along a side of the display), `thickness` (the room across it) and `button` (a taskbar button's size) |
+| `expanded(layout)` | What it grows to under the pointer, smoothly |
+| `shown` | Whether it shows; a hidden element takes no room, and comes and goes smoothly |
+| `onClick()`, `menu` | A click outside its controls, and a menu on a right click |
+| `onExpandedChanged(expanded)` | It grew under the pointer or shrank back, for what only needs updating while it's grown |
+
+The element has `update(changes)`, `refresh()` to ask for its views again, and `dispose()`. Pop-ups can be anchored to it.
+
 ## popups
 
 `popups.open(options)` opens a pop-up that Kestrel draws in Luft's style from a description of its content, and returns it with `open`, `update(content)` and `dispose()`, which closes it.
@@ -88,9 +102,9 @@ Content is a tree of Luft's own controls, so a pop-up looks and behaves like the
 | View | Has |
 | --- | --- |
 | `{ type: 'column' \| 'row', children, spacing?, align? }` | Children one under or beside the other. `align` is `start`, `center`, `end` or `fill` |
-| `{ type: 'text', text, style? }` | `title`, `body`, `caption`, or `number` for digits that keep their width |
+| `{ type: 'text', text, style?, maxWidth?, marquee? }` | `title`, `body`, `caption`, or `number` for digits that keep their width. Text wider than `maxWidth` ends in an ellipsis, or with `marquee` slides along once when it changes and while the pointer is over it |
 | `{ type: 'icon', icon, size? }` | An icon |
-| `{ type: 'image', path, width, height }` | A picture from the extension's folders |
+| `{ type: 'image', path, width, height, radius? }` | A picture from the extension's folders, or a player's artwork, with rounded corners |
 | `{ type: 'button', label?, icon?, iconOnly?, style?, disabled?, onActivate }` | `style` is `default`, `primary` or `flat` |
 | `{ type: 'switch', label, checked, onToggled(checked) }` | A switch with its label |
 | `{ type: 'slider', label, value, onChanged(value) }` | A slider from 0 to 1 |
@@ -199,8 +213,12 @@ ext.settingsPage.describe(() => [
 | `location.onChanged(changed)` | The computer moved to another city, checked about every ten minutes while someone listens |
 | `weather.current()` | Resolves to `{ condition, temperature, precipitation, wind, daytime, sunrise, sunset, season, time }` for where the computer is, or `null` |
 | `weather.onChanged(changed)` | A new report about every half hour |
-| `media.player` | What the media keys would control: `app`, `title`, `artist`, `playing`, `playPause()`, `next()`, `previous()`, or `null` |
-| `media.onChanged(changed)` | The player or what it plays changed |
+| `media.player` | What the media keys would control, or `null` |
+| `media.players` | Every player there is |
+| `media.onChanged(changed)` | A player came or went, what it plays changed, it jumped within a track, or artwork arrived |
+| `media.output` | The sound output: `volume` and `muted` to read and set, `devices` with `id`, `name`, `detail` and `active`, `choose(id)`, and `onChanged(changed)` |
+
+A player has `id`, `app`, `appName`, `title`, `artist`, `album`, `artwork` (a file views can show, or `null` until it's fetched), `playing`, `length` in seconds, `canGoNext`, `canGoPrevious`, `canSeek`, `position()` resolving to seconds, `seek(seconds)`, `playPause()`, `next()`, `previous()` and `raise()`.
 
 `condition` is `clear`, `clouds`, `fog`, `drizzle`, `rain`, `snow` or `storm`, in degrees Celsius, millimetres and kilometres an hour. `sunrise` and `sunset` are today's there, in milliseconds since 1970, and `season` is `spring`, `summer`, `autumn` or `winter` by the date and the side of the equator. Weather comes from Open-Meteo, asked with the position rounded to about a kilometre.
 

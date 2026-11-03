@@ -4,7 +4,7 @@ import { appearanceApi, open, sessionApi, settingsApi, storageApi, timersApi } f
 import type { ApiContext } from './context.js';
 import { helperApi } from './helper.js';
 import { locationApi } from './location.js';
-import { mediaApi } from './media.js';
+import { mediaApi } from './media/media.js';
 import { notificationsApi } from './notifications.js';
 import { quickSettingsApi } from './quickSettings/quickSettings.js';
 import { audioLevelsApi } from './audio/levels.js';
@@ -14,7 +14,7 @@ import { searchApi } from './search.js';
 import { settingsPageApi } from './settingsPage/settingsPage.js';
 import { shortcutsApi } from './shortcuts.js';
 import { desktopApi, powerApi } from './system.js';
-import { taskbarApi } from './taskbar.js';
+import { taskbarApi } from './taskbar/taskbar.js';
 import type { Basics, Capabilities, Capability } from './types.js';
 import { typingApi } from './typing.js';
 import { wallpaperApi } from './wallpaper/wallpaper.js';

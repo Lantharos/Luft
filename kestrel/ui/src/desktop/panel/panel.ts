@@ -136,7 +136,9 @@ export class KestrelPanel {
         ];
       });
       right.add_child(this.inputSource.actor);
-      this.extensionItems = new ExtensionItems();
+      this.extensionItems = new ExtensionItems(() => ({
+        vertical: this.screen.vertical, thickness: this.screen.metrics.button, button: this.screen.metrics.button,
+      }));
       right.add_child(this.extensionItems.actor);
       right.add_child(this.tray.actor);
       this.statusIcons.add_child(new BatteryIndicator(16).actor);
@@ -280,6 +282,7 @@ export class KestrelPanel {
     const orientation = vertical ? Clutter.Orientation.VERTICAL : Clutter.Orientation.HORIZONTAL;
     for (const box of [this.center, this.status, this.statusIcons]) box.orientation = orientation;
     this.privacy?.orient(orientation);
+    this.extensionItems?.relayout();
     this.clock.setNarrow(vertical);
     this.taskbar.reorient(this.edge);
     this.surface.sync();
@@ -372,6 +375,7 @@ export class KestrelPanel {
       const metrics = this.screen.metrics;
       this.launcher.resize(metrics.button);
       this.taskbar.resize(metrics);
+      this.extensionItems?.relayout();
       this.place(true);
     }
     if (key === 'taskbar-position' && this.screen.edge !== this.edge) this.moveEdge();

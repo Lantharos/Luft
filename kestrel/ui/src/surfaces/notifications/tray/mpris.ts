@@ -1,5 +1,5 @@
 import Gio from 'gi://Gio';
-import type GLib from 'gi://GLib';
+import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import Shell from 'gi://Shell';
 
@@ -26,9 +26,12 @@ interface MprisPlayerRemote {
   readonly CanPlay: boolean;
   readonly CanGoNext: boolean;
   readonly CanGoPrevious: boolean;
+  readonly CanSeek: boolean;
   PlayPauseAsync(): Promise<[]>;
   NextAsync(): Promise<[]>;
   PreviousAsync(): Promise<[]>;
+  SetPositionAsync(trackId: string, position: number): Promise<[]>;
+  connectSignal(name: 'Seeked', callback: (proxy: Gio.DBusProxy, sender: string, args: [number]) => void): number;
 }
 
 type MprisProxy = MprisRemote & Gio.DBusProxy;
@@ -44,6 +47,7 @@ const MPRIS_PATH = '/org/mpris/MediaPlayer2';
 export namespace MprisPlayer {
   export interface Signals extends GObject.Object.SignalSignatures {
     'changed': () => void;
+    'seeked': () => void;
   }
 }
 
@@ -53,6 +57,7 @@ export const MprisPlayer = GObject.registerClass({
   },
   Signals: {
     'changed': {},
+    'seeked': {},
   },
 }, class MprisPlayer extends GObject.Object {
   declare connect: GObject.SignalMethods<this, MprisPlayer.Signals>['connect'];
@@ -65,6 +70,9 @@ export const MprisPlayer = GObject.registerClass({
   private artists: string[] = [];
   private title = '';
   private coverUrl = '';
+  private albumTitle = '';
+  private lengthUs = 0;
+  private trackId = '';
   private appValue: Shell.App | null = null;
 
   constructor(private readonly busName: string) {
@@ -95,6 +103,38 @@ export const MprisPlayer = GObject.registerClass({
 
   get app(): Shell.App | null {
     return this.appValue;
+  }
+
+  get name(): string {
+    return this.busName;
+  }
+
+  get identity(): string {
+    return this.appValue?.get_name() ?? this.mprisProxy?.Identity ?? '';
+  }
+
+  get trackAlbum(): string {
+    return this.albumTitle;
+  }
+
+  /** The track's length in microseconds, or 0 when the player doesn't say. */
+  get trackLength(): number {
+    return this.lengthUs;
+  }
+
+  get canSeek(): boolean {
+    return !!this.playerProxy?.CanSeek && !!this.trackId && this.lengthUs > 0;
+  }
+
+  /** Where the track is, in microseconds. Players don't announce it as it moves, so it's asked for each time. */
+  async position(): Promise<number> {
+    const reply = await Gio.DBus.session.call(this.busName, MPRIS_PATH, 'org.freedesktop.DBus.Properties', 'Get',
+      new GLib.Variant('(ss)', ['org.mpris.MediaPlayer2.Player', 'Position']), null, Gio.DBusCallFlags.NONE, -1, null);
+    return Number((reply.deepUnpack() as [GLib.Variant])[0].deepUnpack());
+  }
+
+  seekTo(microseconds: number): void {
+    if (this.canSeek) this.playerProxy!.SetPositionAsync(this.trackId, Math.round(microseconds)).catch(logError);
   }
 
   playPause(): void {
@@ -143,6 +183,7 @@ export const MprisPlayer = GObject.registerClass({
 
   private onPlayerProxyReady(): void {
     this.playerProxy!.connectObject('g-properties-changed', () => this.updateState(), this);
+    this.playerProxy!.connectSignal('Seeked', () => this.emit('seeked'));
     this.updateState();
   }
 
@@ -181,6 +222,13 @@ export const MprisPlayer = GObject.registerClass({
       this.faulty('cover art', 'a string', coverUrl);
       this.coverUrl = '';
     }
+
+    const album = metadata['xesam:album'];
+    this.albumTitle = typeof album === 'string' ? album : '';
+    const length = metadata['mpris:length'];
+    this.lengthUs = typeof length === 'number' || typeof length === 'bigint' ? Number(length) : 0;
+    const trackId = metadata['mpris:trackid'];
+    this.trackId = typeof trackId === 'string' ? trackId : '';
 
     this.appValue = mprisProxy.DesktopEntry
       ? Shell.AppSystem.get_default().lookup_app(`${mprisProxy.DesktopEntry}.desktop`)

@@ -1,11 +1,14 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
+import Pango from 'gi://Pango';
 import St from 'gi://St';
 
 import { BarLevel } from '../../../../shared/widgets/barLevel.js';
 import { Slider } from '../../../../shared/widgets/slider.js';
+import { animateActor } from '../../../../shared/motion/motion.js';
 import { resolveIcon } from '../icons.js';
+import { artwork } from '../media/artwork.js';
 import type { ButtonView, EntryView, IconView, ImageView, ItemView, ProgressView, SliderView, SwitchView, TextView, View } from '../types.js';
 
 /** A control on screen for one node of a view, which takes later versions of the same kind of node in place. */
@@ -24,20 +27,62 @@ export interface ControlHost {
 
 export function imageFile(host: ControlHost, path: string): Gio.File {
   const file = Gio.File.new_for_path(GLib.path_is_absolute(path) ? path : GLib.build_filenamev([host.extensionPath, path]));
-  if (!host.folders.some(folder => file.has_prefix(Gio.File.new_for_path(folder)))) throw new Error(`${path} is outside the extension's folders`);
+  if (!host.folders.some(folder => file.has_prefix(Gio.File.new_for_path(folder))) && !artwork.holds(file.get_path()!))
+    throw new Error(`${path} is outside the extension's folders`);
   return file;
 }
 
+const MARQUEE_PAUSE_MS = 1200;
+const MARQUEE_PIXELS_PER_S = 36;
+
+/** Text that fits its width: cut short with an ellipsis, or sliding along once to show the rest. */
+function fittedText(label: St.Label): { actor: St.BoxLayout; fit(maxWidth: number | undefined, marquee: boolean): void; slide(): void } {
+  const clip = new St.BoxLayout({ clip_to_allocation: true, reactive: true, track_hover: true, y_align: Clutter.ActorAlign.CENTER });
+  clip.add_child(label);
+  let marquee = false;
+  let overflow = 0;
+  const slide = () => {
+    label.remove_transition('translation-x');
+    label.translation_x = 0;
+    if (!marquee || overflow <= 0) return;
+    const duration = Math.round(overflow / MARQUEE_PIXELS_PER_S * 1000);
+    animateActor(label, {
+      translation_x: -overflow, duration, delay: MARQUEE_PAUSE_MS, mode: Clutter.AnimationMode.EASE_IN_OUT_SINE,
+      onComplete: () => animateActor(label, { translation_x: 0, duration: 400, delay: MARQUEE_PAUSE_MS, mode: Clutter.AnimationMode.EASE_OUT_QUAD }),
+    });
+  };
+  clip.connect('notify::hover', () => {
+    if (clip.hover) slide();
+  });
+  return {
+    actor: clip,
+    fit: (maxWidth, scrolls) => {
+      marquee = scrolls;
+      label.clutter_text.ellipsize = maxWidth && !scrolls ? Pango.EllipsizeMode.END : Pango.EllipsizeMode.NONE;
+      const natural = label.get_preferred_width(-1)[1];
+      overflow = maxWidth ? Math.max(0, natural - maxWidth) : 0;
+      clip.width = maxWidth ? Math.min(natural, maxWidth) : -1;
+      label.width = maxWidth && !scrolls ? Math.min(natural, maxWidth) : -1;
+    },
+    slide,
+  };
+}
+
 export function textControl(node: TextView): Control<TextView> {
-  const label = new St.Label({ y_align: Clutter.ActorAlign.CENTER });
-  label.clutter_text.line_wrap = true;
-  label.clutter_text.ellipsize = 0;
+  const label = new St.Label({ y_align: Clutter.ActorAlign.CENTER, x_align: Clutter.ActorAlign.START });
+  const fitted = fittedText(label);
+  let shown = '';
   const update = (next: TextView) => {
+    const changed = next.text !== shown;
+    shown = next.text;
     label.text = next.text;
     label.style_class = `kestrel-extension-text kestrel-extension-text-${next.style ?? 'body'}`;
+    label.clutter_text.line_wrap = !next.maxWidth;
+    fitted.fit(next.maxWidth, !!next.marquee);
+    if (changed) fitted.slide();
   };
   update(node);
-  return { actor: label, update };
+  return { actor: fitted.actor, update };
 }
 
 export function iconControl(node: IconView, host: ControlHost): Control<IconView> {
@@ -51,18 +96,14 @@ export function iconControl(node: IconView, host: ControlHost): Control<IconView
 }
 
 export function imageControl(node: ImageView, host: ControlHost): Control<ImageView> {
-  const bin = new St.Bin();
-  let shown = '';
+  const picture = new St.Widget({ y_align: Clutter.ActorAlign.CENTER });
   const update = (next: ImageView) => {
-    bin.set_size(next.width, next.height);
-    const key = `${next.path} ${next.width} ${next.height}`;
-    if (key === shown) return;
-    shown = key;
-    const scale = St.ThemeContext.get_for_stage(global.stage).scale_factor;
-    bin.child = St.TextureCache.get_default().load_file_async(imageFile(host, next.path), next.width, next.height, scale, 1);
+    picture.set_size(next.width, next.height);
+    const uri = imageFile(host, next.path).get_uri();
+    picture.style = `background-image: url("${uri}"); background-size: cover; border-radius: ${Math.max(0, next.radius ?? 0)}px;`;
   };
   update(node);
-  return { actor: bin, update };
+  return { actor: picture, update };
 }
 
 export function buttonControl(node: ButtonView, host: ControlHost): Control<ButtonView> {

@@ -1,0 +1,13 @@
+<node>
+  <interface name="com.lantharos.Kestrel.Extensions">
+    <method name="Reload">
+      <arg type="s" direction="in"/>
+    </method>
+    <method name="Disable">
+      <arg type="s" direction="in"/>
+    </method>
+    <method name="Remove">
+      <arg type="s" direction="in"/>
+    </method>
+  </interface>
+</node>

@@ -108,16 +108,24 @@ fn plans(updates: &[AppUpdate]) -> Vec<Plan> {
         |packages| Job::UpdateDebs { packages },
         package,
     ));
-    plans.extend(of(Source::AppImage).into_iter().map(|update| {
-        plan(
-            update.key.clone(),
-            update.name.clone(),
-            Job::UpdateAppImage {
-                id: update.id.clone(),
-            },
-            Vec::new(),
-        )
-    }));
+    plans.extend(
+        updates
+            .iter()
+            .filter(|update| update.source == Source::AppImage || update.store.is_some())
+            .filter(|update| update.store.as_ref().is_none_or(|store| !store.widens))
+            .map(|update| {
+                let job = match &update.store {
+                    Some(store) => Job::UpdateStore {
+                        id: store.id.clone(),
+                        consent: store.consent.clone(),
+                    },
+                    None => Job::UpdateAppImage {
+                        id: update.id.clone(),
+                    },
+                };
+                plan(update.key.clone(), update.name.clone(), job, Vec::new())
+            }),
+    );
     plans
 }
 
@@ -200,5 +208,14 @@ pub fn run(arguments: &Arguments) -> Exit {
         return Exit::Done;
     }
     show(&updates);
+    for update in updates
+        .iter()
+        .filter(|update| update.store.as_ref().is_some_and(|store| store.widens))
+    {
+        println!(
+            "{} asks for more access than you agreed to, so it waits until you look at it in Schelf.",
+            Ink::stdout().bold(&update.name)
+        );
+    }
     carry_out(&plans(&updates), |_| {})
 }

@@ -1,6 +1,8 @@
 import { events as sabineEvents } from '@lantharos/sabine';
 import { appearance } from '@luft/ui';
 import { commands } from '#lib/bindings.js';
+import * as store from '#lib/catalog/store.js';
+import { catalog } from './catalog.svelte';
 import { library } from './library.svelte';
 import { navigation, type Route } from './navigation.svelte';
 import { operations } from './operations.svelte';
@@ -18,6 +20,7 @@ function openFiles(files: string[]) {
 const SEARCH = 'schelf:search?';
 const FULL_ACCESS = 'schelf:full-access?';
 const APP = 'schelf:app?';
+const LISTING = 'schelf:app/';
 
 async function askFullAccess(id: string) {
 	if (!library.loaded) await library.refresh();
@@ -32,7 +35,23 @@ async function openApp(id: string) {
 	if (app) navigation.open({ page: 'app', target: { installed: app.key }, name: app.name });
 }
 
+async function openListing(id: string) {
+	const listing = await store.entry(id).catch(() => null);
+	if (listing) {
+		navigation.open({ page: 'app', target: { listing }, name: listing.name });
+		return;
+	}
+	if (!library.loaded) await library.refresh();
+	const app = library.installed.find((entry) => entry.listing === id);
+	if (app) navigation.open({ page: 'app', target: { installed: app.key }, name: app.name });
+}
+
 function openPage(argumentsList: (string | null)[]) {
+	const listing = argumentsList.find((argument) => argument?.startsWith(LISTING));
+	if (listing) {
+		void openListing(decodeURIComponent(listing.slice(LISTING.length)));
+		return;
+	}
 	const app = argumentsList.find((argument) => argument?.startsWith(APP));
 	if (app) {
 		void openApp(decodeURIComponent(app.slice(APP.length)));
@@ -62,5 +81,5 @@ export async function start() {
 		openPage(list);
 		openFiles(await commands.appActivationFiles({ arguments: list, workingDirectory }));
 	});
-	await Promise.all([operations.start(), library.start()]);
+	await Promise.all([operations.start(), library.start(), catalog.start()]);
 }

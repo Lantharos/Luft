@@ -1,6 +1,6 @@
 ---
 title: Installing software
-description: Flatpak apps, AppImages, command-line tools in a Toolbox container, and system packages for services and vendors' apps.
+description: Apps from schelf.store and Flathub, AppImages, command-line tools in a Toolbox container, and system packages for services and vendors' apps.
 sidebar:
   order: 3
 ---
@@ -9,16 +9,17 @@ Luft's system is a sealed image, so apps and tools live next to it, in your acco
 
 | Kind | Where it goes | Updates |
 | --- | --- | --- |
+| Apps and extensions from schelf.store | Your account: AppImages in `~/Applications` in their sandbox, apps built with Sabine next to Luft's own, extensions on your desktop | By themselves, a few minutes after you sign in and every six hours |
 | Flatpak apps from Flathub | Your account | In Schelf, under Updates, or `schelf update` |
 | AppImages | `~/Applications`, with a menu entry and icon | By themselves, a few minutes after you sign in and every six hours |
 | Command-line tools from Fedora | A Toolbox container, with their commands in `~/.local/bin` | In Schelf, under Updates, or `schelf update` |
-| System packages from Fedora and the software sources you add | The system, for everyone on the computer | With Luft, in [Settings](/system/updates/) |
+| Fedora's desktop apps, and system packages from Fedora and the software sources you add | The system, for everyone on the computer | With Luft, in [Settings](/system/updates/) |
 
 Apps and tools don't need an administrator's password, in Schelf or in the terminal. System packages do.
 
 ## Flatpak
 
-Most desktop apps come from [Flathub](https://flathub.org). Schelf adds Flathub the first time you install something and installs apps for your account. App pages explain each app's permissions in plain words, and opening a `.flatpakref` file installs that app.
+Most desktop apps come from [Flathub](https://flathub.org), and Schelf lists them next to the apps published on [schelf.store](https://schelf.store). Schelf adds Flathub the first time you install something from it and installs apps for your account. App pages explain each app's permissions in plain words, and opening a `.flatpakref` file installs that app.
 
 The `flatpak` command works too: `flatpak install --user flathub org.example.App`.
 
@@ -136,7 +137,7 @@ The `schelf` command, or `sch` for short, does the same as the app:
 | `schelf install ripgrep` | Installs an app or a tool, or several at once (`schelf add` works too) |
 | `schelf install ./app.AppImage` | Installs a `.rpm`, `.deb`, `.AppImage`, `.flatpak`, `.flatpakref` or `.flatpakrepo` file |
 | `schelf remove ripgrep` | Removes something you installed |
-| `schelf search image editor` | Looks on Flathub, in Fedora and your software sources at once, and through your AppImages |
+| `schelf search image editor` | Looks on schelf.store, Flathub, in Fedora and your software sources at once, and through your AppImages |
 | `schelf update` | Updates apps, AppImages and tools. Luft itself updates in [Settings](/system/updates/) |
 | `schelf list` | Shows what you installed, by where it came from, and the system packages |
 | `schelf install --system tailscale` | Adds a package to the system, from Fedora or your software sources ([more](#system-packages)) |
@@ -145,7 +146,7 @@ The `schelf` command, or `sch` for short, does the same as the app:
 | `schelf trust 1password` | Gives a Flatpak app or an AppImage [full access](#full-access), after warning you and asking first |
 | `schelf untrust 1password` | Puts it back in its sandbox |
 
-When a name is both on Flathub and in Fedora, a desktop app comes from Flathub and a command-line tool from Fedora. If that still leaves a choice, Schelf asks which one you mean. `--flathub` or `--fedora` picks the place yourself, `-y` goes ahead without asking, and `schelf --help` lists everything.
+A name schelf.store has comes from there. Otherwise, when it's both on Flathub and in Fedora, a desktop app comes from Flathub and a command-line tool from Fedora. If that still leaves a choice, Schelf asks which one you mean. `--store`, `--flathub` or `--fedora` picks the place yourself, `-y` goes ahead without asking, and `schelf --help` lists everything. Before an app from schelf.store installs, the command shows what it can use and asks.
 
 While the Schelf app is open, the command hands its work to the app, so both show the same progress and the app's queue runs one thing at a time. Otherwise the command does the work itself, and waits if the app or another terminal is already changing your software.
 

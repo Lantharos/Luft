@@ -1,13 +1,8 @@
-import type { Permissions } from '#lib/bindings.js';
+import type { CatalogApp, Origin, Permissions, StoreDetails } from '#lib/bindings.js';
 
-export interface CatalogApp {
-	key: string;
-	id: string;
-	name: string;
-	summary: string;
-	icon: string | null;
-	developer: string | null;
-}
+export type { CatalogApp };
+
+export const catalogKey = (app: Pick<CatalogApp, 'origin' | 'id'>) => `${app.origin}:${app.id}`;
 
 export interface Screenshot {
 	url: string;
@@ -22,6 +17,7 @@ export interface Release {
 
 export interface AppDetails {
 	id: string;
+	origin: Origin;
 	name: string;
 	summary: string;
 	description: string;
@@ -35,9 +31,5 @@ export interface AppDetails {
 	installedSize: number | null;
 	verified: string | null;
 	permissions: Permissions | null;
-}
-
-export interface Page {
-	apps: CatalogApp[];
-	pages: number;
+	store: StoreDetails | null;
 }

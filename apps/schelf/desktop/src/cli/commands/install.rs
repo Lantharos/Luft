@@ -13,7 +13,7 @@ const COMMANDS_SHOWN: usize = 5;
 
 fn nothing(name: &str, only: Option<Catalog>, suggestions: &[Candidate]) {
     let ink = Ink::stderr();
-    let places = only.map_or("Flathub or Fedora", Catalog::title);
+    let places = only.map_or("schelf.store, Flathub or Fedora", Catalog::title);
     eprintln!("There's nothing called {} on {places}.", ink.bold(name));
     if suggestions.is_empty() {
         return;
@@ -38,7 +38,7 @@ fn choose(name: &str, found: Vec<Candidate>, yes: bool) -> Result<Candidate, Exi
     {
         format!("Name the one you want by its ID, such as {}.", found[0].id)
     } else {
-        "Pick one with --flathub or --fedora.".to_owned()
+        "Pick one with --store, --flathub or --fedora.".to_owned()
     };
     let chosen = pick(name, &options, yes, &hint)?;
     Ok(found
@@ -98,7 +98,7 @@ fn prepare(target: &str, only: Option<Catalog>, yes: bool) -> Result<Option<Plan
         );
         return Ok(None);
     }
-    Ok(Some(candidate.plan()))
+    candidate.plan(yes).map(Some)
 }
 
 fn tool_notes(package: &str) -> Vec<String> {

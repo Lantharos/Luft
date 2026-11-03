@@ -55,7 +55,7 @@ fn pick(name: &str, options: &[String], yes: bool, hint: &str) -> Result<usize, 
     prompt::choose(options).ok_or(Exit::Declined)
 }
 
-fn confirm(question: &str, yes: bool) -> Result<(), Exit> {
+pub fn confirm(question: &str, yes: bool) -> Result<(), Exit> {
     if yes {
         return Ok(());
     }
@@ -70,7 +70,7 @@ fn confirm(question: &str, yes: bool) -> Result<(), Exit> {
     }
 }
 
-fn list_of(names: &[String]) -> String {
+pub fn list_of(names: &[String]) -> String {
     match names {
         [] => String::new(),
         [only] => only.clone(),

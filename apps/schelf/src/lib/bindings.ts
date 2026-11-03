@@ -12,25 +12,15 @@ export const commands = {
 		token?: string | null,
 	}, options?: CallOptions) => invoke<null>("app_open_url", params, options),
 	appState: (options?: CallOptions) => invoke<AppState>("app_state", {}, options),
+	fedoraDetails: (params: {
+		package: string,
+	}, options?: CallOptions) => invoke<FedoraDetails | null>("fedora_details", params, options),
 	filesInspect: (params: {
 		path: string,
 	}, options?: CallOptions) => invoke<OpenedFile>("files_inspect", params, options),
 	flathubAppstream: (params: {
 		id: string,
 	}, options?: CallOptions) => invoke<import("#lib/catalog/flathub.js").Appstream>("flathub_appstream", params, options),
-	flathubCategory: (params: {
-		category: string,
-		page: number,
-		perPage: number,
-	}, options?: CallOptions) => invoke<import("#lib/catalog/flathub.js").HitPage>("flathub_category", params, options),
-	flathubCollection: (params: {
-		name: string,
-		page: number,
-		perPage: number,
-	}, options?: CallOptions) => invoke<import("#lib/catalog/flathub.js").HitPage>("flathub_collection", params, options),
-	flathubSearch: (params: {
-		query: string,
-	}, options?: CallOptions) => invoke<import("#lib/catalog/flathub.js").HitPage>("flathub_search", params, options),
 	flathubSummary: (params: {
 		id: string,
 	}, options?: CallOptions) => invoke<import("#lib/catalog/flathub.js").Summary>("flathub_summary", params, options),
@@ -103,6 +93,25 @@ export const commands = {
 		source: string,
 	}, options?: CallOptions) => invoke<CheckedSource>("sources_fetch", params, options),
 	sourcesList: (options?: CallOptions) => invoke<AddedSource[]>("sources_list", {}, options),
+	storeCategory: (params: {
+		category: string,
+	}, options?: CallOptions) => invoke<CatalogApp[]>("store_category", params, options),
+	storeCollection: (params: {
+		collection: Collection,
+	}, options?: CallOptions) => invoke<CatalogApp[]>("store_collection", params, options),
+	storeDetails: (params: {
+		id: string,
+	}, options?: CallOptions) => invoke<StoreDetails>("store_details", params, options),
+	storeEntry: (params: {
+		id: string,
+	}, options?: CallOptions) => invoke<CatalogApp | null>("store_entry", params, options),
+	storeExtensions: (options?: CallOptions) => invoke<CatalogApp[]>("store_extensions", {}, options),
+	storeRefresh: (options?: CallOptions) => invoke<StoreState>("store_refresh", {}, options),
+	storeRevocations: (options?: CallOptions) => invoke<StoreState>("store_revocations", {}, options),
+	storeSearch: (params: {
+		query: string,
+	}, options?: CallOptions) => invoke<CatalogApp[]>("store_search", params, options),
+	storeState: (options?: CallOptions) => invoke<StoreState>("store_state", {}, options),
 	systemSearch: (params: {
 		query: string,
 	}, options?: CallOptions) => invoke<ToolSummary[]>("system_search", params, options),
@@ -158,6 +167,7 @@ export type AppUpdate = {
 	installation: Installation | null,
 	reference: string | null,
 	package: string | null,
+	store: StoreUpdate | null,
 };
 
 export type Appearance = {
@@ -168,6 +178,27 @@ export type Appearance = {
 	locale: Locale,
 };
 
+/**  Why an app or one of its versions was pulled or flagged. */
+export type Block = {
+	action: Severity,
+	reason: string,
+	note: string | null,
+};
+
+export type Builder = "github-actions" | "developer";
+
+/**  What the pages show of an entry. */
+export type CatalogApp = {
+	id: string,
+	kind: Kind,
+	origin: Origin,
+	name: string,
+	summary: string,
+	icon: string | null,
+	developer: string | null,
+	package: string | null,
+};
+
 /**  A repository and what the system said about it, to be trusted before it's added. */
 export type CheckedSource = {
 	draft: RepositoryDraft,
@@ -175,11 +206,32 @@ export type CheckedSource = {
 	added: boolean,
 };
 
+export type Collection = "popular" | "updated";
+
+/**  What you saw and agreed to before installing or updating a store app. */
+export type Consent = {
+	version: string,
+	permissions: Declared | null,
+	fullAccess: boolean,
+};
+
 export type Corners = "rounded" | "square";
 
 export type CustomIcons = {
 	icon: boolean,
 	symbolic: boolean,
+};
+
+/**
+ *  What an app may use, in Luft's shared permission format; an app that
+ *  declares nothing gets full access.
+ */
+export type Declared = {
+	network: boolean,
+	filesystems: string[],
+	devices: string[],
+	talk: string[],
+	unsandboxed: string | null,
 };
 
 /**
@@ -198,11 +250,23 @@ export type DescribedSource = {
 	url: string,
 };
 
+/**  A Fedora package's page, from Fedora's software sources. */
+export type FedoraDetails = {
+	version: string,
+	description: string,
+	license: string,
+	homepage: string | null,
+	size: number,
+	download: number,
+};
+
 export type Finished = {
 	keys: string[],
 	action: Action,
 	succeeded: boolean,
 };
+
+export type Format = "sabine" | "appimage" | "luft-extension";
 
 export type IconPaint = {
 	plate: string,
@@ -230,11 +294,25 @@ export type InstalledApp = {
 	path: string | null,
 	commands: string[],
 	services: string[],
+	/**  The schelf.store app it was installed as. */
+	listing: string | null,
 };
 
-export type Job = { kind: "installFlathub"; id: string } | { kind: "installFlatpakRef"; path: string } | { kind: "installFlatpakBundle"; path: string } | { kind: "installDeb"; path: string } | { kind: "removeDeb"; package: string } | { kind: "updateDebs"; packages: string[] } | { kind: "addFlatpakRepo"; path: string; name: string } | { kind: "installAppImage"; path: string; 
+/**  A store app or extension on this computer. */
+export type InstalledFromStore = {
+	id: string,
+	kind: Kind,
+	name: string,
+	version: string,
+	local: string,
+	block: Block | null,
+};
+
+export type Job = { kind: "installFlathub"; id: string } | { kind: "installStore"; id: string; consent: Consent } | { kind: "updateStore"; id: string; consent: Consent } | { kind: "removeStore"; id: string } | { kind: "installFlatpakRef"; path: string } | { kind: "installFlatpakBundle"; path: string } | { kind: "installDeb"; path: string } | { kind: "removeDeb"; package: string } | { kind: "updateDebs"; packages: string[] } | { kind: "addFlatpakRepo"; path: string; name: string } | { kind: "installAppImage"; path: string; 
 /**  Whether you let an app that asks to run unsandboxed do so. */
 fullAccess: boolean } | { kind: "installTool"; package: string } | { kind: "installToolFile"; path: string } | { kind: "removeFlatpak"; installation: Installation; reference: string } | { kind: "removeAppImage"; id: string } | { kind: "removeTool"; package: string } | { kind: "updateFlatpaks"; installation: Installation; references: string[] } | { kind: "updateAppImage"; id: string } | { kind: "updateTools"; packages: string[] } | { kind: "installSystemPackages"; packages: string[] } | { kind: "removeSystemPackages"; packages: string[] } | { kind: "installSystemPackageFile"; path: string; package: string; repository?: RepositoryDraft | null } | { kind: "removeRepository"; file: string };
+
+export type Kind = "app" | "extension";
 
 export type Locale = {
 	languages: string[],
@@ -288,6 +366,8 @@ export type Operation = {
 
 export type OperationState = "queued" | "running" | "failed";
 
+export type Origin = "schelf" | "flathub" | "fedora";
+
 export type Palette = {
 	accent: string,
 	wallpaperAccent: string,
@@ -310,6 +390,14 @@ export type Permissions = {
 export type Progress = {
 	stage: Stage,
 	fraction: number | null,
+};
+
+/**  Where a release came from. */
+export type Provenance = {
+	origin: Builder,
+	repository: string | null,
+	commit: string | null,
+	run: string | null,
 };
 
 /**
@@ -336,9 +424,16 @@ export type SchemeColors = {
 	dark: { [key in string]: string },
 };
 
+export type Screenshot = {
+	url: string,
+	caption: string | null,
+};
+
 export type Setting = { setting: "allowed"; value: boolean } | { setting: "banners"; value: boolean } | { setting: "lockScreen"; value: boolean } | { setting: "detailsOnLockScreen"; value: boolean } | { setting: "sound"; value: string } | { setting: "duringDoNotDisturb"; value: string } | { setting: "keptInList"; value: boolean };
 
-export type Source = "flatpak" | "appImage" | "tool" | "debian" | "system";
+export type Severity = "block" | "warn";
+
+export type Source = "flatpak" | "appImage" | "tool" | "debian" | "system" | "sabine" | "extension";
 
 export type SourceKey = {
 	fingerprint: string,
@@ -346,6 +441,50 @@ export type SourceKey = {
 };
 
 export type Stage = "waiting" | "preparing" | "downloading" | "installing" | "removing" | "finishing";
+
+/**  A store app's page. */
+export type StoreDetails = {
+	id: string,
+	kind: Kind,
+	format: Format,
+	name: string,
+	summary: string,
+	description: string,
+	icon: string | null,
+	screenshots: Screenshot[],
+	developer: string,
+	verified: boolean,
+	homepage: string | null,
+	license: string | null,
+	version: string | null,
+	published: string | null,
+	notes: string,
+	size: number | null,
+	declared: Declared | null,
+	access: Permissions | null,
+	provenance: Provenance | null,
+};
+
+export type StoreState = {
+	installed: InstalledFromStore[],
+	outOfDate: boolean,
+};
+
+/**  A newer release of a store app than the one installed. */
+export type StoreUpdate = {
+	id: string,
+	kind: Kind,
+	format: Format,
+	name: string,
+	icon: string | null,
+	local: string,
+	from: string,
+	to: string,
+	size: number,
+	consent: Consent,
+	/**  Whether it asks for more than you agreed to, so it waits for you. */
+	widens: boolean,
+};
 
 export type ToolSummary = {
 	package: string,

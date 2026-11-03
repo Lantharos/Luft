@@ -1,21 +1,5 @@
 import { commands, type Permissions } from '#lib/bindings.js';
-import type { AppDetails, CatalogApp, Page, Screenshot } from './types';
-import type { CategoryId } from './categories';
-
-export type Collection = 'popular' | 'trending' | 'recently-updated' | 'recently-added';
-
-interface Hit {
-	app_id: string;
-	name: string;
-	summary: string;
-	icon: string | null;
-	developer_name?: string | null;
-}
-
-export interface HitPage {
-	hits: Hit[];
-	totalPages: number;
-}
+import type { AppDetails, Screenshot } from './types';
 
 interface ScreenshotSize {
 	width: string;
@@ -52,26 +36,6 @@ export interface Summary {
 }
 
 const PREFERRED_WIDTH = 752;
-const PAGE_SIZE = 48;
-
-function toApp(hit: Hit): CatalogApp {
-	return {
-		key: `flathub:${hit.app_id}`,
-		id: hit.app_id,
-		name: hit.name,
-		summary: hit.summary,
-		icon: hit.icon,
-		developer: hit.developer_name ?? null
-	};
-}
-
-const toPage = (page: HitPage): Page => ({ apps: page.hits.map(toApp), pages: page.totalPages });
-
-export const collection = (name: Collection, page = 1, perPage = PAGE_SIZE) => commands.flathubCollection({ name, page, perPage }).then(toPage);
-
-export const category = (id: CategoryId, page = 1) => commands.flathubCategory({ category: id, page, perPage: PAGE_SIZE }).then(toPage);
-
-export const search = (query: string) => commands.flathubSearch({ query }).then((page) => page.hits.map(toApp));
 
 function screenshot(entry: { caption?: string | null; sizes: ScreenshotSize[] }): Screenshot | null {
 	const sizes = [...entry.sizes].sort((a, b) => Math.abs(Number(a.width) - PREFERRED_WIDTH) - Math.abs(Number(b.width) - PREFERRED_WIDTH));
@@ -96,7 +60,7 @@ function verified(metadata: Appstream['metadata']): string | null {
 	if (!metadata?.['flathub::verification::verified']) return null;
 	const website = metadata['flathub::verification::website'];
 	const login = metadata['flathub::verification::login_name'];
-	return typeof website === 'string' ? website : typeof login === 'string' ? login : 'Flathub';
+	return `Verified as ${typeof website === 'string' ? website : typeof login === 'string' ? login : 'Flathub'}`;
 }
 
 export async function details(id: string): Promise<AppDetails> {
@@ -107,6 +71,7 @@ export async function details(id: string): Promise<AppDetails> {
 	const release = appstream.releases?.find((entry) => entry.type !== 'development') ?? appstream.releases?.[0];
 	return {
 		id,
+		origin: 'flathub',
 		name: appstream.name,
 		summary: appstream.summary,
 		description: appstream.description,
@@ -121,6 +86,7 @@ export async function details(id: string): Promise<AppDetails> {
 		downloadSize: summary.download_size ?? null,
 		installedSize: summary.installed_size ?? null,
 		verified: verified(appstream.metadata),
-		permissions: permissions(summary)
+		permissions: permissions(summary),
+		store: null
 	};
 }

@@ -1,12 +1,13 @@
+import type { CatalogApp, Collection } from '#lib/bindings.js';
 import type { CategoryId } from '#lib/catalog/categories.js';
-import type { Collection } from '#lib/catalog/flathub.js';
 
-export type AppTarget = { id: string } | { installed: string };
+export type AppTarget = { listing: CatalogApp } | { installed: string };
 
 export type Route =
 	| { page: 'discover' }
 	| { page: 'installed' }
 	| { page: 'updates' }
+	| { page: 'extensions' }
 	| { page: 'category'; category: CategoryId }
 	| { page: 'collection'; collection: Collection }
 	| { page: 'search'; query: string }

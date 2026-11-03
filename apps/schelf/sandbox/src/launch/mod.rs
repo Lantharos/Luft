@@ -12,6 +12,7 @@ mod wait;
 use std::process::Command;
 use std::time::{Duration, Instant};
 
+use luft_software::apps::appimage;
 use zbus::Connection;
 
 use crate::app::{App, Grants};
@@ -38,7 +39,20 @@ pub fn run(id: &str, arguments: Vec<String>) -> i32 {
     }
 }
 
+/// Shows why schelf.store pulled the app in Schelf, which offers to remove it.
+fn refuse_pulled(store_id: &str) -> String {
+    if let Ok(schelf) = std::env::current_exe() {
+        let _ = Command::new(schelf)
+            .arg(format!("schelf:app/{store_id}"))
+            .spawn();
+    }
+    "schelf.store pulled it, so it can't start.".to_owned()
+}
+
 fn start(id: &str, arguments: Vec<String>) -> Result<i32, String> {
+    if let Some(store_id) = appimage::blocked().get(id) {
+        return Err(refuse_pulled(store_id));
+    }
     let app = App::find(id)?;
     let runtime = tokio::runtime::Builder::new_current_thread()
         .enable_all()

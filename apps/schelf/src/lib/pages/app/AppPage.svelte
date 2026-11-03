@@ -1,15 +1,20 @@
 <script lang="ts">
+	import ShieldOff from '@lucide/svelte/icons/shield-off';
+	import { Row } from '@luft/ui';
 	import { commands, type Permissions } from '#lib/bindings.js';
 	import AccessList from '#lib/components/AccessList.svelte';
 	import AppArt from '#lib/components/AppArt.svelte';
 	import Description from '#lib/components/Description.svelte';
 	import Screenshots from '#lib/components/Screenshots.svelte';
+	import { catalog } from '#lib/state/catalog.svelte.js';
 	import type { AppTarget } from '#lib/state/navigation.svelte.js';
 	import AppActions from './AppActions.svelte';
 	import AppFacts from './AppFacts.svelte';
 	import FullAccess from './FullAccess.svelte';
 	import NameAndIcon from './NameAndIcon.svelte';
 	import Notifications from './Notifications.svelte';
+	import Provenance from './Provenance.svelte';
+	import PulledNotice from './PulledNotice.svelte';
 	import { installedFor, load, type Loaded } from './load';
 
 	let { target, name, askFullAccess = false }: { target: AppTarget; name: string; askFullAccess?: boolean } = $props();
@@ -23,9 +28,14 @@
 	const details = $derived(loaded?.details ?? null);
 	const installed = $derived(installedFor(target));
 	const permissions = $derived(localPermissions ?? details?.permissions ?? null);
+	const known = $derived('listing' in target ? target.listing : null);
 	const title = $derived(details?.name ?? installed?.name ?? name);
-	const summary = $derived(details?.summary ?? installed?.summary ?? '');
+	const summary = $derived(details?.summary ?? installed?.summary ?? known?.summary ?? '');
 	const sandboxed = $derived(installed?.source === 'appImage' || installed?.source === 'flatpak' ? installed : null);
+	const store = $derived(details?.store ?? null);
+	const listing = $derived(loaded?.listing ?? known);
+	const block = $derived(installed?.listing ? (catalog.installed(installed.listing)?.block ?? null) : null);
+	const from = $derived(listing?.origin === 'flathub' ? 'From Flathub' : listing?.origin === 'fedora' ? 'From Fedora' : null);
 
 	$effect(() => {
 		asking = askFullAccess;
@@ -65,18 +75,22 @@
 <div class="soft-scroll h-full overflow-y-auto">
 	<div class="mx-auto flex w-full max-w-[880px] flex-col gap-7 px-8 pt-2 pb-10">
 		<header class="flex items-center gap-5">
-			<AppArt icon={details?.icon ?? installed?.icon ?? null} desktop={installed?.desktop} source={installed?.source} size={88} />
+			<AppArt icon={details?.icon ?? installed?.icon ?? known?.icon ?? null} desktop={installed?.desktop} source={installed?.source ?? (store?.kind === 'extension' ? 'extension' : null)} size={88} />
 			<div class="flex min-w-0 flex-1 flex-col gap-1">
 				<h2 class="truncate text-[26px] font-semibold">{title}</h2>
-				{#if details?.developer}
-					<span class="truncate text-[13px] text-[var(--text-muted)]">{details.developer}</span>
+				{#if details?.developer || from}
+					<span class="truncate text-[13px] text-[var(--text-muted)]">{[details?.developer, from].filter(Boolean).join(' · ')}</span>
 				{/if}
 				{#if summary}
 					<p class="text-[14px] text-[var(--text-soft)]">{summary}</p>
 				{/if}
 			</div>
-			<AppActions name={title} listing={loaded?.listing ?? null} {installed} />
+			<AppActions name={title} {listing} {store} {installed} pulled={block?.action === 'block'} />
 		</header>
+
+		{#if block && installed}
+			<PulledNotice name={title} {block} app={installed} />
+		{/if}
 
 		{#if !loaded}
 			<div class="flex flex-col gap-3" aria-busy="true">
@@ -110,6 +124,19 @@
 				</AccessList>
 			{:else if permissions}
 				<AccessList {permissions} />
+			{:else if store}
+				<AccessList permissions={null}>
+					<Row
+						title="Full access"
+						description={store.declared?.unsandboxed
+							? `It asks to run outside a sandbox: “${store.declared.unsandboxed}”`
+							: 'It runs outside a sandbox, with everything a program you start yourself can do.'}
+						icon={ShieldOff}
+					/>
+				</AccessList>
+			{/if}
+			{#if store?.provenance}
+				<Provenance provenance={store.provenance} />
 			{/if}
 		{/if}
 	</div>

@@ -1,36 +1,40 @@
 <script lang="ts">
+	import type { CatalogApp, Collection } from '#lib/bindings.js';
 	import Shelf from '#lib/components/Shelf.svelte';
-	import * as flathub from '#lib/catalog/flathub.js';
-	import type { AppDetails, CatalogApp } from '#lib/catalog/types.js';
+	import * as store from '#lib/catalog/store.js';
+	import { catalogKey, type AppDetails } from '#lib/catalog/types.js';
+	import { details } from '#lib/pages/app/load.js';
+	import { catalog } from '#lib/state/catalog.svelte.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
+	import { COLLECTIONS } from '#lib/state/titles.js';
 	import Spotlight from './Spotlight.svelte';
 
 	const SHELF_SIZE = 6;
+	const SHELVES: Collection[] = ['popular', 'updated'];
 
-	let popular = $state<CatalogApp[] | null>(null);
-	let trending = $state<CatalogApp[] | null>(null);
-	let updated = $state<CatalogApp[] | null>(null);
-	let spotlight = $state<AppDetails | null>(null);
+	let shelves = $state<Record<Collection, CatalogApp[]> | null>(null);
+	let spotlight = $state<{ listing: CatalogApp; app: AppDetails } | null>(null);
 	let offline = $state(false);
-
-	async function shelf(name: flathub.Collection) {
-		return (await flathub.collection(name, 1, SHELF_SIZE + 1)).apps;
-	}
+	let empty = $state(false);
 
 	async function load() {
 		offline = false;
 		try {
-			const [first, second, third] = await Promise.all([shelf('trending'), shelf('popular'), shelf('recently-updated')]);
-			trending = first.slice(1, SHELF_SIZE + 1);
-			popular = second.slice(0, SHELF_SIZE);
-			updated = third.slice(0, SHELF_SIZE);
-			if (first[0]) spotlight = await flathub.details(first[0].id).catch(() => null);
+			const [popular, updated] = await Promise.all(SHELVES.map(store.collection));
+			const featured = popular.find((app) => app.origin === 'schelf') ?? popular[0];
+			const others = (apps: CatalogApp[]) => apps.filter((app) => !featured || catalogKey(app) !== catalogKey(featured)).slice(0, SHELF_SIZE);
+			shelves = { popular: others(popular), updated: others(updated) };
+			empty = !featured;
+			if (featured) spotlight = await details(featured).then((app) => ({ listing: featured, app })).catch(() => null);
 		} catch {
 			offline = true;
 		}
 	}
 
-	void load();
+	$effect(() => {
+		void catalog.version;
+		void load();
+	});
 </script>
 
 <div class="soft-scroll h-full overflow-y-auto">
@@ -38,19 +42,21 @@
 		{#if offline}
 			<div class="flex items-center justify-between gap-4 rounded-[var(--radius-group)] bg-[var(--surface)] px-5 py-4">
 				<p class="text-[14px] text-[var(--text-soft)]">
-					Flathub can't be reached right now. The apps you have are still here.
+					schelf.store can't be reached right now. The apps you have are still here.
 				</p>
-				<button type="button" class="button" onclick={load}>Try again</button>
+				<button type="button" class="button" onclick={() => catalog.refresh()}>Try again</button>
 			</div>
+		{:else if empty}
+			<p class="px-1.5 pt-16 text-center text-[15px] text-[var(--text-muted)]">There are no apps here yet. Check back soon.</p>
 		{:else}
 			{#if spotlight}
-				<Spotlight app={spotlight} />
+				<Spotlight listing={spotlight.listing} app={spotlight.app} />
 			{:else}
 				<div class="skeleton h-[240px]"></div>
 			{/if}
-			<Shelf title="Trending" apps={trending} onmore={() => navigation.push({ page: 'collection', collection: 'trending' })} />
-			<Shelf title="Popular" apps={popular} onmore={() => navigation.push({ page: 'collection', collection: 'popular' })} />
-			<Shelf title="New and updated" apps={updated} onmore={() => navigation.push({ page: 'collection', collection: 'recently-updated' })} />
+			{#each SHELVES as collection (collection)}
+				<Shelf title={COLLECTIONS[collection]} apps={shelves?.[collection] ?? null} onmore={() => navigation.push({ page: 'collection', collection })} />
+			{/each}
 		{/if}
 	</div>
 </div>

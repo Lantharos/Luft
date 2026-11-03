@@ -1,11 +1,13 @@
 <script lang="ts">
 	import { bytes, date, Row, Section } from '@luft/ui';
-	import type { InstalledApp } from '#lib/bindings.js';
+	import type { InstalledApp, Origin } from '#lib/bindings.js';
 	import type { AppDetails } from '#lib/catalog/types.js';
 	import { sourceName } from '#lib/format.js';
 	import { openUrl } from '#lib/bridge/index.js';
 
 	let { details, installed }: { details: AppDetails | null; installed: InstalledApp | null } = $props();
+
+	const ORIGINS: Record<Origin, string> = { schelf: 'schelf.store', flathub: 'Flathub', fedora: 'Fedora, in the system for everyone' };
 
 	function license(value: string) {
 		if (/proprietary/i.test(value)) return 'Proprietary';
@@ -20,12 +22,12 @@
 	});
 	const source = $derived.by(() => {
 		if (installed) {
-			const name = sourceName(installed.source, installed.origin);
+			const name = sourceName(installed);
 			if (installed.source === 'flatpak') return `${name}, ${installed.installation === 'user' ? 'for you only' : 'for everyone on this computer'}`;
 			if (installed.source === 'system') return 'Fedora, in the system for everyone';
 			return name;
 		}
-		return 'Flathub';
+		return ORIGINS[details?.origin ?? 'flathub'];
 	});
 </script>
 
@@ -44,7 +46,7 @@
 		<Row title="Services" description="Start with the computer"><span class="max-w-[320px] truncate">{installed.services.join(', ')}</span></Row>
 	{/if}
 	{#if details?.developer}
-		<Row title="Developer" description={details.verified ? `Verified as ${details.verified}` : undefined}><span class="text-right">{details.developer}</span></Row>
+		<Row title="Developer" description={details.verified ?? undefined}><span class="text-right">{details.developer}</span></Row>
 	{/if}
 	{#if details?.license}
 		<Row title="License"><span class="max-w-[320px] truncate">{license(details.license)}</span></Row>

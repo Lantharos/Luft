@@ -1,11 +1,14 @@
 use std::collections::HashSet;
 use std::process::{Command, Stdio};
 
+use luft_app::block_on;
 use luft_software::apps::toolbox::{self, Available, Repositories};
+use luft_software::system::system_packages;
 
-use super::{Candidate, Catalog, Kind};
+use super::{Candidate, Catalog, Kind, store};
 use crate::catalog::tools;
 use crate::operations::Job;
+use crate::store::catalog::Origin;
 
 const GRAPHICAL: [&str; 14] = [
     "libgtk-",
@@ -87,12 +90,29 @@ fn candidates(found: Vec<Available>) -> Vec<Candidate> {
         .collect()
 }
 
+/// Fedora's desktop apps from the store's mirror, which install as system
+/// packages, then its command-line tools.
+fn with_apps(apps: Vec<Candidate>, tools: Vec<Candidate>) -> Vec<Candidate> {
+    let packages: HashSet<String> = apps.iter().map(|app| app.id.clone()).collect();
+    apps.into_iter()
+        .chain(tools.into_iter().filter(|tool| !packages.contains(&tool.id)))
+        .collect()
+}
+
+fn in_system() -> HashSet<String> {
+    block_on(system_packages::list())
+        .map(|packages| packages.requested.into_iter().collect())
+        .unwrap_or_default()
+}
+
 pub fn search(query: &str) -> Result<Vec<Candidate>, String> {
-    tools::search(query).map(candidates)
+    let apps = store::search_in(query, Origin::Fedora, &in_system())?;
+    Ok(with_apps(apps, tools::search(query).map(candidates)?))
 }
 
 pub fn find(name: &str) -> Result<Vec<Candidate>, String> {
-    Ok(candidates(tools::find(name)?.into_iter().collect()))
+    let apps = store::find_in(name, Origin::Fedora, &in_system())?;
+    Ok(with_apps(apps, candidates(tools::find(name)?.into_iter().collect())))
 }
 
 fn repoquery(repositories: Repositories, arguments: &[&str]) -> Result<String, String> {

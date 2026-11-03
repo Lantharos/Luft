@@ -31,7 +31,7 @@
 		}
 		const tools = waiting.filter((update) => update.source === 'tool');
 		batch('tool-updates', tools, { kind: 'updateTools', packages: tools.map((update) => update.package!) });
-		for (const update of waiting.filter((update) => update.source === 'appImage')) void operations.run(update.key, update.name, updateJob(update));
+		for (const update of waiting.filter((update) => (update.source === 'appImage' || update.store) && !update.store?.widens)) void operations.run(update.key, update.name, updateJob(update));
 	}
 </script>
 
@@ -44,7 +44,7 @@
 					{#if library.error}
 						{library.error}
 					{:else if library.checking}
-						Looking at Flathub, your AppImages and your tools
+						Looking at schelf.store, Flathub, your AppImages and your tools
 					{:else if library.updates}
 						{updates.length ? `${bytes(size)} to download · ` : ''}Checked {ago(library.updates.checked)}
 					{/if}

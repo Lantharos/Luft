@@ -1,5 +1,5 @@
 [Unit]
-Description=Update AppImages
+Description=Update apps
 After=luft-preinstall.service
 ConditionUser=!@system
 

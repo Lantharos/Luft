@@ -38,6 +38,7 @@ fn app(name: &str, packages: &SystemPackages) -> InstalledApp {
         path: None,
         commands: Vec::new(),
         services,
+        listing: None,
     }
 }
 

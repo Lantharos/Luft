@@ -7,12 +7,16 @@ use luft_software::apps::appimage::{self, Placement};
 use luft_software::apps::{flatpak, toolbox, updates};
 use luft_software::task::{Cancel, Task};
 
+use crate::store;
+use crate::store::install::Reason;
+
 const SEEDS: &str = "/usr/share/luft/preinstall";
 
 pub fn run(command: &str) -> Option<i32> {
     let result = match command {
         "--preinstall" => preinstall(),
         "--update-apps" => update_apps(),
+        "--check-revocations" => store::check_revocations(),
         "--integrate-apps" => {
             integrate_apps();
             Ok(())
@@ -100,9 +104,30 @@ fn install_seed(seed: &Path) -> Result<(), String> {
     }
 }
 
+fn update_store_apps(failures: &mut Vec<String>) {
+    let found = match store::updates::find() {
+        Ok(found) => found,
+        Err(error) => return failures.push(error),
+    };
+    for update in found.into_iter().filter(|update| !update.widens) {
+        match quietly(|task| store::install::install(&update.id, &update.consent, Reason::Update, task)) {
+            Ok(()) => eprintln!("Updated {} to {}", update.name, update.to),
+            Err(error) => failures.push(format!("{}: {error}", update.name)),
+        }
+    }
+}
+
 fn update_apps() -> Result<(), String> {
     let mut failures = Vec::new();
-    for (app, _) in updates::appimages() {
+    update_store_apps(&mut failures);
+    let managed: BTreeSet<String> = store::record::all()
+        .into_values()
+        .map(|installed| installed.local)
+        .collect();
+    for (app, _) in updates::appimages()
+        .into_iter()
+        .filter(|(app, _)| !managed.contains(&app.id))
+    {
         match quietly(|task| appimage::update(&app, task)) {
             Ok(updated) => eprintln!(
                 "Updated {} to {}",

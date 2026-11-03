@@ -1,6 +1,7 @@
 import type { AppUpdate, InstalledApp, Job } from '#lib/bindings.js';
 
 export function removeJob(app: InstalledApp): Job {
+	if (app.listing) return { kind: 'removeStore', id: app.listing };
 	if (app.source === 'flatpak') return { kind: 'removeFlatpak', installation: app.installation!, reference: app.reference! };
 	if (app.source === 'tool') return { kind: 'removeTool', package: app.package! };
 	if (app.source === 'debian') return { kind: 'removeDeb', package: app.package! };
@@ -9,6 +10,7 @@ export function removeJob(app: InstalledApp): Job {
 }
 
 export function updateJob(update: AppUpdate): Job {
+	if (update.store) return { kind: 'updateStore', id: update.store.id, consent: update.store.consent };
 	if (update.source === 'flatpak') return { kind: 'updateFlatpaks', installation: update.installation!, references: [update.reference!] };
 	if (update.source === 'tool') return { kind: 'updateTools', packages: [update.package!] };
 	if (update.source === 'debian') return { kind: 'updateDebs', packages: [update.package!] };

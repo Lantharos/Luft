@@ -1,6 +1,7 @@
-import type { Operation, Source } from '#lib/bindings.js';
+import type { InstalledApp, Operation } from '#lib/bindings.js';
 
-export function sourceName(source: Source, origin: string) {
+export function sourceName({ source, origin, listing }: Pick<InstalledApp, 'source' | 'origin' | 'listing'>) {
+	if (listing) return source === 'extension' ? 'Extension from schelf.store' : 'schelf.store';
 	if (source === 'appImage') return 'AppImage';
 	if (source === 'tool') return 'Tools container';
 	if (source === 'debian') return '.deb file, in the Ubuntu container';

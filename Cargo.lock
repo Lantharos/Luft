@@ -816,6 +816,7 @@ dependencies = [
  "iana-time-zone",
  "js-sys",
  "num-traits",
+ "serde",
  "wasm-bindgen",
  "windows-link",
 ]
@@ -7084,9 +7085,13 @@ dependencies = [
 name = "schelf"
 version = "0.1.0"
 dependencies = [
+ "base64",
+ "chrono",
  "dirs",
+ "ed25519-dalek",
  "flate2",
  "futures-util",
+ "getrandom 0.4.3",
  "gio",
  "gio-unix",
  "libc",
@@ -7096,12 +7101,17 @@ dependencies = [
  "luft-software",
  "quick-xml 0.42.0",
  "sabine",
+ "sabine-service",
  "serde",
  "serde_json",
+ "sha2",
  "specta",
  "specta-typescript",
+ "tar",
  "tokio",
+ "ureq",
  "zbus 6.0.0",
+ "zstd 0.14.3",
 ]
 
 [[package]]

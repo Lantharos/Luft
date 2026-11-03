@@ -1,5 +1,5 @@
 [Unit]
-Description=Update AppImages every few hours
+Description=Update apps every few hours
 ConditionUser=!@system
 
 [Timer]

@@ -2,6 +2,7 @@
 	import type { Component } from 'svelte';
 	import Compass from '@lucide/svelte/icons/compass';
 	import HardDrive from '@lucide/svelte/icons/hard-drive';
+	import Puzzle from '@lucide/svelte/icons/puzzle';
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 	import { ProgressBar, SearchField, selectionPill } from '@luft/ui';
 	import { CATEGORIES } from '#lib/catalog/categories.js';
@@ -60,6 +61,7 @@
 			{@render item({ page: 'discover' }, 'Discover', Compass)}
 			{@render item({ page: 'installed' }, 'Installed', HardDrive)}
 			{@render item({ page: 'updates' }, 'Updates', RefreshCw, library.updateCount)}
+			{@render item({ page: 'extensions' }, 'Extensions', Puzzle)}
 		</div>
 		<div class="flex flex-col gap-0.5">
 			{#each CATEGORIES as category (category.id)}

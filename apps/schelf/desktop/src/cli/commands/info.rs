@@ -3,10 +3,14 @@ use luft_software::apps::toolbox::Repositories;
 
 use crate::cli::Exit;
 use crate::cli::arguments::Arguments;
-use crate::cli::sources::{Candidate, Catalog, Kind, Origin, catalogs, fedora, flathub, installed};
+use crate::cli::sources::{
+    Candidate, Catalog, Kind, Origin, catalogs, fedora, flathub, installed, store,
+};
 use crate::cli::terminal::progress::Line;
 use crate::cli::terminal::{Ink, Look, Table, bytes, wrap};
 use crate::library::{InstalledApp, Source};
+use crate::store::listing::{self, Builder, StoreDetails};
+use crate::store::signed::Age;
 
 const INDENT: &str = "  ";
 
@@ -146,18 +150,17 @@ fn fedora_package(candidate: &Candidate, apps: &[InstalledApp]) -> Result<(), St
     Ok(())
 }
 
-fn system_package(candidate: &Candidate, apps: &[InstalledApp]) -> Result<(), String> {
-    let details = fedora::details(Repositories::Added, &candidate.id)?
-        .ok_or("Your software sources don't have it any more.")?;
+fn system_package(
+    candidate: &Candidate,
+    apps: &[InstalledApp],
+    repositories: Repositories,
+    source: String,
+) -> Result<(), String> {
+    let details = fedora::details(repositories, &candidate.id)?
+        .ok_or("It isn't available any more.")?;
     let installed = installed_version(apps, Origin::System, &details.package);
     let mut facts = Facts(Vec::new());
-    facts.add(
-        "Source",
-        Some(format!(
-            "System package, from {}",
-            candidate.catalog.title()
-        )),
-    );
+    facts.add("Source", Some(source));
     facts.add("Version", Some(details.version.clone()));
     facts.add(
         "Installed",
@@ -210,11 +213,76 @@ fn installed_app(app: &InstalledApp) {
     );
 }
 
+fn store_app(candidate: &Candidate, apps: &[InstalledApp]) -> Result<(), String> {
+    let listing = listing::fetch(&candidate.id, Age::Current)?;
+    let installed = apps
+        .iter()
+        .find(|app| app.listing.as_deref() == Some(listing.id.as_str()));
+    let details = StoreDetails::from(listing);
+    let mut facts = Facts(Vec::new());
+    facts.add(
+        "Source",
+        Some(format!("schelf.store, {}", candidate.kind.describe())),
+    );
+    facts.add("ID", Some(details.id.clone()));
+    facts.add("Version", details.version.clone());
+    facts.add(
+        "Installed",
+        Some(installed.map_or_else(
+            || "no".to_owned(),
+            |app| app.version.clone().unwrap_or_else(|| "yes".to_owned()),
+        )),
+    );
+    facts.add("Download", details.size.map(bytes));
+    facts.add("License", details.license.clone());
+    facts.add("Developer", Some(details.developer.clone()));
+    facts.add("Website", details.homepage.clone());
+    facts.add("Built", built(&details));
+    let access = match &details.declared {
+        Some(declared) if details.access.is_some() => store::access(declared),
+        _ => vec!["Everything you can, outside a sandbox".to_owned()],
+    };
+    for (index, line) in access.into_iter().enumerate() {
+        facts.add(if index == 0 { "Can use" } else { "" }, Some(line));
+    }
+    show(
+        &details.name,
+        &details.summary,
+        facts,
+        &text_of(&details.description),
+    );
+    Ok(())
+}
+
+fn built(details: &StoreDetails) -> Option<String> {
+    let provenance = details.provenance.as_ref()?;
+    Some(match (provenance.origin, &provenance.repository, &provenance.commit) {
+        (Builder::GithubActions, Some(repository), Some(commit)) => format!(
+            "on GitHub Actions, from {repository} at {}",
+            commit.chars().take(7).collect::<String>()
+        ),
+        (Builder::GithubActions, _, _) => "on GitHub Actions".to_owned(),
+        (Builder::Developer, _, _) => "uploaded by the developer".to_owned(),
+    })
+}
+
 fn catalog_entry(candidate: &Candidate, apps: &[InstalledApp]) -> Result<(), String> {
-    match candidate.catalog {
-        Catalog::Flathub => flathub_app(candidate, apps),
-        Catalog::Fedora => fedora_package(candidate, apps),
-        Catalog::System => system_package(candidate, apps),
+    match (candidate.catalog, candidate.kind) {
+        (Catalog::Store, _) => store_app(candidate, apps),
+        (Catalog::Flathub, _) => flathub_app(candidate, apps),
+        (Catalog::Fedora, Kind::Desktop) => system_package(
+            candidate,
+            apps,
+            Repositories::Fedora,
+            "Fedora, a desktop app in the system for everyone".to_owned(),
+        ),
+        (Catalog::Fedora, _) => fedora_package(candidate, apps),
+        (Catalog::System, _) => system_package(
+            candidate,
+            apps,
+            Repositories::Added,
+            format!("System package, from {}", candidate.catalog.title()),
+        ),
     }
 }
 

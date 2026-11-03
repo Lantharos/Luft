@@ -4,6 +4,7 @@ mod flatpaks;
 pub mod full_access;
 mod settings;
 pub mod sources;
+mod store;
 mod system;
 mod tools;
 
@@ -22,6 +23,8 @@ pub enum Source {
     Tool,
     Debian,
     System,
+    Sabine,
+    Extension,
 }
 
 #[derive(Serialize, Clone, Debug, Type)]
@@ -43,6 +46,8 @@ pub struct InstalledApp {
     pub path: Option<String>,
     pub commands: Vec<String>,
     pub services: Vec<String>,
+    /// The schelf.store app it was installed as.
+    pub listing: Option<String>,
 }
 
 #[derive(Deserialize, Type)]
@@ -65,6 +70,7 @@ pub fn installed() -> Vec<InstalledApp> {
         let system = scope.spawn(system::installed);
         let debs = scope.spawn(debian::installed);
         let mut apps = appimages::installed();
+        apps.extend(store::installed());
         apps.extend(debs.join().unwrap_or_default());
         apps.extend(flatpaks.join().unwrap_or_default());
         apps.extend(tools.join().unwrap_or_default());

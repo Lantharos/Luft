@@ -62,6 +62,12 @@ pub fn resolve(name: &str, only: Option<Catalog>) -> Result<Resolved, String> {
         .into_iter()
         .flatten()
         .collect();
+    if found
+        .iter()
+        .any(|candidate| candidate.catalog == Catalog::Store)
+    {
+        found.retain(|candidate| candidate.catalog == Catalog::Store);
+    }
     match found.len() {
         0 => {
             let suggestions = across(&catalogs, |catalog| {

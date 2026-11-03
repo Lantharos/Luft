@@ -13,7 +13,9 @@
 	const operation = $derived(operations.forKey(update.key));
 	const active = $derived(operation && operation.state !== 'failed' ? operation : null);
 	const versions = $derived(update.from && update.to && update.from !== update.to ? `${update.from} → ${update.to}` : (update.to ?? update.from));
-	const detail = $derived(operation?.state === 'failed' ? operation.error : [versions, update.size ? bytes(update.size) : null].filter(Boolean).join(' · '));
+	const detail = $derived(
+		operation?.state === 'failed' ? operation.error : [versions, update.size ? bytes(update.size) : null, update.store?.widens ? 'Asks for more access' : null].filter(Boolean).join(' · ')
+	);
 
 	function open() {
 		if (!update.platform) navigation.push({ page: 'app', target: { installed: update.key }, name: update.name });
@@ -34,6 +36,8 @@
 	</button>
 	{#if active}
 		<ProgressButton operation={active} />
+	{:else if update.store?.widens}
+		<button type="button" class="button" onclick={open}>Review</button>
 	{:else}
 		<button type="button" class="button" onclick={() => operations.run(update.key, update.name, updateJob(update))}>Update</button>
 	{/if}

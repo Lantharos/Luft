@@ -1,0 +1,9 @@
+[Unit]
+Description=Check for apps schelf.store pulled
+ConditionUser=!@system
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/schelf --check-revocations
+Nice=10
+IOSchedulingClass=idle

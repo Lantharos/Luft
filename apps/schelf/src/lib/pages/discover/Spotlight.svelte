@@ -1,16 +1,17 @@
 <script lang="ts">
 	import AppArt from '#lib/components/AppArt.svelte';
+	import type { CatalogApp } from '#lib/bindings.js';
 	import type { AppDetails } from '#lib/catalog/types.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
 
-	let { app }: { app: AppDetails } = $props();
+	let { listing, app }: { listing: CatalogApp; app: AppDetails } = $props();
 	const shot = $derived(app.screenshots[0]);
 </script>
 
 <button
 	type="button"
 	class="spotlight"
-	onclick={() => navigation.push({ page: 'app', target: { id: app.id }, name: app.name })}
+	onclick={() => navigation.push({ page: 'app', target: { listing }, name: app.name })}
 >
 	<div class="flex min-w-0 flex-1 flex-col items-start gap-3">
 		<AppArt icon={app.icon} size={64} />

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { CatalogApp } from '#lib/catalog/types.js';
+	import type { CatalogApp } from '#lib/bindings.js';
 	import TileGrid from './TileGrid.svelte';
 
 	interface Props {

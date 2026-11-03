@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use luft_app::apps::App;
@@ -10,6 +11,10 @@ use specta::Type;
 use tokio::task::{JoinHandle, spawn_blocking};
 
 use crate::library::Source;
+use crate::store;
+use crate::store::listing::Format;
+use crate::store::record;
+use crate::store::updates::StoreUpdate;
 
 #[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
@@ -27,6 +32,7 @@ pub struct AppUpdate {
     pub installation: Option<Installation>,
     pub reference: Option<String>,
     pub package: Option<String>,
+    pub store: Option<StoreUpdate>,
 }
 
 #[derive(Serialize, Type)]
@@ -59,6 +65,7 @@ fn flatpaks(updates: Vec<flatpak::Update>) -> Vec<AppUpdate> {
                 installation: Some(item.installation),
                 reference: Some(item.reference),
                 package: None,
+                store: None,
                 id: item.id,
             }
         })
@@ -66,8 +73,13 @@ fn flatpaks(updates: Vec<flatpak::Update>) -> Vec<AppUpdate> {
 }
 
 fn appimages() -> Vec<AppUpdate> {
+    let managed: HashSet<String> = record::all()
+        .into_values()
+        .map(|installed| installed.local)
+        .collect();
     updates::appimages()
         .into_iter()
+        .filter(|(app, _)| !managed.contains(&app.id))
         .map(|(app, available)| AppUpdate {
             key: format!("appimage/{}", app.id),
             source: Source::AppImage,
@@ -81,6 +93,7 @@ fn appimages() -> Vec<AppUpdate> {
             installation: None,
             reference: None,
             package: None,
+            store: None,
             id: app.id,
         })
         .collect()
@@ -103,6 +116,7 @@ fn tools(updates: Vec<toolbox::Update>) -> Vec<AppUpdate> {
             installation: None,
             reference: None,
             package: Some(update.package),
+            store: None,
         })
         .collect()
 }
@@ -127,6 +141,39 @@ fn debs(updates: Vec<debian::Update>) -> Vec<AppUpdate> {
                 installation: None,
                 reference: None,
                 package: Some(update.package),
+                store: None,
+            }
+        })
+        .collect()
+}
+
+fn from_store(updates: Vec<StoreUpdate>) -> Vec<AppUpdate> {
+    updates
+        .into_iter()
+        .map(|update| {
+            let desktop = Some(format!("{}.desktop", update.local));
+            let (key, source, desktop) = match update.format {
+                Format::Appimage => (format!("appimage/{}", update.local), Source::AppImage, desktop),
+                Format::Sabine => (format!("sabine/{}", update.id), Source::Sabine, desktop),
+                Format::LuftExtension => {
+                    (format!("extension/{}", update.id), Source::Extension, None)
+                }
+            };
+            AppUpdate {
+                key,
+                source,
+                id: update.local.clone(),
+                desktop,
+                name: update.name.clone(),
+                icon: update.icon.clone(),
+                from: Some(update.from.clone()),
+                to: Some(update.to.clone()),
+                size: update.size,
+                platform: false,
+                installation: None,
+                reference: None,
+                package: None,
+                store: Some(update),
             }
         })
         .collect()
@@ -141,11 +188,13 @@ pub async fn find() -> (Vec<AppUpdate>, Option<String>) {
     let tools = spawn_blocking(|| toolbox::updates().map(tools));
     let appimages = spawn_blocking(appimages);
     let debs = spawn_blocking(|| debian::updates().map(debs));
+    let store = spawn_blocking(|| store::updates::find().map(from_store));
     let debs = joined(debs).await;
+    let store = joined(store).await;
     let flatpaks = joined(flatpaks).await;
     let tools = joined(tools).await;
     let appimages = appimages.await.unwrap_or_default();
-    let error = [&flatpaks, &tools, &debs]
+    let error = [&flatpaks, &tools, &debs, &store]
         .into_iter()
         .find_map(|result| result.as_ref().err())
         .cloned();
@@ -153,6 +202,7 @@ pub async fn find() -> (Vec<AppUpdate>, Option<String>) {
     apps.extend(appimages);
     apps.extend(tools.unwrap_or_default());
     apps.extend(debs.unwrap_or_default());
+    apps.extend(store.unwrap_or_default());
     apps.sort_by_cached_key(|update| (update.platform, update.name.to_lowercase()));
     (apps, error)
 }

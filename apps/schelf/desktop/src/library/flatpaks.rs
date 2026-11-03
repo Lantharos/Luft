@@ -34,6 +34,7 @@ pub fn installed() -> Vec<InstalledApp> {
                 path: None,
                 commands: Vec::new(),
                 services: Vec::new(),
+                listing: None,
                 id: item.id,
             }
         })

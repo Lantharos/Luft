@@ -15,6 +15,8 @@ use serde::{Deserialize, Serialize};
 use specta::Type;
 
 use crate::catalog::cache;
+use crate::store;
+use crate::store::catalog::Origin;
 use crate::library::sources::CheckedSource;
 
 #[derive(Serialize, Type)]
@@ -365,25 +367,18 @@ fn simplified(name: &str) -> String {
 
 /// Finds the app on Flathub by its name, which only counts when it's exactly the same.
 pub fn on_flathub(name: &str) -> Option<OnFlathub> {
-    let found: serde_json::Value = crate::catalog::flathub::search(name).ok()?.read().ok()?;
+    let catalog = store::catalog::current().ok()?;
     let wanted = simplified(name);
-    let text = |hit: &serde_json::Value, key: &str| hit[key].as_str().map(str::to_owned);
-    found["hits"]
-        .as_array()?
+    catalog
+        .entries()
         .iter()
-        .find(|hit| {
-            hit["name"]
-                .as_str()
-                .is_some_and(|name| simplified(name) == wanted)
-        })
-        .and_then(|hit| {
-            Some(OnFlathub {
-                id: text(hit, "app_id")?,
-                name: text(hit, "name")?,
-                summary: text(hit, "summary"),
-                icon: text(hit, "icon"),
-                verified: hit["verification_verified"].as_bool().unwrap_or(false),
-            })
+        .find(|entry| entry.origin == Origin::Flathub && simplified(&entry.name) == wanted)
+        .map(|entry| OnFlathub {
+            id: entry.id.clone(),
+            name: entry.name.clone(),
+            summary: Some(entry.summary.clone()).filter(|summary| !summary.is_empty()),
+            icon: entry.icon.clone(),
+            verified: entry.developer.as_ref().is_some_and(|developer| developer.verified),
         })
 }
 

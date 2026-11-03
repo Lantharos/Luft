@@ -1,5 +1,6 @@
 <script lang="ts">
 	import AppWindow from '@lucide/svelte/icons/app-window';
+	import Puzzle from '@lucide/svelte/icons/puzzle';
 	import Server from '@lucide/svelte/icons/server';
 	import SquareTerminal from '@lucide/svelte/icons/square-terminal';
 	import { AppIcon } from '@luft/ui';
@@ -26,6 +27,8 @@
 	<span class="fallback" style:width="{size}px" style:height="{size}px"><SquareTerminal size={size * 0.5} /></span>
 {:else if source === 'system'}
 	<span class="fallback" style:width="{size}px" style:height="{size}px"><Server size={size * 0.5} /></span>
+{:else if source === 'extension' && (!icon || broken)}
+	<span class="fallback" style:width="{size}px" style:height="{size}px"><Puzzle size={size * 0.5} /></span>
 {:else if remote && !broken}
 	<img src={icon} alt="" width={size} height={size} loading="lazy" decoding="async" style:width="{size}px" style:height="{size}px" onerror={() => (broken = true)} />
 {:else if remote}

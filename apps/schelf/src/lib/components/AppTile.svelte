@@ -1,13 +1,13 @@
 <script lang="ts">
-	import type { CatalogApp } from '#lib/catalog/types.js';
+	import type { CatalogApp } from '#lib/bindings.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
 	import AppArt from './AppArt.svelte';
 
 	let { app }: { app: CatalogApp } = $props();
 </script>
 
-<button type="button" class="tile" onclick={() => navigation.push({ page: 'app', target: { id: app.id }, name: app.name })}>
-	<AppArt icon={app.icon} size={52} />
+<button type="button" class="tile" onclick={() => navigation.push({ page: 'app', target: { listing: app }, name: app.name })}>
+	<AppArt icon={app.icon} source={app.kind === 'extension' ? 'extension' : null} size={52} />
 	<span class="text">
 		<span class="name">{app.name}</span>
 		<span class="summary">{app.summary}</span>

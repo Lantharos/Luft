@@ -19,7 +19,7 @@
 	const detail = $derived.by(() => {
 		if (operation?.state === 'failed') return operation.error;
 		const services = app.services.length ? `Runs ${app.services.join(', ')}` : null;
-		const parts = [sourceName(app.source, app.origin), app.version, app.size ? bytes(app.size) : null, services];
+		const parts = [sourceName(app), app.version, app.size ? bytes(app.size) : null, services];
 		return parts.filter(Boolean).join(' · ');
 	});
 

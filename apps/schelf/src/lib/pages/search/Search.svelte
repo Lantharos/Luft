@@ -1,8 +1,8 @@
 <script lang="ts">
 	import AppArt from '#lib/components/AppArt.svelte';
 	import Shelf from '#lib/components/Shelf.svelte';
-	import * as flathub from '#lib/catalog/flathub.js';
-	import type { CatalogApp } from '#lib/catalog/types.js';
+	import type { CatalogApp } from '#lib/bindings.js';
+	import * as store from '#lib/catalog/store.js';
 	import { sourceName } from '#lib/format.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
@@ -24,16 +24,18 @@
 		const current = query;
 		remote = null;
 		error = null;
-		flathub
+		store
 			.search(current)
-			.then((apps) => {
-				if (current === query) remote = apps.slice(0, LIMIT);
+			.then((found) => {
+				if (current === query) remote = found;
 			})
 			.catch((reason) => {
 				if (current === query) error = String(reason);
 			});
 	});
 
+	const apps = $derived(remote?.filter((app) => app.kind === 'app').slice(0, LIMIT) ?? null);
+	const extensions = $derived(remote?.filter((app) => app.kind === 'extension').slice(0, LIMIT) ?? []);
 	const others = $derived(tools === null || system === null ? null : tools + system);
 	const nothing = $derived(!installed.length && remote?.length === 0 && others === 0);
 </script>
@@ -49,7 +51,7 @@
 							<AppArt icon={app.icon} desktop={app.desktop} source={app.source} size={40} />
 							<span class="flex min-w-0 flex-col">
 								<span class="truncate text-[14px] font-semibold">{app.name}</span>
-								<span class="truncate text-[12.5px] text-[var(--text-muted)]">{sourceName(app.source, app.origin)}</span>
+								<span class="truncate text-[12.5px] text-[var(--text-muted)]">{sourceName(app)}</span>
 							</span>
 						</button>
 					{/each}
@@ -57,9 +59,12 @@
 			</section>
 		{/if}
 		{#if error}
-			<p class="px-1.5 text-[14px] text-[var(--text-muted)]">Flathub can't be searched right now. {error}</p>
-		{:else if remote === null || remote.length}
-			<Shelf title="Flathub" apps={remote} />
+			<p class="px-1.5 text-[14px] text-[var(--text-muted)]">Apps can't be searched right now. {error}</p>
+		{:else if apps === null || apps.length}
+			<Shelf title="Apps" {apps} />
+		{/if}
+		{#if extensions.length}
+			<Shelf title="Extensions" apps={extensions} />
 		{/if}
 		<PackageResults {query} kind="tool" bind:found={tools} />
 		<PackageResults {query} kind="system" bind:found={system} />

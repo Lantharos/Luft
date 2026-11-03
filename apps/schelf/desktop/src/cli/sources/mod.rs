@@ -3,16 +3,19 @@ pub mod file;
 pub mod flathub;
 pub mod installed;
 mod resolve;
+pub mod store;
 pub mod system;
 
 pub use resolve::{Resolved, catalogs, resolve, search};
 
+use crate::cli::Exit;
 use crate::cli::perform::{Plan, Verb};
 use crate::library::Source;
 use crate::operations::{Job, Request};
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum Origin {
+    Store,
     Flathub,
     Fedora,
     AppImage,
@@ -21,7 +24,8 @@ pub enum Origin {
 }
 
 impl Origin {
-    pub const ALL: [Self; 5] = [
+    pub const ALL: [Self; 6] = [
+        Self::Store,
         Self::Flathub,
         Self::Fedora,
         Self::AppImage,
@@ -31,6 +35,7 @@ impl Origin {
 
     pub fn flag(self) -> &'static str {
         match self {
+            Self::Store => "store",
             Self::Flathub => "flathub",
             Self::Fedora => "fedora",
             Self::AppImage => "appimage",
@@ -41,6 +46,7 @@ impl Origin {
 
     pub fn title(self) -> &'static str {
         match self {
+            Self::Store => "schelf.store",
             Self::Flathub => "Flathub",
             Self::Fedora => "Fedora",
             Self::AppImage => "AppImage",
@@ -54,12 +60,14 @@ impl Origin {
             Self::AppImage => "AppImages",
             Self::Debian => "Apps from .deb files",
             Self::System => "System packages",
+            Self::Store => "Schelf",
             _ => self.title(),
         }
     }
 
     pub fn of(source: Source) -> Self {
         match source {
+            Source::Sabine | Source::Extension => Self::Store,
             Source::Flatpak => Self::Flathub,
             Source::Tool => Self::Fedora,
             Source::AppImage => Self::AppImage,
@@ -77,16 +85,18 @@ impl Origin {
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum Catalog {
+    Store,
     Flathub,
     Fedora,
     System,
 }
 
 impl Catalog {
-    pub const ALL: [Self; 3] = [Self::Flathub, Self::Fedora, Self::System];
+    pub const ALL: [Self; 4] = [Self::Store, Self::Flathub, Self::Fedora, Self::System];
 
     pub fn origin(self) -> Origin {
         match self {
+            Self::Store => Origin::Store,
             Self::Flathub => Origin::Flathub,
             Self::Fedora => Origin::Fedora,
             Self::System => Origin::System,
@@ -102,6 +112,7 @@ impl Catalog {
 
     pub fn search(self, query: &str) -> Result<Vec<Candidate>, String> {
         match self {
+            Self::Store => store::search(query),
             Self::Flathub => flathub::search(query),
             Self::Fedora => fedora::search(query),
             Self::System => system::search(query),
@@ -110,21 +121,23 @@ impl Catalog {
 
     pub fn find(self, name: &str) -> Result<Vec<Candidate>, String> {
         match self {
+            Self::Store => store::find(name),
             Self::Flathub => flathub::find(name),
             Self::Fedora => fedora::find(name),
             Self::System => system::find(name),
         }
     }
 
-    fn install(self, id: &str) -> (String, Job) {
-        match self {
-            Self::Flathub => (
+    fn install(self, id: &str, kind: Kind, yes: bool) -> Result<(String, Job), Exit> {
+        Ok(match (self, kind) {
+            (Self::Store, _) => store::install(id, yes)?,
+            (Self::Flathub, _) => (
                 format!("flathub:{id}"),
                 Job::InstallFlathub { id: id.to_owned() },
             ),
-            Self::Fedora => fedora::install(id),
-            Self::System => system::install(id),
-        }
+            (Self::Fedora, Kind::Desktop) | (Self::System, _) => system::install(id),
+            (Self::Fedora, _) => fedora::install(id),
+        })
     }
 }
 
@@ -133,6 +146,7 @@ pub enum Kind {
     Desktop,
     Command,
     System,
+    Extension,
 }
 
 impl Kind {
@@ -141,6 +155,7 @@ impl Kind {
             Self::Desktop => "desktop app",
             Self::Command => "command-line tool",
             Self::System => "system package",
+            Self::Extension => "Luft extension",
         }
     }
 }
@@ -170,9 +185,9 @@ impl Candidate {
         )
     }
 
-    pub fn plan(&self) -> Plan {
-        let (key, job) = self.catalog.install(&self.id);
-        Plan {
+    pub fn plan(&self, yes: bool) -> Result<Plan, Exit> {
+        let (key, job) = self.catalog.install(&self.id, self.kind, yes)?;
+        Ok(Plan {
             request: Request {
                 key,
                 title: self.name.clone(),
@@ -181,6 +196,6 @@ impl Candidate {
             },
             verb: Verb::Install,
             from: Some(self.catalog.title().to_owned()),
-        }
+        })
     }
 }

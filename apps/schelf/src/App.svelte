@@ -56,7 +56,7 @@
 							<Installed />
 						{:else if entry.page === 'updates'}
 							<Updates />
-						{:else if entry.page === 'category' || entry.page === 'collection'}
+						{:else if entry.page === 'category' || entry.page === 'collection' || entry.page === 'extensions'}
 							<Browse route={entry} />
 						{:else if entry.page === 'search'}
 							<Search query={entry.query} />

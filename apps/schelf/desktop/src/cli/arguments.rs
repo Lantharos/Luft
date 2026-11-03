@@ -50,35 +50,37 @@ impl Command {
     pub fn usage(self) -> &'static str {
         match self {
             Self::Install => {
-                "install NAME|FILE...  [--flathub|--fedora|--system] [-y]\n\n\
-                 Installs apps from Flathub and command-line tools from Fedora into your\n\
-                 account, or a .rpm, .AppImage, .flatpakref or .flatpakrepo file. A name\n\
-                 found in both is a desktop app from Flathub or a command-line tool from\n\
-                 Fedora; when that still leaves a choice, Schelf asks. You can write add instead of install.\n\n\
+                "install NAME|FILE...  [--store|--flathub|--fedora|--system] [-y]\n\n\
+                 Installs apps and extensions from schelf.store, apps from Flathub and\n\
+                 Fedora, and command-line tools from Fedora into your account, or a .rpm,\n\
+                 .AppImage, .flatpakref or .flatpakrepo file. A name schelf.store has comes\n\
+                 from there, then from Flathub, then from Fedora; when that still leaves a\n\
+                 choice, Schelf asks. Apps from schelf.store show what they can use first.\n\
+                 You can write add instead of install.\n\n\
                  With --system, Fedora packages go into the system itself, for services such\n\
                  as Tailscale, Docker or libvirt. They're rebuilt with every update of Luft."
             }
             Self::Remove => {
-                "remove NAME...  [--flathub|--fedora|--appimage|--system] [-y]\n\n\
-                 Removes apps, AppImages and command-line tools you installed, and system\n\
+                "remove NAME...  [--store|--flathub|--fedora|--appimage|--system] [-y]\n\n\
+                 Removes apps, extensions, AppImages and command-line tools you installed, and system\n\
                  packages with everything they added."
             }
             Self::Search => {
-                "search QUERY  [--flathub|--fedora]\n\n\
-                 Looks for apps on Flathub and command-line tools from Fedora, and\n\
-                 through the AppImages you have."
+                "search QUERY  [--store|--flathub|--fedora]\n\n\
+                 Looks for apps and extensions on schelf.store, apps on Flathub and Fedora,\n\
+                 command-line tools from Fedora, and through the AppImages you have."
             }
             Self::Update => {
-                "update [NAME...]  [--flathub|--fedora|--appimage]\n\n\
+                "update [NAME...]  [--store|--flathub|--fedora|--appimage]\n\n\
                  Updates apps, AppImages and command-line tools. Luft itself updates in\n\
                  Settings, under Updates."
             }
             Self::List => {
-                "list  [--flathub|--fedora|--appimage|--system]\n\n\
+                "list  [--store|--flathub|--fedora|--appimage|--system]\n\n\
                  Shows what you installed, by where it came from, and the system packages."
             }
             Self::Info => {
-                "info NAME  [--flathub|--fedora|--appimage]\n\n\
+                "info NAME  [--store|--flathub|--fedora|--appimage]\n\n\
                  Shows the details of an app or command-line tool, from every source\n\
                  that has it."
             }
@@ -199,7 +201,7 @@ pub fn help(program: &str, command: Option<Command>) -> String {
          \x20 untrust NAME...       Put them back in their sandbox\n\
          \x20 repo add|remove|list  Manage software sources for system packages\n\n\
          Options:\n\
-         \x20 --flathub, --fedora, --appimage  Use only this source\n\
+         \x20 --store, --flathub, --fedora, --appimage  Use only this source\n\
          \x20 --system              Fedora packages for the whole system, such as services\n\
          \x20 -y, --yes             Go ahead without asking\n\
          \x20 -h, --help            Show help, also for a command\n\

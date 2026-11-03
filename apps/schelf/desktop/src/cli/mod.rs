@@ -1,7 +1,7 @@
 mod arguments;
 mod commands;
 pub mod perform;
-mod sources;
+pub mod sources;
 mod terminal;
 
 use std::path::Path;

@@ -1,0 +1,80 @@
+use luft_app::block_on;
+use luft_software::apps::flatpak;
+use serde::Serialize;
+use specta::Type;
+
+use super::catalog::Kind;
+use super::install::Consent;
+use super::listing::{self, Declared, Format};
+use super::record::{self, Installed};
+use super::revocations::{self, Severity};
+use super::signed::Age;
+
+/// A newer release of a store app than the one installed.
+#[derive(Serialize, Clone, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct StoreUpdate {
+    pub id: String,
+    pub kind: Kind,
+    pub format: Format,
+    pub name: String,
+    pub icon: Option<String>,
+    pub local: String,
+    pub from: String,
+    pub to: String,
+    pub size: u64,
+    pub consent: Consent,
+    /// Whether it asks for more than you agreed to, so it waits for you.
+    pub widens: bool,
+}
+
+fn widens(after: Option<&Declared>, before: Option<&Declared>) -> bool {
+    match (after, before) {
+        (_, None) => false,
+        (None, Some(_)) => true,
+        (Some(after), Some(before)) => after.widens(before),
+    }
+}
+
+async fn full_access(installed: &Installed) -> bool {
+    installed.format == Format::Appimage && flatpak::has_full_access(&installed.local).await
+}
+
+fn update(id: String, installed: Installed) -> Result<Option<StoreUpdate>, String> {
+    let listing = listing::fetch(&id, Age::Current)?;
+    let Some(release) = listing.release() else {
+        return Ok(None);
+    };
+    let pulled = revocations::current()
+        .and_then(|list| list.block(&id, Some(&release.version)))
+        .is_some_and(|block| block.action == Severity::Block);
+    if release.version == installed.version || pulled {
+        return Ok(None);
+    }
+    Ok(Some(StoreUpdate {
+        widens: widens(release.permissions.as_ref(), installed.agreed.as_ref()),
+        consent: Consent {
+            version: release.version.clone(),
+            permissions: release.permissions.clone(),
+            full_access: block_on(full_access(&installed)),
+        },
+        size: listing.artifact(release).map_or(0, |artifact| artifact.size),
+        to: release.version.clone(),
+        icon: listing.icon.clone(),
+        name: installed.name,
+        kind: installed.kind,
+        format: installed.format,
+        local: installed.local,
+        from: installed.version,
+        id,
+    }))
+}
+
+/// Every store app with a release this device may have now.
+pub fn find() -> Result<Vec<StoreUpdate>, String> {
+    let mut found = Vec::new();
+    for (id, installed) in record::all() {
+        found.extend(update(id, installed)?);
+    }
+    Ok(found)
+}

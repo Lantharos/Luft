@@ -1,9 +1,10 @@
 # Schelf
 
-Schelf is where you get apps on Luft. It finds, installs, updates and removes apps from Flathub and AppImages, and command-line tools from Fedora in a Toolbox container. System updates live in Settings, so Schelf only shows apps. Using it is described in [the docs](https://docs.luft.computer/apps/schelf/), and the code it shares with Settings is in [packages/system/software](../../packages/system/software/README.md).
+Schelf is where you get apps on Luft. Its catalog is [schelf.store](https://schelf.store): the store's own apps and extensions, then Flathub's and Fedora's apps from the store's mirror. It installs, updates and removes them, AppImages, and command-line tools from Fedora in a Toolbox container. System updates live in Settings, so Schelf only shows apps. Using it is described in [the docs](https://docs.luft.computer/apps/schelf/), and the code it shares with Settings is in [packages/system/software](../../packages/system/software/README.md).
 
 | Source | Installed for |
 |--------|---------------|
+| schelf.store | Your account: AppImages in `~/Applications` in the AppImage sandbox with the access they declare, Sabine apps through Sabine's service, extensions in `~/.local/share/luft/extensions` |
 | Flathub | Your account; Flathub is added on first use |
 | AppImage | Your account, in `~/Applications`, with a menu entry, icon and automatic updates, running in a sandbox |
 | `.deb` files | Your account, in an Ubuntu 26.04 Toolbox container called `luft-ubuntu`, with menu entries and icons copied out, unless the app is on Flathub too, which Schelf offers first |
@@ -22,7 +23,7 @@ bun run desktop:bundle   # Sabine bundle
 sabine install --bundle .
 ```
 
-Installing makes Schelf the app for `.flatpak`, `.flatpakref`, `.deb`, `.flatpakrepo`, `.rpm` and `.AppImage` files and for `schelf:` links (`schelf:updates`, `schelf:installed`, `schelf:search?<query>`).
+Installing makes Schelf the app for `.flatpak`, `.flatpakref`, `.deb`, `.flatpakrepo`, `.rpm` and `.AppImage` files and for `schelf:` links (`schelf:app/<id>`, `schelf:updates`, `schelf:installed`, `schelf:search?<query>`).
 
 ## Command line
 
@@ -30,4 +31,4 @@ The same binary is the `schelf` command, with `sch` linked to it in Luft's image
 
 While the app runs, it owns `com.lantharos.Schelf` on the session bus. The `com.lantharos.Schelf1` interface at `/com/lantharos/Schelf` takes an operation as JSON with `Start` (a key, title and job, as Schelf's own pages send them) and stops it with `Cancel`; `Changed` and `Finished` signals report on it. Apps in a Flatpak sandbox can't call it unless they have full access. The command hands its work to the app this way, so both share one queue. Without the app, it runs the work itself. Either way every job holds the account's software lock from `packages/system/software` while it changes anything.
 
-How Schelf adds the preinstalled apps and keeps apps updated in the background is in [the Schelf reference](../../docs/components/schelf.md).
+How Schelf reads schelf.store, adds the preinstalled apps and keeps apps updated in the background is in [the Schelf reference](../../docs/components/schelf.md).

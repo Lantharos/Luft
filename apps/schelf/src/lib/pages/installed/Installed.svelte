@@ -17,7 +17,7 @@
 		system: 'Packages you add to the system, such as services, show up here. Add one in Tern with schelf install --system, or open a package file.'
 	};
 
-	const NOUNS: Partial<Record<Filter, [string, string]>> = { tool: ['tool', 'tools'], system: ['package', 'packages'] };
+	const NOUNS: Partial<Record<Filter, [string, string]>> = { tool: ['tool', 'tools'], system: ['package', 'packages'], extension: ['extension', 'extensions'] };
 
 	let filter = $state<Filter>('all');
 	let removing = $state<InstalledApp | null>(null);
@@ -40,7 +40,8 @@
 					{ value: 'tool', label: 'Tools' },
 					{ value: 'system', label: 'System' },
 					{ value: 'appImage', label: 'AppImage' },
-					...(library.installed.some((app) => app.source === 'debian') ? [{ value: 'debian' as const, label: '.deb' }] : [])
+					...(library.installed.some((app) => app.source === 'debian') ? [{ value: 'debian' as const, label: '.deb' }] : []),
+					...(library.installed.some((app) => app.source === 'extension') ? [{ value: 'extension' as const, label: 'Extensions' }] : [])
 				]}
 				onchange={(value) => (filter = value)}
 			/>

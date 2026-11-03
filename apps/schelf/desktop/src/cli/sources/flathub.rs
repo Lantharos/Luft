@@ -3,26 +3,11 @@ use std::collections::HashSet;
 use luft_software::apps::flatpak;
 use serde::Deserialize;
 
-use super::{Candidate, Catalog, Kind};
+use super::{Candidate, Kind, store};
 use crate::catalog::flathub;
+use crate::store::catalog::Origin;
 
 const CONSOLE: &str = "console-application";
-const DESKTOP: &str = "desktop-application";
-
-#[derive(Deserialize)]
-struct Hits {
-    hits: Vec<Hit>,
-}
-
-#[derive(Deserialize)]
-struct Hit {
-    app_id: String,
-    name: String,
-    #[serde(default)]
-    summary: String,
-    #[serde(rename = "type", default)]
-    kind: String,
-}
 
 #[derive(Deserialize)]
 pub struct Details {
@@ -89,35 +74,8 @@ fn installed() -> HashSet<String> {
         .collect()
 }
 
-fn hits(query: &str) -> Result<Vec<Hit>, String> {
-    flathub::search(query)?.read::<Hits>().map(|hits| hits.hits)
-}
-
-fn candidates(hits: Vec<Hit>) -> Vec<Candidate> {
-    let installed = installed();
-    hits.into_iter()
-        .filter(|hit| hit.kind == DESKTOP || hit.kind == CONSOLE)
-        .map(|hit| Candidate {
-            catalog: Catalog::Flathub,
-            installed: installed.contains(&hit.app_id),
-            kind: kind(&hit.kind),
-            id: hit.app_id,
-            name: hit.name,
-            summary: hit.summary,
-        })
-        .collect()
-}
-
 pub fn search(query: &str) -> Result<Vec<Candidate>, String> {
-    hits(query).map(candidates)
-}
-
-fn last_part(id: &str) -> &str {
-    id.rsplit('.').next().unwrap_or(id)
-}
-
-fn looks_like_id(name: &str) -> bool {
-    name.matches('.').count() >= 2 && !name.contains(char::is_whitespace)
+    store::search_in(query, Origin::Flathub, &installed())
 }
 
 pub fn details(id: &str) -> Result<Details, String> {
@@ -129,23 +87,5 @@ pub fn sizes(id: &str) -> Option<Sizes> {
 }
 
 pub fn find(name: &str) -> Result<Vec<Candidate>, String> {
-    if looks_like_id(name)
-        && let Ok(details) = details(name)
-    {
-        return Ok(vec![Candidate {
-            catalog: Catalog::Flathub,
-            installed: installed().contains(&details.id),
-            kind: kind(&details.kind),
-            id: details.id,
-            name: details.name,
-            summary: details.summary,
-        }]);
-    }
-    let wanted = name.to_lowercase();
-    let exact = |hit: &Hit| {
-        hit.app_id.to_lowercase() == wanted
-            || hit.name.to_lowercase() == wanted
-            || last_part(&hit.app_id).to_lowercase() == wanted
-    };
-    Ok(candidates(hits(name)?.into_iter().filter(exact).collect()))
+    store::find_in(name, Origin::Flathub, &installed())
 }

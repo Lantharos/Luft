@@ -13,18 +13,13 @@ use super::cache::Entry;
 const API: &str = "https://flathub.org/api/v2/";
 const FRESH: Duration = Duration::from_secs(6 * 60 * 60);
 
-/// The TypeScript type the page reads a Flathub answer as.
+/// The TypeScript type the page reads a Flathub app's details as.
 pub trait Shape {
     const NAME: &'static str;
 }
 
-pub enum HitPage {}
 pub enum Appstream {}
 pub enum Summary {}
-
-impl Shape for HitPage {
-    const NAME: &'static str = "HitPage";
-}
 
 impl Shape for Appstream {
     const NAME: &'static str = "Appstream";
@@ -98,37 +93,10 @@ fn get<S>(path: String) -> Result<Flathub<S>, String> {
     })
 }
 
-pub fn collection(name: &str, page: u32, per_page: u32) -> Result<Flathub<HitPage>, String> {
-    get(format!(
-        "collection/{}?page={page}&per_page={per_page}",
-        segment(name)?
-    ))
-}
-
-pub fn category(id: &str, page: u32, per_page: u32) -> Result<Flathub<HitPage>, String> {
-    get(format!(
-        "collection/category/{}?page={page}&per_page={per_page}",
-        segment(id)?
-    ))
-}
-
 pub fn appstream(id: &str) -> Result<Flathub<Appstream>, String> {
     get(format!("appstream/{}", segment(id)?))
 }
 
 pub fn summary(id: &str) -> Result<Flathub<Summary>, String> {
     get(format!("summary/{}", segment(id)?))
-}
-
-pub fn search(query: &str) -> Result<Flathub<HitPage>, String> {
-    let body = serde_json::json!({ "query": query, "filters": [], "hitsPerPage": 60, "page": 1 })
-        .to_string();
-    cached(Entry::new("search", &query.to_lowercase()), || {
-        http::agent()
-            .post(format!("{API}search"))
-            .header("content-type", "application/json")
-            .send(body.as_str())
-            .map_err(http::failure)
-            .and_then(http::read)
-    })
 }

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { CatalogApp } from '#lib/catalog/types.js';
+	import { catalogKey, type CatalogApp } from '#lib/catalog/types.js';
 	import AppTile from './AppTile.svelte';
 
 	let { apps, placeholders = 6 }: { apps: CatalogApp[] | null; placeholders?: number } = $props();
@@ -7,7 +7,7 @@
 
 <div class="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-1">
 	{#if apps}
-		{#each apps as app (app.key)}
+		{#each apps as app (catalogKey(app))}
 			<div class="h-[84px]"><AppTile {app} /></div>
 		{/each}
 	{:else}

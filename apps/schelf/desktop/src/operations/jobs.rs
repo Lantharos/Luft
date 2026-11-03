@@ -9,6 +9,9 @@ use luft_software::task::Task;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
+use crate::store;
+use crate::store::install::{Consent, Reason};
+
 #[derive(Deserialize, Serialize, Clone, Copy, PartialEq, Eq, Debug, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum Action {
@@ -25,6 +28,17 @@ pub enum Action {
 )]
 pub enum Job {
     InstallFlathub {
+        id: String,
+    },
+    InstallStore {
+        id: String,
+        consent: Consent,
+    },
+    UpdateStore {
+        id: String,
+        consent: Consent,
+    },
+    RemoveStore {
         id: String,
     },
     InstallFlatpakRef {
@@ -97,6 +111,7 @@ impl Job {
     pub fn action(&self) -> Action {
         match self {
             Self::InstallFlathub { .. }
+            | Self::InstallStore { .. }
             | Self::InstallFlatpakRef { .. }
             | Self::InstallFlatpakBundle { .. }
             | Self::InstallDeb { .. }
@@ -107,12 +122,14 @@ impl Job {
             | Self::InstallSystemPackages { .. }
             | Self::InstallSystemPackageFile { .. } => Action::Install,
             Self::RemoveFlatpak { .. }
+            | Self::RemoveStore { .. }
             | Self::RemoveDeb { .. }
             | Self::RemoveAppImage { .. }
             | Self::RemoveTool { .. }
             | Self::RemoveSystemPackages { .. }
             | Self::RemoveRepository { .. } => Action::Remove,
             Self::UpdateFlatpaks { .. }
+            | Self::UpdateStore { .. }
             | Self::UpdateDebs { .. }
             | Self::UpdateAppImage { .. }
             | Self::UpdateTools { .. } => Action::Update,
@@ -128,6 +145,13 @@ impl Job {
                 flatpak::integrate();
                 Ok(())
             }
+            Self::InstallStore { id, consent } => {
+                store::install::install(id, consent, Reason::Install, task)
+            }
+            Self::UpdateStore { id, consent } => {
+                store::install::install(id, consent, Reason::Update, task)
+            }
+            Self::RemoveStore { id } => store::install::remove(id),
             Self::InstallFlatpakRef { path } => {
                 flatpak::install_ref(Installation::User, path, task)?;
                 flatpak::integrate();

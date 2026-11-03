@@ -1,12 +1,10 @@
+import type { Collection } from '#lib/bindings.js';
 import { category } from '#lib/catalog/categories.js';
-import type { Collection } from '#lib/catalog/flathub.js';
 import type { Route } from './navigation.svelte';
 
-const COLLECTIONS: Record<Collection, string> = {
+export const COLLECTIONS: Record<Collection, string> = {
 	popular: 'Popular',
-	trending: 'Trending',
-	'recently-updated': 'New and updated',
-	'recently-added': 'Recently added'
+	updated: 'New and updated'
 };
 
 export function title(route: Route) {
@@ -17,6 +15,8 @@ export function title(route: Route) {
 			return 'Installed';
 		case 'updates':
 			return 'Updates';
+		case 'extensions':
+			return 'Extensions';
 		case 'category':
 			return category(route.category).title;
 		case 'collection':

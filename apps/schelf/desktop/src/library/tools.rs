@@ -23,6 +23,7 @@ pub fn installed() -> Vec<InstalledApp> {
             path: None,
             commands: tool.commands,
             services: Vec::new(),
+            listing: None,
         })
         .collect()
 }

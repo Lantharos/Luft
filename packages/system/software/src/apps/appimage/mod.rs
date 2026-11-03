@@ -1,3 +1,4 @@
+mod blocked;
 mod bundle;
 mod declaration;
 mod elf;
@@ -10,6 +11,7 @@ mod library;
 mod sabine;
 mod update;
 
+pub use blocked::{blocked, set_blocked};
 pub use bundle::{Bundle, Icon, icons, read as inspect};
 pub use declaration::Declaration;
 pub use elf::{is_appimage, payload_offset};

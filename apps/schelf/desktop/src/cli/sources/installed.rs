@@ -66,7 +66,10 @@ fn removal_job(app: &InstalledApp) -> Job {
         Source::Tool => Job::RemoveTool {
             package: app.package.clone().unwrap_or_default(),
         },
-        Source::AppImage => Job::RemoveAppImage { id: app.id.clone() },
+        Source::AppImage | Source::Sabine | Source::Extension => match &app.listing {
+            Some(id) => Job::RemoveStore { id: id.clone() },
+            None => Job::RemoveAppImage { id: app.id.clone() },
+        },
         Source::Debian => Job::RemoveDeb {
             package: app.package.clone().unwrap_or_default(),
         },

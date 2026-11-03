@@ -3,6 +3,7 @@
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 tools="$root/kestrel/tools"
 built_tools="$root/kestrel/run/tools"
+built_extensions="$root/kestrel/run/extensions"
 build="${KESTREL_BUILD:-$root/kestrel/build}"
 compositor_prefix="${KESTREL_COMPOSITOR:-$root/kestrel/run/mutter-install}"
 compositor="$compositor_prefix/lib"
@@ -31,9 +32,19 @@ require_build() {
   fi
 }
 
+build_extensions() {
+  local source id
+  rm -rf "$built_extensions"
+  for source in "$root"/extensions/*/build.sh; do
+    id="$(sed -n 's/^id = "\(.*\)"$/\1/p' "${source%/*}/extension.toml")"
+    "$source" "$built_extensions/$id"
+  done
+}
+
 build_helpers() {
   glib-compile-schemas "$build/data"
   bun "$tools/build.ts" "$built_tools"
+  build_extensions
   (cd "$root" && cargo build --release --quiet -p kestrel-session-manager -p kestrel-settings -p kestrel-search -p kestrel-portal -p luft-pinentry \
     -p kestrel-openconnect -p kestrel-greeter-service -p kestrel-wrapper -p peek -p luft-accounts-service -p luft-speech-service)
 }
@@ -113,25 +124,17 @@ use_luft_defaults() {
   unset LANGUAGE "${!LC_@}"
 }
 
-# The extensions Luft ships, laid out as the image installs them: their files from the tree, except the sources the build
-# turns into their code and helpers
-stage_extensions() {
-  local staged="$session/system-data" source id folder entry
-  rm -rf "$staged"
-  for source in "$root"/kestrel/extensions/*/extension.toml; do
-    source="$(dirname "$source")"
-    id="$(sed -n 's/^id = "\(.*\)"$/\1/p' "$source/extension.toml")"
-    folder="$staged/luft/extensions/$id"
-    mkdir -p "$folder"
-    for entry in "$source"/*; do
-      case "${entry##*/}" in
-        src | helper) ;;
-        *) ln -s "$entry" "$folder/" ;;
-      esac
-    done
-    find "$build/extensions/${source##*/}" -maxdepth 1 -type f \( -name '*.js' -o -perm -u+x \) -exec ln -s {} "$folder/" \;
+# A new account gets the extensions Luft preinstalls once, the way Schelf installs them at its first sign-in
+preinstall_extensions() {
+  local installed="$session/data/luft/extensions" record="$session/state/luft/preinstalled" built id
+  mkdir -p "$installed" "${record%/*}"
+  touch "$record"
+  for built in "$built_extensions"/*; do
+    id="${built##*/}"
+    grep -qxF "$id.json" "$record" && continue
+    cp -r "$built" "$installed/"
+    echo "$id.json" >> "$record"
   done
-  export XDG_DATA_DIRS="$staged:$XDG_DATA_DIRS"
 }
 
 prepare_session() {
@@ -162,6 +165,6 @@ prepare_session() {
   ln -sfn "$root/kestrel/engine/data/session/kestrel-portal.portal" "$session/data/xdg-desktop-portal/portals/kestrel-portal.portal"
   ln -sfn "$root/kestrel/engine/data/session/kestrel-portals.conf" "$session/config/xdg-desktop-portal/kestrel-portals.conf"
   export_build_paths
-  stage_extensions
+  preinstall_extensions
   [[ "$mode" == nested ]] || use_luft_defaults
 }

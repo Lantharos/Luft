@@ -9,7 +9,7 @@ import soundfile
 from dsp import RATE, highpass, normalize, seconds
 from scipy import signal
 
-OUTPUT = Path(__file__).resolve().parents[2] / "extensions/rain/sounds"
+OUTPUT = Path(__file__).resolve().parents[3] / "extensions/rain/sounds"
 PREVIEWS = "https://cdn.freesound.org/previews"
 LOOP_LENGTH = 30
 SEAM = 4

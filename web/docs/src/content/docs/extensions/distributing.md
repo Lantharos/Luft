@@ -11,12 +11,7 @@ Schelf carries extensions next to apps, with `kind = "extension"` and `format = 
 
 ## Where Luft keeps them
 
-| Folder | Holds |
-| --- | --- |
-| `/usr/share/luft/extensions/<id>/` | Extensions that come with Luft, such as Rain |
-| `~/.local/share/luft/extensions/<id>/` | Extensions you installed |
-
-An installed copy with the same id as one that comes with Luft replaces it, which is how the store updates Rain between Luft releases. Removing it removes the extension for that account.
+Every extension lives in `~/.local/share/luft/extensions/<id>/`. The ones Luft comes with, such as Rain, are installed there from the store when you first sign in, and update and remove like any other.
 
 ## The D-Bus interface
 
@@ -24,10 +19,10 @@ Settings and Schelf manage extensions through `com.lantharos.Kestrel.Extensions`
 
 | Member | Does |
 | --- | --- |
-| `List() → aa{sv}` | Every installed extension: `id`, `name`, `description`, `version`, `api`, `path`, `origin` (`system` or `user`), `overrides`, `permissions`, `helper`, `enabled`, `state` (`running`, `off`, `failed`, `crashed`, `invalid`), `problem`, `cpu` and `memory` while it runs, and `settings` |
+| `List() → aa{sv}` | Every installed extension: `id`, `name`, `description`, `version`, `api`, `path`, `permissions`, `helper`, `enabled`, `state` (`running`, `off`, `failed`, `crashed`, `invalid`), `problem`, `cpu` and `memory` while it runs, and `settings` |
 | `Enable(s id)`, `Disable(s id)` | Turns it on or off |
 | `Reload(s id)` | Reads its folder again. A new extension starts, an updated one restarts with its new code, a deleted one stops |
-| `Remove(s id)` | Deletes an installed copy and its settings, and hides one that comes with Luft for this account |
+| `Remove(s id)` | Deletes it and its settings |
 | `SetSetting(s id, s key, v value)` | Changes a declared setting; a value that doesn't fit is refused |
 | `ApiVersions` | Property: the API versions this Luft runs |
 | `ExtensionsChanged` | Signal: something in `List` changed |

@@ -5,7 +5,7 @@
 	{"name": "kestrel-system", "bundle": "kestrel", "mask": "kestrel/ui/locales/*/system.ftl", "sources": ["kestrel/ui/src/system", "kestrel/ui/src/extensions"]},
 	{"name": "kestrel-auth", "bundle": "kestrel", "mask": "kestrel/ui/locales/*/auth.ftl", "sources": ["kestrel/ui/src/auth", "kestrel/ui/src/session"]},
 	{"name": "kestrel-portal", "bundle": "kestrel", "mask": "kestrel/ui/locales/*/portal.ftl", "sources": ["kestrel/ui/src/portal"]},
-	{"name": "extension-rain", "bundle": "extension-rain", "mask": "kestrel/extensions/rain/locales/*/rain.ftl", "sources": ["kestrel/extensions/rain", "kestrel/ui/src/extensions/runtime/instance.ts"]},
+	{"name": "extension-rain", "bundle": "extension-rain", "mask": "extensions/rain/locales/*/rain.ftl", "sources": ["extensions/rain", "kestrel/ui/src/extensions/runtime/instance.ts"]},
 	{"name": "kestrel-settings", "bundle": "kestrel-settings", "mask": "kestrel/settings/locales/*/settings.ftl", "sources": ["kestrel/settings/src/modules/system/drives", "kestrel/settings/src/modules/devices/power/discharge.rs"]},
 	{"name": "kestrel-portal-service", "bundle": "kestrel-portal", "mask": "kestrel/portal/locales/*/portal.ftl", "sources": ["kestrel/portal/src"]},
 	{"name": "ui", "bundle": "ui", "mask": "packages/web/ui/locales/*/ui.ftl", "sources": ["packages/web/ui/src"]},

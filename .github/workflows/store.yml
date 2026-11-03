@@ -67,7 +67,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install --yes libglib2.0-dev libgstreamer1.0-dev libpipewire-0.3-dev zstd
 
-      - run: '"${{ needs.plan.outputs.folder }}/pack.sh" dist'
+      - run: extensions/pack.sh "${{ needs.plan.outputs.folder }}" dist
 
       - uses: actions/upload-artifact@v7
         with:

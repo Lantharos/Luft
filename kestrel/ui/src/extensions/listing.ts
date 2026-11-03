@@ -48,8 +48,6 @@ export function listed(installed: Installed, manager: ExtensionManager): Fields 
   const fields: Fields = {
     id: text(installed.id),
     path: text(installed.path),
-    origin: text(installed.origin),
-    overrides: GLib.Variant.new_boolean(installed.overrides),
     enabled: GLib.Variant.new_boolean(!manager.store.disabled.has(installed.id)),
     state: text(state(installed, manager)),
     problem: text(installed.problem ?? manager.store.problem(installed.id)?.detail ?? ''),

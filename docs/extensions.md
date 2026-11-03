@@ -8,21 +8,20 @@ Extensions add to Kestrel: a layer over the wallpaper, quick settings tiles, tas
 | `kestrel/ui/src/extensions/api/v1` | API version 1. `types.ts` is the contract; everything else implements it |
 | `kestrel/ui/src/extensions/service.ts` | The D-Bus interface below |
 | `packages/extension-api` | `@luft/extension-api`, the types for extension authors, written from `types.ts` by `bun kestrel/ui/extensionApi.ts`. `bun run check` in `kestrel/ui` fails when it's out of date |
-| `kestrel/extensions` | Extensions Luft ships, such as Rain, built by `kestrel/engine/extensions` |
+| `extensions` | Lantharos's own extensions, such as Rain. Each has a `build.sh` that makes its folder, which `extensions/pack.sh` packs for schelf.store |
 | `apps/settings/src/lib/panels/personalization/extensions` | Settings → Extensions |
 
 ## On disk
 
 ```
-/usr/share/luft/extensions/<id>/           extensions Luft ships, one folder per extension
-~/.local/share/luft/extensions/<id>/       extensions the person installed
+~/.local/share/luft/extensions/<id>/       one folder per installed extension
   extension.toml                           the manifest
   extension.js                             one ES module whose default export is enable(extension)
   locales/<language>/*.ftl                 translations, English in locales/en
   ...                                      anything else it ships, such as a helper program
 ```
 
-Every folder in `luft/extensions` under `XDG_DATA_HOME` and each of `XDG_DATA_DIRS` counts, and its name must be the manifest's `id`. A user copy replaces a system copy with the same id: that's how the store updates an extension Luft ships. Once Rain has an approved release, the image also carries it in `/usr/share/luft/preinstall`, and every account gets that copy at sign-in, so it's updated from the store from the start; the built-in copy is used until then. Removing an extension that replaces a system copy hides the system copy too. An extension runs unless it's turned off.
+Each folder in `luft/extensions` under `XDG_DATA_HOME` is an extension, and its name must be the manifest's `id`. There's no system-wide folder: extensions Luft comes with, such as Rain, are store releases the image carries in `/usr/share/luft/preinstall`, which Schelf installs into each account at sign-in, once and offline ([Schelf](components/schelf.md#preinstalled-apps-and-background-updates)), and updates from schelf.store after that. Removing one deletes its folder, and it stays removed. An extension runs unless it's turned off.
 
 ## Manifest
 
@@ -71,18 +70,18 @@ Kestrel serves `com.lantharos.Kestrel.Extensions` at `/com/lantharos/Kestrel/Ext
 | `Enable(s id)` | Turns it on, forgetting why Kestrel turned it off |
 | `Disable(s id)` | Turns it off |
 | `Reload(s id)` | Reads its folder again: a new or updated extension starts, a removed one stops. A new version of an extension Kestrel turned off runs again |
-| `Remove(s id)` | Stops it, deletes the user copy and its settings, and hides the system copy for this account |
+| `Remove(s id)` | Stops it and deletes its folder and settings |
 | `SetSetting(s id, s key, v value)` | Changes one of its declared settings; a value that doesn't fit is refused |
 | `ApiVersions` (property, `au`) | The extension API versions this Kestrel runs |
 | `ExtensionsChanged` (signal) | Something in `List` changed |
 
-Each entry of `List` has `id`, `name` and `description` (translated), `version`, `api`, `path`, `origin` (`system` or `user`), `overrides` (a user copy replacing a system one), `permissions`, `helper`, `enabled`, `state` (`running`, `off`, `failed`, `crashed` or `invalid`) and `problem` (why it isn't running), `cpu` (share of one processor since it started, counting its helper) and `memory` (its helper's resident memory) while it runs, and `settings`: for each setting its `key`, `type`, translated `label` and `description`, `value`, `default`, `depends`, and `options` or `swatches` as `a(ss)` of value and label, or `min`, `max`, `step` and `unit`.
+Each entry of `List` has `id`, `name` and `description` (translated), `version`, `api`, `path`, `permissions`, `helper`, `enabled`, `state` (`running`, `off`, `failed`, `crashed` or `invalid`) and `problem` (why it isn't running), `cpu` (share of one processor since it started, counting its helper) and `memory` (its helper's resident memory) while it runs, and `settings`: for each setting its `key`, `type`, translated `label` and `description`, `value`, `default`, `depends`, and `options` or `swatches` as `a(ss)` of value and label, or `min`, `max`, `step` and `unit`.
 
 To install an extension, unpack it into `~/.local/share/luft/extensions/<id>/` and call `Reload(id)`; to update, replace the folder and call `Reload(id)` again.
 
 ## Settings
 
-Kestrel keeps what the person decided in `com.lantharos.kestrel`: `disabled-extensions`, `removed-extensions`, `extension-settings` (values by id and key, only those changed from the default) and `extension-problems`. Settings changes them only through the D-Bus interface, so every value is checked against the manifest.
+Kestrel keeps what the person decided in `com.lantharos.kestrel`: `disabled-extensions`, `extension-settings` (values by id and key, only those changed from the default) and `extension-problems`. Settings changes them only through the D-Bus interface, so every value is checked against the manifest.
 
 ## Safety
 

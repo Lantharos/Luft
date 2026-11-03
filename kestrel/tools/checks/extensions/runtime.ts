@@ -8,7 +8,7 @@ import {checks} from '../lib/check.js';
 import {capture} from '../lib/screenshots.js';
 import {pause} from '../lib/wait.js';
 import {closeStart, groupTitles, openStart, rows, search, titleOf} from '../start/search/results.js';
-import {copyFolder, install, layerSheets, listed, RAIN, request, rewrite, setSetting, systemFolder, userFolder} from './lib/extensions.js';
+import {copyFolder, install, layerSheets, listed, RAIN, request, rewrite, setSetting, userFolder} from './lib/extensions.js';
 
 const {require, eventually} = checks('extensions');
 const PROBE = 'com.example.Probe';
@@ -28,8 +28,8 @@ const probeTile = () => descendants(named('kestrel-quick-settings')!).find(actor
 const notified = (title: string) => Main.messageTray.getSources().some(source => source.notifications.some(notification => notification.title === title));
 
 async function checkRain() {
-  const rain = await eventually(() => listed(RAIN), 'Rain ships with Luft and is listed');
-  require(rain.origin === 'system' && rain.state === 'running' && rain.version === '1.0.0', 'Rain runs from the system copy');
+  const rain = await eventually(() => listed(RAIN), 'Rain is preinstalled for a new account and listed');
+  require(rain.state === 'running' && rain.version === '1.0.0', 'Rain runs from the copy in the account');
   require(layerSheets(RAIN).length === 0, 'Rain draws nothing while it is off: its layer has no actors');
 }
 
@@ -95,19 +95,20 @@ async function checkThrowing() {
   await capture('extension-turned-off');
 }
 
-async function checkUserCopyOverrides() {
-  copyFolder(Gio.File.new_for_path(systemFolder(RAIN)), Gio.File.new_for_path(userFolder(RAIN)));
-  rewrite(`${userFolder(RAIN)}/extension.toml`, text => text.replace('version = "1.0.0"', 'version = "9.0.0"'));
-  await request('Reload', RAIN);
-  await eventually(async () => {
-    const rain = await listed(RAIN);
-    return rain?.origin === 'user' && rain.overrides && rain.version === '9.0.0' && rain.state === 'running';
-  }, 'a user copy replaces the system copy, as a store update would');
-  await request('Remove', RAIN);
-  await eventually(async () => !await listed(RAIN), 'removing it takes Rain away for this account');
-  require(!GLib.file_test(userFolder(RAIN), GLib.FileTest.EXISTS), 'and deletes the user copy');
-  kestrel.reset('removed-extensions');
-  await eventually(async () => (await listed(RAIN))?.origin === 'system', 'the system copy comes back once it is no longer removed');
+async function checkRemovingRain() {
+  const kept = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_user_data_dir(), `kept-${RAIN}`]));
+  copyFolder(Gio.File.new_for_path(userFolder(RAIN)), kept);
+  try {
+    await request('Remove', RAIN);
+    await eventually(async () => !await listed(RAIN), 'removing Rain takes it away');
+    require(!GLib.file_test(userFolder(RAIN), GLib.FileTest.EXISTS), 'and deletes its folder');
+    await request('Reload', RAIN);
+    require(!await listed(RAIN), 'no other copy of Rain comes back');
+  } finally {
+    kept.move(Gio.File.new_for_path(userFolder(RAIN)), Gio.FileCopyFlags.NONE, null, null);
+    await request('Reload', RAIN);
+  }
+  await eventually(async () => (await listed(RAIN))?.state === 'running', 'installing Rain again runs it');
 }
 
 export async function run() {
@@ -118,9 +119,9 @@ export async function run() {
     await checkDisabledCleansUp();
     await checkReload();
     await checkThrowing();
-    await checkUserCopyOverrides();
+    await checkRemovingRain();
   } finally {
     for (const id of [PROBE, BROKEN]) await request('Remove', id);
-    for (const key of ['disabled-extensions', 'removed-extensions', 'extension-settings', 'extension-problems']) kestrel.reset(key);
+    for (const key of ['disabled-extensions', 'extension-settings', 'extension-problems']) kestrel.reset(key);
   }
 }

@@ -15,8 +15,6 @@ export interface Listed {
   id: string;
   name: string;
   version?: string;
-  origin: 'system' | 'user';
-  overrides: boolean;
   enabled: boolean;
   state: string;
   problem: string;
@@ -44,8 +42,6 @@ export async function setting(id: string, key: string) {
 export const layerSheets = (id: string) => descendants(global.stage).filter(actor => actor.name === `extension-layer:${id}`);
 
 export const userFolder = (id: string) => GLib.build_filenamev([GLib.get_user_data_dir(), 'luft', 'extensions', id]);
-export const systemFolder = (id: string) => GLib.get_system_data_dirs().map(folder => GLib.build_filenamev([folder, 'luft', 'extensions', id]))
-  .find(folder => GLib.file_test(folder, GLib.FileTest.IS_DIR))!;
 
 export function copyFolder(from: Gio.File, to: Gio.File) {
   GLib.mkdir_with_parents(to.get_path()!, 0o755);

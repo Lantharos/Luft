@@ -12,13 +12,6 @@
 	let removing = $state(false);
 	let cost = $derived(usage(extension));
 	let visible = $derived(extension.settings.filter((setting) => shown(extension, setting)));
-	let source = $derived(
-		extension.origin === 'system'
-			? t('settings-extensions-from-luft', { version: extension.version })
-			: extension.overrides
-				? t('settings-extensions-updated', { version: extension.version })
-				: t('settings-extensions-installed', { version: extension.version })
-	);
 </script>
 
 <SubPage title={extension.name} {onclose}>
@@ -53,16 +46,14 @@
 	{/if}
 
 	<Section>
-		<Row title={t('settings-extensions-remove')} description={source} onclick={() => (removing = true)} />
+		<Row title={t('settings-extensions-remove')} description={t('settings-extensions-installed', { version: extension.version })} onclick={() => (removing = true)} />
 	</Section>
 </SubPage>
 
 {#if removing}
 	<ConfirmDialog
 		title={t('settings-extensions-remove-title', { name: extension.name })}
-		description={extension.origin === 'system' || extension.overrides
-			? t('settings-extensions-remove-shipped')
-			: t('settings-extensions-remove-description')}
+		description={t('settings-extensions-remove-description')}
 		action={t('settings-extensions-remove')}
 		danger
 		run={async () => {

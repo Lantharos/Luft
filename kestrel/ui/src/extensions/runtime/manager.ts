@@ -43,7 +43,6 @@ export class ExtensionManager {
         this.changed();
       }),
       this.store.watchStates(() => this.sync()),
-      this.store.watchRemoved(() => this.rescan()),
       onLocaleChanged(() => this.restartAll()),
     ];
     this.rescan();
@@ -68,7 +67,7 @@ export class ExtensionManager {
   }
 
   rescan(): void {
-    this.installed = discover(this.store.removed);
+    this.installed = discover();
     for (const id of [...this.instances.keys()].filter(id => !this.installed.some(installed => installed.id === id))) this.drop(id);
     for (const installed of this.installed.filter(hasManifest)) {
       const instance = this.instances.get(installed.id);
@@ -79,7 +78,7 @@ export class ExtensionManager {
   }
 
   reload(id: string): void {
-    const found = findOne(id, this.store.removed);
+    const found = findOne(id);
     const previous = this.instances.get(id);
     if (found?.manifest && previous && this.store.problem(id) && previous.manifest.version !== found.manifest.version) {
       this.store.setProblem(id, null);
@@ -104,8 +103,7 @@ export class ExtensionManager {
     const installed = this.installed.find(candidate => candidate.id === id);
     if (!installed) return;
     this.drop(id);
-    if (installed.origin === 'user') removeFolder(installed.path);
-    if (installed.origin === 'system' || installed.overrides) this.store.setRemoved(id, true);
+    removeFolder(installed.path);
     this.store.forgetValues(id);
     this.store.setProblem(id, null);
     this.store.setDisabled(id, false);

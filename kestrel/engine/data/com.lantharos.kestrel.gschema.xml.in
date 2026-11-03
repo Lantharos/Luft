@@ -333,14 +333,6 @@
         extension that fails, or that was running through two crashes in a row.
       </description>
     </key>
-    <key name="removed-extensions" type="as">
-      <default>[]</default>
-      <summary>Extensions Luft ships that were removed</summary>
-      <description>
-        Ids of extensions in the system's extension folders that are hidden
-        for this account. A copy installed for the account still shows.
-      </description>
-    </key>
     <key name="extension-settings" type="a{sa{sv}}">
       <default>{}</default>
       <summary>Settings of extensions</summary>

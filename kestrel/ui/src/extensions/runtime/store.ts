@@ -11,7 +11,6 @@ export interface Problem {
 }
 
 const DISABLED = 'disabled-extensions';
-const REMOVED = 'removed-extensions';
 const SETTINGS = 'extension-settings';
 const PROBLEMS = 'extension-problems';
 
@@ -42,10 +41,6 @@ export class ExtensionStore {
     return this.watch([DISABLED, PROBLEMS], changed);
   }
 
-  watchRemoved(changed: () => void): () => void {
-    return this.watch([REMOVED], changed);
-  }
-
   private watch(keys: string[], changed: () => void): () => void {
     const handlers = keys.map(key => this.settings.connect(`changed::${key}`, changed));
     return () => handlers.forEach(handler => this.settings.disconnect(handler));
@@ -55,24 +50,12 @@ export class ExtensionStore {
     return new Set(this.settings.get_strv(DISABLED));
   }
 
-  get removed(): ReadonlySet<string> {
-    return new Set(this.settings.get_strv(REMOVED));
-  }
-
   setDisabled(id: string, disabled: boolean): void {
     const ids = new Set(this.disabled);
     if (disabled === ids.has(id)) return;
     if (disabled) ids.add(id);
     else ids.delete(id);
     this.settings.set_strv(DISABLED, [...ids].sort());
-  }
-
-  setRemoved(id: string, removed: boolean): void {
-    const ids = new Set(this.removed);
-    if (removed === ids.has(id)) return;
-    if (removed) ids.add(id);
-    else ids.delete(id);
-    this.settings.set_strv(REMOVED, [...ids].sort());
   }
 
   value(id: string, key: string): SettingValue | undefined {

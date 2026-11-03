@@ -4,6 +4,7 @@ const BUILT_HERE = [
 	'kestrel/engine',
 	'kestrel/compositor',
 	'kestrel/tools',
+	'extensions',
 	'.github/ci/kestrel',
 	'.github/scripts/kestrel',
 	'os/image/packages/build.txt',

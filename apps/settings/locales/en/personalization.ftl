@@ -339,11 +339,8 @@ settings-extensions-permission-location = See roughly where you are
 settings-extensions-permission-media = See and control what's playing
 settings-extensions-remove = Remove
 # $version is the extension's version
-settings-extensions-from-luft = Comes with Luft, version { $version }
-settings-extensions-updated = Updated to version { $version }
 settings-extensions-installed = Version { $version }
 # $name is the extension's name
 settings-extensions-remove-title = Remove { $name }?
 settings-extensions-remove-description = It's removed for good, along with its settings.
-settings-extensions-remove-shipped = It's removed for your account, along with its settings. You can get it back from Schelf.
 settings-extensions-custom-color = Custom

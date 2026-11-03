@@ -902,8 +902,6 @@ export type Extension = {
 	name: string,
 	description: string,
 	version: string,
-	origin: string,
-	overrides: boolean,
 	enabled: boolean,
 	state: string,
 	problem: string,

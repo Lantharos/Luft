@@ -1,5 +1,5 @@
 {
-  "name": "@luft/kestrel-extensions",
+  "name": "@luft/extensions",
   "private": true,
   "type": "module",
   "scripts": {

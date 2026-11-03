@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const FOLDERS = ['apps', 'kestrel/extensions'];
+const FOLDERS = ['apps', 'extensions'];
 const LINUX = 'linux-x86_64 linux-aarch64';
 const PLATFORMS: Record<string, string> = { 'com.lantharos.meet': 'windows-x86_64 linux-x86_64' };
 

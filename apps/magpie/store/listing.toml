@@ -1,0 +1,3 @@
+summary = "Photos, videos and music"
+description = "Opens photos, videos, songs, PDFs and fonts, with the rest of the folder an arrow key away."
+screenshots = ["light.webp", "dark.webp"]

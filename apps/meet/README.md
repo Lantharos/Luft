@@ -25,7 +25,7 @@ cargo build --release --target x86_64-pc-windows-gnu --manifest-path desktop/Car
 sabine bundle . --target appimage                                                         # Linux, needs appimagetool
 ```
 
-To run the Windows build, put `meet.exe` in a folder with a `resources` folder holding `Sabine.toml`, `dist` and `public`. The [Meet Luft workflow](../../.github/workflows/meet.yml) builds the Windows setup program and the AppImage and publishes them to get.luft.computer.
+To run the Windows build, put `meet.exe` in a folder with a `resources` folder holding `Sabine.toml`, `dist` and `public`. The nightly image run publishes Meet Luft on schelf.store when it changed, and promoting a nightly to stable copies that release's Windows setup program and AppImage to get.luft.computer ([releases](../../docs/releases.md#apps-on-schelfstore)).
 
 `--nightly`, or Ctrl+Shift+N in the app, uses nightly builds instead of releases. Ctrl+Shift+L saves the newest logs from Try Luft to the desktop as a zip.
 

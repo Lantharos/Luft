@@ -1,0 +1,3 @@
+summary = "Files"
+description = "Tabs, Quick Look, network drives and your cloud drives, with a sidebar that knows where Windows lives."
+screenshots = ["light.webp", "dark.webp"]

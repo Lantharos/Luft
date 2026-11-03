@@ -1,0 +1,118 @@
+import { type Item, sabineTag, storeItems } from './items';
+import { isOut, listed, promote, type Release, releases, settling, taken } from './schelf';
+import { changesBetween, head, sourceKey } from './sources';
+import { compareVersions, newest, nextVersion } from './versions';
+
+type Planned = Item & { version: string; notes: string };
+type Published = Pick<Planned, 'id' | 'version'>;
+
+const NIGHTLY = 'nightly';
+const STABLE = 'stable';
+const MEET = { id: 'com.lantharos.meet', files: { 'meet-luft.exe': ['windows-x86_64', 'exe'], 'meet-luft.AppImage': ['linux-x86_64', 'app-image'] } };
+const SETTLE_MINUTES = 45;
+
+const print = (outputs: Record<string, string>) =>
+  console.log(
+    Object.entries(outputs)
+      .map(([key, value]) => `${key}=${value}`)
+      .join('\n'),
+  );
+
+async function planItem(item: Item, commit: string): Promise<Planned | undefined> {
+  const history = (await releases(item.id)).filter(taken);
+  const last = history[0];
+  if (last?.commit && sourceKey(last.commit, item.folder) === sourceKey(commit, item.folder)) return undefined;
+  return {
+    ...item,
+    version: nextVersion(item.floor, history.map((release) => release.version)),
+    notes: last?.commit ? await changesBetween(last.commit, commit, item.folder) : '',
+  };
+}
+
+async function plan() {
+  const commit = head();
+  const planned = (await Promise.all(storeItems().map((item) => planItem(item, commit)))).filter((item) => item !== undefined);
+  const pick = (kind: Item['kind'], keys: (keyof Planned)[]) =>
+    JSON.stringify(planned.filter((item) => item.kind === kind).map((item) => Object.fromEntries(keys.map((key) => [key, item[key]]))));
+  for (const item of planned) console.error(`${item.id} ${item.version}`);
+  print({
+    sabine: sabineTag(),
+    apps: pick('app', ['name', 'folder', 'platforms', 'version']),
+    extensions: pick('extension', ['name', 'folder', 'version']),
+    publish: JSON.stringify(planned.map(({ name, id, kind, folder, version, notes }) => ({ name, id, kind, folder, version, notes }))),
+  });
+}
+
+async function settled({ id, version }: Published, deadline: number): Promise<Release | undefined> {
+  const release = (await releases(id)).find((candidate) => candidate.version === version && candidate.channel === NIGHTLY);
+  const listedNow = async () => (await listed(id)).some((candidate) => candidate.version === version);
+  if (release && !settling(release) && (!isOut(release) || (await listedNow()))) return release;
+  if (Date.now() > deadline) return release;
+  await Bun.sleep(30_000);
+  return settled({ id, version }, deadline);
+}
+
+async function settle(published: Published[]) {
+  const deadline = Date.now() + SETTLE_MINUTES * 60_000;
+  for (const item of published) {
+    const release = await settled(item, deadline);
+    if (release && isOut(release)) console.error(`${item.id} ${item.version} is out on ${NIGHTLY}`);
+    else console.log(`::warning::${item.id} ${item.version} is ${release?.status ?? 'missing'}, so the image keeps its newest release that's out`);
+  }
+}
+
+async function catalog() {
+  const versions = await Promise.all(
+    storeItems().map(async (item) => {
+      const version = newest((await listed(item.id)).map((release) => release.version));
+      return version && `${item.id}=${version}`;
+    }),
+  );
+  print({ releases: versions.filter(Boolean).join(' ') });
+}
+
+async function promoteItem(item: Item, version: string) {
+  const history = await releases(item.id);
+  const stable = history.filter((release) => release.channel === STABLE && taken(release));
+  const current = newest(stable.map((release) => release.version));
+  if (current && compareVersions(current, version) >= 0) return console.error(`${item.id} has ${current} on ${STABLE} already`);
+  const source = history.find((release) => release.version === version && isOut(release));
+  const since = stable.find((release) => release.version === current)?.commit;
+  const notes = since && source?.commit ? await changesBetween(since, source.commit, item.folder) : '';
+  const promoted = await promote(item.id, version, STABLE, notes);
+  console.error(`${item.id} ${version} went to ${STABLE}, ${promoted.status}`);
+  return promoted;
+}
+
+async function meetFiles(version: string) {
+  const release = (await listed(MEET.id)).find((candidate) => candidate.version === version)!;
+  return Object.entries(MEET.files).map(([name, [platform, kind]]) => {
+    const { url, sha256 } = release.artifacts.find((artifact) => artifact.platform === platform && artifact.kind === kind)!;
+    return { name, url, sha256 };
+  });
+}
+
+async function promoteAll(label: string) {
+  const items = new Map(storeItems().map((item) => [item.id, item]));
+  const failures: string[] = [];
+  let meet = '[]';
+  for (const [id, version] of label.split(' ').filter(Boolean).map((pair) => pair.split('='))) {
+    const item = items.get(id);
+    if (!item) throw new Error(`${id} isn't in the repository any more`);
+    try {
+      const promoted = await promoteItem(item, version);
+      if (promoted && id === MEET.id) meet = JSON.stringify(await meetFiles(version));
+    } catch (error) {
+      failures.push(`${id} ${version}: ${(error as Error).message}`);
+    }
+  }
+  print({ meet });
+  if (failures.length) throw new Error(`Some releases didn't go to ${STABLE}:\n${failures.join('\n')}`);
+}
+
+const [command, argument] = process.argv.slice(2);
+if (command === 'plan') await plan();
+else if (command === 'settle' && argument) await settle(JSON.parse(argument));
+else if (command === 'catalog') await catalog();
+else if (command === 'promote' && argument !== undefined) await promoteAll(argument);
+else throw new Error('Usage: index.ts plan | settle PUBLISHED | catalog | promote RELEASES');

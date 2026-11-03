@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { dirname, join, normalize } from 'node:path';
 
-import { type Component, MANIFEST, manifestDirs, nestedComponent, parseManifest } from './manifest';
+import { MANIFEST, manifestDirs, nestedComponent, parseManifest } from './manifest';
 
 export type Tree = { files: string[]; has: (path: string) => boolean; read: (path: string) => string };
 
@@ -80,7 +80,7 @@ export function fewest(paths: Iterable<string>) {
 
 type Kind = 'crates' | 'packages';
 
-function reach(tree: Tree, component: Component) {
+function reach(tree: Tree, owner: string, paths: string[]) {
   const cargo = cargoWorkspace(tree);
   const packages = workspacePackages(tree);
   const reached = { crates: new Set<string>(), packages: new Set<string>() };
@@ -88,7 +88,7 @@ function reach(tree: Tree, component: Component) {
   let web = false;
 
   const visit = (path: string, kind: Kind) => {
-    if (!tree.has(path)) throw new Error(`${component.dir}/${MANIFEST} needs ${path}, which isn't in the tree`);
+    if (!tree.has(path)) throw new Error(`${owner} needs ${path}, which isn't in the tree`);
     if (reached[kind].has(path)) return;
     reached[kind].add(path);
     if (kind === 'crates') {
@@ -102,7 +102,7 @@ function reach(tree: Tree, component: Component) {
     }
   };
 
-  for (const path of [component.dir, ...component.sources]) {
+  for (const path of paths) {
     visit(path, 'crates');
     visit(path, 'packages');
   }
@@ -113,7 +113,7 @@ function reach(tree: Tree, component: Component) {
 export function partReach(tree: Tree, part: string) {
   const reached = components(tree)
     .filter((component) => component.part === part)
-    .map((component) => reach(tree, component));
+    .map((component) => reach(tree, `${component.dir}/${MANIFEST}`, [component.dir, ...component.sources]));
   const crates = fewest(reached.flatMap((each) => each.crates));
   const packages = fewest(reached.flatMap((each) => each.packages));
   return { crates, packages, sources: fewest([...crates, ...packages, ...reached.flatMap((each) => each.roots)]) };
@@ -121,4 +121,13 @@ export function partReach(tree: Tree, part: string) {
 
 export function partSources(tree: Tree, part: string) {
   return partReach(tree, part).sources;
+}
+
+export function folderSources(tree: Tree, folder: string) {
+  const parent = dirname(folder);
+  const isFolder = (path: string) => tree.files.some((file) => file.startsWith(`${path}/`));
+  const beside = tree.files.filter((file) => dirname(file) === parent && !isFolder(file));
+  const shared = tree.has(`${parent}/package.json`) ? packageDependencies(tree, workspacePackages(tree), parent) : [];
+  const reached = reach(tree, folder, [folder, ...shared]);
+  return fewest([...reached.crates, ...reached.packages, ...reached.roots, ...beside]);
 }

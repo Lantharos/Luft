@@ -49,7 +49,7 @@ part, stage copies the files one part puts into the image to FOLDER, building
 the part when it's missing, and base prints the Fedora image the parts are built on (LUFT_BASE, by
 digest). cef prints the CEF build the web runtime ships, the newest one Sabine
 would install (LUFT_CEF), so a new CEF build makes the runtime part again. store
-prints the newest approved schelf.store release of each app in
+prints the newest schelf.store release that's out, on any channel, of each app in
 os/image/parts/store/apps.toml as ID=VERSION=PART (LUFT_STORE, or empty for none);
 those apps ship from the store instead of being built into the image. updates lists the packages IMAGE adds to that Fedora image which have
 updates, and exits with 100 when there are some, like dnf check-upgrade.

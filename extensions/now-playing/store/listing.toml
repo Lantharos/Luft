@@ -1,0 +1,3 @@
+summary = "What's playing, in the taskbar"
+description = "The song or video that's playing sits in the taskbar with its cover and controls, and a pop-up lets you seek, change the volume and output, and switch between players."
+screenshots = ["taskbar.webp", "popup.webp", "side.webp"]

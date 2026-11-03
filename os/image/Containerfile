@@ -38,9 +38,10 @@ ARG RELEASE_NOTES=""
 ARG REVISION=""
 ARG CEF=""
 ARG STORE=""
+ARG STORE_RELEASES=""
 LABEL org.opencontainers.image.version="${VERSION}" org.opencontainers.image.revision="${REVISION}" \
     org.opencontainers.image.base.name="${BASE}" com.lantharos.release-notes="${RELEASE_NOTES}" \
-    com.lantharos.cef="${CEF}" com.lantharos.store="${STORE}"
+    com.lantharos.cef="${CEF}" com.lantharos.store="${STORE}" com.lantharos.store-releases="${STORE_RELEASES}"
 
 FROM luft AS luft-split
 RUN mkdir /kernel && bootc container split-kernel-and-rootfs --rootfs / --output /kernel

@@ -45,6 +45,7 @@ jobs:
       notes: ${{ steps.release.outputs.notes }}
       digest: ${{ steps.release.outputs.digest }}
       nvidia-digest: ${{ steps.release.outputs.nvidia-digest }}
+      store-releases: ${{ steps.release.outputs.store-releases }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -78,7 +79,8 @@ jobs:
         run: |
           [[ "$NIGHTLY" =~ ^($MAJOR\.([0-9]+))-nightly\.[0-9]+$ ]] || { echo "$NIGHTLY doesn't name a Luft $MAJOR nightly." >&2; exit 1; }
           version="${BASH_REMATCH[1]}" release="${BASH_REMATCH[2]}"
-          revision="$(skopeo inspect --retry-times 3 --format '{{index .Labels "org.opencontainers.image.revision"}}' "docker://$IMAGE:$NIGHTLY")"
+          labels="$(skopeo inspect --retry-times 3 --format '{{json .Labels}}' "docker://$IMAGE:$NIGHTLY")"
+          revision="$(jq -r '."org.opencontainers.image.revision" // empty' <<<"$labels")"
           [[ -n "$revision" ]] || { echo "$NIGHTLY doesn't say which commit it was built from." >&2; exit 1; }
           tagged="$(git ls-remote --tags --refs origin "refs/tags/v$version" | cut -f1)"
           if [[ -z "$tagged" ]]; then
@@ -132,6 +134,7 @@ jobs:
             echo "version=$version"
             echo "revision=$revision"
             echo "notes=$notes"
+            echo "store-releases=$(jq -r '."com.lantharos.store-releases" // empty' <<<"$labels")"
           } >> "$GITHUB_OUTPUT"
 
   stick:
@@ -144,6 +147,51 @@ jobs:
     permissions:
       contents: read
       packages: read
+
+  store-promote:
+    name: Store releases to stable
+    needs: promote
+    runs-on: ubuntu-26.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          filter: blob:none
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Send this nightly's apps and extensions to stable
+        id: promote
+        env:
+          STORE_RELEASES: ${{ needs.promote.outputs.store-releases }}
+        run: bun .github/scripts/store/index.ts promote "$STORE_RELEASES" >> "$GITHUB_OUTPUT"
+
+      - name: Put Meet Luft's downloads next to the release
+        if: always() && steps.promote.outputs.meet && steps.promote.outputs.meet != '[]'
+        env:
+          MEET: ${{ steps.promote.outputs.meet }}
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+          AWS_REQUEST_CHECKSUM_CALCULATION: when_required
+          AWS_RESPONSE_CHECKSUM_VALIDATION: when_required
+        working-directory: ${{ runner.temp }}
+        run: |
+          jq -r '.[] | "\(.name) \(.url) \(.sha256)"' <<<"$MEET" | while read -r name url sha256; do
+            curl -sfL --retry 3 -o "$name" "$url"
+            echo "$sha256  $name" | tee "$name.sha256" | sha256sum --check
+            for file in "$name" "$name.sha256"; do
+              aws s3 cp "$file" "s3://$R2_BUCKET/meet/$file" --endpoint-url "https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com" --only-show-errors
+            done
+          done
 
   release:
     name: GitHub release
@@ -204,6 +252,10 @@ jobs:
     if: "!inputs.promote"
     runs-on: ubuntu-26.04
     timeout-minutes: 15
+    permissions:
+      contents: read
+      packages: read
+      id-token: write
     outputs:
       skip: ${{ steps.version.outputs.skip }}
       version: ${{ steps.version.outputs.version }}
@@ -215,6 +267,10 @@ jobs:
       parts: ${{ steps.parts.outputs.parts }}
       signed: ${{ steps.parts.outputs.signed }}
       details: ${{ steps.parts.outputs.details }}
+      sabine: ${{ steps.store.outputs.sabine }}
+      apps: ${{ steps.store.outputs.apps }}
+      extensions: ${{ steps.store.outputs.extensions }}
+      publish: ${{ steps.store.outputs.publish }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -226,8 +282,14 @@ jobs:
 
       - uses: ./.github/actions/registry
 
+      - name: Apps and extensions that changed since their last release
+        id: store
+        run: bun .github/scripts/store/index.ts plan >> "$GITHUB_OUTPUT"
+
       - name: Version and release notes
         id: version
+        env:
+          PUBLISH: ${{ steps.store.outputs.publish }}
         run: |
           nightly="$(skopeo inspect --retry-times 3 --format '{{json .Labels}}' "docker://$IMAGE:$MAJOR-nightly")"
           built="$(jq -r '."org.opencontainers.image.revision" // empty' <<<"$nightly")"
@@ -239,7 +301,7 @@ jobs:
             echo "LUFT_CEF=$cef"
             echo "LUFT_STORE=$store"
           } >> "$GITHUB_ENV"
-          if [[ "$GITHUB_EVENT_NAME" == schedule && "$built" == "$GITHUB_SHA" &&
+          if [[ "$GITHUB_EVENT_NAME" == schedule && "$built" == "$GITHUB_SHA" && "$PUBLISH" == "[]" &&
                 "$base" == "$(jq -r '."org.opencontainers.image.base.name" // empty' <<<"$nightly")" &&
                 "$cef" == "$(jq -r '."com.lantharos.cef" // empty' <<<"$nightly")" &&
                 "$store" == "$(jq -r '."com.lantharos.store" // empty' <<<"$nightly")" ]] &&
@@ -280,10 +342,146 @@ jobs:
             echo "base=$LUFT_BASE"
             echo "cef=$LUFT_CEF"
             echo "store=$LUFT_STORE"
-            echo "parts=$(jq -c '[.[] | select(.signing == "unsigned") | .name]' <<<"$missing")"
+            echo "parts=$(jq -c '[.[] | select(.signing == "unsigned" and .name != "store") | .name]' <<<"$missing")"
             echo "signed=$(jq -c '[.[] | select(.signing == "signed") | .name]' <<<"$missing")"
             echo "details=$(jq -c 'map({(.name): {key, family}}) | add // {}' <<<"$missing")"
           } >> "$GITHUB_OUTPUT"
+
+  store-apps:
+    name: App
+    needs: plan
+    if: needs.plan.outputs.apps != '' && needs.plan.outputs.apps != '[]'
+    strategy:
+      fail-fast: false
+      matrix:
+        app: ${{ fromJSON(needs.plan.outputs.apps) }}
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    uses: Lantharos/Sabine/.github/workflows/release-app.yml@0bd7346ef3b1d098caa383dc2ceb7addeb63d909
+    with:
+      sabine_version: ${{ needs.plan.outputs.sabine }}
+      app: ${{ matrix.app.folder }}
+      platforms: ${{ matrix.app.platforms }}
+      version: ${{ matrix.app.version }}
+      artifact: app-${{ matrix.app.name }}
+      linux_packages: libglib2.0-dev libseccomp-dev
+      # Building the MSI package accepts the WiX 7 licence: https://docs.firegiant.com/wix/osmf/
+      accept_wix_eula: true
+    secrets: inherit
+
+  store-extensions:
+    name: Extension
+    needs: plan
+    if: needs.plan.outputs.extensions != '' && needs.plan.outputs.extensions != '[]'
+    strategy:
+      fail-fast: false
+      matrix:
+        extension: ${{ fromJSON(needs.plan.outputs.extensions) }}
+        runner: [ubuntu-24.04, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install --frozen-lockfile
+
+      - name: Install the helpers' libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes libglib2.0-dev libgstreamer1.0-dev libpipewire-0.3-dev zstd
+
+      - name: Use the version being released
+        run: sed -i 's/^version = ".*"$/version = "${{ matrix.extension.version }}"/' "${{ matrix.extension.folder }}/extension.toml"
+
+      - run: extensions/pack.sh "${{ matrix.extension.folder }}" dist
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: extension-${{ matrix.extension.name }}-${{ matrix.runner }}
+          path: dist
+          if-no-files-found: error
+
+  store-publish:
+    name: Publish
+    needs: [plan, store-apps, store-extensions]
+    if: ${{ !cancelled() && needs.plan.result == 'success' && needs.plan.outputs.publish != '[]' }}
+    runs-on: ubuntu-26.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        item: ${{ fromJSON(needs.plan.outputs.publish) }}
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: ${{ matrix.item.kind }}-${{ matrix.item.name }}-*
+          path: dist
+          merge-multiple: true
+
+      - uses: Lantharos/Store/publish@v1
+        with:
+          files: dist/**
+          schelf-toml: ${{ matrix.item.folder }}/schelf.toml
+          version: ${{ matrix.item.version }}
+          channel: nightly
+          notes: ${{ matrix.item.notes }}
+
+  store-part:
+    name: Store part
+    needs: [plan, store-publish]
+    if: ${{ !cancelled() && needs.plan.result == 'success' && needs.plan.outputs.skip != '1' }}
+    runs-on: ubuntu-26.04
+    timeout-minutes: 75
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    outputs:
+      store: ${{ steps.releases.outputs.store }}
+      releases: ${{ steps.releases.outputs.releases }}
+    env:
+      LUFT_BASE: ${{ needs.plan.outputs.base }}
+      LUFT_CEF: ${{ needs.plan.outputs.cef }}
+      LUFT_SECUREBOOT_CERT: os/image/keys/luft-secureboot.crt
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - uses: ./.github/actions/registry
+
+      - name: Wait for tonight's releases to pass their checks
+        if: needs.plan.outputs.publish != '[]'
+        env:
+          PUBLISH: ${{ needs.plan.outputs.publish }}
+        run: bun .github/scripts/store/index.ts settle "$PUBLISH"
+
+      - name: Releases the image ships with
+        id: releases
+        run: |
+          store="$(os/image/build.sh store)"
+          echo "store=$store" >> "$GITHUB_OUTPUT"
+          bun .github/scripts/store/index.ts catalog >> "$GITHUB_OUTPUT"
+          echo "LUFT_STORE=$store" >> "$GITHUB_ENV"
+
+      - name: Build the part
+        run: |
+          state="$(os/image/build.sh plan luft | awk -F '\t' '$1 == "store" {print $3}')"
+          [[ "$state" != missing ]] || os/image/build.sh part store --cache-from "$CACHE" --cache-to "$CACHE"
 
   parts:
     name: Part
@@ -342,7 +540,7 @@ jobs:
 
   image:
     name: Images
-    needs: [plan, parts, signed-parts]
+    needs: [plan, parts, signed-parts, store-part]
     if: >-
       always() && needs.plan.result == 'success' && needs.plan.outputs.skip != '1' &&
       !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled')
@@ -351,7 +549,8 @@ jobs:
     env:
       LUFT_BASE: ${{ needs.plan.outputs.base }}
       LUFT_CEF: ${{ needs.plan.outputs.cef }}
-      LUFT_STORE: ${{ needs.plan.outputs.store }}
+      LUFT_STORE: ${{ needs.store-part.outputs.store }}
+      STORE_RELEASES: ${{ needs.store-part.outputs.releases }}
       VERSION: ${{ needs.plan.outputs.version }}
       RELEASE_NOTES: ${{ needs.plan.outputs.notes }}
     steps:
@@ -377,7 +576,8 @@ jobs:
       - name: Build both images
         run: |
           os/image/build.sh luft luft-nvidia --cache-from "$CACHE" --cache-to "$CACHE" \
-            --build-arg "VERSION=$VERSION" --build-arg "REVISION=$GITHUB_SHA" --build-arg "RELEASE_NOTES=$RELEASE_NOTES"
+            --build-arg "VERSION=$VERSION" --build-arg "REVISION=$GITHUB_SHA" --build-arg "RELEASE_NOTES=$RELEASE_NOTES" \
+            --build-arg "STORE_RELEASES=$STORE_RELEASES"
 
       - name: Forget the signing keys
         if: always()

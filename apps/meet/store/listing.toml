@@ -1,0 +1,3 @@
+summary = "Gets a computer ready for Luft without a USB stick"
+description = "Checks the computer, makes room next to the system already there, and restarts into Luft once to try it or install it. It can also make a USB stick, and take everything back out again."
+screenshots = ["check.webp", "room.webp", "ready.webp"]

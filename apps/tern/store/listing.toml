@@ -1,0 +1,3 @@
+summary = "Terminal"
+description = "Tabs and split panes, a nudge when a long command finishes, and colours from your wallpaper."
+screenshots = ["light.webp", "dark.webp"]

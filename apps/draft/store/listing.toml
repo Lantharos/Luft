@@ -1,0 +1,3 @@
+summary = "Text and code"
+description = "Over a hundred languages, multiple cursors and a Markdown preview, and it remembers where you left off."
+screenshots = ["light.webp", "dark.webp"]

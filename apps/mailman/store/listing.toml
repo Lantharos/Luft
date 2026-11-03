@@ -1,0 +1,3 @@
+summary = "Mail"
+description = "One inbox for every account, a screener for new senders and search that works offline."
+screenshots = ["inbox.webp", "reading.webp", "compose.webp"]

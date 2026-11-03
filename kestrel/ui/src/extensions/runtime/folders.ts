@@ -47,3 +47,12 @@ export function findOne(id: string): Installed | null {
 export function discover(): Installed[] {
   return children().sort().map(read);
 }
+
+/** Where an extension keeps files of its own, outside its folder so updates keep them. */
+export function dataFolder(id: string): string {
+  return GLib.build_filenamev([GLib.get_user_data_dir(), 'luft', 'extension-data', id]);
+}
+
+export function storageFile(id: string): string {
+  return GLib.build_filenamev([GLib.get_user_state_dir(), 'luft', 'extension-storage', `${id}.json`]);
+}

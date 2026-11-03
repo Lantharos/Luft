@@ -11,7 +11,7 @@ function addToggle(context: ApiContext, options: ToggleOptions, ordinal: number)
   const { scope, values, manifest } = context;
   if (options.setting && values.describe(options.setting).type !== 'switch') throw new Error(`${options.setting} isn't a switch`);
   const actor = new QuickMenuToggle({ toggle_mode: true });
-  const onToggled = options.onToggled && scope.guard(options.onToggled);
+  const onToggled = options.onToggled && context.fromPerson(options.onToggled);
   let state: State = { ...options };
   let syncing = false;
   let forgetMenu = () => {};

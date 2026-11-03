@@ -150,7 +150,15 @@ class KestrelUi {
     this.liveWallpaper = new LiveWallpaper(() => context.layoutManager.monitors);
     this.extensions = new Extensions({
       menus: this.menus,
+      keybindings: context.keybindings,
+      wallpaper: context.wallpaper,
       monitors: () => context.layoutManager.monitors,
+      primaryIndex: () => context.layoutManager.primaryMonitor?.index ?? 0,
+      monitorAt,
+      workArea: index => {
+        const { x, y, width, height } = context.layoutManager.getWorkAreaForMonitor(index);
+        return { x, y, width, height };
+      },
       taskbar: monitor => {
         const actor = this.panels.panelOn(monitor)?.actor;
         if (!actor?.mapped) return null;
@@ -159,7 +167,15 @@ class KestrelUi {
         return { x, y, width, height };
       },
       accent: () => this.services.appearance.AccentColor || '#ffffff',
+      wallpaperAccent: () => this.services.appearance.WallpaperAccentColor || this.services.appearance.AccentColor || '#ffffff',
       watchAccent: changed => this.services.appearance.watchAccent(changed),
+      addPopup: actor => context.layoutManager.addTopChrome(actor),
+      removePopup: actor => context.layoutManager.removeChrome(actor),
+      dismissSurfaces: () => this.dismissImmediately(),
+      type: text => {
+        if (context.inputMethod.currentFocus) context.inputMethod.commit(text);
+        else clipboard.pasteWithoutKeeping(text);
+      },
     });
     this.rotation = new RotationAnimation(context.layoutManager, context.createBackground);
     this.surfaces = new Surfaces({

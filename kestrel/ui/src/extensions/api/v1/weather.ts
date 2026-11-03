@@ -4,7 +4,7 @@ import Soup from 'gi://Soup?version=3.0';
 
 import type { ApiContext } from './context.js';
 import { whereabouts } from './location.js';
-import type { Weather, WeatherCondition, WeatherReport } from './types.js';
+import type { Season, Weather, WeatherCondition, WeatherReport } from './types.js';
 
 Gio._promisify(Soup.Session.prototype, 'send_and_read_async');
 
@@ -13,8 +13,17 @@ const REFRESH_S = 30 * 60;
 const FRESH_FOR_US = REFRESH_S * GLib.USEC_PER_SEC;
 const decoder = new TextDecoder();
 
+const NORTHERN_SEASONS: Season[] = ['winter', 'winter', 'spring', 'spring', 'spring', 'summer', 'summer', 'summer', 'autumn', 'autumn', 'autumn', 'winter'];
+const OPPOSITE: Record<Season, Season> = { winter: 'summer', spring: 'autumn', summer: 'winter', autumn: 'spring' };
+
 interface Forecast {
   current: { time: number; temperature_2m: number; precipitation: number; weather_code: number; wind_speed_10m: number; is_day: number };
+  daily: { sunrise: number[]; sunset: number[] };
+}
+
+export function seasonAt(latitude: number, date: Date): Season {
+  const northern = NORTHERN_SEASONS[date.getMonth()];
+  return latitude >= 0 ? northern : OPPOSITE[northern];
 }
 
 function condition(code: number): WeatherCondition {
@@ -65,17 +74,20 @@ class WeatherSource {
     const place = await whereabouts();
     if (!place) return null;
     const query = `latitude=${place.latitude.toFixed(2)}&longitude=${place.longitude.toFixed(2)}&timeformat=unixtime` +
-      '&current=temperature_2m,precipitation,weather_code,wind_speed_10m,is_day';
+      '&current=temperature_2m,precipitation,weather_code,wind_speed_10m,is_day&daily=sunrise,sunset&forecast_days=1&timezone=auto';
     const message = Soup.Message.new('GET', `${FORECAST}?${query}`)!;
     const bytes = await this.session.send_and_read_async(message, GLib.PRIORITY_LOW, null);
     if (message.get_status() !== Soup.Status.OK) return null;
-    const { current } = JSON.parse(decoder.decode(bytes.toArray())) as Forecast;
+    const { current, daily } = JSON.parse(decoder.decode(bytes.toArray())) as Forecast;
     return {
       condition: condition(current.weather_code),
       temperature: current.temperature_2m,
       precipitation: current.precipitation,
       wind: current.wind_speed_10m,
       daytime: current.is_day === 1,
+      sunrise: daily.sunrise[0] * 1000,
+      sunset: daily.sunset[0] * 1000,
+      season: seasonAt(place.latitude, new Date(current.time * 1000)),
       time: current.time * 1000,
     };
   }

@@ -3,6 +3,7 @@
 
 #include <meta/meta-context.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "shell-enum-types.h"
 #include "shell-mixer-private.h"
@@ -16,6 +17,7 @@ enum
   PROP_INPUT,
   PROP_RECORDING,
   PROP_DICTATING,
+  PROP_PLAYING,
   N_PROPS
 };
 
@@ -161,9 +163,11 @@ sync_recording (ShellMixer *mixer)
   g_hash_table_iter_init (&iter, mixer->recorders);
   while (g_hash_table_iter_next (&iter, NULL, &client))
     {
-      if (g_hash_table_contains (mixer->level_meter_clients, client))
+      guint pid = GPOINTER_TO_UINT (g_hash_table_lookup (mixer->clients, client));
+
+      if (g_hash_table_contains (mixer->level_meter_clients, client) || pid == (guint) getpid ())
         continue;
-      if (dictates (mixer, GPOINTER_TO_UINT (g_hash_table_lookup (mixer->clients, client))))
+      if (dictates (mixer, pid))
         dictating = TRUE;
       else
         recording = TRUE;
@@ -179,6 +183,23 @@ sync_recording (ShellMixer *mixer)
       mixer->dictating = dictating;
       g_object_notify_by_pspec (G_OBJECT (mixer), props[PROP_DICTATING]);
     }
+}
+
+void
+_shell_mixer_sync_playing (ShellMixer *mixer)
+{
+  gboolean playing = FALSE;
+  GHashTableIter iter;
+  gpointer running;
+
+  g_hash_table_iter_init (&iter, mixer->players);
+  while (!playing && g_hash_table_iter_next (&iter, NULL, &running))
+    playing = GPOINTER_TO_INT (running);
+
+  if (mixer->playing == playing)
+    return;
+  mixer->playing = playing;
+  g_object_notify_by_pspec (G_OBJECT (mixer), props[PROP_PLAYING]);
 }
 
 void
@@ -345,6 +366,7 @@ _shell_mixer_forget (ShellMixer *mixer)
   g_hash_table_remove_all (mixer->clients);
   g_hash_table_remove_all (mixer->level_meter_clients);
   g_hash_table_remove_all (mixer->players);
+  _shell_mixer_sync_playing (mixer);
   g_clear_pointer (&mixer->default_sink, g_free);
   g_clear_pointer (&mixer->default_source, g_free);
   g_clear_pointer (&mixer->pending_port, g_free);
@@ -375,6 +397,9 @@ shell_mixer_get_property (GObject    *object,
       break;
     case PROP_DICTATING:
       g_value_set_boolean (value, mixer->dictating);
+      break;
+    case PROP_PLAYING:
+      g_value_set_boolean (value, mixer->playing);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -427,6 +452,14 @@ shell_mixer_class_init (ShellMixerClass *klass)
                           G_PARAM_READABLE | G_PARAM_STATIC_STRINGS | G_PARAM_EXPLICIT_NOTIFY);
   props[PROP_DICTATING] =
     g_param_spec_boolean ("dictating", NULL, NULL, FALSE,
+                          G_PARAM_READABLE | G_PARAM_STATIC_STRINGS | G_PARAM_EXPLICIT_NOTIFY);
+  /**
+   * ShellMixer:playing:
+   *
+   * Whether any app plays sound: some playback stream isn't paused.
+   */
+  props[PROP_PLAYING] =
+    g_param_spec_boolean ("playing", NULL, NULL, FALSE,
                           G_PARAM_READABLE | G_PARAM_STATIC_STRINGS | G_PARAM_EXPLICIT_NOTIFY);
   g_object_class_install_properties (object_class, N_PROPS, props);
 
@@ -527,6 +560,14 @@ shell_mixer_get_input (ShellMixer *mixer)
   g_return_val_if_fail (SHELL_IS_MIXER (mixer), NULL);
 
   return mixer->input;
+}
+
+gboolean
+shell_mixer_get_playing (ShellMixer *mixer)
+{
+  g_return_val_if_fail (SHELL_IS_MIXER (mixer), FALSE);
+
+  return mixer->playing;
 }
 
 gboolean

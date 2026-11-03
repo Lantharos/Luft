@@ -1,0 +1,33 @@
+id = "com.example.Api"
+name = "Api"
+description = "Uses the parts of the extension API that pop up, type, play and listen."
+version = "1.0.0"
+api = 1
+permissions = ["taskbar", "popups", "typing", "sounds", "audio-levels", "wallpaper"]
+
+[[settings]]
+key = "glow"
+type = "switch"
+label = "glow"
+default = true
+page = "appearance"
+
+[[settings]]
+key = "look"
+type = "choice"
+label = "look"
+default = "soft"
+options = [
+  { value = "soft", label = "soft", image = "soft.svg" },
+  { value = "sharp", label = "sharp", image = "sharp.svg" },
+]
+
+[[shortcuts]]
+key = "type"
+label = "shortcut-type"
+default = "<Super><Alt>y"
+
+[[shortcuts]]
+key = "taken"
+label = "shortcut-taken"
+default = "<Super>s"

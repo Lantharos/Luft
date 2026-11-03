@@ -86,7 +86,7 @@ export function fillMenu(menu: PopupMenu.PopupMenuBase, items: readonly MenuItem
         });
       }
     } else {
-      const [item, sync] = checkItem(entry.label, () => !!entry.checked, context.scope.guard(() => entry.onActivate()));
+      const [item, sync] = checkItem(entry.label, () => !!entry.checked, context.fromPerson(() => entry.onActivate()));
       menu.addMenuItem(item);
       syncs.push(sync);
     }

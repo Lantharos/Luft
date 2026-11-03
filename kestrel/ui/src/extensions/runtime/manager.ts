@@ -7,7 +7,7 @@ import type { SettingValue } from '../api/v1/types.js';
 import { LayerStage } from '../api/v1/wallpaper/stage.js';
 import type { ExtensionHost } from '../host.js';
 import { CrashGuard } from './crashes.js';
-import { discover, findOne, type Installed } from './folders.js';
+import { dataFolder, discover, findOne, type Installed } from './folders.js';
 import { ExtensionInstance, type RuntimeServices } from './instance.js';
 import { noticeTurnedOff } from './notices.js';
 import { ExtensionStore, type Problem, type ProblemKind } from './store.js';
@@ -22,6 +22,7 @@ export class ExtensionManager {
   private installed: Installed[] = [];
   private readonly instances = new Map<string, ExtensionInstance>();
   private readonly listeners = new Set<() => void>();
+  private readonly pageListeners = new Set<(id: string) => void>();
   private readonly disconnectors: (() => void)[];
   private snapshots: string | null = null;
   private loads = 0;
@@ -34,6 +35,7 @@ export class ExtensionManager {
       snapshotPath: id => GLib.build_filenamev([this.snapshots ??= GLib.dir_make_tmp('kestrel-extensions-XXXXXX'), `${id}-${++this.loads}.js`]),
       failed: (id, error) => this.failed(id, error),
       openSettings: id => openSettings(`extensions/${id}`),
+      pageChanged: id => this.pageListeners.forEach(listener => listener(id)),
     };
     const culprits = this.crashes.culprits;
     for (const id of culprits) this.keepOff(id, { kind: 'crash', detail: '' });
@@ -43,6 +45,7 @@ export class ExtensionManager {
         this.changed();
       }),
       this.store.watchStates(() => this.sync()),
+      this.store.watchShortcuts(() => this.changed()),
       onLocaleChanged(() => this.restartAll()),
     ];
     this.rescan();
@@ -60,6 +63,11 @@ export class ExtensionManager {
   watch(changed: () => void): () => void {
     this.listeners.add(changed);
     return () => this.listeners.delete(changed);
+  }
+
+  watchPages(changed: (id: string) => void): () => void {
+    this.pageListeners.add(changed);
+    return () => this.pageListeners.delete(changed);
   }
 
   private changed(): void {
@@ -102,18 +110,30 @@ export class ExtensionManager {
   remove(id: string): void {
     const installed = this.installed.find(candidate => candidate.id === id);
     if (!installed) return;
+    this.instances.get(id)?.stored.forget();
     this.drop(id);
     removeFolder(installed.path);
+    if (GLib.file_test(dataFolder(id), GLib.FileTest.IS_DIR)) removeFolder(dataFolder(id));
     this.store.forgetValues(id);
+    this.store.forgetShortcuts(id);
     this.store.setProblem(id, null);
     this.store.setDisabled(id, false);
     this.rescan();
   }
 
   setSetting(id: string, key: string, value: SettingValue): void {
+    this.installedInstance(id).values.set(key, value);
+  }
+
+  setShortcut(id: string, key: string, accelerators: string[] | null): void {
+    if (!this.installedInstance(id).manifest.shortcuts?.some(shortcut => shortcut.key === key)) throw new Error(`${key} isn't a shortcut of ${id}`);
+    this.store.setShortcut(id, key, accelerators);
+  }
+
+  private installedInstance(id: string): ExtensionInstance {
     const instance = this.instances.get(id);
     if (!instance) throw new Error(`${id} isn't installed`);
-    instance.values.set(key, value);
+    return instance;
   }
 
   private replace(installed: Installed & { manifest: NonNullable<Installed['manifest']> }): void {

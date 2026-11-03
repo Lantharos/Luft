@@ -4,6 +4,7 @@ import type { SettingDescription } from './api/v1/types.js';
 import type { Installed } from './runtime/folders.js';
 import type { ExtensionInstance } from './runtime/instance.js';
 import type { ExtensionManager } from './runtime/manager.js';
+import { chosenShortcuts } from './runtime/shortcuts.js';
 import { variant } from './runtime/store.js';
 
 type Fields = Record<string, GLib.Variant>;
@@ -11,6 +12,8 @@ type Fields = Record<string, GLib.Variant>;
 const text = (value: string) => GLib.Variant.new_string(value);
 const choices = (options: { value: string; label: string }[], instance: ExtensionInstance) =>
   new GLib.Variant('a(ss)', options.map(option => [option.value, instance.translations.t(option.label)]));
+const pictures = (options: { image?: string }[], instance: ExtensionInstance) =>
+  GLib.Variant.new_strv(options.map(option => GLib.build_filenamev([instance.installed.path, option.image!])));
 
 function described(setting: SettingDescription, instance: ExtensionInstance): Fields {
   const { translations, values } = instance;
@@ -23,7 +26,9 @@ function described(setting: SettingDescription, instance: ExtensionInstance): Fi
     default: variant(setting.default),
   };
   if (setting.depends) fields.depends = text(setting.depends);
+  if (setting.page) fields.page = text(setting.page);
   if (setting.type === 'choice') fields.options = choices(setting.options, instance);
+  if (setting.type === 'choice' && setting.options.every(option => option.image)) fields.images = pictures(setting.options, instance);
   if (setting.type === 'color') fields.swatches = choices(setting.swatches ?? [], instance);
   if (setting.type === 'slider') {
     Object.assign(fields, { min: GLib.Variant.new_double(setting.min), max: GLib.Variant.new_double(setting.max) });
@@ -31,6 +36,19 @@ function described(setting: SettingDescription, instance: ExtensionInstance): Fi
     if (setting.unit) fields.unit = text(setting.unit);
   }
   return fields;
+}
+
+function shortcuts(instance: ExtensionInstance, manager: ExtensionManager): GLib.Variant {
+  const { manifest, translations } = instance;
+  const bound = instance.shortcuts.current?.accelerators ?? chosenShortcuts(manifest.id, manifest, manager.store);
+  const chosen = manager.store.shortcutChoices[manifest.id] ?? {};
+  return new GLib.Variant('aa{sv}', (manifest.shortcuts ?? []).map(shortcut => ({
+    key: text(shortcut.key),
+    label: text(translations.t(shortcut.label)),
+    accelerators: GLib.Variant.new_strv(bound[shortcut.key] ?? []),
+    default: text(shortcut.default ?? ''),
+    changed: GLib.Variant.new_boolean(shortcut.key in chosen),
+  })));
 }
 
 function state(installed: Installed, manager: ExtensionManager): string {
@@ -64,6 +82,8 @@ export function listed(installed: Installed, manager: ExtensionManager): Fields 
     permissions: GLib.Variant.new_strv(manifest.permissions ?? []),
     helper: GLib.Variant.new_boolean(!!manifest.helper),
     settings: new GLib.Variant('aa{sv}', instance.values.descriptions.map(setting => described(setting, instance))),
+    shortcuts: shortcuts(instance, manager),
+    page: GLib.Variant.new_boolean(instance.page.described),
     ...usage ? { cpu: GLib.Variant.new_double(usage.cpu), memory: GLib.Variant.new_uint64(usage.memory) } : {},
   };
 }

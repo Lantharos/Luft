@@ -85,6 +85,8 @@ libshell_public_headers = [
   'mixer/shell-mixer.h',
   'mixer/shell-mixer-device.h',
   'mixer/shell-mixer-stream.h',
+  'sound/shell-audio-monitor.h',
+  'sound/shell-sound-mix.h',
   'sound/shell-sound-player.h',
 ]
 
@@ -137,7 +139,9 @@ libshell_sources = [
   'mixer/shell-mixer-players.c',
   'mixer/shell-mixer-server.c',
   'mixer/shell-mixer-stream.c',
+  'sound/shell-audio-monitor.c',
   'sound/shell-sound-decode.c',
+  'sound/shell-sound-mix.c',
   'sound/shell-sound-output.c',
   'sound/shell-sound-player.c',
   'sound/shell-sound-theme.c',

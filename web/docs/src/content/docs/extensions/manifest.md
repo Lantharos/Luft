@@ -1,6 +1,6 @@
 ---
 title: The manifest
-description: Every field of extension.toml, the permissions and the setting types.
+description: Every field of extension.toml, the permissions, the setting types and keyboard shortcuts.
 sidebar:
   order: 2
 ---
@@ -19,6 +19,7 @@ sidebar:
 | `permissions` | What it uses beyond the basics, see below |
 | `[helper]` | `path` names a program in the folder that the API can start |
 | `[[settings]]` | Settings people change in Settings → Extensions, see below |
+| `[[shortcuts]]` | Keyboard shortcuts people can change in Settings → Keyboard, see below |
 
 ## Permissions
 
@@ -34,8 +35,14 @@ The API object only has the parts an extension asked for. Settings and Schelf sh
 | `weather` | See the weather where you are | `weather` |
 | `location` | See roughly where you are | `location` |
 | `media` | See and control what's playing | `media` |
+| `popups` | Show panels and small windows | `popups` |
+| `typing` | Type into other apps | `typing` |
+| `sounds` | Play sounds | `sounds` |
+| `audio-levels` | Follow the beat of what's playing | `audioLevels` |
 
-A `[helper]` gives `helper`. It's a native program, so Schelf shows that the extension runs one and scans it like any app.
+A `[helper]` gives `helper`. It's a native program, so Schelf shows that the extension runs one and scans it like any app. `[[shortcuts]]` gives `shortcuts`.
+
+`typing` is the one to ask for least: an extension can only type within ten seconds of someone using it, and the taskbar shows that it did.
 
 ## Settings
 
@@ -48,13 +55,14 @@ Each `[[settings]]` table is one setting. Settings draws it with Luft's own cont
 | `label` | A message id. Its value is the title, its `.description` attribute the line under it |
 | `default` | The value until someone changes it |
 | `depends` | A switch declared earlier; the setting only shows while that switch is on |
+| `page` | Another page of Settings the setting also shows on, under the extension's name: `appearance` (needs `wallpaper`), `taskbar` (needs `taskbar`), `sound` (needs `sounds` or `audio-levels`) or `input` (needs `typing`) |
 
 | Type | Value | Extra fields | Shows as |
 | --- | --- | --- | --- |
 | `switch` | `true` or `false` | | A switch |
-| `choice` | One option's `value` | `options`, a list of `{ value, label }` with message ids as labels | Buttons side by side for up to three options, a menu for more |
+| `choice` | One option's `value` | `options`, a list of `{ value, label, image? }` with message ids as labels | Buttons side by side for up to three options, a menu for more, or pictures when every option has an `image` |
 | `slider` | A number from `min` to `max` | `min`, `max`, `step`, and `unit = "percent"` to show it as a percentage | A slider |
-| `color` | `#rrggbb`, or `accent` for the accent colour | `swatches`, a list of `{ value, label }` offered first | Swatches and a colour picker |
+| `color` | `#rrggbb`, `accent` for the accent colour, or `wallpaper` for the colour the wallpaper suggests | `swatches`, a list of `{ value, label }` offered first | Swatches and a colour picker |
 
 ```toml
 [[settings]]
@@ -76,3 +84,26 @@ swatches = [{ value = "accent", label = "tint-accent" }, { value = "#f2efe8", la
 ```
 
 Values are stored per account. A value that no longer fits after an update, such as an option that was removed, falls back to the default.
+
+An option's `image` is a PNG, JPEG, WebP or SVG in the extension's folder, best at 3:2, showing what the option looks like.
+
+The page Settings shows for an extension lists these settings. An extension that needs more, such as lists of its own or values only it knows, describes a whole page with [`settingsPage`](/extensions/api/#settings-page); the settings declared here keep working inside it.
+
+## Shortcuts
+
+Each `[[shortcuts]]` table is a keyboard shortcut that works anywhere but the lock screen while the extension runs. People see and change it in Settings → Keyboard → Shortcuts, under Extensions.
+
+| Field | Means |
+| --- | --- |
+| `key` | Lowercase, with dashes, unique among its shortcuts |
+| `label` | A message id saying what it does |
+| `default` | What it's set to at first, such as `<Super><Alt>v` |
+
+A default that Luft, an app or another extension already uses, or that people could type by accident, such as a single letter, stays unset until someone picks a shortcut for it.
+
+```toml
+[[shortcuts]]
+key = "show"
+label = "shortcut-show"
+default = "<Super><Alt>v"
+```

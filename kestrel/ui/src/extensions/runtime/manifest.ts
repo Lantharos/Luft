@@ -1,6 +1,6 @@
 import { parse } from 'smol-toml';
 
-import type { ChoiceOption, Manifest, Permission, SettingDescription, SettingValue } from '../api/v1/types.js';
+import type { ChoiceOption, Manifest, Permission, SettingDescription, SettingsPageId, SettingValue, ShortcutDescription } from '../api/v1/types.js';
 import { API_VERSIONS } from '../api/versions.js';
 
 export const MANIFEST = 'extension.toml';
@@ -10,7 +10,16 @@ const ID = /^[A-Za-z][A-Za-z0-9_-]*(\.[A-Za-z][A-Za-z0-9_-]*){2,}$/;
 const KEY = /^[a-z][a-z0-9-]*$/;
 const MESSAGE = /^[a-zA-Z][\w-]*$/;
 const HEX = /^#[0-9a-f]{6}$/i;
-const PERMISSIONS: readonly Permission[] = ['wallpaper', 'quick-settings', 'taskbar', 'search', 'notifications', 'weather', 'location', 'media'];
+const PERMISSIONS: readonly Permission[] = [
+  'wallpaper', 'quick-settings', 'taskbar', 'search', 'notifications', 'weather', 'location', 'media', 'popups', 'typing', 'sounds', 'audio-levels',
+];
+const PAGES: Record<SettingsPageId, readonly Permission[]> = {
+  appearance: ['wallpaper'],
+  taskbar: ['taskbar'],
+  sound: ['sounds', 'audio-levels'],
+  input: ['typing'],
+};
+const IMAGE = /\.(png|jpe?g|webp|svg)$/i;
 
 export class ManifestError extends Error {}
 
@@ -47,10 +56,24 @@ function list(source: Table, key: string, where: string): unknown[] {
   return value;
 }
 
+export function insideFolder(path: string): boolean {
+  return !path.startsWith('/') && !path.split('/').includes('..');
+}
+
+function image(source: Table, where: string): string | undefined {
+  const path = optionalText(source, 'image', where);
+  if (path !== undefined && (!insideFolder(path) || !IMAGE.test(path))) fail(`${where}.image must be a PNG, JPEG, WebP or SVG inside the extension`);
+  return path;
+}
+
 function options(source: Table, key: string, where: string): ChoiceOption[] {
   return list(source, key, where).map((entry, index) => {
-    const option = table(entry, `${where}.${key}[${index}]`);
-    return { value: text(option, 'value', `${where}.${key}[${index}]`), label: text(option, 'label', `${where}.${key}[${index}]`, MESSAGE) };
+    const at = `${where}.${key}[${index}]`;
+    const option = table(entry, at);
+    const described: ChoiceOption = { value: text(option, 'value', at), label: text(option, 'label', at, MESSAGE) };
+    const picture = image(option, at);
+    if (picture) described.image = picture;
+    return described;
   });
 }
 
@@ -59,14 +82,26 @@ export function validValue(setting: SettingDescription, value: unknown): value i
     case 'switch': return typeof value === 'boolean';
     case 'choice': return setting.options.some(option => option.value === value);
     case 'slider': return typeof value === 'number' && value >= setting.min && value <= setting.max;
-    case 'color': return value === 'accent' || (typeof value === 'string' && HEX.test(value));
+    case 'color': return value === 'accent' || value === 'wallpaper' || (typeof value === 'string' && HEX.test(value));
   }
 }
 
-function setting(entry: unknown, index: number): SettingDescription {
+function page(source: Table, where: string, permissions: readonly Permission[]): SettingsPageId | undefined {
+  const value = source.page;
+  if (value === undefined) return undefined;
+  if (typeof value !== 'string' || !(value in PAGES)) fail(`${where}.page must be appearance, taskbar, sound or input`);
+  const allowed = PAGES[value as SettingsPageId];
+  if (!allowed.some(permission => permissions.includes(permission))) fail(`${where} shows on the ${value} page, which needs the ${allowed.join(' or ')} permission`);
+  return value as SettingsPageId;
+}
+
+function setting(entry: unknown, index: number, permissions: readonly Permission[]): SettingDescription {
   const where = `settings[${index}]`;
   const source = table(entry, where);
-  const base = { key: text(source, 'key', where, KEY), label: text(source, 'label', where, MESSAGE), depends: optionalText(source, 'depends', where) };
+  const base = {
+    key: text(source, 'key', where, KEY), label: text(source, 'label', where, MESSAGE), depends: optionalText(source, 'depends', where),
+    page: page(source, where, permissions),
+  };
   const type = source.type;
   let described: SettingDescription;
   switch (type) {
@@ -112,8 +147,24 @@ function dependencies(settings: SettingDescription[]): void {
 function helper(source: Table): Manifest['helper'] {
   if (source.helper === undefined) return undefined;
   const path = text(table(source.helper, 'helper'), 'path', 'helper');
-  if (path.startsWith('/') || path.split('/').includes('..')) fail('helper.path must stay inside the extension');
+  if (!insideFolder(path)) fail('helper.path must stay inside the extension');
   return { path };
+}
+
+function shortcut(entry: unknown, index: number): ShortcutDescription {
+  const where = `shortcuts[${index}]`;
+  const source = table(entry, where);
+  const described: ShortcutDescription = { key: text(source, 'key', where, KEY), label: text(source, 'label', where, MESSAGE) };
+  const accelerator = optionalText(source, 'default', where);
+  if (accelerator !== undefined) described.default = accelerator;
+  return described;
+}
+
+function shortcuts(source: Table): ShortcutDescription[] {
+  const described = list(source, 'shortcuts', 'manifest').map(shortcut);
+  const keys = new Set(described.map(entry => entry.key));
+  if (keys.size !== described.length) fail('shortcuts has a key twice');
+  return described;
 }
 
 export function parseManifest(source: string): Manifest {
@@ -129,7 +180,7 @@ export function parseManifest(source: string): Manifest {
     if (!PERMISSIONS.includes(permission as Permission)) fail(`it asks for an unknown permission, ${String(permission)}`);
     return permission as Permission;
   });
-  const settings = list(document, 'settings', 'manifest').map(setting);
+  const settings = list(document, 'settings', 'manifest').map((entry, index) => setting(entry, index, permissions));
   dependencies(settings);
   return {
     id: text(document, 'id', 'manifest', ID),
@@ -139,6 +190,7 @@ export function parseManifest(source: string): Manifest {
     api: api as Manifest['api'],
     permissions,
     settings,
+    shortcuts: shortcuts(document),
     helper: helper(document),
   };
 }

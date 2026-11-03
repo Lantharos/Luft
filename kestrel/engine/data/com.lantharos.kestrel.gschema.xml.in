@@ -341,6 +341,14 @@
         extension id and key. Settings that keep their default are left out.
       </description>
     </key>
+    <key name="extension-shortcuts" type="a{sa{sas}}">
+      <default>{}</default>
+      <summary>Shortcuts of extensions</summary>
+      <description>
+        The keyboard shortcuts people set for extensions, by extension id and
+        the key the manifest declares. Shortcuts left at their default are left out.
+      </description>
+    </key>
     <key name="extension-problems" type="a{s(ss)}">
       <default>{}</default>
       <summary>Why Kestrel turned extensions off</summary>

@@ -126,13 +126,13 @@ use_luft_defaults() {
 
 # A new account gets the extensions Luft preinstalls once, the way Schelf installs them at its first sign-in
 preinstall_extensions() {
-  local installed="$session/data/luft/extensions" record="$session/state/luft/preinstalled" built id
+  local installed="$session/data/luft/extensions" record="$session/state/luft/preinstalled" id
   mkdir -p "$installed" "${record%/*}"
   touch "$record"
-  for built in "$built_extensions"/*; do
-    id="${built##*/}"
+  for id in $(sed -n 's/^id = "\(.*\)"$/\1/p' "$root/os/image/parts/store/apps.toml"); do
+    [[ -d "$built_extensions/$id" ]] || continue
     grep -qxF "$id.json" "$record" && continue
-    cp -r "$built" "$installed/"
+    cp -r "$built_extensions/$id" "$installed/"
     echo "$id.json" >> "$record"
   done
 }

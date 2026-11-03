@@ -1,8 +1,8 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
-import GLib from 'gi://GLib';
 import * as MessageTray from '../../surfaces/notifications/tray/messageTray.js';
 import { getInputSourceManager } from '../inputSources/keyboard.js';
+import { afterModifiersAreReleased } from '../../shared/input/modifiers.js';
 
 import type { Context } from '../../context.js';
 import { t } from '../../shared/i18n/index.js';
@@ -13,8 +13,6 @@ import { DictationPill } from './pill/pill.js';
 import { NotInstalled, Speech, Unsupported } from './speech.js';
 
 const HELD_MODIFIERS = Clutter.ModifierType.SHIFT_MASK | Clutter.ModifierType.SUPER_MASK | Clutter.ModifierType.MOD4_MASK;
-const MODIFIER_POLL_MS = 20;
-const MODIFIER_WAIT_MS = 1000;
 
 type Phase = 'idle' | 'listening' | 'finishing';
 type Mode = 'hold' | 'toggle';
@@ -23,16 +21,6 @@ function currentLayout(): string {
   const manager = getInputSourceManager();
   const source = manager.currentSource;
   return source?.type === 'xkb' ? source.id : manager.keyboardManager.currentLayout?.id ?? '';
-}
-
-function afterModifiersAreReleased(run: () => void): void {
-  const deadline = GLib.get_monotonic_time() + MODIFIER_WAIT_MS * 1000;
-  GLib.timeout_add(GLib.PRIORITY_DEFAULT, MODIFIER_POLL_MS, () => {
-    const [, , modifiers] = global.get_pointer();
-    if (modifiers & HELD_MODIFIERS && GLib.get_monotonic_time() < deadline) return GLib.SOURCE_CONTINUE;
-    run();
-    return GLib.SOURCE_REMOVE;
-  });
 }
 
 export class Dictation {
@@ -152,7 +140,7 @@ export class Dictation {
     const text = this.unplaced + rest;
     if (!text) return;
     if (this.context.inputMethod.currentFocus) this.context.inputMethod.commit(text);
-    else afterModifiersAreReleased(() => this.paste(text));
+    else afterModifiersAreReleased(() => this.paste(text), HELD_MODIFIERS);
   }
 
   private clearPreedit(): void {

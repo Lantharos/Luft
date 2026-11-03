@@ -15,11 +15,20 @@ export interface Disposable {
  * - `weather`: See the weather where you are
  * - `location`: See roughly where you are
  * - `media`: See and control what's playing
+ * - `popups`: Show panels and small windows
+ * - `typing`: Type into other apps
+ * - `sounds`: Play sounds
+ * - `audio-levels`: Follow the beat of what's playing
  */
-export type Permission = 'wallpaper' | 'quick-settings' | 'taskbar' | 'search' | 'notifications' | 'weather' | 'location' | 'media';
+export type Permission =
+  | 'wallpaper' | 'quick-settings' | 'taskbar' | 'search' | 'notifications' | 'weather' | 'location' | 'media'
+  | 'popups' | 'typing' | 'sounds' | 'audio-levels';
 
-/** A permission, or `helper` for an extension whose manifest declares a native helper. */
-export type Capability = Permission | 'helper';
+/**
+ * A permission, `helper` for an extension whose manifest declares a native helper, or `shortcuts` for one that
+ * declares keyboard shortcuts.
+ */
+export type Capability = Permission | 'helper' | 'shortcuts';
 
 type CamelCase<Name extends string> = Name extends `${infer Head}-${infer Tail}` ? `${Head}${Capitalize<CamelCase<Tail>>}` : Name;
 
@@ -33,7 +42,12 @@ export interface Capabilities {
   weather: Weather;
   location: Location;
   media: Media;
+  popups: Popups;
+  typing: Typing;
+  sounds: Sounds;
+  'audio-levels': AudioLevels;
   helper: Helper;
+  shortcuts: Shortcuts;
 }
 
 /** What every extension gets, whatever it asked for. */
@@ -44,12 +58,24 @@ export interface Basics {
   readonly version: string;
   /** The extension's folder, for files it ships. */
   readonly path: string;
+  /** A folder of the extension's own for files it writes, kept across updates and deleted when it's removed. Kestrel makes it on first use. */
+  readonly dataPath: string;
   readonly settings: Settings;
+  /** The extension's own page in Settings. */
+  readonly settingsPage: SettingsPage;
+  /** Small values the extension keeps, such as what someone last picked. */
+  readonly storage: Storage;
   readonly timers: Timers;
   readonly session: Session;
+  readonly desktop: Desktop;
+  readonly power: Power;
   readonly appearance: Appearance;
   /** A message from the extension's translations, in the language Kestrel uses. Kestrel turns the extension off and on again when the language changes. */
   t(id: string, args?: Record<string, string | number>): string;
+  /** Opens a web link in the browser, or a file or folder in the app that opens it, such as `https://luft.computer` or `file:///home/…`. */
+  open(uri: string): void;
+  /** Opens the extension's page in Settings. */
+  openSettings(): void;
   /** Runs `cleanup` when the extension is turned off, after everything it made through this API is gone. */
   onDisable(cleanup: () => void): Disposable;
 }
@@ -88,15 +114,48 @@ export interface Session {
   onChanged(changed: () => void): Disposable;
 }
 
+export interface Desktop {
+  /**
+   * Whether the wallpaper shows on any display: windows leave some of it uncovered, nothing runs full screen and the
+   * screen isn't locked.
+   */
+  readonly wallpaperVisible: boolean;
+  onChanged(changed: () => void): Disposable;
+}
+
+export interface Power {
+  /** Whether the computer runs on its battery. */
+  readonly onBattery: boolean;
+  /** Whether the computer saves power: the power saver mode is on. Do less while it is. */
+  readonly saving: boolean;
+  onChanged(changed: () => void): Disposable;
+}
+
 /** A colour as `#rrggbb`. */
 export type Color = string;
 
 export interface Appearance {
   /** The accent colour the person chose or the wallpaper suggests. */
   readonly accent: Color;
+  /** The colour the wallpaper suggests, whatever accent the person chose. */
+  readonly wallpaperAccent: Color;
   /** Whether the desktop uses its dark style. */
   readonly dark: boolean;
+  /** Whether people asked for less motion, or animations are off. Keep things still or slow while it's on. */
+  readonly reducedMotion: boolean;
   onChanged(changed: () => void): Disposable;
+}
+
+/** What {@link Storage} keeps: anything JSON can hold. */
+export type Stored = null | boolean | number | string | readonly Stored[] | { readonly [key: string]: Stored };
+
+/** Values kept across restarts and updates, up to 1 MB in all, and deleted when the extension is removed. */
+export interface Storage {
+  get<Value extends Stored = Stored>(key: string): Value | undefined;
+  /** Keeps a value. Kestrel writes it to disk soon after, and when the extension is turned off. */
+  set(key: string, value: Stored): void;
+  delete(key: string): void;
+  keys(): string[];
 }
 
 /** A rectangle in pixels. */
@@ -108,7 +167,7 @@ export interface Rect {
 }
 
 export interface Wallpaper {
-  /** Draws a shader over the wallpaper and under every window on each display. */
+  /** Draws a shader across each display, over the wallpaper. */
   addLayer(layer: LayerOptions): Layer;
 }
 
@@ -117,14 +176,33 @@ export interface LayerOptions {
   declarations?: string;
   /**
    * GLSL statements run for every pixel. They can read `vec2 layer_position`, the pixel's place in pixels from the
-   * display's top left corner, and `vec2 layer_size`, and they set `vec4 layer_color` to the pixel's colour with
-   * premultiplied alpha. It starts out transparent.
+   * display's top left corner, and `vec2 layer_size`, the display's size, and they set `vec4 layer_color` to the
+   * pixel's colour with premultiplied alpha. It starts out transparent.
    */
   shader: string;
   /** Runs before every frame the layer draws, to set its uniforms. */
   frame(frame: LayerFrame): void;
   /** Whether the layer starts out active, as {@link Layer.active}. It does unless this is `false`. */
   active?: boolean;
+  /**
+   * `above-windows`, the default, draws over windows too, so it can reach them, and should leave their rectangles
+   * clear. `below-windows` draws between the wallpaper and the windows.
+   */
+  depth?: 'above-windows' | 'below-windows';
+  /**
+   * The part of each display the layer covers, relative to its top left corner, such as a band along the bottom, or
+   * `null` to leave the display out. The shader only runs there, which costs far less than the whole display. It
+   * covers every display whole without this. Kestrel asks again when displays change and after {@link Layer.reshape}.
+   */
+  area?(display: LayerArea): Rect | null;
+}
+
+export interface LayerArea {
+  /** Which display this is, as Kestrel numbers them. */
+  readonly index: number;
+  readonly primary: boolean;
+  readonly width: number;
+  readonly height: number;
 }
 
 export interface LayerFrame {
@@ -137,6 +215,10 @@ export interface LayerFrame {
 }
 
 export interface LayerDisplay {
+  /** Which display this is, as Kestrel numbers them. */
+  readonly index: number;
+  /** Whether it's the primary display. */
+  readonly primary: boolean;
   readonly width: number;
   readonly height: number;
   /** Windows on this display, topmost first, relative to its top left corner. */
@@ -151,10 +233,12 @@ export interface LayerDisplay {
 
 export interface Layer extends Disposable {
   /**
-   * Whether the layer wants to draw. It only draws while it's active, the wallpaper shows on a display and animations
-   * are on, fading in and out, and an inactive layer holds nothing on screen.
+   * Whether the layer wants to draw. It only draws while it's active, the wallpaper shows on a display, animations
+   * are on and the computer isn't saving power, fading in and out, and an inactive layer holds nothing on screen.
    */
   active: boolean;
+  /** Asks {@link LayerOptions.area} again for every display, after what it depends on changed. */
+  reshape(): void;
 }
 
 /** A menu entry that runs something. */
@@ -215,6 +299,214 @@ export interface TaskbarItemOptions {
 
 export interface TaskbarItem extends Disposable {
   update(changes: Partial<TaskbarItemOptions>): void;
+}
+
+export interface Popups {
+  /** Opens a panel or a small window that Kestrel draws from `content`, in Luft's style. */
+  open(options: PopupOptions): Popup;
+}
+
+/** A point in pixels from the top left corner of all displays. */
+export interface Point {
+  x: number;
+  y: number;
+}
+
+/** A place on the display the pointer is on, inside the area windows use. */
+export type ScreenPosition = 'top-left' | 'top' | 'top-right' | 'left' | 'center' | 'right' | 'bottom-left' | 'bottom' | 'bottom-right';
+
+/** Where a pop-up appears: next to one of the extension's taskbar items, at the pointer, at a place on the display, or at a point. */
+export type PopupAnchor = TaskbarItem | 'pointer' | ScreenPosition | Point;
+
+export interface PopupOptions {
+  anchor: PopupAnchor;
+  /** What screen readers call it, and a window's title. */
+  title: string;
+  content: View;
+  /**
+   * A `panel`, the default, takes the keyboard while it's open and closes when people press Escape, click elsewhere
+   * or open something else, like quick settings. A `window` floats above the windows without taking the keyboard
+   * until people click into it, has a title and a close button, and stays until it's closed or people drag it away.
+   */
+  kind?: 'panel' | 'window';
+  /** Width in pixels, 200 to 560; 340 without it. The height follows the content, up to what fits on the display. */
+  width?: number;
+  /** Runs once when it closes, however it closes. */
+  onClosed?(): void;
+}
+
+export interface Popup extends Disposable {
+  /** Whether it's still showing. Disposing it closes it. */
+  readonly open: boolean;
+  /** Shows new content. Parts that kept their place and kind are updated where they are, so sliders keep being dragged and fields keep their caret. */
+  update(content: View): void;
+}
+
+/**
+ * What a pop-up shows: a tree of Luft's own controls. `column` and `row` arrange their children; the rest are
+ * controls. Callbacks run in the extension, and a callback that throws turns it off like any other.
+ */
+export type View =
+  | StackView | TextView | IconView | ImageView | ButtonView | SwitchView | SliderView | EntryView | ItemView | ProgressView
+  | { type: 'separator' } | { type: 'spacer' };
+
+export interface StackView {
+  type: 'column' | 'row';
+  children: readonly View[];
+  /** Pixels between children; 8 without it. */
+  spacing?: number;
+  /** How children line up across the stack: `fill`, the default for columns, stretches them. */
+  align?: 'start' | 'center' | 'end' | 'fill';
+}
+
+export interface TextView {
+  type: 'text';
+  text: string;
+  /** `body` without it. `number` keeps digits the same width, for clocks and counters. */
+  style?: 'title' | 'body' | 'caption' | 'number';
+}
+
+export interface IconView {
+  type: 'icon';
+  icon: Icon;
+  /** Pixels; 16 without it. */
+  size?: number;
+}
+
+export interface ImageView {
+  type: 'image';
+  /** A PNG, JPEG, WebP or SVG in the extension's folder or data folder. */
+  path: string;
+  width: number;
+  height: number;
+}
+
+export interface ButtonView {
+  type: 'button';
+  /** A label, an icon or both. Give an icon-only button a `label` anyway for screen readers, with `iconOnly`. */
+  label?: string;
+  icon?: Icon;
+  iconOnly?: boolean;
+  style?: 'default' | 'primary' | 'flat';
+  disabled?: boolean;
+  onActivate(): void;
+}
+
+export interface SwitchView {
+  type: 'switch';
+  label: string;
+  checked: boolean;
+  onToggled(checked: boolean): void;
+}
+
+export interface SliderView {
+  type: 'slider';
+  /** For screen readers. */
+  label: string;
+  /** 0 to 1. */
+  value: number;
+  onChanged(value: number): void;
+}
+
+export interface EntryView {
+  type: 'entry';
+  /** For screen readers, and shown while it's empty unless there's a `placeholder`. */
+  label: string;
+  placeholder?: string;
+  /** What it starts with. Later updates leave what people typed alone unless this changes. */
+  text?: string;
+  onChanged?(text: string): void;
+  /** Runs when people press Enter. */
+  onSubmit?(text: string): void;
+}
+
+/** A row people can pick, like an entry in a list of results. */
+export interface ItemView {
+  type: 'item';
+  title: string;
+  subtitle?: string;
+  icon?: Icon;
+  /** A check mark at the end. */
+  checked?: boolean;
+  onActivate?(): void;
+}
+
+export interface ProgressView {
+  type: 'progress';
+  /** 0 to 1. */
+  value: number;
+}
+
+export interface Shortcuts {
+  /** Runs `activated` when people press the shortcut declared as `key`, wherever they are, unless the screen is locked. */
+  onActivated(key: string, activated: () => void): Disposable;
+  /** What the shortcut is set to, as people read it, such as `Super+Alt+V`, or `null` while it has none. */
+  label(key: string): string | null;
+}
+
+export interface Typing {
+  /**
+   * Types `text` into whatever has the keyboard, as if people typed it, and returns whether it could. An extension can
+   * only type within ten seconds of people using it, through its shortcut, a pop-up, taskbar item, quick settings
+   * tile, notification or search result, and the taskbar shows that it typed. A panel of the extension that's open
+   * closes first, so the text goes where it was going before.
+   */
+  type(text: string): boolean;
+}
+
+export interface Sounds {
+  /**
+   * Plays a sound file in the extension's folder, such as an Ogg, FLAC or WAV file. Everything an extension plays goes
+   * through one stream with its name, which people can turn down in Sound settings, and goes quiet while the screen
+   * is locked. Files are decoded once and kept while they play, so keep loops short, a minute at most.
+   */
+  play(path: string, options?: SoundOptions): Sound;
+  /** The volume of everything the extension plays, 0 to 1, changed smoothly. */
+  volume: number;
+}
+
+export interface SoundOptions {
+  /** 0 to 1; 1 without it. */
+  volume?: number;
+  /** Plays it again from the start without a gap, until it's stopped. */
+  loop?: boolean;
+  /** Milliseconds to fade in over. */
+  fadeIn?: number;
+}
+
+export interface Sound extends Disposable {
+  /** Whether it's still playing or loading. */
+  readonly playing: boolean;
+  /** Changes its volume, 0 to 1, over `fade` milliseconds. */
+  setVolume(volume: number, fade?: number): void;
+  /** Fades it out over `fade` milliseconds, then stops it. Disposing stops it at once. */
+  stop(fade?: number): void;
+  /** Runs `ended` when it stops: at its end, after `stop`, or when it can't be played. */
+  onEnded(ended: () => void): Disposable;
+}
+
+export interface AudioLevels {
+  /** Whether any app plays sound. */
+  readonly playing: boolean;
+  onPlayingChanged(changed: () => void): Disposable;
+  /**
+   * Starts listening to everything the computer plays, split into `bands` from low to high, 1 to 64. Kestrel only
+   * listens while a listener is open and something plays, so an open listener costs nothing in silence.
+   */
+  listen(bands: number): AudioListener;
+}
+
+export interface AudioListener extends Disposable {
+  /**
+   * How loud it is now, and how loud each band is, low to high, all 0 to 1 and 0 while nothing plays. It's cheap
+   * enough to read in every frame of a wallpaper layer; smooth the values to taste.
+   */
+  read(): AudioReading;
+}
+
+export interface AudioReading {
+  readonly level: number;
+  readonly bands: readonly number[];
 }
 
 export interface Search {
@@ -282,9 +574,14 @@ export interface Coordinates {
 export interface Location {
   /** Roughly where the computer is, to the city, or `null` while location services are off or the position is unknown. */
   current(): Promise<Coordinates | null>;
+  /** Runs `changed` when the computer has moved to another city, checked about every ten minutes. */
+  onChanged(changed: (coordinates: Coordinates) => void): Disposable;
 }
 
 export type WeatherCondition = 'clear' | 'clouds' | 'fog' | 'drizzle' | 'rain' | 'snow' | 'storm';
+
+/** The season where the computer is, by the date and which side of the equator it's on. */
+export type Season = 'spring' | 'summer' | 'autumn' | 'winter';
 
 export interface WeatherReport {
   condition: WeatherCondition;
@@ -295,6 +592,10 @@ export interface WeatherReport {
   /** Kilometres an hour. */
   wind: number;
   daytime: boolean;
+  /** Today's sunrise and sunset there, in milliseconds since 1970. */
+  sunrise: number;
+  sunset: number;
+  season: Season;
   /** When the report was made, in milliseconds since 1970. */
   time: number;
 }
@@ -326,12 +627,20 @@ export interface Media {
 /** Which extension API a manifest targets. Kestrel keeps every version it shipped working. */
 export type ApiVersion = 1;
 
+/**
+ * A Settings page besides the extension's own where a setting can show too, with the permission that allows it:
+ * `appearance` (`wallpaper`), `taskbar` (`taskbar`), `sound` (`sounds` or `audio-levels`) and `input` (`typing`).
+ */
+export type SettingsPageId = 'appearance' | 'taskbar' | 'sound' | 'input';
+
 interface SettingBase {
   key: string;
   /** A message id from the extension's translations: its value is the title, its `.description` attribute the line under it. */
   label: string;
   /** Shows the setting only while this switch, declared before it, is on. */
   depends?: string;
+  /** Also shows the setting on this page of Settings, under the extension's name. */
+  page?: SettingsPageId;
 }
 
 export interface SwitchSetting extends SettingBase {
@@ -343,6 +652,8 @@ export interface ChoiceOption {
   value: string;
   /** A message id from the extension's translations. */
   label: string;
+  /** A picture of the option, a PNG, JPEG, WebP or SVG in the extension's folder. When every option has one, Settings offers them as pictures. */
+  image?: string;
 }
 
 export interface ChoiceSetting extends SettingBase {
@@ -363,13 +674,120 @@ export interface SliderSetting extends SettingBase {
 
 export interface ColorSetting extends SettingBase {
   type: 'color';
-  /** `#rrggbb`, or `accent` for the accent colour. */
+  /** `#rrggbb`, `accent` for the accent colour, or `wallpaper` for the colour the wallpaper suggests. */
   default: string;
-  /** Colours offered first, each `#rrggbb` or `accent`. Settings also offers any other colour. */
+  /** Colours offered first, each `#rrggbb`, `accent` or `wallpaper`. Settings also offers any other colour. */
   swatches?: ChoiceOption[];
 }
 
 export type SettingDescription = SwitchSetting | ChoiceSetting | SliderSetting | ColorSetting;
+
+/** A keyboard shortcut the extension offers. People can change it in Settings → Keyboard. */
+export interface ShortcutDescription {
+  key: string;
+  /** A message id from the extension's translations, saying what the shortcut does. */
+  label: string;
+  /**
+   * What it's set to at first, such as `<Super><Alt>v`. It stays unset when this is taken by Luft, an app or another
+   * extension, or isn't a combination people can't type by accident.
+   */
+  default?: string;
+}
+
+/**
+ * The extension's page in Settings → Extensions. Without a description it lists the declared settings; with one it
+ * shows what `build` returns, below the switch that turns the extension on and off.
+ */
+export interface SettingsPage {
+  /**
+   * Describes the page. Kestrel calls `build` only while Settings shows the page: when it opens, after a declared
+   * setting changes, and after {@link refresh}. While the extension is off, Settings lists its declared settings.
+   */
+  describe(build: () => readonly PageSection[]): Disposable;
+  /** Asks for the page to be built again, when something only the extension knows has changed. */
+  refresh(): void;
+}
+
+export interface PageSection {
+  title?: string;
+  description?: string;
+  items: readonly PageItem[];
+}
+
+/**
+ * A row of a Settings page. `{ setting }` shows a declared setting the way Settings shows it; the others show values
+ * the extension keeps itself, and their callbacks run in the extension. Images are files in the extension's folder or
+ * data folder.
+ */
+export type PageItem =
+  | { setting: string }
+  | PageRow | PageSwitch | PageChoice | PageSlider | PageButton | PageEntry | PagePreview | PageList | { type: 'text'; text: string };
+
+interface PageControl {
+  title: string;
+  description?: string;
+}
+
+/** A line with a value at its end, which opens something when `onActivate` is there. */
+export interface PageRow extends PageControl {
+  type: 'row';
+  value?: string;
+  onActivate?(): void;
+}
+
+export interface PageSwitch extends PageControl {
+  type: 'switch';
+  checked: boolean;
+  onToggled(checked: boolean): void;
+}
+
+export interface PageChoice extends PageControl {
+  type: 'choice';
+  value: string;
+  /** Labels are text here, not message ids. */
+  options: readonly { value: string; label: string; image?: string }[];
+  onChanged(value: string): void;
+}
+
+export interface PageSlider extends PageControl {
+  type: 'slider';
+  value: number;
+  min: number;
+  max: number;
+  step?: number;
+  unit?: 'percent';
+  onChanged(value: number): void;
+}
+
+export interface PageButton extends PageControl {
+  type: 'button';
+  label: string;
+  danger?: boolean;
+  onActivate(): void;
+}
+
+export interface PageEntry extends PageControl {
+  type: 'entry';
+  value: string;
+  placeholder?: string;
+  /** Runs when people press Enter or leave the field after changing it. */
+  onSubmit(text: string): void;
+}
+
+/** A picture across the page, such as what the current choices look like. */
+export interface PagePreview {
+  type: 'preview';
+  image: string;
+  /** What the picture shows, for screen readers. */
+  description: string;
+}
+
+export interface PageList {
+  type: 'list';
+  items: readonly { title: string; description?: string; image?: string; actions?: readonly { label: string; danger?: boolean; onActivate(): void }[] }[];
+  /** What the list says while it's empty. */
+  empty?: string;
+}
 
 /** `extension.toml`, the manifest at the top of an extension's folder. */
 export interface Manifest {
@@ -383,6 +801,7 @@ export interface Manifest {
   api: ApiVersion;
   permissions?: Permission[];
   settings?: SettingDescription[];
+  shortcuts?: ShortcutDescription[];
   /** A native program in the extension's folder that {@link Helper} starts. */
   helper?: { path: string };
 }

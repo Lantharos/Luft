@@ -6,6 +6,7 @@ import { LEVEL_METERS } from '../../shared/apps/levelMeters.js';
 import { ownDictation } from '../dictation/listening.js';
 import { windowAccess } from '../peek/access/grants.js';
 import { cameraMonitor } from './camera.js';
+import { typingActivity } from './typing.js';
 
 export interface PrivacyState {
   camera: boolean;
@@ -14,6 +15,7 @@ export interface PrivacyState {
   recording: boolean;
   location: boolean;
   windows: boolean;
+  typing: boolean;
 }
 
 export class PrivacyMonitor {
@@ -44,6 +46,7 @@ export class PrivacyMonitor {
     });
     this.disconnectors.push(
       windowAccess.watch(changed),
+      typingActivity.watch(changed),
       ownDictation.watch(dictationChanged),
       () => this.camera.disconnect(camera),
       () => this.mixer.disconnect(recording),
@@ -66,6 +69,7 @@ export class PrivacyMonitor {
       recording: [...this.handles].some(handle => handle.is_recording),
       location: this.geoclue.inUse,
       windows: windowAccess.active.length > 0,
+      typing: typingActivity.active.length > 0,
     };
   }
 

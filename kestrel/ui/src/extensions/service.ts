@@ -20,8 +20,27 @@ const INTERFACE = `<node>
       <arg type="s" name="key" direction="in"/>
       <arg type="v" name="value" direction="in"/>
     </method>
+    <method name="SetShortcut">
+      <arg type="s" name="id" direction="in"/>
+      <arg type="s" name="key" direction="in"/>
+      <arg type="as" name="accelerators" direction="in"/>
+    </method>
+    <method name="ResetShortcut">
+      <arg type="s" name="id" direction="in"/>
+      <arg type="s" name="key" direction="in"/>
+    </method>
+    <method name="Page">
+      <arg type="s" name="id" direction="in"/>
+      <arg type="s" name="page" direction="out"/>
+    </method>
+    <method name="Act">
+      <arg type="s" name="id" direction="in"/>
+      <arg type="s" name="control" direction="in"/>
+      <arg type="v" name="value" direction="in"/>
+    </method>
     <property name="ApiVersions" type="au" access="read"/>
     <signal name="ExtensionsChanged"/>
+    <signal name="PageChanged"><arg type="s" name="id"/></signal>
   </interface>
 </node>`;
 const CHANGED_DELAY = 50;
@@ -30,11 +49,13 @@ const CHANGED_DELAY = 50;
 export class ExtensionsService {
   private readonly dbus = Gio.DBusExportedObject.wrapJSObject(INTERFACE, this);
   private readonly unwatch: () => void;
+  private readonly unwatchPages: () => void;
   private changedSource = 0;
 
   constructor(private readonly manager: ExtensionManager) {
     this.dbus.export(Gio.DBus.session, PATH);
     this.unwatch = manager.watch(() => this.queueChanged());
+    this.unwatchPages = manager.watchPages(id => this.dbus.emit_signal('PageChanged', new GLib.Variant('(s)', [id])));
   }
 
   get ApiVersions(): number[] {
@@ -66,6 +87,26 @@ export class ExtensionsService {
     this.answer(invocation, 'change extension settings', () => this.manager.setSetting(id, key, value.deepUnpack() as SettingValue));
   }
 
+  SetShortcutAsync([id, key, accelerators]: [string, string, string[]], invocation: Gio.DBusMethodInvocation): void {
+    this.answer(invocation, 'change extension shortcuts', () => this.manager.setShortcut(id, key, accelerators));
+  }
+
+  ResetShortcutAsync([id, key]: [string, string], invocation: Gio.DBusMethodInvocation): void {
+    this.answer(invocation, 'change extension shortcuts', () => this.manager.setShortcut(id, key, null));
+  }
+
+  PageAsync([id]: [string], invocation: Gio.DBusMethodInvocation): void {
+    this.answer(invocation, 'see extension settings', () => new GLib.Variant('(s)', [this.manager.instance(id)?.page.json() ?? '']));
+  }
+
+  ActAsync([id, control, value]: [string, string, GLib.Variant], invocation: Gio.DBusMethodInvocation): void {
+    this.answer(invocation, 'change extension settings', () => {
+      const instance = this.manager.instance(id);
+      if (!instance?.running) throw new Error(`${id} isn't running`);
+      instance.page.act(control, value.deepUnpack());
+    });
+  }
+
   private answer(invocation: Gio.DBusMethodInvocation, action: string, act: () => GLib.Variant | void): void {
     void refuseSandboxed(invocation, action).then(refused => {
       if (refused) return;
@@ -89,6 +130,7 @@ export class ExtensionsService {
   destroy(): void {
     if (this.changedSource) GLib.source_remove(this.changedSource);
     this.unwatch();
+    this.unwatchPages();
     this.dbus.unexport();
   }
 }

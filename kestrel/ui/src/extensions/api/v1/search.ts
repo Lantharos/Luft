@@ -12,7 +12,7 @@ export function searchApi(context: ApiContext): Search {
     title: result.title,
     description: result.description ?? '',
     icon: resolveIcon(path, result.icon ?? FALLBACK_ICON),
-    activate: scope.guard(() => result.activate()),
+    activate: context.fromPerson(() => result.activate()),
   });
   return {
     addProvider: (provider: SearchProvider) => {

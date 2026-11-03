@@ -1,3 +1,4 @@
+import type Clutter from 'gi://Clutter';
 import Meta from 'gi://Meta';
 import St from 'gi://St';
 
@@ -6,7 +7,7 @@ import type { Monitor } from '../../../../desktop/panel/panel.js';
 import { PlaybackConditions } from '../../../../desktop/wallpaper/conditions.js';
 import { reducedMotion } from '../../../../shared/motion/motion.js';
 import type { ExtensionHost } from '../../../host.js';
-import type { Rect } from '../types.js';
+import type { LayerOptions, Rect } from '../types.js';
 
 const SURFACE_TYPES = [Meta.WindowType.NORMAL, Meta.WindowType.DIALOG, Meta.WindowType.MODAL_DIALOG, Meta.WindowType.UTILITY];
 
@@ -73,6 +74,15 @@ export class LayerStage {
 
   monitors(): Monitor[] {
     return this.host.monitors();
+  }
+
+  primaryIndex(): number {
+    return this.host.primaryIndex();
+  }
+
+  place(actor: Clutter.Actor, depth: NonNullable<LayerOptions['depth']>): void {
+    if (depth === 'below-windows') global.window_group.insert_child_above(actor, this.host.wallpaper);
+    else global.window_group.get_parent()!.insert_child_above(actor, global.window_group);
   }
 
   taskbar(monitor: Monitor): Rect | null {

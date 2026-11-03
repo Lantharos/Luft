@@ -13,6 +13,9 @@ export interface Problem {
 const DISABLED = 'disabled-extensions';
 const SETTINGS = 'extension-settings';
 const PROBLEMS = 'extension-problems';
+const SHORTCUTS = 'extension-shortcuts';
+
+export type ShortcutChoices = Record<string, Record<string, string[]>>;
 
 /** What the person decided about extensions, kept in Kestrel's settings. */
 export class ExtensionStore {
@@ -41,6 +44,25 @@ export class ExtensionStore {
     return this.watch([DISABLED, PROBLEMS], changed);
   }
 
+  watchShortcuts(changed: () => void): () => void {
+    return this.watch([SHORTCUTS], changed);
+  }
+
+  /** The shortcuts people set themselves, by extension id and key. Shortcuts left alone aren't here. */
+  get shortcutChoices(): ShortcutChoices {
+    return this.settings.get_value(SHORTCUTS).deepUnpack() as ShortcutChoices;
+  }
+
+  setShortcut(id: string, key: string, accelerators: string[] | null): void {
+    const choices = this.shortcutChoices;
+    const own = { ...choices[id] };
+    if (accelerators) own[key] = accelerators;
+    else delete own[key];
+    if (Object.keys(own).length) choices[id] = own;
+    else delete choices[id];
+    this.settings.set_value(SHORTCUTS, new GLib.Variant('a{sa{sas}}', choices));
+  }
+
   private watch(keys: string[], changed: () => void): () => void {
     const handlers = keys.map(key => this.settings.connect(`changed::${key}`, changed));
     return () => handlers.forEach(handler => this.settings.disconnect(handler));
@@ -65,6 +87,13 @@ export class ExtensionStore {
   setValue(id: string, key: string, value: SettingValue): void {
     const own = { ...this.values[id], [key]: value };
     this.writeValues({ ...this.values, [id]: own });
+  }
+
+  forgetShortcuts(id: string): void {
+    const choices = this.shortcutChoices;
+    if (!(id in choices)) return;
+    delete choices[id];
+    this.settings.set_value(SHORTCUTS, new GLib.Variant('a{sa{sas}}', choices));
   }
 
   forgetValues(id: string): void {

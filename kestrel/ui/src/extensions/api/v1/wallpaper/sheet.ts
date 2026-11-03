@@ -3,10 +3,11 @@ import Cogl from 'gi://Cogl';
 import GObject from 'gi://GObject';
 
 import type { Monitor } from '../../../../desktop/panel/panel.js';
+import type { Rect } from '../types.js';
 
 export function layerSnippet(declarations: string, shader: string): Cogl.Snippet {
-  const snippet = Cogl.Snippet.new(Cogl.SnippetHook.FRAGMENT, `uniform vec2 layer_size;\n${declarations}\n`, null);
-  snippet.set_replace(`vec2 layer_position = cogl_tex_coord_in[0].xy * layer_size;
+  const snippet = Cogl.Snippet.new(Cogl.SnippetHook.FRAGMENT, `uniform vec2 layer_size;\nuniform vec4 layer_area;\n${declarations}\n`, null);
+  snippet.set_replace(`vec2 layer_position = layer_area.xy + cogl_tex_coord_in[0].xy * layer_area.zw;
 vec4 layer_color = vec4(0.0);
 {
 ${shader}
@@ -47,13 +48,14 @@ export class Sheet {
   readonly actor: InstanceType<typeof SheetActor>;
   destroyed = false;
 
-  constructor(readonly monitor: Monitor, snippet: Cogl.Snippet, name: string) {
+  constructor(readonly monitor: Monitor, readonly primary: boolean, area: Rect, snippet: Cogl.Snippet, name: string) {
     this.actor = new SheetActor(snippet);
     this.actor.name = name;
     this.actor.connect('destroy', () => (this.destroyed = true));
-    this.actor.set_position(monitor.x, monitor.y);
-    this.actor.set_size(monitor.width, monitor.height);
+    this.actor.set_position(monitor.x + area.x, monitor.y + area.y);
+    this.actor.set_size(area.width, area.height);
     this.actor.uniform('layer_size', 2, [monitor.width, monitor.height]);
+    this.actor.uniform('layer_area', 4, [area.x, area.y, area.width, area.height]);
   }
 
   destroy(): void {

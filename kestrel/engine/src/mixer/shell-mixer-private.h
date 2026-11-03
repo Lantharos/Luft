@@ -79,6 +79,7 @@ struct _ShellMixer
   ShellMixerStream *input;
   gboolean recording;
   gboolean dictating;
+  gboolean playing;
   guint dictation_pid;
 
   GPtrArray *devices[2];
@@ -137,6 +138,7 @@ void        _shell_mixer_update_player    (ShellMixer                 *mixer,
                                            gboolean                    announce_start);
 void        _shell_mixer_remove_player    (ShellMixer                 *mixer,
                                            guint32                     index);
+void        _shell_mixer_sync_playing     (ShellMixer                 *mixer);
 void        _shell_mixer_playback_started (ShellMixer                 *mixer,
                                            guint                       pid,
                                            const char                 *app_id,

@@ -3,7 +3,7 @@ import GLib from 'gi://GLib';
 
 import {descendants} from '../../lib/actors.js';
 import {call} from '../../lib/dbus.js';
-import {fixture} from '../../lib/processes.js';
+import {fixture, repository} from '../../lib/processes.js';
 
 const NAME = 'com.lantharos.Kestrel';
 const PATH = '/com/lantharos/Kestrel/Extensions';
@@ -56,6 +56,12 @@ export function copyFolder(from: Gio.File, to: Gio.File) {
 
 export function install(name: string, id: string) {
   copyFolder(Gio.File.new_for_path(fixture('extensions', name)), Gio.File.new_for_path(userFolder(id)));
+}
+
+/** Installs one of Luft's own extensions from the session's build of `extensions`, as the store would. */
+export async function installBuilt(id: string) {
+  copyFolder(Gio.File.new_for_path(repository('kestrel', 'run', 'extensions', id)), Gio.File.new_for_path(userFolder(id)));
+  await request('Reload', id);
 }
 
 export function rewrite(path: string, change: (text: string) => string) {

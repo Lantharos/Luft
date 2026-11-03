@@ -121,11 +121,14 @@ privacy-thing-microphone = microphone
 privacy-thing-screen = screen
 privacy-thing-location = location
 privacy-thing-windows = windows
+privacy-thing-typing = keyboard
 
 privacy-camera-unknown-app = An app is using the camera
 privacy-stop-sharing = Stop sharing the screen
 privacy-stop-recording = Stop recording
 privacy-turn-off-location = Turn off location services
+# An extension typed text into an app a moment ago. Opens the extension in Settings.
+privacy-extension-typed = { $name } typed for you
 privacy-settings = Privacy settings
 # Shown after an app's name in the menu, for example "Firefox · Camera"
 privacy-camera = Camera
@@ -572,6 +575,8 @@ updates-ready-body = Restart when it suits you to install them.
 ## Extensions
 # Menu item of an extension's quick settings tile or taskbar button; $name is the extension's name
 extension-menu-settings = { $name } Settings
+# Button that closes a small window an extension opened
+extension-popup-close = Close
 # Notification title when Kestrel switched an extension off by itself; $name is the extension's name
 extension-turned-off-title = { $name } was turned off
 extension-turned-off-error = It stopped working. You can turn it on again in Settings.

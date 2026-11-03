@@ -4,12 +4,23 @@ import GLib from 'gi://GLib';
 
 import { animateActor } from '../../../../shared/motion/motion.js';
 import type { Scope } from '../../../runtime/scope.js';
+import type { Monitor } from '../../../../desktop/panel/panel.js';
 import type { LayerDisplay, LayerOptions, Rect } from '../types.js';
 import { layerSnippet, Sheet } from './sheet.js';
 import { type LayerStage, stackedWindows } from './stage.js';
 
 const FADE_DURATION = 600;
 const TIME_WRAP_S = 3600;
+
+function clamped(area: Rect, monitor: { width: number; height: number }): Rect {
+  const x = Math.max(0, Math.min(Math.round(area.x), monitor.width - 1));
+  const y = Math.max(0, Math.min(Math.round(area.y), monitor.height - 1));
+  return {
+    x, y,
+    width: Math.max(1, Math.min(Math.round(area.width), monitor.width - x)),
+    height: Math.max(1, Math.min(Math.round(area.height), monitor.height - y)),
+  };
+}
 
 function relative(rect: Rect, sheet: Sheet): Rect {
   return { x: rect.x - sheet.monitor.x, y: rect.y - sheet.monitor.y, width: rect.width, height: rect.height };
@@ -25,6 +36,7 @@ export class WallpaperLayer {
   private readonly timeline = new Clutter.Timeline({ actor: global.stage, duration: 1000, repeat_count: -1 });
   private readonly unstage: () => void;
   private sheets: Sheet[] = [];
+  private built = false;
   private wanted: boolean;
   private gone = false;
   private lastFrame = 0;
@@ -49,29 +61,44 @@ export class WallpaperLayer {
 
   sync(): void {
     if (this.gone) return;
-    const visible = this.wanted ?this.stage.visibleMonitors() : new Set<number>();
-    if (visible.size && !this.sheets.length) this.build();
-    for (const sheet of this.sheets.filter(sheet => !sheet.destroyed)) this.show(sheet, visible.has(sheet.monitor.index));
-    if (visible.size && !this.timeline.is_playing()) {
+    const visible = this.wanted ? this.stage.visibleMonitors() : new Set<number>();
+    if (visible.size && !this.built) this.build();
+    const sheets = this.sheets.filter(sheet => !sheet.destroyed);
+    for (const sheet of sheets) this.show(sheet, visible.has(sheet.monitor.index));
+    if (sheets.some(sheet => visible.has(sheet.monitor.index)) && !this.timeline.is_playing()) {
       this.lastFrame = 0;
       this.timeline.start();
     }
   }
 
   monitorsChanged(): void {
-    if (!this.sheets.length) return;
+    if (!this.built) return;
     this.clear();
     this.sync();
   }
 
+  reshape(): void {
+    this.monitorsChanged();
+  }
+
+  private areaOf(monitor: Monitor, primary: boolean): Rect | null {
+    const full = { x: 0, y: 0, width: monitor.width, height: monitor.height };
+    if (!this.options.area) return full;
+    const area = this.scope.run(() => this.options.area!({ index: monitor.index, primary, width: monitor.width, height: monitor.height }));
+    return area ? clamped(area, monitor) : null;
+  }
+
   private build(): void {
-    const uiGroup = global.window_group.get_parent()!;
-    this.sheets = this.stage.monitors().map(monitor => {
-      const sheet = new Sheet(monitor, this.snippet, this.name);
+    this.built = true;
+    const primary = this.stage.primaryIndex();
+    this.sheets = this.stage.monitors().flatMap(monitor => {
+      const area = this.areaOf(monitor, monitor.index === primary);
+      if (!area) return [];
+      const sheet = new Sheet(monitor, monitor.index === primary, area, this.snippet, this.name);
       sheet.actor.opacity = 0;
       sheet.actor.visible = false;
-      uiGroup.insert_child_above(sheet.actor, global.window_group);
-      return sheet;
+      this.stage.place(sheet.actor, this.options.depth ?? 'above-windows');
+      return [sheet];
     });
   }
 
@@ -99,6 +126,8 @@ export class WallpaperLayer {
     const shown = this.sheets.filter(sheet => !sheet.destroyed && sheet.actor.visible);
     let windows: Rect[] | null = null;
     const displays = shown.map((sheet): LayerDisplay => ({
+      index: sheet.monitor.index,
+      primary: sheet.primary,
       width: sheet.monitor.width,
       height: sheet.monitor.height,
       get windows() {
@@ -117,6 +146,7 @@ export class WallpaperLayer {
     this.timeline.stop();
     for (const sheet of this.sheets) sheet.destroy();
     this.sheets = [];
+    this.built = false;
   }
 
   destroy(): void {

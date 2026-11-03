@@ -1,12 +1,16 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
+import type { ApiContext } from './context.js';
 import type { Coordinates, Location } from './types.js';
 
 const GEOCLUE = 'org.freedesktop.GeoClue2';
 const CITY_ACCURACY = 4;
 const FRESH_FOR_US = 10 * 60 * GLib.USEC_PER_SEC;
 const GIVE_UP_AFTER_S = 30;
+const CHECK_EVERY_S = 10 * 60;
+const MOVED_KM = 5;
+const EARTH_RADIUS_KM = 6371;
 
 let known: { coordinates: Coordinates; at: number } | null = null;
 let pending: Promise<Coordinates | null> | null = null;
@@ -63,6 +67,55 @@ export async function whereabouts(): Promise<Coordinates | null> {
   return pending;
 }
 
-export function locationApi(): Location {
-  return { current: () => whereabouts() };
+function kilometresBetween(a: Coordinates, b: Coordinates): number {
+  const radians = (degrees: number) => degrees * Math.PI / 180;
+  const latitude = radians(b.latitude - a.latitude);
+  const longitude = radians(b.longitude - a.longitude);
+  const h = Math.sin(latitude / 2) ** 2 + Math.cos(radians(a.latitude)) * Math.cos(radians(b.latitude)) * Math.sin(longitude / 2) ** 2;
+  return 2 * EARTH_RADIUS_KM * Math.asin(Math.sqrt(h));
+}
+
+/** Tells its listeners when the computer moved to another city, asking GeoClue only while someone listens. */
+class Moves {
+  private readonly listeners = new Set<(coordinates: Coordinates) => void>();
+  private last: Coordinates | null = null;
+  private timer = 0;
+
+  watch(changed: (coordinates: Coordinates) => void): () => void {
+    this.listeners.add(changed);
+    if (!this.timer) {
+      void this.check();
+      this.timer = GLib.timeout_add_seconds(GLib.PRIORITY_LOW, CHECK_EVERY_S, () => {
+        void this.check();
+        return GLib.SOURCE_CONTINUE;
+      });
+    }
+    return () => {
+      this.listeners.delete(changed);
+      if (this.listeners.size || !this.timer) return;
+      GLib.source_remove(this.timer);
+      this.timer = 0;
+    };
+  }
+
+  private async check(): Promise<void> {
+    const now = await whereabouts();
+    if (!now) return;
+    if (!this.last) {
+      this.last = now;
+      return;
+    }
+    if (kilometresBetween(this.last, now) < MOVED_KM) return;
+    this.last = now;
+    for (const listener of [...this.listeners]) listener(now);
+  }
+}
+
+const moves = new Moves();
+
+export function locationApi({ scope }: ApiContext): Location {
+  return {
+    current: () => whereabouts(),
+    onChanged: changed => scope.disposable(moves.watch(scope.guard(changed))),
+  };
 }

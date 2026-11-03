@@ -94,6 +94,7 @@ _shell_mixer_update_player (ShellMixer               *mixer,
   gboolean playing = !info->corked;
 
   g_hash_table_insert (mixer->players, key, GINT_TO_POINTER (playing));
+  _shell_mixer_sync_playing (mixer);
   if (announce_start && playing && !was_playing)
     look_up_client (mixer, info);
 }
@@ -102,5 +103,6 @@ void
 _shell_mixer_remove_player (ShellMixer *mixer,
                             guint32     index)
 {
-  g_hash_table_remove (mixer->players, GUINT_TO_POINTER (index));
+  if (g_hash_table_remove (mixer->players, GUINT_TO_POINTER (index)))
+    _shell_mixer_sync_playing (mixer);
 }

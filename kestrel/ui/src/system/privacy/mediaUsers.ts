@@ -32,6 +32,7 @@ const SOURCES: Record<string, MediaKind> = { 'Video/Source': 'camera', 'Audio/So
 const RECORDER = 'Stream/Input/Audio';
 
 const PULSE_CLIENT = 'pipewire-pulse';
+const OWN_PID = new Gio.Credentials().get_unix_pid();
 
 type Props = Record<string, string | number | boolean>;
 type Consumer = { kind: 'level-meter' } | { kind: 'verified'; name: string; app: Shell.App | null; pid: number } | { kind: 'reported'; name: string };
@@ -64,7 +65,9 @@ export async function mediaUsers(dictationPid: number): Promise<MediaUser[]> {
   for (const [kind, consumer] of [...linked, ...recorders]) {
     const props = consumer?.info?.props;
     if (!kind || !consumer || !props) continue;
-    const user = consumerOf(clients.get(Number(props['client.id'])), props);
+    const client = clients.get(Number(props['client.id']));
+    if (Number(client?.['pipewire.sec.pid'] ?? 0) === OWN_PID) continue;
+    const user = consumerOf(client, props);
     if (user.kind === 'level-meter' || (user.kind === 'verified' && dictates(user.pid, dictationPid))) continue;
     users.set(`${kind}:${consumer.id}`, {
       kind, node: consumer.id,

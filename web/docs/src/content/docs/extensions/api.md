@@ -15,27 +15,35 @@ Everything an extension adds returns a `Disposable` with `dispose()`, to take it
 | --- | --- |
 | `id`, `version` | From the manifest |
 | `path` | The extension's folder |
+| `dataPath` | A folder of its own for files it writes, kept across updates and deleted with the extension |
 | `t(id, args?)` | A message from its translations, in the desktop's language |
+| `open(uri)` | Opens a web link in the browser, or a file or folder in the app that opens it |
+| `openSettings()` | Opens the extension's page in Settings |
 | `onDisable(cleanup)` | Runs `cleanup` when the extension is turned off, after everything it made is gone |
 | `settings.get(key)` | A declared setting's value |
 | `settings.set(key, value)` | Changes a declared setting; Settings shows the change at once. A value that doesn't fit throws |
 | `settings.onChanged(changed)` | Runs `changed(key)` when a setting changes, here or in Settings |
+| `storage.get(key)`, `storage.set(key, value)`, `storage.delete(key)`, `storage.keys()` | Values it keeps for itself, anything JSON holds, up to 1 MB in all. They're written soon after a change and when it's turned off |
 | `timers.timeout(ms, callback)`, `timers.interval(ms, callback)` | Timers that stop with the extension |
 | `session.active`, `session.onChanged(changed)` | Whether someone is using the desktop: signed in and not locked |
-| `appearance.accent`, `appearance.dark`, `appearance.onChanged(changed)` | The accent colour as `#rrggbb`, and whether the dark style is on |
+| `desktop.wallpaperVisible`, `desktop.onChanged(changed)` | Whether the wallpaper shows anywhere: windows leave some uncovered, nothing is full screen, the screen isn't locked |
+| `power.onBattery`, `power.saving`, `power.onChanged(changed)` | Whether it runs on battery, and whether power saver is on. Do less while it is |
+| `appearance.accent`, `appearance.wallpaperAccent`, `appearance.dark`, `appearance.reducedMotion`, `appearance.onChanged(changed)` | The accent colour and the colour the wallpaper suggests as `#rrggbb`, whether the dark style is on, and whether people asked for less motion or turned animations off |
 
 ## wallpaper
 
-`wallpaper.addLayer(options)` draws a GLSL shader across each display, above the wallpaper and the windows, so drops can land on windows; leave the windows' rectangles clear to keep them readable. It only draws while it's active, the wallpaper shows on a display and animations are on, fades in and out, and holds nothing on screen otherwise.
+`wallpaper.addLayer(options)` draws a GLSL shader across each display, over the wallpaper. It only draws while it's active, the wallpaper shows on a display, animations are on and the computer isn't saving power; it fades in and out, and holds nothing on screen otherwise.
 
 | Option | Is |
 | --- | --- |
 | `declarations` | Uniforms, constants and functions |
-| `shader` | Statements run for every pixel. They read `vec2 layer_position` (pixels from the display's top left) and `vec2 layer_size`, and set `vec4 layer_color`, premultiplied |
+| `shader` | Statements run for every pixel. They read `vec2 layer_position` (pixels from the display's top left) and `vec2 layer_size` (the display's size), and set `vec4 layer_color`, premultiplied |
 | `frame(frame)` | Runs before every frame it draws |
 | `active` | Whether it starts active; it does unless `false` |
+| `depth` | `above-windows`, the default, also draws over windows, so drops can land on them; leave the windows' rectangles clear to keep them readable. `below-windows` draws between the wallpaper and the windows |
+| `area(display)` | The part of each display to cover, such as a band along the bottom, or `null` to leave a display out. `display` has `index`, `primary`, `width` and `height`. The shader only runs there, which costs far less than the whole display |
 
-`frame` has `time` (seconds, wrapping every hour), `elapsed` (seconds since the last frame, 0 after a pause) and `displays`. Each display has `width`, `height`, `windows` (rectangles topmost first, relative to the display), `taskbar`, `uniform(name, ...values)` for `float` to `vec4`, and `uniformArray(name, components, values)` for arrays. The layer has `active`, to start and stop it.
+`frame` has `time` (seconds, wrapping every hour), `elapsed` (seconds since the last frame, 0 after a pause) and `displays`. Each display has `index`, `primary`, `width`, `height`, `windows` (rectangles topmost first, relative to the display, for drops and snow that land on window tops), `taskbar`, `uniform(name, ...values)` for `float` to `vec4`, and `uniformArray(name, components, values)` for arrays. The layer has `active`, to start and stop it, and `reshape()`, to ask for `area` again after what it depends on changed.
 
 ```js
 const layer = ext.wallpaper.addLayer({
@@ -62,6 +70,115 @@ The toggle has `update(changes)`.
 
 `taskbar.addItem({ icon, label, onClick?, menu? })` adds a button next to the clock. `menu` takes the same entries as a quick settings menu, without settings; it opens on a right click, or on any click without `onClick`. The item has `update(changes)`.
 
+## popups
+
+`popups.open(options)` opens a pop-up that Kestrel draws in Luft's style from a description of its content, and returns it with `open`, `update(content)` and `dispose()`, which closes it.
+
+| Option | Is |
+| --- | --- |
+| `anchor` | A taskbar item it made, `'pointer'`, a place on the display under the pointer (`'top-left'`, `'top'`, `'top-right'`, `'left'`, `'center'`, `'right'`, `'bottom-left'`, `'bottom'`, `'bottom-right'`), or a point `{ x, y }` |
+| `title` | What screen readers call it, and a window's title |
+| `content` | What it shows, see below |
+| `kind` | `panel`, the default, takes the keyboard while it's open and closes on Escape, a click elsewhere, or when something else opens. `window` floats above the windows without taking the keyboard, has a title and a close button, and can be dragged |
+| `width` | 200 to 560 pixels; 340 without it. The height follows the content |
+| `onClosed()` | Runs once when it closes, however it closes |
+
+Content is a tree of Luft's own controls, so a pop-up looks and behaves like the rest of the desktop and can't break it. `update` keeps every control that stayed in its place and kind, so a slider being dragged or a field being typed in carries on.
+
+| View | Has |
+| --- | --- |
+| `{ type: 'column' \| 'row', children, spacing?, align? }` | Children one under or beside the other. `align` is `start`, `center`, `end` or `fill` |
+| `{ type: 'text', text, style? }` | `title`, `body`, `caption`, or `number` for digits that keep their width |
+| `{ type: 'icon', icon, size? }` | An icon |
+| `{ type: 'image', path, width, height }` | A picture from the extension's folders |
+| `{ type: 'button', label?, icon?, iconOnly?, style?, disabled?, onActivate }` | `style` is `default`, `primary` or `flat` |
+| `{ type: 'switch', label, checked, onToggled(checked) }` | A switch with its label |
+| `{ type: 'slider', label, value, onChanged(value) }` | A slider from 0 to 1 |
+| `{ type: 'entry', label, placeholder?, text?, onChanged?(text), onSubmit?(text) }` | A text field; `onSubmit` runs on Enter |
+| `{ type: 'item', title, subtitle?, icon?, checked?, onActivate? }` | A row to pick, as in a list of results |
+| `{ type: 'progress', value }` | A bar from 0 to 1 |
+| `{ type: 'separator' }`, `{ type: 'spacer' }` | A line, and room that pushes the rest apart |
+
+```js
+const item = ext.taskbar.addItem({
+  icon: 'alarm-symbolic',
+  label: 'Timer',
+  onClick: () => ext.popups.open({
+    anchor: item,
+    title: 'Timer',
+    content: { type: 'column', children: [
+      { type: 'text', text: '25:00', style: 'number' },
+      { type: 'button', label: 'Start', style: 'primary', onActivate: start },
+    ] },
+  }),
+});
+```
+
+## shortcuts
+
+An extension that declares `[[shortcuts]]` gets `shortcuts.onActivated(key, activated)`, which runs when people press that shortcut anywhere but the lock screen, and `shortcuts.label(key)`, what it's set to as people read it, such as `Super+Alt+V`, or `null` while it has none.
+
+## typing
+
+`typing.type(text)` types into whatever has the keyboard, as if people typed it, and returns whether it could. It only works within ten seconds of someone using the extension, through its shortcut, a pop-up, taskbar item, quick settings tile, notification or search result, and the taskbar shows that it typed. A panel of the extension that's open closes first, so the text goes where it was going.
+
+## sounds
+
+`sounds.play(path, options?)` plays a sound file from the extension's folder, such as Ogg, FLAC or WAV, and returns it with `playing`, `setVolume(volume, fade?)`, `stop(fade?)`, `onEnded(ended)` and `dispose()`, which stops it at once. Fades are in milliseconds.
+
+| Option | Is |
+| --- | --- |
+| `volume` | 0 to 1; 1 without it |
+| `loop` | Plays it again from the start without a gap until it's stopped |
+| `fadeIn` | Milliseconds to fade in over |
+
+Everything an extension plays goes through one stream with its name, which people can turn down in Sound settings, and goes quiet while the screen is locked. `sounds.volume` sets the volume of all of it. Files are decoded once and kept while they play, so keep loops to a minute or so.
+
+## audioLevels
+
+`audioLevels.playing` and `audioLevels.onPlayingChanged(changed)` tell whether any app plays sound. `audioLevels.listen(bands)` starts listening to everything the computer plays, split into 1 to 64 bands from low to high, and returns a listener with `read()` and `dispose()`. `read()` gives `{ level, bands }`, all 0 to 1, and is cheap enough to call in every frame of a wallpaper layer. Kestrel only listens while a listener is open and something plays, so an open listener costs nothing in silence.
+
+```js
+const listener = ext.audioLevels.listen(16);
+const layer = ext.wallpaper.addLayer({
+  depth: 'below-windows',
+  area: ({ width, height }) => ({ x: 0, y: height - 200, width, height: 200 }),
+  declarations: 'uniform float bass;',
+  shader: 'float a = bass * (1.0 - (layer_size.y - layer_position.y) / 200.0); layer_color = vec4(a, a * 0.7, a * 0.4, a);',
+  frame: ({ displays }) => {
+    const { bands } = listener.read();
+    for (const display of displays) display.uniform('bass', bands[0]);
+  },
+});
+ext.audioLevels.onPlayingChanged(() => (layer.active = ext.audioLevels.playing));
+```
+
+## Settings page
+
+Without anything else, an extension's page in Settings → Extensions lists the settings its manifest declares. `settingsPage.describe(build)` gives it a page of its own instead: `build` returns sections, each with an optional `title` and `description` and its `items`, and Settings draws them with its own controls. Kestrel calls `build` only while Settings shows the page, when it opens, after a declared setting changes and after `settingsPage.refresh()`. While the extension is off, Settings lists its declared settings.
+
+| Item | Shows |
+| --- | --- |
+| `{ setting: key }` | A declared setting, as Settings shows it |
+| `{ type: 'row', title, description?, value?, onActivate? }` | A line with a value at its end, which opens something with `onActivate` |
+| `{ type: 'switch', title, description?, checked, onToggled(checked) }` | A switch for a value the extension keeps itself |
+| `{ type: 'choice', title, description?, value, options, onChanged(value) }` | Options as `{ value, label, image? }`, with text labels |
+| `{ type: 'slider', title, description?, value, min, max, step?, unit?, onChanged(value) }` | A slider |
+| `{ type: 'button', title, description?, label, danger?, onActivate() }` | A row with a button |
+| `{ type: 'entry', title, description?, value, placeholder?, onSubmit(text) }` | A text field, submitted on Enter or when it loses focus |
+| `{ type: 'preview', image, description }` | A picture across the page |
+| `{ type: 'list', items, empty? }` | Rows of `{ title, description?, image?, actions? }`, where actions are `{ label, danger?, onActivate() }` |
+| `{ type: 'text', text }` | A paragraph |
+
+Images are files in the extension's folder or data folder. Callbacks run in the extension like any other.
+
+```js
+ext.settingsPage.describe(() => [
+  { title: 'Look', items: [{ setting: 'style' }, { setting: 'color' }] },
+  { title: 'Saved', items: (ext.storage.get('saved') ?? []).map(name => ({ type: 'row', title: name })) },
+]);
+```
+
 ## search
 
 `search.addProvider({ title, search(query) })` adds results to Start. `search` returns, or resolves to, results with `title`, `description?`, `icon?` and `activate()`. Start shows the first five under `title` and drops answers to queries that are no longer typed.
@@ -79,12 +196,13 @@ The toggle has `update(changes)`.
 | Member | Is |
 | --- | --- |
 | `location.current()` | Resolves to `{ latitude, longitude, accuracy }` to about a city, or `null` while location services are off |
-| `weather.current()` | Resolves to `{ condition, temperature, precipitation, wind, daytime, time }` for where the computer is, or `null` |
+| `location.onChanged(changed)` | The computer moved to another city, checked about every ten minutes while someone listens |
+| `weather.current()` | Resolves to `{ condition, temperature, precipitation, wind, daytime, sunrise, sunset, season, time }` for where the computer is, or `null` |
 | `weather.onChanged(changed)` | A new report about every half hour |
 | `media.player` | What the media keys would control: `app`, `title`, `artist`, `playing`, `playPause()`, `next()`, `previous()`, or `null` |
 | `media.onChanged(changed)` | The player or what it plays changed |
 
-`condition` is `clear`, `clouds`, `fog`, `drizzle`, `rain`, `snow` or `storm`, in degrees Celsius, millimetres and kilometres an hour. Weather comes from Open-Meteo, asked with the position rounded to about a kilometre.
+`condition` is `clear`, `clouds`, `fog`, `drizzle`, `rain`, `snow` or `storm`, in degrees Celsius, millimetres and kilometres an hour. `sunrise` and `sunset` are today's there, in milliseconds since 1970, and `season` is `spring`, `summer`, `autumn` or `winter` by the date and the side of the equator. Weather comes from Open-Meteo, asked with the position rounded to about a kilometre.
 
 ## Icons
 
@@ -92,4 +210,4 @@ Wherever an icon goes, give a symbolic icon name such as `weather-showers-symbol
 
 ## Versions
 
-This is version 1. A later version gets a page of its own; extensions that target version 1 keep running as they are.
+This is version 1. It grows while Luft is young, without taking anything away, so extensions written for it keep running. A later, incompatible version would get a page of its own.

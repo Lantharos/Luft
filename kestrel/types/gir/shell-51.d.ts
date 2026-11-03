@@ -354,6 +354,53 @@ export namespace Shell {
     }
 
 
+    namespace AudioMonitor {
+        // Signal signatures
+        interface SignalSignatures extends GObject.Object.SignalSignatures {}
+
+        // Constructor properties interface
+        interface ConstructorProps extends GObject.Object.ConstructorProps {}
+    }
+
+    class AudioMonitor extends GObject.Object {
+        static $gtype: GObject.GType<AudioMonitor>;
+
+        /**
+         * Compile-time signal type information.
+         *
+         * This instance property is generated only for TypeScript type checking.
+         * It is not defined at runtime and should not be accessed in JS code.
+         * @internal
+         */
+        $signals: AudioMonitor.SignalSignatures;
+
+        // Constructors
+        constructor(properties?: Partial<AudioMonitor.ConstructorProps>, ...args: any[]);
+
+        _init(...args: any[]): void;
+
+        // Signals
+        /** @signal */
+        connect<K extends keyof AudioMonitor.SignalSignatures>(signal: K, callback: GObject.SignalCallback<this, AudioMonitor.SignalSignatures[K]>): number;
+
+        /** @signal */
+        connect_after<K extends keyof AudioMonitor.SignalSignatures>(signal: K, callback: GObject.SignalCallback<this, AudioMonitor.SignalSignatures[K]>): number;
+
+        /** @signal */
+        emit<K extends keyof AudioMonitor.SignalSignatures>(signal: K, ...args: GObject.GjsParameters<AudioMonitor.SignalSignatures[K]>): void;
+
+        // Static methods
+        static get_default(): AudioMonitor;
+
+        // Methods
+        get_listening(): boolean;
+
+        read(n_bands: number): [number[], number];
+
+        set_listening(listening: boolean): void;
+    }
+
+
     namespace BlurEffect {
         // Signal signatures
         interface SignalSignatures extends Clutter.Effect.SignalSignatures {
@@ -870,6 +917,7 @@ export namespace Shell {
             "notify::dictating": (pspec: GObject.ParamSpec) => void;
             "notify::input": (pspec: GObject.ParamSpec) => void;
             "notify::output": (pspec: GObject.ParamSpec) => void;
+            "notify::playing": (pspec: GObject.ParamSpec) => void;
             "notify::recording": (pspec: GObject.ParamSpec) => void;
         }
 
@@ -878,6 +926,7 @@ export namespace Shell {
             dictating: boolean;
             input: MixerStream | null;
             output: MixerStream | null;
+            playing: boolean;
             recording: boolean;
         }
     }
@@ -891,6 +940,8 @@ export namespace Shell {
         get input(): MixerStream | null;
 
         get output(): MixerStream | null;
+
+        get playing(): boolean;
 
         get recording(): boolean;
 
@@ -935,6 +986,8 @@ export namespace Shell {
         get_input(): MixerStream | null;
 
         get_output(): MixerStream | null;
+
+        get_playing(): boolean;
 
         get_recording(): boolean;
 
@@ -1419,6 +1472,59 @@ export namespace Shell {
     }
 
 
+    namespace SoundMix {
+        // Signal signatures
+        interface SignalSignatures extends GObject.Object.SignalSignatures {
+            /** @signal */
+            ended: (sound: number) => void;
+        }
+
+        // Constructor properties interface
+        interface ConstructorProps extends GObject.Object.ConstructorProps {}
+    }
+
+    class SoundMix extends GObject.Object {
+        static $gtype: GObject.GType<SoundMix>;
+
+        /**
+         * Compile-time signal type information.
+         *
+         * This instance property is generated only for TypeScript type checking.
+         * It is not defined at runtime and should not be accessed in JS code.
+         * @internal
+         */
+        $signals: SoundMix.SignalSignatures;
+
+        // Constructors
+        constructor(properties?: Partial<SoundMix.ConstructorProps>, ...args: any[]);
+
+        _init(...args: any[]): void;
+
+        static ["new"](name: string, icon_name: string): SoundMix;
+
+        // Signals
+        /** @signal */
+        connect<K extends keyof SoundMix.SignalSignatures>(signal: K, callback: GObject.SignalCallback<this, SoundMix.SignalSignatures[K]>): number;
+
+        /** @signal */
+        connect_after<K extends keyof SoundMix.SignalSignatures>(signal: K, callback: GObject.SignalCallback<this, SoundMix.SignalSignatures[K]>): number;
+
+        /** @signal */
+        emit<K extends keyof SoundMix.SignalSignatures>(signal: K, ...args: GObject.GjsParameters<SoundMix.SignalSignatures[K]>): void;
+
+        // Methods
+        close(): void;
+
+        play(file: Gio.File, loop: boolean, volume: number, fade_ms: number): number;
+
+        set_master(volume: number, fade_ms: number): void;
+
+        set_volume(sound: number, volume: number, fade_ms: number): void;
+
+        stop(sound: number, fade_ms: number): void;
+    }
+
+
     namespace SoundPlayer {
         // Signal signatures
         interface SignalSignatures extends GObject.Object.SignalSignatures {
@@ -1877,6 +1983,8 @@ export namespace Shell {
 
     type AppSystemClass = typeof AppSystem;
 
+    type AudioMonitorClass = typeof AudioMonitor;
+
     type BlurEffectClass = typeof BlurEffect;
 
     type CameraMonitorClass = typeof CameraMonitor;
@@ -1904,6 +2012,8 @@ export namespace Shell {
     type PolkitAuthenticationAgentClass = typeof PolkitAuthenticationAgent;
 
     type ScreenshotClass = typeof Screenshot;
+
+    type SoundMixClass = typeof SoundMix;
 
     type SoundPlayerClass = typeof SoundPlayer;
 

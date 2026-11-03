@@ -11,6 +11,8 @@ export interface TaskbarEntry {
   click(button: St.Button): void;
   secondaryClick(button: St.Button): void;
   watch(changed: () => void): () => void;
+  /** The button showing it, or `null` once it's gone. */
+  shown(button: St.Button | null): void;
 }
 
 export const taskbarEntries = new Registry<TaskbarEntry>();
@@ -42,6 +44,7 @@ export class ExtensionItems {
     sync();
     this.actor.add_child(button);
     this.buttons.set(entry, { button, unwatch: entry.watch(sync) });
+    entry.shown(button);
   }
 
   private remove(entry: TaskbarEntry): void {
@@ -49,6 +52,7 @@ export class ExtensionItems {
     if (!shown) return;
     this.buttons.delete(entry);
     shown.unwatch();
+    entry.shown(null);
     shown.button.destroy();
   }
 

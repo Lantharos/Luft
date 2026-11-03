@@ -47,6 +47,14 @@ export class PlaybackConditions {
     return this.proxies.get(source)?.get_cached_property(name)?.deepUnpack() as T | undefined;
   }
 
+  get onBattery(): boolean {
+    return !!this.property<boolean>(POWER, 'OnBattery');
+  }
+
+  get powerSaving(): boolean {
+    return this.property<string>(PROFILES, 'ActiveProfile') === 'power-saver';
+  }
+
   get allowed(): boolean {
     return !DISPLAY_OFF_MODES.includes(this.property<number>(DISPLAY, 'PowerSaveMode') ?? 0) &&
       (!this.batteryKey || this.settings.get_boolean(this.batteryKey) || !this.property<boolean>(POWER, 'OnBattery')) &&

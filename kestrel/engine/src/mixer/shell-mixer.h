@@ -23,6 +23,7 @@ double            shell_mixer_get_max_amplified (void);
 
 ShellMixerStream *shell_mixer_get_output        (ShellMixer *mixer);
 ShellMixerStream *shell_mixer_get_input         (ShellMixer *mixer);
+gboolean          shell_mixer_get_playing       (ShellMixer *mixer);
 gboolean          shell_mixer_get_recording     (ShellMixer *mixer);
 gboolean          shell_mixer_get_dictating     (ShellMixer *mixer);
 void              shell_mixer_set_dictation_process (ShellMixer *mixer,

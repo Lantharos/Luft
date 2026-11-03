@@ -59,6 +59,7 @@ export class AppearanceService {
   private appearance: Appearance | null = null;
   private taskbar = '{}';
   private published = '';
+  private lastWallpaperAccent = '';
   private persistId = 0;
   private writing = Promise.resolve();
   private readonly accentListeners = new Set<() => void>();
@@ -154,6 +155,8 @@ export class AppearanceService {
     if (!seed) return;
     const accent = accentColor(seed);
     const previousAccent = this.AccentColor;
+    const previousWallpaperAccent = this.lastWallpaperAccent;
+    this.lastWallpaperAccent = this.WallpaperAccentColor;
     this.appearance = {
       accentColor: toHex(accent),
       accentName: namedAccent(seed),
@@ -172,8 +175,9 @@ export class AppearanceService {
     if (this.appearance.accentColor !== previousAccent) {
       this.interfaceSettings.set_string('accent-color', this.appearance.accentName);
       this.changed(accent);
-      for (const listener of [...this.accentListeners]) listener();
     }
+    if (this.appearance.accentColor !== previousAccent || this.WallpaperAccentColor !== previousWallpaperAccent)
+      for (const listener of [...this.accentListeners]) listener();
     for (const [name] of PROPERTIES) this.emitChanged(name);
     this.schedulePersist();
   }

@@ -8,6 +8,7 @@ import { formatsLocale, localized, t } from '../../shared/i18n/index.js';
 import { windowAccess, type Level } from '../peek/access/grants.js';
 import { mediaUsers, setMuted, type MediaUser } from './mediaUsers.js';
 import { PrivacyMonitor, type PrivacyState } from './monitor.js';
+import { typingActivity } from './typing.js';
 
 const ICONS: Record<keyof PrivacyState, string> = {
   camera: 'camera-web-symbolic',
@@ -16,10 +17,11 @@ const ICONS: Record<keyof PrivacyState, string> = {
   recording: 'media-record-symbolic',
   location: 'find-location-symbolic',
   windows: 'focus-windows-symbolic',
+  typing: 'input-keyboard-symbolic',
 };
 const THINGS: Record<keyof PrivacyState, string> = {
   camera: 'privacy-thing-camera', microphone: 'privacy-thing-microphone', sharing: 'privacy-thing-screen', recording: 'privacy-thing-screen',
-  location: 'privacy-thing-location', windows: 'privacy-thing-windows',
+  location: 'privacy-thing-location', windows: 'privacy-thing-windows', typing: 'privacy-thing-typing',
 };
 
 const WINDOW_ACCESS: Record<Level, string> = { use: 'privacy-windows-using-programs', see: 'privacy-windows-seeing-programs' };
@@ -74,6 +76,8 @@ export class PrivacyIndicator {
       entries.push({ label: t('privacy-turn-off-location'), icon: icon(ICONS.location),
         run: () => new Gio.Settings({ schema_id: 'org.gnome.system.location' }).set_boolean('enabled', false) });
     entries.push(...this.windowEntries());
+    for (const typist of typingActivity.active)
+      entries.push({ label: t('privacy-extension-typed', { name: typist.name }), icon: icon(ICONS.typing), run: typist.settings });
     entries.push('separator', { label: t('privacy-settings'), run: () => this.menus.settings('privacy') });
     this.menus.openFrom(this.actor, entries);
   }

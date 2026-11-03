@@ -28,8 +28,8 @@ export function notificationsApi(context: ApiContext): Notifications {
         gicon: options.icon ? resolveIcon(context.path, options.icon) : null,
         urgency: options.urgent ? MessageTray.Urgency.CRITICAL : MessageTray.Urgency.NORMAL,
       });
-      if (options.onActivate) notification.connect('activated', scope.guard(options.onActivate));
-      for (const action of options.actions ?? []) notification.addAction(action.label, scope.guard(() => action.onActivate()));
+      if (options.onActivate) notification.connect('activated', context.fromPerson(options.onActivate));
+      for (const action of options.actions ?? []) notification.addAction(action.label, context.fromPerson(() => action.onActivate()));
       let shown = true;
       const handle = scope.disposable(() => {
         if (shown) notification.destroy();

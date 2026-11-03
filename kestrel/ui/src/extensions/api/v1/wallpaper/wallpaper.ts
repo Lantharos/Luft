@@ -14,6 +14,7 @@ export function wallpaperApi({ layers, scope, manifest }: ApiContext): Wallpaper
         set active(active: boolean) {
           layer.active = active;
         },
+        reshape: () => layer.reshape(),
         dispose: () => handle.dispose(),
       };
     },

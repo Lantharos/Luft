@@ -38,12 +38,12 @@ check-space-erase-drive = Kettal { $drive } on selle jaoks ruumi, kui see ketas 
 check-space-short = Pole piisavalt vaba ruumi
 check-space-short-windows = Luft vajab umbes { $needed } GB, mille Windows saab loovutada. Vabasta Windowsis { $missing } GB, näiteks kettapuhastusega, ja kontrolli siis uuesti.
 check-space-short-linux = Luft vajab käivitumiseks umbes { $needed } GB. Vabasta { $missing } GB ja kontrolli siis uuesti.
-check-system-replaceable = Luft võib tulla selle asemele ja jätta alles sinu failid, konto ja sätted.
+check-system-replaceable = Luft võib tulla selle asemele ja jätta alles sinu failid, konto ja seadistused.
 check-system-single = Sinu failid on süsteemiga samal partitsioonil, seega selle asendamist failide säilitamisega veel ei toetata. Lufti proovimine ja installimine töötavad.
 check-system-encrypted = See on krüptitud, seega selle asendamist failide säilitamisega veel ei toetata.
 check-system-unknown = Selle ketas on jaotatud viisil, mida Luft ei saa veel failide säilitamisega asendada.
 check-encryption-off = Windows pole krüptitud
-check-encryption-off-detail = Lufti installimine saab lugeda selle sätteid ja sinu Bluetooth-seadmeid.
+check-encryption-off-detail = Lufti paigaldamine saab lugeda selle seadistusi ja sinu Bluetooth-seadmeid.
 check-encryption-on = Windows on krüptitud BitLockeriga
 check-encryption-on-detail = Pole probleemi. Windows teeb ruumi ise ja Meet Luft toob üle selle, mida Luft lukustatud kettalt lugeda ei saa. Hoia taastevõti igaks juhuks käepärast.
 check-encryption-changing = BitLocker alles krüptib või dekrüptib
@@ -59,7 +59,7 @@ check-secure-boot-off-detail = Luft töötab ka ilma selleta, kuid petmisvastase
 check-secure-boot-restart-into = Meet Luft saab taaskäivitada püsivara sätetesse, kus see asub jaotises { $place }.
 check-secure-boot-restart-into-anywhere = Meet Luft saab taaskäivitada püsivara sätetesse, kus see on tavaliselt jaotises Security või Boot.
 check-secure-boot-turn-on = Sisselülitamiseks taaskäivita arvuti ja vajuta { $key }, kui ilmub tootja { $maker } logo, seejärel ava { $place }.
-check-secure-boot-turn-on-anywhere = Sisselülitamiseks ava arvuti käivitumise ajal püsivara sätted ja vaata jaotist Security või Boot.
+check-secure-boot-turn-on-anywhere = Sisselülitamiseks ava arvuti käivitumise ajal püsivara seadistused ja vaata jaotist Security või Boot.
 
 ## Where Secure Boot is in the firmware settings of each computer brand
 
@@ -135,7 +135,7 @@ helper-gap-shortfall = Selles ruumis on { $available } GB, kuid Luft vajab { $ne
 helper-place-gone = See ruum pole enam vaba. Kontrolli uuesti, kuhu Luft mahub.
 helper-box-shortfall = Windows saab loovutada veel { $available } GB, kuid valitud asjad vajavad { $needed } GB.
 helper-box-room-shortfall = Lufti ruumist saab loovutada { $available } GB, kuid valitud asjad vajavad { $needed } GB.
-helper-bluetooth-unreadable = Windowsi Bluetoothi sätteid ei saanud avada
+helper-bluetooth-unreadable = Windowsi Bluetoothi seadistuste avamine ei õnnestunus
 helper-registry-not-opened = Registrivõtit { $key } ei saanud avada: { $error }
 helper-registry-not-changed = Registriväärtust { $value } ei saanud muuta: { $error }
 helper-registry-not-saved = Faili { $file } ei saanud salvestada: { $error }

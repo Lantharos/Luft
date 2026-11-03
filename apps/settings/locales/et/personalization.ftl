@@ -32,10 +32,11 @@ settings-appearance-wallpaper-video = { $name }, video
 settings-appearance-wallpaper-current = Praegune taustapilt
 settings-appearance-wallpaper-empty = Siin kuvatakse pildid ja videod, mis on kaustas Pildid › Wallpapers.
 settings-appearance-wallpaper-add = Lisa taustapilte
-settings-appearance-wallpaper-count = { $count ->
-    [one] { $count } taustapilt
-   *[other] { $count } taustapilti
-}
+settings-appearance-wallpaper-count =
+    { $count ->
+        [one] { $count } taustapilt
+       *[other] { $count } taustapilti
+    }
 settings-appearance-wallpaper-folder = Kaust Wallpapers
 settings-appearance-wallpaper-folder-description = Pildid › Wallpapers
 settings-appearance-wallpaper-fit-title = Sobitus
@@ -266,3 +267,53 @@ settings-accessibility-flash-screen = Ekraan
 ## Extensions
 
 settings-extensions-custom-color = Kohandatud
+settings-extensions-description = Lisamoodulid täiendavad töölaua funktsionaalsust. Saad neid siin lülitada välja, muuda nende toimimist või ka neid eemaldada.
+settings-extensions-none = Ühtegi lisamoodulit pole paigaldatud
+settings-extensions-unavailable = Kui töölaud ei tööta, siis lisamooduli ei saa kuvada.
+settings-extensions-on = Lülita „{ $name }“ sisse
+settings-extensions-enabled = Kasutusel
+settings-extensions-failed = Lülitatud välja, kuna lisamoodul lõpetas töö
+settings-extensions-crashed = Lülitatud välja, kuna lisamoodul põhjustas kaks korda töölaua uuesti käivitumise
+settings-extensions-invalid = Käivitamine selles Lufti versioonis pole võimalik
+settings-extensions-problem = Mis läks valesti
+settings-extensions-settings = Seadistused
+settings-extensions-permissions = Mis on lubatud
+settings-extensions-permission-notifications = Teavituste saatmine
+settings-extensions-permission-search = Otsingutulemuste täiendamine
+settings-extensions-permission-taskbar = Nuppude lisamine tegumiribale
+settings-extensions-permission-quick-settings = Paanide lisamine kiirseadistustesse
+settings-extensions-permission-wallpaper = Taustapildile sisu loomine
+settings-extensions-permission-weather = Näha ilmateadet sinu asukohas
+settings-extensions-permission-location = Tuvastada sinu umbkaudset asukohta
+settings-extensions-permission-media = Näha ja juhtida esitamisel multimeediumit
+settings-extensions-permission-popups = Kuvada kõiki ribasid ja väikeaknaid
+settings-extensions-permission-typing = Sisestada teistesse rakendustesse
+settings-extensions-permission-sounds = Esitada helisid
+settings-extensions-permission-audio-levels = Jälgida esitamisel multimeediumi rütmi
+settings-extensions-remove = Eemalda
+settings-extensions-installed = Versioon { $version }
+settings-extensions-remove-title = Kas eemaldad „{ $name }“ lisamooduli?
+settings-extensions-remove-description = Ta eemaldatakse kõikjalt, kaasates ka seadistused.
+settings-extensions-place = Aseta tegumiribale
+settings-extensions-place-edit = Muuda tegumiriba
+settings-extensions-place-islands = Eraldi saarekestena liigutas seda tegumiriba muutmise ajal ise
+settings-extensions-place-start = Tegumiriba alguses
+settings-extensions-place-end = Tegumiriba lõpus
+settings-extensions-place-before-apps = Rakendustest vasakul
+settings-extensions-place-after-apps = Rakendustest paremal
+settings-extensions-place-beside-tray = Süsteemisalve kõrval
+settings-taskbar-presets = Paigustused
+settings-taskbar-preset-classic = Klassikaline
+settings-taskbar-preset-centered = Keskele joondatud dokk
+settings-taskbar-preset-mac = macOS-iga sarnane
+settings-taskbar-preset-side = Külgdokk
+settings-taskbar-edit = Muuda töölaual
+settings-taskbar-element-start = Start
+settings-taskbar-element-dock = Rakenduse
+settings-taskbar-element-tray = Süsteemisalv
+settings-taskbar-element-status = Võrk, heli ja aku
+settings-taskbar-element-clock = Kell ja teavitused
+settings-extensions-place-elsewhere = Mujal
+settings-taskbar-island-move = Lohista selle saarekese teisaldamiseks
+settings-taskbar-edit-description = Lohista tegumiriba saarekesed ja nende osad ükspuha kuhu ekraani äärde
+settings-taskbar-island = Saareke, kus on: { $parts }

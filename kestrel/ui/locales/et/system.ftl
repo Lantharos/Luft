@@ -9,7 +9,7 @@ dictation-setup-body = Räägi ja öeldu kirjutatakse sinu eest mis tahes rakend
 dictation-setup-action = Seadista dikteerimine
 dictation-unsupported-title = Dikteerimine keeles { $language } pole selles arvutis saadaval
 dictation-unsupported-body = Selle arvuti protsessor ei suuda käitada kõnetuvastajat, mida keel { $language } vajab. Saad dikteerida mõnes teises keeles.
-dictation-settings-action = Dikteerimise sätted
+dictation-settings-action = Dikteerimise seadistused
 
 ## System health notifications
 
@@ -92,7 +92,7 @@ privacy-camera-unknown-app = Üks rakendus kasutab kaamerat
 privacy-stop-sharing = Lõpeta ekraani jagamine
 privacy-stop-recording = Lõpeta salvestamine
 privacy-turn-off-location = Lülita asukohateenused välja
-privacy-settings = Privaatsussätted
+privacy-settings = Privaatsusseadistused
 privacy-camera = Kaamera
 privacy-microphone = Mikrofon
 privacy-microphone-muted = Mikrofon on vaigistatud
@@ -166,7 +166,7 @@ airplane-mode-title = Lennukirežiim
 power-profile-title = Toiterežiim
 power-profile-header = Toiterežiim
 power-profile-open-menu = Ava toiterežiimide menüü
-power-profile-settings = Toitesätted
+power-profile-settings = Toiteseadistused
 power-profile-performance = Jõudlus
 power-profile-balanced = Tasakaalustatud
 power-profile-power-saver = Energiasääst
@@ -199,7 +199,7 @@ backlight-high = Kõrge
 
 ## Sound
 
-volume-sound-settings = Helisätted
+volume-sound-settings = Heliseadistused
 volume-mute = Vaigista
 volume-unmute = Tühista vaigistus
 volume-output-slider = Helitugevus
@@ -213,7 +213,7 @@ volume-input-open-menu = Ava helisisendi menüü
 
 bluetooth-title = Bluetooth
 bluetooth-open-menu = Ava Bluetoothi menüü
-bluetooth-settings = Bluetoothi sätted
+bluetooth-settings = Bluetoothi seadistused
 bluetooth-connect = Ühenda
 bluetooth-disconnect = Katkesta ühendus
 bluetooth-connect-device = Ühenda seadmega { $deviceName }
@@ -228,7 +228,7 @@ bluetooth-connected-count =
 
 ## Network menus in quick settings
 
-network-menu-unknown-network = <tundmatu>
+network-menu-unknown-network = <pole teada>
 network-menu-connect = Ühenda
 network-menu-disconnect = Katkesta ühendus
 network-menu-connect-to = Ühenda: { $name }
@@ -247,20 +247,20 @@ network-menu-connected-count =
     }
 network-menu-vpn = VPN
 network-menu-vpn-open-menu = Ava VPN-i menüü
-network-menu-vpn-settings = VPN-i sätted
+network-menu-vpn-settings = VPN-i seadistused
 network-menu-wifi = Wi-Fi
 network-menu-wifi-open-menu = Ava Wi-Fi menüü
 network-menu-wifi-settings = Kõik võrgud
 network-menu-wired = Juhtmega ühendused
 network-menu-wired-open-menu = Ava juhtmega ühenduste menüü
-network-menu-wired-settings = Juhtmega võrgu sätted
+network-menu-wired-settings = Juhtmega võrgu seadistused
 network-menu-tethers = Bluetoothi ühiskasutus
 network-menu-tethers-open-menu = Ava Bluetoothi ühiskasutuse menüü
 network-menu-tether = Ühiskasutus
-network-menu-tether-settings = Bluetoothi sätted
+network-menu-tether-settings = Bluetoothi seadistused
 network-menu-mobile-connections = Mobiilsideühendused
 network-menu-mobile-open-menu = Ava mobiilsideühenduste menüü
-network-menu-mobile-settings = Mobiilse lairibaühenduse sätted
+network-menu-mobile-settings = Mobiilse lairibaühenduse seadistused
 network-menu-mobile = Mobiilside
 network-device-wired = Juhtmega
 network-device-named = { $kind } ({ $name })
@@ -292,13 +292,13 @@ access-dialog-allow = Luba
 
 ## Display change confirmation
 
-display-change-title = Kas jätta need kuvasätted?
+display-change-title = Kas jättad alles need ekraaniseadistused?
 display-change-countdown =
     { $seconds ->
-        [one] Sätted taastatakse { $seconds } sekundi pärast
-       *[other] Sätted taastatakse { $seconds } sekundi pärast
+        [one] Seadistused taastatakse { $seconds } sekundi pärast
+       *[other] Seadistused taastatakse { $seconds } sekundi pärast
     }
-display-change-revert = Taasta sätted
+display-change-revert = Taasta seadistused
 display-change-keep = Jäta muudatused
 
 ## Drive connected notification
@@ -325,7 +325,7 @@ kbd-a11y-leave-off = Jäta välja
 
 audio-device-title = Vali heliseade
 audio-device-cancel = Loobu
-audio-device-sound-settings = Helisätted
+audio-device-sound-settings = Heliseadistused
 audio-device-headphones = Kõrvaklapid
 audio-device-headset = Peakomplekt
 audio-device-microphone = Mikrofon
@@ -410,7 +410,15 @@ screenshot-captured = Kuvatõmmis on tehtud
 screenshot-captured-body = Pildi saad kleepida lõikelaualt
 
 ## System updates
+
 updates-available-title = Saadaval on süsteemivärskendused
-updates-available-body = Nende allalaadimiseks ja installimiseks ava Sätted.
+updates-available-body = Nende allalaadimiseks ja installimiseks ava Seadistused.
 updates-ready-title = Värskendused on installimiseks valmis
 updates-ready-body = Nende installimiseks taaskäivita arvuti, kui sulle sobib.
+privacy-thing-typing = klahvistik
+privacy-extension-typed = { $name } sisestas sinu jaoks
+extension-menu-settings = Lisamooduli seadistused: { $name }
+extension-popup-close = Sulge
+extension-turned-off-title = { $name } on kasutuselt eemaldatud
+extension-turned-off-error = Ta lõpetas töötamise. Võid ta seadistustest uuesti sisse lülitada.
+extension-turned-off-crash = Töölaud käivitud töötamise ajal paar korda. Võid ta seadistustes uuesti sisse lülitada.

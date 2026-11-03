@@ -17,7 +17,7 @@ settings-network-username = Kasutajanimi
 settings-network-router = Ruuter
 settings-network-dns-servers = DNS-serverid
 settings-network-private-key = Privaatvõti
-settings-network-connection-settings = Ühenduse sätted
+settings-network-connection-settings = Ühenduse seadistused
 settings-network-connect-failed = Ühendamine ebaõnnestus
 
 ## Network: connection states
@@ -89,7 +89,7 @@ settings-network-wifi-saved = Salvestatud
 settings-network-wifi-enterprise = Logi sisse töö- või koolikontoga
 settings-network-wifi-connect-failed = Selle võrguga ei õnnestunud ühenduda
 settings-network-wifi-saved-password-failed = Salvestatud salasõna ei sobinud. Sisesta see uuesti.
-settings-network-wifi-settings = Võrgu sätted
+settings-network-wifi-settings = Võrgu seadistused
 settings-network-wifi-searching = Võrkude otsimine…
 settings-network-hidden = Ühenda peidetud võrguga
     .description = Sisesta võrgu nimi ja turbe tüüp.
@@ -111,7 +111,7 @@ settings-network-forget = Unusta see võrk
     .button = Unusta
 settings-network-remove-vpn = Eemalda see VPN
 settings-network-remove-connection = Eemalda see ühendus
-settings-network-remove-description = Kustutab selle sätted sellest arvutist
+settings-network-remove-description = Kustutab selle seadistused antud arvutist
 settings-network-remove = Eemalda
 settings-network-general = Üldine
 settings-network-autoconnect = Ühenda automaatselt
@@ -238,7 +238,7 @@ settings-network-proxy-skip = Ära kasuta puhverserverit järgmiste jaoks
 settings-network-proxy-error-url = Sisesta veebiaadress, näiteks http://example.com/proxy.pac
 settings-network-proxy-error-host = Sisesta ainult serveri nimi, näiteks proxy.example.com
 settings-network-proxy-error-port = Kasuta porti vahemikus 1 kuni 65535
-settings-network-proxy-save-failed = Puhverserveri sätteid ei õnnestunud salvestada
+settings-network-proxy-save-failed = Puhverserveri seadistuste salvestamine ei õnnestunud
 
 ## Network: VPN
 

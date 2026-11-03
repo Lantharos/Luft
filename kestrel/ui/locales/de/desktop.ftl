@@ -104,15 +104,3 @@ title-bar-menu-monitor-down = Auf Bildschirm unten verschieben
 title-bar-menu-monitor-left = Auf Bildschirm links verschieben
 title-bar-menu-monitor-right = Auf Bildschirm rechts verschieben
 title-bar-menu-close = Schließen
-
-## Rain
-
-rain-title = Regen
-rain-open-menu = Regenmenü öffnen
-rain-drizzle = Nieselregen
-rain-rain = Regen
-rain-storm = Sturm
-rain-show = Auf dem Desktop zeigen
-rain-sound = Ton
-rain-volume = Lautstärke des Regens
-rain-settings = Regen-Einstellungen

@@ -213,6 +213,7 @@ conf_inc = include_directories('.')
 subdir('data')
 subdir('ui')
 subdir('src')
+subdir('extensions')
 
 gnome.post_install(glib_compile_schemas: true)
 

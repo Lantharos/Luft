@@ -104,15 +104,3 @@ title-bar-menu-monitor-down = Zhvendos në monitorin poshtë
 title-bar-menu-monitor-left = Zhvendos në monitorin majtas
 title-bar-menu-monitor-right = Zhvendos në monitorin djathtas
 title-bar-menu-close = Mbyll
-
-## Rain
-
-rain-title = Shi
-rain-open-menu = Hap menynë e shiut
-rain-drizzle = Vesë
-rain-rain = Shi
-rain-storm = Stuhi
-rain-show = Shfaqe në desktop
-rain-sound = Zëri
-rain-volume = Volumi i shiut
-rain-settings = Cilësimet e shiut

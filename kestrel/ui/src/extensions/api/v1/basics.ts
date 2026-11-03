@@ -1,0 +1,68 @@
+import GLib from 'gi://GLib';
+
+import { isDark, watchScheme } from '../../../shared/display/scheme.js';
+import type { ApiContext } from './context.js';
+import type { Appearance, Disposable, Session, Settings, Timers } from './types.js';
+
+export function settingsApi({ values, scope }: ApiContext): Settings {
+  return {
+    get: key => values.get(key) as never,
+    set: (key, value) => values.set(key, value),
+    onChanged: changed => scope.disposable(values.watch(scope.guard(changed))),
+  };
+}
+
+function timer(scope: ApiContext['scope'], milliseconds: number, callback: () => void, repeat: boolean): Disposable {
+  let source = 0;
+  const handle = scope.disposable(() => {
+    if (source) GLib.source_remove(source);
+  });
+  source = GLib.timeout_add(GLib.PRIORITY_DEFAULT, Math.max(0, milliseconds), () => {
+    scope.run(callback);
+    if (repeat) return GLib.SOURCE_CONTINUE;
+    source = 0;
+    handle.dispose();
+    return GLib.SOURCE_REMOVE;
+  });
+  return handle;
+}
+
+export function timersApi({ scope }: ApiContext): Timers {
+  return {
+    timeout: (milliseconds, callback) => timer(scope, milliseconds, callback, false),
+    interval: (milliseconds, callback) => timer(scope, milliseconds, callback, true),
+  };
+}
+
+export function sessionApi({ host, scope }: ApiContext): Session {
+  return {
+    get active() {
+      return host.desktop.active;
+    },
+    onChanged: changed => {
+      const guarded = scope.guard(changed);
+      let active = host.desktop.active;
+      return scope.disposable(host.desktop.watch(() => {
+        if (host.desktop.active === active) return;
+        active = host.desktop.active;
+        guarded();
+      }));
+    },
+  };
+}
+
+export function appearanceApi({ host, scope }: ApiContext): Appearance {
+  return {
+    get accent() {
+      return host.accent();
+    },
+    get dark() {
+      return isDark();
+    },
+    onChanged: changed => {
+      const guarded = scope.guard(changed);
+      const stops = [host.watchAccent(guarded), watchScheme(() => guarded())];
+      return scope.disposable(() => stops.forEach(stop => stop()));
+    },
+  };
+}

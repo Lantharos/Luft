@@ -12,6 +12,7 @@ import { KeepAwake } from './keepAwake.js';
 import { t } from '../../shared/i18n/index.js';
 import { animateActor, Spring } from '../../shared/motion/motion.js';
 import { blurSurface } from '../../shared/layout/surface.js';
+import { type ExtensionTile, extensionTiles } from './extensionTiles.js';
 import { detach, type QuickControl, type QuickItem, type ControlMenu, type QuickSettingsSource } from './quickControls.js';
 import { styleControl } from './tiles/controlTile.js';
 import { ActionTiles, type Tile } from './tiles/actionTiles.js';
@@ -65,8 +66,10 @@ export class QuickSettings {
     this.drag = new TileDrag(this.grid, () => this.saveOrder());
     this.actions = new ActionTiles({ takeScreenshot, openSettings: page => menus.settings(page), close });
     const unwatchRemoved = this.layoutStore.watchRemoved(() => this.arrangeTiles(true));
+    const unwatchExtensions = extensionTiles.watch((tile, added) => added ? this.addExtensionTile(tile) : this.dropTile(tile.id));
     this.actor.connect('destroy', () => {
       unwatchRemoved();
+      unwatchExtensions();
       if (this.layoutLater) global.compositor.get_laters().remove(this.layoutLater);
       if (this.revealTimer) GLib.Source.remove(this.revealTimer);
       this.actions.destroy();
@@ -82,7 +85,7 @@ export class QuickSettings {
 
     const indicators = [['network', source.network, 'network'], ['bluetooth', source.bluetooth, 'bluetooth'],
       ['airplane', source.rfkill, 'network'], ['power', source.powerProfiles, 'power'], ['keep-awake', source.caffeine, 'power'],
-      ['night-light', source.nightLight, 'display'], ['dark-style', source.darkMode, 'appearance'], ['rain', source.rain, 'appearance'],
+      ['night-light', source.nightLight, 'display'], ['dark-style', source.darkMode, 'appearance'],
       ['do-not-disturb', source.doNotDisturb, 'privacy'], ['keyboard', source.backlight, 'power'],
       ['rotation', source.autoRotate, 'display']] as const;
     for (const [key, indicator, settingsPanel] of indicators) {
@@ -93,6 +96,7 @@ export class QuickSettings {
     }
     for (const tile of this.actions.tiles)
       this.register({ ...tile, name: () => tile.id === 'battery' ? t('quick-settings-battery') : tile.actor.accessible_name });
+    for (const tile of extensionTiles.items) this.registerExtensionTile(tile);
     this.arrangeTiles(false);
     this.addSlider(source.volumeOutput.quickSettingsItems[0]);
     this.addSlider(createInputSlider());
@@ -149,6 +153,24 @@ export class QuickSettings {
     this.drag.attach(tile.actor);
     const menu = (tile.actor as QuickControl).menu;
     if (menu) this.grid.addMenu(tile.actor, menu);
+  }
+
+  private registerExtensionTile(tile: ExtensionTile): void {
+    this.adoptTile(tile.actor);
+    this.register({ id: tile.id, actor: tile.actor, settingsPanel: tile.settingsPanel, name: () => tile.actor.title ?? tile.id });
+  }
+
+  private addExtensionTile(tile: ExtensionTile): void {
+    this.registerExtensionTile(tile);
+    this.arrangeTiles(true);
+  }
+
+  private dropTile(id: string): void {
+    const index = this.tiles.findIndex(tile => tile.id === id);
+    if (index < 0) return;
+    const [tile] = this.tiles.splice(index, 1);
+    this.grid.removeMenu(tile.actor);
+    this.arrangeTiles(true);
   }
 
   private arrangeTiles(animate: boolean): void {

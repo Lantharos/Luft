@@ -6,14 +6,14 @@ import { FluentNumber, localized, t } from '../../../shared/i18n/index.js';
 import { battery, type BatteryState } from '../../../shared/battery/battery.js';
 import { BatteryIndicator } from '../../../shared/battery/indicator.js';
 import { LOCK, bindAvailability } from '../sessionActions.js';
-import { openSettings, type SettingsPageId } from '../../../system/settingsPages.js';
+import { openSettings, type SettingsLink, type SettingsPageId } from '../../../system/settingsPages.js';
 import { actionTile, TILE_ICON_SIZE, type ActionTile } from './controlTile.js';
 import { shortDuration } from '../../../shared/time/duration.js';
 
 export interface Tile {
   id: string;
   actor: St.Button;
-  settingsPanel: SettingsPageId | null;
+  settingsPanel: SettingsLink | null;
 }
 
 interface ActionHandlers {

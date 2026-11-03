@@ -1,19 +1,20 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
+import GLib from 'gi://GLib';
 
-import {descendants} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {hold, press, release} from '../lib/input/input.js';
 import {stopAll} from '../lib/processes.js';
+import {capture} from '../lib/screenshots.js';
 import {openWindow} from '../tiling/lib/tiling.js';
+import {layerSheets, RAIN, setSetting} from '../extensions/lib/extensions.js';
 
 const {eventually} = checks('rain');
-const settings = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
-const KEYS = ['rain', 'rain-visible', 'rain-sound'];
+const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 
 function primarySheet() {
   const monitor = global.display.get_monitor_geometry(global.display.get_primary_monitor());
-  return descendants(global.stage).find(actor => actor.name === 'kestrel-rain' && actor.x === monitor.x && actor.y === monitor.y);
+  return layerSheets(RAIN).find(actor => actor.x === monitor.x && actor.y === monitor.y);
 }
 
 const raining = () => {
@@ -34,11 +35,11 @@ export async function run() {
   // Rain needs animations, which sessions without a GPU turn off
   const forced = global.force_animations;
   global.force_animations = true;
-  settings.set_boolean('rain-sound', false);
-  settings.set_boolean('rain-visible', true);
-  settings.set_boolean('rain', true);
   try {
+    await setSetting(RAIN, 'rain', new GLib.Variant('b', true));
     await eventually(raining, 'rain falls over the wallpaper');
+    await setSetting(RAIN, 'intensity', new GLib.Variant('s', 'storm'));
+    await capture('rain-extension');
     const {window} = await openWindow('Covering');
     window.maximize();
     await eventually(dry, 'a maximized window hides the rain');
@@ -50,8 +51,13 @@ export async function run() {
     await eventually(raining, 'switching to a workspace whose window leaves the wallpaper showing brings the rain back');
     await activate(0);
     await eventually(dry, 'switching back to the maximized window hides it again');
+
+    await activate(1);
+    await eventually(raining, 'the rain is back on the second workspace');
+    await setSetting(RAIN, 'rain', new GLib.Variant('b', false));
+    await eventually(() => !layerSheets(RAIN).length, 'turning rain off lets the drops wind down and the layer go', 15000);
   } finally {
-    for (const key of KEYS) settings.reset(key);
+    kestrel.reset('extension-settings');
     await activate(0).catch(() => {});
     await stopAll();
     global.force_animations = forced;

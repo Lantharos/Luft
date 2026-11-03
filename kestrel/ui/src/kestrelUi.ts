@@ -3,7 +3,7 @@ import Meta from 'gi://Meta';
 import type St from 'gi://St';
 
 import type { Context } from './context.js';
-import { fromHex, type Rgb } from './appearance/color.js';
+import type { Rgb } from './appearance/color.js';
 import type { AppearanceService } from './appearance/service.js';
 import { Greeter, type GreeterContext } from './auth/greeter/greeter.js';
 import { LockControls } from './auth/lockScreen/controls.js';
@@ -20,12 +20,11 @@ import { WindowPreviews } from './desktop/panel/windowPreviews.js';
 import { TaskView } from './desktop/taskView/taskView.js';
 import { wallpaperFloor } from './desktop/wallpaper/floor.js';
 import { LiveWallpaper } from './desktop/wallpaper/liveWallpaper.js';
-import { Rain } from './desktop/rain/rain.js';
-import { RainSound } from './desktop/rain/sound.js';
 import { Tiling } from './desktop/tiling/tiling.js';
 import { SnapLayouts } from './desktop/windows/snapLayouts.js';
 import { Workspaces } from './desktop/windows/workspaces.js';
 import { RotationAnimation } from './desktop/rotation/rotation.js';
+import { Extensions } from './extensions/extensions.js';
 import { Setup, type SetupContext } from './session/setup/setup.js';
 import { afterMotion, dropAfterMotion } from './shared/motion/afterMotion.js';
 import { navigateWithKeyboard } from './shared/input/keyboardNavigation.js';
@@ -78,8 +77,7 @@ class KestrelUi {
   readonly board: Board;
   private readonly tiling: Tiling;
   private readonly liveWallpaper: LiveWallpaper;
-  private readonly rain: Rain;
-  private readonly rainSound = new RainSound();
+  private readonly extensions: Extensions;
   private readonly rotation: RotationAnimation;
   private readonly copilot: CopilotActions;
   private readonly fourFingers = new FourFingerSwipe(direction => this.followFourFingers(direction));
@@ -150,7 +148,8 @@ class KestrelUi {
     };
     this.taskView = new TaskView(context.createBackground, workspace => this.board.frameOf(workspace), close, context.activateWindow);
     this.liveWallpaper = new LiveWallpaper(() => context.layoutManager.monitors);
-    this.rain = new Rain({
+    this.extensions = new Extensions({
+      menus: this.menus,
       monitors: () => context.layoutManager.monitors,
       taskbar: monitor => {
         const actor = this.panels.panelOn(monitor)?.actor;
@@ -159,7 +158,8 @@ class KestrelUi {
         const [width, height] = actor.get_transformed_size();
         return { x, y, width, height };
       },
-      accent: () => fromHex(this.services.appearance.AccentColor || '#ffffff'),
+      accent: () => this.services.appearance.AccentColor || '#ffffff',
+      watchAccent: changed => this.services.appearance.watchAccent(changed),
     });
     this.rotation = new RotationAnimation(context.layoutManager, context.createBackground);
     this.surfaces = new Surfaces({
@@ -257,7 +257,7 @@ class KestrelUi {
       this.dismissImmediately();
       this.panels.sync();
       this.liveWallpaper.monitorsChanged();
-      this.rain.monitorsChanged();
+      this.extensions.monitorsChanged();
       this.board.monitorsChanged();
       this.tiling.monitorsChanged();
       this.followTaskbarEdge();
@@ -338,8 +338,7 @@ class KestrelUi {
     const primary = this.context.layoutManager.primaryMonitor;
     this.panels.showCorner(!!primary && !taskbarPreferences.on(primary.index).shown && available && !this.taskView.visible && !this.board.shown && !covered.has(primary.index));
     this.liveWallpaper.sync(available && !this.taskView.visible && !this.board.shown);
-    this.rain.sync(available && !this.taskView.visible && !this.board.shown);
-    this.rainSound.sync(available);
+    this.extensions.syncDesktop(available && !this.taskView.visible && !this.board.shown, available);
     if (!available) this.dismissImmediately();
   }
 
@@ -428,8 +427,7 @@ class KestrelUi {
     this.panels.shutdown();
     this.liveWallpaper.destroy();
     this.touchscreen.destroy();
-    this.rain.destroy();
-    this.rainSound.destroy();
+    this.extensions.shutdown();
     this.rotation.destroy();
     this.copilot.destroy();
     this.tiling.destroy();

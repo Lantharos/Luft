@@ -18,6 +18,7 @@ import { AppResults } from './providers/apps.js';
 import { ClipboardResults, type ClipboardSource } from './providers/clipboard.js';
 import { CommandResults } from './providers/commands.js';
 import { EmojiResults } from './providers/emoji.js';
+import { ExtensionResults } from './providers/extensions.js';
 import { SettingsResults } from './providers/settings.js';
 import { WebSearch } from './providers/web.js';
 import { WindowResults } from './providers/windows.js';
@@ -71,6 +72,7 @@ export class SearchEngine {
   private readonly calculator: Calculator;
   private readonly answers: AnswerResults;
   private readonly web: WebSearch;
+  private readonly extensions: ExtensionResults;
   private readonly rates = new CurrencyRates(() => {
     if (this.text) this.emit(false, true);
   });
@@ -98,6 +100,7 @@ export class SearchEngine {
     this.answers = new AnswerResults(host.close);
     this.web = new WebSearch(host.close);
     this.opener = new FileOpener(host.close);
+    this.extensions = new ExtensionResults(() => this.emit(false), host.close);
   }
 
   update(apps: Gio.AppInfo[]): void {
@@ -170,6 +173,7 @@ export class SearchEngine {
   private lookUp(text: string): void {
     const cancellable = this.cancellable = new Gio.Cancellable();
     this.waiting.clear();
+    if (text.length >= SHORTEST_EXTRA_QUERY) this.extensions.lookUp(text, cancellable);
     if (text.length >= SHORTEST_NAME_QUERY) {
       this.waiting.add('names');
       this.later(callback => GLib.idle_add(GLib.PRIORITY_DEFAULT_IDLE, callback), () => {
@@ -257,7 +261,7 @@ export class SearchEngine {
       .sort(([, a], [, b]) => a[0].score - b[0].score);
     const groups: SearchGroup[] = [...ordered, ['files', without(files.ranked)] as const]
       .map(([id, entries]) => ({ title: t(TITLES[id]), items: entries.map(({ item }) => item) }));
-    groups.push({ title: t(TITLES.contents), items: this.mentionItems(files.shown) });
+    groups.push({ title: t(TITLES.contents), items: this.mentionItems(files.shown) }, ...this.extensions.groups(this.text));
     const pending = this.waiting.size > 0;
     const found = groups.filter(group => group.items.length);
     if (best || pending) found.push({ title: t(TITLES.web), items: [web] });

@@ -29,7 +29,7 @@ build_compositor() {
 build_engine() {
   local setup=()
   [[ -f "$work/engine/build.ninja" ]] && setup+=(--reconfigure)
-  (cd "$luft" && bun install --frozen-lockfile --filter @luft/kestrel-ui --filter @luft/kestrel-types)
+  (cd "$luft" && bun install --frozen-lockfile --filter @luft/kestrel-ui --filter @luft/kestrel-types --filter @luft/kestrel-extensions)
   export NODE_PATH="$kestrel/ui/node_modules"
   meson setup "${setup[@]}" "$work/engine" "$kestrel/engine" \
     -Dpkg_config_path="$prefix/lib/pkgconfig" --prefix="$prefix" --buildtype=release

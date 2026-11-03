@@ -104,15 +104,3 @@ title-bar-menu-monitor-down = Teisalda alumisele kuvarile
 title-bar-menu-monitor-left = Teisalda vasakpoolsele kuvarile
 title-bar-menu-monitor-right = Teisalda parempoolsele kuvarile
 title-bar-menu-close = Sulge
-
-## Rain
-
-rain-title = Vihm
-rain-open-menu = Ava vihmamenüü
-rain-drizzle = Uduvihm
-rain-rain = Vihm
-rain-storm = Torm
-rain-show = Näita töölaual
-rain-sound = Heli
-rain-volume = Vihma valjus
-rain-settings = Vihma seadistused

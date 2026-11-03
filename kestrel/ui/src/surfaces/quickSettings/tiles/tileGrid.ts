@@ -75,6 +75,11 @@ export class TileGrid {
     menu.connect('open-state-changed', (_menu, open) => open ? this.expand(tile, menu) : this.collapsed(tile, menu));
   }
 
+  removeMenu(tile: St.Widget): void {
+    if (tile === this.expanded) this.collapse(false);
+    this.menus.delete(tile);
+  }
+
   collapse(animate: boolean): void {
     this.instant = !animate;
     this.openMenu?.close({ animate });

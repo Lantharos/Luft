@@ -1,0 +1,15 @@
+extension-name = Vihm
+extension-description = Vihm sajab taustapildile ja protsib akendele ja tegumiribale või sinu töötamise ajal esitab heli
+rain = Vihm
+intensity = Kui tugev peaks vihm olema
+drizzle = Uduvihm
+steady = Vihm
+storm = Torm
+color = Värv
+water = Vesi
+accent = Rõhuvärv
+visible = Näita töölaual
+    .description = Vihmapiisad sajavad akendele ja tegumiribale
+sound = Heli
+    .description = Salvestatud vihm, tormis ka äikesega. Jätkab esitamist ka avatud akende taga
+volume = Vihma valjus

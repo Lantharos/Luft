@@ -1,0 +1,9 @@
+extension-name = Probe
+item = Probe
+hello = Hello from the probe
+on = Probing
+    .description = Lets the probe look around
+mood = Mood
+calm = Calm
+giddy = Giddy
+level = Level

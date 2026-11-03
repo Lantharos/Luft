@@ -1,11 +1,11 @@
 import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
 
+import { restartedAfterCrash } from '../../../system/health/restarted.js';
 import { appOf, capture, read, remembered, type SavedWindow, write } from './snapshot.js';
 
 const NOTE_AFTER_MS = 500;
 const RETURN_WITHIN_SECONDS = 60;
-const RESTARTED = 'KESTREL_RESTARTED';
 
 interface Returned {
   window: Meta.Window;
@@ -24,9 +24,7 @@ export class WindowRecovery {
   private dirty = false;
 
   constructor(private readonly locked: () => boolean) {
-    const restarted = GLib.getenv(RESTARTED) !== null;
-    GLib.unsetenv(RESTARTED);
-    if (restarted) this.awaitReturn();
+    if (restartedAfterCrash) this.awaitReturn();
     const display = global.display;
     display.connect('window-created', (_display, window: Meta.Window) => this.created(window));
     display.connect('restacked', () => this.note());

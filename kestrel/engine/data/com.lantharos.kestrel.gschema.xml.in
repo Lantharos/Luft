@@ -91,18 +91,6 @@
     <value nick="large" value="2"/>
   </enum>
 
-  <enum id="com.lantharos.kestrel.RainIntensity">
-    <value nick="drizzle" value="0"/>
-    <value nick="rain" value="1"/>
-    <value nick="storm" value="2"/>
-  </enum>
-
-  <enum id="com.lantharos.kestrel.RainColor">
-    <value nick="water" value="0"/>
-    <value nick="accent" value="1"/>
-    <value nick="custom" value="2"/>
-  </enum>
-
   <enum id="com.lantharos.kestrel.TaskbarAutoHide">
     <value nick="never" value="0"/>
     <value nick="always" value="1"/>
@@ -149,7 +137,7 @@
       <summary>Order of the Quick Settings tiles</summary>
     </key>
     <key name="quick-tiles-removed" type="as">
-      <default>["screenshot", "settings", "lock", "rotation-0", "rain-0"]</default>
+      <default>["screenshot", "settings", "lock", "rotation-0", "com.lantharos.Rain/0"]</default>
       <summary>Quick Settings tiles removed by the user</summary>
     </key>
     <key name="quick-tiles-known" type="as">
@@ -328,47 +316,37 @@
         computer runs on battery.
       </description>
     </key>
-    <key name="rain" type="b">
-      <default>false</default>
-      <summary>Let it rain</summary>
+    <key name="disabled-extensions" type="as">
+      <default>[]</default>
+      <summary>Extensions that are turned off</summary>
       <description>
-        Turns rain on, shown on the desktop when rain-visible is on and heard
-        when rain-sound is on. The Rain tile in Quick Settings switches this.
+        Every installed extension runs unless its id is here. Kestrel adds an
+        extension that fails, or that was running through two crashes in a row.
       </description>
     </key>
-    <key name="rain-visible" type="b">
-      <default>true</default>
-      <summary>Show rain on the desktop</summary>
+    <key name="removed-extensions" type="as">
+      <default>[]</default>
+      <summary>Extensions Luft ships that were removed</summary>
       <description>
-        Rain falls over the wallpaper, lands on the top edges of windows and
-        the taskbar and splashes there. It stops while the wallpaper is
-        hidden, animations are off or reduced, or the power saver is on.
+        Ids of extensions in the system's extension folders that are hidden
+        for this account. A copy installed for the account still shows.
       </description>
     </key>
-    <key name="rain-sound" type="b">
-      <default>false</default>
-      <summary>Play the sound of rain</summary>
+    <key name="extension-settings" type="a{sa{sv}}">
+      <default>{}</default>
+      <summary>Settings of extensions</summary>
       <description>
-        The sound is made as it plays, so it never loops. It keeps playing
-        behind windows and stops while the screen is locked.
+        The values of the settings extensions declare in their manifests, by
+        extension id and key. Settings that keep their default are left out.
       </description>
     </key>
-    <key name="rain-volume" type="d">
-      <range min="0" max="1"/>
-      <default>0.6</default>
-      <summary>Volume of the rain sound</summary>
-    </key>
-    <key name="rain-intensity" enum="com.lantharos.kestrel.RainIntensity">
-      <default>'rain'</default>
-      <summary>How hard it rains</summary>
-    </key>
-    <key name="rain-color" enum="com.lantharos.kestrel.RainColor">
-      <default>'water'</default>
-      <summary>Color of the rain on the desktop</summary>
-    </key>
-    <key name="rain-custom-color" type="s">
-      <default>'#9e0810'</default>
-      <summary>Color of the rain when rain-color is 'custom'</summary>
+    <key name="extension-problems" type="a{s(ss)}">
+      <default>{}</default>
+      <summary>Why Kestrel turned extensions off</summary>
+      <description>
+        By extension id: "error" with the error's message, or "crash" when
+        Kestrel crashed twice in a row while it was running.
+      </description>
     </key>
     <key name="global-shortcuts" type="s">
       <default>'{}'</default>

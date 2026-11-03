@@ -30,7 +30,8 @@ export class TileLayout {
   }
 
   saveOrder(ids: string[]): void {
-    this.settings.set_strv(ORDER, ids);
+    const absent = this.settings.get_strv(ORDER).filter(id => !ids.includes(id));
+    this.settings.set_strv(ORDER, [...ids, ...absent]);
   }
 
   remove(id: string): void {

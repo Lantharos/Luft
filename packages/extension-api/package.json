@@ -1,0 +1,21 @@
+{
+	"name": "@luft/extension-api",
+	"version": "1.0.0",
+	"description": "Types for Luft extensions",
+	"type": "module",
+	"license": "GPL-3.0-or-later",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Lantharos/Luft.git",
+		"directory": "packages/extension-api"
+	},
+	"exports": {
+		".": {
+			"types": "./v1.d.ts"
+		},
+		"./v1": {
+			"types": "./v1.d.ts"
+		}
+	},
+	"files": ["v1.d.ts"]
+}

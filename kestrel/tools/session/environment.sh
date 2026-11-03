@@ -113,6 +113,27 @@ use_luft_defaults() {
   unset LANGUAGE "${!LC_@}"
 }
 
+# The extensions Luft ships, laid out as the image installs them: their files from the tree, except the sources the build
+# turns into their code and helpers
+stage_extensions() {
+  local staged="$session/system-data" source id folder entry
+  rm -rf "$staged"
+  for source in "$root"/kestrel/extensions/*/extension.toml; do
+    source="$(dirname "$source")"
+    id="$(sed -n 's/^id = "\(.*\)"$/\1/p' "$source/extension.toml")"
+    folder="$staged/luft/extensions/$id"
+    mkdir -p "$folder"
+    for entry in "$source"/*; do
+      case "${entry##*/}" in
+        src | helper) ;;
+        *) ln -s "$entry" "$folder/" ;;
+      esac
+    done
+    find "$build/extensions/${source##*/}" -maxdepth 1 -type f \( -name '*.js' -o -perm -u+x \) -exec ln -s {} "$folder/" \;
+  done
+  export XDG_DATA_DIRS="$staged:$XDG_DATA_DIRS"
+}
+
 prepare_session() {
   session="$1"
   local mode="$2" data_path="$compositor_data:/usr/local/share:/usr/share" cursors=/usr/share/icons:/usr/share/pixmaps
@@ -141,5 +162,6 @@ prepare_session() {
   ln -sfn "$root/kestrel/engine/data/session/kestrel-portal.portal" "$session/data/xdg-desktop-portal/portals/kestrel-portal.portal"
   ln -sfn "$root/kestrel/engine/data/session/kestrel-portals.conf" "$session/config/xdg-desktop-portal/kestrel-portals.conf"
   export_build_paths
+  stage_extensions
   [[ "$mode" == nested ]] || use_luft_defaults
 }

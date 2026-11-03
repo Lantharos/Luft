@@ -563,3 +563,11 @@ updates-available-body = Open Settings to download and install them.
 # Notification shown when the system downloaded updates by itself and they wait for a restart
 updates-ready-title = Updates are ready to install
 updates-ready-body = Restart when it suits you to install them.
+
+## Extensions
+# Menu item of an extension's quick settings tile or taskbar button; $name is the extension's name
+extension-menu-settings = { $name } Settings
+# Notification title when Kestrel switched an extension off by itself; $name is the extension's name
+extension-turned-off-title = { $name } was turned off
+extension-turned-off-error = It stopped working. You can turn it on again in Settings.
+extension-turned-off-crash = The desktop restarted twice while it was running. You can turn it on again in Settings.

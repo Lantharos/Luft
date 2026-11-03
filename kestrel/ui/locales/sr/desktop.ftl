@@ -105,15 +105,3 @@ title-bar-menu-monitor-down = Премести на екран доле
 title-bar-menu-monitor-left = Премести на екран лево
 title-bar-menu-monitor-right = Премести на екран десно
 title-bar-menu-close = Затвори
-
-## Rain
-
-rain-title = Киша
-rain-open-menu = Отвори мени кише
-rain-drizzle = Росуља
-rain-rain = Киша
-rain-storm = Олуја
-rain-show = Прикажи на радној површини
-rain-sound = Звук
-rain-volume = Јачина кише
-rain-settings = Подешавања кише

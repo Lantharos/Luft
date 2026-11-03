@@ -1,8 +1,10 @@
 part = "kestrel"
 sources = [
     "kestrel/compositor",
+    "kestrel/extensions",
     "kestrel/tools/unicode",
     "kestrel/ui",
+    "packages/extension-api",
     "packages/i18n/tools",
     "packages/web/motion",
     "packages/web/settings-pages",

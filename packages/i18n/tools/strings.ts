@@ -65,7 +65,7 @@ function markupStrings(content: string, code: RegExp): Finding[] {
 }
 
 export function hardCoded(file: string, content: string): Finding[] {
-	if (file.endsWith('.d.ts')) return [];
+	if (file.endsWith('.d.ts') || file.endsWith('.toml')) return [];
 	if (file.endsWith('.svelte')) return markupStrings(content, SVELTE_CODE);
 	if (file.endsWith('.astro')) return markupStrings(content, ASTRO_CODE);
 	if (file.endsWith('.rs')) return rustStrings(content);

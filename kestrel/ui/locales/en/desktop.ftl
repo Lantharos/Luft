@@ -140,21 +140,3 @@ title-bar-menu-monitor-down = Move to Monitor Down
 title-bar-menu-monitor-left = Move to Monitor Left
 title-bar-menu-monitor-right = Move to Monitor Right
 title-bar-menu-close = Close
-
-## Rain
-
-# Quick settings tile title and menu header, keep short
-rain-title = Rain
-# Screen-reader label of the arrow button next to the rain tile
-rain-open-menu = Open rain menu
-# How hard it rains, also shown under the tile title
-rain-drizzle = Drizzle
-rain-rain = Rain
-rain-storm = Storm
-# Menu item: whether rain falls over the wallpaper
-rain-show = Show on the desktop
-# Menu item: whether the sound of rain plays
-rain-sound = Sound
-# Screen-reader label of the rain volume slider
-rain-volume = Rain volume
-rain-settings = Rain Settings

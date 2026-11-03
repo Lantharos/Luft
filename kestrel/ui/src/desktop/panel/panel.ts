@@ -11,6 +11,7 @@ import type { ContextMenus } from '../menus/contextMenus.js';
 import { createLauncher, floorAlong, type Launcher } from './launcher/launcher.js';
 import { Tray } from '../tray/tray.js';
 import { DesktopPeek } from './widgets/desktopPeek.js';
+import { ExtensionItems } from './widgets/extensionItems.js';
 import { PanelClock } from './widgets/clock.js';
 import { BatteryIndicator } from '../../shared/battery/indicator.js';
 import { PrivacyIndicator } from '../../system/privacy/indicator.js';
@@ -82,6 +83,7 @@ export class KestrelPanel {
   private readonly quickButton: St.Button | null = null;
   private readonly clockButton: St.Button;
   private readonly tray: Tray | null = null;
+  private readonly extensionItems: ExtensionItems | null = null;
   private readonly privacy: PrivacyIndicator | null = null;
   private readonly inputSource: InputSourceIndicator | null = null;
   private readonly refreshAfterMotion = () => this.refreshApps();
@@ -134,6 +136,8 @@ export class KestrelPanel {
         ];
       });
       right.add_child(this.inputSource.actor);
+      this.extensionItems = new ExtensionItems();
+      right.add_child(this.extensionItems.actor);
       right.add_child(this.tray.actor);
       this.statusIcons.add_child(new BatteryIndicator(16).actor);
       const quickButton = new St.Button({ style_class: 'kestrel-status-button', child: this.statusIcons, can_focus: true });
@@ -206,6 +210,7 @@ export class KestrelPanel {
     this.workspaceWindows?.destroy();
     this.workspaceWindows = null;
     this.tray?.shutdown();
+    this.extensionItems?.shutdown();
     this.privacy?.shutdown();
     this.inputSource?.shutdown();
     this.taskbar.shutdown();

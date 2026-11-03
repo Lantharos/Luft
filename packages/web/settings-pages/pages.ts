@@ -9,6 +9,7 @@ export type PanelId =
 	| 'taskbar'
 	| 'windows'
 	| 'accessibility'
+	| 'extensions'
 	| 'apps'
 	| 'privacy'
 	| 'security'
@@ -71,6 +72,7 @@ export const PANEL_PAGES: Page<PanelId>[][] = [
 		}),
 		page('taskbar', 'settings-page-taskbar', 'user-desktop-symbolic'),
 		page('windows', 'settings-page-windows', 'focus-windows-symbolic', { keywords: ['settings-page-windows', 'settings-page-tiling'] }),
+		page('extensions', 'settings-page-extensions', 'application-x-addon-symbolic'),
 		page('accessibility', 'settings-page-accessibility', 'preferences-desktop-accessibility-symbolic')
 	],
 	[

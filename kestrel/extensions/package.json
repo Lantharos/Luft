@@ -1,0 +1,14 @@
+{
+  "name": "@luft/kestrel-extensions",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@luft/extension-api": "workspace:*",
+    "@types/bun": "^1.4.3",
+    "esbuild": "0.28.2",
+    "typescript": "7.0.2"
+  }
+}

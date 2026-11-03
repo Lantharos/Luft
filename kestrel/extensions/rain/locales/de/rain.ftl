@@ -1,0 +1,15 @@
+extension-name = Regen
+extension-description = Regen fällt über das Hintergrundbild und spritzt auf Fenster und die Taskleiste, oder ist beim Arbeiten zu hören
+rain = Regen
+intensity = Wie stark es regnet
+drizzle = Nieselregen
+steady = Regen
+storm = Sturm
+color = Farbe
+water = Wasser
+accent = Akzentfarbe
+visible = Auf dem Desktop zeigen
+    .description = Tropfen landen auf Fenstern und der Taskleiste
+sound = Ton
+    .description = Aufgenommener Regen, bei Gewitter mit Donner. Spielt auch hinter Fenstern weiter
+volume = Lautstärke des Regens

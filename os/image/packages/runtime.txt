@@ -45,6 +45,7 @@ greetd
 greetd-selinux
 gsettings-desktop-schemas
 gstreamer1-plugin-dav1d
+gstreamer1-plugin-gtk4
 gstreamer1-plugin-libav
 gstreamer1-plugins-bad-free
 gstreamer1-plugins-good

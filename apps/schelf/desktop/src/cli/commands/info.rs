@@ -238,8 +238,9 @@ fn store_app(candidate: &Candidate, apps: &[InstalledApp]) -> Result<(), String>
     facts.add("Developer", Some(details.developer.clone()));
     facts.add("Website", details.homepage.clone());
     facts.add("Built", built(&details));
-    let access = match &details.declared {
-        Some(declared) if details.access.is_some() => store::access(declared),
+    let access = match (&details.extension, &details.declared) {
+        (Some(extension), _) => store::extension_access(extension),
+        (None, Some(declared)) if details.access.is_some() => store::access(declared),
         _ => vec!["Everything you can, outside a sandbox".to_owned()],
     };
     for (index, line) in access.into_iter().enumerate() {

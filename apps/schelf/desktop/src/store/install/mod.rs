@@ -11,7 +11,7 @@ use sabine_service::SabineService;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
-use super::listing::{self, Declared, Format, Listing, Release};
+use super::listing::{self, Declared, ExtensionAccess, Format, Listing, Release};
 use super::record::{self, Installed};
 use super::revocations::{self, Severity};
 use super::signed::Age;
@@ -22,6 +22,7 @@ use super::signed::Age;
 pub struct Consent {
     pub version: String,
     pub permissions: Option<Declared>,
+    pub extension: Option<ExtensionAccess>,
     pub full_access: bool,
 }
 
@@ -53,7 +54,10 @@ fn refuse_pulled(listing: &Listing, release: &Release) -> Result<(), String> {
 }
 
 fn agreed(listing: &Listing, release: &Release, consent: &Consent) -> Result<(), String> {
-    if release.version != consent.version || release.permissions != consent.permissions {
+    if release.version != consent.version
+        || release.permissions != consent.permissions
+        || release.extension != consent.extension
+    {
         return Err(format!(
             "{} changed since you looked at it. Look at it again before installing.",
             listing.name()
@@ -134,6 +138,7 @@ pub fn install(id: &str, consent: &Consent, reason: Reason, task: Task) -> Resul
             version: release.version.clone(),
             local: local?,
             agreed: release.permissions.clone(),
+            agreed_extension: release.extension.clone(),
         },
     )
 }

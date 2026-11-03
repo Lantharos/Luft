@@ -5,7 +5,7 @@ use specta::Type;
 
 use super::catalog::Kind;
 use super::install::Consent;
-use super::listing::{self, Declared, Format};
+use super::listing::{self, Declared, ExtensionAccess, Format};
 use super::record::{self, Installed};
 use super::revocations::{self, Severity};
 use super::signed::Age;
@@ -26,6 +26,14 @@ pub struct StoreUpdate {
     pub consent: Consent,
     /// Whether it asks for more than you agreed to, so it waits for you.
     pub widens: bool,
+}
+
+fn widens_extension(after: Option<&ExtensionAccess>, before: Option<&ExtensionAccess>) -> bool {
+    match (after, before) {
+        (Some(after), Some(before)) => after.widens(before),
+        (Some(_), None) => true,
+        (None, _) => false,
+    }
 }
 
 fn widens(after: Option<&Declared>, before: Option<&Declared>) -> bool {
@@ -52,10 +60,17 @@ fn update(id: String, installed: Installed) -> Result<Option<StoreUpdate>, Strin
         return Ok(None);
     }
     Ok(Some(StoreUpdate {
-        widens: widens(release.permissions.as_ref(), installed.agreed.as_ref()),
+        widens: match installed.format {
+            Format::LuftExtension => widens_extension(
+                release.extension.as_ref(),
+                installed.agreed_extension.as_ref(),
+            ),
+            _ => widens(release.permissions.as_ref(), installed.agreed.as_ref()),
+        },
         consent: Consent {
             version: release.version.clone(),
             permissions: release.permissions.clone(),
+            extension: release.extension.clone(),
             full_access: block_on(full_access(&installed)),
         },
         size: listing.artifact(release).map_or(0, |artifact| artifact.size),

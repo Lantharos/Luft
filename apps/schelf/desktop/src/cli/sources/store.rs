@@ -9,7 +9,7 @@ use crate::library;
 use crate::operations::Job;
 use crate::store::catalog::{self, Entry, Origin};
 use crate::store::install::Consent;
-use crate::store::listing::{self, Declared, Format, Listing, Release};
+use crate::store::listing::{self, Declared, ExtensionAccess, Format, Listing, Release};
 use crate::store::signed::Age;
 
 fn kind(entry: &Entry) -> Kind {
@@ -148,11 +148,47 @@ pub fn access(declared: &Declared) -> Vec<String> {
     access
 }
 
+/// What an extension may do, in the words Settings uses.
+pub fn extension_access(access: &ExtensionAccess) -> Vec<String> {
+    let mut lines: Vec<String> = access
+        .permissions
+        .iter()
+        .map(|permission| {
+            match permission.as_str() {
+                "wallpaper" => "Draw over the wallpaper",
+                "quick-settings" => "Add tiles to quick settings",
+                "taskbar" => "Add buttons to the taskbar",
+                "search" => "Add results to search",
+                "notifications" => "Send notifications",
+                "weather" => "See the weather where you are",
+                "location" => "See roughly where you are",
+                "media" => "See and control what's playing",
+                other => other,
+            }
+            .to_owned()
+        })
+        .collect();
+    if access.helper {
+        lines.push("Runs its own program".to_owned());
+    }
+    if lines.is_empty() {
+        lines.push("Nothing beyond the basics".to_owned());
+    }
+    lines
+}
+
 /// Shows what the app may use and asks, and whether you gave an AppImage that
 /// asks to run unsandboxed full access.
 fn agree_to(listing: &Listing, release: &Release, yes: bool) -> Result<bool, Exit> {
     let ink = Ink::stderr();
     let name = ink.bold(listing.name());
+    if let Some(access) = &release.extension {
+        eprintln!("{name} can:");
+        for line in extension_access(access) {
+            eprintln!("  {line}");
+        }
+        return confirm(&format!("Install {}?", listing.name()), yes).map(|()| false);
+    }
     let declared = release.permissions.as_ref();
     if let Some(declared) =
         declared.filter(|declared| release.sandboxed() && declared.unsandboxed.is_none())
@@ -196,6 +232,7 @@ pub fn install(id: &str, yes: bool) -> Result<(String, Job), Exit> {
             consent: Consent {
                 version: release.version.clone(),
                 permissions: release.permissions.clone(),
+                extension: release.extension.clone(),
                 full_access,
             },
         },

@@ -1,5 +1,6 @@
 use std::fs::{self, File};
 use std::path::{Path, PathBuf};
+use std::sync::OnceLock;
 
 use luft_app::{block_on, dbus};
 use luft_dbus_macros::introspect;
@@ -19,6 +20,9 @@ trait Extensions {
     fn disable(&self, id: &str) -> zbus::Result<()>;
 
     fn remove(&self, id: &str) -> zbus::Result<()>;
+
+    #[zbus(property)]
+    fn api_versions(&self) -> zbus::Result<Vec<u32>>;
 }
 
 fn folder() -> PathBuf {
@@ -41,6 +45,15 @@ async fn desktop() -> Result<ExtensionsProxy<'static>, String> {
 /// desktop that isn't running finds it when it starts.
 fn reload(id: &str) {
     let _ = block_on(async { desktop().await?.reload(id).await.map_err(failed) });
+}
+
+/// The extension API versions the desktop runs; none when it can't be asked.
+pub fn api_versions() -> &'static [u32] {
+    static VERSIONS: OnceLock<Vec<u32>> = OnceLock::new();
+    VERSIONS.get_or_init(|| {
+        block_on(async { desktop().await?.api_versions().await.map_err(failed) })
+            .unwrap_or_default()
+    })
 }
 
 /// The extension's own folder inside what was unpacked: the archive holds

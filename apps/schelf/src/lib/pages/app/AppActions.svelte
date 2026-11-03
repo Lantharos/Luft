@@ -34,7 +34,7 @@
 
 	function storeJob(fullAccess: boolean): Job | null {
 		if (!store?.version) return null;
-		const consent = { version: store.version, permissions: store.declared, fullAccess };
+		const consent = { version: store.version, permissions: store.declared, extension: store.extension, fullAccess };
 		return consenting === 'update' ? { kind: 'updateStore', id: store.id, consent } : { kind: 'installStore', id: store.id, consent };
 	}
 

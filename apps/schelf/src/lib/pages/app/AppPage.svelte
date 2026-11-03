@@ -1,6 +1,7 @@
 <script lang="ts">
 	import ShieldOff from '@lucide/svelte/icons/shield-off';
-	import { Row } from '@luft/ui';
+	import { Row, Section } from '@luft/ui';
+	import { abilities } from '#lib/app/extensionAccess.js';
 	import { commands, type Permissions } from '#lib/bindings.js';
 	import AccessList from '#lib/components/AccessList.svelte';
 	import AppArt from '#lib/components/AppArt.svelte';
@@ -124,6 +125,12 @@
 				</AccessList>
 			{:else if permissions}
 				<AccessList {permissions} />
+			{:else if store?.extension}
+				<Section title="What it can do">
+					{#each abilities(store.extension) as ability (ability.title)}
+						<Row title={ability.title} icon={ability.icon} />
+					{/each}
+				</Section>
 			{:else if store}
 				<AccessList permissions={null}>
 					<Row

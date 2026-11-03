@@ -212,6 +212,7 @@ export type Collection = "popular" | "updated";
 export type Consent = {
 	version: string,
 	permissions: Declared | null,
+	extension: ExtensionAccess | null,
 	fullAccess: boolean,
 };
 
@@ -248,6 +249,15 @@ export type DescribedSource = {
 	id: string,
 	name: string,
 	url: string,
+};
+
+/**
+ *  What an extension asks for: permissions from the extension API, and
+ *  whether it runs a program of its own.
+ */
+export type ExtensionAccess = {
+	permissions: string[],
+	helper: boolean,
 };
 
 /**  A Fedora package's page, from Fedora's software sources. */
@@ -461,6 +471,7 @@ export type StoreDetails = {
 	notes: string,
 	size: number | null,
 	declared: Declared | null,
+	extension: ExtensionAccess | null,
 	access: Permissions | null,
 	provenance: Provenance | null,
 };

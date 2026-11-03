@@ -7,10 +7,10 @@ use specta::Type;
 
 use super::catalog::{Developer, Kind};
 use super::device;
+use super::install::extensions;
 use super::signed::{self, Age};
 
 const LOCALE: &str = "en";
-const EXTENSION_API: u32 = 1;
 
 #[derive(Deserialize, Serialize, Clone, Copy, PartialEq, Eq, Debug, Type)]
 #[serde(rename_all = "kebab-case")]
@@ -122,6 +122,25 @@ pub enum Builder {
     Developer,
 }
 
+/// What an extension asks for: permissions from the extension API, and
+/// whether it runs a program of its own.
+#[derive(Deserialize, Serialize, Clone, PartialEq, Eq, Debug, Type)]
+pub struct ExtensionAccess {
+    pub permissions: Vec<String>,
+    pub helper: bool,
+}
+
+impl ExtensionAccess {
+    /// Whether `self` asks for something `before` didn't.
+    pub fn widens(&self, before: &Self) -> bool {
+        (self.helper && !before.helper)
+            || self
+                .permissions
+                .iter()
+                .any(|permission| !before.permissions.contains(permission))
+    }
+}
+
 /// Where a release came from.
 #[derive(Deserialize, Serialize, Clone, Type)]
 pub struct Provenance {
@@ -165,6 +184,8 @@ pub struct Release {
     pub notes: String,
     rollout: Rollout,
     pub permissions: Option<Declared>,
+    #[serde(default)]
+    pub extension: Option<ExtensionAccess>,
     access: Access,
     requires: Requires,
     pub provenance: Provenance,
@@ -180,7 +201,7 @@ impl Release {
     fn supported(&self) -> bool {
         self.requires
             .extension_api
-            .is_none_or(|api| api <= EXTENSION_API)
+            .is_none_or(|api| extensions::api_versions().contains(&api))
     }
 }
 
@@ -266,6 +287,7 @@ pub struct StoreDetails {
     pub notes: String,
     pub size: Option<u64>,
     pub declared: Option<Declared>,
+    pub extension: Option<ExtensionAccess>,
     pub access: Option<Permissions>,
     pub provenance: Option<Provenance>,
 }
@@ -289,6 +311,7 @@ impl From<Listing> for StoreDetails {
                 .filter(|declared| limited && declared.unsandboxed.is_none())
                 .map(|declared| declared.declaration().permissions()),
             declared,
+            extension: release.as_ref().and_then(|release| release.extension.clone()),
             version: release.as_ref().map(|release| release.version.clone()),
             published: release.as_ref().map(|release| release.published.clone()),
             notes: release.as_ref().map(|release| release.notes.clone()).unwrap_or_default(),

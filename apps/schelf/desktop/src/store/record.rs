@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 
 use super::catalog::Kind;
 use super::device;
-use super::listing::{Declared, Format};
+use super::listing::{Declared, ExtensionAccess, Format};
 
 /// A store app or extension on this computer, with the access you agreed to.
 #[derive(Deserialize, Serialize, Clone)]
@@ -19,6 +19,7 @@ pub struct Installed {
     /// Its id where it's installed: the AppImage's or the extension's.
     pub local: String,
     pub agreed: Option<Declared>,
+    pub agreed_extension: Option<ExtensionAccess>,
 }
 
 fn path() -> PathBuf {

@@ -57,7 +57,7 @@ export class OuterEdges {
 
   private watch(window: Meta.Window): void {
     if (!RESIZABLE_TYPES.includes(window.get_window_type())) return;
-    const signals = (['shown', 'size-changed', 'notify::titlebar-height'] as const).map(signal => window.connect(signal, () => this.sync(window)));
+    const signals = (['shown', 'size-changed', 'notify::titlebar-height', 'notify::window-type'] as const).map(signal => window.connect(signal, () => this.sync(window)));
     signals.push(window.connect('unmanaged', () => this.forget(window)));
     this.watched.set(window, signals);
     this.sync(window);
@@ -65,7 +65,7 @@ export class OuterEdges {
 
   private sync(window: Meta.Window): void {
     const actor = window.get_compositor_private<Meta.WindowActor>();
-    const wanted = !!actor && window.get_titlebar_height() === 0 && !framedByX11(window) && drawsNothingOutside(window);
+    const wanted = !!actor && RESIZABLE_TYPES.includes(window.get_window_type()) && window.get_titlebar_height() === 0 && !framedByX11(window) && drawsNothingOutside(window);
     const edge = this.edges.get(window);
     if (wanted && !edge) this.edges.set(window, new OuterEdge(window, actor!));
     if (!wanted && edge) {

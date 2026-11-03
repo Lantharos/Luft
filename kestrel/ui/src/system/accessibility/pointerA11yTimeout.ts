@@ -94,11 +94,13 @@ class PieTimer extends St.DrawingArea {
     this.ease_property('angle', FULL_CIRCLE, {
       duration,
       mode: Clutter.AnimationMode.LINEAR,
-      onComplete: () => this.zoomOut(),
     });
   }
 
-  private zoomOut(): void {
+  finish(): void {
+    this.remove_all_transitions();
+    this.angle = FULL_CIRCLE;
+    this.opacity = 255;
     this.ease({
       scale_x: 2,
       scale_y: 2,
@@ -111,25 +113,28 @@ class PieTimer extends St.DrawingArea {
 }
 
 export class PointerA11yTimeout {
-  private pieTimer: PieTimer | null = null;
+  private pending: PieTimer | null = null;
 
   constructor() {
     const seat = global.stage.context.get_backend().get_default_seat();
+    seat.set_pointer_a11y_dwell_click_type(Clutter.PointerA11yDwellClickType.PRIMARY);
 
     seat.connect('ptr-a11y-timeout-started', (_seat, _type, timeout) => {
+      this.pending?.destroy();
       const [x, y] = global.get_pointer();
 
       const pieTimer = new PieTimer();
-      this.pieTimer = pieTimer;
+      this.pending = pieTimer;
       Main.uiGroup.add_child(pieTimer);
       Main.uiGroup.set_child_above_sibling(pieTimer, null);
-      pieTimer.connect('destroy', () => (this.pieTimer = null));
 
       pieTimer.start(x, y, timeout);
     });
 
     seat.connect('ptr-a11y-timeout-stopped', (_seat, _type, clicked) => {
-      if (!clicked) this.pieTimer?.destroy();
+      if (clicked) this.pending?.finish();
+      else this.pending?.destroy();
+      this.pending = null;
     });
   }
 }

@@ -1,0 +1,87 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Tue, 3 Nov 2026 16:47:59 +0100
+Subject: [PATCH 61/61] clutter: wait for the pointer to move before dwelling
+ again after a click
+
+After a dwell click, any motion that stays within the dwell threshold,
+such as a hand resting on a mouse or a touchpad's jitter, starts a new
+dwell at the same spot, so a resting pointer keeps clicking. Keep the
+clicked spot as the dwell position until the pointer leaves it by more
+than the threshold, and only then arm the next dwell.
+
+Upstream-Status: forwardable
+---
+ clutter/clutter/clutter-input-pointer-a11y.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/clutter/clutter/clutter-input-pointer-a11y.c b/clutter/clutter/clutter-input-pointer-a11y.c
+index f8dbee4c5b8eb9325299e1b83420e991f53b5abd..a7a67f81e455cf5eb772caf629f699690baf8d09 100644
+--- a/clutter/clutter/clutter-input-pointer-a11y.c
++++ b/clutter/clutter/clutter-input-pointer-a11y.c
+@@ -45,6 +45,7 @@ typedef struct _ClutterPtrA11yData
+   float dwell_y;
+   gboolean dwell_drag_started;
+   gboolean dwell_gesture_started;
++  gboolean dwell_clicked_in_place;
+   guint dwell_timer;
+   guint dwell_position_timer;
+ 
+@@ -309,6 +310,14 @@ is_dwell_gesturing (ClutterSeat *seat)
+   return ptr_a11y_data->dwell_gesture_started;
+ }
+ 
++static gboolean
++is_dwell_clicked_in_place (ClutterSeat *seat)
++{
++  ClutterPtrA11yData *ptr_a11y_data = ptr_a11y_data_from_seat (seat);
++
++  return ptr_a11y_data->dwell_clicked_in_place;
++}
++
+ static gboolean
+ has_button_pressed (ClutterSeat *seat)
+ {
+@@ -331,6 +340,7 @@ should_start_dwell (ClutterSeat *seat)
+    * drag action.
+    */
+   return !is_dwell_click_pending (seat) &&
++         !is_dwell_clicked_in_place (seat) &&
+          (is_dwell_dragging (seat) ||
+           !has_button_pressed (seat));
+ }
+@@ -353,6 +363,7 @@ should_update_dwell_position (ClutterSeat *seat)
+ {
+   return !is_dwell_gesturing (seat) &&
+          !is_dwell_click_pending (seat) &&
++         !is_dwell_clicked_in_place (seat) &&
+          !is_secondary_click_pending (seat);
+ }
+ 
+@@ -547,6 +558,7 @@ trigger_dwell_click (gpointer data)
+     {
+       emit_dwell_click (seat, get_dwell_click_type (seat));
+       update_dwell_click_type (seat);
++      ptr_a11y_data->dwell_clicked_in_place = TRUE;
+     }
+ }
+ 
+@@ -682,6 +694,8 @@ _clutter_seat_a11y_on_motion_event (ClutterSeat *seat,
+                                     float        x,
+                                     float        y)
+ {
++  ClutterPtrA11yData *ptr_a11y_data = ptr_a11y_data_from_seat (seat);
++
+   if (!_clutter_seat_is_pointer_a11y_enabled (seat))
+     return;
+ 
+@@ -700,6 +714,9 @@ _clutter_seat_a11y_on_motion_event (ClutterSeat *seat,
+       if (should_stop_dwell (seat))
+         stop_dwell_timeout (seat);
+ 
++      if (is_dwell_clicked_in_place (seat) && pointer_has_moved (seat))
++        ptr_a11y_data->dwell_clicked_in_place = FALSE;
++
+       if (should_start_dwell (seat))
+         start_dwell_position_timeout (seat);
+     }

@@ -58,3 +58,4 @@
 0058-wayland-drop-the-primary-selection.patch
 0059-display-finish-startups-of-X11-windows-launched-befo.patch
 0060-compositor-round-the-corners-of-maximized-and-tiled-.patch
+0061-clutter-wait-for-the-pointer-to-move-before-dwelling.patch

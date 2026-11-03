@@ -42,7 +42,7 @@ Apps are told which you chose, so they can follow it too.
 | Option | Does |
 | --- | --- |
 | Mouse keys | Move the pointer with the number pad |
-| Click by resting the pointer | Clicks when the pointer stays still for a moment |
+| Click by resting the pointer | Clicks when the pointer stays still for a moment, while a circle at the pointer fills up. It clicks once; move the pointer on to click again |
 | Hold to right-click | Holding the button down right-clicks |
 | Press Ctrl to find the pointer | Shows where the pointer is |
 

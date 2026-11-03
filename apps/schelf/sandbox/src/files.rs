@@ -36,7 +36,7 @@ enum Marked {
     Uri(PathBuf),
 }
 
-fn decode(uri: &str) -> Option<PathBuf> {
+pub fn decode(uri: &str) -> Option<PathBuf> {
     let encoded = uri.strip_prefix(FILE_SCHEME)?;
     let mut bytes = Vec::with_capacity(encoded.len());
     let mut rest = encoded.as_bytes();

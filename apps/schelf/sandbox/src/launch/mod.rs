@@ -65,7 +65,11 @@ fn start(id: &str, arguments: Vec<String>) -> Result<i32, String> {
     let folder = Folder::of(id)?;
     let lock = folder.lock()?;
     if matches!(lock, Lock::Running) && folder.unsandboxed().is_some() {
-        return Err(unsandboxed::hand_over(&app, files::unmarked(arguments)));
+        return Err(unsandboxed::hand_over(
+            &app,
+            &folder,
+            files::unmarked(arguments),
+        ));
     }
     if let Lock::Ours(_) = lock
         && grants.full_access

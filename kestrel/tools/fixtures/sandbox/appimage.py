@@ -18,14 +18,14 @@ def write(path, text, mode=0o644):
     os.chmod(path, mode)
 
 
-def pack(output, sources):
+def pack(output, sources, runtime=RUNTIME):
     with tempfile.TemporaryDirectory() as root:
         payload = os.path.join(root, "payload")
         subprocess.run(
             ["mksquashfs", *sources, payload, "-quiet", "-no-progress", "-noappend", "-all-root", "-comp", "lz4"],
             check=True,
         )
-        with open(RUNTIME, "rb") as file:
+        with open(runtime, "rb") as file:
             runtime = bytearray(file.read())
         runtime[8:11] = APPIMAGE_TYPE_2
         with open(output, "wb") as out, open(payload, "rb") as squashed:

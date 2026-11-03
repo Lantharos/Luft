@@ -67,6 +67,14 @@ Chromium sandboxes its renderers with user namespaces, which the AppImage sandbo
 
 Renderers then run in their own namespaces with Chromium's system call filter, as in a Flatpak, and the apps no longer need `--no-sandbox`.
 
+## Opening files and links
+
+Whatever an AppImage opens, a download, a link or a folder, goes to the desktop portal, which starts your app for it in your own session. Schelf stands in for `xdg-open` for every AppImage: inside the sandbox it takes the place of `/usr/bin/xdg-open`, and an app you gave full access finds it first on its `PATH`, with `GIO_USE_PORTALS` set for GLib apps. It hands files to the portal's `OpenFile` and links to `OpenURI`, with the activation token of the click, so the app that opens comes to the front. That keeps the app for it out of the sandbox, and away from the folders the AppImage keeps its own files in: an app with full access runs with `XDG_CONFIG_HOME` and `XDG_DATA_HOME` pointing at its folder, which Schelf or Draft would otherwise take for yours.
+
+The portal only opens files the sandbox shows at the path they have outside it, such as your Downloads folder and the folders you gave the app, not the files in the app's own folder, which the sandbox shows as your home folder.
+
+The relay follows the bus authentication of every client, including ones that send their commands without waiting for each answer, as zbus does.
+
 ## Secrets
 
 The sandbox's `.flatpak-info` lists the names its bus proxy allows, as Flatpak's does. Since it names `org.freedesktop.secrets`, Luft's xdg-desktop-portal patch tells libsecret the Secret portal isn't there, and libsecret keeps passwords in Luft Keyring through the Secret Service, so Luft no longer rebuilds libsecret.

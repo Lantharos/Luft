@@ -16,6 +16,7 @@ const OUTER_USER_NAMESPACE: &str = "/run/.userns";
 const X11_AUTHORITY: &str = "Xauthority";
 const APP_RUN: &str = "/app/AppRun";
 const SYSTEMD_RUN: &str = "/usr/bin/systemd-run";
+const XDG_OPEN: &str = "/usr/bin/xdg-open";
 const ZYPAK: &str = "/usr/lib/zypak";
 const ZYPAK_HELPER: &str = "zypak-helper";
 const SYSTEM_FOLDERS: [&str; 5] = [
@@ -298,6 +299,7 @@ impl Profile<'_> {
     /// The mounts of the app's own sandbox.
     fn mounts(&self, home: &Path, launcher: &Path) -> Result<Arguments, String> {
         let mut arguments = self.floor(home, launcher, Temporary::Shared)?;
+        arguments.bind("--ro-bind", launcher, XDG_OPEN);
         self.devices(&mut arguments);
         arguments.0.extend(self.display()?.0);
         arguments.0.extend(self.sound()?.0);
@@ -322,7 +324,8 @@ impl Profile<'_> {
             .set("APPDIR", INSIDE_APP)
             .set("APPIMAGE", &self.app.image)
             .set("OWD", home)
-            .set("DESKTOPINTEGRATION", "1");
+            .set("DESKTOPINTEGRATION", "1")
+            .set("CHROME_DESKTOP", format!("{}.desktop", self.app.id));
         if self.shares_home(home) {
             let data = data_folder(home, &self.app.id)?;
             arguments

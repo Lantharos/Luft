@@ -1,7 +1,7 @@
 use std::os::fd::OwnedFd;
 use std::os::unix::net::{UnixListener, UnixStream};
 use std::path::Path;
-use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU32, AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex};
 
 use super::Portal;
@@ -46,6 +46,26 @@ pub fn serve(listener: UnixListener, upstream: &Path, portal: Arc<Portal>) {
     });
 }
 
+/// How far a connection's authentication got: how many commands the app
+/// sent before `BEGIN`, each of which the bus answers with one line, and
+/// whether it sent `BEGIN`, which apps may send before those answers arrive.
+#[derive(Default)]
+struct Authentication {
+    commands: AtomicUsize,
+    begun: AtomicBool,
+}
+
+impl Authentication {
+    fn sent(&self, lines: &[u8]) {
+        let commands = lines.iter().filter(|byte| **byte == b'\n').count();
+        self.commands.fetch_add(commands, Ordering::AcqRel);
+    }
+
+    fn answered(&self, replies: usize) -> bool {
+        self.begun.load(Ordering::Acquire) && replies >= self.commands.load(Ordering::Acquire)
+    }
+}
+
 fn relay(id: u64, app: UnixStream, bus: UnixStream, portal: Arc<Portal>) {
     let (Ok(app_reader), Ok(bus_writer)) = (app.try_clone(), bus.try_clone()) else {
         return;
@@ -55,11 +75,11 @@ fn relay(id: u64, app: UnixStream, bus: UnixStream, portal: Arc<Portal>) {
         stream: Mutex::new(app),
         serial: AtomicU32::new(1),
     });
-    let authenticated = Arc::new(AtomicBool::new(false));
-    let downstream = (client.clone(), authenticated.clone());
+    let authentication = Arc::new(Authentication::default());
+    let downstream = (client.clone(), authentication.clone());
     std::thread::spawn(move || from_bus(bus, &downstream.0, &downstream.1));
     std::thread::spawn(move || {
-        from_app(&app_reader, &bus_writer, &client, &authenticated, &portal);
+        from_app(&app_reader, &bus_writer, &client, &authentication, &portal);
         portal.disconnected(client.id);
         let _ = bus_writer.shutdown(std::net::Shutdown::Both);
     });
@@ -99,13 +119,13 @@ fn from_app(
     app: &UnixStream,
     bus: &UnixStream,
     client: &Arc<Client>,
-    authenticated: &AtomicBool,
+    authentication: &Authentication,
     portal: &Arc<Portal>,
 ) {
     let mut receiver = wire::Receiver::default();
     let mut bytes = Vec::new();
     let mut fds = Vec::new();
-    while !authenticated.load(Ordering::Acquire) {
+    while !authentication.begun.load(Ordering::Acquire) {
         if !matches!(receiver.receive(app, &mut bytes, &mut fds), Ok(true)) {
             return;
         }
@@ -114,13 +134,15 @@ fn from_app(
                 .iter()
                 .rposition(|byte| *byte == b'\n')
                 .map_or(0, |at| at + 1);
+            authentication.sent(&bytes[..keep]);
             if wire::send(bus, &bytes[..keep], &[]).is_err() {
                 return;
             }
             bytes.drain(..keep);
             continue;
         };
-        authenticated.store(true, Ordering::Release);
+        authentication.sent(&bytes[..end - AUTHENTICATED.len()]);
+        authentication.begun.store(true, Ordering::Release);
         if wire::send(bus, &bytes[..end], &[]).is_err() {
             return;
         }
@@ -143,17 +165,23 @@ fn from_app(
     }
 }
 
-fn from_bus(bus: UnixStream, client: &Client, authenticated: &AtomicBool) {
+fn from_bus(bus: UnixStream, client: &Client, authentication: &Authentication) {
     let mut receiver = wire::Receiver::default();
     let mut bytes = Vec::new();
     let mut fds = Vec::new();
+    let mut replies = 0;
     while let Ok(true) = receiver.receive(&bus, &mut bytes, &mut fds) {
-        if !authenticated.load(Ordering::Acquire) {
+        while !authentication.answered(replies)
+            && let Some(end) = bytes.iter().position(|byte| *byte == b'\n')
+        {
             let stream = client.stream.lock().expect("client stream");
-            if wire::send(&stream, &bytes, &[]).is_err() {
+            if wire::send(&stream, &bytes[..=end], &[]).is_err() {
                 return;
             }
-            bytes.clear();
+            bytes.drain(..=end);
+            replies += 1;
+        }
+        if !authentication.answered(replies) {
             continue;
         }
         let Ok(found) = frames(&mut bytes, &mut fds) else {

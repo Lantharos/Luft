@@ -1,0 +1,16 @@
+<node>
+  <interface name="org.freedesktop.portal.OpenURI">
+    <method name="OpenURI">
+      <arg type="s" direction="in"/>
+      <arg type="s" direction="in"/>
+      <arg type="a{sv}" direction="in"/>
+      <arg type="o" direction="out"/>
+    </method>
+    <method name="OpenFile">
+      <arg type="s" direction="in"/>
+      <arg type="h" direction="in"/>
+      <arg type="a{sv}" direction="in"/>
+      <arg type="o" direction="out"/>
+    </method>
+  </interface>
+</node>

@@ -1,3 +1,4 @@
+use std::ffi::OsString;
 use std::os::unix::process::CommandExt;
 use std::process::{Command, Stdio};
 
@@ -25,10 +26,21 @@ fn namespace_sandbox_works() -> bool {
         .is_ok_and(|status| status.success())
 }
 
-fn command(app: &App, arguments: Vec<String>) -> Result<Command, String> {
+/// The app's search path, where `xdg-open` hands what it opens to the
+/// portal, so your apps start in your own session rather than with the
+/// folders the app keeps its files in.
+fn search_path(folder: &Folder) -> Result<OsString, String> {
+    let system = std::env::var_os("PATH").unwrap_or_default();
+    std::env::join_paths(std::iter::once(folder.opener()?).chain(std::env::split_paths(&system)))
+        .map_err(|error| error.to_string())
+}
+
+fn command(app: &App, folder: &Folder, arguments: Vec<String>) -> Result<Command, String> {
     let data = data_folder(&home()?, &app.id)?;
     let mut command = Command::new(&app.image);
     command
+        .env("PATH", search_path(folder)?)
+        .env("GIO_USE_PORTALS", "1")
         .env("DESKTOPINTEGRATION", "1")
         .env("CHROME_DESKTOP", format!("{}.desktop", app.id))
         .env(SABINE_FULL_ACCESS, "1")
@@ -50,7 +62,7 @@ fn command(app: &App, arguments: Vec<String>) -> Result<Command, String> {
 /// keeping its own files in the same folder its sandbox would, and waits
 /// for it so later launches find it running.
 pub fn run(app: &App, folder: &Folder, arguments: Vec<String>) -> Result<i32, String> {
-    let mut child = command(app, arguments)?
+    let mut child = command(app, folder, arguments)?
         .spawn()
         .map_err(|error| error.to_string())?;
     folder.record_unsandboxed(child.id())?;
@@ -61,8 +73,8 @@ pub fn run(app: &App, folder: &Folder, arguments: Vec<String>) -> Result<i32, St
 
 /// Hands a launch to the copy of the app already running without a
 /// sandbox, which passes it on to its open window itself.
-pub fn hand_over(app: &App, arguments: Vec<String>) -> String {
-    match command(app, arguments) {
+pub fn hand_over(app: &App, folder: &Folder, arguments: Vec<String>) -> String {
+    match command(app, folder, arguments) {
         Ok(mut command) => command.exec().to_string(),
         Err(error) => error,
     }

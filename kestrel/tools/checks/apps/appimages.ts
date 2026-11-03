@@ -1,7 +1,9 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
+import GioUnix from 'gi://GioUnix';
 import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
+import Shell from 'gi://Shell';
 import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {checks} from '../lib/check.js';
@@ -10,7 +12,9 @@ import {fixture, outcome, repository, scratch, spawn, stop, waitForWindow, windo
 import {capture} from '../lib/screenshots.js';
 import {pause, waitUntil} from '../lib/wait.js';
 import {withApp} from './lib/apps.js';
+import {write} from './lib/files.js';
 import {showEnd} from './settings/navigation.js';
+import {withFullAccess} from '../lib/access/permissions.js';
 
 const {require} = checks('AppImage sandbox');
 const SCHELF = repository('target', 'release', 'schelf');
@@ -23,6 +27,9 @@ const WINDOW_TIMEOUT = 60000;
 const LOADING = 5000;
 const FIRST_APP: Point = [655, 468];
 const SCROLL_STEPS = 5;
+const OPENER = 'com.lantharos.KestrelChecks.TexOpener';
+const TEX = 'text/x-tex';
+const OPEN_TIMEOUT = 20000;
 
 export const timeout = 1200000;
 
@@ -72,6 +79,8 @@ async function checkApp(path: string) {
     const window = await waitForWindow(candidate => !before.has(candidate) && (!isWayland(candidate) || candidate.get_sandboxed_app_id() === id),
       `${name} opens a window that Kestrel knows as ${id} (launch ${launchNumber})`, WINDOW_TIMEOUT);
     if (!isWayland(window)) console.log(`Kestrel AppImage sandbox: ${name} uses X11, where windows carry no sandbox`);
+    const app = Shell.WindowTracker.get_default().get_window_app(window);
+    require(app?.get_id() === `${id}.desktop` && !app.is_window_backed(), `${name}'s window belongs to its menu entry, so it can be pinned`);
     require(GLib.file_test(GLib.build_filenamev([GLib.get_home_dir(), '.var', 'app', id]), GLib.FileTest.IS_DIR),
       `${name} keeps its files in a folder of its own`);
     if (launchNumber === 1) {
@@ -145,6 +154,61 @@ async function checkDeclaredAccess() {
   require(lines.includes('own'), 'an app given your home folder still keeps its own files in its folder');
 }
 
+function installOpener(record: string) {
+  const path = desktopFile(OPENER);
+  const script = scratch('tex-opener.sh');
+  write(script, `printf '%s\\n' "$1" "$(readlink /proc/self/ns/mnt)" "\${XDG_DATA_HOME:-$HOME/.local/share}" > ${GLib.shell_quote(record)}\n`);
+  write(path, `[Desktop Entry]\nType=Application\nName=Tex opener\nExec=sh ${script} %u\nMimeType=${TEX};\n`);
+  GioUnix.DesktopAppInfo.new_from_filename(path)!.set_as_default_for_type(TEX);
+  return () => {
+    Gio.AppInfo.reset_type_associations(TEX);
+    GLib.unlink(path);
+  };
+}
+
+async function opened(record: string, label: string) {
+  await waitUntil(() => GLib.file_test(record, GLib.FileTest.EXISTS), label, OPEN_TIMEOUT);
+  const [uri, namespace, dataHome] = new TextDecoder().decode(GLib.file_get_contents(record)[1]).split('\n');
+  GLib.unlink(record);
+  return {path: Gio.File.new_for_commandline_arg(uri).get_path(), namespace, dataHome};
+}
+
+function downloadsFolder() {
+  const folder = GLib.build_filenamev([GLib.get_home_dir(), 'Downloads']);
+  const userDirs = GLib.build_filenamev([GLib.get_user_config_dir(), 'user-dirs.dirs']);
+  if (!GLib.file_test(userDirs, GLib.FileTest.EXISTS)) write(userDirs, 'XDG_DOWNLOAD_DIR="$HOME/Downloads"\n');
+  GLib.mkdir_with_parents(folder, 0o755);
+  return folder;
+}
+
+async function checkOpening() {
+  const image = scratch('Atlas.AppImage');
+  require((await outcome(['python3', SABINE_BUILDER, image, 'org.example.Atlas', 'Atlas', ''])).ok, 'a Sabine AppImage is built');
+  const id = await install(image);
+  const page = GLib.build_filenamev([downloadsFolder(), 'page.tex']);
+  write(page, '\\documentclass{article}\n');
+  const record = scratch('opened-by-atlas');
+  const uninstall = installOpener(record);
+  const ownNamespace = GLib.file_read_link('/proc/self/ns/mnt');
+  const {program, rest} = launchLine(id);
+  const open = () => outcome([program, ...rest, 'xdg-open', page]);
+  try {
+    require((await open()).ok, 'a sandboxed AppImage opens a download');
+    const sandboxed = await opened(record, 'a file a sandboxed AppImage opens reaches the app for it');
+    require(sandboxed.path === page, 'the app for it gets the file the AppImage opened');
+    require(sandboxed.namespace === ownNamespace, 'the app for it starts outside the sandbox');
+    await withFullAccess(id, async () => {
+      require((await open()).ok, 'an AppImage with full access opens a download');
+      const unsandboxed = await opened(record, 'a file an AppImage with full access opens reaches the app for it');
+      require(unsandboxed.path === page, 'the app for it gets the file an AppImage with full access opened');
+      require(unsandboxed.dataHome === GLib.get_user_data_dir(), "the app for it starts with your own folders, not the AppImage's");
+    });
+  } finally {
+    uninstall();
+    GLib.unlink(page);
+  }
+}
+
 function appImagesIn(folder: string) {
   const found = Gio.File.new_for_path(folder);
   if (!found.query_exists(null)) return [];
@@ -159,6 +223,7 @@ export async function run() {
     return;
   }
   await checkDeclaredAccess();
+  await checkOpening();
   const electron = GLib.getenv('KESTREL_ELECTRON');
   if (electron && GLib.file_test(ZYPAK, GLib.FileTest.IS_EXECUTABLE)) await checkRendererSandbox(electron);
   else if (electron) console.log('Kestrel AppImage sandbox: Electron\'s renderer sandbox skipped without Zypak');

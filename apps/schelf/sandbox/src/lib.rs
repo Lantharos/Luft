@@ -6,6 +6,7 @@ mod escalate;
 mod files;
 mod inside;
 mod launch;
+mod open;
 mod portal;
 mod request;
 mod scope;
@@ -24,8 +25,10 @@ const CONFINE: &str = "--sandbox-confine";
 /// line asks for, and returns the exit status.
 pub fn run(arguments: &[String]) -> Option<i32> {
     let called = std::env::args().next()?;
-    if std::path::Path::new(&called).file_name()? == scope::SYSTEMD_RUN {
-        return Some(scope::run_here(arguments));
+    match std::path::Path::new(&called).file_name()?.to_str()? {
+        scope::SYSTEMD_RUN => return Some(scope::run_here(arguments)),
+        open::XDG_OPEN => return Some(open::run(arguments)),
+        _ => {}
     }
     match arguments.split_first()? {
         (flag, [id, rest @ ..]) if flag == SANDBOX => Some(launch::run(id, rest.to_vec())),

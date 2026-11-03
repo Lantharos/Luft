@@ -125,6 +125,18 @@ impl Folder {
         Ok(())
     }
 
+    /// A folder that puts Schelf's `xdg-open` ahead of the system's, for an
+    /// app that runs without a sandbox.
+    pub fn opener(&self) -> Result<PathBuf, String> {
+        let folder = self.path.join("bin");
+        private_folder(&folder)?;
+        let link = folder.join(crate::open::XDG_OPEN);
+        let launcher = std::env::current_exe().map_err(|error| error.to_string())?;
+        let _ = fs::remove_file(&link);
+        std::os::unix::fs::symlink(launcher, &link).map_err(|error| error.to_string())?;
+        Ok(folder)
+    }
+
     pub fn mount_point(&self) -> PathBuf {
         self.path.join("app")
     }

@@ -5,6 +5,7 @@ generic_name = "Mail"
 categories = ["Network", "Email", "Office"]
 keywords = ["mail", "email", "e-mail", "inbox", "imap", "smtp", "jmap", "gmail", "outlook", "fastmail", "newsletter", "thunderbird", "evolution", "geary"]
 version = "0.1.0"
+maintainer = "Lantharos <kristof@lanth.me>"
 icon = "public/favicon.svg"
 cargo_manifest = "desktop/Cargo.toml"
 mime_types = ["x-scheme-handler/mailto", "message/rfc822"]

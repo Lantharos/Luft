@@ -5,6 +5,7 @@ generic_name = "Terminal"
 categories = ["System", "TerminalEmulator"]
 keywords = ["terminal", "console", "shell", "command line", "command prompt", "cmd", "powershell", "prompt", "cli", "tty", "bash", "zsh", "fish", "xterm", "konsole", "ptyxis"]
 version = "0.1.0"
+maintainer = "Lantharos <kristof@lanth.me>"
 icon = "public/favicon.svg"
 cargo_manifest = "desktop/Cargo.toml"
 

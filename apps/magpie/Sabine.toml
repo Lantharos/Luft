@@ -5,6 +5,7 @@ generic_name = "Media Viewer"
 categories = ["AudioVideo", "Audio", "Video", "Player", "Graphics", "Viewer"]
 keywords = ["photos", "pictures", "images", "image viewer", "gallery", "video player", "videos", "movies", "music player", "music", "audio", "songs", "pdf", "document viewer", "preview", "viewer", "fonts", "font viewer", "typeface", "media player", "loupe", "totem", "showtime", "evince", "papers", "vlc", "gnome-font-viewer"]
 version = "0.1.0"
+maintainer = "Lantharos <kristof@lanth.me>"
 icon = "public/favicon.svg"
 cargo_manifest = "desktop/Cargo.toml"
 mime_types = [

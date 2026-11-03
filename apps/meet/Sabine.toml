@@ -5,6 +5,7 @@ generic_name = "Luft installer for Windows"
 categories = ["System"]
 keywords = ["luft", "install", "dual boot", "linux"]
 version = "0.1.2"
+maintainer = "Lantharos <kristof@lanth.me>"
 icon = "public/favicon.svg"
 installer_image = "desktop/installer.png"
 cargo_manifest = "desktop/Cargo.toml"

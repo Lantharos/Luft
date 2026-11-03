@@ -1,0 +1,7 @@
+id = "com.lantharos.NowPlaying"
+kind = "extension"
+format = "luft-extension"
+permissions = "extension.toml"
+
+[requires]
+extension_api = 1

@@ -1,0 +1,29 @@
+id = "com.lantharos.NowPlaying"
+name = "Now Playing"
+description = "What's playing, in the taskbar, with its cover and controls."
+version = "1.0.0"
+api = 1
+permissions = ["taskbar", "media", "popups"]
+
+[[settings]]
+key = "show"
+type = "choice"
+label = "show"
+default = "everything"
+options = [
+  { value = "everything", label = "show-everything" },
+  { value = "title", label = "show-title" },
+  { value = "cover", label = "show-cover" },
+]
+
+[[settings]]
+key = "controls"
+type = "switch"
+label = "controls"
+default = true
+
+[[settings]]
+key = "hide-paused"
+type = "switch"
+label = "hide-paused"
+default = false

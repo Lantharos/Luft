@@ -52,6 +52,7 @@ build_layer_parts() {
   local name ref
   base="$(</usr/share/luft/base-image)"
   podman_options=()
+  snapshot_tree
   while read -r name ref; do
     part_exists "$ref" || build_part "$name" "$ref"
     extract_part "$name" "$ref"

@@ -1,6 +1,6 @@
 ## The home page of luft.computer
 
-home-title = Luft OS – rami ir sparti darbo aplinka jūsų kompiuteriui
+home-title = Luft – rami ir sparti darbo aplinka jūsų kompiuteriui
 home-description = Rami ir sparti darbo aplinka jūsų kompiuteriui. Išbandykite ją iš Windows arba Linux vienu paleidimu iš naujo, be USB atmintuko.
 home-get = Gauti Luft
 home-look = Apžvelgti

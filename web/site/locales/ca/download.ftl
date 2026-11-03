@@ -1,4 +1,4 @@
-download-title = Baixa Luft OS
+download-title = Baixa Luft
 download-description = Proveu o instal·leu Luft des de Windows o Linux amb Meet Luft, o baixeu la ISO per a una memòria USB.
 download-heading = Obtén Luft
 download-lede = Gratuït, per a qualsevol PC de 64 bits. Comenceu des del sistema que ja teniu, o des d’una memòria USB.

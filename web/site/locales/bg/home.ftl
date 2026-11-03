@@ -1,6 +1,6 @@
 ## The home page of luft.computer
 
-home-title = Luft OS – спокойна и бърза работна среда за вашия компютър
+home-title = Luft – спокойна и бърза работна среда за вашия компютър
 home-description = Спокойна и бърза работна среда за вашия компютър. Пробвайте я от Windows или Linux с едно рестартиране, без USB флашка.
 home-get = Изтегли Luft
 home-look = Разгледай

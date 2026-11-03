@@ -1,6 +1,6 @@
 ## The download page, and the download buttons on the home page
 
-download-title = Laadi alla Luft OS
+download-title = Laadi alla Luft
 download-description = Proovi või installi Luft Windowsist või Linuxist rakendusega Meet Luft või laadi alla ISO USB-mälupulga jaoks.
 download-heading = Hangi Luft
 download-lede = Tasuta, igale 64-bitisele arvutile. Alusta praegusest süsteemist või USB-mälupulgalt.

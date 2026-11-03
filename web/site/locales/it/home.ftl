@@ -1,4 +1,4 @@
-home-title = Luft OS – un desktop calmo e veloce per il tuo PC
+home-title = Luft – un desktop calmo e veloce per il tuo PC
 home-description = Un desktop calmo e veloce per il tuo PC. Provalo da Windows o Linux con un solo riavvio, senza chiavetta USB.
 home-get = Scarica Luft
 home-look = Dai un’occhiata

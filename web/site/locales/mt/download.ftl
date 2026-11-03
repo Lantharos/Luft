@@ -1,6 +1,6 @@
 ## The download page, and the download buttons on the home page
 
-download-title = Niżżel Luft OS
+download-title = Niżżel Luft
 download-description = Ipprova jew installa Luft minn Windows jew Linux b’Meet Luft, jew niżżel l-ISO għal drajv USB.
 download-heading = Ikseb Luft
 download-lede = B’xejn, għal kull PC ta’ 64 bit. Ibda mis-sistema li għandek, jew minn drajv USB.

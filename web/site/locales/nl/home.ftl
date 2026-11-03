@@ -1,6 +1,6 @@
 ## The home page of luft.computer
 
-home-title = Luft OS – een rustig, snel bureaublad voor je pc
+home-title = Luft – een rustig, snel bureaublad voor je pc
 home-description = Een rustig, snel bureaublad voor je pc. Probeer het vanuit Windows of Linux met één herstart, zonder usb-stick.
 home-get = Luft downloaden
 home-look = Bekijken

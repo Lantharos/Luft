@@ -1,6 +1,6 @@
 ## The download page, and the download buttons on the home page
 
-download-title = Last ned Luft OS
+download-title = Last ned Luft
 download-description = Prøv eller installer Luft frå Windows eller Linux med Meet Luft, eller last ned ISO-fila til ein minnepinne.
 download-heading = Få Luft
 download-lede = Gratis, for alle 64-bits PC-ar. Start frå systemet du har, eller frå ein minnepinne.

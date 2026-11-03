@@ -16,15 +16,13 @@ export function homeStructuredData(description: string) {
 			},
 			{
 				'@type': 'WebSite',
-				name: 'Luft OS',
-				alternateName: 'Luft',
+				name: 'Luft',
 				url: `${urls.site}/`,
 				publisher: { '@id': PUBLISHER }
 			},
 			{
 				'@type': 'SoftwareApplication',
-				name: 'Luft OS',
-				alternateName: 'Luft',
+				name: 'Luft',
 				description,
 				url: `${urls.site}/`,
 				downloadUrl: `${urls.site}/download`,

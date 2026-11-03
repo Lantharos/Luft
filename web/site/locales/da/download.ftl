@@ -1,6 +1,6 @@
 ## The download page, and the download buttons on the home page
 
-download-title = Hent Luft OS
+download-title = Hent Luft
 download-description = Prøv eller installer Luft fra Windows eller Linux med Meet Luft, eller hent ISO-filen til et USB-stik.
 download-heading = Hent Luft
 download-lede = Gratis, til enhver 64-bit-pc. Start fra det system, du har, eller fra et USB-stik.

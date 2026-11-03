@@ -1,6 +1,6 @@
 ## The home page of luft.computer
 
-home-title = Luft OS – një desktop i qetë dhe i shpejtë për kompjuterin tënd
+home-title = Luft – një desktop i qetë dhe i shpejtë për kompjuterin tënd
 home-description = Një desktop i qetë dhe i shpejtë për kompjuterin tënd. Provoje nga Windows ose Linux me një rinisje, pa memorie USB.
 home-get = Merr Luft
 home-look = Hidhi një sy

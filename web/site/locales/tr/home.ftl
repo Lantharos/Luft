@@ -1,6 +1,6 @@
 ## The home page of luft.computer
 
-home-title = Luft OS – bilgisayarınız için sakin ve hızlı bir masaüstü
+home-title = Luft – bilgisayarınız için sakin ve hızlı bir masaüstü
 home-description = Bilgisayarınız için sakin ve hızlı bir masaüstü. Windows’tan ya da Linux’tan tek bir yeniden başlatmayla deneyin, USB bellek gerekmez.
 home-get = Luft’u edin
 home-look = Göz at

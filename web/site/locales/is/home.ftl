@@ -1,4 +1,4 @@
-home-title = Luft OS – rólegt og snöggt skjáborð fyrir tölvuna þína
+home-title = Luft – rólegt og snöggt skjáborð fyrir tölvuna þína
 home-description = Rólegt og snöggt skjáborð fyrir tölvuna þína. Prófaðu það úr Windows eða Linux með einni endurræsingu, án USB-lykils.
 home-get = Sækja Luft
 home-look = Skoða nánar

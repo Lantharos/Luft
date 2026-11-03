@@ -1,4 +1,4 @@
-home-title = Luft OS – un escritorio tranquilo y rápido para tu PC
+home-title = Luft – un escritorio tranquilo y rápido para tu PC
 home-description = Un escritorio tranquilo y rápido para tu PC. Pruébalo desde Windows o Linux con un solo reinicio, sin memoria USB.
 home-get = Obtener Luft
 home-look = Echar un vistazo

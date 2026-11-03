@@ -1,6 +1,6 @@
 ## The home page of luft.computer
 
-home-title = Luft OS – umirjeno in hitro namizje za vaš računalnik
+home-title = Luft – umirjeno in hitro namizje za vaš računalnik
 home-description = Umirjeno in hitro namizje za vaš računalnik. Preizkusite ga iz sistema Windows ali Linux z enim vnovičnim zagonom, brez ključka USB.
 home-get = Prenesi Luft
 home-look = Oglej si

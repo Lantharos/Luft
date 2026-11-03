@@ -1,4 +1,4 @@
-home-title = Luft OS – um ambiente de trabalho calmo e rápido para o seu PC
+home-title = Luft – um ambiente de trabalho calmo e rápido para o seu PC
 home-description = Um ambiente de trabalho calmo e rápido para o seu PC. Experimente-o a partir do Windows ou do Linux com um só reinício, sem pen USB.
 home-get = Obter o Luft
 home-look = Ver mais

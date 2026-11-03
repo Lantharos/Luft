@@ -1,6 +1,6 @@
 ## The home page of luft.computer
 
-home-title = Luft OS – desktop kalm u ħafif għall-kompjuter tiegħek
+home-title = Luft – desktop kalm u ħafif għall-kompjuter tiegħek
 home-description = Desktop kalm u ħafif għall-kompjuter tiegħek. Ipprovah minn Windows jew Linux b’restart wieħed, mingħajr drajv USB.
 home-get = Ikseb Luft
 home-look = Agħti ħarsa

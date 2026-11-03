@@ -1,6 +1,6 @@
 ## The home page of luft.computer
 
-home-title = Luft OS – et rolig, raskt skrivebord for PC-en din
+home-title = Luft – et rolig, raskt skrivebord for PC-en din
 home-description = Et rolig, raskt skrivebord for PC-en din. Prøv det fra Windows eller Linux med én omstart, uten minnepinne.
 home-get = Last ned Luft
 home-look = Ta en titt

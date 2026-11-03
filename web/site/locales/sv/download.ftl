@@ -1,6 +1,6 @@
 ## The download page, and the download buttons on the home page
 
-download-title = Hämta Luft OS
+download-title = Hämta Luft
 download-description = Prova eller installera Luft från Windows eller Linux med Meet Luft, eller hämta ISO-filen till ett USB-minne.
 download-heading = Hämta Luft
 download-lede = Gratis, för alla 64-bitars datorer. Börja från systemet du har, eller från ett USB-minne.

@@ -1,6 +1,6 @@
 ## The download page, and the download buttons on the home page
 
-download-title = Prenos Luft OS-a
+download-title = Prenos Lufta
 download-description = Preizkusite ali namestite Luft iz sistema Windows ali Linux z aplikacijo Meet Luft ali pa prenesite ISO za ključek USB.
 download-heading = Prenesite Luft
 download-lede = Brezplačno, za vsak 64-bitni računalnik. Začnite iz sistema, ki ga imate, ali s ključka USB.

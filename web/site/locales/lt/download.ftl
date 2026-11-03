@@ -1,6 +1,6 @@
 ## The download page, and the download buttons on the home page
 
-download-title = Atsisiųsti Luft OS
+download-title = Atsisiųsti Luft
 download-description = Išbandykite arba įdiekite Luft iš Windows ar Linux su Meet Luft arba atsisiųskite ISO USB atmintukui.
 download-heading = Gauti Luft
 download-lede = Nemokama, bet kuriam 64 bitų kompiuteriui. Pradėkite iš turimos sistemos arba nuo USB atmintuko.

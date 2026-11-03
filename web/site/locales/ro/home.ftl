@@ -1,4 +1,4 @@
-home-title = Luft OS – un desktop calm și rapid pentru PC
+home-title = Luft – un desktop calm și rapid pentru PC
 home-description = Un desktop calm și rapid pentru PC. Încercați-l din Windows sau Linux cu o singură repornire, fără stick USB.
 home-get = Obține Luft
 home-look = Aruncă o privire

@@ -1,6 +1,6 @@
 ## The download page, and the download buttons on the home page
 
-download-title = Pobierz Luft OS
+download-title = Pobierz Luft
 download-description = Wypróbuj lub zainstaluj Luft z systemu Windows lub Linux za pomocą aplikacji Meet Luft albo pobierz obraz ISO na pamięć USB.
 download-heading = Pobierz Luft
 download-lede = Bezpłatnie, na każdy 64-bitowy komputer. Zacznij od systemu, który masz, albo od pamięci USB.

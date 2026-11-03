@@ -1,6 +1,6 @@
 ## The download page, and the download buttons on the home page
 
-download-title = Stáhnout Luft OS
+download-title = Stáhnout Luft
 download-description = Vyzkoušejte nebo nainstalujte Luft z Windows nebo Linuxu pomocí aplikace Meet Luft, nebo si stáhněte obraz ISO pro flash disk.
 download-heading = Získejte Luft
 download-lede = Zdarma, pro každé 64bitové PC. Začněte ze systému, který máte, nebo z flash disku.

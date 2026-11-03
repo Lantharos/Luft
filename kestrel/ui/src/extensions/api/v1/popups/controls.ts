@@ -1,5 +1,6 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
+import GObject from 'gi://GObject';
 import GLib from 'gi://GLib';
 import Pango from 'gi://Pango';
 import St from 'gi://St';
@@ -35,34 +36,64 @@ export function imageFile(host: ControlHost, path: string): Gio.File {
 const MARQUEE_PAUSE_MS = 1200;
 const MARQUEE_PIXELS_PER_S = 36;
 
+/** Lays out one child no wider than `widest`: cut to it, or at its full width for sliding along, and remembers by how much it's too wide. */
+const WidestLayout = GObject.registerClass(class WidestLayout extends Clutter.BinLayout {
+  widest = 0;
+  sliding = false;
+  overflow = 0;
+
+  vfunc_get_preferred_width(container: Clutter.Actor, forHeight: number): [number, number] {
+    const [minimum, natural] = super.vfunc_get_preferred_width(container, forHeight);
+    return this.widest ? [Math.min(minimum, this.widest), Math.min(natural, this.widest)] : [minimum, natural];
+  }
+
+  vfunc_allocate(container: Clutter.Actor, box: Clutter.ActorBox): void {
+    const child = container.get_first_child();
+    if (!child) return;
+    const [, natural] = child.get_preferred_width(box.get_height());
+    const width = box.get_width();
+    this.overflow = Math.max(0, natural - width);
+    const shown = this.sliding ? natural : Math.min(natural, width);
+    const top = box.y1 + (box.get_height() - child.get_preferred_height(shown)[1]) / 2;
+    child.allocate(Clutter.ActorBox.new(box.x1, top, box.x1 + shown, top + child.get_preferred_height(shown)[1]));
+  }
+});
+
 /** Text that fits its width: cut short with an ellipsis, or sliding along once to show the rest. */
-function fittedText(label: St.Label): { actor: St.BoxLayout; fit(maxWidth: number | undefined, marquee: boolean): void; slide(): void } {
-  const clip = new St.BoxLayout({ clip_to_allocation: true, reactive: true, track_hover: true, y_align: Clutter.ActorAlign.CENTER });
+function fittedText(label: St.Label): { actor: St.Widget; fit(maxWidth: number | undefined, marquee: boolean): void; slide(): void } {
+  const layout = new WidestLayout();
+  const clip = new St.Widget({ layout_manager: layout, clip_to_allocation: true, reactive: true, track_hover: true, y_align: Clutter.ActorAlign.CENTER });
   clip.add_child(label);
-  let marquee = false;
-  let overflow = 0;
+  let waiting = 0;
+  const startSliding = () => {
+    waiting = 0;
+    const overflow = layout.overflow;
+    if (!layout.sliding || overflow <= 0) return GLib.SOURCE_REMOVE;
+    animateActor(label, {
+      translation_x: -overflow, duration: Math.round(overflow / MARQUEE_PIXELS_PER_S * 1000), mode: Clutter.AnimationMode.EASE_IN_OUT_SINE,
+      onComplete: () => animateActor(label, { translation_x: 0, duration: 400, delay: MARQUEE_PAUSE_MS, mode: Clutter.AnimationMode.EASE_OUT_QUAD }),
+    });
+    return GLib.SOURCE_REMOVE;
+  };
   const slide = () => {
     label.remove_transition('translation-x');
     label.translation_x = 0;
-    if (!marquee || overflow <= 0) return;
-    const duration = Math.round(overflow / MARQUEE_PIXELS_PER_S * 1000);
-    animateActor(label, {
-      translation_x: -overflow, duration, delay: MARQUEE_PAUSE_MS, mode: Clutter.AnimationMode.EASE_IN_OUT_SINE,
-      onComplete: () => animateActor(label, { translation_x: 0, duration: 400, delay: MARQUEE_PAUSE_MS, mode: Clutter.AnimationMode.EASE_OUT_QUAD }),
-    });
+    if (waiting) GLib.source_remove(waiting);
+    waiting = GLib.timeout_add(GLib.PRIORITY_DEFAULT, MARQUEE_PAUSE_MS, startSliding);
   };
+  clip.connect('destroy', () => {
+    if (waiting) GLib.source_remove(waiting);
+  });
   clip.connect('notify::hover', () => {
     if (clip.hover) slide();
   });
   return {
     actor: clip,
-    fit: (maxWidth, scrolls) => {
-      marquee = scrolls;
-      label.clutter_text.ellipsize = maxWidth && !scrolls ? Pango.EllipsizeMode.END : Pango.EllipsizeMode.NONE;
-      const natural = label.get_preferred_width(-1)[1];
-      overflow = maxWidth ? Math.max(0, natural - maxWidth) : 0;
-      clip.width = maxWidth ? Math.min(natural, maxWidth) : -1;
-      label.width = maxWidth && !scrolls ? Math.min(natural, maxWidth) : -1;
+    fit: (maxWidth, marquee) => {
+      layout.widest = maxWidth ?? 0;
+      layout.sliding = !!maxWidth && marquee;
+      label.clutter_text.ellipsize = maxWidth && !marquee ? Pango.EllipsizeMode.END : Pango.EllipsizeMode.NONE;
+      layout.layout_changed();
     },
     slide,
   };
@@ -159,7 +190,8 @@ export function buttonControl(node: ButtonView, host: ControlHost): Control<Butt
     button.accessible_name = next.label ?? '';
     button.reactive = button.can_focus = !next.disabled;
     button.opacity = next.disabled ? 110 : 255;
-    button.style_class = `button kestrel-extension-button ${next.style ?? 'default'}${label.visible ? '' : ' icon-only'}`;
+    icon.icon_size = next.small ? 14 : 16;
+    button.style_class = `button kestrel-extension-button ${next.style ?? 'default'}${label.visible ? '' : ' icon-only'}${next.small ? ' small' : ''}`;
   };
   update(node);
   return { actor: button, update };

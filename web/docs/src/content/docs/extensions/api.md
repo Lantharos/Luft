@@ -105,7 +105,7 @@ Content is a tree of Luft's own controls, so a pop-up looks and behaves like the
 | `{ type: 'text', text, style?, maxWidth?, marquee? }` | `title`, `body`, `caption`, or `number` for digits that keep their width. Text wider than `maxWidth` ends in an ellipsis, or with `marquee` slides along once when it changes and while the pointer is over it |
 | `{ type: 'icon', icon, size? }` | An icon |
 | `{ type: 'image', path, width, height, radius?, progress? }` | A picture from the extension's folders, or a player's artwork, with rounded corners. `progress`, 0 to 1, draws a thin ring around a round picture, such as how far along a track is |
-| `{ type: 'button', label?, icon?, iconOnly?, style?, disabled?, onActivate }` | `style` is `default`, `primary` or `flat` |
+| `{ type: 'button', label?, icon?, iconOnly?, style?, small?, disabled?, onActivate }` | `style` is `default`, `primary` or `flat`; `small` makes it smaller, such as controls under a title in the taskbar |
 | `{ type: 'switch', label, checked, onToggled(checked) }` | A switch with its label |
 | `{ type: 'slider', label, value, onChanged(value) }` | A slider from 0 to 1 |
 | `{ type: 'entry', label, placeholder?, text?, onChanged?(text), onSubmit?(text) }` | A text field; `onSubmit` runs on Enter |

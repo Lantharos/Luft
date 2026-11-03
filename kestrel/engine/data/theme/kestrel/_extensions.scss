@@ -6,6 +6,8 @@
 .kestrel-extension-button { padding: 7px 14px; font-size: 13px; font-weight: 500; }
 .kestrel-extension-button-box { spacing: 6px; }
 .kestrel-extension-button.icon-only { padding: 7px; }
+.kestrel-extension-button.small { padding: 4px 8px; font-size: 12px; }
+.kestrel-extension-button.icon-only.small { padding: 3px; }
 .kestrel-extension-button.flat { background-color: transparent; }
 .kestrel-extension-button.primary { font-weight: 600; }
 
@@ -34,4 +36,5 @@
 .kestrel-extension-element {
   .kestrel-extension-text-title { font-size: 13px; }
   .kestrel-extension-button { padding: 3px 5px; border-radius: 8px; }
+  .kestrel-extension-button.icon-only.small { padding: 2px 4px; border-radius: 6px; }
 }

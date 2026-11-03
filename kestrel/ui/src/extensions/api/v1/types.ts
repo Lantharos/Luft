@@ -438,6 +438,8 @@ export interface ButtonView {
   icon?: Icon;
   iconOnly?: boolean;
   style?: 'default' | 'primary' | 'flat';
+  /** A smaller button with a smaller icon, such as media controls under a title in the taskbar. */
+  small?: boolean;
   disabled?: boolean;
   onActivate(): void;
 }

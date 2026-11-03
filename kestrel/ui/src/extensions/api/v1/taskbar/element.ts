@@ -1,4 +1,5 @@
 import Clutter from 'gi://Clutter';
+import GLib from 'gi://GLib';
 import St from 'gi://St';
 
 import type { ElementActor, ElementLayout } from '../../../../desktop/panel/widgets/extensionElements.js';
@@ -43,6 +44,7 @@ export class ElementWidget implements ElementActor {
   private readonly grown: RenderedView;
   private growing = false;
   private shown = false;
+  private waiting = 0;
 
   constructor(private readonly state: () => ElementState, controls: ControlHost, private readonly handlers: ElementHandlers, private layout: ElementLayout) {
     this.compact = new RenderedView(controls);
@@ -91,6 +93,10 @@ export class ElementWidget implements ElementActor {
   }
 
   private sync(animate: boolean): void {
+    if (!this.actor.get_stage()) {
+      this.syncOnceOnStage();
+      return;
+    }
     const state = this.state();
     const growing = this.actor.hover && !!state.expanded && state.shown;
     if (growing !== this.growing) {
@@ -131,7 +137,16 @@ export class ElementWidget implements ElementActor {
     });
   }
 
+  private syncOnceOnStage(): void {
+    this.waiting ||= GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
+      this.waiting = 0;
+      this.sync(false);
+      return GLib.SOURCE_REMOVE;
+    });
+  }
+
   destroy(): void {
+    if (this.waiting) GLib.source_remove(this.waiting);
     this.actor.destroy();
   }
 }

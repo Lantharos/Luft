@@ -17,8 +17,11 @@ const NOW_PLAYING = 'com.lantharos.NowPlaying';
 const ELEMENT = `extension-element:${NOW_PLAYING}/now-playing`;
 const LENGTH_S = 214;
 const LAYOUTS = ['compact', 'full', 'no-controls', 'cover'];
-const PREVIEW_MARGIN = 36;
-const MAX_WIDTH = 200;
+const PREVIEW_WIDTH = 300;
+const TITLE_WIDTH = 104;
+const NARROW_TITLE = 80;
+const SPACING = 8;
+const TITLE_SLIDES_FOR_MS = 8000;
 const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 
 const element = () => descendants(global.stage).find(actor => actor.name === ELEMENT) ?? null;
@@ -38,7 +41,7 @@ function player(name: string, identity: string, title: string, artist: string, c
 /** A 3:2 picture of the element where it sits on the taskbar, for the layout's preview in Settings. */
 async function preview(name: string) {
   const [x] = element()!.get_transformed_position();
-  const width = MAX_WIDTH + 2 * PREVIEW_MARGIN;
+  const width = PREVIEW_WIDTH;
   const height = Math.round(width * 2 / 3);
   const left = Math.max(0, Math.min(global.stage.width - width, Math.round(x + element()!.width / 2 - width / 2)));
   await captureArea(name, {x: left, y: global.stage.height - height, width, height});
@@ -49,21 +52,30 @@ const titleWidth = () => descendants(element()!).find(actor => actor instanceof 
 async function checkLayouts() {
   const widths: Record<string, number> = {};
   const titles: Record<string, number> = {};
+  rest();
   for (const layout of LAYOUTS) {
     await setSetting(NOW_PLAYING, 'layout', new GLib.Variant('s', layout));
     await pause(700);
     widths[layout] = element()!.width;
-    if (layout !== 'cover') titles[layout] = titleWidth();
+    if (layout !== 'cover') {
+      titles[layout] = titleWidth();
+      await pause(TITLE_SLIDES_FOR_MS);
+    }
     await capture(`now-playing-${layout}`);
     await preview(`now-playing-preview-${layout}`);
   }
-  require(Object.values(widths).every(width => width <= MAX_WIDTH + 2), `every layout stays within the widest width people chose (${Object.values(widths).join(', ')} pixels)`);
-  require(titles.compact > titles.full + 40, `with the controls under it the title gets far more room (${titles.compact} and ${titles.full} pixels)`);
-  require(widths.cover <= element()!.height + 8, 'just the cover is a small square');
-  await setSetting(NOW_PLAYING, 'max-width', new GLib.Variant('d', 140));
+  const cover = element()!.height;
+  const compactAtMost = cover + SPACING + TITLE_WIDTH + 4;
+  require(widths.compact <= compactAtMost, `compact is the cover and a short title, ${widths.compact} pixels wide (${compactAtMost} at most)`);
+  require(titles.compact <= TITLE_WIDTH && titles.full <= TITLE_WIDTH, 'a long title slides along within the title width instead of widening it');
+  require(widths.full > widths.compact + 40, `the wide layout puts the controls beside it (${widths.full} pixels)`);
+  require(widths.cover <= cover + 8, 'just the cover is a small square');
   await setSetting(NOW_PLAYING, 'layout', new GLib.Variant('s', 'compact'));
-  await eventually(() => element()!.width <= 150, 'a smaller widest width keeps it inside it');
-  await setSetting(NOW_PLAYING, 'max-width', new GLib.Variant('d', 200));
+  await setSetting(NOW_PLAYING, 'title-width', new GLib.Variant('d', NARROW_TITLE));
+  await eventually(() => element()!.width < widths.compact - 10, 'a narrower title width makes it narrower still');
+  await setSetting(NOW_PLAYING, 'title-width', new GLib.Variant('d', TITLE_WIDTH));
+  await eventually(() => Math.abs(element()!.width - widths.compact) < 2, 'and the default brings it back');
+  return widths.compact;
 }
 
 async function playerProperty(name: string, property: string) {
@@ -87,15 +99,14 @@ export async function run() {
     await pause(400);
     await capture('now-playing-taskbar');
 
-    await checkLayouts();
-    await setSetting(NOW_PLAYING, 'layout', new GLib.Variant('s', 'compact'));
-    await pause(600);
-    const compact = actor.width;
+    const compact = await checkLayouts();
     moveTo([actor.get_transformed_position()[0] + 14, actor.get_transformed_position()[1] + actor.height / 2]);
     await eventually(() => actor.width > compact + 40, 'it grows under the pointer');
     await pause(500);
     await eventually(() => mentions(actor, '/ 3:34 · Tunes'), 'and shows which app plays and how far along');
     await capture('now-playing-grown');
+    rest();
+    await eventually(() => Math.abs(actor.width - compact) < 2, 'it shrinks back to its compact width when the pointer leaves');
 
     buttonNamed(actor, 'Pause')!.emit('clicked', 1);
     await eventually(async () => await playerProperty('KestrelCheckMusic', 'PlaybackStatus') === 'Paused', 'its pause button pauses the player');

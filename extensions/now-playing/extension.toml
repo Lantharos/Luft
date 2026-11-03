@@ -29,13 +29,13 @@ options = [
 ]
 
 [[settings]]
-key = "max-width"
+key = "title-width"
 type = "slider"
-label = "max-width"
-default = 200
-min = 140
-max = 420
-step = 10
+label = "title-width"
+default = 104
+min = 80
+max = 320
+step = 8
 
 [[settings]]
 key = "hide-paused"

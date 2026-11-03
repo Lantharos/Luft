@@ -7,8 +7,6 @@ type Granted = 'taskbar' | 'media' | 'popups';
 export type Layout = 'compact' | 'full' | 'no-controls' | 'cover';
 
 const SPACING = 8;
-const CONTROL = 26;
-const SMALLEST_TEXT = 60;
 const PROGRESS_WIDTH = 120;
 
 export function cover(player: MediaPlayer, size: number, radius: number, progress?: number): View {
@@ -17,9 +15,9 @@ export function cover(player: MediaPlayer, size: number, radius: number, progres
     : { type: 'icon', icon: 'audio-x-generic-symbolic', size: Math.round(size * 0.6) };
 }
 
-export function controls(extension: Extension<Granted>, player: MediaPlayer, vertical = false): View {
+export function controls(extension: Extension<Granted>, player: MediaPlayer, vertical = false, small = false): View {
   const button = (icon: string, label: string, onActivate: () => void, disabled = false): View =>
-    ({ type: 'button', icon, label, iconOnly: true, style: 'flat', disabled, onActivate });
+    ({ type: 'button', icon, label, iconOnly: true, style: 'flat', small, disabled, onActivate });
   return {
     type: vertical ? 'column' : 'row',
     spacing: 0,
@@ -39,12 +37,12 @@ function choices(extension: Extension<Granted>) {
   return {
     layout,
     second: second === 'controls' && layout !== 'compact' ? 'artist' : second,
-    maxWidth: extension.settings.get<number>('max-width'),
+    titleWidth: extension.settings.get<number>('title-width'),
   };
 }
 
 function secondLine(extension: Extension<Granted>, player: MediaPlayer, second: string, width: number): View {
-  if (second === 'controls') return controls(extension, player);
+  if (second === 'controls') return controls(extension, player, false, true);
   const text = second === 'album' ? player.album || player.artist : player.artist;
   return { type: 'text', text: text || extension.t('unknown-artist'), style: 'caption', maxWidth: width };
 }
@@ -60,10 +58,6 @@ function words(extension: Extension<Granted>, player: MediaPlayer, second: strin
 
 const coverSize = (layout: ElementLayout) => layout.button - 8;
 
-function textWidth(maxWidth: number, layout: ElementLayout, beside: boolean): number {
-  return Math.max(SMALLEST_TEXT, maxWidth - coverSize(layout) - SPACING - (beside ? 3 * CONTROL + SPACING : 0));
-}
-
 function upright(extension: Extension<Granted>, following: Following, player: MediaPlayer, chosen: Layout, layout: ElementLayout): View {
   if (chosen === 'cover') return cover(player, layout.button - 4, 0, progressOf(following, player));
   return {
@@ -78,7 +72,7 @@ const progressOf = (following: Following, player: MediaPlayer) => player.length 
 export function compact(extension: Extension<Granted>, following: Following, layout: ElementLayout): View {
   const player = following.player;
   if (!player) return { type: 'spacer' };
-  const { layout: chosen, second, maxWidth } = choices(extension);
+  const { layout: chosen, second, titleWidth } = choices(extension);
   if (layout.vertical) return upright(extension, following, player, chosen, layout);
   if (chosen === 'cover') return cover(player, layout.button - 4, 0, progressOf(following, player));
   const beside = chosen === 'full';
@@ -87,7 +81,7 @@ export function compact(extension: Extension<Granted>, following: Following, lay
     spacing: SPACING,
     children: [
       cover(player, coverSize(layout), 6),
-      words(extension, player, second, textWidth(maxWidth, layout, beside)),
+      words(extension, player, second, titleWidth),
       ...beside ? [controls(extension, player)] : [],
     ],
   };
@@ -97,7 +91,7 @@ export function compact(extension: Extension<Granted>, following: Following, lay
 export function expanded(extension: Extension<Granted>, following: Following, layout: ElementLayout): View {
   const player = following.player;
   if (!player || layout.vertical) return compact(extension, following, layout);
-  const { layout: chosen, second, maxWidth } = choices(extension);
+  const { layout: chosen, second, titleWidth } = choices(extension);
   const position = following.position(player);
   const progress: View = {
     type: 'column',
@@ -117,7 +111,7 @@ export function expanded(extension: Extension<Granted>, following: Following, la
     spacing: SPACING + 2,
     children: [
       cover(player, coverSize(layout), 6),
-      words(extension, player, second === 'controls' ? 'artist' : second, textWidth(maxWidth, layout, false)),
+      words(extension, player, second === 'controls' ? 'artist' : second, titleWidth),
       progress,
       ...controlled ? [controls(extension, player)] : [],
     ],

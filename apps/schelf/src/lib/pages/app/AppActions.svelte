@@ -2,7 +2,7 @@
 	import type { CatalogApp, InstalledApp, Job, StoreDetails } from '#lib/bindings.js';
 	import ProgressButton from '#lib/components/ProgressButton.svelte';
 	import RemoveDialog from '#lib/components/RemoveDialog.svelte';
-	import { launch } from '#lib/bridge/index.js';
+	import { launch, openUrl } from '#lib/bridge/index.js';
 	import { catalogKey } from '#lib/catalog/types.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { operations } from '#lib/state/operations.svelte.js';
@@ -33,7 +33,7 @@
 	}
 
 	function storeJob(fullAccess: boolean): Job | null {
-		if (!store?.version) return null;
+		if (!store?.installer || !store.version) return null;
 		const consent = { version: store.version, permissions: store.declared, extension: store.extension, fullAccess };
 		return consenting === 'update' ? { kind: 'updateStore', id: store.id, consent } : { kind: 'installStore', id: store.id, consent };
 	}
@@ -71,8 +71,11 @@
 			{#if installed.desktop && !pulled}
 				<button type="button" class="button primary large" onclick={() => launch(installed.desktop!)}>Open</button>
 			{/if}
-		{:else if listing && (listing.origin !== 'schelf' || store?.version)}
+		{:else if listing && (listing.origin !== 'schelf' || store?.installer)}
 			<button type="button" class="button primary large" onclick={install}>Install</button>
+		{:else if store?.download}
+			{@const file = store.download}
+			<button type="button" class="button large" title={file.name} onclick={() => openUrl(file.url)}>Download</button>
 		{/if}
 	</div>
 	{#if operation?.state === 'failed'}

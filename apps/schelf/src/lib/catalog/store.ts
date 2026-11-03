@@ -27,7 +27,7 @@ function fromStore(store: StoreDetails): AppDetails {
 		homepage: store.homepage,
 		screenshots: store.screenshots,
 		release: store.version ? { version: store.version, date: timestamp(store.published), notes: store.notes } : null,
-		downloadSize: store.size,
+		downloadSize: store.size ?? store.download?.size ?? null,
 		installedSize: null,
 		verified: store.verified ? 'Verified by schelf.store' : null,
 		permissions: store.access,
@@ -68,3 +68,5 @@ export async function fedoraDetails(app: CatalogApp): Promise<AppDetails> {
 }
 
 export const storeDetails = (id: string) => commands.storeDetails({ id }).then(fromStore);
+
+export const follow = (id: string, channel: string) => commands.storeFollow({ id, channel }).then(fromStore);

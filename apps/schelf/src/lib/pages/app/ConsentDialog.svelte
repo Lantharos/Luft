@@ -53,7 +53,7 @@
 		title="{verb} {store.name} with full access?"
 		description="{reason
 			? `${store.name} asks to run outside a sandbox: “${reason}” There it can do anything a program you start yourself can, without asking.`
-			: `${store.name} doesn't run in a sandbox, so it can do anything a program you start yourself can, without asking.`}{store.format === 'appimage' ? ' You can take full access away on its page later.' : ''}"
+			: `${store.name} doesn't run in a sandbox, so it can do anything a program you start yourself can, without asking.`}{store.installer === 'appimage' ? ' You can take full access away on its page later.' : ''}"
 		facts={FULL_ACCESS_ABILITIES}
 		confirm="{verb} with full access"
 		onconfirm={() => onconfirm(true)}

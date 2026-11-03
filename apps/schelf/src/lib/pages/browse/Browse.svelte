@@ -2,6 +2,7 @@
 	import { VirtualScroller } from '@luft/ui';
 	import type { CatalogApp } from '#lib/bindings.js';
 	import AppTile from '#lib/components/AppTile.svelte';
+	import ExtensionTile from '#lib/components/ExtensionTile.svelte';
 	import * as store from '#lib/catalog/store.js';
 	import { catalogKey } from '#lib/catalog/types.js';
 	import { catalog } from '#lib/state/catalog.svelte.js';
@@ -10,6 +11,7 @@
 	type Listing = Extract<Route, { page: 'category' } | { page: 'collection' } | { page: 'extensions' }>;
 
 	const LAYOUT = { itemHeight: 84, minItemWidth: 250, gap: 4, padding: { top: 4, left: 28, right: 28, bottom: 40 } };
+	const EXTENSION_LAYOUT = { itemHeight: (width: number) => width / 2 + 54, minItemWidth: 250, gap: 22, padding: { top: 4, left: 34, right: 34, bottom: 40 } };
 
 	let { route }: { route: Listing } = $props();
 
@@ -44,7 +46,7 @@
 	});
 </script>
 
-<VirtualScroller class="soft-scroll h-full" items={apps} key={catalogKey} layout={LAYOUT}>
+<VirtualScroller class="soft-scroll h-full" items={apps} key={catalogKey} layout={route.page === 'extensions' ? EXTENSION_LAYOUT : LAYOUT}>
 	{#snippet header()}
 		<div class="flex min-h-2 items-center justify-between gap-4 bg-[var(--content)] px-8 pb-3">
 			{#if error}
@@ -58,6 +60,10 @@
 		</div>
 	{/snippet}
 	{#snippet children(app)}
-		<AppTile {app} />
+		{#if app.kind === 'extension'}
+			<ExtensionTile {app} />
+		{:else}
+			<AppTile {app} />
+		{/if}
 	{/snippet}
 </VirtualScroller>

@@ -9,7 +9,7 @@ use crate::library;
 use crate::operations::Job;
 use crate::store::catalog::{self, Entry, Origin};
 use crate::store::install::Consent;
-use crate::store::listing::{self, Declared, ExtensionAccess, Format, Listing, Release};
+use crate::store::listing::{self, Declared, ExtensionAccess, Format, Listing, Offer, Release, channel};
 use crate::store::signed::Age;
 
 fn kind(entry: &Entry) -> Kind {
@@ -179,7 +179,7 @@ pub fn extension_access(access: &ExtensionAccess) -> Vec<String> {
 
 /// Shows what the app may use and asks, and whether you gave an AppImage that
 /// asks to run unsandboxed full access.
-fn agree_to(listing: &Listing, release: &Release, yes: bool) -> Result<bool, Exit> {
+fn agree_to(listing: &Listing, release: &Release, format: Format, yes: bool) -> Result<bool, Exit> {
     let ink = Ink::stderr();
     let name = ink.bold(listing.name());
     if let Some(access) = &release.extension {
@@ -202,7 +202,7 @@ fn agree_to(listing: &Listing, release: &Release, yes: bool) -> Result<bool, Exi
     let why = declared
         .and_then(|declared| declared.unsandboxed.as_deref())
         .map_or_else(String::new, |reason| format!(" It says: {reason}"));
-    if listing.format != Format::Appimage {
+    if format != Format::Appimage {
         eprintln!("{name} runs outside a sandbox, with everything you can do.{why}");
         return confirm(&format!("Install {}?", listing.name()), yes).map(|()| true);
     }
@@ -220,11 +220,18 @@ pub fn install(id: &str, yes: bool) -> Result<(String, Job), Exit> {
         eprintln!("{error}");
         Exit::Failed
     })?;
-    let Some(release) = listing.release() else {
-        eprintln!("{} isn't available for this computer.", listing.name());
+    let channel = channel::followed(&listing.id);
+    let Some(Offer { release, format, .. }) = listing.release(&channel) else {
+        match channel.as_str() {
+            channel::STABLE => eprintln!("{} isn't available for this computer.", listing.name()),
+            channel => eprintln!(
+                "{} has no {channel} version for this computer.",
+                listing.name()
+            ),
+        }
         return Err(Exit::Missing);
     };
-    let full_access = agree_to(&listing, release, yes)?;
+    let full_access = agree_to(&listing, release, format, yes)?;
     Ok((
         format!("schelf:{}", listing.id),
         Job::InstallStore {

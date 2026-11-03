@@ -17,12 +17,24 @@ export function details(listing: CatalogApp): Promise<AppDetails> {
 	return store.fedoraDetails(listing);
 }
 
+const unlisted = (installed: InstalledApp, id: string): CatalogApp => ({
+	id,
+	kind: installed.source === 'extension' ? 'extension' : 'app',
+	origin: 'schelf',
+	name: installed.name,
+	summary: installed.summary ?? '',
+	icon: installed.icon,
+	art: null,
+	developer: null,
+	package: null
+});
+
 async function listingFor(installed: InstalledApp | null): Promise<CatalogApp | null> {
-	if (installed?.listing) return store.entry(installed.listing);
+	if (installed?.listing) return (await store.entry(installed.listing)) ?? unlisted(installed, installed.listing);
 	if (installed?.source === 'flatpak' && installed.origin === 'flathub') {
 		const found = await store.entry(installed.id).catch(() => null);
 		if (found?.origin === 'flathub') return found;
-		return { id: installed.id, kind: 'app', origin: 'flathub', name: installed.name, summary: installed.summary ?? '', icon: null, developer: null, package: null };
+		return { id: installed.id, kind: 'app', origin: 'flathub', name: installed.name, summary: installed.summary ?? '', icon: null, art: null, developer: null, package: null };
 	}
 	return null;
 }

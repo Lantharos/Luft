@@ -6,11 +6,13 @@
 	import AccessList from '#lib/components/AccessList.svelte';
 	import AppArt from '#lib/components/AppArt.svelte';
 	import Description from '#lib/components/Description.svelte';
+	import ExtensionArt from '#lib/components/ExtensionArt.svelte';
 	import Screenshots from '#lib/components/Screenshots.svelte';
 	import { catalog } from '#lib/state/catalog.svelte.js';
 	import type { AppTarget } from '#lib/state/navigation.svelte.js';
 	import AppActions from './AppActions.svelte';
 	import AppFacts from './AppFacts.svelte';
+	import Channel from './Channel.svelte';
 	import FullAccess from './FullAccess.svelte';
 	import NameAndIcon from './NameAndIcon.svelte';
 	import Notifications from './Notifications.svelte';
@@ -36,6 +38,8 @@
 	const store = $derived(details?.store ?? null);
 	const listing = $derived(loaded?.listing ?? known);
 	const block = $derived(installed?.listing ? (catalog.installed(installed.listing)?.block ?? null) : null);
+	const extension = $derived(store?.kind === 'extension' || installed?.source === 'extension' || known?.kind === 'extension');
+	const icon = $derived(details?.icon ?? installed?.icon ?? known?.icon ?? null);
 	const from = $derived(listing?.origin === 'flathub' ? 'From Flathub' : listing?.origin === 'fedora' ? 'From Fedora' : null);
 
 	$effect(() => {
@@ -76,7 +80,11 @@
 <div class="soft-scroll h-full overflow-y-auto">
 	<div class="mx-auto flex w-full max-w-[880px] flex-col gap-7 px-8 pt-2 pb-10">
 		<header class="flex items-center gap-5">
-			<AppArt icon={details?.icon ?? installed?.icon ?? known?.icon ?? null} desktop={installed?.desktop} source={installed?.source ?? (store?.kind === 'extension' ? 'extension' : null)} size={88} />
+			{#if extension}
+				<ExtensionArt art={details?.screenshots[0]?.url ?? known?.art ?? null} {icon} height={88} />
+			{:else}
+				<AppArt {icon} desktop={installed?.desktop} source={installed?.source ?? null} size={88} />
+			{/if}
 			<div class="flex min-w-0 flex-1 flex-col gap-1">
 				<h2 class="truncate text-[26px] font-semibold">{title}</h2>
 				{#if details?.developer || from}
@@ -115,6 +123,9 @@
 				</section>
 			{/if}
 			<AppFacts {details} {installed} />
+			{#if store && store.channels.length > 1}
+				<Channel {store} installed={installed !== null} onchange={(details) => loaded && (loaded = { ...loaded, details })} />
+			{/if}
 			{#if installed?.desktop}
 				<NameAndIcon desktop={installed.desktop} />
 				<Notifications desktop={installed.desktop} />

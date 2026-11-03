@@ -12,6 +12,9 @@ const EXTENSION_PLATFORMS: &[&str] = &["luft-x86_64", "luft"];
 #[cfg(target_arch = "aarch64")]
 const EXTENSION_PLATFORMS: &[&str] = &["luft-aarch64", "luft"];
 
+/// The platform of a file the store has for every system, such as an archive.
+pub const ANY_SYSTEM: &str = "any";
+
 /// The platforms of the store's artifacts that run here, most specific first.
 pub fn platforms(kind: Kind) -> &'static [&'static str] {
     match kind {
@@ -42,8 +45,4 @@ pub fn draw() -> f64 {
     let draw = (u64::from_le_bytes(bytes) >> 11) as f64 / (1u64 << 53) as f64;
     let _ = luft_app::files::replace(&path, draw.to_string().as_bytes());
     draw
-}
-
-pub fn in_rollout(percent: u8) -> bool {
-    draw() * 100.0 < f64::from(percent)
 }

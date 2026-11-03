@@ -6,7 +6,7 @@ export interface Padding {
 }
 
 export interface VirtualLayout {
-	itemHeight: number;
+	itemHeight: number | ((itemWidth: number) => number);
 	minItemWidth?: number;
 	gap?: number;
 	padding?: Partial<Padding>;
@@ -42,7 +42,7 @@ export class GridGeometry {
 		const inner = Math.max(0, width - this.padding.left - this.padding.right);
 		this.columns = layout.minItemWidth ? Math.max(1, Math.floor((inner + this.gap) / (layout.minItemWidth + this.gap))) : 1;
 		this.itemWidth = Math.max(0, (inner - this.gap * (this.columns - 1)) / this.columns);
-		this.itemHeight = layout.itemHeight;
+		this.itemHeight = typeof layout.itemHeight === 'number' ? layout.itemHeight : layout.itemHeight(this.itemWidth);
 		this.pitch = this.itemHeight + this.gap;
 		this.rows = Math.ceil(count / this.columns);
 		this.height = this.padding.top + Math.max(0, this.rows * this.pitch - this.gap) + this.padding.bottom;

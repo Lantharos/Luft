@@ -5,7 +5,7 @@ use specta::Type;
 
 use super::catalog::Kind;
 use super::install::Consent;
-use super::listing::{self, Declared, ExtensionAccess, Format};
+use super::listing::{self, Declared, ExtensionAccess, Format, Offer, channel};
 use super::record::{self, Installed};
 use super::revocations::{self, Severity};
 use super::signed::Age;
@@ -44,19 +44,25 @@ fn widens(after: Option<&Declared>, before: Option<&Declared>) -> bool {
     }
 }
 
+/// Whether you let the installed app run outside a sandbox: a Sabine app
+/// always does, an AppImage when you gave it full access.
 async fn full_access(installed: &Installed) -> bool {
-    installed.format == Format::Appimage && flatpak::has_full_access(&installed.local).await
+    match installed.format {
+        Format::Sabine => true,
+        Format::Appimage => flatpak::has_full_access(&installed.local).await,
+        Format::LuftExtension => false,
+    }
 }
 
 fn update(id: String, installed: Installed) -> Result<Option<StoreUpdate>, String> {
     let listing = listing::fetch(&id, Age::Current)?;
-    let Some(release) = listing.release() else {
+    let Some(Offer { release, artifact, .. }) = listing.release(&channel::followed(&id)) else {
         return Ok(None);
     };
     let pulled = revocations::current()
         .and_then(|list| list.block(&id, Some(&release.version)))
         .is_some_and(|block| block.action == Severity::Block);
-    if release.version == installed.version || pulled {
+    if !listing::newer(&release.version, &installed.version) || pulled {
         return Ok(None);
     }
     Ok(Some(StoreUpdate {
@@ -73,7 +79,7 @@ fn update(id: String, installed: Installed) -> Result<Option<StoreUpdate>, Strin
             extension: release.extension.clone(),
             full_access: block_on(full_access(&installed)),
         },
-        size: listing.artifact(release).map_or(0, |artifact| artifact.size),
+        size: artifact.size,
         to: release.version.clone(),
         icon: listing.icon.clone(),
         name: installed.name,

@@ -5,7 +5,12 @@ import {rest, scroll, type Point} from '../lib/input/input.js';
 import {withApp} from './lib/apps.js';
 import {checkPalette, showDark, withPalette, type Palette} from './lib/palette.js';
 
-const PAGES = {discover: [], search: ['schelf:search?gcompris']};
+const PAGES = {
+  discover: [],
+  search: ['schelf:search?gcompris'],
+  extensions: ['schelf:extensions'],
+  extension: ['schelf:app/com.lantharos.Rain'],
+};
 const CONTENT: Point = [700, 400];
 const SCROLL_STEPS = 40;
 

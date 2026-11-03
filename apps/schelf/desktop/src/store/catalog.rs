@@ -53,6 +53,7 @@ pub struct Entry {
     #[serde(default)]
     pub summary: String,
     pub icon: Option<String>,
+    pub art: Option<String>,
     #[serde(default)]
     pub categories: Vec<String>,
     pub publisher: Option<Publisher>,
@@ -65,8 +66,12 @@ pub struct Entry {
 }
 
 impl Entry {
+    /// Whether it has a stable release this computer installs, or a file
+    /// for it to download. An app only for other systems isn't shown.
     fn runs_here(&self) -> bool {
+        let any_system = self.kind == Kind::App && self.platforms.contains_key(device::ANY_SYSTEM);
         self.origin != Origin::Schelf
+            || any_system
             || device::platforms(self.kind)
                 .iter()
                 .any(|name| self.platforms.contains_key(*name))
@@ -89,6 +94,8 @@ pub struct CatalogApp {
     pub name: String,
     pub summary: String,
     pub icon: Option<String>,
+    /// An extension's wide picture, cut from its first screenshot.
+    pub art: Option<String>,
     pub developer: Option<String>,
     pub package: Option<String>,
 }
@@ -102,6 +109,7 @@ impl From<&Entry> for CatalogApp {
             name: entry.name.clone(),
             summary: entry.summary.clone(),
             icon: entry.icon.clone(),
+            art: entry.art.clone(),
             developer: entry.publisher.as_ref().map(|publisher| publisher.name.clone()),
             package: entry.package.clone(),
         }

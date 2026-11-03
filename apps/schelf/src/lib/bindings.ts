@@ -106,6 +106,10 @@ export const commands = {
 		id: string,
 	}, options?: CallOptions) => invoke<CatalogApp | null>("store_entry", params, options),
 	storeExtensions: (options?: CallOptions) => invoke<CatalogApp[]>("store_extensions", {}, options),
+	storeFollow: (params: {
+		id: string,
+		channel: string,
+	}, options?: CallOptions) => invoke<StoreDetails>("store_follow", params, options),
 	storeRefresh: (options?: CallOptions) => invoke<StoreState>("store_refresh", {}, options),
 	storeRevocations: (options?: CallOptions) => invoke<StoreState>("store_revocations", {}, options),
 	storeSearch: (params: {
@@ -195,6 +199,8 @@ export type CatalogApp = {
 	name: string,
 	summary: string,
 	icon: string | null,
+	/**  An extension's wide picture, cut from its first screenshot. */
+	art: string | null,
 	developer: string | null,
 	package: string | null,
 };
@@ -251,6 +257,13 @@ export type DescribedSource = {
 	url: string,
 };
 
+/**  A file to download for an app this computer can't install itself. */
+export type Download = {
+	url: string,
+	name: string,
+	size: number,
+};
+
 /**
  *  What an extension asks for: permissions from the extension API, and
  *  whether it runs a program of its own.
@@ -276,6 +289,7 @@ export type Finished = {
 	succeeded: boolean,
 };
 
+/**  How Luft installs a store app, and so how it updates and removes it. */
 export type Format = "sabine" | "appimage" | "luft-extension";
 
 export type IconPaint = {
@@ -452,11 +466,12 @@ export type SourceKey = {
 
 export type Stage = "waiting" | "preparing" | "downloading" | "installing" | "removing" | "finishing";
 
-/**  A store app's page. */
+/**  A store app's page, for the channel you follow. */
 export type StoreDetails = {
 	id: string,
 	kind: Kind,
-	format: Format,
+	/**  How it installs here; none when there's only a file to download. */
+	installer: Format | null,
 	name: string,
 	summary: string,
 	description: string,
@@ -466,10 +481,13 @@ export type StoreDetails = {
 	verified: boolean,
 	homepage: string | null,
 	license: string | null,
+	channel: string,
+	channels: string[],
 	version: string | null,
 	published: string | null,
 	notes: string,
 	size: number | null,
+	download: Download | null,
 	declared: Declared | null,
 	extension: ExtensionAccess | null,
 	access: Permissions | null,

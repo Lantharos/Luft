@@ -1,5 +1,5 @@
 // Picks the schelf.store releases the image preinstalls, and puts them in a stage the way Schelf reads them
-// on first sign-in: each app's listing, holding only the release that ships, next to that release's file.
+// on first sign-in: each app's listing, holding only the stable release that ships, next to that release's file.
 //
 //   releases.ts resolve                 prints ID=VERSION[=PART] for each app with an approved release, on one line
 //   releases.ts stage DESTDIR ID=VERSION,...
@@ -9,7 +9,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 type Artifact = { platform: string; kind: string; url: string; size: number; sha256: string };
-type Release = { version: string; artifacts: Artifact[] };
+type Release = { version: string; channel: string; artifacts: Artifact[] };
 type Listing = { id: string; kind: 'app' | 'extension'; releases: Release[] } & Record<string, unknown>;
 type Preinstall = { id: string; replaces?: string };
 
@@ -31,7 +31,7 @@ function artifact(listing: Listing, release: Release) {
   }
 }
 
-const newest = (listing?: Listing) => listing && listing.releases.find((release) => artifact(listing, release));
+const newest = (listing?: Listing) => listing && listing.releases.find((release) => release.channel === 'stable' && artifact(listing, release));
 
 async function resolve() {
   const { preinstall } = Bun.TOML.parse(await Bun.file(join(import.meta.dir, 'apps.toml')).text()) as { preinstall: Preinstall[] };

@@ -14,7 +14,7 @@ Schelf is where you get apps. Its catalog is [schelf.store](https://schelf.store
 ## Finding apps
 
 - **Discover** shows popular and recently updated apps, and categories. Apps published on schelf.store come first, then Flathub's, then Fedora's, and an app that's in more than one place shows once.
-- **Extensions** lists what you can add to Luft's desktop, such as something drawn on the wallpaper or a quick settings tile.
+- **Extensions** lists what you can add to Luft's desktop, such as something drawn on the wallpaper or a quick settings tile, each with a picture of it at work.
 - **Search** looks through your installed apps, the catalog and command-line tools at once. It forgives typos while you're online, and searches the catalog on your computer when you're not.
 - **App pages** have screenshots, release notes, the size, licence and source, and what the app can use in plain words, broadest access first. Apps from Flathub and Fedora say so under their name. Apps published on schelf.store also say where they come from: whether they were built in public on GitHub Actions, from which repository and commit, with a link to the build.
 - **Full access**, on an installed Flatpak app's or AppImage's page, takes the app out of its sandbox, for apps that need it, such as a password manager. [Installing software](/system/software/#full-access) explains what that means.
@@ -27,6 +27,7 @@ Schelf is where you get apps. Its catalog is [schelf.store](https://schelf.store
 - **Installed** lists every app with its size and where it came from. Under System are the [system packages](/system/software/#system-packages), with the services they run, and **Software sources**, where vendors' package repositories are added and removed.
 - **Updates** updates every app in one go. Flatpak runtimes are listed separately, as app platforms.
 - Apps from schelf.store and AppImages update by themselves a few minutes after you sign in, and every six hours after that. New versions reach computers in stages over a few days, so a bad release can be stopped before everyone has it.
+- Apps from schelf.store get finished versions, the stable channel. When an app also publishes previews, its page lets you switch it to **Beta**, previews of its next version, or **Nightly**, built from its newest code, often every day, which can reach you after only automatic checks. Schelf remembers the choice for that app and only installs versions from the channel you picked. Going back to Stable keeps the version you have until a stable one is newer.
 - An installed app's page also sets its name and icon, and how it notifies you: whether it may, its banners and sound, whether it gets through Do Not Disturb, and what it shows on the lock screen.
 
 Opening a `.flatpak`, `.flatpakref`, `.deb`, `.AppImage` or `.rpm` file shows a page explaining it, and where it would go, before anything is installed. A desktop app's `.rpm`, such as 1Password's or Chrome's, becomes a system package, and when it comes with its vendor's repository, Schelf shows that repository and its key and adds it, so the app keeps getting updates. A `.flatpak` file installs its app for your account, along with the runtime it needs from Flathub; it updates only from newer files unless it names a repository of its own. A `.deb` file's app is offered from Flathub when it's there too, and otherwise goes into an Ubuntu container. [Installing software](/system/software/) explains where each kind goes.
@@ -34,6 +35,10 @@ Opening a `.flatpak`, `.flatpakref`, `.deb`, `.AppImage` or `.rpm` file shows a 
 ## Apps from schelf.store
 
 Everything Schelf downloads from schelf.store is signed, and Schelf checks the signature and every file before it installs anything. AppImages run in their [sandbox](/system/software/#full-access) with the access they declared, apps built with Sabine install like Luft's own apps, and extensions are added to your desktop.
+
+Some apps on schelf.store come as installers and archives for each system instead. Schelf installs their AppImage like any other. When an app only has another kind of Linux file, such as a `.deb`, `.rpm` or `.flatpak`, its page offers it to download, and opening the file shows where it would go before anything is installed. Apps with nothing for Linux aren't shown.
+
+An app that isn't listed on schelf.store still has its page there, and a `schelf:app/` link from it opens that page in Schelf.
 
 schelf.store can pull an app that turns out to be harmful. Schelf checks for that every hour: a pulled app can't start any more, and its page says why and offers to remove it. Your files stay until you do. For a version with a known problem, the page shows a warning instead.
 

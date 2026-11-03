@@ -1,6 +1,6 @@
 import { events as sabineEvents } from '@lantharos/sabine';
 import { appearance } from '@luft/ui';
-import { commands } from '#lib/bindings.js';
+import { commands, type CatalogApp } from '#lib/bindings.js';
 import * as store from '#lib/catalog/store.js';
 import { catalog } from './catalog.svelte';
 import { library } from './library.svelte';
@@ -9,7 +9,8 @@ import { operations } from './operations.svelte';
 
 const PAGES: Record<string, Route> = {
 	'schelf:updates': { page: 'updates' },
-	'schelf:installed': { page: 'installed' }
+	'schelf:installed': { page: 'installed' },
+	'schelf:extensions': { page: 'extensions' }
 };
 
 function openFiles(files: string[]) {
@@ -35,8 +36,16 @@ async function openApp(id: string) {
 	if (app) navigation.open({ page: 'app', target: { installed: app.key }, name: app.name });
 }
 
+async function unlisted(id: string): Promise<CatalogApp | null> {
+	const details = await commands.storeDetails({ id }).catch(() => null);
+	if (!details) return null;
+	const { kind, name, summary, icon, developer, screenshots } = details;
+	const art = kind === 'extension' ? (screenshots[0]?.url ?? null) : null;
+	return { id: details.id, kind, origin: 'schelf', name, summary, icon, art, developer, package: null };
+}
+
 async function openListing(id: string) {
-	const listing = await store.entry(id).catch(() => null);
+	const listing = (await store.entry(id).catch(() => null)) ?? (await unlisted(id));
 	if (listing) {
 		navigation.open({ page: 'app', target: { listing }, name: listing.name });
 		return;

@@ -11,7 +11,7 @@ use sabine_service::SabineService;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
-use super::listing::{self, Declared, ExtensionAccess, Format, Listing, Release};
+use super::listing::{self, Declared, ExtensionAccess, Format, Listing, Offer, Release, channel};
 use super::record::{self, Installed};
 use super::revocations::{self, Severity};
 use super::signed::Age;
@@ -109,18 +109,31 @@ fn install_sabine(id: &str, archive: &Path, task: Task) -> Result<String, String
         .map_err(|error| error.to_string())
 }
 
-/// Installs `file`, the artifact of `release`, and records it with the
-/// access it was installed with.
+fn remove_installed(installed: &Installed) -> Result<(), String> {
+    match installed.format {
+        Format::Appimage => appimage::remove(&installed.local),
+        Format::Sabine => SabineService::default()
+            .remove_store_app(&installed.local)
+            .map_err(|error| error.to_string()),
+        Format::LuftExtension => extensions::remove(&installed.local),
+    }
+}
+
+/// Installs `file`, the artifact of the release on offer, and records it with the
+/// access it was installed with. When the app moved to another packaging,
+/// such as from Sabine to an AppImage, the new one replaces the old.
 fn place(
     listing: &Listing,
-    release: &Release,
+    Offer { release, format, .. }: Offer,
     file: &Path,
     full_access: bool,
     task: Task,
 ) -> Result<(), String> {
-    let granting =
-        record::get(&listing.id).is_none_or(|previous| previous.agreed != release.permissions);
-    let local = match listing.format {
+    let previous = record::get(&listing.id);
+    let granting = previous.as_ref().is_none_or(|previous| {
+        previous.format != format || previous.agreed != release.permissions
+    });
+    let local = match format {
         Format::Appimage => install_appimage(release, full_access, granting, file, task),
         Format::Sabine => install_sabine(&listing.id, file, task),
         Format::LuftExtension => extensions::install(&listing.id, file, task),
@@ -129,30 +142,33 @@ fn place(
         &listing.id,
         Installed {
             kind: listing.kind,
-            format: listing.format,
+            format,
             name: listing.name().to_owned(),
             icon: listing.icon.clone(),
             version: release.version.clone(),
-            local,
+            local: local.clone(),
             agreed: release.permissions.clone(),
             agreed_extension: release.extension.clone(),
         },
-    )
+    )?;
+    match previous {
+        Some(previous) if previous.format != format || previous.local != local => {
+            remove_installed(&previous)
+        }
+        _ => Ok(()),
+    }
 }
 
 /// Installs or updates `id` from schelf.store, as you agreed to in `consent`.
 pub fn install(id: &str, consent: &Consent, reason: Reason, task: Task) -> Result<(), String> {
     let listing = listing::fetch(id, Age::Current)?;
-    let release = listing
-        .release()
+    let offer = listing
+        .release(&channel::followed(id))
         .ok_or_else(|| format!("{} isn't available for this computer.", listing.name()))?;
-    agreed(&listing, release, consent)?;
-    refuse_pulled(&listing, release)?;
-    let artifact = listing
-        .artifact(release)
-        .ok_or_else(|| format!("{} isn't available for this computer.", listing.name()))?;
-    let file = download::verified(&listing.id, artifact, reason.query(), task)?;
-    let placed = place(&listing, release, &file, consent.full_access, task);
+    agreed(&listing, offer.release, consent)?;
+    refuse_pulled(&listing, offer.release)?;
+    let file = download::verified(&listing.id, offer.artifact, reason.query(), task)?;
+    let placed = place(&listing, offer, &file, consent.full_access, task);
     let _ = std::fs::remove_file(&file);
     placed
 }
@@ -165,28 +181,20 @@ pub fn install_shipped(path: &Path, task: Task) -> Result<(), String> {
     if record::get(&listing.id).is_some() {
         return Ok(());
     }
-    let release = listing
+    let offer = listing
         .shipped()
         .ok_or_else(|| format!("{} came without a file for this computer.", listing.name()))?;
-    let artifact = listing
-        .artifact(release)
-        .ok_or_else(|| format!("{} came without a file for this computer.", listing.name()))?;
-    let file = download::shipped(path, artifact)?;
-    let full_access = release
+    let file = download::shipped(path, offer.artifact)?;
+    let full_access = offer
+        .release
         .permissions
         .as_ref()
         .is_none_or(|declared| declared.unsandboxed.is_some());
-    place(&listing, release, &file, full_access, task)
+    place(&listing, offer, &file, full_access, task)
 }
 
 pub fn remove(id: &str) -> Result<(), String> {
     let installed = record::get(id).ok_or("It isn't installed any more.")?;
-    match installed.format {
-        Format::Appimage => appimage::remove(&installed.local)?,
-        Format::Sabine => SabineService::default()
-            .remove_store_app(&installed.local)
-            .map_err(|error| error.to_string())?,
-        Format::LuftExtension => extensions::remove(&installed.local)?,
-    }
+    remove_installed(&installed)?;
     record::forget(id)
 }

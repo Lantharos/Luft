@@ -23,7 +23,7 @@ bun run desktop:bundle   # Sabine bundle
 sabine install --bundle .
 ```
 
-Installing makes Schelf the app for `.flatpak`, `.flatpakref`, `.deb`, `.flatpakrepo`, `.rpm` and `.AppImage` files and for `schelf:` links (`schelf:app/<id>`, `schelf:updates`, `schelf:installed`, `schelf:search?<query>`).
+Installing makes Schelf the app for `.flatpak`, `.flatpakref`, `.deb`, `.flatpakrepo`, `.rpm` and `.AppImage` files and for `schelf:` links (`schelf:app/<id>`, `schelf:updates`, `schelf:installed`, `schelf:extensions`, `schelf:search?<query>`).
 
 ## Command line
 

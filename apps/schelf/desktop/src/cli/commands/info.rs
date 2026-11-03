@@ -9,7 +9,7 @@ use crate::cli::sources::{
 use crate::cli::terminal::progress::Line;
 use crate::cli::terminal::{Ink, Look, Table, bytes, wrap};
 use crate::library::{InstalledApp, Source};
-use crate::store::listing::{self, Builder, StoreDetails};
+use crate::store::listing::{self, Builder, StoreDetails, channel};
 use crate::store::signed::Age;
 
 const INDENT: &str = "  ";
@@ -227,6 +227,10 @@ fn store_app(candidate: &Candidate, apps: &[InstalledApp]) -> Result<(), String>
     facts.add("ID", Some(details.id.clone()));
     facts.add("Version", details.version.clone());
     facts.add(
+        "Channel",
+        (details.channel != channel::STABLE).then(|| details.channel.clone()),
+    );
+    facts.add(
         "Installed",
         Some(installed.map_or_else(
             || "no".to_owned(),
@@ -234,6 +238,10 @@ fn store_app(candidate: &Candidate, apps: &[InstalledApp]) -> Result<(), String>
         )),
     );
     facts.add("Download", details.size.map(bytes));
+    facts.add(
+        "File",
+        details.download.as_ref().map(|download| download.url.clone()),
+    );
     facts.add("License", details.license.clone());
     facts.add("Developer", Some(details.developer.clone()));
     facts.add("Website", details.homepage.clone());

@@ -57,6 +57,12 @@ struct Listing {
 }
 
 #[derive(Deserialize, Type)]
+struct Follow {
+    id: String,
+    channel: String,
+}
+
+#[derive(Deserialize, Type)]
 struct Category {
     category: String,
 }
@@ -120,6 +126,10 @@ fn refresh() -> Result<StoreState, String> {
     Ok(state())
 }
 
+fn details(id: &str) -> Result<StoreDetails, String> {
+    listing::fetch(id, Age::Within(std::time::Duration::from_secs(60))).map(StoreDetails::from)
+}
+
 fn entry(id: &str) -> Result<Option<CatalogApp>, String> {
     Ok(catalog::current()?.find(id).map(CatalogApp::from))
 }
@@ -143,8 +153,9 @@ pub fn register(window: SabineWindow) -> SabineWindow {
         })
         .command("store_search", |Query { query }| search::search(&query))
         .command("store_entry", |Listing { id }| entry(&id))
-        .command("store_details", |Listing { id }| {
-            listing::fetch(&id, Age::Within(std::time::Duration::from_secs(60)))
-                .map(StoreDetails::from)
+        .command("store_details", |Listing { id }| details(&id))
+        .command("store_follow", |Follow { id, channel }| {
+            listing::channel::follow(&id, &channel)?;
+            details(&id)
         })
 }

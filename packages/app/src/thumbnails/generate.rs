@@ -5,6 +5,7 @@ use std::path::{Path, PathBuf};
 use serde::Serialize;
 use specta::Type;
 
+use super::album;
 use super::cache::{self, Source, ThumbnailSize};
 use super::child::Cancellation;
 use super::raster;
@@ -44,14 +45,21 @@ pub(super) fn thumbnail(
     let generated = if raster::decodes(&mime, source.bytes) {
         raster::render(&source.path, size.pixels())
     } else {
-        let Some(thumbnailer) = registry.find(&mime) else {
-            return mime.starts_with("image/").then(|| ready(None));
+        let thumbnailed = match registry.find(&mime) {
+            Some(thumbnailer) => match thumbnailer.run(&source, size, cancellation) {
+                Ok(image) => raster::fit(image, size.pixels()),
+                Err(Failure::Cancelled) => return None,
+                Err(Failure::Failed(error)) => Err(error),
+            },
+            None if !album::is_music(&mime) => {
+                return mime.starts_with("image/").then(|| ready(None));
+            }
+            None => Err("No thumbnailer reads this music".to_string()),
         };
-        match thumbnailer.run(&source, size, cancellation) {
-            Ok(image) => raster::fit(image, size.pixels()),
-            Err(Failure::Cancelled) => return None,
-            Err(Failure::Failed(error)) => Err(error),
-        }
+        thumbnailed.or_else(|error| match album::folder_cover(&mime, &source.path) {
+            Some(cover) => raster::render(&cover, size.pixels()),
+            None => Err(error),
+        })
     };
     match generated.and_then(|image| cache::store(&source, size, &image)) {
         Ok(path) => Some(ready(Some(path))),

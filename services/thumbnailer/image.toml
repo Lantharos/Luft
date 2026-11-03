@@ -4,4 +4,4 @@ part = "services"
 "/usr/libexec/" = ["luft-thumbnailer"]
 
 [files]
-"/usr/share/thumbnailers/" = ["data/luft-apps.thumbnailer"]
+"/usr/share/thumbnailers/" = ["data/luft-apps.thumbnailer", "data/luft-music.thumbnailer", "data/luft-videos.thumbnailer"]

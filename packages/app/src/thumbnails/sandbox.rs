@@ -60,8 +60,11 @@ impl Sandbox {
         writer.write_all(&seccomp::no_new_namespaces())?;
         drop(writer);
         let mut command = Command::new("bwrap");
+        command.args(base_arguments());
+        if program.starts_with('/') && !program.starts_with("/usr/") {
+            command.args(["--ro-bind", program, program]);
+        }
         command
-            .args(base_arguments())
             .arg("--ro-bind")
             .args([input, input])
             .arg("--bind")

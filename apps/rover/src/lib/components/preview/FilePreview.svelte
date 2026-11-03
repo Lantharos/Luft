@@ -60,6 +60,7 @@
 		<video
 			class="preview-image"
 			src={full ? source : `${source}#t=0.1`}
+			poster={thumbnailOf(entry).thumbnail ?? undefined}
 			autoplay={full}
 			preload="metadata"
 			playsinline
@@ -77,7 +78,7 @@
 	</div>
 {:else if kind === 'audio'}
 	<div class="preview-stack">
-		<EntryIcon kind="audio" size={iconSize} />
+		<EntryIcon kind="audio" size={iconSize} {...thumbnailOf(entry)} fit="contain" />
 		<audio
 			src={source}
 			autoplay={full}

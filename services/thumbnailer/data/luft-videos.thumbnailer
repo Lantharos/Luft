@@ -1,0 +1,4 @@
+[Thumbnailer Entry]
+TryExec=/usr/libexec/luft-thumbnailer
+Exec=/usr/libexec/luft-thumbnailer -s %s --video %i %o
+MimeType=video/mp4;video/x-m4v;video/webm;video/matroska;video/x-matroska;video/quicktime;video/vnd.avi;video/x-msvideo;video/mp2t;video/mpeg;video/ogg;video/x-ogm+ogg;video/x-theora+ogg;video/3gpp;video/3gpp2;video/x-flv;video/x-ms-wmv;video/x-ms-asf;video/dv;video/x-mjpeg;

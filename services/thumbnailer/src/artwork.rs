@@ -12,6 +12,7 @@ use resvg::tiny_skia::{Pixmap, Transform};
 use resvg::usvg::{ImageHrefResolver, Options, Tree};
 
 const MAX_ICON_BYTES: usize = 8 << 20;
+const MAX_PICTURE_BYTES: usize = 32 << 20;
 const MAX_PNG_SIDE: u32 = 4096;
 const GZIP_MAGIC: [u8; 2] = [0x1f, 0x8b];
 
@@ -33,6 +34,13 @@ pub fn write(icon: &Icon, size: u32, output: &Path) -> Result<(), String> {
         IconSize::Pixels(_) => downscale(&icon.bytes, size)?,
     };
     std::fs::write(output, png).map_err(|error| error.to_string())
+}
+
+pub fn write_picture(bytes: &[u8], size: u32, output: &Path) -> Result<(), String> {
+    if bytes.len() > MAX_PICTURE_BYTES {
+        return Err("The picture is too large".to_string());
+    }
+    std::fs::write(output, downscale(bytes, size)?).map_err(|error| error.to_string())
 }
 
 fn self_contained() -> Options<'static> {
@@ -86,18 +94,20 @@ fn rasterize(svg: &[u8], size: u32) -> Result<Vec<u8>, String> {
     pixmap.encode_png().map_err(|error| error.to_string())
 }
 
-fn downscale(png: &[u8], size: u32) -> Result<Vec<u8>, String> {
+fn downscale(bytes: &[u8], size: u32) -> Result<Vec<u8>, String> {
     let mut limits = Limits::default();
     limits.max_image_width = Some(MAX_PNG_SIDE);
     limits.max_image_height = Some(MAX_PNG_SIDE);
-    let mut reader = ImageReader::with_format(Cursor::new(png), ImageFormat::Png);
+    let mut reader = ImageReader::new(Cursor::new(bytes))
+        .with_guessed_format()
+        .map_err(|error| error.to_string())?;
     reader.limits(limits);
     let source = reader
         .decode()
         .map_err(|error| error.to_string())?
         .into_rgba8();
     let (width, height) = source.dimensions();
-    let scale = size as f64 / width.max(height) as f64;
+    let scale = (size as f64 / width.max(height) as f64).min(1.0);
     let pixels = |length: u32| ((length as f64 * scale).round() as u32).max(1);
     let (target_width, target_height) = (pixels(width), pixels(height));
     let source = Image::from_vec_u8(width, height, source.into_raw(), PixelType::U8x4)
@@ -111,7 +121,7 @@ fn downscale(png: &[u8], size: u32) -> Result<Vec<u8>, String> {
         )
         .map_err(|error| error.to_string())?;
     let image = RgbaImage::from_raw(target_width, target_height, target.into_vec())
-        .ok_or("The icon could not be resized")?;
+        .ok_or("The picture could not be resized")?;
     let mut encoded = Cursor::new(Vec::new());
     image
         .write_to(&mut encoded, ImageFormat::Png)

@@ -1,0 +1,4 @@
+[Thumbnailer Entry]
+TryExec=/usr/libexec/luft-thumbnailer
+Exec=/usr/libexec/luft-thumbnailer -s %s --cover %i %o
+MimeType=audio/mpeg;audio/flac;audio/x-flac;audio/x-flac+ogg;audio/mp4;audio/x-m4a;audio/m4a;audio/x-m4b;audio/ogg;audio/x-vorbis+ogg;audio/x-opus+ogg;audio/opus;audio/x-speex+ogg;audio/vnd.wave;audio/x-wav;audio/x-aiff;audio/aiff;audio/x-ape;audio/x-wavpack;audio/x-musepack;

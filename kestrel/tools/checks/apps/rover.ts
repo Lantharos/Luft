@@ -10,6 +10,7 @@ import {changes, withApp} from './lib/apps.js';
 import {exists, removeTree, write} from './lib/files.js';
 import {checkPalette, showDark, withPalette} from './lib/palette.js';
 import {checkNetwork} from './rover/network.js';
+import {checkThumbnails, withThumbnailers} from './rover/thumbnails.js';
 
 const {require, eventually} = checks('Luft app');
 const DRAG = {steps: 24, interval: 30, hover: 300};
@@ -68,14 +69,15 @@ async function checkTextMenu(app: LuftApp) {
 export async function run() {
   try {
     await withPalette(async palette => {
-      await withApp('rover', [], async app => {
+      await withThumbnailers(() => withApp('rover', [], async app => {
         await checkPalette(app, palette, {accent: true});
         await showDark(app, palette);
         await checkDrag(app);
         await checkPrinting(app);
         await checkTextMenu(app);
         await checkProperties(app);
-      });
+        await checkThumbnails(app, GLib.build_filenamev([FOLDER, 'Thumbnails']), open);
+      }));
       const rclone = GLib.find_program_in_path('rclone');
       if (rclone) await checkNetwork(rclone);
       else console.log('Kestrel Luft app check: rover network locations skipped without rclone');

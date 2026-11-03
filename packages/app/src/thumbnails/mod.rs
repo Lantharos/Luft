@@ -1,3 +1,4 @@
+mod album;
 mod cache;
 mod child;
 mod generate;

@@ -1,7 +1,7 @@
 [package]
 name = "luft-thumbnailer"
 version = "0.1.0"
-description = "Shows the app icon of AppImages, Flatpak bundles and Flatpak references as their thumbnail"
+description = "Shows the app icon of AppImages, Flatpak bundles and Flatpak references, the cover art of music, and a representative frame of videos, as their thumbnail"
 authors = ["Kristof"]
 license.workspace = true
 edition.workspace = true
@@ -12,7 +12,11 @@ dirs.workspace = true
 fast_image_resize.workspace = true
 flate2 = { workspace = true, features = ["default"] }
 glib.workspace = true
-image.workspace = true
+gstreamer.workspace = true
+gstreamer-app.workspace = true
+gstreamer-video.workspace = true
+image = { workspace = true, features = ["jpeg", "webp"] }
+lofty.workspace = true
 luft-software.workspace = true
 memmap2.workspace = true
 resvg.workspace = true

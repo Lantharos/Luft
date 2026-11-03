@@ -1,6 +1,8 @@
 mod artwork;
+mod cover;
 mod flatpak;
 mod request;
+mod video;
 
 use std::fs::File;
 use std::io::Read;
@@ -9,7 +11,7 @@ use std::process::ExitCode;
 
 use luft_software::apps::appimage::{self, Icon};
 
-use request::Request;
+use request::{Kind, Request};
 
 const HEAD_BYTES: u64 = 256;
 
@@ -30,15 +32,23 @@ fn icons(path: &Path) -> Result<Vec<Icon>, String> {
     }
 }
 
-fn run(request: &Request) -> Result<(), String> {
+fn app_icon(request: &Request) -> Result<(), String> {
     let icon = artwork::best(icons(&request.input)?, request.size)
         .ok_or_else(|| format!("{} has no app icon", request.input.display()))?;
     artwork::write(&icon, request.size, &request.output)
 }
 
+fn run(request: &Request) -> Result<(), String> {
+    match request.kind {
+        Kind::App => app_icon(request),
+        Kind::Video => video::write(&request.input, request.size, &request.output),
+        Kind::Cover => cover::write(&request.input, request.size, &request.output),
+    }
+}
+
 fn main() -> ExitCode {
     let Some(request) = Request::parse(std::env::args_os().skip(1)) else {
-        eprintln!("Usage: luft-thumbnailer -s SIZE INPUT OUTPUT");
+        eprintln!("Usage: luft-thumbnailer -s SIZE [--video | --cover] INPUT OUTPUT");
         return ExitCode::from(2);
     };
     match run(&request) {

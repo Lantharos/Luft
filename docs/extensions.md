@@ -22,7 +22,7 @@ Extensions add to Kestrel: a layer over the wallpaper, quick settings tiles, tas
   ...                                      anything else it ships, such as a helper program
 ```
 
-Every folder in `luft/extensions` under `XDG_DATA_HOME` and each of `XDG_DATA_DIRS` counts, and its name must be the manifest's `id`. A user copy replaces a system copy with the same id: that's how the store updates an extension Luft ships. An extension runs unless it's turned off.
+Every folder in `luft/extensions` under `XDG_DATA_HOME` and each of `XDG_DATA_DIRS` counts, and its name must be the manifest's `id`. A user copy replaces a system copy with the same id: that's how the store updates an extension Luft ships. Once Rain has an approved release, the image also carries it in `/usr/share/luft/preinstall`, and every account gets that copy at sign-in, so it's updated from the store from the start; the built-in copy is used until then. Removing an extension that replaces a system copy hides the system copy too. An extension runs unless it's turned off.
 
 ## Manifest
 

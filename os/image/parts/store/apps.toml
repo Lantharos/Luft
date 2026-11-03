@@ -1,0 +1,14 @@
+[[preinstall]]
+id = "com.lantharos.draft"
+replaces = "app-draft"
+
+[[preinstall]]
+id = "com.lantharos.magpie"
+replaces = "app-magpie"
+
+[[preinstall]]
+id = "com.lantharos.mailman"
+replaces = "app-mailman"
+
+[[preinstall]]
+id = "com.lantharos.Rain"

@@ -211,6 +211,7 @@ jobs:
       notes: ${{ steps.version.outputs.notes }}
       base: ${{ steps.parts.outputs.base }}
       cef: ${{ steps.parts.outputs.cef }}
+      store: ${{ steps.parts.outputs.store }}
       parts: ${{ steps.parts.outputs.parts }}
       signed: ${{ steps.parts.outputs.signed }}
       details: ${{ steps.parts.outputs.details }}
@@ -232,13 +233,16 @@ jobs:
           built="$(jq -r '."org.opencontainers.image.revision" // empty' <<<"$nightly")"
           base="$(os/image/build.sh base)"
           cef="$(os/image/build.sh cef)"
+          store="$(os/image/build.sh store)"
           {
             echo "LUFT_BASE=$base"
             echo "LUFT_CEF=$cef"
+            echo "LUFT_STORE=$store"
           } >> "$GITHUB_ENV"
           if [[ "$GITHUB_EVENT_NAME" == schedule && "$built" == "$GITHUB_SHA" &&
                 "$base" == "$(jq -r '."org.opencontainers.image.base.name" // empty' <<<"$nightly")" &&
-                "$cef" == "$(jq -r '."com.lantharos.cef" // empty' <<<"$nightly")" ]] &&
+                "$cef" == "$(jq -r '."com.lantharos.cef" // empty' <<<"$nightly")" &&
+                "$store" == "$(jq -r '."com.lantharos.store" // empty' <<<"$nightly")" ]] &&
             LUFT_BASE="$base" os/image/build.sh updates "$IMAGE:$MAJOR-nightly"; then
             echo "Nothing changed since the last nightly."
             echo "skip=1" >> "$GITHUB_OUTPUT"
@@ -275,6 +279,7 @@ jobs:
           {
             echo "base=$LUFT_BASE"
             echo "cef=$LUFT_CEF"
+            echo "store=$LUFT_STORE"
             echo "parts=$(jq -c '[.[] | select(.signing == "unsigned") | .name]' <<<"$missing")"
             echo "signed=$(jq -c '[.[] | select(.signing == "signed") | .name]' <<<"$missing")"
             echo "details=$(jq -c 'map({(.name): {key, family}}) | add // {}' <<<"$missing")"
@@ -293,6 +298,7 @@ jobs:
     env:
       LUFT_BASE: ${{ needs.plan.outputs.base }}
       LUFT_CEF: ${{ needs.plan.outputs.cef }}
+      LUFT_STORE: ${{ needs.plan.outputs.store }}
     steps:
       - uses: actions/checkout@v7
 
@@ -315,6 +321,7 @@ jobs:
     env:
       LUFT_BASE: ${{ needs.plan.outputs.base }}
       LUFT_CEF: ${{ needs.plan.outputs.cef }}
+      LUFT_STORE: ${{ needs.plan.outputs.store }}
     steps:
       - uses: actions/checkout@v7
 
@@ -344,6 +351,7 @@ jobs:
     env:
       LUFT_BASE: ${{ needs.plan.outputs.base }}
       LUFT_CEF: ${{ needs.plan.outputs.cef }}
+      LUFT_STORE: ${{ needs.plan.outputs.store }}
       VERSION: ${{ needs.plan.outputs.version }}
       RELEASE_NOTES: ${{ needs.plan.outputs.notes }}
     steps:

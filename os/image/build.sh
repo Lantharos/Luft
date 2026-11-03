@@ -25,6 +25,7 @@ Usage: os/image/build.sh [luft] [luft-nvidia] [PODMAN BUILD OPTIONS...]
        os/image/build.sh stage NAME FOLDER
        os/image/build.sh base
        os/image/build.sh cef
+       os/image/build.sh store
        os/image/build.sh updates IMAGE
 
 Builds the Luft images with Podman and seals them as localhost/luft:45 and
@@ -38,7 +39,7 @@ localhost/luft-kernel:45, where os/image/seal.sh takes it from.
 
 The image is put together from parts: Kestrel, the boot services, the patched
 bootc and xdg-desktop-portal, the web runtime, Helium, Zypak, the system
-services, each app and NVIDIA's driver. Each part is an image named after a hash of everything it's built from,
+services, each app, the schelf.store releases it preinstalls and NVIDIA's driver. Each part is an image named after a hash of everything it's built from,
 the Fedora image's digest and the CEF build included, in LUFT_PARTS (default localhost/luft-parts),
 so a build only makes the parts that changed. LUFT_REBUILD=1 makes every part again. Compilers keep their caches in
 LUFT_IMAGE_CACHE (default ~/.cache/luft-image), shared by every checkout.
@@ -47,7 +48,10 @@ plan lists each part with its image and whether it's missing, part builds one
 part, stage copies the files one part puts into the image to FOLDER, building
 the part when it's missing, and base prints the Fedora image the parts are built on (LUFT_BASE, by
 digest). cef prints the CEF build the web runtime ships, the newest one Sabine
-would install (LUFT_CEF), so a new CEF build makes the runtime part again. updates lists the packages IMAGE adds to that Fedora image which have
+would install (LUFT_CEF), so a new CEF build makes the runtime part again. store
+prints the newest approved schelf.store release of each app in
+os/image/parts/store/apps.toml as ID=VERSION=PART (LUFT_STORE, or empty for none);
+those apps ship from the store instead of being built into the image. updates lists the packages IMAGE adds to that Fedora image which have
 updates, and exits with 100 when there are some, like dnf check-upgrade.
 
 Signs with the keys named by LUFT_SECUREBOOT_KEY, LUFT_SECUREBOOT_CERT (PEM)
@@ -88,6 +92,27 @@ resolve_cef() {
     "$bun" /parts/cef.ts
 }
 
+resolve_store() {
+  if [[ -n "${LUFT_STORE+set}" ]]; then
+    printf '%s' "$LUFT_STORE"
+    return
+  fi
+  podman run "${retries[@]}" --quiet --rm --security-opt label=disable --volume "$image/parts/store:/store:ro" \
+    "$bun" /store/releases.ts resolve
+}
+
+store_entries() {
+  tr ' ' '\n' <<<"$store" | sed '/^$/d'
+}
+
+store_replaces() {
+  store_entries | awk -F= 'NF == 3 {print $3}'
+}
+
+store_versions() {
+  store_entries | cut -d= -f1,2 | paste -sd,
+}
+
 resolve_base() {
   local base="${LUFT_BASE:-quay.io/fedora/fedora-bootc:$fedora}" digest
   if [[ "$base" == *@sha256:* ]]; then
@@ -108,11 +133,12 @@ is_signed() {
 
 part_names() {
   local components
-  components="$(in_bun /luft/os/image/parts/components/parts.ts /tree /luft names)"
+  components="$(in_bun /luft/os/image/parts/components/parts.ts /tree /luft names | { grep -vxF -f <(store_replaces) || true; })"
   grep -v '^app-' <<<"$components"
   printf '%s\n' bootc portal
   [[ "$1" != luft-nvidia ]] || echo nvidia
   printf '%s\n' runtime helium cursors zypak
+  [[ -z "$store" ]] || echo store
   grep '^app-' <<<"$components"
 }
 
@@ -140,6 +166,7 @@ part_target() {
     bootc) echo "bootc BOOTC=$(bootc_version)" ;;
     portal) echo "portal PORTAL=$(repo_version xdg-desktop-portal)" ;;
     runtime) echo "runtime CEF=$cef" ;;
+    store) echo "store STORE=$(store_versions)" ;;
     boot | nvidia) echo "$1 SIGNED_BY=$(signed_by)" ;;
     *) echo "$1" ;;
   esac
@@ -290,7 +317,7 @@ gather_parts() {
   [[ ! -d "$parts/apps" ]] || { chmod -R u+w "$parts/apps"; rm -rf "$parts/apps"; }
   mkdir -p "$parts/apps"
   for name in "${names[@]}"; do
-    [[ "$name" != services && "$name" != app-* ]] || cp -alf "$parts/$name/stage/." "$parts/apps/"
+    [[ "$name" != services && "$name" != store && "$name" != app-* ]] || cp -alf "$parts/$name/stage/." "$parts/apps/"
   done
   part_files needed.txt "${names[@]}" | sort -u | { grep -vxF -f <(part_files provided.txt "${names[@]}") || true; } |
     sed 's/$/()(64bit)/' > "$parts/needed.txt"
@@ -303,7 +330,7 @@ build_system() {
   local target="$1" tag="$2"
   shift 2
   podman build "${retries[@]}" --layers --no-hosts --no-hostname --security-opt label=disable --target "$target" --file "$image/Containerfile" \
-    --build-context "parts=$state/parts" --build-arg "BASE=$base" --build-arg "CEF=$cef" "$@" \
+    --build-context "parts=$state/parts" --build-arg "BASE=$base" --build-arg "CEF=$cef" --build-arg "STORE=$store" "$@" \
     "${podman_options[@]}" --tag "$tag" "$luft"
 }
 
@@ -384,7 +411,8 @@ case "${1:-luft}" in
   -h | --help) usage ;;
   base) resolve_base ;;
   cef) resolve_cef ;;
-  plan) base="$(resolve_base)"; cef="$(resolve_cef)"; snapshot_tree; plan "${@:2}" ;;
+  store) resolve_store ;;
+  plan) base="$(resolve_base)"; cef="$(resolve_cef)"; store="$(resolve_store)"; snapshot_tree; plan "${@:2}" ;;
   updates)
     (($# == 2)) || { usage >&2; exit 2; }
     base="$(resolve_base)"
@@ -394,6 +422,7 @@ case "${1:-luft}" in
     (($# >= 2)) || { usage >&2; exit 2; }
     base="$(resolve_base)"
     [[ "$2" != runtime ]] || cef="$(resolve_cef)"
+    [[ "$2" != store ]] || store="$(resolve_store)"
     podman_options=("${@:3}")
     ! is_signed "$2" || require_keys LUFT_SECUREBOOT_KEY LUFT_SECUREBOOT_CERT
     snapshot_tree
@@ -404,6 +433,7 @@ case "${1:-luft}" in
     (($# == 3)) || { usage >&2; exit 2; }
     base="$(resolve_base)"
     [[ "$2" != runtime ]] || cef="$(resolve_cef)"
+    [[ "$2" != store ]] || store="$(resolve_store)"
     podman_options=()
     ! is_signed "$2" || require_keys LUFT_SECUREBOOT_KEY LUFT_SECUREBOOT_CERT
     snapshot_tree
@@ -412,6 +442,7 @@ case "${1:-luft}" in
   luft | luft-nvidia)
     base="$(resolve_base)"
     cef="$(resolve_cef)"
+    store="$(resolve_store)"
     variants=()
     while [[ "${1:-}" == luft || "${1:-}" == luft-nvidia ]]; do
       variants+=("$1")

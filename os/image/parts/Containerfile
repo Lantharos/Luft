@@ -123,6 +123,20 @@ RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
 FROM scratch AS helium
 COPY --from=helium-build /stage /stage
 
+FROM builder AS store-build
+ARG STORE
+COPY os/image/parts/store /src/os/image/parts/store
+COPY os/image/parts/stages/needed.sh /src/os/image/parts/stages/needed.sh
+RUN bun /src/os/image/parts/store/releases.ts stage /stage "${STORE}" && \
+    mkdir /var/tmp/store && \
+    for file in /stage/usr/share/luft/preinstall/*.tar.*; do tar -xf "$file" -C /var/tmp/store; done && \
+    /src/os/image/parts/stages/needed.sh /var/tmp/store /out && \
+    rm -rf /var/tmp/store
+
+FROM scratch AS store
+COPY --from=store-build /stage /stage
+COPY --from=store-build /out/ /
+
 FROM ${BASE} AS cursors-build
 COPY os/image/parts/cursors /src/os/image/parts/cursors
 COPY os/image/parts/stages/cursors.sh /src/os/image/parts/stages/cursors.sh

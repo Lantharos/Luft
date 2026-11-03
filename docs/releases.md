@@ -32,13 +32,19 @@ The version is only in the image's labels, the `org.opencontainers.image.version
 | Nightly stick | After every nightly, from that nightly |
 | Stable images and stick | Only when promoted by hand |
 
-A nightly is built when `main` has new commits, Fedora published a new base image, or a package the image adds to Fedora's has an update, which happens most days. The build compares the commit and base image recorded in the last nightly's labels and runs `os/image/build.sh updates` on it, which is `dnf check-upgrade` for the packages Luft adds. When all three match, the night is skipped.
+A nightly is built when `main` has new commits, Fedora published a new base image, a package the image adds to Fedora's has an update, which happens most days, or schelf.store approved a new release of an app the image ships from it. The build compares the commit, base image, CEF build and store releases recorded in the last nightly's labels and runs `os/image/build.sh updates` on it, which is `dnf check-upgrade` for the packages Luft adds. When all of them match, the night is skipped.
 
 Before `:1-nightly` moves, the new image is installed in a VM on the runner the way Install Luft does, started with Secure Boot, signed in to with a password made up for that run, and checked until the desktop and Settings work ([Testing](testing.md#ci)). When that fails, the nightly isn't published, `:1-nightly` stays on the last one that passed, and the run keeps the screenshots and logs.
 
 Helium's newest release is picked up at 01:00, so it lands in that night's build. Sabine has its own releases; a new Sabine version reaches the nightlies first and stable with the next promotion. The image build fails when its Sabine would not run one of the image's own apps. On a running system, Sabine holds back an update that would stop an installed app, until a Luft update brings newer apps or, for an app the person installed, they update or remove it; Settings → Updates names those apps.
 
 A new major version lands on the nightlies first.
+
+## Apps on schelf.store
+
+Draft, Magpie, Mailman, Rover, Tern and Meet Luft, and the Rain extension, are published on [schelf.store](https://schelf.store) too, so they install and update anywhere Sabine runs. Pushing a tag named after the app's folder and its version, such as `draft/v0.2.0` or `rain/v1.1.0`, runs the Store workflow (`.github/workflows/store.yml`) for that app only: it checks the version against `Sabine.toml` or `extension.toml`, builds it with Sabine's release workflow for Linux x86_64 and ARM64 (and Windows for Meet Luft), or packs the extension with its helper on both architectures with its `pack.sh`, and sends it to the store, whose review approves it. The tag's message becomes the release notes. Each app's `schelf.toml` says what it is, and the `[sandbox]` table in its `Sabine.toml` what it needs; apps that update from the store say `provider = "schelf"` under `[updates]`.
+
+Draft, Magpie and Mailman don't need anything only the image can give them, so the image ships them from the store, listed in `os/image/parts/store/apps.toml`. Each build takes the newest approved release of each and leaves the app's own part out; `schelf --preinstall` installs it for every account at sign-in, offline, and Schelf keeps it updated from then on, so it can be removed like any app ([Schelf](components/schelf.md#preinstalled-apps-and-background-updates)). Until an app has an approved release, the image keeps building it in. The image records the releases it took in its `com.lantharos.store` label, and a newly approved release makes the next nightly even when nothing else changed. Rain ships both ways: built into the image, and from the store, whose copy replaces the built-in one. Rover and Tern stay in the image, since other parts of Luft open them and they handle folders and terminals for the whole system.
 
 ## Promoting a nightly
 

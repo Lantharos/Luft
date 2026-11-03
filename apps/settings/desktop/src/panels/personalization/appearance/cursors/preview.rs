@@ -3,8 +3,8 @@ use std::hash::{DefaultHasher, Hash, Hasher};
 use std::path::{Path, PathBuf};
 use std::time::UNIX_EPOCH;
 
-use image::{ImageFormat, RgbaImage};
 use image::imageops::{self, FilterType};
+use image::{ImageFormat, RgbaImage};
 use luft_i18n::t;
 use serde::Deserialize;
 use specta::Type;

@@ -36,7 +36,7 @@ pub enum Kind {
 }
 
 #[derive(Deserialize)]
-pub struct Developer {
+pub struct Publisher {
     pub name: String,
     pub verified: bool,
 }
@@ -55,7 +55,7 @@ pub struct Entry {
     pub icon: Option<String>,
     #[serde(default)]
     pub categories: Vec<String>,
-    pub developer: Option<Developer>,
+    pub publisher: Option<Publisher>,
     #[serde(default)]
     platforms: BTreeMap<String, IgnoredAny>,
     pub package: Option<String>,
@@ -102,7 +102,7 @@ impl From<&Entry> for CatalogApp {
             name: entry.name.clone(),
             summary: entry.summary.clone(),
             icon: entry.icon.clone(),
-            developer: entry.developer.as_ref().map(|developer| developer.name.clone()),
+            developer: entry.publisher.as_ref().map(|publisher| publisher.name.clone()),
             package: entry.package.clone(),
         }
     }

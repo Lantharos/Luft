@@ -378,7 +378,7 @@ pub fn on_flathub(name: &str) -> Option<OnFlathub> {
             name: entry.name.clone(),
             summary: Some(entry.summary.clone()).filter(|summary| !summary.is_empty()),
             icon: entry.icon.clone(),
-            verified: entry.developer.as_ref().is_some_and(|developer| developer.verified),
+            verified: entry.publisher.as_ref().is_some_and(|publisher| publisher.verified),
         })
 }
 

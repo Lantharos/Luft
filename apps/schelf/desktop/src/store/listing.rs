@@ -5,7 +5,7 @@ use luft_software::apps::flatpak::Permissions;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
-use super::catalog::{Developer, Kind};
+use super::catalog::{Kind, Publisher};
 use super::device;
 use super::install::extensions;
 use super::signed::{self, Age};
@@ -214,7 +214,7 @@ pub struct Listing {
     listing: BTreeMap<String, Text>,
     pub icon: Option<String>,
     pub screenshots: Vec<Screenshot>,
-    pub developer: Developer,
+    pub publisher: Publisher,
     pub homepage: Option<String>,
     pub licence: Option<String>,
     releases: Vec<Release>,
@@ -316,8 +316,8 @@ impl From<Listing> for StoreDetails {
             published: release.as_ref().map(|release| release.published.clone()),
             notes: release.as_ref().map(|release| release.notes.clone()).unwrap_or_default(),
             provenance: release.map(|release| release.provenance),
-            verified: listing.developer.verified,
-            developer: listing.developer.name,
+            verified: listing.publisher.verified,
+            developer: listing.publisher.name,
             id: listing.id,
             kind: listing.kind,
             format: listing.format,

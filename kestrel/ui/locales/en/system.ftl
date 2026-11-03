@@ -550,6 +550,11 @@ screenshot-screencast-start-failed = Screencast Failed to Start
 screenshot-screencast-out-of-space = Screencast Failed: Out of Disk Space
 screenshot-screencast-try-again = Screencast Failed, Please Try Again
 screenshot-screencast-failed = Screencast Failed
+screenshot-screencast-stopped = Screencast Stopped
+# Body of the notification shown when a recording stops because its video was deleted or moved
+screenshot-screencast-file-removed = Its video was deleted or moved while recording.
+# Body of a failed recording whose video can’t be written to disk
+screenshot-screencast-write-failed = The video couldn’t be saved.
 screenshot-screencast-view = Click here to view the video
 # Notification button that opens the file manager at the saved file
 screenshot-show-in-rover = Show in Rover

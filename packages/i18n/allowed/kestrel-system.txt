@@ -6,7 +6,9 @@ kestrel/ui/src/system/screencast/recorder.ts	Sender has vanished
 kestrel/ui/src/system/screencast/recorder.ts	Session closed unexpectedly
 kestrel/ui/src/system/screencast/recorder.ts	All pipelines failed to start
 kestrel/ui/src/system/screencast/recorder.ts	Unexpected EOS message
-kestrel/ui/src/system/screencast/recorder.ts	Out of disk space
+kestrel/ui/src/system/screencast/recorder.ts	Timed out finishing the recording
+kestrel/ui/src/system/screencast/recorder.ts	Stopped before recording started
+kestrel/ui/src/system/screencast/recorder.ts	The recording was deleted or moved
 kestrel/ui/src/system/screencast/screencastService.ts	Saving to disk is disabled
 kestrel/ui/src/system/screencast/screencastService.ts	Service is already recording
 kestrel/ui/src/system/display/ddcutil.ts	Invalid display

@@ -52,8 +52,9 @@ export class Screencaster {
     });
 
   constructor(private readonly host: ScreencasterHost) {
-    this.proxy.connectSignal('Error', (_proxy, _sender, [errorName, message]) =>
-      this.failed('RECORDING', Gio.DBusError.new_for_dbus_error(errorName, message)));
+    this.proxy.connectSignal('Error', (_proxy, _sender, [errorName, message]) => {
+      if (this.inProgress) this.failed('RECORDING', Gio.DBusError.new_for_dbus_error(errorName, message));
+    });
 
     this.proxy.connect('notify::g-name-owner', () => {
       if (this.proxy.g_name_owner || !this.inProgress || this.starting) return;
@@ -64,11 +65,9 @@ export class Screencaster {
 
   async start(area: ScreencastArea, retries = 0): Promise<void> {
     this.setInProgress(true);
-    let retry = false;
+    this.starting = true;
 
     try {
-      this.starting = true;
-
       const [, path] = await this.proxy.ScreencastAreaAsync(
         area.x, area.y, area.width, area.height,
         GLib.build_filenamev([
@@ -78,37 +77,33 @@ export class Screencaster {
         { 'draw-cursor': new GLib.Variant('b', area.drawCursor) });
 
       this.path = path;
+      this.starting = false;
     } catch (error) {
-      if ((error as GLib.Error).matches(Gio.DBusError, Gio.DBusError.NO_REPLY) && retries < 2)
-        retry = true;
-      else
+      this.starting = false;
+      if (!this.inProgress) return;
+
+      if ((error as GLib.Error).matches(Gio.DBusError, Gio.DBusError.NO_REPLY) && retries < 2) {
+        console.log('Screencast service crashed during startup, trying again');
+        this.setInProgress(false);
+        void this.start(area, retries + 1);
+      } else {
         this.failed('STARTUP', error as GLib.Error);
-    }
-
-    this.starting = false;
-
-    if (retry) {
-      console.log('Screencast service crashed during startup, trying again');
-      this.setInProgress(false);
-      void this.start(area, retries + 1);
+      }
     }
   }
 
   async stop(): Promise<void> {
     if (!this.inProgress) return;
 
+    const cancelsStart = this.starting;
     this.setInProgress(false);
 
     try {
-      const [success] = await this.proxy.StopScreencastAsync();
-      if (!success) throw new Error();
+      const [recorded] = await this.proxy.StopScreencastAsync();
+      if (recorded && !cancelsStart) this.showNotification(KestrelUi.t('screenshot-screencast-recorded'));
     } catch (error) {
-      const { message } = error as Error;
-      log(message ? `Error stopping screencast: ${message}` : 'Error stopping screencast');
-      return;
+      this.failed('RECORDING', error as GLib.Error);
     }
-
-    this.showNotification(KestrelUi.t('screenshot-screencast-recorded'));
   }
 
   private failed(phase: Phase, error: GLib.Error): void {
@@ -121,6 +116,12 @@ export class Screencaster {
       this.showNotification(KestrelUi.t('screenshot-screencast-start-failed'));
     } else if (error.matches(ScreencastErrors, ScreencastError.OUT_OF_DISK_SPACE)) {
       this.showNotification(KestrelUi.t('screenshot-screencast-out-of-space'));
+    } else if (error.matches(ScreencastErrors, ScreencastError.FILE_REMOVED)) {
+      this.path = null;
+      this.showNotification(KestrelUi.t('screenshot-screencast-stopped'), KestrelUi.t('screenshot-screencast-file-removed'));
+    } else if (error.matches(ScreencastErrors, ScreencastError.WRITE_FAILED)) {
+      this.path = null;
+      this.showNotification(KestrelUi.t('screenshot-screencast-failed'), KestrelUi.t('screenshot-screencast-write-failed'));
     } else if (error.matches(ScreencastErrors, ScreencastError.SERVICE_CRASH)) {
       this.showNotification(KestrelUi.t('screenshot-screencast-try-again'));
     } else {
@@ -128,12 +129,12 @@ export class Screencaster {
     }
   }
 
-  private showNotification(title: string): void {
+  private showNotification(title: string, body = this.path ? KestrelUi.t('screenshot-screencast-view') : ''): void {
     const source = screenshotNotificationSource();
     const notification = new MessageTray.Notification({
       source,
       title,
-      body: this.path ? KestrelUi.t('screenshot-screencast-view') : '',
+      body,
       isTransient: true,
       forFeedback: true,
     });

@@ -68,11 +68,12 @@ export class ScreencastService extends ServiceImplementation {
 
     try {
       await recorder.stopRecording();
+      invocation.return_value(GLib.Variant.new('(b)', [true]));
     } catch (error) {
       console.error(`${sender}: Error while stopping recorder: ${(error as Error).message}`);
+      invocation.return_gerror(error as GLib.Error);
     } finally {
       this.removeRecorder(sender);
-      invocation.return_value(GLib.Variant.new('(b)', [true]));
     }
   }
 
@@ -88,10 +89,9 @@ export class ScreencastService extends ServiceImplementation {
       return;
     }
 
-    const [sessionPath] = this.proxy.CreateSessionSync({});
-
     let recorder: Recorder;
     try {
+      const [sessionPath] = this.proxy.CreateSessionSync({});
       recorder = new Recorder(sessionPath, area, filePathStem(fileTemplate), options, invocation);
     } catch (error) {
       console.error(`Failed to create recorder: ${(error as Error).message}`);

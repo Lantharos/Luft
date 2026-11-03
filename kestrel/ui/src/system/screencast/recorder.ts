@@ -26,9 +26,10 @@ const ScreenCastStreamProxy = Gio.DBusProxy.makeProxyWrapper<ScreenCastStreamRem
   loadSubInterfaceXML('org.gnome.Mutter.ScreenCast.Stream', 'org.gnome.Mutter.ScreenCast'));
 
 const DEFAULT_DRAW_CURSOR = true;
+const FINISH_TIMEOUT_SECONDS = 10;
 
-type PipelineState = 'INIT' | 'STARTING' | 'PLAYING' | 'FLUSHING' | 'STOPPED' | 'ERROR';
-type SessionState = 'INIT' | 'ACTIVE' | 'STOPPED';
+type PipelineState = 'INIT' | 'STARTING' | 'PLAYING' | 'FLUSHING' | 'STOPPED';
+type SessionState = 'ACTIVE' | 'STOPPED';
 
 export interface Area {
   readonly x: number;
@@ -57,13 +58,16 @@ export class Recorder extends EventEmitter {
   private streamProxy: ReturnType<typeof ScreenCastStreamProxy> | null = null;
   private nameWatchId: number;
   private pipelineState: PipelineState = 'INIT';
-  private sessionState: SessionState = 'INIT';
+  private sessionState: SessionState = 'ACTIVE';
   private pipeline: Gst.Element | null = null;
   private pipelineConfigs: Generator<PipelineConfig, void> | null = null;
+  private fileMonitor: Gio.FileMonitor | null = null;
+  private finishTimeoutId = 0;
   private nodeId = 0;
   private filePath: string | null = null;
   private startRequest: Request<string> | null = null;
   private stopRequest: Request<void> | null = null;
+  private stopping: Promise<void> | null = null;
 
   constructor(sessionPath: string, private readonly area: Area, private readonly filePathStem: string,
     options: Record<string, GLib.Variant>, invocation: Gio.DBusMethodInvocation) {
@@ -91,33 +95,67 @@ export class Recorder extends EventEmitter {
     return new Promise((resolve, reject) => {
       this.startRequest = { resolve, reject };
 
-      const { x, y, width, height } = this.area;
-      const [streamPath] = this.sessionProxy.RecordAreaSync(x, y, width, height, {
-        'is-recording': GLib.Variant.new('b', true),
-        'cursor-mode': GLib.Variant.new('u', this.drawCursor ? 1 : 0),
-      });
+      try {
+        const { x, y, width, height } = this.area;
+        const [streamPath] = this.sessionProxy.RecordAreaSync(x, y, width, height, {
+          'is-recording': GLib.Variant.new('b', true),
+          'cursor-mode': GLib.Variant.new('u', this.drawCursor ? 1 : 0),
+        });
 
-      this.streamProxy = ScreenCastStreamProxy(Gio.DBus.session, 'org.gnome.Mutter.ScreenCast', streamPath);
-      this.streamProxy.connectSignal('PipeWireStreamAdded', (_proxy, _sender, [nodeId]) => {
-        this.nodeId = nodeId;
-        this.pipelineState = 'STARTING';
-        this.pipelineConfigs = pipelineConfigs();
-        this.tryNextPipeline();
-      });
-      this.sessionProxy.StartSync();
-      this.sessionState = 'ACTIVE';
+        this.streamProxy = ScreenCastStreamProxy(Gio.DBus.session, 'org.gnome.Mutter.ScreenCast', streamPath);
+        this.streamProxy.connectSignal('PipeWireStreamAdded', (_proxy, _sender, [nodeId]) => {
+          this.nodeId = nodeId;
+          this.pipelineState = 'STARTING';
+          this.pipelineConfigs = pipelineConfigs();
+          this.tryNextPipeline();
+        });
+        this.sessionProxy.StartSync();
+      } catch (e) {
+        this.bailOutOnError((e as Error).message);
+      }
     });
   }
 
   stopRecording(): Promise<void> {
-    if (this.startRequest) return Promise.reject(new Error('Unable to stop recorder while still starting'));
-
     console.debug('Stop recording');
-    return new Promise((resolve, reject) => {
+    this.stopping ??= new Promise((resolve, reject) => {
       this.stopRequest = { resolve, reject };
-      this.pipelineState = 'FLUSHING';
-      this.pipeline!.send_event(Gst.Event.new_eos());
+      if (this.pipelineState === 'PLAYING') this.finish();
+      else this.cancel();
     });
+    return this.stopping;
+  }
+
+  private finish(): void {
+    this.pipelineState = 'FLUSHING';
+    this.finishTimeoutId = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, FINISH_TIMEOUT_SECONDS, () => {
+      this.finishTimeoutId = 0;
+      this.bailOutOnError('Timed out finishing the recording');
+      return GLib.SOURCE_REMOVE;
+    });
+    this.pipeline!.send_event(Gst.Event.new_eos());
+  }
+
+  private cancel(): void {
+    this.blocklist.restore();
+    this.shutDown();
+
+    this.startRequest?.reject(GLib.Error.new_literal(ScreencastErrors, ScreencastError.RECORDER_ERROR, 'Stopped before recording started'));
+    this.startRequest = null;
+
+    this.stopRequest!.resolve();
+    this.stopRequest = null;
+  }
+
+  private shutDown(): void {
+    if (this.finishTimeoutId) GLib.source_remove(this.finishTimeoutId);
+    this.finishTimeoutId = 0;
+    this.fileMonitor?.cancel();
+    this.fileMonitor = null;
+    this.disposePipeline();
+    this.pipelineState = 'STOPPED';
+    this.unwatchSender();
+    this.stopSession();
   }
 
   private unwatchSender(): void {
@@ -127,12 +165,11 @@ export class Recorder extends EventEmitter {
     this.nameWatchId = 0;
   }
 
-  private teardownPipeline(): void {
+  private disposePipeline(): void {
     if (!this.pipeline) return;
 
+    this.pipeline.get_bus()!.remove_watch();
     if (this.pipeline.set_state(Gst.State.NULL) !== Gst.StateChangeReturn.SUCCESS) console.warn('Failed to set pipeline state to NULL');
-
-    this.pipelineState = 'STOPPED';
     this.pipeline = null;
   }
 
@@ -140,7 +177,11 @@ export class Recorder extends EventEmitter {
     if (this.sessionState !== 'ACTIVE') return;
 
     this.sessionState = 'STOPPED';
-    this.sessionProxy.StopSync();
+    try {
+      this.sessionProxy.StopSync();
+    } catch (e) {
+      console.warn(`Failed to stop the screen cast session: ${(e as Error).message}`);
+    }
   }
 
   private bailOutOnError(message: string, errorCode: number = ScreencastError.RECORDER_ERROR): void {
@@ -149,22 +190,14 @@ export class Recorder extends EventEmitter {
 
     if (errorCode !== ScreencastError.PIPELINE_ERROR) this.blocklist.restore();
 
-    this.teardownPipeline();
-    this.unwatchSender();
-    this.stopSession();
+    this.shutDown();
 
-    this.startRequest?.reject(error);
+    const request = this.startRequest ?? this.stopRequest;
     this.startRequest = null;
-
-    this.stopRequest?.reject(error);
     this.stopRequest = null;
 
-    this.emit('error', error);
-  }
-
-  private handleFatalPipelineError(message: string, errorCode: number): void {
-    this.pipelineState = 'ERROR';
-    this.bailOutOnError(message, errorCode);
+    if (request) request.reject(error);
+    else this.emit('error', error);
   }
 
   private onSessionClosed(): void {
@@ -172,6 +205,14 @@ export class Recorder extends EventEmitter {
 
     this.sessionState = 'STOPPED';
     this.bailOutOnError('Session closed unexpectedly');
+  }
+
+  private watchFile(): void {
+    this.fileMonitor = Gio.File.new_for_path(this.filePath!).monitor_file(Gio.FileMonitorFlags.WATCH_MOVES, null);
+    this.fileMonitor.connect('changed', (_monitor, _file, _otherFile, event) => {
+      if (event === Gio.FileMonitorEvent.DELETED || event === Gio.FileMonitorEvent.MOVED_OUT)
+        this.bailOutOnError('The recording was deleted or moved', ScreencastError.FILE_REMOVED);
+    });
   }
 
   private tryNextPipeline(): void {
@@ -182,7 +223,7 @@ export class Recorder extends EventEmitter {
 
     const { done, value: pipelineConfig } = this.pipelineConfigs!.next();
     if (done) {
-      this.handleFatalPipelineError('All pipelines failed to start', ScreencastError.ALL_PIPELINES_FAILED);
+      this.bailOutOnError('All pipelines failed to start', ScreencastError.ALL_PIPELINES_FAILED);
       return;
     }
 
@@ -192,10 +233,7 @@ export class Recorder extends EventEmitter {
       return;
     }
 
-    if (this.pipeline) {
-      if (this.pipeline.set_state(Gst.State.NULL) !== Gst.StateChangeReturn.SUCCESS) console.warn('Failed to set pipeline state to NULL');
-      this.pipeline = null;
-    }
+    this.disposePipeline();
 
     let pipeline: Gst.Element;
     try {
@@ -240,6 +278,7 @@ export class Recorder extends EventEmitter {
     if (this.pipelineState !== 'STARTING' || message.src !== this.pipeline || newState !== Gst.State.PLAYING) return;
 
     this.pipelineState = 'PLAYING';
+    this.watchFile();
     this.startRequest!.resolve(this.filePath!);
     this.startRequest = null;
   }
@@ -251,17 +290,24 @@ export class Recorder extends EventEmitter {
         this.tryNextPipeline();
         break;
       case 'PLAYING':
-        this.handleFatalPipelineError('Unexpected EOS message', ScreencastError.PIPELINE_ERROR);
+        this.bailOutOnError('Unexpected EOS message', ScreencastError.PIPELINE_ERROR);
         break;
       case 'FLUSHING':
-        this.blocklist.restore();
-        this.teardownPipeline();
-        this.unwatchSender();
-        this.stopSession();
-        this.stopRequest!.resolve();
-        this.stopRequest = null;
+        this.onFinished();
         break;
     }
+  }
+
+  private onFinished(): void {
+    if (!GLib.file_test(this.filePath!, GLib.FileTest.EXISTS)) {
+      this.bailOutOnError('The recording was deleted or moved', ScreencastError.FILE_REMOVED);
+      return;
+    }
+
+    this.blocklist.restore();
+    this.shutDown();
+    this.stopRequest!.resolve();
+    this.stopRequest = null;
   }
 
   private onError(error: GLib.Error): void {
@@ -272,13 +318,14 @@ export class Recorder extends EventEmitter {
         break;
       case 'PLAYING':
       case 'FLUSHING':
-        if (error.matches(Gst.ResourceError, Gst.ResourceError.NO_SPACE_LEFT)) {
-          this.handleFatalPipelineError('Out of disk space', ScreencastError.OUT_OF_DISK_SPACE);
-        } else {
-          this.handleFatalPipelineError(`GStreamer error while in state ${this.pipelineState}: ${error.message}`,
-            ScreencastError.PIPELINE_ERROR);
-        }
+        this.bailOutOnError(`GStreamer error while in state ${this.pipelineState}: ${error.message}`, errorCodeOf(error));
         break;
     }
   }
+}
+
+function errorCodeOf(error: GLib.Error): number {
+  if (error.matches(Gst.ResourceError, Gst.ResourceError.NO_SPACE_LEFT)) return ScreencastError.OUT_OF_DISK_SPACE;
+  if (error.matches(Gst.ResourceError, Gst.ResourceError.WRITE)) return ScreencastError.WRITE_FAILED;
+  return ScreencastError.PIPELINE_ERROR;
 }

@@ -1,11 +1,13 @@
 [Unit]
 Description=Install the apps Luft comes with
-Before=graphical-session-pre.target kestrel.service
+After=kestrel-session.target graphical-session.target
+PartOf=graphical-session.target
 ConditionUser=!@system
 
 [Service]
 Type=oneshot
 ExecStart=/usr/bin/schelf --preinstall
+Nice=10
 
 [Install]
-WantedBy=graphical-session-pre.target
+WantedBy=kestrel-session.target

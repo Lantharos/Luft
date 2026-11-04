@@ -54,7 +54,7 @@
 		const cover = visualizer.cover;
 		if (!cover) return;
 		const moves = new ResizeObserver(measure);
-		moves.observe(cover);
+		for (let box = cover; box !== canvas.parentElement; box = box.parentElement!) moves.observe(box);
 		return () => moves.disconnect();
 	});
 
@@ -92,7 +92,7 @@
 			scene.center = [(bounds.width / 2) * scale, (bounds.height / 2) * scale];
 			scene.cover = [0, 0];
 		}
-		wake();
+		if (primed) renderer.draw(scene);
 	}
 
 	function frame(now: number) {

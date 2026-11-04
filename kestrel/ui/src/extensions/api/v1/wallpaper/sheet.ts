@@ -54,12 +54,12 @@ const SheetActor = GObject.registerClass(class ExtensionLayerSheet extends Clutt
   }
 });
 
-/** One display's share of a layer. */
+/** One rectangle of a layer on one display. */
 export class Sheet {
   readonly actor: InstanceType<typeof SheetActor>;
   destroyed = false;
 
-  constructor(readonly monitor: Monitor, readonly primary: boolean, area: Rect, snippet: Cogl.Snippet, name: string) {
+  constructor(readonly monitor: Monitor, readonly primary: boolean, readonly part: number, area: Rect, snippet: Cogl.Snippet, name: string) {
     this.actor = new SheetActor(snippet);
     this.actor.name = name;
     this.actor.connect('destroy', () => (this.destroyed = true));

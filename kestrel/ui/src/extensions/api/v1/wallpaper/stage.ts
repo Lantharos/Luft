@@ -6,7 +6,7 @@ import type { Monitor } from '../../../../desktop/panel/panel.js';
 import { PlaybackConditions } from '../../../../desktop/wallpaper/conditions.js';
 import { reducedMotion } from '../../../../shared/motion/motion.js';
 import type { ExtensionHost } from '../../../host.js';
-import type { LayerOptions, Outline, Rect } from '../types.js';
+import type { LayerOptions, Rect, TaskbarOutline } from '../types.js';
 import { SurfaceWatch } from './surfaces.js';
 
 export interface StagedLayer {
@@ -75,7 +75,7 @@ export class LayerStage {
     return this.host.taskbar(monitor);
   }
 
-  taskbarOutlines(monitor: Monitor): Outline[] {
-    return this.host.taskbarIslands(monitor).map(({ x, y, width, height, radius }) => ({ x, y, width, height, radii: [radius, radius, radius, radius] }));
+  taskbarOutlines(monitor: Monitor): TaskbarOutline[] {
+    return this.host.taskbarIslands(monitor).map(({ x, y, width, height, edge, radius }) => ({ x, y, width, height, edge, radii: [radius, radius, radius, radius] }));
   }
 }

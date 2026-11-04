@@ -238,6 +238,11 @@ export interface Surface extends Outline {
   id: string;
 }
 
+/** A piece of the taskbar the way it shows, and which edge of the display it sits on. */
+export interface TaskbarOutline extends Outline {
+  edge: 'top' | 'bottom' | 'left' | 'right';
+}
+
 export interface Wallpaper {
   /** Draws a shader across each display, over the wallpaper. */
   addLayer(layer: LayerOptions): Layer;
@@ -366,10 +371,12 @@ export interface LayerOptions {
   depth?: 'above-windows' | 'below-windows';
   /**
    * The part of each display the layer covers, relative to its top left corner, such as a band along the bottom, or
-   * `null` to leave the display out. The shader only runs there, which costs far less than the whole display. It
-   * covers every display whole without this. Kestrel asks again when displays change and after {@link Layer.reshape}.
+   * `null` to leave the display out. The shader only runs there, which costs far less than the whole display. A list
+   * of rectangles covers each of them on its own, such as the two sides, and {@link LayerDisplay.part} tells them
+   * apart. It covers every display whole without this. Kestrel asks again when displays change and after
+   * {@link Layer.reshape}.
    */
-  area?(display: LayerArea): Rect | null;
+  area?(display: LayerArea): Rect | readonly Rect[] | null;
   /**
    * Names of picture atlases the shader samples, filled with {@link Layer.setPictures}. Each name declares
    * `sampler2D name`, `vec2 name_grid` (columns and rows of cells, each square), `float name_count` (how many pictures)
@@ -392,13 +399,15 @@ export interface LayerFrame {
   readonly time: number;
   /** Seconds since the previous frame, or 0 for the first frame after the layer appears. */
   readonly elapsed: number;
-  /** The displays the layer shows on in this frame. */
+  /** The displays the layer shows on in this frame, one entry for each rectangle of its {@link LayerOptions.area}. */
   readonly displays: readonly LayerDisplay[];
 }
 
 export interface LayerDisplay {
   /** Which display this is, as Kestrel numbers them. */
   readonly index: number;
+  /** Which of the rectangles {@link LayerOptions.area} returned this entry draws, counting from 0. */
+  readonly part: number;
   /** Whether it's the primary display. */
   readonly primary: boolean;
   readonly width: number;
@@ -408,8 +417,8 @@ export interface LayerDisplay {
   /** The taskbar on this display, relative to its top left corner. */
   readonly taskbar: Rect | null;
   /** What shows of the taskbar, relative to the display's top left corner: the bar, or each island of a taskbar in islands. */
-  readonly taskbarOutlines: readonly Outline[];
-  /** Sets a `float`, `vec2`, `vec3` or `vec4` uniform, by how many values it gets. */
+  readonly taskbarOutlines: readonly TaskbarOutline[];
+  /** Sets a `float`, `vec2`, `vec3` or `vec4` uniform of this entry's rectangle, by how many values it gets. */
   uniform(name: string, ...values: number[]): void;
   /** Sets a uniform array, such as `vec4 rects[16]` with `components` 4. */
   uniformArray(name: string, components: 1 | 2 | 3 | 4, values: readonly number[]): void;

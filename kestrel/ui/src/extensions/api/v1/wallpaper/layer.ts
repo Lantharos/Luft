@@ -5,7 +5,7 @@ import GLib from 'gi://GLib';
 import { animateActor } from '../../../../shared/motion/motion.js';
 import type { Scope } from '../../../runtime/scope.js';
 import type { Monitor } from '../../../../desktop/panel/panel.js';
-import type { LayerDisplay, LayerOptions, Outline, Rect } from '../types.js';
+import type { LayerDisplay, LayerOptions, Outline, Rect, TaskbarOutline } from '../types.js';
 import { type Atlas, atlasDeclarations, packAtlas } from './atlas.js';
 import { layerSnippet, Sheet } from './sheet.js';
 import type { LayerStage } from './stage.js';
@@ -24,8 +24,8 @@ function clamped(area: Rect, monitor: { width: number; height: number }): Rect {
   };
 }
 
-function relative<Shape extends Rect>(shape: Shape, sheet: Sheet): Shape {
-  return { ...shape, x: shape.x - sheet.monitor.x, y: shape.y - sheet.monitor.y };
+function relative<Shape extends Rect>(shape: Shape, monitor: Monitor): Shape {
+  return { ...shape, x: shape.x - monitor.x, y: shape.y - monitor.y };
 }
 
 function overlaps(rect: Rect, { x, y, width, height }: Rect): boolean {
@@ -99,26 +99,23 @@ export class WallpaperLayer {
     sheet.actor.uniform(`${name}_pictures`, 4, atlas.pictures);
   }
 
-  private areaOf(monitor: Monitor, primary: boolean): Rect | null {
-    const full = { x: 0, y: 0, width: monitor.width, height: monitor.height };
-    if (!this.options.area) return full;
+  private areasOf(monitor: Monitor, primary: boolean): Rect[] {
+    if (!this.options.area) return [{ x: 0, y: 0, width: monitor.width, height: monitor.height }];
     const area = this.scope.run(() => this.options.area!({ index: monitor.index, primary, width: monitor.width, height: monitor.height }));
-    return area ? clamped(area, monitor) : null;
+    return [area ?? []].flat().map(rect => clamped(rect, monitor));
   }
 
   private build(): void {
     this.built = true;
     const primary = this.stage.primaryIndex();
-    this.sheets = this.stage.monitors().flatMap(monitor => {
-      const area = this.areaOf(monitor, monitor.index === primary);
-      if (!area) return [];
-      const sheet = new Sheet(monitor, monitor.index === primary, area, this.snippet, this.name);
+    this.sheets = this.stage.monitors().flatMap(monitor => this.areasOf(monitor, monitor.index === primary).map((area, part) => {
+      const sheet = new Sheet(monitor, monitor.index === primary, part, area, this.snippet, this.name);
       for (const [name, atlas] of this.atlases) this.applyAtlas(sheet, name, atlas);
       sheet.actor.opacity = 0;
       sheet.actor.visible = false;
       this.stage.place(sheet.actor, this.options.depth ?? 'above-windows');
-      return [sheet];
-    });
+      return sheet;
+    }));
   }
 
   private show(sheet: Sheet, shown: boolean): void {
@@ -144,19 +141,29 @@ export class WallpaperLayer {
     this.lastFrame = now;
     const shown = this.sheets.filter(sheet => !sheet.destroyed && sheet.actor.visible);
     let windows: Outline[] | null = null;
-    const displays = shown.map((sheet): LayerDisplay => ({
-      index: sheet.monitor.index,
-      primary: sheet.primary,
-      width: sheet.monitor.width,
-      height: sheet.monitor.height,
+    const outlines = new Map<Monitor, TaskbarOutline[]>();
+    const stage = this.stage;
+    const displays = shown.map(({ monitor, primary, part, actor }): LayerDisplay => ({
+      index: monitor.index,
+      part,
+      primary,
+      width: monitor.width,
+      height: monitor.height,
       get windows() {
         windows ??= stackedWindows();
-        return windows.filter(rect => overlaps(rect, sheet.monitor)).map(rect => relative(rect, sheet));
+        return windows.filter(rect => overlaps(rect, monitor)).map(rect => relative(rect, monitor));
       },
-      taskbar: (rect => rect && relative(rect, sheet))(this.stage.taskbar(sheet.monitor)),
-      taskbarOutlines: this.stage.taskbarOutlines(sheet.monitor).map(outline => relative(outline, sheet)),
-      uniform: (name, ...values) => sheet.actor.uniform(name, values.length, values),
-      uniformArray: (name, components, values) => sheet.actor.uniform(name, components, values),
+      get taskbar() {
+        const rect = stage.taskbar(monitor);
+        return rect && relative(rect, monitor);
+      },
+      get taskbarOutlines() {
+        let known = outlines.get(monitor);
+        if (!known) outlines.set(monitor, known = stage.taskbarOutlines(monitor).map(outline => relative(outline, monitor)));
+        return known;
+      },
+      uniform: (name, ...values) => actor.uniform(name, values.length, values),
+      uniformArray: (name, components, values) => actor.uniform(name, components, values),
     }));
     this.scope.run(() => this.options.frame({ time: ((now - this.started) / GLib.USEC_PER_SEC) % TIME_WRAP_S, elapsed, displays }));
     for (const sheet of shown) sheet.actor.queue_redraw();

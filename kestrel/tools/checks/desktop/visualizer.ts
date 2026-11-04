@@ -2,11 +2,12 @@ import Gio from 'gi://Gio';
 import type Meta from 'gi://Meta';
 import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
+import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {playMusic} from '../lib/audio/music.js';
 import {checks} from '../lib/check.js';
 import {stop, stopAll} from '../lib/processes.js';
-import {capture} from '../lib/screenshots.js';
+import {capture, captureFrame, type Area, type Frame} from '../lib/screenshots.js';
 import {pause} from '../lib/wait.js';
 import {openWindow} from '../tiling/lib/tiling.js';
 import {eachFrame, FrameRecorder, summarize, summarizeGpu} from '../../frames/recorder.js';
@@ -20,6 +21,22 @@ const monitor = Shell.AudioMonitor.get_default();
 
 const SWEEP_FRAMES = 120;
 const ROUNDS = 3;
+const MUSIC_S = 180;
+const CPU_SAMPLE_MS = 8000;
+const TICKS_PER_S = 100;
+
+type Edge = 'bottom' | 'top' | 'left' | 'right';
+type Resting = Record<Edge, Frame>;
+
+const EDGES: Edge[] = ['bottom', 'top', 'left', 'right'];
+const ONE_EDGE: Edge[][] = EDGES.map(edge => [edge]);
+const SIDES: Edge[] = ['left', 'right'];
+const WITHOUT_ONE: Edge[] = ['top', 'bottom', 'right'];
+const BESIDE_EDGE = 12;
+const PROBE_DEPTH = 24;
+const PROBE_LENGTH = 320;
+const LIT = 8;
+const FADED_IN_MS = 900;
 
 const showing = () => layerSheets(VISUALIZER).some(sheet => sheet.visible && sheet.opacity === 255);
 
@@ -37,6 +54,124 @@ async function sweep(window: Meta.Window) {
   window.move_frame(true, start.x, start.y);
   const [view] = global.stage.peek_stage_views();
   return {...summarize(runs, view.get_refresh_rate()), gpu: summarizeGpu(runs)};
+}
+
+/** A strip of the desktop just inside each edge, clear of the taskbar. */
+function probes(): Record<Edge, Area> {
+  const {x, y, width, height} = Main.layoutManager.getWorkAreaForMonitor(Main.layoutManager.primaryIndex);
+  const middleX = Math.round(x + width / 2 - PROBE_LENGTH / 2);
+  const middleY = Math.round(y + height / 2 - PROBE_LENGTH / 2);
+  return {
+    bottom: {x: middleX, y: y + height - BESIDE_EDGE - PROBE_DEPTH, width: PROBE_LENGTH, height: PROBE_DEPTH},
+    top: {x: middleX, y: y + BESIDE_EDGE, width: PROBE_LENGTH, height: PROBE_DEPTH},
+    left: {x: x + BESIDE_EDGE, y: middleY, width: PROBE_DEPTH, height: PROBE_LENGTH},
+    right: {x: x + width - BESIDE_EDGE - PROBE_DEPTH, y: middleY, width: PROBE_DEPTH, height: PROBE_LENGTH},
+  };
+}
+
+async function restingEdges(): Promise<Resting> {
+  const areas = probes();
+  const frames = {} as Resting;
+  for (const edge of EDGES) frames[edge] = await captureFrame(areas[edge]);
+  return frames;
+}
+
+async function requireLitEdges(resting: Resting, lit: readonly Edge[], label: string) {
+  const areas = probes();
+  for (const edge of EDGES) {
+    const apart = (await captureFrame(areas[edge])).pixelsApart(resting[edge], LIT);
+    require(lit.includes(edge) ? apart > 0 : apart === 0, `${label}: the ${edge} edge ${lit.includes(edge) ? 'glows' : 'stays dark'}`);
+  }
+}
+
+const place = (edges: readonly Edge[]) => setSetting(VISUALIZER, 'edges', new GLib.Variant('as', [...edges]));
+
+async function settledOn(edges: readonly Edge[]) {
+  await place(edges);
+  const bands = edges.length * global.display.get_n_monitors();
+  await eventually(() => showing() && layerSheets(VISUALIZER).length === bands, `${edges.join(', ')} draws one band for each of those edges on every display and none for the others`);
+  await pause(FADED_IN_MS);
+}
+
+function requireBandsAlong(edges: readonly Edge[]) {
+  for (const {index, x, y, width, height} of Main.layoutManager.monitors) {
+    const along: Record<Edge, (sheet: Area) => boolean> = {
+      bottom: sheet => sheet.x === x && sheet.width === width && sheet.y + sheet.height === y + height,
+      top: sheet => sheet.x === x && sheet.width === width && sheet.y === y,
+      left: sheet => sheet.y === y && sheet.height === height && sheet.x === x,
+      right: sheet => sheet.y === y && sheet.height === height && sheet.x + sheet.width === x + width,
+    };
+    for (const edge of edges) require(layerSheets(VISUALIZER).some(along[edge]), `a band runs along the ${edge} edge of display ${index}`);
+  }
+}
+
+async function arrange(edge: Edge) {
+  kestrel.set_value('taskbar-arrangement', new GLib.Variant('a(sas)', [[`${edge}-center`, ['start', 'dock']], [`${edge}-end`, ['tray', 'status', 'clock']]]));
+  await pause(FADED_IN_MS);
+}
+
+/** What each edge looks like with nothing playing, for the taskbar on every edge. */
+async function restingWithTaskbars() {
+  const resting = {} as Record<Edge, Resting>;
+  for (const edge of EDGES) {
+    await arrange(edge);
+    resting[edge] = await restingEdges();
+  }
+  kestrel.reset('taskbar-arrangement');
+  await pause(FADED_IN_MS);
+  return resting;
+}
+
+async function checkEdges(resting: Resting) {
+  for (const edges of [...ONE_EDGE, SIDES, ['top', 'bottom'] as Edge[], WITHOUT_ONE, EDGES]) {
+    const name = edges.join('-');
+    await settledOn(edges);
+    requireBandsAlong(edges);
+    await capture(`visualizer-edges-${name}`);
+    await requireLitEdges(resting, edges, name);
+  }
+  require(await place([]).then(() => false, () => true), 'it can’t be left with no edges at all');
+  for (const style of ['wave', 'bars']) {
+    await setSetting(VISUALIZER, 'style', new GLib.Variant('s', style));
+    await pause(FADED_IN_MS);
+    await capture(`visualizer-edges-all-${style}`);
+  }
+  await setSetting(VISUALIZER, 'style', new GLib.Variant('s', 'glow'));
+  kestrel.set_string('taskbar-style', 'separate');
+  await pause(FADED_IN_MS);
+  await capture('visualizer-edges-all-islands');
+  kestrel.reset('taskbar-style');
+}
+
+async function checkFollowsTaskbar(resting: Record<Edge, Resting>) {
+  for (const edge of ['left', 'top', 'right'] as const) {
+    await arrange(edge);
+    await settledOn([edge]);
+    await capture(`visualizer-taskbar-${edge}-beside`);
+    await requireLitEdges(resting[edge], [edge], `beside a taskbar on the ${edge}`);
+    await settledOn(EDGES);
+    await capture(`visualizer-taskbar-${edge}-around`);
+    await requireLitEdges(resting[edge], EDGES, `all around with the taskbar on the ${edge}`);
+  }
+  kestrel.reset('taskbar-arrangement');
+  await pause(FADED_IN_MS);
+}
+
+function ticks(path: string): number {
+  const text = new TextDecoder().decode(GLib.file_get_contents(path)[1]);
+  const fields = text.slice(text.lastIndexOf(')') + 2).split(' ');
+  return Number(fields[11]) + Number(fields[12]);
+}
+
+/** Percent of one core Kestrel uses, all of it and its compositor thread, while the music plays on these edges. */
+async function cpu(edges: readonly Edge[]) {
+  const whole = '/proc/self/stat';
+  const compositor = `/proc/self/task/${new TextDecoder().decode(GLib.file_get_contents(whole)[1]).split(' ')[0]}/stat`;
+  await settledOn(edges);
+  const before = [ticks(whole), ticks(compositor)];
+  await pause(CPU_SAMPLE_MS);
+  const percent = (used: number) => Math.round(used / TICKS_PER_S / (CPU_SAMPLE_MS / 1000) * 1000) / 10;
+  return {process: percent(ticks(whole) - before[0]), compositor: percent(ticks(compositor) - before[1])};
 }
 
 function report<Frames>(name: string, frames: Frames): Frames {
@@ -57,8 +192,10 @@ export async function run() {
     swept.move_frame(true, 300, global.stage.height - 420);
     const quiet = report('nothing playing', await sweep(swept));
     swept.minimize();
+    await pause(FADED_IN_MS);
+    const resting = await restingWithTaskbars();
 
-    const music = await playMusic(40, (condition, label) => eventually(condition, label));
+    const music = await playMusic(MUSIC_S, (condition, label) => eventually(condition, label));
     try {
       await eventually(showing, 'music brings the glow up along the bottom of the desktop');
       await pause(1500);
@@ -68,6 +205,12 @@ export async function run() {
         await capture(`visualizer-${style}`);
       }
       await setSetting(VISUALIZER, 'style', new GLib.Variant('s', 'glow'));
+      await checkEdges(resting.bottom);
+      await checkFollowsTaskbar(resting);
+      const usage: Record<string, Awaited<ReturnType<typeof cpu>>> = {};
+      for (const [name, edges] of Object.entries({bottom: ['bottom'] as Edge[], sides: SIDES, around: EDGES})) usage[name] = await cpu(edges);
+      report('CPU', usage);
+      await settledOn(['bottom']);
       await openWindow('Above the glow', 720, 420);
       await pause(700);
       require(showing(), 'it stays below a window that leaves the wallpaper showing');
@@ -78,7 +221,7 @@ export async function run() {
       swept.raise();
       await pause(700);
       const playing = report('music playing', await sweep(swept));
-      GLib.file_set_contents(GLib.build_filenamev([GLib.getenv('KESTREL_CAPTURE_DIR')!, 'visualizer-frames.json']), JSON.stringify({quiet, playing}, null, 2));
+      GLib.file_set_contents(GLib.build_filenamev([GLib.getenv('KESTREL_CAPTURE_DIR')!, 'visualizer-frames.json']), JSON.stringify({quiet, playing, usage}, null, 2));
       require(playing.missed <= quiet.missed + 2, `a window slides over the glow without missing frames (${quiet.missed} → ${playing.missed} missed)`);
     } finally {
       await stop(music);
@@ -88,7 +231,7 @@ export async function run() {
   } finally {
     await request('Remove', VISUALIZER);
     await stopAll();
-    for (const key of ['extension-settings', 'disabled-extensions']) kestrel.reset(key);
+    for (const key of ['extension-settings', 'disabled-extensions', 'taskbar-arrangement', 'taskbar-style']) kestrel.reset(key);
     global.force_animations = forced;
   }
 }

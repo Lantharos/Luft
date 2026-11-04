@@ -1,6 +1,6 @@
 id = "com.lantharos.Visualizer"
 name = "Visualizer"
-description = "A soft glow along the bottom of the desktop that moves with whatever is playing."
+description = "A soft glow along the edges of the desktop that moves with whatever is playing."
 version = "1.0.0"
 api = 1
 permissions = ["wallpaper", "audio-levels"]
@@ -37,6 +37,19 @@ min = 0.1
 max = 1
 step = 0.05
 unit = "percent"
+
+[[settings]]
+key = "edges"
+type = "choices"
+label = "edges"
+default = ["bottom"]
+min = 1
+options = [
+  { value = "top", label = "edges-top" },
+  { value = "bottom", label = "edges-bottom" },
+  { value = "left", label = "edges-left" },
+  { value = "right", label = "edges-right" },
+]
 
 [[settings]]
 key = "displays"

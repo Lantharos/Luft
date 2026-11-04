@@ -14,7 +14,7 @@ export function describePage(visualizer: Extension<Granted>): void {
       }],
     },
     { title: t('look'), items: [{ setting: 'style' }, { setting: 'color' }, { setting: 'intensity' }] },
-    { title: t('where'), items: [{ setting: 'displays' }] },
+    { title: t('where'), items: [{ setting: 'edges' }, { setting: 'displays' }] },
   ]);
   visualizer.audioLevels.onPlayingChanged(() => visualizer.settingsPage.refresh());
 }

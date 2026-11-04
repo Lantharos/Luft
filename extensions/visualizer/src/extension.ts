@@ -1,12 +1,12 @@
 import type { Enable, LayerDisplay } from '@luft/extension-api';
 
+import { type Edge, edgeAreas, strip } from './edges.js';
 import { describePage } from './page.js';
 import { BANDS, DECLARATIONS, SHADER, STYLES, type Style } from './shader.js';
 import { Spectrum } from './spectrum.js';
 
 type Granted = 'wallpaper' | 'audio-levels';
 
-const REACH = 0.3;
 const SETTLED = 0.004;
 const FADE_IN_S = 0.8;
 
@@ -19,6 +19,7 @@ const enable: Enable<Granted> = visualizer => {
   const spectrum = new Spectrum();
   const listener = audioLevels.listen(BANDS);
   let presence = 0;
+  let edges = settings.get<readonly Edge[]>('edges');
 
   const color = () => {
     const chosen = settings.get<string>('color');
@@ -28,16 +29,10 @@ const enable: Enable<Granted> = visualizer => {
   };
   let tint = color();
 
-  const paint = (display: LayerDisplay, time: number, strength: number) => {
-    const bar = display.taskbar;
-    const alongBottom = !!bar && bar.width > bar.height && bar.y + bar.height >= display.height - 1;
+  const paint = (display: LayerDisplay, moment: readonly number[]) => {
     display.uniformArray('vis_bands', 1, spectrum.bands);
-    display.uniform('vis_floor', alongBottom ? display.height - bar!.y : 0);
-    display.uniform('vis_level', spectrum.level);
-    display.uniform('vis_time', time);
-    display.uniform('vis_height', Math.round(display.height * REACH));
-    display.uniform('vis_strength', strength);
-    display.uniform('vis_style', STYLES[settings.get<Style>('style')]);
+    display.uniformArray('vis_strip', 4, strip(edges, edges[display.part], display));
+    display.uniform('vis_moment', ...moment);
     display.uniform('vis_color', ...tint);
   };
 
@@ -46,9 +41,7 @@ const enable: Enable<Granted> = visualizer => {
     shader: SHADER,
     depth: 'below-windows',
     active: audioLevels.playing,
-    area: ({ primary, width, height }) => settings.get('displays') === 'primary' && !primary ? null : {
-      x: 0, y: Math.round(height * (1 - REACH)), width, height: Math.round(height * REACH),
-    },
+    area: display => settings.get('displays') === 'primary' && !display.primary ? null : edgeAreas(edges, display),
     frame: ({ time, elapsed, displays }) => {
       spectrum.follow(listener.read(), elapsed);
       presence = audioLevels.playing ? Math.min(1, presence + elapsed / FADE_IN_S) : presence;
@@ -56,8 +49,8 @@ const enable: Enable<Granted> = visualizer => {
         presence = 0;
         layer.active = false;
       }
-      const strength = presence * settings.get<number>('intensity');
-      for (const display of displays) paint(display, time, strength);
+      const moment = [spectrum.level, time, presence * settings.get<number>('intensity'), STYLES[settings.get<Style>('style')]];
+      for (const display of displays) paint(display, moment);
     },
   });
 
@@ -67,7 +60,8 @@ const enable: Enable<Granted> = visualizer => {
   appearance.onChanged(() => (tint = color()));
   settings.onChanged(key => {
     if (key === 'color') tint = color();
-    if (key === 'displays') layer.reshape();
+    if (key === 'edges') edges = settings.get<readonly Edge[]>('edges');
+    if (key === 'edges' || key === 'displays') layer.reshape();
   });
   describePage(visualizer);
 };

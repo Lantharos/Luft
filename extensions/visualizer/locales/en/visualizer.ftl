@@ -1,6 +1,6 @@
 # The name of the extension in Settings and the store
 extension-name = Visualizer
-extension-description = A soft glow along the bottom of the desktop that moves with whatever is playing
+extension-description = A soft glow along the edges of the desktop that moves with whatever is playing
 style = Style
 glow = Glow
 wave = Wave
@@ -11,6 +11,12 @@ accent = Accent color
 warm-white = Warm white
 intensity = Intensity
     .description = How tall and bright it gets
+edges = Sits along
+    .description = Pick any of the edges of the screen
+edges-top = Top
+edges-bottom = Bottom
+edges-left = Left
+edges-right = Right
 displays = Shows on
 every-display = Every display
 main-display = The main display

@@ -12,14 +12,16 @@ vec2 snow_flakes(vec2 p, float cell, float speed, float size, float seed) {
   float r1 = sky_hash(id + seed);
   float r2 = sky_hash(id.yx * 1.31 + seed);
   float r3 = sky_hash(id * 0.71 + seed * 2.3);
-  float present = step(r3, 0.2 + 0.8 * sky_density);
   float sway = sin(sky_time * (0.4 + 0.6 * r2) + r1 * 6.2832) * 0.15;
   vec2 centre = cell * vec2(0.3 + 0.4 * r1 + sway, 0.3 + 0.4 * r2);
   float distance = length(local - centre);
   float radius = size * (0.6 + 0.6 * r3);
+  if (distance > radius + 1.0) return vec2(0.0);
+  float height = (id.y + 0.5) * cell + sky_time * speed;
+  if (r3 > sky_density_lingering(height / speed, 0.2)) return vec2(0.0);
   float flake = 1.0 - smoothstep(0.0, radius, distance);
   float shade = 1.0 - smoothstep(radius * 0.6, radius + 1.0, distance);
-  return present * vec2(flake, shade);
+  return vec2(flake, shade);
 }
 
 float snow_cap(vec2 p, vec4 r, vec4 corners, float depth) {

@@ -9,7 +9,8 @@ float fireflies_layer(vec2 p, float cell, float size, float seed) {
   float r2 = sky_hash(id.yx * 1.31 + seed);
   float r3 = sky_hash(id * 0.71 + seed * 2.3);
   float lowness = clamp((id.y + 0.5) * cell / layer_size.y, 0.0, 1.0);
-  if (r3 > (0.1 + 0.5 * sky_density) * (0.3 + 0.7 * lowness)) return 0.0;
+  float gathered = (0.1 + 0.5 * sky_density) * (0.3 + 0.7 * lowness) - r3;
+  if (gathered <= 0.0) return 0.0;
   float t = sky_time;
   vec2 wander = vec2(
     sin(t * (0.21 + 0.2 * r1) + r2 * 6.2832) + 0.5 * sin(t * (0.53 + 0.3 * r2) + r3 * 6.2832),
@@ -20,7 +21,7 @@ float fireflies_layer(vec2 p, float cell, float size, float seed) {
   float light = 0.06 + 0.94 * blink * blink;
   float core = exp(-squared / (2.0 * size * size));
   float halo = exp(-squared / (72.0 * size * size));
-  return light * (core + 0.4 * halo);
+  return light * (core + 0.4 * halo) * smoothstep(0.0, 0.08, gathered);
 }
 `;
 

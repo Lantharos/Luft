@@ -3,27 +3,31 @@ import { type Effect, paintSky, SKY } from './sky.js';
 const DECLARATIONS = `${SKY}
 uniform vec3 rain_tint;
 
+#define RAIN_SPLASHES_S 4.0
+#define RAIN_SIDE_SPLASHES_S 5.0
+
 vec2 rain_layer(vec2 p, float cell, float speed, float len, float width, float seed) {
   float x = p.x - p.y * sky_wind;
   float column = floor(x / cell);
   float r1 = sky_hash(vec2(column, seed));
   float r2 = sky_hash(vec2(seed, column));
-  float spacing = len * (3.0 + 9.0 * r2) / (0.4 + 0.6 * sky_density);
-  float travelled = sky_time * speed * (0.85 + 0.3 * r1) / spacing + r1 * 7.0;
+  float spacing = len * (3.0 + 9.0 * r2);
+  float fall = speed * (0.85 + 0.3 * r1);
+  float travelled = sky_time * fall / spacing + r1 * 7.0;
   float u = p.y / spacing - fract(travelled);
   float slot = floor(u) - floor(travelled);
   float along = fract(u) * spacing;
-  float present = step(sky_hash(vec2(column * 1.7 + slot, seed + 3.1)), 0.3 + 0.7 * sky_density);
   float start = sky_hash(vec2(slot, column + seed)) * max(spacing - len, 0.0);
   float tail = (along - start) / len;
   if (tail < 0.0 || tail > 1.0) return vec2(0.0);
+  float head = p.y + (1.0 - tail) * len;
+  if (sky_hash(vec2(column * 1.7 + slot, seed + 3.1)) > sky_density_started(head / fall)) return vec2(0.0);
   float centre = (column + 0.25 + 0.5 * r2) * cell;
   float distance = abs(x - centre);
   float edge = 1.0 - smoothstep(width * 0.5, width * 0.5 + 0.9, distance);
   float halo = 1.0 - smoothstep(width * 0.5 + 0.6, width * 0.5 + 2.2, distance);
   float shade = 0.55 + 0.45 * sky_hash(vec2(slot, column * 3.3 + seed));
-  float strength = present * tail * tail * shade;
-  return vec2(edge, halo) * strength;
+  return vec2(edge, halo) * tail * tail * shade;
 }
 
 float rain_below(float x, float above) {
@@ -40,13 +44,12 @@ float rain_splashes(vec2 p) {
   float total = 0.0;
   float cell = 16.0;
   float base = floor(p.x / cell);
-  float rate = 1.2 + 2.8 * sky_density;
   for (int k = -1; k <= 1; k++) {
     float n = base + float(k);
-    float w = sky_time * rate + sky_hash(vec2(n, 9.1)) * 13.0;
+    float w = sky_time * RAIN_SPLASHES_S + sky_hash(vec2(n, 9.1)) * 13.0;
     float event = floor(w);
-    float age = fract(w) / rate;
-    if (age > 0.38 || sky_hash(vec2(event, n + 4.2)) > 0.35 + 0.65 * sky_density) continue;
+    float age = fract(w) / RAIN_SPLASHES_S;
+    if (sky_hash(vec2(event, n + 4.2)) > sky_density_started(age)) continue;
     float x0 = (n + sky_hash(vec2(n, event))) * cell;
     float top = sky_surface(x0);
     if (p.y < top - 34.0) continue;
@@ -61,7 +64,7 @@ float rain_splashes(vec2 p) {
       if (sky_sheltered(vec2(x0, y0 - 0.5)) > 0.5) continue;
     }
     if (p.y < y0 - 34.0 || p.y > y0 + 2.0) continue;
-    float fade = 1.0 - age / 0.38;
+    float fade = 1.0 - age * RAIN_SPLASHES_S;
     vec2 d = p - vec2(x0, y0);
     float spread = 2.0 + 30.0 * age;
     float ring = exp(-pow((abs(d.x) - spread) / 1.3, 2.0) - pow(d.y / 0.9, 2.0));
@@ -97,8 +100,10 @@ float rain_drips(vec2 p) {
       float edge = r.y + (side == 0 ? corners.x : corners.y);
       if (abs(p.x - x) > 4.0 || p.y < edge - 2.0) continue;
       float seed = sky_hash(vec2(float(i) * 3.0 + float(side), 5.7));
-      float period = (1.4 + 2.2 * seed) / (0.4 + 0.6 * sky_density);
-      float age = fract(sky_time / period + seed) * period;
+      float period = 1.4 + 2.2 * seed;
+      float cycles = sky_time / period + seed;
+      float age = fract(cycles) * period;
+      if (sky_hash(vec2(floor(cycles), seed)) > sqrt(sky_density_started(age))) continue;
       float hang = 0.75 * period;
       if (age < hang) {
         float radius = 0.6 + 1.5 * age / hang;
@@ -122,7 +127,7 @@ float rain_side_splashes(vec2 p) {
   if (abs(sky_wind) < 0.02) return 0.0;
   bool rightward = sky_wind > 0.0;
   float outward = rightward ? -1.0 : 1.0;
-  float rate = (1.0 + 3.0 * sky_density) * min(abs(sky_wind) * 6.0, 1.5);
+  float exposure = min(abs(sky_wind) * 4.0, 1.0);
   float cell = 12.0;
   float total = 0.0;
   for (int i = 0; i < SKY_SHAPES; i++) {
@@ -137,13 +142,13 @@ float rain_side_splashes(vec2 p) {
     float base = floor(p.y / cell);
     for (int k = -1; k <= 5; k++) {
       float n = base - float(k);
-      float w = sky_time * rate + sky_hash(vec2(n, float(i) * 7.3 + 2.1)) * 11.0;
+      float w = sky_time * RAIN_SIDE_SPLASHES_S + sky_hash(vec2(n, float(i) * 7.3 + 2.1)) * 11.0;
       float event = floor(w);
-      float age = fract(w) / rate;
-      if (age > 0.3 || sky_hash(vec2(event, n + 3.3)) > 0.3 + 0.7 * sky_density) continue;
+      float age = fract(w) / RAIN_SIDE_SPLASHES_S;
+      if (sky_hash(vec2(event, n + 3.3)) > exposure * sky_density_started(age)) continue;
       float y0 = (n + sky_hash(vec2(n, event))) * cell;
       if (y0 < top || y0 > bottom || sky_sheltered(vec2(x + outward * 0.5, y0)) > 0.5) continue;
-      float fade = 1.0 - age / 0.3;
+      float fade = 1.0 - age * RAIN_SIDE_SPLASHES_S;
       vec2 d = p - vec2(x, y0);
       total += 0.7 * exp(-pow(d.x / 1.6, 2.0) - pow(d.y / 2.2, 2.0)) * max(0.0, 1.0 - age / 0.06);
       for (int j = 0; j < 2; j++) {

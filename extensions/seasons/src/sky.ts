@@ -1,17 +1,15 @@
 import type { Layer, LayerFrame, Wallpaper } from '@luft/extension-api';
 
+import { Density } from './density.js';
 import type { Effect } from './effects/sky.js';
 import { EFFECTS, type EffectName, type Scene } from './scene/scene.js';
 
-const BUILD_UP_S = 1.6;
-const WIND_DOWN_S = 1.2;
 const WIND_CHANGE_S = 4;
-const DRY = 0.002;
 
 interface Drawn {
   effect: Effect;
   layer: Layer;
-  density: number;
+  density: Density;
   wind: number;
   drift: number;
   time: number;
@@ -40,7 +38,7 @@ export class Sky {
         atlases: effect.atlases,
         frame: frame => this.frame(name, frame),
       });
-      this.drawn.set(name, { effect, layer, density: 0, wind: 0, drift: 0, time: 0 });
+      this.drawn.set(name, { effect, layer, density: new Density(), wind: 0, drift: 0, time: 0 });
     }
   }
 
@@ -56,26 +54,28 @@ export class Sky {
   show(scene: Scene | null): void {
     this.scene = scene;
     for (const [name, drawn] of this.drawn) {
-      if (scene?.effect === name && !drawn.layer.active && drawn.density <= DRY) drawn.wind = scene.wind;
-      drawn.layer.active = scene?.effect === name || drawn.density > DRY;
+      if (scene?.effect === name && !drawn.layer.active && drawn.density.dry) drawn.wind = scene.wind;
+      drawn.layer.active = scene?.effect === name || !drawn.density.dry;
     }
   }
 
   private frame(name: EffectName, { time, elapsed, displays }: LayerFrame): void {
     const drawn = this.drawn.get(name)!;
     const target = this.scene?.effect === name ? this.scene : null;
-    const goal = target?.density ?? 0;
-    drawn.density = ease(drawn.density, goal, elapsed, goal > drawn.density ? BUILD_UP_S : WIND_DOWN_S);
-    if (!target && drawn.density <= DRY) {
-      drawn.density = 0;
+    drawn.density.advance(target?.density ?? 0, time, elapsed);
+    if (!target && drawn.density.dry) {
+      drawn.density.stop();
       drawn.layer.active = false;
     }
     if (target) drawn.wind = ease(drawn.wind, target.wind, elapsed, WIND_CHANGE_S);
     const wind = drawn.wind * gusting(time);
-    if (time < drawn.time) drawn.drift = 0;
+    if (time < drawn.time) {
+      drawn.drift = 0;
+      drawn.density.forget(time);
+    }
     drawn.time = time;
     drawn.drift += wind * 100 * elapsed;
-    const weather = { time, density: drawn.density, wind, drift: drawn.drift };
+    const weather = { time, density: drawn.density.value, history: drawn.density.history, wind, drift: drawn.drift };
     displays.forEach((display, index) => drawn.effect.paint(display, index, weather, elapsed));
   }
 }

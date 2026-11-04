@@ -7,6 +7,8 @@ export interface Weather {
   time: number;
   /** How much falls or floats, from 0 to 1. */
   density: number;
+  /** See {@link Density.history}. */
+  history: readonly [number, number, number, number];
   /** How far things drift sideways for each pixel they fall. */
   wind: number;
   /** How far the wind has carried something falling 100 pixels a second, in pixels. */
@@ -31,6 +33,7 @@ export const SKY = `
 
 uniform float sky_time;
 uniform float sky_density;
+uniform vec4 sky_history;
 uniform float sky_wind;
 uniform float sky_drift;
 uniform float sky_count;
@@ -41,6 +44,15 @@ float sky_hash(vec2 p) {
   vec3 q = fract(vec3(p.xyx) * 0.1031);
   q += dot(q, q.yzx + 33.33);
   return fract((q.x + q.y) * q.z);
+}
+
+float sky_density_started(float age) {
+  float since = sky_time - age - sky_history.z;
+  return since <= 0.0 ? sky_history.x : mix(sky_history.y, sky_history.x, exp(-since * sky_history.w));
+}
+
+float sky_density_lingering(float age, float least) {
+  return min(mix(least, 1.0, sky_density_started(age)), sky_density * 4.0);
 }
 
 float sky_radius(vec4 corners, vec2 offset) {
@@ -140,6 +152,7 @@ export function paintSky(display: LayerDisplay, weather: Weather): readonly Outl
   });
   display.uniform('sky_time', weather.time);
   display.uniform('sky_density', weather.density);
+  display.uniform('sky_history', ...weather.history);
   display.uniform('sky_wind', weather.wind);
   display.uniform('sky_drift', weather.drift);
   display.uniform('sky_count', shapes.length);

@@ -33,7 +33,8 @@ vec4 leaves_layer(vec2 p, float cell, float speed, float size, float seed) {
   float r1 = sky_hash(id + seed);
   float r2 = sky_hash(id.yx * 1.31 + seed);
   float r3 = sky_hash(id * 0.71 + seed * 2.3);
-  if (r3 > 0.15 + 0.6 * sky_density) return vec4(0.0);
+  float height = (id.y + 0.5) * cell + sky_time * speed;
+  if (r3 > 0.75 * sky_density_lingering(height / speed, 0.2)) return vec4(0.0);
   float sway = sin(sky_time * (0.5 + 0.4 * r2) + r1 * 6.2832);
   vec2 drifting = p - (local - cell * vec2(0.5 + 0.17 * sway, 0.3 + 0.4 * r2));
   float half_length = size * (0.75 + 0.5 * r2);

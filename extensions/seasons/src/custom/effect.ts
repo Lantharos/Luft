@@ -38,13 +38,13 @@ vec4 custom_fall(vec2 p, vec2 id, float cell, float speed, float scale, float se
   float r1 = sky_hash(id + seed);
   float r2 = sky_hash(id.yx * 1.31 + seed);
   float r3 = sky_hash(id * 0.71 + seed * 2.3);
-  if (r3 > 0.1 + 0.9 * sky_density) return vec4(0.0);
   float size = mix(custom_size.x, custom_size.y, r2) * scale;
   vec2 shift = vec2(sky_drift * speed / 100.0, sky_time * speed);
   vec2 centre = (id + vec2(0.5 + 0.2 * (r1 - 0.5), 0.3 + 0.4 * r2)) * cell + shift;
   float lasts = cell * 0.8;
   float reach = size * 1.5 + lasts * (abs(sky_wind) + 0.35);
   if (abs(p.x - centre.x) > reach || p.y > centre.y + size || p.y < centre.y - lasts - size * 1.5) return vec4(0.0);
+  if (r3 > sky_density_lingering(centre.y / speed, 0.1)) return vec4(0.0);
   vec2 at = centre;
   float shown = 1.0;
   float travel = 0.0;

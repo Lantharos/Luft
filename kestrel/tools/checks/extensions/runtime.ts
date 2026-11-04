@@ -8,7 +8,7 @@ import {checks} from '../lib/check.js';
 import {capture} from '../lib/screenshots.js';
 import {pause} from '../lib/wait.js';
 import {closeStart, groupTitles, openStart, rows, search, titleOf} from '../start/search/results.js';
-import {copyFolder, install, layerSheets, listed, RAIN, request, rewrite, SEASONS, setSetting, setting, userFolder} from './lib/extensions.js';
+import {copyFolder, install, layerSheets, listed, request, rewrite, SEASONS, setSetting, userFolder} from './lib/extensions.js';
 
 const {require, eventually} = checks('extensions');
 const PROBE = 'com.example.Probe';
@@ -120,27 +120,6 @@ async function checkRemovingSeasons() {
   await eventually(async () => (await listed(SEASONS))?.state === 'running', 'installing Seasons again runs it');
 }
 
-async function checkTakingOverFromRain() {
-  const kept = keep(SEASONS);
-  await request('Remove', SEASONS);
-  install('rain', RAIN);
-  await request('Reload', RAIN);
-  await eventually(async () => (await listed(RAIN))?.state === 'running', 'an account that still has Rain runs it');
-  for (const [key, value] of [['rain', GLib.Variant.new_boolean(true)], ['intensity', GLib.Variant.new_string('storm')], ['sound', GLib.Variant.new_boolean(true)], ['volume', GLib.Variant.new_double(0.3)]] as const)
-    await setSetting(RAIN, key, value);
-
-  await kept.restore();
-  await eventually(async () => (await listed(SEASONS))?.state === 'running', 'Seasons runs once it arrives');
-  await eventually(async () => !await listed(RAIN), 'and takes Rain away');
-  require(!GLib.file_test(userFolder(RAIN), GLib.FileTest.EXISTS), "Rain's folder is gone");
-  require(await setting(SEASONS, 'on') === true && await setting(SEASONS, 'effect') === 'rain', 'Seasons comes on with rain, since Rain was on');
-  require(await setting(SEASONS, 'intensity') === 'heavy' && await setting(SEASONS, 'sound') === true && await setting(SEASONS, 'volume') === 0.3,
-    "Rain's storm, sound and volume carry over");
-  require(!(kestrel.get_value('extension-settings').recursiveUnpack() as Record<string, unknown>)[RAIN], "Rain's own settings are forgotten");
-  await eventually(() => layerSheets(SEASONS).length > 0, 'and it rains right away');
-  await setSetting(SEASONS, 'on', GLib.Variant.new_boolean(false));
-}
-
 export async function run() {
   try {
     await checkSeasons();
@@ -150,7 +129,6 @@ export async function run() {
     await checkReload();
     await checkThrowing();
     await checkRemovingSeasons();
-    await checkTakingOverFromRain();
   } finally {
     for (const id of [PROBE, BROKEN]) await request('Remove', id);
     for (const key of ['disabled-extensions', 'extension-settings', 'extension-problems']) kestrel.reset(key);

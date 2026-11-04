@@ -1,3 +1,8 @@
 summary = "Music you can see along the bottom of the desktop"
 description = "A soft glow, a wave or bars along the bottom of the desktop that move with whatever is playing, in your wallpaper's colours, your accent or warm white."
 screenshots = ["glow.webp", "bars.webp", "window.webp"]
+keywords = ["music", "visualizer", "audio", "bars", "wave", "wallpaper"]
+categories = ["AudioVideo", "Graphics"]
+homepage = "https://luft.computer"
+support = "https://github.com/Lantharos/Luft/issues"
+brand_color = "#5a3fa0"

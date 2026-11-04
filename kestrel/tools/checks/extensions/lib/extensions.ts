@@ -10,7 +10,6 @@ const PATH = '/com/lantharos/Kestrel/Extensions';
 const IFACE = 'com.lantharos.Kestrel.Extensions';
 
 export const SEASONS = 'com.lantharos.Seasons';
-export const RAIN = 'com.lantharos.Rain';
 
 export interface Listed {
   id: string;

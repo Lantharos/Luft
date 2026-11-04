@@ -4,14 +4,12 @@ description = "Rain, snow, autumn leaves, fireflies, mist or pictures of your ow
 version = "1.0.0"
 api = 1
 permissions = ["wallpaper", "quick-settings", "weather", "sounds", "calls"]
-replaces = "com.lantharos.Rain"
 
 [[settings]]
 key = "on"
 type = "switch"
 label = "seasons"
 default = false
-replaces = "rain"
 
 [[settings]]
 key = "effect"
@@ -37,9 +35,9 @@ type = "choice"
 label = "intensity"
 default = "steady"
 options = [
-  { value = "light", label = "light", replaces = "drizzle" },
-  { value = "steady", label = "steady", replaces = "rain" },
-  { value = "heavy", label = "heavy", replaces = "storm" },
+  { value = "light", label = "light" },
+  { value = "steady", label = "steady" },
+  { value = "heavy", label = "heavy" },
 ]
 
 [[settings]]

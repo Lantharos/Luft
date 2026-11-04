@@ -79,8 +79,6 @@ Permissions, with the words Settings and the store show for them:
 
 `locked-sounds` needs `sounds` too. A `[helper]` table isn't a permission, but the store shows that the extension runs a program of its own. `[network]` isn't one either, but Settings and the store show the hosts it names as "Connect to api.example.com". `[[shortcuts]]` shows in Settings → Keyboard.
 
-An extension that takes over from another names it with `replaces = "com.example.Old"`, and a setting or choice option whose key or value changed names the old one with its own `replaces`. Once both are installed, whether the new one arrives at sign-in or in an update, Kestrel copies the old one's values into the new one's settings, keeps the new one off if the person had turned the old one off, and removes the old one with its settings, storage and data. Seasons replaces Rain this way.
-
 A setting's `page` puts it on another page of Settings too, under the extension's name, while the extension runs: `appearance` needs `wallpaper`, `taskbar` needs `taskbar`, `sound` needs `sounds` or `audio-levels`, and `input` needs `typing`.
 
 ## D-Bus

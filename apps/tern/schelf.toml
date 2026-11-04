@@ -2,6 +2,7 @@ id = "com.lantharos.tern"
 kind = "app"
 format = "sabine"
 permissions = "Sabine.toml"
+listing = "store/"
 
 [requires]
 sabine = "0.73"

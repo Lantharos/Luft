@@ -1,3 +1,8 @@
 summary = "A calm timer for work sessions, in the taskbar"
 description = "Start a 15, 25 or 45 minute session, an hour or an hour and a half from the taskbar. While it runs, banners and notification sounds wait in the notification center, Soundscapes plays if you have it, and the taskbar shows how long is left. When it ends, a quiet note says how long you focused and which apps sent what."
 screenshots = ["running.webp", "expanded.webp", "summary.webp"]
+keywords = ["timer", "pomodoro", "focus", "concentration", "do not disturb", "work session"]
+categories = ["Office", "Utility"]
+homepage = "https://luft.computer"
+support = "https://github.com/Lantharos/Luft/issues"
+brand_color = "#9a7a2e"

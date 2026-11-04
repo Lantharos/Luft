@@ -1,3 +1,7 @@
-summary = "Files"
+summary = "Your files, network drives and cloud drives, in tabs"
 description = "Tabs, Quick Look, network drives and your cloud drives, with a sidebar that knows where Windows lives."
 screenshots = ["light.webp", "dark.webp"]
+categories = ["System", "Utility"]
+homepage = "https://luft.computer"
+support = "https://github.com/Lantharos/Luft/issues"
+brand_color = "#3e6b4f"

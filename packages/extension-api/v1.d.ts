@@ -899,8 +899,6 @@ interface SettingBase {
   depends?: string;
   /** Also shows the setting on this page of Settings, under the extension's name. */
   page?: SettingsPageId;
-  /** The key of the setting it takes its value from in the extension this one {@link Manifest.replaces}, when that key differs. */
-  replaces?: string;
 }
 
 export interface SwitchSetting extends SettingBase {
@@ -914,8 +912,6 @@ export interface ChoiceOption {
   label: string;
   /** A picture of the option, a PNG, JPEG, WebP or SVG in the extension's folder. When every option has one, Settings offers them as pictures. */
   image?: string;
-  /** The value of the replaced extension's setting that becomes this option, when it differs. */
-  replaces?: string;
 }
 
 export interface ChoiceSetting extends SettingBase {
@@ -1079,9 +1075,4 @@ export interface Manifest {
   helper?: { path: string };
   /** The hosts {@link Network} may connect to, such as `api.example.com`, or `localhost:8787` while developing. */
   network?: { hosts: string[] };
-  /**
-   * The id of an extension this one takes the place of. Once both are installed, Kestrel carries that one's settings
-   * over to this one's, keeps this one off if that one was, and removes that one.
-   */
-  replaces?: string;
 }

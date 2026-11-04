@@ -1,3 +1,7 @@
-summary = "Text and code"
+summary = "A text and code editor that remembers where you left off"
 description = "Over a hundred languages, multiple cursors and a Markdown preview, and it remembers where you left off."
 screenshots = ["light.webp", "dark.webp"]
+categories = ["Utility", "Development"]
+homepage = "https://luft.computer"
+support = "https://github.com/Lantharos/Luft/issues"
+brand_color = "#2f4858"

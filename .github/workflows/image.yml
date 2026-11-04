@@ -348,7 +348,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
   store-apps:
-    name: App
+    name: App (${{ matrix.app.name }})
     needs: plan
     if: needs.plan.outputs.apps != '' && needs.plan.outputs.apps != '[]'
     strategy:
@@ -372,7 +372,7 @@ jobs:
     secrets: inherit
 
   store-extensions:
-    name: Extension
+    name: Extension (${{ matrix.extension.name }} on ${{ matrix.runner }})
     needs: plan
     if: needs.plan.outputs.extensions != '' && needs.plan.outputs.extensions != '[]'
     strategy:
@@ -408,7 +408,7 @@ jobs:
           if-no-files-found: error
 
   store-publish:
-    name: Publish
+    name: Publish (${{ matrix.item.name }} ${{ matrix.item.version }})
     needs: [plan, store-apps, store-extensions]
     if: ${{ !cancelled() && needs.plan.result == 'success' && needs.plan.outputs.publish != '[]' }}
     runs-on: ubuntu-26.04

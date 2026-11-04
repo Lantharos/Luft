@@ -1,0 +1,31 @@
+id = "com.lantharos.Pult"
+name = "Pult"
+description = "What's waiting in your Pult inboxes, in the taskbar, with urgent items as notifications and your items in search."
+version = "1.0.0"
+api = 1
+permissions = ["taskbar", "popups", "notifications", "search"]
+
+[network]
+hosts = ["app.pult.sh"]
+
+[[settings]]
+key = "count"
+type = "choice"
+label = "count"
+default = "open"
+options = [
+  { value = "open", label = "count-open" },
+  { value = "unread", label = "count-unread" },
+]
+
+[[settings]]
+key = "urgent"
+type = "switch"
+label = "urgent"
+default = true
+
+[[settings]]
+key = "hide-empty"
+type = "switch"
+label = "hide-empty"
+default = false

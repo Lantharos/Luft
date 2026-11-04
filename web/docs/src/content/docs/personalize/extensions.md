@@ -1,11 +1,11 @@
 ---
 title: Extensions
-description: Seasons, Soundscapes and other extensions that add to the desktop, and how to turn them off, set them up or remove them.
+description: Seasons, Soundscapes, Focus, Pult and other extensions that add to the desktop, and how to turn them off, set them up or remove them.
 sidebar:
   order: 5
 ---
 
-Extensions add to the desktop: something on the wallpaper, a tile in quick settings, a button on the taskbar, results in search. Luft comes with one, Seasons, and you can find more in [Schelf](/apps/schelf/).
+Extensions add to the desktop: something on the wallpaper, a tile in quick settings, a button on the taskbar, results in search. Luft comes with one, Seasons, and you can find more, such as Soundscapes, Focus and Pult, in [Schelf](/apps/schelf/).
 
 **Settings → Extensions** lists them. The switch next to each turns it on or off; opening one shows what it can do, its own settings and **Remove**. An extension only gets what it says it needs, and the list under **What it can do** is exactly that.
 
@@ -32,3 +32,19 @@ Soundscapes plays forest, café, fire, waves, wind, distant thunder, rain, white
 Its tile in [quick settings](/desktop/quick-settings/) plays and pauses, and its arrow picks a mix, such as Rainy café, Campfire, Seaside, Deep focus or Thunderstorm, opens the mixer with a slider for every sound, and sets the sleep timer. The sleep timer stops it after 15 minutes to an hour and a half, fading out over the last minute. Until then it keeps playing when the screen locks, so you can fall asleep to it.
 
 In Settings → Extensions → Soundscapes you set how loud each sound is, save the mix you made under a name of your own, rename or delete your mixes, and set the overall volume. While music or a video plays in another app it fades out, and it comes back when that stops; turn off **Pause while other things play** to keep it going. It waits the same way while you're in a call, that is while an app uses your microphone or camera, unless you turn off **Pause during calls**. Without a sleep timer, it goes quiet while the screen is locked.
+
+## Focus
+
+Focus is a timer on the taskbar for work sessions. Click it, pick 15, 25 or 45 minutes, an hour or an hour and a half, and start. While it runs, the taskbar shows the minutes left, and under the pointer the seconds, when it ends and how many notifications are waiting, with buttons to pause and end it.
+
+During a session, banners and notification sounds wait. Urgent notifications and apps you let through Do Not Disturb still show, and everything else stays in the notification center. If Soundscapes is installed, the mix you last chose plays during the session and stops after it. When the session ends, a notification says how long you focused and which apps sent what, with a button for another session.
+
+**Super+Alt+F** starts or ends a session. In Settings → Extensions → Focus you choose the length a session starts with, and whether it holds notifications back and plays Soundscapes.
+
+## Pult
+
+Pult puts how much is waiting in your [Pult](https://pult.sh) inboxes on the taskbar, tells you about urgent items with a notification, and finds your items when you search in Start.
+
+To sign in, open Settings → Extensions → Pult and choose **Sign in**. Pult opens in your browser with a code; check that it matches the one in Settings and confirm. The extension can then see your inboxes in every project you're in, but can't change anything, and it keeps its sign-in in your keyring. You can sign it out in Settings, or from Pult under Settings → Security.
+
+Clicking it on the taskbar lists urgent items and every inbox with something waiting, each opening in Pult. Choose whether the number counts everything waiting or only what you haven't read, and whether it hides when nothing waits. Urgent items show even during Do Not Disturb and focus sessions; turn off **Notify about urgent items** if you'd rather just see the count.

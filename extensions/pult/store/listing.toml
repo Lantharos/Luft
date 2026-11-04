@@ -1,0 +1,3 @@
+summary = "What's waiting in your Pult inboxes"
+description = "See how many items wait in your Pult inboxes right on the taskbar, across every project you're in, get a notification the moment something urgent comes in, and find any item from Start. Sign in once with a code you confirm in your browser; it can read what's waiting but never change anything."
+screenshots = ["popup.webp", "urgent.webp", "search.webp"]

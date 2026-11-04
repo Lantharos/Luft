@@ -9,4 +9,4 @@ trap 'rm -rf "$stage"' EXIT
 
 "$extension/build.sh" "$stage/$id"
 mkdir -p "$out"
-tar --create --directory "$stage" --owner=0 --group=0 --numeric-owner "$id" | zstd -19 --quiet -o "$out/$id-$(uname -m).tar.zst"
+tar --create --directory "$stage" --owner=0 --group=0 --numeric-owner "$id" | zstd -19 --quiet -o "$out/$id.tar.zst"

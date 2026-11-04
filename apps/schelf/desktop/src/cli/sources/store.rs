@@ -230,14 +230,16 @@ pub fn install(id: &str, yes: bool) -> Result<(String, Job), Exit> {
         eprintln!("{error}");
         Exit::Failed
     })?;
-    let channel = channel::followed(&listing.id);
-    let Some(Offer { release, format, .. }) = listing.release(&channel) else {
-        match channel.as_str() {
-            channel::STABLE => eprintln!("{} isn't available for this computer.", listing.name()),
-            channel => eprintln!(
-                "{} has no {channel} version for this computer.",
-                listing.name()
-            ),
+    let Some(Offer { release, format, .. }) = listing.release() else {
+        let following = channel::following(&listing.id);
+        if following.chosen && following.channel != channel::STABLE {
+            eprintln!(
+                "{} has no {} version for this computer.",
+                listing.name(),
+                following.channel
+            );
+        } else {
+            eprintln!("{} isn't available for this computer.", listing.name());
         }
         return Err(Exit::Missing);
     };

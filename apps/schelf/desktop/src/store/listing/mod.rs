@@ -14,6 +14,7 @@ use serde::Deserialize;
 use super::catalog::{Kind, Publisher};
 use super::device;
 use super::signed::{self, Age};
+use channel::Following;
 
 pub use access::{Declared, ExtensionAccess};
 pub use details::StoreDetails;
@@ -111,9 +112,23 @@ impl Listing {
             .max_by(|left, right| version::compare(&left.release.version, &right.release.version))
     }
 
-    /// The release this device may install on `channel`.
-    pub fn release(&self, channel: &str) -> Option<Offer<'_>> {
-        self.newest(channel, self.platforms(), device::draw())
+    /// The highest version out of the channels `following` takes releases
+    /// from.
+    fn followed(&self, following: &Following, platforms: &[&str], draw: f64) -> Option<Offer<'_>> {
+        following
+            .sources()
+            .into_iter()
+            .filter_map(|channel| self.newest(channel, platforms, draw))
+            .max_by(|left, right| version::compare(&left.release.version, &right.release.version))
+    }
+
+    /// The release this device may install, from the channel you follow.
+    pub fn release(&self) -> Option<Offer<'_>> {
+        self.followed(
+            &channel::following(&self.id),
+            self.platforms(),
+            device::draw(),
+        )
     }
 
     /// The release a listing shipped with the system holds, whatever its
@@ -124,20 +139,21 @@ impl Listing {
             .find_map(|release| Offer::of(release, self.platforms()))
     }
 
-    /// The newest release on `channel` with a file for Linux to download,
-    /// for an app this device can't install from that channel.
+    /// The newest release you follow with a file for Linux to download, for
+    /// an app this device can't install from those channels.
     fn download(
         &self,
-        channel: &str,
+        following: &Following,
         platforms: &[&str],
         draw: f64,
     ) -> Option<(&Release, &Artifact)> {
         if self.kind != Kind::App {
             return None;
         }
+        let sources = following.sources();
         self.releases
             .iter()
-            .filter(|release| release.channel == channel && release.reaches(draw))
+            .filter(|release| sources.contains(&release.channel.as_str()) && release.reaches(draw))
             .filter_map(|release| Some((release, release.download(platforms)?)))
             .max_by(|(left, _), (right, _)| version::compare(&left.version, &right.version))
     }

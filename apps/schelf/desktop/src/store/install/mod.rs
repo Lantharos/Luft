@@ -11,7 +11,7 @@ use sabine_service::SabineService;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
-use super::listing::{self, Declared, ExtensionAccess, Format, Listing, Offer, Release, channel};
+use super::listing::{self, Declared, ExtensionAccess, Format, Listing, Offer, Release};
 use super::record::{self, Installed};
 use super::revocations::{self, Severity};
 use super::signed::Age;
@@ -176,7 +176,7 @@ pub fn install(id: &str, consent: &Consent, reason: Reason, task: Task) -> Resul
         return replace(id, &replacement.id, consent, task);
     }
     let offer = listing
-        .release(&channel::followed(id))
+        .release()
         .ok_or_else(|| format!("{} isn't available for this computer.", listing.name()))?;
     agreed(&listing, offer.release, consent)?;
     refuse_pulled(&listing, offer.release)?;

@@ -489,7 +489,14 @@ export type StoreDetails = {
 	homepage: string | null,
 	license: string | null,
 	channel: string,
-	channels: string[],
+	/**
+	 *  The channel the release below is on, when one is. Going with a nightly
+	 *  system, that can be stable.
+	 */
+	releaseChannel: string | null,
+	/**  What's picked on the page out of `choices`. */
+	choice: string,
+	choices: string[],
 	version: string | null,
 	published: string | null,
 	notes: string,

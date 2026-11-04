@@ -81,6 +81,12 @@ impl Deployments {
             .ok_or_else(|| NOT_FROM_AN_IMAGE.into())
     }
 
+    /// The release channel this system follows, the one its next update
+    /// comes from, when it follows one of Luft's own images.
+    pub fn channel(&self) -> Option<&'static str> {
+        self.0.followed.as_ref()?.release_channel()
+    }
+
     fn new_bytes(&self, image: &Image) -> u64 {
         let present: HashSet<&String> = self.all().flat_map(Deployment::layers).collect();
         image

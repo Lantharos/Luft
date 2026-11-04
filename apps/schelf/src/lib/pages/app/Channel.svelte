@@ -15,18 +15,28 @@
 	let problem = $state('');
 	let changing = $state(false);
 
+	const WITH_SYSTEM = 'system';
+
 	const label = (channel: string) => channel.charAt(0).toUpperCase() + channel.slice(1);
-	const options = $derived(store.channels.map((channel) => ({ value: channel, label: label(channel) })));
+	const options = $derived(store.choices.map((choice) => ({ value: choice, label: choice === WITH_SYSTEM ? 'Same as Luft' : label(choice) })));
+	const withSystem = $derived(store.choice === WITH_SYSTEM);
+	const onOtherChannel = $derived(store.releaseChannel !== null && store.releaseChannel !== store.channel);
 	const description = $derived(
-		[PREVIEWS[store.channel], installed && store.channel !== 'stable' ? 'Going back to Stable keeps the version you have until a stable one is newer.' : null].filter(Boolean).join(' ') || undefined
+		[
+			withSystem ? `Luft is on ${label(store.channel)}, so this is too.` : PREVIEWS[store.channel],
+			onOtherChannel ? `Its newest version right now is the ${store.releaseChannel} one.` : null,
+			installed && store.channel !== 'stable' ? 'Going back to Stable keeps the version you have until a stable one is newer.' : null
+		]
+			.filter(Boolean)
+			.join(' ') || undefined
 	);
 
-	async function choose(channel: string) {
-		if (changing || channel === store.channel) return;
+	async function choose(choice: string) {
+		if (changing || choice === store.choice) return;
 		problem = '';
 		changing = true;
 		try {
-			onchange(await follow(store.id, channel));
+			onchange(await follow(store.id, choice));
 			if (installed) void library.check();
 		} catch (reason) {
 			problem = errorText(reason);
@@ -38,7 +48,7 @@
 
 <Section title="Versions">
 	<Row title="Channel" {description}>
-		<Segmented label="Channel" {options} value={store.channel} onchange={choose} />
+		<Segmented label="Channel" {options} value={store.choice} onchange={choose} />
 	</Row>
 </Section>
 {#if problem}

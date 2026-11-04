@@ -129,7 +129,7 @@
 				</section>
 			{/if}
 			<AppFacts {details} {installed} />
-			{#if store && store.channels.length > 1}
+			{#if store && store.choices.length > 1}
 				<Channel {store} installed={installed !== null} onchange={(details) => loaded && (loaded = { ...loaded, details })} />
 			{/if}
 			{#if installed?.desktop}

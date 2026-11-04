@@ -53,7 +53,12 @@ pub struct StoreDetails {
     pub homepage: Option<String>,
     pub license: Option<String>,
     pub channel: String,
-    pub channels: Vec<String>,
+    /// The channel the release below is on, when one is. Going with a nightly
+    /// system, that can be stable.
+    pub release_channel: Option<String>,
+    /// What's picked on the page out of `choices`.
+    pub choice: String,
+    pub choices: Vec<String>,
     pub version: Option<String>,
     pub published: Option<String>,
     pub notes: String,
@@ -72,6 +77,7 @@ pub struct StoreDetails {
 impl StoreDetails {
     /// The page of an app you have that schelf.store no longer has at all.
     pub fn gone(id: &str, installed: Installed) -> Self {
+        let following = channel::following(id);
         Self {
             id: id.to_owned(),
             kind: installed.kind,
@@ -85,8 +91,10 @@ impl StoreDetails {
             verified: false,
             homepage: None,
             license: None,
-            channel: channel::followed(id),
-            channels: Vec::new(),
+            choice: following.choice().to_owned(),
+            channel: following.channel,
+            release_channel: None,
+            choices: Vec::new(),
             version: None,
             published: None,
             notes: String::new(),
@@ -104,12 +112,12 @@ impl StoreDetails {
 
 impl From<Listing> for StoreDetails {
     fn from(listing: Listing) -> Self {
-        let followed = channel::followed(&listing.id);
+        let following = channel::following(&listing.id);
         let (platforms, draw) = (listing.platforms(), device::draw());
-        let installable = listing.newest(&followed, platforms, draw);
+        let installable = listing.followed(&following, platforms, draw);
         let download = match installable {
             Some(_) => None,
-            None => listing.download(&followed, platforms, draw),
+            None => listing.download(&following, platforms, draw),
         };
         let release: Option<Release> = installable
             .map(|offer| offer.release)
@@ -122,10 +130,7 @@ impl From<Listing> for StoreDetails {
             name: artifact.name().to_owned(),
             size: artifact.size,
         });
-        let mut channels = listing.channels(platforms);
-        if !channels.contains(&followed) {
-            channels.push(followed.clone());
-        }
+        let choices = following.choices(listing.channels(platforms));
         let withdrawn = listing.releases.is_empty();
         let text = listing.text();
         let declared = release
@@ -141,8 +146,10 @@ impl From<Listing> for StoreDetails {
             installer,
             size,
             download,
-            channel: followed,
-            channels,
+            choice: following.choice().to_owned(),
+            channel: following.channel,
+            release_channel: release.as_ref().map(|release| release.channel.clone()),
+            choices,
             access: declared
                 .as_ref()
                 .filter(|declared| limited && declared.unsandboxed.is_none())

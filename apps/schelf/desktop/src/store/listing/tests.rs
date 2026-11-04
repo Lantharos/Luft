@@ -1,10 +1,12 @@
 use serde_json::{Value, json};
 
-use super::channel::{self, STABLE};
+use super::channel::{self, Following, STABLE};
 use super::{Format, Listing};
 
 const LINUX: &[&str] = &["linux-x86_64"];
 const EVERYONE: f64 = 0.99;
+const SEASONS: &str = "com.lantharos.seasons";
+const TIDE: &str = "io.example.Tide";
 
 fn file(platform: &str, format: &str, kind: &str, name: &str) -> Value {
     json!({
@@ -88,6 +90,16 @@ fn channels_of_tide() -> Listing {
 fn newest_version<'a>(listing: &'a Listing, channel: &str) -> Option<&'a str> {
     listing
         .newest(channel, LINUX, EVERYONE)
+        .map(|offer| offer.release.version.as_str())
+}
+
+fn on(id: &str, chosen: Option<&str>, system: Option<&'static str>) -> Following {
+    Following::decide(id, chosen.map(str::to_owned), || system)
+}
+
+fn followed_version<'a>(listing: &'a Listing, following: &Following) -> Option<&'a str> {
+    listing
+        .followed(following, LINUX, EVERYONE)
         .map(|offer| offer.release.version.as_str())
 }
 
@@ -202,7 +214,9 @@ fn linux_files_luft_cannot_install_are_offered_to_download() {
         )],
     );
     assert!(tide.newest(STABLE, LINUX, EVERYONE).is_none());
-    let (_, artifact) = tide.download(STABLE, LINUX, EVERYONE).unwrap();
+    let (_, artifact) = tide
+        .download(&on(TIDE, None, None), LINUX, EVERYONE)
+        .unwrap();
     assert_eq!(artifact.name(), "tide_amd64.deb");
     assert_eq!(tide.channels(LINUX), [STABLE]);
 }
@@ -229,7 +243,10 @@ fn files_for_other_systems_are_not_offered_at_all() {
         )],
     );
     assert!(tide.newest(STABLE, LINUX, EVERYONE).is_none());
-    assert!(tide.download(STABLE, LINUX, EVERYONE).is_none());
+    assert!(
+        tide.download(&on(TIDE, None, None), LINUX, EVERYONE)
+            .is_none()
+    );
 }
 
 #[test]
@@ -249,4 +266,122 @@ fn a_move_to_a_new_framework_installs_the_new_packaging() {
     let offer = tide.newest(STABLE, LINUX, EVERYONE).unwrap();
     assert_eq!(offer.release.version, "2.0.0");
     assert_eq!(offer.format, Format::Appimage);
+}
+
+#[test]
+fn luft_own_apps_go_with_the_system_and_others_stay_on_stable() {
+    assert_eq!(on(SEASONS, None, Some("nightly")).channel, "nightly");
+    assert_eq!(
+        on("COM.Lantharos.Seasons", None, Some("nightly")).channel,
+        "nightly"
+    );
+    assert_eq!(on(SEASONS, None, Some(STABLE)).channel, STABLE);
+    assert_eq!(on(SEASONS, None, None).channel, STABLE);
+    assert_eq!(on(TIDE, None, Some("nightly")).channel, STABLE);
+    assert_eq!(
+        on("com.lantharoslike.Tide", None, Some("nightly")).channel,
+        STABLE
+    );
+}
+
+#[test]
+fn a_choice_on_the_page_beats_the_system() {
+    let stable = on(SEASONS, Some(STABLE), Some("nightly"));
+    assert_eq!(stable.channel, STABLE);
+    assert_eq!(stable.choice(), STABLE);
+    assert_eq!(
+        on(SEASONS, Some("nightly"), Some(STABLE)).channel,
+        "nightly"
+    );
+    assert_eq!(on(TIDE, Some("beta"), Some(STABLE)).channel, "beta");
+}
+
+#[test]
+fn choosing_stable_is_only_remembered_for_luft_own_apps() {
+    let mut chosen = std::collections::BTreeMap::new();
+    channel::remember(&mut chosen, "COM.Lantharos.Seasons", STABLE);
+    channel::remember(&mut chosen, TIDE, "nightly");
+    channel::remember(&mut chosen, TIDE, STABLE);
+    assert_eq!(chosen.len(), 1);
+    assert_eq!(chosen[SEASONS], STABLE);
+    channel::remember(&mut chosen, SEASONS, "system");
+    assert!(chosen.is_empty());
+}
+
+#[test]
+fn a_nightly_system_gets_stable_until_a_nightly_release_exists() {
+    let nightly = on(SEASONS, None, Some("nightly"));
+    let stable_only = listing("sabine", &[release("1.2.0", STABLE, 100, &[archive()])]);
+    assert_eq!(followed_version(&stable_only, &nightly), Some("1.2.0"));
+    assert_eq!(
+        followed_version(&channels_of_tide(), &nightly),
+        Some("1.4.0-nightly.20261103")
+    );
+}
+
+#[test]
+fn a_nightly_system_never_gets_less_than_stable_has() {
+    let behind = listing(
+        "sabine",
+        &[
+            release("1.2.0", "nightly", 100, &[archive()]),
+            release("1.3.0", STABLE, 100, &[archive()]),
+        ],
+    );
+    assert_eq!(
+        followed_version(&behind, &on(SEASONS, None, Some("nightly"))),
+        Some("1.3.0")
+    );
+}
+
+#[test]
+fn choosing_a_channel_takes_only_its_releases() {
+    let stable_only = listing("sabine", &[release("1.2.0", STABLE, 100, &[archive()])]);
+    let chosen = on(SEASONS, Some("nightly"), Some("nightly"));
+    assert_eq!(followed_version(&stable_only, &chosen), None);
+    let tide = channels_of_tide();
+    assert_eq!(
+        followed_version(&tide, &on(SEASONS, Some(STABLE), Some("nightly"))),
+        Some("1.2.0")
+    );
+}
+
+#[test]
+fn moving_to_a_stable_system_keeps_a_newer_install_until_stable_catches_up() {
+    let tide = channels_of_tide();
+    let installed = "1.4.0-nightly.20261103";
+    let stable = on(SEASONS, None, Some(STABLE));
+    assert!(!super::newer(
+        followed_version(&tide, &stable).unwrap(),
+        installed
+    ));
+    let caught_up = listing("sabine", &[release("1.4.0", STABLE, 100, &[archive()])]);
+    assert!(super::newer(
+        followed_version(&caught_up, &stable).unwrap(),
+        installed
+    ));
+}
+
+#[test]
+fn the_page_leads_with_the_system_for_luft_own_apps() {
+    let previews = || vec![STABLE.to_owned(), "nightly".to_owned()];
+    let stable_only = || vec![STABLE.to_owned()];
+    let nightly = on(SEASONS, None, Some("nightly"));
+    assert_eq!(nightly.choice(), "system");
+    assert_eq!(nightly.choices(stable_only()), ["system", STABLE]);
+    assert_eq!(
+        on(SEASONS, None, Some(STABLE)).choices(previews()),
+        ["system", STABLE, "nightly"]
+    );
+    assert_eq!(
+        on(SEASONS, None, Some(STABLE)).choices(stable_only()),
+        [STABLE]
+    );
+    let third_party = on(TIDE, None, Some("nightly"));
+    assert_eq!(third_party.choice(), STABLE);
+    assert_eq!(third_party.choices(previews()), [STABLE, "nightly"]);
+    assert_eq!(
+        on(TIDE, Some("beta"), None).choices(stable_only()),
+        [STABLE, "beta"]
+    );
 }

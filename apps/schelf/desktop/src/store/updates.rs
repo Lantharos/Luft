@@ -6,7 +6,7 @@ use specta::Type;
 
 use super::catalog::Kind;
 use super::install::Consent;
-use super::listing::{self, Declared, ExtensionAccess, Format, Listing, Offer, channel};
+use super::listing::{self, Declared, ExtensionAccess, Format, Listing, Offer};
 use super::record::{self, Installed};
 use super::revocations::{self, Severity};
 use super::signed::Age;
@@ -83,7 +83,7 @@ fn update(id: String, installed: Installed) -> Result<Option<StoreUpdate>, Strin
         release,
         artifact,
         format,
-    }) = listing.release(&channel::followed(&listing.id))
+    }) = listing.release()
     else {
         return Ok(None);
     };

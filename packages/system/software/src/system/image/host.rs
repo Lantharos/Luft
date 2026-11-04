@@ -72,6 +72,21 @@ impl Reference {
         }
     }
 
+    /// Which release channel the image's tag belongs to: `1-nightly` and
+    /// versions such as `1.2-nightly.21` are nightlies, `1` and versions such
+    /// as `1.1` are stable, and any other tag is on neither.
+    pub fn release_channel(&self) -> Option<&'static str> {
+        let standard = Variant::Standard.reference(&self.image)?;
+        let tag = standard.rsplit_once(':')?.1;
+        if tag.contains("-nightly") {
+            Some("nightly")
+        } else if tag.chars().all(|c| c.is_ascii_digit() || c == '.') {
+            Some("stable")
+        } else {
+            None
+        }
+    }
+
     pub fn as_variant(&self, variant: Variant) -> Option<Self> {
         Some(Self {
             image: variant.reference(&self.image)?,

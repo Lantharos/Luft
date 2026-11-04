@@ -129,3 +129,35 @@ fn the_version_luft_went_back_from_is_not_offered_again() {
     };
     assert!(!returned.lacks(&update));
 }
+
+fn following(image: &str) -> Deployments {
+    let status = serde_json::json!({
+        "host": {
+            "spec": { "image": { "image": image, "transport": "registry" } },
+            "status": { "booted": { "image": null } }
+        }
+    });
+    deployments(&status.to_string())
+}
+
+#[test]
+fn the_release_channel_comes_from_the_followed_tag() {
+    const LUFT: &str = "ghcr.io/lantharos/luft";
+    for (tag, channel) in [
+        ("1-nightly", Some("nightly")),
+        ("1-nightly-nvidia", Some("nightly")),
+        ("2-nightly", Some("nightly")),
+        ("1.2-nightly.21", Some("nightly")),
+        ("1", Some("stable")),
+        ("1-nvidia", Some("stable")),
+        ("1.1", Some("stable")),
+        ("dev", None),
+    ] {
+        assert_eq!(
+            following(&format!("{LUFT}:{tag}")).channel(),
+            channel,
+            "{tag}"
+        );
+    }
+    assert_eq!(following(&format!("{LUFT}@sha256:abc")).channel(), None);
+}

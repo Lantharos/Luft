@@ -7,6 +7,11 @@ import { PackProblem } from './packs/read.js';
 const GUIDE = 'https://docs.luft.computer/personalize/strays/';
 const PREVIEW_RATE = 6;
 const WALK_LOOPS = 3;
+const BUILT_IN_DESCRIPTIONS: Record<string, string> = {
+  tuft: 'tuft-description',
+  pip: 'pip-description',
+  dollop: 'dollop-description',
+};
 
 function previewFrames({ frames }: Pack): number[] {
   return [...frames.look, ...Array.from({ length: WALK_LOOPS }, () => frames.walk).flat(), ...frames.sitDown, frames.sit, frames.sit, ...frames.lieDown, frames.sleep, frames.sleep, frames.sleep];
@@ -35,7 +40,7 @@ export function describePage(strays: Extension, library: Library): void {
     return {
       type: 'sprite',
       title: pack.name,
-      description: (builtIn ? t(`${pack.id}-description`) : pack.description) ?? undefined,
+      description: (builtIn ? t(BUILT_IN_DESCRIPTIONS[pack.id]) : pack.description) ?? undefined,
       image: pack.sheet,
       cell: pack.frameSheet.cell,
       columns: pack.frameSheet.columns,

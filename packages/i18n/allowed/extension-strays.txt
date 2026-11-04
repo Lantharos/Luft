@@ -1,0 +1,3 @@
+extensions/strays/art/draw.ts	Flies over to whatever looks like a good perch
+extensions/strays/art/draw.ts	My stray
+extensions/strays/art/draw.ts	One line about who this is

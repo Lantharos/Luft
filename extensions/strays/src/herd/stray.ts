@@ -43,6 +43,21 @@ type Activity =
 
 const between = ([low, high]: Bounds) => low + (high - low) * Math.random();
 
+export const MOODS = {
+  stand: 'mood-stand',
+  sit: 'mood-sit',
+  sleep: 'mood-sleep',
+  hover: 'mood-hover',
+  still: 'mood-still',
+  walk: 'mood-walk',
+  fall: 'mood-fall',
+  climb: 'mood-climb',
+  leap: 'mood-leap',
+  fly: 'mood-fly',
+  held: 'mood-held',
+} as const;
+export type Mood = keyof typeof MOODS;
+
 /** One creature: where it is, what it's doing, and what it does next. */
 export class Stray {
   x: number;
@@ -57,13 +72,13 @@ export class Stray {
   private activity: Activity = { kind: 'air' };
   private steps = 0;
   private shown = 0;
-  private described = '';
+  private described: Mood | null = null;
   private clinging = 0;
   private route: Move[] = [];
   private graphOf: { world: World; graph: Graph } | null = null;
   private inReach = new Set<string>();
 
-  constructor(readonly pack: Pack, readonly sprite: Sprite, private world: World, private readonly describe: (mood: string) => string) {
+  constructor(readonly pack: Pack, readonly sprite: Sprite, private world: World, private readonly describe: (mood: Mood) => string) {
     this.x = between([world.body.width, world.display.width - world.body.width]);
     this.y = -world.body.height;
     this.shown = pack.frames.fall[0];
@@ -86,7 +101,7 @@ export class Stray {
     return this.pack.frames;
   }
 
-  private show(frame: number, mood: string): void {
+  private show(frame: number, mood: Mood): void {
     this.shown = frame;
     this.sprite.place({ display: this.display, x: this.x, y: this.y, frame, flipped: this.facing < 0 });
     if (mood === this.described) return;
@@ -95,7 +110,7 @@ export class Stray {
   }
 
   private redraw(): void {
-    this.show(this.shown, this.described);
+    this.show(this.shown, this.described ?? 'stand');
   }
 
   private stand(platform: Platform, x: number): void {

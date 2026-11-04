@@ -2,7 +2,7 @@ import type { Disposable, Extension, Sprites, SurfaceDisplay } from '@luft/exten
 
 import type { Pack } from '../packs/pack.js';
 import { World } from '../world/world.js';
-import { STEP_S, Stray } from './stray.js';
+import { MOODS, STEP_S, Stray } from './stray.js';
 
 type Granted = 'wallpaper' | 'calls';
 
@@ -63,7 +63,7 @@ export class Herd {
         onDropped: ({ display, x, y }) => this.drop(stray, display, x, y),
       });
       const display = displays[slot % displays.length];
-      const stray: Stray = new Stray(pack, sprite, worldOn(display, sprite.sizeOn(display.index)), mood => this.extension.t(`mood-${mood}`, { name: pack.name }));
+      const stray: Stray = new Stray(pack, sprite, worldOn(display, sprite.sizeOn(display.index)), mood => this.extension.t(MOODS[mood], { name: pack.name }));
       this.strays.push(stray);
       if (this.drowsy) stray.doze();
     }

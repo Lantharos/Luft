@@ -581,3 +581,10 @@ extension-popup-close = Close
 extension-turned-off-title = { $name } was turned off
 extension-turned-off-error = It stopped working. You can turn it on again in Settings.
 extension-turned-off-crash = The desktop restarted twice while it was running. You can turn it on again in Settings.
+# Notification after an extension stopped holding notifications back, such as at the end of a work session; $name is the extension's name
+extension-held-title = While { $name } held notifications back
+# $count is how many notifications came in, $apps lists the apps they came from, such as "Mailman and Chat"
+extension-held-body = { $count ->
+    [one] One came in from { $apps }
+   *[other] { $count } came in from { $apps }
+}

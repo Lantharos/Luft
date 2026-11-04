@@ -3,6 +3,7 @@ import GLib from 'gi://GLib';
 
 import { onLocaleChanged } from '../../shared/i18n/index.js';
 import { openSettings } from '../../system/settingsPages.js';
+import { forgetSecrets } from '../api/v1/secrets.js';
 import type { SettingValue } from '../api/v1/types.js';
 import { LayerStage } from '../api/v1/wallpaper/stage.js';
 import type { ExtensionHost } from '../host.js';
@@ -123,6 +124,7 @@ export class ExtensionManager {
     this.drop(id);
     removeFolder(path);
     if (GLib.file_test(dataFolder(id), GLib.FileTest.IS_DIR)) removeFolder(dataFolder(id));
+    forgetSecrets(id);
     this.store.forgetValues(id);
     this.store.forgetShortcuts(id);
     this.store.setProblem(id, null);

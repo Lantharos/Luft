@@ -33,6 +33,7 @@ export class PopupFrame {
   private previousFocus: Clutter.Actor | null = null;
   private drag: { grab: Clutter.Grab; dx: number; dy: number } | null = null;
   private closing = false;
+  private updating = false;
 
   constructor(private readonly host: ExtensionHost, controls: ControlHost, content: View, private readonly options: FrameOptions) {
     const panel = options.kind === 'panel';
@@ -134,7 +135,7 @@ export class PopupFrame {
     if (!this.actor.navigate_focus(null, St.DirectionType.TAB_FORWARD, false)) this.actor.grab_key_focus();
     this.watch(global.stage, global.stage.connect('notify::key-focus', () => {
       const focus = global.stage.get_key_focus();
-      if (!this.closing && (!focus || !this.actor.contains(focus))) this.close();
+      if (!this.closing && !this.updating && (!focus || !this.actor.contains(focus))) this.close();
     }));
   }
 
@@ -155,9 +156,16 @@ export class PopupFrame {
     this.actor.set_position(x, y);
   }
 
+  /** Shows new content. A panel keeps the keyboard when the control that had it goes away, such as a button replaced by others. */
   update(content: View): void {
+    this.updating = true;
     this.view.show(content);
-    if (this.options.kind === 'panel') this.fit();
+    this.updating = false;
+    if (this.options.kind !== 'panel') return;
+    this.fit();
+    const focus = global.stage.get_key_focus();
+    if (!this.closing && (!focus || !this.actor.contains(focus)) && !this.actor.navigate_focus(null, St.DirectionType.TAB_FORWARD, false))
+      this.actor.grab_key_focus();
   }
 
   close(): void {

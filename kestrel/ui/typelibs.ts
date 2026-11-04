@@ -27,6 +27,7 @@ export const TYPELIB_VERSIONS: Record<string, string> = {
   PangoCairo: '1.0',
   Polkit: '1.0',
   PolkitAgent: '1.0',
+  Secret: '1',
   Soup: '3.0',
 };
 

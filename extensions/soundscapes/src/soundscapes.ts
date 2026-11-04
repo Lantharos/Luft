@@ -5,7 +5,7 @@ import { Mixes, type Mix } from './mixes.js';
 import { Player } from './player.js';
 import { SleepTimer } from './sleep.js';
 
-export type Granted = 'sounds' | 'media' | 'quick-settings' | 'popups';
+export type Granted = 'sounds' | 'locked-sounds' | 'media' | 'calls' | 'quick-settings' | 'popups';
 
 const RESUME_DELAY_MS = 2000;
 
@@ -17,6 +17,7 @@ export class Soundscapes {
   private readonly listeners = new Set<() => void>();
   private popup: Popup | null = null;
   private resuming: { dispose(): void } | null = null;
+  private waitingFor: 'media' | 'call' | null = null;
 
   constructor(readonly extension: Extension<Granted>) {
     this.mixes = new Mixes(extension.storage, extension.t, () => this.changed());
@@ -28,12 +29,13 @@ export class Soundscapes {
     extension.settings.onChanged(key => {
       if (key === 'sleep-timer') this.sleep.restart();
       if (key === 'volume') extension.sounds.volume = extension.settings.get<number>('volume');
-      if (key === 'pause-for-media') this.followMedia();
+      if (key === 'pause-for-media' || key === 'pause-for-calls') this.follow();
       this.changed();
     });
-    extension.media.onChanged(() => this.followMedia());
+    extension.media.onChanged(() => this.follow());
+    extension.calls.onChanged(() => this.follow());
     extension.sounds.volume = extension.settings.get<number>('volume');
-    this.followMedia();
+    this.follow();
   }
 
   onChanged(listener: () => void): void {
@@ -57,7 +59,7 @@ export class Soundscapes {
   /** Why it's quiet while on, or when the sleep timer stops it. */
   readonly detail = (): string | null => {
     const { t } = this.extension;
-    if (this.player.held) return t('held');
+    if (this.player.held) return t(this.waitingFor === 'call' ? 'held-call' : 'held');
     const deadline = this.sleep.deadline;
     return deadline ? t('stops-at', { time: new Date(deadline).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) }) : null;
   };
@@ -81,13 +83,22 @@ export class Soundscapes {
     });
   }
 
-  /** Waits while another app plays music or a video, and comes back a moment after it stops, so it doesn't jump in between tracks. */
-  private followMedia(): void {
-    const othersPlay = this.extension.settings.get<boolean>('pause-for-media') && this.extension.media.players.some(player => player.playing);
+  /**
+   * Waits during a call, or while another app plays music or a video, and comes back a moment after it ends, so it
+   * doesn't jump in between tracks.
+   */
+  private follow(): void {
+    const { settings, media, calls } = this.extension;
+    const inCall = settings.get<boolean>('pause-for-calls') && calls.active;
+    const othersPlay = settings.get<boolean>('pause-for-media') && media.players.some(player => player.playing);
+    const waitingFor = inCall ? 'call' : othersPlay ? 'media' : null;
+    const reasonChanged = waitingFor !== this.waitingFor;
+    this.waitingFor = waitingFor;
     this.resuming?.dispose();
     this.resuming = null;
-    if (othersPlay) this.player.wait(true);
+    if (this.waitingFor) this.player.wait(true);
     else if (this.player.held) this.resuming = this.extension.timers.timeout(RESUME_DELAY_MS, () => this.player.wait(false));
     else this.player.wait(false);
+    if (reasonChanged) this.changed();
   }
 }

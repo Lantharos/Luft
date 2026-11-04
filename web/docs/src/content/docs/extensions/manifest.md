@@ -18,6 +18,7 @@ sidebar:
 | `api` | The extension API version it targets. Luft keeps every version it shipped working, and refuses versions it doesn't know |
 | `permissions` | What it uses beyond the basics, see below |
 | `[helper]` | `path` names a program in the folder that the API can start |
+| `[network]` | `hosts` names the hosts it connects to, such as `["api.example.com"]` |
 | `[[settings]]` | Settings people change in Settings → Extensions, see below |
 | `[[shortcuts]]` | Keyboard shortcuts people can change in Settings → Keyboard, see below |
 | `replaces` | The id of an extension this one takes over from, see [Taking over from another extension](#taking-over-from-another-extension) |
@@ -40,8 +41,11 @@ The API object only has the parts an extension asked for. Settings and Schelf sh
 | `typing` | Type into other apps | `typing` |
 | `sounds` | Play sounds | `sounds` |
 | `audio-levels` | Follow the beat of what's playing | `audioLevels` |
+| `calls` | Know when you're in a call | `calls` |
+| `locked-sounds` | Keep playing sounds while the screen is locked | `lockedSounds` |
+| `do-not-disturb` | Hold back notifications for a while | `doNotDisturb` |
 
-A `[helper]` gives `helper`. It's a native program, so Schelf shows that the extension runs one and scans it like any app. `[[shortcuts]]` gives `shortcuts`.
+`locked-sounds` needs `sounds` too. A `[helper]` gives `helper`. It's a native program, so Schelf shows that the extension runs one and scans it like any app. `[network]` gives `network`, and Settings and Schelf show its hosts as "Connect to api.example.com"; a release that adds a host asks again, like one that adds a permission. `[[shortcuts]]` gives `shortcuts`.
 
 `typing` is the one to ask for least: an extension can only type within ten seconds of someone using it, and the taskbar shows that it did.
 

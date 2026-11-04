@@ -69,6 +69,7 @@ pub(super) struct Listed {
     state: String,
     problem: String,
     permissions: Option<Vec<String>>,
+    network: Option<Vec<String>>,
     settings: Option<Vec<ListedSetting>>,
     shortcuts: Option<Vec<ListedShortcut>>,
     page: Option<bool>,
@@ -120,6 +121,7 @@ pub struct Extension {
     state: String,
     problem: String,
     permissions: Vec<String>,
+    network: Vec<String>,
     settings: Vec<ExtensionSetting>,
     shortcuts: Vec<ExtensionShortcut>,
     page: bool,
@@ -173,6 +175,7 @@ impl From<Listed> for Extension {
             state: listed.state,
             problem: listed.problem,
             permissions: listed.permissions.unwrap_or_default(),
+            network: listed.network.unwrap_or_default(),
             settings: listed
                 .settings
                 .unwrap_or_default()

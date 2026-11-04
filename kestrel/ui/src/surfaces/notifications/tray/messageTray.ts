@@ -12,7 +12,7 @@ import * as Layout from '../../../core/stage/layout.js';
 import * as Main from '../../../core/main.js';
 import * as MessageList from './messageList.js';
 
-import { bannerAllowed, soundAllowed } from './bannerRules.js';
+import { bannerAllowed, heldBack, soundAllowed } from './bannerRules.js';
 import { FocusGrabber } from './focusGrabber.js';
 import { Notification, Source } from './notification.js';
 import { NotificationDestroyedReason, State, Urgency } from './notificationEnums.js';
@@ -248,7 +248,9 @@ export class MessageTray extends St.Widget {
       notification.playSound();
 
     if (!bannerAllowed(notification, this.notificationSettings)) {
-      if (!notification.source.policy.keepInList)
+      const holds = heldBack(notification);
+      for (const hold of holds) hold.take(notification);
+      if (!holds.length && !notification.source.policy.keepInList)
         this.discardSoon(notification);
       return;
     }

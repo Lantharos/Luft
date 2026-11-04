@@ -1,6 +1,6 @@
 # Extensions
 
-Extensions add to Kestrel: layers over the wallpaper, quick settings tiles, taskbar buttons, pop-up panels and small windows, keyboard shortcuts, search results, notifications, sounds, and pages in Settings. They run inside Kestrel's process but only see a versioned API object, never Kestrel's internals. What Luft does for everyone, such as the emoji picker, clipboard history and dictation, stays built into Kestrel; extensions are for what's optional. How to write one is in [the developer docs](https://docs.luft.computer/extensions/getting-started/); this page is how it works inside Luft.
+Extensions add to Kestrel: layers over the wallpaper, quick settings tiles, taskbar buttons, pop-up panels and small windows, keyboard shortcuts, search results, notifications, sounds, and pages in Settings. They can follow calls, hold notifications back for a while, connect to the hosts they name, keep secrets in the keyring and ask each other to do things. They run inside Kestrel's process but only see a versioned API object, never Kestrel's internals. What Luft does for everyone, such as the emoji picker, clipboard history and dictation, stays built into Kestrel; extensions are for what's optional. How to write one is in [the developer docs](https://docs.luft.computer/extensions/getting-started/); this page is how it works inside Luft.
 
 | Where | What |
 | --- | --- |
@@ -9,7 +9,7 @@ Extensions add to Kestrel: layers over the wallpaper, quick settings tiles, task
 | `kestrel/ui/src/extensions/service.ts` | The D-Bus interface below |
 | `kestrel/engine/src/sound` | `ShellSoundMix`, which plays an extension's sounds, and `ShellAudioMonitor`, which measures what the computer plays |
 | `packages/extension-api` | `@luft/extension-api`, the types for extension authors, written from `types.ts` by `bun kestrel/ui/extensionApi.ts`. `bun run check` in `kestrel/ui` fails when it's out of date |
-| `extensions` | Lantharos's own extensions, such as Seasons. Each has a `build.sh` that makes its folder, which `extensions/pack.sh` packs for schelf.store |
+| `extensions` | Lantharos's own extensions, such as Seasons, Focus and Pult. Each has a `build.sh` that makes its folder, which `extensions/pack.sh` packs for schelf.store |
 | `apps/settings/src/lib/panels/personalization/extensions` | Settings → Extensions, each extension's page, and its rows on other pages |
 
 ## On disk
@@ -38,6 +38,9 @@ permissions = ["wallpaper", "quick-settings"]
 
 [helper]                          # optional native program, started through the API
 path = "clock-helper"
+
+[network]                         # optional hosts it connects to, over HTTPS
+hosts = ["api.example.com"]
 
 [[settings]]                      # switch, choice, slider or color
 key = "seconds"
@@ -70,8 +73,11 @@ Permissions, with the words Settings and the store show for them:
 | `typing` | Type into other apps |
 | `sounds` | Play sounds |
 | `audio-levels` | Follow the beat of what's playing |
+| `calls` | Know when you're in a call |
+| `locked-sounds` | Keep playing sounds while the screen is locked |
+| `do-not-disturb` | Hold back notifications for a while |
 
-A `[helper]` table isn't a permission, but the store shows that the extension runs a program of its own. `[[shortcuts]]` isn't one either; the shortcuts show in Settings → Keyboard.
+`locked-sounds` needs `sounds` too. A `[helper]` table isn't a permission, but the store shows that the extension runs a program of its own. `[network]` isn't one either, but Settings and the store show the hosts it names as "Connect to api.example.com". `[[shortcuts]]` shows in Settings → Keyboard.
 
 An extension that takes over from another names it with `replaces = "com.example.Old"`, and a setting or choice option whose key or value changed names the old one with its own `replaces`. Once both are installed, whether the new one arrives at sign-in or in an update, Kestrel copies the old one's values into the new one's settings, keeps the new one off if the person had turned the old one off, and removes the old one with its settings, storage and data. Seasons replaces Rain this way.
 
@@ -97,7 +103,7 @@ Kestrel serves `com.lantharos.Kestrel.Extensions` at `/com/lantharos/Kestrel/Ext
 | `ExtensionsChanged` (signal) | Something in `List` changed |
 | `PageChanged(s id)` (signal) | The extension's page should be built again: it asked, or a setting changed |
 
-Each entry of `List` has `id`, `name` and `description` (translated), `version`, `api`, `path`, `permissions`, `helper`, `enabled`, `state` (`running`, `off`, `failed`, `crashed` or `invalid`) and `problem` (why it isn't running), `settings`: for each setting its `key`, `type`, translated `label` and `description`, `value`, `default`, `depends`, `page`, and `options` or `swatches` as `a(ss)` of value and label, `images` with the full path of each option's picture, or `min`, `max`, `step` and `unit`; `shortcuts`: for each its `key`, translated `label`, the `accelerators` it's bound to, its `default` and whether it `changed`; and `page`, whether it describes a page of its own.
+Each entry of `List` has `id`, `name` and `description` (translated), `version`, `api`, `path`, `permissions`, `helper`, `network` (the hosts it connects to), `enabled`, `state` (`running`, `off`, `failed`, `crashed` or `invalid`) and `problem` (why it isn't running), `settings`: for each setting its `key`, `type`, translated `label` and `description`, `value`, `default`, `depends`, `page`, and `options` or `swatches` as `a(ss)` of value and label, `images` with the full path of each option's picture, or `min`, `max`, `step` and `unit`; `shortcuts`: for each its `key`, translated `label`, the `accelerators` it's bound to, its `default` and whether it `changed`; and `page`, whether it describes a page of its own.
 
 ## Settings pages
 
@@ -109,7 +115,7 @@ While an extension runs, Kestrel grabs its shortcuts from the compositor: what t
 
 ## Pop-ups
 
-Pop-ups are drawn by Kestrel from a tree of its own controls, not by the extension, so they look and move like the rest of Luft and can't reach Kestrel's internals. A panel takes the keyboard and closes when it loses it; a window floats above windows and leaves the keyboard alone until clicked. Updates keep each control that stayed in place, so drags and typing carry on.
+Pop-ups are drawn by Kestrel from a tree of its own controls, not by the extension, so they look and move like the rest of Luft and can't reach Kestrel's internals. A panel takes the keyboard and closes when it loses it; a window floats above windows and leaves the keyboard alone until clicked. Updates keep each control that stayed in place, so drags and typing carry on, and a panel keeps the keyboard when the control that had it is replaced, such as a Start button that becomes Pause and End.
 
 ## Taskbar elements
 
@@ -137,7 +143,7 @@ Each frame, a layer gets the windows on each display, topmost first, and the tas
 
 ## Sound
 
-Each extension that plays sounds gets one `ShellSoundMix`: a PipeWire playback stream named after it, made when it first plays, with sounds decoded once into memory, mixed with per-sound volume and fades and gapless loops, and silenced while the session isn't active. `ShellAudioMonitor` listens to the default output's monitor with a passive capture stream, but only while some extension holds a listener and `ShellMixer:playing` says an app plays; reading it runs an FFT of the latest samples on demand. Kestrel's own capture doesn't count as recording for the privacy indicator.
+Each extension that plays sounds gets one `ShellSoundMix`: a PipeWire playback stream named after it, made when it first plays, with sounds decoded once into memory, mixed with per-sound volume and fades and gapless loops, and silenced while the session isn't active. One with `locked-sounds` can keep its stream going while the screen is locked by holding `lockedSounds.keep()`, which Soundscapes does while its sleep timer runs; letting go, or the extension being turned off, silences it again. `ShellAudioMonitor` listens to the default output's monitor with a passive capture stream, but only while some extension holds a listener and `ShellMixer:playing` says an app plays; reading it runs an FFT of the latest samples on demand. Kestrel's own capture doesn't count as recording for the privacy indicator.
 
 ## Media
 
@@ -157,13 +163,31 @@ Kestrel keeps what the person decided in `com.lantharos.kestrel`: `disabled-exte
 - A turned off extension costs nothing: its module is never loaded. A wallpaper layer has no actors while it's inactive and stops its frame clock while nothing shows, and its shader only runs over the area it asks for.
 - Modules load once per path in GJS, so Kestrel copies `extension.js` to a temporary file for each load. That's what lets `Reload` run new code without restarting Kestrel.
 
+## Calls
+
+`calls` follows what the privacy indicator follows: `ShellMixer:recording` for apps recording from the microphone, and the camera monitor for apps filming. Kestrel's own dictation and level meters don't count. A call starts as soon as either is taken and ends three seconds after both are let go, so it doesn't end while an app switches devices. Soundscapes waits during calls, and Seasons quiets its rain.
+
+## Holding notifications back
+
+`doNotDisturb.hold()` holds back other apps' banners and sounds the way Do Not Disturb does: urgent notifications, apps people let through Do Not Disturb and the extension's own notifications still show, and everything held stays in the notification center. `surfaces/notifications/tray/holds.ts` keeps the holds, and the message tray asks them before it shows a banner or plays a sound. A hold counts what it held by app, while those notifications are still there, and never shows the extension what they say. `release()` ends it and hands those counts to the extension to sum up itself, as Focus does at the end of a session; when a hold ends any other way, including the extension being turned off, Kestrel sums it up with a notification of its own.
+
+## Network
+
+`network.fetch` talks HTTPS to the hosts the manifest names under `[network]`, through one Soup session, and refuses every other host; plain HTTP is only allowed to `localhost` and `127.0.0.1`. A response is read whole, up to 4 MB, and a request is cancelled after its timeout or when the extension is turned off.
+
+## Secrets
+
+`secrets` keeps values such as sign-in tokens in the keyring through libsecret, under the schema `com.lantharos.Kestrel.ExtensionSecret` with the extension's id and the value's key as attributes. Removing the extension deletes them.
+
+## Requests between extensions
+
+`peers.handle(name, answer)` answers requests from other extensions, and `peers.request(id, name, value)` asks one, with values copied as JSON. Both run in each extension's own guard, so an extension that fails while answering is turned off like any other. Soundscapes answers `play`, saying whether it was already playing, and `pause`; Focus uses them to play the mix during a session and stop it after, only if it started it.
+
 ## Wanted
 
 What extensions need that the API doesn't offer yet:
 
 - **Whether other apps play sound.** `audioLevels.playing` counts the extension's own sounds too, so an extension that plays sounds can't tell when another app starts. Soundscapes pauses for media players instead, which misses apps without one, such as games.
-- **Calls.** Nothing tells an extension that a call is going on, such as an app recording from the microphone, for Soundscapes to pause during it.
-- **Sounds while the screen is locked.** Every extension's sounds go quiet while it's locked, which stops sleep sounds once the screen locks by itself. A sound could ask to keep playing.
 
 ## Adding an API version
 

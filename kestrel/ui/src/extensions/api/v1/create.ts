@@ -5,12 +5,17 @@ import type { ApiContext } from './context.js';
 import { helperApi } from './helper.js';
 import { locationApi } from './location.js';
 import { mediaApi } from './media/media.js';
-import { notificationsApi } from './notifications.js';
+import { doNotDisturbApi } from './notifications/doNotDisturb.js';
+import { notificationsApi } from './notifications/notifications.js';
+import { networkApi } from './network.js';
+import { peersApi } from './peers.js';
 import { quickSettingsApi } from './quickSettings/quickSettings.js';
 import { audioLevelsApi } from './audio/levels.js';
-import { soundsApi } from './audio/sounds.js';
+import { lockedSoundsApi, soundsApi } from './audio/sounds.js';
+import { callsApi } from './calls.js';
 import { popupsApi } from './popups/popups.js';
 import { searchApi } from './search.js';
+import { secretsApi } from './secrets.js';
 import { settingsPageApi } from './settingsPage/settingsPage.js';
 import { shortcutsApi } from './shortcuts.js';
 import { desktopApi, powerApi } from './system.js';
@@ -34,8 +39,12 @@ const PARTS: { [Name in Capability]: { property: string; create(context: ApiCont
   'typing': { property: 'typing', create: typingApi },
   'sounds': { property: 'sounds', create: soundsApi },
   'audio-levels': { property: 'audioLevels', create: audioLevelsApi },
+  'calls': { property: 'calls', create: callsApi },
+  'locked-sounds': { property: 'lockedSounds', create: lockedSoundsApi },
+  'do-not-disturb': { property: 'doNotDisturb', create: doNotDisturbApi },
   'helper': { property: 'helper', create: helperApi },
   'shortcuts': { property: 'shortcuts', create: shortcutsApi },
+  'network': { property: 'network', create: networkApi },
 };
 
 /** The object an extension gets: the basics, plus exactly what its manifest asked for. */
@@ -52,6 +61,8 @@ export function createApi(context: ApiContext): Readonly<Basics & Record<string,
     settings: settingsApi(context),
     settingsPage: settingsPageApi(context),
     storage: storageApi(context),
+    secrets: secretsApi(context),
+    peers: peersApi(context),
     timers: timersApi(context),
     session: sessionApi(context),
     desktop: desktopApi(context),
@@ -66,6 +77,7 @@ export function createApi(context: ApiContext): Readonly<Basics & Record<string,
   };
   const granted: Capability[] = [
     ...manifest.permissions ?? [], ...manifest.helper ? ['helper' as const] : [], ...manifest.shortcuts?.length ? ['shortcuts' as const] : [],
+    ...manifest.network ? ['network' as const] : [],
   ];
   const extension = Object.defineProperties({}, Object.getOwnPropertyDescriptors(basics)) as Basics & Record<string, unknown>;
   for (const capability of granted) extension[PARTS[capability].property] = PARTS[capability].create(context);

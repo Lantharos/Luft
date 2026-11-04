@@ -265,12 +265,13 @@ export type Download = {
 };
 
 /**
- *  What an extension asks for: permissions from the extension API, and
- *  whether it runs a program of its own.
+ *  What an extension asks for: permissions from the extension API, whether
+ *  it runs a program of its own, and the hosts it connects to.
  */
 export type ExtensionAccess = {
 	permissions: string[],
 	helper: boolean,
+	network: string[],
 };
 
 /**  A Fedora package's page, from Fedora's software sources. */

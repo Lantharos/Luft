@@ -1,0 +1,9 @@
+id = "com.example.Quiet"
+name = "Quiet"
+description = "Follows calls, holds notifications back, keeps playing while locked, keeps a secret and fetches from one host."
+version = "1.0.0"
+api = 1
+permissions = ["notifications", "calls", "sounds", "locked-sounds", "do-not-disturb"]
+
+[network]
+hosts = ["127.0.0.1:1"]

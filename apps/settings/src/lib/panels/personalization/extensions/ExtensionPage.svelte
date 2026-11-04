@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { t } from '@luft/i18n';
+	import { i18n, t } from '@luft/i18n';
 	import { ConfirmDialog, Row, Section, Switch } from '@luft/ui';
 	import type { Extension } from '#lib/bindings.js';
 	import SubPage from '#lib/components/SubPage.svelte';
@@ -36,11 +36,14 @@
 		</Section>
 	{/if}
 
-	{#if extension.permissions.length}
+	{#if extension.permissions.length || extension.network.length}
 		<Section title={t('settings-extensions-permissions')}>
 			{#each extension.permissions as permission (permission)}
 				<Row title={PERMISSIONS[permission] ? t(PERMISSIONS[permission]) : permission} />
 			{/each}
+			{#if extension.network.length}
+				<Row title={t('settings-extensions-permission-network', { hosts: new Intl.ListFormat(i18n.formats, { type: 'conjunction' }).format(extension.network) })} />
+			{/if}
 		</Section>
 	{/if}
 

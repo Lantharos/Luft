@@ -14,7 +14,7 @@ import { describePage } from './page.js';
 import { Sky } from './sky.js';
 import { RainSound } from './sound.js';
 
-type Granted = 'wallpaper' | 'quick-settings' | 'weather' | 'sounds';
+type Granted = 'wallpaper' | 'quick-settings' | 'weather' | 'sounds' | 'calls';
 
 const ICONS: Record<EffectName, string> = {
   rain: 'weather-showers-symbolic',
@@ -50,7 +50,7 @@ const enable: Enable<Granted> = seasons => {
   let pictures = 0;
   let scene: Scene | null = null;
   const outside = new OutsideWatch(seasons, () => update());
-  const sound = new RainSound(seasons, () => scene?.effect === 'rain' ? scene.density : null);
+  const sound = new RainSound(seasons, () => scene?.effect === 'rain' && !seasons.calls.active ? scene.density : null);
   const toggle = seasons.quickSettings.addToggle({
     title: seasons.t('seasons'),
     icon: ICONS.rain,
@@ -84,7 +84,7 @@ const enable: Enable<Granted> = seasons => {
     const visible = settings.get<boolean>('visible');
     sky.show(visible ? scene : null);
     sound.sync();
-    impact.sync(visible && scene?.effect === 'custom' && seasons.desktop.wallpaperVisible ? presets.chosen : null);
+    impact.sync(visible && scene?.effect === 'custom' && seasons.desktop.wallpaperVisible && !seasons.calls.active ? presets.chosen : null);
     toggle.update({ subtitle: subtitle(), icon: icon() });
   };
   const picturesChanged = () => {
@@ -94,6 +94,7 @@ const enable: Enable<Granted> = seasons => {
   picturesChanged();
   settings.onChanged(update);
   seasons.desktop.onChanged(update);
+  seasons.calls.onChanged(update);
   presets.watch(picturesChanged);
   describePage(seasons, presets, () => {
     settings.set('effect', 'custom');

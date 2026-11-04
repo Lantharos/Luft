@@ -19,16 +19,19 @@ export interface Disposable {
  * - `typing`: Type into other apps
  * - `sounds`: Play sounds
  * - `audio-levels`: Follow the beat of what's playing
+ * - `calls`: Know when you're in a call
+ * - `locked-sounds`: Keep playing sounds while the screen is locked
+ * - `do-not-disturb`: Hold back notifications for a while
  */
 export type Permission =
   | 'wallpaper' | 'quick-settings' | 'taskbar' | 'search' | 'notifications' | 'weather' | 'location' | 'media'
-  | 'popups' | 'typing' | 'sounds' | 'audio-levels';
+  | 'popups' | 'typing' | 'sounds' | 'audio-levels' | 'calls' | 'locked-sounds' | 'do-not-disturb';
 
 /**
- * A permission, `helper` for an extension whose manifest declares a native helper, or `shortcuts` for one that
- * declares keyboard shortcuts.
+ * A permission, `helper` for an extension whose manifest declares a native helper, `shortcuts` for one that declares
+ * keyboard shortcuts, or `network` for one that names the hosts it connects to.
  */
-export type Capability = Permission | 'helper' | 'shortcuts';
+export type Capability = Permission | 'helper' | 'shortcuts' | 'network';
 
 type CamelCase<Name extends string> = Name extends `${infer Head}-${infer Tail}` ? `${Head}${Capitalize<CamelCase<Tail>>}` : Name;
 
@@ -46,8 +49,12 @@ export interface Capabilities {
   typing: Typing;
   sounds: Sounds;
   'audio-levels': AudioLevels;
+  calls: Calls;
+  'locked-sounds': LockedSounds;
+  'do-not-disturb': DoNotDisturb;
   helper: Helper;
   shortcuts: Shortcuts;
+  network: Network;
 }
 
 /** What every extension gets, whatever it asked for. */
@@ -65,6 +72,10 @@ export interface Basics {
   readonly settingsPage: SettingsPage;
   /** Small values the extension keeps, such as what someone last picked. */
   readonly storage: Storage;
+  /** Passwords and sign-in tokens, kept in the keyring. */
+  readonly secrets: Secrets;
+  /** Other extensions, to ask them to do something or answer what they ask. */
+  readonly peers: Peers;
   readonly timers: Timers;
   readonly session: Session;
   readonly desktop: Desktop;
@@ -173,6 +184,32 @@ export interface Storage {
   set(key: string, value: Stored): void;
   delete(key: string): void;
   keys(): string[];
+}
+
+/**
+ * Secrets kept in the person's keyring, such as a token from signing in to a service, encrypted and unlocked with their
+ * account. They're deleted when the extension is removed.
+ */
+export interface Secrets {
+  /** The secret kept under `key`, or `null` when there's none or the keyring can't be reached. */
+  get(key: string): Promise<string | null>;
+  set(key: string, secret: string): Promise<void>;
+  delete(key: string): Promise<void>;
+}
+
+/**
+ * Requests between extensions, such as a timer asking Soundscapes to play while it runs. Both sides take part: an
+ * extension only answers the requests it handles, and values pass as copies of what JSON can hold.
+ */
+export interface Peers {
+  /** Answers requests named `name` from other extensions with what `answer` returns, until disposed. */
+  handle(name: string, answer: (value: Stored, from: string) => Stored | void | Promise<Stored | void>): Disposable;
+  /** Whether the extension with this id runs and answers requests named `name`. */
+  handles(id: string, name: string): boolean;
+  /** Asks another extension and returns its answer. It rejects when that extension doesn't run, doesn't handle `name` or fails. */
+  request(id: string, name: string, value?: Stored): Promise<Stored | undefined>;
+  /** Runs `changed` when an extension starts or stops answering a request, such as when one is installed or turned off. */
+  onChanged(changed: () => void): Disposable;
 }
 
 /** A rectangle in pixels. */
@@ -548,7 +585,8 @@ export interface Sounds {
   /**
    * Plays a sound file in the extension's folder, such as an Ogg, FLAC or WAV file. Everything an extension plays goes
    * through one stream with its name, which people can turn down in Sound settings, and goes quiet while the screen
-   * is locked. Files are decoded once and kept while they play, so keep loops short, a minute at most.
+   * is locked, unless {@link LockedSounds.keep} holds it. Files are decoded once and kept while they play, so keep
+   * loops short, a minute at most.
    */
   play(path: string, options?: SoundOptions): Sound;
   /** The volume of everything the extension plays, 0 to 1, changed smoothly. */
@@ -573,6 +611,28 @@ export interface Sound extends Disposable {
   stop(fade?: number): void;
   /** Runs `ended` when it stops: at its end, after `stop`, or when it can't be played. */
   onEnded(ended: () => void): Disposable;
+}
+
+/** Needs the `sounds` permission too. */
+export interface LockedSounds {
+  /**
+   * Keeps everything the extension plays going while the screen is locked, such as sounds to fall asleep to, until
+   * it's disposed. Take it only while something plays that people expect to keep hearing.
+   */
+  keep(): Disposable;
+}
+
+/**
+ * Whether people are in a call: an app records from the microphone or films with the camera. Kestrel's own dictation
+ * and level meters don't count.
+ */
+export interface Calls {
+  /** Whether a call is going on. It starts as soon as the microphone or camera is taken, and ends a few seconds after both are let go, so a call doesn't end while an app switches devices. */
+  readonly active: boolean;
+  readonly microphone: boolean;
+  readonly camera: boolean;
+  /** Runs `changed` when a call starts or ends. */
+  onChanged(changed: () => void): Disposable;
 }
 
 export interface AudioLevels {
@@ -633,6 +693,67 @@ export interface NotificationOptions {
 
 /** Disposing a notification withdraws it. */
 export type Notification = Disposable;
+
+export interface DoNotDisturb {
+  /**
+   * Holds back other notifications' banners and sounds until the hold ends, the way Do Not Disturb does, such as during
+   * a work session. Urgent notifications and apps people let through Do Not Disturb still show. Nothing is lost: what
+   * comes in stays in the notification center. Notifications the extension sends itself aren't held.
+   */
+  hold(): NotificationHold;
+  /** Whether notifications are held back: Do Not Disturb is on, or an extension holds them. */
+  readonly holding: boolean;
+  onChanged(changed: () => void): Disposable;
+}
+
+/** Notifications that came in from one app during a hold, and are still in the notification center. */
+export interface HeldNotifications {
+  /** The app's name. */
+  readonly app: string;
+  readonly count: number;
+}
+
+export interface NotificationHold extends Disposable {
+  /** What came in so far, by app, most first. Only names and counts: the extension never sees what notifications say. */
+  readonly held: readonly HeldNotifications[];
+  /** Runs `changed` when another notification is held, or a held one is dismissed. */
+  onHeld(changed: () => void): Disposable;
+  /**
+   * Ends the hold and returns what came in, for the extension to sum up itself. Disposing the hold, or the extension
+   * being turned off, ends it too, and then Kestrel sums up what came in with a notification of its own.
+   */
+  release(): readonly HeldNotifications[];
+}
+
+/**
+ * Connects to the hosts the manifest names under `[network]`, over HTTPS. Requests to any other host are refused, so
+ * the store and Settings can show exactly where an extension connects.
+ */
+export interface Network {
+  fetch(url: string, options?: RequestOptions): Promise<Response>;
+}
+
+export interface RequestOptions {
+  /** `GET` without it. */
+  method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+  headers?: Readonly<Record<string, string>>;
+  /** Sent as is; set `content-type` in `headers`, such as `application/json`. */
+  body?: string;
+  /** Seconds to wait before giving up; 20 without it. */
+  timeout?: number;
+}
+
+/** A whole response, up to 4 MB. A request that can't reach the host rejects instead. */
+export interface Response {
+  readonly status: number;
+  /** Whether the status is 200 to 299. */
+  readonly ok: boolean;
+  /** Header names in lowercase. */
+  readonly headers: Readonly<Record<string, string>>;
+  readonly text: string;
+  /** The body read as JSON. It throws when it isn't. */
+  json<Value = unknown>(): Value;
+}
 
 export interface Helper {
   /**
@@ -954,6 +1075,8 @@ export interface Manifest {
   shortcuts?: ShortcutDescription[];
   /** A native program in the extension's folder that {@link Helper} starts. */
   helper?: { path: string };
+  /** The hosts {@link Network} may connect to, such as `api.example.com`, or `localhost:8787` while developing. */
+  network?: { hosts: string[] };
   /**
    * The id of an extension this one takes the place of. Once both are installed, Kestrel carries that one's settings
    * over to this one's, keeps this one off if that one was, and removes that one.

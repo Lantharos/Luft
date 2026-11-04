@@ -171,6 +171,9 @@ class KestrelUi {
       addPopup: actor => context.layoutManager.addTopChrome(actor),
       removePopup: actor => context.layoutManager.removeChrome(actor),
       dismissSurfaces: () => this.dismissImmediately(),
+      showNotifications: () => {
+        if (this.surfaces.active !== 'notifications') this.toggleSurface('notifications');
+      },
       type: text => {
         if (context.inputMethod.currentFocus) context.inputMethod.commit(text);
         else clipboard.pasteWithoutKeeping(text);
@@ -357,7 +360,7 @@ class KestrelUi {
     const primary = this.context.layoutManager.primaryMonitor;
     this.panels.showCorner(!!primary && !taskbarPreferences.on(primary.index).shown && available && !this.taskView.visible && !this.board.shown && !covered.has(primary.index));
     this.liveWallpaper.sync(available && !this.taskView.visible && !this.board.shown);
-    this.extensions.syncDesktop(available && !this.taskView.visible && !this.board.shown, available);
+    this.extensions.syncDesktop(available && !this.taskView.visible && !this.board.shown, available, this.context.sessionMode.isLocked || !!this.context.screenShield?.active);
     if (!available) this.dismissImmediately();
   }
 

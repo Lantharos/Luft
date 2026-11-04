@@ -75,12 +75,14 @@ impl Declared {
     }
 }
 
-/// What an extension asks for: permissions from the extension API, and
-/// whether it runs a program of its own.
+/// What an extension asks for: permissions from the extension API, whether
+/// it runs a program of its own, and the hosts it connects to.
 #[derive(Deserialize, Serialize, Clone, PartialEq, Eq, Debug, Type)]
 pub struct ExtensionAccess {
     pub permissions: Vec<String>,
     pub helper: bool,
+    #[serde(default)]
+    pub network: Vec<String>,
 }
 
 impl ExtensionAccess {
@@ -91,6 +93,7 @@ impl ExtensionAccess {
                 .permissions
                 .iter()
                 .any(|permission| !before.permissions.contains(permission))
+            || self.network.iter().any(|host| !before.network.contains(host))
     }
 }
 

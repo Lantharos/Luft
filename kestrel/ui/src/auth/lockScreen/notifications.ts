@@ -9,6 +9,7 @@ import { styleSurface } from '../../appearance/kestrelGlass.js';
 import { fixMarkup } from '../../core/runtime/util.js';
 import { MprisSource, type MprisPlayer } from '../../surfaces/notifications/tray/mpris.js';
 import { MediaMessage } from '../../surfaces/notifications/tray/messageList.js';
+import { notificationHolds } from '../../surfaces/notifications/tray/holds.js';
 
 const LOCK_SCREEN_PREVIEWS = 3;
 
@@ -198,7 +199,7 @@ export class NotificationsBox extends St.BoxLayout {
   }
 
   private wakeUpScreenForSource(source: Source): void {
-    if (!this.settings.get_boolean('show-banners')) return;
+    if (!this.settings.get_boolean('show-banners') || notificationHolds.active) return;
     if (this.sources.get(source)?.sourceBox.visible) this.emit('wake-up-screen');
   }
 

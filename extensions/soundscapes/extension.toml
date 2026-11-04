@@ -3,7 +3,7 @@ name = "Soundscapes"
 description = "Forest, café, fire, waves, rain and soft noise, mixed the way you like them, to focus or fall asleep to."
 version = "1.0.0"
 api = 1
-permissions = ["sounds", "media", "quick-settings", "popups"]
+permissions = ["sounds", "locked-sounds", "media", "calls", "quick-settings", "popups"]
 
 [[settings]]
 key = "volume"
@@ -33,4 +33,10 @@ options = [
 key = "pause-for-media"
 type = "switch"
 label = "pause-for-media"
+default = true
+
+[[settings]]
+key = "pause-for-calls"
+type = "switch"
+label = "pause-for-calls"
 default = true

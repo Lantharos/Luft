@@ -11,10 +11,12 @@ export class DesktopState {
   private listeners = new Set<() => void>();
   wallpaperShown = false;
   active = false;
+  locked = false;
 
-  update(wallpaperShown: boolean, active: boolean): void {
+  update(wallpaperShown: boolean, active: boolean, locked: boolean): void {
     this.wallpaperShown = wallpaperShown;
     this.active = active;
+    this.locked = locked;
     for (const listener of [...this.listeners]) listener();
   }
 
@@ -48,6 +50,8 @@ export interface ExtensionHost {
   removePopup(actor: Clutter.Actor): void;
   /** Closes Kestrel's own surfaces and menus, before a panel opens. */
   dismissSurfaces(): void;
+  /** Opens the notification center. */
+  showNotifications(): void;
   /** Types text into what has the keyboard, or pastes it where nothing takes typed text. */
   type(text: string): void;
 }

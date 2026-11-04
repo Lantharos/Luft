@@ -1,10 +1,13 @@
-import * as Main from '../../../core/main.js';
-import * as MessageTray from '../../../surfaces/notifications/tray/messageTray.js';
-import type { ApiContext } from './context.js';
-import { resolveIcon } from './icons.js';
-import type { NotificationOptions, Notifications } from './types.js';
+import * as Main from '../../../../core/main.js';
+import * as MessageTray from '../../../../surfaces/notifications/tray/messageTray.js';
+import type { ApiContext } from '../context.js';
+import { resolveIcon } from '../icons.js';
+import type { NotificationOptions, Notifications } from '../types.js';
 
 const SOURCE_ICON = 'application-x-addon-symbolic';
+
+/** Which extension sent through each source, so its own notifications pass its holds. */
+export const sourceOwners = new WeakMap<MessageTray.Source, string>();
 
 export function notificationsApi(context: ApiContext): Notifications {
   const { scope } = context;
@@ -12,11 +15,16 @@ export function notificationsApi(context: ApiContext): Notifications {
   const sourceFor = (): MessageTray.Source => {
     if (source) return source;
     const created = source = new MessageTray.Source({ title: context.name, iconName: SOURCE_ICON });
+    sourceOwners.set(created, context.manifest.id);
+    let alive = true;
     created.connect('destroy', () => {
+      alive = false;
       if (source === created) source = null;
     });
+    scope.disposable(() => {
+      if (alive) created.destroy();
+    });
     Main.messageTray.add(created);
-    scope.disposable(() => created.destroy());
     return created;
   };
   return {

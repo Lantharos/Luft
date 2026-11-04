@@ -921,6 +921,7 @@ export type Extension = {
 	state: string,
 	problem: string,
 	permissions: string[],
+	network: string[],
 	settings: ExtensionSetting[],
 	shortcuts: ExtensionShortcut[],
 	page: boolean,

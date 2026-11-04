@@ -51,6 +51,8 @@ export async function run() {
     await request('Remove', PROBE);
     for (const key of ['disabled-extensions', 'extension-problems']) kestrel.reset(key);
     GLib.unlink(STATE);
+    delete (globalThis as {probe?: unknown}).probe;
+    delete (globalThis as {probeLoads?: unknown}).probeLoads;
   }
 }
 

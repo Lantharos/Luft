@@ -12,7 +12,10 @@ const MESSAGE = /^[a-zA-Z][\w-]*$/;
 const HEX = /^#[0-9a-f]{6}$/i;
 const PERMISSIONS: readonly Permission[] = [
   'wallpaper', 'quick-settings', 'taskbar', 'search', 'notifications', 'weather', 'location', 'media', 'popups', 'typing', 'sounds', 'audio-levels',
+  'calls', 'locked-sounds', 'do-not-disturb',
 ];
+const NEEDS: Partial<Record<Permission, Permission>> = { 'locked-sounds': 'sounds' };
+const HOST = /^(localhost|127\.0\.0\.1|[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+)(:\d{1,5})?$/;
 const PAGES: Record<SettingsPageId, readonly Permission[]> = {
   appearance: ['wallpaper'],
   taskbar: ['taskbar'],
@@ -154,6 +157,18 @@ function helper(source: Table): Manifest['helper'] {
   return { path };
 }
 
+function network(source: Table): Manifest['network'] {
+  if (source.network === undefined) return undefined;
+  const hosts = list(table(source.network, 'network'), 'hosts', 'network');
+  if (!hosts.length) fail('network.hosts names no hosts');
+  return {
+    hosts: hosts.map((host, index) => {
+      if (typeof host !== 'string' || !HOST.test(host)) fail(`network.hosts[${index}] must be a host name such as api.example.com`);
+      return host;
+    }),
+  };
+}
+
 function shortcut(entry: unknown, index: number): ShortcutDescription {
   const where = `shortcuts[${index}]`;
   const source = table(entry, where);
@@ -183,6 +198,10 @@ export function parseManifest(source: string): Manifest {
     if (!PERMISSIONS.includes(permission as Permission)) fail(`it asks for an unknown permission, ${String(permission)}`);
     return permission as Permission;
   });
+  for (const permission of permissions) {
+    const needed = NEEDS[permission];
+    if (needed && !permissions.includes(needed)) fail(`${permission} needs the ${needed} permission too`);
+  }
   const settings = list(document, 'settings', 'manifest').map((entry, index) => setting(entry, index, permissions));
   dependencies(settings);
   return {
@@ -195,6 +214,7 @@ export function parseManifest(source: string): Manifest {
     settings,
     shortcuts: shortcuts(document),
     helper: helper(document),
+    network: network(document),
     replaces: document.replaces === undefined ? undefined : text(document, 'replaces', 'manifest', ID),
   };
 }

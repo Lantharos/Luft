@@ -19,7 +19,10 @@ export const PERMISSIONS: Record<string, string> = {
 	popups: 'settings-extensions-permission-popups',
 	typing: 'settings-extensions-permission-typing',
 	sounds: 'settings-extensions-permission-sounds',
-	'audio-levels': 'settings-extensions-permission-audio-levels'
+	'audio-levels': 'settings-extensions-permission-audio-levels',
+	calls: 'settings-extensions-permission-calls',
+	'locked-sounds': 'settings-extensions-permission-locked-sounds',
+	'do-not-disturb': 'settings-extensions-permission-do-not-disturb'
 };
 
 export function summary(extension: Extension): string {

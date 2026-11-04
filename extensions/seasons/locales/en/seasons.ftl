@@ -30,7 +30,7 @@ accent = Accent color
 visible = Show on the desktop
     .description = Rain and snow land on windows and the taskbar
 sound = Sound
-    .description = Recorded rain while it rains, with thunder in storms. Keeps playing behind windows
+    .description = Recorded rain while it rains, with thunder in storms. Keeps playing behind windows, and goes quiet during calls
 # Screen-reader label of the rain volume slider, and its title in Settings
 volume = Rain volume
 # Sections of the Settings page

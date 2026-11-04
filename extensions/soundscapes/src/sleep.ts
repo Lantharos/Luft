@@ -2,15 +2,16 @@ import type { Disposable, Extension } from '@luft/extension-api';
 
 import type { Player } from './player.js';
 
-type Granted = 'sounds';
+type Granted = 'sounds' | 'locked-sounds';
 
 const DEADLINE = 'sleep-at';
 const FADE_MS = 60_000;
 const MINUTE_MS = 60_000;
 
 /**
- * Stops playing after the minutes the sleep timer is set to, fading out over the last minute. The time it stops at is
- * kept, so pausing and playing again before then keeps counting toward it.
+ * Stops playing after the minutes the sleep timer is set to, fading out over the last minute, and keeps playing while
+ * the screen locks until then. The time it stops at is kept, so pausing and playing again before then keeps counting
+ * toward it.
  */
 export class SleepTimer {
   private timers: Disposable[] = [];
@@ -45,8 +46,9 @@ export class SleepTimer {
       this.extension.storage.set(DEADLINE, deadline);
     }
     const left = deadline - now;
-    const { timers } = this.extension;
+    const { timers, lockedSounds } = this.extension;
     this.timers = [
+      lockedSounds.keep(),
       timers.timeout(Math.max(0, left - FADE_MS), () => this.player.fallAsleep(Math.min(FADE_MS, deadline - Date.now()))),
       timers.timeout(left, () => {
         this.extension.storage.delete(DEADLINE);

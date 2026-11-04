@@ -23,8 +23,8 @@ export class Extensions {
     this.service = new ExtensionsService(this.manager);
   }
 
-  syncDesktop(wallpaperShown: boolean, active: boolean): void {
-    this.desktop.update(wallpaperShown, active);
+  syncDesktop(wallpaperShown: boolean, active: boolean, locked: boolean): void {
+    this.desktop.update(wallpaperShown, active, locked);
   }
 
   monitorsChanged(): void {

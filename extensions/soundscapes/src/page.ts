@@ -47,7 +47,7 @@ export function describePage(soundscapes: Soundscapes): void {
         onChanged: (level: number) => player.setLevel(sound, level),
       })),
     },
-    { title: t('playback'), items: [{ setting: 'volume' }, { setting: 'sleep-timer' }, { setting: 'pause-for-media' }] },
+    { title: t('playback'), items: [{ setting: 'volume' }, { setting: 'sleep-timer' }, { setting: 'pause-for-media' }, { setting: 'pause-for-calls' }] },
   ]);
   soundscapes.onChanged(() => extension.settingsPage.refresh());
 }

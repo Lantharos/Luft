@@ -26,6 +26,8 @@ Everything an extension adds returns a `Disposable` with `dispose()`, to take it
 | `settings.set(key, value)` | Changes a declared setting; Settings shows the change at once. A value that doesn't fit throws |
 | `settings.onChanged(changed)` | Runs `changed(key)` when a setting changes, here or in Settings |
 | `storage.get(key)`, `storage.set(key, value)`, `storage.delete(key)`, `storage.keys()` | Values it keeps for itself, anything JSON holds, up to 1 MB in all. They're written soon after a change and when it's turned off |
+| `secrets.get(key)`, `secrets.set(key, secret)`, `secrets.delete(key)` | Passwords and sign-in tokens, kept encrypted in the keyring. `get` resolves to `null` when there's none. They're deleted with the extension |
+| `peers.handle(name, answer)`, `peers.request(id, name, value?)`, `peers.handles(id, name)`, `peers.onChanged(changed)` | Requests between extensions, see [peers](#peers) |
 | `timers.timeout(ms, callback)`, `timers.interval(ms, callback)` | Timers that stop with the extension |
 | `session.active`, `session.onChanged(changed)` | Whether someone is using the desktop: signed in and not locked |
 | `desktop.wallpaperVisible`, `desktop.onChanged(changed)` | Whether the wallpaper shows anywhere: windows leave some uncovered, nothing is full screen, the screen isn't locked |
@@ -149,7 +151,7 @@ An extension that declares `[[shortcuts]]` gets `shortcuts.onActivated(key, acti
 | `loop` | Plays it again from the start without a gap until it's stopped |
 | `fadeIn` | Milliseconds to fade in over |
 
-Everything an extension plays goes through one stream with its name, which people can turn down in Sound settings, and goes quiet while the screen is locked. `sounds.volume` sets the volume of all of it. Files are decoded once and kept while they play, so keep loops to a minute or so.
+Everything an extension plays goes through one stream with its name, which people can turn down in Sound settings, and goes quiet while the screen is locked. With `locked-sounds`, `lockedSounds.keep()` keeps it playing while the screen is locked until it's disposed, for sounds people expect to keep hearing, such as ones to fall asleep to. `sounds.volume` sets the volume of all of it. Files are decoded once and kept while they play, so keep loops to a minute or so.
 
 ## audioLevels
 
@@ -195,6 +197,41 @@ ext.settingsPage.describe(() => [
   { title: 'Look', items: [{ setting: 'style' }, { setting: 'color' }] },
   { title: 'Saved', items: (ext.storage.get('saved') ?? []).map(name => ({ type: 'row', title: name })) },
 ]);
+```
+
+## calls
+
+`calls.active` says whether people are in a call: an app records from the microphone or films with the camera. Luft's own dictation doesn't count. `calls.microphone` and `calls.camera` say which, and `calls.onChanged(changed)` runs when a call starts or ends. A call ends a few seconds after both are let go, so it doesn't end while an app switches devices.
+
+```js
+ext.calls.onChanged(() => (ext.sounds.volume = ext.calls.active ? 0 : 1));
+```
+
+## doNotDisturb
+
+`doNotDisturb.hold()` holds back other notifications' banners and sounds until the hold ends, the way Do Not Disturb does, such as during a work session. Urgent notifications, apps people let through Do Not Disturb and the extension's own notifications still show, and what comes in waits in the notification center. The hold has `held`, a list of `{ app, count }` with the apps that sent something and how many of those are still there, most first, and `onHeld(changed)`. The extension never sees what the notifications say.
+
+`release()` ends the hold and returns `held`, for the extension to sum up itself. Disposing the hold, or the extension being turned off, ends it too, and then Luft sums it up with a notification of its own. `doNotDisturb.holding` and `doNotDisturb.onChanged(changed)` tell whether notifications are held back at all, by Do Not Disturb or any extension.
+
+## network
+
+`network.fetch(url, options?)` sends an HTTPS request to one of the hosts `[network]` names and resolves to the whole response: `status`, `ok`, `headers` with lowercase names, `text` and `json()`. Other hosts are refused. Options are `method`, `headers`, `body` as a string and `timeout` in seconds, 20 without it. Responses are read up to 4 MB, and a request that can't reach the host rejects.
+
+```js
+const response = await ext.network.fetch('https://api.example.com/v1/count', {
+  headers: { authorization: `Bearer ${await ext.secrets.get('token')}` },
+});
+if (response.ok) ext.storage.set('count', response.json().count);
+```
+
+## peers
+
+Extensions can ask each other to do things. `peers.handle(name, answer)` answers requests named `name` with what `answer(value, from)` returns, until disposed. `peers.request(id, name, value?)` asks the extension with that id and resolves to its answer, or rejects when it doesn't run or doesn't handle `name`. `peers.handles(id, name)` says whether it does, and `peers.onChanged(changed)` runs when an extension starts or stops answering something. Values are copies of what JSON holds.
+
+Soundscapes answers `play`, with `{ wasPlaying }`, and `pause`:
+
+```js
+if (ext.peers.handles('com.lantharos.Soundscapes', 'play')) await ext.peers.request('com.lantharos.Soundscapes', 'play');
 ```
 
 ## search

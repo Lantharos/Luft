@@ -24,7 +24,7 @@ custom-mix = Custom mix
 volume = Volume
     .description = How loud all of it plays, next to the levels of each sound
 sleep-timer = Sleep timer
-    .description = Fades out over the last minute, then stops
+    .description = Keeps playing while the screen is locked, then fades out over the last minute and stops
 sleep-off = Off
 sleep-15 = 15 minutes
 sleep-30 = 30 minutes
@@ -32,6 +32,8 @@ sleep-60 = 1 hour
 sleep-90 = 1 hour 30 minutes
 pause-for-media = Pause while other things play
     .description = Music and videos in other apps. It comes back when they stop
+pause-for-calls = Pause during calls
+    .description = While an app uses your microphone or camera. It comes back when the call ends
 
 play = Play
 pause = Pause
@@ -39,6 +41,8 @@ playing = Playing
 paused = Paused
 # Shown under Playing while music or a video in another app has it paused
 held = Waiting while something else plays
+# Shown under Playing while a call has it paused
+held-call = Waiting until your call ends
 # $time is a time of day such as 23:40
 stops-at = Stops at { $time }
 mixer = Mixer

@@ -167,11 +167,17 @@ pub fn extension_access(access: &ExtensionAccess) -> Vec<String> {
                 "typing" => "Type into other apps",
                 "sounds" => "Play sounds",
                 "audio-levels" => "Follow the beat of what's playing",
+                "calls" => "Know when you're in a call",
+                "locked-sounds" => "Keep playing sounds while the screen is locked",
+                "do-not-disturb" => "Hold back notifications for a while",
                 other => other,
             }
             .to_owned()
         })
         .collect();
+    if !access.network.is_empty() {
+        lines.push(format!("Connect to {}", access.network.join(", ")));
+    }
     if access.helper {
         lines.push("Runs its own program".to_owned());
     }

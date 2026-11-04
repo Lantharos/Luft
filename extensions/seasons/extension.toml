@@ -3,7 +3,7 @@ name = "Seasons"
 description = "Rain, snow, autumn leaves, fireflies, mist or pictures of your own falling over the wallpaper, as you choose or as the weather and season are where you are."
 version = "1.0.0"
 api = 1
-permissions = ["wallpaper", "quick-settings", "weather", "sounds"]
+permissions = ["wallpaper", "quick-settings", "weather", "sounds", "calls"]
 replaces = "com.lantharos.Rain"
 
 [[settings]]

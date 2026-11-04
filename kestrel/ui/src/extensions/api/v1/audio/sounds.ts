@@ -1,7 +1,7 @@
 import Shell from 'gi://Shell';
 
 import type { ApiContext } from '../context.js';
-import type { Disposable, Sound, SoundOptions, Sounds } from '../types.js';
+import type { Disposable, LockedSounds, Sound, SoundOptions, Sounds } from '../types.js';
 import { extensionFile } from './files.js';
 
 const ICON = 'application-x-addon-symbolic';
@@ -11,13 +11,39 @@ const VOLUME_FADE_MS = 150;
 const unit = (value: number) => Math.min(1, Math.max(0, Number.isFinite(value) ? value : 0));
 const milliseconds = (value: number | undefined) => Math.max(0, Math.round(value ?? 0));
 
+/** How many times each extension's sounds are kept playing while the screen is locked, and what to tell when that changes. */
+const keptWhileLocked = new WeakMap<ApiContext, { count: number; changed: () => void }>();
+
+function keeping(context: ApiContext) {
+  let kept = keptWhileLocked.get(context);
+  if (!kept) keptWhileLocked.set(context, kept = { count: 0, changed: () => {} });
+  return kept;
+}
+
+export function lockedSoundsApi(context: ApiContext): LockedSounds {
+  return {
+    keep: () => {
+      const kept = keeping(context);
+      kept.count++;
+      kept.changed();
+      return context.scope.disposable(() => {
+        kept.count--;
+        kept.changed();
+      });
+    },
+  };
+}
+
 export function soundsApi(context: ApiContext): Sounds {
   const { scope, host, path, dataPath, name } = context;
   const ended = new Map<number, () => void>();
+  const kept = keeping(context);
   let mix: Shell.SoundMix | null = null;
   let volume = 1;
 
-  const master = () => volume * (host.desktop.active ? 1 : 0);
+  const audible = () => host.desktop.active || (host.desktop.locked && kept.count > 0);
+  const master = () => volume * (audible() ? 1 : 0);
+  kept.changed = () => mix?.set_master(master(), LOCK_FADE_MS);
   const open = (): Shell.SoundMix => {
     if (mix) return mix;
     const created = mix = Shell.SoundMix.new(name, ICON);

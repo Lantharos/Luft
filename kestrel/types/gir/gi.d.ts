@@ -32,6 +32,7 @@ import './pango-1.0.d.ts';
 import './pangocairo-1.0.d.ts';
 import './polkit-1.0.d.ts';
 import './polkitagent-1.0.d.ts';
+import './secret-1.d.ts';
 import './soup-3.0.d.ts';
 import './harfbuzz-0.0.d.ts';
 import './gl-1.0.d.ts';

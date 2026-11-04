@@ -39,6 +39,9 @@
  * have it also track through startup-notification.
  */
 
+#define STEAM_WINDOW_CLASS "steam_app_"
+#define STEAM_FLATPAK "com.valvesoftware.Steam"
+
 struct _ShellWindowTracker
 {
   GObject parent;
@@ -64,6 +67,7 @@ static GParamSpec *props[N_PROPS] = { NULL, };
 enum {
   STARTUP_SEQUENCE_CHANGED,
   TRACKED_WINDOWS_CHANGED,
+  STEAM_GAME_OPENED,
 
   LAST_SIGNAL
 };
@@ -124,6 +128,12 @@ shell_window_tracker_class_init (ShellWindowTrackerClass *klass)
                                                    0,
                                                    NULL, NULL, NULL,
                                                    G_TYPE_NONE, 0);
+  signals[STEAM_GAME_OPENED] = g_signal_new ("steam-game-opened",
+                                             SHELL_TYPE_WINDOW_TRACKER,
+                                             G_SIGNAL_RUN_LAST,
+                                             0,
+                                             NULL, NULL, NULL,
+                                             G_TYPE_NONE, 1, G_TYPE_STRING);
 }
 
 static gboolean
@@ -486,6 +496,86 @@ get_app_from_window_scope (MetaWindow *window)
   return NULL;
 }
 
+static gboolean
+is_steam_game (const char *id)
+{
+  return id[0] != '\0' && strcmp (id, "0") != 0 && strspn (id, "0123456789") == strlen (id);
+}
+
+static gboolean
+may_be_steam_game (MetaWindow *window)
+{
+  const char *sandbox_id = meta_window_get_sandboxed_app_id (window);
+
+  return sandbox_id == NULL || strcmp (sandbox_id, STEAM_FLATPAK) == 0;
+}
+
+static const char *
+steam_game_from_class (MetaWindow *window)
+{
+  const char *wm_class = meta_window_get_wm_class (window);
+  const char *game;
+
+  if (wm_class == NULL || !g_str_has_prefix (wm_class, STEAM_WINDOW_CLASS))
+    return NULL;
+
+  game = wm_class + strlen (STEAM_WINDOW_CLASS);
+  return is_steam_game (game) && may_be_steam_game (window) ? game : NULL;
+}
+
+static char *
+steam_game_from_environment (MetaWindow *window)
+{
+  static const char *const variables[] = { "SteamGameId=", "SteamAppId=" };
+  g_autofree char *path = NULL;
+  g_autofree char *environment = NULL;
+  gsize length;
+  size_t i;
+  pid_t pid = meta_window_get_pid (window);
+
+  if (pid < 1 || !may_be_steam_game (window))
+    return NULL;
+
+  path = g_strdup_printf ("/proc/%d/environ", pid);
+  if (!g_file_get_contents (path, &environment, &length, NULL))
+    return NULL;
+
+  for (i = 0; i < G_N_ELEMENTS (variables); i++)
+    {
+      const char *entry;
+
+      for (entry = environment; entry < environment + length; entry += strlen (entry) + 1)
+        {
+          if (g_str_has_prefix (entry, variables[i]) && is_steam_game (entry + strlen (variables[i])))
+            return g_strdup (entry + strlen (variables[i]));
+        }
+    }
+
+  return NULL;
+}
+
+/*
+ * get_app_from_steam_game:
+ * @window: a #MetaWindow
+ * @game: the Steam game ID the window belongs to
+ *
+ * Finds the app that starts @game. A game without one yet gets a button of
+ * its own from its window, until "steam-game-opened" has made it an app.
+ *
+ * Return value: (transfer full): A newly-referenced #ShellApp
+ */
+static ShellApp *
+get_app_from_steam_game (ShellWindowTracker *tracker,
+                         MetaWindow         *window,
+                         const char         *game)
+{
+  ShellApp *app = shell_app_system_lookup_steam_game (shell_app_system_get_default (), game);
+
+  g_signal_emit (tracker, signals[STEAM_GAME_OPENED], 0, game);
+
+  return app ? g_object_ref (app) : _shell_app_new_for_window (window);
+}
+
 /**
  * get_app_for_window:
  *
@@ -502,6 +592,8 @@ get_app_for_window (ShellWindowTracker    *tracker,
   ShellApp *result = NULL;
   MetaWindow *transient_for;
   const char *startup_id;
+  const char *steam_class_game;
+  g_autofree char *steam_launched_game = NULL;
 
   transient_for = meta_window_get_transient_for (window);
   if (transient_for != NULL)
@@ -524,12 +616,20 @@ get_app_for_window (ShellWindowTracker    *tracker,
   if (meta_window_is_remote (window))
     return _shell_app_new_for_window (window);
 
+  steam_class_game = steam_game_from_class (window);
+  if (steam_class_game != NULL)
+    return get_app_from_steam_game (tracker, window, steam_class_game);
+
   /* Check if the app's WM_CLASS specifies an app; this is
    * canonical if it does.
    */
   result = get_app_from_window_wmclass (window);
   if (result != NULL)
     return result;
+
+  steam_launched_game = steam_game_from_environment (window);
+  if (steam_launched_game != NULL)
+    return get_app_from_steam_game (tracker, window, steam_launched_game);
 
   /* Check if the window was opened from within a sandbox; if this
    * is the case, a corresponding .desktop file is guaranteed to match;

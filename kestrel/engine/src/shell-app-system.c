@@ -22,6 +22,8 @@
 #define RESCAN_TIMEOUT_MS 2500
 #define MAX_RESCAN_RETRIES 6
 
+#define STEAM_GAME_URI "steam://rungameid/"
+
 /* Vendor prefixes are something that can be preprended to a .desktop
  * file name.  Undo this.
  */
@@ -51,6 +53,7 @@ typedef struct _ShellAppSystem
   GHashTable *running_apps;
   GHashTable *id_to_app;
   GHashTable *startup_wm_class_to_id;
+  GHashTable *steam_game_to_id;
   GList *installed_apps;
 
   guint rescan_icons_timeout_id;
@@ -145,6 +148,40 @@ scan_startup_wm_class_to_id (ShellAppSystem *self)
       if (!old_id)
         g_hash_table_insert (self->startup_wm_class_to_id,
                              g_strdup (startup_wm_class), g_strdup (id));
+    }
+}
+
+static char *
+steam_game_launched_by (GAppInfo *info)
+{
+  const char *commandline = g_app_info_get_commandline (info);
+  const char *game = commandline ? strstr (commandline, STEAM_GAME_URI) : NULL;
+
+  if (game == NULL)
+    return NULL;
+
+  game += strlen (STEAM_GAME_URI);
+  return g_strndup (game, strspn (game, "0123456789"));
+}
+
+static void
+scan_steam_game_to_id (ShellAppSystem *self)
+{
+  const GList *l;
+
+  g_hash_table_remove_all (self->steam_game_to_id);
+
+  for (l = shell_app_cache_get_all (shell_app_cache_get_default ()); l != NULL; l = l->next)
+    {
+      GAppInfo *info = l->data;
+      g_autofree char *game = steam_game_launched_by (info);
+
+      if (game == NULL)
+        continue;
+
+      if (g_app_info_should_show (info) || !g_hash_table_contains (self->steam_game_to_id, game))
+        g_hash_table_insert (self->steam_game_to_id,
+                             g_steal_pointer (&game), g_strdup (g_app_info_get_id (info)));
     }
 }
 
@@ -277,6 +314,7 @@ installed_changed (ShellAppCache  *cache,
 
   rescan_icon_theme (self);
   scan_startup_wm_class_to_id (self);
+  scan_steam_game_to_id (self);
 
   g_hash_table_foreach_remove (self->id_to_app, stale_app_remove_func, NULL);
   g_hash_table_foreach (self->running_apps, collect_stale_windows, windows);
@@ -298,6 +336,7 @@ shell_app_system_init (ShellAppSystem *self)
                                            (GDestroyNotify)g_object_unref);
 
   self->startup_wm_class_to_id = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
+  self->steam_game_to_id = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
 
   cache = shell_app_cache_get_default ();
   g_signal_connect (cache, "changed", G_CALLBACK (installed_changed), self);
@@ -312,6 +351,7 @@ shell_app_system_finalize (GObject *object)
   g_hash_table_destroy (self->running_apps);
   g_hash_table_destroy (self->id_to_app);
   g_hash_table_destroy (self->startup_wm_class_to_id);
+  g_hash_table_destroy (self->steam_game_to_id);
   g_list_free_full (self->installed_apps, g_object_unref);
   g_clear_handle_id (&self->rescan_icons_timeout_id, g_source_remove);
 
@@ -465,6 +505,24 @@ shell_app_system_lookup_startup_wmclass (ShellAppSystem *system,
     return NULL;
 
   return shell_app_system_lookup_app (system, id);
+}
+
+/**
+ * shell_app_system_lookup_steam_game:
+ * @system: a #ShellAppSystem
+ * @game: A Steam game ID
+ *
+ * Find the application whose launch command starts @game through Steam.
+ *
+ * Returns: (transfer none) (nullable): A #ShellApp for @game
+ */
+ShellApp *
+shell_app_system_lookup_steam_game (ShellAppSystem *system,
+                                    const char     *game)
+{
+  const char *id = g_hash_table_lookup (system->steam_game_to_id, game);
+
+  return id ? shell_app_system_lookup_app (system, id) : NULL;
 }
 
 void

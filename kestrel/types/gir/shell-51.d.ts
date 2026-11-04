@@ -351,6 +351,8 @@ export namespace Shell {
         lookup_heuristic_basename(id: string): App;
 
         lookup_startup_wmclass(wmclass: string | null): App;
+
+        lookup_steam_game(game: string): App | null;
     }
 
 
@@ -1877,6 +1879,8 @@ export namespace Shell {
         interface SignalSignatures extends GObject.Object.SignalSignatures {
             /** @signal */
             "startup-sequence-changed": (object: Meta.StartupSequence) => void;
+            /** @signal */
+            "steam-game-opened": (object: string) => void;
             /** @signal */
             "tracked-windows-changed": () => void;
             "notify::focus-app": (pspec: GObject.ParamSpec) => void;

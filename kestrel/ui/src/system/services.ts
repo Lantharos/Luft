@@ -9,6 +9,7 @@ import { PasskeyPrompts } from '../auth/passkeys/service.js';
 import { LoginWallpaper } from '../desktop/wallpaper/loginWallpaper.js';
 import { LaunchFeedback } from '../desktop/windows/launchFeedback.js';
 import { OpenWindows } from '../desktop/windows/openWindows.js';
+import { SteamGames } from '../desktop/windows/steamGames.js';
 import { TitleBars } from '../desktop/windows/titleBars/titleBars.js';
 import { VariableRefresh } from '../desktop/windows/variableRefresh.js';
 import { SeeThroughWindows } from '../desktop/windows/seeThrough/seeThrough.js';
@@ -43,6 +44,7 @@ export class SystemServices {
   private readonly recordingSounds = new RecordingSounds();
   private readonly soundService = new SoundService();
   private readonly launchFeedback = new LaunchFeedback();
+  private readonly steamGames = new SteamGames();
   private readonly openWindows = new OpenWindows();
   private readonly variableRefresh = new VariableRefresh();
   private readonly monitorWake = new MonitorWake();
@@ -93,6 +95,7 @@ export class SystemServices {
     this.recordingSounds.destroy();
     this.soundService.destroy();
     this.launchFeedback.destroy();
+    this.steamGames.destroy();
     this.openWindows.destroy();
     this.variableRefresh.destroy();
     this.monitorWake.destroy();

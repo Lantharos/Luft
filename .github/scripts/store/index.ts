@@ -19,7 +19,12 @@ const print = (outputs: Record<string, string>) =>
   );
 
 async function planItem(item: Item, commit: string): Promise<Planned | undefined> {
-  const history = (await releases(item.id)).filter(taken);
+  const all = await releases(item.id);
+  if (!all) {
+    console.error(`::warning::${item.id} has no listing on schelf.store yet, so it waits until seed-lantharos.ts adds it`);
+    return undefined;
+  }
+  const history = all.filter(taken);
   const last = history[0];
   if (last?.commit && sourceKey(last.commit, item.folder) === sourceKey(commit, item.folder)) return undefined;
   return {
@@ -44,7 +49,7 @@ async function plan() {
 }
 
 async function settled({ id, version }: Published, deadline: number): Promise<Release | undefined> {
-  const release = (await releases(id)).find((candidate) => candidate.version === version && candidate.channel === NIGHTLY);
+  const release = (await releases(id))!.find((candidate) => candidate.version === version && candidate.channel === NIGHTLY);
   const listedNow = async () => (await listed(id)).some((candidate) => candidate.version === version);
   if (release && !settling(release) && (!isOut(release) || (await listedNow()))) return release;
   if (Date.now() > deadline) return release;
@@ -72,7 +77,7 @@ async function catalog() {
 }
 
 async function promoteItem(item: Item, version: string) {
-  const history = await releases(item.id);
+  const history = (await releases(item.id))!;
   const stable = history.filter((release) => release.channel === STABLE && taken(release));
   const current = newest(stable.map((release) => release.version));
   if (current && compareVersions(current, version) >= 0) return console.error(`${item.id} has ${current} on ${STABLE} already`);

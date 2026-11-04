@@ -42,10 +42,8 @@ export function sourceKey(commit: string, folder: string) {
   return hash.digest('hex');
 }
 
-export async function changesBetween(since: string | null, until: string, folder: string) {
-  const sources = folderSources(snapshot(until).tree, folder);
-  const range = since ? [`${since}..${until}`] : [until];
-  const subjects = (await $`git log --no-merges --format=%s -n ${NOTES_LIMIT} ${range} -- ${sources}`.text()).trim();
+export async function changesBetween(since: string, until: string, folder: string) {
+  const subjects = (await $`git log --no-merges --format=%s -n ${NOTES_LIMIT} ${since}..${until} -- ${folder}`.text()).trim();
   return subjects ? subjects.split('\n').map((subject) => `- ${subject}`).join('\n') : '';
 }
 

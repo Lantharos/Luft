@@ -22,21 +22,26 @@ async function identity() {
   return ((await response.json()) as { value: string }).value;
 }
 
-async function call<T>(path: string, init: RequestInit = {}) {
-  const response = await fetch(`${API}/${path}`, {
+async function request(path: string, init: RequestInit = {}) {
+  return fetch(`${API}/${path}`, {
     ...init,
     headers: { authorization: `Bearer ${await identity()}`, 'content-type': 'application/json' },
   });
-  if (!response.ok) throw new Error(`schelf.store answered ${response.status} for ${path}: ${await response.text()}`);
+}
+
+async function read<T>(response: Response) {
+  if (!response.ok) throw new Error(`schelf.store answered ${response.status} for ${response.url}: ${await response.text()}`);
   return (await response.json()) as T;
 }
 
 export async function releases(id: string) {
-  return (await call<{ releases: Release[] }>(`${id}/releases`)).releases;
+  const response = await request(`${id}/releases`);
+  if (response.status === 404) return undefined;
+  return (await read<{ releases: Release[] }>(response)).releases;
 }
 
-export function promote(id: string, version: string, channel: string, notes: string) {
-  return call<Release>(`${id}/promote`, { method: 'POST', body: JSON.stringify({ version, channel, notes }) });
+export async function promote(id: string, version: string, channel: string, notes: string) {
+  return read<Release>(await request(`${id}/promote`, { method: 'POST', body: JSON.stringify({ version, channel, notes }) }));
 }
 
 export async function listed(id: string) {

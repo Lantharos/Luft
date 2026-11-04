@@ -1531,7 +1531,7 @@ export namespace Shell {
         // Signal signatures
         interface SignalSignatures extends GObject.Object.SignalSignatures {
             /** @signal */
-            played: (object: string, p0: string | null) => void;
+            played: (object: string, p0: string) => void;
             /** @signal */
             started: (object: string, p0: number) => void;
         }
@@ -1571,7 +1571,11 @@ export namespace Shell {
         static get_default(): SoundPlayer;
 
         // Methods
-        check_file(file: Gio.File, cancellable: Gio.Cancellable | null, callback: Gio.AsyncReadyCallback<null> | null): void;
+        check_file(file: Gio.File, cancellable: Gio.Cancellable | null): globalThis.Promise<boolean>;
+
+        check_file(file: Gio.File, cancellable: Gio.Cancellable | null, callback: Gio.AsyncReadyCallback<this> | null): void;
+
+        check_file(file: Gio.File, cancellable: Gio.Cancellable | null, callback?: Gio.AsyncReadyCallback<this> | null): globalThis.Promise<boolean> | void;
 
         check_file_finish(result: Gio.AsyncResult): boolean;
 

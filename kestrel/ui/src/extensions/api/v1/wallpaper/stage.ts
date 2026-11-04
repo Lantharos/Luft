@@ -1,5 +1,4 @@
 import type Clutter from 'gi://Clutter';
-import Meta from 'gi://Meta';
 import St from 'gi://St';
 
 import { visibleWallpaperMonitors } from '../../../../desktop/panel/coverage.js';
@@ -8,28 +7,7 @@ import { PlaybackConditions } from '../../../../desktop/wallpaper/conditions.js'
 import { reducedMotion } from '../../../../shared/motion/motion.js';
 import type { ExtensionHost } from '../../../host.js';
 import type { LayerOptions, Outline, Rect } from '../types.js';
-
-const SURFACE_TYPES = [Meta.WindowType.NORMAL, Meta.WindowType.DIALOG, Meta.WindowType.MODAL_DIALOG, Meta.WindowType.UTILITY];
-
-function onScreen(window: Meta.Window, workspace: Meta.Workspace): boolean {
-  const actor = window.get_compositor_private() as Meta.WindowActor | null;
-  return !window.minimized && window.showing_on_its_workspace() && window.located_on_workspace(workspace) &&
-    SURFACE_TYPES.includes(window.window_type) && !!actor?.visible && actor.opacity > 0;
-}
-
-function outline(window: Meta.Window): Outline {
-  const { x, y, width, height } = window.get_frame_rect();
-  const [rounded, radius] = window.get_rounded_corners();
-  const corner = (bit: number) => rounded & bit ? radius : 0;
-  return { x, y, width, height, radii: [corner(1), corner(2), corner(4), corner(8)] };
-}
-
-export function stackedWindows(): Outline[] {
-  const workspace = global.workspace_manager.get_active_workspace();
-  return global.display.sort_windows_by_stacking(workspace.list_windows().filter(window => onScreen(window, workspace)))
-    .reverse()
-    .map(outline);
-}
+import { SurfaceWatch } from './surfaces.js';
 
 export interface StagedLayer {
   sync(): void;
@@ -42,8 +20,11 @@ export class LayerStage {
   private readonly shell = St.Settings.get();
   private conditions: PlaybackConditions | null = null;
   private disconnectors: (() => void)[] = [];
+  readonly surfaces: SurfaceWatch;
 
-  constructor(readonly host: ExtensionHost) {}
+  constructor(readonly host: ExtensionHost) {
+    this.surfaces = new SurfaceWatch(host);
+  }
 
   add(layer: StagedLayer): () => void {
     if (!this.layers.size) this.start();
@@ -85,6 +66,7 @@ export class LayerStage {
   }
 
   place(actor: Clutter.Actor, depth: NonNullable<LayerOptions['depth']>): void {
+    actor.get_parent()?.remove_child(actor);
     if (depth === 'below-windows') global.window_group.insert_child_above(actor, this.host.wallpaper);
     else global.window_group.get_parent()!.insert_child_above(actor, global.window_group);
   }

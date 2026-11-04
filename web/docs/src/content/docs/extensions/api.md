@@ -19,8 +19,9 @@ Everything an extension adds returns a `Disposable` with `dispose()`, to take it
 | `t(id, args?)` | A message from its translations, in the desktop's language |
 | `open(uri)` | Opens a web link in the browser, or a file or folder in the app that opens it |
 | `openSettings()` | Opens the extension's page in Settings |
-| `pickFiles({ title, kind, multiple? })` | Lets people pick pictures (`images`) or sounds (`sounds`) with the file chooser, right after they used the extension, such as from a button on its Settings page. Luft keeps copies in `dataPath` and returns their paths, or none when they cancel |
-| `deleteFile(path)` | Deletes a file in `dataPath`, such as a picked picture no longer used |
+| `pickFiles({ title, kind, multiple? })` | Lets people pick pictures (`images`), sounds (`sounds`) or a `folder` with the file chooser, right after they used the extension, such as from a button on its Settings page. Luft keeps copies in `dataPath` and returns their paths, or none when they cancel. A folder comes with the files directly inside it, up to 32 of up to 8 MB each |
+| `deleteFile(path)` | Deletes a file or folder in `dataPath`, such as a picked picture no longer used |
+| `readText(path)` | A text file in the extension's folder or `dataPath`, or `null` when it isn't there |
 | `onDisable(cleanup)` | Runs `cleanup` when the extension is turned off, after everything it made is gone |
 | `settings.get(key)` | A declared setting's value |
 | `settings.set(key, value)` | Changes a declared setting; Settings shows the change at once. A value that doesn't fit throws |
@@ -56,6 +57,28 @@ const layer = ext.wallpaper.addLayer({
   shader: 'layer_color = vec4(glow, glow * 0.6, 0.0, glow) * (1.0 - layer_position.y / layer_size.y);',
   frame: ({ time, displays }) => displays.forEach(display => display.uniform('glow', 0.2 + 0.1 * Math.sin(time))),
 });
+```
+
+### Sprites
+
+`wallpaper.addSprites()` is for a few small things that live on the desktop, where a shader across the screen would be far too much. Sprites sit between the wallpaper and the windows, so windows cover them by themselves, and they take no shader and no frame clock: nothing runs and nothing's drawn until you move one, and then only its own few pixels.
+
+| Member | Is |
+| --- | --- |
+| `loadSheet({ path, cell })` | Cuts a picture of square frames `cell` pixels wide into frames, row by row. Returns a sheet with `columns`, `rows` and `cell`, and throws when the picture can't be read or isn't a whole number of frames |
+| `add(options)` | Adds a sprite: its `sheet`, about how tall it shows as `height`, and optionally `onClick()`, `onPicked()`, `onCarried(point)` and `onDropped(point)`. With `onPicked`, people can pick it up: Luft moves it with the pointer, above the windows, and `point` says the `display`, `x` and `y` of its feet |
+| `dispose()` | Takes them all away |
+
+A sprite has `place({ display, x, y, frame, flipped? })`, which shows it with its feet at that point and only touches what's changed, `describe(label)`, what screen readers call it, and `sizeOn(display)`, its size there. It shows a whole number of screen pixels per pixel of its sheet, the nearest to `height`, so pixel art stays crisp at every display scale. It takes clicks only on what shows of it; the desktop keeps every other pixel.
+
+To know what's where, `wallpaper.surfaces` lists each display with `index`, `primary`, `width`, `height`, `scale`, `fullscreen`, `windows` and `taskbar`. Windows and taskbar pieces are outlines as in `frame.displays`, each with an `id` that lasts as long as it does. `wallpaper.onSurfacesChanged(changed)` runs before the next frame after any of them moved, appeared or went, at most once a frame, and never while nothing changes.
+
+```js
+const sprites = ext.wallpaper.addSprites();
+const sheet = sprites.loadSheet({ path: 'cat.png', cell: 24 });
+const cat = sprites.add({ sheet, height: 48, onClick: () => ext.notifications.send({ title: 'Meow' }) });
+const [{ index, height }] = ext.wallpaper.surfaces;
+cat.place({ display: index, x: 200, y: height, frame: 0 });
 ```
 
 ## quickSettings
@@ -188,6 +211,7 @@ Without anything else, an extension's page in Settings → Extensions lists the 
 | `{ type: 'preview', image, description }` | A picture across the page |
 | `{ type: 'list', items, empty? }` | Rows of `{ title, description?, image?, actions? }`, where actions are `{ label, danger?, onActivate() }` |
 | `{ type: 'text', text }` | A paragraph |
+| `{ type: 'sprite', title, description?, image, cell, columns, frames, rate, checked?, onToggled?, actions? }` | A row with a small animation at its start: `frames` of a sheet of `cell` pixel frames, `columns` wide, looping `rate` times a second, with an optional switch and buttons |
 | `{ type: 'taskbar-place', element }` | Where one of its taskbar elements sits, by its key. People choose it there on a taskbar that's one bar; with separate islands it points them to editing the taskbar |
 
 Images are files in the extension's folder or data folder. Callbacks run in the extension like any other.

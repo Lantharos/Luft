@@ -10,8 +10,10 @@ const PORTAL_PATH = '/org/freedesktop/portal/desktop';
 const CHOOSER = 'org.freedesktop.portal.FileChooser';
 const REQUEST = 'org.freedesktop.portal.Request';
 const PICKED = 'picked';
+const MOST_FOLDER_FILES = 32;
+const LARGEST_FOLDER_FILE = 8 * 1024 * 1024;
 
-const KINDS: Record<PickOptions['kind'], string[]> = {
+const KINDS: Record<Exclude<PickOptions['kind'], 'folder'>, string[]> = {
   images: ['image/png', 'image/webp', 'image/svg+xml', 'image/gif', 'image/jpeg'],
   sounds: ['audio/ogg', 'audio/flac', 'audio/x-wav', 'audio/wav', 'audio/mpeg'],
 };
@@ -34,7 +36,9 @@ function chosen(title: string, options: PickOptions): Promise<string[]> {
       handle_token: GLib.Variant.new_string(token),
       multiple: GLib.Variant.new_boolean(!!options.multiple),
       modal: GLib.Variant.new_boolean(true),
-      filters: new GLib.Variant('a(sa(us))', [[title, KINDS[options.kind].map((type): [number, string] => [1, type])]]),
+      ...options.kind === 'folder'
+        ? { directory: GLib.Variant.new_boolean(true) }
+        : { filters: new GLib.Variant('a(sa(us))', [[title, KINDS[options.kind].map((type): [number, string] => [1, type])]]) },
     };
     bus.call(PORTAL, PORTAL_PATH, CHOOSER, 'OpenFile', new GLib.Variant('(ssa{sv})', ['', title, chooserOptions]),
       null, Gio.DBusCallFlags.NONE, -1, null, (_bus, result) => {
@@ -57,10 +61,42 @@ function copyIn(uri: string, folder: string): string {
   return target;
 }
 
+function regularFiles(folder: Gio.File): Gio.File[] {
+  const children = folder.enumerate_children('standard::name,standard::type,standard::size', Gio.FileQueryInfoFlags.NOFOLLOW_SYMLINKS, null);
+  const files: Gio.File[] = [];
+  for (let info = children.next_file(null); info; info = children.next_file(null)) {
+    if (info.get_file_type() !== Gio.FileType.REGULAR || info.get_size() > LARGEST_FOLDER_FILE) continue;
+    files.push(folder.get_child(info.get_name()));
+  }
+  return files.slice(0, MOST_FOLDER_FILES);
+}
+
+function copyFolderIn(uri: string, folder: string): string {
+  const source = Gio.File.new_for_uri(uri);
+  const target = Gio.File.new_for_path(GLib.build_filenamev([folder, GLib.uuid_string_random()]));
+  target.make_directory(null);
+  for (const file of regularFiles(source)) file.copy(target.get_child(file.get_basename()!), Gio.FileCopyFlags.NONE, null, null);
+  return target.get_path()!;
+}
+
+function remove(file: Gio.File): void {
+  if (file.query_file_type(Gio.FileQueryInfoFlags.NOFOLLOW_SYMLINKS, null) === Gio.FileType.DIRECTORY) {
+    const children = file.enumerate_children('standard::name', Gio.FileQueryInfoFlags.NOFOLLOW_SYMLINKS, null);
+    for (let info = children.next_file(null); info; info = children.next_file(null)) remove(file.get_child(info.get_name()));
+  }
+  file.delete(null);
+}
+
 export function deleteFile(context: ApiContext, path: string): void {
   const file = extensionFile([context.dataPath], path);
   if (file.equal(Gio.File.new_for_path(context.dataPath))) throw new Error("The data folder itself can't be deleted");
-  file.delete(null);
+  remove(file);
+}
+
+export function readText(context: ApiContext, path: string): string | null {
+  const file = extensionFile([context.path, context.dataPath], path);
+  if (!file.query_exists(null)) return null;
+  return new TextDecoder().decode(file.load_contents(null)[1]);
 }
 
 /** Lets people pick files through the file chooser, and keeps copies of them in the extension's data folder. */
@@ -69,5 +105,5 @@ export async function pickFiles(context: ApiContext, options: PickOptions): Prom
   const uris = await chosen(options.title, options);
   const folder = GLib.build_filenamev([context.dataPath, PICKED]);
   GLib.mkdir_with_parents(folder, 0o700);
-  return uris.map(uri => copyIn(uri, folder));
+  return uris.map(uri => options.kind === 'folder' ? copyFolderIn(uri, folder) : copyIn(uri, folder));
 }

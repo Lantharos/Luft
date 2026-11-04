@@ -9,7 +9,7 @@ Extensions add to Kestrel: layers over the wallpaper, quick settings tiles, task
 | `kestrel/ui/src/extensions/service.ts` | The D-Bus interface below |
 | `kestrel/engine/src/sound` | `ShellSoundMix`, which plays an extension's sounds, and `ShellAudioMonitor`, which measures what the computer plays |
 | `packages/extension-api` | `@luft/extension-api`, the types for extension authors, written from `types.ts` by `bun kestrel/ui/extensionApi.ts`. `bun run check` in `kestrel/ui` fails when it's out of date |
-| `extensions` | Lantharos's own extensions, such as Seasons, Focus and Pult. Each has a `build.sh` that makes its folder, which `extensions/pack.sh` packs for schelf.store |
+| `extensions` | Lantharos's own extensions, such as Seasons, Strays, Focus and Pult. Each has a `build.sh` that makes its folder, which `extensions/pack.sh` packs for schelf.store |
 | `apps/settings/src/lib/panels/personalization/extensions` | Settings → Extensions, each extension's page, and its rows on other pages |
 
 ## On disk
@@ -105,7 +105,7 @@ Each entry of `List` has `id`, `name` and `description` (translated), `version`,
 
 ## Settings pages
 
-An extension's page in Settings lists its declared settings. One that calls `settingsPage.describe` gets a page of its own instead: Kestrel calls its builder when Settings asks with `Page`, turns the sections into JSON, checks every image against the extension's folders, and replaces each callback with an `action` id. Settings draws the page with its own controls and sends `Act` with that id and the new value. Nothing an extension describes runs in Settings, so it can't break Settings or reach into it. While the extension is off, the page lists its declared settings.
+An extension's page in Settings lists its declared settings. One that calls `settingsPage.describe` gets a page of its own instead: Kestrel calls its builder when Settings asks with `Page`, turns the sections into JSON, checks every image against the extension's folders, and replaces each callback with an `action` id. A `sprite` row plays frames of a sprite sheet in a loop beside its title, with Settings doing the animating, which stops with reduced motion. Settings draws the page with its own controls and sends `Act` with that id and the new value. Nothing an extension describes runs in Settings, so it can't break Settings or reach into it. While the extension is off, the page lists its declared settings.
 
 ## Shortcuts
 
@@ -137,7 +137,17 @@ Where an element sits is the person's choice, never the extension's. They drag i
 
 ## Wallpaper layers
 
-Each frame, a layer gets the windows on each display, topmost first, and the taskbar as outlines: their rectangles with the radius of every rounded corner, which Mutter reports through `meta_window_get_rounded_corners()` and the taskbar takes from its own shape, so a taskbar in islands is one outline for each island. A layer can name picture atlases; `setPictures` packs up to eight pictures, and the frames of animated GIF and WebP pictures, into one texture of 128-pixel cells, which the shader samples. Pictures people pick come through the file chooser portal with `pickFiles`, which only works right after the person used the extension and keeps copies in its data folder.
+Each frame, a layer gets the windows on each display, topmost first, and the taskbar as outlines: their rectangles with the radius of every rounded corner, which Mutter reports through `meta_window_get_rounded_corners()` and the taskbar takes from its own shape, so a taskbar in islands is one outline for each island. A layer can name picture atlases; `setPictures` packs up to eight pictures, and the frames of animated GIF and WebP pictures, into one texture of 128-pixel cells, which the shader samples. Pictures people pick come through the file chooser portal with `pickFiles`, which only works right after the person used the extension and keeps copies in its data folder. Picking a `folder` copies the files directly inside it, up to 32 of up to 8 MB each, into a new folder there, and `readText` reads text files back.
+
+## Sprites
+
+A shader layer suits what fills the screen. `wallpaper.addSprites` is for a few small things instead, such as Strays' creatures: each sprite is one small actor between the wallpaper and the windows, so windows cover it by themselves, rounded corners and all, and moving it damages only its own few pixels. There's no shader, no frame clock and no timeline; a sprite that isn't told to change costs nothing, and `place` only touches what differs from the last call.
+
+`loadSheet` cuts a picture into frames, each kept twice as a texture, as drawn and mirrored, with what shows of it. A sprite shows a whole number of screen pixels for each pixel of its sheet, the nearest to the `height` asked for, and snaps to screen pixels, so pixel art stays crisp at any display scale. Actors are filtered with nearest neighbour.
+
+A sprite takes clicks only on what shows of its current frame, through a `vfunc_pick` around those pixels, so the desktop keeps every other pixel. A press takes the stage's grab; past a few pixels of movement the sprite is picked up, moves above the windows and follows the pointer, and it goes back below them when it's let go. A press that doesn't move is a click. Sprites hide while the wallpaper doesn't show, such as in the task view and on the lock screen.
+
+`wallpaper.surfaces` reads windows and the taskbar on demand, each with an id that lasts as long as it does, the display's scale and whether something runs full screen. `onSurfacesChanged` connects to each window, workspace switches, displays and the taskbar's layout, only while an extension listens, and calls listeners once before the next frame, so nothing runs while nothing moves.
 
 ## Sound
 

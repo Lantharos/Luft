@@ -3,6 +3,7 @@ import St from 'gi://St';
 
 import { edgeOf, type Arrangement, type Spot } from '../../../../../../packages/web/ui/src/taskbar/arrangement/index';
 import { isVertical, type Edge } from '../../../shared/layout/edge.js';
+import { taskbarShapesChanged } from './shapes.js';
 
 export interface Island {
   spot: Spot;
@@ -76,6 +77,7 @@ export class IslandSet {
   private create(spot: Spot, below: Clutter.Actor): Island {
     const box = new St.BoxLayout({ style_class: 'kestrel-taskbar', x_align: Clutter.ActorAlign.CENTER, y_align: Clutter.ActorAlign.CENTER });
     const actor = new St.Bin({ child: box });
+    actor.connect('notify::allocation', taskbarShapesChanged);
     this.panel.insert_child_below(actor, below);
     return { spot, edge: edgeOf(spot), actor, box, elements: [] };
   }

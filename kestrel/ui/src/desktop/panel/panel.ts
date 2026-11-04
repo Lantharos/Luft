@@ -24,7 +24,7 @@ import { EDGE_MARGIN, NO_DEPTHS, type Anchor, type Depths } from '../../shared/l
 import { t } from '../../shared/i18n/index.js';
 import { TaskbarElements } from './elements/panelElements.js';
 import { IslandSet, type Island } from './islands/islandSet.js';
-import { IslandShapes, type IslandShape } from './islands/shapes.js';
+import { IslandShapes, type IslandShape, taskbarShapesChanged } from './islands/shapes.js';
 import { PanelTablet } from './tablet/panelTablet.js';
 import { alongOf, moveBar } from '../../../../../packages/web/ui/src/taskbar/arrangement/index';
 
@@ -101,6 +101,7 @@ export class KestrelPanel {
     });
     this.actor.add_child(this.peek.actor);
     this.actor.add_child(this.layout.glide);
+    this.actor.connect('notify::allocation', taskbarShapesChanged);
     for (const edge of ['bottom', 'left', 'top', 'right'] as const) this.struts.set(edge, new St.Widget());
     this.autoHide = new AutoHide(this.actor, () => this.monitor, () => this.tablet.rest, () => this.sliders);
     this.launcher = createLauncher(actions.start, this.screen.metrics.button,

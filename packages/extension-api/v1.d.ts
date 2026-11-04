@@ -95,8 +95,10 @@ export interface Basics {
    * when they cancel, so the extension never depends on where the files were.
    */
   pickFiles(options: PickOptions): Promise<string[]>;
-  /** Deletes a file in {@link dataPath}, such as a picked file people no longer use. */
+  /** Deletes a file or folder in {@link dataPath}, such as something picked that people no longer use. */
   deleteFile(path: string): void;
+  /** Reads a text file in the extension's folder or {@link dataPath}, such as a manifest in a folder people picked. Returns `null` when it isn't there. */
+  readText(path: string): string | null;
   /** Runs `cleanup` when the extension is turned off, after everything it made through this API is gone. */
   onDisable(cleanup: () => void): Disposable;
 }
@@ -170,8 +172,11 @@ export interface Appearance {
 export interface PickOptions {
   /** What the file chooser says it's for, in the language Kestrel uses. */
   title: string;
-  /** Pictures (PNG, WebP, SVG, GIF or JPEG) or sounds (Ogg, FLAC, WAV or MP3). */
-  kind: 'images' | 'sounds';
+  /**
+   * Pictures (PNG, WebP, SVG, GIF or JPEG), sounds (Ogg, FLAC, WAV or MP3), or a folder of up to 32 files of up to 8 MB
+   * each, without the folders inside it, for something that's several files together.
+   */
+  kind: 'images' | 'sounds' | 'folder';
   /** Lets people pick several at once. */
   multiple?: boolean;
 }
@@ -228,9 +233,118 @@ export interface Outline extends Rect {
   radii: readonly [number, number, number, number];
 }
 
+/** A window or a piece of the taskbar, with an id that stays the same while it moves or changes size. */
+export interface Surface extends Outline {
+  /** Stays the same for as long as the window or piece of the taskbar exists. */
+  id: string;
+}
+
 export interface Wallpaper {
   /** Draws a shader across each display, over the wallpaper. */
   addLayer(layer: LayerOptions): Layer;
+  /**
+   * Adds small pictures that live on the desktop, between the wallpaper and the windows, and that people can pick up.
+   * They only take clicks on what shows of them; the desktop keeps every other pixel.
+   * Each one costs nothing until it's told to change: unlike a layer, they run no shader and no frame clock, and only
+   * the few pixels a sprite changes get drawn again.
+   */
+  addSprites(): Sprites;
+  /** What's on each display right now, read when asked. */
+  readonly surfaces: readonly SurfaceDisplay[];
+  /**
+   * Runs `changed` before the next frame after windows or the taskbar moved, changed size, appeared or went, or the
+   * displays changed, at most once a frame. Nothing runs while nothing changes.
+   */
+  onSurfacesChanged(changed: () => void): Disposable;
+}
+
+export interface SurfaceDisplay {
+  /** Which display this is, as Kestrel numbers them. */
+  readonly index: number;
+  readonly primary: boolean;
+  readonly width: number;
+  readonly height: number;
+  /** How many of the screen's own pixels one pixel here takes up, such as 1.5 at 150%. */
+  readonly scale: number;
+  /** Whether a window runs full screen here. */
+  readonly fullscreen: boolean;
+  /** Windows on this display, topmost first, relative to its top left corner. */
+  readonly windows: readonly Surface[];
+  /** What shows of the taskbar, relative to the display's top left corner: the bar, or each island of a taskbar in islands. */
+  readonly taskbar: readonly Surface[];
+}
+
+export interface SpriteSheetOptions {
+  /** A picture in the extension's folders, PNG, WebP or JPEG, of square frames in a grid, read row by row. */
+  path: string;
+  /** A frame's width and height in the picture's own pixels. Its size must be a whole number of frames each way. */
+  cell: number;
+}
+
+/** A picture cut into frames. Frames count from the top left, row by row. */
+export interface SpriteSheet {
+  readonly columns: number;
+  readonly rows: number;
+  /** A frame's width and height in the picture's own pixels. */
+  readonly cell: number;
+}
+
+/** Where a sprite shows, by the middle of its bottom edge, and what it looks like there. */
+export interface SpritePlace {
+  /** The display, as in {@link SurfaceDisplay.index}. */
+  display: number;
+  /** Pixels from the display's left edge to the sprite's middle. */
+  x: number;
+  /** Pixels from the display's top edge to the sprite's feet. */
+  y: number;
+  /** Which frame of its sheet shows. */
+  frame: number;
+  /** Mirrors it, to face the other way. */
+  flipped?: boolean;
+}
+
+export interface SpriteOptions {
+  sheet: SpriteSheet;
+  /**
+   * About how tall it shows, in pixels. Kestrel takes the nearest whole number of screen pixels for each pixel of the
+   * sheet on each display, so the picture stays crisp at every display scale; {@link Sprite.sizeOn} says what that came to.
+   */
+  height: number;
+  /** Runs when someone clicks or taps it without moving it. */
+  onClick?(): void;
+  /**
+   * Runs when someone starts dragging it. Kestrel moves it with the pointer, above the windows, until it's dropped.
+   * Without this people can't pick it up.
+   */
+  onPicked?(): void;
+  /** Runs as it's carried, with where its feet are. */
+  onCarried?(point: SpritePoint): void;
+  /** Runs when it's let go, with where its feet are. It's back below the windows, and stays there until placed. */
+  onDropped?(point: SpritePoint): void;
+}
+
+export interface SpritePoint {
+  display: number;
+  x: number;
+  y: number;
+}
+
+export interface Sprites extends Disposable {
+  /**
+   * Cuts a picture into frames, or throws when it can't be read or isn't a whole number of frames. Sheets stay in
+   * memory until {@link Sprites.dispose}, so reuse one.
+   */
+  loadSheet(options: SpriteSheetOptions): SpriteSheet;
+  add(options: SpriteOptions): Sprite;
+}
+
+export interface Sprite extends Disposable {
+  /** Shows it there. Only what differs from the last call does anything, so keeping a resting sprite costs nothing. */
+  place(place: SpritePlace): void;
+  /** Says what screen readers call it, such as what it's doing. */
+  describe(label: string): void;
+  /** Its width and height on a display, in pixels. */
+  sizeOn(display: number): number;
 }
 
 export interface LayerOptions {
@@ -979,7 +1093,7 @@ export interface PageSection {
  */
 export type PageItem =
   | { setting: string }
-  | PageRow | PageSwitch | PageChoice | PageSlider | PageButton | PageEntry | PagePreview | PageList | PageTaskbarPlace | { type: 'text'; text: string };
+  | PageRow | PageSwitch | PageChoice | PageSlider | PageButton | PageEntry | PagePreview | PageSprite | PageList | PageTaskbarPlace | { type: 'text'; text: string };
 
 /**
  * Where one of the extension's taskbar elements sits, chosen by people, never by the extension. On a taskbar that's
@@ -1049,6 +1163,24 @@ export interface PagePreview {
   image: string;
   /** What the picture shows, for screen readers. */
   description: string;
+}
+
+/** A row with a small animation from a sprite sheet at its start, a switch and buttons of its own, all optional. */
+export interface PageSprite extends PageControl {
+  type: 'sprite';
+  /** The sheet, a PNG, JPEG or WebP of square frames. */
+  image: string;
+  /** A frame's width and height in the picture's own pixels. */
+  cell: number;
+  /** How many frames fit across the sheet. */
+  columns: number;
+  /** The frames to play in a loop, counting from the top left, row by row. */
+  frames: readonly number[];
+  /** Frames a second. */
+  rate: number;
+  checked?: boolean;
+  onToggled?(checked: boolean): void;
+  actions?: readonly { label: string; danger?: boolean; onActivate(): void }[];
 }
 
 export interface PageList {

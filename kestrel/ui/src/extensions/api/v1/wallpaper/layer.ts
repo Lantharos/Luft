@@ -8,7 +8,8 @@ import type { Monitor } from '../../../../desktop/panel/panel.js';
 import type { LayerDisplay, LayerOptions, Outline, Rect } from '../types.js';
 import { type Atlas, atlasDeclarations, packAtlas } from './atlas.js';
 import { layerSnippet, Sheet } from './sheet.js';
-import { type LayerStage, stackedWindows } from './stage.js';
+import type { LayerStage } from './stage.js';
+import { stackedWindows } from './windows.js';
 
 const FADE_DURATION = 600;
 const TIME_WRAP_S = 3600;

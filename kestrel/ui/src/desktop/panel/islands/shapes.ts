@@ -11,6 +11,18 @@ export interface IslandShape extends Box {
   radius: number;
 }
 
+const shapeListeners = new Set<() => void>();
+
+export function taskbarShapesChanged(): void {
+  for (const listener of shapeListeners) listener();
+}
+
+/** Runs `changed` whenever the bar or an island is laid out somewhere else. */
+export function watchTaskbarShapes(changed: () => void): () => void {
+  shapeListeners.add(changed);
+  return () => shapeListeners.delete(changed);
+}
+
 function boxOf(actor: St.Widget): Box {
   const [x, y] = actor.get_transformed_position();
   const [width, height] = actor.get_transformed_size();

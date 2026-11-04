@@ -47,6 +47,10 @@ export function pageBuilder(folders: readonly string[], extensionPath: string, s
       throw new Error(`${what} must be a PNG, JPEG, WebP or SVG in the extension's folders`);
     return file.get_path()!;
   };
+  const actions = (list: unknown, where: string) => ((list ?? []) as Plain[]).map((action, number) => ({
+    label: text(action.label, `${where}.actions[${number}].label`), danger: !!action.danger,
+    action: callback(action.onActivate, `${where}.actions[${number}].onActivate`),
+  }));
   const control = (item: Plain, where: string) => ({ title: text(item.title, `${where}.title`), description: optionalText(item.description, `${where}.description`) });
 
   const describe = (entry: PageItem, where: string): Plain => {
@@ -83,15 +87,18 @@ export function pageBuilder(folders: readonly string[], extensionPath: string, s
         action: callback(item.onSubmit, `${where}.onSubmit`),
       };
       case 'preview': return { type: 'preview', image: image(item.image, `${where}.image`), description: text(item.description, `${where}.description`) };
+      case 'sprite': return {
+        type: 'sprite', ...control(item, where), image: image(item.image, `${where}.image`), cell: finite(item.cell, `${where}.cell`), columns: finite(item.columns, `${where}.columns`),
+        frames: (item.frames as unknown[]).map((frame, index) => finite(frame, `${where}.frames[${index}]`)), rate: finite(item.rate, `${where}.rate`),
+        checked: item.onToggled ? !!item.checked : undefined, action: item.onToggled ? callback(item.onToggled, `${where}.onToggled`) : undefined,
+        actions: actions(item.actions, where),
+      };
       case 'list': return {
         type: 'list', empty: optionalText(item.empty, `${where}.empty`),
         items: (item.items as Plain[]).slice(0, ITEM_LIMIT).map((row, index) => ({
           title: text(row.title, `${where}.items[${index}].title`), description: optionalText(row.description, `${where}.items[${index}].description`),
           image: image(row.image, `${where}.items[${index}].image`),
-          actions: ((row.actions ?? []) as Plain[]).map((action, number) => ({
-            label: text(action.label, `${where}.items[${index}].actions[${number}].label`), danger: !!action.danger,
-            action: callback(action.onActivate, `${where}.items[${index}].actions[${number}].onActivate`),
-          })),
+          actions: actions(row.actions, `${where}.items[${index}]`),
         })),
       };
       default: throw new Error(`${where} isn't a kind of page item`);

@@ -78,6 +78,18 @@ pub enum PageItem {
         image: String,
         description: String,
     },
+    Sprite {
+        title: String,
+        description: Option<String>,
+        image: String,
+        cell: f64,
+        columns: f64,
+        frames: Vec<f64>,
+        rate: f64,
+        checked: Option<bool>,
+        action: Option<String>,
+        actions: Vec<PageAction>,
+    },
     List {
         empty: Option<String>,
         items: Vec<PageListItem>,

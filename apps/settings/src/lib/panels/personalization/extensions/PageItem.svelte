@@ -7,6 +7,7 @@
 	import { extensions, shown } from './extensions.svelte';
 	import ImageChoice from './ImageChoice.svelte';
 	import SettingRow from './SettingRow.svelte';
+	import SpritePreview from './SpritePreview.svelte';
 	import TaskbarPlace from './TaskbarPlace.svelte';
 
 	const SEGMENTS = 3;
@@ -89,6 +90,19 @@
 	</Row>
 {:else if item.type === 'preview'}
 	<img class="preview" src={fileUrl(item.image)} alt={item.description} decoding="async" />
+{:else if item.type === 'sprite'}
+	{@const action = item.action}
+	<div class="sprite-row">
+		<SpritePreview image={item.image} cell={item.cell} columns={item.columns} frames={item.frames} rate={item.rate} />
+		<Row title={item.title} description={item.description ?? undefined}>
+			{#each item.actions as button, number (number)}
+				<button type="button" class="button" class:danger={button.danger} onclick={() => act(button.action)}>{button.label}</button>
+			{/each}
+			{#if action && item.checked !== null}
+				<Switch label={item.title} checked={item.checked} onchange={(on) => act(action, on)} />
+			{/if}
+		</Row>
+	</div>
 {:else if item.type === 'taskbar-place'}
 	<TaskbarPlace element={item.element} />
 {:else if item.type === 'list'}
@@ -104,6 +118,18 @@
 {/if}
 
 <style>
+	.sprite-row {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+		padding-inline-start: 10px;
+	}
+
+	.sprite-row > :global(:last-child) {
+		flex: 1;
+		min-width: 0;
+	}
+
 	.preview {
 		display: block;
 		width: calc(100% - 12px);

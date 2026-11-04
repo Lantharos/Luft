@@ -1,0 +1,34 @@
+id = "com.lantharos.Strays"
+name = "Strays"
+description = "A few small creatures who live on your desktop, walking along the taskbar and the tops of your windows, and mostly napping."
+version = "1.0.0"
+api = 1
+permissions = ["wallpaper", "quick-settings", "calls"]
+
+[[settings]]
+key = "on"
+type = "switch"
+label = "strays"
+default = true
+
+[[settings]]
+key = "count"
+depends = "on"
+type = "slider"
+label = "count"
+default = 2
+min = 1
+max = 6
+step = 1
+
+[[settings]]
+key = "size"
+depends = "on"
+type = "choice"
+label = "size"
+default = "medium"
+options = [
+  { value = "small", label = "small" },
+  { value = "medium", label = "medium" },
+  { value = "large", label = "large" },
+]

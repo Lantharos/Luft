@@ -13,6 +13,7 @@ const VISUALIZER = 'com.lantharos.Visualizer';
 const NOW_PLAYING = 'com.lantharos.NowPlaying';
 const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 const SOUNDSCAPES = 'com.lantharos.Soundscapes';
+const STRAYS = 'com.lantharos.Strays';
 
 async function checkOwnPages(app: LuftApp) {
   await installBuilt(VISUALIZER);
@@ -36,6 +37,13 @@ async function checkOwnPages(app: LuftApp) {
     (await show(app, `extensions/${SOUNDSCAPES.toLowerCase()}`)).save('settings-extension-soundscapes');
   } finally {
     await request('Remove', SOUNDSCAPES);
+  }
+  await installBuilt(STRAYS);
+  try {
+    (await show(app, `extensions/${STRAYS.toLowerCase()}`)).save('settings-extension-strays');
+    (await showEnd(app, `extensions/${STRAYS.toLowerCase()}`)).save('settings-extension-strays-end');
+  } finally {
+    await request('Remove', STRAYS);
   }
 }
 

@@ -1,0 +1,58 @@
+{
+  "name": "Pip",
+  "description": "Flies over to whatever looks like a good perch",
+  "frame": 24,
+  "sheet": "sheet.png",
+  "states": {
+    "idle": {
+      "row": 0,
+      "frames": 4
+    },
+    "walk": {
+      "row": 1,
+      "frames": 4
+    },
+    "sit": {
+      "row": 2,
+      "frames": 2
+    },
+    "sleep": {
+      "row": 3,
+      "frames": 2
+    },
+    "fall": {
+      "row": 4,
+      "frames": 3
+    },
+    "land": {
+      "row": 4,
+      "start": 3,
+      "frames": 1
+    },
+    "fly": {
+      "row": 5,
+      "frames": 4
+    },
+    "held": {
+      "row": 6,
+      "frames": 4
+    }
+  },
+  "abilities": {
+    "walks": true,
+    "climbs": false,
+    "jumps": 0,
+    "flies": true
+  },
+  "likes": {
+    "window": 4,
+    "taskbar": 3,
+    "ground": 0.5,
+    "edges": 0
+  },
+  "temper": {
+    "stride": 1.2,
+    "gravity": 0.35,
+    "sleepiness": 0.3
+  }
+}

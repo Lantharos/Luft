@@ -1,0 +1,58 @@
+{
+  "name": "Example",
+  "description": "A finished sheet to copy from",
+  "frame": 24,
+  "sheet": "sheet.png",
+  "states": {
+    "idle": {
+      "row": 0,
+      "frames": 4
+    },
+    "walk": {
+      "row": 1,
+      "frames": 4
+    },
+    "sit": {
+      "row": 2,
+      "frames": 2
+    },
+    "sleep": {
+      "row": 3,
+      "frames": 2
+    },
+    "fall": {
+      "row": 4,
+      "frames": 3
+    },
+    "land": {
+      "row": 4,
+      "start": 3,
+      "frames": 1
+    },
+    "climb": {
+      "row": 5,
+      "frames": 4
+    },
+    "held": {
+      "row": 6,
+      "frames": 4
+    }
+  },
+  "abilities": {
+    "walks": true,
+    "climbs": true,
+    "jumps": 5.5,
+    "flies": false
+  },
+  "likes": {
+    "window": 3,
+    "taskbar": 2,
+    "ground": 1,
+    "edges": 0.3
+  },
+  "temper": {
+    "stride": 1.6,
+    "gravity": 1,
+    "sleepiness": 0.6
+  }
+}

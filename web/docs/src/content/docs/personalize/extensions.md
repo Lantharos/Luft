@@ -1,11 +1,11 @@
 ---
 title: Extensions
-description: Seasons, Soundscapes, Focus, Pult and other extensions that add to the desktop, and how to turn them off, set them up or remove them.
+description: Seasons, Strays, Soundscapes, Focus, Pult and other extensions that add to the desktop, and how to turn them off, set them up or remove them.
 sidebar:
   order: 5
 ---
 
-Extensions add to the desktop: something on the wallpaper, a tile in quick settings, a button on the taskbar, results in search. Luft comes with one, Seasons, and you can find more, such as Soundscapes, Focus and Pult, in [Schelf](/apps/schelf/).
+Extensions add to the desktop: something on the wallpaper, a tile in quick settings, a button on the taskbar, results in search. Luft comes with one, Seasons, and you can find more, such as [Strays](/personalize/strays/), Soundscapes, Focus and Pult, in [Schelf](/apps/schelf/).
 
 **Settings → Extensions** lists them. The switch next to each turns it on or off; opening one shows what it can do, its own settings and **Remove**. An extension only gets what it says it needs, and the list under **What it can do** is exactly that.
 
@@ -24,6 +24,10 @@ Rain can also play as **sound**, recorded rain from a drizzle to a downpour with
 **My pictures** lets things of your own fall, such as petals, stars or shells. In Settings → Extensions → Seasons, make a set, add up to eight pictures with see-through backgrounds, or short animated GIF or WebP pictures, and choose how many fall, how big and fast they are, the wind, how much they spin, whether they bounce off windows or settle on them for a moment, and a sound for when they land. Seasons keeps its own copies of what you pick, and you can keep several sets.
 
 The Seasons tile in [quick settings](/desktop/quick-settings/) switches it on and off, and its arrow picks what falls, whether it shows on the desktop, and its sound. If you used Rain, Seasons takes its place with your rain settings.
+
+## Strays
+
+[Strays](/personalize/strays/) puts a few small creatures on your desktop that wander across the taskbar and your windows, and that you can pick up, or draw yourself. Its tile in [quick settings](/desktop/quick-settings/) switches them on and off and sets how many.
 
 ## Soundscapes
 

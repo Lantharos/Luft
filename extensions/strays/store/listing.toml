@@ -1,0 +1,8 @@
+summary = "Small creatures who live on your desktop"
+description = "Tuft, Pip and Dollop walk along the taskbar and the tops of your windows, look around, climb, hop down and take long naps. Move a window and they ride along or get nudged aside; close it and they tumble to whatever's below. Pick one up and put it somewhere else if you like. They stay behind your windows, sleep through full screen, calls and battery saver, and use next to nothing while they rest. Draw your own with the template, and share them as a folder with friends."
+screenshots = ["island.webp", "window.webp", "pip.webp", "settings.webp"]
+keywords = ["desktop pet", "pet", "pixel art", "sprites", "cat", "companion", "cute"]
+categories = ["Utility", "Graphics"]
+homepage = "https://luft.computer"
+support = "https://github.com/Lantharos/Luft/issues"
+brand_color = "#c9804e"

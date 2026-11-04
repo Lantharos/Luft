@@ -15,7 +15,7 @@
 
 	let { icon, desktop = null, size = 48, source = null }: Props = $props();
 	let broken = $state(false);
-	const remote = $derived(icon?.startsWith('http') ?? false);
+	const remote = $derived(!desktop && (icon?.startsWith('http') ?? false));
 
 	$effect(() => {
 		void icon;

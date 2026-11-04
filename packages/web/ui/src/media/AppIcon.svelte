@@ -14,6 +14,7 @@
 	let broken = $state(false);
 	let missingGlyph = $state<string | null>(null);
 
+	const source = $derived(icon?.startsWith('http') ? icon : icon && fileUrl(icon));
 	const icons = $derived(appearance.appIcons);
 	const chosen = $derived(style ?? icons?.style ?? 'default');
 	const paint = $derived(icons && id && chosen !== 'default' ? icons[chosen] : null);
@@ -45,8 +46,8 @@
 		<span class="shade"></span>
 		<span class="ink"></span>
 	</span>
-{:else if icon && !broken}
-	<img src={fileUrl(icon)} alt="" width={size} height={size} loading="lazy" decoding="async" style:width="{size}px" style:height="{size}px" onerror={() => (broken = true)} />
+{:else if source && !broken}
+	<img src={source} alt="" width={size} height={size} loading="lazy" decoding="async" style:width="{size}px" style:height="{size}px" onerror={() => (broken = true)} />
 {:else}
 	<span class="fallback" style:width="{size}px" style:height="{size}px">
 		<AppWindow size={size * 0.55} />

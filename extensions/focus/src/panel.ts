@@ -4,6 +4,13 @@ import type { FocusSession, Granted } from './session.js';
 import { countdown, timeOfDay } from './time.js';
 
 const SOUNDSCAPES = 'com.lantharos.Soundscapes';
+const SHORT_LABELS = {
+  '15': 'length-short-15',
+  '25': 'length-short-25',
+  '45': 'length-short-45',
+  '60': 'length-short-60',
+  '90': 'length-short-90',
+} as const;
 export const LENGTHS = ['15', '25', '45', '60', '90'] as const;
 
 function before(extension: Extension<Granted>, session: FocusSession): View[] {
@@ -19,7 +26,7 @@ function before(extension: Extension<Granted>, session: FocusSession): View[] {
       type: 'row',
       spacing: 4,
       children: LENGTHS.map((length): View => ({
-        type: 'button', label: t(`length-short-${length}`), small: true, style: length === chosen ? 'default' : 'flat',
+        type: 'button', label: t(SHORT_LABELS[length]), small: true, style: length === chosen ? 'default' : 'flat',
         onActivate: () => settings.set('length', length),
       })),
     },

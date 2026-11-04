@@ -5,7 +5,8 @@ import Shell from 'gi://Shell';
 import St from 'gi://St';
 import {PopupBaseMenuItem, QuickMenuToggle, toggleSurface} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
-import {intoSpeakers, speakersIntoLevels} from '../lib/audio/routing.js';
+import {LEVEL_FLOOR_DB, loudness as speakersLoudness} from '../lib/audio/loudness.js';
+import {intoSpeakers} from '../lib/audio/routing.js';
 import {descendants, existing, ofType, shown, styled, textOf} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {call} from '../lib/dbus.js';
@@ -23,9 +24,7 @@ const IFACE = 'com.lantharos.Kestrel.Extensions';
 const SLEEP_LEFT_MS = 70000;
 const SLEEP_FADE_MS = 60000;
 const FADE_IN_MS = 3000;
-const LISTENING_MS = 500;
 const TILE_INSET = 40;
-const LEVEL_FLOOR_DB = -48;
 const AUDIBLY_QUIETER_DB = 4;
 const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 const monitor = Shell.AudioMonitor.get_default();
@@ -58,19 +57,9 @@ let routed = false;
 /** Whether its sounds play, routed into the speakers once, the way a session manager would. */
 const audible = async () => (routed ||= await intoSpeakers({'media.name': 'Soundscapes'}, 'Soundscapes:output', 2)) && mixer.playing;
 
-/** How loud the mix sounds through the speakers in decibels, averaged over a second, listening afresh since a quiet speaker stops feeding the levels. */
 async function loudness(): Promise<number> {
   await eventually(audible, 'its sounds reach the speakers');
-  monitor.set_listening(false);
-  monitor.set_listening(true);
-  await eventually(() => speakersIntoLevels(), 'and Kestrel hears them');
-  await pause(LISTENING_MS);
-  let sum = 0;
-  for (let reading = 0; reading < 20; reading++) {
-    sum += monitor.read(1)[1];
-    await pause(50);
-  }
-  return (1 - sum / 20) * LEVEL_FLOOR_DB;
+  return speakersLoudness(eventually);
 }
 
 function clickTile() {

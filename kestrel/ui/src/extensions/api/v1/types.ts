@@ -609,7 +609,7 @@ export interface Sound extends Disposable {
   setVolume(volume: number, fade?: number): void;
   /** Fades it out over `fade` milliseconds, then stops it. Disposing stops it at once. */
   stop(fade?: number): void;
-  /** Runs `ended` when it stops: at its end, after `stop`, or when it can't be played. */
+  /** Runs `ended` when it stops: at its end, after `stop`, when it can't be played, or when the sound server goes away. */
   onEnded(ended: () => void): Disposable;
 }
 

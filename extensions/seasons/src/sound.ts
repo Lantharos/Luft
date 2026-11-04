@@ -6,6 +6,7 @@ const STORM_FROM = 0.75;
 const BUILD_UP_MS = 1400;
 const WIND_DOWN_MS = 1000;
 const GLIDE_MS = 1500;
+const RETRY_MS = 5000;
 
 const between = (low: number, high: number) => low + (high - low) * Math.random();
 
@@ -23,6 +24,7 @@ function gains(intensity: number): number[] {
 export class RainSound {
   private readonly loops = new Map<string, Sound>();
   private thunder: Disposable | null = null;
+  private retry: Disposable | null = null;
   private lastThunder = Math.floor(Math.random() * THUNDERS);
 
   constructor(private readonly seasons: Extension<'sounds'>, private readonly raining: () => number | null) {}
@@ -48,11 +50,23 @@ export class RainSound {
       this.loops.delete(name);
       return;
     }
-    if (playing) {
+    if (playing?.playing) {
       playing.setVolume(gain, GLIDE_MS);
       return;
     }
-    this.loops.set(name, this.seasons.sounds.play(`sounds/${name}.oga`, { loop: true, volume: gain, fadeIn: BUILD_UP_MS }));
+    const loop = this.seasons.sounds.play(`sounds/${name}.oga`, { loop: true, volume: gain, fadeIn: BUILD_UP_MS });
+    this.loops.set(name, loop);
+    loop.onEnded(() => this.lost(name, loop));
+  }
+
+  /** A loop only ends by itself when it can't play, such as while the sound server is away, so it tries again a little later. */
+  private lost(name: string, loop: Sound): void {
+    if (this.loops.get(name) !== loop) return;
+    this.loops.delete(name);
+    this.retry ??= this.seasons.timers.timeout(RETRY_MS, () => {
+      this.retry = null;
+      this.sync();
+    });
   }
 
   private get storm(): number {
@@ -74,6 +88,8 @@ export class RainSound {
 
   private silence(): void {
     this.stopThunder();
+    this.retry?.dispose();
+    this.retry = null;
     for (const loop of this.loops.values()) loop.stop(WIND_DOWN_MS);
     this.loops.clear();
   }

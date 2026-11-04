@@ -259,6 +259,14 @@ on_idle (void     *data,
 }
 
 static void
+end_all_voices_locked (ShellSoundMix *mix)
+{
+  for (guint i = 0; i < mix->voices->len; i++)
+    report_ended_locked (mix, g_array_index (mix->voices, Voice, i).id);
+  g_array_set_size (mix->voices, 0);
+}
+
+static void
 on_stream_state_changed (void                 *data,
                          enum pw_stream_state  old,
                          enum pw_stream_state  state,
@@ -266,8 +274,11 @@ on_stream_state_changed (void                 *data,
 {
   ShellSoundMix *mix = data;
 
-  if (state == PW_STREAM_STATE_ERROR || state == PW_STREAM_STATE_UNCONNECTED)
-    mix->broken = TRUE;
+  if (state != PW_STREAM_STATE_ERROR && state != PW_STREAM_STATE_UNCONNECTED)
+    return;
+
+  mix->broken = TRUE;
+  end_all_voices_locked (mix);
 }
 
 static const struct pw_stream_events stream_events = {
@@ -285,9 +296,7 @@ disconnect_locked (ShellSoundMix *mix)
       g_clear_pointer (&mix->stream, pw_stream_destroy);
     }
   g_clear_pointer (&mix->core, pw_core_disconnect);
-  for (guint i = 0; i < mix->voices->len; i++)
-    report_ended_locked (mix, g_array_index (mix->voices, Voice, i).id);
-  g_array_set_size (mix->voices, 0);
+  end_all_voices_locked (mix);
   mix->active = FALSE;
   mix->broken = FALSE;
 }
@@ -700,8 +709,8 @@ shell_sound_mix_class_init (ShellSoundMixClass *klass)
    * @mix: the mix
    * @sound: the sound's id
    *
-   * A sound stopped: it played to its end, faded out after a stop, or
-   * couldn't be played.
+   * A sound stopped: it played to its end, faded out after a stop, couldn't
+   * be played, or lost its stream.
    */
   signals[ENDED] = g_signal_new ("ended", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST,
                                  0, NULL, NULL, NULL, G_TYPE_NONE, 1, G_TYPE_UINT);

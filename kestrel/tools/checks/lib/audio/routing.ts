@@ -31,6 +31,12 @@ export async function givePorts(match: Match, direction: 'Input' | 'Output', cha
   return (await outcome(['pw-cli', 's', `${id}`, 'PortConfig', JSON.stringify(config)])).ok;
 }
 
+/** Takes a node away from the sound server, as when the server restarts. */
+export async function removeNode(match: Match): Promise<boolean> {
+  const id = await nodeId(match);
+  return id !== null && (await outcome(['pw-cli', 'destroy', `${id}`])).ok;
+}
+
 export async function link(from: string, to: string): Promise<boolean> {
   const {ok, stderr} = await outcome(['pw-link', from, to]);
   return ok || stderr.includes('File exists');

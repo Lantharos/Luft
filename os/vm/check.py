@@ -131,8 +131,8 @@ class Check:
         self.screenshot("login-screen")
         self.machine.type(PASSWORD + "\n")
         self.log(f"typed {USER}'s password")
-        units = f"systemctl --user --machine={USER}@ is-active {SESSION_UNITS}"
-        self.wait("the desktop is up", lambda: self.succeeds(units), 300)
+        states = f"systemctl --user --machine={USER}@ is-active {SESSION_UNITS}"
+        self.wait("the desktop is up", lambda: self.succeeds(f'test "$({states} | sort -u)" = active'), 300)
         self.steady("Kestrel", f"systemctl --user --machine={USER}@ show --property=MainPID --value kestrel.service")
         if self.output(f"ls -A {INCIDENTS} 2>/dev/null | wc -l") != "0":
             raise MachineError("the graphics watchdog recorded an incident")

@@ -1,0 +1,36 @@
+id = "com.lantharos.Focus"
+name = "Focus"
+description = "A timer in the taskbar for work sessions, with notifications held back until you're done."
+version = "1.0.0"
+api = 1
+permissions = ["taskbar", "popups", "notifications", "do-not-disturb"]
+
+[[settings]]
+key = "length"
+type = "choice"
+label = "length"
+default = "25"
+options = [
+  { value = "15", label = "length-15" },
+  { value = "25", label = "length-25" },
+  { value = "45", label = "length-45" },
+  { value = "60", label = "length-60" },
+  { value = "90", label = "length-90" },
+]
+
+[[settings]]
+key = "hold-notifications"
+type = "switch"
+label = "hold-notifications"
+default = true
+
+[[settings]]
+key = "soundscapes"
+type = "switch"
+label = "soundscapes"
+default = true
+
+[[shortcuts]]
+key = "toggle"
+label = "shortcut-toggle"
+default = "<Super><Alt>f"

@@ -1,9 +1,8 @@
 import type { Extension, View } from '@luft/extension-api';
 
-import type { FocusSession, Granted } from './session.js';
+import { type FocusSession, type Granted, SOUNDSCAPES } from './session.js';
 import { countdown, timeOfDay } from './time.js';
 
-const SOUNDSCAPES = 'com.lantharos.Soundscapes';
 const SHORT_LABELS = {
   '15': 'length-short-15',
   '25': 'length-short-25',

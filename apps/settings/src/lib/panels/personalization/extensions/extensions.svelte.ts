@@ -1,5 +1,5 @@
 import { commands, events } from '#lib/bindings.js';
-import type { Extension, ExtensionSetting, ExtensionSettingValue, PageSection } from '#lib/bindings.js';
+import type { Extension, ExtensionSetting, ExtensionSettingValue, PageItem, PageSection } from '#lib/bindings.js';
 
 class Extensions {
 	list = $state<Extension[] | null>(null);
@@ -72,8 +72,24 @@ class Extensions {
 
 export const extensions = new Extensions();
 
+function met({ when, whenMin, whenMax }: ExtensionSetting, value: ExtensionSettingValue): boolean {
+	if (when.length) return when.some((wanted) => (Array.isArray(value) ? value.includes(String(wanted)) : value === wanted));
+	if (whenMin === null && whenMax === null) return value === true;
+	return typeof value === 'number' && value >= (whenMin ?? value) && value <= (whenMax ?? value);
+}
+
 export function shown(extension: Extension, setting: ExtensionSetting): boolean {
 	if (!setting.depends) return true;
 	const parent = extension.settings.find((other) => other.key === setting.depends);
-	return !!parent && parent.value === true && shown(extension, parent);
+	return !!parent && met(setting, parent.value) && shown(extension, parent);
+}
+
+/** A section whose settings all hide goes with them, title included. */
+export function shownSections(extension: Extension, sections: PageSection[]): PageSection[] {
+	const showing = (item: PageItem) => {
+		if (item.type !== 'setting') return true;
+		const declared = extension.settings.find((setting) => setting.key === item.key);
+		return !!declared && shown(extension, declared);
+	};
+	return sections.filter((section) => section.items.some(showing));
 }

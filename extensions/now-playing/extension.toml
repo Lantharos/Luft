@@ -19,6 +19,8 @@ options = [
 
 [[settings]]
 key = "second-line"
+depends = "layout"
+when = ["compact"]
 type = "choice"
 label = "second-line"
 default = "controls"
@@ -30,6 +32,8 @@ options = [
 
 [[settings]]
 key = "title-width"
+depends = "layout"
+when = ["compact", "full", "no-controls"]
 type = "slider"
 label = "title-width"
 default = 104

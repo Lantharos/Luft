@@ -42,12 +42,27 @@ path = "clock-helper"
 [network]                         # optional hosts it connects to, over HTTPS
 hosts = ["api.example.com"]
 
-[[settings]]                      # switch, choice, slider or color
+[[settings]]                      # switch, choice, choices, slider or color
 key = "seconds"
 type = "switch"
 label = "seconds"                 # a message id; its .description attribute is the line under it
 default = false
 page = "appearance"               # also shown on this page of Settings, if a permission allows
+
+[[settings]]
+key = "format"
+type = "choice"
+label = "format"
+default = "digital"
+options = [{ value = "digital", label = "digital" }, { value = "dial", label = "dial" }]
+
+[[settings]]
+key = "hands"
+type = "switch"
+label = "hands"
+default = true
+depends = "format"                # shows only while another setting, declared before it, shows
+when = ["dial"]                   # and has one of these values
 
 [[shortcuts]]                     # changed in Settings → Keyboard
 key = "show"
@@ -79,6 +94,8 @@ Permissions, with the words Settings and the store show for them:
 
 `locked-sounds` needs `sounds` too. A `[helper]` table isn't a permission, but the store shows that the extension runs a program of its own. `[network]` isn't one either, but Settings and the store show the hosts it names as "Connect to api.example.com". `[[shortcuts]]` shows in Settings → Keyboard.
 
+A setting's `depends` hides it until another setting allows it. Without `when` that's a switch being on. With `when` it's any of a list of values, of a `switch` (`[false]` shows it while the switch is off), `choice`, `slider` or `color`, any of the options of a `choices` setting being picked, or a part of a slider's range, such as `{ min = 0.5 }`. A setting hides with the one it depends on, whatever that one's value, so they chain. Hiding changes nothing about a value: it stays stored and keeps its meaning to the extension. Kestrel refuses a `depends` on a setting not declared before it, and a `when` with values that setting can't have.
+
 A setting's `page` puts it on another page of Settings too, under the extension's name, while the extension runs: `appearance` needs `wallpaper`, `taskbar` needs `taskbar`, `sound` needs `sounds` or `audio-levels`, and `input` needs `typing`.
 
 ## D-Bus
@@ -101,11 +118,11 @@ Kestrel serves `com.lantharos.Kestrel.Extensions` at `/com/lantharos/Kestrel/Ext
 | `ExtensionsChanged` (signal) | Something in `List` changed |
 | `PageChanged(s id)` (signal) | The extension's page should be built again: it asked, or a setting changed |
 
-Each entry of `List` has `id`, `name` and `description` (translated), `version`, `api`, `path`, `permissions`, `helper`, `network` (the hosts it connects to), `enabled`, `state` (`running`, `off`, `failed`, `crashed` or `invalid`) and `problem` (why it isn't running), `settings`: for each setting its `key`, `type`, translated `label` and `description`, `value`, `default`, `depends`, `page`, and `options` or `swatches` as `a(ss)` of value and label, `images` with the full path of each option's picture, or `min`, `max`, `step` and `unit`; `shortcuts`: for each its `key`, translated `label`, the `accelerators` it's bound to, its `default` and whether it `changed`; and `page`, whether it describes a page of its own.
+Each entry of `List` has `id`, `name` and `description` (translated), `version`, `api`, `path`, `permissions`, `helper`, `network` (the hosts it connects to), `enabled`, `state` (`running`, `off`, `failed`, `crashed` or `invalid`) and `problem` (why it isn't running), `settings`: for each setting its `key`, `type`, translated `label` and `description`, `value`, `default`, `depends`, `when` (`av`, the values it shows for) or `when-min` and `when-max` (the part of a slider it shows for), `page`, and `options` or `swatches` as `a(ss)` of value and label, with `min` the fewest options a `choices` setting keeps, `images` with the full path of each option's picture, or `min`, `max`, `step` and `unit`; `shortcuts`: for each its `key`, translated `label`, the `accelerators` it's bound to, its `default` and whether it `changed`; and `page`, whether it describes a page of its own.
 
 ## Settings pages
 
-An extension's page in Settings lists its declared settings. One that calls `settingsPage.describe` gets a page of its own instead: Kestrel calls its builder when Settings asks with `Page`, turns the sections into JSON, checks every image against the extension's folders, and replaces each callback with an `action` id. A `sprite` row plays frames of a sprite sheet in a loop beside its title, with Settings doing the animating, which stops with reduced motion. Settings draws the page with its own controls and sends `Act` with that id and the new value. Nothing an extension describes runs in Settings, so it can't break Settings or reach into it. While the extension is off, the page lists its declared settings.
+An extension's page in Settings lists its declared settings. One that calls `settingsPage.describe` gets a page of its own instead: Kestrel calls its builder when Settings asks with `Page`, turns the sections into JSON, checks every image against the extension's folders, and replaces each callback with an `action` id. A `sprite` row plays frames of a sprite sheet in a loop beside its title, with Settings doing the animating, which stops with reduced motion. Settings draws the page with its own controls and sends `Act` with that id and the new value. A declared setting follows its `depends` there as everywhere else, in the extension's rows on other pages and in quick settings menus too, and a section whose settings all hide goes with them. Nothing an extension describes runs in Settings, so it can't break Settings or reach into it. While the extension is off, the page lists its declared settings.
 
 ## Shortcuts
 

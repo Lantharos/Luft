@@ -55,16 +55,18 @@ Each `[[settings]]` table is one setting. Settings draws it with Luft's own cont
 | Field | Means |
 | --- | --- |
 | `key` | Lowercase, with dashes, unique in the extension |
-| `type` | `switch`, `choice`, `slider` or `color` |
+| `type` | `switch`, `choice`, `choices`, `slider` or `color` |
 | `label` | A message id. Its value is the title, its `.description` attribute the line under it |
 | `default` | The value until someone changes it |
-| `depends` | A switch declared earlier; the setting only shows while that switch is on |
+| `depends` | A setting declared earlier; this one only shows while that one shows, and while it's on if it's a switch |
+| `when` | What `depends` has to be for the setting to show, instead of on: a list of values, or part of a slider's range |
 | `page` | Another page of Settings the setting also shows on, under the extension's name: `appearance` (needs `wallpaper`), `taskbar` (needs `taskbar`), `sound` (needs `sounds` or `audio-levels`) or `input` (needs `typing`) |
 
 | Type | Value | Extra fields | Shows as |
 | --- | --- | --- | --- |
 | `switch` | `true` or `false` | | A switch |
 | `choice` | One option's `value` | `options`, a list of `{ value, label, image? }` with message ids as labels | Buttons side by side for up to three options, a menu for more, or pictures when every option has an `image` |
+| `choices` | A list of options' `value`s, any number of them at once | `options`, as for `choice`, and `min`, the fewest that stay picked: `min = 1` keeps the last one from being turned off | Buttons side by side that turn on and off one by one |
 | `slider` | A number from `min` to `max` | `min`, `max`, `step`, and `unit = "percent"` to show it as a percentage | A slider |
 | `color` | `#rrggbb`, `accent` for the accent colour, or `wallpaper` for the colour the wallpaper suggests | `swatches`, a list of `{ value, label }` offered first | Swatches and a colour picker |
 
@@ -87,11 +89,39 @@ default = "accent"
 swatches = [{ value = "accent", label = "tint-accent" }, { value = "#f2efe8", label = "tint-paper" }]
 ```
 
+### Showing a setting only when it applies
+
+A setting can wait for another one, so people only see options they can use. It names that setting in `depends`, which has to be declared before it, and says in `when` which values it shows for:
+
+```toml
+[[settings]]
+key = "second-hand"
+type = "switch"
+label = "second-hand"
+default = true
+depends = "style"
+when = ["hands"]
+```
+
+| `depends` names a | `when` is | Shows |
+| --- | --- | --- |
+| `switch` | left out | While the switch is on |
+| `switch` | `[false]` | While the switch is off |
+| `choice` | `["digital", "hands"]` | While one of these is chosen |
+| `choices` | `["top", "bottom"]` | While at least one of these is picked |
+| `slider` | `{ min = 0.5 }`, `{ max = 0.5 }` or `{ min = 0.25, max = 0.75 }` | While the slider is in that range, ends included |
+| `slider` | `[0, 1]` | At exactly these values |
+| `color` | `["accent"]` | While one of these is chosen |
+
+Conditions chain: when a setting hides, everything that depends on it hides too, whatever its own `when` says. So a setting that depends on `style` above only shows while `second-hand` shows. This works everywhere a setting appears: the extension's page, a page of its own, its rows on other pages of Settings and quick settings menus. In a [quick settings menu](/extensions/api/#quicksettings) of a toggle with its own `setting`, that switch counts as on, since people turn it on from there.
+
+A hidden setting keeps its value, and `settings.get` still returns it, so the extension decides what it means while it's hidden. A manifest is refused when `depends` names a setting declared later or not at all, when `when` has no values or a value the other setting can't have, when a range isn't on a slider or misses it entirely, when `when` comes without `depends`, or when `depends` names anything but a switch without a `when`.
+
 Values are stored per account. A value that no longer fits after an update, such as an option that was removed, falls back to the default.
 
 An option's `image` is a PNG, JPEG, WebP or SVG in the extension's folder, best at 3:2, showing what the option looks like.
 
-The page Settings shows for an extension lists these settings. An extension that needs more, such as lists of its own or values only it knows, describes a whole page with [`settingsPage`](/extensions/api/#settings-page); the settings declared here keep working inside it.
+The page Settings shows for an extension lists these settings. An extension that needs more, such as lists of its own or values only it knows, describes a whole page with [`settingsPage`](/extensions/api/#settings-page); the settings declared here keep working inside it, `depends` included, and a section whose settings all hide disappears.
 
 ## Shortcuts
 

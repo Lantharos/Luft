@@ -7,6 +7,7 @@ pub enum ExtensionSettingValue {
     Switch(bool),
     Number(f64),
     Text(String),
+    Options(Vec<String>),
 }
 
 impl From<ExtensionSettingValue> for Variant<'static> {
@@ -15,6 +16,7 @@ impl From<ExtensionSettingValue> for Variant<'static> {
             ExtensionSettingValue::Switch(on) => Variant::Bool(on),
             ExtensionSettingValue::Number(number) => Variant::F64(number),
             ExtensionSettingValue::Text(text) => Variant::from(text),
+            ExtensionSettingValue::Options(options) => Variant::from(options),
         }
     }
 }
@@ -24,6 +26,9 @@ fn setting_value(value: &OwnedVariant) -> Option<ExtensionSettingValue> {
         Variant::Bool(on) => Some(ExtensionSettingValue::Switch(*on)),
         Variant::F64(number) => Some(ExtensionSettingValue::Number(*number)),
         Variant::Str(text) => Some(ExtensionSettingValue::Text(text.to_string())),
+        Variant::Array(_) => <Vec<String>>::try_from(value.try_clone().ok()?)
+            .ok()
+            .map(ExtensionSettingValue::Options),
         _ => None,
     }
 }
@@ -38,6 +43,11 @@ struct ListedSetting {
     description: String,
     value: OwnedVariant,
     depends: Option<String>,
+    when: Option<Vec<OwnedVariant>>,
+    #[zbus(rename = "when-min")]
+    when_min: Option<f64>,
+    #[zbus(rename = "when-max")]
+    when_max: Option<f64>,
     options: Option<Vec<(String, String)>>,
     swatches: Option<Vec<(String, String)>>,
     min: Option<f64>,
@@ -90,6 +100,9 @@ pub struct ExtensionSetting {
     description: String,
     value: ExtensionSettingValue,
     depends: Option<String>,
+    when: Vec<ExtensionSettingValue>,
+    when_min: Option<f64>,
+    when_max: Option<f64>,
     options: Vec<ExtensionChoice>,
     swatches: Vec<ExtensionChoice>,
     min: Option<f64>,
@@ -143,6 +156,14 @@ fn setting(listed: ListedSetting) -> Option<ExtensionSetting> {
         label: listed.label,
         description: listed.description,
         depends: listed.depends,
+        when: listed
+            .when
+            .unwrap_or_default()
+            .iter()
+            .filter_map(setting_value)
+            .collect(),
+        when_min: listed.when_min,
+        when_max: listed.when_max,
         options: choices(listed.options),
         swatches: choices(listed.swatches),
         min: listed.min,

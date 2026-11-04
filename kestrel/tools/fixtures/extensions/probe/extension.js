@@ -7,7 +7,7 @@ export default function enable(probe) {
     label: probe.t('item'),
     onClick: () => probe.notifications.send({ title: probe.t('hello') }),
   });
-  probe.quickSettings.addToggle({ title: probe.t('item'), icon: 'face-smile-symbolic', setting: 'on', menu: [{ setting: 'mood' }, 'settings'] });
+  probe.quickSettings.addToggle({ title: probe.t('item'), icon: 'face-smile-symbolic', setting: 'on', menu: [{ setting: 'mood' }, { setting: 'giddy-only' }, { setting: 'while-off' }, { setting: 'level' }, { setting: 'high-only' }, { setting: 'senses' }, { setting: 'hearing-only' }, 'settings'] });
   probe.search.addProvider({ title: probe.t('item'), search: query => [{ title: `Probe found ${query}`, activate() {} }] });
   probe.timers.interval(20, () => state.ticks++);
   probe.onDisable(() => (state.disabled = true));

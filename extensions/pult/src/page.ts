@@ -30,7 +30,10 @@ export function describePage(pult: Pult): void {
   const { t } = extension;
   extension.settingsPage.describe(() => [
     { title: t('account'), items: account(pult) },
-    { title: t('showing'), items: [{ setting: 'count' }, { setting: 'urgent' }, { setting: 'hide-empty' }, { type: 'taskbar-place', element: 'pult' }] },
+    {
+      title: t('showing'),
+      items: [...pult.client.signedIn ? [{ setting: 'count' }, { setting: 'urgent' }] : [], { setting: 'hide-empty' }, { type: 'taskbar-place', element: 'pult' }],
+    },
   ]);
   pult.onChanged(() => extension.settingsPage.refresh());
 }

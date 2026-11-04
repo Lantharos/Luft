@@ -949,6 +949,9 @@ export type ExtensionSetting = {
 	description: string,
 	value: ExtensionSettingValue,
 	depends: string | null,
+	when: ExtensionSettingValue[],
+	whenMin: number | null,
+	whenMax: number | null,
 	options: ExtensionChoice[],
 	swatches: ExtensionChoice[],
 	min: number | null,
@@ -959,7 +962,7 @@ export type ExtensionSetting = {
 	images: string[],
 };
 
-export type ExtensionSettingValue = boolean | number | string;
+export type ExtensionSettingValue = boolean | number | string | string[];
 
 export type ExtensionShortcut = {
 	key: string,

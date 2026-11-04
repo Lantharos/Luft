@@ -18,7 +18,7 @@ export interface Listed {
   enabled: boolean;
   state: string;
   problem: string;
-  settings?: {key: string; value: boolean | number | string}[];
+  settings?: {key: string; value: boolean | number | string | string[]; depends?: string; when?: unknown[]; 'when-min'?: number}[];
 }
 
 export async function list(): Promise<Listed[]> {

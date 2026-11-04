@@ -128,5 +128,6 @@ export class ExtensionStore {
 export function variant(value: SettingValue): GLib.Variant {
   if (typeof value === 'boolean') return GLib.Variant.new_boolean(value);
   if (typeof value === 'number') return GLib.Variant.new_double(value);
-  return GLib.Variant.new_string(value);
+  if (typeof value === 'string') return GLib.Variant.new_string(value);
+  return GLib.Variant.new_strv(value as string[]);
 }

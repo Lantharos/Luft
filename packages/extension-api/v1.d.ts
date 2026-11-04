@@ -112,7 +112,8 @@ export type Extension<Granted extends Capability = never> = Basics & { readonly 
 /** The default export of an extension's module. Kestrel calls it each time the extension is turned on. */
 export type Enable<Granted extends Capability = never> = (extension: Extension<Granted>) => void | Promise<void>;
 
-export type SettingValue = boolean | number | string;
+/** A switch's `boolean`, a slider's `number`, a choice's or colour's `string`, or the options picked in a `choices` setting. */
+export type SettingValue = boolean | number | string | readonly string[];
 
 /** The settings declared in the manifest, as the person set them in Settings. */
 export interface Settings {
@@ -1005,12 +1006,29 @@ export type ApiVersion = 1;
  */
 export type SettingsPageId = 'appearance' | 'taskbar' | 'sound' | 'input';
 
+/**
+ * The values of another setting that a setting shows for: any of a list, or a range of a slider, both ends included.
+ * For a `choices` setting, the list names options, and any of them being picked is enough.
+ */
+export type SettingCondition = readonly (boolean | number | string)[] | SliderRange;
+
+/** Part of a slider's range; an end left out is open. */
+export interface SliderRange {
+  min?: number;
+  max?: number;
+}
+
 interface SettingBase {
   key: string;
   /** A message id from the extension's translations: its value is the title, its `.description` attribute the line under it. */
   label: string;
-  /** Shows the setting only while this switch, declared before it, is on. */
+  /**
+   * Shows the setting only while this setting, declared before it, is itself showing and has a value in {@link when}.
+   * Without `when` it has to be a switch, and the setting shows while that switch is on.
+   */
   depends?: string;
+  /** The values of {@link depends} the setting shows for, such as `["compact", "full"]`, `[false]` or `{ min = 0.5 }`. */
+  when?: SettingCondition;
   /** Also shows the setting on this page of Settings, under the extension's name. */
   page?: SettingsPageId;
 }
@@ -1034,6 +1052,15 @@ export interface ChoiceSetting extends SettingBase {
   options: ChoiceOption[];
 }
 
+/** Any number of options at once, such as which edges of the display to use. Its value lists them in the order they're declared. */
+export interface ChoicesSetting extends SettingBase {
+  type: 'choices';
+  default: readonly string[];
+  options: ChoiceOption[];
+  /** The fewest options that can be picked. Settings keeps the last ones from being turned off. */
+  min?: number;
+}
+
 export interface SliderSetting extends SettingBase {
   type: 'slider';
   default: number;
@@ -1052,7 +1079,7 @@ export interface ColorSetting extends SettingBase {
   swatches?: ChoiceOption[];
 }
 
-export type SettingDescription = SwitchSetting | ChoiceSetting | SliderSetting | ColorSetting;
+export type SettingDescription = SwitchSetting | ChoiceSetting | ChoicesSetting | SliderSetting | ColorSetting;
 
 /** A keyboard shortcut the extension offers. People can change it in Settings → Keyboard. */
 export interface ShortcutDescription {

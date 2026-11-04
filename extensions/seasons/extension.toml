@@ -30,7 +30,8 @@ options = [
 
 [[settings]]
 key = "intensity"
-depends = "on"
+depends = "effect"
+when = ["rain", "snow", "leaves", "fireflies", "fog", "season"]
 type = "choice"
 label = "intensity"
 default = "steady"
@@ -42,7 +43,8 @@ options = [
 
 [[settings]]
 key = "color"
-depends = "on"
+depends = "effect"
+when = ["rain", "weather", "season"]
 type = "color"
 label = "color"
 default = "#dbe6f7"
@@ -60,7 +62,8 @@ default = true
 
 [[settings]]
 key = "sound"
-depends = "on"
+depends = "effect"
+when = ["rain", "weather", "season"]
 type = "switch"
 label = "sound"
 default = false

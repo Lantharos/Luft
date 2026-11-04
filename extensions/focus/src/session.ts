@@ -2,7 +2,7 @@ import type { Disposable, Extension, HeldNotifications, NotificationHold } from 
 
 export type Granted = 'taskbar' | 'popups' | 'notifications' | 'do-not-disturb' | 'shortcuts';
 
-const SOUNDSCAPES = 'com.lantharos.Soundscapes';
+export const SOUNDSCAPES = 'com.lantharos.Soundscapes';
 const STORED = 'session';
 const MINUTE_MS = 60_000;
 

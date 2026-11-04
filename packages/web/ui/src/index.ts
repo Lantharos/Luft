@@ -8,6 +8,7 @@ export { default as IconButton } from './controls/IconButton.svelte';
 export { default as PasswordField } from './controls/PasswordField.svelte';
 export { default as ProgressBar } from './controls/ProgressBar.svelte';
 export { default as SearchField } from './controls/SearchField.svelte';
+export { default as MultiChoice } from './controls/MultiChoice.svelte';
 export { default as Segmented } from './controls/Segmented.svelte';
 export { default as Select } from './controls/Select.svelte';
 export { default as Slider } from './controls/Slider.svelte';

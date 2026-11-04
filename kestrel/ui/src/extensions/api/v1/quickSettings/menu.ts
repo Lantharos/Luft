@@ -6,7 +6,7 @@ import { t } from '../../../../shared/i18n/index.js';
 import * as PopupMenu from '../../../../shared/popups/popupMenu.js';
 import { Slider } from '../../../../shared/widgets/slider.js';
 import type { ApiContext } from '../context.js';
-import type { MenuItem, SettingDescription, SliderSetting } from '../types.js';
+import type { ChoicesSetting, MenuItem, SettingDescription, SliderSetting } from '../types.js';
 
 class SliderItem extends PopupMenu.PopupBaseMenuItem {
   static {
@@ -52,6 +52,12 @@ function sliderItem(context: ApiContext, setting: SliderSetting, label: string):
   }];
 }
 
+function toggleOption(context: ApiContext, setting: ChoicesSetting, option: string): void {
+  const picked = context.values.get(setting.key) as readonly string[];
+  const next = picked.includes(option) ? picked.filter(other => other !== option) : [...picked, option];
+  if (next.length >= (setting.min ?? 0)) context.values.set(setting.key, next);
+}
+
 function settingItems(context: ApiContext, setting: SettingDescription): [PopupMenu.PopupBaseMenuItem, Sync][] {
   const { values, translations } = context;
   const label = translations.t(setting.label);
@@ -61,6 +67,9 @@ function settingItems(context: ApiContext, setting: SettingDescription): [PopupM
     case 'choice':
       return setting.options.map(option =>
         checkItem(translations.t(option.label), () => values.get(setting.key) === option.value, () => values.set(setting.key, option.value)));
+    case 'choices':
+      return setting.options.map(option =>
+        checkItem(translations.t(option.label), () => (values.get(setting.key) as readonly string[]).includes(option.value), () => toggleOption(context, setting, option.value)));
     case 'slider':
       return [sliderItem(context, setting, label)];
     case 'color':

@@ -7,7 +7,6 @@ layout-full = Wide
 layout-no-controls = No controls
 layout-cover = Just the cover
 second-line = Under the title
-    .description = The controls only fit there in the compact layout; the others show the artist instead
 second-line-controls = Controls
 second-line-artist = Artist
 second-line-album = Album

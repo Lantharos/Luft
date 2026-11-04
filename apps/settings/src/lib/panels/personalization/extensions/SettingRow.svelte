@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Row, Segmented, Select, Slider, Switch } from '@luft/ui';
+	import { MultiChoice, Row, Segmented, Select, Slider, Switch } from '@luft/ui';
 	import type { Extension, ExtensionSetting } from '#lib/bindings.js';
 	import { percent } from '#lib/format.js';
 	import ColorSetting from './ColorSetting.svelte';
@@ -10,7 +10,7 @@
 
 	let { extension, setting }: { extension: Extension; setting: ExtensionSetting } = $props();
 
-	const set = (value: boolean | number | string) => extensions.set(extension, setting, value);
+	const set = (value: boolean | number | string | string[]) => extensions.set(extension, setting, value);
 	let format = $derived(
 		setting.unit === 'percent' ? (value: number) => percent((value - (setting.min ?? 0)) / ((setting.max ?? 1) - (setting.min ?? 0))) : undefined
 	);
@@ -22,6 +22,8 @@
 <Row title={setting.label} description={setting.description || undefined}>
 	{#if setting.kind === 'switch'}
 		<Switch label={setting.label} checked={setting.value === true} onchange={set} />
+	{:else if setting.kind === 'choices' && Array.isArray(setting.value)}
+		<MultiChoice label={setting.label} options={setting.options} value={setting.value} least={setting.min ?? 0} onchange={set} />
 	{:else if setting.kind === 'choice' && !pictures.length && setting.options.length <= SEGMENTS}
 		<Segmented label={setting.label} options={setting.options} value={String(setting.value)} onchange={set} />
 	{:else if setting.kind === 'choice' && !pictures.length}

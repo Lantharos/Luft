@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { Section } from '@luft/ui';
 	import type { Extension } from '#lib/bindings.js';
-	import { extensions } from './extensions.svelte';
+	import { extensions, shownSections } from './extensions.svelte';
 	import PageItem from './PageItem.svelte';
 
 	let { extension }: { extension: Extension } = $props();
 
 	$effect(() => extensions.showPage(extension.id));
 
-	let sections = $derived(extensions.pages[extension.id] ?? []);
+	let sections = $derived(shownSections(extension, extensions.pages[extension.id] ?? []));
 </script>
 
 {#each sections as section, index (index)}

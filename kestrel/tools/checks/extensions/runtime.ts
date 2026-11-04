@@ -8,7 +8,7 @@ import {checks} from '../lib/check.js';
 import {capture} from '../lib/screenshots.js';
 import {pause} from '../lib/wait.js';
 import {closeStart, groupTitles, openStart, rows, search, titleOf} from '../start/search/results.js';
-import {copyFolder, install, layerSheets, listed, request, rewrite, SEASONS, setSetting, userFolder} from './lib/extensions.js';
+import {copyFolder, install, layerSheets, listed, request, rewrite, SEASONS, setSetting, setting, userFolder} from './lib/extensions.js';
 
 const {require, eventually} = checks('extensions');
 const PROBE = 'com.example.Probe';
@@ -84,6 +84,73 @@ async function checkReload() {
   require(descendants(named('kestrel-extension-items')!).filter(actor => actor.accessible_name === 'Probe').length === 1, 'the old version left nothing behind');
 }
 
+const menuEntries = () => (probeTile() as InstanceType<typeof QuickMenuToggle>).menu.box.get_children()
+  .filter(item => item.visible)
+  .flatMap(item => descendants(item))
+  .flatMap(actor => actor instanceof St.Label ? [actor.text] : []);
+
+async function checkConditions() {
+  const shows = (label: string) => menuEntries().includes(label);
+  require(!shows('Only while giddy') && !shows('Only when high'), 'a setting waiting for another one’s value hides from quick settings');
+  await setSetting(PROBE, 'mood', new GLib.Variant('s', 'giddy'));
+  await eventually(() => shows('Only while giddy'), 'choosing the value it waits for shows it');
+  require(shows('Only while the giddy one is off'), 'a switch can ask for another one to be off');
+  await setSetting(PROBE, 'giddy-only', new GLib.Variant('b', true));
+  await eventually(() => !shows('Only while the giddy one is off'), 'and hides once that switch is on');
+  await setSetting(PROBE, 'mood', new GLib.Variant('s', 'calm'));
+  await eventually(() => !shows('Only while giddy'), 'choosing another value hides it again');
+  await setSetting(PROBE, 'giddy-only', new GLib.Variant('b', false));
+  await pause(100);
+  require(!shows('Only while the giddy one is off'), 'hiding a setting hides the ones that depend on it, whatever their own condition says');
+
+  await setSetting(PROBE, 'level', new GLib.Variant('d', 0.9));
+  await eventually(() => shows('Only when high'), 'a slider inside the range shows what depends on it');
+  await setSetting(PROBE, 'level', new GLib.Variant('d', 0.5));
+  await eventually(() => !shows('Only when high'), 'and outside it hides it');
+
+  require(!shows('Only while hearing'), 'a setting can wait for an option of a multiple choice');
+  await setSetting(PROBE, 'senses', new GLib.Variant('as', ['hearing', 'sight']));
+  await eventually(() => shows('Only while hearing'), 'and shows once that option is picked along with others');
+  require(JSON.stringify(await setting(PROBE, 'senses')) === '["sight","hearing"]', 'a multiple choice keeps its options in the order they are declared');
+  await setSetting(PROBE, 'senses', new GLib.Variant('as', ['hearing']));
+  await pause(100);
+  const emptied = await setSetting(PROBE, 'senses', new GLib.Variant('as', [])).then(() => false, () => true);
+  require(emptied, 'a multiple choice refuses fewer options than its min');
+  await setSetting(PROBE, 'senses', new GLib.Variant('as', ['sight']));
+
+  const declared = (await listed(PROBE))!.settings!;
+  const field = (key: string) => declared.find(setting => setting.key === key)!;
+  require(field('giddy-only').depends === 'mood' && (field('giddy-only').when as unknown[])[0] === 'giddy', 'Settings is told the values a setting waits for');
+  require(field('high-only')['when-min'] === 0.75, 'and the range');
+}
+
+async function checkRefusedConditions() {
+  const folder = userFolder(PROBE);
+  const [, original] = GLib.file_get_contents(`${folder}/extension.toml`);
+  const manifest = new TextDecoder().decode(original);
+  const wrong: [string, string, string][] = [
+    ['when = ["giddy"]', 'when = ["grumpy"]', 'a value the choice doesn’t offer'],
+    ['when = ["giddy"]', 'when = []', 'no values'],
+    ['when = ["giddy"]', 'when = { min = 1 }', 'a range on a choice'],
+    ['depends = "mood"\nwhen = ["giddy"]', 'depends = "mood"', 'no when on a setting that isn’t a switch'],
+    ['depends = "mood"\nwhen = ["giddy"]', 'when = ["giddy"]', 'when without depends'],
+    ['depends = "mood"', 'depends = "while-off"', 'something declared after it'],
+    ['when = { min = 0.75 }', 'when = { min = 2 }', 'a range outside the slider'],
+    ['when = { min = 0.75 }', 'when = { from = 0.75 }', 'a range without min or max'],
+    ['when = { min = 0.75 }', 'when = [true]', 'a value of the wrong type'],
+    ['when = ["hearing"]', 'when = ["taste"]', 'an option the multiple choice doesn’t offer'],
+    ['default = ["sight"]', 'default = []', 'a default with fewer options than its min'],
+  ];
+  for (const [from, to, what] of wrong) {
+    GLib.file_set_contents(`${folder}/extension.toml`, manifest.replace(from, to));
+    await request('Reload', PROBE);
+    await eventually(async () => (await listed(PROBE))?.state === 'invalid', `a manifest with ${what} is refused`);
+  }
+  GLib.file_set_contents(`${folder}/extension.toml`, manifest);
+  await request('Reload', PROBE);
+  await eventually(async () => (await listed(PROBE))?.state === 'running', 'the manifest put right runs again');
+}
+
 async function checkThrowing() {
   install('broken', BROKEN);
   await request('Reload', BROKEN);
@@ -125,6 +192,8 @@ export async function run() {
     await checkSeasons();
     await checkDisabledCostsNothing();
     await checkEnabled();
+    await checkConditions();
+    await checkRefusedConditions();
     await checkDisabledCleansUp();
     await checkReload();
     await checkThrowing();

@@ -30,3 +30,46 @@ min = 0
 max = 1
 unit = "percent"
 depends = "on"
+
+[[settings]]
+key = "giddy-only"
+type = "switch"
+label = "giddy-only"
+default = false
+depends = "mood"
+when = ["giddy"]
+
+[[settings]]
+key = "high-only"
+type = "switch"
+label = "high-only"
+default = false
+depends = "level"
+when = { min = 0.75 }
+
+[[settings]]
+key = "senses"
+type = "choices"
+label = "senses"
+default = ["sight"]
+min = 1
+options = [
+  { value = "sight", label = "sight" },
+  { value = "hearing", label = "hearing" },
+]
+
+[[settings]]
+key = "hearing-only"
+type = "switch"
+label = "hearing-only"
+default = false
+depends = "senses"
+when = ["hearing"]
+
+[[settings]]
+key = "while-off"
+type = "switch"
+label = "while-off"
+default = false
+depends = "giddy-only"
+when = [false]

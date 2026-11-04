@@ -1,6 +1,6 @@
 import { parse } from 'smol-toml';
 
-import type { ChoiceOption, Manifest, Permission, SettingDescription, SettingsPageId, SettingValue, ShortcutDescription } from '../api/v1/types.js';
+import type { ChoiceOption, Manifest, Permission, SettingCondition, SettingDescription, SettingsPageId, SettingValue, ShortcutDescription, SliderRange } from '../api/v1/types.js';
 import { API_VERSIONS } from '../api/versions.js';
 
 export const MANIFEST = 'extension.toml';
@@ -84,6 +84,9 @@ export function validValue(setting: SettingDescription, value: unknown): value i
   switch (setting.type) {
     case 'switch': return typeof value === 'boolean';
     case 'choice': return setting.options.some(option => option.value === value);
+    case 'choices':
+      return Array.isArray(value) && value.length >= (setting.min ?? 0) && new Set(value).size === value.length &&
+        value.every(picked => setting.options.some(option => option.value === picked));
     case 'slider': return typeof value === 'number' && value >= setting.min && value <= setting.max;
     case 'color': return value === 'accent' || value === 'wallpaper' || (typeof value === 'string' && HEX.test(value));
   }
@@ -98,12 +101,21 @@ function page(source: Table, where: string, permissions: readonly Permission[]):
   return value as SettingsPageId;
 }
 
+function condition(source: Table, where: string): SettingCondition | undefined {
+  const when = source.when;
+  if (when === undefined || Array.isArray(when)) return when as SettingCondition | undefined;
+  const range = table(when, `${where}.when`);
+  const unknown = Object.keys(range).find(end => end !== 'min' && end !== 'max');
+  if (unknown) fail(`${where}.when can only have min and max, not ${unknown}`);
+  return Object.fromEntries(Object.keys(range).map(end => [end, number(range, end, `${where}.when`)]));
+}
+
 function setting(entry: unknown, index: number, permissions: readonly Permission[]): SettingDescription {
   const where = `settings[${index}]`;
   const source = table(entry, where);
   const base = {
     key: text(source, 'key', where, KEY), label: text(source, 'label', where, MESSAGE), depends: optionalText(source, 'depends', where),
-    page: page(source, where, permissions),
+    when: condition(source, where), page: page(source, where, permissions),
   };
   const type = source.type;
   let described: SettingDescription;
@@ -115,6 +127,13 @@ function setting(entry: unknown, index: number, permissions: readonly Permission
       described = { ...base, type, default: source.default as string, options: options(source, 'options', where) };
       if (!described.options.length) fail(`${where} offers no options`);
       break;
+    case 'choices': {
+      described = { ...base, type, default: source.default as string[], options: options(source, 'options', where) };
+      if (!described.options.length) fail(`${where} offers no options`);
+      if (source.min !== undefined) described.min = number(source, 'min', where);
+      if ((described.min ?? 0) > described.options.length) fail(`${where}.min is more than it offers`);
+      break;
+    }
     case 'slider': {
       const unit = source.unit;
       if (unit !== undefined && unit !== 'percent') fail(`${where}.unit must be "percent"`);
@@ -128,10 +147,29 @@ function setting(entry: unknown, index: number, permissions: readonly Permission
       if (!described.swatches!.every(swatch => validValue(described, swatch.value))) fail(`${where}.swatches must be colours`);
       break;
     default:
-      fail(`${where}.type must be switch, choice, slider or color`);
+      fail(`${where}.type must be switch, choice, choices, slider or color`);
   }
   if (!validValue(described, described.default)) fail(`${where}.default doesn't fit the setting`);
   return described;
+}
+
+function checkCondition(described: SettingDescription, parent: SettingDescription): void {
+  const { key, when } = described;
+  if (when === undefined) {
+    if (parent.type !== 'switch') fail(`${key} depends on ${parent.key}, which isn't a switch, so it needs when`);
+  } else if (Array.isArray(when)) {
+    if (!when.length) fail(`${key}'s when names no values`);
+    const possible = (value: unknown) => parent.type === 'choices' ? parent.options.some(option => option.value === value) : validValue(parent, value);
+    const wrong = when.find(value => !possible(value));
+    if (wrong !== undefined) fail(`${key}'s when has ${JSON.stringify(wrong)}, which ${parent.key} can't be`);
+  } else {
+    const { min, max } = when as SliderRange;
+    if (parent.type !== 'slider') fail(`${key}'s when is a range, which only works on a slider, and ${parent.key} isn't one`);
+    if (min === undefined && max === undefined) fail(`${key}'s when has neither min nor max`);
+    const low = min ?? parent.min;
+    const high = max ?? parent.max;
+    if (low > high || low > parent.max || high < parent.min) fail(`${key}'s when is outside what ${parent.key} can be`);
+  }
 }
 
 function dependencies(settings: SettingDescription[]): void {
@@ -141,9 +179,13 @@ function dependencies(settings: SettingDescription[]): void {
     keys.add(described.key);
   }
   settings.forEach((described, index) => {
-    if (!described.depends) return;
-    const depends = settings.slice(0, index).find(other => other.key === described.depends);
-    if (depends?.type !== 'switch') fail(`${described.key} depends on ${described.depends}, which isn't a switch declared before it`);
+    if (!described.depends) {
+      if (described.when !== undefined) fail(`${described.key} has when without depends`);
+      return;
+    }
+    const parent = settings.slice(0, index).find(other => other.key === described.depends);
+    if (!parent) fail(`${described.key} depends on ${described.depends}, which isn't declared before it`);
+    checkCondition(described, parent);
   });
 }
 

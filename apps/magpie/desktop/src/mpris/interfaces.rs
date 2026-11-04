@@ -6,6 +6,7 @@ use luft_dbus_macros::introspect;
 use parking_lot::Mutex;
 use serde::Serialize;
 use specta::Type;
+use zbus::object_server::SignalEmitter;
 use zbus::{ObjectPath, OwnedVariant, interface};
 
 use super::playback::{self, Repeat, Reported};
@@ -105,6 +106,9 @@ impl Player {
 #[introspect]
 #[interface(name = "org.mpris.MediaPlayer2.Player")]
 impl Player {
+    #[zbus(signal)]
+    pub async fn seeked(emitter: &SignalEmitter<'_>, position: i64) -> zbus::Result<()>;
+
     fn next(&self) {
         self.send(MediaAction::Next);
     }

@@ -9,6 +9,7 @@ use luft_app::dbus::{self, failed};
 use parking_lot::Mutex;
 use tokio::sync::Mutex as AsyncMutex;
 use zbus::Variant;
+use zbus::object_server::SignalEmitter;
 
 pub use interfaces::MediaAction;
 use interfaces::{Player, Root, Shared};
@@ -83,14 +84,8 @@ impl Mpris {
         if previous.playback.track == playback.track
             && (expected - playback.position).abs() > SEEK_TOLERANCE
         {
-            connection
-                .emit_signal(
-                    None::<&str>,
-                    PATH,
-                    PLAYER,
-                    "Seeked",
-                    &(playback::microseconds(playback.position),),
-                )
+            let emitter = SignalEmitter::new(connection, PATH).map_err(failed)?;
+            Player::seeked(&emitter, playback::microseconds(playback.position))
                 .await
                 .map_err(failed)?;
         }

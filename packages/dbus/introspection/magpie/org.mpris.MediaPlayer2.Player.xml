@@ -1,5 +1,8 @@
 <node>
   <interface name="org.mpris.MediaPlayer2.Player">
+    <signal name="Seeked">
+      <arg name="position" type="x"/>
+    </signal>
     <method name="Next">
     </method>
     <method name="Previous">

@@ -1,3 +1,7 @@
-summary = "Mail"
+summary = "One inbox for every mail account, with search that works offline"
 description = "One inbox for every account, a screener for new senders and search that works offline."
 screenshots = ["inbox.webp", "reading.webp", "compose.webp"]
+categories = ["Network", "Office"]
+homepage = "https://luft.computer"
+support = "https://github.com/Lantharos/Luft/issues"
+brand_color = "#a8452f"

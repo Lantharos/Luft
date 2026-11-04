@@ -1,3 +1,7 @@
-summary = "Photos, videos and music"
+summary = "One viewer for your photos, videos, music, PDFs and fonts"
 description = "Opens photos, videos, songs, PDFs and fonts, with the rest of the folder an arrow key away."
 screenshots = ["light.webp", "dark.webp"]
+categories = ["AudioVideo", "Graphics"]
+homepage = "https://luft.computer"
+support = "https://github.com/Lantharos/Luft/issues"
+brand_color = "#5b3a6e"

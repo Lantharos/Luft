@@ -1,3 +1,7 @@
-summary = "Terminal"
+summary = "A terminal with tabs, split panes and colours from your wallpaper"
 description = "Tabs and split panes, a nudge when a long command finishes, and colours from your wallpaper."
 screenshots = ["light.webp", "dark.webp"]
+categories = ["System", "Development"]
+homepage = "https://luft.computer"
+support = "https://github.com/Lantharos/Luft/issues"
+brand_color = "#1f5f6b"

@@ -453,6 +453,16 @@ export const commands = {
 		key: string,
 		value: Value,
 	}) & (Location), options?: CallOptions) => invoke<null>("settings_write", params, options),
+	soundCustomChoose: (params: {
+		name: string,
+	}, options?: CallOptions) => invoke<null>("sound_custom_choose", params, options),
+	soundCustomChooseSet: (params: {
+		names: string[],
+	}, options?: CallOptions) => invoke<SoundSet | null>("sound_custom_choose_set", params, options),
+	soundCustomReset: (params: {
+		name: string,
+	}, options?: CallOptions) => invoke<null>("sound_custom_reset", params, options),
+	soundCustomResetAll: (options?: CallOptions) => invoke<null>("sound_custom_reset_all", {}, options),
 	soundMeter: (params: {
 		enabled: boolean,
 	}, options?: CallOptions) => invoke<null>("sound_meter", params, options),
@@ -1462,6 +1472,11 @@ export type SigningKey = {
 };
 
 export type SigningKeyState = "none" | "pending" | "enrolled";
+
+export type SoundSet = {
+	used: number,
+	skipped: string[],
+};
 
 export type SoundSnapshot = {
 	outputs: DeviceView[],

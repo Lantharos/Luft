@@ -244,6 +244,22 @@ desktop-apps-cannot-autostart = This app can't start automatically
 # $property is a technical property name the login screen should have reported
 desktop-login-missing-property = The login screen left out { $property }
 
+## Custom system sounds
+
+# Title of the file picker
+desktop-sound-choose-title = Choose a Sound
+# Title of the folder picker
+desktop-sound-set-choose-title = Choose a Folder of Sounds
+# Name of the file type filter in the file picker
+desktop-sound-filter = Audio files
+desktop-sound-unopenable = This file can't be opened
+# $name is a file name
+desktop-sound-unplayable = { $name } can't be played. Try another audio file.
+# $name is a file name
+desktop-sound-too-long = { $name } is too long. A system sound can be up to { $seconds } seconds.
+desktop-sound-set-empty = This folder has no files named after a system sound.
+desktop-sound-set-unusable = None of the sounds in this folder can be used.
+
 ## Picture chooser for the login screen wallpaper and account pictures
 # Title of the file chooser
 desktop-picture-choose-title = Choose a Picture

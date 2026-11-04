@@ -22,6 +22,7 @@ export type SubpageId =
 	| 'network/ethernet'
 	| 'network/vpn'
 	| 'network/proxy'
+	| 'sound/custom'
 	| 'input/shortcuts'
 	| 'input/dictation'
 	| 'security/encryption'
@@ -92,6 +93,7 @@ export const SUBPAGES: Page<SubpageId>[] = [
 	page('network/ethernet', 'settings-page-ethernet', 'network-wired-symbolic', { keywords: [] }),
 	page('network/vpn', 'settings-page-vpn', 'network-vpn-symbolic', { keywords: [] }),
 	page('network/proxy', 'settings-page-proxy', 'preferences-system-network-proxy-symbolic', { keywords: [] }),
+	page('sound/custom', 'settings-page-custom-sounds', 'audio-x-generic-symbolic'),
 	page('input/shortcuts', 'settings-page-shortcuts', 'preferences-desktop-keyboard-shortcuts-symbolic', { keywords: [] }),
 	page('input/dictation', 'settings-page-dictation', 'audio-input-microphone-symbolic', { copilotKey: 'settings-page-dictation' }),
 	page('security/encryption', 'settings-page-encryption', 'drive-harddisk-symbolic', { keywords: [] }),

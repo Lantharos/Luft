@@ -17,6 +17,14 @@ void              shell_sound_player_play_file        (ShellSoundPlayer *player,
                                                        GFile            *file);
 void              shell_sound_player_play_fd          (ShellSoundPlayer *player,
                                                        int               fd);
+void              shell_sound_player_check_file       (ShellSoundPlayer    *player,
+                                                       GFile               *file,
+                                                       GCancellable        *cancellable,
+                                                       GAsyncReadyCallback  callback,
+                                                       gpointer             user_data);
+gboolean          shell_sound_player_check_file_finish (ShellSoundPlayer  *player,
+                                                        GAsyncResult      *result,
+                                                        GError           **error);
 guint64           shell_sound_player_get_cached_bytes (ShellSoundPlayer *player);
 
 G_END_DECLS

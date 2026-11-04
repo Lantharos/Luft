@@ -15,11 +15,13 @@
 
 ShellSoundClip *
 _shell_sound_clip_new (const char *name,
+                       const char *path,
                        GBytes     *samples)
 {
   ShellSoundClip *clip = g_atomic_rc_box_new0 (ShellSoundClip);
 
   clip->name = g_strdup (name);
+  clip->path = g_strdup (path);
   clip->samples = g_bytes_ref (samples);
   clip->frames = g_bytes_get_size (samples) / FRAME_SIZE;
   return clip;
@@ -35,6 +37,7 @@ static void
 clip_clear (ShellSoundClip *clip)
 {
   g_free (clip->name);
+  g_free (clip->path);
   g_bytes_unref (clip->samples);
 }
 
@@ -63,6 +66,7 @@ typedef struct
   char *name;
   GFile *file;
   int fd;
+  gsize max_frames;
 } Request;
 
 static void
@@ -138,6 +142,13 @@ decode (Request  *request,
           gst_buffer_unmap (gst_sample_get_buffer (sample), &map);
         }
       gst_sample_unref (sample);
+
+      if (samples->len / FRAME_SIZE > request->max_frames)
+        {
+          gst_element_set_state (pipeline, GST_STATE_NULL);
+          g_set_error (error, G_IO_ERROR, G_IO_ERROR_MESSAGE_TOO_LARGE, "%s is too long", request->name);
+          return NULL;
+        }
     }
 
   if (!check_bus (pipeline, error))
@@ -159,6 +170,7 @@ decode_in_thread (GTask        *task,
   Request *request = task_data;
   GError *error = NULL;
   g_autoptr (GBytes) samples = NULL;
+  g_autofree char *path = NULL;
 
   gst_init (NULL, NULL);
   samples = decode (request, &error);
@@ -174,7 +186,8 @@ decode_in_thread (GTask        *task,
       return;
     }
 
-  g_task_return_pointer (task, _shell_sound_clip_new (request->name, samples),
+  path = request->file ? g_file_get_path (request->file) : NULL;
+  g_task_return_pointer (task, _shell_sound_clip_new (request->name, path, samples),
                          (GDestroyNotify) _shell_sound_clip_unref);
 }
 
@@ -193,6 +206,7 @@ run (Request             *request,
 void
 _shell_sound_decode (const char          *name,
                      GFile               *file,
+                     gsize                max_frames,
                      GCancellable        *cancellable,
                      GAsyncReadyCallback  callback,
                      gpointer             user_data)
@@ -202,6 +216,7 @@ _shell_sound_decode (const char          *name,
   request->name = g_strdup (name);
   request->file = g_object_ref (file);
   request->fd = -1;
+  request->max_frames = max_frames;
   run (request, cancellable, callback, user_data);
 }
 
@@ -216,6 +231,7 @@ _shell_sound_decode_fd (const char          *name,
 
   request->name = g_strdup (name);
   request->fd = fd;
+  request->max_frames = SHELL_SOUND_ANY_LENGTH;
   run (request, cancellable, callback, user_data);
 }
 

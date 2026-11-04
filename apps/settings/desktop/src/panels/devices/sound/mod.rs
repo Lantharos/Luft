@@ -1,4 +1,5 @@
 mod card;
+mod custom;
 mod kestrel;
 mod meter;
 mod model;
@@ -110,4 +111,8 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         })
         .command_async("sound_preview", kestrel::preview)
         .command_async("sound_play", kestrel::play)
+        .command_async("sound_custom_choose", custom::choose)
+        .command_async("sound_custom_choose_set", custom::choose_set)
+        .command("sound_custom_reset", custom::reset)
+        .command("sound_custom_reset_all", custom::reset_all)
 }

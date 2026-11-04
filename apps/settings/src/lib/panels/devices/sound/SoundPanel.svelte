@@ -11,11 +11,13 @@
 	import type { DeviceView, Direction, Port, SoundSnapshot } from '#lib/bindings.js';
 	import SubPage from '#lib/components/SubPage.svelte';
 	import { percent } from '#lib/format.js';
+	import { app } from '#lib/state/app.svelte.js';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import AppsSection from './AppsSection.svelte';
 	import DevicesSection from './DevicesSection.svelte';
 	import LevelMeter from './LevelMeter.svelte';
-	import SystemSounds from './SystemSounds.svelte';
+	import CustomSounds from './system/CustomSounds.svelte';
+	import SystemSounds from './system/SystemSounds.svelte';
 	import VolumeRow from './VolumeRow.svelte';
 
 	type Output = {
@@ -78,7 +80,11 @@
 	{/if}
 {/snippet}
 
-{#if sound && page === 'apps'}
+{#if app.section === 'custom'}
+	<SubPage title={t('settings-sound-custom')} onclose={() => (app.section = null)}>
+		<CustomSounds />
+	</SubPage>
+{:else if sound && page === 'apps'}
 	<SubPage title={t('settings-sound-apps')} onclose={() => (page = null)}>
 		<AppsSection apps={sound.apps} outputs={sound.outputs} {max} />
 	</SubPage>
@@ -144,7 +150,7 @@
 		</Section>
 	{/if}
 
-	<SystemSounds />
+	<SystemSounds oncustomize={() => (app.section = 'custom')} />
 
 	<ExtensionRows page="sound" />
 {/if}

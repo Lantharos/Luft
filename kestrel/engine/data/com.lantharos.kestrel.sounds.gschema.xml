@@ -6,6 +6,11 @@
       <summary>Volume of the system sounds</summary>
       <description>Scales every system sound, on top of the output's own volume.</description>
     </key>
+    <key name="custom" type="a{ss}">
+      <default>{}</default>
+      <summary>Custom sounds</summary>
+      <description>Audio files to play instead of Luft's sounds, by the name of the sound, such as message-new-instant. Settings copies them into the data folder.</description>
+    </key>
     <key name="notifications" type="b">
       <default>true</default>
       <summary>Notification sounds</summary>

@@ -524,7 +524,7 @@ shell_sound_mix_play (ShellSoundMix *mix,
   decoding = g_new0 (Decoding, 1);
   decoding->mix = g_object_ref (mix);
   decoding->path = g_strdup (path);
-  _shell_sound_decode (path, file, mix->cancellable, on_decoded, decoding);
+  _shell_sound_decode (path, file, SHELL_SOUND_ANY_LENGTH, mix->cancellable, on_decoded, decoding);
   return waiting.id;
 }
 

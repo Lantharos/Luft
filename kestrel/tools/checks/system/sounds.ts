@@ -4,6 +4,7 @@ import GLib from 'gi://GLib';
 import Shell from 'gi://Shell';
 import {captureScreenshot} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
+import {checkCustomSounds} from '../lib/audio/customSounds.js';
 import {checks} from '../lib/check.js';
 import {call} from '../lib/dbus.js';
 import {press} from '../lib/input/input.js';
@@ -139,6 +140,8 @@ export async function run() {
     console.log(`Kestrel sounds check: ${player.get_cached_bytes()} bytes of decoded sounds kept`);
     console.log(`Kestrel sounds check: Luft’s sound after ${unknown.toFixed(1)} ms for an unknown sender, ${watched.toFixed(1)} ms when waiting for the app’s own`);
     console.log(`Kestrel sounds check: ${costOfPlaybackStarts().toFixed(1)} µs to note a stream starting`);
+
+    await checkCustomSounds(() => notify('Maya', {'x-shell-sender-pid': new GLib.Variant('u', 0)}));
   } finally {
     player.disconnect(played);
     discord.reset('sound');

@@ -1,6 +1,6 @@
 ---
 title: Sounds
-description: The sounds Luft plays for notifications, devices, the volume, screenshots and recording, and how to quiet them.
+description: The sounds Luft plays for notifications, devices, the volume, screenshots and recording, how to quiet them and how to use your own.
 sidebar:
   order: 4
 ---
@@ -33,6 +33,39 @@ The play button next to each kind plays it once, so you can hear it before choos
 - The lock screen only plays errors, such as a wrong password.
 - When an app such as Discord plays its own sound as a notification arrives, Luft's stays quiet so you don't hear two. A call or music the app was already playing doesn't count.
 - Each app's notifications can play something else: on the app's page in Schelf, under Notifications, set **Sound** to **Luft's sound**, **The app's own** or **None**.
+
+## Using your own sounds
+
+**Your own sounds**, at the end of **System sounds**, lists every sound Luft plays. Next to each one, **Choose** picks an audio file to play instead, the play button plays what's set now, and the arrow goes back to Luft's sound. The new sound takes over right away.
+
+- Luft keeps its own copy of the file, so it goes on working if you move or delete the original.
+- A sound can be up to 10 seconds long. Luft tells you if a file is longer than that, or if it can't play it.
+- The switches for each kind still apply: a sound you've replaced stays quiet when its kind is off.
+- Your **Sign-in** sound plays when your desktop appears. The login screen itself stays with Luft's sounds, because it runs before you've signed in and can't reach your files.
+
+To replace many sounds at once, choose **Use a folder of sounds**. Luft looks in the folder, and in a `stereo` folder inside it, for audio files named after a sound, and uses each one it can play. Every sound the folder doesn't have goes back to Luft's. **Reset All** undoes it. These are the names:
+
+| Sound | File name |
+| --- | --- |
+| Notification | `message-new-instant` |
+| Quiet notification | `dialog-information` |
+| New mail | `message-new-email` |
+| Device connected | `device-added` |
+| Device disconnected | `device-removed` |
+| Charger plugged in | `power-plug` |
+| Low battery | `battery-low` |
+| Volume change | `audio-volume-change` |
+| Screenshot | `screen-capture` |
+| Sign-in | `desktop-login` |
+| Mail sent | `message-sent-email` |
+| Recording started | `recording-started` |
+| Recording stopped | `recording-stopped` |
+| Error | `dialog-error` |
+| Warning | `dialog-warning` |
+| Question | `dialog-question` |
+| Key | `keyboard-tap` |
+| Delete key | `keyboard-tap-delete` |
+| Space bar | `keyboard-tap-space` |
 
 ## When nothing plays
 

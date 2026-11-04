@@ -16,6 +16,7 @@ Apps and scripts can open Settings and Keys at a specific page with a link, thro
 | `kestrel-settings:network/ethernet` | Ethernet |
 | `kestrel-settings:network/vpn` | VPN |
 | `kestrel-settings:network/proxy` | Proxy |
+| `kestrel-settings:sound/custom` | Your own sounds |
 | `kestrel-settings:input/shortcuts` | Keyboard shortcuts |
 | `kestrel-settings:input/dictation` | Dictation |
 | `kestrel-settings:appearance/fonts` | All fonts |

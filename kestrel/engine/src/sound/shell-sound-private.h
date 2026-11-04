@@ -5,15 +5,19 @@
 
 #define SHELL_SOUND_RATE 48000
 #define SHELL_SOUND_CHANNELS 2
+#define SHELL_SOUND_ANY_LENGTH G_MAXSIZE
+#define SHELL_SOUND_LONGEST_CUSTOM_FRAMES (10 * SHELL_SOUND_RATE)
 
 typedef struct
 {
   char *name;
+  char *path;
   GBytes *samples;
   gsize frames;
 } ShellSoundClip;
 
 ShellSoundClip *_shell_sound_clip_new   (const char *name,
+                                         const char *path,
                                          GBytes     *samples);
 ShellSoundClip *_shell_sound_clip_ref   (ShellSoundClip *clip);
 void            _shell_sound_clip_unref (ShellSoundClip *clip);
@@ -22,6 +26,7 @@ G_DEFINE_AUTOPTR_CLEANUP_FUNC (ShellSoundClip, _shell_sound_clip_unref)
 
 void            _shell_sound_decode        (const char          *name,
                                             GFile               *file,
+                                            gsize                max_frames,
                                             GCancellable        *cancellable,
                                             GAsyncReadyCallback  callback,
                                             gpointer             user_data);

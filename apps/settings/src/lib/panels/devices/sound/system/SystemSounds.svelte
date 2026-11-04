@@ -6,6 +6,12 @@
 	import { percent } from '#lib/format.js';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 
+	interface Props {
+		oncustomize: () => void;
+	}
+
+	let { oncustomize }: Props = $props();
+
 	type Kinds = {
 		notifications: boolean;
 		devices: boolean;
@@ -27,10 +33,11 @@
 	];
 
 	const sound = useSettings<{ 'event-sounds': boolean }>('org.gnome.desktop.sound', ['event-sounds']);
-	const kinds = useSettings<Kinds & { volume: number }>('com.lantharos.kestrel.sounds', [...KINDS.map((kind) => kind.key), 'volume']);
+	const kinds = useSettings<Kinds & { volume: number; custom: Record<string, string> }>('com.lantharos.kestrel.sounds', [...KINDS.map((kind) => kind.key), 'volume', 'custom']);
 
 	let on = $derived(sound.values['event-sounds'] ?? true);
 	let volume = $derived(kinds.values.volume ?? 1);
+	let replaced = $derived(Object.keys(kinds.values.custom ?? {}).length);
 </script>
 
 <Section title={t('settings-sound-system')}>
@@ -50,5 +57,6 @@
 				<Switch label={t(kind.title)} checked={kinds.values[kind.key] ?? kind.key !== 'keyboard'} onchange={(checked) => kinds.set(kind.key, checked)} />
 			</Row>
 		{/each}
+		<Row title={t('settings-sound-custom')} description={replaced ? t('settings-sound-custom-count', { count: replaced }) : t('settings-sound-custom-description')} onclick={oncustomize} />
 	{/if}
 </Section>

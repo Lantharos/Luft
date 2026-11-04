@@ -1,6 +1,7 @@
 import type { Component } from 'svelte';
 import Accessibility from '@lucide/svelte/icons/accessibility';
 import AppWindow from '@lucide/svelte/icons/app-window';
+import AudioLines from '@lucide/svelte/icons/audio-lines';
 import BatteryCharging from '@lucide/svelte/icons/battery-charging';
 import Bluetooth from '@lucide/svelte/icons/bluetooth';
 import EthernetPort from '@lucide/svelte/icons/ethernet-port';
@@ -48,6 +49,7 @@ export interface Panel extends Page, View {}
 
 const network = () => import('./connections/network/NetworkPanel.svelte');
 const input = () => import('./devices/input/InputPanel.svelte');
+const sound = () => import('./devices/sound/SoundPanel.svelte');
 const security = () => import('./protection/security/SecurityPanel.svelte');
 const accounts = () => import('./system/accounts/AccountsPanel.svelte');
 const system = () => import('./system/SystemPanel.svelte');
@@ -60,7 +62,7 @@ const VIEWS: Record<PageId, View> = {
 		needs: { present: (hardware) => hardware.bluetooth, missing: 'settings-bluetooth-missing' }
 	},
 	display: { icon: Monitor, load: () => import('./devices/display/DisplayPanel.svelte') },
-	sound: { icon: Volume2, load: () => import('./devices/sound/SoundPanel.svelte') },
+	sound: { icon: Volume2, load: sound },
 	power: {
 		icon: BatteryCharging,
 		load: () => import('./devices/power/PowerPanel.svelte'),
@@ -82,6 +84,7 @@ const VIEWS: Record<PageId, View> = {
 	'network/ethernet': { icon: EthernetPort, load: network },
 	'network/vpn': { icon: Shield, load: network },
 	'network/proxy': { icon: Globe, load: network },
+	'sound/custom': { icon: AudioLines, load: sound },
 	'input/shortcuts': { icon: Keyboard, load: input },
 	'input/dictation': { icon: Mic, load: input },
 	'security/encryption': { icon: HardDrive, load: security },

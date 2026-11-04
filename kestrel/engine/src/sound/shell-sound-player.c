@@ -21,6 +21,7 @@ struct _ShellSoundPlayer
 
   GSettings *settings;
   GSettings *sounds;
+  GVariant *custom;
   ShellSoundTheme *theme;
   ShellSoundOutput *output;
   GCancellable *cancellable;
@@ -34,6 +35,7 @@ typedef struct
 {
   ShellSoundPlayer *player;
   char *name;
+  gboolean custom;
 } Decoding;
 
 static void
@@ -49,13 +51,49 @@ start (ShellSoundPlayer *player,
        ShellSoundClip   *clip)
 {
   _shell_sound_output_play (player->output, clip);
-  g_signal_emit (player, signals[PLAYED], 0, clip->name);
+  g_signal_emit (player, signals[PLAYED], 0, clip->name, clip->path);
+}
+
+static void on_sound_decoded (GObject      *source,
+                              GAsyncResult *result,
+                              gpointer      data);
+
+static gboolean
+decode_theme_sound (Decoding *decoding)
+{
+  ShellSoundPlayer *player = decoding->player;
+  gboolean disabled;
+  g_autoptr (GFile) file = _shell_sound_theme_lookup (player->theme, decoding->name, &disabled);
+
+  if (!file)
+    return FALSE;
+
+  decoding->custom = FALSE;
+  _shell_sound_decode (decoding->name, file, SHELL_SOUND_ANY_LENGTH, player->cancellable, on_sound_decoded, decoding);
+  return TRUE;
+}
+
+static gboolean
+decode_custom_sound (Decoding *decoding)
+{
+  ShellSoundPlayer *player = decoding->player;
+  const char *path;
+  g_autoptr (GFile) file = NULL;
+
+  if (!g_variant_lookup (player->custom, decoding->name, "&s", &path))
+    return FALSE;
+
+  file = g_file_new_for_path (path);
+  decoding->custom = TRUE;
+  _shell_sound_decode (decoding->name, file, SHELL_SOUND_LONGEST_CUSTOM_FRAMES,
+                       player->cancellable, on_sound_decoded, decoding);
+  return TRUE;
 }
 
 static void
-on_theme_sound_decoded (GObject      *source,
-                        GAsyncResult *result,
-                        gpointer      data)
+on_sound_decoded (GObject      *source,
+                  GAsyncResult *result,
+                  gpointer      data)
 {
   Decoding *decoding = data;
   ShellSoundPlayer *player = decoding->player;
@@ -69,12 +107,17 @@ on_theme_sound_decoded (GObject      *source,
       return;
     }
 
+  if (!clip)
+    {
+      g_warning ("Can't play the sound %s: %s", decoding->name, error->message);
+      if (decoding->custom && decode_theme_sound (decoding))
+        return;
+    }
+
   wanted = GPOINTER_TO_INT (g_hash_table_lookup (player->pending, decoding->name));
   g_hash_table_remove (player->pending, decoding->name);
 
-  if (!clip)
-    g_warning ("Can't play the sound %s: %s", decoding->name, error->message);
-  else
+  if (clip)
     {
       g_hash_table_insert (player->clips, g_strdup (decoding->name), _shell_sound_clip_ref (clip));
       if (wanted)
@@ -89,9 +132,7 @@ load (ShellSoundPlayer *player,
       const char       *name,
       gboolean          play)
 {
-  g_autoptr (GFile) file = NULL;
   Decoding *decoding;
-  gboolean disabled;
 
   if (g_hash_table_contains (player->pending, name))
     {
@@ -100,15 +141,15 @@ load (ShellSoundPlayer *player,
       return;
     }
 
-  file = _shell_sound_theme_lookup (player->theme, name, &disabled);
-  if (!file)
-    return;
-
   decoding = g_new0 (Decoding, 1);
   decoding->player = g_object_ref (player);
   decoding->name = g_strdup (name);
   g_hash_table_insert (player->pending, g_strdup (name), GINT_TO_POINTER (play));
-  _shell_sound_decode (name, file, player->cancellable, on_theme_sound_decoded, decoding);
+  if (!decode_custom_sound (decoding) && !decode_theme_sound (decoding))
+    {
+      g_hash_table_remove (player->pending, name);
+      decoding_free (decoding);
+    }
 }
 
 void
@@ -146,7 +187,7 @@ shell_sound_player_play_file (ShellSoundPlayer *player,
 {
   g_autofree char *name = g_file_get_basename (file);
 
-  _shell_sound_decode (name, file, player->cancellable, on_file_decoded, g_object_ref (player));
+  _shell_sound_decode (name, file, SHELL_SOUND_ANY_LENGTH, player->cancellable, on_file_decoded, g_object_ref (player));
 }
 
 void
@@ -154,6 +195,47 @@ shell_sound_player_play_fd (ShellSoundPlayer *player,
                             int               fd)
 {
   _shell_sound_decode_fd ("sound", fd, player->cancellable, on_file_decoded, g_object_ref (player));
+}
+
+/**
+ * shell_sound_player_check_file:
+ * @player: the sound player
+ * @file: the sound to try
+ * @cancellable: (nullable): cancels the check
+ * @callback: (scope async): called when the sound has been decoded
+ * @user_data: data for @callback
+ *
+ * Decodes @file the way a custom sound is decoded, to learn whether it plays.
+ */
+void
+shell_sound_player_check_file (ShellSoundPlayer    *player,
+                               GFile               *file,
+                               GCancellable        *cancellable,
+                               GAsyncReadyCallback  callback,
+                               gpointer             user_data)
+{
+  g_autofree char *name = g_file_get_basename (file);
+
+  _shell_sound_decode (name, file, SHELL_SOUND_LONGEST_CUSTOM_FRAMES, cancellable, callback, user_data);
+}
+
+/**
+ * shell_sound_player_check_file_finish:
+ * @player: the sound player
+ * @result: the result of the check
+ * @error: set when the sound can't be played, to %G_IO_ERROR_MESSAGE_TOO_LARGE
+ *   when it's too long
+ *
+ * Returns: whether @file can be used as a custom sound
+ */
+gboolean
+shell_sound_player_check_file_finish (ShellSoundPlayer  *player,
+                                      GAsyncResult      *result,
+                                      GError           **error)
+{
+  g_autoptr (ShellSoundClip) clip = _shell_sound_decode_finish (result, error);
+
+  return clip != NULL;
 }
 
 void
@@ -186,14 +268,20 @@ on_started (const char *name,
 }
 
 static void
-load_theme (ShellSoundPlayer *player)
+forget_sounds (ShellSoundPlayer *player)
 {
-  g_autofree char *name = g_settings_get_string (player->settings, "theme-name");
-
   g_cancellable_cancel (player->cancellable);
   g_set_object (&player->cancellable, g_cancellable_new ());
   g_hash_table_remove_all (player->clips);
   g_hash_table_remove_all (player->pending);
+}
+
+static void
+load_theme (ShellSoundPlayer *player)
+{
+  g_autofree char *name = g_settings_get_string (player->settings, "theme-name");
+
+  forget_sounds (player);
   g_clear_pointer (&player->theme, _shell_sound_theme_free);
   player->theme = _shell_sound_theme_new (name);
 }
@@ -202,6 +290,21 @@ static void
 load_volume (ShellSoundPlayer *player)
 {
   _shell_sound_output_set_volume (player->output, g_settings_get_double (player->sounds, "volume"));
+}
+
+static void
+read_custom_sounds (ShellSoundPlayer *player)
+{
+  g_clear_pointer (&player->custom, g_variant_unref);
+  player->custom = g_settings_get_value (player->sounds, "custom");
+}
+
+static void
+on_custom_sounds_changed (ShellSoundPlayer *player)
+{
+  forget_sounds (player);
+  read_custom_sounds (player);
+  load (player, WARM_SOUND, FALSE);
 }
 
 static void
@@ -218,6 +321,8 @@ shell_sound_player_init (ShellSoundPlayer *player)
   player->sounds = g_settings_new ("com.lantharos.kestrel.sounds");
   g_signal_connect_swapped (player->sounds, "changed::volume", G_CALLBACK (load_volume), player);
   load_volume (player);
+  g_signal_connect_swapped (player->sounds, "changed::custom", G_CALLBACK (on_custom_sounds_changed), player);
+  read_custom_sounds (player);
 }
 
 static void
@@ -229,6 +334,7 @@ shell_sound_player_finalize (GObject *object)
   g_clear_object (&player->cancellable);
   g_clear_object (&player->settings);
   g_clear_object (&player->sounds);
+  g_clear_pointer (&player->custom, g_variant_unref);
   g_clear_pointer (&player->theme, _shell_sound_theme_free);
   g_clear_pointer (&player->clips, g_hash_table_unref);
   g_clear_pointer (&player->pending, g_hash_table_unref);
@@ -245,7 +351,7 @@ shell_sound_player_class_init (ShellSoundPlayerClass *klass)
   object_class->finalize = shell_sound_player_finalize;
 
   signals[PLAYED] = g_signal_new ("played", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST,
-                                  0, NULL, NULL, NULL, G_TYPE_NONE, 1, G_TYPE_STRING);
+                                  0, NULL, NULL, NULL, G_TYPE_NONE, 2, G_TYPE_STRING, G_TYPE_STRING);
   signals[STARTED] = g_signal_new ("started", G_TYPE_FROM_CLASS (klass), G_SIGNAL_RUN_LAST,
                                    0, NULL, NULL, NULL, G_TYPE_NONE, 2, G_TYPE_STRING, G_TYPE_INT64);
 }

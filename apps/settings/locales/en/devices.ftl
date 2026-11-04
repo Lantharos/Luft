@@ -135,6 +135,54 @@ settings-sound-kind-sign-in = Sign-in sound
 settings-sound-kind-keyboard = Keyboard taps
     .description = Each key on the on-screen keyboard
     .preview = Play a keyboard tap
+settings-sound-custom = Your own sounds
+settings-sound-custom-description = Use your own audio files for any sound
+settings-sound-custom-count = { $count ->
+    [one] { $count } sound replaced
+   *[other] { $count } sounds replaced
+}
+settings-sound-kind-feedback = Everyday sounds
+settings-sound-kind-alerts = Alerts
+settings-sound-set = Sound set
+settings-sound-set-folder = Use a folder of sounds
+settings-sound-set-folder-description = Files named after a sound replace it, such as message-new-instant.ogg. Every other sound goes back to Luft's.
+# Button that opens a folder picker
+settings-sound-set-choose = Choose Folder
+settings-sound-set-used = { $count ->
+    [one] Using { $count } sound from the folder.
+   *[other] Using { $count } sounds from the folder.
+}
+# $files is a comma-separated list of file names
+settings-sound-set-skipped = Couldn't use { $files }.
+# Button that goes back to the sounds Luft comes with
+settings-sound-reset-all = Reset All
+# Shown below a sound's name when it plays the sound Luft comes with
+settings-sound-default = Luft's sound
+# Button that opens a file picker
+settings-sound-choose = Choose
+# Labels of the buttons on a sound's row. $sound is the sound's name, such as Notification.
+settings-sound-choose-label = Choose a file for { $sound }
+settings-sound-play = Play { $sound }
+settings-sound-reset = Go back to Luft's sound for { $sound }
+settings-sound-name-notification = Notification
+settings-sound-name-quiet-notification = Quiet notification
+settings-sound-name-new-mail = New mail
+settings-sound-name-device-added = Device connected
+settings-sound-name-device-removed = Device disconnected
+settings-sound-name-charger = Charger plugged in
+settings-sound-name-low-battery = Low battery
+settings-sound-name-volume = Volume change
+settings-sound-name-screenshot = Screenshot
+settings-sound-name-sign-in = Sign-in
+settings-sound-name-mail-sent = Mail sent
+settings-sound-name-recording-started = Recording started
+settings-sound-name-recording-stopped = Recording stopped
+settings-sound-name-error = Error
+settings-sound-name-warning = Warning
+settings-sound-name-question = Question
+settings-sound-name-key = Key
+settings-sound-name-delete-key = Delete key
+settings-sound-name-space-key = Space bar
 
 ## Power and battery
 

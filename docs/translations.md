@@ -16,6 +16,7 @@ Luft is translated into Albanian, Bosnian, Bulgarian, Catalan, Croatian, Czech, 
 | kestrel-portal | `kestrel/ui/locales/*/portal.ftl` | printing, screen sharing, shortcuts and other app requests |
 | extension-seasons | `extensions/seasons/locales/*/seasons.ftl` | the Seasons extension: its name, tile, settings and page |
 | extension-strays | `extensions/strays/locales/*/strays.ftl` | the Strays extension: its name, tile, page and why a stray can't be added |
+| extension-playthings | `extensions/playthings/locales/*/playthings.ftl` | the Playthings extension: its name, tile, settings and arranging |
 | extension-keystrokes | `extensions/keystrokes/locales/*/keystrokes.ftl` | the Keystrokes extension: its settings, sounds, what it can see, and why a set of sounds can't be added |
 | extension-reminders | `extensions/reminders/locales/*/reminders.ftl` | the Reminders extension: its settings, lists, notifications and the nudges for overdue goals. Quick add itself reads English |
 | extension-soundscapes | `extensions/soundscapes/locales/*/soundscapes.ftl` | the Soundscapes extension: its sounds, mixes, tile, mixer and settings |

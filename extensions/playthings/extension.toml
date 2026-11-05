@@ -1,0 +1,175 @@
+id = "com.lantharos.Playthings"
+name = "Playthings"
+description = "Lanterns, clouds, a campfire and stars on your wallpaper that sway, part, flare and twinkle when you brush past them with the pointer or a finger."
+version = "1.0.0"
+api = 1
+permissions = ["wallpaper", "quick-settings", "popups"]
+
+[[settings]]
+key = "on"
+type = "switch"
+label = "playthings"
+default = true
+
+[[settings]]
+key = "lanterns"
+depends = "on"
+type = "switch"
+label = "lanterns"
+default = true
+
+[[settings]]
+key = "lantern-count"
+depends = "lanterns"
+type = "slider"
+label = "lantern-count"
+default = 3
+min = 1
+max = 7
+step = 1
+
+[[settings]]
+key = "lantern-place"
+depends = "lanterns"
+type = "choice"
+label = "place"
+default = "left"
+options = [
+  { value = "left", label = "place-left" },
+  { value = "middle", label = "place-middle" },
+  { value = "right", label = "place-right" },
+  { value = "across", label = "place-across" },
+]
+
+[[settings]]
+key = "lantern-paper"
+depends = "lanterns"
+type = "choice"
+label = "lantern-paper"
+default = "mixed"
+options = [
+  { value = "mixed", label = "paper-mixed" },
+  { value = "amber", label = "paper-amber" },
+  { value = "coral", label = "paper-coral" },
+  { value = "jade", label = "paper-jade" },
+]
+
+[[settings]]
+key = "clouds"
+depends = "on"
+type = "switch"
+label = "clouds"
+default = true
+
+[[settings]]
+key = "cloud-count"
+depends = "clouds"
+type = "slider"
+label = "cloud-count"
+default = 2
+min = 1
+max = 6
+step = 1
+
+[[settings]]
+key = "cloud-place"
+depends = "clouds"
+type = "choice"
+label = "place"
+default = "across"
+options = [
+  { value = "left", label = "place-left" },
+  { value = "middle", label = "place-middle" },
+  { value = "right", label = "place-right" },
+  { value = "across", label = "place-across" },
+]
+
+[[settings]]
+key = "campfire"
+depends = "on"
+type = "switch"
+label = "campfire"
+default = true
+
+[[settings]]
+key = "campfire-count"
+depends = "campfire"
+type = "slider"
+label = "campfire-count"
+default = 1
+min = 1
+max = 3
+step = 1
+
+[[settings]]
+key = "campfire-place"
+depends = "campfire"
+type = "choice"
+label = "place"
+default = "right"
+options = [
+  { value = "left", label = "place-left" },
+  { value = "middle", label = "place-middle" },
+  { value = "right", label = "place-right" },
+  { value = "across", label = "place-across" },
+]
+
+[[settings]]
+key = "stars"
+depends = "on"
+type = "switch"
+label = "stars"
+default = true
+
+[[settings]]
+key = "star-count"
+depends = "stars"
+type = "slider"
+label = "star-count"
+default = 1
+min = 1
+max = 4
+step = 1
+
+[[settings]]
+key = "star-place"
+depends = "stars"
+type = "choice"
+label = "place"
+default = "right"
+options = [
+  { value = "left", label = "place-left" },
+  { value = "middle", label = "place-middle" },
+  { value = "right", label = "place-right" },
+  { value = "across", label = "place-across" },
+]
+
+[[settings]]
+key = "size"
+depends = "on"
+type = "choice"
+label = "size"
+default = "medium"
+options = [
+  { value = "small", label = "small" },
+  { value = "medium", label = "medium" },
+  { value = "large", label = "large" },
+]
+
+[[settings]]
+key = "displays"
+depends = "on"
+type = "choice"
+label = "displays"
+default = "main"
+options = [
+  { value = "main", label = "displays-main" },
+  { value = "every", label = "displays-every" },
+]
+
+[[settings]]
+key = "ambient"
+depends = "on"
+type = "switch"
+label = "ambient"
+default = true

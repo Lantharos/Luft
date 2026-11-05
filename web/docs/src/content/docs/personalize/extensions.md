@@ -1,11 +1,11 @@
 ---
 title: Extensions
-description: Seasons, Strays, Keystrokes, Soundscapes, Focus, Reminders, Pult and other extensions that add to the desktop, and how to turn them off, set them up or remove them.
+description: Seasons, Strays, Playthings, Keystrokes, Soundscapes, Focus, Reminders, Pult and other extensions that add to the desktop, and how to turn them off, set them up or remove them.
 sidebar:
   order: 5
 ---
 
-Extensions add to the desktop: something on the wallpaper, a tile in quick settings, a button on the taskbar, results in search. Luft comes with one, Seasons, and you can find more, such as [Strays](/personalize/strays/), [Keystrokes](/personalize/keystrokes/), Soundscapes, Focus, [Reminders](/personalize/reminders/) and Pult, in [Schelf](/apps/schelf/).
+Extensions add to the desktop: something on the wallpaper, a tile in quick settings, a button on the taskbar, results in search. Luft comes with one, Seasons, and you can find more, such as [Strays](/personalize/strays/), [Playthings](/personalize/playthings/), [Keystrokes](/personalize/keystrokes/), Soundscapes, Focus, [Reminders](/personalize/reminders/) and Pult, in [Schelf](/apps/schelf/).
 
 **Settings → Extensions** lists them. The switch next to each turns it on or off; opening one shows what it can do, its own settings and **Remove**. An extension only gets what it says it needs, and the list under **What it can do** is exactly that.
 
@@ -28,6 +28,10 @@ The Seasons tile in [quick settings](/desktop/quick-settings/) switches it on an
 ## Strays
 
 [Strays](/personalize/strays/) puts a few small creatures on your desktop that wander across the taskbar and your windows, and that you can pick up, or draw yourself. Its tile in [quick settings](/desktop/quick-settings/) switches them on and off and sets how many.
+
+## Playthings
+
+[Playthings](/personalize/playthings/) hangs lanterns, clouds, a campfire and stars on your wallpaper that react to the pointer and your fingers, and that you can drag wherever you like. Its tile in [quick settings](/desktop/quick-settings/) switches them on and off.
 
 ## Keystrokes
 

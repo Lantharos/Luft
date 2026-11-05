@@ -14,6 +14,7 @@
 	{"name": "extension-strays", "bundle": "extension-strays", "mask": "extensions/strays/locales/*/strays.ftl", "sources": ["extensions/strays", "kestrel/ui/src/extensions/runtime/instance.ts"]},
 	{"name": "extension-keystrokes", "bundle": "extension-keystrokes", "mask": "extensions/keystrokes/locales/*/keystrokes.ftl", "sources": ["extensions/keystrokes", "kestrel/ui/src/extensions/runtime/instance.ts"]},
 	{"name": "extension-reminders", "bundle": "extension-reminders", "mask": "extensions/reminders/locales/*/reminders.ftl", "sources": ["extensions/reminders", "kestrel/ui/src/extensions/runtime/instance.ts"]},
+	{"name": "extension-playthings", "bundle": "extension-playthings", "mask": "extensions/playthings/locales/*/playthings.ftl", "sources": ["extensions/playthings", "kestrel/ui/src/extensions/runtime/instance.ts"]},
 	{"name": "kestrel-settings", "bundle": "kestrel-settings", "mask": "kestrel/settings/locales/*/settings.ftl", "sources": ["kestrel/settings/src/modules/system/drives", "kestrel/settings/src/modules/devices/power/discharge.rs"]},
 	{"name": "kestrel-portal-service", "bundle": "kestrel-portal", "mask": "kestrel/portal/locales/*/portal.ftl", "sources": ["kestrel/portal/src"]},
 	{"name": "ui", "bundle": "ui", "mask": "packages/web/ui/locales/*/ui.ftl", "sources": ["packages/web/ui/src"]},

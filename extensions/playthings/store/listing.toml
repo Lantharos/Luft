@@ -1,0 +1,8 @@
+summary = "Lanterns, clouds, a campfire and stars that react to your pointer"
+description = "Hang paper lanterns that swing when you brush past them and light up when clicked. Clouds part around the pointer and rain a little when poked, a campfire leans away, throws sparks and catches when you fan it, and stars brighten and join up near the pointer, with a shooting star for a flick. Fingers work just like a mouse, as many as you like at once. Pick what shows, how many and where, then drag them wherever you want on each display. They live on your wallpaper behind your windows, leave the rest of your desktop alone, rest during full screen and battery saver, and use nothing at all when still."
+screenshots = ["desktop.webp", "night.webp", "arrange.webp", "settings.webp"]
+keywords = ["interactive wallpaper", "desktop toys", "lanterns", "clouds", "campfire", "stars", "touch", "physics"]
+categories = ["Utility", "Graphics"]
+homepage = "https://luft.computer"
+support = "https://github.com/Lantharos/Luft/issues"
+brand_color = "#ec8f34"

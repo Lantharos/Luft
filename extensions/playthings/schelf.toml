@@ -1,0 +1,8 @@
+id = "com.lantharos.Playthings"
+kind = "extension"
+format = "luft-extension"
+permissions = "extension.toml"
+listing = "store/"
+
+[requires]
+extension_api = 1

@@ -39,6 +39,7 @@ float window_inside(vec2 position) {
 
 const FILTER = `
 uniform vec2 filter_size;
+uniform float filter_scale;
 uniform float filter_time;
 
 vec4 filter_scene(vec2 position) {

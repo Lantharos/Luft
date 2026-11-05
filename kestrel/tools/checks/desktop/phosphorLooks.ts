@@ -49,6 +49,9 @@ async function checkEveryLook() {
     await capture(`phosphor-overlay-${look}`);
   }
   await choose('overlay', 'off');
+  await choose('chromatic-aberration', 0.5);
+  await eventually(() => attachedEffects().views > 0, 'chromatic aberration works alone');
+  await choose('chromatic-aberration', 0);
   for (const invert of ['colors', 'lightness']) {
     await choose('invert', invert);
     await eventually(() => attachedEffects().views > 0, `inverting ${invert} works`);

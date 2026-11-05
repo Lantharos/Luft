@@ -52,6 +52,7 @@ export class DesktopFilter extends Effect implements DesktopFilterApi {
     this.passes.forEach((pass, index) => filter.add_pass(this.snippets[index], pass.scale ?? FULL_SIZE));
     const framebuffer = view.get_onscreen();
     filter.set_uniform('filter_size', 2, [framebuffer.get_width(), framebuffer.get_height()]);
+    filter.set_uniform('filter_scale', 1, [view.get_scale()]);
     this.uniforms.forEach((name, components, values) => filter.set_uniform(name, components, values));
     filter.set_captured(!!this.filterOptions.captured);
     return filter;

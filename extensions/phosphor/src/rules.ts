@@ -1,9 +1,9 @@
 import type { EffectWindow, Extension } from '@luft/extension-api';
 
 export type Granted = 'screen-effects';
-export type Part = 'border' | 'overlay' | 'crt' | 'motion';
+export type Part = 'border' | 'overlay' | 'crt' | 'aberration' | 'motion';
 
-export const PARTS: readonly Part[] = ['border', 'overlay', 'crt', 'motion'];
+export const PARTS: readonly Part[] = ['border', 'overlay', 'crt', 'aberration', 'motion'];
 
 type Everywhere = Record<Part, boolean>;
 type Rule = Partial<Record<Part, boolean>>;
@@ -11,9 +11,9 @@ type Rules = Record<string, Rule>;
 
 const RULES = 'rules';
 const EVERYWHERE = 'everywhere';
-const DEFAULTS: Everywhere = { border: true, overlay: true, crt: false, motion: true };
+const DEFAULTS: Everywhere = { border: true, overlay: true, crt: false, aberration: false, motion: true };
 
-/** Which parts go on every app, and what each app does differently. A CRT inside a window starts off everywhere. */
+/** Which parts go on every app, and what each app does differently. What reads a window's pixels starts off everywhere. */
 export class AppRules {
   private rules: Rules;
   private everywhere: Everywhere;
@@ -35,6 +35,11 @@ export class AppRules {
     this.everywhere[part] = on;
     this.phosphor.storage.set(EVERYWHERE, this.everywhere);
     this.changed();
+  }
+
+  /** Whether any window could get this part, so what costs memory per window only exists when one can. */
+  used(part: Part): boolean {
+    return this.everywhere[part] || this.apps.some(app => this.value(app, part));
   }
 
   get apps(): string[] {

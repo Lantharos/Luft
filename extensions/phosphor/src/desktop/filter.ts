@@ -44,14 +44,25 @@ uniform float grade_contrast;
 uniform vec3 grade_shadows;
 uniform vec3 grade_lights;
 uniform float shadow_boost;
-uniform float bloom_amount;`;
+uniform float bloom_amount;
+uniform float chromatic_aberration;`;
 
 const USE_BEND = `
 vec2 scene_position = curved(filter_uv);
 float on_tube = step(0.0, scene_position.x) * step(scene_position.x, 1.0) * step(0.0, scene_position.y) * step(scene_position.y, 1.0);
 filter_color = filter_scene(scene_position) * on_tube;`;
 
-const NO_BEND = 'vec2 scene_position = filter_uv;';
+const NO_BEND = `
+vec2 scene_position = filter_uv;
+float on_tube = 1.0;`;
+
+const USE_ABERRATION = `
+vec2 from_middle_of_tube = scene_position * 2.0 - 1.0;
+vec2 outward = from_middle_of_tube * filter_size;
+float reach = dot(from_middle_of_tube, from_middle_of_tube) * 0.5;
+vec2 fringe = outward / max(length(outward), 1.0) * reach * chromatic_aberration * 8.0 * filter_scale / filter_size;
+filter_color.r = filter_scene(scene_position + fringe).r * on_tube;
+filter_color.b = filter_scene(scene_position - fringe).b * on_tube;`;
 
 const USE_BLOOM = 'filter_color.rgb += texture2D(cogl_sampler3, scene_position).rgb * bloom_amount;';
 
@@ -96,13 +107,15 @@ interface Choices {
   grade: string;
   shadows: boolean;
   bloom: boolean;
+  aberration: boolean;
 }
 
-function finalShader({ crt, curved, flicker, invert, grade, shadows, bloom }: Choices): FilterPass {
+function finalShader({ crt, curved, flicker, invert, grade, shadows, bloom, aberration }: Choices): FilterPass {
   return {
     declarations: `${curved ? CURVE : ''}${DECLARATIONS}`,
     shader: [
       curved ? USE_BEND : NO_BEND,
+      aberration ? USE_ABERRATION : '',
       bloom ? USE_BLOOM : '',
       shadows ? USE_SHADOWS : '',
       grade !== 'off' ? USE_GRADE : '',
@@ -137,14 +150,15 @@ export class ScreenFilter {
       grade: settings.get<string>('grade'),
       shadows: settings.get<number>('shadow-boost') > 0,
       bloom: settings.get<number>('bloom') > 0,
+      aberration: settings.get<number>('chromatic-aberration') > 0,
     };
   }
 
   update(): void {
     const { settings, screenEffects, t } = this.phosphor;
     const choices = this.choices();
-    const { crt, curved, flicker, invert, grade, shadows, bloom } = choices;
-    const wanted = crt || invert !== 'off' || grade !== 'off' || shadows || bloom;
+    const { crt, curved, flicker, invert, grade, shadows, bloom, aberration } = choices;
+    const wanted = crt || invert !== 'off' || grade !== 'off' || shadows || bloom || aberration;
     const shape = wanted ? JSON.stringify(choices) + settings.get<boolean>('filters-fullscreen') : '';
     if (shape !== this.shape) {
       this.shape = shape;
@@ -171,6 +185,7 @@ export class ScreenFilter {
     filter.set('crt_mask', settings.get<number>('crt-mask'));
     filter.set('shadow_boost', settings.get<number>('shadow-boost'));
     filter.set('bloom_amount', settings.get<number>('bloom'));
+    filter.set('chromatic_aberration', settings.get<number>('chromatic-aberration'));
     const grade = GRADES[settings.get<string>('grade')];
     if (!grade) return;
     filter.set('grade_amount', settings.get<number>('grade-strength'));

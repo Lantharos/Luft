@@ -163,7 +163,7 @@ export interface FilterPass {
 /**
  * Shaders over a whole display, after everything else is drawn. A pass gets `vec2 filter_uv` and `vec4 filter_color`, what's
  * on the display there, and changes `filter_color`; `filter_scene(position)` reads any other pixel, `cogl_sampler1` and up
- * are what earlier passes drew, `filter_size` is the display in pixels and `filter_time` follows
+ * are what earlier passes drew, `filter_size` is the display in pixels, `filter_scale` its display scale, for sizes that should look the same at any scale, and `filter_time` follows
  * {@link ScreenEffectOptions.animated}. It costs one pass over the display each time something changes on it, and none
  * while nothing does. One display takes one filter, so put everything into one shader: with two, the first waits until the
  * second is gone. They stay off on the lock screen.

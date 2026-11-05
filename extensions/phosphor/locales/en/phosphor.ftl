@@ -1,6 +1,6 @@
 # The name of the extension in Settings and the store
 extension-name = Phosphor
-extension-description = Rice the whole desktop: borders, glow, CRT and open and close effects on windows, filters and bloom over the screen, and lines across the taskbar and Luft's apps
+extension-description = Rice the whole desktop: borders, glow, CRT, colour fringes and open and close effects on windows, filters, bloom and chromatic aberration over the screen, and lines across the taskbar and Luft's apps
 off = Off
 normal = Normal
 accent = Accent
@@ -40,6 +40,8 @@ vignette = Vignette
 crt-border = CRT border
 window-crt = CRT in windows
     .description = How strong it is. It runs inside the pixels of the apps you pick below, and costs some memory for each window.
+window-aberration = Chromatic aberration in windows
+    .description = How strong it is. Red and blue drift apart towards the edges of the window. It runs inside the pixels of the apps you pick below, and costs some memory for each window.
 open-effect = When a window opens
 close-effect = When a window closes
 glitch = Glitch
@@ -55,6 +57,7 @@ section-rules-detail = Pick what goes on every app, then make exceptions.
 everywhere-border = Border on every app
 everywhere-overlay = Overlay on every app
 everywhere-crt = CRT on every app
+everywhere-aberration = Chromatic aberration on every app
 everywhere-motion = Open and close effects on every app
 rules-empty = No exceptions yet
 # Buttons on an app's exception; $part is the name of an effect, such as Border
@@ -87,6 +90,8 @@ shadow-boost = Shadow boost
     .description = Lifts dark areas so you can see into them.
 bloom = Bloom
     .description = Bright parts of the screen glow into what's around them.
+chromatic-aberration = Chromatic aberration
+    .description = Red and blue drift apart towards the edges of the screen, like a cheap lens. It looks the same at every display scale.
 filters-fullscreen = Keep on fullscreen windows
     .description = Off takes filters away while something runs fullscreen on that display, so games stay fast. On, every frame of a game goes through the filter, which costs speed.
 filters-captured = Show in screenshots and recordings

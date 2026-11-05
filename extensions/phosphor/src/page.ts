@@ -2,7 +2,7 @@ import type { Extension, PageItem, PageSection } from '@luft/extension-api';
 
 import { type AppRules, type Granted, type Part, PARTS } from './rules.js';
 
-const PART_LABELS: Record<Part, string> = { border: 'border', overlay: 'overlay', crt: 'window-crt', motion: 'rule-motion' };
+const PART_LABELS: Record<Part, string> = { border: 'border', overlay: 'overlay', crt: 'window-crt', aberration: 'window-aberration', motion: 'rule-motion' };
 
 function appName(apps: { id: string; name: string }[], id: string): string {
   return apps.find(app => app.id === id)?.name ?? id;
@@ -62,7 +62,7 @@ export function describePage(phosphor: Extension<Granted>, rules: AppRules): voi
       title: t('section-windows'),
       items: [
         { setting: 'border' }, { setting: 'border-color' }, { setting: 'border-second-color' }, { setting: 'border-width' }, { setting: 'border-motion' }, { setting: 'border-focused' },
-        { setting: 'overlay' }, { setting: 'overlay-strength' }, { setting: 'window-crt' },
+        { setting: 'overlay' }, { setting: 'overlay-strength' }, { setting: 'window-crt' }, { setting: 'window-aberration' },
         { setting: 'open-effect' }, { setting: 'close-effect' }, { setting: 'windows-fullscreen' },
       ],
     },
@@ -72,7 +72,7 @@ export function describePage(phosphor: Extension<Granted>, rules: AppRules): voi
       description: t('section-desktop-detail'),
       items: [
         { setting: 'desktop-crt' }, { setting: 'crt-scanlines' }, { setting: 'crt-curvature' }, { setting: 'crt-mask' }, { setting: 'crt-flicker' },
-        { setting: 'invert' }, { setting: 'grade' }, { setting: 'grade-strength' }, { setting: 'shadow-boost' }, { setting: 'bloom' },
+        { setting: 'invert' }, { setting: 'grade' }, { setting: 'grade-strength' }, { setting: 'shadow-boost' }, { setting: 'bloom' }, { setting: 'chromatic-aberration' },
         { setting: 'filters-fullscreen' }, { setting: 'filters-captured' },
       ],
     },

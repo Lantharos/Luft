@@ -206,6 +206,8 @@ Rounded corners, the outline and shadows stay as they are, since a window shader
 
 A filter over the whole screen could be an offscreen effect on the stage, but that one texture would span every display at one scale, paint everything again for any damage, and lose culling. Patch 65 gives each `ClutterStageView` a chain of fragment shaders instead. The view paints into the offscreen texture it already uses for rotated and color managed output, so only what changed is painted, and a frame nothing changed in isn't drawn. Then the shaders run over the whole view and the onscreen buffer is swapped whole, since a pixel of bloom or curvature can depend on any other. Earlier passes draw into textures of their own at a part of the display's size, so bloom runs on half and quarter sized textures. A filter that moves queues frames with `queue_filter_frame`, which run the shaders and paint nothing. A view without a filter has no offscreen target and takes exactly the paths it took before, and `set_filter(null)` frees everything.
 
+Chromatic aberration shows how a filter stays the same across scales: it samples red and blue a few pixels apart along the line from the middle of the display, further towards the edges, and `filter_scale` makes that the same distance on the display at 100% and 200%. It's part of the same one shader as the other filters, so it adds three texture reads, and as a still filter it draws only when something changes. In a window it's a window shader of its own, with its own texture, so a window with both it and the CRT holds two.
+
 Filters run before rotation and the output color transform, in the view's blending color space, so they see what the desktop drew. Each logical display is one filter, except a tiled monitor made of two views, which bends each half on its own.
 
 A filter that bends the picture asks for a software pointer with `meta_backend_inhibit_hw_cursor`, so the pointer bends with it and stays on what it points at. It costs a filter pass for each pointer movement. Filters that don't bend leave the hardware cursor alone, so the pointer stays free and isn't filtered.
@@ -250,6 +252,8 @@ The magnifier clones the stage inside the scene, so filters apply over what it s
 | Screen CRT with curvature | 1.0 | 2.2 |
 | Screen colour grade and shadow boost | 1.0 | 1.3 |
 | Screen bloom | 0.4 | 3.9 |
+| Screen chromatic aberration | not measured | 1.1 |
+| Chromatic aberration in every window | not measured | 0.8 |
 | Everything on the screen at once | 1.3 | 5.1 |
 
 These are one run on a busy computer, so differences under a millisecond say little. An integrated GPU takes several times as long. A filter on a 4K display also holds about 33 MB for the view's texture, and bloom about 12 MB more; each window with a shader holds a texture of its own size.

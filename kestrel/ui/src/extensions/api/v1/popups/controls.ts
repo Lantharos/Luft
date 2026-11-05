@@ -253,8 +253,9 @@ export function entryControl(node: EntryView, host: ControlHost): Control<EntryV
   const entry = new St.Entry({ style_class: 'kestrel-extension-entry', can_focus: true, x_expand: true, text: node.text ?? '' });
   let current = node;
   let given = node.text ?? '';
+  let replacing = false;
   entry.clutter_text.connect('text-changed', () => {
-    if (current.onChanged) host.act(() => current.onChanged!(entry.text));
+    if (current.onChanged && !replacing) host.act(() => current.onChanged!(entry.text));
   });
   entry.clutter_text.connect('activate', () => {
     if (current.onSubmit) host.act(() => current.onSubmit!(entry.text));
@@ -265,7 +266,10 @@ export function entryControl(node: EntryView, host: ControlHost): Control<EntryV
     entry.accessible_name = next.label;
     if ((next.text ?? '') === given) return;
     given = next.text ?? '';
-    if (entry.text !== given) entry.text = given;
+    if (entry.text === given) return;
+    replacing = true;
+    entry.text = given;
+    replacing = false;
   };
   update(node);
   return { actor: entry, update };

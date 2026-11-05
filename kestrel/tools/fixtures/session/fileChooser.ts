@@ -11,6 +11,15 @@ const CHOOSER = `<node><interface name="org.freedesktop.impl.portal.FileChooser"
     <arg type="u" name="response" direction="out"/>
     <arg type="a{sv}" name="results" direction="out"/>
   </method>
+  <method name="SaveFile">
+    <arg type="o" name="handle" direction="in"/>
+    <arg type="s" name="app_id" direction="in"/>
+    <arg type="s" name="parent_window" direction="in"/>
+    <arg type="s" name="title" direction="in"/>
+    <arg type="a{sv}" name="options" direction="in"/>
+    <arg type="u" name="response" direction="out"/>
+    <arg type="a{sv}" name="results" direction="out"/>
+  </method>
 </interface></node>`;
 
 const CHECKS = `<node><interface name="com.lantharos.KestrelChecks.FileChooser">
@@ -22,9 +31,9 @@ const CANCELLED = 1;
 
 let answer = '';
 
-const chooser = Gio.DBusExportedObject.wrapJSObject(CHOOSER, {
-  OpenFile: () => answer ? [ANSWERED, {uris: new GLib.Variant('as', [answer])}] : [CANCELLED, {}],
-});
+const answered = () => answer ? [ANSWERED, {uris: new GLib.Variant('as', [answer])}] : [CANCELLED, {}];
+
+const chooser = Gio.DBusExportedObject.wrapJSObject(CHOOSER, {OpenFile: answered, SaveFile: answered});
 const checks = Gio.DBusExportedObject.wrapJSObject(CHECKS, {
   Answer: (uri: string) => {
     answer = uri;

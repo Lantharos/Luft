@@ -14,6 +14,7 @@ export { getStyleVariant } from './appearance/kestrelTheme.js';
 export { Key } from './surfaces/keyboard/key.js';
 export { SwitcherPopup } from './desktop/switchers/switcherPopup.js';
 export { getLoginManager } from './session/actions/loginManager.js';
+export { clockChanges } from './extensions/api/v1/clock.js';
 export { loadStagedImage } from './session/actions/stagedImage.js';
 export { NotificationMessage } from './surfaces/notifications/messages/notificationMessage.js';
 export { WeekStrip } from './surfaces/notifications/calendar/weekStrip.js';

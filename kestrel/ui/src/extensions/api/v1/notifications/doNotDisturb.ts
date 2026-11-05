@@ -1,11 +1,9 @@
-import Gio from 'gi://Gio';
-
 import { formatsLocale, t } from '../../../../shared/i18n/index.js';
 import { notificationHolds, type HeldFromApp } from '../../../../surfaces/notifications/tray/holds.js';
 import * as MessageTray from '../../../../surfaces/notifications/tray/messageTray.js';
 import type { ApiContext } from '../context.js';
 import type { DoNotDisturb, HeldNotifications, NotificationHold } from '../types.js';
-import { sourceOwners } from './notifications.js';
+import { heldBack, sourceOwners, watchHeldBack } from './notifications.js';
 
 /** Tells people what came in while the extension held notifications back, when it ended without summing up itself. */
 function sumUp({ name, host }: ApiContext, held: readonly HeldFromApp[]): void {
@@ -25,7 +23,6 @@ function sumUp({ name, host }: ApiContext, held: readonly HeldFromApp[]): void {
 
 export function doNotDisturbApi(context: ApiContext): DoNotDisturb {
   const { scope, manifest } = context;
-  const banners = new Gio.Settings({ schema_id: 'org.gnome.desktop.notifications' });
   const exempt = (source: MessageTray.Source) => sourceOwners.get(source) === manifest.id;
   return {
     hold: (): NotificationHold => {
@@ -57,16 +54,8 @@ export function doNotDisturbApi(context: ApiContext): DoNotDisturb {
       };
     },
     get holding() {
-      return !banners.get_boolean('show-banners') || notificationHolds.active;
+      return heldBack();
     },
-    onChanged: changed => {
-      const guarded = scope.guard(changed);
-      const id = banners.connect('changed::show-banners', () => guarded());
-      const stop = notificationHolds.watch(guarded);
-      return scope.disposable(() => {
-        banners.disconnect(id);
-        stop();
-      });
-    },
+    onChanged: changed => scope.disposable(watchHeldBack(scope.guard(changed))),
   };
 }

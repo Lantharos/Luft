@@ -1,4 +1,7 @@
+import Gio from 'gi://Gio';
+
 import * as Main from '../../../../core/main.js';
+import { notificationHolds } from '../../../../surfaces/notifications/tray/holds.js';
 import * as MessageTray from '../../../../surfaces/notifications/tray/messageTray.js';
 import type { ApiContext } from '../context.js';
 import { resolveIcon } from '../icons.js';
@@ -8,6 +11,19 @@ const SOURCE_ICON = 'application-x-addon-symbolic';
 
 /** Which extension sent through each source, so its own notifications pass its holds. */
 export const sourceOwners = new WeakMap<MessageTray.Source, string>();
+
+const banners = new Gio.Settings({ schema_id: 'org.gnome.desktop.notifications' });
+
+export const heldBack = (): boolean => !banners.get_boolean('show-banners') || notificationHolds.active;
+
+export function watchHeldBack(changed: () => void): () => void {
+  const id = banners.connect('changed::show-banners', () => changed());
+  const stop = notificationHolds.watch(changed);
+  return () => {
+    banners.disconnect(id);
+    stop();
+  };
+}
 
 export function notificationsApi(context: ApiContext): Notifications {
   const { scope } = context;
@@ -49,5 +65,9 @@ export function notificationsApi(context: ApiContext): Notifications {
       notification.source!.addNotification(notification);
       return handle;
     },
+    get heldBack() {
+      return heldBack();
+    },
+    onHeldBackChanged: changed => scope.disposable(watchHeldBack(scope.guard(changed))),
   };
 }

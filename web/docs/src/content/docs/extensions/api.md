@@ -19,9 +19,11 @@ Everything an extension adds returns a `Disposable` with `dispose()`, to take it
 | `t(id, args?)` | A message from its translations, in the desktop's language |
 | `open(uri)` | Opens a web link in the browser, or a file or folder in the app that opens it |
 | `openSettings()` | Opens the extension's page in Settings |
-| `pickFiles({ title, kind, multiple? })` | Lets people pick pictures (`images`), sounds (`sounds`) or a `folder` with the file chooser, right after they used the extension, such as from a button on its Settings page. Luft keeps copies in `dataPath` and returns their paths, or none when they cancel. A folder comes with the files directly inside it, up to 32 of up to 8 MB each |
+| `pickFiles({ title, kind, multiple? })` | Lets people pick pictures (`images`), sounds (`sounds`), calendars (`calendars`) or a `folder` with the file chooser, right after they used the extension, such as from a button on its Settings page. Luft keeps copies in `dataPath` and returns their paths, or none when they cancel. A folder comes with the files directly inside it, up to 32 of up to 8 MB each |
 | `deleteFile(path)` | Deletes a file or folder in `dataPath`, such as a picked picture no longer used |
 | `readText(path)` | A text file in the extension's folder or `dataPath`, or `null` when it isn't there |
+| `writeText(path, text)` | Writes a text file in `dataPath`, without holding up the desktop and in one go: a crash or a power cut leaves the old contents or the new ones, never a part. Resolves once it's on disk |
+| `saveFile({ title, name, text })` | Asks people where to save a text file with the file chooser, right after they used the extension. Resolves to whether it was saved |
 | `onDisable(cleanup)` | Runs `cleanup` when the extension is turned off, after everything it made is gone |
 | `settings.get(key)` | A declared setting's value |
 | `settings.set(key, value)` | Changes a declared setting; Settings shows the change at once. A value that doesn't fit throws |
@@ -29,7 +31,8 @@ Everything an extension adds returns a `Disposable` with `dispose()`, to take it
 | `storage.get(key)`, `storage.set(key, value)`, `storage.delete(key)`, `storage.keys()` | Values it keeps for itself, anything JSON holds, up to 1 MB in all. They're written soon after a change and when it's turned off |
 | `secrets.get(key)`, `secrets.set(key, secret)`, `secrets.delete(key)` | Passwords and sign-in tokens, kept encrypted in the keyring. `get` resolves to `null` when there's none. They're deleted with the extension |
 | `peers.handle(name, answer)`, `peers.request(id, name, value?)`, `peers.handles(id, name)`, `peers.onChanged(changed)` | Requests between extensions, see [peers](#peers) |
-| `timers.timeout(ms, callback)`, `timers.interval(ms, callback)` | Timers that stop with the extension |
+| `timers.timeout(ms, callback)`, `timers.interval(ms, callback)` | Timers that stop with the extension. They only count time the computer is awake |
+| `timers.onClockChanged(changed)` | Runs `changed(cause)` when the time jumped, with `wake`, `clock` or `time-zone`. Something waiting for a time of day sets its timer again here, and needs no timer of its own to notice |
 | `session.active`, `session.onChanged(changed)` | Whether someone is using the desktop: signed in and not locked |
 | `desktop.wallpaperVisible`, `desktop.onChanged(changed)` | Whether the wallpaper shows anywhere: windows leave some uncovered, nothing is full screen, the screen isn't locked |
 | `power.onBattery`, `power.saving`, `power.onChanged(changed)` | Whether it runs on battery, and whether power saver is on. Do less while it is |
@@ -289,6 +292,8 @@ if (ext.peers.handles('com.lantharos.Soundscapes', 'play')) await ext.peers.requ
 ## notifications
 
 `notifications.send({ title, body?, icon?, urgent?, onActivate?, actions? })` shows a notification from the extension. `actions` are `{ label, onActivate }`. Disposing it withdraws it.
+
+`notifications.heldBack` says whether banners are held back right now, by Do Not Disturb or an extension such as Focus, and `notifications.onHeldBackChanged(changed)` says when that changes, for what should be seen rather than land in the notification center unnoticed.
 
 ## helper
 

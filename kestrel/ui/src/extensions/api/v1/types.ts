@@ -99,6 +99,16 @@ export interface Basics {
   deleteFile(path: string): void;
   /** Reads a text file in the extension's folder or {@link dataPath}, such as a manifest in a folder people picked. Returns `null` when it isn't there. */
   readText(path: string): string | null;
+  /**
+   * Writes a text file in {@link dataPath}, off the main thread and in one go: the old contents stay whole until the
+   * new ones are safely on disk, so a crash or a power cut leaves one or the other, never a part.
+   */
+  writeText(path: string, text: string): Promise<void>;
+  /**
+   * Asks people where to save a text file with the file chooser, right after they used the extension. Returns whether
+   * it was saved, or `false` when they cancel.
+   */
+  saveFile(options: SaveOptions): Promise<boolean>;
   /** Runs `cleanup` when the extension is turned off, after everything it made through this API is gone. */
   onDisable(cleanup: () => void): Disposable;
 }
@@ -130,7 +140,15 @@ export interface Timers {
   timeout(milliseconds: number, callback: () => void): Disposable;
   /** Runs `callback` every `milliseconds` until disposed. */
   interval(milliseconds: number, callback: () => void): Disposable;
+  /**
+   * Runs `changed` when the time jumped instead of ticking by. Timers only count time the computer is awake, so
+   * something waiting for a time of day sets its timer again here, and needs no timer of its own to notice.
+   */
+  onClockChanged(changed: (cause: ClockChange) => void): Disposable;
 }
+
+/** Why the time jumped: the computer woke from sleep, the clock was set, or the time zone changed. */
+export type ClockChange = 'wake' | 'clock' | 'time-zone';
 
 export interface Session {
   /** Whether someone is using the desktop: signed in, and the screen isn't locked. */
@@ -174,12 +192,21 @@ export interface PickOptions {
   /** What the file chooser says it's for, in the language Kestrel uses. */
   title: string;
   /**
-   * Pictures (PNG, WebP, SVG, GIF or JPEG), sounds (Ogg, FLAC, WAV or MP3), or a folder of up to 32 files of up to 8 MB
-   * each, without the folders inside it, for something that's several files together.
+   * Pictures (PNG, WebP, SVG, GIF or JPEG), sounds (Ogg, FLAC, WAV or MP3), calendars (iCalendar `.ics`), or a folder
+   * of up to 32 files of up to 8 MB each, without the folders inside it, for something that's several files together.
    */
-  kind: 'images' | 'sounds' | 'folder';
+  kind: 'images' | 'sounds' | 'calendars' | 'folder';
   /** Lets people pick several at once. */
   multiple?: boolean;
+}
+
+export interface SaveOptions {
+  /** What the file chooser says it's for, in the language Kestrel uses. */
+  title: string;
+  /** The file name it suggests, such as `reminders.ics`. */
+  name: string;
+  /** What goes in the file. */
+  text: string;
 }
 
 /** What {@link Storage} keeps: anything JSON can hold. */
@@ -833,6 +860,12 @@ export interface SearchResult {
 
 export interface Notifications {
   send(notification: NotificationOptions): Notification;
+  /**
+   * Whether banners are held back right now: Do Not Disturb is on, or an extension such as Focus holds them. A
+   * notification sent meanwhile goes straight to the notification center, so what should be seen when it's over can wait.
+   */
+  readonly heldBack: boolean;
+  onHeldBackChanged(changed: () => void): Disposable;
 }
 
 export interface NotificationOptions {

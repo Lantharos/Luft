@@ -4,6 +4,7 @@ import St from 'gi://St';
 
 import { isDark, watchScheme } from '../../../shared/display/scheme.js';
 import { reducedMotion } from '../../../shared/motion/motion.js';
+import { clockChanges } from './clock.js';
 import type { ApiContext } from './context.js';
 import type { Appearance, Disposable, Session, Settings, Storage, Timers } from './types.js';
 
@@ -34,6 +35,7 @@ export function timersApi({ scope }: ApiContext): Timers {
   return {
     timeout: (milliseconds, callback) => timer(scope, milliseconds, callback, false),
     interval: (milliseconds, callback) => timer(scope, milliseconds, callback, true),
+    onClockChanged: changed => scope.disposable(clockChanges.watch(scope.guard(changed))),
   };
 }
 

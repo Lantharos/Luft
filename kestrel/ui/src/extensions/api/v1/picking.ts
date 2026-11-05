@@ -3,7 +3,7 @@ import GLib from 'gi://GLib';
 
 import { extensionFile } from './audio/files.js';
 import type { ApiContext } from './context.js';
-import type { PickOptions } from './types.js';
+import type { PickOptions, SaveOptions } from './types.js';
 
 const PORTAL = 'org.freedesktop.portal.Desktop';
 const PORTAL_PATH = '/org/freedesktop/portal/desktop';
@@ -16,11 +16,16 @@ const LARGEST_FOLDER_FILE = 8 * 1024 * 1024;
 const KINDS: Record<Exclude<PickOptions['kind'], 'folder'>, string[]> = {
   images: ['image/png', 'image/webp', 'image/svg+xml', 'image/gif', 'image/jpeg'],
   sounds: ['audio/ogg', 'audio/flac', 'audio/x-wav', 'audio/wav', 'audio/mpeg'],
+  calendars: ['text/calendar'],
 };
+
+Gio._promisify(Gio.File.prototype, 'replace_contents_bytes_async', 'replace_contents_finish');
 
 let requests = 0;
 
-function chosen(title: string, options: PickOptions): Promise<string[]> {
+const string = (value: string) => GLib.Variant.new_string(value);
+
+function asked(method: 'OpenFile' | 'SaveFile', title: string, options: Record<string, GLib.Variant>): Promise<string[]> {
   const bus = Gio.DBus.session;
   const token = `kestrel_extension_${++requests}`;
   const sender = bus.get_unique_name()!.slice(1).replaceAll('.', '_');
@@ -32,15 +37,8 @@ function chosen(title: string, options: PickOptions): Promise<string[]> {
         const [response, results] = parameters.recursiveUnpack() as [number, { uris?: string[] }];
         resolve(response === 0 ? results.uris ?? [] : []);
       });
-    const chooserOptions = {
-      handle_token: GLib.Variant.new_string(token),
-      multiple: GLib.Variant.new_boolean(!!options.multiple),
-      modal: GLib.Variant.new_boolean(true),
-      ...options.kind === 'folder'
-        ? { directory: GLib.Variant.new_boolean(true) }
-        : { filters: new GLib.Variant('a(sa(us))', [[title, KINDS[options.kind].map((type): [number, string] => [1, type])]]) },
-    };
-    bus.call(PORTAL, PORTAL_PATH, CHOOSER, 'OpenFile', new GLib.Variant('(ssa{sv})', ['', title, chooserOptions]),
+    const chooserOptions = { handle_token: string(token), modal: GLib.Variant.new_boolean(true), ...options };
+    bus.call(PORTAL, PORTAL_PATH, CHOOSER, method, new GLib.Variant('(ssa{sv})', ['', title, chooserOptions]),
       null, Gio.DBusCallFlags.NONE, -1, null, (_bus, result) => {
         try {
           bus.call_finish(result);
@@ -49,6 +47,15 @@ function chosen(title: string, options: PickOptions): Promise<string[]> {
           reject(error);
         }
       });
+  });
+}
+
+function chosen(options: PickOptions): Promise<string[]> {
+  return asked('OpenFile', options.title, {
+    multiple: GLib.Variant.new_boolean(!!options.multiple),
+    ...options.kind === 'folder'
+      ? { directory: GLib.Variant.new_boolean(true) }
+      : { filters: new GLib.Variant('a(sa(us))', [[options.title, KINDS[options.kind].map((type): [number, string] => [1, type])]]) },
   });
 }
 
@@ -102,8 +109,27 @@ export function readText(context: ApiContext, path: string): string | null {
 /** Lets people pick files through the file chooser, and keeps copies of them in the extension's data folder. */
 export async function pickFiles(context: ApiContext, options: PickOptions): Promise<string[]> {
   if (!context.gestures.recent) throw new Error('Files can only be picked right after people use the extension');
-  const uris = await chosen(options.title, options);
+  const uris = await chosen(options);
   const folder = GLib.build_filenamev([context.dataPath, PICKED]);
   GLib.mkdir_with_parents(folder, 0o700);
   return uris.map(uri => options.kind === 'folder' ? copyFolderIn(uri, folder) : copyIn(uri, folder));
+}
+
+function replaceFile(file: Gio.File, text: string): Promise<unknown> {
+  const contents = new GLib.Bytes(new TextEncoder().encode(text));
+  return file.replace_contents_bytes_async(contents, null, false, Gio.FileCreateFlags.REPLACE_DESTINATION, null);
+}
+
+export function writeText(context: ApiContext, path: string, text: string): Promise<unknown> {
+  GLib.mkdir_with_parents(context.dataPath, 0o700);
+  return replaceFile(extensionFile([context.dataPath], path), text);
+}
+
+/** Asks where to save a text file and writes it there. */
+export async function saveFile(context: ApiContext, options: SaveOptions): Promise<boolean> {
+  if (!context.gestures.recent) throw new Error('Files can only be saved right after people use the extension');
+  const [uri] = await asked('SaveFile', options.title, { current_name: string(options.name) });
+  if (!uri) return false;
+  await replaceFile(Gio.File.new_for_uri(uri), options.text);
+  return true;
 }

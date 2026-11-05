@@ -13428,6 +13428,8 @@ export namespace Clutter {
 
         get_default_paint_flags(): PaintFlag;
 
+        get_filter(): ViewFilter | null;
+
         get_framebuffer(): Cogl.Framebuffer;
 
         get_layout(rect: Mtk.Rectangle): void;
@@ -13444,7 +13446,11 @@ export namespace Clutter {
 
         has_shadowfb(): boolean;
 
+        queue_filter_frame(): void;
+
         schedule_update_now(): void;
+
+        set_filter(filter: ViewFilter | null): void;
     }
 
 
@@ -14618,6 +14624,54 @@ export namespace Clutter {
     }
 
 
+    namespace ViewFilter {
+        // Signal signatures
+        interface SignalSignatures extends GObject.Object.SignalSignatures {}
+
+        // Constructor properties interface
+        interface ConstructorProps extends GObject.Object.ConstructorProps {}
+    }
+
+    class ViewFilter extends GObject.Object {
+        static $gtype: GObject.GType<ViewFilter>;
+
+        /**
+         * Compile-time signal type information.
+         *
+         * This instance property is generated only for TypeScript type checking.
+         * It is not defined at runtime and should not be accessed in JS code.
+         * @internal
+         */
+        $signals: ViewFilter.SignalSignatures;
+
+        // Constructors
+        constructor(properties?: Partial<ViewFilter.ConstructorProps>, ...args: any[]);
+
+        _init(...args: any[]): void;
+
+        static ["new"](): ViewFilter;
+
+        // Signals
+        /** @signal */
+        connect<K extends keyof ViewFilter.SignalSignatures>(signal: K, callback: GObject.SignalCallback<this, ViewFilter.SignalSignatures[K]>): number;
+
+        /** @signal */
+        connect_after<K extends keyof ViewFilter.SignalSignatures>(signal: K, callback: GObject.SignalCallback<this, ViewFilter.SignalSignatures[K]>): number;
+
+        /** @signal */
+        emit<K extends keyof ViewFilter.SignalSignatures>(signal: K, ...args: GObject.GjsParameters<ViewFilter.SignalSignatures[K]>): void;
+
+        // Methods
+        add_pass(snippet: Cogl.Snippet, scale: number): void;
+
+        get_captured(): boolean;
+
+        set_captured(captured: boolean): void;
+
+        set_uniform(name: string, n_components: number, values: number[]): void;
+    }
+
+
     namespace VirtualInputDevice {
         // Signal signatures
         interface SignalSignatures extends GObject.Object.SignalSignatures {
@@ -15474,6 +15528,8 @@ export namespace Clutter {
     type TransitionClass = typeof Transition;
 
     type TransitionGroupClass = typeof TransitionGroup;
+
+    type ViewFilterClass = typeof ViewFilter;
 
     type VirtualInputDeviceClass = typeof VirtualInputDevice;
 

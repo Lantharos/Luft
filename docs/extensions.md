@@ -1,6 +1,6 @@
 # Extensions
 
-Extensions add to Kestrel: layers over the wallpaper, quick settings tiles, taskbar buttons, pop-up panels and small windows, keyboard shortcuts, search results, notifications, sounds, and pages in Settings. They can follow calls, hold notifications back for a while, connect to the hosts they name, keep secrets in the keyring and ask each other to do things. They run inside Kestrel's process but only see a versioned API object, never Kestrel's internals. What Luft does for everyone, such as the emoji picker, clipboard history and dictation, stays built into Kestrel; extensions are for what's optional. How to write one is in [the developer docs](https://docs.luft.computer/extensions/getting-started/); this page is how it works inside Luft.
+Extensions add to Kestrel: layers over the wallpaper, shaders on windows and the whole screen, quick settings tiles, taskbar buttons, pop-up panels and small windows, keyboard shortcuts, search results, notifications, sounds, and pages in Settings. They can follow calls, hold notifications back for a while, connect to the hosts they name, keep secrets in the keyring and ask each other to do things. They run inside Kestrel's process but only see a versioned API object, never Kestrel's internals. What Luft does for everyone, such as the emoji picker, clipboard history and dictation, stays built into Kestrel; extensions are for what's optional. How to write one is in [the developer docs](https://docs.luft.computer/extensions/getting-started/); this page is how it works inside Luft.
 
 | Where | What |
 | --- | --- |
@@ -9,7 +9,7 @@ Extensions add to Kestrel: layers over the wallpaper, quick settings tiles, task
 | `kestrel/ui/src/extensions/service.ts` | The D-Bus interface below |
 | `kestrel/engine/src/sound` | `ShellSoundMix`, which plays an extension's sounds, and `ShellAudioMonitor`, which measures what the computer plays |
 | `packages/extension-api` | `@luft/extension-api`, the types for extension authors, written from `types.ts` by `bun kestrel/ui/extensionApi.ts`. `bun run check` in `kestrel/ui` fails when it's out of date |
-| `extensions` | Lantharos's own extensions, such as Seasons, Strays, Playthings, Keystrokes, Focus, Reminders and Pult. Each has a `build.sh` that makes its folder, which `extensions/pack.sh` packs for schelf.store |
+| `extensions` | Lantharos's own extensions, such as Seasons, Strays, Playthings, Keystrokes, Focus, Reminders, Phosphor and Pult. Each has a `build.sh` that makes its folder, which `extensions/pack.sh` packs for schelf.store |
 | `apps/settings/src/lib/panels/personalization/extensions` | Settings → Extensions, each extension's page, and its rows on other pages |
 
 ## On disk
@@ -92,6 +92,7 @@ Permissions, with the words Settings and the store show for them:
 | `locked-sounds` | Keep playing sounds while the screen is locked |
 | `input-sounds` | Play a sound when you type and click, without seeing your keys |
 | `do-not-disturb` | Hold back notifications for a while |
+| `screen-effects` | Draw over and change how your windows and the whole screen look |
 
 `locked-sounds` and `input-sounds` need `sounds` too, and `input-sounds` can't go with `audio-levels`, which could hear the presses in the sound. A `[helper]` table isn't a permission, but the store shows that the extension runs a program of its own. `[network]` isn't one either, but Settings and the store show the hosts it names as "Connect to api.example.com". `[[shortcuts]]` shows in Settings → Keyboard.
 
@@ -182,6 +183,78 @@ What shows of a frame is a box around each of eight bands across it, so an open 
 It listens on each display's `Meta.BackgroundActor` and on pressable sprites, because Clutter only delivers events to reactive actors, so it hears nothing while a window, the taskbar or a surface is under the pointer. That's what keeps windows in front: a sprite behind a window can't react through it, and nothing runs per motion while the pointer is over a window. Over the bare desktop, each motion costs one look through the extension's areas, and only motion inside them reaches its code. When a window opens under the pointer, or the pointer leaves the areas or the desktop, the extension hears `gone`.
 
 Following only listens. A press on the bare desktop stays the desktop's, so the right-click menu and long press work as they always do, while the extension sees `down` and `up` beside them. A press with the primary button or a finger on a pressable sprite does belong to that sprite: its `down`, `move` and `up` carry the sprite and go on outside the areas, through Clutter's implicit grab, until it's let go. Each finger has its own `id` from its touch slot, 0 being the mouse, so several can hold several sprites. A press that began on the desktop and wandered over a window is the other case Clutter keeps delivering; for those, each motion picks what's under it and reports `gone` over a window. Right-clicks pass through a pressable sprite to the desktop's own menu, given to it with `bindDesktopMenu`.
+
+## Screen effects
+
+`screen-effects` lets an extension run shaders on what's on the screen, in `api/v1/screenEffects`. Phosphor is built on it. Five kinds of effect cover what people ask for, each at the lowest cost that can do it:
+
+| Effect | Goes on | Costs |
+| --- | --- | --- |
+| `addWindowOverlay` | A child actor of the window actor, above its surfaces | A few rectangles of shader, no offscreen target. A border draws and damages only its strips |
+| `addWindowShader` | An offscreen effect on the actor holding the window's surfaces | One texture per window, redrawn when the window commits, drawn once otherwise |
+| `addWindowTransition` | An offscreen effect on the window actor, while it opens or closes | Nothing between those moments |
+| `addDesktopFilter` | A `ClutterViewFilter` on each stage view | One pass over the display on each frame, none while nothing changes |
+| `addSurfaceOverlay` | A `Clutter.Effect` on the taskbar's islands and Kestrel's panels, which adds one pipeline after the actor | One rectangle each time the surface draws, no offscreen target and no change to layout |
+
+Rounded corners, the outline and shadows stay as they are, since a window shader runs on the surfaces, whose corners are already cut, under the shadow and outline, which `MetaWindowActor` draws. A shader that keeps alpha keeps the corners. Overlays get each corner's radius from `meta_window_get_rounded_corners()` and draw a signed distance to that shape, in stage coordinates, so they stay sharp at any display scale, and a window that's see-through stays see-through under them. Tiled, maximized and square windows report their own corners.
+
+`match` decides per window from the app's id, the window's kind and whether it's focused, maximized or fullscreen. Titles aren't offered, so an extension can't read what's in a window from its effect rules.
+
+### Whole-screen filters
+
+A filter over the whole screen could be an offscreen effect on the stage, but that one texture would span every display at one scale, paint everything again for any damage, and lose culling. Patch 65 gives each `ClutterStageView` a chain of fragment shaders instead. The view paints into the offscreen texture it already uses for rotated and color managed output, so only what changed is painted, and a frame nothing changed in isn't drawn. Then the shaders run over the whole view and the onscreen buffer is swapped whole, since a pixel of bloom or curvature can depend on any other. Earlier passes draw into textures of their own at a part of the display's size, so bloom runs on half and quarter sized textures. A filter that moves queues frames with `queue_filter_frame`, which run the shaders and paint nothing. A view without a filter has no offscreen target and takes exactly the paths it took before, and `set_filter(null)` frees everything.
+
+Filters run before rotation and the output color transform, in the view's blending color space, so they see what the desktop drew. Each logical display is one filter, except a tiled monitor made of two views, which bends each half on its own.
+
+A filter that bends the picture asks for a software pointer with `meta_backend_inhibit_hw_cursor`, so the pointer bends with it and stays on what it points at. It costs a filter pass for each pointer movement. Filters that don't bend leave the hardware cursor alone, so the pointer stays free and isn't filtered.
+
+### Fullscreen and scanout
+
+By default an effect comes off a fullscreen window, and a filter comes off a display with one on it, so games and videos scan out directly and pay nothing. `fullscreen: true` keeps it on: a filter refuses direct scanout on its view by itself, and a window effect on a fullscreen window calls `meta_compositor_disable_unredirect()` while it's there.
+
+### What moves
+
+Effects don't follow the display's refresh. Each that moves says how many frames a second it wants, 30 by default, and shares a timer with others at that rate. The timers stop on the lock screen, while the display is off, in power saving, with reduced motion, and 30 seconds after the last input, through the same idle monitor Kestrel dims with. Nothing else makes a frame: a still filter over a still screen draws nothing.
+
+### When something goes wrong
+
+Cogl compiles a pipeline the first time it draws, and used to only log what the driver said. `cogl_context_take_shader_error()` keeps the message, so `compileError` draws one pixel with the real snippet on a real pipeline and asks. An effect that fails this never goes on the screen. The extension keeps running, its `onProblem` is called, and a notification names the effect.
+
+While anything is attached, `FrameWatch` waits for the GPU right after a paint, every two seconds and only when something paints. Three frames in a row of 250 ms or more, or one of 1.5 seconds, turn off the most expensive effect attached, with a notification, and the watch goes on. `cogl_framebuffer_finish` holds the frame for as long as the GPU needs to finish it, which is the work it was doing anyway.
+
+`<Control><Alt>Escape`, `screen-effects-off` in `com.lantharos.kestrel.keybindings`, is Kestrel's own shortcut rather than an extension's, so it works whatever an extension does, in every mode. It detaches everything at once, without running extension code, and sets `screen-effects-off` in `com.lantharos.kestrel`, which lasts across restarts, so an unreadable filter doesn't come back at the next sign-in. A notification and the extension's page bring effects back.
+
+Kestrel notes in `~/.local/state/kestrel/effects-starting` that effects are about to go on, and removes the note when the GPU finished a frame with them. A note left at the next start means the computer or the desktop went down before that, such as a shader that hangs the GPU, which a crash count wouldn't see after a restart of the computer: Kestrel then starts with effects off and says so. Crashes after that are the [crash guard](#safety)'s: two in a row and the extension stays off.
+
+Filters stay off on the lock screen, so it can always be read. Window and surface effects go too, since they run for the desktop and the lock screen covers it.
+
+### Screenshots, recording and accessibility
+
+Window effects and surface overlays are part of the scene, so screenshots and recordings show them. Filters aren't: captures paint the stage into their own framebuffers, which is why they miss night light too, and that's what a filter does unless it sets `captured`. Then `clutter_stage_paint_to_framebuffer` also paints each filtered view it touches into a texture and runs the filter over that. It costs a repaint of the whole view for each captured frame, so it's a setting. A recording of a filter that moves by itself only updates when something else on the screen does.
+
+The magnifier clones the stage inside the scene, so filters apply over what it shows, and its own brightness, contrast and color effects stay on its actors, untouched.
+
+### What they cost
+
+`session.sh frames` measures Phosphor with 12 extra windows open while a window slides across the screen. On an NVIDIA GPU with a 60 Hz virtual display, the median time the GPU took for a whole frame after the paint, in milliseconds:
+
+| Effect | 1440×900 | 3840×2160 |
+| --- | --- | --- |
+| Nothing on | 0.9 | 1.3 |
+| Border on every window | 0.5 | 0.7 |
+| Scanline overlay on every window | 0.7 | 0.6 |
+| CRT in every window | 0.4 | 1.5 |
+| Screen CRT | 0.8 | 2.2 |
+| Screen CRT with curvature | 1.0 | 2.2 |
+| Screen colour grade and shadow boost | 1.0 | 1.3 |
+| Screen bloom | 0.4 | 3.9 |
+| Everything on the screen at once | 1.3 | 5.1 |
+
+These are one run on a busy computer, so differences under a millisecond say little. An integrated GPU takes several times as long. A filter on a 4K display also holds about 33 MB for the view's texture, and bloom about 12 MB more; each window with a shader holds a texture of its own size.
+
+### Luft's apps
+
+Part of an app's pixels are the app's, and Kestrel doesn't touch them. `setAppLines` sets `app-lines` in `com.lantharos.kestrel`, which reaches every Luft app through `luft-app` as an `appearance.lines` event and a `data-lines` attribute, the way square corners do, and `base.css` in `@luft/ui` draws the lines over the page with a pseudo element. It goes when the extension does. Other apps have no shared theme to go through, so what can reach them is a window overlay.
 
 ## Sound
 

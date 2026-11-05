@@ -17,3 +17,17 @@ export function noticeTurnedOff(name: string, kind: ProblemKind, openSettings: (
   notification.connect('activated', openSettings);
   source.addNotification(notification);
 }
+
+/** Tells the person that Kestrel took one of an extension's effects off the screen, and why. */
+export function noticeEffectOff(name: string, effect: string, problem: 'shader' | 'slow', openSettings: () => void): void {
+  const source = MessageTray.getSystemSource();
+  const notification = new MessageTray.Notification({
+    source,
+    title: t('screen-effect-off-title', { effect }),
+    body: t(problem === 'shader' ? 'screen-effect-off-shader' : 'screen-effect-off-slow', { name }),
+    gicon: new Gio.ThemedIcon({ name: 'application-x-addon-symbolic' }),
+    privacyScope: MessageTray.PrivacyScope.SYSTEM,
+  });
+  notification.connect('activated', openSettings);
+  source.addNotification(notification);
+}

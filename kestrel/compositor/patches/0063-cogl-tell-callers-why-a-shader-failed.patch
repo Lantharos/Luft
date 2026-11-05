@@ -1,0 +1,139 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Thu, 5 Nov 2026 12:47:06 +0100
+Subject: [PATCH 63/65] cogl: tell callers why a shader failed
+
+Pipelines compile the first time they draw, and a shader that doesn't
+compile only left a warning in the log. The shell runs shaders it was
+handed by extensions and has to turn one off when the driver refuses it.
+
+Keep the driver's first message on the context until someone takes it, so
+drawing with a pipeline and flushing is a check of exactly what will run.
+
+Upstream-Status: luft-only API for extension shaders
+---
+ cogl/cogl/cogl-context-private.h              |  4 ++++
+ cogl/cogl/cogl-context.c                      | 21 +++++++++++++++++++
+ cogl/cogl/cogl-context.h                      | 14 +++++++++++++
+ .../driver/gl/cogl-pipeline-fragend-glsl.c    |  1 +
+ .../driver/gl/cogl-pipeline-progend-glsl.c    |  1 +
+ .../driver/gl/cogl-pipeline-vertend-glsl.c    |  1 +
+ 6 files changed, 42 insertions(+)
+
+diff --git a/cogl/cogl/cogl-context-private.h b/cogl/cogl/cogl-context-private.h
+index d83540e09281188807252a2a982f339218ae543f..3295fd244c835113854e3405e4f8c0946ad06faa 100644
+--- a/cogl/cogl/cogl-context-private.h
++++ b/cogl/cogl/cogl-context-private.h
+@@ -48,6 +48,10 @@
+ #include "cogl/cogl-private.h"
+ #include "cogl/winsys/cogl-winsys.h"
+ 
++void
++_cogl_context_note_shader_error (CoglContext *context,
++                                 const char  *message);
++
+ void
+ _cogl_context_set_current_projection_entry (CoglContext *context,
+                                             CoglMatrixEntry *entry);
+diff --git a/cogl/cogl/cogl-context.c b/cogl/cogl/cogl-context.c
+index da1ac4e3c32f1bacfcfd040f714719c3df0c2847..982b52cd8a9b0ffb0460820de39e915a25ff4fef 100644
+--- a/cogl/cogl/cogl-context.c
++++ b/cogl/cogl/cogl-context.c
+@@ -53,6 +53,8 @@ typedef struct _CoglContextPrivate
+ 
+   gboolean is_defunct;
+ 
++  char *shader_error;
++
+   CoglPipeline *default_pipeline;
+   CoglPipelineLayer *default_layer_0;
+   CoglPipelineLayer *default_layer_n;
+@@ -232,6 +234,7 @@ cogl_context_dispose (GObject *object)
+   CoglContextPrivate *priv =
+     cogl_context_get_instance_private (context);
+ 
++  g_clear_pointer (&priv->shader_error, g_free);
+   g_clear_object (&priv->default_2d_texture);
+   g_clear_object (&priv->opaque_color_pipeline);
+   g_clear_object (&priv->blit_texture_pipeline);
+@@ -1451,3 +1454,21 @@ cogl_context_destroy (CoglContext *context)
+   priv->is_defunct = TRUE;
+   g_object_unref (context);
+ }
++
++void
++_cogl_context_note_shader_error (CoglContext *context,
++                                 const char  *message)
++{
++  CoglContextPrivate *priv = cogl_context_get_instance_private (context);
++
++  if (!priv->shader_error)
++    priv->shader_error = g_strdup (message);
++}
++
++char *
++cogl_context_take_shader_error (CoglContext *context)
++{
++  CoglContextPrivate *priv = cogl_context_get_instance_private (context);
++
++  return g_steal_pointer (&priv->shader_error);
++}
+diff --git a/cogl/cogl/cogl-context.h b/cogl/cogl/cogl-context.h
+index 7631a0a66a2dc4d7324a99b15774c6d83a3acb87..3d059c5be55eb730f18f29d3e0a07fc9d2170b2b 100644
+--- a/cogl/cogl/cogl-context.h
++++ b/cogl/cogl/cogl-context.h
+@@ -223,4 +223,18 @@ void cogl_context_set_winsys_feature (CoglContext      *context,
+ COGL_EXPORT
+ gboolean cogl_context_is_defunct (CoglContext *context);
+ 
++/**
++ * cogl_context_take_shader_error:
++ * @context: a #CoglContext
++ *
++ * Retrieves why a GLSL shader last failed to compile or link, and forgets it.
++ * Pipelines are compiled the first time they draw, so drawing with one and
++ * flushing its framebuffer tells whether its snippets work on this driver.
++ *
++ * Returns: (transfer full) (nullable): the driver's message, or %NULL when
++ *   nothing failed since the last call
++ */
++COGL_EXPORT
++char * cogl_context_take_shader_error (CoglContext *context);
++
+ G_END_DECLS
+diff --git a/cogl/cogl/driver/gl/cogl-pipeline-fragend-glsl.c b/cogl/cogl/driver/gl/cogl-pipeline-fragend-glsl.c
+index 7e382ddf8e8c2bec24c691bcca65bcd5d706cb96..2c4d55c2b14d075461958c35f7d04a4b0df3445b 100644
+--- a/cogl/cogl/driver/gl/cogl-pipeline-fragend-glsl.c
++++ b/cogl/cogl/driver/gl/cogl-pipeline-fragend-glsl.c
+@@ -1065,6 +1065,7 @@ cogl_pipeline_fragend_glsl_end (CoglPipeline  *pipeline,
+           shader_log = g_alloca (len);
+           GE (driver, glGetShaderInfoLog (shader, len, &len, shader_log));
+           g_warning ("Shader compilation failed:\n%s", shader_log);
++          _cogl_context_note_shader_error (ctx, shader_log);
+         }
+ 
+       shader_state->header = NULL;
+diff --git a/cogl/cogl/driver/gl/cogl-pipeline-progend-glsl.c b/cogl/cogl/driver/gl/cogl-pipeline-progend-glsl.c
+index e0ac9d8bed07b463526df35803511c6b94bcee8c..d404c5b6b8b98ad15f9b37fb7805572a8be15b87 100644
+--- a/cogl/cogl/driver/gl/cogl-pipeline-progend-glsl.c
++++ b/cogl/cogl/driver/gl/cogl-pipeline-progend-glsl.c
+@@ -379,6 +379,7 @@ link_program (CoglContext *ctx,
+ 
+       g_warning ("Failed to link GLSL program:\n%.*s\n",
+                  log_length, log);
++      _cogl_context_note_shader_error (ctx, log);
+ 
+       g_free (log);
+     }
+diff --git a/cogl/cogl/driver/gl/cogl-pipeline-vertend-glsl.c b/cogl/cogl/driver/gl/cogl-pipeline-vertend-glsl.c
+index c00be432ab9dbafb7b4e5d5b6a7e3a2496285ee5..a17e0778b430e9e3aa0be923685f28168f44274f 100644
+--- a/cogl/cogl/driver/gl/cogl-pipeline-vertend-glsl.c
++++ b/cogl/cogl/driver/gl/cogl-pipeline-vertend-glsl.c
+@@ -729,6 +729,7 @@ cogl_pipeline_vertend_glsl_end (CoglPipeline  *pipeline,
+           shader_log = g_alloca (len);
+           GE (driver, glGetShaderInfoLog (shader, len, &len, shader_log));
+           g_warning ("Shader compilation failed:\n%s", shader_log);
++          _cogl_context_note_shader_error (ctx, shader_log);
+         }
+ 
+       shader_state->header = NULL;

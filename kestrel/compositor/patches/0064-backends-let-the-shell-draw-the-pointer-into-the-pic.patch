@@ -1,0 +1,51 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Thu, 5 Nov 2026 12:47:06 +0100
+Subject: [PATCH 64/65] backends: let the shell draw the pointer into the
+ picture
+
+A filter that bends the picture has to bend the pointer with it, or the
+pointer stops lining up with what it points at. That takes a software
+cursor, which the debug control can already force, so let the shell ask
+for it through the same count.
+
+Upstream-Status: luft-only API for extension shaders
+---
+ src/backends/meta-backend-private.h | 6 ------
+ src/meta/meta-backend.h             | 6 ++++++
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/src/backends/meta-backend-private.h b/src/backends/meta-backend-private.h
+index 3512df64e1ed44d871d957246f2e82cddd2214ad..c4dbda6e2dad614d950ba9dfcd10a0ffd96de290 100644
+--- a/src/backends/meta-backend-private.h
++++ b/src/backends/meta-backend-private.h
+@@ -206,12 +206,6 @@ void meta_backend_add_hw_cursor_inhibitor (MetaBackend           *backend,
+ void meta_backend_remove_hw_cursor_inhibitor (MetaBackend           *backend,
+                                               MetaHwCursorInhibitor *inhibitor);
+ 
+-META_EXPORT_TEST
+-void meta_backend_inhibit_hw_cursor (MetaBackend *backend);
+-
+-META_EXPORT_TEST
+-void meta_backend_uninhibit_hw_cursor (MetaBackend *backend);
+-
+ META_EXPORT_TEST
+ gboolean meta_backend_is_hw_cursors_inhibited (MetaBackend *backend);
+ 
+diff --git a/src/meta/meta-backend.h b/src/meta/meta-backend.h
+index 827c21576466e8680e1a1f534c8c6129e9808b7a..026147caa5cf87929da16cfb69127ad8766eaf7c 100644
+--- a/src/meta/meta-backend.h
++++ b/src/meta/meta-backend.h
+@@ -62,6 +62,12 @@ MetaKeymapDescription * meta_backend_get_keymap_description (MetaBackend *backen
+ META_EXPORT
+ MetaContext * meta_backend_get_context (MetaBackend *backend);
+ 
++META_EXPORT
++void meta_backend_inhibit_hw_cursor (MetaBackend *backend);
++
++META_EXPORT
++void meta_backend_uninhibit_hw_cursor (MetaBackend *backend);
++
+ META_EXPORT
+ ClutterActor *meta_backend_get_stage (MetaBackend *backend);
+ 

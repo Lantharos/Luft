@@ -171,6 +171,7 @@ pub fn extension_access(access: &ExtensionAccess) -> Vec<String> {
                 "locked-sounds" => "Keep playing sounds while the screen is locked",
                 "input-sounds" => "Play a sound when you type and click, without seeing your keys",
                 "do-not-disturb" => "Hold back notifications for a while",
+                "screen-effects" => "Draw over and change how your windows and the whole screen look",
                 other => other,
             }
             .to_owned()

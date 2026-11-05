@@ -19,7 +19,7 @@ const INTERFACE = 'org.gnome.desktop.interface';
 const A11Y_INTERFACE = 'org.gnome.desktop.a11y.interface';
 const KESTREL = 'com.lantharos.kestrel';
 // Only what apps need to look like the desktop, since the rest of Kestrel's settings are private
-const KESTREL_KEYS = ['rounded-window-corners'];
+const KESTREL_KEYS = ['rounded-window-corners', 'app-lines'];
 const SHARED_SCHEMAS = [
   'org.gnome.desktop.a11y',
   A11Y_INTERFACE,

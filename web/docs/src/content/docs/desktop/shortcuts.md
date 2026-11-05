@@ -28,6 +28,7 @@ sidebar:
 | <kbd>Super</kbd>+<kbd>L</kbd> | Lock the screen |
 | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Esc</kbd> | [Barometer](/apps/barometer/), the system monitor |
 | <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Delete</kbd> | Log out, after asking |
+| <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Esc</kbd> | Turn off every screen effect from extensions, until you turn them back on |
 | <kbd>Super</kbd>+<kbd>Space</kbd> / <kbd>Shift</kbd>+<kbd>Super</kbd>+<kbd>Space</kbd> | Next or previous keyboard layout |
 | <kbd>Super</kbd>+<kbd>P</kbd> | Switch displays: mirror, join, external only or built-in only |
 | <kbd>Super</kbd>+<kbd>O</kbd> | Rotation lock |

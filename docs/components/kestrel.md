@@ -88,7 +88,7 @@ greetd reads `/run/greetd/config.toml`, which `kestrel-greeter-service --write-g
 
 ## Extensions
 
-Kestrel runs extensions, such as Seasons, which ships with Luft. How they load, what they may use, their D-Bus interface and the crash guard are in [Extensions](../extensions.md).
+Kestrel runs extensions, such as Seasons, which ships with Luft. How they load, what they may use, their D-Bus interface, the crash guard and shaders on windows and the screen are in [Extensions](../extensions.md).
 
 ## Signing in and unlocking
 

@@ -12,7 +12,7 @@ const MESSAGE = /^[a-zA-Z][\w-]*$/;
 const HEX = /^#[0-9a-f]{6}$/i;
 const PERMISSIONS: readonly Permission[] = [
   'wallpaper', 'quick-settings', 'taskbar', 'search', 'notifications', 'weather', 'location', 'media', 'popups', 'typing', 'sounds', 'audio-levels',
-  'calls', 'locked-sounds', 'input-sounds', 'do-not-disturb',
+  'calls', 'locked-sounds', 'input-sounds', 'do-not-disturb', 'screen-effects',
 ];
 const NEEDS: Partial<Record<Permission, Permission>> = { 'locked-sounds': 'sounds', 'input-sounds': 'sounds' };
 const APART: Partial<Record<Permission, Permission>> = { 'input-sounds': 'audio-levels' };

@@ -24,6 +24,7 @@ import { Tiling } from './desktop/tiling/tiling.js';
 import { SnapLayouts } from './desktop/windows/snapLayouts.js';
 import { Workspaces } from './desktop/windows/workspaces.js';
 import { RotationAnimation } from './desktop/rotation/rotation.js';
+import { watchTaskbarShapes } from './desktop/panel/islands/shapes.js';
 import { Extensions } from './extensions/extensions.js';
 import { Setup, type SetupContext } from './session/setup/setup.js';
 import { afterMotion, dropAfterMotion } from './shared/motion/afterMotion.js';
@@ -166,6 +167,15 @@ class KestrelUi {
       taskbar: monitor => this.panels.panelOn(monitor)?.shapes.bar() ?? null,
       taskbarIslands: monitor => this.panels.panelOn(monitor)?.islandShapes() ?? [],
       windowPicture: actor => context.windowPicture(actor),
+      surfaceAnchors: surface => {
+        switch (surface) {
+          case 'taskbar': return this.panels.all.flatMap(panel => panel.islandAnchors());
+          case 'quick-settings': return [{ actor: this.quick.actor }];
+          case 'start': return [{ actor: this.surfaces.start.actor }];
+          case 'notifications': return [{ actor: this.surfaces.notifications.actor }];
+        }
+      },
+      watchSurfaceAnchors: watchTaskbarShapes,
       accent: () => this.services.appearance.AccentColor || '#ffffff',
       wallpaperAccent: () => this.services.appearance.WallpaperAccentColor || this.services.appearance.AccentColor || '#ffffff',
       watchAccent: changed => this.services.appearance.watchAccent(changed),

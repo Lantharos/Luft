@@ -15,6 +15,7 @@ import { inputSoundsApi } from './audio/inputSounds.js';
 import { lockedSoundsApi, soundsApi } from './audio/sounds.js';
 import { callsApi } from './calls.js';
 import { popupsApi } from './popups/popups.js';
+import { screenEffectsApi } from './screenEffects/screenEffects.js';
 import { searchApi } from './search.js';
 import { secretsApi } from './secrets.js';
 import { settingsPageApi } from './settingsPage/settingsPage.js';
@@ -44,6 +45,7 @@ const PARTS: { [Name in Capability]: { property: string; create(context: ApiCont
   'locked-sounds': { property: 'lockedSounds', create: lockedSoundsApi },
   'input-sounds': { property: 'inputSounds', create: inputSoundsApi },
   'do-not-disturb': { property: 'doNotDisturb', create: doNotDisturbApi },
+  'screen-effects': { property: 'screenEffects', create: screenEffectsApi },
   'helper': { property: 'helper', create: helperApi },
   'shortcuts': { property: 'shortcuts', create: shortcutsApi },
   'network': { property: 'network', create: networkApi },

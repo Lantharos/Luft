@@ -1,0 +1,1231 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Thu, 5 Nov 2026 12:47:06 +0100
+Subject: [PATCH 65/65] clutter: let a stage view filter what it shows
+
+A shader over the whole screen could only be an offscreen effect on the
+stage, which spans every monitor at one scale, paints everything again for
+any damage and turns off culling.
+
+Give a stage view a chain of fragment shaders instead. The view keeps
+painting into the texture it already uses for rotated and color managed
+output, so a frame still paints only what changed, and a frame where
+nothing changed isn't drawn at all. The shaders run over the whole view on
+each frame, and the onscreen buffer is swapped whole, since any pixel may
+depend on any other. A filter that animates queues frames that run only
+the shaders, without painting.
+
+A view without a filter takes the same paths as before: no offscreen, no
+extra pipeline, clipped redraws and direct scanout.
+
+Captures paint the stage into framebuffers of their own, so they don't see
+a filter, like night light. A filter can ask to be shown in them; then
+they paint the whole view and filter that.
+
+Upstream-Status: luft-only API for extension shaders
+---
+ clutter/clutter/clutter-stage-view-private.h  |   4 +
+ clutter/clutter/clutter-stage-view.c          | 227 ++++++++++-
+ clutter/clutter/clutter-stage-view.h          |  11 +
+ clutter/clutter/clutter-stage.c               | 196 ++++++---
+ clutter/clutter/clutter-view-filter-private.h |  29 ++
+ clutter/clutter/clutter-view-filter.c         | 373 ++++++++++++++++++
+ clutter/clutter/clutter-view-filter.h         |  53 +++
+ clutter/clutter/clutter.h                     |   1 +
+ clutter/clutter/meson.build                   |   3 +
+ src/backends/meta-stage-impl.c                |  31 +-
+ src/compositor/meta-compositor-view-native.c  |   8 +
+ 11 files changed, 868 insertions(+), 68 deletions(-)
+ create mode 100644 clutter/clutter/clutter-view-filter-private.h
+ create mode 100644 clutter/clutter/clutter-view-filter.c
+ create mode 100644 clutter/clutter/clutter-view-filter.h
+
+diff --git a/clutter/clutter/clutter-stage-view-private.h b/clutter/clutter/clutter-stage-view-private.h
+index 6e3fde07fd4c7916e7255e58418a3cba72191d52..b4cabce29bc4c1ee5056fe31b07cff86df9dd363 100644
+--- a/clutter/clutter/clutter-stage-view-private.h
++++ b/clutter/clutter/clutter-stage-view-private.h
+@@ -25,6 +25,10 @@ CLUTTER_EXPORT
+ void clutter_stage_view_after_paint (ClutterStageView *view,
+                                      MtkRegion        *redraw_clip);
+ 
++CoglFramebuffer * clutter_stage_view_get_capture_scene (ClutterStageView *view);
++
++CoglTexture * clutter_stage_view_filter_capture (ClutterStageView *view);
++
+ CLUTTER_EXPORT
+ void clutter_stage_view_before_swap_buffer (ClutterStageView *view,
+                                             const MtkRegion  *swap_region);
+diff --git a/clutter/clutter/clutter-stage-view.c b/clutter/clutter/clutter-stage-view.c
+index 736d3ead9505ed1ab3363f110731d7abe2ec435d..735023669d61dda69a56f8820810a1367cfae867 100644
+--- a/clutter/clutter/clutter-stage-view.c
++++ b/clutter/clutter/clutter-stage-view.c
+@@ -32,6 +32,7 @@
+ #include "clutter/clutter-frame-private.h"
+ #include "clutter/clutter-mutter.h"
+ #include "clutter/clutter-stage-private.h"
++#include "clutter/clutter-view-filter-private.h"
+ #include "cogl/cogl.h"
+ #include "mtk/mtk.h"
+ 
+@@ -81,6 +82,10 @@ typedef struct _ClutterStageViewPrivate
+   CoglOffscreen *offscreen;
+   CoglPipeline *offscreen_pipeline;
+ 
++  ClutterViewFilter *filter;
++  CoglOffscreen *capture_scene;
++  CoglOffscreen *capture_result;
++
+   gboolean use_shadowfb;
+   struct {
+     CoglOffscreen *framebuffer;
+@@ -235,6 +240,27 @@ ensure_stage_view_offscreen (ClutterStageView *view)
+   g_set_object (&priv->offscreen, offscreen);
+ }
+ 
++static void
++fit_pipeline_to_output (ClutterStageView *view,
++                        CoglPipeline     *pipeline)
++{
++  ClutterStageViewPrivate *priv =
++    clutter_stage_view_get_instance_private (view);
++
++  if (priv->transform != MTK_MONITOR_TRANSFORM_NORMAL)
++    {
++      graphene_matrix_t matrix;
++
++      clutter_stage_view_get_offscreen_transformation_matrix (view, &matrix);
++      cogl_pipeline_set_layer_matrix (pipeline, 0, &matrix);
++    }
++
++  clutter_color_pipeline_shader_set_color_state (pipeline,
++                                                 priv->color_state,
++                                                 priv->output_color_state,
++                                                 CLUTTER_COLOR_STATE_TRANSFORM_OPAQUE);
++}
++
+ static void
+ ensure_stage_view_offscreen_pipeline (ClutterStageView *view)
+ {
+@@ -257,20 +283,22 @@ ensure_stage_view_offscreen_pipeline (ClutterStageView *view)
+   cogl_pipeline_set_layer_wrap_mode (pipeline, 0,
+                                      COGL_PIPELINE_WRAP_MODE_CLAMP_TO_EDGE);
+ 
+-  if (priv->transform != MTK_MONITOR_TRANSFORM_NORMAL)
+-    {
+-      graphene_matrix_t matrix;
++  fit_pipeline_to_output (view, pipeline);
+ 
+-      clutter_stage_view_get_offscreen_transformation_matrix (view, &matrix);
+-      cogl_pipeline_set_layer_matrix (pipeline, 0, &matrix);
+-    }
++  g_set_object (&priv->offscreen_pipeline, pipeline);
++}
+ 
+-  clutter_color_pipeline_shader_set_color_state (pipeline,
+-                                                 priv->color_state,
+-                                                 priv->output_color_state,
+-                                                 CLUTTER_COLOR_STATE_TRANSFORM_OPAQUE);
++static void
++ensure_stage_view_filter_output (ClutterStageView *view)
++{
++  ClutterStageViewPrivate *priv =
++    clutter_stage_view_get_instance_private (view);
++  g_autoptr (CoglPipeline) output = NULL;
+ 
+-  g_set_object (&priv->offscreen_pipeline, pipeline);
++  output = clutter_view_filter_new_output (priv->filter,
++                                           cogl_offscreen_get_texture (priv->offscreen));
++  fit_pipeline_to_output (view, output);
++  clutter_view_filter_set_output (priv->filter, output);
+ }
+ 
+ static gboolean
+@@ -282,11 +310,24 @@ on_ensure_offscreen_idle (gpointer data)
+ 
+   ensure_stage_view_offscreen (view);
+   ensure_stage_view_offscreen_pipeline (view);
++  if (priv->filter)
++    ensure_stage_view_filter_output (view);
+ 
+   priv->ensure_offscreen_idle_id = 0;
+   return G_SOURCE_REMOVE;
+ }
+ 
++/* Shell code runs in the middle of frames too, and the frame goes on to paint. */
++static void
++ensure_stage_view_offscreen_now (ClutterStageView *view)
++{
++  ClutterStageViewPrivate *priv =
++    clutter_stage_view_get_instance_private (view);
++
++  g_clear_handle_id (&priv->ensure_offscreen_idle_id, mtk_source_remove);
++  on_ensure_offscreen_idle (view);
++}
++
+ static void
+ clutter_stage_view_invalidate_offscreen (ClutterStageView *view)
+ {
+@@ -299,7 +340,8 @@ clutter_stage_view_invalidate_offscreen (ClutterStageView *view)
+       clutter_stage_view_schedule_update (view);
+     }
+ 
+-  if (priv->transform == MTK_MONITOR_TRANSFORM_NORMAL &&
++  if (!priv->filter &&
++      priv->transform == MTK_MONITOR_TRANSFORM_NORMAL &&
+       !clutter_color_pipeline_shader_needs_color_state (priv->color_state,
+                                                         priv->output_color_state,
+                                                         CLUTTER_COLOR_STATE_TRANSFORM_OPAQUE))
+@@ -509,6 +551,21 @@ init_shadowfb (ClutterStageView *view)
+   return;
+ }
+ 
++static void
++paint_filter (ClutterStageView *view,
++              CoglFramebuffer  *target)
++{
++  ClutterStageViewPrivate *priv =
++    clutter_stage_view_get_instance_private (view);
++  g_autoptr (MtkRegion) whole_view = mtk_region_create_rectangle (&priv->layout);
++  CoglPipeline *pipeline;
++
++  pipeline = clutter_view_filter_run (priv->filter,
++                                      cogl_offscreen_get_texture (priv->offscreen));
++  paint_transformed_framebuffer (view, pipeline, priv->offscreen, target,
++                                 whole_view);
++}
++
+ void
+ clutter_stage_view_after_paint (ClutterStageView *view,
+                                 MtkRegion        *redraw_clip)
+@@ -518,7 +575,13 @@ clutter_stage_view_after_paint (ClutterStageView *view,
+ 
+   g_warn_if_fail (priv->ensure_offscreen_idle_id == 0);
+ 
+-  if (priv->offscreen)
++  if (priv->filter)
++    {
++      paint_filter (view, priv->shadow.framebuffer ?
++                          COGL_FRAMEBUFFER (priv->shadow.framebuffer) :
++                          priv->framebuffer);
++    }
++  else if (priv->offscreen)
+     {
+       if (priv->shadow.framebuffer)
+         {
+@@ -542,6 +605,141 @@ clutter_stage_view_after_paint (ClutterStageView *view,
+     }
+ }
+ 
++/**
++ * clutter_stage_view_set_filter:
++ * @view: a #ClutterStageView
++ * @filter: (nullable): the filter, or %NULL for none
++ *
++ * Sends what @view paints through @filter on its way to the screen. Without
++ * one the view paints straight to the screen, and can scan out directly, as
++ * if this was never called.
++ */
++void
++clutter_stage_view_set_filter (ClutterStageView  *view,
++                               ClutterViewFilter *filter)
++{
++  ClutterStageViewPrivate *priv =
++    clutter_stage_view_get_instance_private (view);
++  gboolean had_filter = priv->filter != NULL;
++
++  if (priv->filter == filter)
++    return;
++
++  if (priv->filter)
++    clutter_view_filter_set_output (priv->filter, NULL);
++
++  g_set_object (&priv->filter, filter);
++
++  if (had_filter && filter && priv->offscreen)
++    {
++      ensure_stage_view_filter_output (view);
++      clutter_stage_view_queue_filter_frame (view);
++      return;
++    }
++
++  if (!filter)
++    {
++      g_clear_object (&priv->capture_scene);
++      g_clear_object (&priv->capture_result);
++    }
++
++  clutter_stage_view_invalidate_offscreen (view);
++
++  if (filter)
++    ensure_stage_view_offscreen_now (view);
++}
++
++/**
++ * clutter_stage_view_get_filter:
++ * @view: a #ClutterStageView
++ *
++ * Returns: (transfer none) (nullable): the filter @view sends what it paints through
++ */
++ClutterViewFilter *
++clutter_stage_view_get_filter (ClutterStageView *view)
++{
++  ClutterStageViewPrivate *priv =
++    clutter_stage_view_get_instance_private (view);
++
++  return priv->filter;
++}
++
++/**
++ * clutter_stage_view_queue_filter_frame:
++ * @view: a #ClutterStageView with a filter
++ *
++ * Draws the next frame through the filter again, without painting anything
++ * that hasn't changed, for a filter that moves by itself.
++ */
++void
++clutter_stage_view_queue_filter_frame (ClutterStageView *view)
++{
++  ClutterStageViewPrivate *priv =
++    clutter_stage_view_get_instance_private (view);
++
++  if (!priv->has_redraw_clip)
++    {
++      priv->redraw_clip = mtk_region_create ();
++      priv->has_redraw_clip = TRUE;
++    }
++
++  clutter_stage_view_schedule_update (view);
++}
++
++static CoglOffscreen *
++ensure_capture_target (CoglOffscreen    **target,
++                       CoglFramebuffer   *like)
++{
++  CoglContext *context = cogl_framebuffer_get_context (like);
++  g_autoptr (CoglTexture) texture = NULL;
++  g_autoptr (GError) error = NULL;
++
++  if (*target)
++    return *target;
++
++  texture = cogl_texture_2d_new_with_size (context,
++                                           cogl_framebuffer_get_width (like),
++                                           cogl_framebuffer_get_height (like));
++  *target = cogl_offscreen_new_with_texture (texture);
++  if (!cogl_framebuffer_allocate (COGL_FRAMEBUFFER (*target), &error))
++    g_warning ("Failed to allocate a filter capture: %s", error->message);
++
++  return *target;
++}
++
++CoglFramebuffer *
++clutter_stage_view_get_capture_scene (ClutterStageView *view)
++{
++  ClutterStageViewPrivate *priv =
++    clutter_stage_view_get_instance_private (view);
++
++  return COGL_FRAMEBUFFER (ensure_capture_target (&priv->capture_scene,
++                                                  COGL_FRAMEBUFFER (priv->offscreen)));
++}
++
++/* Runs the filter over the capture scene, and returns the result. */
++CoglTexture *
++clutter_stage_view_filter_capture (ClutterStageView *view)
++{
++  ClutterStageViewPrivate *priv =
++    clutter_stage_view_get_instance_private (view);
++  CoglOffscreen *result = ensure_capture_target (&priv->capture_result,
++                                                 COGL_FRAMEBUFFER (priv->offscreen));
++  CoglTexture *scene = cogl_offscreen_get_texture (priv->capture_scene);
++  g_autoptr (CoglPipeline) pipeline =
++    cogl_pipeline_copy (clutter_view_filter_run (priv->filter, scene));
++  graphene_matrix_t identity;
++
++  graphene_matrix_init_identity (&identity);
++  cogl_pipeline_set_layer_matrix (pipeline, 0, &identity);
++  cogl_framebuffer_draw_textured_rectangle (COGL_FRAMEBUFFER (result), pipeline,
++                                            -1, 1, 1, -1,
++                                            0, 0, 1, 1);
++  cogl_framebuffer_flush (COGL_FRAMEBUFFER (result));
++
++  return cogl_offscreen_get_texture (result);
++}
++
+ static void
+ copy_shadowfb_to_onscreen (ClutterStageView *view,
+                            const MtkRegion  *swap_region)
+@@ -1327,6 +1525,9 @@ clutter_stage_view_dispose (GObject *object)
+   g_clear_object (&priv->color_state);
+   g_clear_object (&priv->offscreen);
+   g_clear_object (&priv->offscreen_pipeline);
++  g_clear_object (&priv->filter);
++  g_clear_object (&priv->capture_scene);
++  g_clear_object (&priv->capture_result);
+   g_clear_object (&priv->output_color_state);
+   g_clear_pointer (&priv->redraw_clip, mtk_region_unref);
+   g_clear_pointer (&priv->accumulated_redraw_clip, mtk_region_unref);
+diff --git a/clutter/clutter/clutter-stage-view.h b/clutter/clutter/clutter-stage-view.h
+index 9c52f5a7dac91ef5471baccea45a6ac01875a312..b37d01e09435f1c253a991b1cc6ae79dce87bf77 100644
+--- a/clutter/clutter/clutter-stage-view.h
++++ b/clutter/clutter/clutter-stage-view.h
+@@ -27,6 +27,7 @@
+ #include "clutter/clutter-macros.h"
+ #include "clutter/clutter-frame-clock.h"
+ #include "clutter/clutter-types.h"
++#include "clutter/clutter-view-filter.h"
+ #include "mtk/mtk.h"
+ 
+ #define CLUTTER_TYPE_STAGE_VIEW (clutter_stage_view_get_type ())
+@@ -58,6 +59,16 @@ CoglFramebuffer *clutter_stage_view_get_framebuffer (ClutterStageView *view);
+ CLUTTER_EXPORT
+ CoglFramebuffer *clutter_stage_view_get_onscreen (ClutterStageView *view);
+ 
++CLUTTER_EXPORT
++void clutter_stage_view_set_filter (ClutterStageView  *view,
++                                    ClutterViewFilter *filter);
++
++CLUTTER_EXPORT
++ClutterViewFilter * clutter_stage_view_get_filter (ClutterStageView *view);
++
++CLUTTER_EXPORT
++void clutter_stage_view_queue_filter_frame (ClutterStageView *view);
++
+ CLUTTER_EXPORT
+ float clutter_stage_view_get_scale (ClutterStageView *view);
+ 
+diff --git a/clutter/clutter/clutter-stage.c b/clutter/clutter/clutter-stage.c
+index c18a87e161260f36132259bceb37dd0689fe7c4a..8fae1720a4e40bbd9fd89a928a60514eeb38eb21 100644
+--- a/clutter/clutter/clutter-stage.c
++++ b/clutter/clutter/clutter-stage.c
+@@ -2601,6 +2601,147 @@ clutter_stage_presented (ClutterStage     *stage,
+   g_signal_emit (stage, stage_signals[PRESENTED], 0, view, frame_info);
+ }
+ 
++static void
++paint_scene_to_framebuffer (ClutterStage       *stage,
++                            CoglFramebuffer    *framebuffer,
++                            const MtkRectangle *rect,
++                            float               scale,
++                            ClutterColorState  *color_state,
++                            const MtkRegion    *redraw_clip,
++                            ClutterPaintFlag    paint_flags)
++{
++  ClutterStagePrivate *priv = clutter_stage_get_instance_private (stage);
++  ClutterPaintContext *paint_context;
++  g_autoptr (MtkRegion) intersection = NULL;
++  float exact_viewport[4];
++  float viewport[4];
++  graphene_matrix_t projection;
++
++  COGL_TRACE_BEGIN_SCOPED (PaintToFramebuffer,
++                           "Clutter::Stage::paint_to_framebuffer()");
++
++  if (paint_flags & CLUTTER_PAINT_FLAG_CLEAR)
++    {
++      CoglColor clear_color;
++
++      cogl_color_init_from_4f (&clear_color, 0.0, 0.0, 0.0, 0.0);
++      cogl_framebuffer_clear (framebuffer, COGL_BUFFER_BIT_COLOR, &clear_color);
++    }
++
++  intersection = mtk_region_create_rectangle (rect);
++
++  if (redraw_clip)
++    mtk_region_intersect (intersection, redraw_clip);
++
++  if (!color_state)
++    color_state = clutter_actor_get_color_state (CLUTTER_ACTOR (stage));
++
++  paint_context =
++    clutter_paint_context_new_for_framebuffer (framebuffer,
++                                               intersection,
++                                               paint_flags,
++                                               color_state);
++
++  exact_viewport[0] = -(rect->x * scale);
++  exact_viewport[1] = -(rect->y * scale);
++  exact_viewport[2] = priv->viewport[2] * scale;
++  exact_viewport[3] = priv->viewport[3] * scale;
++  clutter_stage_calculate_viewport_and_projection (&priv->projection,
++                                                   exact_viewport,
++                                                   viewport,
++                                                   &projection);
++
++  cogl_framebuffer_push_matrix (framebuffer);
++  cogl_framebuffer_set_projection_matrix (framebuffer, &projection);
++  cogl_framebuffer_set_viewport (framebuffer,
++                                 viewport[0], viewport[1],
++                                 viewport[2], viewport[3]);
++  clutter_actor_paint (CLUTTER_ACTOR (stage), paint_context);
++  cogl_framebuffer_pop_matrix (framebuffer);
++
++  clutter_paint_context_destroy (paint_context);
++
++  cogl_framebuffer_flush (framebuffer);
++}
++
++static gboolean
++paint_filtered_views (ClutterStage       *stage,
++                      ClutterColorState  *color_state,
++                      ClutterPaintFlag    paint_flags,
++                      const MtkRectangle *rect)
++{
++  ClutterStagePrivate *priv = clutter_stage_get_instance_private (stage);
++  gboolean filtered = FALSE;
++  GList *l;
++
++  for (l = _clutter_stage_window_get_views (priv->impl); l; l = l->next)
++    {
++      ClutterStageView *view = l->data;
++      ClutterViewFilter *filter = clutter_stage_view_get_filter (view);
++      MtkRectangle layout;
++
++      clutter_stage_view_get_layout (view, &layout);
++      if (!filter || !clutter_view_filter_get_captured (filter) ||
++          !mtk_rectangle_overlap (&layout, rect))
++        continue;
++
++      paint_scene_to_framebuffer (stage,
++                                  clutter_stage_view_get_capture_scene (view),
++                                  &layout,
++                                  clutter_stage_view_get_scale (view),
++                                  color_state, NULL, paint_flags);
++      filtered = TRUE;
++    }
++
++  return filtered;
++}
++
++static void
++draw_filtered_views (ClutterStage       *stage,
++                     CoglFramebuffer    *framebuffer,
++                     const MtkRectangle *rect,
++                     float               scale)
++{
++  ClutterStagePrivate *priv = clutter_stage_get_instance_private (stage);
++  CoglContext *context = cogl_framebuffer_get_context (framebuffer);
++  int width = cogl_framebuffer_get_width (framebuffer);
++  int height = cogl_framebuffer_get_height (framebuffer);
++  GList *l;
++
++  cogl_framebuffer_push_matrix (framebuffer);
++  cogl_framebuffer_orthographic (framebuffer, 0, 0, width, height, -1, 1);
++  cogl_framebuffer_set_viewport (framebuffer, 0, 0, width, height);
++
++  for (l = _clutter_stage_window_get_views (priv->impl); l; l = l->next)
++    {
++      ClutterStageView *view = l->data;
++      ClutterViewFilter *filter = clutter_stage_view_get_filter (view);
++      g_autoptr (CoglPipeline) pipeline = NULL;
++      MtkRectangle layout;
++      float x, y;
++
++      clutter_stage_view_get_layout (view, &layout);
++      if (!filter || !clutter_view_filter_get_captured (filter) ||
++          !mtk_rectangle_overlap (&layout, rect))
++        continue;
++
++      pipeline = cogl_pipeline_new (context);
++      cogl_pipeline_set_blend (pipeline, "RGBA = ADD (SRC_COLOR, 0)", NULL);
++      cogl_pipeline_set_layer_texture (pipeline, 0,
++                                       clutter_stage_view_filter_capture (view));
++      x = (layout.x - rect->x) * scale;
++      y = (layout.y - rect->y) * scale;
++      cogl_framebuffer_draw_textured_rectangle (framebuffer, pipeline,
++                                                x, y,
++                                                x + layout.width * scale,
++                                                y + layout.height * scale,
++                                                0, 0, 1, 1);
++    }
++
++  cogl_framebuffer_pop_matrix (framebuffer);
++  cogl_framebuffer_flush (framebuffer);
++}
++
+ /**
+  * clutter_stage_get_capture_final_size:
+  * @stage: a #ClutterStage actor
+@@ -2682,58 +2823,13 @@ clutter_stage_paint_to_framebuffer_clipped (ClutterStage       *stage,
+                                             const MtkRegion    *redraw_clip,
+                                             ClutterPaintFlag    paint_flags)
+ {
+-  ClutterStagePrivate *priv = clutter_stage_get_instance_private (stage);
+-  ClutterPaintContext *paint_context;
+-  g_autoptr (MtkRegion) intersection = NULL;
+-  float exact_viewport[4];
+-  float viewport[4];
+-  graphene_matrix_t projection;
++  gboolean filtered = paint_filtered_views (stage, color_state, paint_flags, rect);
+ 
+-  COGL_TRACE_BEGIN_SCOPED (PaintToFramebuffer,
+-                           "Clutter::Stage::paint_to_framebuffer()");
+-
+-  if (paint_flags & CLUTTER_PAINT_FLAG_CLEAR)
+-    {
+-      CoglColor clear_color;
+-
+-      cogl_color_init_from_4f (&clear_color, 0.0, 0.0, 0.0, 0.0);
+-      cogl_framebuffer_clear (framebuffer, COGL_BUFFER_BIT_COLOR, &clear_color);
+-    }
++  paint_scene_to_framebuffer (stage, framebuffer, rect, scale, color_state,
++                              filtered ? NULL : redraw_clip, paint_flags);
+ 
+-  intersection = mtk_region_create_rectangle (rect);
+-
+-  if (redraw_clip)
+-    mtk_region_intersect (intersection, redraw_clip);
+-
+-  if (!color_state)
+-    color_state = clutter_actor_get_color_state (CLUTTER_ACTOR (stage));
+-
+-  paint_context =
+-    clutter_paint_context_new_for_framebuffer (framebuffer,
+-                                               intersection,
+-                                               paint_flags,
+-                                               color_state);
+-
+-  exact_viewport[0] = -(rect->x * scale);
+-  exact_viewport[1] = -(rect->y * scale);
+-  exact_viewport[2] = priv->viewport[2] * scale;
+-  exact_viewport[3] = priv->viewport[3] * scale;
+-  clutter_stage_calculate_viewport_and_projection (&priv->projection,
+-                                                   exact_viewport,
+-                                                   viewport,
+-                                                   &projection);
+-
+-  cogl_framebuffer_push_matrix (framebuffer);
+-  cogl_framebuffer_set_projection_matrix (framebuffer, &projection);
+-  cogl_framebuffer_set_viewport (framebuffer,
+-                                 viewport[0], viewport[1],
+-                                 viewport[2], viewport[3]);
+-  clutter_actor_paint (CLUTTER_ACTOR (stage), paint_context);
+-  cogl_framebuffer_pop_matrix (framebuffer);
+-
+-  clutter_paint_context_destroy (paint_context);
+-
+-  cogl_framebuffer_flush (framebuffer);
++  if (filtered)
++    draw_filtered_views (stage, framebuffer, rect, scale);
+ }
+ 
+ void
+diff --git a/clutter/clutter/clutter-view-filter-private.h b/clutter/clutter/clutter-view-filter-private.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..8323aa84976d5f268c4de40f71d0740c4c629289
+--- /dev/null
++++ b/clutter/clutter/clutter-view-filter-private.h
+@@ -0,0 +1,29 @@
++/*
++ * Copyright (C) 2026 Lantharos
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#pragma once
++
++#include "clutter/clutter-view-filter.h"
++
++CoglPipeline * clutter_view_filter_run (ClutterViewFilter *filter,
++                                        CoglTexture       *scene);
++
++CoglPipeline * clutter_view_filter_new_output (ClutterViewFilter *filter,
++                                               CoglTexture       *scene);
++
++void clutter_view_filter_set_output (ClutterViewFilter *filter,
++                                     CoglPipeline      *output);
+diff --git a/clutter/clutter/clutter-view-filter.c b/clutter/clutter/clutter-view-filter.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..5a7ee54867587de96f92b7b173e4c6b92d3cb90d
+--- /dev/null
++++ b/clutter/clutter/clutter-view-filter.c
+@@ -0,0 +1,373 @@
++/*
++ * Copyright (C) 2026 Lantharos
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
++ */
++
++/**
++ * ClutterViewFilter:
++ *
++ * A chain of fragment shaders a [class@Clutter.StageView] sends what it painted
++ * through on its way to the screen.
++ *
++ * The view keeps the painted scene in a texture, so a frame only paints what
++ * changed and a frame that changes nothing isn't drawn at all, while the shaders
++ * run over the whole view. Each pass samples the scene as layer 0 and the result
++ * of earlier passes as the layers after it, and draws into a texture of its own
++ * at its scale of the view. The last pass draws to the screen.
++ */
++
++#include "config.h"
++
++#include "clutter/clutter-view-filter-private.h"
++
++#include <math.h>
++
++typedef struct _FilterPass
++{
++  CoglSnippet *snippet;
++  float scale;
++  CoglPipeline *pipeline;
++  CoglOffscreen *target;
++} FilterPass;
++
++typedef struct _FilterUniform
++{
++  int n_components;
++  int n_values;
++  float *values;
++} FilterUniform;
++
++struct _ClutterViewFilter
++{
++  GObject parent_instance;
++
++  GPtrArray *passes;
++  GHashTable *uniforms;
++  CoglPipeline *output;
++  gboolean captured;
++  int width;
++  int height;
++};
++
++G_DEFINE_FINAL_TYPE (ClutterViewFilter, clutter_view_filter, G_TYPE_OBJECT)
++
++static void
++filter_pass_free (FilterPass *pass)
++{
++  g_clear_object (&pass->snippet);
++  g_clear_object (&pass->pipeline);
++  g_clear_object (&pass->target);
++  g_free (pass);
++}
++
++static void
++filter_uniform_free (FilterUniform *uniform)
++{
++  g_free (uniform->values);
++  g_free (uniform);
++}
++
++static void
++apply_uniform (CoglPipeline  *pipeline,
++               const char    *name,
++               FilterUniform *uniform)
++{
++  int location = cogl_pipeline_get_uniform_location (pipeline, name);
++
++  cogl_pipeline_set_uniform_float (pipeline, location,
++                                   uniform->n_components,
++                                   uniform->n_values / uniform->n_components,
++                                   uniform->values);
++}
++
++static void
++apply_uniforms (ClutterViewFilter *filter,
++                CoglPipeline      *pipeline)
++{
++  GHashTableIter iter;
++  gpointer name, uniform;
++
++  g_hash_table_iter_init (&iter, filter->uniforms);
++  while (g_hash_table_iter_next (&iter, &name, &uniform))
++    apply_uniform (pipeline, name, uniform);
++}
++
++static void
++clear_targets (ClutterViewFilter *filter)
++{
++  unsigned int i;
++
++  for (i = 0; i < filter->passes->len; i++)
++    {
++      FilterPass *pass = g_ptr_array_index (filter->passes, i);
++
++      g_clear_object (&pass->pipeline);
++      g_clear_object (&pass->target);
++    }
++}
++
++static CoglPipeline *
++create_pipeline (ClutterViewFilter *filter,
++                 CoglContext       *context,
++                 FilterPass        *pass,
++                 unsigned int       index)
++{
++  CoglPipeline *pipeline = cogl_pipeline_new (context);
++  unsigned int i;
++
++  cogl_pipeline_set_static_name (pipeline, "ClutterViewFilter");
++  cogl_pipeline_set_blend (pipeline, "RGBA = ADD (SRC_COLOR, 0)", NULL);
++  cogl_pipeline_add_snippet (pipeline, pass->snippet);
++
++  for (i = 0; i <= index; i++)
++    {
++      cogl_pipeline_set_layer_filters (pipeline, i,
++                                       COGL_PIPELINE_FILTER_LINEAR,
++                                       COGL_PIPELINE_FILTER_LINEAR);
++      cogl_pipeline_set_layer_wrap_mode (pipeline, i,
++                                         COGL_PIPELINE_WRAP_MODE_CLAMP_TO_EDGE);
++    }
++
++  for (i = 0; i < index; i++)
++    {
++      FilterPass *earlier = g_ptr_array_index (filter->passes, i);
++
++      cogl_pipeline_set_layer_texture (pipeline, i + 1,
++                                       cogl_offscreen_get_texture (earlier->target));
++    }
++
++  apply_uniforms (filter, pipeline);
++  return pipeline;
++}
++
++static void
++ensure_passes (ClutterViewFilter *filter,
++               CoglTexture       *scene)
++{
++  CoglContext *context = cogl_texture_get_context (scene);
++  int width = cogl_texture_get_width (scene);
++  int height = cogl_texture_get_height (scene);
++  unsigned int i;
++
++  if (filter->width != width || filter->height != height)
++    {
++      clear_targets (filter);
++      filter->width = width;
++      filter->height = height;
++    }
++
++  for (i = 0; i < filter->passes->len; i++)
++    {
++      FilterPass *pass = g_ptr_array_index (filter->passes, i);
++      gboolean last = i == filter->passes->len - 1;
++
++      if (!last && !pass->target)
++        {
++          g_autoptr (CoglTexture) texture = NULL;
++          g_autoptr (GError) error = NULL;
++
++          texture = cogl_texture_2d_new_with_size (context,
++                                                   MAX ((int) roundf (width * pass->scale), 1),
++                                                   MAX ((int) roundf (height * pass->scale), 1));
++          pass->target = cogl_offscreen_new_with_texture (texture);
++          if (!cogl_framebuffer_allocate (COGL_FRAMEBUFFER (pass->target), &error))
++            g_warning ("Failed to allocate a filter pass: %s", error->message);
++        }
++
++      if (!pass->pipeline)
++        pass->pipeline = create_pipeline (filter, context, pass, i);
++    }
++}
++
++/*
++ * Draws every pass but the last over @scene, and returns the pipeline of the
++ * last, which samples them and @scene, for the caller to draw where it wants.
++ */
++CoglPipeline *
++clutter_view_filter_run (ClutterViewFilter *filter,
++                         CoglTexture       *scene)
++{
++  unsigned int last = filter->passes->len - 1;
++  FilterPass *final_pass;
++  unsigned int i;
++
++  ensure_passes (filter, scene);
++
++  for (i = 0; i < last; i++)
++    {
++      FilterPass *pass = g_ptr_array_index (filter->passes, i);
++
++      cogl_pipeline_set_layer_texture (pass->pipeline, 0, scene);
++      cogl_framebuffer_draw_textured_rectangle (COGL_FRAMEBUFFER (pass->target),
++                                                pass->pipeline,
++                                                -1, 1, 1, -1,
++                                                0, 0, 1, 1);
++    }
++
++  final_pass = g_ptr_array_index (filter->passes, last);
++  cogl_pipeline_set_layer_texture (final_pass->pipeline, 0, scene);
++  if (filter->output)
++    {
++      cogl_pipeline_set_layer_texture (filter->output, 0, scene);
++      return filter->output;
++    }
++
++  return final_pass->pipeline;
++}
++
++/* A copy of the last pass for the view to fit to its output. */
++CoglPipeline *
++clutter_view_filter_new_output (ClutterViewFilter *filter,
++                                CoglTexture       *scene)
++{
++  FilterPass *final_pass;
++
++  ensure_passes (filter, scene);
++  final_pass = g_ptr_array_index (filter->passes, filter->passes->len - 1);
++  return cogl_pipeline_copy (final_pass->pipeline);
++}
++
++void
++clutter_view_filter_set_output (ClutterViewFilter *filter,
++                                CoglPipeline      *output)
++{
++  g_set_object (&filter->output, output);
++}
++
++/**
++ * clutter_view_filter_add_pass:
++ * @filter: a #ClutterViewFilter
++ * @snippet: a fragment snippet
++ * @scale: the size of what the pass draws, as a part of the view's
++ *
++ * Adds a pass after those already there. The last pass always has the view's
++ * size, whatever its @scale says.
++ */
++void
++clutter_view_filter_add_pass (ClutterViewFilter *filter,
++                              CoglSnippet       *snippet,
++                              float              scale)
++{
++  FilterPass *pass = g_new0 (FilterPass, 1);
++
++  pass->snippet = g_object_ref (snippet);
++  pass->scale = scale;
++  g_ptr_array_add (filter->passes, pass);
++  clear_targets (filter);
++}
++
++/**
++ * clutter_view_filter_set_uniform:
++ * @filter: a #ClutterViewFilter
++ * @name: the uniform
++ * @n_components: floats per value
++ * @values: (array length=n_values): the values
++ * @n_values: how many floats @values holds
++ *
++ * Sets a uniform of every pass. It takes effect the next time the filter runs;
++ * [method@Clutter.StageView.queue_filter_frame] runs it without painting.
++ */
++void
++clutter_view_filter_set_uniform (ClutterViewFilter *filter,
++                                 const char        *name,
++                                 int                n_components,
++                                 const float       *values,
++                                 int                n_values)
++{
++  FilterUniform *uniform = g_new0 (FilterUniform, 1);
++  unsigned int i;
++
++  uniform->n_components = n_components;
++  uniform->n_values = n_values;
++  uniform->values = g_memdup2 (values, n_values * sizeof (float));
++  g_hash_table_replace (filter->uniforms, g_strdup (name), uniform);
++
++  for (i = 0; i < filter->passes->len; i++)
++    {
++      FilterPass *pass = g_ptr_array_index (filter->passes, i);
++
++      if (pass->pipeline)
++        apply_uniform (pass->pipeline, name, uniform);
++    }
++
++  if (filter->output)
++    apply_uniform (filter->output, name, uniform);
++}
++
++/**
++ * clutter_view_filter_set_captured:
++ * @filter: a #ClutterViewFilter
++ * @captured: whether screenshots and recordings show the filter
++ *
++ * Decides what [method@Clutter.Stage.paint_to_framebuffer] paints where the
++ * filter's view lies. Without it they see what the view paints, unfiltered.
++ */
++void
++clutter_view_filter_set_captured (ClutterViewFilter *filter,
++                                  gboolean           captured)
++{
++  filter->captured = captured;
++}
++
++/**
++ * clutter_view_filter_get_captured:
++ * @filter: a #ClutterViewFilter
++ *
++ * Returns: whether screenshots and recordings show the filter
++ */
++gboolean
++clutter_view_filter_get_captured (ClutterViewFilter *filter)
++{
++  return filter->captured;
++}
++
++static void
++clutter_view_filter_finalize (GObject *object)
++{
++  ClutterViewFilter *filter = CLUTTER_VIEW_FILTER (object);
++
++  g_clear_object (&filter->output);
++  g_clear_pointer (&filter->passes, g_ptr_array_unref);
++  g_clear_pointer (&filter->uniforms, g_hash_table_unref);
++
++  G_OBJECT_CLASS (clutter_view_filter_parent_class)->finalize (object);
++}
++
++static void
++clutter_view_filter_class_init (ClutterViewFilterClass *klass)
++{
++  GObjectClass *object_class = G_OBJECT_CLASS (klass);
++
++  object_class->finalize = clutter_view_filter_finalize;
++}
++
++static void
++clutter_view_filter_init (ClutterViewFilter *filter)
++{
++  filter->passes = g_ptr_array_new_with_free_func ((GDestroyNotify) filter_pass_free);
++  filter->uniforms = g_hash_table_new_full (g_str_hash, g_str_equal, g_free,
++                                            (GDestroyNotify) filter_uniform_free);
++}
++
++/**
++ * clutter_view_filter_new:
++ *
++ * Returns: (transfer full): a filter with no passes yet
++ */
++ClutterViewFilter *
++clutter_view_filter_new (void)
++{
++  return g_object_new (CLUTTER_TYPE_VIEW_FILTER, NULL);
++}
+diff --git a/clutter/clutter/clutter-view-filter.h b/clutter/clutter/clutter-view-filter.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..e62402468288b05ab66dc382ce3b270ac312f07b
+--- /dev/null
++++ b/clutter/clutter/clutter-view-filter.h
+@@ -0,0 +1,53 @@
++/*
++ * Copyright (C) 2026 Lantharos
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#pragma once
++
++#if !defined(__CLUTTER_H_INSIDE__) && !defined(CLUTTER_COMPILATION)
++#error "Only <clutter/clutter.h> can be included directly."
++#endif
++
++#include "clutter/clutter-macros.h"
++#include "cogl/cogl.h"
++
++#define CLUTTER_TYPE_VIEW_FILTER (clutter_view_filter_get_type ())
++CLUTTER_EXPORT
++G_DECLARE_FINAL_TYPE (ClutterViewFilter, clutter_view_filter,
++                      CLUTTER, VIEW_FILTER,
++                      GObject)
++
++CLUTTER_EXPORT
++ClutterViewFilter * clutter_view_filter_new (void);
++
++CLUTTER_EXPORT
++void clutter_view_filter_add_pass (ClutterViewFilter *filter,
++                                   CoglSnippet       *snippet,
++                                   float              scale);
++
++CLUTTER_EXPORT
++void clutter_view_filter_set_uniform (ClutterViewFilter *filter,
++                                      const char        *name,
++                                      int                n_components,
++                                      const float       *values,
++                                      int                n_values);
++
++CLUTTER_EXPORT
++void clutter_view_filter_set_captured (ClutterViewFilter *filter,
++                                       gboolean           captured);
++
++CLUTTER_EXPORT
++gboolean clutter_view_filter_get_captured (ClutterViewFilter *filter);
+diff --git a/clutter/clutter/clutter.h b/clutter/clutter/clutter.h
+index 026f6f6fcce9729fb9ad064bb25200a21beb9ab2..5c5c4d42791c44a7c54eaea2226ee011355862a0 100644
+--- a/clutter/clutter/clutter.h
++++ b/clutter/clutter/clutter.h
+@@ -105,6 +105,7 @@
+ #include "clutter/clutter-snap-constraint.h"
+ #include "clutter/clutter-stage.h"
+ #include "clutter/clutter-stage-view.h"
++#include "clutter/clutter-view-filter.h"
+ #include "clutter/clutter-texture-content.h"
+ #include "clutter/clutter-timeline.h"
+ #include "clutter/clutter-transition-group.h"
+diff --git a/clutter/clutter/meson.build b/clutter/clutter/meson.build
+index 130f477fb9c00246e43e233746c7f56a6a8f115d..2a090562a9b3d1fb9bca3990b8d01801a4c0b834 100644
+--- a/clutter/clutter/meson.build
++++ b/clutter/clutter/meson.build
+@@ -80,6 +80,7 @@ clutter_headers = [
+   'clutter-snap-constraint.h',
+   'clutter-stage.h',
+   'clutter-stage-view.h',
++  'clutter-view-filter.h',
+   'clutter-texture-content.h',
+   'clutter-timeline.h',
+   'clutter-transition-group.h',
+@@ -179,6 +180,7 @@ clutter_sources = [
+   'clutter-stage-manager-accessible.c',
+   'clutter-stage-manager.c',
+   'clutter-stage-view.c',
++  'clutter-view-filter.c',
+   'clutter-stage-window.c',
+   'clutter-texture-content.c',
+   'clutter-transition-group.c',
+@@ -225,6 +227,7 @@ clutter_private_headers = [
+   'clutter-stage-manager-private.h',
+   'clutter-stage-private.h',
+   'clutter-stage-view-private.h',
++  'clutter-view-filter-private.h',
+   'clutter-stage-window.h',
+   'clutter-timeline-private.h',
+ ]
+diff --git a/src/backends/meta-stage-impl.c b/src/backends/meta-stage-impl.c
+index e521d7b935c73da06a566c8fae202b07008d0128..45d8908f64bf196770b151802f74bf5f21f554f5 100644
+--- a/src/backends/meta-stage-impl.c
++++ b/src/backends/meta-stage-impl.c
+@@ -512,7 +512,9 @@ meta_stage_impl_redraw_view_primary (MetaStageImpl    *stage_impl,
+   CoglFramebuffer *fb = clutter_stage_view_get_framebuffer (stage_view);
+   CoglContext *context = cogl_framebuffer_get_context (fb);
+   CoglFramebuffer *onscreen = clutter_stage_view_get_onscreen (stage_view);
++  CoglFramebuffer *damage_target;
+   MtkRectangle view_rect;
++  gboolean filtered;
+   gboolean is_full_redraw;
+   gboolean use_clipped_redraw;
+   gboolean buffer_has_valid_damage_history = FALSE;
+@@ -539,8 +541,11 @@ meta_stage_impl_redraw_view_primary (MetaStageImpl    *stage_impl,
+   fb_width = cogl_framebuffer_get_width (fb);
+   fb_height = cogl_framebuffer_get_height (fb);
+ 
++  filtered = clutter_stage_view_get_filter (stage_view) != NULL;
++  damage_target = filtered ? fb : onscreen;
++
+   has_buffer_age =
+-    COGL_IS_ONSCREEN (onscreen) &&
++    COGL_IS_ONSCREEN (damage_target) &&
+     cogl_context_has_winsys_feature (context, COGL_WINSYS_FEATURE_BUFFER_AGE);
+ 
+   redraw_clip = clutter_stage_view_take_accumulated_redraw_clip (stage_view);
+@@ -571,7 +576,7 @@ meta_stage_impl_redraw_view_primary (MetaStageImpl    *stage_impl,
+                                has_buffer_age,
+                                buffer_has_valid_damage_history,
+                                paint_debug_flags,
+-                               onscreen,
++                               damage_target,
+                                stage_window);
+ 
+   if (use_clipped_redraw)
+@@ -615,7 +620,7 @@ meta_stage_impl_redraw_view_primary (MetaStageImpl    *stage_impl,
+         queued_redraw_clip = mtk_region_ref (redraw_clip);
+     }
+ 
+-  g_return_if_fail (!mtk_region_is_empty (fb_clip_region));
++  g_return_if_fail (filtered || !mtk_region_is_empty (fb_clip_region));
+ 
+   /* XXX: It seems there will be a race here in that the stage
+    * window may be resized before the cogl_onscreen_swap_region
+@@ -626,7 +631,7 @@ meta_stage_impl_redraw_view_primary (MetaStageImpl    *stage_impl,
+    * artefacts.
+    */
+   /* swap_region does not need damage history, set it up before that */
+-  if (!use_clipped_redraw)
++  if (!use_clipped_redraw || filtered)
+     swap_region = mtk_region_create ();
+   else if (clutter_stage_view_has_shadowfb (stage_view))
+     swap_region = mtk_region_ref (fb_clip_region);
+@@ -661,6 +666,17 @@ meta_stage_impl_redraw_view_primary (MetaStageImpl    *stage_impl,
+ 
+       clutter_damage_history_step (damage_history);
+     }
++  else if (filtered && COGL_IS_ONSCREEN (onscreen))
++    {
++      g_autoptr (MtkRegion) whole_view = NULL;
++
++      whole_view = mtk_region_create_rectangle (&(MtkRectangle) {
++        .width = fb_width,
++        .height = fb_height,
++      });
++      clutter_damage_history_record (damage_history, whole_view);
++      clutter_damage_history_step (damage_history);
++    }
+ 
+   if (use_clipped_redraw)
+     {
+@@ -690,9 +706,14 @@ meta_stage_impl_redraw_view_primary (MetaStageImpl    *stage_impl,
+       debug_redraw_clip = mtk_region_create_rectangle (&view_rect);
+       paint_stage (stage_impl, stage_view, debug_redraw_clip, frame);
+     }
++  else if (mtk_region_is_empty (fb_clip_region))
++    {
++      clutter_stage_view_after_paint (stage_view, redraw_clip);
++    }
+   else if (use_clipped_redraw)
+     {
+-      queue_damage_region (stage_window, stage_view, fb_clip_region);
++      if (!filtered)
++        queue_damage_region (stage_window, stage_view, fb_clip_region);
+ 
+       cogl_framebuffer_push_region_clip (fb, fb_clip_region);
+ 
+diff --git a/src/compositor/meta-compositor-view-native.c b/src/compositor/meta-compositor-view-native.c
+index 41adfabbea8b3135eacaff7c049155dc5e6d966f..d9414115c9e13905320845e59d60106ffe8f4345 100644
+--- a/src/compositor/meta-compositor-view-native.c
++++ b/src/compositor/meta-compositor-view-native.c
+@@ -152,6 +152,14 @@ find_candidate (MetaCompositorView *compositor_view,
+       return NULL;
+     }
+ 
++  if (clutter_stage_view_get_filter (stage_view))
++    {
++      meta_topic (META_DEBUG_RENDER,
++                  "No %s candidate: the view is filtered",
++                  topic);
++      return NULL;
++    }
++
+   window_actor =
+     meta_compositor_view_get_top_window_actor (compositor_view);
+   if (!window_actor)

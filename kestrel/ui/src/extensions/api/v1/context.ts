@@ -10,6 +10,7 @@ import type { StoredValues } from '../../runtime/storage.js';
 import type { Translations } from '../../runtime/translations.js';
 import type { SettingValues } from '../../runtime/values.js';
 import type { OpenPanels } from './popups/popups.js';
+import type { EffectsStage } from './screenEffects/stage.js';
 import type { Manifest } from './types.js';
 import type { LayerStage } from './wallpaper/stage.js';
 
@@ -36,6 +37,7 @@ export interface ApiContext {
   /** When people last used the extension, for what only they may start. */
   readonly gestures: Gestures;
   readonly layers: LayerStage;
+  readonly screenEffects: EffectsStage;
   /** The helper processes running, so Settings can show what they use. */
   readonly helpers: Set<Gio.Subprocess>;
   openSettings(): void;

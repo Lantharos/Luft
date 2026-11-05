@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Tue, 3 Nov 2026 07:46:35 +0100
-Subject: [PATCH 60/62] compositor: round the corners of maximized and tiled
+Subject: [PATCH 60/65] compositor: round the corners of maximized and tiled
  windows that face open space
 
 Maximized and tiled windows lost all their rounding. When the shell keeps

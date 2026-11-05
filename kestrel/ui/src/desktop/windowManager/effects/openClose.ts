@@ -4,6 +4,7 @@ import type GObject from 'gi://GObject';
 import type Meta from 'gi://Meta';
 
 import { Curve, Duration, Spring, holdMotion, reducedMotion } from '../../../kestrelUi.js';
+import { RunningTransition, windowTransitions } from './shaderTransition.js';
 
 const OPEN = { scale: 0.94, rise: 8 };
 const DIALOG_OPEN = { scale: 0.96, rise: 0 };
@@ -16,6 +17,7 @@ interface Effect {
   completed: () => void;
   release: (() => void) | null;
   cancel: (() => void) | null;
+  transition: RunningTransition | null;
 }
 
 const hasContent = (texture: Meta.ShapedTexture) => texture.get_preferred_size()[1] > 0;
@@ -58,7 +60,26 @@ function afterFirstFrame(actor: Meta.WindowActor, shown: () => void): () => void
 export class OpenCloseEffects {
   private readonly effects = new Map<Meta.WindowActor, Effect>();
 
+  private shaded(actor: Meta.WindowActor, kind: 'open' | 'close'): RunningTransition | null {
+    const transition = reducedMotion() ? null : windowTransitions.find(actor, kind);
+    return transition && new RunningTransition(actor, transition, () => this.finish(actor));
+  }
+
   open(actor: Meta.WindowActor, dialog: boolean, completed: () => void): void {
+    const running = this.shaded(actor, 'open');
+    if (running) {
+      actor.opacity = 0;
+      actor.show();
+      const effect = this.start(actor, completed);
+      effect.transition = running;
+      effect.cancel = afterFirstFrame(actor, () => {
+        effect.cancel = null;
+        effect.release = holdMotion();
+        actor.opacity = 255;
+        running.start();
+      });
+      return;
+    }
     const { scale, rise } = dialog ? DIALOG_OPEN : OPEN;
     const motion = !reducedMotion();
     actor.set_pivot_point(0.5, 0.5);
@@ -87,7 +108,13 @@ export class OpenCloseEffects {
   }
 
   close(actor: Meta.WindowActor, completed: () => void): void {
-    this.start(actor, completed).release = holdMotion();
+    const effect = this.start(actor, completed);
+    effect.release = holdMotion();
+    effect.transition = this.shaded(actor, 'close');
+    if (effect.transition) {
+      effect.transition.start();
+      return;
+    }
     actor.set_pivot_point(0.5, 0.5);
     if (!reducedMotion())
       actor.ease({ scale_x: CLOSE_SCALE, scale_y: CLOSE_SCALE, spring: Spring.snappy });
@@ -98,7 +125,7 @@ export class OpenCloseEffects {
   }
 
   private start(actor: Meta.WindowActor, completed: () => void): Effect {
-    const effect: Effect = { completed, release: null, cancel: null };
+    const effect: Effect = { completed, release: null, cancel: null, transition: null };
     this.effects.set(actor, effect);
     return effect;
   }
@@ -108,6 +135,7 @@ export class OpenCloseEffects {
     if (!effect) return;
     this.effects.delete(actor);
     effect.cancel?.();
+    effect.transition?.stop();
     for (const property of ANIMATED) actor.remove_transition(property);
     actor.set({ opacity: 255, scale_x: 1, scale_y: 1, translation_y: 0 });
     actor.set_pivot_point(0, 0);

@@ -352,6 +352,7 @@ settings-extensions-permission-calls = Know when you're in a call
 settings-extensions-permission-locked-sounds = Keep playing sounds while the screen is locked
 settings-extensions-permission-input-sounds = Play a sound when you type and click, without seeing your keys
 settings-extensions-permission-do-not-disturb = Hold back notifications for a while
+settings-extensions-permission-screen-effects = Draw over and change how your windows and the whole screen look
 # $hosts lists the web addresses the extension connects to, such as "app.pult.sh"
 settings-extensions-permission-network = Connect to { $hosts }
 settings-extensions-remove = Remove

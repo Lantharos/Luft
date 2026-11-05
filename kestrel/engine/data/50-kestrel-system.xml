@@ -17,6 +17,9 @@
 	<KeyListEntry name="focus-active-notification"
                       description="Focus the active notification"/>
 
+	<KeyListEntry name="screen-effects-off"
+                      description="Turn off every screen effect"/>
+
 	<KeyListEntry name="clipboard-history"
                       description="Show clipboard history"/>
 

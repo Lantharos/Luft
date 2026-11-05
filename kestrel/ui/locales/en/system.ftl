@@ -581,6 +581,17 @@ extension-popup-close = Close
 extension-turned-off-title = { $name } was turned off
 extension-turned-off-error = It stopped working. You can turn it on again in Settings.
 extension-turned-off-crash = The desktop restarted twice while it was running. You can turn it on again in Settings.
+# Notification title when Kestrel took one effect of an extension off the screen by itself; $effect is the effect's name
+screen-effect-off-title = { $effect } was turned off
+# The effect's shader doesn't work on this computer; $name is the extension's name
+screen-effect-off-shader = Its shader doesn't work on this computer. { $name } keeps running without it.
+# The effect made the desktop very slow; $name is the extension's name
+screen-effect-off-slow = It made the desktop very slow. { $name } keeps running without it.
+# Notification after the shortcut turned off everything extensions draw over windows and the screen
+screen-effects-off-title = Screen effects are off
+screen-effects-off-body = They stay off until you turn them back on.
+# Button on that notification
+screen-effects-off-action = Turn Back On
 # Notification after an extension stopped holding notifications back, such as at the end of a work session; $name is the extension's name
 extension-held-title = While { $name } held notifications back
 # $count is how many notifications came in, $apps lists the apps they came from, such as "Mailman and Chat"

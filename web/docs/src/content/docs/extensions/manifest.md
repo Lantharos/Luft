@@ -44,6 +44,7 @@ The API object only has the parts an extension asked for. Settings and Schelf sh
 | `locked-sounds` | Keep playing sounds while the screen is locked | `lockedSounds` |
 | `input-sounds` | Play a sound when you type and click, without seeing your keys | `inputSounds` |
 | `do-not-disturb` | Hold back notifications for a while | `doNotDisturb` |
+| `screen-effects` | Draw over and change how your windows and the whole screen look | `screenEffects` |
 
 `locked-sounds` and `input-sounds` need `sounds` too, and `input-sounds` can't go with `audio-levels`. A `[helper]` gives `helper`. It's a native program, so Schelf shows that the extension runs one and scans it like any app. `[network]` gives `network`, and Settings and Schelf show its hosts as "Connect to api.example.com"; a release that adds a host asks again, like one that adds a permission. `[[shortcuts]]` gives `shortcuts`.
 

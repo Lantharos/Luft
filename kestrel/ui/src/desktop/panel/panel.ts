@@ -306,6 +306,10 @@ export class KestrelPanel {
     return this.shapes.shapes();
   }
 
+  islandAnchors(): { actor: St.Widget; radius: number }[] {
+    return this.shapes.anchors();
+  }
+
   /** The island a surface's button sits in, which the surface opens beside. */
   islandOf(surface: string): Island | null {
     const element = SURFACE_ELEMENTS[surface];

@@ -34,6 +34,7 @@ Environment:
   KESTREL_CAPTURE_SCHEME  Starts sessions light or dark (default: dark).
   KESTREL_CAPTURE_WALLPAPER  Image to use as the wallpaper in both schemes.
   KESTREL_CAPTURE_TASKBAR  Starts sessions with the taskbar on this edge: left, top or right.
+  KESTREL_EXTENSIONS    Space separated extensions to install, on top of the preinstalled ones.
   KESTREL_BUILD         Kestrel build to run (default: kestrel/build).
   KESTREL_COMPOSITOR    Mutter install to run on (default: kestrel/run/mutter-install).
   KESTREL_FRAMES_BASELINE  A saved frames report to compare against.

@@ -896,6 +896,8 @@ export namespace Cogl {
         set_named_pipeline(key: PipelineKey, pipeline: Pipeline | null): void;
 
         set_winsys_feature(feature: WinsysFeature, value: boolean): void;
+
+        take_shader_error(): string | null;
     }
 
 

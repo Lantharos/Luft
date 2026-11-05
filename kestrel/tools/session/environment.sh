@@ -130,7 +130,7 @@ preinstall_extensions() {
   local installed="$session/data/luft/extensions" record="$session/state/luft/preinstalled" id
   mkdir -p "$installed" "${record%/*}"
   touch "$record"
-  for id in $(sed -n 's/^id = "\(.*\)"$/\1/p' "$root/os/image/parts/store/apps.toml"); do
+  for id in $(sed -n 's/^id = "\(.*\)"$/\1/p' "$root/os/image/parts/store/apps.toml") ${KESTREL_EXTENSIONS:-}; do
     [[ -d "$built_extensions/$id" ]] || continue
     grep -qxF "$id.json" "$record" && continue
     cp -r "$built_extensions/$id" "$installed/"

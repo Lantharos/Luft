@@ -8,6 +8,7 @@ import Lock from '@lucide/svelte/icons/lock';
 import AudioLines from '@lucide/svelte/icons/audio-lines';
 import Image from '@lucide/svelte/icons/image';
 import Keyboard from '@lucide/svelte/icons/keyboard';
+import Sparkles from '@lucide/svelte/icons/sparkles';
 import MapPin from '@lucide/svelte/icons/map-pin';
 import Music from '@lucide/svelte/icons/music';
 import PanelBottom from '@lucide/svelte/icons/panel-bottom';
@@ -40,7 +41,8 @@ const PERMISSIONS: Record<string, Ability> = {
 	calls: { icon: Phone, title: "Know when you're in a call" },
 	'locked-sounds': { icon: Lock, title: 'Keep playing sounds while the screen is locked' },
 	'input-sounds': { icon: Keyboard, title: 'Play a sound when you type and click, without seeing your keys' },
-	'do-not-disturb': { icon: BellOff, title: 'Hold back notifications for a while' }
+	'do-not-disturb': { icon: BellOff, title: 'Hold back notifications for a while' },
+	'screen-effects': { icon: Sparkles, title: 'Draw over and change how your windows and the whole screen look' }
 };
 
 export function abilities(access: ExtensionAccess): Ability[] {

@@ -5,7 +5,7 @@ import type { Keybindings } from '../context.js';
 import type { ContextMenus } from '../desktop/menus/contextMenus.js';
 import type { Monitor } from '../desktop/panel/panel.js';
 import type { IslandShape } from '../desktop/panel/islands/shapes.js';
-import type { Rect } from './api/v1/types.js';
+import type { EffectSurface, Rect } from './api/v1/types.js';
 
 /** What the desktop is doing, as far as extensions care. It tells its listeners whenever windows or surfaces may have moved. */
 export class DesktopState {
@@ -27,6 +27,13 @@ export class DesktopState {
   }
 }
 
+/** One of Kestrel's surfaces as an actor. */
+export interface SurfaceAnchor {
+  actor: Clutter.Actor;
+  /** The rounding of its corners, when its style doesn't say. */
+  radius?: number;
+}
+
 /** The pieces of Kestrel the extension API stands on. Extensions only ever see the API built over them. */
 export interface ExtensionHost {
   readonly desktop: DesktopState;
@@ -44,6 +51,9 @@ export interface ExtensionHost {
   taskbarIslands(monitor: Monitor): IslandShape[];
   /** What shows in place of a window that's hidden while it changes size, if it is. */
   windowPicture(actor: Meta.WindowActor): Clutter.Actor | null;
+  /** The actors that make up one of Kestrel's surfaces right now. */
+  surfaceAnchors(surface: EffectSurface): SurfaceAnchor[];
+  watchSurfaceAnchors(changed: () => void): () => void;
   accent(): string;
   wallpaperAccent(): string;
   watchAccent(changed: () => void): () => void;

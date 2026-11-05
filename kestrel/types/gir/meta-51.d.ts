@@ -1092,6 +1092,8 @@ export namespace Meta {
 
         has_direct_input(logical_monitor: LogicalMonitor): boolean;
 
+        inhibit_hw_cursor(): void;
+
         is_headless(): boolean;
 
         is_rendering_hardware_accelerated(): boolean;
@@ -1105,6 +1107,8 @@ export namespace Meta {
         set_keymap_async(description: KeymapDescription, layout_index: number, cancellable: Gio.Cancellable | null, callback?: Gio.AsyncReadyCallback<this> | null): globalThis.Promise<boolean> | void;
 
         set_keymap_finish(result: Gio.AsyncResult): boolean;
+
+        uninhibit_hw_cursor(): void;
 
         init(cancellable: Gio.Cancellable | null): boolean;
 

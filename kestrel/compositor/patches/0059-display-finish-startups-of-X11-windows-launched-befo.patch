@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Sun, 1 Nov 2026 20:09:02 +0100
-Subject: [PATCH 59/62] display: finish startups of X11 windows launched before
+Subject: [PATCH 59/65] display: finish startups of X11 windows launched before
  Xwayland ran
 
 When Xwayland starts on demand, a launch made before it ran gets a

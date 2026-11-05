@@ -5,6 +5,7 @@ import type { ExtensionHost } from '../host.js';
 import { API_VERSIONS } from '../api/versions.js';
 import type { Manifest } from '../api/v1/types.js';
 import { OpenPanels } from '../api/v1/popups/popups.js';
+import type { EffectsStage } from '../api/v1/screenEffects/stage.js';
 import type { LayerStage } from '../api/v1/wallpaper/stage.js';
 import { dataFolder, type Installed } from './folders.js';
 import { Gestures } from './gestures.js';
@@ -21,6 +22,7 @@ export interface RuntimeServices {
   readonly host: ExtensionHost;
   readonly store: ExtensionStore;
   readonly layers: LayerStage;
+  readonly screenEffects: EffectsStage;
   /** A file name for this load of an extension's module, since a module loads only once per path. */
   snapshotPath(id: string): string;
   failed(id: string, error: unknown): void;
@@ -77,7 +79,7 @@ export class ExtensionInstance {
       const gestures = this.gestures;
       const api = API_VERSIONS[this.manifest.api]({
         manifest: this.manifest, name: this.name, path: this.installed.path, dataPath: dataFolder(this.id), host: this.services.host, scope,
-        translations: this.translations, values: this.values, stored: this.stored, store: this.services.store, shortcuts: this.shortcuts, gestures, panels: new OpenPanels(), page: this.page, layers: this.services.layers, helpers: this.helpers,
+        translations: this.translations, values: this.values, stored: this.stored, store: this.services.store, shortcuts: this.shortcuts, gestures, panels: new OpenPanels(), page: this.page, layers: this.services.layers, screenEffects: this.services.screenEffects, helpers: this.helpers,
         openSettings: () => this.services.openSettings(this.id),
         fromPerson: callback => (...args) => scope.run(() => {
           gestures.used();

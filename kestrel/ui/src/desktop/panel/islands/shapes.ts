@@ -52,6 +52,13 @@ export class IslandShapes {
       });
   }
 
+  /** The actors of what `shapes` lists. */
+  anchors(): { actor: St.Widget; radius: number }[] {
+    const screen = this.screen();
+    if (screen.joined) return [{ actor: this.panel, radius: this.barRadius() }];
+    return this.islands.islands.map(({ actor }) => ({ actor, radius: screen.metrics.radius }));
+  }
+
   /** The taskbar along the dock's edge as one box: the bar, or around the islands on that edge. */
   bar(): Box | null {
     const edge = this.screen().edge;

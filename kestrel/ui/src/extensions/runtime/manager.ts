@@ -5,6 +5,7 @@ import { onLocaleChanged } from '../../shared/i18n/index.js';
 import { openSettings } from '../../system/settingsPages.js';
 import { forgetSecrets } from '../api/v1/secrets.js';
 import type { SettingValue } from '../api/v1/types.js';
+import { EffectsStage } from '../api/v1/screenEffects/stage.js';
 import { LayerStage } from '../api/v1/wallpaper/stage.js';
 import type { ExtensionHost } from '../host.js';
 import { CrashGuard } from './crashes.js';
@@ -33,6 +34,7 @@ export class ExtensionManager {
       host,
       store: this.store,
       layers: new LayerStage(host),
+      screenEffects: new EffectsStage(host),
       snapshotPath: id => GLib.build_filenamev([this.snapshots ??= GLib.dir_make_tmp('kestrel-extensions-XXXXXX'), `${id}-${++this.loads}.js`]),
       failed: (id, error) => this.failed(id, error),
       openSettings: id => openSettings(`extensions/${id}`),

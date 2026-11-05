@@ -281,6 +281,55 @@ ext.calls.onChanged(() => (ext.sounds.volume = ext.calls.active ? 0 : 1));
 
 `release()` ends the hold and returns `held`, for the extension to sum up itself. Disposing the hold, or the extension being turned off, ends it too, and then Luft sums it up with a notification of its own. `doNotDisturb.holding` and `doNotDisturb.onChanged(changed)` tell whether notifications are held back at all, by Do Not Disturb or any extension.
 
+## screenEffects
+
+Shaders on windows, on whole displays and on the taskbar and panels, for extensions that change how the desktop looks. Everything here draws over what people see, so Settings and Schelf say so plainly. Nothing runs and nothing is attached for an effect you haven't added, so an extension with everything turned off costs nothing.
+
+| Call | What it draws | Costs |
+| --- | --- | --- |
+| `addWindowOverlay(options)` | Over or around windows, without reading them | A little shader |
+| `addWindowShader(options)` | A window's own pixels | A texture for each window |
+| `addWindowTransition(options)` | A window while it opens or closes | Nothing in between |
+| `addDesktopFilter(options)` | A whole display, after everything else | A pass over the display each frame something changes |
+| `addSurfaceOverlay(options)` | The taskbar, Quick Settings, Start or notifications, over what they show | A little shader |
+
+Every option list takes a `label`, the effect's name for the notification when Kestrel has to turn it off, and these:
+
+| Option | Means |
+| --- | --- |
+| `animated` | It moves by itself: `true` for 30 frames a second, or another rate. Leave it out when nothing moves, so nothing draws until something changes. It stops on the lock screen, with the display off, in power saving, with reduced motion and after 30 seconds without input |
+| `fullscreen` | It stays over something fullscreen. Off, which is the default, games and videos go straight to the screen. On, every frame goes through the compositor first |
+| `onProblem(problem, detail)` | Kestrel turned it off, for `'shader'` or `'slow'`, and told the person |
+
+An effect returns an object with `set(name, ...values)` for `float` to `vec4` uniforms, `problem`, and `dispose()`. Window effects also take `match(window)`, which gets `{ appId, kind, focused, maximized, fullscreen }` and says whether the effect goes on it, and `refresh()` asks it again.
+
+```js
+const border = ext.screenEffects.addWindowOverlay({
+  label: 'Border',
+  margin: 0,
+  inset: 3,
+  declarations: 'uniform vec3 color;',
+  shader: `
+    float edge = clamp(0.5 - (abs(outline_distance(outline_position) + 1.0) - 1.0) * outline_scale, 0.0, 1.0);
+    outline_color = vec4(color, 1.0) * edge;`,
+  match: window => window.focused,
+  followsFocus: true,
+});
+border.set('color', 0.5, 0.96, 0.54);
+```
+
+An overlay gets `outline_position` in pixels from the top left of the window's frame, and sets `outline_color`, premultiplied, so a colour with alpha 0 adds light. `outline_distance(position)` is the distance to the window's edge, around its real corners, negative inside, `outline_inside(position)` is how much of a pixel is inside, and `outline_size`, `outline_scale` and `outline_time` say the rest. `margin` is how far it may draw outside the frame and `inset` how far in; without `inset` it covers the whole window, and with it only the band redraws.
+
+A window shader gets `window_uv` and `window_color` and changes `window_color`. `window_sample(position)` reads any other pixel, `window_frame` is where the frame sits in the texture, as x, y, width and height from 0 to 1, since the texture also holds the app's own shadows, and `window_size` and `window_time` say the rest. Keep alpha as it is, and rounded corners stay. A transition is the same with `window_progress` going from 0 to 1 over its `duration`, for the `kinds` it names, `open` and `close`.
+
+A filter has `passes`, each with a `shader` and maybe `declarations` and a `scale`. All but the last draw into their own texture at that part of the display's size, for things like bloom, and later passes read them as `cogl_sampler1` and up; the scene is `filter_scene(position)`. A pass gets `filter_uv` and `filter_color` and changes `filter_color`. Put everything you want into one shader, since a display takes one filter. `warps: true` draws the pointer into the picture, for filters that bend it. `captured: true` shows the filter in screenshots and recordings, which by default don't show it, like night light. `setPasses` changes the shaders and `setCaptured` the setting.
+
+`check({ kind, shader, declarations })`, with `kind` `window`, `overlay` or `filter`, tries a shader on this computer's driver and returns what's wrong with it. An effect whose shader doesn't compile never goes on the screen: it has a `problem`, and your extension keeps running. An effect that makes frames very slow comes off by itself, the most expensive first.
+
+`Ctrl`+`Alt`+`Esc` turns every effect of every extension off until people turn them back on. `off` and `onOffChanged(changed)` follow it, `shortcut` says what it's set to, and `turnBackOn()`, right after people used your extension, ends it. Say so on your page, since it's what they'll look for when they can't read the screen.
+
+`setAppLines('lines' | 'scanlines' | 'none')` asks Luft's apps to draw lines through their own styles. `apps()` lists the apps on the computer, for rules about them.
+
 ## network
 
 `network.fetch(url, options?)` sends an HTTPS request to one of the hosts `[network]` names and resolves to the whole response: `status`, `ok`, `headers` with lowercase names, `text` and `json()`. Other hosts are refused. Options are `method`, `headers`, `body` as a string and `timeout` in seconds, 20 without it. Responses are read up to 4 MB, and a request that can't reach the host rejects.

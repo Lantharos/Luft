@@ -60,3 +60,6 @@
 0060-compositor-round-the-corners-of-maximized-and-tiled-.patch
 0061-clutter-wait-for-the-pointer-to-move-before-dwelling.patch
 0062-window-tell-the-shell-which-corners-are-rounded.patch
+0063-cogl-tell-callers-why-a-shader-failed.patch
+0064-backends-let-the-shell-draw-the-pointer-into-the-pic.patch
+0065-clutter-let-a-stage-view-filter-what-it-shows.patch

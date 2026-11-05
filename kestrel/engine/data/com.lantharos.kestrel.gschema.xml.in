@@ -218,6 +218,23 @@
       <default>7.0</default>
       <summary>Hour, in local time, when a custom schedule turns the dark style off</summary>
     </key>
+    <key name="screen-effects-off" type="b">
+      <default>false</default>
+      <summary>Whether every screen effect is turned off</summary>
+      <description>
+        Set by the shortcut that turns off everything extensions draw with
+        shaders, so an unreadable filter doesn't come back after a restart.
+      </description>
+    </key>
+    <key name="app-lines" type="s">
+      <choices>
+        <choice value="none"/>
+        <choice value="lines"/>
+        <choice value="scanlines"/>
+      </choices>
+      <default>"none"</default>
+      <summary>Lines Luft's apps draw through their shared styles</summary>
+    </key>
     <key name="see-through-apps" type="as">
       <default>[]</default>
       <summary>Apps whose windows let what's behind them show through</summary>
@@ -610,6 +627,10 @@
       <description>
         Keybinding to focus the active notification.
       </description>
+    </key>
+    <key name="screen-effects-off" type="as">
+      <default>["&lt;Control&gt;&lt;Alt&gt;Escape"]</default>
+      <summary>Turn off every screen effect at once</summary>
     </key>
     <key name="clipboard-history" type="as">
       <default>["&lt;Super&gt;v"]</default>

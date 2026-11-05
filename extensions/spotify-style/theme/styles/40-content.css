@@ -38,6 +38,7 @@ h2,
 }
 
 .main-trackList-trackListHeader {
+  --background-highlight: var(--content);
   border-bottom: 1px solid var(--hairline);
 }
 

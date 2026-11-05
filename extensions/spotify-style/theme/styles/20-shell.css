@@ -42,7 +42,6 @@
   background: transparent;
 }
 
-.main-topBar-background,
 .main-entityHeader-backgroundColor,
 .main-entityHeader-overlay,
 .main-actionBarBackground-background,
@@ -51,6 +50,10 @@
   background: none !important;
   background-color: transparent !important;
   background-image: none !important;
+}
+
+.main-topBar-background {
+  background: var(--content) !important;
 }
 
 .main-globalNav-searchInputContainer input,

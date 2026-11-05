@@ -120,7 +120,7 @@ fn install(spicetify: &Spicetify, theme: &Path) -> io::Result<bool> {
         spicetify.apply()?;
     }
     if !spicetify.has_theme() {
-        let detail = "Spicetify finished, but the theme isn't in Spotify".to_owned();
+        let detail = "spicetify finished, but the theme isn't in spotify".to_owned();
         return Err(Problem::failed(detail).into());
     }
     Ok(needed)

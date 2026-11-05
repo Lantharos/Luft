@@ -27,7 +27,7 @@ struct Ran {
 
 impl Ran {
     fn has(&self, words: &str) -> bool {
-        self.said.contains(words)
+        self.said.to_lowercase().contains(words)
     }
 
     /// The last thing Spicetify called an error, without the colours it prints for a terminal.
@@ -61,11 +61,11 @@ impl Ran {
             Some("read-only")
         } else if self.has("\"prefs\" file location") || self.has("prefs_path") {
             Some("no-prefs")
-        } else if self.has("Spotify location") || self.has("\"spotify_path\"") {
+        } else if self.has("spotify location") || self.has("\"spotify_path\"") {
             Some("no-spotify")
         } else if self.has("cannot be backed up at this state") {
             Some("not-stock")
-        } else if self.has("version mismatch with Spicetify") {
+        } else if self.has("version mismatch with spicetify") {
             Some("too-new")
         } else {
             None

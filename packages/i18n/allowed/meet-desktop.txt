@@ -1,12 +1,12 @@
-apps/meet/desktop/src/windows/belongings.rs	Control Panel\Desktop
-apps/meet/desktop/src/windows/logs.rs	Luft logs
-apps/meet/desktop/src/windows/regional.rs	Keyboard Layout\Preload
-apps/meet/desktop/src/windows/regional.rs	Keyboard Layout\Substitutes
-apps/meet/desktop/src/app/mod.rs	Meet Luft
-apps/meet/desktop/src/boot/load_option.rs	Meet Luft
-apps/meet/desktop/src/windows/helper/setup/refresh.rs	Luft logs
-apps/meet/desktop/src/windows/helper/system/protected.rs	Meet Luft
-apps/meet/desktop/src/linux/app.rs	Luft keeps your files in place on Linux, so there's nothing to pack.
-apps/meet/desktop/src/linux/helper/mod.rs	Meet Luft doesn't do that on Linux.
-apps/meet/desktop/src/linux/logs.rs	Luft logs
-apps/meet/desktop/src/windows/helper/drive/storage.rs	Windows storage error {code}
+apps/store/meet/desktop/src/windows/belongings.rs	Control Panel\Desktop
+apps/store/meet/desktop/src/windows/logs.rs	Luft logs
+apps/store/meet/desktop/src/windows/regional.rs	Keyboard Layout\Preload
+apps/store/meet/desktop/src/windows/regional.rs	Keyboard Layout\Substitutes
+apps/store/meet/desktop/src/app/mod.rs	Meet Luft
+apps/store/meet/desktop/src/boot/load_option.rs	Meet Luft
+apps/store/meet/desktop/src/windows/helper/setup/refresh.rs	Luft logs
+apps/store/meet/desktop/src/windows/helper/system/protected.rs	Meet Luft
+apps/store/meet/desktop/src/linux/app.rs	Luft keeps your files in place on Linux, so there's nothing to pack.
+apps/store/meet/desktop/src/linux/helper/mod.rs	Meet Luft doesn't do that on Linux.
+apps/store/meet/desktop/src/linux/logs.rs	Luft logs
+apps/store/meet/desktop/src/windows/helper/drive/storage.rs	Windows storage error {code}

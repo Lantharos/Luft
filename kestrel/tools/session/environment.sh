@@ -165,7 +165,7 @@ prepare_session() {
   ln -sfn "$root/kestrel/engine/data/session/kestrel.portal" "$session/data/xdg-desktop-portal/portals/kestrel.portal"
   ln -sfn "$root/kestrel/engine/data/session/kestrel-portal.portal" "$session/data/xdg-desktop-portal/portals/kestrel-portal.portal"
   ln -sfn "$root/kestrel/engine/data/session/kestrel-portals.conf" "$session/config/xdg-desktop-portal/kestrel-portals.conf"
-  ln -sfn "$root/apps/rover/data/rover.portal" "$session/data/xdg-desktop-portal/portals/rover.portal"
+  ln -sfn "$root/apps/system/rover/data/rover.portal" "$session/data/xdg-desktop-portal/portals/rover.portal"
   export_build_paths
   preinstall_extensions
   [[ "$mode" == nested ]] || use_luft_defaults

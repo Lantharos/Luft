@@ -22,7 +22,7 @@ across restarts until reset, and is taken off by itself when Luft updates.
   kestrel     Kestrel, its settings, search, greeter, keyring, passkeys and watchdog
   boot        trustd, USB protection and Sushi, as far as they run after startup
   services    The installer, updater, system packages, sleep, accounts, speech and Windows services
-  app-NAME    An app from apps/NAME
+  app-NAME    An app from apps/system or apps/store
 USAGE
 }
 
@@ -36,7 +36,7 @@ check_parts() {
     case "$name" in
       kestrel | boot | services) ;;
       app-meet) echo "Meet Luft runs on Windows, not on Luft." >&2; exit 2 ;;
-      app-*) [[ -d "$luft/apps/${name#app-}" ]] || { echo "There is no app called ${name#app-}." >&2; exit 2; } ;;
+      app-*) app_folder "${name#app-}" >/dev/null || { echo "There is no app called ${name#app-}." >&2; exit 2; } ;;
       *) layer_usage >&2; exit 2 ;;
     esac
   done

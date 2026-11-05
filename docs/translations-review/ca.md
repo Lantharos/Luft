@@ -29,10 +29,10 @@ Strings in Luft’s Catalan translation that a native speaker should check: term
 - `kestrel/ui/locales/ca/system.ftl` `dictation-unsupported-title` / `dictation-unsupported-body`: "El dictat en { $language }…" — $language currently arrives in English, so the sentence will mix languages until the speech service localizes names.
 - `kestrel/ui/locales/ca/desktop.ftl` `task-view-desktop`: "Espai de treball { $number }" — follows the glossary (workspace), but Catalan Windows says «Escriptori 1»; check it fits the task view card.
 - `kestrel/ui/locales/ca/desktop.ftl` `tray-apps`: "Aplicacions de la safata del sistema" — long for a screen-reader label; «Aplicacions de la safata» may be enough.
-- `apps/setup/locales/ca/setup.ftl` `setup-region-field-language` (and keyboard, time-zone): "la llengua", "el teclat", "la zona horària" — written with the article because they are only joined into setup-region-intro-guessed («Hem deduït la llengua i el teclat a partir de l’ordinador…»); verify the list joiner produces «i».
-- `apps/setup/locales/ca/setup.ftl` `setup-replace-keeps-drives`: "{ $drives }, muntats en arrencar com abans" — plural masculine agreement assumes several drives; with one it should be «muntat».
-- `apps/setup/locales/ca/setup.ftl` `setup-destination-meet-choice-description` etc.: option labels and their descriptions use the singular imperative like buttons (Conserva, Esborra, Fes-hi una ullada), while step titles use vós (Trieu un disc); check this split feels right.
-- `apps/setup/locales/ca/setup.ftl` `setup-windows-fast-startup`: "Desactiva l’inici ràpid de Windows" — Catalan Windows calls Fast Startup «Inici ràpid»; confirm.
+- `apps/system/setup/locales/ca/setup.ftl` `setup-region-field-language` (and keyboard, time-zone): "la llengua", "el teclat", "la zona horària" — written with the article because they are only joined into setup-region-intro-guessed («Hem deduït la llengua i el teclat a partir de l’ordinador…»); verify the list joiner produces «i».
+- `apps/system/setup/locales/ca/setup.ftl` `setup-replace-keeps-drives`: "{ $drives }, muntats en arrencar com abans" — plural masculine agreement assumes several drives; with one it should be «muntat».
+- `apps/system/setup/locales/ca/setup.ftl` `setup-destination-meet-choice-description` etc.: option labels and their descriptions use the singular imperative like buttons (Conserva, Esborra, Fes-hi una ullada), while step titles use vós (Trieu un disc); check this split feels right.
+- `apps/system/setup/locales/ca/setup.ftl` `setup-windows-fast-startup`: "Desactiva l’inici ràpid de Windows" — Catalan Windows calls Fast Startup «Inici ràpid»; confirm.
 - `kestrel/ui/locales/ca/desktop.ftl` `switch-monitor-join`: "Amplia" — Windows' term for extending displays; check it's clear next to Duplica.
 - `kestrel/ui/locales/ca/shell.ftl` `ctrl-alt-tab-panel`: "Barra de tasques" — English says Panel but the comment says it is the taskbar.
 - `kestrel/ui/locales/ca/system.ftl` `inhibit-shortcuts-title`: "Permet inhibir les dreceres" — GNOME's wording; «inhibir» may feel technical.
@@ -41,26 +41,26 @@ Strings in Luft’s Catalan translation that a native speaker should check: term
 
 ## Settings
 
-- `apps/settings/locales/ca/connections.ftl` `settings-network-router`: "Encaminador" — Softcatalà's term; confirm it isn't too formal next to «router», which many people use.
-- `apps/settings/locales/ca/connections.ftl` `settings-network-wireguard-keepalive`: "Manteniment de la connexió" — WireGuard's «keepalive» has no settled Catalan term; check whether keeping «Keepalive» is clearer to the people who use this field.
-- `apps/settings/locales/ca/system.ftl` `settings-accounts-online`: "Cada compte es converteix en una carpeta de Cloud i els fitx…" — assumes the Cloud folder keeps its English name on disk; check against the folder's actual name.
-- `apps/settings/locales/ca/connections.ftl` `settings-bluetooth-request-display`: "Escriviu aquest codi amb { $name } i premeu Retorn." — phrased with «amb» so the fallback «el dispositiu» doesn't need a contraction; check it reads well.
-- `apps/settings/locales/ca/devices.ftl` `settings-sound-mute`: "Silencia: { $name }" — $name can be «Volum» or an app's name, so a colon was used; check this reads well for a screen reader.
-- `apps/settings/locales/ca/devices.ftl` `settings-power-time-left`: "Queden aproximadament { $time }" — with «menys d’un minut» it reads «Queden aproximadament menys d’un minut»; check.
-- `apps/settings/locales/ca/devices.ftl` `settings-dictation-engine-description`: "{ $engine } reconeix aquesta llengua: { $language }" — colon used because the language name would need an article («l’anglès»); check whether this feels stiff.
-- `apps/settings/locales/ca/devices.ftl` `settings-keys-keypad`: "{ $key } (teclat numèric)" — check against how Catalan keyboard labels name keypad keys.
-- `apps/settings/locales/ca/devices.ftl` `settings-keyboard-caps-lock`: "Tecla Bloq Maj" — key names Bloq Maj, Bloq Núm and Bloq Despl follow Spanish-layout keyboards; confirm.
-- `apps/settings/locales/ca/personalization.ftl` `settings-fonts-sample`: "Jove xef, porti whisky amb quinze glaçons d’hidrogen, coi!" — the classic Catalan pangram; it needs «coi» for the letter c and ends with an exclamation mark. Check it is acceptable as a font sample.
-- `apps/settings/locales/ca/personalization.ftl` `settings-appearance-wallpaper-fit-title`: "Encaix" (options Omple, Encaixa, Centra, Estira, Mosaic) — avoided «Ajusta» because the glossary reserves ajustar for snapping; check against what Catalan Windows/GNOME show for wallpaper fit.
-- `apps/settings/locales/ca/personalization.ftl` `settings-appearance-wallpaper-folder-description`: "Imatges › Wallpapers" — the Wallpapers folder keeps its English name on disk; check that Imatges is the name Rover shows for Pictures.
-- `apps/settings/locales/ca/personalization.ftl` `settings-cursors-folder-description`: "Carpeta personal › .local › share › icons" — Home rendered as GNOME's «Carpeta personal»; check it matches Rover's name for Home.
-- `apps/settings/locales/ca/personalization.ftl` `settings-appearance-tint-slate`: "Pissarra" — slate as a color name; «Gris blavós» may read clearer.
-- `apps/settings/locales/ca/protection.ftl` `settings-encryption-step-screen`: "Mentre s’inicia, apareixerà breument una pantalla «Encrypting your device»." — the startup screen is only shown in English, so its title is quoted as it appears; check this reads acceptably.
-- `apps/settings/locales/ca/protection.ftl` `settings-security-anti-cheat`: "Jocs amb antitrampes" — no settled Catalan term for anti-cheat.
-- `apps/settings/locales/ca/protection.ftl` `settings-security-hardware-fix-maker`: "Només el fabricant de l’ordinador pot afegir aquestes { $count } proteccions, …" — English has no noun here; «protecció/proteccions» is named so the pronoun has something to agree with. Check it reads well above the list.
-- `apps/settings/locales/ca/protection.ftl` `settings-encryption-progress`: "{ $percent } completat" — check the agreement reads naturally («40 % completat») and fits inside settings-security-encrypting-progress.
-- `apps/settings/locales/ca/protection.ftl` `settings-passkeys-last-used`: "Darrer ús: { $when }" — assumes $when is a relative phrase like «fa 3 dies»; same for `settings-passwords-ssh-added` "Afegida { $when }" and `system.ftl` `settings-updates-released` "Publicada { $when }".
-- `apps/settings/locales/ca/system.ftl` `settings-about-other-system`: "Suprimiu-lo per donar-ne els { $size } a Luft" — check the article before the size placeable reads well.
+- `apps/system/settings/locales/ca/connections.ftl` `settings-network-router`: "Encaminador" — Softcatalà's term; confirm it isn't too formal next to «router», which many people use.
+- `apps/system/settings/locales/ca/connections.ftl` `settings-network-wireguard-keepalive`: "Manteniment de la connexió" — WireGuard's «keepalive» has no settled Catalan term; check whether keeping «Keepalive» is clearer to the people who use this field.
+- `apps/system/settings/locales/ca/system.ftl` `settings-accounts-online`: "Cada compte es converteix en una carpeta de Cloud i els fitx…" — assumes the Cloud folder keeps its English name on disk; check against the folder's actual name.
+- `apps/system/settings/locales/ca/connections.ftl` `settings-bluetooth-request-display`: "Escriviu aquest codi amb { $name } i premeu Retorn." — phrased with «amb» so the fallback «el dispositiu» doesn't need a contraction; check it reads well.
+- `apps/system/settings/locales/ca/devices.ftl` `settings-sound-mute`: "Silencia: { $name }" — $name can be «Volum» or an app's name, so a colon was used; check this reads well for a screen reader.
+- `apps/system/settings/locales/ca/devices.ftl` `settings-power-time-left`: "Queden aproximadament { $time }" — with «menys d’un minut» it reads «Queden aproximadament menys d’un minut»; check.
+- `apps/system/settings/locales/ca/devices.ftl` `settings-dictation-engine-description`: "{ $engine } reconeix aquesta llengua: { $language }" — colon used because the language name would need an article («l’anglès»); check whether this feels stiff.
+- `apps/system/settings/locales/ca/devices.ftl` `settings-keys-keypad`: "{ $key } (teclat numèric)" — check against how Catalan keyboard labels name keypad keys.
+- `apps/system/settings/locales/ca/devices.ftl` `settings-keyboard-caps-lock`: "Tecla Bloq Maj" — key names Bloq Maj, Bloq Núm and Bloq Despl follow Spanish-layout keyboards; confirm.
+- `apps/system/settings/locales/ca/personalization.ftl` `settings-fonts-sample`: "Jove xef, porti whisky amb quinze glaçons d’hidrogen, coi!" — the classic Catalan pangram; it needs «coi» for the letter c and ends with an exclamation mark. Check it is acceptable as a font sample.
+- `apps/system/settings/locales/ca/personalization.ftl` `settings-appearance-wallpaper-fit-title`: "Encaix" (options Omple, Encaixa, Centra, Estira, Mosaic) — avoided «Ajusta» because the glossary reserves ajustar for snapping; check against what Catalan Windows/GNOME show for wallpaper fit.
+- `apps/system/settings/locales/ca/personalization.ftl` `settings-appearance-wallpaper-folder-description`: "Imatges › Wallpapers" — the Wallpapers folder keeps its English name on disk; check that Imatges is the name Rover shows for Pictures.
+- `apps/system/settings/locales/ca/personalization.ftl` `settings-cursors-folder-description`: "Carpeta personal › .local › share › icons" — Home rendered as GNOME's «Carpeta personal»; check it matches Rover's name for Home.
+- `apps/system/settings/locales/ca/personalization.ftl` `settings-appearance-tint-slate`: "Pissarra" — slate as a color name; «Gris blavós» may read clearer.
+- `apps/system/settings/locales/ca/protection.ftl` `settings-encryption-step-screen`: "Mentre s’inicia, apareixerà breument una pantalla «Encrypting your device»." — the startup screen is only shown in English, so its title is quoted as it appears; check this reads acceptably.
+- `apps/system/settings/locales/ca/protection.ftl` `settings-security-anti-cheat`: "Jocs amb antitrampes" — no settled Catalan term for anti-cheat.
+- `apps/system/settings/locales/ca/protection.ftl` `settings-security-hardware-fix-maker`: "Només el fabricant de l’ordinador pot afegir aquestes { $count } proteccions, …" — English has no noun here; «protecció/proteccions» is named so the pronoun has something to agree with. Check it reads well above the list.
+- `apps/system/settings/locales/ca/protection.ftl` `settings-encryption-progress`: "{ $percent } completat" — check the agreement reads naturally («40 % completat») and fits inside settings-security-encrypting-progress.
+- `apps/system/settings/locales/ca/protection.ftl` `settings-passkeys-last-used`: "Darrer ús: { $when }" — assumes $when is a relative phrase like «fa 3 dies»; same for `settings-passwords-ssh-added` "Afegida { $when }" and `system.ftl` `settings-updates-released` "Publicada { $when }".
+- `apps/system/settings/locales/ca/system.ftl` `settings-about-other-system`: "Suprimiu-lo per donar-ne els { $size } a Luft" — check the article before the size placeable reads well.
 
 ## Website
 
@@ -71,11 +71,11 @@ Strings in Luft’s Catalan translation that a native speaker should check: term
 
 ## Meet Luft
 
-- `apps/meet/desktop/locales/ca/desktop.ftl` `check-space-short-windows`: "per exemple amb la Neteja de disc" — the Catalan Windows name of Disk Cleanup could not be verified; confirm against a Catalan Windows 11.
-- `apps/meet/locales/ca/meet.ftl` `meet-logs-saved`: "els registres de la prova de Luft" — Try Luft rendered as «la prova de Luft» in running text, since the button form «Prova Luft» doesn’t fit after «de»; check it is still recognisable as the same mode.
-- `apps/meet/locales/ca/meet.ftl` `ready-box-description`: "la caixa de mudança" — moving box rendered literally (also in `working-packing` and `drive-box-no-guid`); check it reads naturally.
-- `apps/meet/locales/ca/meet.ftl` `meet-channel-latest`: "Meet Luft tornarà a fer servir les versions publicades" — «releases» as opposed to nightly builds; «versions estables» was avoided because there are no stable releases yet.
-- `apps/meet/locales/ca/meet.ftl` `box-total-slow`: "{ $size }, que es triga aproximadament { $minutes } minuts a empaquetar" — check it reads well after the size placeable.
-- `apps/meet/desktop/locales/ca/desktop.ftl` `check-secure-boot-turn-on`: "quan aparegui el logotip de la marca { $maker }" — «de la marca» added so brands starting with a vowel (Acer, ASUS) don’t need «d’»; check it isn’t too wordy.
-- `apps/meet/desktop/locales/ca/desktop.ftl` `helper-not-started`: "L’auxiliar de Meet Luft" — helper rendered as «l’auxiliar»; check whether «el procés auxiliar» is clearer.
-- `apps/meet/locales/ca/meet.ftl` `luft-title`: "El vostre Luft" — Luft normally takes no article; the possessive needs one here, as in «la vostra memòria de Luft»; check it reads naturally as a title.
+- `apps/store/meet/desktop/locales/ca/desktop.ftl` `check-space-short-windows`: "per exemple amb la Neteja de disc" — the Catalan Windows name of Disk Cleanup could not be verified; confirm against a Catalan Windows 11.
+- `apps/store/meet/locales/ca/meet.ftl` `meet-logs-saved`: "els registres de la prova de Luft" — Try Luft rendered as «la prova de Luft» in running text, since the button form «Prova Luft» doesn’t fit after «de»; check it is still recognisable as the same mode.
+- `apps/store/meet/locales/ca/meet.ftl` `ready-box-description`: "la caixa de mudança" — moving box rendered literally (also in `working-packing` and `drive-box-no-guid`); check it reads naturally.
+- `apps/store/meet/locales/ca/meet.ftl` `meet-channel-latest`: "Meet Luft tornarà a fer servir les versions publicades" — «releases» as opposed to nightly builds; «versions estables» was avoided because there are no stable releases yet.
+- `apps/store/meet/locales/ca/meet.ftl` `box-total-slow`: "{ $size }, que es triga aproximadament { $minutes } minuts a empaquetar" — check it reads well after the size placeable.
+- `apps/store/meet/desktop/locales/ca/desktop.ftl` `check-secure-boot-turn-on`: "quan aparegui el logotip de la marca { $maker }" — «de la marca» added so brands starting with a vowel (Acer, ASUS) don’t need «d’»; check it isn’t too wordy.
+- `apps/store/meet/desktop/locales/ca/desktop.ftl` `helper-not-started`: "L’auxiliar de Meet Luft" — helper rendered as «l’auxiliar»; check whether «el procés auxiliar» is clearer.
+- `apps/store/meet/locales/ca/meet.ftl` `luft-title`: "El vostre Luft" — Luft normally takes no article; the possessive needs one here, as in «la vostra memòria de Luft»; check it reads naturally as a title.

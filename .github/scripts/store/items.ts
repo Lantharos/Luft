@@ -4,7 +4,7 @@ import { join } from 'node:path';
 export type Kind = 'app' | 'extension';
 export type Item = { name: string; folder: string; kind: Kind; id: string; manifest: string; floor: string; platforms: string; runners: string[] };
 
-const FOLDERS = ['apps', 'extensions'];
+const FOLDERS = ['apps/store', 'extensions'];
 const LINUX = 'linux-x86_64 linux-aarch64';
 const RUNNERS = ['ubuntu-24.04', 'ubuntu-24.04-arm'];
 const PLATFORMS: Record<string, string> = { 'com.lantharos.meet': 'windows-x86_64 linux-x86_64' };

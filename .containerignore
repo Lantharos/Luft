@@ -7,5 +7,5 @@ kestrel/run
 kestrel/build
 kestrel/install
 sushi/vm
-apps/meet/vm
+apps/store/meet/vm
 docs

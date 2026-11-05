@@ -1,6 +1,6 @@
 # System packages
 
-How packages from Fedora, from software sources people add and from package files get into Luft's sealed system without changing it. What people see is in [Installing software](https://docs.luft.computer/system/software/#system-packages); the code is `luft-packages` in [services/packages](../services/packages), and Schelf's `--system` and `repo` in [apps/schelf](../apps/schelf/README.md).
+How packages from Fedora, from software sources people add and from package files get into Luft's sealed system without changing it. What people see is in [Installing software](https://docs.luft.computer/system/software/#system-packages); the code is `luft-packages` in [services/packages](../services/packages), and Schelf's `--system` and `repo` in [apps/system/schelf](../apps/system/schelf/README.md).
 
 ## The idea
 

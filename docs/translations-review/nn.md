@@ -20,7 +20,7 @@ Strings in Luft's Nynorsk translation that a native speaker should check: terms 
 - `packages/web/ui/locales/nn/ui.ftl` `ui-fingerprint-retry`: "Fingeren vart ikkje lesen godt nok. Prøv igjen." — check it sounds natural.
 - `packages/web/ui/locales/nn/ui.ftl` `ui-fingerprint-place`: "Legg { $finger } på sensoren." — the finger name is indefinite without «din»; check «Legg høgre peikefinger på sensoren» reads naturally.
 - `packages/web/ui/locales/nn/ui.ftl` `ui-finger-right-little`: "Høgre veslefinger" — chosen over «litlefinger»; check which is more common.
-- `apps/settings/locales/nn/settings.ftl` `settings-more-show`: "Vis { $count } til" — check «til» vs «fleire» after a number.
+- `apps/system/settings/locales/nn/settings.ftl` `settings-more-show`: "Vis { $count } til" — check «til» vs «fleire» after a number.
 
 ## Kestrel and setup
 
@@ -34,29 +34,29 @@ Strings in Luft's Nynorsk translation that a native speaker should check: terms 
 - `kestrel/ui/locales/nn/system.ftl` `network-menu-tethers`: "Deling over Bluetooth" (and `network-menu-tether` "Deling") — no settled term for Bluetooth tethering.
 - `kestrel/ui/locales/nn/system.ftl` `display-change-title`: "Behalde skjerminnstillingane?" — kept under 30 characters; check the bare infinitive question reads fine.
 - `kestrel/ui/locales/nn/auth.ftl` `end-session-remote-user`: "{ $userName } (eksternt)" — check this is the clearest word for a user signed in over SSH.
-- `apps/setup/locales/nn/setup.ftl` `setup-windows-hibernated`: "… Rask oppstart … hald inne Skift medan du vel Avslutt …" — names taken from Norwegian Windows (Rask oppstart, Avslutt, and Diskbehandling in `setup-windows-bitlocker`); verify against a Norwegian Windows.
-- `apps/setup/locales/nn/setup.ftl` `setup-region-intro-guessed`: "Vi har gjetta { $guesses }, …" with parts like "tastaturet ut frå datamaskinen" — check the joined sentence reads naturally.
-- `apps/setup/locales/nn/setup.ftl` `setup-network-unavailable`: "… frå oppgåvelinja." — English says "the panel", read here as the taskbar.
+- `apps/system/setup/locales/nn/setup.ftl` `setup-windows-hibernated`: "… Rask oppstart … hald inne Skift medan du vel Avslutt …" — names taken from Norwegian Windows (Rask oppstart, Avslutt, and Diskbehandling in `setup-windows-bitlocker`); verify against a Norwegian Windows.
+- `apps/system/setup/locales/nn/setup.ftl` `setup-region-intro-guessed`: "Vi har gjetta { $guesses }, …" with parts like "tastaturet ut frå datamaskinen" — check the joined sentence reads naturally.
+- `apps/system/setup/locales/nn/setup.ftl` `setup-network-unavailable`: "… frå oppgåvelinja." — English says "the panel", read here as the taskbar.
 - `kestrel/ui/locales/nn/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 
-- `apps/settings/locales/nn/connections.ftl` `settings-network-ip-routes`: "Ruter" — spelled like "ruter" (router) used on the same page; check whether another word for routes is better.
-- `apps/settings/locales/nn/connections.ftl` `settings-network-security-psk`: "WPA2-Personleg" (also WPA3, and "Bedrift" for Enterprise) — Windows keeps "WPA2-Personal"/"WPA2-Enterprise"; check which a Nynorsk reader expects.
-- `apps/settings/locales/nn/connections.ftl` `settings-network-ip-link-local`: "Berre lenkjelokal" — no settled Nynorsk term.
-- `apps/settings/locales/nn/connections.ftl` `settings-network-proxy`: "Proxy" — the loanword, as in Windows; «mellomtenar» is only in the search keywords.
-- `apps/settings/locales/nn/system.ftl` `settings-accounts-online`: "Kvar konto blir ei mappe i Cloud, og filer vert lasta ned nå…" — assumes the folder keeps the English name Cloud.
-- `apps/settings/locales/nn/devices.ftl` `settings-mouse-touchpad-tap`: "Trykk lett for å klikke" — check against what Norwegian users know for "Tap to click".
-- `apps/settings/desktop/locales/nn/desktop.ftl` `desktop-shortcut-switch-panels`: "Byt mellom systemkontrollar" (and `desktop-shortcut-cycle-panels`) — moves keyboard focus between the taskbar and other parts of the desktop; check the name makes sense in the shortcut list.
-- `apps/settings/locales/nn/personalization.ftl` `settings-appearance-icons-clear`: "Klar" — icon style next to Original and Farga; «klar» may read as "ready", check whether «Gjennomsiktige» fits if the style is see-through glass.
-- `apps/settings/locales/nn/personalization.ftl` `settings-appearance-style`: "Modus" with the choices Lys and Mørk — follows «mørk modus» from Quick settings; check it reads well as the row name.
-- `apps/settings/locales/nn/personalization.ftl` `settings-fonts-sample`: "Vår sære Zulu frå badeøya spelte jo whist og quickstep i min taxi" — Nynorsk form of the common Norwegian pangram; check it reads naturally.
-- `apps/settings/locales/nn/personalization.ftl` `settings-taskbar-look-solid`: "Heildekkande" — check against what Norwegian desktops call an opaque bar.
-- `apps/settings/locales/nn/personalization.ftl` `settings-cursors-folder-description`: "Tema du legg i Heimemappe › .local › share › icons …" — check whether the home folder shows as «Heimemappe» or «Heim» in the file manager.
-- `apps/settings/locales/nn/protection.ftl` `settings-security-anti-cheat`: "Spel med anti-juks" — no settled Norwegian term; "anti-cheat" may be what gamers actually say.
-- `apps/settings/locales/nn/protection.ftl` `settings-encryption-backup`: "… sikkerheitskopi …" — check against «tryggingskopi», which fits the «tryggleik» used elsewhere.
-- `apps/settings/locales/nn/system.ftl` `settings-updates-last-checked`: "Sist sjekka { $when }" — assumes $when arrives as "for 5 minutt sidan" or "i går"; same for `settings-updates-released` and `settings-passwords-ssh-added`.
-- `apps/settings/locales/nn/system.ftl` `settings-updates-switching-standard`: "Lastar ned standardbiletet …" — "image" as in system image; «bilete» could be misread as picture, consider «standardsystemet».
+- `apps/system/settings/locales/nn/connections.ftl` `settings-network-ip-routes`: "Ruter" — spelled like "ruter" (router) used on the same page; check whether another word for routes is better.
+- `apps/system/settings/locales/nn/connections.ftl` `settings-network-security-psk`: "WPA2-Personleg" (also WPA3, and "Bedrift" for Enterprise) — Windows keeps "WPA2-Personal"/"WPA2-Enterprise"; check which a Nynorsk reader expects.
+- `apps/system/settings/locales/nn/connections.ftl` `settings-network-ip-link-local`: "Berre lenkjelokal" — no settled Nynorsk term.
+- `apps/system/settings/locales/nn/connections.ftl` `settings-network-proxy`: "Proxy" — the loanword, as in Windows; «mellomtenar» is only in the search keywords.
+- `apps/system/settings/locales/nn/system.ftl` `settings-accounts-online`: "Kvar konto blir ei mappe i Cloud, og filer vert lasta ned nå…" — assumes the folder keeps the English name Cloud.
+- `apps/system/settings/locales/nn/devices.ftl` `settings-mouse-touchpad-tap`: "Trykk lett for å klikke" — check against what Norwegian users know for "Tap to click".
+- `apps/system/settings/desktop/locales/nn/desktop.ftl` `desktop-shortcut-switch-panels`: "Byt mellom systemkontrollar" (and `desktop-shortcut-cycle-panels`) — moves keyboard focus between the taskbar and other parts of the desktop; check the name makes sense in the shortcut list.
+- `apps/system/settings/locales/nn/personalization.ftl` `settings-appearance-icons-clear`: "Klar" — icon style next to Original and Farga; «klar» may read as "ready", check whether «Gjennomsiktige» fits if the style is see-through glass.
+- `apps/system/settings/locales/nn/personalization.ftl` `settings-appearance-style`: "Modus" with the choices Lys and Mørk — follows «mørk modus» from Quick settings; check it reads well as the row name.
+- `apps/system/settings/locales/nn/personalization.ftl` `settings-fonts-sample`: "Vår sære Zulu frå badeøya spelte jo whist og quickstep i min taxi" — Nynorsk form of the common Norwegian pangram; check it reads naturally.
+- `apps/system/settings/locales/nn/personalization.ftl` `settings-taskbar-look-solid`: "Heildekkande" — check against what Norwegian desktops call an opaque bar.
+- `apps/system/settings/locales/nn/personalization.ftl` `settings-cursors-folder-description`: "Tema du legg i Heimemappe › .local › share › icons …" — check whether the home folder shows as «Heimemappe» or «Heim» in the file manager.
+- `apps/system/settings/locales/nn/protection.ftl` `settings-security-anti-cheat`: "Spel med anti-juks" — no settled Norwegian term; "anti-cheat" may be what gamers actually say.
+- `apps/system/settings/locales/nn/protection.ftl` `settings-encryption-backup`: "… sikkerheitskopi …" — check against «tryggingskopi», which fits the «tryggleik» used elsewhere.
+- `apps/system/settings/locales/nn/system.ftl` `settings-updates-last-checked`: "Sist sjekka { $when }" — assumes $when arrives as "for 5 minutt sidan" or "i går"; same for `settings-updates-released` and `settings-passwords-ssh-added`.
+- `apps/system/settings/locales/nn/system.ftl` `settings-updates-switching-standard`: "Lastar ned standardbiletet …" — "image" as in system image; «bilete» could be misread as picture, consider «standardsystemet».
 
 ## Website
 
@@ -67,10 +67,10 @@ Strings in Luft's Nynorsk translation that a native speaker should check: terms 
 
 ## Meet Luft
 
-- `apps/meet/desktop/locales/nn/desktop.ftl` `check-encryption-changing-detail`: "i Innstillinger, under Enhetskryptering" — Bokmål page names, because Windows ships no Nynorsk; setup.ftl says «einingskryptering» in running text, so check the mix reads right.
-- `apps/meet/locales/nn/meet.ftl` `ready-remove-description`: "òg flytteeska" — «flytteeske» for the moving box partition; check it reads as Meet Luft's packed bundle.
-- `apps/meet/locales/nn/meet.ftl` `meet-logs-saved`: "Loggane frå då du prøvde Luft, er lagra på skrivebordet ditt" — "logs from Try Luft" rephrased; check it isn't too long for a notice.
-- `apps/meet/desktop/locales/nn/desktop.ftl` `check-start-entries-detail`: "Ho kan ryddast bort." — «oppstartsoppføring» taken as feminine (ei føring); check the pronoun.
-- `apps/meet/desktop/locales/nn/desktop.ftl` `check-encryption-on-detail`: "for sikkerheits skuld" — fixed phrase kept although the guide prefers «tryggleik»; check it doesn't read as Bokmål.
-- `apps/meet/desktop/locales/nn/desktop.ftl` `check-secure-boot-off-detail`: "spel med juksevern" — no settled Nynorsk term for anti-cheat.
-- `apps/meet/locales/nn/meet.ftl` `luft-title`: "Ditt Luft" — Nynorsk usually puts the possessive after the noun, which a name without a definite ending can't take; check it reads naturally as a title.
+- `apps/store/meet/desktop/locales/nn/desktop.ftl` `check-encryption-changing-detail`: "i Innstillinger, under Enhetskryptering" — Bokmål page names, because Windows ships no Nynorsk; setup.ftl says «einingskryptering» in running text, so check the mix reads right.
+- `apps/store/meet/locales/nn/meet.ftl` `ready-remove-description`: "òg flytteeska" — «flytteeske» for the moving box partition; check it reads as Meet Luft's packed bundle.
+- `apps/store/meet/locales/nn/meet.ftl` `meet-logs-saved`: "Loggane frå då du prøvde Luft, er lagra på skrivebordet ditt" — "logs from Try Luft" rephrased; check it isn't too long for a notice.
+- `apps/store/meet/desktop/locales/nn/desktop.ftl` `check-start-entries-detail`: "Ho kan ryddast bort." — «oppstartsoppføring» taken as feminine (ei føring); check the pronoun.
+- `apps/store/meet/desktop/locales/nn/desktop.ftl` `check-encryption-on-detail`: "for sikkerheits skuld" — fixed phrase kept although the guide prefers «tryggleik»; check it doesn't read as Bokmål.
+- `apps/store/meet/desktop/locales/nn/desktop.ftl` `check-secure-boot-off-detail`: "spel med juksevern" — no settled Nynorsk term for anti-cheat.
+- `apps/store/meet/locales/nn/meet.ftl` `luft-title`: "Ditt Luft" — Nynorsk usually puts the possessive after the noun, which a name without a definite ending can't take; check it reads naturally as a title.

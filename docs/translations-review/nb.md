@@ -16,7 +16,7 @@ Strings in Luft's Norwegian Bokmål translation that a native speaker should che
 - `kestrel/ui/locales/nb/shell.ftl` `keys-backspace`: "Tilbake" — Norwegian keyboards print an arrow; check whether «Backspace» is the more familiar shortcut label.
 - `packages/web/ui/locales/nb/ui.ftl` `ui-fingerprint-retry`: "Det ble ikke lest skikkelig. Prøv igjen." — check it sounds natural.
 - `packages/web/ui/locales/nb/ui.ftl` `ui-media-unmute`: "Slå på lyd" — check it is clear next to «Demp».
-- `apps/settings/locales/nb/settings.ftl` `settings-more-show`: "Vis { $count } til" — check «til» vs «flere» after a number.
+- `apps/system/settings/locales/nb/settings.ftl` `settings-more-show`: "Vis { $count } til" — check «til» vs «flere» after a number.
 
 ## Kestrel and setup
 
@@ -27,27 +27,27 @@ Strings in Luft's Norwegian Bokmål translation that a native speaker should che
 - `kestrel/ui/locales/nb/system.ftl` `network-menu-tethers`: "Internettdeling via Bluetooth" — no settled short term for Bluetooth tethering; may clip as a menu header.
 - `kestrel/ui/locales/nb/desktop.ftl` `switch-monitor-join`: "Utvid skjermer" — follows Windows' «Utvid»; check against the 15-character limit context.
 - `kestrel/ui/locales/nb/system.ftl` `inhibit-shortcuts-title`: "Tillat at hurtigtaster overstyres" — "inhibit shortcuts" has no settled Norwegian term.
-- `apps/setup/installer/locales/nb/installer.ftl` `installer-no-deployment`: "Det nye systemet har ingen utrulling" — «utrulling» for an ostree deployment is a technical guess.
-- `apps/setup/locales/nb/setup.ftl` `setup-region-intro-guessed`: "Vi har gjettet { $guesses }" — relies on the joined list ("tastaturet ut fra datamaskinen og tidssonen ut fra nettverket") using «og»; check the list joiner.
+- `apps/system/setup/installer/locales/nb/installer.ftl` `installer-no-deployment`: "Det nye systemet har ingen utrulling" — «utrulling» for an ostree deployment is a technical guess.
+- `apps/system/setup/locales/nb/setup.ftl` `setup-region-intro-guessed`: "Vi har gjettet { $guesses }" — relies on the joined list ("tastaturet ut fra datamaskinen og tidssonen ut fra nettverket") using «og»; check the list joiner.
 - `kestrel/ui/locales/nb/system.ftl` `network-menu-hotspot`: "Trådløssone på { $name }" — $name is the Wi-Fi device sharing the connection; check it reads well with the device names people see, and against Windows' «mobilt tilkoblingspunkt».
 - `kestrel/ui/locales/nb/system.ftl` `screenshot-source`: "Skjermbilder og opptak" — notification source for the screenshot and recording tool; «skjermopptak» alone would mean only recordings.
 - `kestrel/ui/locales/nb/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 
-- `apps/settings/locales/nb/connections.ftl` `settings-network-ip-link-local`: "Bare lokal lenke (link-local)" — no settled Norwegian term; check it reads naturally.
-- `apps/settings/locales/nb/connections.ftl` `settings-network-security-owe`: "Forbedret åpen" — literal; Windows shows "OWE"; check.
-- `apps/settings/locales/nb/connections.ftl` `settings-network-wireguard-keepalive`: "Keepalive" — left in English as WireGuard tools do.
-- `apps/settings/locales/nb/system.ftl` `settings-accounts-online`: "Hver konto blir en mappe i Cloud, og filer lastes ned når du…" — assumes the folder is literally named Cloud and not localized.
-- `apps/settings/locales/nb/connections.ftl` `settings-bluetooth-request-confirm`: "Vil du koble sammen med { $name }?" — pairing is translated «koble sammen»/«sammenkobling» throughout; check it doesn't read too close to «koble til».
-- `apps/settings/locales/nb/devices.ftl` `settings-power-suspend-plugged-in`: "Hvilemodus når den er koblet til strøm" — may be long for a row label.
-- `apps/settings/locales/nb/personalization.ftl` `settings-cursors-folder-description`: "Temaer du legger i Hjem › .local › share › icons, vises her" — check that "Hjem" matches how Rover names the home folder in Norwegian.
-- `apps/settings/locales/nb/personalization.ftl` `settings-fonts-monospace`: "Fast bredde" — monospace has no single settled short term; check against how Rover/Draft name it.
-- `apps/settings/locales/nb/personalization.ftl` `settings-accessibility-dwell-time`: "Hold i ro i" — label followed by a duration slider; check it reads naturally next to the value.
-- `apps/settings/locales/nb/protection.ftl` `settings-security-anti-cheat`: "Spill med juksebeskyttelse" — «juksebeskyttelse» for anti-cheat; gamers may expect «anti-cheat».
-- `apps/settings/locales/nb/protection.ftl` `settings-passwords-seal`: "Forsegl" — «forsegle» for sealing to the TPM; check it reads clearly.
-- `apps/settings/locales/nb/system.ftl` `settings-datetime-format-12h`: "12-timers" — English says AM/PM; Norwegian Windows labels it as 12-hour, check the choice is clear next to «24-timers».
-- `apps/settings/locales/nb/system.ftl` `settings-updates-switching-standard`: "Laster ned standardbildet…" — «bildet» for the system image may be read as a picture; «systembildet» may be clearer but longer.
+- `apps/system/settings/locales/nb/connections.ftl` `settings-network-ip-link-local`: "Bare lokal lenke (link-local)" — no settled Norwegian term; check it reads naturally.
+- `apps/system/settings/locales/nb/connections.ftl` `settings-network-security-owe`: "Forbedret åpen" — literal; Windows shows "OWE"; check.
+- `apps/system/settings/locales/nb/connections.ftl` `settings-network-wireguard-keepalive`: "Keepalive" — left in English as WireGuard tools do.
+- `apps/system/settings/locales/nb/system.ftl` `settings-accounts-online`: "Hver konto blir en mappe i Cloud, og filer lastes ned når du…" — assumes the folder is literally named Cloud and not localized.
+- `apps/system/settings/locales/nb/connections.ftl` `settings-bluetooth-request-confirm`: "Vil du koble sammen med { $name }?" — pairing is translated «koble sammen»/«sammenkobling» throughout; check it doesn't read too close to «koble til».
+- `apps/system/settings/locales/nb/devices.ftl` `settings-power-suspend-plugged-in`: "Hvilemodus når den er koblet til strøm" — may be long for a row label.
+- `apps/system/settings/locales/nb/personalization.ftl` `settings-cursors-folder-description`: "Temaer du legger i Hjem › .local › share › icons, vises her" — check that "Hjem" matches how Rover names the home folder in Norwegian.
+- `apps/system/settings/locales/nb/personalization.ftl` `settings-fonts-monospace`: "Fast bredde" — monospace has no single settled short term; check against how Rover/Draft name it.
+- `apps/system/settings/locales/nb/personalization.ftl` `settings-accessibility-dwell-time`: "Hold i ro i" — label followed by a duration slider; check it reads naturally next to the value.
+- `apps/system/settings/locales/nb/protection.ftl` `settings-security-anti-cheat`: "Spill med juksebeskyttelse" — «juksebeskyttelse» for anti-cheat; gamers may expect «anti-cheat».
+- `apps/system/settings/locales/nb/protection.ftl` `settings-passwords-seal`: "Forsegl" — «forsegle» for sealing to the TPM; check it reads clearly.
+- `apps/system/settings/locales/nb/system.ftl` `settings-datetime-format-12h`: "12-timers" — English says AM/PM; Norwegian Windows labels it as 12-hour, check the choice is clear next to «24-timers».
+- `apps/system/settings/locales/nb/system.ftl` `settings-updates-switching-standard`: "Laster ned standardbildet…" — «bildet» for the system image may be read as a picture; «systembildet» may be clearer but longer.
 
 ## Website
 
@@ -57,9 +57,9 @@ Strings in Luft's Norwegian Bokmål translation that a native speaker should che
 
 ## Meet Luft
 
-- `apps/meet/locales/nb/meet.ftl` `ready-remove-description`: "også flytteesken" — «flytteeske» for the moving box partition; check it reads as Meet Luft's packed bundle, not a literal box.
-- `apps/meet/locales/nb/meet.ftl` `hello-check`: "Sjekk denne datamaskinen" — the Windows variant uses «datamaskin» per the glossary, though Windows itself says «denne PC-en»; check which feels more natural in a Windows app.
-- `apps/meet/locales/nb/meet.ftl` `meet-logs-saved`: "Loggene fra å prøve Luft er lagret på skrivebordet ditt" — "logs from Try Luft" rephrased; check «fra å prøve Luft» reads naturally.
-- `apps/meet/desktop/locales/nb/desktop.ftl` `check-start-entries`: "En gammel oppstartsoppføring" — «oppstartsoppføring» for a firmware boot entry; check against what Windows/firmware tools say.
-- `apps/meet/locales/nb/meet.ftl` `stick-replace-description`: "Den nye versjonen av Luft kan ta plassen." — "the new Luft" rephrased to avoid a definite form on the name.
-- `apps/meet/desktop/locales/nb/desktop.ftl` `check-secure-boot-off-detail`: "spill med juksebeskyttelse" — same «juksebeskyttelse» as Settings; gamers may expect «anti-cheat».
+- `apps/store/meet/locales/nb/meet.ftl` `ready-remove-description`: "også flytteesken" — «flytteeske» for the moving box partition; check it reads as Meet Luft's packed bundle, not a literal box.
+- `apps/store/meet/locales/nb/meet.ftl` `hello-check`: "Sjekk denne datamaskinen" — the Windows variant uses «datamaskin» per the glossary, though Windows itself says «denne PC-en»; check which feels more natural in a Windows app.
+- `apps/store/meet/locales/nb/meet.ftl` `meet-logs-saved`: "Loggene fra å prøve Luft er lagret på skrivebordet ditt" — "logs from Try Luft" rephrased; check «fra å prøve Luft» reads naturally.
+- `apps/store/meet/desktop/locales/nb/desktop.ftl` `check-start-entries`: "En gammel oppstartsoppføring" — «oppstartsoppføring» for a firmware boot entry; check against what Windows/firmware tools say.
+- `apps/store/meet/locales/nb/meet.ftl` `stick-replace-description`: "Den nye versjonen av Luft kan ta plassen." — "the new Luft" rephrased to avoid a definite form on the name.
+- `apps/store/meet/desktop/locales/nb/desktop.ftl` `check-secure-boot-off-detail`: "spill med juksebeskyttelse" — same «juksebeskyttelse» as Settings; gamers may expect «anti-cheat».

@@ -24,25 +24,25 @@ Luft is translated into Albanian, Bosnian, Bulgarian, Catalan, Croatian, Czech, 
 | kestrel-settings | `kestrel/settings/locales/*/settings.ftl` | notifications from `kestrel-settings` about drives and the battery |
 | kestrel-portal-service | `kestrel/portal/locales/*/portal.ftl` | print job names and printing failures from `kestrel-portal` |
 | ui | `packages/web/ui/locales/*/ui.ftl` | the UI kit every app shares |
-| settings | `apps/settings/locales/*/settings.ftl` | Settings' window, sidebar and its groups, and search |
+| settings | `apps/system/settings/locales/*/settings.ftl` | Settings' window, sidebar and its groups, and search |
 | settings-pages | `packages/web/settings-pages/locales/*/pages.ftl` | Settings' page names and search words, also used by Start |
-| settings-connections | `apps/settings/locales/*/connections.ftl` | Network, Bluetooth |
-| settings-devices | `apps/settings/locales/*/devices.ftl` | Displays, Sound, Power, Input |
-| settings-personalization | `apps/settings/locales/*/personalization.ftl` | Appearance, Desktop, Notifications, Accessibility |
-| settings-protection | `apps/settings/locales/*/protection.ftl` | Apps, Privacy, Security |
-| settings-system | `apps/settings/locales/*/system.ftl` | Accounts, Language & time, System |
-| settings-desktop | `apps/settings/desktop/locales/*/desktop.ftl` | messages from Settings' native side |
-| sandbox | `apps/schelf/sandbox/locales/*/sandbox.ftl` | notifications from the sandbox AppImages run in |
+| settings-connections | `apps/system/settings/locales/*/connections.ftl` | Network, Bluetooth |
+| settings-devices | `apps/system/settings/locales/*/devices.ftl` | Displays, Sound, Power, Input |
+| settings-personalization | `apps/system/settings/locales/*/personalization.ftl` | Appearance, Desktop, Notifications, Accessibility |
+| settings-protection | `apps/system/settings/locales/*/protection.ftl` | Apps, Privacy, Security |
+| settings-system | `apps/system/settings/locales/*/system.ftl` | Accounts, Language & time, System |
+| settings-desktop | `apps/system/settings/desktop/locales/*/desktop.ftl` | messages from Settings' native side |
+| sandbox | `apps/system/schelf/sandbox/locales/*/sandbox.ftl` | notifications from the sandbox AppImages run in |
 | trust | `packages/system/trust/locales/*/trust.ftl` | errors from the security service, shared by Disks, Settings and Install Luft |
-| setup | `apps/setup/locales/*/setup.ftl` | Install Luft and first-run setup |
-| setup-desktop | `apps/setup/desktop/locales/*/desktop.ftl` | messages from setup's native side |
-| setup-installer | `apps/setup/installer/locales/*/installer.ftl` | the installer service's errors and progress |
-| meet | `apps/meet/locales/*/meet.ftl` | Meet Luft, the Windows and Linux app that gets a computer ready for Luft |
-| meet-desktop | `apps/meet/desktop/locales/*/desktop.ftl` | Meet Luft's checks, errors and file dialogs from its native side |
-| soundboard | `apps/soundboard/locales/*/soundboard.ftl` | Soundboard's boards, tiles, sound editor and levels |
-| soundboard-desktop | `apps/soundboard/desktop/locales/*/desktop.ftl` | Soundboard's tray menu and its stop-all shortcut |
-| convertible | `apps/convertible/locales/*/convertible.ftl` | Convertible's window: formats, options, the editor and the queue |
-| convertible-desktop | `apps/convertible/desktop/locales/*/desktop.ftl` | why a conversion failed, from Convertible's native side |
+| setup | `apps/system/setup/locales/*/setup.ftl` | Install Luft and first-run setup |
+| setup-desktop | `apps/system/setup/desktop/locales/*/desktop.ftl` | messages from setup's native side |
+| setup-installer | `apps/system/setup/installer/locales/*/installer.ftl` | the installer service's errors and progress |
+| meet | `apps/store/meet/locales/*/meet.ftl` | Meet Luft, the Windows and Linux app that gets a computer ready for Luft |
+| meet-desktop | `apps/store/meet/desktop/locales/*/desktop.ftl` | Meet Luft's checks, errors and file dialogs from its native side |
+| soundboard | `apps/store/soundboard/locales/*/soundboard.ftl` | Soundboard's boards, tiles, sound editor and levels |
+| soundboard-desktop | `apps/store/soundboard/desktop/locales/*/desktop.ftl` | Soundboard's tray menu and its stop-all shortcut |
+| convertible | `apps/store/convertible/locales/*/convertible.ftl` | Convertible's window: formats, options, the editor and the queue |
+| convertible-desktop | `apps/store/convertible/desktop/locales/*/desktop.ftl` | why a conversion failed, from Convertible's native side |
 | site | `web/site/locales/*/site.ftl` | the website's header, footer, language list and missing-page page |
 | site-home | `web/site/locales/*/home.ftl` | the website's home page |
 | site-download | `web/site/locales/*/download.ftl` | the website's download page |
@@ -105,7 +105,7 @@ LUFT_LOCALE=de kestrel/tools/session.sh nested
 ## Adding a language
 
 1. Add it to `LANGUAGES` in `packages/i18n/src/locales.ts`, `LOCALES` in `packages/i18n/rust/locales.rs` and the `localizer!` macro in `packages/i18n/rust/lib.rs`. `LANGUAGES` is what Settings offers; keep it sorted by the language's own name, English first.
-2. Add its locales, with the country each is spoken in, to `LOCALES` in `apps/setup/src/lib/regional/languages.ts`, which Install Luft offers, and to `FORMATS` in `apps/settings/src/lib/panels/system/language/region/formats.ts`.
+2. Add its locales, with the country each is spoken in, to `LOCALES` in `apps/system/setup/src/lib/regional/languages.ts`, which Install Luft offers, and to `FORMATS` in `apps/system/settings/src/lib/panels/system/language/region/formats.ts`.
 3. Add its file to the outputs of `kestrel-locales` in `kestrel/engine/ui/meson.build` and to `kestrel/engine/ui/kestrel.gresource.xml`.
 4. Add its CEF locale to `languages` in `os/image/parts/stages/runtime.sh` if CEF ships one.
 5. Create its folder with an empty file for every component, a glossary and a style guide. Weblate does the first step for new languages added there.

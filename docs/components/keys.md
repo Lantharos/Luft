@@ -1,6 +1,6 @@
 # Keys files and input methods
 
-Where [Keys](../../apps/keys) keeps layouts, dead keys and input methods, and the format of an input method. Using Keys is described in [the docs](https://docs.luft.computer/apps/keys/), and the links that open it in [Opening Settings and Keys](https://docs.luft.computer/developers/links/).
+Where [Keys](../../apps/system/keys) keeps layouts, dead keys and input methods, and the format of an input method. Using Keys is described in [the docs](https://docs.luft.computer/apps/keys/), and the links that open it in [Opening Settings and Keys](https://docs.luft.computer/developers/links/).
 
 ## Files
 

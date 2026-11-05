@@ -88,7 +88,7 @@ From an app's folder, `bun run check` type-checks its interface. The interface c
 
 On every push and pull request, `.github/workflows/checks.yml` runs Clippy and the tests of only the crates a change can reach, through their own files, the crates they depend on, the shared dependency entries they use or the locked packages they build with, and `bun run check` for the interface packages it touches. The test job for the apps also fails when the bindings of an app or a shared package no longer match their Rust side. Clippy and the tests run side by side, each split between the crates built on Sabine and the rest, and each of those jobs keeps a build cache of its own. The Rust checks run in `ghcr.io/lantharos/luft-ci`, a Fedora image with the build dependencies and Rust toolchains made from `.github/ci`, rebuilt every week and whenever that folder changes. When a service's unit file changes, `bun .github/scripts/units/index.ts` checks that its sandbox didn't get weaker; see [Service sandboxing](security.md#service-sandboxing).
 
-`cargo test -p convertible` runs real conversions over the small files in `apps/convertible/desktop/tests/fixtures` and over pictures, documents and archives it makes on the spot, then opens each result with another decoder: it checks that pictures match, that tags and covers survive, that redacted pixels are gone from the file's bytes and that a failed job leaves its folder as it was. Formats the machine has no encoder for are skipped, so a toolbox without RPM Fusion's codecs covers less than Luft itself; the test programs in `target/debug/deps` also run on the host. `apps:convertible` drives the app in a headless session: it opens a picture, picks the first suggestion, converts, redacts part of it, answers the question about the existing file, and opens a video, a song and a batch.
+`cargo test -p convertible` runs real conversions over the small files in `apps/store/convertible/desktop/tests/fixtures` and over pictures, documents and archives it makes on the spot, then opens each result with another decoder: it checks that pictures match, that tags and covers survive, that redacted pixels are gone from the file's bytes and that a failed job leaves its folder as it was. Formats the machine has no encoder for are skipped, so a toolbox without RPM Fusion's codecs covers less than Luft itself; the test programs in `target/debug/deps` also run on the host. `apps:convertible` drives the app in a headless session: it opens a picture, picks the first suggestion, converts, redacts part of it, answers the question about the existing file, and opens a video, a song and a batch.
 
 ## NVIDIA graphics
 
@@ -106,7 +106,7 @@ After signing in again, the session sees an NVIDIA card; removing the file bring
 
 ## Installer
 
-`apps/setup/installer/vm/run.sh` installs Luft for real with `bootc install to-filesystem` inside a QEMU VM with spare drives, checks the result and starts the installed drive with UEFI. See [Install Luft](../apps/setup/README.md#testing).
+`apps/system/setup/installer/vm/run.sh` installs Luft for real with `bootc install to-filesystem` inside a QEMU VM with spare drives, checks the result and starts the installed drive with UEFI. See [Install Luft](../apps/system/setup/README.md#testing).
 
 ## Luft Keyring and Passkeys
 
@@ -126,7 +126,7 @@ Everything that needs a real computer runs in QEMU VMs from `os/vm`, without `su
 
 `LUFT_VM` picks another folder than `os/vm/state`, so VMs can live side by side. `check.py` writes its screenshots, the serial console, the journal and `bootc status` to `check` in that folder, and keeps them when a step fails or times out. Every step has a time limit.
 
-`os/vm/check.sh` holds what the checks of single services share: a check image with the check's files on top of the system, started directly from a drive with the image's kernel, or installed with `disk.sh`. The [installer](#installer), [Luft Keyring and Passkeys](#luft-keyring-and-passkeys), [sleep](../services/sleep/README.md), [Windows](../services/windows/README.md) and [Disks](../apps/disks/README.md) checks use it.
+`os/vm/check.sh` holds what the checks of single services share: a check image with the check's files on top of the system, started directly from a drive with the image's kernel, or installed with `disk.sh`. The [installer](#installer), [Luft Keyring and Passkeys](#luft-keyring-and-passkeys), [sleep](../services/sleep/README.md), [Windows](../services/windows/README.md) and [Disks](../apps/system/disks/README.md) checks use it.
 
 SushiBoot and Sushi are tried on the installed image too. `qemu.sh` options that matter for startup:
 

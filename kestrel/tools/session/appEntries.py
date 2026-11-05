@@ -49,7 +49,7 @@ def main(root: Path, data: Path) -> None:
     icons.mkdir(parents=True, exist_ok=True)
     launchers.mkdir(exist_ok=True)
     services.mkdir(parents=True, exist_ok=True)
-    for manifest in sorted(root.glob('apps/*/Sabine.toml')):
+    for manifest in sorted(root.glob('apps/*/*/Sabine.toml')):
         folder = manifest.parent
         binary = root / 'target/release' / folder.name
         if not binary.is_file():

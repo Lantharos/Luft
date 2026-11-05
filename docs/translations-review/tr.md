@@ -34,32 +34,32 @@ Strings in Luft's Turkish translation that a native speaker should check: terms 
 - `kestrel/ui/locales/tr/system.ftl` `network-menu-tether`: "Paylaşım" — short tile title for Bluetooth tethering; check it is clear enough.
 - `kestrel/ui/locales/tr/desktop.ftl` `switch-monitor-join`: "Genişlet" — Windows' word for extending the desktop across displays.
 - `kestrel/ui/locales/tr/portal.ftl` `portal-unknown-app-subject`: "Uygulama" — sentences with { $appName } avoid "uygulaması" after the placeable so this stand-in doesn't produce "Uygulama uygulaması"; check the sentences still read well with real app names.
-- `apps/setup/locales/tr/setup.ftl` `setup-region-intro-guessed`: "Luft’u kuralım. Bazı seçimleri tahmin ettik: { $guesses }. Yanlış olanı değiştirin." — with guesses like "dil ve klavye bilgisayarınıza göre"; check the assembled sentence with two guesses joined by "ve".
-- `apps/setup/locales/tr/setup.ftl` `setup-account-full-name-example`: "Cahit Arf" — a well-known Turkish mathematician, in the spirit of Ada Lovelace; confirm.
-- `apps/setup/installer/locales/tr/installer.ftl` `installer-no-deployment`: "Yeni sistemde dağıtım yok" — technical ostree term; check dağıtım is understood.
+- `apps/system/setup/locales/tr/setup.ftl` `setup-region-intro-guessed`: "Luft’u kuralım. Bazı seçimleri tahmin ettik: { $guesses }. Yanlış olanı değiştirin." — with guesses like "dil ve klavye bilgisayarınıza göre"; check the assembled sentence with two guesses joined by "ve".
+- `apps/system/setup/locales/tr/setup.ftl` `setup-account-full-name-example`: "Cahit Arf" — a well-known Turkish mathematician, in the spirit of Ada Lovelace; confirm.
+- `apps/system/setup/installer/locales/tr/installer.ftl` `installer-no-deployment`: "Yeni sistemde dağıtım yok" — technical ostree term; check dağıtım is understood.
 - `kestrel/ui/locales/tr/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 
-- `apps/settings/locales/tr/connections.ftl` `settings-bluetooth-request-unnamed`: "Cihaz" — capitalized because every pairing sentence was built to start with { $name }; check the sentences still read well with a real device name.
-- `apps/settings/locales/tr/connections.ftl` `settings-network-metered`: "Tarifeli bağlantı" — Windows' term; check it against "Ölçülü bağlantı", which the page keywords also list.
-- `apps/settings/locales/tr/connections.ftl` `settings-network-proxy-port`: "Port" — chose "port" over GNOME's "Bağlantı noktası" to fit the short field; confirm.
-- `apps/settings/locales/tr/connections.ftl` `settings-network-ip-routes`: "Rotalar" — GNOME's word; "Yönlendirmeler" is the alternative.
-- `apps/settings/locales/tr/system.ftl` `settings-accounts-approve`: "İleri Düzey Veri Koruması’nı" — check Apple's current Turkish name for Advanced Data Protection.
-- `apps/settings/locales/tr/devices.ftl` `settings-dictation-hold`: "Dikte için basılı tutun: { $keys }" — colon form avoids a suffix on { $keys } (e.g. "Super+Alt ya da Copilot tuşu"); check it reads naturally.
-- `apps/settings/locales/tr/devices.ftl` `settings-power-capacity`: "Şu an { $full }, yeniyken { $design }" — rephrased from "X of Y when new".
-- `apps/settings/locales/tr/devices.ftl` `settings-keys-keypad`: "Tuş takımı { $key }" — check what Turkish OSes print for number-pad keys; may clip on shortcut labels.
-- `apps/settings/locales/tr/protection.ftl` `settings-encryption-passphrase-title` (and every passphrase string, also in setup): "Disk parolası seçin" — "passphrase" is rendered as "disk parolası" to keep it apart from the account "parola"; check it reads naturally.
-- `apps/settings/locales/tr/protection.ftl` `settings-privacy-screen-off-after`: "{ $duration } sonra" — assumes $duration is a bare noun phrase like "5 dakika"; check with real values.
-- `apps/settings/locales/tr/protection.ftl` `settings-encryption-drive-encrypting-paused`: "Bir sürücü şifreleniyor, { $percent } noktasında duraklatıldı" — "noktasında" avoids a suffix on the percent; may sound stiff.
-- `apps/settings/locales/tr/protection.ftl` `settings-security-key-step-choose`: "{ $option } seçeneğini, ardından { $next } seçeneğini seçin." — placeables are English MokManager option names; "seçeneğini seçin" is repetitive, check for a smoother verb.
-- `apps/settings/locales/tr/protection.ftl` `settings-security-anti-cheat`: "Hile önleyicili oyunlar" — no settled Turkish term for anti-cheat; some gamers just say "anti-cheat".
-- `apps/settings/locales/tr/protection.ftl` `settings-passwords-stores`: "Uygulama oturumları" — "sign-ins" stored by apps; "oturum" might be read as a running session.
-- `apps/settings/locales/tr/personalization.ftl` `settings-appearance-icons-clear`: "Şeffaf" — icon style "Clear" (glass-like); check it isn't read as "clear/empty".
-- `apps/settings/locales/tr/personalization.ftl` `settings-appearance-tint-slate`: "Arduvaz" — accurate but uncommon colour name; "Kurşuni" may be friendlier.
-- `apps/settings/locales/tr/system.ftl` `settings-updates-switching-standard`: "Standart sistem görüntüsü indiriliyor…" — "image" as in OS image; check "sistem görüntüsü" is understood and not read as a picture.
-- `apps/settings/locales/tr/system.ftl` `settings-login-wallpaper-own`: "Kişiye özel" — choice "Their own" vs "Herkes için aynı"; check it is clear enough.
-- `apps/settings/locales/tr/system.ftl` `settings-about-other-system`: "Kapladığı { $size } alanı Luft’a vermek için kaldırın" — check with real sizes.
+- `apps/system/settings/locales/tr/connections.ftl` `settings-bluetooth-request-unnamed`: "Cihaz" — capitalized because every pairing sentence was built to start with { $name }; check the sentences still read well with a real device name.
+- `apps/system/settings/locales/tr/connections.ftl` `settings-network-metered`: "Tarifeli bağlantı" — Windows' term; check it against "Ölçülü bağlantı", which the page keywords also list.
+- `apps/system/settings/locales/tr/connections.ftl` `settings-network-proxy-port`: "Port" — chose "port" over GNOME's "Bağlantı noktası" to fit the short field; confirm.
+- `apps/system/settings/locales/tr/connections.ftl` `settings-network-ip-routes`: "Rotalar" — GNOME's word; "Yönlendirmeler" is the alternative.
+- `apps/system/settings/locales/tr/system.ftl` `settings-accounts-approve`: "İleri Düzey Veri Koruması’nı" — check Apple's current Turkish name for Advanced Data Protection.
+- `apps/system/settings/locales/tr/devices.ftl` `settings-dictation-hold`: "Dikte için basılı tutun: { $keys }" — colon form avoids a suffix on { $keys } (e.g. "Super+Alt ya da Copilot tuşu"); check it reads naturally.
+- `apps/system/settings/locales/tr/devices.ftl` `settings-power-capacity`: "Şu an { $full }, yeniyken { $design }" — rephrased from "X of Y when new".
+- `apps/system/settings/locales/tr/devices.ftl` `settings-keys-keypad`: "Tuş takımı { $key }" — check what Turkish OSes print for number-pad keys; may clip on shortcut labels.
+- `apps/system/settings/locales/tr/protection.ftl` `settings-encryption-passphrase-title` (and every passphrase string, also in setup): "Disk parolası seçin" — "passphrase" is rendered as "disk parolası" to keep it apart from the account "parola"; check it reads naturally.
+- `apps/system/settings/locales/tr/protection.ftl` `settings-privacy-screen-off-after`: "{ $duration } sonra" — assumes $duration is a bare noun phrase like "5 dakika"; check with real values.
+- `apps/system/settings/locales/tr/protection.ftl` `settings-encryption-drive-encrypting-paused`: "Bir sürücü şifreleniyor, { $percent } noktasında duraklatıldı" — "noktasında" avoids a suffix on the percent; may sound stiff.
+- `apps/system/settings/locales/tr/protection.ftl` `settings-security-key-step-choose`: "{ $option } seçeneğini, ardından { $next } seçeneğini seçin." — placeables are English MokManager option names; "seçeneğini seçin" is repetitive, check for a smoother verb.
+- `apps/system/settings/locales/tr/protection.ftl` `settings-security-anti-cheat`: "Hile önleyicili oyunlar" — no settled Turkish term for anti-cheat; some gamers just say "anti-cheat".
+- `apps/system/settings/locales/tr/protection.ftl` `settings-passwords-stores`: "Uygulama oturumları" — "sign-ins" stored by apps; "oturum" might be read as a running session.
+- `apps/system/settings/locales/tr/personalization.ftl` `settings-appearance-icons-clear`: "Şeffaf" — icon style "Clear" (glass-like); check it isn't read as "clear/empty".
+- `apps/system/settings/locales/tr/personalization.ftl` `settings-appearance-tint-slate`: "Arduvaz" — accurate but uncommon colour name; "Kurşuni" may be friendlier.
+- `apps/system/settings/locales/tr/system.ftl` `settings-updates-switching-standard`: "Standart sistem görüntüsü indiriliyor…" — "image" as in OS image; check "sistem görüntüsü" is understood and not read as a picture.
+- `apps/system/settings/locales/tr/system.ftl` `settings-login-wallpaper-own`: "Kişiye özel" — choice "Their own" vs "Herkes için aynı"; check it is clear enough.
+- `apps/system/settings/locales/tr/system.ftl` `settings-about-other-system`: "Kapladığı { $size } alanı Luft’a vermek için kaldırın" — check with real sizes.
 
 ## Website
 
@@ -70,12 +70,12 @@ Strings in Luft's Turkish translation that a native speaker should check: terms 
 
 ## Meet Luft
 
-- `apps/meet/locales/tr/meet.ftl` `linux-ready-description`: "…her zamanki gibi başlayan sistem: { $system }." — a colon so the name needs no suffix and the fallback «bu sistem» isn't lowercase at the start of a sentence; the same in the other linux-ready lines and check-startup-uefi-linux. Check that it doesn't sound stiff.
-- `apps/meet/locales/tr/meet.ftl` `ready-remove-description`: "taşınma kutusu" — "moving box"; check that the image comes across.
-- `apps/meet/locales/tr/meet.ftl` `problem-tidy`: "önyükleme girdileri" — "start entries" in the firmware boot menu; check it against what firmware and Windows tools say.
-- `apps/meet/locales/tr/meet.ftl` `meet-keep-it`: "Kalsın" — the button that keeps Luft instead of removing it; check that it reads clearly as a button.
-- `apps/meet/desktop/locales/tr/desktop.ftl` `helper-registry-not-opened`: "Açılamadı: { $key } ({ $error })" — rebuilt as a colon form so the placeable needs no suffix; same pattern in several helper-, live- and stick- errors.
-- `apps/meet/desktop/locales/tr/desktop.ftl` `check-secure-boot-off-detail`: "hile önleyicili oyunlar" — "games with anti-cheat"; gamers may expect "anti-cheat".
-- `apps/meet/locales/tr/meet.ftl` `room-places-title`: "Luft nereye yerleşsin?" — echoes “yerleşmeden” from check-blocked-description; check it suits a choice between drives.
-- `apps/meet/desktop/locales/tr/desktop.ftl` `check-space-erase-drive`: "{ $drive } diski silinirse o diskte ona yer var." — the conditional reads a little stiff; check the word order.
-- `apps/meet/desktop/locales/tr/desktop.ftl` `helper-box-room-shortfall`: "Luft’un alanında { $available } GB ayrılabilir, seçtikleriniz ise { $needed } GB gerektiriyor." — "Luft’s room can spare" is the space already set aside for Luft; check that comes across.
+- `apps/store/meet/locales/tr/meet.ftl` `linux-ready-description`: "…her zamanki gibi başlayan sistem: { $system }." — a colon so the name needs no suffix and the fallback «bu sistem» isn't lowercase at the start of a sentence; the same in the other linux-ready lines and check-startup-uefi-linux. Check that it doesn't sound stiff.
+- `apps/store/meet/locales/tr/meet.ftl` `ready-remove-description`: "taşınma kutusu" — "moving box"; check that the image comes across.
+- `apps/store/meet/locales/tr/meet.ftl` `problem-tidy`: "önyükleme girdileri" — "start entries" in the firmware boot menu; check it against what firmware and Windows tools say.
+- `apps/store/meet/locales/tr/meet.ftl` `meet-keep-it`: "Kalsın" — the button that keeps Luft instead of removing it; check that it reads clearly as a button.
+- `apps/store/meet/desktop/locales/tr/desktop.ftl` `helper-registry-not-opened`: "Açılamadı: { $key } ({ $error })" — rebuilt as a colon form so the placeable needs no suffix; same pattern in several helper-, live- and stick- errors.
+- `apps/store/meet/desktop/locales/tr/desktop.ftl` `check-secure-boot-off-detail`: "hile önleyicili oyunlar" — "games with anti-cheat"; gamers may expect "anti-cheat".
+- `apps/store/meet/locales/tr/meet.ftl` `room-places-title`: "Luft nereye yerleşsin?" — echoes “yerleşmeden” from check-blocked-description; check it suits a choice between drives.
+- `apps/store/meet/desktop/locales/tr/desktop.ftl` `check-space-erase-drive`: "{ $drive } diski silinirse o diskte ona yer var." — the conditional reads a little stiff; check the word order.
+- `apps/store/meet/desktop/locales/tr/desktop.ftl` `helper-box-room-shortfall`: "Luft’un alanında { $available } GB ayrılabilir, seçtikleriniz ise { $needed } GB gerektiriyor." — "Luft’s room can spare" is the space already set aside for Luft; check that comes across.

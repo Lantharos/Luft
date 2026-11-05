@@ -5,7 +5,7 @@ import IBus from 'gi://IBus';
 import type Meta from 'gi://Meta';
 
 import {atSessionEnd} from '../../../automation/runner.js';
-import {requireFresh} from './freshness.js';
+import {appFolder, requireFresh} from './freshness.js';
 import {prepareHome} from './home.js';
 import {call} from '../dbus.js';
 import {click, type Point} from '../input/input.js';
@@ -60,8 +60,7 @@ function environment(manifest: string | null = null): Record<string, string | nu
 
 function command(name: string) {
   requireFresh(name);
-  const app = repository('apps', name);
-  return {path: repository('target/release', name), manifest: GLib.build_filenamev([app, 'Sabine.toml'])};
+  return {path: repository('target/release', name), manifest: GLib.build_filenamev([appFolder(name), 'Sabine.toml'])};
 }
 
 export const appBinary = (name: string) => command(name).path;

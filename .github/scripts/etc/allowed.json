@@ -1,28 +1,28 @@
 {
-	"apps/meet/desktop/src/linux/helper/machine.rs": {
+	"apps/store/meet/desktop/src/linux/helper/machine.rs": {
 		"/etc/os-release": "Reads which Linux Meet Luft runs on"
 	},
-	"apps/meet/desktop/src/linux/regional/keyboards.rs": {
+	"apps/store/meet/desktop/src/linux/regional/keyboards.rs": {
 		"/etc/vconsole.conf": "Reads the keyboard layout of the Linux Meet Luft runs on",
 		"/etc/default/keyboard": "Reads the keyboard layout of the Linux Meet Luft runs on",
 		"/etc/X11/xorg.conf.d/00-keyboard.conf": "Reads the keyboard layout of the Linux Meet Luft runs on"
 	},
-	"apps/schelf/desktop/src/cli/commands/remove.rs": {
+	"apps/system/schelf/desktop/src/cli/commands/remove.rs": {
 		"/etc": "Tells what removing system packages takes away"
 	},
-	"apps/schelf/sandbox/src/launch/profile.rs": {
+	"apps/system/schelf/sandbox/src/launch/profile.rs": {
 		"/etc": "Shows AppImages the system's configuration read-only"
 	},
-	"apps/settings/desktop/src/panels/protection/apps/startup.rs": {
+	"apps/system/settings/desktop/src/panels/protection/apps/startup.rs": {
 		"/etc/xdg": "Reads the apps that start for everyone"
 	},
-	"apps/settings/desktop/src/panels/system/about/mod.rs": {
+	"apps/system/settings/desktop/src/panels/system/about/mod.rs": {
 		"/etc/os-release": "Reads which system it runs on"
 	},
-	"apps/setup/installer/src/install/configure/networks.rs": {
+	"apps/system/setup/installer/src/install/configure/networks.rs": {
 		"/etc/NetworkManager/system-connections": "Reads the live system's Wi-Fi networks, to hand them to the installed one as NetworkManager's own configuration"
 	},
-	"apps/tern/desktop/src/shell/mod.rs": {
+	"apps/system/tern/desktop/src/shell/mod.rs": {
 		"/etc/shells": "Reads the shells people can pick"
 	},
 	"kestrel/engine/data/session/kestrel-session.in": {

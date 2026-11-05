@@ -17,7 +17,7 @@ Strings in Luft's Finnish translation that a native speaker should check. Each i
 - `packages/web/ui/locales/fi/ui.ftl` `ui-media-pause`: "Keskeytä" — some players say "Tauko"; check which is expected.
 - `packages/web/ui/locales/fi/ui.ftl` `ui-split-space`: "Tila Luftille" — slider label for disk space; check against "Luftin tila", which may read as a status.
 - `packages/web/ui/locales/fi/ui.ftl` `ui-recovery-key-label`: "Palautusavain { $key }" — read out by screen readers before the key itself.
-- `apps/settings/locales/fi/settings.ftl` `settings-more-show`: "Näytä { $count } lisää" — same in both plural forms; check it fits every list it ends.
+- `apps/system/settings/locales/fi/settings.ftl` `settings-more-show`: "Näytä { $count } lisää" — same in both plural forms; check it fits every list it ends.
 - `packages/web/settings-pages/locales/fi/pages.ftl` `settings-page-appearance`: "Ulkoasu" — GNOME's word; Windows says Mukauttaminen.
 - `packages/web/settings-pages/locales/fi/pages.ftl` `settings-page-security`: "Suojaus" — see the glossary note on security.
 - `packages/web/settings-pages/locales/fi/pages.ftl` `settings-page-cursors`: "Osoitinteemat" — the page holds mouse cursor themes; check against "Kohdistinteemat".
@@ -35,35 +35,35 @@ Strings in Luft's Finnish translation that a native speaker should check. Each i
 - `kestrel/ui/locales/fi/shell.ftl` `ctrl-alt-tab-panel`: "Tehtäväpalkki" — English says "Panel"; translated as the taskbar it refers to.
 - `kestrel/ui/locales/fi/system.ftl` `dictation-unsupported-body`: "…puheentunnistinta, jota { $language } vaatii." — the language name may arrive in English (e.g. "Japanese"), so the sentence may read oddly.
 - `kestrel/ui/locales/fi/system.ftl` `peek-error-launch-not-started-by-peek`: "Käynnistää voi vain ohjelman, jonka peek run on itse käynnistänyt" — the English is ambiguous; check the intended meaning.
-- `apps/setup/locales/fi/setup.ftl` `setup-destination-alongside-choice`: "{ $windows } -järjestelmän rinnalle" — compound used to keep "Windows 11" in the nominative; check it doesn't feel heavy.
-- `apps/setup/locales/fi/setup.ftl` `setup-region-intro-guessed`: "Valmiiksi pääteltiin { $guesses }, …" with parts like "kieli tietokoneen perusteella" — check that the joined list reads naturally.
-- `apps/setup/locales/fi/setup.ftl` `setup-windows-hibernated`, `setup-windows-fast-startup`: "nopea käynnistys" — Windows' Finnish name for Fast Startup; check it matches current Windows wording.
+- `apps/system/setup/locales/fi/setup.ftl` `setup-destination-alongside-choice`: "{ $windows } -järjestelmän rinnalle" — compound used to keep "Windows 11" in the nominative; check it doesn't feel heavy.
+- `apps/system/setup/locales/fi/setup.ftl` `setup-region-intro-guessed`: "Valmiiksi pääteltiin { $guesses }, …" with parts like "kieli tietokoneen perusteella" — check that the joined list reads naturally.
+- `apps/system/setup/locales/fi/setup.ftl` `setup-windows-hibernated`, `setup-windows-fast-startup`: "nopea käynnistys" — Windows' Finnish name for Fast Startup; check it matches current Windows wording.
 - `kestrel/ui/locales/fi/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 
-- `apps/settings/locales/fi/connections.ftl` `settings-network-metered-yes`, `settings-network-metered-no`: "Laskutettava", "Ei laskutettava" — shortened from "Käytön mukaan laskutettava"; check the options read clearly under the row title.
-- `apps/settings/locales/fi/connections.ftl` `settings-network-security-owe`: "Parannettu avoin" — no settled Finnish term for Enhanced Open (OWE); check against Windows and Android.
-- `apps/settings/locales/fi/connections.ftl` `settings-network-ip-ignore`: "Ei hallita" — check it reads naturally as a picker option.
-- `apps/settings/locales/fi/connections.ftl` `settings-bluetooth-request-confirm`: "Muodostetaanko pariliitos: { $name }?" — with the unnamed fallback this reads "…: laite?"; check it's acceptable.
-- `apps/settings/locales/fi/connections.ftl` `settings-bluetooth-request-display`: the description leaves out { $name } ("Kirjoita tämä koodi laitteella ja paina sitten Enter.") because the title already names the device and no inflected form fits the unnamed fallback.
-- `apps/settings/locales/fi/system.ftl` `settings-accounts-online`: "Jokaisesta tilistä tulee kansio Cloudiin, ja tiedostot ladat…" — assumes the folder is named Cloud on disk; check.
-- `apps/settings/locales/fi/devices.ftl` `settings-sound-output`, `settings-sound-input`: "Ulostulo", "Sisääntulo" — GNOME's words, also used in quick settings; Windows 11 may use others.
-- `apps/settings/locales/fi/devices.ftl` `settings-power-charging-until-full`: "Latautuu, aikaa täyteen { $time }" — built so the duration stays in the nominative; check "alle minuutin" reads well here and in "Noin { $time } jäljellä".
-- `apps/settings/locales/fi/devices.ftl` `settings-power-screen-off`: "Näytön sammutus" — a noun label instead of "Turn off the screen after", with durations as options; check it reads well with "Ei koskaan".
-- `apps/settings/locales/fi/devices.ftl` `settings-keys-keypad`: "Num { $key }" — check what Finnish keyboards and Windows call number pad keys.
-- `apps/settings/locales/fi/devices.ftl` `settings-keys-eject`: "Poista levy" — check against the usual Finnish name of the eject key.
-- `apps/settings/locales/fi/personalization.ftl` `settings-fonts-sample`: "Viekas kettu punaturkki laiskan koiran takaa kurkki" — the familiar Finnish counterpart of the English sample, but it has no ä or ö; check whether a sample with them is preferred.
-- `apps/settings/locales/fi/personalization.ftl` `settings-appearance-wallpaper-span`: "Laajenna näyttöjen yli" — Windows says just "Laajenna"; check it reads well as a fit option.
-- `apps/settings/locales/fi/personalization.ftl` `settings-taskbar-look-solid`: "Peittävä" — opaque taskbar background; "Kiinteä" is the alternative.
-- `apps/settings/locales/fi/personalization.ftl` `settings-appearance-tint-slate`: "Siniharmaa" — slate has no common Finnish color name.
-- `apps/settings/locales/fi/personalization.ftl` `settings-accessibility-bounce-keys`, `settings-accessibility-bounce-keys-delay`: "Toistuvien painallusten esto", "Toistuvien painallusten viive" — no settled Finnish term for bounce keys, and long for labels.
-- `apps/settings/locales/fi/personalization.ftl` `settings-accessibility-dwell-time`: "Pysäytysaika" — label before a duration slider; check it's understood as how long the pointer must rest.
-- `apps/settings/locales/fi/personalization.ftl` `settings-accessibility-typing-assist-count`: "Pois", "{ $count } päällä" — check the count reads naturally as a row summary.
-- `apps/settings/locales/fi/protection.ftl` `settings-privacy-screen-off-after`: "Kun { $duration } on kulunut" — built so the duration stays in the nominative; check it reads naturally with "1 minuutti" and "5 minuuttia".
-- `apps/settings/locales/fi/protection.ftl` `settings-passwords-history-signed`: "{ $app } allekirjoitti kohteella ”{ $item }”" — "kohteella" is vague; the item is normally a key.
-- `apps/settings/locales/fi/system.ftl` `settings-updates-switching-standard`: "Ladataan vakiokuvaa…" — the standard system image (without NVIDIA's driver); check it's clear.
-- `apps/settings/locales/fi/system.ftl` `settings-users-fingerprint-remove-description`: "Tämän jälkeen { $finger } ei enää kelpaa kirjautumiseen." — relies on the .inline finger name in the nominative.
+- `apps/system/settings/locales/fi/connections.ftl` `settings-network-metered-yes`, `settings-network-metered-no`: "Laskutettava", "Ei laskutettava" — shortened from "Käytön mukaan laskutettava"; check the options read clearly under the row title.
+- `apps/system/settings/locales/fi/connections.ftl` `settings-network-security-owe`: "Parannettu avoin" — no settled Finnish term for Enhanced Open (OWE); check against Windows and Android.
+- `apps/system/settings/locales/fi/connections.ftl` `settings-network-ip-ignore`: "Ei hallita" — check it reads naturally as a picker option.
+- `apps/system/settings/locales/fi/connections.ftl` `settings-bluetooth-request-confirm`: "Muodostetaanko pariliitos: { $name }?" — with the unnamed fallback this reads "…: laite?"; check it's acceptable.
+- `apps/system/settings/locales/fi/connections.ftl` `settings-bluetooth-request-display`: the description leaves out { $name } ("Kirjoita tämä koodi laitteella ja paina sitten Enter.") because the title already names the device and no inflected form fits the unnamed fallback.
+- `apps/system/settings/locales/fi/system.ftl` `settings-accounts-online`: "Jokaisesta tilistä tulee kansio Cloudiin, ja tiedostot ladat…" — assumes the folder is named Cloud on disk; check.
+- `apps/system/settings/locales/fi/devices.ftl` `settings-sound-output`, `settings-sound-input`: "Ulostulo", "Sisääntulo" — GNOME's words, also used in quick settings; Windows 11 may use others.
+- `apps/system/settings/locales/fi/devices.ftl` `settings-power-charging-until-full`: "Latautuu, aikaa täyteen { $time }" — built so the duration stays in the nominative; check "alle minuutin" reads well here and in "Noin { $time } jäljellä".
+- `apps/system/settings/locales/fi/devices.ftl` `settings-power-screen-off`: "Näytön sammutus" — a noun label instead of "Turn off the screen after", with durations as options; check it reads well with "Ei koskaan".
+- `apps/system/settings/locales/fi/devices.ftl` `settings-keys-keypad`: "Num { $key }" — check what Finnish keyboards and Windows call number pad keys.
+- `apps/system/settings/locales/fi/devices.ftl` `settings-keys-eject`: "Poista levy" — check against the usual Finnish name of the eject key.
+- `apps/system/settings/locales/fi/personalization.ftl` `settings-fonts-sample`: "Viekas kettu punaturkki laiskan koiran takaa kurkki" — the familiar Finnish counterpart of the English sample, but it has no ä or ö; check whether a sample with them is preferred.
+- `apps/system/settings/locales/fi/personalization.ftl` `settings-appearance-wallpaper-span`: "Laajenna näyttöjen yli" — Windows says just "Laajenna"; check it reads well as a fit option.
+- `apps/system/settings/locales/fi/personalization.ftl` `settings-taskbar-look-solid`: "Peittävä" — opaque taskbar background; "Kiinteä" is the alternative.
+- `apps/system/settings/locales/fi/personalization.ftl` `settings-appearance-tint-slate`: "Siniharmaa" — slate has no common Finnish color name.
+- `apps/system/settings/locales/fi/personalization.ftl` `settings-accessibility-bounce-keys`, `settings-accessibility-bounce-keys-delay`: "Toistuvien painallusten esto", "Toistuvien painallusten viive" — no settled Finnish term for bounce keys, and long for labels.
+- `apps/system/settings/locales/fi/personalization.ftl` `settings-accessibility-dwell-time`: "Pysäytysaika" — label before a duration slider; check it's understood as how long the pointer must rest.
+- `apps/system/settings/locales/fi/personalization.ftl` `settings-accessibility-typing-assist-count`: "Pois", "{ $count } päällä" — check the count reads naturally as a row summary.
+- `apps/system/settings/locales/fi/protection.ftl` `settings-privacy-screen-off-after`: "Kun { $duration } on kulunut" — built so the duration stays in the nominative; check it reads naturally with "1 minuutti" and "5 minuuttia".
+- `apps/system/settings/locales/fi/protection.ftl` `settings-passwords-history-signed`: "{ $app } allekirjoitti kohteella ”{ $item }”" — "kohteella" is vague; the item is normally a key.
+- `apps/system/settings/locales/fi/system.ftl` `settings-updates-switching-standard`: "Ladataan vakiokuvaa…" — the standard system image (without NVIDIA's driver); check it's clear.
+- `apps/system/settings/locales/fi/system.ftl` `settings-users-fingerprint-remove-description`: "Tämän jälkeen { $finger } ei enää kelpaa kirjautumiseen." — relies on the .inline finger name in the nominative.
 
 ## Website
 
@@ -74,16 +74,16 @@ Strings in Luft's Finnish translation that a native speaker should check. Each i
 
 ## Meet Luft
 
-- `apps/meet/locales/fi/meet.ftl` `ready-remove-description`, `working-packing`: "muuttolaatikko" — the moving box; check it reads naturally as a name for the packed data.
-- `apps/meet/desktop/locales/fi/desktop.ftl` `check-start-entries`, `problem-tidy`: "käynnistysmerkintä" — no settled Finnish term for a firmware boot entry.
-- `apps/meet/desktop/locales/fi/desktop.ftl` `check-space-short-windows`: "Levyn puhdistuksella" — Disk Cleanup's Finnish name from memory; check against current Windows.
-- `apps/meet/locales/fi/meet.ftl` `stick-none`, `stick-erase-description`: "vähintään { $size }:n USB-tikku" — genitive ending added after the size placeable ("4 Gt:n"); check it reads well.
-- `apps/meet/desktop/locales/fi/desktop.ftl` `check-secure-boot-turn-on`: "painamalla { $key }, kun valmistajan { $maker } logo tulee näkyviin" — the volume-up key name is written in the partitive to fit; check the sentence with both key forms.
-- `apps/meet/locales/fi/meet.ftl` `problem-check`, `hello-check`: Windows variants say "PC", Linux "tietokone", following the English; Finnish Windows mostly says "tietokone", so both could be the same.
-- `apps/meet/locales/fi/meet.ftl` `room-place-whole-detail`, `room-erase-description`, `room-erase-empty`: "tämän { $size }:n levyn" — genitive ending added after the size placeable, as on the stick screens; check it reads well with every unit.
-- `apps/meet/locales/fi/meet.ftl` `luft-title`: "Luftisi" — possessive suffix on the name; check it doesn't feel odd as a page title, against "Oma Luft".
-- `apps/meet/locales/fi/meet.ftl` `luft-resize-title`: "Muuta Luftin kokoa" — shorter than the English "Change how much space Luft has"; check it is clear that it's about disk space.
+- `apps/store/meet/locales/fi/meet.ftl` `ready-remove-description`, `working-packing`: "muuttolaatikko" — the moving box; check it reads naturally as a name for the packed data.
+- `apps/store/meet/desktop/locales/fi/desktop.ftl` `check-start-entries`, `problem-tidy`: "käynnistysmerkintä" — no settled Finnish term for a firmware boot entry.
+- `apps/store/meet/desktop/locales/fi/desktop.ftl` `check-space-short-windows`: "Levyn puhdistuksella" — Disk Cleanup's Finnish name from memory; check against current Windows.
+- `apps/store/meet/locales/fi/meet.ftl` `stick-none`, `stick-erase-description`: "vähintään { $size }:n USB-tikku" — genitive ending added after the size placeable ("4 Gt:n"); check it reads well.
+- `apps/store/meet/desktop/locales/fi/desktop.ftl` `check-secure-boot-turn-on`: "painamalla { $key }, kun valmistajan { $maker } logo tulee näkyviin" — the volume-up key name is written in the partitive to fit; check the sentence with both key forms.
+- `apps/store/meet/locales/fi/meet.ftl` `problem-check`, `hello-check`: Windows variants say "PC", Linux "tietokone", following the English; Finnish Windows mostly says "tietokone", so both could be the same.
+- `apps/store/meet/locales/fi/meet.ftl` `room-place-whole-detail`, `room-erase-description`, `room-erase-empty`: "tämän { $size }:n levyn" — genitive ending added after the size placeable, as on the stick screens; check it reads well with every unit.
+- `apps/store/meet/locales/fi/meet.ftl` `luft-title`: "Luftisi" — possessive suffix on the name; check it doesn't feel odd as a page title, against "Oma Luft".
+- `apps/store/meet/locales/fi/meet.ftl` `luft-resize-title`: "Muuta Luftin kokoa" — shorter than the English "Change how much space Luft has"; check it is clear that it's about disk space.
 
 ## Install Luft
 
-- `apps/setup/locales/fi/setup.ftl` `setup-destination-meet-drive-choice-description`, `setup-confirm-meet-drive-title`: "levylle { $drive }" — the drive name stands uninflected after "levylle"; check it reads naturally with names like "Samsung SSD 980".
+- `apps/system/setup/locales/fi/setup.ftl` `setup-destination-meet-drive-choice-description`, `setup-confirm-meet-drive-title`: "levylle { $drive }" — the drive name stands uninflected after "levylle"; check it reads naturally with names like "Samsung SSD 980".

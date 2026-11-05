@@ -23,10 +23,10 @@ Strings in Luft's Icelandic translation that a native speaker should check: term
 
 ## Kestrel and setup
 
-- `apps/setup/locales/is/setup.ftl` `setup-region-title`: "Velkomin í Luft" — uses the common gender-neutral signage form instead of "Velkomin(n)"; confirm this reads well.
-- `apps/setup/locales/is/setup.ftl` `setup-region-intro-guessed`: "Byrjum. Við giskuðum á { $guesses }, svo breyttu því sem passar ekki." — $guesses is built from "{ $fields } út frá tölvunni/netinu" joined by "og"; check the assembled sentence reads naturally.
-- `apps/setup/locales/is/setup.ftl` `setup-protect-passphrase-label`: "Lykilsetning" — used for passphrase everywhere, also in Settings, to keep it apart from "lykilorð"; check it is the term Icelandic users know.
-- `apps/setup/locales/is/setup.ftl` `setup-windows-hibernated`: "flýtiræsingu" and `setup-windows-bitlocker` "Diskastjórnun" — assumed Icelandic Windows names for Fast Startup and Disk Management; verify.
+- `apps/system/setup/locales/is/setup.ftl` `setup-region-title`: "Velkomin í Luft" — uses the common gender-neutral signage form instead of "Velkomin(n)"; confirm this reads well.
+- `apps/system/setup/locales/is/setup.ftl` `setup-region-intro-guessed`: "Byrjum. Við giskuðum á { $guesses }, svo breyttu því sem passar ekki." — $guesses is built from "{ $fields } út frá tölvunni/netinu" joined by "og"; check the assembled sentence reads naturally.
+- `apps/system/setup/locales/is/setup.ftl` `setup-protect-passphrase-label`: "Lykilsetning" — used for passphrase everywhere, also in Settings, to keep it apart from "lykilorð"; check it is the term Icelandic users know.
+- `apps/system/setup/locales/is/setup.ftl` `setup-windows-hibernated`: "flýtiræsingu" and `setup-windows-bitlocker` "Diskastjórnun" — assumed Icelandic Windows names for Fast Startup and Disk Management; verify.
 - `kestrel/ui/locales/is/portal.ftl` `portal-unknown-app-object`: "forritinu" — every sentence that puts it in object position was written to take the dative (Leyfa …, með …, frá …, úr …, í …); check any sentence where the app name sits mid-sentence as subject.
 - `kestrel/ui/locales/is/portal.ftl` `shortcuts-record-title`: "Flýtilyklar í { $appName }" — "í" so the dative works with the unknown-app fallback; "fyrir" would be more natural but needs the accusative.
 - `kestrel/ui/locales/is/desktop.ftl` `window-menu-close`, `portal.ftl` `usb-title`/`usb-description`, `setup.ftl` `setup-replace-keeps-accounts`: English singular variants without the number became exact [1] variants, since Icelandic [one] also covers 21, 31 ….
@@ -39,28 +39,28 @@ Strings in Luft's Icelandic translation that a native speaker should check: term
 
 ## Settings
 
-- `apps/settings/locales/is/devices.ftl` `settings-power-duration-minutes`: "{ $minutes } mínútu" — durations are in the accusative so they fit „eftir { $time }“, „Um { $time } eftir“ and the pickers after „Slökkva á skjánum eftir“; check every use reads well.
-- `apps/settings/locales/is/devices.ftl` `settings-dictation-copilot-key`: "Copilot-lyklinum" — dative, because it fills „Haltu { $keys } inni“; check the joined list „Super+Alt eða Copilot-lyklinum“.
-- `apps/settings/locales/is/devices.ftl` `settings-dictation-engine-description`: "Talgreining með { $engine } – { $language }" — rebuilt so the language name's case doesn't matter.
-- `apps/settings/locales/is/devices.ftl` `settings-display-orientation-portrait-right`: "Skammsnið, hægri" — langsnið/skammsnið for landscape/portrait; check against what Windows uses in Icelandic.
-- `apps/settings/locales/is/devices.ftl` `settings-display-scale`: "Kvarði" — Windows' word; „Stærð“ may be clearer.
-- `apps/settings/locales/is/connections.ftl` `settings-network-security-owe`: "Aukið opið" — no settled Icelandic term for Enhanced Open (OWE).
-- `apps/settings/locales/is/connections.ftl` `settings-network-security-enterprise`: "Fyrirtæki" — WPA Enterprise; might read better as „Fyrirtækjanet“.
-- `apps/settings/locales/is/connections.ftl` `settings-network-ip-link-local`: "Aðeins staðbundin vistföng (link-local)" — no settled term.
-- `apps/settings/locales/is/connections.ftl` `settings-network-wireguard-keepalive`: "Viðhaldsboð" — no settled term for keepalive.
-- `apps/settings/locales/is/system.ftl` `settings-accounts-approve`: "…notar Advanced Data Protection…" — Apple has no Icelandic name for it, kept in English.
-- `apps/settings/locales/is/connections.ftl` `settings-bluetooth-request-display`: "Sláðu þennan kóða inn á tækinu og ýttu svo á Enter." — leaves out { $name } because „á“ needs the dative and the unnamed fallback „tækið“ is nominative/accusative.
-- `apps/settings/locales/is/protection.ftl` `settings-encryption-pin-field`: "PIN-númer" — used throughout, as Windows does; check it isn't too long in the PIN dialog rows and buttons („Bæta við PIN-númeri við ræsingu“).
-- `apps/settings/locales/is/protection.ftl` `settings-security-anti-cheat`: "Leikir með svindlvörn" — no settled Icelandic term for anti-cheat; „svindlvörn“ is a coinage.
-- `apps/settings/locales/is/protection.ftl` `settings-passwords-ssh-copy`: "Afrita dreifilykil { $name }" — check it reads naturally with a key name after it.
-- `apps/settings/locales/is/protection.ftl` `settings-passwords-history-all`: "Sýna öll { $count }" — neuter „öll“ assumes the items are atvik/lykilorð; check against the list it expands.
-- `apps/settings/locales/is/personalization.ftl` `settings-accessibility-typing-assist-count`: "{ $count } virk / virkar" — agreement is loose (it counts the typing assists); another phrasing may read better.
-- `apps/settings/locales/is/personalization.ftl` `settings-appearance-wallpaper-folder-description`: "Myndir › Wallpapers" — the folder itself is named Wallpapers in every language; check the Pictures folder shows as „Myndir“ on Icelandic systems.
-- `apps/settings/locales/is/personalization.ftl` `settings-accessibility-dwell-time`: "Halda kyrru í" — label before a duration slider; check it reads well with the slider value.
-- `apps/settings/locales/is/system.ftl` `settings-datetime-week-start-regional`: "{ $day }, samkvæmt svæðinu þínu" — assumes $day is the nominative weekday name.
-- `apps/settings/locales/is/system.ftl` `settings-users-fingerprint-remove-description`: "Þú getur ekki lengur notað { $finger } til að skrá þig inn." — relies on the accusative .inline finger forms from ui.ftl.
-- `apps/settings/locales/is/system.ftl` `settings-about-other-system`: "Fjarlægðu það til að gefa Luft plássið, { $size }" — reworded around the size placeable; check it reads naturally.
-- `apps/settings/locales/is/system.ftl` `settings-about-mount-internal`: "Tengja" — chosen for mount; check it isn't confused with connecting a device.
+- `apps/system/settings/locales/is/devices.ftl` `settings-power-duration-minutes`: "{ $minutes } mínútu" — durations are in the accusative so they fit „eftir { $time }“, „Um { $time } eftir“ and the pickers after „Slökkva á skjánum eftir“; check every use reads well.
+- `apps/system/settings/locales/is/devices.ftl` `settings-dictation-copilot-key`: "Copilot-lyklinum" — dative, because it fills „Haltu { $keys } inni“; check the joined list „Super+Alt eða Copilot-lyklinum“.
+- `apps/system/settings/locales/is/devices.ftl` `settings-dictation-engine-description`: "Talgreining með { $engine } – { $language }" — rebuilt so the language name's case doesn't matter.
+- `apps/system/settings/locales/is/devices.ftl` `settings-display-orientation-portrait-right`: "Skammsnið, hægri" — langsnið/skammsnið for landscape/portrait; check against what Windows uses in Icelandic.
+- `apps/system/settings/locales/is/devices.ftl` `settings-display-scale`: "Kvarði" — Windows' word; „Stærð“ may be clearer.
+- `apps/system/settings/locales/is/connections.ftl` `settings-network-security-owe`: "Aukið opið" — no settled Icelandic term for Enhanced Open (OWE).
+- `apps/system/settings/locales/is/connections.ftl` `settings-network-security-enterprise`: "Fyrirtæki" — WPA Enterprise; might read better as „Fyrirtækjanet“.
+- `apps/system/settings/locales/is/connections.ftl` `settings-network-ip-link-local`: "Aðeins staðbundin vistföng (link-local)" — no settled term.
+- `apps/system/settings/locales/is/connections.ftl` `settings-network-wireguard-keepalive`: "Viðhaldsboð" — no settled term for keepalive.
+- `apps/system/settings/locales/is/system.ftl` `settings-accounts-approve`: "…notar Advanced Data Protection…" — Apple has no Icelandic name for it, kept in English.
+- `apps/system/settings/locales/is/connections.ftl` `settings-bluetooth-request-display`: "Sláðu þennan kóða inn á tækinu og ýttu svo á Enter." — leaves out { $name } because „á“ needs the dative and the unnamed fallback „tækið“ is nominative/accusative.
+- `apps/system/settings/locales/is/protection.ftl` `settings-encryption-pin-field`: "PIN-númer" — used throughout, as Windows does; check it isn't too long in the PIN dialog rows and buttons („Bæta við PIN-númeri við ræsingu“).
+- `apps/system/settings/locales/is/protection.ftl` `settings-security-anti-cheat`: "Leikir með svindlvörn" — no settled Icelandic term for anti-cheat; „svindlvörn“ is a coinage.
+- `apps/system/settings/locales/is/protection.ftl` `settings-passwords-ssh-copy`: "Afrita dreifilykil { $name }" — check it reads naturally with a key name after it.
+- `apps/system/settings/locales/is/protection.ftl` `settings-passwords-history-all`: "Sýna öll { $count }" — neuter „öll“ assumes the items are atvik/lykilorð; check against the list it expands.
+- `apps/system/settings/locales/is/personalization.ftl` `settings-accessibility-typing-assist-count`: "{ $count } virk / virkar" — agreement is loose (it counts the typing assists); another phrasing may read better.
+- `apps/system/settings/locales/is/personalization.ftl` `settings-appearance-wallpaper-folder-description`: "Myndir › Wallpapers" — the folder itself is named Wallpapers in every language; check the Pictures folder shows as „Myndir“ on Icelandic systems.
+- `apps/system/settings/locales/is/personalization.ftl` `settings-accessibility-dwell-time`: "Halda kyrru í" — label before a duration slider; check it reads well with the slider value.
+- `apps/system/settings/locales/is/system.ftl` `settings-datetime-week-start-regional`: "{ $day }, samkvæmt svæðinu þínu" — assumes $day is the nominative weekday name.
+- `apps/system/settings/locales/is/system.ftl` `settings-users-fingerprint-remove-description`: "Þú getur ekki lengur notað { $finger } til að skrá þig inn." — relies on the accusative .inline finger forms from ui.ftl.
+- `apps/system/settings/locales/is/system.ftl` `settings-about-other-system`: "Fjarlægðu það til að gefa Luft plássið, { $size }" — reworded around the size placeable; check it reads naturally.
+- `apps/system/settings/locales/is/system.ftl` `settings-about-mount-internal`: "Tengja" — chosen for mount; check it isn't confused with connecting a device.
 
 ## Website
 
@@ -71,16 +71,16 @@ Strings in Luft's Icelandic translation that a native speaker should check: term
 
 ## Meet Luft
 
-- `apps/meet/locales/is/meet.ftl` `ready-remove-description`: "flutningakassanum" — the moving box; no settled term.
-- `apps/meet/locales/is/meet.ftl` `meet-logs-saved`: "Atvikaskrár úr prufukeyrslu Luft…" — "Try Luft" as „prufukeyrsla”, and logs as „atvikaskrár”; check both.
-- `apps/meet/locales/is/meet.ftl` `problem-declined`: "Veldu Já þegar Windows spyr." — assumes the UAC button in the Icelandic language pack is „Já”.
-- `apps/meet/desktop/locales/is/desktop.ftl` `check-fast-startup-on`: "Kveikt er á flýtiræsingu" — „flýtiræsing” as in Setup; couldn't verify Windows' Icelandic name for Fast Startup, nor „Diskhreinsun” for Disk Cleanup and „Dulritun tækis” for Device encryption.
-- `apps/meet/desktop/locales/is/desktop.ftl` `helper-not-started`: "Hjálparforrit Meet Luft…" — "helper" as „hjálparforrit”.
-- `apps/meet/desktop/locales/is/desktop.ftl` `drive-volume-missing`: "Gagnasvæðið { $path }…" — "volume" as „gagnasvæði”; no settled term.
-- `apps/meet/locales/is/meet.ftl` `luft-title`: "Luft hjá þér" — "Your Luft" reworded because Luft isn't inflected; check it works as a screen title.
-- `apps/meet/locales/is/meet.ftl` `room-place-whole`: "Allur diskurinn { $drive }" — "diskurinn" put first so the drive name stays uninflected; check it reads well with names like "Samsung SSD 990 PRO".
-- `apps/meet/locales/is/meet.ftl` `room-place-windows-free`: "Þar eru { $size } þegar laus" — plural agreement assumes a size like "40 GB"; check it reads right with any size.
+- `apps/store/meet/locales/is/meet.ftl` `ready-remove-description`: "flutningakassanum" — the moving box; no settled term.
+- `apps/store/meet/locales/is/meet.ftl` `meet-logs-saved`: "Atvikaskrár úr prufukeyrslu Luft…" — "Try Luft" as „prufukeyrsla”, and logs as „atvikaskrár”; check both.
+- `apps/store/meet/locales/is/meet.ftl` `problem-declined`: "Veldu Já þegar Windows spyr." — assumes the UAC button in the Icelandic language pack is „Já”.
+- `apps/store/meet/desktop/locales/is/desktop.ftl` `check-fast-startup-on`: "Kveikt er á flýtiræsingu" — „flýtiræsing” as in Setup; couldn't verify Windows' Icelandic name for Fast Startup, nor „Diskhreinsun” for Disk Cleanup and „Dulritun tækis” for Device encryption.
+- `apps/store/meet/desktop/locales/is/desktop.ftl` `helper-not-started`: "Hjálparforrit Meet Luft…" — "helper" as „hjálparforrit”.
+- `apps/store/meet/desktop/locales/is/desktop.ftl` `drive-volume-missing`: "Gagnasvæðið { $path }…" — "volume" as „gagnasvæði”; no settled term.
+- `apps/store/meet/locales/is/meet.ftl` `luft-title`: "Luft hjá þér" — "Your Luft" reworded because Luft isn't inflected; check it works as a screen title.
+- `apps/store/meet/locales/is/meet.ftl` `room-place-whole`: "Allur diskurinn { $drive }" — "diskurinn" put first so the drive name stays uninflected; check it reads well with names like "Samsung SSD 990 PRO".
+- `apps/store/meet/locales/is/meet.ftl` `room-place-windows-free`: "Þar eru { $size } þegar laus" — plural agreement assumes a size like "40 GB"; check it reads right with any size.
 
 ## Install Luft
 
-- `apps/setup/locales/is/setup.ftl` `setup-destination-meet-drive-description`: "Luft ræsist þaðan með eigin ræsiskrám" — check "ræsist" reads as the system starting from that drive.
+- `apps/system/setup/locales/is/setup.ftl` `setup-destination-meet-drive-description`: "Luft ræsist þaðan með eigin ræsiskrám" — check "ræsist" reads as the system starting from that drive.

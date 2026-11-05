@@ -33,33 +33,33 @@ Strings in Luft's Bulgarian translation that a native speaker should check. Each
 - `kestrel/ui/locales/bg/surfaces.ftl` `quick-settings-battery-left`: "Остават { $duration }" — plural verb assumed for formatted spans like "1 ч 20 мин"; reads oddly with a single "1 ч".
 - `kestrel/ui/locales/bg/portal.ftl` `portal-unknown-app-subject`: "Приложението" — app names in portal sentences have no "приложението" prefix because this fallback fills the same slot; check sentences like "{ $appName } ще вижда…" read well with both.
 - `kestrel/ui/locales/bg/portal.ftl` `print-orientation-portrait`: "Портретна" / "Пейзажна" — check against what Bulgarian print dialogs use (some say "Книжна"/"Албумна").
-- `apps/setup/locales/bg/setup.ftl` `setup-region-intro-guessed`: "Да започнем с настройката. Определихме { $guesses }, затова променете каквото не е вярно." — guesses expand to "езика и клавиатурата по компютъра ви и часовата зона по мрежата ви"; check the joined sentence.
-- `apps/setup/locales/bg/setup.ftl` `setup-account-user-name-invalid`: "Използвайте малки латински букви, цифри, - и _" — added "латински", assuming user names are ASCII only.
-- `apps/setup/locales/bg/setup.ftl` `setup-windows-hibernated`: "…изключен с Бързо стартиране…" — Fast Startup and Disk Management (Управление на дискове) named as Bulgarian Windows does; verify.
+- `apps/system/setup/locales/bg/setup.ftl` `setup-region-intro-guessed`: "Да започнем с настройката. Определихме { $guesses }, затова променете каквото не е вярно." — guesses expand to "езика и клавиатурата по компютъра ви и часовата зона по мрежата ви"; check the joined sentence.
+- `apps/system/setup/locales/bg/setup.ftl` `setup-account-user-name-invalid`: "Използвайте малки латински букви, цифри, - и _" — added "латински", assuming user names are ASCII only.
+- `apps/system/setup/locales/bg/setup.ftl` `setup-windows-hibernated`: "…изключен с Бързо стартиране…" — Fast Startup and Disk Management (Управление на дискове) named as Bulgarian Windows does; verify.
 - `kestrel/ui/locales/bg/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 
-- `apps/settings/locales/bg/connections.ftl` `settings-network-security`, `settings-network-detail-security`: "Защита", "Вид защита" — Wi‑Fi security uses защита as in Windows, not the glossary's сигурност (which stays for the Security page); confirm.
-- `apps/settings/locales/bg/connections.ftl` `settings-network-security-owe`: "Подобрена отворена" — no settled Bulgarian name for Enhanced Open (OWE); check whether keeping the English name is better.
-- `apps/settings/locales/bg/connections.ftl` `settings-network-ip-link-local`: "Само локална връзка" — GNOME-style rendering of link-local; check it is recognizable.
-- `apps/settings/locales/bg/connections.ftl` `settings-network-ip-search-domains` `.label`: "{ $family } домейни за търсене" — Windows-style prefix order, unlike the "Метод за { $family }" pattern used for the other labels.
-- `apps/settings/locales/bg/system.ftl` `settings-accounts-online`: "Всеки акаунт става папка в Cloud, а файловете се изтеглят, к…" — assumes the folder is literally named Cloud on disk; confirm.
-- `apps/settings/locales/bg/connections.ftl` `settings-bluetooth-windows`: "В Windows е сдвоено: { $devices }…" — rephrased with a colon so device names of any gender fit.
-- `apps/settings/locales/bg/system.ftl` `settings-accounts-provider-icloud`: "акаунт в Apple" — follows Apple's Bulgarian wording for Apple Account; confirm.
-- `apps/settings/locales/bg/devices.ftl` `settings-sound-mute`: "{ $name }: изключи звука" — colon form because $name can be "Сила на звука" or an app name.
-- `apps/settings/locales/bg/devices.ftl` `settings-sound-connection`: "Връзка" — the device port (speakers vs headphones); check whether "Порт" or "Изход" reads better.
-- `apps/settings/locales/bg/devices.ftl` `settings-keys-keypad`: "Num { $key }" — short label for number-pad keys; check against what Bulgarian users expect.
-- `apps/settings/locales/bg/devices.ftl` `settings-dictation-engine-description`: "{ $engine } разпознава { $language }" — assumes language names arrive lowercase, as Bulgarian writes them.
-- `apps/settings/locales/bg/devices.ftl` `settings-shortcuts-add`: "Добави комбинация" — shared by a dialog title and a button, so the imperative is used for both.
-- `apps/settings/locales/bg/protection.ftl` `settings-passwords-stores-count`: "{ $count } запазен вход / запазени входа" — "sign-ins" as a countable noun is awkward in Bulgarian; check whether another phrasing fits better.
-- `apps/settings/locales/bg/personalization.ftl` `settings-accessibility-typing-assist-count`: "{ $count } включена / включени" — the counted noun (помощна функция) is implied; check it reads well next to the row title "Помощ при писане".
-- `apps/settings/locales/bg/personalization.ftl` `settings-appearance-theme-apps`: "Цветове от тапета и за другите приложения" — free rendering of "Match other apps to the wallpaper"; check it is clear as a switch title.
-- `apps/settings/locales/bg/personalization.ftl` `settings-appearance-icons-clear`: "Прозрачни" — assumes "Clear" means glass-like transparent icons, not "remove".
-- `apps/settings/locales/bg/protection.ftl` `settings-security-anti-cheat`: "Игри със защита срещу измами" — anti-cheat has no settled Bulgarian term; gamers may simply say "анти-чийт".
-- `apps/settings/locales/bg/system.ftl` `settings-datetime-increase`: "Увеличи: { $label }" — colon used so the case of Час/Минута doesn't matter.
+- `apps/system/settings/locales/bg/connections.ftl` `settings-network-security`, `settings-network-detail-security`: "Защита", "Вид защита" — Wi‑Fi security uses защита as in Windows, not the glossary's сигурност (which stays for the Security page); confirm.
+- `apps/system/settings/locales/bg/connections.ftl` `settings-network-security-owe`: "Подобрена отворена" — no settled Bulgarian name for Enhanced Open (OWE); check whether keeping the English name is better.
+- `apps/system/settings/locales/bg/connections.ftl` `settings-network-ip-link-local`: "Само локална връзка" — GNOME-style rendering of link-local; check it is recognizable.
+- `apps/system/settings/locales/bg/connections.ftl` `settings-network-ip-search-domains` `.label`: "{ $family } домейни за търсене" — Windows-style prefix order, unlike the "Метод за { $family }" pattern used for the other labels.
+- `apps/system/settings/locales/bg/system.ftl` `settings-accounts-online`: "Всеки акаунт става папка в Cloud, а файловете се изтеглят, к…" — assumes the folder is literally named Cloud on disk; confirm.
+- `apps/system/settings/locales/bg/connections.ftl` `settings-bluetooth-windows`: "В Windows е сдвоено: { $devices }…" — rephrased with a colon so device names of any gender fit.
+- `apps/system/settings/locales/bg/system.ftl` `settings-accounts-provider-icloud`: "акаунт в Apple" — follows Apple's Bulgarian wording for Apple Account; confirm.
+- `apps/system/settings/locales/bg/devices.ftl` `settings-sound-mute`: "{ $name }: изключи звука" — colon form because $name can be "Сила на звука" or an app name.
+- `apps/system/settings/locales/bg/devices.ftl` `settings-sound-connection`: "Връзка" — the device port (speakers vs headphones); check whether "Порт" or "Изход" reads better.
+- `apps/system/settings/locales/bg/devices.ftl` `settings-keys-keypad`: "Num { $key }" — short label for number-pad keys; check against what Bulgarian users expect.
+- `apps/system/settings/locales/bg/devices.ftl` `settings-dictation-engine-description`: "{ $engine } разпознава { $language }" — assumes language names arrive lowercase, as Bulgarian writes them.
+- `apps/system/settings/locales/bg/devices.ftl` `settings-shortcuts-add`: "Добави комбинация" — shared by a dialog title and a button, so the imperative is used for both.
+- `apps/system/settings/locales/bg/protection.ftl` `settings-passwords-stores-count`: "{ $count } запазен вход / запазени входа" — "sign-ins" as a countable noun is awkward in Bulgarian; check whether another phrasing fits better.
+- `apps/system/settings/locales/bg/personalization.ftl` `settings-accessibility-typing-assist-count`: "{ $count } включена / включени" — the counted noun (помощна функция) is implied; check it reads well next to the row title "Помощ при писане".
+- `apps/system/settings/locales/bg/personalization.ftl` `settings-appearance-theme-apps`: "Цветове от тапета и за другите приложения" — free rendering of "Match other apps to the wallpaper"; check it is clear as a switch title.
+- `apps/system/settings/locales/bg/personalization.ftl` `settings-appearance-icons-clear`: "Прозрачни" — assumes "Clear" means glass-like transparent icons, not "remove".
+- `apps/system/settings/locales/bg/protection.ftl` `settings-security-anti-cheat`: "Игри със защита срещу измами" — anti-cheat has no settled Bulgarian term; gamers may simply say "анти-чийт".
+- `apps/system/settings/locales/bg/system.ftl` `settings-datetime-increase`: "Увеличи: { $label }" — colon used so the case of Час/Минута doesn't matter.
 - `packages/web/ui/locales/bg/ui.ftl` `ui-passphrase-field`: "Парола за диска" — used for passphrase in Settings and in setup, to keep it apart from the account password; check it reads naturally everywhere.
-- `apps/settings/locales/bg/personalization.ftl` `settings-appearance-wallpaper-folder-description`: "Снимки › Wallpapers" — "Снимки" is used for the Pictures folder throughout; check it matches the folder name Bulgarian systems actually create (some use "Изображения").
+- `apps/system/settings/locales/bg/personalization.ftl` `settings-appearance-wallpaper-folder-description`: "Снимки › Wallpapers" — "Снимки" is used for the Pictures folder throughout; check it matches the folder name Bulgarian systems actually create (some use "Изображения").
 
 ## Website
 
@@ -70,14 +70,14 @@ Strings in Luft's Bulgarian translation that a native speaker should check. Each
 
 ## Meet Luft
 
-- `apps/meet/locales/bg/meet.ftl` `meet-logs-saved`: "Журналите от пробването на Luft…" — logs as "журнали"; Windows says "регистрационни файлове" and many people say "логове".
-- `apps/meet/locales/bg/meet.ftl` `ready-remove-description`: "кашона за преместване" — the moving box; check it reads as a container for packed things and not too literally.
-- `apps/meet/locales/bg/meet.ftl` `box-pack`: "Опаковай" — pack/unpack as опаковам/разопаковам, while Setup says "Нещата, които събрахте"; check whether събирам fits better.
-- `apps/meet/locales/bg/meet.ftl` `hello-check`: "Провери този компютър" — PC and computer are both "компютър", as Bulgarian Windows says; the $platform variants are identical.
-- `apps/meet/locales/bg/meet.ftl` `linux-ready-restart-replace`: "Инсталаторът се отваря с { $system } като система за замяна" — phrased to avoid gender agreement with the system name.
-- `apps/meet/locales/bg/meet.ftl` `check-action-tidy`: "Разчисти" — tidying old start entries; check it's clear as a button.
-- `apps/meet/desktop/locales/bg/desktop.ftl` `check-secure-boot-turn-on`: "натиснете { $key }" — with `check-firmware-key-volume-up` as "бутона за увеличаване на звука"; check the sentence reads well with both a key name and the button.
-- `apps/meet/desktop/locales/bg/desktop.ftl` `check-fast-startup-on`: "Бързо стартиране е включено" — the setting's name is neuter by its sense (стартиране); confirm the agreement.
-- `apps/meet/locales/bg/meet.ftl` `room-places-title`: "Къде да се настани Luft?" — echoes „да се настани“ from check-blocked-description; check it doesn’t sound too figurative for choosing a drive.
-- `apps/meet/locales/bg/meet.ftl` `room-place-windows-free`: "Там вече има { $size } свободни" — plural agreement assumes sizes like „120 GB“.
-- `apps/meet/desktop/locales/bg/desktop.ftl` `helper-box-room-shortfall`: "Мястото на Luft може да отдели { $available } ГБ, а за избраното са нужни { $needed } ГБ." — "Luft’s room can spare" is the space already set aside for Luft; check that comes across.
+- `apps/store/meet/locales/bg/meet.ftl` `meet-logs-saved`: "Журналите от пробването на Luft…" — logs as "журнали"; Windows says "регистрационни файлове" and many people say "логове".
+- `apps/store/meet/locales/bg/meet.ftl` `ready-remove-description`: "кашона за преместване" — the moving box; check it reads as a container for packed things and not too literally.
+- `apps/store/meet/locales/bg/meet.ftl` `box-pack`: "Опаковай" — pack/unpack as опаковам/разопаковам, while Setup says "Нещата, които събрахте"; check whether събирам fits better.
+- `apps/store/meet/locales/bg/meet.ftl` `hello-check`: "Провери този компютър" — PC and computer are both "компютър", as Bulgarian Windows says; the $platform variants are identical.
+- `apps/store/meet/locales/bg/meet.ftl` `linux-ready-restart-replace`: "Инсталаторът се отваря с { $system } като система за замяна" — phrased to avoid gender agreement with the system name.
+- `apps/store/meet/locales/bg/meet.ftl` `check-action-tidy`: "Разчисти" — tidying old start entries; check it's clear as a button.
+- `apps/store/meet/desktop/locales/bg/desktop.ftl` `check-secure-boot-turn-on`: "натиснете { $key }" — with `check-firmware-key-volume-up` as "бутона за увеличаване на звука"; check the sentence reads well with both a key name and the button.
+- `apps/store/meet/desktop/locales/bg/desktop.ftl` `check-fast-startup-on`: "Бързо стартиране е включено" — the setting's name is neuter by its sense (стартиране); confirm the agreement.
+- `apps/store/meet/locales/bg/meet.ftl` `room-places-title`: "Къде да се настани Luft?" — echoes „да се настани“ from check-blocked-description; check it doesn’t sound too figurative for choosing a drive.
+- `apps/store/meet/locales/bg/meet.ftl` `room-place-windows-free`: "Там вече има { $size } свободни" — plural agreement assumes sizes like „120 GB“.
+- `apps/store/meet/desktop/locales/bg/desktop.ftl` `helper-box-room-shortfall`: "Мястото на Luft може да отдели { $available } ГБ, а за избраното са нужни { $needed } ГБ." — "Luft’s room can spare" is the space already set aside for Luft; check that comes across.

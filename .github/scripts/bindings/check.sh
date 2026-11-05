@@ -13,7 +13,7 @@ check() {
   SABINE_BINDINGS="$PWD/$bindings" SABINE_BINDINGS_CHECK=1 cargo run --locked --quiet -p "$package" "$@" || status=1
 }
 
-for manifest in apps/*/Sabine.toml; do
+for manifest in apps/*/*/Sabine.toml; do
   app="$(dirname "$manifest")"
   bindings="$(sed -n '/^\[bindings\]/,/^\[/s/^path = "\(.*\)"/\1/p' "$manifest")"
   [[ -n "$bindings" ]] || continue

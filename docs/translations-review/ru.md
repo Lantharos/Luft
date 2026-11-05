@@ -31,29 +31,29 @@ Strings in Luft's Russian translation that a native speaker should check, each l
 - `kestrel/ui/locales/ru/system.ftl` `oom-closed-body`: "…поэтому его пришлось закрыть…" — «его» covers both приложение and контейнер; check it reads clearly after either title.
 - `kestrel/ui/locales/ru/system.ftl` `screenshot-capture`: "Захватить" — shutter button for both screenshots and recordings; «Снять» could be an alternative.
 - `kestrel/ui/locales/ru/system.ftl` `network-menu-tethers`, `network-menu-tether`: "Модем через Bluetooth", "Модем" — no settled term for Bluetooth tethering.
-- `apps/setup/locales/ru/setup.ftl` `setup-region-intro-guessed`: "Начнём настройку. Определено автоматически: { $guesses }. Измените то, что не подходит." — the guess parts are nominative («язык и раскладка клавиатуры по данным компьютера»); check the joined list.
-- `apps/setup/locales/ru/setup.ftl` `setup-account-full-name-example`: "Софья Ковалевская" — a well-known Russian mathematician, the counterpart of Ada Lovelace; check it suits a name placeholder.
-- `apps/setup/locales/ru/setup.ftl` `setup-drive-has-windows`: "На диске { $windows }" — short subtitle under a drive name; check it reads well there.
-- `apps/setup/installer/locales/ru/installer.ftl` `installer-relabel-failed`: "Не удалось подготовить метки ваших файлов для Luft" — the source is about SELinux relabelling; wording may be vague.
+- `apps/system/setup/locales/ru/setup.ftl` `setup-region-intro-guessed`: "Начнём настройку. Определено автоматически: { $guesses }. Измените то, что не подходит." — the guess parts are nominative («язык и раскладка клавиатуры по данным компьютера»); check the joined list.
+- `apps/system/setup/locales/ru/setup.ftl` `setup-account-full-name-example`: "Софья Ковалевская" — a well-known Russian mathematician, the counterpart of Ada Lovelace; check it suits a name placeholder.
+- `apps/system/setup/locales/ru/setup.ftl` `setup-drive-has-windows`: "На диске { $windows }" — short subtitle under a drive name; check it reads well there.
+- `apps/system/setup/installer/locales/ru/installer.ftl` `installer-relabel-failed`: "Не удалось подготовить метки ваших файлов для Luft" — the source is about SELinux relabelling; wording may be vague.
 - `kestrel/ui/locales/ru/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 
-- `apps/settings/locales/ru/connections.ftl` `settings-bluetooth-request-unnamed`: "без названия" — reads after «устройство»/«устройством»/«на устройстве» in every pairing sentence, which put the noun in front of { $name }; check real names read well there too, e.g. «Выполнить сопряжение с устройством AirPods?»
-- `apps/settings/locales/ru/system.ftl` `settings-accounts-remove-note`: "Ваши файлы останутся в { $provider }." — fine for OneDrive, Dropbox, iCloud Drive; check with Nextcloud or WebDAV.
-- `apps/settings/locales/ru/system.ftl` `settings-accounts-provider-icloud`: "Ваш Аккаунт Apple, …" — follows Apple's Russian branding «Аккаунт Apple» (capital А) rather than the glossary's «учётная запись»; confirm.
-- `apps/settings/locales/ru/connections.ftl` `settings-network-security-owe`: "Улучшенная открытая" — no settled Russian term for Enhanced Open (OWE); check against Windows and Android wording.
-- `apps/settings/locales/ru/connections.ftl` `settings-network-wireguard-keepalive`: "Поддержание соединения" — WireGuard clients often keep "Keepalive" untranslated; check which reads better.
-- `apps/settings/locales/ru/devices.ftl` `settings-power-time-left`: "До разрядки примерно { $time }" — keeps the duration nominative («3 часа 20 минут»); with «менее минуты» it becomes «примерно менее минуты», check whether that is acceptable.
-- `apps/settings/locales/ru/devices.ftl` `settings-power-duration-minutes`: "{ $minutes } минута" — nominative picker values shown next to labels like «Отключать экран через»; fine as separate values, but would need «1 минуту» if ever joined into one phrase.
-- `apps/settings/locales/ru/devices.ftl` `settings-keys-keypad`: "Num { $key }" — short form for number-pad keys; check against Russian Windows' shortcut labels.
-- `apps/settings/locales/ru/devices.ftl` `settings-keys-volume-up`: "Громкость +" (also volume-down, brightness-up/down with "+"/"−", mute «Без звука», microphone-mute «Откл. микрофон») — compact key labels; check they don't look odd inside a shortcut like Ctrl+Громкость +.
-- `apps/settings/locales/ru/protection.ftl` `settings-privacy-screen-off-after`: "{ $duration } бездействия" — the duration arrives nominative («5 минут»), so «Через { $duration }» would give «через 1 минута»; check this reads well as the value next to «Отключение экрана».
-- `apps/settings/locales/ru/protection.ftl` `settings-passwords-stores-count`: "Сохранено данных для входа: { $count }" — sign-ins aren't countable in Russian, so every variant uses the colon form.
-- `apps/settings/locales/ru/system.ftl` `settings-users-fingerprint-remove-description`: "Входить в систему { $finger } больше не получится." — relies on the finger's .inline form being instrumental («правым указательным пальцем»).
-- `apps/settings/locales/ru/personalization.ftl` `settings-cursors-folder-description`: "Здесь появляются темы, сохранённые по пути: Домашняя папка › .local › share › icons" — check the colon construction and that «Домашняя папка» matches Rover's name for Home.
-- `apps/settings/locales/ru/personalization.ftl` `settings-appearance-icons-clear`: "Прозрачные" — unsure whether "Clear" means transparent, glass-like icons; check against the actual look.
-- `apps/settings/locales/ru/personalization.ftl` `settings-appearance-tint-slate`: "Сланцевый" — may feel bookish; «Серо-синий» is an alternative.
+- `apps/system/settings/locales/ru/connections.ftl` `settings-bluetooth-request-unnamed`: "без названия" — reads after «устройство»/«устройством»/«на устройстве» in every pairing sentence, which put the noun in front of { $name }; check real names read well there too, e.g. «Выполнить сопряжение с устройством AirPods?»
+- `apps/system/settings/locales/ru/system.ftl` `settings-accounts-remove-note`: "Ваши файлы останутся в { $provider }." — fine for OneDrive, Dropbox, iCloud Drive; check with Nextcloud or WebDAV.
+- `apps/system/settings/locales/ru/system.ftl` `settings-accounts-provider-icloud`: "Ваш Аккаунт Apple, …" — follows Apple's Russian branding «Аккаунт Apple» (capital А) rather than the glossary's «учётная запись»; confirm.
+- `apps/system/settings/locales/ru/connections.ftl` `settings-network-security-owe`: "Улучшенная открытая" — no settled Russian term for Enhanced Open (OWE); check against Windows and Android wording.
+- `apps/system/settings/locales/ru/connections.ftl` `settings-network-wireguard-keepalive`: "Поддержание соединения" — WireGuard clients often keep "Keepalive" untranslated; check which reads better.
+- `apps/system/settings/locales/ru/devices.ftl` `settings-power-time-left`: "До разрядки примерно { $time }" — keeps the duration nominative («3 часа 20 минут»); with «менее минуты» it becomes «примерно менее минуты», check whether that is acceptable.
+- `apps/system/settings/locales/ru/devices.ftl` `settings-power-duration-minutes`: "{ $minutes } минута" — nominative picker values shown next to labels like «Отключать экран через»; fine as separate values, but would need «1 минуту» if ever joined into one phrase.
+- `apps/system/settings/locales/ru/devices.ftl` `settings-keys-keypad`: "Num { $key }" — short form for number-pad keys; check against Russian Windows' shortcut labels.
+- `apps/system/settings/locales/ru/devices.ftl` `settings-keys-volume-up`: "Громкость +" (also volume-down, brightness-up/down with "+"/"−", mute «Без звука», microphone-mute «Откл. микрофон») — compact key labels; check they don't look odd inside a shortcut like Ctrl+Громкость +.
+- `apps/system/settings/locales/ru/protection.ftl` `settings-privacy-screen-off-after`: "{ $duration } бездействия" — the duration arrives nominative («5 минут»), so «Через { $duration }» would give «через 1 минута»; check this reads well as the value next to «Отключение экрана».
+- `apps/system/settings/locales/ru/protection.ftl` `settings-passwords-stores-count`: "Сохранено данных для входа: { $count }" — sign-ins aren't countable in Russian, so every variant uses the colon form.
+- `apps/system/settings/locales/ru/system.ftl` `settings-users-fingerprint-remove-description`: "Входить в систему { $finger } больше не получится." — relies on the finger's .inline form being instrumental («правым указательным пальцем»).
+- `apps/system/settings/locales/ru/personalization.ftl` `settings-cursors-folder-description`: "Здесь появляются темы, сохранённые по пути: Домашняя папка › .local › share › icons" — check the colon construction and that «Домашняя папка» matches Rover's name for Home.
+- `apps/system/settings/locales/ru/personalization.ftl` `settings-appearance-icons-clear`: "Прозрачные" — unsure whether "Clear" means transparent, glass-like icons; check against the actual look.
+- `apps/system/settings/locales/ru/personalization.ftl` `settings-appearance-tint-slate`: "Сланцевый" — may feel bookish; «Серо-синий» is an alternative.
 
 ## Website
 
@@ -64,10 +64,10 @@ Strings in Luft's Russian translation that a native speaker should check, each l
 
 ## Meet Luft
 
-- `apps/meet/locales/ru/meet.ftl` `meet-logs-saved`: "Журналы пробного запуска Luft сохранены на рабочем столе" — "Try Luft" rendered as «пробный запуск»; check it reads naturally.
-- `apps/meet/desktop/locales/ru/desktop.ftl` `check-start-entries`: "Старая загрузочная запись" — "start entry" (firmware boot menu entry), matching Setup's «загрузочные файлы».
-- `apps/meet/locales/ru/meet.ftl` `stick-keep`: "Оставить оба" — uses an exact `[1]` variant, since the `one` category also covers 21, 31…; same for `stick-replace-description` and `check-start-entries`.
-- `apps/meet/desktop/locales/ru/desktop.ftl` `check-encryption-changing-detail`: "…в Параметрах Windows, в разделе «Шифрование устройства»." — Windows' Settings app is «Параметры» in Russian, unlike Luft's «Настройки».
-- `apps/meet/locales/ru/meet.ftl` `room-place-free-detail`: "{ $size }, которые больше ничем не заняты" — the plural relative clause assumes sizes like «120 ГБ»; check it reads well with any size.
-- `apps/meet/locales/ru/meet.ftl` `luft-resize-title`: "Изменить размер Luft" — shorter than the English "Change how much space Luft has"; check it reads as the title of the row.
-- `apps/meet/desktop/locales/ru/desktop.ftl` `helper-box-room-shortfall`: "В месте для Luft найдётся ещё { $available } ГБ, а выбранным вещам нужно { $needed } ГБ." — "Luft’s room can spare" is the space already set aside for Luft; check that comes across.
+- `apps/store/meet/locales/ru/meet.ftl` `meet-logs-saved`: "Журналы пробного запуска Luft сохранены на рабочем столе" — "Try Luft" rendered as «пробный запуск»; check it reads naturally.
+- `apps/store/meet/desktop/locales/ru/desktop.ftl` `check-start-entries`: "Старая загрузочная запись" — "start entry" (firmware boot menu entry), matching Setup's «загрузочные файлы».
+- `apps/store/meet/locales/ru/meet.ftl` `stick-keep`: "Оставить оба" — uses an exact `[1]` variant, since the `one` category also covers 21, 31…; same for `stick-replace-description` and `check-start-entries`.
+- `apps/store/meet/desktop/locales/ru/desktop.ftl` `check-encryption-changing-detail`: "…в Параметрах Windows, в разделе «Шифрование устройства»." — Windows' Settings app is «Параметры» in Russian, unlike Luft's «Настройки».
+- `apps/store/meet/locales/ru/meet.ftl` `room-place-free-detail`: "{ $size }, которые больше ничем не заняты" — the plural relative clause assumes sizes like «120 ГБ»; check it reads well with any size.
+- `apps/store/meet/locales/ru/meet.ftl` `luft-resize-title`: "Изменить размер Luft" — shorter than the English "Change how much space Luft has"; check it reads as the title of the row.
+- `apps/store/meet/desktop/locales/ru/desktop.ftl` `helper-box-room-shortfall`: "В месте для Luft найдётся ещё { $available } ГБ, а выбранным вещам нужно { $needed } ГБ." — "Luft’s room can spare" is the space already set aside for Luft; check that comes across.

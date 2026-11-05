@@ -26,35 +26,35 @@ Strings in Luft's European Portuguese translation that a native speaker should c
 - `kestrel/ui/locales/pt/portal.ftl` `print-paper-letter` … `print-paper-statement`: paper names kept in English (Letter, Legal, Executive, Statement), Tabloid as "Tabloide" — check against what CUPS and GNOME show in Portuguese.
 - `kestrel/ui/locales/pt/system.ftl` `network-menu-tethers`, `network-menu-tether`: "Partilha de ligação por Bluetooth", "Partilha de ligação" — no settled tile term; check it fits the tile width.
 - `kestrel/ui/locales/pt/desktop.ftl` `switch-monitor-join`: "Expandir" — Windows' term for extended displays; check it matches Windows in Portugal ("Expandir estes ecrãs").
-- `apps/setup/installer/locales/pt/installer.ftl` `installer-no-deployment`: "implementação" — an ostree deployment; technical, check the wording.
-- `apps/setup/locales/pt/setup.ftl` `setup-region-intro-guessed`: "Deduzimos { $guesses }; …" with fields carrying their article ("o teclado a partir do computador e o fuso horário a partir da rede") — check the assembled sentence.
-- `apps/setup/locales/pt/setup.ftl` `setup-network-unavailable`: "a partir da barra de tarefas" — English says "the panel"; assumed the taskbar's network icons.
-- `apps/setup/locales/pt/setup.ftl` `setup-windows-fast-startup`, `setup-windows-bitlocker`: "arranque rápido", "Gestão de Discos" — check these match the names Windows uses in Portugal.
-- `apps/setup/locales/pt/setup.ftl` `setup-meet-room-packed`: "O que empacotou no Windows ({ $size }) é desempacotado na sua nova conta." — should match whatever the Meet Luft app calls packing.
-- `apps/setup/locales/pt/setup.ftl` `setup-region-title`: "Bem-vindo ao Luft" — masculine form, as Windows uses.
+- `apps/system/setup/installer/locales/pt/installer.ftl` `installer-no-deployment`: "implementação" — an ostree deployment; technical, check the wording.
+- `apps/system/setup/locales/pt/setup.ftl` `setup-region-intro-guessed`: "Deduzimos { $guesses }; …" with fields carrying their article ("o teclado a partir do computador e o fuso horário a partir da rede") — check the assembled sentence.
+- `apps/system/setup/locales/pt/setup.ftl` `setup-network-unavailable`: "a partir da barra de tarefas" — English says "the panel"; assumed the taskbar's network icons.
+- `apps/system/setup/locales/pt/setup.ftl` `setup-windows-fast-startup`, `setup-windows-bitlocker`: "arranque rápido", "Gestão de Discos" — check these match the names Windows uses in Portugal.
+- `apps/system/setup/locales/pt/setup.ftl` `setup-meet-room-packed`: "O que empacotou no Windows ({ $size }) é desempacotado na sua nova conta." — should match whatever the Meet Luft app calls packing.
+- `apps/system/setup/locales/pt/setup.ftl` `setup-region-title`: "Bem-vindo ao Luft" — masculine form, as Windows uses.
 - `kestrel/ui/locales/pt/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 
-- `apps/settings/locales/pt/connections.ftl` `settings-bluetooth-request-display`: ".description = Escreva este código no dispositivo e prima Enter." — `{ $name }` left out because "em { $name }" breaks with the unnamed fallback «o dispositivo» («em o dispositivo»); the title still names the device. Check this reads fine.
-- `apps/settings/locales/pt/connections.ftl` `settings-network-security-owe`: "Aberta melhorada" — no settled term for Wi‑Fi Enhanced Open (OWE); check against what Windows or Android show in Portugal.
-- `apps/settings/locales/pt/connections.ftl` `settings-network-ip-link-local`: "Só local da ligação" — literal rendering of link-local; GNOME uses «Apenas ligação local», which may read better.
-- `apps/settings/locales/pt/connections.ftl` `settings-bluetooth-windows`: "{ $devices } está emparelhado no Windows…" — the participle is masculine; a device name that is clearly feminine would mismatch.
-- `apps/settings/locales/pt/system.ftl` `settings-accounts-remove-note`: "Os seus ficheiros ficam no { $provider }." — assumes every provider takes the masculine article (iCloud Drive, OneDrive, Dropbox, Nextcloud, WebDAV).
-- `apps/settings/locales/pt/devices.ftl` `settings-sound-mute`: "Desativar som: { $name }" — built with a colon so it works for both «Volume» and app names; check it sounds natural to a screen-reader user.
-- `apps/settings/locales/pt/devices.ftl` `settings-display-night-light-from`: "Início" (and `-to` "Fim") — chosen over «Ativa às» because the time picker label is read as "{ $label }, { $time }".
-- `apps/settings/locales/pt/devices.ftl` `settings-keys-keypad`: "{ $key } (teclado numérico)" — check whether a shorter form like «Num { $key }» is preferred on shortcut labels.
-- `apps/settings/locales/pt/devices.ftl` `settings-power-time-left`: "Tempo restante: cerca de { $time }" — rephrased to avoid «Restam» agreeing with a singular duration.
-- `apps/settings/locales/pt/personalization.ftl` `settings-appearance-wallpaper-folder`: "Pasta Wallpapers" — the folder inside Pictures is really named Wallpapers, so the name stays in English; check it reads well next to «Imagens».
-- `apps/settings/locales/pt/personalization.ftl` `settings-fonts-sample`: "Um pequeno jabuti xereta viu dez cegonhas felizes" — a well-known pangram, but Brazilian in origin (jabuti, xereta); a more European sentence may be preferable.
-- `apps/settings/locales/pt/personalization.ftl` `settings-appearance-icons-clear`: "Transparentes" — the glass-like "Clear" icon style; confirm against the actual look.
-- `apps/settings/locales/pt/personalization.ftl` `settings-accessibility-zoom`: "Lupa" — Windows' name for the screen magnifier, also used on the lock screen; "Zoom" is the alternative.
-- `apps/settings/locales/pt/personalization.ftl` `settings-accessibility-dwell`: "Clicar ao repousar o ponteiro" — no settled term for dwell click; the lock screen's shorter label is «Clique por permanência».
-- `apps/settings/locales/pt/protection.ftl` `settings-passwords-stores`: "Credenciais das aplicações" — the sign-ins apps store, rendered as credenciais.
-- `apps/settings/locales/pt/protection.ftl` `settings-security-anti-cheat`: "Jogos com anti-batota" — anti-batota is the European word, but gamers may expect "anti-cheat".
-- `apps/settings/locales/pt/protection.ftl` `settings-passwords-ssh-added`: "Adicionada { $when }" — assumes $when reads like «há 3 dias» or «ontem»; the same goes for `settings-passkeys-last-used` and `apps/settings/locales/pt/system.ftl` `settings-updates-released`.
-- `apps/settings/locales/pt/system.ftl` `settings-updates-apps-count`: "[0] Geridas no Schelf" — agrees with atualizações; check it fits under the "App updates" row.
-- `apps/settings/locales/pt/system.ftl` `settings-about-hostname`: "Nome do anfitrião" — GNOME's term; Windows just says «Nome do dispositivo».
+- `apps/system/settings/locales/pt/connections.ftl` `settings-bluetooth-request-display`: ".description = Escreva este código no dispositivo e prima Enter." — `{ $name }` left out because "em { $name }" breaks with the unnamed fallback «o dispositivo» («em o dispositivo»); the title still names the device. Check this reads fine.
+- `apps/system/settings/locales/pt/connections.ftl` `settings-network-security-owe`: "Aberta melhorada" — no settled term for Wi‑Fi Enhanced Open (OWE); check against what Windows or Android show in Portugal.
+- `apps/system/settings/locales/pt/connections.ftl` `settings-network-ip-link-local`: "Só local da ligação" — literal rendering of link-local; GNOME uses «Apenas ligação local», which may read better.
+- `apps/system/settings/locales/pt/connections.ftl` `settings-bluetooth-windows`: "{ $devices } está emparelhado no Windows…" — the participle is masculine; a device name that is clearly feminine would mismatch.
+- `apps/system/settings/locales/pt/system.ftl` `settings-accounts-remove-note`: "Os seus ficheiros ficam no { $provider }." — assumes every provider takes the masculine article (iCloud Drive, OneDrive, Dropbox, Nextcloud, WebDAV).
+- `apps/system/settings/locales/pt/devices.ftl` `settings-sound-mute`: "Desativar som: { $name }" — built with a colon so it works for both «Volume» and app names; check it sounds natural to a screen-reader user.
+- `apps/system/settings/locales/pt/devices.ftl` `settings-display-night-light-from`: "Início" (and `-to` "Fim") — chosen over «Ativa às» because the time picker label is read as "{ $label }, { $time }".
+- `apps/system/settings/locales/pt/devices.ftl` `settings-keys-keypad`: "{ $key } (teclado numérico)" — check whether a shorter form like «Num { $key }» is preferred on shortcut labels.
+- `apps/system/settings/locales/pt/devices.ftl` `settings-power-time-left`: "Tempo restante: cerca de { $time }" — rephrased to avoid «Restam» agreeing with a singular duration.
+- `apps/system/settings/locales/pt/personalization.ftl` `settings-appearance-wallpaper-folder`: "Pasta Wallpapers" — the folder inside Pictures is really named Wallpapers, so the name stays in English; check it reads well next to «Imagens».
+- `apps/system/settings/locales/pt/personalization.ftl` `settings-fonts-sample`: "Um pequeno jabuti xereta viu dez cegonhas felizes" — a well-known pangram, but Brazilian in origin (jabuti, xereta); a more European sentence may be preferable.
+- `apps/system/settings/locales/pt/personalization.ftl` `settings-appearance-icons-clear`: "Transparentes" — the glass-like "Clear" icon style; confirm against the actual look.
+- `apps/system/settings/locales/pt/personalization.ftl` `settings-accessibility-zoom`: "Lupa" — Windows' name for the screen magnifier, also used on the lock screen; "Zoom" is the alternative.
+- `apps/system/settings/locales/pt/personalization.ftl` `settings-accessibility-dwell`: "Clicar ao repousar o ponteiro" — no settled term for dwell click; the lock screen's shorter label is «Clique por permanência».
+- `apps/system/settings/locales/pt/protection.ftl` `settings-passwords-stores`: "Credenciais das aplicações" — the sign-ins apps store, rendered as credenciais.
+- `apps/system/settings/locales/pt/protection.ftl` `settings-security-anti-cheat`: "Jogos com anti-batota" — anti-batota is the European word, but gamers may expect "anti-cheat".
+- `apps/system/settings/locales/pt/protection.ftl` `settings-passwords-ssh-added`: "Adicionada { $when }" — assumes $when reads like «há 3 dias» or «ontem»; the same goes for `settings-passkeys-last-used` and `apps/system/settings/locales/pt/system.ftl` `settings-updates-released`.
+- `apps/system/settings/locales/pt/system.ftl` `settings-updates-apps-count`: "[0] Geridas no Schelf" — agrees with atualizações; check it fits under the "App updates" row.
+- `apps/system/settings/locales/pt/system.ftl` `settings-about-hostname`: "Nome do anfitrião" — GNOME's term; Windows just says «Nome do dispositivo».
 
 ## Website
 
@@ -65,11 +65,11 @@ Strings in Luft's European Portuguese translation that a native speaker should c
 
 ## Meet Luft
 
-- `apps/meet/desktop/locales/pt/desktop.ftl` `check-encryption-changing-detail`: "nas Definições, em Encriptação de dispositivos" — the Windows Settings page name for Portugal from memory; setup.ftl uses the lowercase «encriptação do dispositivo» in running text. Confirm against a pt-PT Windows 11.
-- `apps/meet/desktop/locales/pt/desktop.ftl` `check-space-short-windows`: "com a Limpeza do Disco" — Disk Cleanup's pt-PT name, likewise `drive-hide-failed` «Explorador de Ficheiros»; check both against Windows.
-- `apps/meet/locales/pt/meet.ftl` `linux-ready-description`: "Até decidir o contrário, { $system } continua a arrancar normalmente." — $system has no article because it can also be «este sistema»; «Fedora Linux 42 continua» without «o» may read slightly bare. Same in the other linux-ready-* messages.
-- `apps/meet/locales/pt/meet.ftl` `meet-logs-saved`: "Os registos da experiência com o Luft foram guardados no ambiente de trabalho" — "logs from Try Luft" rendered as «registos da experiência com o Luft»; check it is clear.
-- `apps/meet/locales/pt/meet.ftl` `meet-channel-latest`: "O Meet Luft volta a utilizar as versões normais" — "releases" as opposed to nightly builds; «versões estáveis» is the alternative, but there are no stable releases yet.
-- `apps/meet/desktop/locales/pt/desktop.ftl` `helper-not-started`: "O processo auxiliar do Meet Luft não arrancou" — "helper" as «processo auxiliar»; check it isn't too technical for an error line.
-- `apps/meet/desktop/locales/pt/desktop.ftl` `check-secure-boot-turn-on`: "quando aparecer o logótipo { $maker }" — built without an article so any brand fits; check it reads naturally with «Lenovo», «HP», «Dell».
-- `apps/meet/locales/pt/meet.ftl` `luft-resize-passphrase`: "enquanto se desloca" — "while it moves" (Luft moving into its new space at startup); check it is understood, or whether «enquanto muda de tamanho» is clearer.
+- `apps/store/meet/desktop/locales/pt/desktop.ftl` `check-encryption-changing-detail`: "nas Definições, em Encriptação de dispositivos" — the Windows Settings page name for Portugal from memory; setup.ftl uses the lowercase «encriptação do dispositivo» in running text. Confirm against a pt-PT Windows 11.
+- `apps/store/meet/desktop/locales/pt/desktop.ftl` `check-space-short-windows`: "com a Limpeza do Disco" — Disk Cleanup's pt-PT name, likewise `drive-hide-failed` «Explorador de Ficheiros»; check both against Windows.
+- `apps/store/meet/locales/pt/meet.ftl` `linux-ready-description`: "Até decidir o contrário, { $system } continua a arrancar normalmente." — $system has no article because it can also be «este sistema»; «Fedora Linux 42 continua» without «o» may read slightly bare. Same in the other linux-ready-* messages.
+- `apps/store/meet/locales/pt/meet.ftl` `meet-logs-saved`: "Os registos da experiência com o Luft foram guardados no ambiente de trabalho" — "logs from Try Luft" rendered as «registos da experiência com o Luft»; check it is clear.
+- `apps/store/meet/locales/pt/meet.ftl` `meet-channel-latest`: "O Meet Luft volta a utilizar as versões normais" — "releases" as opposed to nightly builds; «versões estáveis» is the alternative, but there are no stable releases yet.
+- `apps/store/meet/desktop/locales/pt/desktop.ftl` `helper-not-started`: "O processo auxiliar do Meet Luft não arrancou" — "helper" as «processo auxiliar»; check it isn't too technical for an error line.
+- `apps/store/meet/desktop/locales/pt/desktop.ftl` `check-secure-boot-turn-on`: "quando aparecer o logótipo { $maker }" — built without an article so any brand fits; check it reads naturally with «Lenovo», «HP», «Dell».
+- `apps/store/meet/locales/pt/meet.ftl` `luft-resize-passphrase`: "enquanto se desloca" — "while it moves" (Luft moving into its new space at startup); check it is understood, or whether «enquanto muda de tamanho» is clearer.

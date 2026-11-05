@@ -37,36 +37,36 @@ Strings in Luft's Ukrainian translation that a native speaker should check, each
 - `kestrel/ui/locales/uk/system.ftl` `peek-error-unknown-handle`: "…не має дескриптора { $handle }…" — "handle" rendered as «дескриптор»; a reviewer may prefer «мітка».
 - `kestrel/ui/locales/uk/system.ftl` `network-menu-tethers`: "Модеми Bluetooth" — Bluetooth tethering; check against KDE/GNOME wording.
 - `kestrel/ui/locales/uk/system.ftl` `screenshot-source`: "Знімки й записи екрана" — name for "Screen Capture" notifications; «Захоплення екрана» is the alternative.
-- `apps/setup/locales/uk/setup.ftl` `setup-region-intro-guessed`, `setup-region-field-*`: field names are in the accusative (мову, клавіатуру) to follow «Автоматично визначено …» — check the joined list reads well.
-- `apps/setup/locales/uk/setup.ftl` `setup-windows-hibernated`: "…утримуйте Shift, вибираючи «Завершити роботу»…" — Windows' Ukrainian menu item; check it matches current Windows.
-- `apps/setup/locales/uk/setup.ftl` `setup-windows-bitlocker`: "…у програмі «Керування дисками»…" — Windows' Ukrainian name for Disk Management.
-- `apps/setup/locales/uk/setup.ftl` `setup-account-user-name-invalid`: "Використовуйте малі латинські літери, цифри, - і _" — added «латинські» since Cyrillic isn't allowed; confirm.
-- `apps/setup/locales/uk/setup.ftl` `setup-protect-kept`: "Ключ відновлення збережено" — impersonal to avoid the gendered «Я зберіг/зберегла».
+- `apps/system/setup/locales/uk/setup.ftl` `setup-region-intro-guessed`, `setup-region-field-*`: field names are in the accusative (мову, клавіатуру) to follow «Автоматично визначено …» — check the joined list reads well.
+- `apps/system/setup/locales/uk/setup.ftl` `setup-windows-hibernated`: "…утримуйте Shift, вибираючи «Завершити роботу»…" — Windows' Ukrainian menu item; check it matches current Windows.
+- `apps/system/setup/locales/uk/setup.ftl` `setup-windows-bitlocker`: "…у програмі «Керування дисками»…" — Windows' Ukrainian name for Disk Management.
+- `apps/system/setup/locales/uk/setup.ftl` `setup-account-user-name-invalid`: "Використовуйте малі латинські літери, цифри, - і _" — added «латинські» since Cyrillic isn't allowed; confirm.
+- `apps/system/setup/locales/uk/setup.ftl` `setup-protect-kept`: "Ключ відновлення збережено" — impersonal to avoid the gendered «Я зберіг/зберегла».
 - `kestrel/ui/locales/uk/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 
-- `apps/settings/locales/uk/connections.ftl` `settings-bluetooth-request-unnamed`: "без назви" — chosen so it reads after «пристроєм/пристрою/пристрої { $name }» in every pairing sentence; check it reads well in all six.
-- `apps/settings/locales/uk/connections.ftl` `settings-bluetooth-windows`: "Пристрій { $devices } має пару у Windows…" — $devices is a list of names; check the noun in front reads naturally with a joined list like «Клавіатура, Миша і ще 3».
-- `apps/settings/locales/uk/connections.ftl` `settings-network-security-owe`: "Покращена відкрита" — no settled Ukrainian name for OWE / Enhanced Open; check against Windows or Android.
-- `apps/settings/locales/uk/connections.ftl` `settings-network-anonymous-identity`: "Анонімна ідентичність" — Windows and NetworkManager wording varies («анонімне посвідчення»); check.
-- `apps/settings/locales/uk/system.ftl` `settings-accounts-remove-note`: "Ваші файли залишаться в сервісі { $provider }. Зміни, зроблені тут, спершу буде вивантажено." — check «сервісі» vs «службі» and «вивантажено» for uploading.
-- `apps/settings/locales/uk/devices.ftl` `settings-power-time-left`: "Залишилося приблизно { $time }" — $time is nominative («1 хвилина»), so agreement is slightly off for 1, 21…; check if acceptable.
-- `apps/settings/locales/uk/devices.ftl` `settings-power-long-sleep-hours`: "{ $hours } годину" — accusative, to follow the label «Вимикати через»; settings-power-duration-* stay nominative because they are also used inside sentences.
-- `apps/settings/locales/uk/devices.ftl` `settings-keys-keypad`: "Num { $key }" — keyboards print no word for the keypad; check if «Num 5» is what people expect.
-- `apps/settings/locales/uk/devices.ftl` `settings-dictation-copilot-key`: "клавішу Copilot" — accusative because it is inserted after «Утримуйте»; check it still reads right everywhere $keys is used.
-- `apps/settings/locales/uk/personalization.ftl` `settings-cursors-folder-description`: "Тут з’являються теми з папки Домівка › .local › share › icons" — «Домівка» is GNOME's name for the home folder; it must match what Rover shows in its path bar.
-- `apps/settings/locales/uk/personalization.ftl` `settings-fonts-sample`: "Чуєш їх, доцю, га? Кумедна ж ти, прощайся без ґольфів!" — a well-known Ukrainian pangram; check it fits the preview width.
-- `apps/settings/locales/uk/personalization.ftl` `settings-accessibility-dwell-time`: "Утримувати" — followed by a duration slider; check it reads naturally next to the value (same for `settings-accessibility-hold-time`).
-- `apps/settings/locales/uk/personalization.ftl` `settings-accessibility-locate-pointer`: "Знаходити вказівник клавішею Ctrl" — rephrased as a switch label rather than an instruction.
-- `apps/settings/locales/uk/personalization.ftl` `settings-taskbar-look-accent`: "Колір акценту" — noun among feminine adjectives (Суцільна, Прозора); «Акцентна» is shorter if it clips.
-- `apps/settings/locales/uk/protection.ftl` `settings-security-anti-cheat`: "Ігри з античитом" — gamer word «античит»; check it is acceptable in a system interface.
-- `apps/settings/locales/uk/protection.ftl` `settings-passwords-access-reset`: "Дозволити програмі { $app } знову запитати доступ до { $item }" — $item stays in the nominative after «до»; fine for most names, may read oddly for declinable ones.
-- `apps/settings/locales/uk/protection.ftl` `settings-passwords-contents`: "{ $count } паролі або ключі" — mixed count of passwords and keys; check the few/many forms read naturally.
-- `apps/settings/locales/uk/protection.ftl` `settings-passwords-stores-count`: "Збережено облікових даних: { $count }" — «облікові дані» is uncountable, so all plural variants use the colon form.
-- `apps/settings/locales/uk/system.ftl` `settings-datetime-increase`: "Збільшити: { $label }" — colon form so the hour/minute label can stay in the nominative.
-- `apps/settings/locales/uk/system.ftl` `settings-users-fingerprint-remove-description`: "Ви більше не зможете входити, прикладаючи { $finger }." — relies on .inline being in the accusative, which matches the nominative for these masculine nouns.
-- `apps/settings/locales/uk/system.ftl` `settings-updates-stay`: "Залишитися на { $version }" — check that a bare version number after «на» reads well on the button.
+- `apps/system/settings/locales/uk/connections.ftl` `settings-bluetooth-request-unnamed`: "без назви" — chosen so it reads after «пристроєм/пристрою/пристрої { $name }» in every pairing sentence; check it reads well in all six.
+- `apps/system/settings/locales/uk/connections.ftl` `settings-bluetooth-windows`: "Пристрій { $devices } має пару у Windows…" — $devices is a list of names; check the noun in front reads naturally with a joined list like «Клавіатура, Миша і ще 3».
+- `apps/system/settings/locales/uk/connections.ftl` `settings-network-security-owe`: "Покращена відкрита" — no settled Ukrainian name for OWE / Enhanced Open; check against Windows or Android.
+- `apps/system/settings/locales/uk/connections.ftl` `settings-network-anonymous-identity`: "Анонімна ідентичність" — Windows and NetworkManager wording varies («анонімне посвідчення»); check.
+- `apps/system/settings/locales/uk/system.ftl` `settings-accounts-remove-note`: "Ваші файли залишаться в сервісі { $provider }. Зміни, зроблені тут, спершу буде вивантажено." — check «сервісі» vs «службі» and «вивантажено» for uploading.
+- `apps/system/settings/locales/uk/devices.ftl` `settings-power-time-left`: "Залишилося приблизно { $time }" — $time is nominative («1 хвилина»), so agreement is slightly off for 1, 21…; check if acceptable.
+- `apps/system/settings/locales/uk/devices.ftl` `settings-power-long-sleep-hours`: "{ $hours } годину" — accusative, to follow the label «Вимикати через»; settings-power-duration-* stay nominative because they are also used inside sentences.
+- `apps/system/settings/locales/uk/devices.ftl` `settings-keys-keypad`: "Num { $key }" — keyboards print no word for the keypad; check if «Num 5» is what people expect.
+- `apps/system/settings/locales/uk/devices.ftl` `settings-dictation-copilot-key`: "клавішу Copilot" — accusative because it is inserted after «Утримуйте»; check it still reads right everywhere $keys is used.
+- `apps/system/settings/locales/uk/personalization.ftl` `settings-cursors-folder-description`: "Тут з’являються теми з папки Домівка › .local › share › icons" — «Домівка» is GNOME's name for the home folder; it must match what Rover shows in its path bar.
+- `apps/system/settings/locales/uk/personalization.ftl` `settings-fonts-sample`: "Чуєш їх, доцю, га? Кумедна ж ти, прощайся без ґольфів!" — a well-known Ukrainian pangram; check it fits the preview width.
+- `apps/system/settings/locales/uk/personalization.ftl` `settings-accessibility-dwell-time`: "Утримувати" — followed by a duration slider; check it reads naturally next to the value (same for `settings-accessibility-hold-time`).
+- `apps/system/settings/locales/uk/personalization.ftl` `settings-accessibility-locate-pointer`: "Знаходити вказівник клавішею Ctrl" — rephrased as a switch label rather than an instruction.
+- `apps/system/settings/locales/uk/personalization.ftl` `settings-taskbar-look-accent`: "Колір акценту" — noun among feminine adjectives (Суцільна, Прозора); «Акцентна» is shorter if it clips.
+- `apps/system/settings/locales/uk/protection.ftl` `settings-security-anti-cheat`: "Ігри з античитом" — gamer word «античит»; check it is acceptable in a system interface.
+- `apps/system/settings/locales/uk/protection.ftl` `settings-passwords-access-reset`: "Дозволити програмі { $app } знову запитати доступ до { $item }" — $item stays in the nominative after «до»; fine for most names, may read oddly for declinable ones.
+- `apps/system/settings/locales/uk/protection.ftl` `settings-passwords-contents`: "{ $count } паролі або ключі" — mixed count of passwords and keys; check the few/many forms read naturally.
+- `apps/system/settings/locales/uk/protection.ftl` `settings-passwords-stores-count`: "Збережено облікових даних: { $count }" — «облікові дані» is uncountable, so all plural variants use the colon form.
+- `apps/system/settings/locales/uk/system.ftl` `settings-datetime-increase`: "Збільшити: { $label }" — colon form so the hour/minute label can stay in the nominative.
+- `apps/system/settings/locales/uk/system.ftl` `settings-users-fingerprint-remove-description`: "Ви більше не зможете входити, прикладаючи { $finger }." — relies on .inline being in the accusative, which matches the nominative for these masculine nouns.
+- `apps/system/settings/locales/uk/system.ftl` `settings-updates-stay`: "Залишитися на { $version }" — check that a bare version number after «на» reads well on the button.
 
 ## Website
 
@@ -77,11 +77,11 @@ Strings in Luft's Ukrainian translation that a native speaker should check, each
 
 ## Meet Luft
 
-- `apps/meet/locales/uk/meet.ftl` `meet-logs-saved`: "Журнали пробного запуску Luft збережено на робочому столі" — "Try Luft" rendered as „пробний запуск“; check it matches how the mode reads elsewhere.
-- `apps/meet/desktop/locales/uk/desktop.ftl` `check-start-entries`: "Старий запис запуску" — "start entry" (firmware boot menu entry) as „запис запуску“, matching Setup's „файли запуску“; some may expect „запис завантаження“.
-- `apps/meet/locales/uk/meet.ftl` `stick-keep`: "Залишити обидва" — uses an exact `[1]` variant, since the `one` category also covers 21, 31…; same for `stick-replace-description` and `check-start-entries`.
-- `apps/meet/desktop/locales/uk/desktop.ftl` `check-fast-startup-on-detail`: "…переходить у режим глибокого сну…" — hibernate; check against Ukrainian Windows' wording.
-- `apps/meet/desktop/locales/uk/desktop.ftl` `check-secure-boot-restart-into`: "…де цей параметр розташовано в { $place }." — $place is an English firmware menu path; check the preposition.
-- `apps/meet/locales/uk/meet.ftl` `room-place-free-detail`: "{ $size }, які більше нічим не зайняті" — the plural relative clause assumes sizes like «120 ГБ»; check it reads well with any size.
-- `apps/meet/locales/uk/meet.ftl` `luft-resize-title`: "Змінити розмір Luft" — shorter than the English "Change how much space Luft has"; check it reads as the title of the row.
-- `apps/meet/desktop/locales/uk/desktop.ftl` `helper-box-room-shortfall`: "У місці для Luft знайдеться ще { $available } ГБ, а вибраним речам потрібно { $needed } ГБ." — "Luft’s room can spare" is the space already set aside for Luft; check that comes across.
+- `apps/store/meet/locales/uk/meet.ftl` `meet-logs-saved`: "Журнали пробного запуску Luft збережено на робочому столі" — "Try Luft" rendered as „пробний запуск“; check it matches how the mode reads elsewhere.
+- `apps/store/meet/desktop/locales/uk/desktop.ftl` `check-start-entries`: "Старий запис запуску" — "start entry" (firmware boot menu entry) as „запис запуску“, matching Setup's „файли запуску“; some may expect „запис завантаження“.
+- `apps/store/meet/locales/uk/meet.ftl` `stick-keep`: "Залишити обидва" — uses an exact `[1]` variant, since the `one` category also covers 21, 31…; same for `stick-replace-description` and `check-start-entries`.
+- `apps/store/meet/desktop/locales/uk/desktop.ftl` `check-fast-startup-on-detail`: "…переходить у режим глибокого сну…" — hibernate; check against Ukrainian Windows' wording.
+- `apps/store/meet/desktop/locales/uk/desktop.ftl` `check-secure-boot-restart-into`: "…де цей параметр розташовано в { $place }." — $place is an English firmware menu path; check the preposition.
+- `apps/store/meet/locales/uk/meet.ftl` `room-place-free-detail`: "{ $size }, які більше нічим не зайняті" — the plural relative clause assumes sizes like «120 ГБ»; check it reads well with any size.
+- `apps/store/meet/locales/uk/meet.ftl` `luft-resize-title`: "Змінити розмір Luft" — shorter than the English "Change how much space Luft has"; check it reads as the title of the row.
+- `apps/store/meet/desktop/locales/uk/desktop.ftl` `helper-box-room-shortfall`: "У місці для Luft знайдеться ще { $available } ГБ, а вибраним речам потрібно { $needed } ГБ." — "Luft’s room can spare" is the space already set aside for Luft; check that comes across.

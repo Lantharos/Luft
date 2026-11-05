@@ -22,7 +22,7 @@ const appNames = new Map<string, string>();
 
 function app(folder: string): Place {
 	if (!appNames.has(folder)) {
-		const manifest = git('show', `HEAD:apps/${folder}/Sabine.toml`) ?? '';
+		const manifest = git('show', `HEAD:apps/system/${folder}/Sabine.toml`) ?? git('show', `HEAD:apps/store/${folder}/Sabine.toml`) ?? '';
 		appNames.set(folder, /^name = "([^"]+)"$/m.exec(manifest)?.[1] ?? folder);
 	}
 	return { area: 'apps', title: appNames.get(folder)! };
@@ -31,8 +31,8 @@ function app(folder: string): Place {
 export function place(path: string): Place | undefined {
 	if (UNSEEN.some((pattern) => pattern.test(path))) return undefined;
 	if (path.startsWith('kestrel/')) return DESKTOP;
-	if (/^(apps\/(setup|meet)|os\/iso)\//.test(path)) return INSTALLING;
-	const folder = /^apps\/([^/]+)\//.exec(path)?.[1];
+	if (/^(apps\/(system\/|store\/)?(setup|meet)|os\/iso)\//.test(path)) return INSTALLING;
+	const folder = /^apps\/(?:system\/|store\/)?([^/]+)\//.exec(path)?.[1];
 	if (folder) return app(folder);
 	if (path.startsWith('os/image/parts/helium/')) return { area: 'apps', title: 'Helium' };
 	if (path.startsWith('os/image/parts/cursors/')) return DESKTOP;

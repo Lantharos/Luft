@@ -38,40 +38,40 @@ Strings in Luft's Hungarian translation that a native speaker should check: term
 - `kestrel/ui/locales/hu/system.ftl` `kbd-a11y-leave-on`: "Megtartás" — used for both Leave On and Leave Off, since each appears in a separate dialog; check this is clear.
 - `kestrel/ui/locales/hu/system.ftl` `screenshot-capture`: "Rögzítés" — same word as pinning (rögzítés) in other places; check whether "Felvétel" or "Készítés" is better for the shutter button.
 - `kestrel/ui/locales/hu/system.ftl` `network-menu-mobile`: "Mobilnet" — short tile title for Mobile Broadband; check it is the familiar word.
-- `apps/setup/locales/hu/setup.ftl` `setup-region-intro-guessed`: "Néhány beállítást előre kitöltöttünk: { $guesses }." with pieces like "nyelv és billentyűzet (a számítógép alapján)" — check the joined list reads well.
-- `apps/setup/locales/hu/setup.ftl` `setup-account-full-name-example`: "Neumann János" — a well-known name in Hungarian order (family name first); check the full name field doesn't assume given-name-first.
-- `apps/setup/locales/hu/setup.ftl` `setup-ready-start`: "Kezdés" — short button for "Start using Luft"; check it is not too vague.
-- `apps/setup/locales/hu/setup.ftl` `setup-finishing-trust`: "…kéri, hogy jelölje megbízhatónak a Luftot." — check this wording for trusting Luft's key.
-- `apps/setup/installer/locales/hu/installer.ftl` `installer-no-deployment`: "Az új rendszernek nincs telepített példánya" — "deployment" (ostree) has no settled Hungarian term.
+- `apps/system/setup/locales/hu/setup.ftl` `setup-region-intro-guessed`: "Néhány beállítást előre kitöltöttünk: { $guesses }." with pieces like "nyelv és billentyűzet (a számítógép alapján)" — check the joined list reads well.
+- `apps/system/setup/locales/hu/setup.ftl` `setup-account-full-name-example`: "Neumann János" — a well-known name in Hungarian order (family name first); check the full name field doesn't assume given-name-first.
+- `apps/system/setup/locales/hu/setup.ftl` `setup-ready-start`: "Kezdés" — short button for "Start using Luft"; check it is not too vague.
+- `apps/system/setup/locales/hu/setup.ftl` `setup-finishing-trust`: "…kéri, hogy jelölje megbízhatónak a Luftot." — check this wording for trusting Luft's key.
+- `apps/system/setup/installer/locales/hu/installer.ftl` `installer-no-deployment`: "Az új rendszernek nincs telepített példánya" — "deployment" (ostree) has no settled Hungarian term.
 - `kestrel/ui/locales/hu/auth.ftl` `lock-screen-dwell-click`: "Kattintás a mutató megállításával" — matches the Settings name, but is long for the lock screen's accessibility menu; check it fits.
 - `kestrel/ui/locales/hu/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 
-- `apps/settings/locales/hu/system.ftl` `settings-accounts-online` and `personalization.ftl` `settings-cursors-folder-description`: "a Saját mappában lévő Cloud mappán belül", "A Saját mappa › .local › share › icons" — check that "Saját mappa" matches how Rover names the home folder, and that the Cloud folder keeps its English name on disk.
-- `apps/settings/locales/hu/connections.ftl` `settings-bluetooth-request-unnamed`: "névtelen eszköz" — fills $name in the pairing sentences ("Párosítás ezzel: névtelen eszköz?"); check it reads acceptably in every request message.
-- `apps/settings/locales/hu/connections.ftl` `settings-bluetooth-request-confirm` and siblings: "Párosítás ezzel: { $name }?" — colon constructions avoid suffixing the device name; check they don't feel too stiff for a dialog title.
-- `apps/settings/locales/hu/connections.ftl` `settings-network-band`: "{ $band } GHz · { $channel }. csatorna" — ordinal dot after the placeable; assumes $channel is a plain number.
-- `apps/settings/locales/hu/system.ftl` `settings-accounts-browser`: "…bejelentkezhet { $provider } fiókjával…" — relies on "Microsoft fiókjával"/"Dropbox fiókjával" without hyphen, which is not strictly standard spelling.
-- `apps/settings/locales/hu/system.ftl` `settings-accounts-approve`: "…be van kapcsolva a Speciális adatvédelem." — check this matches Apple's Hungarian name for Advanced Data Protection.
-- `apps/settings/locales/hu/connections.ftl` `settings-network-security-psk`: "WPA2 Személyes" — Windows writes "WPA2-Personal" in some versions; check the preferred form.
-- `apps/settings/locales/hu/connections.ftl` `settings-bluetooth-windows`: "A Windowsban párosított eszközök: { $devices }. …" — $devices is a joined list; check the list joiner ("és még 3") fits.
-- `apps/settings/locales/hu/devices.ftl` `settings-sound-app-output`: "{ $app } hangkimenete" — picker label for "Play { $app } on"; check it fits the UI.
-- `apps/settings/locales/hu/devices.ftl` `settings-power-limit-stops-at`: "A töltés { $level } töltöttségnél leáll" — avoids "80%-nál"; check it isn't too wordy.
-- `apps/settings/locales/hu/devices.ftl` `settings-keys-keypad`: "Num { $key }" — no settled Hungarian label for keypad keys.
-- `apps/settings/locales/hu/personalization.ftl` `settings-fonts-sample`: "Árvíztűrő tükörfúrógép" — the classic Hungarian accent test phrase, not a full pangram; check whether a real pangram ("Jó foxim és don Quijote…") is preferred despite its length.
-- `apps/settings/locales/hu/personalization.ftl` `settings-appearance-dark-from`: "Sötét mód kezdete" — rewritten as a noun to sit before the time picker; check it reads well next to the time.
-- `apps/settings/locales/hu/personalization.ftl` `settings-accessibility-dwell-time`: "Várakozás" — label before a duration slider; check it is clear enough (also `settings-accessibility-hold-time` "Nyomva tartás").
-- `apps/settings/locales/hu/personalization.ftl` `settings-appearance-icons-clear`: "Áttetsző" — icon style "Clear"; check it isn't read as "Törlés".
+- `apps/system/settings/locales/hu/system.ftl` `settings-accounts-online` and `personalization.ftl` `settings-cursors-folder-description`: "a Saját mappában lévő Cloud mappán belül", "A Saját mappa › .local › share › icons" — check that "Saját mappa" matches how Rover names the home folder, and that the Cloud folder keeps its English name on disk.
+- `apps/system/settings/locales/hu/connections.ftl` `settings-bluetooth-request-unnamed`: "névtelen eszköz" — fills $name in the pairing sentences ("Párosítás ezzel: névtelen eszköz?"); check it reads acceptably in every request message.
+- `apps/system/settings/locales/hu/connections.ftl` `settings-bluetooth-request-confirm` and siblings: "Párosítás ezzel: { $name }?" — colon constructions avoid suffixing the device name; check they don't feel too stiff for a dialog title.
+- `apps/system/settings/locales/hu/connections.ftl` `settings-network-band`: "{ $band } GHz · { $channel }. csatorna" — ordinal dot after the placeable; assumes $channel is a plain number.
+- `apps/system/settings/locales/hu/system.ftl` `settings-accounts-browser`: "…bejelentkezhet { $provider } fiókjával…" — relies on "Microsoft fiókjával"/"Dropbox fiókjával" without hyphen, which is not strictly standard spelling.
+- `apps/system/settings/locales/hu/system.ftl` `settings-accounts-approve`: "…be van kapcsolva a Speciális adatvédelem." — check this matches Apple's Hungarian name for Advanced Data Protection.
+- `apps/system/settings/locales/hu/connections.ftl` `settings-network-security-psk`: "WPA2 Személyes" — Windows writes "WPA2-Personal" in some versions; check the preferred form.
+- `apps/system/settings/locales/hu/connections.ftl` `settings-bluetooth-windows`: "A Windowsban párosított eszközök: { $devices }. …" — $devices is a joined list; check the list joiner ("és még 3") fits.
+- `apps/system/settings/locales/hu/devices.ftl` `settings-sound-app-output`: "{ $app } hangkimenete" — picker label for "Play { $app } on"; check it fits the UI.
+- `apps/system/settings/locales/hu/devices.ftl` `settings-power-limit-stops-at`: "A töltés { $level } töltöttségnél leáll" — avoids "80%-nál"; check it isn't too wordy.
+- `apps/system/settings/locales/hu/devices.ftl` `settings-keys-keypad`: "Num { $key }" — no settled Hungarian label for keypad keys.
+- `apps/system/settings/locales/hu/personalization.ftl` `settings-fonts-sample`: "Árvíztűrő tükörfúrógép" — the classic Hungarian accent test phrase, not a full pangram; check whether a real pangram ("Jó foxim és don Quijote…") is preferred despite its length.
+- `apps/system/settings/locales/hu/personalization.ftl` `settings-appearance-dark-from`: "Sötét mód kezdete" — rewritten as a noun to sit before the time picker; check it reads well next to the time.
+- `apps/system/settings/locales/hu/personalization.ftl` `settings-accessibility-dwell-time`: "Várakozás" — label before a duration slider; check it is clear enough (also `settings-accessibility-hold-time` "Nyomva tartás").
+- `apps/system/settings/locales/hu/personalization.ftl` `settings-appearance-icons-clear`: "Áttetsző" — icon style "Clear"; check it isn't read as "Törlés".
 - `packages/web/ui/locales/hu/ui.ftl` `ui-passphrase-field`: "Jelmondat" — passphrase term, not in the glossary; used throughout the disk-unlock strings.
-- `apps/settings/locales/hu/protection.ftl` `settings-security-hardware-description`: "{ $summary }. Szint: { $level }/{ $highest }." — restructured to avoid suffixes on numbers; check it reads naturally.
-- `apps/settings/locales/hu/protection.ftl` `settings-passwords-access-revoke`: "{ $app } nem használhatja ezt: { $item }" — screen-reader label of a remove button phrased as a statement; check whether an action noun reads better.
-- `apps/settings/locales/hu/protection.ftl` `settings-passwords-forget-title`: "Elfelejti ennek az alkalmazásnak a mentett adatait: { $app }?" — colon form to avoid an article before the app name; check it isn't too stiff.
-- `apps/settings/locales/hu/protection.ftl` `settings-security-anti-cheat-luft-key`: "Az Epicnek még fel kell vennie a listájára a Luft kulcsát" — suffix on the company name Epic; check spelling.
-- `apps/settings/locales/hu/system.ftl` `settings-updates-version-staged`: "{ $version } verzió készen áll a telepítésre" — sentences start with the version number and no article to avoid a/az; check this reads acceptably (also `settings-updates-version-available`, `settings-updates-notes-title`).
-- `apps/settings/locales/hu/system.ftl` `settings-updates-stay`: "Maradás ennél: { $version }" — button; check it fits and reads well.
-- `apps/settings/locales/hu/system.ftl` `settings-users-fingerprint-remove-description`: "Többé nem használhatja { $finger } a bejelentkezéshez." — relies on the .inline finger forms (accusative with article) from ui.ftl.
-- `apps/settings/locales/hu/connections.ftl` `settings-network-link-connected`: "Csatlakozva" — used for every network and Bluetooth connection, with "csatlakoztatva" kept for things plugged in; Windows writes "Csatlakoztatva" for both, so check which reads more naturally.
+- `apps/system/settings/locales/hu/protection.ftl` `settings-security-hardware-description`: "{ $summary }. Szint: { $level }/{ $highest }." — restructured to avoid suffixes on numbers; check it reads naturally.
+- `apps/system/settings/locales/hu/protection.ftl` `settings-passwords-access-revoke`: "{ $app } nem használhatja ezt: { $item }" — screen-reader label of a remove button phrased as a statement; check whether an action noun reads better.
+- `apps/system/settings/locales/hu/protection.ftl` `settings-passwords-forget-title`: "Elfelejti ennek az alkalmazásnak a mentett adatait: { $app }?" — colon form to avoid an article before the app name; check it isn't too stiff.
+- `apps/system/settings/locales/hu/protection.ftl` `settings-security-anti-cheat-luft-key`: "Az Epicnek még fel kell vennie a listájára a Luft kulcsát" — suffix on the company name Epic; check spelling.
+- `apps/system/settings/locales/hu/system.ftl` `settings-updates-version-staged`: "{ $version } verzió készen áll a telepítésre" — sentences start with the version number and no article to avoid a/az; check this reads acceptably (also `settings-updates-version-available`, `settings-updates-notes-title`).
+- `apps/system/settings/locales/hu/system.ftl` `settings-updates-stay`: "Maradás ennél: { $version }" — button; check it fits and reads well.
+- `apps/system/settings/locales/hu/system.ftl` `settings-users-fingerprint-remove-description`: "Többé nem használhatja { $finger } a bejelentkezéshez." — relies on the .inline finger forms (accusative with article) from ui.ftl.
+- `apps/system/settings/locales/hu/connections.ftl` `settings-network-link-connected`: "Csatlakozva" — used for every network and Bluetooth connection, with "csatlakoztatva" kept for things plugged in; Windows writes "Csatlakoztatva" for both, so check which reads more naturally.
 
 ## Website
 
@@ -82,17 +82,17 @@ Strings in Luft's Hungarian translation that a native speaker should check: term
 
 ## Meet Luft
 
-- `apps/meet/locales/hu/meet.ftl` `ready-remove-description`, `working-packing`: "költözési doboz" — the moving box; check it reads naturally.
-- `apps/meet/desktop/locales/hu/desktop.ftl` `check-start-entries`, `problem-tidy`: "indítási bejegyzés" — no settled Hungarian term for a firmware boot entry.
-- `apps/meet/desktop/locales/hu/desktop.ftl` `check-encryption-changing-detail`: "a Gépházban, az Eszköztitkosítás résznél" — check that Windows 11 still calls Settings "Gépház" in Hungarian.
-- `apps/meet/desktop/locales/hu/desktop.ftl` `check-secure-boot-turn-on`: "nyomja meg a következőt, amikor megjelenik a gyártó ({ $maker }) logója: { $key }" — reordered so the key and brand need no suffix; check it reads naturally.
-- `apps/meet/locales/hu/meet.ftl` `linux-ready-description`, `linux-ready-try-description`: "A rendszer ({ $system })" — the system name is put in parentheses to avoid an article and suffix.
-- `apps/meet/locales/hu/meet.ftl` `meet-nightly`, `meet-channel-nightly`: "Éjszakai buildek" — same informal term as on the website.
-- `apps/meet/locales/hu/meet.ftl` `luft-title`: "Az Ön Luftja" — check it doesn't sound stiff as a page title.
-- `apps/meet/locales/hu/meet.ftl` `room-place-free`, `room-place-whole`, `luft-description-drive`, `ready-install-drive-description`: the drive name follows a colon so it needs no article or suffix; check these read naturally.
-- `apps/meet/desktop/locales/hu/desktop.ftl` `check-space-erase-drive`: "Van hely a számára ezen a meghajtón, ha törlik: { $drive }." — reordered around the drive name; check it reads naturally.
-- `apps/meet/locales/hu/meet.ftl` `resize-trim-title`: "Csökkenti a Luft méretét { $size } értékkel?" — “értékkel” keeps the size uninflected; check it doesn't read too technical next to resize-grow-title.
+- `apps/store/meet/locales/hu/meet.ftl` `ready-remove-description`, `working-packing`: "költözési doboz" — the moving box; check it reads naturally.
+- `apps/store/meet/desktop/locales/hu/desktop.ftl` `check-start-entries`, `problem-tidy`: "indítási bejegyzés" — no settled Hungarian term for a firmware boot entry.
+- `apps/store/meet/desktop/locales/hu/desktop.ftl` `check-encryption-changing-detail`: "a Gépházban, az Eszköztitkosítás résznél" — check that Windows 11 still calls Settings "Gépház" in Hungarian.
+- `apps/store/meet/desktop/locales/hu/desktop.ftl` `check-secure-boot-turn-on`: "nyomja meg a következőt, amikor megjelenik a gyártó ({ $maker }) logója: { $key }" — reordered so the key and brand need no suffix; check it reads naturally.
+- `apps/store/meet/locales/hu/meet.ftl` `linux-ready-description`, `linux-ready-try-description`: "A rendszer ({ $system })" — the system name is put in parentheses to avoid an article and suffix.
+- `apps/store/meet/locales/hu/meet.ftl` `meet-nightly`, `meet-channel-nightly`: "Éjszakai buildek" — same informal term as on the website.
+- `apps/store/meet/locales/hu/meet.ftl` `luft-title`: "Az Ön Luftja" — check it doesn't sound stiff as a page title.
+- `apps/store/meet/locales/hu/meet.ftl` `room-place-free`, `room-place-whole`, `luft-description-drive`, `ready-install-drive-description`: the drive name follows a colon so it needs no article or suffix; check these read naturally.
+- `apps/store/meet/desktop/locales/hu/desktop.ftl` `check-space-erase-drive`: "Van hely a számára ezen a meghajtón, ha törlik: { $drive }." — reordered around the drive name; check it reads naturally.
+- `apps/store/meet/locales/hu/meet.ftl` `resize-trim-title`: "Csökkenti a Luft méretét { $size } értékkel?" — “értékkel” keeps the size uninflected; check it doesn't read too technical next to resize-grow-title.
 
 ## Install Luft
 
-- `apps/setup/locales/hu/setup.ftl` `setup-destination-meet-drive-choice-description`, `setup-confirm-meet-drive-title`: "…ezen a lemezen: { $drive }", "Telepíti a Luftot erre a lemezre: { $drive }?" — the drive name goes after a colon so it never takes a suffix; check the choice line doesn't read too stiff.
+- `apps/system/setup/locales/hu/setup.ftl` `setup-destination-meet-drive-choice-description`, `setup-confirm-meet-drive-title`: "…ezen a lemezen: { $drive }", "Telepíti a Luftot erre a lemezre: { $drive }?" — the drive name goes after a colon so it never takes a suffix; check the choice line doesn't read too stiff.

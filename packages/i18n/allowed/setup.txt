@@ -1,10 +1,10 @@
-apps/setup/src/lib/components/trust/EnrollSteps.svelte	Press any key to perform\nMOK management
-apps/setup/src/lib/components/trust/EnrollSteps.svelte	Shim
-apps/setup/src/lib/components/trust/EnrollSteps.svelte	Perform MOK management
-apps/setup/src/lib/components/trust/EnrollSteps.svelte	Continue boot
-apps/setup/src/lib/components/trust/EnrollSteps.svelte	Enroll MOK
-apps/setup/src/lib/components/trust/EnrollSteps.svelte	Enroll key from disk
-apps/setup/src/lib/components/trust/EnrollSteps.svelte	Enroll hash from disk
-apps/setup/src/lib/components/trust/EnrollSteps.svelte	Enroll the key(s)?
-apps/setup/src/lib/steps/live/destination/MeetRoom.svelte	Windows
-apps/setup/src/lib/steps/live/network/Network.svelte	Wi-Fi
+apps/system/setup/src/lib/components/trust/EnrollSteps.svelte	Press any key to perform\nMOK management
+apps/system/setup/src/lib/components/trust/EnrollSteps.svelte	Shim
+apps/system/setup/src/lib/components/trust/EnrollSteps.svelte	Perform MOK management
+apps/system/setup/src/lib/components/trust/EnrollSteps.svelte	Continue boot
+apps/system/setup/src/lib/components/trust/EnrollSteps.svelte	Enroll MOK
+apps/system/setup/src/lib/components/trust/EnrollSteps.svelte	Enroll key from disk
+apps/system/setup/src/lib/components/trust/EnrollSteps.svelte	Enroll hash from disk
+apps/system/setup/src/lib/components/trust/EnrollSteps.svelte	Enroll the key(s)?
+apps/system/setup/src/lib/steps/live/destination/MeetRoom.svelte	Windows
+apps/system/setup/src/lib/steps/live/network/Network.svelte	Wi-Fi

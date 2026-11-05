@@ -1,55 +1,55 @@
-apps/setup/installer/src/config.rs	Couldn't parse {}
-apps/setup/installer/src/config.rs	Couldn't read {}
-apps/setup/installer/src/first_boot/window.rs	Couldn't read {BOOT_ID}
-apps/setup/installer/src/install/drive/layout.rs	Luft startup
-apps/setup/installer/src/meet/reclaim.rs	Couldn't remove {}
-apps/setup/installer/src/meet/reclaim.rs	Luft couldn't grow into the space Meet Luft used
-apps/setup/installer/src/meet/reclaim.rs	Meet Luft's copy of Luft couldn't be removed
-apps/setup/installer/src/resize/btrfs.rs	Luft's file system couldn't change its size
-apps/setup/installer/src/resize/btrfs.rs	Luft's file system didn't say how full it is
-apps/setup/installer/src/resize/btrfs.rs	Luft's files couldn't move off {device}
-apps/setup/installer/src/resize/disk.rs	An open disk has no name
-apps/setup/installer/src/resize/disk.rs	Luft's partition isn't on any drive
-apps/setup/installer/src/resize/disk.rs	The drive {id} is gone
-apps/setup/installer/src/resize/luks.rs	Luft's drive is still being encrypted or decrypted, so it can't move until that's done
-apps/setup/installer/src/resize/luks.rs	Luft's drive only opens with a passphrase, which Luft can't type for itself
-apps/setup/installer/src/resize/luks.rs	Luft's encryption didn't say where its data starts
-apps/setup/installer/src/resize/luks.rs	Luft's encryption header isn't readable
-apps/setup/installer/src/resize/mod.rs	Luft didn't change its size
-apps/setup/installer/src/resize/mod.rs	Luft gave up changing its size
-apps/setup/installer/src/resize/mod.rs	Luft's file system already spans more than one partition
-apps/setup/installer/src/resize/mod.rs	Luft's partition doesn't hold btrfs
-apps/setup/installer/src/resize/mod.rs	Luft's partition isn't on its drive
-apps/setup/installer/src/resize/mod.rs	The request is for another Luft
-apps/setup/installer/src/resize/plan.rs	Luft is too full to move this way
-apps/setup/installer/src/resize/plan.rs	Luft wouldn't have room for its files
-apps/setup/installer/src/resize/plan.rs	That's too little to give back
-apps/setup/installer/src/resize/plan.rs	The free space is too small
-apps/setup/installer/src/resize/plan.rs	There's no free space next to Luft
-apps/setup/installer/src/resize/plan.rs	There's no free space right before Luft
-apps/setup/installer/src/resize/request.rs	Luft's resize request isn't readable
-apps/setup/installer/src/resize/space.rs	Luft's partition isn't on its drive
-apps/setup/installer/src/resize/startup.rs	Luft startup
-apps/setup/installer/src/resize/startup.rs	Luft's new startup partition couldn't be formatted
-apps/setup/installer/src/resize/startup.rs	Luft's new startup partition disappeared
-apps/setup/installer/src/resize/startup.rs	Luft's startup files couldn't be copied
-apps/setup/installer/src/resize/steps.rs	The grown partition isn't part of Luft's file system
-apps/setup/installer/src/resize/steps.rs	The partition at {at} is gone
-apps/setup/installer/src/survey/windows/hints.rs	All Users
-apps/setup/installer/src/survey/windows/hints.rs	Control Panel\Desktop
-apps/setup/installer/src/survey/windows/hints.rs	Control Panel\Desktop\MuiCached
-apps/setup/installer/src/survey/windows/hints.rs	Control Panel\International
-apps/setup/installer/src/survey/windows/hints.rs	Default User
-apps/setup/installer/src/survey/windows/hints.rs	Keyboard Layout\Preload
-apps/setup/installer/src/survey/windows/hints.rs	Keyboard Layout\Substitutes
-apps/setup/installer/src/survey/windows/tests.rs	Control Panel\Desktop
-apps/setup/installer/src/survey/windows/tests.rs	Control Panel\International
-apps/setup/installer/src/survey/windows/tests.rs	Keyboard Layout\Preload
-apps/setup/installer/src/survey/windows/tests.rs	Keyboard Layout\Substitutes
-apps/setup/installer/src/survey/windows/tests.rs	Pacific Standard Time
-apps/setup/installer/src/survey/windows/tests.rs	Romance Standard Time
-apps/setup/installer/src/survey/windows/tests.rs	Windows 10 Home
-apps/setup/installer/src/survey/windows/tests.rs	Windows 10 Pro
-apps/setup/installer/src/system/files.rs	Couldn't open {}
-apps/setup/installer/src/system/files.rs	There's nothing to remove
-apps/setup/installer/src/system/system_disk.rs	The system disk's lock couldn't be taken
+apps/system/setup/installer/src/config.rs	Couldn't parse {}
+apps/system/setup/installer/src/config.rs	Couldn't read {}
+apps/system/setup/installer/src/first_boot/window.rs	Couldn't read {BOOT_ID}
+apps/system/setup/installer/src/install/drive/layout.rs	Luft startup
+apps/system/setup/installer/src/meet/reclaim.rs	Couldn't remove {}
+apps/system/setup/installer/src/meet/reclaim.rs	Luft couldn't grow into the space Meet Luft used
+apps/system/setup/installer/src/meet/reclaim.rs	Meet Luft's copy of Luft couldn't be removed
+apps/system/setup/installer/src/resize/btrfs.rs	Luft's file system couldn't change its size
+apps/system/setup/installer/src/resize/btrfs.rs	Luft's file system didn't say how full it is
+apps/system/setup/installer/src/resize/btrfs.rs	Luft's files couldn't move off {device}
+apps/system/setup/installer/src/resize/disk.rs	An open disk has no name
+apps/system/setup/installer/src/resize/disk.rs	Luft's partition isn't on any drive
+apps/system/setup/installer/src/resize/disk.rs	The drive {id} is gone
+apps/system/setup/installer/src/resize/luks.rs	Luft's drive is still being encrypted or decrypted, so it can't move until that's done
+apps/system/setup/installer/src/resize/luks.rs	Luft's drive only opens with a passphrase, which Luft can't type for itself
+apps/system/setup/installer/src/resize/luks.rs	Luft's encryption didn't say where its data starts
+apps/system/setup/installer/src/resize/luks.rs	Luft's encryption header isn't readable
+apps/system/setup/installer/src/resize/mod.rs	Luft didn't change its size
+apps/system/setup/installer/src/resize/mod.rs	Luft gave up changing its size
+apps/system/setup/installer/src/resize/mod.rs	Luft's file system already spans more than one partition
+apps/system/setup/installer/src/resize/mod.rs	Luft's partition doesn't hold btrfs
+apps/system/setup/installer/src/resize/mod.rs	Luft's partition isn't on its drive
+apps/system/setup/installer/src/resize/mod.rs	The request is for another Luft
+apps/system/setup/installer/src/resize/plan.rs	Luft is too full to move this way
+apps/system/setup/installer/src/resize/plan.rs	Luft wouldn't have room for its files
+apps/system/setup/installer/src/resize/plan.rs	That's too little to give back
+apps/system/setup/installer/src/resize/plan.rs	The free space is too small
+apps/system/setup/installer/src/resize/plan.rs	There's no free space next to Luft
+apps/system/setup/installer/src/resize/plan.rs	There's no free space right before Luft
+apps/system/setup/installer/src/resize/request.rs	Luft's resize request isn't readable
+apps/system/setup/installer/src/resize/space.rs	Luft's partition isn't on its drive
+apps/system/setup/installer/src/resize/startup.rs	Luft startup
+apps/system/setup/installer/src/resize/startup.rs	Luft's new startup partition couldn't be formatted
+apps/system/setup/installer/src/resize/startup.rs	Luft's new startup partition disappeared
+apps/system/setup/installer/src/resize/startup.rs	Luft's startup files couldn't be copied
+apps/system/setup/installer/src/resize/steps.rs	The grown partition isn't part of Luft's file system
+apps/system/setup/installer/src/resize/steps.rs	The partition at {at} is gone
+apps/system/setup/installer/src/survey/windows/hints.rs	All Users
+apps/system/setup/installer/src/survey/windows/hints.rs	Control Panel\Desktop
+apps/system/setup/installer/src/survey/windows/hints.rs	Control Panel\Desktop\MuiCached
+apps/system/setup/installer/src/survey/windows/hints.rs	Control Panel\International
+apps/system/setup/installer/src/survey/windows/hints.rs	Default User
+apps/system/setup/installer/src/survey/windows/hints.rs	Keyboard Layout\Preload
+apps/system/setup/installer/src/survey/windows/hints.rs	Keyboard Layout\Substitutes
+apps/system/setup/installer/src/survey/windows/tests.rs	Control Panel\Desktop
+apps/system/setup/installer/src/survey/windows/tests.rs	Control Panel\International
+apps/system/setup/installer/src/survey/windows/tests.rs	Keyboard Layout\Preload
+apps/system/setup/installer/src/survey/windows/tests.rs	Keyboard Layout\Substitutes
+apps/system/setup/installer/src/survey/windows/tests.rs	Pacific Standard Time
+apps/system/setup/installer/src/survey/windows/tests.rs	Romance Standard Time
+apps/system/setup/installer/src/survey/windows/tests.rs	Windows 10 Home
+apps/system/setup/installer/src/survey/windows/tests.rs	Windows 10 Pro
+apps/system/setup/installer/src/system/files.rs	Couldn't open {}
+apps/system/setup/installer/src/system/files.rs	There's nothing to remove
+apps/system/setup/installer/src/system/system_disk.rs	The system disk's lock couldn't be taken

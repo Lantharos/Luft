@@ -28,35 +28,35 @@ Strings in Luft's Dutch translation that a native speaker should check: terms wh
 - `kestrel/ui/locales/nl/shell.ftl` `ctrl-alt-tab-panel`: "Taakbalk" — English says "Panel", the comment says it is the taskbar.
 - `kestrel/ui/locales/nl/system.ftl` `screenshot-screenshots-folder`, `screenshot-screencasts-folder`: "Schermafbeeldingen", "Schermopnamen" — folder names on disk; check they match what other Dutch apps (Rover, Magpie) expect.
 - `kestrel/ui/locales/nl/system.ftl` `screenshot-source`: "Schermopname" — also the word for screen recording; "Schermafbeelding en -opname" may be clearer but long.
-- `apps/setup/locales/nl/setup.ftl` `setup-region-intro-guessed`: "Laten we beginnen. We hebben { $guesses } afgeleid, dus pas aan wat niet klopt." — with $guesses like "je toetsenbord van je computer en je tijdzone van je netwerk"; check the joined sentence reads well.
-- `apps/setup/locales/nl/setup.ftl` `setup-account-full-name-example`: "Rembrandt van Rijn" — check a reviewer is happy with this example name.
-- `apps/setup/locales/nl/setup.ftl` `setup-windows-fast-startup`: "Snel opstarten uitschakelen in Windows" — uses the Dutch Windows name "Snel opstarten"; also used in `setup-windows-hibernated`, along with "Schijfbeheer" for Disk Management.
-- `apps/setup/locales/nl/setup.ftl` `setup-network-unavailable`: "…via de taakbalk." — English says "from the panel"; assumed it means the taskbar network icons.
-- `apps/setup/installer/locales/nl/installer.ftl` `installer-no-deployment`: "Het nieuwe systeem heeft geen deployment" — technical term left in English, no settled Dutch equivalent.
+- `apps/system/setup/locales/nl/setup.ftl` `setup-region-intro-guessed`: "Laten we beginnen. We hebben { $guesses } afgeleid, dus pas aan wat niet klopt." — with $guesses like "je toetsenbord van je computer en je tijdzone van je netwerk"; check the joined sentence reads well.
+- `apps/system/setup/locales/nl/setup.ftl` `setup-account-full-name-example`: "Rembrandt van Rijn" — check a reviewer is happy with this example name.
+- `apps/system/setup/locales/nl/setup.ftl` `setup-windows-fast-startup`: "Snel opstarten uitschakelen in Windows" — uses the Dutch Windows name "Snel opstarten"; also used in `setup-windows-hibernated`, along with "Schijfbeheer" for Disk Management.
+- `apps/system/setup/locales/nl/setup.ftl` `setup-network-unavailable`: "…via de taakbalk." — English says "from the panel"; assumed it means the taskbar network icons.
+- `apps/system/setup/installer/locales/nl/installer.ftl` `installer-no-deployment`: "Het nieuwe systeem heeft geen deployment" — technical term left in English, no settled Dutch equivalent.
 - `kestrel/ui/locales/nl/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 
-- `apps/settings/locales/nl/protection.ftl` `settings-encryption-unlocks-security-key`: "Ontgrendelt bij het opstarten met je beveiligingssleutel" — "beveiligingssleutel" for a hardware security key (Windows' word); check it doesn't read as a software key.
-- `apps/settings/locales/nl/system.ftl` `settings-datetime-week-start-regional`: "{ $day }, volgens je regio" — Dutch weekday names are lowercase, so the label may start with a lowercase letter if the code doesn't capitalize it.
-- `apps/settings/locales/nl/system.ftl` `settings-updates-last-checked`: "Laatst gecontroleerd: { $when }" — colon form chosen so relative times like "gisteren" and "5 minuten geleden" both fit; same for settings-updates-released, settings-passwords-ssh-added, settings-passkeys-last-used.
-- `apps/settings/locales/nl/system.ftl` `settings-updates-switching-standard`: "Standaardimage downloaden…" — "image" for the system image; "de image" vs "het image" is unsettled in Dutch; de is used.
-- `apps/settings/locales/nl/personalization.ftl` `settings-appearance-icons-clear`: "Doorzichtig" — English "Clear" icon style (glassy, like iOS); check it's understood as a look, not as "empty".
-- `apps/settings/locales/nl/personalization.ftl` `settings-fonts-monospace`: "Vaste breedte" — label for the monospace font row; some may expect "Monospace".
-- `apps/settings/locales/nl/connections.ftl` `settings-network-security-owe`: "Enhanced Open" — kept the Wi‑Fi Alliance name; check whether Windows or macOS in Dutch translate it.
-- `apps/settings/locales/nl/connections.ftl` `settings-network-security-psk`: "WPA2 Persoonlijk" (and WPA3 Persoonlijk, Zakelijk) — follows macOS; Windows writes "WPA2-Persoonlijk". Check which spelling reads best.
-- `apps/settings/locales/nl/connections.ftl` `settings-network-private-address`: "Privéadres" — no settled term (macOS says "Privé-wifiadres", Windows "Willekeurige hardwareadressen").
-- `apps/settings/locales/nl/connections.ftl` `settings-network-ip-link-local`: "Alleen link-local" — kept the technical term untranslated.
-- `apps/settings/locales/nl/system.ftl` `settings-accounts-app-password`: "App-wachtwoord" — Microsoft's spelling; strict compound rules would give "appwachtwoord".
-- `apps/settings/locales/nl/system.ftl` `settings-accounts-approve`: "Geavanceerde gegevensbescherming" — Apple's Dutch name for Advanced Data Protection; confirm capitalization.
-- `apps/settings/locales/nl/devices.ftl` `settings-display-orientation-portrait-right`: "Staand, naar rechts" (and "Staand, naar links", "Liggend, omgedraaid") — check against Windows' Dutch orientation names.
-- `apps/settings/locales/nl/devices.ftl` `settings-keys-keypad`: "Numeriek { $key }" — no printed key name exists; check whether "Num { $key }" is more familiar.
-- `apps/settings/locales/nl/devices.ftl` `settings-dictation-credits`: "Bronvermelding" — chosen over the loanword "Credits".
-- `apps/settings/locales/nl/devices.ftl` `settings-power-capacity`: "{ $full } van { $design } toen hij nieuw was" — “hij” refers to the battery; check it reads naturally in the Battery health row.
-- `apps/settings/desktop/locales/nl/desktop.ftl` `desktop-shortcut-switch-panels`: "Wisselen tussen systeembediening" — vague English source; check it makes sense in the shortcut list.
-- `apps/settings/desktop/locales/nl/desktop.ftl` `desktop-shortcut-show-screenshot-ui`: "Schermafbeelding maken met keuzes" — “interactively” has no neat Dutch equivalent.
-- `apps/settings/locales/nl/system.ftl` `settings-accounts-online`: "Onlineaccounts" — one-word compound per the spelling rules; GNOME writes "Online-accounts".
-- `apps/settings/locales/nl/personalization.ftl` `settings-appearance-wallpaper-folder-description`: "Afbeeldingen › Wallpapers" — assumes the Pictures folder shows as Afbeeldingen (the Dutch folder name); Wallpapers is the real folder name and stays English.
+- `apps/system/settings/locales/nl/protection.ftl` `settings-encryption-unlocks-security-key`: "Ontgrendelt bij het opstarten met je beveiligingssleutel" — "beveiligingssleutel" for a hardware security key (Windows' word); check it doesn't read as a software key.
+- `apps/system/settings/locales/nl/system.ftl` `settings-datetime-week-start-regional`: "{ $day }, volgens je regio" — Dutch weekday names are lowercase, so the label may start with a lowercase letter if the code doesn't capitalize it.
+- `apps/system/settings/locales/nl/system.ftl` `settings-updates-last-checked`: "Laatst gecontroleerd: { $when }" — colon form chosen so relative times like "gisteren" and "5 minuten geleden" both fit; same for settings-updates-released, settings-passwords-ssh-added, settings-passkeys-last-used.
+- `apps/system/settings/locales/nl/system.ftl` `settings-updates-switching-standard`: "Standaardimage downloaden…" — "image" for the system image; "de image" vs "het image" is unsettled in Dutch; de is used.
+- `apps/system/settings/locales/nl/personalization.ftl` `settings-appearance-icons-clear`: "Doorzichtig" — English "Clear" icon style (glassy, like iOS); check it's understood as a look, not as "empty".
+- `apps/system/settings/locales/nl/personalization.ftl` `settings-fonts-monospace`: "Vaste breedte" — label for the monospace font row; some may expect "Monospace".
+- `apps/system/settings/locales/nl/connections.ftl` `settings-network-security-owe`: "Enhanced Open" — kept the Wi‑Fi Alliance name; check whether Windows or macOS in Dutch translate it.
+- `apps/system/settings/locales/nl/connections.ftl` `settings-network-security-psk`: "WPA2 Persoonlijk" (and WPA3 Persoonlijk, Zakelijk) — follows macOS; Windows writes "WPA2-Persoonlijk". Check which spelling reads best.
+- `apps/system/settings/locales/nl/connections.ftl` `settings-network-private-address`: "Privéadres" — no settled term (macOS says "Privé-wifiadres", Windows "Willekeurige hardwareadressen").
+- `apps/system/settings/locales/nl/connections.ftl` `settings-network-ip-link-local`: "Alleen link-local" — kept the technical term untranslated.
+- `apps/system/settings/locales/nl/system.ftl` `settings-accounts-app-password`: "App-wachtwoord" — Microsoft's spelling; strict compound rules would give "appwachtwoord".
+- `apps/system/settings/locales/nl/system.ftl` `settings-accounts-approve`: "Geavanceerde gegevensbescherming" — Apple's Dutch name for Advanced Data Protection; confirm capitalization.
+- `apps/system/settings/locales/nl/devices.ftl` `settings-display-orientation-portrait-right`: "Staand, naar rechts" (and "Staand, naar links", "Liggend, omgedraaid") — check against Windows' Dutch orientation names.
+- `apps/system/settings/locales/nl/devices.ftl` `settings-keys-keypad`: "Numeriek { $key }" — no printed key name exists; check whether "Num { $key }" is more familiar.
+- `apps/system/settings/locales/nl/devices.ftl` `settings-dictation-credits`: "Bronvermelding" — chosen over the loanword "Credits".
+- `apps/system/settings/locales/nl/devices.ftl` `settings-power-capacity`: "{ $full } van { $design } toen hij nieuw was" — “hij” refers to the battery; check it reads naturally in the Battery health row.
+- `apps/system/settings/desktop/locales/nl/desktop.ftl` `desktop-shortcut-switch-panels`: "Wisselen tussen systeembediening" — vague English source; check it makes sense in the shortcut list.
+- `apps/system/settings/desktop/locales/nl/desktop.ftl` `desktop-shortcut-show-screenshot-ui`: "Schermafbeelding maken met keuzes" — “interactively” has no neat Dutch equivalent.
+- `apps/system/settings/locales/nl/system.ftl` `settings-accounts-online`: "Onlineaccounts" — one-word compound per the spelling rules; GNOME writes "Online-accounts".
+- `apps/system/settings/locales/nl/personalization.ftl` `settings-appearance-wallpaper-folder-description`: "Afbeeldingen › Wallpapers" — assumes the Pictures folder shows as Afbeeldingen (the Dutch folder name); Wallpapers is the real folder name and stays English.
 
 ## Website
 
@@ -67,11 +67,11 @@ Strings in Luft's Dutch translation that a native speaker should check: terms wh
 
 ## Meet Luft
 
-- `apps/meet/locales/nl/meet.ftl` `meet-logs-saved`: "De logboeken van het uitproberen van Luft staan op je bureaublad" — "Try Luft" as a session has no short Dutch name; check that "het uitproberen van Luft" reads naturally (also meet-logs-none, meet-logs-failed, logs-not-saved).
-- `apps/meet/locales/nl/meet.ftl` `problem-tidy`: "De oude opstartvermeldingen konden niet worden verwijderd." — "opstartvermelding" for a firmware boot entry; check whether "opstartitem" is what Dutch users know from Windows.
-- `apps/meet/locales/nl/meet.ftl` `ready-remove-description`: "…ook de verhuisdoos…" — the moving box as "verhuisdoos"; check the metaphor lands, also in drive-box-no-guid.
-- `apps/meet/locales/nl/meet.ftl` `meet-iso-use`: "Een iso gebruiken die ik al heb" — lowercase "iso" and "Luft-iso" follow the website; check against "ISO".
-- `apps/meet/locales/nl/meet.ftl` `stick-drives-label`: "Usb-schijven" — "USB drives" kept apart from "usb-stick"; check whether "usb-sticks" is simply clearer (also problem-sticks, stick-looking).
-- `apps/meet/desktop/locales/nl/desktop.ftl` `check-startup-bios-linux`: "Schakel het in de firmware-instellingen in, samen met het systeem dat hier al staat" — the English is vague about what happens to the existing system; check the meaning comes across.
-- `apps/meet/desktop/locales/nl/desktop.ftl` `check-firmware-key-volume-up`: "de knop volume omhoog" — inserted after "druk je op"; check it reads well in that sentence.
-- `apps/meet/locales/nl/meet.ftl` `room-place-whole`: "Heel { $drive }" — "All of" before a drive name like "Samsung SSD 990 PRO"; check it reads naturally, or whether "{ $drive } helemaal" is better.
+- `apps/store/meet/locales/nl/meet.ftl` `meet-logs-saved`: "De logboeken van het uitproberen van Luft staan op je bureaublad" — "Try Luft" as a session has no short Dutch name; check that "het uitproberen van Luft" reads naturally (also meet-logs-none, meet-logs-failed, logs-not-saved).
+- `apps/store/meet/locales/nl/meet.ftl` `problem-tidy`: "De oude opstartvermeldingen konden niet worden verwijderd." — "opstartvermelding" for a firmware boot entry; check whether "opstartitem" is what Dutch users know from Windows.
+- `apps/store/meet/locales/nl/meet.ftl` `ready-remove-description`: "…ook de verhuisdoos…" — the moving box as "verhuisdoos"; check the metaphor lands, also in drive-box-no-guid.
+- `apps/store/meet/locales/nl/meet.ftl` `meet-iso-use`: "Een iso gebruiken die ik al heb" — lowercase "iso" and "Luft-iso" follow the website; check against "ISO".
+- `apps/store/meet/locales/nl/meet.ftl` `stick-drives-label`: "Usb-schijven" — "USB drives" kept apart from "usb-stick"; check whether "usb-sticks" is simply clearer (also problem-sticks, stick-looking).
+- `apps/store/meet/desktop/locales/nl/desktop.ftl` `check-startup-bios-linux`: "Schakel het in de firmware-instellingen in, samen met het systeem dat hier al staat" — the English is vague about what happens to the existing system; check the meaning comes across.
+- `apps/store/meet/desktop/locales/nl/desktop.ftl` `check-firmware-key-volume-up`: "de knop volume omhoog" — inserted after "druk je op"; check it reads well in that sentence.
+- `apps/store/meet/locales/nl/meet.ftl` `room-place-whole`: "Heel { $drive }" — "All of" before a drive name like "Samsung SSD 990 PRO"; check it reads naturally, or whether "{ $drive } helemaal" is better.

@@ -1,7 +1,7 @@
 /os/vm/state/
 /os/image/state/
 /os/iso/state/
-/apps/meet/vm/state/
+/apps/store/meet/vm/state/
 /kestrel/build/
 /kestrel/install/
 /kestrel/run/

@@ -53,7 +53,7 @@ A destination ending in `/` is a folder, and each file keeps its name there. `mo
 Every file is placed on its own with `install -DZ`, so the same command can stage components anywhere:
 
 ```sh
-bun os/image/parts/components/install.ts DESTDIR security apps/setup/installer
+bun os/image/parts/components/install.ts DESTDIR security apps/system/setup/installer
 ```
 
 ## Adding a component

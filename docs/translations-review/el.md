@@ -31,29 +31,29 @@ Strings in Luft's Greek translation that a native speaker should check: terms wi
 - `kestrel/ui/locales/el/system.ftl` `network-menu-mobile`: "Κινητά δεδομένα" — tile title for mobile broadband.
 - `kestrel/ui/locales/el/desktop.ftl` `switch-monitor-built-in-only`: "Μόνο εσωτερική" — shortened to stay under 15 characters; «ενσωματωμένη» would be more precise.
 - `kestrel/ui/locales/el/surfaces.ftl` `osk-letters-key`: "ΑΒΓ" — Greek letters on the key; check that's right when the active layout is Latin.
-- `apps/setup/locales/el/setup.ftl` `setup-region-field-language`: "τη γλώσσα" — field names carry the accusative article because they are only used inside «Συμπεράναμε { $guesses }».
-- `apps/setup/locales/el/setup.ftl` `setup-destination-replace-title`: "Αντικατάσταση του { $system }" — assumes a Latin system name (neuter).
-- `apps/setup/locales/el/setup.ftl` `setup-windows-hibernated`: "…τερματίστηκαν με γρήγορη εκκίνηση…" — assumes Greek Windows calls Fast Startup «Γρήγορη εκκίνηση».
-- `apps/setup/installer/locales/el/installer.ftl` `installer-no-deployment`: "Το νέο σύστημα δεν έχει ανάπτυξη" — ostree "deployment" has no settled Greek term.
+- `apps/system/setup/locales/el/setup.ftl` `setup-region-field-language`: "τη γλώσσα" — field names carry the accusative article because they are only used inside «Συμπεράναμε { $guesses }».
+- `apps/system/setup/locales/el/setup.ftl` `setup-destination-replace-title`: "Αντικατάσταση του { $system }" — assumes a Latin system name (neuter).
+- `apps/system/setup/locales/el/setup.ftl` `setup-windows-hibernated`: "…τερματίστηκαν με γρήγορη εκκίνηση…" — assumes Greek Windows calls Fast Startup «Γρήγορη εκκίνηση».
+- `apps/system/setup/installer/locales/el/installer.ftl` `installer-no-deployment`: "Το νέο σύστημα δεν έχει ανάπτυξη" — ostree "deployment" has no settled Greek term.
 - `kestrel/ui/locales/el/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 
-- `apps/settings/locales/el/connections.ftl` `settings-bluetooth-request-unnamed`: "τη συσκευή" — accusative so it fits "Σύζευξη με { $name };", "για { $name }"; the .description lines of request-confirm, request-authorize and request-display say «η συσκευή» instead of repeating $name, which the title already shows.
-- `apps/settings/locales/el/connections.ftl` `settings-network-security-owe`: "Βελτιωμένο ανοιχτό" — no settled Greek term for Enhanced Open (OWE); compare with what Windows/Android show.
-- `apps/settings/locales/el/devices.ftl` `settings-keys-keypad`: "Num { $key }" — short label for number-pad keys; check whether Greek users would expect something else.
-- `apps/settings/locales/el/devices.ftl` `settings-dictation-language-unavailable`: "Η γλώσσα { $language } δεν είναι διαθέσιμη …" — depends on how language names are written (e.g. «Αγγλικά»).
-- `apps/settings/locales/el/devices.ftl` `settings-power-time-left`: "Περίπου { $time } ακόμη" — avoids verb agreement with the duration; with "λιγότερο από ένα λεπτό" it reads "Περίπου λιγότερο από ένα λεπτό ακόμη", as in English.
-- `apps/settings/locales/el/personalization.ftl` `settings-cursors-folder-description`: "Τα θέματα που βάζετε στον Προσωπικό φάκελο › .local › share › icons εμφανίζονται εδώ" — «Προσωπικός φάκελος» is GNOME's name for Home; confirm it matches what Rover shows.
-- `apps/settings/locales/el/personalization.ftl` `settings-fonts-sample`: "Ξεσκεπάζω την ψυχοφθόρα βδελυγμία" — the classic Greek pangram; check it reads acceptably as a font preview.
-- `apps/settings/locales/el/personalization.ftl` `settings-appearance-icons-clear`: "Διάφανα" — unsure whether "Clear" means transparent/glass icons; confirm against the actual style.
-- `apps/settings/locales/el/personalization.ftl` `settings-appearance-tint-slate`: "Γκρι" — Greek has no common word for slate; «Γκρι» may collide if a plain gray is ever added.
-- `apps/settings/locales/el/personalization.ftl` `settings-accessibility-hold-time`: "Πάτημα για" — followed by a duration slider; check it reads naturally next to the value.
-- `apps/settings/locales/el/protection.ftl` `settings-passwords-history-read`: "Η εφαρμογή { $app } χρησιμοποίησε το «{ $item }»" — neuter article before a quoted item name of any gender; same pattern in the other history and access-revoke lines.
-- `apps/settings/locales/el/protection.ftl` `settings-security-anti-cheat-ready`: "Έτοιμο για παιχνίδια με anti-cheat" — "anti-cheat" kept in English as gamers say it; neuter «Έτοιμο» assumes the computer/system as subject.
-- `apps/settings/locales/el/protection.ftl` `settings-usb-hold-back`: "Αναμονή για νέες συσκευές USB" — meaning is "block new USB devices while locked"; a reviewer may prefer «Αναστολή νέων συσκευών USB».
-- `apps/settings/locales/el/system.ftl` `settings-updates-switching-standard`: "Λήψη της τυπικής εικόνας…" — «εικόνα» for system image may be read as a picture; «εικόνα συστήματος» is longer but clearer.
-- `apps/settings/locales/el/system.ftl` `settings-about-old-system`: "Διατηρήθηκε όταν το αντικατέστησε το Luft · { $size }" — assumes the old system is neuter (e.g. τα Windows would be plural); check against real values.
+- `apps/system/settings/locales/el/connections.ftl` `settings-bluetooth-request-unnamed`: "τη συσκευή" — accusative so it fits "Σύζευξη με { $name };", "για { $name }"; the .description lines of request-confirm, request-authorize and request-display say «η συσκευή» instead of repeating $name, which the title already shows.
+- `apps/system/settings/locales/el/connections.ftl` `settings-network-security-owe`: "Βελτιωμένο ανοιχτό" — no settled Greek term for Enhanced Open (OWE); compare with what Windows/Android show.
+- `apps/system/settings/locales/el/devices.ftl` `settings-keys-keypad`: "Num { $key }" — short label for number-pad keys; check whether Greek users would expect something else.
+- `apps/system/settings/locales/el/devices.ftl` `settings-dictation-language-unavailable`: "Η γλώσσα { $language } δεν είναι διαθέσιμη …" — depends on how language names are written (e.g. «Αγγλικά»).
+- `apps/system/settings/locales/el/devices.ftl` `settings-power-time-left`: "Περίπου { $time } ακόμη" — avoids verb agreement with the duration; with "λιγότερο από ένα λεπτό" it reads "Περίπου λιγότερο από ένα λεπτό ακόμη", as in English.
+- `apps/system/settings/locales/el/personalization.ftl` `settings-cursors-folder-description`: "Τα θέματα που βάζετε στον Προσωπικό φάκελο › .local › share › icons εμφανίζονται εδώ" — «Προσωπικός φάκελος» is GNOME's name for Home; confirm it matches what Rover shows.
+- `apps/system/settings/locales/el/personalization.ftl` `settings-fonts-sample`: "Ξεσκεπάζω την ψυχοφθόρα βδελυγμία" — the classic Greek pangram; check it reads acceptably as a font preview.
+- `apps/system/settings/locales/el/personalization.ftl` `settings-appearance-icons-clear`: "Διάφανα" — unsure whether "Clear" means transparent/glass icons; confirm against the actual style.
+- `apps/system/settings/locales/el/personalization.ftl` `settings-appearance-tint-slate`: "Γκρι" — Greek has no common word for slate; «Γκρι» may collide if a plain gray is ever added.
+- `apps/system/settings/locales/el/personalization.ftl` `settings-accessibility-hold-time`: "Πάτημα για" — followed by a duration slider; check it reads naturally next to the value.
+- `apps/system/settings/locales/el/protection.ftl` `settings-passwords-history-read`: "Η εφαρμογή { $app } χρησιμοποίησε το «{ $item }»" — neuter article before a quoted item name of any gender; same pattern in the other history and access-revoke lines.
+- `apps/system/settings/locales/el/protection.ftl` `settings-security-anti-cheat-ready`: "Έτοιμο για παιχνίδια με anti-cheat" — "anti-cheat" kept in English as gamers say it; neuter «Έτοιμο» assumes the computer/system as subject.
+- `apps/system/settings/locales/el/protection.ftl` `settings-usb-hold-back`: "Αναμονή για νέες συσκευές USB" — meaning is "block new USB devices while locked"; a reviewer may prefer «Αναστολή νέων συσκευών USB».
+- `apps/system/settings/locales/el/system.ftl` `settings-updates-switching-standard`: "Λήψη της τυπικής εικόνας…" — «εικόνα» for system image may be read as a picture; «εικόνα συστήματος» is longer but clearer.
+- `apps/system/settings/locales/el/system.ftl` `settings-about-old-system`: "Διατηρήθηκε όταν το αντικατέστησε το Luft · { $size }" — assumes the old system is neuter (e.g. τα Windows would be plural); check against real values.
 
 ## Website
 
@@ -64,12 +64,12 @@ Strings in Luft's Greek translation that a native speaker should check: terms wi
 
 ## Meet Luft
 
-- `apps/meet/locales/el/meet.ftl` `linux-ready-description`: "…θα ξεκινά κανονικά { $system }." — the system name comes after the verb with no article, so the fallback «αυτό το σύστημα» also fits; the same pattern is used in linux-ready-try-description, linux-ready-restart-try, linux-ready-restart-replace and check-startup-uefi-linux. Check that it reads naturally with names like «Fedora Linux 42».
-- `apps/meet/locales/el/meet.ftl` `linux-ready-replace-title`: "Αντικατάσταση: { $system }" — Setup writes «Αντικατάσταση του { $system }». I used a colon here because the fallback «αυτό το σύστημα» can't follow «του».
-- `apps/meet/locales/el/meet.ftl` `ready-remove-description`: "κούτα μετακόμισης" — "moving box"; check that the image comes across, or whether «κιβώτιο μεταφοράς» is clearer.
-- `apps/meet/locales/el/meet.ftl` `problem-tidy`: "καταχωρίσεις εκκίνησης" — "start entries" in the firmware boot menu; no settled Greek term.
-- `apps/meet/desktop/locales/el/desktop.ftl` `helper-not-started`: "βοηθητική διεργασία" — "helper"; check that it isn't too technical.
-- `apps/meet/desktop/locales/el/desktop.ftl` `check-firmware-place-security`: "Security › Secure Boot" — I used › instead of "then", since it's inserted after «στο»; check that it reads well inside the sentence.
-- `apps/meet/locales/el/meet.ftl` `room-place-whole`: "Ολόκληρο το { $drive }" — drive names take the neuter article like other Latin names, though «δίσκος» is masculine; same in room-place-free, room-erase-title and luft-description-drive. Check whether «ολόκληρος ο δίσκος { $drive }» reads better.
-- `apps/meet/locales/el/meet.ftl` `room-live-free`: "Από αυτόν τον χώρο, τα { $free } είναι ήδη ελεύθερα…" — the article «τα» before the size assumes plural sizes like «120 GB»; same in luft-windows-free-description and check-space-free-already.
-- `apps/meet/desktop/locales/el/desktop.ftl` `helper-box-room-shortfall`: "Ο χώρος του Luft μπορεί να διαθέσει { $available } GB και αυτά χρειάζονται { $needed } GB." — "Luft’s room can spare" is the space already set aside for Luft; check that comes across.
+- `apps/store/meet/locales/el/meet.ftl` `linux-ready-description`: "…θα ξεκινά κανονικά { $system }." — the system name comes after the verb with no article, so the fallback «αυτό το σύστημα» also fits; the same pattern is used in linux-ready-try-description, linux-ready-restart-try, linux-ready-restart-replace and check-startup-uefi-linux. Check that it reads naturally with names like «Fedora Linux 42».
+- `apps/store/meet/locales/el/meet.ftl` `linux-ready-replace-title`: "Αντικατάσταση: { $system }" — Setup writes «Αντικατάσταση του { $system }». I used a colon here because the fallback «αυτό το σύστημα» can't follow «του».
+- `apps/store/meet/locales/el/meet.ftl` `ready-remove-description`: "κούτα μετακόμισης" — "moving box"; check that the image comes across, or whether «κιβώτιο μεταφοράς» is clearer.
+- `apps/store/meet/locales/el/meet.ftl` `problem-tidy`: "καταχωρίσεις εκκίνησης" — "start entries" in the firmware boot menu; no settled Greek term.
+- `apps/store/meet/desktop/locales/el/desktop.ftl` `helper-not-started`: "βοηθητική διεργασία" — "helper"; check that it isn't too technical.
+- `apps/store/meet/desktop/locales/el/desktop.ftl` `check-firmware-place-security`: "Security › Secure Boot" — I used › instead of "then", since it's inserted after «στο»; check that it reads well inside the sentence.
+- `apps/store/meet/locales/el/meet.ftl` `room-place-whole`: "Ολόκληρο το { $drive }" — drive names take the neuter article like other Latin names, though «δίσκος» is masculine; same in room-place-free, room-erase-title and luft-description-drive. Check whether «ολόκληρος ο δίσκος { $drive }» reads better.
+- `apps/store/meet/locales/el/meet.ftl` `room-live-free`: "Από αυτόν τον χώρο, τα { $free } είναι ήδη ελεύθερα…" — the article «τα» before the size assumes plural sizes like «120 GB»; same in luft-windows-free-description and check-space-free-already.
+- `apps/store/meet/desktop/locales/el/desktop.ftl` `helper-box-room-shortfall`: "Ο χώρος του Luft μπορεί να διαθέσει { $available } GB και αυτά χρειάζονται { $needed } GB." — "Luft’s room can spare" is the space already set aside for Luft; check that comes across.

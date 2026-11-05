@@ -28,32 +28,32 @@ Strings in Luft's Swedish translation that a native speaker should check: terms 
 - `kestrel/ui/locales/sv/system.ftl` `network-menu-tether`: "Delad anslutning" (and `network-menu-tethers` "Delade anslutningar via Bluetooth") — no settled Swedish term for tethering; check it is understood and fits the tile.
 - `kestrel/ui/locales/sv/desktop.ftl` `switch-monitor-join`: "Utöka" — Windows' word for extending the desktop; check it is clear next to "Spegla".
 - `kestrel/ui/locales/sv/auth.ftl` `ctrl-alt-tab-unlock`: "Upplåsning" — names the lock screen sign-in prompt in the Ctrl+Alt+Tab switcher; check it is understandable.
-- `apps/setup/locales/sv/setup.ftl` `setup-region-intro-guessed`: "Vi har gissat { $guesses }, så ändra det som inte stämmer." with parts like "tangentbordet utifrån datorn" — check the assembled sentence with two guesses joined by "och".
-- `apps/setup/locales/sv/setup.ftl` `setup-destination-meet-choice-description`: "Använd de { $size } som Meet Luft har gjort plats för bredvid Windows." — check the construction around the size.
-- `apps/setup/installer/locales/sv/installer.ftl` `installer-no-deployment`: "Det nya systemet har ingen driftsättning" — technical ostree term; check whether a plainer word fits better.
+- `apps/system/setup/locales/sv/setup.ftl` `setup-region-intro-guessed`: "Vi har gissat { $guesses }, så ändra det som inte stämmer." with parts like "tangentbordet utifrån datorn" — check the assembled sentence with two guesses joined by "och".
+- `apps/system/setup/locales/sv/setup.ftl` `setup-destination-meet-choice-description`: "Använd de { $size } som Meet Luft har gjort plats för bredvid Windows." — check the construction around the size.
+- `apps/system/setup/installer/locales/sv/installer.ftl` `installer-no-deployment`: "Det nya systemet har ingen driftsättning" — technical ostree term; check whether a plainer word fits better.
 - `kestrel/ui/locales/sv/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 
-- `apps/settings/locales/sv/connections.ftl` `settings-network-security-owe`: "Förbättrat öppet" — no settled Swedish term for OWE / Enhanced Open; check against what Windows or routers show in Swedish.
-- `apps/settings/locales/sv/connections.ftl` `settings-network-security-enterprise`: "Enterprise" — kept English as routers and Windows print it (WPA2-Enterprise); "Företag" is the alternative.
-- `apps/settings/locales/sv/connections.ftl` `settings-network-ip-routes`: "Vägar" — GNOME uses "Rutter"; check which a Swedish network admin expects.
-- `apps/settings/locales/sv/connections.ftl` `settings-network-wireguard-preshared-key`: "I förväg delad nyckel" — WireGuard UIs often keep "Preshared key"; check.
-- `apps/settings/locales/sv/connections.ftl` `settings-network-wireguard-keepalive`: "Keepalive" — kept as the WireGuard term.
-- `apps/settings/locales/sv/system.ftl` `settings-accounts-online`: "Varje konto blir en mapp i Cloud, och filer hämtas när du öp…" — check whether the Cloud folder keeps its English name on a Swedish system.
-- `apps/settings/locales/sv/devices.ftl` `settings-sound-mute`: "Stäng av ljudet för { $name }" — $name can be "Volym", which reads oddly capitalized mid-sentence for screen readers.
-- `apps/settings/locales/sv/devices.ftl` `settings-keys-keypad`: "Num { $key }" — short form for number-pad keys; check against Swedish keyboard conventions.
-- `apps/settings/locales/sv/devices.ftl` `settings-power-suspend-plugged-in`: "Viloläge med laddare ansluten" — row label for the suspend timeout when plugged in; check it pairs naturally with "Viloläge på batteri".
-- `apps/settings/locales/sv/devices.ftl` `settings-power-long-sleep`: "Stäng av efter lång tid i viloläge" — may clip at laptop width.
-- `apps/settings/desktop/locales/sv/desktop.ftl` `desktop-shortcut-show-screenshot-ui`: "Ta en skärmbild och välj vad som ska med" — free rendering of "interactively"; same for the screen recording one.
-- `apps/settings/locales/sv/personalization.ftl` `settings-fonts-sample`: "Flygande bäckasiner söka hwila på mjuka tuvor" — the classic Swedish pangram, but archaic (söka, hwila); a reviewer may prefer a modern sentence.
-- `apps/settings/locales/sv/personalization.ftl` `settings-appearance-icons-clear`: "Genomskinliga" — chose this over iOS' "Klar" to avoid clashing with the Done button; check against the icon style it names.
-- `apps/settings/locales/sv/personalization.ftl` `settings-taskbar-look`: "Bakgrund" — English "Look"; renamed to avoid repeating the page name Utseende right next to the back button.
-- `apps/settings/locales/sv/personalization.ftl` `settings-fonts-monospace`: "Fast breddsteg" — standard typographic term, but long; check it fits as a row title.
-- `apps/settings/locales/sv/protection.ftl` `settings-security-anti-cheat`: "Spel med fuskskydd" — no settled Swedish term; gamers often just say anti-cheat.
-- `apps/settings/locales/sv/protection.ftl` `settings-usb-hold-back`: "Spärra nya USB-enheter" — "spärra" may sound more permanent than holding devices back until unlock.
-- `apps/settings/locales/sv/system.ftl` `settings-datetime-increase`: "Öka { $label }" — $label arrives capitalized (Timme/Minut), so it reads "Öka Timme" to a screen reader.
-- `apps/settings/locales/sv/system.ftl` `settings-about-other-system`: "Ta bort det för att ge dess { $size } till Luft" — "det" assumes the other system is referred to as "systemet" (ett); check against the row title it sits under.
+- `apps/system/settings/locales/sv/connections.ftl` `settings-network-security-owe`: "Förbättrat öppet" — no settled Swedish term for OWE / Enhanced Open; check against what Windows or routers show in Swedish.
+- `apps/system/settings/locales/sv/connections.ftl` `settings-network-security-enterprise`: "Enterprise" — kept English as routers and Windows print it (WPA2-Enterprise); "Företag" is the alternative.
+- `apps/system/settings/locales/sv/connections.ftl` `settings-network-ip-routes`: "Vägar" — GNOME uses "Rutter"; check which a Swedish network admin expects.
+- `apps/system/settings/locales/sv/connections.ftl` `settings-network-wireguard-preshared-key`: "I förväg delad nyckel" — WireGuard UIs often keep "Preshared key"; check.
+- `apps/system/settings/locales/sv/connections.ftl` `settings-network-wireguard-keepalive`: "Keepalive" — kept as the WireGuard term.
+- `apps/system/settings/locales/sv/system.ftl` `settings-accounts-online`: "Varje konto blir en mapp i Cloud, och filer hämtas när du öp…" — check whether the Cloud folder keeps its English name on a Swedish system.
+- `apps/system/settings/locales/sv/devices.ftl` `settings-sound-mute`: "Stäng av ljudet för { $name }" — $name can be "Volym", which reads oddly capitalized mid-sentence for screen readers.
+- `apps/system/settings/locales/sv/devices.ftl` `settings-keys-keypad`: "Num { $key }" — short form for number-pad keys; check against Swedish keyboard conventions.
+- `apps/system/settings/locales/sv/devices.ftl` `settings-power-suspend-plugged-in`: "Viloläge med laddare ansluten" — row label for the suspend timeout when plugged in; check it pairs naturally with "Viloläge på batteri".
+- `apps/system/settings/locales/sv/devices.ftl` `settings-power-long-sleep`: "Stäng av efter lång tid i viloläge" — may clip at laptop width.
+- `apps/system/settings/desktop/locales/sv/desktop.ftl` `desktop-shortcut-show-screenshot-ui`: "Ta en skärmbild och välj vad som ska med" — free rendering of "interactively"; same for the screen recording one.
+- `apps/system/settings/locales/sv/personalization.ftl` `settings-fonts-sample`: "Flygande bäckasiner söka hwila på mjuka tuvor" — the classic Swedish pangram, but archaic (söka, hwila); a reviewer may prefer a modern sentence.
+- `apps/system/settings/locales/sv/personalization.ftl` `settings-appearance-icons-clear`: "Genomskinliga" — chose this over iOS' "Klar" to avoid clashing with the Done button; check against the icon style it names.
+- `apps/system/settings/locales/sv/personalization.ftl` `settings-taskbar-look`: "Bakgrund" — English "Look"; renamed to avoid repeating the page name Utseende right next to the back button.
+- `apps/system/settings/locales/sv/personalization.ftl` `settings-fonts-monospace`: "Fast breddsteg" — standard typographic term, but long; check it fits as a row title.
+- `apps/system/settings/locales/sv/protection.ftl` `settings-security-anti-cheat`: "Spel med fuskskydd" — no settled Swedish term; gamers often just say anti-cheat.
+- `apps/system/settings/locales/sv/protection.ftl` `settings-usb-hold-back`: "Spärra nya USB-enheter" — "spärra" may sound more permanent than holding devices back until unlock.
+- `apps/system/settings/locales/sv/system.ftl` `settings-datetime-increase`: "Öka { $label }" — $label arrives capitalized (Timme/Minut), so it reads "Öka Timme" to a screen reader.
+- `apps/system/settings/locales/sv/system.ftl` `settings-about-other-system`: "Ta bort det för att ge dess { $size } till Luft" — "det" assumes the other system is referred to as "systemet" (ett); check against the row title it sits under.
 
 ## Website
 
@@ -63,10 +63,10 @@ Strings in Luft's Swedish translation that a native speaker should check: terms 
 
 ## Meet Luft
 
-- `apps/meet/locales/sv/meet.ftl` `meet-channel-latest`: "Meet Luft använder vanliga versioner igen" — "releases" as opposed to nightly builds; check whether "utgåvor" or "stabila versioner" reads better.
-- `apps/meet/locales/sv/meet.ftl` `ready-description`: "Välj hur du vill möta det." — keeps the "meet" of Meet Luft; check it doesn't sound odd for trying or installing a system.
-- `apps/meet/locales/sv/meet.ftl` `problem-room`: "Det gick inte att göra plats för Luft." — the "didn't finish" errors all use "Det gick inte att …", which loses the sense of being interrupted halfway.
-- `apps/meet/locales/sv/meet.ftl` `stick-done-title`: "Ditt Luft-minne är klart" — "Luft-minne" for a Luft USB stick; check it isn't read as some kind of memory.
-- `apps/meet/locales/sv/meet.ftl` `working-downloading`: "För över Luft" — "Bringing Luft over"; kept apart from "Hämtar Luft", which the stick download uses.
-- `apps/meet/desktop/locales/sv/desktop.ftl` `check-firmware-key-volume-up`: "volymknappen upp" — fills "tryck på { $key }"; check against what Swedish tablet guides call the volume-up button.
-- `apps/meet/desktop/locales/sv/desktop.ftl` `check-startup-bios-linux`: "… och ställ om systemet som redan finns här …" — free rendering of "along with the system already here"; check the meaning is clear.
+- `apps/store/meet/locales/sv/meet.ftl` `meet-channel-latest`: "Meet Luft använder vanliga versioner igen" — "releases" as opposed to nightly builds; check whether "utgåvor" or "stabila versioner" reads better.
+- `apps/store/meet/locales/sv/meet.ftl` `ready-description`: "Välj hur du vill möta det." — keeps the "meet" of Meet Luft; check it doesn't sound odd for trying or installing a system.
+- `apps/store/meet/locales/sv/meet.ftl` `problem-room`: "Det gick inte att göra plats för Luft." — the "didn't finish" errors all use "Det gick inte att …", which loses the sense of being interrupted halfway.
+- `apps/store/meet/locales/sv/meet.ftl` `stick-done-title`: "Ditt Luft-minne är klart" — "Luft-minne" for a Luft USB stick; check it isn't read as some kind of memory.
+- `apps/store/meet/locales/sv/meet.ftl` `working-downloading`: "För över Luft" — "Bringing Luft over"; kept apart from "Hämtar Luft", which the stick download uses.
+- `apps/store/meet/desktop/locales/sv/desktop.ftl` `check-firmware-key-volume-up`: "volymknappen upp" — fills "tryck på { $key }"; check against what Swedish tablet guides call the volume-up button.
+- `apps/store/meet/desktop/locales/sv/desktop.ftl` `check-startup-bios-linux`: "… och ställ om systemet som redan finns här …" — free rendering of "along with the system already here"; check the meaning is clear.

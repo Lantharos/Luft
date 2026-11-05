@@ -27,33 +27,33 @@ Strings in Luft's Polish translation that a native speaker should check, each li
 - `kestrel/ui/locales/pl/surfaces.ftl` `start-search-settings-section`: "Ustawienia: { $page }" — check it fits as a search result description.
 - `kestrel/ui/locales/pl/system.ftl` `auto-rotate-title`: "Autoobracanie" — short tile title; GNOME says "Automatyczne obracanie", which may clip.
 - `kestrel/ui/locales/pl/system.ftl` `network-menu-tethers`: "Tethering przez Bluetooth" — no settled Polish term; Windows and Android also use "tethering".
-- `apps/setup/locales/pl/setup.ftl` `setup-region-field-keyboard`: "klawiaturę" — the field names are in the accusative to fit "Dobrano { $guesses }"; they're only used in that list.
-- `apps/setup/locales/pl/setup.ftl` `setup-network-unavailable`: "Możesz połączyć się później z paska zadań." — English says "from the panel"; check which part of the desktop is meant.
-- `apps/setup/locales/pl/setup.ftl` `setup-windows-hibernated`: "…przytrzymaj Shift i wybierz Zamknij…" — Polish Windows calls Shut down "Zamknij" in the power menu; Fast Startup is "szybkie uruchamianie".
-- `apps/setup/installer/locales/pl/installer.ftl` `installer-box-unopened`: "Nie udało się otworzyć kartonu przeprowadzkowego" — "moving box" metaphor for what Meet Luft packs; check it matches whatever Meet Luft's Polish text calls it.
+- `apps/system/setup/locales/pl/setup.ftl` `setup-region-field-keyboard`: "klawiaturę" — the field names are in the accusative to fit "Dobrano { $guesses }"; they're only used in that list.
+- `apps/system/setup/locales/pl/setup.ftl` `setup-network-unavailable`: "Możesz połączyć się później z paska zadań." — English says "from the panel"; check which part of the desktop is meant.
+- `apps/system/setup/locales/pl/setup.ftl` `setup-windows-hibernated`: "…przytrzymaj Shift i wybierz Zamknij…" — Polish Windows calls Shut down "Zamknij" in the power menu; Fast Startup is "szybkie uruchamianie".
+- `apps/system/setup/installer/locales/pl/installer.ftl` `installer-box-unopened`: "Nie udało się otworzyć kartonu przeprowadzkowego" — "moving box" metaphor for what Meet Luft packs; check it matches whatever Meet Luft's Polish text calls it.
 - `kestrel/ui/locales/pl/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 
-- `apps/settings/locales/pl/connections.ftl` `settings-network-security-owe`: "Rozszerzona otwarta" — no settled Polish term for Enhanced Open (OWE); check against what Windows or Android show.
-- `apps/settings/locales/pl/connections.ftl` `settings-bluetooth-request-confirm`: "Sparować z: { $name }?" — colon avoids declining the device name (and the unnamed fallback „urządzenie”); check it reads naturally. The .description lines of the pairing requests drop { $name } for the same reason.
-- `apps/settings/locales/pl/system.ftl` `settings-accounts-online`: "Każde konto staje się folderem w Cloud, a pliki pobierają si…" — kept the folder name Cloud on the assumption it is a fixed folder name on disk, as other languages did; translate if the folder is localized.
-- `apps/settings/locales/pl/devices.ftl` `settings-power-time-left`: "Szacowany czas pracy: { $time }" — "about … left" rephrased so the nominative duration fits; check it is clear on a battery row.
-- `apps/settings/locales/pl/devices.ftl` `settings-power-charging-until-full`: "Ładowanie, do pełnego naładowania: { $time }" — colon construction for the nominative duration; may be long at laptop size.
-- `apps/settings/locales/pl/devices.ftl` `settings-power-screen-off`: "Wyłączanie ekranu po czasie" — English "Turn off the screen after" + option cannot take nominative durations in Polish („po 5 minut” is wrong); check the label with options like „5 minut”. Same for `settings-power-long-sleep-after` "Czas do wyłączenia".
-- `apps/settings/locales/pl/devices.ftl` `settings-mouse-touchpad-scroll-edge`: "Przy krawędzi" — and `settings-mouse-touchpad-click-corner` "W rogu"; options shown next to "Dwoma palcami", check they read as a consistent set.
-- `apps/settings/locales/pl/devices.ftl` `settings-keys-keypad`: "Num { $key }" — chosen for keypad keys (Num 5, Num Enter); check against common Polish usage.
-- `apps/settings/locales/pl/protection.ftl` `settings-privacy-screen-off-after`: "Po { $duration } bezczynności" — built so $duration stays in the nominative ("5 minut bezczynności"); check it reads well with every duration value, e.g. "1 minuta".
+- `apps/system/settings/locales/pl/connections.ftl` `settings-network-security-owe`: "Rozszerzona otwarta" — no settled Polish term for Enhanced Open (OWE); check against what Windows or Android show.
+- `apps/system/settings/locales/pl/connections.ftl` `settings-bluetooth-request-confirm`: "Sparować z: { $name }?" — colon avoids declining the device name (and the unnamed fallback „urządzenie”); check it reads naturally. The .description lines of the pairing requests drop { $name } for the same reason.
+- `apps/system/settings/locales/pl/system.ftl` `settings-accounts-online`: "Każde konto staje się folderem w Cloud, a pliki pobierają si…" — kept the folder name Cloud on the assumption it is a fixed folder name on disk, as other languages did; translate if the folder is localized.
+- `apps/system/settings/locales/pl/devices.ftl` `settings-power-time-left`: "Szacowany czas pracy: { $time }" — "about … left" rephrased so the nominative duration fits; check it is clear on a battery row.
+- `apps/system/settings/locales/pl/devices.ftl` `settings-power-charging-until-full`: "Ładowanie, do pełnego naładowania: { $time }" — colon construction for the nominative duration; may be long at laptop size.
+- `apps/system/settings/locales/pl/devices.ftl` `settings-power-screen-off`: "Wyłączanie ekranu po czasie" — English "Turn off the screen after" + option cannot take nominative durations in Polish („po 5 minut” is wrong); check the label with options like „5 minut”. Same for `settings-power-long-sleep-after` "Czas do wyłączenia".
+- `apps/system/settings/locales/pl/devices.ftl` `settings-mouse-touchpad-scroll-edge`: "Przy krawędzi" — and `settings-mouse-touchpad-click-corner` "W rogu"; options shown next to "Dwoma palcami", check they read as a consistent set.
+- `apps/system/settings/locales/pl/devices.ftl` `settings-keys-keypad`: "Num { $key }" — chosen for keypad keys (Num 5, Num Enter); check against common Polish usage.
+- `apps/system/settings/locales/pl/protection.ftl` `settings-privacy-screen-off-after`: "Po { $duration } bezczynności" — built so $duration stays in the nominative ("5 minut bezczynności"); check it reads well with every duration value, e.g. "1 minuta".
 - `packages/web/ui/locales/pl/ui.ftl` `ui-passphrase-field`: "Fraza hasła" — chosen for "passphrase" to keep it distinct from the account "hasło"; not in the glossary, check it against what Polish disk-encryption UIs use.
-- `apps/settings/locales/pl/protection.ftl` `settings-encryption-unlocks-security-key`: "Odblokowywany kluczem zabezpieczeń przy uruchamianiu" — "klucz zabezpieczeń" (Windows' term for a hardware security key) is not in the glossary.
-- `apps/settings/locales/pl/protection.ftl` `settings-security-anti-cheat`: "Gry z ochroną przed oszustwami" — Polish gamers often just say "anti-cheat"; check which is more recognizable.
-- `apps/settings/locales/pl/protection.ftl` `settings-passwords-stores`: "Dane logowania aplikacji" — "sign-in" as a countable noun has no good Polish equivalent, so the count message uses "Zapisane dane logowania: { $count }".
-- `apps/settings/locales/pl/protection.ftl` `settings-passwords-history-read`: "Aplikacja { $app } użyła „{ $item }”" — the quoted item sits where Polish wants the genitive; check it doesn't read odd with real item names.
-- `apps/settings/locales/pl/protection.ftl` `settings-passkeys-last-used`: "Ostatnio użyty { $when }" — depends on $when being a phrase like "3 dni temu" or "wczoraj".
-- `apps/settings/locales/pl/system.ftl` `settings-users-fingerprint-remove-description`: "Nie zalogujesz się już za pomocą tego palca ({ $finger })." — the finger name arrives in the nominative, so it's put in parentheses rather than declined.
-- `apps/settings/locales/pl/system.ftl` `settings-updates-apps-count`: "… w sklepie Schelf" — "sklep" avoids repeating "aplikacja … w aplikacji Schelf"; check this is acceptable with the app-name rule.
-- `apps/settings/locales/pl/personalization.ftl` `settings-appearance-wallpaper-tile`: "Sąsiadująco" — Windows' term; check it fits next to the imperative options (Wypełnij, Dopasuj, Wyśrodkuj, Rozciągnij).
-- `apps/settings/locales/pl/personalization.ftl` `settings-appearance-icons-clear`: "Przezroczyste" — assumes "Clear" means the glass-like transparent icon style, not "remove".
+- `apps/system/settings/locales/pl/protection.ftl` `settings-encryption-unlocks-security-key`: "Odblokowywany kluczem zabezpieczeń przy uruchamianiu" — "klucz zabezpieczeń" (Windows' term for a hardware security key) is not in the glossary.
+- `apps/system/settings/locales/pl/protection.ftl` `settings-security-anti-cheat`: "Gry z ochroną przed oszustwami" — Polish gamers often just say "anti-cheat"; check which is more recognizable.
+- `apps/system/settings/locales/pl/protection.ftl` `settings-passwords-stores`: "Dane logowania aplikacji" — "sign-in" as a countable noun has no good Polish equivalent, so the count message uses "Zapisane dane logowania: { $count }".
+- `apps/system/settings/locales/pl/protection.ftl` `settings-passwords-history-read`: "Aplikacja { $app } użyła „{ $item }”" — the quoted item sits where Polish wants the genitive; check it doesn't read odd with real item names.
+- `apps/system/settings/locales/pl/protection.ftl` `settings-passkeys-last-used`: "Ostatnio użyty { $when }" — depends on $when being a phrase like "3 dni temu" or "wczoraj".
+- `apps/system/settings/locales/pl/system.ftl` `settings-users-fingerprint-remove-description`: "Nie zalogujesz się już za pomocą tego palca ({ $finger })." — the finger name arrives in the nominative, so it's put in parentheses rather than declined.
+- `apps/system/settings/locales/pl/system.ftl` `settings-updates-apps-count`: "… w sklepie Schelf" — "sklep" avoids repeating "aplikacja … w aplikacji Schelf"; check this is acceptable with the app-name rule.
+- `apps/system/settings/locales/pl/personalization.ftl` `settings-appearance-wallpaper-tile`: "Sąsiadująco" — Windows' term; check it fits next to the imperative options (Wypełnij, Dopasuj, Wyśrodkuj, Rozciągnij).
+- `apps/system/settings/locales/pl/personalization.ftl` `settings-appearance-icons-clear`: "Przezroczyste" — assumes "Clear" means the glass-like transparent icon style, not "remove".
 
 ## Website
 
@@ -64,12 +64,12 @@ Strings in Luft's Polish translation that a native speaker should check, each li
 
 ## Meet Luft
 
-- `apps/meet/locales/pl/meet.ftl` `meet-logs-saved`: "Dzienniki z wypróbowywania systemu Luft zapisano na pulpicie" — "Try Luft" as a mode has no fixed Polish name, so it's described; check it reads naturally in all three logs messages.
-- `apps/meet/desktop/locales/pl/desktop.ftl` `check-start-entries`: "Stary wpis rozruchowy" — "start entry" (a firmware boot menu entry) rendered as wpis rozruchowy, used throughout Meet Luft.
-- `apps/meet/locales/pl/meet.ftl` `check-action-tidy`: "Uporządkuj" — button for removing stale boot entries; check it's clear enough next to the explanation.
-- `apps/meet/desktop/locales/pl/desktop.ftl` `check-secure-boot-restart-into`: "…gdzie ta opcja jest w { $place }" — $place is an English firmware menu path ("Security, a potem Secure Boot"); check the preposition reads well with it.
-- `apps/meet/desktop/locales/pl/desktop.ftl` `helper-pipe-hijacked`: "{ $pipe } otworzyło coś innego niż pomocnik Meet Luft" — word order chosen so $pipe needs no case.
-- `apps/meet/locales/pl/meet.ftl` `room-erase-bitlocker`: "Szyfrowanie BitLocker" — a noun instead of "Zaszyfrowana funkcją BitLocker", so it fits next to any partition without gender agreement; check it reads as a state on the partition row.
-- `apps/meet/locales/pl/meet.ftl` `room-place-free-detail`: "{ $size } miejsca, którego nic innego nie używa" — "miejsca" added so the relative clause doesn't depend on the number in $size; check it isn't too long for a detail line.
-- `apps/meet/locales/pl/meet.ftl` `luft-bar-used`: "{ $size }, zajęte: { $used }" — colon form keeps $used in the nominative; check it reads naturally under the space bar.
-- `apps/meet/desktop/locales/pl/desktop.ftl` `helper-box-room-shortfall`: "Miejsce systemu Luft pomieści jeszcze { $available } GB…" — "Luft’s room" rendered as the space set aside for Luft; check it's clear this is the room Meet Luft made.
+- `apps/store/meet/locales/pl/meet.ftl` `meet-logs-saved`: "Dzienniki z wypróbowywania systemu Luft zapisano na pulpicie" — "Try Luft" as a mode has no fixed Polish name, so it's described; check it reads naturally in all three logs messages.
+- `apps/store/meet/desktop/locales/pl/desktop.ftl` `check-start-entries`: "Stary wpis rozruchowy" — "start entry" (a firmware boot menu entry) rendered as wpis rozruchowy, used throughout Meet Luft.
+- `apps/store/meet/locales/pl/meet.ftl` `check-action-tidy`: "Uporządkuj" — button for removing stale boot entries; check it's clear enough next to the explanation.
+- `apps/store/meet/desktop/locales/pl/desktop.ftl` `check-secure-boot-restart-into`: "…gdzie ta opcja jest w { $place }" — $place is an English firmware menu path ("Security, a potem Secure Boot"); check the preposition reads well with it.
+- `apps/store/meet/desktop/locales/pl/desktop.ftl` `helper-pipe-hijacked`: "{ $pipe } otworzyło coś innego niż pomocnik Meet Luft" — word order chosen so $pipe needs no case.
+- `apps/store/meet/locales/pl/meet.ftl` `room-erase-bitlocker`: "Szyfrowanie BitLocker" — a noun instead of "Zaszyfrowana funkcją BitLocker", so it fits next to any partition without gender agreement; check it reads as a state on the partition row.
+- `apps/store/meet/locales/pl/meet.ftl` `room-place-free-detail`: "{ $size } miejsca, którego nic innego nie używa" — "miejsca" added so the relative clause doesn't depend on the number in $size; check it isn't too long for a detail line.
+- `apps/store/meet/locales/pl/meet.ftl` `luft-bar-used`: "{ $size }, zajęte: { $used }" — colon form keeps $used in the nominative; check it reads naturally under the space bar.
+- `apps/store/meet/desktop/locales/pl/desktop.ftl` `helper-box-room-shortfall`: "Miejsce systemu Luft pomieści jeszcze { $available } GB…" — "Luft’s room" rendered as the space set aside for Luft; check it's clear this is the room Meet Luft made.

@@ -30,29 +30,29 @@ Strings in Luft's Slovenian translation that a native speaker should check: term
 - `kestrel/ui/locales/sl/portal.ftl` `usb-description`: "Dokler je naprava priključena, lahko { $appName } z njo komunicira neposredno." — present tense to avoid gender agreement; $appName can also be "aplikacija" when unknown.
 - `kestrel/ui/locales/sl/system.ftl` `network-menu-connect-to`: "Poveži z omrežjem { $name }" — $name can also be a device (phone tethering), where "omrežjem" is slightly off.
 - `kestrel/ui/locales/sl/system.ftl` `display-change-title`: "Ohranim nastavitve zaslona?" — must stay under 30 characters; check the first-person form is acceptable.
-- `apps/setup/locales/sl/setup.ftl` `setup-region-intro-guessed`: "Začnimo z nastavitvijo. Nekaj smo že izpolnili: { $guesses }. Popravite, kar ni prav." — $guesses joins pieces like "jezik in tipkovnica glede na računalnik"; check it reads well with the list formatter.
-- `apps/setup/locales/sl/setup.ftl` `setup-network-unavailable`: "Povežete se lahko pozneje prek opravilne vrstice." — English says "from the panel"; assumed it means the taskbar.
+- `apps/system/setup/locales/sl/setup.ftl` `setup-region-intro-guessed`: "Začnimo z nastavitvijo. Nekaj smo že izpolnili: { $guesses }. Popravite, kar ni prav." — $guesses joins pieces like "jezik in tipkovnica glede na računalnik"; check it reads well with the list formatter.
+- `apps/system/setup/locales/sl/setup.ftl` `setup-network-unavailable`: "Povežete se lahko pozneje prek opravilne vrstice." — English says "from the panel"; assumed it means the taskbar.
 - `kestrel/ui/locales/sl/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 
-- `apps/settings/locales/sl/connections.ftl` `settings-bluetooth-request-confirm`: "Ali naj se { $name } seznani s tem računalnikom?" — built so { $name } stays nominative (unnamed is „naprava“); check it reads naturally with real device names.
-- `apps/settings/locales/sl/connections.ftl` `settings-bluetooth-request-authorize`: description "Naprava se bo lahko povezala s tem računalnikom." — { $name } dropped to avoid gender agreement with unknown names; check this is acceptable.
-- `apps/settings/locales/sl/connections.ftl` `settings-bluetooth-windows`: "Naprava/Napravi/Naprave { $devices } …" — agreement assumes $count is the total number of devices in the list.
-- `apps/settings/locales/sl/connections.ftl` `settings-network-ip-link-local`: "Samo lokalna povezava" — no settled Slovenian term for link-local.
-- `apps/settings/locales/sl/connections.ftl` `settings-network-security-owe`: "Izboljšano odprto" — check against Windows' Slovenian wording for Enhanced Open.
-- `apps/settings/locales/sl/system.ftl` `settings-accounts-apple-account`: "Račun Apple" — Apple has no Slovenian localization; chose the modifier-after-noun order from the style guide.
-- `apps/settings/locales/sl/devices.ftl` `settings-power-duration-minutes`: "{ $minutes } minuto …" — durations are in the accusative (they follow „čez“, „zdrži še“); verify every sentence and picker using them takes the accusative, such as „Zdrži še približno { $time }“.
-- `apps/settings/locales/sl/devices.ftl` `settings-keys-keypad`: "Številčnica { $key }" — check whether keyboards/OSes say Num or something else for keypad keys.
+- `apps/system/settings/locales/sl/connections.ftl` `settings-bluetooth-request-confirm`: "Ali naj se { $name } seznani s tem računalnikom?" — built so { $name } stays nominative (unnamed is „naprava“); check it reads naturally with real device names.
+- `apps/system/settings/locales/sl/connections.ftl` `settings-bluetooth-request-authorize`: description "Naprava se bo lahko povezala s tem računalnikom." — { $name } dropped to avoid gender agreement with unknown names; check this is acceptable.
+- `apps/system/settings/locales/sl/connections.ftl` `settings-bluetooth-windows`: "Naprava/Napravi/Naprave { $devices } …" — agreement assumes $count is the total number of devices in the list.
+- `apps/system/settings/locales/sl/connections.ftl` `settings-network-ip-link-local`: "Samo lokalna povezava" — no settled Slovenian term for link-local.
+- `apps/system/settings/locales/sl/connections.ftl` `settings-network-security-owe`: "Izboljšano odprto" — check against Windows' Slovenian wording for Enhanced Open.
+- `apps/system/settings/locales/sl/system.ftl` `settings-accounts-apple-account`: "Račun Apple" — Apple has no Slovenian localization; chose the modifier-after-noun order from the style guide.
+- `apps/system/settings/locales/sl/devices.ftl` `settings-power-duration-minutes`: "{ $minutes } minuto …" — durations are in the accusative (they follow „čez“, „zdrži še“); verify every sentence and picker using them takes the accusative, such as „Zdrži še približno { $time }“.
+- `apps/system/settings/locales/sl/devices.ftl` `settings-keys-keypad`: "Številčnica { $key }" — check whether keyboards/OSes say Num or something else for keypad keys.
 - `packages/web/ui/locales/sl/ui.ftl` `ui-passphrase-field`: "Šifrirno geslo" — used for the passphrase in setup and Settings alike; check it reads as distinct from the account "geslo" and matches what GNOME Disks uses in Slovenian.
-- `apps/settings/locales/sl/protection.ftl` `settings-privacy-screen-off-after`: "{ $duration } nedejavnosti" — rebuilt as "5 minut nedejavnosti" so the duration's case never changes; check it reads well as a row value under "Zaslon se izklopi".
-- `apps/settings/locales/sl/protection.ftl` `settings-security-hardware-fix-maker` (and the other fix-* messages): "Obe lahko doda …" for two — check that "obe" referring to listed protections (zaščite, f) reads naturally.
-- `apps/settings/locales/sl/protection.ftl` `settings-passwords-history-signed`: "Aplikacija { $app } je podpisala s ključem „{ $item }“" — the item may be a password rather than a key; check "s ključem" fits.
-- `apps/settings/locales/sl/protection.ftl` `settings-passwords-access-revoke`: "Prepovej aplikaciji { $app } uporabo elementa „{ $item }“" — "elementa" added to avoid declining the item name; check it isn't stiff.
-- `apps/settings/locales/sl/personalization.ftl` `settings-appearance-wallpaper-tile`: "Razpostavi" — check against the Windows/GNOME Slovenian term for tiled wallpaper ("Tlakovano" is the other candidate).
-- `apps/settings/locales/sl/personalization.ftl` `settings-accessibility-typing-assist-count`: "Vklopljeno: { $count }" — neutral form used for every plural category to avoid agreement with an unnamed noun.
-- `apps/settings/locales/sl/system.ftl` `settings-datetime-increase`: "{ $label }: povečaj" — screen-reader label; word order chosen because $label is capitalized (Ura, Minuta).
-- `apps/settings/locales/sl/system.ftl` `settings-updates-apps-count`: "{ $count } aplikacija ima posodobitev v aplikaciji Schelf" — "aplikacija … v aplikaciji" repeats; a reviewer may prefer another phrasing.
+- `apps/system/settings/locales/sl/protection.ftl` `settings-privacy-screen-off-after`: "{ $duration } nedejavnosti" — rebuilt as "5 minut nedejavnosti" so the duration's case never changes; check it reads well as a row value under "Zaslon se izklopi".
+- `apps/system/settings/locales/sl/protection.ftl` `settings-security-hardware-fix-maker` (and the other fix-* messages): "Obe lahko doda …" for two — check that "obe" referring to listed protections (zaščite, f) reads naturally.
+- `apps/system/settings/locales/sl/protection.ftl` `settings-passwords-history-signed`: "Aplikacija { $app } je podpisala s ključem „{ $item }“" — the item may be a password rather than a key; check "s ključem" fits.
+- `apps/system/settings/locales/sl/protection.ftl` `settings-passwords-access-revoke`: "Prepovej aplikaciji { $app } uporabo elementa „{ $item }“" — "elementa" added to avoid declining the item name; check it isn't stiff.
+- `apps/system/settings/locales/sl/personalization.ftl` `settings-appearance-wallpaper-tile`: "Razpostavi" — check against the Windows/GNOME Slovenian term for tiled wallpaper ("Tlakovano" is the other candidate).
+- `apps/system/settings/locales/sl/personalization.ftl` `settings-accessibility-typing-assist-count`: "Vklopljeno: { $count }" — neutral form used for every plural category to avoid agreement with an unnamed noun.
+- `apps/system/settings/locales/sl/system.ftl` `settings-datetime-increase`: "{ $label }: povečaj" — screen-reader label; word order chosen because $label is capitalized (Ura, Minuta).
+- `apps/system/settings/locales/sl/system.ftl` `settings-updates-apps-count`: "{ $count } aplikacija ima posodobitev v aplikaciji Schelf" — "aplikacija … v aplikaciji" repeats; a reviewer may prefer another phrasing.
 
 ## Website
 
@@ -63,14 +63,14 @@ Strings in Luft's Slovenian translation that a native speaker should check: term
 
 ## Meet Luft
 
-- `apps/meet/locales/sl/meet.ftl` `linux-ready-description`: "… se kot običajno še naprej zaganja { $system }." — { $system } can be „ta sistem“, so Linux sentences keep it out of the sentence start; check the word order reads naturally.
-- `apps/meet/locales/sl/meet.ftl` `linux-ready-restart-replace`: "Namestitveni program se odpre z že izbrano zamenjavo za { $system } …" — rebuilt to avoid declining the system name; check it isn't stiff.
-- `apps/meet/locales/sl/meet.ftl` `check-found-description`: "To je ugotovila aplikacija Meet Luft." — messages avoid giving Meet Luft a gender by using „aplikacija Meet Luft“ or impersonal „ni bilo mogoče …“; check that's the right call.
-- `apps/meet/locales/sl/meet.ftl` `stick-done-eject`: "Pred odstranitvijo ga izvrzite." — check against Windows' Slovenian wording for ejecting a drive.
-- `apps/meet/desktop/locales/sl/desktop.ftl` `drive-storage-error`: "napaka shrambe sistema Windows { $code }" — no settled term for "Windows storage error".
-- `apps/meet/desktop/locales/sl/desktop.ftl` `check-wifi-broadcom`: "telefon za internetno povezavo prek USB" — paraphrase of USB tethering; check Android's Slovenian term („Internet prek USB-ja“).
-- `apps/meet/locales/sl/meet.ftl` `room-live-free`: "Prostega je že { $free }, …" — partitive genitive chosen so the sentence works for any size; check it reads naturally.
-- `apps/meet/locales/sl/meet.ftl` `room-erase-bitlocker`: "Šifrirano z BitLockerjem" — neuter status form under a partition's name in the list; "Šifrirana" (agreeing with particija) is the alternative.
-- `apps/meet/locales/sl/meet.ftl` `room-erase-understood`: "Vem, da je del tega šifriran z BitLockerjem in ga ni mogoče obnoviti" — tick box text in first person; check "del tega" reads clearly as "some of what is on the drive".
-- `apps/meet/locales/sl/meet.ftl` `luft-windows-free-title`: "Prepusti prosti prostor sistemu Windows" — check "prepusti" is the most natural verb for handing free space over.
-- `apps/meet/desktop/locales/sl/desktop.ftl` `check-space-free-already`: "Od tega je že prostih { $size } GB …" — "prostih" fits 5 and more and decimals; for 1–4 GB the agreement would be off.
+- `apps/store/meet/locales/sl/meet.ftl` `linux-ready-description`: "… se kot običajno še naprej zaganja { $system }." — { $system } can be „ta sistem“, so Linux sentences keep it out of the sentence start; check the word order reads naturally.
+- `apps/store/meet/locales/sl/meet.ftl` `linux-ready-restart-replace`: "Namestitveni program se odpre z že izbrano zamenjavo za { $system } …" — rebuilt to avoid declining the system name; check it isn't stiff.
+- `apps/store/meet/locales/sl/meet.ftl` `check-found-description`: "To je ugotovila aplikacija Meet Luft." — messages avoid giving Meet Luft a gender by using „aplikacija Meet Luft“ or impersonal „ni bilo mogoče …“; check that's the right call.
+- `apps/store/meet/locales/sl/meet.ftl` `stick-done-eject`: "Pred odstranitvijo ga izvrzite." — check against Windows' Slovenian wording for ejecting a drive.
+- `apps/store/meet/desktop/locales/sl/desktop.ftl` `drive-storage-error`: "napaka shrambe sistema Windows { $code }" — no settled term for "Windows storage error".
+- `apps/store/meet/desktop/locales/sl/desktop.ftl` `check-wifi-broadcom`: "telefon za internetno povezavo prek USB" — paraphrase of USB tethering; check Android's Slovenian term („Internet prek USB-ja“).
+- `apps/store/meet/locales/sl/meet.ftl` `room-live-free`: "Prostega je že { $free }, …" — partitive genitive chosen so the sentence works for any size; check it reads naturally.
+- `apps/store/meet/locales/sl/meet.ftl` `room-erase-bitlocker`: "Šifrirano z BitLockerjem" — neuter status form under a partition's name in the list; "Šifrirana" (agreeing with particija) is the alternative.
+- `apps/store/meet/locales/sl/meet.ftl` `room-erase-understood`: "Vem, da je del tega šifriran z BitLockerjem in ga ni mogoče obnoviti" — tick box text in first person; check "del tega" reads clearly as "some of what is on the drive".
+- `apps/store/meet/locales/sl/meet.ftl` `luft-windows-free-title`: "Prepusti prosti prostor sistemu Windows" — check "prepusti" is the most natural verb for handing free space over.
+- `apps/store/meet/desktop/locales/sl/desktop.ftl` `check-space-free-already`: "Od tega je že prostih { $size } GB …" — "prostih" fits 5 and more and decimals; for 1–4 GB the agreement would be off.

@@ -44,7 +44,7 @@ Luft is young. There's no stable release yet: the downloads are nightly builds o
 | --- | --- |
 | [`os`](os/README.md) | The system image, the USB stick and VMs to try them in |
 | [`kestrel`](kestrel/README.md) | The desktop, login screen, keyring, passkeys and session services |
-| [`apps`](apps) | Luft's apps, one folder each, and Install Luft and Meet Luft |
+| [`apps`](apps) | Luft's apps: `system` for the ones in the image, Install Luft among them, and `store` for the ones on schelf.store, Meet Luft among them |
 | [`extensions`](docs/extensions.md) | Luft's own desktop extensions, such as Seasons |
 | [`packages`](packages) | Code the apps and services share: the native app shell, D-Bus and translations, libraries for the system's parts in `system` and the UI kit in `web` |
 | [`services`](services) | Luft's own system and session services: updates, sleep, online accounts, dictation, Windows next to Luft and app thumbnails |

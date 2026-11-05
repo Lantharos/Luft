@@ -160,9 +160,13 @@ bootc_version() {
   { base_version bootc; echo; echo "$bootc_minimum"; } | sort -V | tail -1
 }
 
+app_folder() {
+  (cd "$luft" && compgen -G "apps/*/$1")
+}
+
 part_target() {
   case "$1" in
-    app-*) echo "app APP=${1#app-}" ;;
+    app-*) echo "app APP=${1#app-} FOLDER=$(app_folder "${1#app-}")" ;;
     bootc) echo "bootc BOOTC=$(bootc_version)" ;;
     portal) echo "portal PORTAL=$(repo_version xdg-desktop-portal)" ;;
     runtime) echo "runtime CEF=$cef" ;;

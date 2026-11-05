@@ -10,8 +10,8 @@ const SERVICE_SECTION = /^\[Service\]$/m;
 const TEST_ONLY = ['**/vm/**', '**/tools/check/**'].map((pattern) => new Glob(pattern));
 
 const SCOPES: [string, Scope][] = [
-	['apps/setup/installer/data/*', 'system'],
-	['apps/*/data/*', 'user'],
+	['apps/system/setup/installer/data/*', 'system'],
+	['apps/*/*/data/*', 'user'],
 	['sushi/data/systemd/*', 'system'],
 	['kestrel/engine/data/system/*', 'system'],
 	['kestrel/engine/data/session/*', 'user'],

@@ -35,7 +35,7 @@ After pulling, `meson compile -C kestrel/build` is enough. The nested session co
 Each app runs from its own folder:
 
 ```sh
-cd apps/rover
+cd apps/system/rover
 bun run desktop:dev      # the interface with hot reload, in its native window
 bun run check            # type checks
 bun run desktop:build    # a release build
@@ -63,7 +63,7 @@ os/dev/layer.sh reset                    # back to the signed image
 | `kestrel` | Kestrel, its settings service, search, the login screen's service, Luft Keyring, Luft Passkeys and the watchdog |
 | `boot` | trustd, USB protection and Sushi's shutdown screen |
 | `services` | The installer, updater, system packages, sleep, accounts, speech and Windows services |
-| `app-NAME` | The app in `apps/NAME` |
+| `app-NAME` | The app called NAME in `apps/system` or `apps/store` |
 
 Run it on Luft itself rather than in a toolbox, from a clone of this repository; Luft already has the Git and Podman it needs. The first `apply` downloads the base and sets up the builder, which takes a while and around 8 GB of space; later ones only rebuild what changed. It asks for your password to lay the build over `/usr`. `apply` refreshes the settings schemas, icon, font, MIME and app caches over the combined system, labels everything for SELinux with the installed policy, restarts the system services the build replaces, and reloads D-Bus. Log out and back in to run a new Kestrel or a new session service.
 
@@ -92,7 +92,7 @@ os/vm/disk.sh                        # install the image onto a virtual disk, as
 SECURE_BOOT=1 os/vm/qemu.sh          # start it with Secure Boot and a TPM
 os/vm/check.py session               # or check that it starts, signs in and opens Settings
 ISO=os/iso/state/luft-VERSION.iso os/vm/qemu.sh   # start the stick instead
-apps/setup/installer/vm/run.sh       # real installs next to a Windows-like drive
+apps/system/setup/installer/vm/run.sh       # real installs next to a Windows-like drive
 ```
 
 [Testing on real hardware](/reference/hardware-testing/) lists what to try when Luft goes on a new computer.

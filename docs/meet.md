@@ -1,6 +1,6 @@
 # Meet Luft
 
-How Meet Luft prepares a Windows or Linux computer for Luft, makes USB sticks and keeps logs from Try Luft. The app is in [apps/meet](../apps/meet/README.md).
+How Meet Luft prepares a Windows or Linux computer for Luft, makes USB sticks and keeps logs from Try Luft. The app is in [apps/store/meet](../apps/store/meet/README.md).
 
 ## Which Luft it downloads
 
@@ -180,7 +180,7 @@ Meet Luft shows the first of your display languages it's translated into: on Win
 
 ## Signatures
 
-Every published `.sha256` has a [minisign](https://jedisct1.github.io/minisign/) signature next to it, `.sha256.minisig`, whose trusted comment is the name of the ISO it's for. The ISO workflow signs with the `LUFT_ISO_MINISIGN_KEY` Actions secret, and Meet Luft has the public key built in as `PUBLIC_KEY` in `apps/meet/desktop/src/live/signature.rs`. It only accepts checksums signed for the exact ISO it downloads, so an older or other ISO can't be passed off as the one it asked for, and refuses a download without a signature. An ISO picked with *Use an ISO I already have* is the person's own choice and isn't checked against a signature.
+Every published `.sha256` has a [minisign](https://jedisct1.github.io/minisign/) signature next to it, `.sha256.minisig`, whose trusted comment is the name of the ISO it's for. The ISO workflow signs with the `LUFT_ISO_MINISIGN_KEY` Actions secret, and Meet Luft has the public key built in as `PUBLIC_KEY` in `apps/store/meet/desktop/src/live/signature.rs`. It only accepts checksums signed for the exact ISO it downloads, so an older or other ISO can't be passed off as the one it asked for, and refuses a download without a signature. An ISO picked with *Use an ISO I already have* is the person's own choice and isn't checked against a signature.
 
 To change the key, make a new pair without a password on a computer you trust (`minisign -G -W -p luft-iso.pub -s luft-iso.key`), replace the secret with the whole of `luft-iso.key`, publish ISOs signed with it, and only then put the second line of `luft-iso.pub` into `PUBLIC_KEY`. Copies of Meet Luft with the old key refuse ISOs signed with the new one.
 

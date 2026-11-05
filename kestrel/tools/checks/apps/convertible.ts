@@ -90,8 +90,8 @@ async function checkRedaction(app: LuftApp, folder: string) {
 }
 
 async function checkEditors(folder: string) {
-  const clip = repository('apps', 'convertible', 'desktop', 'tests', 'fixtures', 'clip.webm');
-  const song = repository('apps', 'convertible', 'desktop', 'tests', 'fixtures', 'tone.flac');
+  const clip = repository('apps', 'store', 'convertible', 'desktop', 'tests', 'fixtures', 'clip.webm');
+  const song = repository('apps', 'store', 'convertible', 'desktop', 'tests', 'fixtures', 'tone.flac');
   await withApp('convertible', [clip], async app => {
     await pause(SETTLE);
     app.click(EDIT_MODE);

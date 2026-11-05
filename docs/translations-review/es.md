@@ -26,26 +26,26 @@ Strings in Luft's Spanish translation that a native speaker should check: terms 
 - `kestrel/ui/locales/es/system.ftl` `network-menu-tether`: "Conexión compartida" — Bluetooth tethering has no settled Spanish term (Android says "Compartir conexión por Bluetooth"); anclaje was avoided because anclar means pin. Check it reads right as a Quick settings tile title.
 - `kestrel/ui/locales/es/desktop.ftl` `switch-monitor-external-only`: "Solo externas" — the plural assumes several external displays may be meant; check against the 15-character limit and context.
 - `kestrel/ui/locales/es/portal.ftl` `print-paper-statement`: "Media carta" — North American paper names; check they match what Spanish print dialogs show.
-- `apps/setup/locales/es/setup.ftl` `setup-region-guess-from-computer`: "tu { $fields } a partir del ordenador" — "tu" before a joined list ("tu idioma y teclado") is acceptable, but check it reads well with every field combination.
-- `apps/setup/locales/es/setup.ftl` `setup-account-full-name-example`: "Clara Campoamor" — chosen as a well-known Spanish name; confirm.
+- `apps/system/setup/locales/es/setup.ftl` `setup-region-guess-from-computer`: "tu { $fields } a partir del ordenador" — "tu" before a joined list ("tu idioma y teclado") is acceptable, but check it reads well with every field combination.
+- `apps/system/setup/locales/es/setup.ftl` `setup-account-full-name-example`: "Clara Campoamor" — chosen as a well-known Spanish name; confirm.
 - `kestrel/ui/locales/es/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 
-- `apps/settings/locales/es/connections.ftl` `settings-network-security-owe`: "Abierta mejorada" — no settled Spanish name for Wi‑Fi Enhanced Open (OWE); check whether it should stay in English.
-- `apps/settings/locales/es/connections.ftl` `settings-network-wireguard-keepalive`: "Keepalive" — kept in English as WireGuard clients do; check whether a Spanish term reads better.
-- `apps/settings/locales/es/system.ftl` `settings-accounts-approve`: "la Protección de datos avanzada" — check against Apple's current Spanish (Spain) name for Advanced Data Protection.
-- `apps/settings/locales/es/devices.ftl` `settings-dictation-hold`: "Pulsa y mantén { $keys } para dictar" — avoids "mantén pulsado/pulsada" because $keys can be a shortcut or "la tecla Copilot"; check it reads naturally.
-- `apps/settings/locales/es/devices.ftl` `settings-dictation-language-unavailable`: "El idioma { $language } no está disponible en este ordenador" — "el idioma" is added so the lowercase language name doesn't start the sentence; same in `settings-dictation-engine-description`.
-- `apps/settings/locales/es/devices.ftl` `settings-keys-keypad`: "{ $key } del teclado numérico" — long for a shortcut label; check whether a shorter form is preferred.
-- `apps/settings/locales/es/devices.ftl` `settings-power-limit-stops-at`: "Detiene la carga al { $level }" — assumes $level is a percentage ("al 80 %").
-- `apps/settings/locales/es/personalization.ftl` `settings-cursors-folder-description`: "Aquí aparecen los temas que pongas en Carpeta personal › .local › share › icons" — "Carpeta personal" for Home follows GNOME; check it matches what Rover shows.
-- `apps/settings/locales/es/personalization.ftl` `settings-appearance-icons-clear`: "Transparentes" — the English "Clear" icon style; check it describes the glass-like look.
-- `apps/settings/locales/es/personalization.ftl` `settings-accessibility-typing-assist`: "Ayuda para escribir" — the count variants are feminine ("{ $count } activada(s)"), counting assists (ayudas); check it reads naturally under this heading.
-- `apps/settings/locales/es/protection.ftl` `settings-security-anti-cheat`: "Juegos con antitrampas" — check "antitrampas" is what Spanish players say rather than "anti-cheat".
-- `apps/settings/locales/es/protection.ftl` `settings-usb-hold-back`: "Retener los dispositivos USB nuevos" — check "retener" is clear for holding them back until unlock.
-- `apps/settings/locales/es/system.ftl` `settings-updates-stay`: "Seguir en la { $version }" — elides "versión" before the number; check it reads well with real version values.
-- `apps/settings/locales/es/system.ftl` `settings-updates-released`: "Publicada { $when }" — assumes $when is a phrase like "hace 3 días" or "ayer".
+- `apps/system/settings/locales/es/connections.ftl` `settings-network-security-owe`: "Abierta mejorada" — no settled Spanish name for Wi‑Fi Enhanced Open (OWE); check whether it should stay in English.
+- `apps/system/settings/locales/es/connections.ftl` `settings-network-wireguard-keepalive`: "Keepalive" — kept in English as WireGuard clients do; check whether a Spanish term reads better.
+- `apps/system/settings/locales/es/system.ftl` `settings-accounts-approve`: "la Protección de datos avanzada" — check against Apple's current Spanish (Spain) name for Advanced Data Protection.
+- `apps/system/settings/locales/es/devices.ftl` `settings-dictation-hold`: "Pulsa y mantén { $keys } para dictar" — avoids "mantén pulsado/pulsada" because $keys can be a shortcut or "la tecla Copilot"; check it reads naturally.
+- `apps/system/settings/locales/es/devices.ftl` `settings-dictation-language-unavailable`: "El idioma { $language } no está disponible en este ordenador" — "el idioma" is added so the lowercase language name doesn't start the sentence; same in `settings-dictation-engine-description`.
+- `apps/system/settings/locales/es/devices.ftl` `settings-keys-keypad`: "{ $key } del teclado numérico" — long for a shortcut label; check whether a shorter form is preferred.
+- `apps/system/settings/locales/es/devices.ftl` `settings-power-limit-stops-at`: "Detiene la carga al { $level }" — assumes $level is a percentage ("al 80 %").
+- `apps/system/settings/locales/es/personalization.ftl` `settings-cursors-folder-description`: "Aquí aparecen los temas que pongas en Carpeta personal › .local › share › icons" — "Carpeta personal" for Home follows GNOME; check it matches what Rover shows.
+- `apps/system/settings/locales/es/personalization.ftl` `settings-appearance-icons-clear`: "Transparentes" — the English "Clear" icon style; check it describes the glass-like look.
+- `apps/system/settings/locales/es/personalization.ftl` `settings-accessibility-typing-assist`: "Ayuda para escribir" — the count variants are feminine ("{ $count } activada(s)"), counting assists (ayudas); check it reads naturally under this heading.
+- `apps/system/settings/locales/es/protection.ftl` `settings-security-anti-cheat`: "Juegos con antitrampas" — check "antitrampas" is what Spanish players say rather than "anti-cheat".
+- `apps/system/settings/locales/es/protection.ftl` `settings-usb-hold-back`: "Retener los dispositivos USB nuevos" — check "retener" is clear for holding them back until unlock.
+- `apps/system/settings/locales/es/system.ftl` `settings-updates-stay`: "Seguir en la { $version }" — elides "versión" before the number; check it reads well with real version values.
+- `apps/system/settings/locales/es/system.ftl` `settings-updates-released`: "Publicada { $when }" — assumes $when is a phrase like "hace 3 días" or "ayer".
 
 ## Website
 
@@ -56,12 +56,12 @@ Strings in Luft's Spanish translation that a native speaker should check: terms 
 
 ## Meet Luft
 
-- `apps/meet/locales/es/meet.ftl` `ready-remove-description`: "incluida la caja de mudanza" — "caja de mudanza" for the moving box is new here (setup avoids naming it); check it reads naturally (also in `working-packing` .description and `drive-box-no-guid` in desktop.ftl).
-- `apps/meet/locales/es/meet.ftl` `meet-logs-saved`: "los registros de la prueba de Luft" — "Try Luft" rendered as "la prueba de Luft" so it fits the sentence; check it's clear it means the Try Luft session (same in `meet-logs-none`, `meet-logs-failed`, `logs-not-saved`).
-- `apps/meet/locales/es/meet.ftl` `meet-channel-latest`: "Meet Luft volverá a usar las versiones normales" — "releases" as "versiones normales" to contrast with nightly; check a better word exists.
-- `apps/meet/locales/es/meet.ftl` `check-get-ready-file`: "No se cambian las particiones" — for "Nothing is repartitioned"; check it's clear nothing on the disk layout changes (also `check-folder-fine` in desktop.ftl).
-- `apps/meet/desktop/locales/es/desktop.ftl` `check-space-short-windows`: "con Liberador de espacio en disco" — Windows' Spanish name for Disk Cleanup from memory; confirm against a Spanish Windows 11.
-- `apps/meet/desktop/locales/es/desktop.ftl` `check-firmware-key-volume-up`: "subir volumen" — check this reads right inside "pulsa { $key } cuando aparezca el logotipo".
-- `apps/meet/desktop/locales/es/desktop.ftl` `helper-not-started`: "El asistente de Meet Luft" — "helper" as "asistente", which can also suggest a wizard; check whether "proceso auxiliar" is clearer.
-- `apps/meet/desktop/locales/es/desktop.ftl` `helper-box-room-shortfall`: "El espacio de Luft puede ceder { $available } GB…" — "Luft's room" is the space set aside for Luft, which holds the moving box; check «ceder» reads right here, where Windows is not the one giving.
-- `apps/meet/locales/es/meet.ftl` `luft-resize-passphrase`: "mientras se traslada" — "while it moves" (Luft moving into its new space at startup); check it is understood, or whether «mientras cambia de tamaño» is clearer.
+- `apps/store/meet/locales/es/meet.ftl` `ready-remove-description`: "incluida la caja de mudanza" — "caja de mudanza" for the moving box is new here (setup avoids naming it); check it reads naturally (also in `working-packing` .description and `drive-box-no-guid` in desktop.ftl).
+- `apps/store/meet/locales/es/meet.ftl` `meet-logs-saved`: "los registros de la prueba de Luft" — "Try Luft" rendered as "la prueba de Luft" so it fits the sentence; check it's clear it means the Try Luft session (same in `meet-logs-none`, `meet-logs-failed`, `logs-not-saved`).
+- `apps/store/meet/locales/es/meet.ftl` `meet-channel-latest`: "Meet Luft volverá a usar las versiones normales" — "releases" as "versiones normales" to contrast with nightly; check a better word exists.
+- `apps/store/meet/locales/es/meet.ftl` `check-get-ready-file`: "No se cambian las particiones" — for "Nothing is repartitioned"; check it's clear nothing on the disk layout changes (also `check-folder-fine` in desktop.ftl).
+- `apps/store/meet/desktop/locales/es/desktop.ftl` `check-space-short-windows`: "con Liberador de espacio en disco" — Windows' Spanish name for Disk Cleanup from memory; confirm against a Spanish Windows 11.
+- `apps/store/meet/desktop/locales/es/desktop.ftl` `check-firmware-key-volume-up`: "subir volumen" — check this reads right inside "pulsa { $key } cuando aparezca el logotipo".
+- `apps/store/meet/desktop/locales/es/desktop.ftl` `helper-not-started`: "El asistente de Meet Luft" — "helper" as "asistente", which can also suggest a wizard; check whether "proceso auxiliar" is clearer.
+- `apps/store/meet/desktop/locales/es/desktop.ftl` `helper-box-room-shortfall`: "El espacio de Luft puede ceder { $available } GB…" — "Luft's room" is the space set aside for Luft, which holds the moving box; check «ceder» reads right here, where Windows is not the one giving.
+- `apps/store/meet/locales/es/meet.ftl` `luft-resize-passphrase`: "mientras se traslada" — "while it moves" (Luft moving into its new space at startup); check it is understood, or whether «mientras cambia de tamaño» is clearer.

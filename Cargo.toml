@@ -1,24 +1,24 @@
 [workspace]
 resolver = "3"
 members = [
-    "apps/barometer/desktop",
-    "apps/convertible/desktop",
-    "apps/disks/desktop",
-    "apps/draft/desktop",
-    "apps/keys/desktop",
-    "apps/magpie/desktop",
-    "apps/mailman/desktop",
-    "apps/meet/desktop",
-    "apps/rover/desktop",
-    "apps/schelf/desktop",
-    "apps/schelf/sandbox",
-    "apps/settings/desktop",
-    "apps/setup/contract",
-    "apps/setup/desktop",
-    "apps/setup/installer",
-    "apps/signin/desktop",
-    "apps/soundboard/desktop",
-    "apps/tern/desktop",
+    "apps/system/barometer/desktop",
+    "apps/store/convertible/desktop",
+    "apps/system/disks/desktop",
+    "apps/store/draft/desktop",
+    "apps/system/keys/desktop",
+    "apps/store/magpie/desktop",
+    "apps/store/mailman/desktop",
+    "apps/store/meet/desktop",
+    "apps/system/rover/desktop",
+    "apps/system/schelf/desktop",
+    "apps/system/schelf/sandbox",
+    "apps/system/settings/desktop",
+    "apps/system/setup/contract",
+    "apps/system/setup/desktop",
+    "apps/system/setup/installer",
+    "apps/system/signin/desktop",
+    "apps/store/soundboard/desktop",
+    "apps/system/tern/desktop",
     "extensions/spotify-style/helper",
     "sushi/crates/sushi",
     "sushi/crates/sushi-scene",
@@ -70,24 +70,24 @@ members = [
     "services/windows",
 ]
 default-members = [
-    "apps/barometer/desktop",
-    "apps/convertible/desktop",
-    "apps/disks/desktop",
-    "apps/draft/desktop",
-    "apps/keys/desktop",
-    "apps/magpie/desktop",
-    "apps/mailman/desktop",
-    "apps/meet/desktop",
-    "apps/rover/desktop",
-    "apps/schelf/desktop",
-    "apps/schelf/sandbox",
-    "apps/settings/desktop",
-    "apps/setup/contract",
-    "apps/setup/desktop",
-    "apps/setup/installer",
-    "apps/signin/desktop",
-    "apps/soundboard/desktop",
-    "apps/tern/desktop",
+    "apps/system/barometer/desktop",
+    "apps/store/convertible/desktop",
+    "apps/system/disks/desktop",
+    "apps/store/draft/desktop",
+    "apps/system/keys/desktop",
+    "apps/store/magpie/desktop",
+    "apps/store/mailman/desktop",
+    "apps/store/meet/desktop",
+    "apps/system/rover/desktop",
+    "apps/system/schelf/desktop",
+    "apps/system/schelf/sandbox",
+    "apps/system/settings/desktop",
+    "apps/system/setup/contract",
+    "apps/system/setup/desktop",
+    "apps/system/setup/installer",
+    "apps/system/signin/desktop",
+    "apps/store/soundboard/desktop",
+    "apps/system/tern/desktop",
     "sushi/crates/sushi",
     "sushi/crates/sushi-scene",
     "sushi/crates/sushictl",
@@ -153,12 +153,12 @@ luft-disks = { path = "packages/system/disks" }
 luft-fingerprint = { path = "packages/system/fingerprint" }
 luft-i18n = { path = "packages/i18n" }
 luft-identity = { path = "packages/identity" }
-luft-installer-contract = { path = "apps/setup/contract" }
+luft-installer-contract = { path = "apps/system/setup/contract" }
 luft-keyring-vault = { path = "kestrel/keyring/vault" }
 luft-keyring-wire = { path = "kestrel/keyring/wire" }
 luft-meet = { path = "packages/system/meet" }
 luft-network = { path = "packages/system/network" }
-luft-sandbox = { path = "apps/schelf/sandbox" }
+luft-sandbox = { path = "apps/system/schelf/sandbox" }
 luft-software = { path = "packages/system/software", default-features = false }
 luft-speech = { path = "packages/system/speech" }
 luft-trust = { path = "packages/system/trust" }

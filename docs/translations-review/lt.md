@@ -36,38 +36,38 @@ Strings in Luft's Lithuanian translation that a native speaker should check: ter
 - `kestrel/ui/locales/lt/system.ftl` `auto-rotate-title`: "Automatinis pasukimas" — may clip on a quick settings tile.
 - `kestrel/ui/locales/lt/system.ftl` `display-change-title`: "Palikti šiuos nustatymus?" — shortened (dropped „ekrano“) to stay under 30 characters.
 - `kestrel/ui/locales/lt/desktop.ftl` `switch-monitor-join`: "Išplėsti" — Windows' word for extending the desktop across displays.
-- `apps/setup/locales/lt/setup.ftl` `setup-region-intro-guessed`: "Pradėkime. Parinkome { $guesses }, tad …" — fields are accusative („kalbą“, „klaviatūrą“, „laiko juostą“) and each guess reads „… pagal jūsų kompiuterį“; check the assembled sentence.
-- `apps/setup/locales/lt/setup.ftl` `setup-replace-keeps-accounts`: "[1] Kita joje esanti paskyra … / Dar { $count } paskyrų …" — exact [1] plus all four categories with „Dar“; check wording.
-- `apps/setup/locales/lt/setup.ftl` `setup-replace-keeps-tools`: "… – prisijungus, Toolbox aplinkoje" — Toolbox kept as a name; check phrasing.
-- `apps/setup/locales/lt/setup.ftl` `setup-account-full-name-example`: "Jonas Jonaitis" — the standard Lithuanian placeholder name.
-- `apps/setup/locales/lt/setup.ftl` `setup-windows-hibernated`: "… naudojant spartųjį paleidimą …" and `setup-windows-bitlocker` "Disko tvarkymą": check these match current Windows Lithuanian names (Spartusis paleidimas, Disko tvarkymas).
+- `apps/system/setup/locales/lt/setup.ftl` `setup-region-intro-guessed`: "Pradėkime. Parinkome { $guesses }, tad …" — fields are accusative („kalbą“, „klaviatūrą“, „laiko juostą“) and each guess reads „… pagal jūsų kompiuterį“; check the assembled sentence.
+- `apps/system/setup/locales/lt/setup.ftl` `setup-replace-keeps-accounts`: "[1] Kita joje esanti paskyra … / Dar { $count } paskyrų …" — exact [1] plus all four categories with „Dar“; check wording.
+- `apps/system/setup/locales/lt/setup.ftl` `setup-replace-keeps-tools`: "… – prisijungus, Toolbox aplinkoje" — Toolbox kept as a name; check phrasing.
+- `apps/system/setup/locales/lt/setup.ftl` `setup-account-full-name-example`: "Jonas Jonaitis" — the standard Lithuanian placeholder name.
+- `apps/system/setup/locales/lt/setup.ftl` `setup-windows-hibernated`: "… naudojant spartųjį paleidimą …" and `setup-windows-bitlocker` "Disko tvarkymą": check these match current Windows Lithuanian names (Spartusis paleidimas, Disko tvarkymas).
 - `kestrel/ui/locales/lt/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 
-- `apps/settings/locales/lt/connections.ftl` `settings-bluetooth-request-unnamed`: "be pavadinimo" — the pairing sentences put a declined "įrenginys/įrenginį/įrenginiui" before { $name }, so an unnamed device reads "įrenginį be pavadinimo"; check this reads naturally in every pairing sentence.
-- `apps/settings/locales/lt/connections.ftl` `settings-network-security-owe`: "Patobulintas atviras" — no settled Lithuanian term for Enhanced Open (OWE); check against Windows/Android.
-- `apps/settings/locales/lt/connections.ftl` `settings-network-ip-link-local`: "Tik vietinis saitas" — check against GNOME/NetworkManager Lithuanian wording for link-local.
-- `apps/settings/locales/lt/connections.ftl` `settings-network-router`: "Maršruto parinktuvas" — Windows' term, long for a field label; may clip.
-- `apps/settings/locales/lt/system.ftl` `settings-accounts-online` `.description`: "Kiekviena paskyra tampa aplanku Cloud…" — assumes the folder is literally named Cloud.
-- `apps/settings/locales/lt/system.ftl` `settings-accounts-approve`: "išplėstinė duomenų apsauga" — check Apple's official Lithuanian name for Advanced Data Protection.
-- `apps/settings/locales/lt/connections.ftl` `settings-bluetooth-visible-for`: "{ $minutes } minutę" (accusative of duration) — check it reads right as a standalone menu option.
-- `apps/settings/locales/lt/system.ftl` `settings-accounts-remove-note`: "Jūsų failai lieka tarnyboje { $provider }." — "tarnyboje" for a cloud service; check it sounds natural for OneDrive, iCloud Drive etc.
-- `apps/settings/locales/lt/devices.ftl` `settings-dictation-engine-description`: "{ $engine } atpažįsta šią kalbą: { $language }" — Lithuanian language names arrive as "anglų", so the sentence is built around a colon; same for `settings-dictation-language-unavailable` and `settings-dictation-engine-graphics-card`.
-- `apps/settings/locales/lt/devices.ftl` `settings-dictation-hold`: "Diktuokite laikydami { $keys }" — needs { $keys } in the accusative; `settings-dictation-copilot-key` is "Copilot klavišą" for that reason, and a joined list such as "Super+Alt arba Copilot klavišą" should still read correctly.
-- `apps/settings/locales/lt/devices.ftl` `settings-power-screen-off`: "Laikas iki ekrano išjungimo" — rephrased so the duration picker values (nominative "5 minutės") fit; check the label.
-- `apps/settings/locales/lt/devices.ftl` `settings-power-long-sleep-hours`: "{ $hours } valandos" (genitive after "Išjungti po") — days and weeks likewise; these only work after "po".
-- `apps/settings/locales/lt/devices.ftl` `settings-keys-keypad`: "Num { $key }" — no settled Lithuanian name for number-pad keys in shortcut labels.
-- `apps/settings/locales/lt/protection.ftl` `settings-privacy-screen-off-after`: "Po: { $duration }" — "po" needs the genitive ("po 5 minučių") but the duration arrives in an unknown case, so a colon was used; check whether it reads acceptably or the duration format allows a natural phrase.
+- `apps/system/settings/locales/lt/connections.ftl` `settings-bluetooth-request-unnamed`: "be pavadinimo" — the pairing sentences put a declined "įrenginys/įrenginį/įrenginiui" before { $name }, so an unnamed device reads "įrenginį be pavadinimo"; check this reads naturally in every pairing sentence.
+- `apps/system/settings/locales/lt/connections.ftl` `settings-network-security-owe`: "Patobulintas atviras" — no settled Lithuanian term for Enhanced Open (OWE); check against Windows/Android.
+- `apps/system/settings/locales/lt/connections.ftl` `settings-network-ip-link-local`: "Tik vietinis saitas" — check against GNOME/NetworkManager Lithuanian wording for link-local.
+- `apps/system/settings/locales/lt/connections.ftl` `settings-network-router`: "Maršruto parinktuvas" — Windows' term, long for a field label; may clip.
+- `apps/system/settings/locales/lt/system.ftl` `settings-accounts-online` `.description`: "Kiekviena paskyra tampa aplanku Cloud…" — assumes the folder is literally named Cloud.
+- `apps/system/settings/locales/lt/system.ftl` `settings-accounts-approve`: "išplėstinė duomenų apsauga" — check Apple's official Lithuanian name for Advanced Data Protection.
+- `apps/system/settings/locales/lt/connections.ftl` `settings-bluetooth-visible-for`: "{ $minutes } minutę" (accusative of duration) — check it reads right as a standalone menu option.
+- `apps/system/settings/locales/lt/system.ftl` `settings-accounts-remove-note`: "Jūsų failai lieka tarnyboje { $provider }." — "tarnyboje" for a cloud service; check it sounds natural for OneDrive, iCloud Drive etc.
+- `apps/system/settings/locales/lt/devices.ftl` `settings-dictation-engine-description`: "{ $engine } atpažįsta šią kalbą: { $language }" — Lithuanian language names arrive as "anglų", so the sentence is built around a colon; same for `settings-dictation-language-unavailable` and `settings-dictation-engine-graphics-card`.
+- `apps/system/settings/locales/lt/devices.ftl` `settings-dictation-hold`: "Diktuokite laikydami { $keys }" — needs { $keys } in the accusative; `settings-dictation-copilot-key` is "Copilot klavišą" for that reason, and a joined list such as "Super+Alt arba Copilot klavišą" should still read correctly.
+- `apps/system/settings/locales/lt/devices.ftl` `settings-power-screen-off`: "Laikas iki ekrano išjungimo" — rephrased so the duration picker values (nominative "5 minutės") fit; check the label.
+- `apps/system/settings/locales/lt/devices.ftl` `settings-power-long-sleep-hours`: "{ $hours } valandos" (genitive after "Išjungti po") — days and weeks likewise; these only work after "po".
+- `apps/system/settings/locales/lt/devices.ftl` `settings-keys-keypad`: "Num { $key }" — no settled Lithuanian name for number-pad keys in shortcut labels.
+- `apps/system/settings/locales/lt/protection.ftl` `settings-privacy-screen-off-after`: "Po: { $duration }" — "po" needs the genitive ("po 5 minučių") but the duration arrives in an unknown case, so a colon was used; check whether it reads acceptably or the duration format allows a natural phrase.
 - `packages/web/ui/locales/lt/ui.ftl` `ui-passphrase-field`: "Slaptafrazė" — used throughout for "passphrase" (GNOME's term) to keep it distinct from "slaptažodis"; confirm it is understood.
-- `apps/settings/locales/lt/protection.ftl` `settings-passwords-seal-title`: "Užplombuoti saugos lustu" — "seal" has no settled OS term; check "užplombuoti" vs "užsandarinti".
-- `apps/settings/locales/lt/protection.ftl` `settings-security-anti-cheat`: "Žaidimai su apsauga nuo sukčiavimo" — anti-cheat has no settled term; gamers may just say "anti-cheat".
-- `apps/settings/locales/lt/protection.ftl` `settings-passwords-ssh-added`: "Pridėtas { $when }" — assumes the relative time reads as "prieš 3 dienas" / "vakar"; same for `settings-passkeys-last-used`, `settings-updates-last-checked`, `settings-updates-released`.
-- `apps/settings/locales/lt/system.ftl` `settings-updates-switching-standard`: "Atsisiunčiamas standartinis atvaizdis…" — "atvaizdis" for a system image; check it is the expected word.
-- `apps/settings/locales/lt/system.ftl` `settings-datetime-week-start-regional`: "Pagal jūsų regioną: { $day }" — reordered so the lowercase weekday name doesn't start the label.
-- `apps/settings/locales/lt/system.ftl` `settings-about-hostname`: "Kompiuterio vardas" — sits next to "Įrenginio pavadinimas"; check the two are distinct enough.
-- `apps/settings/locales/lt/personalization.ftl` `settings-fonts-sample`: "Įlinkdama fechtuotojo špaga sublykčiojusi pragręžė apvalų arbūzą" — common Lithuanian pangram; check it is the preferred one.
-- `apps/settings/locales/lt/personalization.ftl` `settings-accessibility-bounce-keys`: "Atmetimo klavišai" — no settled Lithuanian term for bounce keys.
+- `apps/system/settings/locales/lt/protection.ftl` `settings-passwords-seal-title`: "Užplombuoti saugos lustu" — "seal" has no settled OS term; check "užplombuoti" vs "užsandarinti".
+- `apps/system/settings/locales/lt/protection.ftl` `settings-security-anti-cheat`: "Žaidimai su apsauga nuo sukčiavimo" — anti-cheat has no settled term; gamers may just say "anti-cheat".
+- `apps/system/settings/locales/lt/protection.ftl` `settings-passwords-ssh-added`: "Pridėtas { $when }" — assumes the relative time reads as "prieš 3 dienas" / "vakar"; same for `settings-passkeys-last-used`, `settings-updates-last-checked`, `settings-updates-released`.
+- `apps/system/settings/locales/lt/system.ftl` `settings-updates-switching-standard`: "Atsisiunčiamas standartinis atvaizdis…" — "atvaizdis" for a system image; check it is the expected word.
+- `apps/system/settings/locales/lt/system.ftl` `settings-datetime-week-start-regional`: "Pagal jūsų regioną: { $day }" — reordered so the lowercase weekday name doesn't start the label.
+- `apps/system/settings/locales/lt/system.ftl` `settings-about-hostname`: "Kompiuterio vardas" — sits next to "Įrenginio pavadinimas"; check the two are distinct enough.
+- `apps/system/settings/locales/lt/personalization.ftl` `settings-fonts-sample`: "Įlinkdama fechtuotojo špaga sublykčiojusi pragręžė apvalų arbūzą" — common Lithuanian pangram; check it is the preferred one.
+- `apps/system/settings/locales/lt/personalization.ftl` `settings-accessibility-bounce-keys`: "Atmetimo klavišai" — no settled Lithuanian term for bounce keys.
 
 ## Website
 
@@ -78,15 +78,15 @@ Strings in Luft's Lithuanian translation that a native speaker should check: ter
 
 ## Meet Luft
 
-- `apps/meet/locales/lt/meet.ftl` `ready-remove-description`, `working-packing`: "persikraustymo dėžė" — the moving box; check it reads naturally.
-- `apps/meet/desktop/locales/lt/desktop.ftl` `check-start-entries`, `problem-tidy`: "paleidimo įrašas" — no settled Lithuanian term for a firmware boot entry.
-- `apps/meet/desktop/locales/lt/desktop.ftl` `check-space-short-windows`, `drive-hide-failed`, `check-encryption-changing-detail`: "Disko valymą", "Failų naršyklės", "Parametruose" — Windows names from memory; check against Lithuanian Windows 11.
-- `apps/meet/locales/lt/meet.ftl` `stick-keep`: "Palikti abi", "Palikti visas" — feminine, agreeing with "Luft" as a system.
-- `apps/meet/locales/lt/meet.ftl` `problem-check`, `hello-check`: both platform variants say "kompiuteris".
-- `apps/meet/locales/lt/meet.ftl` `room-places-title`: "Kur įdiegti Luft?" — the English asks where Luft should go; "įdiegti" is used because Luft is installed there afterwards, but at this step it is only tried. Check against "Kur dėti Luft?".
-- `apps/meet/locales/lt/meet.ftl` `resize-least`: "Pakeiskite bent { $size }." — check it reads as "by at least" and not "to at least".
-- `apps/meet/locales/lt/meet.ftl` `luft-resize-start-first`: "pranešti programai Meet Luft" — “programai” added so the dative reads clearly; check it fits.
+- `apps/store/meet/locales/lt/meet.ftl` `ready-remove-description`, `working-packing`: "persikraustymo dėžė" — the moving box; check it reads naturally.
+- `apps/store/meet/desktop/locales/lt/desktop.ftl` `check-start-entries`, `problem-tidy`: "paleidimo įrašas" — no settled Lithuanian term for a firmware boot entry.
+- `apps/store/meet/desktop/locales/lt/desktop.ftl` `check-space-short-windows`, `drive-hide-failed`, `check-encryption-changing-detail`: "Disko valymą", "Failų naršyklės", "Parametruose" — Windows names from memory; check against Lithuanian Windows 11.
+- `apps/store/meet/locales/lt/meet.ftl` `stick-keep`: "Palikti abi", "Palikti visas" — feminine, agreeing with "Luft" as a system.
+- `apps/store/meet/locales/lt/meet.ftl` `problem-check`, `hello-check`: both platform variants say "kompiuteris".
+- `apps/store/meet/locales/lt/meet.ftl` `room-places-title`: "Kur įdiegti Luft?" — the English asks where Luft should go; "įdiegti" is used because Luft is installed there afterwards, but at this step it is only tried. Check against "Kur dėti Luft?".
+- `apps/store/meet/locales/lt/meet.ftl` `resize-least`: "Pakeiskite bent { $size }." — check it reads as "by at least" and not "to at least".
+- `apps/store/meet/locales/lt/meet.ftl` `luft-resize-start-first`: "pranešti programai Meet Luft" — “programai” added so the dative reads clearly; check it fits.
 
 ## Install Luft
 
-- `apps/setup/locales/lt/setup.ftl` `setup-destination-meet-drive-description`: "o Luft pasileidžia iš ten su savo paleidimo failais" — reflexive verb chosen so it needs no gender agreement with Luft; check it doesn't read too informal next to "sistema Luft" elsewhere.
+- `apps/system/setup/locales/lt/setup.ftl` `setup-destination-meet-drive-description`: "o Luft pasileidžia iš ten su savo paleidimo failais" — reflexive verb chosen so it needs no gender agreement with Luft; check it doesn't read too informal next to "sistema Luft" elsewhere.

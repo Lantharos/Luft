@@ -35,32 +35,32 @@ Strings in Luft's Macedonian translation that a native speaker should check. Eac
 - `kestrel/ui/locales/mk/system.ftl` `network-menu-hotspot`: "Хотспот на { $name }" — loanword; „Точка на пристап“ is the alternative.
 - `kestrel/ui/locales/mk/system.ftl` `screenshot-screencasts-folder`: "Снимки од екранот" — folder name on disk, next to „Слики од екранот“ for screenshots; check the two are distinct enough.
 - `kestrel/ui/locales/mk/shell.ftl` `ctrl-alt-tab-panel`: "Лента со задачи" — English says "Panel", which here means the taskbar.
-- `apps/setup/locales/mk/setup.ftl` `setup-region-intro-guessed`: "Да почнеме со поставувањето. Претпоставивме: { $guesses }. Сменете сè што не е точно." — the list is built from definite nouns („јазикот и тастатурата според компјутерот“); check the joined sentence with real values.
-- `apps/setup/locales/mk/setup.ftl` `setup-account-full-name-example`: "Блаже Конески" — a well-known Macedonian name as the placeholder.
-- `apps/setup/locales/mk/setup.ftl` `setup-windows-fast-startup`: "Исклучи го Брзо стартување во Windows" — assumes Windows calls Fast Startup „Брзо стартување“ in Macedonian; same for „Управување со дискови“ (Disk Management) in `setup-windows-bitlocker`.
-- `apps/setup/installer/locales/mk/installer.ftl` `installer-no-deployment`: "Новиот систем нема распоредување" — technical term for a system deployment; check the wording.
+- `apps/system/setup/locales/mk/setup.ftl` `setup-region-intro-guessed`: "Да почнеме со поставувањето. Претпоставивме: { $guesses }. Сменете сè што не е точно." — the list is built from definite nouns („јазикот и тастатурата според компјутерот“); check the joined sentence with real values.
+- `apps/system/setup/locales/mk/setup.ftl` `setup-account-full-name-example`: "Блаже Конески" — a well-known Macedonian name as the placeholder.
+- `apps/system/setup/locales/mk/setup.ftl` `setup-windows-fast-startup`: "Исклучи го Брзо стартување во Windows" — assumes Windows calls Fast Startup „Брзо стартување“ in Macedonian; same for „Управување со дискови“ (Disk Management) in `setup-windows-bitlocker`.
+- `apps/system/setup/installer/locales/mk/installer.ftl` `installer-no-deployment`: "Новиот систем нема распоредување" — technical term for a system deployment; check the wording.
 - `kestrel/ui/locales/mk/system.ftl` `inhibit-shortcuts-titled-app`, `privacy-reported-app`: written without a fluent speaker; check that the window title reads naturally in the sentence and that the note after a name says Kestrel couldn't check it, not that the app is untrustworthy.
 
 ## Settings
 
-- `apps/settings/locales/mk/connections.ftl` `settings-network-security-psk`, `settings-network-security-sae`, `settings-network-security-enterprise`, `settings-network-security-owe`: "WPA2 лична", "WPA3 лична", "Деловна", "Подобрена отворена" — check whether these Wi-Fi security names should stay in English (WPA2-Personal, Enterprise, Enhanced Open).
-- `apps/settings/locales/mk/system.ftl` `settings-accounts-apple-account`: "Apple-сметка" — Apple has no Macedonian localization; check whether „Apple Account“ reads better.
-- `apps/settings/locales/mk/system.ftl` `settings-accounts-approve`: "…користи Напредна заштита на податоците…" — Apple's Advanced Data Protection has no official Macedonian name.
-- `apps/settings/locales/mk/connections.ftl` `settings-bluetooth-windows`: "Уредот { $devices } е спарен во Windows…" / "Уредите { $devices } се спарени…" — the noun avoids gender agreement with device names; check it with a list like „Keyboard, Mouse и уште 3“.
-- `apps/settings/locales/mk/connections.ftl` `settings-bluetooth-request-authorize`: "Да се дозволи спарување со { $name }?" — `$name` may be the fallback „уредот“; check both readings.
-- `apps/settings/locales/mk/connections.ftl` `settings-network-wireguard-keepalive`: "Одржување на врската" — no settled term for WireGuard keepalive; „Keepalive“ may be more familiar.
-- `apps/settings/locales/mk/devices.ftl` `settings-power-time-left`: "Преостанато: околу { $time }" — with „помалку од минута“ it reads „околу помалку од минута“, as awkward as the English.
-- `apps/settings/locales/mk/devices.ftl` `settings-sound-mute`: "Исклучи звук – { $name }" — screen-reader label; `$name` is „Јачина на звук“ or an app name, the dash avoids case agreement.
-- `apps/settings/locales/mk/devices.ftl` `settings-keys-keypad`: "Нумерички { $key }" — keypad keys have no printed name; check whether „Num { $key }“ is more familiar.
-- `apps/settings/locales/mk/devices.ftl` `settings-display-mirror`: "Огледално прикажување" — Windows uses „Дуплирај“; check which is more familiar.
+- `apps/system/settings/locales/mk/connections.ftl` `settings-network-security-psk`, `settings-network-security-sae`, `settings-network-security-enterprise`, `settings-network-security-owe`: "WPA2 лична", "WPA3 лична", "Деловна", "Подобрена отворена" — check whether these Wi-Fi security names should stay in English (WPA2-Personal, Enterprise, Enhanced Open).
+- `apps/system/settings/locales/mk/system.ftl` `settings-accounts-apple-account`: "Apple-сметка" — Apple has no Macedonian localization; check whether „Apple Account“ reads better.
+- `apps/system/settings/locales/mk/system.ftl` `settings-accounts-approve`: "…користи Напредна заштита на податоците…" — Apple's Advanced Data Protection has no official Macedonian name.
+- `apps/system/settings/locales/mk/connections.ftl` `settings-bluetooth-windows`: "Уредот { $devices } е спарен во Windows…" / "Уредите { $devices } се спарени…" — the noun avoids gender agreement with device names; check it with a list like „Keyboard, Mouse и уште 3“.
+- `apps/system/settings/locales/mk/connections.ftl` `settings-bluetooth-request-authorize`: "Да се дозволи спарување со { $name }?" — `$name` may be the fallback „уредот“; check both readings.
+- `apps/system/settings/locales/mk/connections.ftl` `settings-network-wireguard-keepalive`: "Одржување на врската" — no settled term for WireGuard keepalive; „Keepalive“ may be more familiar.
+- `apps/system/settings/locales/mk/devices.ftl` `settings-power-time-left`: "Преостанато: околу { $time }" — with „помалку од минута“ it reads „околу помалку од минута“, as awkward as the English.
+- `apps/system/settings/locales/mk/devices.ftl` `settings-sound-mute`: "Исклучи звук – { $name }" — screen-reader label; `$name` is „Јачина на звук“ or an app name, the dash avoids case agreement.
+- `apps/system/settings/locales/mk/devices.ftl` `settings-keys-keypad`: "Нумерички { $key }" — keypad keys have no printed name; check whether „Num { $key }“ is more familiar.
+- `apps/system/settings/locales/mk/devices.ftl` `settings-display-mirror`: "Огледално прикажување" — Windows uses „Дуплирај“; check which is more familiar.
 - `packages/web/ui/locales/mk/ui.ftl` `ui-passphrase-field`: "Тајна фраза" — passphrase has no settled Macedonian term; chosen to stay distinct from лозинка and used for every passphrase in Settings and setup.
-- `apps/settings/locales/mk/protection.ftl` `settings-encryption-pin`: "PIN при стартување" — PIN kept in Latin (PIN-от, PIN-овите); a reviewer may prefer ПИН as on bank cards.
-- `apps/settings/locales/mk/personalization.ftl` `settings-fonts-monospace`: "Еднаква ширина" — monospace has no common short term; check it is understood.
-- `apps/settings/locales/mk/personalization.ftl` `settings-accessibility-typing-assist-count`: "{ $count } вклучена / вклучени" — feminine agreement assumes a hidden „функција“; check it reads well next to the row title.
-- `apps/settings/locales/mk/personalization.ftl` `settings-accessibility-dwell-time`: "Задржи" / `settings-accessibility-hold-time`: "Држи" — labels before a duration slider; check they read well with the value.
-- `apps/settings/locales/mk/system.ftl` `settings-updates-switching-standard`: "Се презема стандардната слика на системот…" — "system image" as слика на системот; check it isn't read as a picture.
-- `apps/settings/locales/mk/system.ftl` `settings-updates-last-checked`: "Последна проверка { $when }" — relies on relative times like „пред 5 минути“ and „вчера“ reading naturally after it.
-- `apps/settings/locales/mk/system.ftl` `settings-datetime-format-12h`: "12-часовен" — English says AM/PM; the format name reads more naturally.
+- `apps/system/settings/locales/mk/protection.ftl` `settings-encryption-pin`: "PIN при стартување" — PIN kept in Latin (PIN-от, PIN-овите); a reviewer may prefer ПИН as on bank cards.
+- `apps/system/settings/locales/mk/personalization.ftl` `settings-fonts-monospace`: "Еднаква ширина" — monospace has no common short term; check it is understood.
+- `apps/system/settings/locales/mk/personalization.ftl` `settings-accessibility-typing-assist-count`: "{ $count } вклучена / вклучени" — feminine agreement assumes a hidden „функција“; check it reads well next to the row title.
+- `apps/system/settings/locales/mk/personalization.ftl` `settings-accessibility-dwell-time`: "Задржи" / `settings-accessibility-hold-time`: "Држи" — labels before a duration slider; check they read well with the value.
+- `apps/system/settings/locales/mk/system.ftl` `settings-updates-switching-standard`: "Се презема стандардната слика на системот…" — "system image" as слика на системот; check it isn't read as a picture.
+- `apps/system/settings/locales/mk/system.ftl` `settings-updates-last-checked`: "Последна проверка { $when }" — relies on relative times like „пред 5 минути“ and „вчера“ reading naturally after it.
+- `apps/system/settings/locales/mk/system.ftl` `settings-datetime-format-12h`: "12-часовен" — English says AM/PM; the format name reads more naturally.
 
 ## Website
 
@@ -71,14 +71,14 @@ Strings in Luft's Macedonian translation that a native speaker should check. Eac
 
 ## Meet Luft
 
-- `apps/meet/locales/mk/meet.ftl` `meet-logs-saved`: "Дневниците од пробувањето на Luft…" — logs as „дневници“ and Try Luft as „пробувањето на Luft“; check both read naturally.
-- `apps/meet/locales/mk/meet.ftl` `meet-channel-latest`: "…редовни изданија" — releases as opposed to nightly builds; no settled term.
-- `apps/meet/locales/mk/meet.ftl` `room-confirm-title`: "Да се дадат { $size } на Luft?" — plural verb assumes sizes like „120 GB“.
-- `apps/meet/locales/mk/meet.ftl` `stick-keep`: "Задржи ги двата" — masculine „двата“ for two Luft builds; check against „двете“.
-- `apps/meet/locales/mk/meet.ftl` `linux-ready-replace-title`: "Замени го { $system }" — `$system` is a Latin name or the fallback „овој систем“, so no „системот“ before it.
-- `apps/meet/desktop/locales/mk/desktop.ftl` `check-fast-startup-on`: "Брзо стартување е вклучено" — assumes Windows' Macedonian name for Fast Startup; same for „Чистење на дискот“ and „Шифрирање на уредот“.
-- `apps/meet/desktop/locales/mk/desktop.ftl` `check-firmware-key-volume-up`: "копчето за зголемување на звукот" — check it fits after „притиснете“.
-- `apps/meet/locales/mk/meet.ftl` `room-place-free-detail`: "{ $size } што ништо друго не ги користи" — the plural clitic „ги“ assumes sizes like „120 GB“; same in luft-windows-free-description.
-- `apps/meet/locales/mk/meet.ftl` `room-places-title`: "Каде да се всели Luft?" — echoes „да се всели“ from check-blocked-description; check it doesn’t sound too figurative for choosing a drive.
-- `apps/meet/desktop/locales/mk/desktop.ftl` `helper-box-room-shortfall`: "Просторот на Luft може да одвои { $available } GB, а на избраното му требаат { $needed } GB." — "Luft’s room can spare" is the space already set aside for Luft; check that comes across.
-- `apps/meet/locales/mk/meet.ftl` `resize-drive-free`: "{ $size } слободни на { $drive }" — plural adjective assumes sizes like „20 GB“, as in room-confirm-title.
+- `apps/store/meet/locales/mk/meet.ftl` `meet-logs-saved`: "Дневниците од пробувањето на Luft…" — logs as „дневници“ and Try Luft as „пробувањето на Luft“; check both read naturally.
+- `apps/store/meet/locales/mk/meet.ftl` `meet-channel-latest`: "…редовни изданија" — releases as opposed to nightly builds; no settled term.
+- `apps/store/meet/locales/mk/meet.ftl` `room-confirm-title`: "Да се дадат { $size } на Luft?" — plural verb assumes sizes like „120 GB“.
+- `apps/store/meet/locales/mk/meet.ftl` `stick-keep`: "Задржи ги двата" — masculine „двата“ for two Luft builds; check against „двете“.
+- `apps/store/meet/locales/mk/meet.ftl` `linux-ready-replace-title`: "Замени го { $system }" — `$system` is a Latin name or the fallback „овој систем“, so no „системот“ before it.
+- `apps/store/meet/desktop/locales/mk/desktop.ftl` `check-fast-startup-on`: "Брзо стартување е вклучено" — assumes Windows' Macedonian name for Fast Startup; same for „Чистење на дискот“ and „Шифрирање на уредот“.
+- `apps/store/meet/desktop/locales/mk/desktop.ftl` `check-firmware-key-volume-up`: "копчето за зголемување на звукот" — check it fits after „притиснете“.
+- `apps/store/meet/locales/mk/meet.ftl` `room-place-free-detail`: "{ $size } што ништо друго не ги користи" — the plural clitic „ги“ assumes sizes like „120 GB“; same in luft-windows-free-description.
+- `apps/store/meet/locales/mk/meet.ftl` `room-places-title`: "Каде да се всели Luft?" — echoes „да се всели“ from check-blocked-description; check it doesn’t sound too figurative for choosing a drive.
+- `apps/store/meet/desktop/locales/mk/desktop.ftl` `helper-box-room-shortfall`: "Просторот на Luft може да одвои { $available } GB, а на избраното му требаат { $needed } GB." — "Luft’s room can spare" is the space already set aside for Luft; check that comes across.
+- `apps/store/meet/locales/mk/meet.ftl` `resize-drive-free`: "{ $size } слободни на { $drive }" — plural adjective assumes sizes like „20 GB“, as in room-confirm-title.

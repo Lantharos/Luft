@@ -1,1 +1,1 @@
-apps/soundboard/desktop/src/lib.rs	Soundboard
+apps/store/soundboard/desktop/src/lib.rs	Soundboard

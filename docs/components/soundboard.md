@@ -1,6 +1,6 @@
 # Soundboard
 
-Soundboard ([apps/soundboard](../../apps/soundboard)) is a store app, not part of the image. Its Rust side owns the audio, so the sounds, the hotkeys and the virtual microphone keep working with the window closed, when no browser runs.
+Soundboard ([apps/store/soundboard](../../apps/store/soundboard)) is a store app, not part of the image. Its Rust side owns the audio, so the sounds, the hotkeys and the virtual microphone keep working with the window closed, when no browser runs.
 
 Sabine starts the program again for each window's host and for every later launch, so the audio starts in `SoundboardState::start`, which only the app's own process runs. Everything the app writes is in folders named after its app ID, the only ones Sabine's confinement lets it write to.
 

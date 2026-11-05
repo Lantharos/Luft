@@ -10,7 +10,7 @@ Extensions add to Kestrel: layers over the wallpaper, shaders on windows and the
 | `kestrel/engine/src/sound` | `ShellSoundMix`, which plays an extension's sounds, and `ShellAudioMonitor`, which measures what the computer plays |
 | `packages/extension-api` | `@luft/extension-api`, the types for extension authors, written from `types.ts` by `bun kestrel/ui/extensionApi.ts`. `bun run check` in `kestrel/ui` fails when it's out of date |
 | `extensions` | Lantharos's own extensions, such as Seasons, Strays, Playthings, Keystrokes, Focus, Reminders, Phosphor and Pult. Each has a `build.sh` that makes its folder, which `extensions/pack.sh` packs for schelf.store |
-| `apps/settings/src/lib/panels/personalization/extensions` | Settings → Extensions, each extension's page, and its rows on other pages |
+| `apps/system/settings/src/lib/panels/personalization/extensions` | Settings → Extensions, each extension's page, and its rows on other pages |
 
 ## On disk
 

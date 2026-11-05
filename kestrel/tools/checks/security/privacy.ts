@@ -10,7 +10,6 @@ import {outcome, spawn, stop} from '../lib/processes.js';
 import {pause, settled} from '../lib/wait.js';
 import {followLink, openApp} from '../apps/lib/apps.js';
 import {capture} from '../lib/screenshots.js';
-import {startSessionClient} from '../system/lib/sessionClient.js';
 
 const {require, eventually} = checks('panel status');
 const SCREEN_CAST = 'org.gnome.Mutter.ScreenCast';
@@ -41,13 +40,10 @@ const showsIcon = (actor: Clutter.Actor, name: string) => descendants(actor).som
 export async function run() {
   const privacy = named('kestrel-privacy')!;
   const menu = named('kestrel-context-menu')!;
-  const panel = named('kestrel-panel')!;
   require(!privacy.visible, 'the privacy button stays hidden while nothing is in use');
 
   await shareScreen();
-  const inhibitor = await startSessionClient('--inhibit');
   await eventually(() => privacy.visible && showsIcon(privacy, 'screen-shared-symbolic'), 'sharing the screen shows the privacy button', 10000);
-  await eventually(() => showsIcon(named('Quick settings', panel)!, 'view-reveal-symbolic'), 'apps keeping the screen awake show an eye');
   await capture('privacy');
 
   click(privacy);
@@ -56,8 +52,6 @@ export async function run() {
   click(named('Stop sharing the screen', menu)!);
   await eventually(() => !privacy.visible, 'stopping the share hides the privacy button');
 
-  await stop(inhibitor);
-  await eventually(() => !showsIcon(panel, 'view-reveal-symbolic'), 'the eye goes away when the app lets the screen sleep');
 
   for (const meter of LEVEL_METER_NAMES) {
     const recorder = spawn(['parecord', '--device=microphone', `--property=application.id=${meter}`, '/dev/null']);

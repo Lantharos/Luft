@@ -8,7 +8,6 @@ import { createInputSlider } from '../../system/audio/volume.js';
 import type { ContextMenus, MenuEntry } from '../../desktop/menus/contextMenus.js';
 import { ScrollPane } from './scrollPane.js';
 import { attachSliderValue } from './sliderValue.js';
-import { KeepAwake } from './keepAwake.js';
 import { t } from '../../shared/i18n/index.js';
 import { animateActor, Spring } from '../../shared/motion/motion.js';
 import { blurSurface } from '../../shared/layout/surface.js';
@@ -45,7 +44,6 @@ export class QuickSettings {
   private readonly actions: ActionTiles;
   private openMenu: ControlMenu | null = null;
   updateStatus = () => {};
-  private readonly keepAwake = new KeepAwake(() => this.updateStatus());
   private layoutLater = 0;
   private revealTimer = 0;
 
@@ -73,7 +71,6 @@ export class QuickSettings {
       if (this.layoutLater) global.compositor.get_laters().remove(this.layoutLater);
       if (this.revealTimer) GLib.Source.remove(this.revealTimer);
       this.actions.destroy();
-      this.keepAwake.destroy();
     });
     menus.bind(this.actor, () => this.surfaceMenu());
     this.scroll.body.add_style_class_name('kestrel-quick-scroll-body');
@@ -107,7 +104,6 @@ export class QuickSettings {
     const volumeIcons = source.volumeOutput.get_children() as TrackedIcon[];
     const visibleIcon = (icons: TrackedIcon[]) => icons.find(icon => icon.visible)?.icon_name;
     this.updateStatus = () => statusChanged([
-      this.keepAwake.active ? 'view-reveal-symbolic' : undefined,
       visibleIcon(airplaneIcons),
       visibleIcon(networkIcons) ?? 'network-offline-symbolic',
       visibleIcon(bluetoothIcons),

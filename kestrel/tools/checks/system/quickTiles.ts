@@ -78,8 +78,8 @@ async function checkKeepAwake() {
   new Gio.Settings({schema_id: 'com.lantharos.kestrel'}).set_strv('quick-tiles-removed', []);
   await eventually(() => grid().get_n_children() > placed, 'tiles hidden by default come back when the setting changes');
   await settled();
-  await toggle(keepAwake, 'keep awake holds the session awake and shows the eye', checked => checked && statusShows('view-reveal-symbolic'));
-  await toggle(keepAwake, 'turning keep awake off lets the session sleep', checked => !checked && !statusShows('view-reveal-symbolic'));
+  await toggle(keepAwake, 'keep awake holds the session awake', checked => checked);
+  await toggle(keepAwake, 'turning keep awake off lets the session sleep', checked => !checked);
 
   more(keepAwake).emit('clicked', 1);
   const hour = () => named('1 Hour', quick()) ?? descendants(quick())

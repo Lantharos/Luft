@@ -5,4 +5,4 @@ permissions = "Sabine.toml"
 listing = "store/"
 
 [requires]
-sabine = "0.77"
+sabine = "0.78"

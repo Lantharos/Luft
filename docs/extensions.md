@@ -9,7 +9,7 @@ Extensions add to Kestrel: layers over the wallpaper, quick settings tiles, task
 | `kestrel/ui/src/extensions/service.ts` | The D-Bus interface below |
 | `kestrel/engine/src/sound` | `ShellSoundMix`, which plays an extension's sounds, and `ShellAudioMonitor`, which measures what the computer plays |
 | `packages/extension-api` | `@luft/extension-api`, the types for extension authors, written from `types.ts` by `bun kestrel/ui/extensionApi.ts`. `bun run check` in `kestrel/ui` fails when it's out of date |
-| `extensions` | Lantharos's own extensions, such as Seasons, Strays, Keystrokes, Focus and Pult. Each has a `build.sh` that makes its folder, which `extensions/pack.sh` packs for schelf.store |
+| `extensions` | Lantharos's own extensions, such as Seasons, Strays, Keystrokes, Focus, Reminders and Pult. Each has a `build.sh` that makes its folder, which `extensions/pack.sh` packs for schelf.store |
 | `apps/settings/src/lib/panels/personalization/extensions` | Settings → Extensions, each extension's page, and its rows on other pages |
 
 ## On disk
@@ -22,7 +22,7 @@ Extensions add to Kestrel: layers over the wallpaper, quick settings tiles, task
   ...                                      anything else it ships, such as a helper program
 ```
 
-What an extension keeps for itself lives outside its folder, so updates keep it: files in `~/.local/share/luft/extension-data/<id>/` and stored values in `~/.local/state/luft/extension-storage/<id>.json`. Removing the extension deletes both.
+What an extension keeps for itself lives outside its folder, so updates keep it: files in `~/.local/share/luft/extension-data/<id>/` and stored values in `~/.local/state/luft/extension-storage/<id>.json`. Removing the extension deletes both. `writeText` writes a file there through GIO on a worker thread, to a temporary file that's synced and renamed over the old one, so a crash leaves the old contents or the new ones, and the compositor never waits for the disk.
 
 Each folder in `luft/extensions` under `XDG_DATA_HOME` is an extension, and its name must be the manifest's `id`. There's no system-wide folder: extensions Luft comes with, such as Seasons, are store releases the image carries in `/usr/share/luft/preinstall`, which Schelf installs into each account at sign-in, once and offline ([Schelf](components/schelf.md#preinstalled-apps-and-background-updates)), and updates from schelf.store after that. Removing one deletes its folder, and it stays removed. An extension runs unless it's turned off.
 
@@ -155,7 +155,7 @@ Where an element sits is the person's choice, never the extension's. They drag i
 
 ## Wallpaper layers
 
-A layer draws one actor for each rectangle of its `area`, so what it leaves out costs nothing: the Visualizer has a band for each edge that's on. `below-windows` layers and sprites sit in a background group of their own right above the wallpaper, since Mutter lowers windows past any other actor in the window group whenever it restacks them. Each frame, a layer gets the windows on each display, topmost first, and the taskbar as outlines: their rectangles with the radius of every rounded corner, which Mutter reports through `meta_window_get_rounded_corners()` and the taskbar takes from its own shape, so a taskbar in islands is one outline for each island, with the edge it sits on. A layer can name picture atlases; `setPictures` packs up to eight pictures, and the frames of animated GIF and WebP pictures, into one texture of 128-pixel cells, which the shader samples. Pictures people pick come through the file chooser portal with `pickFiles`, which only works right after the person used the extension and keeps copies in its data folder. Picking a `folder` copies the files directly inside it, up to 32 of up to 8 MB each, into a new folder there, and `readText` reads text files back.
+A layer draws one actor for each rectangle of its `area`, so what it leaves out costs nothing: the Visualizer has a band for each edge that's on. `below-windows` layers and sprites sit in a background group of their own right above the wallpaper, since Mutter lowers windows past any other actor in the window group whenever it restacks them. Each frame, a layer gets the windows on each display, topmost first, and the taskbar as outlines: their rectangles with the radius of every rounded corner, which Mutter reports through `meta_window_get_rounded_corners()` and the taskbar takes from its own shape, so a taskbar in islands is one outline for each island, with the edge it sits on. A layer can name picture atlases; `setPictures` packs up to eight pictures, and the frames of animated GIF and WebP pictures, into one texture of 128-pixel cells, which the shader samples. Pictures people pick come through the file chooser portal with `pickFiles`, which only works right after the person used the extension and keeps copies in its data folder. It also takes `calendars`, and `saveFile` asks where to save a text file the same way. Picking a `folder` copies the files directly inside it, up to 32 of up to 8 MB each, into a new folder there, and `readText` reads text files back.
 
 ## Sprites
 
@@ -233,6 +233,22 @@ Kestrel keeps what the person decided in `com.lantharos.kestrel`: `disabled-exte
 ## Holding notifications back
 
 `doNotDisturb.hold()` holds back other apps' banners and sounds the way Do Not Disturb does: urgent notifications, apps people let through Do Not Disturb and the extension's own notifications still show, and everything held stays in the notification center. `surfaces/notifications/tray/holds.ts` keeps the holds, and the message tray asks them before it shows a banner or plays a sound. A hold counts what it held by app, while those notifications are still there, and never shows the extension what they say. `release()` ends it and hands those counts to the extension to sum up itself, as Focus does at the end of a session; when a hold ends any other way, including the extension being turned off, Kestrel sums it up with a notification of its own.
+
+An extension that only wants to know, because something of its own should wait until it can be seen, doesn't need `do-not-disturb`: `notifications.heldBack` says whether banners are held back, for any reason, and `onHeldBackChanged` tells when that changes.
+
+## The clock
+
+Timers run on the monotonic clock, which stops while the computer sleeps, so a timer can't wait for a time of day by itself. `timers.onClockChanged` says when the time jumped: `wake` from logind's `PrepareForSleep`, `clock` from a `timerfd` armed with `TFD_TIMER_CANCEL_ON_SET`, which only fires when the wall clock is set, and `time-zone` from a file monitor on `/etc/localtime`, after clearing GJS's cached time zone so `Date` follows. `api/v1/clock.ts` watches these only while an extension listens, and none of them wake anything in between.
+
+## Reminders
+
+Reminders has exactly one timer, however many reminders there are. `Reminders.refresh` moves repeating reminders on, rings what's due and sets that timer for the earliest thing still to come: a reminder ringing, one coming back, a goal's nudge, a heads-up, or midnight, when the lists change. It runs again when something changes, when the clock jumps, when a hold ends and when the screen unlocks, and at no other time. Nothing is polled, so 400 reminders cost the same as none.
+
+Times are kept as they read on the wall, a day and an hour with no time zone, and turned into an instant only when they're needed. That is what makes daylight saving and travel work: 09:00 stays 09:00. A time the clocks skip lands just after them and a time they repeat rings for the first one, which is what `new Date(year, month, day, hours, minutes)` does. Calendar arithmetic goes through UTC days, never through adding 24 hours. How long a snooze lasts or when something comes back is counted in real time instead.
+
+What was due while it couldn't ring takes care of itself: a reminder remembers whether it rang for its current occurrence, so whatever's past due and hasn't rung rings at the next `refresh`, once, and a repeat moves to its latest occurrence first. While banners are held nothing rings and nothing's marked, so it all arrives when the hold ends. While the screen is locked, new reminders still go out, but ones coming back wait.
+
+Reminders live in `reminders.json` in the extension's data folder, written with `writeText` after every change. Each has an `id` that never changes, which is its `UID` in calendar files, and an `updatedAt`, which is what syncing would need to match copies up. There's no sync today, and nothing leaves the computer. Quick add reads English: `parse/parse.ts` takes the phrases it understands out of the text one at a time, and what's left is the title.
 
 ## Network
 

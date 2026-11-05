@@ -1,0 +1,8 @@
+summary = "Birthdays, to-dos and goals, in the taskbar and out of your head"
+description = "Type what you need to remember the way you'd say it, such as \"dentist tuesday 3pm\", \"mum's birthday 14 march every year\" or \"pay rent every month on the 1st\", and Reminders shows what it understood before adding it. The taskbar shows what's next or how many are due, and a click opens the list: overdue, today, upcoming and to-dos with no date. Notifications have Done and Snooze, and come back until you answer them. They wait out Do Not Disturb and Focus, and anything you missed while the computer was off shows up once when it starts. Birthdays give a heads-up days ahead. Goals show how long they're overdue and get a gentle nudge now and then, with a bit of humour if you like. Search for reminders or add them from Start, import and export .ics files, and keep everything on your own computer."
+screenshots = ["list.webp", "add.webp", "notification.webp"]
+keywords = ["reminders", "to-do", "tasks", "birthdays", "anniversaries", "goals", "deadlines", "calendar", "ics"]
+categories = ["Office", "Utility"]
+homepage = "https://luft.computer"
+support = "https://github.com/Lantharos/Luft/issues"
+brand_color = "#d9a441"

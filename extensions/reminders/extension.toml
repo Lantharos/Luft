@@ -1,0 +1,118 @@
+id = "com.lantharos.Reminders"
+name = "Reminders"
+description = "Birthdays, to-dos and goals in the taskbar, with notifications that come back until you answer them."
+version = "1.0.0"
+api = 1
+permissions = ["taskbar", "popups", "notifications", "search"]
+
+[[settings]]
+key = "morning"
+type = "choice"
+label = "morning"
+default = "09:00"
+options = [
+  { value = "07:00", label = "morning-7" },
+  { value = "08:00", label = "morning-8" },
+  { value = "09:00", label = "morning-9" },
+  { value = "10:00", label = "morning-10" },
+  { value = "12:00", label = "morning-12" },
+]
+
+[[settings]]
+key = "snooze"
+type = "choice"
+label = "snooze"
+default = "10"
+options = [
+  { value = "5", label = "minutes-5" },
+  { value = "10", label = "minutes-10" },
+  { value = "15", label = "minutes-15" },
+  { value = "30", label = "minutes-30" },
+  { value = "60", label = "minutes-60" },
+]
+
+[[settings]]
+key = "come-back"
+type = "switch"
+label = "come-back"
+default = true
+
+[[settings]]
+key = "come-back-every"
+type = "choice"
+label = "come-back-every"
+default = "15"
+depends = "come-back"
+options = [
+  { value = "5", label = "minutes-5" },
+  { value = "10", label = "minutes-10" },
+  { value = "15", label = "minutes-15" },
+  { value = "30", label = "minutes-30" },
+  { value = "60", label = "minutes-60" },
+]
+
+[[settings]]
+key = "birthday-heads-up"
+type = "choice"
+label = "birthday-heads-up"
+default = "3"
+options = [
+  { value = "0", label = "heads-up-0" },
+  { value = "1", label = "heads-up-1" },
+  { value = "3", label = "heads-up-3" },
+  { value = "7", label = "heads-up-7" },
+  { value = "14", label = "heads-up-14" },
+]
+
+[[settings]]
+key = "goal-nudges"
+type = "switch"
+label = "goal-nudges"
+default = true
+
+[[settings]]
+key = "goal-nudge-every"
+type = "choice"
+label = "goal-nudge-every"
+default = "3"
+depends = "goal-nudges"
+options = [
+  { value = "1", label = "nudge-1-day" },
+  { value = "3", label = "nudge-3-days" },
+  { value = "7", label = "nudge-7-days" },
+]
+
+[[settings]]
+key = "goal-humour"
+type = "switch"
+label = "goal-humour"
+default = true
+depends = "goal-nudges"
+
+[[settings]]
+key = "taskbar-shows"
+type = "choice"
+label = "taskbar-shows"
+default = "next"
+options = [
+  { value = "next", label = "taskbar-shows-next" },
+  { value = "due", label = "taskbar-shows-due" },
+  { value = "icon", label = "taskbar-shows-icon" },
+]
+
+[[settings]]
+key = "taskbar-next-within"
+type = "choice"
+label = "taskbar-next-within"
+default = "today"
+depends = "taskbar-shows"
+when = ["next"]
+options = [
+  { value = "today", label = "taskbar-next-today" },
+  { value = "week", label = "taskbar-next-week" },
+]
+
+[[shortcuts]]
+key = "open"
+label = "shortcut-open"
+default = "<Super><Alt>r"

@@ -13,6 +13,7 @@ import {checks} from '../lib/check.js';
 import {call} from '../lib/dbus.js';
 import {click, hold, press, release, type Point} from '../lib/input/input.js';
 import {capture} from '../lib/screenshots.js';
+import {threads} from '../lib/threads.js';
 import {builtFixture, repository, scratch, spawn, stop, waitForWindow, windows} from '../lib/processes.js';
 import {pause} from '../lib/wait.js';
 import {promptEntry, showPrompt, unlock, wake} from '../lockScreen/lib/shield.js';
@@ -269,22 +270,6 @@ async function checkLatency() {
     mix.close();
     await request('Enable', KEYSTROKES);
   }
-}
-
-function threads() {
-  const tasks = Gio.File.new_for_path('/proc/self/task').enumerate_children('standard::name', Gio.FileQueryInfoFlags.NONE, null);
-  const found = new Map<string, {name: string; onCpu: number; switches: number}>();
-  const decode = (path: string) => new TextDecoder().decode(GLib.file_get_contents(path)[1]);
-  for (let info: Gio.FileInfo | null; (info = tasks.next_file(null));) {
-    const folder = `/proc/self/task/${info.get_name()}`;
-    const status = decode(`${folder}/status`);
-    found.set(info.get_name(), {
-      name: decode(`${folder}/comm`).trim(),
-      onCpu: Number(decode(`${folder}/schedstat`).split(' ')[0]),
-      switches: Number(/\nvoluntary_ctxt_switches:\s+(\d+)/.exec(status)![1]) + Number(/nonvoluntary_ctxt_switches:\s+(\d+)/.exec(status)![1]),
-    });
-  }
-  return found;
 }
 
 /** Percent of a core all of Kestrel uses and how often its threads wake, while `during` runs. */

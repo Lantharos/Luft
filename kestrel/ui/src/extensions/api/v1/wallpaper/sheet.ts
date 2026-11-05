@@ -63,9 +63,13 @@ export class Sheet {
     this.actor = new SheetActor(snippet);
     this.actor.name = name;
     this.actor.connect('destroy', () => (this.destroyed = true));
-    this.actor.set_position(monitor.x + area.x, monitor.y + area.y);
-    this.actor.set_size(area.width, area.height);
     this.actor.uniform('layer_size', 2, [monitor.width, monitor.height]);
+    this.cover(area);
+  }
+
+  cover(area: Rect): void {
+    this.actor.set_position(this.monitor.x + area.x, this.monitor.y + area.y);
+    this.actor.set_size(area.width, area.height);
     this.actor.uniform('layer_area', 4, [area.x, area.y, area.width, area.height]);
   }
 

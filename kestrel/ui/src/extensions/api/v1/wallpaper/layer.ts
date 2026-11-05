@@ -81,7 +81,11 @@ export class WallpaperLayer {
   }
 
   reshape(): void {
-    this.monitorsChanged();
+    if (!this.built) return;
+    const parts = this.parts();
+    const fits = parts.length === this.sheets.length && parts.every(({ monitor }, index) => this.sheets[index].monitor === monitor && !this.sheets[index].destroyed);
+    if (fits) parts.forEach(({ area }, index) => this.sheets[index].cover(area));
+    else this.monitorsChanged();
   }
 
   setPictures(name: string, paths: readonly string[]): number {
@@ -105,17 +109,24 @@ export class WallpaperLayer {
     return [area ?? []].flat().map(rect => clamped(rect, monitor));
   }
 
+  private parts() {
+    const primaryIndex = this.stage.primaryIndex();
+    return this.stage.monitors().flatMap(monitor => {
+      const primary = monitor.index === primaryIndex;
+      return this.areasOf(monitor, primary).map((area, part) => ({ monitor, primary, part, area }));
+    });
+  }
+
   private build(): void {
     this.built = true;
-    const primary = this.stage.primaryIndex();
-    this.sheets = this.stage.monitors().flatMap(monitor => this.areasOf(monitor, monitor.index === primary).map((area, part) => {
-      const sheet = new Sheet(monitor, monitor.index === primary, part, area, this.snippet, this.name);
+    this.sheets = this.parts().map(({ monitor, primary, part, area }) => {
+      const sheet = new Sheet(monitor, primary, part, area, this.snippet, this.name);
       for (const [name, atlas] of this.atlases) this.applyAtlas(sheet, name, atlas);
       sheet.actor.opacity = 0;
       sheet.actor.visible = false;
       this.stage.place(sheet.actor, this.options.depth ?? 'above-windows');
       return sheet;
-    }));
+    });
   }
 
   private show(sheet: Sheet, shown: boolean): void {

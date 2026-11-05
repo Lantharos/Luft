@@ -191,7 +191,7 @@ async function checkPipFlies() {
   });
   await capture('strays-pip');
   const perch = sprite();
-  await drag([middle(), foot() - perch.height / 2], [1300, 380], {steps: 16, hover: 100});
+  await drag([middle(), perch.y + perch.height / 4], [1300, 380], {steps: 16, hover: 100});
   await eventually(() => /hovering/.test(mood()) && near(foot(), 404, 30), 'let go in mid-air, Pip stays there', 3000);
   const clear: [number, number] = [perch.x + 1, perch.y + 1];
   require(global.stage.get_actor_at_pos(Clutter.PickMode.REACTIVE, ...clear) !== perch, 'the see-through corners of a sprite stay the desktop\'s');

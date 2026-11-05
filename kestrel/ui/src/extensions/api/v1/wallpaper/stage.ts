@@ -1,4 +1,5 @@
 import type Clutter from 'gi://Clutter';
+import Meta from 'gi://Meta';
 import St from 'gi://St';
 
 import { visibleWallpaperMonitors } from '../../../../desktop/panel/coverage.js';
@@ -20,6 +21,7 @@ export class LayerStage {
   private readonly shell = St.Settings.get();
   private conditions: PlaybackConditions | null = null;
   private disconnectors: (() => void)[] = [];
+  private belowWindows: Meta.BackgroundGroup | null = null;
   readonly surfaces: SurfaceWatch;
 
   constructor(readonly host: ExtensionHost) {
@@ -67,8 +69,17 @@ export class LayerStage {
 
   place(actor: Clutter.Actor, depth: NonNullable<LayerOptions['depth']>): void {
     actor.get_parent()?.remove_child(actor);
-    if (depth === 'below-windows') global.window_group.insert_child_above(actor, this.host.wallpaper);
+    if (depth === 'below-windows') this.belowWindowsGroup().add_child(actor);
     else global.window_group.get_parent()!.insert_child_above(actor, global.window_group);
+  }
+
+  /** Mutter lowers windows past anything in the window group that isn't a background whenever it restacks them, so this has to be one. */
+  private belowWindowsGroup(): Meta.BackgroundGroup {
+    if (!this.belowWindows) {
+      this.belowWindows = new Meta.BackgroundGroup();
+      global.window_group.insert_child_above(this.belowWindows, this.host.wallpaper);
+    }
+    return this.belowWindows;
   }
 
   taskbar(monitor: Monitor): Rect | null {

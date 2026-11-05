@@ -13,7 +13,7 @@ export function describePage(visualizer: Extension<Granted>): void {
         description: visualizer.audioLevels.playing ? undefined : t('resting-detail'),
       }],
     },
-    { title: t('look'), items: [{ setting: 'style' }, { setting: 'color' }, { setting: 'intensity' }] },
+    { title: t('look'), items: [{ setting: 'style' }, { setting: 'color' }, { setting: 'intensity' }, { setting: 'reach' }] },
     { title: t('where'), items: [{ setting: 'edges' }, { setting: 'displays' }] },
   ]);
   visualizer.audioLevels.onPlayingChanged(() => visualizer.settingsPage.refresh());

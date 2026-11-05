@@ -1,6 +1,6 @@
 import type { Enable, LayerDisplay } from '@luft/extension-api';
 
-import { type Edge, edgeAreas, strip } from './edges.js';
+import { type Edge, edgeAreas, type Placement, strip } from './edges.js';
 import { describePage } from './page.js';
 import { BANDS, DECLARATIONS, SHADER, STYLES, type Style } from './shader.js';
 import { Spectrum } from './spectrum.js';
@@ -19,7 +19,8 @@ const enable: Enable<Granted> = visualizer => {
   const spectrum = new Spectrum();
   const listener = audioLevels.listen(BANDS);
   let presence = 0;
-  let edges = settings.get<readonly Edge[]>('edges');
+  const placed = (): Placement => ({ edges: settings.get<readonly Edge[]>('edges'), reach: settings.get<number>('reach') });
+  let placement = placed();
 
   const color = () => {
     const chosen = settings.get<string>('color');
@@ -31,7 +32,7 @@ const enable: Enable<Granted> = visualizer => {
 
   const paint = (display: LayerDisplay, moment: readonly number[]) => {
     display.uniformArray('vis_bands', 1, spectrum.bands);
-    display.uniformArray('vis_strip', 4, strip(edges, edges[display.part], display));
+    display.uniformArray('vis_strip', 4, strip(placement, placement.edges[display.part], display));
     display.uniform('vis_moment', ...moment);
     display.uniform('vis_color', ...tint);
   };
@@ -41,7 +42,7 @@ const enable: Enable<Granted> = visualizer => {
     shader: SHADER,
     depth: 'below-windows',
     active: audioLevels.playing,
-    area: display => settings.get('displays') === 'primary' && !display.primary ? null : edgeAreas(edges, display),
+    area: display => settings.get('displays') === 'primary' && !display.primary ? null : edgeAreas(placement, display),
     frame: ({ time, elapsed, displays }) => {
       spectrum.follow(listener.read(), elapsed);
       presence = audioLevels.playing ? Math.min(1, presence + elapsed / FADE_IN_S) : presence;
@@ -60,8 +61,8 @@ const enable: Enable<Granted> = visualizer => {
   appearance.onChanged(() => (tint = color()));
   settings.onChanged(key => {
     if (key === 'color') tint = color();
-    if (key === 'edges') edges = settings.get<readonly Edge[]>('edges');
-    if (key === 'edges' || key === 'displays') layer.reshape();
+    if (key === 'edges' || key === 'reach') placement = placed();
+    if (key === 'edges' || key === 'reach' || key === 'displays') layer.reshape();
   });
   describePage(visualizer);
 };

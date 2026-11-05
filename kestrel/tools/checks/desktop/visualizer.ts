@@ -8,7 +8,7 @@ import {playMusic} from '../lib/audio/music.js';
 import {checks} from '../lib/check.js';
 import {stop, stopAll} from '../lib/processes.js';
 import {capture, captureFrame, type Area, type Frame} from '../lib/screenshots.js';
-import {pause} from '../lib/wait.js';
+import {nextFrame, pause} from '../lib/wait.js';
 import {openWindow} from '../tiling/lib/tiling.js';
 import {eachFrame, FrameRecorder, summarize, summarizeGpu} from '../../frames/recorder.js';
 import {installBuilt, layerSheets, listed, request, setSetting} from '../extensions/lib/extensions.js';
@@ -37,6 +37,13 @@ const PROBE_DEPTH = 24;
 const PROBE_LENGTH = 320;
 const LIT = 8;
 const FADED_IN_MS = 900;
+const DEFAULT_REACH = 0.5;
+const PROBED_REACH = 0.3;
+const SHEET_END_DEPTH = 2;
+const SHEET_END_LENGTH = 400;
+const FADED_AWAY = 2;
+const OVER_THE_BAND = 360;
+const WINDOW_INSET = 48;
 
 const showing = () => layerSheets(VISUALIZER).some(sheet => sheet.visible && sheet.opacity === 255);
 
@@ -67,6 +74,45 @@ function probes(): Record<Edge, Area> {
     left: {x: x + BESIDE_EDGE, y: middleY, width: PROBE_DEPTH, height: PROBE_LENGTH},
     right: {x: x + width - BESIDE_EDGE - PROBE_DEPTH, y: middleY, width: PROBE_DEPTH, height: PROBE_LENGTH},
   };
+}
+
+/** The strip at the far end of a band, away from its edge, where nothing may be left of it. */
+function farEnd({x, y, width, height}: Area, edge: Edge): Area {
+  const middle = edge === 'left' || edge === 'right'
+    ? {x, width, y: y + Math.round((height - SHEET_END_LENGTH) / 2), height: SHEET_END_LENGTH}
+    : {x: x + Math.round((width - SHEET_END_LENGTH) / 2), width: SHEET_END_LENGTH, y, height};
+  return {
+    bottom: {...middle, height: SHEET_END_DEPTH},
+    top: {...middle, y: y + height - SHEET_END_DEPTH, height: SHEET_END_DEPTH},
+    left: {...middle, x: x + width - SHEET_END_DEPTH, width: SHEET_END_DEPTH},
+    right: {...middle, width: SHEET_END_DEPTH},
+  }[edge];
+}
+
+/** What an area shows with the Visualizer's bands and without them, one right after the other. */
+async function withAndWithoutBands(area: Area) {
+  const sheets = layerSheets(VISUALIZER);
+  const shown = await captureFrame(area);
+  for (const sheet of sheets) sheet.hide();
+  await nextFrame();
+  await nextFrame();
+  const hidden = await captureFrame(area);
+  for (const sheet of sheets) sheet.show();
+  return {shown, hidden};
+}
+
+function edgeOf({x, y, width, height}: Area): Edge {
+  const {width: displayWidth, height: displayHeight} = Main.layoutManager.primaryMonitor!;
+  if (width === displayWidth) return y === 0 && height < displayHeight ? 'top' : 'bottom';
+  return height === displayHeight && x === 0 ? 'left' : 'right';
+}
+
+async function requireFadedBandEnds(label: string) {
+  for (const sheet of layerSheets(VISUALIZER)) {
+    const edge = edgeOf(sheet);
+    const {shown, hidden} = await withAndWithoutBands(farEnd(sheet, edge));
+    require(shown.pixelsApart(hidden, FADED_AWAY) === 0, `${label}: the ${edge} band fades away before it ends`);
+  }
 }
 
 async function restingEdges(): Promise<Resting> {
@@ -123,12 +169,14 @@ async function restingWithTaskbars() {
 }
 
 async function checkEdges(resting: Resting) {
+  await setSetting(VISUALIZER, 'reach', new GLib.Variant('d', PROBED_REACH));
   for (const edges of [...ONE_EDGE, SIDES, ['top', 'bottom'] as Edge[], WITHOUT_ONE, EDGES]) {
     const name = edges.join('-');
     await settledOn(edges);
     requireBandsAlong(edges);
     await capture(`visualizer-edges-${name}`);
     await requireLitEdges(resting, edges, name);
+    await requireFadedBandEnds(name);
   }
   require(await place([]).then(() => false, () => true), 'it can’t be left with no edges at all');
   for (const style of ['wave', 'bars']) {
@@ -141,6 +189,62 @@ async function checkEdges(resting: Resting) {
   await pause(FADED_IN_MS);
   await capture('visualizer-edges-all-islands');
   kestrel.reset('taskbar-style');
+  await setSetting(VISUALIZER, 'reach', new GLib.Variant('d', DEFAULT_REACH));
+}
+
+/** A spot inside the window that sits over the band of an edge, clear of its shadow and rounded corners. */
+function overBand(edge: Edge): {x: number; y: number} {
+  const {x, y, width, height} = Main.layoutManager.getWorkAreaForMonitor(Main.layoutManager.primaryIndex);
+  const middle = {x: Math.round(x + (width - OVER_THE_BAND) / 2), y: Math.round(y + (height - OVER_THE_BAND) / 2)};
+  return {
+    bottom: {x: middle.x, y: y + height - OVER_THE_BAND - BESIDE_EDGE},
+    top: {x: middle.x, y: y + BESIDE_EDGE},
+    left: {x: x + BESIDE_EDGE, y: middle.y},
+    right: {x: x + width - OVER_THE_BAND - BESIDE_EDGE, y: middle.y},
+  }[edge];
+}
+
+/** Mutter lowers restacked windows past whatever else is in the window group, so the windows change places with the band showing. */
+async function checkBehindWindows() {
+  const {window: above} = await openWindow('Over the band', OVER_THE_BAND, OVER_THE_BAND);
+  const {window: below} = await openWindow('Under the other', OVER_THE_BAND, OVER_THE_BAND);
+  for (const edge of EDGES) {
+    await settledOn([edge]);
+    below.raise();
+    above.raise();
+    await pause(FADED_IN_MS);
+    const {x, y} = overBand(edge);
+    above.move_frame(true, x, y);
+    below.move_frame(true, x, y);
+    const {x: left, y: top, width, height} = above.get_frame_rect();
+    const inside = {x: left + WINDOW_INSET, y: top + WINDOW_INSET, width: width - 2 * WINDOW_INSET, height: height - 2 * WINDOW_INSET};
+    for (const style of STYLES) {
+      await setSetting(VISUALIZER, 'style', new GLib.Variant('s', style));
+      await pause(FADED_IN_MS);
+      await capture(`visualizer-behind-window-${edge}-${style}`);
+      const {shown, hidden} = await withAndWithoutBands(inside);
+      require(shown.pixelsApart(hidden, 0) === 0, `the ${style} style on the ${edge} edge stays behind a window`);
+    }
+  }
+  await setSetting(VISUALIZER, 'style', new GLib.Variant('s', 'glow'));
+  await settledOn(['bottom']);
+  for (const window of [above, below]) window.delete(global.get_current_time());
+  await eventually(() => !above.get_compositor_private() && !below.get_compositor_private(), 'the windows over the band close');
+}
+
+async function checkReach() {
+  for (const reach of [0.2, 1]) {
+    await setSetting(VISUALIZER, 'reach', new GLib.Variant('d', reach));
+    await pause(FADED_IN_MS);
+    for (const style of STYLES) {
+      await setSetting(VISUALIZER, 'style', new GLib.Variant('s', style));
+      await pause(FADED_IN_MS);
+      await capture(`visualizer-reach-${reach * 100}-${style}`);
+      await requireFadedBandEnds(`reaching ${reach * 100}% of the short side in the ${style} style`);
+    }
+  }
+  await setSetting(VISUALIZER, 'style', new GLib.Variant('s', 'glow'));
+  await setSetting(VISUALIZER, 'reach', new GLib.Variant('d', DEFAULT_REACH));
 }
 
 async function checkFollowsTaskbar(resting: Record<Edge, Resting>) {
@@ -207,6 +311,8 @@ export async function run() {
       await setSetting(VISUALIZER, 'style', new GLib.Variant('s', 'glow'));
       await checkEdges(resting.bottom);
       await checkFollowsTaskbar(resting);
+      await checkBehindWindows();
+      await checkReach();
       const usage: Record<string, Awaited<ReturnType<typeof cpu>>> = {};
       for (const [name, edges] of Object.entries({bottom: ['bottom'] as Edge[], sides: SIDES, around: EDGES})) usage[name] = await cpu(edges);
       report('CPU', usage);

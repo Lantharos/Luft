@@ -30,9 +30,11 @@ const float VIS_MITER_SOFTNESS = 48.0;
 float vis_spectrum(float x) {
   float along = abs(x / vis_length - 0.5) * 2.0;
   float position = along * ${BANDS - 1}.0;
+  int first = int(max(floor(position) - 1.0, 0.0));
+  int last = int(min(floor(position) + 2.0, ${BANDS - 1}.0));
   float total = 0.0;
   float weight = 0.0;
-  for (int i = 0; i < ${BANDS}; i++) {
+  for (int i = first; i <= last; i++) {
     float offset = position - float(i);
     float w = max(0.0, 1.0 - offset * offset / 4.0);
     w *= w;
@@ -61,16 +63,16 @@ float x = dot(vis_along, layer_position) + vis_along_start;
 if (vis_style < 0.5) {
   float s = vis_spectrum(x);
   float ripple = 1.0 + 0.05 * sin(x * 0.006 + vis_time * 0.9) + 0.03 * sin(x * 0.017 - vis_time * 1.7);
-  float reach = vis_height * (0.16 + 0.84 * s) * ripple;
+  float reach = vis_height * (0.09 + 0.91 * s) * ripple;
   float height = max(rise, 0.0);
   float glow = exp(-1.8 * height / max(reach, 1.0));
-  float base = exp(-height / (vis_height * 0.1)) * (0.3 + 0.7 * vis_level);
+  float base = exp(-height / (vis_height * 0.06)) * (0.3 + 0.7 * vis_level);
   layer_color = vis_paint((glow * (0.35 + 0.65 * s) + 0.35 * base) * vis_strength, rise, x);
 } else if (vis_style < 1.5) {
   float s = vis_spectrum(x);
   float sway = sin(x * 0.004 + vis_time * 1.3) * 0.08 + sin(x * 0.011 - vis_time * 0.7) * 0.05;
-  float crest = vis_height * (0.08 + 0.62 * s) * (1.0 + sway);
-  float echo = vis_height * (0.06 + 0.42 * s) * (1.0 - sway * 1.6);
+  float crest = vis_height * (0.05 + 0.75 * s) * (1.0 + sway);
+  float echo = vis_height * (0.035 + 0.5 * s) * (1.0 - sway * 1.6);
   float line = 1.0 - smoothstep(0.0, 2.2, abs(rise - crest));
   float faint = (1.0 - smoothstep(0.0, 1.6, abs(rise - echo))) * 0.45;
   float fill = rise >= 0.0 && rise < crest ? 0.18 * (1.0 - rise / max(crest, 1.0)) : 0.0;
@@ -81,7 +83,7 @@ if (vis_style < 0.5) {
   float centre = (column + 0.5) * width;
   float s = vis_spectrum(centre);
   float half_width = width * 0.22;
-  float top = vis_height * (0.04 + 0.86 * s);
+  float top = vis_height * (0.025 + 0.875 * s);
   float radius = min(half_width, top * 0.5);
   vec2 q = abs(vec2(x - centre, rise - (top - radius) * 0.5)) - vec2(half_width, (top + radius) * 0.5) + radius;
   float outside = length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - radius;

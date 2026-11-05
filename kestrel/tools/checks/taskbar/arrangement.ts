@@ -7,7 +7,7 @@ import {Main, arrangeTaskbar, carryOverEdgeAndAlignment, taskbarEditor, taskbarE
 import {existing, named, shown} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {alongEdge, arrange, arrangement, boxOf, type Arrangement} from '../lib/edge.js';
-import {centerOf, click, moveTo, press, pressButton, releaseButton, rest} from '../lib/input/input.js';
+import {centerOf, click, moveTo, press, pressButton, releaseButton, rest, restingPoint, rightClick} from '../lib/input/input.js';
 import {fixture, spawn, stopAll, waitForWindow} from '../lib/processes.js';
 import {capture, captureFrame} from '../lib/screenshots.js';
 import {pause, settled} from '../lib/wait.js';
@@ -276,6 +276,25 @@ async function checkEditing() {
   rest();
 }
 
+async function checkDesktopMenu() {
+  const menu = existing('kestrel-context-menu');
+  for (const style of ['bar', 'floating', 'separate']) {
+    settings.set_string('taskbar-style', style);
+    await settled();
+    rightClick(restingPoint());
+    await eventually(() => menu.visible && named('Edit taskbar', menu), `right-clicking the desktop offers to edit a ${style} taskbar`);
+    await capture(`desktop-menu-${style}`);
+    click(existing('Edit taskbar', menu));
+    await eventually(() => taskbarEditor() && shown(named('kestrel-arrange-done')), `the desktop's menu opens the editor for a ${style} taskbar`);
+    await settled();
+    await capture(`desktop-menu-editing-${style}`);
+    click(existing('kestrel-arrange-done'));
+    await eventually(() => !taskbarEditor(), 'Done closes the editor');
+  }
+  settings.reset('taskbar-style');
+  rest();
+}
+
 async function checkSecondDisplay() {
   const other = Main.layoutManager.monitors.find(monitor => monitor !== primary());
   if (!other) return;
@@ -301,6 +320,7 @@ export async function run() {
     await checkStartAlone();
     await checkExtensionElement();
     await checkEditing();
+    await checkDesktopMenu();
     await checkSecondDisplay();
   } finally {
     taskbarEditor()?.cancel();

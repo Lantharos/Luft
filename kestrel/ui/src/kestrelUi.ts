@@ -309,9 +309,11 @@ class KestrelUi {
   }
 
   private desktopMenu(): MenuEntry[] {
+    const { shown, touch } = this.panels.primary.screen;
     return [
       { label: t('desktop-menu-wallpaper'), run: () => this.menus.settings('appearance/wallpaper') },
       { label: t('desktop-menu-display-settings'), run: () => this.menus.settings('display') },
+      ...shown && !touch ? [{ label: t('taskbar-arrange'), run: () => this.arrangeTaskbar() }] : [],
       { label: t('desktop-menu-settings'), run: () => this.menus.settings() },
     ];
   }

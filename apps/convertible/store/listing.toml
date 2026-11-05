@@ -1,0 +1,7 @@
+summary = "Convert, edit and compress files, all on your computer"
+description = "Drop pictures, videos, music, documents, archives or fonts and pick a format. Crop, trim, mark up, redact and resize in the same window, run whole folders in a queue, and keep everything offline."
+screenshots = ["light.webp", "dark.webp"]
+categories = ["Utility", "AudioVideo", "Graphics"]
+homepage = "https://luft.computer"
+support = "https://github.com/Lantharos/Luft/issues"
+brand_color = "#2f6f5e"

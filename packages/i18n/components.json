@@ -37,6 +37,8 @@
 	{"name": "meet-desktop", "bundle": "meet-desktop", "mask": "apps/meet/desktop/locales/*/desktop.ftl", "sources": ["apps/meet/desktop/src"]},
 	{"name": "soundboard", "bundle": "soundboard", "mask": "apps/soundboard/locales/*/soundboard.ftl", "sources": ["apps/soundboard/src"]},
 	{"name": "soundboard-desktop", "bundle": "soundboard-desktop", "mask": "apps/soundboard/desktop/locales/*/desktop.ftl", "sources": ["apps/soundboard/desktop/src"]},
+	{"name": "convertible", "bundle": "convertible", "mask": "apps/convertible/locales/*/convertible.ftl", "sources": ["apps/convertible/src"]},
+	{"name": "convertible-desktop", "bundle": "convertible-desktop", "mask": "apps/convertible/desktop/locales/*/desktop.ftl", "sources": ["apps/convertible/desktop/src"]},
 	{"name": "site", "bundle": "site", "mask": "web/site/locales/*/site.ftl", "sources": ["web/site/src/layouts", "web/site/src/components/site", "web/site/src/views/NotFound.astro", "web/site/src/data/nav.ts"]},
 	{"name": "site-home", "bundle": "site", "mask": "web/site/locales/*/home.ftl", "sources": ["web/site/src/components/home", "web/site/src/views/Home.astro", "web/site/src/data/apps.ts", "web/site/src/data/faq.ts"]},
 	{"name": "site-download", "bundle": "site", "mask": "web/site/locales/*/download.ftl", "sources": ["web/site/src/components/download", "web/site/src/views/Download.astro"]}

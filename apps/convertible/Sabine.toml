@@ -1,0 +1,96 @@
+[app]
+id = "com.lantharos.convertible"
+name = "Convertible"
+generic_name = "File Converter"
+categories = ["Utility", "AudioVideo", "Graphics"]
+keywords = ["convert", "converter", "file converter", "resize", "crop", "compress", "pdf", "merge pdf", "split pdf", "video", "audio", "image", "webp", "heic", "mp4", "mp3", "zip", "redact", "metadata", "handbrake", "imagemagick", "ffmpeg"]
+version = "0.1.0"
+maintainer = "Lantharos <kristof@lanth.me>"
+icon = "public/favicon.svg"
+cargo_manifest = "desktop/Cargo.toml"
+mime_types = [
+	"image/jpeg",
+	"image/png",
+	"image/apng",
+	"image/gif",
+	"image/webp",
+	"image/avif",
+	"image/svg+xml",
+	"image/heic",
+	"image/heif",
+	"image/jxl",
+	"image/bmp",
+	"image/tiff",
+	"image/vnd.microsoft.icon",
+	"image/x-tga",
+	"image/qoi",
+	"image/x-exr",
+	"image/x-portable-anymap",
+	"image/x-portable-pixmap",
+	"video/mp4",
+	"video/webm",
+	"video/x-matroska",
+	"video/quicktime",
+	"video/ogg",
+	"video/x-m4v",
+	"video/3gpp",
+	"video/x-msvideo",
+	"video/mpeg",
+	"video/x-flv",
+	"video/x-ms-wmv",
+	"audio/mpeg",
+	"audio/flac",
+	"audio/ogg",
+	"audio/x-vorbis+ogg",
+	"audio/opus",
+	"audio/x-opus+ogg",
+	"audio/wav",
+	"audio/x-wav",
+	"audio/aac",
+	"audio/mp4",
+	"audio/x-m4a",
+	"audio/x-aiff",
+	"audio/x-ms-wma",
+	"application/pdf",
+	"text/markdown",
+	"text/html",
+	"text/plain",
+	"text/csv",
+	"text/tab-separated-values",
+	"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+	"application/vnd.oasis.opendocument.text",
+	"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+	"application/vnd.ms-excel",
+	"application/vnd.oasis.opendocument.spreadsheet",
+	"application/zip",
+	"application/x-7z-compressed",
+	"application/x-tar",
+	"application/x-compressed-tar",
+	"application/x-xz-compressed-tar",
+	"application/x-zstd-compressed-tar",
+	"application/x-bzip-compressed-tar",
+	"font/ttf",
+	"font/otf",
+	"font/woff",
+	"font/woff2",
+]
+
+[install]
+command = "cargo run --manifest-path desktop/Cargo.toml --"
+
+[web]
+root = "."
+dist = "dist"
+entry = "dist/index.html"
+build = "bun run build"
+local_files = true
+
+[updates]
+provider = "schelf"
+
+[sandbox]
+unsandboxed = true
+reason = "It reads your files wherever they are and writes results beside them, and it decodes pictures in sandboxes of its own, which can't start inside another one. Nothing it does goes online: its converting processes are cut off from the network."
+
+[bindings]
+path = "src/lib/bindings.ts"

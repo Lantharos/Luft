@@ -1,0 +1,67 @@
+---
+title: Convertible
+description: Convert, edit and compress files on your own computer.
+sidebar:
+  order: 9
+---
+
+Convertible turns files into other files. Drop something on it, pick a format, and press **Convert**. It's in [Schelf](/apps/schelf/). Nothing leaves your computer: the processes that do the converting are cut off from the network.
+
+Open a file with Convertible from Rover's **Open with** and you see just that file, with the formats that suit it first. Right-click files in Rover and choose **Convert…** to bring several at once.
+
+## What it converts
+
+| Kind | Reads | Writes |
+| --- | --- | --- |
+| Pictures | PNG, JPEG, WebP, AVIF, HEIC, JPEG XL, GIF, TIFF, BMP, ICO, TGA, QOI, PNM, OpenEXR, HDR, DDS, SVG | The same, except DDS and SVG, plus PDF |
+| Videos | MP4, WebM, MKV, MOV, AVI, MPEG, WMV, FLV, 3GP and what else your media codecs read | MP4, WebM, MKV, MOV, AVI, animated GIF, or just the sound |
+| Music and sound | MP3, FLAC, Ogg, Opus, WAV, M4A, AIFF, WMA | MP3, FLAC, Ogg, Opus, WAV, M4A, AIFF, with tags and cover art |
+| Documents | PDF, Markdown, HTML, text, Word (DOCX), OpenDocument Text | PDF, Markdown, HTML, text; PDF pages as pictures |
+| Spreadsheets | CSV, TSV, Excel, OpenDocument Spreadsheet | CSV, TSV, Excel |
+| Archives | ZIP, 7z, TAR and TAR with Gzip, XZ, Zstandard or Bzip2 | The same, or a folder |
+| Fonts | TrueType, OpenType, WOFF, WOFF2 | WOFF, WOFF2, and back to the font's own outline format |
+
+Video that already fits the new format is copied rather than encoded again, which keeps its quality and takes seconds. Hardware encoding is used when your graphics card offers it. **More options** has the codec, the sample rate and a target file size.
+
+PDFs merge: drop several, or pictures and PDFs together, pick PDF, and leave **Combine into one PDF** on. To split one, give it a page range such as `1-3, 7`, or turn on **One file per page**. JPEGs go into a PDF as they are, without losing quality.
+
+## What it can't do
+
+Press the question mark next to **Convert** to see this list, along with anything your computer has no encoder for.
+
+- **Word, Excel and PowerPoint to PDF.** Laying an office file out as it was designed takes a full office suite. Word and OpenDocument files give up their text and tables as Markdown, HTML or plain text, without pictures or page layout.
+- **PDF to Word.** A PDF records where letters sit, not paragraphs. You can have its text, or each page as a picture.
+- **Files locked with a password**, PDFs and archives both.
+- **RAR archives.** Their licence rules out open source tools.
+- **PDFs from text in other alphabets.** Markdown, HTML and text become PDFs with Luft's own font, which covers Latin and a few more alphabets. Text with other letters, such as Japanese, stops with a message, and HTML is the better target for it.
+- **Subtitle tracks and chapters** aren't carried over. Every sound track is.
+- **Copy-protected media.**
+- **TrueType to OpenType.** It would redraw every glyph.
+
+## Editing
+
+Press **Edit** above a picture, video or song. You see the result as you go, and <kbd>Ctrl</kbd>+<kbd>Z</kbd> takes back any step.
+
+- **Crop, rotate and flip**, and resize under the format's options.
+- **Brightness, contrast and colour.**
+- **Mark up** with arrows, lines, boxes, ellipses, highlights and text. Marks on a video stay on every frame.
+- **Blur** softens part of a picture, and **Redact** replaces it with solid black. Use Redact for anything secret: the pixels are gone from the file, and so are camera details, which can hold a small copy of the original. Blurred text can sometimes be read again.
+- **Trim** videos and sound by dragging the ends of the timeline, or with the arrow keys on a handle.
+
+| Key | Does |
+| --- | --- |
+| <kbd>V</kbd> | Select, then drag a mark to move it, or <kbd>Delete</kbd> to remove it |
+| <kbd>C</kbd> | Crop |
+| <kbd>A</kbd> <kbd>L</kbd> <kbd>B</kbd> <kbd>E</kbd> | Arrow, line, box, ellipse |
+| <kbd>H</kbd> <kbd>T</kbd> | Highlight, text |
+| <kbd>U</kbd> <kbd>R</kbd> | Blur, redact |
+| <kbd>Ctrl</kbd>+<kbd>Enter</kbd> | Convert |
+| <kbd>Ctrl</kbd>+<kbd>O</kbd> | Add files |
+
+## Many files at once
+
+Drop a folder or a pile of files. Pick one format for each kind of file, or give a single file its own. Files you edited keep their edits.
+
+The queue shows progress and the time left, and lets you pause, cancel and try again. Several jobs run side by side, as many as your processor and memory can take, at low priority so the rest of the computer stays responsive. Results are written to a temporary file first, so a job that fails or is cancelled leaves nothing behind, and an existing file is never replaced unless you say so. Drag a finished result out of the queue into another app.
+
+Save a format and its options as a preset with the bookmark button.

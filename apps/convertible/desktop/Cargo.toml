@@ -1,0 +1,69 @@
+[package]
+name = "convertible"
+version = "0.1.0"
+description = "Convert, edit and compress files on your own computer"
+authors = ["Kristof"]
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[lib]
+name = "convertible_lib"
+
+[dependencies]
+bzip2.workspace = true
+calamine.workspace = true
+csv.workspace = true
+dirs.workspace = true
+fast_image_resize = { workspace = true, features = ["image"] }
+flate2 = { workspace = true, features = ["default"] }
+gif.workspace = true
+gio.workspace = true
+glycin = { workspace = true, features = ["tokio"] }
+gstreamer = { workspace = true, features = ["v1_24"] }
+gstreamer-app.workspace = true
+gstreamer-pbutils.workspace = true
+gstreamer-video.workspace = true
+hayro.workspace = true
+htmd.workspace = true
+image = { workspace = true, features = ["bmp", "dds", "exr", "ff", "gif", "hdr", "ico", "jpeg", "pnm", "qoi", "rayon", "tga", "tiff", "webp"] }
+imagequant.workspace = true
+imagesize.workspace = true
+img-parts.workspace = true
+infer.workspace = true
+jpeg-encoder.workspace = true
+krilla.workspace = true
+landlock.workspace = true
+libc.workspace = true
+liblzma.workspace = true
+lofty.workspace = true
+lopdf.workspace = true
+luft-app = { workspace = true, features = ["settings"] }
+luft-i18n.workspace = true
+parking_lot.workspace = true
+pulldown-cmark.workspace = true
+quick-xml.workspace = true
+rayon.workspace = true
+resvg.workspace = true
+rust_xlsxwriter = { workspace = true, features = ["constant_memory"] }
+sabine.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+skrifa.workspace = true
+sevenz-rust2 = { workspace = true, features = ["compress", "util"] }
+specta.workspace = true
+tar.workspace = true
+time.workspace = true
+ttf2woff2.workspace = true
+tokio = { workspace = true, features = ["rt-multi-thread"] }
+walkdir.workspace = true
+webp.workspace = true
+wuff.workspace = true
+zip = { workspace = true, features = ["bzip2", "lzma", "zstd"] }
+zstd.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[lints]
+workspace = true

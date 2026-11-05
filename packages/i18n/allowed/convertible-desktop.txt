@@ -1,0 +1,5 @@
+apps/convertible/desktop/src/engine/formats.rs	Ogg Video
+apps/convertible/desktop/src/engine/formats.rs	Ogg Vorbis
+apps/convertible/desktop/src/engine/formats.rs	Radiance HDR
+apps/convertible/desktop/src/engine/image/marks.rs	Open Runde
+apps/convertible/desktop/src/lib.rs	Convertible

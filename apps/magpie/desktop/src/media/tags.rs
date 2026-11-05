@@ -9,6 +9,7 @@ use serde::Serialize;
 use specta::Type;
 
 use crate::cache;
+use crate::folder::kinds::{Kind, kind};
 
 const FOLDER_ART: [&str; 4] = ["cover", "folder", "front", "album"];
 const ART_EXTENSIONS: [&str; 4] = ["jpg", "jpeg", "png", "webp"];
@@ -30,6 +31,10 @@ pub struct Tags {
 }
 
 pub fn read_all(paths: Vec<String>) -> Vec<Tags> {
+    let paths: Vec<_> = paths
+        .into_iter()
+        .filter(|path| kind(Path::new(path)) == Some(Kind::Audio))
+        .collect();
     let workers = thread::available_parallelism().map_or(2, |cores| cores.get().min(4));
     let chunk = paths.len().div_ceil(workers).max(1);
     thread::scope(|scope| {

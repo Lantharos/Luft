@@ -9,3 +9,4 @@ kestrel/ui/src/auth/passkeys/service.ts	The prompt could not be shown
 kestrel/ui/src/session/actions/endSessionDialog.ts	Unknown dialog type requested
 kestrel/ui/src/session/actions/endSessionDialog.ts	Cannot grab pointer and keyboard
 kestrel/ui/src/auth/lockScreen/pages.ts	Lock screen swipe tracker
+kestrel/ui/src/auth/greeter/controls/power.ts	The login screen asks what the power button should do

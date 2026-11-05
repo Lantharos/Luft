@@ -1,15 +1,13 @@
 <script lang="ts">
 	import Plus from '@lucide/svelte/icons/plus';
 	import Square from '@lucide/svelte/icons/square';
-	import { ContextMenu, MenuItem, SearchField, WindowControls } from '@luft/ui';
+	import { SearchField, WindowControls } from '@luft/ui';
 	import { t } from '@luft/i18n';
-	import type { Sound } from '#lib/bindings.js';
 	import { app } from '#lib/state/app.svelte.js';
 	import { commands } from '#lib/bindings.js';
 	import Tile from './Tile.svelte';
 
 	let dragging = $state(false);
-	let menu = $state<{ sound: Sound; at: { x: number; y: number } } | null>(null);
 
 	function dragged(event: DragEvent) {
 		if (!event.dataTransfer?.types.includes('Files')) return;
@@ -39,7 +37,7 @@
 		{#if app.sounds.length}
 			<div class="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-3">
 				{#each app.sounds as sound (sound.id)}
-					<Tile {sound} onmenu={(at) => (menu = { sound, at })} />
+					<Tile {sound} onmenu={(at) => (app.menu = { kind: 'sound', sound, at })} />
 				{/each}
 			</div>
 		{:else if app.search}
@@ -52,14 +50,6 @@
 		{/if}
 	</div>
 </main>
-
-{#if menu}
-	{@const { sound, at } = menu}
-	<ContextMenu {at} onclose={() => (menu = null)}>
-		<MenuItem onclick={() => (app.editing = sound)}>{t('tile-edit')}</MenuItem>
-		<MenuItem danger onclick={() => void app.removeSound(sound)}>{t('tile-remove')}</MenuItem>
-	</ContextMenu>
-{/if}
 
 <style>
 	.dragging {

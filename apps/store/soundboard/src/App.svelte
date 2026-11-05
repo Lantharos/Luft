@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { appearance, GlassShell, Toast } from '@luft/ui';
 	import BoardView from '#lib/components/BoardView.svelte';
+	import Menus from '#lib/components/Menus.svelte';
 	import SoundEditor from '#lib/components/SoundEditor.svelte';
 	import Sidebar from '#lib/components/Sidebar.svelte';
 	import { app } from '#lib/state/app.svelte.js';
@@ -18,6 +19,8 @@
 	<Sidebar />
 	<BoardView />
 </GlassShell>
+
+<Menus />
 
 {#if app.editing}
 	{#key app.editing.id}

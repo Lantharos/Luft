@@ -1,34 +1,14 @@
 <script lang="ts">
 	import Plus from '@lucide/svelte/icons/plus';
-	import { ConfirmDialog, ContextMenu, Dialog, MenuItem, MenuSeparator, selectionPill, TextField, tooltip } from '@luft/ui';
+	import { selectionPill, tooltip } from '@luft/ui';
 	import { t } from '@luft/i18n';
 	import type { Board } from '#lib/bindings.js';
 	import { app } from '#lib/state/app.svelte.js';
-	import { toast } from '#lib/state/toast.svelte.js';
 	import MixPanel from './MixPanel.svelte';
-
-	let menu = $state<{ board: Board; at: { x: number; y: number } } | null>(null);
-	let renaming = $state<{ board: Board; name: string } | null>(null);
-	let removing = $state<Board | null>(null);
 
 	function open(event: MouseEvent, board: Board) {
 		event.preventDefault();
-		menu = { board, at: { x: event.clientX, y: event.clientY } };
-	}
-
-	async function exportBoard(board: Board) {
-		await app.exportBoard(board).then(() => toast.show(t('board-exported')), app.failed);
-	}
-
-	async function importBoard() {
-		const before = app.library.boards.length;
-		await app.importBoard().catch(app.failed);
-		if (app.library.boards.length > before) toast.show(t('board-imported'));
-	}
-
-	function rename() {
-		if (renaming?.name.trim()) void app.renameBoard(renaming.board.id, renaming.name.trim());
-		renaming = null;
+		app.menu = { kind: 'board', board, at: { x: event.clientX, y: event.clientY } };
 	}
 </script>
 
@@ -60,39 +40,6 @@
 	</nav>
 	<MixPanel />
 </aside>
-
-{#if menu}
-	{@const { board, at } = menu}
-	<ContextMenu {at} onclose={() => (menu = null)}>
-		<MenuItem onclick={() => (renaming = { board, name: board.name })}>{t('board-rename')}</MenuItem>
-		<MenuItem onclick={() => void exportBoard(board)}>{t('board-export')}</MenuItem>
-		<MenuItem onclick={() => void importBoard()}>{t('board-import')}</MenuItem>
-		<MenuSeparator />
-		<MenuItem danger onclick={() => (removing = board)}>{t('board-remove')}</MenuItem>
-	</ContextMenu>
-{/if}
-
-{#if renaming}
-	<Dialog title={t('board-rename')} onclose={() => (renaming = null)}>
-		<TextField bind:value={renaming.name} label={t('board-name')} onkeydown={(event) => event.key === 'Enter' && rename()} />
-		{#snippet actions()}
-			<button type="button" class="button" onclick={() => (renaming = null)}>{t('editor-cancel')}</button>
-			<button type="button" class="button primary" onclick={rename}>{t('editor-save')}</button>
-		{/snippet}
-	</Dialog>
-{/if}
-
-{#if removing}
-	{@const board = removing}
-	<ConfirmDialog
-		title={t('board-remove-title', { name: board.name })}
-		description={t('board-remove-detail', { count: board.sounds.length })}
-		action={t('board-remove')}
-		danger
-		run={() => app.removeBoard(board.id)}
-		onclose={() => (removing = null)}
-	/>
-{/if}
 
 <style>
 	.add {

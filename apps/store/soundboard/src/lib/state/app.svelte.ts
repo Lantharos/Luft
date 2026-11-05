@@ -4,6 +4,9 @@ import { commands, events } from '#lib/bindings.js';
 import type { Board, Hotkey, Library, Meters, Mix, Settings, Sound, Status } from '#lib/bindings.js';
 import { toast } from './toast.svelte';
 
+type Point = { x: number; y: number };
+export type Menu = ({ kind: 'board'; board: Board } | { kind: 'sound'; sound: Sound }) & { at: Point };
+
 class AppStore {
 	library = $state.raw<Library>({ boards: [] });
 	settings = $state.raw<Settings | null>(null);
@@ -15,6 +18,9 @@ class AppStore {
 	boardId = $state<number | null>(null);
 	search = $state('');
 	editing = $state<Sound | null>(null);
+	menu = $state.raw<Menu | null>(null);
+	renaming = $state.raw<Board | null>(null);
+	removing = $state.raw<Board | null>(null);
 
 	board: Board | null = $derived(this.library.boards.find((board) => board.id === this.boardId) ?? this.library.boards[0] ?? null);
 	sounds: Sound[] = $derived.by(() => {

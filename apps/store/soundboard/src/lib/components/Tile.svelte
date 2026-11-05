@@ -24,7 +24,7 @@
 	const held = () => sound.trigger === 'hold';
 
 	function down(event: PointerEvent) {
-		if (event.button === SIDE_BUTTON) return;
+		if (event.button === SIDE_BUTTON || app.menu) return;
 		void commands.press({ sound: sound.id, preview: false });
 	}
 

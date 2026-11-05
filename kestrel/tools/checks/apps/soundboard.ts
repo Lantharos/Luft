@@ -9,9 +9,9 @@ import {RATE, wav} from '../lib/audio/music.js';
 import {givePorts, intoSpeakers, link} from '../lib/audio/routing.js';
 import {checks} from '../lib/check.js';
 import {call} from '../lib/dbus.js';
-import {hold, release} from '../lib/input/input.js';
+import {hold, press, release} from '../lib/input/input.js';
 import {outcome, repository, scratch, spawn, stop, waitForWindow, type Process} from '../lib/processes.js';
-import {capture} from '../lib/screenshots.js';
+import {capture, type Area, type Frame} from '../lib/screenshots.js';
 import {pause} from '../lib/wait.js';
 import {lock, unlock} from '../lockScreen/lib/shield.js';
 import {openApp} from './lib/apps.js';
@@ -35,6 +35,16 @@ const SILENT = 0.01;
 const ADD_SOUNDS: [number, number] = [904, 30];
 const FIRST_TILE: [number, number] = [370, 130];
 const EDIT_ITEM: [number, number] = [392, 146];
+const TILE_BESIDE_MENU: [number, number] = [335, 170];
+const FIRST_BOARD: [number, number] = [140, 80];
+const RENAME_ITEM: [number, number] = [162, 96];
+const EMPTY_SPOT: [number, number] = [700, 600];
+const MICROPHONE_SELECT: [number, number] = [140, 479];
+const BESIDE_TILE = {x: 490, y: 134, width: 60, height: 60};
+const BESIDE_BOARD = {x: 284, y: 96, width: 16, height: 80};
+const BELOW_SELECT = {x: 40, y: 515, width: 200, height: 100};
+const MENU_TOLERANCE = 6;
+const MENU_PIXELS = 100;
 const LISTEN_MS = 700;
 const AFTER_PRESS_MS = 400;
 const IDLE_MS = 10000;
@@ -93,6 +103,85 @@ function checkCopied(original: string) {
   GLib.unlink(original);
   const library = JSON.parse(read(GLib.build_filenamev([dataFolder(), 'library.json']))) as {boards: {sounds: {file: string}[]}[]};
   require(exists(GLib.build_filenamev([dataFolder(), 'sounds', library.boards[0].sounds[0].file])), 'the sound keeps a copy of its own');
+}
+
+const shows = async (app: LuftApp, area: Area, base: Frame) => (await app.frame(area)).pixelsApart(base, MENU_TOLERANCE) > MENU_PIXELS;
+
+async function opens(app: LuftApp, area: Area, base: Frame, label: string, act: () => void) {
+  act();
+  await eventually(() => shows(app, area, base), label);
+}
+
+async function closes(app: LuftApp, area: Area, base: Frame, label: string, act: () => void) {
+  act();
+  await eventually(async () => !await shows(app, area, base), label);
+}
+
+function pressEscape() {
+  press(Clutter.KEY_Escape);
+}
+
+async function checkMenus(app: LuftApp) {
+  const empty = () => app.click(EMPTY_SPOT);
+  empty();
+  await pause(AFTER_PRESS_MS);
+  const tileMenu = app.area(BESIDE_TILE);
+  const boardMenu = app.area(BESIDE_BOARD);
+  const popover = app.area(BELOW_SELECT);
+  const [noTileMenu, noBoardMenu, noPopover] = [await app.frame(tileMenu), await app.frame(boardMenu), await app.frame(popover)];
+  const openTile = () => app.click(FIRST_TILE, Clutter.BUTTON_SECONDARY);
+  const openBoard = () => app.click(FIRST_BOARD, Clutter.BUTTON_SECONDARY);
+
+  await opens(app, tileMenu, noTileMenu, 'right-clicking a tile opens its menu', openTile);
+  await capture('soundboard-tile-menu');
+  await closes(app, tileMenu, noTileMenu, 'clicking elsewhere closes the menu', empty);
+  await opens(app, tileMenu, noTileMenu, 'the menu opens again', openTile);
+  await closes(app, tileMenu, noTileMenu, 'Escape closes the menu', pressEscape);
+
+  await opens(app, boardMenu, noBoardMenu, 'right-clicking a board opens its menu', openBoard);
+  await closes(app, boardMenu, noBoardMenu, 'clicking elsewhere closes the board\'s menu', empty);
+  await opens(app, boardMenu, noBoardMenu, 'the board\'s menu opens again', openBoard);
+  await closes(app, boardMenu, noBoardMenu, 'Escape closes the board\'s menu', pressEscape);
+
+  await opens(app, boardMenu, noBoardMenu, 'a board\'s menu is open', openBoard);
+  await closes(app, boardMenu, noBoardMenu, 'right-clicking a tile closes the board\'s menu', openTile);
+  await eventually(() => shows(app, tileMenu, noTileMenu), 'and opens the tile\'s, so only one is ever open');
+  await closes(app, tileMenu, noTileMenu, 'right-clicking a board closes the tile\'s menu', openBoard);
+  await eventually(() => shows(app, boardMenu, noBoardMenu), 'and opens the board\'s');
+  await closes(app, boardMenu, noBoardMenu, 'and that one closes too', empty);
+
+  await opens(app, tileMenu, noTileMenu, 'the tile\'s menu opens once more', openTile);
+  await pause(AFTER_PRESS_MS);
+  await opens(app, popover, noPopover, 'choosing Edit opens the editor', () => app.click(EDIT_ITEM));
+  await pause(AFTER_PRESS_MS);
+  await capture('soundboard-editor');
+  await closes(app, tileMenu, noTileMenu, 'Escape closes the editor, and no menu is left behind', pressEscape);
+
+  await opens(app, boardMenu, noBoardMenu, 'a board\'s menu opens for renaming', openBoard);
+  await pause(AFTER_PRESS_MS);
+  await opens(app, popover, noPopover, 'choosing Rename opens its dialog', () => app.click(RENAME_ITEM));
+  await pause(AFTER_PRESS_MS);
+  await capture('soundboard-rename');
+  await closes(app, boardMenu, noBoardMenu, 'Escape closes the rename dialog', pressEscape);
+
+  await pause(AFTER_PRESS_MS);
+  const openSelect = () => app.click(MICROPHONE_SELECT);
+  await opens(app, popover, noPopover, 'the microphone list opens', openSelect);
+  await closes(app, popover, noPopover, 'clicking elsewhere closes the microphone list', empty);
+  await pause(AFTER_PRESS_MS);
+  await opens(app, popover, noPopover, 'the microphone list opens again', openSelect);
+  await closes(app, popover, noPopover, 'Escape closes the microphone list', pressEscape);
+}
+
+/** Clicking a tile to close a menu mustn't play it into someone's call. */
+async function checkDismissingIsSilent(app: LuftApp) {
+  const heard = await listening(async () => {
+    app.click(FIRST_TILE, Clutter.BUTTON_SECONDARY);
+    await pause(AFTER_PRESS_MS);
+    app.click(TILE_BESIDE_MENU);
+    await pause(AFTER_PRESS_MS);
+  });
+  require(toneStrength(heard, SOUND_PITCH) < SILENT, `clicking a tile to close a menu plays nothing (${toneStrength(heard, SOUND_PITCH).toFixed(3)})`);
 }
 
 async function checkSoundAndVoice(app: LuftApp) {
@@ -266,15 +355,8 @@ export async function run() {
       await addSound(first, original);
       checkCopied(original);
       await capture('soundboard-board');
-      first.click(FIRST_TILE, Clutter.BUTTON_SECONDARY);
-      await pause(AFTER_PRESS_MS);
-      await capture('soundboard-tile-menu');
-      first.click(EDIT_ITEM);
-      await pause(AFTER_PRESS_MS);
-      await capture('soundboard-editor');
-      hold(Clutter.KEY_Escape);
-      release(Clutter.KEY_Escape);
-      await pause(AFTER_PRESS_MS);
+      await checkMenus(first);
+      await checkDismissingIsSilent(first);
       await checkSoundAndVoice(first);
       await checkPrivacy(first);
       const sound = soundId()!;

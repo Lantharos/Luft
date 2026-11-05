@@ -10,6 +10,7 @@ import {fixture, scratch} from '../lib/processes.js';
 import type {Frame} from '../lib/screenshots.js';
 import {changes, withApp} from './lib/apps.js';
 import {checkPalette, useScheme, withPalette, type Palette} from './lib/palette.js';
+import {checkDrops} from './magpie/drops.js';
 
 interface Sample {
   name: string;
@@ -108,4 +109,5 @@ export async function run() {
     for (const sample of SAMPLES) await checkSample(sample, home, palette);
   });
   await checkPrinting();
+  await checkDrops();
 }

@@ -1,6 +1,6 @@
 # luft-sleep
 
-Keeps a sleeping laptop from running its battery flat. Luft can't hibernate (Secure Boot's lockdown rules it out), so instead the computer wakes briefly on a timer while it sleeps on battery, checks the battery and how long it has slept, and either goes straight back to sleep or shuts down the usual way, so apps and sessions close as they would from the power menu. Plugged in, it just sleeps. Computers without a battery sleep normally.
+Keeps a sleeping laptop from running its battery flat. Luft can't hibernate (Secure Boot's lockdown rules it out), so instead the computer wakes briefly on a timer while it sleeps on battery, checks the battery and how long it has slept, and either goes straight back to sleep or shuts down the usual way, so apps and sessions close as they would from the power menu. Plugged in, it just sleeps. Waking more than a minute after a check was due counts as someone waking the computer, since some laptops can't be woken by the timer. Computers without a battery sleep normally.
 
 It shuts down when the battery falls to 5% or once it has slept on battery for the chosen time, a day unless changed in Settings → Power. Checks start an hour in and come sooner as the battery drains faster.
 

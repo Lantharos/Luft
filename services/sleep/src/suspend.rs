@@ -13,7 +13,7 @@ use rustix::time::{
 
 use crate::battery;
 use crate::config;
-use crate::plan::{Plan, Step};
+use crate::plan::{Plan, Step, woken_by_alarm};
 
 const SYSTEMD_SLEEP: &str = "/usr/lib/systemd/systemd-sleep";
 const LIDS: &str = "/proc/acpi/button/lid";
@@ -88,9 +88,11 @@ pub fn run() -> anyhow::Result<()> {
     let closed_lid = lid_closed() == Some(true);
     let (mut plan, mut wait) = Plan::start(limit, boot_time(), reading);
     loop {
+        let due = boot_time() + wait;
         alarm.ring_in(wait)?;
         sleep()?;
-        if !alarm.rang()? || (closed_lid && lid_closed() == Some(false)) {
+        let by_alarm = woken_by_alarm(alarm.rang()?, due, boot_time());
+        if !by_alarm || (closed_lid && lid_closed() == Some(false)) {
             return Ok(());
         }
         let Some(reading) = battery::read() else {

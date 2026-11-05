@@ -9,11 +9,18 @@ const FIRST_CHECK: Duration = HOUR;
 const PLUGGED_IN_CHECK: Duration = Duration::from_secs(2 * 60 * 60);
 const SOONEST_CHECK: Duration = Duration::from_secs(10 * 60);
 const LATEST_CHECK: Duration = Duration::from_secs(6 * 60 * 60);
+const ALARM_SLACK: Duration = MINUTE;
 
 #[derive(Debug, PartialEq)]
 pub enum Step {
     SleepFor(Duration),
     PowerOff,
+}
+
+/// Some laptops can't be woken by the alarm, so it can run out unnoticed while
+/// they sleep. Waking long after it was due means a person woke the computer.
+pub fn woken_by_alarm(rang: bool, due: Duration, now: Duration) -> bool {
+    rang && now <= due + ALARM_SLACK
 }
 
 pub struct Plan {
@@ -87,6 +94,14 @@ mod tests {
             on_battery: false,
             level,
         }
+    }
+
+    #[test]
+    fn a_wake_long_after_the_alarm_is_a_person() {
+        assert!(woken_by_alarm(true, HOUR, HOUR));
+        assert!(woken_by_alarm(true, HOUR, HOUR + ALARM_SLACK));
+        assert!(!woken_by_alarm(true, HOUR, HOUR * 9));
+        assert!(!woken_by_alarm(false, HOUR, HOUR));
     }
 
     #[test]

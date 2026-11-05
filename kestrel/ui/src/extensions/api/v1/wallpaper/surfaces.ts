@@ -24,6 +24,14 @@ export function windowWithId(id: string): Meta.Window | null {
   return global.get_window_actors().find(actor => windowId(actor.meta_window!) === id)?.meta_window ?? null;
 }
 
+/** What tells a display from others across restarts and plugging it in again: the monitor itself, or else its port. */
+function displayId(index: number): string {
+  const manager = global.backend.get_monitor_manager();
+  const [monitor] = manager.get_logical_monitors()!.find(logical => logical.get_number() === index)!.get_monitors();
+  const serial = monitor.get_serial();
+  return serial ? `${monitor.get_vendor()}:${monitor.get_product()}:${serial}` : monitor.get_connector();
+}
+
 /** Where windows and the taskbar are, and word of when that changes, watched only while an extension listens. */
 export class SurfaceWatch {
   private readonly listeners = new Set<() => void>();
@@ -40,12 +48,15 @@ export class SurfaceWatch {
     const primary = this.host.primaryIndex();
     return this.host.monitors().map(monitor => {
       const relative = (shape: Surface): Surface => ({ ...shape, x: shape.x - monitor.x, y: shape.y - monitor.y });
+      const area = this.host.workArea(monitor.index);
       return {
         index: monitor.index,
+        id: displayId(monitor.index),
         primary: monitor.index === primary,
         width: monitor.width,
         height: monitor.height,
         scale: global.display.get_monitor_scale(monitor.index),
+        workArea: { ...area, x: area.x - monitor.x, y: area.y - monitor.y },
         fullscreen: windows.some(window => window.is_fullscreen() && window.get_monitor() === monitor.index),
         windows: shapes.filter(shape => touches(shape, monitor)).map(relative),
         taskbar: this.host.taskbarIslands(monitor).map(({ x, y, width, height, radius }, index) =>

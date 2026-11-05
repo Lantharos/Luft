@@ -12,6 +12,8 @@ export function wallpaperApi({ layers, scope, manifest, path, dataPath }: ApiCon
       return {
         loadSheet: options => sprites.loadSheet(options),
         add: options => sprites.add(options),
+        onFrame: step => sprites.onFrame(step),
+        lift: lifted => sprites.lift(lifted),
         dispose: () => handle.dispose(),
       };
     },
@@ -19,6 +21,14 @@ export function wallpaperApi({ layers, scope, manifest, path, dataPath }: ApiCon
       return layers.surfaces.displays();
     },
     onSurfacesChanged: changed => scope.disposable(layers.surfaces.watch(scope.guard(changed))),
+    followPointer: options => {
+      const follower = layers.pointers.follow(options, scope);
+      const handle = scope.disposable(() => follower.stop());
+      return {
+        setAreas: areas => follower.setAreas(areas),
+        dispose: () => handle.dispose(),
+      };
+    },
     addLayer: (options: LayerOptions): Layer => {
       const layer = new WallpaperLayer(options, layers, scope, `extension-layer:${manifest.id}`);
       const handle = scope.disposable(() => layer.destroy());

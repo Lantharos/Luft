@@ -9,7 +9,7 @@ Extensions add to Kestrel: layers over the wallpaper, quick settings tiles, task
 | `kestrel/ui/src/extensions/service.ts` | The D-Bus interface below |
 | `kestrel/engine/src/sound` | `ShellSoundMix`, which plays an extension's sounds, and `ShellAudioMonitor`, which measures what the computer plays |
 | `packages/extension-api` | `@luft/extension-api`, the types for extension authors, written from `types.ts` by `bun kestrel/ui/extensionApi.ts`. `bun run check` in `kestrel/ui` fails when it's out of date |
-| `extensions` | Lantharos's own extensions, such as Seasons, Strays, Keystrokes, Focus, Reminders and Pult. Each has a `build.sh` that makes its folder, which `extensions/pack.sh` packs for schelf.store |
+| `extensions` | Lantharos's own extensions, such as Seasons, Strays, Playthings, Keystrokes, Focus, Reminders and Pult. Each has a `build.sh` that makes its folder, which `extensions/pack.sh` packs for schelf.store |
 | `apps/settings/src/lib/panels/personalization/extensions` | Settings → Extensions, each extension's page, and its rows on other pages |
 
 ## On disk
@@ -167,7 +167,21 @@ A sprite takes clicks only on what shows of its current frame, through a `vfunc_
 
 `place` with `on` stands a sprite on a window, with `x` and `y` counted from that window's corner. The sprite moves right in front of the window actor in the window group, so it shows over the windows below and under those above, and `wallpaper/ride.ts` moves it itself: on `position-changed` and `size-changed`, which run before the frame that shows the move, on changes to the actor's translation and scale, which tiling and the second half of a size change use, and with the picture that stands in for a window while it changes size. Its distance from the window's corner stays one number, so there's nothing to round differently from one frame to the next, and the extension doesn't run at all while a window carries a sprite along. It stays a sibling of the window actor rather than a child: an X11 window's paint volume leaves children out, a child at the top of the actor would stop a window from being scanned out directly, and hiding the actor for a size change would hide it too.
 
-`wallpaper.surfaces` reads windows and the taskbar on demand, each with an id that lasts as long as it does, the display's scale and whether something runs full screen. `onSurfacesChanged` connects to each window, workspace switches, displays and the taskbar's layout, only while an extension listens, and calls listeners once before the next frame, so nothing runs while nothing moves.
+A sprite can also be `smooth`, for painted art rather than pixel art: it shows at exactly its height, filtered and with mipmaps, and `place` can turn, fade and stretch it around a `pivot`. Smooth sprites share one group actor, so they stack in the order they were added and windows pass a single actor rather than each sprite, and `sprites.lift` takes the whole group above the windows and back. They move by translation, which never queues a layout, so a moving sprite only damages itself. Their sheets keep one texture per frame, since they flip by scaling. A sprite at opacity 0 hides, and costs nothing to paint.
+
+What shows of a frame is a box around each of eight bands across it, so an open shape keeps the desktop's clicks in its corners and between its parts.
+
+`sprites.onFrame` runs a step before each frame on one `Clutter.Timeline`, which exists only while a step wants frames and stops when the last one returns false. It's for what moves right now. Anything ongoing belongs on a slow timer, which is how Playthings keeps ambient motion at 12 steps a second and runs the frame step only for what the pointer just touched.
+
+`wallpaper.surfaces` reads windows and the taskbar on demand, each with an id that lasts as long as it does, the display's scale, a stable `id` of its own for keeping things per display, its `workArea` and whether something runs full screen. `onSurfacesChanged` connects to each window, workspace switches, displays and the taskbar's layout, only while an extension listens, and calls listeners once before the next frame, so nothing runs while nothing moves.
+
+## Following the pointer
+
+`wallpaper.followPointer` tells an extension about the mouse and fingers on the bare desktop and on its own `pressable` sprites, inside the areas it names and nowhere else. `DesktopPointers` (`wallpaper/pointers.ts`) stands behind it, one for all extensions, connected only while something follows.
+
+It listens on each display's `Meta.BackgroundActor` and on pressable sprites, because Clutter only delivers events to reactive actors, so it hears nothing while a window, the taskbar or a surface is under the pointer. That's what keeps windows in front: a sprite behind a window can't react through it, and nothing runs per motion while the pointer is over a window. Over the bare desktop, each motion costs one look through the extension's areas, and only motion inside them reaches its code. When a window opens under the pointer, or the pointer leaves the areas or the desktop, the extension hears `gone`.
+
+Following only listens. A press on the bare desktop stays the desktop's, so the right-click menu and long press work as they always do, while the extension sees `down` and `up` beside them. A press with the primary button or a finger on a pressable sprite does belong to that sprite: its `down`, `move` and `up` carry the sprite and go on outside the areas, through Clutter's implicit grab, until it's let go. Each finger has its own `id` from its touch slot, 0 being the mouse, so several can hold several sprites. A press that began on the desktop and wandered over a window is the other case Clutter keeps delivering; for those, each motion picks what's under it and reports `gone` over a window. Right-clicks pass through a pressable sprite to the desktop's own menu, given to it with `bindDesktopMenu`.
 
 ## Sound
 

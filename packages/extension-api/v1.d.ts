@@ -291,16 +291,66 @@ export interface Wallpaper {
    * displays changed, at most once a frame. Nothing runs while nothing changes.
    */
   onSurfacesChanged(changed: () => void): Disposable;
+  /**
+   * Hears about the pointer and fingers on the bare desktop and on the extension's own sprites, inside the areas asked
+   * for and nowhere else. Windows in front stop it, nothing reaches the extension over anything else, and it costs
+   * nothing while the pointer stays out of those areas. It only listens: a press on the bare desktop still does what
+   * it always does.
+   */
+  followPointer(options: PointerFollowOptions): PointerFollow;
+}
+
+/** A part of a display, relative to its top left corner, where an extension wants to hear about the pointer. */
+export interface PointerArea extends Rect {
+  /** The display, as in {@link SurfaceDisplay.index}. */
+  display: number;
+}
+
+export interface PointerFollowOptions {
+  areas: readonly PointerArea[];
+  onPointer(event: DesktopPointerEvent): void;
+}
+
+export interface PointerFollow extends Disposable {
+  /** Replaces the areas, such as when things moved. */
+  setAreas(areas: readonly PointerArea[]): void;
+}
+
+/** Something the pointer or a finger did on the desktop. */
+export interface DesktopPointerEvent {
+  /** 0 for the mouse. Each finger has its own number while it's down, so several can be told apart. */
+  readonly id: number;
+  readonly kind: 'mouse' | 'touch';
+  /**
+   * `down` and `up` are the primary button or a finger. `gone` means it left the areas or the desktop, such as when a
+   * window opened under it, and nothing more comes until it's back. A finger that's lifted sends only `up`.
+   */
+  readonly phase: 'move' | 'down' | 'up' | 'gone';
+  /** The display, as in {@link SurfaceDisplay.index}. Meaningless for `gone`, like `x` and `y`. */
+  readonly display: number;
+  readonly x: number;
+  readonly y: number;
+  /** When it happened, in milliseconds, for working out how fast it goes. */
+  readonly time: number;
+  /**
+   * The {@link SpriteOptions.pressable} sprite the press landed on, until it's let go. Such a press stays with that
+   * sprite wherever it goes and reports `move`s outside the areas too. Null on the bare desktop.
+   */
+  readonly sprite: Sprite | null;
 }
 
 export interface SurfaceDisplay {
-  /** Which display this is, as Kestrel numbers them. */
+  /** Which display this is, as Kestrel numbers them. It can change when displays come and go. */
   readonly index: number;
+  /** What the display is known by across restarts and being plugged in again, for keeping things per display. */
+  readonly id: string;
   readonly primary: boolean;
   readonly width: number;
   readonly height: number;
   /** How many of the screen's own pixels one pixel here takes up, such as 1.5 at 150%. */
   readonly scale: number;
+  /** Where windows go on this display, without the taskbar, relative to its top left corner. */
+  readonly workArea: Rect;
   /** Whether a window runs full screen here. */
   readonly fullscreen: boolean;
   /** Windows on this display, topmost first, relative to its top left corner. */
@@ -314,6 +364,8 @@ export interface SpriteSheetOptions {
   path: string;
   /** A frame's width and height in the picture's own pixels. Its size must be a whole number of frames each way. */
   cell: number;
+  /** For {@link SpriteOptions.smooth} sprites. Keeps half as much in memory, since they flip without a mirrored copy. */
+  smooth?: boolean;
 }
 
 /** A picture cut into frames. Frames count from the top left, row by row. */
@@ -342,6 +394,13 @@ export interface SpritePlace {
    * Nothing happens if that window has just gone.
    */
   on?: string;
+  /** Only for {@link SpriteOptions.smooth} sprites: degrees clockwise around its pivot. */
+  rotation?: number;
+  /** Only for {@link SpriteOptions.smooth} sprites: how much shows, from 0 to 1. At 0 it costs nothing. */
+  opacity?: number;
+  /** Only for {@link SpriteOptions.smooth} sprites: stretches it around its pivot. */
+  scaleX?: number;
+  scaleY?: number;
 }
 
 export interface SpriteOptions {
@@ -351,6 +410,22 @@ export interface SpriteOptions {
    * sheet on each display, so the picture stays crisp at every display scale; {@link Sprite.sizeOn} says what that came to.
    */
   height: number;
+  /**
+   * For painted art rather than pixel art. It shows at exactly `height`, filtered and not snapped to pixels, and can
+   * turn, fade and stretch through {@link SpritePlace}. Load its sheet with {@link SpriteSheetOptions.smooth}. Moving
+   * one never asks for a layout. `onClick` and picking up don't apply; use `pressable` instead.
+   */
+  smooth?: boolean;
+  /**
+   * Only for smooth sprites: the point of the frame that {@link SpritePlace} puts in place and that it turns around, as
+   * parts of its width and height. The middle of the bottom edge, `[0.5, 1]`, without it.
+   */
+  pivot?: readonly [number, number];
+  /**
+   * Only for smooth sprites: takes presses on what shows of it and reports them through
+   * {@link Wallpaper.followPointer}, each finger on its own, so people can hold several at once.
+   */
+  pressable?: boolean;
   /** Runs when someone clicks or taps it without moving it. */
   onClick?(): void;
   /**
@@ -377,6 +452,13 @@ export interface Sprites extends Disposable {
    */
   loadSheet(options: SpriteSheetOptions): SpriteSheet;
   add(options: SpriteOptions): Sprite;
+  /**
+   * Runs `step` before each frame, with the seconds since the last, until it returns false. For things moving right
+   * now, not for anything that keeps going: nothing runs and nothing wakes once every step has stopped.
+   */
+  onFrame(step: (seconds: number) => boolean): Disposable;
+  /** Shows the smooth sprites above the windows, such as while people arrange them, or back below. */
+  lift(lifted: boolean): void;
 }
 
 export interface Sprite extends Disposable {

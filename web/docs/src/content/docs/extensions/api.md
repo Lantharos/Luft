@@ -68,13 +68,30 @@ const layer = ext.wallpaper.addLayer({
 
 | Member | Is |
 | --- | --- |
-| `loadSheet({ path, cell })` | Cuts a picture of square frames `cell` pixels wide into frames, row by row. Returns a sheet with `columns`, `rows` and `cell`, and throws when the picture can't be read or isn't a whole number of frames |
+| `loadSheet({ path, cell, smooth? })` | Cuts a picture of square frames `cell` pixels wide into frames, row by row. Returns a sheet with `columns`, `rows` and `cell`, and throws when the picture can't be read or isn't a whole number of frames |
 | `add(options)` | Adds a sprite: its `sheet`, about how tall it shows as `height`, and optionally `onClick()`, `onPicked()`, `onCarried(point)` and `onDropped(point)`. With `onPicked`, people can pick it up: Luft moves it with the pointer, above the windows, and `point` says the `display`, `x` and `y` of its feet |
+| `onFrame(step)` | Runs `step(seconds)` before each frame until it returns false, for what's moving right now |
+| `lift(lifted)` | Shows smooth sprites above the windows, or back below them |
 | `dispose()` | Takes them all away |
 
 A sprite has `place({ display, x, y, frame, flipped? })`, which shows it with its feet at that point and only touches what's changed, `describe(label)`, what screen readers call it, and `sizeOn(display)`, its size there. It shows a whole number of screen pixels per pixel of its sheet, the nearest to `height`, so pixel art stays crisp at every display scale. It takes clicks only on what shows of it; the desktop keeps every other pixel.
 
-To know what's where, `wallpaper.surfaces` lists each display with `index`, `primary`, `width`, `height`, `scale`, `fullscreen`, `windows` and `taskbar`. Windows and taskbar pieces are outlines as in `frame.displays`, each with an `id` that lasts as long as it does. `wallpaper.onSurfacesChanged(changed)` runs before the next frame after any of them moved, appeared or went, at most once a frame, and never while nothing changes.
+For painted art rather than pixel art, load the sheet with `smooth: true` and add sprites with `smooth: true`. They show at exactly `height`, filtered, and `place` also takes `rotation` in degrees, `opacity` from 0 to 1, `scaleX` and `scaleY`, all around a `pivot` you give as parts of the frame, such as `[0.5, 0]` for a lantern hanging from its top. They stack in the order you add them, and nothing is drawn for one at opacity 0.
+
+Add `pressable: true` to a smooth sprite to take presses on what shows of it, and hear about them through `wallpaper.followPointer({ areas, onPointer })`. It tells you what the mouse and fingers do on the bare desktop and your own sprites, inside `areas` (each with a `display`, `x`, `y`, `width` and `height`) and nowhere else, so it costs nothing while the pointer is elsewhere. Windows in front stop it by themselves. `setAreas` replaces the areas, and `dispose()` stops it.
+
+| Member of the event | Is |
+| --- | --- |
+| `id` | 0 for the mouse. Each finger has its own number while it's down |
+| `kind` | `mouse` or `touch` |
+| `phase` | `move`, `down` and `up` for the primary button or a finger, and `gone` when it left the areas or the desktop, such as a window opening under it |
+| `display`, `x`, `y` | Where it is, except for `gone` |
+| `time` | When it happened, in milliseconds, to work out how fast it goes |
+| `sprite` | The pressable sprite a press landed on, until it's let go. Such a press goes on outside the areas. Null on the bare desktop |
+
+Following only listens: a press on the bare desktop still does what it always does, and right-clicks on a sprite open the desktop's menu.
+
+To know what's where, `wallpaper.surfaces` lists each display with `index`, an `id` that stays the same across restarts and plugging it in again, `primary`, `width`, `height`, `scale`, `workArea`, `fullscreen`, `windows` and `taskbar`. Windows and taskbar pieces are outlines as in `frame.displays`, each with an `id` that lasts as long as it does. `wallpaper.onSurfacesChanged(changed)` runs before the next frame after any of them moved, appeared or went, at most once a frame, and never while nothing changes.
 
 ```js
 const sprites = ext.wallpaper.addSprites();

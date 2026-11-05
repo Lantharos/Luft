@@ -1,88 +1,15 @@
 import Clutter from 'gi://Clutter';
-import Cogl from 'gi://Cogl';
-import GdkPixbuf from 'gi://GdkPixbuf';
-import GObject from 'gi://GObject';
-import St from 'gi://St';
 
 import type { Scope } from '../../../runtime/scope.js';
-import type { Sprite, SpriteOptions, SpritePlace, SpritePoint, SpriteSheet, SpriteSheetOptions } from '../types.js';
+import type { Disposable, Sprite, SpriteOptions, SpritePlace, SpritePoint, SpriteSheet, SpriteSheetOptions } from '../types.js';
+import { cutFrames, type Mirrored, SpriteActor } from './frames.js';
+import { FrameStepper } from './frameStepper.js';
 import { WindowRide } from './ride.js';
+import { SmoothSprite } from './smoothSprite.js';
 import type { LayerStage } from './stage.js';
 import { windowWithId } from './surfaces.js';
 
 const DRAG_THRESHOLD = 6;
-
-/** What a frame covers: the box around its pixels that show, as parts of the frame's width and height. */
-interface Covered {
-  left: number;
-  top: number;
-  right: number;
-  bottom: number;
-}
-
-/** A frame as it's drawn and facing the other way, and what shows of it in each. */
-interface Mirrored {
-  images: readonly [St.ImageContent, St.ImageContent];
-  covered: readonly [Covered, Covered];
-}
-
-const VISIBLE_ALPHA = 32;
-
-function coveredBy(pixels: Uint8Array, cell: number): Covered {
-  let [left, top, right, bottom] = [cell, cell, 0, 0];
-  for (let y = 0; y < cell; y++) {
-    for (let x = 0; x < cell; x++) {
-      if (pixels[(y * cell + x) * 4 + 3] < VISIBLE_ALPHA) continue;
-      left = Math.min(left, x);
-      top = Math.min(top, y);
-      right = Math.max(right, x + 1);
-      bottom = Math.max(bottom, y + 1);
-    }
-  }
-  return { left: left / cell, top: top / cell, right: right / cell, bottom: bottom / cell };
-}
-
-/** A sprite on the desktop, which only takes clicks on what shows of it, so the desktop keeps the rest of its square. */
-const SpriteActor = GObject.registerClass(class ExtensionSprite extends Clutter.Actor {
-  covered: Covered = { left: 0, top: 0, right: 1, bottom: 1 };
-
-  vfunc_pick(context: Clutter.PickContext): void {
-    if (!this.should_pick(context)) return;
-    const { left, top, right, bottom } = this.covered;
-    const { width, height } = this;
-    this.pick_box(context, new Clutter.ActorBox({ x1: left * width, y1: top * height, x2: right * width, y2: bottom * height }));
-  }
-});
-
-function content(context: Cogl.Context, pixels: Uint8Array, cell: number): St.ImageContent {
-  const image = St.ImageContent.new_with_preferred_size(cell, cell) as St.ImageContent;
-  image.set_data(context, pixels, Cogl.PixelFormat.RGBA_8888, cell, cell, cell * 4);
-  return image;
-}
-
-function cutFrames({ path, cell }: SpriteSheetOptions): { sheet: SpriteSheet; frames: Mirrored[] } {
-  const loaded = GdkPixbuf.Pixbuf.new_from_file(path);
-  const picture = loaded.get_has_alpha() ? loaded : loaded.add_alpha(false, 0, 0, 0)!;
-  const columns = picture.width / cell;
-  const rows = picture.height / cell;
-  if (!Number.isInteger(columns) || !Number.isInteger(rows)) throw new Error(`${path} isn't a whole number of ${cell} pixel frames`);
-  const context = global.stage.context.get_backend().get_cogl_context();
-  const pixels = picture.get_pixels();
-  const frames = Array.from({ length: columns * rows }, (_, index): Mirrored => {
-    const start = Math.floor(index / columns) * cell * picture.rowstride + (index % columns) * cell * 4;
-    const tight = new Uint8Array(cell * cell * 4);
-    const mirrored = new Uint8Array(cell * cell * 4);
-    for (let row = 0; row < cell; row++) {
-      const from = start + row * picture.rowstride;
-      tight.set(pixels.subarray(from, from + cell * 4), row * cell * 4);
-      for (let column = 0; column < cell; column++) {
-        mirrored.set(pixels.subarray(from + column * 4, from + (column + 1) * 4), (row * cell + cell - 1 - column) * 4);
-      }
-    }
-    return { images: [content(context, tight, cell), content(context, mirrored, cell)], covered: [coveredBy(tight, cell), coveredBy(mirrored, cell)] };
-  });
-  return { sheet: Object.freeze({ columns, rows, cell }), frames };
-}
 
 const pointerPosition = (event: Clutter.Event): [number, number] => {
   const [x, y] = event.get_coords();
@@ -255,12 +182,15 @@ class DesktopSprite {
 
 /** An extension's sprites, shown while the wallpaper is, and the frames they share. */
 export class DesktopSprites {
-  private readonly sprites = new Set<DesktopSprite>();
+  private readonly sprites = new Set<DesktopSprite | SmoothSprite>();
   private readonly frames = new Map<SpriteSheet, Mirrored[]>();
   private readonly unwatch: () => void;
+  private readonly stepper: FrameStepper;
+  private group: Clutter.Actor | null = null;
 
   constructor(private readonly stage: LayerStage, private readonly scope: Scope, private readonly name: string, private readonly pathOf: (file: string) => string) {
     this.unwatch = stage.host.desktop.watch(() => this.sync());
+    this.stepper = new FrameStepper(scope);
   }
 
   private sync(): void {
@@ -274,25 +204,50 @@ export class DesktopSprites {
   }
 
   add(options: SpriteOptions): Sprite {
-    const sprite = new DesktopSprite(options, this.frames.get(options.sheet)!, this.name, this.stage, this.scope);
+    const frames = this.frames.get(options.sheet)!;
+    const sprite = options.smooth
+      ? new SmoothSprite(options, frames, this.name, this.stage, this.scope, this.smoothGroup())
+      : new DesktopSprite(options, frames, this.name, this.stage, this.scope);
     this.sprites.add(sprite);
     this.sync();
+    if (sprite.actor.reactive) this.stage.host.bindDesktopMenu(sprite.actor);
     const handle = this.scope.disposable(() => {
       this.sprites.delete(sprite);
       sprite.destroy();
     });
-    return {
+    const made: Sprite = {
       place: place => sprite.place(place),
       describe: label => (sprite.actor.accessible_name = label),
       sizeOn: display => sprite.sizeOn(display),
       dispose: () => handle.dispose(),
     };
+    if (sprite instanceof SmoothSprite) sprite.handle = made;
+    return made;
+  }
+
+  /** Smooth sprites share one actor, so they stack in the order they were added and windows only ever pass one thing. */
+  private smoothGroup(): Clutter.Actor {
+    if (!this.group) {
+      this.group = new Clutter.Actor({ name: `${this.name}-group` });
+      this.stage.place(this.group, 'below-windows');
+    }
+    return this.group;
+  }
+
+  lift(lifted: boolean): void {
+    if (this.group) this.stage.place(this.group, lifted ? 'above-windows' : 'below-windows');
+  }
+
+  onFrame(step: (seconds: number) => boolean): Disposable {
+    return this.stepper.add(step);
   }
 
   destroy(): void {
     this.unwatch();
+    this.stepper.destroy();
     for (const sprite of this.sprites) sprite.destroy();
     this.sprites.clear();
     this.frames.clear();
+    this.group?.destroy();
   }
 }

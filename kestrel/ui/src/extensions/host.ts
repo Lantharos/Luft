@@ -53,6 +53,8 @@ export interface ExtensionHost {
   removePopup(actor: Clutter.Actor): void;
   /** Closes Kestrel's own surfaces and menus, before a panel opens. */
   dismissSurfaces(): void;
+  /** Gives an actor on the desktop the desktop's own right-click menu. */
+  bindDesktopMenu(actor: Clutter.Actor): void;
   /** Opens the notification center. */
   showNotifications(): void;
   /** Types text into what has the keyboard, or pastes it where nothing takes typed text. */

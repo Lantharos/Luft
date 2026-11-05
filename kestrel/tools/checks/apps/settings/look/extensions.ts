@@ -17,6 +17,7 @@ const NOW_PLAYING = 'com.lantharos.NowPlaying';
 const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 const SOUNDSCAPES = 'com.lantharos.Soundscapes';
 const STRAYS = 'com.lantharos.Strays';
+const PLAYTHINGS = 'com.lantharos.Playthings';
 const KEYSTROKES = 'com.lantharos.Keystrokes';
 const PRIVACY_SCROLL_STEPS = 4;
 
@@ -71,6 +72,14 @@ async function checkOwnPages(app: LuftApp) {
     (await showEnd(app, `extensions/${STRAYS.toLowerCase()}`)).save('settings-extension-strays-end');
   } finally {
     await request('Remove', STRAYS);
+  }
+  await installBuilt(PLAYTHINGS);
+  try {
+    await setSetting(PLAYTHINGS, 'ambient', new GLib.Variant('b', false));
+    (await show(app, `extensions/${PLAYTHINGS.toLowerCase()}`)).save('settings-extension-playthings');
+    (await showEnd(app, `extensions/${PLAYTHINGS.toLowerCase()}`)).save('settings-extension-playthings-end');
+  } finally {
+    await request('Remove', PLAYTHINGS);
   }
   await installBuilt(KEYSTROKES);
   try {

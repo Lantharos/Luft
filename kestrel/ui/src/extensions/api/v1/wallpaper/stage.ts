@@ -8,6 +8,7 @@ import { PlaybackConditions } from '../../../../desktop/wallpaper/conditions.js'
 import { reducedMotion } from '../../../../shared/motion/motion.js';
 import type { ExtensionHost } from '../../../host.js';
 import type { LayerOptions, Rect, TaskbarOutline } from '../types.js';
+import { DesktopPointers } from './pointers.js';
 import { SurfaceWatch } from './surfaces.js';
 
 export interface StagedLayer {
@@ -23,9 +24,11 @@ export class LayerStage {
   private disconnectors: (() => void)[] = [];
   private belowWindows: Meta.BackgroundGroup | null = null;
   readonly surfaces: SurfaceWatch;
+  readonly pointers: DesktopPointers;
 
   constructor(readonly host: ExtensionHost) {
     this.surfaces = new SurfaceWatch(host);
+    this.pointers = new DesktopPointers(host);
   }
 
   add(layer: StagedLayer): () => void {

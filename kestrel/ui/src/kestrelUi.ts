@@ -171,6 +171,7 @@ class KestrelUi {
       watchAccent: changed => this.services.appearance.watchAccent(changed),
       addPopup: actor => context.layoutManager.addTopChrome(actor),
       removePopup: actor => context.layoutManager.removeChrome(actor),
+      bindDesktopMenu: actor => this.menus.bindSecondaryClick(actor, () => this.desktopMenu()),
       dismissSurfaces: () => this.dismissImmediately(),
       showNotifications: () => {
         if (this.surfaces.active !== 'notifications') this.toggleSurface('notifications');

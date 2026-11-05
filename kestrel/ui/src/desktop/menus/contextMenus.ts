@@ -65,17 +65,22 @@ export class ContextMenus {
   bind(actor: Clutter.Actor, entries: () => MenuEntry[]): void {
     this.bound.add(actor);
     longPress(actor, (x, y) => this.open(actor, entries(), x, y), target => this.enabled() && this.nearestBound(target) === actor);
-    actor.connect('button-press-event', (_actor, event) => {
-      if (event.get_button() !== Clutter.BUTTON_SECONDARY) return Clutter.EVENT_PROPAGATE;
-      const [x, y] = event.get_coords();
-      this.open(actor, entries(), x, y);
-      return Clutter.EVENT_STOP;
-    });
+    this.bindSecondaryClick(actor, entries);
     actor.connect('key-press-event', (_actor, event) => {
       if (event.get_key_symbol() !== Clutter.KEY_Menu &&
           !(event.get_key_symbol() === Clutter.KEY_F10 && (event.get_state() & Clutter.ModifierType.SHIFT_MASK)))
         return Clutter.EVENT_PROPAGATE;
       this.openFrom(actor, entries());
+      return Clutter.EVENT_STOP;
+    });
+  }
+
+  /** Opens the menu on a right click only, for what uses a long press itself. */
+  bindSecondaryClick(actor: Clutter.Actor, entries: () => MenuEntry[]): void {
+    actor.connect('button-press-event', (_actor, event) => {
+      if (event.get_button() !== Clutter.BUTTON_SECONDARY) return Clutter.EVENT_PROPAGATE;
+      const [x, y] = event.get_coords();
+      this.open(actor, entries(), x, y);
       return Clutter.EVENT_STOP;
     });
   }

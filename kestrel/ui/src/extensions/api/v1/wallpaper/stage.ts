@@ -80,7 +80,7 @@ export class LayerStage {
   private belowWindowsGroup(): Meta.BackgroundGroup {
     if (!this.belowWindows) {
       this.belowWindows = new Meta.BackgroundGroup();
-      global.window_group.insert_child_above(this.belowWindows, this.host.wallpaper);
+      this.host.desktopLayer.add_child(this.belowWindows);
     }
     return this.belowWindows;
   }

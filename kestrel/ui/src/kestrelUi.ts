@@ -19,12 +19,14 @@ import { systemMonitor } from './desktop/panel/widgets/systemMonitor.js';
 import { WindowPreviews } from './desktop/panel/windowPreviews.js';
 import { TaskView } from './desktop/taskView/taskView.js';
 import { wallpaperFloor } from './desktop/wallpaper/floor.js';
+import { wallpaperPictures, watchWallpaperPictures } from './desktop/wallpaper/pictures.js';
 import { LiveWallpaper } from './desktop/wallpaper/liveWallpaper.js';
 import { Tiling } from './desktop/tiling/tiling.js';
 import { SnapLayouts } from './desktop/windows/snapLayouts.js';
 import { Workspaces } from './desktop/windows/workspaces.js';
 import { RotationAnimation } from './desktop/rotation/rotation.js';
 import { watchTaskbarShapes } from './desktop/panel/islands/shapes.js';
+import { setTaskbarBlurHeld } from './desktop/panel/preferences/taskbarLook.js';
 import { Extensions } from './extensions/extensions.js';
 import { Setup, type SetupContext } from './session/setup/setup.js';
 import { afterMotion, dropAfterMotion } from './shared/motion/afterMotion.js';
@@ -157,6 +159,7 @@ class KestrelUi {
       menus: this.menus,
       keybindings: context.keybindings,
       wallpaper: context.wallpaper,
+      desktopLayer: context.desktopLayer,
       monitors: () => context.layoutManager.monitors,
       primaryIndex: () => context.layoutManager.primaryMonitor?.index ?? 0,
       monitorAt,
@@ -176,6 +179,20 @@ class KestrelUi {
         }
       },
       watchSurfaceAnchors: watchTaskbarShapes,
+      desktopPictures: () => [
+        { actor: context.desktopLayer, fillsView: true, underWindows: true },
+        ...wallpaperPictures(),
+        ...this.panels.all.flatMap(panel => panel.islandAnchors()).map(({ actor }) => ({ actor })),
+      ],
+      watchDesktopPictures: changed => {
+        const unwatchShapes = watchTaskbarShapes(changed);
+        const unwatchPictures = watchWallpaperPictures(changed);
+        return () => {
+          unwatchShapes();
+          unwatchPictures();
+        };
+      },
+      holdTaskbarBlur: setTaskbarBlurHeld,
       accent: () => this.services.appearance.AccentColor || '#ffffff',
       wallpaperAccent: () => this.services.appearance.WallpaperAccentColor || this.services.appearance.AccentColor || '#ffffff',
       watchAccent: changed => this.services.appearance.watchAccent(changed),

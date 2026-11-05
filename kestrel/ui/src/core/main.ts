@@ -285,6 +285,7 @@ function initializeDesktop(): void {
     stopScreencast: () => screenshotUI.stopScreencast(),
     createBackground: (container, monitorIndex) => layoutManager.createBackground(container, monitorIndex),
     wallpaper: layoutManager.backgroundGroup,
+    desktopLayer: layoutManager.desktopLayer,
     registerPanel: actor => ctrlAltTabManager.addGroup(actor, 'ctrl-alt-tab-panel', 'view-grid-symbolic'),
     inputMethod,
     keyboard,

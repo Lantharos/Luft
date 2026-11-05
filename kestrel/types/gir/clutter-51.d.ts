@@ -7648,6 +7648,8 @@ export namespace Clutter {
 
         has_constraints(): boolean;
 
+        has_damage(): boolean;
+
         has_effects(): boolean;
 
         has_key_focus(): boolean;
@@ -13447,6 +13449,8 @@ export namespace Clutter {
         has_shadowfb(): boolean;
 
         queue_filter_frame(): void;
+
+        queue_redraw_region(region: Mtk.Region): void;
 
         schedule_update_now(): void;
 

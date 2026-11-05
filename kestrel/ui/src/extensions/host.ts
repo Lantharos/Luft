@@ -34,13 +34,24 @@ export interface SurfaceAnchor {
   radius?: number;
 }
 
+/** Something a filter on the desktop goes over. */
+export interface DesktopPicture {
+  actor: Clutter.Actor;
+  /** Whether it covers its displays. */
+  fillsView?: boolean;
+  /** Whether it lies below the windows, which then hide it. */
+  underWindows?: boolean;
+}
+
 /** The pieces of Kestrel the extension API stands on. Extensions only ever see the API built over them. */
 export interface ExtensionHost {
   readonly desktop: DesktopState;
   readonly menus: ContextMenus;
   readonly keybindings: Keybindings;
-  /** The wallpaper, at the bottom of the window group. */
+  /** The wallpaper. */
   readonly wallpaper: Clutter.Actor;
+  /** The wallpaper and what's drawn on it, at the bottom of the window group. */
+  readonly desktopLayer: Clutter.Actor;
   monitors(): Monitor[];
   primaryIndex(): number;
   monitorAt(x: number, y: number): Monitor | null;
@@ -54,6 +65,11 @@ export interface ExtensionHost {
   /** The actors that make up one of Kestrel's surfaces right now. */
   surfaceAnchors(surface: EffectSurface): SurfaceAnchor[];
   watchSurfaceAnchors(changed: () => void): () => void;
+  /** What a filter on the desktop goes over right now. */
+  desktopPictures(): DesktopPicture[];
+  watchDesktopPictures(changed: () => void): () => void;
+  /** Keeps the taskbar's blur off while a filter bends the taskbar. */
+  holdTaskbarBlur(held: boolean): void;
   accent(): string;
   wallpaperAccent(): string;
   watchAccent(changed: () => void): () => void;

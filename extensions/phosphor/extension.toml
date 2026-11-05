@@ -271,7 +271,19 @@ step = 0.05
 unit = "percent"
 
 [[settings]]
+key = "filters-scope"
+type = "choice"
+label = "filters-scope"
+default = "screen"
+options = [
+  { value = "screen", label = "filters-scope-screen" },
+  { value = "desktop", label = "filters-scope-desktop" },
+]
+
+[[settings]]
 key = "filters-fullscreen"
+depends = "filters-scope"
+when = ["screen"]
 type = "switch"
 label = "filters-fullscreen"
 default = false

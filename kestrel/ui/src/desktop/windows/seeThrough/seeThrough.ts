@@ -7,6 +7,7 @@ import Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import { blurBackdrop } from '../../../appearance/kestrelGlass.js';
+import { showsWallpaper } from '../../wallpaper/pictures.js';
 import { SeeThroughEffect } from './seeThroughEffect.js';
 import { WallpaperBackdrop } from './wallpaperBackdrop.js';
 import { WallpaperFrost } from './wallpaperFrost.js';
@@ -78,7 +79,9 @@ class LiveBackdrop implements Backdrop {
 class WallpaperOnlyBackdrop implements Backdrop {
   readonly actor = new WallpaperBackdrop({ name: 'kestrel-see-through-wallpaper' });
 
-  constructor(private readonly frost: () => WallpaperFrost) {}
+  constructor(private readonly frost: () => WallpaperFrost) {
+    showsWallpaper(this.actor, false);
+  }
 
   sync(): void {}
 

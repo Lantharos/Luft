@@ -63,6 +63,7 @@ export interface Context {
   openScreenshot(): void;
   stopScreencast(): void;
   createBackground(container: Clutter.Actor, monitorIndex: number): { destroy(): void };
+  desktopLayer: Clutter.Actor;
   wallpaper: Clutter.Actor;
   registerPanel(actor: St.Widget): void;
   inputMethod: TextInput;

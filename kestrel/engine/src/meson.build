@@ -62,6 +62,7 @@ libshell_public_headers = [
   'shell-app.h',
   'shell-app-system.h',
   'shell-blur-effect.h',
+  'shell-desktop-filter-effect.h',
   'shell-camera-monitor.h',
   'shell-edge-drag-gesture.h',
   'shell-fonts.h',
@@ -92,6 +93,7 @@ libshell_public_headers = [
 ]
 
 libshell_private_headers = [
+  'shell-desktop-filter-picture.h',
   'shell-app-private.h',
   'shell-app-scope-private.h',
   'shell-app-cache-private.h',
@@ -108,6 +110,7 @@ libshell_sources = [
   'shell-app-scope.c',
   'shell-app-system.c',
   'shell-blur-effect.c',
+  'shell-desktop-filter-effect.c',
   'shell-backdrop.c',
   'shell-backdrop-behind.c',
   'shell-backdrop-spread.c',
@@ -151,6 +154,7 @@ libshell_sources = [
 ]
 
 libshell_private_sources = [
+  'shell-desktop-filter-picture.c',
   'shell-app-cache.c',
 ]
 

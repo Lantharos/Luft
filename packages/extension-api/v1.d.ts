@@ -170,10 +170,24 @@ export interface FilterPass {
  */
 export interface DesktopFilterOptions extends ScreenEffectOptions {
   passes: readonly FilterPass[];
-  /** Whether it moves or bends the picture. The pointer is then drawn into the picture too, or it would point at the wrong thing. */
+  /** Whether it moves or bends the picture. Over the whole screen, the pointer is then drawn into the picture too, or it would point at the wrong thing. */
   warps?: boolean;
   /** Whether screenshots and recordings show it. Like night light, they don't by default. */
   captured?: boolean;
+  /**
+   * Where it goes: over the `screen`, by default, or over the `desktop`, meaning the wallpaper and the taskbar, with what's
+   * drawn on the wallpaper, while windows and everything else stay untouched and show it behind them where they let it through.
+   * `filter_uv` still spans the display on both, so the two read as one picture.
+   * Shaders that read earlier passes do it with `filter_read(cogl_samplerN, position)` to work in both places.
+   */
+  scope?: 'screen' | 'desktop';
+  /** How far a desktop filter carries a pixel from where it was, as a share of the display, so what changes under it repaints that far around. */
+  reach?: number;
+  /**
+   * For a desktop filter that bends the picture: where a point of the picture shows, both as shares of the display. Over the
+   * desktop the pointer is then drawn there, so it stays on what it's over. Over windows, which don't bend, it stays as it is.
+   */
+  shownAt?: (x: number, y: number) => [number, number];
 }
 
 export interface DesktopFilter extends ScreenEffectBase {

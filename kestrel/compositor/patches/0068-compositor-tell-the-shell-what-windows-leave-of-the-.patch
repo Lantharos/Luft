@@ -1,0 +1,117 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Thu, 5 Nov 2026 23:27:27 +0100
+Subject: [PATCH 68/68] compositor: tell the shell what windows leave of the
+ desktop
+
+The compositor already works out which parts of the stage opaque windows
+cover before each frame. A shader on the desktop that moves by itself has
+to repaint what shows of the desktop on every tick, and repainting the
+parts behind opaque windows as well would mean redrawing those windows for
+nothing, so keep the region and let the shell read it.
+
+Upstream-Status: luft-only API for extension shaders
+---
+ src/compositor/compositor.c | 38 ++++++++++++++++++++++++++++++-------
+ src/meta/compositor.h       |  3 +++
+ 2 files changed, 34 insertions(+), 7 deletions(-)
+
+diff --git a/src/compositor/compositor.c b/src/compositor/compositor.c
+index cc0f7fd45a8899bb4e037a0f57547972345b921a..03ec2eec6d97e7ca9ca9daf5efc30e0185275b94 100644
+--- a/src/compositor/compositor.c
++++ b/src/compositor/compositor.c
+@@ -107,6 +107,7 @@ typedef struct _MetaCompositorPrivate
+   gulong stage_presented_id;
+   gulong before_update_handler_id;
+   gulong before_paint_handler_id;
++  MtkRegion *uncovered;
+   gulong after_paint_handler_id;
+   gulong window_visibility_updated_id;
+   gulong views_rebuilt_handler_id;
+@@ -946,11 +947,10 @@ on_presented (ClutterStage     *stage,
+ }
+ 
+ static void
+-cull_unobscured_group (ClutterActor       *group,
+-                       ClutterActor       *stage,
+-                       const MtkRectangle *stage_rect)
++cull_unobscured_group (ClutterActor *group,
++                       ClutterActor *stage,
++                       MtkRegion    *stage_region)
+ {
+-  g_autoptr (MtkRegion) stage_region = mtk_region_create_rectangle (stage_rect);
+   g_autoptr (MtkRegion) group_region = NULL;
+   graphene_matrix_t group_to_stage, stage_to_group;
+ 
+@@ -974,6 +974,22 @@ cull_unobscured_group (ClutterActor       *group,
+   meta_cullable_cull_unobscured (META_CULLABLE (group), group_region);
+ }
+ 
++/**
++ * meta_compositor_get_uncovered_region:
++ * @compositor: a #MetaCompositor
++ *
++ * Returns: (transfer full) (nullable): what windows left of the desktop as of
++ * the last frame, in stage coordinates, or %NULL before the first frame
++ */
++MtkRegion *
++meta_compositor_get_uncovered_region (MetaCompositor *compositor)
++{
++  MetaCompositorPrivate *priv =
++    meta_compositor_get_instance_private (compositor);
++
++  return priv->uncovered ? mtk_region_copy (priv->uncovered) : NULL;
++}
++
+ static void
+ meta_compositor_real_before_paint (MetaCompositor     *compositor,
+                                    MetaCompositorView *compositor_view,
+@@ -984,6 +1000,8 @@ meta_compositor_real_before_paint (MetaCompositor     *compositor,
+   ClutterActor *stage = meta_backend_get_stage (priv->backend);
+   ClutterStageView *stage_view;
+   MtkRectangle stage_rect;
++  g_autoptr (MtkRegion) top_windows_region = NULL;
++  g_autoptr (MtkRegion) feedback_region = NULL;
+   GList *l;
+ 
+   stage_rect = (MtkRectangle) {
+@@ -992,9 +1010,14 @@ meta_compositor_real_before_paint (MetaCompositor     *compositor,
+     (int) clutter_actor_get_height (stage),
+   };
+ 
+-  cull_unobscured_group (priv->window_group, stage, &stage_rect);
+-  cull_unobscured_group (priv->top_window_group, stage, &stage_rect);
+-  cull_unobscured_group (priv->feedback_group, stage, &stage_rect);
++  g_clear_pointer (&priv->uncovered, mtk_region_unref);
++  priv->uncovered = mtk_region_create_rectangle (&stage_rect);
++  top_windows_region = mtk_region_create_rectangle (&stage_rect);
++  feedback_region = mtk_region_create_rectangle (&stage_rect);
++
++  cull_unobscured_group (priv->window_group, stage, priv->uncovered);
++  cull_unobscured_group (priv->top_window_group, stage, top_windows_region);
++  cull_unobscured_group (priv->feedback_group, stage, feedback_region);
+ 
+   stage_view = meta_compositor_view_get_stage_view (compositor_view);
+ 
+@@ -1395,6 +1418,7 @@ meta_compositor_dispose (GObject *object)
+   g_clear_signal_handler (&priv->views_rebuilt_handler_id, renderer);
+ 
+   g_clear_pointer (&priv->windows, g_list_free);
++  g_clear_pointer (&priv->uncovered, mtk_region_unref);
+ 
+   G_OBJECT_CLASS (meta_compositor_parent_class)->dispose (object);
+ }
+diff --git a/src/meta/compositor.h b/src/meta/compositor.h
+index aba0a0aad3aba1bfaec92360404b45a1a8060386..13053042be5c069e4fb89d3fe8a7aea45d243986 100644
+--- a/src/meta/compositor.h
++++ b/src/meta/compositor.h
+@@ -81,6 +81,9 @@ ClutterStage * meta_compositor_get_stage (MetaCompositor *compositor);
+ META_EXPORT
+ ClutterActor * meta_compositor_get_window_group (MetaCompositor *compositor);
+ 
++META_EXPORT
++MtkRegion * meta_compositor_get_uncovered_region (MetaCompositor *compositor);
++
+ META_EXPORT
+ GList * meta_compositor_get_window_actors (MetaCompositor *compositor);
+ 

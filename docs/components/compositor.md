@@ -30,6 +30,7 @@ Kestrel runs on its own build of Mutter 51 ([kestrel/compositor](../../kestrel/c
 - Modifiers the shell can treat as used up while a shortcut made of them is held, such as the one held to dictate, so apps scroll, click and type as if they weren't held, and shortcuts that react to being let go that still notice it when a modifier comes up first
 - A Wayland socket the process that starts Kestrel made and keeps, passed in `WAYLAND_SOCKET_NAME` and `WAYLAND_SOCKET_FD`, so apps can reconnect after a crash, see [Crash recovery](kestrel.md#crash-recovery)
 - A chain of fragment shaders on each stage view for filters over a whole display, `ClutterViewFilter`, which keeps partial repaints and leaves a view without one on the same paths as before, and `cogl_context_take_shader_error()`, so the shell can tell when a driver refuses a shader. See [Screen effects](../extensions.md#screen-effects)
+- `clutter_view_filter_run()` for effects that run such a chain over a single actor, `clutter_stage_view_queue_redraw_region()` to repaint a region with no actor changed, and `meta_compositor_get_uncovered_region()`, what opaque windows leave of the desktop
 - Smaller fixes, each described in its patch
 
 ## App permissions

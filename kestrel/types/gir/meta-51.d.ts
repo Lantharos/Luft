@@ -1827,6 +1827,8 @@ export namespace Meta {
 
         get_top_window_group(): Clutter.Actor;
 
+        get_uncovered_region(): Mtk.Region | null;
+
         get_window_actors(): Clutter.Actor[];
 
         get_window_group(): Clutter.Actor;

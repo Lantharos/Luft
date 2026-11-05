@@ -10,6 +10,14 @@ import { taskbarPreferences, type TaskbarLayout } from './taskbarPreferences.js'
 
 const BLURRED: TaskbarLook[] = ['glass', 'accent'];
 
+const surfaces = new Set<TaskbarSurface>();
+let blurHeld = false;
+
+export function setTaskbarBlurHeld(held: boolean): void {
+  blurHeld = held;
+  for (const surface of surfaces) surface.sync();
+}
+
 export class TaskbarSurface {
   private readonly blur: Shell.BlurEffect;
   private readonly baseClasses: string;
@@ -21,7 +29,11 @@ export class TaskbarSurface {
     this.baseClasses = actor.style_class;
     this.blur = blurBackdrop(actor, 0);
     const unwatch = watchScheme(() => this.sync());
-    actor.connect('destroy', unwatch);
+    surfaces.add(this);
+    actor.connect('destroy', () => {
+      unwatch();
+      surfaces.delete(this);
+    });
     this.sync();
   }
 
@@ -49,7 +61,7 @@ export class TaskbarSurface {
       ? ['kestrel-taskbar-separate', sizing].join(' ')
       : [this.baseClasses, sizing, ...style === 'floating' ? ['kestrel-taskbar-floating'] : [], ...surface, ...across(vertical)].join(' ');
     this.actor.reactive = !separate;
-    const blurred = BLURRED.includes(look) && !opaque;
+    const blurred = BLURRED.includes(look) && !opaque && !blurHeld;
     this.blur.enabled = blurred && !separate;
     for (const { actor, edge } of this.islands()) {
       actor.style_class = separate ? ['kestrel-panel', sizing, ...surface, ...across(isVertical(edge))].join(' ') : '';

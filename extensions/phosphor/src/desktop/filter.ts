@@ -3,6 +3,10 @@ import type { DesktopFilter, Extension, FilterPass } from '@luft/extension-api';
 import type { Granted } from '../rules.js';
 
 const FLICKER_RATE = 30;
+const CURVE_REACH = 0.07;
+const CURVE_STEPS = 6;
+const BLOOM_REACH = 0.02;
+const ABERRATION_REACH = 0.01;
 
 const GRADES: Record<string, { tint: number[]; saturation: number; contrast: number; shadows: number[]; lights: number[] }> = {
   warm: { tint: [1.08, 1.0, 0.86], saturation: 1.05, contrast: 1.02, shadows: [0, 0, 0], lights: [0, 0, 0] },
@@ -28,9 +32,9 @@ filter_color = vec4(bright * (1.0 / 0.38), 1.0);`;
 
 const blur = (sampler: string, axis: string) => `
 vec2 step_size = ${axis} / filter_size * 3.0;
-vec3 sum = texture2D(${sampler}, filter_uv).rgb * 0.227;
-sum += (texture2D(${sampler}, filter_uv + step_size * 1.385).rgb + texture2D(${sampler}, filter_uv - step_size * 1.385).rgb) * 0.316;
-sum += (texture2D(${sampler}, filter_uv + step_size * 3.231).rgb + texture2D(${sampler}, filter_uv - step_size * 3.231).rgb) * 0.0703;
+vec3 sum = filter_read(${sampler}, filter_uv).rgb * 0.227;
+sum += (filter_read(${sampler}, filter_uv + step_size * 1.385).rgb + filter_read(${sampler}, filter_uv - step_size * 1.385).rgb) * 0.316;
+sum += (filter_read(${sampler}, filter_uv + step_size * 3.231).rgb + filter_read(${sampler}, filter_uv - step_size * 3.231).rgb) * 0.0703;
 filter_color = vec4(sum, 1.0);`;
 
 const DECLARATIONS = `
@@ -64,7 +68,7 @@ vec2 fringe = outward / max(length(outward), 1.0) * reach * chromatic_aberration
 filter_color.r = filter_scene(scene_position + fringe).r * on_tube;
 filter_color.b = filter_scene(scene_position - fringe).b * on_tube;`;
 
-const USE_BLOOM = 'filter_color.rgb += texture2D(cogl_sampler3, scene_position).rgb * bloom_amount;';
+const USE_BLOOM = 'filter_color.rgb += filter_read(cogl_sampler3, scene_position).rgb * bloom_amount;';
 
 const USE_SHADOWS = `
 float dark = 1.0 - clamp(dot(filter_color.rgb, vec3(0.2126, 0.7152, 0.0722)), 0.0, 1.0);
@@ -126,6 +130,20 @@ function finalShader({ crt, curved, flicker, invert, grade, shadows, bloom, aber
   };
 }
 
+/** Where `curved` puts a point of the picture on the tube, found the way a fixed point is, since it has no closed form. */
+function shownOnTube(curvature: number) {
+  const bend = 0.07 * curvature;
+  return (x: number, y: number): [number, number] => {
+    const [sceneX, sceneY] = [x * 2 - 1, y * 2 - 1];
+    let [shownX, shownY] = [sceneX, sceneY];
+    for (let step = 0; step < CURVE_STEPS; step++) {
+      const stretch = 1 + (shownX * shownX + shownY * shownY) * bend;
+      [shownX, shownY] = [sceneX / stretch, sceneY / stretch];
+    }
+    return [shownX * 0.5 + 0.5, shownY * 0.5 + 0.5];
+  };
+}
+
 const bloomPasses = (): FilterPass[] => [
   { shader: BRIGHT, scale: 0.5 },
   { shader: blur('cogl_sampler1', 'vec2(1.0, 0.0)'), scale: 0.25 },
@@ -159,7 +177,9 @@ export class ScreenFilter {
     const choices = this.choices();
     const { crt, curved, flicker, invert, grade, shadows, bloom, aberration } = choices;
     const wanted = crt || invert !== 'off' || grade !== 'off' || shadows || bloom || aberration;
-    const shape = wanted ? JSON.stringify(choices) + settings.get<boolean>('filters-fullscreen') : '';
+    const scope = settings.get<'screen' | 'desktop'>('filters-scope');
+    const reach = (curved ? settings.get<number>('crt-curvature') * CURVE_REACH : 0) + (bloom ? BLOOM_REACH : 0) + (aberration ? ABERRATION_REACH : 0);
+    const shape = wanted ? `${JSON.stringify(choices)} ${settings.get<boolean>('filters-fullscreen')} ${scope} ${reach}` : '';
     if (shape !== this.shape) {
       this.shape = shape;
       this.filter?.dispose();
@@ -170,6 +190,9 @@ export class ScreenFilter {
         animated: flicker ? FLICKER_RATE : false,
         fullscreen: settings.get<boolean>('filters-fullscreen'),
         captured: settings.get<boolean>('filters-captured'),
+        scope,
+        reach,
+        shownAt: curved ? shownOnTube(settings.get<number>('crt-curvature')) : undefined,
       });
     }
     this.apply();

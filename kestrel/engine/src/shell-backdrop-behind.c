@@ -7,7 +7,6 @@
 #define PRINT_SEED 0xcbf29ce484222325
 #define PRINT_PRIME 0x100000001b3
 
-gboolean clutter_actor_has_damage (ClutterActor *actor);
 
 typedef struct
 {

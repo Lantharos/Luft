@@ -1,5 +1,6 @@
 import type Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
+import Shell from 'gi://Shell';
 
 import {descendants} from '../../lib/actors.js';
 import {call} from '../../lib/dbus.js';
@@ -61,10 +62,11 @@ export function attachedEffects() {
   const overlays = descendants(global.window_group).filter(actor => actor.constructor.name.includes('Overlay'));
   const effects = [...descendants(global.stage)].flatMap((actor: Clutter.Actor) =>
     actor.get_effects().filter(effect => effect.constructor.name.startsWith('ExtensionWindow') || effect.constructor.name.startsWith('ExtensionSurface')));
-  return {views: views.length, overlays: overlays.length, effects: effects.length};
+  const layers = [...descendants(global.stage)].flatMap((actor: Clutter.Actor) => actor.get_effects().filter(effect => effect instanceof Shell.DesktopFilterEffect));
+  return {views: views.length, overlays: overlays.length, effects: effects.length, layers: layers.length};
 }
 
 export const nothingAttached = () => {
-  const {views, overlays, effects} = attachedEffects();
-  return views + overlays + effects === 0;
+  const {views, overlays, effects, layers} = attachedEffects();
+  return views + overlays + effects + layers === 0;
 };

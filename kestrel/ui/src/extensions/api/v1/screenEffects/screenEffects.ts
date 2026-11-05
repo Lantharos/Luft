@@ -5,6 +5,7 @@ import { label } from '../../../../portal/shortcuts/accelerators.js';
 import type { ApiContext } from '../context.js';
 import type { ScreenEffects } from '../types.js';
 import { DesktopFilter } from './desktopFilter.js';
+import { DesktopLayerFilter } from './desktopLayers.js';
 import { compileError, filterSnippet, outlineSnippet, windowSnippet } from './shaders.js';
 import { SurfaceOverlay } from './surfaceOverlay.js';
 import { WindowTransition } from './windows/transition.js';
@@ -40,7 +41,7 @@ export function screenEffectsApi(context: ApiContext): ScreenEffects {
     addWindowShader: options => new WindowShader(stage, context, options),
     addWindowOverlay: options => new WindowOverlay(stage, context, options),
     addWindowTransition: options => new WindowTransition(stage, context, options),
-    addDesktopFilter: options => new DesktopFilter(stage, context, options),
+    addDesktopFilter: options => options.scope === 'desktop' ? new DesktopLayerFilter(stage, context, options) : new DesktopFilter(stage, context, options),
     addSurfaceOverlay: options => new SurfaceOverlay(stage, context, options),
     setAppLines: style => stage.setAppLines(style),
   };

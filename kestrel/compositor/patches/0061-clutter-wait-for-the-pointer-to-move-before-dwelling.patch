@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Tue, 3 Nov 2026 16:47:59 +0100
-Subject: [PATCH 61/66] clutter: wait for the pointer to move before dwelling
+Subject: [PATCH 61/68] clutter: wait for the pointer to move before dwelling
  again after a click
 
 After a dwell click, any motion that stays within the dwell threshold,

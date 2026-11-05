@@ -1,0 +1,129 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Thu, 5 Nov 2026 23:27:17 +0100
+Subject: [PATCH 67/68] clutter: let shell effects run view filters and repaint
+ regions
+
+A filter that only covers part of what a view shows has to run from an
+effect, on a picture of that part, so make clutter_view_filter_run
+available to the shell. When such a filter moves by itself, nothing in the
+scene changed, so no actor can queue the redraw: let the shell name the
+region of a view to paint again.
+
+Upstream-Status: luft-only API for extension shaders
+---
+ clutter/clutter/clutter-actor.h               |  3 +++
+ clutter/clutter/clutter-mutter.h              |  3 ---
+ clutter/clutter/clutter-stage-view.c          | 24 +++++++++++++++++++
+ clutter/clutter/clutter-stage-view.h          |  4 ++++
+ clutter/clutter/clutter-view-filter-private.h |  3 ---
+ clutter/clutter/clutter-view-filter.h         |  4 ++++
+ 6 files changed, 35 insertions(+), 6 deletions(-)
+
+diff --git a/clutter/clutter/clutter-actor.h b/clutter/clutter/clutter-actor.h
+index 4bda55062d8fdecffe021e7081bc6e566b7162dc..c3e1999af439fe66f7a5e20a38dd910ef20fdc5d 100644
+--- a/clutter/clutter/clutter-actor.h
++++ b/clutter/clutter/clutter-actor.h
+@@ -849,6 +849,9 @@ void                            clutter_actor_set_opacity_override
+ CLUTTER_EXPORT
+ gint                            clutter_actor_get_opacity_override              (ClutterActor               *self);
+ 
++CLUTTER_EXPORT
++gboolean                        clutter_actor_has_damage                        (ClutterActor               *actor);
++
+ CLUTTER_EXPORT
+ void                            clutter_actor_inhibit_culling                   (ClutterActor               *actor);
+ CLUTTER_EXPORT
+diff --git a/clutter/clutter/clutter-mutter.h b/clutter/clutter/clutter-mutter.h
+index f61ac9a816fd91e553435be450de697d44298525..f9d4a52737828466b4c84c60fd33721d70a5f93f 100644
+--- a/clutter/clutter/clutter-mutter.h
++++ b/clutter/clutter/clutter-mutter.h
+@@ -125,9 +125,6 @@ CLUTTER_EXPORT
+ void clutter_stage_view_assign_next_scanout (ClutterStageView *stage_view,
+                                              CoglScanout      *scanout);
+ 
+-CLUTTER_EXPORT
+-gboolean clutter_actor_has_damage (ClutterActor *actor);
+-
+ CLUTTER_EXPORT
+ gboolean clutter_actor_has_transitions (ClutterActor *actor);
+ 
+diff --git a/clutter/clutter/clutter-stage-view.c b/clutter/clutter/clutter-stage-view.c
+index 735023669d61dda69a56f8820810a1367cfae867..827d66bf631f8a84ceba6e9b453833cfc668b479 100644
+--- a/clutter/clutter/clutter-stage-view.c
++++ b/clutter/clutter/clutter-stage-view.c
+@@ -686,6 +686,30 @@ clutter_stage_view_queue_filter_frame (ClutterStageView *view)
+   clutter_stage_view_schedule_update (view);
+ }
+ 
++/**
++ * clutter_stage_view_queue_redraw_region:
++ * @view: a #ClutterStageView
++ * @region: what to paint again, in stage coordinates
++ *
++ * Paints @region of @view again without any actor having changed, for
++ * something that looks different from one frame to the next by itself.
++ */
++void
++clutter_stage_view_queue_redraw_region (ClutterStageView *view,
++                                        const MtkRegion  *region)
++{
++  int i;
++
++  for (i = 0; i < mtk_region_num_rectangles (region); i++)
++    {
++      MtkRectangle rect = mtk_region_get_rectangle (region, i);
++
++      clutter_stage_view_add_redraw_clip (view, &rect);
++    }
++
++  clutter_stage_view_schedule_update (view);
++}
++
+ static CoglOffscreen *
+ ensure_capture_target (CoglOffscreen    **target,
+                        CoglFramebuffer   *like)
+diff --git a/clutter/clutter/clutter-stage-view.h b/clutter/clutter/clutter-stage-view.h
+index b37d01e09435f1c253a991b1cc6ae79dce87bf77..d48a2700b7be5de3702d1b49d4e5381cad15296e 100644
+--- a/clutter/clutter/clutter-stage-view.h
++++ b/clutter/clutter/clutter-stage-view.h
+@@ -69,6 +69,10 @@ ClutterViewFilter * clutter_stage_view_get_filter (ClutterStageView *view);
+ CLUTTER_EXPORT
+ void clutter_stage_view_queue_filter_frame (ClutterStageView *view);
+ 
++CLUTTER_EXPORT
++void clutter_stage_view_queue_redraw_region (ClutterStageView *view,
++                                             const MtkRegion  *region);
++
+ CLUTTER_EXPORT
+ float clutter_stage_view_get_scale (ClutterStageView *view);
+ 
+diff --git a/clutter/clutter/clutter-view-filter-private.h b/clutter/clutter/clutter-view-filter-private.h
+index 8323aa84976d5f268c4de40f71d0740c4c629289..82516cf597866d0a4843ac1f5e1f82bb0e018b7c 100644
+--- a/clutter/clutter/clutter-view-filter-private.h
++++ b/clutter/clutter/clutter-view-filter-private.h
+@@ -19,9 +19,6 @@
+ 
+ #include "clutter/clutter-view-filter.h"
+ 
+-CoglPipeline * clutter_view_filter_run (ClutterViewFilter *filter,
+-                                        CoglTexture       *scene);
+-
+ CoglPipeline * clutter_view_filter_new_output (ClutterViewFilter *filter,
+                                                CoglTexture       *scene);
+ 
+diff --git a/clutter/clutter/clutter-view-filter.h b/clutter/clutter/clutter-view-filter.h
+index e62402468288b05ab66dc382ce3b270ac312f07b..e5cc614e4ff427b0bd252800324e724275817521 100644
+--- a/clutter/clutter/clutter-view-filter.h
++++ b/clutter/clutter/clutter-view-filter.h
+@@ -33,6 +33,10 @@ G_DECLARE_FINAL_TYPE (ClutterViewFilter, clutter_view_filter,
+ CLUTTER_EXPORT
+ ClutterViewFilter * clutter_view_filter_new (void);
+ 
++CLUTTER_EXPORT
++CoglPipeline * clutter_view_filter_run (ClutterViewFilter *filter,
++                                        CoglTexture       *scene);
++
+ CLUTTER_EXPORT
+ void clutter_view_filter_add_pass (ClutterViewFilter *filter,
+                                    CoglSnippet       *snippet,

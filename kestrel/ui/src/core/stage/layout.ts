@@ -60,6 +60,7 @@ export const LayoutManager = GObject.registerClass({
   private startingUp = true;
   private readonly chrome = new ChromeTracker(actor => this.findMonitorForActor(actor));
   private readonly inputPanelGroup: Clutter.Actor;
+  readonly desktopLayer: Meta.BackgroundGroup;
   private readonly bgGroup: Meta.BackgroundGroup;
   readonly backgrounds: MonitorBackgrounds;
   private systemBackground: Clutter.Actor | null = null;
@@ -140,9 +141,11 @@ export const LayoutManager = GObject.registerClass({
     global.stage.remove_child(feedbackGroup);
     this.uiGroup.add_child(feedbackGroup);
 
+    this.desktopLayer = new Meta.BackgroundGroup();
+    global.window_group.add_child(this.desktopLayer);
+    global.window_group.set_child_below_sibling(this.desktopLayer, null);
     this.bgGroup = new Meta.BackgroundGroup();
-    global.window_group.add_child(this.bgGroup);
-    global.window_group.set_child_below_sibling(this.bgGroup, null);
+    this.desktopLayer.add_child(this.bgGroup);
     this.backgrounds = new MonitorBackgrounds(this, this.bgGroup);
 
     global.workspace_manager.connect('notify::n-workspaces', () => this.chrome.queueUpdateRegions());

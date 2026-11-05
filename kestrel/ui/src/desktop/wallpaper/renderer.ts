@@ -6,6 +6,7 @@ import Meta from 'gi://Meta';
 import type { Monitor } from '../panel/panel.js';
 import { animateActor } from '../../shared/motion/motion.js';
 import { helperProgram } from '../../shared/apps/programs.js';
+import { showsWallpaper } from './pictures.js';
 
 const FADE_DURATION = 400;
 const SIGTERM = 15;
@@ -36,6 +37,7 @@ export class Renderer {
     this.mapId = global.window_manager.connect('map', (_wm, actor: Meta.WindowActor) => {
       if (!this.windows.has(actor.meta_window!)) return;
       this.place(actor.meta_window!);
+      showsWallpaper(actor, true);
       actor.opacity = 0;
       animateActor(actor, { opacity: 255, duration: FADE_DURATION, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
     });

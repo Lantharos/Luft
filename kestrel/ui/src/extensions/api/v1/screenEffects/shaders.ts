@@ -42,8 +42,24 @@ uniform vec2 filter_size;
 uniform float filter_scale;
 uniform float filter_time;
 
+#define filter_read(sampler, position) texture2D(sampler, position)
+
 vec4 filter_scene(vec2 position) {
   return texture2D(cogl_sampler0, position);
+}
+`;
+
+const DESKTOP_LAYER = `
+uniform vec2 filter_size;
+uniform float filter_scale;
+uniform float filter_time;
+uniform vec4 filter_area;
+
+#define filter_read(sampler, position) texture2D(sampler, ((position) - filter_area.xy) / filter_area.zw)
+
+vec4 filter_scene(vec2 position) {
+  vec4 color = filter_read(cogl_sampler0, position);
+  return color.a > 0.0 ? vec4(color.rgb / color.a, color.a) : vec4(0.0);
 }
 `;
 
@@ -83,6 +99,16 @@ vec4 filter_color = filter_scene(filter_uv);
 ${shader}
 }
 cogl_color_out = filter_color;
+`);
+
+/** One pass of a filter over part of a display that may be see-through: the shader works as in `filterSnippet`, on colours that aren't premultiplied. */
+export const desktopLayerSnippet = (declarations: string, shader: string): Cogl.Snippet => replacing(`${DESKTOP_LAYER}${declarations}\n`, `
+vec2 filter_uv = filter_area.xy + cogl_tex_coord_in[0].xy * filter_area.zw;
+vec4 filter_color = filter_scene(filter_uv);
+{
+${shader}
+}
+cogl_color_out = vec4(filter_color.rgb * filter_color.a, filter_color.a);
 `);
 
 /** Compiles `snippet` as it will run, on a pipeline with `layers` layers, and says what the driver refused, if anything. */

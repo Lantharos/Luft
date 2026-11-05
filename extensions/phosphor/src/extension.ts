@@ -10,7 +10,7 @@ import { addWindowCrt, tuneWindowCrt } from './windows/crt.js';
 import { addOverlay, tuneOverlay } from './windows/overlay.js';
 import { addTransition } from './windows/transitions.js';
 
-const FILTER_KEYS = new Set(['desktop-crt', 'crt-scanlines', 'crt-curvature', 'crt-mask', 'crt-flicker', 'invert', 'grade', 'grade-strength', 'shadow-boost', 'bloom', 'chromatic-aberration', 'filters-fullscreen', 'filters-captured']);
+const FILTER_KEYS = new Set(['desktop-crt', 'crt-scanlines', 'crt-curvature', 'crt-mask', 'crt-flicker', 'invert', 'grade', 'grade-strength', 'shadow-boost', 'bloom', 'chromatic-aberration', 'filters-scope', 'filters-fullscreen', 'filters-captured']);
 const SURFACE_KEYS = new Set(['surface-lines', 'surface-places']);
 const TUNED_KEYS = new Set(['border-color', 'border-second-color', 'overlay-strength', 'window-crt', 'window-aberration', 'surface-color']);
 

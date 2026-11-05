@@ -571,6 +571,58 @@ export namespace Shell {
     }
 
 
+    namespace DesktopFilterEffect {
+        // Signal signatures
+        interface SignalSignatures extends Clutter.Effect.SignalSignatures {
+            "notify::actor": (pspec: GObject.ParamSpec) => void;
+            "notify::enabled": (pspec: GObject.ParamSpec) => void;
+            "notify::name": (pspec: GObject.ParamSpec) => void;
+        }
+
+        // Constructor properties interface
+        interface ConstructorProps extends Clutter.Effect.ConstructorProps {}
+    }
+
+    class DesktopFilterEffect extends Clutter.Effect {
+        static $gtype: GObject.GType<DesktopFilterEffect>;
+
+        /**
+         * Compile-time signal type information.
+         *
+         * This instance property is generated only for TypeScript type checking.
+         * It is not defined at runtime and should not be accessed in JS code.
+         * @internal
+         */
+        $signals: DesktopFilterEffect.SignalSignatures;
+
+        // Constructors
+        constructor(properties?: Partial<DesktopFilterEffect.ConstructorProps>, ...args: any[]);
+
+        _init(...args: any[]): void;
+
+        // Signals
+        /** @signal */
+        connect<K extends keyof DesktopFilterEffect.SignalSignatures>(signal: K, callback: GObject.SignalCallback<this, DesktopFilterEffect.SignalSignatures[K]>): number;
+
+        /** @signal */
+        connect_after<K extends keyof DesktopFilterEffect.SignalSignatures>(signal: K, callback: GObject.SignalCallback<this, DesktopFilterEffect.SignalSignatures[K]>): number;
+
+        /** @signal */
+        emit<K extends keyof DesktopFilterEffect.SignalSignatures>(signal: K, ...args: GObject.GjsParameters<DesktopFilterEffect.SignalSignatures[K]>): void;
+
+        // Methods
+        queue_frame(shown: Mtk.Region | null): void;
+
+        set_captured(captured: boolean): void;
+
+        set_fills_view(fills_view: boolean): void;
+
+        set_reach(reach: number): void;
+
+        set_view_filter(view: Clutter.StageView, filter: Clutter.ViewFilter | null): void;
+    }
+
+
     namespace EdgeDragGesture {
         // Signal signatures
         interface SignalSignatures extends Clutter.Gesture.SignalSignatures {
@@ -2068,6 +2120,8 @@ export namespace Shell {
     type BlurEffectClass = typeof BlurEffect;
 
     type CameraMonitorClass = typeof CameraMonitor;
+
+    type DesktopFilterEffectClass = typeof DesktopFilterEffect;
 
     type EdgeDragGestureClass = typeof EdgeDragGesture;
 

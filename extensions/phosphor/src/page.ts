@@ -81,7 +81,7 @@ export function describePage(phosphor: Extension<Granted>, rules: AppRules): voi
       items: [
         { setting: 'desktop-crt' }, { setting: 'crt-scanlines' }, { setting: 'crt-curvature' }, { setting: 'crt-mask' }, { setting: 'crt-flicker' },
         { setting: 'invert' }, { setting: 'grade' }, { setting: 'grade-strength' }, { setting: 'shadow-boost' }, { setting: 'bloom' }, { setting: 'chromatic-aberration' },
-        { setting: 'filters-fullscreen' }, { setting: 'filters-captured' },
+        { setting: 'filters-scope' }, { setting: 'filters-fullscreen' }, { setting: 'filters-captured' },
       ],
     },
     {

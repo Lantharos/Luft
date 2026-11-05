@@ -44,6 +44,8 @@ export class PointerFollower {
   }
 }
 
+const fingerOf = (event: Clutter.Event) => event.get_event_sequence().get_slot() + 1;
+
 const pressedButtons = Clutter.ModifierType.BUTTON1_MASK | Clutter.ModifierType.BUTTON2_MASK | Clutter.ModifierType.BUTTON3_MASK;
 
 /**
@@ -124,7 +126,7 @@ export class DesktopPointers {
     }
     const touch = type === Clutter.EventType.TOUCH_BEGIN || type === Clutter.EventType.TOUCH_UPDATE ||
       type === Clutter.EventType.TOUCH_END || type === Clutter.EventType.TOUCH_CANCEL;
-    const id = touch ? event.get_event_sequence().get_slot() + 1 : MOUSE;
+    const id = touch ? fingerOf(event) : MOUSE;
     const [x, y] = event.get_coords();
     const time = event.get_time_us() / 1000;
     if (type === Clutter.EventType.BUTTON_PRESS || type === Clutter.EventType.TOUCH_BEGIN) {
@@ -185,8 +187,9 @@ export class DesktopPointers {
   private left(event: Clutter.Event): void {
     const related = event.get_related();
     if (related && (this.host.wallpaper.contains(related) || this.isSprite(related))) return;
+    const id = event.get_event_sequence() ? fingerOf(event) : MOUSE;
     for (const follower of this.followers) {
-      if (follower.near.has(MOUSE) && !follower.held.has(MOUSE)) this.send(follower, MOUSE, 'gone', 0, 0, 0, null);
+      if (follower.near.has(id) && !follower.held.has(id)) this.send(follower, id, 'gone', 0, 0, 0, null);
     }
   }
 

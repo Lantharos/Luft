@@ -1,0 +1,1 @@
+ACTION=="add", SUBSYSTEM=="pci", ATTR{vendor}=="0x1022", ATTR{device}=="0x1483", ATTR{[dmi/id]board_vendor}=="Gigabyte*", ATTR{power/wakeup}="disabled"

@@ -16,6 +16,8 @@ const FILE: &str = "luft.theme.css";
 const HEADER: &str = "/**\n * @name Luft\n * @description The desktop's colors, fonts and light and dark styles\n * @author Tailor\n */\n";
 /// Discord's window can't load fonts from Vesktop's themes folder, so they come inside the theme, as `fonts.css`.
 const STYLES: &str = include_str!("vesktop.css");
+/// Discord shapes avatars, server icons and status dots with SVG masks rather than corners, so they lose those too.
+const SQUARE: &str = include_str!("square.css");
 const LOCK: &str = "SingletonLock";
 const SOCKET: &str = "SingletonSocket";
 
@@ -47,7 +49,8 @@ impl Install {
     }
 
     fn apply(&self, fonts: &str, look: &Look) -> io::Result<State> {
-        let theme = format!("{HEADER}{}{fonts}{STYLES}", look.stylesheet());
+        let square = if look.square_corners { SQUARE } else { "" };
+        let theme = format!("{HEADER}{}{fonts}{STYLES}{square}", look.stylesheet());
         write_changed(&self.theme(), theme.as_bytes())?;
         match settings::lists(&self.settings(), FILE)? {
             None => Ok("first-run"),

@@ -18,6 +18,9 @@ const ORIGINAL: &str = "library.original.css";
 const FOLDER: &str = "tailor";
 const SAVING: &str = ".library.tailor-saving";
 
+/// Steam's own corners go with the desktop's square corners, and the television interface keeps its own.
+const SQUARE: &str = "body.DesktopUI *,\nbody.DesktopUI ::before,\nbody.DesktopUI ::after {\n  border-radius: 0 !important;\n}\n";
+
 /// What Steam reads instead of its own stylesheet. Steam's startup check compares file sizes, so this is padded to
 /// the size of the file it stands in for.
 fn stand_in(size: usize) -> io::Result<Vec<u8>> {
@@ -85,7 +88,9 @@ impl Install {
 
     fn refresh(&self, look: &Look) -> io::Result<()> {
         let path = self.interface().join(FOLDER).join("look.css");
-        write_changed(&path, look.stylesheet().as_bytes()).map(|_| ())
+        let square = if look.square_corners { SQUARE } else { "" };
+        let styles = format!("{}{square}", look.stylesheet());
+        write_changed(&path, styles.as_bytes()).map(|_| ())
     }
 
     /// Steam's own stylesheets, each once: the stand-in is skipped, as what it replaced is there under its new name.

@@ -221,3 +221,20 @@ fn a_stand_in_from_an_older_tailor_is_brought_up_to_date_and_steam_s_file_stays(
     let original = fs::read_to_string(fixture.folder.join("steamui/css").join(ORIGINAL)).unwrap();
     assert_eq!(original, STEAM_STYLES.repeat(40));
 }
+
+#[test]
+fn steam_s_own_corners_follow_the_desktop_s_square_corners() {
+    let mut fixture = fixture(FLATPAK);
+    let look = fixture.folder.join("steamui/tailor/look.css");
+    let mut desktop = sample("#a0c4ff");
+    fixture.steam.apply(&desktop).unwrap();
+    assert!(!fs::read_to_string(&look).unwrap().contains("border-radius"));
+
+    desktop.square_corners = true;
+    fixture.steam.refresh(&desktop).unwrap();
+    assert!(
+        fs::read_to_string(&look)
+            .unwrap()
+            .contains("border-radius: 0 !important")
+    );
+}

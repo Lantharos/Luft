@@ -1,0 +1,35 @@
+
+:root,
+.theme-dark,
+.theme-darker,
+.theme-midnight,
+.theme-light {
+  --radius-xs: 0px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-xxl: 0px;
+  --radius-round: 0px;
+}
+
+*,
+::before,
+::after,
+::-webkit-scrollbar-thumb,
+::-webkit-scrollbar-track {
+  border-radius: 0 !important;
+}
+
+foreignObject,
+rect[mask*='svg-mask-status'],
+[class*='avatarMasked'],
+[class^='mask_'],
+[class*=' mask_'] {
+  mask: none !important;
+}
+
+rect {
+  rx: 0 !important;
+  ry: 0 !important;
+}

@@ -166,3 +166,30 @@ fn a_vesktop_that_never_ran_is_asked_to_run_first() {
     let install = Install(fixture.folder.clone());
     assert_eq!(install.apply("", &sample("#a0c4ff")).unwrap(), "first-run");
 }
+
+#[test]
+fn square_corners_come_and_go_with_the_desktop_s_setting() {
+    let mut fixture = fixture(FLATPAK);
+    let theme = fixture.folder.join("themes").join(FILE);
+    let mut look = sample("#a0c4ff");
+    fixture.vesktop.apply(&look).unwrap();
+    assert!(
+        !fs::read_to_string(&theme)
+            .unwrap()
+            .contains("foreignObject")
+    );
+
+    look.square_corners = true;
+    fixture.vesktop.refresh(&look).unwrap();
+    let square = fs::read_to_string(&theme).unwrap();
+    assert!(square.contains("foreignObject"));
+    assert!(square.contains("border-radius: 0 !important"));
+
+    look.square_corners = false;
+    fixture.vesktop.refresh(&look).unwrap();
+    assert!(
+        !fs::read_to_string(&theme)
+            .unwrap()
+            .contains("foreignObject")
+    );
+}

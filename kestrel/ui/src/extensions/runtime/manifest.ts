@@ -192,9 +192,13 @@ function dependencies(settings: SettingDescription[]): void {
 
 function helper(source: Table): Manifest['helper'] {
   if (source.helper === undefined) return undefined;
-  const path = text(table(source.helper, 'helper'), 'path', 'helper');
+  const described = table(source.helper, 'helper');
+  const path = text(described, 'path', 'helper');
   if (!insideFolder(path)) fail('helper.path must stay inside the extension');
-  return { path };
+  if (described['turned-off'] === undefined) return { path };
+  const turnedOff = list(described, 'turned-off', 'helper');
+  if (!turnedOff.every(argument => typeof argument === 'string')) fail('helper.turned-off must be a list of arguments');
+  return { path, turnedOff: turnedOff as string[] };
 }
 
 function network(source: Table): Manifest['network'] {

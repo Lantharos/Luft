@@ -1,0 +1,10 @@
+id = "com.lantharos.SpotifyStyle"
+name = "Spotify Style"
+description = "Spotify in Luft's look, following the desktop's colors, fonts and light and dark styles."
+version = "1.0.0"
+api = 1
+permissions = []
+
+[helper]
+path = "spotify-style"
+turned-off = ["restore"]

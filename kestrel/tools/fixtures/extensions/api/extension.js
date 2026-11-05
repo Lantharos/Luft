@@ -18,6 +18,7 @@ const panel = (count, slider) => ({
 });
 
 export default function enable(api) {
+  state.appearance = api.appearance;
   let presses = 0;
   const item = api.taskbar.addItem({
     icon: 'face-smile-symbolic',

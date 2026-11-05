@@ -3,6 +3,7 @@ import GLib from 'gi://GLib';
 
 import { onLocaleChanged } from '../../shared/i18n/index.js';
 import { openSettings } from '../../system/settingsPages.js';
+import { runTurnedOffHelper } from '../api/v1/helper.js';
 import { forgetSecrets } from '../api/v1/secrets.js';
 import type { SettingValue } from '../api/v1/types.js';
 import { EffectsStage } from '../api/v1/screenEffects/stage.js';
@@ -109,13 +110,20 @@ export class ExtensionManager {
 
   disable(id: string): void {
     this.store.setDisabled(id, true);
+    this.undoElsewhere(id);
   }
 
   remove(id: string): void {
     const installed = this.installed.find(candidate => candidate.id === id);
     if (!installed) return;
+    this.undoElsewhere(id);
     this.erase(installed);
     this.rescan();
+  }
+
+  private undoElsewhere(id: string): void {
+    const installed = this.installed.find(candidate => candidate.id === id);
+    if (installed && hasManifest(installed)) runTurnedOffHelper(installed.path, installed.manifest);
   }
 
   private erase({ id, path }: Installed): void {

@@ -1,6 +1,7 @@
 import GLib from 'gi://GLib';
 
-import { appearanceApi, open, sessionApi, settingsApi, storageApi, timersApi } from './basics.js';
+import { appearanceApi } from './appearance.js';
+import { open, sessionApi, settingsApi, storageApi, timersApi } from './basics.js';
 import type { ApiContext } from './context.js';
 import { helperApi } from './helper.js';
 import { locationApi } from './location.js';

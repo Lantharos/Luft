@@ -1,0 +1,123 @@
+.Root,
+.Root__top-container {
+  background: var(--content);
+  gap: 0;
+  padding: 0;
+}
+
+.Root__nav-bar,
+.Root__right-sidebar,
+.Root__now-playing-bar {
+  --background-base: var(--sidebar-solid);
+  background: var(--sidebar-solid);
+}
+
+.Root__globalNav {
+  background: var(--sidebar-solid);
+  border-bottom: 1px solid var(--hairline);
+}
+
+.Root__nav-bar {
+  border-right: 1px solid var(--hairline);
+}
+
+.Root__right-sidebar {
+  border-left: 1px solid var(--hairline);
+}
+
+.Root__now-playing-bar {
+  border-top: 1px solid var(--hairline);
+}
+
+.Root__main-view,
+.Root__nav-bar > *,
+.Root__right-sidebar > *,
+.Root__main-view > * {
+  border-radius: 0;
+}
+
+.Root__nav-bar > *,
+.Root__right-sidebar > *,
+.Root__now-playing-bar > * {
+  background: transparent;
+}
+
+.main-topBar-background,
+.main-entityHeader-backgroundColor,
+.main-entityHeader-overlay,
+.main-actionBarBackground-background,
+.main-home-homeHeader,
+.main-yourLibraryX-libraryRootlist::before {
+  background: none !important;
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+.main-globalNav-searchInputContainer input,
+.main-topBar-searchBar input,
+.x-filterBox-filterInput {
+  background: var(--control) !important;
+  border: none !important;
+  border-radius: var(--radius-pill) !important;
+  box-shadow: none !important;
+  color: var(--ink) !important;
+}
+
+.main-yourLibraryX-listItem > * {
+  border-radius: var(--radius-item);
+}
+
+.main-contextMenu-menu,
+[role='menu'],
+[role='dialog'],
+.main-popupModal-container {
+  background: var(--popover) !important;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-group) !important;
+  box-shadow: 0 12px 32px var(--shadow-soft) !important;
+}
+
+.main-contextMenu-menuItemButton {
+  border-radius: var(--radius-item);
+}
+
+::-webkit-scrollbar-thumb,
+.os-scrollbar-handle {
+  background: color-mix(in oklab, var(--ink) 18%, transparent) !important;
+  border-radius: var(--radius-pill) !important;
+}
+
+.Root__globalNav button:not([data-encore-id='buttonPrimary'] *) {
+  --background-elevated-base: var(--control);
+  --background-elevated-highlight: var(--control-hover);
+  --background-elevated-press: var(--control-hover);
+}
+
+.main-globalNav-historyButtonsSpacer {
+  position: relative;
+}
+
+:root[data-scheme='light'] .main-globalNav-historyButtonsSpacer::before {
+  background: var(--kestrel-inverse-surface, #2f3030);
+  border-radius: var(--radius-pill);
+  content: '';
+  height: 24px;
+  left: 4px;
+  pointer-events: none;
+  position: absolute;
+  top: -4px;
+  width: 40px;
+}
+
+.Root__now-playing-bar {
+  margin: 0;
+  padding: 0;
+}
+
+.Root__nav-bar,
+.main-yourLibraryX-entryPoints,
+.Root__right-sidebar-overlayWrapper,
+.Root__right-sidebar-peekContent,
+.Root__right-sidebar video {
+  border-radius: 0;
+}

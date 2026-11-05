@@ -63,6 +63,7 @@ export class AppearanceService {
   private persistId = 0;
   private writing = Promise.resolve();
   private readonly accentListeners = new Set<() => void>();
+  private readonly paletteListeners = new Set<() => void>();
 
   constructor(private readonly changed: (color: Rgb) => void) {
     this.dbus.export(Gio.DBus.session, '/com/lantharos/Kestrel/Appearance');
@@ -113,6 +114,11 @@ export class AppearanceService {
   watchAccent(changed: () => void): () => void {
     this.accentListeners.add(changed);
     return () => this.accentListeners.delete(changed);
+  }
+
+  watchPalette(changed: () => void): () => void {
+    this.paletteListeners.add(changed);
+    return () => this.paletteListeners.delete(changed);
   }
 
   repaintTaskbar(): void {
@@ -179,6 +185,7 @@ export class AppearanceService {
     if (this.appearance.accentColor !== previousAccent || this.WallpaperAccentColor !== previousWallpaperAccent)
       for (const listener of [...this.accentListeners]) listener();
     for (const [name] of PROPERTIES) this.emitChanged(name);
+    for (const listener of [...this.paletteListeners]) listener();
     this.schedulePersist();
   }
 

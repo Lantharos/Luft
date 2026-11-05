@@ -1,0 +1,164 @@
+@font-face {
+  font-family: 'Open Runde';
+  font-weight: 400;
+  src: local('Open Runde Regular'), local('OpenRunde-Regular'), url('OpenRunde-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Open Runde';
+  font-weight: 500;
+  src: local('Open Runde Medium'), local('OpenRunde-Medium'), url('OpenRunde-Medium.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Open Runde';
+  font-weight: 600 900;
+  src: local('Open Runde Semibold'), local('OpenRunde-Semibold'), url('OpenRunde-Semibold.woff2') format('woff2');
+}
+
+:root {
+  --ink: var(--kestrel-on-surface, #f3f3ef);
+  --content: var(--kestrel-surface, #121211);
+  --raised: var(--kestrel-surface-container-low, #1a1a18);
+  --control: var(--kestrel-surface-container-high, #252522);
+  --control-hover: var(--kestrel-surface-container-highest, #31312e);
+  --popover: var(--kestrel-surface-container, #1c1c1a);
+  --sidebar-solid: var(--kestrel-surface-container-low, #181817);
+  --text-soft: var(--kestrel-on-surface-variant, #c9c9c3);
+  --text-muted: var(--kestrel-outline, #8f8f88);
+  --accent: var(--kestrel-primary, #f3f3ef);
+  --accent-text: var(--kestrel-on-primary, #181817);
+  --accent-soft: color-mix(in oklab, var(--accent) 14%, transparent);
+  --danger: var(--kestrel-error, #e0aaaa);
+  --surface: color-mix(in oklab, var(--ink) 4%, transparent);
+  --surface-hover: color-mix(in oklab, var(--ink) 6.5%, transparent);
+  --surface-press: color-mix(in oklab, var(--ink) 9%, transparent);
+  --hairline: color-mix(in oklab, var(--ink) 7%, transparent);
+  --shadow-soft: rgba(0, 0, 0, 0.32);
+  --radius-pill: 999px;
+  --radius-group: 18px;
+  --radius-item: 10px;
+  --font-stack: var(--luft-font, 'Open Runde'), 'Open Runde', ui-sans-serif, system-ui, sans-serif;
+  --panel-gap: 0px;
+  --encore-body-font-stack: var(--font-stack);
+  --encore-title-font-stack: var(--font-stack);
+  --encore-variable-font-stack: var(--font-stack);
+  color-scheme: dark;
+}
+
+:root[data-scheme='light'] {
+  --raised: var(--kestrel-surface-container-lowest, #ffffff);
+  --popover: var(--kestrel-surface-container-lowest, #ffffff);
+  --sidebar-solid: var(--kestrel-surface-container, #eeeeea);
+  --hairline: color-mix(in oklab, var(--ink) 8%, transparent);
+  --shadow-soft: rgba(27, 27, 25, 0.14);
+  color-scheme: light;
+}
+
+html.encore-dark-theme,
+html.encore-dark-theme .encore-base-set,
+html.encore-dark-theme .encore-app-frame-set,
+html.encore-dark-theme .encore-muted-accent-set,
+html.encore-dark-theme .encore-announcement-subdued-set,
+html.encore-dark-theme .encore-positive-subdued-set,
+html.encore-dark-theme .encore-negative-subdued-set,
+html.encore-dark-theme .encore-warning-subdued-set {
+  --background-base: var(--content);
+  --background-highlight: var(--surface-hover);
+  --background-press: var(--surface-press);
+  --background-elevated-base: var(--popover);
+  --background-elevated-highlight: var(--control);
+  --background-elevated-press: var(--control-hover);
+  --background-tinted-base: var(--surface);
+  --background-tinted-highlight: var(--surface-hover);
+  --background-tinted-press: var(--surface-press);
+  --text-base: var(--ink);
+  --text-subdued: var(--text-soft);
+  --text-bright-accent: var(--accent);
+  --text-negative: var(--danger);
+  --text-warning: var(--text-soft);
+  --text-positive: var(--accent);
+  --text-announcement: var(--accent);
+  --essential-base: var(--ink);
+  --essential-subdued: var(--text-muted);
+  --essential-bright-accent: var(--accent);
+  --essential-negative: var(--danger);
+  --essential-warning: var(--text-soft);
+  --essential-positive: var(--accent);
+  --essential-announcement: var(--accent);
+  --decorative-base: var(--ink);
+  --decorative-subdued: var(--hairline);
+}
+
+html.encore-dark-theme .encore-bright-accent-set {
+  --background-base: var(--accent);
+  --background-highlight: color-mix(in oklab, var(--accent) 88%, var(--ink));
+  --background-press: color-mix(in oklab, var(--accent) 88%, var(--content));
+  --background-elevated-base: var(--accent);
+  --background-elevated-highlight: color-mix(in oklab, var(--accent) 88%, var(--ink));
+  --background-elevated-press: color-mix(in oklab, var(--accent) 88%, var(--content));
+  --text-base: var(--accent-text);
+  --text-subdued: var(--accent-text);
+  --text-bright-accent: var(--accent-text);
+  --essential-base: var(--accent-text);
+  --essential-subdued: var(--accent-text);
+  --essential-bright-accent: var(--accent-text);
+  --decorative-base: var(--accent-text);
+  --decorative-subdued: var(--accent-text);
+}
+
+html.encore-dark-theme .encore-inverted-set,
+html.encore-dark-theme .encore-inverted-light-set {
+  --background-base: var(--kestrel-inverse-surface, #f3f3ef);
+  --background-highlight: color-mix(in oklab, var(--kestrel-inverse-surface, #f3f3ef) 92%, var(--content));
+  --background-press: color-mix(in oklab, var(--kestrel-inverse-surface, #f3f3ef) 84%, var(--content));
+  --text-base: var(--kestrel-inverse-on-surface, #181817);
+  --text-subdued: var(--kestrel-inverse-on-surface, #181817);
+  --text-bright-accent: var(--kestrel-inverse-primary, #181817);
+  --essential-base: var(--kestrel-inverse-on-surface, #181817);
+  --essential-subdued: var(--kestrel-inverse-on-surface, #181817);
+  --essential-bright-accent: var(--kestrel-inverse-primary, #181817);
+}
+
+html {
+  font-size: calc(100% * var(--luft-text-scale, 1));
+}
+
+html,
+body {
+  background: var(--content);
+  color: var(--ink);
+  font-family: var(--font-stack);
+  -webkit-font-smoothing: antialiased;
+}
+
+body,
+button,
+input,
+textarea {
+  font-family: var(--font-stack) !important;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+:focus-visible {
+  outline-color: var(--accent) !important;
+}
+
+:root[data-corners='square'] *,
+:root[data-corners='square'] ::before,
+:root[data-corners='square'] ::after {
+  border-radius: 0 !important;
+}
+
+:root[data-motion='off'] *,
+:root[data-motion='off'] ::before,
+:root[data-motion='off'] ::after {
+  animation-duration: 1ms !important;
+  animation-iteration-count: 1 !important;
+  scroll-behavior: auto !important;
+  transition-duration: 1ms !important;
+}

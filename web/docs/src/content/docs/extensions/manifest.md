@@ -17,7 +17,7 @@ sidebar:
 | `version` | The extension's version, such as `1.2.0` |
 | `api` | The extension API version it targets. Luft keeps every version it shipped working, and refuses versions it doesn't know |
 | `permissions` | What it uses beyond the basics, see below |
-| `[helper]` | `path` names a program in the folder that the API can start |
+| `[helper]` | `path` names a program in the folder that the API can start. `turned-off` is an optional list of arguments it runs with once when people turn the extension off or remove it, so it can undo what it changed outside its folder |
 | `[network]` | `hosts` names the hosts it connects to, such as `["api.example.com"]` |
 | `[[settings]]` | Settings people change in Settings → Extensions, see below |
 | `[[shortcuts]]` | Keyboard shortcuts people can change in Settings → Keyboard, see below |

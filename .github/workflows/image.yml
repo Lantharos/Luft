@@ -390,6 +390,10 @@ jobs:
 
       - run: bun install --frozen-lockfile
 
+      - name: Install Rust for a native helper
+        if: hashFiles(format('{0}/helper/Cargo.toml', matrix.extension.folder)) != ''
+        run: rustup update stable && rustup default stable
+
       - name: Use the version being released
         run: sed -i 's/^version = ".*"$/version = "${{ matrix.extension.version }}"/' "${{ matrix.extension.folder }}/extension.toml"
 

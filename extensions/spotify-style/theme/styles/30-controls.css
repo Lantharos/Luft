@@ -1,0 +1,51 @@
+[data-encore-id='buttonPrimary'] > *,
+[data-encore-id='buttonSecondary'],
+[data-encore-id='buttonTertiary'] {
+  font-weight: 500;
+}
+
+[data-encore-id='buttonPrimary'] > * {
+  background: var(--accent);
+  box-shadow: none !important;
+  color: var(--accent-text);
+}
+
+[data-encore-id='buttonSecondary'] {
+  background: var(--control);
+  border: none;
+  box-shadow: none !important;
+  color: var(--ink);
+}
+
+[data-encore-id='buttonSecondary']:hover {
+  background: var(--control-hover);
+}
+
+.x-progressBar-progressBarBg,
+.progress-bar {
+  --bg-color: color-mix(in oklab, var(--ink) 14%, transparent);
+  --fg-color: var(--accent);
+  --is-active-fg-color: var(--accent);
+}
+
+.x-progressBar-fillColor,
+.x-progressBar-progressFillColor {
+  background-color: var(--accent) !important;
+}
+
+.progress-bar__slider,
+.x-progressBar-sliderArea > * {
+  background: var(--accent) !important;
+}
+
+.x-toggle-indicatorWrapper {
+  background: var(--control) !important;
+}
+
+.x-toggle-input:checked ~ .x-toggle-indicatorWrapper {
+  background: var(--accent) !important;
+}
+
+.x-toggle-indicator {
+  background: var(--raised) !important;
+}

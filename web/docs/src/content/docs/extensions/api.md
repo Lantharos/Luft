@@ -36,7 +36,7 @@ Everything an extension adds returns a `Disposable` with `dispose()`, to take it
 | `session.active`, `session.onChanged(changed)` | Whether someone is using the desktop: signed in and not locked |
 | `desktop.wallpaperVisible`, `desktop.onChanged(changed)` | Whether the wallpaper shows anywhere: windows leave some uncovered, nothing is full screen, the screen isn't locked |
 | `power.onBattery`, `power.saving`, `power.onChanged(changed)` | Whether it runs on battery, and whether power saver is on. Do less while it is |
-| `appearance.accent`, `appearance.wallpaperAccent`, `appearance.dark`, `appearance.reducedMotion`, `appearance.onChanged(changed)` | The accent colour and the colour the wallpaper suggests as `#rrggbb`, whether the dark style is on, and whether people asked for less motion or turned animations off |
+| `appearance.accent`, `appearance.wallpaperAccent`, `appearance.dark`, `appearance.colors`, `appearance.font`, `appearance.textScale`, `appearance.squareCorners`, `appearance.reducedMotion`, `appearance.onChanged(changed)` | The accent colour and the colour the wallpaper suggests as `#rrggbb`, whether the dark style is on, the current style's colours by role, the interface font, how much larger text is, whether corners are square, and whether people asked for less motion or turned animations off |
 
 ## wallpaper
 

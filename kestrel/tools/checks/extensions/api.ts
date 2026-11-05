@@ -42,6 +42,7 @@ interface ApiState {
   listen(bands: number): void;
   playing(): boolean;
   store(value: unknown): void;
+  appearance: {colors: Record<string, string>; font: string; textScale: number; squareCorners: boolean; onChanged(changed: () => void): {dispose(): void}};
 }
 
 const api = () => (globalThis as {api?: ApiState}).api!;
@@ -63,6 +64,20 @@ async function checkListing() {
   require(listing.page, 'it describes a settings page of its own');
   require(listing.settings.find(setting => setting.key === 'glow')?.page === 'appearance', 'a setting can show on the Appearance page too');
   require(listing.settings.find(setting => setting.key === 'look')?.images?.length === 2, 'a choice offers its pictures to Settings');
+}
+
+async function checkAppearance() {
+  const {appearance} = api();
+  require(/^#[0-9a-f]{6}$/.test(appearance.colors.surface), 'it reads the current style’s colors by role');
+  require(appearance.font.length > 0 && appearance.textScale > 0, 'it reads the interface font and text size');
+  const rounded = kestrel.get_boolean('rounded-window-corners');
+  let told = false;
+  const watching = appearance.onChanged(() => (told = true));
+  kestrel.set_boolean('rounded-window-corners', !rounded);
+  await eventually(() => told, 'it hears when the corners change');
+  require(appearance.squareCorners === rounded, 'and reads the new corners');
+  watching.dispose();
+  kestrel.reset('rounded-window-corners');
 }
 
 async function checkPanel() {
@@ -211,6 +226,7 @@ export async function run() {
   await request('Reload', API);
   try {
     await checkListing();
+    await checkAppearance();
     await checkPanel();
     await checkWindow();
     await checkShortcutsAndTyping();

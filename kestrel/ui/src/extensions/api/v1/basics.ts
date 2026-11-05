@@ -1,12 +1,9 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import St from 'gi://St';
 
-import { isDark, watchScheme } from '../../../shared/display/scheme.js';
-import { reducedMotion } from '../../../shared/motion/motion.js';
 import { clockChanges } from './clock.js';
 import type { ApiContext } from './context.js';
-import type { Appearance, Disposable, Session, Settings, Storage, Timers } from './types.js';
+import type { Disposable, Session, Settings, Storage, Timers } from './types.js';
 
 export function settingsApi({ values, scope }: ApiContext): Settings {
   return {
@@ -52,36 +49,6 @@ export function sessionApi({ host, scope }: ApiContext): Session {
         active = host.desktop.active;
         guarded();
       }));
-    },
-  };
-}
-
-const stillMotion = () => reducedMotion() || !St.Settings.get().enable_animations;
-
-function watchMotion(changed: () => void): () => void {
-  const settings = St.Settings.get();
-  const ids = [settings.connect('notify::enable-animations', changed), settings.connect('notify::reduced-motion', changed)];
-  return () => ids.forEach(id => settings.disconnect(id));
-}
-
-export function appearanceApi({ host, scope }: ApiContext): Appearance {
-  return {
-    get accent() {
-      return host.accent();
-    },
-    get wallpaperAccent() {
-      return host.wallpaperAccent();
-    },
-    get dark() {
-      return isDark();
-    },
-    get reducedMotion() {
-      return stillMotion();
-    },
-    onChanged: changed => {
-      const guarded = scope.guard(changed);
-      const stops = [host.watchAccent(guarded), watchScheme(() => guarded()), watchMotion(guarded)];
-      return scope.disposable(() => stops.forEach(stop => stop()));
     },
   };
 }

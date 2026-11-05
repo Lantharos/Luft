@@ -355,6 +355,14 @@ export interface Appearance {
   readonly wallpaperAccent: Color;
   /** Whether the desktop uses its dark style. */
   readonly dark: boolean;
+  /** The colours of the current style by role, such as `surface` and `onPrimary`, the palette Luft's apps are drawn with. */
+  readonly colors: Readonly<Record<string, Color>>;
+  /** The family of the font people chose for the interface. */
+  readonly font: string;
+  /** How much larger people want text, where 1 is the usual size. */
+  readonly textScale: number;
+  /** Whether people chose square corners for windows and what's in them. */
+  readonly squareCorners: boolean;
   /** Whether people asked for less motion, or animations are off. Keep things still or slow while it's on. */
   readonly reducedMotion: boolean;
   onChanged(changed: () => void): Disposable;
@@ -1561,7 +1569,11 @@ export interface Manifest {
   settings?: SettingDescription[];
   shortcuts?: ShortcutDescription[];
   /** A native program in the extension's folder that {@link Helper} starts. */
-  helper?: { path: string };
+  helper?: {
+    path: string;
+    /** Arguments to run the helper with once when people turn the extension off or remove it, so it can undo what it did elsewhere. */
+    turnedOff?: string[];
+  };
   /** The hosts {@link Network} may connect to, such as `api.example.com`, or `localhost:8787` while developing. */
   network?: { hosts: string[] };
 }

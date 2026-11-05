@@ -2,7 +2,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import type { ApiContext } from './context.js';
-import type { Disposable, Helper, HelperProcess } from './types.js';
+import type { Disposable, Helper, HelperProcess, Manifest } from './types.js';
 
 Gio._promisify(Gio.OutputStream.prototype, 'write_all_async');
 
@@ -71,6 +71,14 @@ function start(context: ApiContext, program: string, args: string[]): HelperProc
     close: () => input.close_async(GLib.PRIORITY_DEFAULT, null, null),
     dispose: () => stop.dispose(),
   };
+}
+
+export function runTurnedOffHelper(path: string, { helper }: Manifest): void {
+  if (!helper?.turnedOff) return;
+  const launcher = new Gio.SubprocessLauncher({ flags: Gio.SubprocessFlags.NONE });
+  launcher.set_cwd(path);
+  launcher.setenv('LUFT_EXTENSION_DIR', path, true);
+  launcher.spawnv([GLib.build_filenamev([path, helper.path]), ...helper.turnedOff]);
 }
 
 export function helperApi(context: ApiContext): Helper {

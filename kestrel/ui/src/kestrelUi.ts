@@ -179,6 +179,8 @@ class KestrelUi {
       accent: () => this.services.appearance.AccentColor || '#ffffff',
       wallpaperAccent: () => this.services.appearance.WallpaperAccentColor || this.services.appearance.AccentColor || '#ffffff',
       watchAccent: changed => this.services.appearance.watchAccent(changed),
+      colors: dark => dark ? this.services.appearance.DarkColors : this.services.appearance.LightColors,
+      watchPalette: changed => this.services.appearance.watchPalette(changed),
       addPopup: actor => context.layoutManager.addTopChrome(actor),
       removePopup: actor => context.layoutManager.removeChrome(actor),
       bindDesktopMenu: actor => this.menus.bindSecondaryClick(actor, () => this.desktopMenu()),

@@ -57,6 +57,8 @@ export interface ExtensionHost {
   accent(): string;
   wallpaperAccent(): string;
   watchAccent(changed: () => void): () => void;
+  colors(dark: boolean): Record<string, string>;
+  watchPalette(changed: () => void): () => void;
   watchMonitors(changed: () => void): () => void;
   /** Puts a pop-up above everything but the screen keyboard, or takes it away. */
   addPopup(actor: Clutter.Actor): void;

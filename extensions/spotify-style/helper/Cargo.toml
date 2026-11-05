@@ -1,0 +1,14 @@
+[package]
+name = "spotify-style"
+version = "0.1.0"
+description = "Keeps Spotify in Luft's style for the Spotify Style extension"
+authors = ["Kristof"]
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+inotify.workspace = true
+
+[lints]
+workspace = true

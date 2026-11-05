@@ -38,6 +38,7 @@ permissions = ["wallpaper", "quick-settings"]
 
 [helper]                          # optional native program, started through the API
 path = "clock-helper"
+turned-off = ["restore"]          # optional arguments it runs with once when people turn the extension off or remove it
 
 [network]                         # optional hosts it connects to, over HTTPS
 hosts = ["api.example.com"]
@@ -366,3 +367,13 @@ What extensions need that the API doesn't offer yet:
 ## Adding an API version
 
 Version 1 grows in place while there are no extensions outside Luft's own: add to it, never take away or change what's there. When a change can't keep old extensions working, copy `api/v1` to `api/v2`, change the copy, add it to `API_VERSIONS` in `api/versions.ts` and to `extensionApi.ts`, and keep `v1` working. Extensions keep targeting the version they were written for.
+
+## Spotify Style
+
+Spotify Style restyles Spotify through Spicetify. Its helper puts the `Luft` theme in Spicetify's themes folder, selects it, remembers the theme from before in `previous-theme` next to it, and applies it without restarting Spotify. When Flatpak swaps in a new Spotify, the helper sees `active` change in the deployment folder and applies the theme again.
+
+Spotify's sandbox can't reach the session bus or `~/.config/kestrel`, and its Chromium doesn't follow the desktop's light and dark styles. So the extension writes the desktop's look to the helper as a line of JSON whenever it changes, and the helper passes it on as server-sent events on `127.0.0.1:47291`, only to Spotify's origin. It's idle until something changes. The theme's script remembers the last look, so Spotify opens in it before the stream connects.
+
+Spotify's `…` button is native and always white, so the theme puts a dark pill behind it in the light style.
+
+Turning the extension off runs `spotify-style restore`, which goes back to the theme from before.

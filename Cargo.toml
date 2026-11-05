@@ -18,6 +18,7 @@ members = [
     "apps/signin/desktop",
     "apps/soundboard/desktop",
     "apps/tern/desktop",
+    "extensions/spotify-style/helper",
     "sushi/crates/sushi",
     "sushi/crates/sushi-scene",
     "sushi/crates/sushiboot",

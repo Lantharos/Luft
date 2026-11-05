@@ -1,0 +1,111 @@
+h1,
+h2,
+.main-entityHeader-title {
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+}
+
+.main-card-card {
+  background: var(--surface);
+  border-radius: var(--radius-group);
+  box-shadow: none;
+}
+
+.main-card-card:hover {
+  background: var(--surface-hover);
+}
+
+.main-card-card img,
+.main-trackList-rowImage,
+.main-entityHeader-image {
+  border-radius: var(--radius-item);
+  box-shadow: none !important;
+}
+
+.main-trackList-trackListRow {
+  border-radius: var(--radius-item);
+}
+
+.main-trackList-trackListRow:hover,
+.main-trackList-trackListRow:focus-within {
+  background: var(--surface-hover);
+}
+
+.main-trackList-selected,
+[aria-selected='true'] > .main-trackList-trackListRow,
+.main-trackList-trackListRow[data-context-menu-open='true'] {
+  background: var(--accent-soft) !important;
+}
+
+.main-trackList-trackListHeader {
+  border-bottom: 1px solid var(--hairline);
+}
+
+.main-trackInfo-name a,
+.main-trackInfo-artists a {
+  color: inherit;
+}
+
+.main-actionBar-shuffleButton {
+  color: var(--text-soft);
+}
+
+.main-entityHeader-metaDataText,
+.main-entityHeader-metaData a,
+.main-entityHeader-metaData span {
+  color: var(--text-soft);
+}
+
+.playlist-playlist-actionBarBackground-background,
+.main-topBar-overlay {
+  background: none !important;
+}
+
+.main-cardImage-imageWrapper,
+.main-card-PlayButtonContainer,
+.cover-art,
+.main-image-image,
+.progress-bar__slider,
+[class*='x-entityImage'] {
+  box-shadow: none !important;
+}
+
+[class*='equaliser'] img,
+.main-trackList-playingIcon {
+  filter: grayscale(1);
+}
+
+.main-nowPlayingView-canvasVisualEnhancement::before {
+  background: linear-gradient(color-mix(in oklab, var(--sidebar-solid) 70%, transparent), transparent 30%);
+}
+
+.main-nowPlayingView-canvasVisualEnhancement::after {
+  background: none;
+}
+
+.main-nowPlayingView-contextItemInfo::before {
+  background: linear-gradient(transparent, var(--sidebar-solid) 89%);
+}
+
+[style*='i.scdn.co'] .main-nowPlayingView-sectionHeaderText {
+  color: #ffffff;
+}
+
+.main-entityHeader-withBackgroundImage .main-entityHeader-title,
+.main-entityHeader-withBackgroundImage .main-entityHeader-title *,
+.main-entityHeader-withBackgroundImage .main-entityHeader-metaDataText,
+.main-entityHeader-withBackgroundImage .main-entityHeader-metaData a,
+.main-entityHeader-withBackgroundImage .main-entityHeader-metaData span,
+.main-entityHeader-withBackgroundImage .main-entityHeader-subtitle,
+.main-entityHeader-withBackgroundImage .main-entityHeader-subtitle * {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff;
+}
+
+.search-searchCategory-contentArea::before {
+  background: linear-gradient(90deg, color-mix(in oklab, var(--content) 70%, transparent), transparent);
+}
+
+.search-searchCategory-contentArea::after {
+  background: linear-gradient(-90deg, color-mix(in oklab, var(--content) 70%, transparent), transparent);
+}

@@ -1,4 +1,5 @@
 pub mod corners;
+pub mod lines;
 pub mod motion;
 pub mod palette;
 pub mod typography;
@@ -16,6 +17,7 @@ pub fn declare_appearance(window: SabineWindow) -> SabineWindow {
         .bridge_event(&typography::TYPOGRAPHY_CHANGED)
         .bridge_event(&motion::MOTION_CHANGED)
         .bridge_event(&corners::CORNERS_CHANGED)
+        .bridge_event(&lines::LINES_CHANGED)
 }
 
 async fn proxy() -> Result<Proxy<'static>, String> {
@@ -44,6 +46,7 @@ pub async fn watch(events: Events) {
     let corners = corners::Corners::read(&proxy).await;
     events.set_square_corners(corners == corners::Corners::Square);
     events.emit(corners::CORNERS_CHANGED, corners);
+    events.emit(lines::LINES_CHANGED, lines::Lines::read(&proxy).await);
     while let Some(signal) = signals.next().await {
         let Ok((namespace, key, _)) = signal
             .body()
@@ -64,6 +67,9 @@ pub async fn watch(events: Events) {
             let corners = corners::Corners::read(&proxy).await;
             events.set_square_corners(corners == corners::Corners::Square);
             events.emit(corners::CORNERS_CHANGED, corners);
+        }
+        if lines::changed(&namespace, &key) {
+            events.emit(lines::LINES_CHANGED, lines::Lines::read(&proxy).await);
         }
     }
 }

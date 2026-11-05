@@ -546,6 +546,7 @@ export const events = {
 	accountsStep: (callback: (payload: StepUpdate) => void) => listen<StepUpdate>("accounts.step", callback),
 	appearanceCorners: (callback: (payload: Corners) => void) => listen<Corners>("appearance.corners", callback),
 	appearanceCursorInstall: (callback: (payload: InstallEvent) => void) => listen<InstallEvent>("appearance.cursorInstall", callback),
+	appearanceLines: (callback: (payload: Lines) => void) => listen<Lines>("appearance.lines", callback),
 	appearanceMotion: (callback: (payload: Motion) => void) => listen<Motion>("appearance.motion", callback),
 	appearanceTypography: (callback: (payload: Typography) => void) => listen<Typography>("appearance.typography", callback),
 	appearanceWallpapers: (callback: (payload: Library) => void) => listen<Library>("appearance.wallpapers", callback),
@@ -701,6 +702,7 @@ export type Appearance = {
 	typography: Typography,
 	motion: Motion,
 	corners: Corners,
+	lines: Lines,
 	locale: Locale,
 };
 
@@ -1118,6 +1120,8 @@ export type Library = {
 	wallpapers: Wallpaper[],
 	groups: WallpaperGroup[],
 };
+
+export type Lines = "none" | "lines" | "scanlines";
 
 export type Link = "connected" | "connecting" | "disconnected" | "unplugged";
 

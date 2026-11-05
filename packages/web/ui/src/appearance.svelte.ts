@@ -1,7 +1,7 @@
 import { events as systemEvents, system } from '@lantharos/sabine';
 import { i18n } from '@luft/i18n';
 
-import { events, type AppIcons, type Appearance, type Corners, type Motion, type Palette, type SchemeColors, type Typography } from './bindings/appearance';
+import { events, type AppIcons, type Appearance, type Corners, type Lines, type Motion, type Palette, type SchemeColors, type Typography } from './bindings/appearance';
 import type { TaskbarLooks } from './taskbar/looks';
 
 export type { AppIconStyle, Appearance, Palette, SchemeColors } from './bindings/appearance';
@@ -30,6 +30,7 @@ class AppearanceState {
 	typography = $state<Typography>({ interface: null, monospace: null, textScale: 1 });
 	motion = $state<Motion>('full');
 	corners = $state<Corners>('rounded');
+	lines = $state<Lines>('none');
 	fontSans = $derived(fontList(this.typography.interface, SANS));
 	fontMono = $derived(fontList(this.typography.monospace, MONO));
 
@@ -39,13 +40,15 @@ class AppearanceState {
 		this.type(initial.typography);
 		this.move(initial.motion);
 		this.round(initial.corners);
+		this.line(initial.lines);
 		void i18n.start(initial.locale);
 		const stops = [
 			events.kestrelPalette((palette) => this.receive(palette)),
 			systemEvents.appearanceChanged(({ colorScheme }) => (this.scheme = colorScheme)),
 			events.appearanceTypography((typography) => this.type(typography)),
 			events.appearanceMotion((motion) => this.move(motion)),
-			events.appearanceCorners((corners) => this.round(corners))
+			events.appearanceCorners((corners) => this.round(corners)),
+			events.appearanceLines((lines) => this.line(lines))
 		];
 		void system.appearance().then(({ colorScheme }) => (this.scheme = colorScheme));
 		return () => stops.forEach((stop) => stop());
@@ -59,6 +62,11 @@ class AppearanceState {
 	private round(corners: Corners) {
 		this.corners = corners;
 		document.documentElement.dataset.corners = corners;
+	}
+
+	private line(lines: Lines) {
+		this.lines = lines;
+		document.documentElement.dataset.lines = lines;
 	}
 
 	private type(typography: Typography) {

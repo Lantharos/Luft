@@ -127,6 +127,7 @@ export const commands = {
 
 export const events = {
 	appearanceCorners: (callback: (payload: Corners) => void) => listen<Corners>("appearance.corners", callback),
+	appearanceLines: (callback: (payload: Lines) => void) => listen<Lines>("appearance.lines", callback),
 	appearanceMotion: (callback: (payload: Motion) => void) => listen<Motion>("appearance.motion", callback),
 	appearanceTypography: (callback: (payload: Typography) => void) => listen<Typography>("appearance.typography", callback),
 	kestrelPalette: (callback: (payload: Palette) => void) => listen<Palette>("kestrel.palette", callback),
@@ -179,6 +180,7 @@ export type Appearance = {
 	typography: Typography,
 	motion: Motion,
 	corners: Corners,
+	lines: Lines,
 	locale: Locale,
 };
 
@@ -338,6 +340,8 @@ export type Job = { kind: "installFlathub"; id: string } | { kind: "installStore
 fullAccess: boolean } | { kind: "installTool"; package: string } | { kind: "installToolFile"; path: string } | { kind: "removeFlatpak"; installation: Installation; reference: string } | { kind: "removeAppImage"; id: string } | { kind: "removeTool"; package: string } | { kind: "updateFlatpaks"; installation: Installation; references: string[] } | { kind: "updateAppImage"; id: string } | { kind: "updateTools"; packages: string[] } | { kind: "installSystemPackages"; packages: string[] } | { kind: "removeSystemPackages"; packages: string[] } | { kind: "installSystemPackageFile"; path: string; package: string; repository?: RepositoryDraft | null } | { kind: "removeRepository"; file: string };
 
 export type Kind = "app" | "extension";
+
+export type Lines = "none" | "lines" | "scanlines";
 
 export type Locale = {
 	languages: string[],

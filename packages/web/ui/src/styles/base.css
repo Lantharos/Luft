@@ -67,3 +67,20 @@
 		border-radius: 0 !important;
 	}
 }
+
+:root[data-lines='lines'] body::after,
+:root[data-lines='scanlines'] body::after {
+	content: '';
+	inset: 0;
+	pointer-events: none;
+	position: fixed;
+	z-index: 2147483647;
+}
+
+:root[data-lines='lines'] body::after {
+	background: linear-gradient(var(--accent), var(--accent)) top / 100% 2px no-repeat;
+}
+
+:root[data-lines='scanlines'] body::after {
+	background: repeating-linear-gradient(transparent 0 2px, color-mix(in oklab, var(--accent) 7%, transparent) 2px 3px);
+}

@@ -4,6 +4,7 @@ import { listen } from "@lantharos/sabine";
 
 export const events = {
 	appearanceCorners: (callback: (payload: Corners) => void) => listen<Corners>("appearance.corners", callback),
+	appearanceLines: (callback: (payload: Lines) => void) => listen<Lines>("appearance.lines", callback),
 	appearanceMotion: (callback: (payload: Motion) => void) => listen<Motion>("appearance.motion", callback),
 	appearanceTypography: (callback: (payload: Typography) => void) => listen<Typography>("appearance.typography", callback),
 	kestrelPalette: (callback: (payload: Palette) => void) => listen<Palette>("kestrel.palette", callback),
@@ -23,6 +24,7 @@ export type Appearance = {
 	typography: Typography,
 	motion: Motion,
 	corners: Corners,
+	lines: Lines,
 	locale: Locale,
 };
 
@@ -34,6 +36,8 @@ export type IconPaint = {
 	shade: string,
 	rim: number,
 };
+
+export type Lines = "none" | "lines" | "scanlines";
 
 export type Locale = {
 	languages: string[],

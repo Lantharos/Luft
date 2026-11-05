@@ -7,7 +7,9 @@ use specta::Type;
 
 use crate::bridge::events::Events;
 use crate::desktop::palette::{self, Palette};
-use crate::desktop::{self, corners::Corners, motion::Motion, typography::Typography};
+use crate::desktop::{
+    self, corners::Corners, lines::Lines, motion::Motion, typography::Typography,
+};
 
 // Kestrel rounds windows to 15px, so the blur and input regions follow it
 const WINDOW_RADIUS: i32 = 15;
@@ -88,6 +90,7 @@ pub struct Appearance {
     typography: Typography,
     motion: Motion,
     corners: Corners,
+    lines: Lines,
     locale: Locale,
 }
 
@@ -98,6 +101,7 @@ impl Appearance {
             typography: Typography::current().await,
             motion: Motion::current().await,
             corners: Corners::current().await,
+            lines: Lines::current().await,
             locale: Locale {
                 languages: luft_i18n::requested(),
                 formats: luft_i18n::formats(),

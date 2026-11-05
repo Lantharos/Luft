@@ -124,6 +124,7 @@ export const commands = {
 
 export const events = {
 	appearanceCorners: (callback: (payload: Corners) => void) => listen<Corners>("appearance.corners", callback),
+	appearanceLines: (callback: (payload: Lines) => void) => listen<Lines>("appearance.lines", callback),
 	appearanceMotion: (callback: (payload: Motion) => void) => listen<Motion>("appearance.motion", callback),
 	appearanceTypography: (callback: (payload: Typography) => void) => listen<Typography>("appearance.typography", callback),
 	fingerprintEnroll: (callback: (payload: EnrollProgress) => void) => listen<EnrollProgress>("fingerprint.enroll", callback),
@@ -157,6 +158,7 @@ export type Appearance = {
 	typography: Typography,
 	motion: Motion,
 	corners: Corners,
+	lines: Lines,
 	locale: Locale,
 };
 
@@ -298,6 +300,8 @@ export type Known = {
 };
 
 export type Layout = "subvolumes" | "separateHome" | "single" | "encrypted" | "unknown";
+
+export type Lines = "none" | "lines" | "scanlines";
 
 export type Link = "connected" | "connecting" | "disconnected" | "unplugged";
 

@@ -18,6 +18,12 @@ function touches(rect: StageRect, area: StageRect): boolean {
   return rect.x < area.x + area.width && rect.x + rect.width > area.x && rect.y < area.y + area.height && rect.y + rect.height > area.y;
 }
 
+const windowId = (window: Meta.Window) => `window:${window.get_stable_sequence()}`;
+
+export function windowWithId(id: string): Meta.Window | null {
+  return global.get_window_actors().find(actor => windowId(actor.meta_window!) === id)?.meta_window ?? null;
+}
+
 /** Where windows and the taskbar are, and word of when that changes, watched only while an extension listens. */
 export class SurfaceWatch {
   private readonly listeners = new Set<() => void>();
@@ -30,7 +36,7 @@ export class SurfaceWatch {
   displays(): SurfaceDisplay[] {
     const workspace = global.workspace_manager.get_active_workspace();
     const windows = global.display.sort_windows_by_stacking(workspace.list_windows().filter(window => isSurface(window, workspace))).reverse();
-    const shapes = windows.map((window): Surface => ({ ...outline(window), id: `window:${window.get_stable_sequence()}` }));
+    const shapes = windows.map((window): Surface => ({ ...outline(window), id: windowId(window) }));
     const primary = this.host.primaryIndex();
     return this.host.monitors().map(monitor => {
       const relative = (shape: Surface): Surface => ({ ...shape, x: shape.x - monitor.x, y: shape.y - monitor.y });

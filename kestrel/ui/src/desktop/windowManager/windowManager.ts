@@ -237,6 +237,10 @@ export class WindowManager {
     if (!this.shouldAnimateActor(actor, MORPH_TYPES) || !this.morphs.begin(actor, oldFrameRect, completed)) completed();
   }
 
+  windowPicture(actor: Meta.WindowActor): Clutter.Actor | null {
+    return this.morphs.pictureOf(actor);
+  }
+
   morphWindow(window: Meta.Window): void {
     const actor = window.get_compositor_private() as Meta.WindowActor | null;
     if (actor && this.shouldAnimateActor(actor, MORPH_TYPES)) this.morphs.begin(actor, window.get_frame_rect(), () => {});

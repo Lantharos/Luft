@@ -165,6 +165,7 @@ class KestrelUi {
       },
       taskbar: monitor => this.panels.panelOn(monitor)?.shapes.bar() ?? null,
       taskbarIslands: monitor => this.panels.panelOn(monitor)?.islandShapes() ?? [],
+      windowPicture: actor => context.windowPicture(actor),
       accent: () => this.services.appearance.AccentColor || '#ffffff',
       wallpaperAccent: () => this.services.appearance.WallpaperAccentColor || this.services.appearance.AccentColor || '#ffffff',
       watchAccent: changed => this.services.appearance.watchAccent(changed),

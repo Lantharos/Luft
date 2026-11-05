@@ -275,6 +275,7 @@ function initializeDesktop(): void {
     canInteract: () => actionMode === Shell.ActionMode.NORMAL,
     snapWindow: (window, rect) => wm.snapWindow(window, rect),
     morphWindow: window => wm.morphWindow(window),
+    windowPicture: actor => wm.windowPicture(actor),
     showWindowMenu: (window, rect) => wm.showWindowMenu(window, rect),
     swipeWorkspaces: event => wm.swipeWorkspaces(event),
     activateWindow: window => wm.activateWithSnapGroup(window),

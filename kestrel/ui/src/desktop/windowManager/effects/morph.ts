@@ -61,7 +61,6 @@ class Morph {
       parent.add_child(snapshot.actor);
     }
     this.keepAbove();
-    actor.opacity = 0;
 
     const window = actor.meta_window!;
     const texture = actor.get_texture()!;
@@ -85,6 +84,14 @@ class Morph {
       this.reveal();
       return GLib.SOURCE_REMOVE;
     });
+  }
+
+  get picture(): Clutter.Actor | null {
+    return this.live ? null : this.snapshot.actor;
+  }
+
+  hide(): void {
+    this.actor.opacity = 0;
   }
 
   private keepAbove(): void {
@@ -220,7 +227,12 @@ export class WindowMorphs {
       completed();
     });
     this.morphs.set(actor, morph);
+    morph.hide();
     return true;
+  }
+
+  pictureOf(actor: Meta.WindowActor): Clutter.Actor | null {
+    return this.morphs.get(actor)?.picture ?? null;
   }
 
   interrupt(actor: Meta.WindowActor): void {

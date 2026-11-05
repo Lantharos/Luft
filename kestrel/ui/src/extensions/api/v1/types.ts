@@ -276,7 +276,7 @@ export interface Wallpaper {
   /** Draws a shader across each display, over the wallpaper. */
   addLayer(layer: LayerOptions): Layer;
   /**
-   * Adds small pictures that live on the desktop, between the wallpaper and the windows, and that people can pick up.
+   * Adds small pictures that live on the desktop, between the wallpaper and the windows or standing on a window, and that people can pick up.
    * They only take clicks on what shows of them; the desktop keeps every other pixel.
    * Each one costs nothing until it's told to change: unlike a layer, they run no shader and no frame clock, and only
    * the few pixels a sprite changes get drawn again.
@@ -326,14 +326,20 @@ export interface SpriteSheet {
 export interface SpritePlace {
   /** The display, as in {@link SurfaceDisplay.index}. */
   display: number;
-  /** Pixels from the display's left edge to the sprite's middle. */
+  /** Pixels from the display's left edge to the sprite's middle, or from the window's left edge with {@link SpritePlace.on}. */
   x: number;
-  /** Pixels from the display's top edge to the sprite's feet. */
+  /** Pixels from the display's top edge to the sprite's feet, or from the window's top edge with {@link SpritePlace.on}. */
   y: number;
   /** Which frame of its sheet shows. */
   frame: number;
   /** Mirrors it, to face the other way. */
   flipped?: boolean;
+  /**
+   * The window it stands on, as in {@link Surface.id}. It then shows right in front of that window instead of below
+   * all of them, and goes wherever the window goes by itself, in step with it on every frame, however the window moves.
+   * Nothing happens if that window has just gone.
+   */
+  on?: string;
 }
 
 export interface SpriteOptions {

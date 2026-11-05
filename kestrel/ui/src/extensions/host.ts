@@ -1,4 +1,5 @@
 import type Clutter from 'gi://Clutter';
+import type Meta from 'gi://Meta';
 
 import type { Keybindings } from '../context.js';
 import type { ContextMenus } from '../desktop/menus/contextMenus.js';
@@ -41,6 +42,8 @@ export interface ExtensionHost {
   taskbar(monitor: Monitor): Rect | null;
   /** Each part of the taskbar on a display as people see it, in stage coordinates: the bar, or every separate island with its edge and rounding. */
   taskbarIslands(monitor: Monitor): IslandShape[];
+  /** What shows in place of a window that's hidden while it changes size, if it is. */
+  windowPicture(actor: Meta.WindowActor): Clutter.Actor | null;
   accent(): string;
   wallpaperAccent(): string;
   watchAccent(changed: () => void): () => void;

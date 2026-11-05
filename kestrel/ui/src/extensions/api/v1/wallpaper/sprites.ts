@@ -6,7 +6,9 @@ import St from 'gi://St';
 
 import type { Scope } from '../../../runtime/scope.js';
 import type { Sprite, SpriteOptions, SpritePlace, SpritePoint, SpriteSheet, SpriteSheetOptions } from '../types.js';
+import { WindowRide } from './ride.js';
 import type { LayerStage } from './stage.js';
+import { windowWithId } from './surfaces.js';
 
 const DRAG_THRESHOLD = 6;
 
@@ -97,6 +99,7 @@ class DesktopSprite {
   private pressed: [number, number] = [0, 0];
   private held: [number, number] | null = null;
   private shown = true;
+  private ride: WindowRide | null = null;
 
   constructor(private readonly options: SpriteOptions, private readonly frames: readonly Mirrored[], name: string,
     private readonly stage: LayerStage, private readonly scope: Scope) {
@@ -135,7 +138,9 @@ class DesktopSprite {
       this.actor.set_content(images[side]);
       this.actor.covered = covered[side];
     }
-    if (last?.display !== place.display || last.x !== place.x || last.y !== place.y) this.move(place);
+    if (place.on) this.standOn(place, place.on);
+    else if (this.ride) this.stepOff(place);
+    else if (last?.display !== place.display || last.x !== place.x || last.y !== place.y) this.move(place);
     this.actor.visible = this.shown;
   }
 
@@ -143,6 +148,28 @@ class DesktopSprite {
   show(shown: boolean): void {
     this.shown = shown;
     this.actor.visible = shown && !!this.place_;
+  }
+
+  private standOn(place: SpritePlace, id: string): void {
+    const window = windowWithId(id);
+    if (!window) return;
+    if (this.ride?.window !== window) {
+      this.ride?.stop();
+      this.ride = new WindowRide(window, this.actor, this.stage.host.windowPicture);
+    }
+    const size = this.sizeOn(place.display);
+    this.ride.place(place.x - size / 2, place.y - size, this.scaleOf(place.display));
+  }
+
+  private stepOff(place: SpritePlace): void {
+    this.endRide();
+    this.stage.place(this.actor, 'below-windows');
+    this.move(place);
+  }
+
+  private endRide(): void {
+    this.ride?.stop();
+    this.ride = null;
   }
 
   private move({ display, x, y }: SpritePlace): void {
@@ -191,6 +218,7 @@ class DesktopSprite {
     if (!this.held) {
       if (!this.options.onPicked || Math.hypot(x - startX, y - startY) < DRAG_THRESHOLD) return;
       this.held = [startX - this.actor.x, startY - this.actor.y];
+      this.endRide();
       this.stage.place(this.actor, 'above-windows');
       this.scope.run(() => this.options.onPicked!());
     }
@@ -220,6 +248,7 @@ class DesktopSprite {
 
   destroy(): void {
     this.letGo();
+    this.endRide();
     this.actor.destroy();
   }
 }

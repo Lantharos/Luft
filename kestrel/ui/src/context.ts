@@ -56,6 +56,7 @@ export interface Context {
   canInteract(): boolean;
   snapWindow(window: Meta.Window, rect: Mtk.Rectangle): void;
   morphWindow(window: Meta.Window): void;
+  windowPicture(actor: Meta.WindowActor): Clutter.Actor | null;
   showWindowMenu(window: Meta.Window, rect: Mtk.Rectangle): void;
   swipeWorkspaces(event: Clutter.Event): boolean;
   activateWindow(window: Meta.Window): void;

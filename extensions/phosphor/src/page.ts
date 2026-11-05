@@ -4,6 +4,14 @@ import { type AppRules, type Granted, type Part, PARTS } from './rules.js';
 
 const PART_LABELS: Record<Part, string> = { border: 'border', overlay: 'overlay', crt: 'window-crt', aberration: 'window-aberration', motion: 'rule-motion' };
 
+const EVERYWHERE_LABELS: Record<Part, string> = {
+  border: 'everywhere-border',
+  overlay: 'everywhere-overlay',
+  crt: 'everywhere-crt',
+  aberration: 'everywhere-aberration',
+  motion: 'everywhere-motion',
+};
+
 function appName(apps: { id: string; name: string }[], id: string): string {
   return apps.find(app => app.id === id)?.name ?? id;
 }
@@ -14,7 +22,7 @@ function ruleItems(phosphor: Extension<Granted>, rules: AppRules): PageItem[] {
   const free = apps.filter(app => !rules.apps.includes(app.id));
   return [
     ...PARTS.map((part): PageItem => ({
-      type: 'switch', title: t(`everywhere-${part}`), checked: rules.onEverywhere(part),
+      type: 'switch', title: t(EVERYWHERE_LABELS[part]), checked: rules.onEverywhere(part),
       onToggled: checked => rules.setEverywhere(part, checked),
     })),
     {

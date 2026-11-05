@@ -19,6 +19,7 @@ export class LockControls {
   private readonly inputSource: InputSourceIndicator;
   private readonly accessibility = new LockAccessibility();
   private readonly power = new LockPower();
+  private readonly powerButton: St.Button;
 
   constructor(private readonly layoutManager: Context['layoutManager'], monitorAt: (x: number, y: number) => Monitor | null) {
     this.menus = new ContextMenus(monitorAt, () => {}, () => true, () => {}, () => {});
@@ -32,11 +33,15 @@ export class LockControls {
     this.inputSource = new InputSourceIndicator(this.menus, () => []);
     this.row.add(this.inputSource.actor);
     this.row.button('kestrel-lock-accessibility', t('lock-screen-accessibility'), this.row.icon('preferences-desktop-accessibility-symbolic'), () => this.accessibility.entries());
-    this.row.button('kestrel-lock-power', t('lock-screen-power'), this.row.icon('system-shutdown-symbolic'), () => this.power.entries());
+    this.powerButton = this.row.button('kestrel-lock-power', t('lock-screen-power'), this.row.icon('system-shutdown-symbolic'), () => this.power.entries());
   }
 
   get actor(): St.BoxLayout {
     return this.row.actor;
+  }
+
+  openPowerMenu(): void {
+    this.row.openMenu(this.powerButton, this.power.entries());
   }
 
   private showBattery(state: BatteryState | null): void {

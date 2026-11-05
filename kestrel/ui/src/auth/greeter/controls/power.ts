@@ -1,7 +1,9 @@
 import Gio from 'gi://Gio';
+import type GioUnix from 'gi://GioUnix';
 import GLib from 'gi://GLib';
 
 import type { MenuEntry } from '../../../desktop/menus/contextMenus.js';
+import { getLoginManager } from '../../../session/actions/loginManager.js';
 import { Blackout } from '../../../session/farewell.js';
 import { t } from '../../../shared/i18n/index.js';
 
@@ -27,11 +29,20 @@ function callLogind(method: string, parameters: GLib.Variant | null): Promise<GL
 export class PowerActions {
   private readonly blackout = new Blackout();
   private available: typeof ACTIONS = [];
+  private powerKey: GioUnix.InputStream | null = null;
 
   async load(): Promise<void> {
     const answers = await Promise.all(ACTIONS.map(action =>
       callLogind(action.check, null).then(reply => reply.deepUnpack<[string]>()[0]).catch(() => 'na')));
     this.available = ACTIONS.filter((_action, index) => ['yes', 'challenge'].includes(answers[index]));
+  }
+
+  async holdPowerKey(): Promise<void> {
+    this.powerKey = await getLoginManager().inhibit('handle-power-key', 'The login screen asks what the power button should do', 'block');
+  }
+
+  releasePowerKey(): void {
+    this.powerKey?.close(null);
   }
 
   entries(): MenuEntry[] {

@@ -249,6 +249,11 @@ impl Manager {
         self.0.end(Action::Reboot, 0);
     }
 
+    fn show_power_options(&self) {
+        self.0
+            .offer_power_options(self.0.inhibitors.paths(INHIBIT_LOGOUT));
+    }
+
     async fn suspend(&self) -> Result<(), Failure> {
         system::perform(&self.0.system, Power::Suspend)
             .await

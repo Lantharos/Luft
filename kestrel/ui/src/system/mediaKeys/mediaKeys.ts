@@ -16,11 +16,12 @@ const SCHEMA = 'com.lantharos.kestrel.media-keys';
 const ANYWHERE = Shell.ActionMode.ALL;
 const DESKTOP = Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW;
 const UNLESS_UNLOCKING = Shell.ActionMode.ALL & ~Shell.ActionMode.UNLOCK_SCREEN;
-const POWER = DESKTOP | Shell.ActionMode.LOGIN_SCREEN | Shell.ActionMode.LOCK_SCREEN | Shell.ActionMode.UNLOCK_SCREEN;
+const POWER = DESKTOP | Shell.ActionMode.POPUP | Shell.ActionMode.SYSTEM_MODAL | Shell.ActionMode.LOCK_SCREEN | Shell.ActionMode.UNLOCK_SCREEN;
 
 interface Binding {
   modes: Shell.ActionMode;
   repeats?: boolean;
+  alwaysHeard?: boolean;
   run(): void;
 }
 
@@ -35,7 +36,7 @@ export class MediaKeys {
 
   constructor(private readonly context: Context, openStart: () => void) {
     this.volume = new VolumeKeys(context.showOsd);
-    this.power = new PowerKeys(() => context.sessionMode.isLocked);
+    this.power = new PowerKeys(() => context.sessionMode.isLocked, () => context.screenShield?.openPowerMenu());
     this.devices = new DeviceKeys(context.showOsd);
     this.custom = new CustomShortcuts(context.keybindings);
     this.lockKeys = new LockKeys(context.showOsd, context.layoutManager);
@@ -84,9 +85,9 @@ export class MediaKeys {
       'logout': { modes: DESKTOP, run: () => this.power.logOut() },
       'reboot': { modes: DESKTOP, run: () => this.power.restart() },
       'shutdown': { modes: DESKTOP, run: () => this.power.powerOff() },
-      'power': { modes: POWER, run: () => this.power.powerButton() },
-      'suspend': { modes: POWER, run: () => this.power.sleepKey('Suspend') },
-      'hibernate': { modes: POWER, run: () => this.power.sleepKey('Hibernate') },
+      'power': { modes: POWER, alwaysHeard: true, run: () => this.power.powerButton() },
+      'suspend': { modes: POWER, alwaysHeard: true, run: () => this.power.sleepKey('Suspend') },
+      'hibernate': { modes: POWER, alwaysHeard: true, run: () => this.power.sleepKey('Hibernate') },
       'magnifier': { modes: ANYWHERE, run: () => this.accessibility.toggle('screen-magnifier-enabled') },
       'screenreader': { modes: ANYWHERE, run: () => this.accessibility.toggle('screen-reader-enabled') },
       'on-screen-keyboard': { modes: ANYWHERE, run: () => this.accessibility.toggle('screen-keyboard-enabled') },
@@ -97,8 +98,10 @@ export class MediaKeys {
       'magnifier-zoom-out': { modes: ANYWHERE, repeats: true, run: () => this.accessibility.zoom(false) },
     };
     const settings = new Gio.Settings({ schema_id: SCHEMA });
-    for (const [name, { modes, repeats, run }] of Object.entries(bindings))
-      context.keybindings.add(name, settings, repeats ? Meta.KeyBindingFlags.NONE : Meta.KeyBindingFlags.IGNORE_AUTOREPEAT, modes, run);
+    for (const [name, { modes, repeats, alwaysHeard, run }] of Object.entries(bindings)) {
+      const flags = (repeats ? Meta.KeyBindingFlags.NONE : Meta.KeyBindingFlags.IGNORE_AUTOREPEAT) | (alwaysHeard ? Meta.KeyBindingFlags.NON_MASKABLE : Meta.KeyBindingFlags.NONE);
+      context.keybindings.add(name, settings, flags, modes, run);
+    }
   }
 
   private press(key: PlayerKey): void {

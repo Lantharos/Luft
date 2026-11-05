@@ -114,7 +114,7 @@ Scrolling over the taskbar switches workspaces too.
 
 ## Media and hardware keys
 
-The volume, mute, microphone, play, pause, next and previous, brightness, keyboard backlight, touchpad, airplane mode, Bluetooth, calculator, mail, browser and power keys on your keyboard do what they say.
+The volume, mute, microphone, play, pause, next and previous, brightness, keyboard backlight, touchpad, airplane mode, Bluetooth, calculator, mail, browser and power keys on your keyboard do what they say. The power button asks whether to power off, restart, suspend or log out; Settings, under Power & Battery, can make it suspend or do nothing instead. While the screen is off, pressing it only turns the screen back on, and holding it down is left to your computer.
 
 | Shortcut | Does |
 | --- | --- |

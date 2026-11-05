@@ -176,7 +176,7 @@ export class ScreenShield extends Signals.EventEmitter {
 
     if (inhibit) {
       try {
-        this.inhibitor = await this.loginManager.inhibit(KestrelUi.t('lock-inhibit-reason'), this.inhibitCancellable);
+        this.inhibitor = await this.loginManager.inhibit('sleep', KestrelUi.t('lock-inhibit-reason'), 'delay', this.inhibitCancellable);
       } catch (e) {
         if (!(e as GLib.Error).matches(Gio.IOErrorEnum, Gio.IOErrorEnum.CANCELLED))
           log(`Failed to inhibit suspend: ${(e as GLib.Error).message}`);
@@ -378,6 +378,10 @@ export class ScreenShield extends Signals.EventEmitter {
 
   get activationTime(): number {
     return this.activationTimeValue;
+  }
+
+  openPowerMenu(): void {
+    this.dialog?.openPowerMenu();
   }
 
   deactivate(animate: boolean): void {

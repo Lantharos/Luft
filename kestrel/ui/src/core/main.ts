@@ -2,7 +2,7 @@ import type Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GioUnix from 'gi://GioUnix';
 import GLib from 'gi://GLib';
-import type Meta from 'gi://Meta';
+import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 
 import * as MessageTray from '../surfaces/notifications/tray/messageTray.js';
@@ -256,6 +256,8 @@ async function initializeGreeter(): Promise<void> {
   layoutManager.init(KestrelUi.startGreeter({
     layoutManager,
     pushModal: actor => pushModal(actor, { actionMode: Shell.ActionMode.LOGIN_SCREEN }),
+    bindPowerKey: run => wm.addKeybinding('power', new Gio.Settings({ schema_id: 'com.lantharos.kestrel.media-keys' }),
+      Meta.KeyBindingFlags.IGNORE_AUTOREPEAT | Meta.KeyBindingFlags.NON_MASKABLE, Shell.ActionMode.LOGIN_SCREEN, run),
   }));
 
   GLib.idle_add_once(GLib.PRIORITY_DEFAULT, () => {

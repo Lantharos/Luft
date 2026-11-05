@@ -13,6 +13,9 @@ const LOGIN = `<node><interface name="org.freedesktop.login1.Manager">
   <method name="Suspend"><arg type="b" direction="in"/></method>
   <method name="Hibernate"><arg type="b" direction="in"/></method>
   <method name="PowerOff"><arg type="b" direction="in"/></method>
+  <method name="SuspendWithFlags"><arg type="t" direction="in"/></method>
+  <method name="HibernateWithFlags"><arg type="t" direction="in"/></method>
+  <method name="PowerOffWithFlags"><arg type="t" direction="in"/></method>
   <method name="CanPowerOff"><arg type="s" direction="out"/></method>
   <method name="CanReboot"><arg type="s" direction="out"/></method>
   <method name="CanSuspend"><arg type="s" direction="out"/></method>
@@ -26,6 +29,7 @@ const LOGIN_CONTROL = `<node><interface name="com.lantharos.KestrelChecks.Login"
   <method name="SetLidClosed"><arg type="b" direction="in"/></method>
   <method name="PrepareForSleep"><arg type="b" direction="in"/></method>
   <method name="SetCanHibernate"><arg type="s" direction="in"/></method>
+  <method name="SetSleepRefused"><arg type="b" direction="in"/></method>
 </interface></node>`;
 const LOGIN_USER = `<node><interface name="org.freedesktop.login1.User">
   <property name="Display" type="(so)" access="read"/>
@@ -106,6 +110,14 @@ function connectedPair(): [Gio.Socket, Gio.Socket] {
   return [given, held];
 }
 
+export function answerInhibit(invocation: Gio.DBusMethodInvocation, released: () => void) {
+  const [given, held] = connectedPair();
+  followRelease(held, released);
+  const descriptors = new Gio.UnixFDList();
+  invocation.return_value_with_unix_fd_list(new GLib.Variant('(h)', [descriptors.append(given.get_fd())]), descriptors);
+  given.close();
+}
+
 function followRelease(held: Gio.Socket, released: () => void) {
   const connection = held.connection_factory_create_connection();
   inhibitors.add(connection);
@@ -120,18 +132,21 @@ function followRelease(held: Gio.Socket, released: () => void) {
 export function publishBasics(publish: Publish, calls: string[]) {
   let lidClosed = false;
   let canHibernate = 'na';
+  let sleepRefused = false;
   const login = publish(LOGIN, {
     InhibitAsync([what, , , mode]: string[], invocation: Gio.DBusMethodInvocation) {
       calls.push(`Inhibit ${what} ${mode}`);
-      const [given, held] = connectedPair();
-      followRelease(held, () => calls.push(`Release ${what} ${mode}`));
-      const descriptors = new Gio.UnixFDList();
-      invocation.return_value_with_unix_fd_list(new GLib.Variant('(h)', [descriptors.append(given.get_fd())]), descriptors);
-      given.close();
+      answerInhibit(invocation, () => calls.push(`Release ${what} ${mode}`));
     },
     Suspend: () => calls.push('Suspend'),
     Hibernate: () => calls.push('Hibernate'),
     PowerOff: () => calls.push('PowerOff'),
+    SuspendWithFlags() {
+      if (sleepRefused) throw new Error('The firmware refused to suspend');
+      calls.push('Suspend');
+    },
+    HibernateWithFlags: () => calls.push('Hibernate'),
+    PowerOffWithFlags: () => calls.push('PowerOff'),
     Reboot: () => calls.push('Reboot'),
     CanPowerOff: () => 'yes',
     CanReboot: () => 'yes',
@@ -149,6 +164,9 @@ export function publishBasics(publish: Publish, calls: string[]) {
     PrepareForSleep: (sleeping: boolean) => login.emit_signal('PrepareForSleep', new GLib.Variant('(b)', [sleeping])),
     SetCanHibernate: (answer: string) => {
       canHibernate = answer;
+    },
+    SetSleepRefused: (refused: boolean) => {
+      sleepRefused = refused;
     },
   }, '/com/lantharos/KestrelChecks/Login');
   publish(LOGIN_USER, {Display: [SESSION_ID, SESSION_PATH]}, '/org/freedesktop/login1/user/self');

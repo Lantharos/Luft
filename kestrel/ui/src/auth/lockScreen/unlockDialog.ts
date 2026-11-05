@@ -224,6 +224,10 @@ export class UnlockDialog extends St.Widget {
     this.fingerprint.destroy();
   }
 
+  openPowerMenu(): void {
+    this.controls.openPowerMenu();
+  }
+
   cancel(): void {
     if (this.promptActive) this.authPrompt!.cancel();
   }

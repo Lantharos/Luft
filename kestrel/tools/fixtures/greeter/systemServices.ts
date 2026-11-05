@@ -2,6 +2,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import {FINGERPRINT_NAME, publishFingerprint} from '../system/fingerprint.js';
+import {answerInhibit} from '../system/basics.js';
 
 const [images, events] = ARGV;
 const INTERFACES = '/usr/share/dbus-1/interfaces';
@@ -108,6 +109,10 @@ publish('org.freedesktop.login1.Manager', {
   CanSuspend: () => 'yes',
   CanReboot: () => 'yes',
   CanPowerOff: () => 'yes',
+  InhibitAsync([what, , , mode]: string[], invocation: Gio.DBusMethodInvocation) {
+    record({type: 'inhibit', action: `${what} ${mode}`});
+    answerInhibit(invocation, () => {});
+  },
   Suspend: () => record({type: 'power', action: 'suspend'}),
   Reboot: () => record({type: 'power', action: 'reboot'}),
   PowerOffAsync: (_parameters: [boolean], invocation: Gio.DBusMethodInvocation) => {

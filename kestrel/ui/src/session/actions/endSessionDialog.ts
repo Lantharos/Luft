@@ -11,6 +11,7 @@ import * as Dialog from '../../shared/dialogs/dialog.js';
 import * as GnomeSession from './gnomeSession.js';
 import * as KestrelUi from '../../kestrelUi.js';
 import * as LoginManager from './loginManager.js';
+import * as SystemActions from './systemActions.js';
 import * as UserWidget from '../../shared/widgets/userWidget.js';
 import { CheckBox } from '../../shared/widgets/checkBox.js';
 import { ModalDialog, State } from '../../shared/dialogs/modalDialog.js';
@@ -224,20 +225,22 @@ export class EndSessionDialog extends ModalDialog {
     this.stopAltCapture();
     this.clearButtons();
 
-    this.addButton({
+    const cancel = this.addButton({
       action: () => this.cancel(),
       label: KestrelUi.t('end-session-cancel'),
       key: Clutter.KEY_Escape,
     });
 
+    const offersOptions = this.type === DialogType.POWER_OPTIONS;
+    (this.buttonLayout.layout_manager as Clutter.BoxLayout).orientation = offersOptions ? Clutter.Orientation.VERTICAL : Clutter.Orientation.HORIZONTAL;
+    if (offersOptions) {
+      this.addPowerOptions();
+      this.buttonLayout.set_child_above_sibling(cancel, null);
+      return;
+    }
+
     const { confirmSignal } = this.dialogContent;
-    const button = this.addButton({
-      action: () => {
-        this.afterClosing(() => this.confirm(confirmSignal).catch(logError));
-        this.close(true);
-      },
-      label: this.dialogContent.confirmLabel(),
-    });
+    const button = this.addConfirmButton(this.dialogContent.confirmLabel(), confirmSignal);
 
     if (!this.canRebootToBootLoaderMenu || confirmSignal !== 'ConfirmedReboot') return;
 
@@ -251,6 +254,32 @@ export class EndSessionDialog extends ModalDialog {
     });
     this.rebootButtonAlt.visible = false;
     this.altCapture.enabled = true;
+  }
+
+  private addConfirmButton(label: string, signal: ConfirmSignal): St.Button {
+    return this.addButton({
+      action: () => {
+        this.afterClosing(() => this.confirm(signal).catch(logError));
+        this.close(true);
+      },
+      label,
+    });
+  }
+
+  private addPowerOptions(): void {
+    const actions = SystemActions.getDefault();
+    if (actions.canPowerOff) this.addConfirmButton(KestrelUi.t('end-session-power-off-button'), 'ConfirmedShutdown');
+    if (actions.canRestart) this.addConfirmButton(KestrelUi.t('end-session-restart-button'), 'ConfirmedReboot');
+    if (actions.canSuspend) {
+      this.addButton({
+        action: () => {
+          this.afterClosing(() => actions.activateSuspend());
+          this.close();
+        },
+        label: KestrelUi.t('end-session-suspend-button'),
+      });
+    }
+    if (actions.canLogout) this.addConfirmButton(KestrelUi.t('end-session-log-out-button'), 'ConfirmedLogout');
   }
 
   private stopAltCapture(): void {
@@ -300,6 +329,8 @@ export class EndSessionDialog extends ModalDialog {
   }
 
   private startTimer(): void {
+    if (!this.totalSecondsToStayOpen) return;
+
     const startTime = GLib.get_monotonic_time();
     this.secondsLeft = this.totalSecondsToStayOpen;
 
@@ -382,8 +413,15 @@ export class EndSessionDialog extends ModalDialog {
   async OpenAsync([type, , totalSecondsToStayOpen, inhibitorObjectPaths]: OpenParams, invocation: Gio.DBusMethodInvocation): Promise<void> {
     if (await KestrelUi.refuseSandboxed(invocation, 'ask to end the session')) return;
 
+    if (type === this.type && (this.state === State.OPENING || this.state === State.OPENED)) {
+      invocation.return_value(null);
+      return;
+    }
+
+    this.stopTimer();
     this.totalSecondsToStayOpen = totalSecondsToStayOpen;
     this.type = type;
+    if (type === DialogType.POWER_OPTIONS) await SystemActions.getDefault().refresh();
 
     const staged = await loadStagedImage();
     this.stagedImage = staged?.switching ? null : staged;

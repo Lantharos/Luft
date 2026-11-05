@@ -24,6 +24,7 @@ import { GreeterControls } from './controls/controls.js';
 import { availableSessions, sessionCommand, type Session } from './sessions.js';
 import { GreeterSignIn } from './signIn.js';
 import { UserList } from './userList.js';
+import { WakePress } from '../../session/actions/wakePress.js';
 
 const IDLE_TIMEOUT = 2 * 60 * 1000;
 const ACCOUNTS_TIMEOUT = 1000;
@@ -36,6 +37,7 @@ export interface GreeterContext {
     addTopChrome(actor: Clutter.Actor): void;
   };
   pushModal(actor: Clutter.Actor): void;
+  bindPowerKey(run: () => void): void;
 }
 
 function rememberSession(user: string, session: string, method: SignInMethod): Promise<void> {
@@ -65,6 +67,7 @@ export class Greeter {
   private readonly sessions = availableSessions();
   private readonly menus: ContextMenus;
   private readonly controls: GreeterControls;
+  private readonly wakePress = new WakePress();
   private readonly monument: Monument;
   private backdrop: LockBackdrop | null = null;
   private showWallpaper!: () => void;
@@ -109,6 +112,7 @@ export class Greeter {
     context.layoutManager.addTopChrome(this.menus.shield);
     context.layoutManager.addTopChrome(this.menus.actor);
     context.pushModal(context.layoutManager.uiGroup);
+    context.bindPowerKey(() => this.powerKeyPressed());
     this.dialog.grab_key_focus();
 
     if (this.accounts.loaded) this.showUsers();
@@ -116,6 +120,10 @@ export class Greeter {
       if (!this.backdrop) this.choose(null);
       return GLib.SOURCE_REMOVE;
     });
+  }
+
+  private powerKeyPressed(): void {
+    if (!this.finishing && !this.wakePress.heard) this.controls.openPowerMenu();
   }
 
   private matchNumLock(): void {

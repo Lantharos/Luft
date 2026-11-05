@@ -182,6 +182,10 @@ end-session-update-restart-countdown = { $seconds ->
 # Button
 end-session-update-restart-button = Restart & Install
 # Checkbox
+end-session-power-options-title = What Should This Computer Do?
+end-session-power-options-description = You pressed the power button.
+end-session-suspend-button = Suspend
+
 end-session-install-updates = Install pending software updates
 # Checkbox. $version is the system version the update installs
 end-session-install-version = Install version { $version }

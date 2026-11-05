@@ -21,6 +21,7 @@ export const DialogType = {
   SHUTDOWN: 1,
   RESTART: 2,
   UPDATE_RESTART: 3,
+  POWER_OPTIONS: 4,
 } as const;
 
 const logout: EndSessionContent = {
@@ -69,11 +70,23 @@ const updateRestart: EndSessionContent = {
   showOtherSessions: true,
 };
 
+const powerOptions: EndSessionContent = {
+  subject: () => KestrelUi.t('end-session-power-options-title'),
+  description: () => KestrelUi.t('end-session-power-options-description'),
+  checkBoxText: () => KestrelUi.t('end-session-install-updates'),
+  showBatteryWarning: true,
+  confirmSignal: 'ConfirmedShutdown',
+  confirmLabel: () => KestrelUi.t('end-session-power-off-button'),
+  iconName: 'system-shutdown-symbolic',
+  showOtherSessions: true,
+};
+
 export const DIALOG_CONTENT: Record<number, EndSessionContent> = {
   [DialogType.LOGOUT]: logout,
   [DialogType.SHUTDOWN]: shutdown,
   [DialogType.RESTART]: restart,
   [DialogType.UPDATE_RESTART]: updateRestart,
+  [DialogType.POWER_OPTIONS]: powerOptions,
 };
 
 export function roundSecondsToInterval(totalSeconds: number, secondsLeft: number, interval: number): number {

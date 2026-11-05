@@ -13,6 +13,7 @@ export class GreeterControls {
   private readonly row: ControlRow;
   readonly accessibility = new Accessibility();
   private readonly power = new PowerActions();
+  private readonly powerButton: St.Button;
   private readonly sessionLabel = new St.Label({ style_class: 'kestrel-login-label', y_align: Clutter.ActorAlign.CENTER });
   private readonly inputSource: InputSourceIndicator;
   private current: Session | null = null;
@@ -23,12 +24,17 @@ export class GreeterControls {
     this.inputSource = new InputSourceIndicator(menus, () => []);
     this.row.add(this.inputSource.actor);
     this.row.button('kestrel-greeter-accessibility', t('greeter-accessibility'), this.row.icon('preferences-desktop-accessibility-symbolic'), () => this.accessibility.entries());
-    this.row.button('kestrel-greeter-power', t('greeter-power'), this.row.icon('system-shutdown-symbolic'), () => this.power.entries());
+    this.powerButton = this.row.button('kestrel-greeter-power', t('greeter-power'), this.row.icon('system-shutdown-symbolic'), () => this.power.entries());
     void this.power.load();
+    this.power.holdPowerKey().catch(error => console.warn(`The system keeps the power button: ${error}`));
   }
 
   get actor(): St.BoxLayout {
     return this.row.actor;
+  }
+
+  openPowerMenu(): void {
+    this.row.openMenu(this.powerButton, this.power.entries());
   }
 
   showSession(session: Session | null): void {
@@ -45,6 +51,7 @@ export class GreeterControls {
   }
 
   shutdown(): void {
+    this.power.releasePowerKey();
     this.inputSource.shutdown();
     this.accessibility.shutdown();
   }

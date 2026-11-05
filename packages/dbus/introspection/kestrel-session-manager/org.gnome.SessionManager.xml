@@ -43,6 +43,8 @@
     </method>
     <method name="Reboot">
     </method>
+    <method name="ShowPowerOptions">
+    </method>
     <method name="Suspend">
     </method>
     <method name="CanShutdown">

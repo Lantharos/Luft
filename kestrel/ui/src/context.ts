@@ -52,7 +52,7 @@ export interface Context {
   messageTray: MessageTray;
   quickSettings: QuickSettingsSource;
   sessionMode: { isLocked: boolean; hasWindows: boolean; connect(signal: string, callback: () => void): number; disconnect(id: number): void };
-  screenShield: { active: boolean; connect(signal: string, callback: () => void): number; disconnect(id: number): void } | null;
+  screenShield: { active: boolean; openPowerMenu(): void; connect(signal: string, callback: () => void): number; disconnect(id: number): void } | null;
   canInteract(): boolean;
   snapWindow(window: Meta.Window, rect: Mtk.Rectangle): void;
   morphWindow(window: Meta.Window): void;

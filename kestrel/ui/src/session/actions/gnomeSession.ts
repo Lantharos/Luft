@@ -47,6 +47,7 @@ interface SessionManagerRemote {
   LogoutAsync(mode: number): Promise<[]>;
   ShutdownAsync(mode: number): Promise<[]>;
   RebootAsync(): Promise<[]>;
+  ShowPowerOptionsAsync(): Promise<[]>;
   SuspendAsync(): Promise<[]>;
   IsInhibitedAsync(flags: number): Promise<[boolean]>;
   connectSignal(name: 'InhibitorAdded' | 'InhibitorRemoved', callback: (proxy: Gio.DBusProxy, sender: string, args: [string]) => void): number;

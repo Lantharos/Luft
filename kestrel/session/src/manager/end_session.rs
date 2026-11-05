@@ -13,6 +13,7 @@ use crate::system::{self, Power};
 
 const FAREWELL: Duration = Duration::from_millis(250);
 const CONFIRM_SECONDS: u32 = 60;
+const POWER_OPTIONS_DIALOG: u32 = 4;
 
 #[derive(Clone, Copy)]
 pub enum Action {
@@ -30,6 +31,13 @@ impl Action {
         }
     }
 
+    fn prompt(self) -> Prompt {
+        Prompt {
+            dialog_type: self.dialog_type(),
+            seconds: CONFIRM_SECONDS,
+        }
+    }
+
     fn confirmed_by(signal: &str) -> Option<Self> {
         match signal {
             "ConfirmedLogout" => Some(Self::Logout),
@@ -39,6 +47,17 @@ impl Action {
         }
     }
 }
+
+#[derive(Clone, Copy)]
+struct Prompt {
+    dialog_type: u32,
+    seconds: u32,
+}
+
+const POWER_OPTIONS: Prompt = Prompt {
+    dialog_type: POWER_OPTIONS_DIALOG,
+    seconds: 0,
+};
 
 #[introspect]
 #[proxy(
@@ -70,7 +89,7 @@ impl Confirmation {
 
 async fn confirmed(
     connection: &Connection,
-    action: Action,
+    prompt: Prompt,
     inhibitors: &[OwnedObjectPath],
 ) -> zbus::Result<Option<Action>> {
     let dialog = DialogProxy::builder(connection)
@@ -79,7 +98,7 @@ async fn confirmed(
         .await?;
     let mut answers = dialog.inner().receive_all_signals().await?;
     dialog
-        .open(action.dialog_type(), 0, CONFIRM_SECONDS, inhibitors)
+        .open(prompt.dialog_type, 0, prompt.seconds, inhibitors)
         .await?;
     while let Some(answer) = answers.next().await {
         let header = answer.header();
@@ -96,9 +115,18 @@ async fn confirmed(
 impl Session {
     /// Asks you in Kestrel before ending the session, listing what holds it up.
     pub fn confirm(self: &Arc<Self>, action: Action, inhibitors: Vec<OwnedObjectPath>) {
+        self.ask(action.prompt(), inhibitors);
+    }
+
+    /// Lets you pick how to end the session, with nothing chosen for you.
+    pub fn offer_power_options(self: &Arc<Self>, inhibitors: Vec<OwnedObjectPath>) {
+        self.ask(POWER_OPTIONS, inhibitors);
+    }
+
+    fn ask(self: &Arc<Self>, prompt: Prompt, inhibitors: Vec<OwnedObjectPath>) {
         let session = Arc::clone(self);
         let waiting = tokio::spawn(async move {
-            match confirmed(&session.connection, action, &inhibitors).await {
+            match confirmed(&session.connection, prompt, &inhibitors).await {
                 Ok(Some(action)) => {
                     drop(tokio::spawn(
                         async move { session.finish(action, true).await },

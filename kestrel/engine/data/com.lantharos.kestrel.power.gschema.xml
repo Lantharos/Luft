@@ -43,7 +43,7 @@
       <summary>Seconds without use before acting on battery</summary>
     </key>
     <key name="power-button-action" enum="com.lantharos.kestrel.PowerButtonAction">
-      <default>'suspend'</default>
+      <default>'interactive'</default>
       <summary>What the power button does</summary>
     </key>
     <key name="power-saver-profile-on-low-battery" type="b">

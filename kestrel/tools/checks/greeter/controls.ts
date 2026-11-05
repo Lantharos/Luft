@@ -1,10 +1,12 @@
+import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import Pango from 'gi://Pango';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import {existing, named, ofType, shown} from '../lib/actors.js';
-import {click} from '../lib/input/input.js';
+
+import {click, press} from '../lib/input/input.js';
 import {capture} from '../lib/screenshots.js';
 import {eventually, events, require} from './lib/prompt.js';
 
@@ -56,6 +58,15 @@ export async function checkControls() {
   await choose('kestrel-greeter-accessibility', 'Larger text');
   await eventually(() => settings.get_double('text-scaling-factor') === 1, 'and off again');
   await eventually(() => !shown(menu), 'the accessibility menu closes again');
+
+  await eventually(() => happened('inhibit', 'handle-power-key block'), 'the login screen takes over the power button');
+  press(Clutter.KEY_PowerOff);
+  await eventually(() => shown(menu) && ['Suspend', 'Restart', 'Power off'].every(item => named(item, menu)),
+    'the power button opens the power menu');
+  await capture('login-power-button');
+  press(Clutter.KEY_Escape);
+  await eventually(() => !shown(menu), 'Escape closes the power button’s menu');
+  require(!events().some(event => event.type === 'power'), 'the power button’s menu ends nothing by itself');
 
   click(existing('kestrel-greeter-power'));
   await eventually(() => shown(menu) && ['Suspend', 'Restart', 'Power off'].every(item => named(item, menu)),

@@ -23,11 +23,13 @@ export class ControlRow {
       name, style_class: 'kestrel-status-button kestrel-login-control', child,
       accessible_name: label, can_focus: true, track_hover: true,
     });
-    button.connect('clicked', () => {
-      const [x, y] = button.get_transformed_position();
-      this.menus.open(button, entries(), Math.round(x + button.width / 2), Math.round(y));
-    });
+    button.connect('clicked', () => this.openMenu(button, entries()));
     this.actor.add_child(button);
     return button;
+  }
+
+  openMenu(button: St.Button, entries: MenuEntry[]): void {
+    const [x, y] = button.get_transformed_position();
+    this.menus.open(button, entries, Math.round(x + button.width / 2), Math.round(y));
   }
 }

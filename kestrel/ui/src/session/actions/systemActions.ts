@@ -20,6 +20,7 @@ interface SessionManagerProxy {
   LogoutAsync(mode: number): Promise<[]>;
   ShutdownAsync(mode: number): Promise<[]>;
   RebootAsync(): Promise<[]>;
+  ShowPowerOptionsAsync(): Promise<[]>;
   SuspendAsync(): Promise<[]>;
 }
 
@@ -77,7 +78,7 @@ const SystemActions = GObject.registerClass({
       void this.updateHaveReboot();
     });
 
-    Gio.bus_watch_name(Gio.BusType.SESSION, SESSION_MANAGER, Gio.BusNameWatcherFlags.NONE, () => this.refresh(), null);
+    Gio.bus_watch_name(Gio.BusType.SESSION, SESSION_MANAGER, Gio.BusNameWatcherFlags.NONE, () => void this.refresh(), null);
 
     Main.sessionMode.connect('updated', () => this.sessionUpdated());
     this.sessionUpdated();
@@ -103,10 +104,8 @@ const SystemActions = GObject.registerClass({
     return this.actions.get('logout')!;
   }
 
-  refresh(): void {
-    void this.updateHaveShutdown();
-    void this.updateHaveReboot();
-    void this.updateHaveSuspend();
+  async refresh(): Promise<void> {
+    await Promise.all([this.updateHaveShutdown(), this.updateHaveReboot(), this.updateHaveSuspend()]);
   }
 
   private sessionUpdated(): void {
@@ -198,6 +197,10 @@ const SystemActions = GObject.registerClass({
   activateRestart(): void {
     this.require('restart');
     this.session.RebootAsync().catch(logErrorUnlessCancelled);
+  }
+
+  showPowerOptions(): void {
+    this.session.ShowPowerOptionsAsync().catch(logErrorUnlessCancelled);
   }
 
   activateSuspend(): void {

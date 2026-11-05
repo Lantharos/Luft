@@ -126,8 +126,8 @@ class LoginManager extends EventEmitter {
     }
   }
 
-  async inhibit(reason: string, cancellable: Gio.Cancellable): Promise<GioUnix.InputStream> {
-    const inVariant = new GLib.Variant('(ssss)', ['sleep', 'Kestrel', reason, 'delay']);
+  async inhibit(what: string, reason: string, mode: 'delay' | 'block', cancellable: Gio.Cancellable | null = null): Promise<GioUnix.InputStream> {
+    const inVariant = new GLib.Variant('(ssss)', [what, 'Kestrel', reason, mode]);
     const [, fdList] = await this.proxy.call_with_unix_fd_list('Inhibit', inVariant, 0, -1, null, cancellable);
     const [fd] = fdList!.steal_fds();
     return new GioUnix.InputStream({ fd });

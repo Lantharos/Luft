@@ -153,3 +153,6 @@ end-session-console-user = { $userName } (konsool)
 ## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
 
 ctrl-alt-tab-unlock = Lukust avamine
+end-session-power-options-title = Mida peaks see arvuti tegema?
+end-session-power-options-description = Sa vajutasid toitenuppu.
+end-session-suspend-button = Unerežiim

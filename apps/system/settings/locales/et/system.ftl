@@ -332,6 +332,6 @@ settings-accounts-copied = Kopeeritud
 settings-accounts-code = Kinnituskood
     .placeholder = 6-kohaline kood
 settings-accounts-text-me = Saada kood hoopis SMS-iga
-settings-accounts-choose-phone = Millisele numbrile peaks Apple koodi saatma?
+settings-accounts-choose-phone = Millisele numbrile peaks Apple'i koodi saatma?
     .description = Saada SMS
 settings-accounts-approve = Sinu Apple’i konto kasutab täpsemat andmekaitset. Kinnita taotlus oma iPhone’is, iPadis või Macis, et see arvuti saaks iCloud Drive’i avada.

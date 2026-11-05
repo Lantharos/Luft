@@ -18,3 +18,4 @@ second-line-artist = Esitaja
 second-line-album = Album
 unknown-artist = Tundmatu esitaja
 progress = { $position } kestusest { $length }
+second-line = Pealkirja all

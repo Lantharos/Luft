@@ -43,6 +43,7 @@ struct ListedSetting {
     description: String,
     value: OwnedVariant,
     depends: Option<String>,
+    hidden: Option<bool>,
     when: Option<Vec<OwnedVariant>>,
     #[zbus(rename = "when-min")]
     when_min: Option<f64>,
@@ -100,6 +101,7 @@ pub struct ExtensionSetting {
     description: String,
     value: ExtensionSettingValue,
     depends: Option<String>,
+    hidden: bool,
     when: Vec<ExtensionSettingValue>,
     when_min: Option<f64>,
     when_max: Option<f64>,
@@ -156,6 +158,7 @@ fn setting(listed: ListedSetting) -> Option<ExtensionSetting> {
         label: listed.label,
         description: listed.description,
         depends: listed.depends,
+        hidden: listed.hidden.unwrap_or_default(),
         when: listed
             .when
             .unwrap_or_default()

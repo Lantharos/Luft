@@ -62,6 +62,7 @@ Each `[[settings]]` table is one setting. Settings draws it with Luft's own cont
 | `default` | The value until someone changes it |
 | `depends` | A setting declared earlier; this one only shows while that one shows, and while it's on if it's a switch |
 | `when` | What `depends` has to be for the setting to show, instead of on: a list of values, or part of a slider's range |
+| `hidden` | `true` never shows the setting. The extension sets it with `settings.set`, and others can `depends` on it, such as a `choices` setting of what it found on the computer |
 | `page` | Another page of Settings the setting also shows on, under the extension's name: `appearance` (needs `wallpaper`), `taskbar` (needs `taskbar`), `sound` (needs `sounds` or `audio-levels`) or `input` (needs `typing` or `input-sounds`) |
 
 | Type | Value | Extra fields | Shows as |

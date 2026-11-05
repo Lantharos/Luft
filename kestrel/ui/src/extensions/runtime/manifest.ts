@@ -116,7 +116,7 @@ function setting(entry: unknown, index: number, permissions: readonly Permission
   const source = table(entry, where);
   const base = {
     key: text(source, 'key', where, KEY), label: text(source, 'label', where, MESSAGE), depends: optionalText(source, 'depends', where),
-    when: condition(source, where), page: page(source, where, permissions),
+    when: condition(source, where), page: page(source, where, permissions), hidden: source.hidden === true,
   };
   const type = source.type;
   let described: SettingDescription;

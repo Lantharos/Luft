@@ -36,6 +36,7 @@ function described(setting: SettingDescription, instance: ExtensionInstance): Fi
   if (Array.isArray(setting.when)) fields.when = new GLib.Variant('av', setting.when.map(variant));
   else Object.assign(fields, range(setting.when as SliderRange | undefined));
   if (setting.page) fields.page = text(setting.page);
+  if (setting.hidden) fields.hidden = GLib.Variant.new_boolean(true);
   if (setting.type === 'choice' || setting.type === 'choices') fields.options = choices(setting.options, instance);
   if (setting.type === 'choices' && setting.min) fields.min = GLib.Variant.new_double(setting.min);
   if (setting.type === 'choice' && setting.options.every(option => option.image)) fields.images = pictures(setting.options, instance);

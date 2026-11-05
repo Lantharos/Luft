@@ -951,6 +951,7 @@ export type ExtensionSetting = {
 	description: string,
 	value: ExtensionSettingValue,
 	depends: string | null,
+	hidden: boolean,
 	when: ExtensionSettingValue[],
 	whenMin: number | null,
 	whenMax: number | null,

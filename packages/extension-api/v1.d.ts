@@ -1369,6 +1369,8 @@ interface SettingBase {
   when?: SettingCondition;
   /** Also shows the setting on this page of Settings, under the extension's name. */
   page?: SettingsPageId;
+  /** Never shows it: the extension keeps the value itself, such as what it found, for other settings to {@link depends} on. */
+  hidden?: boolean;
 }
 
 export interface SwitchSetting extends SettingBase {

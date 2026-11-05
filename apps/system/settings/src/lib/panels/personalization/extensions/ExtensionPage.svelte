@@ -11,7 +11,7 @@
 	let { extension, onclose }: { extension: Extension; onclose: () => void } = $props();
 
 	let removing = $state(false);
-	let visible = $derived(extension.settings.filter((setting) => shown(extension, setting)));
+	let visible = $derived(extension.settings.filter((setting) => !setting.hidden && shown(extension, setting)));
 </script>
 
 <SubPage title={extension.name} {onclose}>

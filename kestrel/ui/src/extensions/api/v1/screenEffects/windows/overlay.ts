@@ -6,10 +6,14 @@ import Mtk from 'gi://Mtk';
 
 import type { ApiContext } from '../../context.js';
 import type { EffectWindow, WindowOverlayOptions } from '../../types.js';
+import { cornerRadii } from '../../wallpaper/windows.js';
 import { Effect } from '../effect.js';
 import { compileError, outlineSnippet, pipelineContext, Uniforms } from '../shaders.js';
 import type { EffectsStage } from '../stage.js';
-import type { Attachment, WindowEffect } from './tracker.js';
+import { type Attachment, FrameInBuffer, type WindowEffect } from './tracker.js';
+
+// How far a rounded corner's arc comes in from both edges at once, at the largest radius a window has
+const ROUNDED_CORNER_DEPTH = 5;
 
 type Strip = [x: number, y: number, width: number, height: number];
 
@@ -19,7 +23,7 @@ const OverlayActor = GObject.registerClass(class ExtensionWindowOverlay extends 
   private strips: Strip[] = [];
   private margin = 0;
 
-  constructor(snippet: Cogl.Snippet) {
+  constructor(snippet: Cogl.Snippet, private readonly window: Meta.Window, private readonly frameInBuffer: FrameInBuffer) {
     super({ reactive: false });
     const context = pipelineContext();
     this.pipeline = Cogl.Pipeline.new(context);
@@ -41,7 +45,10 @@ const OverlayActor = GObject.registerClass(class ExtensionWindowOverlay extends 
     for (const [x, y, width, height] of this.strips) this.queue_redraw_with_clip(new Mtk.Rectangle({ x, y, width, height }));
   }
 
+  /** Mutter settles a window's corners as it paints it, with nothing to say they changed, so they're read at the same moment. */
   vfunc_paint_node(root: Clutter.PaintNode): void {
+    this.uniform('outline_radii', 4, cornerRadii(this.window));
+    this.frameInBuffer.check();
     const node = Clutter.PipelineNode.new(this.pipeline);
     root.add_child(node);
     for (const [x, y, width, height] of this.strips)
@@ -53,7 +60,7 @@ type Overlay = InstanceType<typeof OverlayActor>;
 
 function stripsFor(width: number, height: number, margin: number, inset: number | undefined): Strip[] {
   if (inset === undefined) return [[0, 0, width, height]];
-  const band = margin + inset;
+  const band = margin + inset + ROUNDED_CORNER_DEPTH;
   return [
     [0, 0, width, band],
     [0, height - band, width, band],
@@ -64,9 +71,11 @@ function stripsFor(width: number, height: number, margin: number, inset: number 
 
 class OverlaidWindow implements Attachment {
   private readonly overlay: Overlay;
+  private readonly frameInBuffer: FrameInBuffer;
 
   constructor(private readonly owner: WindowOverlay, private readonly window: Meta.Window, actor: Meta.WindowActor) {
-    this.overlay = new OverlayActor(owner.snippet);
+    this.frameInBuffer = new FrameInBuffer(window, () => this.place());
+    this.overlay = new OverlayActor(owner.snippet, window, this.frameInBuffer);
     owner.shared.forEach((name, components, values) => this.overlay.uniform(name, components, values));
     actor.add_child(this.overlay);
     this.place();
@@ -76,14 +85,11 @@ class OverlaidWindow implements Attachment {
     const { margin, inset } = this.owner.geometry;
     const frame = this.window.get_frame_rect();
     const buffer = this.window.get_buffer_rect();
-    const [rounded, radius] = this.window.get_rounded_corners();
-    const corner = (bit: number) => rounded & bit ? radius : 0;
     const width = frame.width + margin * 2;
     const height = frame.height + margin * 2;
     this.overlay.set_position(frame.x - buffer.x - margin, frame.y - buffer.y - margin);
     this.overlay.set_size(width, height);
     this.overlay.uniform('outline_size', 2, [frame.width, frame.height]);
-    this.overlay.uniform('outline_radii', 4, [corner(1), corner(2), corner(4), corner(8)]);
     this.overlay.uniform('outline_margin', 1, [margin]);
     this.overlay.uniform('outline_scale', 1, [global.display.get_monitor_scale(this.window.get_monitor())]);
     this.overlay.shape(stripsFor(width, height, margin, inset), margin);
@@ -95,6 +101,7 @@ class OverlaidWindow implements Attachment {
   }
 
   detach(): void {
+    this.frameInBuffer.destroy();
     this.overlay.destroy();
     this.owner.left(this);
   }

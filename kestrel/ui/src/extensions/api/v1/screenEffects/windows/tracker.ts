@@ -1,4 +1,5 @@
 import type Clutter from 'gi://Clutter';
+import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 
@@ -40,6 +41,40 @@ const holdsSurfaces = (actor: Clutter.Actor) => (actor.constructor as typeof Clu
 
 /** The actor holding a window's surfaces, which is what has its pixels, under its shadow. */
 export const surfacesOf = (actor: Meta.WindowActor): Clutter.Actor | null => actor.get_children().find(holdsSurfaces) ?? null;
+
+/**
+ * Notices when a window's frame moved inside its buffer. An app's shadow can grow or shrink around a frame that stays the
+ * same, which nothing announces, but it always takes a repaint, so what's drawn on the window asks as it paints.
+ */
+export class FrameInBuffer {
+  private known = '';
+  private later = 0;
+
+  constructor(private readonly window: Meta.Window, private readonly moved: () => void) {
+    this.known = this.place();
+  }
+
+  private place(): string {
+    const frame = this.window.get_frame_rect();
+    const buffer = this.window.get_buffer_rect();
+    return `${frame.x - buffer.x} ${frame.y - buffer.y} ${buffer.width} ${buffer.height}`;
+  }
+
+  check(): void {
+    const place = this.place();
+    if (place === this.known || this.later) return;
+    this.known = place;
+    this.later = global.compositor.get_laters().add(Meta.LaterType.BEFORE_REDRAW, () => {
+      this.later = 0;
+      this.moved();
+      return GLib.SOURCE_REMOVE;
+    });
+  }
+
+  destroy(): void {
+    if (this.later) global.compositor.get_laters().remove(this.later);
+  }
+}
 
 class TrackedWindow {
   private readonly attachments = new Map<WindowEffect, Attachment>();

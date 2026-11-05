@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Thu, 5 Nov 2026 12:47:06 +0100
-Subject: [PATCH 64/65] backends: let the shell draw the pointer into the
+Subject: [PATCH 64/66] backends: let the shell draw the pointer into the
  picture
 
 A filter that bends the picture has to bend the pointer with it, or the

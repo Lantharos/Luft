@@ -8,7 +8,7 @@ import type { EffectWindow, WindowShaderOptions } from '../../types.js';
 import { Effect } from '../effect.js';
 import { compileError, Uniforms, windowSnippet } from '../shaders.js';
 import type { EffectsStage } from '../stage.js';
-import { type Attachment, surfacesOf, type WindowEffect } from './tracker.js';
+import { type Attachment, FrameInBuffer, surfacesOf, type WindowEffect } from './tracker.js';
 
 const NAME = 'extension-window-shader';
 let serial = 0;
@@ -17,14 +17,17 @@ let serial = 0;
 export const WindowPixels = GObject.registerClass(class ExtensionWindowPixels extends Clutter.OffscreenEffect {
   private snippet!: Cogl.Snippet;
   private uniforms!: Uniforms;
+  private painting: (() => void) | null = null;
   private pipeline: Cogl.Pipeline | null = null;
 
-  shade(snippet: Cogl.Snippet, uniforms: Uniforms): void {
+  shade(snippet: Cogl.Snippet, uniforms: Uniforms, painting: (() => void) | null = null): void {
     this.snippet = snippet;
     this.uniforms = uniforms;
+    this.painting = painting;
   }
 
   vfunc_paint_target(node: Clutter.PaintNode, paintContext: Clutter.PaintContext): void {
+    this.painting?.();
     const pipeline = this.get_pipeline()!;
     if (pipeline !== this.pipeline) {
       pipeline.add_snippet(this.snippet);
@@ -57,9 +60,11 @@ class ShadedWindow implements Attachment {
   private readonly uniforms = new Uniforms();
   private surfaces: Clutter.Actor | null = null;
   private readonly surfaceSignals: number[];
+  private readonly frameInBuffer: FrameInBuffer;
 
   constructor(private readonly owner: WindowShader, private readonly window: Meta.Window, private readonly actor: Meta.WindowActor) {
-    this.effect.shade(owner.snippet, this.uniforms);
+    this.frameInBuffer = new FrameInBuffer(window, () => this.place());
+    this.effect.shade(owner.snippet, this.uniforms, () => this.frameInBuffer.check());
     owner.shared.forEach((name, components, values) => this.uniforms.set(name, components, values));
     frameUniforms(this.uniforms, window);
     this.surfaceSignals = (['child-added', 'child-removed'] as const).map(signal => actor.connect(signal, () => this.follow()));
@@ -87,6 +92,7 @@ class ShadedWindow implements Attachment {
   }
 
   detach(): void {
+    this.frameInBuffer.destroy();
     for (const signal of this.surfaceSignals) this.actor.disconnect(signal);
     this.surfaces?.remove_effect(this.effect);
     this.owner.left(this);

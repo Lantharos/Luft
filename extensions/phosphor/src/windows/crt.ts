@@ -25,7 +25,7 @@ if (window_inside(window_uv) > 0.5) {
   color *= 1.0 - line * 0.32 * crt_strength;
   float column = mod(floor(bent.x * window_size.x), 3.0);
   vec3 mask = vec3(column < 0.5 ? 1.0 : 0.82, abs(column - 1.0) < 0.5 ? 1.0 : 0.82, column > 1.5 ? 1.0 : 0.82);
-  window_color = vec4(mix(color, color * mask, crt_strength), middle.a) * inside_screen;
+  window_color = vec4(min(mix(color, color * mask, crt_strength), vec3(middle.a)), middle.a) * inside_screen;
 }`;
 
 export function tuneWindowCrt({ settings }: Extension<Granted>, crt: WindowEffectHandle): void {

@@ -13,11 +13,16 @@ function onScreen(window: Meta.Window, workspace: Meta.Workspace): boolean {
   return isSurface(window, workspace) && !!actor?.visible && actor.opacity > 0;
 }
 
-export function outline(window: Meta.Window): Outline {
-  const { x, y, width, height } = window.get_frame_rect();
+/** The radius of each of a window's corners as they show right now: top left, top right, bottom right, bottom left. */
+export function cornerRadii(window: Meta.Window): [number, number, number, number] {
   const [rounded, radius] = window.get_rounded_corners();
   const corner = (bit: number) => rounded & bit ? radius : 0;
-  return { x, y, width, height, radii: [corner(1), corner(2), corner(4), corner(8)] };
+  return [corner(1), corner(2), corner(4), corner(8)];
+}
+
+export function outline(window: Meta.Window): Outline {
+  const { x, y, width, height } = window.get_frame_rect();
+  return { x, y, width, height, radii: cornerRadii(window) };
 }
 
 export function stackedWindows(): Outline[] {

@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Tue, 3 Nov 2026 20:45:09 +0100
-Subject: [PATCH 62/65] window: tell the shell which corners are rounded
+Subject: [PATCH 62/66] window: tell the shell which corners are rounded
 
 Expose meta_window_get_rounded_corners(), which returns the corners the
 compositor rounds for a window and their radius, so the shell can follow

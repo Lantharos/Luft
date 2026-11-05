@@ -63,3 +63,4 @@
 0063-cogl-tell-callers-why-a-shader-failed.patch
 0064-backends-let-the-shell-draw-the-pointer-into-the-pic.patch
 0065-clutter-let-a-stage-view-filter-what-it-shows.patch
+0066-x11-tell-floating-windows-they-are-tiled-while-corne.patch

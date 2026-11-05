@@ -9,9 +9,11 @@ import {capture, captureFrame} from '../lib/screenshots.js';
 import {pause, settled} from '../lib/wait.js';
 import {listed, request} from '../extensions/lib/extensions.js';
 import {act, attachedEffects, choose, installProbes, nothingAttached, pageItems, PHOSPHOR, SHADERS, shadersRun} from './phosphor/effects.js';
+import {checkCorners} from './phosphor/corners.js';
 import {installStripedApp, STRIPED_DESKTOP_ID} from './phosphor/windows.js';
 
-const {require, eventually} = checks('phosphor looks');
+const looks = checks('phosphor looks');
+const {require, eventually} = looks;
 const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 const OFF_NOTICE = 'was turned off';
 const TRANSITIONS = ['glitch', 'fold', 'dissolve', 'burn', 'crt'];
@@ -120,10 +122,12 @@ export async function run() {
     await checkEveryLook();
     await checkTransitions();
     await checkRules(striped);
+    await stopAll();
+    await checkCorners(looks);
   } finally {
     await request('Remove', SHADERS);
     await request('Remove', PHOSPHOR);
     await stopAll();
-    for (const key of ['extension-settings', 'disabled-extensions']) kestrel.reset(key);
+    for (const key of ['extension-settings', 'disabled-extensions', 'rounded-window-corners']) kestrel.reset(key);
   }
 }

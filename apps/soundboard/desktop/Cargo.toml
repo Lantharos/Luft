@@ -1,0 +1,39 @@
+[package]
+name = "soundboard"
+version = "0.1.0"
+description = "A soundboard that plays into games and calls through a virtual microphone"
+authors = ["Kristof"]
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[lib]
+name = "soundboard_lib"
+
+[dependencies]
+dirs.workspace = true
+getrandom.workspace = true
+gstreamer.workspace = true
+gstreamer-app.workspace = true
+luft-app = { workspace = true, features = ["settings"] }
+luft-i18n.workspace = true
+memmap2.workspace = true
+parking_lot.workspace = true
+pipewire = { workspace = true, features = ["v0_3_49"] }
+pulseaudio.workspace = true
+rtrb.workspace = true
+rustix = { workspace = true, features = ["event"] }
+sabine.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+specta.workspace = true
+tokio = { workspace = true, features = ["rt", "sync", "time"] }
+zbus = { workspace = true, features = ["proxy", "tokio"] }
+zip.workspace = true
+
+[dev-dependencies]
+libc.workspace = true
+tempfile.workspace = true
+
+[lints]
+workspace = true

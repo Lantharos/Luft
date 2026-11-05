@@ -38,6 +38,8 @@ Luft is translated into Albanian, Bosnian, Bulgarian, Catalan, Croatian, Czech, 
 | setup-installer | `apps/setup/installer/locales/*/installer.ftl` | the installer service's errors and progress |
 | meet | `apps/meet/locales/*/meet.ftl` | Meet Luft, the Windows and Linux app that gets a computer ready for Luft |
 | meet-desktop | `apps/meet/desktop/locales/*/desktop.ftl` | Meet Luft's checks, errors and file dialogs from its native side |
+| soundboard | `apps/soundboard/locales/*/soundboard.ftl` | Soundboard's boards, tiles, sound editor and levels |
+| soundboard-desktop | `apps/soundboard/desktop/locales/*/desktop.ftl` | Soundboard's tray menu and its stop-all shortcut |
 | site | `web/site/locales/*/site.ftl` | the website's header, footer, language list and missing-page page |
 | site-home | `web/site/locales/*/home.ftl` | the website's home page |
 | site-download | `web/site/locales/*/download.ftl` | the website's download page |

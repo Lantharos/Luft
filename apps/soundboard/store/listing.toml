@@ -1,0 +1,7 @@
+summary = "Play sounds into games and calls, with your voice still coming through"
+description = "Gives your computer a second microphone called Soundboard that carries your voice and your sounds together. Pick it in a game or a call, then play sounds from a grid of tiles or with hotkeys that work while the game has focus."
+screenshots = ["light.webp", "dark.webp"]
+categories = ["AudioVideo", "Utility"]
+homepage = "https://luft.computer"
+support = "https://github.com/Lantharos/Luft/issues"
+brand_color = "#3d3a52"

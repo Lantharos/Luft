@@ -366,7 +366,7 @@ jobs:
       platforms: ${{ matrix.app.platforms }}
       version: ${{ matrix.app.version }}
       artifact: app-${{ matrix.app.name }}
-      linux_packages: libglib2.0-dev libseccomp-dev
+      linux_packages: libglib2.0-dev libseccomp-dev libclang-dev libpipewire-0.3-dev libspa-0.2-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
       # Building the MSI package accepts the WiX 7 licence: https://docs.firegiant.com/wix/osmf/
       accept_wix_eula: true
     secrets: inherit

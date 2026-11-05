@@ -6876,6 +6876,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "rtrb"
+version = "0.3.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "342e1478a6e1c839e7405033eabfdc954d4d5dabd39f34e83420a43a95acfb04"
+
+[[package]]
 name = "rtree_rs"
 version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7793,6 +7799,33 @@ name = "solana-nohash-hasher"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8b8a731ed60e89177c8a7ab05fe0f1511cedd3e70e773f288f9de33a9cfdc21e"
+
+[[package]]
+name = "soundboard"
+version = "0.1.0"
+dependencies = [
+ "dirs",
+ "getrandom 0.4.3",
+ "gstreamer",
+ "gstreamer-app",
+ "libc",
+ "luft-app",
+ "luft-i18n",
+ "memmap2",
+ "parking_lot 0.13.0",
+ "pipewire",
+ "pulseaudio",
+ "rtrb",
+ "rustix",
+ "sabine",
+ "serde",
+ "serde_json",
+ "specta",
+ "tempfile",
+ "tokio",
+ "zbus 6.0.0",
+ "zip",
+]
 
 [[package]]
 name = "specta"

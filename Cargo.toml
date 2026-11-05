@@ -16,6 +16,7 @@ members = [
     "apps/setup/desktop",
     "apps/setup/installer",
     "apps/signin/desktop",
+    "apps/soundboard/desktop",
     "apps/tern/desktop",
     "sushi/crates/sushi",
     "sushi/crates/sushi-scene",
@@ -82,6 +83,7 @@ default-members = [
     "apps/setup/desktop",
     "apps/setup/installer",
     "apps/signin/desktop",
+    "apps/soundboard/desktop",
     "apps/tern/desktop",
     "sushi/crates/sushi",
     "sushi/crates/sushi-scene",
@@ -250,6 +252,7 @@ raw-window-handle = "0.6.2"
 rayon = "1.12.0"
 regex = "1.13.1"
 regf-rs = "0.1.1"
+rtrb = "0.3.4"
 resvg = "0.48.1"
 rfd = "0.17.2"
 roxmltree = "0.21.1"

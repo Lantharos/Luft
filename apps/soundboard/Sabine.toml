@@ -1,0 +1,30 @@
+[app]
+id = "com.lantharos.soundboard"
+name = "Soundboard"
+generic_name = "Soundboard"
+categories = ["AudioVideo", "Audio", "Mixer"]
+keywords = ["soundboard", "sound board", "sound effects", "sfx", "sounds", "meme sounds", "virtual microphone", "virtual mic", "voicemod", "soundux", "discord", "hotkeys", "push to play"]
+version = "0.1.0"
+maintainer = "Lantharos <kristof@lanth.me>"
+icon = "public/favicon.svg"
+cargo_manifest = "desktop/Cargo.toml"
+
+[install]
+command = "cargo run --manifest-path desktop/Cargo.toml --"
+
+[web]
+root = "."
+dist = "dist"
+entry = "dist/index.html"
+build = "bun run build"
+local_files = true
+
+[updates]
+provider = "schelf"
+
+[sandbox]
+network = false
+filesystems = ["home:ro"]
+
+[bindings]
+path = "src/lib/bindings.ts"

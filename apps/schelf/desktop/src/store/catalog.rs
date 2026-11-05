@@ -8,6 +8,7 @@ use serde::{Deserialize, Serialize};
 use specta::Type;
 
 use super::device;
+use super::listing::channel;
 use super::signed::{self, Age};
 
 const STORE: &str = "index/v1/catalog.json";
@@ -66,8 +67,10 @@ pub struct Entry {
 }
 
 impl Entry {
-    /// Whether it has a stable release this computer installs, or a file
-    /// for it to download. An app only for other systems isn't shown.
+    /// Whether it has a stable release this computer installs, a file for it
+    /// to download, or may be out only on the preview channel it follows,
+    /// which the catalog doesn't list. An app only for other systems isn't
+    /// shown.
     fn runs_here(&self) -> bool {
         let any_system = self.kind == Kind::App && self.platforms.contains_key(device::ANY_SYSTEM);
         self.origin != Origin::Schelf
@@ -75,6 +78,7 @@ impl Entry {
             || device::platforms(self.kind)
                 .iter()
                 .any(|name| self.platforms.contains_key(*name))
+            || (self.platforms.is_empty() && channel::follows_preview(&self.id))
     }
 
     fn in_category(&self, category: &str) -> bool {

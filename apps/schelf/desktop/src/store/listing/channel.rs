@@ -98,6 +98,11 @@ pub fn following(id: &str) -> Following {
     Following::decide(id, chosen().remove(&id.to_lowercase()), system)
 }
 
+/// Whether one of Luft's own items follows a channel other than stable.
+pub fn follows_preview(id: &str) -> bool {
+    is_own(id) && following(id).channel != STABLE
+}
+
 /// Stable is the default of other people's apps, so only choosing it for
 /// Luft's own needs remembering.
 pub(super) fn remember(channels: &mut BTreeMap<String, String>, id: &str, channel: &str) {

@@ -1,0 +1,5 @@
+id = "com.example.Shaders"
+name = "Shaders"
+version = "1.0.0"
+api = 1
+permissions = ["screen-effects"]

@@ -1,0 +1,314 @@
+id = "com.lantharos.Phosphor"
+name = "Phosphor"
+description = "Rice the whole desktop: borders, glow, CRT and open and close effects on windows, filters and bloom over the screen, and lines across the taskbar and Luft's apps."
+version = "1.0.0"
+api = 1
+permissions = ["screen-effects"]
+
+[[settings]]
+key = "border"
+type = "choice"
+label = "border"
+default = "off"
+options = [
+  { value = "off", label = "off" },
+  { value = "color", label = "border-color-style" },
+  { value = "gradient", label = "border-gradient" },
+  { value = "glow", label = "border-glow" },
+]
+
+[[settings]]
+key = "border-color"
+depends = "border"
+when = ["color", "gradient", "glow"]
+type = "color"
+label = "border-first-color"
+default = "accent"
+swatches = [
+  { value = "accent", label = "accent" },
+  { value = "#8bf58a", label = "phosphor-green" },
+  { value = "#ffb347", label = "amber" },
+  { value = "#ff5fa2", label = "neon-pink" },
+]
+
+[[settings]]
+key = "border-second-color"
+depends = "border"
+when = ["gradient"]
+type = "color"
+label = "border-second-color"
+default = "#5fd4ff"
+swatches = [
+  { value = "accent", label = "accent" },
+  { value = "#5fd4ff", label = "ice" },
+  { value = "#ff5fa2", label = "neon-pink" },
+]
+
+[[settings]]
+key = "border-width"
+depends = "border"
+when = ["color", "gradient", "glow"]
+type = "slider"
+label = "border-width"
+default = 2
+min = 1
+max = 8
+step = 1
+
+[[settings]]
+key = "border-motion"
+depends = "border"
+when = ["color", "gradient", "glow"]
+type = "choice"
+label = "border-motion"
+default = "still"
+options = [
+  { value = "still", label = "still" },
+  { value = "flow", label = "flow" },
+  { value = "pulse", label = "pulse" },
+]
+
+[[settings]]
+key = "border-focused"
+depends = "border"
+when = ["color", "gradient", "glow"]
+type = "switch"
+label = "border-focused"
+default = false
+
+[[settings]]
+key = "overlay"
+type = "choice"
+label = "overlay"
+default = "off"
+options = [
+  { value = "off", label = "off" },
+  { value = "scanlines", label = "scanlines" },
+  { value = "tint", label = "tint" },
+  { value = "grain", label = "grain" },
+  { value = "vignette", label = "vignette" },
+  { value = "bezel", label = "crt-border" },
+]
+
+[[settings]]
+key = "overlay-strength"
+depends = "overlay"
+when = ["scanlines", "tint", "grain", "vignette", "bezel"]
+type = "slider"
+label = "strength"
+default = 0.4
+min = 0.05
+max = 1
+step = 0.05
+unit = "percent"
+
+[[settings]]
+key = "window-crt"
+type = "slider"
+label = "window-crt"
+default = 0.5
+min = 0.1
+max = 1
+step = 0.05
+unit = "percent"
+
+[[settings]]
+key = "open-effect"
+type = "choice"
+label = "open-effect"
+default = "off"
+options = [
+  { value = "off", label = "normal" },
+  { value = "glitch", label = "glitch" },
+  { value = "fold", label = "fold" },
+  { value = "dissolve", label = "dissolve" },
+  { value = "burn", label = "burn" },
+  { value = "crt", label = "crt-power" },
+]
+
+[[settings]]
+key = "close-effect"
+type = "choice"
+label = "close-effect"
+default = "off"
+options = [
+  { value = "off", label = "normal" },
+  { value = "glitch", label = "glitch" },
+  { value = "fold", label = "fold" },
+  { value = "dissolve", label = "dissolve" },
+  { value = "burn", label = "burn" },
+  { value = "crt", label = "crt-power" },
+]
+
+[[settings]]
+key = "windows-fullscreen"
+type = "switch"
+label = "windows-fullscreen"
+default = false
+
+[[settings]]
+key = "desktop-crt"
+type = "switch"
+label = "desktop-crt"
+default = false
+
+[[settings]]
+key = "crt-scanlines"
+depends = "desktop-crt"
+type = "slider"
+label = "crt-scanlines"
+default = 0.35
+min = 0
+max = 1
+step = 0.05
+unit = "percent"
+
+[[settings]]
+key = "crt-curvature"
+depends = "desktop-crt"
+type = "slider"
+label = "crt-curvature"
+default = 0
+min = 0
+max = 1
+step = 0.05
+unit = "percent"
+
+[[settings]]
+key = "crt-mask"
+depends = "desktop-crt"
+type = "slider"
+label = "crt-mask"
+default = 0.2
+min = 0
+max = 1
+step = 0.05
+unit = "percent"
+
+[[settings]]
+key = "crt-flicker"
+depends = "desktop-crt"
+type = "switch"
+label = "crt-flicker"
+default = false
+
+[[settings]]
+key = "invert"
+type = "choice"
+label = "invert"
+default = "off"
+options = [
+  { value = "off", label = "off" },
+  { value = "colors", label = "invert-colors" },
+  { value = "lightness", label = "invert-lightness" },
+]
+
+[[settings]]
+key = "grade"
+type = "choice"
+label = "grade"
+default = "off"
+options = [
+  { value = "off", label = "off" },
+  { value = "warm", label = "grade-warm" },
+  { value = "cold", label = "grade-cold" },
+  { value = "teal-orange", label = "grade-teal-orange" },
+  { value = "noir", label = "grade-noir" },
+  { value = "sepia", label = "grade-sepia" },
+  { value = "vivid", label = "grade-vivid" },
+]
+
+[[settings]]
+key = "grade-strength"
+depends = "grade"
+when = ["warm", "cold", "teal-orange", "noir", "sepia", "vivid"]
+type = "slider"
+label = "strength"
+default = 0.7
+min = 0.1
+max = 1
+step = 0.05
+unit = "percent"
+
+[[settings]]
+key = "shadow-boost"
+type = "slider"
+label = "shadow-boost"
+default = 0
+min = 0
+max = 1
+step = 0.05
+unit = "percent"
+
+[[settings]]
+key = "bloom"
+type = "slider"
+label = "bloom"
+default = 0
+min = 0
+max = 1
+step = 0.05
+unit = "percent"
+
+[[settings]]
+key = "filters-fullscreen"
+type = "switch"
+label = "filters-fullscreen"
+default = false
+
+[[settings]]
+key = "filters-captured"
+type = "switch"
+label = "filters-captured"
+default = false
+
+[[settings]]
+key = "surface-lines"
+type = "choice"
+label = "surface-lines"
+default = "off"
+options = [
+  { value = "off", label = "off" },
+  { value = "lines", label = "lines" },
+  { value = "scanlines", label = "scanlines" },
+  { value = "shimmer", label = "shimmer" },
+]
+
+[[settings]]
+key = "surface-places"
+depends = "surface-lines"
+when = ["lines", "scanlines", "shimmer"]
+type = "choices"
+label = "surface-places"
+default = ["taskbar", "quick-settings"]
+min = 1
+options = [
+  { value = "taskbar", label = "taskbar" },
+  { value = "quick-settings", label = "quick-settings" },
+  { value = "start", label = "start" },
+  { value = "notifications", label = "notifications" },
+]
+
+[[settings]]
+key = "surface-color"
+depends = "surface-lines"
+when = ["lines", "scanlines", "shimmer"]
+type = "color"
+label = "surface-color"
+default = "accent"
+swatches = [
+  { value = "accent", label = "accent" },
+  { value = "#8bf58a", label = "phosphor-green" },
+  { value = "#ffb347", label = "amber" },
+]
+
+[[settings]]
+key = "app-lines"
+type = "choice"
+label = "app-lines"
+default = "none"
+options = [
+  { value = "none", label = "off" },
+  { value = "lines", label = "lines" },
+  { value = "scanlines", label = "scanlines" },
+]

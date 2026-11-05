@@ -33,3 +33,7 @@ rect {
   rx: 0 !important;
   ry: 0 !important;
 }
+
+[class*='avatarDecoration'] {
+  display: none !important;
+}

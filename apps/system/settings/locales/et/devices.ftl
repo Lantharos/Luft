@@ -472,3 +472,6 @@ settings-mouse-touchpad-disable-typing = Keela tippimise ajal
 settings-mouse-touchpad-disable-typing-description = Et kursor tippimise ajal ei hüppaks
 settings-sound-connection-undetected = { $name } (mitte midagi ei õnnestunud tuvastada)
 settings-shortcuts-extensions = Lisamoodulid
+settings-sound-kind-feedback = Igapäevased helid
+settings-sound-custom = Sinu omad helid
+settings-sound-custom-description = Kasuta oma helifaile ükspuha mis helide jaoks

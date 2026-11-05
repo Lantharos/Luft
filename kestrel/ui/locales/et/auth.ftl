@@ -37,7 +37,7 @@ keyring-allow = Luba
 keyring-deny = Ära luba
 keyring-password = Salasõna
 keyring-mismatch = Sisestused ei ühti
-keyring-unlock = Ava
+keyring-unlock = Ava lukustus
 keyring-cancel = Loobu
 
 ## Passkey prompts. $site is a website's domain, $app the name of the app asking, $account a user name or email address

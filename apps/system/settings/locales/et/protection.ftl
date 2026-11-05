@@ -297,7 +297,7 @@ settings-passwords-contents =
     }
 settings-passwords-protected-chip = Kaitstud sinu salasõna ja turvakiibiga
 settings-passwords-protected = Kaitstud sinu salasõnaga
-settings-passwords-unlock = Ava
+settings-passwords-unlock = Ava lukustus
 settings-passwords-lock = Lukusta
 settings-passwords-seal-title = Pitseeri turvakiibiga
 settings-passwords-seal-description = Nende koopiaid ei saa teises arvutis avada

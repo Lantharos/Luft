@@ -352,7 +352,7 @@ mount-pim-invalid = PIM peab olema number või tühi
 mount-password = Salasõna
 mount-remember-password = Jäta salasõna meelde
 mount-cancel = Loobu
-mount-unlock = Ava
+mount-unlock = Ava lukustus
 mount-open-app = Ava { $appName }
 mount-wrong-password = Vabandust, see ei õnnestunud. Proovi uuesti.
 mount-unlock-failed = Köidet ei õnnestunud avada
@@ -422,3 +422,10 @@ extension-popup-close = Sulge
 extension-turned-off-title = { $name } on kasutuselt eemaldatud
 extension-turned-off-error = Ta lõpetas töötamise. Võid ta seadistustest uuesti sisse lülitada.
 extension-turned-off-crash = Töölaud käivitud töötamise ajal paar korda. Võid ta seadistustes uuesti sisse lülitada.
+extension-held-title = Kui { $name } piirab teavitusi
+extension-held-body =
+    { $count ->
+        [one] Üks tuli rakendusest { $apps }
+       *[other] { $count } tulid rakendusest { $apps }
+    }
+screen-effect-off-title = { $effect } on lülitatud välja

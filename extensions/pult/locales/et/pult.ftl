@@ -1,0 +1,15 @@
+account = Kasutajakonto
+sign-in = Logi sisse
+signed-out = Pole sisselogitud
+    .description = Logi sisse ja näed, mis on sinu postkastis ootel. Pult avab kinnitamiseks sinu veebibrauseris
+signed-in-as = { $name }
+    .description = { $email }
+sign-out = Logi välja
+page-closed = Kas sulgesid lehe?
+open-again = Ava ta uuesti
+cancel = Katkesta
+hide-empty = Peida, kui mitte midagi pole ootel
+open-pult = Ava Pult
+not-connected = Pult pole hetkel kättesaadav
+open = Ava
+search-title = Pult

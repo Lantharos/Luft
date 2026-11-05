@@ -606,7 +606,7 @@
         </langSet>
                 <langSet xml:lang="et">
           <tig>
-            <term>rõhuvärv</term>
+            <term>aktsentvärv</term>
             <note from="translator">Color taken from the wallpaper and used for highlights</note>
           </tig>
         </langSet>
@@ -1152,7 +1152,7 @@
         </langSet>
                 <langSet xml:lang="et">
           <tig>
-            <term>avama</term>
+            <term>ava lukustus</term>
             <note from="translator">verb, for a screen or disk; button Ava, lukust avama where Ava alone is unclear</note>
           </tig>
         </langSet>

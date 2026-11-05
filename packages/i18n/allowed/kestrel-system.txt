@@ -26,3 +26,8 @@ kestrel/ui/src/system/screenshot/service/screenshotService.ts	Saving to disk is 
 kestrel/ui/src/system/screenshot/service/screenshotService.ts	Screenshots are limited to the system. To see or use windows, run peek --help
 kestrel/ui/src/system/screenshot/service/screenshotService.ts	The area is empty or reaches past the screen
 kestrel/ui/src/system/screenshot/service/screenshotService.ts	Operation was cancelled
+kestrel/ui/src/extensions/runtime/manifest.ts	${key}'s when names no values
+kestrel/ui/src/extensions/runtime/manifest.ts	${key}'s when has ${JSON.stringify(wrong)}, which ${parent.key} can't be
+kestrel/ui/src/extensions/runtime/manifest.ts	${key}'s when is a range, which only works on a slider, and ${parent.key} isn't one
+kestrel/ui/src/extensions/runtime/manifest.ts	${key}'s when has neither min nor max
+kestrel/ui/src/extensions/runtime/manifest.ts	${key}'s when is outside what ${parent.key} can be

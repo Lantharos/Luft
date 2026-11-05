@@ -167,6 +167,13 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Extension permissions the store knows
+        run: bun .github/scripts/store/permissions.ts
+
       - uses: ./.github/actions/registry
 
       - name: Build container

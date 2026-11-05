@@ -22,11 +22,25 @@
 }
 
 foreignObject,
-rect[mask*='svg-mask-status'],
-[class*='avatarMasked'],
+rect[mask],
+image[mask],
+[class*='banner' i] [mask],
+[class*='avatar' i],
+[class*='masked' i],
 [class^='mask_'],
-[class*=' mask_'] {
+[class*=' mask_'],
+[class^='fill_'],
+[class*=' fill_'],
+[class*='iconImage'],
+[class*='iconPlaceholder'],
+[class*='partyMember'],
+[class*='largeImageMask'],
+[class^='viewer_'] {
   mask: none !important;
+}
+
+mask circle:not([fill='white' i], [fill='#fff' i], [fill='#ffffff' i]) {
+  r: 0 !important;
 }
 
 rect {

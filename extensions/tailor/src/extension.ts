@@ -31,7 +31,7 @@ const enable: Enable<'helper'> = extension => {
   const hear = (line: string) => {
     const report = JSON.parse(line) as Report;
     if ('found' in report) settings.set('found', report.found.filter(isApp));
-    else if (isApp(report.app) && states[report.app] !== report.state) states[report.app] = report.state;
+    else if (isApp(report.app)) states[report.app] = { state: report.state, detail: report.detail };
     else return;
     settingsPage.refresh();
   };

@@ -2,15 +2,21 @@ import type { Extension, PageItem, PageSection } from '@luft/extension-api';
 
 export const APPS = ['spotify', 'steam', 'vesktop'] as const;
 export type AppId = (typeof APPS)[number];
-export type States = Partial<Record<AppId, string>>;
-export type Report = { found: string[] } | { app: string; state: string };
+export type Status = { state: string; detail?: string };
+export type States = Partial<Record<AppId, Status>>;
+export type Report = { found: string[] } | ({ app: string } & Status);
 
-const RETRYABLE = ['no-spicetify', 'no-spotify', 'first-run', 'failed'];
+const RETRYABLE = ['no-spicetify', 'no-spotify', 'no-prefs', 'read-only', 'not-stock', 'too-new', 'first-run', 'failed'];
 
 const messages = ({ t }: Extension<'helper'>): Record<AppId, Record<string, string>> => ({
   spotify: {
     'no-spicetify': t('spotify-no-spicetify'),
     'no-spotify': t('spotify-no-spotify'),
+    'no-prefs': t('spotify-no-prefs'),
+    'read-only': t('spotify-read-only'),
+    'not-stock': t('spotify-not-stock'),
+    'too-new': t('spotify-too-new'),
+    working: t('spotify-working'),
     failed: t('spotify-failed'),
     restart: t('spotify-restart'),
     ready: t('spotify-ready'),
@@ -29,11 +35,12 @@ const messages = ({ t }: Extension<'helper'>): Record<AppId, Record<string, stri
   },
 });
 
-function status(extension: Extension<'helper'>, app: AppId, state: string, retry: () => void): PageItem {
+function status(extension: Extension<'helper'>, app: AppId, { state, detail }: Status, retry: () => void): PageItem {
   const title = messages(extension)[app][state] ?? '';
+  const described = detail ? { description: detail } : {};
   return RETRYABLE.includes(state)
-    ? { type: 'button', title, label: extension.t('try-again'), onActivate: retry }
-    : { type: 'row', title };
+    ? { type: 'button', title, ...described, label: extension.t('try-again'), onActivate: retry }
+    : { type: 'row', title, ...described };
 }
 
 export function describePage(extension: Extension<'helper'>, states: States, retry: () => void): void {

@@ -8,7 +8,7 @@ use serde::Deserialize;
 
 use crate::home::Home;
 use crate::look::Look;
-use crate::themes::{self, State, Theme};
+use crate::themes::{self, Problem, State, Theme};
 use crate::watch::Folders;
 
 /// What the extension wants, sent whole whenever any of it changes.
@@ -86,13 +86,19 @@ impl Helper {
 
     fn show(&mut self, index: usize, result: io::Result<State>) {
         let id = self.themes[index].id();
-        say_state(
-            id,
-            result.unwrap_or_else(|error| {
+        match result {
+            Ok(state) => say_state(id, state),
+            Err(error) => {
                 eprintln!("Couldn't dress {id}: {error}");
-                "failed"
-            }),
-        );
+                let problem = error
+                    .get_ref()
+                    .and_then(|cause| cause.downcast_ref::<Problem>());
+                let (state, detail) = problem.map_or(("failed", error.to_string()), |problem| {
+                    (problem.state, problem.detail.clone())
+                });
+                say(&serde_json::json!({ "app": id, "state": state, "detail": detail }));
+            }
+        }
     }
 
     fn apply(&mut self, index: usize) {

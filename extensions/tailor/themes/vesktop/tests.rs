@@ -184,6 +184,7 @@ fn square_corners_come_and_go_with_the_desktop_s_setting() {
     let square = fs::read_to_string(&theme).unwrap();
     assert!(square.contains("foreignObject"));
     assert!(square.contains("border-radius: 0 !important"));
+    assert!(square.contains("mask circle:not("));
 
     look.square_corners = false;
     fixture.vesktop.refresh(&look).unwrap();

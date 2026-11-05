@@ -2,7 +2,9 @@ mod spotify;
 mod steam;
 mod vesktop;
 
+use std::error::Error;
 use std::ffi::OsStr;
+use std::fmt;
 use std::io;
 use std::path::PathBuf;
 use std::sync::mpsc::Sender;
@@ -13,6 +15,37 @@ use crate::serve::Event;
 
 /// What's true of an app right now, by a name the extension turns into words.
 pub type State = &'static str;
+
+/// Why an app couldn't be dressed: the state that says what to do, and what it comes down to in the app's own words.
+#[derive(Debug)]
+pub struct Problem {
+    pub state: State,
+    pub detail: String,
+}
+
+impl Problem {
+    pub fn new(state: State, detail: String) -> Self {
+        Self { state, detail }
+    }
+
+    pub fn failed(detail: String) -> Self {
+        Self::new("failed", detail)
+    }
+}
+
+impl fmt::Display for Problem {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(formatter, "{}: {}", self.state, self.detail)
+    }
+}
+
+impl Error for Problem {}
+
+impl From<Problem> for io::Error {
+    fn from(problem: Problem) -> Self {
+        Self::other(problem)
+    }
+}
 
 /// One app Tailor dresses. Every method runs on the helper's one working thread.
 pub trait Theme {

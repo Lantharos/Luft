@@ -127,7 +127,8 @@ impl Spicetify {
     }
 
     pub fn spotify(&self) -> PathBuf {
-        self.home.join(self.setting("spotify_path").unwrap_or_default())
+        self.home
+            .join(self.setting("spotify_path").unwrap_or_default())
     }
 
     pub fn is_patched(&self) -> bool {

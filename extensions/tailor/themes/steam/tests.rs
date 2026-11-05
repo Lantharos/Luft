@@ -165,3 +165,59 @@ fn a_steam_that_never_ran_is_asked_to_run_first() {
     let mut steam = fixture.steam;
     assert_eq!(steam.apply(&sample("#a0c4ff")).unwrap(), "first-run");
 }
+
+#[test]
+fn every_stylesheet_of_steam_s_is_recolored_once() {
+    let mut fixture = fixture(FLATPAK);
+    let styles = fixture.folder.join("steamui/css");
+    fs::write(styles.join("sp.css"), ".library{color:#67c1f5}").unwrap();
+    fs::write(
+        styles.join("chunk~1.css"),
+        ".chunk{background-color:#171d25}",
+    )
+    .unwrap();
+
+    fixture.steam.apply(&sample("#a0c4ff")).unwrap();
+
+    let recolored =
+        fs::read_to_string(fixture.folder.join("steamui/tailor/recolored.css")).unwrap();
+    assert!(recolored.contains(".library{color:var(--luft-accent);}"));
+    assert!(recolored.contains(".chunk{background-color:var(--luft-low);}"));
+    assert_eq!(recolored.matches(".DialogButton").count(), 40);
+}
+
+#[test]
+fn an_update_with_new_colors_is_recolored_again() {
+    let mut fixture = fixture(FLATPAK);
+    let styles = fixture.folder.join("steamui/css");
+    fixture.steam.apply(&sample("#a0c4ff")).unwrap();
+    fs::write(styles.join("sp.css"), ".new-in-the-update{color:#67c1f5}").unwrap();
+
+    assert!(fixture.steam.stirred_by("sp.css".as_ref()));
+    fixture.steam.apply(&sample("#a0c4ff")).unwrap();
+
+    let recolored =
+        fs::read_to_string(fixture.folder.join("steamui/tailor/recolored.css")).unwrap();
+    assert!(recolored.contains(".new-in-the-update"));
+}
+
+#[test]
+fn a_stand_in_from_an_older_tailor_is_brought_up_to_date_and_steam_s_file_stays() {
+    let mut fixture = fixture(FLATPAK);
+    let library = fixture.folder.join("steamui/css").join(LIBRARY);
+    fixture.steam.apply(&sample("#a0c4ff")).unwrap();
+    let size = fs::metadata(&library).unwrap().len();
+    let mut older = b"/* Tailor */\n".to_vec();
+    older.resize(usize::try_from(size).unwrap(), b' ');
+    fs::write(&library, older).unwrap();
+
+    fixture.steam.apply(&sample("#a0c4ff")).unwrap();
+
+    assert!(
+        fs::read_to_string(&library)
+            .unwrap()
+            .contains("recolored.css")
+    );
+    let original = fs::read_to_string(fixture.folder.join("steamui/css").join(ORIGINAL)).unwrap();
+    assert_eq!(original, STEAM_STYLES.repeat(40));
+}

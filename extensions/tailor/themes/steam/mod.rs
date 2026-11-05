@@ -1,3 +1,6 @@
+mod palette;
+mod recolor;
+
 use std::ffi::OsStr;
 use std::fs;
 use std::io;
@@ -21,7 +24,7 @@ fn stand_in(size: usize) -> io::Result<Vec<u8>> {
     let mut styles = MARK.to_vec();
     styles.extend_from_slice(
         format!(
-            "\n@import url(\"{ORIGINAL}\");\n@import url(\"../{FOLDER}/look.css\");\n@import url(\"../{FOLDER}/steam.css\");\n"
+            "\n@import url(\"{ORIGINAL}\");\n@import url(\"../{FOLDER}/look.css\");\n@import url(\"../{FOLDER}/steam.css\");\n@import url(\"../{FOLDER}/recolored.css\");\n"
         )
         .as_bytes(),
     );
@@ -30,6 +33,13 @@ fn stand_in(size: usize) -> io::Result<Vec<u8>> {
     }
     styles.resize(size, b' ');
     Ok(styles)
+}
+
+/// A stylesheet that came with an update, which needs recoloring too.
+fn is_steam_sheet(name: &OsStr) -> bool {
+    Path::new(name)
+        .extension()
+        .is_some_and(|extension| extension == "css")
 }
 
 /// One Steam's folder, the Flatpak's or the native one.
@@ -53,8 +63,14 @@ impl Install {
     fn stand_in(&self) -> io::Result<()> {
         let library = self.styles().join(LIBRARY);
         let details = fs::metadata(&library)?;
-        if fs::read(&library)?.starts_with(MARK) {
+        let wanted = stand_in(usize::try_from(details.len()).map_err(io::Error::other)?)?;
+        let current = fs::read(&library)?;
+        if current == wanted {
             return Ok(());
+        }
+        if current.starts_with(MARK) {
+            replace(&library, &wanted)?;
+            return fs::set_permissions(&library, details.permissions());
         }
         let saving = self.styles().join(SAVING);
         match fs::remove_file(&saving) {
@@ -63,18 +79,38 @@ impl Install {
         }
         fs::hard_link(&library, &saving)?;
         fs::rename(&saving, self.styles().join(ORIGINAL))?;
-        replace(
-            &library,
-            &stand_in(usize::try_from(details.len()).map_err(io::Error::other)?)?,
-        )?;
+        replace(&library, &wanted)?;
         fs::set_permissions(&library, details.permissions())
+    }
+
+    fn refresh(&self, look: &Look) -> io::Result<()> {
+        let path = self.interface().join(FOLDER).join("look.css");
+        write_changed(&path, look.stylesheet().as_bytes()).map(|_| ())
+    }
+
+    /// Steam's own stylesheets, each once: the stand-in is skipped, as what it replaced is there under its new name.
+    fn recolored(&self) -> io::Result<String> {
+        let mut sheets: Vec<_> = fs::read_dir(self.styles())?
+            .filter_map(|entry| entry.ok().map(|entry| entry.path()))
+            .filter(|path| {
+                path.extension().is_some_and(|extension| extension == "css")
+                    && path.file_name().is_some_and(|name| name != LIBRARY)
+            })
+            .collect();
+        sheets.sort();
+        let mut recolored = String::new();
+        for sheet in sheets {
+            recolor::recolor(&String::from_utf8_lossy(&fs::read(sheet)?), &mut recolored);
+        }
+        Ok(recolored)
     }
 
     fn apply(&self, assets: &Path, look: &Look) -> io::Result<()> {
         let folder = self.interface().join(FOLDER);
         copy_changed(assets, &folder)?;
-        write_changed(&folder.join("look.css"), look.stylesheet().as_bytes())?;
-        self.stand_in()
+        self.refresh(look)?;
+        self.stand_in()?;
+        write_changed(&folder.join("recolored.css"), self.recolored()?.as_bytes()).map(|_| ())
     }
 
     fn restore(&self) -> io::Result<()> {
@@ -147,7 +183,12 @@ impl Theme for Steam {
     }
 
     fn refresh(&mut self, look: &Look) -> io::Result<State> {
-        self.apply(look)
+        for install in self.installs() {
+            if install.interface().join(FOLDER).is_dir() {
+                install.refresh(look)?;
+            }
+        }
+        Ok("ready")
     }
 
     fn restore(&mut self) -> io::Result<()> {
@@ -166,7 +207,7 @@ impl Theme for Steam {
     }
 
     fn stirred_by(&self, name: &OsStr) -> bool {
-        name == LIBRARY || name == "css" || name == FOLDER
+        name == "css" || name == FOLDER || is_steam_sheet(name)
     }
 }
 

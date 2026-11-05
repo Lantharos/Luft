@@ -127,7 +127,7 @@ impl Spicetify {
     }
 
     pub fn spotify(&self) -> PathBuf {
-        PathBuf::from(self.setting("spotify_path").unwrap_or_default())
+        self.home.join(self.setting("spotify_path").unwrap_or_default())
     }
 
     pub fn is_patched(&self) -> bool {
@@ -153,9 +153,11 @@ impl Spicetify {
         format!("sudo chmod -R a+wr {}", self.spotify().display())
     }
 
+    /// Runs where a terminal would, so a config with paths written from the home folder means the same here.
     fn run<'a>(&self, arguments: impl IntoIterator<Item = &'a str>) -> io::Result<Ran> {
         let output = Command::new(&self.program)
             .args(arguments)
+            .current_dir(&self.home)
             .stdin(Stdio::null())
             .output()?;
         let said = [output.stdout, output.stderr]
@@ -184,7 +186,7 @@ impl Spicetify {
     pub fn find_prefs(&self) -> io::Result<()> {
         let known = self.setting("prefs_path").unwrap_or_default();
         let flatpak = self.home.join(FLATPAK_PREFS);
-        if Path::new(&known).is_file() || !flatpak.is_file() {
+        if self.home.join(&known).is_file() || !flatpak.is_file() {
             return Ok(());
         }
         self.configure(&[("prefs_path", &flatpak.to_string_lossy())])

@@ -204,6 +204,20 @@ fn prefs_that_are_gone_are_replaced_by_the_flatpak_s() {
 }
 
 #[test]
+fn prefs_written_from_the_home_folder_are_kept() {
+    let mut fixture = fixture();
+    let relative = "./.var/app/com.spotify.Client/config/spotify/prefs";
+    let prefs = fixture.scratch.path().join(relative);
+    fs::create_dir_all(prefs.parent().unwrap()).unwrap();
+    fs::write(prefs, "").unwrap();
+    fixture.set("prefs_path", relative);
+
+    fixture.spotify.apply(&sample("#a0c4ff")).unwrap();
+
+    assert_eq!(fixture.get("prefs_path"), relative);
+}
+
+#[test]
 fn a_system_wide_flatpak_is_found_and_asks_for_write_access() {
     let mut fixture = fixture();
     let root = fixture.scratch.path().join("system");

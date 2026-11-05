@@ -22,7 +22,7 @@
 }
 
 foreignObject,
-rect[mask],
+rect[mask^='url(#svg-mask'],
 image[mask],
 [class*='banner' i] [mask],
 [class*='avatar' i],
@@ -41,6 +41,15 @@ image[mask],
 
 mask circle:not([fill='white' i], [fill='#fff' i], [fill='#ffffff' i]) {
   r: 0 !important;
+}
+
+mask rect[fill='black' i] {
+  width: 0 !important;
+  height: 0 !important;
+}
+
+mask polygon {
+  display: none;
 }
 
 rect {

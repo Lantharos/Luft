@@ -1,11 +1,11 @@
 ---
 title: Extensions
-description: Seasons, Strays, Soundscapes, Focus, Pult and other extensions that add to the desktop, and how to turn them off, set them up or remove them.
+description: Seasons, Strays, Keystrokes, Soundscapes, Focus, Pult and other extensions that add to the desktop, and how to turn them off, set them up or remove them.
 sidebar:
   order: 5
 ---
 
-Extensions add to the desktop: something on the wallpaper, a tile in quick settings, a button on the taskbar, results in search. Luft comes with one, Seasons, and you can find more, such as [Strays](/personalize/strays/), Soundscapes, Focus and Pult, in [Schelf](/apps/schelf/).
+Extensions add to the desktop: something on the wallpaper, a tile in quick settings, a button on the taskbar, results in search. Luft comes with one, Seasons, and you can find more, such as [Strays](/personalize/strays/), [Keystrokes](/personalize/keystrokes/), Soundscapes, Focus and Pult, in [Schelf](/apps/schelf/).
 
 **Settings → Extensions** lists them. The switch next to each turns it on or off; opening one shows what it can do, its own settings and **Remove**. An extension only gets what it says it needs, and the list under **What it can do** is exactly that.
 
@@ -28,6 +28,10 @@ The Seasons tile in [quick settings](/desktop/quick-settings/) switches it on an
 ## Strays
 
 [Strays](/personalize/strays/) puts a few small creatures on your desktop that wander across the taskbar and your windows, and that you can pick up, or draw yourself. Its tile in [quick settings](/desktop/quick-settings/) switches them on and off and sets how many.
+
+## Keystrokes
+
+[Keystrokes](/personalize/keystrokes/) plays a soft sound as you type and click, from crisp mechanical switches to a typewriter, without seeing what you type. You can make your own set of sounds.
 
 ## Soundscapes
 

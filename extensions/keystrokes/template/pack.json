@@ -1,0 +1,26 @@
+{
+  "name": "My sounds",
+  "description": "One line about how they sound",
+  "sounds": {
+    "key": [
+      "key-1.flac",
+      "key-2.flac"
+    ],
+    "space": [
+      "space-1.flac",
+      "space-2.flac"
+    ],
+    "enter": [
+      "enter-1.flac",
+      "enter-2.flac"
+    ],
+    "backspace": [
+      "backspace-1.flac",
+      "backspace-2.flac"
+    ],
+    "click": [
+      "click-1.flac",
+      "click-2.flac"
+    ]
+  }
+}

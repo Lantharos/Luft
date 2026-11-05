@@ -12,3 +12,5 @@ python3 -m venv ~/.cache/luft-sounds && ~/.cache/luft-sounds/bin/pip install -r 
 `rain.py` cuts the rain loops and thunder in `extensions/seasons/sounds` from CC0 recordings on Freesound, listed at the top of the script with the second each cut starts at. It downloads them once into `~/.cache/luft-rain`.
 
 `soundscapes.py` cuts the loops in `extensions/soundscapes/sounds` the same way, from the CC0 recordings it lists, takes its rain and thunder from `rain.py`'s, and makes the white and brown noise. It downloads them into `~/.cache/luft-soundscapes`.
+
+`keystrokes.py` synthesizes every sound in `extensions/keystrokes`, its packs, mouse click and template, from noise and decaying sine waves, and writes each pack's `pack.json`. It takes no recordings. Its recipes are at the top of the script, each hit a burst of noise and the modes it sets ringing.

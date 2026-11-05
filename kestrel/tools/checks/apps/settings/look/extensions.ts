@@ -6,7 +6,7 @@ import {checks} from '../../../lib/check.js';
 import {pause} from '../../../lib/wait.js';
 import type {Point} from '../../../lib/input/input.js';
 import {installBuilt, request, SEASONS, setSetting, setting} from '../../../extensions/lib/extensions.js';
-import {scrollToEnd, show, showEnd} from '../navigation.js';
+import {scrollDown, scrollToEnd, show, showEnd} from '../navigation.js';
 
 const {eventually, require} = checks('Luft app');
 const HEAVY: Point = [955, 318];
@@ -17,6 +17,8 @@ const NOW_PLAYING = 'com.lantharos.NowPlaying';
 const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 const SOUNDSCAPES = 'com.lantharos.Soundscapes';
 const STRAYS = 'com.lantharos.Strays';
+const KEYSTROKES = 'com.lantharos.Keystrokes';
+const PRIVACY_SCROLL_STEPS = 4;
 
 async function checkOwnPages(app: LuftApp) {
   await installBuilt(VISUALIZER);
@@ -69,6 +71,17 @@ async function checkOwnPages(app: LuftApp) {
     (await showEnd(app, `extensions/${STRAYS.toLowerCase()}`)).save('settings-extension-strays-end');
   } finally {
     await request('Remove', STRAYS);
+  }
+  await installBuilt(KEYSTROKES);
+  try {
+    (await showEnd(app, 'sound')).save('settings-sound-keystrokes');
+    const page = await show(app, `extensions/${KEYSTROKES.toLowerCase()}`);
+    page.save('settings-extension-keystrokes');
+    const privacy = await scrollDown(app, page, PRIVACY_SCROLL_STEPS);
+    privacy.save('settings-extension-keystrokes-privacy');
+    (await scrollToEnd(app, privacy)).save('settings-extension-keystrokes-end');
+  } finally {
+    await request('Remove', KEYSTROKES);
   }
 }
 

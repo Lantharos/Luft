@@ -5,7 +5,7 @@ sidebar:
   order: 4
 ---
 
-Luft plays short, soft sounds when something happens that you might not be looking at. Everything here is in Settings, under **Sound**, in **System sounds**.
+Luft plays short, soft sounds when something happens that you might not be looking at. Everything here is in Settings, under **Sound**, in **System sounds**. For a sound on every key and click, there's [Keystrokes](/personalize/keystrokes/).
 
 ## What plays when
 

@@ -1,0 +1,34 @@
+{
+  "name": "Soft membrane",
+  "description": "A quiet office keyboard, round and muted",
+  "sounds": {
+    "key": [
+      "key-1.flac",
+      "key-2.flac",
+      "key-3.flac",
+      "key-4.flac",
+      "key-5.flac"
+    ],
+    "space": [
+      "space-1.flac",
+      "space-2.flac",
+      "space-3.flac",
+      "space-4.flac",
+      "space-5.flac"
+    ],
+    "enter": [
+      "enter-1.flac",
+      "enter-2.flac",
+      "enter-3.flac",
+      "enter-4.flac",
+      "enter-5.flac"
+    ],
+    "backspace": [
+      "backspace-1.flac",
+      "backspace-2.flac",
+      "backspace-3.flac",
+      "backspace-4.flac",
+      "backspace-5.flac"
+    ]
+  }
+}

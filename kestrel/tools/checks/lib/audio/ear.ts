@@ -1,0 +1,64 @@
+import GLib from 'gi://GLib';
+
+import type {Eventually} from '../check.js';
+import {scratch, spawn, stop} from '../processes.js';
+import {pause} from '../wait.js';
+import {RATE} from './music.js';
+import {givePorts, link, speakers} from './routing.js';
+
+const EAR = 'check-ear';
+const SETTLE_MS = 150;
+const AFTER_MS = 350;
+const WAV_HEADER = 44;
+const CHANNELS = 2;
+const LOUD_ENOUGH = 0.015;
+const QUIET_BETWEEN_MS = 22;
+
+function dataOf(bytes: Uint8Array): Uint8Array {
+  const text = new TextDecoder('latin1').decode(bytes.subarray(0, 4096));
+  const at = text.indexOf('data');
+  return bytes.subarray(at < 0 ? WAV_HEADER : at + 8);
+}
+
+function leftChannel(bytes: Uint8Array): Float32Array {
+  const data = dataOf(bytes);
+  const whole = data.length - data.length % (CHANNELS * 4);
+  const interleaved = new Float32Array(data.buffer.slice(data.byteOffset, data.byteOffset + whole));
+  return Float32Array.from({length: interleaved.length / CHANNELS}, (_, index) => interleaved[index * CHANNELS]);
+}
+
+/** What came out of the speakers while `act` ran, and for a moment after, one channel of it at 48 kHz. */
+export async function overhear(eventually: Eventually, act: () => void | Promise<void>, afterMs = AFTER_MS): Promise<Float32Array> {
+  const path = scratch(`${EAR}-${GLib.uuid_string_random()}.wav`);
+  const ear = spawn(['pw-record', '-P', `{ node.name = ${EAR} }`, '--rate', `${RATE}`, '--channels', `${CHANNELS}`, '--format', 'f32', path]);
+  await eventually(async () => await speakers() && await givePorts({'node.name': EAR}, 'Input', CHANNELS) &&
+    await link('speakers:monitor_FL', `${EAR}:input_FL`) && await link('speakers:monitor_FR', `${EAR}:input_FR`), 'the ear hears the speakers');
+  await pause(SETTLE_MS);
+  await act();
+  await pause(afterMs);
+  await stop(ear);
+  const samples = leftChannel(GLib.file_get_contents(path)[1]);
+  GLib.unlink(path);
+  return samples;
+}
+
+/** Where each separate sound starts, in samples. */
+export function onsets(samples: Float32Array): number[] {
+  const gap = RATE * QUIET_BETWEEN_MS / 1000;
+  const starts: number[] = [];
+  let lastLoud = -gap;
+  for (let index = 0; index < samples.length; index++) {
+    if (Math.abs(samples[index]) < LOUD_ENOUGH) continue;
+    if (index - lastLoud >= gap) starts.push(index);
+    lastLoud = index;
+  }
+  return starts;
+}
+
+/** The pitch of a pure tone starting there, by how often it crosses zero. */
+export function pitchAt(samples: Float32Array, start: number, length = RATE / 100): number {
+  let crossings = 0;
+  for (let index = start + 1; index < start + length; index++)
+    if ((samples[index - 1] < 0) !== (samples[index] < 0)) crossings++;
+  return crossings / 2 * RATE / length;
+}

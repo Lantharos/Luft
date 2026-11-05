@@ -15,13 +15,17 @@ export async function show(app: LuftApp, page: string, label = `settings shows $
 
 export const showEnd = async (app: LuftApp, page: string) => scrollToEnd(app, await show(app, page));
 
+export async function scrollDown(app: LuftApp, shown: Frame, steps = SCROLL_STEPS) {
+  for (let step = 0; step < steps; step++) scroll(Clutter.ScrollDirection.DOWN, app.at(SCROLL_POINT));
+  return app.settle(frame => !frame.looksLike(shown));
+}
+
 export async function scrollToEnd(app: LuftApp, shown: Frame) {
   let after = shown;
   let before: Frame;
   do {
     before = after;
-    for (let step = 0; step < SCROLL_STEPS; step++) scroll(Clutter.ScrollDirection.DOWN, app.at(SCROLL_POINT));
-    after = await app.settle(frame => !frame.looksLike(before));
+    after = await scrollDown(app, before);
   } while (!after.looksLike(before));
   return after;
 }

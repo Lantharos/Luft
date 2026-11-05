@@ -1,0 +1,42 @@
+id = "com.lantharos.Keystrokes"
+name = "Keystrokes"
+description = "Soft sounds as you type and click, like a mechanical keyboard, a typewriter or a quiet membrane, without seeing what you type."
+version = "1.0.0"
+api = 1
+permissions = ["sounds", "input-sounds"]
+
+[[settings]]
+key = "keys"
+type = "switch"
+label = "keys"
+default = true
+
+[[settings]]
+key = "key-volume"
+depends = "keys"
+type = "slider"
+label = "key-volume"
+default = 0.7
+min = 0.05
+max = 1
+step = 0.05
+unit = "percent"
+page = "sound"
+
+[[settings]]
+key = "clicks"
+type = "switch"
+label = "clicks"
+default = true
+
+[[settings]]
+key = "click-volume"
+depends = "clicks"
+type = "slider"
+label = "click-volume"
+default = 0.6
+min = 0.05
+max = 1
+step = 0.05
+unit = "percent"
+page = "sound"

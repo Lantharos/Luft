@@ -3,12 +3,13 @@ import GLib from 'gi://GLib';
 import {spawn, stop, type Process} from '../processes.js';
 import {intoSpeakers, speakersIntoLevels} from './routing.js';
 
-const RATE = 48000;
+export const RATE = 48000;
 const BEAT_S = 0.5;
 const CHORDS = [[220, 261.63, 329.63], [174.61, 220, 261.63], [196, 246.94, 293.66], [164.81, 207.65, 246.94]];
 const BASS = [55, 43.65, 49, 41.2];
 
-function wav(samples: Float32Array): Uint8Array {
+/** A 16-bit mono WAV file. */
+export function wav(samples: Float32Array): Uint8Array {
   const bytes = new Uint8Array(44 + samples.length * 2);
   const view = new DataView(bytes.buffer);
   const text = (offset: number, value: string) => [...value].forEach((character, index) => view.setUint8(offset + index, character.charCodeAt(0)));

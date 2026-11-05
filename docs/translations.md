@@ -16,6 +16,7 @@ Luft is translated into Albanian, Bosnian, Bulgarian, Catalan, Croatian, Czech, 
 | kestrel-portal | `kestrel/ui/locales/*/portal.ftl` | printing, screen sharing, shortcuts and other app requests |
 | extension-seasons | `extensions/seasons/locales/*/seasons.ftl` | the Seasons extension: its name, tile, settings and page |
 | extension-strays | `extensions/strays/locales/*/strays.ftl` | the Strays extension: its name, tile, page and why a stray can't be added |
+| extension-keystrokes | `extensions/keystrokes/locales/*/keystrokes.ftl` | the Keystrokes extension: its settings, sounds, what it can see, and why a set of sounds can't be added |
 | extension-soundscapes | `extensions/soundscapes/locales/*/soundscapes.ftl` | the Soundscapes extension: its sounds, mixes, tile, mixer and settings |
 | kestrel-settings | `kestrel/settings/locales/*/settings.ftl` | notifications from `kestrel-settings` about drives and the battery |
 | kestrel-portal-service | `kestrel/portal/locales/*/portal.ftl` | print job names and printing failures from `kestrel-portal` |

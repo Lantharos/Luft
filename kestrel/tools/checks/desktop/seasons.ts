@@ -11,6 +11,7 @@ import {capture} from '../lib/screenshots.js';
 import {pause} from '../lib/wait.js';
 import {openWindow} from '../tiling/lib/tiling.js';
 import {layerSheets, request, SEASONS, setSetting} from '../extensions/lib/extensions.js';
+import {checkParting, listening, partsForPointer} from './lib/seasonsParting.js';
 
 const {eventually} = checks('seasons');
 const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
@@ -45,6 +46,7 @@ async function activate(index: number) {
 async function checkEffects() {
   await setSetting(SEASONS, 'on', new GLib.Variant('b', true));
   await eventually(falling, 'rain falls over the wallpaper');
+  await checkParting();
   await choose('intensity', 'heavy');
   await eventually(() => subtitle() === 'Storm', 'the tile says it storms');
   const {window} = await openWindow('Sheltering', 640, 360);
@@ -53,6 +55,7 @@ async function checkEffects() {
   await capture('seasons-rain');
 
   await show('snow', 'Snow');
+  await partsForPointer('snow', 'seasons-snow-parted');
   await pause(SETTLING_MS);
   await capture('seasons-snow');
   kestrel.set_boolean('rounded-window-corners', false);
@@ -62,6 +65,7 @@ async function checkEffects() {
   await show('leaves', 'Autumn leaves');
   await pause(4000);
   await capture('seasons-leaves');
+  await partsForPointer('leaves', 'seasons-leaves-parted');
   await show('fireflies', 'Fireflies');
   await pause(4000);
   await capture('seasons-fireflies');
@@ -101,6 +105,7 @@ async function checkPictures() {
     await pause(5000);
     await capture(`seasons-custom-${landing}`);
   }
+  await partsForPointer('pictures', 'seasons-custom-parted');
   await choose('effect', 'rain');
 }
 
@@ -119,6 +124,7 @@ async function checkCovered() {
   const {window} = await openWindow('Covering');
   window.maximize();
   await eventually(dry, 'a maximized window hides it');
+  await eventually(() => !listening(), 'and nothing listens to the pointer while it can\'t show');
 
   const {window: small} = await openWindow('Small', 360, 240);
   small.change_workspace_by_index(1, false);
@@ -152,4 +158,4 @@ export async function run() {
   }
 }
 
-export const timeout = 240000;
+export const timeout = 420000;

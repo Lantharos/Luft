@@ -1,8 +1,9 @@
+import { paintParted, PARTED } from './parted.js';
 import { Settling } from './settling.js';
 import { type Effect, paintSky, SKY } from './sky.js';
 import { MAX_SHAPES } from './surfaces.js';
 
-const DECLARATIONS = `${SKY}
+const DECLARATIONS = `${SKY}${PARTED}
 uniform float snow_caps[SKY_SHAPES];
 
 vec2 snow_flakes(vec2 p, float cell, float speed, float size, float seed) {
@@ -39,9 +40,11 @@ if (uncovered > 0.0) {
   vec2 p = layer_position;
   vec2 snow = vec2(0.0);
   if (sky_sheltered(p) < 0.5) {
-    snow += vec2(0.5, 0.05) * snow_flakes(p, 22.0, 32.0, 1.8, 1.0);
-    snow += vec2(0.8, 0.07) * snow_flakes(p, 36.0, 52.0, 2.7, 2.0);
-    snow += vec2(1.0, 0.09) * snow_flakes(p, 58.0, 80.0, 3.9, 3.0);
+    vec3 sky = parted(p);
+    snow += vec2(0.5, 0.05) * snow_flakes(sky.xy, 22.0, 32.0, 1.8, 1.0);
+    snow += vec2(0.8, 0.07) * snow_flakes(sky.xy, 36.0, 52.0, 2.7, 2.0);
+    snow += vec2(1.0, 0.09) * snow_flakes(sky.xy, 58.0, 80.0, 3.9, 3.0);
+    snow *= sky.z;
   }
   float cap = 0.0;
   for (int i = 0; i < SKY_SHAPES; i++) {
@@ -60,7 +63,9 @@ export function snow(): Effect {
   return {
     declarations: DECLARATIONS,
     shader: SHADER,
+    parts: true,
     paint(display, index, weather, elapsed) {
+      paintParted(display, weather);
       const depths = settling.depths(index, paintSky(display, weather), weather.density, elapsed);
       display.uniformArray('snow_caps', 1, [...depths, ...new Array<number>(MAX_SHAPES - depths.length).fill(0)]);
     },

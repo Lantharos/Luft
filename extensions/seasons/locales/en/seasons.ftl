@@ -29,6 +29,8 @@ water = Water
 accent = Accent color
 visible = Show on the desktop
     .description = Rain and snow land on windows and the taskbar
+part = Move aside for the pointer
+    .description = Rain, snow, leaves and pictures part softly around the pointer and your fingers on the bare desktop
 sound = Sound
     .description = Recorded rain while it rains, with thunder in storms. Keeps playing behind windows, and goes quiet during calls
 # Screen-reader label of the rain volume slider, and its title in Settings

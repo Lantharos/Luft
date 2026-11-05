@@ -5,6 +5,8 @@ const FULL = 0.98;
 const AIRBORNE_S = 120;
 const NEVER = 1e9;
 
+export const ease = (from: number, to: number, elapsed: number, seconds: number) => from + (to - from) * (1 - Math.exp(-elapsed / seconds));
+
 /**
  * How much of an effect shows, easing towards what it should be, and how it got there: whatever is already in the air
  * keeps falling, so an effect that gets lighter only starts fewer new things. An effect starting from nothing has

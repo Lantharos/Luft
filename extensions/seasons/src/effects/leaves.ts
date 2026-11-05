@@ -1,6 +1,7 @@
+import { paintParted, PARTED } from './parted.js';
 import { type Effect, paintSky, SKY } from './sky.js';
 
-const DECLARATIONS = `${SKY}
+const DECLARATIONS = `${SKY}${PARTED}
 vec3 leaves_colour(float pick) {
   if (pick < 0.3) return vec3(0.86, 0.47, 0.13);
   if (pick < 0.55) return vec3(0.66, 0.22, 0.09);
@@ -64,13 +65,13 @@ vec4 leaves_layer(vec2 p, float cell, float speed, float size, float seed) {
 const SHADER = `
 float uncovered = 1.0 - sky_covered(layer_position);
 if (uncovered > 0.0) {
-  vec2 p = layer_position;
-  vec4 far = leaves_layer(p, 100.0, 34.0, 6.0, 1.0) * 0.65;
-  vec4 middle = leaves_layer(p, 150.0, 50.0, 9.0, 2.0) * 0.88;
-  vec4 near = leaves_layer(p, 220.0, 72.0, 13.5, 3.0);
+  vec3 sky = parted(layer_position);
+  vec4 far = leaves_layer(sky.xy, 100.0, 34.0, 6.0, 1.0) * 0.65;
+  vec4 middle = leaves_layer(sky.xy, 150.0, 50.0, 9.0, 2.0) * 0.88;
+  vec4 near = leaves_layer(sky.xy, 220.0, 72.0, 13.5, 3.0);
   vec4 leaves = middle + far * (1.0 - middle.a);
   leaves = near + leaves * (1.0 - near.a);
-  layer_color = leaves * uncovered;
+  layer_color = leaves * sky.z * uncovered;
 }
 `;
 
@@ -79,8 +80,10 @@ export function leaves(): Effect {
   return {
     declarations: DECLARATIONS,
     shader: SHADER,
+    parts: true,
     paint(display, _index, weather) {
       paintSky(display, weather);
+      paintParted(display, weather);
     },
   };
 }

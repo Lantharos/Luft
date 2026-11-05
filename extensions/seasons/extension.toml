@@ -61,6 +61,14 @@ label = "visible"
 default = true
 
 [[settings]]
+key = "part"
+depends = "effect"
+when = ["rain", "snow", "leaves", "custom", "weather", "season"]
+type = "switch"
+label = "part"
+default = true
+
+[[settings]]
 key = "sound"
 depends = "effect"
 when = ["rain", "weather", "season"]

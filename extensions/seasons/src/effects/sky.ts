@@ -1,5 +1,6 @@
 import type { LayerDisplay, Outline } from '@luft/extension-api';
 
+import type { Touch } from '../parting.js';
 import { MAX_SHAPES, shapesOf } from './surfaces.js';
 
 /** How much of an effect shows and how it moves, as the frame paints it. */
@@ -13,6 +14,8 @@ export interface Weather {
   wind: number;
   /** How far the wind has carried something falling 100 pixels a second, in pixels. */
   drift: number;
+  /** The mouse and fingers that part what falls. */
+  touches: readonly Touch[];
 }
 
 export interface Effect {
@@ -20,6 +23,8 @@ export interface Effect {
   shader: string;
   /** Picture atlases its shader samples. */
   atlases?: readonly string[];
+  /** Whether what it draws moves aside for the pointer. */
+  parts?: boolean;
   paint(display: LayerDisplay, index: number, weather: Weather, elapsed: number): void;
 }
 

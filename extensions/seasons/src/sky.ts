@@ -1,7 +1,8 @@
 import type { Layer, LayerFrame, Wallpaper } from '@luft/extension-api';
 
-import { Density } from './density.js';
+import { Density, ease } from './density.js';
 import type { Effect } from './effects/sky.js';
+import { Parting } from './parting.js';
 import { EFFECTS, type EffectName, type Scene } from './scene/scene.js';
 
 const WIND_CHANGE_S = 4;
@@ -15,8 +16,6 @@ interface Drawn {
   time: number;
 }
 
-const ease = (from: number, to: number, elapsed: number, seconds: number) => from + (to - from) * (1 - Math.exp(-elapsed / seconds));
-
 const gusting = (time: number) => 1 + 0.35 * Math.sin(time * 0.21) + 0.15 * Math.sin(time * 0.73 + 1.3);
 
 /**
@@ -25,9 +24,11 @@ const gusting = (time: number) => 1 + 0.35 * Math.sin(time * 0.21) + 0.15 * Math
  */
 export class Sky {
   private readonly drawn = new Map<EffectName, Drawn>();
+  private readonly parting: Parting;
   private scene: Scene | null = null;
 
   constructor(wallpaper: Wallpaper, effects: Record<EffectName, Effect>) {
+    this.parting = new Parting(wallpaper);
     for (const name of EFFECTS) {
       const effect = effects[name];
       const layer = wallpaper.addLayer({
@@ -51,8 +52,10 @@ export class Sky {
     return this.scene?.effect ?? null;
   }
 
-  show(scene: Scene | null): void {
+  /** Shows `scene`, which moves aside for the pointer if `parts` says it may. */
+  show(scene: Scene | null, parts: boolean): void {
     this.scene = scene;
+    this.parting.allow(parts && !!scene && !!this.drawn.get(scene.effect)!.effect.parts);
     for (const [name, drawn] of this.drawn) {
       if (scene?.effect === name && !drawn.layer.active && drawn.density.dry) drawn.wind = scene.wind;
       drawn.layer.active = scene?.effect === name || !drawn.density.dry;
@@ -75,7 +78,8 @@ export class Sky {
     }
     drawn.time = time;
     drawn.drift += wind * 100 * elapsed;
-    const weather = { time, density: drawn.density.value, history: drawn.density.history, wind, drift: drawn.drift };
+    if (target || !this.scene) this.parting.advance(elapsed, displays);
+    const weather = { time, density: drawn.density.value, history: drawn.density.history, wind, drift: drawn.drift, touches: this.parting.touches };
     displays.forEach((display, index) => drawn.effect.paint(display, index, weather, elapsed));
   }
 }

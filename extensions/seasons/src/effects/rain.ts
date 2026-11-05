@@ -1,6 +1,7 @@
+import { paintParted, PARTED } from './parted.js';
 import { type Effect, paintSky, SKY } from './sky.js';
 
-const DECLARATIONS = `${SKY}
+const DECLARATIONS = `${SKY}${PARTED}
 uniform vec3 rain_tint;
 
 #define RAIN_SPLASHES_S 4.0
@@ -173,10 +174,11 @@ if (uncovered > 0.0) {
   float rain = 0.0;
   float shadow = 0.0;
   if (p.y <= surf + 6.0 || sheltered < 0.5) {
-    float open = 1.0 - sheltered;
-    vec2 drops = open * (0.22 * rain_layer(p, 7.0, 650.0, 12.0, 0.7, 1.0)
-      + 0.34 * rain_layer(p, 12.0, 1000.0, 22.0, 0.9, 2.0)
-      + 0.55 * rain_layer(p, 23.0, 1450.0, 54.0, 1.3, 3.0));
+    vec3 sky = parted(p);
+    float open = (1.0 - sheltered) * sky.z;
+    vec2 drops = open * (0.22 * rain_layer(sky.xy, 7.0, 650.0, 12.0, 0.7, 1.0)
+      + 0.34 * rain_layer(sky.xy, 12.0, 1000.0, 22.0, 0.9, 2.0)
+      + 0.55 * rain_layer(sky.xy, 23.0, 1450.0, 54.0, 1.3, 3.0));
     rain += drops.x;
     shadow += drops.y;
     rain += 0.7 * rain_splashes(p);
@@ -194,8 +196,10 @@ export function rain(tint: () => readonly number[]): Effect {
   return {
     declarations: DECLARATIONS,
     shader: SHADER,
+    parts: true,
     paint(display, _index, weather) {
       paintSky(display, weather);
+      paintParted(display, weather);
       display.uniform('rain_tint', ...tint());
     },
   };

@@ -7,7 +7,7 @@ import type { Presets } from './custom/presets.js';
 export function describePage(seasons: Extension, presets: Presets, show: () => void): void {
   const { t } = seasons;
   seasons.settingsPage.describe(() => [
-    { title: t('look'), items: [{ setting: 'effect' }, { setting: 'intensity' }, { setting: 'color' }, { setting: 'visible' }] },
+    { title: t('look'), items: [{ setting: 'effect' }, { setting: 'intensity' }, { setting: 'color' }, { setting: 'visible' }, { setting: 'part' }] },
     { title: t('sound'), items: [{ setting: 'sound' }, { setting: 'volume' }] },
     ...customSections(seasons, presets, show),
   ]);

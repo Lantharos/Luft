@@ -1,5 +1,6 @@
 import type { Layer } from '@luft/extension-api';
 
+import { paintParted, PARTED } from '../effects/parted.js';
 import { type Effect, paintSky, SKY } from '../effects/sky.js';
 import type { Landing, Preset } from './presets.js';
 
@@ -7,7 +8,7 @@ export const ATLAS = 'custom_pictures';
 
 const LANDINGS: Record<Landing, number> = { through: 0, bounce: 1, settle: 2 };
 
-const DECLARATIONS = `${SKY}
+const DECLARATIONS = `${SKY}${PARTED}
 uniform vec2 custom_size;
 uniform float custom_speed;
 uniform float custom_spin;
@@ -83,10 +84,10 @@ vec4 custom_layer(vec2 p, float cell, float speed, float scale, float seed) {
 const SHADER = `
 float uncovered = 1.0 - sky_covered(layer_position);
 if (uncovered > 0.0 && custom_pictures_count > 0.0) {
-  vec2 p = layer_position;
-  vec4 far = custom_layer(p, custom_cell * 0.7, custom_speed * 0.6, 0.6, 1.0) * 0.7;
-  vec4 near = custom_layer(p, custom_cell, custom_speed, 1.0, 2.0);
-  layer_color = (near + far * (1.0 - near.a)) * uncovered;
+  vec3 sky = parted(layer_position);
+  vec4 far = custom_layer(sky.xy, custom_cell * 0.7, custom_speed * 0.6, 0.6, 1.0) * 0.7;
+  vec4 near = custom_layer(sky.xy, custom_cell, custom_speed, 1.0, 2.0);
+  layer_color = (near + far * (1.0 - near.a)) * sky.z * uncovered;
 }
 `;
 
@@ -96,9 +97,11 @@ export function custom(preset: () => Preset | null): Effect {
     declarations: DECLARATIONS,
     shader: SHADER,
     atlases: [ATLAS],
+    parts: true,
     paint(display, _index, weather) {
       const chosen = preset();
       paintSky(display, weather);
+      paintParted(display, weather);
       if (!chosen) return;
       display.uniform('custom_size', chosen.smallest, chosen.largest);
       display.uniform('custom_speed', chosen.speed);

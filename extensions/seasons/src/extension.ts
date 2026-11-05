@@ -32,7 +32,7 @@ function tint(hex: string): number[] {
 }
 
 const enable: Enable<Granted> = seasons => {
-  const { settings, appearance } = seasons;
+  const { settings, appearance, desktop, power } = seasons;
   const on = () => settings.get<boolean>('on');
   const choice = () => settings.get<Choice>('effect');
   const following = () => choice() === 'weather' || choice() === 'season';
@@ -82,9 +82,9 @@ const enable: Enable<Granted> = seasons => {
     outside.follow(on() && following());
     scene = sceneNow();
     const visible = settings.get<boolean>('visible');
-    sky.show(visible ? scene : null);
+    sky.show(visible ? scene : null, settings.get<boolean>('part') && desktop.wallpaperVisible && !appearance.reducedMotion && !power.saving);
     sound.sync();
-    impact.sync(visible && scene?.effect === 'custom' && seasons.desktop.wallpaperVisible && !seasons.calls.active ? presets.chosen : null);
+    impact.sync(visible && scene?.effect === 'custom' && desktop.wallpaperVisible && !seasons.calls.active ? presets.chosen : null);
     toggle.update({ subtitle: subtitle(), icon: icon() });
   };
   const picturesChanged = () => {
@@ -93,7 +93,7 @@ const enable: Enable<Granted> = seasons => {
   };
   picturesChanged();
   settings.onChanged(update);
-  seasons.desktop.onChanged(update);
+  for (const source of [desktop, appearance, power]) source.onChanged(update);
   seasons.calls.onChanged(update);
   presets.watch(picturesChanged);
   describePage(seasons, presets, () => {

@@ -1,6 +1,7 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
+import Mtk from 'gi://Mtk';
 
 import {descendants} from '../../lib/actors.js';
 import {call} from '../../lib/dbus.js';
@@ -13,19 +14,15 @@ const NAME = 'com.lantharos.Kestrel';
 const PATH = '/com/lantharos/Kestrel/Extensions';
 const IFACE = 'com.lantharos.Kestrel.Extensions';
 const CLOCK_TICKS = 100;
+const ATTEMPTS = 3;
 
-export const group = () => descendants(global.stage).find(actor => actor.name === `extension-sprite:${PLAYTHINGS}-group`) ?? null;
-export const parts = () => group()?.get_children() ?? [];
+export const groups = () => descendants(global.stage).filter(actor => actor.name === `extension-sprite:${PLAYTHINGS}-group`);
+export const parts = () => groups().flatMap(group => group.get_children());
 export const labelled = (label: string) => parts().filter(actor => actor.accessible_name === label);
 export const hasPart = (actor: Clutter.Actor | null) => !!actor && parts().includes(actor);
 
 /** The part right after `actor`, which is added next. */
 export const nextPart = (actor: Clutter.Actor) => parts()[parts().indexOf(actor) + 1];
-/** Where an actor's pivot shows on the stage. */
-export const pivotOf = (actor: Clutter.Actor): Point => {
-  const [x, y] = [actor.translation_x + actor.width * actor.pivot_point.x, actor.translation_y + actor.height * actor.pivot_point.y];
-  return [x, y];
-};
 export const middleOf = (actor: Clutter.Actor): Point => {
   const box = actor.get_transformed_extents();
   return [box.get_x() + box.get_width() / 2, box.get_y() + box.get_height() / 2];
@@ -64,6 +61,10 @@ export interface Cost {
   paints: number;
   wakeups: number;
   cpu: number;
+  /** Paints a second of displays other than the main one. */
+  elsewhere: number;
+  /** Whether any part looks different at the end. */
+  partsChanged: boolean;
 }
 
 function threadSwitches() {
@@ -83,15 +84,36 @@ function cpuTicks() {
   return Number(fields[11]) + Number(fields[12]);
 }
 
+const looks = () => parts().map(actor => [actor.translation_x, actor.translation_y, turned(actor), actor.opacity, actor.scale_x, actor.scale_y, actor.visible]).join(';');
+
 /** What Kestrel costs per second while `during` runs, or over `milliseconds` of leaving it alone. */
 export async function cost(milliseconds: number, during: () => Promise<void> = () => pause(milliseconds)): Promise<Cost> {
   let frames = 0;
-  const painted = global.stage.connect('after-paint', () => frames++);
+  let elsewhere = 0;
+  const main = global.display.get_monitor_geometry(global.display.get_primary_monitor());
+  const painted = global.stage.connect('after-paint', (_stage, view) => {
+    const layout = new Mtk.Rectangle();
+    view.get_layout(layout);
+    frames++;
+    if (layout.x !== main.x) elsewhere++;
+  });
+  const before = looks();
   const [switches, ticks, started] = [threadSwitches(), cpuTicks(), GLib.get_monotonic_time()];
   await during();
   const seconds = (GLib.get_monotonic_time() - started) / 1e6;
-  const measured = {paints: frames / seconds, wakeups: (threadSwitches() - switches) / seconds, cpu: (cpuTicks() - ticks) / CLOCK_TICKS / seconds * 100};
+  const measured = {paints: frames / seconds, wakeups: (threadSwitches() - switches) / seconds, cpu: (cpuTicks() - ticks) / CLOCK_TICKS / seconds * 100, elsewhere: elsewhere / seconds, partsChanged: looks() !== before};
   global.stage.disconnect(painted);
+  return measured;
+}
+
+/**
+ * Measures until `accept` agrees, a few times at most. The taskbar's clock paints every display when the minute turns,
+ * and Kestrel itself paints for a second or so now and then with no extension installed, so one window says little;
+ * something Playthings does wrong shows in all of them.
+ */
+export async function steady(name: string, milliseconds: number, accept: (measured: Cost) => boolean) {
+  let measured = await measure(name, milliseconds);
+  for (let attempt = 1; attempt < ATTEMPTS && !accept(measured); attempt++) measured = await measure(`${name}, again`, milliseconds);
   return measured;
 }
 
@@ -99,7 +121,7 @@ export async function measure(name: string, milliseconds = 8000, during?: () => 
   if (!during) rest();
   if (!during) await pause(800);
   const measured = await cost(milliseconds, during);
-  const shown = {paints: +measured.paints.toFixed(2), wakeups: +measured.wakeups.toFixed(1), cpu: +measured.cpu.toFixed(2)};
+  const shown = {paints: +measured.paints.toFixed(2), elsewhere: +measured.elsewhere.toFixed(2), wakeups: +measured.wakeups.toFixed(1), cpu: +measured.cpu.toFixed(2)};
   console.log(`Kestrel playthings, ${name}: ${JSON.stringify(shown)}`);
   return measured;
 }

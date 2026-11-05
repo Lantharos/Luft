@@ -51,7 +51,7 @@ export class SmoothSprite {
     return this.options.height;
   }
 
-  place({ display, x, y, frame, rotation = 0, opacity = 1, scaleX = 1, scaleY = 1, flipped = false }: SpritePlace): void {
+  place({ x, y, frame, rotation = 0, opacity = 1, scaleX = 1, scaleY = 1, flipped = false }: SpritePlace): void {
     const { actor } = this;
     if (frame !== this.frame) {
       this.frame = frame;
@@ -59,10 +59,9 @@ export class SmoothSprite {
       actor.set_content(images[0]);
       actor.covered = covered[0];
     }
-    const monitor = this.stage.monitors().find(({ index }) => index === display)!;
     const size = this.options.height;
-    const left = monitor.x + x - size * this.pivotX;
-    const top = monitor.y + y - size * this.pivotY;
+    const left = x - size * this.pivotX;
+    const top = y - size * this.pivotY;
     if (left !== this.x || top !== this.y) {
       this.x = left;
       this.y = top;

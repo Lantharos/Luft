@@ -4,7 +4,7 @@ import { Campfire } from '../things/campfire.js';
 import { Cloud } from '../things/cloud.js';
 import { Lantern, type Paper, PAPERS } from '../things/lantern.js';
 import { Stars } from '../things/stars.js';
-import { inside, type Kind, type Sheets, type Stand, type Thing } from '../things/thing.js';
+import { inside, type Kind, type Limit, type Sheets, type Stand, type Thing } from '../things/thing.js';
 import { Arrangement } from './arrangement.js';
 import { coveredBy } from './covered.js';
 import { Places, thingId } from './places.js';
@@ -26,7 +26,22 @@ const KINDS: { kind: Kind; on: string; count: string; place: string }[] = [
 ];
 
 const labelOf = (t: Extension['t']) => (kind: Kind) => ({ lantern: t('label-lantern'), cloud: t('label-cloud'), campfire: t('label-campfire'), stars: t('label-stars') })[kind];
-const stampOf = (displays: readonly SurfaceDisplay[]) => JSON.stringify(displays.map(({ id, index, width, height, workArea }) => [id, index, width, height, workArea]));
+const beside = (start: number, length: number, otherStart: number, otherLength: number) => start < otherStart + otherLength && otherStart < start + length;
+
+/** Where a display ends, counted from its corner, on the sides another display adjoins. */
+function limitOn({ x, y, width, height }: SurfaceDisplay, displays: readonly SurfaceDisplay[]): Limit {
+  const others = displays.filter(other => other.x !== x || other.y !== y);
+  const alongside = others.filter(other => beside(y, height, other.y, other.height));
+  const aboveOrBelow = others.filter(other => beside(x, width, other.x, other.width));
+  return {
+    left: alongside.some(other => other.x + other.width === x) ? 0 : -Infinity,
+    right: alongside.some(other => other.x === x + width) ? width : Infinity,
+    top: aboveOrBelow.some(other => other.y + other.height === y) ? 0 : -Infinity,
+    bottom: aboveOrBelow.some(other => other.y === y + height) ? height : Infinity,
+  };
+}
+
+const stampOf = (displays: readonly SurfaceDisplay[]) => JSON.stringify(displays.map(({ id, index, x, y, width, height, workArea }) => [id, index, x, y, width, height, workArea]));
 
 /** Everything on the desktop: it builds things from the settings and decides which of them run, and how often. */
 export class Playground {
@@ -102,6 +117,7 @@ export class Playground {
         display: display.index,
         displayId: display.id,
         room: display.workArea,
+        limit: limitOn(display, displays),
         calm: () => this.extension.appearance.reducedMotion,
         label: labelOf(this.extension.t),
       };
@@ -188,8 +204,17 @@ export class Playground {
     this.hidden.clear();
     for (const thing of this.things) {
       const display = displays.find(({ index }) => index === thing.display)!;
-      if (display.fullscreen || coveredBy(thing.bounds, display.windows)) this.hidden.add(thing);
+      if (!display.fullscreen && !coveredBy(thing.bounds, display.windows)) continue;
+      this.hidden.add(thing);
+      this.stopThing(thing);
     }
+  }
+
+  /** Nobody can see it, so whatever it was doing ends here. */
+  private stopThing(thing: Thing): void {
+    if (!this.awake.delete(thing)) return;
+    thing.rest();
+    for (const [pointer, held] of this.holds) if (held === thing) this.holds.delete(pointer);
   }
 
   private conditionsChanged(): void {
@@ -259,7 +284,7 @@ export class Playground {
 
   private wakeAround(pointer: Pointer): void {
     for (const thing of this.things) {
-      if (thing.display === pointer.display && inside(thing.reach, pointer.x, pointer.y)) this.wake(thing);
+      if (thing.display === pointer.display && !this.hidden.has(thing) && inside(thing.reach, pointer.x, pointer.y)) this.wake(thing);
     }
   }
 

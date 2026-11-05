@@ -76,7 +76,7 @@ const layer = ext.wallpaper.addLayer({
 
 A sprite has `place({ display, x, y, frame, flipped? })`, which shows it with its feet at that point and only touches what's changed, `describe(label)`, what screen readers call it, and `sizeOn(display)`, its size there. It shows a whole number of screen pixels per pixel of its sheet, the nearest to `height`, so pixel art stays crisp at every display scale. It takes clicks only on what shows of it; the desktop keeps every other pixel.
 
-For painted art rather than pixel art, load the sheet with `smooth: true` and add sprites with `smooth: true`. They show at exactly `height`, filtered, and `place` also takes `rotation` in degrees, `opacity` from 0 to 1, `scaleX` and `scaleY`, all around a `pivot` you give as parts of the frame, such as `[0.5, 0]` for a lantern hanging from its top. They stack in the order you add them, and nothing is drawn for one at opacity 0.
+For painted art rather than pixel art, load the sheet with `smooth: true` and add sprites with `smooth: true`. They show at exactly `height`, filtered, and `place` also takes `rotation` in degrees, `opacity` from 0 to 1, `scaleX` and `scaleY`, all around a `pivot` you give as parts of the frame, such as `[0.5, 0]` for a lantern hanging from its top. Give each a `display`, the main one otherwise: it's cut off at that display's edges. They stack in the order you add them, and nothing is drawn for one at opacity 0.
 
 Add `pressable: true` to a smooth sprite to take presses on what shows of it, and hear about them through `wallpaper.followPointer({ areas, onPointer })`. It tells you what the mouse and fingers do on the bare desktop and your own sprites, inside `areas` (each with a `display`, `x`, `y`, `width` and `height`) and nowhere else, so it costs nothing while the pointer is elsewhere. Windows in front stop it by themselves. `setAreas` replaces the areas, and `dispose()` stops it.
 
@@ -91,7 +91,7 @@ Add `pressable: true` to a smooth sprite to take presses on what shows of it, an
 
 Following only listens: a press on the bare desktop still does what it always does, and right-clicks on a sprite open the desktop's menu.
 
-To know what's where, `wallpaper.surfaces` lists each display with `index`, an `id` that stays the same across restarts and plugging it in again, `primary`, `width`, `height`, `scale`, `workArea`, `fullscreen`, `windows` and `taskbar`. Windows and taskbar pieces are outlines as in `frame.displays`, each with an `id` that lasts as long as it does. `wallpaper.onSurfacesChanged(changed)` runs before the next frame after any of them moved, appeared or went, at most once a frame, and never while nothing changes.
+To know what's where, `wallpaper.surfaces` lists each display with `index`, an `id` that stays the same across restarts and plugging it in again, `primary`, `x`, `y`, `width`, `height`, `scale`, `workArea`, `fullscreen`, `windows` and `taskbar`. Windows and taskbar pieces are outlines as in `frame.displays`, each with an `id` that lasts as long as it does. `wallpaper.onSurfacesChanged(changed)` runs before the next frame after any of them moved, appeared or went, at most once a frame, and never while nothing changes.
 
 ```js
 const sprites = ext.wallpaper.addSprites();

@@ -186,11 +186,13 @@ export class DesktopSprites {
   private readonly frames = new Map<SpriteSheet, Mirrored[]>();
   private readonly unwatch: () => void;
   private readonly stepper: FrameStepper;
-  private group: Clutter.Actor | null = null;
+  private readonly groups = new Map<number, Clutter.Actor>();
+  private readonly unwatchMonitors: () => void;
 
   constructor(private readonly stage: LayerStage, private readonly scope: Scope, private readonly name: string, private readonly pathOf: (file: string) => string) {
     this.unwatch = stage.host.desktop.watch(() => this.sync());
     this.stepper = new FrameStepper(scope);
+    this.unwatchMonitors = stage.host.watchMonitors(() => this.fitGroups());
   }
 
   private sync(): void {
@@ -206,7 +208,7 @@ export class DesktopSprites {
   add(options: SpriteOptions): Sprite {
     const frames = this.frames.get(options.sheet)!;
     const sprite = options.smooth
-      ? new SmoothSprite(options, frames, this.name, this.stage, this.scope, this.smoothGroup())
+      ? new SmoothSprite(options, frames, this.name, this.stage, this.scope, this.groupOn(options.display ?? this.stage.primaryIndex()))
       : new DesktopSprite(options, frames, this.name, this.stage, this.scope);
     this.sprites.add(sprite);
     this.sync();
@@ -225,17 +227,31 @@ export class DesktopSprites {
     return made;
   }
 
-  /** Smooth sprites share one actor, so they stack in the order they were added and windows only ever pass one thing. */
-  private smoothGroup(): Clutter.Actor {
-    if (!this.group) {
-      this.group = new Clutter.Actor({ name: `${this.name}-group` });
-      this.stage.place(this.group, 'below-windows');
+  /**
+   * Smooth sprites share one actor on each display, so they stack in the order they were added, windows only ever
+   * pass that one actor, and what reaches past the edge of a display is cut off there rather than showing on the next.
+   */
+  private groupOn(display: number): Clutter.Actor {
+    let group = this.groups.get(display);
+    if (!group) {
+      group = new Clutter.Actor({ name: `${this.name}-group`, clip_to_allocation: true });
+      this.groups.set(display, group);
+      this.stage.place(group, 'below-windows');
+      this.fitGroups();
     }
-    return this.group;
+    return group;
+  }
+
+  private fitGroups(): void {
+    for (const { index, x, y, width, height } of this.stage.monitors()) {
+      const group = this.groups.get(index);
+      group?.set_position(x, y);
+      group?.set_size(width, height);
+    }
   }
 
   lift(lifted: boolean): void {
-    if (this.group) this.stage.place(this.group, lifted ? 'above-windows' : 'below-windows');
+    for (const group of this.groups.values()) this.stage.place(group, lifted ? 'above-windows' : 'below-windows');
   }
 
   onFrame(step: (seconds: number) => boolean): Disposable {
@@ -244,10 +260,12 @@ export class DesktopSprites {
 
   destroy(): void {
     this.unwatch();
+    this.unwatchMonitors();
     this.stepper.destroy();
     for (const sprite of this.sprites) sprite.destroy();
     this.sprites.clear();
     this.frames.clear();
-    this.group?.destroy();
+    for (const group of this.groups.values()) group.destroy();
+    this.groups.clear();
   }
 }

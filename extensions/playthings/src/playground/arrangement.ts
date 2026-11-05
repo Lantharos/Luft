@@ -51,7 +51,7 @@ export class Arrangement {
     this.lifted = sprites;
     for (const thing of this.things()) {
       thing.rest();
-      const ring = sprites.add({ sheet: sheets.glow, height: RING, smooth: true, pivot: [0.5, 0.5] });
+      const ring = sprites.add({ sheet: sheets.glow, height: RING, smooth: true, display: thing.display, pivot: [0.5, 0.5] });
       this.rings.set(thing, ring);
       this.showRing(thing);
     }
@@ -90,6 +90,6 @@ export class Arrangement {
     this.showRing(thing);
     if (phase === 'move') return;
     this.carried.delete(id);
-    this.places.put(thing.displayId, thing.id, point, thing.room);
+    this.places.put(thing.displayId, thing.id, thing.home, thing.room);
   }
 }

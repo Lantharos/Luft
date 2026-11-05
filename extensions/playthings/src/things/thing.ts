@@ -28,6 +28,14 @@ export interface Sheets {
   comet: SpriteSheet;
 }
 
+/** How far a thing can reach without touching another display, Infinity where there's none beside this one. */
+export interface Limit {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+}
+
 /** What a thing needs of the place it lives in. */
 export interface Stand {
   readonly sprites: Sprites;
@@ -38,6 +46,8 @@ export interface Stand {
   readonly displayId: string;
   /** Where things can be: the display without the taskbar. */
   readonly room: Box;
+  /** Where it stops, so that what it does never repaints the next display. */
+  readonly limit: Limit;
   /** How big things are, 1 for the middle size. */
   readonly size: number;
   /** Whether things should stay still when pushed around: they still respond, only without motion. */
@@ -66,13 +76,25 @@ export abstract class Thing {
   }
 
   protected part(sheet: SpriteSheet, height: number, options: Partial<SpriteOptions> = {}): Sprite {
-    const sprite = this.stand.sprites.add({ sheet, height, smooth: true, ...options });
+    const sprite = this.stand.sprites.add({ sheet, height, smooth: true, display: this.stand.display, ...options });
     this.parts.push(sprite);
     if (options.pressable) {
       this.pressable.add(sprite);
       sprite.describe(this.stand.label(this.kind));
     }
     return sprite;
+  }
+
+  /** Moves a point in by as much as a thing `halfWidth` wide and `halfHeight` tall needs to stay on its display. */
+  protected kept({ x, y }: Point, halfWidth: number, halfHeight: number): Point {
+    const { left, top, right, bottom } = this.stand.limit;
+    return { x: Math.min(right - halfWidth, Math.max(left + halfWidth, x)), y: Math.min(bottom - halfHeight, Math.max(top + halfHeight, y)) };
+  }
+
+  /** How much to shrink a round glow here so it stays on its display. */
+  protected fitted({ x, y }: Point, radius: number): number {
+    const { left, top, right, bottom } = this.stand.limit;
+    return Math.min(1, Math.min(x - left, right - x, y - top, bottom - y) / radius);
   }
 
   owns(sprite: Sprite): boolean {

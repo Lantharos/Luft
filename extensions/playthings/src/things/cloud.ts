@@ -6,6 +6,7 @@ import { between, nearness, shuffled, Spring, Stepper } from './physics.js';
 import { type Box, expanded, type Point, type Stand, Thing } from './thing.js';
 
 const PUFF_HEIGHT = 170;
+const PUFF_REACH = 0.62;
 const WIDTH = 300;
 const CLOUD_HEIGHT = 120;
 const REACH = 110;
@@ -86,7 +87,8 @@ export class Cloud extends Thing {
     return this.home;
   }
 
-  moveTo({ x, y }: Point): void {
+  moveTo(point: Point): void {
+    const { x, y } = this.kept(point, this.width / 2 + DRIFT + PUFF_HEIGHT * this.stand.size * PUFF_REACH, this.height / 2 + PUFF_HEIGHT * this.stand.size * PUFF_REACH);
     this.x = x;
     this.y = y;
     this.rest();

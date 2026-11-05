@@ -26,6 +26,7 @@ const SWING_DAMPING = 0.72;
 const SMALL_SWING_DAMPING = 2.4;
 const SMALL_SWING_PIXELS = 7;
 const TO_DEGREES = 180 / Math.PI;
+const EDGE_ROOM = 14;
 
 export const PAPERS = ['amber', 'coral', 'jade'] as const;
 export type Paper = typeof PAPERS[number];
@@ -55,6 +56,7 @@ export class Lantern extends Thing {
   private flicker = 0;
   private holder: Pointer | null = null;
   private burning = false;
+  private glowFit = 1;
 
   constructor(id: string, stand: Stand, paper: Paper, slot: number) {
     super(id, 'lantern', stand);
@@ -86,10 +88,12 @@ export class Lantern extends Thing {
   }
 
   /** Hangs the lantern with its top at `point`, under the ceiling at the same place. */
-  moveTo({ x, y }: Point): void {
+  moveTo(point: Point): void {
+    const { x, y } = this.kept(point, this.bodyHeight * 0.6 + EDGE_ROOM, 0);
     this.anchorX = x;
     this.anchorY = this.stand.room.y;
     this.length = Math.max(24, y - this.anchorY);
+    this.glowFit = this.fitted({ x, y: y + this.bodyHeight / 2 }, this.glowHeight / 2 + EDGE_ROOM);
     this.rest();
   }
 
@@ -196,6 +200,6 @@ export class Lantern extends Thing {
     this.lit.place({ display, x, y, frame: shown + PAPERS.length, rotation: -body * TO_DEGREES, opacity: lit });
     const bottom = this.bodyHeight * 0.98;
     this.tassel.place({ display, x: x + Math.sin(body) * bottom, y: y + Math.cos(body) * bottom, frame: shown, rotation: -(body + this.drape.value) * TO_DEGREES });
-    this.glow.place({ display, x: x + Math.sin(body) * this.bodyHeight * 0.5, y: y + Math.cos(body) * this.bodyHeight * 0.5, frame: shown, opacity: clamp(glow * 0.72, 0, 1) });
+    this.glow.place({ display, x: x + Math.sin(body) * this.bodyHeight * 0.5, y: y + Math.cos(body) * this.bodyHeight * 0.5, frame: shown, opacity: clamp(glow * 0.72, 0, 1), scaleX: this.glowFit, scaleY: this.glowFit });
   }
 }

@@ -53,6 +53,8 @@ export class SurfaceWatch {
         index: monitor.index,
         id: displayId(monitor.index),
         primary: monitor.index === primary,
+        x: monitor.x,
+        y: monitor.y,
         width: monitor.width,
         height: monitor.height,
         scale: global.display.get_monitor_scale(monitor.index),

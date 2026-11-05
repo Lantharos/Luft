@@ -12,7 +12,7 @@ import {capture} from '../lib/screenshots.js';
 import {nextFrame, pause} from '../lib/wait.js';
 import {openWindow} from '../tiling/lib/tiling.js';
 import {installBuilt, listed, request} from '../extensions/lib/extensions.js';
-import {ambient, choose, group, hasPart, labelled, measure, middleOf, nextPart, only, parts, PLAYTHINGS, pressButton, setPowerProfile, topAt, turned} from './lib/playthings.js';
+import {ambient, choose, type Cost, groups, hasPart, labelled, measure, middleOf, nextPart, only, parts, PLAYTHINGS, pressButton, setPowerProfile, steady, topAt, turned} from './lib/playthings.js';
 
 const {require, eventually} = checks('playthings');
 const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
@@ -21,6 +21,8 @@ const seat = global.stage.context.get_backend().get_default_seat();
 const touchscreen = seat.create_virtual_device(Clutter.InputDeviceType.TOUCHSCREEN_DEVICE);
 const now = () => GLib.get_monotonic_time();
 const QUIET_PAINTS = 0.5;
+const POINTER_ARRIVES_MS = 150;
+const THE_GLOW = 1;
 const FULL_SCREEN_SLACK = 2;
 const COMET_AT_LEAST = 150;
 const FAR_FROM_CLOUDS: Point = [700, 640];
@@ -81,7 +83,7 @@ async function checkLanterns() {
   rest();
   await settled(lantern);
   await pause(1200);
-  require((await measure('a settled lantern', 3000)).paints <= QUIET_PAINTS, 'once settled it paints nothing');
+  await resting('a settled lantern', 3000, 'once settled it paints nothing');
 
   const middle = middleOf(lantern);
   require(topAt(middle) === lantern, 'a click on a lantern lands on it');
@@ -98,7 +100,7 @@ async function checkLanterns() {
   await settled(lantern);
 
   moveTo(beside);
-  await pause(150);
+  await pause(POINTER_ARRIVES_MS);
   pressMouse();
   releaseButton();
   await pause(300);
@@ -117,7 +119,7 @@ async function checkLanterns() {
   await settled(lantern);
   const held = middleOf(lantern);
   moveTo(held);
-  await nextFrame();
+  await pause(POINTER_ARRIVES_MS);
   pressMouse();
   await sweep(held, [held[0] + 120, held[1] - 30], 20);
   await pause(250);
@@ -205,7 +207,7 @@ async function checkClouds() {
   await capture('playthings-clouds-parted');
   await pause(2500);
   const parked = await measure('a pointer parked in a cloud', 2000, () => pause(2000));
-  require(parked.paints <= QUIET_PAINTS, `puffs held apart by a still pointer rest too (${parked.paints} paints a second)`);
+  if (parked.paints > QUIET_PAINTS) require((await measure('a pointer parked in a cloud, again', 2000, () => pause(2000))).paints <= QUIET_PAINTS, 'puffs held apart by a still pointer rest too');
   const before = showing();
   click(center);
   await eventually(() => showing() > before, 'poking a cloud makes it rain');
@@ -235,12 +237,13 @@ async function checkCampfire() {
   rest();
   await settled(flame);
 
-  const before = showing();
+  const resting = flames.length + THE_GLOW;
+  await eventually(() => showing() === resting, 'any sparks from moving past it burn out', 8000);
   click([x, y + 20]);
-  await eventually(() => showing() > before, 'clicking throws sparks');
+  await eventually(() => showing() > resting, 'clicking throws sparks');
   await capture('playthings-sparks');
   rest();
-  await eventually(() => showing() === before, 'the sparks burn out', 8000);
+  await eventually(() => showing() === resting, 'the sparks burn out', 8000);
   const [restingX, restingY] = [flame.scale_x, flame.scale_y];
   let fanned = false;
   for (let stroke = 0; stroke < 8 && !fanned; stroke++) {
@@ -296,8 +299,9 @@ async function checkSleeping(fullScreenAlone: number) {
   await eventually(() => labelled('Lantern').length && labelled('Star').length, 'everything shows');
   rest();
   await pause(600);
-  const breathing = await measure('all four, ambient', 6000);
-  require(breathing.paints > 4 && breathing.paints < 22, `ambient motion runs at a low rate (${breathing.paints} paints a second)`);
+  const lowRate = ({paints, elsewhere}: Cost) => paints > 4 && paints < 22 && elsewhere === 0;
+  const breathing = await steady('all four, ambient', 6000, lowRate);
+  require(lowRate(breathing), `ambient motion runs at a low rate, on its own display (${breathing.paints} paints a second, ${breathing.elsewhere} on the other)`);
 
   await fullScreen(async () => {
     const puff = labelled('Cloud')[0];
@@ -309,13 +313,11 @@ async function checkSleeping(fullScreenAlone: number) {
 
   a11y.set_string('reduced-motion', 'reduce');
   await pause(800);
-  const reduced = await measure('reduced motion', 3000);
-  require(reduced.paints <= QUIET_PAINTS, `it stays still with reduced motion (${reduced.paints} paints a second)`);
+  await resting('reduced motion', 3000, 'it stays still with reduced motion');
   a11y.reset('reduced-motion');
   await setPowerProfile('power-saver');
   await pause(800);
-  const saver = await measure('battery saver', 3000);
-  require(saver.paints <= QUIET_PAINTS, `it stays still with battery saver on (${saver.paints} paints a second)`);
+  await resting('battery saver', 3000, 'it stays still with battery saver on');
   await setPowerProfile('balanced');
   await pause(500);
   require((await measure('back to normal', 2000)).paints > 4, 'ambient motion comes back after');
@@ -324,10 +326,11 @@ async function checkSleeping(fullScreenAlone: number) {
   rest();
   await pause(800);
   await capture('playthings-most');
-  await measure('the most of everything, ambient', 6000);
+  const most = await steady('the most of everything, ambient', 6000, lowRate);
+  require(lowRate(most), `the most of everything stays at that rate and leaves the other display alone (${most.paints} paints a second, ${most.elsewhere} on the other)`);
   await ambient(false);
   await pause(800);
-  require((await measure('the most of everything, still', 5000)).paints <= QUIET_PAINTS, 'with ambient motion off, the most of everything still paints nothing');
+  await resting('the most of everything, still', 5000, 'with ambient motion off, the most of everything still paints nothing');
   await choose({'lantern-count': count(3), 'cloud-count': count(2), 'campfire-count': count(1), 'star-count': count(1)});
   await eventually(() => lanterns().length === 3, 'back to the default amounts');
   await pause(500);
@@ -360,7 +363,7 @@ async function checkArranging() {
   await capture('playthings-arranging');
   const target: Point = [420, 560];
   moveTo(start);
-  await nextFrame();
+  await pause(POINTER_ARRIVES_MS);
   pressMouse();
   await sweep(start, target, 14);
   releaseButton();
@@ -405,12 +408,11 @@ async function checkDisplaysAndTaskbar() {
   await eventually(() => named('Done'), 'arranging works with every display');
   await pause(300);
   const elsewhere = labelled('Lantern').find(actor => middleOf(actor)[0] > secondLeft)!;
-  const home = labelled('Lantern')[0];
-  const [homeX, homeY] = middleOf(home);
+  const onMain = () => labelled('Lantern').find(actor => middleOf(actor)[0] < secondLeft)!;
+  const [homeX, homeY] = middleOf(onMain());
   const from = middleOf(elsewhere);
   moveTo(from);
-  await nextFrame();
-  await pause(100);
+  await pause(POINTER_ARRIVES_MS);
   pressMouse();
   await sweep(from, [from[0] + 200, from[1] + 90], 12);
   releaseButton();
@@ -422,15 +424,30 @@ async function checkDisplaysAndTaskbar() {
   await pause(500);
   const moved = labelled('Lantern').find(actor => middleOf(actor)[0] > secondLeft)!;
   require(!near(middleOf(moved)[0], from[0], 8), 'what was moved on one display stays moved');
-  require(near(middleOf(labelled('Lantern')[0])[0], homeX) && near(middleOf(labelled('Lantern')[0])[1], homeY), 'and the same lantern on the other display stays put');
+  require(near(middleOf(onMain())[0], homeX) && near(middleOf(onMain())[1], homeY), 'and the same lantern on the other display stays put');
   await pressButton('Put everything back');
   await eventually(() => labelled('Campfire').length > 3, 'putting everything back rebuilds them');
+}
+
+/** Nothing of Playthings changes and nothing paints, however long it's left. */
+async function resting(name: string, milliseconds: number, what: string) {
+  const {paints, partsChanged} = await steady(name, milliseconds, ({paints: measured}) => measured <= QUIET_PAINTS);
+  require(!partsChanged, `${what}: no part changes`);
+  require(paints <= QUIET_PAINTS, `${what} (${paints} paints a second)`);
 }
 
 async function takeBaseline() {
   await pause(1500);
   rest();
   await pause(1500);
+  await measure('moving the pointer without Playthings', 4000, async () => {
+    for (let pass = 0; pass < 6; pass++) {
+      await sweep([200, 300], [420, 300], 18);
+      await sweep([420, 300], [200, 300], 18);
+    }
+  });
+  rest();
+  await pause(800);
   console.log(`Kestrel playthings, display scale: ${global.display.get_monitor_scale(global.display.get_primary_monitor())}`);
   await measure('without Playthings', 5000);
   let paints = 0;
@@ -447,7 +464,7 @@ export async function run() {
     const fullScreenAlone = await takeBaseline();
     await installBuilt(PLAYTHINGS);
     await eventually(async () => (await listed(PLAYTHINGS))?.state === 'running', 'Playthings runs once installed');
-    await eventually(() => !!group(), 'things show');
+    await eventually(() => groups().length > 0, 'things show');
     rest();
     await pause(1000);
     await capture('playthings-desktop');

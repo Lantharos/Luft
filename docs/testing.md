@@ -35,7 +35,7 @@ Headless sessions run Kestrel through `kestrel-wrapper`, as the real session doe
 
 `tiling:monitors`, `system:dimming`, `windows:seeThroughWallpaper`, `taskbar:arrangement` and `desktop:playthings` always run with a second 1280×720 display to the right of the first, which the other groups only get from `KESTREL_CAPTURE_SECONDARY_SIZE`. `windows:seeThroughWallpaper` sets that display to its largest scale and checks a see-through window spanning both. `system:dimming` lets the screen go idle until it dims, saving `dimming-fading` and `dimming-dimmed`, and gives the first display a stand-in backlight to check how a built-in panel dims and comes back.
 
-`desktop:playthings` prints what Playthings costs at rest, in ambient motion, asleep and being played with, as paints, wakeups and CPU a second. `after-paint` counts each display painted, so one frame touching both displays counts twice. Run it with `KESTREL_CAPTURE_SIZE=2880x1800:286x179mm` for the same at 200%.
+`desktop:playthings` prints what Playthings costs at rest, in ambient motion, asleep and being played with, as paints, wakeups and CPU a second. `after-paint` counts each display painted, and moving the pointer paints both displays of a headless session by itself, so compare with the line for moving it without Playthings. Run it with `KESTREL_CAPTURE_SIZE=2880x1800:286x179mm` for the same at 200%.
 
 The `tablet` groups fold the session into a tablet with a virtual tablet mode switch and touchscreen, swipe and tap with a finger, and turn the display through Mutter's display configuration. Their clips of each transition go to `clips` in the capture folder, like those of `motion`.
 

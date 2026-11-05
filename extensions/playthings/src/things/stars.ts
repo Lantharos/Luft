@@ -100,7 +100,9 @@ export class Stars extends Thing {
     return this.home;
   }
 
-  moveTo({ x, y }: Point): void {
+  moveTo(point: Point): void {
+    const edge = this.span + STAR * this.stand.size;
+    const { x, y } = this.kept(point, edge, edge);
     this.x = x;
     this.y = y;
     this.rest();

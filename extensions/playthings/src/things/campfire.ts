@@ -50,6 +50,7 @@ export class Campfire extends Thing {
   private flicker = 0;
   private wobble = 0;
   private owed = 0;
+  private glowFit = 1;
 
   constructor(id: string, stand: Stand, slot: number) {
     super(id, 'campfire', stand);
@@ -82,13 +83,19 @@ export class Campfire extends Thing {
     return { x: this.x, y: this.y };
   }
 
+  private get glowY(): number {
+    return this.y - GLOW * this.unit * 0.14;
+  }
+
   get grip(): Point {
     return { x: this.x, y: this.y - 50 * this.unit };
   }
 
-  moveTo({ x, y }: Point): void {
+  moveTo(point: Point): void {
+    const { x, y } = this.kept(point, LOGS * this.unit * 0.6, 0);
     this.x = x;
     this.y = y;
+    this.glowFit = this.fitted({ x, y: this.glowY }, GLOW * this.unit / 2);
     this.rest();
   }
 
@@ -164,7 +171,7 @@ export class Campfire extends Thing {
     const { display } = this.stand;
     const heat = this.heat.value;
     const step = Math.floor(this.flicker);
-    this.glow.place({ display, x: this.x, y: this.y - GLOW * this.unit * 0.14, frame: 3, opacity: clamp(0.55 + heat * 0.35 + Math.sin(step * 1.7) * 0.03, 0, 1) });
+    this.glow.place({ display, x: this.x, y: this.glowY, frame: 3, opacity: clamp(0.55 + heat * 0.35 + Math.sin(step * 1.7) * 0.03, 0, 1), scaleX: this.glowFit, scaleY: this.glowFit });
     this.logs.place({ display, x: this.x, y: this.y, frame: 0 });
     this.tongues.forEach((tongue, index) => {
       const frame = (tongue.frame + step + index) % FLAME_FRAMES + (tongue.deep ? FLAME_FRAMES : 0);

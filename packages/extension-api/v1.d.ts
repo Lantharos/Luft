@@ -523,6 +523,9 @@ export interface SurfaceDisplay {
   /** What the display is known by across restarts and being plugged in again, for keeping things per display. */
   readonly id: string;
   readonly primary: boolean;
+  /** Where it sits among the other displays. */
+  readonly x: number;
+  readonly y: number;
   readonly width: number;
   readonly height: number;
   /** How many of the screen's own pixels one pixel here takes up, such as 1.5 at 150%. */
@@ -594,6 +597,11 @@ export interface SpriteOptions {
    * one never asks for a layout. `onClick` and picking up don't apply; use `pressable` instead.
    */
   smooth?: boolean;
+  /**
+   * Only for smooth sprites: the display it lives on, as in {@link SurfaceDisplay.index}, the main one without it. It
+   * never shows beyond that display's edges, and {@link SpritePlace.display} doesn't move it.
+   */
+  display?: number;
   /**
    * Only for smooth sprites: the point of the frame that {@link SpritePlace} puts in place and that it turns around, as
    * parts of its width and height. The middle of the bottom edge, `[0.5, 1]`, without it.

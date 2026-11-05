@@ -64,12 +64,14 @@ async function checkBinding() {
     ['mute', 'Toggle mute', 'CTRL+ALT+m'],
     ['deafen', 'Toggle deafen', 'LOGO+v'],
     ['talk', 'Push to talk', 'a'],
+    ['board', 'Play a sound', 'F9'],
     ['copy', 'Copy the call link', 'CTRL+c'],
     ['next', 'Next channel', 'ALT+Down'],
   ]), 'Allow', ['Toggle mute', 'Ctrl+Alt+M']));
   require(voice.mute === 'Ctrl+Alt+M', 'free preferred shortcuts are given once allowed');
   require(voice.deafen === null, 'shortcuts the shell already uses are left unassigned');
   require(voice.talk === null, 'shortcuts that would swallow typing are left unassigned');
+  require(voice.board === 'F9', 'a function key can stand alone');
   require(voice.copy === null && voice.next === null, 'shortcuts apps use for editing and moving around are left unassigned');
   const obs = await session('com.obsproject.Studio');
   require((await bind(obs, [['mute', 'Mute desktop audio', 'CTRL+ALT+m']])).mute === null, 'apps cannot take shortcuts another app holds');
@@ -89,7 +91,7 @@ async function checkTrigger(signals: Signal[], discordHandles: string[]) {
 async function checkDialog(signals: Signal[], {discord, discordAgain}: {discord: string; discordAgain: string}) {
   await call(SHORTCUTS, 'ConfigureShortcuts', new GLib.Variant('(osa{sv})', [discordAgain, '', {}]), null);
   const keys = () => styled('kestrel-shortcut-key', shortcutsDialog());
-  await eventually(() => keys().length === 5 && keys().every(shown), 'the shortcut dialog opens');
+  await eventually(() => keys().length === 6 && keys().every(shown), 'the shortcut dialog opens');
   await settled();
   const [mute, deafen] = keys().map(key => ofType(key, St.Button));
   require(mute.label === 'Ctrl+Alt+M' && deafen.label === 'Not set', 'the shortcut dialog lists every shortcut');

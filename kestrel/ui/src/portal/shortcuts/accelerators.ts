@@ -22,6 +22,7 @@ const TYPING_MODIFIERS = new Set(['shift', 'mod2', 'lock']);
 const EDITING_LETTERS = new Set(['a', 'c', 'v', 'x', 'y', 'z']);
 const EDITING_KEYS = new Set(['left', 'right', 'up', 'down', 'home', 'end', 'page_up', 'page_down', 'prior', 'next', 'backspace', 'delete',
   'insert', 'tab', 'return', 'escape', 'space', 'f4']);
+const BARE_KEY = /^(f\d{1,2}|kp_.+)$/;
 const LABEL_ORDER = ['super', 'ctrl', 'alt', 'shift', 'meta', 'hyper'];
 
 interface Parsed { modifiers: string[]; key: string }
@@ -53,7 +54,8 @@ export function claimable(accelerator: string): boolean {
   const { modifiers, key } = parse(accelerator);
   const held = modifiers.filter(modifier => !TYPING_MODIFIERS.has(modifier));
   const name = key.toLowerCase();
-  if (!held.length || !name) return false;
+  if (!name) return false;
+  if (!held.length) return BARE_KEY.test(name);
   if (held.length === 1 && held[0] === 'ctrl' && EDITING_LETTERS.has(name)) return false;
   return !(held.every(modifier => modifier === 'ctrl' || modifier === 'alt') && EDITING_KEYS.has(name));
 }

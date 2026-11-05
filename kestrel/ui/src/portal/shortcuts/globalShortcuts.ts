@@ -122,9 +122,11 @@ export class GlobalShortcutsPortal {
     }
     invocation.return_value(null);
     const unavailable = new Set([...reservedAccelerators(), ...this.store.takenByOthers(session.appId)]);
-    void recordShortcuts(session.appId, this.store.app(session.appId), unavailable).then(edited => {
+    const stored = this.store.app(session.appId);
+    const wanted = new Set([...this.sessions].filter(other => other.appId === session.appId).flatMap(other => other.ids));
+    void recordShortcuts(session.appId, Object.fromEntries(Object.entries(stored).filter(([id]) => wanted.has(id))), unavailable).then(edited => {
       if (!edited) return;
-      this.store.save(session.appId, edited);
+      this.store.save(session.appId, { ...this.store.app(session.appId), ...edited });
       for (const other of this.sessions) {
         if (other.appId !== session.appId) continue;
         this.grab(other, edited);
@@ -160,7 +162,7 @@ export class GlobalShortcutsPortal {
     session.release();
     for (const id of session.ids) {
       for (const accelerator of shortcuts[id]?.shortcuts ?? []) {
-        const action = global.display.grab_accelerator(accelerator, Meta.KeyBindingFlags.TRIGGER_RELEASE);
+        const action = global.display.grab_accelerator(accelerator, Meta.KeyBindingFlags.TRIGGER_RELEASE | Meta.KeyBindingFlags.IGNORE_AUTOREPEAT);
         if (action === Meta.KeyBindingAction.NONE) continue;
         this.keybindings.allow(Meta.external_binding_name_for_action(action), Shell.ActionMode.NORMAL);
         session.grabs.set(action, id);

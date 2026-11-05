@@ -1,7 +1,7 @@
 mod details;
 mod open_with;
 
-use luft_app::Commands;
+use luft_app::{Commands, Empty};
 use sabine::SabineWindow;
 use serde::Deserialize;
 use specta::Type;
@@ -18,6 +18,12 @@ struct Opening {
 }
 
 #[derive(Deserialize, Type)]
+struct Conversion {
+    paths: Vec<String>,
+    token: Option<String>,
+}
+
+#[derive(Deserialize, Type)]
 struct Launch {
     path: String,
     app: String,
@@ -27,6 +33,12 @@ struct Launch {
 pub fn register(window: SabineWindow) -> SabineWindow {
     window
         .command("file_details", |Target { path }| details::inspect(&path))
+        .command("converter_installed", |Empty {}| {
+            Ok(open_with::converter_installed())
+        })
+        .command("convert_files", |Conversion { paths, token }| {
+            open_with::convert(&paths, token.as_deref())
+        })
         .command("apps_for_file", |Target { path }| {
             Ok(open_with::apps_for(&path))
         })

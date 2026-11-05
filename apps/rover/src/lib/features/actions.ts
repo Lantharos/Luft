@@ -43,6 +43,10 @@ export function printFiles(manager: FileManager, entries: FileEntry[]) {
 	if (printable(entries)) print.files(entries.map((entry) => entry.path)).catch(manager.notify);
 }
 
+export function convert(manager: FileManager, entries: FileEntry[]) {
+	api.convertFiles(entries.map((entry) => entry.path)).catch(manager.notify);
+}
+
 export function rename(manager: FileManager, entries: FileEntry[]) {
 	if (entries.length > 1) dialogs.rename(entries);
 	else if (entries[0]) manager.startRename(entries[0]);

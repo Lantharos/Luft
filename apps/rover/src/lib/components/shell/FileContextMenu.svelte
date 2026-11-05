@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Archive from '@lucide/svelte/icons/archive';
+	import ArrowLeftRight from '@lucide/svelte/icons/arrow-left-right';
 	import ChartPie from '@lucide/svelte/icons/chart-pie';
 	import Check from '@lucide/svelte/icons/check';
 	import Clipboard from '@lucide/svelte/icons/clipboard';
@@ -118,6 +119,9 @@
 		{@render item(Archive, 'Compress…', () => tools.compress(manager, targets))}
 		{#if archives}
 			{@render item(PackageOpen, 'Extract here', () => tools.extract(manager, targets))}
+		{/if}
+		{#if manager.converter}
+			{@render item(ArrowLeftRight, 'Convert…', () => tools.convert(manager, targets))}
 		{/if}
 		{#if printable}
 			{@render item(Printer, 'Print…', () => tools.printFiles(manager, targets))}

@@ -53,6 +53,11 @@ export const commands = {
 		name: string,
 		format: ArchiveFormat,
 	}, options?: CallOptions) => invoke<string>("compress_items", params, options),
+	convertFiles: (params: {
+		paths: string[],
+		token?: string | null,
+	}, options?: CallOptions) => invoke<null>("convert_files", params, options),
+	converterInstalled: (options?: CallOptions) => invoke<boolean>("converter_installed", {}, options),
 	copyItems: (params: {
 		sources: string[],
 		destination: string,

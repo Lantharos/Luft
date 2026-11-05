@@ -4,6 +4,8 @@ use luft_app::launch;
 use serde::Serialize;
 use specta::Type;
 
+const CONVERTER: &str = "com.lantharos.convertible.desktop";
+
 #[derive(Serialize, Type)]
 pub struct OpenWithApps {
     default: Option<App>,
@@ -49,6 +51,17 @@ pub fn launch_default(path: &str, token: Option<&str>) -> Result<bool, String> {
         .query_default_handler(gio::Cancellable::NONE)
         .map_err(|error| error.to_string())?;
     open_in(&app, &file, token)
+}
+
+pub fn converter_installed() -> bool {
+    gio_unix::DesktopAppInfo::new(CONVERTER).is_some()
+}
+
+pub fn convert(paths: &[String], token: Option<&str>) -> Result<(), String> {
+    let app =
+        gio_unix::DesktopAppInfo::new(CONVERTER).ok_or("Convertible is no longer installed")?;
+    let files: Vec<gio::File> = paths.iter().map(gio::File::for_path).collect();
+    launch::open_files(app.upcast_ref(), &files, token).map_err(|error| error.to_string())
 }
 
 fn open_in(app: &gio::AppInfo, file: &gio::File, token: Option<&str>) -> Result<bool, String> {

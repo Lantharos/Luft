@@ -69,6 +69,7 @@ export class FileManager {
 	viewMode = $state<ViewMode>('list');
 	draft = $state<InlineDraft | null>(null);
 	contextMenu = $state<ContextMenuState | null>(null);
+	converter = $state(false);
 	placeMenu = $state.raw<PlaceMenuState | null>(null);
 	clipboard = $state.raw<ClipboardState>({ items: [], operation: null });
 	notice = $state<string | null>(null);
@@ -171,6 +172,7 @@ export class FileManager {
 	}
 
 	start = async (state: AppState, startPath?: string) => {
+		void this.#findConverter();
 		settings.value = state.settings;
 		this.userDirs = state.userDirs;
 		appearance.start(state);
@@ -358,6 +360,11 @@ export class FileManager {
 		if (entry && !this.selection.has(entry.path)) this.selectOnly(entry.path);
 		this.placeMenu = null;
 		this.contextMenu = { x: event.clientX, y: event.clientY, target: entry ?? null };
+		void this.#findConverter();
+	};
+
+	#findConverter = async () => {
+		this.converter = await commands.converterInstalled();
 	};
 
 	openPlaceMenu = (event: MouseEvent, place: SidebarPlace) => {

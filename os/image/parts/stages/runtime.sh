@@ -25,8 +25,15 @@ share_resources() {
   cp -al "$runtime/Resources/locales" "$runtime/Release/locales"
 }
 
+put_cli_on_path() {
+  local cli="$destdir/usr/lib/sabine/bin/current/sabine"
+  install -DZ -m 755 "$cli" "$destdir/usr/bin/sabine"
+  ln -f "$destdir/usr/bin/sabine" "$cli"
+}
+
 for runtime in "$destdir"/usr/lib/sabine/runtimes/cef/*/; do
   strip --strip-unneeded "$runtime"/Release/*.so*
   keep_languages "$runtime/Resources/locales"
   share_resources "${runtime%/}"
 done
+put_cli_on_path

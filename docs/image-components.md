@@ -63,3 +63,15 @@ bun os/image/parts/components/install.ts DESTDIR security apps/system/setup/inst
 3. Build the part with `os/image/build.sh part PART`, or see what it installs with `os/image/build.sh stage PART FOLDER`.
 
 A new part also needs a stage of its own, named after it, in `os/image/parts/Containerfile`.
+
+## The `sabine` command
+
+The `runtime` part isn't built from an `image.toml`: it installs the Sabine that `Cargo.toml` pins for every user, in `/usr/lib/sabine`, with the CEF build the image ships. That includes the `sabine` command, which `stages/runtime.sh` also places at `/usr/bin/sabine` with `install -DZ`, as a hard link to the same file. So it's always the version Luft's apps are built with, and an update of Luft updates it. Sabine's own updater never writes to it, and `sabine update` says so.
+
+Sabine's rule for which `sabine` runs is that the newest Sabine on the computer wins:
+
+- A `sabine` that starts and finds a newer Sabine, the image's or the one in the person's data folder, runs that version's command in its place. An old `~/.cargo/bin/sabine`, which comes before `/usr/bin` on `PATH`, follows the image this way.
+- A person's own Sabine in `~/.local/share/sabine` only exists when they ask for it with `sabine update` or an app needs a newer one. The daemon then keeps it current, and `/usr/bin/sabine` hands over to it.
+- A `sabine` newer than both runs as it is, and `SABINE_CLI_PINNED=1` keeps any `sabine` on its own version. The image build sets it, so what gets built is always what's pinned.
+
+A toolbox has its own `/usr`, so `/usr/bin/sabine` isn't there; from inside one the image's command is `/run/host/usr/bin/sabine`. It shares the home folder though, so a `sabine` in `~/.cargo/bin` works in it and follows the person's own Sabine. To have it follow the image too, link the image's Sabine into the toolbox with `sudo ln -s /run/host/usr/lib/sabine /usr/lib/sabine`, which works in a Fedora toolbox and not in other distributions, whose libraries differ.

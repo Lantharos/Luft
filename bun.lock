@@ -5,53 +5,15 @@
     "": {
       "name": "luft",
     },
-    "apps/system/barometer": {
-      "name": "barometer",
-      "version": "0.1.0",
-      "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.76",
-      },
-      "devDependencies": {
-        "@lucide/svelte": "^1.51.0",
-        "@luft/ui": "workspace:*",
-        "@sveltejs/vite-plugin-svelte": "^7.3.1",
-        "@tailwindcss/vite": "^4.3.3",
-        "@types/node": "^26.6.4",
-        "svelte": "^5.57.1",
-        "svelte-check": "^4.7.6",
-        "tailwindcss": "^4.3.3",
-        "typescript": "~6.0.3",
-        "vite": "^8.3.2",
-      },
-    },
     "apps/store/convertible": {
       "name": "convertible",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.76",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.77",
       },
       "devDependencies": {
         "@lucide/svelte": "^1.51.0",
         "@luft/i18n": "workspace:*",
-        "@luft/ui": "workspace:*",
-        "@sveltejs/vite-plugin-svelte": "^7.3.1",
-        "@tailwindcss/vite": "^4.3.3",
-        "@types/node": "^26.6.4",
-        "svelte": "^5.57.1",
-        "svelte-check": "^4.7.6",
-        "tailwindcss": "^4.3.3",
-        "typescript": "~6.0.3",
-        "vite": "^8.3.2",
-      },
-    },
-    "apps/system/disks": {
-      "name": "disks",
-      "version": "0.1.0",
-      "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.76",
-      },
-      "devDependencies": {
-        "@lucide/svelte": "^1.51.0",
         "@luft/ui": "workspace:*",
         "@sveltejs/vite-plugin-svelte": "^7.3.1",
         "@tailwindcss/vite": "^4.3.3",
@@ -73,26 +35,7 @@
         "@codemirror/search": "^6.7.2",
         "@codemirror/state": "^6.7.6",
         "@codemirror/view": "^6.43.13",
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.76",
-      },
-      "devDependencies": {
-        "@lucide/svelte": "^1.51.0",
-        "@luft/ui": "workspace:*",
-        "@sveltejs/vite-plugin-svelte": "^7.3.1",
-        "@tailwindcss/vite": "^4.3.3",
-        "@types/node": "^26.6.4",
-        "svelte": "^5.57.1",
-        "svelte-check": "^4.7.6",
-        "tailwindcss": "^4.3.3",
-        "typescript": "~6.0.3",
-        "vite": "^8.3.2",
-      },
-    },
-    "apps/system/keys": {
-      "name": "keys",
-      "version": "0.1.0",
-      "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.76",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.77",
       },
       "devDependencies": {
         "@lucide/svelte": "^1.51.0",
@@ -111,7 +54,7 @@
       "name": "magpie",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.76",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.77",
         "pdfjs-dist": "^6.4.299",
       },
       "devDependencies": {
@@ -131,7 +74,7 @@
       "name": "mailman",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.76",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.77",
       },
       "devDependencies": {
         "@lucide/svelte": "^1.51.0",
@@ -150,7 +93,7 @@
       "name": "meet",
       "version": "0.1.2",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.76",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.77",
       },
       "devDependencies": {
         "@lucide/svelte": "^1.51.0",
@@ -166,11 +109,88 @@
         "vite": "^8.3.2",
       },
     },
+    "apps/store/soundboard": {
+      "name": "soundboard",
+      "version": "0.1.0",
+      "dependencies": {
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.77",
+      },
+      "devDependencies": {
+        "@lucide/svelte": "^1.51.0",
+        "@luft/i18n": "workspace:*",
+        "@luft/ui": "workspace:*",
+        "@sveltejs/vite-plugin-svelte": "^7.3.1",
+        "@tailwindcss/vite": "^4.3.3",
+        "@types/node": "^26.6.4",
+        "svelte": "^5.57.1",
+        "svelte-check": "^4.7.6",
+        "tailwindcss": "^4.3.3",
+        "typescript": "~6.0.3",
+        "vite": "^8.3.2",
+      },
+    },
+    "apps/system/barometer": {
+      "name": "barometer",
+      "version": "0.1.0",
+      "dependencies": {
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.77",
+      },
+      "devDependencies": {
+        "@lucide/svelte": "^1.51.0",
+        "@luft/ui": "workspace:*",
+        "@sveltejs/vite-plugin-svelte": "^7.3.1",
+        "@tailwindcss/vite": "^4.3.3",
+        "@types/node": "^26.6.4",
+        "svelte": "^5.57.1",
+        "svelte-check": "^4.7.6",
+        "tailwindcss": "^4.3.3",
+        "typescript": "~6.0.3",
+        "vite": "^8.3.2",
+      },
+    },
+    "apps/system/disks": {
+      "name": "disks",
+      "version": "0.1.0",
+      "dependencies": {
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.77",
+      },
+      "devDependencies": {
+        "@lucide/svelte": "^1.51.0",
+        "@luft/ui": "workspace:*",
+        "@sveltejs/vite-plugin-svelte": "^7.3.1",
+        "@tailwindcss/vite": "^4.3.3",
+        "@types/node": "^26.6.4",
+        "svelte": "^5.57.1",
+        "svelte-check": "^4.7.6",
+        "tailwindcss": "^4.3.3",
+        "typescript": "~6.0.3",
+        "vite": "^8.3.2",
+      },
+    },
+    "apps/system/keys": {
+      "name": "keys",
+      "version": "0.1.0",
+      "dependencies": {
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.77",
+      },
+      "devDependencies": {
+        "@lucide/svelte": "^1.51.0",
+        "@luft/ui": "workspace:*",
+        "@sveltejs/vite-plugin-svelte": "^7.3.1",
+        "@tailwindcss/vite": "^4.3.3",
+        "@types/node": "^26.6.4",
+        "svelte": "^5.57.1",
+        "svelte-check": "^4.7.6",
+        "tailwindcss": "^4.3.3",
+        "typescript": "~6.0.3",
+        "vite": "^8.3.2",
+      },
+    },
     "apps/system/rover": {
       "name": "rover",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.76",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.77",
       },
       "devDependencies": {
         "@lucide/svelte": "^1.51.0",
@@ -189,7 +209,7 @@
       "name": "schelf",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.76",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.77",
       },
       "devDependencies": {
         "@lucide/svelte": "^1.51.0",
@@ -208,7 +228,7 @@
       "name": "settings",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.76",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.77",
       },
       "devDependencies": {
         "@lucide/svelte": "^1.51.0",
@@ -230,7 +250,7 @@
       "name": "setup",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.76",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.77",
       },
       "devDependencies": {
         "@lucide/svelte": "^1.51.0",
@@ -251,30 +271,10 @@
       "name": "signin",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.76",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.77",
       },
       "devDependencies": {
         "@lucide/svelte": "^1.51.0",
-        "@luft/ui": "workspace:*",
-        "@sveltejs/vite-plugin-svelte": "^7.3.1",
-        "@tailwindcss/vite": "^4.3.3",
-        "@types/node": "^26.6.4",
-        "svelte": "^5.57.1",
-        "svelte-check": "^4.7.6",
-        "tailwindcss": "^4.3.3",
-        "typescript": "~6.0.3",
-        "vite": "^8.3.2",
-      },
-    },
-    "apps/store/soundboard": {
-      "name": "soundboard",
-      "version": "0.1.0",
-      "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.76",
-      },
-      "devDependencies": {
-        "@lucide/svelte": "^1.51.0",
-        "@luft/i18n": "workspace:*",
         "@luft/ui": "workspace:*",
         "@sveltejs/vite-plugin-svelte": "^7.3.1",
         "@tailwindcss/vite": "^4.3.3",
@@ -290,7 +290,7 @@
       "name": "tern",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.76",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.77",
         "@xterm/addon-clipboard": "^0.2.0",
         "@xterm/addon-fit": "^0.11.0",
         "@xterm/addon-search": "^0.16.0",
@@ -376,7 +376,7 @@
       "name": "@luft/network",
       "version": "0.1.0",
       "dependencies": {
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.76",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.77",
       },
       "devDependencies": {
         "typescript": "~6.0.3",
@@ -394,7 +394,7 @@
         "@codemirror/lang-markdown": "^6.5.2",
         "@codemirror/language": "^6.12.4",
         "@codemirror/language-data": "^6.5.2",
-        "@lantharos/sabine": "github:Lantharos/Sabine#v0.76",
+        "@lantharos/sabine": "github:Lantharos/Sabine#v0.77",
         "@lezer/highlight": "^1.2.5",
         "@lucide/svelte": "^1.51.0",
         "@luft/i18n": "workspace:*",
@@ -802,7 +802,7 @@
 
     "@jridgewell/trace-mapping": ["@jridgewell/trace-mapping@0.3.31", "", { "dependencies": { "@jridgewell/resolve-uri": "^3.1.0", "@jridgewell/sourcemap-codec": "^1.4.14" } }, "sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw=="],
 
-    "@lantharos/sabine": ["@lantharos/sabine@github:Lantharos/Sabine#a45b5ed", {}, "Lantharos-Sabine-a45b5ed", "sha512-Iw4QKuafxR5YCDToGi224Qka5bUNgNdg4bQ7osg78EYG4LOV3/LR+4gHlUUoCrkEfTOA9UQYI0zYoqcjXxNXrA=="],
+    "@lantharos/sabine": ["@lantharos/sabine@github:Lantharos/Sabine#69394dd", {}, "Lantharos-Sabine-69394dd", "sha512-sbqhX+p4hjwXzwYQX89qssV9ADcblsLMfmdArJ6spdtbaAfpewjPMroeeOXcAbtm52DmYJ/lICrhERYtGe4vrQ=="],
 
     "@lezer/common": ["@lezer/common@1.5.3", "", {}, "sha512-H0iErY4e43LpXbYDyBci5W4v/RwTgGV3YzYOlJPiGZ8RY8w51kVE+xLn1tg3Z6UmSfyETvtsUK3r7YsgDQEI7Q=="],
 

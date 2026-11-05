@@ -8,15 +8,15 @@ export interface Spot {
   span: Span;
 }
 
-/** One way of getting from a spot to another: `jump` and `drop` arc through the air, `fly` goes straight there. */
+/** One way of getting from a spot to another: `jump` and `drop` arc through the air, `fly` goes straight there, and `scale` jumps at the side of a window and climbs the rest. */
 export interface Move {
-  kind: 'jump' | 'drop' | 'fly' | 'climb' | 'cling';
+  kind: 'jump' | 'drop' | 'fly' | 'climb' | 'cling' | 'scale';
   from: Spot;
   to: Spot;
   /** Where it sets off from, where it lands. */
   fromX: number;
   toX: number;
-  /** The side the wall is on, for `climb` and `cling`. */
+  /** The side the wall is on, for `climb`, `cling` and `scale`. */
   side: number;
 }
 
@@ -26,8 +26,9 @@ export interface Route {
 }
 
 const ARC_SAMPLES = 8;
-const MOST_MOVES_ON_A_ROUTE = 3;
+const MOST_MOVES_ON_A_ROUTE = 4;
 const HIGHEST_RISE = 0.9;
+const HIGHEST_SCALE = 2.5;
 const LIFT_LENGTHS = 0.7;
 const LIFT_PER_PIXEL = 0.2;
 const LIFT_PER_RISE = 0.6;
@@ -112,6 +113,23 @@ export class Graph {
     return { kind: 'cling', from, to: from, fromX: end, toX: end, side: direction };
   }
 
+  /** Jumps up at the side of a window hanging higher than it could reach, and climbs from there. */
+  private scale(from: Spot, to: Spot, reach: number): Move | null {
+    const { world } = this;
+    const surface = world.surfaces.find(({ id }) => id === to.platform.id)!;
+    if (from.platform.y - (surface.y + surface.height) > reach * HIGHEST_SCALE) return null;
+    const half = world.body.width / 2;
+    const walls = [{ side: 1, x: surface.x - half }, { side: -1, x: surface.x + surface.width + half }]
+      .filter(({ x }) => x >= half && x <= world.display.width - half)
+      .sort((one, other) => Math.abs(clamp(one.x, from.span) - one.x) - Math.abs(clamp(other.x, from.span) - other.x));
+    for (const { side, x } of walls) {
+      const fromX = clamp(x, from.span);
+      const toX = x + side * world.body.width * 2;
+      if (Math.abs(fromX - x) <= reach && Math.abs(clamp(toX, to.span) - toX) <= world.body.width * 2) return { kind: 'scale', from, to, fromX, toX: clamp(toX, to.span), side };
+    }
+    return null;
+  }
+
   private nearestSpot(platform: Platform, x: number): Spot | null {
     const reach = this.world.body.width * 2;
     const spots = this.spots.filter(spot => spot.platform === platform && Math.abs(clamp(x, spot.span) - x) <= reach);
@@ -132,6 +150,10 @@ export class Graph {
     if (flies) for (const to of others) moves.push({ kind: 'fly', from, to, fromX: clamp(to.span.left, from.span), toX: (to.span.left + to.span.right) / 2, side: 0 });
     if (!walks) return moves as Move[];
     if (reach) for (const to of others) moves.push(this.jumpBetween(from, to, reach));
+    if (reach && climbs) {
+      const taken = new Set(moves.map(move => move?.to));
+      for (const to of others) if (to.platform.kind === 'window' && to.platform.y < from.platform.y && !taken.has(to)) moves.push(this.scale(from, to, reach));
+    }
     for (const direction of [-1, 1]) {
       moves.push(this.dropOff(from, direction));
       if (climbs) moves.push(this.climb(from, direction));

@@ -53,7 +53,7 @@ export function describePage(strays: Extension, library: Library): void {
   };
 
   strays.settingsPage.describe(() => [
-    { items: [{ setting: 'count' }, { setting: 'size' }] },
+    { items: [{ setting: 'count' }, { setting: 'activity' }, { setting: 'size' }] },
     { title: t('who'), items: library.packs.map(packRow) },
     {
       title: t('make-your-own'),

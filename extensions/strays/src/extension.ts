@@ -24,9 +24,17 @@ const enable: Enable<Granted> = strays => {
     else herd.clear();
     toggle.update({ subtitle: on ? t('around', { count: herd.count }) : null });
   };
+  const whoIsAround = () => [settings.get<boolean>('on'), settings.get<number>('count'), settings.get<string>('size')].join();
+  let around = whoIsAround();
 
+  herd.setPace(settings.get<string>('activity'));
   populate();
-  settings.onChanged(populate);
+  settings.onChanged(() => {
+    herd.setPace(settings.get<string>('activity'));
+    if (whoIsAround() === around) return;
+    around = whoIsAround();
+    populate();
+  });
   library.watch(populate);
   describePage(strays, library);
 };

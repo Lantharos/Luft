@@ -45,14 +45,30 @@
     "flies": false
   },
   "likes": {
-    "window": 3,
-    "taskbar": 2,
-    "ground": 1,
-    "edges": 0.3
+    "window": 6,
+    "taskbar": 3,
+    "ground": 0.5,
+    "edges": 0.4
   },
   "temper": {
     "stride": 1.6,
     "gravity": 1,
-    "sleepiness": 0.6
+    "sleepiness": 0.6,
+    "curiosity": 0.9
+  },
+  "together": {
+    "chatty": 0.8,
+    "does": {
+      "greet": 2,
+      "chase": 2,
+      "play": 2,
+      "nap": 0.5,
+      "stalk": 1,
+      "bump": 1
+    },
+    "with": {
+      "Pip": "stalk",
+      "Dollop": "bump"
+    }
   }
 }

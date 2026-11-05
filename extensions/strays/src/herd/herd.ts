@@ -2,7 +2,11 @@ import type { Disposable, Extension, Sprites, SurfaceDisplay } from '@luft/exten
 
 import type { Pack } from '../packs/pack.js';
 import { World } from '../world/world.js';
-import { MOODS, STEP_S, Stray } from './stray.js';
+import { MOODS } from './activity.js';
+import { type Body, STEP_S } from './body.js';
+import { Encounters } from './encounters.js';
+import { PACES, type Pace } from './pace.js';
+import { Stray } from './stray.js';
 
 type Granted = 'wallpaper' | 'calls';
 
@@ -19,6 +23,8 @@ export class Herd {
   private alarm: Disposable | null = null;
   private drowsy = false;
   private noticing: Disposable | null = null;
+  private pace: Pace = PACES.lively;
+  private readonly encounters = new Encounters(() => this.strays, () => this.pace);
 
   constructor(private readonly extension: Extension<Granted>, private readonly sprites: Sprites) {
     const changed = () => this.conditionsChanged();
@@ -31,13 +37,14 @@ export class Herd {
     return this.strays.length;
   }
 
-  private displayOf(index: number): SurfaceDisplay {
-    const { surfaces } = this.extension.wallpaper;
-    return surfaces.find(display => display.index === index) ?? surfaces[0];
+  /** How much they get up to, for everyone from their next rest on. */
+  setPace(name: string): void {
+    this.pace = PACES[name];
   }
 
   private worldFor(stray: Stray, index: number): World {
-    const display = this.displayOf(index);
+    const { surfaces } = this.extension.wallpaper;
+    const display = surfaces.find(display => display.index === index) ?? surfaces[0];
     return worldOn(display, stray.sprite.sizeOn(display.index));
   }
 
@@ -59,11 +66,12 @@ export class Herd {
         height: HEIGHTS[size],
         onClick: () => this.poke(stray),
         onPicked: () => this.pick(stray),
-        onCarried: ({ display, x, y }) => stray.carried(this.worldFor(stray, display), x, y),
         onDropped: ({ display, x, y }) => this.drop(stray, display, x, y),
       });
       const display = displays[slot % displays.length];
-      const stray: Stray = new Stray(pack, sprite, worldOn(display, sprite.sizeOn(display.index)), mood => this.extension.t(MOODS[mood], { name: pack.name }));
+      const stray: Stray = new Stray(pack, sprite, worldOn(display, sprite.sizeOn(display.index)), mood => this.extension.t(MOODS[mood], { name: pack.name }), () => this.pace);
+      stray.encounters = this.encounters;
+      this.encounters.welcome(stray);
       this.strays.push(stray);
       if (this.drowsy) stray.doze();
     }
@@ -112,14 +120,15 @@ export class Herd {
   private surfacesChanged(): void {
     if (!this.strays.length) return;
     this.conditionsChanged();
+    const displays = this.extension.wallpaper.surfaces;
     const worlds = new Map<string, World>();
-    for (const stray of this.strays) {
-      const display = this.displayOf(stray.display);
+    const worldOf = (display: SurfaceDisplay, stray: Body) => {
       const size = stray.sprite.sizeOn(display.index);
       const key = `${display.index}:${size}`;
       if (!worlds.has(key)) worlds.set(key, worldOn(display, size));
-      stray.surfacesChanged(worlds.get(key)!, this.drowsy);
-    }
+      return worlds.get(key)!;
+    };
+    for (const stray of this.strays) stray.surfacesChanged(displays, worldOf, this.drowsy);
     this.schedule();
     this.noticeOnceStill();
   }

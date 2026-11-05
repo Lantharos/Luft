@@ -5,13 +5,13 @@ sidebar:
   order: 6
 ---
 
-Strays is an extension from [Schelf](/apps/schelf/). It puts a few small creatures on your desktop: Tuft, who walks, climbs and jumps, Pip, who flies, and slow, round Dollop. They wander on their own between the taskbar, its islands, the tops of windows and the screen's edges, wherever they like best, and spend most of their time sitting and sleeping.
+Strays is an extension from [Schelf](/apps/schelf/). It puts a few small creatures on your desktop: Tuft, who walks, climbs and jumps, Pip, who flies, and slow, round Dollop. They wander on their own between the taskbar, its islands, the tops of windows and the screen's edges, wherever they like best, stopping for a sit or a nap along the way. When they meet they might say hello, play or chase each other, Tuft stalks Pip until Pip flies off, and Dollop gets bumped and likes company for a nap.
 
-Move a window and whoever's on it rides along. Close or minimize it and they fall to whatever's below. Bring a window close and they may well hop on. You can pick one up with the mouse, carry it anywhere and let go: it falls from there, Pip stays in the air for a bit and flies off, and over a window it lands on top.
+Move, maximize or tile a window and whoever's on it stays on. They fall to whatever's below when you close or minimize it, or push it off the side of the screen, and they follow you when you change workspace. Bring a window close and they may well hop on. You can pick one up with the mouse, carry it anywhere and let go: it falls from there, Pip stays in the air for a bit and flies off, and over a window it lands on top.
 
-They live behind your windows, so they never cover anything in them. They sleep while something's full screen, during calls, with the power saver on and with reduced motion, and use next to nothing while they rest.
+They live behind your windows, so they never cover anything in the window you're using: one on a window stands in front of the windows below it and behind those above it. They sleep while something's full screen, during calls, with the power saver on and with reduced motion, and use next to nothing while they rest.
 
-Settings › Extensions › Strays has how many there are, one to six, how big, and who comes by.
+Settings › Extensions › Strays has how many there are, one to six, how active they are, how big, and who comes by. Sleepy strays rest for a minute or two at a time, Lively ones for seconds to a minute, and Restless ones hardly sit still. Each keeps its own temperament at every level: Dollop is always the slowest.
 
 ## Make your own
 
@@ -49,7 +49,12 @@ Frames are square and sit in a grid with no gaps. 24 by 24 pixels looks at home 
   },
   "abilities": { "walks": true, "climbs": true, "jumps": 5, "flies": false },
   "likes": { "window": 3, "taskbar": 2, "ground": 1, "edges": 0.3 },
-  "temper": { "stride": 1.6, "gravity": 1, "sleepiness": 0.6 }
+  "temper": { "stride": 1.6, "gravity": 1, "sleepiness": 0.6, "curiosity": 0.8 },
+  "together": {
+    "chatty": 0.6,
+    "does": { "greet": 3, "chase": 1, "play": 2, "nap": 1 },
+    "with": { "Pip": "stalk" }
+  }
 }
 ```
 
@@ -80,7 +85,24 @@ The rest is optional too.
 | `temper.stride` | How far it steps, in pixels of a 24 pixel frame | `1.4` |
 | `temper.gravity` | How fast it falls, where 1 is Tuft and 0.35 is Pip | `1` |
 | `temper.sleepiness` | How likely it is to doze off when sitting, from 0 to 1 | `0.5` |
+| `temper.curiosity` | How keen it is to get up and go somewhere, from 0 to 1. Curious ones also rest for less | `0.6` |
+| `together.chatty` | How keen it is on company, from 0 to 1 | `0.5` |
+| `together.does` | How much it likes doing each of these with another stray, against the others | `greet` 3, `chase`, `play` and `nap` 1, `stalk` and `bump` 0 |
+| `together.with` | What it does first of all with a certain stray, by name, such as `{ "Pip": "stalk" }` | Nothing |
+
+### Together
+
+Every stray joins in, even without `together`, and uses its own frames, so there's nothing extra to draw.
+
+| Encounter | What happens |
+| --- | --- |
+| `greet` | It goes over, and they look at each other |
+| `chase` | It runs at the other, who runs off, or flies off if it can |
+| `play` | They hop around each other |
+| `nap` | It lies down next to the other, who lies down too |
+| `stalk` | It creeps up, crouches and pounces, and the other gets away |
+| `bump` | It runs into the other, who gets knocked aside |
 
 ### Sharing
 
-A stray is just its folder, so zip it and send it, or put it in a Git repository where people can see the sheet and suggest changes. Whoever gets it unzips it and adds the folder. A pack holds no code, only a picture and a list of numbers, so there's nothing to be careful of when adding one from someone else.
+A stray is just its folder, so zip it and send it, or put it in a Git repository where people can see the sheet and suggest changes. Whoever gets it unzips it and adds the folder. A pack holds no code, only a picture and a list of numbers and names, so there's nothing to be careful of when adding one from someone else.

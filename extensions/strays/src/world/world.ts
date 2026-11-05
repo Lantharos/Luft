@@ -12,7 +12,7 @@ export interface Platform extends Span {
   radiusLeft: number;
   radiusRight: number;
   kind: PlatformKind;
-  /** Where a stray fits, by the middle of its feet: no other window or piece of the taskbar is in the way or above. */
+  /** Where a stray would choose to be, by the middle of its feet: it fits, and nothing shows over it. A stray already there stays whatever happens to this. */
   open: readonly Span[];
 }
 
@@ -42,8 +42,8 @@ function subtract(spans: readonly Span[], { left, right }: Span): Span[] {
   });
 }
 
-const covering = (surfaces: readonly Surface[], id: string, y: number, height: number) =>
-  surfaces.filter(surface => surface.id !== id && surface.y < y && surface.y + surface.height > y - height);
+const overlapping = (surfaces: readonly Surface[], y: number, height: number) =>
+  surfaces.filter(surface => surface.y < y && surface.y + surface.height > y - height);
 
 /** What strays can stand on and walk along on one display, worked out from where windows and the taskbar are. */
 export class World {
@@ -54,7 +54,7 @@ export class World {
     this.surfaces = [...display.taskbar, ...display.windows];
     const taskbar = new Set(display.taskbar.map(({ id }) => id));
     const platforms = this.surfaces
-      .filter(({ y }) => y > 0)
+      .filter(({ id, y }) => y > 0 || !taskbar.has(id))
       .map(surface => this.platform(surface.id, surface.x, surface.x + surface.width, surface.y, surface.radii[0], surface.radii[1], taskbar.has(surface.id) ? 'taskbar' : 'window'));
     this.platforms = [...platforms, this.platform(FLOOR, 0, display.width, display.height, 0, 0, 'ground')].sort((one, other) => one.y - other.y);
   }
@@ -63,9 +63,15 @@ export class World {
     const half = this.body.width / 2;
     const whole = [{ left: Math.max(left, half), right: Math.min(right, this.display.width - half) }].filter(span => span.right > span.left);
     const fits = y - this.body.height >= 0;
-    const open = covering(this.surfaces, id, y, this.body.height)
+    const open = this.inFrontOf(id, kind, y)
       .reduce((spans, { x, width }) => subtract(spans, { left: x - half, right: x + width + half }), fits ? whole : []);
     return { id, left, right, y, radiusLeft, radiusRight, kind, open };
+  }
+
+  /** What shows over a stray standing at `y` on a surface: on a window it's in front of those below that window, and everywhere else behind them all. */
+  private inFrontOf(id: string, kind: PlatformKind, y: number): Surface[] {
+    const shownOver = kind === 'window' ? this.surfaces.slice(0, this.surfaces.findIndex(surface => surface.id === id)) : this.surfaces.filter(surface => surface.id !== id);
+    return overlapping(shownOver, y, this.body.height);
   }
 
   find(id: string): Platform | null {
@@ -96,7 +102,7 @@ export class World {
   ledge(platform: Platform, span: Span, direction: number): Ledge {
     const half = this.body.width / 2;
     const end = direction > 0 ? span.right : span.left;
-    const surface = covering(this.surfaces, platform.id, platform.y, this.body.height)
+    const surface = this.inFrontOf(platform.id, platform.kind, platform.y)
       .find(({ x, width }) => Math.abs((direction > 0 ? x - half : x + width + half) - end) <= TOUCHING);
     if (surface) return { kind: 'wall', surface };
     return end <= half + TOUCHING || end >= this.display.width - half - TOUCHING ? { kind: 'screen' } : { kind: 'drop' };

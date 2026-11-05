@@ -10,6 +10,8 @@ export interface Temper {
   gravity: number;
   /** How likely it is to doze off when it could. */
   sleepiness: number;
+  /** How keen it is to get up and go somewhere rather than stay put, from 0 to 1. */
+  curiosity: number;
 }
 
 /** How a stray gets around. */
@@ -23,6 +25,19 @@ export interface Abilities {
 
 /** How much it likes being in each kind of place, against the others. `edges` is clinging to the side of the screen. */
 export type Likes = Record<PlatformKind | 'edges', number>;
+
+export const ENCOUNTERS = ['greet', 'chase', 'play', 'nap', 'stalk', 'bump'] as const;
+export type Encounter = typeof ENCOUNTERS[number];
+
+/** How a stray gets on with the others. */
+export interface Together {
+  /** How keen it is on company at all, from 0 to 1. */
+  chatty: number;
+  /** How much it likes doing each thing with another stray, against the others. */
+  does: Record<Encounter, number>;
+  /** What it does first of all with a certain stray, by that stray's name. */
+  with: Readonly<Record<string, Encounter>>;
+}
 
 /** Which frames of the sheet each thing a stray does shows, as frame numbers. */
 export interface Frames {
@@ -56,6 +71,7 @@ export interface Pack {
   temper: Temper;
   abilities: Abilities;
   likes: Likes;
+  together: Together;
 }
 
 /** A row of the sheet, or part of one. */
@@ -72,8 +88,9 @@ export type StateName = typeof REQUIRED_STATES[number] | typeof OPTIONAL_STATES[
 export const SMALLEST_FRAME = 8;
 export const LARGEST_FRAME = 128;
 
-export const DEFAULT_TEMPER: Temper = { stride: 1.4, gravity: 1, sleepiness: 0.5 };
+export const DEFAULT_TEMPER: Temper = { stride: 1.4, gravity: 1, sleepiness: 0.5, curiosity: 0.6 };
 export const DEFAULT_LIKES: Likes = { window: 2, taskbar: 2, ground: 1, edges: 0.3 };
+export const DEFAULT_TOGETHER: Together = { chatty: 0.5, does: { greet: 3, chase: 1, play: 1, nap: 1, stalk: 0, bump: 0 }, with: {} };
 
 const HOLD_LOOK_STEPS = 4;
 

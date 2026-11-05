@@ -1,6 +1,6 @@
 id = "com.lantharos.Strays"
 name = "Strays"
-description = "A few small creatures who live on your desktop, walking along the taskbar and the tops of your windows, and mostly napping."
+description = "A few small creatures who live on your desktop and get up to things on the taskbar, the tops of your windows and with each other."
 version = "1.0.0"
 api = 1
 permissions = ["wallpaper", "quick-settings", "calls"]
@@ -20,6 +20,18 @@ default = 2
 min = 1
 max = 6
 step = 1
+
+[[settings]]
+key = "activity"
+depends = "on"
+type = "choice"
+label = "activity"
+default = "lively"
+options = [
+  { value = "sleepy", label = "sleepy" },
+  { value = "lively", label = "lively" },
+  { value = "restless", label = "restless" },
+]
 
 [[settings]]
 key = "size"

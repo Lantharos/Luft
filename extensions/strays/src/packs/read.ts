@@ -1,6 +1,6 @@
 import type { Extension, SpriteSheet, Sprites } from '@luft/extension-api';
 
-import { type Abilities, DEFAULT_LIKES, DEFAULT_TEMPER, framesOf, LARGEST_FRAME, type Likes, OPTIONAL_STATES, type Pack, REQUIRED_STATES, SMALLEST_FRAME, type State, type StateName, type Temper } from './pack.js';
+import { type Abilities, DEFAULT_LIKES, DEFAULT_TEMPER, DEFAULT_TOGETHER, type Encounter, ENCOUNTERS, framesOf, LARGEST_FRAME, type Likes, OPTIONAL_STATES, type Pack, REQUIRED_STATES, SMALLEST_FRAME, type State, type StateName, type Temper, type Together } from './pack.js';
 
 const MANIFEST = 'pack.json';
 const DEFAULT_SHEET = 'sheet.png';
@@ -21,6 +21,7 @@ type Manifest = {
   temper?: Partial<Temper>;
   abilities?: Partial<Abilities>;
   likes?: Partial<Likes>;
+  together?: { chatty?: unknown; does?: Record<string, unknown>; with?: Record<string, unknown> };
 };
 
 function parsed(text: string | null): Manifest {
@@ -36,6 +37,17 @@ function abilitiesOf({ walks = true, climbs, jumps = 0, flies = false }: Partial
   if (typeof jumps !== 'number' || jumps < 0) throw new PackProblem('pack-bad-jumps');
   if (!walks && !flies) throw new PackProblem('pack-cant-move');
   return { walks: !!walks, climbs: climbs ?? hasClimb, jumps, flies: !!flies };
+}
+
+const isEncounter = (name: unknown): name is Encounter => ENCOUNTERS.includes(name as Encounter);
+
+function togetherOf({ chatty = DEFAULT_TOGETHER.chatty, does = {}, with: favourites = {} }: NonNullable<Manifest['together']>): Together {
+  if (typeof chatty !== 'number' || chatty < 0) throw new PackProblem('pack-bad-together');
+  for (const [encounter, weight] of Object.entries(does)) {
+    if (!isEncounter(encounter) || typeof weight !== 'number' || weight < 0) throw new PackProblem('pack-bad-together');
+  }
+  for (const encounter of Object.values(favourites)) if (!isEncounter(encounter)) throw new PackProblem('pack-bad-together');
+  return { chatty, does: { ...DEFAULT_TOGETHER.does, ...does as Record<Encounter, number> }, with: favourites as Record<string, Encounter> };
 }
 
 function checkedSheetName(sheet: unknown): string {
@@ -63,7 +75,7 @@ function framesIn(name: StateName, state: Partial<State>, sheet: SpriteSheet): n
 /** Reads a pack from its folder, or throws a {@link PackProblem} that says plainly what's wrong with it. */
 export function readPack(strays: Extension, sprites: Sprites, folder: string): Pack {
   const manifest = parsed(strays.readText(`${folder}/${MANIFEST}`));
-  const { name, description, frame, states = {}, temper, abilities = {}, likes } = manifest;
+  const { name, description, frame, states = {}, temper, abilities = {}, likes, together = {} } = manifest;
   if (typeof name !== 'string' || !name.trim()) throw new PackProblem('pack-no-name');
   if (!Number.isInteger(frame) || (frame as number) < SMALLEST_FRAME || (frame as number) > LARGEST_FRAME) throw new PackProblem('pack-bad-frame', { smallest: SMALLEST_FRAME, largest: LARGEST_FRAME });
   for (const state of REQUIRED_STATES) if (!states[state]) throw new PackProblem('pack-missing-state', { state });
@@ -84,5 +96,6 @@ export function readPack(strays: Extension, sprites: Sprites, folder: string): P
     temper: { ...DEFAULT_TEMPER, ...temper },
     abilities: abilitiesOf(abilities, !!states.climb),
     likes: { ...DEFAULT_LIKES, ...likes },
+    together: togetherOf(together),
   };
 }

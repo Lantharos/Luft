@@ -1,17 +1,18 @@
 import type { Pack } from '../packs/pack.js';
 import type { Graph, Move, Route, Spot } from '../world/graph.js';
 
-const STAYING_PUT = 0.8;
-const FURTHER_AWAY = 0.6;
+const STAYING_PUT = 0.3;
+const FURTHER_AWAY = 0.75;
+const BEEN_THERE = 0.25;
 
-/** Where a stray fancies going from where it is: anywhere it can reach, more often where it likes to be and close by. */
-export function pickDestination(graph: Graph, from: Spot, pack: Pack): Route | Move {
+/** Where a stray fancies going from where it is: anywhere it can reach, more often where it likes to be, close by and not where it just was. */
+export function pickDestination(graph: Graph, from: Spot, pack: Pack, justLeft: string | null): Route | Move {
   const routes = graph.routesFrom(from);
   const clinging = graph.movesFrom(from).filter(move => move.kind === 'cling');
   const weighted: [Route | Move, number][] = [
     ...routes.map((route): [Route, number] => {
       const here = route.moves.length === 0 ? STAYING_PUT : FURTHER_AWAY ** (route.moves.length - 1);
-      return [route, pack.likes[route.spot.platform.kind] * here];
+      return [route, pack.likes[route.spot.platform.kind] * here * (route.spot.platform.id === justLeft ? BEEN_THERE : 1)];
     }),
     ...clinging.map((move): [Move, number] => [move, pack.likes.edges]),
   ];
@@ -30,7 +31,7 @@ export function flightFrom(graph: Graph, x: number, pack: Pack): Move {
   return { kind: 'fly', from: to, to, fromX: x, toX: (to.span.left + to.span.right) / 2, side: 0 };
 }
 
-/** Windows it could get to in one go, by what's on them. */
+/** Windows it could get to in one go. */
 export function windowsInReach(graph: Graph, from: Spot): Move[] {
-  return graph.movesFrom(from).filter(move => move.kind !== 'cling' && move.kind !== 'drop' && move.to.platform.kind === 'window');
+  return graph.movesFrom(from).filter(move => move.kind !== 'cling' && move.kind !== 'drop' && move.kind !== 'scale' && move.to.platform.kind === 'window');
 }

@@ -53,6 +53,16 @@
   "temper": {
     "stride": 0.8,
     "gravity": 1.3,
-    "sleepiness": 0.75
+    "sleepiness": 0.75,
+    "curiosity": 0.4
+  },
+  "together": {
+    "chatty": 0.4,
+    "does": {
+      "greet": 2,
+      "chase": 0.2,
+      "play": 0.5,
+      "nap": 4
+    }
   }
 }

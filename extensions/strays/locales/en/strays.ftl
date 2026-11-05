@@ -1,6 +1,6 @@
 # The name of the extension in Settings and the store
 extension-name = Strays
-extension-description = A few small creatures who live on your desktop, walking along the taskbar and the tops of your windows, and mostly napping
+extension-description = A few small creatures who live on your desktop and get up to things on the taskbar, the tops of your windows and with each other
 # Quick settings tile title and the switch in Settings, keep short
 strays = Strays
 # Under the tile title
@@ -10,6 +10,11 @@ around = { $count ->
    *[other] { $count } around
 }
 count = How many
+activity = How active
+# How much they get up to, least first
+sleepy = Sleepy
+lively = Lively
+restless = Restless
 size = How big
 small = Small
 medium = Medium
@@ -34,6 +39,12 @@ mood-climb = { $name }, climbing
 mood-leap = { $name }, jumping
 mood-fly = { $name }, flying
 mood-held = { $name }, being carried
+mood-greet = { $name }, saying hello
+mood-chase = { $name }, chasing
+mood-flee = { $name }, running away
+mood-play = { $name }, playing
+mood-stalk = { $name }, sneaking up
+mood-bumped = { $name }, getting bumped
 make-your-own = Make your own
 make-your-own-detail = A stray is a folder with a sprite sheet and a small pack.json that says which frames do what
 add-pack = Add a stray
@@ -55,6 +66,7 @@ pack-bad-sheet-name = The sheet in pack.json has to be a file in the same folder
 pack-missing-state = pack.json doesn't say which frames are { $state }, and every stray needs that
 pack-bad-state = The { $state } entry in pack.json needs a row and a number of frames
 pack-bad-jumps = jumps in pack.json has to be a number: how many of its own lengths it can jump
+pack-bad-together = together in pack.json has to say how chatty it is with a number, and what it does with others from greet, chase, play, nap, stalk and bump
 pack-cant-move = A stray that doesn't walk has to fly, or it can't go anywhere
 pack-no-sheet = { $sheet } isn't in that folder
 pack-wrong-size = { $sheet } can't be read, or its width and height aren't a whole number of { $frame } pixel frames

@@ -37,6 +37,9 @@
 	"kestrel/settings/src/shared/location.rs": {
 		"/etc/localtime": "Reads the time zone"
 	},
+	"kestrel/ui/src/extensions/api/v1/clock.ts": {
+		"/etc/localtime": "Watches for the time zone changing"
+	},
 	"kestrel/ui/src/shared/time/wallClock.ts": {
 		"/etc/localtime": "Follows the time zone"
 	},

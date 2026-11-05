@@ -1,0 +1,10 @@
+failure-damaged = Selle faili lugemine ei õnnestunud: { $detail }
+failure-file = Selle faili lugemine või kirjutamine ei õnnestunud: { $detail }
+failure-no-video-encoder = Selles arvutis pole videokodeerijat „{ $format }“ vormingu jaoks.
+failure-no-audio-encoder = Selles arvutis pole helikodeerijat „{ $format }“ vormingu jaoks.
+failure-unsupported = Teisendus pole võimalik: { $source } -> { $target }.
+failure-no-preview = Sellist tüüpi faili jaoks pole eelvaadet.
+preview-superseded = See eelvaade on asendatud uuemaga.
+failure-no-cache = Puhverdatud andmete kausta pole.
+dialog-open = Ava
+dialog-choose-folder = Vali kaust

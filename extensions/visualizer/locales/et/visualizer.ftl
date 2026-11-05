@@ -1,0 +1,9 @@
+extension-name = Visualiseerija
+style = Stiil
+glow = Kuma
+wave = Laine
+bars = Ribad
+color = Värv
+wallpaper = Taustapilt
+accent = Aktsentvärv
+warm-white = Soe valge

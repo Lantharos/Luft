@@ -254,3 +254,5 @@ desktop-shortcut-tiling-focus-first = Säti fookus esimesele veerule
 desktop-shortcut-tiling-focus-last = Säti fookus viimasele veerule
 desktop-shortcut-tiling-move-first = Tõsta veerg algusesse
 desktop-shortcut-tiling-move-last = Tõsta veerg lõppu
+desktop-sound-filter = Helifailid
+desktop-sound-unopenable = Selle faili avamine ei õnnestu

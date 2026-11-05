@@ -76,3 +76,5 @@ settings-page-corners = Nurgad
     .keywords = ümarad nurgad, ümar nurk, kandilised nurgad, kandiline nurk, aknanurk, nurgaraadius
 settings-page-extensions = Lisamoodulid
     .keywords = lisamoodulid, laiendused, pluginad, vihm, töölauaefektid
+settings-page-custom-sounds = Sinu omad helid
+    .keywords = süsteemi helid, omad helid, heliskeem, helide komplekt, helikomplekt, teavituste helid, helin, hoiatuse heli, äratuse helin

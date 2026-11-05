@@ -11,6 +11,7 @@ import { networkApi } from './network.js';
 import { peersApi } from './peers.js';
 import { quickSettingsApi } from './quickSettings/quickSettings.js';
 import { audioLevelsApi } from './audio/levels.js';
+import { inputSoundsApi } from './audio/inputSounds.js';
 import { lockedSoundsApi, soundsApi } from './audio/sounds.js';
 import { callsApi } from './calls.js';
 import { popupsApi } from './popups/popups.js';
@@ -41,6 +42,7 @@ const PARTS: { [Name in Capability]: { property: string; create(context: ApiCont
   'audio-levels': { property: 'audioLevels', create: audioLevelsApi },
   'calls': { property: 'calls', create: callsApi },
   'locked-sounds': { property: 'lockedSounds', create: lockedSoundsApi },
+  'input-sounds': { property: 'inputSounds', create: inputSoundsApi },
   'do-not-disturb': { property: 'doNotDisturb', create: doNotDisturbApi },
   'helper': { property: 'helper', create: helperApi },
   'shortcuts': { property: 'shortcuts', create: shortcutsApi },

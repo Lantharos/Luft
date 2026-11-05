@@ -9,7 +9,7 @@ Extensions add to Kestrel: layers over the wallpaper, quick settings tiles, task
 | `kestrel/ui/src/extensions/service.ts` | The D-Bus interface below |
 | `kestrel/engine/src/sound` | `ShellSoundMix`, which plays an extension's sounds, and `ShellAudioMonitor`, which measures what the computer plays |
 | `packages/extension-api` | `@luft/extension-api`, the types for extension authors, written from `types.ts` by `bun kestrel/ui/extensionApi.ts`. `bun run check` in `kestrel/ui` fails when it's out of date |
-| `extensions` | Lantharos's own extensions, such as Seasons, Strays, Focus and Pult. Each has a `build.sh` that makes its folder, which `extensions/pack.sh` packs for schelf.store |
+| `extensions` | Lantharos's own extensions, such as Seasons, Strays, Keystrokes, Focus and Pult. Each has a `build.sh` that makes its folder, which `extensions/pack.sh` packs for schelf.store |
 | `apps/settings/src/lib/panels/personalization/extensions` | Settings → Extensions, each extension's page, and its rows on other pages |
 
 ## On disk
@@ -90,13 +90,14 @@ Permissions, with the words Settings and the store show for them:
 | `audio-levels` | Follow the beat of what's playing |
 | `calls` | Know when you're in a call |
 | `locked-sounds` | Keep playing sounds while the screen is locked |
+| `input-sounds` | Play a sound when you type and click, without seeing your keys |
 | `do-not-disturb` | Hold back notifications for a while |
 
-`locked-sounds` needs `sounds` too. A `[helper]` table isn't a permission, but the store shows that the extension runs a program of its own. `[network]` isn't one either, but Settings and the store show the hosts it names as "Connect to api.example.com". `[[shortcuts]]` shows in Settings → Keyboard.
+`locked-sounds` and `input-sounds` need `sounds` too, and `input-sounds` can't go with `audio-levels`, which could hear the presses in the sound. A `[helper]` table isn't a permission, but the store shows that the extension runs a program of its own. `[network]` isn't one either, but Settings and the store show the hosts it names as "Connect to api.example.com". `[[shortcuts]]` shows in Settings → Keyboard.
 
 A setting's `depends` hides it until another setting allows it. Without `when` that's a switch being on. With `when` it's any of a list of values, of a `switch` (`[false]` shows it while the switch is off), `choice`, `slider` or `color`, any of the options of a `choices` setting being picked, or a part of a slider's range, such as `{ min = 0.5 }`. A setting hides with the one it depends on, whatever that one's value, so they chain. Hiding changes nothing about a value: it stays stored and keeps its meaning to the extension. Kestrel refuses a `depends` on a setting not declared before it, and a `when` with values that setting can't have.
 
-A setting's `page` puts it on another page of Settings too, under the extension's name, while the extension runs: `appearance` needs `wallpaper`, `taskbar` needs `taskbar`, `sound` needs `sounds` or `audio-levels`, and `input` needs `typing`.
+A setting's `page` puts it on another page of Settings too, under the extension's name, while the extension runs: `appearance` needs `wallpaper`, `taskbar` needs `taskbar`, `sound` needs `sounds` or `audio-levels`, and `input` needs `typing` or `input-sounds`.
 
 ## D-Bus
 
@@ -169,6 +170,43 @@ A sprite takes clicks only on what shows of its current frame, through a `vfunc_
 ## Sound
 
 Each extension that plays sounds gets one `ShellSoundMix`: a PipeWire playback stream named after it, made when it first plays, with sounds decoded once into memory, mixed with per-sound volume and fades and gapless loops, and silenced while the session isn't active. One with `locked-sounds` can keep its stream going while the screen is locked by holding `lockedSounds.keep()`, which Soundscapes does while its sleep timer runs; letting go, or the extension being turned off, silences it again. `ShellAudioMonitor` listens to the default output's monitor with a passive capture stream, but only while some extension holds a listener and `ShellMixer:playing` says an app plays; reading it runs an FFT of the latest samples on demand. Kestrel's own capture doesn't count as recording for the privacy indicator.
+
+## Sounds for keys and clicks
+
+`input-sounds` is what lets an extension sound like a keyboard without learning anything about typing. `typing` isn't involved: that one types into apps, and has nothing to do with reading the keyboard.
+
+The extension only ever hands over files and levels. `ShellKeySounds` (`kestrel/engine/src/sound/shell-key-sounds.c`) decodes them ahead into memory and then does everything else in the compositor: while a level is above 0 it has a Clutter event filter, ahead of Mutter's own, that sorts a press and plays a sound for it. No JavaScript runs for a press, nothing reaches the extension, and there's no signal, callback or value it could read one from. `sounds.onEnded` and the like don't apply, because these sounds never pass through `sounds.play`.
+
+Exactly what's looked at for each press:
+
+| Press | Sorted as |
+| --- | --- |
+| Space | `space` |
+| Enter, on either side | `enter` |
+| Backspace | `backspace` |
+| The volume keys and the power key | Nothing, and it doesn't sound |
+| Any other key up to `KEY_COMPOSE`, by its Linux key code | `key`, the same for all of them |
+| Any mouse button | `click` |
+
+That sorting stays inside Kestrel too: the extension doesn't see the kind, only which of its files get played. Held keys don't repeat, and events the input method sends again, synthetic ones and pointer events made from touch don't count.
+
+Nothing plays at all:
+
+- while the desktop isn't active: the screen is locked or locking, or the session is on another seat. `active-changed` of the screen shield sets this as the lock starts, not when it finishes.
+- while the keyboard is in a `ClutterText` with a password character, checked at each press, so it covers every Kestrel prompt, whatever its input purpose.
+- while an app's field says it's hidden. `InputMethod.hidesTyping` is on from the moment a field with the password purpose, or the `SENSITIVE_DATA` or `HIDDEN_TEXT` hints, has input method focus, until it loses it. This goes for Wayland apps through `text-input-v3`.
+
+That last one depends on what apps say. A field that never says it's a password can't be told from any other: a terminal asking for a password, and X11 apps, which don't use `text-input-v3`. People hear keys there, so Keystrokes says so on its page and in the store, and the extension still learns nothing.
+
+Because a sound is played from the file the extension picked, an extension that could also hear the computer's output could count presses, so the manifest refuses `input-sounds` with `audio-levels`.
+
+Playback goes through a lane of the extension's `ShellSoundMix`, `shell-sound-strikes.c`, made for following a press at once. It has its own stream with `PW_STREAM_FLAG_RT_PROCESS` and a 128-frame quantum, about 2.7 ms at 48 kHz. A press goes from the compositor's main thread into a lock-free ring, without a syscall, and the stream's realtime thread takes it at the start of its next cycle, so neither thread ever waits for the other and the compositor can't stall on audio. Each press picks a file at random, never the same one twice in a row, with a little over ±1 dB of level and ±3% of pitch, which the mixer applies by interpolating at a fixed-point rate.
+
+Nothing allocates while it plays: voices come from a fixed set of eight. At most six sound at once, and the oldest of them fades out over 2 ms for the next, so fast typing can't pile up. A soft knee above 0.75 keeps the sum below full scale. A press older than 250 ms when the stream gets to it is dropped rather than played late, such as while the output wakes up.
+
+The stream stays running for 2 to 4 seconds after the last press, so the first key of the next word isn't late, and then stops, along with its timer; a pack that was replaced is let go then, once no voice can be playing it. At rest it has no wakeups at all. `desktop:keystrokes` measures how long a press takes, along with what typing costs. On a USB sound card, the output adds 4 ms, so a press while typing is heard about 7 ms later. Waking the stopped stream adds 2 to 3 ms. After 5 seconds or more of silence the sound server has suspended the card as well, and waking it takes 10 to 16 ms, so that first key lands at around 15 to 20 ms, a little past the target, and Bluetooth outputs are slower still.
+
+`get_latest_latency` on `ShellKeySounds` is how checks measure it: microseconds from the press to the sound leaving the computer, as far as PipeWire can tell. It's not part of the extension API.
 
 ## Media
 

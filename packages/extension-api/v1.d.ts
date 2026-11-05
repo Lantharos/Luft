@@ -23,11 +23,12 @@ export interface Disposable {
  * - `audio-levels`: Follow the beat of what's playing
  * - `calls`: Know when you're in a call
  * - `locked-sounds`: Keep playing sounds while the screen is locked
+ * - `input-sounds`: Play a sound when you type and click, without seeing your keys
  * - `do-not-disturb`: Hold back notifications for a while
  */
 export type Permission =
   | 'wallpaper' | 'quick-settings' | 'taskbar' | 'search' | 'notifications' | 'weather' | 'location' | 'media'
-  | 'popups' | 'typing' | 'sounds' | 'audio-levels' | 'calls' | 'locked-sounds' | 'do-not-disturb';
+  | 'popups' | 'typing' | 'sounds' | 'audio-levels' | 'calls' | 'locked-sounds' | 'input-sounds' | 'do-not-disturb';
 
 /**
  * A permission, `helper` for an extension whose manifest declares a native helper, `shortcuts` for one that declares
@@ -53,6 +54,7 @@ export interface Capabilities {
   'audio-levels': AudioLevels;
   calls: Calls;
   'locked-sounds': LockedSounds;
+  'input-sounds': InputSounds;
   'do-not-disturb': DoNotDisturb;
   helper: Helper;
   shortcuts: Shortcuts;
@@ -748,6 +750,34 @@ export interface LockedSounds {
   keep(): Disposable;
 }
 
+/** What a press sounds like, the only thing Kestrel tells presses apart by: a letter or any other key, Space, Enter, Backspace, or a mouse button. */
+export type InputSound = 'key' | 'space' | 'enter' | 'backspace' | 'click';
+
+/** Sound files for each kind of press, in the extension's folders. With several for one kind, each press plays one of them at random. */
+export type InputSoundFiles = Partial<Record<InputSound, readonly string[]>>;
+
+/**
+ * Sounds for key presses and mouse clicks. Kestrel reads the keyboard and the mouse and plays them itself, within
+ * milliseconds; the extension hands over the files and levels and never hears of a press, not which key, how many or
+ * when. Nothing plays while the screen is locked or while a field that hides its text has the keyboard, such as a
+ * password field, and held keys don't repeat. Each press varies slightly in pitch and level. This can't be asked for
+ * together with `audio-levels`, which would hear the presses in the sound. Needs the `sounds` permission too.
+ */
+export interface InputSounds {
+  /**
+   * Decodes these files ahead and switches to them once they're all ready. Each can be up to a second long, in any
+   * format {@link Sounds.play} takes.
+   * @returns The name of a file that can't be played, in which case the files before keep playing, or null.
+   */
+  load(files: InputSoundFiles): Promise<string | null>;
+  /** How loud key presses are, 0 to 1. At 0, Kestrel stops looking at keys. */
+  keys: number;
+  /** How loud mouse clicks are, 0 to 1. At 0, Kestrel stops looking at clicks. */
+  clicks: number;
+  /** Plays one of a kind's sounds as a press would, at this level or 1, so people can hear it. */
+  preview(sound: InputSound, level?: number): void;
+}
+
 /**
  * Whether people are in a call: an app records from the microphone or films with the camera. Kestrel's own dictation
  * and level meters don't count.
@@ -1011,7 +1041,7 @@ export type ApiVersion = 1;
 
 /**
  * A Settings page besides the extension's own where a setting can show too, with the permission that allows it:
- * `appearance` (`wallpaper`), `taskbar` (`taskbar`), `sound` (`sounds` or `audio-levels`) and `input` (`typing`).
+ * `appearance` (`wallpaper`), `taskbar` (`taskbar`), `sound` (`sounds` or `audio-levels`) and `input` (`typing` or `input-sounds`).
  */
 export type SettingsPageId = 'appearance' | 'taskbar' | 'sound' | 'input';
 

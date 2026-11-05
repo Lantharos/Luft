@@ -100,6 +100,19 @@ export namespace Shell {
     }
 
 
+    export namespace KeySound {
+        export const $gtype: GObject.GType<KeySound>;
+    }
+
+    enum KeySound {
+        KEY = 0,
+        SPACE = 1,
+        ENTER = 2,
+        BACKSPACE = 3,
+        CLICK = 4,
+    }
+
+
     export namespace NetworkAgentResponse {
         export const $gtype: GObject.GType<NetworkAgentResponse>;
     }
@@ -904,6 +917,61 @@ export namespace Shell {
 
         /** @signal */
         emit<K extends keyof InvertLightnessEffect.SignalSignatures>(signal: K, ...args: GObject.GjsParameters<InvertLightnessEffect.SignalSignatures[K]>): void;
+    }
+
+
+    namespace KeySounds {
+        // Signal signatures
+        interface SignalSignatures extends GObject.Object.SignalSignatures {
+            /** @signal */
+            loaded: (problem: string | null) => void;
+        }
+
+        // Constructor properties interface
+        interface ConstructorProps extends GObject.Object.ConstructorProps {}
+    }
+
+    class KeySounds extends GObject.Object {
+        static $gtype: GObject.GType<KeySounds>;
+
+        /**
+         * Compile-time signal type information.
+         *
+         * This instance property is generated only for TypeScript type checking.
+         * It is not defined at runtime and should not be accessed in JS code.
+         * @internal
+         */
+        $signals: KeySounds.SignalSignatures;
+
+        // Constructors
+        constructor(properties?: Partial<KeySounds.ConstructorProps>, ...args: any[]);
+
+        _init(...args: any[]): void;
+
+        static ["new"](mix: SoundMix): KeySounds;
+
+        // Signals
+        /** @signal */
+        connect<K extends keyof KeySounds.SignalSignatures>(signal: K, callback: GObject.SignalCallback<this, KeySounds.SignalSignatures[K]>): number;
+
+        /** @signal */
+        connect_after<K extends keyof KeySounds.SignalSignatures>(signal: K, callback: GObject.SignalCallback<this, KeySounds.SignalSignatures[K]>): number;
+
+        /** @signal */
+        emit<K extends keyof KeySounds.SignalSignatures>(signal: K, ...args: GObject.GjsParameters<KeySounds.SignalSignatures[K]>): void;
+
+        // Methods
+        close(): void;
+
+        get_latest_latency(): number;
+
+        load(kinds: number[], files: Gio.File[]): void;
+
+        preview(kind: KeySound, level: number): void;
+
+        set_levels(keys: number, clicks: number): void;
+
+        set_quiet(quiet: boolean): void;
     }
 
 
@@ -2008,6 +2076,8 @@ export namespace Shell {
     type GlyphRendererClass = typeof GlyphRenderer;
 
     type InvertLightnessEffectClass = typeof InvertLightnessEffect;
+
+    type KeySoundsClass = typeof KeySounds;
 
     type MixerClass = typeof Mixer;
 

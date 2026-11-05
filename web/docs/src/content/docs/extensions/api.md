@@ -176,6 +176,30 @@ An extension that declares `[[shortcuts]]` gets `shortcuts.onActivated(key, acti
 
 Everything an extension plays goes through one stream with its name, which people can turn down in Sound settings, and goes quiet while the screen is locked. With `locked-sounds`, `lockedSounds.keep()` keeps it playing while the screen is locked until it's disposed, for sounds people expect to keep hearing, such as ones to fall asleep to. `sounds.volume` sets the volume of all of it. Files are decoded once and kept while they play, so keep loops to a minute or so.
 
+## inputSounds
+
+Sounds for key presses and mouse clicks, with `input-sounds`. Your extension never hears of a press: not which key, not how many, not when. You hand Luft the files, and it plays them itself, within milliseconds of the press.
+
+```js
+ext.inputSounds.keys = 0.7;
+ext.inputSounds.clicks = 0.5;
+const problem = await ext.inputSounds.load({
+  key: ['sounds/key-1.flac', 'sounds/key-2.flac'],
+  space: ['sounds/space.flac'],
+  enter: ['sounds/enter.flac'],
+  backspace: ['sounds/backspace.flac'],
+  click: ['sounds/click.flac'],
+});
+```
+
+| Member | Is |
+| --- | --- |
+| `load(files)` | Decodes these ahead and switches to them once they're all ready. Each kind is a list, and a press plays one of them at random. Files can be up to a second long. Resolves with the name of a file that can't be played, in which case the files before keep playing, or with `null` |
+| `keys`, `clicks` | How loud each is, 0 to 1. At 0, Luft stops looking at them |
+| `preview(sound, level?)` | Plays one of `key`, `space`, `enter`, `backspace` or `click`, so people can hear it |
+
+`key` is a letter or any other key: Luft tells nothing else apart. The volume keys and the power key don't sound, and held keys sound once. Each press varies slightly in pitch and level. Nothing plays while the screen is locked or while a password field has the keyboard, and `preview` doesn't either.
+
 ## audioLevels
 
 `audioLevels.playing` and `audioLevels.onPlayingChanged(changed)` tell whether any app plays sound. `audioLevels.listen(bands)` starts listening to everything the computer plays, split into 1 to 64 bands from low to high, and returns a listener with `read()` and `dispose()`. `read()` gives `{ level, bands }`, all 0 to 1, and is cheap enough to call in every frame of a wallpaper layer. Kestrel only listens while a listener is open and something plays, so an open listener costs nothing in silence.

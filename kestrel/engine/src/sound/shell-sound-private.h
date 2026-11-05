@@ -3,6 +3,8 @@
 
 #include <gio/gio.h>
 
+#include "shell-sound-mix.h"
+
 #define SHELL_SOUND_RATE 48000
 #define SHELL_SOUND_CHANNELS 2
 #define SHELL_SOUND_ANY_LENGTH G_MAXSIZE
@@ -62,3 +64,27 @@ void              _shell_sound_output_play    (ShellSoundOutput      *output,
                                                ShellSoundClip        *clip);
 void              _shell_sound_output_set_volume (ShellSoundOutput   *output,
                                                   double              volume);
+
+struct pw_thread_loop;
+struct pw_context;
+
+typedef struct _ShellSoundStrikes ShellSoundStrikes;
+
+ShellSoundStrikes *_shell_sound_strikes_new        (const char            *name,
+                                                    const char            *icon_name,
+                                                    struct pw_thread_loop *loop,
+                                                    struct pw_context     *context);
+void               _shell_sound_strikes_free       (ShellSoundStrikes     *strikes);
+void               _shell_sound_strikes_connect    (ShellSoundStrikes     *strikes);
+void               _shell_sound_strikes_play       (ShellSoundStrikes     *strikes,
+                                                    const ShellSoundClip  *clip,
+                                                    float                  gain,
+                                                    float                  rate,
+                                                    gint64                 pressed_us);
+void               _shell_sound_strikes_retire     (ShellSoundStrikes     *strikes,
+                                                    ShellSoundClip        *clip);
+void               _shell_sound_strikes_set_master (ShellSoundStrikes     *strikes,
+                                                    double                 volume);
+gint64             _shell_sound_strikes_latest_us  (ShellSoundStrikes     *strikes);
+
+ShellSoundStrikes *_shell_sound_mix_strikes        (ShellSoundMix         *mix);

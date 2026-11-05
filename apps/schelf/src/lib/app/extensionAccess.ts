@@ -39,6 +39,7 @@ const PERMISSIONS: Record<string, Ability> = {
 	'audio-levels': { icon: AudioLines, title: "Follow the beat of what's playing" },
 	calls: { icon: Phone, title: "Know when you're in a call" },
 	'locked-sounds': { icon: Lock, title: 'Keep playing sounds while the screen is locked' },
+	'input-sounds': { icon: Keyboard, title: 'Play a sound when you type and click, without seeing your keys' },
 	'do-not-disturb': { icon: BellOff, title: 'Hold back notifications for a while' }
 };
 

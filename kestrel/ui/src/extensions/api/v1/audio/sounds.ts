@@ -14,6 +14,11 @@ const milliseconds = (value: number | undefined) => Math.max(0, Math.round(value
 /** How many times each extension's sounds are kept playing while the screen is locked, and what to tell when that changes. */
 const keptWhileLocked = new WeakMap<ApiContext, { count: number; changed: () => void }>();
 
+/** Each extension's one mix, for what else plays through it. */
+const mixes = new WeakMap<ApiContext, () => Shell.SoundMix>();
+
+export const openMix = (context: ApiContext): Shell.SoundMix => mixes.get(context)!();
+
 function keeping(context: ApiContext) {
   let kept = keptWhileLocked.get(context);
   if (!kept) keptWhileLocked.set(context, kept = { count: 0, changed: () => {} });
@@ -62,6 +67,7 @@ export function soundsApi(context: ApiContext): Sounds {
     return created;
   };
 
+  mixes.set(context, open);
   return {
     get volume() {
       return volume;

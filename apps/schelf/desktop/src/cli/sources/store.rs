@@ -169,6 +169,7 @@ pub fn extension_access(access: &ExtensionAccess) -> Vec<String> {
                 "audio-levels" => "Follow the beat of what's playing",
                 "calls" => "Know when you're in a call",
                 "locked-sounds" => "Keep playing sounds while the screen is locked",
+                "input-sounds" => "Play a sound when you type and click, without seeing your keys",
                 "do-not-disturb" => "Hold back notifications for a while",
                 other => other,
             }

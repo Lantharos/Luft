@@ -350,6 +350,7 @@ settings-extensions-permission-sounds = Play sounds
 settings-extensions-permission-audio-levels = Follow the beat of what's playing
 settings-extensions-permission-calls = Know when you're in a call
 settings-extensions-permission-locked-sounds = Keep playing sounds while the screen is locked
+settings-extensions-permission-input-sounds = Play a sound when you type and click, without seeing your keys
 settings-extensions-permission-do-not-disturb = Hold back notifications for a while
 # $hosts lists the web addresses the extension connects to, such as "app.pult.sh"
 settings-extensions-permission-network = Connect to { $hosts }

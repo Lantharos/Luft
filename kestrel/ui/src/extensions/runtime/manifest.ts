@@ -12,15 +12,16 @@ const MESSAGE = /^[a-zA-Z][\w-]*$/;
 const HEX = /^#[0-9a-f]{6}$/i;
 const PERMISSIONS: readonly Permission[] = [
   'wallpaper', 'quick-settings', 'taskbar', 'search', 'notifications', 'weather', 'location', 'media', 'popups', 'typing', 'sounds', 'audio-levels',
-  'calls', 'locked-sounds', 'do-not-disturb',
+  'calls', 'locked-sounds', 'input-sounds', 'do-not-disturb',
 ];
-const NEEDS: Partial<Record<Permission, Permission>> = { 'locked-sounds': 'sounds' };
+const NEEDS: Partial<Record<Permission, Permission>> = { 'locked-sounds': 'sounds', 'input-sounds': 'sounds' };
+const APART: Partial<Record<Permission, Permission>> = { 'input-sounds': 'audio-levels' };
 const HOST = /^(localhost|127\.0\.0\.1|[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+)(:\d{1,5})?$/;
 const PAGES: Record<SettingsPageId, readonly Permission[]> = {
   appearance: ['wallpaper'],
   taskbar: ['taskbar'],
   sound: ['sounds', 'audio-levels'],
-  input: ['typing'],
+  input: ['typing', 'input-sounds'],
 };
 const IMAGE = /\.(png|jpe?g|webp|svg)$/i;
 
@@ -240,6 +241,8 @@ export function parseManifest(source: string): Manifest {
   for (const permission of permissions) {
     const needed = NEEDS[permission];
     if (needed && !permissions.includes(needed)) fail(`${permission} needs the ${needed} permission too`);
+    const apart = APART[permission];
+    if (apart && permissions.includes(apart)) fail(`${permission} can't go with the ${apart} permission`);
   }
   const settings = list(document, 'settings', 'manifest').map((entry, index) => setting(entry, index, permissions));
   dependencies(settings);

@@ -22,6 +22,7 @@ export const PERMISSIONS: Record<string, string> = {
 	'audio-levels': 'settings-extensions-permission-audio-levels',
 	calls: 'settings-extensions-permission-calls',
 	'locked-sounds': 'settings-extensions-permission-locked-sounds',
+	'input-sounds': 'settings-extensions-permission-input-sounds',
 	'do-not-disturb': 'settings-extensions-permission-do-not-disturb'
 };
 

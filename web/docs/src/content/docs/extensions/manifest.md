@@ -42,9 +42,10 @@ The API object only has the parts an extension asked for. Settings and Schelf sh
 | `audio-levels` | Follow the beat of what's playing | `audioLevels` |
 | `calls` | Know when you're in a call | `calls` |
 | `locked-sounds` | Keep playing sounds while the screen is locked | `lockedSounds` |
+| `input-sounds` | Play a sound when you type and click, without seeing your keys | `inputSounds` |
 | `do-not-disturb` | Hold back notifications for a while | `doNotDisturb` |
 
-`locked-sounds` needs `sounds` too. A `[helper]` gives `helper`. It's a native program, so Schelf shows that the extension runs one and scans it like any app. `[network]` gives `network`, and Settings and Schelf show its hosts as "Connect to api.example.com"; a release that adds a host asks again, like one that adds a permission. `[[shortcuts]]` gives `shortcuts`.
+`locked-sounds` and `input-sounds` need `sounds` too, and `input-sounds` can't go with `audio-levels`. A `[helper]` gives `helper`. It's a native program, so Schelf shows that the extension runs one and scans it like any app. `[network]` gives `network`, and Settings and Schelf show its hosts as "Connect to api.example.com"; a release that adds a host asks again, like one that adds a permission. `[[shortcuts]]` gives `shortcuts`.
 
 `typing` is the one to ask for least: an extension can only type within ten seconds of someone using it, and the taskbar shows that it did.
 
@@ -60,7 +61,7 @@ Each `[[settings]]` table is one setting. Settings draws it with Luft's own cont
 | `default` | The value until someone changes it |
 | `depends` | A setting declared earlier; this one only shows while that one shows, and while it's on if it's a switch |
 | `when` | What `depends` has to be for the setting to show, instead of on: a list of values, or part of a slider's range |
-| `page` | Another page of Settings the setting also shows on, under the extension's name: `appearance` (needs `wallpaper`), `taskbar` (needs `taskbar`), `sound` (needs `sounds` or `audio-levels`) or `input` (needs `typing`) |
+| `page` | Another page of Settings the setting also shows on, under the extension's name: `appearance` (needs `wallpaper`), `taskbar` (needs `taskbar`), `sound` (needs `sounds` or `audio-levels`) or `input` (needs `typing` or `input-sounds`) |
 
 | Type | Value | Extra fields | Shows as |
 | --- | --- | --- | --- |

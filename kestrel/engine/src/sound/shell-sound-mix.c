@@ -70,6 +70,9 @@ struct _ShellSoundMix
   Ramp master;
   GArray *ended;
   guint ended_idle;
+
+  ShellSoundStrikes *strikes;
+  double master_volume;
 };
 
 enum
@@ -629,6 +632,25 @@ shell_sound_mix_set_master (ShellSoundMix *mix,
   pw_thread_loop_lock (mix->loop);
   ramp_to (&mix->master, volume, fade_ms);
   pw_thread_loop_unlock (mix->loop);
+
+  mix->master_volume = volume;
+  if (mix->strikes)
+    _shell_sound_strikes_set_master (mix->strikes, volume);
+}
+
+/* The lane for sounds that have to follow a press, made when it's first asked for, until the mix closes. */
+ShellSoundStrikes *
+_shell_sound_mix_strikes (ShellSoundMix *mix)
+{
+  if (!mix->loop)
+    return NULL;
+
+  if (!mix->strikes)
+    {
+      mix->strikes = _shell_sound_strikes_new (mix->name, mix->icon_name, mix->loop, mix->context);
+      _shell_sound_strikes_set_master (mix->strikes, mix->master_volume);
+    }
+  return mix->strikes;
 }
 
 /**
@@ -645,6 +667,7 @@ shell_sound_mix_close (ShellSoundMix *mix)
     return;
 
   g_cancellable_cancel (mix->cancellable);
+  g_clear_pointer (&mix->strikes, _shell_sound_strikes_free);
   pw_thread_loop_lock (mix->loop);
   disconnect_locked (mix);
   g_array_set_size (mix->ended, 0);
@@ -690,6 +713,7 @@ shell_sound_mix_init (ShellSoundMix *mix)
   g_array_set_clear_func (mix->voices, (GDestroyNotify) voice_clear);
   mix->ended = g_array_new (FALSE, FALSE, sizeof (guint));
   mix->master.value = mix->master.target = 1.0f;
+  mix->master_volume = 1.0;
 
   mix->loop = pw_thread_loop_new ("kestrel-extension-sounds", NULL);
   mix->context = pw_context_new (pw_thread_loop_get_loop (mix->loop), NULL, 0);

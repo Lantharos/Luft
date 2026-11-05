@@ -16,6 +16,7 @@ Gio._promisify(IBus.InputContext.prototype, 'process_key_event_async', 'process_
 
 const HIDE_PANEL_TIME = 50;
 const SUPER_MASK = Clutter.ModifierType.SUPER_MASK | Clutter.ModifierType.MOD4_MASK;
+const HIDING_HINTS = IBus.InputHints.PRIVATE | IBus.InputHints.HIDDEN_TEXT;
 
 const HAVE_REQUIRE_SURROUNDING_TEXT = GObject.signal_lookup('require-surrounding-text', IBus.InputContext.$gtype);
 
@@ -71,6 +72,7 @@ interface CursorWindow {
 export namespace InputMethod {
   export interface Signals extends Clutter.InputMethod.SignalSignatures {
     'surrounding-text-set': () => void;
+    'hides-typing-changed': () => void;
   }
 }
 
@@ -113,6 +115,7 @@ function x11Caret(): CaretRect | null {
 export const InputMethod = GObject.registerClass({
   Signals: {
     'surrounding-text-set': {},
+    'hides-typing-changed': {},
   },
 }, class InputMethod extends Clutter.InputMethod {
   declare connect: GObject.SignalMethods<this, InputMethod.Signals>['connect'];
@@ -120,6 +123,7 @@ export const InputMethod = GObject.registerClass({
 
   private hints = 0;
   private purpose = 0;
+  private hiddenField = false;
   private focus: Clutter.InputFocus | null = null;
   private cursorRect: CaretRect | null = null;
   private cursorWindow: CursorWindow = { window: null, x: 0, y: 0 };
@@ -205,6 +209,7 @@ export const InputMethod = GObject.registerClass({
 
   vfunc_focus_in(focus: Clutter.InputFocus): void {
     this.focus = focus;
+    this.syncHiddenField();
     if (this.context) {
       this.update();
       this.context.focus_in();
@@ -219,6 +224,7 @@ export const InputMethod = GObject.registerClass({
 
   vfunc_focus_out(): void {
     this.focus = null;
+    this.syncHiddenField();
     this.cursorRect = null;
     if (this.context) {
       this.fullReset(this.context);
@@ -284,11 +290,25 @@ export const InputMethod = GObject.registerClass({
 
     this.hints = ibusHints;
     this.context?.set_content_type(this.purpose, this.hints);
+    this.syncHiddenField();
   }
 
   vfunc_update_content_purpose(purpose: Clutter.InputContentPurpose): void {
     this.purpose = CONTENT_PURPOSES.get(purpose) ?? 0;
     this.context?.set_content_type(this.purpose, this.hints);
+    this.syncHiddenField();
+  }
+
+  /** Whether the field that has the keyboard hides what's typed, such as a password, so nothing may follow the typing. */
+  get hidesTyping(): boolean {
+    return this.hiddenField;
+  }
+
+  private syncHiddenField(): void {
+    const hidden = !!this.focus && (this.purpose === IBus.InputPurpose.PASSWORD || !!(this.hints & HIDING_HINTS));
+    if (hidden === this.hiddenField) return;
+    this.hiddenField = hidden;
+    this.emit('hides-typing-changed');
   }
 
   vfunc_filter_key_event(event: Clutter.Event): boolean {

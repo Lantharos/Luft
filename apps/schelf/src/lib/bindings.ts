@@ -489,6 +489,8 @@ export type StoreDetails = {
 	homepage: string | null,
 	license: string | null,
 	channel: string,
+	/**  The channel that ended and sent you to `channel`, when one did. */
+	endedChannel: string | null,
 	/**
 	 *  The channel the release below is on, when one is. Going with a nightly
 	 *  system, that can be stable.

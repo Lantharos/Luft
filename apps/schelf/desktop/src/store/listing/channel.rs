@@ -40,6 +40,8 @@ fn system() -> Option<&'static str> {
 pub struct Following {
     pub channel: String,
     pub chosen: bool,
+    /// The channel this came from, when that one ended and sent people here.
+    pub ended: Option<String>,
     system: Option<&'static str>,
 }
 
@@ -55,7 +57,18 @@ impl Following {
         Self {
             chosen: chosen.is_some(),
             channel: chosen.unwrap_or_else(|| system.unwrap_or(STABLE).to_owned()),
+            ended: None,
             system,
+        }
+    }
+
+    /// Follows `destination` in place of a channel that ended. Your choice
+    /// stays remembered, so reopening the channel brings you back to it.
+    pub(super) fn moved_to(self, destination: &str) -> Self {
+        Self {
+            channel: destination.to_owned(),
+            ended: Some(self.channel),
+            ..self
         }
     }
 

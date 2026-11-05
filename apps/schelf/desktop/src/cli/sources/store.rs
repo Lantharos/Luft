@@ -231,7 +231,7 @@ pub fn install(id: &str, yes: bool) -> Result<(String, Job), Exit> {
         Exit::Failed
     })?;
     let Some(Offer { release, format, .. }) = listing.release() else {
-        let following = channel::following(&listing.id);
+        let following = listing.following(listing.platforms());
         if following.chosen && following.channel != channel::STABLE {
             eprintln!(
                 "{} has no {} version for this computer.",

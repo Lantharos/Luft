@@ -20,12 +20,15 @@
 	const label = (channel: string) => channel.charAt(0).toUpperCase() + channel.slice(1);
 	const options = $derived(store.choices.map((choice) => ({ value: choice, label: choice === WITH_SYSTEM ? 'Same as Luft' : label(choice) })));
 	const withSystem = $derived(store.choice === WITH_SYSTEM);
+	const ended = $derived(store.endedChannel);
 	const onOtherChannel = $derived(store.releaseChannel !== null && store.releaseChannel !== store.channel);
 	const description = $derived(
 		[
-			withSystem ? `Luft is on ${label(store.channel)}, so this is too.` : PREVIEWS[store.channel],
+			ended ? `${label(ended)} has ended, so this now follows ${label(store.channel)}.` : null,
+			withSystem && !ended ? `Luft is on ${label(store.channel)}, so this is too.` : PREVIEWS[store.channel],
 			onOtherChannel ? `Its newest version right now is the ${store.releaseChannel} one.` : null,
-			installed && store.channel !== 'stable' ? 'Going back to Stable keeps the version you have until a stable one is newer.' : null
+			installed && ended ? `You keep the version you have until a newer one is out on ${label(store.channel)}.` : null,
+			installed && !ended && store.channel !== 'stable' ? 'Going back to Stable keeps the version you have until a stable one is newer.' : null
 		]
 			.filter(Boolean)
 			.join(' ') || undefined

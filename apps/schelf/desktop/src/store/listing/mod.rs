@@ -75,6 +75,9 @@ pub struct Listing {
     pub homepage: Option<String>,
     pub licence: Option<String>,
     pub replaced_by: Option<Replacement>,
+    /// Where each channel the publisher ended sends people now.
+    #[serde(default)]
+    ended_channels: BTreeMap<String, String>,
     releases: Vec<Release>,
 }
 
@@ -96,8 +99,33 @@ impl Listing {
             .map_or(self.id.as_str(), |text| text.name.as_str())
     }
 
-    fn platforms(&self) -> &'static [&'static str] {
+    pub fn platforms(&self) -> &'static [&'static str] {
         device::platforms(self.kind)
+    }
+
+    /// Whether a device on `platforms` can install or download `release`.
+    fn available(&self, release: &Release, platforms: &[&str]) -> bool {
+        release.installable(platforms).is_some()
+            || (self.kind == Kind::App && release.download(platforms).is_some())
+    }
+
+    /// The channel this device follows, going where an ended channel points.
+    /// Until the destination has something for this device, the ended
+    /// channel's releases are still the ones to offer.
+    pub fn following(&self, platforms: &[&str]) -> Following {
+        self.resolved(channel::following(&self.id), platforms)
+    }
+
+    fn resolved(&self, following: Following, platforms: &[&str]) -> Following {
+        let destination = self.ended_channels.get(&following.channel);
+        match destination.filter(|destination| {
+            self.releases.iter().any(|release| {
+                release.channel == **destination && self.available(release, platforms)
+            })
+        }) {
+            Some(destination) => following.moved_to(destination),
+            None => following,
+        }
     }
 
     /// The highest version on `channel` that a device on `platforms`, at
@@ -124,11 +152,8 @@ impl Listing {
 
     /// The release this device may install, from the channel you follow.
     pub fn release(&self) -> Option<Offer<'_>> {
-        self.followed(
-            &channel::following(&self.id),
-            self.platforms(),
-            device::draw(),
-        )
+        let platforms = self.platforms();
+        self.followed(&self.following(platforms), platforms, device::draw())
     }
 
     /// The release a listing shipped with the system holds, whatever its
@@ -159,13 +184,14 @@ impl Listing {
     }
 
     /// The channels this app ships on for this device, that its page offers.
+    /// An ended channel isn't one of them.
     fn channels(&self, platforms: &[&str]) -> Vec<String> {
         channel::offered(
             self.releases
                 .iter()
                 .filter(|release| {
-                    release.installable(platforms).is_some()
-                        || (self.kind == Kind::App && release.download(platforms).is_some())
+                    self.available(release, platforms)
+                        && !self.ended_channels.contains_key(&release.channel)
                 })
                 .map(|release| release.channel.as_str()),
         )

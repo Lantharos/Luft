@@ -385,3 +385,82 @@ fn the_page_leads_with_the_system_for_luft_own_apps() {
         [STABLE, "beta"]
     );
 }
+
+fn beta_ended_into_stable(releases: &[Value]) -> Listing {
+    let mut tide = listing("sabine", releases);
+    tide.ended_channels.insert("beta".into(), STABLE.into());
+    tide
+}
+
+#[test]
+fn choosing_an_ended_channel_follows_where_it_points() {
+    let tide = beta_ended_into_stable(&[
+        release("2.0.0-beta.3", "beta", 100, &[archive()]),
+        release("1.9.0", STABLE, 100, &[archive()]),
+    ]);
+    let following = tide.resolved(on(TIDE, Some("beta"), None), LINUX);
+    assert_eq!(following.channel, STABLE);
+    assert_eq!(following.ended.as_deref(), Some("beta"));
+    assert_eq!(following.choice(), STABLE);
+    assert_eq!(followed_version(&tide, &following), Some("1.9.0"));
+}
+
+#[test]
+fn a_build_newer_than_the_destination_stays_until_it_catches_up() {
+    let installed = "2.0.0-beta.3";
+    let tide = beta_ended_into_stable(&[
+        release("2.0.0-beta.3", "beta", 100, &[archive()]),
+        release("1.9.0", STABLE, 100, &[archive()]),
+    ]);
+    let following = tide.resolved(on(TIDE, Some("beta"), None), LINUX);
+    assert!(!super::newer(
+        followed_version(&tide, &following).unwrap(),
+        installed
+    ));
+    let caught_up = beta_ended_into_stable(&[
+        release("2.0.0", STABLE, 100, &[archive()]),
+        release("2.0.0-beta.3", "beta", 100, &[archive()]),
+    ]);
+    let following = caught_up.resolved(on(TIDE, Some("beta"), None), LINUX);
+    assert!(super::newer(
+        followed_version(&caught_up, &following).unwrap(),
+        installed
+    ));
+}
+
+#[test]
+fn an_ended_channel_leaves_the_page_but_keeps_its_releases_in_the_listing() {
+    let tide = beta_ended_into_stable(&[
+        release("2.0.0-beta.3", "beta", 100, &[archive()]),
+        release("1.9.0", STABLE, 100, &[archive()]),
+    ]);
+    assert_eq!(tide.channels(LINUX), [STABLE]);
+    assert_eq!(newest_version(&tide, "beta"), Some("2.0.0-beta.3"));
+}
+
+#[test]
+fn a_luft_system_on_an_ended_channel_moves_and_keeps_stable_as_a_source() {
+    let mut tide = channels_of_tide();
+    tide.ended_channels.insert("nightly".into(), "beta".into());
+    let following = tide.resolved(on(SEASONS, None, Some("nightly")), LINUX);
+    assert_eq!(following.channel, "beta");
+    assert_eq!(following.sources(), ["beta", STABLE]);
+    assert_eq!(following.choice(), "system");
+}
+
+#[test]
+fn the_ended_channel_stays_until_the_destination_has_something_for_this_device() {
+    let tide = beta_ended_into_stable(&[
+        release("2.0.0-beta.3", "beta", 100, &[archive()]),
+        release(
+            "1.9.0",
+            STABLE,
+            100,
+            &[file("windows-x86_64", "sabine", "archive", "tide.zip")],
+        ),
+    ]);
+    let following = tide.resolved(on(TIDE, Some("beta"), None), LINUX);
+    assert_eq!(following.channel, "beta");
+    assert_eq!(following.ended, None);
+    assert_eq!(followed_version(&tide, &following), Some("2.0.0-beta.3"));
+}

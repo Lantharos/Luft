@@ -53,6 +53,8 @@ pub struct StoreDetails {
     pub homepage: Option<String>,
     pub license: Option<String>,
     pub channel: String,
+    /// The channel that ended and sent you to `channel`, when one did.
+    pub ended_channel: Option<String>,
     /// The channel the release below is on, when one is. Going with a nightly
     /// system, that can be stable.
     pub release_channel: Option<String>,
@@ -93,6 +95,7 @@ impl StoreDetails {
             license: None,
             choice: following.choice().to_owned(),
             channel: following.channel,
+            ended_channel: None,
             release_channel: None,
             choices: Vec::new(),
             version: None,
@@ -112,8 +115,8 @@ impl StoreDetails {
 
 impl From<Listing> for StoreDetails {
     fn from(listing: Listing) -> Self {
-        let following = channel::following(&listing.id);
         let (platforms, draw) = (listing.platforms(), device::draw());
+        let following = listing.following(platforms);
         let installable = listing.followed(&following, platforms, draw);
         let download = match installable {
             Some(_) => None,
@@ -148,6 +151,7 @@ impl From<Listing> for StoreDetails {
             download,
             choice: following.choice().to_owned(),
             channel: following.channel,
+            ended_channel: following.ended,
             release_channel: release.as_ref().map(|release| release.channel.clone()),
             choices,
             access: declared

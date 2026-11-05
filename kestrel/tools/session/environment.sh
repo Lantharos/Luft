@@ -153,7 +153,7 @@ prepare_session() {
   cache_link="${XDG_RUNTIME_DIR:-/tmp}/kestrel-cache-$(session_hash "$session" 12)"
   ln -sfn "$session/cache" "$cache_link"
   export XDG_CACHE_HOME="$cache_link"
-  printf 'user-db:user\nfile-db:%s\n' "$build/data/dconf/kestrel" > "$session/dconf-profile"
+  printf 'user-db:kestrel_%s\nfile-db:%s\n' "$(session_hash "$session" 12)" "$build/data/dconf/kestrel" > "$session/dconf-profile"
   export DCONF_PROFILE="$session/dconf-profile"
   export XCURSOR_PATH="$XDG_DATA_HOME/icons:$cursors"
   mkdir -p "$session/data/fonts"

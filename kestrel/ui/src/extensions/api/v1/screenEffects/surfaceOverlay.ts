@@ -36,6 +36,7 @@ const SurfaceShading = GObject.registerClass(class ExtensionSurfaceShading exten
     const radius = Math.min(this.radius ?? (actor as St.Widget).get_theme_node().get_border_radius(St.Corner.TOPLEFT), width / 2, height / 2);
     this.pipeline.set_uniform_float(this.pipeline.get_uniform_location('outline_size'), 2, 1, [width, height]);
     this.pipeline.set_uniform_float(this.pipeline.get_uniform_location('outline_radii'), 4, 1, [radius, radius, radius, radius]);
+    this.pipeline.set_uniform_float(this.pipeline.get_uniform_location('outline_scale'), 1, 1, [actor.get_resource_scale()]);
     const node = Clutter.PipelineNode.new(this.pipeline);
     root.add_child(node);
     node.add_texture_rectangle(Clutter.ActorBox.new(0, 0, width, height), 0, 0, width, height);

@@ -372,14 +372,14 @@ jobs:
     secrets: inherit
 
   store-extensions:
-    name: Extension (${{ matrix.extension.name }})
+    name: Extension (${{ matrix.extension.name }} on ${{ matrix.extension.runner }})
     needs: plan
     if: needs.plan.outputs.extensions != '' && needs.plan.outputs.extensions != '[]'
     strategy:
       fail-fast: false
       matrix:
         extension: ${{ fromJSON(needs.plan.outputs.extensions) }}
-    runs-on: ubuntu-24.04
+    runs-on: ${{ matrix.extension.runner }}
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
@@ -401,7 +401,7 @@ jobs:
 
       - uses: actions/upload-artifact@v7
         with:
-          name: extension-${{ matrix.extension.name }}-package
+          name: extension-${{ matrix.extension.name }}-${{ matrix.extension.runner }}
           path: dist
           if-no-files-found: error
 

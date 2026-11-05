@@ -43,7 +43,7 @@ async function plan() {
   print({
     sabine: sabineTag(),
     apps: pick('app', ['name', 'folder', 'platforms', 'version']),
-    extensions: pick('extension', ['name', 'folder', 'version']),
+    extensions: JSON.stringify(planned.filter((item) => item.kind === 'extension').flatMap(({ name, folder, version, runners }) => runners.map((runner) => ({ name, folder, version, runner })))),
     publish: JSON.stringify(planned.map(({ name, id, kind, folder, version, notes }) => ({ name, id, kind, folder, version, notes }))),
   });
 }

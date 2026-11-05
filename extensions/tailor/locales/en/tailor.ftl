@@ -1,0 +1,25 @@
+# The name of the extension in Settings and the store
+extension-name = Tailor
+extension-description = Dresses other apps in Luft's look, following the desktop's colors, fonts and light and dark styles
+found = Apps found on this computer
+nothing-found = None of the apps Tailor can dress are on this computer. Once one is, it shows up here.
+try-again = Try again
+spotify = Spotify
+    .description = Spotify takes on Luft's surfaces, controls and fonts through Spicetify, and follows the desktop while it's open.
+spotify-no-spicetify = Spicetify isn't installed. It's what lets Spotify change its look, so install it from spicetify.app first.
+spotify-no-spotify = Spicetify can't find Spotify. Open Spotify once, then try again.
+spotify-failed = Spotify couldn't be dressed. Check that Spotify and Spicetify are up to date, then try again.
+spotify-restart = Restart Spotify to see its new look.
+spotify-ready = Spotify follows the desktop whenever it's open.
+spotify-connected = Spotify is following the desktop.
+steam = Steam
+    .description = Steam's library, menus and windows take on Luft's colors and fonts, and keep them after Steam updates. Store pages stay as they are.
+steam-first-run = Open Steam once so it can finish installing, then try again.
+steam-failed = Steam couldn't be dressed. Check that Steam is up to date, then try again.
+steam-ready = Steam picks up the desktop's look each time it opens. It can't change while it's open.
+vesktop = Vesktop
+    .description = Adds a theme to Vesktop in Luft's colors and fonts, which follows the desktop while it's open. Vesktop runs Vencord, which Discord doesn't allow. Tailor only provides a theme.
+vesktop-first-run = Open Vesktop once, change any setting so it saves them, then try again.
+vesktop-failed = Vesktop couldn't be dressed. Check that it's up to date, then try again.
+vesktop-quit-once = Quit Vesktop once, from its tray icon too, so the theme can be turned on. It's safe to reopen right after.
+vesktop-ready = Vesktop follows the desktop whenever it's open.

@@ -9,7 +9,7 @@ Extensions add to Kestrel: layers over the wallpaper, shaders on windows and the
 | `kestrel/ui/src/extensions/service.ts` | The D-Bus interface below |
 | `kestrel/engine/src/sound` | `ShellSoundMix`, which plays an extension's sounds, and `ShellAudioMonitor`, which measures what the computer plays |
 | `packages/extension-api` | `@luft/extension-api`, the types for extension authors, written from `types.ts` by `bun kestrel/ui/extensionApi.ts`. `bun run check` in `kestrel/ui` fails when it's out of date |
-| `extensions` | Lantharos's own extensions, such as Seasons, Strays, Playthings, Keystrokes, Focus, Reminders, Phosphor and Pult. Each has a `build.sh` that makes its folder, which `extensions/pack.sh` packs for schelf.store |
+| `extensions` | Lantharos's own extensions, such as Seasons, Strays, Playthings, Keystrokes, Focus, Reminders, Phosphor, Tailor and Pult. Each has a `build.sh` that makes its folder, which `extensions/pack.sh` packs for schelf.store |
 | `apps/system/settings/src/lib/panels/personalization/extensions` | Settings → Extensions, each extension's page, and its rows on other pages |
 
 ## On disk
@@ -98,6 +98,8 @@ Permissions, with the words Settings and the store show for them:
 `locked-sounds` and `input-sounds` need `sounds` too, and `input-sounds` can't go with `audio-levels`, which could hear the presses in the sound. A `[helper]` table isn't a permission, but the store shows that the extension runs a program of its own. `[network]` isn't one either, but Settings and the store show the hosts it names as "Connect to api.example.com". `[[shortcuts]]` shows in Settings → Keyboard.
 
 A setting's `depends` hides it until another setting allows it. Without `when` that's a switch being on. With `when` it's any of a list of values, of a `switch` (`[false]` shows it while the switch is off), `choice`, `slider` or `color`, any of the options of a `choices` setting being picked, or a part of a slider's range, such as `{ min = 0.5 }`. A setting hides with the one it depends on, whatever that one's value, so they chain. Hiding changes nothing about a value: it stays stored and keeps its meaning to the extension. Kestrel refuses a `depends` on a setting not declared before it, and a `when` with values that setting can't have.
+
+A setting with `hidden = true` never shows. The extension sets it itself, with `settings.set`, and other settings can depend on it, which is how one can show only for what it found on the computer.
 
 A setting's `page` puts it on another page of Settings too, under the extension's name, while the extension runs: `appearance` needs `wallpaper`, `taskbar` needs `taskbar`, `sound` needs `sounds` or `audio-levels`, and `input` needs `typing` or `input-sounds`.
 
@@ -368,12 +370,32 @@ What extensions need that the API doesn't offer yet:
 
 Version 1 grows in place while there are no extensions outside Luft's own: add to it, never take away or change what's there. When a change can't keep old extensions working, copy `api/v1` to `api/v2`, change the copy, add it to `API_VERSIONS` in `api/versions.ts` and to `extensionApi.ts`, and keep `v1` working. Extensions keep targeting the version they were written for.
 
-## Spotify Style
+## Tailor
 
-Spotify Style restyles Spotify through Spicetify. Its helper puts the `Luft` theme in Spicetify's themes folder, selects it, remembers the theme from before in `previous-theme` next to it, and applies it without restarting Spotify. When Flatpak swaps in a new Spotify, the helper sees `active` change in the deployment folder and applies the theme again.
+Tailor dresses apps that have no theme files of their own. Each app is a folder in `extensions/tailor/themes` with a small module, and what it needs at run time beside it. The module implements `Theme` from `themes/mod.rs`: `detect`, `apply`, `refresh` for a new look, `restore`, and `watched`, the folders to sleep on. Adding an app means adding its folder, a line in `themes::all`, a switch in the manifest and its messages.
 
-Spotify's sandbox can't reach the session bus or `~/.config/kestrel`, and its Chromium doesn't follow the desktop's light and dark styles. So the extension writes the desktop's look to the helper as a line of JSON whenever it changes, and the helper passes it on as server-sent events on `127.0.0.1:47291`, only to Spotify's origin. It's idle until something changes. The theme's script remembers the last look, so Spotify opens in it before the stream connects.
+The extension sends the helper one line of JSON whenever the desktop's look or a switch changes, and the helper answers with which apps it found and how each is doing. Those it found go in the `found` setting, which is hidden and which every app's switch depends on, so Settings only ever shows apps that are there. A Flatpak being installed or removed shows up by itself. The helper has one thread on standard input and one on inotify, and both block, so it wakes only when there's something to do. Natively and as a Flatpak, each app is found by its folders.
+
+Turning an app off runs its `restore`, and turning the extension off or removing it runs `tailor restore`, which does that for all of them. What's needed to undo a change stays next to the change, so nothing depends on the extension's data folder, which removing it deletes.
+
+### Spotify
+
+Spotify is restyled through Spicetify. The helper puts the `Luft` theme in Spicetify's themes folder, selects it, remembers the theme from before in `previous-theme` next to it, and applies it without restarting Spotify. When Flatpak swaps in a new Spotify, or a package puts back the `xpui.spa` Spicetify took apart, the helper sees it and applies the theme again.
+
+Spotify's sandbox can't reach the session bus or `~/.config/kestrel`, and its Chromium doesn't follow the desktop's light and dark styles. So the helper passes the look on as server-sent events on `127.0.0.1:47291`, only to Spotify's origin. The theme's script remembers the last look, so Spotify opens in it before the stream connects.
 
 Spotify's `…` button is native and always white, so the theme puts a dark pill behind it in the light style.
 
-Turning the extension off runs `spotify-style restore`, which goes back to the theme from before.
+### Vesktop
+
+Vesktop gets `luft.theme.css` in its `themes` folder, under `~/.var/app/dev.vencord.Vesktop/config/vesktop` for the Flatpak and `~/.config/vesktop` natively. It overrides Discord's own variables for surfaces, text, icons, controls and fonts on every theme class, so it looks the same whichever theme Discord is set to. Discord's window can't load fonts from that folder, as Vencord's protocol doesn't allow it for fonts, so `build.sh` puts Open Runde inside the theme as `fonts.css`. Vencord watches that folder, so a new look only means rewriting the file, and Vesktop reloads it while it's open.
+
+Turning the theme on means adding it to `enabledThemes` in `settings/settings.json`, and there's no way to do that while Vesktop runs: it holds the file in memory, writes it whole on any change and never reads it again. So the helper only changes that file while Vesktop is closed, which it knows from `SingletonLock` being there and something answering on `SingletonSocket`, as a crash leaves the lock behind. Until then it sleeps on the folder, and Settings asks people to quit Vesktop once. The list is replaced where it stands in the file, written the way Vencord writes it, so the rest keeps its bytes and taking the entry out gives back the file it found. Turning the theme off while Vesktop is open removes the theme file, so the look goes at once, and the helper stays behind to take the entry out when Vesktop closes.
+
+### Steam
+
+Steam doesn't read a custom stylesheet by itself, and it has no setting or launch option for one. Every window it opens loads `steamui/css/library.css`, though, and the folder is writable, under `~/.var/app/com.valvesoftware.Steam/.local/share/Steam` for the Flatpak and `~/.local/share/Steam` natively. So the helper hard-links that file to `library.original.css` and renames a stand-in over it, which imports the original, `steamui/tailor/look.css` with the colors and `steamui/tailor/steam.css`. Steam's startup check compares file sizes, so the stand-in is padded to the size of the file it replaces. Restoring renames the original back, with its bytes and its date.
+
+`steam.css` names Steam's generated class names, which can change when Steam updates. Steam's Chromium loads stylesheets once and can't be told to load them again without a debugging port or code running inside Steam, neither of which Tailor wants, so a new look shows the next time Steam opens. Store and community pages are websites, and stay as they are.
+
+A Steam update rewrites `library.css`. The helper sleeps on `steamui` and `steamui/css`, and when that happens it keeps the new file as the original and puts the stand-in back.

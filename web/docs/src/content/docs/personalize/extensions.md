@@ -37,6 +37,16 @@ The Seasons tile in [quick settings](/desktop/quick-settings/) switches it on an
 
 [Keystrokes](/personalize/keystrokes/) plays a soft sound as you type and click, from crisp mechanical switches to a typewriter, without seeing what you type. You can make your own set of sounds.
 
+## Tailor
+
+Tailor dresses other apps in Luft's look: the colors of your wallpaper, your fonts, and light and dark. In **Settings → Extensions → Tailor** you'll find the apps it can dress that are on your computer, each with a switch and a line about what it does. Turning one off, or removing Tailor, puts that app back exactly as it was.
+
+- **Spotify** needs [Spicetify](https://spicetify.app) installed first, and follows the desktop while it's open.
+- **Vesktop** gets a theme that follows the desktop while it's open. The first time, quit it once, from its tray icon too, so the theme can be turned on.
+- **Steam** picks up the look each time it opens, and keeps it after updates. Store and community pages stay as they are.
+
+Both the Flatpak and the regular versions of these apps work.
+
 ## Reminders
 
 [Reminders](/personalize/reminders/) keeps birthdays, to-dos and goals in the taskbar. Type them the way you'd say them, and they come back until you answer.

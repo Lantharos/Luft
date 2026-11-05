@@ -1,0 +1,186 @@
+
+:root,
+.theme-dark,
+.theme-darker,
+.theme-midnight,
+.theme-light {
+  --luft-ink: var(--kestrel-on-surface);
+  --luft-soft: var(--kestrel-on-surface-variant);
+  --luft-muted: var(--kestrel-outline);
+  --luft-page: var(--kestrel-surface);
+  --luft-low: var(--kestrel-surface-container-low);
+  --luft-mid: var(--kestrel-surface-container);
+  --luft-high: var(--kestrel-surface-container-high);
+  --luft-highest: var(--kestrel-surface-container-highest);
+  --luft-accent: var(--kestrel-primary);
+  --luft-on-accent: var(--kestrel-on-primary);
+  --luft-hover: color-mix(in oklab, var(--luft-ink) 6.5%, transparent);
+  --luft-press: color-mix(in oklab, var(--luft-ink) 10%, transparent);
+  --luft-selected: color-mix(in oklab, var(--luft-accent) 14%, transparent);
+  --luft-hairline: color-mix(in oklab, var(--luft-ink) 8%, transparent);
+
+  --font-primary: var(--luft-font), 'Open Runde', ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-primary);
+  --font-headline: var(--font-primary);
+
+  --app-frame-background: var(--luft-low);
+  --app-frame-border: transparent;
+  --background-base-lowest: var(--luft-low);
+  --background-base-lower: var(--luft-low);
+  --background-base-low: var(--luft-mid);
+  --background-surface-high: var(--luft-page);
+  --background-surface-higher: var(--luft-mid);
+  --background-surface-highest: var(--luft-high);
+  --background-secondary-alt: var(--luft-mid);
+  --background-accent: var(--luft-accent);
+  --background-brand: var(--luft-accent);
+  --background-code: var(--luft-low);
+  --background-mod-subtle: var(--luft-hover);
+  --background-mod-normal: var(--luft-hover);
+  --background-mod-strong: var(--luft-press);
+  --background-mod-muted: var(--luft-hover);
+  --bg-surface-raised: var(--luft-mid);
+  --chat-background: var(--luft-page);
+  --chat-background-default: var(--luft-page);
+  --chat-border: transparent;
+  --chat-text-muted: var(--luft-muted);
+  --channeltextarea-background: var(--luft-high);
+  --channel-background-default: var(--luft-low);
+  --channel-text-area-placeholder: var(--luft-muted);
+  --channel-icon: var(--luft-muted);
+  --channels-default: var(--luft-soft);
+  --modal-background: var(--luft-mid);
+  --modal-footer-background: var(--luft-mid);
+  --card-background-default: var(--luft-mid);
+  --card-border-default: var(--luft-hairline);
+  --embed-background: var(--luft-low);
+  --embed-background-alternate: var(--luft-mid);
+  --panel-bg: var(--luft-low);
+  --user-profile-background-hover: var(--luft-hover);
+  --user-profile-border: var(--luft-hairline);
+  --user-profile-overlay-background: var(--luft-mid);
+  --user-profile-toolbar-background: var(--luft-mid);
+  --user-profile-toolbar-border: var(--luft-hairline);
+
+  --text-default: var(--luft-ink);
+  --text-strong: var(--luft-ink);
+  --text-subtle: var(--luft-soft);
+  --text-muted: var(--luft-muted);
+  --text-invert: var(--kestrel-surface);
+  --text-brand: var(--luft-accent);
+  --text-link: var(--luft-accent);
+  --text-feedback-critical: var(--kestrel-error);
+
+  --icon-default: var(--luft-soft);
+  --icon-strong: var(--luft-ink);
+  --icon-subtle: var(--luft-soft);
+  --icon-muted: var(--luft-muted);
+  --icon-invert: var(--kestrel-surface);
+  --icon-brand: var(--luft-accent);
+  --icon-link: var(--luft-accent);
+  --icon-feedback-critical: var(--kestrel-error);
+
+  --interactive-background-default: transparent;
+  --interactive-background-hover: var(--luft-hover);
+  --interactive-background-active: var(--luft-press);
+  --interactive-background-selected: var(--luft-selected);
+  --interactive-accent-background-default: var(--luft-accent);
+  --interactive-accent-background-hover: var(--luft-accent);
+  --interactive-accent-background-active: var(--luft-accent);
+  --interactive-accent-background-selected: var(--luft-accent);
+  --interactive-icon-default: var(--luft-soft);
+  --interactive-icon-hover: var(--luft-ink);
+  --interactive-icon-active: var(--luft-ink);
+  --interactive-text-default: var(--luft-soft);
+  --interactive-text-hover: var(--luft-ink);
+  --interactive-text-active: var(--luft-ink);
+  --interactive-muted: var(--luft-muted);
+
+  --input-background-default: var(--luft-high);
+  --input-border-default: transparent;
+  --input-border-hover: var(--luft-hairline);
+  --input-border-active: var(--luft-accent);
+  --input-border-readonly: transparent;
+  --input-icon-default: var(--luft-soft);
+  --input-placeholder-text-default: var(--luft-muted);
+  --input-text-default: var(--luft-ink);
+
+  --border-subtle: var(--luft-hairline);
+  --border-muted: var(--luft-hairline);
+  --border-normal: var(--luft-hairline);
+  --border-strong: color-mix(in oklab, var(--luft-ink) 14%, transparent);
+  --border-focus: var(--luft-accent);
+
+  --control-primary-background-default: var(--luft-accent);
+  --control-primary-background-hover: color-mix(in oklab, var(--luft-accent) 88%, var(--luft-ink));
+  --control-primary-background-active: color-mix(in oklab, var(--luft-accent) 88%, var(--luft-page));
+  --control-primary-border-default: transparent;
+  --control-primary-border-hover: transparent;
+  --control-primary-border-active: transparent;
+  --control-primary-text-default: var(--luft-on-accent);
+  --control-primary-text-hover: var(--luft-on-accent);
+  --control-primary-text-active: var(--luft-on-accent);
+  --control-primary-icon-default: var(--luft-on-accent);
+  --control-primary-icon-hover: var(--luft-on-accent);
+  --control-primary-icon-active: var(--luft-on-accent);
+  --control-secondary-background-default: var(--luft-high);
+  --control-secondary-background-hover: var(--luft-highest);
+  --control-secondary-background-active: var(--luft-highest);
+  --control-secondary-border-default: transparent;
+  --control-secondary-border-hover: transparent;
+  --control-secondary-border-active: transparent;
+  --control-secondary-text-default: var(--luft-ink);
+  --control-secondary-text-hover: var(--luft-ink);
+  --control-secondary-text-active: var(--luft-ink);
+  --control-secondary-icon-default: var(--luft-ink);
+  --control-secondary-icon-hover: var(--luft-ink);
+  --control-secondary-icon-active: var(--luft-ink);
+  --control-brand-foreground: var(--luft-accent);
+  --control-brand-foreground-new: var(--luft-accent);
+
+  --mention-background: var(--luft-selected);
+  --mention-foreground: var(--luft-accent);
+  --message-background-hover: var(--luft-hover);
+  --message-highlight-background-default: var(--luft-selected);
+  --message-highlight-background-hover: var(--luft-selected);
+  --message-mentioned-background-default: var(--luft-selected);
+  --message-mentioned-background-hover: var(--luft-selected);
+
+  --reaction-background-default: var(--luft-high);
+  --reaction-background-hover: var(--luft-highest);
+  --reaction-background-active: var(--luft-highest);
+  --reaction-background-reacted-default: var(--luft-selected);
+  --reaction-background-reacted-hover: var(--luft-selected);
+  --reaction-border-default: transparent;
+  --reaction-border-hover: transparent;
+  --reaction-border-active: transparent;
+  --reaction-border-reacted-default: var(--luft-accent);
+  --reaction-text-default: var(--luft-ink);
+  --reaction-text-hover: var(--luft-ink);
+  --reaction-text-active: var(--luft-ink);
+  --reaction-text-reacted-default: var(--luft-accent);
+
+  --scrollbar-auto-thumb: var(--luft-highest);
+  --scrollbar-auto-track: transparent;
+  --scrollbar-auto-scrollbar-color-thumb: var(--luft-highest);
+  --scrollbar-auto-scrollbar-color-track: transparent;
+  --scrollbar-thin-thumb: var(--luft-highest);
+  --scrollbar-thin-track: transparent;
+
+  --tabs-indicator-default: var(--luft-accent);
+  --progressbar-indicator-background: var(--luft-accent);
+  --progressbar-track-background: var(--luft-high);
+  --spoiler-hidden-background: var(--luft-high);
+  --spoiler-hidden-background-hover: var(--luft-highest);
+  --spoiler-revealed-background: var(--luft-high);
+
+  --radius-xs: calc(var(--luft-corners) * 6px);
+  --radius-sm: calc(var(--luft-corners) * 10px);
+  --radius-md: calc(var(--luft-corners) * 14px);
+  --radius-lg: calc(var(--luft-corners) * 18px);
+  --radius-xl: calc(var(--luft-corners) * 22px);
+}
+
+html {
+  font-size: calc(100% * var(--luft-text-scale));
+}

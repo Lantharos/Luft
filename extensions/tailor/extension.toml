@@ -1,0 +1,46 @@
+id = "com.lantharos.Tailor"
+name = "Tailor"
+description = "Dresses other apps in Luft's look, following the desktop's colors, fonts and light and dark styles."
+version = "1.0.0"
+api = 1
+permissions = []
+
+[helper]
+path = "tailor"
+turned-off = ["restore"]
+
+[[settings]]
+key = "found"
+type = "choices"
+label = "found"
+default = []
+hidden = true
+options = [
+  { value = "spotify", label = "spotify" },
+  { value = "steam", label = "steam" },
+  { value = "vesktop", label = "vesktop" },
+]
+
+[[settings]]
+key = "spotify"
+type = "switch"
+label = "spotify"
+default = true
+depends = "found"
+when = ["spotify"]
+
+[[settings]]
+key = "steam"
+type = "switch"
+label = "steam"
+default = true
+depends = "found"
+when = ["steam"]
+
+[[settings]]
+key = "vesktop"
+type = "switch"
+label = "vesktop"
+default = true
+depends = "found"
+when = ["vesktop"]

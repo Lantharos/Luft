@@ -1,8 +1,0 @@
-summary = "Spotify in Luft's look"
-description = "Spotify takes on Luft's surfaces, controls and fonts, in the colors of your wallpaper. It switches between light and dark with the desktop, without restarting, and picks the look up again after Spotify updates. Spicetify needs to be installed first. Turning the extension off puts Spotify back the way it was."
-screenshots = ["light.webp", "dark.webp"]
-keywords = ["spotify", "spicetify", "theme", "music", "colors", "dark mode"]
-categories = ["AudioVideo", "Utility"]
-homepage = "https://luft.computer"
-support = "https://github.com/Lantharos/Luft/issues"
-brand_color = "#3a6b52"

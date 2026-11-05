@@ -1,0 +1,19 @@
+[package]
+name = "tailor"
+version = "0.1.0"
+description = "Keeps other apps in Luft's look for the Tailor extension"
+authors = ["Kristof"]
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+inotify.workspace = true
+serde.workspace = true
+serde_json = { workspace = true, features = ["raw_value"] }
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[lints]
+workspace = true

@@ -1,0 +1,208 @@
+@font-face {
+  font-family: 'Open Runde';
+  font-weight: 400;
+  src: local('Open Runde Regular'), local('OpenRunde-Regular'), url('OpenRunde-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Open Runde';
+  font-weight: 500;
+  src: local('Open Runde Medium'), local('OpenRunde-Medium'), url('OpenRunde-Medium.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Open Runde';
+  font-weight: 600 900;
+  src: local('Open Runde Semibold'), local('OpenRunde-Semibold'), url('OpenRunde-Semibold.woff2') format('woff2');
+}
+
+html:root {
+  --luft-ink: var(--kestrel-on-surface);
+  --luft-soft: var(--kestrel-on-surface-variant);
+  --luft-muted: var(--kestrel-outline);
+  --luft-page: var(--kestrel-surface);
+  --luft-low: var(--kestrel-surface-container-low);
+  --luft-mid: var(--kestrel-surface-container);
+  --luft-high: var(--kestrel-surface-container-high);
+  --luft-highest: var(--kestrel-surface-container-highest);
+  --luft-accent: var(--kestrel-primary);
+  --luft-on-accent: var(--kestrel-on-primary);
+  --luft-hover: color-mix(in oklab, var(--luft-ink) 6.5%, transparent);
+  --luft-selected: color-mix(in oklab, var(--luft-accent) 14%, transparent);
+  --luft-hairline: color-mix(in oklab, var(--luft-ink) 8%, transparent);
+  --luft-control-radius: calc(var(--luft-corners) * 10px);
+  --luft-panel-radius: calc(var(--luft-corners) * 18px);
+  --luft-font-stack: var(--luft-font), 'Open Runde', ui-sans-serif, system-ui, sans-serif;
+  --font-family: var(--luft-font-stack);
+  --color-text-light-title: var(--luft-ink);
+  --color-text-light-subtitle: var(--luft-soft);
+  --color-text-light-body: var(--luft-soft);
+  --color-text-light-description: var(--luft-muted);
+  --color-text-light-note: var(--luft-muted);
+}
+
+body.DesktopUI {
+  --gpSystemLighterGrey: var(--luft-soft);
+  font-family: var(--luft-font-stack);
+  font-size: calc(100% * var(--luft-text-scale));
+  color: var(--luft-ink);
+  background: var(--luft-page);
+}
+
+body.DesktopUI :is(button, input, textarea, select) {
+  font-family: var(--luft-font-stack) !important;
+}
+
+/* The main window: its outer frame, the top bar with Store and Library, the menu bar and the bar along the bottom */
+body.DesktopUI ._1ENHEsrSLcTRtPQFl1F-wL {
+  background: var(--luft-page) !important;
+  border-color: transparent !important;
+}
+
+body.DesktopUI ._3Z7VQ1IMk4E3HsHvrkLNgo,
+body.DesktopUI ._3Z3ohQ8-1NKnCZkbS6fvy,
+body.DesktopUI ._1_yS5UP7el0aN4vntx3dx,
+body.DesktopUI ._3vCzSrrXZzZjVJFZNg9SGu {
+  background: var(--luft-low) !important;
+}
+
+body.DesktopUI ._3-GyQfKnKaWozIRLOw4BjY {
+  background: var(--luft-high) !important;
+  color: var(--luft-ink) !important;
+  text-transform: none !important;
+}
+
+body.DesktopUI ._2D64jIEK7wpUR_NlObDW76,
+body.DesktopUI ._1Ky59qmywxOUtNcI1cgmkX {
+  color: var(--luft-soft) !important;
+}
+
+/* The library: the search box above the list, the list of games, its section headers and the home page */
+body.DesktopUI ._2TKEazUUS3TlniZfpc8OOe {
+  background: var(--luft-low) !important;
+}
+
+body.DesktopUI ._2-O4ZG0KrnSrzISHBKctFQ,
+body.DesktopUI ._2sYIghGVXJr6tsQVvcryy8 {
+  background: transparent !important;
+  border-radius: var(--luft-control-radius) !important;
+  color: var(--luft-soft) !important;
+}
+
+body.DesktopUI ._2-O4ZG0KrnSrzISHBKctFQ:hover,
+body.DesktopUI ._2sYIghGVXJr6tsQVvcryy8:hover {
+  background: var(--luft-hover) !important;
+  color: var(--luft-ink) !important;
+}
+
+body.DesktopUI ._2-O4ZG0KrnSrzISHBKctFQ.sXMOsx8OIRalBMxO9yFY5,
+body.DesktopUI ._2sYIghGVXJr6tsQVvcryy8.sXMOsx8OIRalBMxO9yFY5 {
+  background: var(--luft-selected) !important;
+  color: var(--luft-accent) !important;
+}
+
+body.DesktopUI ._3Sb2o_mQ30IDRh0C72QUUu {
+  background: var(--luft-page) !important;
+  background-image: none !important;
+}
+
+body.DesktopUI ._2a1-sPpExCp24Q8dfImB0a {
+  color: var(--luft-ink) !important;
+}
+
+/* Menus and drop-downs */
+body.DesktopUI :is(.PP7LM0Ow1K5qkR8WElLpt, ._2LigNhjmULtkRCXW5237ai, ._12DEITwNCR63H338pFyoji, .BaERlvVMT45z7ZQ-TZiAe, .ZmMzAFCxvwjUFR245iuLe, ._3pofGqV0buiKAfMPEs3_82, .Eq8Px4ixn5sAFSR6_9wWQ, ._30wJO3MC4x-I1OWpy1TAeE, .EDl_mzaY3WxkgmYVD8W4d) {
+  background: var(--luft-mid) !important;
+  border-radius: var(--luft-control-radius) !important;
+  color: var(--luft-ink) !important;
+}
+
+/* Buttons and fields, which keep these plain class names in every window */
+body.DesktopUI .DialogButton {
+  background: var(--luft-high) !important;
+  border-radius: var(--luft-control-radius) !important;
+  color: var(--luft-ink) !important;
+}
+
+body.DesktopUI .DialogButton:enabled:hover {
+  background: var(--luft-highest) !important;
+}
+
+body.DesktopUI .DialogButton._DialogLayout.Primary,
+body.DesktopUI .DialogButton.Primary {
+  background: var(--luft-accent) !important;
+  color: var(--luft-on-accent) !important;
+}
+
+body.DesktopUI .DialogInput,
+body.DesktopUI .DialogTextInputBase {
+  background: var(--luft-high) !important;
+  border: none !important;
+  border-radius: var(--luft-control-radius) !important;
+  box-shadow: none !important;
+  color: var(--luft-ink) !important;
+}
+
+/* Windows of their own, such as Settings and game properties */
+body.DesktopUI .DialogContent,
+body.DesktopUI .DialogBody {
+  background: var(--luft-page) !important;
+  color: var(--luft-ink) !important;
+}
+
+body.DesktopUI .DialogHeader,
+body.DesktopUI .DialogLabel {
+  color: var(--luft-soft) !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+
+/* Signing in */
+body.DesktopUI ._3NH9aXAeVjt_j6_vKppevN,
+body.DesktopUI ._1NOsG2PAO2rRBb8glCFM_6 {
+  background: var(--luft-page) !important;
+  background-image: none !important;
+}
+
+body.DesktopUI .title-area-highlight {
+  background: var(--luft-accent) !important;
+  background-image: none !important;
+}
+
+body.DesktopUI ._2GBWeup5cttgbTw8FM3tfx {
+  background: var(--luft-high) !important;
+  border-radius: var(--luft-control-radius) !important;
+  color: var(--luft-ink) !important;
+}
+
+body.DesktopUI .DjSvCZoKKfoNSmarsEcTS {
+  background: var(--luft-accent) !important;
+  background-image: none !important;
+  border-radius: var(--luft-control-radius) !important;
+  color: var(--luft-on-accent) !important;
+}
+
+body.DesktopUI .XrYgea66b38RASmbI3PJo {
+  color: var(--luft-soft) !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+
+body.DesktopUI ._12zBmIktqPpcwJXItTb8f9 {
+  color: var(--luft-accent) !important;
+}
+
+body.DesktopUI ._1W_6HXiG4JJ0By1qN_0fGZ {
+  color: var(--kestrel-error) !important;
+}
+
+body.DesktopUI ._1K431RbY14lkaFW6-XgSsC,
+body.DesktopUI ._10bGilozn2bfCfiPfANMhC {
+  color: var(--luft-soft) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.DesktopUI * {
+    transition: none !important;
+  }
+}

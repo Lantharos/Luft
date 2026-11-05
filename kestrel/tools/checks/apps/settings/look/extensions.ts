@@ -6,6 +6,7 @@ import {checks} from '../../../lib/check.js';
 import {pause} from '../../../lib/wait.js';
 import type {Point} from '../../../lib/input/input.js';
 import {installBuilt, request, SEASONS, setSetting, setting} from '../../../extensions/lib/extensions.js';
+import {placeApps, TAILOR} from '../../../extensions/lib/tailor.js';
 import {scrollDown, scrollToEnd, show, showEnd} from '../navigation.js';
 
 const {eventually, require} = checks('Luft app');
@@ -80,6 +81,14 @@ async function checkOwnPages(app: LuftApp) {
     (await showEnd(app, `extensions/${PLAYTHINGS.toLowerCase()}`)).save('settings-extension-playthings-end');
   } finally {
     await request('Remove', PLAYTHINGS);
+  }
+  placeApps();
+  GLib.mkdir_with_parents(GLib.build_filenamev([GLib.get_user_data_dir(), 'flatpak', 'app', 'com.spotify.Client']), 0o755);
+  await installBuilt(TAILOR);
+  try {
+    (await show(app, `extensions/${TAILOR.toLowerCase()}`, 'it lists the apps it found, each with its switch')).save('settings-extension-tailor');
+  } finally {
+    await request('Remove', TAILOR);
   }
   await installBuilt(KEYSTROKES);
   try {

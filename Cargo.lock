@@ -8896,13 +8896,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "spotify-style"
-version = "0.1.0"
-dependencies = [
- "inotify",
-]
-
-[[package]]
 name = "sqlite-wasm-rs"
 version = "0.5.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -9210,6 +9203,16 @@ name = "tagptr"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7b2093cf4c8eb1e67749a6762251bc9cd836b6fc171623bd0a9d324d37af2417"
+
+[[package]]
+name = "tailor"
+version = "0.1.0"
+dependencies = [
+ "inotify",
+ "serde",
+ "serde_json",
+ "tempfile",
+]
 
 [[package]]
 name = "tap"

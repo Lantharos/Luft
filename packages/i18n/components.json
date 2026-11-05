@@ -9,7 +9,7 @@
 	{"name": "extension-soundscapes", "bundle": "extension-soundscapes", "mask": "extensions/soundscapes/locales/*/soundscapes.ftl", "sources": ["extensions/soundscapes", "kestrel/ui/src/extensions/runtime/instance.ts"]},
 	{"name": "extension-focus", "bundle": "extension-focus", "mask": "extensions/focus/locales/*/focus.ftl", "sources": ["extensions/focus", "kestrel/ui/src/extensions/runtime/instance.ts"]},
 	{"name": "extension-now-playing", "bundle": "extension-now-playing", "mask": "extensions/now-playing/locales/*/now-playing.ftl", "sources": ["extensions/now-playing", "kestrel/ui/src/extensions/runtime/instance.ts"]},
-	{"name": "extension-spotify-style", "bundle": "extension-spotify-style", "mask": "extensions/spotify-style/locales/*/spotify-style.ftl", "sources": ["extensions/spotify-style", "kestrel/ui/src/extensions/runtime/instance.ts"]},
+	{"name": "extension-tailor", "bundle": "extension-tailor", "mask": "extensions/tailor/locales/*/tailor.ftl", "sources": ["extensions/tailor", "kestrel/ui/src/extensions/runtime/instance.ts"]},
 	{"name": "extension-pult", "bundle": "extension-pult", "mask": "extensions/pult/locales/*/pult.ftl", "sources": ["extensions/pult", "kestrel/ui/src/extensions/runtime/instance.ts"]},
 	{"name": "extension-visualizer", "bundle": "extension-visualizer", "mask": "extensions/visualizer/locales/*/visualizer.ftl", "sources": ["extensions/visualizer", "kestrel/ui/src/extensions/runtime/instance.ts"]},
 	{"name": "extension-strays", "bundle": "extension-strays", "mask": "extensions/strays/locales/*/strays.ftl", "sources": ["extensions/strays", "kestrel/ui/src/extensions/runtime/instance.ts"]},

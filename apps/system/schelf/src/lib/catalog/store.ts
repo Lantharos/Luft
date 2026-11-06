@@ -1,3 +1,4 @@
+import { renderMarkdown } from '@luft/ui';
 import { commands, type CatalogApp, type Collection, type StoreDetails } from '#lib/bindings.js';
 import type { CategoryId } from './categories';
 import type { AppDetails } from './types';
@@ -14,19 +15,22 @@ export const entry = (id: string) => commands.storeEntry({ id });
 
 const timestamp = (published: string | null) => (published ? Math.floor(Date.parse(published) / 1000) : null);
 
-function fromStore(store: StoreDetails): AppDetails {
+const rendered = async (text: string) => (await renderMarkdown(text, null)).html;
+
+async function fromStore(store: StoreDetails): Promise<AppDetails> {
+	const [description, notes] = await Promise.all([rendered(store.description), rendered(store.notes)]);
 	return {
 		id: store.id,
 		origin: 'schelf',
 		name: store.name,
 		summary: store.summary,
-		description: store.description,
+		description,
 		icon: store.icon,
 		developer: store.developer,
 		license: store.license,
 		homepage: store.homepage,
 		screenshots: store.screenshots,
-		release: store.version ? { version: store.version, date: timestamp(store.published), notes: store.notes } : null,
+		release: store.version ? { version: store.version, date: timestamp(store.published), notes } : null,
 		downloadSize: store.size ?? store.download?.size ?? null,
 		installedSize: null,
 		verified: store.verified ? 'Verified by schelf.store' : null,

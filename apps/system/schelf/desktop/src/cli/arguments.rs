@@ -199,7 +199,8 @@ pub fn help(program: &str, command: Option<Command>) -> String {
          \x20 info NAME             Show details\n\
          \x20 trust NAME...         Give Flatpak apps full access\n\
          \x20 untrust NAME...       Put them back in their sandbox\n\
-         \x20 repo add|remove|list  Manage software sources for system packages\n\n\
+         \x20 repo add|remove|list  Manage software sources for system packages\n\
+         \x20 init, check, publish  Put your own apps on schelf.store\n\n\
          Options:\n\
          \x20 --store, --flathub, --fedora, --appimage  Use only this source\n\
          \x20 --system              Fedora packages for the whole system, such as services\n\

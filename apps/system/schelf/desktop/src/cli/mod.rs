@@ -1,9 +1,11 @@
 mod arguments;
 mod commands;
 pub mod perform;
+mod publishing;
 pub mod sources;
 mod terminal;
 
+use std::io::IsTerminal;
 use std::path::Path;
 
 use arguments::Request;
@@ -56,6 +58,14 @@ fn execute(arguments: &[String]) -> Exit {
 }
 
 pub fn run(arguments: &[String]) -> Option<i32> {
-    let first = arguments.first()?;
+    let Some(first) = arguments.first() else {
+        return std::io::stdin().is_terminal().then(|| {
+            print!("{}", arguments::help(&program(), None));
+            Exit::Done as i32
+        });
+    };
+    if publishing::recognised(first) {
+        return Some(publishing::run(arguments));
+    }
     arguments::recognised(first).then(|| execute(arguments) as i32)
 }

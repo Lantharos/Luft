@@ -11,7 +11,7 @@ focus is destroyed.
  1 file changed, 101 insertions(+)
 
 diff --git a/src/tests/clutter/conform/text.c b/src/tests/clutter/conform/text.c
-index ae597b4150..a3cd5a7fbc 100644
+index ae597b415..a3cd5a7fb 100644
 --- a/src/tests/clutter/conform/text.c
 +++ b/src/tests/clutter/conform/text.c
 @@ -18,6 +18,82 @@ test_text_data[] = {

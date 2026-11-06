@@ -21,7 +21,7 @@ Fixes: f1570318ec3e ("wayland: Only schedule a single cursor location update")
  1 file changed, 2 insertions(+)
 
 diff --git a/src/wayland/meta-wayland-text-input.c b/src/wayland/meta-wayland-text-input.c
-index ef1866aea1..2ed8af2616 100644
+index ef1866aea..2ed8af261 100644
 --- a/src/wayland/meta-wayland-text-input.c
 +++ b/src/wayland/meta-wayland-text-input.c
 @@ -574,6 +574,8 @@ meta_wayland_text_input_set_focus (MetaWaylandTextInput *text_input,

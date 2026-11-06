@@ -1,8 +1,8 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Tue, 27 Oct 2026 18:47:00 +0100
-Subject: [PATCH 2/2] tests/wayland: Add test for text input cursor rectangles
- after focus moves
+Subject: [PATCH 2/2] tests/wayland: Test text input cursor rectangles after
+ focus moves
 
 Check that a cursor rectangle reaches the input method after the
 previously focused surface went away while it still had a cursor
@@ -17,10 +17,10 @@ rectangle update pending.
  create mode 100644 src/tests/wayland-text-input-tests.c
 
 diff --git a/src/tests/meson.build b/src/tests/meson.build
-index 269931c749..da1b2fe6aa 100644
+index add8ff7b9..1b2dc6023 100644
 --- a/src/tests/meson.build
 +++ b/src/tests/meson.build
-@@ -1119,6 +1119,17 @@ wayland_test_cases = [
+@@ -1131,6 +1131,17 @@ wayland_test_cases = [
        test_client_executables.get('idle-inhibit'),
      ],
    },
@@ -39,7 +39,7 @@ index 269931c749..da1b2fe6aa 100644
      'name': 'wayland-cursor',
      'suite': 'wayland',
 diff --git a/src/tests/wayland-test-clients/meson.build b/src/tests/wayland-test-clients/meson.build
-index 9c92663def..c41a67a790 100644
+index 9c92663de..c41a67a79 100644
 --- a/src/tests/wayland-test-clients/meson.build
 +++ b/src/tests/wayland-test-clients/meson.build
 @@ -101,6 +101,9 @@ wayland_test_clients = [
@@ -54,7 +54,7 @@ index 9c92663def..c41a67a790 100644
    },
 diff --git a/src/tests/wayland-test-clients/text-input.c b/src/tests/wayland-test-clients/text-input.c
 new file mode 100644
-index 0000000000..33a7a3805f
+index 000000000..33a7a3805
 --- /dev/null
 +++ b/src/tests/wayland-test-clients/text-input.c
 @@ -0,0 +1,182 @@
@@ -242,7 +242,7 @@ index 0000000000..33a7a3805f
 +}
 diff --git a/src/tests/wayland-text-input-tests.c b/src/tests/wayland-text-input-tests.c
 new file mode 100644
-index 0000000000..f60b5acb29
+index 000000000..f60b5acb2
 --- /dev/null
 +++ b/src/tests/wayland-text-input-tests.c
 @@ -0,0 +1,115 @@

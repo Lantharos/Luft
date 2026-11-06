@@ -1,0 +1,136 @@
+diff --git a/cogl/cogl/cogl-driver.c b/cogl/cogl/cogl-driver.c
+index 93cae6fed..62cd02e57 100644
+--- a/cogl/cogl/cogl-driver.c
++++ b/cogl/cogl/cogl-driver.c
+@@ -94,11 +94,18 @@ cogl_driver_get_vendor (CoglDriver *driver)
+   return klass->get_vendor (driver);
+ }
+ 
++__attribute__ ((visibility ("default"))) int cogl_driver_fake_resets = 0;
+ CoglGraphicsResetStatus
+ cogl_driver_get_graphics_reset_status (CoglDriver *driver)
+ {
+   CoglDriverClass *klass = COGL_DRIVER_GET_CLASS (driver);
+ 
++  if (cogl_driver_fake_resets > 0)
++    {
++      cogl_driver_fake_resets--;
++      return COGL_GRAPHICS_RESET_STATUS_GUILTY_CONTEXT_RESET;
++    }
++
+   return klass->get_graphics_reset_status (driver);
+ }
+ 
+diff --git a/src/tests/stage-view-tests.c b/src/tests/stage-view-tests.c
+index c734f8250..2f3b9fbad 100644
+--- a/src/tests/stage-view-tests.c
++++ b/src/tests/stage-view-tests.c
+@@ -1648,6 +1648,99 @@ on_before_tests (MetaContext *context)
+   test_backend = meta_context_get_backend (context);
+ }
+ 
++extern int cogl_driver_fake_resets;
++
++static CoglTexture *
++proof_solid_texture (CoglContext *cogl_context,
++                     uint8_t      r,
++                     uint8_t      g,
++                     uint8_t      b)
++{
++  GError *error = NULL;
++  uint8_t data[64 * 64 * 4];
++  CoglTexture *texture;
++  int i;
++
++  for (i = 0; i < 64 * 64; i++)
++    {
++      data[i * 4 + 0] = r;
++      data[i * 4 + 1] = g;
++      data[i * 4 + 2] = b;
++      data[i * 4 + 3] = 0xff;
++    }
++  texture = COGL_TEXTURE (cogl_texture_2d_new_from_data (cogl_context, 64, 64,
++                                                         COGL_PIXEL_FORMAT_RGBA_8888,
++                                                         64 * 4, data, &error));
++  g_assert_no_error (error);
++  cogl_texture_allocate (texture, &error);
++  g_assert_no_error (error);
++  return texture;
++}
++
++static gboolean
++proof_not_fatal (const char *d, GLogLevelFlags l, const char *m, gpointer u)
++{
++  return FALSE;
++}
++
++static void
++meta_test_stage_views_texture_content_reset (void)
++{
++  MetaBackend *backend = meta_context_get_backend (test_context);
++  ClutterBackend *clutter_backend = meta_backend_get_clutter_backend (backend);
++  ClutterActor *stage = meta_backend_get_stage (backend);
++  ClutterGraphicsRecoveryContext *recovery =
++    clutter_backend_get_graphics_recovery_context (clutter_backend);
++  CoglContext *cogl_context = clutter_backend_get_cogl_context (clutter_backend);
++  g_autoptr (ClutterContent) content = NULL;
++  g_autoptr (CoglTexture) old_texture = NULL;
++  CoglTexture *unrelated[256];
++  int n;
++  ClutterActor *actor;
++  ClutterStageView *view;
++  uint8_t pixel[4];
++
++  old_texture = proof_solid_texture (cogl_context, 0xff, 0, 0);
++  content = clutter_texture_content_new_from_texture (old_texture, NULL);
++  actor = clutter_actor_new ();
++  clutter_actor_set_content (actor, content);
++  clutter_actor_set_size (actor, 64, 64);
++  clutter_actor_add_child (stage, actor);
++  clutter_actor_queue_redraw (stage);
++  meta_wait_for_paint (CLUTTER_STAGE (stage));
++
++  view = CLUTTER_STAGE_VIEW (clutter_stage_peek_stage_views (CLUTTER_STAGE (stage))->data);
++  cogl_framebuffer_read_pixels (clutter_stage_view_get_framebuffer (view),
++                                10, 10, 1, 1, COGL_PIXEL_FORMAT_RGBA_8888, pixel);
++  g_message ("before reset: %02x%02x%02x", pixel[0], pixel[1], pixel[2]);
++  g_assert_cmpint (pixel[0], ==, 0xff);
++
++  cogl_driver_fake_resets = 1;
++  while (clutter_graphics_recovery_context_is_in_progress (recovery))
++    g_main_context_iteration (NULL, TRUE);
++
++  cogl_context = clutter_backend_get_cogl_context (clutter_backend);
++  g_message ("old context defunct: %d, new context differs: %d",
++             cogl_context_is_defunct (cogl_texture_get_context (old_texture)),
++             cogl_context != cogl_texture_get_context (old_texture));
++  g_test_log_set_fatal_handler (proof_not_fatal, NULL);
++  for (n = 0; n < 256; n++)
++    unrelated[n] = proof_solid_texture (cogl_context, 0, 0xff, 0);
++
++  clutter_actor_queue_redraw (stage);
++  meta_wait_for_paint (CLUTTER_STAGE (stage));
++
++  view = CLUTTER_STAGE_VIEW (clutter_stage_peek_stage_views (CLUTTER_STAGE (stage))->data);
++  cogl_framebuffer_read_pixels (clutter_stage_view_get_framebuffer (view),
++                                10, 10, 1, 1, COGL_PIXEL_FORMAT_RGBA_8888, pixel);
++  g_message ("after reset: %02x%02x%02x", pixel[0], pixel[1], pixel[2]);
++  for (n = 0; n < 256; n++)
++    g_object_unref (unrelated[n]);
++  g_assert_cmpint (pixel[1], !=, 0xff);
++
++  clutter_actor_destroy (actor);
++}
++
+ static void
+ init_tests (void)
+ {
+@@ -1683,6 +1776,8 @@ init_tests (void)
+                    meta_test_timeline_actor_tree_clear);
+   g_test_add_func ("/stage-views/offscreen-effect-resource-scale",
+                    meta_test_stage_views_offscreen_effect_resource_scale);
++  g_test_add_func ("/stage-views/texture-content-reset",
++                   meta_test_stage_views_texture_content_reset);
+   g_test_add_func ("/stage-views/fractional-position",
+                    meta_test_stage_views_fractional_position);
+ }

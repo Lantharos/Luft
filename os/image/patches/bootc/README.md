@@ -20,9 +20,9 @@ The patches are against bootc 1.17.3. A change that a bootc release carries need
 
 `boot-counting.patch` isn't upstream: bootc's main branch writes its entries without a counter, though `kernel-install` gives new entries tries from `/etc/kernel/tries`.
 
-`staged-entries.patch` isn't upstream: bootc's main branch still writes a staged UKI's entries next to those already staged.
+`staged-entries.patch` is [bootc-dev/bootc#2630](https://github.com/bootc-dev/bootc/pull/2630), which isn't merged yet: bootc's main branch still writes a staged UKI's entries next to those already staged.
 
-`rollback-entry-names.patch` isn't upstream: bootc's main branch still rolls back with `bootc` as the name.
+`rollback-entry-names.patch` is [bootc-dev/bootc#2631](https://github.com/bootc-dev/bootc/pull/2631), which isn't merged yet: bootc's main branch still rolls back with `bootc` as the name.
 
 `require-verity.patch` isn't upstream: bootc 1.17.3 and its main branch still let `meta.json` decide whether the initramfs checks fs-verity, even when the command line asks for it.
 

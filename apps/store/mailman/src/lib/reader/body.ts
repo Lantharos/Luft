@@ -15,14 +15,16 @@ const QUOTES = [
 	'#Signature'
 ].join(',');
 const OUTLOOK_MARKERS = '#divRplyFwdMsg, #appendonsend, hr#stopSpelling';
+const DARK_QUERY = /@media[^{]*prefers-color-scheme\s*:\s*dark[^{]*/gi;
 
 export function stylesheet(rendered: Rendered, dark: boolean, darken: boolean) {
 	const adopt = rendered.plain || !rendered.designed;
-	const inverted = dark && darken && !adopt;
+	const ownDark = dark && darken && !adopt && rendered.html.search(DARK_QUERY) !== -1;
+	const inverted = dark && darken && !adopt && !ownDark;
 	return `
 		:host { display: block; contain: layout paint; overflow: hidden; }
 		.mm-root { overflow-wrap: anywhere; font: 14px/1.6 ${adopt ? "'Open Runde', system-ui, sans-serif" : 'system-ui, sans-serif'}; color: ${adopt ? 'var(--text)' : '#1b1b19'}; user-select: text; cursor: auto; }
-		${adopt ? '.mm-root a { color: var(--accent); } .mm-root blockquote { margin: 8px 0; padding-left: 12px; border-left: 2px solid var(--hairline); color: var(--text-muted); }' : '.mm-root { background: #fff; border-radius: 12px; padding: 12px; }'}
+		${adopt ? '.mm-root a { color: var(--accent); } .mm-root blockquote { margin: 8px 0; padding-left: 12px; border-left: 2px solid var(--hairline); color: var(--text-muted); }' : ownDark ? '.mm-root { color: var(--text); border-radius: 12px; overflow: hidden; }' : '.mm-root { background: #fff; border-radius: 12px; padding: 12px; }'}
 		${inverted ? '.mm-root { filter: invert(0.9) hue-rotate(180deg); } .mm-root img, .mm-root video, .mm-root [style*="background-image"] { filter: invert(1) hue-rotate(180deg); }' : ''}
 		.mm-root > :first-child { margin-top: 0; }
 		.mm-root > :last-child { margin-bottom: 0; }
@@ -33,6 +35,14 @@ export function stylesheet(rendered: Rendered, dark: boolean, darken: boolean) {
 		table { max-width: 100%; }
 		pre, code { white-space: pre-wrap; }
 	`;
+}
+
+export function applyColorScheme(root: ParentNode, dark: boolean) {
+	root.querySelectorAll('style').forEach((style) => {
+		style.textContent = (style.textContent ?? '')
+			.replace(DARK_QUERY, dark ? '@media all ' : '@media not all ')
+			.replaceAll(':root', ':host');
+	});
 }
 
 export function markQuotes(content: HTMLElement) {

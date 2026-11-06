@@ -4,7 +4,7 @@
 	import * as api from '#lib/bridge/index.js';
 	import { composer } from '#lib/compose/composer.svelte.js';
 	import { mail } from '#lib/mail/mail.svelte.js';
-	import { markQuotes, showFiles, showRemote, stylesheet } from './body';
+	import { applyColorScheme, markQuotes, showFiles, showRemote, stylesheet } from './body';
 	import { remoteImages } from './images.svelte';
 
 	interface Props {
@@ -22,11 +22,13 @@
 	$effect(() => {
 		if (!host) return;
 		const root = host.shadowRoot ?? host.attachShadow({ mode: 'open' });
+		const dark = appearance.scheme === 'dark';
 		const style = document.createElement('style');
-		style.textContent = stylesheet(rendered, appearance.scheme === 'dark', mail.settings.darkMail);
+		style.textContent = stylesheet(rendered, dark, mail.settings.darkMail);
 		const body = document.createElement('div');
 		body.className = 'mm-root mm-collapsed';
 		body.innerHTML = rendered.html;
+		applyColorScheme(body, dark && mail.settings.darkMail);
 		root.replaceChildren(style, body);
 		showFiles(body);
 		quotes = markQuotes(body);

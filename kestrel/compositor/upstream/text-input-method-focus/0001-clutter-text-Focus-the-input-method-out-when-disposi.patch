@@ -9,10 +9,13 @@ but an actor that is being destroyed loses key focus without
 key-focus-out being emitted. A text destroyed while it had key focus
 left the input method focused on its ClutterInputFocus. That object
 outlives the text and still points at it, so the next surrounding text
-request read freed memory and crashed the compositor.
+request read freed memory, which can crash the compositor.
 
 Focus the input method out when a text that still has it focused is
-disposed.
+disposed. This doesn't reset the input focus first, since that could
+commit preedit text into a text being disposed.
+
+Fixes: dce3aa5c015e ("clutter/actor: Don't emit focus signals during destruction")
 ---
  clutter/clutter/pango/clutter-text.c | 3 +++
  1 file changed, 3 insertions(+)

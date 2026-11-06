@@ -10,7 +10,7 @@ window closed, the handler stayed recorded on the old surface, so no
 text input focused afterwards ever told the input method where its
 cursor is. Drop the pending update when focus leaves the surface.
 
-Upstream-Status: forwardable
+Upstream-Status: upstream https://gitlab.gnome.org/GNOME/mutter/-/merge_requests/5459
 ---
  src/wayland/meta-wayland-text-input.c | 2 ++
  1 file changed, 2 insertions(+)

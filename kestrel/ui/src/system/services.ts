@@ -8,6 +8,7 @@ import { SystemPrompts } from '../auth/keyring/prompts.js';
 import { PasskeyPrompts } from '../auth/passkeys/service.js';
 import { LoginWallpaper } from '../desktop/wallpaper/loginWallpaper.js';
 import { LaunchFeedback } from '../desktop/windows/launchFeedback.js';
+import { ActivationTokens } from '../desktop/windows/activationTokens.js';
 import { OpenWindows } from '../desktop/windows/openWindows.js';
 import { SteamGames } from '../desktop/windows/steamGames.js';
 import { TitleBars } from '../desktop/windows/titleBars/titleBars.js';
@@ -46,6 +47,7 @@ export class SystemServices {
   private readonly launchFeedback = new LaunchFeedback();
   private readonly steamGames = new SteamGames();
   private readonly openWindows = new OpenWindows();
+  private readonly activationTokens = new ActivationTokens();
   private readonly variableRefresh = new VariableRefresh();
   private readonly monitorWake = new MonitorWake();
   private readonly seeThrough = new SeeThroughWindows();
@@ -97,6 +99,7 @@ export class SystemServices {
     this.launchFeedback.destroy();
     this.steamGames.destroy();
     this.openWindows.destroy();
+    this.activationTokens.destroy();
     this.variableRefresh.destroy();
     this.monitorWake.destroy();
     this.seeThrough.destroy();

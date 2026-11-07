@@ -44,7 +44,8 @@ const runtime = () => ({
 export const activateInAppRuntime = () => call('org.freedesktop.DBus', '/org/freedesktop/DBus', 'org.freedesktop.DBus', 'UpdateActivationEnvironment',
   new GLib.Variant('(a{ss})', [runtime()]));
 
-function environment(manifest: string | null = null): Record<string, string | null> {
+/** What Luft apps start with in a check: their own home and runtime folders. */
+export function environment(manifest: string | null = null): Record<string, string | null> {
   home ??= prepareHome();
   const ibus = IBus.get_address();
   return {

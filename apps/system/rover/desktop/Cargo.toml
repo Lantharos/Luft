@@ -16,7 +16,7 @@ sabine.workspace = true
 serde_json.workspace = true
 specta.workspace = true
 serde.workspace = true
-tokio = { workspace = true, features = ["default", "process"] }
+tokio = { workspace = true, features = ["default", "process", "rt"] }
 walkdir.workspace = true
 dirs.workspace = true
 chrono.workspace = true

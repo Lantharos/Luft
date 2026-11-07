@@ -3,13 +3,15 @@ import Gio from 'gi://Gio';
 import GioUnix from 'gi://GioUnix';
 import GLib from 'gi://GLib';
 import type Meta from 'gi://Meta';
+import Shell from 'gi://Shell';
 
 import {changes, openApp} from '../apps/lib/apps.js';
 import {exists, removeTree, write} from '../apps/lib/files.js';
-import type {LuftApp} from '../lib/apps/luftApp.js';
+import {environment, type LuftApp} from '../lib/apps/luftApp.js';
 import {checks} from '../lib/check.js';
 import {press, type, type Point} from '../lib/input/input.js';
-import {findWindow, fixture, scratch, spawn, waitForWindow, windows} from '../lib/processes.js';
+import {findWindow, fixture, gjs, scratch, spawn, stop, waitForWindow, windows} from '../lib/processes.js';
+import {capture} from '../lib/screenshots.js';
 import {pause, settled} from '../lib/wait.js';
 
 const {require, eventually} = checks('handoff focus');
@@ -25,6 +27,12 @@ const UNPROMPTED_LINK = 'http://127.0.0.1:9/unprompted';
 const BODY: Point = [620, 420];
 const BROWSER = 'com.lantharos.Kestrel.HandoffBrowser';
 const LINK_SCHEMES = ['x-scheme-handler/http', 'x-scheme-handler/https'];
+const SHOW_FOLDER = 10;
+const OPEN_FOLDER = 12;
+const showFolderUnfocused = `
+  const {Gio, GLib} = imports.gi;
+  Gio.DBus.session.call_sync('org.freedesktop.FileManager1', '/org/freedesktop/FileManager1', 'org.freedesktop.FileManager1', 'ShowFolders',
+    new GLib.Variant('(ass)', [[GLib.filename_to_uri('${FOLDER}', null)], '']), null, Gio.DBusCallFlags.NONE, -1, null);`;
 
 const focused = () => global.display.focus_window;
 
@@ -57,6 +65,37 @@ async function checkTerminal() {
     await eventually(() => focused() && isTern(focused()), 'a running Tern comes to the front for Open terminal here');
     windows().filter(isTern).forEach(window => window.kill());
   } finally {
+    await rover.close();
+    removeTree(FOLDER);
+  }
+}
+
+async function checkFolderRequests() {
+  write(GLib.build_filenamev([FOLDER, 'Note.txt']), 'Pack the charger\n');
+  const rover = await openApp('rover');
+  const [, command] = GLib.shell_parse_argv(Shell.AppSystem.get_default().lookup_app('com.lantharos.rover.desktop')!.app_info.get_commandline()!);
+  const caller = gjs('clients/windows/folderCaller.js', [FOLDER, ...command!.filter(argument => !argument.startsWith('%'))], {env: {...environment(), ...NO_LAUNCH_TOKEN}});
+  try {
+    const window = await waitForWindow('Kestrel folder caller');
+    const front = async () => {
+      window.activate(global.get_current_time());
+      await eventually(() => window.has_focus(), 'the app asking for the folder is in front');
+    };
+    await front();
+    caller.send_signal(SHOW_FOLDER);
+    await eventually(() => rover.window.has_focus(), 'Rover comes forward for a folder the app in front shows without a token', OPEN_TIMEOUT);
+    await settled();
+    await capture('rover-folder-from-app');
+
+    await front();
+    spawn(['gjs', '-c', showFolderUnfocused], {env: NO_LAUNCH_TOKEN});
+    await pause(UNPROMPTED_WAIT);
+    require(window.has_focus(), 'a folder shown by an app in the background leaves Rover behind');
+
+    caller.send_signal(OPEN_FOLDER);
+    await eventually(() => rover.window.has_focus(), 'Rover comes forward when the app in front opens a folder with it', OPEN_TIMEOUT);
+  } finally {
+    await stop(caller);
     await rover.close();
     removeTree(FOLDER);
   }
@@ -110,6 +149,7 @@ async function checkLink(helium: string) {
 
 export async function run() {
   await checkTerminal();
+  await checkFolderRequests();
   const helium = GLib.getenv('KESTREL_HELIUM');
   if (helium) await checkLink(helium);
   else console.log('Kestrel handoff focus: the browser is skipped without KESTREL_HELIUM');

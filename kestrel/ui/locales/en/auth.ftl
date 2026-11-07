@@ -14,11 +14,15 @@ greeter-restart = Restart
 greeter-power-off = Power off
 # Last entry of the account list, for signing in to an account that isn't listed
 greeter-another-account = Another account
+# Shown on the login screen while it rests, before the sign-in prompt comes up
+greeter-wake-hint = Press any key or click to sign in
 
 ## Lock screen
 
 # Screen-reader label of the accessibility menu button
 lock-screen-accessibility = Accessibility
+# Shown on the lock screen while it rests, before the password prompt comes up
+lock-screen-wake-hint = Press any key or click to unlock
 # Screen-reader label of the power menu button
 lock-screen-power = Power
 # Screen-reader label of the battery status. $level is the charge, already formatted as a percentage
@@ -139,54 +143,54 @@ polkit-failed = Sorry, that didn’t work. Please try again.
 ## Log out, power off and restart dialog
 
 # Dialog title. $userName is the person's full name
-end-session-log-out-user = Log Out { $userName }
+end-session-log-out-user = Log out { $userName }?
 # Dialog title
-end-session-log-out-title = Log Out
+end-session-log-out-title = Log out?
 # $userName is the person's full name
 end-session-log-out-user-countdown = { $seconds ->
-    [one] { $userName } will be logged out automatically in { $seconds } second
-   *[other] { $userName } will be logged out automatically in { $seconds } seconds
+    [one] Open apps close and { $userName } goes back to the login screen. This happens by itself in { $seconds } second unless you cancel.
+   *[other] Open apps close and { $userName } goes back to the login screen. This happens by itself in { $seconds } seconds unless you cancel.
 }
 end-session-log-out-countdown = { $seconds ->
-    [one] You will be logged out automatically in { $seconds } second
-   *[other] You will be logged out automatically in { $seconds } seconds
+    [one] Open apps close and you go back to the login screen. This happens by itself in { $seconds } second unless you cancel.
+   *[other] Open apps close and you go back to the login screen. This happens by itself in { $seconds } seconds unless you cancel.
 }
 # Button
-end-session-log-out-button = Log Out
+end-session-log-out-button = Log out
 # Dialog title
-end-session-power-off-title = Power Off
+end-session-power-off-title = Turn off the computer?
 # Dialog title when updates are installed before powering off
-end-session-power-off-updates-title = Install Updates & Power Off
+end-session-power-off-updates-title = Install the update and turn off the computer?
 end-session-power-off-countdown = { $seconds ->
-    [one] The system will power off automatically in { $seconds } second
-   *[other] The system will power off automatically in { $seconds } seconds
+    [one] Open apps close and the computer turns off. This happens by itself in { $seconds } second unless you cancel.
+   *[other] Open apps close and the computer turns off. This happens by itself in { $seconds } seconds unless you cancel.
 }
 # Button
-end-session-power-off-button = Power Off
+end-session-power-off-button = Power off
 # Dialog title
-end-session-restart-title = Restart
+end-session-restart-title = Restart the computer?
 # Dialog title when updates are installed before restarting
-end-session-restart-updates-title = Install Updates & Restart
+end-session-restart-updates-title = Install the update and restart?
 end-session-restart-countdown = { $seconds ->
-    [one] The system will restart automatically in { $seconds } second
-   *[other] The system will restart automatically in { $seconds } seconds
+    [one] Open apps close and the computer starts again. This happens by itself in { $seconds } second unless you cancel.
+   *[other] Open apps close and the computer starts again. This happens by itself in { $seconds } seconds unless you cancel.
 }
 # Button
 end-session-restart-button = Restart
 # Dialog title
-end-session-update-restart-title = Restart & Install Updates
+end-session-update-restart-title = Restart and install the update?
 end-session-update-restart-countdown = { $seconds ->
-    [one] The system will automatically restart and install updates in { $seconds } second
-   *[other] The system will automatically restart and install updates in { $seconds } seconds
+    [one] Open apps close and the update installs as the computer starts again. This happens by itself in { $seconds } second unless you cancel.
+   *[other] Open apps close and the update installs as the computer starts again. This happens by itself in { $seconds } seconds unless you cancel.
 }
 # Button
-end-session-update-restart-button = Restart & Install
+end-session-update-restart-button = Restart and install
 # Checkbox
-end-session-power-options-title = What Should This Computer Do?
+end-session-power-options-title = What should the computer do?
 end-session-power-options-description = You pressed the power button.
 end-session-suspend-button = Suspend
 
-end-session-install-updates = Install pending software updates
+end-session-install-updates = Install the update that's ready
 # Checkbox. $version is the system version the update installs
 end-session-install-version = Install version { $version }
 # A nightly build of a version that isn't out yet, like "1.2 Nightly 21": $release is the version it leads to, $number counts the nightly builds toward it
@@ -196,7 +200,7 @@ end-session-busy-apps = Some applications are busy or have unsaved work
 end-session-other-users = Other users are logged in
 end-session-cancel = Cancel
 # Button shown in place of Restart while Alt is held; restarts into the boot menu
-end-session-boot-options = Boot Options
+end-session-boot-options = Startup options
 # A user signed in from another computer, for example over SSH. $userName is their name
 end-session-remote-user = { $userName } (remote)
 # A user signed in on a text console. $userName is their name

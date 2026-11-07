@@ -303,10 +303,15 @@ impl Power {
             return;
         }
         self.screen_locked = locked;
-        let woke_before_locking = std::mem::take(&mut self.locking_for_sleep) && !self.sleeping;
+        let for_sleep = std::mem::take(&mut self.locking_for_sleep);
         self.configure().await;
         if locked {
-            if !woke_before_locking {
+            let blank = if for_sleep {
+                self.sleeping
+            } else {
+                self.lid_closed || self.watches.idle_for().await >= SCREEN_OFF_AFTER_LOCK
+            };
+            if blank {
                 self.set_mode(Mode::Blank).await;
             }
             self.inhibitors.release_sleep();

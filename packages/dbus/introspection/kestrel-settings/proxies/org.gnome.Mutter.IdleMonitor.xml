@@ -10,6 +10,9 @@
     <method name="RemoveWatch">
       <arg type="u" direction="in"/>
     </method>
+    <method name="GetIdletime">
+      <arg type="t" direction="out"/>
+    </method>
     <signal name="WatchFired">
       <arg type="u"/>
     </signal>

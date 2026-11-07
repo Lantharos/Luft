@@ -85,6 +85,7 @@ export class UnlockDialog extends St.Widget {
       auth: this.promptBox,
       side: notificationsBox,
       controls: this.controls.actor,
+      hint: 'lock-screen-wake-hint',
       actionMode: Shell.ActionMode.UNLOCK_SCREEN,
       preparePrompt: () => this.ensureAuthPrompt(),
       asleep: () => this.restAuthPrompt(),

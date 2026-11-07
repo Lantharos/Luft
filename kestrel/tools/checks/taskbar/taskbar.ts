@@ -118,8 +118,37 @@ async function checkOpening(panel: Clutter.Actor) {
   }
 }
 
+async function checkSteady(panel: Clutter.Actor) {
+  const start = ofType(existing('Start', panel), St.Widget);
+  const at = () => start.get_transformed_position().join(',');
+  const before = at();
+  moveTo(centerOf(start));
+  const app = gjs('clients/windows/window.js');
+  try {
+    const window = await waitForWindow('Kestrel window check');
+    const id = Shell.WindowTracker.get_default().get_window_app(window).id;
+    await settled();
+    require(!named(`kestrel-app-${id}`, panel) && at() === before, 'an app opening under the pointer waits to join the taskbar, so Start stays put');
+    rest();
+    const button = ofType(await eventually(() => named(`kestrel-app-${id}`, panel), 'the app joins the taskbar once the pointer leaves'), St.Button);
+    await settled();
+    const shifted = at();
+    moveTo(centerOf(start));
+    await stop(app);
+    await eventually(() => !button.reactive, 'a closed app gives up its button');
+    await settled();
+    require(at() === shifted && button.get_parent()!.width > 0, 'a closed app keeps its place while the pointer is over the taskbar');
+    rest();
+    await eventually(() => !named(`kestrel-app-${id}`, panel) && at() === before, 'the taskbar closes the gap once the pointer leaves');
+  } finally {
+    await stop(app);
+    rest();
+  }
+}
+
 export async function run() {
   const panel = existing('kestrel-panel');
+  await checkSteady(panel);
   await checkOpening(panel);
   const app = gjs('clients/windows/window.js', ['--multiple']);
   const windows = await waitForWindows(TITLES);

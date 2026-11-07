@@ -7,6 +7,7 @@ use crate::files::counts::CountBatch;
 use crate::files::operations::Operation;
 use crate::files::watch::DirectoryChanged;
 use crate::history::HistoryState;
+use crate::integration::nearby::NearbyDevice;
 use crate::locations::network::NetworkAsk;
 use crate::search::SearchUpdate;
 
@@ -23,6 +24,7 @@ pub const FOLDER_COUNTS: BridgeEvent<CountBatch> = BridgeEvent::new("rover.count
 pub const NETWORK_CHANGED: BridgeEvent<()> = BridgeEvent::new("rover.network");
 pub const NETWORK_ASK: BridgeEvent<NetworkAsk> = BridgeEvent::new("rover.network.ask");
 pub const CLOUD_CHANGED: BridgeEvent<()> = BridgeEvent::new("rover.cloud");
+pub const NEARBY_CHANGED: BridgeEvent<Vec<NearbyDevice>> = BridgeEvent::new("rover.nearby");
 
 pub fn declare(window: SabineWindow) -> SabineWindow {
     window
@@ -38,4 +40,5 @@ pub fn declare(window: SabineWindow) -> SabineWindow {
         .bridge_event(&NETWORK_CHANGED)
         .bridge_event(&NETWORK_ASK)
         .bridge_event(&CLOUD_CHANGED)
+        .bridge_event(&NEARBY_CHANGED)
 }

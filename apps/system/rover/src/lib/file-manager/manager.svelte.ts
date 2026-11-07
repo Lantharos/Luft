@@ -3,6 +3,7 @@ import { appearance, basename, errorText, parent } from '@luft/ui';
 import { commands } from '#lib/bindings.js';
 import type { AppState, DriveInfo, FileEntry, GroupBy, Operation, PinnedFolder, SortBy, TrashContents, UserDirs, ViewMode } from '#lib/bindings.js';
 import * as api from '#lib/bridge/index.js';
+import { NearbyState } from '#lib/features/nearby.svelte.js';
 import { settings } from '#lib/state/settings.svelte.js';
 import { Tabs } from '#lib/state/tabs.svelte.js';
 import type { Arrival, ClipboardState, InlineDraft, SidebarView, TabHistoryEntry, ViewMemory } from '#lib/types/index.js';
@@ -57,6 +58,7 @@ export class FileManager {
 	readonly drives = new DrivesState();
 	readonly network = new NetworkState();
 	readonly cloud = new CloudState();
+	readonly nearby = new NearbyState();
 	readonly actions = new FileActions(this);
 
 	view = $state<SidebarView>('home');
@@ -180,6 +182,7 @@ export class FileManager {
 		void this.drives.load();
 		void this.network.load();
 		void this.cloud.load();
+		void this.nearby.load();
 		const path = startPath ?? this.homePath;
 		this.tabs.open(this.#homeEntry(path));
 		await this.loadDirectory(path);

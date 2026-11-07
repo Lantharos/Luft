@@ -1,6 +1,7 @@
 pub mod chooser;
 pub mod file_manager_bus;
 pub mod launch_args;
+pub mod nearby;
 pub mod portal;
 pub mod terminal;
 

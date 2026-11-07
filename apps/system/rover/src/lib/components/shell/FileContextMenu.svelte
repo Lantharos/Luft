@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Archive from '@lucide/svelte/icons/archive';
+	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 	import ArrowLeftRight from '@lucide/svelte/icons/arrow-left-right';
 	import ChartPie from '@lucide/svelte/icons/chart-pie';
 	import Check from '@lucide/svelte/icons/check';
@@ -16,12 +17,16 @@
 	import Globe from '@lucide/svelte/icons/globe';
 	import Info from '@lucide/svelte/icons/info';
 	import Link from '@lucide/svelte/icons/link';
+	import Monitor from '@lucide/svelte/icons/monitor';
 	import PackageOpen from '@lucide/svelte/icons/package-open';
 	import Plus from '@lucide/svelte/icons/plus';
 	import Printer from '@lucide/svelte/icons/printer';
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 	import Scissors from '@lucide/svelte/icons/scissors';
 	import Search from '@lucide/svelte/icons/search';
+	import Send from '@lucide/svelte/icons/send';
+	import Server from '@lucide/svelte/icons/server';
+	import Smartphone from '@lucide/svelte/icons/smartphone';
 	import SquarePen from '@lucide/svelte/icons/square-pen';
 	import Star from '@lucide/svelte/icons/star';
 	import Terminal from '@lucide/svelte/icons/terminal';
@@ -54,6 +59,19 @@
 	let kept = $derived(cloud.keptEverywhere(manager, targets));
 	let archives = $derived(targets.length > 0 && targets.every((entry) => !entry.isDir && isArchive(entry.name)));
 	let printable = $derived(tools.printable(targets));
+	let nearby = $derived(manager.nearby.devices);
+	let choosingDevice = $state(false);
+
+	const DEVICE_ICONS: Record<string, Component> = { mobile: Smartphone, web: Globe, headless: Terminal, server: Server };
+
+	function chooseDevice() {
+		choosingDevice = true;
+		manager.nearby.lookAgain();
+	}
+
+	function sendTo(device: string) {
+		run(() => manager.nearby.send(device, targets.map((entry) => entry.path)));
+	}
 
 	function close() {
 		manager.contextMenu = null;
@@ -82,7 +100,18 @@
 {/snippet}
 
 <ContextMenu at={menu} onclose={close}>
-	{#if target}
+	{#if target && choosingDevice}
+		<MenuItem onclick={() => (choosingDevice = false)}>
+			<ArrowLeft size={16} />
+			<span>Back</span>
+		</MenuItem>
+		<MenuSeparator />
+		{#each nearby as device (device.id)}
+			{@render item(DEVICE_ICONS[device.kind] ?? Monitor, device.name, () => sendTo(device.id))}
+		{:else}
+			{@render item(Send, 'No devices nearby', () => {}, false, true)}
+		{/each}
+	{:else if target}
 		{@render item(ExternalLink, 'Open', () => manager.openEntry(target))}
 		{#if !target.isDir}
 			{@render item(Eye, 'Quick Look', view.toggleQuickLook)}
@@ -125,6 +154,12 @@
 		{/if}
 		{#if printable}
 			{@render item(Printer, 'Print…', () => tools.printFiles(manager, targets))}
+		{/if}
+		{#if nearby.length}
+			<MenuItem onclick={chooseDevice}>
+				<Send size={16} />
+				<span>Send to device</span>
+			</MenuItem>
 		{/if}
 		{#if target.isDir}
 			{@render item(Terminal, 'Open in terminal', () => tools.openTerminal(manager, target.path))}

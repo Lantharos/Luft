@@ -116,6 +116,7 @@ export const commands = {
 	listOperations: (options?: CallOptions) => invoke<Operation[]>("list_operations", {}, options),
 	listTrash: (options?: CallOptions) => invoke<TrashContents>("list_trash", {}, options),
 	listWindows: (options?: CallOptions) => invoke<WindowsDrive[]>("list_windows", {}, options),
+	lookForDevices: (options?: CallOptions) => invoke<null>("look_for_devices", {}, options),
 	manageDrive: (params: {
 		mountPoint: string,
 		token?: string | null,
@@ -130,6 +131,7 @@ export const commands = {
 	moveToTrash: (params: {
 		paths: string[],
 	}, options?: CallOptions) => invoke<null>("move_to_trash", params, options),
+	nearbyDevices: (options?: CallOptions) => invoke<NearbyDevice[]>("nearby_devices", {}, options),
 	networkAnswer: (params: {
 		id: number,
 		cancelled: boolean,
@@ -197,6 +199,10 @@ export const commands = {
 	resumeOperation: (params: {
 		id: string,
 	}, options?: CallOptions) => invoke<null>("resume_operation", params, options),
+	sendToDevice: (params: {
+		device: string,
+		paths: string[],
+	}, options?: CallOptions) => invoke<null>("send_to_device", params, options),
 	setDefaultApp: (params: {
 		path: string,
 		app: string,
@@ -248,6 +254,7 @@ export const events = {
 	roverDrives: (callback: (payload: null) => void) => listen<null>("rover.drives", callback),
 	roverHistory: (callback: (payload: HistoryState) => void) => listen<HistoryState>("rover.history", callback),
 	roverMeasure: (callback: (payload: Measurement) => void) => listen<Measurement>("rover.measure", callback),
+	roverNearby: (callback: (payload: NearbyDevice[]) => void) => listen<NearbyDevice[]>("rover.nearby", callback),
 	roverNetwork: (callback: (payload: null) => void) => listen<null>("rover.network", callback),
 	roverNetworkAsk: (callback: (payload: NetworkAsk) => void) => listen<NetworkAsk>("rover.network.ask", callback),
 	roverOperations: (callback: (payload: Operation[]) => void) => listen<Operation[]>("rover.operations", callback),
@@ -441,6 +448,13 @@ export type Measurement = {
 };
 
 export type Motion = "full" | "reduced" | "off";
+
+export type NearbyDevice = {
+	id: string,
+	name: string,
+	/**  `mobile`, `desktop`, `web`, `headless` or `server`. */
+	kind: string,
+};
 
 export type NetworkAsk = { kind: "password"; id: number; message: string; user: string; domain: string; needsUser: boolean; needsDomain: boolean; needsPassword: boolean; anonymous: boolean; saving: boolean } | { kind: "question"; id: number; message: string; choices: string[] } | { kind: "done"; id: number };
 

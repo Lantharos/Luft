@@ -1,0 +1,57 @@
+use crate::place::Coordinates;
+
+pub struct Sun {
+    pub sunrise: f64,
+    pub sunset: f64,
+}
+
+pub enum Daylight {
+    Sun(Sun),
+    PolarDay,
+    PolarNight,
+}
+
+pub fn daylight(time: &glib::DateTime, at: Coordinates) -> Daylight {
+    let offset = time.utc_offset().as_seconds() as f64 / 3600.0;
+    let days_since_1900 = (time.to_unix() as f64 / 86400.0 + 25569.0).floor();
+    let julian_day = days_since_1900 + 2415018.5 - offset / 24.0;
+    let century = (julian_day - 2451545.0) / 36525.0;
+    let mean_longitude = (280.46646 + century * (36000.76983 + century * 0.0003032)) % 360.0;
+    let mean_anomaly = 357.52911 + century * (35999.05029 - 0.0001537 * century);
+    let eccentricity = 0.016708634 - century * (0.000042037 + 0.0000001267 * century);
+    let anomaly = mean_anomaly.to_radians();
+    let center = anomaly.sin() * (1.914602 - century * (0.004817 + 0.000014 * century))
+        + (2.0 * anomaly).sin() * (0.019993 - 0.000101 * century)
+        + (3.0 * anomaly).sin() * 0.000289;
+    let apparent_longitude = mean_longitude + center
+        - 0.00569
+        - 0.00478 * (125.04 - 1934.136 * century).to_radians().sin();
+    let mean_obliquity = 23.0
+        + (26.0 + (21.448 - century * (46.815 + century * (0.00059 - century * 0.001813))) / 60.0)
+            / 60.0;
+    let obliquity = mean_obliquity + 0.00256 * (125.04 - 1934.136 * century).to_radians().cos();
+    let declination = (obliquity.to_radians().sin() * apparent_longitude.to_radians().sin()).asin();
+    let y = (obliquity / 2.0).to_radians().tan().powi(2);
+    let longitude = mean_longitude.to_radians();
+    let equation_of_time = 4.0
+        * (y * (2.0 * longitude).sin() - 2.0 * eccentricity * anomaly.sin()
+            + 4.0 * eccentricity * y * anomaly.sin() * (2.0 * longitude).cos()
+            - 0.5 * y * y * (4.0 * longitude).sin()
+            - 1.25 * eccentricity * eccentricity * (2.0 * anomaly).sin())
+        .to_degrees();
+    let latitude = at.latitude.to_radians();
+    let hour_angle_cosine = 90.833_f64.to_radians().cos() / (latitude.cos() * declination.cos())
+        - latitude.tan() * declination.tan();
+    if hour_angle_cosine > 1.0 {
+        return Daylight::PolarNight;
+    }
+    if hour_angle_cosine < -1.0 {
+        return Daylight::PolarDay;
+    }
+    let hour_angle = hour_angle_cosine.acos().to_degrees();
+    let solar_noon = (720.0 - 4.0 * at.longitude - equation_of_time + offset * 60.0) / 1440.0;
+    Daylight::Sun(Sun {
+        sunrise: (solar_noon - hour_angle * 4.0 / 1440.0) * 24.0,
+        sunset: (solar_noon + hour_angle * 4.0 / 1440.0) * 24.0,
+    })
+}

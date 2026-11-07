@@ -1,3 +1,5 @@
+use serde::{Deserialize, Serialize};
+
 use crate::error::Error;
 
 #[derive(Clone, Copy)]
@@ -25,7 +27,8 @@ impl SignInMethod {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
 pub enum Style {
     Light,
     Dark,

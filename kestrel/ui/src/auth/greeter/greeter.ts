@@ -69,7 +69,7 @@ export class Greeter {
   private readonly controls: GreeterControls;
   private readonly wakePress = new WakePress();
   private readonly monument: Monument;
-  private backdrop: LockBackdrop | null = null;
+  private backdropShown: Promise<void> | null = null;
   private showWallpaper!: () => void;
   readonly wallpaperShown = new Promise<void>(resolve => (this.showWallpaper = resolve));
   private selected: AccountsService.User | null = null;
@@ -117,7 +117,7 @@ export class Greeter {
 
     if (this.accounts.loaded) this.showUsers();
     else GLib.timeout_add(GLib.PRIORITY_DEFAULT, ACCOUNTS_TIMEOUT, () => {
-      if (!this.backdrop) this.choose(null);
+      if (!this.accounts.loaded) this.choose(null);
       return GLib.SOURCE_REMOVE;
     });
   }
@@ -152,12 +152,12 @@ export class Greeter {
     if (this.finishing || (user === this.selected && this.started)) return;
     this.selected = user;
     this.userList.select(user);
-    this.appearance.showWallpaperOf(user?.get_uid() ?? null);
-    if (!this.backdrop) {
-      this.backdrop = new LockBackdrop();
-      this.dialog.insert_child_at_index(this.backdrop.actor, 0);
-      void this.backdrop.loaded.then(this.showWallpaper);
-    }
+    const appearance = this.appearance.showWallpaperOf(user?.get_uid() ?? null);
+    this.backdropShown ??= appearance.then(() => {
+      const backdrop = new LockBackdrop();
+      this.dialog.insert_child_at_index(backdrop.actor, 0);
+      return backdrop.loaded.then(this.showWallpaper);
+    });
     this.useSession(this.preferredSession(user));
     const restart = this.started;
     this.stop();
@@ -191,7 +191,7 @@ export class Greeter {
   private enterUserName(name: string): void {
     const user = this.accounts.find(name);
     const known = user.is_loaded && !user.system_account;
-    this.appearance.showWallpaperOf(known ? user.get_uid() : null);
+    void this.appearance.showWallpaperOf(known ? user.get_uid() : null);
     this.useSession(this.preferredSession(known ? user : null));
     this.prompt.setUser(known ? user : null);
     this.prompt.allowGoingBack(true);
@@ -201,7 +201,7 @@ export class Greeter {
 
   private goBack(): void {
     if (!this.selected && this.prompt.userName) {
-      this.appearance.showWallpaperOf(null);
+      void this.appearance.showWallpaperOf(null);
       this.prompt.setUser(null);
       this.prompt.allowGoingBack(false);
       this.prompt.askForUserName();

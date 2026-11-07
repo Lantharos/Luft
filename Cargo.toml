@@ -46,6 +46,7 @@ members = [
     "kestrel/watchdog",
     "kestrel/wrapper",
     "packages/app",
+    "packages/daylight",
     "packages/dbus",
     "packages/dbus/macros",
     "packages/i18n",
@@ -113,6 +114,7 @@ default-members = [
     "kestrel/watchdog",
     "kestrel/wrapper",
     "packages/app",
+    "packages/daylight",
     "packages/dbus",
     "packages/dbus/macros",
     "packages/i18n",
@@ -150,6 +152,7 @@ repository = "https://github.com/Lantharos/Luft"
 ctap = { path = "kestrel/passkeys/crates/ctap" }
 luft-accounts = { path = "packages/system/accounts" }
 luft-app = { path = "packages/app" }
+luft-daylight = { path = "packages/daylight" }
 luft-dbus = { path = "packages/dbus" }
 luft-dbus-macros = { path = "packages/dbus/macros" }
 luft-disks = { path = "packages/system/disks" }

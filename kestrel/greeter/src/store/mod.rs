@@ -1,6 +1,7 @@
 mod choices;
 mod config;
 mod displays;
+mod style;
 mod wallpaper;
 
 use std::fs;
@@ -10,17 +11,20 @@ use std::path::{Path, PathBuf};
 pub use choices::{SignInMethod, Style};
 pub use config::Config;
 pub use displays::prepare as prepare_displays;
+pub use style::StyleChoice;
 pub use wallpaper::{Focus, encode as encode_wallpaper, read as read_wallpaper};
 
 use crate::files::{self, Readers, write_atomically};
 
 const WALLPAPER: &str = "wallpaper.jpg";
 const WALLPAPER_DETAILS: &str = "wallpaper.json";
+const DARK_WALLPAPER: &str = "wallpaper-dark.jpg";
+const DARK_WALLPAPER_DETAILS: &str = "wallpaper-dark.json";
 const DISPLAYS: &str = "display/monitors.xml";
 const USER_DISPLAYS: &str = "monitors.xml";
 const USER_NUM_LOCK: &str = "num-lock";
 const USER_SIGN_IN_METHOD: &str = "sign-in-method";
-const USER_STYLE: &str = "style";
+const USER_STYLE: &str = "style.json";
 
 pub struct Store {
     root: PathBuf,
@@ -57,7 +61,13 @@ impl Store {
     }
 
     pub fn save_shared_wallpaper(&self, jpeg: &[u8], focus: Focus) -> io::Result<()> {
-        save_wallpaper(&self.root.join("shared"), jpeg, focus, Readers::Everyone)
+        save_wallpaper(
+            &self.root.join("shared"),
+            [WALLPAPER, WALLPAPER_DETAILS],
+            jpeg,
+            focus,
+            Readers::Everyone,
+        )
     }
 
     pub fn clear_shared_wallpaper(&self) -> io::Result<()> {
@@ -65,8 +75,32 @@ impl Store {
         files::remove(&self.root.join("shared").join(WALLPAPER_DETAILS))
     }
 
-    pub fn save_user_wallpaper(&self, uid: u32, jpeg: &[u8], focus: Focus) -> io::Result<()> {
-        save_wallpaper(&self.user_folder(uid), jpeg, focus, Readers::LoginScreen)
+    pub fn save_user_wallpapers(
+        &self,
+        uid: u32,
+        light: (&[u8], Focus),
+        dark: Option<(&[u8], Focus)>,
+    ) -> io::Result<()> {
+        let folder = self.user_folder(uid);
+        let names = [DARK_WALLPAPER, DARK_WALLPAPER_DETAILS];
+        match dark {
+            Some((jpeg, focus)) => {
+                save_wallpaper(&folder, names, jpeg, focus, Readers::LoginScreen)?
+            }
+            None => {
+                for name in names {
+                    files::remove(&folder.join(name))?;
+                }
+            }
+        }
+        let (jpeg, focus) = light;
+        save_wallpaper(
+            &folder,
+            [WALLPAPER, WALLPAPER_DETAILS],
+            jpeg,
+            focus,
+            Readers::LoginScreen,
+        )
     }
 
     pub fn user_displays(&self, uid: u32) -> Option<Vec<u8>> {
@@ -113,10 +147,15 @@ impl Store {
         )
     }
 
-    pub fn save_user_style(&self, uid: u32, style: Style) -> io::Result<()> {
+    pub fn user_style(&self, uid: u32) -> Option<StyleChoice> {
+        serde_json::from_slice(&fs::read(self.user_folder(uid).join(USER_STYLE)).ok()?).ok()
+    }
+
+    pub fn save_user_style(&self, uid: u32, style: &StyleChoice) -> io::Result<()> {
+        let contents = serde_json::to_vec(style).expect("the style serializes");
         write_atomically(
             &self.user_folder(uid).join(USER_STYLE),
-            style.name().as_bytes(),
+            &contents,
             Readers::LoginScreen,
         )
     }
@@ -134,7 +173,13 @@ impl Store {
     }
 }
 
-fn save_wallpaper(folder: &Path, jpeg: &[u8], focus: Focus, readers: Readers) -> io::Result<()> {
-    write_atomically(&folder.join(WALLPAPER_DETAILS), &focus.details(), readers)?;
-    write_atomically(&folder.join(WALLPAPER), jpeg, readers)
+fn save_wallpaper(
+    folder: &Path,
+    [picture, details]: [&str; 2],
+    jpeg: &[u8],
+    focus: Focus,
+    readers: Readers,
+) -> io::Result<()> {
+    write_atomically(&folder.join(details), &focus.details(), readers)?;
+    write_atomically(&folder.join(picture), jpeg, readers)
 }

@@ -14,7 +14,7 @@ use crate::access::{self, Access, CONFIGURE, SET_APPEARANCE};
 use crate::error::Error;
 use crate::idle::Idle;
 use crate::options::Options;
-use crate::store::{self, Config, Focus, SignInMethod, Store, Style};
+use crate::store::{self, Config, Focus, SignInMethod, Store, Style, StyleChoice};
 use crate::system::greetd::{Greetd, InitialSession};
 use crate::system::sessions::{self, Session};
 use crate::system::{accounts, users};
@@ -44,6 +44,10 @@ impl Greeter {
 
     async fn prepare_wallpaper(&self, wallpaper: OwnedFd) -> Result<Vec<u8>, Error> {
         let bytes = read_within(move || store::read_wallpaper(wallpaper.into())).await?;
+        self.encode_wallpaper(bytes).await
+    }
+
+    async fn encode_wallpaper(&self, bytes: Vec<u8>) -> Result<Vec<u8>, Error> {
         let _decoding = self.decoding.lock().await;
         spawn_blocking(move || store::encode_wallpaper(&bytes))
             .await
@@ -167,16 +171,29 @@ impl Greeter {
         #[zbus(header)] header: Header<'_>,
         wallpaper: OwnedFd,
         focus: (f64, f64),
+        dark_wallpaper: OwnedFd,
+        dark_focus: (f64, f64),
     ) -> Result<(), Error> {
         let _active = self.idle.hold();
         self.access
             .authorize(connection, &header, SET_APPEARANCE)
             .await?;
-        let focus = Focus::new(focus)?;
+        let (focus, dark_focus) = (Focus::new(focus)?, Focus::new(dark_focus)?);
         let uid = access::caller_uid(connection, &header).await?;
-        let jpeg = self.prepare_wallpaper(wallpaper).await?;
+        let light = read_within(move || store::read_wallpaper(wallpaper.into())).await?;
+        let dark = read_within(move || store::read_wallpaper(dark_wallpaper.into())).await?;
+        let dark = if dark == light && dark_focus == focus {
+            None
+        } else {
+            Some(self.encode_wallpaper(dark).await?)
+        };
+        let light = self.encode_wallpaper(light).await?;
         let _writing = self.writing.lock().await;
-        Ok(self.store.save_user_wallpaper(uid, &jpeg, focus)?)
+        Ok(self.store.save_user_wallpapers(
+            uid,
+            (&light, focus),
+            dark.as_deref().map(|jpeg| (jpeg, dark_focus)),
+        )?)
     }
 
     async fn set_displays(
@@ -241,15 +258,36 @@ impl Greeter {
         #[zbus(connection)] connection: &Connection,
         #[zbus(header)] header: Header<'_>,
         style: String,
+        schedule: String,
+        window: (f64, f64),
+        coordinates: (f64, f64),
     ) -> Result<(), Error> {
         let _active = self.idle.hold();
         self.access
             .authorize(connection, &header, SET_APPEARANCE)
             .await?;
-        let style = Style::parse(&style)?;
+        let style = StyleChoice::new(&style, schedule, window, coordinates)?;
         let uid = access::caller_uid(connection, &header).await?;
         let _writing = self.writing.lock().await;
-        Ok(self.store.save_user_style(uid, style)?)
+        Ok(self.store.save_user_style(uid, &style)?)
+    }
+
+    async fn current_style(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        uid: u32,
+    ) -> Result<(String, u32), Error> {
+        let _active = self.idle.hold();
+        self.access.authorize_greeter(connection, &header).await?;
+        let (style, change) = self
+            .store
+            .user_style(uid)
+            .map_or((Style::Dark, None), |choice| choice.now());
+        let seconds = change.map_or(0, |change| {
+            u32::try_from(change.as_secs() + 1).expect("changes come within a day")
+        });
+        Ok((style.name().into(), seconds))
     }
 
     async fn set_shared_wallpaper(

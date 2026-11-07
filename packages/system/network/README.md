@@ -1,6 +1,6 @@
 # luft-network
 
-Network connections through NetworkManager, shared by Settings and Install Luft: Wi-Fi, wired, VPN and WireGuard, saved profiles, certificates and airplane mode.
+Network connections through NetworkManager, shared by Settings and Install Luft: Wi-Fi, wired, VPN and WireGuard, saved profiles, certificates, airplane mode, and whether each network is a home or a public one for the firewall.
 
 ```toml
 luft-network.workspace = true

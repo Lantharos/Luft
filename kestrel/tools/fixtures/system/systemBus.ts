@@ -4,6 +4,7 @@ import GLib from 'gi://GLib';
 import {ACCOUNTS_NAME, publishAccounts} from './accounts.js';
 import {BASIC_NAMES, publishBasics} from './basics.js';
 import {FINGERPRINT_NAME, publishFingerprint} from './fingerprint.js';
+import {FIREWALL_NAME, publishFirewall} from './network/firewall.js';
 import {NETWORK_MANAGER_NAME, publishNetworkManager} from './network/networkManager.js';
 import {PACKAGES_NAME, publishPackages} from './packages.js';
 import {publishSecurity, SECURITY_NAMES} from './security.js';
@@ -30,7 +31,7 @@ function publish(xml: string, implementation: object, path: string) {
 
 publishBasics(publish, calls);
 publishAccounts(publish);
-publishNetworkManager(publish, calls);
+publishFirewall(publish, calls, publishNetworkManager(publish, calls));
 publish(CALLS, {
   Take: () => {
     const fresh = calls.splice(0);
@@ -46,6 +47,6 @@ publishUpdater(publish, calls);
 publishPackages(publish);
 publishFingerprint(publish, calls);
 
-for (const name of [...BASIC_NAMES, ACCOUNTS_NAME, NETWORK_MANAGER_NAME, 'com.lantharos.KestrelChecks', 'org.freedesktop.UDisks2', WINDOWS_NAME, SLEEP_NAME, UPDATER_NAME, PACKAGES_NAME, FINGERPRINT_NAME, ...SECURITY_NAMES])
+for (const name of [...BASIC_NAMES, ACCOUNTS_NAME, NETWORK_MANAGER_NAME, FIREWALL_NAME, 'com.lantharos.KestrelChecks', 'org.freedesktop.UDisks2', WINDOWS_NAME, SLEEP_NAME, UPDATER_NAME, PACKAGES_NAME, FINGERPRINT_NAME, ...SECURITY_NAMES])
   Gio.bus_own_name_on_connection(Gio.DBus.system, name, Gio.BusNameOwnerFlags.NONE, null, null);
 new GLib.MainLoop(null, false).run();

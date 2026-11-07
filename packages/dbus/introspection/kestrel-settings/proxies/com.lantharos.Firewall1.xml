@@ -1,0 +1,9 @@
+<node>
+  <interface name="com.lantharos.Firewall1">
+    <method name="SetNetworkType">
+      <arg type="o" direction="in"/>
+      <arg type="s" direction="in"/>
+    </method>
+    <property name="Unclassified" type="a(os)" access="read"/>
+  </interface>
+</node>

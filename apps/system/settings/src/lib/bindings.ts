@@ -323,12 +323,17 @@ export const commands = {
 		purpose: Purpose,
 	}, options?: CallOptions) => invoke<string | null>("network_choose_certificate", params, options),
 	networkClose: (options?: CallOptions) => invoke<null>("network_close", {}, options),
+	networkClosePort: (params: {
+		port: number,
+		protocol: Protocol,
+	}, options?: CallOptions) => invoke<null>("network_close_port", params, options),
 	networkDeactivate: (params: {
 		active: string,
 	}, options?: CallOptions) => invoke<null>("network_deactivate", params, options),
 	networkDisconnect: (params: {
 		device: string,
 	}, options?: CallOptions) => invoke<null>("network_disconnect", params, options),
+	networkFirewall: (options?: CallOptions) => invoke<Firewall | null>("network_firewall", {}, options),
 	networkForget: (params: {
 		ssid: string,
 	}, options?: CallOptions) => invoke<null>("network_forget", params, options),
@@ -341,6 +346,10 @@ export const commands = {
 		enterprise?: Enterprise | null,
 	}, options?: CallOptions) => invoke<null>("network_join", params, options),
 	networkOpen: (options?: CallOptions) => invoke<Network>("network_open", {}, options),
+	networkOpenPort: (params: {
+		port: number,
+		protocol: Protocol,
+	}, options?: CallOptions) => invoke<null>("network_open_port", params, options),
 	networkProfile: (params: {
 		path: string,
 	}, options?: CallOptions) => invoke<Profile>("network_profile", params, options),
@@ -358,6 +367,10 @@ export const commands = {
 	networkSetAirplane: (params: {
 		enabled: boolean,
 	}, options?: CallOptions) => invoke<null>("network_set_airplane", params, options),
+	networkSetType: (params: {
+		connection: string,
+		networkType: NetworkType,
+	}, options?: CallOptions) => invoke<null>("network_set_type", params, options),
 	networkSetWifi: (params: {
 		enabled: boolean,
 	}, options?: CallOptions) => invoke<null>("network_set_wifi", params, options),
@@ -989,6 +1002,12 @@ export type Fingerprints = {
 	enrolled: string[],
 };
 
+export type Firewall = {
+	networks: GuardedNetwork[],
+	unclassified: string[],
+	openPorts: OpenPort[],
+};
+
 export type Firmware = {
 	id: string,
 	name: string,
@@ -1010,6 +1029,14 @@ export type FontFamily = {
 	monospace: boolean,
 	file: string,
 	removable: boolean,
+};
+
+export type GuardedNetwork = {
+	connection: string,
+	name: string,
+	medium: Medium,
+	networkType: NetworkType | null,
+	connected: boolean,
 };
 
 export type Handler = {
@@ -1170,6 +1197,8 @@ export type LoginSession = {
 	name: string,
 };
 
+export type Medium = "wifi" | "wired";
+
 export type Metered = "automatic" | "yes" | "no";
 
 export type Mode = {
@@ -1215,9 +1244,16 @@ export type Network = {
 	airplane: Airplane | null,
 };
 
+export type NetworkType = "home" | "public";
+
 export type Offer = {
 	to: Variant,
 	size: number | null,
+};
+
+export type OpenPort = {
+	port: number,
+	protocol: Protocol,
 };
 
 export type Order = "popular" | "rating" | "newest";
@@ -1382,6 +1418,8 @@ export type Protection = {
 	name: string,
 	fix: Fix,
 };
+
+export type Protocol = "tcp" | "udp";
 
 export type Provider = "onedrive" | "dropbox" | "icloud" | "nextcloud" | "webdav";
 

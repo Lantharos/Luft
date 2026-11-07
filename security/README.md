@@ -1,12 +1,13 @@
 # Security
 
-Luft's device security services. **trustd** adds Luft's Secure Boot key to shim, keeps shim and SushiBoot up to date, unlocks the disk with the TPM, changes the size and place of Luft's partition, and encrypts or decrypts other drives in place; Settings shows it on its Security page and `trustctl` from the command line. **luft-usb-protection** holds back new USB devices while the screen is locked, except keyboards, mice and security keys.
+Luft's device security services. **trustd** adds Luft's Secure Boot key to shim, keeps shim and SushiBoot up to date, unlocks the disk with the TPM, changes the size and place of Luft's partition, and encrypts or decrypts other drives in place; Settings shows it on its Security page and `trustctl` from the command line. **luft-usb-protection** holds back new USB devices while the screen is locked, except keyboards, mice and security keys. **luft-firewall** keeps devices on the network from connecting to the computer, more leniently on home networks.
 
 How the pieces protect the computer is in [docs/security.md](../docs/security.md), boot and recovery in [docs/boot.md](../docs/boot.md), and what people see in [Security](https://docs.luft.computer/system/security/).
 
 | Crate | Builds |
 | --- | --- |
 | `crates/trust` | `trustd` and `trustctl` |
+| `crates/firewall` | `luft-firewall` |
 | `crates/usb` | `luft-usb-protection` |
 
 ## Build
@@ -35,5 +36,6 @@ All commands need root.
 | --- | --- | --- |
 | `com.lantharos.Trust1` | `data/trust/com.lantharos.Trust1.xml` | `com.lantharos.trust.*` |
 | `com.lantharos.UsbProtection1` | `data/usb/com.lantharos.UsbProtection1.xml` | `com.lantharos.usb-protection.configure` |
+| `com.lantharos.Firewall1` | `data/firewall/com.lantharos.Firewall1.xml` | `com.lantharos.firewall.*` |
 
 Reading state is open to everyone. Showing the recovery key asks every time, and confirming that a version started is allowed for the active session. Other drives are on `com.lantharos.Trust1.Drives` at the same object.

@@ -22,9 +22,9 @@ export const NETWORK_MANAGER_NAME = 'org.freedesktop.NetworkManager';
 
 const variant = (signature: string, value: unknown) => new GLib.Variant(signature, value);
 
-function wiredSettings() {
+function wiredSettings(zone: string) {
   return {
-    'connection': {id: variant('s', 'Wired connection 1'), uuid: variant('s', UUID), type: variant('s', '802-3-ethernet')},
+    'connection': {id: variant('s', 'Wired connection 1'), uuid: variant('s', UUID), type: variant('s', '802-3-ethernet'), zone: variant('s', zone)},
     '802-3-ethernet': {},
     'ipv4': {method: variant('s', 'auto')},
     'ipv6': {method: variant('s', 'auto')},
@@ -93,7 +93,8 @@ export function publishNetworkManager(publish: Publish, calls: string[]) {
     },
     CanModify: true,
   }]]);
-  object(WIRED_CONNECTION, [['.Settings.Connection', {Unsaved: false, GetSettings: () => wiredSettings()}]]);
+  let wiredZone = 'home';
+  const [wiredConnection] = object(WIRED_CONNECTION, [['.Settings.Connection', {Unsaved: false, GetSettings: () => wiredSettings(wiredZone)}]]);
   object(ACTIVE, [['.Connection.Active', {
     Connection: WIRED_CONNECTION, SpecificObject: '/', Id: 'Wired connection 1', Uuid: UUID, Type: '802-3-ethernet', Devices: [WIRED_DEVICE],
     State: ACTIVATED, Default: true,
@@ -150,4 +151,10 @@ export function publishNetworkManager(publish: Publish, calls: string[]) {
     AnswerSecrets: (id: number, joined: boolean) => wifi.answerSecrets(id, joined),
     Forgotten: () => wifi.forgotten,
   }, '/com/lantharos/KestrelChecks/NetworkManager');
+
+  return (connection: string, zone: string) => {
+    if (connection !== WIRED_CONNECTION) return wifi.classify(connection, zone);
+    wiredZone = zone;
+    wiredConnection.emit_signal('Updated', null);
+  };
 }

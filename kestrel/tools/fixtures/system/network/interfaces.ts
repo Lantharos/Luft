@@ -40,6 +40,7 @@ export const NETWORK_MANAGER_XML = `<node>
   <property name="Unsaved" type="b" access="read"/>
   <method name="GetSettings"><arg type="a{sa{sv}}" direction="out"/></method>
   <method name="Delete"/>
+  <signal name="Updated"/>
   <signal name="Removed"/>
 </interface>
 <interface name="org.freedesktop.NetworkManager.Connection.Active">

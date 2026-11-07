@@ -1,0 +1,18 @@
+<node>
+  <interface name="com.lantharos.Firewall1">
+    <method name="SetNetworkType">
+      <arg name="network" type="o" direction="in"/>
+      <arg name="kind" type="s" direction="in"/>
+    </method>
+    <method name="OpenPort">
+      <arg name="port" type="q" direction="in"/>
+      <arg name="protocol" type="s" direction="in"/>
+    </method>
+    <method name="ClosePort">
+      <arg name="port" type="q" direction="in"/>
+      <arg name="protocol" type="s" direction="in"/>
+    </method>
+    <property name="OpenPorts" type="a(qs)" access="read"/>
+    <property name="Unclassified" type="a(os)" access="read"/>
+  </interface>
+</node>

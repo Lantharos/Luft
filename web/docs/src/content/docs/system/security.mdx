@@ -46,6 +46,14 @@ While the screen is locked, and at the login screen, new USB devices wait until 
 
 Devices already connected keep working. Turning this off in Settings needs an administrator.
 
+## Home and public networks
+
+Every Wi-Fi and wired network is either a home network or a public one. On a home network, your other devices can find this computer and connect to it, so casting to a Chromecast, Spotify Connect, games on the local network, Steam streaming and sharing files work without setting anything up. On a public network, like in a café, hotel or airport, nothing on the network can connect to this computer; only the answers to its own connections come in.
+
+The first time Luft starts, it asks what kind of network you're on, with Home picked already. After that, a new network counts as public until you choose, and a notification asks. You can change any network in Settings, under Network → Firewall.
+
+Even on a home network, the ports up to 1024, which belong to system services such as a web or file server, stay closed until you open them there. Opening one needs an administrator. Tailscale, and the virtual machines, containers and Android apps running on this computer, keep working on either kind of network.
+
 ## Games with anti-cheat
 
 Easy Anti-Cheat for Linux and others like it only let a game run when the computer can show it started the way its maker intended. Luft meets each of Epic's requirements by default: a signed kernel and drivers, a TPM, Secure Boot with well-known keys only, a measured startup, the IOMMU, a locked-down kernel, and kexec turned off.

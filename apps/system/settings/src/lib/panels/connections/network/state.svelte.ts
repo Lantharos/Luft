@@ -1,14 +1,18 @@
 import { t } from '@luft/i18n';
-import type { Network, Vpn, Wifi, Wired } from '@luft/network';
+import type { Firewall, Network, Vpn, Wifi, Wired } from '@luft/network';
 import { commands, events } from '#lib/bindings.js';
 import { linkLabel, speedLabel } from './describe';
 
 export class NetworkState {
 	network = $state<Network | null>(null);
+	firewall = $state<Firewall | null>(null);
 	problems = $state<Record<string, string>>({});
 
 	start() {
-		const stopChanged = events.networkChanged((next) => (this.network = next));
+		const stopChanged = events.networkChanged((next) => {
+			this.network = next;
+			void this.refreshFirewall();
+		});
 		const stopFailed = events.networkFailed((failure) => {
 			const vpn = this.network?.vpns.find((candidate) => candidate.active === failure.path || candidate.name === failure.name);
 			const wired = this.network?.wired.find((candidate) => candidate.device === failure.path);
@@ -16,11 +20,22 @@ export class NetworkState {
 			if (key) this.problems[key] = t('settings-network-connect-failed');
 		});
 		void commands.networkOpen().then((initial) => (this.network = initial));
+		void this.refreshFirewall();
 		return () => {
 			stopChanged();
 			stopFailed();
 			void commands.networkClose();
 		};
+	}
+
+	async refreshFirewall() {
+		this.firewall = await commands.networkFirewall().catch(() => null);
+	}
+
+	firewallSummary(firewall: Firewall) {
+		const current = firewall.networks.find((network) => network.connected);
+		if (!current) return undefined;
+		return t(current.networkType === 'home' ? 'settings-network-firewall-summary-home' : 'settings-network-firewall-summary-public', { network: current.name });
 	}
 
 	wifiSummary(wifi: Wifi) {

@@ -24,3 +24,13 @@ battery-saver-title = Power saver is on
 battery-saver-body = It makes the battery last until you plug in.
 # Button on the battery-saver-title notification
 battery-saver-turn-off = Turn off
+
+## Asking what kind of network a new network is
+
+# $network is the name of the Wi-Fi or wired network just joined
+network-type-title = Is { $network } a home network?
+network-type-body = On a home network, your other devices can find this computer for casting, games and sharing files. On a public one, like in a café or hotel, nothing on the network can reach it.
+# Button on the network-type-title notification
+network-type-home = Home
+# Button on the network-type-title notification
+network-type-public = Public

@@ -278,6 +278,16 @@ setup-stage-waiting = Finishing up
 setup-stage-configuring = Setting up your account
 setup-stage-finished = Done
 
+## What kind of network the computer is on, asked on the first start
+
+setup-network-type-title = What kind of network is this?
+# $network is the name of the network, or a list of names when the computer joined several
+setup-network-type-description = You’re connected to { $network }. On a home network, your other devices can find this computer.
+setup-network-type-home = Home
+    .detail = At home or at work. Casting, games and sharing files just work
+setup-network-type-public = Public
+    .detail = In a café, hotel or airport. Nothing on the network can reach this computer
+
 ## Trusting Luft at startup (Secure Boot key enrollment)
 ## The firmware screens in these steps are in English, so keep the names of its
 ## menu items (Enroll MOK, Continue, Yes, Reboot) as they are.

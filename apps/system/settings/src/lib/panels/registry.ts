@@ -4,6 +4,7 @@ import AppWindow from '@lucide/svelte/icons/app-window';
 import AudioLines from '@lucide/svelte/icons/audio-lines';
 import BatteryCharging from '@lucide/svelte/icons/battery-charging';
 import Bluetooth from '@lucide/svelte/icons/bluetooth';
+import BrickWallShield from '@lucide/svelte/icons/brick-wall-shield';
 import EthernetPort from '@lucide/svelte/icons/ethernet-port';
 import Globe from '@lucide/svelte/icons/globe';
 import Hand from '@lucide/svelte/icons/hand';
@@ -83,6 +84,7 @@ const VIEWS: Record<PageId, View> = {
 	'network/wifi': { icon: Wifi, load: network },
 	'network/ethernet': { icon: EthernetPort, load: network },
 	'network/vpn': { icon: Shield, load: network },
+	'network/firewall': { icon: BrickWallShield, load: network },
 	'network/proxy': { icon: Globe, load: network },
 	'sound/custom': { icon: AudioLines, load: sound },
 	'input/shortcuts': { icon: Keyboard, load: input },

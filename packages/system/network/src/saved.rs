@@ -7,12 +7,14 @@ use luft_app::dbus::{self, failed};
 use zbus::proxy::MethodFlags;
 use zbus::{OwnedObjectPath, Proxy};
 
+use super::firewall::NetworkType;
 use super::profile::settings::{Settings, get};
 use super::{CONNECTION, SERVICE, SETTINGS};
 
 #[derive(Clone)]
 pub enum Kind {
     Wifi { ssid: Vec<u8> },
+    Wired,
     Vpn,
     Other,
 }
@@ -23,6 +25,7 @@ pub struct Saved {
     pub name: String,
     pub kind: Kind,
     pub joined: bool,
+    pub network_type: Option<NetworkType>,
 }
 
 static CACHE: LazyLock<Mutex<HashMap<String, Saved>>> = LazyLock::new(Mutex::default);
@@ -37,6 +40,7 @@ fn kind(settings: &Settings) -> Kind {
                 ssid: get(settings, "802-11-wireless", "ssid").unwrap_or_default(),
             }
         }
+        "802-3-ethernet" => Kind::Wired,
         "vpn" | "wireguard" => Kind::Vpn,
         _ => Kind::Other,
     }
@@ -59,6 +63,9 @@ async fn load(path: String) -> Result<Saved, String> {
         kind: kind(&settings),
         joined: get::<u64>(&settings, "connection", "timestamp")
             .is_some_and(|timestamp| timestamp > 0),
+        network_type: get::<String>(&settings, "connection", "zone")
+            .as_deref()
+            .and_then(NetworkType::parse),
         path,
     })
 }

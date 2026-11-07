@@ -274,6 +274,37 @@ settings-network-proxy-error-host = Enter just the server name, like proxy.examp
 settings-network-proxy-error-port = Use a port from 1 to 65535
 settings-network-proxy-save-failed = Couldn't save the proxy settings
 
+## Network: firewall
+
+# $network is the name of the network the computer is connected to
+settings-network-firewall-summary-home = { $network } is a home network
+# $network is the name of the network the computer is connected to
+settings-network-firewall-summary-public = { $network } is a public network
+settings-network-firewall = Firewall
+    .description = Home networks let your other devices find this computer. On public networks, nothing on the network can reach it, only answers to its own connections come in. A network counts as public until you choose.
+settings-network-firewall-home = Home
+settings-network-firewall-public = Public
+settings-network-firewall-connected = Connected
+settings-network-firewall-unchosen = Counts as public until you choose
+settings-network-firewall-no-networks = No Wi‑Fi or wired networks yet
+settings-network-firewall-home-title = On home networks
+    .description = Devices on the same network can reach apps that listen on ports above 1024, which casting, games, Spotify Connect and sharing files use. Ports up to 1024 belong to system services and stay closed unless you open them here.
+# $port is a port number, like 22
+settings-network-firewall-port = Port { $port }
+settings-network-firewall-tcp = TCP
+settings-network-firewall-udp = UDP
+settings-network-firewall-close-port = Close this port
+settings-network-firewall-open-port = Open a port
+    .description = For a service on this computer, such as a web or file server
+settings-network-firewall-port-number = Port
+settings-network-firewall-protocol = Protocol
+# Button
+settings-network-firewall-open = Open
+# Button label while opening a port
+settings-network-firewall-opening = Opening
+settings-network-firewall-error-port = Enter a port from 1 to 65535
+settings-network-firewall-error-open-already = Ports above 1024 are already open on home networks
+
 ## Network: VPN
 
 settings-network-vpn = VPN

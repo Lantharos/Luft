@@ -1,0 +1,33 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+ "https://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node name="/com/lantharos/Firewall1">
+  <!--
+    Luft's firewall. Every Wi-Fi and wired network is home or public, kept as the
+    NetworkManager connection's connection.zone ("home" or "public"); one nobody chose yet
+    counts as public.
+
+    Unclassified: the networks in use that nobody chose a type for yet, as (connection, name),
+    connection being the NetworkManager settings path.
+    OpenPorts: ports up to 1024 opened on home networks, as (port, protocol), protocol being
+    "tcp" or "udp". Higher ports are always open to devices on a home network.
+
+    SetNetworkType sets a connection's type to "home" or "public"; the person at the computer
+    may do it without a password. OpenPort and ClosePort need an administrator.
+  -->
+  <interface name="com.lantharos.Firewall1">
+    <property name="Unclassified" type="a(os)" access="read"/>
+    <property name="OpenPorts" type="a(qs)" access="read"/>
+    <method name="SetNetworkType">
+      <arg name="network" type="o" direction="in"/>
+      <arg name="kind" type="s" direction="in"/>
+    </method>
+    <method name="OpenPort">
+      <arg name="port" type="q" direction="in"/>
+      <arg name="protocol" type="s" direction="in"/>
+    </method>
+    <method name="ClosePort">
+      <arg name="port" type="q" direction="in"/>
+      <arg name="protocol" type="s" direction="in"/>
+    </method>
+  </interface>
+</node>

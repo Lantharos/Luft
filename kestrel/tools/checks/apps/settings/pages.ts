@@ -6,7 +6,7 @@ import {settled} from '../../lib/wait.js';
 import {useScheme, type Scheme} from '../lib/palette.js';
 import {show} from './navigation.js';
 
-const PAGES = ['bluetooth', 'network', 'network/ethernet', 'network/vpn', 'network/proxy', 'display', 'sound', 'power', 'input', 'input/shortcuts',
+const PAGES = ['bluetooth', 'network', 'network/ethernet', 'network/vpn', 'network/firewall', 'network/proxy', 'display', 'sound', 'power', 'input', 'input/shortcuts',
   'input/dictation', 'appearance', 'appearance/icons', 'appearance/text', 'appearance/fonts', 'appearance/cursor', 'appearance/wallpaper', 'taskbar', 'taskbar/start', 'taskbar/more', 'windows', 'accessibility', 'apps', 'privacy', 'security',
   'security/encryption', 'security/keyring', 'accounts', 'accounts/login', 'language', 'system', 'system/about'];
 

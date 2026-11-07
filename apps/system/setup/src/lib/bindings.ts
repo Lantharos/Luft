@@ -38,12 +38,17 @@ export const commands = {
 		purpose: Purpose,
 	}, options?: CallOptions) => invoke<string | null>("network_choose_certificate", params, options),
 	networkClose: (options?: CallOptions) => invoke<null>("network_close", {}, options),
+	networkClosePort: (params: {
+		port: number,
+		protocol: Protocol,
+	}, options?: CallOptions) => invoke<null>("network_close_port", params, options),
 	networkDeactivate: (params: {
 		active: string,
 	}, options?: CallOptions) => invoke<null>("network_deactivate", params, options),
 	networkDisconnect: (params: {
 		device: string,
 	}, options?: CallOptions) => invoke<null>("network_disconnect", params, options),
+	networkFirewall: (options?: CallOptions) => invoke<Firewall | null>("network_firewall", {}, options),
 	networkForget: (params: {
 		ssid: string,
 	}, options?: CallOptions) => invoke<null>("network_forget", params, options),
@@ -56,6 +61,10 @@ export const commands = {
 		enterprise?: Enterprise | null,
 	}, options?: CallOptions) => invoke<null>("network_join", params, options),
 	networkOpen: (options?: CallOptions) => invoke<Network>("network_open", {}, options),
+	networkOpenPort: (params: {
+		port: number,
+		protocol: Protocol,
+	}, options?: CallOptions) => invoke<null>("network_open_port", params, options),
 	networkProfile: (params: {
 		path: string,
 	}, options?: CallOptions) => invoke<Profile>("network_profile", params, options),
@@ -73,6 +82,10 @@ export const commands = {
 	networkSetAirplane: (params: {
 		enabled: boolean,
 	}, options?: CallOptions) => invoke<null>("network_set_airplane", params, options),
+	networkSetType: (params: {
+		connection: string,
+		networkType: NetworkType,
+	}, options?: CallOptions) => invoke<null>("network_set_type", params, options),
 	networkSetWifi: (params: {
 		enabled: boolean,
 	}, options?: CallOptions) => invoke<null>("network_set_wifi", params, options),
@@ -233,9 +246,23 @@ export type Fingerprints = {
 	enrolled: string[],
 };
 
+export type Firewall = {
+	networks: GuardedNetwork[],
+	unclassified: string[],
+	openPorts: OpenPort[],
+};
+
 export type Geolocation = {
 	time_zone: string | null,
 	country_code: string | null,
+};
+
+export type GuardedNetwork = {
+	connection: string,
+	name: string,
+	medium: Medium,
+	networkType: NetworkType | null,
+	connected: boolean,
 };
 
 export type Hardware = {
@@ -327,6 +354,8 @@ export type Locale = {
 	fixed: boolean,
 };
 
+export type Medium = "wifi" | "wired";
+
 export type MeetSurvey = {
 	drive: string,
 	space: Space | null,
@@ -352,6 +381,13 @@ export type Network = {
 	wired: Wired[],
 	vpns: Vpn[],
 	airplane: Airplane | null,
+};
+
+export type NetworkType = "home" | "public";
+
+export type OpenPort = {
+	port: number,
+	protocol: Protocol,
 };
 
 export type Owner = {
@@ -384,6 +420,8 @@ export type Profile = {
 	mac: string,
 	wireless: Wireless | null,
 };
+
+export type Protocol = "tcp" | "udp";
 
 export type Purpose = "authority" | "client" | "key";
 

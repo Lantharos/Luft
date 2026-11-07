@@ -1,13 +1,14 @@
 import { i18n } from '@luft/i18n';
 import { appearance } from '@luft/ui';
-import { commands, type Hardware, type TrustState } from '#lib/bindings.js';
+import { commands, type Hardware, type NewNetwork, type TrustState } from '#lib/bindings.js';
 import { NO_HARDWARE } from '#lib/bridge/system.js';
 import { flow, type Step } from './flow.svelte.js';
 import { install } from './install.svelte.js';
 import { regional } from './regional.svelte.js';
 
-function firstBootSkips(trust: TrustState | null, hardware: Hardware): Step[] {
+function firstBootSkips(trust: TrustState | null, hardware: Hardware, newNetworks: NewNetwork[]): Step[] {
 	const skips: Step[] = [];
+	if (!newNetworks.length) skips.push('network-type');
 	if (!trust || trust.secureBoot !== 'on' || trust.key !== 'none' || !trust.keyAvailable) skips.push('secure-boot');
 	if (!hardware.fingerprint) skips.push('fingerprint');
 	return skips;
@@ -18,6 +19,7 @@ class SetupState {
 	trust = $state<TrustState | null>(null);
 	secureBootCode = $state('');
 	refusedFingers = $state<string[]>([]);
+	newNetworks = $state<NewNetwork[]>([]);
 	ready = $state(false);
 
 	async start() {
@@ -30,7 +32,8 @@ class SetupState {
 		this.trust = await commands.trustState().catch(() => null);
 		if (phase === 'first-boot') {
 			void regional.adoptFormats().catch(() => {});
-			flow.begin(phase, firstBootSkips(this.trust, this.hardware));
+			this.newNetworks = (await commands.networkFirewall().catch(() => null))?.unclassified ?? [];
+			flow.begin(phase, firstBootSkips(this.trust, this.hardware, this.newNetworks));
 		} else {
 			await regional.start();
 			flow.begin(phase, []);

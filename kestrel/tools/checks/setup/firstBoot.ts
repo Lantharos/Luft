@@ -57,6 +57,15 @@ async function checkHandoff(endSession: () => Promise<void>) {
   throw new Error('Kestrel kept running after setup finished');
 }
 
+async function checkNetworkType() {
+  const setup = new Setup();
+  await setup.open();
+  await setup.shot('network-type');
+  await setup.click(AT.continue, 'continuing moves on from the network question');
+  await setup.called('SetNetworkType /org/freedesktop/NetworkManager/Settings/1 home', 'the network becomes a home network unless the person picks Public');
+  await setup.close();
+}
+
 async function checkKeyAlreadyTrusted() {
   const setup = new Setup();
   await setup.setSigningKey('enrolled');
@@ -71,6 +80,7 @@ async function checkKeyAlreadyTrusted() {
 export async function checkFirstBoot(endSession: () => Promise<void>) {
   const setup = new Setup();
   await setup.setPhase('first-boot');
+  await checkNetworkType();
   await checkKeyAlreadyTrusted();
   await setup.open();
   await checkSecureBoot(setup);

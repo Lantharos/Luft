@@ -1,6 +1,7 @@
 mod actions;
 pub mod airplane;
 mod certificate;
+mod firewall;
 mod profile;
 mod saved;
 mod snapshot;
@@ -137,6 +138,10 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         .command_async("network_profile_secret", |Connection { path }| async move {
             profile::secret(&path).await
         })
+        .command_async("network_firewall", firewall::read)
+        .command_async("network_set_type", firewall::classify)
+        .command_async("network_open_port", firewall::open_port)
+        .command_async("network_close_port", firewall::close_port)
         .command_async("network_choose_certificate", |Choose { purpose }| {
             certificate::choose(purpose)
         })

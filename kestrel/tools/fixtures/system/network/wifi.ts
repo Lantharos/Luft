@@ -41,14 +41,15 @@ interface Saved {
   name: string;
   uuid: string;
   psk: string;
+  zone?: string;
 }
 
 const variant = (signature: string, value: unknown) => new GLib.Variant(signature, value);
 const ssid = (name: string) => variant('ay', new TextEncoder().encode(name));
 
-function settings({name, uuid, psk}: Saved, withSecrets: boolean) {
+function settings({name, uuid, psk, zone = ''}: Saved, withSecrets: boolean) {
   return {
-    'connection': {id: variant('s', name), uuid: variant('s', uuid), type: variant('s', '802-11-wireless')},
+    'connection': {id: variant('s', name), uuid: variant('s', uuid), type: variant('s', '802-11-wireless'), zone: variant('s', zone)},
     '802-11-wireless': {ssid: ssid(name), mode: variant('s', 'infrastructure')},
     [SECURITY]: {'key-mgmt': variant('s', 'wpa-psk'), ...withSecrets && psk ? {psk: variant('s', psk)} : {}},
   };
@@ -58,6 +59,7 @@ export class Wifi {
   readonly forgotten: string[] = [];
   private readonly points = new Map<string, string>();
   private readonly connections = new Map<string, Saved>();
+  private readonly exported = new Map<string, Gio.DBusExportedObject>();
   private readonly actives: string[] = [];
   private readonly pending: SecretRequest[] = [];
   private readonly asked = new Map<number, SecretRequest>();
@@ -152,7 +154,7 @@ export class Wifi {
   private save(saved: Saved) {
     const path = `${MANAGER}/Settings/${this.nextId++}`;
     this.connections.set(path, saved);
-    this.host.object(path, [['.Settings.Connection', {
+    const [connection] = this.host.object(path, [['.Settings.Connection', {
       Unsaved: false,
       GetSettings: () => settings(saved, false),
       Delete: () => {
@@ -160,13 +162,20 @@ export class Wifi {
         this.forget(path);
       },
     }]]);
+    this.exported.set(path, connection);
     this.host.addConnection(path);
     this.device[0]?.emit_property_changed('AvailableConnections', variant('ao', [...this.connections.keys()]));
     return path;
   }
 
+  classify(path: string, zone: string) {
+    this.connections.get(path)!.zone = zone;
+    this.exported.get(path)!.emit_signal('Updated', null);
+  }
+
   private forget(path: string) {
     this.connections.delete(path);
+    this.exported.delete(path);
     this.host.removeConnection(path);
     this.host.remove(path);
     this.device[0]?.emit_property_changed('AvailableConnections', variant('ao', [...this.connections.keys()]));

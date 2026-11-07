@@ -21,6 +21,7 @@ export type SubpageId =
 	| 'network/wifi'
 	| 'network/ethernet'
 	| 'network/vpn'
+	| 'network/firewall'
 	| 'network/proxy'
 	| 'sound/custom'
 	| 'input/shortcuts'
@@ -92,6 +93,7 @@ export const SUBPAGES: Page<SubpageId>[] = [
 	page('network/wifi', 'settings-page-wifi', 'network-wireless-symbolic', { keywords: [] }),
 	page('network/ethernet', 'settings-page-ethernet', 'network-wired-symbolic', { keywords: [] }),
 	page('network/vpn', 'settings-page-vpn', 'network-vpn-symbolic', { keywords: [] }),
+	page('network/firewall', 'settings-page-firewall', 'security-high-symbolic'),
 	page('network/proxy', 'settings-page-proxy', 'preferences-system-network-proxy-symbolic', { keywords: [] }),
 	page('sound/custom', 'settings-page-custom-sounds', 'audio-x-generic-symbolic'),
 	page('input/shortcuts', 'settings-page-shortcuts', 'preferences-desktop-keyboard-shortcuts-symbolic', { keywords: [] }),

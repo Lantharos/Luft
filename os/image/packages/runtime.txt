@@ -80,6 +80,7 @@ NetworkManager-openconnect
 NetworkManager-openvpn
 NetworkManager-wifi
 NetworkManager-wwan
+nftables
 nss-mdns
 onnxruntime
 openconnect

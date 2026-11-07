@@ -5198,6 +5198,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "luft-firewall"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "futures-util",
+ "luft-dbus",
+ "luft-dbus-macros",
+ "tokio",
+ "zbus 6.0.0",
+]
+
+[[package]]
 name = "luft-i18n"
 version = "0.1.0"
 dependencies = [

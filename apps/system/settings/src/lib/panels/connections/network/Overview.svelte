@@ -1,4 +1,5 @@
 <script lang="ts">
+	import BrickWallShield from '@lucide/svelte/icons/brick-wall-shield';
 	import EthernetPort from '@lucide/svelte/icons/ethernet-port';
 	import Globe from '@lucide/svelte/icons/globe';
 	import Plane from '@lucide/svelte/icons/plane';
@@ -11,7 +12,7 @@
 	import { proxyLabel, type Proxy } from './proxy/proxy.svelte';
 	import type { NetworkState } from './state.svelte';
 
-	type Page = 'wifi' | 'ethernet' | 'vpn' | 'proxy';
+	type Page = 'wifi' | 'ethernet' | 'vpn' | 'firewall' | 'proxy';
 
 	interface Props {
 		connections: NetworkState;
@@ -55,6 +56,9 @@
 		</ActionRow>
 	{/each}
 	<Row title={t('settings-network-vpn')} icon={Shield} description={vpnSummary} onclick={() => onopen('vpn')} />
+	{#if connections.firewall}
+		<Row title={t('settings-page-firewall')} icon={BrickWallShield} description={connections.firewallSummary(connections.firewall)} onclick={() => onopen('firewall')} />
+	{/if}
 	{#if network.airplane}
 		{@const airplane = network.airplane}
 		<Row title={t('settings-network-airplane')} icon={Plane} description={airplane.hardware ? t('settings-network-airplane-hardware') : t('settings-network-airplane.description')}>

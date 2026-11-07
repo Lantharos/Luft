@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
+ "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
+<policyconfig>
+  <vendor>Luft</vendor>
+  <vendor_url>https://github.com/Lantharos</vendor_url>
+
+  <action id="com.lantharos.firewall.classify">
+    <description>Choose whether a network is a home or a public network</description>
+    <message>Authentication is required to change what kind of network this is</message>
+    <defaults>
+      <allow_any>auth_admin_keep</allow_any>
+      <allow_inactive>auth_admin_keep</allow_inactive>
+      <allow_active>yes</allow_active>
+    </defaults>
+  </action>
+
+  <action id="com.lantharos.firewall.open-ports">
+    <description>Open or close ports on home networks</description>
+    <message>Authentication is required to change which ports are open on home networks</message>
+    <defaults>
+      <allow_any>auth_admin_keep</allow_any>
+      <allow_inactive>auth_admin_keep</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+  </action>
+</policyconfig>

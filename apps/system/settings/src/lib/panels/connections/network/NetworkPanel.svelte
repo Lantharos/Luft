@@ -4,6 +4,7 @@
 	import ConnectionPage from './connection/ConnectionPage.svelte';
 	import type { Target } from './connection/profile';
 	import EthernetPage from './ethernet/EthernetPage.svelte';
+	import FirewallPage from './firewall/FirewallPage.svelte';
 	import Overview from './Overview.svelte';
 	import { useProxy } from './proxy/proxy.svelte';
 	import ProxyPage from './proxy/ProxyPage.svelte';
@@ -42,6 +43,8 @@
 	<EthernetPage {connections} wired={network.wired} onconfigure={configure} onclose={close} />
 {:else if network && section === 'vpn'}
 	<VpnPage {connections} vpns={network.vpns} onconfigure={configure} onclose={close} />
+{:else if connections.firewall && section === 'firewall'}
+	<FirewallPage {connections} firewall={connections.firewall} onclose={close} />
 {:else if proxy.available && section === 'proxy'}
 	<ProxyPage {proxy} onclose={close} />
 {:else if network}

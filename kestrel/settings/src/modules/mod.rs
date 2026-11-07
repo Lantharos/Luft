@@ -5,7 +5,7 @@ mod system;
 use crate::context::Context;
 use desktop::{a11y, night_light, xsettings};
 use devices::{keyboard, power, printers, rfkill, sound};
-use system::security::{signing_key, usb_protection};
+use system::security::{network_type, signing_key, usb_protection};
 use system::{drives, housekeeping, memory, profile_locks, timezone, watchdog};
 
 #[derive(Clone, Copy)]
@@ -15,6 +15,7 @@ pub enum Module {
     Housekeeping,
     Keyboard,
     Memory,
+    NetworkType,
     NightLight,
     Power,
     Printers,
@@ -29,12 +30,13 @@ pub enum Module {
 }
 
 impl Module {
-    pub const ALL: [Self; 16] = [
+    pub const ALL: [Self; 17] = [
         Self::A11y,
         Self::Drives,
         Self::Housekeeping,
         Self::Keyboard,
         Self::Memory,
+        Self::NetworkType,
         Self::NightLight,
         Self::Power,
         Self::Printers,
@@ -59,6 +61,7 @@ impl Module {
             Self::Housekeeping => "housekeeping",
             Self::Keyboard => "keyboard",
             Self::Memory => "memory",
+            Self::NetworkType => "network-type",
             Self::NightLight => "night-light",
             Self::Power => "power",
             Self::Printers => "printers",
@@ -80,6 +83,7 @@ impl Module {
             Self::Housekeeping => housekeeping::start(context).await,
             Self::Keyboard => keyboard::start(context).await,
             Self::Memory => memory::start(context).await,
+            Self::NetworkType => network_type::start(context).await,
             Self::NightLight => night_light::start(context).await,
             Self::Power => power::start(context).await,
             Self::Printers => printers::start(context).await,

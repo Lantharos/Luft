@@ -232,6 +232,18 @@ While the screen is locked, and at the login screen, new USB devices wait until 
 
 Luft doesn't answer LLMNR, the old Windows way of looking up names on a local network: anyone on the same network could answer a lookup and pose as another computer to catch sign-ins. Devices on the network are still found by name through mDNS (`name.local`), which Avahi answers.
 
+### Firewall
+
+Every Wi-Fi and wired network is home or public, kept with the network's NetworkManager profile as its `connection.zone` (`home` or `public`), so it moves with the profile. A network nobody chose for counts as public. Install Luft asks about the network the computer is on at the first start, with Home picked, and after that `kestrel-settings` asks in a notification whenever the computer joins a network nobody chose for. Settings → Network → Firewall shows and changes each network.
+
+`luft-firewall` keeps one nftables table, `inet luft`, with an input chain that drops what it doesn't allow. It loads the table before the network comes up, then follows NetworkManager over D-Bus and replaces the whole table in one transaction whenever a network connects, gets new addresses or changes type, so nothing slips through while it changes. It allows:
+
+- On every network: replies to the computer's own connections, loopback, the ICMP and ICMPv6 messages IPv4 and IPv6 need (neighbor discovery, router advertisements, multicast listener queries, packet too big and the other errors), and DHCP and DHCPv6 replies.
+- Everything from Tailscale (`tailscale0`) and from the virtual networks the computer hosts: libvirt (`virbr*`), Podman and toolbox (`podman*`, `cni-podman*`), Waydroid (`waydroid*`) and Docker (`docker0`), plus networks NetworkManager shares itself, such as a hotspot.
+- On home networks, from addresses inside that network's own ranges only: every TCP and UDP port above 1024, which covers mDNS, SSDP and discovery replies, Chromecast, Spotify Connect, LAN games, Steam streaming and LocalSend, plus ping and the ports up to 1024 opened in Settings. A connection from outside the network, forwarded by the router, isn't a device on the network and stays out.
+
+Ping doesn't answer on public networks. The forward and NAT chains other software keeps, such as libvirt's, Podman's and NetworkManager's for sharing, are left alone. Ports opened below 1024 are kept in `/var/lib/luft-firewall/ports`; opening or closing one needs an administrator, while the person at the computer can choose a network's type. Stopping the service leaves the last rules in place. `com.lantharos.Firewall1` serves the networks waiting for a type and the open ports to Settings, Install Luft and `kestrel-settings`.
+
 ## Service sandboxing
 
 Each of Luft's services runs with only what it needs: a read-only view of the system with write access to its own folders, no network, devices or capabilities it doesn't use, and a filter on the system calls it may make. Services that hand their sandbox on to apps they start, such as cloud drives and Kestrel's settings, or that start containers, keep fewer of these limits so those apps keep working.

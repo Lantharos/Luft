@@ -22,6 +22,7 @@
 	import SaveImageDialog from './images/SaveImageDialog.svelte';
 	import StartupDialog from './StartupDialog.svelte';
 	import GiveLuftDialog from './systems/GiveLuftDialog.svelte';
+	import MoveLuftDialog from './moving/MoveLuftDialog.svelte';
 	import RemoveSystemDialog from './systems/RemoveSystemDialog.svelte';
 	import UnlockDialog from './encryption/UnlockDialog.svelte';
 	import WriteImageDialog from './images/WriteImageDialog.svelte';
@@ -61,6 +62,8 @@
 	<TurnOffDialog volume={dialog.volume} onclose={dialogs.close} />
 {:else if dialog?.kind === 'give-luft'}
 	<GiveLuftDialog drive={live(dialog.drive) ?? dialog.drive} offset={dialog.offset} size={dialog.size} onclose={dialogs.close} />
+{:else if dialog?.kind === 'move-luft'}
+	<MoveLuftDialog onclose={dialogs.close} />
 {:else if dialog?.kind === 'remove-system'}
 	<RemoveSystemDialog system={dialog.system} onclose={dialogs.close} />
 {:else if dialog?.kind === 'recovery-key'}

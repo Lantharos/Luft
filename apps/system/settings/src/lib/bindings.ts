@@ -1620,7 +1620,7 @@ export type SuggestionAction = "firmware-settings";
 
 export type Switchable = "location" | "camera" | "clipboard";
 
-export type SystemKind = "windows" | "linux" | "old-system";
+export type SystemKind = "windows" | "linux" | "old-system" | "earlier-luft";
 
 export type Target = "output" | "input" | "app";
 

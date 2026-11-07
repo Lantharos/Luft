@@ -31,6 +31,8 @@
 	let removed = $state<Removed | null>(null);
 	let error = $state('');
 	let growing = $state(false);
+	let givingBack = $state(false);
+	let givenBack = $state(false);
 
 	let steps = $derived([...plannedSteps(system), ...(growStarted ? [GROW_STEP] : [])]);
 	let drive = $derived(disks.drives.find((candidate) => candidate.id === (removed?.drive ?? system.drive)) ?? null);
@@ -111,6 +113,21 @@
 		}
 	}
 
+	async function giveBack() {
+		const target = removed?.giveBack;
+		if (!target) return;
+		givingBack = true;
+		try {
+			await commands.disksGiveBack({ block: target.block, size: target.size }, WAIT);
+			givenBack = true;
+		} catch (caught) {
+			const message = errorText(caught);
+			if (message !== CANCELLED) error = message;
+		} finally {
+			givingBack = false;
+		}
+	}
+
 	function makePartition() {
 		if (!drive || !removed?.free) return;
 		dialogs.open({ kind: 'create', drive, offset: removed.free.offset, size: removed.free.size });
@@ -155,11 +172,20 @@
 			<p class="text-[13.5px] leading-relaxed">The space right after Luft is free. Enter the disk’s passphrase or recovery key to give it to Luft.</p>
 			<KeyPrompt {request} onsubmit={grow} />
 		{/if}
-		{#if removed.free}
+		{#if givenBack && removed.giveBack}
+			<p class="text-[13.5px] leading-relaxed">Windows has its {bytes(removed.giveBack.size)} back.</p>
+		{:else if removed.free && removed.giveBack}
+			<p class="text-[13.5px] leading-relaxed">
+				{bytes(removed.free.size)} is free right after Windows. Give it back to Windows, or make it a partition for your files.
+			</p>
+		{:else if removed.free}
 			<p class="text-[13.5px] leading-relaxed">
 				{bytes(removed.free.size)} is free on {drive?.name ?? 'the drive'}.
 				{room ? 'Give it to Luft, or make it a partition for your files.' : 'You can make it a partition for your files.'}
 			</p>
+		{/if}
+		{#if error}
+			<p class="text-[13px] leading-relaxed text-[var(--danger)]">{error}</p>
 		{/if}
 	{/if}
 
@@ -175,8 +201,11 @@
 			{#if request.asking}
 				<button type="button" class="button" disabled={growing || !request.key} onclick={grow}>Give Luft the space</button>
 			{/if}
-			{#if removed?.free && drive}
-				<button type="button" class="button" onclick={makePartition}>Make a partition</button>
+			{#if removed?.free && drive && !givenBack}
+				<button type="button" class="button" disabled={givingBack} onclick={makePartition}>Make a partition</button>
+			{/if}
+			{#if removed?.giveBack && !givenBack}
+				<button type="button" class="button" disabled={givingBack} onclick={giveBack}>{#if givingBack}<Spinner />{/if}Give to Windows</button>
 			{/if}
 			{#if room}
 				<button type="button" class="button" onclick={giveLuft}>Give to Luft</button>

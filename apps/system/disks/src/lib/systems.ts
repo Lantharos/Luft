@@ -16,6 +16,7 @@ export function partName(system: OtherSystem, part: SystemPart) {
 	if (part.role === 'recovery') return 'Windows recovery';
 	if (part.role === 'meet') return MEET_PARTS[part.label] ?? part.label;
 	if (system.kind === 'windows') return part.label && part.label !== 'Windows' ? `Windows, “${part.label}”` : 'Windows';
+	if (system.kind === 'earlier-luft') return part.filesystem === 'vfat' ? 'Its startup partition' : 'Luft’s earlier copy, with its files';
 	return part.label ? `${system.name}, “${part.label}”` : system.name;
 }
 
@@ -33,6 +34,7 @@ export function startupName(system: OtherSystem) {
 
 export function summary(system: OtherSystem) {
 	if (system.kind === 'old-system') return `Kept when Luft replaced it · ${bytes(system.size)}`;
+	if (system.kind === 'earlier-luft') return `Left here when Luft moved to another drive · ${bytes(system.size)}`;
 	if (system.size === 0) return 'Only its startup files are left';
 	if (system.bitlocker) return `Encrypted with BitLocker · ${bytes(system.size)}`;
 	if (!system.parts.some((part) => part.role === 'system')) return `Only its reserved and recovery partitions are left · ${bytes(system.size)}`;

@@ -24,6 +24,8 @@ export const AT = {
   deleteProjects: [660, 198], undo: [766, 30], deleteScratch: [767, 198], exact: [803, 243], settings: [861, 198],
   apply: [924, 30], confirmApply: [766, 482],
   crucial: [130, 262], removeSystem: [992, 534], confirmRemoveSystem: [728, 517], systemDone: [767, 530],
+  samsung: [130, 43], moveLuft: [876, 230], moveToSeagate: [540, 255], moveOn: [755, 577],
+  placeFree: [540, 327], placeErase: [540, 382], placeOn: [755, 448], eraseBack: [605, 447], sizeOn: [755, 490], moveIt: [752, 464], callOff: [582, 425],
 } satisfies Record<string, Point>;
 
 export type Control = keyof typeof AT;

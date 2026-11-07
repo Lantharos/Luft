@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use super::facts::{Facts, OldSystem, OtherStartup};
+use super::facts::{EarlierLuft, Facts, OldSystem, OtherStartup};
 use super::{Kind, Part, Role, Startup, System, names};
 use crate::udisks::snapshot::{Drive, Snapshot};
 use crate::udisks::volumes::{Segment, Volume};
@@ -351,6 +351,29 @@ fn linux(
         .collect()
 }
 
+fn earlier_luft(snapshot: &Snapshot, earlier: &EarlierLuft) -> Option<System> {
+    let found = named(snapshot, &earlier.partitions);
+    let (drive, _) = found.first()?;
+    let parts: Vec<Part> = found
+        .iter()
+        .filter(|(_, volume)| !volume.in_use_by_system())
+        .map(|(_, volume)| part(volume, Role::System))
+        .collect();
+    Some(System {
+        id: "earlier-luft".to_owned(),
+        kind: Kind::EarlierLuft,
+        name: "Luft’s earlier copy".to_owned(),
+        drive: drive.id.clone(),
+        size: total(&parts),
+        files: None,
+        folder: None,
+        bitlocker: false,
+        kept: None,
+        startups: Vec::new(),
+        parts,
+    })
+}
+
 pub fn systems(snapshot: &Snapshot, facts: &Facts) -> Vec<System> {
     if !facts.luft_starts {
         return Vec::new();
@@ -371,6 +394,12 @@ pub fn systems(snapshot: &Snapshot, facts: &Facts) -> Vec<System> {
     let mut systems: Vec<System> = record
         .and_then(|record| old_system(snapshot, facts, record))
         .into_iter()
+        .chain(
+            facts
+                .earlier
+                .as_ref()
+                .and_then(|earlier| earlier_luft(snapshot, earlier)),
+        )
         .collect();
     systems.extend(windows(snapshot, facts, &taken));
     systems.extend(linux(snapshot, facts, &taken, kept_folders));

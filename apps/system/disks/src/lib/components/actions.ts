@@ -5,6 +5,7 @@ import { dialogs } from '#lib/dialogs/dialogs.svelte.js';
 import { editor } from '#lib/editor/editor.svelte.js';
 import { changing } from '#lib/encryption.svelte.js';
 import { inner, volumeName } from '#lib/format.js';
+import { luftVolume } from '#lib/luft.js';
 import { explorable } from '#lib/partitions/types.js';
 import { disks } from '#lib/state/disks.svelte.js';
 
@@ -14,6 +15,8 @@ export interface Action {
 	danger?: boolean;
 	checked?: boolean;
 }
+
+const MOVE_LUFT: Action = { label: 'Move Luft to another drive…', run: () => dialogs.open({ kind: 'move-luft' }) };
 
 function act(volume: Volume, action: () => Promise<unknown>) {
 	void disks.run(volume.block, action);
@@ -72,6 +75,7 @@ export function volumeMenu(drive: Drive, volume: Volume, remembered: boolean): A
 	if (mounted && isProtected(volume)) look.push({ label: 'Open', run: () => void openFolder(contents.mountPoints[0]) });
 	if (explorable(volume)) look.push({ label: 'See what’s using space', run: () => disks.explore(contents.mountPoints[0], name) });
 	look.push({ label: 'Details', run: () => dialogs.open({ kind: 'details', drive, volume }) });
+	if (luftVolume(drive)?.block === volume.block) return [look, [MOVE_LUFT]];
 	if (isProtected(volume) || drive.readOnly) return [look];
 
 	const state: Action[] = [];
@@ -108,6 +112,7 @@ export function volumeMenu(drive: Drive, volume: Volume, remembered: boolean): A
 export function driveMenu(drive: Drive): Action[][] {
 	const about: Action[] = [{ label: 'Drive details', run: () => dialogs.open({ kind: 'drive', drive }) }];
 	const edit: Action[] = drive.table && !drive.readOnly ? [{ label: 'Edit partitions…', run: () => editor.open(drive.id) }] : [];
+	if (luftVolume(drive)) return [about, edit, [MOVE_LUFT]];
 	if (drive.system || drive.readOnly) return [about, edit];
 	return [about, edit, imageActions(drive, drive.block, drive.name), [{ label: 'Format drive…', run: () => dialogs.open({ kind: 'format-drive', drive }), danger: true }]];
 }

@@ -90,6 +90,7 @@ fn loader(folder: &str, kind: &str, named: &[u32]) -> OtherStartup {
 fn facts(startups: Vec<OtherStartup>) -> Facts {
     Facts {
         luft_starts: true,
+        earlier: None,
         startups,
         windows: vec![WindowsInstall {
             device: "/dev/vda3".to_owned(),

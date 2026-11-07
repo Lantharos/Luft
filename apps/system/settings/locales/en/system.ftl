@@ -249,6 +249,7 @@ settings-about-manage-drives = Manage drives
 settings-about-mount-internal = Mount internal drives when you sign in
 # $size is a size, like 120 GB
 settings-about-old-system = Kept when Luft replaced it · { $size }
+settings-about-earlier-luft = Left on the drive Luft moved from · { $size }
 settings-about-other-system = Remove it to give its { $size } to Luft
 # Button, verb
 settings-about-remove = Remove

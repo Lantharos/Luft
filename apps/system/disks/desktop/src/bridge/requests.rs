@@ -175,6 +175,17 @@ pub struct Grow {
 }
 
 #[derive(Deserialize, Type)]
+pub struct MoveLuft {
+    pub choice: luft_disks::moving::Choice,
+}
+
+#[derive(Deserialize, Type)]
+pub struct GiveBack {
+    pub block: String,
+    pub size: u64,
+}
+
+#[derive(Deserialize, Type)]
 pub struct RestoreImage {
     pub block: String,
     pub path: String,

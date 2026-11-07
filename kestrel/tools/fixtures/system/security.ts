@@ -31,6 +31,11 @@ const TRUST = `<node><interface name="com.lantharos.Trust1">
   <method name="GrowSystem"><arg name="unlock" type="s" direction="in"/><arg name="grown" type="t" direction="out"/></method>
   <method name="GrowSystemAtStart"/>
   <method name="CancelSystemResize"/>
+  <method name="MoveSystem"><arg name="drive" type="s" direction="in"/><arg name="offset" type="t" direction="in"/><arg name="size" type="t" direction="in"/></method>
+  <method name="EraseAndMoveSystem"><arg name="drive" type="s" direction="in"/></method>
+  <method name="CancelSystemMove"/>
+  <method name="ForgetSystemMoveFailure"/>
+  <method name="RemoveEarlierCopy"/>
 </interface></node>`;
 const USB_PROTECTION = `<node><interface name="com.lantharos.UsbProtection1">
   <property name="Enabled" type="b" access="read"/>
@@ -45,6 +50,10 @@ const FWUPD = `<node><interface name="org.freedesktop.fwupd">
 </interface></node>`;
 
 const WINDOWS_ESP = '10000000-0000-4000-8000-000001048576';
+const DISK = {Device: 's', Encrypted: 'b', Unlock: 'as', RecoveryKeyStored: 'b', TpmRefused: 'b', SecureBootChanged: 'b', Resize: 's',
+  Move: 's', MoveTo: 's', MoveRefused: 's', MoveNeeds: 't', MoveCopies: 't', MoveFailedTo: 's', MoveFailed: 's',
+  EarlierCopy: 'as', EarlierCopyDrive: 's', EarlierCopySize: 't'};
+const GB = 1000 ** 3;
 const SUCCESS = 1 << 0;
 const FIRMWARE_SETTING = 1 << 12;
 const CONTACT_MAKER = 1 << 11;
@@ -68,6 +77,13 @@ const overridden = (defaults: object, overrides: object) => Object.definePropert
 
 export function publishSecurity(publish: Publish, calls: string[], model: Model, trust: object = {}) {
   const startups: Startup[] = [[WINDOWS_ESP, 'EFI/Microsoft', 'windows', [[0, 'Windows Boot Manager']], []]];
+  const disk = {Device: '/dev/nvme0n1p3', Encrypted: true, Unlock: ['tpm', 'pin', 'recovery-key'], RecoveryKeyStored: true, TpmRefused: false,
+    SecureBootChanged: false, Resize: '', Move: '', MoveTo: '', MoveRefused: '', MoveNeeds: 48 * GB, MoveCopies: 31 * GB, MoveFailedTo: '',
+    MoveFailed: '', EarlierCopy: [] as string[], EarlierCopyDrive: '', EarlierCopySize: 0};
+  const moving = (drive: string) => {
+    disk.Move = 'waiting';
+    disk.MoveTo = drive.split('/').at(-1)?.replaceAll('_', ' ') ?? drive;
+  };
   publish(TRUST, overridden({
     SecureBoot: 'on',
     Tpm: variants({Present: 'b', Version: 's', Usable: 'b', Reason: 's'}, {Present: true, Version: '2.0', Usable: true, Reason: ''}),
@@ -75,9 +91,9 @@ export function publishSecurity(publish: Publish, calls: string[], model: Model,
       {State: 'enrolled', Available: true, Reason: '', Missed: 0, MissedThisBoot: false, OtherKeys: [], RemovingOtherKeys: false}),
     Startup: variants({Installed: 'b', Measured: 'b', Available: 'b', Reason: 's', WithoutKey: 'b'},
       {Installed: true, Measured: true, Available: true, Reason: '', WithoutKey: false}),
-    Disk: variants({Device: 's', Encrypted: 'b', Unlock: 'as', RecoveryKeyStored: 'b', TpmRefused: 'b', SecureBootChanged: 'b', Resize: 's'},
-      {Device: '/dev/nvme0n1p3', Encrypted: true, Unlock: ['tpm', 'pin', 'recovery-key'], RecoveryKeyStored: true, TpmRefused: false,
-        SecureBootChanged: false, Resize: ''}),
+    get Disk() {
+      return variants(DISK, disk);
+    },
     AntiCheat: variants({Checks: 'a(sbs)', UsesLuftKey: 'b'},
       {Checks: ANTI_CHEAT_CHECKS.map(id => [id, true, '']), UsesLuftKey: true}),
     GenerateRecoveryKey: () => NEW_RECOVERY_KEY,
@@ -106,6 +122,21 @@ export function publishSecurity(publish: Publish, calls: string[], model: Model,
     },
     GrowSystemAtStart: () => calls.push('GrowSystemAtStart'),
     CancelSystemResize: () => calls.push('CancelSystemResize'),
+    MoveSystem: (drive: string, offset: number, size: number) => {
+      calls.push(`MoveSystem ${drive}`);
+      calls.push(`MoveSystem size ${size} at ${offset}`);
+      moving(drive);
+    },
+    EraseAndMoveSystem: (drive: string) => {
+      calls.push(`EraseAndMoveSystem ${drive}`);
+      moving(drive);
+    },
+    CancelSystemMove: () => {
+      calls.push('CancelSystemMove');
+      disk.Move = '';
+    },
+    ForgetSystemMoveFailure: () => calls.push('ForgetSystemMoveFailure'),
+    RemoveEarlierCopy: () => calls.push('RemoveEarlierCopy'),
   }, trust), '/com/lantharos/Trust1');
   const drives = drivesService(calls, model, LETTERS_RECOVERY_KEY);
   drives.attach(publish(DRIVES, drives.implementation, '/com/lantharos/Trust1'));

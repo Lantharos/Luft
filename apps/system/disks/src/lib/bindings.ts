@@ -4,6 +4,7 @@ import { invoke, listen, type CallOptions } from "@lantharos/sabine";
 
 export const commands = {
 	appState: (options?: CallOptions) => invoke<AppState>("app_state", {}, options),
+	disksCancelMove: (options?: CallOptions) => invoke<null>("disks_cancel_move", {}, options),
 	disksCancelSystemResize: (options?: CallOptions) => invoke<null>("disks_cancel_system_resize", {}, options),
 	disksChangePassphrase: (params: {
 		block: string,
@@ -19,6 +20,7 @@ export const commands = {
 	disksDeletePartition: (params: {
 		block: string,
 	}, options?: CallOptions) => invoke<null>("disks_delete_partition", params, options),
+	disksForgetMoveFailure: (options?: CallOptions) => invoke<null>("disks_forget_move_failure", {}, options),
 	disksForgetPassphrase: (params: {
 		block: string,
 	}, options?: CallOptions) => invoke<null>("disks_forget_passphrase", params, options),
@@ -33,6 +35,10 @@ export const commands = {
 		format: Format,
 	}, options?: CallOptions) => invoke<null>("disks_format_volume", params, options),
 	disksFormats: (options?: CallOptions) => invoke<Support[]>("disks_formats", {}, options),
+	disksGiveBack: (params: {
+		block: string,
+		size: number,
+	}, options?: CallOptions) => invoke<null>("disks_give_back", params, options),
 	disksGiveLuft: (params: {
 		offset: number,
 	}, options?: CallOptions) => invoke<LuftGiven>("disks_give_luft", params, options),
@@ -68,6 +74,10 @@ export const commands = {
 	disksMount: (params: {
 		block: string,
 	}, options?: CallOptions) => invoke<string>("disks_mount", params, options),
+	disksMoveLuft: (params: {
+		choice: MoveChoice,
+	}, options?: CallOptions) => invoke<null>("disks_move_luft", params, options),
+	disksMoveOptions: (options?: CallOptions) => invoke<LuftMove>("disks_move_options", {}, options),
 	disksOpenFolder: (params: {
 		path: string,
 		token?: string | null,
@@ -287,6 +297,12 @@ export type Format = {
 	erase: boolean,
 };
 
+export type GiveBack = {
+	block: string,
+	name: string,
+	size: number,
+};
+
 export type Health = {
 	state: HealthState,
 	temperature: number | null,
@@ -342,6 +358,13 @@ export type LuftGiven = { kind: "grown"; bytes: number } | { kind: "at-start" } 
 
 export type LuftGrowth = "now" | "at-start";
 
+export type LuftMove = {
+	needs: MoveNeeds,
+	refused: string | null,
+	state: MoveState,
+	destinations: MoveDestination[],
+};
+
 export type LuftReach = { kind: "after" } | { kind: "before" } | { kind: "apart"; between: string[] };
 
 export type LuftRoom = {
@@ -352,9 +375,62 @@ export type LuftRoom = {
 
 export type Motion = "full" | "reduced" | "off";
 
+export type MoveChoice = { kind: "free"; drive: string; offset: number; size: number } | { kind: "shrink"; drive: string; block: string; size: number; luft: number } | { kind: "erase"; drive: string };
+
+export type MoveDestination = {
+	drive: string,
+	name: string,
+	size: number,
+	kind: DriveKind,
+	refused: string | null,
+	free: MoveSpace | null,
+	shrink: MoveShrink[],
+	erase: MoveErase,
+};
+
+export type MoveErase = {
+	refused: string | null,
+	contents: MoveErased[],
+	luft: number,
+};
+
+export type MoveErased = {
+	name: string,
+	size: number,
+};
+
+export type MoveNeeds = {
+	luft: number,
+	copies: number,
+};
+
 export type MoveProgress = {
 	copied: number,
 	total: number,
+};
+
+export type MoveShrink = {
+	block: string,
+	name: string,
+	filesystem: string,
+	offset: number,
+	size: number,
+	smallest: number,
+	freeAfter: number,
+	startup: number,
+};
+
+export type MoveSpace = {
+	offset: number,
+	size: number,
+	startup: number,
+};
+
+export type MoveState = {
+	stage: string,
+	to: string,
+	failedTo: string,
+	failed: string,
 };
 
 export type OtherSystem = {
@@ -401,6 +477,7 @@ export type Removed = {
 	needsKey: boolean,
 	drive: string,
 	free: Space | null,
+	giveBack: GiveBack | null,
 };
 
 export type SchemeColors = {
@@ -466,7 +543,7 @@ export type Support = {
 	resize: number,
 };
 
-export type SystemKind = "windows" | "linux" | "old-system";
+export type SystemKind = "windows" | "linux" | "old-system" | "earlier-luft";
 
 export type SystemPart = {
 	block: string,

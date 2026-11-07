@@ -11,6 +11,7 @@ import {Driver} from './disks/driver.js';
 import {checkEncrypted, checkEncryption, checkHealth, checkRemovable, copied} from './disks/drives.js';
 import {checkEditing} from './disks/editing.js';
 import {trashed, writeSpace} from './disks/space.js';
+import {checkMoveLuft} from './disks/moving.js';
 import {checkOtherSystems} from './disks/systems.js';
 
 const {require, eventually} = checks('Luft app');
@@ -72,6 +73,7 @@ async function checkSpace() {
 
 export async function run() {
   await withPalette(async palette => {
+    await withDriver([], driver => checkMoveLuft(driver, palette));
     await withDriver([], async driver => {
       await checkPalette(driver.app, palette);
       await showDark(driver.app, palette);

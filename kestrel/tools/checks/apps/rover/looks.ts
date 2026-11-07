@@ -5,8 +5,8 @@ import GLib from 'gi://GLib';
 import type {LuftApp} from '../../lib/apps/luftApp.js';
 import {checks} from '../../lib/check.js';
 import {press, type Point} from '../../lib/input/input.js';
-import {settled} from '../../lib/wait.js';
 import {changes} from '../lib/apps.js';
+import {squareCorners} from '../lib/corners.js';
 import {write} from '../lib/files.js';
 import {menuItem} from './places.js';
 
@@ -16,18 +16,6 @@ const COLORS = 8;
 
 type Open = (app: LuftApp, path: string) => Promise<void>;
 
-const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
-
-async function squareCorners(look: () => Promise<void>) {
-  kestrel.set_boolean('rounded-window-corners', false);
-  try {
-    await settled();
-    await look();
-  } finally {
-    kestrel.reset('rounded-window-corners');
-    await settled();
-  }
-}
 
 const lookOf = (path: string) =>
   Gio.File.new_for_path(path).query_info('xattr::luft.look', Gio.FileQueryInfoFlags.NONE, null).get_attribute_string('xattr::luft.look');

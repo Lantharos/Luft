@@ -13,12 +13,12 @@ use crate::launch;
 use crate::space::Explorer;
 use crate::trust::{self, drives as encryption_drives};
 use crate::udisks::{self, snapshot};
-use luft_disks::{partitions, systems};
+use luft_disks::{moving, partitions, systems};
 use requests::{
     Block, ChangePassphrase, CreateImage, CreatePartition, Drive, Encrypt, Folder, FormatDrive,
-    FormatEncrypted, FormatVolume, Grow, Handoff, KeySheet, Label, NextStep, Place, Remove,
-    RestoreImage, Resume, Room, Selftest, Shown, Startup, SystemId, Unlock, Unlocked, Unlocking,
-    Uuid,
+    FormatEncrypted, FormatVolume, GiveBack, Grow, Handoff, KeySheet, Label, MoveLuft, NextStep,
+    Place, Remove, RestoreImage, Resume, Room, Selftest, Shown, Startup, SystemId, Unlock,
+    Unlocked, Unlocking, Uuid,
 };
 
 mod requests;
@@ -170,6 +170,17 @@ fn register_systems(window: SabineWindow, state: &State) -> SabineWindow {
             systems::luft::cancel_resize()
         })
         .command_async("disks_restart", |Empty {}| luft::restart())
+        .command_async("disks_move_options", |Empty {}| moving::options())
+        .command_async("disks_move_luft", |MoveLuft { choice }| {
+            moving::apply(choice)
+        })
+        .command_async("disks_cancel_move", |Empty {}| moving::cancel())
+        .command_async("disks_forget_move_failure", |Empty {}| {
+            moving::forget_failure()
+        })
+        .command_async("disks_give_back", |GiveBack { block, size }| async move {
+            systems::give_back(&block, size).await
+        })
 }
 
 fn register_volumes(window: SabineWindow) -> SabineWindow {

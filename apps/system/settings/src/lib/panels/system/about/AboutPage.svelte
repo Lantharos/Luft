@@ -44,6 +44,7 @@
 
 	function describe(system: OtherSystem) {
 		if (system.kind === 'old-system') return t('settings-about-old-system', { size: bytes(system.size) });
+		if (system.kind === 'earlier-luft') return t('settings-about-earlier-luft', { size: bytes(system.size) });
 		return t('settings-about-other-system', { size: bytes(system.size) });
 	}
 

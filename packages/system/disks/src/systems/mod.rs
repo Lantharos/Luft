@@ -10,7 +10,7 @@ use specta::Type;
 use crate::udisks::{self, snapshot};
 
 pub use facts::Facts;
-pub use remove::{Removed, Step, remove, remove_old_system_startups};
+pub use remove::{GiveBack, Removed, Step, give_back, remove, remove_old_system_startups};
 
 #[derive(Serialize, Clone, Copy, PartialEq, Eq, Debug, Type)]
 #[serde(rename = "SystemKind", rename_all = "kebab-case")]
@@ -18,6 +18,7 @@ pub enum Kind {
     Windows,
     Linux,
     OldSystem,
+    EarlierLuft,
 }
 
 #[derive(Serialize, Clone, Copy, PartialEq, Eq, Debug, Type)]

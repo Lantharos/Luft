@@ -36,9 +36,15 @@ pub struct OldSystem {
     pub folder: Option<String>,
 }
 
+pub struct EarlierLuft {
+    pub drive: String,
+    pub partitions: Vec<String>,
+}
+
 #[derive(Default)]
 pub struct Facts {
     pub luft_starts: bool,
+    pub earlier: Option<EarlierLuft>,
     pub startups: Vec<OtherStartup>,
     pub windows: Vec<WindowsInstall>,
     pub old_system: Option<OldSystem>,
@@ -57,14 +63,22 @@ struct WindowsFound {
 
 type Listed = (String, String, String, Vec<(u16, String)>, Vec<String>);
 
-async fn luft_starts() -> bool {
-    TRUST
-        .read()
-        .await
-        .ok()
-        .flatten()
-        .and_then(|properties| get::<bool>(&group(&properties, "Startup"), "Installed"))
-        .unwrap_or(false)
+struct Luft {
+    starts: bool,
+    earlier: Option<EarlierLuft>,
+}
+
+async fn luft() -> Luft {
+    let properties = TRUST.read().await.ok().flatten().unwrap_or_default();
+    let disk = group(&properties, "Disk");
+    let partitions: Vec<String> = get(&disk, "EarlierCopy").unwrap_or_default();
+    Luft {
+        starts: get::<bool>(&group(&properties, "Startup"), "Installed").unwrap_or(false),
+        earlier: (!partitions.is_empty()).then(|| EarlierLuft {
+            drive: get(&disk, "EarlierCopyDrive").unwrap_or_default(),
+            partitions,
+        }),
+    }
 }
 
 async fn startups() -> Vec<OtherStartup> {
@@ -129,12 +143,14 @@ fn old_system() -> Option<OldSystem> {
 
 impl Facts {
     pub async fn gather() -> Self {
-        if !luft_starts().await {
+        let luft = luft().await;
+        if !luft.starts {
             return Self::default();
         }
         let (startups, windows) = futures_util::future::join(startups(), windows()).await;
         Self {
             luft_starts: true,
+            earlier: luft.earlier,
             startups,
             windows,
             old_system: old_system(),

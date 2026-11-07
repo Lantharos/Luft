@@ -273,12 +273,12 @@ fn install(job: &Job, report: &impl Fn(Status)) -> Result<()> {
         eprintln!("The Wi-Fi networks joined here weren't brought over: {error:#}");
     }
     handoff::prepare(&deployment, &user)?;
+    let secure_boot_code = trust::ask_shim_to_trust_luft(&deployment)?;
     drop(deployment);
     if let Some(kept) = kept {
         kept.finish()?;
     }
     mounted.finish()?;
-    let secure_boot_code = startup::ask_shim_to_trust_luft()?;
     report(Status {
         secure_boot_code,
         ..Status::at(Stage::Finished, 1.0)

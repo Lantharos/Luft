@@ -66,7 +66,11 @@ enum Command {
 #[derive(Subcommand)]
 enum SecureBootAction {
     /// Ask shim to trust Luft's key at the next restart
-    Enroll,
+    Enroll {
+        /// Keep the request in STATE, the state folder of a system that hasn't started yet, and print only the code
+        #[arg(long)]
+        state: Option<PathBuf>,
+    },
     /// Withdraw the request before restarting
     Cancel,
     /// Ask shim to remove the keys added from elsewhere at the next restart
@@ -177,13 +181,20 @@ fn follow_up() {
     if let Err(error) = disk::unlock::seal::follow_up() {
         eprintln!("Couldn't seal the disk key to how this computer starts: {error:#}");
     }
+    if let Err(error) = disk::unlock::without_key::follow_up() {
+        eprintln!("Couldn't seal the disk key to the start without Luft's key: {error:#}");
+    }
 }
 
 fn secure_boot(action: SecureBootAction) -> Result<()> {
     match action {
-        SecureBootAction::Enroll => {
+        SecureBootAction::Enroll { state: None } => {
             let code = mok::request()?;
             report::enrollment_steps(&code);
+            Ok(())
+        }
+        SecureBootAction::Enroll { state: Some(state) } => {
+            println!("{}", mok::request_in(&state)?);
             Ok(())
         }
         SecureBootAction::Cancel => mok::cancel(),

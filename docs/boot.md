@@ -38,14 +38,29 @@ Starting another version from the menu, or Rescue, never counts against an updat
 
 ## Adding Luft's Secure Boot key
 
-Shim only trusts Luft's key after someone confirms it in person, once per computer. Install Luft queues the key before the first restart and shows an eight-digit code:
+Shim only trusts Luft's key after someone confirms it in person, once per computer. People see this as finishing setting up Secure Boot. Install Luft queues the key before the first restart and shows an eight-digit code. The request is kept in the new system's `/var/lib/trustd` (`trustctl secure-boot enroll --state`), so the installed system knows the code, and every later reminder shows the same one until the key is in.
 
-1. After the restart, shim's blue screen waits ten seconds for a key press.
-2. Choose Enroll MOK, Continue, Yes, type the code, and choose Reboot.
+Shim's blue screen is in English, so Luft quotes its words exactly:
 
-If the blue screen was skipped, the computer still starts: shim shows "Verification failed" for SushiBoot, and after OK the firmware moves on to the entry called "Luft without its key". It starts the same version through Fedora's signed GRUB and kernel, from `EFI/luft-start` (the kernel itself is on the startup partition when there is one), which trustd keeps in step with the newest version until the key is added. Each version's kernel and initramfs go in a folder of their own, and GRUB's configuration switches to it only once it's complete. That way has no signed command line or TPM unlock, so an encrypted disk asks for its recovery key or passphrase. trustd asks shim again with a new code at the next starts, up to three times, and Sushi shows the code for 20 seconds before each restart, or until Enter is pressed; after that, Settings (or `trustctl secure-boot enroll`) asks again. Once the key is in, trustd removes `EFI/luft-start` and its entry. The live system, from a stick or Meet Luft, leaves the key and the EFI system partition alone.
+1. "Press any key to perform MOK management": press any key. Luft asks shim to wait 60 seconds here instead of 10 (`mokutil --timeout`).
+2. Choose "Enroll MOK", then "Continue".
+3. At "Enroll the key(s)?", choose "Yes" (shim selects "No" first).
+4. At "Password:", type the eight digits and press Enter. Nothing shows while typing; a wrong code shows "Password doesn't match".
+5. Choose "Reboot".
 
-The key can also be added from the blue screen without a code: press a key for key management, then Enroll key from disk, the EFI system partition, `EFI`, `luft`, `luft.cer`, Continue, Yes and Reboot.
+Until the key is added, there's a second firmware entry, "Luft without its key". It starts the same version through Fedora's signed shim, GRUB and kernel, from `EFI/luft-start` (the kernel itself is on the startup partition when there is one), which trustd keeps in step with the newest version. Each version's kernel and initramfs go in a folder of their own, and GRUB's configuration switches to it only once it's complete. Its command line carries `luft.started=without-key`, so trustd, Settings and Sushi know how the computer started, and `systemd.mount-extra` for the partitions at `/boot` and `/efi`, since GRUB doesn't tell systemd which partition it started from.
+
+- While a request is waiting, the next start goes through "Luft without its key" (`BootNext`), even with the USB stick still in. Its shim shows the blue screen. After "Reboot" the firmware starts the Luft entry, which shim now trusts. When the blue screen goes by, shim carries on into GRUB, so nothing stops at shim's errors.
+- When nothing is waiting, "Luft without its key" comes before the Luft entry, so the computer starts without errors until the key is added.
+- That way has no signed command line, so the TPM can't check it and an encrypted disk asks for its recovery key, with Sushi saying Secure Boot isn't set up yet. Once the disk is open, trustd seals the disk key to exactly that start too: PCR 4 (shim and GRUB), 7 (the Secure Boot state), 8 (every GRUB command and the kernel's command line) and 9 (every file GRUB read, the kernel and initramfs included), and only when GRUB measured into 8 and 9. Starts the same way then unlock by themselves until the version or that path changes. A TPM with a PIN isn't sealed this way.
+- After a start that went by the blue screen, trustd asks shim again with the same code, up to three times, and Sushi shows the steps and the code for 30 seconds before each restart, or until Enter is pressed. Settings shows the code and steps under Security, Secure Boot, where a notification after signing in leads, once per start; `trustctl secure-boot enroll` prints them.
+- Kestrel keeps the screen on while its power off and restart dialog counts down, and Sushi switches the display back on when it takes over, so the steps are always on screen before the restart.
+- Updates, rolling back and the version in Settings work on that start too: with the boot entries at `/boot`, Luft's bootc reads them when Fedora's GRUB started the system ([`grub-started.patch`](../os/image/patches/bootc/README.md)).
+- Once the key is in, trustd removes `EFI/luft-start`, its entry and the disk key sealed to it.
+
+The live system, from a stick or Meet Luft, leaves the key and the EFI system partition alone.
+
+The key can also be added from the blue screen without a code: press a key for key management, then "Enroll key from disk", the EFI system partition, `EFI`, `luft`, `luft.cer`, "Continue", "Yes" and "Reboot".
 
 ## When Luft can't start
 

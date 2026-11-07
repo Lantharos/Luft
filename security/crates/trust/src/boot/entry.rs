@@ -73,6 +73,15 @@ pub fn ensure(esp: &Esp, label: &str, loader: &str) -> Result<()> {
         .status()
 }
 
+pub fn start_next(label: &str) -> Result<()> {
+    match numbers(&listing(), label).first() {
+        Some(number) => Tool::new("efibootmgr")
+            .args(["--bootnext", number])
+            .status(),
+        None => Ok(()),
+    }
+}
+
 pub fn put_first(labels: &[&str]) -> Result<()> {
     let listing = listing();
     let first: Vec<String> = labels

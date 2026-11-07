@@ -11,14 +11,16 @@
     SigningKey: Luft's Secure Boot key, which signs the boot menu, the startup images and drivers.
       State (s: "none", "pending" until the next restart adds it, "enrolled"),
       Available (b), Reason (s, why it can't be added here),
-      Missed (u, restarts that went by without the key being added since it was requested; after three,
-      it is no longer requested again by itself and State goes back to "none"),
+      Missed (u, restarts that went by without the key being added since it was requested; until three,
+      it is requested again with the same code, then State goes back to "none"),
       MissedThisBoot (b, the restart that started this boot was one of them),
       OtherKeys (as, names of keys added to shim from elsewhere, which shim also trusts for drivers;
       Luft's key and shim's own don't count), RemovingOtherKeys (b, the next restart asks to remove them).
 
     Startup: Installed (b, shim and Luft's boot menu are on the EFI system partition),
-      Measured (b, this boot came through them and recorded what started), Available (b), Reason (s).
+      Measured (b, this boot came through them and recorded what started),
+      WithoutKey (b, this boot came through the entry "Luft without its key", Fedora's GRUB, because shim doesn't
+      trust Luft's key yet), Available (b), Reason (s).
 
     Disk: Device (s), Encrypted (b),
       Encrypting (s: "" when nothing is changing, "after-restart" once EncryptSystemDisk asked for it,

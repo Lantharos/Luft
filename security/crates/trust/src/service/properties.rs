@@ -62,6 +62,7 @@ pub fn startup(startup: &Startup) -> Dict {
     dict([
         ("Installed", startup.installed.into()),
         ("Measured", startup.measured.into()),
+        ("WithoutKey", startup.without_key.into()),
         ("Available", startup.available.into()),
         ("Reason", startup.reason.as_str().into()),
     ])

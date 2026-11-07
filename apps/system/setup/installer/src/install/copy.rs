@@ -46,7 +46,9 @@ fn copy(image: &Image, mounted: &Mounted, start: u64, progress: impl Fn(f64)) ->
     let mut child = command(image, mounted).spawn()?;
     let mut shown = 0.0_f64;
     while child.try_wait()?.is_none() {
-        let written = used_space(mounted.root()).unwrap_or(start).saturating_sub(start);
+        let written = used_space(mounted.root())
+            .unwrap_or(start)
+            .saturating_sub(start);
         shown = shown.max((written as f64 / image.size as f64).min(1.0));
         progress(shown);
         std::thread::sleep(POLL);

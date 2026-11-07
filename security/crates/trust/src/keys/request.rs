@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 
@@ -29,12 +31,20 @@ impl Request {
     }
 
     pub fn load() -> Option<Self> {
-        serde_json::from_slice(&std::fs::read(paths::state(FILE)).ok()?).ok()
+        Self::load_in(Path::new(paths::STATE))
+    }
+
+    pub fn load_in(state: &Path) -> Option<Self> {
+        serde_json::from_slice(&std::fs::read(state.join(FILE)).ok()?).ok()
     }
 
     pub fn save(&self) -> Result<()> {
-        paths::ensure_private(paths::STATE)?;
-        paths::write_private(&paths::state(FILE), &serde_json::to_vec(self)?)?;
+        self.save_in(Path::new(paths::STATE))
+    }
+
+    pub fn save_in(&self, state: &Path) -> Result<()> {
+        paths::ensure_private(state)?;
+        paths::write_private(&state.join(FILE), &serde_json::to_vec(self)?)?;
         Ok(())
     }
 

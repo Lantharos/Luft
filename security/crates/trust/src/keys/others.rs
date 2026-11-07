@@ -82,6 +82,7 @@ pub fn request_removal() -> Result<String> {
         .arg("--hash-file")
         .arg(mok::hash_file(&scratch, &code)?)
         .status()?;
+    mok::wait_longer_on_blue_screen()?;
     Ok(code)
 }
 

@@ -21,7 +21,7 @@ All commands need root.
 | Command | Does |
 | --- | --- |
 | `trustctl status` | Shows Secure Boot, the TPM, the key, the startup and the disk |
-| `trustctl secure-boot enroll` / `cancel` | Asks shim to trust Luft's key at the next restart, or withdraws that |
+| `trustctl secure-boot enroll [--state DIR]` / `cancel` | Asks shim to trust Luft's key at the next restart, or withdraws that. `--state` keeps the request in a system that hasn't started yet, as Install Luft does |
 | `trustctl secure-boot remove-others` / `keep-others` | Asks shim to remove keys added from elsewhere at the next restart, or withdraws that |
 | `trustctl anti-cheat` | Checks what games with anti-cheat look for ([details](../docs/security.md#games-with-anti-cheat)) |
 | `trustctl startup install [--esp DIR]` | Puts shim and SushiBoot on the EFI system partition and makes Luft the firmware's boot entry |

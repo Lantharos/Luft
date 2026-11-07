@@ -1,5 +1,5 @@
 use crate::anticheat::{self, Readiness};
-use crate::boot::startup;
+use crate::boot::{fallback, startup};
 use crate::disk::{self, DiskStatus};
 use crate::keys::request::Request;
 use crate::keys::{self, mok, others};
@@ -19,6 +19,7 @@ pub struct SigningKey {
 pub struct Startup {
     pub installed: bool,
     pub measured: bool,
+    pub without_key: bool,
     pub available: bool,
     pub reason: String,
 }
@@ -64,6 +65,7 @@ pub fn startup() -> Startup {
     Startup {
         installed: startup::installed(),
         measured: efi::measured_uki() && startup::started_through_menu(),
+        without_key: fallback::started_through(),
         available: reason.is_none(),
         reason: reason.unwrap_or_default().to_owned(),
     }

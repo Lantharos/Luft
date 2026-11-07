@@ -1,4 +1,5 @@
 use crate::anticheat::Readiness;
+use crate::keys::mok;
 use crate::service::status;
 use crate::system::secrets::secret::Secret;
 
@@ -74,22 +75,24 @@ pub fn recovery_key(key: &Secret) {
     println!("Keep it somewhere other than this computer. It unlocks the disk when the TPM can't.");
 }
 
-fn blue_screen_steps(asks_about: &str, choice: &str, code: &str) {
+fn blue_screen_steps(choice: &str, question: &str, code: &str) {
     println!(
-        "Restart the computer. A blue screen asks about {asks_about} and waits only 10 seconds, so press a key when it appears. Then:"
+        "Restart the computer. A blue screen says \"Press any key to perform MOK management\" and waits {} seconds. Press any key, then:",
+        mok::BLUE_SCREEN_SECONDS
     );
-    println!("  1. Choose {choice}, then Continue");
-    println!("  2. Choose Yes");
-    println!("  3. Type {} {} and press Enter", &code[..4], &code[4..]);
-    println!("  4. Choose Reboot");
+    println!("  1. Choose \"{choice}\"");
+    println!("  2. Choose \"Continue\"");
+    println!("  3. At \"{question}\", choose \"Yes\"");
+    println!("  4. At \"Password:\", type {code} and press Enter");
+    println!("  5. Choose \"Reboot\"");
 }
 
 pub fn enrollment_steps(code: &str) {
-    blue_screen_steps("a new key", "Enroll MOK", code);
+    blue_screen_steps("Enroll MOK", "Enroll the key(s)?", code);
 }
 
 pub fn removal_steps(code: &str) {
-    blue_screen_steps("removing keys", "Delete MOK", code);
+    blue_screen_steps("Delete MOK", "Delete the key(s)?", code);
 }
 
 pub fn anti_cheat(readiness: &Readiness, other_keys: &[String]) {

@@ -4,13 +4,16 @@ use anyhow::{Result, bail};
 
 use super::CERTIFICATE;
 use super::request::Request;
+use crate::boot::startup;
 use crate::errors::Unsupported;
+use crate::paths;
 use crate::system::firmware::efi::{self, SecureBoot};
 use crate::system::host::command::Tool;
 use crate::system::secrets::scratch::Scratch;
 use crate::system::secrets::secret::Secret;
 
 const AUTOMATIC_ATTEMPTS: u32 = 3;
+pub const BLUE_SCREEN_SECONDS: u32 = 60;
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum Enrollment {
@@ -53,21 +56,26 @@ pub(super) fn one_time_code() -> Result<String> {
 }
 
 pub fn request() -> Result<String> {
+    request_in(Path::new(paths::STATE))
+}
+
+pub fn request_in(state: &Path) -> Result<String> {
     match enrollment() {
         Enrollment::Enrolled => bail!(Unsupported(
             "This computer already trusts Luft's key.".to_owned()
         )),
         Enrollment::Pending => {
-            let request = Request::load().unwrap_or_default();
+            let request = Request::load_in(state).unwrap_or_default();
             match request.code.clone() {
                 Some(code) => {
                     show_on_restart(&request);
+                    startup::arrange()?;
                     Ok(code)
                 }
-                None => ask_again(request),
+                None => ask_again(request, state),
             }
         }
-        Enrollment::None => ask_shim(Request::default()),
+        Enrollment::None => ask_shim(Request::default(), state),
     }
 }
 
@@ -75,9 +83,9 @@ fn revoke() -> Result<()> {
     Tool::new("mokutil").arg("--revoke-import").status()
 }
 
-fn ask_again(request: Request) -> Result<String> {
+fn ask_again(request: Request, state: &Path) -> Result<String> {
     revoke()?;
-    ask_shim(request)
+    ask_shim(request, state)
 }
 
 pub(super) fn hash_file(scratch: &Scratch, code: &str) -> Result<PathBuf> {
@@ -88,6 +96,12 @@ pub(super) fn hash_file(scratch: &Scratch, code: &str) -> Result<PathBuf> {
     scratch.write("mok-hash", &hash)
 }
 
+pub(super) fn wait_longer_on_blue_screen() -> Result<()> {
+    Tool::new("mokutil")
+        .arg(format!("--timeout={BLUE_SCREEN_SECONDS}"))
+        .status()
+}
+
 fn import(code: &str) -> Result<()> {
     let scratch = Scratch::empty()?;
     Tool::new("mokutil")
@@ -95,25 +109,31 @@ fn import(code: &str) -> Result<()> {
         .arg(Path::new(CERTIFICATE))
         .arg("--hash-file")
         .arg(hash_file(&scratch, code)?)
-        .status()
+        .status()?;
+    wait_longer_on_blue_screen()
 }
 
-fn ask_shim(mut request: Request) -> Result<String> {
-    let code = one_time_code()?;
+fn ask_shim(mut request: Request, state: &Path) -> Result<String> {
+    let code = match request.code.clone() {
+        Some(code) => code,
+        None => one_time_code()?,
+    };
     import(&code)?;
     request.code = Some(code.clone());
-    request.save()?;
+    request.save_in(state)?;
     show_on_restart(&request);
+    startup::arrange()?;
     Ok(code)
 }
 
 fn missed(mut request: Request) -> Result<()> {
     request.count_miss();
     if request.missed < AUTOMATIC_ATTEMPTS {
-        ask_shim(request).map(drop)
+        ask_shim(request, Path::new(paths::STATE)).map(drop)
     } else {
         request.code = None;
-        request.save()
+        request.save()?;
+        startup::arrange()
     }
 }
 
@@ -124,7 +144,9 @@ pub fn follow_up() -> Result<()> {
     match (enrollment(), Request::load()) {
         (Enrollment::Enrolled, _) => Request::forget(),
         (Enrollment::Pending, Some(request)) => show_on_restart(&request),
-        (Enrollment::Pending, None) => ask_again(Request::default()).map(drop)?,
+        (Enrollment::Pending, None) => {
+            ask_again(Request::default(), Path::new(paths::STATE)).map(drop)?
+        }
         (Enrollment::None, Some(request)) if request.code.is_some() => missed(request)?,
         (Enrollment::None, Some(_)) => {}
         (Enrollment::None, None) => missed(Request::default())?,
@@ -138,7 +160,7 @@ pub fn cancel() -> Result<()> {
     }
     Request::declined(AUTOMATIC_ATTEMPTS).save()?;
     show_on_restart(&Request::default());
-    Ok(())
+    startup::arrange()
 }
 
 fn show_on_restart(request: &Request) {

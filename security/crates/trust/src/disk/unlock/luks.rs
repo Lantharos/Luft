@@ -31,6 +31,8 @@ pub struct Token {
     pub keyslots: Vec<String>,
     #[serde(rename = "tpm2-pin", default)]
     pub tpm2_pin: bool,
+    #[serde(rename = "tpm2-pcrs", default)]
+    pub tpm2_pcrs: Vec<u32>,
     #[serde(default)]
     pub filesystem: String,
 }

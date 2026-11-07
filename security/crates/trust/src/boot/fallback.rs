@@ -7,6 +7,7 @@ use super::esp::Esp;
 use super::files::{self, SHIM};
 use super::partition::BootPartition;
 use super::pe::PeFile;
+use crate::system::host::blocks;
 
 pub const FOLDER: &str = "EFI/luft-start";
 pub const LOADER: &str = "\\EFI\\luft-start\\shimx64.efi";
@@ -15,6 +16,8 @@ const KERNEL: &str = "linux";
 const INITRD: &str = "initrd";
 const GRUB_CONFIG: &str = "grub.cfg";
 const SYSTEM_NAME_BYTES: usize = 8;
+pub const STARTED_WITHOUT_KEY: &str = "luft.started=without-key";
+const BOOT_MOUNT_OPTIONS: &str = "umask=0077,x-systemd.automount,x-systemd.idle-timeout=120";
 
 struct Entry {
     sort_key: String,
@@ -47,9 +50,23 @@ fn default_image(boot: &BootPartition) -> Result<PathBuf> {
     Ok(boot.file(entry.image.trim_start_matches('/')))
 }
 
-fn grub_config(boot_uuid: &str, system: &str, command_line: &str) -> String {
+fn mounted_at(uuid: &str, place: &str) -> String {
+    format!("systemd.mount-extra=UUID={uuid}:{place}:vfat:{BOOT_MOUNT_OPTIONS}")
+}
+
+fn boot_mounts(esp: &Esp, boot: &BootPartition) -> Result<String> {
+    let esp_uuid =
+        blocks::fs_uuid(&esp.name).context("The EFI system partition has no file system.")?;
+    let mut mounts = vec![mounted_at(&boot.uuid, "/boot")];
+    if esp_uuid != boot.uuid {
+        mounts.push(mounted_at(&esp_uuid, "/efi"));
+    }
+    Ok(mounts.join(" "))
+}
+
+fn grub_config(boot_uuid: &str, system: &str, command_line: &str, mounts: &str) -> String {
     format!(
-        "set timeout=0\nsearch --no-floppy --fs-uuid --set=root {boot_uuid}\nlinux /{system}/{KERNEL} {command_line}\ninitrd /{system}/{INITRD}\nboot\n"
+        "set timeout=0\nsearch --no-floppy --fs-uuid --set=root {boot_uuid}\nlinux /{system}/{KERNEL} {command_line} {mounts} {STARTED_WITHOUT_KEY}\ninitrd /{system}/{INITRD}\nboot\n"
     )
 }
 
@@ -93,10 +110,17 @@ pub fn place(esp: &Esp, boot: &BootPartition) -> Result<bool> {
     changed |= files::place_shim_after(&files::grub()?, &loaders, SHIM)?;
     changed |= files::write_if_changed(
         &loaders.join(GRUB_CONFIG),
-        grub_config(&boot.uuid, &system, &command_line).as_bytes(),
+        grub_config(&boot.uuid, &system, &command_line, &boot_mounts(esp, boot)?).as_bytes(),
     )?;
     remove_other_systems(boot, &boot.file(&system));
     Ok(changed)
+}
+
+pub fn started_through() -> bool {
+    std::fs::read_to_string("/proc/cmdline").is_ok_and(|line| {
+        line.split_whitespace()
+            .any(|argument| argument == STARTED_WITHOUT_KEY)
+    })
 }
 
 pub fn remove(esp: &Esp, boot: &BootPartition) {

@@ -1,0 +1,84 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Sat, 7 Nov 2026 14:00:00 +0100
+Subject: [PATCH] composefs: Keep BLS entries when a signed GRUB started the
+ system
+
+---
+--- a/crates/lib/src/bootc_composefs/status.rs
++++ b/crates/lib/src/bootc_composefs/status.rs
+@@ -465,6 +465,9 @@
+ ///
+ /// - When `EFI_LOADER_INFO` is present, its content selects between systemd-
+ ///   boot, GRUB Confidential Compute, and generic GRUB (existing behavior).
++///   A generic GRUB with no GRUB directory next to a BLS layout only chain
++///   loaded the system, as a signed GRUB can for a BLS-native install, so the
++///   boot entries are still BLS-compatible.
+ /// - When there are no EFI variables to inspect (`SystemNotUEFI` /
+ ///   `MissingVar`), fall back to a filesystem probe: many non-EFI systems
+ ///   still lay down the BLS Type 1 entry layout at `/boot/loader/entries/`
+@@ -494,6 +497,13 @@
+                 Ok(Bootloader::Systemd)
+             } else if loader.contains("grub cc") {
+                 Ok(Bootloader::GrubCC)
++            } else if bls_entries_dir_present && !grub_dir_present {
++                tracing::debug!(
++                    "EFI_LOADER_INFO names a GRUB, but there is no GRUB directory \
++                     and {BLS_ENTRIES_DIR} is a directory; treating bootloader as \
++                     BLS-compatible (systemd-boot)"
++                );
++                Ok(Bootloader::Systemd)
+             } else {
+                 Ok(Bootloader::Grub)
+             }
+@@ -530,17 +540,21 @@
+     }
+ 
+     let efi_result = read_uefi_var(EFI_LOADER_INFO);
+-    let non_efi = matches!(
+-        &efi_result,
+-        Err(EfiError::SystemNotUEFI) | Err(EfiError::MissingVar),
+-    );
++    let probed = match &efi_result {
++        Err(EfiError::SystemNotUEFI) | Err(EfiError::MissingVar) => true,
++        Ok(loader) => {
++            let loader = loader.to_lowercase();
++            !loader.contains("systemd-boot") && !loader.contains("grub cc")
++        }
++        Err(_) => false,
++    };
+ 
+     let bootloader = classify_bootloader(
+         efi_result,
+-        // The FS probes are only consulted in the non-EFI classification
+-        // branch; skip the `stat(2)`s on EFI systems.
+-        non_efi && std::path::Path::new(BLS_ENTRIES_DIR).is_dir(),
+-        non_efi && GRUB_DIRS.iter().any(|d| std::path::Path::new(d).is_dir()),
++        // The FS probes only matter without EFI variables or for a generic
++        // GRUB; skip the `stat(2)`s otherwise.
++        probed && std::path::Path::new(BLS_ENTRIES_DIR).is_dir(),
++        probed && GRUB_DIRS.iter().any(|d| std::path::Path::new(d).is_dir()),
+     )?;
+ 
+     // The bootloader cannot change over the lifetime of a single bootc
+@@ -1638,6 +1652,20 @@
+                 grub_dir: false,
+                 expected: Bootloader::Systemd,
+             },
++            Case {
++                desc: "UEFI GRUB without a GRUB dir next to BLS entries: BLS",
++                efi: Ok("GRUB 2.12".into()),
++                bls: true,
++                grub_dir: false,
++                expected: Bootloader::Systemd,
++            },
++            Case {
++                desc: "UEFI GRUB with its GRUB dir: GRUB",
++                efi: Ok("GRUB 2.12".into()),
++                bls: true,
++                grub_dir: true,
++                expected: Bootloader::Grub,
++            },
+             // UEFI classification must ignore both probes entirely.
+             Case {
+                 desc: "UEFI systemd-boot with a stray GRUB dir: still systemd",

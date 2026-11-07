@@ -6,7 +6,7 @@ use super::esp::{self, Esp};
 use super::files::{self, SECOND_STAGE, SHIM};
 use super::{entry, fallback, partition};
 use crate::keys::{self, mok};
-use crate::system::firmware::efi;
+use crate::system::firmware::efi::{self, SecureBoot};
 
 const BOOT_MENU: &str = "/usr/lib/sushi/efi/SushiBoot.efi";
 const FOLDER: &str = "EFI/luft";
@@ -90,9 +90,36 @@ pub fn place(esp: &Esp) -> Result<bool> {
     changed |= place_fallback(esp)?;
     if efi::booted_with_uefi() {
         entry::ensure(esp, LABEL, LOADER)?;
-        entry::put_first(&[LABEL, FALLBACK_LABEL])?;
+        arrange()?;
     }
     Ok(changed)
+}
+
+fn waiting_for_key() -> Option<mok::Enrollment> {
+    let enrollment = mok::enrollment();
+    (efi::secure_boot() == SecureBoot::On && enrollment != mok::Enrollment::Enrolled)
+        .then_some(enrollment)
+}
+
+fn entries_in_order() -> [&'static str; 2] {
+    match waiting_for_key() {
+        Some(mok::Enrollment::None) => [FALLBACK_LABEL, LABEL],
+        _ => [LABEL, FALLBACK_LABEL],
+    }
+}
+
+/// While shim waits to be asked about Luft's key, the next start goes through the entry that starts
+/// without it, so a missed blue screen carries on into Luft instead of stopping at shim's errors.
+/// Until the key is added, that entry comes first.
+pub fn arrange() -> Result<()> {
+    if !efi::booted_with_uefi() {
+        return Ok(());
+    }
+    entry::put_first(&entries_in_order())?;
+    if waiting_for_key() == Some(mok::Enrollment::Pending) {
+        entry::start_next(FALLBACK_LABEL)?;
+    }
+    Ok(())
 }
 
 pub fn install(esp: Option<&Path>) -> Result<()> {
@@ -100,7 +127,12 @@ pub fn install(esp: Option<&Path>) -> Result<()> {
         Some(path) => esp::at(path)?,
         None => esp::find()?,
     };
-    place(&esp).map(drop)
+    place(&esp)?;
+    if efi::booted_with_uefi() {
+        entry::start_next(entries_in_order()[0])?;
+        arrange()?;
+    }
+    Ok(())
 }
 
 pub fn installed() -> bool {

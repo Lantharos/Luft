@@ -107,6 +107,10 @@ impl Task<'_> {
         (self.report)(Progress::new(stage, fraction));
     }
 
+    pub fn downloaded(&self, done: u64, total: Option<u64>) {
+        (self.report)(Progress::downloading(done, total));
+    }
+
     pub fn exclusive(&self) -> Result<Exclusive, String> {
         let file = lock_file()?;
         loop {

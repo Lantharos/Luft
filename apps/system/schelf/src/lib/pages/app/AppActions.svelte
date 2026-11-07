@@ -3,6 +3,7 @@
 	import ProgressButton from '#lib/components/ProgressButton.svelte';
 	import RemoveDialog from '#lib/components/RemoveDialog.svelte';
 	import { launch, openUrl } from '#lib/bridge/index.js';
+	import { transferred } from '#lib/format.js';
 	import { catalogKey } from '#lib/catalog/types.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { operations } from '#lib/state/operations.svelte.js';
@@ -78,7 +79,9 @@
 			<button type="button" class="button large" title={file.name} onclick={() => openUrl(file.url)}>Download</button>
 		{/if}
 	</div>
-	{#if operation?.state === 'failed'}
+	{#if active && transferred(active)}
+		<p class="text-[12.5px] text-[var(--text-muted)] tabular-nums">{transferred(active)}</p>
+	{:else if operation?.state === 'failed'}
 		<p class="max-w-[320px] text-right text-[12.5px] text-[var(--danger)]">{operation.error}</p>
 	{/if}
 </div>

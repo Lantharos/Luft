@@ -1,6 +1,6 @@
 <script lang="ts">
 	import X from '@lucide/svelte/icons/x';
-	import { ProgressBar, tooltip } from '@luft/ui';
+	import { ProgressBar, Spinner, tooltip } from '@luft/ui';
 	import type { Operation } from '#lib/bindings.js';
 	import { activity, percent } from '#lib/format.js';
 	import { operations } from '#lib/state/operations.svelte.js';
@@ -12,8 +12,17 @@
 </script>
 
 <div class="progress" class:large>
-	<ProgressBar fraction={operation.progress?.fraction ?? null} label={operation.title} class="absolute inset-0 h-auto rounded-none bg-transparent [--progress-color:var(--accent-soft)]" />
-	<span class="label">{activity(operation)}{value === null ? '…' : ` ${value}%`}</span>
+	{#if value !== null}
+		<ProgressBar fraction={operation.progress?.fraction ?? null} label={operation.title} class="absolute inset-0 h-auto rounded-none bg-transparent [--progress-color:var(--accent-soft)]" />
+	{/if}
+	<span class="label">
+		{activity(operation)}
+		{#if value === null}
+			<Spinner size={14} class="text-[var(--text-muted)]" />
+		{:else}
+			{value}%
+		{/if}
+	</span>
 	<button type="button" class="cancel" aria-label="Cancel" {@attach tooltip('Cancel')} onclick={() => operations.cancel(operation.id)}>
 		<X size={14} />
 	</button>
@@ -41,7 +50,10 @@
 
 	.label {
 		position: relative;
+		display: flex;
 		flex: 1;
+		align-items: center;
+		gap: 6px;
 		white-space: nowrap;
 		font-variant-numeric: tabular-nums;
 	}

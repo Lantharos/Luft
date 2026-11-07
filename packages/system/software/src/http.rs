@@ -7,7 +7,6 @@ use std::time::Duration;
 use ureq::Agent;
 use ureq::tls::{RootCerts, TlsConfig};
 
-use crate::progress::Stage;
 use crate::task::{CANCELLED, Task};
 
 const USER_AGENT: &str = "Luft Software (https://github.com/Lantharos)";
@@ -53,9 +52,11 @@ pub fn read(response: ureq::http::Response<ureq::Body>) -> Result<String, String
     Ok(body)
 }
 
-pub fn download(url: &str, destination: &Path, task: Task) -> Result<(), String> {
+/// Downloads `url` to `destination`, reporting how much arrived out of the
+/// size the server gives, or `size` when it gives none.
+pub fn download(url: &str, destination: &Path, size: Option<u64>, task: Task) -> Result<(), String> {
     let response = agent().get(url).call().map_err(failure)?;
-    let total = response.body().content_length();
+    let total = response.body().content_length().or(size);
     let mut body = response
         .into_body()
         .into_with_config()
@@ -79,10 +80,7 @@ pub fn download(url: &str, destination: &Path, task: Task) -> Result<(), String>
         file.write_all(&buffer[..read])
             .map_err(|error| error.to_string())?;
         received += read as u64;
-        task.progress(
-            Stage::Downloading,
-            total.map(|total| received as f32 / total.max(1) as f32),
-        );
+        task.downloaded(received, total);
     }
     file.flush().map_err(|error| error.to_string())
 }

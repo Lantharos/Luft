@@ -326,7 +326,7 @@ fn steady(previous: Option<Progress>, next: Progress) -> Progress {
                 (Some(before), Some(now)) => Some(before.max(now)),
                 (before, now) => now.or(before),
             };
-            Progress::new(next.stage, fraction)
+            Progress { fraction, ..next }
         }
         _ => next,
     }

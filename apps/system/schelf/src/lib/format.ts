@@ -1,3 +1,4 @@
+import { bytes } from '@luft/ui';
 import type { InstalledApp, Operation } from '#lib/bindings.js';
 
 export function sourceName({ source, origin, listing }: Pick<InstalledApp, 'source' | 'origin' | 'listing'>) {
@@ -17,9 +18,15 @@ const VERBS: Record<Operation['action'], [string, string]> = {
 
 export function activity(operation: Operation) {
 	const [running, queued] = VERBS[operation.action];
-	if (operation.progress?.stage === 'downloading') return 'Downloading';
 	if (operation.state === 'queued' || operation.progress?.stage === 'waiting') return queued;
+	if (operation.progress?.stage === 'preparing') return 'Getting ready';
+	if (operation.progress?.stage === 'downloading') return 'Downloading';
 	return running;
 }
 
 export const percent = (operation: Operation) => (operation.progress?.fraction == null ? null : Math.round(operation.progress.fraction * 100));
+
+export function transferred(operation: Operation) {
+	const transfer = operation.progress?.stage === 'downloading' ? operation.progress.transfer : null;
+	return transfer ? `${bytes(transfer.done)} of ${bytes(transfer.total)}` : null;
+}

@@ -38,10 +38,18 @@ impl Stage {
     }
 }
 
+/// How many bytes of a download arrived, out of how many.
+#[derive(Serialize, Clone, Copy, PartialEq, Debug, Type)]
+pub struct Transfer {
+    pub done: u64,
+    pub total: u64,
+}
+
 #[derive(Serialize, Clone, Copy, PartialEq, Debug, Type)]
 pub struct Progress {
     pub stage: Stage,
     pub fraction: Option<f32>,
+    pub transfer: Option<Transfer>,
 }
 
 impl Progress {
@@ -49,6 +57,17 @@ impl Progress {
         Self {
             stage,
             fraction: fraction.map(|fraction| fraction.clamp(0.0, 1.0)),
+            transfer: None,
+        }
+    }
+
+    pub fn downloading(done: u64, total: Option<u64>) -> Self {
+        let Some(total) = total else {
+            return Self::new(Stage::Downloading, None);
+        };
+        Self {
+            transfer: Some(Transfer { done, total }),
+            ..Self::new(Stage::Downloading, Some(done as f32 / total.max(1) as f32))
         }
     }
 }

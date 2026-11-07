@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Dialog } from '@luft/ui';
+	import { bytes, Dialog } from '@luft/ui';
 	import type { StoreDetails } from '#lib/bindings.js';
 	import { FULL_ACCESS_ABILITIES } from '#lib/app/fullAccess.js';
 	import { abilities } from '#lib/app/extensionAccess.js';
@@ -18,6 +18,7 @@
 	const access = $derived(store.extension ? abilities(store.extension) : store.access ? describe(store.access) : null);
 	const reason = $derived(store.declared?.unsandboxed);
 	const verb = $derived(updating ? 'Update' : 'Install');
+	const size = $derived(store.size ?? store.download?.size ?? null);
 </script>
 
 {#if access}
@@ -43,6 +44,9 @@
 				</li>
 			{/each}
 		</ul>
+		{#if size}
+			<p class="mt-4 text-[13px] text-[var(--text-muted)]">{bytes(size)} to download</p>
+		{/if}
 		{#snippet actions()}
 			<button type="button" class="button" onclick={onclose}>Cancel</button>
 			<button type="button" class="button primary" onclick={() => onconfirm(false)}>{verb}</button>
@@ -56,6 +60,7 @@
 			: `${store.name} doesn't run in a sandbox, so it can do anything a program you start yourself can, without asking.`}{store.installer === 'appimage' ? ' You can take full access away on its page later.' : ''}"
 		facts={FULL_ACCESS_ABILITIES}
 		confirm="{verb} with full access"
+		note={size ? `${bytes(size)} to download` : undefined}
 		onconfirm={() => onconfirm(true)}
 		{onclose}
 	/>

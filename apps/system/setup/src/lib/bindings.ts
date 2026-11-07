@@ -251,7 +251,7 @@ export type Fingerprints = {
 
 export type Firewall = {
 	networks: GuardedNetwork[],
-	unclassified: string[],
+	unclassified: NewNetwork[],
 	openPorts: OpenPort[],
 };
 
@@ -393,6 +393,11 @@ export type Network = {
 };
 
 export type NetworkType = "home" | "public";
+
+export type NewNetwork = {
+	connection: string,
+	name: string,
+};
 
 export type OpenPort = {
 	port: number,

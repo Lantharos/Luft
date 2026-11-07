@@ -12,19 +12,19 @@ import { appIcon } from '../../appearance/icons/appIcons.js';
 import type { ContextMenus } from '../../desktop/menus/contextMenus.js';
 import { t } from '../../shared/i18n/index.js';
 import { appName } from '../../shared/apps/names.js';
+import { AppHint, appKind } from './appHint.js';
 
 export class StartGrid {
   readonly header = new St.BoxLayout({ style_class: 'kestrel-grid-header' });
   readonly actor = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-app-grid', reactive: true, x_expand: true, y_expand: true });
   private readonly layout = new StartLayout();
   private readonly drag: GridDrag;
+  private readonly hint = new AppHint();
   private readonly results: SearchResults;
   private readonly resultsBox = new St.BoxLayout({ name: 'kestrel-search-results', orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-search-results', x_expand: true, visible: false });
   private catalogDirty = false;
-  private catalog: Gio.AppInfo[] | null = null;
   private readonly buttons = new Map<string, { signature: string; actor: St.Button; draggable: { enabled: boolean } }>();
   private apps = new Map<string, Gio.AppInfo>();
-  private pinned = new Set<string>();
   private searchView: SearchView | null = null;
   private folder: string | null = null;
   private headerKey: string | null = null;
@@ -35,6 +35,7 @@ export class StartGrid {
     this.actor.add_child(this.resultsBox);
     this.results = new SearchResults(menus, actor => this.reveal(actor));
     this.actor.connect('destroy', () => {
+      this.hint.destroy();
       for (const { actor } of this.buttons.values()) if (!actor.get_parent()) actor.destroy();
       this.buttons.clear();
     });
@@ -42,14 +43,11 @@ export class StartGrid {
     this.drag.target(this.actor, source => this.searchView ? null : () => this.layout.move(source.id, this.folder));
   }
 
-  update(apps: Gio.AppInfo[], pinned: Set<string>): void {
-    if (apps !== this.catalog) {
-      this.catalog = apps;
-      this.apps = new Map(apps.map(app => [app.get_id()!, app]));
-      this.layout.sync([...this.apps.keys()]);
-      this.catalogDirty = true;
-    }
-    this.pinned = pinned;
+  update(apps: Gio.AppInfo[]): void {
+    const named = apps.map(app => ({ app, name: appName(app) })).sort((a, b) => a.name.localeCompare(b.name));
+    this.apps = new Map(named.map(({ app }) => [app.get_id()!, app]));
+    this.layout.sync([...this.apps.keys()]);
+    this.catalogDirty = true;
     if (!this.drag.active) this.render();
   }
 
@@ -89,7 +87,7 @@ export class StartGrid {
 
   private visible(id: string): boolean {
     const folder = this.layout.folder(id);
-    return folder ? folder.apps.some(app => this.apps.has(app) && !this.pinned.has(app)) : this.apps.has(id) && !this.pinned.has(id);
+    return folder ? folder.apps.some(app => this.apps.has(app)) : this.apps.has(id);
   }
 
   private render(animate = false, reorder = false): void {
@@ -227,6 +225,8 @@ export class StartGrid {
     content.add_child(name);
     const button = new St.Button({ name: `kestrel-start-item-${id}`, style_class: 'kestrel-app-button', child: content, width: 92, x_expand: true, can_focus: true, track_hover: true, accessible_name: label });
     button.connect('key-focus-in', () => this.reveal(button));
+    const kind = app && appKind(app, label);
+    if (kind) this.hint.bind(button, kind);
     liftIcon(button, icon);
     button.connect('clicked', () => {
       if (this.drag.active) return;

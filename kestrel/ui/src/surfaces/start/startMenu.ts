@@ -1,5 +1,5 @@
 import Clutter from 'gi://Clutter';
-import Gio from 'gi://Gio';
+import type Gio from 'gi://Gio';
 import St from 'gi://St';
 
 import { blurSurface } from '../../shared/layout/surface.js';
@@ -9,7 +9,6 @@ import { SearchEngine, type SearchHost } from '../search/engine.js';
 import { searchField } from '../search/field.js';
 import { watchInstalledApps } from '../search/installedApps.js';
 import { launchApp } from '../search/providers/apps.js';
-import { taskbarPreferences } from '../../desktop/panel/preferences/taskbarPreferences.js';
 import { isControlEnter } from '../../shared/input/keyboardNavigation.js';
 import type { StartArea, StartSurface } from './startSurface.js';
 import { dock, isVertical, toward, type Edge, type Offset } from '../../shared/layout/edge.js';
@@ -24,12 +23,9 @@ export class StartMenu implements StartSurface {
   readonly search: St.Entry;
   readonly footer: StartFooter;
   readonly focusOnTouch = false;
-  private readonly favorites = new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });
-  private pinned = this.readPinned();
   private readonly browser: StartGrid;
   private readonly searchProvider: SearchEngine;
   private readonly close: () => void;
-  private apps: Gio.AppInfo[] = [];
 
   constructor(host: SearchHost) {
     const { menus } = host;
@@ -70,27 +66,14 @@ export class StartMenu implements StartSurface {
     this.footer = new StartFooter(host.close, menus);
     this.actor.add_child(this.footer.actor);
 
-    const pinnedChanged = () => {
-      this.pinned = this.readPinned();
-      this.browser.update(this.apps, this.pinned);
-    };
-    const favoritesChanged = this.favorites.connect('changed::favorite-apps', pinnedChanged);
-    const unwatchTaskbar = taskbarPreferences.watch(key => { if (key === 'taskbar-show-pinned') pinnedChanged(); });
     const unwatchApps = watchInstalledApps(apps => {
-      this.apps = apps;
       this.searchProvider.update(apps);
-      this.browser.update(apps, this.pinned);
+      this.browser.update(apps);
     });
     this.actor.connect('destroy', () => {
       this.searchProvider.destroy();
       unwatchApps();
-      this.favorites.disconnect(favoritesChanged);
-      unwatchTaskbar();
     });
-  }
-
-  private readPinned(): Set<string> {
-    return new Set(taskbarPreferences.showPinned ? this.favorites.get_strv('favorite-apps') : []);
   }
 
   focus(): void {

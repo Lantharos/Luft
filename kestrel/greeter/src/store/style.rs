@@ -15,6 +15,7 @@ pub struct StyleChoice {
     schedule: String,
     window: (f64, f64),
     coordinates: Option<(f64, f64)>,
+    rounded_corners: bool,
 }
 
 impl StyleChoice {
@@ -23,6 +24,7 @@ impl StyleChoice {
         schedule: String,
         window: (f64, f64),
         coordinates: (f64, f64),
+        rounded_corners: bool,
     ) -> Result<Self, Error> {
         let style = Style::parse(style)?;
         let hour = |value: f64| (0.0..=24.0).contains(&value);
@@ -50,7 +52,12 @@ impl StyleChoice {
             schedule,
             window,
             coordinates,
+            rounded_corners,
         })
+    }
+
+    pub fn rounded_corners(&self) -> bool {
+        self.rounded_corners
     }
 
     pub fn now(&self) -> (Style, Option<Duration>) {

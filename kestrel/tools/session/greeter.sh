@@ -38,8 +38,8 @@ cp "${KESTREL_CAPTURE_WALLPAPER:-$run/images/mara-dark-wallpaper.png}" "$run/sta
 cp "$run/images/theo-wallpaper.png" "$run/state/users/2002/wallpaper.jpg"
 cp "$run/images/ines-wallpaper.png" "$run/state/users/2003/wallpaper.jpg"
 hour=$((10#$(date +%H)))
-printf '{"style":"light","schedule":"custom","window":[%d,%d],"coordinates":null}' $(((hour + 23) % 24)) $(((hour + 12) % 24)) > "$run/state/users/2001/style.json"
-printf '{"style":"light","schedule":"off","window":[0,0],"coordinates":null}' > "$run/state/users/2003/style.json"
+printf '{"style":"light","schedule":"custom","window":[%d,%d],"coordinates":null,"roundedCorners":true}' $(((hour + 23) % 24)) $(((hour + 12) % 24)) > "$run/state/users/2001/style.json"
+printf '{"style":"light","schedule":"off","window":[0,0],"coordinates":null,"roundedCorners":false}' > "$run/state/users/2003/style.json"
 printf '[Desktop Entry]\nName=Kestrel\nExec=kestrel-session\nDesktopNames=Kestrel;GNOME\n' > "$run/data/wayland-sessions/kestrel.desktop"
 printf '[Desktop Entry]\nName=Sway\nExec=sway\n' > "$run/data/wayland-sessions/sway.desktop"
 export XDG_DATA_DIRS="$run/data:$XDG_DATA_DIRS"

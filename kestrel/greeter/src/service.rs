@@ -253,6 +253,7 @@ impl Greeter {
         Ok(self.store.save_user_sign_in_method(uid, method)?)
     }
 
+    #[allow(clippy::too_many_arguments)]
     async fn set_style(
         &self,
         #[zbus(connection)] connection: &Connection,
@@ -261,12 +262,13 @@ impl Greeter {
         schedule: String,
         window: (f64, f64),
         coordinates: (f64, f64),
+        rounded_corners: bool,
     ) -> Result<(), Error> {
         let _active = self.idle.hold();
         self.access
             .authorize(connection, &header, SET_APPEARANCE)
             .await?;
-        let style = StyleChoice::new(&style, schedule, window, coordinates)?;
+        let style = StyleChoice::new(&style, schedule, window, coordinates, rounded_corners)?;
         let uid = access::caller_uid(connection, &header).await?;
         let _writing = self.writing.lock().await;
         Ok(self.store.save_user_style(uid, &style)?)
@@ -277,17 +279,18 @@ impl Greeter {
         #[zbus(connection)] connection: &Connection,
         #[zbus(header)] header: Header<'_>,
         uid: u32,
-    ) -> Result<(String, u32), Error> {
+    ) -> Result<(String, u32, bool), Error> {
         let _active = self.idle.hold();
         self.access.authorize_greeter(connection, &header).await?;
-        let (style, change) = self
-            .store
-            .user_style(uid)
-            .map_or((Style::Dark, None), |choice| choice.now());
+        let choice = self.store.user_style(uid);
+        let (style, change) = choice
+            .as_ref()
+            .map_or((Style::Dark, None), StyleChoice::now);
         let seconds = change.map_or(0, |change| {
             u32::try_from(change.as_secs() + 1).expect("changes come within a day")
         });
-        Ok((style.name().into(), seconds))
+        let rounded_corners = choice.as_ref().is_none_or(StyleChoice::rounded_corners);
+        Ok((style.name().into(), seconds, rounded_corners))
     }
 
     async fn set_shared_wallpaper(

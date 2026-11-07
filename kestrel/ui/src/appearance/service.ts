@@ -1,7 +1,7 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import { setSolidSurfaces, setSquareSurfaces } from './kestrelGlass.js';
-import { setSquareCorners } from './kestrelTheme.js';
+import { followCorners } from './corners.js';
+import { setSolidSurfaces } from './kestrelGlass.js';
 
 import { accentColor, fromHex, namedAccent, NEUTRAL, seedFromColor, seedFromSamples, toHex, type Rgb, type Seed } from './color.js';
 import { appearanceCss, appearanceJson, type Appearance } from './exports.js';
@@ -55,6 +55,7 @@ export class AppearanceService {
     if (this.paintTaskbar()) this.emitChanged('Taskbar');
   });
   private readonly unwatchScheme = watchScheme(() => this.update());
+  private readonly unwatchCorners = followCorners(this.settings);
   private wallpaperSeed: Seed | null = null;
   private appearance: Appearance | null = null;
   private taskbar = '{}';
@@ -74,16 +75,8 @@ export class AppearanceService {
       [this.settings, this.settings.connect('changed::accent', () => this.update())],
       [this.settings, this.settings.connect('changed::accent-color', () => this.update())],
       [this.settings, this.settings.connect('changed::theme-apps', () => this.schedulePersist())],
-      [this.settings, this.settings.connect('changed::rounded-window-corners', () => this.followCorners())],
     ];
     setSolidSurfaces(this.PureBlack && isDark());
-    this.followCorners();
-  }
-
-  private followCorners(): void {
-    const square = !this.settings.get_boolean('rounded-window-corners');
-    setSquareSurfaces(square);
-    setSquareCorners(square);
   }
 
   private get palette(): Palette | null {
@@ -214,6 +207,7 @@ export class AppearanceService {
     this.glyphFiles.destroy();
     this.unwatchIcons();
     this.unwatchScheme();
+    this.unwatchCorners();
     Gio.bus_unown_name(this.nameId);
     this.dbus.unexport();
     this.stylesheet.unload();

@@ -26,7 +26,7 @@ export async function checkStyleChange() {
   const now = GLib.DateTime.new_now_local();
   const hour = now.get_hour() + now.get_minute() / 60 + now.get_seconds() / 3600;
   const window = [(hour + 23) % 24, (hour + CHANGE_IN_SECONDS / 3600) % 24];
-  GLib.file_set_contents(stored(THEO, 'style.json').get_path()!, JSON.stringify({style: 'dark', schedule: 'custom', window, coordinates: null}));
+  GLib.file_set_contents(stored(THEO, 'style.json').get_path()!, JSON.stringify({style: 'dark', schedule: 'custom', window, coordinates: null, roundedCorners: true}));
   Gio.File.new_for_path(`${GLib.getenv('KESTREL_GREETER_IMAGES')}/sam-wallpaper.png`).copy(stored(THEO, 'wallpaper-dark.jpg'), Gio.FileCopyFlags.OVERWRITE, null, null);
   const rows = styled('kestrel-greeter-user', existing('kestrel-greeter-users')).filter((row): row is St.Button => row instanceof St.Button && row.mapped);
   click(rows[2]);

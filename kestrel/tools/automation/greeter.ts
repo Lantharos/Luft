@@ -1,4 +1,5 @@
 import {checkControls} from '../checks/greeter/controls.js';
+import {checkCorners} from '../checks/greeter/corners.js';
 import {checkFingerprint} from '../checks/greeter/fingerprint.js';
 import {checkPeople} from '../checks/greeter/people.js';
 import {reportResources} from '../checks/greeter/resources.js';
@@ -13,6 +14,7 @@ export async function run() {
   await checkPeople();
   await checkFingerprint();
   await checkStyleChange();
+  await checkCorners();
   await checkControls();
   await checkSigningIn();
 }

@@ -20,11 +20,13 @@
       <arg name="schedule" type="s" direction="in"/>
       <arg name="window" type="(dd)" direction="in"/>
       <arg name="coordinates" type="(dd)" direction="in"/>
+      <arg name="rounded_corners" type="b" direction="in"/>
     </method>
     <method name="CurrentStyle">
       <arg name="uid" type="u" direction="in"/>
       <arg type="s" direction="out"/>
       <arg type="u" direction="out"/>
+      <arg type="b" direction="out"/>
     </method>
     <method name="SetSharedWallpaper">
       <arg name="wallpaper" type="h" direction="in"/>

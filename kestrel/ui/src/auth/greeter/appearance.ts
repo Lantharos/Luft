@@ -2,6 +2,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import { seedFromSamples, type Rgb } from '../../appearance/color.js';
+import { followCorners } from '../../appearance/corners.js';
 import { buildPalette } from '../../appearance/palette.js';
 import { AccentStylesheet } from '../../appearance/stylesheet.js';
 import { getLoginManager } from '../../session/actions/loginManager.js';
@@ -44,16 +45,18 @@ function focusOf(details: Gio.File): GLib.Variant {
   }
 }
 
-function currentStyle(uid: number): Promise<[style: string, secondsUntilChange: number]> {
+type LoginStyle = [style: string, secondsUntilChange: number, roundedCorners: boolean];
+
+function currentStyle(uid: number): Promise<LoginStyle> {
   return new Promise(resolve => Gio.DBus.system.call(
     'com.lantharos.Greeter1', '/com/lantharos/Greeter1', 'com.lantharos.Greeter1', 'CurrentStyle',
-    new GLib.Variant('(u)', [uid]), new GLib.VariantType('(su)'), Gio.DBusCallFlags.NONE, STYLE_TIMEOUT, null,
+    new GLib.Variant('(u)', [uid]), new GLib.VariantType('(sub)'), Gio.DBusCallFlags.NONE, STYLE_TIMEOUT, null,
     (connection, result) => {
       try {
-        resolve(connection!.call_finish(result).deepUnpack<[string, number]>());
+        resolve(connection!.call_finish(result).deepUnpack<LoginStyle>());
       } catch (error) {
         console.warn(`The login screen style is unknown: ${error}`);
-        resolve(['dark', 0]);
+        resolve(['dark', 0, true]);
       }
     }));
 }
@@ -69,6 +72,7 @@ export class LoginAppearance {
 
   constructor() {
     applyDesktopDefaults();
+    followCorners(this.kestrel);
     getLoginManager().connect('prepare-for-sleep', (_manager, aboutToSuspend) => {
       if (!aboutToSuspend) void this.showWallpaperOf(this.shownUid);
     });
@@ -87,9 +91,12 @@ export class LoginAppearance {
       light: luftDefault(this.background, 'picture-uri'),
       dark: luftDefault(this.background, 'picture-uri-dark'),
     });
-    if (!style) return;
-    const [name, secondsUntilChange] = style;
-    this.showStyle(name);
+    if (!style) {
+      this.kestrel.reset('rounded-window-corners');
+      return;
+    }
+    const [name, secondsUntilChange, roundedCorners] = style;
+    this.showStyle(name, roundedCorners);
     if (secondsUntilChange) this.styleChange = GLib.timeout_add_seconds(GLib.PRIORITY_LOW, secondsUntilChange, () => {
       this.styleChange = 0;
       void this.showWallpaperOf(uid);
@@ -112,9 +119,10 @@ export class LoginAppearance {
     this.background.apply();
   }
 
-  private showStyle(style: string): void {
+  private showStyle(style: string, roundedCorners: boolean): void {
     const scheme = style === 'light' ? 'default' : 'prefer-dark';
     if (this.interfaceSettings.get_string('color-scheme') !== scheme) this.interfaceSettings.set_string('color-scheme', scheme);
+    if (this.kestrel.get_boolean('rounded-window-corners') !== roundedCorners) this.kestrel.set_boolean('rounded-window-corners', roundedCorners);
   }
 
   wallpaperSampled(samples: Rgb[]): void {

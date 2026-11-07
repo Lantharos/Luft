@@ -1,0 +1,11 @@
+[Unit]
+Description=Move Luft to other drives and check what came along and what was left
+After=dbus.service local-fs.target trustd-system-disk.service NetworkManager.service
+ConditionPathExists=/var/lib/luft-move-check/stage
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/luft-move-check
+
+[Install]
+WantedBy=multi-user.target

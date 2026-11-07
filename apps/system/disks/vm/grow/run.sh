@@ -39,7 +39,8 @@ expect_in_log "$vm/prepare.log" luft-grow-check PREPARED
 rm -f "$vm/root.img" "$vm/source.img"
 
 starts() {
-  "$here/boot.py" --vm "$vm" --drive "$vm/drive.img" --log "$vm/$1.log" --passphrase "$passphrase" "${@:2}"
+  "$here/../boot.py" --vm "$vm" --drive "$vm/drive.img" --log "$vm/$1.log" --check luft-grow-check \
+    --passphrase "$passphrase" "${@:2}"
 }
 
 starts installed --cut "trustd Changing Luft's partition: Leave"

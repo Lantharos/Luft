@@ -15,7 +15,8 @@ QEMU OPTIONS are passed on, such as more drives.
   DISK=path         start from another drive, raw unless it ends in .qcow2;
                     DISK= without a path starts with none
   DRIVES="a.img b.qcow2:ro"  attach more drives after DISK, in this order;
-                    :ro attaches one read-only
+                    :ro attaches one read-only, and :nvme, :sata or
+                    :virtio puts one on that bus
   DISK_BUS=nvme     attach the drives as NVMe instead of virtio
   SECOND=64G        add an empty second drive of that size, kept in LUFT_VM
   ISO=luft.iso      also attach a start medium and start from it, with an
@@ -61,18 +62,26 @@ xres="${XRES:-1920}"
 yres="${YRES:-1080}"
 disk="${DISK-$vm/disk.qcow2}"
 drives=()
+sata=0
 
 format_of() {
   if [[ "$1" == *.qcow2 ]]; then echo qcow2; else echo raw; fi
 }
 
 attach() {
-  local file="${1%:ro}" boot="${2:-}" id="drive$((${#drives[@]} / 4))" readonly=""
-  [[ "$1" != *:ro ]] || readonly=",readonly=on"
+  local file="$1" boot="${2:-}" id="drive$((${#drives[@]} / 4))" readonly="" own="$bus"
+  while [[ "$file" =~ :(ro|virtio|nvme|sata)$ ]]; do
+    case "${BASH_REMATCH[1]}" in
+      ro) readonly=",readonly=on" ;;
+      *) own="${BASH_REMATCH[1]}" ;;
+    esac
+    file="${file%:*}"
+  done
   drives+=(-drive "if=none,id=$id,format=$(format_of "$file"),cache=unsafe,discard=unmap,file=$file$readonly")
-  case "$bus" in
+  case "$own" in
     virtio) drives+=(-device "virtio-blk-pci,drive=$id$boot") ;;
     nvme) drives+=(-device "nvme,serial=$id,drive=$id$boot") ;;
+    sata) drives+=(-device "ide-hd,bus=ide.$((sata++)),drive=$id,rotation_rate=1$boot") ;;
   esac
 }
 

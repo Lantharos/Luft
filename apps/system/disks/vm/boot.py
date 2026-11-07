@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Starts the installed drive, types the disk's passphrase whenever the startup shows its prompt, and switches the
+"""Starts the installed drives, types the disk's passphrase whenever the startup shows its prompt, and switches the
 VM off at once the first time the serial console shows CUT, as a power cut would."""
 
 import argparse
@@ -9,20 +9,20 @@ import sys
 import time
 from pathlib import Path
 
-luft = Path(__file__).resolve().parents[5]
+luft = Path(__file__).resolve().parents[4]
 sys.path.insert(0, str(luft / "os" / "vm"))
 from control import Machine, MachineError  # noqa: E402
 
-CHECK = b"luft-grow-check: "
 FIELD = (0.578, 0.73)
 ANSWERED_FOR = 15
 
 
-def boot(vm: Path, drive: Path, log: Path, minutes: int) -> subprocess.Popen:
-    log.unlink(missing_ok=True)
+def boot(arguments) -> subprocess.Popen:
+    arguments.log.unlink(missing_ok=True)
     environment = os.environ | {
-        "DISK": str(drive), "TPM": "0", "NETWORK": "0", "HEADLESS": "1", "MEMORY": "4096",
-        "SERIAL": str(log), "TIMEOUT": str(minutes * 60), "LUFT_VM": str(vm),
+        "DISK": arguments.drive, "DRIVES": arguments.drives, "TPM": arguments.tpm, "NETWORK": "0",
+        "HEADLESS": "1", "MEMORY": "4096", "SERIAL": str(arguments.log), "TIMEOUT": str(arguments.minutes * 60),
+        "LUFT_VM": str(arguments.vm),
     }
     return subprocess.Popen([str(luft / "os" / "vm" / "qemu.sh")], env=environment)
 
@@ -37,14 +37,18 @@ def asking(machine: Machine) -> bool:
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--vm", type=Path, required=True)
-    parser.add_argument("--drive", type=Path, required=True)
+    parser.add_argument("--drive", default="", help="the drive to start from, as qemu.sh's DISK")
+    parser.add_argument("--drives", default="", help="more drives, as qemu.sh's DRIVES")
+    parser.add_argument("--tpm", default="0", help="as qemu.sh's TPM")
     parser.add_argument("--log", type=Path, required=True)
+    parser.add_argument("--check", required=True, help="the prefix the check's lines start with")
     parser.add_argument("--passphrase", required=True)
     parser.add_argument("--cut", default="", help="switch off the first time this shows up on the console")
     parser.add_argument("--minutes", type=int, default=60)
     arguments = parser.parse_args()
 
-    qemu = boot(arguments.vm, arguments.drive, arguments.log, arguments.minutes)
+    check = f"{arguments.check}: ".encode()
+    qemu = boot(arguments)
     machine = None
     answered = 0.0
     seen = 0
@@ -53,17 +57,17 @@ def main():
         time.sleep(2)
         text = arguments.log.read_bytes() if arguments.log.exists() else b""
         for line in text[seen:].splitlines(keepends=True):
-            if line.endswith(b"\n") and CHECK in line:
-                print(line[line.index(CHECK):].decode(errors="replace").rstrip(), flush=True)
+            if line.endswith(b"\n") and check in line:
+                print(line[line.index(check):].decode(errors="replace").rstrip(), flush=True)
         seen = text.rfind(b"\n") + 1
         try:
             machine = machine or Machine(arguments.vm, seconds=30)
             if cut and cut in text:
-                print(f"luft-grow-check: cutting the power at “{arguments.cut}”", flush=True)
+                print(f"{arguments.check}: cutting the power at “{arguments.cut}”", flush=True)
                 machine.qmp("quit")
                 cut = b""
             elif time.monotonic() - answered > ANSWERED_FOR and asking(machine):
-                print("luft-grow-check: typing the passphrase at the startup's prompt", flush=True)
+                print(f"{arguments.check}: typing the passphrase at the startup's prompt", flush=True)
                 machine.type(arguments.passphrase)
                 machine.press("ret")
                 answered = time.monotonic()

@@ -55,7 +55,7 @@ boot_root_drive() {
   rm -f "$log"
   DISK="$vm/root.img" KERNEL="$vm/vmlinuz" INITRD="$vm/initramfs.img" \
     APPEND="root=LABEL=luft-check-root rw console=ttyS0 ${SELINUX:-selinux=0} systemd.unit=multi-user.target ${APPEND:-}" \
-    TPM=0 NETWORK=0 HEADLESS=1 MEMORY="${MEMORY:-6144}" SERIAL="$log" TIMEOUT=$((minutes * 60)) LUFT_VM="$vm" \
+    TPM="${TPM:-0}" NETWORK=0 HEADLESS=1 MEMORY="${MEMORY:-6144}" SERIAL="$log" TIMEOUT=$((minutes * 60)) LUFT_VM="$vm" \
     "$luft/os/vm/qemu.sh" -no-reboot "$@" || true
 }
 

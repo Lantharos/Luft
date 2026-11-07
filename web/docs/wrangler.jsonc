@@ -1,6 +1,7 @@
 {
 	"$schema": "./node_modules/wrangler/config-schema.json",
 	"name": "luft-docs",
+	"account_id": "2e3bfcbc9512a7ab1ea3a9cb9a474b30",
 	"compatibility_date": "2026-10-17",
 	"routes": [{ "pattern": "docs.luft.computer", "custom_domain": true }],
 	"assets": {

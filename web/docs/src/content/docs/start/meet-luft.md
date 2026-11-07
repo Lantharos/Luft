@@ -41,6 +41,8 @@ Meet Luft asks Windows for administrator rights once, when it first looks at the
 
 Meet Luft for Linux repartitions nothing. It keeps Luft as files in a folder, `/home/.luft-meet` on the drive with your home folder, and adds a small start entry called *Meet Luft* next to your system's own boot files. The folder has to be on ext4, btrfs or XFS on a plain partition: Luft can't start from an encrypted drive, LVM or RAID yet, and Meet Luft tells you when that's the case.
 
+Opened on a computer that already runs Luft, Meet Luft doesn't set anything up. It offers to give Luft more space in Disks, to look for the newest Luft in Settings, or to make a USB stick.
+
 It asks for your password once, when it first looks at the computer. When Luft is ready, there are three ways in:
 
 - **Try Luft** opens the desktop.
@@ -51,7 +53,7 @@ It asks for your password once, when it first looks at the computer. When Luft i
 
 When you open Meet Luft on a PC that has Luft, it shows **Your Luft**:
 
-- **Change how much space Luft has** gives Luft more of Windows' space, or gives some back. Windows makes itself smaller right away; Luft moves into the space the next time it starts and takes a few minutes, while you can keep using it. To give space back, Luft moves its files first, then Meet Luft hands the space to Windows when you open it again. Luft needs some free room to move. An encrypted Luft moves with its own keys, so you won't need the recovery key; one that opens only with a passphrase can't move by itself. When Luft has a drive of its own, it can take the free space right after it, or leave some of it free.
+- **Change how much space Luft has** gives Luft more of Windows' space, or gives some back. Free space right before or after Luft always goes to Luft first, so Windows only gives what's missing, and when that's enough Windows doesn't change at all. Otherwise Windows makes itself smaller right away; Luft moves into the space the next time it starts and takes a few minutes, while you can keep using it. To give space back, Luft moves its files first, then Meet Luft hands the space to Windows when you open it again. Luft needs some free room to move. An encrypted Luft moves with its own keys, so you won't need the recovery key; one that opens only with a passphrase can't move by itself. When Luft has a drive of its own, or another partition sits between it and Windows, it can take all the free space right before and after it, or become smaller.
 - **Give Windows the free space** extends Windows into unused space right after it.
 - **Remove Luft from this PC** deletes Luft, its start files and its start entry, and gives Windows the space back. It asks first, and doesn't need a recovery key even when Luft is encrypted.
 

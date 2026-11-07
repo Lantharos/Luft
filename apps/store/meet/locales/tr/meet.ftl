@@ -177,7 +177,6 @@ luft-description-drive = Luft, { $drive } diskinde yüklü.
 luft-bar-used = { $size }, { $used } kullanılıyor
 luft-resize-title = Luft’un alanını değiştir
 luft-resize-description = Luft’a Windows’un alanından daha fazlasını verin ya da bir kısmını Windows’a geri verin.
-luft-resize-drive-description = Luft’a { $drive } diskindeki boş alandan daha fazlasını verin ya da bir kısmını boş bırakın.
 luft-resize-passphrase = Luft’un diski yalnızca disk parolasıyla açılıyor ve Luft taşınırken bu parolayı kendisi yazamaz.
 luft-resize-start-first = Meet Luft’a ne kadar dolu olduğunu bildirebilmesi için Luft’u bir kez başlatın, sonra geri gelin.
 luft-resize-apart = Windows ile Luft arasında başka bir bölüm var, bu yüzden alanlarını paylaşamazlar.

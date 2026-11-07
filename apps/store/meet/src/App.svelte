@@ -18,11 +18,13 @@
 	import Room from '#lib/steps/prepare/Room.svelte';
 	import Check from '#lib/steps/start/Check.svelte';
 	import Hello from '#lib/steps/start/Hello.svelte';
+	import OnLuft from '#lib/steps/start/OnLuft.svelte';
 	import Stick from '#lib/steps/stick/Stick.svelte';
 	import StickDone from '#lib/steps/stick/StickDone.svelte';
 
 	const STEPS = {
 		hello: Hello,
+		onLuft: OnLuft,
 		luft: YourLuft,
 		resize: Resize,
 		check: Check,
@@ -50,6 +52,9 @@
 
 	onMount(() => {
 		const stops = [session.listen()];
+		void meet.onLuft().then((onLuft) => {
+			if (onLuft && session.step === 'hello') session.go('onLuft');
+		});
 		void meet.installed().then((installed) => {
 			if (installed && session.step === 'hello') void luft.open();
 		});

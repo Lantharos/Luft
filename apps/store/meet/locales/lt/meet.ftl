@@ -177,7 +177,6 @@ luft-description-drive = Luft įdiegta diske { $drive }.
 luft-bar-used = { $size }, naudojama { $used }
 luft-resize-title = Keisti Luft skirtą vietą
 luft-resize-description = Skirkite sistemai Luft daugiau Windows vietos arba dalį grąžinkite sistemai Windows.
-luft-resize-drive-description = Skirkite sistemai Luft daugiau laisvos vietos diske { $drive } arba dalį jos palikite laisvą.
 luft-resize-passphrase = Luft diską galima atrakinti tik slaptafraze, o Luft pati jos įvesti negali, kol persikelia.
 luft-resize-start-first = Vieną kartą paleiskite Luft, kad ji galėtų pranešti programai Meet Luft, kiek yra užpildyta, tada grįžkite.
 luft-resize-apart = Tarp Windows ir Luft yra kitas skaidinys, todėl jos negali dalytis vieta.

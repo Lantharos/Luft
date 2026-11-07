@@ -177,7 +177,6 @@ luft-description-drive = Luft huwa installat fuq { $drive }.
 luft-bar-used = { $size }, { $used } użati
 luft-resize-title = Ibdel kemm għandu spazju Luft
 luft-resize-description = Agħti lil Luft aktar mill-ispazju ta’ Windows, jew agħti ftit lura lil Windows.
-luft-resize-drive-description = Agħti lil Luft aktar mill-ispazju ħieles fuq { $drive }, jew ħalli ftit minnu ħieles.
 luft-resize-passphrase = Id-drajv ta’ Luft jinfetaħ biss b’passphrase, u Luft ma jistax jiktibha hu stess waqt li jiċċaqlaq.
 luft-resize-start-first = Ħaddem lil Luft darba, biex ikun jista’ jgħid lil Meet Luft kemm hu mimli, u mbagħad erġa’ lura.
 luft-resize-apart = Hemm partizzjoni oħra bejn Windows u Luft, għalhekk ma jistgħux jaqsmu l-ispazju tagħhom.

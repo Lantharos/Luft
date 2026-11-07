@@ -163,7 +163,6 @@ luft-description-drive = Luft este instalat pe { $drive }.
 luft-bar-used = { $size }, { $used } ocupați
 luft-resize-title = Modifică spațiul sistemului Luft
 luft-resize-description = Oferiți sistemului Luft mai mult din spațiul Windows sau redați o parte sistemului Windows.
-luft-resize-drive-description = Oferiți sistemului Luft mai mult din spațiul liber de pe { $drive } sau lăsați o parte din el liberă.
 luft-resize-passphrase = Unitatea sistemului Luft se deschide doar cu o frază de acces, iar Luft nu o poate introduce singur cât timp se mută.
 luft-resize-start-first = Porniți Luft o dată, ca să-i poată spune aplicației Meet Luft cât de plin este, apoi reveniți.
 luft-resize-apart = Între Windows și Luft se află altă partiție, așa că nu își pot împărți spațiul.

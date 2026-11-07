@@ -31,9 +31,14 @@
 	let installed = $derived(luft.installed);
 	let pending = $derived(installed?.pending ?? null);
 	let held = $derived(installed?.blocked && installed.blocked !== 'busy' ? HELD[installed.blocked] : null);
-	let resizing = $derived(
-		!installed ? '' : installed.besideWindows ? t('luft-resize-description') : t('luft-resize-drive-description', { drive: installed.drive })
-	);
+	let free = $derived(installed ? installed.freeBefore + installed.freeAfter : 0);
+	let resizing = $derived.by(() => {
+		if (!installed) return '';
+		if (installed.besideWindows) return free >= GIB ? t('luft-resize-free-description', { size: bytes(free) }) : t('luft-resize-description');
+		return free >= GIB
+			? t('luft-resize-drive-free-description', { size: bytes(free), drive: installed.drive })
+			: t('luft-resize-drive-trim-description', { drive: installed.drive });
+	});
 
 	let description = $derived(
 		!installed ? t('luft-looking') : installed.besideWindows ? t('luft-description-beside') : t('luft-description-drive', { drive: installed.drive })

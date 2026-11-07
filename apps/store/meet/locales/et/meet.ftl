@@ -183,7 +183,6 @@ luft-description-drive = Luft on installitud kettale { $drive }.
 luft-bar-used = { $size }, kasutusel { $used }
 luft-resize-title = Muuda Lufti ruumi suurust
 luft-resize-description = Anna Luftile rohkem Windowsi ruumi või anna osa Windowsile tagasi.
-luft-resize-drive-description = Anna Luftile rohkem vaba ruumi kettal { $drive } või jäta osa sellest vabaks.
 luft-resize-passphrase = Lufti ketas avaneb ainult paroolifraasiga ja Luft ei saa seda kolimise ajal ise sisestada.
 luft-resize-start-first = Käivita Luft üks kord, et see saaks Meet Luftile öelda, kui täis see on, ja tule siis tagasi.
 luft-resize-apart = Windowsi ja Lufti vahel on teine partitsioon, nii et nad ei saa oma ruumi jagada.

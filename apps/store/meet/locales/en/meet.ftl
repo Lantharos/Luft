@@ -58,6 +58,7 @@ problem-luft = Meet Luft couldn’t look at Luft’s drive.
 problem-resize = Changing Luft’s size didn’t finish.
 problem-cancel = Meet Luft couldn’t call off the change.
 problem-give = Windows couldn’t take the space back.
+problem-open = Meet Luft couldn’t open that.
 # Shown when the permission prompt was turned down
 problem-declined = { $platform ->
     [linux] Meet Luft needs your permission to work on the drive. Enter your password when it asks.
@@ -214,7 +215,10 @@ luft-bar-used = { $size }, { $used } used
 luft-resize-title = Change how much space Luft has
 luft-resize-description = Give Luft more of Windows’ space, or give some back to Windows.
 # $drive is the name of a drive, like "Samsung SSD 990 PRO"
-luft-resize-drive-description = Give Luft more of the free space on { $drive }, or leave some of it free.
+luft-resize-drive-free-description = Give Luft the { $size } of free space next to it on { $drive }, or make it smaller.
+# $drive is the name of a drive, like "Samsung SSD 990 PRO"
+luft-resize-drive-trim-description = Make Luft smaller and leave the space free on { $drive }.
+luft-resize-free-description = { $size } of free space next to Luft can go to it, and Windows can give it more.
 luft-resize-passphrase = Luft’s drive opens only with a passphrase, and Luft can’t type it for itself while it moves.
 luft-resize-start-first = Start Luft once, so it can tell Meet Luft how full it is, then come back.
 luft-resize-apart = Another partition sits between Windows and Luft, so they can’t share their space.
@@ -253,12 +257,17 @@ resize-drive-description = Drag to choose how much of { $drive } Luft takes. Luf
 resize-drive-free = { $size } free on { $drive }
 resize-used = Luft’s files take up { $size }.
 resize-least = Change it by at least { $size }.
+resize-free-first = The { $size } of free space next to Luft goes to it first.
 # Button, verb
 resize-apply = Change it
 resize-grow-title = Give Luft { $size } more?
 resize-grow-description = Windows makes itself smaller right away. Luft moves into the new space the next time it starts, which takes a few minutes. Keep the PC plugged in.
+resize-grow-free-description = Luft moves into the free space next to it the next time it starts, which takes a few minutes. Windows stays as it is. Keep the PC plugged in.
+resize-grow-in-place-description = Luft takes the free space right after it the next time it starts, which takes a moment. Windows stays as it is.
 # $drive is the name of a drive
 resize-grow-drive-description = Luft takes the free space on { $drive } the next time it starts, which takes a moment.
+# $drive is the name of a drive
+resize-grow-drive-move-description = Luft moves into the free space next to it on { $drive } the next time it starts, which takes a few minutes. Keep the PC plugged in.
 resize-trim-title = Make Luft { $size } smaller?
 # $drive is the name of a drive
 resize-trim-description = Luft makes itself smaller the next time it starts, and the space stays free on { $drive }.
@@ -389,3 +398,12 @@ stick-done-ventoy-key = With Secure Boot on, Ventoy asks once to enroll its own 
 stick-done = Done
 # Button that makes one more stick
 stick-done-another = Make another
+
+## Meet Luft started on Luft itself
+
+on-luft-title = You’re already on Luft
+on-luft-description = Meet Luft gets other computers ready for Luft. This one is ready, and Luft looks after itself here.
+on-luft-space-title = Give Luft more space
+on-luft-space-description = Disks shows the free space on this computer’s drives and gives what’s next to Luft to it.
+on-luft-updates-title = Get the newest Luft
+on-luft-updates-description = Settings looks for updates under System and installs them while you keep working.

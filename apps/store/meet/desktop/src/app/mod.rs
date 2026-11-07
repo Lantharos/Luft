@@ -1,5 +1,6 @@
 pub mod calls;
 pub mod job;
+mod on_luft;
 mod stick;
 
 use std::sync::{Arc, OnceLock};
@@ -20,6 +21,7 @@ use crate::stick::copy::Room;
 #[cfg(windows)]
 use crate::windows::app as platform;
 use job::Jobs;
+use on_luft::OnLuft;
 
 const APP_ID: &str = "com.lantharos.meet";
 pub const TITLE: &str = "Meet Luft";
@@ -104,6 +106,7 @@ fn window(window: SabineWindow, events: &Events) -> SabineWindow {
         .job("meet_stick_offer", |_, sourced| stick::offer(sourced))
         .job("meet_make_stick", stick::make)
         .job("meet_pick_iso", |_, Empty {}| Ok(platform::pick_iso()))
+        .on_luft()
         .window()
 }
 

@@ -177,7 +177,6 @@ luft-description-drive = Luft е инсталиран на { $drive }.
 luft-bar-used = { $size }, използвани { $used }
 luft-resize-title = Промяна на мястото за Luft
 luft-resize-description = Дайте на Luft още от мястото на Windows или върнете част от него на Windows.
-luft-resize-drive-description = Дайте на Luft още от свободното място на { $drive } или оставете част от него свободна.
 luft-resize-passphrase = Дискът на Luft се отваря само с парола за диска, а Luft не може сам да я въведе, докато се премества.
 luft-resize-start-first = Стартирайте Luft веднъж, за да може да каже на Meet Luft колко е запълнен, след което се върнете тук.
 luft-resize-apart = Между Windows и Luft има друг дял, затова те не могат да делят мястото си.

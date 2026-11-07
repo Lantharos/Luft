@@ -6,7 +6,6 @@ use super::request;
 use crate::L10N;
 use crate::boot::entries;
 use crate::boot::load_option;
-use crate::plan::sizes::align_up;
 use crate::protocol::Stage;
 use crate::protocol::answers::{Installed, Range};
 use crate::serving::Context;
@@ -25,13 +24,18 @@ fn measured() -> Result<Survey, String> {
     survey(Measure::WhatWindowsCanSpare)?.ok_or_else(|| t!(L10N, "luft-gone"))
 }
 
-pub fn range() -> Result<Option<Range>, String> {
-    let quick = found()?;
-    let survey = if quick.beside_windows() {
-        measured()?
-    } else {
+fn sized(quick: Survey) -> Survey {
+    if !quick.next_to_windows() {
+        return quick;
+    }
+    measured().unwrap_or_else(|error| {
+        eprintln!("Windows didn't say how far it can shrink, so it keeps its size: {error}");
         quick
-    };
+    })
+}
+
+pub fn range() -> Result<Option<Range>, String> {
+    let survey = sized(found()?);
     Ok(survey
         .range()
         .filter(|_| survey.describe().blocked.is_none()))
@@ -54,49 +58,46 @@ pub fn details() -> Result<Option<Installed>, String> {
         return Ok(None);
     };
     forget_what_is_gone(&survey)?;
+    if survey.pending() != Some(Change::Grow) {
+        record::windows_gave_luft(None)?;
+    }
     Ok(Some(survey.describe()))
 }
 
 pub fn resize(context: &Context, size: u64) -> Result<Installed, String> {
     let quick = found()?;
     let current = quick.luft.root.size;
-    let survey = if size > current && quick.beside_windows() {
-        measured()?
-    } else {
-        quick
-    };
+    let survey = if size > current { sized(quick) } else { quick };
     let range = survey
         .range()
         .filter(|_| survey.describe().blocked.is_none());
     let Some(range) = range else {
         return Err(t!(L10N, "luft-not-resizable"));
     };
-    let gap = survey.gap().unwrap_or(0);
     if !range.allows(current, size) {
         return Err(t!(L10N, "luft-size-not-allowed"));
     }
-    let change = if !survey.beside_windows() {
-        if size > current {
-            Change::Grow
-        } else {
-            Change::Trim {
-                bytes: current - size,
-            }
-        }
-    } else if size > current {
-        let taken = align_up((size - current).saturating_sub(gap));
-        if taken > 0 {
-            context.progress(Stage::Shrinking, 0, 1);
-            survey.storage.resize(
-                &survey.layout.windows,
-                survey.windows.partition.size - taken,
-            )?;
-            context.progress(Stage::Shrinking, 1, 1);
-        }
-        Change::Grow
-    } else {
-        Change::Shrink {
+    let geometry = survey.geometry();
+    let change = match &geometry {
+        None if size > current => Change::Grow,
+        None => Change::Trim {
             bytes: current - size,
+        },
+        Some(_) if size < current => Change::Shrink {
+            bytes: current - size,
+        },
+        Some(geometry) => {
+            let taken = geometry.taken(size - current);
+            if taken > 0 {
+                context.progress(Stage::Shrinking, 0, 1);
+                survey.storage.resize(
+                    &survey.layout.windows,
+                    survey.windows.partition.size - taken,
+                )?;
+                context.progress(Stage::Shrinking, 1, 1);
+            }
+            record::windows_gave_luft((taken > 0).then_some(taken))?;
+            Change::Grow
         }
     };
     request::write(&Request {
@@ -110,21 +111,27 @@ pub fn cancel() -> Result<Installed, String> {
     let survey = found()?;
     let pending = survey.pending();
     request::clear()?;
-    if pending == Some(Change::Grow) {
-        extend_windows(&survey)?;
+    let given = Made::read().given_to_luft;
+    if let (Some(Change::Grow), Some(bytes)) = (pending, given) {
+        extend_windows_by(&survey, bytes)?;
     }
+    record::windows_gave_luft(None)?;
     Ok(found()?.describe())
 }
 
-pub fn extend_windows(survey: &Survey) -> Result<(), String> {
+fn extend_windows_by(survey: &Survey, most: u64) -> Result<(), String> {
     let layout = survey.storage.layout(&windows_drive::find()?.volume)?;
-    let free = layout.free_after_windows();
+    let free = layout.free_after_windows().min(most);
     if free > 0 {
         survey
             .storage
             .resize(&layout.windows, layout.windows.Size + free)?;
     }
     Ok(())
+}
+
+pub fn extend_windows(survey: &Survey) -> Result<(), String> {
+    extend_windows_by(survey, u64::MAX)
 }
 
 pub fn give_windows() -> Result<Installed, String> {

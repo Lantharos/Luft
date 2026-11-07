@@ -157,7 +157,6 @@ luft-description-drive = Tá Luft suiteáilte ar { $drive }.
 luft-bar-used = { $size }, { $used } in úsáid
 luft-resize-title = Athraigh an méid spáis atá ag Luft
 luft-resize-description = Tabhair níos mó de spás Windows do Luft, nó tabhair cuid de ar ais do Windows.
-luft-resize-drive-description = Tabhair níos mó den spás saor ar { $drive } do Luft, nó fág cuid de saor.
 luft-resize-passphrase = Ní osclaítear tiomántán Luft ach le frása faire, agus ní féidir le Luft é a chlóscríobh dó féin agus é ag bogadh.
 luft-resize-start-first = Tosaigh Luft uair amháin, ionas gur féidir leis a insint do Meet Luft cé chomh lán atá sé, agus ansin fill ar ais.
 luft-resize-apart = Tá deighilt eile idir Windows agus Luft, mar sin ní féidir leo a spás a roinnt.

@@ -177,7 +177,6 @@ luft-description-drive = Luft je nameščen na disku { $drive }.
 luft-bar-used = { $size }, zasedeno: { $used }
 luft-resize-title = Spremeni, koliko prostora ima Luft
 luft-resize-description = Luftu namenite več prostora sistema Windows ali pa ga nekaj vrnite sistemu Windows.
-luft-resize-drive-description = Luftu namenite več prostega prostora na disku { $drive } ali pa ga nekaj pustite prostega.
 luft-resize-passphrase = Luftov disk se odpre le s šifrirnim geslom, ki ga Luft med premikanjem ne more vnesti sam.
 luft-resize-start-first = Enkrat zaženite Luft, da lahko aplikaciji Meet Luft sporoči, kako poln je, nato se vrnite sem.
 luft-resize-apart = Med sistemom Windows in Luftom je druga particija, zato si prostora ne moreta deliti.

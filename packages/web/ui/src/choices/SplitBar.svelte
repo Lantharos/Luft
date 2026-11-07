@@ -6,6 +6,7 @@
 		total: number;
 		used: number;
 		free?: number;
+		unclaimed?: number;
 		value: number;
 		min: number;
 		max: number;
@@ -13,14 +14,15 @@
 		onchange: (value: number) => void;
 	}
 
-	let { total, used, free = 0, value, min, max, step, onchange }: Props = $props();
+	let { total, used, free = 0, unclaimed = 0, value, min, max, step, onchange }: Props = $props();
 
 	let track = $state<HTMLDivElement>();
 	let dragging = $state(false);
 
 	let kept = $derived(total - value);
+	let windows = $derived(kept - unclaimed);
 	let split = $derived((kept / total) * 100);
-	let windowsSize = $derived(t('ui-split-windows-size', { size: bytes(kept), used: bytes(used) }));
+	let windowsSize = $derived(t('ui-split-windows-size', { size: bytes(windows), used: bytes(used) }));
 
 	function clamp(size: number) {
 		return Math.min(max, Math.max(min, Math.round(size / step) * step));
@@ -65,9 +67,12 @@
 		onpointercancel={() => (dragging = false)}
 		onkeydown={keydown}
 	>
-		<div class="windows" style:width="{split}%">
-			<div class="used" style:width="{(used / kept) * 100}%"></div>
+		<div class="windows" style:width="{(windows / total) * 100}%">
+			<div class="used" style:width="{(used / windows) * 100}%"></div>
 		</div>
+		{#if unclaimed > 0}
+			<div class="unclaimed" style:width="{(unclaimed / total) * 100}%"></div>
+		{/if}
 		<div class="handle" style:left="{split}%"></div>
 		<div class="luft">
 			{#if free > 0}
@@ -115,6 +120,12 @@
 		justify-content: flex-end;
 		background: var(--accent);
 		opacity: 0.85;
+	}
+
+	.unclaimed {
+		flex: none;
+		border: 1.5px dashed var(--text-muted);
+		border-radius: 16px;
 	}
 
 	.free {

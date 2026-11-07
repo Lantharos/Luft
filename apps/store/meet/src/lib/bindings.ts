@@ -19,6 +19,10 @@ export const commands = {
 		stick: string,
 		way: Way,
 	}, options?: CallOptions) => invoke<Outcome<Finished>>("meet_make_stick", params, options),
+	meetOnLuft: (options?: CallOptions) => invoke<Outcome<boolean>>("meet_on_luft", {}, options),
+	meetOpenOnLuft: (params: {
+		page: LuftPage,
+	}, options?: CallOptions) => invoke<Outcome<null>>("meet_open_on_luft", params, options),
 	meetPack: (params: {
 		folders?: ChosenFolder[],
 		wallpaper?: string | null,
@@ -167,6 +171,7 @@ export type Installed = {
 	besideWindows: boolean,
 	size: number,
 	allocated: number | null,
+	freeBefore: number,
 	freeAfter: number,
 	windowsSize: number,
 	windowsUsed: number,
@@ -205,6 +210,8 @@ export type Locale = {
 	formats: string,
 	fixed: boolean,
 };
+
+export type LuftPage = "space" | "updates";
 
 export type Machine = {
 	architecture: Architecture,
@@ -260,6 +267,8 @@ export type Progress = {
 export type Range = {
 	smallest: number,
 	most: number,
+	free: number,
+	freeAlone: boolean,
 	leastGrow: number,
 	leastShrink: number,
 };

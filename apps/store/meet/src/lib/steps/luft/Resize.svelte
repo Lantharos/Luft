@@ -14,25 +14,44 @@
 	let current = $derived(installed.size);
 	let growing = $derived(luft.size > current);
 	let change = $derived(Math.abs(luft.size - current));
+	let nearby = $derived(installed.freeBefore + installed.freeAfter);
+	let fitsFree = $derived(!!range && growing && range.freeAlone && change === range.free);
 	let least = $derived(range ? (growing ? range.leastGrow : range.leastShrink) : 0);
-	let allowed = $derived(!!range && change > 0 && change >= least);
+	let allowed = $derived(!!range && change > 0 && (fitsFree || change >= least));
 
 	let beside = $derived(installed.besideWindows);
 	let drive = $derived(installed.drive);
-	let free = $derived(Math.max(0, current + installed.freeAfter - luft.size));
+	let fromFree = $derived(growing ? Math.min(nearby, change) : 0);
+	let unclaimed = $derived(growing ? Math.max(0, nearby - change) : nearby + change);
+	let free = $derived(Math.max(0, current + nearby - luft.size));
 
 	let confirmTitle = $derived(
 		growing ? t('resize-grow-title', { size: bytes(change) }) : beside ? t('resize-shrink-title', { size: bytes(change) }) : t('resize-trim-title', { size: bytes(change) })
 	);
 	let confirmDescription = $derived.by(() => {
-		if (beside) return growing ? t('resize-grow-description') : t('resize-shrink-description');
-		return growing ? t('resize-grow-drive-description', { drive }) : t('resize-trim-description', { drive });
+		if (beside && growing) {
+			if (change > nearby) return t('resize-grow-description');
+			return installed.freeBefore > 0 ? t('resize-grow-free-description') : t('resize-grow-in-place-description');
+		}
+		if (beside) return t('resize-shrink-description');
+		if (growing) return installed.freeBefore > 0 ? t('resize-grow-drive-move-description', { drive }) : t('resize-grow-drive-description', { drive });
+		return t('resize-trim-description', { drive });
 	});
 
 	let note = $derived.by(() => {
-		if (change > 0 && change < least) return t('resize-least', { size: bytes(least) });
+		if (change > 0 && !allowed) return t('resize-least', { size: bytes(range?.freeAlone && growing ? range.free : least) });
+		if (growing && nearby > 0) return t('resize-free-first', { size: bytes(nearby) });
 		return installed.allocated === null ? '' : t('resize-used', { size: bytes(installed.allocated) });
 	});
+
+	function choose(next: number) {
+		if (!range || next <= current || next - current >= range.leastGrow) {
+			luft.size = next;
+			return;
+		}
+		const choices = [current, ...(range.freeAlone ? [current + range.free] : []), ...(current + range.leastGrow <= range.most ? [current + range.leastGrow] : [])];
+		luft.size = choices.reduce((best, choice) => (Math.abs(choice - next) < Math.abs(best - next) ? choice : best));
+	}
 
 	function apply() {
 		confirming = false;
@@ -54,7 +73,7 @@
 				step={GIB}
 				label={t('resize-title')}
 				format={bytes}
-				onchange={(next) => (luft.size = next)}
+				onchange={choose}
 			/>
 			<div class="flex justify-between text-[13.5px]">
 				<span><span class="font-semibold">Luft</span> <span class="text-[var(--text-soft)]">{bytes(luft.size)}</span></span>
@@ -65,13 +84,15 @@
 	{:else if range}
 		<div class="flex flex-col gap-6">
 			<SplitBar
-				total={installed.windowsSize + installed.windowsFree + current}
+				total={installed.windowsSize + nearby + current}
 				used={installed.windowsUsed}
+				free={fromFree}
+				{unclaimed}
 				value={luft.size}
 				min={range.smallest}
 				max={range.most}
 				step={GIB}
-				onchange={(next) => (luft.size = next)}
+				onchange={choose}
 			/>
 			<p class="text-[13.5px] leading-relaxed text-[var(--text-soft)]">{note}</p>
 		</div>

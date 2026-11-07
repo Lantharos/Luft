@@ -4,7 +4,7 @@ import { commands, events, type Action, type Channel, type Intent, type PlaceKin
 import * as meet from '#lib/bridge/meet.js';
 import type { Packing } from '#lib/bridge/meet.js';
 
-export type Step = 'hello' | 'luft' | 'resize' | 'check' | 'room' | 'working' | 'ready' | 'box' | 'removed' | 'stick' | 'stickDone';
+export type Step = 'hello' | 'onLuft' | 'luft' | 'resize' | 'check' | 'room' | 'working' | 'ready' | 'box' | 'removed' | 'stick' | 'stickDone';
 export type Task =
 	| 'check'
 	| 'room'
@@ -22,7 +22,8 @@ export type Task =
 	| 'luft'
 	| 'resize'
 	| 'cancel'
-	| 'give';
+	| 'give'
+	| 'open';
 
 export interface Failure {
 	task: Task;
@@ -31,7 +32,7 @@ export interface Failure {
 	retry: () => unknown;
 }
 
-const ORDER: Step[] = ['hello', 'luft', 'resize', 'check', 'room', 'working', 'ready', 'box', 'stick', 'stickDone', 'removed'];
+const ORDER: Step[] = ['hello', 'onLuft', 'luft', 'resize', 'check', 'room', 'working', 'ready', 'box', 'stick', 'stickDone', 'removed'];
 const GIB = 1024 ** 3;
 const SHARE = 0.4;
 const NOTE_SHOWN = 6000;

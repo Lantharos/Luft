@@ -179,7 +179,6 @@ luft-description-drive = Luft är installerat på { $drive }.
 luft-bar-used = { $size }, { $used } används
 luft-resize-title = Ändra hur mycket utrymme Luft har
 luft-resize-description = Ge Luft mer av utrymmet från Windows, eller ge tillbaka en del till Windows.
-luft-resize-drive-description = Ge Luft mer av det lediga utrymmet på { $drive }, eller lämna en del av det ledigt.
 luft-resize-passphrase = Lufts disk kan bara låsas upp med en lösenfras, och Luft kan inte skriva in den själv medan det flyttar.
 luft-resize-start-first = Starta Luft en gång så att det kan berätta för Meet Luft hur fullt det är, och kom sedan tillbaka.
 luft-resize-apart = En annan partition ligger mellan Windows och Luft, så de kan inte dela på utrymmet.

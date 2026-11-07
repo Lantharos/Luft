@@ -157,7 +157,6 @@ luft-description-drive = Luft er sett upp á { $drive }.
 luft-bar-used = { $size }, { $used } í notkun
 luft-resize-title = Breyta plássinu sem Luft hefur
 luft-resize-description = Gefðu Luft meira af plássi Windows eða skilaðu hluta af því til Windows.
-luft-resize-drive-description = Gefðu Luft meira af lausa plássinu á { $drive } eða skildu hluta af því eftir lausan.
 luft-resize-passphrase = Diskur Luft opnast aðeins með lykilsetningu og Luft getur ekki slegið hana inn sjálft á meðan það flytur sig.
 luft-resize-start-first = Ræstu Luft einu sinni svo það geti sagt Meet Luft hve fullt það er og komdu svo aftur.
 luft-resize-apart = Önnur disksneið er á milli Windows og Luft, svo þau geta ekki deilt plássi.

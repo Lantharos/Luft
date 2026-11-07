@@ -42,6 +42,7 @@ pub struct Installed {
     pub beside_windows: bool,
     pub size: u64,
     pub allocated: Option<u64>,
+    pub free_before: u64,
     pub free_after: u64,
     pub windows_size: u64,
     pub windows_used: u64,
@@ -56,6 +57,8 @@ pub struct Installed {
 pub struct Range {
     pub smallest: u64,
     pub most: u64,
+    pub free: u64,
+    pub free_alone: bool,
     pub least_grow: u64,
     pub least_shrink: u64,
 }

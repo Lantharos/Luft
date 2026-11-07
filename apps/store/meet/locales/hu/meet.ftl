@@ -177,7 +177,6 @@ luft-description-drive = A Luft telepítési helye: { $drive }.
 luft-bar-used = { $size }, ebből { $used } foglalt
 luft-resize-title = A Luft helyének módosítása
 luft-resize-description = Adjon a Luftnak több helyet a Windowséból, vagy adjon vissza belőle a Windowsnak.
-luft-resize-drive-description = Adjon a Luftnak több szabad helyet, vagy hagyjon belőle szabadon ezen a meghajtón: { $drive }.
 luft-resize-passphrase = A Luft meghajtója csak jelmondattal nyílik meg, és a Luft költözés közben nem tudja maga beírni.
 luft-resize-start-first = Indítsa el egyszer a Luftot, hogy közölhesse a Meet Lufttal, mennyire van tele, aztán térjen vissza.
 luft-resize-apart = A Windows és a Luft között egy másik partíció van, ezért nem tudnak osztozni a helyükön.

@@ -1,4 +1,4 @@
-import { commands, type Failure, type Intent, type Outcome, type Source, type WindowsChoices } from '#lib/bindings.js';
+import { commands, type Failure, type Intent, type LuftPage, type Outcome, type Source, type WindowsChoices } from '#lib/bindings.js';
 
 export type Packing = Parameters<typeof commands.meetPack>[0];
 
@@ -35,6 +35,8 @@ export const giveWindows = () => settle(commands.meetGiveWindows(UNTIL_DONE));
 export const startLuft = () => settle(commands.meetStartLuft(UNTIL_DONE));
 export const removeLuft = () => settle(commands.meetRemoveLuft(UNTIL_DONE));
 export const installed = () => settle(commands.meetInstalled(UNTIL_DONE));
+export const onLuft = () => settle(commands.meetOnLuft());
+export const openOnLuft = (page: LuftPage) => settle(commands.meetOpenOnLuft({ page }));
 export const pickIso = () => settle(commands.meetPickIso(UNTIL_DONE));
 export const saveLogs = () => settle(commands.meetSaveLogs(UNTIL_DONE));
 export const showFile = (path: string) => settle(commands.meetShowFile({ path }, UNTIL_DONE));

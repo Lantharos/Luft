@@ -177,7 +177,6 @@ luft-description-drive = Luft je nainstalovaný na disku { $drive }.
 luft-bar-used = { $size }, využito { $used }
 luft-resize-title = Změnit velikost systému Luft
 luft-resize-description = Dejte systému Luft víc místa z Windows, nebo část místa vraťte systému Windows.
-luft-resize-drive-description = Dejte systému Luft víc volného místa na disku { $drive }, nebo jeho část nechte volnou.
 luft-resize-passphrase = Disk systému Luft se otevírá jen heslem k disku a Luft ho během přesunu nemůže zadat sám.
 luft-resize-start-first = Jednou spusťte Luft, aby mohl aplikaci Meet Luft sdělit, jak je zaplněný, a pak se sem vraťte.
 luft-resize-apart = Mezi Windows a systémem Luft je jiný oddíl, takže nemohou sdílet místo.

@@ -177,7 +177,6 @@ luft-description-drive = Το Luft είναι εγκατεστημένο στο 
 luft-bar-used = { $size }, σε χρήση { $used }
 luft-resize-title = Αλλαγή του χώρου του Luft
 luft-resize-description = Δώστε στο Luft περισσότερο από τον χώρο των Windows ή επιστρέψτε λίγο στα Windows.
-luft-resize-drive-description = Δώστε στο Luft περισσότερο από τον ελεύθερο χώρο στο { $drive } ή αφήστε λίγο από αυτόν ελεύθερο.
 luft-resize-passphrase = Ο δίσκος του Luft ανοίγει μόνο με φράση πρόσβασης και το Luft δεν μπορεί να την πληκτρολογήσει μόνο του όσο μετακινείται.
 luft-resize-start-first = Ξεκινήστε το Luft μία φορά, ώστε να πει στο Meet Luft πόσο γεμάτο είναι, και μετά επιστρέψτε.
 luft-resize-apart = Ανάμεσα στα Windows και στο Luft υπάρχει άλλο διαμέρισμα, οπότε δεν μπορούν να μοιραστούν τον χώρο τους.

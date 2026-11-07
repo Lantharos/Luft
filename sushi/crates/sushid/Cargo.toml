@@ -10,6 +10,7 @@ rust-version.workspace = true
 [dependencies]
 anyhow.workspace = true
 libc.workspace = true
+luft-recovery-key.workspace = true
 rustix = { workspace = true, features = ["event", "fs", "mm", "net", "process", "termios", "time"] }
 sushi.workspace = true
 

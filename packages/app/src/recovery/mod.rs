@@ -14,6 +14,7 @@ use crate::portal::{self, FileChooser, Response, uri_path};
 use sheet::{Font, Line};
 
 const GROUPS_PER_LINE: usize = 4;
+const WORDS_PER_LINE: usize = 3;
 
 pub struct Sheet<'a> {
     pub key: &'a str,
@@ -46,22 +47,54 @@ pub fn computer() -> String {
 }
 
 impl Sheet<'_> {
-    fn shown_key(&self) -> String {
-        self.key.to_ascii_uppercase()
+    fn words(&self) -> Option<Vec<&str>> {
+        let words: Vec<&str> = self.key.split(' ').collect();
+        (words.len() > 1).then_some(words)
+    }
+
+    fn key_rows(&self) -> Vec<String> {
+        match self.words() {
+            Some(words) => words
+                .chunks(WORDS_PER_LINE)
+                .enumerate()
+                .map(|(row, words)| {
+                    let cells: Vec<String> = words
+                        .iter()
+                        .enumerate()
+                        .map(|(column, word)| {
+                            format!("{:>2} {word:<9}", row * WORDS_PER_LINE + column + 1)
+                        })
+                        .collect();
+                    cells.join("  ").trim_end().to_owned()
+                })
+                .collect(),
+            None => {
+                let key = self.key.to_ascii_uppercase();
+                let groups: Vec<&str> = key.split('-').collect();
+                groups
+                    .chunks(GROUPS_PER_LINE)
+                    .map(|chunk| chunk.join("-"))
+                    .collect()
+            }
+        }
     }
 
     fn text(&self) -> String {
-        format!(
-            "Recovery key for {}\n\n{}\n\n{}\n",
+        let mut text = format!(
+            "Recovery key for {}\n\n{}\n\n",
             self.name,
-            self.shown_key(),
-            self.explanation.join(" ")
-        )
+            self.key_rows().join("\n")
+        );
+        if self.words().is_some() {
+            text.push_str(self.key);
+            text.push_str("\n\n");
+        }
+        text.push_str(&self.explanation.join(" "));
+        text.push('\n');
+        text
     }
 
     fn lines(&self) -> Vec<Line> {
-        let key = self.shown_key();
-        let groups: Vec<&str> = key.split('-').collect();
         let mut lines = vec![
             Line {
                 font: Font::Heading,
@@ -77,16 +110,24 @@ impl Sheet<'_> {
             },
         ];
         lines.extend(
-            groups
-                .chunks(GROUPS_PER_LINE)
+            self.key_rows()
+                .into_iter()
                 .enumerate()
-                .map(|(index, chunk)| Line {
+                .map(|(index, row)| Line {
                     font: Font::Key,
-                    size: 22,
+                    size: 18,
                     gap: if index == 0 { 60 } else { 32 },
-                    text: chunk.join("-"),
+                    text: row,
                 }),
         );
+        if self.words().is_some() {
+            lines.push(Line {
+                font: Font::Text,
+                size: 12,
+                gap: 40,
+                text: self.key.to_owned(),
+            });
+        }
         lines.extend(
             self.explanation
                 .iter()

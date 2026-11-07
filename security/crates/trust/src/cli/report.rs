@@ -3,6 +3,8 @@ use crate::keys::mok;
 use crate::service::status;
 use crate::system::secrets::secret::Secret;
 
+const WORD_COLUMNS: usize = 3;
+
 fn yes_no(value: bool) -> &'static str {
     if value { "yes" } else { "no" }
 }
@@ -70,6 +72,20 @@ pub fn recovery_key(key: &Secret) {
     println!();
     println!("Recovery key:");
     println!();
+    let words: Vec<&str> = key.text().split(' ').collect();
+    if words.len() > 1 {
+        for (index, row) in words.chunks(WORD_COLUMNS).enumerate() {
+            let line: Vec<String> = row
+                .iter()
+                .enumerate()
+                .map(|(column, word)| {
+                    format!("{:>2}  {word:<10}", index * WORD_COLUMNS + column + 1)
+                })
+                .collect();
+            println!("    {}", line.join("  ").trim_end());
+        }
+        println!();
+    }
     println!("    {}", key.text());
     println!();
     println!("Keep it somewhere other than this computer. It unlocks the disk when the TPM can't.");

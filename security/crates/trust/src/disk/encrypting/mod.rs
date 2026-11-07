@@ -59,12 +59,7 @@ pub fn possible(disk: &SystemDisk) -> bool {
 }
 
 fn checked(recovery_key: &Secret, passphrase: &Secret, on_battery: bool) -> Result<Secret> {
-    let recovery_key = keys::normalize(recovery_key);
-    if !keys::is_recovery_key(&recovery_key) {
-        bail!(Unsupported(
-            "That isn't a recovery key made by this computer.".to_owned()
-        ));
-    }
+    let recovery_key = keys::recovery_key(recovery_key)?;
     let length = passphrase.text().chars().count();
     if (!passphrase.is_empty() || !tpm_unlocks()) && length < SHORTEST_PASSPHRASE {
         bail!(Unsupported(format!(

@@ -56,6 +56,7 @@ members = [
     "packages/system/fingerprint",
     "packages/system/meet",
     "packages/system/network",
+    "packages/system/recovery-key",
     "packages/system/software",
     "packages/system/speech",
     "packages/system/trust",
@@ -124,6 +125,7 @@ default-members = [
     "packages/system/fingerprint",
     "packages/system/meet",
     "packages/system/network",
+    "packages/system/recovery-key",
     "packages/system/software",
     "packages/system/speech",
     "packages/system/trust",
@@ -164,6 +166,7 @@ luft-keyring-vault = { path = "kestrel/keyring/vault" }
 luft-keyring-wire = { path = "kestrel/keyring/wire" }
 luft-meet = { path = "packages/system/meet" }
 luft-network = { path = "packages/system/network" }
+luft-recovery-key = { path = "packages/system/recovery-key" }
 luft-sandbox = { path = "apps/system/schelf/sandbox" }
 luft-software = { path = "packages/system/software", default-features = false }
 luft-speech = { path = "packages/system/speech" }

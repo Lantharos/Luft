@@ -1,4 +1,4 @@
-use crate::errors::{Busy, NeedsKey, Unsupported, WrongKey};
+use crate::errors::{Busy, MistypedKey, NeedsKey, Unsupported, WrongKey};
 
 #[derive(zbus::DBusError, Debug)]
 #[zbus(prefix = "com.lantharos.Trust1.Error")]
@@ -26,7 +26,9 @@ impl From<anyhow::Error> for Error {
     fn from(error: anyhow::Error) -> Self {
         eprintln!("{error:#}");
         let message = error.to_string();
-        if error.downcast_ref::<WrongKey>().is_some() || error.downcast_ref::<NeedsKey>().is_some()
+        if error.downcast_ref::<WrongKey>().is_some()
+            || error.downcast_ref::<NeedsKey>().is_some()
+            || error.downcast_ref::<MistypedKey>().is_some()
         {
             Self::WrongKey(message)
         } else if error.downcast_ref::<Unsupported>().is_some() {

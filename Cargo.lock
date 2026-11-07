@@ -5553,6 +5553,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "luft-recovery-key"
+version = "0.1.0"
+dependencies = [
+ "getrandom 0.4.3",
+ "sha2",
+]
+
+[[package]]
 name = "luft-sandbox"
 version = "0.1.0"
 dependencies = [
@@ -9241,6 +9249,7 @@ dependencies = [
  "drm",
  "drm-ffi",
  "libc",
+ "luft-recovery-key",
  "rustix",
  "serde",
  "serde_json",
@@ -9282,6 +9291,7 @@ version = "0.2.0"
 dependencies = [
  "anyhow",
  "libc",
+ "luft-recovery-key",
  "rustix",
  "sushi",
 ]
@@ -9814,6 +9824,7 @@ dependencies = [
  "luft-disks",
  "luft-identity",
  "luft-meet",
+ "luft-recovery-key",
  "rustix",
  "serde",
  "serde_json",

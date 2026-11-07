@@ -1,0 +1,15 @@
+[package]
+name = "luft-recovery-key"
+version = "0.1.0"
+description = "Disk recovery keys as twelve words, and the older keys of 64 letters, shared by trustd and Sushi"
+authors = ["Kristof"]
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+getrandom.workspace = true
+sha2.workspace = true
+
+[lints]
+workspace = true

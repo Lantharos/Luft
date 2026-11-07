@@ -26,6 +26,7 @@ pub enum Key {
     Clear,
     Enter,
     Escape,
+    Tab,
     Up,
     Down,
     PageUp,
@@ -99,6 +100,7 @@ fn key(character: char, escape: &mut Option<String>) -> Option<Key> {
             None
         }
         '\r' | '\n' => Some(Key::Enter),
+        '\t' => Some(Key::Tab),
         '\u{7f}' | '\u{8}' => Some(Key::Erase),
         '\u{15}' => Some(Key::Clear),
         character if !character.is_control() => Some(Key::Text(character)),

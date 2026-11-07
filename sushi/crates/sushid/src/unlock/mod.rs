@@ -1,13 +1,15 @@
 mod ask;
+mod words;
 
-use sushi::ipc::password::{PasswordRequests, RECOVERY_KEY_LETTERS, Request, Secret};
-use sushi::scene::{Prompt, ShownKey};
+use luft_recovery_key::{OLD_LETTERS, Reading, WORDS};
+use sushi::ipc::password::{PasswordRequests, Request, Secret};
+use sushi::scene::Prompt;
 use sushi::terminal::{Key, Terminal};
 
 use ask::Ask;
+use words::{Entry, Words};
 
-const NOT_A_RECOVERY_KEY: &str =
-    "Recovery keys only use the letters B C D E F G H I J K L N R T U V";
+const MISTYPED: &str = "One of the words isn't right. Check them against your recovery key.";
 
 pub struct Unlock {
     request: Request,
@@ -67,24 +69,55 @@ impl Unlock {
         Some(unlock)
     }
 
-    fn key_note(&self) -> Option<(String, f32)> {
-        let typed = self.secret.characters();
-        match self.secret.recovery_key_letters() {
-            None => Some((NOT_A_RECOVERY_KEY.to_owned(), 1.0)),
-            Some(RECOVERY_KEY_LETTERS) => Some(("Press Enter to unlock".to_owned(), 0.7)),
-            Some(letters) if letters > RECOVERY_KEY_LETTERS => Some((
-                format!("A recovery key has {RECOVERY_KEY_LETTERS} characters, this is more"),
+    fn letters_note(&self, letters: usize) -> (String, f32) {
+        match letters {
+            OLD_LETTERS => ("Press Enter to unlock".to_owned(), 0.7),
+            letters if letters > OLD_LETTERS => (
+                format!("A recovery key of letters has {OLD_LETTERS}, this is more"),
                 1.0,
-            )),
-            Some(letters) if self.incomplete => Some((
-                format!("{letters} of {RECOVERY_KEY_LETTERS} characters. Type the rest first."),
+            ),
+            letters if self.incomplete => (
+                format!("{letters} of {OLD_LETTERS} letters. Type the rest first."),
                 1.0,
-            )),
-            Some(letters) if typed > 0 => Some((
-                format!("{letters} of {RECOVERY_KEY_LETTERS} characters"),
+            ),
+            letters => (format!("{letters} of {OLD_LETTERS} letters"), 0.5),
+        }
+    }
+
+    fn words_note(&self, words: Words) -> (String, f32) {
+        match words {
+            Words {
+                unknown: Some(index),
+                ..
+            } => (
+                format!(
+                    "Word {} isn't a recovery key word. Check how it's spelled.",
+                    index + 1
+                ),
+                1.0,
+            ),
+            Words {
+                holds: Some(true), ..
+            } => ("Press Enter to unlock".to_owned(), 0.7),
+            Words {
+                holds: Some(false), ..
+            } => (MISTYPED.to_owned(), 1.0),
+            Words { typed: 0, .. } => (
+                "Type the first 4 letters of each word, then press Space".to_owned(),
                 0.5,
-            )),
-            Some(_) => None,
+            ),
+            Words { typed, .. } if self.incomplete => (
+                format!("{typed} of {WORDS} words. Type the rest first."),
+                1.0,
+            ),
+            Words { typed, .. } => (format!("{typed} of {WORDS} words"), 0.5),
+        }
+    }
+
+    fn key_note(&self) -> (String, f32) {
+        match words::read(self.secret.bytes()) {
+            Entry::Letters(letters) => self.letters_note(letters),
+            Entry::Words(words) => self.words_note(words),
         }
     }
 
@@ -95,13 +128,13 @@ impl Unlock {
         self.prompt.explanation = copy.explanation;
         self.prompt.placeholder = copy.placeholder.to_owned();
         self.prompt.typed = self.secret.characters();
-        self.prompt.key = only_a_key.then(|| ShownKey::new(self.secret.recovery_key_shown()));
+        self.prompt.key = only_a_key.then(|| words::shown(self.secret.bytes()));
         self.prompt.note = if self.rejected {
             Some((copy.rejected.to_owned(), 1.0))
         } else if self.caps_lock && !only_a_key {
             Some(("Caps Lock is on".to_owned(), 0.7))
         } else if only_a_key {
-            self.key_note()
+            Some(self.key_note())
         } else {
             self.ask
                 .can_go_back()
@@ -111,7 +144,16 @@ impl Unlock {
 
     fn ready_to_answer(&self) -> bool {
         !self.ask.wants_only_a_recovery_key()
-            || self.secret.recovery_key_letters() == Some(RECOVERY_KEY_LETTERS)
+            || matches!(
+                luft_recovery_key::read(self.secret.bytes()),
+                Reading::Key(_)
+            )
+    }
+
+    fn next_word(&mut self) {
+        if words::can_move_on(self.secret.bytes()) {
+            self.secret.push(' ');
+        }
     }
 
     pub fn is_live(&self) -> bool {
@@ -135,8 +177,13 @@ impl Unlock {
         if keys.is_empty() {
             return Typed::Nothing;
         }
+        let only_a_key = self.ask.wants_only_a_recovery_key();
         for key in keys {
             match key {
+                Key::Text(' ') | Key::Tab if only_a_key => {
+                    self.incomplete = false;
+                    self.next_word();
+                }
                 Key::Text(character) => {
                     self.incomplete = false;
                     self.secret.push(character);

@@ -1,9 +1,10 @@
 use std::path::Path;
 
 use anyhow::{Result, bail};
+use luft_recovery_key::Reading;
 
 use super::luks::{self, Header};
-use crate::errors::{NeedsKey, Unsupported, WrongKey};
+use crate::errors::{MistypedKey, NeedsKey, Unsupported, WrongKey};
 use crate::keys as signing;
 use crate::paths;
 use crate::system::firmware::{efi, tpm};
@@ -12,53 +13,34 @@ use crate::system::secrets::creds::{self, Protection};
 use crate::system::secrets::scratch::Scratch;
 use crate::system::secrets::secret::Secret;
 
-const MODHEX: &[u8; 16] = b"cbdefghijklnrtuv";
 const ESCROW: &str = "recovery-key.cred";
 const ESCROW_NAME: &str = "trustd.recovery-key";
 const NEW_PIN_CREDENTIAL: &str = "cryptenroll.new-tpm2-pin";
 
 pub fn generate_recovery_key() -> Result<Secret> {
-    let mut bytes = [0u8; 32];
-    getrandom::fill(&mut bytes)?;
-    let mut key = Vec::with_capacity(71);
-    for (index, byte) in bytes.iter().enumerate() {
-        if index > 0 && index % 4 == 0 {
-            key.push(b'-');
-        }
-        key.push(MODHEX[usize::from(byte >> 4)]);
-        key.push(MODHEX[usize::from(byte & 0xf)]);
-    }
-    bytes.fill(0);
-    Ok(Secret::new(key))
+    Ok(Secret::new(luft_recovery_key::generate()?))
 }
 
-pub fn normalize(typed: &Secret) -> Secret {
-    let letters: Vec<u8> = typed
-        .bytes()
-        .iter()
-        .filter(|byte| !matches!(byte, b'-' | b' '))
-        .map(u8::to_ascii_lowercase)
-        .collect();
-    if letters.len() != 64 || !letters.iter().all(|letter| MODHEX.contains(letter)) {
-        return typed.clone();
+pub fn normalize(typed: &Secret) -> Result<Secret> {
+    match luft_recovery_key::read(typed.bytes()) {
+        Reading::Key(key) => Ok(Secret::new(key)),
+        Reading::Mistyped => Err(MistypedKey.into()),
+        Reading::NotAKey => Ok(typed.clone()),
     }
-    let mut key = Vec::with_capacity(71);
-    for (index, letter) in letters.iter().enumerate() {
-        if index > 0 && index % 8 == 0 {
-            key.push(b'-');
-        }
-        key.push(*letter);
+}
+
+pub fn recovery_key(typed: &Secret) -> Result<Secret> {
+    match luft_recovery_key::read(typed.bytes()) {
+        Reading::Key(key) => Ok(Secret::new(key)),
+        Reading::Mistyped => Err(MistypedKey.into()),
+        Reading::NotAKey => bail!(Unsupported(
+            "That isn't a recovery key made by this computer.".to_owned()
+        )),
     }
-    Secret::new(key)
 }
 
 pub fn is_recovery_key(key: &Secret) -> bool {
-    let normal = normalize(key);
-    normal.bytes().len() == 71
-        && normal
-            .bytes()
-            .iter()
-            .all(|byte| *byte == b'-' || MODHEX.contains(byte))
+    matches!(luft_recovery_key::read(key.bytes()), Reading::Key(_))
 }
 
 pub fn escrow_in(state: &Path, key: &Secret) -> Result<()> {
@@ -91,7 +73,7 @@ pub fn unlock_key(device: &Path, header: Option<&Path>, typed: &Secret) -> Resul
     let key = if typed.is_empty() {
         escrowed().ok_or(NeedsKey)?
     } else {
-        normalize(typed)
+        normalize(typed)?
     };
     if !opens(device, header, &key) {
         return Err(if typed.is_empty() {

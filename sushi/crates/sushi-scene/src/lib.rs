@@ -15,8 +15,9 @@ pub use image::decode_bmp;
 pub use logo::FirmwareLogo;
 pub use monitor::Monitor;
 pub use panels::failure::Failure;
+pub use panels::key::{Shown, ShownKey, Slot};
 pub use panels::notice::Notice;
-pub use panels::prompt::{Prompt, ShownKey, is_shaking};
+pub use panels::prompt::{Prompt, is_shaking};
 pub use panels::status::{Progress, Status};
 pub use scene::{Scene, Visuals};
 pub use tiny_skia;
@@ -152,6 +153,7 @@ pub fn rounded(field: tiny_skia::Rect, radius: f32) -> Option<Path> {
         right,
         top + radius,
     );
+    path.line_to(right, bottom - radius);
     path.cubic_to(
         right,
         bottom - radius + handle,
@@ -169,6 +171,7 @@ pub fn rounded(field: tiny_skia::Rect, radius: f32) -> Option<Path> {
         left,
         bottom - radius,
     );
+    path.line_to(left, top + radius);
     path.cubic_to(
         left,
         top + radius - handle,

@@ -13,7 +13,7 @@ const SHORTEST_PASSPHRASE: usize = 8;
 
 fn check_recovery_key(recovery_key: &Secret) -> Result<()> {
     ensure!(
-        keys::is_recovery_key(recovery_key) && keys::normalize(recovery_key) == *recovery_key,
+        keys::recovery_key(recovery_key).is_ok_and(|key| key == *recovery_key),
         "That isn't a recovery key Luft makes"
     );
     Ok(())

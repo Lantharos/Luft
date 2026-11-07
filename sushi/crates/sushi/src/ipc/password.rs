@@ -3,12 +3,11 @@ use std::os::fd::{AsFd, BorrowedFd, OwnedFd};
 use std::os::unix::net::UnixDatagram;
 use std::path::{Path, PathBuf};
 
+use luft_recovery_key::Reading;
 use rustix::fs::inotify::{self, CreateFlags, WatchFlags};
 use rustix::time::{ClockId, clock_gettime};
 
 const REQUESTS: &str = "/run/systemd/ask-password";
-const MODHEX: &[u8; 16] = b"cbdefghijklnrtuv";
-pub const RECOVERY_KEY_LETTERS: usize = 64;
 pub const SHELL: &str = "sushi:shell";
 
 #[derive(Default)]
@@ -35,39 +34,11 @@ impl Secret {
         self.wipe_from(0);
     }
 
-    pub fn recovery_key_letters(&self) -> Option<usize> {
-        let mut letters = 0;
-        for byte in &self.0 {
-            match byte {
-                b'-' | b' ' => {}
-                byte if MODHEX.contains(&byte.to_ascii_lowercase()) => letters += 1,
-                _ => return None,
-            }
-        }
-        Some(letters)
-    }
-
-    pub fn recovery_key_shown(&self) -> String {
-        String::from_utf8_lossy(&self.0)
-            .chars()
-            .filter(|character| !matches!(character, '-' | ' '))
-            .flat_map(char::to_uppercase)
-            .collect()
-    }
-
     pub fn tidy_recovery_key(&mut self) {
-        if self.recovery_key_letters() != Some(RECOVERY_KEY_LETTERS) {
-            return;
+        if let Reading::Key(key) = luft_recovery_key::read(&self.0) {
+            self.clear();
+            self.0 = key;
         }
-        let mut tidy = Vec::with_capacity(RECOVERY_KEY_LETTERS + 7);
-        for byte in self.0.iter().filter(|byte| !matches!(byte, b'-' | b' ')) {
-            if !tidy.is_empty() && (tidy.len() + 1) % 9 == 0 {
-                tidy.push(b'-');
-            }
-            tidy.push(byte.to_ascii_lowercase());
-        }
-        self.clear();
-        self.0 = tidy;
     }
 
     pub fn bytes(&self) -> &[u8] {
@@ -213,20 +184,6 @@ mod tests {
             PathBuf::from("/run/systemd/ask-password/sck.1")
         );
         assert_eq!(request.not_after, None);
-    }
-
-    #[test]
-    fn recovery_keys_typed_without_dashes_get_them_back() {
-        let mut secret = Secret::default();
-        "CBDEFGHI jklnrtuv"
-            .repeat(4)
-            .chars()
-            .for_each(|character| secret.push(character));
-        secret.tidy_recovery_key();
-        assert_eq!(
-            std::str::from_utf8(&secret.0).unwrap(),
-            "cbdefghi-jklnrtuv-".repeat(4).trim_end_matches('-')
-        );
     }
 
     #[test]

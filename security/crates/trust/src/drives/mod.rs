@@ -137,16 +137,6 @@ pub fn reprobe(device: &std::path::Path) {
         .status();
 }
 
-fn checked_recovery_key(typed: &Secret) -> Result<Secret> {
-    let key = keys::normalize(typed);
-    if !keys::is_recovery_key(&key) {
-        bail!(Unsupported(
-            "That isn't a recovery key made by this computer.".to_owned()
-        ));
-    }
-    Ok(key)
-}
-
 fn checked_passphrase(passphrase: &Secret) -> Result<()> {
     if !passphrase.is_empty() && passphrase.text().chars().count() < SHORTEST_PASSPHRASE {
         bail!(Unsupported(format!(
@@ -230,7 +220,7 @@ pub fn encrypt(
         bail!(Unsupported("It's already encrypted.".to_owned()));
     }
     target.require_unused()?;
-    let recovery = checked_recovery_key(recovery)?;
+    let recovery = keys::recovery_key(recovery)?;
     checked_passphrase(passphrase)?;
     if auto_unlock {
         unlocking::require_system_protected()?;
@@ -360,7 +350,7 @@ pub fn set_up_unlocking(
         bail!(Unsupported("It already has a recovery key.".to_owned()));
     }
     if !recovery.is_empty() {
-        let recovery = checked_recovery_key(recovery)?;
+        let recovery = keys::recovery_key(recovery)?;
         let slot = match slot_opened_by(&target, &header, &recovery) {
             Some(slot) => slot,
             None => keys::add_keyslot(&target.device, &key, &recovery, &header)?,

@@ -7,6 +7,9 @@ pub struct WrongKey;
 pub struct NeedsKey;
 
 #[derive(Debug)]
+pub struct MistypedKey;
+
+#[derive(Debug)]
 pub struct Unsupported(pub String);
 
 #[derive(Debug)]
@@ -24,6 +27,12 @@ impl fmt::Display for NeedsKey {
     }
 }
 
+impl fmt::Display for MistypedKey {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter.write_str("One of the words isn't right. Check them against your recovery key.")
+    }
+}
+
 impl fmt::Display for Unsupported {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         formatter.write_str(&self.0)
@@ -38,5 +47,6 @@ impl fmt::Display for Busy {
 
 impl std::error::Error for WrongKey {}
 impl std::error::Error for NeedsKey {}
+impl std::error::Error for MistypedKey {}
 impl std::error::Error for Unsupported {}
 impl std::error::Error for Busy {}

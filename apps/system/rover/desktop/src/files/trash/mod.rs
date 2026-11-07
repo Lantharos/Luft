@@ -8,9 +8,9 @@ use serde::Serialize;
 
 use super::operations::{OperationPhase, OperationType, OperationsQueue};
 use super::privileged::{is_permission_error, os, remove_path, run_pkexec};
-use crate::locations::cloud::is_cloud;
 use crate::files::text::{items, subject};
 use crate::history::{History, Step};
+use crate::locations::cloud::is_cloud;
 pub use locations::TrashLocation;
 use locations::parse_trashinfo;
 pub(crate) use locations::trash_locations;

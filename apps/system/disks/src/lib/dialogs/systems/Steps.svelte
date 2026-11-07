@@ -1,8 +1,8 @@
 <script lang="ts">
 	import Check from '@lucide/svelte/icons/check';
-	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import X from '@lucide/svelte/icons/x';
 	import type { PlannedStep } from '#lib/systems.js';
+	import { Spinner } from '@luft/ui';
 
 	interface Props {
 		steps: PlannedStep[];
@@ -30,7 +30,7 @@
 				{#if status === 'done'}
 					<Check size={15} />
 				{:else if status === 'running'}
-					<LoaderCircle size={15} class="animate-spin" />
+					<Spinner size={15} />
 				{:else if status === 'failed'}
 					<X size={15} />
 				{:else}

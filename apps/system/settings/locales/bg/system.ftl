@@ -70,7 +70,7 @@ settings-users-password-new-placeholder = { $count ->
 settings-users-password-confirm = Потвърждение
 settings-users-password-confirm-placeholder = Въведете я отново
 settings-users-password-change = Промени паролата
-settings-users-password-changing = Промяна…
+settings-users-password-changing = Промяна
 settings-users-password-wrong = Това не е текущата ви парола
 settings-users-password-mismatch = Паролите не съвпадат
 settings-users-password-too-short = Паролата е твърде кратка
@@ -124,11 +124,11 @@ settings-login-automatic-off = Изключен
 
 ## Updates
 
-settings-updates-checking = Търсене на актуализации…
-settings-updates-downloading = Изтегляне на актуализациите…
-settings-updates-rolling-back = Подготовка на предишната версия…
-settings-updates-switching-nvidia = Изтегляне на драйвера на NVIDIA…
-settings-updates-switching-standard = Изтегляне на стандартния образ…
+settings-updates-checking = Търсене на актуализации
+settings-updates-downloading = Изтегляне на актуализациите
+settings-updates-rolling-back = Подготовка на предишната версия
+settings-updates-switching-nvidia = Изтегляне на драйвера на NVIDIA
+settings-updates-switching-standard = Изтегляне на стандартния образ
 settings-updates-up-to-date = Системата ви е актуална
 settings-updates-version = Версия { $version }
 settings-updates-version-new = Нова версия
@@ -148,9 +148,9 @@ settings-updates-last-checked = Последна проверка: { $when }
 settings-updates-never-checked = Още не е проверявано
 settings-updates-stop = Спри
 settings-updates-check = Провери сега
-settings-updates-checking-button = Проверка…
+settings-updates-checking-button = Проверка
 settings-updates-app-updates = Актуализации на приложения
-settings-updates-apps-checking = Търсене на актуализации за приложенията ви…
+settings-updates-apps-checking = Търсене на актуализации за приложенията ви
 settings-updates-apps-count = { $count ->
     [0] Управляват се в Schelf
     [one] { $count } приложение има актуализация в Schelf
@@ -171,7 +171,7 @@ settings-updates-background-description = Актуализациите са го
 settings-updates-firmware = Фърмуер
 settings-updates-firmware-description = Актуализации на софтуера, вграден в хардуера ви
 settings-updates-firmware-restart = Завършва при рестартиране
-settings-updates-firmware-installing = Инсталиране…
+settings-updates-firmware-installing = Инсталиране
 settings-updates-firmware-update = Актуализирай
 settings-updates-firmware-failed = Фърмуерът не можа да бъде актуализиран
 settings-updates-download = Изтегли
@@ -262,7 +262,7 @@ settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud �
 settings-accounts-sign-in-again-needed = Влезте отново, за да продължите да го използвате
 settings-accounts-paused-metered = Синхронизирането е на пауза при връзка с отчитане
 settings-accounts-paused-battery = Синхронизирането е на пауза, докато батерията е слаба
-settings-accounts-connecting = Свързване…
+settings-accounts-connecting = Свързване
 settings-accounts-offline = Офлайн
 settings-accounts-offline-kept = Офлайн, запазените файлове са налични
 settings-accounts-not-connected = Няма връзка
@@ -285,7 +285,7 @@ settings-accounts-sign-in-again = Влез отново
 settings-accounts-keep = Остави
 settings-accounts-remove = Премахни
 settings-accounts-remove-confirm = Премахни от компютъра
-settings-accounts-removing = Премахване…
+settings-accounts-removing = Премахване
 settings-accounts-remove-note = Файловете ви остават в { $provider }. Промените, направени тук, първо се качват.
 
 ## Accounts: providers
@@ -318,7 +318,7 @@ settings-accounts-continue-in-browser = Продължи в браузъра
 settings-accounts-sign-in = Вход
 settings-accounts-try-again = Опитай отново
 settings-accounts-continue = Продължи
-settings-accounts-working = Връзка с { $provider }…
+settings-accounts-working = Връзка с { $provider }
 settings-accounts-finish-in-browser = Завършете влизането с { $provider } в браузъра си. Luft никога не вижда паролата ви, а тази страница ще се обнови сама, щом приключите.
 settings-accounts-no-browser = Браузърът не се отвори. Копирайте връзката и я отворете в браузър.
 settings-accounts-open-again = Отвори страницата отново

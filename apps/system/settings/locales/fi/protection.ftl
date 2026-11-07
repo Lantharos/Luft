@@ -182,7 +182,7 @@ settings-encryption-summary-chip = Siihen asti suojaussiru säilyttää palautus
 settings-encryption-summary-recovery-key = Siihen asti käynnistyksessä kysytään palautusavainta tunnuslauseen sijaan.
 # Button, verb: starts encrypting this computer
 settings-encryption-encrypt = Salaa
-settings-encryption-making-room = Tehdään tilaa…
+settings-encryption-making-room = Tehdään tilaa
 settings-encryption-unlocks-chip-pin = Lukitus avataan suojaussirulla ja PIN-koodilla
 settings-encryption-unlocks-chip = Lukitus avautuu itsestään suojaussirulla
 settings-encryption-unlocks-passphrase = Kysyy tunnuslausetta käynnistyksessä

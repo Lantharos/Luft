@@ -27,7 +27,7 @@ Sentence case everywhere: only the first word and names take a capital letter. �
 
 - Quotation marks: „…” (low 9, high 9), and «…» inside them.
 - Apostrophe: ’, only where Polish needs it for a foreign name, which Luft avoids.
-- Ellipsis: one character, „…”, with no space before it: „Ładowanie…”.
+- Ellipsis: one character, „…”, with no space before it. A message about something in progress, such as loading, takes none, because the app shows a spinner beside it.
 - Dash: the en dash with spaces, „ – ”. No em dashes.
 - Percent sign with no space: „57%”. Units take a space: „4,5 W”.
 - Commas before „aby”, „że”, „który”, „gdy” as Polish grammar requires, even where English has none.

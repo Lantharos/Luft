@@ -115,4 +115,4 @@ ui-passphrase-mismatch = De wachtwoordzinnen komen niet overeen
 
 ## Encryption
 
-ui-encryption-checking = Controleren…
+ui-encryption-checking = Controleren

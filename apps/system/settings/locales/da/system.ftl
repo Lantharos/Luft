@@ -70,7 +70,7 @@ settings-users-password-new-placeholder = { $count ->
 settings-users-password-confirm = Bekræft
 settings-users-password-confirm-placeholder = Skriv den igen
 settings-users-password-change = Skift adgangskode
-settings-users-password-changing = Skifter…
+settings-users-password-changing = Skifter
 settings-users-password-wrong = Det er ikke din nuværende adgangskode
 settings-users-password-mismatch = Adgangskoderne er ikke ens
 settings-users-password-too-short = Adgangskoden er for kort
@@ -124,11 +124,11 @@ settings-login-automatic-off = Fra
 
 ## Updates
 
-settings-updates-checking = Søger efter opdateringer…
-settings-updates-downloading = Henter opdateringer…
-settings-updates-rolling-back = Gør den tidligere version klar…
-settings-updates-switching-nvidia = Henter NVIDIAs driver…
-settings-updates-switching-standard = Henter standardudgaven…
+settings-updates-checking = Søger efter opdateringer
+settings-updates-downloading = Henter opdateringer
+settings-updates-rolling-back = Gør den tidligere version klar
+settings-updates-switching-nvidia = Henter NVIDIAs driver
+settings-updates-switching-standard = Henter standardudgaven
 settings-updates-up-to-date = Dit system er opdateret
 settings-updates-version = Version { $version }
 settings-updates-version-new = En ny version
@@ -148,9 +148,9 @@ settings-updates-last-checked = Sidst kontrolleret { $when }
 settings-updates-never-checked = Ikke kontrolleret endnu
 settings-updates-stop = Stop
 settings-updates-check = Søg nu
-settings-updates-checking-button = Søger…
+settings-updates-checking-button = Søger
 settings-updates-app-updates = Appopdateringer
-settings-updates-apps-checking = Søger efter opdateringer til dine apps…
+settings-updates-apps-checking = Søger efter opdateringer til dine apps
 settings-updates-apps-count = { $count ->
     [0] Administreres i Schelf
     [one] { $count } app har en opdatering i Schelf
@@ -171,7 +171,7 @@ settings-updates-background-description = Opdateringerne installeres, næste gan
 settings-updates-firmware = Firmware
 settings-updates-firmware-description = Opdateringer til softwaren, der er indbygget i din hardware
 settings-updates-firmware-restart = Gøres færdig, når du genstarter
-settings-updates-firmware-installing = Installerer…
+settings-updates-firmware-installing = Installerer
 settings-updates-firmware-update = Opdater
 settings-updates-firmware-failed = Firmwaren kunne ikke opdateres
 settings-updates-download = Hent
@@ -262,7 +262,7 @@ settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud e
 settings-accounts-sign-in-again-needed = Log ind igen for at blive ved med at bruge den
 settings-accounts-paused-metered = Synkronisering sat på pause på en forbrugsafregnet forbindelse
 settings-accounts-paused-battery = Synkronisering sat på pause, mens batteriet er lavt
-settings-accounts-connecting = Opretter forbindelse…
+settings-accounts-connecting = Opretter forbindelse
 settings-accounts-offline = Offline
 settings-accounts-offline-kept = Offline, gemte filer er her stadig
 settings-accounts-not-connected = Ikke forbundet
@@ -285,7 +285,7 @@ settings-accounts-sign-in-again = Log ind igen
 settings-accounts-keep = Behold
 settings-accounts-remove = Fjern
 settings-accounts-remove-confirm = Fjern fra denne computer
-settings-accounts-removing = Fjerner…
+settings-accounts-removing = Fjerner
 settings-accounts-remove-note = Dine filer bliver i { $provider }. Ændringer foretaget her sendes op først.
 
 ## Accounts: providers
@@ -318,7 +318,7 @@ settings-accounts-continue-in-browser = Fortsæt i browseren
 settings-accounts-sign-in = Log ind
 settings-accounts-try-again = Prøv igen
 settings-accounts-continue = Fortsæt
-settings-accounts-working = Kontakter { $provider }…
+settings-accounts-working = Kontakter { $provider }
 settings-accounts-finish-in-browser = Afslut login hos { $provider } i din browser. Luft ser aldrig din adgangskode, og dette opdateres af sig selv, når du er færdig.
 settings-accounts-no-browser = Der blev ikke åbnet nogen browser. Kopier linket, og åbn det i en browser.
 settings-accounts-open-again = Åbn siden igen

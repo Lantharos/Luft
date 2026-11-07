@@ -72,7 +72,7 @@ settings-users-password-new-placeholder = { $count ->
 settings-users-password-confirm = Potrditev
 settings-users-password-confirm-placeholder = Vnesite ga znova
 settings-users-password-change = Spremeni geslo
-settings-users-password-changing = Spreminjanje …
+settings-users-password-changing = Spreminjanje
 settings-users-password-wrong = To ni vaše trenutno geslo
 settings-users-password-mismatch = Gesli se ne ujemata
 settings-users-password-too-short = To geslo je prekratko
@@ -128,11 +128,11 @@ settings-login-automatic-off = Izklopljeno
 
 ## Updates
 
-settings-updates-checking = Iskanje posodobitev …
-settings-updates-downloading = Prenašanje posodobitev …
-settings-updates-rolling-back = Pripravljanje prejšnje različice …
-settings-updates-switching-nvidia = Prenašanje gonilnika NVIDIA …
-settings-updates-switching-standard = Prenašanje standardne slike sistema …
+settings-updates-checking = Iskanje posodobitev
+settings-updates-downloading = Prenašanje posodobitev
+settings-updates-rolling-back = Pripravljanje prejšnje različice
+settings-updates-switching-nvidia = Prenašanje gonilnika NVIDIA
+settings-updates-switching-standard = Prenašanje standardne slike sistema
 settings-updates-up-to-date = Sistem je posodobljen
 settings-updates-version = Različica { $version }
 settings-updates-version-new = Nova različica
@@ -152,9 +152,9 @@ settings-updates-last-checked = Nazadnje preverjeno { $when }
 settings-updates-never-checked = Še ni preverjeno
 settings-updates-stop = Ustavi
 settings-updates-check = Preveri zdaj
-settings-updates-checking-button = Preverjanje …
+settings-updates-checking-button = Preverjanje
 settings-updates-app-updates = Posodobitve aplikacij
-settings-updates-apps-checking = Iskanje posodobitev za vaše aplikacije …
+settings-updates-apps-checking = Iskanje posodobitev za vaše aplikacije
 settings-updates-apps-count = { $count ->
     [0] Upravljanje v aplikaciji Schelf
     [one] { $count } aplikacija ima posodobitev v aplikaciji Schelf
@@ -177,7 +177,7 @@ settings-updates-background-description = Posodobitve so pripravljene za namesti
 settings-updates-firmware = Vdelana programska oprema
 settings-updates-firmware-description = Posodobitve programske opreme, vdelane v vašo strojno opremo
 settings-updates-firmware-restart = Dokonča se ob vnovičnem zagonu
-settings-updates-firmware-installing = Nameščanje …
+settings-updates-firmware-installing = Nameščanje
 settings-updates-firmware-update = Posodobi
 settings-updates-firmware-failed = Vdelane programske opreme ni bilo mogoče posodobiti
 settings-updates-download = Prenesi
@@ -268,7 +268,7 @@ settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud a
 settings-accounts-sign-in-again-needed = Za nadaljnjo uporabo se znova prijavite
 settings-accounts-paused-metered = Sinhronizacija je med merjeno povezavo zaustavljena
 settings-accounts-paused-battery = Sinhronizacija je zaustavljena, ker je baterija skoraj prazna
-settings-accounts-connecting = Povezovanje …
+settings-accounts-connecting = Povezovanje
 settings-accounts-offline = Brez povezave
 settings-accounts-offline-kept = Brez povezave, ohranjene datoteke so še vedno tu
 settings-accounts-not-connected = Ni povezano
@@ -295,7 +295,7 @@ settings-accounts-sign-in-again = Znova se prijavi
 settings-accounts-keep = Obdrži
 settings-accounts-remove = Odstrani
 settings-accounts-remove-confirm = Odstrani iz tega računalnika
-settings-accounts-removing = Odstranjevanje …
+settings-accounts-removing = Odstranjevanje
 settings-accounts-remove-note = Vaše datoteke ostanejo v storitvi { $provider }. Spremembe, narejene tukaj, se najprej pošljejo tja.
 
 ## Accounts: providers
@@ -328,7 +328,7 @@ settings-accounts-continue-in-browser = Nadaljuj v brskalniku
 settings-accounts-sign-in = Prijava
 settings-accounts-try-again = Poskusi znova
 settings-accounts-continue = Nadaljuj
-settings-accounts-working = Povezovanje s storitvijo { $provider } …
+settings-accounts-working = Povezovanje s storitvijo { $provider }
 settings-accounts-finish-in-browser = Prijavo s storitvijo { $provider } dokončajte v brskalniku. Luft vašega gesla nikoli ne vidi, ta stran pa se samodejno posodobi, ko končate.
 settings-accounts-no-browser = Brskalnik se ni odprl. Kopirajte povezavo in jo odprite v brskalniku.
 settings-accounts-open-again = Znova odpri stran

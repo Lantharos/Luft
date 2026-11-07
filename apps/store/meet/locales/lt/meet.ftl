@@ -75,7 +75,7 @@ check-moment = Tai užtruks akimirką.
 check-slow = Windows skaičiuoja, kiek vietos gali atiduoti. Dideliame diske tai gali užtrukti kelias minutes.
 check-blocked-description = Prieš Luft įsikraustant, reikia kai ką pakeisti. Štai ką daryti.
 check-found-description = Štai ką rado Meet Luft.
-check-checking = Tikrinamas diskas, programinė aparatinė įranga ir aparatinė įranga…
+check-checking = Tikrinamas diskas, programinė aparatinė įranga ir aparatinė įranga
 check-again = Tikrinti dar kartą
 check-action-firmware = Atidaryti programinės aparatinės įrangos nustatymus
 check-action-tidy = Sutvarkyti
@@ -171,7 +171,7 @@ linux-ready-remove-description = Meet Luft ištrina Luft failus, paleidimo failu
 
 luft-title = Jūsų Luft
 luft-looking = Meet Luft rado Luft šiame kompiuteryje.
-luft-checking = Tikrinamas Luft diskas…
+luft-checking = Tikrinamas Luft diskas
 luft-description-beside = Luft įdiegta šiame kompiuteryje šalia Windows.
 luft-description-drive = Luft įdiegta diske { $drive }.
 luft-bar-used = { $size }, naudojama { $used }
@@ -225,7 +225,7 @@ resize-shrink-description = Luft perkels savo failus kitą kartą pasileidusi, o
 
 box-title = Pasiimkite savo daiktus
 box-description = Pasirinkite, ką pasiimti. Luft tai išpakuos į naująją paskyrą, kai bus įdiegta, o iš Windows nieko nebus pašalinta.
-box-looking = Peržiūrimi jūsų aplankai…
+box-looking = Peržiūrimi jūsų aplankai
 box-folder-desktop = Darbalaukis
 box-folder-documents = Dokumentai
 box-folder-downloads = Atsisiuntimai
@@ -297,7 +297,7 @@ removed-description = { $platform ->
 
 stick-title = Sukurti USB atmintuką
 stick-description = Iš jo Luft pasileidžia bet kuriame kompiuteryje – išbandyti ar įdiegti.
-stick-looking = Ieškoma USB įrenginių…
+stick-looking = Ieškoma USB įrenginių
 stick-none = Prijunkite bent { $size } talpos USB atmintuką. Jis atsiras čia.
 stick-drives-label = USB įrenginiai
 stick-offer = { $name }, { $size }

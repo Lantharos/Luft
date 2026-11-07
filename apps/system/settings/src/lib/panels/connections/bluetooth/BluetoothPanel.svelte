@@ -2,10 +2,9 @@
 	import BluetoothIcon from '@lucide/svelte/icons/bluetooth';
 	import Eye from '@lucide/svelte/icons/eye';
 	import Info from '@lucide/svelte/icons/info';
-	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import { onMount } from 'svelte';
 	import { t } from '@luft/i18n';
-	import { ActionRow, Dialog, errorText, IconButton, item, reorder, Row, Section, Select, Switch } from '@luft/ui';
+	import { ActionRow, Dialog, errorText, IconButton, item, reorder, Row, Section, Select, Spinner, Switch } from '@luft/ui';
 	import { commands, events } from '#lib/bindings.js';
 	import type { Adapter, Bluetooth, BluetoothDevice, PairingRequest } from '#lib/bindings.js';
 	import MoreRow, { COLLAPSED } from '#lib/components/MoreRow.svelte';
@@ -173,7 +172,7 @@
 						>
 							{#snippet trailing()}
 								{#if busy[device.path]}
-									<LoaderCircle size={16} class="animate-spin" />
+									<Spinner size={16} />
 								{/if}
 							{/snippet}
 							{#snippet actions()}
@@ -199,14 +198,14 @@
 						>
 							{#snippet trailing()}
 								{#if busy[device.path]}
-									<LoaderCircle size={16} class="animate-spin" />
+									<Spinner size={16} />
 								{/if}
 							{/snippet}
 						</ActionRow>
 					</div>
 				{:else}
 					<Row title={t('settings-bluetooth-searching')} description={t('settings-bluetooth-searching.description')}>
-						<LoaderCircle size={16} class="animate-spin" />
+						<Spinner size={16} />
 					</Row>
 				{/each}
 				{#if bluetooth.nearby.length > COLLAPSED}

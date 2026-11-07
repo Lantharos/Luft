@@ -197,7 +197,7 @@ settings-encryption-summary-chip = Go dtí go mbeidh sé déanta, coinníonn an 
 settings-encryption-summary-recovery-key = Go dtí go mbeidh sé déanta, iarrann sé an eochair athshlánaithe ag an tosú in ionad do fhrása faire.
 # Button, verb: starts encrypting this computer
 settings-encryption-encrypt = Criptigh
-settings-encryption-making-room = Spás á dhéanamh…
+settings-encryption-making-room = Spás á dhéanamh
 settings-encryption-unlocks-chip-pin = Díghlasálann sé leis an tslis slándála agus le d’UAP
 settings-encryption-unlocks-chip = Díghlasálann sé leis féin leis an tslis slándála
 settings-encryption-unlocks-passphrase = Iarrann sé d’fhrása faire ag an tosú

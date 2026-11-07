@@ -116,4 +116,4 @@ ui-passphrase-mismatch = Paroles frāzes nesakrīt
 
 ## Encryption
 
-ui-encryption-checking = Notiek pārbaude…
+ui-encryption-checking = Notiek pārbaude

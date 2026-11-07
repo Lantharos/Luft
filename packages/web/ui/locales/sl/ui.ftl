@@ -117,4 +117,4 @@ ui-passphrase-mismatch = Šifrirni gesli se ne ujemata
 
 ## Encryption
 
-ui-encryption-checking = Preverjanje …
+ui-encryption-checking = Preverjanje

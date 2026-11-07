@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import { Dialog } from '@luft/ui';
+	import { Dialog, Spinner } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { Drive, Format } from '#lib/bindings.js';
 	import { WAIT } from '#lib/bridge/index.js';
@@ -39,6 +39,6 @@
 	<FormatFields bind:format bind:valid offerErase={false} />
 	{#snippet actions()}
 		<button type="button" class="button" onclick={onclose}>Cancel</button>
-		<button type="button" class="button primary" disabled={!valid || working} onclick={submit}>{working ? 'Creating…' : 'Create'}</button>
+		<button type="button" class="button primary" disabled={!valid || working} onclick={submit}>{#if working}<Spinner />Creating{:else}Create{/if}</button>
 	{/snippet}
 </Dialog>

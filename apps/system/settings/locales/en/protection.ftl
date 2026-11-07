@@ -217,7 +217,7 @@ settings-encryption-summary-chip = Until it’s done, the security chip keeps th
 settings-encryption-summary-recovery-key = Until it’s done, it asks for the recovery key at startup instead of your passphrase.
 # Button, verb: starts encrypting this computer
 settings-encryption-encrypt = Encrypt
-settings-encryption-making-room = Making room…
+settings-encryption-making-room = Making room
 settings-encryption-unlocks-chip-pin = Unlocks with the security chip and your PIN
 settings-encryption-unlocks-chip = Unlocks by itself with the security chip
 settings-encryption-unlocks-passphrase = Asks for your passphrase at startup

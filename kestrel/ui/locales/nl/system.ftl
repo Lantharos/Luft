@@ -49,7 +49,7 @@ media-keys-num-lock-off = Num Lock uit
 
 vpn-sign-in-title = Aanmelden bij { $connection }
 vpn-connect = Verbinden
-vpn-signing-in = Aanmelden…
+vpn-signing-in = Aanmelden
 vpn-finish-in-browser = Rond het aanmelden af in je browser.
 vpn-certificate-untrusted = { $host } gaf een certificaat dat niet kan worden gecontroleerd ({ $reason }). De vingerafdruk is { $fingerprint }.
 vpn-certificate-warning = Iemand kan zich voordoen als deze server. Maak alleen verbinding als je dit verwachtte.

@@ -49,7 +49,7 @@ media-keys-num-lock-off = Num Lock as
 
 vpn-sign-in-title = Sínigh isteach ar { $connection }
 vpn-connect = Ceangail
-vpn-signing-in = Ag síniú isteach…
+vpn-signing-in = Ag síniú isteach
 vpn-finish-in-browser = Críochnaigh an síniú isteach i do bhrabhsálaí.
 vpn-certificate-untrusted = Thug { $host } teastas nach féidir a fhíorú ({ $reason }). Is é seo a mhéarlorg: { $fingerprint }.
 vpn-certificate-warning = D’fhéadfadh duine éigin a bheith ag ligean air gurb é an freastalaí seo é. Ná ceangail ach má bhí tú ag súil leis seo.

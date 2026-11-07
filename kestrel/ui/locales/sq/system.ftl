@@ -49,7 +49,7 @@ media-keys-num-lock-off = Num Lock joaktiv
 
 vpn-sign-in-title = Hyr në { $connection }
 vpn-connect = Lidhu
-vpn-signing-in = Po hyn…
+vpn-signing-in = Po hyn
 vpn-finish-in-browser = Përfundo hyrjen në shfletues.
 vpn-certificate-untrusted = { $host } paraqiti një certifikatë që nuk mund të verifikohet ({ $reason }). Gjurma e saj e gishtit është { $fingerprint }.
 vpn-certificate-warning = Dikush mund të shtiret si ky server. Lidhu vetëm nëse e prisje këtë.

@@ -76,7 +76,7 @@ check-moment = Dit duurt even.
 check-slow = Windows berekent hoeveel ruimte het kan missen. Op een grote schijf kan dat een paar minuten duren.
 check-blocked-description = Er moet nog iets veranderen voordat Luft kan intrekken. Zo doe je dat.
 check-found-description = Dit heeft Meet Luft gevonden.
-check-checking = De schijf, de firmware en de hardware worden gecontroleerd…
+check-checking = De schijf, de firmware en de hardware worden gecontroleerd
 check-again = Opnieuw controleren
 check-action-firmware = Firmware-instellingen openen
 check-action-tidy = Opruimen
@@ -173,7 +173,7 @@ linux-ready-remove-description = Meet Luft wist de bestanden van Luft, de opstar
 
 luft-title = Je Luft
 luft-looking = Meet Luft heeft Luft op deze pc gevonden.
-luft-checking = De schijf van Luft wordt bekeken…
+luft-checking = De schijf van Luft wordt bekeken
 luft-description-beside = Luft is naast Windows op deze pc geïnstalleerd.
 luft-description-drive = Luft is geïnstalleerd op { $drive }.
 luft-bar-used = { $size }, { $used } gebruikt
@@ -227,7 +227,7 @@ resize-shrink-description = Luft verplaatst zijn bestanden de volgende keer dat 
 
 box-title = Je spullen meenemen
 box-description = Kies wat je meeneemt. Luft pakt het uit in je nieuwe account zodra het is geïnstalleerd, en er wordt niets uit Windows verwijderd.
-box-looking = Je mappen worden doorzocht…
+box-looking = Je mappen worden doorzocht
 box-folder-desktop = Bureaublad
 box-folder-documents = Documenten
 box-folder-downloads = Downloads
@@ -294,7 +294,7 @@ removed-description = { $platform ->
 
 stick-title = Een usb-stick maken
 stick-description = Luft start ervan op elke computer, om het uit te proberen of te installeren.
-stick-looking = Usb-schijven zoeken…
+stick-looking = Usb-schijven zoeken
 stick-none = Sluit een usb-stick van { $size } of meer aan. Hij verschijnt hier.
 stick-drives-label = Usb-schijven
 stick-offer = { $name }, { $size }

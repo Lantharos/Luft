@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import { t } from '@luft/i18n';
-	import { Row, Section, Segmented, TextField } from '@luft/ui';
+	import { Row, Section, Segmented, Spinner, TextField } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';
 	import { words } from '../connection/validate';
 	import { proxyLabel, type Mode, type Protocol, type Proxy } from './proxy.svelte';
@@ -91,7 +91,7 @@
 
 <SubPage title={t('settings-page-proxy')} {onclose}>
 	{#snippet actions()}
-		<button type="button" class="button primary" disabled={!ready} onclick={save}>{saving ? t('settings-network-saving') : t('settings-network-save')}</button>
+		<button type="button" class="button primary" disabled={!ready} onclick={save}>{#if saving}<Spinner />{/if}{saving ? t('settings-network-saving') : t('settings-network-save')}</button>
 	{/snippet}
 
 	{#if problem}

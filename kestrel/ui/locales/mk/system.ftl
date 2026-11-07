@@ -49,7 +49,7 @@ media-keys-num-lock-off = Num Lock е исклучен
 
 vpn-sign-in-title = Најава на { $connection }
 vpn-connect = Поврзи
-vpn-signing-in = Се најавува…
+vpn-signing-in = Се најавува
 vpn-finish-in-browser = Завршете ја најавата во прелистувачот.
 vpn-certificate-untrusted = { $host } прикажа сертификат што не може да се потврди ({ $reason }). Неговиот отпечаток е { $fingerprint }.
 vpn-certificate-warning = Некој може да се претставува како овој сервер. Поврзете се само ако го очекувавте ова.

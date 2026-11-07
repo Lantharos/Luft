@@ -49,7 +49,7 @@ media-keys-num-lock-off = Num Lock izslēgts
 
 vpn-sign-in-title = Pierakstīties: { $connection }
 vpn-connect = Izveidot savienojumu
-vpn-signing-in = Notiek pierakstīšanās…
+vpn-signing-in = Notiek pierakstīšanās
 vpn-finish-in-browser = Pabeidziet pierakstīšanos pārlūkprogrammā.
 vpn-certificate-untrusted = Serveris { $host } uzrādīja sertifikātu, ko nevar pārbaudīt ({ $reason }). Tā nospiedums: { $fingerprint }.
 vpn-certificate-warning = Kāds var uzdoties par šo serveri. Izveidojiet savienojumu tikai tad, ja to gaidījāt.

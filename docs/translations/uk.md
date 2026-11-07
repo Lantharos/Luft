@@ -27,7 +27,7 @@ Sentence case everywhere: only the first word and names take a capital letter. �
 
 - Quotation marks: «…», and „…“ inside them.
 - Apostrophe: the typographic ’, never ' or ʼ: комп’ютер, під’єднати, в’язка.
-- Ellipsis: one character, «…», with no space before it: «Завантаження…».
+- Ellipsis: one character, «…», with no space before it. A message about something in progress, such as loading, takes none, because the app shows a spinner beside it.
 - Dash: the em dash with spaces, « — », as Ukrainian typography uses it. Ranges take the en dash without spaces: 2–4.
 - Percent sign with no space, as Windows writes it: «57%». Units take a space and Ukrainian symbols: «4,5 Вт».
 - Mind euphony: «і/й» and «у/в» alternate by the sounds around them: «Дата й час», «Мова й регіон», but «перезавантажити і встановити»; «у файл», «в іншому».

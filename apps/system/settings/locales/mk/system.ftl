@@ -70,7 +70,7 @@ settings-users-password-new-placeholder = { $count ->
 settings-users-password-confirm = Потврда
 settings-users-password-confirm-placeholder = Внесете ја повторно
 settings-users-password-change = Промени ја лозинката
-settings-users-password-changing = Се менува…
+settings-users-password-changing = Се менува
 settings-users-password-wrong = Тоа не е вашата тековна лозинка
 settings-users-password-mismatch = Лозинките не се совпаѓаат
 settings-users-password-too-short = Лозинката е прекратка
@@ -124,11 +124,11 @@ settings-login-automatic-off = Исклучено
 
 ## Updates
 
-settings-updates-checking = Се бараат ажурирања…
-settings-updates-downloading = Се преземаат ажурирањата…
-settings-updates-rolling-back = Се подготвува претходната верзија…
-settings-updates-switching-nvidia = Се презема двигателот на NVIDIA…
-settings-updates-switching-standard = Се презема стандардната слика на системот…
+settings-updates-checking = Се бараат ажурирања
+settings-updates-downloading = Се преземаат ажурирањата
+settings-updates-rolling-back = Се подготвува претходната верзија
+settings-updates-switching-nvidia = Се презема двигателот на NVIDIA
+settings-updates-switching-standard = Се презема стандардната слика на системот
 settings-updates-up-to-date = Системот е ажуриран
 settings-updates-version = Верзија { $version }
 settings-updates-version-new = Нова верзија
@@ -148,9 +148,9 @@ settings-updates-last-checked = Последна проверка { $when }
 settings-updates-never-checked = Сè уште не е проверено
 settings-updates-stop = Запри
 settings-updates-check = Провери сега
-settings-updates-checking-button = Се проверува…
+settings-updates-checking-button = Се проверува
 settings-updates-app-updates = Ажурирања на апликации
-settings-updates-apps-checking = Се бараат ажурирања за вашите апликации…
+settings-updates-apps-checking = Се бараат ажурирања за вашите апликации
 settings-updates-apps-count = { $count ->
     [0] Се управуваат во Schelf
     [one] { $count } апликација има ажурирање во Schelf
@@ -171,7 +171,7 @@ settings-updates-background-description = Ажурирањата се подго
 settings-updates-firmware = Фирмвер
 settings-updates-firmware-description = Ажурирања за софтверот вграден во вашиот хардвер
 settings-updates-firmware-restart = Ќе заврши кога ќе рестартирате
-settings-updates-firmware-installing = Се инсталира…
+settings-updates-firmware-installing = Се инсталира
 settings-updates-firmware-update = Ажурирај
 settings-updates-firmware-failed = Фирмверот не може да се ажурира
 settings-updates-download = Преземи
@@ -262,7 +262,7 @@ settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud �
 settings-accounts-sign-in-again-needed = Најавете се повторно за да продолжите да ја користите
 settings-accounts-paused-metered = Синхронизацијата е паузирана на мерена врска
 settings-accounts-paused-battery = Синхронизацијата е паузирана додека батеријата е слаба
-settings-accounts-connecting = Се поврзува…
+settings-accounts-connecting = Се поврзува
 settings-accounts-offline = Офлајн
 settings-accounts-offline-kept = Офлајн, задржаните датотеки се сè уште тука
 settings-accounts-not-connected = Не е поврзана
@@ -285,7 +285,7 @@ settings-accounts-sign-in-again = Најави се повторно
 settings-accounts-keep = Задржи
 settings-accounts-remove = Отстрани
 settings-accounts-remove-confirm = Отстрани од овој компјутер
-settings-accounts-removing = Се отстранува…
+settings-accounts-removing = Се отстранува
 settings-accounts-remove-note = Вашите датотеки остануваат во { $provider }. Промените направени тука прво се испраќаат таму.
 
 ## Accounts: providers
@@ -318,7 +318,7 @@ settings-accounts-continue-in-browser = Продолжи во прелистув
 settings-accounts-sign-in = Најави се
 settings-accounts-try-again = Обиди се повторно
 settings-accounts-continue = Продолжи
-settings-accounts-working = Се поврзува со { $provider }…
+settings-accounts-working = Се поврзува со { $provider }
 settings-accounts-finish-in-browser = Завршете ја најавата со { $provider } во прелистувачот. Luft никогаш не ја гледа вашата лозинка, а ова ќе се ажурира само штом ќе завршите.
 settings-accounts-no-browser = Не се отвори прелистувач. Копирајте ја врската и отворете ја во прелистувач.
 settings-accounts-open-again = Отвори ја страницата повторно

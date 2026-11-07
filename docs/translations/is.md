@@ -32,7 +32,7 @@ Sentence case everywhere: only the first word and names take a capital letter. �
 
 - Quotation marks: „…“, low then high, and ‚…‘ inside them.
 - Apostrophe: ’, the typographic one. Icelandic rarely needs it.
-- Ellipsis: one character, „…“, with no space before it: „Vistar…“.
+- Ellipsis: one character, „…“, with no space before it. A message about something in progress, such as loading, takes none, because the app shows a spinner beside it.
 - Dash: the en dash with spaces, „ – “. No em dashes. Ranges use the en dash without spaces: 2–4.
 - No space before the percent sign: „57%“. A space before other units: „4,5 W“.
 - „&“ in English names becomes „og“: „Orka og rafhlaða“.

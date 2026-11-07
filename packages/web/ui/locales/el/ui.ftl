@@ -115,4 +115,4 @@ ui-passphrase-mismatch = Οι φράσεις πρόσβασης δεν ταιρ�
 
 ## Encryption
 
-ui-encryption-checking = Έλεγχος…
+ui-encryption-checking = Έλεγχος

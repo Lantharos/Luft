@@ -71,7 +71,7 @@ settings-users-password-new-placeholder = { $count ->
 settings-users-password-confirm = Confirmare
 settings-users-password-confirm-placeholder = Tastați din nou
 settings-users-password-change = Schimbă parola
-settings-users-password-changing = Se schimbă…
+settings-users-password-changing = Se schimbă
 settings-users-password-wrong = Aceasta nu este parola actuală
 settings-users-password-mismatch = Parolele nu coincid
 settings-users-password-too-short = Parola este prea scurtă
@@ -126,11 +126,11 @@ settings-login-automatic-off = Dezactivată
 
 ## Updates
 
-settings-updates-checking = Se caută actualizări…
-settings-updates-downloading = Se descarcă actualizările…
-settings-updates-rolling-back = Se pregătește versiunea anterioară…
-settings-updates-switching-nvidia = Se descarcă driverul NVIDIA…
-settings-updates-switching-standard = Se descarcă imaginea standard…
+settings-updates-checking = Se caută actualizări
+settings-updates-downloading = Se descarcă actualizările
+settings-updates-rolling-back = Se pregătește versiunea anterioară
+settings-updates-switching-nvidia = Se descarcă driverul NVIDIA
+settings-updates-switching-standard = Se descarcă imaginea standard
 settings-updates-up-to-date = Sistemul este actualizat
 settings-updates-version = Versiunea { $version }
 settings-updates-version-new = O versiune nouă
@@ -150,9 +150,9 @@ settings-updates-last-checked = Ultima verificare: { $when }
 settings-updates-never-checked = Nu s-a verificat încă
 settings-updates-stop = Oprește
 settings-updates-check = Verifică acum
-settings-updates-checking-button = Se verifică…
+settings-updates-checking-button = Se verifică
 settings-updates-app-updates = Actualizări pentru aplicații
-settings-updates-apps-checking = Se caută actualizări pentru aplicații…
+settings-updates-apps-checking = Se caută actualizări pentru aplicații
 settings-updates-apps-count = { $count ->
     [0] Gestionate în Schelf
     [one] { $count } aplicație are o actualizare în Schelf
@@ -174,7 +174,7 @@ settings-updates-background-description = Actualizările sunt gata de instalare 
 settings-updates-firmware = Firmware
 settings-updates-firmware-description = Actualizări pentru software-ul integrat în hardware
 settings-updates-firmware-restart = Se finalizează la repornire
-settings-updates-firmware-installing = Se instalează…
+settings-updates-firmware-installing = Se instalează
 settings-updates-firmware-update = Actualizează
 settings-updates-firmware-failed = Firmware-ul nu a putut fi actualizat
 settings-updates-download = Descarcă
@@ -265,7 +265,7 @@ settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud s
 settings-accounts-sign-in-again-needed = Conectați-vă din nou pentru a-l folosi în continuare
 settings-accounts-paused-metered = Sincronizarea este întreruptă pe o conexiune contorizată
 settings-accounts-paused-battery = Sincronizarea este întreruptă cât timp bateria este descărcată
-settings-accounts-connecting = Se conectează…
+settings-accounts-connecting = Se conectează
 settings-accounts-offline = Offline
 settings-accounts-offline-kept = Offline, fișierele păstrate sunt în continuare aici
 settings-accounts-not-connected = Neconectat
@@ -290,7 +290,7 @@ settings-accounts-sign-in-again = Conectează-te din nou
 settings-accounts-keep = Păstrează
 settings-accounts-remove = Elimină
 settings-accounts-remove-confirm = Elimină de pe acest computer
-settings-accounts-removing = Se elimină…
+settings-accounts-removing = Se elimină
 settings-accounts-remove-note = Fișierele rămân în { $provider }. Modificările făcute aici sunt trimise mai întâi.
 
 ## Accounts: providers
@@ -323,7 +323,7 @@ settings-accounts-continue-in-browser = Continuă în browser
 settings-accounts-sign-in = Conectează-te
 settings-accounts-try-again = Încearcă din nou
 settings-accounts-continue = Continuă
-settings-accounts-working = Se comunică cu { $provider }…
+settings-accounts-working = Se comunică cu { $provider }
 settings-accounts-finish-in-browser = Finalizați conectarea cu { $provider } în browser. Luft nu vede niciodată parola, iar această pagină se actualizează singură după ce terminați.
 settings-accounts-no-browser = Nu s-a deschis niciun browser. Copiați linkul și deschideți-l într-un browser.
 settings-accounts-open-again = Deschide din nou pagina

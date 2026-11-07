@@ -72,7 +72,7 @@ settings-users-password-new-placeholder = { $count ->
 settings-users-password-confirm = Подтверждение
 settings-users-password-confirm-placeholder = Введите ещё раз
 settings-users-password-change = Изменить пароль
-settings-users-password-changing = Изменение…
+settings-users-password-changing = Изменение
 settings-users-password-wrong = Текущий пароль указан неверно
 settings-users-password-mismatch = Пароли не совпадают
 settings-users-password-too-short = Пароль слишком короткий
@@ -128,11 +128,11 @@ settings-login-automatic-off = Отключён
 
 ## Updates
 
-settings-updates-checking = Поиск обновлений…
-settings-updates-downloading = Скачивание обновлений…
-settings-updates-rolling-back = Подготовка предыдущей версии…
-settings-updates-switching-nvidia = Скачивание драйвера NVIDIA…
-settings-updates-switching-standard = Скачивание стандартного образа…
+settings-updates-checking = Поиск обновлений
+settings-updates-downloading = Скачивание обновлений
+settings-updates-rolling-back = Подготовка предыдущей версии
+settings-updates-switching-nvidia = Скачивание драйвера NVIDIA
+settings-updates-switching-standard = Скачивание стандартного образа
 settings-updates-up-to-date = Система обновлена
 settings-updates-version = Версия { $version }
 settings-updates-version-new = Новая версия
@@ -152,9 +152,9 @@ settings-updates-last-checked = Последняя проверка: { $when }
 settings-updates-never-checked = Проверок ещё не было
 settings-updates-stop = Остановить
 settings-updates-check = Проверить
-settings-updates-checking-button = Проверка…
+settings-updates-checking-button = Проверка
 settings-updates-app-updates = Обновления приложений
-settings-updates-apps-checking = Поиск обновлений приложений…
+settings-updates-apps-checking = Поиск обновлений приложений
 settings-updates-apps-count = { $count ->
     [0] Управляются в приложении Schelf
     [one] Обновления для { $count } приложения в Schelf
@@ -177,7 +177,7 @@ settings-updates-background-description = Обновления будут гот
 settings-updates-firmware = Прошивка
 settings-updates-firmware-description = Обновления программ, встроенных в оборудование
 settings-updates-firmware-restart = Завершится после перезагрузки
-settings-updates-firmware-installing = Установка…
+settings-updates-firmware-installing = Установка
 settings-updates-firmware-update = Обновить
 settings-updates-firmware-failed = Не удалось обновить прошивку
 settings-updates-download = Скачать
@@ -268,7 +268,7 @@ settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud �
 settings-accounts-sign-in-again-needed = Войдите снова, чтобы продолжить
 settings-accounts-paused-metered = Синхронизация приостановлена на лимитном подключении
 settings-accounts-paused-battery = Синхронизация приостановлена из-за низкого заряда батареи
-settings-accounts-connecting = Подключение…
+settings-accounts-connecting = Подключение
 settings-accounts-offline = Не в сети
 settings-accounts-offline-kept = Не в сети, сохранённые файлы доступны
 settings-accounts-not-connected = Не подключено
@@ -295,7 +295,7 @@ settings-accounts-sign-in-again = Войти снова
 settings-accounts-keep = Оставить
 settings-accounts-remove = Удалить
 settings-accounts-remove-confirm = Удалить с этого компьютера
-settings-accounts-removing = Удаление…
+settings-accounts-removing = Удаление
 settings-accounts-remove-note = Ваши файлы останутся в { $provider }. Сначала туда будут отправлены изменения, сделанные здесь.
 
 ## Accounts: providers
@@ -328,7 +328,7 @@ settings-accounts-continue-in-browser = Продолжить в браузере
 settings-accounts-sign-in = Войти
 settings-accounts-try-again = Повторить
 settings-accounts-continue = Продолжить
-settings-accounts-working = Связь с { $provider }…
+settings-accounts-working = Связь с { $provider }
 settings-accounts-finish-in-browser = Завершите вход через { $provider } в браузере. Luft никогда не видит ваш пароль, а эта страница обновится сама, когда вы закончите.
 settings-accounts-no-browser = Браузер не открылся. Скопируйте ссылку и откройте её в браузере.
 settings-accounts-open-again = Открыть страницу снова

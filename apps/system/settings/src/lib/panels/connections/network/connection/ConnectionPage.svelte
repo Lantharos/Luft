@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { t } from '@luft/i18n';
-	import { errorText, Row, Section } from '@luft/ui';
+	import { errorText, Row, Section, Spinner } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';
 	import { waitForPerson, type Network, type Profile } from '@luft/network';
 	import { commands } from '#lib/bindings.js';
@@ -88,7 +88,7 @@
 
 <SubPage {title} {onclose}>
 	{#snippet actions()}
-		<button type="button" class="button primary" disabled={!ready} onclick={save}>{saving ? t('settings-network-saving') : t('settings-network-save')}</button>
+		<button type="button" class="button primary" disabled={!ready} onclick={save}>{#if saving}<Spinner />{/if}{saving ? t('settings-network-saving') : t('settings-network-save')}</button>
 	{/snippet}
 
 	{#if problem}

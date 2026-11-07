@@ -115,4 +115,4 @@ ui-passphrase-mismatch = Lykilsetningarnar passa ekki saman
 
 ## Encryption
 
-ui-encryption-checking = Athugar…
+ui-encryption-checking = Athugar

@@ -27,7 +27,7 @@ Lowercase words such as wifi and usb-stick take a capital only at the start of a
 
 - Quotation marks: “…”, and ‘…’ inside them.
 - Apostrophe: ’, as in “emoji’s” and “pc’s”.
-- Ellipsis: one character, “…”, with no space before it: “Laden…”.
+- Ellipsis: one character, “…”, with no space before it. A message about something in progress, such as loading, takes none, because the app shows a spinner beside it.
 - Dash: the en dash with spaces, “ – ”.
 - Percent sign directly after the number, with no space: “57%”.
 - Compounds are written as one word, as Dutch requires: “klembordgeschiedenis”, “apparaatversleuteling”. Use a hyphen only where vowels would clash (“auto-update”, “media-afspeler”) and after abbreviations and names: “usb-stick”, “pdf-bestand”, “Rover-venster”.

@@ -115,4 +115,4 @@ ui-passphrase-mismatch = A jelmondatok nem egyeznek
 
 ## Encryption
 
-ui-encryption-checking = Ellenőrzés…
+ui-encryption-checking = Ellenőrzés

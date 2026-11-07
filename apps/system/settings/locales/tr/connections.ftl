@@ -3,7 +3,7 @@
 ## Network: shared words
 
 settings-network-save = Kaydet
-settings-network-saving = Kaydediliyor…
+settings-network-saving = Kaydediliyor
 settings-network-cancel = İptal
 settings-network-connect = Bağlan
 settings-network-disconnect = Bağlantıyı kes
@@ -22,7 +22,7 @@ settings-network-connect-failed = Bağlanılamadı
 ## Network: connection states
 
 settings-network-link-connected = Bağlı
-settings-network-link-connecting = Bağlanıyor…
+settings-network-link-connecting = Bağlanıyor
 settings-network-link-disconnected = Bağlı değil
 settings-network-link-unplugged = Kablo takılı değil
 
@@ -88,7 +88,7 @@ settings-network-wifi-enterprise = İş ya da okul hesabıyla oturum açın
 settings-network-wifi-connect-failed = Bu ağa bağlanılamadı
 settings-network-wifi-saved-password-failed = Kayıtlı parola işe yaramadı. Parolayı yeniden girin.
 settings-network-wifi-settings = Ağ ayarları
-settings-network-wifi-searching = Ağlar aranıyor…
+settings-network-wifi-searching = Ağlar aranıyor
 settings-network-hidden = Gizli bir ağa bağlan
     .description = Ağın adını ve nasıl korunduğunu girin.
 settings-network-hidden-name = Ağ adı
@@ -247,7 +247,7 @@ settings-network-vpn-off = Kapalı
 settings-network-vpn-none = Ayarlanmadı
 settings-network-vpn-import = Dosyadan içe aktar
     .description = WireGuard, OpenVPN ve diğer VPN yapılandırma dosyaları
-settings-network-vpn-importing = İçe aktarılıyor…
+settings-network-vpn-importing = İçe aktarılıyor
 settings-network-wireguard = WireGuard’ı kur
     .description = VPN sağlayıcınızdan ya da sunucunuzdan aldığınız bilgileri girin
 settings-network-wireguard-dialog = Bu bilgileri VPN sağlayıcınız ya da sunucunun sahibi verebilir.
@@ -267,7 +267,7 @@ settings-network-wireguard-keepalive = Canlı tutma
     .description = Bağlantının bir yönlendiricinin arkasında açık kalmasına yardımcı olur
     .placeholder = İsteğe bağlı, saniye cinsinden
 settings-network-wireguard-add = Ekle
-settings-network-wireguard-adding = Ekleniyor…
+settings-network-wireguard-adding = Ekleniyor
 settings-network-wireguard-error-private-key = Bir özel anahtar girin ya da oluşturun
 settings-network-wireguard-error-addresses = En az bir adres girin
 settings-network-wireguard-error-server-key = Sunucunun ortak anahtarını girin
@@ -292,16 +292,16 @@ settings-bluetooth-visible-until-off = Kapatılana kadar
 settings-bluetooth-visible-failed = Bu bilgisayarın görünürlüğü değiştirilemedi
 settings-bluetooth-paired = Cihazlarım
 settings-bluetooth-nearby = Yakındaki cihazlar
-settings-bluetooth-searching = Cihazlar aranıyor…
+settings-bluetooth-searching = Cihazlar aranıyor
     .description = Eklemek istediğiniz cihazı eşleştirme moduna alın
 settings-bluetooth-blocked = Bluetooth bir donanım anahtarıyla kapatılmış
     .description = Açmak için bilgisayarınızdaki anahtarı ya da tuşu kullanın
 settings-bluetooth-details = Cihaz ayrıntıları
 settings-bluetooth-connected = Bağlı
 settings-bluetooth-connected-battery = Bağlı · Pil { $battery }
-settings-bluetooth-connecting = Bağlanıyor…
-settings-bluetooth-disconnecting = Bağlantı kesiliyor…
-settings-bluetooth-pairing = Eşleştiriliyor…
+settings-bluetooth-connecting = Bağlanıyor
+settings-bluetooth-disconnecting = Bağlantı kesiliyor
+settings-bluetooth-pairing = Eşleştiriliyor
 settings-bluetooth-forget-confirm = “{ $name }” unutulsun mu?
     .description = Bu bilgisayarla kullanmak için cihazı yeniden eşleştirmeniz gerekir.
 settings-bluetooth-forget = Unut

@@ -71,7 +71,7 @@ settings-users-password-new-placeholder = { $count ->
 settings-users-password-confirm = Potvrda
 settings-users-password-confirm-placeholder = Upišite je ponovno
 settings-users-password-change = Promijeni lozinku
-settings-users-password-changing = Mijenjanje…
+settings-users-password-changing = Mijenjanje
 settings-users-password-wrong = To nije vaša trenutačna lozinka
 settings-users-password-mismatch = Lozinke se ne podudaraju
 settings-users-password-too-short = Ova je lozinka prekratka
@@ -126,11 +126,11 @@ settings-login-automatic-off = Isključeno
 
 ## Updates
 
-settings-updates-checking = Traženje ažuriranja…
-settings-updates-downloading = Preuzimanje ažuriranja…
-settings-updates-rolling-back = Priprema prethodne verzije…
-settings-updates-switching-nvidia = Preuzimanje upravljačkog programa tvrtke NVIDIA…
-settings-updates-switching-standard = Preuzimanje standardne slike sustava…
+settings-updates-checking = Traženje ažuriranja
+settings-updates-downloading = Preuzimanje ažuriranja
+settings-updates-rolling-back = Priprema prethodne verzije
+settings-updates-switching-nvidia = Preuzimanje upravljačkog programa tvrtke NVIDIA
+settings-updates-switching-standard = Preuzimanje standardne slike sustava
 settings-updates-up-to-date = Vaš je sustav ažuran
 settings-updates-version = Verzija { $version }
 settings-updates-version-new = Nova verzija
@@ -150,9 +150,9 @@ settings-updates-last-checked = Zadnja provjera: { $when }
 settings-updates-never-checked = Još nije provjereno
 settings-updates-stop = Zaustavi
 settings-updates-check = Provjeri sada
-settings-updates-checking-button = Provjera…
+settings-updates-checking-button = Provjera
 settings-updates-app-updates = Ažuriranja aplikacija
-settings-updates-apps-checking = Traženje ažuriranja za vaše aplikacije…
+settings-updates-apps-checking = Traženje ažuriranja za vaše aplikacije
 settings-updates-apps-count = { $count ->
     [0] Upravlja se u aplikaciji Schelf
     [one] { $count } aplikacija ima ažuriranje u aplikaciji Schelf
@@ -174,7 +174,7 @@ settings-updates-background-description = Ažuriranja su spremna za instalaciju 
 settings-updates-firmware = Firmver
 settings-updates-firmware-description = Ažuriranja softvera ugrađenog u vaš hardver
 settings-updates-firmware-restart = Završava se pri ponovnom pokretanju
-settings-updates-firmware-installing = Instaliranje…
+settings-updates-firmware-installing = Instaliranje
 settings-updates-firmware-update = Ažuriraj
 settings-updates-firmware-failed = Firmver nije bilo moguće ažurirati
 settings-updates-download = Preuzmi
@@ -265,7 +265,7 @@ settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud i
 settings-accounts-sign-in-again-needed = Ponovno se prijavite da biste ga nastavili koristiti
 settings-accounts-paused-metered = Sinkronizacija je pauzirana na ograničenoj vezi
 settings-accounts-paused-battery = Sinkronizacija je pauzirana dok je baterija pri kraju
-settings-accounts-connecting = Povezivanje…
+settings-accounts-connecting = Povezivanje
 settings-accounts-offline = Izvan mreže
 settings-accounts-offline-kept = Izvan mreže, zadržane datoteke i dalje su dostupne
 settings-accounts-not-connected = Nije povezano
@@ -290,7 +290,7 @@ settings-accounts-sign-in-again = Ponovno se prijavi
 settings-accounts-keep = Zadrži
 settings-accounts-remove = Ukloni
 settings-accounts-remove-confirm = Ukloni s ovog računala
-settings-accounts-removing = Uklanjanje…
+settings-accounts-removing = Uklanjanje
 settings-accounts-remove-note = Vaše datoteke ostaju u usluzi { $provider }. Promjene napravljene ovdje najprije se šalju onamo.
 
 ## Accounts: providers
@@ -323,7 +323,7 @@ settings-accounts-continue-in-browser = Nastavi u pregledniku
 settings-accounts-sign-in = Prijava
 settings-accounts-try-again = Pokušaj ponovno
 settings-accounts-continue = Nastavi
-settings-accounts-working = Povezivanje s uslugom { $provider }…
+settings-accounts-working = Povezivanje s uslugom { $provider }
 settings-accounts-finish-in-browser = Dovršite prijavu putem usluge { $provider } u pregledniku. Luft nikad ne vidi vašu lozinku, a ovo će se samo ažurirati kad završite.
 settings-accounts-no-browser = Preglednik se nije otvorio. Kopirajte poveznicu i otvorite je u pregledniku.
 settings-accounts-open-again = Ponovno otvori stranicu

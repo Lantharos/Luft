@@ -1,8 +1,7 @@
 <script lang="ts">
 	import Cable from '@lucide/svelte/icons/cable';
-	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import { t } from '@luft/i18n';
-	import { Switch } from '@luft/ui';
+	import { Spinner, Switch } from '@luft/ui';
 	import { needsPassword, type Network, type WifiNetwork } from '@luft/network';
 	import { commands, events } from '#lib/bindings.js';
 	import StepFrame from '#lib/components/StepFrame.svelte';
@@ -72,7 +71,7 @@
 	{#if unavailable}
 		<p class="text-[14px] text-[var(--text-soft)]">{t('setup-network-unavailable')}</p>
 	{:else if !current}
-		<div class="flex items-center gap-3 text-[14px] text-[var(--text-soft)]"><LoaderCircle size={18} class="animate-spin" />{t('setup-network-looking')}</div>
+		<div class="flex items-center gap-3 text-[14px] text-[var(--text-soft)]"><Spinner size={18} />{t('setup-network-looking')}</div>
 	{:else}
 		<div class="flex flex-col gap-1">
 			{#if wired}

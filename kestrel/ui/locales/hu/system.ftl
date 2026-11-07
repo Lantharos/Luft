@@ -49,7 +49,7 @@ media-keys-num-lock-off = Num Lock kikapcsolva
 
 vpn-sign-in-title = Bejelentkezés: { $connection }
 vpn-connect = Csatlakozás
-vpn-signing-in = Bejelentkezés…
+vpn-signing-in = Bejelentkezés
 vpn-finish-in-browser = Fejezze be a bejelentkezést a böngészőben.
 vpn-certificate-untrusted = { $host } kiszolgáló olyan tanúsítványt küldött, amely nem ellenőrizhető ({ $reason }). A tanúsítvány ujjlenyomata: { $fingerprint }.
 vpn-certificate-warning = Lehet, hogy valaki ennek a kiszolgálónak adja ki magát. Csak akkor csatlakozzon, ha erre számított.

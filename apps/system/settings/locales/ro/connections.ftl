@@ -3,7 +3,7 @@
 ## Network: shared words
 
 settings-network-save = Salvează
-settings-network-saving = Se salvează…
+settings-network-saving = Se salvează
 settings-network-cancel = Anulează
 settings-network-connect = Conectează
 settings-network-disconnect = Deconectează
@@ -22,7 +22,7 @@ settings-network-connect-failed = Conectarea nu a reușit
 ## Network: connection states
 
 settings-network-link-connected = Conectat
-settings-network-link-connecting = Se conectează…
+settings-network-link-connecting = Se conectează
 settings-network-link-disconnected = Neconectat
 settings-network-link-unplugged = Cablu deconectat
 
@@ -89,7 +89,7 @@ settings-network-wifi-enterprise = Conectați-vă cu un cont de la serviciu sau 
 settings-network-wifi-connect-failed = Conectarea la această rețea nu a reușit
 settings-network-wifi-saved-password-failed = Parola salvată nu a funcționat. Introduceți-o din nou.
 settings-network-wifi-settings = Setările rețelei
-settings-network-wifi-searching = Se caută rețele…
+settings-network-wifi-searching = Se caută rețele
 settings-network-hidden = Conectare la o rețea ascunsă
     .description = Introduceți numele rețelei și tipul de securitate.
 settings-network-hidden-name = Numele rețelei
@@ -249,7 +249,7 @@ settings-network-vpn-off = Dezactivat
 settings-network-vpn-none = Neconfigurat
 settings-network-vpn-import = Importă dintr-un fișier
     .description = Fișiere de configurare WireGuard, OpenVPN și alte fișiere VPN
-settings-network-vpn-importing = Se importă…
+settings-network-vpn-importing = Se importă
 settings-network-wireguard = Configurează WireGuard
     .description = Introduceți datele primite de la furnizorul VPN sau de pe server
 settings-network-wireguard-dialog = Aceste date le puteți primi de la furnizorul VPN sau de la administratorul serverului.
@@ -269,7 +269,7 @@ settings-network-wireguard-keepalive = Keepalive
     .description = Ajută conexiunea să rămână activă în spatele unui router
     .placeholder = Opțional, în secunde
 settings-network-wireguard-add = Adaugă
-settings-network-wireguard-adding = Se adaugă…
+settings-network-wireguard-adding = Se adaugă
 settings-network-wireguard-error-private-key = Introduceți sau generați o cheie privată
 settings-network-wireguard-error-addresses = Introduceți cel puțin o adresă
 settings-network-wireguard-error-server-key = Introduceți cheia publică a serverului
@@ -295,16 +295,16 @@ settings-bluetooth-visible-until-off = Până la dezactivare
 settings-bluetooth-visible-failed = Vizibilitatea acestui computer nu a putut fi schimbată
 settings-bluetooth-paired = Dispozitivele mele
 settings-bluetooth-nearby = Dispozitive din apropiere
-settings-bluetooth-searching = Se caută dispozitive…
+settings-bluetooth-searching = Se caută dispozitive
     .description = Puneți dispozitivul pe care vreți să-l adăugați în modul de asociere
 settings-bluetooth-blocked = Bluetooth este dezactivat de un comutator hardware
     .description = Folosiți comutatorul sau tasta de pe computer pentru a-l activa
 settings-bluetooth-details = Detaliile dispozitivului
 settings-bluetooth-connected = Conectat
 settings-bluetooth-connected-battery = Conectat · baterie { $battery }
-settings-bluetooth-connecting = Se conectează…
-settings-bluetooth-disconnecting = Se deconectează…
-settings-bluetooth-pairing = Se asociază…
+settings-bluetooth-connecting = Se conectează
+settings-bluetooth-disconnecting = Se deconectează
+settings-bluetooth-pairing = Se asociază
 settings-bluetooth-forget-confirm = Eliminați „{ $name }”?
     .description = Va trebui să-l asociați din nou pentru a-l folosi cu acest computer.
 settings-bluetooth-forget = Elimină

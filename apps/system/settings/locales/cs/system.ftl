@@ -72,7 +72,7 @@ settings-users-password-new-placeholder = { $count ->
 settings-users-password-confirm = Potvrzení
 settings-users-password-confirm-placeholder = Zadejte ho znovu
 settings-users-password-change = Změnit heslo
-settings-users-password-changing = Měnění…
+settings-users-password-changing = Měnění
 settings-users-password-wrong = Toto není vaše současné heslo
 settings-users-password-mismatch = Hesla se neshodují
 settings-users-password-too-short = Toto heslo je příliš krátké
@@ -128,11 +128,11 @@ settings-login-automatic-off = Vypnuto
 
 ## Updates
 
-settings-updates-checking = Hledání aktualizací…
-settings-updates-downloading = Stahování aktualizací…
-settings-updates-rolling-back = Příprava předchozí verze…
-settings-updates-switching-nvidia = Stahování ovladače NVIDIA…
-settings-updates-switching-standard = Stahování standardního obrazu…
+settings-updates-checking = Hledání aktualizací
+settings-updates-downloading = Stahování aktualizací
+settings-updates-rolling-back = Příprava předchozí verze
+settings-updates-switching-nvidia = Stahování ovladače NVIDIA
+settings-updates-switching-standard = Stahování standardního obrazu
 settings-updates-up-to-date = Systém je aktuální
 settings-updates-version = Verze { $version }
 settings-updates-version-new = Nová verze
@@ -152,9 +152,9 @@ settings-updates-last-checked = Naposledy zkontrolováno { $when }
 settings-updates-never-checked = Zatím nezkontrolováno
 settings-updates-stop = Zastavit
 settings-updates-check = Zkontrolovat
-settings-updates-checking-button = Kontrola…
+settings-updates-checking-button = Kontrola
 settings-updates-app-updates = Aktualizace aplikací
-settings-updates-apps-checking = Hledání aktualizací aplikací…
+settings-updates-apps-checking = Hledání aktualizací aplikací
 settings-updates-apps-count = { $count ->
     [0] Spravuje se v aplikaci Schelf
     [one] V aplikaci Schelf čeká aktualizace pro { $count } aplikaci
@@ -177,7 +177,7 @@ settings-updates-background-description = Aktualizace budou připravené k insta
 settings-updates-firmware = Firmware
 settings-updates-firmware-description = Aktualizace softwaru zabudovaného do hardwaru
 settings-updates-firmware-restart = Dokončí se po restartu
-settings-updates-firmware-installing = Instalace…
+settings-updates-firmware-installing = Instalace
 settings-updates-firmware-update = Aktualizovat
 settings-updates-firmware-failed = Firmware se nepodařilo aktualizovat
 settings-updates-download = Stáhnout
@@ -268,7 +268,7 @@ settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud n
 settings-accounts-sign-in-again-needed = Pro další používání se znovu přihlaste
 settings-accounts-paused-metered = Synchronizace je na měřeném připojení pozastavená
 settings-accounts-paused-battery = Synchronizace je pozastavená kvůli slabé baterii
-settings-accounts-connecting = Připojování…
+settings-accounts-connecting = Připojování
 settings-accounts-offline = Offline
 settings-accounts-offline-kept = Offline, uložené soubory jsou stále k dispozici
 settings-accounts-not-connected = Nepřipojeno
@@ -295,7 +295,7 @@ settings-accounts-sign-in-again = Znovu se přihlásit
 settings-accounts-keep = Ponechat
 settings-accounts-remove = Odebrat
 settings-accounts-remove-confirm = Odebrat z tohoto počítače
-settings-accounts-removing = Odebírání…
+settings-accounts-removing = Odebírání
 settings-accounts-remove-note = Vaše soubory zůstanou ve službě { $provider }. Změny provedené tady se nejdřív odešlou.
 
 ## Accounts: providers
@@ -328,7 +328,7 @@ settings-accounts-continue-in-browser = Pokračovat v prohlížeči
 settings-accounts-sign-in = Přihlásit se
 settings-accounts-try-again = Zkusit znovu
 settings-accounts-continue = Pokračovat
-settings-accounts-working = Komunikace se službou { $provider }…
+settings-accounts-working = Komunikace se službou { $provider }
 settings-accounts-finish-in-browser = Dokončete přihlášení přes { $provider } v prohlížeči. Luft vaše heslo nikdy neuvidí a až budete hotovi, tato stránka se sama aktualizuje.
 settings-accounts-no-browser = Prohlížeč se neotevřel. Zkopírujte odkaz a otevřete ho v prohlížeči.
 settings-accounts-open-again = Znovu otevřít stránku

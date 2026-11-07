@@ -3,7 +3,7 @@
 ## Network: shared words
 
 settings-network-save = Opslaan
-settings-network-saving = Opslaan…
+settings-network-saving = Opslaan
 settings-network-cancel = Annuleren
 settings-network-connect = Verbinden
 settings-network-disconnect = Verbinding verbreken
@@ -22,7 +22,7 @@ settings-network-connect-failed = Kan geen verbinding maken
 ## Network: connection states
 
 settings-network-link-connected = Verbonden
-settings-network-link-connecting = Verbinden…
+settings-network-link-connecting = Verbinden
 settings-network-link-disconnected = Niet verbonden
 settings-network-link-unplugged = Kabel losgekoppeld
 
@@ -88,7 +88,7 @@ settings-network-wifi-enterprise = Aanmelden met een account van werk of school
 settings-network-wifi-connect-failed = Kan geen verbinding maken met dit netwerk
 settings-network-wifi-saved-password-failed = Het opgeslagen wachtwoord werkte niet. Voer het opnieuw in.
 settings-network-wifi-settings = Netwerkinstellingen
-settings-network-wifi-searching = Netwerken zoeken…
+settings-network-wifi-searching = Netwerken zoeken
 settings-network-hidden = Verbinden met een verborgen netwerk
     .description = Voer de naam van het netwerk in en hoe het beveiligd is.
 settings-network-hidden-name = Netwerknaam
@@ -247,7 +247,7 @@ settings-network-vpn-off = Uit
 settings-network-vpn-none = Niet ingesteld
 settings-network-vpn-import = Importeren uit een bestand
     .description = Configuratiebestanden van WireGuard, OpenVPN en andere VPN’s
-settings-network-vpn-importing = Importeren…
+settings-network-vpn-importing = Importeren
 settings-network-wireguard = WireGuard instellen
     .description = Voer de gegevens van je VPN-aanbieder of server in
 settings-network-wireguard-dialog = Je VPN-aanbieder of de eigenaar van de server kan je deze gegevens geven.
@@ -267,7 +267,7 @@ settings-network-wireguard-keepalive = Keepalive
     .description = Helpt de verbinding actief te houden achter een router
     .placeholder = Optioneel, in seconden
 settings-network-wireguard-add = Toevoegen
-settings-network-wireguard-adding = Toevoegen…
+settings-network-wireguard-adding = Toevoegen
 settings-network-wireguard-error-private-key = Voer een privésleutel in of genereer er een
 settings-network-wireguard-error-addresses = Voer minstens één adres in
 settings-network-wireguard-error-server-key = Voer de openbare sleutel van de server in
@@ -292,16 +292,16 @@ settings-bluetooth-visible-until-off = Tot uitgeschakeld
 settings-bluetooth-visible-failed = Kan niet wijzigen of deze computer zichtbaar is
 settings-bluetooth-paired = Mijn apparaten
 settings-bluetooth-nearby = Apparaten in de buurt
-settings-bluetooth-searching = Apparaten zoeken…
+settings-bluetooth-searching = Apparaten zoeken
     .description = Zet het apparaat dat je wilt toevoegen in de koppelmodus
 settings-bluetooth-blocked = Bluetooth is uitgeschakeld met een hardwareschakelaar
     .description = Gebruik de schakelaar of toets op je computer om het in te schakelen
 settings-bluetooth-details = Apparaatgegevens
 settings-bluetooth-connected = Verbonden
 settings-bluetooth-connected-battery = Verbonden · batterij { $battery }
-settings-bluetooth-connecting = Verbinden…
-settings-bluetooth-disconnecting = Verbinding verbreken…
-settings-bluetooth-pairing = Koppelen…
+settings-bluetooth-connecting = Verbinden
+settings-bluetooth-disconnecting = Verbinding verbreken
+settings-bluetooth-pairing = Koppelen
 settings-bluetooth-forget-confirm = “{ $name }” vergeten?
     .description = Je moet het opnieuw koppelen om het met deze computer te gebruiken.
 settings-bluetooth-forget = Vergeten

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { Checkbox, PasswordField, RecoveryKey } from '@luft/ui';
+	import { Checkbox, PasswordField, RecoveryKey, Spinner } from '@luft/ui';
 	import { commands, type Encryption } from '#lib/bindings.js';
 	import { WAIT_FOR_PERSON } from '#lib/bridge/system.js';
 	import StepFrame from '#lib/components/StepFrame.svelte';
@@ -59,7 +59,7 @@
 	{#snippet actions()}
 		<button type="button" class="plain-button large" disabled={install.starting} onclick={() => choose(false)}>{t('setup-protect-skip')}</button>
 		<button type="button" class="button primary large px-6" disabled={!ready || install.starting} onclick={() => choose(true)}>
-			{t(install.starting ? 'setup-destination-starting' : 'setup-protect-encrypt')}
+			{#if install.starting}<Spinner />{/if}{t(install.starting ? 'setup-destination-starting' : 'setup-protect-encrypt')}
 		</button>
 	{/snippet}
 </StepFrame>

@@ -115,4 +115,4 @@ ui-passphrase-mismatch = Паролите за диска не съвпадат
 
 ## Encryption
 
-ui-encryption-checking = Проверка…
+ui-encryption-checking = Проверка

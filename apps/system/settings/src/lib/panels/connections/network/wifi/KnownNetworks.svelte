@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Settings from '@lucide/svelte/icons/settings';
 	import { t } from '@luft/i18n';
-	import { errorText, IconButton, Row, Section } from '@luft/ui';
+	import { errorText, IconButton, Row, Section, Spinner } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';
 	import { waitForPerson, type Known, type Network } from '@luft/network';
 	import { commands } from '#lib/bindings.js';
@@ -52,6 +52,7 @@
 	<Section description={t('settings-network-known.description')}>
 		{#each network.known as known (known.connection)}
 			<Row title={known.ssid} description={describe(known)}>
+				{#if nearby.get(known.ssid)?.state === 'connecting'}<Spinner />{/if}
 				<IconButton
 					icon={Settings}
 					label={t('settings-network-wifi-settings')}

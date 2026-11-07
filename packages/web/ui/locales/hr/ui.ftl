@@ -116,4 +116,4 @@ ui-passphrase-mismatch = Lozinke za disk se ne podudaraju
 
 ## Encryption
 
-ui-encryption-checking = Provjeravanje…
+ui-encryption-checking = Provjeravanje

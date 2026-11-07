@@ -1,9 +1,8 @@
 <script lang="ts">
 	import Import from '@lucide/svelte/icons/import';
-	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import { onMount } from 'svelte';
 	import { i18n, t } from '@luft/i18n';
-	import { ActionRow, errorText, Section } from '@luft/ui';
+	import { ActionRow, errorText, Section, Spinner } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { WindowsDevice } from '#lib/bindings.js';
 	import { importFromWindows } from './api';
@@ -50,7 +49,7 @@
 		>
 			{#snippet trailing()}
 				{#if importing}
-					<LoaderCircle size={16} class="animate-spin" />
+					<Spinner size={16} />
 				{/if}
 			{/snippet}
 		</ActionRow>

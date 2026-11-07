@@ -75,7 +75,7 @@ check-moment = Θα πάρει λίγο χρόνο.
 check-slow = Τα Windows υπολογίζουν πόσο χώρο μπορούν να διαθέσουν. Σε μεγάλο δίσκο αυτό μπορεί να πάρει μερικά λεπτά.
 check-blocked-description = Κάτι πρέπει να αλλάξει πριν εγκατασταθεί το Luft. Δείτε τι να κάνετε.
 check-found-description = Αυτά βρήκε το Meet Luft.
-check-checking = Έλεγχος δίσκου, υλικολογισμικού και υλικού…
+check-checking = Έλεγχος δίσκου, υλικολογισμικού και υλικού
 check-again = Νέος έλεγχος
 check-action-firmware = Άνοιγμα ρυθμίσεων υλικολογισμικού
 check-action-tidy = Τακτοποίηση
@@ -171,7 +171,7 @@ linux-ready-remove-description = Το Meet Luft διαγράφει τα αρχε
 
 luft-title = Το Luft σας
 luft-looking = Το Meet Luft βρήκε το Luft σε αυτό το PC.
-luft-checking = Έλεγχος του δίσκου του Luft…
+luft-checking = Έλεγχος του δίσκου του Luft
 luft-description-beside = Το Luft είναι εγκατεστημένο δίπλα στα Windows σε αυτό το PC.
 luft-description-drive = Το Luft είναι εγκατεστημένο στο { $drive }.
 luft-bar-used = { $size }, σε χρήση { $used }
@@ -225,7 +225,7 @@ resize-shrink-description = Το Luft μετακινεί τα αρχεία το�
 
 box-title = Πάρτε μαζί τα πράγματά σας
 box-description = Επιλέξτε τι θα πάρετε μαζί. Το Luft τα αποσυσκευάζει στον νέο σας λογαριασμό όταν εγκατασταθεί, και τίποτα δεν αφαιρείται από τα Windows.
-box-looking = Εξέταση των φακέλων σας…
+box-looking = Εξέταση των φακέλων σας
 box-folder-desktop = Επιφάνεια εργασίας
 box-folder-documents = Έγγραφα
 box-folder-downloads = Λήψεις
@@ -291,7 +291,7 @@ removed-description = { $platform ->
 
 stick-title = Δημιουργία στικ USB
 stick-description = Το Luft ξεκινά από αυτό σε οποιονδήποτε υπολογιστή, για δοκιμή ή εγκατάσταση.
-stick-looking = Αναζήτηση μονάδων USB…
+stick-looking = Αναζήτηση μονάδων USB
 stick-none = Συνδέστε ένα στικ USB των { $size } ή μεγαλύτερο. Θα εμφανιστεί εδώ.
 stick-drives-label = Μονάδες USB
 stick-offer = { $name }, { $size }

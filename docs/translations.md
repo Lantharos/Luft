@@ -86,6 +86,7 @@ Message IDs are stable, semantic and start with the feature they belong to, such
 
 - Variables are camelCase. Pass numbers as numbers; Fluent formats them for the language.
 - Add a comment above a message when the English is ambiguous: whether "Open" is a verb, where the text shows, what a variable holds.
+- A message about something in progress, such as `Looking for updates`, has no ellipsis: the app shows a spinner next to it, so the motion says it's still going. An ellipsis only ends a menu item or button that asks for more before it acts, such as `Print…`.
 - Keyboard shortcut labels are built from translatable key names, since German writes Strg for Ctrl.
 - Log messages and errors meant for developers stay in English.
 

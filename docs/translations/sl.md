@@ -28,7 +28,7 @@ Sentence case everywhere: only the first word and names take a capital letter. �
 
 - Quotation marks: „…“, and ‚…‘ inside them.
 - Apostrophe: ’.
-- Ellipsis: one character, „…“. No space before it when something is left out of a word, a space otherwise: „Nalaganje …“.
+- Ellipsis: one character, „…“. No space before it when something is left out of a word, a space otherwise. A message about something in progress, such as loading, takes none, because the app shows a spinner beside it.
 - Dash: the en dash with spaces, „ – “. No em dashes.
 - No space before ! ? : ;. A space between a number and its unit or the percent sign: „57 %“, „4,5 W“.
 - Key names stay as printed on keyboards sold in Slovenia: Ctrl, Alt, Shift, Enter, Esc, Delete. Only the space bar is translated: Preslednica.

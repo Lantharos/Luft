@@ -182,7 +182,7 @@ settings-encryption-summary-chip = Þar til það er búið geymir öryggiskubbu
 settings-encryption-summary-recovery-key = Þar til það er búið biður það um endurheimtarlykilinn við ræsingu í stað lykilsetningarinnar þinnar.
 # Button, verb: starts encrypting this computer
 settings-encryption-encrypt = Dulrita
-settings-encryption-making-room = Býr til pláss…
+settings-encryption-making-room = Býr til pláss
 settings-encryption-unlocks-chip-pin = Opnast með öryggiskubbnum og PIN-númerinu þínu
 settings-encryption-unlocks-chip = Opnast sjálfkrafa með öryggiskubbnum
 settings-encryption-unlocks-passphrase = Biður um lykilsetninguna þína við ræsingu

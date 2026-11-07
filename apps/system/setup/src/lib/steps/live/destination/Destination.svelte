@@ -3,11 +3,10 @@
 	import ArrowRightLeft from '@lucide/svelte/icons/arrow-right-left';
 	import HardDrive from '@lucide/svelte/icons/hard-drive';
 	import LayoutPanelLeft from '@lucide/svelte/icons/layout-panel-left';
-	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import Sparkles from '@lucide/svelte/icons/sparkles';
 	import SlidersHorizontal from '@lucide/svelte/icons/sliders-horizontal';
 	import { t } from '@luft/i18n';
-	import { bytes, Choice } from '@luft/ui';
+	import { bytes, Choice, Spinner } from '@luft/ui';
 	import { commands, type Drive, type Target, type WindowsVolume } from '#lib/bindings.js';
 	import StepFrame from '#lib/components/StepFrame.svelte';
 	import { flow } from '#lib/state/flow.svelte.js';
@@ -117,7 +116,7 @@
 				<span class="text-[var(--danger)]">{install.surveyError}</span>
 				<button type="button" class="plain-button" onclick={() => install.look()}>{t('setup-try-again')}</button>
 			{:else}
-				<LoaderCircle size={18} class="animate-spin" />{t('setup-destination-looking')}
+				<Spinner size={18} />{t('setup-destination-looking')}
 			{/if}
 		</div>
 	{:else if view === 'choose'}
@@ -181,7 +180,7 @@
 		{/if}
 		{#if view !== 'choose'}
 			<button type="button" class="button primary large px-6" disabled={!target || install.starting} onclick={choose}>
-				{t(install.starting ? 'setup-destination-starting' : view === 'replace' ? 'setup-destination-replace' : 'setup-destination-install')}
+				{#if install.starting}<Spinner />{/if}{t(install.starting ? 'setup-destination-starting' : view === 'replace' ? 'setup-destination-replace' : 'setup-destination-install')}
 			</button>
 		{/if}
 	{/snippet}

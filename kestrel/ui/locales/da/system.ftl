@@ -49,7 +49,7 @@ media-keys-num-lock-off = Num Lock fra
 
 vpn-sign-in-title = Log ind på { $connection }
 vpn-connect = Opret forbindelse
-vpn-signing-in = Logger ind…
+vpn-signing-in = Logger ind
 vpn-finish-in-browser = Gør login færdigt i din browser.
 vpn-certificate-untrusted = { $host } viste et certifikat, der ikke kan bekræftes ({ $reason }). Dets fingeraftryk er { $fingerprint }.
 vpn-certificate-warning = Nogen kan udgive sig for at være denne server. Opret kun forbindelse, hvis du forventede dette.

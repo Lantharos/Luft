@@ -28,7 +28,7 @@ Sentence case everywhere: only the first word and names take a capital letter. �
 
 - Quotation marks: ”…”, the same closing mark on both sides, and ’…’ inside them.
 - Apostrophe: ’.
-- Ellipsis: one character, ”…”, with no space before it: ”Ladataan…”.
+- Ellipsis: one character, ”…”, with no space before it. A message about something in progress, such as loading, takes none, because the app shows a spinner beside it.
 - Dash: the en dash with spaces, ” – ”, and without spaces in ranges. No em dashes.
 - Percent and units take a space: ”57 %”, ”4,5 W”.
 - Compounds with a name, an abbreviation or a digit take a hyphen: ”Rover-sovellus”, ”USB-tikku”, ”Wi-Fi-verkko”, ”PDF-tiedosto”.

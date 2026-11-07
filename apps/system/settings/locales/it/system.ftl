@@ -70,7 +70,7 @@ settings-users-password-new-placeholder = { $count ->
 settings-users-password-confirm = Conferma
 settings-users-password-confirm-placeholder = Digitala di nuovo
 settings-users-password-change = Cambia password
-settings-users-password-changing = Modifica in corso…
+settings-users-password-changing = Modifica in corso
 settings-users-password-wrong = Non è la tua password attuale
 settings-users-password-mismatch = Le password non corrispondono
 settings-users-password-too-short = Questa password è troppo corta
@@ -124,11 +124,11 @@ settings-login-automatic-off = Disattivato
 
 ## Updates
 
-settings-updates-checking = Ricerca di aggiornamenti…
-settings-updates-downloading = Download degli aggiornamenti…
-settings-updates-rolling-back = Preparazione della versione precedente…
-settings-updates-switching-nvidia = Download del driver NVIDIA…
-settings-updates-switching-standard = Download dell’immagine standard…
+settings-updates-checking = Ricerca di aggiornamenti
+settings-updates-downloading = Download degli aggiornamenti
+settings-updates-rolling-back = Preparazione della versione precedente
+settings-updates-switching-nvidia = Download del driver NVIDIA
+settings-updates-switching-standard = Download dell’immagine standard
 settings-updates-up-to-date = Il sistema è aggiornato
 settings-updates-version = Versione { $version }
 settings-updates-version-new = Una nuova versione
@@ -148,9 +148,9 @@ settings-updates-last-checked = Ultimo controllo: { $when }
 settings-updates-never-checked = Non ancora controllato
 settings-updates-stop = Interrompi
 settings-updates-check = Controlla ora
-settings-updates-checking-button = Controllo…
+settings-updates-checking-button = Controllo
 settings-updates-app-updates = Aggiornamenti delle app
-settings-updates-apps-checking = Ricerca di aggiornamenti per le tue app…
+settings-updates-apps-checking = Ricerca di aggiornamenti per le tue app
 settings-updates-apps-count = { $count ->
     [0] Gestiti in Schelf
     [one] { $count } app ha un aggiornamento in Schelf
@@ -171,7 +171,7 @@ settings-updates-background-description = Gli aggiornamenti sono pronti da insta
 settings-updates-firmware = Firmware
 settings-updates-firmware-description = Aggiornamenti per il software integrato nel tuo hardware
 settings-updates-firmware-restart = Termina al riavvio
-settings-updates-firmware-installing = Installazione…
+settings-updates-firmware-installing = Installazione
 settings-updates-firmware-update = Aggiorna
 settings-updates-firmware-failed = Impossibile aggiornare il firmware
 settings-updates-download = Scarica
@@ -262,7 +262,7 @@ settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud o
 settings-accounts-sign-in-again-needed = Accedi di nuovo per continuare a usarlo
 settings-accounts-paused-metered = Sincronizzazione in pausa su una connessione a consumo
 settings-accounts-paused-battery = Sincronizzazione in pausa con la batteria scarica
-settings-accounts-connecting = Connessione…
+settings-accounts-connecting = Connessione
 settings-accounts-offline = Offline
 settings-accounts-offline-kept = Offline, i file conservati sono ancora qui
 settings-accounts-not-connected = Non connesso
@@ -285,7 +285,7 @@ settings-accounts-sign-in-again = Accedi di nuovo
 settings-accounts-keep = Mantieni
 settings-accounts-remove = Rimuovi
 settings-accounts-remove-confirm = Rimuovi da questo computer
-settings-accounts-removing = Rimozione…
+settings-accounts-removing = Rimozione
 settings-accounts-remove-note = I tuoi file restano su { $provider }. Le modifiche fatte qui vengono caricate prima.
 
 ## Accounts: providers
@@ -318,7 +318,7 @@ settings-accounts-continue-in-browser = Continua nel browser
 settings-accounts-sign-in = Accedi
 settings-accounts-try-again = Riprova
 settings-accounts-continue = Continua
-settings-accounts-working = Comunicazione con { $provider }…
+settings-accounts-working = Comunicazione con { $provider }
 settings-accounts-finish-in-browser = Completa l’accesso con { $provider } nel browser. Luft non vede mai la tua password e questa pagina si aggiorna da sola quando hai finito.
 settings-accounts-no-browser = Non si è aperto nessun browser. Copia il link e aprilo in un browser.
 settings-accounts-open-again = Apri di nuovo la pagina

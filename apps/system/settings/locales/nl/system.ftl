@@ -70,7 +70,7 @@ settings-users-password-new-placeholder = { $count ->
 settings-users-password-confirm = Bevestigen
 settings-users-password-confirm-placeholder = Typ het opnieuw
 settings-users-password-change = Wachtwoord wijzigen
-settings-users-password-changing = Wijzigen…
+settings-users-password-changing = Wijzigen
 settings-users-password-wrong = Dat is niet je huidige wachtwoord
 settings-users-password-mismatch = De wachtwoorden komen niet overeen
 settings-users-password-too-short = Dit wachtwoord is te kort
@@ -124,11 +124,11 @@ settings-login-automatic-off = Uit
 
 ## Updates
 
-settings-updates-checking = Zoeken naar updates…
-settings-updates-downloading = Updates downloaden…
-settings-updates-rolling-back = Vorige versie wordt klaargezet…
-settings-updates-switching-nvidia = Driver van NVIDIA downloaden…
-settings-updates-switching-standard = Standaardimage downloaden…
+settings-updates-checking = Zoeken naar updates
+settings-updates-downloading = Updates downloaden
+settings-updates-rolling-back = Vorige versie wordt klaargezet
+settings-updates-switching-nvidia = Driver van NVIDIA downloaden
+settings-updates-switching-standard = Standaardimage downloaden
 settings-updates-up-to-date = Je systeem is up-to-date
 settings-updates-version = Versie { $version }
 settings-updates-version-new = Een nieuwe versie
@@ -148,9 +148,9 @@ settings-updates-last-checked = Laatst gecontroleerd: { $when }
 settings-updates-never-checked = Nog niet gecontroleerd
 settings-updates-stop = Stoppen
 settings-updates-check = Nu controleren
-settings-updates-checking-button = Controleren…
+settings-updates-checking-button = Controleren
 settings-updates-app-updates = App-updates
-settings-updates-apps-checking = Zoeken naar updates voor je apps…
+settings-updates-apps-checking = Zoeken naar updates voor je apps
 settings-updates-apps-count = { $count ->
     [0] Beheerd in Schelf
     [one] { $count } app heeft een update in Schelf
@@ -171,7 +171,7 @@ settings-updates-background-description = Updates zijn klaar om te installeren b
 settings-updates-firmware = Firmware
 settings-updates-firmware-description = Updates voor de software die in je hardware is ingebouwd
 settings-updates-firmware-restart = Wordt afgerond als je opnieuw opstart
-settings-updates-firmware-installing = Installeren…
+settings-updates-firmware-installing = Installeren
 settings-updates-firmware-update = Bijwerken
 settings-updates-firmware-failed = De firmware kon niet worden bijgewerkt
 settings-updates-download = Downloaden
@@ -262,7 +262,7 @@ settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud o
 settings-accounts-sign-in-again-needed = Meld je opnieuw aan om het te blijven gebruiken
 settings-accounts-paused-metered = Synchronisatie gepauzeerd op een verbinding met datalimiet
 settings-accounts-paused-battery = Synchronisatie gepauzeerd zolang de batterij bijna leeg is
-settings-accounts-connecting = Verbinden…
+settings-accounts-connecting = Verbinden
 settings-accounts-offline = Offline
 settings-accounts-offline-kept = Offline, bewaarde bestanden zijn nog beschikbaar
 settings-accounts-not-connected = Niet verbonden
@@ -285,7 +285,7 @@ settings-accounts-sign-in-again = Opnieuw aanmelden
 settings-accounts-keep = Behouden
 settings-accounts-remove = Verwijderen
 settings-accounts-remove-confirm = Verwijderen van deze computer
-settings-accounts-removing = Verwijderen…
+settings-accounts-removing = Verwijderen
 settings-accounts-remove-note = Je bestanden blijven in { $provider }. Wijzigingen die je hier hebt gemaakt, worden eerst geüpload.
 
 ## Accounts: providers
@@ -318,7 +318,7 @@ settings-accounts-continue-in-browser = Doorgaan in browser
 settings-accounts-sign-in = Aanmelden
 settings-accounts-try-again = Opnieuw proberen
 settings-accounts-continue = Doorgaan
-settings-accounts-working = Verbinden met { $provider }…
+settings-accounts-working = Verbinden met { $provider }
 settings-accounts-finish-in-browser = Rond het aanmelden bij { $provider } af in je browser. Luft ziet je wachtwoord nooit, en dit wordt vanzelf bijgewerkt zodra je klaar bent.
 settings-accounts-no-browser = Er is geen browser geopend. Kopieer de link en open die in een browser.
 settings-accounts-open-again = Pagina opnieuw openen

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ago, bytes, Section } from '@luft/ui';
+	import { ago, bytes, Section, Spinner } from '@luft/ui';
 	import type { AppUpdate, Job } from '#lib/bindings.js';
 	import { updateJob } from '#lib/app/jobs.js';
 	import { library } from '#lib/state/library.svelte.js';
@@ -14,7 +14,7 @@
 	const size = $derived(updates.reduce((sum, update) => sum + update.size, 0));
 
 	const headline = $derived.by(() => {
-		if (!library.updates) return library.checking ? 'Checking for updates…' : 'Updates';
+		if (!library.updates) return library.checking ? 'Checking for updates' : 'Updates';
 		if (!updates.length) return 'Your apps are up to date';
 		return `${updates.length} ${updates.length === 1 ? 'update' : 'updates'} available`;
 	});
@@ -39,7 +39,10 @@
 	<div class="mx-auto flex w-full max-w-[760px] flex-col gap-7 px-8 pt-2 pb-10">
 		<div class="flex items-center gap-4 px-2">
 			<div class="flex min-w-0 flex-1 flex-col gap-1">
-				<span class="text-[22px] font-semibold">{headline}</span>
+				<span class="flex items-center gap-3 text-[22px] font-semibold">
+					{headline}
+					{#if !library.updates && library.checking}<Spinner size={18} class="text-[var(--text-muted)]" />{/if}
+				</span>
 				<span class="text-[13px] text-[var(--text-muted)]">
 					{#if library.error}
 						{library.error}

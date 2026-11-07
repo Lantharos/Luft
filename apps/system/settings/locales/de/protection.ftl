@@ -182,7 +182,7 @@ settings-encryption-summary-chip = Bis es fertig ist, verwahrt der Sicherheitsch
 settings-encryption-summary-recovery-key = Bis es fertig ist, wird beim Start der Wiederherstellungsschlüssel statt deiner Passphrase abgefragt.
 # Button, verb: starts encrypting this computer
 settings-encryption-encrypt = Verschlüsseln
-settings-encryption-making-room = Platz wird geschaffen…
+settings-encryption-making-room = Platz wird geschaffen
 settings-encryption-unlocks-chip-pin = Entsperrt mit dem Sicherheitschip und deiner PIN
 settings-encryption-unlocks-chip = Entsperrt von selbst mit dem Sicherheitschip
 settings-encryption-unlocks-passphrase = Fragt beim Start nach deiner Passphrase

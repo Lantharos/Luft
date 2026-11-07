@@ -70,7 +70,7 @@ settings-users-password-new-placeholder = { $count ->
 settings-users-password-confirm = Confirmar
 settings-users-password-confirm-placeholder = Digite de novo
 settings-users-password-change = Alterar senha
-settings-users-password-changing = Alterando…
+settings-users-password-changing = Alterando
 settings-users-password-wrong = Essa não é a sua senha atual
 settings-users-password-mismatch = As senhas não coincidem
 settings-users-password-too-short = Esta senha é curta demais
@@ -124,11 +124,11 @@ settings-login-automatic-off = Desativado
 
 ## Updates
 
-settings-updates-checking = Procurando atualizações…
-settings-updates-downloading = Baixando atualizações…
-settings-updates-rolling-back = Preparando a versão anterior…
-settings-updates-switching-nvidia = Baixando o driver da NVIDIA…
-settings-updates-switching-standard = Baixando a imagem padrão…
+settings-updates-checking = Procurando atualizações
+settings-updates-downloading = Baixando atualizações
+settings-updates-rolling-back = Preparando a versão anterior
+settings-updates-switching-nvidia = Baixando o driver da NVIDIA
+settings-updates-switching-standard = Baixando a imagem padrão
 settings-updates-up-to-date = O sistema está atualizado
 settings-updates-version = Versão { $version }
 settings-updates-version-new = Uma nova versão
@@ -148,9 +148,9 @@ settings-updates-last-checked = Última verificação: { $when }
 settings-updates-never-checked = Ainda não verificado
 settings-updates-stop = Parar
 settings-updates-check = Verificar agora
-settings-updates-checking-button = Verificando…
+settings-updates-checking-button = Verificando
 settings-updates-app-updates = Atualizações de apps
-settings-updates-apps-checking = Procurando atualizações para os seus apps…
+settings-updates-apps-checking = Procurando atualizações para os seus apps
 settings-updates-apps-count = { $count ->
     [0] Gerenciadas no Schelf
     [one] { $count } app tem atualização no Schelf
@@ -171,7 +171,7 @@ settings-updates-background-description = As atualizações ficam prontas para i
 settings-updates-firmware = Firmware
 settings-updates-firmware-description = Atualizações do software embutido no hardware
 settings-updates-firmware-restart = Termina quando você reiniciar
-settings-updates-firmware-installing = Instalando…
+settings-updates-firmware-installing = Instalando
 settings-updates-firmware-update = Atualizar
 settings-updates-firmware-failed = Não foi possível atualizar o firmware
 settings-updates-download = Baixar
@@ -262,7 +262,7 @@ settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud o
 settings-accounts-sign-in-again-needed = Entre novamente para continuar usando
 settings-accounts-paused-metered = Sincronização pausada em uma conexão limitada
 settings-accounts-paused-battery = Sincronização pausada enquanto a bateria está fraca
-settings-accounts-connecting = Conectando…
+settings-accounts-connecting = Conectando
 settings-accounts-offline = Offline
 settings-accounts-offline-kept = Offline, os arquivos mantidos continuam aqui
 settings-accounts-not-connected = Não conectada
@@ -285,7 +285,7 @@ settings-accounts-sign-in-again = Entrar novamente
 settings-accounts-keep = Manter
 settings-accounts-remove = Remover
 settings-accounts-remove-confirm = Remover deste computador
-settings-accounts-removing = Removendo…
+settings-accounts-removing = Removendo
 settings-accounts-remove-note = Seus arquivos continuam no { $provider }. As alterações feitas aqui são enviadas antes.
 
 ## Accounts: providers
@@ -318,7 +318,7 @@ settings-accounts-continue-in-browser = Continuar no navegador
 settings-accounts-sign-in = Entrar
 settings-accounts-try-again = Tentar novamente
 settings-accounts-continue = Continuar
-settings-accounts-working = Conectando ao { $provider }…
+settings-accounts-working = Conectando ao { $provider }
 settings-accounts-finish-in-browser = Termine de entrar com { $provider } no navegador. O Luft nunca vê sua senha, e esta tela é atualizada sozinha quando você terminar.
 settings-accounts-no-browser = Nenhum navegador foi aberto. Copie o link e abra-o em um navegador.
 settings-accounts-open-again = Abrir a página novamente

@@ -49,7 +49,7 @@ media-keys-num-lock-off = Num Lock vypnutý
 
 vpn-sign-in-title = Prihlásenie do siete { $connection }
 vpn-connect = Pripojiť
-vpn-signing-in = Prihlasuje sa…
+vpn-signing-in = Prihlasuje sa
 vpn-finish-in-browser = Dokončite prihlásenie v prehliadači.
 vpn-certificate-untrusted = Server { $host } predložil certifikát, ktorý sa nedá overiť ({ $reason }). Jeho odtlačok je { $fingerprint }.
 vpn-certificate-warning = Niekto sa môže vydávať za tento server. Pripojte sa, iba ak ste to očakávali.

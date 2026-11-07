@@ -70,7 +70,7 @@ settings-users-password-new-placeholder = { $count ->
 settings-users-password-confirm = Megerősítés
 settings-users-password-confirm-placeholder = Írja be újra
 settings-users-password-change = Jelszó módosítása
-settings-users-password-changing = Módosítás…
+settings-users-password-changing = Módosítás
 settings-users-password-wrong = Nem ez a jelenlegi jelszava
 settings-users-password-mismatch = A jelszavak nem egyeznek
 settings-users-password-too-short = Ez a jelszó túl rövid
@@ -124,11 +124,11 @@ settings-login-automatic-off = Ki
 
 ## Updates
 
-settings-updates-checking = Frissítések keresése…
-settings-updates-downloading = Frissítések letöltése…
-settings-updates-rolling-back = A korábbi verzió előkészítése…
-settings-updates-switching-nvidia = Az NVIDIA-illesztőprogram letöltése…
-settings-updates-switching-standard = A normál rendszerkép letöltése…
+settings-updates-checking = Frissítések keresése
+settings-updates-downloading = Frissítések letöltése
+settings-updates-rolling-back = A korábbi verzió előkészítése
+settings-updates-switching-nvidia = Az NVIDIA-illesztőprogram letöltése
+settings-updates-switching-standard = A normál rendszerkép letöltése
 settings-updates-up-to-date = A rendszer naprakész
 settings-updates-version = { $version } verzió
 settings-updates-version-new = Új verzió
@@ -148,9 +148,9 @@ settings-updates-last-checked = Utolsó ellenőrzés: { $when }
 settings-updates-never-checked = Még nem volt ellenőrzés
 settings-updates-stop = Leállítás
 settings-updates-check = Ellenőrzés most
-settings-updates-checking-button = Ellenőrzés…
+settings-updates-checking-button = Ellenőrzés
 settings-updates-app-updates = Alkalmazásfrissítések
-settings-updates-apps-checking = Frissítések keresése az alkalmazásokhoz…
+settings-updates-apps-checking = Frissítések keresése az alkalmazásokhoz
 settings-updates-apps-count = { $count ->
     [0] A Schelf alkalmazásban kezelhető
     [one] { $count } alkalmazáshoz van frissítés a Schelf alkalmazásban
@@ -171,7 +171,7 @@ settings-updates-background-description = A frissítések a következő újraind
 settings-updates-firmware = Firmware
 settings-updates-firmware-description = A hardverbe épített szoftver frissítései
 settings-updates-firmware-restart = Újraindításkor fejeződik be
-settings-updates-firmware-installing = Telepítés…
+settings-updates-firmware-installing = Telepítés
 settings-updates-firmware-update = Frissítés
 settings-updates-firmware-failed = Nem sikerült frissíteni a firmware-t
 settings-updates-download = Letöltés
@@ -262,7 +262,7 @@ settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud v
 settings-accounts-sign-in-again-needed = A további használathoz jelentkezzen be újra
 settings-accounts-paused-metered = A szinkronizálás szünetel forgalomkorlátos kapcsolaton
 settings-accounts-paused-battery = A szinkronizálás szünetel, amíg alacsony az akkumulátor töltöttsége
-settings-accounts-connecting = Csatlakozás…
+settings-accounts-connecting = Csatlakozás
 settings-accounts-offline = Offline
 settings-accounts-offline-kept = Offline, a megtartott fájlok továbbra is elérhetők
 settings-accounts-not-connected = Nincs csatlakozva
@@ -285,7 +285,7 @@ settings-accounts-sign-in-again = Újbóli bejelentkezés
 settings-accounts-keep = Megtartás
 settings-accounts-remove = Eltávolítás
 settings-accounts-remove-confirm = Eltávolítás erről a számítógépről
-settings-accounts-removing = Eltávolítás…
+settings-accounts-removing = Eltávolítás
 settings-accounts-remove-note = A fájlok megmaradnak itt: { $provider }. Az itt végzett módosítások előbb feltöltődnek.
 
 ## Accounts: providers
@@ -318,7 +318,7 @@ settings-accounts-continue-in-browser = Folytatás a böngészőben
 settings-accounts-sign-in = Bejelentkezés
 settings-accounts-try-again = Újra
 settings-accounts-continue = Tovább
-settings-accounts-working = Kapcsolódás ehhez: { $provider }…
+settings-accounts-working = Kapcsolódás ehhez: { $provider }
 settings-accounts-finish-in-browser = Fejezze be a bejelentkezést { $provider } fiókjával a böngészőben. A Luft sosem látja a jelszavát, és ez az oldal magától frissül, amint végzett.
 settings-accounts-no-browser = Nem nyílt meg böngésző. Másolja ki a hivatkozást, és nyissa meg egy böngészőben.
 settings-accounts-open-again = Oldal újbóli megnyitása

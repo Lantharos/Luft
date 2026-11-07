@@ -8,7 +8,7 @@ setup-try-again = Försök igen
 setup-restart = Starta om
 setup-restart-now = Starta om nu
 setup-restart-later = Starta om senare
-setup-saving = Sparar …
+setup-saving = Sparar
 
 ## Install progress, shown at the bottom of every step while Luft copies
 
@@ -51,7 +51,7 @@ setup-destination-meet-title = Bredvid Windows
 setup-destination-meet-description = Meet Luft har redan gjort plats, så Windows förblir precis som det är.
 setup-destination-meet-drive-title = På { $drive }
 setup-destination-meet-drive-description = Meet Luft har redan gjort plats på en annan disk, och Luft startar därifrån med egna startfiler.
-setup-destination-looking = Letar efter diskar …
+setup-destination-looking = Letar efter diskar
 
 setup-destination-meet-choice = Bredvid Windows
 setup-destination-meet-choice-description = Använd de { $size } som Meet Luft har gjort plats för bredvid Windows.
@@ -69,7 +69,7 @@ setup-destination-custom-choice = Anpassat
 setup-destination-custom-choice-description = Ordna partitionerna själv i Diskar.
 
 setup-destination-more-options = Fler alternativ
-setup-destination-starting = Startar …
+setup-destination-starting = Startar
 setup-destination-replace = Ersätt
 setup-destination-install = Installera Luft
 
@@ -127,7 +127,7 @@ setup-drive-partitions = { $count ->
 ## Custom space
 
 setup-custom-open-disks = Öppna Diskar
-setup-custom-looking = Letar …
+setup-custom-looking = Letar
 setup-custom-look-again = Leta igen
 setup-custom-free-label = Ledigt utrymme
 setup-custom-free-space = { $size } ledigt utrymme
@@ -172,14 +172,14 @@ setup-replace-blocked-read-only = Disken är skrivskyddad.
 setup-network-title = Anslut till internet
 setup-network-description = Det här är valfritt. När du är ansluten kan Luft ställa in klockan och tidszonen, och du kan använda internet medan Luft installeras.
 setup-network-unavailable = Inga nätverk är tillgängliga just nu. Du kan ansluta senare från panelen.
-setup-network-looking = Letar efter nätverk …
+setup-network-looking = Letar efter nätverk
 setup-network-cable = Ansluten med kabel
 setup-network-show-all = Visa alla nätverk
 setup-network-skip = Hoppa över
 setup-network-failed = Det gick inte att ansluta
 setup-network-wrong-password = Fel lösenord
 setup-network-connected = Ansluten
-setup-network-connecting = Ansluter …
+setup-network-connecting = Ansluter
 setup-network-saved = Sparat
 setup-network-password = Lösenord
 setup-network-join = Anslut
@@ -235,7 +235,7 @@ setup-enroll-digits = { $count ->
 setup-secure-boot-title = Datorn litar inte på Luft än
 setup-secure-boot-code = Direkt efter nästa omstart ber en blå skärm dig att lita på Luft. Använd tangentbordet där med den här koden.
 setup-secure-boot-skipped = Den blå skärmen hoppades över. Hämta en ny kod och starta om, och använd sedan tangentbordet där.
-setup-secure-boot-getting = Hämtar din kod …
+setup-secure-boot-getting = Hämtar din kod
 setup-secure-boot-new-code = Hämta en ny kod
 
 ## Encryption

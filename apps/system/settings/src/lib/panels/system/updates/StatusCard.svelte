@@ -7,6 +7,7 @@
 	import { versionLabel } from '../version';
 	import { headline, subline } from './headline';
 	import NotesDialog from './image/NotesDialog.svelte';
+	import { Spinner } from '@luft/ui';
 
 	interface Props {
 		system: string | null;
@@ -26,13 +27,13 @@
 	const status = $derived([headline(overview, activity), subline(overview, activity, failure)].filter(Boolean).join(' · '));
 </script>
 
-<HeroCard title={system ?? ''} detail={version} {status} icon={Laptop}>
+<HeroCard title={system ?? ''} detail={version} {status} working={busy || !overview} icon={Laptop}>
 	{#snippet actions()}
 		{#if current?.notes}
 			<button type="button" class="button" onclick={() => (notes = current)}>{t('settings-updates-whats-new')}</button>
 		{/if}
 		<button type="button" class="button" disabled={busy} onclick={() => attempt(commands.updatesCheck)}>
-			{activity.running === 'check' ? t('settings-updates-checking-button') : t('settings-updates-check')}
+			{#if activity.running === 'check'}<Spinner />{t('settings-updates-checking-button')}{:else}{t('settings-updates-check')}{/if}
 		</button>
 	{/snippet}
 </HeroCard>

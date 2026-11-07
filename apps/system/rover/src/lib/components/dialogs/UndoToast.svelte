@@ -7,8 +7,8 @@
 		if (!current) return null;
 		const failed = current.kind === 'failed';
 		const action =
-			failed || current.kind === 'info' ? null : current.kind === 'undone' ? { label: 'Redo', run: history.redo } : { label: 'Undo', run: history.undo };
-		return { id: current.id, message: current.message, failed, action };
+			failed || current.kind === 'info' || current.kind === 'working' ? null : current.kind === 'undone' ? { label: 'Redo', run: history.redo } : { label: 'Undo', run: history.undo };
+		return { id: current.id, message: current.message, failed, busy: current.kind === 'working', action };
 	});
 </script>
 

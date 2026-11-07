@@ -182,7 +182,7 @@ settings-encryption-summary-chip = Tills det är klart förvarar säkerhetschipp
 settings-encryption-summary-recovery-key = Tills det är klart frågar den efter återställningsnyckeln vid start i stället för din lösenfras.
 # Button, verb: starts encrypting this computer
 settings-encryption-encrypt = Kryptera
-settings-encryption-making-room = Gör plats…
+settings-encryption-making-room = Gör plats
 settings-encryption-unlocks-chip-pin = Låses upp med säkerhetschippet och din PIN-kod
 settings-encryption-unlocks-chip = Låses upp av sig själv med säkerhetschippet
 settings-encryption-unlocks-passphrase = Frågar efter din lösenfras vid start

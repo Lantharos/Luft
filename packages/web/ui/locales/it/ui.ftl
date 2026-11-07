@@ -115,4 +115,4 @@ ui-passphrase-mismatch = Le passphrase non corrispondono
 
 ## Encryption
 
-ui-encryption-checking = Verifica…
+ui-encryption-checking = Verifica

@@ -81,7 +81,7 @@ check-moment = See võtab hetke.
 check-slow = Windows arvutab, kui palju ruumi see loovutada saab. Suurel kettal võib see võtta mõne minuti.
 check-blocked-description = Enne kui Luft sisse kolida saab, tuleb midagi muuta. Toimi nii.
 check-found-description = Meet Luft leidis järgmist.
-check-checking = Ketta, püsivara ja riistvara kontrollimine…
+check-checking = Ketta, püsivara ja riistvara kontrollimine
 check-again = Kontrolli uuesti
 check-action-firmware = Ava püsivara seadistused
 check-action-tidy = Korista
@@ -177,7 +177,7 @@ linux-ready-remove-description = Meet Luft kustutab Lufti failid, käivitusfaili
 
 luft-title = Sinu Luft
 luft-looking = Meet Luft leidis sellest arvutist Lufti.
-luft-checking = Lufti ketta kontrollimine…
+luft-checking = Lufti ketta kontrollimine
 luft-description-beside = Luft on selles arvutis installitud Windowsi kõrvale.
 luft-description-drive = Luft on installitud kettale { $drive }.
 luft-bar-used = { $size }, kasutusel { $used }
@@ -231,7 +231,7 @@ resize-shrink-description = Luft teisaldab oma failid järgmisel käivitamisel, 
 
 box-title = Võta oma asjad kaasa
 box-description = Vali, mida kaasa võtta. Luft pakib selle pärast installimist sinu uude kontosse lahti ja Windowsist ei eemaldata midagi.
-box-looking = Kaustade läbivaatamine…
+box-looking = Kaustade läbivaatamine
 box-folder-desktop = Töölaud
 box-folder-documents = Dokumendid
 box-folder-downloads = Allalaadimised
@@ -301,7 +301,7 @@ removed-description =
 
 stick-title = Tee USB-mälupulk
 stick-description = Luft käivitub sellelt mis tahes arvutis, et seda proovida või installida.
-stick-looking = USB-draivide otsimine…
+stick-looking = USB-draivide otsimine
 stick-none = Ühenda USB-mälupulk, mille maht on vähemalt { $size }. See ilmub siia.
 stick-drives-label = USB-draivid
 stick-offer = { $name }, { $size }

@@ -29,7 +29,7 @@ Sentence case everywhere: only the first word and names take a capital letter. �
 
 - Quotation marks: ”…”, the same character on both sides, and ’…’ inside them.
 - Apostrophe: ’, the typographic one.
-- Ellipsis: one character, ”…”. A space before it when it stands for missing words (”Läser in …”), none when part of a word is left out.
+- Ellipsis: one character, ”…”. A space before it when it stands for missing words, none when part of a word is left out. A message about something in progress, such as loading, takes none, because the app shows a spinner beside it.
 - Dash: the en dash with spaces, ” – ”. No em dashes. Ranges use the en dash without spaces: 2–4.
 - A space before the percent sign and before units: ”57 %”, ”4,5 W”.
 - ”&” in English names becomes ”och”: ”Datum och tid”.

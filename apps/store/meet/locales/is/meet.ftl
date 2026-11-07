@@ -67,7 +67,7 @@ check-moment = Þetta tekur smástund.
 check-slow = Windows er að reikna út hve mikið pláss það getur látið af hendi. Á stórum diski getur það tekið nokkrar mínútur.
 check-blocked-description = Eitthvað þarf að breytast áður en Luft getur flutt inn. Svona gerirðu það.
 check-found-description = Þetta fann Meet Luft.
-check-checking = Athugar diskinn, fastbúnaðinn og vélbúnaðinn…
+check-checking = Athugar diskinn, fastbúnaðinn og vélbúnaðinn
 check-again = Athuga aftur
 check-action-firmware = Opna stillingar fastbúnaðar
 check-action-tidy = Taka til
@@ -151,7 +151,7 @@ linux-ready-remove-description = Meet Luft eyðir skrám Luft, ræsiskrám þess
 
 luft-title = Luft hjá þér
 luft-looking = Meet Luft fann Luft á þessari tölvu.
-luft-checking = Skoðar disk Luft…
+luft-checking = Skoðar disk Luft
 luft-description-beside = Luft er sett upp við hlið Windows á þessari tölvu.
 luft-description-drive = Luft er sett upp á { $drive }.
 luft-bar-used = { $size }, { $used } í notkun
@@ -200,7 +200,7 @@ resize-shrink-description = Luft færir skrárnar sínar næst þegar það ræs
 
 box-title = Taktu dótið þitt með
 box-description = Veldu hvað á að fylgja með. Luft tekur það upp í nýja aðganginn þinn þegar það hefur verið sett upp og engu er eytt úr Windows.
-box-looking = Fer yfir möppurnar þínar…
+box-looking = Fer yfir möppurnar þínar
 box-folder-desktop = Skjáborð
 box-folder-documents = Skjöl
 box-folder-downloads = Niðurhal
@@ -260,7 +260,7 @@ removed-description = { $platform ->
 
 stick-title = Búa til USB-lykil
 stick-description = Luft ræsist af honum á hvaða tölvu sem er, til að prófa það eða setja það upp.
-stick-looking = Leitar að USB-drifum…
+stick-looking = Leitar að USB-drifum
 stick-none = Settu í samband USB-lykil sem er { $size } eða stærri. Hann birtist hér.
 stick-drives-label = USB-drif
 stick-offer = { $name }, { $size }

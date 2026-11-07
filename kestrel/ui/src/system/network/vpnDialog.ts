@@ -3,6 +3,7 @@ import GObject from 'gi://GObject';
 import St from 'gi://St';
 import { EntryField, MessageDialogContent } from '../../shared/dialogs/dialog.js';
 import { ModalDialog } from '../../shared/dialogs/modalDialog.js';
+import { Spinner } from '../../shared/widgets/animation.js';
 import { CapsLockWarning, addContextMenu } from '../../shared/widgets/shellEntry.js';
 
 import { feedbackLabel, showText } from '../../auth/keyring/passwordForm.js';
@@ -66,6 +67,7 @@ export class VpnDialog {
   private readonly content: MessageDialogContent;
   private readonly form = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-dialog-form' });
   private readonly warning = feedbackLabel('prompt-dialog-error-label');
+  private readonly spinner = new Spinner(24, { hideOnStop: true });
   private controls = new Map<string, Control>();
   private shape = '';
   private submitButton: St.Button | null = null;
@@ -76,6 +78,8 @@ export class VpnDialog {
     this.content = new MessageDialogContent({ title, icon_name: ICON });
     this.form.add_child(this.warning);
     this.content.add_child(this.form);
+    this.spinner.x_align = Clutter.ActorAlign.CENTER;
+    this.content.add_child(this.spinner);
     modal.contentLayout.add_child(this.content);
     modal.connect('closed', () => {
       if (!this.finished) this.cancel();
@@ -88,6 +92,7 @@ export class VpnDialog {
 
   show(step: Step): boolean {
     this.busy = false;
+    this.spinner.stop();
     this.content.description = step.message;
     const shape = step.fields.map(({ key, secret, choices }) => `${key} ${secret} ${choices?.map(choice => choice.name)}`).join('\n');
     if (shape === this.shape) this.refill(step.fields);
@@ -108,6 +113,7 @@ export class VpnDialog {
 
   wait(message: string): void {
     this.busy = true;
+    this.spinner.play();
     this.content.description = message;
     this.setEditable(false);
     this.modal.clearButtons();

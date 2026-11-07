@@ -115,4 +115,4 @@ ui-passphrase-mismatch = Paroolifraasid ei ühti
 
 ## Encryption
 
-ui-encryption-checking = Kontrollimine…
+ui-encryption-checking = Kontrollimine

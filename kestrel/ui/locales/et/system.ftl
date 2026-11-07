@@ -49,7 +49,7 @@ media-keys-num-lock-off = Num Lock väljas
 
 vpn-sign-in-title = Logi sisse: { $connection }
 vpn-connect = Ühenda
-vpn-signing-in = Sisselogimine…
+vpn-signing-in = Sisselogimine
 vpn-finish-in-browser = Lõpeta sisselogimine brauseris.
 vpn-certificate-untrusted = { $host } esitas sertifikaadi, mida ei saa kontrollida ({ $reason }). Selle sõrmejälg on { $fingerprint }.
 vpn-certificate-warning = Keegi võib end selle serverina esitleda. Loo ühendus ainult siis, kui ootasid seda.

@@ -49,7 +49,7 @@ media-keys-num-lock-off = Num Lock je izklopljen
 
 vpn-sign-in-title = Prijava v { $connection }
 vpn-connect = Poveži
-vpn-signing-in = Prijavljanje …
+vpn-signing-in = Prijavljanje
 vpn-finish-in-browser = Prijavo dokončajte v brskalniku.
 vpn-certificate-untrusted = Strežnik { $host } je predložil potrdilo, ki ga ni mogoče preveriti ({ $reason }). Prstni odtis potrdila: { $fingerprint }.
 vpn-certificate-warning = Nekdo se morda izdaja za ta strežnik. Povežite se le, če ste to pričakovali.

@@ -49,7 +49,7 @@ media-keys-num-lock-off = Num Lock kapalı
 
 vpn-sign-in-title = Oturum aç: { $connection }
 vpn-connect = Bağlan
-vpn-signing-in = Oturum açılıyor…
+vpn-signing-in = Oturum açılıyor
 vpn-finish-in-browser = Oturum açma işlemini tarayıcınızda tamamlayın.
 vpn-certificate-untrusted = { $host } doğrulanamayan bir sertifika sundu ({ $reason }). Parmak izi: { $fingerprint }.
 vpn-certificate-warning = Başka biri bu sunucuymuş gibi davranıyor olabilir. Yalnızca bunu bekliyorsanız bağlanın.

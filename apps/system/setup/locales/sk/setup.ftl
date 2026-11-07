@@ -8,7 +8,7 @@ setup-try-again = Skúsiť znova
 setup-restart = Reštartovať
 setup-restart-now = Reštartovať teraz
 setup-restart-later = Reštartovať neskôr
-setup-saving = Ukladá sa…
+setup-saving = Ukladá sa
 
 ## Install progress, shown at the bottom of every step while Luft copies
 
@@ -51,7 +51,7 @@ setup-destination-meet-title = Vedľa Windows
 setup-destination-meet-description = Aplikácia Meet Luft už miesto pripravila, takže Windows zostane presne tak, ako je.
 setup-destination-meet-drive-title = Na disku { $drive }
 setup-destination-meet-drive-description = Aplikácia Meet Luft už miesto pripravila na inom disku a Luft sa odtiaľ spúšťa s vlastnými spúšťacími súbormi.
-setup-destination-looking = Prezerajú sa disky…
+setup-destination-looking = Prezerajú sa disky
 
 setup-destination-meet-choice = Vedľa Windows
 setup-destination-meet-choice-description = Použiť { $size }, ktoré pripravila aplikácia Meet Luft vedľa Windows.
@@ -69,7 +69,7 @@ setup-destination-custom-choice = Vlastné
 setup-destination-custom-choice-description = Usporiadajte oddiely sami v aplikácii Disky.
 
 setup-destination-more-options = Ďalšie možnosti
-setup-destination-starting = Spúšťa sa…
+setup-destination-starting = Spúšťa sa
 setup-destination-replace = Nahradiť
 setup-destination-install = Inštalovať Luft
 
@@ -131,7 +131,7 @@ setup-drive-partitions = { $count ->
 ## Custom space
 
 setup-custom-open-disks = Otvoriť Disky
-setup-custom-looking = Hľadá sa…
+setup-custom-looking = Hľadá sa
 setup-custom-look-again = Hľadať znova
 setup-custom-free-label = Voľné miesto
 setup-custom-free-space = Voľné miesto: { $size }
@@ -182,14 +182,14 @@ setup-replace-blocked-read-only = Jeho disk je iba na čítanie.
 setup-network-title = Pripojenie k internetu
 setup-network-description = Nie je to povinné. Po pripojení si Luft nastaví hodiny a časové pásmo a počas inštalácie môžete používať internet.
 setup-network-unavailable = Siete momentálne nie sú dostupné. Pripojiť sa môžete neskôr z panela úloh.
-setup-network-looking = Hľadajú sa siete…
+setup-network-looking = Hľadajú sa siete
 setup-network-cable = Pripojené káblom
 setup-network-show-all = Zobraziť všetky siete
 setup-network-skip = Preskočiť
 setup-network-failed = Nepodarilo sa pripojiť
 setup-network-wrong-password = Nesprávne heslo
 setup-network-connected = Pripojené
-setup-network-connecting = Pripája sa…
+setup-network-connecting = Pripája sa
 setup-network-saved = Uložená
 setup-network-password = Heslo
 setup-network-join = Pripojiť
@@ -247,7 +247,7 @@ setup-enroll-digits = { $count ->
 setup-secure-boot-title = Počítač ešte Luftu nedôveruje
 setup-secure-boot-code = Hneď po ďalšom reštarte sa na modrej obrazovke zobrazí výzva, či má počítač dôverovať Luftu. Tam použite klávesnicu a zadajte tento kód.
 setup-secure-boot-skipped = Modrá obrazovka bola preskočená. Získajte nový kód, reštartujte počítač a potom tam použite klávesnicu.
-setup-secure-boot-getting = Získava sa kód…
+setup-secure-boot-getting = Získava sa kód
 setup-secure-boot-new-code = Získať nový kód
 
 ## Encryption

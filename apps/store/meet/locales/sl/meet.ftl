@@ -75,7 +75,7 @@ check-moment = To traja trenutek.
 check-slow = Windows ugotavlja, koliko prostora lahko odstopi. Na velikem disku lahko to traja nekaj minut.
 check-blocked-description = Preden se Luft lahko vseli, je treba nekaj spremeniti. Tako to storite.
 check-found-description = To je ugotovila aplikacija Meet Luft.
-check-checking = Preverjanje diska, vdelane programske opreme in strojne opreme …
+check-checking = Preverjanje diska, vdelane programske opreme in strojne opreme
 check-again = Preveri znova
 check-action-firmware = Odpri nastavitve vdelane programske opreme
 check-action-tidy = Pospravi
@@ -171,7 +171,7 @@ linux-ready-remove-description = Izbrišejo se Luftove datoteke, njegove zagonsk
 
 luft-title = Vaš Luft
 luft-looking = Aplikacija Meet Luft je v tem računalniku našla Luft.
-luft-checking = Pregledovanje Luftovega diska …
+luft-checking = Pregledovanje Luftovega diska
 luft-description-beside = Luft je v tem računalniku nameščen ob sistemu Windows.
 luft-description-drive = Luft je nameščen na disku { $drive }.
 luft-bar-used = { $size }, zasedeno: { $used }
@@ -225,7 +225,7 @@ resize-shrink-description = Luft ob naslednjem zagonu premakne svoje datoteke, k
 
 box-title = Vzemite svoje stvari s seboj
 box-description = Izberite, kaj želite vzeti s seboj. Luft to razpakira v vaš novi račun, ko je nameščen, iz sistema Windows pa se nič ne odstrani.
-box-looking = Pregledovanje map …
+box-looking = Pregledovanje map
 box-folder-desktop = Namizje
 box-folder-documents = Dokumenti
 box-folder-downloads = Prenosi
@@ -297,7 +297,7 @@ removed-description = { $platform ->
 
 stick-title = Izdelava ključka USB
 stick-description = Z njega se Luft zažene v katerem koli računalniku, da ga preizkusite ali namestite.
-stick-looking = Iskanje pogonov USB …
+stick-looking = Iskanje pogonov USB
 stick-none = Priključite ključek USB z vsaj { $size }. Prikazal se bo tukaj.
 stick-drives-label = Pogoni USB
 stick-offer = { $name }, { $size }

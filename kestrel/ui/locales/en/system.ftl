@@ -69,7 +69,7 @@ media-keys-num-lock-off = Num Lock off
 vpn-sign-in-title = Sign in to { $connection }
 # Dialog button
 vpn-connect = Connect
-vpn-signing-in = Signing in…
+vpn-signing-in = Signing in
 vpn-finish-in-browser = Finish signing in with your browser.
 # $host is the server address, $reason why the certificate can't be trusted (from the VPN software, may be in English), $fingerprint a long hexadecimal code
 vpn-certificate-untrusted = { $host } presented a certificate that can’t be verified ({ $reason }). Its fingerprint is { $fingerprint }.

@@ -183,7 +183,7 @@ settings-encryption-summary-chip = Док се не заврши, безбедн
 settings-encryption-summary-recovery-key = Док се не заврши, при покретању тражи кључ за опоравак уместо ваше приступне фразе.
 # Button, verb: starts encrypting this computer
 settings-encryption-encrypt = Шифруј
-settings-encryption-making-room = Ослобађање простора…
+settings-encryption-making-room = Ослобађање простора
 settings-encryption-unlocks-chip-pin = Откључава се безбедносним чипом и вашим PIN-ом
 settings-encryption-unlocks-chip = Откључава се сам помоћу безбедносног чипа
 settings-encryption-unlocks-passphrase = При покретању тражи вашу приступну фразу

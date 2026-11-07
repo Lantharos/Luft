@@ -75,7 +75,7 @@ check-moment = Dan jieħu ftit.
 check-slow = Windows qed jikkalkula kemm jista’ jagħti spazju. Fuq drajv kbir dan jista’ jieħu ftit minuti.
 check-blocked-description = Hemm bżonn tinbidel xi ħaġa qabel ma Luft jista’ jidħol. Hawn x’għandek tagħmel.
 check-found-description = Hawn x’sab Meet Luft.
-check-checking = Qed jiġu ċċekkjati d-drajv, il-firmware u l-hardware…
+check-checking = Qed jiġu ċċekkjati d-drajv, il-firmware u l-hardware
 check-again = Erġa’ ċċekkja
 check-action-firmware = Iftaħ is-settings tal-firmware
 check-action-tidy = Naddaf
@@ -171,7 +171,7 @@ linux-ready-remove-description = Meet Luft iħassar il-fajls ta’ Luft, il-fajl
 
 luft-title = Luft fuq dan il-PC
 luft-looking = Meet Luft sab lil Luft fuq dan il-PC.
-luft-checking = Qed jiġi ċċekkjat id-drajv ta’ Luft…
+luft-checking = Qed jiġi ċċekkjat id-drajv ta’ Luft
 luft-description-beside = Luft huwa installat ħdejn Windows fuq dan il-PC.
 luft-description-drive = Luft huwa installat fuq { $drive }.
 luft-bar-used = { $size }, { $used } użati
@@ -225,7 +225,7 @@ resize-shrink-description = Luft iċaqlaq il-fajls tiegħu id-darba li jmiss li 
 
 box-title = Ġib l-affarijiet tiegħek
 box-description = Agħżel x’se tieħu miegħek. Luft jiftaħhom fil-kont il-ġdid tiegħek meta jiġi installat, u xejn ma jitneħħa minn Windows.
-box-looking = Qed jiġu mfittxija l-fowlders tiegħek…
+box-looking = Qed jiġu mfittxija l-fowlders tiegħek
 box-folder-desktop = Desktop
 box-folder-documents = Dokumenti
 box-folder-downloads = Downloads
@@ -300,7 +300,7 @@ removed-description = { $platform ->
 
 stick-title = Agħmel drajv USB
 stick-description = Luft jibda minnu fuq kwalunkwe kompjuter, biex tipprovah jew tinstallah.
-stick-looking = Qed jiġu mfittxija drajvs USB…
+stick-looking = Qed jiġu mfittxija drajvs USB
 stick-none = Qabbad drajv USB ta’ { $size } jew aktar. Jidher hawn.
 stick-drives-label = Drajvs USB
 stick-offer = { $name }, { $size }

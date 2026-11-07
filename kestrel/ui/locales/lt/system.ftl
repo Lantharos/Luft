@@ -49,7 +49,7 @@ media-keys-num-lock-off = Num Lock išjungtas
 
 vpn-sign-in-title = Prisijungti prie VPN { $connection }
 vpn-connect = Prisijungti
-vpn-signing-in = Jungiamasi…
+vpn-signing-in = Jungiamasi
 vpn-finish-in-browser = Baikite prisijungti naršyklėje.
 vpn-certificate-untrusted = Serveris { $host } pateikė sertifikatą, kurio nepavyksta patikrinti ({ $reason }). Jo kontrolinis kodas: { $fingerprint }.
 vpn-certificate-warning = Kažkas gali apsimesti šiuo serveriu. Junkitės tik tada, jei to tikėjotės.

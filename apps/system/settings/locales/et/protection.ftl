@@ -187,7 +187,7 @@ settings-encryption-summary-chip = Kuni see valmis pole, hoiab turvakiip taastev
 settings-encryption-summary-recovery-key = Kuni see valmis pole, küsitakse käivitamisel sinu paroolifraasi asemel taastevõtit.
 # Button, verb: starts encrypting this computer
 settings-encryption-encrypt = Krüpti
-settings-encryption-making-room = Ruumi tegemine…
+settings-encryption-making-room = Ruumi tegemine
 settings-encryption-unlocks-chip-pin = Avaneb turvakiibi ja PIN-koodiga
 settings-encryption-unlocks-chip = Avaneb turvakiibiga iseenesest
 settings-encryption-unlocks-passphrase = Küsib käivitamisel paroolifraasi

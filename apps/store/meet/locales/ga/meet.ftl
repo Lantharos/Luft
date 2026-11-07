@@ -67,7 +67,7 @@ check-moment = Tógfaidh sé seo nóiméad.
 check-slow = Tá Windows ag oibriú amach cé mhéad spáis is féidir leis a thabhairt uaidh. Ar thiomántán mór, d’fhéadfadh sé seo cúpla nóiméad a thógáil.
 check-blocked-description = Caithfear rud éigin a athrú sular féidir le Luft bogadh isteach. Seo le déanamh.
 check-found-description = Seo a d’aimsigh Meet Luft.
-check-checking = Ag seiceáil an tiomántáin, na ndochtearraí agus na crua-earraí…
+check-checking = Ag seiceáil an tiomántáin, na ndochtearraí agus na crua-earraí
 check-again = Seiceáil arís
 check-action-firmware = Oscail socruithe na ndochtearraí
 check-action-tidy = Glan suas
@@ -151,7 +151,7 @@ linux-ready-remove-description = Scriosann Meet Luft comhaid Luft, a chomhaid to
 
 luft-title = Do Luft
 luft-looking = D’aimsigh Meet Luft Luft ar an ríomhaire seo.
-luft-checking = Ag scrúdú tiomántán Luft…
+luft-checking = Ag scrúdú tiomántán Luft
 luft-description-beside = Tá Luft suiteáilte taobh le Windows ar an ríomhaire seo.
 luft-description-drive = Tá Luft suiteáilte ar { $drive }.
 luft-bar-used = { $size }, { $used } in úsáid
@@ -200,7 +200,7 @@ resize-shrink-description = Bogfaidh Luft a chomhaid an chéad uair eile a thos�
 
 box-title = Tabhair do chuid rudaí leat
 box-description = Roghnaigh cad a thabharfaidh tú leat. Díphacálann Luft é i do chuntas nua nuair a bheidh sé suiteáilte, agus ní bhaintear aon rud as Windows.
-box-looking = Ag dul trí d’fhillteáin…
+box-looking = Ag dul trí d’fhillteáin
 box-folder-desktop = Deasc
 box-folder-documents = Cáipéisí
 box-folder-downloads = Íoslódálacha
@@ -269,7 +269,7 @@ removed-description = { $platform ->
 
 stick-title = Déan cipín USB
 stick-description = Tosaíonn Luft uaidh ar aon ríomhaire, le triail a bhaint as nó le é a shuiteáil.
-stick-looking = Ag cuardach tiomántán USB…
+stick-looking = Ag cuardach tiomántán USB
 stick-none = Ceangail cipín USB de { $size } nó níos mó. Taispeánfar anseo é.
 stick-drives-label = Tiomántáin USB
 stick-offer = { $name }, { $size }

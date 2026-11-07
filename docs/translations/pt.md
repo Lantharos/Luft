@@ -28,7 +28,7 @@ Sentence case everywhere: only the first word and names take a capital letter. �
 
 - Quotation marks: «…», and “…” inside them.
 - Apostrophe: ’, rarely needed.
-- Ellipsis: one character, «…», with no space before it.
+- Ellipsis: one character, «…», with no space before it. A message about something in progress, such as loading, takes none, because the app shows a spinner beside it.
 - Dash: the em dash with spaces, « — », used sparingly.
 - No space before ? ! : ; or %. Write «57%», as Windows does. Units take a space: «4,5 W», «120 GB».
 - Key names stay as printed on Portuguese keyboards, which mostly use the English names: Ctrl, Alt, Shift, Enter, Esc, Tab, Delete, Home, End. The unlabeled keys take their Portuguese names: «Espaço», «Retrocesso».

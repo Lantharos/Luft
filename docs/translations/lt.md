@@ -27,7 +27,7 @@ Sentence case everywhere: only the first word and names take a capital letter. �
 
 - Quotation marks: „…“, and ‚…‘ inside them.
 - Apostrophe: ’, rarely needed.
-- Ellipsis: one character, „…“, with no space before it.
+- Ellipsis: one character, „…“, with no space before it. A message about something in progress, such as loading, takes none, because the app shows a spinner beside it.
 - Dash: the en dash with spaces, „ – “.
 - Percent sign with a space before it: „57 %“. Units likewise: „4,5 W“.
 - Always write the Lithuanian letters (ą, č, ę, ė, į, š, ų, ū, ž). Search keywords may add a spelling without them, or the English word, when people often type it that way.

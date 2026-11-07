@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Dialog, errorText, PasswordField, Segmented, TextField } from '@luft/ui';
+	import { Dialog, errorText, PasswordField, Segmented, Spinner, TextField } from '@luft/ui';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import { commands } from '#lib/bindings.js';
 	import type { AccountConfig, NewSecret, Provider, Server } from '#lib/bindings.js';
@@ -137,7 +137,8 @@
 		{/if}
 		<button type="button" class="button primary" disabled={busy} onclick={() => void (step === 'email' ? lookUp() : add())}>
 			{#if busy}
-				{step === 'email' ? 'Looking up…' : canOAuth ? 'Waiting for sign-in…' : 'Connecting…'}
+				<Spinner />
+				{step === 'email' ? 'Looking up' : canOAuth ? 'Waiting for sign-in' : 'Connecting'}
 			{:else}
 				{step === 'email' ? 'Continue' : canOAuth ? `Continue with ${PROVIDER_NAMES[oauth!]}` : 'Add account'}
 			{/if}

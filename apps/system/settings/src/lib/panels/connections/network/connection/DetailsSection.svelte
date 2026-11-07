@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { Row, Section } from '@luft/ui';
+	import { Row, Section, Spinner } from '@luft/ui';
 	import { percent } from '#lib/format.js';
 	import type { Link, Network } from '@luft/network';
 	import { commands } from '#lib/bindings.js';
@@ -78,6 +78,7 @@
 	{@const current = live}
 	<Section>
 		<Row title={linkLabel(current.state)}>
+			{#if current.state === 'connecting'}<Spinner />{/if}
 			{#if current.state === 'disconnected'}
 				<button type="button" class="button" disabled={busy} onclick={() => run(current.connect)}>{t('settings-network-connect')}</button>
 			{:else if current.state !== 'unplugged'}

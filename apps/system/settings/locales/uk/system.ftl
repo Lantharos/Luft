@@ -72,7 +72,7 @@ settings-users-password-new-placeholder = { $count ->
 settings-users-password-confirm = Підтвердження
 settings-users-password-confirm-placeholder = Введіть ще раз
 settings-users-password-change = Змінити пароль
-settings-users-password-changing = Зміна…
+settings-users-password-changing = Зміна
 settings-users-password-wrong = Це не ваш поточний пароль
 settings-users-password-mismatch = Паролі не збігаються
 settings-users-password-too-short = Цей пароль закороткий
@@ -128,11 +128,11 @@ settings-login-automatic-off = Вимкнено
 
 ## Updates
 
-settings-updates-checking = Пошук оновлень…
-settings-updates-downloading = Завантаження оновлень…
-settings-updates-rolling-back = Підготовка попередньої версії…
-settings-updates-switching-nvidia = Завантаження драйвера NVIDIA…
-settings-updates-switching-standard = Завантаження стандартного образу…
+settings-updates-checking = Пошук оновлень
+settings-updates-downloading = Завантаження оновлень
+settings-updates-rolling-back = Підготовка попередньої версії
+settings-updates-switching-nvidia = Завантаження драйвера NVIDIA
+settings-updates-switching-standard = Завантаження стандартного образу
 settings-updates-up-to-date = Система оновлена
 settings-updates-version = Версія { $version }
 settings-updates-version-new = Нова версія
@@ -152,9 +152,9 @@ settings-updates-last-checked = Остання перевірка: { $when }
 settings-updates-never-checked = Ще не перевірялося
 settings-updates-stop = Зупинити
 settings-updates-check = Перевірити зараз
-settings-updates-checking-button = Перевірка…
+settings-updates-checking-button = Перевірка
 settings-updates-app-updates = Оновлення програм
-settings-updates-apps-checking = Пошук оновлень для ваших програм…
+settings-updates-apps-checking = Пошук оновлень для ваших програм
 settings-updates-apps-count = { $count ->
     [0] Керуються в магазині Schelf
     [one] { $count } програма має оновлення в магазині Schelf
@@ -177,7 +177,7 @@ settings-updates-background-description = Оновлення будуть гот
 settings-updates-firmware = Мікропрограма
 settings-updates-firmware-description = Оновлення програмного забезпечення, вбудованого у ваше обладнання
 settings-updates-firmware-restart = Завершиться після перезавантаження
-settings-updates-firmware-installing = Встановлення…
+settings-updates-firmware-installing = Встановлення
 settings-updates-firmware-update = Оновити
 settings-updates-firmware-failed = Не вдалося оновити мікропрограму
 settings-updates-download = Завантажити
@@ -268,7 +268,7 @@ settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud �
 settings-accounts-sign-in-again-needed = Увійдіть знову, щоб і далі ним користуватися
 settings-accounts-paused-metered = Синхронізацію призупинено через лімітне з’єднання
 settings-accounts-paused-battery = Синхронізацію призупинено через низький заряд акумулятора
-settings-accounts-connecting = Під’єднання…
+settings-accounts-connecting = Під’єднання
 settings-accounts-offline = Офлайн
 settings-accounts-offline-kept = Офлайн, збережені файли доступні
 settings-accounts-not-connected = Не під’єднано
@@ -295,7 +295,7 @@ settings-accounts-sign-in-again = Увійти знову
 settings-accounts-keep = Залишити
 settings-accounts-remove = Вилучити
 settings-accounts-remove-confirm = Вилучити з цього комп’ютера
-settings-accounts-removing = Вилучення…
+settings-accounts-removing = Вилучення
 settings-accounts-remove-note = Ваші файли залишаться в сервісі { $provider }. Зміни, зроблені тут, спершу буде вивантажено.
 
 ## Accounts: providers
@@ -328,7 +328,7 @@ settings-accounts-continue-in-browser = Продовжити в браузері
 settings-accounts-sign-in = Увійти
 settings-accounts-try-again = Спробувати ще раз
 settings-accounts-continue = Продовжити
-settings-accounts-working = Зв’язок із { $provider }…
+settings-accounts-working = Зв’язок із { $provider }
 settings-accounts-finish-in-browser = Завершіть вхід через { $provider } у браузері. Luft ніколи не бачить вашого пароля, а це вікно оновиться саме, щойно ви закінчите.
 settings-accounts-no-browser = Браузер не відкрився. Скопіюйте посилання й відкрийте його в браузері.
 settings-accounts-open-again = Відкрити сторінку ще раз

@@ -192,7 +192,7 @@ settings-encryption-summary-chip = Dokler ni končano, varnostni čip hrani obno
 settings-encryption-summary-recovery-key = Dokler ni končano, ob zagonu zahteva obnovitveni ključ namesto šifrirnega gesla.
 # Button, verb: starts encrypting this computer
 settings-encryption-encrypt = Šifriraj
-settings-encryption-making-room = Ustvarjanje prostora…
+settings-encryption-making-room = Ustvarjanje prostora
 settings-encryption-unlocks-chip-pin = Odklene se z varnostnim čipom in vašo kodo PIN
 settings-encryption-unlocks-chip = Samodejno se odklene z varnostnim čipom
 settings-encryption-unlocks-passphrase = Ob zagonu zahteva šifrirno geslo

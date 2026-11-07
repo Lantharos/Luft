@@ -141,4 +141,4 @@ ui-passphrase-mismatch = The passphrases don’t match
 ## Encryption
 
 # Shown while checking whether a disk can be encrypted
-ui-encryption-checking = Checking…
+ui-encryption-checking = Checking

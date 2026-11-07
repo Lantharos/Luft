@@ -8,7 +8,7 @@ setup-try-again = Încearcă din nou
 setup-restart = Repornește
 setup-restart-now = Repornește acum
 setup-restart-later = Repornește mai târziu
-setup-saving = Se salvează…
+setup-saving = Se salvează
 
 ## Install progress, shown at the bottom of every step while Luft copies
 
@@ -51,7 +51,7 @@ setup-destination-meet-title = Lângă Windows
 setup-destination-meet-description = Meet Luft a făcut deja acest loc, așa că Windows rămâne exact cum este.
 setup-destination-meet-drive-title = Pe { $drive }
 setup-destination-meet-drive-description = Meet Luft a făcut deja acest loc pe alt disc, iar Luft pornește de acolo cu propriile fișiere de pornire.
-setup-destination-looking = Se analizează unitățile…
+setup-destination-looking = Se analizează unitățile
 
 setup-destination-meet-choice = Alături de Windows
 setup-destination-meet-choice-description = Folosiți spațiul de { $size } pregătit de Meet Luft lângă Windows.
@@ -69,7 +69,7 @@ setup-destination-custom-choice = Personalizat
 setup-destination-custom-choice-description = Aranjați manual partițiile în Discuri.
 
 setup-destination-more-options = Mai multe opțiuni
-setup-destination-starting = Se pornește…
+setup-destination-starting = Se pornește
 setup-destination-replace = Înlocuiește
 setup-destination-install = Instalează Luft
 
@@ -129,7 +129,7 @@ setup-drive-partitions = { $count ->
 ## Custom space
 
 setup-custom-open-disks = Deschide Discuri
-setup-custom-looking = Se caută…
+setup-custom-looking = Se caută
 setup-custom-look-again = Caută din nou
 setup-custom-free-label = Spațiu liber
 setup-custom-free-space = Spațiu liber: { $size }
@@ -177,14 +177,14 @@ setup-replace-blocked-read-only = Unitatea lui este doar în citire.
 setup-network-title = Conectați-vă la internet
 setup-network-description = Este opțional. Online, Luft poate seta ceasul și fusul orar, iar internetul poate fi folosit pe durata instalării.
 setup-network-unavailable = Rețelele nu sunt disponibile momentan. Vă puteți conecta mai târziu din panou.
-setup-network-looking = Se caută rețele…
+setup-network-looking = Se caută rețele
 setup-network-cable = Conectat prin cablu
 setup-network-show-all = Afișează toate rețelele
 setup-network-skip = Omite
 setup-network-failed = Conectarea nu a reușit
 setup-network-wrong-password = Parolă greșită
 setup-network-connected = Conectat
-setup-network-connecting = Se conectează…
+setup-network-connecting = Se conectează
 setup-network-saved = Salvată
 setup-network-password = Parolă
 setup-network-join = Conectează
@@ -241,7 +241,7 @@ setup-enroll-digits = { $count ->
 setup-secure-boot-title = Computerul nu are încă încredere în Luft
 setup-secure-boot-code = Imediat după următoarea repornire, un ecran albastru vă cere să aveți încredere în Luft. Acolo folosiți tastatura și acest cod.
 setup-secure-boot-skipped = Ecranul albastru a fost omis. Obțineți un cod nou și reporniți, apoi folosiți tastatura acolo.
-setup-secure-boot-getting = Se obține codul…
+setup-secure-boot-getting = Se obține codul
 setup-secure-boot-new-code = Obține un cod nou
 
 ## Encryption

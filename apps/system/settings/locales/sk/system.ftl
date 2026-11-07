@@ -72,7 +72,7 @@ settings-users-password-new-placeholder = { $count ->
 settings-users-password-confirm = Potvrdenie
 settings-users-password-confirm-placeholder = Zadajte ho znova
 settings-users-password-change = Zmeniť heslo
-settings-users-password-changing = Mení sa…
+settings-users-password-changing = Mení sa
 settings-users-password-wrong = Toto nie je vaše súčasné heslo
 settings-users-password-mismatch = Heslá sa nezhodujú
 settings-users-password-too-short = Toto heslo je príliš krátke
@@ -128,11 +128,11 @@ settings-login-automatic-off = Vypnuté
 
 ## Updates
 
-settings-updates-checking = Hľadajú sa aktualizácie…
-settings-updates-downloading = Sťahujú sa aktualizácie…
-settings-updates-rolling-back = Pripravuje sa predchádzajúca verzia…
-settings-updates-switching-nvidia = Sťahuje sa ovládač NVIDIA…
-settings-updates-switching-standard = Sťahuje sa štandardný obraz…
+settings-updates-checking = Hľadajú sa aktualizácie
+settings-updates-downloading = Sťahujú sa aktualizácie
+settings-updates-rolling-back = Pripravuje sa predchádzajúca verzia
+settings-updates-switching-nvidia = Sťahuje sa ovládač NVIDIA
+settings-updates-switching-standard = Sťahuje sa štandardný obraz
 settings-updates-up-to-date = Systém je aktuálny
 settings-updates-version = Verzia { $version }
 settings-updates-version-new = Nová verzia
@@ -152,9 +152,9 @@ settings-updates-last-checked = Naposledy skontrolované: { $when }
 settings-updates-never-checked = Zatiaľ neskontrolované
 settings-updates-stop = Zastaviť
 settings-updates-check = Skontrolovať teraz
-settings-updates-checking-button = Kontroluje sa…
+settings-updates-checking-button = Kontroluje sa
 settings-updates-app-updates = Aktualizácie aplikácií
-settings-updates-apps-checking = Hľadajú sa aktualizácie aplikácií…
+settings-updates-apps-checking = Hľadajú sa aktualizácie aplikácií
 settings-updates-apps-count = { $count ->
     [0] Spravuje sa v aplikácii Schelf
     [one] { $count } aplikácia má aktualizáciu v aplikácii Schelf
@@ -177,7 +177,7 @@ settings-updates-background-description = Aktualizácie budú pripravené na in�
 settings-updates-firmware = Firmvér
 settings-updates-firmware-description = Aktualizácie softvéru zabudovaného v hardvéri
 settings-updates-firmware-restart = Dokončí sa po reštarte
-settings-updates-firmware-installing = Inštaluje sa…
+settings-updates-firmware-installing = Inštaluje sa
 settings-updates-firmware-update = Aktualizovať
 settings-updates-firmware-failed = Firmvér sa nepodarilo aktualizovať
 settings-updates-download = Stiahnuť
@@ -268,7 +268,7 @@ settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud a
 settings-accounts-sign-in-again-needed = Ak ho chcete ďalej používať, znova sa prihláste
 settings-accounts-paused-metered = Synchronizácia je pozastavená na meranom pripojení
 settings-accounts-paused-battery = Synchronizácia je pozastavená pri slabej batérii
-settings-accounts-connecting = Pripája sa…
+settings-accounts-connecting = Pripája sa
 settings-accounts-offline = Offline
 settings-accounts-offline-kept = Offline, ponechané súbory sú stále tu
 settings-accounts-not-connected = Nepripojené
@@ -295,7 +295,7 @@ settings-accounts-sign-in-again = Znova sa prihlásiť
 settings-accounts-keep = Ponechať
 settings-accounts-remove = Odstrániť
 settings-accounts-remove-confirm = Odstrániť z tohto počítača
-settings-accounts-removing = Odstraňuje sa…
+settings-accounts-removing = Odstraňuje sa
 settings-accounts-remove-note = Vaše súbory zostanú v službe { $provider }. Zmeny urobené tu sa najprv odošlú.
 
 ## Accounts: providers
@@ -328,7 +328,7 @@ settings-accounts-continue-in-browser = Pokračovať v prehliadači
 settings-accounts-sign-in = Prihlásiť sa
 settings-accounts-try-again = Skúsiť znova
 settings-accounts-continue = Pokračovať
-settings-accounts-working = Komunikuje sa so službou { $provider }…
+settings-accounts-working = Komunikuje sa so službou { $provider }
 settings-accounts-finish-in-browser = Dokončite prihlásenie cez { $provider } v prehliadači. Luft vaše heslo nikdy neuvidí a po dokončení sa táto stránka aktualizuje sama.
 settings-accounts-no-browser = Prehliadač sa neotvoril. Skopírujte odkaz a otvorte ho v prehliadači.
 settings-accounts-open-again = Znova otvoriť stránku

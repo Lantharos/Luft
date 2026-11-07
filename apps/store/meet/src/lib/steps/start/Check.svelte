@@ -2,9 +2,8 @@
 	import CircleCheck from '@lucide/svelte/icons/circle-check';
 	import CircleX from '@lucide/svelte/icons/circle-x';
 	import Info from '@lucide/svelte/icons/info';
-	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import { t } from '@luft/i18n';
-	import { bytes, Dialog } from '@luft/ui';
+	import { bytes, Dialog, Spinner } from '@luft/ui';
 	import type { Action, Level } from '#lib/bindings.js';
 	import Frame from '#lib/components/Frame.svelte';
 	import Problem from '#lib/components/Problem.svelte';
@@ -86,7 +85,7 @@
 			{#if session.failure}
 				<Problem failure={session.failure} />
 			{:else}
-				<LoaderCircle size={18} class="animate-spin" />{t('check-checking')}
+				<Spinner size={18} />{t('check-checking')}
 			{/if}
 		</div>
 	{:else}

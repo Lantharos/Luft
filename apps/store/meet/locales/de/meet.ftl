@@ -76,7 +76,7 @@ check-moment = Das dauert einen Moment.
 check-slow = Windows ermittelt, wie viel Platz es abgeben kann. Auf einem großen Datenträger kann das ein paar Minuten dauern.
 check-blocked-description = Bevor Luft einziehen kann, muss sich etwas ändern. So geht’s.
 check-found-description = Das hat Meet Luft gefunden.
-check-checking = Datenträger, Firmware und Hardware werden geprüft …
+check-checking = Datenträger, Firmware und Hardware werden geprüft
 check-again = Erneut prüfen
 check-action-firmware = Firmware-Einstellungen öffnen
 check-action-tidy = Aufräumen
@@ -173,7 +173,7 @@ linux-ready-remove-description = Meet Luft löscht die Dateien von Luft, seine S
 
 luft-title = Dein Luft
 luft-looking = Meet Luft hat Luft auf diesem PC gefunden.
-luft-checking = Der Datenträger von Luft wird geprüft …
+luft-checking = Der Datenträger von Luft wird geprüft
 luft-description-beside = Luft ist neben Windows auf diesem PC installiert.
 luft-description-drive = Luft ist auf { $drive } installiert.
 luft-bar-used = { $size }, { $used } belegt
@@ -227,7 +227,7 @@ resize-shrink-description = Luft verschiebt seine Dateien beim nächsten Start, 
 
 box-title = Deine Sachen mitnehmen
 box-description = Wähl, was mitkommen soll. Luft packt es nach der Installation in deinem neuen Konto aus, und aus Windows wird nichts entfernt.
-box-looking = Deine Ordner werden durchsucht …
+box-looking = Deine Ordner werden durchsucht
 box-folder-desktop = Desktop
 box-folder-documents = Dokumente
 box-folder-downloads = Downloads
@@ -294,7 +294,7 @@ removed-description = { $platform ->
 
 stick-title = USB-Stick erstellen
 stick-description = Luft startet davon auf jedem Computer, zum Ausprobieren oder Installieren.
-stick-looking = USB-Laufwerke werden gesucht …
+stick-looking = USB-Laufwerke werden gesucht
 stick-none = Steck einen USB-Stick mit { $size } oder mehr ein. Er erscheint dann hier.
 stick-drives-label = USB-Laufwerke
 stick-offer = { $name }, { $size }

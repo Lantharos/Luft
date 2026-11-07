@@ -115,4 +115,4 @@ ui-passphrase-mismatch = Frazëkalimet nuk përputhen
 
 ## Encryption
 
-ui-encryption-checking = Po kontrollohet…
+ui-encryption-checking = Po kontrollohet

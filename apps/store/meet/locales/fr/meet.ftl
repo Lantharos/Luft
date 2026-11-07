@@ -75,7 +75,7 @@ check-moment = Cela prend un instant.
 check-slow = Windows calcule l’espace qu’il peut libérer. Sur un grand disque, cela peut prendre quelques minutes.
 check-blocked-description = Il reste quelque chose à changer avant que Luft puisse s’installer. Voici comment faire.
 check-found-description = Voici ce que Meet Luft a trouvé.
-check-checking = Vérification du disque, du micrologiciel et du matériel…
+check-checking = Vérification du disque, du micrologiciel et du matériel
 check-again = Vérifier de nouveau
 check-action-firmware = Ouvrir les paramètres du micrologiciel
 check-action-tidy = Faire le ménage
@@ -171,7 +171,7 @@ linux-ready-remove-description = Meet Luft supprime les fichiers de Luft, ses fi
 
 luft-title = Votre Luft
 luft-looking = Meet Luft a trouvé Luft sur ce PC.
-luft-checking = Analyse du disque de Luft…
+luft-checking = Analyse du disque de Luft
 luft-description-beside = Luft est installé à côté de Windows sur ce PC.
 luft-description-drive = Luft est installé sur { $drive }.
 luft-bar-used = { $size }, dont { $used } utilisés
@@ -225,7 +225,7 @@ resize-shrink-description = Luft déplace ses fichiers à son prochain démarrag
 
 box-title = Emporter vos affaires
 box-description = Choisissez ce que vous emportez. Luft le déballe dans votre nouveau compte une fois installé, et rien n’est retiré de Windows.
-box-looking = Analyse de vos dossiers…
+box-looking = Analyse de vos dossiers
 box-folder-desktop = Bureau
 box-folder-documents = Documents
 box-folder-downloads = Téléchargements
@@ -291,7 +291,7 @@ removed-description = { $platform ->
 
 stick-title = Créer une clé USB
 stick-description = Luft démarre depuis celle-ci sur n’importe quel ordinateur, pour l’essayer ou l’installer.
-stick-looking = Recherche de clés USB…
+stick-looking = Recherche de clés USB
 stick-none = Branchez une clé USB de { $size } ou plus. Elle apparaîtra ici.
 stick-drives-label = Clés USB
 stick-offer = { $name }, { $size }

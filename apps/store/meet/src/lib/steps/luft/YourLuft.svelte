@@ -2,11 +2,10 @@
 	import ArrowLeftRight from '@lucide/svelte/icons/arrow-left-right';
 	import Eraser from '@lucide/svelte/icons/eraser';
 	import Hourglass from '@lucide/svelte/icons/hourglass';
-	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import PanelLeftOpen from '@lucide/svelte/icons/panel-left-open';
 	import Usb from '@lucide/svelte/icons/usb';
 	import { t } from '@luft/i18n';
-	import { bytes, Choice, Dialog } from '@luft/ui';
+	import { bytes, Choice, Dialog, Spinner } from '@luft/ui';
 	import type { Blocked, Change } from '#lib/bindings.js';
 	import Frame from '#lib/components/Frame.svelte';
 	import Problem from '#lib/components/Problem.svelte';
@@ -57,7 +56,7 @@
 			{#if session.failure}
 				<Problem failure={session.failure} />
 			{:else}
-				<LoaderCircle size={18} class="animate-spin" />{t('luft-checking')}
+				<Spinner size={18} />{t('luft-checking')}
 			{/if}
 		</div>
 	{:else}

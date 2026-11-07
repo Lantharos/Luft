@@ -8,7 +8,7 @@ setup-try-again = Yritä uudelleen
 setup-restart = Käynnistä uudelleen
 setup-restart-now = Käynnistä uudelleen nyt
 setup-restart-later = Käynnistä uudelleen myöhemmin
-setup-saving = Tallennetaan…
+setup-saving = Tallennetaan
 
 ## Install progress, shown at the bottom of every step while Luft copies
 
@@ -51,7 +51,7 @@ setup-destination-meet-title = Windowsin rinnalle
 setup-destination-meet-description = Meet Luft on jo tehnyt tilan valmiiksi, joten Windows pysyy täysin ennallaan.
 setup-destination-meet-drive-title = Levy: { $drive }
 setup-destination-meet-drive-description = Meet Luft on jo tehnyt tilan valmiiksi toiselle levylle, ja Luft käynnistyy sieltä omilla käynnistystiedostoillaan.
-setup-destination-looking = Tarkistetaan levyjä…
+setup-destination-looking = Tarkistetaan levyjä
 
 setup-destination-meet-choice = Windowsin rinnalle
 setup-destination-meet-choice-description = Käytä tilaa, jonka Meet Luft teki Windowsin rinnalle ({ $size }).
@@ -69,7 +69,7 @@ setup-destination-custom-choice = Mukautettu
 setup-destination-custom-choice-description = Järjestä osiot itse Levyt-sovelluksessa.
 
 setup-destination-more-options = Lisää vaihtoehtoja
-setup-destination-starting = Käynnistetään…
+setup-destination-starting = Käynnistetään
 setup-destination-replace = Korvaa
 setup-destination-install = Asenna Luft
 
@@ -127,7 +127,7 @@ setup-drive-partitions = { $count ->
 ## Custom space
 
 setup-custom-open-disks = Avaa Levyt
-setup-custom-looking = Etsitään…
+setup-custom-looking = Etsitään
 setup-custom-look-again = Etsi uudelleen
 setup-custom-free-label = Vapaa tila
 setup-custom-free-space = { $size } vapaata tilaa
@@ -172,14 +172,14 @@ setup-replace-blocked-read-only = Sen levy on kirjoitussuojattu.
 setup-network-title = Yhdistä internetiin
 setup-network-description = Tämä on valinnaista. Kun olet verkossa, Luft voi asettaa kellon ja aikavyöhykkeen, ja voit käyttää internetiä asennuksen aikana.
 setup-network-unavailable = Verkot eivät ole juuri nyt käytettävissä. Voit yhdistää myöhemmin tehtäväpalkista.
-setup-network-looking = Etsitään verkkoja…
+setup-network-looking = Etsitään verkkoja
 setup-network-cable = Yhdistetty kaapelilla
 setup-network-show-all = Näytä kaikki verkot
 setup-network-skip = Ohita
 setup-network-failed = Yhteyttä ei voitu muodostaa
 setup-network-wrong-password = Väärä salasana
 setup-network-connected = Yhdistetty
-setup-network-connecting = Yhdistetään…
+setup-network-connecting = Yhdistetään
 setup-network-saved = Tallennettu
 setup-network-password = Salasana
 setup-network-join = Liity
@@ -235,7 +235,7 @@ setup-enroll-digits = { $count ->
 setup-secure-boot-title = Tietokoneesi ei vielä luota Luftiin
 setup-secure-boot-code = Heti seuraavan uudelleenkäynnistyksen jälkeen sininen näyttö pyytää luottamaan Luftiin. Kirjoita siinä tämä koodi näppäimistöllä.
 setup-secure-boot-skipped = Sininen näyttö ohitettiin. Hae uusi koodi, käynnistä uudelleen ja käytä sitten siinä näppäimistöä.
-setup-secure-boot-getting = Haetaan koodia…
+setup-secure-boot-getting = Haetaan koodia
 setup-secure-boot-new-code = Hae uusi koodi
 
 ## Encryption

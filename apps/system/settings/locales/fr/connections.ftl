@@ -3,7 +3,7 @@
 ## Network: shared words
 
 settings-network-save = Enregistrer
-settings-network-saving = Enregistrement…
+settings-network-saving = Enregistrement
 settings-network-cancel = Annuler
 settings-network-connect = Se connecter
 settings-network-disconnect = Se déconnecter
@@ -22,7 +22,7 @@ settings-network-connect-failed = Connexion impossible
 ## Network: connection states
 
 settings-network-link-connected = Connecté
-settings-network-link-connecting = Connexion…
+settings-network-link-connecting = Connexion
 settings-network-link-disconnected = Non connecté
 settings-network-link-unplugged = Câble débranché
 
@@ -88,7 +88,7 @@ settings-network-wifi-enterprise = Connexion avec un compte professionnel ou sco
 settings-network-wifi-connect-failed = Impossible de se connecter à ce réseau
 settings-network-wifi-saved-password-failed = Le mot de passe enregistré n’a pas fonctionné. Saisissez-le de nouveau.
 settings-network-wifi-settings = Paramètres du réseau
-settings-network-wifi-searching = Recherche de réseaux…
+settings-network-wifi-searching = Recherche de réseaux
 settings-network-hidden = Se connecter à un réseau masqué
     .description = Saisissez le nom du réseau et son type de sécurité.
 settings-network-hidden-name = Nom du réseau
@@ -247,7 +247,7 @@ settings-network-vpn-off = Désactivé
 settings-network-vpn-none = Non configuré
 settings-network-vpn-import = Importer depuis un fichier
     .description = Fichiers de configuration WireGuard, OpenVPN et d’autres VPN
-settings-network-vpn-importing = Importation…
+settings-network-vpn-importing = Importation
 settings-network-wireguard = Configurer WireGuard
     .description = Saisissez les informations fournies par votre fournisseur de VPN ou votre serveur
 settings-network-wireguard-dialog = Votre fournisseur de VPN ou le propriétaire du serveur peut vous donner ces informations.
@@ -267,7 +267,7 @@ settings-network-wireguard-keepalive = Keepalive
     .description = Aide la connexion à rester active derrière un routeur
     .placeholder = Facultatif, en secondes
 settings-network-wireguard-add = Ajouter
-settings-network-wireguard-adding = Ajout…
+settings-network-wireguard-adding = Ajout
 settings-network-wireguard-error-private-key = Saisissez ou générez une clé privée
 settings-network-wireguard-error-addresses = Saisissez au moins une adresse
 settings-network-wireguard-error-server-key = Saisissez la clé publique du serveur
@@ -292,16 +292,16 @@ settings-bluetooth-visible-until-off = Jusqu’à la désactivation
 settings-bluetooth-visible-failed = Impossible de modifier la visibilité de cet ordinateur
 settings-bluetooth-paired = Mes appareils
 settings-bluetooth-nearby = Appareils à proximité
-settings-bluetooth-searching = Recherche d’appareils…
+settings-bluetooth-searching = Recherche d’appareils
     .description = Mettez l’appareil à ajouter en mode d’association
 settings-bluetooth-blocked = Le Bluetooth est désactivé par un interrupteur matériel
     .description = Utilisez l’interrupteur ou la touche de votre ordinateur pour l’activer
 settings-bluetooth-details = Détails de l’appareil
 settings-bluetooth-connected = Connecté
 settings-bluetooth-connected-battery = Connecté · batterie { $battery }
-settings-bluetooth-connecting = Connexion…
-settings-bluetooth-disconnecting = Déconnexion…
-settings-bluetooth-pairing = Association…
+settings-bluetooth-connecting = Connexion
+settings-bluetooth-disconnecting = Déconnexion
+settings-bluetooth-pairing = Association
 settings-bluetooth-forget-confirm = Oublier « { $name } » ?
     .description = Vous devrez l’associer de nouveau pour l’utiliser avec cet ordinateur.
 settings-bluetooth-forget = Oublier

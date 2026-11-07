@@ -49,7 +49,7 @@ media-keys-num-lock-off = Slökkt á Num Lock
 
 vpn-sign-in-title = Skrá inn á { $connection }
 vpn-connect = Tengjast
-vpn-signing-in = Skráir inn…
+vpn-signing-in = Skráir inn
 vpn-finish-in-browser = Ljúktu innskráningunni í vafranum.
 vpn-certificate-untrusted = { $host } sýndi skilríki sem ekki er hægt að staðfesta ({ $reason }). Fingrafar þess er { $fingerprint }.
 vpn-certificate-warning = Einhver gæti verið að þykjast vera þessi þjónn. Tengstu aðeins ef þú áttir von á þessu.

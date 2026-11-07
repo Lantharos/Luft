@@ -192,7 +192,7 @@ settings-encryption-summary-chip = Доки шифрування не завер
 settings-encryption-summary-recovery-key = Доки шифрування не завершено, під час запуску запитується ключ відновлення замість парольної фрази.
 # Button, verb: starts encrypting this computer
 settings-encryption-encrypt = Зашифрувати
-settings-encryption-making-room = Звільнення місця…
+settings-encryption-making-room = Звільнення місця
 settings-encryption-unlocks-chip-pin = Розблоковується процесором безпеки й вашим PIN-кодом
 settings-encryption-unlocks-chip = Розблоковується автоматично процесором безпеки
 settings-encryption-unlocks-passphrase = Під час запуску запитує парольну фразу

@@ -70,7 +70,7 @@ settings-users-password-new-placeholder = { $count ->
 settings-users-password-confirm = Staðfesta
 settings-users-password-confirm-placeholder = Sláðu það inn aftur
 settings-users-password-change = Breyta lykilorði
-settings-users-password-changing = Breytir…
+settings-users-password-changing = Breytir
 settings-users-password-wrong = Þetta er ekki núverandi lykilorðið þitt
 settings-users-password-mismatch = Lykilorðin passa ekki saman
 settings-users-password-too-short = Þetta lykilorð er of stutt
@@ -124,11 +124,11 @@ settings-login-automatic-off = Slökkt
 
 ## Updates
 
-settings-updates-checking = Leitar að uppfærslum…
-settings-updates-downloading = Sækir uppfærslur…
-settings-updates-rolling-back = Undirbýr fyrri útgáfu…
-settings-updates-switching-nvidia = Sækir rekil frá NVIDIA…
-settings-updates-switching-standard = Sækir stöðluðu kerfismyndina…
+settings-updates-checking = Leitar að uppfærslum
+settings-updates-downloading = Sækir uppfærslur
+settings-updates-rolling-back = Undirbýr fyrri útgáfu
+settings-updates-switching-nvidia = Sækir rekil frá NVIDIA
+settings-updates-switching-standard = Sækir stöðluðu kerfismyndina
 settings-updates-up-to-date = Kerfið þitt er uppfært
 settings-updates-version = Útgáfa { $version }
 settings-updates-version-new = Ný útgáfa
@@ -148,9 +148,9 @@ settings-updates-last-checked = Síðast athugað { $when }
 settings-updates-never-checked = Ekki athugað enn
 settings-updates-stop = Stöðva
 settings-updates-check = Athuga núna
-settings-updates-checking-button = Athugar…
+settings-updates-checking-button = Athugar
 settings-updates-app-updates = Forritauppfærslur
-settings-updates-apps-checking = Leitar að uppfærslum fyrir forritin þín…
+settings-updates-apps-checking = Leitar að uppfærslum fyrir forritin þín
 settings-updates-apps-count = { $count ->
     [0] Stjórnað í Schelf
     [one] { $count } forrit er með uppfærslu í Schelf
@@ -171,7 +171,7 @@ settings-updates-background-description = Uppfærslurnar eru tilbúnar til uppse
 settings-updates-firmware = Fastbúnaður
 settings-updates-firmware-description = Uppfærslur fyrir hugbúnaðinn sem er innbyggður í vélbúnaðinn
 settings-updates-firmware-restart = Lýkur þegar þú endurræsir
-settings-updates-firmware-installing = Setur upp…
+settings-updates-firmware-installing = Setur upp
 settings-updates-firmware-update = Uppfæra
 settings-updates-firmware-failed = Ekki tókst að uppfæra fastbúnaðinn
 settings-updates-download = Sækja
@@ -262,7 +262,7 @@ settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud e
 settings-accounts-sign-in-again-needed = Skráðu þig inn aftur til að halda áfram að nota hann
 settings-accounts-paused-metered = Samstilling í bið á mældri tengingu
 settings-accounts-paused-battery = Samstilling í bið meðan rafhlaðan er lág
-settings-accounts-connecting = Tengist…
+settings-accounts-connecting = Tengist
 settings-accounts-offline = Ótengt
 settings-accounts-offline-kept = Ótengt, geymdar skrár eru enn hér
 settings-accounts-not-connected = Ekki tengt
@@ -285,7 +285,7 @@ settings-accounts-sign-in-again = Skrá inn aftur
 settings-accounts-keep = Halda
 settings-accounts-remove = Fjarlægja
 settings-accounts-remove-confirm = Fjarlægja af þessari tölvu
-settings-accounts-removing = Fjarlægir…
+settings-accounts-removing = Fjarlægir
 settings-accounts-remove-note = Skrárnar þínar verða áfram í { $provider }. Breytingar sem gerðar eru hér eru fyrst sendar upp.
 
 ## Accounts: providers
@@ -318,7 +318,7 @@ settings-accounts-continue-in-browser = Halda áfram í vafra
 settings-accounts-sign-in = Skrá inn
 settings-accounts-try-again = Reyna aftur
 settings-accounts-continue = Halda áfram
-settings-accounts-working = Hefur samband við { $provider }…
+settings-accounts-working = Hefur samband við { $provider }
 settings-accounts-finish-in-browser = Ljúktu innskráningu hjá { $provider } í vafranum. Luft sér aldrei lykilorðið þitt og þetta uppfærist sjálfkrafa þegar því er lokið.
 settings-accounts-no-browser = Enginn vafri opnaðist. Afritaðu tengilinn og opnaðu hann í vafra.
 settings-accounts-open-again = Opna síðuna aftur

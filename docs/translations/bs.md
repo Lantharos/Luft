@@ -29,7 +29,7 @@ Sentence case everywhere: only the first word and names take a capital letter. �
 ## Typography
 
 - Quotation marks: „…“, and ‚…‘ inside them. A full stop goes after the closing quotation mark.
-- Ellipsis: one character, „…“, with no space before it.
+- Ellipsis: one character, „…“, with no space before it. A message about something in progress, such as loading, takes none, because the app shows a spinner beside it.
 - Dash: the en dash with spaces, „ – “.
 - Key names stay as printed on keyboards: Ctrl, Alt, Shift, Super.
 

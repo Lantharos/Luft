@@ -115,4 +115,4 @@ ui-passphrase-mismatch = Lösenfraserna matchar inte
 
 ## Encryption
 
-ui-encryption-checking = Kontrollerar …
+ui-encryption-checking = Kontrollerar

@@ -3,7 +3,7 @@
 ## Network: shared words
 
 settings-network-save = Tallenna
-settings-network-saving = Tallennetaan…
+settings-network-saving = Tallennetaan
 settings-network-cancel = Peruuta
 settings-network-connect = Yhdistä
 settings-network-disconnect = Katkaise yhteys
@@ -22,7 +22,7 @@ settings-network-connect-failed = Yhteyttä ei voitu muodostaa
 ## Network: connection states
 
 settings-network-link-connected = Yhdistetty
-settings-network-link-connecting = Yhdistetään…
+settings-network-link-connecting = Yhdistetään
 settings-network-link-disconnected = Ei yhdistetty
 settings-network-link-unplugged = Kaapeli irrotettu
 
@@ -88,7 +88,7 @@ settings-network-wifi-enterprise = Kirjaudu työpaikan tai koulun tilillä
 settings-network-wifi-connect-failed = Tähän verkkoon ei voitu yhdistää
 settings-network-wifi-saved-password-failed = Tallennettu salasana ei toiminut. Anna se uudelleen.
 settings-network-wifi-settings = Verkon asetukset
-settings-network-wifi-searching = Etsitään verkkoja…
+settings-network-wifi-searching = Etsitään verkkoja
 settings-network-hidden = Yhdistä piilotettuun verkkoon
     .description = Anna verkon nimi ja suojaustapa.
 settings-network-hidden-name = Verkon nimi
@@ -247,7 +247,7 @@ settings-network-vpn-off = Pois
 settings-network-vpn-none = Ei määritetty
 settings-network-vpn-import = Tuo tiedostosta
     .description = WireGuard-, OpenVPN- ja muut VPN-määritystiedostot
-settings-network-vpn-importing = Tuodaan…
+settings-network-vpn-importing = Tuodaan
 settings-network-wireguard = Määritä WireGuard
     .description = Anna VPN-palveluntarjoajalta tai palvelimelta saamasi tiedot
 settings-network-wireguard-dialog = Saat nämä tiedot VPN-palveluntarjoajaltasi tai palvelimen omistajalta.
@@ -267,7 +267,7 @@ settings-network-wireguard-keepalive = Keepalive
     .description = Auttaa pitämään yhteyden auki reitittimen takana
     .placeholder = Valinnainen, sekunteina
 settings-network-wireguard-add = Lisää
-settings-network-wireguard-adding = Lisätään…
+settings-network-wireguard-adding = Lisätään
 settings-network-wireguard-error-private-key = Anna tai luo yksityinen avain
 settings-network-wireguard-error-addresses = Anna vähintään yksi osoite
 settings-network-wireguard-error-server-key = Anna palvelimen julkinen avain
@@ -292,16 +292,16 @@ settings-bluetooth-visible-until-off = Kunnes poistetaan käytöstä
 settings-bluetooth-visible-failed = Tietokoneen näkyvyyttä ei voitu muuttaa
 settings-bluetooth-paired = Omat laitteet
 settings-bluetooth-nearby = Lähellä olevat laitteet
-settings-bluetooth-searching = Etsitään laitteita…
+settings-bluetooth-searching = Etsitään laitteita
     .description = Aseta lisättävä laite pariliitostilaan
 settings-bluetooth-blocked = Bluetooth on kytketty pois laitekytkimellä
     .description = Kytke se päälle tietokoneen kytkimellä tai näppäimellä
 settings-bluetooth-details = Laitteen tiedot
 settings-bluetooth-connected = Yhdistetty
 settings-bluetooth-connected-battery = Yhdistetty · akku { $battery }
-settings-bluetooth-connecting = Yhdistetään…
-settings-bluetooth-disconnecting = Katkaistaan yhteyttä…
-settings-bluetooth-pairing = Muodostetaan pariliitosta…
+settings-bluetooth-connecting = Yhdistetään
+settings-bluetooth-disconnecting = Katkaistaan yhteyttä
+settings-bluetooth-pairing = Muodostetaan pariliitosta
 settings-bluetooth-forget-confirm = Unohdetaanko laite ”{ $name }”?
     .description = Laitteen pariliitos on muodostettava uudelleen, jotta voit käyttää sitä tämän tietokoneen kanssa.
 settings-bluetooth-forget = Unohda

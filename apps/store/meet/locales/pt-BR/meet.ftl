@@ -76,7 +76,7 @@ check-moment = Isso leva um momento.
 check-slow = O Windows está calculando quanto espaço pode ceder. Em um disco grande, isso pode levar alguns minutos.
 check-blocked-description = Algumas coisas precisam mudar antes de o Luft chegar. Veja o que fazer.
 check-found-description = Veja o que o Meet Luft encontrou.
-check-checking = Verificando o disco, o firmware e o hardware…
+check-checking = Verificando o disco, o firmware e o hardware
 check-again = Verificar de novo
 check-action-firmware = Abrir configurações do firmware
 check-action-tidy = Limpar
@@ -174,7 +174,7 @@ linux-ready-remove-description = O Meet Luft exclui os arquivos do Luft, os arqu
 
 luft-title = Seu Luft
 luft-looking = O Meet Luft encontrou o Luft neste PC.
-luft-checking = Analisando o disco do Luft…
+luft-checking = Analisando o disco do Luft
 luft-description-beside = O Luft está instalado ao lado do Windows neste PC.
 luft-description-drive = O Luft está instalado em { $drive }.
 luft-bar-used = { $size }, { $used } em uso
@@ -228,7 +228,7 @@ resize-shrink-description = O Luft move os arquivos na próxima vez que iniciar,
 
 box-title = Traga suas coisas
 box-description = Escolha o que levar. O Luft desempacota tudo na sua nova conta quando for instalado, e nada é removido do Windows.
-box-looking = Verificando suas pastas…
+box-looking = Verificando suas pastas
 box-folder-desktop = Área de trabalho
 box-folder-documents = Documentos
 box-folder-downloads = Downloads
@@ -295,7 +295,7 @@ removed-description = { $platform ->
 
 stick-title = Criar um pen drive
 stick-description = O Luft inicia por ele em qualquer computador, para experimentar ou instalar.
-stick-looking = Procurando unidades USB…
+stick-looking = Procurando unidades USB
 stick-none = Conecte um pen drive de { $size } ou mais. Ele aparece aqui.
 stick-drives-label = Unidades USB
 stick-offer = { $name }, { $size }

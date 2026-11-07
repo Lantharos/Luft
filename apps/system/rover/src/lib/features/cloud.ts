@@ -16,7 +16,7 @@ export async function keep(manager: FileManager, entries: FileEntry[]) {
 }
 
 export async function free(manager: FileManager, entries: FileEntry[]) {
-	history.inform('Sending changes up before freeing space…');
+	history.working('Sending changes up before freeing space');
 	try {
 		await commands.cloudFree({ paths: paths(entries) }, { timeoutMs: 600_000 });
 		history.inform(entries.length === 1 ? `${entries[0].name} is online only now` : 'Freed up space');
@@ -43,7 +43,7 @@ export async function openInBrowser(manager: FileManager, entry: FileEntry) {
 export function describe(drive: Drive) {
 	if (drive.state === 'signInAgain') return 'Sign in again in Settings';
 	if (drive.state === 'offline') return drive.kept.length ? 'Offline, showing what’s kept on this device' : 'Offline';
-	if (drive.state === 'connecting') return 'Connecting…';
+	if (drive.state === 'connecting') return 'Connecting';
 	if (drive.state === 'problem') return drive.problem ?? 'Not connected';
 	if (drive.paused) return drive.paused === 'metered' ? 'Syncing paused on a metered connection' : 'Syncing paused while the battery is low';
 	if (drive.syncing > 0) return `Syncing ${plural(drive.syncing, 'change')}`;

@@ -182,7 +182,7 @@ settings-encryption-summary-chip = Tot het klaar is, bewaart de beveiligingschip
 settings-encryption-summary-recovery-key = Tot het klaar is, wordt bij het opstarten om de herstelsleutel gevraagd in plaats van om je wachtwoordzin.
 # Button, verb: starts encrypting this computer
 settings-encryption-encrypt = Versleutel
-settings-encryption-making-room = Ruimte maken…
+settings-encryption-making-room = Ruimte maken
 settings-encryption-unlocks-chip-pin = Ontgrendelt met de beveiligingschip en je pincode
 settings-encryption-unlocks-chip = Ontgrendelt vanzelf met de beveiligingschip
 settings-encryption-unlocks-passphrase = Vraagt bij het opstarten om je wachtwoordzin

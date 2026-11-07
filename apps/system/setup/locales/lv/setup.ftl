@@ -8,7 +8,7 @@ setup-try-again = Mēģināt vēlreiz
 setup-restart = Restartēt
 setup-restart-now = Restartēt tagad
 setup-restart-later = Restartēt vēlāk
-setup-saving = Notiek saglabāšana…
+setup-saving = Notiek saglabāšana
 
 ## Install progress, shown at the bottom of every step while Luft copies
 
@@ -51,7 +51,7 @@ setup-destination-meet-title = Blakus Windows
 setup-destination-meet-description = Meet Luft jau ir atbrīvojusi vietu, tāpēc Windows paliek tieši tāda, kāda ir.
 setup-destination-meet-drive-title = Diskā { $drive }
 setup-destination-meet-drive-description = Meet Luft jau ir atbrīvojusi vietu citā diskā, un Luft startē no turienes ar saviem startēšanas failiem.
-setup-destination-looking = Notiek disku pārbaude…
+setup-destination-looking = Notiek disku pārbaude
 
 setup-destination-meet-choice = Blakus Windows
 setup-destination-meet-choice-description = Izmantot { $size }, ko Meet Luft atbrīvoja blakus Windows.
@@ -69,7 +69,7 @@ setup-destination-custom-choice = Pielāgoti
 setup-destination-custom-choice-description = Sakārtot nodalījumus pašam lietotnē Diski.
 
 setup-destination-more-options = Vairāk opciju
-setup-destination-starting = Notiek palaišana…
+setup-destination-starting = Notiek palaišana
 setup-destination-replace = Aizstāt
 setup-destination-install = Instalēt Luft
 
@@ -129,7 +129,7 @@ setup-drive-partitions = { $count ->
 ## Custom space
 
 setup-custom-open-disks = Atvērt lietotni Diski
-setup-custom-looking = Notiek meklēšana…
+setup-custom-looking = Notiek meklēšana
 setup-custom-look-again = Meklēt vēlreiz
 setup-custom-free-label = Brīvā vieta
 setup-custom-free-space = Brīvā vieta: { $size }
@@ -177,14 +177,14 @@ setup-replace-blocked-read-only = Tās disks ir tikai lasāms.
 setup-network-title = Savienojuma izveide ar internetu
 setup-network-description = Tas nav obligāti. Ja ir interneta savienojums, Luft var iestatīt pulksteni un laika joslu, un instalēšanas laikā varat lietot internetu.
 setup-network-unavailable = Tīkli pašlaik nav pieejami. Savienojumu var izveidot vēlāk no uzdevumjoslas.
-setup-network-looking = Notiek tīklu meklēšana…
+setup-network-looking = Notiek tīklu meklēšana
 setup-network-cable = Savienots ar kabeli
 setup-network-show-all = Rādīt visus tīklus
 setup-network-skip = Izlaist
 setup-network-failed = Neizdevās izveidot savienojumu
 setup-network-wrong-password = Nepareiza parole
 setup-network-connected = Savienots
-setup-network-connecting = Notiek savienojuma izveide…
+setup-network-connecting = Notiek savienojuma izveide
 setup-network-saved = Saglabāts
 setup-network-password = Parole
 setup-network-join = Pievienoties
@@ -241,7 +241,7 @@ setup-enroll-digits = { $count ->
 setup-secure-boot-title = Jūsu dators vēl neuzticas sistēmai Luft
 setup-secure-boot-code = Tūlīt pēc nākamās restartēšanas zilā ekrānā tiks jautāts, vai uzticēties sistēmai Luft. Tur ar tastatūru ievadiet šo kodu.
 setup-secure-boot-skipped = Zilais ekrāns tika izlaists. Iegūstiet jaunu kodu un restartējiet, pēc tam tur izmantojiet tastatūru.
-setup-secure-boot-getting = Notiek koda iegūšana…
+setup-secure-boot-getting = Notiek koda iegūšana
 setup-secure-boot-new-code = Iegūt jaunu kodu
 
 ## Encryption

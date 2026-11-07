@@ -5,7 +5,7 @@ const TOAST_MS = 6000;
 
 export interface Toast {
 	id: number;
-	kind: NoticeKind | 'info';
+	kind: NoticeKind | 'info' | 'working';
 	message: string;
 }
 
@@ -37,6 +37,8 @@ class History {
 	};
 
 	inform = (message: string) => this.#show('info', message);
+
+	working = (message: string) => this.#show('working', message);
 
 	hold = () => clearTimeout(this.#timer);
 

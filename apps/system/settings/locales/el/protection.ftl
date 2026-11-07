@@ -182,7 +182,7 @@ settings-encryption-summary-chip = Μέχρι να ολοκληρωθεί, το 
 settings-encryption-summary-recovery-key = Μέχρι να ολοκληρωθεί, ζητά το κλειδί αποκατάστασης κατά την εκκίνηση αντί για τη φράση πρόσβασής σας.
 # Button, verb: starts encrypting this computer
 settings-encryption-encrypt = Κρυπτογράφηση
-settings-encryption-making-room = Δημιουργία χώρου…
+settings-encryption-making-room = Δημιουργία χώρου
 settings-encryption-unlocks-chip-pin = Ξεκλειδώνει με το τσιπ ασφαλείας και το PIN σας
 settings-encryption-unlocks-chip = Ξεκλειδώνει αυτόματα με το τσιπ ασφαλείας
 settings-encryption-unlocks-passphrase = Ζητά τη φράση πρόσβασης κατά την εκκίνηση

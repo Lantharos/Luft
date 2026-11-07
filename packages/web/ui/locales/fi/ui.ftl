@@ -115,4 +115,4 @@ ui-passphrase-mismatch = Tunnuslauseet eivät täsmää
 
 ## Encryption
 
-ui-encryption-checking = Tarkistetaan…
+ui-encryption-checking = Tarkistetaan

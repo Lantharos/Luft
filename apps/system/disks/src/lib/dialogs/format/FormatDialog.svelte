@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import { bytes, Dialog } from '@luft/ui';
+	import { bytes, Dialog, Spinner } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { Drive, Format, Volume } from '#lib/bindings.js';
 	import { WAIT } from '#lib/bridge/index.js';
@@ -48,6 +48,6 @@
 	<FormatFields bind:format bind:valid offerErase />
 	{#snippet actions()}
 		<button type="button" class="button" onclick={onclose}>Cancel</button>
-		<button type="button" class="button danger" disabled={!valid || working} onclick={submit}>{working ? 'Formatting…' : 'Erase and format'}</button>
+		<button type="button" class="button danger" disabled={!valid || working} onclick={submit}>{#if working}<Spinner />Formatting{:else}Erase and format{/if}</button>
 	{/snippet}
 </Dialog>

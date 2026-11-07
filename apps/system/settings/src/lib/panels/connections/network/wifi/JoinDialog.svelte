@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import { t } from '@luft/i18n';
-	import { Dialog, PasswordField, Segmented, TextField } from '@luft/ui';
+	import { Dialog, PasswordField, Segmented, Spinner, TextField } from '@luft/ui';
 	import EnterpriseFields from '../connection/EnterpriseFields.svelte';
 	import { newEnterprise } from '../connection/profile';
 	import { checkEnterprise, minimumPassword, type Errors } from '../connection/validate';
@@ -125,7 +125,7 @@
 	{/if}
 	{#snippet actions()}
 		<button type="button" class="button" onclick={onclose}>{t('settings-network-cancel')}</button>
-		<button type="button" class="button primary" disabled={!ready} onclick={submit}>{busy ? t('settings-network-link-connecting') : t('settings-network-connect')}</button>
+		<button type="button" class="button primary" disabled={!ready} onclick={submit}>{#if busy}<Spinner />{/if}{busy ? t('settings-network-link-connecting') : t('settings-network-connect')}</button>
 	{/snippet}
 </Dialog>
 

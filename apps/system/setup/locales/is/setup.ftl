@@ -8,7 +8,7 @@ setup-try-again = Reyna aftur
 setup-restart = Endurræsa
 setup-restart-now = Endurræsa núna
 setup-restart-later = Endurræsa seinna
-setup-saving = Vistar…
+setup-saving = Vistar
 
 ## Install progress, shown at the bottom of every step while Luft copies
 
@@ -51,7 +51,7 @@ setup-destination-meet-title = Við hlið Windows
 setup-destination-meet-description = Meet Luft hefur þegar búið til þetta pláss, svo Windows helst óbreytt.
 setup-destination-meet-drive-title = Á { $drive }
 setup-destination-meet-drive-description = Meet Luft hefur þegar búið til þetta pláss á öðrum diski, og Luft ræsist þaðan með eigin ræsiskrám.
-setup-destination-looking = Skoðar diskana…
+setup-destination-looking = Skoðar diskana
 
 setup-destination-meet-choice = Við hlið Windows
 setup-destination-meet-choice-description = Nota plássið ({ $size }) sem Meet Luft bjó til við hlið Windows.
@@ -69,7 +69,7 @@ setup-destination-custom-choice = Sérsniðið
 setup-destination-custom-choice-description = Raða disksneiðum handvirkt í forritinu Diskar.
 
 setup-destination-more-options = Fleiri valkostir
-setup-destination-starting = Ræsir…
+setup-destination-starting = Ræsir
 setup-destination-replace = Skipta út
 setup-destination-install = Setja upp Luft
 
@@ -127,7 +127,7 @@ setup-drive-partitions = { $count ->
 ## Custom space
 
 setup-custom-open-disks = Opna Diska
-setup-custom-looking = Leitar…
+setup-custom-looking = Leitar
 setup-custom-look-again = Leita aftur
 setup-custom-free-label = Laust pláss
 setup-custom-free-space = { $size } laust pláss
@@ -172,14 +172,14 @@ setup-replace-blocked-read-only = Diskurinn er aðeins til lestrar.
 setup-network-title = Tengjast internetinu
 setup-network-description = Þetta er valfrjálst. Með nettengingu getur Luft stillt klukkuna og tímabeltið og þú getur notað internetið á meðan Luft er sett upp.
 setup-network-unavailable = Net eru ekki tiltæk eins og er. Þú getur tengst seinna á verkstikunni.
-setup-network-looking = Leitar að netum…
+setup-network-looking = Leitar að netum
 setup-network-cable = Tengt með snúru
 setup-network-show-all = Sýna öll net
 setup-network-skip = Sleppa
 setup-network-failed = Ekki tókst að tengjast
 setup-network-wrong-password = Rangt lykilorð
 setup-network-connected = Tengt
-setup-network-connecting = Tengist…
+setup-network-connecting = Tengist
 setup-network-saved = Vistað
 setup-network-password = Lykilorð
 setup-network-join = Tengjast
@@ -235,7 +235,7 @@ setup-enroll-digits = { $count ->
 setup-secure-boot-title = Tölvan treystir Luft ekki enn
 setup-secure-boot-code = Strax eftir næstu endurræsingu biður blár skjár þig um að treysta Luft. Notaðu lyklaborðið þar með þessum kóða.
 setup-secure-boot-skipped = Bláa skjánum var sleppt. Fáðu nýjan kóða og endurræstu, notaðu svo lyklaborðið þar.
-setup-secure-boot-getting = Sækir kóðann…
+setup-secure-boot-getting = Sækir kóðann
 setup-secure-boot-new-code = Fá nýjan kóða
 
 ## Encryption

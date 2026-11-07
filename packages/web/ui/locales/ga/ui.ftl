@@ -118,4 +118,4 @@ ui-passphrase-mismatch = Níl na frásaí faire mar a chéile
 
 ## Encryption
 
-ui-encryption-checking = Á sheiceáil…
+ui-encryption-checking = Á sheiceáil

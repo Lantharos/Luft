@@ -3,7 +3,7 @@
 ## Network: shared words
 
 settings-network-save = Shrani
-settings-network-saving = Shranjevanje …
+settings-network-saving = Shranjevanje
 settings-network-cancel = Prekliči
 settings-network-connect = Poveži
 settings-network-disconnect = Prekini povezavo
@@ -22,7 +22,7 @@ settings-network-connect-failed = Povezava ni uspela
 ## Network: connection states
 
 settings-network-link-connected = Povezano
-settings-network-link-connecting = Povezovanje …
+settings-network-link-connecting = Povezovanje
 settings-network-link-disconnected = Ni povezano
 settings-network-link-unplugged = Kabel ni priključen
 
@@ -90,7 +90,7 @@ settings-network-wifi-enterprise = Prijava s službenim ali šolskim računom
 settings-network-wifi-connect-failed = Povezava s tem omrežjem ni uspela
 settings-network-wifi-saved-password-failed = Shranjeno geslo ni delovalo. Vnesite ga znova.
 settings-network-wifi-settings = Nastavitve omrežja
-settings-network-wifi-searching = Iskanje omrežij …
+settings-network-wifi-searching = Iskanje omrežij
 settings-network-hidden = Poveži se s skritim omrežjem
     .description = Vnesite ime omrežja in način zaščite.
 settings-network-hidden-name = Ime omrežja
@@ -251,7 +251,7 @@ settings-network-vpn-off = Izklopljeno
 settings-network-vpn-none = Ni nastavljeno
 settings-network-vpn-import = Uvozi iz datoteke
     .description = Datoteke z nastavitvami za WireGuard, OpenVPN in druge VPN-je
-settings-network-vpn-importing = Uvažanje …
+settings-network-vpn-importing = Uvažanje
 settings-network-wireguard = Nastavi WireGuard
     .description = Vnesite podatke ponudnika VPN-ja ali strežnika
 settings-network-wireguard-dialog = Te podatke vam lahko da ponudnik VPN-ja ali lastnik strežnika.
@@ -271,7 +271,7 @@ settings-network-wireguard-keepalive = Ohranjanje povezave
     .description = Pomaga ohraniti povezavo za usmerjevalnikom
     .placeholder = Neobvezno, v sekundah
 settings-network-wireguard-add = Dodaj
-settings-network-wireguard-adding = Dodajanje …
+settings-network-wireguard-adding = Dodajanje
 settings-network-wireguard-error-private-key = Vnesite ali ustvarite zasebni ključ
 settings-network-wireguard-error-addresses = Vnesite vsaj en naslov
 settings-network-wireguard-error-server-key = Vnesite javni ključ strežnika
@@ -298,16 +298,16 @@ settings-bluetooth-visible-until-off = Do izklopa
 settings-bluetooth-visible-failed = Vidnosti tega računalnika ni bilo mogoče spremeniti
 settings-bluetooth-paired = Moje naprave
 settings-bluetooth-nearby = Naprave v bližini
-settings-bluetooth-searching = Iskanje naprav …
+settings-bluetooth-searching = Iskanje naprav
     .description = Napravo, ki jo želite dodati, preklopite v način seznanjanja
 settings-bluetooth-blocked = Bluetooth je izklopljen s strojnim stikalom
     .description = Vklopite ga s stikalom ali tipko na računalniku
 settings-bluetooth-details = Podrobnosti naprave
 settings-bluetooth-connected = Povezano
 settings-bluetooth-connected-battery = Povezano · baterija { $battery }
-settings-bluetooth-connecting = Povezovanje …
-settings-bluetooth-disconnecting = Prekinjanje povezave …
-settings-bluetooth-pairing = Seznanjanje …
+settings-bluetooth-connecting = Povezovanje
+settings-bluetooth-disconnecting = Prekinjanje povezave
+settings-bluetooth-pairing = Seznanjanje
 settings-bluetooth-forget-confirm = Želite pozabiti napravo „{ $name }“?
     .description = Če jo boste želeli uporabljati s tem računalnikom, jo boste morali znova seznaniti.
 settings-bluetooth-forget = Pozabi

@@ -75,7 +75,7 @@ check-moment = Отнема само момент.
 check-slow = Windows изчислява колко място може да отдели. При голям диск това може да отнеме няколко минути.
 check-blocked-description = Нещо трябва да се промени, преди Luft да се настани. Ето какво да направите.
 check-found-description = Ето какво откри Meet Luft.
-check-checking = Проверка на диска, фърмуера и хардуера…
+check-checking = Проверка на диска, фърмуера и хардуера
 check-again = Провери отново
 check-action-firmware = Отвори настройките на фърмуера
 check-action-tidy = Разчисти
@@ -171,7 +171,7 @@ linux-ready-remove-description = Meet Luft изтрива файловете н�
 
 luft-title = Вашият Luft
 luft-looking = Meet Luft откри Luft на този компютър.
-luft-checking = Преглеждане на диска на Luft…
+luft-checking = Преглеждане на диска на Luft
 luft-description-beside = Luft е инсталиран до Windows на този компютър.
 luft-description-drive = Luft е инсталиран на { $drive }.
 luft-bar-used = { $size }, използвани { $used }
@@ -225,7 +225,7 @@ resize-shrink-description = Luft премества файловете си пр
 
 box-title = Пренасяне на нещата ви
 box-description = Изберете какво да вземете. Luft го разопакова в новия ви акаунт след инсталирането, а от Windows нищо не се премахва.
-box-looking = Преглеждане на папките ви…
+box-looking = Преглеждане на папките ви
 box-folder-desktop = Работен плот
 box-folder-documents = Документи
 box-folder-downloads = Изтегляния
@@ -291,7 +291,7 @@ removed-description = { $platform ->
 
 stick-title = Създаване на USB флашка
 stick-description = Luft стартира от нея на всеки компютър, за да го пробвате или инсталирате.
-stick-looking = Търсене на USB устройства…
+stick-looking = Търсене на USB устройства
 stick-none = Включете USB флашка от { $size } или повече. Тя ще се покаже тук.
 stick-drives-label = USB устройства
 stick-offer = { $name }, { $size }

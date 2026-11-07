@@ -10,11 +10,13 @@ export interface ToastMessage {
 	message: string;
 	action?: ToastAction | null;
 	failed?: boolean;
+	busy?: boolean;
 }
 
 interface ShowOptions {
 	action?: ToastAction | null;
 	failed?: boolean;
+	busy?: boolean;
 	duration?: number;
 }
 
@@ -31,9 +33,9 @@ export class Toasts {
 
 	constructor(private readonly shownMs = SHOWN_MS) {}
 
-	show(message: string, { action = null, failed = false, duration = this.shownMs }: ShowOptions = {}) {
+	show(message: string, { action = null, failed = false, busy = false, duration = this.shownMs }: ShowOptions = {}) {
 		clearTimeout(this.#timer);
-		this.current = { id: ++this.#next, message, action, failed };
+		this.current = { id: ++this.#next, message, action, failed, busy };
 		if (!this.#held) this.#timer = setTimeout(this.dismiss, duration);
 	}
 

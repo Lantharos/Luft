@@ -75,7 +75,7 @@ check-moment = Bu biraz sürer.
 check-slow = Windows ne kadar yer ayırabileceğini hesaplıyor. Büyük bir diskte bu birkaç dakika sürebilir.
 check-blocked-description = Luft yerleşmeden önce bir şeyin değişmesi gerekiyor. Yapmanız gerekenler şunlar.
 check-found-description = Meet Luft’un buldukları.
-check-checking = Disk, üretici yazılımı ve donanım denetleniyor…
+check-checking = Disk, üretici yazılımı ve donanım denetleniyor
 check-again = Yeniden denetle
 check-action-firmware = Üretici yazılımı ayarlarını aç
 check-action-tidy = Temizle
@@ -171,7 +171,7 @@ linux-ready-remove-description = Meet Luft, Luft’un dosyalarını, önyükleme
 
 luft-title = Luft’unuz
 luft-looking = Meet Luft bu bilgisayarda Luft’u buldu.
-luft-checking = Luft’un diski inceleniyor…
+luft-checking = Luft’un diski inceleniyor
 luft-description-beside = Luft bu bilgisayarda Windows’un yanında yüklü.
 luft-description-drive = Luft, { $drive } diskinde yüklü.
 luft-bar-used = { $size }, { $used } kullanılıyor
@@ -225,7 +225,7 @@ resize-shrink-description = Luft bir sonraki başlangıçta dosyalarını taşı
 
 box-title = Eşyalarınızı getirin
 box-description = Yanınızda ne götüreceğinizi seçin. Luft yüklendiğinde bunları yeni hesabınıza açar; Windows’tan hiçbir şey silinmez.
-box-looking = Klasörlerinize göz atılıyor…
+box-looking = Klasörlerinize göz atılıyor
 box-folder-desktop = Masaüstü
 box-folder-documents = Belgeler
 box-folder-downloads = İndirilenler
@@ -291,7 +291,7 @@ removed-description = { $platform ->
 
 stick-title = USB bellek hazırla
 stick-description = Luft, denemek ya da yüklemek için her bilgisayarda bu bellekten başlar.
-stick-looking = USB bellekler aranıyor…
+stick-looking = USB bellekler aranıyor
 stick-none = En az { $size } boyutunda bir USB bellek takın. Burada görünecek.
 stick-drives-label = USB bellekler
 stick-offer = { $name }, { $size }

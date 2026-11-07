@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Dialog, Row, Section, TextField } from '@luft/ui';
+	import { Dialog, Row, Section, Spinner, TextField } from '@luft/ui';
 	import { commands, type AddedSource, type CheckedSource } from '#lib/bindings.js';
 	import ProgressButton from '#lib/components/ProgressButton.svelte';
 	import SourceTrustDialog from '#lib/components/SourceTrustDialog.svelte';
@@ -91,7 +91,7 @@
 							onkeydown={(event) => event.key === 'Enter' && check()}
 						/>
 					</div>
-					<button type="button" class="button primary" disabled={!address.trim() || checking} onclick={check}>{checking ? 'Checking…' : 'Add'}</button>
+					<button type="button" class="button primary" disabled={!address.trim() || checking} onclick={check}>{#if checking}<Spinner />Checking{:else}Add{/if}</button>
 				</div>
 			</Row>
 		</Section>

@@ -28,7 +28,7 @@ Sentence case everywhere: only the first word and names take a capital letter. �
 
 - Quotation marks: “…”, and ‘…’ inside them.
 - Apostrophe: ’, rarely needed.
-- Ellipsis: one character, “…”, with no space before it: “Carregando…”.
+- Ellipsis: one character, “…”, with no space before it. A message about something in progress, such as loading, takes none, because the app shows a spinner beside it.
 - Dash: the em dash with spaces, “ — ”.
 - No space before punctuation. The percent sign follows the number with no space: “57%”. Units take a space: “4,5 W”.
 - Key names follow Brazilian ABNT2 keyboards, which print the English names: Ctrl, Alt, Shift, Enter, Esc, Tab, Backspace, Delete, Home, End, Page Up, Page Down. Only the space bar is translated, as “Espaço”.

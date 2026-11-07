@@ -115,4 +115,4 @@ ui-passphrase-mismatch = Passfrasane er ikkje like
 
 ## Encryption
 
-ui-encryption-checking = Sjekkar …
+ui-encryption-checking = Sjekkar

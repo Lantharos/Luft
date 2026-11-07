@@ -5,6 +5,7 @@
 	import VcsBadge from '#lib/components/vcs/VcsBadge.svelte';
 	import { projectSummary, statusLabel } from '#lib/vcs/format.js';
 	import type { VcsState } from '#lib/vcs/state.svelte.js';
+	import { Spinner } from '@luft/ui';
 
 	interface Props {
 		vcs: VcsState;
@@ -126,7 +127,7 @@
 
 			<section class="soft-scroll min-h-0 overflow-auto bg-[var(--content)] px-4 py-3 shadow-[inset_0_1px_0_var(--hairline)]" aria-label="Diff preview">
 				{#if vcs.isDiffLoading}
-					<div class="text-[13px] text-[var(--text-muted)]">Loading diff...</div>
+					<div class="flex items-center gap-2 text-[13px] text-[var(--text-muted)]"><Spinner size={14} />Loading the changes</div>
 				{:else if vcs.diff}
 					<pre class="whitespace-pre-wrap break-words font-mono text-[12px] leading-5 text-[var(--text-soft)]">{vcs.diff}</pre>
 				{:else}

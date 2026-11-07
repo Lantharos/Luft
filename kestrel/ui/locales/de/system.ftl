@@ -49,7 +49,7 @@ media-keys-num-lock-off = Num-Taste aus
 
 vpn-sign-in-title = Bei { $connection } anmelden
 vpn-connect = Verbinden
-vpn-signing-in = Anmeldung läuft …
+vpn-signing-in = Anmeldung läuft
 vpn-finish-in-browser = Schließ die Anmeldung in deinem Browser ab.
 vpn-certificate-untrusted = { $host } hat ein Zertifikat vorgelegt, das nicht überprüft werden kann ({ $reason }). Sein Fingerabdruck ist { $fingerprint }.
 vpn-certificate-warning = Jemand könnte sich als dieser Server ausgeben. Verbinde dich nur, wenn du das erwartet hast.

@@ -49,7 +49,7 @@ media-keys-num-lock-off = Bloq Num desactivado
 
 vpn-sign-in-title = Iniciar sesión en { $connection }
 vpn-connect = Conectar
-vpn-signing-in = Iniciando sesión…
+vpn-signing-in = Iniciando sesión
 vpn-finish-in-browser = Termina de iniciar sesión en el navegador.
 vpn-certificate-untrusted = { $host } ha presentado un certificado que no se puede verificar ({ $reason }). Su huella digital es { $fingerprint }.
 vpn-certificate-warning = Alguien podría estar haciéndose pasar por este servidor. Conéctate solo si lo esperabas.

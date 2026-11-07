@@ -75,7 +75,7 @@ check-moment = Tas aizņems brīdi.
 check-slow = Windows aprēķina, cik daudz vietas tā var atvēlēt. Lielā diskā tas var aizņemt dažas minūtes.
 check-blocked-description = Pirms Luft var ievākties, kaut kas jāmaina. Lūk, kas jādara.
 check-found-description = Lūk, ko atrada Meet Luft.
-check-checking = Notiek diska, aparātprogrammatūras un aparatūras pārbaude…
+check-checking = Notiek diska, aparātprogrammatūras un aparatūras pārbaude
 check-again = Pārbaudīt vēlreiz
 check-action-firmware = Atvērt aparātprogrammatūras iestatījumus
 check-action-tidy = Sakārtot
@@ -171,7 +171,7 @@ linux-ready-remove-description = Meet Luft izdzēš Luft failus, startēšanas f
 
 luft-title = Jūsu Luft
 luft-looking = Meet Luft atrada Luft šajā datorā.
-luft-checking = Notiek Luft diska pārbaude…
+luft-checking = Notiek Luft diska pārbaude
 luft-description-beside = Luft ir instalēta šajā datorā blakus Windows.
 luft-description-drive = Luft ir instalēta diskā { $drive }.
 luft-bar-used = { $size }, izmantoti { $used }
@@ -225,7 +225,7 @@ resize-shrink-description = Luft pārvietos savus failus nākamajā startēšana
 
 box-title = Paņemiet savas lietas
 box-description = Izvēlieties, ko ņemt līdzi. Luft pēc instalēšanas to izpakos jūsu jaunajā kontā, un no Windows nekas netiks noņemts.
-box-looking = Notiek jūsu mapju pārskatīšana…
+box-looking = Notiek jūsu mapju pārskatīšana
 box-folder-desktop = Darbvirsma
 box-folder-documents = Dokumenti
 box-folder-downloads = Lejupielādes
@@ -294,7 +294,7 @@ removed-description = { $platform ->
 
 stick-title = Izveidot USB zibatmiņu
 stick-description = No tās Luft startē jebkurā datorā, lai to izmēģinātu vai instalētu.
-stick-looking = Notiek USB disku meklēšana…
+stick-looking = Notiek USB disku meklēšana
 stick-none = Pievienojiet USB zibatmiņu, kuras ietilpība ir vismaz { $size }. Tā parādīsies šeit.
 stick-drives-label = USB diski
 stick-offer = { $name }, { $size }

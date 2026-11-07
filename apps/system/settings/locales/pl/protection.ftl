@@ -192,7 +192,7 @@ settings-encryption-summary-chip = Do czasu zakończenia procesor zabezpieczeń 
 settings-encryption-summary-recovery-key = Do czasu zakończenia przy uruchamianiu pyta o klucz odzyskiwania zamiast o frazę hasła.
 # Button, verb: starts encrypting this computer
 settings-encryption-encrypt = Zaszyfruj
-settings-encryption-making-room = Robienie miejsca…
+settings-encryption-making-room = Robienie miejsca
 settings-encryption-unlocks-chip-pin = Odblokowywany procesorem zabezpieczeń i kodem PIN
 settings-encryption-unlocks-chip = Odblokowywany samodzielnie przez procesor zabezpieczeń
 settings-encryption-unlocks-passphrase = Prosi o frazę hasła przy uruchamianiu

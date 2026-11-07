@@ -80,7 +80,7 @@ settings-users-password-new-placeholder = { $count ->
 settings-users-password-confirm = Confirm
 settings-users-password-confirm-placeholder = Type it again
 settings-users-password-change = Change password
-settings-users-password-changing = Changing…
+settings-users-password-changing = Changing
 settings-users-password-wrong = That isn’t your current password
 settings-users-password-mismatch = The passwords don’t match
 settings-users-password-too-short = This password is too short
@@ -141,11 +141,11 @@ settings-login-automatic-off = Off
 
 ## Updates
 
-settings-updates-checking = Looking for updates…
-settings-updates-downloading = Downloading updates…
-settings-updates-rolling-back = Getting the earlier version ready…
-settings-updates-switching-nvidia = Downloading NVIDIA’s driver…
-settings-updates-switching-standard = Downloading the standard image…
+settings-updates-checking = Looking for updates
+settings-updates-downloading = Downloading updates
+settings-updates-rolling-back = Getting the earlier version ready
+settings-updates-switching-nvidia = Downloading NVIDIA’s driver
+settings-updates-switching-standard = Downloading the standard image
 settings-updates-up-to-date = Your system is up to date
 settings-updates-version = Version { $version }
 settings-updates-version-new = A new version
@@ -167,9 +167,9 @@ settings-updates-last-checked = Last checked { $when }
 settings-updates-never-checked = Not checked yet
 settings-updates-stop = Stop
 settings-updates-check = Check now
-settings-updates-checking-button = Checking…
+settings-updates-checking-button = Checking
 settings-updates-app-updates = App updates
-settings-updates-apps-checking = Looking for updates to your apps…
+settings-updates-apps-checking = Looking for updates to your apps
 settings-updates-apps-count = { $count ->
     [0] Managed in Schelf
     [one] { $count } app has an update in Schelf
@@ -191,7 +191,7 @@ settings-updates-background-description = Updates are ready to install the next 
 settings-updates-firmware = Firmware
 settings-updates-firmware-description = Updates for the software built into your hardware
 settings-updates-firmware-restart = Finishes when you restart
-settings-updates-firmware-installing = Installing…
+settings-updates-firmware-installing = Installing
 # Button, verb
 settings-updates-firmware-update = Update
 settings-updates-firmware-failed = The firmware couldn’t be updated
@@ -302,7 +302,7 @@ settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud o
 settings-accounts-sign-in-again-needed = Sign in again to keep using it
 settings-accounts-paused-metered = Syncing paused on a metered connection
 settings-accounts-paused-battery = Syncing paused while the battery is low
-settings-accounts-connecting = Connecting…
+settings-accounts-connecting = Connecting
 settings-accounts-offline = Offline
 settings-accounts-offline-kept = Offline, kept files are still here
 settings-accounts-not-connected = Not connected
@@ -330,7 +330,7 @@ settings-accounts-keep = Keep
 settings-accounts-remove = Remove
 # Button that confirms removing an account
 settings-accounts-remove-confirm = Remove from this computer
-settings-accounts-removing = Removing…
+settings-accounts-removing = Removing
 # $provider is the service's name, like "OneDrive"
 settings-accounts-remove-note = Your files stay in { $provider }. Changes made here are sent up first.
 
@@ -374,7 +374,7 @@ settings-accounts-try-again = Try again
 # Button
 settings-accounts-continue = Continue
 # $provider is the service's name, like "iCloud Drive"
-settings-accounts-working = Talking to { $provider }…
+settings-accounts-working = Talking to { $provider }
 # $provider is the service's name, like "OneDrive"
 settings-accounts-finish-in-browser = Finish signing in with { $provider } in your browser. Luft never sees your password, and this updates on its own once you’re done.
 settings-accounts-no-browser = No browser opened. Copy the link and open it in a browser.

@@ -8,7 +8,7 @@ setup-try-again = Opnieuw proberen
 setup-restart = Opnieuw opstarten
 setup-restart-now = Nu opnieuw opstarten
 setup-restart-later = Later opnieuw opstarten
-setup-saving = Opslaan…
+setup-saving = Opslaan
 
 ## Install progress, shown at the bottom of every step while Luft copies
 
@@ -51,7 +51,7 @@ setup-destination-meet-title = Naast Windows
 setup-destination-meet-description = Meet Luft heeft deze ruimte al gemaakt, dus Windows blijft precies zoals het is.
 setup-destination-meet-drive-title = Op { $drive }
 setup-destination-meet-drive-description = Meet Luft heeft deze ruimte al op een andere schijf gemaakt, en Luft start van daaruit met eigen opstartbestanden.
-setup-destination-looking = Je schijven worden bekeken…
+setup-destination-looking = Je schijven worden bekeken
 
 setup-destination-meet-choice = Naast Windows
 setup-destination-meet-choice-description = De { $size } gebruiken die Meet Luft naast Windows heeft gemaakt.
@@ -69,7 +69,7 @@ setup-destination-custom-choice = Aangepast
 setup-destination-custom-choice-description = Zelf partities indelen in Schijven.
 
 setup-destination-more-options = Meer opties
-setup-destination-starting = Starten…
+setup-destination-starting = Starten
 setup-destination-replace = Vervangen
 setup-destination-install = Luft installeren
 
@@ -127,7 +127,7 @@ setup-drive-partitions = { $count ->
 ## Custom space
 
 setup-custom-open-disks = Schijven openen
-setup-custom-looking = Zoeken…
+setup-custom-looking = Zoeken
 setup-custom-look-again = Opnieuw kijken
 setup-custom-free-label = Vrije ruimte
 setup-custom-free-space = { $size } vrije ruimte
@@ -172,14 +172,14 @@ setup-replace-blocked-read-only = De schijf is alleen-lezen.
 setup-network-title = Verbinding maken met internet
 setup-network-description = Dit is optioneel. Als je online bent, kan Luft je klok en tijdzone instellen, en kun je internet gebruiken terwijl Luft wordt geïnstalleerd.
 setup-network-unavailable = Netwerken zijn nu niet beschikbaar. Je kunt later verbinding maken via de taakbalk.
-setup-network-looking = Netwerken zoeken…
+setup-network-looking = Netwerken zoeken
 setup-network-cable = Verbonden met een kabel
 setup-network-show-all = Alle netwerken tonen
 setup-network-skip = Overslaan
 setup-network-failed = Kan geen verbinding maken
 setup-network-wrong-password = Onjuist wachtwoord
 setup-network-connected = Verbonden
-setup-network-connecting = Verbinden…
+setup-network-connecting = Verbinden
 setup-network-saved = Opgeslagen
 setup-network-password = Wachtwoord
 setup-network-join = Verbinden
@@ -235,7 +235,7 @@ setup-enroll-digits = { $count ->
 setup-secure-boot-title = Je computer vertrouwt Luft nog niet
 setup-secure-boot-code = Direct na de volgende herstart vraagt een blauw scherm of je Luft vertrouwt. Gebruik daar het toetsenbord met deze code.
 setup-secure-boot-skipped = Het blauwe scherm is overgeslagen. Vraag een nieuwe code aan en start opnieuw op. Gebruik daarna het toetsenbord op dat scherm.
-setup-secure-boot-getting = Je code wordt opgehaald…
+setup-secure-boot-getting = Je code wordt opgehaald
 setup-secure-boot-new-code = Nieuwe code aanvragen
 
 ## Encryption

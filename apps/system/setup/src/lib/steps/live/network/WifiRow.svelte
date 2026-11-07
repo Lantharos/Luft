@@ -4,7 +4,7 @@
 	import WifiHigh from '@lucide/svelte/icons/wifi-high';
 	import WifiLow from '@lucide/svelte/icons/wifi-low';
 	import { t } from '@luft/i18n';
-	import { PasswordField } from '@luft/ui';
+	import { PasswordField, Spinner } from '@luft/ui';
 	import { needsPassword, type WifiNetwork } from '@luft/network';
 
 	interface Props {
@@ -27,6 +27,7 @@
 	<button type="button" class="flex w-full items-center gap-3.5 px-4 py-3 text-left" onclick={onchoose}>
 		<Signal size={20} class="flex-none text-[var(--text-soft)]" />
 		<span class="min-w-0 flex-1 truncate text-[15px]">{network.ssid}</span>
+		{#if network.state === 'connecting' && !problem}<Spinner size={15} class="text-[var(--text-muted)]" />{/if}
 		{#if status}
 			<span class="text-[13px] {problem ? 'text-[var(--danger)]' : 'text-[var(--text-muted)]'}">{status}</span>
 		{/if}

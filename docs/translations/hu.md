@@ -27,7 +27,7 @@ Sentence case everywhere: only the first word and names take a capital letter. �
 
 - Quotation marks: „…”, and »…« inside them.
 - Apostrophe: ’, rarely needed in Hungarian.
-- Ellipsis: one character, „…”, with no space before it: „Betöltés…”.
+- Ellipsis: one character, „…”, with no space before it. A message about something in progress, such as loading, takes none, because the app shows a spinner beside it.
 - Dash: the en dash with spaces, „ – ”. No em dashes.
 - No space before punctuation.
 - Percent sign directly after the number, with no space: „57%”. Units take a space: „4,5 W”, „120 GB”.

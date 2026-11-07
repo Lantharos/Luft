@@ -8,7 +8,7 @@ setup-try-again = Torna-ho a provar
 setup-restart = Reinicia
 setup-restart-now = Reinicia ara
 setup-restart-later = Reinicia més tard
-setup-saving = S’està desant…
+setup-saving = S’està desant
 
 ## Install progress, shown at the bottom of every step while Luft copies
 
@@ -51,7 +51,7 @@ setup-destination-meet-title = Al costat de Windows
 setup-destination-meet-description = Meet Luft ja ha fet aquest espai, així que Windows es queda tal com està.
 setup-destination-meet-drive-title = A { $drive }
 setup-destination-meet-drive-description = Meet Luft ja ha fet aquest espai en un altre disc, i Luft s’inicia des d’allà amb fitxers d’arrencada propis.
-setup-destination-looking = S’estan examinant els discs…
+setup-destination-looking = S’estan examinant els discs
 
 setup-destination-meet-choice = Al costat de Windows
 setup-destination-meet-choice-description = Fes servir els { $size } que Meet Luft ha preparat al costat de Windows.
@@ -69,7 +69,7 @@ setup-destination-custom-choice = Personalitzat
 setup-destination-custom-choice-description = Organitza les particions manualment a Discs.
 
 setup-destination-more-options = Més opcions
-setup-destination-starting = S’està iniciant…
+setup-destination-starting = S’està iniciant
 setup-destination-replace = Substitueix
 setup-destination-install = Instal·la Luft
 
@@ -127,7 +127,7 @@ setup-drive-partitions = { $count ->
 ## Custom space
 
 setup-custom-open-disks = Obre Discs
-setup-custom-looking = S’està mirant…
+setup-custom-looking = S’està mirant
 setup-custom-look-again = Torna a mirar
 setup-custom-free-label = Espai lliure
 setup-custom-free-space = { $size } d’espai lliure
@@ -172,14 +172,14 @@ setup-replace-blocked-read-only = El seu disc és només de lectura.
 setup-network-title = Connecteu-vos a internet
 setup-network-description = És opcional. Si esteu en línia, Luft pot ajustar el rellotge i la zona horària, i podeu fer servir internet mentre Luft s’instal·la.
 setup-network-unavailable = Ara mateix no hi ha xarxes disponibles. Podeu connectar-vos més tard des de la barra de tasques.
-setup-network-looking = S’estan cercant xarxes…
+setup-network-looking = S’estan cercant xarxes
 setup-network-cable = Connectat amb cable
 setup-network-show-all = Mostra totes les xarxes
 setup-network-skip = Omet
 setup-network-failed = No s’ha pogut connectar
 setup-network-wrong-password = Contrasenya incorrecta
 setup-network-connected = Connectat
-setup-network-connecting = S’està connectant…
+setup-network-connecting = S’està connectant
 setup-network-saved = Desada
 setup-network-password = Contrasenya
 setup-network-join = Connecta
@@ -235,7 +235,7 @@ setup-enroll-digits = { $count ->
 setup-secure-boot-title = L’ordinador encara no confia en Luft
 setup-secure-boot-code = Just després del pròxim reinici, una pantalla blava us demanarà que confieu en Luft. Feu-hi servir el teclat amb aquest codi.
 setup-secure-boot-skipped = S’ha omès la pantalla blava. Obteniu un codi nou i reinicieu; després feu servir el teclat en aquella pantalla.
-setup-secure-boot-getting = S’està obtenint el codi…
+setup-secure-boot-getting = S’està obtenint el codi
 setup-secure-boot-new-code = Obtén un codi nou
 
 ## Encryption

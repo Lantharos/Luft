@@ -76,7 +76,7 @@ check-moment = Triga un moment.
 check-slow = Windows està calculant quant espai pot cedir. En un disc gran pot trigar uns minuts.
 check-blocked-description = Cal canviar alguna cosa abans que Luft s’hi pugui instal·lar. Això és el que heu de fer.
 check-found-description = Això és el que ha trobat Meet Luft.
-check-checking = S’estan comprovant el disc, el microprogramari i el maquinari…
+check-checking = S’estan comprovant el disc, el microprogramari i el maquinari
 check-again = Torna a comprovar
 check-action-firmware = Obre la configuració del microprogramari
 check-action-tidy = Fes neteja
@@ -173,7 +173,7 @@ linux-ready-remove-description = Meet Luft suprimeix els fitxers de Luft, els se
 
 luft-title = El vostre Luft
 luft-looking = Meet Luft ha trobat Luft en aquest ordinador.
-luft-checking = S’està examinant el disc de Luft…
+luft-checking = S’està examinant el disc de Luft
 luft-description-beside = Luft està instal·lat al costat de Windows en aquest ordinador.
 luft-description-drive = Luft està instal·lat a { $drive }.
 luft-bar-used = { $size }, { $used } en ús
@@ -227,7 +227,7 @@ resize-shrink-description = Luft mou els seus fitxers la pròxima vegada que s�
 
 box-title = Porteu les vostres coses
 box-description = Trieu què us voleu endur. Luft ho desempaqueta al vostre compte nou quan s’instal·la, i no se suprimeix res de Windows.
-box-looking = S’estan examinant les vostres carpetes…
+box-looking = S’estan examinant les vostres carpetes
 box-folder-desktop = Escriptori
 box-folder-documents = Documents
 box-folder-downloads = Baixades
@@ -294,7 +294,7 @@ removed-description = { $platform ->
 
 stick-title = Creeu una memòria USB
 stick-description = Serveix per iniciar Luft a qualsevol ordinador, per provar-lo o per instal·lar-lo.
-stick-looking = S’estan cercant unitats USB…
+stick-looking = S’estan cercant unitats USB
 stick-none = Connecteu una memòria USB de { $size } o més. Apareixerà aquí.
 stick-drives-label = Unitats USB
 stick-offer = { $name }, { $size }

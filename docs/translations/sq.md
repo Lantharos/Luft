@@ -24,7 +24,7 @@ Sentence case everywhere: only the first word and names take a capital letter. �
 ## Typography
 
 - Quotation marks: “…”, as in Microsoft's Albanian. Use ‘…’ inside them.
-- Ellipsis: one character, “…”, with no space before it.
+- Ellipsis: one character, “…”, with no space before it. A message about something in progress, such as loading, takes none, because the app shows a spinner beside it.
 - Dash: the en dash with spaces, “ – ”.
 - Use ë and ç everywhere; never replace them with e and c.
 - Key names stay as printed on keyboards: Ctrl, Alt, Shift, Super.

@@ -24,7 +24,7 @@ Sentence case, with the usual German rules for nouns. Feature names are ordinary
 ## Typography
 
 - Quotation marks: „…“, and ‚…‘ inside them.
-- Ellipsis: one character, „…“, with no space before it when something is left out of a word, and a space before it otherwise: „Wird geladen …“.
+- Ellipsis: one character, „…“, with no space before it when something is left out of a word, and a space before it otherwise. A message about something in progress, such as loading, takes none, because the app shows a spinner beside it.
 - Dash: the en dash with spaces, „ – “. No em dashes.
 - Compounds with names, abbreviations or English words take a hyphen: „Rover-Fenster“, „USB-Stick“, „PDF-Datei“.
 - Key names follow German keyboards: Strg, Entf, Einfg, Bild auf, Bild ab, Pos1, Ende, Umschalt. These come from translatable key names, so translate them where they appear.

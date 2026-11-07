@@ -73,7 +73,7 @@ settings-users-password-new-placeholder = { $count ->
 settings-users-password-confirm = Deimhnigh
 settings-users-password-confirm-placeholder = Clóscríobh arís é
 settings-users-password-change = Athraigh an pasfhocal
-settings-users-password-changing = Á athrú…
+settings-users-password-changing = Á athrú
 settings-users-password-wrong = Ní hé sin do phasfhocal reatha
 settings-users-password-mismatch = Níl na pasfhocail mar a chéile
 settings-users-password-too-short = Tá an pasfhocal seo róghearr
@@ -130,11 +130,11 @@ settings-login-automatic-off = As
 
 ## Updates
 
-settings-updates-checking = Nuashonruithe á lorg…
-settings-updates-downloading = Nuashonruithe á n-íoslódáil…
-settings-updates-rolling-back = An leagan roimhe seo á ullmhú…
-settings-updates-switching-nvidia = Tiománaí NVIDIA á íoslódáil…
-settings-updates-switching-standard = An íomhá chaighdeánach á híoslódáil…
+settings-updates-checking = Nuashonruithe á lorg
+settings-updates-downloading = Nuashonruithe á n-íoslódáil
+settings-updates-rolling-back = An leagan roimhe seo á ullmhú
+settings-updates-switching-nvidia = Tiománaí NVIDIA á íoslódáil
+settings-updates-switching-standard = An íomhá chaighdeánach á híoslódáil
 settings-updates-up-to-date = Tá do chóras cothrom le dáta
 settings-updates-version = Leagan { $version }
 settings-updates-version-new = Leagan nua
@@ -154,9 +154,9 @@ settings-updates-last-checked = Seiceáilte go deireanach { $when }
 settings-updates-never-checked = Gan seiceáil fós
 settings-updates-stop = Stop
 settings-updates-check = Seiceáil anois
-settings-updates-checking-button = Á sheiceáil…
+settings-updates-checking-button = Á sheiceáil
 settings-updates-app-updates = Nuashonruithe aipeanna
-settings-updates-apps-checking = Nuashonruithe do d’aipeanna á lorg…
+settings-updates-apps-checking = Nuashonruithe do d’aipeanna á lorg
 settings-updates-apps-count = { $count ->
     [0] Á bhainistiú i Schelf
     [one] Nuashonruithe i Schelf do { $count } aip
@@ -180,7 +180,7 @@ settings-updates-background-description = Beidh na nuashonruithe réidh le suite
 settings-updates-firmware = Dochtearraí
 settings-updates-firmware-description = Nuashonruithe do na bogearraí atá ionsuite i do chrua-earraí
 settings-updates-firmware-restart = Críochnóidh sé nuair a atosóidh tú
-settings-updates-firmware-installing = Á shuiteáil…
+settings-updates-firmware-installing = Á shuiteáil
 settings-updates-firmware-update = Nuashonraigh
 settings-updates-firmware-failed = Níorbh fhéidir na dochtearraí a nuashonrú
 settings-updates-download = Íoslódáil
@@ -271,7 +271,7 @@ settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud n
 settings-accounts-sign-in-again-needed = Sínigh isteach arís chun leanúint ar aghaidh ag úsáid an chuntais
 settings-accounts-paused-metered = Sioncrónú curtha ar sos ar cheangal méadraithe
 settings-accounts-paused-battery = Sioncrónú curtha ar sos fad atá an ceallra íseal
-settings-accounts-connecting = Ag ceangal…
+settings-accounts-connecting = Ag ceangal
 settings-accounts-offline = As líne
 settings-accounts-offline-kept = As líne, tá na comhaid choinnithe fós anseo
 settings-accounts-not-connected = Gan cheangal
@@ -300,7 +300,7 @@ settings-accounts-sign-in-again = Sínigh isteach arís
 settings-accounts-keep = Coinnigh
 settings-accounts-remove = Bain
 settings-accounts-remove-confirm = Bain den ríomhaire seo
-settings-accounts-removing = Á bhaint…
+settings-accounts-removing = Á bhaint
 settings-accounts-remove-note = Fanann do chomhaid ar { $provider }. Seoltar suas na hathruithe a rinneadh anseo ar dtús.
 
 ## Accounts: providers
@@ -333,7 +333,7 @@ settings-accounts-continue-in-browser = Lean ar aghaidh sa bhrabhsálaí
 settings-accounts-sign-in = Sínigh isteach
 settings-accounts-try-again = Bain triail eile as
 settings-accounts-continue = Lean ar aghaidh
-settings-accounts-working = Ag caint leis an tseirbhís { $provider }…
+settings-accounts-working = Ag caint leis an tseirbhís { $provider }
 settings-accounts-finish-in-browser = Críochnaigh an síniú isteach ar { $provider } i do bhrabhsálaí. Ní fheiceann Luft do phasfhocal riamh, agus nuashonrófar é seo leis féin nuair a bheidh tú réidh.
 settings-accounts-no-browser = Níor osclaíodh aon bhrabhsálaí. Cóipeáil an nasc agus oscail é i mbrabhsálaí.
 settings-accounts-open-again = Oscail an leathanach arís

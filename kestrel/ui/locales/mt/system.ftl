@@ -49,7 +49,7 @@ media-keys-num-lock-off = Num Lock mitfi
 
 vpn-sign-in-title = Idħol f’{ $connection }
 vpn-connect = Ikkonnettja
-vpn-signing-in = Qed tidħol…
+vpn-signing-in = Qed tidħol
 vpn-finish-in-browser = Lesti d-dħul fil-browser.
 vpn-certificate-untrusted = { $host } ta ċertifikat li ma jistax jiġi vverifikat ({ $reason }). Il-fingerprint tiegħu huwa { $fingerprint }.
 vpn-certificate-warning = Xi ħadd jista’ jkun qed jippretendi li huwa dan is-server. Ikkonnettja biss jekk kont qed tistenna dan.

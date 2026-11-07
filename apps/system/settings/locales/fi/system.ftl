@@ -70,7 +70,7 @@ settings-users-password-new-placeholder = { $count ->
 settings-users-password-confirm = Vahvista
 settings-users-password-confirm-placeholder = Kirjoita uudelleen
 settings-users-password-change = Vaihda salasana
-settings-users-password-changing = Vaihdetaan…
+settings-users-password-changing = Vaihdetaan
 settings-users-password-wrong = Tämä ei ole nykyinen salasanasi
 settings-users-password-mismatch = Salasanat eivät täsmää
 settings-users-password-too-short = Salasana on liian lyhyt
@@ -124,11 +124,11 @@ settings-login-automatic-off = Pois
 
 ## Updates
 
-settings-updates-checking = Etsitään päivityksiä…
-settings-updates-downloading = Ladataan päivityksiä…
-settings-updates-rolling-back = Valmistellaan aiempaa versiota…
-settings-updates-switching-nvidia = Ladataan NVIDIAn ohjainta…
-settings-updates-switching-standard = Ladataan vakiokuvaa…
+settings-updates-checking = Etsitään päivityksiä
+settings-updates-downloading = Ladataan päivityksiä
+settings-updates-rolling-back = Valmistellaan aiempaa versiota
+settings-updates-switching-nvidia = Ladataan NVIDIAn ohjainta
+settings-updates-switching-standard = Ladataan vakiokuvaa
 settings-updates-up-to-date = Järjestelmäsi on ajan tasalla
 settings-updates-version = Versio { $version }
 settings-updates-version-new = Uusi versio
@@ -148,9 +148,9 @@ settings-updates-last-checked = Viimeksi tarkistettu { $when }
 settings-updates-never-checked = Ei vielä tarkistettu
 settings-updates-stop = Pysäytä
 settings-updates-check = Tarkista nyt
-settings-updates-checking-button = Tarkistetaan…
+settings-updates-checking-button = Tarkistetaan
 settings-updates-app-updates = Sovelluspäivitykset
-settings-updates-apps-checking = Etsitään sovelluksiesi päivityksiä…
+settings-updates-apps-checking = Etsitään sovelluksiesi päivityksiä
 settings-updates-apps-count = { $count ->
     [0] Hallitaan Schelfissä
     [one] { $count } sovelluksen voi päivittää Schelfissä
@@ -171,7 +171,7 @@ settings-updates-background-description = Päivitykset ovat valmiina asennettavi
 settings-updates-firmware = Laiteohjelmisto
 settings-updates-firmware-description = Päivitykset laitteistoon sisäänrakennetulle ohjelmistolle
 settings-updates-firmware-restart = Valmistuu uudelleenkäynnistyksessä
-settings-updates-firmware-installing = Asennetaan…
+settings-updates-firmware-installing = Asennetaan
 settings-updates-firmware-update = Päivitä
 settings-updates-firmware-failed = Laiteohjelmistoa ei voitu päivittää
 settings-updates-download = Lataa
@@ -262,7 +262,7 @@ settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud t
 settings-accounts-sign-in-again-needed = Kirjaudu uudelleen, jotta voit jatkaa käyttöä
 settings-accounts-paused-metered = Synkronointi keskeytetty käytön mukaan laskutettavassa yhteydessä
 settings-accounts-paused-battery = Synkronointi keskeytetty, koska akun varaus on vähissä
-settings-accounts-connecting = Yhdistetään…
+settings-accounts-connecting = Yhdistetään
 settings-accounts-offline = Offline-tilassa
 settings-accounts-offline-kept = Offline-tilassa, säilytetyt tiedostot ovat yhä käytettävissä
 settings-accounts-not-connected = Ei yhdistetty
@@ -285,7 +285,7 @@ settings-accounts-sign-in-again = Kirjaudu uudelleen
 settings-accounts-keep = Säilytä
 settings-accounts-remove = Poista
 settings-accounts-remove-confirm = Poista tästä tietokoneesta
-settings-accounts-removing = Poistetaan…
+settings-accounts-removing = Poistetaan
 settings-accounts-remove-note = Tiedostosi pysyvät palvelussa { $provider }. Täällä tehdyt muutokset lähetetään ensin.
 
 ## Accounts: providers
@@ -318,7 +318,7 @@ settings-accounts-continue-in-browser = Jatka selaimessa
 settings-accounts-sign-in = Kirjaudu sisään
 settings-accounts-try-again = Yritä uudelleen
 settings-accounts-continue = Jatka
-settings-accounts-working = Yhdistetään palveluun { $provider }…
+settings-accounts-working = Yhdistetään palveluun { $provider }
 settings-accounts-finish-in-browser = Viimeistele { $provider } -kirjautuminen selaimessa. Luft ei koskaan näe salasanaasi, ja tämä näkymä päivittyy itsestään, kun olet valmis.
 settings-accounts-no-browser = Selain ei avautunut. Kopioi linkki ja avaa se selaimessa.
 settings-accounts-open-again = Avaa sivu uudelleen

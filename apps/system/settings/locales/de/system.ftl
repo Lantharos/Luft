@@ -70,7 +70,7 @@ settings-users-password-new-placeholder = { $count ->
 settings-users-password-confirm = Bestätigen
 settings-users-password-confirm-placeholder = Erneut eingeben
 settings-users-password-change = Passwort ändern
-settings-users-password-changing = Wird geändert …
+settings-users-password-changing = Wird geändert
 settings-users-password-wrong = Das ist nicht dein aktuelles Passwort
 settings-users-password-mismatch = Die Passwörter stimmen nicht überein
 settings-users-password-too-short = Dieses Passwort ist zu kurz
@@ -124,11 +124,11 @@ settings-login-automatic-off = Aus
 
 ## Updates
 
-settings-updates-checking = Nach Updates wird gesucht …
-settings-updates-downloading = Updates werden heruntergeladen …
-settings-updates-rolling-back = Die frühere Version wird vorbereitet …
-settings-updates-switching-nvidia = Der NVIDIA-Treiber wird heruntergeladen …
-settings-updates-switching-standard = Das Standard-Image wird heruntergeladen …
+settings-updates-checking = Nach Updates wird gesucht
+settings-updates-downloading = Updates werden heruntergeladen
+settings-updates-rolling-back = Die frühere Version wird vorbereitet
+settings-updates-switching-nvidia = Der NVIDIA-Treiber wird heruntergeladen
+settings-updates-switching-standard = Das Standard-Image wird heruntergeladen
 settings-updates-up-to-date = Dein System ist auf dem neuesten Stand
 settings-updates-version = Version { $version }
 settings-updates-version-new = Eine neue Version
@@ -148,9 +148,9 @@ settings-updates-last-checked = Zuletzt gesucht { $when }
 settings-updates-never-checked = Noch nicht gesucht
 settings-updates-stop = Stoppen
 settings-updates-check = Jetzt suchen
-settings-updates-checking-button = Wird gesucht …
+settings-updates-checking-button = Wird gesucht
 settings-updates-app-updates = App-Updates
-settings-updates-apps-checking = Nach Updates für deine Apps wird gesucht …
+settings-updates-apps-checking = Nach Updates für deine Apps wird gesucht
 settings-updates-apps-count = { $count ->
     [0] Werden in Schelf verwaltet
     [one] { $count } App hat ein Update in Schelf
@@ -171,7 +171,7 @@ settings-updates-background-description = Updates sind beim nächsten Neustart b
 settings-updates-firmware = Firmware
 settings-updates-firmware-description = Updates für die Software, die in deine Hardware eingebaut ist
 settings-updates-firmware-restart = Wird beim Neustart abgeschlossen
-settings-updates-firmware-installing = Wird installiert …
+settings-updates-firmware-installing = Wird installiert
 settings-updates-firmware-update = Aktualisieren
 settings-updates-firmware-failed = Die Firmware konnte nicht aktualisiert werden
 settings-updates-download = Herunterladen
@@ -262,7 +262,7 @@ settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud o
 settings-accounts-sign-in-again-needed = Melde dich erneut an, um es weiter zu nutzen
 settings-accounts-paused-metered = Synchronisierung bei getakteter Verbindung pausiert
 settings-accounts-paused-battery = Synchronisierung bei niedrigem Akkustand pausiert
-settings-accounts-connecting = Wird verbunden …
+settings-accounts-connecting = Wird verbunden
 settings-accounts-offline = Offline
 settings-accounts-offline-kept = Offline, behaltene Dateien sind weiterhin da
 settings-accounts-not-connected = Nicht verbunden
@@ -285,7 +285,7 @@ settings-accounts-sign-in-again = Erneut anmelden
 settings-accounts-keep = Behalten
 settings-accounts-remove = Entfernen
 settings-accounts-remove-confirm = Von diesem Computer entfernen
-settings-accounts-removing = Wird entfernt …
+settings-accounts-removing = Wird entfernt
 settings-accounts-remove-note = Deine Dateien bleiben in { $provider }. Änderungen von hier werden vorher hochgeladen.
 
 ## Accounts: providers
@@ -318,7 +318,7 @@ settings-accounts-continue-in-browser = Im Browser fortfahren
 settings-accounts-sign-in = Anmelden
 settings-accounts-try-again = Erneut versuchen
 settings-accounts-continue = Weiter
-settings-accounts-working = Verbindung mit { $provider } …
+settings-accounts-working = Verbindung mit { $provider }
 settings-accounts-finish-in-browser = Schließ die Anmeldung bei { $provider } in deinem Browser ab. Luft sieht dein Passwort nie, und diese Ansicht aktualisiert sich von selbst, sobald du fertig bist.
 settings-accounts-no-browser = Es wurde kein Browser geöffnet. Kopier den Link und öffne ihn in einem Browser.
 settings-accounts-open-again = Seite erneut öffnen

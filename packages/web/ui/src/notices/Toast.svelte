@@ -3,6 +3,7 @@
 	import type { ClassValue } from 'svelte/elements';
 	import { t } from '@luft/i18n';
 	import { toast as presence } from '../motion/transitions';
+	import Spinner from './Spinner.svelte';
 	import { swipeAway } from './swipe';
 	import type { ToastMessage } from './toasts.svelte';
 
@@ -47,7 +48,10 @@
 			in:presence
 			out:leave
 		>
-			<span class="min-w-0 truncate">{item.message}</span>
+			<span class="flex min-w-0 items-center gap-2.5">
+				{#if item.busy}<Spinner size={15} />{/if}
+				<span class="truncate">{item.message}</span>
+			</span>
 			{#if item.action}
 				{@const action = item.action}
 				<button class="toast-action" type="button" onclick={() => act(item, action.run)}>{action.label}</button>

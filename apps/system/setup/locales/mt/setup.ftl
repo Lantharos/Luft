@@ -8,7 +8,7 @@ setup-try-again = Erġa’ pprova
 setup-restart = Irristartja
 setup-restart-now = Irristartja issa
 setup-restart-later = Irristartja aktar tard
-setup-saving = Qed jissejvja…
+setup-saving = Qed jissejvja
 
 ## Install progress, shown at the bottom of every step while Luft copies
 
@@ -51,7 +51,7 @@ setup-destination-meet-title = Ħdejn Windows
 setup-destination-meet-description = Meet Luft diġà għamel dan l-ispazju, għalhekk Windows jibqa’ eżatt kif inhu.
 setup-destination-meet-drive-title = Fuq { $drive }
 setup-destination-meet-drive-description = Meet Luft diġà għamel dan l-ispazju fuq diska oħra, u Luft jibda minn hemm bil-fajls tal-istartjar tiegħu.
-setup-destination-looking = Qed nifli d-diski…
+setup-destination-looking = Qed nifli d-diski
 
 setup-destination-meet-choice = Ħdejn Windows
 setup-destination-meet-choice-description = Uża l-ispazju ta’ { $size } li għamel Meet Luft ħdejn Windows.
@@ -69,7 +69,7 @@ setup-destination-custom-choice = Personalizzat
 setup-destination-custom-choice-description = Organizza l-partizzjonijiet int stess f’Diski.
 
 setup-destination-more-options = Aktar għażliet
-setup-destination-starting = Qed jibda…
+setup-destination-starting = Qed jibda
 setup-destination-replace = Ibdel
 setup-destination-install = Installa Luft
 
@@ -133,7 +133,7 @@ setup-drive-partitions = { $count ->
 ## Custom space
 
 setup-custom-open-disks = Iftaħ Diski
-setup-custom-looking = Qed infittex…
+setup-custom-looking = Qed infittex
 setup-custom-look-again = Erġa’ ħares
 setup-custom-free-label = Spazju ħieles
 setup-custom-free-space = { $size } spazju ħieles
@@ -187,14 +187,14 @@ setup-replace-blocked-read-only = Id-diska tagħha hija read-only.
 setup-network-title = Ikkonnettja mal-internet
 setup-network-description = Dan mhux obbligatorju. Meta tkun online, Luft jista’ jissettja l-ħin u ż-żona tal-ħin, u tista’ tuża l-internet waqt li Luft jiġi installat.
 setup-network-unavailable = In-netwerks mhumiex disponibbli bħalissa. Tista’ tikkonnettja aktar tard mit-taskbar.
-setup-network-looking = Qed infittex netwerks…
+setup-network-looking = Qed infittex netwerks
 setup-network-cable = Konness b’kejbil
 setup-network-show-all = Uri n-netwerks kollha
 setup-network-skip = Aqbeż
 setup-network-failed = Ma setax jikkonnettja
 setup-network-wrong-password = Password ħażina
 setup-network-connected = Konness
-setup-network-connecting = Qed jikkonnettja…
+setup-network-connecting = Qed jikkonnettja
 setup-network-saved = Issejvjat
 setup-network-password = Password
 setup-network-join = Ikkonnettja
@@ -253,7 +253,7 @@ setup-enroll-digits = { $count ->
 setup-secure-boot-title = Il-kompjuter għadu ma jafdax lil Luft
 setup-secure-boot-code = Eżatt wara r-restart li jmiss, skrin blu jitolbok tafda lil Luft. Hemmhekk uża t-tastiera b’dan il-kodiċi.
 setup-secure-boot-skipped = L-iskrin blu nqabeż. Ikseb kodiċi ġdid u irristartja, imbagħad hemmhekk uża t-tastiera.
-setup-secure-boot-getting = Qed jinġieb il-kodiċi…
+setup-secure-boot-getting = Qed jinġieb il-kodiċi
 setup-secure-boot-new-code = Ikseb kodiċi ġdid
 
 ## Encryption

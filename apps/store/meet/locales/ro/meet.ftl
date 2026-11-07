@@ -67,7 +67,7 @@ check-moment = Durează doar un moment.
 check-slow = Windows calculează cât spațiu poate ceda. Pe o unitate mare, poate dura câteva minute.
 check-blocked-description = Ceva trebuie schimbat înainte ca Luft să se poată instala. Iată ce trebuie făcut.
 check-found-description = Iată ce a găsit Meet Luft.
-check-checking = Se verifică unitatea, firmware-ul și componentele hardware…
+check-checking = Se verifică unitatea, firmware-ul și componentele hardware
 check-again = Verifică din nou
 check-action-firmware = Deschide setările firmware-ului
 check-action-tidy = Curăță
@@ -157,7 +157,7 @@ linux-ready-remove-description = Meet Luft șterge fișierele sistemului Luft, f
 
 luft-title = Luft pe acest PC
 luft-looking = Meet Luft a găsit Luft pe acest PC.
-luft-checking = Se analizează unitatea sistemului Luft…
+luft-checking = Se analizează unitatea sistemului Luft
 luft-description-beside = Luft este instalat lângă Windows pe acest PC.
 luft-description-drive = Luft este instalat pe { $drive }.
 luft-bar-used = { $size }, { $used } ocupați
@@ -209,7 +209,7 @@ resize-shrink-description = Luft își mută fișierele la următoarea pornire, 
 
 box-title = Aduceți-vă lucrurile
 box-description = Alegeți ce să luați. Luft le despachetează în noul cont după instalare și nu se elimină nimic din Windows.
-box-looking = Se parcurg folderele…
+box-looking = Se parcurg folderele
 box-folder-desktop = Desktop
 box-folder-documents = Documente
 box-folder-downloads = Descărcări
@@ -272,7 +272,7 @@ removed-description = { $platform ->
 
 stick-title = Creați un stick USB
 stick-description = Luft pornește de pe el pe orice computer, pentru încercare sau instalare.
-stick-looking = Se caută unități USB…
+stick-looking = Se caută unități USB
 stick-none = Conectați un stick USB de cel puțin { $size }. Va apărea aici.
 stick-drives-label = Unități USB
 stick-offer = { $name }, { $size }

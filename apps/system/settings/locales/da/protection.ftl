@@ -182,7 +182,7 @@ settings-encryption-summary-chip = Indtil den er færdig, opbevarer sikkerhedsch
 settings-encryption-summary-recovery-key = Indtil den er færdig, beder den om genoprettelsesnøglen ved opstart i stedet for din adgangsfrase.
 # Button, verb: starts encrypting this computer
 settings-encryption-encrypt = Krypter
-settings-encryption-making-room = Gør plads…
+settings-encryption-making-room = Gør plads
 settings-encryption-unlocks-chip-pin = Låses op med sikkerhedschippen og din pinkode
 settings-encryption-unlocks-chip = Låses op af sig selv med sikkerhedschippen
 settings-encryption-unlocks-passphrase = Beder om din adgangsfrase ved opstart

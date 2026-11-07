@@ -116,4 +116,4 @@ ui-passphrase-mismatch = Frazele de acces nu coincid
 
 ## Encryption
 
-ui-encryption-checking = Se verifică…
+ui-encryption-checking = Se verifică

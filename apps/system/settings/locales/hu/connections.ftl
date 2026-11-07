@@ -3,7 +3,7 @@
 ## Network: shared words
 
 settings-network-save = Mentés
-settings-network-saving = Mentés…
+settings-network-saving = Mentés
 settings-network-cancel = Mégse
 settings-network-connect = Csatlakozás
 settings-network-disconnect = Leválasztás
@@ -22,7 +22,7 @@ settings-network-connect-failed = Nem sikerült csatlakozni
 ## Network: connection states
 
 settings-network-link-connected = Csatlakozva
-settings-network-link-connecting = Csatlakozás…
+settings-network-link-connecting = Csatlakozás
 settings-network-link-disconnected = Nincs csatlakozva
 settings-network-link-unplugged = Kábel kihúzva
 
@@ -88,7 +88,7 @@ settings-network-wifi-enterprise = Bejelentkezés munkahelyi vagy iskolai fiókk
 settings-network-wifi-connect-failed = Nem sikerült csatlakozni ehhez a hálózathoz
 settings-network-wifi-saved-password-failed = A mentett jelszó nem működött. Adja meg újra.
 settings-network-wifi-settings = Hálózat beállításai
-settings-network-wifi-searching = Hálózatok keresése…
+settings-network-wifi-searching = Hálózatok keresése
 settings-network-hidden = Csatlakozás rejtett hálózathoz
     .description = Adja meg a hálózat nevét és a biztonság típusát.
 settings-network-hidden-name = Hálózat neve
@@ -247,7 +247,7 @@ settings-network-vpn-off = Ki
 settings-network-vpn-none = Nincs beállítva
 settings-network-vpn-import = Importálás fájlból
     .description = WireGuard-, OpenVPN- és egyéb VPN-konfigurációs fájlok
-settings-network-vpn-importing = Importálás…
+settings-network-vpn-importing = Importálás
 settings-network-wireguard = WireGuard beállítása
     .description = Adja meg a VPN-szolgáltatótól vagy a kiszolgálóról kapott adatokat
 settings-network-wireguard-dialog = Ezeket az adatokat a VPN-szolgáltatótól vagy a kiszolgáló tulajdonosától kaphatja meg.
@@ -267,7 +267,7 @@ settings-network-wireguard-keepalive = Életben tartás
     .description = Segít fenntartani a kapcsolatot útválasztó mögött
     .placeholder = Nem kötelező, másodpercben
 settings-network-wireguard-add = Hozzáadás
-settings-network-wireguard-adding = Hozzáadás…
+settings-network-wireguard-adding = Hozzáadás
 settings-network-wireguard-error-private-key = Adjon meg vagy hozzon létre egy titkos kulcsot
 settings-network-wireguard-error-addresses = Adjon meg legalább egy címet
 settings-network-wireguard-error-server-key = Adja meg a kiszolgáló nyilvános kulcsát
@@ -292,16 +292,16 @@ settings-bluetooth-visible-until-off = Kikapcsolásig
 settings-bluetooth-visible-failed = Nem sikerült módosítani a számítógép láthatóságát
 settings-bluetooth-paired = Saját eszközök
 settings-bluetooth-nearby = Közeli eszközök
-settings-bluetooth-searching = Eszközök keresése…
+settings-bluetooth-searching = Eszközök keresése
     .description = Állítsa párosítási módba a hozzáadni kívánt eszközt
 settings-bluetooth-blocked = A Bluetootht hardveres kapcsoló kikapcsolta
     .description = A bekapcsoláshoz használja a számítógép kapcsolóját vagy billentyűjét
 settings-bluetooth-details = Eszköz adatai
 settings-bluetooth-connected = Csatlakozva
 settings-bluetooth-connected-battery = Csatlakozva · akkumulátor: { $battery }
-settings-bluetooth-connecting = Csatlakozás…
-settings-bluetooth-disconnecting = Leválasztás…
-settings-bluetooth-pairing = Párosítás…
+settings-bluetooth-connecting = Csatlakozás
+settings-bluetooth-disconnecting = Leválasztás
+settings-bluetooth-pairing = Párosítás
 settings-bluetooth-forget-confirm = Elfelejti ezt az eszközt: „{ $name }”?
     .description = Ahhoz, hogy újra használja ezzel a számítógéppel, ismét párosítania kell.
 settings-bluetooth-forget = Elfelejtés

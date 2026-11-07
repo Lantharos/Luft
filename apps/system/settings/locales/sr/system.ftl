@@ -71,7 +71,7 @@ settings-users-password-new-placeholder = { $count ->
 settings-users-password-confirm = Потврда
 settings-users-password-confirm-placeholder = Унесите поново
 settings-users-password-change = Промени лозинку
-settings-users-password-changing = Мења се…
+settings-users-password-changing = Мења се
 settings-users-password-wrong = То није ваша тренутна лозинка
 settings-users-password-mismatch = Лозинке се не поклапају
 settings-users-password-too-short = Ова лозинка је прекратка
@@ -126,11 +126,11 @@ settings-login-automatic-off = Искључено
 
 ## Updates
 
-settings-updates-checking = Тражење ажурирања…
-settings-updates-downloading = Преузимање ажурирања…
-settings-updates-rolling-back = Припрема се ранија верзија…
-settings-updates-switching-nvidia = Преузима се NVIDIA драјвер…
-settings-updates-switching-standard = Преузима се стандардна слика система…
+settings-updates-checking = Тражење ажурирања
+settings-updates-downloading = Преузимање ажурирања
+settings-updates-rolling-back = Припрема се ранија верзија
+settings-updates-switching-nvidia = Преузима се NVIDIA драјвер
+settings-updates-switching-standard = Преузима се стандардна слика система
 settings-updates-up-to-date = Систем је ажуран
 settings-updates-version = Верзија { $version }
 settings-updates-version-new = Нова верзија
@@ -150,9 +150,9 @@ settings-updates-last-checked = Последња провера { $when }
 settings-updates-never-checked = Још није проверено
 settings-updates-stop = Заустави
 settings-updates-check = Провери сада
-settings-updates-checking-button = Провера…
+settings-updates-checking-button = Провера
 settings-updates-app-updates = Ажурирања апликација
-settings-updates-apps-checking = Траже се ажурирања за ваше апликације…
+settings-updates-apps-checking = Траже се ажурирања за ваше апликације
 settings-updates-apps-count = { $count ->
     [0] Управља се у апликацији Schelf
     [one] { $count } апликација има ажурирање у апликацији Schelf
@@ -174,7 +174,7 @@ settings-updates-background-description = Ажурирања су спремна
 settings-updates-firmware = Фирмвер
 settings-updates-firmware-description = Ажурирања за софтвер уграђен у ваш хардвер
 settings-updates-firmware-restart = Завршава се при поновном покретању
-settings-updates-firmware-installing = Инсталира се…
+settings-updates-firmware-installing = Инсталира се
 settings-updates-firmware-update = Ажурирај
 settings-updates-firmware-failed = Фирмвер није могао да се ажурира
 settings-updates-download = Преузми
@@ -265,7 +265,7 @@ settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud �
 settings-accounts-sign-in-again-needed = Пријавите се поново да бисте наставили да га користите
 settings-accounts-paused-metered = Синхронизација је паузирана на ограниченој вези
 settings-accounts-paused-battery = Синхронизација је паузирана док је батерија при крају
-settings-accounts-connecting = Повезивање…
+settings-accounts-connecting = Повезивање
 settings-accounts-offline = Ван мреже
 settings-accounts-offline-kept = Ван мреже, задржане датотеке су и даље ту
 settings-accounts-not-connected = Није повезано
@@ -290,7 +290,7 @@ settings-accounts-sign-in-again = Пријави се поново
 settings-accounts-keep = Задржи
 settings-accounts-remove = Уклони
 settings-accounts-remove-confirm = Уклони са овог рачунара
-settings-accounts-removing = Уклањање…
+settings-accounts-removing = Уклањање
 settings-accounts-remove-note = Ваше датотеке остају у услузи { $provider }. Измене направљене овде прво се отпремају.
 
 ## Accounts: providers
@@ -323,7 +323,7 @@ settings-accounts-continue-in-browser = Настави у прегледачу
 settings-accounts-sign-in = Пријава
 settings-accounts-try-again = Покушај поново
 settings-accounts-continue = Настави
-settings-accounts-working = Повезивање са услугом { $provider }…
+settings-accounts-working = Повезивање са услугом { $provider }
 settings-accounts-finish-in-browser = Завршите пријаву преко услуге { $provider } у прегледачу. Luft никада не види вашу лозинку, а ово ће се само ажурирати када завршите.
 settings-accounts-no-browser = Прегледач се није отворио. Копирајте везу и отворите је у прегледачу.
 settings-accounts-open-again = Поново отвори страницу

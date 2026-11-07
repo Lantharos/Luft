@@ -75,7 +75,7 @@ check-moment = Chvíľu to potrvá.
 check-slow = Windows zisťuje, koľko miesta môže uvoľniť. Na veľkom disku to môže trvať niekoľko minút.
 check-blocked-description = Skôr než sa Luft nasťahuje, treba niečo zmeniť. Postup nájdete nižšie.
 check-found-description = Toto zistila aplikácia Meet Luft.
-check-checking = Kontroluje sa disk, firmvér a hardvér…
+check-checking = Kontroluje sa disk, firmvér a hardvér
 check-again = Skontrolovať znova
 check-action-firmware = Otvoriť nastavenia firmvéru
 check-action-tidy = Upratať
@@ -171,7 +171,7 @@ linux-ready-remove-description = Meet Luft odstráni súbory systému Luft, jeho
 
 luft-title = Váš Luft
 luft-looking = Aplikácia Meet Luft našla v tomto počítači Luft.
-luft-checking = Kontroluje sa disk systému Luft…
+luft-checking = Kontroluje sa disk systému Luft
 luft-description-beside = Luft je v tomto počítači nainštalovaný vedľa Windows.
 luft-description-drive = Luft je nainštalovaný na disku { $drive }.
 luft-bar-used = { $size }, využité { $used }
@@ -225,7 +225,7 @@ resize-shrink-description = Luft pri ďalšom spustení presunie svoje súbory, 
 
 box-title = Vezmite si svoje veci
 box-description = Vyberte, čo si vziať so sebou. Luft to po inštalácii rozbalí do vášho nového účtu a z Windows sa nič neodstráni.
-box-looking = Prechádzajú sa priečinky…
+box-looking = Prechádzajú sa priečinky
 box-folder-desktop = Pracovná plocha
 box-folder-documents = Dokumenty
 box-folder-downloads = Stiahnuté súbory
@@ -297,7 +297,7 @@ removed-description = { $platform ->
 
 stick-title = Vytvoriť USB kľúč
 stick-description = Luft sa z neho spustí na akomkoľvek počítači, aby ste ho mohli vyskúšať alebo nainštalovať.
-stick-looking = Hľadajú sa USB kľúče…
+stick-looking = Hľadajú sa USB kľúče
 stick-none = Pripojte USB kľúč s kapacitou aspoň { $size }. Zobrazí sa tu.
 stick-drives-label = USB kľúče
 stick-offer = { $name }, { $size }

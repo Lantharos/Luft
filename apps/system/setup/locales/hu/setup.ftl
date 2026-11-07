@@ -8,7 +8,7 @@ setup-try-again = Újra
 setup-restart = Újraindítás
 setup-restart-now = Újraindítás most
 setup-restart-later = Újraindítás később
-setup-saving = Mentés…
+setup-saving = Mentés
 
 ## Install progress, shown at the bottom of every step while Luft copies
 
@@ -51,7 +51,7 @@ setup-destination-meet-title = A Windows mellett
 setup-destination-meet-description = A Meet Luft már elkészítette ezt a helyet, így a Windows teljesen változatlan marad.
 setup-destination-meet-drive-title = Lemez: { $drive }
 setup-destination-meet-drive-description = A Meet Luft már elkészítette ezt a helyet egy másik lemezen, és a Luft onnan indul, saját indítófájlokkal.
-setup-destination-looking = Lemezek vizsgálata…
+setup-destination-looking = Lemezek vizsgálata
 
 setup-destination-meet-choice = A Windows mellett
 setup-destination-meet-choice-description = A Meet Luft által a Windows mellett létrehozott hely használata ({ $size }).
@@ -69,7 +69,7 @@ setup-destination-custom-choice = Egyéni
 setup-destination-custom-choice-description = Partíciók elrendezése saját kezűleg a Lemezek alkalmazásban.
 
 setup-destination-more-options = További lehetőségek
-setup-destination-starting = Indítás…
+setup-destination-starting = Indítás
 setup-destination-replace = Lecserélés
 setup-destination-install = Luft telepítése
 
@@ -127,7 +127,7 @@ setup-drive-partitions = { $count ->
 ## Custom space
 
 setup-custom-open-disks = Lemezek megnyitása
-setup-custom-looking = Keresés…
+setup-custom-looking = Keresés
 setup-custom-look-again = Újrakeresés
 setup-custom-free-label = Szabad hely
 setup-custom-free-space = { $size } szabad hely
@@ -172,14 +172,14 @@ setup-replace-blocked-read-only = A lemeze csak olvasható.
 setup-network-title = Csatlakozás az internethez
 setup-network-description = Ez nem kötelező. Ha online van, a Luft beállíthatja az órát és az időzónát, és a telepítés közben is használhatja az internetet.
 setup-network-unavailable = A hálózatok most nem érhetők el. Később a tálcáról csatlakozhat.
-setup-network-looking = Hálózatok keresése…
+setup-network-looking = Hálózatok keresése
 setup-network-cable = Kábellel csatlakozva
 setup-network-show-all = Összes hálózat megjelenítése
 setup-network-skip = Kihagyás
 setup-network-failed = Nem sikerült csatlakozni
 setup-network-wrong-password = Hibás jelszó
 setup-network-connected = Csatlakozva
-setup-network-connecting = Csatlakozás…
+setup-network-connecting = Csatlakozás
 setup-network-saved = Mentve
 setup-network-password = Jelszó
 setup-network-join = Csatlakozás
@@ -235,7 +235,7 @@ setup-enroll-digits = { $count ->
 setup-secure-boot-title = A számítógép még nem tartja megbízhatónak a Luftot
 setup-secure-boot-code = Közvetlenül a következő újraindítás után egy kék képernyő kéri, hogy jelölje megbízhatónak a Luftot. Ott a billentyűzettel adja meg ezt a kódot.
 setup-secure-boot-skipped = A kék képernyő kimaradt. Kérjen új kódot, indítsa újra a számítógépet, majd ott használja a billentyűzetet.
-setup-secure-boot-getting = Kód lekérése…
+setup-secure-boot-getting = Kód lekérése
 setup-secure-boot-new-code = Új kód kérése
 
 ## Encryption

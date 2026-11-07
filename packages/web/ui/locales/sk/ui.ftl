@@ -117,4 +117,4 @@ ui-passphrase-mismatch = Prístupové frázy sa nezhodujú
 
 ## Encryption
 
-ui-encryption-checking = Kontroluje sa…
+ui-encryption-checking = Kontroluje sa

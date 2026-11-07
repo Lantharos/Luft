@@ -1,10 +1,12 @@
 <script lang="ts">
 	import type { Component, Snippet } from 'svelte';
+	import { Spinner } from '@luft/ui';
 
 	interface Props {
 		title: string;
 		detail?: string | null;
 		status?: string | null;
+		working?: boolean;
 		icon?: Component;
 		good?: boolean;
 		leading?: Snippet;
@@ -12,7 +14,7 @@
 		children?: Snippet;
 	}
 
-	let { title, detail, status, icon: Icon, good = false, leading, actions, children }: Props = $props();
+	let { title, detail, status, working = false, icon: Icon, good = false, leading, actions, children }: Props = $props();
 </script>
 
 <div class="row-group">
@@ -28,7 +30,10 @@
 				{#if detail}<span class="font-normal text-[var(--text-muted)]">{detail}</span>{/if}
 			</span>
 			{#if status}
-				<span class="truncate text-[13.5px] text-[var(--text-muted)]">{status}</span>
+				<span class="flex min-w-0 items-center gap-2 text-[13.5px] text-[var(--text-muted)]">
+					{#if working}<Spinner size={14} />{/if}
+					<span class="truncate">{status}</span>
+				</span>
 			{/if}
 			{@render children?.()}
 		</div>

@@ -27,7 +27,7 @@ Sentence case everywhere: only the first word and names take a capital letter. �
 
 - Quotation marks: „…“, and ‚…‘ inside them.
 - Apostrophe: ’, rarely needed.
-- Ellipsis: one character, „…“, with no space before it.
+- Ellipsis: one character, „…“, with no space before it. A message about something in progress, such as loading, takes none, because the app shows a spinner beside it.
 - Dash: the en dash with spaces, „ – “.
 - Percent sign with a space before it: „57 %“.
 - Use the long vowels and soft consonants (ā, ē, ī, ū, č, ģ, ķ, ļ, ņ, š, ž) everywhere. Search keywords may add a spelling without them when people often type it that way.

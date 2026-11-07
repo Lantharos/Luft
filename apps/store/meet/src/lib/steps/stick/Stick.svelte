@@ -1,7 +1,6 @@
 <script lang="ts">
-	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import { t } from '@luft/i18n';
-	import { bytes } from '@luft/ui';
+	import { bytes, Spinner } from '@luft/ui';
 	import type { Stick } from '#lib/bindings.js';
 	import Frame from '#lib/components/Frame.svelte';
 	import Problem from '#lib/components/Problem.svelte';
@@ -26,7 +25,7 @@
 			{#if maker.problem}
 				<Problem failure={maker.problem} />
 			{:else}
-				<LoaderCircle size={18} class="animate-spin" />{t('stick-looking')}
+				<Spinner size={18} />{t('stick-looking')}
 			{/if}
 		</div>
 	{:else if maker.sticks.length === 0}

@@ -115,4 +115,4 @@ ui-passphrase-mismatch = Тајните фрази не се совпаѓаат
 
 ## Encryption
 
-ui-encryption-checking = Се проверува…
+ui-encryption-checking = Се проверува

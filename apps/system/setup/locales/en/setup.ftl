@@ -11,7 +11,7 @@ setup-restart = Restart
 setup-restart-now = Restart now
 setup-restart-later = Restart later
 # Button label while the account is being saved
-setup-saving = Saving…
+setup-saving = Saving
 
 ## Install progress, shown at the bottom of every step while Luft copies
 
@@ -63,7 +63,7 @@ setup-destination-meet-description = Meet Luft already made this room, so Window
 # $drive is a drive name, like "Samsung SSD 980"
 setup-destination-meet-drive-title = On { $drive }
 setup-destination-meet-drive-description = Meet Luft already made this room on another drive, and Luft starts from there with start files of its own.
-setup-destination-looking = Looking at your drives…
+setup-destination-looking = Looking at your drives
 
 setup-destination-meet-choice = Alongside Windows
 # $size is a size like "120 GB"
@@ -86,7 +86,7 @@ setup-destination-custom-choice = Custom
 setup-destination-custom-choice-description = Arrange partitions yourself in Disks.
 
 setup-destination-more-options = More options
-setup-destination-starting = Starting…
+setup-destination-starting = Starting
 # Button, verb
 setup-destination-replace = Replace
 setup-destination-install = Install Luft
@@ -171,7 +171,7 @@ setup-drive-partitions = { $count ->
 ## Custom space
 
 setup-custom-open-disks = Open Disks
-setup-custom-looking = Looking…
+setup-custom-looking = Looking
 setup-custom-look-again = Look again
 # Screen-reader label of the list of free spaces
 setup-custom-free-label = Free space
@@ -226,7 +226,7 @@ setup-replace-blocked-read-only = Its drive is read-only.
 setup-network-title = Connect to the internet
 setup-network-description = This is optional. Being online lets Luft set your clock and time zone, and you can use the internet while Luft installs.
 setup-network-unavailable = Networks aren’t available right now. You can connect later from the panel.
-setup-network-looking = Looking for networks…
+setup-network-looking = Looking for networks
 setup-network-cable = Connected with a cable
 setup-network-show-all = Show all networks
 # Button that moves on without connecting
@@ -234,7 +234,7 @@ setup-network-skip = Skip
 setup-network-failed = Couldn’t connect
 setup-network-wrong-password = Wrong password
 setup-network-connected = Connected
-setup-network-connecting = Connecting…
+setup-network-connecting = Connecting
 # A network this computer knows the password of
 setup-network-saved = Saved
 setup-network-password = Password
@@ -294,7 +294,7 @@ setup-enroll-digits = { $count ->
 setup-secure-boot-title = Your computer doesn’t trust Luft yet
 setup-secure-boot-code = Right after the next restart, a blue screen asks to trust Luft. Use the keyboard there with this code.
 setup-secure-boot-skipped = The blue screen was skipped. Get a new code and restart, then use the keyboard there.
-setup-secure-boot-getting = Getting your code…
+setup-secure-boot-getting = Getting your code
 setup-secure-boot-new-code = Get a new code
 
 ## Fingerprint

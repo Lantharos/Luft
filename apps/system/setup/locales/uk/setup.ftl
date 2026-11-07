@@ -8,7 +8,7 @@ setup-try-again = Спробувати ще раз
 setup-restart = Перезавантажити
 setup-restart-now = Перезавантажити зараз
 setup-restart-later = Перезавантажити пізніше
-setup-saving = Збереження…
+setup-saving = Збереження
 
 ## Install progress, shown at the bottom of every step while Luft copies
 
@@ -51,7 +51,7 @@ setup-destination-meet-title = Поруч із Windows
 setup-destination-meet-description = Це місце вже звільнено за допомогою Meet Luft, тож Windows залишиться без змін.
 setup-destination-meet-drive-title = На диску { $drive }
 setup-destination-meet-drive-description = Це місце вже звільнено на іншому диску за допомогою Meet Luft, і Luft запускається звідти з власними файлами запуску.
-setup-destination-looking = Перевірка дисків…
+setup-destination-looking = Перевірка дисків
 
 setup-destination-meet-choice = Поруч із Windows
 setup-destination-meet-choice-description = Використати { $size }, звільнені за допомогою Meet Luft поруч із Windows.
@@ -69,7 +69,7 @@ setup-destination-custom-choice = Власний варіант
 setup-destination-custom-choice-description = Розподіліть розділи самостійно в програмі «Диски».
 
 setup-destination-more-options = Інші варіанти
-setup-destination-starting = Запуск…
+setup-destination-starting = Запуск
 setup-destination-replace = Замінити
 setup-destination-install = Встановити Luft
 
@@ -131,7 +131,7 @@ setup-drive-partitions = { $count ->
 ## Custom space
 
 setup-custom-open-disks = Відкрити «Диски»
-setup-custom-looking = Перевірка…
+setup-custom-looking = Перевірка
 setup-custom-look-again = Перевірити знову
 setup-custom-free-label = Вільне місце
 setup-custom-free-space = Вільне місце: { $size }
@@ -182,14 +182,14 @@ setup-replace-blocked-read-only = Її диск доступний лише дл
 setup-network-title = Під’єднання до інтернету
 setup-network-description = Це необов’язково. Через інтернет Luft зможе налаштувати годинник і часовий пояс, а ви зможете користуватися інтернетом під час встановлення.
 setup-network-unavailable = Мережі зараз недоступні. Під’єднатися можна пізніше з панелі завдань.
-setup-network-looking = Пошук мереж…
+setup-network-looking = Пошук мереж
 setup-network-cable = Під’єднано кабелем
 setup-network-show-all = Показати всі мережі
 setup-network-skip = Пропустити
 setup-network-failed = Не вдалося під’єднатися
 setup-network-wrong-password = Неправильний пароль
 setup-network-connected = Під’єднано
-setup-network-connecting = Під’єднання…
+setup-network-connecting = Під’єднання
 setup-network-saved = Збережено
 setup-network-password = Пароль
 setup-network-join = Під’єднатися
@@ -247,7 +247,7 @@ setup-enroll-digits = { $count ->
 setup-secure-boot-title = Комп’ютер поки що не довіряє Luft
 setup-secure-boot-code = Одразу після наступного перезавантаження синій екран запитає, чи довіряти Luft. Скористайтеся там клавіатурою, щоб ввести цей код.
 setup-secure-boot-skipped = Синій екран було пропущено. Отримайте новий код і перезавантажте комп’ютер, а потім скористайтеся там клавіатурою.
-setup-secure-boot-getting = Отримання коду…
+setup-secure-boot-getting = Отримання коду
 setup-secure-boot-new-code = Отримати новий код
 
 ## Encryption

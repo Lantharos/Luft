@@ -8,7 +8,7 @@ setup-try-again = Provo sërish
 setup-restart = Rinis
 setup-restart-now = Rinis tani
 setup-restart-later = Rinis më vonë
-setup-saving = Po ruhet…
+setup-saving = Po ruhet
 
 ## Install progress, shown at the bottom of every step while Luft copies
 
@@ -51,7 +51,7 @@ setup-destination-meet-title = Pranë Windows
 setup-destination-meet-description = Meet Luft e ka bërë tashmë këtë vend, ndaj Windows mbetet ashtu siç është.
 setup-destination-meet-drive-title = Në { $drive }
 setup-destination-meet-drive-description = Meet Luft e ka bërë tashmë këtë vend në një disk tjetër, dhe Luft niset prej andej me skedarët e vet të nisjes.
-setup-destination-looking = Po shikohen disqet…
+setup-destination-looking = Po shikohen disqet
 
 setup-destination-meet-choice = Pranë Windows
 setup-destination-meet-choice-description = Përdor { $size } që bëri Meet Luft pranë Windows.
@@ -69,7 +69,7 @@ setup-destination-custom-choice = I personalizuar
 setup-destination-custom-choice-description = Rregullo vetë ndarjet te Disqet.
 
 setup-destination-more-options = Më shumë opsione
-setup-destination-starting = Po niset…
+setup-destination-starting = Po niset
 setup-destination-replace = Zëvendëso
 setup-destination-install = Instalo Luft
 
@@ -127,7 +127,7 @@ setup-drive-partitions = { $count ->
 ## Custom space
 
 setup-custom-open-disks = Hap Disqet
-setup-custom-looking = Po shikohet…
+setup-custom-looking = Po shikohet
 setup-custom-look-again = Shiko sërish
 setup-custom-free-label = Hapësira e lirë
 setup-custom-free-space = { $size } hapësirë e lirë
@@ -172,14 +172,14 @@ setup-replace-blocked-read-only = Disku i tij është vetëm për lexim.
 setup-network-title = Lidhu me internetin
 setup-network-description = Kjo është opsionale. Kur je në linjë, Luft mund të caktojë orën dhe zonën kohore, dhe mund ta përdorësh internetin ndërsa Luft instalohet.
 setup-network-unavailable = Rrjetet nuk janë të disponueshme tani. Mund të lidhesh më vonë nga paneli.
-setup-network-looking = Po kërkohen rrjete…
+setup-network-looking = Po kërkohen rrjete
 setup-network-cable = Lidhur me kabllo
 setup-network-show-all = Shfaq të gjitha rrjetet
 setup-network-skip = Kapërce
 setup-network-failed = Nuk u lidh dot
 setup-network-wrong-password = Fjalëkalim i gabuar
 setup-network-connected = Lidhur
-setup-network-connecting = Po lidhet…
+setup-network-connecting = Po lidhet
 setup-network-saved = I ruajtur
 setup-network-password = Fjalëkalimi
 setup-network-join = Lidhu
@@ -235,7 +235,7 @@ setup-enroll-digits = { $count ->
 setup-secure-boot-title = Kompjuteri yt nuk i beson ende Luft
 setup-secure-boot-code = Menjëherë pas rinisjes së ardhshme, një ekran blu të kërkon t’i besosh Luft. Përdor tastierën aty me këtë kod.
 setup-secure-boot-skipped = Ekrani blu u kapërcye. Merr një kod të ri dhe rinis, pastaj përdor tastierën aty.
-setup-secure-boot-getting = Po merret kodi yt…
+setup-secure-boot-getting = Po merret kodi yt
 setup-secure-boot-new-code = Merr një kod të ri
 
 ## Encryption

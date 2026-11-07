@@ -5,6 +5,7 @@
 	import Canvas from './Canvas.svelte';
 	import Timeline from './Timeline.svelte';
 	import Toolbar from './Toolbar.svelte';
+	import { Spinner } from '@luft/ui';
 
 	$effect(() => {
 		if (session.current) void editor.open(session.current);
@@ -20,7 +21,7 @@
 			{#if editor.preview}
 				<Canvas />
 			{:else}
-				<p class="m-auto text-[13px] text-[var(--text-muted)]">{t('edit-loading')}</p>
+				<p class="m-auto flex items-center gap-2 text-[13px] text-[var(--text-muted)]"><Spinner size={14} />{t('edit-loading')}</p>
 			{/if}
 		</div>
 	{:else if !editor.timed}

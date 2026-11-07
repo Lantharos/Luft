@@ -182,7 +182,7 @@ settings-encryption-summary-chip = Amíg el nem készül, a biztonsági chip őr
 settings-encryption-summary-recovery-key = Amíg el nem készül, indításkor a jelmondat helyett a helyreállítási kulcsot kéri.
 # Button, verb: starts encrypting this computer
 settings-encryption-encrypt = Titkosítás
-settings-encryption-making-room = Hely felszabadítása…
+settings-encryption-making-room = Hely felszabadítása
 settings-encryption-unlocks-chip-pin = A biztonsági chippel és a PIN-kóddal oldódik fel
 settings-encryption-unlocks-chip = A biztonsági chippel magától oldódik fel
 settings-encryption-unlocks-passphrase = Indításkor a jelmondatot kéri

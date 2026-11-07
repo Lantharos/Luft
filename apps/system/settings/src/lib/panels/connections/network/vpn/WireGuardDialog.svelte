@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { Dialog, errorText, PasswordField, Row, TextField } from '@luft/ui';
+	import { Dialog, errorText, PasswordField, Row, Spinner, TextField } from '@luft/ui';
 	import { waitForPerson } from '@luft/network';
 	import { commands } from '#lib/bindings.js';
 
@@ -164,7 +164,7 @@
 	{/if}
 	{#snippet actions()}
 		<button type="button" class="button" onclick={onclose}>{t('settings-network-cancel')}</button>
-		<button type="button" class="button primary" disabled={!ready} onclick={submit}>{busy ? t('settings-network-wireguard-adding') : t('settings-network-wireguard-add')}</button>
+		<button type="button" class="button primary" disabled={!ready} onclick={submit}>{#if busy}<Spinner />{/if}{busy ? t('settings-network-wireguard-adding') : t('settings-network-wireguard-add')}</button>
 	{/snippet}
 </Dialog>
 

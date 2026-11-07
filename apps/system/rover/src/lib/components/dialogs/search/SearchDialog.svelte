@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { tick } from 'svelte';
-	import { basename, Dialog, parent, plural, SearchField } from '@luft/ui';
+	import { basename, Dialog, parent, plural, SearchField, Spinner } from '@luft/ui';
 	import type { SearchResult } from '#lib/bindings.js';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
 	import { search } from '#lib/features/search.svelte.js';
@@ -20,7 +20,7 @@
 	let shown = $derived(search.ordered.slice(0, SHOWN));
 	let status = $derived.by(() => {
 		if (!search.text.trim()) return 'Type to search this folder and everything inside it';
-		if (search.running) return search.results.length > 0 ? `${plural(search.results.length, 'result')} so far` : 'Searching…';
+		if (search.running) return search.results.length > 0 ? `${plural(search.results.length, 'result')} so far` : 'Searching';
 		if (search.results.length === 0) return 'Nothing matches';
 		const count = plural(search.results.length, 'result');
 		return search.truncated || search.results.length > SHOWN ? `Showing the first ${shown.length} of ${count}, refine to narrow it down` : count;
@@ -78,7 +78,10 @@
 			onopen={open}
 		/>
 	</div>
-	<p class="text-[12px] text-[var(--text-muted)]" role="status">{status}</p>
+	<p class="flex items-center gap-2 text-[12px] text-[var(--text-muted)]" role="status">
+		{#if search.running}<Spinner size={12} />{/if}
+		{status}
+	</p>
 
 	{#snippet actions()}
 		<button class="button" type="button" onclick={search.close}>Close</button>

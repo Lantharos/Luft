@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { bytes, Row, TextField } from '@luft/ui';
+	import { bytes, Row, Spinner, TextField } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { Account, Drive } from '#lib/bindings.js';
 	import { remove } from './api';
@@ -96,7 +96,7 @@
 			{#if confirming}
 				<button type="button" class="button" onclick={() => (confirming = false)}>{t('settings-accounts-keep')}</button>
 				<button type="button" class="button danger" disabled={removing} onclick={forget}>
-					{removing ? t('settings-accounts-removing') : t('settings-accounts-remove-confirm')}
+					{#if removing}<Spinner />{/if}{removing ? t('settings-accounts-removing') : t('settings-accounts-remove-confirm')}
 				</button>
 			{:else}
 				<button type="button" class="button danger" onclick={() => (confirming = true)}>{t('settings-accounts-remove')}</button>
@@ -108,7 +108,9 @@
 	</div>
 {/snippet}
 
-<Row title={account.name} {description} icon={info.icon} expanded={open} onclick={toggle} below={open ? details : undefined} truncate />
+<Row title={account.name} {description} icon={info.icon} expanded={open} onclick={toggle} below={open ? details : undefined} truncate>
+	{#if drive?.state === 'connecting'}<Spinner />{/if}
+</Row>
 
 <style>
 	.details {

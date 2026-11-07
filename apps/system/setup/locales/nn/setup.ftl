@@ -8,7 +8,7 @@ setup-try-again = Prøv igjen
 setup-restart = Start på nytt
 setup-restart-now = Start på nytt no
 setup-restart-later = Start på nytt seinare
-setup-saving = Lagrar …
+setup-saving = Lagrar
 
 ## Install progress, shown at the bottom of every step while Luft copies
 
@@ -51,7 +51,7 @@ setup-destination-meet-title = Ved sida av Windows
 setup-destination-meet-description = Meet Luft har alt laga denne plassen, så Windows blir verande akkurat som det er.
 setup-destination-meet-drive-title = På { $drive }
 setup-destination-meet-drive-description = Meet Luft har alt laga denne plassen på ein annan disk, og Luft startar derifrå med eigne oppstartsfiler.
-setup-destination-looking = Ser på diskane dine …
+setup-destination-looking = Ser på diskane dine
 
 setup-destination-meet-choice = Ved sida av Windows
 setup-destination-meet-choice-description = Bruk dei { $size } som Meet Luft laga ved sida av Windows.
@@ -69,7 +69,7 @@ setup-destination-custom-choice = Tilpassa
 setup-destination-custom-choice-description = Ordne partisjonane sjølv i Diskar.
 
 setup-destination-more-options = Fleire val
-setup-destination-starting = Startar …
+setup-destination-starting = Startar
 setup-destination-replace = Erstatt
 setup-destination-install = Installer Luft
 
@@ -127,7 +127,7 @@ setup-drive-partitions = { $count ->
 ## Custom space
 
 setup-custom-open-disks = Opne Diskar
-setup-custom-looking = Ser etter …
+setup-custom-looking = Ser etter
 setup-custom-look-again = Sjå etter igjen
 setup-custom-free-label = Ledig plass
 setup-custom-free-space = { $size } ledig plass
@@ -172,14 +172,14 @@ setup-replace-blocked-read-only = Disken er skriveverna.
 setup-network-title = Kople til internett
 setup-network-description = Dette er valfritt. Når du er på nett, kan Luft stille klokka og tidssona, og du kan bruke internett medan Luft blir installert.
 setup-network-unavailable = Nettverk er ikkje tilgjengelege no. Du kan kople til seinare frå oppgåvelinja.
-setup-network-looking = Ser etter nettverk …
+setup-network-looking = Ser etter nettverk
 setup-network-cable = Kopla til med kabel
 setup-network-show-all = Vis alle nettverk
 setup-network-skip = Hopp over
 setup-network-failed = Kunne ikkje kople til
 setup-network-wrong-password = Feil passord
 setup-network-connected = Tilkopla
-setup-network-connecting = Koplar til …
+setup-network-connecting = Koplar til
 setup-network-saved = Lagra
 setup-network-password = Passord
 setup-network-join = Kople til
@@ -235,7 +235,7 @@ setup-enroll-digits = { $count ->
 setup-secure-boot-title = Datamaskinen stolar ikkje på Luft enno
 setup-secure-boot-code = Rett etter neste omstart spør ein blå skjerm om du stolar på Luft. Bruk tastaturet der og denne koden.
 setup-secure-boot-skipped = Den blå skjermen vart hoppa over. Hent ein ny kode og start på nytt, og bruk så tastaturet der.
-setup-secure-boot-getting = Hentar koden din …
+setup-secure-boot-getting = Hentar koden din
 setup-secure-boot-new-code = Hent ein ny kode
 
 ## Encryption

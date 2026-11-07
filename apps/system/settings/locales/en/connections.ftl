@@ -5,7 +5,7 @@
 # Button
 settings-network-save = Save
 # Button label while saving
-settings-network-saving = Saving…
+settings-network-saving = Saving
 # Button
 settings-network-cancel = Cancel
 # Button that connects to a network
@@ -32,7 +32,7 @@ settings-network-connect-failed = Couldn't connect
 ## Network: connection states
 
 settings-network-link-connected = Connected
-settings-network-link-connecting = Connecting…
+settings-network-link-connecting = Connecting
 settings-network-link-disconnected = Not connected
 settings-network-link-unplugged = Cable unplugged
 
@@ -108,7 +108,7 @@ settings-network-wifi-connect-failed = Couldn't connect to this network
 settings-network-wifi-saved-password-failed = The saved password didn't work. Enter it again.
 # Screen-reader label of the settings button next to a Wi‑Fi network
 settings-network-wifi-settings = Network settings
-settings-network-wifi-searching = Looking for networks…
+settings-network-wifi-searching = Looking for networks
 settings-network-hidden = Connect to a hidden network
     .description = Enter the network's name and how it's secured.
 settings-network-hidden-name = Network name
@@ -281,7 +281,7 @@ settings-network-vpn-off = Off
 settings-network-vpn-none = Not set up
 settings-network-vpn-import = Import from a file
     .description = WireGuard, OpenVPN and other VPN configuration files
-settings-network-vpn-importing = Importing…
+settings-network-vpn-importing = Importing
 settings-network-wireguard = Set up WireGuard
     .description = Enter the details from your VPN provider or server
 settings-network-wireguard-dialog = Your VPN provider or the server’s owner can give you these details.
@@ -305,7 +305,7 @@ settings-network-wireguard-keepalive = Keepalive
 # Button
 settings-network-wireguard-add = Add
 # Button label while adding
-settings-network-wireguard-adding = Adding…
+settings-network-wireguard-adding = Adding
 settings-network-wireguard-error-private-key = Enter or generate a private key
 settings-network-wireguard-error-addresses = Enter at least one address
 settings-network-wireguard-error-server-key = Enter the server’s public key
@@ -333,7 +333,7 @@ settings-bluetooth-visible-until-off = Until turned off
 settings-bluetooth-visible-failed = Couldn't change whether this computer is visible
 settings-bluetooth-paired = My devices
 settings-bluetooth-nearby = Nearby devices
-settings-bluetooth-searching = Looking for devices…
+settings-bluetooth-searching = Looking for devices
     .description = Put the device you want to add in pairing mode
 settings-bluetooth-blocked = Bluetooth is turned off by a hardware switch
     .description = Use the switch or key on your computer to turn it on
@@ -342,9 +342,9 @@ settings-bluetooth-details = Device details
 settings-bluetooth-connected = Connected
 # $battery is the device's battery level, like "80%"
 settings-bluetooth-connected-battery = Connected · { $battery } battery
-settings-bluetooth-connecting = Connecting…
-settings-bluetooth-disconnecting = Disconnecting…
-settings-bluetooth-pairing = Pairing…
+settings-bluetooth-connecting = Connecting
+settings-bluetooth-disconnecting = Disconnecting
+settings-bluetooth-pairing = Pairing
 # $name is the device's name
 settings-bluetooth-forget-confirm = Forget “{ $name }”?
     .description = You'll need to pair it again to use it with this computer.

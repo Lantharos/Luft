@@ -70,7 +70,7 @@ settings-users-password-new-placeholder = { $count ->
 settings-users-password-confirm = Confirmació
 settings-users-password-confirm-placeholder = Torneu-la a escriure
 settings-users-password-change = Canvia la contrasenya
-settings-users-password-changing = S’està canviant…
+settings-users-password-changing = S’està canviant
 settings-users-password-wrong = Aquesta no és la contrasenya actual
 settings-users-password-mismatch = Les contrasenyes no coincideixen
 settings-users-password-too-short = Aquesta contrasenya és massa curta
@@ -124,11 +124,11 @@ settings-login-automatic-off = Desactivat
 
 ## Updates
 
-settings-updates-checking = S’estan cercant actualitzacions…
-settings-updates-downloading = S’estan baixant les actualitzacions…
-settings-updates-rolling-back = S’està preparant la versió anterior…
-settings-updates-switching-nvidia = S’està baixant el controlador de NVIDIA…
-settings-updates-switching-standard = S’està baixant la imatge estàndard…
+settings-updates-checking = S’estan cercant actualitzacions
+settings-updates-downloading = S’estan baixant les actualitzacions
+settings-updates-rolling-back = S’està preparant la versió anterior
+settings-updates-switching-nvidia = S’està baixant el controlador de NVIDIA
+settings-updates-switching-standard = S’està baixant la imatge estàndard
 settings-updates-up-to-date = El sistema està actualitzat
 settings-updates-version = Versió { $version }
 settings-updates-version-new = Una versió nova
@@ -148,9 +148,9 @@ settings-updates-last-checked = Darrera comprovació: { $when }
 settings-updates-never-checked = Encara no s’ha comprovat
 settings-updates-stop = Atura
 settings-updates-check = Comprova ara
-settings-updates-checking-button = S’està comprovant…
+settings-updates-checking-button = S’està comprovant
 settings-updates-app-updates = Actualitzacions d’aplicacions
-settings-updates-apps-checking = S’estan cercant actualitzacions de les aplicacions…
+settings-updates-apps-checking = S’estan cercant actualitzacions de les aplicacions
 settings-updates-apps-count = { $count ->
     [0] Es gestionen a Schelf
     [one] { $count } aplicació té una actualització a Schelf
@@ -171,7 +171,7 @@ settings-updates-background-description = Les actualitzacions estaran a punt per
 settings-updates-firmware = Microprogramari
 settings-updates-firmware-description = Actualitzacions del programari integrat al maquinari
 settings-updates-firmware-restart = S’acabarà quan reinicieu
-settings-updates-firmware-installing = S’està instal·lant…
+settings-updates-firmware-installing = S’està instal·lant
 settings-updates-firmware-update = Actualitza
 settings-updates-firmware-failed = No s’ha pogut actualitzar el microprogramari
 settings-updates-download = Baixa
@@ -262,7 +262,7 @@ settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud o
 settings-accounts-sign-in-again-needed = Torneu a iniciar la sessió per continuar fent-lo servir
 settings-accounts-paused-metered = Sincronització en pausa en una connexió amb límit de dades
 settings-accounts-paused-battery = Sincronització en pausa mentre la bateria és baixa
-settings-accounts-connecting = S’està connectant…
+settings-accounts-connecting = S’està connectant
 settings-accounts-offline = Fora de línia
 settings-accounts-offline-kept = Fora de línia, els fitxers conservats continuen aquí
 settings-accounts-not-connected = No connectat
@@ -285,7 +285,7 @@ settings-accounts-sign-in-again = Torna a iniciar la sessió
 settings-accounts-keep = Conserva
 settings-accounts-remove = Treu
 settings-accounts-remove-confirm = Treu d’aquest ordinador
-settings-accounts-removing = S’està traient…
+settings-accounts-removing = S’està traient
 settings-accounts-remove-note = Els fitxers es queden a { $provider }. Abans s’hi envien els canvis fets aquí.
 
 ## Accounts: providers
@@ -318,7 +318,7 @@ settings-accounts-continue-in-browser = Continua al navegador
 settings-accounts-sign-in = Inicia la sessió
 settings-accounts-try-again = Torna-ho a provar
 settings-accounts-continue = Continua
-settings-accounts-working = S’està connectant amb { $provider }…
+settings-accounts-working = S’està connectant amb { $provider }
 settings-accounts-finish-in-browser = Acabeu d’iniciar la sessió amb { $provider } al navegador. Luft no veu mai la vostra contrasenya, i això s’actualitzarà sol quan hàgiu acabat.
 settings-accounts-no-browser = No s’ha obert cap navegador. Copieu l’enllaç i obriu-lo en un navegador.
 settings-accounts-open-again = Torna a obrir la pàgina

@@ -182,7 +182,7 @@ settings-encryption-summary-chip = Докато приключи, чипът з�
 settings-encryption-summary-recovery-key = Докато приключи, при стартиране се иска ключът за възстановяване вместо паролата ви за диска.
 # Button, verb: starts encrypting this computer
 settings-encryption-encrypt = Шифровай
-settings-encryption-making-room = Освобождаване на място…
+settings-encryption-making-room = Освобождаване на място
 settings-encryption-unlocks-chip-pin = Отключва се с чипа за сигурност и вашия ПИН
 settings-encryption-unlocks-chip = Отключва се сам с чипа за сигурност
 settings-encryption-unlocks-passphrase = Иска паролата за диска при стартиране

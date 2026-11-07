@@ -50,7 +50,7 @@ media-keys-num-lock-off = Num Lock ανενεργό
 
 vpn-sign-in-title = Σύνδεση: { $connection }
 vpn-connect = Σύνδεση
-vpn-signing-in = Σύνδεση…
+vpn-signing-in = Σύνδεση
 vpn-finish-in-browser = Ολοκληρώστε τη σύνδεση στο πρόγραμμα περιήγησης.
 vpn-certificate-untrusted = Ο διακομιστής { $host } παρουσίασε πιστοποιητικό που δεν μπορεί να επαληθευτεί ({ $reason }). Το αποτύπωμά του είναι { $fingerprint }.
 vpn-certificate-warning = Κάποιος μπορεί να προσποιείται ότι είναι αυτός ο διακομιστής. Συνδεθείτε μόνο αν το περιμένατε.

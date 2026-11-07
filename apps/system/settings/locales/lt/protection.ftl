@@ -192,7 +192,7 @@ settings-encryption-summary-chip = Kol nebaigta, saugos lustas saugo atkūrimo r
 settings-encryption-summary-recovery-key = Kol nebaigta, paleidžiant prašoma atkūrimo rakto, o ne jūsų slaptafrazės.
 # Button, verb: starts encrypting this computer
 settings-encryption-encrypt = Užšifruoti
-settings-encryption-making-room = Atlaisvinama vietos…
+settings-encryption-making-room = Atlaisvinama vietos
 settings-encryption-unlocks-chip-pin = Atrakinamas saugos lustu ir jūsų PIN kodu
 settings-encryption-unlocks-chip = Atrakinamas savaime saugos lustu
 settings-encryption-unlocks-passphrase = Paleidžiant prašoma jūsų slaptafrazės

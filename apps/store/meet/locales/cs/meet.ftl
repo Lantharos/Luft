@@ -75,7 +75,7 @@ check-moment = Chvíli to potrvá.
 check-slow = Windows zjišťují, kolik místa mohou uvolnit. Na velkém disku to může trvat několik minut.
 check-blocked-description = Než se Luft může nastěhovat, je potřeba něco změnit. Postup najdete níže.
 check-found-description = Tohle aplikace Meet Luft zjistila.
-check-checking = Kontrola disku, firmwaru a hardwaru…
+check-checking = Kontrola disku, firmwaru a hardwaru
 check-again = Zkontrolovat znovu
 check-action-firmware = Otevřít nastavení firmwaru
 check-action-tidy = Uklidit
@@ -171,7 +171,7 @@ linux-ready-remove-description = Meet Luft odstraní soubory systému Luft, jeho
 
 luft-title = Váš Luft
 luft-looking = Aplikace Meet Luft našla v tomto počítači Luft.
-luft-checking = Kontrola disku systému Luft…
+luft-checking = Kontrola disku systému Luft
 luft-description-beside = Luft je v tomto počítači nainstalovaný vedle Windows.
 luft-description-drive = Luft je nainstalovaný na disku { $drive }.
 luft-bar-used = { $size }, využito { $used }
@@ -225,7 +225,7 @@ resize-shrink-description = Luft při příštím spuštění přesune své soub
 
 box-title = Vezměte si své věci
 box-description = Vyberte, co si vzít s sebou. Luft to po instalaci rozbalí do vašeho nového účtu a z Windows se nic neodstraní.
-box-looking = Procházení složek…
+box-looking = Procházení složek
 box-folder-desktop = Plocha
 box-folder-documents = Dokumenty
 box-folder-downloads = Stažené soubory
@@ -297,7 +297,7 @@ removed-description = { $platform ->
 
 stick-title = Vytvořit flash disk
 stick-description = Luft se z něj spustí na jakémkoli počítači, abyste ho mohli vyzkoušet nebo nainstalovat.
-stick-looking = Hledání flash disků…
+stick-looking = Hledání flash disků
 stick-none = Připojte flash disk s kapacitou alespoň { $size }. Objeví se tady.
 stick-drives-label = Flash disky
 stick-offer = { $name }, { $size }

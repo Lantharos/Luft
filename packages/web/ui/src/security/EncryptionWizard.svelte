@@ -15,6 +15,7 @@
 	import { t } from '@luft/i18n';
 	import Checkbox from '../controls/Checkbox.svelte';
 	import Dialog from '../dialogs/Dialog.svelte';
+	import Spinner from '../notices/Spinner.svelte';
 	import { errorText } from '../text/errors';
 	import RecoveryKey from './RecoveryKey.svelte';
 
@@ -120,7 +121,7 @@
 				<p class="text-[13px] leading-relaxed text-[var(--text-muted)]">{advice}</p>
 			{/if}
 		{:else if !error}
-			<p class="text-[13px] text-[var(--text-muted)]">{t('ui-encryption-checking')}</p>
+			<p class="flex items-center gap-2 text-[13px] text-[var(--text-muted)]"><Spinner size={14} />{t('ui-encryption-checking')}</p>
 		{/if}
 	{:else if step === 'key'}
 		<RecoveryKey {key} onsave={() => onsave(key)} onprint={() => onprint(key)} />
@@ -149,7 +150,7 @@
 		{:else}
 			<button type="button" class="button" disabled={busy} onclick={back}>{t('ui-dialog-back')}</button>
 			{#if step === 'summary'}
-				<button type="button" class="button {danger ? 'danger' : 'primary'}" disabled={busy} onclick={encrypt}>{busy ? finishing : finish}</button>
+				<button type="button" class="button {danger ? 'danger' : 'primary'}" disabled={busy} onclick={encrypt}>{#if busy}<Spinner />{finishing}{:else}{finish}{/if}</button>
 			{:else}
 				<button type="button" class="button primary" disabled={(step === 'key' && !kept) || (step === 'unlock' && !unlockReady)} onclick={next}>{t('ui-dialog-continue')}</button>
 			{/if}

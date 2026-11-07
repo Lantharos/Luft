@@ -8,7 +8,7 @@ setup-try-again = Επανάληψη
 setup-restart = Επανεκκίνηση
 setup-restart-now = Επανεκκίνηση τώρα
 setup-restart-later = Επανεκκίνηση αργότερα
-setup-saving = Αποθήκευση…
+setup-saving = Αποθήκευση
 
 ## Install progress, shown at the bottom of every step while Luft copies
 
@@ -51,7 +51,7 @@ setup-destination-meet-title = Δίπλα στα Windows
 setup-destination-meet-description = Το Meet Luft έχει ήδη κάνει χώρο, οπότε τα Windows μένουν ακριβώς όπως είναι.
 setup-destination-meet-drive-title = Στον δίσκο { $drive }
 setup-destination-meet-drive-description = Το Meet Luft έχει ήδη κάνει χώρο σε άλλον δίσκο, και το Luft ξεκινά από εκεί με δικά του αρχεία εκκίνησης.
-setup-destination-looking = Έλεγχος των δίσκων σας…
+setup-destination-looking = Έλεγχος των δίσκων σας
 
 setup-destination-meet-choice = Δίπλα στα Windows
 setup-destination-meet-choice-description = Χρήση των { $size } που δημιούργησε το Meet Luft δίπλα στα Windows.
@@ -69,7 +69,7 @@ setup-destination-custom-choice = Προσαρμογή
 setup-destination-custom-choice-description = Οργανώστε μόνοι σας τα διαμερίσματα στην εφαρμογή Δίσκοι.
 
 setup-destination-more-options = Περισσότερες επιλογές
-setup-destination-starting = Έναρξη…
+setup-destination-starting = Έναρξη
 setup-destination-replace = Αντικατάσταση
 setup-destination-install = Εγκατάσταση Luft
 
@@ -127,7 +127,7 @@ setup-drive-partitions = { $count ->
 ## Custom space
 
 setup-custom-open-disks = Άνοιγμα Δίσκων
-setup-custom-looking = Έλεγχος…
+setup-custom-looking = Έλεγχος
 setup-custom-look-again = Νέος έλεγχος
 setup-custom-free-label = Ελεύθερος χώρος
 setup-custom-free-space = Ελεύθερος χώρος { $size }
@@ -172,14 +172,14 @@ setup-replace-blocked-read-only = Ο δίσκος του είναι μόνο γ�
 setup-network-title = Σύνδεση στο διαδίκτυο
 setup-network-description = Αυτό είναι προαιρετικό. Με σύνδεση στο διαδίκτυο, το Luft ρυθμίζει το ρολόι και τη ζώνη ώρας σας, και μπορείτε να χρησιμοποιείτε το διαδίκτυο όσο γίνεται η εγκατάσταση.
 setup-network-unavailable = Τα δίκτυα δεν είναι διαθέσιμα αυτήν τη στιγμή. Μπορείτε να συνδεθείτε αργότερα από τη γραμμή εργασιών.
-setup-network-looking = Αναζήτηση δικτύων…
+setup-network-looking = Αναζήτηση δικτύων
 setup-network-cable = Σύνδεση με καλώδιο
 setup-network-show-all = Εμφάνιση όλων των δικτύων
 setup-network-skip = Παράλειψη
 setup-network-failed = Η σύνδεση δεν ήταν δυνατή
 setup-network-wrong-password = Λάθος κωδικός πρόσβασης
 setup-network-connected = Συνδέθηκε
-setup-network-connecting = Σύνδεση…
+setup-network-connecting = Σύνδεση
 setup-network-saved = Αποθηκευμένο
 setup-network-password = Κωδικός πρόσβασης
 setup-network-join = Σύνδεση
@@ -235,7 +235,7 @@ setup-enroll-digits = { $count ->
 setup-secure-boot-title = Ο υπολογιστής σας δεν εμπιστεύεται ακόμη το Luft
 setup-secure-boot-code = Αμέσως μετά την επόμενη επανεκκίνηση, μια μπλε οθόνη θα σας ζητήσει να εμπιστευτείτε το Luft. Χρησιμοποιήστε εκεί το πληκτρολόγιο με αυτόν τον κωδικό.
 setup-secure-boot-skipped = Η μπλε οθόνη παραλείφθηκε. Λάβετε νέο κωδικό και κάντε επανεκκίνηση, και μετά χρησιμοποιήστε εκεί το πληκτρολόγιο.
-setup-secure-boot-getting = Λήψη του κωδικού σας…
+setup-secure-boot-getting = Λήψη του κωδικού σας
 setup-secure-boot-new-code = Λήψη νέου κωδικού
 
 ## Encryption

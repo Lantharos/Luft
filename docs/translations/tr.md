@@ -29,7 +29,7 @@ Mind the dotted and dotless i when changing case: i ↔ İ, ı ↔ I. “İptal�
 
 - Quotation marks: “…”, and ‘…’ inside them.
 - Apostrophe: ’, the typographic one, before suffixes on names, numbers and abbreviations: “Luft’u”, “USB’ye”.
-- Ellipsis: one character, “…”, with no space before it: “Yükleniyor…”.
+- Ellipsis: one character, “…”, with no space before it. A message about something in progress, such as loading, takes none, because the app shows a spinner beside it.
 - Dash: the en dash with spaces, “ – ”. No em dashes.
 - No space before punctuation.
 - The percent sign comes before the number, with no space: “%57”. Units follow the number with a space: “4,5 W”, “120 GB”.

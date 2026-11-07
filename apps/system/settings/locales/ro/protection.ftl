@@ -187,7 +187,7 @@ settings-encryption-summary-chip = Până se termină, cipul de securitate păst
 settings-encryption-summary-recovery-key = Până se termină, la pornire se cere cheia de recuperare în locul frazei de acces.
 # Button, verb: starts encrypting this computer
 settings-encryption-encrypt = Criptează
-settings-encryption-making-room = Se face loc…
+settings-encryption-making-room = Se face loc
 settings-encryption-unlocks-chip-pin = Se deblochează cu cipul de securitate și PIN-ul
 settings-encryption-unlocks-chip = Se deblochează singur cu cipul de securitate
 settings-encryption-unlocks-passphrase = Cere fraza de acces la pornire

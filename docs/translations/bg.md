@@ -33,7 +33,7 @@ Sentence case everywhere: only the first word and names take a capital letter. �
 
 - Quotation marks: „…“, and ‚…‘ inside them.
 - Apostrophe: ’, rarely needed in Bulgarian.
-- Ellipsis: one character, „…“, with no space before it: „Зареждане…“.
+- Ellipsis: one character, „…“, with no space before it. A message about something in progress, such as loading, takes none, because the app shows a spinner beside it.
 - Dash: the en dash with spaces, „ – “. A hyphen without spaces joins words: „току-що“, „по-късно“.
 - Percent sign with a space before it: „57 %“.
 - Units come from the formatter; write W for watts.

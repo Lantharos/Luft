@@ -3,7 +3,7 @@
 ## Network: shared words
 
 settings-network-save = Uložit
-settings-network-saving = Ukládání…
+settings-network-saving = Ukládání
 settings-network-cancel = Zrušit
 settings-network-connect = Připojit
 settings-network-disconnect = Odpojit
@@ -22,7 +22,7 @@ settings-network-connect-failed = Nepodařilo se připojit
 ## Network: connection states
 
 settings-network-link-connected = Připojeno
-settings-network-link-connecting = Připojování…
+settings-network-link-connecting = Připojování
 settings-network-link-disconnected = Nepřipojeno
 settings-network-link-unplugged = Kabel je odpojený
 
@@ -90,7 +90,7 @@ settings-network-wifi-enterprise = Přihlášení pracovním nebo školním úč
 settings-network-wifi-connect-failed = K této síti se nepodařilo připojit
 settings-network-wifi-saved-password-failed = Uložené heslo nefungovalo. Zadejte ho znovu.
 settings-network-wifi-settings = Nastavení sítě
-settings-network-wifi-searching = Hledání sítí…
+settings-network-wifi-searching = Hledání sítí
 settings-network-hidden = Připojit ke skryté síti
     .description = Zadejte název sítě a způsob jejího zabezpečení.
 settings-network-hidden-name = Název sítě
@@ -251,7 +251,7 @@ settings-network-vpn-off = Vypnuto
 settings-network-vpn-none = Nenastaveno
 settings-network-vpn-import = Importovat ze souboru
     .description = Konfigurační soubory WireGuard, OpenVPN a dalších VPN
-settings-network-vpn-importing = Importování…
+settings-network-vpn-importing = Importování
 settings-network-wireguard = Nastavit WireGuard
     .description = Zadejte údaje od poskytovatele VPN nebo ze serveru
 settings-network-wireguard-dialog = Tyto údaje vám poskytne poskytovatel VPN nebo správce serveru.
@@ -271,7 +271,7 @@ settings-network-wireguard-keepalive = Udržování spojení
     .description = Pomáhá udržet připojení za směrovačem
     .placeholder = Volitelné, v sekundách
 settings-network-wireguard-add = Přidat
-settings-network-wireguard-adding = Přidávání…
+settings-network-wireguard-adding = Přidávání
 settings-network-wireguard-error-private-key = Zadejte nebo vygenerujte soukromý klíč
 settings-network-wireguard-error-addresses = Zadejte alespoň jednu adresu
 settings-network-wireguard-error-server-key = Zadejte veřejný klíč serveru
@@ -298,16 +298,16 @@ settings-bluetooth-visible-until-off = Dokud se nevypne
 settings-bluetooth-visible-failed = Viditelnost tohoto počítače se nepodařilo změnit
 settings-bluetooth-paired = Moje zařízení
 settings-bluetooth-nearby = Zařízení v okolí
-settings-bluetooth-searching = Hledání zařízení…
+settings-bluetooth-searching = Hledání zařízení
     .description = Přepněte zařízení, které chcete přidat, do režimu párování
 settings-bluetooth-blocked = Bluetooth je vypnutý hardwarovým vypínačem
     .description = Zapněte ho vypínačem nebo klávesou na počítači
 settings-bluetooth-details = Podrobnosti o zařízení
 settings-bluetooth-connected = Připojeno
 settings-bluetooth-connected-battery = Připojeno · baterie { $battery }
-settings-bluetooth-connecting = Připojování…
-settings-bluetooth-disconnecting = Odpojování…
-settings-bluetooth-pairing = Párování…
+settings-bluetooth-connecting = Připojování
+settings-bluetooth-disconnecting = Odpojování
+settings-bluetooth-pairing = Párování
 settings-bluetooth-forget-confirm = Zapomenout zařízení „{ $name }“?
     .description = Abyste ho mohli s tímto počítačem znovu používat, budete ho muset znovu spárovat.
 settings-bluetooth-forget = Zapomenout

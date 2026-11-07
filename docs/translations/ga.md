@@ -27,7 +27,7 @@ Sentence case: only the first word and names take a capital letter. “Socruithe
 
 - Quotation marks: “…”, and ‘…’ inside them. Never ASCII quotes.
 - Apostrophe: the typographic ’, which Irish uses often: “d’ordóg”, “m’ainm”, “b’fhéidir”.
-- Ellipsis: one character, “…”, with no space before it.
+- Ellipsis: one character, “…”, with no space before it. A message about something in progress, such as loading, takes none, because the app shows a spinner beside it.
 - Dash: the en dash with spaces, “ – ”. No em dashes.
 - Percent sign with no space: “57%”.
 - Key names stay as printed on Irish and British keyboards: Ctrl, Alt, Shift, Enter, Esc, Tab, Backspace, Delete, Home, End, Page Up, Page Down, Print Screen. Only the space bar, which has no printed name, is “Spás”.

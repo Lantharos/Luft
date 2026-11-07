@@ -115,4 +115,4 @@ ui-passphrase-mismatch = Disk parolaları eşleşmiyor
 
 ## Encryption
 
-ui-encryption-checking = Denetleniyor…
+ui-encryption-checking = Denetleniyor

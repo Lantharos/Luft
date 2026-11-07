@@ -29,7 +29,7 @@ Sentence case: only the first word and names take a capital letter. «Hurtiginns
 
 - Quotation marks: «…», and ‘…’ inside them.
 - Apostrophe: ’, used for the genitive of names ending in s, x or z: «Keys’ oppsett».
-- Ellipsis: one character, «…», with a space before it when it stands for words left out or a process going on: «Lastar …».
+- Ellipsis: one character, «…», with a space before it when it stands for words left out. A message about something in progress, such as loading, takes none, because the app shows a spinner beside it.
 - Dash: the en dash with spaces, « – ». No em dashes.
 - Percent sign and units take a space, a no-break space so they never wrap away from the number: «57 %», «4,5 W».
 - Compounds with names, abbreviations or digits take a hyphen: «Bluetooth-adapter», «USB-minnepinne», «PDF-fil», «Rover-vindauget».

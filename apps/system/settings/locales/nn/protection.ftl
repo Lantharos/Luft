@@ -182,7 +182,7 @@ settings-encryption-summary-chip = Til det er ferdig, oppbevarer tryggleiksbrikk
 settings-encryption-summary-recovery-key = Til det er ferdig blir det spurt etter gjenopprettingsnøkkelen ved oppstart i staden for passfrasen din.
 # Button, verb: starts encrypting this computer
 settings-encryption-encrypt = Krypter
-settings-encryption-making-room = Frigjer plass…
+settings-encryption-making-room = Frigjer plass
 settings-encryption-unlocks-chip-pin = Blir låst opp med tryggleiksbrikka og PIN-koden din
 settings-encryption-unlocks-chip = Blir låst opp av seg sjølv med tryggleiksbrikka
 settings-encryption-unlocks-passphrase = Spør etter passfrasen din ved oppstart

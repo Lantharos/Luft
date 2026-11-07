@@ -49,7 +49,7 @@ media-keys-num-lock-off = Num Lock искључен
 
 vpn-sign-in-title = Пријава на { $connection }
 vpn-connect = Повежи
-vpn-signing-in = Пријављивање…
+vpn-signing-in = Пријављивање
 vpn-finish-in-browser = Довршите пријаву у прегледачу.
 vpn-certificate-untrusted = Сервер { $host } је понудио сертификат који не може да се провери ({ $reason }). Његов отисак је { $fingerprint }.
 vpn-certificate-warning = Неко би могао да се представља као овај сервер. Повежите се само ако сте ово очекивали.

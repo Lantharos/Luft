@@ -31,7 +31,7 @@ Write **ё** everywhere it belongs, as macOS and GNOME do: «ещё», «всё�
 
 - Quotation marks: «…», and „…“ inside them.
 - Apostrophe: ’, only in foreign names, which Luft avoids.
-- Ellipsis: one character, «…», with no space before it: «Загрузка…».
+- Ellipsis: one character, «…», with no space before it. A message about something in progress, such as loading, takes none, because the app shows a spinner beside it.
 - Dash: the em dash with spaces, « — ». Number ranges take the en dash without spaces: «2–4».
 - No space before punctuation. Percent sign and units take a no-break space: «57 %», «4,5 Вт».
 - Commas before «что», «чтобы», «который», «если», «когда» as Russian grammar requires, even where English has none.

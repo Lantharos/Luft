@@ -49,7 +49,7 @@ media-keys-num-lock-off = Num Lock desativado
 
 vpn-sign-in-title = Entrar em { $connection }
 vpn-connect = Conectar
-vpn-signing-in = Entrando…
+vpn-signing-in = Entrando
 vpn-finish-in-browser = Conclua o login no navegador.
 vpn-certificate-untrusted = { $host } apresentou um certificado que não pode ser verificado ({ $reason }). A impressão digital dele é { $fingerprint }.
 vpn-certificate-warning = Alguém pode estar se passando por este servidor. Conecte-se somente se você esperava por isso.

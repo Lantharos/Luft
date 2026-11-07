@@ -8,7 +8,7 @@ setup-try-again = Yeniden dene
 setup-restart = Yeniden başlat
 setup-restart-now = Şimdi yeniden başlat
 setup-restart-later = Daha sonra yeniden başlat
-setup-saving = Kaydediliyor…
+setup-saving = Kaydediliyor
 
 ## Install progress, shown at the bottom of every step while Luft copies
 
@@ -51,7 +51,7 @@ setup-destination-meet-title = Windows’un yanında
 setup-destination-meet-description = Meet Luft bu yeri zaten açtı, Windows olduğu gibi kalır.
 setup-destination-meet-drive-title = { $drive } üzerinde
 setup-destination-meet-drive-description = Meet Luft bu yeri başka bir diskte zaten açtı, Luft da oradan kendi başlangıç dosyalarıyla başlar.
-setup-destination-looking = Diskleriniz inceleniyor…
+setup-destination-looking = Diskleriniz inceleniyor
 
 setup-destination-meet-choice = Windows’un yanında
 setup-destination-meet-choice-description = Meet Luft’un Windows’un yanında açtığı { $size } alanı kullanın.
@@ -69,7 +69,7 @@ setup-destination-custom-choice = Özel
 setup-destination-custom-choice-description = Bölümleri Diskler’de kendiniz düzenleyin.
 
 setup-destination-more-options = Diğer seçenekler
-setup-destination-starting = Başlatılıyor…
+setup-destination-starting = Başlatılıyor
 setup-destination-replace = Değiştir
 setup-destination-install = Luft’u yükle
 
@@ -127,7 +127,7 @@ setup-drive-partitions = { $count ->
 ## Custom space
 
 setup-custom-open-disks = Diskler’i aç
-setup-custom-looking = Bakılıyor…
+setup-custom-looking = Bakılıyor
 setup-custom-look-again = Yeniden bak
 setup-custom-free-label = Boş alan
 setup-custom-free-space = { $size } boş alan
@@ -172,14 +172,14 @@ setup-replace-blocked-read-only = Diski salt okunur durumda.
 setup-network-title = İnternete bağlanın
 setup-network-description = Bu isteğe bağlıdır. Çevrimiçi olduğunuzda Luft saatinizi ve saat diliminizi ayarlayabilir, Luft yüklenirken de interneti kullanabilirsiniz.
 setup-network-unavailable = Ağlar şu anda kullanılamıyor. Daha sonra görev çubuğundan bağlanabilirsiniz.
-setup-network-looking = Ağlar aranıyor…
+setup-network-looking = Ağlar aranıyor
 setup-network-cable = Kabloyla bağlı
 setup-network-show-all = Tüm ağları göster
 setup-network-skip = Atla
 setup-network-failed = Bağlanılamadı
 setup-network-wrong-password = Parola yanlış
 setup-network-connected = Bağlandı
-setup-network-connecting = Bağlanıyor…
+setup-network-connecting = Bağlanıyor
 setup-network-saved = Kayıtlı
 setup-network-password = Parola
 setup-network-join = Bağlan
@@ -235,7 +235,7 @@ setup-enroll-digits = { $count ->
 setup-secure-boot-title = Bilgisayarınız henüz Luft’a güvenmiyor
 setup-secure-boot-code = Bir sonraki yeniden başlatmanın hemen ardından mavi bir ekran Luft’a güvenmek isteyip istemediğinizi sorar. Orada klavyeyle bu kodu kullanın.
 setup-secure-boot-skipped = Mavi ekran atlandı. Yeni bir kod alıp yeniden başlatın, ardından orada klavyeyi kullanın.
-setup-secure-boot-getting = Kodunuz alınıyor…
+setup-secure-boot-getting = Kodunuz alınıyor
 setup-secure-boot-new-code = Yeni kod al
 
 ## Encryption

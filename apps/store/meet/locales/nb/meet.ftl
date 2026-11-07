@@ -76,7 +76,7 @@ check-moment = Dette tar et øyeblikk.
 check-slow = Windows regner ut hvor mye plass det kan avse. På en stor disk kan dette ta noen minutter.
 check-blocked-description = Noe må endres før Luft kan flytte inn. Slik gjør du det.
 check-found-description = Dette fant Meet Luft.
-check-checking = Sjekker disken, fastvaren og maskinvaren…
+check-checking = Sjekker disken, fastvaren og maskinvaren
 check-again = Sjekk igjen
 check-action-firmware = Åpne fastvareinnstillingene
 check-action-tidy = Rydd opp
@@ -173,7 +173,7 @@ linux-ready-remove-description = Meet Luft sletter filene til Luft, oppstartsfil
 
 luft-title = Ditt Luft
 luft-looking = Meet Luft fant Luft på denne datamaskinen.
-luft-checking = Undersøker Lufts disk…
+luft-checking = Undersøker Lufts disk
 luft-description-beside = Luft er installert ved siden av Windows på denne datamaskinen.
 luft-description-drive = Luft er installert på { $drive }.
 luft-bar-used = { $size }, { $used } brukt
@@ -227,7 +227,7 @@ resize-shrink-description = Luft flytter filene sine neste gang det starter, noe
 
 box-title = Ta med tingene dine
 box-description = Velg hva du vil ta med. Luft pakker det ut i den nye kontoen din når det er installert, og ingenting fjernes fra Windows.
-box-looking = Ser gjennom mappene dine…
+box-looking = Ser gjennom mappene dine
 box-folder-desktop = Skrivebord
 box-folder-documents = Dokumenter
 box-folder-downloads = Nedlastinger
@@ -294,7 +294,7 @@ removed-description = { $platform ->
 
 stick-title = Lag en minnepinne
 stick-description = Luft starter fra den på hvilken som helst datamaskin, for å prøve det eller installere det.
-stick-looking = Ser etter USB-stasjoner…
+stick-looking = Ser etter USB-stasjoner
 stick-none = Sett inn en minnepinne på { $size } eller mer. Den dukker opp her.
 stick-drives-label = USB-stasjoner
 stick-offer = { $name }, { $size }

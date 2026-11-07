@@ -28,7 +28,7 @@ Sentence case everywhere: only the first word and names take a capital letter. �
 ## Typography
 
 - Quotation marks: „…“, and ‚…‘ inside them.
-- Ellipsis: one character, „…“, with no space before it after a word: „Načítání…“.
+- Ellipsis: one character, „…“, with no space before it after a word. A message about something in progress, such as loading, takes none, because the app shows a spinner beside it.
 - Dash: the en dash with spaces, „ – “. No em dashes. Ranges take the en dash without spaces: „2–4“.
 - Percent sign and units are separated by a space: „57 %“, „4,5 W“. The placeable carries the number, so write `{ $percentage } %`.
 - Key names stay as printed on Czech keyboards, which use the English names: Ctrl, Alt, Shift, Enter, Esc, Delete, Home, End, Page Up. Only the space bar is translated: Mezerník.

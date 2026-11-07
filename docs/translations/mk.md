@@ -35,7 +35,7 @@ Sentence case everywhere: only the first word and names take a capital letter. �
 
 - Quotation marks: „…“, and ‚…‘ inside them.
 - Apostrophe: ’, which marks a dropped vowel: „’рѓа“. Rarely needed.
-- Ellipsis: one character, „…“, with no space before it: „Се вчитува…“.
+- Ellipsis: one character, „…“, with no space before it. A message about something in progress, such as loading, takes none, because the app shows a spinner beside it.
 - Dash: the en dash with spaces, „ – “. A hyphen without spaces joins words: „USB-меморија“, „е-пошта“.
 - Percent sign right after the number, with no space: „57%“.
 - Units come from the formatter; write W for watts.

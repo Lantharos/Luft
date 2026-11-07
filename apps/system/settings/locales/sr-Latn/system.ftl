@@ -71,7 +71,7 @@ settings-users-password-new-placeholder = { $count ->
 settings-users-password-confirm = Potvrda
 settings-users-password-confirm-placeholder = Unesite ponovo
 settings-users-password-change = Promeni lozinku
-settings-users-password-changing = Menja se…
+settings-users-password-changing = Menja se
 settings-users-password-wrong = To nije vaša trenutna lozinka
 settings-users-password-mismatch = Lozinke se ne poklapaju
 settings-users-password-too-short = Ova lozinka je prekratka
@@ -126,11 +126,11 @@ settings-login-automatic-off = Isključeno
 
 ## Updates
 
-settings-updates-checking = Traženje ažuriranja…
-settings-updates-downloading = Preuzimanje ažuriranja…
-settings-updates-rolling-back = Priprema se ranija verzija…
-settings-updates-switching-nvidia = Preuzima se NVIDIA drajver…
-settings-updates-switching-standard = Preuzima se standardna slika sistema…
+settings-updates-checking = Traženje ažuriranja
+settings-updates-downloading = Preuzimanje ažuriranja
+settings-updates-rolling-back = Priprema se ranija verzija
+settings-updates-switching-nvidia = Preuzima se NVIDIA drajver
+settings-updates-switching-standard = Preuzima se standardna slika sistema
 settings-updates-up-to-date = Sistem je ažuran
 settings-updates-version = Verzija { $version }
 settings-updates-version-new = Nova verzija
@@ -150,9 +150,9 @@ settings-updates-last-checked = Poslednja provera { $when }
 settings-updates-never-checked = Još nije provereno
 settings-updates-stop = Zaustavi
 settings-updates-check = Proveri sada
-settings-updates-checking-button = Provera…
+settings-updates-checking-button = Provera
 settings-updates-app-updates = Ažuriranja aplikacija
-settings-updates-apps-checking = Traže se ažuriranja za vaše aplikacije…
+settings-updates-apps-checking = Traže se ažuriranja za vaše aplikacije
 settings-updates-apps-count = { $count ->
     [0] Upravlja se u aplikaciji Schelf
     [one] { $count } aplikacija ima ažuriranje u aplikaciji Schelf
@@ -174,7 +174,7 @@ settings-updates-background-description = Ažuriranja su spremna za instalaciju 
 settings-updates-firmware = Firmver
 settings-updates-firmware-description = Ažuriranja za softver ugrađen u vaš hardver
 settings-updates-firmware-restart = Završava se pri ponovnom pokretanju
-settings-updates-firmware-installing = Instalira se…
+settings-updates-firmware-installing = Instalira se
 settings-updates-firmware-update = Ažuriraj
 settings-updates-firmware-failed = Firmver nije mogao da se ažurira
 settings-updates-download = Preuzmi
@@ -265,7 +265,7 @@ settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud i
 settings-accounts-sign-in-again-needed = Prijavite se ponovo da biste nastavili da ga koristite
 settings-accounts-paused-metered = Sinhronizacija je pauzirana na ograničenoj vezi
 settings-accounts-paused-battery = Sinhronizacija je pauzirana dok je baterija pri kraju
-settings-accounts-connecting = Povezivanje…
+settings-accounts-connecting = Povezivanje
 settings-accounts-offline = Van mreže
 settings-accounts-offline-kept = Van mreže, zadržane datoteke su i dalje tu
 settings-accounts-not-connected = Nije povezano
@@ -290,7 +290,7 @@ settings-accounts-sign-in-again = Prijavi se ponovo
 settings-accounts-keep = Zadrži
 settings-accounts-remove = Ukloni
 settings-accounts-remove-confirm = Ukloni sa ovog računara
-settings-accounts-removing = Uklanjanje…
+settings-accounts-removing = Uklanjanje
 settings-accounts-remove-note = Vaše datoteke ostaju u usluzi { $provider }. Izmene napravljene ovde prvo se otpremaju.
 
 ## Accounts: providers
@@ -323,7 +323,7 @@ settings-accounts-continue-in-browser = Nastavi u pregledaču
 settings-accounts-sign-in = Prijava
 settings-accounts-try-again = Pokušaj ponovo
 settings-accounts-continue = Nastavi
-settings-accounts-working = Povezivanje sa uslugom { $provider }…
+settings-accounts-working = Povezivanje sa uslugom { $provider }
 settings-accounts-finish-in-browser = Završite prijavu preko usluge { $provider } u pregledaču. Luft nikada ne vidi vašu lozinku, a ovo će se samo ažurirati kada završite.
 settings-accounts-no-browser = Pregledač se nije otvorio. Kopirajte vezu i otvorite je u pregledaču.
 settings-accounts-open-again = Ponovo otvori stranicu

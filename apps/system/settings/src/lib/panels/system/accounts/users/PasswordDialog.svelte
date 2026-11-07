@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { Dialog, errorText, PasswordField } from '@luft/ui';
+	import { Dialog, errorText, PasswordField, Spinner } from '@luft/ui';
 	import type { PasswordOutcome, User } from '#lib/bindings.js';
 	import { changePassword } from './api';
 	import StrengthMeter from './StrengthMeter.svelte';
@@ -75,6 +75,6 @@
 	{/if}
 	{#snippet actions()}
 		<button type="button" class="button" onclick={onclose}>{t('settings-users-cancel')}</button>
-		<button type="button" class="button primary" disabled={!ready} onclick={submit}>{busy ? t('settings-users-password-changing') : t('settings-users-password-change')}</button>
+		<button type="button" class="button primary" disabled={!ready} onclick={submit}>{#if busy}<Spinner />{/if}{busy ? t('settings-users-password-changing') : t('settings-users-password-change')}</button>
 	{/snippet}
 </Dialog>

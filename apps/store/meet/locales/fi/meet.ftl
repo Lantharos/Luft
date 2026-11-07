@@ -75,7 +75,7 @@ check-moment = Tämä kestää hetken.
 check-slow = Windows selvittää, kuinka paljon tilaa se voi luovuttaa. Suurella levyllä tämä voi kestää muutaman minuutin.
 check-blocked-description = Jotain täytyy muuttaa, ennen kuin Luft voi muuttaa sisään. Näin se tehdään.
 check-found-description = Meet Luft löysi seuraavat asiat.
-check-checking = Tarkistetaan levyä, laiteohjelmistoa ja laitteistoa…
+check-checking = Tarkistetaan levyä, laiteohjelmistoa ja laitteistoa
 check-again = Tarkista uudelleen
 check-action-firmware = Avaa laiteohjelmiston asetukset
 check-action-tidy = Siivoa
@@ -171,7 +171,7 @@ linux-ready-remove-description = Meet Luft poistaa Luftin tiedostot, käynnistys
 
 luft-title = Luftisi
 luft-looking = Meet Luft löysi Luftin tästä PC:stä.
-luft-checking = Tarkistetaan Luftin levyä…
+luft-checking = Tarkistetaan Luftin levyä
 luft-description-beside = Luft on asennettu tähän PC:hen Windowsin rinnalle.
 luft-description-drive = Luft on asennettu levylle { $drive }.
 luft-bar-used = { $size }, { $used } käytössä
@@ -225,7 +225,7 @@ resize-shrink-description = Luft siirtää tiedostonsa seuraavalla käynnistyske
 
 box-title = Tuo tavarasi
 box-description = Valitse, mitä otat mukaan. Luft purkaa ne uudelle tilillesi asennuksen jälkeen, eikä Windowsista poisteta mitään.
-box-looking = Käydään kansioita läpi…
+box-looking = Käydään kansioita läpi
 box-folder-desktop = Työpöytä
 box-folder-documents = Tiedostot
 box-folder-downloads = Lataukset
@@ -291,7 +291,7 @@ removed-description = { $platform ->
 
 stick-title = Tee USB-tikku
 stick-description = Luft käynnistyy siltä millä tahansa tietokoneella kokeiltavaksi tai asennettavaksi.
-stick-looking = Etsitään USB-asemia…
+stick-looking = Etsitään USB-asemia
 stick-none = Liitä vähintään { $size }:n USB-tikku. Se näkyy tässä.
 stick-drives-label = USB-asemat
 stick-offer = { $name }, { $size }

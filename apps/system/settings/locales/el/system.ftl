@@ -70,7 +70,7 @@ settings-users-password-new-placeholder = { $count ->
 settings-users-password-confirm = Επιβεβαίωση
 settings-users-password-confirm-placeholder = Πληκτρολογήστε τον ξανά
 settings-users-password-change = Αλλαγή κωδικού πρόσβασης
-settings-users-password-changing = Αλλαγή…
+settings-users-password-changing = Αλλαγή
 settings-users-password-wrong = Αυτός δεν είναι ο τρέχων κωδικός πρόσβασής σας
 settings-users-password-mismatch = Οι κωδικοί πρόσβασης δεν ταιριάζουν
 settings-users-password-too-short = Αυτός ο κωδικός πρόσβασης είναι πολύ μικρός
@@ -124,11 +124,11 @@ settings-login-automatic-off = Ανενεργή
 
 ## Updates
 
-settings-updates-checking = Αναζήτηση ενημερώσεων…
-settings-updates-downloading = Λήψη ενημερώσεων…
-settings-updates-rolling-back = Προετοιμασία της προηγούμενης έκδοσης…
-settings-updates-switching-nvidia = Λήψη του προγράμματος οδήγησης της NVIDIA…
-settings-updates-switching-standard = Λήψη της τυπικής εικόνας…
+settings-updates-checking = Αναζήτηση ενημερώσεων
+settings-updates-downloading = Λήψη ενημερώσεων
+settings-updates-rolling-back = Προετοιμασία της προηγούμενης έκδοσης
+settings-updates-switching-nvidia = Λήψη του προγράμματος οδήγησης της NVIDIA
+settings-updates-switching-standard = Λήψη της τυπικής εικόνας
 settings-updates-up-to-date = Το σύστημά σας είναι ενημερωμένο
 settings-updates-version = Έκδοση { $version }
 settings-updates-version-new = Νέα έκδοση
@@ -148,9 +148,9 @@ settings-updates-last-checked = Τελευταίος έλεγχος: { $when }
 settings-updates-never-checked = Δεν έχει γίνει έλεγχος ακόμη
 settings-updates-stop = Διακοπή
 settings-updates-check = Έλεγχος τώρα
-settings-updates-checking-button = Έλεγχος…
+settings-updates-checking-button = Έλεγχος
 settings-updates-app-updates = Ενημερώσεις εφαρμογών
-settings-updates-apps-checking = Αναζήτηση ενημερώσεων για τις εφαρμογές σας…
+settings-updates-apps-checking = Αναζήτηση ενημερώσεων για τις εφαρμογές σας
 settings-updates-apps-count = { $count ->
     [0] Η διαχείριση γίνεται στο Schelf
     [one] { $count } εφαρμογή έχει ενημέρωση στο Schelf
@@ -171,7 +171,7 @@ settings-updates-background-description = Οι ενημερώσεις είναι
 settings-updates-firmware = Υλικολογισμικό
 settings-updates-firmware-description = Ενημερώσεις για το λογισμικό που είναι ενσωματωμένο στο υλικό σας
 settings-updates-firmware-restart = Ολοκληρώνεται κατά την επανεκκίνηση
-settings-updates-firmware-installing = Εγκατάσταση…
+settings-updates-firmware-installing = Εγκατάσταση
 settings-updates-firmware-update = Ενημέρωση
 settings-updates-firmware-failed = Δεν ήταν δυνατή η ενημέρωση του υλικολογισμικού
 settings-updates-download = Λήψη
@@ -262,7 +262,7 @@ settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud �
 settings-accounts-sign-in-again-needed = Συνδεθείτε ξανά για να συνεχίσετε να τον χρησιμοποιείτε
 settings-accounts-paused-metered = Ο συγχρονισμός διακόπηκε προσωρινά λόγω σύνδεσης με χρέωση
 settings-accounts-paused-battery = Ο συγχρονισμός διακόπηκε προσωρινά λόγω χαμηλής μπαταρίας
-settings-accounts-connecting = Σύνδεση…
+settings-accounts-connecting = Σύνδεση
 settings-accounts-offline = Εκτός σύνδεσης
 settings-accounts-offline-kept = Εκτός σύνδεσης, τα διατηρημένα αρχεία παραμένουν διαθέσιμα
 settings-accounts-not-connected = Μη συνδεδεμένος
@@ -285,7 +285,7 @@ settings-accounts-sign-in-again = Νέα σύνδεση
 settings-accounts-keep = Διατήρηση
 settings-accounts-remove = Αφαίρεση
 settings-accounts-remove-confirm = Αφαίρεση από αυτόν τον υπολογιστή
-settings-accounts-removing = Αφαίρεση…
+settings-accounts-removing = Αφαίρεση
 settings-accounts-remove-note = Τα αρχεία σας παραμένουν στο { $provider }. Οι αλλαγές που έγιναν εδώ αποστέλλονται πρώτα.
 
 ## Accounts: providers
@@ -318,7 +318,7 @@ settings-accounts-continue-in-browser = Συνέχεια στο πρόγραμμ
 settings-accounts-sign-in = Σύνδεση
 settings-accounts-try-again = Επανάληψη
 settings-accounts-continue = Συνέχεια
-settings-accounts-working = Επικοινωνία με { $provider }…
+settings-accounts-working = Επικοινωνία με { $provider }
 settings-accounts-finish-in-browser = Ολοκληρώστε τη σύνδεση με { $provider } στο πρόγραμμα περιήγησης. Το Luft δεν βλέπει ποτέ τον κωδικό πρόσβασής σας και αυτή η σελίδα θα ενημερωθεί μόλις τελειώσετε.
 settings-accounts-no-browser = Δεν άνοιξε πρόγραμμα περιήγησης. Αντιγράψτε τον σύνδεσμο και ανοίξτε τον σε ένα πρόγραμμα περιήγησης.
 settings-accounts-open-again = Άνοιγμα της σελίδας ξανά

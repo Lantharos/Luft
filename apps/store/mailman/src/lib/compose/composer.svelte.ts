@@ -190,7 +190,8 @@ class Composer {
 			this.current = null;
 			this.expanded = false;
 			const later = sendAt !== null;
-			toasts.show(later ? 'Scheduled to send' : 'Sending…', {
+			toasts.show(later ? 'Scheduled to send' : 'Sending', {
+				busy: !later,
 				duration: later ? 5000 : Math.max(2000, (queued.sendAt - Date.now() / 1000) * 1000),
 				action: { label: 'Undo', run: () => void this.undo(queued.id, { ...composition, body: content.source }) }
 			});

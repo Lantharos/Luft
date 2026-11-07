@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { bytes, plural } from '@luft/ui';
+	import { bytes, plural, Spinner } from '@luft/ui';
 	import { describe } from '#lib/features/cloud.js';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
 	import { projectSummary } from '#lib/vcs/format.js';
@@ -25,8 +25,8 @@
 	let cloudDrive = $derived(manager.view === 'home' ? manager.cloud.holding(manager.currentPath) : undefined);
 	let drive = $derived(manager.view === 'home' && !cloudDrive ? manager.drives.holding(manager.currentPath) : undefined);
 	let status = $derived.by(() => {
-		if (vcs.busy === 'sync') return 'Syncing…';
-		if (vcs.busy === 'save') return 'Committing…';
+		if (vcs.busy === 'sync') return 'Syncing';
+		if (vcs.busy === 'save') return 'Committing';
 		if (vcs.error) return 'Version control needs attention';
 		return vcs.lastResult ?? (vcs.project ? projectSummary(vcs.project) : null);
 	});
@@ -38,6 +38,7 @@
 		{#if manager.notice}
 			<span class="truncate text-[var(--danger)]" role="status">{manager.notice}</span>
 		{:else}
+			{#if vcs.busy === 'sync' || vcs.busy === 'save' || cloudDrive?.state === 'connecting'}<Spinner size={12} />{/if}
 			{#if status}
 				<span class="truncate">{status}</span>
 			{/if}

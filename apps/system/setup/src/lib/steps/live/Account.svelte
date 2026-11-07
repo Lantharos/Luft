@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { PasswordField, TextField } from '@luft/ui';
+	import { PasswordField, Spinner, TextField } from '@luft/ui';
 	import StepFrame from '#lib/components/StepFrame.svelte';
 	import { flow } from '#lib/state/flow.svelte.js';
 	import { install } from '#lib/state/install.svelte.js';
@@ -63,7 +63,7 @@
 			{/if}
 		</div>
 		{#snippet actions()}
-			<button type="submit" class="button primary large px-6" disabled={!ready || saving}>{t(saving ? 'setup-saving' : 'setup-continue')}</button>
+			<button type="submit" class="button primary large px-6" disabled={!ready || saving}>{#if saving}<Spinner />{/if}{t(saving ? 'setup-saving' : 'setup-continue')}</button>
 		{/snippet}
 	</StepFrame>
 </form>

@@ -8,7 +8,7 @@ setup-try-again = Bain triail eile as
 setup-restart = Atosaigh
 setup-restart-now = Atosaigh anois
 setup-restart-later = Atosaigh níos déanaí
-setup-saving = Á shábháil…
+setup-saving = Á shábháil
 
 ## Install progress, shown at the bottom of every step while Luft copies
 
@@ -51,7 +51,7 @@ setup-destination-meet-title = Taobh le Windows
 setup-destination-meet-description = Rinne Meet Luft an spás seo cheana, mar sin fanann Windows díreach mar atá.
 setup-destination-meet-drive-title = Ar { $drive }
 setup-destination-meet-drive-description = Rinne Meet Luft an spás seo cheana ar dhiosca eile, agus tosaíonn Luft as sin lena chomhaid tosaithe féin.
-setup-destination-looking = Ag féachaint ar do thiomántáin…
+setup-destination-looking = Ag féachaint ar do thiomántáin
 
 setup-destination-meet-choice = Taobh le Windows
 setup-destination-meet-choice-description = Úsáid an { $size } a rinne Meet Luft taobh le Windows.
@@ -69,7 +69,7 @@ setup-destination-custom-choice = Saincheaptha
 setup-destination-custom-choice-description = Socraigh na deighiltí tú féin san aip Dioscaí.
 
 setup-destination-more-options = Tuilleadh roghanna
-setup-destination-starting = Ag tosú…
+setup-destination-starting = Ag tosú
 setup-destination-replace = Ionadaigh
 setup-destination-install = Suiteáil Luft
 
@@ -133,7 +133,7 @@ setup-drive-partitions = { $count ->
 ## Custom space
 
 setup-custom-open-disks = Oscail Dioscaí
-setup-custom-looking = Ag féachaint…
+setup-custom-looking = Ag féachaint
 setup-custom-look-again = Féach arís
 setup-custom-free-label = Spás saor
 setup-custom-free-space = { $size } saor
@@ -187,14 +187,14 @@ setup-replace-blocked-read-only = Tá a thiomántán inléite amháin.
 setup-network-title = Ceangail leis an idirlíon
 setup-network-description = Is rogha é seo. Má tá tú ar líne, is féidir le Luft do chlog agus do chrios ama a shocrú, agus is féidir leat an t-idirlíon a úsáid fad atá Luft á shuiteáil.
 setup-network-unavailable = Níl líonraí ar fáil faoi láthair. Is féidir leat ceangal níos déanaí ón bpainéal.
-setup-network-looking = Ag cuardach líonraí…
+setup-network-looking = Ag cuardach líonraí
 setup-network-cable = Ceangailte le cábla
 setup-network-show-all = Taispeáin gach líonra
 setup-network-skip = Scipeáil
 setup-network-failed = Níorbh fhéidir ceangal
 setup-network-wrong-password = Pasfhocal mícheart
 setup-network-connected = Ceangailte
-setup-network-connecting = Ag ceangal…
+setup-network-connecting = Ag ceangal
 setup-network-saved = Sábháilte
 setup-network-password = Pasfhocal
 setup-network-join = Ceangail
@@ -253,7 +253,7 @@ setup-enroll-digits = { $count ->
 setup-secure-boot-title = Níl muinín ag do ríomhaire as Luft fós
 setup-secure-boot-code = Díreach tar éis an chéad atosaithe eile, iarrfaidh scáileán gorm ort muinín a bheith agat as Luft. Úsáid an méarchlár ansin leis an gcód seo.
 setup-secure-boot-skipped = Scipeáladh an scáileán gorm. Faigh cód nua agus atosaigh, ansin úsáid an méarchlár ansin.
-setup-secure-boot-getting = Do chód á fháil…
+setup-secure-boot-getting = Do chód á fháil
 setup-secure-boot-new-code = Faigh cód nua
 
 ## Encryption

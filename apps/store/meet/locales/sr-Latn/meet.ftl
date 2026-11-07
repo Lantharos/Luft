@@ -75,7 +75,7 @@ check-moment = Ovo traje trenutak.
 check-slow = Windows računa koliko prostora može da ustupi. Na velikom disku to može da potraje nekoliko minuta.
 check-blocked-description = Nešto mora da se promeni pre nego što Luft može da se useli. Evo šta treba uraditi.
 check-found-description = Evo šta je aplikacija Meet Luft pronašla.
-check-checking = Provera diska, firmvera i hardvera…
+check-checking = Provera diska, firmvera i hardvera
 check-again = Proveri ponovo
 check-action-firmware = Otvori podešavanja firmvera
 check-action-tidy = Počisti
@@ -169,7 +169,7 @@ linux-ready-remove-description = Meet Luft briše datoteke sistema Luft, njegove
 
 luft-title = Vaš Luft
 luft-looking = Aplikacija Meet Luft je pronašla Luft na ovom računaru.
-luft-checking = Pregled diska sistema Luft…
+luft-checking = Pregled diska sistema Luft
 luft-description-beside = Luft je instaliran pored sistema Windows na ovom računaru.
 luft-description-drive = Luft je instaliran na disku { $drive }.
 luft-bar-used = { $size }, zauzeto { $used }
@@ -222,7 +222,7 @@ resize-shrink-description = Luft pri sledećem pokretanju premešta svoje datote
 
 box-title = Ponesite svoje stvari
 box-description = Izaberite šta ćete poneti. Luft će to posle instalacije raspakovati u vaš novi nalog, a iz sistema Windows se ništa ne uklanja.
-box-looking = Pregledanje vaših fascikli…
+box-looking = Pregledanje vaših fascikli
 box-folder-desktop = Radna površina
 box-folder-documents = Dokumenti
 box-folder-downloads = Preuzimanja
@@ -291,7 +291,7 @@ removed-description = { $platform ->
 
 stick-title = Napravi USB fleš
 stick-description = Luft se sa njega pokreće na bilo kom računaru, za isprobavanje ili instalaciju.
-stick-looking = Traženje USB uređaja…
+stick-looking = Traženje USB uređaja
 stick-none = Priključite USB fleš od { $size } ili više. Pojaviće se ovde.
 stick-drives-label = USB uređaji
 stick-offer = { $name }, { $size }

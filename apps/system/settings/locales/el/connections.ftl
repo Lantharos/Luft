@@ -3,7 +3,7 @@
 ## Network: shared words
 
 settings-network-save = Αποθήκευση
-settings-network-saving = Αποθήκευση…
+settings-network-saving = Αποθήκευση
 settings-network-cancel = Ακύρωση
 settings-network-connect = Σύνδεση
 settings-network-disconnect = Αποσύνδεση
@@ -22,7 +22,7 @@ settings-network-connect-failed = Δεν ήταν δυνατή η σύνδεση
 ## Network: connection states
 
 settings-network-link-connected = Συνδεδεμένο
-settings-network-link-connecting = Σύνδεση…
+settings-network-link-connecting = Σύνδεση
 settings-network-link-disconnected = Μη συνδεδεμένο
 settings-network-link-unplugged = Το καλώδιο είναι αποσυνδεδεμένο
 
@@ -88,7 +88,7 @@ settings-network-wifi-enterprise = Σύνδεση με λογαριασμό ερ
 settings-network-wifi-connect-failed = Δεν ήταν δυνατή η σύνδεση σε αυτό το δίκτυο
 settings-network-wifi-saved-password-failed = Ο αποθηκευμένος κωδικός πρόσβασης δεν λειτούργησε. Εισαγάγετέ τον ξανά.
 settings-network-wifi-settings = Ρυθμίσεις δικτύου
-settings-network-wifi-searching = Αναζήτηση δικτύων…
+settings-network-wifi-searching = Αναζήτηση δικτύων
 settings-network-hidden = Σύνδεση σε κρυφό δίκτυο
     .description = Εισαγάγετε το όνομα του δικτύου και τον τύπο ασφάλειάς του.
 settings-network-hidden-name = Όνομα δικτύου
@@ -247,7 +247,7 @@ settings-network-vpn-off = Ανενεργό
 settings-network-vpn-none = Δεν έχει ρυθμιστεί
 settings-network-vpn-import = Εισαγωγή από αρχείο
     .description = Αρχεία ρυθμίσεων WireGuard, OpenVPN και άλλων VPN
-settings-network-vpn-importing = Εισαγωγή…
+settings-network-vpn-importing = Εισαγωγή
 settings-network-wireguard = Ρύθμιση WireGuard
     .description = Εισαγάγετε τα στοιχεία από τον πάροχο ή τον διακομιστή VPN σας
 settings-network-wireguard-dialog = Αυτά τα στοιχεία μπορεί να σας τα δώσει ο πάροχος VPN ή ο διαχειριστής του διακομιστή.
@@ -267,7 +267,7 @@ settings-network-wireguard-keepalive = Διατήρηση σύνδεσης (keep
     .description = Βοηθά τη σύνδεση να παραμένει ενεργή πίσω από δρομολογητή
     .placeholder = Προαιρετικό, σε δευτερόλεπτα
 settings-network-wireguard-add = Προσθήκη
-settings-network-wireguard-adding = Προσθήκη…
+settings-network-wireguard-adding = Προσθήκη
 settings-network-wireguard-error-private-key = Εισαγάγετε ή δημιουργήστε ένα ιδιωτικό κλειδί
 settings-network-wireguard-error-addresses = Εισαγάγετε τουλάχιστον μία διεύθυνση
 settings-network-wireguard-error-server-key = Εισαγάγετε το δημόσιο κλειδί του διακομιστή
@@ -292,16 +292,16 @@ settings-bluetooth-visible-until-off = Μέχρι να απενεργοποιη�
 settings-bluetooth-visible-failed = Δεν ήταν δυνατή η αλλαγή της ορατότητας αυτού του υπολογιστή
 settings-bluetooth-paired = Οι συσκευές μου
 settings-bluetooth-nearby = Κοντινές συσκευές
-settings-bluetooth-searching = Αναζήτηση συσκευών…
+settings-bluetooth-searching = Αναζήτηση συσκευών
     .description = Θέστε τη συσκευή που θέλετε να προσθέσετε σε λειτουργία σύζευξης
 settings-bluetooth-blocked = Το Bluetooth είναι απενεργοποιημένο από διακόπτη υλικού
     .description = Ενεργοποιήστε το με τον διακόπτη ή το πλήκτρο του υπολογιστή σας
 settings-bluetooth-details = Λεπτομέρειες συσκευής
 settings-bluetooth-connected = Συνδεδεμένη
 settings-bluetooth-connected-battery = Συνδεδεμένη · Μπαταρία { $battery }
-settings-bluetooth-connecting = Σύνδεση…
-settings-bluetooth-disconnecting = Αποσύνδεση…
-settings-bluetooth-pairing = Σύζευξη…
+settings-bluetooth-connecting = Σύνδεση
+settings-bluetooth-disconnecting = Αποσύνδεση
+settings-bluetooth-pairing = Σύζευξη
 settings-bluetooth-forget-confirm = Αφαίρεση της συσκευής «{ $name }»;
     .description = Για να τη χρησιμοποιήσετε ξανά με αυτόν τον υπολογιστή, θα χρειαστεί νέα σύζευξη.
 settings-bluetooth-forget = Αφαίρεση

@@ -182,7 +182,7 @@ settings-encryption-summary-chip = Tant qu’il n’est pas terminé, la puce de
 settings-encryption-summary-recovery-key = Tant qu’il n’est pas terminé, la clé de récupération est demandée au démarrage à la place de votre phrase secrète.
 # Button, verb: starts encrypting this computer
 settings-encryption-encrypt = Chiffrer
-settings-encryption-making-room = Libération d’espace…
+settings-encryption-making-room = Libération d’espace
 settings-encryption-unlocks-chip-pin = Se déverrouille avec la puce de sécurité et votre code PIN
 settings-encryption-unlocks-chip = Se déverrouille tout seul avec la puce de sécurité
 settings-encryption-unlocks-passphrase = Demande votre phrase secrète au démarrage

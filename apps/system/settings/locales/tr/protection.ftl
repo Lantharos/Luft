@@ -182,7 +182,7 @@ settings-encryption-summary-chip = İş bitene kadar güvenlik çipi kurtarma an
 settings-encryption-summary-recovery-key = İş bitene kadar başlangıçta disk parolanız yerine kurtarma anahtarı istenir.
 # Button, verb: starts encrypting this computer
 settings-encryption-encrypt = Şifrele
-settings-encryption-making-room = Yer açılıyor…
+settings-encryption-making-room = Yer açılıyor
 settings-encryption-unlocks-chip-pin = Güvenlik çipi ve PIN’inizle açılır
 settings-encryption-unlocks-chip = Güvenlik çipiyle kendiliğinden açılır
 settings-encryption-unlocks-passphrase = Başlangıçta disk parolanızı ister

@@ -90,7 +90,7 @@ check-moment = This takes a moment.
 check-slow = Windows is working out how much room it can spare. On a big drive this can take a few minutes.
 check-blocked-description = Something needs to change before Luft can move in. Here’s what to do.
 check-found-description = Here’s what Meet Luft found.
-check-checking = Checking the drive, the firmware and the hardware…
+check-checking = Checking the drive, the firmware and the hardware
 check-again = Check again
 check-action-firmware = Open firmware settings
 # Button that removes start entries left behind by systems that are gone
@@ -206,7 +206,7 @@ linux-ready-remove-description = Meet Luft deletes Luft’s files, its start fil
 
 luft-title = Your Luft
 luft-looking = Meet Luft found Luft on this PC.
-luft-checking = Looking at Luft’s drive…
+luft-checking = Looking at Luft’s drive
 luft-description-beside = Luft is installed next to Windows on this PC.
 luft-description-drive = Luft is installed on { $drive }.
 # $size is a partition's size and $used how much of it is taken, like "120 GB, 38 GB used"
@@ -269,7 +269,7 @@ resize-shrink-description = Luft moves its files the next time it starts, which 
 
 box-title = Bring your things
 box-description = Choose what to take along. Luft unpacks it into your new account when it’s installed, and nothing is removed from Windows.
-box-looking = Looking through your folders…
+box-looking = Looking through your folders
 box-folder-desktop = Desktop
 box-folder-documents = Documents
 box-folder-downloads = Downloads
@@ -340,7 +340,7 @@ removed-description = { $platform ->
 
 stick-title = Make a USB stick
 stick-description = Luft starts from it on any computer, to try it or to install it.
-stick-looking = Looking for USB drives…
+stick-looking = Looking for USB drives
 # $size is the smallest stick that fits, like "4 GB"
 stick-none = Plug in a USB stick of { $size } or more. It shows up here.
 # Screen-reader label of the list of sticks

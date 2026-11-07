@@ -8,7 +8,7 @@ setup-try-again = Prøv igen
 setup-restart = Genstart
 setup-restart-now = Genstart nu
 setup-restart-later = Genstart senere
-setup-saving = Gemmer…
+setup-saving = Gemmer
 
 ## Install progress, shown at the bottom of every step while Luft copies
 
@@ -51,7 +51,7 @@ setup-destination-meet-title = Ved siden af Windows
 setup-destination-meet-description = Meet Luft har allerede gjort plads, så Windows forbliver præcis, som det er.
 setup-destination-meet-drive-title = På { $drive }
 setup-destination-meet-drive-description = Meet Luft har allerede gjort plads på en anden disk, og Luft starter derfra med sine egne opstartsfiler.
-setup-destination-looking = Undersøger dine diske…
+setup-destination-looking = Undersøger dine diske
 
 setup-destination-meet-choice = Ved siden af Windows
 setup-destination-meet-choice-description = Brug de { $size }, som Meet Luft har gjort klar ved siden af Windows.
@@ -69,7 +69,7 @@ setup-destination-custom-choice = Brugerdefineret
 setup-destination-custom-choice-description = Inddel selv partitionerne i Diske.
 
 setup-destination-more-options = Flere muligheder
-setup-destination-starting = Starter…
+setup-destination-starting = Starter
 setup-destination-replace = Erstat
 setup-destination-install = Installer Luft
 
@@ -127,7 +127,7 @@ setup-drive-partitions = { $count ->
 ## Custom space
 
 setup-custom-open-disks = Åbn Diske
-setup-custom-looking = Undersøger…
+setup-custom-looking = Undersøger
 setup-custom-look-again = Se efter igen
 setup-custom-free-label = Ledig plads
 setup-custom-free-space = { $size } ledig plads
@@ -172,14 +172,14 @@ setup-replace-blocked-read-only = Systemets disk er skrivebeskyttet.
 setup-network-title = Opret forbindelse til internettet
 setup-network-description = Det er valgfrit. Når du er online, kan Luft indstille dit ur og din tidszone, og du kan bruge internettet, mens Luft installeres.
 setup-network-unavailable = Netværk er ikke tilgængelige lige nu. Du kan oprette forbindelse senere fra panelet.
-setup-network-looking = Søger efter netværk…
+setup-network-looking = Søger efter netværk
 setup-network-cable = Forbundet med kabel
 setup-network-show-all = Vis alle netværk
 setup-network-skip = Spring over
 setup-network-failed = Kunne ikke oprette forbindelse
 setup-network-wrong-password = Forkert adgangskode
 setup-network-connected = Forbundet
-setup-network-connecting = Opretter forbindelse…
+setup-network-connecting = Opretter forbindelse
 setup-network-saved = Gemt
 setup-network-password = Adgangskode
 setup-network-join = Opret forbindelse
@@ -235,7 +235,7 @@ setup-enroll-digits = { $count ->
 setup-secure-boot-title = Din computer stoler endnu ikke på Luft
 setup-secure-boot-code = Lige efter næste genstart beder en blå skærm dig om at stole på Luft. Brug tastaturet der med denne kode.
 setup-secure-boot-skipped = Den blå skærm blev sprunget over. Hent en ny kode, og genstart, og brug så tastaturet der.
-setup-secure-boot-getting = Henter din kode…
+setup-secure-boot-getting = Henter din kode
 setup-secure-boot-new-code = Hent en ny kode
 
 ## Encryption

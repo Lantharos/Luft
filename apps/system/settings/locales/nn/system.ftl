@@ -70,7 +70,7 @@ settings-users-password-new-placeholder = { $count ->
 settings-users-password-confirm = Stadfest
 settings-users-password-confirm-placeholder = Skriv det inn igjen
 settings-users-password-change = Endre passord
-settings-users-password-changing = Endrar …
+settings-users-password-changing = Endrar
 settings-users-password-wrong = Det er ikkje det noverande passordet ditt
 settings-users-password-mismatch = Passorda er ikkje like
 settings-users-password-too-short = Dette passordet er for kort
@@ -124,11 +124,11 @@ settings-login-automatic-off = Av
 
 ## Updates
 
-settings-updates-checking = Ser etter oppdateringar …
-settings-updates-downloading = Lastar ned oppdateringar …
-settings-updates-rolling-back = Gjer klar den tidlegare versjonen …
-settings-updates-switching-nvidia = Lastar ned drivaren frå NVIDIA …
-settings-updates-switching-standard = Lastar ned standardbiletet …
+settings-updates-checking = Ser etter oppdateringar
+settings-updates-downloading = Lastar ned oppdateringar
+settings-updates-rolling-back = Gjer klar den tidlegare versjonen
+settings-updates-switching-nvidia = Lastar ned drivaren frå NVIDIA
+settings-updates-switching-standard = Lastar ned standardbiletet
 settings-updates-up-to-date = Systemet ditt er oppdatert
 settings-updates-version = Versjon { $version }
 settings-updates-version-new = Ein ny versjon
@@ -148,9 +148,9 @@ settings-updates-last-checked = Sist sjekka { $when }
 settings-updates-never-checked = Ikkje sjekka enno
 settings-updates-stop = Stopp
 settings-updates-check = Sjekk no
-settings-updates-checking-button = Sjekkar …
+settings-updates-checking-button = Sjekkar
 settings-updates-app-updates = Appoppdateringar
-settings-updates-apps-checking = Ser etter oppdateringar til appane dine …
+settings-updates-apps-checking = Ser etter oppdateringar til appane dine
 settings-updates-apps-count = { $count ->
     [0] Blir handsama i Schelf
     [one] { $count } app har ei oppdatering i Schelf
@@ -171,7 +171,7 @@ settings-updates-background-description = Oppdateringane er klare til å install
 settings-updates-firmware = Fastvare
 settings-updates-firmware-description = Oppdateringar for programvara som er innebygd i maskinvara di
 settings-updates-firmware-restart = Blir fullført når du startar på nytt
-settings-updates-firmware-installing = Installerer …
+settings-updates-firmware-installing = Installerer
 settings-updates-firmware-update = Oppdater
 settings-updates-firmware-failed = Kunne ikkje oppdatere fastvara
 settings-updates-download = Last ned
@@ -262,7 +262,7 @@ settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud e
 settings-accounts-sign-in-again-needed = Logg inn på nytt for å bruke kontoen vidare
 settings-accounts-paused-metered = Synkroniseringa er sett på pause på ei forbruksmålt tilkopling
 settings-accounts-paused-battery = Synkroniseringa er sett på pause medan batteriet er lågt
-settings-accounts-connecting = Koplar til …
+settings-accounts-connecting = Koplar til
 settings-accounts-offline = Fråkopla
 settings-accounts-offline-kept = Fråkopla, lokale filer er framleis tilgjengelege
 settings-accounts-not-connected = Ikkje tilkopla
@@ -285,7 +285,7 @@ settings-accounts-sign-in-again = Logg inn på nytt
 settings-accounts-keep = Behald
 settings-accounts-remove = Fjern
 settings-accounts-remove-confirm = Fjern frå denne datamaskinen
-settings-accounts-removing = Fjernar …
+settings-accounts-removing = Fjernar
 settings-accounts-remove-note = Filene dine blir verande i { $provider }. Endringar du har gjort her, blir sende opp først.
 
 ## Accounts: providers
@@ -318,7 +318,7 @@ settings-accounts-continue-in-browser = Hald fram i nettlesaren
 settings-accounts-sign-in = Logg inn
 settings-accounts-try-again = Prøv igjen
 settings-accounts-continue = Hald fram
-settings-accounts-working = Kontaktar { $provider } …
+settings-accounts-working = Kontaktar { $provider }
 settings-accounts-finish-in-browser = Fullfør innlogginga hos { $provider } i nettlesaren. Luft ser aldri passordet ditt, og denne sida blir oppdatert av seg sjølv når du er ferdig.
 settings-accounts-no-browser = Ingen nettlesar vart opna. Kopier lenkja og opne ho i ein nettlesar.
 settings-accounts-open-again = Opne sida på nytt

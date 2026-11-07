@@ -27,7 +27,7 @@ Sentence case everywhere: only the first word and names take a capital letter. �
 
 - Quotation marks: „…”, and «…» inside them.
 - Apostrophe: ’, never '.
-- Ellipsis: one character, „…”, with no space before it: „Se încarcă…”.
+- Ellipsis: one character, „…”, with no space before it. A message about something in progress, such as loading, takes none, because the app shows a spinner beside it.
 - Dash: the en dash with spaces, „ – ”. No em dashes.
 - No space before punctuation. The percent sign follows the number with no space: „57%”.
 - Hyphen for the article and clitics on loanwords and abbreviations whose spelling differs from the pronunciation: „mouse-ul”, „firmware-ul”, „USB-ul”, but „desktopul”, „touchpadul”, „clipboardul”.

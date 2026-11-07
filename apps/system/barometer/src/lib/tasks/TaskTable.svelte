@@ -8,6 +8,7 @@
 		icon: string | null;
 		app?: string | null;
 		note?: string;
+		working?: boolean;
 		child?: boolean;
 		expanded?: boolean;
 	}
@@ -23,7 +24,7 @@
 </script>
 
 <script lang="ts">
-	import { AppIcon, VirtualScroller, type VirtualHandle } from '@luft/ui';
+	import { AppIcon, Spinner, VirtualScroller, type VirtualHandle } from '@luft/ui';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import type { Snippet } from 'svelte';
 	import type { Sort } from '#lib/state/settings.svelte.js';
@@ -146,6 +147,7 @@
 			{/if}
 			<AppIcon icon={item.icon} id={desktopId(item.app)} size={item.child ? 18 : 22} />
 			<span class="truncate">{item.title}</span>
+			{#if item.working}<Spinner size={12} class="text-[var(--text-muted)]" />{/if}
 			{#if item.note}
 				<span class="note">{item.note}</span>
 			{/if}

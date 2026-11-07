@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import { t } from '@luft/i18n';
-	import { bytes, Checkbox } from '@luft/ui';
+	import { bytes, Checkbox, Spinner } from '@luft/ui';
 	import * as meet from '#lib/bridge/meet.js';
 	import type { FolderKind } from '#lib/bindings.js';
 	import type { Belongings } from '#lib/bindings.js';
@@ -66,7 +65,7 @@
 			{#if problem}
 				<Problem failure={problem} />
 			{:else}
-				<LoaderCircle size={18} class="animate-spin" />{t('box-looking')}
+				<Spinner size={18} />{t('box-looking')}
 			{/if}
 		</div>
 	{:else}

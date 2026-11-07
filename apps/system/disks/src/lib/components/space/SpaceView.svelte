@@ -1,6 +1,6 @@
 <script lang="ts">
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
-	import { bytes, tooltip } from '@luft/ui';
+	import { bytes, Spinner, tooltip } from '@luft/ui';
 	import { showInRover } from '#lib/bridge/index.js';
 	import { dialogs } from '#lib/dialogs/dialogs.svelte.js';
 	import { disks } from '#lib/state/disks.svelte.js';
@@ -58,7 +58,9 @@
 		<Treemap {tiles} hovered={space.hovered} onhover={(key) => (space.hovered = key)} onopen={open} />
 		<SpaceList {tiles} hovered={space.hovered} onhover={(key) => (space.hovered = key)} onopen={open} {actions} />
 	{:else}
-		<p class="px-1.5 pt-6 text-[14px] text-[var(--text-muted)]">{view ? 'This folder is empty.' : 'Measuring…'}</p>
+		<p class="flex items-center gap-2 px-1.5 pt-6 text-[14px] text-[var(--text-muted)]">
+			{#if view}This folder is empty.{:else}<Spinner size={15} />Measuring{/if}
+		</p>
 	{/if}
 </section>
 

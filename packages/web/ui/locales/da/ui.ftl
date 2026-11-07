@@ -115,4 +115,4 @@ ui-passphrase-mismatch = Adgangsfraserne er ikke ens
 
 ## Encryption
 
-ui-encryption-checking = Kontrollerer…
+ui-encryption-checking = Kontrollerer

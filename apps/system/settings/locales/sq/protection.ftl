@@ -182,7 +182,7 @@ settings-encryption-summary-chip = Derisa të mbarojë, çipi i sigurisë e ruan
 settings-encryption-summary-recovery-key = Derisa të mbarojë, në nisje kërkon çelësin e rikuperimit në vend të frazëkalimit tënd.
 # Button, verb: starts encrypting this computer
 settings-encryption-encrypt = Enkripto
-settings-encryption-making-room = Po krijohet vend…
+settings-encryption-making-room = Po krijohet vend
 settings-encryption-unlocks-chip-pin = Zhbllokohet me çipin e sigurisë dhe PIN-in tënd
 settings-encryption-unlocks-chip = Zhbllokohet vetë me çipin e sigurisë
 settings-encryption-unlocks-passphrase = Kërkon frazëkalimin tënd në nisje

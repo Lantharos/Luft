@@ -197,7 +197,7 @@ settings-encryption-summary-chip = Sakemm jitlesta, iċ-ċippa tas-sigurtà żż
 settings-encryption-summary-recovery-key = Sakemm jitlesta, jitlob iċ-ċavetta tal-irkupru meta jistartja minflok il-passphrase tiegħek.
 # Button, verb: starts encrypting this computer
 settings-encryption-encrypt = Iċċifra
-settings-encryption-making-room = Qed jinħoloq l-ispazju…
+settings-encryption-making-room = Qed jinħoloq l-ispazju
 settings-encryption-unlocks-chip-pin = Tiżblokka biċ-ċippa tas-sigurtà u l-PIN
 settings-encryption-unlocks-chip = Tiżblokka waħedha biċ-ċippa tas-sigurtà
 settings-encryption-unlocks-passphrase = Titlob il-passphrase meta tistartja

@@ -29,7 +29,7 @@ Sentence case everywhere: only the first word and names take a capital letter. �
 - Question mark: the Greek question mark «;». Type it as the ordinary semicolon (U+003B), not U+037E: they look the same, U+037E turns into U+003B under Unicode normalization anyway, and fonts and search handle U+003B everywhere. Likewise the ano teleia «·» is typed as U+00B7, not U+0387; interface text rarely needs it, so prefer a full stop or comma.
 - Quotation marks: «…», with “…” inside them. No space inside the guillemets.
 - Apostrophe for elision: the typographic ’ (U+2019): «κατ’ απαίτηση». Avoid elision («σ’ αυτό») in interface text; write the full form.
-- Ellipsis: one character, «…», with no space before it: «Φόρτωση…».
+- Ellipsis: one character, «…», with no space before it. A message about something in progress, such as loading, takes none, because the app shows a spinner beside it.
 - Dash: the en dash with spaces, « – ». No em dashes.
 - Percent sign directly after the number, with no space: «57%», as Windows and phones show it in Greek. Units take a space: «4,5 W», «120 GB».
 - Key names stay as printed on Greek keyboards, which use the English names: Ctrl, Alt, Shift, Enter, Esc, Tab, Backspace, Delete, Home, End, Page Up, Page Down, Print Screen. Only the space bar, which has no label, is called «Διάστημα».

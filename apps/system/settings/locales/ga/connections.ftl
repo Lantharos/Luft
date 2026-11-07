@@ -3,7 +3,7 @@
 ## Network: shared words
 
 settings-network-save = Sábháil
-settings-network-saving = Á shábháil…
+settings-network-saving = Á shábháil
 settings-network-cancel = Cealaigh
 settings-network-connect = Ceangail
 settings-network-disconnect = Dícheangail
@@ -22,7 +22,7 @@ settings-network-connect-failed = Níorbh fhéidir ceangal
 ## Network: connection states
 
 settings-network-link-connected = Ceangailte
-settings-network-link-connecting = Ag ceangal…
+settings-network-link-connecting = Ag ceangal
 settings-network-link-disconnected = Gan cheangal
 settings-network-link-unplugged = Cábla díphlugáilte
 
@@ -91,7 +91,7 @@ settings-network-wifi-enterprise = Sínigh isteach le cuntas oibre nó scoile
 settings-network-wifi-connect-failed = Níorbh fhéidir ceangal leis an líonra seo
 settings-network-wifi-saved-password-failed = Níor oibrigh an pasfhocal sábháilte. Cuir isteach arís é.
 settings-network-wifi-settings = Socruithe an líonra
-settings-network-wifi-searching = Ag cuardach líonraí…
+settings-network-wifi-searching = Ag cuardach líonraí
 settings-network-hidden = Ceangail le líonra folaithe
     .description = Cuir isteach ainm an líonra agus an cineál slándála atá air.
 settings-network-hidden-name = Ainm an líonra
@@ -253,7 +253,7 @@ settings-network-vpn-off = As
 settings-network-vpn-none = Gan socrú
 settings-network-vpn-import = Iompórtáil ó chomhad
     .description = Comhaid chumraíochta WireGuard, OpenVPN agus VPN eile
-settings-network-vpn-importing = Á iompórtáil…
+settings-network-vpn-importing = Á iompórtáil
 settings-network-wireguard = Socraigh WireGuard
     .description = Cuir isteach na sonraí ó do sholáthraí VPN nó ó d’fhreastalaí
 settings-network-wireguard-dialog = Is féidir le do sholáthraí VPN nó le húinéir an fhreastalaí na sonraí seo a thabhairt duit.
@@ -273,7 +273,7 @@ settings-network-wireguard-keepalive = Coinneáil beo
     .description = Cuidíonn sé leis an gceangal fanacht ar bun taobh thiar de ródaire
     .placeholder = Roghnach, i soicindí
 settings-network-wireguard-add = Cuir leis
-settings-network-wireguard-adding = Á chur leis…
+settings-network-wireguard-adding = Á chur leis
 settings-network-wireguard-error-private-key = Cuir isteach nó gin eochair phríobháideach
 settings-network-wireguard-error-addresses = Cuir isteach seoladh amháin ar a laghad
 settings-network-wireguard-error-server-key = Cuir isteach eochair phoiblí an fhreastalaí
@@ -301,16 +301,16 @@ settings-bluetooth-visible-until-off = Go dtí go gcastar as é
 settings-bluetooth-visible-failed = Níorbh fhéidir a athrú an bhfuil an ríomhaire seo infheicthe
 settings-bluetooth-paired = Mo ghléasanna
 settings-bluetooth-nearby = Gléasanna in aice láimhe
-settings-bluetooth-searching = Ag cuardach gléasanna…
+settings-bluetooth-searching = Ag cuardach gléasanna
     .description = Cuir an gléas is mian leat a chur leis i mód péireála
 settings-bluetooth-blocked = Tá Bluetooth casta as le lasc crua-earraí
     .description = Úsáid an lasc nó an eochair ar do ríomhaire chun é a chasadh air
 settings-bluetooth-details = Sonraí an ghléis
 settings-bluetooth-connected = Ceangailte
 settings-bluetooth-connected-battery = Ceangailte · ceallra { $battery }
-settings-bluetooth-connecting = Ag ceangal…
-settings-bluetooth-disconnecting = Ag dícheangal…
-settings-bluetooth-pairing = Ag péireáil…
+settings-bluetooth-connecting = Ag ceangal
+settings-bluetooth-disconnecting = Ag dícheangal
+settings-bluetooth-pairing = Ag péireáil
 settings-bluetooth-forget-confirm = Bain “{ $name }”?
     .description = Beidh ort é a phéireáil arís chun é a úsáid leis an ríomhaire seo.
 settings-bluetooth-forget = Bain

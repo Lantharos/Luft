@@ -117,4 +117,4 @@ ui-passphrase-mismatch = Hesla k disku se neshodují
 
 ## Encryption
 
-ui-encryption-checking = Kontrola…
+ui-encryption-checking = Kontrola

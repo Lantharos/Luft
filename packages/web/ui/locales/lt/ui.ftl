@@ -117,4 +117,4 @@ ui-passphrase-mismatch = Slaptafrazės nesutampa
 
 ## Encryption
 
-ui-encryption-checking = Tikrinama…
+ui-encryption-checking = Tikrinama

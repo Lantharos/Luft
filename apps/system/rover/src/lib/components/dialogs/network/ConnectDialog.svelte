@@ -2,7 +2,7 @@
 	import Server from '@lucide/svelte/icons/server';
 	import X from '@lucide/svelte/icons/x';
 	import { tick } from 'svelte';
-	import { Checkbox, Dialog, TextField } from '@luft/ui';
+	import { Checkbox, Dialog, Spinner, TextField } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { NetworkPlace } from '#lib/bindings.js';
 	import { normalizeAddress, protocolName } from '#lib/file-manager/location/addresses.js';
@@ -84,7 +84,7 @@
 		<div class="flex flex-col gap-1.5">
 			<span class="px-1 text-[13px] font-medium text-[var(--text-soft)]">On this network</span>
 			{#if nearby === null}
-				<p class="px-1 text-[12.5px] text-[var(--text-muted)]">Looking for servers…</p>
+				<p class="flex items-center gap-2 px-1 text-[12.5px] text-[var(--text-muted)]"><Spinner size={13} />Looking for servers</p>
 			{:else}
 				<div class="row-group">
 					{#each nearby as place (place.uri)}

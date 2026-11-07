@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { Row, Section } from '@luft/ui';
+	import { Row, Section, Spinner } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { Activity, Firmware, UpdatePolicy } from '#lib/bindings.js';
 	import { updates } from '#lib/state/updates.svelte.js';
@@ -62,7 +62,9 @@
 		title={t('settings-updates-app-updates')}
 		description={apps === null ? t('settings-updates-apps-checking') : t('settings-updates-apps-count', { count: apps })}
 		onclick={openApps}
-	/>
+	>
+		{#if apps === null}<Spinner />{/if}
+	</Row>
 	{#each info?.sabine ?? [] as app (app.name)}
 		<Row
 			title={t('settings-updates-sabine-waiting', { app: app.name })}

@@ -182,7 +182,7 @@ settings-encryption-summary-chip = Fins que acabi, el xip de seguretat guarda la
 settings-encryption-summary-recovery-key = Fins que acabi, en arrencar demana la clau de recuperació en lloc de la frase de pas.
 # Button, verb: starts encrypting this computer
 settings-encryption-encrypt = Xifra
-settings-encryption-making-room = Fent lloc…
+settings-encryption-making-room = Fent lloc
 settings-encryption-unlocks-chip-pin = Es desbloqueja amb el xip de seguretat i el PIN
 settings-encryption-unlocks-chip = Es desbloqueja sol amb el xip de seguretat
 settings-encryption-unlocks-passphrase = Demana la frase de pas en arrencar

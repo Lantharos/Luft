@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { bytes, Dialog, errorText } from '@luft/ui';
+	import { bytes, Dialog, errorText, Spinner } from '@luft/ui';
 	import { commands, events } from '#lib/bindings.js';
 	import type { OtherSystem, Removed } from '#lib/bindings.js';
 	import { CANCELLED, WAIT, openFolder } from '#lib/bridge/index.js';
@@ -165,7 +165,7 @@
 			<button type="button" class="button" onclick={onclose}>Cancel</button>
 			<button type="button" class="button danger" onclick={remove}>Remove {shortName(system)}</button>
 		{:else if phase === 'working'}
-			<button type="button" class="button" disabled>Removing…</button>
+			<button type="button" class="button" disabled><Spinner />Removing</button>
 		{:else if phase === 'failed'}
 			<button type="button" class="button primary" onclick={onclose}>Close</button>
 		{:else}

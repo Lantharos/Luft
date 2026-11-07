@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Dialog, errorText, PasswordField } from '@luft/ui';
+	import { Dialog, errorText, PasswordField, Spinner } from '@luft/ui';
 	import type { Account, NewSecret } from '#lib/bindings.js';
 	import * as api from '#lib/bridge/index.js';
 	import { mail } from '#lib/mail/mail.svelte.js';
@@ -63,7 +63,8 @@
 		<button type="button" class="button" onclick={onclose}>Cancel</button>
 		<button type="button" class="button primary" disabled={busy} onclick={() => void signIn()}>
 			{#if busy}
-				{provider ? 'Waiting for sign-in…' : 'Connecting…'}
+				<Spinner />
+				{provider ? 'Waiting for sign-in' : 'Connecting'}
 			{:else}
 				{provider ? `Continue with ${PROVIDER_NAMES[provider]}` : 'Sign in'}
 			{/if}

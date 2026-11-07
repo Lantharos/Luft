@@ -29,7 +29,7 @@ Sentence case everywhere: only the first word and names take a capital letter. �
 
 - Quotation marks: «…», and “…” inside them.
 - Questions open with ¿. Exclamations aren't used.
-- Ellipsis: one character, «…», attached to the word before it: «Cargando…».
+- Ellipsis: one character, «…», attached to the word before it. A message about something in progress, such as loading, takes none, because the app shows a spinner beside it.
 - Dashes: avoid them in short interface text. In longer text use the raya «—» for an aside, attached to the words it encloses: «el disco —si está cifrado— pide la clave». Never a hyphen in place of a dash.
 - Percent sign and units take a no-break space after the number: «57 %», «4,5 W».
 - Key names follow Spanish keyboards: Ctrl, Alt, Mayús, Intro, Esc, Supr, Insert, Inicio, Fin, Re Pág, Av Pág, Impr Pant, Retroceso, Espacio. These come from translatable key names, so translate them where they appear.

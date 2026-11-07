@@ -70,7 +70,7 @@ settings-users-password-new-placeholder = { $count ->
 settings-users-password-confirm = Doğrula
 settings-users-password-confirm-placeholder = Yeniden yazın
 settings-users-password-change = Parolayı değiştir
-settings-users-password-changing = Değiştiriliyor…
+settings-users-password-changing = Değiştiriliyor
 settings-users-password-wrong = Geçerli parolanız bu değil
 settings-users-password-mismatch = Parolalar eşleşmiyor
 settings-users-password-too-short = Bu parola çok kısa
@@ -124,11 +124,11 @@ settings-login-automatic-off = Kapalı
 
 ## Updates
 
-settings-updates-checking = Güncellemeler aranıyor…
-settings-updates-downloading = Güncellemeler indiriliyor…
-settings-updates-rolling-back = Önceki sürüm hazırlanıyor…
-settings-updates-switching-nvidia = NVIDIA sürücüsü indiriliyor…
-settings-updates-switching-standard = Standart sistem görüntüsü indiriliyor…
+settings-updates-checking = Güncellemeler aranıyor
+settings-updates-downloading = Güncellemeler indiriliyor
+settings-updates-rolling-back = Önceki sürüm hazırlanıyor
+settings-updates-switching-nvidia = NVIDIA sürücüsü indiriliyor
+settings-updates-switching-standard = Standart sistem görüntüsü indiriliyor
 settings-updates-up-to-date = Sisteminiz güncel
 settings-updates-version = Sürüm { $version }
 settings-updates-version-new = Yeni bir sürüm
@@ -148,9 +148,9 @@ settings-updates-last-checked = Son denetim: { $when }
 settings-updates-never-checked = Henüz denetlenmedi
 settings-updates-stop = Durdur
 settings-updates-check = Şimdi denetle
-settings-updates-checking-button = Denetleniyor…
+settings-updates-checking-button = Denetleniyor
 settings-updates-app-updates = Uygulama güncellemeleri
-settings-updates-apps-checking = Uygulamalarınız için güncellemeler aranıyor…
+settings-updates-apps-checking = Uygulamalarınız için güncellemeler aranıyor
 settings-updates-apps-count = { $count ->
     [0] Schelf uygulamasında yönetilir
     [one] Schelf uygulamasında { $count } uygulamanın güncellemesi var
@@ -171,7 +171,7 @@ settings-updates-background-description = Güncellemeler bir sonraki yeniden ba�
 settings-updates-firmware = Üretici yazılımı
 settings-updates-firmware-description = Donanımınızın içindeki yazılım için güncellemeler
 settings-updates-firmware-restart = Yeniden başlattığınızda tamamlanır
-settings-updates-firmware-installing = Yükleniyor…
+settings-updates-firmware-installing = Yükleniyor
 settings-updates-firmware-update = Güncelle
 settings-updates-firmware-failed = Üretici yazılımı güncellenemedi
 settings-updates-download = İndir
@@ -262,7 +262,7 @@ settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud y
 settings-accounts-sign-in-again-needed = Kullanmaya devam etmek için yeniden oturum açın
 settings-accounts-paused-metered = Tarifeli bağlantıda eşitleme duraklatıldı
 settings-accounts-paused-battery = Pil azken eşitleme duraklatıldı
-settings-accounts-connecting = Bağlanıyor…
+settings-accounts-connecting = Bağlanıyor
 settings-accounts-offline = Çevrimdışı
 settings-accounts-offline-kept = Çevrimdışı, saklanan dosyalar hâlâ burada
 settings-accounts-not-connected = Bağlı değil
@@ -285,7 +285,7 @@ settings-accounts-sign-in-again = Yeniden oturum aç
 settings-accounts-keep = Sakla
 settings-accounts-remove = Kaldır
 settings-accounts-remove-confirm = Bu bilgisayardan kaldır
-settings-accounts-removing = Kaldırılıyor…
+settings-accounts-removing = Kaldırılıyor
 settings-accounts-remove-note = Dosyalarınız { $provider } hesabınızda kalır. Burada yapılan değişiklikler önce oraya gönderilir.
 
 ## Accounts: providers
@@ -318,7 +318,7 @@ settings-accounts-continue-in-browser = Tarayıcıda devam et
 settings-accounts-sign-in = Oturum aç
 settings-accounts-try-again = Yeniden dene
 settings-accounts-continue = Devam et
-settings-accounts-working = { $provider } ile iletişim kuruluyor…
+settings-accounts-working = { $provider } ile iletişim kuruluyor
 settings-accounts-finish-in-browser = Tarayıcınızda { $provider } ile oturum açmayı tamamlayın. Luft parolanızı hiçbir zaman görmez; işiniz bittiğinde bu sayfa kendiliğinden güncellenir.
 settings-accounts-no-browser = Tarayıcı açılmadı. Bağlantıyı kopyalayıp bir tarayıcıda açın.
 settings-accounts-open-again = Sayfayı yeniden aç

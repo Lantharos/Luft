@@ -31,7 +31,7 @@ Sentence case everywhere: only the first word and names take a capital letter. �
 - Apostrophe: always the typographic ’, never ': «l’aplicació», «d’energia», «s’ha desat». Apostrophize the article and de before a vowel or h as usual, but not before the names of letters or before words starting with a stressed i/u sound that isn’t a vowel (el Wi-Fi).
 - Geminated l: always l·l with the middle dot U+00B7, never l.l or a bullet: «instal·lar», «cancel·la», «col·locar».
 - Quotation marks: «…», and “…” inside them.
-- Ellipsis: one character, «…», attached to the word before it: «S’està carregant…».
+- Ellipsis: one character, «…», attached to the word before it. A message about something in progress, such as loading, takes none, because the app shows a spinner beside it.
 - Dashes: avoid them in short interface text. In longer text use the em dash «—» for an aside, attached to the words it encloses. Never a hyphen in place of a dash.
 - Percent sign and units take a no-break space after the number: «57 %», «4,5 W».
 - Key names follow Catalan software and Spanish-layout keyboards: Ctrl, Alt, Maj, Retorn, Esc, Supr, Insert, Inici, Fi, Re Pàg, Av Pàg, Impr Pant, Retrocés, Espai. These come from translatable key names, so translate them where they appear.

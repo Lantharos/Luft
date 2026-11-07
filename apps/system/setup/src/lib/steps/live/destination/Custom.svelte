@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Box from '@lucide/svelte/icons/box';
 	import { t } from '@luft/i18n';
-	import { bytes } from '@luft/ui';
+	import { bytes, Spinner } from '@luft/ui';
 	import { openDisks } from '#lib/bridge/system.js';
 	import OptionRow from '#lib/components/OptionRow.svelte';
 	import { install } from '#lib/state/install.svelte.js';
@@ -24,7 +24,7 @@
 	<div class="flex flex-wrap items-center gap-2">
 		<button type="button" class="button large" onclick={open}>{t('setup-custom-open-disks')}</button>
 		<button type="button" class="plain-button large" disabled={install.surveying} onclick={() => install.look()}>
-			{t(install.surveying ? 'setup-custom-looking' : 'setup-custom-look-again')}
+			{#if install.surveying}<Spinner />{/if}{t(install.surveying ? 'setup-custom-looking' : 'setup-custom-look-again')}
 		</button>
 		{#if problem}
 			<span class="text-[13px] text-[var(--danger)]">{problem}</span>

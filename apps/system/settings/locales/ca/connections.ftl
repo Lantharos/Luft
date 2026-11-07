@@ -3,7 +3,7 @@
 ## Network: shared words
 
 settings-network-save = Desa
-settings-network-saving = S’està desant…
+settings-network-saving = S’està desant
 settings-network-cancel = Cancel·la
 settings-network-connect = Connecta
 settings-network-disconnect = Desconnecta
@@ -22,7 +22,7 @@ settings-network-connect-failed = No s’ha pogut connectar
 ## Network: connection states
 
 settings-network-link-connected = Connectat
-settings-network-link-connecting = S’està connectant…
+settings-network-link-connecting = S’està connectant
 settings-network-link-disconnected = No connectat
 settings-network-link-unplugged = Cable desconnectat
 
@@ -88,7 +88,7 @@ settings-network-wifi-enterprise = Inicieu la sessió amb un compte de la feina 
 settings-network-wifi-connect-failed = No s’ha pogut connectar a aquesta xarxa
 settings-network-wifi-saved-password-failed = La contrasenya desada no ha funcionat. Torneu-la a introduir.
 settings-network-wifi-settings = Configuració de la xarxa
-settings-network-wifi-searching = S’estan cercant xarxes…
+settings-network-wifi-searching = S’estan cercant xarxes
 settings-network-hidden = Connecta’t a una xarxa oculta
     .description = Introduïu el nom de la xarxa i com està protegida.
 settings-network-hidden-name = Nom de la xarxa
@@ -247,7 +247,7 @@ settings-network-vpn-off = Desactivat
 settings-network-vpn-none = Sense configurar
 settings-network-vpn-import = Importa des d’un fitxer
     .description = Fitxers de configuració de WireGuard, OpenVPN i altres VPN
-settings-network-vpn-importing = S’està important…
+settings-network-vpn-importing = S’està important
 settings-network-wireguard = Configura WireGuard
     .description = Introduïu les dades del vostre proveïdor de VPN o del servidor
 settings-network-wireguard-dialog = El vostre proveïdor de VPN o el propietari del servidor us poden donar aquestes dades.
@@ -267,7 +267,7 @@ settings-network-wireguard-keepalive = Manteniment de la connexió
     .description = Ajuda a mantenir la connexió activa darrere d’un encaminador
     .placeholder = Opcional, en segons
 settings-network-wireguard-add = Afegeix
-settings-network-wireguard-adding = S’està afegint…
+settings-network-wireguard-adding = S’està afegint
 settings-network-wireguard-error-private-key = Introduïu o genereu una clau privada
 settings-network-wireguard-error-addresses = Introduïu com a mínim una adreça
 settings-network-wireguard-error-server-key = Introduïu la clau pública del servidor
@@ -292,16 +292,16 @@ settings-bluetooth-visible-until-off = Fins que es desactivi
 settings-bluetooth-visible-failed = No s’ha pogut canviar si aquest ordinador és visible
 settings-bluetooth-paired = Els meus dispositius
 settings-bluetooth-nearby = Dispositius propers
-settings-bluetooth-searching = S’estan cercant dispositius…
+settings-bluetooth-searching = S’estan cercant dispositius
     .description = Poseu el dispositiu que voleu afegir en mode de vinculació
 settings-bluetooth-blocked = Un interruptor físic ha desactivat el Bluetooth
     .description = Feu servir l’interruptor o la tecla de l’ordinador per activar-lo
 settings-bluetooth-details = Detalls del dispositiu
 settings-bluetooth-connected = Connectat
 settings-bluetooth-connected-battery = Connectat · Bateria: { $battery }
-settings-bluetooth-connecting = S’està connectant…
-settings-bluetooth-disconnecting = S’està desconnectant…
-settings-bluetooth-pairing = S’està vinculant…
+settings-bluetooth-connecting = S’està connectant
+settings-bluetooth-disconnecting = S’està desconnectant
+settings-bluetooth-pairing = S’està vinculant
 settings-bluetooth-forget-confirm = Voleu oblidar «{ $name }»?
     .description = L’haureu de tornar a vincular per fer-lo servir amb aquest ordinador.
 settings-bluetooth-forget = Oblida

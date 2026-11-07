@@ -3,7 +3,7 @@
 ## Network: shared words
 
 settings-network-save = Issejvja
-settings-network-saving = Qed jissejvja…
+settings-network-saving = Qed jissejvja
 settings-network-cancel = Ikkanċella
 settings-network-connect = Ikkonnettja
 settings-network-disconnect = Skonnettja
@@ -22,7 +22,7 @@ settings-network-connect-failed = Il-konnessjoni ma rnexxietx
 ## Network: connection states
 
 settings-network-link-connected = Ikkonnettjat
-settings-network-link-connecting = Qed jikkonnettja…
+settings-network-link-connecting = Qed jikkonnettja
 settings-network-link-disconnected = Mhux ikkonnettjat
 settings-network-link-unplugged = Kejbil mhux imdaħħal
 
@@ -91,7 +91,7 @@ settings-network-wifi-enterprise = Idħol b’kont tax-xogħol jew tal-iskola
 settings-network-wifi-connect-failed = Il-konnessjoni ma’ dan in-netwerk ma rnexxietx
 settings-network-wifi-saved-password-failed = Il-password issejvjata ma ħadmitx. Erġa’ daħħalha.
 settings-network-wifi-settings = Settings tan-netwerk
-settings-network-wifi-searching = Qed jitfittxew netwerks…
+settings-network-wifi-searching = Qed jitfittxew netwerks
 settings-network-hidden = Ikkonnettja ma’ netwerk moħbi
     .description = Daħħal l-isem tan-netwerk u kif inhu protett.
 settings-network-hidden-name = Isem tan-netwerk
@@ -253,7 +253,7 @@ settings-network-vpn-off = Mitfi
 settings-network-vpn-none = Mhux issettjat
 settings-network-vpn-import = Importa minn fajl
     .description = Fajls tal-konfigurazzjoni ta’ WireGuard, OpenVPN u VPNs oħra
-settings-network-vpn-importing = Qed jimporta…
+settings-network-vpn-importing = Qed jimporta
 settings-network-wireguard = Issettja WireGuard
     .description = Daħħal id-dettalji mill-fornitur jew mis-server tal-VPN
 settings-network-wireguard-dialog = Il-fornitur tal-VPN jew is-sid tas-server jista’ jagħtik dawn id-dettalji.
@@ -273,7 +273,7 @@ settings-network-wireguard-keepalive = Keepalive
     .description = Tgħin biex il-konnessjoni tibqa’ attiva wara router
     .placeholder = Fakultattiv, f’sekondi
 settings-network-wireguard-add = Żid
-settings-network-wireguard-adding = Qed iżid…
+settings-network-wireguard-adding = Qed iżid
 settings-network-wireguard-error-private-key = Daħħal jew iġġenera ċavetta privata
 settings-network-wireguard-error-addresses = Daħħal mill-inqas indirizz wieħed
 settings-network-wireguard-error-server-key = Daħħal iċ-ċavetta pubblika tas-server
@@ -301,16 +301,16 @@ settings-bluetooth-visible-until-off = Sakemm jintefa
 settings-bluetooth-visible-failed = Ma setax jinbidel jekk dan il-kompjuter jidhirx
 settings-bluetooth-paired = L-apparati tiegħi
 settings-bluetooth-nearby = Apparati fil-qrib
-settings-bluetooth-searching = Qed jitfittxew apparati…
+settings-bluetooth-searching = Qed jitfittxew apparati
     .description = Poġġi l-apparat li trid iżżid f’modalità ta’ tqabbil
 settings-bluetooth-blocked = Il-Bluetooth huwa mitfi minn swiċċ tal-hardware
     .description = Uża s-swiċċ jew it-tast fuq il-kompjuter biex tixgħlu
 settings-bluetooth-details = Dettalji tal-apparat
 settings-bluetooth-connected = Ikkonnettjat
 settings-bluetooth-connected-battery = Ikkonnettjat · batterija { $battery }
-settings-bluetooth-connecting = Qed jikkonnettja…
-settings-bluetooth-disconnecting = Qed jiskonnettja…
-settings-bluetooth-pairing = Qed jitqabbad…
+settings-bluetooth-connecting = Qed jikkonnettja
+settings-bluetooth-disconnecting = Qed jiskonnettja
+settings-bluetooth-pairing = Qed jitqabbad
 settings-bluetooth-forget-confirm = Tinsa “{ $name }”?
     .description = Biex terġa’ tużah ma’ dan il-kompjuter, ikollok terġa’ tqabbdu.
 settings-bluetooth-forget = Insa

@@ -4,7 +4,7 @@
 ## Network: shared words
 
 settings-network-save = Salvesta
-settings-network-saving = Salvestamine…
+settings-network-saving = Salvestamine
 settings-network-cancel = Loobu
 settings-network-connect = Ühenda
 settings-network-disconnect = Katkesta ühendus
@@ -23,7 +23,7 @@ settings-network-connect-failed = Ühendamine ebaõnnestus
 ## Network: connection states
 
 settings-network-link-connected = Ühendatud
-settings-network-link-connecting = Ühendamine…
+settings-network-link-connecting = Ühendamine
 settings-network-link-disconnected = Pole ühendatud
 settings-network-link-unplugged = Kaabel pole ühendatud
 
@@ -90,7 +90,7 @@ settings-network-wifi-enterprise = Logi sisse töö- või koolikontoga
 settings-network-wifi-connect-failed = Selle võrguga ei õnnestunud ühenduda
 settings-network-wifi-saved-password-failed = Salvestatud salasõna ei sobinud. Sisesta see uuesti.
 settings-network-wifi-settings = Võrgu seadistused
-settings-network-wifi-searching = Võrkude otsimine…
+settings-network-wifi-searching = Võrkude otsimine
 settings-network-hidden = Ühenda peidetud võrguga
     .description = Sisesta võrgu nimi ja turbe tüüp.
 settings-network-hidden-name = Võrgu nimi
@@ -247,7 +247,7 @@ settings-network-vpn-off = Väljas
 settings-network-vpn-none = Seadistamata
 settings-network-vpn-import = Impordi failist
     .description = WireGuardi, OpenVPN-i ja muud VPN-i konfiguratsioonifailid
-settings-network-vpn-importing = Importimine…
+settings-network-vpn-importing = Importimine
 settings-network-wireguard = Seadista WireGuard
     .description = Sisesta andmed, mille said VPN-i pakkujalt või serverist
 settings-network-wireguard-dialog = Need andmed saad oma VPN-i pakkujalt või serveri omanikult.
@@ -267,7 +267,7 @@ settings-network-wireguard-keepalive = Elushoidmine
     .description = Aitab ühendusel ruuteri taga püsida
     .placeholder = Valikuline, sekundites
 settings-network-wireguard-add = Lisa
-settings-network-wireguard-adding = Lisamine…
+settings-network-wireguard-adding = Lisamine
 settings-network-wireguard-error-private-key = Sisesta või loo privaatvõti
 settings-network-wireguard-error-addresses = Sisesta vähemalt üks aadress
 settings-network-wireguard-error-server-key = Sisesta serveri avalik võti
@@ -293,16 +293,16 @@ settings-bluetooth-visible-until-off = Kuni väljalülitamiseni
 settings-bluetooth-visible-failed = Selle arvuti nähtavust ei õnnestunud muuta
 settings-bluetooth-paired = Minu seadmed
 settings-bluetooth-nearby = Lähedalasuvad seadmed
-settings-bluetooth-searching = Seadmete otsimine…
+settings-bluetooth-searching = Seadmete otsimine
     .description = Lülita lisatav seade sidumisrežiimi
 settings-bluetooth-blocked = Bluetooth on riistvaralülitiga välja lülitatud
     .description = Lülita see sisse arvuti lüliti või klahviga
 settings-bluetooth-details = Seadme üksikasjad
 settings-bluetooth-connected = Ühendatud
 settings-bluetooth-connected-battery = Ühendatud · aku { $battery }
-settings-bluetooth-connecting = Ühendamine…
-settings-bluetooth-disconnecting = Ühenduse katkestamine…
-settings-bluetooth-pairing = Sidumine…
+settings-bluetooth-connecting = Ühendamine
+settings-bluetooth-disconnecting = Ühenduse katkestamine
+settings-bluetooth-pairing = Sidumine
 settings-bluetooth-forget-confirm = Kas unustada „{ $name }“?
     .description = Selle arvutiga kasutamiseks tuleb seade uuesti siduda.
 settings-bluetooth-forget = Unusta

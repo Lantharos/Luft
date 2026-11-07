@@ -118,4 +118,4 @@ ui-passphrase-mismatch = Il-passphrases ma jaqblux
 
 ## Encryption
 
-ui-encryption-checking = Qed jiċċekkja…
+ui-encryption-checking = Qed jiċċekkja

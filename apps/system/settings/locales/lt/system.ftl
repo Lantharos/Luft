@@ -72,7 +72,7 @@ settings-users-password-new-placeholder = { $count ->
 settings-users-password-confirm = Patvirtinti
 settings-users-password-confirm-placeholder = Įveskite dar kartą
 settings-users-password-change = Keisti slaptažodį
-settings-users-password-changing = Keičiama…
+settings-users-password-changing = Keičiama
 settings-users-password-wrong = Tai ne jūsų dabartinis slaptažodis
 settings-users-password-mismatch = Slaptažodžiai nesutampa
 settings-users-password-too-short = Šis slaptažodis per trumpas
@@ -128,11 +128,11 @@ settings-login-automatic-off = Išjungtas
 
 ## Updates
 
-settings-updates-checking = Ieškoma naujinimų…
-settings-updates-downloading = Atsisiunčiami naujinimai…
-settings-updates-rolling-back = Ruošiama ankstesnė versija…
-settings-updates-switching-nvidia = Atsisiunčiama NVIDIA tvarkyklė…
-settings-updates-switching-standard = Atsisiunčiamas standartinis atvaizdis…
+settings-updates-checking = Ieškoma naujinimų
+settings-updates-downloading = Atsisiunčiami naujinimai
+settings-updates-rolling-back = Ruošiama ankstesnė versija
+settings-updates-switching-nvidia = Atsisiunčiama NVIDIA tvarkyklė
+settings-updates-switching-standard = Atsisiunčiamas standartinis atvaizdis
 settings-updates-up-to-date = Jūsų sistema naujausia
 settings-updates-version = Versija { $version }
 settings-updates-version-new = Nauja versija
@@ -152,9 +152,9 @@ settings-updates-last-checked = Paskutinį kartą tikrinta { $when }
 settings-updates-never-checked = Dar netikrinta
 settings-updates-stop = Sustabdyti
 settings-updates-check = Tikrinti dabar
-settings-updates-checking-button = Tikrinama…
+settings-updates-checking-button = Tikrinama
 settings-updates-app-updates = Programų naujinimai
-settings-updates-apps-checking = Ieškoma jūsų programų naujinimų…
+settings-updates-apps-checking = Ieškoma jūsų programų naujinimų
 settings-updates-apps-count = { $count ->
     [0] Tvarkoma programoje Schelf
     [one] Programoje Schelf galima atnaujinti { $count } programą
@@ -177,7 +177,7 @@ settings-updates-background-description = Naujinimai bus paruošti įdiegti kit�
 settings-updates-firmware = Programinė aparatinė įranga
 settings-updates-firmware-description = Į aparatinę įrangą įdiegtos programinės įrangos naujinimai
 settings-updates-firmware-restart = Bus baigta paleidus iš naujo
-settings-updates-firmware-installing = Diegiama…
+settings-updates-firmware-installing = Diegiama
 settings-updates-firmware-update = Atnaujinti
 settings-updates-firmware-failed = Nepavyko atnaujinti programinės aparatinės įrangos
 settings-updates-download = Atsisiųsti
@@ -268,7 +268,7 @@ settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud a
 settings-accounts-sign-in-again-needed = Prisijunkite iš naujo, kad galėtumėte toliau naudotis
 settings-accounts-paused-metered = Sinchronizavimas pristabdytas, nes ryšys matuojamas
 settings-accounts-paused-battery = Sinchronizavimas pristabdytas, nes akumuliatorius beveik išsikrovęs
-settings-accounts-connecting = Jungiamasi…
+settings-accounts-connecting = Jungiamasi
 settings-accounts-offline = Neprisijungta
 settings-accounts-offline-kept = Neprisijungta, išlaikyti failai vis tiek pasiekiami
 settings-accounts-not-connected = Neprisijungta
@@ -295,7 +295,7 @@ settings-accounts-sign-in-again = Prisijungti iš naujo
 settings-accounts-keep = Palikti
 settings-accounts-remove = Pašalinti
 settings-accounts-remove-confirm = Pašalinti iš šio kompiuterio
-settings-accounts-removing = Šalinama…
+settings-accounts-removing = Šalinama
 settings-accounts-remove-note = Jūsų failai lieka tarnyboje { $provider }. Čia atlikti pakeitimai pirmiausia išsiunčiami.
 
 ## Accounts: providers
@@ -328,7 +328,7 @@ settings-accounts-continue-in-browser = Tęsti naršyklėje
 settings-accounts-sign-in = Prisijungti
 settings-accounts-try-again = Bandyti dar kartą
 settings-accounts-continue = Tęsti
-settings-accounts-working = Susisiekiama su { $provider }…
+settings-accounts-working = Susisiekiama su { $provider }
 settings-accounts-finish-in-browser = Baikite prisijungti per { $provider } naršyklėje. Luft niekada nemato jūsų slaptažodžio, o kai baigsite, šis langas atsinaujins pats.
 settings-accounts-no-browser = Naršyklė neatsidarė. Nukopijuokite nuorodą ir atidarykite ją naršyklėje.
 settings-accounts-open-again = Atidaryti puslapį dar kartą

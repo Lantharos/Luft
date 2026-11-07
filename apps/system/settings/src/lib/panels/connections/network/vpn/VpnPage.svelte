@@ -4,7 +4,7 @@
 	import Settings from '@lucide/svelte/icons/settings';
 	import Shield from '@lucide/svelte/icons/shield';
 	import { t } from '@luft/i18n';
-	import { errorText, IconButton, Row, Section, Switch } from '@luft/ui';
+	import { errorText, IconButton, Row, Section, Spinner, Switch } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';
 	import { waitForPerson, type Vpn } from '@luft/network';
 	import { commands } from '#lib/bindings.js';
@@ -61,7 +61,9 @@
 			disabled={importing}
 			onclick={importFile}
 			below={importProblem ? importNote : undefined}
-		/>
+		>
+			{#if importing}<Spinner />{/if}
+		</Row>
 		<Row
 			title={t('settings-network-wireguard')}
 			icon={KeyRound}

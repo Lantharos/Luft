@@ -8,7 +8,7 @@ setup-try-again = Bandyti dar kartą
 setup-restart = Paleisti iš naujo
 setup-restart-now = Paleisti iš naujo dabar
 setup-restart-later = Paleisti iš naujo vėliau
-setup-saving = Įrašoma…
+setup-saving = Įrašoma
 
 ## Install progress, shown at the bottom of every step while Luft copies
 
@@ -51,7 +51,7 @@ setup-destination-meet-title = Šalia Windows
 setup-destination-meet-description = Meet Luft jau paruošė vietos, todėl Windows lieka visiškai nepakeista.
 setup-destination-meet-drive-title = Diske { $drive }
 setup-destination-meet-drive-description = Meet Luft jau paruošė vietos kitame diske, o Luft pasileidžia iš ten su savo paleidimo failais.
-setup-destination-looking = Tikrinami diskai…
+setup-destination-looking = Tikrinami diskai
 
 setup-destination-meet-choice = Šalia Windows
 setup-destination-meet-choice-description = Naudoti { $size }, kuriuos Meet Luft paruošė šalia Windows.
@@ -69,7 +69,7 @@ setup-destination-custom-choice = Pasirinktinai
 setup-destination-custom-choice-description = Patys sutvarkykite skaidinius programoje Diskai.
 
 setup-destination-more-options = Daugiau parinkčių
-setup-destination-starting = Paleidžiama…
+setup-destination-starting = Paleidžiama
 setup-destination-replace = Pakeisti
 setup-destination-install = Įdiegti Luft
 
@@ -131,7 +131,7 @@ setup-drive-partitions = { $count ->
 ## Custom space
 
 setup-custom-open-disks = Atidaryti Diskus
-setup-custom-looking = Tikrinama…
+setup-custom-looking = Tikrinama
 setup-custom-look-again = Patikrinti dar kartą
 setup-custom-free-label = Laisva vieta
 setup-custom-free-space = Laisva vieta: { $size }
@@ -183,14 +183,14 @@ setup-replace-blocked-read-only = Jos diskas skirtas tik skaityti.
 setup-network-title = Prisijunkite prie interneto
 setup-network-description = Tai nebūtina. Prisijungus prie interneto, Luft galės nustatyti laikrodį ir laiko juostą, o diegimo metu galėsite naudotis internetu.
 setup-network-unavailable = Tinklai šiuo metu nepasiekiami. Prisijungti galėsite vėliau iš skydelio.
-setup-network-looking = Ieškoma tinklų…
+setup-network-looking = Ieškoma tinklų
 setup-network-cable = Prijungta kabeliu
 setup-network-show-all = Rodyti visus tinklus
 setup-network-skip = Praleisti
 setup-network-failed = Nepavyko prisijungti
 setup-network-wrong-password = Neteisingas slaptažodis
 setup-network-connected = Prisijungta
-setup-network-connecting = Jungiamasi…
+setup-network-connecting = Jungiamasi
 setup-network-saved = Įrašytas
 setup-network-password = Slaptažodis
 setup-network-join = Prisijungti
@@ -248,7 +248,7 @@ setup-enroll-digits = { $count ->
 setup-secure-boot-title = Kompiuteris dar nepasitiki sistema Luft
 setup-secure-boot-code = Iškart po kito paleidimo iš naujo mėlyname ekrane bus paprašyta pasitikėti sistema Luft. Ten klaviatūra įveskite šį kodą.
 setup-secure-boot-skipped = Mėlynas ekranas buvo praleistas. Gaukite naują kodą ir paleiskite iš naujo, tada ten naudokite klaviatūrą.
-setup-secure-boot-getting = Gaunamas kodas…
+setup-secure-boot-getting = Gaunamas kodas
 setup-secure-boot-new-code = Gauti naują kodą
 
 ## Encryption

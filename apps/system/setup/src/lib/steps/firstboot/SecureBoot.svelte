@@ -6,6 +6,7 @@
 	import EnrollSteps from '#lib/components/trust/EnrollSteps.svelte';
 	import { flow } from '#lib/state/flow.svelte.js';
 	import { setup } from '#lib/state/setup.svelte.js';
+	import { Spinner } from '@luft/ui';
 
 	let busy = $state(false);
 	let problem = $state('');
@@ -42,7 +43,7 @@
 			<button type="button" class="button primary large px-6" onclick={restartNow}>{t('setup-restart-now')}</button>
 		{:else}
 			<button type="button" class="plain-button large" disabled={busy} onclick={() => flow.next()}>{t('setup-not-now')}</button>
-			<button type="button" class="button primary large px-6" disabled={busy} onclick={getCode}>{t(busy ? 'setup-secure-boot-getting' : 'setup-secure-boot-new-code')}</button>
+			<button type="button" class="button primary large px-6" disabled={busy} onclick={getCode}>{#if busy}<Spinner />{/if}{t(busy ? 'setup-secure-boot-getting' : 'setup-secure-boot-new-code')}</button>
 		{/if}
 	{/snippet}
 </StepFrame>

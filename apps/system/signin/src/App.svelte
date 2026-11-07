@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { appearance, WindowControls } from '@luft/ui';
+	import { appearance, Spinner, WindowControls } from '@luft/ui';
 	import Lock from '@lucide/svelte/icons/lock';
 	import LockOpen from '@lucide/svelte/icons/lock-open';
 	import RotateCw from '@lucide/svelte/icons/rotate-cw';
@@ -46,6 +46,6 @@
 		<WindowControls />
 	</header>
 	<div bind:this={page} class="grid min-h-0 flex-1 place-items-center bg-[var(--content)] text-[13px] text-[var(--text-muted)]">
-		Opening the network's sign-in page…
+		<span class="flex items-center gap-2"><Spinner size={14} />Opening the network's sign-in page</span>
 	</div>
 </div>

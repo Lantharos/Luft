@@ -75,7 +75,7 @@ check-moment = Ez eltart egy pillanatig.
 check-slow = A Windows kiszámolja, mennyi helyet tud átadni. Nagy meghajtón ez néhány percig is eltarthat.
 check-blocked-description = Valamin változtatni kell, mielőtt a Luft beköltözhet. Ezt kell tennie.
 check-found-description = Ezt találta a Meet Luft.
-check-checking = A meghajtó, a firmware és a hardver ellenőrzése…
+check-checking = A meghajtó, a firmware és a hardver ellenőrzése
 check-again = Újbóli ellenőrzés
 check-action-firmware = Firmware-beállítások megnyitása
 check-action-tidy = Rendrakás
@@ -171,7 +171,7 @@ linux-ready-remove-description = A Meet Luft törli a Luft fájljait, indítóf�
 
 luft-title = Az Ön Luftja
 luft-looking = A Meet Luft megtalálta a Luftot ezen a PC-n.
-luft-checking = A Luft meghajtójának átnézése…
+luft-checking = A Luft meghajtójának átnézése
 luft-description-beside = A Luft a Windows mellé van telepítve ezen a PC-n.
 luft-description-drive = A Luft telepítési helye: { $drive }.
 luft-bar-used = { $size }, ebből { $used } foglalt
@@ -225,7 +225,7 @@ resize-shrink-description = A Luft a következő indításkor áthelyezi a fájl
 
 box-title = Hozza a dolgait
 box-description = Válassza ki, mit visz magával. A Luft a telepítés után kicsomagolja az új fiókjába, a Windowsból pedig semmi sem törlődik.
-box-looking = Mappák átnézése…
+box-looking = Mappák átnézése
 box-folder-desktop = Asztal
 box-folder-documents = Dokumentumok
 box-folder-downloads = Letöltések
@@ -291,7 +291,7 @@ removed-description = { $platform ->
 
 stick-title = Pendrive készítése
 stick-description = Erről a Luft bármelyik számítógépen elindul, kipróbálásra vagy telepítésre.
-stick-looking = USB-meghajtók keresése…
+stick-looking = USB-meghajtók keresése
 stick-none = Csatlakoztasson egy legalább { $size } méretű pendrive-ot. Itt fog megjelenni.
 stick-drives-label = USB-meghajtók
 stick-offer = { $name }, { $size }

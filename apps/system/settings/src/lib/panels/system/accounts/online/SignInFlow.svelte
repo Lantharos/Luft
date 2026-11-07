@@ -2,10 +2,9 @@
 	import { onDestroy } from 'svelte';
 	import Copy from '@lucide/svelte/icons/copy';
 	import ExternalLink from '@lucide/svelte/icons/external-link';
-	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import Smartphone from '@lucide/svelte/icons/smartphone';
 	import { t } from '@luft/i18n';
-	import { Choice, TextField } from '@luft/ui';
+	import { Choice, Spinner, TextField } from '@luft/ui';
 	import { commands, events } from '#lib/bindings.js';
 	import type { Step } from '#lib/bindings.js';
 	import { openAddress } from './api';
@@ -71,7 +70,7 @@
 
 {#if step.step === 'working'}
 	<div class="flex items-center gap-3 py-2 text-[14px] text-[var(--text-soft)]">
-		<LoaderCircle size={18} class="animate-spin text-[var(--text-muted)]" />
+		<Spinner size={18} class="text-[var(--text-muted)]" />
 		{t('settings-accounts-working', { provider: providerName })}
 	</div>
 {:else if step.step === 'browser'}
@@ -105,7 +104,7 @@
 	</div>
 {:else if step.step === 'approve'}
 	<div class="flex items-start gap-3 py-1 text-[14px] leading-relaxed text-[var(--text-soft)]">
-		<LoaderCircle size={18} class="mt-0.5 flex-none animate-spin text-[var(--text-muted)]" />
+		<Spinner size={18} class="mt-0.5 flex-none text-[var(--text-muted)]" />
 		<span>{t('settings-accounts-approve')}</span>
 	</div>
 {:else if step.step === 'failed'}

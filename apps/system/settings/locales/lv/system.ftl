@@ -71,7 +71,7 @@ settings-users-password-new-placeholder = { $count ->
 settings-users-password-confirm = Apstiprināt
 settings-users-password-confirm-placeholder = Ierakstiet to vēlreiz
 settings-users-password-change = Mainīt paroli
-settings-users-password-changing = Maina…
+settings-users-password-changing = Maina
 settings-users-password-wrong = Tā nav jūsu pašreizējā parole
 settings-users-password-mismatch = Paroles nesakrīt
 settings-users-password-too-short = Šī parole ir pārāk īsa
@@ -126,11 +126,11 @@ settings-login-automatic-off = Izslēgta
 
 ## Updates
 
-settings-updates-checking = Meklē atjauninājumus…
-settings-updates-downloading = Lejupielādē atjauninājumus…
-settings-updates-rolling-back = Sagatavo iepriekšējo versiju…
-settings-updates-switching-nvidia = Lejupielādē NVIDIA draiveri…
-settings-updates-switching-standard = Lejupielādē standarta attēlu…
+settings-updates-checking = Meklē atjauninājumus
+settings-updates-downloading = Lejupielādē atjauninājumus
+settings-updates-rolling-back = Sagatavo iepriekšējo versiju
+settings-updates-switching-nvidia = Lejupielādē NVIDIA draiveri
+settings-updates-switching-standard = Lejupielādē standarta attēlu
 settings-updates-up-to-date = Sistēma ir atjaunināta
 settings-updates-version = Versija { $version }
 settings-updates-version-new = Jauna versija
@@ -150,9 +150,9 @@ settings-updates-last-checked = Pēdējā pārbaude: { $when }
 settings-updates-never-checked = Vēl nav pārbaudīts
 settings-updates-stop = Apturēt
 settings-updates-check = Pārbaudīt tagad
-settings-updates-checking-button = Pārbauda…
+settings-updates-checking-button = Pārbauda
 settings-updates-app-updates = Lietotņu atjauninājumi
-settings-updates-apps-checking = Meklē lietotņu atjauninājumus…
+settings-updates-apps-checking = Meklē lietotņu atjauninājumus
 settings-updates-apps-count = { $count ->
     [0] Tiek pārvaldītas lietotnē Schelf
     [zero] Lietotnē Schelf ir atjauninājumi { $count } lietotnēm
@@ -174,7 +174,7 @@ settings-updates-background-description = Atjauninājumi būs gatavi instalēša
 settings-updates-firmware = Aparātprogrammatūra
 settings-updates-firmware-description = Atjauninājumi aparatūrā iebūvētajai programmatūrai
 settings-updates-firmware-restart = Tiks pabeigts pēc restartēšanas
-settings-updates-firmware-installing = Instalē…
+settings-updates-firmware-installing = Instalē
 settings-updates-firmware-update = Atjaunināt
 settings-updates-firmware-failed = Aparātprogrammatūru neizdevās atjaunināt
 settings-updates-download = Lejupielādēt
@@ -265,7 +265,7 @@ settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud v
 settings-accounts-sign-in-again-needed = Pierakstieties vēlreiz, lai turpinātu to izmantot
 settings-accounts-paused-metered = Sinhronizēšana apturēta limitētā savienojumā
 settings-accounts-paused-battery = Sinhronizēšana apturēta, jo akumulatora uzlādes līmenis ir zems
-settings-accounts-connecting = Notiek savienošana…
+settings-accounts-connecting = Notiek savienošana
 settings-accounts-offline = Bezsaistē
 settings-accounts-offline-kept = Bezsaistē, paturētie faili joprojām ir pieejami
 settings-accounts-not-connected = Nav savienots
@@ -290,7 +290,7 @@ settings-accounts-sign-in-again = Pierakstīties vēlreiz
 settings-accounts-keep = Paturēt
 settings-accounts-remove = Noņemt
 settings-accounts-remove-confirm = Noņemt no šī datora
-settings-accounts-removing = Noņem…
+settings-accounts-removing = Noņem
 settings-accounts-remove-note = Jūsu faili paliek pakalpojumā { $provider }. Vispirms tiek augšupielādētas šeit veiktās izmaiņas.
 
 ## Accounts: providers
@@ -323,7 +323,7 @@ settings-accounts-continue-in-browser = Turpināt pārlūkā
 settings-accounts-sign-in = Pierakstīties
 settings-accounts-try-again = Mēģināt vēlreiz
 settings-accounts-continue = Turpināt
-settings-accounts-working = Sazinās ar pakalpojumu { $provider }…
+settings-accounts-working = Sazinās ar pakalpojumu { $provider }
 settings-accounts-finish-in-browser = Pabeidziet pierakstīšanos pakalpojumā { $provider } savā pārlūkā. Luft nekad neredz jūsu paroli, un šī lapa atjaunināsies pati, kad pierakstīšanās būs pabeigta.
 settings-accounts-no-browser = Pārlūks netika atvērts. Nokopējiet saiti un atveriet to pārlūkā.
 settings-accounts-open-again = Atvērt lapu vēlreiz

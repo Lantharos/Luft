@@ -70,7 +70,7 @@ settings-users-password-new-placeholder = { $count ->
 settings-users-password-confirm = Confirmar
 settings-users-password-confirm-placeholder = Vuelve a escribirla
 settings-users-password-change = Cambiar contraseña
-settings-users-password-changing = Cambiando…
+settings-users-password-changing = Cambiando
 settings-users-password-wrong = Esa no es tu contraseña actual
 settings-users-password-mismatch = Las contraseñas no coinciden
 settings-users-password-too-short = Esta contraseña es demasiado corta
@@ -124,11 +124,11 @@ settings-login-automatic-off = Desactivado
 
 ## Updates
 
-settings-updates-checking = Buscando actualizaciones…
-settings-updates-downloading = Descargando actualizaciones…
-settings-updates-rolling-back = Preparando la versión anterior…
-settings-updates-switching-nvidia = Descargando el controlador de NVIDIA…
-settings-updates-switching-standard = Descargando la imagen estándar…
+settings-updates-checking = Buscando actualizaciones
+settings-updates-downloading = Descargando actualizaciones
+settings-updates-rolling-back = Preparando la versión anterior
+settings-updates-switching-nvidia = Descargando el controlador de NVIDIA
+settings-updates-switching-standard = Descargando la imagen estándar
 settings-updates-up-to-date = Tu sistema está actualizado
 settings-updates-version = Versión { $version }
 settings-updates-version-new = Una versión nueva
@@ -148,9 +148,9 @@ settings-updates-last-checked = Última comprobación: { $when }
 settings-updates-never-checked = Aún no se ha comprobado
 settings-updates-stop = Detener
 settings-updates-check = Comprobar ahora
-settings-updates-checking-button = Comprobando…
+settings-updates-checking-button = Comprobando
 settings-updates-app-updates = Actualizaciones de aplicaciones
-settings-updates-apps-checking = Buscando actualizaciones de tus aplicaciones…
+settings-updates-apps-checking = Buscando actualizaciones de tus aplicaciones
 settings-updates-apps-count = { $count ->
     [0] Se gestionan en Schelf
     [one] { $count } aplicación tiene una actualización en Schelf
@@ -171,7 +171,7 @@ settings-updates-background-description = Las actualizaciones estarán listas pa
 settings-updates-firmware = Firmware
 settings-updates-firmware-description = Actualizaciones del software integrado en tu hardware
 settings-updates-firmware-restart = Se completa al reiniciar
-settings-updates-firmware-installing = Instalando…
+settings-updates-firmware-installing = Instalando
 settings-updates-firmware-update = Actualizar
 settings-updates-firmware-failed = No se ha podido actualizar el firmware
 settings-updates-download = Descargar
@@ -262,7 +262,7 @@ settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud o
 settings-accounts-sign-in-again-needed = Vuelve a iniciar sesión para seguir usándola
 settings-accounts-paused-metered = Sincronización en pausa en una conexión de uso medido
 settings-accounts-paused-battery = Sincronización en pausa por batería baja
-settings-accounts-connecting = Conectando…
+settings-accounts-connecting = Conectando
 settings-accounts-offline = Sin conexión
 settings-accounts-offline-kept = Sin conexión, los archivos guardados siguen aquí
 settings-accounts-not-connected = No conectada
@@ -285,7 +285,7 @@ settings-accounts-sign-in-again = Volver a iniciar sesión
 settings-accounts-keep = Conservar
 settings-accounts-remove = Quitar
 settings-accounts-remove-confirm = Quitar de este ordenador
-settings-accounts-removing = Quitando…
+settings-accounts-removing = Quitando
 settings-accounts-remove-note = Tus archivos se quedan en { $provider }. Los cambios hechos aquí se suben antes.
 
 ## Accounts: providers
@@ -318,7 +318,7 @@ settings-accounts-continue-in-browser = Continuar en el navegador
 settings-accounts-sign-in = Iniciar sesión
 settings-accounts-try-again = Reintentar
 settings-accounts-continue = Continuar
-settings-accounts-working = Conectando con { $provider }…
+settings-accounts-working = Conectando con { $provider }
 settings-accounts-finish-in-browser = Termina de iniciar sesión con { $provider } en el navegador. Luft nunca ve tu contraseña, y esto se actualizará solo cuando acabes.
 settings-accounts-no-browser = No se ha abierto ningún navegador. Copia el enlace y ábrelo en un navegador.
 settings-accounts-open-again = Volver a abrir la página

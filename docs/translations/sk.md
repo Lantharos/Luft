@@ -27,7 +27,7 @@ Sentence case everywhere: only the first word and names take a capital letter. �
 
 - Quotation marks: „…“, and ‚…‘ inside them.
 - Apostrophes are rare in Slovak; where a foreign name needs one, use ’.
-- Ellipsis: one character, „…“, with no space before it.
+- Ellipsis: one character, „…“, with no space before it. A message about something in progress, such as loading, takes none, because the app shows a spinner beside it.
 - Dash: the en dash with spaces, „ – “.
 - Percent sign and units are separated from the number by a non-breaking space: „57 %“, „4,5 W“.
 - Key names stay as printed on Slovak keyboards, which use the English names: Ctrl, Alt, Shift, Enter, Delete. The space bar is „Medzerník“.

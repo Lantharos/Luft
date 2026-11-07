@@ -71,7 +71,7 @@ settings-users-password-new-placeholder =
 settings-users-password-confirm = Kinnita
 settings-users-password-confirm-placeholder = Sisesta uuesti
 settings-users-password-change = Muuda salasõna
-settings-users-password-changing = Muudan…
+settings-users-password-changing = Muudan
 settings-users-password-wrong = See pole sinu praegune salasõna
 settings-users-password-mismatch = Salasõnad ei ühti
 settings-users-password-too-short = See salasõna on liiga lühike
@@ -126,11 +126,11 @@ settings-login-automatic-off = Väljas
 
 ## Updates
 
-settings-updates-checking = Värskenduste otsimine…
-settings-updates-downloading = Värskenduste allalaadimine…
-settings-updates-rolling-back = Varasema versiooni ettevalmistamine…
-settings-updates-switching-nvidia = NVIDIA draiveri allalaadimine…
-settings-updates-switching-standard = Tavalise tõmmise allalaadimine…
+settings-updates-checking = Värskenduste otsimine
+settings-updates-downloading = Värskenduste allalaadimine
+settings-updates-rolling-back = Varasema versiooni ettevalmistamine
+settings-updates-switching-nvidia = NVIDIA draiveri allalaadimine
+settings-updates-switching-standard = Tavalise tõmmise allalaadimine
 settings-updates-up-to-date = Sinu süsteem on ajakohane
 settings-updates-version = Versioon { $version }
 settings-updates-version-new = Uus versioon
@@ -150,9 +150,9 @@ settings-updates-last-checked = Viimati kontrollitud { $when }
 settings-updates-never-checked = Pole veel kontrollitud
 settings-updates-stop = Lõpeta
 settings-updates-check = Kontrolli kohe
-settings-updates-checking-button = Kontrollimine…
+settings-updates-checking-button = Kontrollimine
 settings-updates-app-updates = Rakenduste värskendused
-settings-updates-apps-checking = Rakenduste värskenduste otsimine…
+settings-updates-apps-checking = Rakenduste värskenduste otsimine
 settings-updates-apps-count =
     { $count ->
         [0] Hallatakse rakenduses Schelf
@@ -174,7 +174,7 @@ settings-updates-background-description = Värskendused on järgmisel taaskäivi
 settings-updates-firmware = Püsivara
 settings-updates-firmware-description = Värskendused riistvarasse sisse ehitatud tarkvarale
 settings-updates-firmware-restart = Lõpetatakse taaskäivitamisel
-settings-updates-firmware-installing = Installimine…
+settings-updates-firmware-installing = Installimine
 settings-updates-firmware-update = Värskenda
 settings-updates-firmware-failed = Püsivara ei õnnestunud värskendada
 settings-updates-download = Laadi alla
@@ -265,7 +265,7 @@ settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud v
 settings-accounts-sign-in-again-needed = Kasutamise jätkamiseks logi uuesti sisse
 settings-accounts-paused-metered = Sünkroonimine on mahupõhise ühenduse tõttu peatatud
 settings-accounts-paused-battery = Sünkroonimine on peatatud, sest aku on tühjenemas
-settings-accounts-connecting = Ühendamine…
+settings-accounts-connecting = Ühendamine
 settings-accounts-offline = Võrguühenduseta
 settings-accounts-offline-kept = Võrguühenduseta, alles hoitud failid on endiselt siin
 settings-accounts-not-connected = Pole ühendatud
@@ -290,7 +290,7 @@ settings-accounts-sign-in-again = Logi uuesti sisse
 settings-accounts-keep = Säilita
 settings-accounts-remove = Eemalda
 settings-accounts-remove-confirm = Eemalda sellest arvutist
-settings-accounts-removing = Eemaldamine…
+settings-accounts-removing = Eemaldamine
 settings-accounts-remove-note = Sinu failid jäävad teenusesse { $provider }. Siin tehtud muudatused saadetakse enne üles.
 
 ## Accounts: providers
@@ -323,7 +323,7 @@ settings-accounts-continue-in-browser = Jätka brauseris
 settings-accounts-sign-in = Logi sisse
 settings-accounts-try-again = Proovi uuesti
 settings-accounts-continue = Jätka
-settings-accounts-working = Ühendumine: { $provider }…
+settings-accounts-working = Ühendumine: { $provider }
 settings-accounts-finish-in-browser = Lõpeta brauseris sisselogimine teenuse { $provider } kontoga. Luft ei näe kunagi sinu salasõna ja see vaade värskendub ise, kui oled lõpetanud.
 settings-accounts-no-browser = Brauser ei avanenud. Kopeeri link ja ava see brauseris.
 settings-accounts-open-again = Ava leht uuesti

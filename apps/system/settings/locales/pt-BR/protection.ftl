@@ -182,7 +182,7 @@ settings-encryption-summary-chip = Até terminar, o chip de segurança guarda a 
 settings-encryption-summary-recovery-key = Até terminar, pede a chave de recuperação na inicialização em vez da sua frase secreta.
 # Button, verb: starts encrypting this computer
 settings-encryption-encrypt = Criptografar
-settings-encryption-making-room = Abrindo espaço…
+settings-encryption-making-room = Abrindo espaço
 settings-encryption-unlocks-chip-pin = Desbloqueia com o chip de segurança e o seu PIN
 settings-encryption-unlocks-chip = Desbloqueia sozinho com o chip de segurança
 settings-encryption-unlocks-passphrase = Pede a frase secreta na inicialização

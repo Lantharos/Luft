@@ -49,7 +49,8 @@
 			title: app.name,
 			icon: app.icon,
 			app: app.key,
-			note: tasks.stopping.has(app.key) ? 'Stopping…' : app.paused ? 'Paused' : undefined,
+			note: tasks.stopping.has(app.key) ? 'Stopping' : app.paused ? 'Paused' : undefined,
+			working: tasks.stopping.has(app.key),
 			expanded: open
 		};
 		if (!open) return [head];

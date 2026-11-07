@@ -75,7 +75,7 @@ check-moment = Це займе трохи часу.
 check-slow = Windows з’ясовує, скільки місця може звільнити. На великому диску це може тривати кілька хвилин.
 check-blocked-description = Перш ніж Luft зможе оселитися, дещо треба змінити. Ось що зробити.
 check-found-description = Ось результати перевірки.
-check-checking = Перевірка диска, мікропрограми й обладнання…
+check-checking = Перевірка диска, мікропрограми й обладнання
 check-again = Перевірити знову
 check-action-firmware = Відкрити параметри мікропрограми
 check-action-tidy = Прибрати
@@ -171,7 +171,7 @@ linux-ready-remove-description = Meet Luft видалить файли Luft, й�
 
 luft-title = Ваш Luft
 luft-looking = На цьому ПК знайдено систему Luft.
-luft-checking = Перевірка диска Luft…
+luft-checking = Перевірка диска Luft
 luft-description-beside = Luft встановлено на цьому ПК поруч із Windows.
 luft-description-drive = Luft встановлено на диску { $drive }.
 luft-bar-used = { $size }, зайнято { $used }
@@ -225,7 +225,7 @@ resize-shrink-description = Luft перемістить свої файли пі
 
 box-title = Візьміть свої речі
 box-description = Виберіть, що взяти з собою. Після встановлення Luft розпакує це у ваш новий обліковий запис, а з Windows нічого не буде видалено.
-box-looking = Перегляд ваших папок…
+box-looking = Перегляд ваших папок
 box-folder-desktop = Робочий стіл
 box-folder-documents = Документи
 box-folder-downloads = Завантаження
@@ -297,7 +297,7 @@ removed-description = { $platform ->
 
 stick-title = Створити USB-накопичувач
 stick-description = З нього Luft запускається на будь-якому комп’ютері, щоб спробувати або встановити систему.
-stick-looking = Пошук USB-накопичувачів…
+stick-looking = Пошук USB-накопичувачів
 stick-none = Під’єднайте USB-накопичувач обсягом від { $size }. Він з’явиться тут.
 stick-drives-label = USB-накопичувачі
 stick-offer = { $name }, { $size }

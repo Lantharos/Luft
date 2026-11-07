@@ -3,7 +3,7 @@
 ## Network: shared words
 
 settings-network-save = Saglabāt
-settings-network-saving = Saglabā…
+settings-network-saving = Saglabā
 settings-network-cancel = Atcelt
 settings-network-connect = Savienot
 settings-network-disconnect = Atvienot
@@ -22,7 +22,7 @@ settings-network-connect-failed = Neizdevās savienot
 ## Network: connection states
 
 settings-network-link-connected = Savienots
-settings-network-link-connecting = Notiek savienošana…
+settings-network-link-connecting = Notiek savienošana
 settings-network-link-disconnected = Nav savienots
 settings-network-link-unplugged = Kabelis atvienots
 
@@ -89,7 +89,7 @@ settings-network-wifi-enterprise = Pierakstīties ar darba vai mācību iestāde
 settings-network-wifi-connect-failed = Neizdevās savienot ar šo tīklu
 settings-network-wifi-saved-password-failed = Saglabātā parole nederēja. Ievadiet to vēlreiz.
 settings-network-wifi-settings = Tīkla iestatījumi
-settings-network-wifi-searching = Notiek tīklu meklēšana…
+settings-network-wifi-searching = Notiek tīklu meklēšana
 settings-network-hidden = Savienot ar slēptu tīklu
     .description = Ievadiet tīkla nosaukumu un drošības veidu.
 settings-network-hidden-name = Tīkla nosaukums
@@ -249,7 +249,7 @@ settings-network-vpn-off = Izslēgts
 settings-network-vpn-none = Nav iestatīts
 settings-network-vpn-import = Importēt no faila
     .description = WireGuard, OpenVPN un citi VPN konfigurācijas faili
-settings-network-vpn-importing = Importē…
+settings-network-vpn-importing = Importē
 settings-network-wireguard = Iestatīt WireGuard
     .description = Ievadiet datus no sava VPN pakalpojuma sniedzēja vai servera
 settings-network-wireguard-dialog = Šos datus jums var sniegt VPN pakalpojuma sniedzējs vai servera īpašnieks.
@@ -269,7 +269,7 @@ settings-network-wireguard-keepalive = Savienojuma uzturēšana
     .description = Palīdz savienojumam nepārtrūkt aiz maršrutētāja
     .placeholder = Nav obligāti, sekundēs
 settings-network-wireguard-add = Pievienot
-settings-network-wireguard-adding = Pievieno…
+settings-network-wireguard-adding = Pievieno
 settings-network-wireguard-error-private-key = Ievadiet vai ģenerējiet privāto atslēgu
 settings-network-wireguard-error-addresses = Ievadiet vismaz vienu adresi
 settings-network-wireguard-error-server-key = Ievadiet servera publisko atslēgu
@@ -295,16 +295,16 @@ settings-bluetooth-visible-until-off = Līdz izslēgšanai
 settings-bluetooth-visible-failed = Neizdevās mainīt šī datora redzamību
 settings-bluetooth-paired = Manas ierīces
 settings-bluetooth-nearby = Tuvumā esošās ierīces
-settings-bluetooth-searching = Notiek ierīču meklēšana…
+settings-bluetooth-searching = Notiek ierīču meklēšana
     .description = Pārslēdziet pievienojamo ierīci savienošanas pārī režīmā
 settings-bluetooth-blocked = Bluetooth ir izslēgts ar aparatūras slēdzi
     .description = Lai to ieslēgtu, izmantojiet slēdzi vai taustiņu uz datora
 settings-bluetooth-details = Ierīces informācija
 settings-bluetooth-connected = Savienota
 settings-bluetooth-connected-battery = Savienota · akumulators { $battery }
-settings-bluetooth-connecting = Notiek savienošana…
-settings-bluetooth-disconnecting = Notiek atvienošana…
-settings-bluetooth-pairing = Notiek savienošana pārī…
+settings-bluetooth-connecting = Notiek savienošana
+settings-bluetooth-disconnecting = Notiek atvienošana
+settings-bluetooth-pairing = Notiek savienošana pārī
 settings-bluetooth-forget-confirm = Vai aizmirst „{ $name }“?
     .description = Lai to atkal izmantotu ar šo datoru, ierīce būs vēlreiz jāsavieno pārī.
 settings-bluetooth-forget = Aizmirst

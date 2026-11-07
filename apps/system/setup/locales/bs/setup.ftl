@@ -8,7 +8,7 @@ setup-try-again = Pokušaj ponovo
 setup-restart = Ponovo pokreni
 setup-restart-now = Ponovo pokreni sada
 setup-restart-later = Ponovo pokreni kasnije
-setup-saving = Čuvanje…
+setup-saving = Čuvanje
 
 ## Install progress, shown at the bottom of every step while Luft copies
 
@@ -51,7 +51,7 @@ setup-destination-meet-title = Pored Windowsa
 setup-destination-meet-description = Meet Luft je već napravio ovaj prostor, pa Windows ostaje tačno onakav kakav jeste.
 setup-destination-meet-drive-title = Na disku { $drive }
 setup-destination-meet-drive-description = Meet Luft je već napravio ovaj prostor na drugom disku, a Luft se pokreće odatle sa vlastitim fajlovima za pokretanje.
-setup-destination-looking = Pregledanje diskova…
+setup-destination-looking = Pregledanje diskova
 
 setup-destination-meet-choice = Pored Windowsa
 setup-destination-meet-choice-description = Koristite { $size } koje je Meet Luft napravio pored Windowsa.
@@ -69,7 +69,7 @@ setup-destination-custom-choice = Prilagođeno
 setup-destination-custom-choice-description = Sami rasporedite particije u aplikaciji Diskovi.
 
 setup-destination-more-options = Više opcija
-setup-destination-starting = Pokretanje…
+setup-destination-starting = Pokretanje
 setup-destination-replace = Zamijeni
 setup-destination-install = Instaliraj Luft
 
@@ -129,7 +129,7 @@ setup-drive-partitions = { $count ->
 ## Custom space
 
 setup-custom-open-disks = Otvori Diskove
-setup-custom-looking = Pregledanje…
+setup-custom-looking = Pregledanje
 setup-custom-look-again = Pogledaj ponovo
 setup-custom-free-label = Slobodni prostor
 setup-custom-free-space = { $size } slobodnog prostora
@@ -177,14 +177,14 @@ setup-replace-blocked-read-only = Njegov disk je samo za čitanje.
 setup-network-title = Povežite se na internet
 setup-network-description = Ovo nije obavezno. Uz internet Luft može podesiti sat i vremensku zonu, a internet možete koristiti dok se Luft instalira.
 setup-network-unavailable = Mreže trenutno nisu dostupne. Možete se povezati kasnije s programske trake.
-setup-network-looking = Traženje mreža…
+setup-network-looking = Traženje mreža
 setup-network-cable = Povezano kablom
 setup-network-show-all = Prikaži sve mreže
 setup-network-skip = Preskoči
 setup-network-failed = Povezivanje nije uspjelo
 setup-network-wrong-password = Pogrešna lozinka
 setup-network-connected = Povezano
-setup-network-connecting = Povezivanje…
+setup-network-connecting = Povezivanje
 setup-network-saved = Sačuvano
 setup-network-password = Lozinka
 setup-network-join = Poveži
@@ -241,7 +241,7 @@ setup-enroll-digits = { $count ->
 setup-secure-boot-title = Vaš računar još ne vjeruje Luftu
 setup-secure-boot-code = Odmah nakon sljedećeg ponovnog pokretanja plavi ekran traži da vjerujete Luftu. Tamo pomoću tastature unesite ovaj kôd.
 setup-secure-boot-skipped = Plavi ekran je preskočen. Zatražite novi kôd i ponovo pokrenite računar, a zatim tamo koristite tastaturu.
-setup-secure-boot-getting = Preuzimanje koda…
+setup-secure-boot-getting = Preuzimanje koda
 setup-secure-boot-new-code = Zatraži novi kôd
 
 ## Encryption

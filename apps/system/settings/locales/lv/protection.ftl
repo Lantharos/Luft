@@ -187,7 +187,7 @@ settings-encryption-summary-chip = Līdz tas ir pabeigts, drošības mikroshēma
 settings-encryption-summary-recovery-key = Līdz tas ir pabeigts, startējot tiek prasīta atkopšanas atslēga paroles frāzes vietā.
 # Button, verb: starts encrypting this computer
 settings-encryption-encrypt = Šifrēt
-settings-encryption-making-room = Tiek atbrīvota vieta…
+settings-encryption-making-room = Tiek atbrīvota vieta
 settings-encryption-unlocks-chip-pin = Atbloķē ar drošības mikroshēmu un jūsu PIN
 settings-encryption-unlocks-chip = Atbloķējas automātiski ar drošības mikroshēmu
 settings-encryption-unlocks-passphrase = Startējot prasa jūsu paroles frāzi

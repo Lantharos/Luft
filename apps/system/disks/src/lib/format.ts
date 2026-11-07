@@ -83,7 +83,7 @@ const JOBS: Record<string, string> = {
 
 export function jobText(job: Job) {
 	const name = JOBS[job.operation] ?? 'Working';
-	return job.progress === null ? `${name}…` : `${name}… ${percent(job.progress)}`;
+	return job.progress === null ? name : `${name} ${percent(job.progress)}`;
 }
 
 export function duration(hours: number) {

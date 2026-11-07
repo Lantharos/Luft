@@ -28,7 +28,7 @@ Sentence case everywhere: only the first word and names take a capital letter. �
 
 - Quotation marks: „…“, and ‚…‘ inside them.
 - Apostrophe: ’, only where Estonian spelling needs one, when a foreign name's ending isn't pronounced as written: „Magpie’i“. Names that end as they sound take the ending directly: „Lufti“, „Kestreli“, „Windowsi“.
-- Ellipsis: one character, „…“, written right after the word: „Laadimine…“.
+- Ellipsis: one character, „…“, written right after the word. A message about something in progress, such as loading, takes none, because the app shows a spinner beside it.
 - Dash: the en dash with spaces, „ – “. No em dashes.
 - Percent sign right after the number, with no space: „57%“. Units take a space: „4,5 W“. Both arrive formatted in placeables, so this only matters when writing the sign yourself.
 - Compounds with abbreviations take a hyphen: „USB-mälupulk“, „PDF-fail“, „Wi-Fi-võrk“.

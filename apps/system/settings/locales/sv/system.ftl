@@ -70,7 +70,7 @@ settings-users-password-new-placeholder = { $count ->
 settings-users-password-confirm = Bekräfta
 settings-users-password-confirm-placeholder = Skriv det igen
 settings-users-password-change = Ändra lösenord
-settings-users-password-changing = Ändrar …
+settings-users-password-changing = Ändrar
 settings-users-password-wrong = Det är inte ditt nuvarande lösenord
 settings-users-password-mismatch = Lösenorden matchar inte
 settings-users-password-too-short = Lösenordet är för kort
@@ -124,11 +124,11 @@ settings-login-automatic-off = Av
 
 ## Updates
 
-settings-updates-checking = Söker efter uppdateringar …
-settings-updates-downloading = Hämtar uppdateringar …
-settings-updates-rolling-back = Förbereder den tidigare versionen …
-settings-updates-switching-nvidia = Hämtar NVIDIA:s drivrutin …
-settings-updates-switching-standard = Hämtar standardavbildningen …
+settings-updates-checking = Söker efter uppdateringar
+settings-updates-downloading = Hämtar uppdateringar
+settings-updates-rolling-back = Förbereder den tidigare versionen
+settings-updates-switching-nvidia = Hämtar NVIDIA:s drivrutin
+settings-updates-switching-standard = Hämtar standardavbildningen
 settings-updates-up-to-date = Systemet är uppdaterat
 settings-updates-version = Version { $version }
 settings-updates-version-new = En ny version
@@ -148,9 +148,9 @@ settings-updates-last-checked = Senast kontrollerat { $when }
 settings-updates-never-checked = Inte kontrollerat än
 settings-updates-stop = Stoppa
 settings-updates-check = Sök nu
-settings-updates-checking-button = Söker …
+settings-updates-checking-button = Söker
 settings-updates-app-updates = Appuppdateringar
-settings-updates-apps-checking = Söker efter uppdateringar till dina appar …
+settings-updates-apps-checking = Söker efter uppdateringar till dina appar
 settings-updates-apps-count = { $count ->
     [0] Hanteras i Schelf
     [one] { $count } app har en uppdatering i Schelf
@@ -171,7 +171,7 @@ settings-updates-background-description = Uppdateringarna är redo att installer
 settings-updates-firmware = Firmware
 settings-updates-firmware-description = Uppdateringar för programvaran som är inbyggd i din maskinvara
 settings-updates-firmware-restart = Slutförs när du startar om
-settings-updates-firmware-installing = Installerar …
+settings-updates-firmware-installing = Installerar
 settings-updates-firmware-update = Uppdatera
 settings-updates-firmware-failed = Det gick inte att uppdatera firmware
 settings-updates-download = Hämta
@@ -262,7 +262,7 @@ settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud e
 settings-accounts-sign-in-again-needed = Logga in igen för att fortsätta använda det
 settings-accounts-paused-metered = Synkroniseringen är pausad på en anslutning med datapriser
 settings-accounts-paused-battery = Synkroniseringen är pausad medan batterinivån är låg
-settings-accounts-connecting = Ansluter …
+settings-accounts-connecting = Ansluter
 settings-accounts-offline = Offline
 settings-accounts-offline-kept = Offline, sparade filer finns kvar
 settings-accounts-not-connected = Inte anslutet
@@ -285,7 +285,7 @@ settings-accounts-sign-in-again = Logga in igen
 settings-accounts-keep = Behåll
 settings-accounts-remove = Ta bort
 settings-accounts-remove-confirm = Ta bort från den här datorn
-settings-accounts-removing = Tar bort …
+settings-accounts-removing = Tar bort
 settings-accounts-remove-note = Dina filer finns kvar i { $provider }. Ändringar som gjorts här skickas upp först.
 
 ## Accounts: providers
@@ -318,7 +318,7 @@ settings-accounts-continue-in-browser = Fortsätt i webbläsaren
 settings-accounts-sign-in = Logga in
 settings-accounts-try-again = Försök igen
 settings-accounts-continue = Fortsätt
-settings-accounts-working = Kontaktar { $provider } …
+settings-accounts-working = Kontaktar { $provider }
 settings-accounts-finish-in-browser = Slutför inloggningen med { $provider } i webbläsaren. Luft ser aldrig ditt lösenord, och det här uppdateras av sig självt när du är klar.
 settings-accounts-no-browser = Ingen webbläsare öppnades. Kopiera länken och öppna den i en webbläsare.
 settings-accounts-open-again = Öppna sidan igen

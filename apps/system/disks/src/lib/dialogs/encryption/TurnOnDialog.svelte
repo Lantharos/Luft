@@ -91,7 +91,7 @@
 	{unlockReady}
 	{summary}
 	finish={reformat ? 'Erase and encrypt' : 'Encrypt'}
-	finishing="Starting…"
+	finishing="Starting"
 	danger={reformat}
 	onfinish={encrypt}
 	{explain}

@@ -8,7 +8,7 @@ setup-try-again = Proovi uuesti
 setup-restart = Taaskäivita
 setup-restart-now = Taaskäivita kohe
 setup-restart-later = Taaskäivita hiljem
-setup-saving = Salvestamine…
+setup-saving = Salvestamine
 
 ## Install progress, shown at the bottom of every step while Luft copies
 
@@ -51,7 +51,7 @@ setup-destination-meet-title = Windowsi kõrval
 setup-destination-meet-description = Meet Luft on selle ruumi juba teinud, nii et Windows jääb täpselt selliseks, nagu see on.
 setup-destination-meet-drive-title = Kettal { $drive }
 setup-destination-meet-drive-description = Meet Luft on selle ruumi juba teisele kettale teinud ja Luft käivitub sealt oma käivitusfailidega.
-setup-destination-looking = Kettaid uuritakse…
+setup-destination-looking = Kettaid uuritakse
 setup-destination-meet-choice = Koos Windowsiga
 setup-destination-meet-choice-description = Kasuta { $size } ruumi, mille Meet Luft Windowsi kõrvale tegi.
 setup-destination-meet-drive-choice = Kettal { $drive }
@@ -67,7 +67,7 @@ setup-destination-try-choice-description = Vaata kõigepealt ringi. Midagi ei in
 setup-destination-custom-choice = Kohandatud
 setup-destination-custom-choice-description = Korralda partitsioonid ise rakenduses Kettad.
 setup-destination-more-options = Rohkem valikuid
-setup-destination-starting = Käivitamine…
+setup-destination-starting = Käivitamine
 setup-destination-replace = Asenda
 setup-destination-install = Installi Luft
 
@@ -127,7 +127,7 @@ setup-drive-partitions =
 ## Custom space
 
 setup-custom-open-disks = Ava Kettad
-setup-custom-looking = Otsimine…
+setup-custom-looking = Otsimine
 setup-custom-look-again = Otsi uuesti
 setup-custom-free-label = Vaba ruum
 setup-custom-free-space = { $size } vaba ruumi
@@ -174,14 +174,14 @@ setup-replace-blocked-read-only = Selle ketas on kirjutuskaitstud.
 setup-network-title = Loo internetiühendus
 setup-network-description = See pole kohustuslik. Võrguühenduse korral saab Luft seadistada kella ja ajavööndi ning saad Lufti installimise ajal internetti kasutada.
 setup-network-unavailable = Võrgud pole praegu saadaval. Ühenduse saad luua hiljem paneelilt.
-setup-network-looking = Võrkude otsimine…
+setup-network-looking = Võrkude otsimine
 setup-network-cable = Ühendatud kaabliga
 setup-network-show-all = Kuva kõik võrgud
 setup-network-skip = Jäta vahele
 setup-network-failed = Ühendamine ebaõnnestus
 setup-network-wrong-password = Vale salasõna
 setup-network-connected = Ühendatud
-setup-network-connecting = Ühendamine…
+setup-network-connecting = Ühendamine
 setup-network-saved = Salvestatud
 setup-network-password = Salasõna
 setup-network-join = Ühenda
@@ -238,7 +238,7 @@ setup-enroll-digits =
 setup-secure-boot-title = Sinu arvuti ei usalda veel Lufti
 setup-secure-boot-code = Kohe pärast järgmist taaskäivitust küsib sinine ekraan, kas Lufti usaldada. Kasuta seal klaviatuuri ja sisesta see kood.
 setup-secure-boot-skipped = Sinine ekraan jäeti vahele. Hangi uus kood ja taaskäivita, seejärel kasuta seal klaviatuuri.
-setup-secure-boot-getting = Koodi hankimine…
+setup-secure-boot-getting = Koodi hankimine
 setup-secure-boot-new-code = Hangi uus kood
 
 ## Encryption

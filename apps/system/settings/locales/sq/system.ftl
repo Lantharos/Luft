@@ -70,7 +70,7 @@ settings-users-password-new-placeholder = { $count ->
 settings-users-password-confirm = Konfirmo
 settings-users-password-confirm-placeholder = Shkruaje sërish
 settings-users-password-change = Ndrysho fjalëkalimin
-settings-users-password-changing = Po ndryshohet…
+settings-users-password-changing = Po ndryshohet
 settings-users-password-wrong = Ky nuk është fjalëkalimi yt aktual
 settings-users-password-mismatch = Fjalëkalimet nuk përputhen
 settings-users-password-too-short = Ky fjalëkalim është shumë i shkurtër
@@ -124,11 +124,11 @@ settings-login-automatic-off = Joaktive
 
 ## Updates
 
-settings-updates-checking = Po kërkohen përditësime…
-settings-updates-downloading = Po shkarkohen përditësimet…
-settings-updates-rolling-back = Po përgatitet versioni i mëparshëm…
-settings-updates-switching-nvidia = Po shkarkohet drajveri i NVIDIA…
-settings-updates-switching-standard = Po shkarkohet imazhi standard…
+settings-updates-checking = Po kërkohen përditësime
+settings-updates-downloading = Po shkarkohen përditësimet
+settings-updates-rolling-back = Po përgatitet versioni i mëparshëm
+settings-updates-switching-nvidia = Po shkarkohet drajveri i NVIDIA
+settings-updates-switching-standard = Po shkarkohet imazhi standard
 settings-updates-up-to-date = Sistemi yt është i përditësuar
 settings-updates-version = Versioni { $version }
 settings-updates-version-new = Një version i ri
@@ -148,9 +148,9 @@ settings-updates-last-checked = Kontrolluar për herë të fundit { $when }
 settings-updates-never-checked = Ende pa kontrolluar
 settings-updates-stop = Ndalo
 settings-updates-check = Kontrollo tani
-settings-updates-checking-button = Po kontrollohet…
+settings-updates-checking-button = Po kontrollohet
 settings-updates-app-updates = Përditësimet e aplikacioneve
-settings-updates-apps-checking = Po kërkohen përditësime për aplikacionet e tua…
+settings-updates-apps-checking = Po kërkohen përditësime për aplikacionet e tua
 settings-updates-apps-count = { $count ->
     [0] Menaxhohen në Schelf
     [one] { $count } aplikacion ka përditësim në Schelf
@@ -171,7 +171,7 @@ settings-updates-background-description = Përditësimet janë gati për t’u i
 settings-updates-firmware = Firmware
 settings-updates-firmware-description = Përditësime për softuerin e integruar në harduerin tënd
 settings-updates-firmware-restart = Përfundon kur të rinisësh
-settings-updates-firmware-installing = Po instalohet…
+settings-updates-firmware-installing = Po instalohet
 settings-updates-firmware-update = Përditëso
 settings-updates-firmware-failed = Firmware nuk mund të përditësohej
 settings-updates-download = Shkarko
@@ -262,7 +262,7 @@ settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud o
 settings-accounts-sign-in-again-needed = Hyr sërish për ta përdorur më tej
 settings-accounts-paused-metered = Sinkronizimi është ndalur në një lidhje me matje
 settings-accounts-paused-battery = Sinkronizimi është ndalur ndërsa bateria është e ulët
-settings-accounts-connecting = Po lidhet…
+settings-accounts-connecting = Po lidhet
 settings-accounts-offline = Jashtë linje
 settings-accounts-offline-kept = Jashtë linje, skedarët e mbajtur janë ende këtu
 settings-accounts-not-connected = Jo e lidhur
@@ -285,7 +285,7 @@ settings-accounts-sign-in-again = Hyr sërish
 settings-accounts-keep = Mbaje
 settings-accounts-remove = Hiq
 settings-accounts-remove-confirm = Hiq nga ky kompjuter
-settings-accounts-removing = Po hiqet…
+settings-accounts-removing = Po hiqet
 settings-accounts-remove-note = Skedarët e tu mbeten në { $provider }. Ndryshimet e bëra këtu dërgohen më parë.
 
 ## Accounts: providers
@@ -318,7 +318,7 @@ settings-accounts-continue-in-browser = Vazhdo në shfletues
 settings-accounts-sign-in = Hyr
 settings-accounts-try-again = Provo sërish
 settings-accounts-continue = Vazhdo
-settings-accounts-working = Po komunikohet me { $provider }…
+settings-accounts-working = Po komunikohet me { $provider }
 settings-accounts-finish-in-browser = Përfundo hyrjen me { $provider } në shfletues. Luft nuk e sheh kurrë fjalëkalimin tënd dhe kjo përditësohet vetë sapo të mbarosh.
 settings-accounts-no-browser = Nuk u hap asnjë shfletues. Kopjo lidhjen dhe hape në një shfletues.
 settings-accounts-open-again = Hap sërish faqen

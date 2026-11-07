@@ -2,7 +2,7 @@
 	import Check from '@lucide/svelte/icons/check';
 	import X from '@lucide/svelte/icons/x';
 	import { untrack } from 'svelte';
-	import { TextField } from '@luft/ui';
+	import { Spinner, TextField } from '@luft/ui';
 	import VcsBadge from '#lib/components/vcs/VcsBadge.svelte';
 	import type { VcsState } from '#lib/vcs/state.svelte.js';
 
@@ -110,7 +110,7 @@
 			<footer class="flex shrink-0 justify-end gap-2 px-4 py-4 shadow-[inset_0_1px_0_var(--hairline)]">
 				<button class="button large" type="button" disabled={Boolean(vcs.busy)} onclick={close}>Cancel</button>
 				<button class="button large" type="button" disabled={!canSubmit} onclick={submit}>
-					{vcs.busy === 'save' ? 'Committing…' : 'Commit'}
+					{#if vcs.busy === 'save'}<Spinner />Committing{:else}Commit{/if}
 				</button>
 			</footer>
 		</section>

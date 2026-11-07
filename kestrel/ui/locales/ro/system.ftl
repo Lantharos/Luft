@@ -49,7 +49,7 @@ media-keys-num-lock-off = Num Lock dezactivat
 
 vpn-sign-in-title = Conectare la { $connection }
 vpn-connect = Conectează
-vpn-signing-in = Se conectează…
+vpn-signing-in = Se conectează
 vpn-finish-in-browser = Finalizați conectarea în browser.
 vpn-certificate-untrusted = { $host } a prezentat un certificat care nu poate fi verificat ({ $reason }). Amprenta lui este { $fingerprint }.
 vpn-certificate-warning = Cineva s-ar putea da drept acest server. Conectați-vă doar dacă vă așteptați la asta.

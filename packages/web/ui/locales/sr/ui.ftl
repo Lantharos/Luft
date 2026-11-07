@@ -116,4 +116,4 @@ ui-passphrase-mismatch = Приступне фразе се не поклапа�
 
 ## Encryption
 
-ui-encryption-checking = Провера…
+ui-encryption-checking = Провера

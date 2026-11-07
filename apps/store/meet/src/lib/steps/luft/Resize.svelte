@@ -1,7 +1,6 @@
 <script lang="ts">
-	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import { t } from '@luft/i18n';
-	import { bytes, Dialog, Slider, SplitBar } from '@luft/ui';
+	import { bytes, Dialog, Slider, Spinner, SplitBar } from '@luft/ui';
 	import Frame from '#lib/components/Frame.svelte';
 	import Problem from '#lib/components/Problem.svelte';
 	import { luft } from '#lib/state/luft.svelte.js';
@@ -80,7 +79,7 @@
 		<p class="text-[14px] leading-relaxed text-[var(--text-soft)]">{t('resize-full')}</p>
 	{:else if !session.failure}
 		<div class="flex items-center gap-3 py-2 text-[14px] text-[var(--text-soft)]">
-			<LoaderCircle size={18} class="animate-spin" />{t('resize-measuring')}
+			<Spinner size={18} />{t('resize-measuring')}
 		</div>
 	{/if}
 	{#if session.failure}

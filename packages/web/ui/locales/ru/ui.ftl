@@ -117,4 +117,4 @@ ui-passphrase-mismatch = Парольные фразы не совпадают
 
 ## Encryption
 
-ui-encryption-checking = Проверка…
+ui-encryption-checking = Проверка

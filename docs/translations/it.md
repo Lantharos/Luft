@@ -28,7 +28,7 @@ Sentence case everywhere: only the first word and names take a capital letter. �
 - Quotation marks: “…”, and ‘…’ inside them. No caporali (« »).
 - Apostrophe: the typographic ’, also in elisions: “l’app”, “un’emoji”, “c’è”.
 - Accents: è, é, à, ì, ò, ù always as accented letters, never with an apostrophe (“è”, not “e'”). Capital È is written È.
-- Ellipsis: one character, “…”, with no space before it.
+- Ellipsis: one character, “…”, with no space before it. A message about something in progress, such as loading, takes none, because the app shows a spinner beside it.
 - Dash: the en dash with spaces, “ – ”.
 - No space before punctuation. Percent sign without a space: “57%”.
 - Key names follow Italian keyboards and Windows: Ctrl, Alt, Maiusc, Invio, Canc, Ins, Home, Fine, Pag su, Pag giù, Stamp, Esc, Tab, Backspace, Spazio, Bloc Maiusc, Bloc Num, Bloc Scorr.

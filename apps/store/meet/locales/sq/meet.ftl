@@ -75,7 +75,7 @@ check-moment = Kjo zgjat pak.
 check-slow = Windows po llogarit sa vend mund të lirojë. Në një disk të madh kjo mund të zgjasë disa minuta.
 check-blocked-description = Diçka duhet të ndryshojë para se Luft të vendoset. Ja çfarë duhet bërë.
 check-found-description = Ja çfarë gjeti Meet Luft.
-check-checking = Po kontrollohen disku, firmware dhe hardueri…
+check-checking = Po kontrollohen disku, firmware dhe hardueri
 check-again = Kontrollo sërish
 check-action-firmware = Hap cilësimet e firmware
 check-action-tidy = Pastro
@@ -171,7 +171,7 @@ linux-ready-remove-description = Meet Luft fshin skedarët e Luft, skedarët e t
 
 luft-title = Luft-i yt
 luft-looking = Meet Luft gjeti Luft në këtë PC.
-luft-checking = Po shikohet disku i Luft…
+luft-checking = Po shikohet disku i Luft
 luft-description-beside = Luft është instaluar pranë Windows në këtë PC.
 luft-description-drive = Luft është instaluar në { $drive }.
 luft-bar-used = { $size }, { $used } të përdorura
@@ -225,7 +225,7 @@ resize-shrink-description = Luft i zhvendos skedarët e tij herën tjetër që n
 
 box-title = Merr me vete gjërat e tua
 box-description = Zgjidh çfarë të marrësh me vete. Luft i shpaketon në llogarinë tënde të re kur të instalohet, dhe asgjë nuk hiqet nga Windows.
-box-looking = Po shikohen dosjet e tua…
+box-looking = Po shikohen dosjet e tua
 box-folder-desktop = Desktopi
 box-folder-documents = Dokumentet
 box-folder-downloads = Shkarkimet
@@ -291,7 +291,7 @@ removed-description = { $platform ->
 
 stick-title = Krijo një memorie USB
 stick-description = Luft niset prej saj në çdo kompjuter, për ta provuar ose instaluar.
-stick-looking = Po kërkohen memorie USB…
+stick-looking = Po kërkohen memorie USB
 stick-none = Lidh një memorie USB prej { $size } ose më shumë. Do të shfaqet këtu.
 stick-drives-label = Memoriet USB
 stick-offer = { $name }, { $size }

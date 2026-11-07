@@ -8,7 +8,7 @@ setup-try-again = Erneut versuchen
 setup-restart = Neu starten
 setup-restart-now = Jetzt neu starten
 setup-restart-later = Später neu starten
-setup-saving = Wird gespeichert …
+setup-saving = Wird gespeichert
 
 ## Install progress, shown at the bottom of every step while Luft copies
 
@@ -51,7 +51,7 @@ setup-destination-meet-title = Neben Windows
 setup-destination-meet-description = Meet Luft hat schon Platz gemacht, Windows bleibt also genau, wie es ist.
 setup-destination-meet-drive-title = Auf { $drive }
 setup-destination-meet-drive-description = Meet Luft hat schon Platz auf einem anderen Datenträger gemacht, und Luft startet von dort mit eigenen Startdateien.
-setup-destination-looking = Datenträger werden geprüft …
+setup-destination-looking = Datenträger werden geprüft
 
 setup-destination-meet-choice = Neben Windows
 setup-destination-meet-choice-description = Die { $size } nutzen, die Meet Luft neben Windows freigemacht hat.
@@ -69,7 +69,7 @@ setup-destination-custom-choice = Benutzerdefiniert
 setup-destination-custom-choice-description = Partitionen selbst in der App Datenträger einteilen.
 
 setup-destination-more-options = Weitere Optionen
-setup-destination-starting = Wird gestartet …
+setup-destination-starting = Wird gestartet
 setup-destination-replace = Ersetzen
 setup-destination-install = Luft installieren
 
@@ -127,7 +127,7 @@ setup-drive-partitions = { $count ->
 ## Custom space
 
 setup-custom-open-disks = Datenträger öffnen
-setup-custom-looking = Wird gesucht …
+setup-custom-looking = Wird gesucht
 setup-custom-look-again = Erneut suchen
 setup-custom-free-label = Freier Speicherplatz
 setup-custom-free-space = { $size } freier Speicherplatz
@@ -172,14 +172,14 @@ setup-replace-blocked-read-only = Sein Datenträger ist schreibgeschützt.
 setup-network-title = Mit dem Internet verbinden
 setup-network-description = Das ist optional. Online kann Luft deine Uhrzeit und Zeitzone einstellen, und du kannst das Internet nutzen, während Luft installiert wird.
 setup-network-unavailable = Netzwerke sind gerade nicht verfügbar. Du kannst dich später über die Taskleiste verbinden.
-setup-network-looking = Netzwerke werden gesucht …
+setup-network-looking = Netzwerke werden gesucht
 setup-network-cable = Über Kabel verbunden
 setup-network-show-all = Alle Netzwerke anzeigen
 setup-network-skip = Überspringen
 setup-network-failed = Verbindung fehlgeschlagen
 setup-network-wrong-password = Falsches Passwort
 setup-network-connected = Verbunden
-setup-network-connecting = Wird verbunden …
+setup-network-connecting = Wird verbunden
 setup-network-saved = Gespeichert
 setup-network-password = Passwort
 setup-network-join = Verbinden
@@ -235,7 +235,7 @@ setup-enroll-digits = { $count ->
 setup-secure-boot-title = Dein Computer vertraut Luft noch nicht
 setup-secure-boot-code = Direkt nach dem nächsten Neustart fragt ein blauer Bildschirm, ob Luft vertraut werden soll. Gib dort mit der Tastatur diesen Code ein.
 setup-secure-boot-skipped = Der blaue Bildschirm wurde übersprungen. Hol dir einen neuen Code und starte neu, dann verwende dort die Tastatur.
-setup-secure-boot-getting = Code wird abgerufen …
+setup-secure-boot-getting = Code wird abgerufen
 setup-secure-boot-new-code = Neuen Code abrufen
 
 ## Encryption

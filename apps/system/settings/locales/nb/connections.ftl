@@ -3,7 +3,7 @@
 ## Network: shared words
 
 settings-network-save = Lagre
-settings-network-saving = Lagrer…
+settings-network-saving = Lagrer
 settings-network-cancel = Avbryt
 settings-network-connect = Koble til
 settings-network-disconnect = Koble fra
@@ -22,7 +22,7 @@ settings-network-connect-failed = Kunne ikke koble til
 ## Network: connection states
 
 settings-network-link-connected = Tilkoblet
-settings-network-link-connecting = Kobler til…
+settings-network-link-connecting = Kobler til
 settings-network-link-disconnected = Ikke tilkoblet
 settings-network-link-unplugged = Kabelen er koblet fra
 
@@ -88,7 +88,7 @@ settings-network-wifi-enterprise = Logg inn med en jobb- eller skolekonto
 settings-network-wifi-connect-failed = Kunne ikke koble til dette nettverket
 settings-network-wifi-saved-password-failed = Det lagrede passordet virket ikke. Skriv det inn på nytt.
 settings-network-wifi-settings = Nettverksinnstillinger
-settings-network-wifi-searching = Ser etter nettverk…
+settings-network-wifi-searching = Ser etter nettverk
 settings-network-hidden = Koble til et skjult nettverk
     .description = Skriv inn navnet på nettverket og hvordan det er sikret.
 settings-network-hidden-name = Nettverksnavn
@@ -247,7 +247,7 @@ settings-network-vpn-off = Av
 settings-network-vpn-none = Ikke satt opp
 settings-network-vpn-import = Importer fra en fil
     .description = Konfigurasjonsfiler for WireGuard, OpenVPN og andre VPN-er
-settings-network-vpn-importing = Importerer…
+settings-network-vpn-importing = Importerer
 settings-network-wireguard = Konfigurer WireGuard
     .description = Skriv inn opplysningene fra VPN-leverandøren eller serveren din
 settings-network-wireguard-dialog = Du får disse opplysningene fra VPN-leverandøren din eller fra eieren av serveren.
@@ -267,7 +267,7 @@ settings-network-wireguard-keepalive = Keepalive
     .description = Hjelper tilkoblingen med å holde seg oppe bak en ruter
     .placeholder = Valgfritt, i sekunder
 settings-network-wireguard-add = Legg til
-settings-network-wireguard-adding = Legger til…
+settings-network-wireguard-adding = Legger til
 settings-network-wireguard-error-private-key = Skriv inn eller generer en privat nøkkel
 settings-network-wireguard-error-addresses = Skriv inn minst én adresse
 settings-network-wireguard-error-server-key = Skriv inn serverens offentlige nøkkel
@@ -292,16 +292,16 @@ settings-bluetooth-visible-until-off = Til den slås av
 settings-bluetooth-visible-failed = Kunne ikke endre om denne datamaskinen er synlig
 settings-bluetooth-paired = Mine enheter
 settings-bluetooth-nearby = Enheter i nærheten
-settings-bluetooth-searching = Ser etter enheter…
+settings-bluetooth-searching = Ser etter enheter
     .description = Sett enheten du vil legge til, i sammenkoblingsmodus
 settings-bluetooth-blocked = Bluetooth er slått av med en maskinvarebryter
     .description = Bruk bryteren eller tasten på datamaskinen for å slå det på
 settings-bluetooth-details = Enhetsdetaljer
 settings-bluetooth-connected = Tilkoblet
 settings-bluetooth-connected-battery = Tilkoblet · batteri { $battery }
-settings-bluetooth-connecting = Kobler til…
-settings-bluetooth-disconnecting = Kobler fra…
-settings-bluetooth-pairing = Kobler sammen…
+settings-bluetooth-connecting = Kobler til
+settings-bluetooth-disconnecting = Kobler fra
+settings-bluetooth-pairing = Kobler sammen
 settings-bluetooth-forget-confirm = Vil du glemme «{ $name }»?
     .description = Du må koble den sammen igjen for å bruke den med denne datamaskinen.
 settings-bluetooth-forget = Glem

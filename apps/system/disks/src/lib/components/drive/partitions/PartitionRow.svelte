@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Lock from '@lucide/svelte/icons/lock';
-	import { bytes } from '@luft/ui';
+	import { bytes, Spinner } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { Drive, Volume } from '#lib/bindings.js';
 	import { dialogs } from '#lib/dialogs/dialogs.svelte.js';
@@ -61,6 +61,7 @@
 	</button>
 	<div class="actions">
 		<ActionMenu label="More for {volumeName(volume)}" groups={menu} disabled={busy} />
+		{#if job}<Spinner size={14} class="text-[var(--text-muted)]" />{/if}
 		{#if status}
 			<span class="status">{status}</span>
 		{/if}

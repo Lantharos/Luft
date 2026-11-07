@@ -3,7 +3,7 @@
 ## Network: shared words
 
 settings-network-save = Lagre
-settings-network-saving = Lagrar …
+settings-network-saving = Lagrar
 settings-network-cancel = Avbryt
 settings-network-connect = Kople til
 settings-network-disconnect = Kople frå
@@ -22,7 +22,7 @@ settings-network-connect-failed = Kunne ikkje kople til
 ## Network: connection states
 
 settings-network-link-connected = Tilkopla
-settings-network-link-connecting = Koplar til …
+settings-network-link-connecting = Koplar til
 settings-network-link-disconnected = Ikkje tilkopla
 settings-network-link-unplugged = Kabelen er kopla frå
 
@@ -88,7 +88,7 @@ settings-network-wifi-enterprise = Logg inn med ein jobb- eller skulekonto
 settings-network-wifi-connect-failed = Kunne ikkje kople til dette nettverket
 settings-network-wifi-saved-password-failed = Det lagra passordet fungerte ikkje. Skriv det inn på nytt.
 settings-network-wifi-settings = Nettverksinnstillingar
-settings-network-wifi-searching = Leitar etter nettverk …
+settings-network-wifi-searching = Leitar etter nettverk
 settings-network-hidden = Kople til eit gøymt nettverk
     .description = Skriv inn namnet på nettverket og kva tryggleik det brukar.
 settings-network-hidden-name = Nettverksnamn
@@ -247,7 +247,7 @@ settings-network-vpn-off = Av
 settings-network-vpn-none = Ikkje sett opp
 settings-network-vpn-import = Importer frå ei fil
     .description = Konfigurasjonsfiler for WireGuard, OpenVPN og andre VPN-ar
-settings-network-vpn-importing = Importerer …
+settings-network-vpn-importing = Importerer
 settings-network-wireguard = Set opp WireGuard
     .description = Skriv inn opplysningane frå VPN-leverandøren eller tenaren din
 settings-network-wireguard-dialog = VPN-leverandøren eller eigaren av tenaren kan gje deg desse opplysningane.
@@ -267,7 +267,7 @@ settings-network-wireguard-keepalive = Keepalive
     .description = Hjelper tilkoplinga med å halde seg oppe bak ein ruter
     .placeholder = Valfritt, i sekund
 settings-network-wireguard-add = Legg til
-settings-network-wireguard-adding = Leggjer til …
+settings-network-wireguard-adding = Leggjer til
 settings-network-wireguard-error-private-key = Skriv inn eller lag ein privat nøkkel
 settings-network-wireguard-error-addresses = Skriv inn minst éi adresse
 settings-network-wireguard-error-server-key = Skriv inn den offentlege nøkkelen til tenaren
@@ -292,16 +292,16 @@ settings-bluetooth-visible-until-off = Til Bluetooth blir slått av
 settings-bluetooth-visible-failed = Kunne ikkje endre om denne datamaskinen er synleg
 settings-bluetooth-paired = Einingane mine
 settings-bluetooth-nearby = Einingar i nærleiken
-settings-bluetooth-searching = Leitar etter einingar …
+settings-bluetooth-searching = Leitar etter einingar
     .description = Set eininga du vil leggje til, i paringsmodus
 settings-bluetooth-blocked = Bluetooth er slått av med ein maskinvarebrytar
     .description = Bruk brytaren eller tasten på datamaskinen for å slå det på
 settings-bluetooth-details = Einingsdetaljar
 settings-bluetooth-connected = Tilkopla
 settings-bluetooth-connected-battery = Tilkopla · batteri { $battery }
-settings-bluetooth-connecting = Koplar til …
-settings-bluetooth-disconnecting = Koplar frå …
-settings-bluetooth-pairing = Parar …
+settings-bluetooth-connecting = Koplar til
+settings-bluetooth-disconnecting = Koplar frå
+settings-bluetooth-pairing = Parar
 settings-bluetooth-forget-confirm = Gløyme «{ $name }»?
     .description = Du må pare eininga på nytt før du kan bruke ho med denne datamaskinen.
 settings-bluetooth-forget = Gløym

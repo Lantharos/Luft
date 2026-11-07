@@ -3,7 +3,7 @@
 ## Network: shared words
 
 settings-network-save = Vista
-settings-network-saving = Vistar…
+settings-network-saving = Vistar
 settings-network-cancel = Hætta við
 settings-network-connect = Tengjast
 settings-network-disconnect = Aftengja
@@ -22,7 +22,7 @@ settings-network-connect-failed = Ekki tókst að tengjast
 ## Network: connection states
 
 settings-network-link-connected = Tengt
-settings-network-link-connecting = Tengist…
+settings-network-link-connecting = Tengist
 settings-network-link-disconnected = Ekki tengt
 settings-network-link-unplugged = Netsnúra ekki í sambandi
 
@@ -88,7 +88,7 @@ settings-network-wifi-enterprise = Skráðu þig inn með aðgangi frá vinnusta
 settings-network-wifi-connect-failed = Ekki tókst að tengjast þessu neti
 settings-network-wifi-saved-password-failed = Vistaða lykilorðið virkaði ekki. Sláðu það inn aftur.
 settings-network-wifi-settings = Netstillingar
-settings-network-wifi-searching = Leitar að netum…
+settings-network-wifi-searching = Leitar að netum
 settings-network-hidden = Tengjast földu neti
     .description = Sláðu inn heiti netsins og veldu hvernig það er varið.
 settings-network-hidden-name = Heiti nets
@@ -247,7 +247,7 @@ settings-network-vpn-off = Slökkt
 settings-network-vpn-none = Ekki uppsett
 settings-network-vpn-import = Flytja inn úr skrá
     .description = WireGuard, OpenVPN og aðrar VPN-stillingaskrár
-settings-network-vpn-importing = Flytur inn…
+settings-network-vpn-importing = Flytur inn
 settings-network-wireguard = Setja upp WireGuard
     .description = Sláðu inn upplýsingarnar frá VPN-þjónustunni þinni eða netþjóninum
 settings-network-wireguard-dialog = VPN-þjónustan þín eða eigandi netþjónsins getur gefið þér þessar upplýsingar.
@@ -267,7 +267,7 @@ settings-network-wireguard-keepalive = Viðhaldsboð
     .description = Hjálpar tengingunni að haldast uppi á bak við beini
     .placeholder = Valfrjálst, í sekúndum
 settings-network-wireguard-add = Bæta við
-settings-network-wireguard-adding = Bætir við…
+settings-network-wireguard-adding = Bætir við
 settings-network-wireguard-error-private-key = Sláðu inn einkalykil eða búðu hann til
 settings-network-wireguard-error-addresses = Sláðu inn minnst eitt vistfang
 settings-network-wireguard-error-server-key = Sláðu inn dreifilykil netþjónsins
@@ -292,16 +292,16 @@ settings-bluetooth-visible-until-off = Þar til slökkt er á Bluetooth
 settings-bluetooth-visible-failed = Ekki tókst að breyta því hvort þessi tölva er sýnileg
 settings-bluetooth-paired = Tækin mín
 settings-bluetooth-nearby = Nálæg tæki
-settings-bluetooth-searching = Leitar að tækjum…
+settings-bluetooth-searching = Leitar að tækjum
     .description = Settu tækið sem þú vilt bæta við í pörunarham
 settings-bluetooth-blocked = Slökkt er á Bluetooth með vélbúnaðarrofa
     .description = Notaðu rofann eða lykilinn á tölvunni til að kveikja á því
 settings-bluetooth-details = Upplýsingar um tæki
 settings-bluetooth-connected = Tengt
 settings-bluetooth-connected-battery = Tengt · rafhlaða { $battery }
-settings-bluetooth-connecting = Tengist…
-settings-bluetooth-disconnecting = Aftengist…
-settings-bluetooth-pairing = Parar…
+settings-bluetooth-connecting = Tengist
+settings-bluetooth-disconnecting = Aftengist
+settings-bluetooth-pairing = Parar
 settings-bluetooth-forget-confirm = Gleyma tækinu „{ $name }“?
     .description = Þú þarft að para það aftur til að nota það með þessari tölvu.
 settings-bluetooth-forget = Gleyma

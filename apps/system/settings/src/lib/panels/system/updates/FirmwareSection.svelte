@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { bytes, Row, Section } from '@luft/ui';
+	import { bytes, Row, Section, Spinner } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { Activity, Firmware } from '#lib/bindings.js';
 	import { percent } from '#lib/format.js';
@@ -28,6 +28,7 @@
 			truncate
 		>
 			{#if installing}
+				<Spinner />
 				<span>{activity.progress?.fraction != null ? percent(activity.progress.fraction) : t('settings-updates-firmware-installing')}</span>
 			{:else}
 				<button type="button" class="button" disabled={busy} onclick={() => install(device)}>{t('settings-updates-firmware-update')}</button>

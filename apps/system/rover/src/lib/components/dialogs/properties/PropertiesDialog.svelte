@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { bytes, dateTime, Dialog, errorText, parent, plural } from '@luft/ui';
+	import { bytes, dateTime, Dialog, errorText, parent, plural, Spinner } from '@luft/ui';
 	import { commands, events } from '#lib/bindings.js';
 	import type { DriveInfo, FileDetails, FileEntry, Measurement, Ownership } from '#lib/bindings.js';
 	import DefaultApp from './DefaultApp.svelte';
@@ -59,10 +59,10 @@
 	function sizeText() {
 		if (drive) return `${bytes(drive.usedSpace)} used of ${bytes(drive.totalSpace)}`;
 		if (!measured) return single ? `${bytes(single.size)} (${single.size.toLocaleString()} bytes)` : '';
-		if (!measurement) return 'Measuring…';
+		if (!measurement) return 'Measuring';
 		const contents = plural(measurement.files, 'file');
 		const folders = measurement.folders > 0 ? `, ${plural(measurement.folders, 'folder')}` : '';
-		return `${bytes(measurement.bytes)} · ${contents}${folders}${measurement.done ? '' : '…'}`;
+		return `${bytes(measurement.bytes)} · ${contents}${folders}`;
 	}
 
 	async function changeMode(mode: number) {
@@ -79,17 +79,20 @@
 	}
 </script>
 
-{#snippet row(label: string, value: string)}
+{#snippet row(label: string, value: string, working = false)}
 	{#if value}
 		<dt class="text-[var(--text-muted)]">{label}</dt>
-		<dd class="min-w-0 break-words text-[var(--text-soft)] select-text">{value}</dd>
+		<dd class="flex min-w-0 items-center gap-2 break-words text-[var(--text-soft)] select-text">
+			{#if working}<Spinner size={13} class="text-[var(--text-muted)]" />{/if}
+			<span class="min-w-0">{value}</span>
+		</dd>
 	{/if}
 {/snippet}
 
 <Dialog {title} wide {onclose}>
 	<dl class="grid grid-cols-[112px_minmax(0,1fr)] gap-x-4 gap-y-2.5 text-[13px]">
 		{@render row('Kind', kind)}
-		{@render row('Size', sizeText())}
+		{@render row('Size', sizeText(), measured && !measurement?.done)}
 		{@render row('Free', drive ? bytes(drive.availableSpace) : '')}
 		{@render row('Location', locations.size === 1 ? [...locations][0] : 'Several folders')}
 		{#if single}

@@ -3,7 +3,7 @@
 ## Network: shared words
 
 settings-network-save = Зачувај
-settings-network-saving = Се зачувува…
+settings-network-saving = Се зачувува
 settings-network-cancel = Откажи
 settings-network-connect = Поврзи
 settings-network-disconnect = Прекини врска
@@ -22,7 +22,7 @@ settings-network-connect-failed = Поврзувањето не успеа
 ## Network: connection states
 
 settings-network-link-connected = Поврзано
-settings-network-link-connecting = Се поврзува…
+settings-network-link-connecting = Се поврзува
 settings-network-link-disconnected = Не е поврзано
 settings-network-link-unplugged = Кабелот е исклучен
 
@@ -88,7 +88,7 @@ settings-network-wifi-enterprise = Најава со сметка од рабо�
 settings-network-wifi-connect-failed = Поврзувањето со оваа мрежа не успеа
 settings-network-wifi-saved-password-failed = Зачуваната лозинка не функционираше. Внесете ја повторно.
 settings-network-wifi-settings = Поставки за мрежата
-settings-network-wifi-searching = Се бараат мрежи…
+settings-network-wifi-searching = Се бараат мрежи
 settings-network-hidden = Поврзување со скриена мрежа
     .description = Внесете го името на мрежата и начинот на кој е заштитена.
 settings-network-hidden-name = Име на мрежата
@@ -247,7 +247,7 @@ settings-network-vpn-off = Исклучено
 settings-network-vpn-none = Не е поставено
 settings-network-vpn-import = Увези од датотека
     .description = Конфигурациски датотеки за WireGuard, OpenVPN и други VPN
-settings-network-vpn-importing = Се увезува…
+settings-network-vpn-importing = Се увезува
 settings-network-wireguard = Постави WireGuard
     .description = Внесете ги податоците од давателот на VPN или од серверот
 settings-network-wireguard-dialog = Овие податоци може да ви ги даде давателот на VPN или сопственикот на серверот.
@@ -267,7 +267,7 @@ settings-network-wireguard-keepalive = Одржување на врската
     .description = Помага врската да остане активна зад рутер
     .placeholder = Изборно, во секунди
 settings-network-wireguard-add = Додај
-settings-network-wireguard-adding = Се додава…
+settings-network-wireguard-adding = Се додава
 settings-network-wireguard-error-private-key = Внесете или генерирајте приватен клуч
 settings-network-wireguard-error-addresses = Внесете барем една адреса
 settings-network-wireguard-error-server-key = Внесете го јавниот клуч на серверот
@@ -292,16 +292,16 @@ settings-bluetooth-visible-until-off = Додека не се исклучи
 settings-bluetooth-visible-failed = Видливоста на овој компјутер не можеше да се промени
 settings-bluetooth-paired = Мои уреди
 settings-bluetooth-nearby = Уреди во близина
-settings-bluetooth-searching = Се бараат уреди…
+settings-bluetooth-searching = Се бараат уреди
     .description = Ставете го уредот што сакате да го додадете во режим на спарување
 settings-bluetooth-blocked = Bluetooth е исклучен со хардверски прекинувач
     .description = Вклучете го со прекинувачот или копчето на компјутерот
 settings-bluetooth-details = Детали за уредот
 settings-bluetooth-connected = Поврзано
 settings-bluetooth-connected-battery = Поврзано · батерија { $battery }
-settings-bluetooth-connecting = Се поврзува…
-settings-bluetooth-disconnecting = Се прекинува врската…
-settings-bluetooth-pairing = Се спарува…
+settings-bluetooth-connecting = Се поврзува
+settings-bluetooth-disconnecting = Се прекинува врската
+settings-bluetooth-pairing = Се спарува
 settings-bluetooth-forget-confirm = Да се заборави „{ $name }“?
     .description = Ќе треба повторно да го спарите за да го користите со овој компјутер.
 settings-bluetooth-forget = Заборави

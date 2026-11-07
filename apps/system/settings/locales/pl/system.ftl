@@ -72,7 +72,7 @@ settings-users-password-new-placeholder = { $count ->
 settings-users-password-confirm = Potwierdź
 settings-users-password-confirm-placeholder = Wpisz ponownie
 settings-users-password-change = Zmień hasło
-settings-users-password-changing = Zmienianie…
+settings-users-password-changing = Zmienianie
 settings-users-password-wrong = To nie jest twoje obecne hasło
 settings-users-password-mismatch = Hasła nie są zgodne
 settings-users-password-too-short = To hasło jest za krótkie
@@ -128,11 +128,11 @@ settings-login-automatic-off = Wyłączone
 
 ## Updates
 
-settings-updates-checking = Szukanie aktualizacji…
-settings-updates-downloading = Pobieranie aktualizacji…
-settings-updates-rolling-back = Przygotowywanie poprzedniej wersji…
-settings-updates-switching-nvidia = Pobieranie sterownika NVIDIA…
-settings-updates-switching-standard = Pobieranie standardowego obrazu…
+settings-updates-checking = Szukanie aktualizacji
+settings-updates-downloading = Pobieranie aktualizacji
+settings-updates-rolling-back = Przygotowywanie poprzedniej wersji
+settings-updates-switching-nvidia = Pobieranie sterownika NVIDIA
+settings-updates-switching-standard = Pobieranie standardowego obrazu
 settings-updates-up-to-date = System jest aktualny
 settings-updates-version = Wersja { $version }
 settings-updates-version-new = Nowa wersja
@@ -152,9 +152,9 @@ settings-updates-last-checked = Ostatnie sprawdzenie: { $when }
 settings-updates-never-checked = Jeszcze nie sprawdzano
 settings-updates-stop = Zatrzymaj
 settings-updates-check = Sprawdź teraz
-settings-updates-checking-button = Sprawdzanie…
+settings-updates-checking-button = Sprawdzanie
 settings-updates-app-updates = Aktualizacje aplikacji
-settings-updates-apps-checking = Szukanie aktualizacji aplikacji…
+settings-updates-apps-checking = Szukanie aktualizacji aplikacji
 settings-updates-apps-count = { $count ->
     [0] Zarządzane w sklepie Schelf
     [one] { $count } aplikacja ma aktualizację w sklepie Schelf
@@ -177,7 +177,7 @@ settings-updates-background-description = Aktualizacje będą gotowe do zainstal
 settings-updates-firmware = Oprogramowanie układowe
 settings-updates-firmware-description = Aktualizacje oprogramowania wbudowanego w sprzęt
 settings-updates-firmware-restart = Zakończy się po ponownym uruchomieniu
-settings-updates-firmware-installing = Instalowanie…
+settings-updates-firmware-installing = Instalowanie
 settings-updates-firmware-update = Zaktualizuj
 settings-updates-firmware-failed = Nie udało się zaktualizować oprogramowania układowego
 settings-updates-download = Pobierz
@@ -268,7 +268,7 @@ settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud l
 settings-accounts-sign-in-again-needed = Zaloguj się ponownie, aby dalej z niego korzystać
 settings-accounts-paused-metered = Synchronizacja wstrzymana przy połączeniu taryfowym
 settings-accounts-paused-battery = Synchronizacja wstrzymana z powodu niskiego poziomu baterii
-settings-accounts-connecting = Łączenie…
+settings-accounts-connecting = Łączenie
 settings-accounts-offline = Offline
 settings-accounts-offline-kept = Offline, zachowane pliki są nadal dostępne
 settings-accounts-not-connected = Brak połączenia
@@ -295,7 +295,7 @@ settings-accounts-sign-in-again = Zaloguj się ponownie
 settings-accounts-keep = Zachowaj
 settings-accounts-remove = Usuń
 settings-accounts-remove-confirm = Usuń z tego komputera
-settings-accounts-removing = Usuwanie…
+settings-accounts-removing = Usuwanie
 settings-accounts-remove-note = Twoje pliki pozostaną w usłudze { $provider }. Zmiany wprowadzone tutaj zostaną najpierw wysłane.
 
 ## Accounts: providers
@@ -328,7 +328,7 @@ settings-accounts-continue-in-browser = Kontynuuj w przeglądarce
 settings-accounts-sign-in = Zaloguj się
 settings-accounts-try-again = Spróbuj ponownie
 settings-accounts-continue = Kontynuuj
-settings-accounts-working = Łączenie z usługą { $provider }…
+settings-accounts-working = Łączenie z usługą { $provider }
 settings-accounts-finish-in-browser = Dokończ logowanie w usłudze { $provider } w przeglądarce. Luft nigdy nie widzi twojego hasła, a ten widok odświeży się sam, gdy skończysz.
 settings-accounts-no-browser = Nie otworzyła się żadna przeglądarka. Skopiuj link i otwórz go w przeglądarce.
 settings-accounts-open-again = Otwórz stronę ponownie

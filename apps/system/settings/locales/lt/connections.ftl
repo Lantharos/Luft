@@ -3,7 +3,7 @@
 ## Network: shared words
 
 settings-network-save = Įrašyti
-settings-network-saving = Įrašoma…
+settings-network-saving = Įrašoma
 settings-network-cancel = Atšaukti
 settings-network-connect = Prisijungti
 settings-network-disconnect = Atsijungti
@@ -22,7 +22,7 @@ settings-network-connect-failed = Nepavyko prisijungti
 ## Network: connection states
 
 settings-network-link-connected = Prisijungta
-settings-network-link-connecting = Jungiamasi…
+settings-network-link-connecting = Jungiamasi
 settings-network-link-disconnected = Neprisijungta
 settings-network-link-unplugged = Kabelis atjungtas
 
@@ -90,7 +90,7 @@ settings-network-wifi-enterprise = Prisijunkite su darbo ar mokymo įstaigos pas
 settings-network-wifi-connect-failed = Nepavyko prisijungti prie šio tinklo
 settings-network-wifi-saved-password-failed = Įrašytas slaptažodis netinka. Įveskite jį dar kartą.
 settings-network-wifi-settings = Tinklo nustatymai
-settings-network-wifi-searching = Ieškoma tinklų…
+settings-network-wifi-searching = Ieškoma tinklų
 settings-network-hidden = Prisijungti prie paslėpto tinklo
     .description = Įveskite tinklo pavadinimą ir saugos tipą.
 settings-network-hidden-name = Tinklo pavadinimas
@@ -251,7 +251,7 @@ settings-network-vpn-off = Išjungta
 settings-network-vpn-none = Nenustatyta
 settings-network-vpn-import = Importuoti iš failo
     .description = WireGuard, OpenVPN ir kiti VPN konfigūracijos failai
-settings-network-vpn-importing = Importuojama…
+settings-network-vpn-importing = Importuojama
 settings-network-wireguard = Nustatyti WireGuard
     .description = Įveskite duomenis, gautus iš VPN teikėjo arba serverio
 settings-network-wireguard-dialog = Šiuos duomenis jums gali pateikti VPN teikėjas arba serverio savininkas.
@@ -271,7 +271,7 @@ settings-network-wireguard-keepalive = Ryšio palaikymas
     .description = Padeda išlaikyti ryšį už maršruto parinktuvo
     .placeholder = Neprivaloma, sekundėmis
 settings-network-wireguard-add = Pridėti
-settings-network-wireguard-adding = Pridedama…
+settings-network-wireguard-adding = Pridedama
 settings-network-wireguard-error-private-key = Įveskite arba sugeneruokite privatųjį raktą
 settings-network-wireguard-error-addresses = Įveskite bent vieną adresą
 settings-network-wireguard-error-server-key = Įveskite serverio viešąjį raktą
@@ -298,16 +298,16 @@ settings-bluetooth-visible-until-off = Kol bus išjungta
 settings-bluetooth-visible-failed = Nepavyko pakeisti, ar šis kompiuteris matomas
 settings-bluetooth-paired = Mano įrenginiai
 settings-bluetooth-nearby = Netoliese esantys įrenginiai
-settings-bluetooth-searching = Ieškoma įrenginių…
+settings-bluetooth-searching = Ieškoma įrenginių
     .description = Įjunkite norimo pridėti įrenginio susiejimo režimą
 settings-bluetooth-blocked = Bluetooth išjungtas aparatiniu jungikliu
     .description = Įjunkite jį kompiuterio jungikliu arba klavišu
 settings-bluetooth-details = Įrenginio informacija
 settings-bluetooth-connected = Prijungta
 settings-bluetooth-connected-battery = Prijungta · akumuliatorius { $battery }
-settings-bluetooth-connecting = Jungiama…
-settings-bluetooth-disconnecting = Atjungiama…
-settings-bluetooth-pairing = Susiejama…
+settings-bluetooth-connecting = Jungiama
+settings-bluetooth-disconnecting = Atjungiama
+settings-bluetooth-pairing = Susiejama
 settings-bluetooth-forget-confirm = Pamiršti įrenginį { $name }?
     .description = Norėdami jį naudoti su šiuo kompiuteriu, turėsite jį susieti iš naujo.
 settings-bluetooth-forget = Pamiršti

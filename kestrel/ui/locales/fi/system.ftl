@@ -49,7 +49,7 @@ media-keys-num-lock-off = Num Lock pois
 
 vpn-sign-in-title = Kirjaudu sisään: { $connection }
 vpn-connect = Yhdistä
-vpn-signing-in = Kirjaudutaan…
+vpn-signing-in = Kirjaudutaan
 vpn-finish-in-browser = Viimeistele kirjautuminen selaimessa.
 vpn-certificate-untrusted = { $host } esitti varmenteen, jota ei voida vahvistaa ({ $reason }). Sen sormenjälki on { $fingerprint }.
 vpn-certificate-warning = Joku voi esiintyä tänä palvelimena. Yhdistä vain, jos odotit tätä.

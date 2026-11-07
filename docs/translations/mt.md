@@ -38,7 +38,7 @@ Sentence case everywhere: only the first word and names take a capital letter. �
 
 - Quotation marks: “…”, and ‘…’ inside them. Many Maltese words end in an apostrophe, so prefer double quotes.
 - Apostrophe: always the typographic ’, never ': ta’, erġa’, saba’, m’hemmx, ’il.
-- Ellipsis: one character, “…”, with no space before it: “Qed jillowdja…”.
+- Ellipsis: one character, “…”, with no space before it. A message about something in progress, such as loading, takes none, because the app shows a spinner beside it.
 - Dash: the en dash with spaces, “ – ”. The hyphen of the article (il-, l-, is-) is a hyphen, never a dash.
 - Percent sign right after the number with no space: 57%. Units take a space: 4.5 W.
 - Key names stay as printed on keyboards sold in Malta, which are English: Ctrl, Alt, Shift, Enter, Delete, Backspace, Home, End, Page Up, Page Down, Print Screen. Spacebar is written as in Windows.

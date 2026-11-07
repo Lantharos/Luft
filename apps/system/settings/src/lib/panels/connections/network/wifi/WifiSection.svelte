@@ -1,9 +1,8 @@
 <script lang="ts">
-	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import Lock from '@lucide/svelte/icons/lock';
 	import Settings from '@lucide/svelte/icons/settings';
 	import { t } from '@luft/i18n';
-	import { ActionRow, IconButton, item, reorder, Row, Section } from '@luft/ui';
+	import { ActionRow, IconButton, item, reorder, Row, Section, Spinner } from '@luft/ui';
 	import MoreRow, { COLLAPSED } from '#lib/components/MoreRow.svelte';
 	import type { Target } from '../connection/profile';
 	import JoinDialog from './JoinDialog.svelte';
@@ -98,7 +97,7 @@
 			>
 				{#snippet trailing()}
 					{#if network.state === 'connecting'}
-						<LoaderCircle size={16} class="animate-spin" />
+						<Spinner size={16} />
 					{/if}
 					{#if isSecured(network.security)}
 						<Lock size={15} />
@@ -112,7 +111,9 @@
 			</ActionRow>
 		</div>
 	{:else}
-		<Row title={t('settings-network-wifi-searching')} />
+		<Row title={t('settings-network-wifi-searching')}>
+			<Spinner />
+		</Row>
 	{/each}
 	{#if wifi.networks.length > COLLAPSED}
 		<MoreRow hidden={wifi.networks.length - COLLAPSED} bind:expanded />

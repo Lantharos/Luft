@@ -73,7 +73,7 @@ settings-users-password-new-placeholder = { $count ->
 settings-users-password-confirm = Ikkonferma
 settings-users-password-confirm-placeholder = Erġa’ ittajpjaha
 settings-users-password-change = Ibdel il-password
-settings-users-password-changing = Qed tinbidel…
+settings-users-password-changing = Qed tinbidel
 settings-users-password-wrong = Din mhijiex il-password attwali
 settings-users-password-mismatch = Il-passwords ma jaqblux
 settings-users-password-too-short = Din il-password qasira wisq
@@ -130,11 +130,11 @@ settings-login-automatic-off = Mitfi
 
 ## Updates
 
-settings-updates-checking = Qed jitfittxew aġġornamenti…
-settings-updates-downloading = Qed jitniżżlu l-aġġornamenti…
-settings-updates-rolling-back = Qed titħejja l-verżjoni ta’ qabel…
-settings-updates-switching-nvidia = Qed jitniżżel id-drajver ta’ NVIDIA…
-settings-updates-switching-standard = Qed titniżżel l-immaġni standard…
+settings-updates-checking = Qed jitfittxew aġġornamenti
+settings-updates-downloading = Qed jitniżżlu l-aġġornamenti
+settings-updates-rolling-back = Qed titħejja l-verżjoni ta’ qabel
+settings-updates-switching-nvidia = Qed jitniżżel id-drajver ta’ NVIDIA
+settings-updates-switching-standard = Qed titniżżel l-immaġni standard
 settings-updates-up-to-date = Is-sistema hija aġġornata
 settings-updates-version = Verżjoni { $version }
 settings-updates-version-new = Verżjoni ġdida
@@ -154,9 +154,9 @@ settings-updates-last-checked = L-aħħar verifika: { $when }
 settings-updates-never-checked = Għadu ma ġiex iċċekkjat
 settings-updates-stop = Waqqaf
 settings-updates-check = Iċċekkja issa
-settings-updates-checking-button = Qed jiċċekkja…
+settings-updates-checking-button = Qed jiċċekkja
 settings-updates-app-updates = Aġġornamenti tal-apps
-settings-updates-apps-checking = Qed jitfittxew aġġornamenti għall-apps…
+settings-updates-apps-checking = Qed jitfittxew aġġornamenti għall-apps
 settings-updates-apps-count = { $count ->
     [0] Immaniġġjati f’Schelf
     [one] { $count } app għandha aġġornament f’Schelf
@@ -180,7 +180,7 @@ settings-updates-background-description = L-aġġornamenti jkunu lesti biex jiġ
 settings-updates-firmware = Firmware
 settings-updates-firmware-description = Aġġornamenti għas-softwer mibni fil-hardware
 settings-updates-firmware-restart = Jitlesta meta tirristartja
-settings-updates-firmware-installing = Qed jiġi installat…
+settings-updates-firmware-installing = Qed jiġi installat
 settings-updates-firmware-update = Aġġorna
 settings-updates-firmware-failed = Il-firmware ma setax jiġi aġġornat
 settings-updates-download = Niżżel
@@ -271,7 +271,7 @@ settings-accounts-add-description = iCloud Drive, OneDrive, Dropbox, Nextcloud j
 settings-accounts-sign-in-again-needed = Erġa’ idħol biex tibqa’ tużah
 settings-accounts-paused-metered = Sinkronizzazzjoni pawżata fuq konnessjoni bil-miter
 settings-accounts-paused-battery = Sinkronizzazzjoni pawżata għax il-batterija baxxa
-settings-accounts-connecting = Qed jikkonnettja…
+settings-accounts-connecting = Qed jikkonnettja
 settings-accounts-offline = Offline
 settings-accounts-offline-kept = Offline, il-fajls miżmuma għadhom hawn
 settings-accounts-not-connected = Mhux ikkonnettjat
@@ -300,7 +300,7 @@ settings-accounts-sign-in-again = Erġa’ idħol
 settings-accounts-keep = Żomm
 settings-accounts-remove = Neħħi
 settings-accounts-remove-confirm = Neħħi minn dan il-kompjuter
-settings-accounts-removing = Qed jitneħħa…
+settings-accounts-removing = Qed jitneħħa
 settings-accounts-remove-note = Il-fajls jibqgħu f’{ $provider }. Il-bidliet li saru hawn jintbagħtu l-ewwel.
 
 ## Accounts: providers
@@ -333,7 +333,7 @@ settings-accounts-continue-in-browser = Kompli fil-browser
 settings-accounts-sign-in = Idħol
 settings-accounts-try-again = Erġa’ pprova
 settings-accounts-continue = Kompli
-settings-accounts-working = Qed jikkomunika ma’ { $provider }…
+settings-accounts-working = Qed jikkomunika ma’ { $provider }
 settings-accounts-finish-in-browser = Lesti d-dħul b’{ $provider } fil-browser. Luft qatt ma jara l-password, u din il-paġna tinbidel waħedha meta tlesti.
 settings-accounts-no-browser = Ma nfetaħ l-ebda browser. Ikkopja l-link u iftħu f’browser.
 settings-accounts-open-again = Erġa’ iftaħ il-paġna

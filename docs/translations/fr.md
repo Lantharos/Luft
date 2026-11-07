@@ -29,7 +29,7 @@ Sentence case everywhere: only the first word and names take a capital letter. �
 - Apostrophe: the typographic ’, never '.
 - A narrow no-break space (U+202F) goes before ; ! and ?, and a no-break space (U+00A0) before :. Since Luft avoids exclamation marks, the question mark and colon are the usual cases: « Supprimer ce fichier ? », « Dernière vérification : { $date } ».
 - Percent sign and units take a no-break space (U+00A0) before them: « 57 % », « 4,5 W ». The space goes in the translation, outside the placeable.
-- Ellipsis: one character, « … », with no space before it: « Chargement… ».
+- Ellipsis: one character, « … », with no space before it: « Chargement… ». A message about something in progress, such as loading, takes none, because the app shows a spinner beside it.
 - Dash: the en dash with spaces, «  –  ».
 - Key names follow French keyboards: Ctrl, Alt, Maj, Entrée, Échap, Espace, Retour arrière, Suppr, Inser, Origine, Fin, Pg préc, Pg suiv, Impr écran. Super stays Super.
 - Write « e-mail », as Windows and macOS do, not « courriel » or « mail », and « en ligne » for online.

@@ -192,7 +192,7 @@ settings-encryption-summary-chip = Dokud nebude hotovo, bezpečnostní čip ucho
 settings-encryption-summary-recovery-key = Dokud nebude hotovo, žádá se při spuštění místo hesla k disku obnovovací klíč.
 # Button, verb: starts encrypting this computer
 settings-encryption-encrypt = Zašifrovat
-settings-encryption-making-room = Uvolňování místa…
+settings-encryption-making-room = Uvolňování místa
 settings-encryption-unlocks-chip-pin = Odemyká se bezpečnostním čipem a vaším PINem
 settings-encryption-unlocks-chip = Odemyká se sám pomocí bezpečnostního čipu
 settings-encryption-unlocks-passphrase = Při spuštění žádá heslo k disku

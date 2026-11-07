@@ -1,7 +1,7 @@
 ## Network: shared words
 
 settings-network-save = Sačuvaj
-settings-network-saving = Čuvanje…
+settings-network-saving = Čuvanje
 settings-network-cancel = Otkaži
 settings-network-connect = Poveži
 settings-network-disconnect = Prekini vezu
@@ -20,7 +20,7 @@ settings-network-connect-failed = Povezivanje nije uspjelo
 ## Network: connection states
 
 settings-network-link-connected = Povezano
-settings-network-link-connecting = Povezivanje…
+settings-network-link-connecting = Povezivanje
 settings-network-link-disconnected = Nije povezano
 settings-network-link-unplugged = Kabl je izvučen
 
@@ -87,7 +87,7 @@ settings-network-wifi-enterprise = Prijava poslovnim ili školskim računom
 settings-network-wifi-connect-failed = Povezivanje s ovom mrežom nije uspjelo
 settings-network-wifi-saved-password-failed = Sačuvana lozinka nije prihvaćena. Unesite je ponovo.
 settings-network-wifi-settings = Postavke mreže
-settings-network-wifi-searching = Traženje mreža…
+settings-network-wifi-searching = Traženje mreža
 settings-network-hidden = Poveži se sa skrivenom mrežom
     .description = Unesite naziv mreže i način na koji je zaštićena.
 settings-network-hidden-name = Naziv mreže
@@ -247,7 +247,7 @@ settings-network-vpn-off = Isključeno
 settings-network-vpn-none = Nije postavljeno
 settings-network-vpn-import = Uvezi iz fajla
     .description = WireGuard, OpenVPN i drugi fajlovi s VPN konfiguracijom
-settings-network-vpn-importing = Uvoz…
+settings-network-vpn-importing = Uvoz
 settings-network-wireguard = Postavi WireGuard
     .description = Unesite podatke od svog VPN pružaoca ili servera
 settings-network-wireguard-dialog = Ove podatke vam može dati vaš VPN pružalac ili vlasnik servera.
@@ -267,7 +267,7 @@ settings-network-wireguard-keepalive = Održavanje veze
     .description = Pomaže da veza ostane aktivna iza rutera
     .placeholder = Neobavezno, u sekundama
 settings-network-wireguard-add = Dodaj
-settings-network-wireguard-adding = Dodavanje…
+settings-network-wireguard-adding = Dodavanje
 settings-network-wireguard-error-private-key = Unesite ili generišite privatni ključ
 settings-network-wireguard-error-addresses = Unesite barem jednu adresu
 settings-network-wireguard-error-server-key = Unesite javni ključ servera
@@ -293,16 +293,16 @@ settings-bluetooth-visible-until-off = Dok se ne isključi
 settings-bluetooth-visible-failed = Vidljivost ovog računara nije moguće promijeniti
 settings-bluetooth-paired = Moji uređaji
 settings-bluetooth-nearby = Uređaji u blizini
-settings-bluetooth-searching = Traženje uređaja…
+settings-bluetooth-searching = Traženje uređaja
     .description = Stavite uređaj koji želite dodati u način uparivanja
 settings-bluetooth-blocked = Bluetooth je isključen hardverskim prekidačem
     .description = Uključite ga prekidačem ili tipkom na računaru
 settings-bluetooth-details = Detalji uređaja
 settings-bluetooth-connected = Povezano
 settings-bluetooth-connected-battery = Povezano · baterija { $battery }
-settings-bluetooth-connecting = Povezivanje…
-settings-bluetooth-disconnecting = Prekidanje veze…
-settings-bluetooth-pairing = Uparivanje…
+settings-bluetooth-connecting = Povezivanje
+settings-bluetooth-disconnecting = Prekidanje veze
+settings-bluetooth-pairing = Uparivanje
 settings-bluetooth-forget-confirm = Zaboraviti „{ $name }“?
     .description = Morat ćete ga ponovo upariti da biste ga koristili s ovim računarom.
 settings-bluetooth-forget = Zaboravi

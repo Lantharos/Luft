@@ -8,7 +8,7 @@ setup-try-again = Tentar novamente
 setup-restart = Reiniciar
 setup-restart-now = Reiniciar agora
 setup-restart-later = Reiniciar mais tarde
-setup-saving = A guardar…
+setup-saving = A guardar
 
 ## Install progress, shown at the bottom of every step while Luft copies
 
@@ -51,7 +51,7 @@ setup-destination-meet-title = Ao lado do Windows
 setup-destination-meet-description = O Meet Luft já preparou este espaço, por isso o Windows fica exatamente como está.
 setup-destination-meet-drive-title = Em { $drive }
 setup-destination-meet-drive-description = O Meet Luft já preparou este espaço noutro disco, e o Luft arranca a partir daí com ficheiros de arranque próprios.
-setup-destination-looking = A analisar os discos…
+setup-destination-looking = A analisar os discos
 
 setup-destination-meet-choice = Ao lado do Windows
 setup-destination-meet-choice-description = Utilizar os { $size } que o Meet Luft preparou ao lado do Windows.
@@ -69,7 +69,7 @@ setup-destination-custom-choice = Personalizado
 setup-destination-custom-choice-description = Organizar as partições manualmente nos Discos.
 
 setup-destination-more-options = Mais opções
-setup-destination-starting = A iniciar…
+setup-destination-starting = A iniciar
 setup-destination-replace = Substituir
 setup-destination-install = Instalar o Luft
 
@@ -127,7 +127,7 @@ setup-drive-partitions = { $count ->
 ## Custom space
 
 setup-custom-open-disks = Abrir os Discos
-setup-custom-looking = A procurar…
+setup-custom-looking = A procurar
 setup-custom-look-again = Procurar novamente
 setup-custom-free-label = Espaço livre
 setup-custom-free-space = { $size } de espaço livre
@@ -172,14 +172,14 @@ setup-replace-blocked-read-only = O disco é só de leitura.
 setup-network-title = Ligar à internet
 setup-network-description = Este passo é opcional. Com ligação, o Luft acerta o relógio e o fuso horário, e pode utilizar a internet enquanto o Luft é instalado.
 setup-network-unavailable = De momento, não há redes disponíveis. Pode ligar-se mais tarde a partir da barra de tarefas.
-setup-network-looking = A procurar redes…
+setup-network-looking = A procurar redes
 setup-network-cable = Ligado por cabo
 setup-network-show-all = Mostrar todas as redes
 setup-network-skip = Ignorar
 setup-network-failed = Não foi possível ligar
 setup-network-wrong-password = Palavra-passe incorreta
 setup-network-connected = Ligado
-setup-network-connecting = A ligar…
+setup-network-connecting = A ligar
 setup-network-saved = Guardada
 setup-network-password = Palavra-passe
 setup-network-join = Ligar
@@ -235,7 +235,7 @@ setup-enroll-digits = { $count ->
 setup-secure-boot-title = O computador ainda não confia no Luft
 setup-secure-boot-code = Logo após o próximo reinício, um ecrã azul pede para confiar no Luft. Utilize o teclado nesse ecrã com este código.
 setup-secure-boot-skipped = O ecrã azul foi ignorado. Obtenha um novo código e reinicie; depois, utilize o teclado nesse ecrã.
-setup-secure-boot-getting = A obter o código…
+setup-secure-boot-getting = A obter o código
 setup-secure-boot-new-code = Obter um novo código
 
 ## Encryption

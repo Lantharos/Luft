@@ -109,6 +109,9 @@ impl Format {
         if self.filesystem.owned() {
             options.insert("take-ownership", Variant::from(true));
         }
+        if self.filesystem == Filesystem::Ext4 {
+            options.insert("mkfs-args", Variant::from(vec!["-m", "0"]));
+        }
         if erase && self.erase {
             options.insert("erase", Variant::from("zero"));
         }

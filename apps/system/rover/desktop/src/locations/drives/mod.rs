@@ -45,6 +45,7 @@ pub struct DriveInfo {
 
 struct Space {
     total: u64,
+    used: u64,
     available: u64,
     read_only: bool,
 }
@@ -78,7 +79,7 @@ pub fn list_drives() -> Vec<DriveInfo> {
             device: mount.device,
             total_space: space.total,
             available_space: space.available,
-            used_space: space.total.saturating_sub(space.available),
+            used_space: space.used,
         };
         match by_device.get_mut(&drive.device) {
             Some(current) if prefers(&drive, current) => *current = drive,
@@ -199,6 +200,7 @@ fn disk_space(mount_point: &str) -> Option<Space> {
         let (total, available) = sample_space(mount_point);
         return Some(Space {
             total,
+            used: total.saturating_sub(available),
             available,
             read_only: false,
         });
@@ -212,6 +214,7 @@ fn disk_space(mount_point: &str) -> Option<Space> {
     let total = stat.f_blocks * stat.f_frsize;
     (total > 0).then_some(Space {
         total,
+        used: (stat.f_blocks - stat.f_bfree) * stat.f_frsize,
         available: stat.f_bavail * stat.f_frsize,
         read_only: stat.f_flag & libc::ST_RDONLY != 0,
     })

@@ -214,7 +214,7 @@
 					<Row title="Updates" description="From its maker's software source when the package adds one, as many do. Otherwise, install a newer file when one comes out." />
 				{/if}
 				{#if file.kind === 'appImage'}
-					<Row title="Installs to" description="It gets a place in your app menu, and Schelf keeps it up to date when it can."><span>Applications folder</span></Row>
+					<Row title="Installs to" description="It gets a place in your app menu, and Schelf keeps it up to date when it can."><span>Your account</span></Row>
 				{:else if file.kind === 'package' && file.system}
 					<Row title="Installs to" description="For everyone on this computer, rebuilt with every update of Luft."><span>System</span></Row>
 					{#if source && sourceName}

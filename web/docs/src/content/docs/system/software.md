@@ -9,9 +9,9 @@ Luft's system is a sealed image, so apps and tools live next to it, in your acco
 
 | Kind | Where it goes | Updates |
 | --- | --- | --- |
-| Apps and extensions from schelf.store | Your account: AppImages in `~/Applications` in their sandbox, apps built with Sabine next to Luft's own, extensions on your desktop | By themselves, a few minutes after you sign in and every six hours |
+| Apps and extensions from schelf.store | Your account: AppImages in their sandbox, apps built with Sabine next to Luft's own, extensions on your desktop | By themselves, a few minutes after you sign in and every six hours |
 | Flatpak apps from Flathub | Your account | In Schelf, under Updates, or `schelf update` |
-| AppImages | `~/Applications`, with a menu entry and icon | By themselves, a few minutes after you sign in and every six hours |
+| AppImages | Your account, with a menu entry and icon | By themselves, a few minutes after you sign in and every six hours |
 | Command-line tools from Fedora | A Toolbox container, with their commands in `~/.local/bin` | In Schelf, under Updates, or `schelf update` |
 | Fedora's desktop apps, and system packages from Fedora and the software sources you add | The system, for everyone on the computer | With Luft, in [Settings](/system/updates/) |
 
@@ -39,7 +39,7 @@ Command-line tools and system packages don't run in a sandbox, so they have full
 
 ## AppImages
 
-Open an `.AppImage` file and Schelf offers to install it. It moves it into `~/Applications` and adds it to Start with its own icon, so it opens like any other app. AppImages you set up earlier with other tools, such as Gear Lever, are picked up too.
+Open an `.AppImage` file and Schelf offers to install it. It keeps it out of your folders, in `~/.local/share/luft/appimages`, and adds it to Start with its own icon, so it opens like any other app. AppImages you set up earlier with other tools, such as Gear Lever, are picked up too.
 
 AppImages run in a sandbox, like Flatpak apps:
 

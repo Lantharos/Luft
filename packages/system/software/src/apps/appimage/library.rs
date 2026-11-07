@@ -66,7 +66,7 @@ pub struct AppImage {
 }
 
 pub fn folder() -> PathBuf {
-    dirs::home_dir().unwrap_or_default().join("Applications")
+    dirs::data_dir().unwrap_or_default().join("luft/appimages")
 }
 
 pub fn applications() -> PathBuf {

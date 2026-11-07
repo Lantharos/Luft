@@ -22,17 +22,15 @@
 	let progress = $derived(t('setup-installing-progress', { progress: new FluentNumber(percent / 100, { style: 'percent' }) }));
 </script>
 
-<section class="flex h-full flex-col px-14 pt-12 pb-8">
-	<div class="flex min-h-0 flex-1 flex-col justify-center">
-		<header class="flex flex-col gap-2">
-			<h1 class="text-[30px] leading-tight font-semibold">{title}</h1>
-			{#if description}
-				<p class="max-w-[540px] text-[15px] leading-relaxed text-[var(--text-soft)]">{description}</p>
-			{/if}
-		</header>
-		<div class="soft-scroll scroll-fade -mx-3 mt-7 min-h-0 shrink overflow-y-auto px-3 pb-2">
-			{@render children?.()}
-		</div>
+<section class="flex h-full flex-col px-14 pt-14 pb-8">
+	<header class="flex flex-col gap-2">
+		<h1 class="text-[30px] leading-tight font-semibold">{title}</h1>
+		{#if description}
+			<p class="max-w-[540px] text-[15px] leading-relaxed text-[var(--text-soft)]">{description}</p>
+		{/if}
+	</header>
+	<div class="soft-scroll scroll-fade -mx-3 mt-7 min-h-0 flex-1 overflow-y-auto px-3 pb-2">
+		{@render children?.()}
 	</div>
 	<footer class="mt-5 grid min-h-10 grid-cols-[1fr_auto_1fr] items-center gap-3">
 		<div class="flex justify-start">

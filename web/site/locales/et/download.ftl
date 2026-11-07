@@ -15,8 +15,6 @@ download-meet-windows = Laadi alla Windowsile
 download-meet-linux = Laadi alla Linuxile
 download-meet-windows-version = Windowsi versioon
 download-meet-linux-version = Linuxi versioon
-download-meet-windows-checksum = Windowsi versiooni kontrollsumma
-download-meet-linux-checksum = Linuxi versiooni kontrollsumma
 download-meet-note = Windows 10 või 11 või Linux UEFI-ga arvutis. Windows võib esimesel avamisel korra küsida: vali Lisateave ja seejärel Käivita ikkagi.
 
 download-iso-text = USB-mälupulga, virtuaalmasina või täiesti tühja arvuti jaoks. See installib võrguühenduseta igale arvutile.

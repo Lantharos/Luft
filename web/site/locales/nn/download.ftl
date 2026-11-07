@@ -15,8 +15,6 @@ download-meet-windows = Last ned for Windows
 download-meet-linux = Last ned for Linux
 download-meet-windows-version = Windows-versjon
 download-meet-linux-version = Linux-versjon
-download-meet-windows-checksum = Windows-kontrollsum
-download-meet-linux-checksum = Linux-kontrollsum
 # Windows finst ikkje på nynorsk, så knappane heiter det same som i bokmålsversjonen.
 download-meet-note = Windows 10 eller 11, eller Linux på ein datamaskin med UEFI. Windows kan spørje éin gong før appen blir opna første gongen: vel «Mer informasjon» og deretter «Kjør likevel».
 

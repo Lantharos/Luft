@@ -13,8 +13,6 @@ download-meet-windows = Télécharger pour Windows
 download-meet-linux = Télécharger pour Linux
 download-meet-windows-version = Version Windows
 download-meet-linux-version = Version Linux
-download-meet-windows-checksum = Somme de contrôle Windows
-download-meet-linux-checksum = Somme de contrôle Linux
 download-meet-note = Windows 10 ou 11, ou Linux sur un ordinateur UEFI. Windows peut demander une confirmation la première fois que vous l’ouvrez : choisissez Informations complémentaires, puis Exécuter quand même.
 
 download-iso-text = Pour une clé USB, une machine virtuelle ou un ordinateur vierge. Il s’installe hors ligne, sur n’importe quel PC.

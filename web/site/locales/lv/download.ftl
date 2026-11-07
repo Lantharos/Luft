@@ -15,8 +15,6 @@ download-meet-windows = Lejupielādēt Windows versiju
 download-meet-linux = Lejupielādēt Linux versiju
 download-meet-windows-version = Windows versija
 download-meet-linux-version = Linux versija
-download-meet-windows-checksum = Windows kontrolsumma
-download-meet-linux-checksum = Linux kontrolsumma
 download-meet-note = Windows 10 vai 11, vai Linux datorā ar UEFI. Pirms pirmās atvēršanas Windows var vienreiz pajautāt: izvēlieties Papildinformācija un pēc tam Tik un tā palaist.
 
 download-iso-text = USB zibatmiņai, virtuālajai mašīnai vai pilnīgi tukšam datoram. Instalē bezsaistē, jebkurā datorā.

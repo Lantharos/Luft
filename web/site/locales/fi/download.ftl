@@ -15,8 +15,6 @@ download-meet-windows = Lataa Windowsille
 download-meet-linux = Lataa Linuxille
 download-meet-windows-version = Windows-versio
 download-meet-linux-version = Linux-versio
-download-meet-windows-checksum = Windows-version tarkistussumma
-download-meet-linux-checksum = Linux-version tarkistussumma
 download-meet-note = Windows 10 tai 11, tai Linux UEFI-tietokoneessa. Windows voi kysyä kerran ennen ensimmäistä avaamista: valitse Lisätietoja ja sitten Suorita silti.
 
 download-iso-text = USB-tikulle, virtuaalikoneelle tai tietokoneelle, jolla ei ole vielä mitään. Se asentuu ilman verkkoyhteyttä mihin tahansa PC:hen.

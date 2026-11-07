@@ -15,8 +15,6 @@ download-meet-windows = Downloaden voor Windows
 download-meet-linux = Downloaden voor Linux
 download-meet-windows-version = Windows-versie
 download-meet-linux-version = Linux-versie
-download-meet-windows-checksum = Windows-checksum
-download-meet-linux-checksum = Linux-checksum
 download-meet-note = Windows 10 of 11, of Linux op een computer met UEFI. Windows vraagt misschien één keer iets voordat het de eerste keer opent: kies Meer informatie en daarna Toch uitvoeren.
 
 download-iso-text = Voor een usb-stick, een virtuele machine of een computer die vanaf nul begint. Het installeert offline, op elke pc.

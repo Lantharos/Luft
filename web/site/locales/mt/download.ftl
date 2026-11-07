@@ -15,8 +15,6 @@ download-meet-windows = Niżżel għal Windows
 download-meet-linux = Niżżel għal Linux
 download-meet-windows-version = Verżjoni għal Windows
 download-meet-linux-version = Verżjoni għal Linux
-download-meet-windows-checksum = Checksum għal Windows
-download-meet-linux-checksum = Checksum għal Linux
 download-meet-note = Windows 10 jew 11, jew Linux fuq kompjuter b’UEFI. Windows jista’ jistaqsi darba qabel jiftħu l-ewwel darba: agħżel Aktar informazzjoni, imbagħad Ħaddem xorta waħda.
 
 download-iso-text = Għal drajv USB, magna virtwali, jew kompjuter li jibda minn xejn. Jinstalla offline, fuq kwalunkwe PC.

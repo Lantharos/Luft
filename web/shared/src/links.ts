@@ -2,6 +2,7 @@ export const urls = {
 	site: 'https://luft.computer',
 	docs: 'https://docs.luft.computer',
 	downloads: 'https://get.luft.computer',
+	meet: 'https://dl.schelf.store/lantharos/meet',
 	source: 'https://github.com/Lantharos/Luft'
 } as const;
 

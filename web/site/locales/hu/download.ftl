@@ -15,8 +15,6 @@ download-meet-windows = Letöltés Windowsra
 download-meet-linux = Letöltés Linuxra
 download-meet-windows-version = Windowsos verzió
 download-meet-linux-version = Linuxos verzió
-download-meet-windows-checksum = Windowsos ellenőrzőösszeg
-download-meet-linux-checksum = Linuxos ellenőrzőösszeg
 download-meet-note = Windows 10 vagy 11, illetve Linux UEFI-s számítógépen. Az első megnyitás előtt a Windows egyszer rákérdezhet: válassza a További információ, majd a Futtatás mindenképp lehetőséget.
 
 download-iso-text = Pendrive-hoz, virtuális géphez vagy teljesen üres számítógéphez. Offline telepít, bármilyen PC-re.

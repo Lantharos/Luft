@@ -15,8 +15,6 @@ download-meet-windows = Λήψη για Windows
 download-meet-linux = Λήψη για Linux
 download-meet-windows-version = Έκδοση για Windows
 download-meet-linux-version = Έκδοση για Linux
-download-meet-windows-checksum = Άθροισμα ελέγχου για Windows
-download-meet-linux-checksum = Άθροισμα ελέγχου για Linux
 download-meet-note = Windows 10 ή 11, ή Linux σε υπολογιστή με UEFI. Τα Windows μπορεί να ρωτήσουν μία φορά πριν το ανοίξουν για πρώτη φορά: επιλέξτε «Περισσότερες πληροφορίες» και μετά «Εκτέλεση οπωσδήποτε».
 
 download-iso-text = Για στικ USB, εικονική μηχανή ή υπολογιστή που ξεκινά από το μηδέν. Εγκαθίσταται χωρίς σύνδεση, σε οποιονδήποτε υπολογιστή.

@@ -13,8 +13,6 @@ download-meet-windows = Íoslódáil do Windows
 download-meet-linux = Íoslódáil do Linux
 download-meet-windows-version = Leagan Windows
 download-meet-linux-version = Leagan Linux
-download-meet-windows-checksum = Suim sheiceála Windows
-download-meet-linux-checksum = Suim sheiceála Linux
 download-meet-note = Windows 10 nó 11, nó Linux ar ríomhaire UEFI. Seans go n-iarrfaidh Windows ort uair amháin sula n-osclóidh sé é den chéad uair: roghnaigh Tuilleadh faisnéise, ansin Rith ar aon nós.
 
 download-iso-text = Do chipín USB, do mheaisín fíorúil, nó do ríomhaire atá ag tosú ó neamhní. Suiteálann sé as líne, ar aon ríomhaire.

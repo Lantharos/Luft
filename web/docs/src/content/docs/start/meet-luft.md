@@ -9,8 +9,10 @@ Meet Luft is a small app for Windows and Linux. It checks your computer, puts Lu
 
 | | Download |
 | --- | --- |
-| Windows 10 or 11 | [meet-luft.exe](https://get.luft.computer/meet/meet-luft.exe) ([checksum](https://get.luft.computer/meet/meet-luft.exe.sha256)) |
-| Linux | [meet-luft.AppImage](https://get.luft.computer/meet/meet-luft.AppImage) ([checksum](https://get.luft.computer/meet/meet-luft.AppImage.sha256)) |
+| Windows 10 or 11 | [Meet Luft for Windows](https://dl.schelf.store/lantharos/meet/latest/windows-x86_64/exe) |
+| Linux | [Meet Luft for Linux](https://dl.schelf.store/lantharos/meet/latest/linux-x86_64/app-image) |
+
+Both come from [schelf.store](https://schelf.store/apps/com.lantharos.meet), which also lists their [checksums](https://dl.schelf.store/lantharos/meet/latest/SHA256SUMS).
 
 Meet Luft isn't code-signed, so Windows SmartScreen asks before it first starts: choose **More info**, then **Run anyway**.
 

@@ -15,8 +15,6 @@ download-meet-windows = Stiahnuť pre Windows
 download-meet-linux = Stiahnuť pre Linux
 download-meet-windows-version = Verzia pre Windows
 download-meet-linux-version = Verzia pre Linux
-download-meet-windows-checksum = Kontrolný súčet pre Windows
-download-meet-linux-checksum = Kontrolný súčet pre Linux
 download-meet-note = Windows 10 alebo 11, prípadne Linux na počítači s UEFI. Pri prvom spustení sa Windows môže raz opýtať: vyberte Ďalšie informácie a potom Spustiť aj tak.
 
 download-iso-text = Pre USB kľúč, virtuálny počítač alebo počítač, ktorý začína od nuly. Inštaluje sa offline, na akékoľvek PC.

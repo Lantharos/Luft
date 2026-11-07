@@ -15,8 +15,6 @@ download-meet-windows = Windows için indir
 download-meet-linux = Linux için indir
 download-meet-windows-version = Windows sürümü
 download-meet-linux-version = Linux sürümü
-download-meet-windows-checksum = Windows sağlama toplamı
-download-meet-linux-checksum = Linux sağlama toplamı
 download-meet-note = Windows 10 veya 11 ya da UEFI’li bir bilgisayarda Linux. Windows ilk açılışta bir kez sorabilir: önce Ek bilgi, ardından Yine de çalıştır seçeneğini seçin.
 
 download-iso-text = USB bellek, sanal makine ya da sıfırdan başlayan bir bilgisayar için. Her bilgisayara çevrimdışı yüklenir.

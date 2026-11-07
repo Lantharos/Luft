@@ -13,8 +13,6 @@ download-meet-windows = Sækja fyrir Windows
 download-meet-linux = Sækja fyrir Linux
 download-meet-windows-version = Útgáfa fyrir Windows
 download-meet-linux-version = Útgáfa fyrir Linux
-download-meet-windows-checksum = Gátsumma fyrir Windows
-download-meet-linux-checksum = Gátsumma fyrir Linux
 download-meet-note = Windows 10 eða 11, eða Linux á tölvu með UEFI. Windows gæti spurt einu sinni áður en forritið opnast í fyrsta skipti: veldu Frekari upplýsingar og svo Keyra samt.
 
 download-iso-text = Fyrir USB-lykil, sýndarvél eða tölvu sem byrjar frá grunni. Uppsetningin þarf enga nettengingu og virkar á hvaða tölvu sem er.

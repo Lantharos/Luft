@@ -167,31 +167,9 @@ jobs:
           bun-version: latest
 
       - name: Send this nightly's apps and extensions to stable
-        id: promote
         env:
           STORE_RELEASES: ${{ needs.promote.outputs.store-releases }}
-        run: bun .github/scripts/store/index.ts promote "$STORE_RELEASES" >> "$GITHUB_OUTPUT"
-
-      - name: Put Meet Luft's downloads next to the release
-        if: always() && steps.promote.outputs.meet && steps.promote.outputs.meet != '[]'
-        env:
-          MEET: ${{ steps.promote.outputs.meet }}
-          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
-          R2_BUCKET: ${{ secrets.R2_BUCKET }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: auto
-          AWS_REQUEST_CHECKSUM_CALCULATION: when_required
-          AWS_RESPONSE_CHECKSUM_VALIDATION: when_required
-        working-directory: ${{ runner.temp }}
-        run: |
-          jq -r '.[] | "\(.name) \(.url) \(.sha256)"' <<<"$MEET" | while read -r name url sha256; do
-            curl -sfL --retry 3 -o "$name" "$url"
-            echo "$sha256  $name" | tee "$name.sha256" | sha256sum --check
-            for file in "$name" "$name.sha256"; do
-              aws s3 cp "$file" "s3://$R2_BUCKET/meet/$file" --endpoint-url "https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com" --only-show-errors
-            done
-          done
+        run: bun .github/scripts/store/index.ts promote "$STORE_RELEASES"
 
   release:
     name: GitHub release
@@ -230,7 +208,7 @@ jobs:
           ## Downloads
 
           - [$iso]($DOWNLOADS/$MAJOR/$iso), with its [checksum]($DOWNLOADS/$MAJOR/$iso.sha256) and [signature]($DOWNLOADS/$MAJOR/$iso.sha256.minisig)
-          - Meet Luft for [Windows]($DOWNLOADS/meet/meet-luft.exe) ([checksum]($DOWNLOADS/meet/meet-luft.exe.sha256)) and [Linux]($DOWNLOADS/meet/meet-luft.AppImage) ([checksum]($DOWNLOADS/meet/meet-luft.AppImage.sha256))
+          - [Meet Luft](https://schelf.store/apps/com.lantharos.meet) for Windows and Linux
 
           ## Images
 

@@ -15,8 +15,6 @@ download-meet-windows = Atsisiųsti Windows versiją
 download-meet-linux = Atsisiųsti Linux versiją
 download-meet-windows-version = Windows versija
 download-meet-linux-version = Linux versija
-download-meet-windows-checksum = Windows kontrolinė suma
-download-meet-linux-checksum = Linux kontrolinė suma
 download-meet-note = Windows 10 ar 11 arba Linux kompiuteryje su UEFI. Prieš pirmą atidarymą Windows gali vieną kartą paklausti: pasirinkite Daugiau informacijos, tada Vis tiek vykdyti.
 
 download-iso-text = USB atmintukui, virtualiajai mašinai ar visiškai tuščiam kompiuteriui. Įdiegia neprisijungus, į bet kurį kompiuterį.

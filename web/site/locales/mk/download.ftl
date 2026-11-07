@@ -15,8 +15,6 @@ download-meet-windows = Преземи за Windows
 download-meet-linux = Преземи за Linux
 download-meet-windows-version = Верзија за Windows
 download-meet-linux-version = Верзија за Linux
-download-meet-windows-checksum = Контролен збир за Windows
-download-meet-linux-checksum = Контролен збир за Linux
 download-meet-note = Windows 10 или 11, или Linux на компјутер со UEFI. При првото отворање Windows може еднаш да побара потврда: изберете Повеќе информации, а потоа Сепак изврши.
 
 download-iso-text = За USB-меморија, виртуелна машина или компјутер што почнува од нула. Се инсталира без интернет, на кој било компјутер.

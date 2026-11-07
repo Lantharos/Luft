@@ -8,7 +8,6 @@ type Published = Pick<Planned, 'id' | 'version'>;
 
 const NIGHTLY = 'nightly';
 const STABLE = 'stable';
-const MEET = { id: 'com.lantharos.meet', files: { 'meet-luft.exe': ['windows-x86_64', 'exe'], 'meet-luft.AppImage': ['linux-x86_64', 'app-image'] } };
 const SETTLE_MINUTES = 45;
 
 const print = (outputs: Record<string, string>) =>
@@ -89,29 +88,18 @@ async function promoteItem(item: Item, version: string) {
   return promoted;
 }
 
-async function meetFiles(version: string) {
-  const release = (await listed(MEET.id)).find((candidate) => candidate.version === version)!;
-  return Object.entries(MEET.files).map(([name, [platform, kind]]) => {
-    const { url, sha256 } = release.artifacts.find((artifact) => artifact.platform === platform && artifact.kind === kind)!;
-    return { name, url, sha256 };
-  });
-}
-
 async function promoteAll(label: string) {
   const items = new Map(storeItems().map((item) => [item.id, item]));
   const failures: string[] = [];
-  let meet = '[]';
   for (const [id, version] of label.split(' ').filter(Boolean).map((pair) => pair.split('='))) {
     const item = items.get(id);
     if (!item) throw new Error(`${id} isn't in the repository any more`);
     try {
-      const promoted = await promoteItem(item, version);
-      if (promoted && id === MEET.id) meet = JSON.stringify(await meetFiles(version));
+      await promoteItem(item, version);
     } catch (error) {
       failures.push(`${id} ${version}: ${(error as Error).message}`);
     }
   }
-  print({ meet });
   if (failures.length) throw new Error(`Some releases didn't go to ${STABLE}:\n${failures.join('\n')}`);
 }
 

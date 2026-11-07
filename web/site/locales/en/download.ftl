@@ -18,8 +18,7 @@ download-meet-windows = Download for Windows
 download-meet-linux = Download for Linux
 download-meet-windows-version = Windows version
 download-meet-linux-version = Linux version
-download-meet-windows-checksum = Windows checksum
-download-meet-linux-checksum = Linux checksum
+download-meet-checksums = Checksums
 # "More info" and "Run anyway" are the buttons of Windows' SmartScreen warning; use the names Windows shows in this language.
 download-meet-note = Windows 10 or 11, or Linux with a UEFI computer. Windows may ask once before opening it the first time: choose More info, then Run anyway.
 

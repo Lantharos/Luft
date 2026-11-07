@@ -13,8 +13,6 @@ download-meet-windows = Transferir para Windows
 download-meet-linux = Transferir para Linux
 download-meet-windows-version = Versão para Windows
 download-meet-linux-version = Versão para Linux
-download-meet-windows-checksum = Soma de verificação para Windows
-download-meet-linux-checksum = Soma de verificação para Linux
 download-meet-note = Windows 10 ou 11, ou Linux num computador UEFI. Na primeira vez, o Windows pode pedir confirmação antes de o abrir: escolha Mais informações e depois Executar mesmo assim.
 
 download-iso-text = Para uma pen USB, uma máquina virtual ou um computador vazio. Instala-se offline, em qualquer PC.

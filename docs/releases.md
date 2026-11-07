@@ -46,7 +46,7 @@ Every app and extension with a `schelf.toml`, such as Draft, Magpie, Mailman, Co
 
 - **Nightly.** Before building the image, the run works out each app's source key the way it does for the image's parts, from its folder, the files next to it, every workspace package and crate it reaches and the lockfiles, and compares it with the key at the commit of the app's newest release. Each app that changed is built with Sabine's release workflow for Linux x86_64 and ARM64 (and Windows for Meet Luft), or packed with `extensions/pack.sh`, once for all machines or, with a native helper, per architecture, and published to the nightly channel, with the subjects of the commits that touched its folder as release notes. The image waits for those releases to pass the store's checks and ships them.
 - **Versions.** The version in `Sabine.toml` or `extension.toml` is the lowest an app's next release can have. Each release takes that version or the next patch after the newest release on any channel, whichever is higher, so nobody bumps a version for a fix. To start a new minor or major version, raise it in the manifest.
-- **Stable.** Promoting a nightly image promotes exactly the app releases it was built with to the stable channel, without building or uploading anything, with the commits that touched each app's folder since its last stable release as notes. They go through the store's review there; an app whose release is already on stable is left alone. When Meet Luft is among them, its Windows setup program and AppImage are copied to `meet/` on get.luft.computer.
+- **Stable.** Promoting a nightly image promotes exactly the app releases it was built with to the stable channel, without building or uploading anything, with the commits that touched each app's folder since its last stable release as notes. They go through the store's review there; an app whose release is already on stable is left alone. Meet Luft's downloads on the website and in the docs are schelf.store's stable links, so they follow its stable release by themselves.
 
 A new app goes in `apps/store` and a new extension in `extensions`, each with a `schelf.toml` with `listing = "store/"` and a `store/listing.toml` with its `summary`, `description`, `categories` (the first is its primary one), `homepage`, `support` and `brand_color`, and the `screenshots` in `store/`, in the order the store shows them. Extensions add their search `keywords` there too. Each nightly sends the file with the release, and the store applies everything but the screenshots, unless that field was changed in the dashboard. Apps that update from the store say `provider = "schelf"` under `[updates]` in `Sabine.toml`, and the `[sandbox]` table there says what they need.
 
@@ -73,7 +73,7 @@ Settings shows the same changelog under What's new, merging every version betwee
 
 ## GitHub releases
 
-Each stable release gets a GitHub release named after its version, such as *Luft 1.1* on the tag `v1.1`, with the changelog, links to its stick and to Meet Luft on get.luft.computer, and the digests of `:1` and `:1-nvidia` with the `cosign verify` command that checks them. The changelog is attached as `CHANGES.md`, and the stick's checksum and signature are attached too. The stick itself is too big for GitHub. Nightlies don't get GitHub releases.
+Each stable release gets a GitHub release named after its version, such as *Luft 1.1* on the tag `v1.1`, with the changelog, links to its stick on get.luft.computer and to Meet Luft on schelf.store, and the digests of `:1` and `:1-nvidia` with the `cosign verify` command that checks them. The changelog is attached as `CHANGES.md`, and the stick's checksum and signature are attached too. The stick itself is too big for GitHub. Nightlies don't get GitHub releases.
 
 ## USB sticks
 
@@ -86,8 +86,7 @@ The stick starts through Fedora's signed shim and GRUB, carries its images so in
 | `…/latest.json` | The newest stick in that folder: its `name`, `version`, `size` and `sha256` |
 | `nightly/notes/VERSION.json` | That nightly's changelog |
 | `1/notes/VERSION.json` | That stable release's changelog |
-| `meet/` | Meet Luft for Windows and Linux |
 
 Each notes file holds the `version`, the `previous` one in its folder and the changelog in `notes`, and a release's also the `nightly` it came from, as a list of sections with an `area` (`desktop`, `apps`, `system` or `installing`), a `title` and their `changes`. The image also carries its changelog in the `com.lantharos.release-notes` label, for when Settings can't reach get.luft.computer.
 
-Every stick and Meet Luft download has a `.sha256` next to it, and each stick's checksum is signed with minisign in a `.sha256.minisig`, with the stick's file name as the trusted comment. The public key is `RWRz9rCK/H8Drrze/f851hxNNOH/D42kpyTMpXV7DT7QoUdCZySZwRWA`.
+Every stick has a `.sha256` next to it, and each stick's checksum is signed with minisign in a `.sha256.minisig`, with the stick's file name as the trusted comment. The public key is `RWRz9rCK/H8Drrze/f851hxNNOH/D42kpyTMpXV7DT7QoUdCZySZwRWA`. Meet Luft's checksums are schelf.store's, in its `SHA256SUMS`.

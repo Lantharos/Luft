@@ -13,8 +13,6 @@ download-meet-windows = Descarcă pentru Windows
 download-meet-linux = Descarcă pentru Linux
 download-meet-windows-version = Versiunea pentru Windows
 download-meet-linux-version = Versiunea pentru Linux
-download-meet-windows-checksum = Suma de control pentru Windows
-download-meet-linux-checksum = Suma de control pentru Linux
 download-meet-note = Windows 10 sau 11 ori Linux pe un computer cu UEFI. La prima deschidere, Windows poate cere o confirmare: alegeți Mai multe informații, apoi Executare oricum.
 
 download-iso-text = Pentru un stick USB, o mașină virtuală sau un computer pornit de la zero. Se instalează offline, pe orice PC.

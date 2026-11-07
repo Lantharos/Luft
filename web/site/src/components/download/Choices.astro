@@ -17,8 +17,7 @@ const sized = (size: number | null) => (size ? ` · ${formatSize(size, locale)}`
 		<p class="mt-5 flex flex-wrap gap-x-4 gap-y-1 text-sm text-ink-muted">
 			<a class="link only-linux" href={meet.windows.href}>{t('download-meet-windows-version')}</a>
 			<a class="link only-windows" href={meet.linux.href}>{t('download-meet-linux-version')}</a>
-			<a class="link" href={meet.windows.checksum}>{t('download-meet-windows-checksum')}</a>
-			<a class="link" href={meet.linux.checksum}>{t('download-meet-linux-checksum')}</a>
+			<a class="link" href={meet.checksums}>{t('download-meet-checksums')}</a>
 		</p>
 		<p class="mt-8 max-w-md text-sm text-ink-muted">{t('download-meet-note')}</p>
 	</div>

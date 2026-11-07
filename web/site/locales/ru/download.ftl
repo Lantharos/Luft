@@ -15,8 +15,6 @@ download-meet-windows = Скачать для Windows
 download-meet-linux = Скачать для Linux
 download-meet-windows-version = Версия для Windows
 download-meet-linux-version = Версия для Linux
-download-meet-windows-checksum = Контрольная сумма для Windows
-download-meet-linux-checksum = Контрольная сумма для Linux
 download-meet-note = Windows 10 или 11 либо Linux на компьютере с UEFI. При первом запуске Windows может один раз предупредить: выберите «Подробнее», а затем «Выполнить в любом случае».
 
 download-iso-text = Для USB-накопителя, виртуальной машины или компьютера, который начинает с нуля. Устанавливается офлайн, на любой ПК.

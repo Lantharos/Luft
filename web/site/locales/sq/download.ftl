@@ -15,8 +15,6 @@ download-meet-windows = Shkarko për Windows
 download-meet-linux = Shkarko për Linux
 download-meet-windows-version = Versioni për Windows
 download-meet-linux-version = Versioni për Linux
-download-meet-windows-checksum = Shuma e kontrollit për Windows
-download-meet-linux-checksum = Shuma e kontrollit për Linux
 download-meet-note = Windows 10 ose 11, ose Linux në një kompjuter me UEFI. Windows mund të pyesë një herë para se ta hapë për herë të parë: zgjidh “Më shumë informacion”, pastaj “Ekzekuto gjithsesi”.
 
 download-iso-text = Për një memorie USB, një makinë virtuale ose një kompjuter që nis nga zero. Instalohet pa internet, në çdo PC.

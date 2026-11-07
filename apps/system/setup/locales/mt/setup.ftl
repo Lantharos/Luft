@@ -244,7 +244,6 @@ setup-protect-keep-safe = Żomm din iċ-ċavetta tal-irkupru x’imkien sigur, �
 setup-protect-passphrase-label = Passphrase
 setup-protect-repeat = Erġa’ ttajpjaha
 setup-protect-mismatch = Ma jaqblux
-setup-protect-kept = Żammejt iċ-ċavetta tal-irkupru
 setup-protect-skip = Iċċifrax
 setup-protect-encrypt = Iċċifra
 

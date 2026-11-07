@@ -229,7 +229,6 @@ setup-protect-keep-safe = Ruaje këtë çelës rikuperimi diku të sigurt, larg 
 setup-protect-passphrase-label = Frazëkalimi
 setup-protect-repeat = Shkruaje sërish
 setup-protect-mismatch = Nuk përputhen
-setup-protect-kept = E kam ruajtur çelësin e rikuperimit
 setup-protect-skip = Mos enkripto
 setup-protect-encrypt = Enkripto
 

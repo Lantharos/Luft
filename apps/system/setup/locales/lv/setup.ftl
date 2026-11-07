@@ -234,7 +234,6 @@ setup-protect-keep-safe = Glabājiet šo atkopšanas atslēgu drošā vietā, at
 setup-protect-passphrase-label = Paroles frāze
 setup-protect-repeat = Ievadiet vēlreiz
 setup-protect-mismatch = Tās nesakrīt
-setup-protect-kept = Atkopšanas atslēga ir saglabāta
 setup-protect-skip = Nešifrēt
 setup-protect-encrypt = Šifrēt
 

@@ -46,7 +46,6 @@ ui-recovery-key-copy = Kopēt
 ui-recovery-key-saved = Saglabāta
 ui-recovery-key-printing = Nosūtīta printerim
 ui-recovery-key-copied = Nokopēta
-ui-recovery-key-kept = Atkopšanas atslēga ir saglabāta
 
 ## Fingerprints
 ## Each finger has a name used as a title (the message value) and a form used inside

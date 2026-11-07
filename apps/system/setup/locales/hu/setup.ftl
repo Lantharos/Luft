@@ -229,7 +229,6 @@ setup-protect-keep-safe = Tartsa ezt a helyreállítási kulcsot biztonságos he
 setup-protect-passphrase-label = Jelmondat
 setup-protect-repeat = Jelmondat még egyszer
 setup-protect-mismatch = Nem egyeznek
-setup-protect-kept = Elmentettem a helyreállítási kulcsot
 setup-protect-skip = Ne legyen titkosítva
 setup-protect-encrypt = Titkosítás
 

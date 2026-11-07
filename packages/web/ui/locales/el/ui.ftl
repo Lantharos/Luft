@@ -46,7 +46,6 @@ ui-recovery-key-copy = Αντιγραφή
 ui-recovery-key-saved = Αποθηκεύτηκε
 ui-recovery-key-printing = Στάλθηκε στον εκτυπωτή
 ui-recovery-key-copied = Αντιγράφηκε
-ui-recovery-key-kept = Αποθήκευσα το κλειδί αποκατάστασης
 
 ## Fingerprints
 ## Each finger has a name used as a title (the message value) and a form used inside

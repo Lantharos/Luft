@@ -46,7 +46,6 @@ ui-recovery-key-copy = Kopiera
 ui-recovery-key-saved = Sparad
 ui-recovery-key-printing = Skickad till skrivaren
 ui-recovery-key-copied = Kopierad
-ui-recovery-key-kept = Jag har sparat min återställningsnyckel
 
 ## Fingerprints
 ## Each finger has a name used as a title (the message value) and a form used inside

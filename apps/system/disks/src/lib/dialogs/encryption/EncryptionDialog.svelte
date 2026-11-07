@@ -77,7 +77,7 @@
 	async function showKey() {
 		const key = await attempt(async () => {
 			const shown = await commands.trustShowKey({ uuid: volume.uuid }, WAIT);
-			dialogs.open({ kind: 'recovery-key', key: shown, name });
+			dialogs.open({ kind: 'recovery-key', key: shown, name, fresh: false });
 		});
 		return key;
 	}
@@ -85,7 +85,7 @@
 	async function addKey() {
 		const key = await commands.trustRecoveryKey().catch((caught) => (error = errorText(caught), ''));
 		if (!key) return;
-		if (await keyed((unlock) => commands.trustUnlocking({ block: volume.block, unlock, recoveryKey: key, autoUnlock: encryption?.autoUnlock ?? false }, WAIT))) dialogs.open({ kind: 'recovery-key', key, name });
+		if (await keyed((unlock) => commands.trustUnlocking({ block: volume.block, unlock, recoveryKey: key, autoUnlock: encryption?.autoUnlock ?? false }, WAIT))) dialogs.open({ kind: 'recovery-key', key, name, fresh: true });
 	}
 
 	function pause() {

@@ -46,7 +46,6 @@ ui-recovery-key-copy = Kopioi
 ui-recovery-key-saved = Tallennettu
 ui-recovery-key-printing = Lähetetty tulostimeen
 ui-recovery-key-copied = Kopioitu
-ui-recovery-key-kept = Olen tallentanut palautusavaimeni
 
 ## Fingerprints
 ## Each finger has a name used as a title (the message value) and a form used inside

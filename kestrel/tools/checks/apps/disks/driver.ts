@@ -17,7 +17,7 @@ export const AT = {
   wdc: [130, 157], seagate: [130, 100], unlock: [1005, 219], newPartition: [1008, 275],
   health: [600, 360], firstDrive: [560, 282], next: [686, 488], write: [666, 419],
   largest: [1009, 467], trash: [860, 565],
-  turnOn: [885, 448], checked: [755, 448], saved: [292, 447], keySaved: [755, 498], unlocking: [755, 436], encrypt: [759, 429],
+  turnOn: [885, 448], checked: [755, 448], writeDown: [570, 447], keySaved: [755, 525], unlocking: [755, 436], encrypt: [759, 429],
   encryption: [885, 499], lock: [900, 300],
   efi: [400, 219], boot: [400, 275], fedora: [400, 331], lab: [130, 205], projects: [400, 387],
   moreDrive: [1025, 86], editPartitions: [876, 183], barProjects: [460, 118], barScratch: [598, 118], barRaw: [657, 118], barFree: [900, 118],
@@ -61,8 +61,12 @@ export class Driver {
     });
   }
 
+  typed(text: string) {
+    return this.act(`disks shows ${text} typed`, () => type(text));
+  }
+
   async enter(text: string) {
-    await this.act(`disks shows ${text} typed`, () => type(text));
+    await this.typed(text);
     return this.key(Clutter.KEY_Return);
   }
 

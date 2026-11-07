@@ -2,6 +2,7 @@ import GLib from 'gi://GLib';
 
 import type {Publish} from './bus.js';
 import {DRIVES, drivesService} from './drives.js';
+import {LETTERS_RECOVERY_KEY, NEW_RECOVERY_KEY} from './recoveryKeys.js';
 import type {Model} from './udisks/model.js';
 
 const TRUST = `<node><interface name="com.lantharos.Trust1">
@@ -44,7 +45,6 @@ const FWUPD = `<node><interface name="org.freedesktop.fwupd">
 </interface></node>`;
 
 const WINDOWS_ESP = '10000000-0000-4000-8000-000001048576';
-const RECOVERY_KEY = 'bfgdekjl-vtictulg-gcjginrv-hcddchdu-ihruiigb-bednnflv-hluincci-cdktjdrh';
 const SUCCESS = 1 << 0;
 const FIRMWARE_SETTING = 1 << 12;
 const CONTACT_MAKER = 1 << 11;
@@ -80,15 +80,15 @@ export function publishSecurity(publish: Publish, calls: string[], model: Model,
         SecureBootChanged: false, Resize: ''}),
     AntiCheat: variants({Checks: 'a(sbs)', UsesLuftKey: 'b'},
       {Checks: ANTI_CHEAT_CHECKS.map(id => [id, true, '']), UsesLuftKey: true}),
-    GenerateRecoveryKey: () => RECOVERY_KEY,
+    GenerateRecoveryKey: () => NEW_RECOVERY_KEY,
     SetUpTpmUnlock: () => {
       calls.push('SetUpTpmUnlock');
       return '';
     },
     RemoveTpmUnlock: () => calls.push('RemoveTpmUnlock'),
-    ShowRecoveryKey: () => RECOVERY_KEY,
+    ShowRecoveryKey: () => LETTERS_RECOVERY_KEY,
     AcceptSecureBootChange: () => calls.push('AcceptSecureBootChange'),
-    ReplaceRecoveryKey: () => RECOVERY_KEY,
+    ReplaceRecoveryKey: () => NEW_RECOVERY_KEY,
     EnrollSigningKey: () => '48203917',
     CancelSigningKeyEnrollment: () => calls.push('CancelSigningKeyEnrollment'),
     RemoveOtherKeys: () => '51740386',
@@ -107,7 +107,7 @@ export function publishSecurity(publish: Publish, calls: string[], model: Model,
     GrowSystemAtStart: () => calls.push('GrowSystemAtStart'),
     CancelSystemResize: () => calls.push('CancelSystemResize'),
   }, trust), '/com/lantharos/Trust1');
-  const drives = drivesService(calls, model, RECOVERY_KEY);
+  const drives = drivesService(calls, model, LETTERS_RECOVERY_KEY);
   drives.attach(publish(DRIVES, drives.implementation, '/com/lantharos/Trust1'));
 
   publish(USB_PROTECTION, {

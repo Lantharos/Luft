@@ -1,3 +1,6 @@
+import Clutter from 'gi://Clutter';
+
+import {NEW_RECOVERY_KEY, RECOVERY_WORD} from '../../fixtures/system/recoveryKeys.js';
 import type {Point} from '../lib/input/input.js';
 import {require, Setup} from './lib/driver.js';
 
@@ -11,7 +14,7 @@ const AT = {
   keyboard: [400, 335],
   outside: [400, 110],
   install: [700, 547],
-  kept: [70, 450],
+  writeDown: [648, 457],
   encrypt: [722, 547],
   confirm: [565, 346],
   name: [315, 238],
@@ -37,14 +40,21 @@ async function checkAccount(setup: Setup) {
 
 async function checkInstallStarts(setup: Setup) {
   await setup.shot('protect');
-  await setup.click(AT.kept, 'confirming the recovery key was kept lets Luft be encrypted');
+  await setup.click(AT.writeDown, 'writing the recovery key down shows its words in a dialog');
+  await setup.shot('protect-write-down');
+  await setup.press(Clutter.KEY_Return, 'once the words are written down, the dialog asks for three of them');
+  const prefix = RECOVERY_WORD.slice(0, 4);
+  await setup.type(`${prefix} ${prefix} ${prefix}`);
+  await setup.shot('protect-check');
+  await setup.press(Clutter.KEY_Return, 'the right three words close the dialog and let Luft be encrypted');
+  await setup.shot('protect-checked');
   await setup.click(AT.encrypt, 'encrypting asks to confirm');
   await setup.shot('protect-confirm');
   await setup.click(AT.confirm, 'confirming starts the install');
   const [request, regional] = await setup.requests();
   require(['default', 'nvidia'].includes(request.variant) && request.target.kind === 'alongside' && request.target.drive.endsWith('/nvme0n1') &&
     request.target.size > 300 * GB && request.target.size < 500 * GB, 'Luft is installed next to Windows with the size the bar shows');
-  require(request.encryption?.recoveryKey?.length === 71 && request.encryption.passphrase === '',
+  require(request.encryption?.recoveryKey === NEW_RECOVERY_KEY && request.encryption.passphrase === '',
     'Luft is encrypted with the recovery key shown, unlocking with the TPM');
   require(regional.keyboard.layout === 'de' && regional.timezone === 'Europe/Berlin' && regional.locale === 'en_US.UTF-8',
     'the installed system gets the keyboard, time zone and language chosen at the start');

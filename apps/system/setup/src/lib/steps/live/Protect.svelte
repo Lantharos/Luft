@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { Checkbox, PasswordField, Spinner } from '@luft/ui';
+	import { PasswordField, Spinner } from '@luft/ui';
 	import { commands, type Encryption } from '#lib/bindings.js';
 	import StepFrame from '#lib/components/StepFrame.svelte';
 	import KeyBackup from '#lib/components/trust/KeyBackup.svelte';
@@ -51,7 +51,6 @@
 				<PasswordField bind:value={repeated} label={t('setup-protect-repeat')} showLabel autocomplete="new-password" error={repeated && repeated !== passphrase ? t('setup-protect-mismatch') : ''} live />
 			</div>
 		{/if}
-		<Checkbox checked={kept} label={t('setup-protect-kept')} onchange={(checked) => (kept = checked)}>{t('setup-protect-kept')}</Checkbox>
 	</div>
 	{#if problem || install.startError}
 		<p class="mt-4 text-[13.5px] text-[var(--danger)]">{problem || install.startError}</p>

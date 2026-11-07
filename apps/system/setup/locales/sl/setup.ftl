@@ -239,7 +239,6 @@ setup-protect-keep-safe = Ta obnovitveni ključ shranite na varno mesto, ločeno
 setup-protect-passphrase-label = Šifrirno geslo
 setup-protect-repeat = Vnesite ga znova
 setup-protect-mismatch = Vnosa se ne ujemata
-setup-protect-kept = Obnovitveni ključ je shranjen na varnem
 setup-protect-skip = Ne šifriraj
 setup-protect-encrypt = Šifriraj
 

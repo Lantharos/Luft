@@ -229,7 +229,6 @@ setup-protect-keep-safe = Bewaar deze herstelsleutel op een veilige plek, niet b
 setup-protect-passphrase-label = Wachtwoordzin
 setup-protect-repeat = Typ hem opnieuw
 setup-protect-mismatch = Ze komen niet overeen
-setup-protect-kept = Ik heb mijn herstelsleutel bewaard
 setup-protect-skip = Niet versleutelen
 setup-protect-encrypt = Versleutelen
 

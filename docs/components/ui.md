@@ -118,8 +118,10 @@ $effect(() => {
 | `MediaControls` | Play, position, time and volume bar for a media element; bind `paused`, `currentTime`, `muted` and `volume` |
 | `SeekBar`, `VolumeControl` | The position and volume parts on their own; `onseek` and `onscrub` |
 | `NativeVideoSurface` | Plays `src` through Sabine's native video for formats Chromium can't decode; bind `player`, handle `onfail` |
-| `RecoveryKey` | Recovery key in groups of eight with copy, `onsave` and `onprint` |
-| `RecoveryKeyDialog` | A recovery key in a dialog; `fresh` keeps it open until the person confirms they kept the key |
+| `RecoveryKey` | A recovery key with save, print and copy; with `onkept`, also Write it down (a `WriteDownDialog`), and `onkept` runs once it was saved, printed or checked. Failures show in a dialog |
+| `RecoveryKeyDialog` | A recovery key in a dialog; `fresh` keeps it open until the key was kept |
+| `RecoveryWords` | The 12 words numbered in three columns, or an older key in its groups of eight |
+| `WriteDownDialog` | Shows the 12 words to write down, then asks for three of them by number, picked at random, and calls `onchecked` once they're right |
 | `EncryptionWizard` | Turning on encryption in four steps: checks, the recovery key, how it unlocks (the `unlock` snippet) and a `summary`, then `onfinish` |
 | `PassphraseFields` | A new passphrase typed twice, with a `minimum` length and room for a strength meter as `children` |
 | `Choice` | Large option button with an icon, title, description and optional `note` |

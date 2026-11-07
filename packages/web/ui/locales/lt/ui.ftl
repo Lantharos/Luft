@@ -46,7 +46,6 @@ ui-recovery-key-copy = Kopijuoti
 ui-recovery-key-saved = Įrašyta
 ui-recovery-key-printing = Nusiųsta į spausdintuvą
 ui-recovery-key-copied = Nukopijuota
-ui-recovery-key-kept = Atkūrimo raktą įrašiau
 
 ## Fingerprints
 ## Each finger has a name used as a title (the message value) and a form used inside

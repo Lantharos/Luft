@@ -46,7 +46,6 @@ ui-recovery-key-copy = Kopyala
 ui-recovery-key-saved = Kaydedildi
 ui-recovery-key-printing = Yazıcıya gönderildi
 ui-recovery-key-copied = Kopyalandı
-ui-recovery-key-kept = Kurtarma anahtarımı kaydettim
 
 ## Fingerprints
 ## Each finger has a name used as a title (the message value) and a form used inside

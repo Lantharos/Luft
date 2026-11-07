@@ -229,7 +229,6 @@ setup-protect-keep-safe = Чувајте го овој клуч за обнов�
 setup-protect-passphrase-label = Тајна фраза
 setup-protect-repeat = Внесете ја повторно
 setup-protect-mismatch = Не се совпаѓаат
-setup-protect-kept = Го зачував клучот за обновување
 setup-protect-skip = Не шифрирај
 setup-protect-encrypt = Шифрирај
 

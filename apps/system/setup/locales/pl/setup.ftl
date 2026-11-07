@@ -239,7 +239,6 @@ setup-protect-keep-safe = Przechowuj ten klucz odzyskiwania w bezpiecznym miejsc
 setup-protect-passphrase-label = Fraza hasła
 setup-protect-repeat = Wpisz ponownie
 setup-protect-mismatch = Wpisy nie są zgodne
-setup-protect-kept = Klucz odzyskiwania jest bezpiecznie zapisany
 setup-protect-skip = Nie szyfruj
 setup-protect-encrypt = Zaszyfruj
 

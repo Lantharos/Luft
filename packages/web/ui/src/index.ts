@@ -52,8 +52,10 @@ export { fingerInSentence, fingerLabel, FINGERS, FingerprintEnrollment, type Fin
 export { default as FingerprintDial } from './security/FingerprintDial.svelte';
 export { default as EncryptionWizard, type EncryptionCheck, type EncryptionStep } from './security/EncryptionWizard.svelte';
 export { default as PassphraseFields } from './security/PassphraseFields.svelte';
-export { default as RecoveryKey } from './security/RecoveryKey.svelte';
-export { default as RecoveryKeyDialog } from './security/RecoveryKeyDialog.svelte';
+export { default as RecoveryKey } from './security/recovery/RecoveryKey.svelte';
+export { default as RecoveryKeyDialog } from './security/recovery/RecoveryKeyDialog.svelte';
+export { default as RecoveryWords } from './security/recovery/RecoveryWords.svelte';
+export { default as WriteDownDialog } from './security/recovery/WriteDownDialog.svelte';
 
 export { springTiming } from './motion/easing';
 export { reorder } from './motion/lists';

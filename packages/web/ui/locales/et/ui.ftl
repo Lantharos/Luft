@@ -46,7 +46,6 @@ ui-recovery-key-copy = Kopeeri
 ui-recovery-key-saved = Salvestatud
 ui-recovery-key-printing = Saadetud printerisse
 ui-recovery-key-copied = Kopeeritud
-ui-recovery-key-kept = Olen taastevõtme salvestanud
 
 ## Fingerprints
 ## Each finger has a name used as a title (the message value) and a form used inside

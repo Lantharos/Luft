@@ -239,7 +239,6 @@ setup-protect-keep-safe = Uložte si tento obnovovací klíč na bezpečné mís
 setup-protect-passphrase-label = Heslo k disku
 setup-protect-repeat = Zadejte ho znovu
 setup-protect-mismatch = Neshodují se
-setup-protect-kept = Obnovovací klíč mám uložený
 setup-protect-skip = Nešifrovat
 setup-protect-encrypt = Zašifrovat
 

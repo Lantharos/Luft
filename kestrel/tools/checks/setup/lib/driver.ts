@@ -5,7 +5,7 @@ import {changes, openApp} from '../../apps/lib/apps.js';
 import type {LuftApp} from '../../lib/apps/luftApp.js';
 import {checks} from '../../lib/check.js';
 import {call} from '../../lib/dbus.js';
-import {rest, type, type Point} from '../../lib/input/input.js';
+import {press, rest, type, type Point} from '../../lib/input/input.js';
 import {capture} from '../../lib/screenshots.js';
 
 export const {require, eventually} = checks('setup');
@@ -83,6 +83,11 @@ export class Setup {
     await changes(this.app, label, () => this.app.click(point));
     await this.app.settle(() => true);
     rest();
+  }
+
+  async press(keyval: number, label: string) {
+    await changes(this.app, label, () => press(keyval));
+    await this.app.settle(() => true);
   }
 
   tap(point: Point) {

@@ -368,6 +368,10 @@
         "vite": "^8.3.2",
       },
     },
+    "packages/system/recovery-key": {
+      "name": "@luft/recovery-key",
+      "version": "0.1.0",
+    },
     "packages/web/motion": {
       "name": "@luft/motion",
       "version": "0.1.0",
@@ -399,6 +403,7 @@
         "@lucide/svelte": "^1.51.0",
         "@luft/i18n": "workspace:*",
         "@luft/motion": "workspace:*",
+        "@luft/recovery-key": "workspace:*",
         "markdown-it": "^15.0.2",
       },
       "devDependencies": {
@@ -857,6 +862,8 @@
     "@luft/motion": ["@luft/motion@workspace:packages/web/motion"],
 
     "@luft/network": ["@luft/network@workspace:packages/web/network"],
+
+    "@luft/recovery-key": ["@luft/recovery-key@workspace:packages/system/recovery-key"],
 
     "@luft/settings-pages": ["@luft/settings-pages@workspace:packages/web/settings-pages"],
 

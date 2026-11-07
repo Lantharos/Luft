@@ -229,7 +229,6 @@ setup-protect-keep-safe = Пазете този ключ за възстанов
 setup-protect-passphrase-label = Парола за диска
 setup-protect-repeat = Въведете я отново
 setup-protect-mismatch = Не съвпадат
-setup-protect-kept = Запазих ключа си за възстановяване
 setup-protect-skip = Без шифроване
 setup-protect-encrypt = Шифровай
 

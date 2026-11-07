@@ -229,7 +229,6 @@ setup-protect-keep-safe = Guardeu aquesta clau de recuperació en un lloc segur,
 setup-protect-passphrase-label = Frase de pas
 setup-protect-repeat = Torneu-la a escriure
 setup-protect-mismatch = No coincideixen
-setup-protect-kept = He guardat la clau de recuperació
 setup-protect-skip = No xifris
 setup-protect-encrypt = Xifra
 

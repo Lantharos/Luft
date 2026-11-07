@@ -234,7 +234,6 @@ setup-protect-keep-safe = Păstrați această cheie de recuperare într-un loc s
 setup-protect-passphrase-label = Frază de acces
 setup-protect-repeat = Introduceți-o din nou
 setup-protect-mismatch = Nu se potrivesc
-setup-protect-kept = Am păstrat cheia de recuperare
 setup-protect-skip = Nu cripta
 setup-protect-encrypt = Criptează
 

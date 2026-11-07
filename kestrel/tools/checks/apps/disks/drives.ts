@@ -1,6 +1,7 @@
 import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 
+import {RECOVERY_WORD} from '../../../fixtures/system/recoveryKeys.js';
 import type {ScratchKeyring} from '../../../fixtures/services/secretService.js';
 import {checks} from '../../lib/check.js';
 import {type} from '../../lib/input/input.js';
@@ -83,7 +84,13 @@ export async function checkEncryption(driver: Driver) {
   await driver.click('seagate');
   await driver.click('more');
   (await driver.click('turnOn')).save('disks-encrypt-dark');
-  for (const step of ['checked', 'saved', 'keySaved', 'unlocking'] as const) await driver.click(step);
+  (await driver.click('checked')).save('disks-encrypt-key-dark');
+  (await driver.click('writeDown')).save('disks-encrypt-write-down-dark');
+  await driver.key(Clutter.KEY_Return);
+  const prefix = RECOVERY_WORD.slice(0, 4);
+  (await driver.typed(`${prefix} ${prefix} ${prefix}`)).save('disks-encrypt-key-check-dark');
+  (await driver.key(Clutter.KEY_Return)).save('disks-encrypt-key-checked-dark');
+  for (const step of ['keySaved', 'unlocking'] as const) await driver.click(step);
   await driver.click('encrypt');
   await driver.called(['Check /dev/sdc1', 'Encrypt /dev/sdc1 auto=true passphrase=false'], 'disks encrypts a partition in place, unlocking automatically on this computer');
   (await driver.app.settle(() => true)).save('disks-encrypting-dark');

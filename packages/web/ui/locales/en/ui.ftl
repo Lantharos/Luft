@@ -60,8 +60,25 @@ ui-recovery-key-saved = Saved
 ui-recovery-key-printing = Sent to the printer
 # Shown after the key was copied to the clipboard
 ui-recovery-key-copied = Copied
-# Checkbox confirming the recovery key was written down or saved
-ui-recovery-key-kept = I’ve saved my recovery key
+# Shown after the key was written down and three of its words typed back
+ui-recovery-key-checked = Written down
+# Dialog titles when keeping the recovery key failed
+ui-recovery-key-save-failed = The key couldn’t be saved
+ui-recovery-key-print-failed = The key couldn’t be printed
+ui-recovery-key-copy-failed = The key couldn’t be copied
+# Button, verb: opens a dialog for writing the recovery key down on paper
+ui-recovery-key-write = Write it down
+ui-recovery-key-write-title = Write down your recovery key
+ui-recovery-key-write-description = Write the 12 words on paper, in this order. Keep the paper somewhere safe, away from this computer.
+# Button: the 12 words are on paper, go on to check three of them
+ui-recovery-key-written = I’ve written them down
+ui-recovery-key-check-title = Check what you wrote
+# $first, $second and $third are word numbers from 1 to 12, picked at random
+ui-recovery-key-check = Type words { $first }, { $second } and { $third } from your paper. Four letters of each are enough.
+# Label of a field for one word of the recovery key; $number is from 1 to 12
+ui-recovery-key-word = Word { $number }
+# The word typed isn't the one at this place in the recovery key
+ui-recovery-key-word-wrong = That isn’t word { $number }
 
 ## Fingerprints
 ## Each finger has a name used as a title (the message value) and a form used inside

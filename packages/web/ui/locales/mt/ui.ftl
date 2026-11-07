@@ -46,7 +46,6 @@ ui-recovery-key-copy = Ikkopja
 ui-recovery-key-saved = Issejvjata
 ui-recovery-key-printing = Intbagħtet lill-printer
 ui-recovery-key-copied = Ikkopjata
-ui-recovery-key-kept = Issejvjajt iċ-ċavetta tal-irkupru
 
 ## Fingerprints
 ## Each finger has a name used as a title (the message value) and a form used inside

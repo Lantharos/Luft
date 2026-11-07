@@ -7,6 +7,7 @@ import {checkFonts} from './settings/look/fonts.js';
 import {checkHardware} from './settings/system/hardware.js';
 import {checkLive} from './settings/live.js';
 import {checkPages} from './settings/pages.js';
+import {checkRecoveryKey} from './settings/security/recoveryKey.js';
 import {checkSeeThrough} from './settings/look/seeThrough.js';
 import {checkTiling} from './settings/look/tiling.js';
 import {checkLongSleep} from './settings/system/power.js';
@@ -29,6 +30,7 @@ export async function run() {
       await checkLive(app);
       await checkHardware(app);
       await checkLongSleep(app);
+      await checkRecoveryKey(app);
       await checkFonts(app);
       await checkWallpaper(app);
       await checkDictation(app);

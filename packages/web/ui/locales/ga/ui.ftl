@@ -46,7 +46,6 @@ ui-recovery-key-copy = Cóipeáil
 ui-recovery-key-saved = Sábháilte
 ui-recovery-key-printing = Seolta chuig an bprintéir
 ui-recovery-key-copied = Cóipeáilte
-ui-recovery-key-kept = Tá m’eochair athshlánaithe sábháilte agam
 
 ## Fingerprints
 ## Each finger has a name used as a title (the message value) and a form used inside

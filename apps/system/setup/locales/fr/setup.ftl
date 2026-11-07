@@ -229,7 +229,6 @@ setup-protect-keep-safe = Conservez cette clé de récupération en lieu sûr, l
 setup-protect-passphrase-label = Phrase secrète
 setup-protect-repeat = Saisissez-la de nouveau
 setup-protect-mismatch = Les saisies ne correspondent pas
-setup-protect-kept = J’ai conservé ma clé de récupération
 setup-protect-skip = Ne pas chiffrer
 setup-protect-encrypt = Chiffrer
 

@@ -229,7 +229,6 @@ setup-protect-keep-safe = Förvara återställningsnyckeln på ett säkert stäl
 setup-protect-passphrase-label = Lösenfras
 setup-protect-repeat = Skriv den igen
 setup-protect-mismatch = De stämmer inte överens
-setup-protect-kept = Jag har sparat min återställningsnyckel
 setup-protect-skip = Kryptera inte
 setup-protect-encrypt = Kryptera
 

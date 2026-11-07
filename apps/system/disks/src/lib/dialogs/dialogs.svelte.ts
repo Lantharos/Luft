@@ -21,7 +21,7 @@ export type OpenDialog =
 	| { kind: 'encrypt'; drive: Drive; volume: Volume }
 	| { kind: 'encryption'; drive: Drive; volume: Volume }
 	| { kind: 'turn-off'; volume: Volume }
-	| { kind: 'recovery-key'; key: string; name: string }
+	| { kind: 'recovery-key'; key: string; name: string; fresh: boolean }
 	| { kind: 'remove-system'; system: OtherSystem }
 	| { kind: 'give-luft'; drive: Drive; offset: number; size: number };
 

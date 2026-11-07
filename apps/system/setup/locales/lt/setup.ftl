@@ -240,7 +240,6 @@ setup-protect-keep-safe = Laikykite šį atkūrimo raktą saugioje vietoje, ne �
 setup-protect-passphrase-label = Slaptafrazė
 setup-protect-repeat = Pakartokite
 setup-protect-mismatch = Nesutampa
-setup-protect-kept = Atkūrimo raktą išsaugojau
 setup-protect-skip = Nešifruoti
 setup-protect-encrypt = Šifruoti
 

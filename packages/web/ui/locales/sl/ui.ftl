@@ -46,7 +46,6 @@ ui-recovery-key-copy = Kopiraj
 ui-recovery-key-saved = Shranjeno
 ui-recovery-key-printing = Poslano tiskalniku
 ui-recovery-key-copied = Kopirano
-ui-recovery-key-kept = Obnovitveni ključ je shranjen
 
 ## Fingerprints
 ## Each finger has a name used as a title (the message value) and a form used inside

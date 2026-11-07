@@ -234,7 +234,6 @@ setup-protect-keep-safe = Čuvajte ovaj ključ za oporavak na sigurnom mestu, da
 setup-protect-passphrase-label = Pristupna fraza
 setup-protect-repeat = Unesite je ponovo
 setup-protect-mismatch = Ne poklapaju se
-setup-protect-kept = Ključ za oporavak je sačuvan
 setup-protect-skip = Ne šifruj
 setup-protect-encrypt = Šifruj
 

@@ -46,7 +46,6 @@ ui-recovery-key-copy = Másolás
 ui-recovery-key-saved = Mentve
 ui-recovery-key-printing = Elküldve a nyomtatóra
 ui-recovery-key-copied = Másolva
-ui-recovery-key-kept = Elmentettem a helyreállítási kulcsot
 
 ## Fingerprints
 ## Each finger has a name used as a title (the message value) and a form used inside

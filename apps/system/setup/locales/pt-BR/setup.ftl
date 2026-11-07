@@ -229,7 +229,6 @@ setup-protect-keep-safe = Guarde esta chave de recuperação em um lugar seguro,
 setup-protect-passphrase-label = Frase secreta
 setup-protect-repeat = Digite de novo
 setup-protect-mismatch = Elas não coincidem
-setup-protect-kept = Guardei minha chave de recuperação
 setup-protect-skip = Não criptografar
 setup-protect-encrypt = Criptografar
 

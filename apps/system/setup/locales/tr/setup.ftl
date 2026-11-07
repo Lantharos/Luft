@@ -229,7 +229,6 @@ setup-protect-keep-safe = Bu kurtarma anahtarını bu bilgisayardan uzakta, güv
 setup-protect-passphrase-label = Disk parolası
 setup-protect-repeat = Yeniden yazın
 setup-protect-mismatch = Eşleşmiyor
-setup-protect-kept = Kurtarma anahtarımı sakladım
 setup-protect-skip = Şifrelemeden kur
 setup-protect-encrypt = Şifrele
 

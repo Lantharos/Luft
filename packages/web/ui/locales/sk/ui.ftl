@@ -46,7 +46,6 @@ ui-recovery-key-copy = Kopírovať
 ui-recovery-key-saved = Uložené
 ui-recovery-key-printing = Odoslané do tlačiarne
 ui-recovery-key-copied = Skopírované
-ui-recovery-key-kept = Kľúč na obnovenie mám uložený
 
 ## Fingerprints
 ## Each finger has a name used as a title (the message value) and a form used inside

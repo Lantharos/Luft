@@ -46,7 +46,6 @@ ui-recovery-key-copy = Afrita
 ui-recovery-key-saved = Vistað
 ui-recovery-key-printing = Sent í prentara
 ui-recovery-key-copied = Afritað
-ui-recovery-key-kept = Ég hef vistað endurheimtarlykilinn
 
 ## Fingerprints
 ## Each finger has a name used as a title (the message value) and a form used inside

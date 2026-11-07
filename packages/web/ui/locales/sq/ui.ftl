@@ -46,7 +46,6 @@ ui-recovery-key-copy = Kopjo
 ui-recovery-key-saved = U ruajt
 ui-recovery-key-printing = U dërgua te printeri
 ui-recovery-key-copied = U kopjua
-ui-recovery-key-kept = E kam ruajtur çelësin e rikuperimit
 
 ## Fingerprints
 ## Each finger has a name used as a title (the message value) and a form used inside

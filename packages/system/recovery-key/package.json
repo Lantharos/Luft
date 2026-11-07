@@ -1,0 +1,9 @@
+{
+	"name": "@luft/recovery-key",
+	"version": "0.1.0",
+	"private": true,
+	"type": "module",
+	"exports": {
+		"./english.txt": "./src/english.txt"
+	}
+}

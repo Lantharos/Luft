@@ -46,7 +46,6 @@ ui-recovery-key-copy = Копирай
 ui-recovery-key-saved = Запазено
 ui-recovery-key-printing = Изпратено към принтера
 ui-recovery-key-copied = Копирано
-ui-recovery-key-kept = Запазих ключа за възстановяване
 
 ## Fingerprints
 ## Each finger has a name used as a title (the message value) and a form used inside

@@ -34,6 +34,7 @@
 		"@lucide/svelte": "^1.51.0",
 		"@luft/i18n": "workspace:*",
 		"@luft/motion": "workspace:*",
+		"@luft/recovery-key": "workspace:*",
 		"markdown-it": "^15.0.2"
 	},
 	"peerDependencies": {

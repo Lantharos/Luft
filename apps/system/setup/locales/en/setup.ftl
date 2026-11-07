@@ -122,7 +122,6 @@ setup-protect-keep-safe = Keep this recovery key somewhere safe, away from this 
 setup-protect-passphrase-label = Passphrase
 setup-protect-repeat = Type it again
 setup-protect-mismatch = They don’t match
-setup-protect-kept = I’ve kept my recovery key
 # Read out by screen readers; $key is the recovery key
 setup-protect-key-label = Recovery key { $key }
 setup-protect-save-usb = Save to a USB drive
@@ -137,7 +136,11 @@ setup-protect-usb-close-saved = Done
 # $drive is the name of a USB drive
 setup-protect-usb-saved = The key is saved on { $drive }. You can take the drive out now.
 setup-protect-printed = Sent to the printer. Keep the page somewhere safe.
-setup-protect-write-hint = Write down all 64 letters in their groups of eight. Upper or lower case both work when you type it.
+setup-protect-written = Written down and checked. Keep the paper somewhere safe.
+# Title of a dialog when printing the recovery key failed
+setup-protect-print-failed = The key couldn’t be printed
+# Button: closes the dialog saying printing failed
+setup-protect-close = Close
 # Button: installs Luft without encrypting it
 setup-protect-skip = Don’t encrypt
 # Button, verb: installs Luft encrypted

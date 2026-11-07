@@ -229,7 +229,6 @@ setup-protect-keep-safe = Bewahre diesen Wiederherstellungsschlüssel an einem s
 setup-protect-passphrase-label = Passphrase
 setup-protect-repeat = Erneut eingeben
 setup-protect-mismatch = Sie stimmen nicht überein
-setup-protect-kept = Ich habe meinen Wiederherstellungsschlüssel aufbewahrt
 setup-protect-skip = Nicht verschlüsseln
 setup-protect-encrypt = Verschlüsseln
 

@@ -229,7 +229,6 @@ setup-protect-keep-safe = Säilytä tämä palautusavain turvallisessa paikassa 
 setup-protect-passphrase-label = Tunnuslause
 setup-protect-repeat = Kirjoita se uudelleen
 setup-protect-mismatch = Ne eivät täsmää
-setup-protect-kept = Olen tallentanut palautusavaimeni
 setup-protect-skip = Älä salaa
 setup-protect-encrypt = Salaa
 

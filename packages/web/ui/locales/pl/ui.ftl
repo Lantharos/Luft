@@ -46,7 +46,6 @@ ui-recovery-key-copy = Kopiuj
 ui-recovery-key-saved = Zapisano
 ui-recovery-key-printing = Wysłano do drukarki
 ui-recovery-key-copied = Skopiowano
-ui-recovery-key-kept = Klucz odzyskiwania jest zapisany
 
 ## Fingerprints
 ## Each finger has a name used as a title (the message value) and a form used inside

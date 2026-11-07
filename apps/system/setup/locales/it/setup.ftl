@@ -229,7 +229,6 @@ setup-protect-keep-safe = Conserva questa chiave di ripristino in un posto sicur
 setup-protect-passphrase-label = Passphrase
 setup-protect-repeat = Digitala di nuovo
 setup-protect-mismatch = Non corrispondono
-setup-protect-kept = Ho conservato la chiave di ripristino
 setup-protect-skip = Non crittografare
 setup-protect-encrypt = Crittografa
 

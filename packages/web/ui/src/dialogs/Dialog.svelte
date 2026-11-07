@@ -1,3 +1,7 @@
+<script lang="ts" module>
+	const open: symbol[] = [];
+</script>
+
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { topLayer } from '../menus/topLayer';
@@ -16,8 +20,15 @@
 
 	const FOCUSABLE = 'button:not(:disabled), input:not(:disabled), textarea:not(:disabled), [tabindex]:not([tabindex="-1"])';
 
+	const self = Symbol();
+
 	let panel = $state<HTMLDivElement>();
 	let actionBar = $state<HTMLDivElement>();
+
+	$effect(() => {
+		open.push(self);
+		return () => void open.splice(open.indexOf(self), 1);
+	});
 
 	$effect(() => {
 		const previous = document.activeElement as HTMLElement | null;
@@ -42,7 +53,7 @@
 	}
 </script>
 
-<svelte:window onkeydown={(event) => event.key === 'Escape' && onclose()} />
+<svelte:window onkeydown={(event) => event.key === 'Escape' && open.at(-1) === self && onclose()} />
 
 <div
 	{@attach topLayer}

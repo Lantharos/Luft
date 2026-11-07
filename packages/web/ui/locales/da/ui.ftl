@@ -46,7 +46,6 @@ ui-recovery-key-copy = Kopier
 ui-recovery-key-saved = Gemt
 ui-recovery-key-printing = Sendt til printeren
 ui-recovery-key-copied = Kopieret
-ui-recovery-key-kept = Jeg har gemt min genoprettelsesnøgle
 
 ## Fingerprints
 ## Each finger has a name used as a title (the message value) and a form used inside

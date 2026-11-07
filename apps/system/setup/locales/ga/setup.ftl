@@ -244,7 +244,6 @@ setup-protect-keep-safe = Coinnigh an eochair athshlánaithe seo in áit shábh�
 setup-protect-passphrase-label = Frása faire
 setup-protect-repeat = Clóscríobh arís é
 setup-protect-mismatch = Ní hionann iad
-setup-protect-kept = Tá m’eochair athshlánaithe coinnithe agam
 setup-protect-skip = Ná criptigh
 setup-protect-encrypt = Criptigh
 

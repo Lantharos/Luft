@@ -64,9 +64,10 @@
 {:else if dialog?.kind === 'remove-system'}
 	<RemoveSystemDialog system={dialog.system} onclose={dialogs.close} />
 {:else if dialog?.kind === 'recovery-key'}
-	{@const { key, name } = dialog}
+	{@const { key, name, fresh } = dialog}
 	<RecoveryKeyDialog
 		{key}
+		{fresh}
 		title="Recovery key for “{name}”"
 		description="Keep a copy somewhere other than this drive and computer."
 		onsave={() => commands.trustSaveKey({ key, name }, WAIT)}

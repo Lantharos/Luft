@@ -13,11 +13,10 @@
 	import CircleAlert from '@lucide/svelte/icons/circle-alert';
 	import CircleCheck from '@lucide/svelte/icons/circle-check';
 	import { t } from '@luft/i18n';
-	import Checkbox from '../controls/Checkbox.svelte';
 	import Dialog from '../dialogs/Dialog.svelte';
 	import Spinner from '../notices/Spinner.svelte';
 	import { errorText } from '../text/errors';
-	import RecoveryKey from './RecoveryKey.svelte';
+	import RecoveryKey from './recovery/RecoveryKey.svelte';
 
 	interface Props {
 		titles: Record<EncryptionStep, string>;
@@ -124,8 +123,7 @@
 			<p class="flex items-center gap-2 text-[13px] text-[var(--text-muted)]"><Spinner size={14} />{t('ui-encryption-checking')}</p>
 		{/if}
 	{:else if step === 'key'}
-		<RecoveryKey {key} onsave={() => onsave(key)} onprint={() => onprint(key)} />
-		<Checkbox label={t('ui-recovery-key-kept')} checked={kept} onchange={(checked) => (kept = checked)}>{t('ui-recovery-key-kept')}</Checkbox>
+		<RecoveryKey {key} onsave={() => onsave(key)} onprint={() => onprint(key)} onkept={() => (kept = true)} />
 	{:else if step === 'unlock'}
 		{@render unlock(submitUnlock)}
 	{:else}

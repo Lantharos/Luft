@@ -46,7 +46,6 @@ ui-recovery-key-copy = Kopier
 ui-recovery-key-saved = Lagra
 ui-recovery-key-printing = Sendt til skrivaren
 ui-recovery-key-copied = Kopiert
-ui-recovery-key-kept = Eg har lagra gjenopprettingsnøkkelen
 
 ## Fingerprints
 ## Each finger has a name used as a title (the message value) and a form used inside

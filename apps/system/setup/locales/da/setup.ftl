@@ -229,7 +229,6 @@ setup-protect-keep-safe = Opbevar denne genoprettelsesnøgle et sikkert sted, v�
 setup-protect-passphrase-label = Adgangsfrase
 setup-protect-repeat = Skriv den igen
 setup-protect-mismatch = De er ikke ens
-setup-protect-kept = Jeg har gemt min genoprettelsesnøgle
 setup-protect-skip = Krypter ikke
 setup-protect-encrypt = Krypter
 

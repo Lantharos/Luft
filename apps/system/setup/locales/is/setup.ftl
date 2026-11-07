@@ -229,7 +229,6 @@ setup-protect-keep-safe = Geymdu þennan endurheimtarlykil á öruggum stað, fj
 setup-protect-passphrase-label = Lykilsetning
 setup-protect-repeat = Sláðu hana inn aftur
 setup-protect-mismatch = Lykilsetningarnar passa ekki saman
-setup-protect-kept = Ég hef geymt endurheimtarlykilinn
 setup-protect-skip = Ekki dulrita
 setup-protect-encrypt = Dulrita
 

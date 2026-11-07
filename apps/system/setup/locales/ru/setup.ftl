@@ -239,7 +239,6 @@ setup-protect-keep-safe = Храните этот ключ восстановл�
 setup-protect-passphrase-label = Парольная фраза
 setup-protect-repeat = Повторите фразу
 setup-protect-mismatch = Фразы не совпадают
-setup-protect-kept = Ключ восстановления сохранён
 setup-protect-skip = Не шифровать
 setup-protect-encrypt = Зашифровать
 

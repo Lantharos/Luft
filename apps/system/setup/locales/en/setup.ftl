@@ -132,6 +132,8 @@ setup-protect-usb-plug = Plug in a USB drive to save the key on it. Anything els
 # Button, verb: saves the recovery key on this USB drive
 setup-protect-usb-save = Save
 setup-protect-usb-done = Saved
+# Button: closes the USB drive dialog once the key is saved
+setup-protect-usb-close-saved = Done
 # $drive is the name of a USB drive
 setup-protect-usb-saved = The key is saved on { $drive }. You can take the drive out now.
 setup-protect-printed = Sent to the printer. Keep the page somewhere safe.

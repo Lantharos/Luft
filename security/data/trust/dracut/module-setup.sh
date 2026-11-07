@@ -16,10 +16,12 @@ installkernel() {
 }
 
 install() {
-    inst_multiple trustctl systemd-creds cryptsetup udevadm cat mount umount "$systemdutildir/systemd-cryptsetup"
+    inst_multiple trustctl systemd-creds cryptsetup udevadm cat mount umount cp blkid wipefs efibootmgr btrfs mkfs.btrfs \
+        "$systemdutildir/systemd-cryptsetup"
     inst_rules 61-trustd-drives.rules
     inst_simple "$moddir/trustd-move.service" "$systemdsystemunitdir/trustd-move.service"
     inst_simple "$moddir/trustd-encrypt.service" "$systemdsystemunitdir/trustd-encrypt.service"
+    inst_simple "$moddir/trustd-move-drive.service" "$systemdsystemunitdir/trustd-move-drive.service"
     inst_multiple "$systemdsystemunitdir/systemd-pcrextend.socket" "$systemdsystemunitdir/systemd-pcrextend@.service" \
         "$systemdutildir/systemd-tpm2-setup" "$systemdsystemunitdir/systemd-tpm2-setup-early.service"
     inst_simple "$moddir/cryptsetup-after-pcrphase.conf" "$systemdsystemunitdir/systemd-cryptsetup@.service.d/trustd.conf"

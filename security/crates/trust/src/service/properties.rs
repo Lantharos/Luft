@@ -102,6 +102,8 @@ pub fn disk(disk: Option<&DiskStatus>, running: Option<Option<Progress>>) -> Dic
         return dict([("Encrypted", false.into())]);
     };
     let (state, progress, remaining) = encrypting(disk.encrypting, running);
+    let moving = &disk.moving;
+    let (failed, earlier) = (moving.failed.as_ref(), moving.earlier.as_ref());
     dict([
         ("Device", disk.device.as_str().into()),
         ("Encrypted", disk.encrypted.into()),
@@ -115,5 +117,45 @@ pub fn disk(disk: Option<&DiskStatus>, running: Option<Option<Progress>>) -> Dic
         ("TpmRefused", disk.tpm_refused.into()),
         ("SecureBootChanged", disk.secure_boot_changed.into()),
         ("Resize", resize(disk.resize).into()),
+        ("Move", moving.stage.unwrap_or_default().into()),
+        ("MoveTo", moving.to.as_str().into()),
+        (
+            "MoveRefused",
+            moving.refused.as_deref().unwrap_or_default().into(),
+        ),
+        ("MoveNeeds", moving.needs.luft.into()),
+        ("MoveCopies", moving.needs.copies.into()),
+        (
+            "MoveFailedTo",
+            failed
+                .map(|failed| failed.drive.as_str())
+                .unwrap_or_default()
+                .into(),
+        ),
+        (
+            "MoveFailed",
+            failed
+                .map(|failed| failed.reason.as_str())
+                .unwrap_or_default()
+                .into(),
+        ),
+        (
+            "EarlierCopy",
+            earlier
+                .map(|earlier| earlier.partitions())
+                .unwrap_or_default()
+                .into(),
+        ),
+        (
+            "EarlierCopyDrive",
+            earlier
+                .map(|earlier| earlier.drive.as_str())
+                .unwrap_or_default()
+                .into(),
+        ),
+        (
+            "EarlierCopySize",
+            earlier.map_or(0, |earlier| earlier.size).into(),
+        ),
     ])
 }

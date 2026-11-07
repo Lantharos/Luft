@@ -32,7 +32,13 @@
       at the last startup, so the recovery key or passphrase was needed), SecureBootChanged (b, the Secure Boot
       settings changed in a way Luft didn't expect, so the TPM stays sealed to the old ones until an administrator
       confirms them with AcceptSecureBootChange), Resize (s: "" when nothing is waiting, or "grow", "shrink" or
-      "trim" when a change of Luft's size waits for the next start, asked for by GrowSystemAtStart or Meet Luft).
+      "trim" when a change of Luft's size waits for the next start, asked for by GrowSystemAtStart or Meet Luft),
+      Move (s: "" when nothing is waiting, "waiting" when Luft copies itself to another drive at the next start,
+      "copied" while it starts from there for the first time, or "failed"), MoveTo (s, that drive's name),
+      MoveRefused (s, why Luft can't move right now, or ""), MoveNeeds (t, the bytes Luft needs on the other drive),
+      MoveCopies (t, about how much it copies), MoveFailedTo and MoveFailed (s, the drive and why the last move
+      didn't happen, until ForgetSystemMoveFailure), EarlierCopy (as, the partition GUIDs of the copy left on the
+      drive Luft moved from), EarlierCopyDrive (s) and EarlierCopySize (t).
 
     AntiCheat: what games with anti-cheat (such as Epic's Easy Anti-Cheat) check about how the computer started.
       Checks (a(sbs): id, met, a sentence for people saying what's missing, empty when met), for "signed-system",
@@ -131,8 +137,29 @@
     </method>
     <!-- Called by the login screen or the desktop once it has been shown for a moment, and accepted from anyone
          in the session at the screen. Completes the start, so systemd-bless-boot marks the running version's
-         boot entry as good, and an update that never gets this far goes back to the version before. -->
+         boot entry as good, and an update that never gets this far goes back to the version before. When Luft
+         started from the drive it moved to, this also makes that drive the one the computer starts from. -->
     <method name="ConfirmStartup"/>
+    <!-- Lays out Luft's partitions in size bytes of free space at offset on another drive (a UDisks drive object
+         path), and asks for Luft to be copied there at the next start. The copy opens with the same keys, since it
+         gets the system disk's LUKS2 header. Refuses the drive Luft is on, removable drives and space that's too
+         small. -->
+    <method name="MoveSystem">
+      <arg name="drive" type="s" direction="in"/>
+      <arg name="offset" type="t" direction="in"/>
+      <arg name="size" type="t" direction="in"/>
+    </method>
+    <!-- The same on a whole drive, after erasing it. Refuses a drive another system starts from or that's in use. -->
+    <method name="EraseAndMoveSystem">
+      <arg name="drive" type="s" direction="in"/>
+    </method>
+    <!-- Takes back a move that waits for the next start, deleting the partitions it made. -->
+    <method name="CancelSystemMove"/>
+    <!-- Forgets why the last move didn't happen, once it has been shown. -->
+    <method name="ForgetSystemMoveFailure"/>
+    <!-- Takes Luft's earlier copy, the one left on the drive it moved from, out of the firmware's start entries,
+         removes its startup files and erases its encryption, so only deleting its partitions is left. -->
+    <method name="RemoveEarlierCopy"/>
   </interface>
 
   <!--

@@ -18,6 +18,7 @@ pub enum Mode {
     Upgrade,
     Firmware,
     Encrypting,
+    Moving,
 }
 
 impl Mode {
@@ -29,6 +30,7 @@ impl Mode {
             Self::Upgrade => "system-upgrade",
             Self::Firmware => "firmware-upgrade",
             Self::Encrypting => "encrypting",
+            Self::Moving => "moving",
         }
     }
 }
@@ -66,10 +68,15 @@ pub enum Command {
     ShowNotice(PathBuf),
     ShowFailure(PathBuf),
     LoadDrivers,
+    Moving(String),
+    Progress(u8),
 }
 
 impl Command {
     pub fn parse(line: &str) -> Option<Self> {
+        if let Some(name) = line.trim().strip_prefix("moving ") {
+            return Some(Self::Moving(name.trim().to_owned()));
+        }
         let mut words = line.split_whitespace();
         let command = match words.next()? {
             "deactivate" => Self::Deactivate,
@@ -78,6 +85,13 @@ impl Command {
             "show" => Self::Show(words.next()?.parse().ok()?),
             "status" => Self::Status,
             "load-drivers" => Self::LoadDrivers,
+            "progress" => Self::Progress(
+                words
+                    .next()?
+                    .parse()
+                    .ok()
+                    .filter(|percent| *percent <= 100)?,
+            ),
             "notice" => match words.next()? {
                 "key-enrollment" => Self::KeyEnrollmentNotice(Some(KeyEnrollment {
                     code: words
@@ -118,6 +132,8 @@ impl Command {
             Self::ShowNotice(path) => format!("notice show {}", path.display()),
             Self::ShowFailure(path) => format!("failure show {}", path.display()),
             Self::LoadDrivers => "load-drivers".into(),
+            Self::Moving(name) => format!("moving {name}"),
+            Self::Progress(percent) => format!("progress {percent}"),
         }
     }
 }
@@ -163,6 +179,8 @@ mod tests {
             Command::ShowNotice("/run/kestrel-watchdog/notice".into()),
             Command::ShowFailure("/run/sushi/failure".into()),
             Command::LoadDrivers,
+            Command::Moving("Samsung SSD 990 PRO".into()),
+            Command::Progress(42),
         ] {
             assert_eq!(Command::parse(&command.encode()), Some(command));
         }

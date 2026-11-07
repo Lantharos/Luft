@@ -42,6 +42,10 @@ enum Action {
     Failure,
     /// Fail when the kernel refused a system file because it doesn't match the version that started
     CheckFiles,
+    /// Take the screen back and say Luft is moving to the drive named
+    Moving { drive: Vec<String> },
+    /// Show how far the activity on screen is, in percent
+    Progress { percent: u8 },
 }
 
 #[derive(Subcommand)]
@@ -93,6 +97,8 @@ fn main() -> ExitCode {
         Action::UpdateRoot { root } => Command::UpdateRoot(root),
         Action::Show { mode } => Command::Show(mode),
         Action::Status => Command::Status,
+        Action::Moving { drive } => Command::Moving(drive.join(" ")),
+        Action::Progress { percent } => Command::Progress(percent.min(100)),
         Action::Notice {
             notice: Notice::KeyEnrollment { code, again },
         } => Command::KeyEnrollmentNotice(Some(KeyEnrollment { code, again })),

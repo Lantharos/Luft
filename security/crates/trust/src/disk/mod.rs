@@ -1,6 +1,7 @@
 pub mod encrypting;
 pub mod encryption;
 pub mod layout;
+pub mod moving;
 pub mod unlock;
 
 use std::path::PathBuf;
@@ -70,6 +71,7 @@ pub struct DiskStatus {
     pub tpm_refused: bool,
     pub secure_boot_changed: bool,
     pub resize: Option<Change>,
+    pub moving: moving::Status,
 }
 
 fn unlock_methods(header: &Header) -> Vec<&'static str> {
@@ -109,5 +111,6 @@ pub fn status() -> Option<DiskStatus> {
             && journal::tpm_refused_this_boot(),
         secure_boot_changed: seal::secure_boot_changed(),
         resize: layout::waiting(&disk),
+        moving: moving::status(&disk),
     })
 }

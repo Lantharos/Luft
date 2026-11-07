@@ -72,6 +72,16 @@ impl Daemon {
             }
             Command::ShowNotice(_) => reply(stream, "The splash isn't on screen"),
             Command::ShowFailure(path) => self.show_failure(&path, stream),
+            Command::Moving(name) => {
+                self.activity.move_to(name, self.now());
+                self.settle_loader(self.now());
+                self.reclaim();
+                reply(stream, "ok");
+            }
+            Command::Progress(percent) => {
+                self.activity.set_progress(percent, self.now());
+                reply(stream, "ok");
+            }
         }
     }
 

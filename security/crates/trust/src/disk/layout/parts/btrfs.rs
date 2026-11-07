@@ -72,13 +72,21 @@ pub fn resize(devid: u64, size: Option<u64>) -> Result<()> {
         .context("Luft's file system couldn't change its size")
 }
 
-pub fn allocated(uuid: &str) -> Result<u64> {
+fn allocation(uuid: &str, field: &str) -> Result<u64> {
     let root = Path::new("/sys/fs/btrfs").join(uuid).join("allocation");
     ALLOCATIONS.iter().try_fold(0, |total, kind| {
-        let text = std::fs::read_to_string(root.join(kind).join("disk_total"))
+        let text = std::fs::read_to_string(root.join(kind).join(field))
             .context("Luft's file system didn't say how full it is")?;
         Ok(total + text.trim().parse::<u64>()?)
     })
+}
+
+pub fn allocated(uuid: &str) -> Result<u64> {
+    allocation(uuid, "disk_total")
+}
+
+pub fn used(uuid: &str) -> Result<u64> {
+    allocation(uuid, "disk_used")
 }
 
 pub fn devices(uuid: &str) -> usize {

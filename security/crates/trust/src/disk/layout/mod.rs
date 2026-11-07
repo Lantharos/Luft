@@ -1,6 +1,6 @@
 mod journal;
 pub mod old_system;
-mod parts;
+pub(crate) mod parts;
 mod plan;
 mod requests;
 mod steps;
@@ -75,6 +75,9 @@ fn requested() -> Result<Option<Journal>> {
 }
 
 pub fn continue_at_start() -> Result<()> {
+    if let Err(error) = super::moving::at_start() {
+        eprintln!("Luft couldn't take back an unfinished move: {error:#}");
+    }
     if encrypting::underway() {
         return Ok(());
     }

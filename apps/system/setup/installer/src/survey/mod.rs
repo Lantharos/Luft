@@ -13,7 +13,6 @@ use luft_meet::Handoff;
 use crate::meet;
 use crate::system::wait;
 pub use drives::WindowsDetails;
-pub use room::ALIGNMENT;
 
 pub struct Survey {
     pub found: luft_installer_contract::Survey,

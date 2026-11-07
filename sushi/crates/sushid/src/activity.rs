@@ -14,6 +14,7 @@ const STEPS: [&str; 6] = [
 
 pub struct Activity {
     mode: Mode,
+    destination: String,
     title: Option<String>,
     progress: Option<u8>,
     detail: Option<String>,
@@ -32,7 +33,7 @@ fn system_name() -> Option<String> {
         .filter(|name| !name.is_empty())
 }
 
-fn title(mode: Mode) -> Option<String> {
+fn title(mode: Mode, destination: &str) -> Option<String> {
     match mode {
         Mode::Boot | Mode::Shutdown => None,
         Mode::Updates => Some("Installing updates".to_owned()),
@@ -43,6 +44,7 @@ fn title(mode: Mode) -> Option<String> {
         ),
         Mode::Firmware => Some("Updating firmware".to_owned()),
         Mode::Encrypting => Some("Encrypting your device".to_owned()),
+        Mode::Moving => Some(format!("Moving Luft to {destination}")),
     }
 }
 
@@ -62,6 +64,7 @@ impl Activity {
     pub fn new() -> Self {
         Self {
             mode: Mode::Boot,
+            destination: String::new(),
             title: None,
             progress: None,
             detail: None,
@@ -76,13 +79,18 @@ impl Activity {
         }
         eprintln!("Showing {}", mode.name());
         self.mode = mode;
-        match title(mode) {
+        match title(mode, &self.destination) {
             Some(title) => {
                 self.title = Some(title);
                 self.alpha.fade_to(1.0, now);
             }
             None => self.alpha.fade_to(0.0, now),
         }
+    }
+
+    pub fn move_to(&mut self, destination: String, now: f32) {
+        self.destination = destination;
+        self.set_mode(Mode::Moving, now);
     }
 
     pub fn set_progress(&mut self, percent: u8, now: f32) {
@@ -105,7 +113,7 @@ impl Activity {
     }
 
     pub fn is_showing(&self) -> bool {
-        title(self.mode).is_some()
+        title(self.mode, &self.destination).is_some()
     }
 
     pub fn is_animating(&self, now: f32) -> bool {
@@ -116,9 +124,13 @@ impl Activity {
     pub fn status(&self, now: f32) -> Option<(Status, f32)> {
         let alpha = self.alpha.value(now);
         let title = self.title.clone().filter(|_| alpha > 0.0)?;
+        let keep_on = match self.mode {
+            Mode::Moving => "Keep the computer on and plugged in.",
+            _ => "Don't turn off your computer.",
+        };
         let note = match self.progress {
-            Some(percent) => format!("{percent}% complete. Don't turn off your computer."),
-            None => "Don't turn off your computer.".to_owned(),
+            Some(percent) => format!("{percent}% complete. {keep_on}"),
+            None => keep_on.to_owned(),
         };
         let status = Status {
             title,

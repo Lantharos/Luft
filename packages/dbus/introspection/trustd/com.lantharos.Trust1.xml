@@ -62,6 +62,20 @@
       <arg name="unlock" type="s" direction="in"/>
       <arg type="t" direction="out"/>
     </method>
+    <method name="MoveSystem">
+      <arg name="drive" type="s" direction="in"/>
+      <arg name="offset" type="t" direction="in"/>
+      <arg name="size" type="t" direction="in"/>
+    </method>
+    <method name="EraseAndMoveSystem">
+      <arg name="drive" type="s" direction="in"/>
+    </method>
+    <method name="CancelSystemMove">
+    </method>
+    <method name="ForgetSystemMoveFailure">
+    </method>
+    <method name="RemoveEarlierCopy">
+    </method>
     <property name="AntiCheat" type="a{sv}" access="read"/>
     <property name="Disk" type="a{sv}" access="read"/>
     <property name="SecureBoot" type="s" access="read"/>

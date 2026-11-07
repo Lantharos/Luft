@@ -17,9 +17,11 @@ use super::system_disk::Encryption;
 use crate::boot::{other_systems, started, startup};
 use crate::disk;
 use crate::disk::layout::{self, old_system};
+use crate::disk::moving;
 use crate::disk::unlock::keys;
 use crate::keys::{mok, others};
 use crate::system::secrets::secret::Secret;
+use luft_disks::moving::layout::Span;
 
 const CHECK: &str = "com.lantharos.trust.check";
 const ENCRYPTION: &str = "com.lantharos.trust.manage-encryption";
@@ -29,6 +31,7 @@ const CONFIRM_STARTUP: &str = "com.lantharos.trust.confirm-startup";
 const OTHER_SYSTEMS: &str = "com.lantharos.trust.remove-other-systems";
 const ACCEPT_SECURE_BOOT: &str = "com.lantharos.trust.accept-secure-boot-change";
 const RESIZE_SYSTEM: &str = "com.lantharos.trust.resize-system";
+const MOVE_SYSTEM: &str = "com.lantharos.trust.move-system";
 const FRESH: Duration = Duration::from_secs(2);
 
 pub struct Trust {
@@ -315,12 +318,24 @@ impl Trust {
         &self,
         #[zbus(connection)] connection: &Connection,
         #[zbus(header)] header: Header<'_>,
+        #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
     ) -> Result<(), Error> {
         self.authorize(connection, &header, CONFIRM_STARTUP).await?;
         let _activity = self.idle.hold();
-        tokio::task::spawn_blocking(started::confirm)
-            .await
-            .map_err(|_| Error::Failed("The startup couldn't be confirmed.".to_owned()))??;
+        let moved = tokio::task::spawn_blocking(|| {
+            started::confirm()?;
+            anyhow::Ok(moving::confirmed())
+        })
+        .await
+        .map_err(|_| Error::Failed("The startup couldn't be confirmed.".to_owned()))??;
+        match moved {
+            Ok(true) => {
+                self.forget_status();
+                self.announce(&emitter).await;
+            }
+            Ok(false) => {}
+            Err(error) => eprintln!("Luft couldn't settle on the drive it moved to: {error:#}"),
+        }
         Ok(())
     }
 
@@ -422,5 +437,69 @@ impl Trust {
         let unlock = Secret::from(unlock);
         self.run(&emitter, move || layout::resize(size, &unlock))
             .await
+    }
+
+    async fn move_system(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
+        drive: String,
+        offset: u64,
+        size: u64,
+    ) -> Result<(), Error> {
+        self.authorize(connection, &header, MOVE_SYSTEM).await?;
+        self.run(&emitter, move || {
+            moving::request(&drive, moving::Place::Free(Span { offset, size }))
+        })
+        .await
+    }
+
+    async fn erase_and_move_system(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
+        drive: String,
+    ) -> Result<(), Error> {
+        self.authorize(connection, &header, MOVE_SYSTEM).await?;
+        self.run(&emitter, move || {
+            moving::request(&drive, moving::Place::Erase)
+        })
+        .await
+    }
+
+    async fn cancel_system_move(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
+    ) -> Result<(), Error> {
+        self.authorize(connection, &header, MOVE_SYSTEM).await?;
+        self.run(&emitter, moving::cancel).await
+    }
+
+    async fn forget_system_move_failure(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
+    ) -> Result<(), Error> {
+        self.authorize(connection, &header, CHECK).await?;
+        self.run(&emitter, || {
+            moving::forget_failure();
+            Ok(())
+        })
+        .await
+    }
+
+    async fn remove_earlier_copy(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
+    ) -> Result<(), Error> {
+        self.authorize(connection, &header, OTHER_SYSTEMS).await?;
+        self.run(&emitter, moving::remove_earlier).await
     }
 }

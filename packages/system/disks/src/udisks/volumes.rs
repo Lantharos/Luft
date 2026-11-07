@@ -251,7 +251,7 @@ fn startup(block: &Object) -> Option<Startup> {
         })
 }
 
-fn used_space(mount_point: &str) -> Option<u64> {
+pub fn used_space(mount_point: &str) -> Option<u64> {
     let path = CString::new(mount_point).ok()?;
     let mut stat = MaybeUninit::<libc::statvfs>::uninit();
     if unsafe { libc::statvfs(path.as_ptr(), stat.as_mut_ptr()) } != 0 {

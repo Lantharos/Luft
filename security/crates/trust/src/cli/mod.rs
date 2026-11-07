@@ -131,6 +131,8 @@ enum SystemDiskAction {
     OpenHalves,
     /// The step at startup that starts encrypting Luft's partition once Settings asked for it, and opens it while it's being encrypted
     StartEncrypting,
+    /// The step at startup that copies Luft onto the drive Disks asked it to move to, before the system uses its files
+    Move,
 }
 
 impl Command {
@@ -268,5 +270,6 @@ fn system_disk(action: SystemDiskAction) -> Result<()> {
             })?,
         SystemDiskAction::OpenHalves => disk::layout::open_in_initrd(),
         SystemDiskAction::StartEncrypting => disk::encrypting::open_in_initrd(),
+        SystemDiskAction::Move => disk::moving::copy_at_start(),
     }
 }

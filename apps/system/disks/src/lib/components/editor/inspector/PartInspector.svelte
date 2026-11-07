@@ -92,7 +92,7 @@
 		{:else}
 			<SizeInput label="Size" focused={created} value={part.size} min={limits.smallest} max={largest} oncommit={(next) => place(part, part.offset, next)} />
 		{/if}
-		<Disclosure bind:open={editor.exact} hint={tooltip('Exact size in MiB')}>MiB</Disclosure>
+		<Disclosure bind:open={editor.exact} hint={tooltip('Exact sizes and space around it, in MiB')}>Exact</Disclosure>
 
 		{#if changeable}
 			<span class="label">Format</span>

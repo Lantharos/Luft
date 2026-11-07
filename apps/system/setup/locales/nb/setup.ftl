@@ -64,7 +64,6 @@ setup-destination-replace-choice-description = Behold filene, kontoen og innstil
 setup-destination-whole-choice = Bruk en hel disk
 setup-destination-whole-choice-description = Slett en disk, og gi hele den til Luft.
 setup-destination-try-choice = Bare prøv Luft
-setup-destination-try-choice-description = Se deg rundt først. Ingenting installeres, og diskene dine forblir urørt.
 setup-destination-custom-choice = Egendefinert
 setup-destination-custom-choice-description = Ordne partisjonene selv i Disker.
 
@@ -170,7 +169,6 @@ setup-replace-blocked-read-only = Disken er skrivebeskyttet.
 ## Connecting to the internet
 
 setup-network-title = Koble til internett
-setup-network-description = Dette er valgfritt. Når du er på nett, kan Luft stille klokken og tidssonen, og du kan bruke internett mens Luft installeres.
 setup-network-unavailable = Nettverk er ikke tilgjengelig akkurat nå. Du kan koble til senere fra panelet.
 setup-network-looking = Ser etter nettverk
 setup-network-cable = Tilkoblet med kabel
@@ -206,11 +204,7 @@ setup-finishing-failed-trying = Datamaskinen starter fortsatt som før. Du kan f
 setup-finishing-use-stick = Bruk Luft fra minnepinnen
 setup-finishing-keep-trying = Fortsett å prøve Luft
 setup-finishing-installed-title = Luft er installert
-setup-finishing-trust-stick = Ta ut minnepinnen når skjermen blir svart. Deretter ber en blå skjerm deg om å stole på Luft. Bruk tastaturet der.
-setup-finishing-trust = Rett etter omstarten ber en blå skjerm deg om å stole på Luft. Bruk tastaturet der.
-setup-finishing-restart-stick = Start på nytt for å ta det i bruk. Ta ut minnepinnen når skjermen blir svart.
 setup-finishing-restart = Start på nytt for å ta det i bruk.
-setup-finishing-title = Nesten ferdig
 setup-finishing-description = Luft kopieres til datamaskinen. Dette tar noen minutter.
 setup-finishing-plug-in = La datamaskinen være koblet til strøm til det er ferdig.
 setup-stage-idle = Gjør klar
@@ -224,19 +218,7 @@ setup-stage-finished = Ferdig
 ## The firmware screens in these steps are in English, so keep the names of its
 ## menu items (Enroll MOK, Continue, Yes, Reboot) as they are.
 
-setup-enroll-press-key = Trykk på en tast innen 10 sekunder
-setup-enroll-choose-enroll = Velg Enroll MOK og deretter Continue
-setup-enroll-choose-yes = Velg Yes
-setup-enroll-type-code = Skriv inn koden, og velg Reboot
-setup-enroll-digits = { $count ->
-    [one] { $count } siffer
-   *[other] { $count } sifre
-}
-setup-secure-boot-title = Datamaskinen stoler ikke på Luft ennå
-setup-secure-boot-code = Rett etter neste omstart ber en blå skjerm deg om å stole på Luft. Bruk tastaturet der med denne koden.
-setup-secure-boot-skipped = Den blå skjermen ble hoppet over. Hent en ny kode og start på nytt, og bruk tastaturet der.
 setup-secure-boot-getting = Henter koden din
-setup-secure-boot-new-code = Hent en ny kode
 
 ## Encryption
 
@@ -265,6 +247,5 @@ setup-fingerprint-choose-another = Velg en annen finger
 ## Done
 
 setup-ready-title = Alt er klart
-setup-ready-trust = Start på nytt én gang til for å fullføre. Rett etter omstarten ber en blå skjerm deg om å stole på Luft. Bruk tastaturet der med denne koden.
 setup-ready-done = Skrivebordet ditt er klart. Kos deg med Luft.
 setup-ready-start = Begynn å bruke Luft

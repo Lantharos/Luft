@@ -64,7 +64,6 @@ setup-destination-replace-choice-description = Żomm il-fajls, il-kont u s-setti
 setup-destination-whole-choice = Uża diska sħiħa
 setup-destination-whole-choice-description = Ħassar diska u agħtiha kollha lil Luft.
 setup-destination-try-choice = Ipprova Luft biss
-setup-destination-try-choice-description = L-ewwel agħti daqqa t’għajn. Ma jiġi installat xejn u d-diski jibqgħu kif inhuma.
 setup-destination-custom-choice = Personalizzat
 setup-destination-custom-choice-description = Organizza l-partizzjonijiet int stess f’Diski.
 
@@ -185,7 +184,6 @@ setup-replace-blocked-read-only = Id-diska tagħha hija read-only.
 ## Connecting to the internet
 
 setup-network-title = Ikkonnettja mal-internet
-setup-network-description = Dan mhux obbligatorju. Meta tkun online, Luft jista’ jissettja l-ħin u ż-żona tal-ħin, u tista’ tuża l-internet waqt li Luft jiġi installat.
 setup-network-unavailable = In-netwerks mhumiex disponibbli bħalissa. Tista’ tikkonnettja aktar tard mit-taskbar.
 setup-network-looking = Qed infittex netwerks
 setup-network-cable = Konness b’kejbil
@@ -221,11 +219,7 @@ setup-finishing-failed-trying = Il-kompjuter għadu jibda bħal qabel. Tista’ 
 setup-finishing-use-stick = Uża Luft mid-drajv USB
 setup-finishing-keep-trying = Kompli pprova Luft
 setup-finishing-installed-title = Luft huwa installat
-setup-finishing-trust-stick = Neħħi d-drajv USB malli l-iskrin jiddallam. Imbagħad skrin blu jitolbok tafda lil Luft. Hemmhekk uża t-tastiera.
-setup-finishing-trust = Eżatt wara r-restart, skrin blu jitolbok tafda lil Luft. Hemmhekk uża t-tastiera.
-setup-finishing-restart-stick = Irristartja biex tibda tużah. Neħħi d-drajv USB malli l-iskrin jiddallam.
 setup-finishing-restart = Irristartja biex tibda tużah.
-setup-finishing-title = Kważi lesti
 setup-finishing-description = Luft qed jiġi kkopjat fuq il-kompjuter. Dan jieħu ftit minuti.
 setup-finishing-plug-in = Żomm il-kompjuter imqabbad mal-elettriku sakemm jispiċċa.
 setup-stage-idle = Qed jitħejja
@@ -239,22 +233,7 @@ setup-stage-finished = Lest
 ## The firmware screens in these steps are in English, so keep the names of its
 ## menu items (Enroll MOK, Continue, Yes, Reboot) as they are.
 
-setup-enroll-press-key = Agħfas tast fi żmien 10 sekondi
-setup-enroll-choose-enroll = Agħżel Enroll MOK, imbagħad Continue
-setup-enroll-choose-yes = Agħżel Yes
-setup-enroll-type-code = Ittajpja l-kodiċi, imbagħad agħżel Reboot
-setup-enroll-digits = { $count ->
-    [one] { $count } ċifra
-    [two] { $count } ċifri
-    [few] { $count } ċifri
-    [many] { $count } ċifra
-   *[other] { $count } ċifra
-}
-setup-secure-boot-title = Il-kompjuter għadu ma jafdax lil Luft
-setup-secure-boot-code = Eżatt wara r-restart li jmiss, skrin blu jitolbok tafda lil Luft. Hemmhekk uża t-tastiera b’dan il-kodiċi.
-setup-secure-boot-skipped = L-iskrin blu nqabeż. Ikseb kodiċi ġdid u irristartja, imbagħad hemmhekk uża t-tastiera.
 setup-secure-boot-getting = Qed jinġieb il-kodiċi
-setup-secure-boot-new-code = Ikseb kodiċi ġdid
 
 ## Encryption
 
@@ -283,6 +262,5 @@ setup-fingerprint-choose-another = Agħżel saba’ ieħor
 ## Done
 
 setup-ready-title = Kollox lest
-setup-ready-trust = Irristartja darba oħra biex tlesti. Eżatt wara r-restart, skrin blu jitolbok tafda lil Luft. Hemmhekk uża t-tastiera b’dan il-kodiċi.
 setup-ready-done = Id-desktop huwa lest. Ħu gost b’Luft.
 setup-ready-start = Ibda uża Luft

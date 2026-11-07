@@ -64,7 +64,6 @@ setup-destination-replace-choice-description = Ваше датотеке, нал
 setup-destination-whole-choice = Користи цео диск
 setup-destination-whole-choice-description = Диск се брише и цео се предаје систему Luft.
 setup-destination-try-choice = Само испробај Luft
-setup-destination-try-choice-description = Прво разгледајте. Ништа се не инсталира и дискови остају нетакнути.
 setup-destination-custom-choice = Прилагођено
 setup-destination-custom-choice-description = Сами распоредите партиције у апликацији Дискови.
 
@@ -175,7 +174,6 @@ setup-replace-blocked-read-only = Његов диск је само за чит�
 ## Connecting to the internet
 
 setup-network-title = Повежите се на интернет
-setup-network-description = Ово није обавезно. Када сте на мрежи, Luft може да подеси сат и временску зону, а интернет можете да користите док се Luft инсталира.
 setup-network-unavailable = Мреже тренутно нису доступне. Можете се повезати касније са траке задатака.
 setup-network-looking = Тражење мрежа
 setup-network-cable = Повезано каблом
@@ -211,11 +209,7 @@ setup-finishing-failed-trying = Рачунар се и даље покреће �
 setup-finishing-use-stick = Користи Luft са флеша
 setup-finishing-keep-trying = Настави са испробавањем
 setup-finishing-installed-title = Luft је инсталиран
-setup-finishing-trust-stick = Извадите USB флеш када екран потамни. Плави екран ће затим тражити да потврдите поверење у Luft. Тамо користите тастатуру.
-setup-finishing-trust = Одмах после поновног покретања плави екран ће тражити да потврдите поверење у Luft. Тамо користите тастатуру.
-setup-finishing-restart-stick = Поново покрените рачунар да бисте почели да користите Luft. Извадите USB флеш када екран потамни.
 setup-finishing-restart = Поново покрените рачунар да бисте почели да користите Luft.
-setup-finishing-title = Још мало
 setup-finishing-description = Luft се копира на рачунар. То траје неколико минута.
 setup-finishing-plug-in = Држите рачунар прикључен на струју док се не заврши.
 setup-stage-idle = Припрема
@@ -229,20 +223,7 @@ setup-stage-finished = Готово
 ## The firmware screens in these steps are in English, so keep the names of its
 ## menu items (Enroll MOK, Continue, Yes, Reboot) as they are.
 
-setup-enroll-press-key = Притисните тастер у року од 10 секунди
-setup-enroll-choose-enroll = Изаберите Enroll MOK, затим Continue
-setup-enroll-choose-yes = Изаберите Yes
-setup-enroll-type-code = Укуцајте код, затим изаберите Reboot
-setup-enroll-digits = { $count ->
-    [one] { $count } цифра
-    [few] { $count } цифре
-   *[other] { $count } цифара
-}
-setup-secure-boot-title = Рачунар још не верује систему Luft
-setup-secure-boot-code = Одмах после следећег поновног покретања плави екран ће тражити да потврдите поверење у Luft. Тамо помоћу тастатуре унесите овај код.
-setup-secure-boot-skipped = Плави екран је прескочен. Набавите нови код и поново покрените рачунар, па тамо користите тастатуру.
 setup-secure-boot-getting = Прибављање кода
-setup-secure-boot-new-code = Набави нови код
 
 ## Encryption
 
@@ -271,6 +252,5 @@ setup-fingerprint-choose-another = Изабери други прст
 ## Done
 
 setup-ready-title = Све је спремно
-setup-ready-trust = Поново покрените рачунар још једном да бисте завршили. Одмах после поновног покретања плави екран ће тражити да потврдите поверење у Luft. Тамо помоћу тастатуре унесите овај код.
 setup-ready-done = Радна површина је спремна. Уживајте у систему Luft.
 setup-ready-start = Почни да користиш Luft

@@ -15,6 +15,7 @@ futures-util.workspace = true
 gio.workspace = true
 gio-unix.workspace = true
 luft-app = { workspace = true, features = ["launch", "recovery"] }
+luft-disks.workspace = true
 luft-fingerprint.workspace = true
 libc.workspace = true
 luft-i18n.workspace = true

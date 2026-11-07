@@ -5,6 +5,7 @@ use std::fs::{File, OpenOptions};
 use std::io::{Seek, Write};
 use std::os::fd::{AsFd, FromRawFd};
 use std::os::unix::fs::OpenOptionsExt;
+use std::path::{Path, PathBuf};
 
 use zbus::{Fd, Variant};
 
@@ -27,9 +28,13 @@ const DISK_EXPLANATION: [&str; 3] = [
 ];
 
 pub fn for_this_computer(key: &str) -> Sheet<'_> {
+    for_computer(key, computer())
+}
+
+pub fn for_computer(key: &str, name: String) -> Sheet<'_> {
     Sheet {
         key,
-        name: computer(),
+        name,
         explanation: &DISK_EXPLANATION,
     }
 }
@@ -41,17 +46,22 @@ pub fn computer() -> String {
 }
 
 impl Sheet<'_> {
+    fn shown_key(&self) -> String {
+        self.key.to_ascii_uppercase()
+    }
+
     fn text(&self) -> String {
         format!(
             "Recovery key for {}\n\n{}\n\n{}\n",
             self.name,
-            self.key,
+            self.shown_key(),
             self.explanation.join(" ")
         )
     }
 
     fn lines(&self) -> Vec<Line> {
-        let groups: Vec<&str> = self.key.split('-').collect();
+        let key = self.shown_key();
+        let groups: Vec<&str> = key.split('-').collect();
         let mut lines = vec![
             Line {
                 font: Font::Heading,
@@ -91,9 +101,17 @@ impl Sheet<'_> {
         lines
     }
 
+    pub fn save_into(&self, folder: &Path, file_name: &str) -> Result<PathBuf, String> {
+        let path = folder.join(file_name);
+        let mut file = File::create(&path).map_err(failed)?;
+        file.write_all(self.text().as_bytes()).map_err(failed)?;
+        file.sync_all().map_err(failed)?;
+        Ok(path)
+    }
+
     pub async fn save(&self, file_name: &str) -> Result<bool, String> {
         let Some(uri) = FileChooser {
-            title: "Save Recovery Key",
+            title: "Save recovery key",
             current_name: Some(file_name),
             ..FileChooser::default()
         }

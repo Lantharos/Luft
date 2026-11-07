@@ -64,7 +64,6 @@ setup-destination-replace-choice-description = Зберегти ваші фай�
 setup-destination-whole-choice = Використати весь диск
 setup-destination-whole-choice-description = Стерти диск і повністю віддати його Luft.
 setup-destination-try-choice = Просто спробувати Luft
-setup-destination-try-choice-description = Спершу роздивіться. Нічого не буде встановлено, а диски залишаться недоторканими.
 setup-destination-custom-choice = Власний варіант
 setup-destination-custom-choice-description = Розподіліть розділи самостійно в програмі «Диски».
 
@@ -180,7 +179,6 @@ setup-replace-blocked-read-only = Її диск доступний лише дл
 ## Connecting to the internet
 
 setup-network-title = Під’єднання до інтернету
-setup-network-description = Це необов’язково. Через інтернет Luft зможе налаштувати годинник і часовий пояс, а ви зможете користуватися інтернетом під час встановлення.
 setup-network-unavailable = Мережі зараз недоступні. Під’єднатися можна пізніше з панелі завдань.
 setup-network-looking = Пошук мереж
 setup-network-cable = Під’єднано кабелем
@@ -216,11 +214,7 @@ setup-finishing-failed-trying = Комп’ютер і далі запускає
 setup-finishing-use-stick = Користуватися Luft з накопичувача
 setup-finishing-keep-trying = Далі пробувати Luft
 setup-finishing-installed-title = Luft встановлено
-setup-finishing-trust-stick = Вийміть USB-накопичувач, щойно екран згасне. Потім синій екран запитає, чи довіряти Luft. Скористайтеся там клавіатурою.
-setup-finishing-trust = Одразу після перезавантаження синій екран запитає, чи довіряти Luft. Скористайтеся там клавіатурою.
-setup-finishing-restart-stick = Перезавантажте комп’ютер, щоб почати роботу. Вийміть USB-накопичувач, щойно екран згасне.
 setup-finishing-restart = Перезавантажте комп’ютер, щоб почати роботу.
-setup-finishing-title = Майже готово
 setup-finishing-description = Luft копіюється на комп’ютер. Це займе кілька хвилин.
 setup-finishing-plug-in = Не від’єднуйте комп’ютер від живлення до завершення.
 setup-stage-idle = Підготовка
@@ -234,21 +228,7 @@ setup-stage-finished = Готово
 ## The firmware screens in these steps are in English, so keep the names of its
 ## menu items (Enroll MOK, Continue, Yes, Reboot) as they are.
 
-setup-enroll-press-key = Натисніть будь-яку клавішу протягом 10 секунд
-setup-enroll-choose-enroll = Виберіть Enroll MOK, а потім Continue
-setup-enroll-choose-yes = Виберіть Yes
-setup-enroll-type-code = Введіть код, а потім виберіть Reboot
-setup-enroll-digits = { $count ->
-    [one] { $count } цифра
-    [few] { $count } цифри
-    [many] { $count } цифр
-   *[other] { $count } цифри
-}
-setup-secure-boot-title = Комп’ютер поки що не довіряє Luft
-setup-secure-boot-code = Одразу після наступного перезавантаження синій екран запитає, чи довіряти Luft. Скористайтеся там клавіатурою, щоб ввести цей код.
-setup-secure-boot-skipped = Синій екран було пропущено. Отримайте новий код і перезавантажте комп’ютер, а потім скористайтеся там клавіатурою.
 setup-secure-boot-getting = Отримання коду
-setup-secure-boot-new-code = Отримати новий код
 
 ## Encryption
 
@@ -277,6 +257,5 @@ setup-fingerprint-choose-another = Вибрати інший палець
 ## Done
 
 setup-ready-title = Усе готово
-setup-ready-trust = Щоб завершити, перезавантажте комп’ютер ще раз. Одразу після перезавантаження синій екран запитає, чи довіряти Luft. Скористайтеся там клавіатурою, щоб ввести цей код.
 setup-ready-done = Робочий стіл готовий. Приємної роботи з Luft.
 setup-ready-start = Почати роботу з Luft

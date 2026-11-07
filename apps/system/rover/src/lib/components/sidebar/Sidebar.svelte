@@ -136,7 +136,7 @@
 			</div>
 		{/if}
 
-		{#if manager.cloud.available}
+		{#if manager.cloud.available && (manager.cloud.drives.length > 0 || !chooser)}
 			<CloudGroup {manager} {drag} adding={!chooser} onopentab={openInTab} />
 		{/if}
 

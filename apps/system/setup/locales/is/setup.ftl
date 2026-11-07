@@ -64,7 +64,6 @@ setup-destination-replace-choice-description = Halda skránum þínum, aðgangin
 setup-destination-whole-choice = Nota heilan disk
 setup-destination-whole-choice-description = Eyða öllu af diski og gefa Luft hann allan.
 setup-destination-try-choice = Bara prófa Luft
-setup-destination-try-choice-description = Skoðaðu þig fyrst um. Ekkert er sett upp og diskarnir haldast óbreyttir.
 setup-destination-custom-choice = Sérsniðið
 setup-destination-custom-choice-description = Raða disksneiðum handvirkt í forritinu Diskar.
 
@@ -170,7 +169,6 @@ setup-replace-blocked-read-only = Diskurinn er aðeins til lestrar.
 ## Connecting to the internet
 
 setup-network-title = Tengjast internetinu
-setup-network-description = Þetta er valfrjálst. Með nettengingu getur Luft stillt klukkuna og tímabeltið og þú getur notað internetið á meðan Luft er sett upp.
 setup-network-unavailable = Net eru ekki tiltæk eins og er. Þú getur tengst seinna á verkstikunni.
 setup-network-looking = Leitar að netum
 setup-network-cable = Tengt með snúru
@@ -206,11 +204,7 @@ setup-finishing-failed-trying = Tölvan ræsist enn eins og áður. Þú getur h
 setup-finishing-use-stick = Nota Luft af lyklinum
 setup-finishing-keep-trying = Halda áfram að prófa Luft
 setup-finishing-installed-title = Luft hefur verið sett upp
-setup-finishing-trust-stick = Taktu USB-lykilinn úr þegar skjárinn verður svartur. Þá biður blár skjár þig um að treysta Luft. Notaðu lyklaborðið þar.
-setup-finishing-trust = Strax eftir endurræsinguna biður blár skjár þig um að treysta Luft. Notaðu lyklaborðið þar.
-setup-finishing-restart-stick = Endurræstu til að byrja að nota það. Taktu USB-lykilinn úr þegar skjárinn verður svartur.
 setup-finishing-restart = Endurræstu til að byrja að nota það.
-setup-finishing-title = Næstum búið
 setup-finishing-description = Verið er að afrita Luft yfir á tölvuna. Það tekur nokkrar mínútur.
 setup-finishing-plug-in = Hafðu tölvuna tengda við rafmagn þar til þessu er lokið.
 setup-stage-idle = Undirbýr
@@ -224,19 +218,7 @@ setup-stage-finished = Lokið
 ## The firmware screens in these steps are in English, so keep the names of its
 ## menu items (Enroll MOK, Continue, Yes, Reboot) as they are.
 
-setup-enroll-press-key = Ýttu á lykil innan 10 sekúndna
-setup-enroll-choose-enroll = Veldu Enroll MOK og svo Continue
-setup-enroll-choose-yes = Veldu Yes
-setup-enroll-type-code = Sláðu inn kóðann og veldu svo Reboot
-setup-enroll-digits = { $count ->
-    [one] { $count } tölustafur
-   *[other] { $count } tölustafir
-}
-setup-secure-boot-title = Tölvan treystir Luft ekki enn
-setup-secure-boot-code = Strax eftir næstu endurræsingu biður blár skjár þig um að treysta Luft. Notaðu lyklaborðið þar með þessum kóða.
-setup-secure-boot-skipped = Bláa skjánum var sleppt. Fáðu nýjan kóða og endurræstu, notaðu svo lyklaborðið þar.
 setup-secure-boot-getting = Sækir kóðann
-setup-secure-boot-new-code = Fá nýjan kóða
 
 ## Encryption
 
@@ -265,6 +247,5 @@ setup-fingerprint-choose-another = Velja annan fingur
 ## Done
 
 setup-ready-title = Allt er tilbúið
-setup-ready-trust = Endurræstu einu sinni enn til að ljúka. Strax eftir endurræsinguna biður blár skjár þig um að treysta Luft. Notaðu lyklaborðið þar með þessum kóða.
 setup-ready-done = Skjáborðið er tilbúið. Góða skemmtun með Luft.
 setup-ready-start = Byrja að nota Luft

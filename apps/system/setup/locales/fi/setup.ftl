@@ -64,7 +64,6 @@ setup-destination-replace-choice-description = Säilytä tiedostosi, tilisi ja a
 setup-destination-whole-choice = Käytä koko levyä
 setup-destination-whole-choice-description = Tyhjennä levy ja anna se kokonaan Luftille.
 setup-destination-try-choice = Kokeile vain Luftia
-setup-destination-try-choice-description = Tutustu ensin. Mitään ei asenneta, eikä levyihisi kosketa.
 setup-destination-custom-choice = Mukautettu
 setup-destination-custom-choice-description = Järjestä osiot itse Levyt-sovelluksessa.
 
@@ -170,7 +169,6 @@ setup-replace-blocked-read-only = Sen levy on kirjoitussuojattu.
 ## Connecting to the internet
 
 setup-network-title = Yhdistä internetiin
-setup-network-description = Tämä on valinnaista. Kun olet verkossa, Luft voi asettaa kellon ja aikavyöhykkeen, ja voit käyttää internetiä asennuksen aikana.
 setup-network-unavailable = Verkot eivät ole juuri nyt käytettävissä. Voit yhdistää myöhemmin tehtäväpalkista.
 setup-network-looking = Etsitään verkkoja
 setup-network-cable = Yhdistetty kaapelilla
@@ -206,11 +204,7 @@ setup-finishing-failed-trying = Tietokoneesi käynnistyy yhä samalla tavalla ku
 setup-finishing-use-stick = Käytä Luftia tikulta
 setup-finishing-keep-trying = Jatka Luftin kokeilua
 setup-finishing-installed-title = Luft on asennettu
-setup-finishing-trust-stick = Irrota USB-tikku, kun näyttö pimenee. Sen jälkeen sininen näyttö pyytää luottamaan Luftiin. Käytä siinä näppäimistöä.
-setup-finishing-trust = Heti uudelleenkäynnistyksen jälkeen sininen näyttö pyytää luottamaan Luftiin. Käytä siinä näppäimistöä.
-setup-finishing-restart-stick = Ota Luft käyttöön käynnistämällä tietokone uudelleen. Irrota USB-tikku, kun näyttö pimenee.
 setup-finishing-restart = Ota Luft käyttöön käynnistämällä tietokone uudelleen.
-setup-finishing-title = Melkein valmista
 setup-finishing-description = Luftia kopioidaan tietokoneellesi. Tämä kestää muutaman minuutin.
 setup-finishing-plug-in = Pidä tietokone kytkettynä verkkovirtaan, kunnes asennus on valmis.
 setup-stage-idle = Valmistellaan
@@ -224,19 +218,7 @@ setup-stage-finished = Valmis
 ## The firmware screens in these steps are in English, so keep the names of its
 ## menu items (Enroll MOK, Continue, Yes, Reboot) as they are.
 
-setup-enroll-press-key = Paina jotakin näppäintä 10 sekunnin kuluessa
-setup-enroll-choose-enroll = Valitse Enroll MOK ja sitten Continue
-setup-enroll-choose-yes = Valitse Yes
-setup-enroll-type-code = Kirjoita koodi ja valitse sitten Reboot
-setup-enroll-digits = { $count ->
-    [one] { $count } numero
-   *[other] { $count } numeroa
-}
-setup-secure-boot-title = Tietokoneesi ei vielä luota Luftiin
-setup-secure-boot-code = Heti seuraavan uudelleenkäynnistyksen jälkeen sininen näyttö pyytää luottamaan Luftiin. Kirjoita siinä tämä koodi näppäimistöllä.
-setup-secure-boot-skipped = Sininen näyttö ohitettiin. Hae uusi koodi, käynnistä uudelleen ja käytä sitten siinä näppäimistöä.
 setup-secure-boot-getting = Haetaan koodia
-setup-secure-boot-new-code = Hae uusi koodi
 
 ## Encryption
 
@@ -265,6 +247,5 @@ setup-fingerprint-choose-another = Valitse toinen sormi
 ## Done
 
 setup-ready-title = Kaikki on valmista
-setup-ready-trust = Viimeistele käynnistämällä tietokone vielä kerran uudelleen. Heti sen jälkeen sininen näyttö pyytää luottamaan Luftiin. Kirjoita siinä tämä koodi näppäimistöllä.
 setup-ready-done = Työpöytäsi on valmis. Mukavia hetkiä Luftin parissa.
 setup-ready-start = Aloita Luftin käyttö

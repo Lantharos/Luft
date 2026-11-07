@@ -67,7 +67,7 @@
 	}
 </script>
 
-<StepFrame title={t('setup-network-title')} description={t('setup-network-description')}>
+<StepFrame title={t('setup-network-title')} description={t('setup-network-intro')}>
 	{#if unavailable}
 		<p class="text-[14px] text-[var(--text-soft)]">{t('setup-network-unavailable')}</p>
 	{:else if !current}

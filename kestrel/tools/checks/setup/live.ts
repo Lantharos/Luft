@@ -4,19 +4,19 @@ import {require, Setup} from './lib/driver.js';
 const GB = 1e9;
 const AT = {
   continue: [711, 547],
-  alongside: [235, 191],
-  whole: [235, 269],
-  custom: [235, 425],
+  alongside: [235, 245],
+  whole: [235, 323],
+  custom: [235, 401],
   back: [85, 547],
-  keyboard: [400, 280],
+  keyboard: [400, 335],
+  outside: [400, 110],
   install: [700, 547],
-  kept: [70, 420],
+  kept: [70, 450],
   encrypt: [722, 547],
   confirm: [565, 346],
-  skip: [730, 547],
-  name: [315, 222],
-  password: [315, 369],
-  repeat: [315, 442],
+  name: [315, 238],
+  password: [315, 385],
+  repeat: [315, 458],
   restart: [690, 547],
   moreOptions: [560, 547],
 } satisfies Record<string, Point>;
@@ -60,7 +60,7 @@ async function checkFromMeet() {
   await setup.click(AT.keyboard, 'the keyboard list opens');
   await setup.type('custom');
   await setup.shot('welcome-keyboard-custom');
-  await setup.click(AT.keyboard, 'clicking outside closes the list');
+  await setup.click(AT.outside, 'clicking outside closes the list');
   await setup.click(AT.continue, 'continuing shows the room Meet Luft made');
   await setup.shot('destination-meet');
   await setup.click(AT.moreOptions, 'more options shows the other ways to install');
@@ -82,7 +82,7 @@ export async function checkLive() {
   await setup.click(AT.keyboard, 'the keyboard list opens');
   await setup.type('dvorak');
   await setup.shot('welcome-keyboard');
-  await setup.click(AT.keyboard, 'clicking outside closes the list');
+  await setup.click(AT.outside, 'clicking outside closes the list');
   await setup.click(AT.continue, 'continuing shows where to install');
   await setup.shot('destination');
   await setup.click(AT.whole, 'choosing a whole drive lists the drives');
@@ -95,8 +95,6 @@ export async function checkLive() {
   await setup.shot('alongside');
   await setup.click(AT.install, 'installing asks whether to encrypt Luft');
   await checkInstallStarts(setup);
-  await setup.shot('network');
-  await setup.click(AT.skip, 'skipping the network asks for an account');
   await checkAccount(setup);
   await setup.shot('copying');
   await setup.setStage('finished', 1);

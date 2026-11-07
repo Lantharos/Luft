@@ -25,6 +25,7 @@ class InstallState {
 	starting = $state(false);
 	startError = $state('');
 	user = $state('');
+	hostname = $state('');
 	intent = $state<Intent | null>(null);
 	replacing = $state<LinuxSystem | null>(null);
 	target = $state<Target | null>(null);
@@ -84,21 +85,25 @@ class InstallState {
 		}
 	}
 
+	suggestHostname(name: string) {
+		return `${name || NAME_FALLBACK}-${this.hardware.portable ? 'laptop' : 'computer'}`;
+	}
+
 	configure() {
-		const name = this.user || this.replacing?.owner?.name || NAME_FALLBACK;
 		return commands.installerConfigure(
 			{
 				locale: regional.language.locale,
 				keyboard: $state.snapshot(regional.keyboard),
 				timezone: regional.zone,
-				hostname: `${name}-${this.hardware.portable ? 'laptop' : 'computer'}`
+				hostname: this.hostname || this.suggestHostname(this.user || this.replacing?.owner?.name || '')
 			},
 			WAIT_FOR_PERSON
 		);
 	}
 
-	async createAccount(name: string, fullName: string, password: string) {
+	async createAccount(name: string, fullName: string, password: string, hostname: string) {
 		this.user = name;
+		this.hostname = hostname;
 		await this.configure();
 		await commands.installerAccount({ name, fullName, password }, WAIT_FOR_PERSON);
 	}

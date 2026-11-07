@@ -1,5 +1,4 @@
 apps/system/setup/src/lib/components/trust/EnrollSteps.svelte	Press any key to perform\nMOK management
-apps/system/setup/src/lib/components/trust/EnrollSteps.svelte	Shim
 apps/system/setup/src/lib/components/trust/EnrollSteps.svelte	Perform MOK management
 apps/system/setup/src/lib/components/trust/EnrollSteps.svelte	Continue boot
 apps/system/setup/src/lib/components/trust/EnrollSteps.svelte	Enroll MOK
@@ -8,3 +7,6 @@ apps/system/setup/src/lib/components/trust/EnrollSteps.svelte	Enroll hash from d
 apps/system/setup/src/lib/components/trust/EnrollSteps.svelte	Enroll the key(s)?
 apps/system/setup/src/lib/steps/live/destination/MeetRoom.svelte	Windows
 apps/system/setup/src/lib/steps/live/network/Network.svelte	Wi-Fi
+apps/system/setup/src/lib/components/trust/EnrollSteps.svelte	Shim UEFI key management
+apps/system/setup/src/lib/components/trust/EnrollSteps.svelte	Booting in 60 seconds
+apps/system/setup/src/lib/components/trust/EnrollSteps.svelte	View key 0

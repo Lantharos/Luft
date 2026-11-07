@@ -63,7 +63,6 @@ setup-destination-replace-choice-description = Jäta alles oma failid, konto ja 
 setup-destination-whole-choice = Kasuta tervet ketast
 setup-destination-whole-choice-description = Kustuta ketas ja anna see tervenisti Luftile.
 setup-destination-try-choice = Proovi Lufti
-setup-destination-try-choice-description = Vaata kõigepealt ringi. Midagi ei installita ja sinu kettad jäävad puutumata.
 setup-destination-custom-choice = Kohandatud
 setup-destination-custom-choice-description = Korralda partitsioonid ise rakenduses Kettad.
 setup-destination-more-options = Rohkem valikuid
@@ -172,7 +171,6 @@ setup-replace-blocked-read-only = Selle ketas on kirjutuskaitstud.
 ## Connecting to the internet
 
 setup-network-title = Loo internetiühendus
-setup-network-description = See pole kohustuslik. Võrguühenduse korral saab Luft seadistada kella ja ajavööndi ning saad Lufti installimise ajal internetti kasutada.
 setup-network-unavailable = Võrgud pole praegu saadaval. Ühenduse saad luua hiljem paneelilt.
 setup-network-looking = Võrkude otsimine
 setup-network-cable = Ühendatud kaabliga
@@ -208,11 +206,7 @@ setup-finishing-failed-trying = Arvuti käivitub endiselt samamoodi nagu varem. 
 setup-finishing-use-stick = Kasuta Lufti mälupulgalt
 setup-finishing-keep-trying = Jätka Lufti proovimist
 setup-finishing-installed-title = Luft on installitud
-setup-finishing-trust-stick = Kui ekraan läheb tumedaks, eemalda USB-mälupulk. Seejärel küsib sinine ekraan, kas Lufti usaldada. Kasuta seal klaviatuuri.
-setup-finishing-trust = Kohe pärast taaskäivitust küsib sinine ekraan, kas Lufti usaldada. Kasuta seal klaviatuuri.
-setup-finishing-restart-stick = Kasutamise alustamiseks taaskäivita arvuti. Kui ekraan läheb tumedaks, eemalda USB-mälupulk.
 setup-finishing-restart = Kasutamise alustamiseks taaskäivita arvuti.
-setup-finishing-title = Peaaegu valmis
 setup-finishing-description = Lufti kopeeritakse sinu arvutisse. See võtab mõne minuti.
 setup-finishing-plug-in = Hoia arvuti vooluvõrgus, kuni see on lõpetatud.
 setup-stage-idle = Ettevalmistamine
@@ -226,20 +220,7 @@ setup-stage-finished = Valmis
 ## The firmware screens in these steps are in English, so keep the names of its
 ## menu items (Enroll MOK, Continue, Yes, Reboot) as they are.
 
-setup-enroll-press-key = Vajuta 10 sekundi jooksul mõnda klahvi
-setup-enroll-choose-enroll = Vali Enroll MOK, seejärel Continue
-setup-enroll-choose-yes = Vali Yes
-setup-enroll-type-code = Tipi kood, seejärel vali Reboot
-setup-enroll-digits =
-    { $count ->
-        [one] { $count } number
-       *[other] { $count } numbrit
-    }
-setup-secure-boot-title = Sinu arvuti ei usalda veel Lufti
-setup-secure-boot-code = Kohe pärast järgmist taaskäivitust küsib sinine ekraan, kas Lufti usaldada. Kasuta seal klaviatuuri ja sisesta see kood.
-setup-secure-boot-skipped = Sinine ekraan jäeti vahele. Hangi uus kood ja taaskäivita, seejärel kasuta seal klaviatuuri.
 setup-secure-boot-getting = Koodi hankimine
-setup-secure-boot-new-code = Hangi uus kood
 
 ## Encryption
 
@@ -268,6 +249,5 @@ setup-fingerprint-choose-another = Vali teine sõrm
 ## Done
 
 setup-ready-title = Kõik on valmis
-setup-ready-trust = Lõpetamiseks taaskäivita veel kord. Kohe pärast taaskäivitust küsib sinine ekraan, kas Lufti usaldada. Kasuta seal klaviatuuri ja sisesta see kood.
 setup-ready-done = Sinu töölaud on valmis. Meeldivat Lufti kasutamist.
 setup-ready-start = Alusta Lufti kasutamist

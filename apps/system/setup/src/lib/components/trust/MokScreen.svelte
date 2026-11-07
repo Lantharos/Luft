@@ -4,9 +4,10 @@
 		items: string[];
 		highlighted?: number;
 		prompt?: string;
+		footer?: string;
 	}
 
-	let { heading, items, highlighted = -1, prompt }: Props = $props();
+	let { heading, items, highlighted = -1, prompt, footer }: Props = $props();
 </script>
 
 <div class="screen" aria-hidden="true">
@@ -20,51 +21,63 @@
 			{/each}
 		</div>
 	{/if}
+	{#if footer}
+		<div class="footer">{footer}</div>
+	{/if}
 </div>
 
 <style>
 	.screen {
+		position: relative;
 		display: flex;
 		aspect-ratio: 4 / 3;
 		flex-direction: column;
-		gap: 8%;
+		align-items: center;
 		overflow: hidden;
-		border-radius: 10px;
-		padding: 10% 8%;
-		background: #0b2d8f;
-		color: #c8cdd8;
+		border-radius: 8px;
+		padding: 6% 5%;
+		background: #0000a8;
+		box-shadow:
+			inset 0 0 0 3px #0000a8,
+			inset 0 0 0 4px #a8a8a8;
+		color: #a8a8a8;
 		font-family: var(--font-mono);
-		font-size: 8.5px;
-		line-height: 1.5;
-		box-shadow: 0 6px 20px var(--shadow-faint);
+		font-size: 7.5px;
+		line-height: 1.45;
+		text-align: center;
 	}
 
 	.heading {
-		align-self: center;
-		padding: 2px 8px;
-		background: #c8cdd8;
-		color: #0b2d8f;
+		white-space: nowrap;
 	}
 
 	.menu {
 		display: flex;
+		margin: auto 0;
 		flex-direction: column;
-		align-items: center;
+		align-items: stretch;
+		padding: 2px 0;
+		box-shadow: 0 0 0 1px #a8a8a8;
 	}
 
 	.item {
-		padding: 0 6px;
+		padding: 0 5px;
+		white-space: nowrap;
 	}
 
 	.item.on {
-		background: #c8cdd8;
-		color: #0b2d8f;
+		background: #000000;
+		color: #ffffff;
 	}
 
 	.prompt {
-		align-self: center;
-		margin-top: 12%;
-		text-align: center;
+		margin: auto 0;
 		white-space: pre-line;
+	}
+
+	.footer {
+		position: absolute;
+		bottom: 6%;
+		left: 6%;
 	}
 </style>

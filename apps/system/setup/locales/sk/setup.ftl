@@ -64,7 +64,6 @@ setup-destination-replace-choice-description = Ponechať súbory, účet aj nast
 setup-destination-whole-choice = Použiť celý disk
 setup-destination-whole-choice-description = Vymazať disk a celý ho dať Luftu.
 setup-destination-try-choice = Len vyskúšať Luft
-setup-destination-try-choice-description = Najprv sa poobzerajte. Nič sa nenainštaluje a disky zostanú nedotknuté.
 setup-destination-custom-choice = Vlastné
 setup-destination-custom-choice-description = Usporiadajte oddiely sami v aplikácii Disky.
 
@@ -180,7 +179,6 @@ setup-replace-blocked-read-only = Jeho disk je iba na čítanie.
 ## Connecting to the internet
 
 setup-network-title = Pripojenie k internetu
-setup-network-description = Nie je to povinné. Po pripojení si Luft nastaví hodiny a časové pásmo a počas inštalácie môžete používať internet.
 setup-network-unavailable = Siete momentálne nie sú dostupné. Pripojiť sa môžete neskôr z panela úloh.
 setup-network-looking = Hľadajú sa siete
 setup-network-cable = Pripojené káblom
@@ -216,11 +214,7 @@ setup-finishing-failed-trying = Počítač sa stále spúšťa tak ako predtým.
 setup-finishing-use-stick = Používať Luft z USB kľúča
 setup-finishing-keep-trying = Ďalej skúšať Luft
 setup-finishing-installed-title = Luft je nainštalovaný
-setup-finishing-trust-stick = Keď obrazovka stmavne, vyberte USB kľúč. Potom sa na modrej obrazovke zobrazí výzva, či má počítač dôverovať Luftu. Tam použite klávesnicu.
-setup-finishing-trust = Hneď po reštarte sa na modrej obrazovke zobrazí výzva, či má počítač dôverovať Luftu. Tam použite klávesnicu.
-setup-finishing-restart-stick = Ak ho chcete začať používať, reštartujte počítač. Keď obrazovka stmavne, vyberte USB kľúč.
 setup-finishing-restart = Ak ho chcete začať používať, reštartujte počítač.
-setup-finishing-title = Už to skoro bude
 setup-finishing-description = Luft sa kopíruje do počítača. Potrvá to niekoľko minút.
 setup-finishing-plug-in = Kým sa to nedokončí, nechajte počítač pripojený k napájaniu.
 setup-stage-idle = Príprava
@@ -234,21 +228,7 @@ setup-stage-finished = Hotovo
 ## The firmware screens in these steps are in English, so keep the names of its
 ## menu items (Enroll MOK, Continue, Yes, Reboot) as they are.
 
-setup-enroll-press-key = Do 10 sekúnd stlačte ľubovoľný kláves
-setup-enroll-choose-enroll = Vyberte Enroll MOK a potom Continue
-setup-enroll-choose-yes = Vyberte Yes
-setup-enroll-type-code = Zadajte kód a potom vyberte Reboot
-setup-enroll-digits = { $count ->
-    [one] { $count } číslica
-    [few] { $count } číslice
-    [many] { $count } číslice
-   *[other] { $count } číslic
-}
-setup-secure-boot-title = Počítač ešte Luftu nedôveruje
-setup-secure-boot-code = Hneď po ďalšom reštarte sa na modrej obrazovke zobrazí výzva, či má počítač dôverovať Luftu. Tam použite klávesnicu a zadajte tento kód.
-setup-secure-boot-skipped = Modrá obrazovka bola preskočená. Získajte nový kód, reštartujte počítač a potom tam použite klávesnicu.
 setup-secure-boot-getting = Získava sa kód
-setup-secure-boot-new-code = Získať nový kód
 
 ## Encryption
 
@@ -277,6 +257,5 @@ setup-fingerprint-choose-another = Vybrať iný prst
 ## Done
 
 setup-ready-title = Všetko je pripravené
-setup-ready-trust = Na dokončenie ešte raz reštartujte počítač. Hneď po reštarte sa na modrej obrazovke zobrazí výzva, či má počítač dôverovať Luftu. Tam použite klávesnicu a zadajte tento kód.
 setup-ready-done = Vaša pracovná plocha je pripravená. Príjemnú prácu s Luftom.
 setup-ready-start = Začať používať Luft

@@ -64,7 +64,6 @@ setup-destination-replace-choice-description = A fájljai, a fiókja és a beál
 setup-destination-whole-choice = Teljes lemez használata
 setup-destination-whole-choice-description = Egy lemez törlése és teljes átadása a Luftnak.
 setup-destination-try-choice = Luft kipróbálása
-setup-destination-try-choice-description = Előbb nézzen körül. Semmi sem települ, a lemezek érintetlenek maradnak.
 setup-destination-custom-choice = Egyéni
 setup-destination-custom-choice-description = Partíciók elrendezése saját kezűleg a Lemezek alkalmazásban.
 
@@ -170,7 +169,6 @@ setup-replace-blocked-read-only = A lemeze csak olvasható.
 ## Connecting to the internet
 
 setup-network-title = Csatlakozás az internethez
-setup-network-description = Ez nem kötelező. Ha online van, a Luft beállíthatja az órát és az időzónát, és a telepítés közben is használhatja az internetet.
 setup-network-unavailable = A hálózatok most nem érhetők el. Később a tálcáról csatlakozhat.
 setup-network-looking = Hálózatok keresése
 setup-network-cable = Kábellel csatlakozva
@@ -206,11 +204,7 @@ setup-finishing-failed-trying = A számítógép továbbra is ugyanúgy indul, m
 setup-finishing-use-stick = Luft használata a pendrive-ról
 setup-finishing-keep-trying = Luft további kipróbálása
 setup-finishing-installed-title = A Luft telepítése kész
-setup-finishing-trust-stick = Amikor a képernyő elsötétül, vegye ki a pendrive-ot. Ezután egy kék képernyő kéri, hogy jelölje megbízhatónak a Luftot. Ott a billentyűzetet használja.
-setup-finishing-trust = Közvetlenül az újraindítás után egy kék képernyő kéri, hogy jelölje megbízhatónak a Luftot. Ott a billentyűzetet használja.
-setup-finishing-restart-stick = A használatához indítsa újra a számítógépet. Amikor a képernyő elsötétül, vegye ki a pendrive-ot.
 setup-finishing-restart = A használatához indítsa újra a számítógépet.
-setup-finishing-title = Mindjárt kész
 setup-finishing-description = A Luft másolása folyamatban van. Ez néhány percig tart.
 setup-finishing-plug-in = Amíg el nem készül, tartsa a számítógépet töltőn.
 setup-stage-idle = Előkészítés
@@ -224,19 +218,7 @@ setup-stage-finished = Kész
 ## The firmware screens in these steps are in English, so keep the names of its
 ## menu items (Enroll MOK, Continue, Yes, Reboot) as they are.
 
-setup-enroll-press-key = Nyomjon le egy billentyűt 10 másodpercen belül
-setup-enroll-choose-enroll = Válassza az Enroll MOK, majd a Continue lehetőséget
-setup-enroll-choose-yes = Válassza a Yes lehetőséget
-setup-enroll-type-code = Írja be a kódot, majd válassza a Reboot lehetőséget
-setup-enroll-digits = { $count ->
-    [one] { $count } számjegy
-   *[other] { $count } számjegy
-}
-setup-secure-boot-title = A számítógép még nem tartja megbízhatónak a Luftot
-setup-secure-boot-code = Közvetlenül a következő újraindítás után egy kék képernyő kéri, hogy jelölje megbízhatónak a Luftot. Ott a billentyűzettel adja meg ezt a kódot.
-setup-secure-boot-skipped = A kék képernyő kimaradt. Kérjen új kódot, indítsa újra a számítógépet, majd ott használja a billentyűzetet.
 setup-secure-boot-getting = Kód lekérése
-setup-secure-boot-new-code = Új kód kérése
 
 ## Encryption
 
@@ -265,6 +247,5 @@ setup-fingerprint-choose-another = Másik ujj kiválasztása
 ## Done
 
 setup-ready-title = Minden kész
-setup-ready-trust = A befejezéshez indítsa újra még egyszer a számítógépet. Közvetlenül az újraindítás után egy kék képernyő kéri, hogy jelölje megbízhatónak a Luftot. Ott a billentyűzettel adja meg ezt a kódot.
 setup-ready-done = Az asztal készen áll. Jó szórakozást a Lufttal.
 setup-ready-start = Kezdés

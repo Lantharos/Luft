@@ -64,7 +64,6 @@ setup-destination-replace-choice-description = Je bestanden, je account en je in
 setup-destination-whole-choice = Een hele schijf gebruiken
 setup-destination-whole-choice-description = Een schijf wissen en helemaal aan Luft geven.
 setup-destination-try-choice = Luft alleen uitproberen
-setup-destination-try-choice-description = Eerst rondkijken. Er wordt niets geïnstalleerd en je schijven blijven onaangeroerd.
 setup-destination-custom-choice = Aangepast
 setup-destination-custom-choice-description = Zelf partities indelen in Schijven.
 
@@ -170,7 +169,6 @@ setup-replace-blocked-read-only = De schijf is alleen-lezen.
 ## Connecting to the internet
 
 setup-network-title = Verbinding maken met internet
-setup-network-description = Dit is optioneel. Als je online bent, kan Luft je klok en tijdzone instellen, en kun je internet gebruiken terwijl Luft wordt geïnstalleerd.
 setup-network-unavailable = Netwerken zijn nu niet beschikbaar. Je kunt later verbinding maken via de taakbalk.
 setup-network-looking = Netwerken zoeken
 setup-network-cable = Verbonden met een kabel
@@ -206,11 +204,7 @@ setup-finishing-failed-trying = Je computer start nog net als eerst. Je kunt Luf
 setup-finishing-use-stick = Luft vanaf de stick gebruiken
 setup-finishing-keep-trying = Luft blijven uitproberen
 setup-finishing-installed-title = Luft is geïnstalleerd
-setup-finishing-trust-stick = Haal de usb-stick eruit zodra het scherm zwart wordt. Daarna vraagt een blauw scherm of je Luft vertrouwt. Gebruik daar het toetsenbord.
-setup-finishing-trust = Direct na het opnieuw opstarten vraagt een blauw scherm of je Luft vertrouwt. Gebruik daar het toetsenbord.
-setup-finishing-restart-stick = Start opnieuw op om het te gaan gebruiken. Haal de usb-stick eruit zodra het scherm zwart wordt.
 setup-finishing-restart = Start opnieuw op om het te gaan gebruiken.
-setup-finishing-title = Bijna klaar
 setup-finishing-description = Luft wordt naar je computer gekopieerd. Dit duurt een paar minuten.
 setup-finishing-plug-in = Houd je computer aangesloten op de lader tot het klaar is.
 setup-stage-idle = Voorbereiden
@@ -224,19 +218,7 @@ setup-stage-finished = Klaar
 ## The firmware screens in these steps are in English, so keep the names of its
 ## menu items (Enroll MOK, Continue, Yes, Reboot) as they are.
 
-setup-enroll-press-key = Druk binnen 10 seconden op een toets
-setup-enroll-choose-enroll = Kies Enroll MOK en daarna Continue
-setup-enroll-choose-yes = Kies Yes
-setup-enroll-type-code = Typ de code en kies daarna Reboot
-setup-enroll-digits = { $count ->
-    [one] { $count } cijfer
-   *[other] { $count } cijfers
-}
-setup-secure-boot-title = Je computer vertrouwt Luft nog niet
-setup-secure-boot-code = Direct na de volgende herstart vraagt een blauw scherm of je Luft vertrouwt. Gebruik daar het toetsenbord met deze code.
-setup-secure-boot-skipped = Het blauwe scherm is overgeslagen. Vraag een nieuwe code aan en start opnieuw op. Gebruik daarna het toetsenbord op dat scherm.
 setup-secure-boot-getting = Je code wordt opgehaald
-setup-secure-boot-new-code = Nieuwe code aanvragen
 
 ## Encryption
 
@@ -265,6 +247,5 @@ setup-fingerprint-choose-another = Andere vinger kiezen
 ## Done
 
 setup-ready-title = Je bent er klaar voor
-setup-ready-trust = Start nog één keer opnieuw op om af te ronden. Direct na het opnieuw opstarten vraagt een blauw scherm of je Luft vertrouwt. Gebruik daar het toetsenbord met deze code.
 setup-ready-done = Je bureaublad staat klaar. Veel plezier met Luft.
 setup-ready-start = Luft gaan gebruiken

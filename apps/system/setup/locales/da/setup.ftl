@@ -64,7 +64,6 @@ setup-destination-replace-choice-description = Behold dine filer, din konto og d
 setup-destination-whole-choice = Brug en hel disk
 setup-destination-whole-choice-description = Slet en disk, og giv hele den til Luft.
 setup-destination-try-choice = Prøv bare Luft
-setup-destination-try-choice-description = Se dig omkring først. Intet bliver installeret, og dine diske forbliver urørte.
 setup-destination-custom-choice = Brugerdefineret
 setup-destination-custom-choice-description = Inddel selv partitionerne i Diske.
 
@@ -170,7 +169,6 @@ setup-replace-blocked-read-only = Systemets disk er skrivebeskyttet.
 ## Connecting to the internet
 
 setup-network-title = Opret forbindelse til internettet
-setup-network-description = Det er valgfrit. Når du er online, kan Luft indstille dit ur og din tidszone, og du kan bruge internettet, mens Luft installeres.
 setup-network-unavailable = Netværk er ikke tilgængelige lige nu. Du kan oprette forbindelse senere fra panelet.
 setup-network-looking = Søger efter netværk
 setup-network-cable = Forbundet med kabel
@@ -206,11 +204,7 @@ setup-finishing-failed-trying = Din computer starter stadig på samme måde som 
 setup-finishing-use-stick = Brug Luft fra USB-stikket
 setup-finishing-keep-trying = Bliv ved med at prøve Luft
 setup-finishing-installed-title = Luft er installeret
-setup-finishing-trust-stick = Tag USB-stikket ud, når skærmen bliver mørk. Derefter beder en blå skærm dig om at stole på Luft. Brug tastaturet der.
-setup-finishing-trust = Lige efter genstarten beder en blå skærm dig om at stole på Luft. Brug tastaturet der.
-setup-finishing-restart-stick = Genstart for at begynde at bruge det. Tag USB-stikket ud, når skærmen bliver mørk.
 setup-finishing-restart = Genstart for at begynde at bruge det.
-setup-finishing-title = Næsten færdig
 setup-finishing-description = Luft bliver kopieret til din computer. Det tager et par minutter.
 setup-finishing-plug-in = Hold din computer tilsluttet strøm, indtil det er færdigt.
 setup-stage-idle = Gør klar
@@ -224,19 +218,7 @@ setup-stage-finished = Færdig
 ## The firmware screens in these steps are in English, so keep the names of its
 ## menu items (Enroll MOK, Continue, Yes, Reboot) as they are.
 
-setup-enroll-press-key = Tryk på en tast inden for 10 sekunder
-setup-enroll-choose-enroll = Vælg Enroll MOK og derefter Continue
-setup-enroll-choose-yes = Vælg Yes
-setup-enroll-type-code = Skriv koden, og vælg derefter Reboot
-setup-enroll-digits = { $count ->
-    [one] { $count } ciffer
-   *[other] { $count } cifre
-}
-setup-secure-boot-title = Din computer stoler endnu ikke på Luft
-setup-secure-boot-code = Lige efter næste genstart beder en blå skærm dig om at stole på Luft. Brug tastaturet der med denne kode.
-setup-secure-boot-skipped = Den blå skærm blev sprunget over. Hent en ny kode, og genstart, og brug så tastaturet der.
 setup-secure-boot-getting = Henter din kode
-setup-secure-boot-new-code = Hent en ny kode
 
 ## Encryption
 
@@ -265,6 +247,5 @@ setup-fingerprint-choose-another = Vælg en anden finger
 ## Done
 
 setup-ready-title = Så er du klar
-setup-ready-trust = Genstart én gang mere for at gøre det færdigt. Lige efter genstarten beder en blå skærm dig om at stole på Luft. Brug tastaturet der med denne kode.
 setup-ready-done = Dit skrivebord er klar. God fornøjelse med Luft.
 setup-ready-start = Begynd at bruge Luft

@@ -1,6 +1,7 @@
 mod fingerprint;
 mod hardware;
 mod installer;
+mod key_drives;
 mod regional;
 mod session;
 mod trust;
@@ -59,15 +60,17 @@ fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     let window = fingerprint::register(window, events);
     let window = installer::register(window);
     let window = trust::register(window);
+    let window = key_drives::register(window);
     let window = regional::register(window);
     session::register(window)
 }
 
+fn watch(events: Events) {
+    installer::watch(events.clone());
+    key_drives::watch(events);
+}
+
 pub fn run() -> ! {
     let events = Events::default();
-    luft_app::run(
-        &events,
-        |built| register(window(built), &events),
-        installer::watch,
-    )
+    luft_app::run(&events, |built| register(window(built), &events), watch)
 }

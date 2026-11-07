@@ -6,11 +6,14 @@
 	import { install } from '#lib/state/install.svelte.js';
 
 	const USER_NAME = /^[a-z_][a-z0-9_-]{0,31}$/;
+	const HOSTNAME = /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$/;
 
 	let kept = install.replacing?.owner ?? null;
 	let fullName = $state(kept?.fullName ?? install.survey?.meet?.movingBox?.fullName ?? '');
 	let userName = $state(kept?.name ?? '');
 	let editedUserName = $state(!!kept);
+	let hostname = $state('');
+	let editedHostname = $state(false);
 	let password = $state('');
 	let repeated = $state('');
 	let saving = $state(false);
@@ -29,11 +32,15 @@
 	$effect(() => {
 		if (!editedUserName) userName = suggested;
 	});
+	$effect(() => {
+		if (!editedHostname) hostname = userName ? install.suggestHostname(userName) : '';
+	});
 
 	let nameError = $derived(userName && !USER_NAME.test(userName) ? t('setup-account-user-name-invalid') : '');
+	let hostnameError = $derived(hostname && !HOSTNAME.test(hostname) ? t('setup-account-computer-name-invalid') : '');
 	let fullNameError = $derived(/[:,\n]/.test(fullName) ? t('setup-account-full-name-invalid') : '');
 	let repeatError = $derived(repeated && repeated !== password ? t('setup-account-mismatch') : '');
-	let ready = $derived(Boolean(fullName.trim() && userName && !nameError && !fullNameError && password && repeated === password));
+	let ready = $derived(Boolean(fullName.trim() && userName && !nameError && !fullNameError && hostname && !hostnameError && password && repeated === password));
 
 	async function submit(event: SubmitEvent) {
 		event.preventDefault();
@@ -41,7 +48,7 @@
 		saving = true;
 		problem = '';
 		try {
-			await install.createAccount(userName, fullName.trim(), password);
+			await install.createAccount(userName, fullName.trim(), password, hostname);
 			flow.next();
 		} catch (error) {
 			problem = String(error);
@@ -55,7 +62,10 @@
 	<StepFrame title={t('setup-account-title')} description={t('setup-account-description')} hideBack={saving}>
 		<div class="grid max-w-[520px] gap-3">
 			<TextField bind:value={fullName} label={t('setup-account-full-name')} showLabel placeholder={t('setup-account-full-name-example')} autocomplete="name" error={fullNameError} live />
-			<TextField bind:value={userName} label={t('setup-account-user-name')} showLabel error={nameError} live onkeydown={() => (editedUserName = true)} />
+			<div class="grid grid-cols-2 gap-3">
+				<TextField bind:value={userName} label={t('setup-account-user-name')} showLabel error={nameError} live onkeydown={() => (editedUserName = true)} />
+				<TextField bind:value={hostname} label={t('setup-account-computer-name')} showLabel error={hostnameError} live onkeydown={() => (editedHostname = true)} />
+			</div>
 			<PasswordField bind:value={password} label={t('setup-account-password')} showLabel autocomplete="new-password" />
 			<PasswordField bind:value={repeated} label={t('setup-account-repeat')} showLabel autocomplete="new-password" error={repeatError} live />
 			{#if problem}

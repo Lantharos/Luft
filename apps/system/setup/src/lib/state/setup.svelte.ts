@@ -9,7 +9,7 @@ import { regional } from './regional.svelte.js';
 function firstBootSkips(trust: TrustState | null, hardware: Hardware, newNetworks: NewNetwork[]): Step[] {
 	const skips: Step[] = [];
 	if (!newNetworks.length) skips.push('network-type');
-	if (!trust || trust.secureBoot !== 'on' || trust.key !== 'none' || !trust.keyAvailable) skips.push('secure-boot');
+	if (!trust || trust.secureBoot !== 'on' || trust.key === 'enrolled' || !trust.keyAvailable) skips.push('secure-boot');
 	if (!hardware.fingerprint) skips.push('fingerprint');
 	return skips;
 }

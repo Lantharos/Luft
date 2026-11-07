@@ -80,8 +80,8 @@ setup-destination-replace-choice = Replace { $system }
 setup-destination-replace-choice-description = Keep your files, your account and your settings, and let Luft take its place.
 setup-destination-whole-choice = Use a whole drive
 setup-destination-whole-choice-description = Erase a drive and give all of it to Luft.
+# Button that leaves setup and starts the desktop from the USB stick, without installing anything
 setup-destination-try-choice = Just try Luft
-setup-destination-try-choice-description = Look around first. Nothing is installed and your drives stay untouched.
 setup-destination-custom-choice = Custom
 setup-destination-custom-choice-description = Arrange partitions yourself in Disks.
 
@@ -105,6 +105,9 @@ setup-confirm-free-title = Install Luft in the free space?
 setup-confirm-replace-keep-old = Luft starts copying right away. The old system won’t start anymore, and its files stay until you remove them.
 setup-confirm-replace-erase-old = Luft starts copying right away. The old system is erased for good, and your files stay where they are.
 setup-confirm-erase-description = Everything on this drive is erased for good, including other systems and files.
+# $drive is a drive name, like "Samsung SSD 980". The drive has nothing on it
+setup-confirm-empty-title = Install Luft on { $drive }?
+setup-confirm-empty-description = This drive is empty, so nothing is lost. Luft starts copying right away, and you can set up your account while it works.
 setup-confirm-install-description = Luft starts copying right away. You can set up your account while it works.
 setup-confirm-erase = Erase and install
 # Button, verb
@@ -120,6 +123,19 @@ setup-protect-passphrase-label = Passphrase
 setup-protect-repeat = Type it again
 setup-protect-mismatch = They don’t match
 setup-protect-kept = I’ve kept my recovery key
+# Read out by screen readers; $key is the recovery key
+setup-protect-key-label = Recovery key { $key }
+setup-protect-save-usb = Save to a USB drive
+setup-protect-print = Print
+setup-protect-write = Write it down
+setup-protect-usb-plug = Plug in a USB drive to save the key on it. Anything else on the drive stays as it is.
+# Button, verb: saves the recovery key on this USB drive
+setup-protect-usb-save = Save
+setup-protect-usb-done = Saved
+# $drive is the name of a USB drive
+setup-protect-usb-saved = The key is saved on { $drive }. You can take the drive out now.
+setup-protect-printed = Sent to the printer. Keep the page somewhere safe.
+setup-protect-write-hint = Write down all 64 letters in their groups of eight. Upper or lower case both work when you type it.
 # Button: installs Luft without encrypting it
 setup-protect-skip = Don’t encrypt
 # Button, verb: installs Luft encrypted
@@ -224,7 +240,7 @@ setup-replace-blocked-read-only = Its drive is read-only.
 ## Connecting to the internet
 
 setup-network-title = Connect to the internet
-setup-network-description = This is optional. Being online lets Luft set your clock and time zone, and you can use the internet while Luft installs.
+setup-network-intro = This is optional. Being online lets Luft set your clock and time zone, and the network you join here is ready when Luft starts for the first time.
 setup-network-unavailable = Networks aren’t available right now. You can connect later from the panel.
 setup-network-looking = Looking for networks
 setup-network-cable = Connected with a cable
@@ -252,6 +268,9 @@ setup-account-user-name = User name
 setup-account-password = Password
 setup-account-repeat = Type it again
 setup-account-user-name-invalid = Use lowercase letters, numbers, - and _
+# The name other computers on the network see, like "ada-laptop"
+setup-account-computer-name = Computer name
+setup-account-computer-name-invalid = Use lowercase letters, numbers and -, without a - at either end
 setup-account-full-name-invalid = Leave out commas and colons
 setup-account-mismatch = The passwords don’t match
 
@@ -264,11 +283,11 @@ setup-finishing-failed-trying = Your computer still starts the way it did before
 setup-finishing-use-stick = Use Luft from the stick
 setup-finishing-keep-trying = Keep trying Luft
 setup-finishing-installed-title = Luft is installed
-setup-finishing-trust-stick = Take out the USB stick once the screen goes dark. A blue screen then asks to trust Luft. Use the keyboard there.
-setup-finishing-trust = Right after the restart, a blue screen asks to trust Luft. Use the keyboard there.
-setup-finishing-restart-stick = Restart to start using it. Take out the USB stick once the screen goes dark.
+setup-finishing-secure-boot-stick = Right after the restart, a blue screen asks to finish setting up Secure Boot. Use the keyboard there with this code. Take out the USB stick once Luft has started.
+setup-finishing-secure-boot = Right after the restart, a blue screen asks to finish setting up Secure Boot. Use the keyboard there with this code.
+setup-finishing-restart-started-stick = Restart to start using it. Take out the USB stick once Luft has started.
 setup-finishing-restart = Restart to start using it.
-setup-finishing-title = Almost there
+setup-finishing-installing-title = Installing Luft
 setup-finishing-description = Luft is being copied to your computer. This takes a few minutes.
 setup-finishing-plug-in = Keep your computer plugged in until it’s done.
 setup-stage-idle = Getting ready
@@ -288,24 +307,23 @@ setup-network-type-home = Home
 setup-network-type-public = Public
     .detail = In a café, hotel or airport. Nothing on the network can reach this computer
 
-## Trusting Luft at startup (Secure Boot key enrollment)
-## The firmware screens in these steps are in English, so keep the names of its
-## menu items (Enroll MOK, Continue, Yes, Reboot) as they are.
+## Finishing Secure Boot at startup (adding Luft's key on shim's blue screen)
+## The blue screen is always in English, so $option, $question and $prompt are its
+## own words, which stay in English and in quotes.
 
-setup-enroll-press-key = Press a key within 10 seconds
-setup-enroll-choose-enroll = Choose Enroll MOK, then Continue
-setup-enroll-choose-yes = Choose Yes
-setup-enroll-type-code = Type the code, then choose Reboot
-# Under the code to type. $count is how many digits it has
-setup-enroll-digits = { $count ->
-    [one] { $count } digit
-   *[other] { $count } digits
-}
-setup-secure-boot-title = Your computer doesn’t trust Luft yet
-setup-secure-boot-code = Right after the next restart, a blue screen asks to trust Luft. Use the keyboard there with this code.
-setup-secure-boot-skipped = The blue screen was skipped. Get a new code and restart, then use the keyboard there.
+setup-enroll-press-any-key = Press any key. It waits a minute.
+setup-enroll-choose = Choose “{ $option }”
+setup-enroll-confirm = At “{ $question }”, choose “{ $option }”
+setup-enroll-type = At “{ $prompt }”, type the code and press Enter, then choose “{ $option }”
+# Read out by screen readers; $code is the eight-digit code
+setup-enroll-code-label = Code { $code }
+setup-enroll-code-hint = Type all eight digits, without a space. Nothing shows while you type.
+setup-enroll-missed = If the blue screen goes by, Luft starts anyway and you can try again.
+setup-secure-boot-finish-title = Finish setting up Secure Boot
+setup-secure-boot-pending = Right after the next restart, a blue screen asks to finish setting up Secure Boot. Use the keyboard there with this code.
+setup-secure-boot-not-set-up = Secure Boot isn’t set up for Luft yet, so Luft starts without its boot menu. Get a code, restart, and use the keyboard on the blue screen.
 setup-secure-boot-getting = Getting your code
-setup-secure-boot-new-code = Get a new code
+setup-secure-boot-get-code = Get a code
 
 ## Fingerprint
 
@@ -322,6 +340,13 @@ setup-fingerprint-choose-another = Choose another finger
 ## Done
 
 setup-ready-title = You’re all set
-setup-ready-trust = Restart once more to finish. Right after the restart, a blue screen asks to trust Luft. Use the keyboard there with this code.
+setup-ready-secure-boot = Restart once more to finish setting up Secure Boot. Right after the restart, a blue screen asks for this code. Use the keyboard there.
 setup-ready-done = Your desktop is ready. Have fun with Luft.
+setup-ready-start-title = Start
+setup-ready-start-detail = Your apps, files and search, from the taskbar or the Super key.
+setup-ready-schelf-title = Schelf
+setup-ready-schelf-detail = Get more apps and keep them up to date.
+setup-ready-settings-title = Settings
+setup-ready-settings-detail = Wi-Fi, accounts, wallpaper and everything else about this computer.
+setup-ready-settings-secure-boot = Finish setting up Secure Boot whenever you’re ready, under Security.
 setup-ready-start = Start using Luft

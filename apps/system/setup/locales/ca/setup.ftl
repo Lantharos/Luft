@@ -64,7 +64,6 @@ setup-destination-replace-choice-description = Conserva els fitxers, el compte i
 setup-destination-whole-choice = Fes servir un disc sencer
 setup-destination-whole-choice-description = Esborra un disc i dona’l sencer a Luft.
 setup-destination-try-choice = Prova Luft sense instal·lar-lo
-setup-destination-try-choice-description = Fes-hi una ullada primer. No s’instal·la res i els discs queden intactes.
 setup-destination-custom-choice = Personalitzat
 setup-destination-custom-choice-description = Organitza les particions manualment a Discs.
 
@@ -170,7 +169,6 @@ setup-replace-blocked-read-only = El seu disc és només de lectura.
 ## Connecting to the internet
 
 setup-network-title = Connecteu-vos a internet
-setup-network-description = És opcional. Si esteu en línia, Luft pot ajustar el rellotge i la zona horària, i podeu fer servir internet mentre Luft s’instal·la.
 setup-network-unavailable = Ara mateix no hi ha xarxes disponibles. Podeu connectar-vos més tard des de la barra de tasques.
 setup-network-looking = S’estan cercant xarxes
 setup-network-cable = Connectat amb cable
@@ -206,11 +204,7 @@ setup-finishing-failed-trying = L’ordinador encara s’inicia com abans. Podeu
 setup-finishing-use-stick = Fes servir Luft des de la memòria
 setup-finishing-keep-trying = Continua provant Luft
 setup-finishing-installed-title = Luft s’ha instal·lat
-setup-finishing-trust-stick = Traieu la memòria USB quan la pantalla es quedi a les fosques. Després, una pantalla blava us demanarà que confieu en Luft. Feu-hi servir el teclat.
-setup-finishing-trust = Just després de reiniciar, una pantalla blava us demanarà que confieu en Luft. Feu-hi servir el teclat.
-setup-finishing-restart-stick = Reinicieu per començar a fer-lo servir. Traieu la memòria USB quan la pantalla es quedi a les fosques.
 setup-finishing-restart = Reinicieu per començar a fer-lo servir.
-setup-finishing-title = Gairebé hi som
 setup-finishing-description = S’està copiant Luft a l’ordinador. Triga uns minuts.
 setup-finishing-plug-in = Manteniu l’ordinador endollat fins que acabi.
 setup-stage-idle = S’està preparant
@@ -224,19 +218,7 @@ setup-stage-finished = Fet
 ## The firmware screens in these steps are in English, so keep the names of its
 ## menu items (Enroll MOK, Continue, Yes, Reboot) as they are.
 
-setup-enroll-press-key = Premeu una tecla abans de 10 segons
-setup-enroll-choose-enroll = Trieu Enroll MOK i després Continue
-setup-enroll-choose-yes = Trieu Yes
-setup-enroll-type-code = Escriviu el codi i trieu Reboot
-setup-enroll-digits = { $count ->
-    [one] { $count } xifra
-   *[other] { $count } xifres
-}
-setup-secure-boot-title = L’ordinador encara no confia en Luft
-setup-secure-boot-code = Just després del pròxim reinici, una pantalla blava us demanarà que confieu en Luft. Feu-hi servir el teclat amb aquest codi.
-setup-secure-boot-skipped = S’ha omès la pantalla blava. Obteniu un codi nou i reinicieu; després feu servir el teclat en aquella pantalla.
 setup-secure-boot-getting = S’està obtenint el codi
-setup-secure-boot-new-code = Obtén un codi nou
 
 ## Encryption
 
@@ -265,6 +247,5 @@ setup-fingerprint-choose-another = Tria un altre dit
 ## Done
 
 setup-ready-title = Ja està tot a punt
-setup-ready-trust = Reinicieu una vegada més per acabar. Just després de reiniciar, una pantalla blava us demanarà que confieu en Luft. Feu-hi servir el teclat amb aquest codi.
 setup-ready-done = L’escriptori ja està a punt. Gaudiu de Luft.
 setup-ready-start = Comença a fer servir Luft

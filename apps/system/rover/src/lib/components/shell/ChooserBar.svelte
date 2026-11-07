@@ -87,9 +87,7 @@
 
 <style>
 	.chooser-bar {
-		background:
-			repeating-linear-gradient(-45deg, color-mix(in oklab, var(--accent) 9%, transparent) 0 9px, transparent 9px 18px),
-			var(--content);
-		box-shadow: inset 0 2px 0 color-mix(in oklab, var(--accent) 55%, transparent);
+		background: var(--content);
+		box-shadow: inset 0 1px 0 var(--hairline);
 	}
 </style>

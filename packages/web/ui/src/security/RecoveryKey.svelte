@@ -17,7 +17,7 @@
 	let done = $state<'saved' | 'printing' | 'copied' | null>(null);
 	let error = $state('');
 
-	const groups = $derived(key.split('-'));
+	const groups = $derived(key.toUpperCase().split('-'));
 
 	async function attempt(action: () => Promise<boolean>, outcome: NonNullable<typeof done>) {
 		error = '';

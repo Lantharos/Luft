@@ -64,7 +64,6 @@ setup-destination-replace-choice-description = Dosyalarınızı, hesabınızı v
 setup-destination-whole-choice = Diskin tamamını kullan
 setup-destination-whole-choice-description = Bir diski silin ve tamamını Luft’a verin.
 setup-destination-try-choice = Luft’u yalnızca dene
-setup-destination-try-choice-description = Önce etrafa göz atın. Hiçbir şey yüklenmez ve diskleriniz olduğu gibi kalır.
 setup-destination-custom-choice = Özel
 setup-destination-custom-choice-description = Bölümleri Diskler’de kendiniz düzenleyin.
 
@@ -170,7 +169,6 @@ setup-replace-blocked-read-only = Diski salt okunur durumda.
 ## Connecting to the internet
 
 setup-network-title = İnternete bağlanın
-setup-network-description = Bu isteğe bağlıdır. Çevrimiçi olduğunuzda Luft saatinizi ve saat diliminizi ayarlayabilir, Luft yüklenirken de interneti kullanabilirsiniz.
 setup-network-unavailable = Ağlar şu anda kullanılamıyor. Daha sonra görev çubuğundan bağlanabilirsiniz.
 setup-network-looking = Ağlar aranıyor
 setup-network-cable = Kabloyla bağlı
@@ -206,11 +204,7 @@ setup-finishing-failed-trying = Bilgisayarınız hâlâ eskisi gibi başlıyor. 
 setup-finishing-use-stick = Luft’u USB bellekten kullan
 setup-finishing-keep-trying = Luft’u denemeye devam et
 setup-finishing-installed-title = Luft yüklendi
-setup-finishing-trust-stick = Ekran karardığında USB belleği çıkarın. Ardından mavi bir ekran Luft’a güvenmek isteyip istemediğinizi sorar. Orada klavyeyi kullanın.
-setup-finishing-trust = Yeniden başlatmanın hemen ardından mavi bir ekran Luft’a güvenmek isteyip istemediğinizi sorar. Orada klavyeyi kullanın.
-setup-finishing-restart-stick = Kullanmaya başlamak için yeniden başlatın. Ekran karardığında USB belleği çıkarın.
 setup-finishing-restart = Kullanmaya başlamak için yeniden başlatın.
-setup-finishing-title = Neredeyse bitti
 setup-finishing-description = Luft bilgisayarınıza kopyalanıyor. Bu birkaç dakika sürer.
 setup-finishing-plug-in = İşlem bitene kadar bilgisayarınızı prizde tutun.
 setup-stage-idle = Hazırlanıyor
@@ -224,19 +218,7 @@ setup-stage-finished = Bitti
 ## The firmware screens in these steps are in English, so keep the names of its
 ## menu items (Enroll MOK, Continue, Yes, Reboot) as they are.
 
-setup-enroll-press-key = 10 saniye içinde bir tuşa basın
-setup-enroll-choose-enroll = Enroll MOK seçeneğini, ardından Continue seçeneğini seçin
-setup-enroll-choose-yes = Yes seçeneğini seçin
-setup-enroll-type-code = Kodu yazın, ardından Reboot seçeneğini seçin
-setup-enroll-digits = { $count ->
-    [one] { $count } basamak
-   *[other] { $count } basamak
-}
-setup-secure-boot-title = Bilgisayarınız henüz Luft’a güvenmiyor
-setup-secure-boot-code = Bir sonraki yeniden başlatmanın hemen ardından mavi bir ekran Luft’a güvenmek isteyip istemediğinizi sorar. Orada klavyeyle bu kodu kullanın.
-setup-secure-boot-skipped = Mavi ekran atlandı. Yeni bir kod alıp yeniden başlatın, ardından orada klavyeyi kullanın.
 setup-secure-boot-getting = Kodunuz alınıyor
-setup-secure-boot-new-code = Yeni kod al
 
 ## Encryption
 
@@ -265,6 +247,5 @@ setup-fingerprint-choose-another = Başka bir parmak seç
 ## Done
 
 setup-ready-title = Her şey hazır
-setup-ready-trust = Bitirmek için bir kez daha yeniden başlatın. Yeniden başlatmanın hemen ardından mavi bir ekran Luft’a güvenmek isteyip istemediğinizi sorar. Orada klavyeyle bu kodu kullanın.
 setup-ready-done = Masaüstünüz hazır. Luft’un keyfini çıkarın.
 setup-ready-start = Luft’u kullanmaya başla

@@ -64,7 +64,6 @@ setup-destination-replace-choice-description = Palikti jūsų failus, paskyrą i
 setup-destination-whole-choice = Naudoti visą diską
 setup-destination-whole-choice-description = Ištrinti diską ir visą jį skirti sistemai Luft.
 setup-destination-try-choice = Tik išbandyti Luft
-setup-destination-try-choice-description = Pirma apsidairykite. Niekas neįdiegiama, o diskai lieka nepaliesti.
 setup-destination-custom-choice = Pasirinktinai
 setup-destination-custom-choice-description = Patys sutvarkykite skaidinius programoje Diskai.
 
@@ -181,7 +180,6 @@ setup-replace-blocked-read-only = Jos diskas skirtas tik skaityti.
 ## Connecting to the internet
 
 setup-network-title = Prisijunkite prie interneto
-setup-network-description = Tai nebūtina. Prisijungus prie interneto, Luft galės nustatyti laikrodį ir laiko juostą, o diegimo metu galėsite naudotis internetu.
 setup-network-unavailable = Tinklai šiuo metu nepasiekiami. Prisijungti galėsite vėliau iš skydelio.
 setup-network-looking = Ieškoma tinklų
 setup-network-cable = Prijungta kabeliu
@@ -217,11 +215,7 @@ setup-finishing-failed-trying = Kompiuteris vis dar pasileidžia taip pat kaip a
 setup-finishing-use-stick = Naudoti Luft iš atmintuko
 setup-finishing-keep-trying = Toliau bandyti Luft
 setup-finishing-installed-title = Sistema Luft įdiegta
-setup-finishing-trust-stick = Kai ekranas užges, ištraukite USB atmintuką. Tada mėlyname ekrane bus paprašyta pasitikėti sistema Luft. Ten naudokite klaviatūrą.
-setup-finishing-trust = Iškart po paleidimo iš naujo mėlyname ekrane bus paprašyta pasitikėti sistema Luft. Ten naudokite klaviatūrą.
-setup-finishing-restart-stick = Paleiskite iš naujo, kad pradėtumėte naudotis. Kai ekranas užges, ištraukite USB atmintuką.
 setup-finishing-restart = Paleiskite iš naujo, kad pradėtumėte naudotis.
-setup-finishing-title = Beveik baigta
 setup-finishing-description = Sistema Luft kopijuojama į jūsų kompiuterį. Tai užtruks kelias minutes.
 setup-finishing-plug-in = Kol baigsis, laikykite kompiuterį prijungtą prie maitinimo.
 setup-stage-idle = Ruošiamasi
@@ -235,21 +229,7 @@ setup-stage-finished = Atlikta
 ## The firmware screens in these steps are in English, so keep the names of its
 ## menu items (Enroll MOK, Continue, Yes, Reboot) as they are.
 
-setup-enroll-press-key = Per 10 sekundžių paspauskite bet kurį klavišą
-setup-enroll-choose-enroll = Pasirinkite Enroll MOK, tada Continue
-setup-enroll-choose-yes = Pasirinkite Yes
-setup-enroll-type-code = Įveskite kodą, tada pasirinkite Reboot
-setup-enroll-digits = { $count ->
-    [one] { $count } skaitmuo
-    [few] { $count } skaitmenys
-    [many] { $count } skaitmens
-   *[other] { $count } skaitmenų
-}
-setup-secure-boot-title = Kompiuteris dar nepasitiki sistema Luft
-setup-secure-boot-code = Iškart po kito paleidimo iš naujo mėlyname ekrane bus paprašyta pasitikėti sistema Luft. Ten klaviatūra įveskite šį kodą.
-setup-secure-boot-skipped = Mėlynas ekranas buvo praleistas. Gaukite naują kodą ir paleiskite iš naujo, tada ten naudokite klaviatūrą.
 setup-secure-boot-getting = Gaunamas kodas
-setup-secure-boot-new-code = Gauti naują kodą
 
 ## Encryption
 
@@ -278,6 +258,5 @@ setup-fingerprint-choose-another = Pasirinkti kitą pirštą
 ## Done
 
 setup-ready-title = Viskas paruošta
-setup-ready-trust = Paleiskite iš naujo dar kartą, kad baigtumėte. Iškart po paleidimo iš naujo mėlyname ekrane bus paprašyta pasitikėti sistema Luft. Ten klaviatūra įveskite šį kodą.
 setup-ready-done = Jūsų darbalaukis paruoštas. Smagaus darbo su Luft.
 setup-ready-start = Pradėti naudoti Luft

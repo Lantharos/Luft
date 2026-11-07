@@ -64,7 +64,6 @@ setup-destination-replace-choice-description = Coinnigh do chomhaid, do chuntas 
 setup-destination-whole-choice = Úsáid tiomántán iomlán
 setup-destination-whole-choice-description = Glan tiomántán agus tabhair ar fad do Luft é.
 setup-destination-try-choice = Bain triail as Luft
-setup-destination-try-choice-description = Féach thart ar dtús. Ní shuiteáiltear aon rud agus ní bhaintear le do thiomántáin.
 setup-destination-custom-choice = Saincheaptha
 setup-destination-custom-choice-description = Socraigh na deighiltí tú féin san aip Dioscaí.
 
@@ -185,7 +184,6 @@ setup-replace-blocked-read-only = Tá a thiomántán inléite amháin.
 ## Connecting to the internet
 
 setup-network-title = Ceangail leis an idirlíon
-setup-network-description = Is rogha é seo. Má tá tú ar líne, is féidir le Luft do chlog agus do chrios ama a shocrú, agus is féidir leat an t-idirlíon a úsáid fad atá Luft á shuiteáil.
 setup-network-unavailable = Níl líonraí ar fáil faoi láthair. Is féidir leat ceangal níos déanaí ón bpainéal.
 setup-network-looking = Ag cuardach líonraí
 setup-network-cable = Ceangailte le cábla
@@ -221,11 +219,7 @@ setup-finishing-failed-trying = Tosaíonn do ríomhaire fós mar a thosaigh sé 
 setup-finishing-use-stick = Úsáid Luft ón gcipín
 setup-finishing-keep-trying = Lean ort ag triail Luft
 setup-finishing-installed-title = Tá Luft suiteáilte
-setup-finishing-trust-stick = Bain amach an cipín USB nuair a théann an scáileán dorcha. Ansin iarrfaidh scáileán gorm ort muinín a bheith agat as Luft. Úsáid an méarchlár ansin.
-setup-finishing-trust = Díreach tar éis an atosaithe, iarrfaidh scáileán gorm ort muinín a bheith agat as Luft. Úsáid an méarchlár ansin.
-setup-finishing-restart-stick = Atosaigh chun tosú á úsáid. Bain amach an cipín USB nuair a théann an scáileán dorcha.
 setup-finishing-restart = Atosaigh chun tosú á úsáid.
-setup-finishing-title = Beagnach ann
 setup-finishing-description = Tá Luft á chóipeáil chuig do ríomhaire. Tógfaidh sé seo cúpla nóiméad.
 setup-finishing-plug-in = Coinnigh do ríomhaire plugáilte isteach go dtí go mbeidh sé críochnaithe.
 setup-stage-idle = Ag ullmhú
@@ -239,22 +233,7 @@ setup-stage-finished = Déanta
 ## The firmware screens in these steps are in English, so keep the names of its
 ## menu items (Enroll MOK, Continue, Yes, Reboot) as they are.
 
-setup-enroll-press-key = Brúigh eochair laistigh de 10 soicind
-setup-enroll-choose-enroll = Roghnaigh Enroll MOK, ansin Continue
-setup-enroll-choose-yes = Roghnaigh Yes
-setup-enroll-type-code = Clóscríobh an cód, ansin roghnaigh Reboot
-setup-enroll-digits = { $count ->
-    [one] { $count } dhigit
-    [two] { $count } dhigit
-    [few] { $count } dhigit
-    [many] { $count } ndigit
-   *[other] { $count } digit
-}
-setup-secure-boot-title = Níl muinín ag do ríomhaire as Luft fós
-setup-secure-boot-code = Díreach tar éis an chéad atosaithe eile, iarrfaidh scáileán gorm ort muinín a bheith agat as Luft. Úsáid an méarchlár ansin leis an gcód seo.
-setup-secure-boot-skipped = Scipeáladh an scáileán gorm. Faigh cód nua agus atosaigh, ansin úsáid an méarchlár ansin.
 setup-secure-boot-getting = Do chód á fháil
-setup-secure-boot-new-code = Faigh cód nua
 
 ## Encryption
 
@@ -283,6 +262,5 @@ setup-fingerprint-choose-another = Roghnaigh méar eile
 ## Done
 
 setup-ready-title = Tá tú réidh
-setup-ready-trust = Atosaigh uair amháin eile chun críochnú. Díreach tar éis an atosaithe, iarrfaidh scáileán gorm ort muinín a bheith agat as Luft. Úsáid an méarchlár ansin leis an gcód seo.
 setup-ready-done = Tá do dheasc réidh. Bain sult as Luft.
 setup-ready-start = Tosaigh ag úsáid Luft

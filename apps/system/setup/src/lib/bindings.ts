@@ -125,13 +125,15 @@ export const commands = {
 	}, options?: CallOptions) => invoke<null>("session_open_disks", params, options),
 	sessionRestart: (options?: CallOptions) => invoke<null>("session_restart", {}, options),
 	trustEnroll: (options?: CallOptions) => invoke<string>("trust_enroll", {}, options),
+	trustKeyDrives: (options?: CallOptions) => invoke<KeyDrive[]>("trust_key_drives", {}, options),
 	trustPrintKey: (params: {
 		key: string,
 	}, options?: CallOptions) => invoke<boolean>("trust_print_key", params, options),
 	trustRecoveryKey: (options?: CallOptions) => invoke<string>("trust_recovery_key", {}, options),
-	trustSaveKey: (params: {
+	trustSaveKeyToDrive: (params: {
 		key: string,
-	}, options?: CallOptions) => invoke<boolean>("trust_save_key", params, options),
+		block: string,
+	}, options?: CallOptions) => invoke<string>("trust_save_key_to_drive", params, options),
 	trustState: (options?: CallOptions) => invoke<TrustState | null>("trust_state", {}, options),
 };
 
@@ -145,6 +147,7 @@ export const events = {
 	kestrelPalette: (callback: (payload: Palette) => void) => listen<Palette>("kestrel.palette", callback),
 	networkChanged: (callback: (payload: Network) => void) => listen<Network>("network.changed", callback),
 	networkFailed: (callback: (payload: Failure) => void) => listen<Failure>("network.failed", callback),
+	trustKeyDrivesChanged: (callback: (payload: KeyDrive[]) => void) => listen<KeyDrive[]>("trust.keyDrivesChanged", callback),
 };
 
 export type Airplane = {
@@ -306,6 +309,12 @@ export type Ip = {
 	automaticDns: boolean,
 	automaticRoutes: boolean,
 	routes: Route[],
+};
+
+export type KeyDrive = {
+	block: string,
+	name: string,
+	size: number,
 };
 
 export type Keyboard = {

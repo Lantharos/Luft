@@ -4,7 +4,8 @@ export type Step = 'region' | 'destination' | 'network' | 'account' | 'finishing
 
 const LIVE: Step[] = ['region', 'destination', 'protect', 'network', 'account', 'finishing'];
 const FIRST_BOOT: Step[] = ['network-type', 'secure-boot', 'fingerprint', 'ready'];
-const POINT_OF_NO_RETURN: Step = 'network';
+const WHILE_INSTALLING: Step[] = ['network', 'account', 'finishing'];
+const FINAL: Step[] = ['finishing', 'ready'];
 
 class Flow {
 	phase = $state<Phase | null>(null);
@@ -14,7 +15,11 @@ class Flow {
 
 	steps = $derived((this.phase === 'first-boot' ? FIRST_BOOT : LIVE).filter((step) => !this.skipped.includes(step)));
 	step = $derived(this.steps[this.index]);
-	canGoBack = $derived(this.index > 0 && this.step !== POINT_OF_NO_RETURN && this.step !== 'finishing' && this.step !== 'ready');
+	canGoBack = $derived(
+		this.index > 0 &&
+			!FINAL.includes(this.step) &&
+			(!WHILE_INSTALLING.includes(this.step) || WHILE_INSTALLING.includes(this.steps[this.index - 1]))
+	);
 
 	skip(step: Step) {
 		if (!this.skipped.includes(step)) this.skipped = [...this.skipped, step];

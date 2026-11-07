@@ -108,7 +108,7 @@
 		<MoreMenu {manager} {view} {chooser} />
 	</div>
 
-	<WindowControls />
+	<WindowControls minimizable={!chooser} maximizable={!chooser} />
 </header>
 
 <style>

@@ -64,7 +64,6 @@ setup-destination-replace-choice-description = Deine Dateien, dein Konto und dei
 setup-destination-whole-choice = Ganzen Datenträger verwenden
 setup-destination-whole-choice-description = Einen Datenträger löschen und ihn ganz Luft geben.
 setup-destination-try-choice = Luft nur ausprobieren
-setup-destination-try-choice-description = Erst mal umsehen. Nichts wird installiert und deine Datenträger bleiben unberührt.
 setup-destination-custom-choice = Benutzerdefiniert
 setup-destination-custom-choice-description = Partitionen selbst in der App Datenträger einteilen.
 
@@ -170,7 +169,6 @@ setup-replace-blocked-read-only = Sein Datenträger ist schreibgeschützt.
 ## Connecting to the internet
 
 setup-network-title = Mit dem Internet verbinden
-setup-network-description = Das ist optional. Online kann Luft deine Uhrzeit und Zeitzone einstellen, und du kannst das Internet nutzen, während Luft installiert wird.
 setup-network-unavailable = Netzwerke sind gerade nicht verfügbar. Du kannst dich später über die Taskleiste verbinden.
 setup-network-looking = Netzwerke werden gesucht
 setup-network-cable = Über Kabel verbunden
@@ -206,11 +204,7 @@ setup-finishing-failed-trying = Dein Computer startet noch genauso wie vorher. D
 setup-finishing-use-stick = Luft vom Stick verwenden
 setup-finishing-keep-trying = Luft weiter ausprobieren
 setup-finishing-installed-title = Luft ist installiert
-setup-finishing-trust-stick = Zieh den USB-Stick ab, sobald der Bildschirm dunkel wird. Ein blauer Bildschirm fragt dann, ob Luft vertraut werden soll. Verwende dort die Tastatur.
-setup-finishing-trust = Direkt nach dem Neustart fragt ein blauer Bildschirm, ob Luft vertraut werden soll. Verwende dort die Tastatur.
-setup-finishing-restart-stick = Starte neu, um Luft zu verwenden. Zieh den USB-Stick ab, sobald der Bildschirm dunkel wird.
 setup-finishing-restart = Starte neu, um Luft zu verwenden.
-setup-finishing-title = Fast geschafft
 setup-finishing-description = Luft wird auf deinen Computer kopiert. Das dauert ein paar Minuten.
 setup-finishing-plug-in = Lass deinen Computer am Strom, bis alles fertig ist.
 setup-stage-idle = Wird vorbereitet
@@ -224,19 +218,7 @@ setup-stage-finished = Fertig
 ## The firmware screens in these steps are in English, so keep the names of its
 ## menu items (Enroll MOK, Continue, Yes, Reboot) as they are.
 
-setup-enroll-press-key = Drück innerhalb von 10 Sekunden eine Taste
-setup-enroll-choose-enroll = Wähl „Enroll MOK“ und dann „Continue“
-setup-enroll-choose-yes = Wähl „Yes“
-setup-enroll-type-code = Gib den Code ein und wähl dann „Reboot“
-setup-enroll-digits = { $count ->
-    [one] { $count } Ziffer
-   *[other] { $count } Ziffern
-}
-setup-secure-boot-title = Dein Computer vertraut Luft noch nicht
-setup-secure-boot-code = Direkt nach dem nächsten Neustart fragt ein blauer Bildschirm, ob Luft vertraut werden soll. Gib dort mit der Tastatur diesen Code ein.
-setup-secure-boot-skipped = Der blaue Bildschirm wurde übersprungen. Hol dir einen neuen Code und starte neu, dann verwende dort die Tastatur.
 setup-secure-boot-getting = Code wird abgerufen
-setup-secure-boot-new-code = Neuen Code abrufen
 
 ## Encryption
 
@@ -265,6 +247,5 @@ setup-fingerprint-choose-another = Anderen Finger wählen
 ## Done
 
 setup-ready-title = Alles bereit
-setup-ready-trust = Starte noch einmal neu, um abzuschließen. Direkt nach dem Neustart fragt ein blauer Bildschirm, ob Luft vertraut werden soll. Gib dort mit der Tastatur diesen Code ein.
 setup-ready-done = Dein Desktop ist bereit. Viel Spaß mit Luft.
 setup-ready-start = Luft verwenden

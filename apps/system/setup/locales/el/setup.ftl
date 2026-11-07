@@ -64,7 +64,6 @@ setup-destination-replace-choice-description = Κρατήστε τα αρχεί�
 setup-destination-whole-choice = Χρήση ολόκληρου δίσκου
 setup-destination-whole-choice-description = Διαγράψτε έναν δίσκο και δώστε τον ολόκληρο στο Luft.
 setup-destination-try-choice = Απλώς δοκιμή του Luft
-setup-destination-try-choice-description = Ρίξτε πρώτα μια ματιά. Δεν εγκαθίσταται τίποτα και οι δίσκοι σας μένουν ανέγγιχτοι.
 setup-destination-custom-choice = Προσαρμογή
 setup-destination-custom-choice-description = Οργανώστε μόνοι σας τα διαμερίσματα στην εφαρμογή Δίσκοι.
 
@@ -170,7 +169,6 @@ setup-replace-blocked-read-only = Ο δίσκος του είναι μόνο γ�
 ## Connecting to the internet
 
 setup-network-title = Σύνδεση στο διαδίκτυο
-setup-network-description = Αυτό είναι προαιρετικό. Με σύνδεση στο διαδίκτυο, το Luft ρυθμίζει το ρολόι και τη ζώνη ώρας σας, και μπορείτε να χρησιμοποιείτε το διαδίκτυο όσο γίνεται η εγκατάσταση.
 setup-network-unavailable = Τα δίκτυα δεν είναι διαθέσιμα αυτήν τη στιγμή. Μπορείτε να συνδεθείτε αργότερα από τη γραμμή εργασιών.
 setup-network-looking = Αναζήτηση δικτύων
 setup-network-cable = Σύνδεση με καλώδιο
@@ -206,11 +204,7 @@ setup-finishing-failed-trying = Ο υπολογιστής σας ξεκινά α
 setup-finishing-use-stick = Χρήση του Luft από το στικ
 setup-finishing-keep-trying = Συνέχεια δοκιμής του Luft
 setup-finishing-installed-title = Το Luft εγκαταστάθηκε
-setup-finishing-trust-stick = Αφαιρέστε το στικ USB μόλις σκοτεινιάσει η οθόνη. Στη συνέχεια, μια μπλε οθόνη θα σας ζητήσει να εμπιστευτείτε το Luft. Χρησιμοποιήστε εκεί το πληκτρολόγιο.
-setup-finishing-trust = Αμέσως μετά την επανεκκίνηση, μια μπλε οθόνη θα σας ζητήσει να εμπιστευτείτε το Luft. Χρησιμοποιήστε εκεί το πληκτρολόγιο.
-setup-finishing-restart-stick = Κάντε επανεκκίνηση για να αρχίσετε να το χρησιμοποιείτε. Αφαιρέστε το στικ USB μόλις σκοτεινιάσει η οθόνη.
 setup-finishing-restart = Κάντε επανεκκίνηση για να αρχίσετε να το χρησιμοποιείτε.
-setup-finishing-title = Σχεδόν τελειώσαμε
 setup-finishing-description = Το Luft αντιγράφεται στον υπολογιστή σας. Αυτό διαρκεί λίγα λεπτά.
 setup-finishing-plug-in = Κρατήστε τον υπολογιστή συνδεδεμένο στο ρεύμα μέχρι να ολοκληρωθεί.
 setup-stage-idle = Προετοιμασία
@@ -224,19 +218,7 @@ setup-stage-finished = Ολοκληρώθηκε
 ## The firmware screens in these steps are in English, so keep the names of its
 ## menu items (Enroll MOK, Continue, Yes, Reboot) as they are.
 
-setup-enroll-press-key = Πατήστε ένα πλήκτρο μέσα σε 10 δευτερόλεπτα
-setup-enroll-choose-enroll = Επιλέξτε «Enroll MOK» και μετά «Continue»
-setup-enroll-choose-yes = Επιλέξτε «Yes»
-setup-enroll-type-code = Πληκτρολογήστε τον κωδικό και μετά επιλέξτε «Reboot»
-setup-enroll-digits = { $count ->
-    [one] { $count } ψηφίο
-   *[other] { $count } ψηφία
-}
-setup-secure-boot-title = Ο υπολογιστής σας δεν εμπιστεύεται ακόμη το Luft
-setup-secure-boot-code = Αμέσως μετά την επόμενη επανεκκίνηση, μια μπλε οθόνη θα σας ζητήσει να εμπιστευτείτε το Luft. Χρησιμοποιήστε εκεί το πληκτρολόγιο με αυτόν τον κωδικό.
-setup-secure-boot-skipped = Η μπλε οθόνη παραλείφθηκε. Λάβετε νέο κωδικό και κάντε επανεκκίνηση, και μετά χρησιμοποιήστε εκεί το πληκτρολόγιο.
 setup-secure-boot-getting = Λήψη του κωδικού σας
-setup-secure-boot-new-code = Λήψη νέου κωδικού
 
 ## Encryption
 
@@ -265,6 +247,5 @@ setup-fingerprint-choose-another = Επιλογή άλλου δαχτύλου
 ## Done
 
 setup-ready-title = Όλα είναι έτοιμα
-setup-ready-trust = Κάντε επανεκκίνηση άλλη μία φορά για να ολοκληρωθεί η ρύθμιση. Αμέσως μετά την επανεκκίνηση, μια μπλε οθόνη θα σας ζητήσει να εμπιστευτείτε το Luft. Χρησιμοποιήστε εκεί το πληκτρολόγιο με αυτόν τον κωδικό.
 setup-ready-done = Η επιφάνεια εργασίας σας είναι έτοιμη. Καλή διασκέδαση με το Luft.
 setup-ready-start = Έναρξη χρήσης του Luft

@@ -64,7 +64,6 @@ setup-destination-replace-choice-description = Paturēt failus, kontu un iestat�
 setup-destination-whole-choice = Izmantot visu disku
 setup-destination-whole-choice-description = Izdzēst disku un atdot to visu sistēmai Luft.
 setup-destination-try-choice = Tikai izmēģināt Luft
-setup-destination-try-choice-description = Vispirms apskatieties. Nekas netiek instalēts, un diski paliek neskarti.
 setup-destination-custom-choice = Pielāgoti
 setup-destination-custom-choice-description = Sakārtot nodalījumus pašam lietotnē Diski.
 
@@ -175,7 +174,6 @@ setup-replace-blocked-read-only = Tās disks ir tikai lasāms.
 ## Connecting to the internet
 
 setup-network-title = Savienojuma izveide ar internetu
-setup-network-description = Tas nav obligāti. Ja ir interneta savienojums, Luft var iestatīt pulksteni un laika joslu, un instalēšanas laikā varat lietot internetu.
 setup-network-unavailable = Tīkli pašlaik nav pieejami. Savienojumu var izveidot vēlāk no uzdevumjoslas.
 setup-network-looking = Notiek tīklu meklēšana
 setup-network-cable = Savienots ar kabeli
@@ -211,11 +209,7 @@ setup-finishing-failed-trying = Dators joprojām startē tāpat kā iepriekš. V
 setup-finishing-use-stick = Lietot Luft no zibatmiņas
 setup-finishing-keep-trying = Turpināt izmēģināt Luft
 setup-finishing-installed-title = Luft ir instalēta
-setup-finishing-trust-stick = Kad ekrāns kļūst tumšs, izņemiet USB zibatmiņu. Pēc tam zilā ekrānā tiks jautāts, vai uzticēties sistēmai Luft. Tur izmantojiet tastatūru.
-setup-finishing-trust = Tūlīt pēc restartēšanas zilā ekrānā tiks jautāts, vai uzticēties sistēmai Luft. Tur izmantojiet tastatūru.
-setup-finishing-restart-stick = Restartējiet, lai sāktu to lietot. Kad ekrāns kļūst tumšs, izņemiet USB zibatmiņu.
 setup-finishing-restart = Restartējiet, lai sāktu to lietot.
-setup-finishing-title = Gandrīz gatavs
 setup-finishing-description = Luft tiek kopēta jūsu datorā. Tas aizņem dažas minūtes.
 setup-finishing-plug-in = Turiet datoru pievienotu barošanai, līdz tas ir pabeigts.
 setup-stage-idle = Notiek sagatavošana
@@ -229,20 +223,7 @@ setup-stage-finished = Gatavs
 ## The firmware screens in these steps are in English, so keep the names of its
 ## menu items (Enroll MOK, Continue, Yes, Reboot) as they are.
 
-setup-enroll-press-key = Nospiediet jebkuru taustiņu 10 sekunžu laikā
-setup-enroll-choose-enroll = Izvēlieties Enroll MOK un pēc tam Continue
-setup-enroll-choose-yes = Izvēlieties Yes
-setup-enroll-type-code = Ievadiet kodu un pēc tam izvēlieties Reboot
-setup-enroll-digits = { $count ->
-    [zero] { $count } cipari
-    [one] { $count } cipars
-   *[other] { $count } cipari
-}
-setup-secure-boot-title = Jūsu dators vēl neuzticas sistēmai Luft
-setup-secure-boot-code = Tūlīt pēc nākamās restartēšanas zilā ekrānā tiks jautāts, vai uzticēties sistēmai Luft. Tur ar tastatūru ievadiet šo kodu.
-setup-secure-boot-skipped = Zilais ekrāns tika izlaists. Iegūstiet jaunu kodu un restartējiet, pēc tam tur izmantojiet tastatūru.
 setup-secure-boot-getting = Notiek koda iegūšana
-setup-secure-boot-new-code = Iegūt jaunu kodu
 
 ## Encryption
 
@@ -271,6 +252,5 @@ setup-fingerprint-choose-another = Izvēlēties citu pirkstu
 ## Done
 
 setup-ready-title = Viss ir gatavs
-setup-ready-trust = Lai pabeigtu, restartējiet vēlreiz. Tūlīt pēc restartēšanas zilā ekrānā tiks jautāts, vai uzticēties sistēmai Luft. Tur ar tastatūru ievadiet šo kodu.
 setup-ready-done = Jūsu darbvirsma ir gatava. Lai jauki ar Luft.
 setup-ready-start = Sākt lietot Luft

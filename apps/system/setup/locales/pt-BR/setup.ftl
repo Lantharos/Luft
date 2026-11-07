@@ -64,7 +64,6 @@ setup-destination-replace-choice-description = Manter seus arquivos, sua conta e
 setup-destination-whole-choice = Usar um disco inteiro
 setup-destination-whole-choice-description = Apagar um disco e entregá-lo todo ao Luft.
 setup-destination-try-choice = Só experimentar o Luft
-setup-destination-try-choice-description = Conheça primeiro. Nada é instalado e os discos ficam intactos.
 setup-destination-custom-choice = Personalizado
 setup-destination-custom-choice-description = Organizar as partições você mesmo no app Discos.
 
@@ -170,7 +169,6 @@ setup-replace-blocked-read-only = O disco dele é somente leitura.
 ## Connecting to the internet
 
 setup-network-title = Conectar à internet
-setup-network-description = Isto é opcional. Com internet, o Luft acerta o relógio e o fuso horário, e você pode usar a internet enquanto o Luft é instalado.
 setup-network-unavailable = As redes não estão disponíveis agora. Você pode se conectar depois pelo painel.
 setup-network-looking = Procurando redes
 setup-network-cable = Conectado por cabo
@@ -206,11 +204,7 @@ setup-finishing-failed-trying = O computador continua iniciando como antes. Voc�
 setup-finishing-use-stick = Usar o Luft pelo pen drive
 setup-finishing-keep-trying = Continuar experimentando o Luft
 setup-finishing-installed-title = O Luft está instalado
-setup-finishing-trust-stick = Retire o pen drive quando a tela escurecer. Depois, uma tela azul vai pedir para confiar no Luft. Use o teclado nela.
-setup-finishing-trust = Logo depois de reiniciar, uma tela azul vai pedir para confiar no Luft. Use o teclado nela.
-setup-finishing-restart-stick = Reinicie para começar a usá-lo. Retire o pen drive quando a tela escurecer.
 setup-finishing-restart = Reinicie para começar a usá-lo.
-setup-finishing-title = Quase lá
 setup-finishing-description = O Luft está sendo copiado para o computador. Isso leva alguns minutos.
 setup-finishing-plug-in = Mantenha o computador ligado na tomada até terminar.
 setup-stage-idle = Preparando
@@ -224,19 +218,7 @@ setup-stage-finished = Concluído
 ## The firmware screens in these steps are in English, so keep the names of its
 ## menu items (Enroll MOK, Continue, Yes, Reboot) as they are.
 
-setup-enroll-press-key = Pressione uma tecla em até 10 segundos
-setup-enroll-choose-enroll = Escolha Enroll MOK e depois Continue
-setup-enroll-choose-yes = Escolha Yes
-setup-enroll-type-code = Digite o código e escolha Reboot
-setup-enroll-digits = { $count ->
-    [one] { $count } dígito
-   *[other] { $count } dígitos
-}
-setup-secure-boot-title = O computador ainda não confia no Luft
-setup-secure-boot-code = Logo depois da próxima reinicialização, uma tela azul vai pedir para confiar no Luft. Use o teclado nela com este código.
-setup-secure-boot-skipped = A tela azul foi pulada. Gere um novo código e reinicie. Depois, use o teclado nela.
 setup-secure-boot-getting = Gerando o código
-setup-secure-boot-new-code = Gerar um novo código
 
 ## Encryption
 
@@ -265,6 +247,5 @@ setup-fingerprint-choose-another = Escolher outro dedo
 ## Done
 
 setup-ready-title = Tudo pronto
-setup-ready-trust = Reinicie mais uma vez para concluir. Logo depois de reiniciar, uma tela azul vai pedir para confiar no Luft. Use o teclado nela com este código.
 setup-ready-done = Sua área de trabalho está pronta. Divirta-se com o Luft.
 setup-ready-start = Começar a usar o Luft

@@ -8690,6 +8690,7 @@ dependencies = [
  "gio-unix",
  "libc",
  "luft-app",
+ "luft-disks",
  "luft-fingerprint",
  "luft-i18n",
  "luft-installer-contract",

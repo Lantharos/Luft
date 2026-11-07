@@ -64,7 +64,6 @@ setup-destination-replace-choice-description = Păstrați fișierele, contul și
 setup-destination-whole-choice = Folosește o unitate întreagă
 setup-destination-whole-choice-description = Ștergeți o unitate și dați-o în întregime sistemului Luft.
 setup-destination-try-choice = Doar încearcă Luft
-setup-destination-try-choice-description = Explorați mai întâi. Nu se instalează nimic, iar unitățile rămân neatinse.
 setup-destination-custom-choice = Personalizat
 setup-destination-custom-choice-description = Aranjați manual partițiile în Discuri.
 
@@ -175,7 +174,6 @@ setup-replace-blocked-read-only = Unitatea lui este doar în citire.
 ## Connecting to the internet
 
 setup-network-title = Conectați-vă la internet
-setup-network-description = Este opțional. Online, Luft poate seta ceasul și fusul orar, iar internetul poate fi folosit pe durata instalării.
 setup-network-unavailable = Rețelele nu sunt disponibile momentan. Vă puteți conecta mai târziu din panou.
 setup-network-looking = Se caută rețele
 setup-network-cable = Conectat prin cablu
@@ -211,11 +209,7 @@ setup-finishing-failed-trying = Computerul pornește în continuare ca înainte.
 setup-finishing-use-stick = Folosește Luft de pe stick
 setup-finishing-keep-trying = Continuă să încerci Luft
 setup-finishing-installed-title = Luft este instalat
-setup-finishing-trust-stick = Scoateți stickul USB când ecranul se întunecă. Apoi un ecran albastru vă cere să aveți încredere în Luft. Acolo folosiți tastatura.
-setup-finishing-trust = Imediat după repornire, un ecran albastru vă cere să aveți încredere în Luft. Acolo folosiți tastatura.
-setup-finishing-restart-stick = Reporniți pentru a începe să îl folosiți. Scoateți stickul USB când ecranul se întunecă.
 setup-finishing-restart = Reporniți pentru a începe să îl folosiți.
-setup-finishing-title = Aproape gata
 setup-finishing-description = Luft se copiază pe computer. Durează câteva minute.
 setup-finishing-plug-in = Țineți computerul conectat la priză până la final.
 setup-stage-idle = Se pregătește
@@ -229,20 +223,7 @@ setup-stage-finished = Gata
 ## The firmware screens in these steps are in English, so keep the names of its
 ## menu items (Enroll MOK, Continue, Yes, Reboot) as they are.
 
-setup-enroll-press-key = Apăsați o tastă în 10 secunde
-setup-enroll-choose-enroll = Alegeți Enroll MOK, apoi Continue
-setup-enroll-choose-yes = Alegeți Yes
-setup-enroll-type-code = Introduceți codul, apoi alegeți Reboot
-setup-enroll-digits = { $count ->
-    [one] { $count } cifră
-    [few] { $count } cifre
-   *[other] { $count } de cifre
-}
-setup-secure-boot-title = Computerul nu are încă încredere în Luft
-setup-secure-boot-code = Imediat după următoarea repornire, un ecran albastru vă cere să aveți încredere în Luft. Acolo folosiți tastatura și acest cod.
-setup-secure-boot-skipped = Ecranul albastru a fost omis. Obțineți un cod nou și reporniți, apoi folosiți tastatura acolo.
 setup-secure-boot-getting = Se obține codul
-setup-secure-boot-new-code = Obține un cod nou
 
 ## Encryption
 
@@ -271,6 +252,5 @@ setup-fingerprint-choose-another = Alege alt deget
 ## Done
 
 setup-ready-title = Totul este gata
-setup-ready-trust = Reporniți încă o dată pentru a finaliza. Imediat după repornire, un ecran albastru vă cere să aveți încredere în Luft. Acolo folosiți tastatura și acest cod.
 setup-ready-done = Desktopul este gata. Bucurați-vă de Luft.
 setup-ready-start = Începe să folosești Luft

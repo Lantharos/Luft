@@ -64,7 +64,6 @@ setup-destination-replace-choice-description = Mbaj skedarët, llogarinë dhe ci
 setup-destination-whole-choice = Përdor një disk të tërë
 setup-destination-whole-choice-description = Fshi një disk dhe jepja të gjithin Luft.
 setup-destination-try-choice = Thjesht provo Luft
-setup-destination-try-choice-description = Shiko përreth fillimisht. Asgjë nuk instalohet dhe disqet e tu mbeten të paprekur.
 setup-destination-custom-choice = I personalizuar
 setup-destination-custom-choice-description = Rregullo vetë ndarjet te Disqet.
 
@@ -170,7 +169,6 @@ setup-replace-blocked-read-only = Disku i tij është vetëm për lexim.
 ## Connecting to the internet
 
 setup-network-title = Lidhu me internetin
-setup-network-description = Kjo është opsionale. Kur je në linjë, Luft mund të caktojë orën dhe zonën kohore, dhe mund ta përdorësh internetin ndërsa Luft instalohet.
 setup-network-unavailable = Rrjetet nuk janë të disponueshme tani. Mund të lidhesh më vonë nga paneli.
 setup-network-looking = Po kërkohen rrjete
 setup-network-cable = Lidhur me kabllo
@@ -206,11 +204,7 @@ setup-finishing-failed-trying = Kompjuteri yt niset ende si më parë. Mund të 
 setup-finishing-use-stick = Përdor Luft nga memoria USB
 setup-finishing-keep-trying = Vazhdo ta provosh Luft
 setup-finishing-installed-title = Luft u instalua
-setup-finishing-trust-stick = Hiq memorien USB sapo të errësohet ekrani. Pastaj një ekran blu të kërkon t’i besosh Luft. Përdor tastierën aty.
-setup-finishing-trust = Menjëherë pas rinisjes, një ekran blu të kërkon t’i besosh Luft. Përdor tastierën aty.
-setup-finishing-restart-stick = Rinis për të nisur ta përdorësh. Hiq memorien USB sapo të errësohet ekrani.
 setup-finishing-restart = Rinis për të nisur ta përdorësh.
-setup-finishing-title = Pothuajse gati
 setup-finishing-description = Luft po kopjohet në kompjuterin tënd. Kjo zgjat disa minuta.
 setup-finishing-plug-in = Mbaje kompjuterin të lidhur në korrent derisa të përfundojë.
 setup-stage-idle = Po përgatitet
@@ -224,19 +218,7 @@ setup-stage-finished = U krye
 ## The firmware screens in these steps are in English, so keep the names of its
 ## menu items (Enroll MOK, Continue, Yes, Reboot) as they are.
 
-setup-enroll-press-key = Shtyp një tast brenda 10 sekondash
-setup-enroll-choose-enroll = Zgjidh Enroll MOK, pastaj Continue
-setup-enroll-choose-yes = Zgjidh Yes
-setup-enroll-type-code = Shkruaj kodin, pastaj zgjidh Reboot
-setup-enroll-digits = { $count ->
-    [one] { $count } shifër
-   *[other] { $count } shifra
-}
-setup-secure-boot-title = Kompjuteri yt nuk i beson ende Luft
-setup-secure-boot-code = Menjëherë pas rinisjes së ardhshme, një ekran blu të kërkon t’i besosh Luft. Përdor tastierën aty me këtë kod.
-setup-secure-boot-skipped = Ekrani blu u kapërcye. Merr një kod të ri dhe rinis, pastaj përdor tastierën aty.
 setup-secure-boot-getting = Po merret kodi yt
-setup-secure-boot-new-code = Merr një kod të ri
 
 ## Encryption
 
@@ -265,6 +247,5 @@ setup-fingerprint-choose-another = Zgjidh një gisht tjetër
 ## Done
 
 setup-ready-title = Gjithçka gati
-setup-ready-trust = Rinis edhe një herë për të përfunduar. Menjëherë pas rinisjes, një ekran blu të kërkon t’i besosh Luft. Përdor tastierën aty me këtë kod.
 setup-ready-done = Desktopi yt është gati. Kënaqu me Luft.
 setup-ready-start = Nis të përdorësh Luft

@@ -43,7 +43,7 @@
 {:else if install.finished && code}
 	<StepFrame
 		title={t('setup-finishing-installed-title')}
-		description={t(fromStick ? 'setup-finishing-trust-stick' : 'setup-finishing-trust')}
+		description={t(fromStick ? 'setup-finishing-secure-boot-stick' : 'setup-finishing-secure-boot')}
 	>
 		<EnrollSteps {code} />
 		{#if problem}
@@ -56,7 +56,7 @@
 {:else if install.finished}
 	<StepFrame
 		title={t('setup-finishing-installed-title')}
-		description={t(fromStick ? 'setup-finishing-restart-stick' : 'setup-finishing-restart')}
+		description={t(fromStick ? 'setup-finishing-restart-started-stick' : 'setup-finishing-restart')}
 	>
 		{#if problem}
 			<p class="text-[13.5px] text-[var(--danger)]">{problem}</p>
@@ -66,7 +66,7 @@
 		{/snippet}
 	</StepFrame>
 {:else}
-	<StepFrame title={t('setup-finishing-title')} description={t('setup-finishing-description')}>
+	<StepFrame title={t('setup-finishing-installing-title')} description={t('setup-finishing-description')}>
 		<div class="flex max-w-[540px] flex-col gap-3 pt-6">
 			<div class="flex items-baseline justify-between text-[15px]">
 				<span class="font-medium">{t(STAGES[status?.stage ?? 'idle'])}</span>

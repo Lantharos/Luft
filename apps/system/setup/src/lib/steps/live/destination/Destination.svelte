@@ -59,6 +59,11 @@
 		}
 		return null;
 	});
+	let buttonLabel = $derived.by(() => {
+		if (install.starting) return 'setup-destination-starting';
+		if (target && install.encryptable(target)) return 'setup-continue';
+		return view === 'replace' ? 'setup-destination-replace' : 'setup-destination-install';
+	});
 	let chosenSystem = $derived(install.systems.find((system) => system.id === replacing) ?? null);
 
 	const TITLES: Record<Exclude<View, 'replace'>, [string, string]> = {
@@ -98,6 +103,7 @@
 	}
 
 	function open(next: View) {
+		if (next === 'whole' && !wholeDrive && install.usableDrives.length === 1) wholeDrive = install.usableDrives[0].block;
 		trail = [...trail, view];
 		view = next;
 	}
@@ -157,7 +163,6 @@
 				disabled={install.usableDrives.length === 0}
 				onclick={() => open('whole')}
 			/>
-			<Choice icon={Sparkles} title={t('setup-destination-try-choice')} description={t('setup-destination-try-choice-description')} onclick={justTry} />
 			<Choice icon={SlidersHorizontal} title={t('setup-destination-custom-choice')} description={t('setup-destination-custom-choice-description')} onclick={() => open('custom')} />
 		</div>
 	{:else if view === 'alongside' && meet?.space && meetDrive}
@@ -175,12 +180,15 @@
 		<p class="mt-4 text-[13.5px] text-[var(--danger)]">{install.startError}</p>
 	{/if}
 	{#snippet actions()}
+		{#if view === 'choose'}
+			<button type="button" class="plain-button large" onclick={justTry}><Sparkles size={17} />{t('setup-destination-try-choice')}</button>
+		{/if}
 		{#if !choicesSeen && survey}
 			<button type="button" class="plain-button large" disabled={install.starting} onclick={() => open('choose')}>{t('setup-destination-more-options')}</button>
 		{/if}
 		{#if view !== 'choose'}
 			<button type="button" class="button primary large px-6" disabled={!target || install.starting} onclick={choose}>
-				{#if install.starting}<Spinner />{/if}{t(install.starting ? 'setup-destination-starting' : view === 'replace' ? 'setup-destination-replace' : 'setup-destination-install')}
+				{#if install.starting}<Spinner />{/if}{t(buttonLabel)}
 			</button>
 		{/if}
 	{/snippet}

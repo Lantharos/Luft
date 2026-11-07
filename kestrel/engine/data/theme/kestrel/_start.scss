@@ -19,6 +19,7 @@
 .kestrel-app-button:focus { background-color: fill(0.12); }
 .kestrel-app-button:active { background-color: fill(0.20); }
 .kestrel-app-label { font-size: 12px; max-width: 84px; height: 30px; text-align: center; }
+.kestrel-start-hint { padding: 6px 12px; font-size: 12px; color: ink(); }
 
 .kestrel-search-result { padding: 0; border-radius: 12px; transition-duration: $motion-tap; }
 .kestrel-search-result:hover { background-color: fill(0.09); }

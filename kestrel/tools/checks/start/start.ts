@@ -1,9 +1,11 @@
 import Clutter from 'gi://Clutter';
+import Gio from 'gi://Gio';
+import Shell from 'gi://Shell';
 import St from 'gi://St';
 
-import {named, ofType, styled} from '../lib/actors.js';
+import {descendants, named, ofType, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
-import {moveTo, press, rest, rightClick, type} from '../lib/input/input.js';
+import {centerOf, moveTo, press, rest, rightClick, type} from '../lib/input/input.js';
 import {capture, captureRenderedFrames} from '../lib/screenshots.js';
 import {pause, settled} from '../lib/wait.js';
 
@@ -39,6 +41,26 @@ async function checkOpening(start: Clutter.Actor) {
   await eventually(() => launcher.hover, 'the Start button reacts to the pointer');
   await capture('launcher-hover');
   rest();
+}
+
+async function checkGrid(start: Clutter.Actor) {
+  const ITEM = 'kestrel-start-item-';
+  const items = descendants(start).filter(actor => actor.name?.startsWith(ITEM) && actor.mapped) as St.Button[];
+  const names = items.map(item => item.accessible_name);
+  require(names.every((name, index) => !index || names[index - 1].localeCompare(name) <= 0), 'Start lists apps from A to Z');
+  const ids = new Set(items.map(item => item.name!.slice(ITEM.length)));
+  const pinned = new Gio.Settings({schema_id: 'com.lantharos.kestrel'}).get_strv('favorite-apps');
+  require(pinned.some(id => ids.has(id)) && pinned.every(id => ids.has(id) || !Shell.AppSystem.get_default().lookup_app(id)), 'Start lists pinned apps too');
+
+  const kindOf = (item: St.Button) => Shell.AppSystem.get_default().lookup_app(item.name!.slice(ITEM.length))?.app_info.get_generic_name();
+  const described = require(items.find(item => kindOf(item) && kindOf(item) !== item.accessible_name), 'Start lists an app with a generic name');
+  moveTo(centerOf(described));
+  const hint = await eventually(() => styled('kestrel-start-hint').find(label => label.visible && (label as St.Label).text === kindOf(described)),
+    'resting on an app in Start says what kind of app it is');
+  await settled();
+  await capture('start-app-hint');
+  rest();
+  await eventually(() => !hint.visible, 'the hint goes away with the pointer');
 }
 
 async function checkCaret() {
@@ -85,6 +107,7 @@ export async function run() {
   await capture('panel');
   const start = named('kestrel-start')!;
   await checkOpening(start);
+  await checkGrid(start);
   const search = await checkCaret();
   await checkHover(start);
   global.stage.set_key_focus(search);

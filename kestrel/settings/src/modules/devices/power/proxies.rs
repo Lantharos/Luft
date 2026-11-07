@@ -11,6 +11,7 @@ pub trait IdleMonitor {
     fn add_idle_watch(&self, interval: u64) -> zbus::Result<u32>;
     fn add_user_active_watch(&self) -> zbus::Result<u32>;
     fn remove_watch(&self, id: u32) -> zbus::Result<()>;
+    fn get_idletime(&self) -> zbus::Result<u64>;
 
     #[zbus(signal)]
     fn watch_fired(&self, id: u32) -> zbus::Result<()>;

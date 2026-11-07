@@ -22,6 +22,7 @@ const ASLEEP_DROP = 40;
 export interface MonumentParts {
   time: St.Label;
   date: St.Label;
+  hint: St.Label;
   auth: Clutter.Actor;
   side: Clutter.Actor;
   controls: Clutter.Actor;
@@ -53,6 +54,7 @@ export class MonumentLayout extends Clutter.LayoutManager {
   private progress = 0;
   private keyboard = 0;
   private clockSize = 0;
+  private shownSize = 0;
 
   constructor(private readonly parts: MonumentParts) {
     super();
@@ -74,11 +76,14 @@ export class MonumentLayout extends Clutter.LayoutManager {
 
   vfunc_allocate(_container: Clutter.Actor, box: Clutter.ActorBox): void {
     const [width, height] = box.get_size();
-    const { time, date, auth, side, controls } = this.parts;
+    const { time, date, hint, auth, side, controls } = this.parts;
     const { scaleFactor } = St.ThemeContext.get_for_stage(global.stage);
     const margin = (height / scaleFactor >= LARGE_DISPLAY ? LARGE_MARGIN : MARGIN) * scaleFactor;
-    const fontSize = clockFontSize(height / scaleFactor) * scaleFactor;
-    this.sizeClock(clockFontSize(height / scaleFactor));
+    const [, , sideWidth, sideHeight] = side.get_preferred_size();
+    const room = width - 2 * margin - (sideWidth ? sideWidth + margin : 0);
+    const size = Math.min(clockFontSize(height / scaleFactor), this.fittingClock(room / scaleFactor));
+    const fontSize = size * scaleFactor;
+    this.sizeClock(size);
     const [, , timeWidth, timeHeight] = time.get_preferred_size();
     const ascent = baselineOf(time);
     const descent = timeHeight - ascent;
@@ -102,14 +107,24 @@ export class MonumentLayout extends Clutter.LayoutManager {
     const [, , , authHeight] = auth.get_preferred_size();
     place(auth, margin, height - Math.max(margin, this.keyboard + KEYBOARD_CLEARANCE * scaleFactor) - authHeight);
 
-    const [, , sideWidth, sideHeight] = side.get_preferred_size();
     place(side, width - margin - sideWidth, height - margin - SIDE_LIFT * scaleFactor - sideHeight);
 
     const [, , controlsWidth, controlsHeight] = controls.get_preferred_size();
     const controlsMargin = CONTROLS_MARGIN * scaleFactor;
     place(controls, width - controlsMargin - controlsWidth, height - controlsMargin - controlsHeight);
 
+    const [, , hintWidth] = hint.get_preferred_size();
+    place(hint, (width - hintWidth) / 2, controlsMargin);
+
     this.show(this.progress);
+  }
+
+  /** The largest clock size whose time fits in `room`, measured from the size the clock has now. */
+  private fittingClock(room: number): number {
+    if (!this.shownSize) return Infinity;
+    const [, natural] = this.parts.time.get_preferred_width(-1);
+    const { scaleFactor } = St.ThemeContext.get_for_stage(global.stage);
+    return Math.floor(room * this.shownSize / (natural / scaleFactor));
   }
 
   private sizeClock(size: number): void {
@@ -117,17 +132,19 @@ export class MonumentLayout extends Clutter.LayoutManager {
     this.clockSize = size;
     global.compositor.get_laters().add(Meta.LaterType.BEFORE_REDRAW, () => {
       this.parts.time.style = `font-size: ${size}px; letter-spacing: ${(CLOCK_TRACKING * size).toFixed(2)}px;`;
+      this.shownSize = size;
       return false;
     });
   }
 
   show(progress: number): void {
     this.progress = progress;
-    const { time, date, auth } = this.parts;
+    const { time, date, hint, auth } = this.parts;
     const scale = 1 + (AWAKE_SCALE - 1) * progress;
     time.set({ scale_x: scale, scale_y: scale, translation_y: this.placement.timeLift * progress });
     date.set({ translation_y: this.placement.dateLift * progress, opacity: Math.round(255 * (1 - 0.15 * progress)) });
     const shown = Math.min(1, Math.max(0, progress));
+    hint.set({ opacity: Math.round(255 * (1 - Math.min(1, shown * 2))), visible: shown < 0.5 });
     auth.set({ opacity: Math.round(255 * Math.min(1, shown * 1.6)), translation_y: this.placement.drop * (1 - progress), visible: shown > 0 });
   }
 }

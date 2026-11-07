@@ -82,6 +82,17 @@ impl Watches {
         }
     }
 
+    /// Seconds since the last input.
+    pub async fn idle_for(&self) -> u32 {
+        if !self.present {
+            return 0;
+        }
+        self.monitor
+            .get_idletime()
+            .await
+            .map_or(0, |milliseconds| (milliseconds / 1000) as u32)
+    }
+
     pub fn forget_activity(&mut self) {
         self.ids.remove(&Watch::Activity);
     }

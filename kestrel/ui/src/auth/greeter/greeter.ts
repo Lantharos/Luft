@@ -91,6 +91,7 @@ export class Greeter {
       auth: this.promptBox,
       side: this.userList.actor,
       controls: this.controls.actor,
+      hint: 'greeter-wake-hint',
       actionMode: Shell.ActionMode.LOGIN_SCREEN,
       preparePrompt: () => this.begin(),
       asleep: () => this.stop(),

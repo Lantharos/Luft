@@ -1,4 +1,5 @@
 pub const SCREEN_OFF_AFTER_LOCK: u32 = 30;
+const DIM_WHILE_LOCKED: u32 = SCREEN_OFF_AFTER_LOCK / 2;
 const DIM_WITHOUT_SCREEN_OFF: u32 = 60;
 const SHORTEST_DIM: u32 = 10;
 const WARNING_GAP: u32 = 30;
@@ -68,7 +69,11 @@ pub struct Timeouts {
 
 pub fn timeouts(situation: &Situation) -> Timeouts {
     let dim = if situation.screen_locked {
-        0
+        if situation.dim_when_idle {
+            DIM_WHILE_LOCKED
+        } else {
+            0
+        }
     } else if situation.saving_power {
         SCREEN_OFF_AFTER_LOCK
     } else if !situation.dim_when_idle {

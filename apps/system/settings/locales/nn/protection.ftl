@@ -85,10 +85,6 @@ settings-security-signed-startup = Signert oppstart
 settings-security-signed-startup-on = Oppstartsmenyen og systemet er signerte for denne datamaskinen
 settings-security-signed-startup-purpose = Lèt berre programvare som er signert for denne datamaskinen, starte han
 settings-security-signed-startup-restart = Blir teken i bruk når du har starta på nytt
-settings-security-signed-startup-missed = Nøkkelen vart ikkje lagd til ved siste omstart
-settings-security-signed-startup-pending = Legg til nøkkelen på den blå skjermen når du startar på nytt
-settings-security-signed-startup-missed-often = Nøkkelen vart ikkje lagd til etter fleire omstartar
-settings-security-show-steps = Vis stega
 settings-security-try-again = Prøv igjen
 
 ## Security: games with anti-cheat
@@ -102,17 +98,10 @@ settings-security-anti-cheat-ready-description = Spel kan kontrollere korleis de
 ## Security: steps on the blue startup screen
 
 settings-security-key-steps-remove = Fjern nøklane når du startar på nytt
-settings-security-key-steps-add = Legg til nøkkelen når du startar på nytt
 settings-security-key-steps-remove-description = Når du har starta på nytt, spør ein blå skjerm om å fjerne nøklar. Han ventar berre i 10 sekund, så trykk på ein tast med ein gong han dukkar opp.
-settings-security-key-steps-add-description = Når du har starta på nytt, spør ein blå skjerm om ein ny nøkkel. Han ventar berre i 10 sekund, så trykk på ein tast med ein gong han dukkar opp.
-settings-security-key-step-choose = Vel { $option } og deretter { $next }.
-settings-security-key-step-confirm = Vel { $option }.
-settings-security-key-step-code = Skriv inn koden nedanfor og trykk { $key }.
-settings-security-key-step-reboot = Vel { $option }.
 settings-security-key-enter = Enter
 settings-security-key-code = Kode { $code }
 settings-security-key-steps-remove-missed = Om du ikkje rekk det, startar datamaskinen som vanleg, og du kan prøve igjen her.
-settings-security-key-steps-add-missed = Om du ikkje rekk det, startar datamaskinen som vanleg, og stega blir viste igjen ved neste omstart, med ein ny kode.
 settings-security-later = Seinare
 settings-security-restart-now = Start på nytt no
 

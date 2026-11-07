@@ -85,10 +85,6 @@ settings-security-signed-startup = Aláírt rendszerindítás
 settings-security-signed-startup-on = A rendszerindító menü és a rendszer ehhez a számítógéphez van aláírva
 settings-security-signed-startup-purpose = Csak az ehhez a számítógéphez aláírt szoftver indíthatja el
 settings-security-signed-startup-restart = Az újraindítás után lép életbe
-settings-security-signed-startup-missed = A kulcs hozzáadása a legutóbbi újraindításkor elmaradt
-settings-security-signed-startup-pending = Újraindításkor adja hozzá a kulcsot a kék képernyőn
-settings-security-signed-startup-missed-often = A kulcs hozzáadása több újraindítás után is elmaradt
-settings-security-show-steps = Lépések megjelenítése
 settings-security-try-again = Újra
 
 ## Security: games with anti-cheat
@@ -102,17 +98,10 @@ settings-security-anti-cheat-ready-description = A játékok ellenőrizhetik, ho
 ## Security: steps on the blue startup screen
 
 settings-security-key-steps-remove = Kulcsok eltávolítása újraindításkor
-settings-security-key-steps-add = Kulcs hozzáadása újraindításkor
 settings-security-key-steps-remove-description = Újraindítás után egy kék képernyő rákérdez a kulcsok eltávolítására. Csak 10 másodpercig vár, ezért amint megjelenik, nyomjon meg egy billentyűt.
-settings-security-key-steps-add-description = Újraindítás után egy kék képernyő rákérdez egy új kulcsra. Csak 10 másodpercig vár, ezért amint megjelenik, nyomjon meg egy billentyűt.
-settings-security-key-step-choose = Válassza ezt: { $option }, majd ezt: { $next }.
-settings-security-key-step-confirm = Válassza ezt: { $option }.
-settings-security-key-step-code = Írja be az alábbi kódot, majd nyomja meg ezt a billentyűt: { $key }.
-settings-security-key-step-reboot = Válassza ezt: { $option }.
 settings-security-key-enter = Enter
 settings-security-key-code = Kód: { $code }
 settings-security-key-steps-remove-missed = Ha lemarad róla, a számítógép a szokásos módon indul el, és itt újra megpróbálhatja.
-settings-security-key-steps-add-missed = Ha lemarad róla, a számítógép a szokásos módon indul el, és a lépések a következő újraindításkor újra megjelennek, egy új kóddal.
 settings-security-later = Később
 settings-security-restart-now = Újraindítás most
 

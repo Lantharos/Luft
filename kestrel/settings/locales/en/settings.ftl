@@ -34,3 +34,16 @@ network-type-body = On a home network, your other devices can find this computer
 network-type-home = Home
 # Button on the network-type-title notification
 network-type-public = Public
+
+## Secure Boot notifications
+# Setting up Secure Boot means confirming Luft's signing key on a blue screen after a restart, with an eight-digit code.
+# Don't call it a "key", so it isn't confused with the disk's recovery key.
+
+# Shown as the source of the notification
+secure-boot-source = Device Security
+secure-boot-unfinished-title = Finish setting up Secure Boot
+secure-boot-missed = The blue screen was missed. It shows again when you restart, with the same code, which Settings shows too.
+secure-boot-waiting = A blue screen asks for a code the next time you restart. Open Settings to see it.
+secure-boot-gave-up = It wasn’t finished after a few restarts. You can set it up in Settings whenever you’re ready.
+# Button that opens the steps in Settings
+secure-boot-show-steps = Show steps

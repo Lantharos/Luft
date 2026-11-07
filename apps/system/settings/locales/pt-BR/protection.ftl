@@ -85,10 +85,6 @@ settings-security-signed-startup = Inicialização assinada
 settings-security-signed-startup-on = O menu de inicialização e o sistema estão assinados para este computador
 settings-security-signed-startup-purpose = Só permite iniciar software assinado para este computador
 settings-security-signed-startup-restart = Passa a valer depois que você reiniciar
-settings-security-signed-startup-missed = A chave não foi adicionada na última reinicialização
-settings-security-signed-startup-pending = Adicione a chave na tela azul ao reiniciar
-settings-security-signed-startup-missed-often = A chave não foi adicionada depois de algumas reinicializações
-settings-security-show-steps = Mostrar etapas
 settings-security-try-again = Tentar novamente
 
 ## Security: games with anti-cheat
@@ -102,17 +98,10 @@ settings-security-anti-cheat-ready-description = Os jogos podem verificar como e
 ## Security: steps on the blue startup screen
 
 settings-security-key-steps-remove = Remova as chaves ao reiniciar
-settings-security-key-steps-add = Adicione a chave ao reiniciar
 settings-security-key-steps-remove-description = Depois que você reiniciar, uma tela azul vai perguntar sobre a remoção de chaves. Ela só espera 10 segundos, então pressione qualquer tecla assim que ela aparecer.
-settings-security-key-steps-add-description = Depois que você reiniciar, uma tela azul vai perguntar sobre uma nova chave. Ela só espera 10 segundos, então pressione qualquer tecla assim que ela aparecer.
-settings-security-key-step-choose = Escolha { $option } e depois { $next }.
-settings-security-key-step-confirm = Escolha { $option }.
-settings-security-key-step-code = Digite o código abaixo e pressione { $key }.
-settings-security-key-step-reboot = Escolha { $option }.
 settings-security-key-enter = Enter
 settings-security-key-code = Código { $code }
 settings-security-key-steps-remove-missed = Se você perder o momento, o computador inicia normalmente e você pode tentar de novo aqui.
-settings-security-key-steps-add-missed = Se você perder o momento, o computador inicia normalmente e as etapas aparecem de novo na próxima reinicialização, com um novo código.
 settings-security-later = Mais tarde
 settings-security-restart-now = Reiniciar agora
 

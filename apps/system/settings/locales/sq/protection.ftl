@@ -85,10 +85,6 @@ settings-security-signed-startup = Nisja e nënshkruar
 settings-security-signed-startup-on = Menyja e nisjes dhe sistemi janë të nënshkruara për këtë kompjuter
 settings-security-signed-startup-purpose = Lejon të nisë këtë kompjuter vetëm softuerin e nënshkruar për të
 settings-security-signed-startup-restart = Fillon të përdoret pasi të rinisësh
-settings-security-signed-startup-missed = Çelësi nuk u shtua në rinisjen e fundit
-settings-security-signed-startup-pending = Shto çelësin në ekranin blu kur të rinisësh
-settings-security-signed-startup-missed-often = Çelësi nuk u shtua pas disa rinisjesh
-settings-security-show-steps = Shfaq hapat
 settings-security-try-again = Provo sërish
 
 ## Security: games with anti-cheat
@@ -102,17 +98,10 @@ settings-security-anti-cheat-ready-description = Lojërat mund të kontrollojnë
 ## Security: steps on the blue startup screen
 
 settings-security-key-steps-remove = Hiq çelësat kur të rinisësh
-settings-security-key-steps-add = Shto çelësin kur të rinisësh
 settings-security-key-steps-remove-description = Pasi të rinisësh, një ekran blu pyet për heqjen e çelësave. Pret vetëm 10 sekonda, ndaj shtyp një tast sapo të shfaqet.
-settings-security-key-steps-add-description = Pasi të rinisësh, një ekran blu pyet për një çelës të ri. Pret vetëm 10 sekonda, ndaj shtyp një tast sapo të shfaqet.
-settings-security-key-step-choose = Zgjidh { $option }, pastaj { $next }.
-settings-security-key-step-confirm = Zgjidh { $option }.
-settings-security-key-step-code = Shkruaj kodin më poshtë dhe shtyp { $key }.
-settings-security-key-step-reboot = Zgjidh { $option }.
 settings-security-key-enter = Enter
 settings-security-key-code = Kodi { $code }
 settings-security-key-steps-remove-missed = Nëse e humbet, kompjuteri niset si zakonisht dhe mund të provosh sërish këtu.
-settings-security-key-steps-add-missed = Nëse e humbet, kompjuteri niset si zakonisht dhe hapat shfaqen sërish në rinisjen e ardhshme, me një kod të ri.
 settings-security-later = Më vonë
 settings-security-restart-now = Rinis tani
 

@@ -85,10 +85,6 @@ settings-security-signed-startup = Arranque firmado
 settings-security-signed-startup-on = El menú de arranque y el sistema están firmados para este ordenador
 settings-security-signed-startup-purpose = Solo deja arrancar el software firmado para este ordenador
 settings-security-signed-startup-restart = Se empezará a usar cuando reinicies
-settings-security-signed-startup-missed = La clave no se añadió en el último reinicio
-settings-security-signed-startup-pending = Añade la clave en la pantalla azul al reiniciar
-settings-security-signed-startup-missed-often = La clave no se ha añadido tras varios reinicios
-settings-security-show-steps = Mostrar los pasos
 settings-security-try-again = Reintentar
 
 ## Security: games with anti-cheat
@@ -102,17 +98,10 @@ settings-security-anti-cheat-ready-description = Los juegos pueden comprobar có
 ## Security: steps on the blue startup screen
 
 settings-security-key-steps-remove = Quita las claves al reiniciar
-settings-security-key-steps-add = Añade la clave al reiniciar
 settings-security-key-steps-remove-description = Después de reiniciar, una pantalla azul te preguntará si quieres quitar claves. Solo espera 10 segundos, así que pulsa cualquier tecla en cuanto aparezca.
-settings-security-key-steps-add-description = Después de reiniciar, una pantalla azul te preguntará por una clave nueva. Solo espera 10 segundos, así que pulsa cualquier tecla en cuanto aparezca.
-settings-security-key-step-choose = Elige { $option } y después { $next }.
-settings-security-key-step-confirm = Elige { $option }.
-settings-security-key-step-code = Escribe el código de abajo y pulsa { $key }.
-settings-security-key-step-reboot = Elige { $option }.
 settings-security-key-enter = Intro
 settings-security-key-code = Código { $code }
 settings-security-key-steps-remove-missed = Si se te pasa, el ordenador arrancará como siempre y podrás volver a intentarlo aquí.
-settings-security-key-steps-add-missed = Si se te pasa, el ordenador arrancará como siempre y los pasos volverán a aparecer en el siguiente reinicio, con un código nuevo.
 settings-security-later = Más tarde
 settings-security-restart-now = Reiniciar ahora
 

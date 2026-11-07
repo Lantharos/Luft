@@ -2,6 +2,8 @@
 	import { t } from '@luft/i18n';
 	import { ConfirmDialog, errorText, RecoveryKeyDialog, Row, Section, Switch } from '@luft/ui';
 	import type { Trust } from '#lib/bindings.js';
+	import { app } from '#lib/state/app.svelte.js';
+	import { withoutKeySentence } from '../../secureboot/describe';
 	import { acceptSecureBootChange, printRecoveryKey, removeTpmUnlock, replaceRecoveryKey, saveRecoveryKey, setUpTpmUnlock, showRecoveryKey } from '../../api';
 	import TpmDialog, { type TpmMode } from './TpmDialog.svelte';
 	import { withUnlock } from './unlock.svelte';
@@ -50,7 +52,11 @@
 </script>
 
 <Section title={t('settings-encryption-unlocking')}>
-	{#if disk.secureBootChanged && tpmUnlocks}
+	{#if trust.startup.withoutKey && tpmUnlocks}
+		<Row title={t('settings-security-secure-boot-unfinished')} description={withoutKeySentence(disk)}>
+			<button type="button" class="button" onclick={() => (app.section = 'secure-boot')}>{t('settings-protection-set-up')}</button>
+		</Row>
+	{:else if disk.secureBootChanged && tpmUnlocks}
 		<Row title={t('settings-encryption-starts-differently')} description={t('settings-encryption-starts-differently-description')}>
 			<button type="button" class="button" disabled={busy} onclick={() => attempt(acceptSecureBootChange)}>{t('settings-encryption-confirm')}</button>
 		</Row>

@@ -87,10 +87,6 @@ settings-security-signed-startup = Підписаний запуск
 settings-security-signed-startup-on = Меню завантаження й система підписані для цього комп’ютера
 settings-security-signed-startup-purpose = Дозволяє запускати лише програмне забезпечення, підписане для цього комп’ютера
 settings-security-signed-startup-restart = Почне діяти після перезавантаження
-settings-security-signed-startup-missed = Ключ не було додано під час останнього перезавантаження
-settings-security-signed-startup-pending = Додайте ключ на синьому екрані під час перезавантаження
-settings-security-signed-startup-missed-often = Ключ не було додано після кількох перезавантажень
-settings-security-show-steps = Показати кроки
 settings-security-try-again = Спробувати ще раз
 
 ## Security: games with anti-cheat
@@ -104,17 +100,10 @@ settings-security-anti-cheat-ready-description = Ігри можуть пере�
 ## Security: steps on the blue startup screen
 
 settings-security-key-steps-remove = Вилучіть ключі під час перезавантаження
-settings-security-key-steps-add = Додайте ключ під час перезавантаження
 settings-security-key-steps-remove-description = Після перезавантаження з’явиться синій екран із запитанням про вилучення ключів. Він чекає лише 10 секунд, тож натисніть будь-яку клавішу, щойно він з’явиться.
-settings-security-key-steps-add-description = Після перезавантаження з’явиться синій екран із запитанням про новий ключ. Він чекає лише 10 секунд, тож натисніть будь-яку клавішу, щойно він з’явиться.
-settings-security-key-step-choose = Виберіть { $option }, потім { $next }.
-settings-security-key-step-confirm = Виберіть { $option }.
-settings-security-key-step-code = Введіть код нижче й натисніть { $key }.
-settings-security-key-step-reboot = Виберіть { $option }.
 settings-security-key-enter = Enter
 settings-security-key-code = Код { $code }
 settings-security-key-steps-remove-missed = Якщо ви не встигнете, комп’ютер запуститься як зазвичай, і ви зможете спробувати ще раз тут.
-settings-security-key-steps-add-missed = Якщо ви не встигнете, комп’ютер запуститься як зазвичай, а кроки з новим кодом з’являться знову під час наступного перезавантаження.
 settings-security-later = Пізніше
 settings-security-restart-now = Перезавантажити зараз
 

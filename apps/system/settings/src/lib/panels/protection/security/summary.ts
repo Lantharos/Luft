@@ -1,13 +1,16 @@
 import { t } from '@luft/i18n';
 import type { Trust } from '#lib/bindings.js';
+import { withoutKeySentence } from './secureboot/describe';
 
 export interface Summary {
 	headline: string;
 	sentence: string;
 	safe: boolean;
+	secureBoot?: boolean;
 }
 
-export function summarize({ disk, secureBoot }: Trust, firmwareUpdates: number): Summary | null {
+export function summarize({ disk, secureBoot, startup }: Trust, firmwareUpdates: number): Summary | null {
+	if (startup.withoutKey) return { headline: t('settings-security-secure-boot-unfinished'), sentence: withoutKeySentence(disk), safe: false, secureBoot: true };
 	if (!disk.device) return null;
 	if (!disk.encrypted) return { headline: t('settings-security-could-be-safer'), sentence: t('settings-security-not-encrypted-description'), safe: false };
 	if (disk.secureBootChanged)

@@ -87,10 +87,6 @@ settings-security-signed-startup = Подписанная загрузка
 settings-security-signed-startup-on = Меню загрузки и система подписаны для этого компьютера
 settings-security-signed-startup-purpose = Запускаться может только ПО, подписанное для этого компьютера
 settings-security-signed-startup-restart = Начнёт действовать после перезагрузки
-settings-security-signed-startup-missed = При последней перезагрузке ключ не был добавлен
-settings-security-signed-startup-pending = Добавьте ключ на синем экране при перезагрузке
-settings-security-signed-startup-missed-often = Ключ не был добавлен после нескольких перезагрузок
-settings-security-show-steps = Показать шаги
 settings-security-try-again = Повторить
 
 ## Security: games with anti-cheat
@@ -104,17 +100,10 @@ settings-security-anti-cheat-ready-description = Игры могут прове�
 ## Security: steps on the blue startup screen
 
 settings-security-key-steps-remove = Удалите ключи при перезагрузке
-settings-security-key-steps-add = Добавьте ключ при перезагрузке
 settings-security-key-steps-remove-description = После перезагрузки появится синий экран с вопросом об удалении ключей. Он ждёт всего 10 секунд, поэтому сразу нажмите любую клавишу.
-settings-security-key-steps-add-description = После перезагрузки появится синий экран с вопросом о новом ключе. Он ждёт всего 10 секунд, поэтому сразу нажмите любую клавишу.
-settings-security-key-step-choose = Выберите { $option }, затем { $next }.
-settings-security-key-step-confirm = Выберите { $option }.
-settings-security-key-step-code = Введите код ниже и нажмите { $key }.
-settings-security-key-step-reboot = Выберите { $option }.
 settings-security-key-enter = Enter
 settings-security-key-code = Код { $code }
 settings-security-key-steps-remove-missed = Если вы не успеете, компьютер загрузится как обычно, и здесь можно будет попробовать ещё раз.
-settings-security-key-steps-add-missed = Если вы не успеете, компьютер загрузится как обычно, а шаги появятся снова при следующей перезагрузке, уже с новым кодом.
 settings-security-later = Позже
 settings-security-restart-now = Перезагрузить сейчас
 

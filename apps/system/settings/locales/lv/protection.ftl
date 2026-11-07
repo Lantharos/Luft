@@ -86,10 +86,6 @@ settings-security-signed-startup = Parakstīta startēšana
 settings-security-signed-startup-on = Sāknēšanas izvēlne un sistēma ir parakstītas šim datoram
 settings-security-signed-startup-purpose = Ļauj startēt tikai šim datoram parakstītu programmatūru
 settings-security-signed-startup-restart = Tiks izmantota pēc restartēšanas
-settings-security-signed-startup-missed = Atslēga netika pievienota pēdējās restartēšanas laikā
-settings-security-signed-startup-pending = Restartējot pievienojiet atslēgu zilajā ekrānā
-settings-security-signed-startup-missed-often = Atslēga netika pievienota pēc vairākām restartēšanām
-settings-security-show-steps = Rādīt darbības
 settings-security-try-again = Mēģināt vēlreiz
 
 ## Security: games with anti-cheat
@@ -103,17 +99,10 @@ settings-security-anti-cheat-ready-description = Spēles var pārbaudīt, kā š
 ## Security: steps on the blue startup screen
 
 settings-security-key-steps-remove = Restartējot noņemiet atslēgas
-settings-security-key-steps-add = Restartējot pievienojiet atslēgu
 settings-security-key-steps-remove-description = Pēc restartēšanas zilajā ekrānā tiks jautāts par atslēgu noņemšanu. Tas gaida tikai 10 sekundes, tāpēc nospiediet jebkuru taustiņu, tiklīdz tas parādās.
-settings-security-key-steps-add-description = Pēc restartēšanas zilajā ekrānā tiks jautāts par jaunu atslēgu. Tas gaida tikai 10 sekundes, tāpēc nospiediet jebkuru taustiņu, tiklīdz tas parādās.
-settings-security-key-step-choose = Izvēlieties { $option }, pēc tam { $next }.
-settings-security-key-step-confirm = Izvēlieties { $option }.
-settings-security-key-step-code = Ierakstiet tālāk redzamo kodu un nospiediet { $key }.
-settings-security-key-step-reboot = Izvēlieties { $option }.
 settings-security-key-enter = Enter
 settings-security-key-code = Kods { $code }
 settings-security-key-steps-remove-missed = Ja to nokavējat, dators startēsies kā parasti, un jūs varēsiet mēģināt vēlreiz šeit.
-settings-security-key-steps-add-missed = Ja to nokavējat, dators startēsies kā parasti, un nākamajā restartēšanas reizē darbības tiks parādītas vēlreiz ar jaunu kodu.
 settings-security-later = Vēlāk
 settings-security-restart-now = Restartēt tūlīt
 

@@ -87,10 +87,6 @@ settings-security-signed-startup = Pasirašytas paleidimas
 settings-security-signed-startup-on = Paleidimo meniu ir sistema pasirašyti šiam kompiuteriui
 settings-security-signed-startup-purpose = Leidžia paleisti tik šiam kompiuteriui pasirašytą programinę įrangą
 settings-security-signed-startup-restart = Bus naudojamas paleidus iš naujo
-settings-security-signed-startup-missed = Paskutinį kartą paleidus iš naujo raktas nebuvo pridėtas
-settings-security-signed-startup-pending = Paleidę iš naujo, pridėkite raktą mėlyname ekrane
-settings-security-signed-startup-missed-often = Raktas nebuvo pridėtas po kelių paleidimų iš naujo
-settings-security-show-steps = Rodyti veiksmus
 settings-security-try-again = Bandyti dar kartą
 
 ## Security: games with anti-cheat
@@ -104,17 +100,10 @@ settings-security-anti-cheat-ready-description = Žaidimai gali patikrinti, kaip
 ## Security: steps on the blue startup screen
 
 settings-security-key-steps-remove = Pašalinkite raktus paleidę iš naujo
-settings-security-key-steps-add = Pridėkite raktą paleidę iš naujo
 settings-security-key-steps-remove-description = Paleidus iš naujo, mėlyname ekrane bus klausiama apie raktų šalinimą. Jis laukia tik 10 sekundžių, todėl vos jam pasirodžius paspauskite bet kurį klavišą.
-settings-security-key-steps-add-description = Paleidus iš naujo, mėlyname ekrane bus klausiama apie naują raktą. Jis laukia tik 10 sekundžių, todėl vos jam pasirodžius paspauskite bet kurį klavišą.
-settings-security-key-step-choose = Pasirinkite { $option }, tada { $next }.
-settings-security-key-step-confirm = Pasirinkite { $option }.
-settings-security-key-step-code = Įveskite toliau pateiktą kodą ir paspauskite { $key }.
-settings-security-key-step-reboot = Pasirinkite { $option }.
 settings-security-key-enter = Enter
 settings-security-key-code = Kodas { $code }
 settings-security-key-steps-remove-missed = Jei nespėsite, kompiuteris pasileis kaip įprasta, o bandyti dar kartą galėsite čia.
-settings-security-key-steps-add-missed = Jei nespėsite, kompiuteris pasileis kaip įprasta, o veiksmai su nauju kodu bus parodyti kitą kartą paleidus iš naujo.
 settings-security-later = Vėliau
 settings-security-restart-now = Paleisti iš naujo dabar
 

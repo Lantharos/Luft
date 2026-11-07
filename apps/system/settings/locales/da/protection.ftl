@@ -85,10 +85,6 @@ settings-security-signed-startup = Signeret opstart
 settings-security-signed-startup-on = Opstartsmenuen og systemet er signeret til denne computer
 settings-security-signed-startup-purpose = Lader kun software, der er signeret til denne computer, starte den
 settings-security-signed-startup-restart = Tages i brug, når du genstarter
-settings-security-signed-startup-missed = Nøglen blev ikke tilføjet ved sidste genstart
-settings-security-signed-startup-pending = Tilføj nøglen på den blå skærm, når du genstarter
-settings-security-signed-startup-missed-often = Nøglen blev ikke tilføjet efter flere genstarter
-settings-security-show-steps = Vis trin
 settings-security-try-again = Prøv igen
 
 ## Security: games with anti-cheat
@@ -102,17 +98,10 @@ settings-security-anti-cheat-ready-description = Spil kan kontrollere, hvordan c
 ## Security: steps on the blue startup screen
 
 settings-security-key-steps-remove = Fjern nøglerne, når du genstarter
-settings-security-key-steps-add = Tilføj nøglen, når du genstarter
 settings-security-key-steps-remove-description = Når du har genstartet, spørger en blå skærm om at fjerne nøgler. Den venter kun 10 sekunder, så tryk på en vilkårlig tast, så snart den vises.
-settings-security-key-steps-add-description = Når du har genstartet, spørger en blå skærm om en ny nøgle. Den venter kun 10 sekunder, så tryk på en vilkårlig tast, så snart den vises.
-settings-security-key-step-choose = Vælg { $option } og derefter { $next }.
-settings-security-key-step-confirm = Vælg { $option }.
-settings-security-key-step-code = Skriv koden nedenfor, og tryk på { $key }.
-settings-security-key-step-reboot = Vælg { $option }.
 settings-security-key-enter = Enter
 settings-security-key-code = Kode { $code }
 settings-security-key-steps-remove-missed = Hvis du ikke når det, starter computeren som normalt, og du kan prøve igen her.
-settings-security-key-steps-add-missed = Hvis du ikke når det, starter computeren som normalt, og trinnene vises igen ved næste genstart med en ny kode.
 settings-security-later = Senere
 settings-security-restart-now = Genstart nu
 

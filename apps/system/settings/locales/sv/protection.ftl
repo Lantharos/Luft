@@ -85,10 +85,6 @@ settings-security-signed-startup = Signerad start
 settings-security-signed-startup-on = Startmenyn och systemet är signerade för den här datorn
 settings-security-signed-startup-purpose = Låter bara programvara som är signerad för den här datorn starta den
 settings-security-signed-startup-restart = Börjar användas efter att du startar om
-settings-security-signed-startup-missed = Nyckeln lades inte till vid den senaste omstarten
-settings-security-signed-startup-pending = Lägg till nyckeln på den blå skärmen när du startar om
-settings-security-signed-startup-missed-often = Nyckeln har inte lagts till trots flera omstarter
-settings-security-show-steps = Visa stegen
 settings-security-try-again = Försök igen
 
 ## Security: games with anti-cheat
@@ -102,17 +98,10 @@ settings-security-anti-cheat-ready-description = Spel kan kontrollera hur datorn
 ## Security: steps on the blue startup screen
 
 settings-security-key-steps-remove = Ta bort nycklarna när du startar om
-settings-security-key-steps-add = Lägg till nyckeln när du startar om
 settings-security-key-steps-remove-description = När du har startat om visas en blå skärm som frågar om att ta bort nycklar. Den väntar bara i 10 sekunder, så tryck på valfri tangent så fort den visas.
-settings-security-key-steps-add-description = När du har startat om visas en blå skärm som frågar om en ny nyckel. Den väntar bara i 10 sekunder, så tryck på valfri tangent så fort den visas.
-settings-security-key-step-choose = Välj { $option } och sedan { $next }.
-settings-security-key-step-confirm = Välj { $option }.
-settings-security-key-step-code = Skriv koden nedan och tryck på { $key }.
-settings-security-key-step-reboot = Välj { $option }.
 settings-security-key-enter = Enter
 settings-security-key-code = Kod { $code }
 settings-security-key-steps-remove-missed = Om du missar den startar datorn som vanligt och du kan försöka igen här.
-settings-security-key-steps-add-missed = Om du missar den startar datorn som vanligt och stegen visas igen vid nästa omstart, med en ny kod.
 settings-security-later = Senare
 settings-security-restart-now = Starta om nu
 

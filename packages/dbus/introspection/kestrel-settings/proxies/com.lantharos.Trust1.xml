@@ -1,5 +1,6 @@
 <node>
   <interface name="com.lantharos.Trust1">
     <property name="SigningKey" type="a{sv}" access="read"/>
+    <property name="Startup" type="a{sv}" access="read"/>
   </interface>
 </node>

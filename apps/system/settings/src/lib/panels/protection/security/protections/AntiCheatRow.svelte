@@ -4,7 +4,7 @@
 	import { errorText, Row, tooltip } from '@luft/ui';
 	import type { AntiCheat, SigningKey } from '#lib/bindings.js';
 	import { keepOtherKeys, removeOtherKeys, restart } from '../api';
-	import KeyStepsDialog from './KeyStepsDialog.svelte';
+	import RemoveKeysDialog from './RemoveKeysDialog.svelte';
 
 	let { antiCheat, key }: { antiCheat: AntiCheat; key: SigningKey } = $props();
 
@@ -53,5 +53,5 @@
 </Row>
 
 {#if code}
-	<KeyStepsDialog {code} removing onclose={() => (code = null)} />
+	<RemoveKeysDialog {code} onclose={() => (code = null)} />
 {/if}

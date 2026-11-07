@@ -85,10 +85,6 @@ settings-security-signed-startup = Ondertekend opstarten
 settings-security-signed-startup-on = Het opstartmenu en het systeem zijn ondertekend voor deze computer
 settings-security-signed-startup-purpose = Laat alleen software opstarten die voor deze computer is ondertekend
 settings-security-signed-startup-restart = Wordt gebruikt nadat je opnieuw hebt opgestart
-settings-security-signed-startup-missed = De sleutel is bij de laatste herstart niet toegevoegd
-settings-security-signed-startup-pending = Voeg de sleutel toe op het blauwe scherm als je opnieuw opstart
-settings-security-signed-startup-missed-often = De sleutel is na een paar herstarts nog niet toegevoegd
-settings-security-show-steps = Stappen tonen
 settings-security-try-again = Opnieuw proberen
 
 ## Security: games with anti-cheat
@@ -102,17 +98,10 @@ settings-security-anti-cheat-ready-description = Games kunnen controleren hoe de
 ## Security: steps on the blue startup screen
 
 settings-security-key-steps-remove = Verwijder de sleutels als je opnieuw opstart
-settings-security-key-steps-add = Voeg de sleutel toe als je opnieuw opstart
 settings-security-key-steps-remove-description = Na het opnieuw opstarten vraagt een blauw scherm of je sleutels wilt verwijderen. Het wacht maar 10 seconden, dus druk op een toets zodra het verschijnt.
-settings-security-key-steps-add-description = Na het opnieuw opstarten vraagt een blauw scherm naar een nieuwe sleutel. Het wacht maar 10 seconden, dus druk op een toets zodra het verschijnt.
-settings-security-key-step-choose = Kies { $option } en daarna { $next }.
-settings-security-key-step-confirm = Kies { $option }.
-settings-security-key-step-code = Typ de code hieronder en druk op { $key }.
-settings-security-key-step-reboot = Kies { $option }.
 settings-security-key-enter = Enter
 settings-security-key-code = Code { $code }
 settings-security-key-steps-remove-missed = Als je het mist, start je computer gewoon op en kun je het hier opnieuw proberen.
-settings-security-key-steps-add-missed = Als je het mist, start je computer gewoon op en verschijnen de stappen bij de volgende herstart opnieuw, met een nieuwe code.
 settings-security-later = Later
 settings-security-restart-now = Nu opnieuw opstarten
 

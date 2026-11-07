@@ -85,10 +85,6 @@ settings-security-signed-startup = Allekirjoitettu käynnistys
 settings-security-signed-startup-on = Käynnistysvalikko ja järjestelmä on allekirjoitettu tälle tietokoneelle
 settings-security-signed-startup-purpose = Sallii vain tälle tietokoneelle allekirjoitetun ohjelmiston käynnistyä
 settings-security-signed-startup-restart = Otetaan käyttöön uudelleenkäynnistyksen jälkeen
-settings-security-signed-startup-missed = Avainta ei lisätty viime uudelleenkäynnistyksessä
-settings-security-signed-startup-pending = Lisää avain sinisessä näytössä, kun käynnistät uudelleen
-settings-security-signed-startup-missed-often = Avainta ei lisätty usean uudelleenkäynnistyksen aikana
-settings-security-show-steps = Näytä vaiheet
 settings-security-try-again = Yritä uudelleen
 
 ## Security: games with anti-cheat
@@ -102,17 +98,10 @@ settings-security-anti-cheat-ready-description = Pelit voivat tarkistaa, miten t
 ## Security: steps on the blue startup screen
 
 settings-security-key-steps-remove = Poista avaimet uudelleenkäynnistyksen yhteydessä
-settings-security-key-steps-add = Lisää avain uudelleenkäynnistyksen yhteydessä
 settings-security-key-steps-remove-description = Uudelleenkäynnistyksen jälkeen sininen näyttö kysyy avainten poistamisesta. Se odottaa vain 10 sekuntia, joten paina mitä tahansa näppäintä heti, kun se tulee näkyviin.
-settings-security-key-steps-add-description = Uudelleenkäynnistyksen jälkeen sininen näyttö kysyy uudesta avaimesta. Se odottaa vain 10 sekuntia, joten paina mitä tahansa näppäintä heti, kun se tulee näkyviin.
-settings-security-key-step-choose = Valitse { $option } ja sitten { $next }.
-settings-security-key-step-confirm = Valitse { $option }.
-settings-security-key-step-code = Kirjoita alla oleva koodi ja paina { $key }.
-settings-security-key-step-reboot = Valitse { $option }.
 settings-security-key-enter = Enter
 settings-security-key-code = Koodi { $code }
 settings-security-key-steps-remove-missed = Jos et ehdi, tietokone käynnistyy tavalliseen tapaan ja voit yrittää uudelleen täällä.
-settings-security-key-steps-add-missed = Jos et ehdi, tietokone käynnistyy tavalliseen tapaan ja vaiheet näytetään uudelleen seuraavan käynnistyksen yhteydessä uudella koodilla.
 settings-security-later = Myöhemmin
 settings-security-restart-now = Käynnistä uudelleen nyt
 

@@ -85,10 +85,6 @@ settings-security-signed-startup = Подписано стартиране
 settings-security-signed-startup-on = Менюто за стартиране и системата са подписани за този компютър
 settings-security-signed-startup-purpose = Компютърът стартира само софтуер, подписан за него
 settings-security-signed-startup-restart = Започва да се използва след рестартиране
-settings-security-signed-startup-missed = Ключът не беше добавен при последното рестартиране
-settings-security-signed-startup-pending = Добавете ключа на синия екран при рестартиране
-settings-security-signed-startup-missed-often = Ключът не беше добавен след няколко рестартирания
-settings-security-show-steps = Покажи стъпките
 settings-security-try-again = Опитай отново
 
 ## Security: games with anti-cheat
@@ -102,17 +98,10 @@ settings-security-anti-cheat-ready-description = Игрите могат да п
 ## Security: steps on the blue startup screen
 
 settings-security-key-steps-remove = Премахнете ключовете при рестартиране
-settings-security-key-steps-add = Добавете ключа при рестартиране
 settings-security-key-steps-remove-description = След рестартиране син екран ще ви попита за премахване на ключове. Той чака само 10 секунди, затова натиснете произволен клавиш веднага щом се появи.
-settings-security-key-steps-add-description = След рестартиране син екран ще ви попита за нов ключ. Той чака само 10 секунди, затова натиснете произволен клавиш веднага щом се появи.
-settings-security-key-step-choose = Изберете { $option }, след това { $next }.
-settings-security-key-step-confirm = Изберете { $option }.
-settings-security-key-step-code = Въведете кода по-долу и натиснете { $key }.
-settings-security-key-step-reboot = Изберете { $option }.
 settings-security-key-enter = Enter
 settings-security-key-code = Код { $code }
 settings-security-key-steps-remove-missed = Ако го пропуснете, компютърът стартира както обикновено и можете да опитате отново оттук.
-settings-security-key-steps-add-missed = Ако го пропуснете, компютърът стартира както обикновено, а стъпките се показват отново при следващото рестартиране, с нов код.
 settings-security-later = По-късно
 settings-security-restart-now = Рестартирай сега
 

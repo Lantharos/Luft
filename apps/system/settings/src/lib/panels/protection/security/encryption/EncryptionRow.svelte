@@ -7,7 +7,7 @@
 	import { encryptionSummary } from './describe';
 	import TurnOnDialog from './TurnOnDialog.svelte';
 
-	let { disk }: { disk: Disk } = $props();
+	let { disk, withoutKey }: { disk: Disk; withoutKey: boolean } = $props();
 
 	let turningOn = $state(false);
 	let busy = $state(false);
@@ -25,7 +25,7 @@
 	}
 </script>
 
-<Row title={t('settings-encryption')} description={encryptionSummary(disk)} icon={LockKeyhole}>
+<Row title={t('settings-encryption')} description={encryptionSummary(disk, withoutKey)} icon={LockKeyhole}>
 	{#if disk.encrypting === 'after-restart'}
 		<button type="button" class="button" disabled={busy} onclick={() => attempt(cancelEncryption)}>{t('settings-encryption-dont-encrypt')}</button>
 		<button type="button" class="button primary" disabled={busy} onclick={() => attempt(restart)}>{t('settings-protection-restart')}</button>

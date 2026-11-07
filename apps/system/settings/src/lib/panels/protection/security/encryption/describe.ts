@@ -1,7 +1,8 @@
 import { i18n, t } from '@luft/i18n';
 import type { Disk } from '#lib/bindings.js';
 
-export function unlockSummary({ unlock }: Disk) {
+export function unlockSummary({ unlock }: Disk, withoutKey: boolean) {
+	if (unlock.includes('tpm') && withoutKey) return t('settings-encryption-unlocks-without-secure-boot');
 	if (unlock.includes('tpm') && unlock.includes('pin')) return t('settings-encryption-unlocks-chip-pin');
 	if (unlock.includes('tpm')) return t('settings-encryption-unlocks-chip');
 	if (unlock.includes('passphrase')) return t('settings-encryption-unlocks-passphrase');
@@ -11,11 +12,11 @@ export function unlockSummary({ unlock }: Disk) {
 
 export const percent = (fraction: number) => new Intl.NumberFormat(i18n.formats, { style: 'percent' }).format(Math.floor(fraction * 100) / 100);
 
-export function encryptionSummary(disk: Disk) {
+export function encryptionSummary(disk: Disk, withoutKey: boolean) {
 	const args = { percent: percent(disk.progress) };
 	if (disk.encrypting === 'after-restart') return t('settings-encryption-after-restart');
 	if (disk.encrypting === 'encrypting') return t('settings-encryption-encrypting', args);
 	if (disk.encrypting === 'waiting') return t('settings-encryption-encrypting-paused', args);
-	if (disk.encrypted) return unlockSummary(disk);
+	if (disk.encrypted) return unlockSummary(disk, withoutKey);
 	return disk.canEncrypt ? t('settings-encryption-not-encrypted') : t('settings-encryption-not-encrypted-reinstall');
 }

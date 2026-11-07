@@ -87,10 +87,6 @@ settings-security-signed-startup = Podpísané spustenie
 settings-security-signed-startup-on = Ponuka zavádzania a systém sú podpísané pre tento počítač
 settings-security-signed-startup-purpose = Počítač spustí len softvér podpísaný preň
 settings-security-signed-startup-restart = Začne sa používať po reštarte
-settings-security-signed-startup-missed = Kľúč sa pri poslednom reštarte nepridal
-settings-security-signed-startup-pending = Pri reštarte pridajte kľúč na modrej obrazovke
-settings-security-signed-startup-missed-often = Kľúč sa nepridal ani po niekoľkých reštartoch
-settings-security-show-steps = Zobraziť postup
 settings-security-try-again = Skúsiť znova
 
 ## Security: games with anti-cheat
@@ -104,17 +100,10 @@ settings-security-anti-cheat-ready-description = Hry môžu skontrolovať, ako s
 ## Security: steps on the blue startup screen
 
 settings-security-key-steps-remove = Pri reštarte odstráňte kľúče
-settings-security-key-steps-add = Pri reštarte pridajte kľúč
 settings-security-key-steps-remove-description = Po reštarte sa modrá obrazovka spýta na odstránenie kľúčov. Čaká len 10 sekúnd, preto hneď, ako sa zobrazí, stlačte ľubovoľný kláves.
-settings-security-key-steps-add-description = Po reštarte sa modrá obrazovka spýta na nový kľúč. Čaká len 10 sekúnd, preto hneď, ako sa zobrazí, stlačte ľubovoľný kláves.
-settings-security-key-step-choose = Vyberte { $option } a potom { $next }.
-settings-security-key-step-confirm = Vyberte { $option }.
-settings-security-key-step-code = Zadajte kód nižšie a stlačte { $key }.
-settings-security-key-step-reboot = Vyberte { $option }.
 settings-security-key-enter = Enter
 settings-security-key-code = Kód { $code }
 settings-security-key-steps-remove-missed = Ak to nestihnete, počítač sa spustí ako zvyčajne a môžete to skúsiť znova tu.
-settings-security-key-steps-add-missed = Ak to nestihnete, počítač sa spustí ako zvyčajne a postup sa zobrazí znova pri ďalšom reštarte s novým kódom.
 settings-security-later = Neskôr
 settings-security-restart-now = Reštartovať teraz
 

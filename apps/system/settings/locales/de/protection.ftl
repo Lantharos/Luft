@@ -85,10 +85,6 @@ settings-security-signed-startup = Signierter Start
 settings-security-signed-startup-on = Bootmenü und System sind für diesen Computer signiert
 settings-security-signed-startup-purpose = Lässt nur Software starten, die für diesen Computer signiert ist
 settings-security-signed-startup-restart = Wird nach einem Neustart verwendet
-settings-security-signed-startup-missed = Der Schlüssel wurde beim letzten Neustart nicht hinzugefügt
-settings-security-signed-startup-pending = Füg beim Neustart den Schlüssel auf dem blauen Bildschirm hinzu
-settings-security-signed-startup-missed-often = Der Schlüssel wurde nach mehreren Neustarts nicht hinzugefügt
-settings-security-show-steps = Schritte anzeigen
 settings-security-try-again = Erneut versuchen
 
 ## Security: games with anti-cheat
@@ -102,17 +98,10 @@ settings-security-anti-cheat-ready-description = Spiele können prüfen, wie die
 ## Security: steps on the blue startup screen
 
 settings-security-key-steps-remove = Schlüssel beim Neustart entfernen
-settings-security-key-steps-add = Schlüssel beim Neustart hinzufügen
 settings-security-key-steps-remove-description = Nach dem Neustart fragt ein blauer Bildschirm, ob Schlüssel entfernt werden sollen. Er wartet nur 10 Sekunden, also drück eine beliebige Taste, sobald er erscheint.
-settings-security-key-steps-add-description = Nach dem Neustart fragt ein blauer Bildschirm nach einem neuen Schlüssel. Er wartet nur 10 Sekunden, also drück eine beliebige Taste, sobald er erscheint.
-settings-security-key-step-choose = Wähl { $option } und dann { $next }.
-settings-security-key-step-confirm = Wähl { $option }.
-settings-security-key-step-code = Gib den Code unten ein und drück { $key }.
-settings-security-key-step-reboot = Wähl { $option }.
 settings-security-key-enter = Eingabe
 settings-security-key-code = Code { $code }
 settings-security-key-steps-remove-missed = Wenn du ihn verpasst, startet dein Computer wie gewohnt und du kannst es hier erneut versuchen.
-settings-security-key-steps-add-missed = Wenn du ihn verpasst, startet dein Computer wie gewohnt und die Schritte erscheinen beim nächsten Neustart wieder, mit einem neuen Code.
 settings-security-later = Später
 settings-security-restart-now = Jetzt neu starten
 

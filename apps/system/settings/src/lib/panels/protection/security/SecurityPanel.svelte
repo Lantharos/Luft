@@ -7,6 +7,7 @@
 	import KeyringPage from './keyring/KeyringPage.svelte';
 	import { KeyringState } from './keyring/state.svelte';
 	import Overview from './Overview.svelte';
+	import SecureBootPage from './secureboot/SecureBootPage.svelte';
 	import { SecurityState } from './state.svelte';
 
 	const security = new SecurityState();
@@ -24,6 +25,8 @@
 
 {#if security.trust && app.section === 'encryption'}
 	<EncryptionPage trust={security.trust} onclose={close} />
+{:else if security.trust && app.section === 'secure-boot'}
+	<SecureBootPage trust={security.trust} onclose={close} />
 {:else if app.section === 'keyring'}
 	<KeyringPage {keyring} fingerprintReader={security.fingerprintReader} onclose={close} />
 {:else}

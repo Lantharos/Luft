@@ -86,10 +86,6 @@ settings-security-signed-startup = Pornire semnată
 settings-security-signed-startup-on = Meniul de pornire și sistemul sunt semnate pentru acest computer
 settings-security-signed-startup-purpose = Permite pornirea doar cu software semnat pentru acest computer
 settings-security-signed-startup-restart = Se aplică după repornire
-settings-security-signed-startup-missed = Cheia nu a fost adăugată la ultima repornire
-settings-security-signed-startup-pending = Adăugați cheia pe ecranul albastru la repornire
-settings-security-signed-startup-missed-often = Cheia nu a fost adăugată după mai multe reporniri
-settings-security-show-steps = Afișează pașii
 settings-security-try-again = Încearcă din nou
 
 ## Security: games with anti-cheat
@@ -103,17 +99,10 @@ settings-security-anti-cheat-ready-description = Jocurile pot verifica modul în
 ## Security: steps on the blue startup screen
 
 settings-security-key-steps-remove = Eliminați cheile la repornire
-settings-security-key-steps-add = Adăugați cheia la repornire
 settings-security-key-steps-remove-description = După repornire, un ecran albastru vă întreabă dacă vreți să eliminați cheile. Așteaptă doar 10 secunde, așa că apăsați orice tastă imediat ce apare.
-settings-security-key-steps-add-description = După repornire, un ecran albastru vă întreabă despre o cheie nouă. Așteaptă doar 10 secunde, așa că apăsați orice tastă imediat ce apare.
-settings-security-key-step-choose = Alegeți { $option }, apoi { $next }.
-settings-security-key-step-confirm = Alegeți { $option }.
-settings-security-key-step-code = Tastați codul de mai jos și apăsați { $key }.
-settings-security-key-step-reboot = Alegeți { $option }.
 settings-security-key-enter = Enter
 settings-security-key-code = Cod { $code }
 settings-security-key-steps-remove-missed = Dacă îl ratați, computerul pornește normal și puteți încerca din nou de aici.
-settings-security-key-steps-add-missed = Dacă îl ratați, computerul pornește normal, iar pașii apar din nou la următoarea repornire, cu un cod nou.
 settings-security-later = Mai târziu
 settings-security-restart-now = Repornește acum
 

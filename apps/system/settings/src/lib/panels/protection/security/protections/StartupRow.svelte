@@ -3,26 +3,26 @@
 	import { t } from '@luft/i18n';
 	import { errorText, Row } from '@luft/ui';
 	import type { SigningKey, Startup } from '#lib/bindings.js';
-	import { cancelSigningKey, enrollSigningKey, installSignedStartup, restart } from '../api';
-	import KeyStepsDialog from './KeyStepsDialog.svelte';
+	import { installSignedStartup, restart } from '../api';
 
-	let { key, startup }: { key: SigningKey; startup: Startup } = $props();
+	let { key, startup, onsecureboot }: { key: SigningKey; startup: Startup; onsecureboot: () => void } = $props();
 
-	let code = $state<string | null>(null);
 	let busy = $state(false);
 	let error = $state('');
 
 	let step = $derived.by(() => {
+		if (startup.withoutKey || (!startup.installed && key.state !== 'enrolled')) {
+			if (key.state === 'pending') return 'pending';
+			return key.available ? 'enroll' : null;
+		}
 		if (startup.installed) return startup.measured ? 'on' : 'restart';
-		if (key.state === 'enrolled') return startup.available ? 'install' : null;
-		if (key.state === 'pending') return 'pending';
-		return key.available ? 'enroll' : null;
+		return startup.available ? 'install' : null;
 	});
 
 	let description = $derived.by(() => {
 		if (step === 'restart') return t('settings-security-signed-startup-restart');
-		if (step === 'pending') return key.missed ? t('settings-security-signed-startup-missed') : t('settings-security-signed-startup-pending');
-		if (step === 'enroll' && key.missed) return t('settings-security-signed-startup-missed-often');
+		if (step === 'pending') return key.missed ? t('settings-security-signed-startup-retry') : t('settings-security-signed-startup-finish');
+		if (step === 'enroll' && key.missed) return t('settings-security-signed-startup-gave-up');
 		return t('settings-security-signed-startup-purpose');
 	});
 
@@ -36,8 +36,6 @@
 		}
 		busy = false;
 	}
-
-	const addKey = () => attempt(async () => (code = await enrollSigningKey()));
 </script>
 
 {#snippet failure()}
@@ -46,21 +44,14 @@
 
 {#if step === 'on'}
 	<Row title={t('settings-security-signed-startup')} description={t('settings-security-signed-startup-on')} icon={Power} />
+{:else if step === 'pending' || step === 'enroll'}
+	<Row title={t('settings-security-signed-startup')} {description} icon={Power} onclick={onsecureboot} />
 {:else if step}
 	<Row title={t('settings-security-signed-startup')} {description} icon={Power} below={error ? failure : undefined}>
 		{#if step === 'restart'}
 			<button type="button" class="button" disabled={busy} onclick={() => attempt(restart)}>{t('settings-protection-restart')}</button>
-		{:else if step === 'install'}
-			<button type="button" class="button" disabled={busy} onclick={() => attempt(installSignedStartup)}>{t('settings-protection-turn-on')}</button>
-		{:else if step === 'pending'}
-			<button type="button" class="button" disabled={busy} onclick={() => attempt(cancelSigningKey)}>{t('settings-protection-cancel')}</button>
-			<button type="button" class="button" disabled={busy} onclick={addKey}>{t('settings-security-show-steps')}</button>
 		{:else}
-			<button type="button" class="button" disabled={busy} onclick={addKey}>{key.missed ? t('settings-security-try-again') : t('settings-protection-set-up')}</button>
+			<button type="button" class="button" disabled={busy} onclick={() => attempt(installSignedStartup)}>{t('settings-protection-turn-on')}</button>
 		{/if}
 	</Row>
-{/if}
-
-{#if code}
-	<KeyStepsDialog {code} onclose={() => (code = null)} />
 {/if}

@@ -14,7 +14,7 @@
 
 <SubPage title={t('settings-encryption')} {onclose}>
 	<Section>
-		<EncryptionRow {disk} />
+		<EncryptionRow {disk} withoutKey={trust.startup.withoutKey} />
 		{#if trust.drives.available}
 			<DrivesRow drives={trust.drives} />
 		{/if}

@@ -86,10 +86,6 @@ settings-security-signed-startup = Allkirjastatud käivitus
 settings-security-signed-startup-on = Alglaadimismenüü ja süsteem on selle arvuti jaoks allkirjastatud
 settings-security-signed-startup-purpose = Lubab arvutit käivitada ainult selle arvuti jaoks allkirjastatud tarkvaral
 settings-security-signed-startup-restart = Võetakse kasutusele pärast taaskäivitust
-settings-security-signed-startup-missed = Võtit ei lisatud viimasel taaskäivitusel
-settings-security-signed-startup-pending = Taaskäivitamisel lisa võti sinisel ekraanil
-settings-security-signed-startup-missed-often = Võtit ei lisatud ka pärast mitut taaskäivitust
-settings-security-show-steps = Kuva juhised
 settings-security-try-again = Proovi uuesti
 
 ## Security: games with anti-cheat
@@ -103,17 +99,10 @@ settings-security-anti-cheat-ready-description = Mängud saavad kontrollida, kui
 ## Security: steps on the blue startup screen
 
 settings-security-key-steps-remove = Eemalda võtmed taaskäivitamisel
-settings-security-key-steps-add = Lisa võti taaskäivitamisel
 settings-security-key-steps-remove-description = Pärast taaskäivitust küsib sinine ekraan võtmete eemaldamise kohta. See ootab ainult 10 sekundit, seega vajuta mõnda klahvi kohe, kui see ilmub.
-settings-security-key-steps-add-description = Pärast taaskäivitust küsib sinine ekraan uue võtme kohta. See ootab ainult 10 sekundit, seega vajuta mõnda klahvi kohe, kui see ilmub.
-settings-security-key-step-choose = Vali { $option }, seejärel { $next }.
-settings-security-key-step-confirm = Vali { $option }.
-settings-security-key-step-code = Tipi allolev kood ja vajuta { $key }.
-settings-security-key-step-reboot = Vali { $option }.
 settings-security-key-enter = Enter
 settings-security-key-code = Kood { $code }
 settings-security-key-steps-remove-missed = Kui see vahele jääb, käivitub arvuti tavapäraselt ja saad siin uuesti proovida.
-settings-security-key-steps-add-missed = Kui see vahele jääb, käivitub arvuti tavapäraselt ja juhised kuvatakse järgmisel taaskäivitusel uuesti, uue koodiga.
 settings-security-later = Hiljem
 settings-security-restart-now = Taaskäivita kohe
 

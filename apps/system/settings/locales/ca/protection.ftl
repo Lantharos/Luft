@@ -85,10 +85,6 @@ settings-security-signed-startup = Arrencada signada
 settings-security-signed-startup-on = El menú d’arrencada i el sistema estan signats per a aquest ordinador
 settings-security-signed-startup-purpose = Només deixa iniciar aquest ordinador amb programari signat per a ell
 settings-security-signed-startup-restart = S’aplicarà quan reinicieu
-settings-security-signed-startup-missed = La clau no es va afegir en el darrer reinici
-settings-security-signed-startup-pending = Afegiu la clau a la pantalla blava quan reinicieu
-settings-security-signed-startup-missed-often = La clau no s’ha afegit després de diversos reinicis
-settings-security-show-steps = Mostra els passos
 settings-security-try-again = Torna-ho a provar
 
 ## Security: games with anti-cheat
@@ -102,17 +98,10 @@ settings-security-anti-cheat-ready-description = Els jocs poden comprovar com s�
 ## Security: steps on the blue startup screen
 
 settings-security-key-steps-remove = Traieu les claus quan reinicieu
-settings-security-key-steps-add = Afegiu la clau quan reinicieu
 settings-security-key-steps-remove-description = Després de reiniciar, una pantalla blava us preguntarà si voleu treure claus. Només espera 10 segons, així que premeu qualsevol tecla tan bon punt aparegui.
-settings-security-key-steps-add-description = Després de reiniciar, una pantalla blava us preguntarà sobre una clau nova. Només espera 10 segons, així que premeu qualsevol tecla tan bon punt aparegui.
-settings-security-key-step-choose = Trieu { $option } i després { $next }.
-settings-security-key-step-confirm = Trieu { $option }.
-settings-security-key-step-code = Escriviu el codi següent i premeu { $key }.
-settings-security-key-step-reboot = Trieu { $option }.
 settings-security-key-enter = Retorn
 settings-security-key-code = Codi { $code }
 settings-security-key-steps-remove-missed = Si se us passa, l’ordinador s’iniciarà com sempre i ho podreu tornar a provar aquí.
-settings-security-key-steps-add-missed = Si se us passa, l’ordinador s’iniciarà com sempre i els passos tornaran a aparèixer en el pròxim reinici, amb un codi nou.
 settings-security-later = Més tard
 settings-security-restart-now = Reinicia ara
 

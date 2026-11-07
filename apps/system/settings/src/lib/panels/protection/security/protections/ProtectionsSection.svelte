@@ -2,6 +2,7 @@
 	import CircuitBoard from '@lucide/svelte/icons/circuit-board';
 	import Microchip from '@lucide/svelte/icons/microchip';
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
+	import ShieldAlert from '@lucide/svelte/icons/shield-alert';
 	import ShieldCheck from '@lucide/svelte/icons/shield-check';
 	import { t } from '@luft/i18n';
 	import { Row, Section } from '@luft/ui';
@@ -13,7 +14,7 @@
 	import StartupRow from './StartupRow.svelte';
 	import UsbRow from './UsbRow.svelte';
 
-	let { security }: { security: SecurityState } = $props();
+	let { security, onsecureboot }: { security: SecurityState; onsecureboot: () => void } = $props();
 
 	let detailing = $state(false);
 
@@ -23,10 +24,12 @@
 <Section title={t('settings-security-protections')}>
 	{#if security.trust}
 		{@const trust = security.trust}
-		{#if trust.secureBoot === 'on'}
+		{#if trust.secureBoot === 'on' && (trust.signingKey.state === 'enrolled' || !trust.signingKey.available)}
 			<Row title={t('settings-security-secure-boot')} description={t('settings-security-secure-boot-description')} icon={ShieldCheck} />
+		{:else if trust.secureBoot === 'on'}
+			<Row title={t('settings-security-secure-boot')} description={t('settings-secure-boot-not-set-up')} icon={ShieldAlert} onclick={onsecureboot} />
 		{/if}
-		<StartupRow key={trust.signingKey} startup={trust.startup} />
+		<StartupRow key={trust.signingKey} startup={trust.startup} {onsecureboot} />
 		{#if trust.tpm.usable}
 			<Row title={t('settings-security-chip')} description={t('settings-security-chip-description')} icon={Microchip} />
 		{/if}

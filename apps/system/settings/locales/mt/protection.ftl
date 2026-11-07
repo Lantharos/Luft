@@ -88,10 +88,6 @@ settings-security-signed-startup = Startjar iffirmat
 settings-security-signed-startup-on = Il-menù tal-boot u s-sistema huma ffirmati għal dan il-kompjuter
 settings-security-signed-startup-purpose = Iħalli biss softwer iffirmat għal dan il-kompjuter jistartjah
 settings-security-signed-startup-restart = Jibda jintuża wara li tirristartja
-settings-security-signed-startup-missed = Iċ-ċavetta ma żdieditx fl-aħħar restart
-settings-security-signed-startup-pending = Żid iċ-ċavetta fuq l-iskrin blu meta tirristartja
-settings-security-signed-startup-missed-often = Iċ-ċavetta ma żdieditx wara diversi restarts
-settings-security-show-steps = Uri l-passi
 settings-security-try-again = Erġa’ pprova
 
 ## Security: games with anti-cheat
@@ -105,17 +101,10 @@ settings-security-anti-cheat-ready-description = Il-logħob jista’ jiċċekkja
 ## Security: steps on the blue startup screen
 
 settings-security-key-steps-remove = Neħħi ċ-ċwievet meta tirristartja
-settings-security-key-steps-add = Żid iċ-ċavetta meta tirristartja
 settings-security-key-steps-remove-description = Wara li tirristartja, skrin blu jistaqsi dwar it-tneħħija taċ-ċwievet. Jistenna biss 10 sekondi, għalhekk agħfas kwalunkwe tast hekk kif jidher.
-settings-security-key-steps-add-description = Wara li tirristartja, skrin blu jistaqsi dwar ċavetta ġdida. Jistenna biss 10 sekondi, għalhekk agħfas kwalunkwe tast hekk kif jidher.
-settings-security-key-step-choose = Agħżel { $option }, imbagħad { $next }.
-settings-security-key-step-confirm = Agħżel { $option }.
-settings-security-key-step-code = Ittajpja l-kodiċi hawn taħt u agħfas { $key }.
-settings-security-key-step-reboot = Agħżel { $option }.
 settings-security-key-enter = Enter
 settings-security-key-code = Kodiċi { $code }
 settings-security-key-steps-remove-missed = Jekk taqbżu, il-kompjuter jistartja bħas-soltu u tista’ terġa’ tipprova minn hawn.
-settings-security-key-steps-add-missed = Jekk taqbżu, il-kompjuter jistartja bħas-soltu u l-passi jerġgħu jidhru fir-restart li jmiss, b’kodiċi ġdid.
 settings-security-later = Aktar tard
 settings-security-restart-now = Irristartja issa
 

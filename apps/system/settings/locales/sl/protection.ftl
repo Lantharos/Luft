@@ -87,10 +87,6 @@ settings-security-signed-startup = Podpisan zagon
 settings-security-signed-startup-on = Zagonski meni in sistem sta podpisana za ta računalnik
 settings-security-signed-startup-purpose = Računalnik lahko zažene samo programska oprema, podpisana zanj
 settings-security-signed-startup-restart = Začne veljati po vnovičnem zagonu
-settings-security-signed-startup-missed = Ključ ob zadnjem zagonu ni bil dodan
-settings-security-signed-startup-pending = Ob vnovičnem zagonu dodajte ključ na modrem zaslonu
-settings-security-signed-startup-missed-often = Ključ po več vnovičnih zagonih ni bil dodan
-settings-security-show-steps = Pokaži korake
 settings-security-try-again = Poskusi znova
 
 ## Security: games with anti-cheat
@@ -104,17 +100,10 @@ settings-security-anti-cheat-ready-description = Igre lahko preverijo, kako se j
 ## Security: steps on the blue startup screen
 
 settings-security-key-steps-remove = Ob vnovičnem zagonu odstranite ključe
-settings-security-key-steps-add = Ob vnovičnem zagonu dodajte ključ
 settings-security-key-steps-remove-description = Po vnovičnem zagonu se prikaže modri zaslon, ki vpraša o odstranitvi ključev. Čaka le 10 sekund, zato pritisnite katero koli tipko takoj, ko se prikaže.
-settings-security-key-steps-add-description = Po vnovičnem zagonu se prikaže modri zaslon, ki vpraša o novem ključu. Čaka le 10 sekund, zato pritisnite katero koli tipko takoj, ko se prikaže.
-settings-security-key-step-choose = Izberite { $option }, nato { $next }.
-settings-security-key-step-confirm = Izberite { $option }.
-settings-security-key-step-code = Vnesite spodnjo kodo in pritisnite { $key }.
-settings-security-key-step-reboot = Izberite { $option }.
 settings-security-key-enter = Enter
 settings-security-key-code = Koda { $code }
 settings-security-key-steps-remove-missed = Če ga zamudite, se računalnik zažene kot običajno in lahko poskusite znova tukaj.
-settings-security-key-steps-add-missed = Če ga zamudite, se računalnik zažene kot običajno, koraki pa se ob naslednjem vnovičnem zagonu znova prikažejo z novo kodo.
 settings-security-later = Pozneje
 settings-security-restart-now = Znova zaženi zdaj
 

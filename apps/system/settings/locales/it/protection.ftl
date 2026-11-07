@@ -85,10 +85,6 @@ settings-security-signed-startup = Avvio firmato
 settings-security-signed-startup-on = Il menu di avvio e il sistema sono firmati per questo computer
 settings-security-signed-startup-purpose = Consente di avviare questo computer solo con software firmato appositamente
 settings-security-signed-startup-restart = Entra in uso dopo il riavvio
-settings-security-signed-startup-missed = La chiave non è stata aggiunta all’ultimo riavvio
-settings-security-signed-startup-pending = Aggiungi la chiave nella schermata blu al riavvio
-settings-security-signed-startup-missed-often = La chiave non è stata aggiunta dopo alcuni riavvii
-settings-security-show-steps = Mostra i passaggi
 settings-security-try-again = Riprova
 
 ## Security: games with anti-cheat
@@ -102,17 +98,10 @@ settings-security-anti-cheat-ready-description = I giochi possono controllare co
 ## Security: steps on the blue startup screen
 
 settings-security-key-steps-remove = Rimuovi le chiavi al riavvio
-settings-security-key-steps-add = Aggiungi la chiave al riavvio
 settings-security-key-steps-remove-description = Dopo il riavvio, una schermata blu chiede se rimuovere le chiavi. Aspetta solo 10 secondi, quindi premi un tasto qualsiasi appena compare.
-settings-security-key-steps-add-description = Dopo il riavvio, una schermata blu chiede di una nuova chiave. Aspetta solo 10 secondi, quindi premi un tasto qualsiasi appena compare.
-settings-security-key-step-choose = Scegli { $option }, poi { $next }.
-settings-security-key-step-confirm = Scegli { $option }.
-settings-security-key-step-code = Digita il codice qui sotto e premi { $key }.
-settings-security-key-step-reboot = Scegli { $option }.
 settings-security-key-enter = Invio
 settings-security-key-code = Codice { $code }
 settings-security-key-steps-remove-missed = Se non fai in tempo, il computer si avvia come al solito e puoi riprovare da qui.
-settings-security-key-steps-add-missed = Se non fai in tempo, il computer si avvia come al solito e i passaggi ricompaiono al prossimo riavvio, con un nuovo codice.
 settings-security-later = Più tardi
 settings-security-restart-now = Riavvia ora
 

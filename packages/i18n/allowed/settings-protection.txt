@@ -1,2 +1,6 @@
-apps/system/settings/src/lib/panels/protection/security/protections/KeyStepsDialog.svelte	Enroll MOK
-apps/system/settings/src/lib/panels/protection/security/protections/KeyStepsDialog.svelte	Delete MOK
+apps/system/settings/src/lib/panels/protection/security/secureboot/shim.ts	Press any key to perform MOK management
+apps/system/settings/src/lib/panels/protection/security/secureboot/shim.ts	Password doesn't match
+apps/system/settings/src/lib/panels/protection/security/secureboot/shim.ts	Enroll MOK
+apps/system/settings/src/lib/panels/protection/security/secureboot/shim.ts	Enroll the key(s)?
+apps/system/settings/src/lib/panels/protection/security/secureboot/shim.ts	Delete MOK
+apps/system/settings/src/lib/panels/protection/security/secureboot/shim.ts	Delete the key(s)?

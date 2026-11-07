@@ -85,10 +85,6 @@ settings-security-signed-startup = İmzalı başlatma
 settings-security-signed-startup-on = Önyükleme menüsü ve sistem bu bilgisayar için imzalandı
 settings-security-signed-startup-purpose = Bilgisayarın yalnızca onun için imzalanmış yazılımlarla başlamasına izin verir
 settings-security-signed-startup-restart = Yeniden başlattıktan sonra kullanılmaya başlar
-settings-security-signed-startup-missed = Anahtar son yeniden başlatmada eklenmedi
-settings-security-signed-startup-pending = Yeniden başlattığınızda anahtarı mavi ekranda ekleyin
-settings-security-signed-startup-missed-often = Anahtar birkaç yeniden başlatmadan sonra da eklenmedi
-settings-security-show-steps = Adımları göster
 settings-security-try-again = Yeniden dene
 
 ## Security: games with anti-cheat
@@ -102,17 +98,10 @@ settings-security-anti-cheat-ready-description = Oyunlar bu bilgisayarın nasıl
 ## Security: steps on the blue startup screen
 
 settings-security-key-steps-remove = Yeniden başlattığınızda anahtarları kaldırın
-settings-security-key-steps-add = Yeniden başlattığınızda anahtarı ekleyin
 settings-security-key-steps-remove-description = Yeniden başlattıktan sonra mavi bir ekran anahtarların kaldırılmasını sorar. Bu ekran yalnızca 10 saniye bekler, bu yüzden görünür görünmez herhangi bir tuşa basın.
-settings-security-key-steps-add-description = Yeniden başlattıktan sonra mavi bir ekran yeni bir anahtarı sorar. Bu ekran yalnızca 10 saniye bekler, bu yüzden görünür görünmez herhangi bir tuşa basın.
-settings-security-key-step-choose = { $option } seçeneğini, ardından { $next } seçeneğini seçin.
-settings-security-key-step-confirm = { $option } seçeneğini seçin.
-settings-security-key-step-code = Aşağıdaki kodu yazıp { $key } tuşuna basın.
-settings-security-key-step-reboot = { $option } seçeneğini seçin.
 settings-security-key-enter = Enter
 settings-security-key-code = Kod { $code }
 settings-security-key-steps-remove-missed = Kaçırırsanız bilgisayarınız her zamanki gibi başlar ve burada yeniden deneyebilirsiniz.
-settings-security-key-steps-add-missed = Kaçırırsanız bilgisayarınız her zamanki gibi başlar ve adımlar bir sonraki yeniden başlatmada yeni bir kodla yeniden gösterilir.
 settings-security-later = Daha sonra
 settings-security-restart-now = Şimdi yeniden başlat
 

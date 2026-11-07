@@ -13,7 +13,7 @@
 	import type { SecurityState } from './state.svelte';
 	import { summarize } from './summary';
 
-	type Page = 'encryption' | 'keyring';
+	type Page = 'encryption' | 'keyring' | 'secure-boot';
 
 	interface Props {
 		security: SecurityState;
@@ -35,17 +35,23 @@
 </script>
 
 {#if summary}
-	<HeroCard title={summary.headline} status={summary.sentence} icon={summary.safe ? ShieldCheck : ShieldAlert} good={summary.safe} />
+	<HeroCard title={summary.headline} status={summary.sentence} icon={summary.safe ? ShieldCheck : ShieldAlert} good={summary.safe}>
+		{#snippet actions()}
+			{#if summary.secureBoot}
+				<button type="button" class="button primary" onclick={() => onopen('secure-boot')}>{t('settings-protection-set-up')}</button>
+			{/if}
+		{/snippet}
+	</HeroCard>
 {/if}
 
 {#if security.loaded}
 	<Section>
 		{#if security.trust?.disk.device}
-			<ActionRow title={t('settings-encryption')} icon={HardDrive} description={encryptionSummary(security.trust.disk)} onclick={() => onopen('encryption')} />
+			<ActionRow title={t('settings-encryption')} icon={HardDrive} description={encryptionSummary(security.trust.disk, security.trust.startup.withoutKey)} onclick={() => onopen('encryption')} />
 		{/if}
 		<ActionRow title={t('settings-passwords-title')} icon={KeyRound} description={keyringSummary()} onclick={() => onopen('keyring')} />
 	</Section>
 	{#if protections}
-		<ProtectionsSection {security} />
+		<ProtectionsSection {security} onsecureboot={() => onopen('secure-boot')} />
 	{/if}
 {/if}

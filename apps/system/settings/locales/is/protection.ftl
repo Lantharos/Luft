@@ -85,10 +85,6 @@ settings-security-signed-startup = Undirrituð ræsing
 settings-security-signed-startup-on = Ræsivalmyndin og kerfið eru undirrituð fyrir þessa tölvu
 settings-security-signed-startup-purpose = Leyfir aðeins hugbúnaði sem er undirritaður fyrir þessa tölvu að ræsa hana
 settings-security-signed-startup-restart = Tekur gildi eftir endurræsingu
-settings-security-signed-startup-missed = Lyklinum var ekki bætt við í síðustu endurræsingu
-settings-security-signed-startup-pending = Bættu lyklinum við á bláa skjánum þegar þú endurræsir
-settings-security-signed-startup-missed-often = Lyklinum var ekki bætt við eftir nokkrar endurræsingar
-settings-security-show-steps = Sýna skref
 settings-security-try-again = Reyna aftur
 
 ## Security: games with anti-cheat
@@ -102,17 +98,10 @@ settings-security-anti-cheat-ready-description = Leikir geta athugað hvernig þ
 ## Security: steps on the blue startup screen
 
 settings-security-key-steps-remove = Fjarlægðu lyklana þegar þú endurræsir
-settings-security-key-steps-add = Bættu lyklinum við þegar þú endurræsir
 settings-security-key-steps-remove-description = Eftir endurræsingu birtist blár skjár sem spyr um að fjarlægja lykla. Hann bíður aðeins í 10 sekúndur, svo ýttu á einhvern lykil um leið og hann birtist.
-settings-security-key-steps-add-description = Eftir endurræsingu birtist blár skjár sem spyr um nýjan lykil. Hann bíður aðeins í 10 sekúndur, svo ýttu á einhvern lykil um leið og hann birtist.
-settings-security-key-step-choose = Veldu { $option } og svo { $next }.
-settings-security-key-step-confirm = Veldu { $option }.
-settings-security-key-step-code = Sláðu inn kóðann hér fyrir neðan og ýttu á { $key }.
-settings-security-key-step-reboot = Veldu { $option }.
 settings-security-key-enter = Enter
 settings-security-key-code = Kóði { $code }
 settings-security-key-steps-remove-missed = Ef þú missir af honum ræsist tölvan eins og venjulega og þú getur reynt aftur hér.
-settings-security-key-steps-add-missed = Ef þú missir af honum ræsist tölvan eins og venjulega og skrefin birtast aftur við næstu endurræsingu, með nýjum kóða.
 settings-security-later = Seinna
 settings-security-restart-now = Endurræsa núna
 

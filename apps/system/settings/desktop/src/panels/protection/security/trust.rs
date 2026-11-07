@@ -36,6 +36,7 @@ pub struct Startup {
     installed: bool,
     measured: bool,
     available: bool,
+    without_key: bool,
 }
 
 #[derive(Serialize, Type)]
@@ -173,6 +174,7 @@ fn startup(map: &Map) -> Startup {
         installed: flag(map, "Installed"),
         measured: flag(map, "Measured"),
         available: flag(map, "Available"),
+        without_key: flag(map, "WithoutKey"),
     }
 }
 

@@ -85,10 +85,6 @@ settings-security-signed-startup = Démarrage signé
 settings-security-signed-startup-on = Le menu de démarrage et le système sont signés pour cet ordinateur
 settings-security-signed-startup-purpose = Seuls les logiciels signés pour cet ordinateur peuvent le démarrer
 settings-security-signed-startup-restart = Pris en compte après le redémarrage
-settings-security-signed-startup-missed = La clé n’a pas été ajoutée au dernier redémarrage
-settings-security-signed-startup-pending = Ajoutez la clé sur l’écran bleu au redémarrage
-settings-security-signed-startup-missed-often = La clé n’a pas été ajoutée après plusieurs redémarrages
-settings-security-show-steps = Afficher les étapes
 settings-security-try-again = Réessayer
 
 ## Security: games with anti-cheat
@@ -102,17 +98,10 @@ settings-security-anti-cheat-ready-description = Les jeux peuvent vérifier comm
 ## Security: steps on the blue startup screen
 
 settings-security-key-steps-remove = Supprimer les clés au redémarrage
-settings-security-key-steps-add = Ajouter la clé au redémarrage
 settings-security-key-steps-remove-description = Après le redémarrage, un écran bleu propose de supprimer des clés. Il n’attend que 10 secondes : appuyez sur une touche dès qu’il apparaît.
-settings-security-key-steps-add-description = Après le redémarrage, un écran bleu propose d’ajouter une nouvelle clé. Il n’attend que 10 secondes : appuyez sur une touche dès qu’il apparaît.
-settings-security-key-step-choose = Choisissez { $option }, puis { $next }.
-settings-security-key-step-confirm = Choisissez { $option }.
-settings-security-key-step-code = Tapez le code ci-dessous et appuyez sur { $key }.
-settings-security-key-step-reboot = Choisissez { $option }.
 settings-security-key-enter = Entrée
 settings-security-key-code = Code { $code }
 settings-security-key-steps-remove-missed = Si vous le manquez, l’ordinateur démarre normalement et vous pourrez réessayer ici.
-settings-security-key-steps-add-missed = Si vous le manquez, l’ordinateur démarre normalement et les étapes s’afficheront de nouveau au prochain redémarrage, avec un nouveau code.
 settings-security-later = Plus tard
 settings-security-restart-now = Redémarrer maintenant
 

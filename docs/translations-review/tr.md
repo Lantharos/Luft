@@ -52,7 +52,6 @@ Strings in Luft's Turkish translation that a native speaker should check: terms 
 - `apps/system/settings/locales/tr/protection.ftl` `settings-encryption-passphrase-title` (and every passphrase string, also in setup): "Disk parolası seçin" — "passphrase" is rendered as "disk parolası" to keep it apart from the account "parola"; check it reads naturally.
 - `apps/system/settings/locales/tr/protection.ftl` `settings-privacy-screen-off-after`: "{ $duration } sonra" — assumes $duration is a bare noun phrase like "5 dakika"; check with real values.
 - `apps/system/settings/locales/tr/protection.ftl` `settings-encryption-drive-encrypting-paused`: "Bir sürücü şifreleniyor, { $percent } noktasında duraklatıldı" — "noktasında" avoids a suffix on the percent; may sound stiff.
-- `apps/system/settings/locales/tr/protection.ftl` `settings-security-key-step-choose`: "{ $option } seçeneğini, ardından { $next } seçeneğini seçin." — placeables are English MokManager option names; "seçeneğini seçin" is repetitive, check for a smoother verb.
 - `apps/system/settings/locales/tr/protection.ftl` `settings-security-anti-cheat`: "Hile önleyicili oyunlar" — no settled Turkish term for anti-cheat; some gamers just say "anti-cheat".
 - `apps/system/settings/locales/tr/protection.ftl` `settings-passwords-stores`: "Uygulama oturumları" — "sign-ins" stored by apps; "oturum" might be read as a running session.
 - `apps/system/settings/locales/tr/personalization.ftl` `settings-appearance-icons-clear`: "Şeffaf" — icon style "Clear" (glass-like); check it isn't read as "clear/empty".

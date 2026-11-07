@@ -1558,6 +1558,7 @@ export type Startup = {
 	installed: boolean,
 	measured: boolean,
 	available: boolean,
+	withoutKey: boolean,
 };
 
 export type Status = {

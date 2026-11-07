@@ -89,6 +89,7 @@ settings-security-needed-recovery-key-description = Link the security chip again
 settings-security-firmware-ready-description = Firmware updates for your hardware are ready in Updates.
 settings-security-encrypted-secure-boot = Your disk is encrypted and Secure Boot checks how it starts.
 settings-security-encrypted = Your disk is encrypted.
+settings-security-secure-boot-unfinished = Secure Boot isn’t set up for Luft yet
 
 ## Security: protections
 
@@ -111,11 +112,9 @@ settings-security-signed-startup = Signed startup
 settings-security-signed-startup-on = The boot menu and system are signed for this computer
 settings-security-signed-startup-purpose = Only lets software signed for this computer start it
 settings-security-signed-startup-restart = Starts being used after you restart
-settings-security-signed-startup-missed = The key wasn’t added at the last restart
-settings-security-signed-startup-pending = Add the key on the blue screen when you restart
-settings-security-signed-startup-missed-often = The key wasn’t added after a few restarts
-# Button that shows the steps for adding the key again
-settings-security-show-steps = Show steps
+settings-security-signed-startup-finish = Finish setting up Secure Boot on the blue screen when you restart
+settings-security-signed-startup-retry = The blue screen was missed. It shows again when you restart
+settings-security-signed-startup-gave-up = Secure Boot wasn’t set up after a few restarts
 settings-security-try-again = Try again
 
 ## Security: games with anti-cheat
@@ -127,24 +126,48 @@ settings-security-anti-cheat-removing = Remove the other keys on the blue screen
 settings-security-anti-cheat-luft-key = Epic still has to add Luft’s key to its list
 settings-security-anti-cheat-ready-description = Games can check how this computer started
 
-## Security: steps on the blue startup screen
-# The blue screen (MokManager) is always in English. Its option names are passed in as $option, $next and $key
-# and shown in bold, so keep each placeable exactly once.
+## Security: setting up Secure Boot for Luft
+# Setting up Secure Boot means adding Luft's signing key to the computer on a blue firmware screen (shim's MokManager)
+# after a restart, with an eight-digit code. Don't call it a "key" here, so it isn't confused with the recovery key.
 
+settings-secure-boot-not-set-up = Not set up for Luft yet
+settings-secure-boot-off = Secure Boot is off
+settings-secure-boot-off-description = It can be turned on in your computer’s firmware settings
+settings-secure-boot-ready = Set up for Luft
+settings-secure-boot-pending-title = Finish setting up Secure Boot
+settings-secure-boot-pending-description = Restart, then follow the steps below on the blue screen that appears
+settings-secure-boot-missed-description = The blue screen was missed last time. Restart and try again with the same code
+settings-secure-boot-none-title = Set up Secure Boot for Luft
+settings-secure-boot-none-description = It takes one restart and a code you type on a blue screen
+settings-secure-boot-gave-up-description = It wasn’t finished after a few restarts. Try again whenever you’re ready
+settings-secure-boot-without-key = Until it’s set up, Luft starts without its boot menu, and the disk may ask for its recovery key after updates.
+settings-secure-boot-without-key-unencrypted = Until it’s set up, Luft starts without its boot menu.
+settings-secure-boot-steps = On the blue screen
+settings-secure-boot-steps-description = The blue screen is always in English. Use the arrow keys and Enter there.
+settings-secure-boot-code-hidden = You need the code on the blue screen.
+# Button that shows the eight-digit code for the blue screen
+settings-secure-boot-show-code = Show code
+settings-secure-boot-code-hint = Type all eight digits, without a space.
+settings-secure-boot-missed-note = If you miss it, Luft still starts, though the disk may ask for its recovery key once. The code stays the same, so you can try again.
+
+## Security: steps on the blue startup screen
+# The blue screen (MokManager) is always in English. Its words are passed in as $screen, $option, $question, $yes,
+# $no, $prompt, $error and $ok and shown in bold, so keep each placeable exactly once.
+
+# $screen is the sentence the blue screen shows while it waits for a key press
+settings-secure-boot-step-press = When the blue screen says { $screen }, press any key. It waits a minute.
+settings-secure-boot-step-choose = Choose { $option }.
+settings-secure-boot-step-confirm = At { $question }, choose { $yes }. { $no } is selected first.
+# $key is the name of the Enter key
+settings-secure-boot-step-password = At { $prompt }, type the code and press { $key }. Nothing shows while you type.
+settings-secure-boot-wrong-code = If it says { $error }, choose { $ok } and type the code again.
 settings-security-key-steps-remove = Remove the keys when you restart
-settings-security-key-steps-add = Add the key when you restart
-settings-security-key-steps-remove-description = After you restart, a blue screen asks about removing keys. It only waits 10 seconds, so press any key as soon as it appears.
-settings-security-key-steps-add-description = After you restart, a blue screen asks about a new key. It only waits 10 seconds, so press any key as soon as it appears.
-settings-security-key-step-choose = Choose { $option }, then { $next }.
-settings-security-key-step-confirm = Choose { $option }.
-settings-security-key-step-code = Type the code below and press { $key }.
-settings-security-key-step-reboot = Choose { $option }.
+settings-security-key-steps-remove-description = After you restart, a blue screen asks about removing keys.
 # Name of the Enter key on the keyboard
 settings-security-key-enter = Enter
 # Screen reader label for the code shown in large digits
 settings-security-key-code = Code { $code }
 settings-security-key-steps-remove-missed = If you miss it, your computer starts as usual and you can try again here.
-settings-security-key-steps-add-missed = If you miss it, your computer starts as usual and the steps show again at the next restart, with a new code.
 # Button: close the dialog and restart another time
 settings-security-later = Later
 settings-security-restart-now = Restart now
@@ -222,6 +245,7 @@ settings-encryption-encrypt = Encrypt
 settings-encryption-making-room = Making room
 settings-encryption-unlocks-chip-pin = Unlocks with the security chip and your PIN
 settings-encryption-unlocks-chip = Unlocks by itself with the security chip
+settings-encryption-unlocks-without-secure-boot = May ask for its recovery key until Secure Boot is set up
 settings-encryption-unlocks-passphrase = Asks for your passphrase at startup
 # A security key is a USB or NFC hardware key, such as a YubiKey
 settings-encryption-unlocks-security-key = Unlocks with your security key at startup

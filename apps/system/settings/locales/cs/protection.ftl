@@ -87,10 +87,6 @@ settings-security-signed-startup = Podepsané spouštění
 settings-security-signed-startup-on = Spouštěcí nabídka a systém jsou podepsané pro tento počítač
 settings-security-signed-startup-purpose = Počítač spustí jen software podepsaný pro tento počítač
 settings-security-signed-startup-restart = Začne se používat po restartu
-settings-security-signed-startup-missed = Při posledním restartu se klíč nepřidal
-settings-security-signed-startup-pending = Při restartu přidejte klíč na modré obrazovce
-settings-security-signed-startup-missed-often = Klíč se nepřidal ani po několika restartech
-settings-security-show-steps = Zobrazit postup
 settings-security-try-again = Zkusit znovu
 
 ## Security: games with anti-cheat
@@ -104,17 +100,10 @@ settings-security-anti-cheat-ready-description = Hry můžou ověřit, jak se te
 ## Security: steps on the blue startup screen
 
 settings-security-key-steps-remove = Odebrání klíčů při restartu
-settings-security-key-steps-add = Přidání klíče při restartu
 settings-security-key-steps-remove-description = Po restartu se modrá obrazovka zeptá na odebrání klíčů. Čeká jen 10 sekund, proto hned, jak se objeví, stiskněte libovolnou klávesu.
-settings-security-key-steps-add-description = Po restartu se modrá obrazovka zeptá na nový klíč. Čeká jen 10 sekund, proto hned, jak se objeví, stiskněte libovolnou klávesu.
-settings-security-key-step-choose = Zvolte { $option } a potom { $next }.
-settings-security-key-step-confirm = Zvolte { $option }.
-settings-security-key-step-code = Zadejte kód níže a stiskněte { $key }.
-settings-security-key-step-reboot = Zvolte { $option }.
 settings-security-key-enter = Enter
 settings-security-key-code = Kód { $code }
 settings-security-key-steps-remove-missed = Pokud to nestihnete, počítač se spustí jako obvykle a můžete to zkusit znovu tady.
-settings-security-key-steps-add-missed = Pokud to nestihnete, počítač se spustí jako obvykle a postup se zobrazí znovu při příštím restartu s novým kódem.
 settings-security-later = Později
 settings-security-restart-now = Restartovat
 

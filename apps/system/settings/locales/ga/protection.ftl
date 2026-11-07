@@ -88,10 +88,6 @@ settings-security-signed-startup = Tosú sínithe
 settings-security-signed-startup-on = Tá an roghchlár tosaithe agus an córas sínithe don ríomhaire seo
 settings-security-signed-startup-purpose = Ní ligeann sé ach do bhogearraí atá sínithe don ríomhaire seo é a thosú
 settings-security-signed-startup-restart = Úsáidfear é tar éis duit atosú
-settings-security-signed-startup-missed = Níor cuireadh an eochair leis ag an atosú deireanach
-settings-security-signed-startup-pending = Cuir an eochair leis ar an scáileán gorm nuair a atosaíonn tú
-settings-security-signed-startup-missed-often = Níor cuireadh an eochair leis tar éis roinnt atosuithe
-settings-security-show-steps = Taispeáin na céimeanna
 settings-security-try-again = Bain triail eile as
 
 ## Security: games with anti-cheat
@@ -105,17 +101,10 @@ settings-security-anti-cheat-ready-description = Is féidir le cluichí seiceái
 ## Security: steps on the blue startup screen
 
 settings-security-key-steps-remove = Bain na heochracha nuair a atosaíonn tú
-settings-security-key-steps-add = Cuir an eochair leis nuair a atosaíonn tú
 settings-security-key-steps-remove-description = Tar éis duit atosú, fiafróidh scáileán gorm faoi eochracha a bhaint. Ní fhanann sé ach 10 soicind, mar sin brúigh eochair ar bith chomh luath is a fheiceann tú é.
-settings-security-key-steps-add-description = Tar éis duit atosú, fiafróidh scáileán gorm faoi eochair nua. Ní fhanann sé ach 10 soicind, mar sin brúigh eochair ar bith chomh luath is a fheiceann tú é.
-settings-security-key-step-choose = Roghnaigh { $option }, ansin { $next }.
-settings-security-key-step-confirm = Roghnaigh { $option }.
-settings-security-key-step-code = Clóscríobh an cód thíos agus brúigh { $key }.
-settings-security-key-step-reboot = Roghnaigh { $option }.
 settings-security-key-enter = Enter
 settings-security-key-code = Cód { $code }
 settings-security-key-steps-remove-missed = Má chailleann tú é, tosóidh do ríomhaire mar is gnáth agus is féidir leat triail eile a bhaint as anseo.
-settings-security-key-steps-add-missed = Má chailleann tú é, tosóidh do ríomhaire mar is gnáth agus taispeánfar na céimeanna arís ag an gcéad atosú eile, le cód nua.
 settings-security-later = Ar ball
 settings-security-restart-now = Atosaigh anois
 

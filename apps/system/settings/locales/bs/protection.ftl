@@ -86,10 +86,6 @@ settings-security-signed-startup = Potpisano pokretanje
 settings-security-signed-startup-on = Meni za pokretanje i sistem su potpisani za ovaj računar
 settings-security-signed-startup-purpose = Dozvoljava pokretanje samo softvera potpisanog za ovaj računar
 settings-security-signed-startup-restart = Počinje se koristiti nakon ponovnog pokretanja
-settings-security-signed-startup-missed = Ključ nije dodan pri posljednjem ponovnom pokretanju
-settings-security-signed-startup-pending = Dodajte ključ na plavom ekranu pri ponovnom pokretanju
-settings-security-signed-startup-missed-often = Ključ nije dodan ni nakon nekoliko ponovnih pokretanja
-settings-security-show-steps = Prikaži korake
 settings-security-try-again = Pokušaj ponovo
 
 ## Security: games with anti-cheat
@@ -103,17 +99,10 @@ settings-security-anti-cheat-ready-description = Igre mogu provjeriti kako se ov
 ## Security: steps on the blue startup screen
 
 settings-security-key-steps-remove = Uklonite ključeve pri ponovnom pokretanju
-settings-security-key-steps-add = Dodajte ključ pri ponovnom pokretanju
 settings-security-key-steps-remove-description = Nakon ponovnog pokretanja, plavi ekran pita o uklanjanju ključeva. Čeka samo 10 sekundi, zato pritisnite bilo koju tipku čim se pojavi.
-settings-security-key-steps-add-description = Nakon ponovnog pokretanja, plavi ekran pita o novom ključu. Čeka samo 10 sekundi, zato pritisnite bilo koju tipku čim se pojavi.
-settings-security-key-step-choose = Odaberite { $option }, zatim { $next }.
-settings-security-key-step-confirm = Odaberite { $option }.
-settings-security-key-step-code = Upišite kôd ispod i pritisnite { $key }.
-settings-security-key-step-reboot = Odaberite { $option }.
 settings-security-key-enter = Enter
 settings-security-key-code = Kôd { $code }
 settings-security-key-steps-remove-missed = Ako to propustite, računar se pokreće kao i obično i ovdje možete pokušati ponovo.
-settings-security-key-steps-add-missed = Ako to propustite, računar se pokreće kao i obično, a koraci se ponovo prikazuju pri sljedećem pokretanju, s novim kôdom.
 settings-security-later = Kasnije
 settings-security-restart-now = Ponovo pokreni sada
 

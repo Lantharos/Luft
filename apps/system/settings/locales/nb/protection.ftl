@@ -85,10 +85,6 @@ settings-security-signed-startup = Signert oppstart
 settings-security-signed-startup-on = Oppstartsmenyen og systemet er signert for denne datamaskinen
 settings-security-signed-startup-purpose = Lar bare programvare som er signert for denne datamaskinen, starte den
 settings-security-signed-startup-restart = Tas i bruk når du starter på nytt
-settings-security-signed-startup-missed = Nøkkelen ble ikke lagt til ved forrige omstart
-settings-security-signed-startup-pending = Legg til nøkkelen på den blå skjermen når du starter på nytt
-settings-security-signed-startup-missed-often = Nøkkelen ble ikke lagt til etter flere omstarter
-settings-security-show-steps = Vis trinnene
 settings-security-try-again = Prøv igjen
 
 ## Security: games with anti-cheat
@@ -102,17 +98,10 @@ settings-security-anti-cheat-ready-description = Spill kan kontrollere hvordan d
 ## Security: steps on the blue startup screen
 
 settings-security-key-steps-remove = Fjern nøklene når du starter på nytt
-settings-security-key-steps-add = Legg til nøkkelen når du starter på nytt
 settings-security-key-steps-remove-description = Etter omstarten spør en blå skjerm om å fjerne nøkler. Den venter bare i 10 sekunder, så trykk på en hvilken som helst tast så snart den vises.
-settings-security-key-steps-add-description = Etter omstarten spør en blå skjerm om en ny nøkkel. Den venter bare i 10 sekunder, så trykk på en hvilken som helst tast så snart den vises.
-settings-security-key-step-choose = Velg { $option } og deretter { $next }.
-settings-security-key-step-confirm = Velg { $option }.
-settings-security-key-step-code = Skriv inn koden nedenfor, og trykk på { $key }.
-settings-security-key-step-reboot = Velg { $option }.
 settings-security-key-enter = Enter
 settings-security-key-code = Kode { $code }
 settings-security-key-steps-remove-missed = Hvis du går glipp av den, starter datamaskinen som vanlig, og du kan prøve igjen her.
-settings-security-key-steps-add-missed = Hvis du går glipp av den, starter datamaskinen som vanlig, og trinnene vises igjen ved neste omstart, med en ny kode.
 settings-security-later = Senere
 settings-security-restart-now = Start på nytt nå
 

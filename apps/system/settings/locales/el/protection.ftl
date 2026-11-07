@@ -85,10 +85,6 @@ settings-security-signed-startup = Υπογεγραμμένη εκκίνηση
 settings-security-signed-startup-on = Το μενού εκκίνησης και το σύστημα είναι υπογεγραμμένα για αυτόν τον υπολογιστή
 settings-security-signed-startup-purpose = Επιτρέπει να ξεκινά μόνο λογισμικό υπογεγραμμένο για αυτόν τον υπολογιστή
 settings-security-signed-startup-restart = Τίθεται σε χρήση μετά την επανεκκίνηση
-settings-security-signed-startup-missed = Το κλειδί δεν προστέθηκε στην τελευταία επανεκκίνηση
-settings-security-signed-startup-pending = Προσθέστε το κλειδί στη μπλε οθόνη κατά την επανεκκίνηση
-settings-security-signed-startup-missed-often = Το κλειδί δεν προστέθηκε μετά από αρκετές επανεκκινήσεις
-settings-security-show-steps = Εμφάνιση βημάτων
 settings-security-try-again = Επανάληψη
 
 ## Security: games with anti-cheat
@@ -102,17 +98,10 @@ settings-security-anti-cheat-ready-description = Τα παιχνίδια μπο�
 ## Security: steps on the blue startup screen
 
 settings-security-key-steps-remove = Αφαίρεση των κλειδιών κατά την επανεκκίνηση
-settings-security-key-steps-add = Προσθήκη του κλειδιού κατά την επανεκκίνηση
 settings-security-key-steps-remove-description = Μετά την επανεκκίνηση, μια μπλε οθόνη ρωτά για την αφαίρεση κλειδιών. Περιμένει μόνο 10 δευτερόλεπτα, οπότε πατήστε οποιοδήποτε πλήκτρο μόλις εμφανιστεί.
-settings-security-key-steps-add-description = Μετά την επανεκκίνηση, μια μπλε οθόνη ρωτά για ένα νέο κλειδί. Περιμένει μόνο 10 δευτερόλεπτα, οπότε πατήστε οποιοδήποτε πλήκτρο μόλις εμφανιστεί.
-settings-security-key-step-choose = Επιλέξτε { $option } και μετά { $next }.
-settings-security-key-step-confirm = Επιλέξτε { $option }.
-settings-security-key-step-code = Πληκτρολογήστε τον παρακάτω κωδικό και πατήστε { $key }.
-settings-security-key-step-reboot = Επιλέξτε { $option }.
 settings-security-key-enter = Enter
 settings-security-key-code = Κωδικός { $code }
 settings-security-key-steps-remove-missed = Αν τη χάσετε, ο υπολογιστής ξεκινά κανονικά και μπορείτε να δοκιμάσετε ξανά εδώ.
-settings-security-key-steps-add-missed = Αν τη χάσετε, ο υπολογιστής ξεκινά κανονικά και τα βήματα εμφανίζονται ξανά στην επόμενη επανεκκίνηση, με νέο κωδικό.
 settings-security-later = Αργότερα
 settings-security-restart-now = Επανεκκίνηση τώρα
 

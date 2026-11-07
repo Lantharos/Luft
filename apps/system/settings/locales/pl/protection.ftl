@@ -87,10 +87,6 @@ settings-security-signed-startup = Podpisane uruchamianie
 settings-security-signed-startup-on = Menu rozruchu i system są podpisane dla tego komputera
 settings-security-signed-startup-purpose = Pozwala uruchamiać ten komputer tylko oprogramowaniu podpisanemu dla niego
 settings-security-signed-startup-restart = Zacznie działać po ponownym uruchomieniu
-settings-security-signed-startup-missed = Klucz nie został dodany przy ostatnim ponownym uruchomieniu
-settings-security-signed-startup-pending = Dodaj klucz na niebieskim ekranie po ponownym uruchomieniu
-settings-security-signed-startup-missed-often = Klucz nie został dodany mimo kilku ponownych uruchomień
-settings-security-show-steps = Pokaż kroki
 settings-security-try-again = Spróbuj ponownie
 
 ## Security: games with anti-cheat
@@ -104,17 +100,10 @@ settings-security-anti-cheat-ready-description = Gry mogą sprawdzić, jak uruch
 ## Security: steps on the blue startup screen
 
 settings-security-key-steps-remove = Usuń klucze po ponownym uruchomieniu
-settings-security-key-steps-add = Dodaj klucz po ponownym uruchomieniu
 settings-security-key-steps-remove-description = Po ponownym uruchomieniu niebieski ekran zapyta o usunięcie kluczy. Czeka tylko 10 sekund, więc naciśnij dowolny klawisz, gdy tylko się pojawi.
-settings-security-key-steps-add-description = Po ponownym uruchomieniu niebieski ekran zapyta o nowy klucz. Czeka tylko 10 sekund, więc naciśnij dowolny klawisz, gdy tylko się pojawi.
-settings-security-key-step-choose = Wybierz { $option }, a następnie { $next }.
-settings-security-key-step-confirm = Wybierz { $option }.
-settings-security-key-step-code = Wpisz poniższy kod i naciśnij { $key }.
-settings-security-key-step-reboot = Wybierz { $option }.
 settings-security-key-enter = Enter
 settings-security-key-code = Kod { $code }
 settings-security-key-steps-remove-missed = Jeśli nie zdążysz, komputer uruchomi się normalnie i możesz spróbować ponownie tutaj.
-settings-security-key-steps-add-missed = Jeśli nie zdążysz, komputer uruchomi się normalnie, a kroki pojawią się ponownie przy następnym uruchomieniu, z nowym kodem.
 settings-security-later = Później
 settings-security-restart-now = Uruchom ponownie teraz
 

@@ -19,6 +19,7 @@ members = [
     "apps/system/signin/desktop",
     "apps/store/soundboard/desktop",
     "apps/system/tern/desktop",
+    "extensions/pigeon/helper",
     "extensions/tailor/helper",
     "sushi/crates/sushi",
     "sushi/crates/sushi-scene",
@@ -176,6 +177,7 @@ anyhow = "1.0.104"
 argon2 = { version = "0.6.0", default-features = false, features = ["zeroize"] }
 backhand = { version = "0.25.5", default-features = false }
 base64 = "0.23.1"
+bytes = "1.12.1"
 bzip2 = "0.6.1"
 calamine = "0.38.0"
 cbc = { version = "0.2.1", features = ["alloc"] }
@@ -215,6 +217,10 @@ hickory-resolver = "0.26.3"
 hkdf = "0.13.0"
 hmac = "0.13.0"
 htmd = "0.5.6"
+http-body = "1.1.0"
+http-body-util = "0.1.5"
+hyper = { version = "1.12.0", default-features = false }
+hyper-util = { version = "0.1.21", default-features = false }
 icu_locale_core = "2.3.0"
 icu_time = { version = "2.3.0", default-features = false }
 ignore = "0.4.33"
@@ -264,6 +270,7 @@ pulldown-cmark = { version = "0.13.6", default-features = false, features = ["ht
 pulseaudio = "0.3.2"
 quick-xml = "0.42.0"
 quote = "1.0.47"
+rcgen = { version = "0.14.10", default-features = false }
 rand = "0.10.3"
 raw-window-handle = "0.6.2"
 rayon = "1.12.0"
@@ -299,6 +306,7 @@ tempfile = "3.27.0"
 time = "0.3.55"
 tiny-skia = { version = "0.12.0", default-features = false }
 tokio = { version = "1.54.0", default-features = false }
+tokio-rustls = { version = "0.26.6", default-features = false }
 toml = "1.1.8"
 toml_edit = "0.25.17"
 tss-esapi = "7.7.0"

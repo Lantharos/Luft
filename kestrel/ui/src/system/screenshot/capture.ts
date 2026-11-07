@@ -28,6 +28,16 @@ export interface CursorCapture {
 
 const NO_CURSOR: CursorCapture = { texture: null, x: 0, y: 0, scale: 1 };
 
+const SCREENSHOTS_MARK = 'xattr::luft.screenshots';
+
+function markScreenshotsFolder(dir: Gio.File) {
+  try {
+    dir.set_attribute_string(SCREENSHOTS_MARK, '1', Gio.FileQueryInfoFlags.NONE, null);
+  } catch (e) {
+    if (!(e as GLib.Error).matches(Gio.IOErrorEnum, Gio.IOErrorEnum.NOT_SUPPORTED)) throw e;
+  }
+}
+
 function makeScreenshotsFolder(): Gio.File {
   const dir = Gio.File.new_for_path(GLib.build_filenamev([
     GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_PICTURES) || GLib.get_home_dir(),
@@ -39,6 +49,7 @@ function makeScreenshotsFolder(): Gio.File {
   } catch (e) {
     if (!(e as GLib.Error).matches(Gio.IOErrorEnum, Gio.IOErrorEnum.EXISTS)) throw e;
   }
+  markScreenshotsFolder(dir);
   return dir;
 }
 

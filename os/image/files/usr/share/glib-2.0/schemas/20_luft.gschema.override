@@ -13,6 +13,11 @@ cursor-theme='Bibata-Modern-Classic'
 [org.gnome.desktop.screensaver]
 restart-enabled=true
 
+[org.gnome.desktop.privacy]
+remove-old-trash-files=true
+remove-old-temp-files=true
+old-files-age=uint32 30
+
 [org.gnome.desktop.sound]
 theme-name='luft'
 

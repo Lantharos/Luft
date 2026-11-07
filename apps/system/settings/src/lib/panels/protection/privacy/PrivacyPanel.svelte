@@ -12,6 +12,7 @@
 	type Session = { 'idle-delay': number };
 	type Location = { enabled: boolean };
 	type Notifications = { 'show-in-lock-screen': boolean };
+	type Housekeeping = { 'remove-old-screenshots': boolean };
 	type Privacy = {
 		'disable-camera': boolean;
 		'disable-microphone': boolean;
@@ -26,6 +27,7 @@
 	const session = useSettings<Session>('org.gnome.desktop.session', ['idle-delay']);
 	const location = useSettings<Location>('org.gnome.system.location', ['enabled']);
 	const notifications = useSettings<Notifications>('org.gnome.desktop.notifications', ['show-in-lock-screen']);
+	const housekeeping = useSettings<Housekeeping>('com.lantharos.kestrel.housekeeping', ['remove-old-screenshots']);
 	const privacy = useSettings<Privacy>('org.gnome.desktop.privacy', [
 		'disable-camera',
 		'disable-microphone',
@@ -54,7 +56,11 @@
 	let locating = $derived(location.values.enabled ?? false);
 	let camera = $derived(!(privacy.values['disable-camera'] ?? false));
 	let remembering = $derived(privacy.values['remember-recent-files'] ?? true);
-	let cleaning = $derived((privacy.values['remove-old-trash-files'] ?? false) || (privacy.values['remove-old-temp-files'] ?? false));
+	let cleaning = $derived(
+		(privacy.values['remove-old-trash-files'] ?? true) ||
+			(privacy.values['remove-old-temp-files'] ?? true) ||
+			(housekeeping.values['remove-old-screenshots'] ?? true)
+	);
 
 	async function clear() {
 		await commands.privacyClearHistory();
@@ -122,15 +128,22 @@
 	<Row title={t('settings-privacy-empty-trash')}>
 		<Switch
 			label={t('settings-privacy-empty-trash')}
-			checked={privacy.values['remove-old-trash-files'] ?? false}
+			checked={privacy.values['remove-old-trash-files'] ?? true}
 			onchange={(on) => privacy.set('remove-old-trash-files', on)}
 		/>
 	</Row>
 	<Row title={t('settings-privacy-delete-temp')} description={t('settings-privacy-delete-temp-hint')}>
 		<Switch
 			label={t('settings-privacy-delete-temp')}
-			checked={privacy.values['remove-old-temp-files'] ?? false}
+			checked={privacy.values['remove-old-temp-files'] ?? true}
 			onchange={(on) => privacy.set('remove-old-temp-files', on)}
+		/>
+	</Row>
+	<Row title={t('settings-privacy-delete-screenshots')} description={t('settings-privacy-delete-screenshots-hint')}>
+		<Switch
+			label={t('settings-privacy-delete-screenshots')}
+			checked={housekeeping.values['remove-old-screenshots'] ?? true}
+			onchange={(on) => housekeeping.set('remove-old-screenshots', on)}
 		/>
 	</Row>
 	<Row title={t('settings-privacy-delete-after')} description={t('settings-privacy-delete-after-hint')} disabled={!cleaning}>

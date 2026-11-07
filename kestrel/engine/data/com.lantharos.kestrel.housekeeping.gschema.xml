@@ -1,0 +1,9 @@
+<schemalist>
+  <schema id="com.lantharos.kestrel.housekeeping" path="/com/lantharos/kestrel/housekeeping/">
+    <key name="remove-old-screenshots" type="b">
+      <default>true</default>
+      <summary>Move old screenshots to the trash</summary>
+      <description>Moves screenshots older than old-files-age in org.gnome.desktop.privacy from the screenshots folder to the trash.</description>
+    </key>
+  </schema>
+</schemalist>

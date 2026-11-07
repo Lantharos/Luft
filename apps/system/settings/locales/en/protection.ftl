@@ -71,6 +71,8 @@ settings-privacy-cleanup = Trash and temporary files
 settings-privacy-empty-trash = Empty trash automatically
 settings-privacy-delete-temp = Delete temporary files automatically
 settings-privacy-delete-temp-hint = Your files in temporary folders that nothing has used lately
+settings-privacy-delete-screenshots = Delete screenshots automatically
+settings-privacy-delete-screenshots-hint = Old screenshots go to the trash first, so you can still get them back
 settings-privacy-delete-after = Delete after
 settings-privacy-delete-after-hint = How long files stay before they’re removed
 

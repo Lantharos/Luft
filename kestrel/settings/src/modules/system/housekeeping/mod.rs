@@ -1,11 +1,12 @@
 mod disk_space;
 mod mounts;
+mod screenshots;
 mod temp;
 mod thumbnails;
 mod trash;
 
 use std::path::{Path, PathBuf};
-use std::time::Duration;
+use std::time::{Duration, SystemTime};
 
 use futures_util::StreamExt;
 use tokio::time::{Instant, interval, interval_at, sleep_until};
@@ -17,6 +18,7 @@ use crate::shared::settings::Schemas;
 use disk_space::{DiskSpace, Low};
 
 const PRIVACY: &str = "org.gnome.desktop.privacy";
+const HOUSEKEEPING: &str = "com.lantharos.kestrel.housekeeping";
 const THUMBNAILS: &str = "org.gnome.desktop.thumbnail-cache";
 const SETTLE: Duration = Duration::from_secs(2 * 60);
 const DAILY: Duration = Duration::from_secs(24 * 60 * 60);
@@ -25,7 +27,10 @@ const DISK_CHECK: Duration = Duration::from_secs(60);
 const DISKS: &str = "com.lantharos.disks.desktop";
 
 pub async fn start(context: &Context) -> zbus::Result<()> {
-    let mut settings = context.settings.watch(&[PRIVACY, THUMBNAILS]).await;
+    let mut settings = context
+        .settings
+        .watch(&[PRIVACY, HOUSEKEEPING, THUMBNAILS])
+        .await;
     let mut actions = NotificationsProxy::new(&context.session)
         .await?
         .receive_action_invoked()
@@ -36,7 +41,7 @@ pub async fn start(context: &Context) -> zbus::Result<()> {
         let mut warning = 0;
         let mut warned_path = PathBuf::new();
         let mut thumbnails_due = Some(Instant::now() + SETTLE);
-        let mut temp_due = Some(Instant::now() + SETTLE);
+        let mut files_due = Some(Instant::now() + SETTLE);
         let mut daily = interval_at(Instant::now() + DAILY, DAILY);
         let mut hourly = interval_at(Instant::now() + HOURLY, HOURLY);
         let mut disk_check = interval(DISK_CHECK);
@@ -47,20 +52,22 @@ pub async fn start(context: &Context) -> zbus::Result<()> {
                     if schema == THUMBNAILS {
                         thumbnails_due = due;
                     } else {
-                        temp_due = due;
+                        files_due = due;
                     }
                 }
                 () = sleep_until(thumbnails_due.unwrap_or_else(Instant::now)), if thumbnails_due.is_some() => {
                     thumbnails_due = None;
                     purge_thumbnails(&settings).await;
                 }
-                () = sleep_until(temp_due.unwrap_or_else(Instant::now)), if temp_due.is_some() => {
-                    temp_due = None;
+                () = sleep_until(files_due.unwrap_or_else(Instant::now)), if files_due.is_some() => {
+                    files_due = None;
                     purge_temp(&settings).await;
+                    trash_screenshots(&settings).await;
                 }
                 _ = daily.tick() => {
                     purge_thumbnails(&settings).await;
                     purge_temp(&settings).await;
+                    trash_screenshots(&settings).await;
                 }
                 _ = hourly.tick() => purge_trash(&settings).await,
                 _ = disk_check.tick() => {
@@ -116,6 +123,18 @@ async fn purge_temp(settings: &Schemas) {
     let changed_before = glib::real_time() / 1_000_000 - i64::from(days) * 24 * 60 * 60;
     let _ = tokio::task::spawn_blocking(move || temp::purge(&temp::directories(), changed_before))
         .await;
+}
+
+async fn trash_screenshots(settings: &Schemas) {
+    if !settings.get::<bool>(HOUSEKEEPING, "remove-old-screenshots") {
+        return;
+    }
+    let days = settings.get::<u32>(PRIVACY, "old-files-age");
+    let taken_before = SystemTime::now() - DAILY * days;
+    let _ = tokio::task::spawn_blocking(move || {
+        screenshots::trash(&screenshots::folders(), taken_before);
+    })
+    .await;
 }
 
 fn disks_path() -> PathBuf {

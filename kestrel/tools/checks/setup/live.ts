@@ -7,11 +7,11 @@ import {require, Setup} from './lib/driver.js';
 const GB = 1e9;
 const AT = {
   continue: [711, 547],
-  alongside: [235, 245],
-  whole: [235, 323],
-  custom: [235, 401],
+  alongside: [235, 191],
+  whole: [235, 269],
+  custom: [235, 347],
   back: [85, 547],
-  keyboard: [400, 335],
+  keyboard: [400, 280],
   outside: [400, 110],
   install: [700, 547],
   writeDown: [648, 457],
@@ -22,7 +22,13 @@ const AT = {
   repeat: [315, 458],
   restart: [690, 547],
   moreOptions: [560, 547],
+  skip: [728, 547],
 } satisfies Record<string, Point>;
+
+async function checkNetwork(setup: Setup) {
+  await setup.shot('network');
+  await setup.click(AT.skip, 'skipping the network page moves on to the account');
+}
 
 async function checkAccount(setup: Setup) {
   await setup.click(AT.name, 'the name field takes focus');
@@ -105,6 +111,7 @@ export async function checkLive() {
   await setup.shot('alongside');
   await setup.click(AT.install, 'installing asks whether to encrypt Luft');
   await checkInstallStarts(setup);
+  await checkNetwork(setup);
   await checkAccount(setup);
   await setup.shot('copying');
   await setup.setStage('finished', 1);

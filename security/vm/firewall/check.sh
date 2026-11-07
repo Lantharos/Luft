@@ -29,6 +29,14 @@ eventually() {
   fail "$label"
 }
 
+no_denials() {
+  local denied
+  denied="$(journalctl -b -k --no-pager -o cat -g 'avc: +denied')"
+  [[ -z "$denied" ]] || echo "$denied" > /dev/console
+  ! grep -qE 'comm="(luft-firewall|nft)"|luft_firewall' <<< "$denied" || fail "SELinux denied the firewall something"
+  say "ok: SELinux enforcing, nothing of the firewall's denied"
+}
+
 connection() { nmcli -g GENERAL.CONNECTION device show "$device"; }
 wired_path() { busctl get-property org.freedesktop.NetworkManager "$(nmcli -g GENERAL.CON-PATH device show "$device")" org.freedesktop.NetworkManager.Connection.Active Connection | cut -d' ' -f2 | tr -d '"'; }
 unclassified() { busctl get-property "$name" "$path" "$name" Unclassified; }
@@ -94,6 +102,7 @@ first() {
   virtual_networks
   untouched_tables
   mkdir -p "$state"
+  no_denials
   say "PASS first"
 }
 
@@ -109,9 +118,11 @@ second() {
   firewall SetNetworkType os "$(wired_path)" public || fail "SetNetworkType public"
   eventually "the network becomes public" is_public
   expect closed "port 8000 on a public network" reaches "$high"
+  no_denials
   say "PASS second"
 }
 
+[[ "$(getenforce)" == Enforcing ]] || fail "SELinux isn't enforcing"
 eventually "the network card shows up" sh -c "nmcli -t -f DEVICE,TYPE device | grep -q ':ethernet$'"
 device="$(nmcli -t -f DEVICE,TYPE device | sed -n 's/:ethernet$//p' | head -n1)"
 eventually "$device connects" sh -c "nmcli -g GENERAL.STATE device show $device | grep -q '^100'"

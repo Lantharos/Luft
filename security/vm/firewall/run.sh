@@ -18,9 +18,10 @@ place 644 "$here/luft-firewall-check.service" /usr/lib/systemd/system/luft-firew
 build_check_image "${LUFT_FIREWALL_BASE:-$image_name:45}" "$image_name-firewall-check" \
   "systemctl enable luft-firewall.service luft-firewall-check.service"
 make_root_drive "$image_name-firewall-check"
+relabel_root_drive "$serial.relabel"
 
 for boot in first second; do
-  CPUS=2 MEMORY=3072 APPEND="luft.firewall-check=$high,$low" \
+  CPUS=2 MEMORY=3072 SELINUX="selinux=1 enforcing=1" APPEND="luft.firewall-check=$high,$low" \
     boot_root_drive "$serial.$boot" 10 -nic "user,model=virtio-net-pci,$forwarded"
   expect_in_log "$serial.$boot" luft-firewall-check "PASS $boot"
 done

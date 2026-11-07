@@ -1,0 +1,13 @@
+[Unit]
+Description=Label the check drive for SELinux
+DefaultDependencies=no
+AllowIsolate=yes
+Requires=local-fs.target
+After=local-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/setfiles -F -e /proc -e /sys -e /dev -e /run /etc/selinux/targeted/contexts/files/file_contexts /
+ExecStartPost=/usr/bin/systemctl --no-block poweroff
+StandardOutput=journal+console
+StandardError=journal+console

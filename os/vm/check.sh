@@ -25,6 +25,7 @@ stage_fingerprint_reader() {
 build_check_image() {
   local base="$1" tag="$2" setup="$3"
   printf 'kargs = ["console=ttyS0,115200"]\n' | install -Dm644 /dev/stdin "$stage/root/usr/lib/bootc/kargs.d/90-check.toml"
+  place 644 "$luft/os/vm/selinux/luft-vm-relabel.service" /usr/lib/systemd/system/luft-vm-relabel.service
   podman build --quiet --no-hosts --no-hostname --build-arg "BASE=$base" --tag "$tag" --file - "$stage" >/dev/null <<CONTAINERFILE
 ARG BASE
 FROM \${BASE}
@@ -53,9 +54,13 @@ boot_root_drive() {
   shift 2
   rm -f "$log"
   DISK="$vm/root.img" KERNEL="$vm/vmlinuz" INITRD="$vm/initramfs.img" \
-    APPEND="root=LABEL=luft-check-root rw console=ttyS0 selinux=0 systemd.unit=multi-user.target ${APPEND:-}" \
+    APPEND="root=LABEL=luft-check-root rw console=ttyS0 ${SELINUX:-selinux=0} systemd.unit=multi-user.target ${APPEND:-}" \
     TPM=0 NETWORK=0 HEADLESS=1 MEMORY="${MEMORY:-6144}" SERIAL="$log" TIMEOUT=$((minutes * 60)) LUFT_VM="$vm" \
     "$luft/os/vm/qemu.sh" -no-reboot "$@" || true
+}
+
+relabel_root_drive() {
+  SELINUX="selinux=1 enforcing=0" APPEND="systemd.unit=luft-vm-relabel.service" boot_root_drive "$1" 15
 }
 
 boot_drive() {

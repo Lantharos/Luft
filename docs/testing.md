@@ -130,7 +130,7 @@ Everything that needs a real computer runs in QEMU VMs from `os/vm`, without `su
 
 `LUFT_VM` picks another folder than `os/vm/state`, so VMs can live side by side. `check.py` writes its screenshots, the serial console, the journal and `bootc status` to `check` in that folder, and keeps them when a step fails or times out. Every step has a time limit.
 
-`os/vm/check.sh` holds what the checks of single services share: a check image with the check's files on top of the system, started directly from a drive with the image's kernel, or installed with `disk.sh`. The [installer](#installer), [Luft Keyring and Passkeys](#luft-keyring-and-passkeys), [sleep](../services/sleep/README.md), [Windows](../services/windows/README.md) and [Disks](../apps/system/disks/README.md) checks use it.
+`os/vm/check.sh` holds what the checks of single services share: a check image with the check's files on top of the system, started directly from a drive with the image's kernel, or installed with `disk.sh`. The [installer](#installer), [Luft Keyring and Passkeys](#luft-keyring-and-passkeys), [sleep](../services/sleep/README.md), [Windows](../services/windows/README.md) and [Disks](../apps/system/disks/README.md) checks use it. A drive started that way has SELinux off, since its files carry no labels. `relabel_root_drive` starts it once to label every file, after which `SELINUX="selinux=1 enforcing=1"` starts it enforcing, as the firewall check does to fail on anything SELinux denies the firewall.
 
 SushiBoot and Sushi are tried on the installed image too. `qemu.sh` options that matter for startup:
 

@@ -10,7 +10,7 @@ import {exists, read} from '../lib/files.js';
 
 const {eventually} = checks('Luft app');
 const HOME: Point = [70, 82];
-const DOCUMENTS: Point = [70, 193];
+const DOCUMENTS: Point = [70, 156];
 const MENU_ITEM = 38;
 const MENU_TOP = 25;
 const SEPARATOR = 9;

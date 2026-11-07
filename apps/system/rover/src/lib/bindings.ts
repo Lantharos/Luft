@@ -654,7 +654,6 @@ export type UserDirs = {
 	pictures: string | null,
 	videos: string | null,
 	music: string | null,
-	desktop: string | null,
 };
 
 export type VcsFileStatus = "modified" | "added" | "deleted" | "renamed" | "untracked" | "ignored" | "conflicted";

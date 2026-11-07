@@ -114,7 +114,6 @@ export const COLORS: { name: string; label: string }[] = [
 ];
 
 export const USER_FOLDER_ICONS: Record<UserFolder, string> = {
-	desktop: 'monitor',
 	documents: 'file-text',
 	downloads: 'download',
 	music: 'music',

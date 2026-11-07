@@ -43,7 +43,6 @@ pub struct UserDirs {
     pub pictures: Option<String>,
     pub videos: Option<String>,
     pub music: Option<String>,
-    pub desktop: Option<String>,
 }
 
 pub fn list_directory(path: String, show_hidden: bool) -> Result<DirectoryContents, String> {
@@ -176,7 +175,6 @@ pub fn user_dirs() -> Result<UserDirs, String> {
         pictures: dirs::picture_dir().map(display),
         videos: dirs::video_dir().map(display),
         music: dirs::audio_dir().map(display),
-        desktop: dirs::desktop_dir().map(display),
     })
 }
 

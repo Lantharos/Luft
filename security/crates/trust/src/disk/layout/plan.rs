@@ -113,7 +113,7 @@ impl Move {
             let middle = start + kept;
             ensure!(
                 end.saturating_sub(middle) >= need,
-                "Luft is too full to move this way"
+                "Luft is too full to move into this little space. Make some room in Luft first"
             );
             steps.push(Step::Shrink {
                 at: start,
@@ -187,7 +187,7 @@ pub fn plan(layout: &Layout, change: Change) -> Result<Vec<Step>> {
             };
             ensure!(
                 free.size >= GIB.max(startup_size),
-                "The free space is too small"
+                "The free space is too small for Luft to move into"
             );
             let mut target = align_up(free.offset);
             if let Some(startup) = &layout.startup {

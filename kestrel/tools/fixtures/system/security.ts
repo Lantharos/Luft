@@ -28,6 +28,8 @@ const TRUST = `<node><interface name="com.lantharos.Trust1">
   <method name="RemoveStartups"><arg name="folders" type="a(ss)" direction="in"/><arg name="partitions" type="as" direction="in"/></method>
   <method name="RemoveOldSystem"/>
   <method name="GrowSystem"><arg name="unlock" type="s" direction="in"/><arg name="grown" type="t" direction="out"/></method>
+  <method name="GrowSystemAtStart"/>
+  <method name="CancelSystemResize"/>
 </interface></node>`;
 const USB_PROTECTION = `<node><interface name="com.lantharos.UsbProtection1">
   <property name="Enabled" type="b" access="read"/>
@@ -73,9 +75,9 @@ export function publishSecurity(publish: Publish, calls: string[], model: Model,
       {State: 'enrolled', Available: true, Reason: '', Missed: 0, MissedThisBoot: false, OtherKeys: [], RemovingOtherKeys: false}),
     Startup: variants({Installed: 'b', Measured: 'b', Available: 'b', Reason: 's'},
       {Installed: true, Measured: true, Available: true, Reason: ''}),
-    Disk: variants({Device: 's', Encrypted: 'b', Unlock: 'as', RecoveryKeyStored: 'b', TpmRefused: 'b', SecureBootChanged: 'b'},
+    Disk: variants({Device: 's', Encrypted: 'b', Unlock: 'as', RecoveryKeyStored: 'b', TpmRefused: 'b', SecureBootChanged: 'b', Resize: 's'},
       {Device: '/dev/nvme0n1p3', Encrypted: true, Unlock: ['tpm', 'pin', 'recovery-key'], RecoveryKeyStored: true, TpmRefused: false,
-        SecureBootChanged: false}),
+        SecureBootChanged: false, Resize: ''}),
     AntiCheat: variants({Checks: 'a(sbs)', UsesLuftKey: 'b'},
       {Checks: ANTI_CHEAT_CHECKS.map(id => [id, true, '']), UsesLuftKey: true}),
     GenerateRecoveryKey: () => RECOVERY_KEY,
@@ -102,6 +104,8 @@ export function publishSecurity(publish: Publish, calls: string[], model: Model,
       calls.push('GrowSystem');
       return 0;
     },
+    GrowSystemAtStart: () => calls.push('GrowSystemAtStart'),
+    CancelSystemResize: () => calls.push('CancelSystemResize'),
   }, trust), '/com/lantharos/Trust1');
   const drives = drivesService(calls, model, RECOVERY_KEY);
   drives.attach(publish(DRIVES, drives.implementation, '/com/lantharos/Trust1'));

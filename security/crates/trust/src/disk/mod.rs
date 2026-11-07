@@ -6,6 +6,7 @@ pub mod unlock;
 use std::path::PathBuf;
 
 use anyhow::{Context, Result};
+use luft_meet::resize::Change;
 
 use crate::system::host::blocks::{self, Mount};
 use crate::system::host::journal;
@@ -68,6 +69,7 @@ pub struct DiskStatus {
     pub recovery_key_stored: bool,
     pub tpm_refused: bool,
     pub secure_boot_changed: bool,
+    pub resize: Option<Change>,
 }
 
 fn unlock_methods(header: &Header) -> Vec<&'static str> {
@@ -106,5 +108,6 @@ pub fn status() -> Option<DiskStatus> {
             && !seal::sealed_this_start()
             && journal::tpm_refused_this_boot(),
         secure_boot_changed: seal::secure_boot_changed(),
+        resize: layout::waiting(&disk),
     })
 }

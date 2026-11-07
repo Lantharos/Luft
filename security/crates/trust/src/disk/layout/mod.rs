@@ -7,10 +7,11 @@ mod steps;
 mod top_level;
 
 use anyhow::{Context, Result, bail, ensure};
-use luft_meet::resize::needed;
+use luft_meet::resize::{Change, Request, needed};
 
-use super::encrypting;
+use super::{SystemDisk, encrypting};
 use crate::errors::{Busy, Unsupported};
+use crate::system::host::blocks;
 use crate::system::host::command::Tool;
 use crate::system::secrets::secret::Secret;
 use journal::{Journal, Working};
@@ -88,15 +89,58 @@ pub fn continue_at_start() -> Result<()> {
     Ok(())
 }
 
-fn change_in_place(
-    typed: &Secret,
-    step: impl FnOnce(&Disk, &Part) -> Result<Option<Step>>,
-) -> Result<(u64, u64)> {
+fn refuse_while_encrypting() -> Result<()> {
     if encrypting::underway() {
         bail!(Unsupported(
             "Luft is being encrypted. Change its size once that's done.".to_owned()
         ));
     }
+    Ok(())
+}
+
+pub fn grow_at_start() -> Result<()> {
+    refuse_while_encrypting()?;
+    let _working = claim()?;
+    match waiting(&SystemDisk::find()?) {
+        Some(Change::Grow) => return Ok(()),
+        Some(_) => bail!(Unsupported(
+            "Luft already waits to change its size at the next start. Call that off first."
+                .to_owned()
+        )),
+        None => {}
+    }
+    let current = requests::windows::current().map_err(unsupported)?;
+    if current.layout.free_before.is_none() {
+        bail!(Unsupported(
+            "There's no free space right before Luft.".to_owned()
+        ));
+    }
+    plan::plan(&current.layout, Change::Grow).map_err(unsupported)?;
+    requests::windows::ask(&Request {
+        change: Change::Grow,
+        partition: current.partition,
+    })
+}
+
+pub fn waiting(disk: &SystemDisk) -> Option<Change> {
+    let request = requests::windows::waiting()?;
+    (blocks::partuuid(&disk.partition)? == request.partition).then_some(request.change)
+}
+
+pub fn cancel_waiting() -> Result<()> {
+    let _working = claim()?;
+    requests::windows::forget()
+}
+
+fn unsupported(error: anyhow::Error) -> anyhow::Error {
+    Unsupported(format!("{error}.")).into()
+}
+
+fn change_in_place(
+    typed: &Secret,
+    step: impl FnOnce(&Disk, &Part) -> Result<Option<Step>>,
+) -> Result<(u64, u64)> {
+    refuse_while_encrypting()?;
     let _working = claim()?;
     let key = halves::system_key(typed)?;
     let device = drive::system_partition()?;

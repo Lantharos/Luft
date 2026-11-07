@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use luft_meet::resize::Change;
 use zbus::{OwnedVariant, Variant};
 
 use super::status::{SigningKey, Startup};
@@ -86,6 +87,15 @@ fn encrypting(
     }
 }
 
+fn resize(change: Option<Change>) -> &'static str {
+    match change {
+        None => "",
+        Some(Change::Grow) => "grow",
+        Some(Change::Shrink { .. }) => "shrink",
+        Some(Change::Trim { .. }) => "trim",
+    }
+}
+
 pub fn disk(disk: Option<&DiskStatus>, running: Option<Option<Progress>>) -> Dict {
     let Some(disk) = disk else {
         return dict([("Encrypted", false.into())]);
@@ -103,5 +113,6 @@ pub fn disk(disk: Option<&DiskStatus>, running: Option<Option<Progress>>) -> Dic
         ("RecoveryKeyStored", disk.recovery_key_stored.into()),
         ("TpmRefused", disk.tpm_refused.into()),
         ("SecureBootChanged", disk.secure_boot_changed.into()),
+        ("Resize", resize(disk.resize).into()),
     ])
 }

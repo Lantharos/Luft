@@ -29,7 +29,8 @@
       RecoveryKeyStored (b, the recovery key can be shown again), TpmRefused (b, the TPM didn't unlock the disk
       at the last startup, so the recovery key or passphrase was needed), SecureBootChanged (b, the Secure Boot
       settings changed in a way Luft didn't expect, so the TPM stays sealed to the old ones until an administrator
-      confirms them with AcceptSecureBootChange).
+      confirms them with AcceptSecureBootChange), Resize (s: "" when nothing is waiting, or "grow", "shrink" or
+      "trim" when a change of Luft's size waits for the next start, asked for by GrowSystemAtStart or Meet Luft).
 
     AntiCheat: what games with anti-cheat (such as Epic's Easy Anti-Cheat) check about how the computer started.
       Checks (a(sbs): id, met, a sentence for people saying what's missing, empty when met), for "signed-system",
@@ -113,6 +114,12 @@
       <arg name="unlock" type="s" direction="in"/>
       <arg name="grown" type="t" direction="out"/>
     </method>
+    <!-- Asks for the system to move into the free space right before it at the next start, then grow over any free
+         space right after it, as Meet Luft's grow request does. Refuses when the move couldn't be done safely, such as
+         when Luft is too full or its disk only opens with a passphrase. -->
+    <method name="GrowSystemAtStart"/>
+    <!-- Takes back a change of the system's size that waits for the next start. -->
+    <method name="CancelSystemResize"/>
     <!-- Shrinks the system's partition to size bytes, or grows it into the free space right after it, with its
          encryption and file system. Returns the partition's new size. -->
     <method name="ResizeSystem">

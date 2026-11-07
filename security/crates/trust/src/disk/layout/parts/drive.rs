@@ -11,6 +11,7 @@ use crate::disk::layout::plan::Span;
 use crate::system::host::wait;
 
 const STARTUP_FILESYSTEM: &str = "vfat";
+const ALIGNMENT: u64 = 1 << 20;
 
 pub struct Part {
     pub span: Span,
@@ -133,11 +134,17 @@ impl Disk {
     }
 
     pub fn free_before(&self, offset: u64) -> Option<Span> {
-        self.free.iter().copied().find(|span| span.end() == offset)
+        self.free
+            .iter()
+            .copied()
+            .find(|span| span.end() <= offset && offset - span.end() < ALIGNMENT)
     }
 
     pub fn free_after(&self, offset: u64) -> Option<Span> {
-        self.free.iter().copied().find(|span| span.offset == offset)
+        self.free
+            .iter()
+            .copied()
+            .find(|span| span.offset >= offset && span.offset - offset < ALIGNMENT)
     }
 
     pub fn create(&self, span: Span, kind: &str, name: &str) -> Result<()> {

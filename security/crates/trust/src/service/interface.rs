@@ -390,6 +390,26 @@ impl Trust {
         self.run(&emitter, move || layout::grow(&unlock)).await
     }
 
+    async fn grow_system_at_start(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
+    ) -> Result<(), Error> {
+        self.authorize(connection, &header, RESIZE_SYSTEM).await?;
+        self.run(&emitter, layout::grow_at_start).await
+    }
+
+    async fn cancel_system_resize(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
+    ) -> Result<(), Error> {
+        self.authorize(connection, &header, RESIZE_SYSTEM).await?;
+        self.run(&emitter, layout::cancel_waiting).await
+    }
+
     async fn resize_system(
         &self,
         #[zbus(connection)] connection: &Connection,

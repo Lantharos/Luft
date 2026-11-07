@@ -30,15 +30,18 @@ pub fn report() -> Result<()> {
         .context("The firmware didn't keep how full Luft is")
 }
 
-fn layout(request: &Request) -> Result<(String, Layout)> {
+pub struct Current {
+    pub drive: String,
+    pub partition: String,
+    pub layout: Layout,
+}
+
+pub fn current() -> Result<Current> {
     let device = drive::system_partition()?;
     let disk = drive::holding(&device)?;
     let root = disk
         .holding(&device)
         .context("Luft's partition isn't on its drive")?;
-    if root.uuid != request.partition {
-        bail!("The request is for another Luft");
-    }
     if root.filesystem != "btrfs" {
         bail!("Luft's partition doesn't hold btrfs");
     }
@@ -66,7 +69,20 @@ fn layout(request: &Request) -> Result<(String, Layout)> {
         allocated: btrfs::allocated(&root.fs_uuid)?,
         startup,
     };
-    Ok((disk.id.clone(), layout))
+    Ok(Current {
+        drive: disk.id.clone(),
+        partition: root.uuid.clone(),
+        layout,
+    })
+}
+
+pub fn waiting() -> Option<Request> {
+    efi::luft_variable(VARIABLE).and_then(|bytes| Request::parse(&bytes).ok())
+}
+
+pub fn ask(request: &Request) -> Result<()> {
+    efi::set_luft_variable(VARIABLE, Some(&request.to_bytes()))
+        .context("The firmware didn't keep Luft's resize request")
 }
 
 pub fn plan() -> Result<Option<Journal>> {
@@ -76,10 +92,13 @@ pub fn plan() -> Result<Option<Journal>> {
     let request = Request::parse(&bytes)
         .map_err(anyhow::Error::msg)
         .context("Luft's resize request isn't readable")?;
-    let (drive, layout) = layout(&request)?;
+    let current = current()?;
+    if current.partition != request.partition {
+        bail!("The request is for another Luft");
+    }
     Ok(Some(Journal::new(
-        drive,
-        plan::plan(&layout, request.change)?,
+        current.drive,
+        plan::plan(&current.layout, request.change)?,
     )))
 }
 

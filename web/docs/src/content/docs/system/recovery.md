@@ -2,7 +2,7 @@
 title: Recovery and troubleshooting
 description: The boot menu, going back to an earlier version, what Luft offers when it can't start, Rescue, and other problems.
 sidebar:
-  order: 6
+  order: 7
 ---
 
 ## The boot menu

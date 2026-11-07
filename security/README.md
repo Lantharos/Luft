@@ -29,6 +29,7 @@ All commands need root.
 | `trustctl recovery-key show` / `replace` | Shows or replaces the disk's recovery key |
 | `trustctl encryption format` / `seal` | What Install Luft uses to encrypt Luft's partition and link the TPM before the first start |
 | `trustctl system-disk continue` | Carries on with the plan in `/var/lib/trustd/system-disk.json`, or makes one from what Meet Luft asked for ([details](../docs/meet.md#changing-lufts-size)) |
+| `trustctl system-disk move` | The startup step that copies Luft to the drive Disks asked it to move to ([details](../docs/boot.md#moving-to-another-drive)) |
 
 ## D-Bus
 

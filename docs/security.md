@@ -117,6 +117,8 @@ When Meet Luft asks Luft to change its size and Luft has to move to a new partit
 - Both halves carry a `luft-move` token in their LUKS2 header with the btrfs file system's UUID. The startup only opens partitions on the system disk's drive that have the token, and closes one again unless the file system inside has that UUID. A header someone copied onto another partition only opens to noise, since its contents weren't written with the volume key, and the UUID inside the encryption can't be read without it.
 - Nothing about a move is kept in firmware variables, so resetting them halfway can't keep Luft from starting.
 
+Moving Luft to another drive ([Boot](boot.md#moving-to-another-drive)) copies the LUKS2 header the same way, but keeps its LUKS UUID, so both drives open with the same keys and the volume key and UUID measured into PCR 15 stay the same. The recovery key, a passphrase, the TPM token and its PIN therefore keep working on the new drive, Luft Keyring keeps unlocking through the TPM, and no new recovery key is made. The TPM token is sealed to the signed startup images and the Secure Boot state, not to the drive. The two copies hold mostly the same files in different places, which reveals no more than one disk written over time, and the old copy's header is erased, and its blocks trimmed, when it's removed. Until then, whoever has the recovery key opens either.
+
 ## Other drives
 
 Disks can encrypt other drives in place through `trustd`. Partitions the system needs, swap, LVM and RAID are refused.

@@ -2,7 +2,7 @@
 title: Logs and reporting problems
 description: Where Luft keeps its logs, what to collect, and how to report a problem.
 sidebar:
-  order: 7
+  order: 8
 ---
 
 ## Reporting a problem

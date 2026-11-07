@@ -1,8 +1,8 @@
 # Disks
 
-Disks shows the drives in your computer and the ones you plug in, and looks after their partitions, formatting, encryption, health and disk images. It can also remove another system and give Luft free space next to it. Using it is described in [the docs](https://docs.luft.computer/apps/disks/).
+Disks shows the drives in your computer and the ones you plug in, and looks after their partitions, formatting, encryption, health and disk images. It can also remove another system, give Luft free space next to it, and move Luft to another drive. Using it is described in [the docs](https://docs.luft.computer/apps/disks/).
 
-Changes go through UDisks, and encryption through [trustd](../../../security/README.md). Anything that erases data asks first. The partitions the running system uses can't be changed, except that trustd grows or shrinks Luft's own partition in place, and moves it into free space in front of it at the next start.
+Changes go through UDisks, and encryption through [trustd](../../../security/README.md). Anything that erases data asks first. The partitions the running system uses can't be changed, except that trustd grows or shrinks Luft's own partition in place, and moves it into free space in front of it, or to another drive, at the next start.
 
 ## Build and run
 
@@ -31,7 +31,7 @@ Installing registers Disks for `.iso` and raw disk image files.
 
 `kestrel/tools/session.sh capture` runs Disks against a stand-in UDisks, keyring and trustd without touching a real drive.
 
-`vm/run.sh` installs Luft next to a Windows-like drive and an old Linux in a VM, removes both from the installed system, and checks that Luft grew and still starts. `vm/grow/run.sh` installs an encrypted Luft next to Windows, leaves free space in front of it, right after it and behind other partitions, checks what Disks offers for each, grows Luft into the space after it, then lets it move into the space in front at the next start, cuts the power in the middle of the move and checks that it finishes and starts again. Both need Podman, QEMU with KVM, OVMF and `localhost/luft-system:45` from `os/image/build.sh`.
+`vm/run.sh` installs Luft next to a Windows-like drive and an old Linux in a VM, removes both from the installed system, and checks that Luft grew and still starts. `vm/grow/run.sh` installs an encrypted Luft next to Windows, leaves free space in front of it, right after it and behind other partitions, checks what Disks offers for each, grows Luft into the space after it, then lets it move into the space in front at the next start, cuts the power in the middle of the move and checks that it finishes and starts again. `vm/move/run.sh` installs an encrypted Luft next to Windows on a SATA drive, with an NVMe drive holding an NTFS data partition and an empty drive, moves Luft into room made on the data partition with a power cut in the middle of copying, checks that the files, a Flatpak, a setting and a Wi-Fi network came along and that the TPM unlocks the new drive, removes the old copy and gives its space back to Windows, then moves Luft onto the whole empty drive. They need Podman, QEMU with KVM, OVMF, swtpm and `localhost/luft-system:45` from `os/image/build.sh`.
 
 ## License
 

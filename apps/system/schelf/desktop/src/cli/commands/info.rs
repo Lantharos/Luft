@@ -6,7 +6,7 @@ use crate::cli::arguments::Arguments;
 use crate::cli::sources::{
     Candidate, Catalog, Kind, Origin, catalogs, fedora, flathub, installed, store,
 };
-use crate::cli::terminal::progress::Line;
+use crate::cli::terminal::Line;
 use crate::cli::terminal::{Ink, Look, Table, bytes, wrap};
 use crate::library::{InstalledApp, Source};
 use crate::store::listing::{self, Builder, StoreDetails, channel};
@@ -156,8 +156,8 @@ fn system_package(
     repositories: Repositories,
     source: String,
 ) -> Result<(), String> {
-    let details = fedora::details(repositories, &candidate.id)?
-        .ok_or("It isn't available any more.")?;
+    let details =
+        fedora::details(repositories, &candidate.id)?.ok_or("It isn't available any more.")?;
     let installed = installed_version(apps, Origin::System, &details.package);
     let mut facts = Facts(Vec::new());
     facts.add("Source", Some(source));
@@ -240,7 +240,10 @@ fn store_app(candidate: &Candidate, apps: &[InstalledApp]) -> Result<(), String>
     facts.add("Download", details.size.map(bytes));
     facts.add(
         "File",
-        details.download.as_ref().map(|download| download.url.clone()),
+        details
+            .download
+            .as_ref()
+            .map(|download| download.url.clone()),
     );
     facts.add("License", details.license.clone());
     facts.add("Developer", Some(details.developer.clone()));
@@ -265,14 +268,20 @@ fn store_app(candidate: &Candidate, apps: &[InstalledApp]) -> Result<(), String>
 
 fn built(details: &StoreDetails) -> Option<String> {
     let provenance = details.provenance.as_ref()?;
-    Some(match (provenance.origin, &provenance.repository, &provenance.commit) {
-        (Builder::GithubActions, Some(repository), Some(commit)) => format!(
-            "on GitHub Actions, from {repository} at {}",
-            commit.chars().take(7).collect::<String>()
-        ),
-        (Builder::GithubActions, _, _) => "on GitHub Actions".to_owned(),
-        (Builder::Developer, _, _) => "uploaded by the developer".to_owned(),
-    })
+    Some(
+        match (
+            provenance.origin,
+            &provenance.repository,
+            &provenance.commit,
+        ) {
+            (Builder::GithubActions, Some(repository), Some(commit)) => format!(
+                "on GitHub Actions, from {repository} at {}",
+                commit.chars().take(7).collect::<String>()
+            ),
+            (Builder::GithubActions, _, _) => "on GitHub Actions".to_owned(),
+            (Builder::Developer, _, _) => "uploaded by the developer".to_owned(),
+        },
+    )
 }
 
 fn catalog_entry(candidate: &Candidate, apps: &[InstalledApp]) -> Result<(), String> {
@@ -307,7 +316,7 @@ pub fn run(arguments: &Arguments) -> Exit {
             println!();
         }
         let line = Line::default();
-        line.say(&format!("Looking for {name}…"));
+        line.say(&format!("Looking for {name}"));
         let apps = installed::all(only);
         let mut found: Vec<Candidate> = Vec::new();
         for catalog in &looked_in {

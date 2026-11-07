@@ -95,7 +95,11 @@ fn candidates(found: Vec<Available>) -> Vec<Candidate> {
 fn with_apps(apps: Vec<Candidate>, tools: Vec<Candidate>) -> Vec<Candidate> {
     let packages: HashSet<String> = apps.iter().map(|app| app.id.clone()).collect();
     apps.into_iter()
-        .chain(tools.into_iter().filter(|tool| !packages.contains(&tool.id)))
+        .chain(
+            tools
+                .into_iter()
+                .filter(|tool| !packages.contains(&tool.id)),
+        )
         .collect()
 }
 
@@ -112,7 +116,10 @@ pub fn search(query: &str) -> Result<Vec<Candidate>, String> {
 
 pub fn find(name: &str) -> Result<Vec<Candidate>, String> {
     let apps = store::find_in(name, Origin::Fedora, &in_system())?;
-    Ok(with_apps(apps, candidates(tools::find(name)?.into_iter().collect())))
+    Ok(with_apps(
+        apps,
+        candidates(tools::find(name)?.into_iter().collect()),
+    ))
 }
 
 fn repoquery(repositories: Repositories, arguments: &[&str]) -> Result<String, String> {

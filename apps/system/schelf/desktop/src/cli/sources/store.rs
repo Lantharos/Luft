@@ -9,7 +9,9 @@ use crate::library;
 use crate::operations::Job;
 use crate::store::catalog::{self, Entry, Origin};
 use crate::store::install::Consent;
-use crate::store::listing::{self, Declared, ExtensionAccess, Format, ListenPort, Listing, Offer, Release, channel};
+use crate::store::listing::{
+    self, Declared, ExtensionAccess, Format, ListenPort, Listing, Offer, Release, channel,
+};
 use crate::store::signed::Age;
 
 fn kind(entry: &Entry) -> Kind {
@@ -58,7 +60,11 @@ pub fn search_in(
     installed: &HashSet<String>,
 ) -> Result<Vec<Candidate>, String> {
     let catalog = catalog::current()?;
-    Ok(candidates(catalog.search(query).into_iter(), origin, installed))
+    Ok(candidates(
+        catalog.search(query).into_iter(),
+        origin,
+        installed,
+    ))
 }
 
 /// The entries called `name`, by id, the last part of the id, its package or its name.
@@ -152,7 +158,11 @@ fn listen_ports(listen: &[ListenPort]) -> String {
     let mut ports: Vec<u16> = listen.iter().map(|listen| listen.port).collect();
     ports.sort_unstable();
     ports.dedup();
-    ports.iter().map(u16::to_string).collect::<Vec<_>>().join(", ")
+    ports
+        .iter()
+        .map(u16::to_string)
+        .collect::<Vec<_>>()
+        .join(", ")
 }
 
 /// What an extension may do, in the words Settings uses.
@@ -178,7 +188,9 @@ pub fn extension_access(access: &ExtensionAccess) -> Vec<String> {
                 "locked-sounds" => "Keep playing sounds while the screen is locked",
                 "input-sounds" => "Play a sound when you type and click, without seeing your keys",
                 "do-not-disturb" => "Hold back notifications for a while",
-                "screen-effects" => "Draw over and change how your windows and the whole screen look",
+                "screen-effects" => {
+                    "Draw over and change how your windows and the whole screen look"
+                }
                 "clipboard" => "Copy to your clipboard",
                 other => other,
             }
@@ -189,7 +201,10 @@ pub fn extension_access(access: &ExtensionAccess) -> Vec<String> {
         lines.push(format!("Connect to {}", access.network.join(", ")));
     }
     if !access.listen.is_empty() {
-        lines.push(format!("Take connections from devices on your network, on port {}", listen_ports(&access.listen)));
+        lines.push(format!(
+            "Take connections from devices on your network, on port {}",
+            listen_ports(&access.listen)
+        ));
     }
     if access.helper {
         lines.push("Runs its own program".to_owned());
@@ -243,7 +258,10 @@ pub fn install(id: &str, yes: bool) -> Result<(String, Job), Exit> {
         eprintln!("{error}");
         Exit::Failed
     })?;
-    let Some(Offer { release, format, .. }) = listing.release() else {
+    let Some(Offer {
+        release, format, ..
+    }) = listing.release()
+    else {
         let following = listing.following(listing.platforms());
         if following.chosen && following.channel != channel::STABLE {
             eprintln!(

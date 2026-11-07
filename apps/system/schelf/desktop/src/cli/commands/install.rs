@@ -5,7 +5,7 @@ use crate::cli::Exit;
 use crate::cli::arguments::Arguments;
 use crate::cli::perform::{Plan, carry_out};
 use crate::cli::sources::{Candidate, Catalog, Resolved, fedora, file, resolve};
-use crate::cli::terminal::progress::Line;
+use crate::cli::terminal::Line;
 use crate::cli::terminal::{Ink, Look, Table};
 use crate::operations::Job;
 
@@ -68,7 +68,7 @@ fn prepare(target: &str, only: Option<Catalog>, yes: bool) -> Result<Option<Plan
         return Ok(Some(prepared.plan));
     }
     let line = Line::default();
-    line.say(&format!("Looking for {target}…"));
+    line.say(&format!("Looking for {target}"));
     let resolved = resolve(target, only);
     line.clear();
     let candidate = match resolved {

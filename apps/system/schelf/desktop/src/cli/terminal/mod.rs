@@ -1,4 +1,5 @@
 mod ink;
+mod line;
 pub mod progress;
 pub mod prompt;
 mod table;
@@ -6,6 +7,7 @@ mod table;
 use std::io::IsTerminal;
 
 pub use ink::Ink;
+pub use line::Line;
 pub use table::{Look, Table, truncate};
 
 const NARROWEST: usize = 40;

@@ -2,7 +2,7 @@ use super::catalog;
 use crate::cli::Exit;
 use crate::cli::arguments::Arguments;
 use crate::cli::sources::{self, Candidate, Origin, installed};
-use crate::cli::terminal::progress::Line;
+use crate::cli::terminal::Line;
 use crate::cli::terminal::{self, Ink, Look, Table};
 use crate::library::InstalledApp;
 
@@ -103,7 +103,7 @@ pub fn run(arguments: &Arguments) -> Exit {
     };
     let query = arguments.words.join(" ");
     let line = Line::default();
-    line.say(&format!("Searching for {query}…"));
+    line.say(&format!("Searching for {query}"));
     let mut groups: Vec<(Origin, Vec<Found>)> = Vec::new();
     let mut failed = false;
     for (catalog, result) in sources::search(&query, only) {

@@ -6,6 +6,7 @@ pub use luft_dbus as dbus;
 pub use luft_i18n as i18n;
 pub use luft_identity as identity;
 mod desktop;
+pub use desktop::corners::Corners;
 pub mod file_manager;
 pub mod files;
 #[cfg(feature = "folders")]

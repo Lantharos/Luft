@@ -6,7 +6,7 @@ use super::list_of;
 use crate::cli::Exit;
 use crate::cli::arguments::Arguments;
 use crate::cli::perform::{Plan, Verb, carry_out};
-use crate::cli::terminal::progress::Line;
+use crate::cli::terminal::Line;
 use crate::cli::terminal::{self, Ink, Look, Table, prompt};
 use crate::operations::{Job, Request};
 
@@ -58,7 +58,7 @@ pub fn confirm_trust(described: &Described, yes: bool) -> Result<(), Exit> {
 fn add(source: &str, yes: bool) -> Exit {
     let ink = Ink::stdout();
     let line = Line::default();
-    line.say(&format!("Fetching {source}…"));
+    line.say(&format!("Fetching {source}"));
     let fetched = repositories::fetch(source).and_then(|draft| {
         let described = block_on(system_packages::describe(&draft))?;
         Ok((draft, described))

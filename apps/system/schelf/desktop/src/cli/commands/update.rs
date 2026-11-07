@@ -5,7 +5,7 @@ use crate::cli::Exit;
 use crate::cli::arguments::Arguments;
 use crate::cli::perform::{Plan, Verb, carry_out};
 use crate::cli::sources::{Origin, installed};
-use crate::cli::terminal::progress::Line;
+use crate::cli::terminal::Line;
 use crate::cli::terminal::{Ink, Look, Table};
 use crate::library::Source;
 use crate::operations::{Job, Request};
@@ -181,7 +181,7 @@ fn unknown(names: &[String], updates: &[AppUpdate], only: Option<Origin>) -> Opt
 
 pub fn run(arguments: &Arguments) -> Exit {
     let line = Line::default();
-    line.say("Checking for updates…");
+    line.say("Checking for updates");
     let (mut updates, error) = block_on(updates::find());
     line.clear();
     if let Some(error) = &error {

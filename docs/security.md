@@ -228,6 +228,10 @@ While the screen is locked, and at the login screen, new USB devices wait until 
 - It uses the kernel's `authorized_default` and `interface_authorized_default` switches per bus, follows logind's lock state, and costs nothing while unlocked. It is not meant to run alongside USBGuard.
 - On by default; turning it off in Settings needs an administrator. The choice is kept in `/var/lib/luft-usb-protection`.
 
+## On the network
+
+Luft doesn't answer LLMNR, the old Windows way of looking up names on a local network: anyone on the same network could answer a lookup and pose as another computer to catch sign-ins. Devices on the network are still found by name through mDNS (`name.local`), which Avahi answers.
+
 ## Service sandboxing
 
 Each of Luft's services runs with only what it needs: a read-only view of the system with write access to its own folders, no network, devices or capabilities it doesn't use, and a filter on the system calls it may make. Services that hand their sandbox on to apps they start, such as cloud drives and Kestrel's settings, or that start containers, keep fewer of these limits so those apps keep working.

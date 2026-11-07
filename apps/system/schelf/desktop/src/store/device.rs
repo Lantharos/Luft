@@ -12,6 +12,10 @@ const EXTENSION_PLATFORMS: &[&str] = &["luft-x86_64", "luft"];
 #[cfg(target_arch = "aarch64")]
 const EXTENSION_PLATFORMS: &[&str] = &["luft-aarch64", "luft"];
 
+/// Apps that only get another system ready for Luft, with nothing to do once
+/// a computer runs it.
+const FOR_OTHER_SYSTEMS: &[&str] = &["com.lantharos.meet"];
+
 /// The platform of a file the store has for every system, such as an archive.
 pub const ANY_SYSTEM: &str = "any";
 
@@ -21,6 +25,12 @@ pub fn platforms(kind: Kind) -> &'static [&'static str] {
         Kind::App => APP_PLATFORMS,
         Kind::Extension => EXTENSION_PLATFORMS,
     }
+}
+
+pub fn useful_here(id: &str) -> bool {
+    !FOR_OTHER_SYSTEMS
+        .iter()
+        .any(|other| other.eq_ignore_ascii_case(id))
 }
 
 pub fn folder() -> PathBuf {

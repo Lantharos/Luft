@@ -1,16 +1,22 @@
 <script lang="ts">
 	import type { CatalogApp } from '#lib/bindings.js';
+	import Check from '@lucide/svelte/icons/check';
+	import { library } from '#lib/state/library.svelte.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
 	import AppArt from './AppArt.svelte';
 
 	let { app }: { app: CatalogApp } = $props();
+	const installed = $derived(library.forListing(app) !== null);
 </script>
 
 <button type="button" class="tile" onclick={() => navigation.push({ page: 'app', target: { listing: app }, name: app.name })}>
 	<AppArt icon={app.icon} source={app.kind === 'extension' ? 'extension' : null} size={52} />
 	<span class="text">
 		<span class="name">{app.name}</span>
-		<span class="summary">{app.summary}</span>
+		<span class="summary" class:single={installed}>{app.summary}</span>
+		{#if installed}
+			<span class="installed"><Check size={13} strokeWidth={2.5} />Installed</span>
+		{/if}
 	</span>
 </button>
 
@@ -59,5 +65,19 @@
 		-webkit-box-orient: vertical;
 		-webkit-line-clamp: 2;
 		line-clamp: 2;
+	}
+
+	.summary.single {
+		-webkit-line-clamp: 1;
+		line-clamp: 1;
+	}
+
+	.installed {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+		font-size: 12px;
+		font-weight: 500;
+		color: var(--text-soft);
 	}
 </style>

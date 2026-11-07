@@ -19,7 +19,7 @@
 
 	const route = $derived(navigation.route);
 	const depth = $derived(navigation.stack.length);
-	const heading = $derived(route.page !== 'app' ? title(route) : depth > 1 ? title(navigation.stack[depth - 2]) : '');
+	const heading = $derived(title(route));
 
 	onMount(() => {
 		void start().then(() => (ready = true));

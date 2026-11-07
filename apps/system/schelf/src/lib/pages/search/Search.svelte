@@ -36,6 +36,7 @@
 
 	const apps = $derived(remote?.filter((app) => app.kind === 'app').slice(0, LIMIT) ?? null);
 	const extensions = $derived(remote?.filter((app) => app.kind === 'extension').slice(0, LIMIT) ?? []);
+	const extensionsFirst = $derived(remote?.[0]?.kind === 'extension');
 	const others = $derived(tools === null || system === null ? null : tools + system);
 	const nothing = $derived(!installed.length && remote?.length === 0 && others === 0);
 </script>
@@ -58,12 +59,15 @@
 				</div>
 			</section>
 		{/if}
+		{#if extensionsFirst}
+			<Shelf title="Extensions" apps={extensions} />
+		{/if}
 		{#if error}
 			<p class="px-1.5 text-[14px] text-[var(--text-muted)]">Apps can't be searched right now. {error}</p>
 		{:else if apps === null || apps.length}
 			<Shelf title="Apps" {apps} />
 		{/if}
-		{#if extensions.length}
+		{#if extensions.length && !extensionsFirst}
 			<Shelf title="Extensions" apps={extensions} />
 		{/if}
 		<PackageResults {query} kind="tool" bind:found={tools} />

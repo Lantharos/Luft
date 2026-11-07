@@ -10,6 +10,9 @@ use sushi_scene::tiny_skia::Pixmap;
 
 use super::card::Card;
 
+const DPMS: &[u8] = b"DPMS";
+const DPMS_ON: u64 = 0;
+
 struct ScanoutBuffer {
     handle: buffer::Handle,
     size: (u32, u32),
@@ -152,8 +155,26 @@ impl Output {
 
     pub fn show(&self, card: &Card) -> io::Result<()> {
         self.set_mode(card, self.first_mode())?;
+        self.switch_on(card);
         self.hide_other_planes(card);
         Ok(())
+    }
+
+    fn switch_on(&self, card: &Card) {
+        let Ok(properties) = card.get_properties(self.connector) else {
+            return;
+        };
+        let dpms = properties.iter().find_map(|(property, value)| {
+            let named_dpms = card
+                .get_property(*property)
+                .is_ok_and(|info| info.name().to_bytes() == DPMS);
+            (named_dpms && *value != DPMS_ON).then_some(*property)
+        });
+        if let Some(dpms) = dpms
+            && let Err(error) = card.set_property(self.connector, dpms, DPMS_ON)
+        {
+            eprintln!("Couldn't switch the display back on: {error}");
+        }
     }
 
     pub fn finish_waking(&mut self, card: &Card) -> io::Result<()> {

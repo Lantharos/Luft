@@ -1,10 +1,13 @@
 mod ask;
 
 use sushi::ipc::password::{PasswordRequests, RECOVERY_KEY_LETTERS, Request, Secret};
-use sushi::scene::Prompt;
+use sushi::scene::{Prompt, ShownKey};
 use sushi::terminal::{Key, Terminal};
 
 use ask::Ask;
+
+const NOT_A_RECOVERY_KEY: &str =
+    "Recovery keys only use the letters B C D E F G H I J K L N R T U V";
 
 pub struct Unlock {
     request: Request,
@@ -12,6 +15,7 @@ pub struct Unlock {
     secret: Secret,
     rejected: bool,
     caps_lock: bool,
+    incomplete: bool,
     pub prompt: Prompt,
 }
 
@@ -57,39 +61,57 @@ impl Unlock {
             secret: Secret::default(),
             rejected,
             caps_lock: false,
+            incomplete: false,
         };
         unlock.refresh();
         Some(unlock)
     }
 
+    fn key_note(&self) -> Option<(String, f32)> {
+        let typed = self.secret.characters();
+        match self.secret.recovery_key_letters() {
+            None => Some((NOT_A_RECOVERY_KEY.to_owned(), 1.0)),
+            Some(RECOVERY_KEY_LETTERS) => Some(("Press Enter to unlock".to_owned(), 0.7)),
+            Some(letters) if letters > RECOVERY_KEY_LETTERS => Some((
+                format!("A recovery key has {RECOVERY_KEY_LETTERS} characters, this is more"),
+                1.0,
+            )),
+            Some(letters) if self.incomplete => Some((
+                format!("{letters} of {RECOVERY_KEY_LETTERS} characters. Type the rest first."),
+                1.0,
+            )),
+            Some(letters) if typed > 0 => Some((
+                format!("{letters} of {RECOVERY_KEY_LETTERS} characters"),
+                0.5,
+            )),
+            Some(_) => None,
+        }
+    }
+
     fn refresh(&mut self) {
         let copy = self.ask.copy();
+        let only_a_key = self.ask.wants_only_a_recovery_key();
         self.prompt.title = copy.title;
         self.prompt.explanation = copy.explanation;
         self.prompt.placeholder = copy.placeholder.to_owned();
         self.prompt.typed = self.secret.characters();
-        let letters = self
-            .secret
-            .recovery_key_letters()
-            .filter(|letters| *letters > 0 && self.ask.wants_only_a_recovery_key());
+        self.prompt.key = only_a_key.then(|| ShownKey::new(self.secret.recovery_key_shown()));
         self.prompt.note = if self.rejected {
             Some((copy.rejected.to_owned(), 1.0))
-        } else if self.caps_lock {
+        } else if self.caps_lock && !only_a_key {
             Some(("Caps Lock is on".to_owned(), 0.7))
+        } else if only_a_key {
+            self.key_note()
         } else {
-            letters
-                .map(|letters| {
-                    (
-                        format!("{letters} of {RECOVERY_KEY_LETTERS} characters"),
-                        0.5,
-                    )
-                })
-                .or_else(|| {
-                    self.ask
-                        .can_go_back()
-                        .then(|| ("Press Esc to go back".to_owned(), 0.5))
-                })
+            self.ask
+                .can_go_back()
+                .then(|| ("Press Esc to go back".to_owned(), 0.5))
         };
+    }
+
+    fn ready_to_answer(&self) -> bool {
+        !self.ask.wants_only_a_recovery_key()
+            || self.secret.recovery_key_letters() == Some(RECOVERY_KEY_LETTERS)
     }
 
     pub fn is_live(&self) -> bool {
@@ -103,20 +125,38 @@ impl Unlock {
         }
     }
 
-    pub fn type_keys(&mut self, terminal: &mut Terminal, answered: &mut Answered) -> Typed {
+    pub fn type_keys(
+        &mut self,
+        terminal: &mut Terminal,
+        answered: &mut Answered,
+        now: f32,
+    ) -> Typed {
         let keys = terminal.keys();
         if keys.is_empty() {
             return Typed::Nothing;
         }
         for key in keys {
             match key {
-                Key::Text(character) => self.secret.push(character),
-                Key::Erase => self.secret.pop(),
-                Key::Clear => self.secret.clear(),
+                Key::Text(character) => {
+                    self.incomplete = false;
+                    self.secret.push(character);
+                }
+                Key::Erase => {
+                    self.incomplete = false;
+                    self.secret.pop();
+                }
+                Key::Clear => {
+                    self.incomplete = false;
+                    self.secret.clear();
+                }
                 Key::Escape if self.ask.can_go_back() => {
                     let _ = self.request.cancel();
                     self.secret.clear();
                     return Typed::Answered;
+                }
+                Key::Enter if !self.ready_to_answer() => {
+                    self.incomplete = true;
+                    self.prompt.shake_started = Some(now);
                 }
                 Key::Enter => {
                     if self.ask.accepts_recovery_key() {

@@ -1,4 +1,3 @@
-import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 
@@ -8,10 +7,7 @@ import * as PopupMenu from '../../shared/popups/popupMenu.js';
 import { QuickMenuToggle, SystemIndicator } from '../toggles/quickSettings.js';
 
 import { formatTime } from '../../shared/time/dateUtils.js';
-
-const BUS_NAME = 'org.gnome.SessionManager';
-const OBJECT_PATH = '/org/gnome/SessionManager';
-const INHIBIT_IDLE = 8;
+import { inhibitIdle, uninhibitIdle } from './idleInhibit.js';
 const ICON_NAME = 'view-reveal-symbolic';
 
 const DURATIONS = new Map([
@@ -20,16 +16,6 @@ const DURATIONS = new Map([
   [60, 'caffeine-1-hour'],
   [120, 'caffeine-2-hours'],
 ]);
-
-function callSessionManager(method: string, parameters: GLib.Variant, replyType: string | null): Promise<GLib.Variant> {
-  return Gio.DBus.session.call(BUS_NAME, OBJECT_PATH, BUS_NAME, method, parameters,
-    replyType ? new GLib.VariantType(replyType) : null, Gio.DBusCallFlags.NONE, -1, null);
-}
-
-function uninhibit(cookie: number): void {
-  callSessionManager('Uninhibit', new GLib.Variant('(u)', [cookie]), null)
-    .catch((error: Error) => logError(error, 'Could not release the keep awake request'));
-}
 
 const CaffeineToggle = GObject.registerClass(class CaffeineToggle extends QuickMenuToggle {
   private cookie = 0;
@@ -75,12 +61,9 @@ const CaffeineToggle = GObject.registerClass(class CaffeineToggle extends QuickM
       });
     }
     try {
-      const reply = await callSessionManager('Inhibit',
-        new GLib.Variant('(susu)', ['org.gnome.Shell', 0, KestrelUi.t('caffeine-inhibit-reason'), INHIBIT_IDLE]),
-        '(u)');
-      const [cookie] = reply.deepUnpack<[number]>();
+      const cookie = await inhibitIdle(KestrelUi.t('caffeine-inhibit-reason'));
       if (this.request === request) this.cookie = cookie;
-      else uninhibit(cookie);
+      else uninhibitIdle(cookie);
     } catch (error) {
       logError(error as Error, 'Could not keep the session awake');
       if (this.request === request) this.stop();
@@ -91,7 +74,7 @@ const CaffeineToggle = GObject.registerClass(class CaffeineToggle extends QuickM
     this.request = null;
     if (this.timeoutId) GLib.source_remove(this.timeoutId);
     this.timeoutId = 0;
-    if (this.cookie) uninhibit(this.cookie);
+    if (this.cookie) uninhibitIdle(this.cookie);
     this.cookie = 0;
     this.minutes = null;
     this.until = null;

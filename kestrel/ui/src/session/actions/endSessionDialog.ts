@@ -21,6 +21,7 @@ import { ModalDialogErrors, ModalDialogError } from '../../core/runtime/dbusErro
 
 import { loadInterfaceXML } from '../../core/runtime/fileUtils.js';
 import { loadStagedImage, type StagedImage } from './stagedImage.js';
+import { inhibitIdle, uninhibitIdle } from '../../system/power/idleInhibit.js';
 
 const ITEM_ICON_SIZE = 64;
 const LOW_BATTERY_THRESHOLD = 30;
@@ -105,6 +106,7 @@ export class EndSessionDialog extends ModalDialog {
   private secondsLeft = 0;
   private totalSecondsToStayOpen = 0;
   private timerId = 0;
+  private awake: Promise<number> | null = null;
   private applications: Inhibitor[] = [];
   private sessions = 0;
   private rebootButton: St.Button | null = null;
@@ -290,8 +292,22 @@ export class EndSessionDialog extends ModalDialog {
 
   override close(skipSignal = false): void {
     super.close();
+    this.letScreenSleep();
 
     if (!skipSignal) this.dbusImpl.emit_signal('Closed', null);
+  }
+
+  private keepScreenAwake(): void {
+    this.awake ??= inhibitIdle(KestrelUi.t('end-session-awake-reason')).catch((error: Error) => {
+      logError(error, 'Could not keep the screen on for the end session dialog');
+      return 0;
+    });
+  }
+
+  private letScreenSleep(): void {
+    const awake = this.awake;
+    this.awake = null;
+    void awake?.then((cookie) => cookie && uninhibitIdle(cookie));
   }
 
   private cancel(): void {
@@ -463,6 +479,7 @@ export class EndSessionDialog extends ModalDialog {
       return;
     }
 
+    this.keepScreenAwake();
     this.startTimer();
     this.sync();
 

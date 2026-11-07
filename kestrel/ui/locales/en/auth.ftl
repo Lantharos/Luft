@@ -153,6 +153,8 @@ end-session-log-out-countdown = { $seconds ->
 }
 # Button
 end-session-log-out-button = Log Out
+# Why the screen stays on while the dialog counts down
+end-session-awake-reason = Counting down to power off, restart or log out
 # Dialog title
 end-session-power-off-title = Power Off
 # Dialog title when updates are installed before powering off

@@ -16,7 +16,7 @@ pub use logo::FirmwareLogo;
 pub use monitor::Monitor;
 pub use panels::failure::Failure;
 pub use panels::notice::Notice;
-pub use panels::prompt::{Prompt, is_shaking};
+pub use panels::prompt::{Prompt, ShownKey, is_shaking};
 pub use panels::status::{Progress, Status};
 pub use scene::{Scene, Visuals};
 pub use tiny_skia;
@@ -25,6 +25,7 @@ use tiny_skia::{Path, PathBuilder};
 
 const LOADER_LOGICAL_SIZE: f32 = 56.0;
 const LOADER_GAP_RATIO: f32 = 0.42;
+pub const CAPTION_SIZE: f32 = 14.0;
 
 pub const FADE_SECONDS: f32 = 0.3;
 
@@ -111,6 +112,21 @@ impl Layout {
             height: (extent * 2) as u32,
         }
     }
+
+    pub fn caption_baseline(&self) -> f32 {
+        self.loader_center.1 + self.loader_size * 0.5 + 36.0 * self.scale
+    }
+
+    pub fn caption_bounds(&self) -> Rect {
+        let baseline = self.caption_baseline();
+        let top = baseline - CAPTION_SIZE * 1.4 * self.scale;
+        Rect {
+            x: 0,
+            y: top as i32,
+            width: self.width,
+            height: libm::ceilf(CAPTION_SIZE * 2.0 * self.scale) as u32,
+        }
+    }
 }
 
 pub fn ease(progress: f32) -> f32 {
@@ -119,7 +135,10 @@ pub fn ease(progress: f32) -> f32 {
 }
 
 pub fn pill(field: tiny_skia::Rect) -> Option<Path> {
-    let radius = field.height() / 2.0;
+    rounded(field, field.height() / 2.0)
+}
+
+pub fn rounded(field: tiny_skia::Rect, radius: f32) -> Option<Path> {
     let handle = radius * 0.552_284_8;
     let (left, top, right, bottom) = (field.left(), field.top(), field.right(), field.bottom());
     let mut path = PathBuilder::new();

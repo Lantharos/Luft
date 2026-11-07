@@ -7,7 +7,7 @@ use sushi::scene::Notice;
 use sushi::terminal::Key;
 
 const LIMIT: Duration = Duration::from_secs(240);
-const KEY_ENROLLMENT_SHOWN: Duration = Duration::from_secs(20);
+const KEY_ENROLLMENT_SHOWN: Duration = Duration::from_secs(30);
 
 pub struct Shown {
     pub notice: Notice,
@@ -18,31 +18,34 @@ pub struct Shown {
     keys: Vec<char>,
 }
 
-fn spaced(code: &str) -> String {
-    let (first, second) = code.split_at(code.len() / 2);
-    format!("{first} {second}")
-}
-
 pub fn key_enrollment(enrollment: &KeyEnrollment, waiting: UnixStream) -> Shown {
     let retry = enrollment
         .again
-        .then(|| "Luft's key wasn't added last time. Let's try again.".to_owned());
+        .then(|| "The blue screen went by last time, so here it is again.".to_owned());
     let notice = Notice {
-        title: "One more step after the restart".to_owned(),
+        title: "Finish setting up Secure Boot after the restart".to_owned(),
         body: retry
             .into_iter()
             .chain([
-                "A blue screen will ask about adding a key. It only waits 10 seconds,".to_owned(),
-                "so press any key as soon as it appears. Then:".to_owned(),
+                "A blue screen says \u{201c}Press any key to perform MOK management\u{201d}"
+                    .to_owned(),
+                "and waits a minute. Press any key, then:".to_owned(),
             ])
             .collect(),
         steps: vec![
-            "Choose Enroll MOK, then Continue".to_owned(),
-            "Choose Yes".to_owned(),
-            format!("Type {} and press Enter", spaced(&enrollment.code)),
-            "Choose Reboot".to_owned(),
+            "Choose \u{201c}Enroll MOK\u{201d}".to_owned(),
+            "Choose \u{201c}Continue\u{201d}".to_owned(),
+            "At \u{201c}Enroll the key(s)?\u{201d}, choose \u{201c}Yes\u{201d}".to_owned(),
+            "At \u{201c}Password:\u{201d}, type this code and press Enter".to_owned(),
+            "Choose \u{201c}Reboot\u{201d}".to_owned(),
         ],
-        footer: format!("Restarting in {SECONDS} seconds. Press Enter to restart now."),
+        code: Some((
+            enrollment.code.clone(),
+            "All eight digits, no space. Nothing shows while you type.".to_owned(),
+        )),
+        footer: format!(
+            "If it goes by, Luft starts anyway and you can try again. Restarting in {SECONDS} seconds, or press Enter."
+        ),
     };
     let mut shown = Shown::new(notice, waiting);
     shown.countdown = Some(KEY_ENROLLMENT_SHOWN);

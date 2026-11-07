@@ -84,6 +84,7 @@ impl Look {
 struct Shown {
     logo: f32,
     loader: f32,
+    caption: bool,
     prompt: f32,
     content: Option<Prompt>,
     status: Option<(Status, f32)>,
@@ -94,6 +95,7 @@ struct Shown {
 }
 
 pub struct Content<'a> {
+    pub caption: Option<&'a str>,
     pub prompt: Option<&'a Prompt>,
     pub status: Option<(Status, f32)>,
     pub notice: Option<&'a Notice>,
@@ -168,6 +170,7 @@ impl Screen {
         content: Content,
     ) -> io::Result<()> {
         let Content {
+            caption,
             prompt,
             status,
             notice,
@@ -176,6 +179,7 @@ impl Screen {
         let next = Shown {
             logo: look.logo.value(now),
             loader: look.loader.value(now),
+            caption: caption.is_some(),
             prompt: look.prompt.value(now) * revealed,
             content: prompt.cloned(),
             status: status.map(|(status, alpha)| (status, alpha * revealed)),
@@ -188,6 +192,7 @@ impl Screen {
             seconds: now,
             logo: next.logo,
             loader: next.loader,
+            caption,
             prompt: prompt.map(|prompt| (prompt, next.prompt)),
             status: next.status.as_ref().map(|(status, alpha)| (status, *alpha)),
             notice: next
@@ -307,6 +312,9 @@ fn damage(scene: &Scene, shown: &Shown, next: &Shown, now: f32) -> Vec<Rect> {
     }
     if shown.loader > 0.0 || next.loader > 0.0 {
         areas.push(scene.loader_area());
+    }
+    if shown.caption != next.caption || (next.caption && shown.loader != next.loader) {
+        areas.push(scene.caption_area());
     }
     let shaking = next
         .content

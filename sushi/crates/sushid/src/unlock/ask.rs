@@ -2,9 +2,11 @@ use std::path::Path;
 
 use sushi::ipc::password::{Request, SHELL};
 use sushi::luks::{self, Unlocking};
+use sushi::started;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Why {
+    WithoutKey,
     Changed,
     NoTpm,
     PinFailed,
@@ -91,6 +93,8 @@ impl Ask {
             Some(unlocking) if unlocking.tpm => Self::Fallback {
                 why: if pin_answered {
                     Why::PinFailed
+                } else if started::without_key() {
+                    Why::WithoutKey
                 } else if has_tpm() {
                     Why::Changed
                 } else {
@@ -173,6 +177,11 @@ impl Ask {
                     Accepts::Passphrase => ("Unlock this computer", "Passphrase"),
                 };
                 let explanation = match why {
+                    Why::WithoutKey => vec![
+                        "Secure Boot isn't set up for Luft yet, so this",
+                        "computer couldn't unlock by itself. Once you're",
+                        "signed in, Luft shows how to finish setting it up.",
+                    ],
                     Why::Changed => vec![
                         "Something about how this computer starts has changed,",
                         "so it couldn't unlock by itself this time. A firmware",

@@ -14,6 +14,7 @@ pub struct Visuals<'a> {
     pub seconds: f32,
     pub logo: f32,
     pub loader: f32,
+    pub caption: Option<&'a str>,
     pub prompt: Option<(&'a Prompt, f32)>,
     pub status: Option<(&'a Status, f32)>,
     pub notice: Option<(&'a Notice, f32)>,
@@ -148,6 +149,10 @@ impl Scene {
         self.project(self.layout.loader_bounds())
     }
 
+    pub fn caption_area(&self) -> Rect {
+        self.project(self.layout.caption_bounds())
+    }
+
     pub fn prompt_area(&self) -> Rect {
         self.project(prompt::bounds(&self.layout))
     }
@@ -168,6 +173,7 @@ impl Scene {
         [
             self.logo_area().filter(|_| visuals.logo > 0.0),
             (visuals.loader > 0.0).then(|| self.loader_area()),
+            (visuals.loader > 0.0 && visuals.caption.is_some()).then(|| self.caption_area()),
             visuals.prompt.map(|_| self.prompt_area()),
             visuals.status.map(|_| self.status_area()),
             visuals.notice.map(|_| self.notice_area()),
@@ -222,6 +228,16 @@ impl Scene {
             visuals.seconds,
             visuals.loader,
         );
+        if let Some(caption) = visuals.caption.filter(|_| visuals.loader > 0.0) {
+            crate::text::centered(
+                &mut canvas,
+                view,
+                caption,
+                (self.layout.loader_center.0, self.layout.caption_baseline()),
+                crate::CAPTION_SIZE * self.layout.scale,
+                0.55 * visuals.loader,
+            );
+        }
         if let Some((prompt, alpha)) = visuals.prompt {
             prompt::draw(
                 &mut canvas,

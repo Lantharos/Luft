@@ -47,6 +47,14 @@ impl Secret {
         Some(letters)
     }
 
+    pub fn recovery_key_shown(&self) -> String {
+        String::from_utf8_lossy(&self.0)
+            .chars()
+            .filter(|character| !matches!(character, '-' | ' '))
+            .flat_map(char::to_uppercase)
+            .collect()
+    }
+
     pub fn tidy_recovery_key(&mut self) {
         if self.recovery_key_letters() != Some(RECOVERY_KEY_LETTERS) {
             return;

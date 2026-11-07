@@ -100,6 +100,10 @@ impl Activity {
         }
     }
 
+    pub fn is_starting(&self) -> bool {
+        self.mode == Mode::Boot
+    }
+
     pub fn is_showing(&self) -> bool {
         title(self.mode).is_some()
     }

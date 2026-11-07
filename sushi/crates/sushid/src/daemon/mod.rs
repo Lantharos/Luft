@@ -18,6 +18,7 @@ use sushi::ipc::password::PasswordRequests;
 use sushi::ipc::plymouth::{self, Client};
 use sushi::render::Logo;
 use sushi::scene::{Failure, Prompt, Scene};
+use sushi::started;
 use sushi::terminal::Terminal;
 
 use crate::activity::Activity;
@@ -28,6 +29,7 @@ use crate::signals::{Switch, VtSignals};
 use crate::takeover::Takeover;
 use crate::unlock::{Answered, Typed, Unlock};
 
+const STARTING_FROM_STICK: &str = "Starting Luft from the USB stick";
 const FRAME: Duration = Duration::from_micros(16_667);
 const WATCH_INTERVAL: Duration = Duration::from_millis(16);
 const CAPS_LOCK_INTERVAL: Duration = Duration::from_millis(250);
@@ -79,6 +81,7 @@ pub struct Daemon {
     driver_waiters: Vec<UnixStream>,
     entering_root: Option<PathBuf>,
     root_waiters: Vec<UnixStream>,
+    from_stick: bool,
     quit: bool,
 }
 
@@ -139,6 +142,7 @@ impl Daemon {
             driver_waiters: Vec::new(),
             entering_root: None,
             root_waiters: Vec::new(),
+            from_stick: started::from_stick(),
             quit: false,
             config,
             hints,
@@ -363,11 +367,12 @@ impl Daemon {
             }
             return;
         }
+        let now = self.now();
         let (Some(terminal), Some(unlock)) = (&mut self.terminal, &mut self.unlock) else {
             return;
         };
         unlock.set_caps_lock(terminal.caps_lock());
-        if let Typed::Answered = unlock.type_keys(terminal, &mut self.answered) {
+        if let Typed::Answered = unlock.type_keys(terminal, &mut self.answered, now) {
             self.close_prompt();
         }
     }
@@ -445,6 +450,8 @@ impl Daemon {
         let status = self.activity.status(now);
         let prompt = shown_prompt(&self.unlock, &self.fading_prompt);
         let content = Content {
+            caption: (self.from_stick && self.activity.is_starting())
+                .then_some(STARTING_FROM_STICK),
             prompt,
             status,
             notice: self

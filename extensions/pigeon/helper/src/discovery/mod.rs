@@ -23,6 +23,7 @@ use crate::protocol::{Info, PORT, Presence, Scheme};
 const ANNOUNCE_AFTER: [Duration; 3] = [Duration::from_millis(100), Duration::from_millis(500), Duration::from_millis(2000)];
 const ANSWERS_WITHIN: Duration = Duration::from_secs(3);
 const CONNECTIONS_CHECKED_EVERY: Duration = Duration::from_secs(10);
+const SCANNED_EVERY: Duration = Duration::from_secs(300);
 const REACH_WITHIN: Duration = Duration::from_secs(2);
 const SCAN_AT_ONCE: usize = 64;
 
@@ -40,18 +41,19 @@ pub async fn run(app: Arc<App>) {
         tokio::spawn(hear(app.clone(), multicast.clone()));
     }
     let mut connections = interval(CONNECTIONS_CHECKED_EVERY);
-    let mut scanned = false;
+    let mut every = interval(SCANNED_EVERY);
     loop {
         tokio::select! {
-            () = app.scans.notified() => scan(&app, multicast.as_deref()).await,
+            () = app.scans.notified() => {}
+            _ = every.tick() => {}
             _ = connections.tick() => {
-                let joined = multicast.as_ref().is_some_and(|multicast| multicast.join_new());
-                if joined || !scanned {
-                    scanned = true;
-                    scan(&app, multicast.as_deref()).await;
+                if !multicast.as_ref().is_some_and(|multicast| multicast.join_new()) {
+                    continue;
                 }
             }
         }
+        scan(&app, multicast.as_deref()).await;
+        every.reset();
     }
 }
 

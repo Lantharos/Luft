@@ -20,6 +20,7 @@ Luft is translated into Albanian, Bosnian, Bulgarian, Catalan, Croatian, Czech, 
 | extension-keystrokes | `extensions/keystrokes/locales/*/keystrokes.ftl` | the Keystrokes extension: its settings, sounds, what it can see, and why a set of sounds can't be added |
 | extension-reminders | `extensions/reminders/locales/*/reminders.ftl` | the Reminders extension: its settings, lists, notifications and the nudges for overdue goals. Quick add itself reads English |
 | extension-tailor | `extensions/tailor/locales/*/tailor.ftl` | the Tailor extension: its name, what it does to each app it dresses and how each one is doing |
+| extension-pigeon | `extensions/pigeon/locales/*/pigeon.ftl` | the Pigeon extension: its tile, panel, offers, sending, notifications and settings |
 | extension-soundscapes | `extensions/soundscapes/locales/*/soundscapes.ftl` | the Soundscapes extension: its sounds, mixes, tile, mixer and settings |
 | kestrel-settings | `kestrel/settings/locales/*/settings.ftl` | notifications from `kestrel-settings` about drives, the battery and new networks |
 | kestrel-portal-service | `kestrel/portal/locales/*/portal.ftl` | print job names and printing failures from `kestrel-portal` |

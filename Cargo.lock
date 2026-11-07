@@ -7024,6 +7024,7 @@ name = "pigeon"
 version = "0.1.0"
 dependencies = [
  "bytes",
+ "dirs",
  "futures-util",
  "getrandom 0.4.3",
  "http-body",

@@ -1,4 +1,3 @@
-use std::fs;
 use std::path::PathBuf;
 
 use serde::Deserialize;
@@ -7,10 +6,12 @@ use serde::Deserialize;
 #[derive(Clone, Debug, Default, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Config {
-    /// The name other devices show, or this computer's name when there's none.
+    /// The name other devices show, or the computer's name when there's none.
     #[serde(default)]
     pub alias: Option<String>,
-    pub folder: PathBuf,
+    /// Where received files go, or Downloads when there's none.
+    #[serde(default)]
+    pub folder: Option<PathBuf>,
     pub receive: bool,
     #[serde(default)]
     pub pin: Option<String>,
@@ -19,8 +20,12 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn alias(&self) -> String {
-        self.alias.clone().filter(|alias| !alias.trim().is_empty()).unwrap_or_else(computer_name)
+    pub fn alias(&self, computer: &str) -> String {
+        self.alias.clone().filter(|alias| !alias.trim().is_empty()).unwrap_or_else(|| computer.to_owned())
+    }
+
+    pub fn folder(&self) -> PathBuf {
+        self.folder.clone().or_else(dirs::download_dir).or_else(dirs::home_dir).expect("people have a home folder")
     }
 
     pub fn trusts(&self, fingerprint: &str) -> bool {
@@ -28,15 +33,21 @@ impl Config {
     }
 }
 
-fn computer_name() -> String {
-    let pretty = fs::read_to_string("/etc/machine-info").ok().and_then(|info| {
-        info.lines()
-            .find_map(|line| line.strip_prefix("PRETTY_HOSTNAME="))
-            .map(|name| name.trim_matches('"').to_owned())
-    });
-    let host = || fs::read_to_string("/etc/hostname").ok().map(|name| name.trim().to_owned());
-    pretty
-        .or_else(host)
-        .filter(|name| !name.is_empty() && name != "localhost")
-        .unwrap_or_else(|| "Luft".into())
+/// The computer's name as people set it, the same one Settings shows, from hostnamed.
+pub async fn computer_name() -> String {
+    let named = async {
+        let hostnamed = zbus::Proxy::new(
+            &zbus::Connection::system().await?,
+            "org.freedesktop.hostname1",
+            "/org/freedesktop/hostname1",
+            "org.freedesktop.hostname1",
+        )
+        .await?;
+        let pretty: String = hostnamed.get_property("PrettyHostname").await?;
+        if !pretty.trim().is_empty() {
+            return Ok(pretty);
+        }
+        hostnamed.get_property::<String>("Hostname").await
+    };
+    named.await.ok().filter(|name: &String| !name.is_empty() && name != "localhost").unwrap_or_else(|| "Luft".into())
 }

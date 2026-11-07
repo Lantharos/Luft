@@ -41,10 +41,13 @@ struct Sending {
 }
 
 impl Outbox {
-    /// Starts sending to the device `device`, and returns the transfer's id, or nothing when that device is gone.
-    pub fn send(&self, app: &Arc<App>, device: &str, what: What) -> Option<String> {
-        let device = app.devices.get(device)?;
+    /// Starts sending to the device `device`, or says it's gone.
+    pub fn send(&self, app: &Arc<App>, device: &str, what: What) {
         let id = random_id();
+        let Some(device) = app.devices.get(device) else {
+            app.link.send(Event::Finished { id, direction: Direction::Out, device: String::new(), outcome: Outcome::Unreachable, saved: Vec::new() });
+            return;
+        };
         let sending = Arc::new(Sending { stop: watch::Sender::new(None), pin: Mutex::default(), receiver: Mutex::default() });
         self.sends.lock().unwrap().insert(id.clone(), sending.clone());
         let (app, transfer_id) = (app.clone(), id.clone());
@@ -54,7 +57,6 @@ impl Outbox {
             app.outbox.sends.lock().unwrap().remove(&transfer_id);
             app.link.send(Event::Finished { id: transfer_id, direction: Direction::Out, device: alias, outcome, saved: Vec::new() });
         });
-        Some(id)
     }
 
     pub fn cancel(&self, id: &str) {
@@ -81,6 +83,7 @@ impl Outbox {
 }
 
 async fn run(app: &App, id: &str, sending: &Sending, device: &Device, what: What) -> Outcome {
+    let text = matches!(what, What::Text(_));
     let files = match what {
         What::Files(paths) => match tokio::task::spawn_blocking(move || files::collect(&paths)).await {
             Ok(Ok(files)) if !files.is_empty() => files,
@@ -94,6 +97,7 @@ async fn run(app: &App, id: &str, sending: &Sending, device: &Device, what: What
         device: device.peer.alias.clone(),
         size: files.iter().map(|file| file.dto.size).sum(),
         files: files.len(),
+        text,
         done: Arc::new(AtomicU64::new(0)),
     };
     let target = Target {

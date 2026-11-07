@@ -15,8 +15,8 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 use std::sync::Arc;
 
-use app::{App, random_id};
-use link::{Command, Commands, Direction, Event, Link, Outcome};
+use app::App;
+use link::{Command, Commands, Event, Link};
 use send::What;
 use tls::Identity;
 
@@ -48,7 +48,7 @@ async fn run(identity: Identity) {
             None => return,
         }
     };
-    let app = App::new(identity, config, Link::start());
+    let app = App::new(identity, config::computer_name().await, config, Link::start());
     tokio::spawn(server::run(app.clone()));
     tokio::spawn(discovery::run(app.clone()));
     tokio::spawn(show_devices(app.clone()));
@@ -66,16 +66,17 @@ async fn run(identity: Identity) {
 fn handle(app: &Arc<App>, command: Command) {
     match command {
         Command::Configure(config) => {
-            let renamed = config.alias() != app.config.borrow().alias();
+            let alias = config.alias(&app.computer);
+            let renamed = alias != app.config.borrow().alias(&app.computer);
+            app.link.send(Event::Ready { fingerprint: app.identity.fingerprint.clone(), alias, folder: config.folder() });
             app.config.send_replace(config);
             if renamed {
-                app.link.send(Event::Ready { fingerprint: app.identity.fingerprint.clone(), alias: app.config.borrow().alias() });
                 app.scans.notify_one();
             }
         }
         Command::Scan => app.scans.notify_one(),
-        Command::Send { device, paths } => send(app, &device, What::Files(paths)),
-        Command::SendText { device, text } => send(app, &device, What::Text(text)),
+        Command::Send { device, paths } => app.outbox.send(app, &device, What::Files(paths)),
+        Command::SendText { device, text } => app.outbox.send(app, &device, What::Text(text)),
         Command::Accept { id } => app.inbox.accept(&id),
         Command::Decline { id } => app.inbox.decline(&id),
         Command::Cancel { id } => {
@@ -83,13 +84,6 @@ fn handle(app: &Arc<App>, command: Command) {
             app.outbox.cancel(&id);
         }
         Command::Pin { id, pin } => app.outbox.pin(&id, pin),
-    }
-}
-
-fn send(app: &Arc<App>, device: &str, what: What) {
-    if app.outbox.send(app, device, what).is_none() {
-        let id = random_id();
-        app.link.send(Event::Finished { id, direction: Direction::Out, device: String::new(), outcome: Outcome::Unreachable, saved: Vec::new() });
     }
 }
 

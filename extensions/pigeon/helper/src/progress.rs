@@ -17,6 +17,8 @@ pub struct Transfer {
     pub device: String,
     pub size: u64,
     pub files: usize,
+    /// Whether it's text rather than files.
+    pub text: bool,
     pub done: Arc<AtomicU64>,
 }
 
@@ -30,6 +32,7 @@ impl Transfer {
             done: self.done.load(Ordering::Relaxed),
             size: self.size,
             files: self.files,
+            text: self.text,
         });
     }
 

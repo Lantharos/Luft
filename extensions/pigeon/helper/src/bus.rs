@@ -34,11 +34,8 @@ impl Pigeon {
         #[zbus(header)] header: Header<'_>,
     ) -> fdo::Result<()> {
         luft_identity::caller::refuse_sandboxed(connection, &header).await?;
-        let paths: Vec<PathBuf> = paths.into_iter().map(PathBuf::from).collect();
-        if paths.is_empty() || !paths.iter().all(|path| path.is_absolute()) {
-            return Err(fdo::Error::InvalidArgs("Send takes full paths".into()));
-        }
-        self.app.outbox.send(&self.app, &device, What::Files(paths)).map(drop).ok_or_else(|| fdo::Error::Failed("That device isn't nearby anymore".into()))
+        self.app.outbox.send(&self.app, &device, What::Files(paths.into_iter().map(PathBuf::from).collect()));
+        Ok(())
     }
 
     /// Looks for devices again.

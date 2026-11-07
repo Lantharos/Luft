@@ -56,13 +56,13 @@ pub enum Outcome {
 #[derive(Debug, Serialize)]
 #[serde(tag = "event", rename_all = "kebab-case")]
 pub enum Event {
-    Ready { fingerprint: String, alias: String },
+    Ready { fingerprint: String, alias: String, folder: PathBuf },
     Listening { listening: bool },
     Devices { devices: Vec<Peer> },
     Scanning { scanning: bool },
     Text { from: Peer, text: String, trusted: bool },
     Offer { id: String, from: Peer, files: Vec<Offered>, size: u64 },
-    Transfer { id: String, direction: Direction, device: String, stage: Stage, done: u64, size: u64, files: usize },
+    Transfer { id: String, direction: Direction, device: String, stage: Stage, done: u64, size: u64, files: usize, text: bool },
     Finished { id: String, direction: Direction, device: String, outcome: Outcome, saved: Vec<PathBuf> },
 }
 

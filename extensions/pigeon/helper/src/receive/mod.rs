@@ -98,7 +98,8 @@ pub async fn prepare(app: &Arc<App>, caller: &Caller, query: &HashMap<String, St
     if trusted {
         app.inbox.decide(&id, Decision::Accept);
     } else {
-        let offered = files.values().map(|file| OfferedFile { name: file.file_name.clone(), size: file.size, kind: file.file_type.clone() }).collect();
+        let mut offered: Vec<OfferedFile> = files.values().map(|file| OfferedFile { name: file.file_name.clone(), size: file.size, kind: file.file_type.clone() }).collect();
+        offered.sort_by(|a, b| a.name.cmp(&b.name));
         app.link.send(Event::Offer { id: id.clone(), from: from.clone(), files: offered, size });
     }
     let decision = decision.await.unwrap_or(Decision::Withdrawn);
@@ -129,11 +130,19 @@ fn accept(app: &Arc<App>, caller: &Caller, info: &Presence, from: Peer, id: Stri
         })
         .collect::<HashMap<_, _>>();
     let active = Arc::new(Active {
-        transfer: Transfer { id: id.clone(), direction: Direction::In, device: from.alias, size, files: entries.len(), done: Arc::new(AtomicU64::new(0)) },
+        transfer: Transfer {
+            id: id.clone(),
+            direction: Direction::In,
+            device: from.alias,
+            size,
+            files: entries.len(),
+            text: false,
+            done: Arc::new(AtomicU64::new(0)),
+        },
         from: caller.address.ip(),
         sender: Target { address: SocketAddr::new(caller.address.ip(), info.port), scheme: info.protocol, fingerprint: None },
         sender_fingerprint: (info.protocol == Scheme::Https).then_some(from.id),
-        folder: app.config.borrow().folder.clone(),
+        folder: app.config.borrow().folder(),
         files: Mutex::new(entries),
         stop: watch::Sender::new(false),
         saved: Mutex::default(),

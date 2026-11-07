@@ -13,6 +13,8 @@ use crate::tls::Identity;
 /// What every part of the helper shares.
 pub struct App {
     pub identity: Identity,
+    /// The computer's name, which other devices see unless people chose another.
+    pub computer: String,
     pub config: watch::Sender<Config>,
     pub devices: Devices,
     pub link: Link,
@@ -22,10 +24,11 @@ pub struct App {
 }
 
 impl App {
-    pub fn new(identity: Identity, config: Config, link: Link) -> Arc<Self> {
-        link.send(Event::Ready { fingerprint: identity.fingerprint.clone(), alias: config.alias() });
+    pub fn new(identity: Identity, computer: String, config: Config, link: Link) -> Arc<Self> {
+        link.send(Event::Ready { fingerprint: identity.fingerprint.clone(), alias: config.alias(&computer), folder: config.folder() });
         Arc::new(Self {
             identity,
+            computer,
             config: watch::Sender::new(config),
             devices: Devices::new(),
             link,
@@ -37,7 +40,7 @@ impl App {
 
     pub fn info(&self) -> Info {
         Info {
-            alias: self.config.borrow().alias(),
+            alias: self.config.borrow().alias(&self.computer),
             version: VERSION.into(),
             device_model: Some("Luft".into()),
             device_type: Some("desktop".into()),

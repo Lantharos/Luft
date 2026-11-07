@@ -69,10 +69,13 @@ pub struct Entry {
 impl Entry {
     /// Whether it has a stable release this computer installs, a file for it
     /// to download, or may be out only on the preview channel it follows,
-    /// which the catalog doesn't list. An app only for other systems isn't
-    /// shown.
+    /// which the catalog doesn't list. An app only for other systems, or only
+    /// useful there, isn't shown.
     fn runs_here(&self) -> bool {
         let any_system = self.kind == Kind::App && self.platforms.contains_key(device::ANY_SYSTEM);
+        if !device::useful_here(&self.id) {
+            return false;
+        }
         self.origin != Origin::Schelf
             || any_system
             || device::platforms(self.kind)
@@ -214,29 +217,54 @@ impl Catalog {
         if needle.chars().count() < SHORTEST_QUERY {
             return Vec::new();
         }
-        let mut found: Vec<(u8, &Entry)> = self
+        let mut found: Vec<(Match, &Entry)> = self
             .entries
             .iter()
-            .filter_map(|entry| Some((rank(entry, &needle)?, entry)))
+            .filter_map(|entry| Some((Match::of(entry, &needle)?, entry)))
             .collect();
-        found.sort_by_key(|(rank, entry)| (*rank, entry.origin, u64::MAX - entry.installs));
+        found.sort_by_key(|(found, entry)| found.order(entry));
         found.into_iter().map(|(_, entry)| entry).collect()
     }
 }
 
-fn rank(entry: &Entry, needle: &str) -> Option<u8> {
-    let name = entry.name.to_lowercase();
-    let last = entry.id.rsplit('.').next().unwrap_or_default().to_lowercase();
-    if name == needle || last == needle || entry.id.eq_ignore_ascii_case(needle) {
-        Some(0)
-    } else if name.starts_with(needle) {
-        Some(1)
-    } else if name.contains(needle) {
-        Some(2)
-    } else if entry.summary.to_lowercase().contains(needle) {
-        Some(3)
-    } else {
-        None
+/// How well an entry's name or summary matches what was searched for, best
+/// first. `Similar` is a match only the store's typo-forgiving search found.
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug)]
+pub enum Match {
+    Exact,
+    Starts,
+    WordStarts,
+    Contains,
+    Summary,
+    Similar,
+}
+
+impl Match {
+    pub fn of(entry: &Entry, needle: &str) -> Option<Self> {
+        let name = entry.name.to_lowercase();
+        let last = entry.id.rsplit('.').next().unwrap_or_default().to_lowercase();
+        if name == needle || last == needle || entry.id.eq_ignore_ascii_case(needle) {
+            Some(Self::Exact)
+        } else if name.starts_with(needle) {
+            Some(Self::Starts)
+        } else if name
+            .split(|letter: char| !letter.is_alphanumeric())
+            .any(|word| word.starts_with(needle))
+        {
+            Some(Self::WordStarts)
+        } else if name.contains(needle) {
+            Some(Self::Contains)
+        } else if entry.summary.to_lowercase().contains(needle) {
+            Some(Self::Summary)
+        } else {
+            None
+        }
+    }
+
+    /// Better matches first; among equal ones, apps from schelf.store before
+    /// mirrored ones, then the most installed.
+    pub fn order(self, entry: &Entry) -> (Self, Origin, u64) {
+        (self, entry.origin, u64::MAX - entry.installs)
     }
 }
 

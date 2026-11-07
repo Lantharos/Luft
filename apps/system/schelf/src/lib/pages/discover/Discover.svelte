@@ -1,10 +1,12 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import type { CatalogApp, Collection } from '#lib/bindings.js';
 	import Shelf from '#lib/components/Shelf.svelte';
 	import * as store from '#lib/catalog/store.js';
 	import { catalogKey, type AppDetails } from '#lib/catalog/types.js';
 	import { details } from '#lib/pages/app/load.js';
 	import { catalog } from '#lib/state/catalog.svelte.js';
+	import { library } from '#lib/state/library.svelte.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
 	import { COLLECTIONS } from '#lib/state/titles.js';
 	import Spotlight from './Spotlight.svelte';
@@ -12,20 +14,27 @@
 	const SHELF_SIZE = 6;
 	const SHELVES: Collection[] = ['popular', 'updated'];
 
-	let shelves = $state<Record<Collection, CatalogApp[]> | null>(null);
+	let collections = $state<Record<Collection, CatalogApp[]> | null>(null);
 	let spotlight = $state<{ listing: CatalogApp; app: AppDetails } | null>(null);
 	let offline = $state(false);
-	let empty = $state(false);
+
+	const featured = $derived.by(() => {
+		if (!collections || !library.loaded) return null;
+		const fresh = collections.popular.filter((app) => !library.forListing(app));
+		return fresh.find((app) => app.origin === 'schelf') ?? fresh[0] ?? null;
+	});
+	const empty = $derived(collections !== null && !collections.popular.length);
+	const shelves = $derived.by(() => {
+		if (!collections || !library.loaded) return null;
+		const others = (apps: CatalogApp[]) => apps.filter((app) => !featured || catalogKey(app) !== catalogKey(featured)).slice(0, SHELF_SIZE);
+		return { popular: others(collections.popular), updated: others(collections.updated) };
+	});
 
 	async function load() {
 		offline = false;
 		try {
 			const [popular, updated] = await Promise.all(SHELVES.map(store.collection));
-			const featured = popular.find((app) => app.origin === 'schelf') ?? popular[0];
-			const others = (apps: CatalogApp[]) => apps.filter((app) => !featured || catalogKey(app) !== catalogKey(featured)).slice(0, SHELF_SIZE);
-			shelves = { popular: others(popular), updated: others(updated) };
-			empty = !featured;
-			if (featured) spotlight = await details(featured).then((app) => ({ listing: featured, app })).catch(() => null);
+			collections = { popular, updated };
 		} catch {
 			offline = true;
 		}
@@ -34,6 +43,20 @@
 	$effect(() => {
 		void catalog.version;
 		void load();
+	});
+
+	const featuredKey = $derived(featured && catalogKey(featured));
+
+	$effect(() => {
+		const key = featuredKey;
+		const listing = untrack(() => featured);
+		spotlight = null;
+		if (!listing) return;
+		void details(listing)
+			.then((app) => {
+				if (featuredKey === key) spotlight = { listing, app };
+			})
+			.catch(() => {});
 	});
 </script>
 
@@ -51,7 +74,7 @@
 		{:else}
 			{#if spotlight}
 				<Spotlight listing={spotlight.listing} app={spotlight.app} />
-			{:else}
+			{:else if !collections || featured}
 				<div class="skeleton h-[240px]"></div>
 			{/if}
 			{#each SHELVES as collection (collection)}

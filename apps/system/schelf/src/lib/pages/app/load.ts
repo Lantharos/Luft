@@ -50,9 +50,5 @@ export async function load(target: AppTarget): Promise<Loaded> {
 }
 
 export function installedFor(target: AppTarget): InstalledApp | null {
-	if ('installed' in target) return library.byKey(target.installed);
-	const { listing } = target;
-	if (listing.origin === 'schelf') return library.installed.find((app) => app.listing === listing.id) ?? null;
-	if (listing.origin === 'flathub') return library.flatpak(listing.id);
-	return library.system(listing.package ?? listing.id);
+	return 'installed' in target ? library.byKey(target.installed) : library.forListing(target.listing);
 }

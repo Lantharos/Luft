@@ -1,4 +1,4 @@
-import { commands, events, type InstalledApp, type Updates } from '#lib/bindings.js';
+import { commands, events, type CatalogApp, type InstalledApp, type Updates } from '#lib/bindings.js';
 import { SLOW } from '#lib/bridge/index.js';
 
 class Library {
@@ -57,6 +57,12 @@ class Library {
 
 	system(name: string) {
 		return this.installed.find((app) => app.source === 'system' && app.id === name) ?? null;
+	}
+
+	forListing(listing: Pick<CatalogApp, 'origin' | 'id' | 'package'>) {
+		if (listing.origin === 'schelf') return this.installed.find((app) => app.listing === listing.id) ?? null;
+		if (listing.origin === 'flathub') return this.flatpak(listing.id);
+		return this.system(listing.package ?? listing.id);
 	}
 
 	update(key: string) {

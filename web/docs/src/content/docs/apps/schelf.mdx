@@ -13,16 +13,16 @@ Schelf is where you get apps. Its catalog is [schelf.store](https://schelf.store
 
 ## Finding apps
 
-- **Discover** shows popular and recently updated apps, and categories. Apps published on schelf.store come first, then Flathub's, then Fedora's, and an app that's in more than one place shows once.
+- **Discover** shows popular and recently updated apps, and categories. Apps published on schelf.store come first, then Flathub's, then Fedora's, and an app that's in more than one place shows once. The app at the top is always one you don't have yet, apps you have are marked Installed, and apps that only help another system get ready for Luft, such as Meet Luft, aren't listed.
 - **Extensions** lists what you can add to Luft's desktop, such as something drawn on the wallpaper or a quick settings tile, each with a picture of it at work.
-- **Search** looks through your installed apps, the catalog and command-line tools at once. It forgives typos while you're online, and searches the catalog on your computer when you're not.
+- **Search** looks through your installed apps, the catalog, extensions and command-line tools at once. Names that match what you typed come first, and among equal matches schelf.store's own apps come before mirrored ones. It forgives typos while you're online, and searches the catalog on your computer when you're not.
 - **App pages** have screenshots, release notes, the size, licence and source, and what the app can use in plain words, broadest access first. Apps from Flathub and Fedora say so under their name. Apps published on schelf.store also say where they come from: whether they were built in public on GitHub Actions, from which repository and commit, with a link to the build.
 - **Full access**, on an installed Flatpak app's or AppImage's page, takes the app out of its sandbox, for apps that need it, such as a password manager. [Installing software](/system/software/#full-access) explains what that means.
 - The catalog is kept on disk and checked for changes when Schelf opens and every six hours, so browsing works offline.
 
 ## Installing and updating
 
-- Downloads queue up, show their progress and can be cancelled.
+- Downloads queue up, show how much has arrived and what's left, then the install step, and can be cancelled. Before a schelf.store app installs, its confirmation says what it can use and how much it downloads.
 - Before an app from schelf.store installs, Schelf shows what it can use and asks you. An app that asks to run outside its sandbox gets the full access confirmation instead. When an update asks for more than you agreed to, it waits under Updates until you look at it again.
 - **Installed** lists every app with its size and where it came from. Under System are the [system packages](/system/software/#system-packages), with the services they run, and **Software sources**, where vendors' package repositories are added and removed.
 - **Updates** updates every app in one go. Flatpak runtimes are listed separately, as app platforms.

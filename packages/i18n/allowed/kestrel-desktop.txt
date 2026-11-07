@@ -4,3 +4,4 @@ kestrel/ui/src/desktop/tray/watcher.ts	Only one tray host is supported
 kestrel/ui/src/desktop/windowManager/windowManager.ts	Window unfullscreen top drag
 kestrel/ui/src/desktop/windowManager/windowManager.ts	Unmatched call to unblockWorkspaceUpdates()
 kestrel/ui/src/desktop/windows/steamGames.ts	Desktop Entry
+kestrel/ui/src/desktop/windows/activationTokens.ts	Only the app in front can bring another window forward

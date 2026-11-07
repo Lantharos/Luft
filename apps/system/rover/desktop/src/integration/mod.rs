@@ -1,3 +1,4 @@
+pub mod activation;
 pub mod chooser;
 pub mod file_manager_bus;
 pub mod launch_args;

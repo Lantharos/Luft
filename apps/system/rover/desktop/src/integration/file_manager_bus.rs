@@ -3,8 +3,11 @@ use std::env;
 use luft_dbus_macros::introspect;
 use tokio::process::Command;
 use url::Url;
-use zbus::interface;
+use zbus::fdo::DBusProxy;
+use zbus::message::Header;
+use zbus::{Connection, interface};
 
+use super::activation;
 use super::launch_args::REVEAL;
 use super::{install_dbus_service, serve_dbus};
 
@@ -16,20 +19,57 @@ struct FileManager;
 #[introspect]
 #[interface(interface = "org.freedesktop.FileManager1")]
 impl FileManager {
-    async fn show_items(&self, uris: Vec<String>, startup_id: String) {
-        open_in_rover(&uris, &startup_id);
+    async fn show_items(
+        &self,
+        uris: Vec<String>,
+        startup_id: String,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+    ) {
+        let token = token(startup_id, connection, &header).await;
+        open_in_rover(&uris, token.as_deref());
     }
 
-    async fn show_folders(&self, uris: Vec<String>, startup_id: String) {
-        open_in_rover(&uris, &startup_id);
+    async fn show_folders(
+        &self,
+        uris: Vec<String>,
+        startup_id: String,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+    ) {
+        let token = token(startup_id, connection, &header).await;
+        open_in_rover(&uris, token.as_deref());
     }
 
-    async fn show_item_properties(&self, uris: Vec<String>, startup_id: String) {
-        open_in_rover(&uris, &startup_id);
+    async fn show_item_properties(
+        &self,
+        uris: Vec<String>,
+        startup_id: String,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+    ) {
+        let token = token(startup_id, connection, &header).await;
+        open_in_rover(&uris, token.as_deref());
     }
 }
 
-fn open_in_rover(uris: &[String], startup_id: &str) {
+/// The caller's own token, or one Kestrel gives when the caller is the app
+/// in front, since many apps ask without one.
+async fn token(startup_id: String, connection: &Connection, header: &Header<'_>) -> Option<String> {
+    if !startup_id.is_empty() {
+        return Some(startup_id);
+    }
+    let sender = header.sender()?;
+    let pid = DBusProxy::new(connection)
+        .await
+        .ok()?
+        .get_connection_unix_process_id(sender.clone().into())
+        .await
+        .ok()?;
+    activation::token_for(connection, pid).await
+}
+
+fn open_in_rover(uris: &[String], token: Option<&str>) {
     let paths: Vec<_> = uris
         .iter()
         .filter_map(|uri| Url::parse(uri).ok()?.to_file_path().ok())
@@ -42,8 +82,8 @@ fn open_in_rover(uris: &[String], startup_id: &str) {
     };
     let mut command = Command::new(exe);
     command.arg(REVEAL).args(paths);
-    if !startup_id.is_empty() {
-        command.env("XDG_ACTIVATION_TOKEN", startup_id);
+    if let Some(token) = token {
+        command.env("XDG_ACTIVATION_TOKEN", token);
     }
     let _ = command.spawn();
 }

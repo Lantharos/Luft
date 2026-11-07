@@ -1,0 +1,8 @@
+<node>
+  <interface name="com.lantharos.Kestrel.Activation">
+    <method name="Token">
+      <arg type="u" direction="in"/>
+      <arg type="s" direction="out"/>
+    </method>
+  </interface>
+</node>

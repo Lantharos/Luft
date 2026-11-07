@@ -43,6 +43,7 @@ interface View {
 	icon: Component;
 	load: () => Promise<{ default: Component }>;
 	titleFor?: (hardware: Hardware) => string;
+	iconFor?: (hardware: Hardware) => Component;
 	needs?: Needs;
 }
 
@@ -56,7 +57,7 @@ const accounts = () => import('./system/accounts/AccountsPanel.svelte');
 const system = () => import('./system/SystemPanel.svelte');
 
 const VIEWS: Record<PageId, View> = {
-	network: { icon: Wifi, load: network },
+	network: { icon: Wifi, iconFor: (hardware) => (hardware.wifi ? Wifi : EthernetPort), load: network },
 	bluetooth: {
 		icon: Bluetooth,
 		load: () => import('./connections/bluetooth/BluetoothPanel.svelte'),
@@ -129,6 +130,10 @@ export function resolveLink(target: string): Link | null {
 
 export function titleOf(panel: Panel, hardware: Hardware) {
 	return t(panel.titleFor?.(hardware) ?? panel.title);
+}
+
+export function iconOf(panel: Panel, hardware: Hardware) {
+	return panel.iconFor?.(hardware) ?? panel.icon;
 }
 
 export function isShown(panel: Panel, hardware: Hardware) {

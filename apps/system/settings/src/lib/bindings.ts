@@ -1006,7 +1006,7 @@ export type Fingerprints = {
 
 export type Firewall = {
 	networks: GuardedNetwork[],
-	unclassified: string[],
+	unclassified: NewNetwork[],
 	openPorts: OpenPort[],
 };
 
@@ -1053,6 +1053,7 @@ export type Hardware = {
 	mouse: boolean,
 	touchpad: boolean,
 	copilotKey: boolean,
+	wifi: boolean,
 };
 
 export type HostSecurity = {
@@ -1248,6 +1249,11 @@ export type Network = {
 
 export type NetworkType = "home" | "public";
 
+export type NewNetwork = {
+	connection: string,
+	name: string,
+};
+
 export type Offer = {
 	to: Variant,
 	size: number | null,
@@ -1413,6 +1419,7 @@ export type Profiles = {
 export type Progress = {
 	stage: Stage,
 	fraction: number | null,
+	transfer: Transfer | null,
 };
 
 export type Protection = {
@@ -1618,6 +1625,12 @@ export type Target = "output" | "input" | "app";
 
 export type Tpm = {
 	usable: boolean,
+};
+
+/**  How many bytes of a download arrived, out of how many. */
+export type Transfer = {
+	done: number,
+	total: number,
 };
 
 export type Trust = {

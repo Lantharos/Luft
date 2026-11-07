@@ -24,7 +24,7 @@
 	--sidebar-text-muted: var(--text-muted);
 	--sidebar-control: color-mix(in oklab, var(--ink) 6%, transparent);
 	--sidebar-control-hover: color-mix(in oklab, var(--ink) 8.5%, transparent);
-	--sidebar-glass: color-mix(in oklab, var(--kestrel-dark-surface, #121211) 34%, transparent);
+	--sidebar-glass: color-mix(in oklab, var(--kestrel-dark-surface, #121211) 52%, transparent);
 	--text: var(--ink);
 	--text-soft: var(--kestrel-dark-on-surface-variant, #c9c9c3);
 	--text-muted: var(--kestrel-dark-outline, #8f8f88);
@@ -78,7 +78,7 @@
 	--sidebar-active: color-mix(in oklab, var(--ink) 8%, transparent);
 	--sidebar-control: color-mix(in oklab, var(--ink) 5%, transparent);
 	--sidebar-control-hover: color-mix(in oklab, var(--ink) 8%, transparent);
-	--sidebar-glass: color-mix(in oklab, var(--kestrel-light-surface, #f6f6f3) 50%, transparent);
+	--sidebar-glass: color-mix(in oklab, var(--kestrel-light-surface, #f6f6f3) 66%, transparent);
 	--text: var(--ink);
 	--text-soft: var(--kestrel-light-on-surface-variant, #3e3e3a);
 	--text-muted: var(--kestrel-light-outline, #75756e);

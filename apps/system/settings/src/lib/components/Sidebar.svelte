@@ -2,7 +2,7 @@
 	import { t } from '@luft/i18n';
 	import { SearchField, selectionPill } from '@luft/ui';
 	import type { Hardware } from '#lib/bindings.js';
-	import { searchPanels, shownGroups, titleOf, type Panel } from '#lib/panels/registry.js';
+	import { iconOf, searchPanels, shownGroups, titleOf, type Panel } from '#lib/panels/registry.js';
 	import { app } from '#lib/state/app.svelte.js';
 	import { hardware } from '#lib/state/hardware.svelte.js';
 	import { updates } from '#lib/state/updates.svelte.js';
@@ -25,6 +25,7 @@
 </script>
 
 {#snippet item(panel: Panel, present: Hardware)}
+	{@const Icon = iconOf(panel, present)}
 	<button
 		type="button"
 		class="nav-item"
@@ -32,7 +33,7 @@
 		aria-current={app.panel === panel.id ? 'page' : undefined}
 		onclick={() => app.open(panel.id)}
 	>
-		<panel.icon size={18} />
+		<Icon size={18} />
 		<span class="truncate">{titleOf(panel, present)}</span>
 		{#if panel.id === 'system' && app.panel !== 'system' && updates.activity.running}
 			<SidebarProgress activity={updates.activity} />

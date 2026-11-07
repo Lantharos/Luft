@@ -77,12 +77,9 @@ export const PANEL_PAGES: Page<PanelId>[][] = [
 		page('extensions', 'settings-page-extensions', 'application-x-addon-symbolic'),
 		page('accessibility', 'settings-page-accessibility', 'preferences-desktop-accessibility-symbolic')
 	],
+	[page('privacy', 'settings-page-privacy', 'preferences-system-privacy-symbolic'), page('security', 'settings-page-security', 'security-high-symbolic')],
 	[
 		page('apps', 'settings-page-apps', 'view-app-grid-symbolic'),
-		page('privacy', 'settings-page-privacy', 'preferences-system-privacy-symbolic'),
-		page('security', 'settings-page-security', 'security-high-symbolic')
-	],
-	[
 		page('accounts', 'settings-page-accounts', 'system-users-symbolic', { keywords: ['settings-page-users', 'settings-page-accounts'] }),
 		page('language', 'settings-page-language', 'preferences-desktop-locale-symbolic', { keywords: ['settings-page-region', 'settings-page-datetime'] }),
 		page('system', 'settings-page-system', 'software-update-available-symbolic', { keywords: ['settings-page-updates'] })

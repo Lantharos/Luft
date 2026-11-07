@@ -71,7 +71,9 @@ function addElement(context: ApiContext, options: TaskbarElementOptions): Taskba
   const { host, scope, manifest, path, dataPath } = context;
   if (!KEY.test(options.key)) throw new Error(`${options.key} isn't a lowercase key with dashes`);
   let state = { ...options };
-  const current = (): ElementState => ({ shown: state.shown !== false, content: state.content, expanded: state.expanded ?? null });
+  const current = (): ElementState => ({
+    shown: state.shown !== false, content: state.content, expanded: state.expanded ?? null, takesFiles: !!state.onDrop,
+  });
   const widgets = new Set<ElementWidget>();
   const listeners = new Set<() => void>();
   let lastUsed: Clutter.Actor | null = null;
@@ -81,6 +83,9 @@ function addElement(context: ApiContext, options: TaskbarElementOptions): Taskba
     click: (actor: Clutter.Actor) => {
       lastUsed = actor;
       if (state.onClick) context.fromPerson(state.onClick)();
+    },
+    drop: (paths: string[]) => {
+      if (state.onDrop && paths.length) context.fromPerson(state.onDrop)(paths);
     },
     expanded: (expanded: boolean) => {
       if (state.onExpandedChanged) scope.run(() => state.onExpandedChanged!(expanded));

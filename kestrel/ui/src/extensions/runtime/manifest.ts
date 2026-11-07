@@ -1,6 +1,6 @@
 import { parse } from 'smol-toml';
 
-import type { ChoiceOption, Manifest, Permission, SettingCondition, SettingDescription, SettingsPageId, SettingValue, ShortcutDescription, SliderRange } from '../api/v1/types.js';
+import type { ChoiceOption, ListenPort, Manifest, Permission, SettingCondition, SettingDescription, SettingsPageId, SettingValue, ShortcutDescription, SliderRange } from '../api/v1/types.js';
 import { API_VERSIONS } from '../api/versions.js';
 
 export const MANIFEST = 'extension.toml';
@@ -12,7 +12,7 @@ const MESSAGE = /^[a-zA-Z][\w-]*$/;
 const HEX = /^#[0-9a-f]{6}$/i;
 const PERMISSIONS: readonly Permission[] = [
   'wallpaper', 'quick-settings', 'taskbar', 'search', 'notifications', 'weather', 'location', 'media', 'popups', 'typing', 'sounds', 'audio-levels',
-  'calls', 'locked-sounds', 'input-sounds', 'do-not-disturb', 'screen-effects',
+  'calls', 'locked-sounds', 'input-sounds', 'do-not-disturb', 'screen-effects', 'clipboard',
 ];
 const NEEDS: Partial<Record<Permission, Permission>> = { 'locked-sounds': 'sounds', 'input-sounds': 'sounds' };
 const APART: Partial<Record<Permission, Permission>> = { 'input-sounds': 'audio-levels' };
@@ -201,16 +201,32 @@ function helper(source: Table): Manifest['helper'] {
   return { path, turnedOff: turnedOff as string[] };
 }
 
+function hosts(described: Table): string[] {
+  return list(described, 'hosts', 'network').map((host, index) => {
+    if (typeof host !== 'string' || !HOST.test(host)) fail(`network.hosts[${index}] must be a host name such as api.example.com`);
+    return host;
+  });
+}
+
+function listen(described: Table): ListenPort[] {
+  const ports = list(described, 'listen', 'network').map((entry, index) => {
+    const where = `network.listen[${index}]`;
+    const port = table(entry, where);
+    const number = port.port;
+    if (typeof number !== 'number' || !Number.isInteger(number) || number < 1 || number > 65535) fail(`${where}.port must be a port from 1 to 65535`);
+    if (port.protocol !== 'tcp' && port.protocol !== 'udp') fail(`${where}.protocol must be "tcp" or "udp"`);
+    return { port: number, protocol: port.protocol } satisfies ListenPort;
+  });
+  if (new Set(ports.map(({ port, protocol }) => `${port}/${protocol}`)).size !== ports.length) fail('network.listen names a port twice');
+  return ports;
+}
+
 function network(source: Table): Manifest['network'] {
   if (source.network === undefined) return undefined;
-  const hosts = list(table(source.network, 'network'), 'hosts', 'network');
-  if (!hosts.length) fail('network.hosts names no hosts');
-  return {
-    hosts: hosts.map((host, index) => {
-      if (typeof host !== 'string' || !HOST.test(host)) fail(`network.hosts[${index}] must be a host name such as api.example.com`);
-      return host;
-    }),
-  };
+  const described = table(source.network, 'network');
+  const named = { hosts: hosts(described), listen: listen(described) };
+  if (!named.hosts.length && !named.listen.length) fail('network names neither hosts nor ports to listen on');
+  return named;
 }
 
 function shortcut(entry: unknown, index: number): ShortcutDescription {

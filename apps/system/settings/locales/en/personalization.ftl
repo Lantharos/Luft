@@ -353,8 +353,14 @@ settings-extensions-permission-locked-sounds = Keep playing sounds while the scr
 settings-extensions-permission-input-sounds = Play a sound when you type and click, without seeing your keys
 settings-extensions-permission-do-not-disturb = Hold back notifications for a while
 settings-extensions-permission-screen-effects = Draw over and change how your windows and the whole screen look
+settings-extensions-permission-clipboard = Copy to your clipboard
 # $hosts lists the web addresses the extension connects to, such as "app.pult.sh"
 settings-extensions-permission-network = Connect to { $hosts }
+# $ports lists port numbers, such as "53317"; $count is how many there are
+settings-extensions-permission-listen = { $count ->
+    [one] Take connections from devices on your network, on port { $ports }
+   *[other] Take connections from devices on your network, on ports { $ports }
+}
 settings-extensions-remove = Remove
 # $version is the extension's version
 settings-extensions-installed = Version { $version }

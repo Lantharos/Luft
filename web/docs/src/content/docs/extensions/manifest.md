@@ -18,7 +18,7 @@ sidebar:
 | `api` | The extension API version it targets. Luft keeps every version it shipped working, and refuses versions it doesn't know |
 | `permissions` | What it uses beyond the basics, see below |
 | `[helper]` | `path` names a program in the folder that the API can start. `turned-off` is an optional list of arguments it runs with once when people turn the extension off or remove it, so it can undo what it changed outside its folder |
-| `[network]` | `hosts` names the hosts it connects to, such as `["api.example.com"]` |
+| `[network]` | `hosts` names the hosts it connects to, such as `["api.example.com"]`. `listen` names the ports its helper takes connections on from other devices, such as `[{ port = 53317, protocol = "tcp" }, { port = 53317, protocol = "udp" }]` |
 | `[[settings]]` | Settings people change in Settings → Extensions, see below |
 | `[[shortcuts]]` | Keyboard shortcuts people can change in Settings → Keyboard, see below |
 
@@ -45,8 +45,9 @@ The API object only has the parts an extension asked for. Settings and Schelf sh
 | `input-sounds` | Play a sound when you type and click, without seeing your keys | `inputSounds` |
 | `do-not-disturb` | Hold back notifications for a while | `doNotDisturb` |
 | `screen-effects` | Draw over and change how your windows and the whole screen look | `screenEffects` |
+| `clipboard` | Copy to your clipboard | `clipboard` |
 
-`locked-sounds` and `input-sounds` need `sounds` too, and `input-sounds` can't go with `audio-levels`. A `[helper]` gives `helper`. It's a native program, so Schelf shows that the extension runs one and scans it like any app. `[network]` gives `network`, and Settings and Schelf show its hosts as "Connect to api.example.com"; a release that adds a host asks again, like one that adds a permission. `[[shortcuts]]` gives `shortcuts`.
+`locked-sounds` and `input-sounds` need `sounds` too, and `input-sounds` can't go with `audio-levels`. A `[helper]` gives `helper`. It's a native program, so Schelf shows that the extension runs one and scans it like any app. `[network]` with `hosts` gives `network`, and Settings and Schelf show its hosts as "Connect to api.example.com"; a release that adds a host asks again, like one that adds a permission. Ports under `listen` show in Settings as "Take connections from devices on your network", and Luft's firewall lets other devices reach ports above 1024 only on networks people marked as home. `[[shortcuts]]` gives `shortcuts`.
 
 `typing` is the one to ask for least: an extension can only type within ten seconds of someone using it, and the taskbar shows that it did.
 

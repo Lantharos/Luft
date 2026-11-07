@@ -1,6 +1,7 @@
 import type { Component } from 'svelte';
 import Bell from '@lucide/svelte/icons/bell';
 import BellOff from '@lucide/svelte/icons/bell-off';
+import Clipboard from '@lucide/svelte/icons/clipboard';
 import CloudSun from '@lucide/svelte/icons/cloud-sun';
 import Cpu from '@lucide/svelte/icons/cpu';
 import Globe from '@lucide/svelte/icons/globe';
@@ -42,7 +43,8 @@ const PERMISSIONS: Record<string, Ability> = {
 	'locked-sounds': { icon: Lock, title: 'Keep playing sounds while the screen is locked' },
 	'input-sounds': { icon: Keyboard, title: 'Play a sound when you type and click, without seeing your keys' },
 	'do-not-disturb': { icon: BellOff, title: 'Hold back notifications for a while' },
-	'screen-effects': { icon: Sparkles, title: 'Draw over and change how your windows and the whole screen look' }
+	'screen-effects': { icon: Sparkles, title: 'Draw over and change how your windows and the whole screen look' },
+	clipboard: { icon: Clipboard, title: 'Copy to your clipboard' }
 };
 
 export function abilities(access: ExtensionAccess): Ability[] {

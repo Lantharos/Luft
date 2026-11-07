@@ -92,6 +92,7 @@ export function listed(installed: Installed, manager: ExtensionManager): Fields 
     permissions: GLib.Variant.new_strv(manifest.permissions ?? []),
     helper: GLib.Variant.new_boolean(!!manifest.helper),
     network: GLib.Variant.new_strv(manifest.network?.hosts ?? []),
+    listen: new GLib.Variant('a(qs)', (manifest.network?.listen ?? []).map(({ port, protocol }): [number, string] => [port, protocol])),
     settings: new GLib.Variant('aa{sv}', instance.values.descriptions.map(setting => described(setting, instance))),
     shortcuts: shortcuts(instance, manager),
     page: GLib.Variant.new_boolean(instance.page.described),

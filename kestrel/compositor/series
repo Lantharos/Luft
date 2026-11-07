@@ -66,3 +66,4 @@
 0066-x11-tell-floating-windows-they-are-tiled-while-corne.patch
 0067-clutter-let-shell-effects-run-view-filters-and-repai.patch
 0068-compositor-tell-the-shell-what-windows-leave-of-the-.patch
+0069-wayland-let-the-shell-take-files-dragged-onto-its-ow.patch

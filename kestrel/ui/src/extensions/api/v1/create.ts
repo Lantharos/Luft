@@ -15,6 +15,7 @@ import { audioLevelsApi } from './audio/levels.js';
 import { inputSoundsApi } from './audio/inputSounds.js';
 import { lockedSoundsApi, soundsApi } from './audio/sounds.js';
 import { callsApi } from './calls.js';
+import { clipboardApi } from './clipboard.js';
 import { popupsApi } from './popups/popups.js';
 import { screenEffectsApi } from './screenEffects/screenEffects.js';
 import { searchApi } from './search.js';
@@ -24,7 +25,7 @@ import { shortcutsApi } from './shortcuts.js';
 import { desktopApi, powerApi } from './system.js';
 import { taskbarApi } from './taskbar/taskbar.js';
 import type { Basics, Capabilities, Capability } from './types.js';
-import { deleteFile, pickFiles, readText, saveFile, writeText } from './picking.js';
+import { chooseFiles, deleteFile, pickFiles, readText, saveFile, writeText } from './picking.js';
 import { typingApi } from './typing.js';
 import { wallpaperApi } from './wallpaper/wallpaper.js';
 import { weatherApi } from './weather.js';
@@ -47,6 +48,7 @@ const PARTS: { [Name in Capability]: { property: string; create(context: ApiCont
   'input-sounds': { property: 'inputSounds', create: inputSoundsApi },
   'do-not-disturb': { property: 'doNotDisturb', create: doNotDisturbApi },
   'screen-effects': { property: 'screenEffects', create: screenEffectsApi },
+  'clipboard': { property: 'clipboard', create: clipboardApi },
   'helper': { property: 'helper', create: helperApi },
   'shortcuts': { property: 'shortcuts', create: shortcutsApi },
   'network': { property: 'network', create: networkApi },
@@ -77,6 +79,7 @@ export function createApi(context: ApiContext): Readonly<Basics & Record<string,
     open,
     openSettings: () => context.openSettings(),
     pickFiles: options => pickFiles(context, options),
+    chooseFiles: options => chooseFiles(context, options),
     deleteFile: path => deleteFile(context, path),
     readText: path => readText(context, path),
     writeText: async (path, text) => {
@@ -87,7 +90,7 @@ export function createApi(context: ApiContext): Readonly<Basics & Record<string,
   };
   const granted: Capability[] = [
     ...manifest.permissions ?? [], ...manifest.helper ? ['helper' as const] : [], ...manifest.shortcuts?.length ? ['shortcuts' as const] : [],
-    ...manifest.network ? ['network' as const] : [],
+    ...manifest.network?.hosts.length ? ['network' as const] : [],
   ];
   const extension = Object.defineProperties({}, Object.getOwnPropertyDescriptors(basics)) as Basics & Record<string, unknown>;
   for (const capability of granted) extension[PARTS[capability].property] = PARTS[capability].create(context);

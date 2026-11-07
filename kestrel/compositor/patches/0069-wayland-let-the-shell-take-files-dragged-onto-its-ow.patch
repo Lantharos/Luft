@@ -1,0 +1,299 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Sat, 7 Nov 2026 12:49:11 +0100
+Subject: [PATCH 69/69] wayland: let the shell take files dragged onto its own
+ actors
+
+A drag from a Wayland client over the shell, such as files from a file
+manager over a taskbar element, has no surface to go to, so dropping it
+cancelled the drag. The shell now says with meta_dnd_set_shell_target()
+when the pointer is over something that takes files. While it does and
+no surface is under the pointer, the source is told the drop would copy
+a URI list, and dropping reads the list from the client and hands it to
+the shell with the dnd-drop signal before finishing the drag.
+
+Upstream-Status: luft-only API for extensions that take dropped files
+---
+ src/backends/meta-dnd-private.h        |   5 ++
+ src/compositor/meta-dnd.c              |  53 +++++++++++++
+ src/meta/meta-dnd.h                    |   4 +
+ src/wayland/meta-wayland-data-device.c | 100 +++++++++++++++++++++++++
+ 4 files changed, 162 insertions(+)
+
+diff --git a/src/backends/meta-dnd-private.h b/src/backends/meta-dnd-private.h
+index 6eb2f6806130e68a80ca4f1f1259b27ffeb3bec4..1ee72473fa89e4f882871ae16983b76c19663ca4 100644
+--- a/src/backends/meta-dnd-private.h
++++ b/src/backends/meta-dnd-private.h
+@@ -29,3 +29,8 @@ void meta_dnd_wayland_handle_end_modal (MetaCompositor *compositor);
+ 
+ void meta_dnd_wayland_on_motion_event (MetaDnd            *dnd,
+                                        const ClutterEvent *event);
++
++gboolean meta_dnd_get_shell_target (MetaDnd *dnd);
++
++void meta_dnd_notify_dnd_drop (MetaDnd    *dnd,
++                               const char *uris);
+diff --git a/src/compositor/meta-dnd.c b/src/compositor/meta-dnd.c
+index 52f75367eebe639b2609104c1491857ca1518ddc..46c7de7428bf42ca865a5e9bcb4da8563cfb82dc 100644
+--- a/src/compositor/meta-dnd.c
++++ b/src/compositor/meta-dnd.c
+@@ -40,6 +40,7 @@ struct _MetaDndPrivate
+   MetaBackend *backend;
+ 
+   gboolean dnd_during_modal;
++  gboolean shell_target;
+ };
+ 
+ struct _MetaDnd
+@@ -54,6 +55,7 @@ enum
+   ENTER,
+   POSITION_CHANGE,
+   LEAVE,
++  DROP,
+ 
+   LAST_SIGNAL
+ };
+@@ -88,6 +90,23 @@ meta_dnd_class_init (MetaDndClass *klass)
+                   0,
+                   NULL, NULL, NULL,
+                   G_TYPE_NONE, 0);
++
++  /**
++   * MetaDnd::dnd-drop:
++   * @dnd: the #MetaDnd
++   * @uris: the dropped files as a `text/uri-list`
++   *
++   * Files a Wayland client dragged were dropped on the shell, where
++   * meta_dnd_set_shell_target() said it takes them. It comes after
++   * #MetaDnd::dnd-leave, once the client has sent the list.
++   */
++  signals[DROP] =
++    g_signal_new ("dnd-drop",
++                  G_TYPE_FROM_CLASS (object_class),
++                  G_SIGNAL_RUN_LAST,
++                  0,
++                  NULL, NULL, NULL,
++                  G_TYPE_NONE, 1, G_TYPE_STRING);
+ }
+ 
+ static void
+@@ -140,6 +159,39 @@ meta_dnd_wayland_on_motion_event (MetaDnd            *dnd,
+   meta_dnd_notify_dnd_position_change (dnd, (int)event_x, (int)event_y);
+ }
+ 
++/**
++ * meta_dnd_set_shell_target:
++ * @dnd: a #MetaDnd
++ * @takes_files: whether the shell takes files dropped where the pointer is
++ *
++ * Lets the shell take files a Wayland client drags over its own actors. While
++ * it's set and no client surface is under the pointer, the drag offers to
++ * copy, and dropping emits #MetaDnd::dnd-drop. It's unset when the drag ends.
++ */
++void
++meta_dnd_set_shell_target (MetaDnd  *dnd,
++                           gboolean  takes_files)
++{
++  MetaDndPrivate *priv = meta_dnd_get_instance_private (dnd);
++
++  priv->shell_target = takes_files;
++}
++
++gboolean
++meta_dnd_get_shell_target (MetaDnd *dnd)
++{
++  MetaDndPrivate *priv = meta_dnd_get_instance_private (dnd);
++
++  return priv->shell_target;
++}
++
++void
++meta_dnd_notify_dnd_drop (MetaDnd    *dnd,
++                          const char *uris)
++{
++  g_signal_emit (dnd, signals[DROP], 0, uris);
++}
++
+ void
+ meta_dnd_wayland_handle_begin_modal (MetaCompositor *compositor)
+ {
+@@ -174,6 +226,7 @@ meta_dnd_wayland_handle_end_modal (MetaCompositor *compositor)
+     return;
+ 
+   priv->dnd_during_modal = FALSE;
++  priv->shell_target = FALSE;
+ 
+   meta_dnd_notify_dnd_leave (dnd);
+ }
+diff --git a/src/meta/meta-dnd.h b/src/meta/meta-dnd.h
+index 1ad02003d395d423c5b31c50a05b639c737e011a..4f12d859e50be89033a428c12a645ca57090c0de 100644
+--- a/src/meta/meta-dnd.h
++++ b/src/meta/meta-dnd.h
+@@ -29,3 +29,7 @@
+ 
+ META_EXPORT
+ G_DECLARE_FINAL_TYPE (MetaDnd, meta_dnd, META, DND, GObject)
++
++META_EXPORT
++void meta_dnd_set_shell_target (MetaDnd  *dnd,
++                                gboolean  takes_files);
+diff --git a/src/wayland/meta-wayland-data-device.c b/src/wayland/meta-wayland-data-device.c
+index f4004d148bdb59be267aac51dc2fdf0912721280..9a6b51de3c0f261bc860605f1d590794fa7e399f 100644
+--- a/src/wayland/meta-wayland-data-device.c
++++ b/src/wayland/meta-wayland-data-device.c
+@@ -26,7 +26,9 @@
+ 
+ #include "wayland/meta-wayland-data-device.h"
+ 
++#include <gio/gunixinputstream.h>
+ #include <glib.h>
++#include <glib-unix.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+@@ -56,6 +58,7 @@
+ #endif
+ 
+ #define ROOTWINDOW_DROP_MIME "application/x-rootwindow-drop"
++#define URI_LIST_MIME "text/uri-list"
+ 
+ static void unset_selection_source (MetaWaylandDataDevice *data_device,
+                                     MetaSelectionType      selection_type);
+@@ -168,8 +171,16 @@ struct _MetaWaylandDragGrab {
+   int                     drag_start_x, drag_start_y;
+ 
+   guint                   need_initial_focus : 1;
++  guint                   shell_takes : 1;
+ };
+ 
++typedef struct
++{
++  MetaWaylandDataSource *source;
++  MetaDnd *dnd;
++  GOutputStream *uris;
++} ShellDrop;
++
+ static void
+ set_selection_source (MetaWaylandDataDevice *data_device,
+                       MetaSelectionType      selection_type,
+@@ -328,6 +339,31 @@ meta_wayland_drag_source_fake_acceptance (MetaWaylandDataSource *source,
+   meta_wayland_data_source_set_has_target (source, TRUE);
+ }
+ 
++static void
++sync_shell_target (MetaWaylandDragGrab *drag_grab,
++                   MetaDnd             *dnd)
++{
++  MetaWaylandDataSource *source = drag_grab->drag_data_source;
++  gboolean takes;
++
++  takes = !drag_grab->drag_focus && source &&
++          meta_dnd_get_shell_target (dnd) &&
++          meta_wayland_data_source_has_mime_type (source, URI_LIST_MIME);
++  if (takes == drag_grab->shell_takes)
++    return;
++
++  drag_grab->shell_takes = takes;
++  if (takes)
++    {
++      meta_wayland_drag_source_fake_acceptance (source, URI_LIST_MIME);
++    }
++  else if (source)
++    {
++      meta_wayland_data_source_target (source, NULL);
++      meta_wayland_data_source_set_has_target (source, FALSE);
++    }
++}
++
+ void
+ meta_wayland_drag_grab_set_focus (MetaWaylandDragGrab *drag_grab,
+                                   MetaWaylandSurface  *surface)
+@@ -342,6 +378,7 @@ meta_wayland_drag_grab_set_focus (MetaWaylandDragGrab *drag_grab,
+     return;
+ 
+   drag_grab->need_initial_focus = FALSE;
++  drag_grab->shell_takes = FALSE;
+ 
+   if (drag_grab->drag_focus)
+     {
+@@ -573,10 +610,65 @@ drag_grab_motion (MetaWaylandEventHandler *handler,
+   data_device_update_position (drag_grab, &point);
+ 
+   meta_dnd_wayland_on_motion_event (meta_backend_get_dnd (backend), event);
++  sync_shell_target (drag_grab, meta_backend_get_dnd (backend));
+ 
+   return !is_dragging_window (drag_grab->seat);
+ }
+ 
++static void
++on_shell_drop_read (GObject      *object,
++                    GAsyncResult *result,
++                    gpointer      user_data)
++{
++  ShellDrop *drop = user_data;
++  GMemoryOutputStream *uris = G_MEMORY_OUTPUT_STREAM (drop->uris);
++
++  if (g_output_stream_splice_finish (drop->uris, result, NULL) >= 0)
++    {
++      g_autofree char *list =
++        g_strndup (g_memory_output_stream_get_data (uris),
++                   g_memory_output_stream_get_data_size (uris));
++
++      meta_dnd_notify_dnd_drop (drop->dnd, list);
++    }
++
++  if (meta_wayland_data_source_get_resource (drop->source))
++    meta_wayland_data_source_notify_finish (drop->source);
++
++  g_object_unref (drop->source);
++  g_object_unref (drop->uris);
++  g_free (drop);
++}
++
++static void
++read_shell_drop (MetaWaylandDataSource *source,
++                 MetaDnd               *dnd)
++{
++  g_autoptr (GInputStream) input = NULL;
++  ShellDrop *drop;
++  int pipe_fds[2];
++
++  if (!g_unix_open_pipe (pipe_fds, FD_CLOEXEC, NULL))
++    {
++      meta_wayland_data_source_notify_finish (source);
++      return;
++    }
++
++  meta_wayland_data_source_send (source, URI_LIST_MIME, pipe_fds[1]);
++  close (pipe_fds[1]);
++  input = g_unix_input_stream_new (pipe_fds[0], TRUE);
++
++  drop = g_new0 (ShellDrop, 1);
++  drop->source = g_object_ref (source);
++  drop->dnd = dnd;
++  drop->uris = g_memory_output_stream_new_resizable ();
++  g_output_stream_splice_async (drop->uris, input,
++                                G_OUTPUT_STREAM_SPLICE_CLOSE_SOURCE |
++                                G_OUTPUT_STREAM_SPLICE_CLOSE_TARGET,
++                                G_PRIORITY_DEFAULT, NULL,
++                                on_shell_drop_read, drop);
++}
++
+ static gboolean
+ drag_grab_release (MetaWaylandEventHandler *handler,
+                    const ClutterEvent      *event,
+@@ -628,6 +720,14 @@ drag_grab_release (MetaWaylandEventHandler *handler,
+       meta_wayland_data_source_update_in_ask (source);
+       success = TRUE;
+     }
++  else if (!drag_grab->drag_focus && source && drag_grab->shell_takes &&
++           meta_wayland_data_source_has_target (source) &&
++           meta_wayland_data_source_get_current_action (source))
++    {
++      meta_wayland_data_source_notify_drop_performed (source);
++      read_shell_drop (source, meta_backend_get_dnd (backend));
++      success = TRUE;
++    }
+   else if (!drag_grab->drag_focus && source &&
+            meta_wayland_data_source_has_target (source) &&
+            meta_wayland_data_source_get_current_action (source) &&

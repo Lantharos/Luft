@@ -1,7 +1,8 @@
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
-import type { StackView, View } from '../types.js';
+import { Spinner } from '../../../../shared/widgets/animation.js';
+import type { SpinnerView, StackView, View } from '../types.js';
 import {
   buttonControl, type Control, type ControlHost, entryControl, iconControl, imageControl, itemControl, progressControl, sliderControl, switchControl,
   textControl,
@@ -39,6 +40,12 @@ function stackControl(node: StackView, host: ControlHost, depth: number): Contro
   return { actor: box, update };
 }
 
+function spinnerControl(node: SpinnerView): Control<SpinnerView> {
+  const spinner = new Spinner(Math.max(8, Math.round(node.size ?? 16)), { animate: true });
+  spinner.connect('notify::mapped', () => (spinner.mapped ? spinner.play() : spinner.stop()));
+  return { actor: spinner, update: () => {} };
+}
+
 function create(node: View, host: ControlHost, depth: number): Control {
   if (depth > DEPTH_LIMIT) throw new Error(`A view can nest ${DEPTH_LIMIT} stacks at most`);
   switch (node.type) {
@@ -53,6 +60,7 @@ function create(node: View, host: ControlHost, depth: number): Control {
     case 'entry': return entryControl(node, host) as Control;
     case 'item': return itemControl(node, host) as Control;
     case 'progress': return progressControl(node) as Control;
+    case 'spinner': return spinnerControl(node) as Control;
     case 'separator': return { actor: new St.Widget({ style_class: 'kestrel-context-separator' }), update: () => {} };
     case 'spacer': return { actor: new St.Widget({ x_expand: true, y_expand: true }), update: () => {} };
     default: throw new Error(`${(node as { type?: unknown }).type} isn't a kind of view`);

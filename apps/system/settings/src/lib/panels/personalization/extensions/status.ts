@@ -24,7 +24,8 @@ export const PERMISSIONS: Record<string, string> = {
 	'locked-sounds': 'settings-extensions-permission-locked-sounds',
 	'input-sounds': 'settings-extensions-permission-input-sounds',
 	'do-not-disturb': 'settings-extensions-permission-do-not-disturb',
-	'screen-effects': 'settings-extensions-permission-screen-effects'
+	'screen-effects': 'settings-extensions-permission-screen-effects',
+	clipboard: 'settings-extensions-permission-clipboard'
 };
 
 export function summary(extension: Extension): string {

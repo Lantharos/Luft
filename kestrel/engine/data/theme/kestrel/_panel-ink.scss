@@ -20,6 +20,7 @@
   .kestrel-task-progress { background-color: fill(0.18); }
   .kestrel-task-progress-fill { background-color: ink(); }
   .kestrel-extension-element {
+    &.dropping { background-color: fill(0.14); }
     .kestrel-extension-text-caption { color: ink(0.62); }
     .kestrel-extension-button:hover, .kestrel-extension-button:focus { background-color: fill(0.12); }
     .kestrel-extension-button:active { background-color: fill(0.18); }

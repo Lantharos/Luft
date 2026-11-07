@@ -21,6 +21,7 @@ Kestrel runs on its own build of Mutter 51 ([kestrel/compositor](../../kestrel/c
 - Touchpad scrolling at the speed set by the touchpad's `scroll-speed` setting, and at the fingers' pace in apps built on Chromium, which would scroll twelve times too far: every one older than 154, and Electron apps on later releases unless they start with Chromium's unscaled touchpad scrolling turned on
 - Title bars for X11 apps in Kestrel's style, colored from `~/.config/kestrel/appearance.css`
 - `xdg-decoration` for Wayland apps that ask for server-side title bars, which the shell draws in the same style
+- `meta_dnd_set_shell_target()` and the `dnd-drop` signal, so the shell can take files dragged from Wayland apps onto its own actors, such as a taskbar element, see [Dropping files on the taskbar](../extensions.md#dropping-files-on-the-taskbar)
 - A signal before a monitor turns, so the shell can animate rotation from a picture of the old orientation
 - `ext-idle-notify-v1`, so apps such as password managers can lock themselves after a while without use, sandboxed or not. Idle times are at least a second, and at least ten seconds for sandboxed apps, so no app can follow someone's typing
 - `ext-data-control-v1`, so password managers can copy a password and clear it again while in the background: apps outside a sandbox and Flatpak apps with full access always get it, other Flatpak apps only when they may use the clipboard in the background, see [App permissions](#app-permissions)

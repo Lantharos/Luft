@@ -2352,6 +2352,8 @@ export namespace Meta {
         // Signal signatures
         interface SignalSignatures extends GObject.Object.SignalSignatures {
             /** @signal */
+            "dnd-drop": (uris: string) => void;
+            /** @signal */
             "dnd-enter": () => void;
             /** @signal */
             "dnd-leave": () => void;
@@ -2389,6 +2391,9 @@ export namespace Meta {
 
         /** @signal */
         emit<K extends keyof Dnd.SignalSignatures>(signal: K, ...args: GObject.GjsParameters<Dnd.SignalSignatures[K]>): void;
+
+        // Methods
+        set_shell_target(takes_files: boolean): void;
     }
 
 

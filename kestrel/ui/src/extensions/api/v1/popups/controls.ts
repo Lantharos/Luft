@@ -7,6 +7,7 @@ import St from 'gi://St';
 
 import { BarLevel } from '../../../../shared/widgets/barLevel.js';
 import { Slider } from '../../../../shared/widgets/slider.js';
+import { Switch } from '../../../../shared/popups/menu/switch.js';
 import { animateActor } from '../../../../shared/motion/motion.js';
 import { resolveIcon } from '../icons.js';
 import { artwork } from '../media/artwork.js';
@@ -198,29 +199,27 @@ export function buttonControl(node: ButtonView, host: ControlHost): Control<Butt
 }
 
 export function switchControl(node: SwitchView, host: ControlHost): Control<SwitchView> {
-  const knob = new St.Widget({ style_class: 'kestrel-extension-switch-knob', y_align: Clutter.ActorAlign.CENTER });
-  const track = new St.Bin({ style_class: 'kestrel-extension-switch', child: knob, y_align: Clutter.ActorAlign.CENTER });
+  const toggle = new Switch(node.checked);
   const label = new St.Label({ x_expand: true, y_align: Clutter.ActorAlign.CENTER });
   const box = new St.BoxLayout({ style_class: 'kestrel-extension-switch-row', x_expand: true });
   box.add_child(label);
-  box.add_child(track);
-  const button = new St.Button({ style_class: 'kestrel-extension-row', child: box, can_focus: true, track_hover: true, toggle_mode: true, x_expand: true });
+  box.add_child(toggle);
+  const button = new St.Button({ style_class: 'kestrel-extension-row', child: box, can_focus: true, track_hover: true, x_expand: true });
   let current = node;
-  const show = (checked: boolean) => {
-    knob.x_align = checked ? Clutter.ActorAlign.END : Clutter.ActorAlign.START;
-    if (checked) track.add_style_pseudo_class('checked');
-    else track.remove_style_pseudo_class('checked');
-  };
-  button.connect('clicked', () => {
-    show(button.checked);
-    host.act(() => current.onToggled(button.checked));
+  let updating = false;
+  button.connect('clicked', () => toggle.toggle());
+  toggle.connect('notify::state', () => {
+    button.checked = toggle.state;
+    if (!updating) host.act(() => current.onToggled(toggle.state));
   });
   const update = (next: SwitchView) => {
     current = next;
     label.text = next.label;
     button.accessible_name = next.label;
+    updating = true;
+    toggle.state = next.checked;
     button.checked = next.checked;
-    show(next.checked);
+    updating = false;
   };
   update(node);
   return { actor: button, update };

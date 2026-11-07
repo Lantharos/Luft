@@ -81,6 +81,7 @@ pub(super) struct Listed {
     problem: String,
     permissions: Option<Vec<String>>,
     network: Option<Vec<String>>,
+    listen: Option<Vec<(u16, String)>>,
     settings: Option<Vec<ListedSetting>>,
     shortcuts: Option<Vec<ListedShortcut>>,
     page: Option<bool>,
@@ -137,9 +138,18 @@ pub struct Extension {
     problem: String,
     permissions: Vec<String>,
     network: Vec<String>,
+    /// The ports it takes connections on from devices on the network.
+    listen: Vec<u16>,
     settings: Vec<ExtensionSetting>,
     shortcuts: Vec<ExtensionShortcut>,
     page: bool,
+}
+
+fn ports(listen: Vec<(u16, String)>) -> Vec<u16> {
+    let mut ports: Vec<u16> = listen.into_iter().map(|(port, _)| port).collect();
+    ports.sort_unstable();
+    ports.dedup();
+    ports
 }
 
 fn choices(pairs: Option<Vec<(String, String)>>) -> Vec<ExtensionChoice> {
@@ -200,6 +210,7 @@ impl From<Listed> for Extension {
             problem: listed.problem,
             permissions: listed.permissions.unwrap_or_default(),
             network: listed.network.unwrap_or_default(),
+            listen: ports(listed.listen.unwrap_or_default()),
             settings: listed
                 .settings
                 .unwrap_or_default()

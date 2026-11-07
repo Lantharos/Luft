@@ -3,6 +3,7 @@ import GLib from 'gi://GLib';
 import St from 'gi://St';
 
 import type { ElementActor, ElementLayout } from '../../../../desktop/panel/elements/extensionElements.js';
+import type { DragDelegate } from '../../../../shared/popups/dndTargets.js';
 import { animateActor } from '../../../../shared/motion/motion.js';
 import type { ControlHost } from '../popups/controls.js';
 import { RenderedView } from '../popups/render.js';
@@ -16,12 +17,14 @@ export interface ElementState {
   shown: boolean;
   content(layout: ElementLayout): View;
   expanded: ((layout: ElementLayout) => View) | null;
+  takesFiles: boolean;
 }
 
 export interface ElementHandlers {
   click(actor: Clutter.Actor): void;
   menu(actor: Clutter.Actor): void;
   expanded(expanded: boolean): void;
+  drop(paths: string[]): void;
   /** Runs an extension callback, returning what it returned, or `undefined` when it threw. */
   run<Result>(build: () => Result): Result | undefined;
 }
@@ -59,6 +62,13 @@ export class ElementWidget implements ElementActor {
     this.grown.actor.opacity = 0;
     this.actor.connect('notify::hover', () => this.sync(true));
     this.actor.connect('button-release-event', (_actor, event) => this.released(event));
+    (this.actor as St.Widget & { _delegate?: DragDelegate })._delegate = {
+      fileDrop: {
+        takes: () => this.state().takesFiles,
+        hover: over => (over ? this.actor.add_style_class_name('dropping') : this.actor.remove_style_class_name('dropping')),
+        drop: paths => handlers.drop(paths),
+      },
+    };
     this.actor.opacity = 0;
     this.actor.visible = false;
     this.refresh(false);

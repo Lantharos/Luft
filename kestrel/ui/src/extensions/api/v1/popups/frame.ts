@@ -143,8 +143,8 @@ export class PopupFrame {
     this.signals.push([actor, id]);
   }
 
-  /** Sizes the pop-up to its content, up to what fits on its display, and places it. */
-  private fit(): void {
+  /** Sizes the pop-up to its content, up to what fits on its display, and places it, or keeps it where it is. */
+  private fit(place = true): void {
     const { placement, width } = this.options;
     const theme = this.actor.get_theme_node();
     const header = this.options.kind === 'window' ? this.actor.get_first_child() : null;
@@ -152,16 +152,23 @@ export class PopupFrame {
     const content = this.view.actor.get_preferred_height(width - theme.get_horizontal_padding())[1];
     const height = Math.min(content + chrome, placement.area.height - 24);
     this.scroll.height = height - chrome;
+    if (!place) return;
     const { x, y } = placement.place(width, height);
     this.actor.set_position(x, y);
   }
 
-  /** Shows new content. A panel keeps the keyboard when the control that had it goes away, such as a button replaced by others. */
+  /**
+   * Shows new content and fits to it. A window stays where it is, as people may have moved it, and a panel keeps the
+   * keyboard when the control that had it goes away, such as a button replaced by others.
+   */
   update(content: View): void {
     this.updating = true;
     this.view.show(content);
     this.updating = false;
-    if (this.options.kind !== 'panel') return;
+    if (this.options.kind !== 'panel') {
+      this.fit(false);
+      return;
+    }
     this.fit();
     const focus = global.stage.get_key_focus();
     if (!this.closing && (!focus || !this.actor.contains(focus)) && !this.actor.navigate_focus(null, St.DirectionType.TAB_FORWARD, false))

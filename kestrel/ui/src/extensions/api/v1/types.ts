@@ -24,10 +24,12 @@ export interface Disposable {
  * - `input-sounds`: Play a sound when you type and click, without seeing your keys
  * - `do-not-disturb`: Hold back notifications for a while
  * - `screen-effects`: Draw over and change how your windows and the whole screen look
+ * - `clipboard`: Copy to your clipboard
  */
 export type Permission =
   | 'wallpaper' | 'quick-settings' | 'taskbar' | 'search' | 'notifications' | 'weather' | 'location' | 'media'
-  | 'popups' | 'typing' | 'sounds' | 'audio-levels' | 'calls' | 'locked-sounds' | 'input-sounds' | 'do-not-disturb' | 'screen-effects';
+  | 'popups' | 'typing' | 'sounds' | 'audio-levels' | 'calls' | 'locked-sounds' | 'input-sounds' | 'do-not-disturb' | 'screen-effects'
+  | 'clipboard';
 
 /**
  * A permission, `helper` for an extension whose manifest declares a native helper, `shortcuts` for one that declares
@@ -56,6 +58,7 @@ export interface Capabilities {
   'input-sounds': InputSounds;
   'do-not-disturb': DoNotDisturb;
   'screen-effects': ScreenEffects;
+  clipboard: Clipboard;
   helper: Helper;
   shortcuts: Shortcuts;
   network: Network;
@@ -279,6 +282,12 @@ export interface Basics {
    * when they cancel, so the extension never depends on where the files were.
    */
   pickFiles(options: PickOptions): Promise<string[]>;
+  /**
+   * Asks people to choose files, or a folder, with the file chooser, right after they used the extension. Returns their
+   * full paths where they are, or none when they cancel, for what the extension hands to its helper or saves into,
+   * such as a folder to keep what it receives in.
+   */
+  chooseFiles(options: ChooseOptions): Promise<string[]>;
   /** Deletes a file or folder in {@link dataPath}, such as something picked that people no longer use. */
   deleteFile(path: string): void;
   /** Reads a text file in the extension's folder or {@link dataPath}, such as a manifest in a folder people picked. Returns `null` when it isn't there. */
@@ -389,6 +398,15 @@ export interface PickOptions {
    */
   kind: 'images' | 'sounds' | 'calendars' | 'folder';
   /** Lets people pick several at once. */
+  multiple?: boolean;
+}
+
+export interface ChooseOptions {
+  /** What the file chooser says it's for, in the language Kestrel uses. */
+  title: string;
+  /** Asks for a folder instead of files. */
+  folder?: boolean;
+  /** Lets people choose several at once. */
   multiple?: boolean;
 }
 
@@ -839,6 +857,11 @@ export interface TaskbarElementOptions {
   onExpandedChanged?(expanded: boolean): void;
   /** A menu that opens on a right click. */
   menu?: ActionItem[];
+  /**
+   * Lets people drop files on the element, from Rover or any other app, and gets their full paths. The element lights
+   * up while files are dragged over it.
+   */
+  onDrop?(paths: string[]): void;
 }
 
 export interface TaskbarElement extends Disposable {
@@ -907,7 +930,7 @@ export interface Popup extends Disposable {
  */
 export type View =
   | StackView | TextView | IconView | ImageView | ButtonView | SwitchView | SliderView | EntryView | ItemView | ProgressView
-  | { type: 'separator' } | { type: 'spacer' };
+  | SpinnerView | { type: 'separator' } | { type: 'spacer' };
 
 export interface StackView {
   type: 'column' | 'row';
@@ -931,7 +954,7 @@ export interface TextView {
 export interface IconView {
   type: 'icon';
   icon: Icon;
-  /** Pixels; 16 without it. */
+  /** Pixels, kept from when it first shows; 16 without it. */
   size?: number;
 }
 
@@ -1003,6 +1026,16 @@ export interface ProgressView {
   type: 'progress';
   /** 0 to 1. */
   value: number;
+}
+
+/**
+ * Shows that something is going on whose end isn't known yet, such as looking for something. Use it on its own: not
+ * next to a progress bar or a percentage, which already show the same.
+ */
+export interface SpinnerView {
+  type: 'spinner';
+  /** Pixels, kept from when it first shows; 16 without it. */
+  size?: number;
 }
 
 export interface Shortcuts {
@@ -1228,6 +1261,18 @@ export interface Response {
   readonly text: string;
   /** The body read as JSON. It throws when it isn't. */
   json<Value = unknown>(): Value;
+}
+
+/**
+ * Puts things on the clipboard, as if people copied them, so they can paste them anywhere. Clipboard history keeps
+ * them like anything else that's copied.
+ */
+export interface Clipboard {
+  setText(text: string): void;
+  /** Copies a PNG, JPEG, WebP or GIF picture, by its full path. */
+  setImage(path: string): Promise<void>;
+  /** Copies files and folders, by their full paths, to paste in Rover and other apps. */
+  setFiles(paths: readonly string[]): void;
 }
 
 export interface Helper {
@@ -1596,6 +1641,15 @@ export interface Manifest {
     /** Arguments to run the helper with once when people turn the extension off or remove it, so it can undo what it did elsewhere. */
     turnedOff?: string[];
   };
-  /** The hosts {@link Network} may connect to, such as `api.example.com`, or `localhost:8787` while developing. */
-  network?: { hosts: string[] };
+  /**
+   * The hosts {@link Network} may connect to, such as `api.example.com`, or `localhost:8787` while developing, and the
+   * ports the extension's helper listens on, which Luft's firewall opens on networks people trust.
+   */
+  network?: { hosts: string[]; listen: ListenPort[] };
+}
+
+/** A port an extension's helper takes connections or datagrams on. */
+export interface ListenPort {
+  port: number;
+  protocol: 'tcp' | 'udp';
 }

@@ -947,6 +947,8 @@ export type Extension = {
 	problem: string,
 	permissions: string[],
 	network: string[],
+	/**  The ports it takes connections on from devices on the network. */
+	listen: number[],
 	settings: ExtensionSetting[],
 	shortcuts: ExtensionShortcut[],
 	page: boolean,

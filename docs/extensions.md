@@ -9,7 +9,7 @@ Extensions add to Kestrel: layers over the wallpaper, shaders on windows and the
 | `kestrel/ui/src/extensions/service.ts` | The D-Bus interface below |
 | `kestrel/engine/src/sound` | `ShellSoundMix`, which plays an extension's sounds, and `ShellAudioMonitor`, which measures what the computer plays |
 | `packages/extension-api` | `@luft/extension-api`, the types for extension authors, written from `types.ts` by `bun kestrel/ui/extensionApi.ts`. `bun run check` in `kestrel/ui` fails when it's out of date |
-| `extensions` | Lantharos's own extensions, such as Seasons, Strays, Playthings, Keystrokes, Focus, Reminders, Phosphor, Tailor and Pult. Each has a `build.sh` that makes its folder, which `extensions/pack.sh` packs for schelf.store |
+| `extensions` | Lantharos's own extensions, such as Seasons, Strays, Playthings, Keystrokes, Focus, Reminders, Phosphor, Tailor, Pult and Pigeon. Each has a `build.sh` that makes its folder, which `extensions/pack.sh` packs for schelf.store |
 | `apps/system/settings/src/lib/panels/personalization/extensions` | Settings → Extensions, each extension's page, and its rows on other pages |
 
 ## On disk
@@ -42,6 +42,7 @@ turned-off = ["restore"]          # optional arguments it runs with once when pe
 
 [network]                         # optional hosts it connects to, over HTTPS
 hosts = ["api.example.com"]
+listen = [{ port = 4242, protocol = "udp" }]  # and ports its helper takes connections on
 
 [[settings]]                      # switch, choice, choices, slider or color
 key = "seconds"
@@ -94,8 +95,9 @@ Permissions, with the words Settings and the store show for them:
 | `input-sounds` | Play a sound when you type and click, without seeing your keys |
 | `do-not-disturb` | Hold back notifications for a while |
 | `screen-effects` | Draw over and change how your windows and the whole screen look |
+| `clipboard` | Copy to your clipboard |
 
-`locked-sounds` and `input-sounds` need `sounds` too, and `input-sounds` can't go with `audio-levels`, which could hear the presses in the sound. A `[helper]` table isn't a permission, but the store shows that the extension runs a program of its own. `[network]` isn't one either, but Settings and the store show the hosts it names as "Connect to api.example.com". `[[shortcuts]]` shows in Settings → Keyboard.
+`locked-sounds` and `input-sounds` need `sounds` too, and `input-sounds` can't go with `audio-levels`, which could hear the presses in the sound. A `[helper]` table isn't a permission, but the store shows that the extension runs a program of its own. `[network]` isn't one either, but Settings and the store show the hosts it names as "Connect to api.example.com", and Settings shows the ports under `listen` as "Take connections from devices on your network, on port 4242". `List` reports them too. Luft's firewall lets devices on networks marked as home reach ports above 1024, so a helper listening on one is reachable there and nowhere else. `[[shortcuts]]` shows in Settings → Keyboard.
 
 A setting's `depends` hides it until another setting allows it. Without `when` that's a switch being on. With `when` it's any of a list of values, of a `switch` (`[false]` shows it while the switch is off), `choice`, `slider` or `color`, any of the options of a `choices` setting being picked, or a part of a slider's range, such as `{ min = 0.5 }`. A setting hides with the one it depends on, whatever that one's value, so they chain. Hiding changes nothing about a value: it stays stored and keeps its meaning to the extension. Kestrel refuses a `depends` on a setting not declared before it, and a `when` with values that setting can't have.
 
@@ -123,7 +125,7 @@ Kestrel serves `com.lantharos.Kestrel.Extensions` at `/com/lantharos/Kestrel/Ext
 | `ExtensionsChanged` (signal) | Something in `List` changed |
 | `PageChanged(s id)` (signal) | The extension's page should be built again: it asked, or a setting changed |
 
-Each entry of `List` has `id`, `name` and `description` (translated), `version`, `api`, `path`, `permissions`, `helper`, `network` (the hosts it connects to), `enabled`, `state` (`running`, `off`, `failed`, `crashed` or `invalid`) and `problem` (why it isn't running), `settings`: for each setting its `key`, `type`, translated `label` and `description`, `value`, `default`, `depends`, `when` (`av`, the values it shows for) or `when-min` and `when-max` (the part of a slider it shows for), `page`, and `options` or `swatches` as `a(ss)` of value and label, with `min` the fewest options a `choices` setting keeps, `images` with the full path of each option's picture, or `min`, `max`, `step` and `unit`; `shortcuts`: for each its `key`, translated `label`, the `accelerators` it's bound to, its `default` and whether it `changed`; and `page`, whether it describes a page of its own.
+Each entry of `List` has `id`, `name` and `description` (translated), `version`, `api`, `path`, `permissions`, `helper`, `network` (the hosts it connects to), `listen` (`a(qs)`, each port its helper listens on with `tcp` or `udp`), `enabled`, `state` (`running`, `off`, `failed`, `crashed` or `invalid`) and `problem` (why it isn't running), `settings`: for each setting its `key`, `type`, translated `label` and `description`, `value`, `default`, `depends`, `when` (`av`, the values it shows for) or `when-min` and `when-max` (the part of a slider it shows for), `page`, and `options` or `swatches` as `a(ss)` of value and label, with `min` the fewest options a `choices` setting keeps, `images` with the full path of each option's picture, or `min`, `max`, `step` and `unit`; `shortcuts`: for each its `key`, translated `label`, the `accelerators` it's bound to, its `default` and whether it `changed`; and `page`, whether it describes a page of its own.
 
 ## Settings pages
 
@@ -156,6 +158,16 @@ Where an element sits is the person's choice, never the extension's. They drag i
 ## Typing
 
 `typing.type` commits text through the input method into the focused field, or pastes it where nothing takes typed text, after any held modifiers are released. It only works within ten seconds of the person using the extension; Kestrel counts its shortcut, its pop-ups, taskbar items, quick settings tiles, notifications and search results. The privacy indicator shows a keyboard for a few seconds after an extension typed, and its menu names it.
+
+## Clipboard and files
+
+`clipboard` puts text, a picture in its own type, or files as a `text/uri-list` on the clipboard through `St.Clipboard` (`api/v1/clipboard.ts`). Clipboard history sees it like any other copy.
+
+`chooseFiles` asks the file chooser portal for files or a folder and returns their paths where they are, for what an extension hands its helper; `pickFiles` copies what was picked into the data folder instead. Both only work right after the person used the extension.
+
+## Dropping files on the taskbar
+
+A taskbar element with `onDrop` takes files dragged from apps. Kestrel can't read a drag that isn't over a window by itself, so patch 69 of the compositor adds `meta_dnd_set_shell_target()`. While a drag that carries `text/uri-list` moves, `XdndHandler` looks for an actor whose delegate has a `fileDrop` target under the pointer, lights it up and tells Mutter. Mutter then tells the app the drop would copy, and when the drag is let go there it reads the URI list from the app and emits `dnd-drop` with it, after `dnd-leave`, which `XdndHandler` hands to the target that was lit last. Drags from X11 apps aren't covered.
 
 ## Wallpaper layers
 

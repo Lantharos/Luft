@@ -36,13 +36,21 @@
 		</Section>
 	{/if}
 
-	{#if extension.permissions.length || extension.network.length}
+	{#if extension.permissions.length || extension.network.length || extension.listen.length}
 		<Section title={t('settings-extensions-permissions')}>
 			{#each extension.permissions as permission (permission)}
 				<Row title={PERMISSIONS[permission] ? t(PERMISSIONS[permission]) : permission} />
 			{/each}
 			{#if extension.network.length}
 				<Row title={t('settings-extensions-permission-network', { hosts: new Intl.ListFormat(i18n.formats, { type: 'conjunction' }).format(extension.network) })} />
+			{/if}
+			{#if extension.listen.length}
+				<Row
+					title={t('settings-extensions-permission-listen', {
+						count: extension.listen.length,
+						ports: new Intl.ListFormat(i18n.formats, { type: 'conjunction' }).format(extension.listen.map(String))
+					})}
+				/>
 			{/if}
 		</Section>
 	{/if}

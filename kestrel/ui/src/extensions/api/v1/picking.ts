@@ -3,7 +3,7 @@ import GLib from 'gi://GLib';
 
 import { extensionFile } from './audio/files.js';
 import type { ApiContext } from './context.js';
-import type { PickOptions, SaveOptions } from './types.js';
+import type { ChooseOptions, PickOptions, SaveOptions } from './types.js';
 
 const PORTAL = 'org.freedesktop.portal.Desktop';
 const PORTAL_PATH = '/org/freedesktop/portal/desktop';
@@ -113,6 +113,16 @@ export async function pickFiles(context: ApiContext, options: PickOptions): Prom
   const folder = GLib.build_filenamev([context.dataPath, PICKED]);
   GLib.mkdir_with_parents(folder, 0o700);
   return uris.map(uri => options.kind === 'folder' ? copyFolderIn(uri, folder) : copyIn(uri, folder));
+}
+
+/** Lets people choose files or a folder with the file chooser, and returns where they are. */
+export async function chooseFiles(context: ApiContext, options: ChooseOptions): Promise<string[]> {
+  if (!context.gestures.recent) throw new Error('Files can only be chosen right after people use the extension');
+  const uris = await asked('OpenFile', options.title, {
+    multiple: GLib.Variant.new_boolean(!!options.multiple),
+    directory: GLib.Variant.new_boolean(!!options.folder),
+  });
+  return uris.map(uri => Gio.File.new_for_uri(uri).get_path()).filter((path): path is string => path !== null);
 }
 
 function replaceFile(file: Gio.File, text: string): Promise<unknown> {

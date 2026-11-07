@@ -4628,6 +4628,7 @@ dependencies = [
  "image",
  "jpeg-encoder",
  "jxl-oxide",
+ "luft-daylight",
  "luft-dbus",
  "luft-dbus-macros",
  "nix",
@@ -4699,6 +4700,7 @@ dependencies = [
  "futures-util",
  "gio",
  "glib",
+ "luft-daylight",
  "luft-dbus",
  "luft-dbus-macros",
  "luft-i18n",
@@ -5271,6 +5273,13 @@ dependencies = [
  "specta-typescript",
  "tokio",
  "zbus 6.0.0",
+]
+
+[[package]]
+name = "luft-daylight"
+version = "0.1.0"
+dependencies = [
+ "glib",
 ]
 
 [[package]]

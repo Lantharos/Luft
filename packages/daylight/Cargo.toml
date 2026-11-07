@@ -1,0 +1,14 @@
+[package]
+name = "luft-daylight"
+version = "0.1.0"
+description = "Sunrise, sunset and the dark style schedule, shared by Kestrel's settings service and the login screen"
+authors = ["Kristof"]
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+glib = { workspace = true, features = ["v2_68"] }
+
+[lints]
+workspace = true

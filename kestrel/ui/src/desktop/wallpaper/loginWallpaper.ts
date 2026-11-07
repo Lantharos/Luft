@@ -4,21 +4,24 @@ import GLib from 'gi://GLib';
 import { sendToLoginScreen, tellLoginScreen } from '../../session/loginScreen/send.js';
 
 const SYNC_DELAY = 1500;
+const UNKNOWN_PLACE: [number, number] = [91, 181];
 
 export class LoginWallpaper {
   private readonly background = new Gio.Settings({ schema_id: 'org.gnome.desktop.background' });
   private readonly interfaceSettings = new Gio.Settings({ schema_id: 'org.gnome.desktop.interface' });
   private readonly kestrel = new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });
+  private readonly nightLight = new Gio.Settings({ schema_id: 'com.lantharos.kestrel.night-light' });
   private readonly signals: [Gio.Settings, number][];
   private timer = 0;
 
   constructor() {
+    const watch = (settings: Gio.Settings, keys: string[]) =>
+      keys.map((key): [Gio.Settings, number] => [settings, settings.connect(`changed::${key}`, () => this.schedule())]);
     this.signals = [
-      [this.background, this.background.connect('changed::picture-uri', () => this.schedule())],
-      [this.background, this.background.connect('changed::picture-uri-dark', () => this.schedule())],
-      [this.interfaceSettings, this.interfaceSettings.connect('changed::color-scheme', () => this.schedule())],
-      [this.kestrel, this.kestrel.connect('changed::wallpaper-focus', () => this.schedule())],
-      [this.kestrel, this.kestrel.connect('changed::wallpaper-focus-dark', () => this.schedule())],
+      ...watch(this.background, ['picture-uri', 'picture-uri-dark']),
+      ...watch(this.interfaceSettings, ['color-scheme']),
+      ...watch(this.kestrel, ['wallpaper-focus', 'wallpaper-focus-dark', 'dark-schedule', 'dark-schedule-from', 'dark-schedule-to']),
+      ...watch(this.nightLight, ['last-coordinates']),
     ];
     this.schedule();
   }
@@ -33,11 +36,15 @@ export class LoginWallpaper {
   }
 
   private sync(): void {
-    const dark = this.interfaceSettings.get_string('color-scheme') === 'prefer-dark';
-    const file = Gio.File.new_for_uri(this.background.get_string(dark ? 'picture-uri-dark' : 'picture-uri'));
-    const focus = this.kestrel.get_value(dark ? 'wallpaper-focus-dark' : 'wallpaper-focus');
-    sendToLoginScreen('SetAppearance', file, 'login-wallpaper', 'wallpaper', [focus]);
-    tellLoginScreen('SetStyle', new GLib.Variant('(s)', [dark ? 'dark' : 'light']), 'login-style', 'style');
+    sendToLoginScreen('SetAppearance', [
+      [Gio.File.new_for_uri(this.background.get_string('picture-uri')), this.kestrel.get_value('wallpaper-focus')],
+      [Gio.File.new_for_uri(this.background.get_string('picture-uri-dark')), this.kestrel.get_value('wallpaper-focus-dark')],
+    ], 'login-wallpaper', 'wallpaper');
+    const style = this.interfaceSettings.get_string('color-scheme') === 'prefer-dark' ? 'dark' : 'light';
+    const schedule = this.kestrel.get_string('dark-schedule');
+    const window: [number, number] = [this.kestrel.get_double('dark-schedule-from'), this.kestrel.get_double('dark-schedule-to')];
+    const place = schedule === 'sunset' ? this.nightLight.get_value('last-coordinates').deepUnpack<[number, number]>() : UNKNOWN_PLACE;
+    tellLoginScreen('SetStyle', new GLib.Variant('(ss(dd)(dd))', [style, schedule, window, place]), 'login-style', 'style');
   }
 
   destroy(): void {

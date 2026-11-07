@@ -1,10 +1,11 @@
 use futures_util::StreamExt;
+use luft_daylight::Coordinates;
 use luft_dbus_macros::introspect;
 use tzf_rs::EmbeddedFinder;
 use zbus::{Connection, proxy};
 
 use crate::context::Context;
-use crate::shared::location::{self, Coordinates};
+use crate::shared::location;
 use crate::shared::notify::{self, Notification, NotificationsProxy, Sound, URGENCY_NORMAL};
 use crate::shared::settings::Schemas;
 use crate::shared::system::LoginProxy;
@@ -77,7 +78,7 @@ async fn follow_location(
     let Ok(Some(zone)) = tokio::task::spawn_blocking(move || zone_at(coordinates)).await else {
         return notification;
     };
-    if location::timezone().as_deref() == Some(zone.as_str()) || !automatic(settings) {
+    if luft_daylight::timezone().as_deref() == Some(zone.as_str()) || !automatic(settings) {
         return notification;
     }
     let changed = async {

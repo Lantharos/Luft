@@ -28,22 +28,31 @@ function call(method: string, parameters: GLib.Variant, descriptors: Gio.UnixFDL
     });
 }
 
-export function sendToLoginScreen(method: string, file: Gio.File, recordName: string, description: string, details: GLib.Variant[] = []): void {
+export type Attachment = [file: Gio.File, ...details: GLib.Variant[]];
+
+function identityOf([file, ...details]: Attachment): string {
+  const info = file.query_info('time::modified,standard::size', Gio.FileQueryInfoFlags.NONE, null);
+  return [file.get_uri(), info.get_modification_date_time()?.to_unix(), info.get_size(), ...details.map(detail => detail.print(false))].join(' ');
+}
+
+export function sendToLoginScreen(method: string, attachments: Attachment[], recordName: string, description: string): void {
   const record = recordOf(recordName);
   const descriptors = new Gio.UnixFDList();
+  const parameters: GLib.Variant[] = [];
   let identity: string;
   try {
-    const info = file.query_info('time::modified,standard::size', Gio.FileQueryInfoFlags.NONE, null);
-    identity = [file.get_uri(), info.get_modification_date_time()?.to_unix(), info.get_size(), ...details.map(detail => detail.print(false))].join(' ');
+    identity = attachments.map(identityOf).join('\n');
     if (identity === readRecord(record)) return;
-    const stream = file.read(null);
-    if (!(stream instanceof GioUnix.FileDescriptorBased)) return;
-    descriptors.append(stream.get_fd());
-    stream.close(null);
+    for (const [file, ...details] of attachments) {
+      const stream = file.read(null);
+      if (!(stream instanceof GioUnix.FileDescriptorBased)) return;
+      parameters.push(GLib.Variant.new_handle(descriptors.append(stream.get_fd())), ...details);
+      stream.close(null);
+    }
   } catch {
     return;
   }
-  call(method, GLib.Variant.new_tuple([GLib.Variant.new_handle(0), ...details]), descriptors, record, identity, description);
+  call(method, GLib.Variant.new_tuple(parameters), descriptors, record, identity, description);
 }
 
 export function tellLoginScreen(method: string, parameters: GLib.Variant, recordName: string, description: string): void {

@@ -19,7 +19,7 @@ export class LoginDisplays {
     if (this.timer) GLib.source_remove(this.timer);
     this.timer = GLib.timeout_add(GLib.PRIORITY_LOW, SYNC_DELAY, () => {
       this.timer = 0;
-      sendToLoginScreen('SetDisplays', this.file, 'login-displays', 'display arrangement');
+      sendToLoginScreen('SetDisplays', [[this.file]], 'login-displays', 'display arrangement');
       return GLib.SOURCE_REMOVE;
     });
   }

@@ -3,6 +3,8 @@
     <method name="SetAppearance">
       <arg name="wallpaper" type="h" direction="in"/>
       <arg name="focus" type="(dd)" direction="in"/>
+      <arg name="dark_wallpaper" type="h" direction="in"/>
+      <arg name="dark_focus" type="(dd)" direction="in"/>
     </method>
     <method name="SetDisplays">
       <arg name="arrangement" type="h" direction="in"/>
@@ -15,6 +17,14 @@
     </method>
     <method name="SetStyle">
       <arg name="style" type="s" direction="in"/>
+      <arg name="schedule" type="s" direction="in"/>
+      <arg name="window" type="(dd)" direction="in"/>
+      <arg name="coordinates" type="(dd)" direction="in"/>
+    </method>
+    <method name="CurrentStyle">
+      <arg name="uid" type="u" direction="in"/>
+      <arg type="s" direction="out"/>
+      <arg type="u" direction="out"/>
     </method>
     <method name="SetSharedWallpaper">
       <arg name="wallpaper" type="h" direction="in"/>

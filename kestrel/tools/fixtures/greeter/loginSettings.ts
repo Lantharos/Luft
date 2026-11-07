@@ -26,15 +26,25 @@ function descriptorOf(stream: Gio.InputStream) {
   return stream.get_fd();
 }
 
-const wallpaper = Gio.File.new_for_path(`${images}/sam-wallpaper.png`).read(null);
+const wallpaper = Gio.File.new_for_path(`${images}/sam-wallpaper.png`);
 const fds = new Gio.UnixFDList();
-fds.append(descriptorOf(wallpaper));
-call('SetAppearance', new GLib.Variant('(h(dd))', [0, [0.5, 0.75]]), fds);
+fds.append(descriptorOf(wallpaper.read(null)));
+fds.append(descriptorOf(wallpaper.read(null)));
+call('SetAppearance', new GLib.Variant('(h(dd)h(dd))', [0, [0.5, 0.75], 1, [0.5, 0.75]]), fds);
 const folder = `${state}/users/${new Gio.Credentials().get_unix_user()}`;
 const [, header] = Gio.File.new_for_path(`${folder}/wallpaper.jpg`).load_contents(null);
 require(header[0] === 0xff && header[1] === 0xd8, 'the desktop wallpaper is stored for the login screen as a still');
 const details: {focus: [number, number]} = JSON.parse(new TextDecoder().decode(Gio.File.new_for_path(`${folder}/wallpaper.json`).load_contents(null)[1]));
 require(details.focus[0] === 0.5 && details.focus[1] === 0.75, 'the part of the wallpaper kept on screen goes with it');
+require(!Gio.File.new_for_path(`${folder}/wallpaper-dark.jpg`).query_exists(null), 'the same wallpaper for both styles is stored once');
+
+const hour = new Date().getUTCHours();
+call('SetStyle', new GLib.Variant('(ss(dd)(dd))', ['light', 'custom', [(hour + 23) % 24, (hour + 1) % 24], [91, 181]]));
+const uid = new Gio.Credentials().get_unix_user();
+const [style, secondsUntilChange] = call('CurrentStyle', new GLib.Variant('(u)', [uid]))[0].deepUnpack<[string, number]>();
+require(style === 'dark' && secondsUntilChange > 0 && secondsUntilChange <= 3600,
+  'the login screen follows the dark style schedule and knows when it changes next');
+call('SetStyle', new GLib.Variant('(ss(dd)(dd))', ['dark', 'off', [0, 0], [91, 181]]));
 
 const user = GLib.get_user_name();
 call('SetHiddenUsers', new GLib.Variant('(as)', [[user]]));

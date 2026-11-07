@@ -9,7 +9,7 @@ use jxl_oxide::integration::JxlDecoder;
 
 use crate::error::Error;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq)]
 pub struct Focus {
     x: f64,
     y: f64,

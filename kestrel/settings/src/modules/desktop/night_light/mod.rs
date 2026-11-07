@@ -5,18 +5,19 @@ mod schedule;
 use std::time::Duration;
 
 use futures_util::StreamExt;
+use luft_daylight::{Coordinates, Daylight, Sun, Window};
 use tokio::sync::mpsc;
 use tokio::time::{Instant, MissedTickBehavior, interval};
 use zbus::Connection;
 use zbus::object_server::InterfaceRef;
 
 use crate::context::Context;
-use crate::shared::location::{self, Coordinates};
+use crate::shared::location;
 use crate::shared::settings::Schemas;
 use crate::shared::system::LoginProxy;
 use color::{Color, Command};
 use dark::DarkSchedule;
-use schedule::{Daylight, NEUTRAL, Sun, Window};
+use schedule::NEUTRAL;
 
 const SCHEMA: &str = "com.lantharos.kestrel.night-light";
 const LOCATION: &str = "org.gnome.system.location";
@@ -120,16 +121,12 @@ pub async fn start(context: &Context) -> zbus::Result<()> {
 
 impl NightLight {
     fn coordinates(&mut self) -> Option<Coordinates> {
-        let (latitude, longitude): (f64, f64) = self.settings.get(SCHEMA, "last-coordinates");
-        if latitude.abs() <= 90.0 && longitude.abs() <= 180.0 {
-            return Some(Coordinates {
-                latitude,
-                longitude,
-            });
+        if let Some(known) = Coordinates::known(self.settings.get(SCHEMA, "last-coordinates")) {
+            return Some(known);
         }
-        let zone = location::timezone()?;
+        let zone = luft_daylight::timezone()?;
         if self.zone.as_ref().is_none_or(|(known, _)| *known != zone) {
-            let coordinates = location::zone_coordinates(&zone);
+            let coordinates = luft_daylight::zone_coordinates(&zone);
             self.zone = Some((zone, coordinates));
         }
         self.zone.as_ref().and_then(|(_, coordinates)| *coordinates)
@@ -159,7 +156,7 @@ impl NightLight {
     fn handle(&mut self, request: Command) {
         match request {
             Command::PauseUntilTomorrow(paused) => {
-                self.paused_at = paused.then(schedule::now);
+                self.paused_at = paused.then(luft_daylight::now);
             }
         }
     }
@@ -172,8 +169,10 @@ impl NightLight {
     }
 
     fn update(&mut self, smooth: bool) {
-        let now = schedule::now();
-        self.daylight = self.coordinates().map(|at| schedule::daylight(&now, at));
+        let now = luft_daylight::now();
+        self.daylight = self
+            .coordinates()
+            .map(|at| luft_daylight::daylight(&now, at));
         self.dark
             .update(&self.settings, &now, self.daylight.as_ref());
         let (active, temperature) = self.target(&now);
@@ -201,7 +200,7 @@ impl NightLight {
         }
         let window = self.window();
         self.resume_after_night(now, &window);
-        match schedule::temperature(schedule::hours(now), &window, warm) {
+        match schedule::temperature(luft_daylight::hours(now), &window, warm) {
             None => (false, NEUTRAL),
             Some(_) if self.paused_at.is_some() => (true, NEUTRAL),
             Some(temperature) => (true, temperature),
@@ -213,11 +212,11 @@ impl NightLight {
             return;
         };
         let elapsed = now.difference(paused_at).as_microseconds();
-        let (paused_hour, hour) = (schedule::hours(paused_at), schedule::hours(now));
+        let (paused_hour, hour) = (luft_daylight::hours(paused_at), luft_daylight::hours(now));
         if elapsed > DAY_MICROSECONDS
             || (elapsed > 0
                 && paused_hour != hour
-                && schedule::is_between(window.to, paused_hour, hour))
+                && luft_daylight::is_between(window.to, paused_hour, hour))
         {
             self.paused_at = None;
         }

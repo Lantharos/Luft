@@ -39,6 +39,8 @@ export class Taskbar {
   readonly actor = new St.BoxLayout({ style_class: 'kestrel-app-slots' });
   private readonly items = new Map<string, AppItem>();
   private initialized = false;
+  private steady = false;
+  private deferred: Shell.App[] | null = null;
   private readonly disconnectors: (() => void)[] = [];
   private metrics: TaskbarMetrics = taskbarPreferences.desktop.metrics;
   private edge: Edge = taskbarPreferences.desktop.edge;
@@ -137,8 +139,27 @@ export class Taskbar {
     this.updateDots(item);
   }
 
-  update(apps: Shell.App[]): void {
+  /**
+   * Keeps every icon where it is while the pointer is over the taskbar, so what's under it stays what gets clicked.
+   * Apps that come and go meanwhile only take or give back their space once the pointer leaves.
+   */
+  holdSteady(steady: boolean): void {
+    this.steady = steady;
+    if (steady || !this.deferred) return;
+    const apps = this.deferred;
+    this.deferred = null;
+    this.update(apps);
+  }
+
+  /** Shows these apps in order; `immediate` is for changes people make on the taskbar itself, like pinning. */
+  update(apps: Shell.App[], immediate = false): void {
     const wanted = new Set(apps.map(app => app.id));
+    if (this.steady && this.initialized && !immediate) {
+      this.deferred = apps;
+      this.vacate(wanted);
+      return;
+    }
+    this.deferred = null;
     const pinned = this.pinned();
     for (const [id, item] of this.items) {
       if (wanted.has(id) || item.removing) continue;
@@ -184,6 +205,16 @@ export class Taskbar {
       animateActor(item.button, { opacity: 255, translation_x: 0, translation_y: 0, duration: this.initialized ? 220 : 0, mode: Clutter.AnimationMode.EASE_OUT_QUART });
     });
     this.initialized = true;
+    this.updateFocus();
+  }
+
+  private vacate(wanted: Set<string>): void {
+    for (const [id, item] of this.items) {
+      if (item.removing) continue;
+      const kept = wanted.has(id);
+      item.button.reactive = kept;
+      animateActor(item.button, { opacity: kept ? 255 : 0, duration: 160 });
+    }
     this.updateFocus();
   }
 

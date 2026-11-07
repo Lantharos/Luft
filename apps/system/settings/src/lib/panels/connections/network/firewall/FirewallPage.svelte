@@ -2,11 +2,12 @@
 	import EthernetPort from '@lucide/svelte/icons/ethernet-port';
 	import WifiIcon from '@lucide/svelte/icons/wifi';
 	import X from '@lucide/svelte/icons/x';
-	import { t } from '@luft/i18n';
+	import { i18n, t } from '@luft/i18n';
 	import { errorText, IconButton, Row, Section, Segmented, Spinner } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';
 	import { waitForPerson, type Firewall, type GuardedNetwork, type NetworkType, type OpenPort } from '@luft/network';
 	import { commands } from '#lib/bindings.js';
+	import { extensions } from '#lib/panels/personalization/extensions/extensions.svelte.js';
 	import type { NetworkState } from '../state.svelte';
 	import OpenPortRow from './OpenPortRow.svelte';
 	import { protocolLabel } from './ports';
@@ -19,6 +20,10 @@
 
 	let { connections, firewall, onclose }: Props = $props();
 
+	let listening = $derived((extensions.list ?? []).filter((extension) => extension.enabled && extension.listen.length));
+
+	void extensions.load();
+
 	let closing = $state<string | null>(null);
 	let problem = $state('');
 
@@ -28,6 +33,7 @@
 	]);
 
 	const portKey = (port: OpenPort) => `${port.port}/${port.protocol}`;
+	const portList = (ports: number[]) => new Intl.ListFormat(i18n.formats, { type: 'conjunction' }).format(ports.map(String));
 
 	function describe(network: GuardedNetwork) {
 		if (!network.networkType) return t('settings-network-firewall-unchosen');
@@ -84,4 +90,12 @@
 		{/each}
 		<OpenPortRow onopen={(port) => attempt(() => commands.networkOpenPort(port, waitForPerson))} />
 	</Section>
+
+	{#if listening.length}
+		<Section title={t('settings-network-firewall-extensions')} description={t('settings-network-firewall-extensions.description')}>
+			{#each listening as extension (extension.id)}
+				<Row title={extension.name} description={t('settings-network-firewall-extension-ports', { count: extension.listen.length, ports: portList(extension.listen) })} />
+			{/each}
+		</Section>
+	{/if}
 </SubPage>

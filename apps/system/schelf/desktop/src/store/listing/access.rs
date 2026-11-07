@@ -75,14 +75,24 @@ impl Declared {
     }
 }
 
+/// A port an extension takes connections on from devices on the network.
+#[derive(Deserialize, Serialize, Clone, PartialEq, Eq, Debug, Type)]
+pub struct ListenPort {
+    pub port: u16,
+    pub protocol: String,
+}
+
 /// What an extension asks for: permissions from the extension API, whether
-/// it runs a program of its own, and the hosts it connects to.
+/// it runs a program of its own, the hosts it connects to and the ports it
+/// listens on.
 #[derive(Deserialize, Serialize, Clone, PartialEq, Eq, Debug, Type)]
 pub struct ExtensionAccess {
     pub permissions: Vec<String>,
     pub helper: bool,
     #[serde(default)]
     pub network: Vec<String>,
+    #[serde(default)]
+    pub listen: Vec<ListenPort>,
 }
 
 impl ExtensionAccess {
@@ -94,6 +104,7 @@ impl ExtensionAccess {
                 .iter()
                 .any(|permission| !before.permissions.contains(permission))
             || self.network.iter().any(|host| !before.network.contains(host))
+            || self.listen.iter().any(|port| !before.listen.contains(port))
     }
 }
 

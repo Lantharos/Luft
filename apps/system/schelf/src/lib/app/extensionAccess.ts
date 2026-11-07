@@ -15,6 +15,7 @@ import Music from '@lucide/svelte/icons/music';
 import PanelBottom from '@lucide/svelte/icons/panel-bottom';
 import PanelTop from '@lucide/svelte/icons/panel-top';
 import Phone from '@lucide/svelte/icons/phone';
+import RadioTower from '@lucide/svelte/icons/radio-tower';
 import Search from '@lucide/svelte/icons/search';
 import ShieldCheck from '@lucide/svelte/icons/shield-check';
 import ToggleRight from '@lucide/svelte/icons/toggle-right';
@@ -50,6 +51,10 @@ const PERMISSIONS: Record<string, Ability> = {
 export function abilities(access: ExtensionAccess): Ability[] {
 	const listed = access.permissions.map((permission) => PERMISSIONS[permission] ?? { icon: ShieldCheck, title: permission });
 	if (access.network.length) listed.push({ icon: Globe, title: `Connect to ${new Intl.ListFormat('en', { type: 'conjunction' }).format(access.network)}` });
+	if (access.listen.length) {
+		const ports = [...new Set(access.listen.map((listen) => String(listen.port)))];
+		listed.push({ icon: RadioTower, title: `Take connections from devices on your network, on port ${new Intl.ListFormat('en', { type: 'conjunction' }).format(ports)}` });
+	}
 	if (access.helper) listed.push({ icon: Cpu, title: 'Runs its own program' });
 	return listed.length ? listed : [{ icon: ShieldCheck, title: 'Nothing beyond the basics' }];
 }

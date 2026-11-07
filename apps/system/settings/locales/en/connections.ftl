@@ -291,6 +291,13 @@ settings-network-firewall-home-title = On home networks
     .description = Devices on the same network can reach apps that listen on ports above 1024, which casting, games, Spotify Connect and sharing files use. Ports up to 1024 belong to system services and stay closed unless you open them here.
 # $port is a port number, like 22
 settings-network-firewall-port = Port { $port }
+settings-network-firewall-extensions = Extensions
+    .description = Extensions that take connections from devices on your network. Home networks let them through.
+# $ports is a list of port numbers, like 53317
+settings-network-firewall-extension-ports = { $count ->
+    [one] Port { $ports }
+   *[other] Ports { $ports }
+}
 settings-network-firewall-tcp = TCP
 settings-network-firewall-udp = UDP
 settings-network-firewall-close-port = Close this port

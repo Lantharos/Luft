@@ -9,7 +9,7 @@ use crate::library;
 use crate::operations::Job;
 use crate::store::catalog::{self, Entry, Origin};
 use crate::store::install::Consent;
-use crate::store::listing::{self, Declared, ExtensionAccess, Format, Listing, Offer, Release, channel};
+use crate::store::listing::{self, Declared, ExtensionAccess, Format, ListenPort, Listing, Offer, Release, channel};
 use crate::store::signed::Age;
 
 fn kind(entry: &Entry) -> Kind {
@@ -148,6 +148,13 @@ pub fn access(declared: &Declared) -> Vec<String> {
     access
 }
 
+fn listen_ports(listen: &[ListenPort]) -> String {
+    let mut ports: Vec<u16> = listen.iter().map(|listen| listen.port).collect();
+    ports.sort_unstable();
+    ports.dedup();
+    ports.iter().map(u16::to_string).collect::<Vec<_>>().join(", ")
+}
+
 /// What an extension may do, in the words Settings uses.
 pub fn extension_access(access: &ExtensionAccess) -> Vec<String> {
     let mut lines: Vec<String> = access
@@ -180,6 +187,9 @@ pub fn extension_access(access: &ExtensionAccess) -> Vec<String> {
         .collect();
     if !access.network.is_empty() {
         lines.push(format!("Connect to {}", access.network.join(", ")));
+    }
+    if !access.listen.is_empty() {
+        lines.push(format!("Take connections from devices on your network, on port {}", listen_ports(&access.listen)));
     }
     if access.helper {
         lines.push("Runs its own program".to_owned());

@@ -268,12 +268,14 @@ export type Download = {
 
 /**
  *  What an extension asks for: permissions from the extension API, whether
- *  it runs a program of its own, and the hosts it connects to.
+ *  it runs a program of its own, the hosts it connects to and the ports it
+ *  listens on.
  */
 export type ExtensionAccess = {
 	permissions: string[],
 	helper: boolean,
 	network: string[],
+	listen: ListenPort[],
 };
 
 /**  A Fedora package's page, from Fedora's software sources. */
@@ -342,6 +344,12 @@ fullAccess: boolean } | { kind: "installTool"; package: string } | { kind: "inst
 export type Kind = "app" | "extension";
 
 export type Lines = "none" | "lines" | "scanlines";
+
+/**  A port an extension takes connections on from devices on the network. */
+export type ListenPort = {
+	port: number,
+	protocol: string,
+};
 
 export type Locale = {
 	languages: string[],

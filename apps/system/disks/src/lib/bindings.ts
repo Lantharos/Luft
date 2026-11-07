@@ -4,6 +4,7 @@ import { invoke, listen, type CallOptions } from "@lantharos/sabine";
 
 export const commands = {
 	appState: (options?: CallOptions) => invoke<AppState>("app_state", {}, options),
+	disksCancelSystemResize: (options?: CallOptions) => invoke<null>("disks_cancel_system_resize", {}, options),
 	disksChangePassphrase: (params: {
 		block: string,
 		current: string,
@@ -32,6 +33,9 @@ export const commands = {
 		format: Format,
 	}, options?: CallOptions) => invoke<null>("disks_format_volume", params, options),
 	disksFormats: (options?: CallOptions) => invoke<Support[]>("disks_formats", {}, options),
+	disksGiveLuft: (params: {
+		offset: number,
+	}, options?: CallOptions) => invoke<LuftGiven>("disks_give_luft", params, options),
 	disksGrowSystem: (params: {
 		unlock: string,
 	}, options?: CallOptions) => invoke<Outcome<number>>("disks_grow_system", params, options),
@@ -58,6 +62,9 @@ export const commands = {
 	disksLock: (params: {
 		block: string,
 	}, options?: CallOptions) => invoke<null>("disks_lock", params, options),
+	disksLuftGift: (params: {
+		offset: number,
+	}, options?: CallOptions) => invoke<LuftGift>("disks_luft_gift", params, options),
 	disksMount: (params: {
 		block: string,
 	}, options?: CallOptions) => invoke<string>("disks_mount", params, options),
@@ -74,6 +81,7 @@ export const commands = {
 	disksRemoveSystem: (params: {
 		id: string,
 	}, options?: CallOptions) => invoke<Removed>("disks_remove_system", params, options),
+	disksRestart: (options?: CallOptions) => invoke<null>("disks_restart", {}, options),
 	disksSafelyRemove: (params: {
 		drive: string,
 		block: string,
@@ -230,6 +238,7 @@ export type Drive = {
 	table: PartitionTable | null,
 	extended: Span | null,
 	segments: Segment[],
+	luft: LuftRoom[],
 	health: Health | null,
 	job: Job | null,
 };
@@ -316,6 +325,7 @@ export type Launch = {
 	image: ChosenImage | null,
 	space: string | null,
 	system: string | null,
+	luft: boolean,
 };
 
 export type Lines = "none" | "lines" | "scanlines";
@@ -324,6 +334,20 @@ export type Locale = {
 	languages: string[],
 	formats: string,
 	fixed: boolean,
+};
+
+export type LuftGift = { kind: "ready"; growth: LuftGrowth } | { kind: "move-first"; name: string; size: number; growth: LuftGrowth } | { kind: "refused"; reason: string };
+
+export type LuftGiven = { kind: "grown"; bytes: number } | { kind: "at-start" } | { kind: "needs-key"; message: string };
+
+export type LuftGrowth = "now" | "at-start";
+
+export type LuftReach = { kind: "after" } | { kind: "before" } | { kind: "apart"; between: string[] };
+
+export type LuftRoom = {
+	offset: number,
+	size: number,
+	reach: LuftReach,
 };
 
 export type Motion = "full" | "reduced" | "off";
@@ -369,6 +393,7 @@ export type Protection = {
 	available: boolean,
 	autoUnlock: string,
 	drives: { [key in string]: DriveEncryption },
+	systemResize: string,
 };
 
 export type Removed = {

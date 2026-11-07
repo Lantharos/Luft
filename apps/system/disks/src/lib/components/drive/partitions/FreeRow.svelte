@@ -1,7 +1,10 @@
 <script lang="ts">
-	import { bytes } from '@luft/ui';
+	import { bytes, Spinner } from '@luft/ui';
+	import { commands } from '#lib/bindings.js';
 	import type { Drive } from '#lib/bindings.js';
+	import { WAIT } from '#lib/bridge/index.js';
 	import { dialogs } from '#lib/dialogs/dialogs.svelte.js';
+	import { luftRoom } from '#lib/luft.js';
 	import { disks } from '#lib/state/disks.svelte.js';
 
 	interface Props {
@@ -14,6 +17,13 @@
 
 	let key = $derived(`free:${offset}`);
 	let blank = $derived(!drive.table);
+	let room = $derived(luftRoom(drive, offset));
+	let waiting = $derived(disks.protection.systemResize === 'grow' && room?.reach.kind === 'before');
+	let calling = $derived(disks.busy.has(key));
+
+	function callOff() {
+		void disks.run(key, () => commands.disksCancelSystemResize(WAIT));
+	}
 </script>
 
 <div
@@ -24,8 +34,17 @@
 >
 	<span class="dashed" aria-hidden="true"></span>
 	<span class="name">{blank ? 'No partitions' : 'Free space'}</span>
-	<span class="facts">{bytes(size)}</span>
-	{#if !drive.readOnly}
+	<span class="facts">{waiting ? `${bytes(size)}, Luft moves in at the next start` : bytes(size)}</span>
+	{#if waiting}
+		<button type="button" class="button ml-auto" disabled={calling} onclick={callOff}>
+			{#if calling}<Spinner />{/if}Keep it free
+		</button>
+	{:else if room && !drive.readOnly}
+		<div class="ml-auto flex gap-2">
+			<button type="button" class="button" onclick={() => dialogs.open({ kind: 'give-luft', drive, offset, size })}>Give to Luft</button>
+			<button type="button" class="button" aria-label="New partition" onclick={() => dialogs.open({ kind: 'create', drive, offset, size })}>New</button>
+		</div>
+	{:else if !drive.readOnly}
 		<button
 			type="button"
 			class="button ml-auto"

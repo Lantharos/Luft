@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use specta::Type;
 
 use super::health::{self, Health};
+use super::room::{self, Room};
 use super::volumes::{self, Segment, Span};
 use super::{BLOCK, DRIVE, JOB, LOOP, PARTITION, TABLE, bytes_text, system};
 
@@ -48,6 +49,7 @@ pub struct Drive {
     pub table: Option<PartitionTable>,
     pub extended: Option<Span>,
     pub segments: Vec<Segment>,
+    pub luft: Vec<Room>,
     pub health: Option<Health>,
     pub job: Option<Job>,
     #[serde(skip)]
@@ -148,6 +150,7 @@ fn drive(objects: &Objects, block: Object, jobs: &Jobs, usage: &system::Usage) -
             .or_else(|| drive.as_deref().and_then(|path| jobs.on(path))),
         sort_key: text("SortKey"),
         system,
+        luft: room::rooms(&segments),
         segments,
         device,
         kind,

@@ -25,4 +25,4 @@ Removing first makes sure Luft's own startup is in place and first in the firmwa
 
 Space right after Luft's partition goes to Luft straight away, while it runs.
 
-Space before Luft's partition can't be added that way. Disks offers to make it a partition for your files instead. To give it to Luft itself, start Luft from a USB stick, choose **Just try Luft**, and move Luft's partition into the space with Disks' partition editor.
+Space before Luft's partition, where Windows usually was, can't be added while Luft runs from it. **Give to Luft** has Luft move into it the next time the computer starts, which takes a few minutes while you can keep using it. You can also make it a partition for your files instead. See [Giving Luft more space](/apps/disks/#giving-luft-more-space).

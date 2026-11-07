@@ -1,10 +1,17 @@
 import { editor } from './editor.svelte';
+import { neighbours } from './limits';
 import type { Part, Span } from './model';
 
 const sameFlags = (a: number[], b: number[]) => a.length === b.length && a.every((bit) => b.includes(bit));
 
 export function place(part: Part, offset: number, size: number) {
 	if (offset === part.offset && size === part.size) return;
+	if (part.system && offset !== part.offset) {
+		if (offset > part.offset || !editor.planned) return;
+		const { before, after } = neighbours(editor.planned, part);
+		editor.push({ kind: 'place', key: part.key, offset: before, size: after - before });
+		return;
+	}
 	editor.push({ kind: 'place', key: part.key, offset, size });
 }
 

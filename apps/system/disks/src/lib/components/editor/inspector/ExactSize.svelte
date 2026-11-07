@@ -26,7 +26,7 @@
 			label="Free space before"
 			exact
 			value={before}
-			min={limits.movable ? limits.before - around.before : before}
+			min={limits.movable ? limits.before - around.before : limits.movesAtStart ? 0 : before}
 			max={limits.movable ? limits.after - part.size - around.before : before}
 			oncommit={(next) => place(part, around.before + next, part.size)}
 		/>

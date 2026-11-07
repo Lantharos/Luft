@@ -1,0 +1,11 @@
+[Unit]
+Description=Give Luft the free space next to it, then check it moved and still starts
+After=dbus.service local-fs.target trustd-system-disk.service
+ConditionPathExists=/var/lib/luft-grow-check/stage
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/luft-grow-check
+
+[Install]
+WantedBy=multi-user.target

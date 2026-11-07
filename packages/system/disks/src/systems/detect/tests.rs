@@ -66,6 +66,7 @@ fn drive(id: &str, volumes: Vec<Volume>) -> Drive {
             .into_iter()
             .map(|volume| Segment::Volume(Box::new(volume)))
             .collect(),
+        luft: Vec::new(),
         health: None,
         job: None,
         sort_key: String::new(),

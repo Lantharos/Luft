@@ -2,13 +2,14 @@ use luft_trust::{Outcome, TRUST};
 use serde::Serialize;
 use specta::Type;
 
+use super::luft::grow;
 use super::{Kind, Role, System, find};
 use crate::partitions;
 use crate::udisks;
+use crate::udisks::room::Reach;
 use crate::udisks::snapshot::{self, Drive};
-use crate::udisks::volumes::{Segment, Volume};
+use crate::udisks::volumes::Segment;
 
-const ROOTS: [&str; 2] = ["/sysroot", "/"];
 const WORTH_OFFERING: u64 = 1 << 30;
 
 #[derive(Serialize, Clone, Debug, Type)]
@@ -40,25 +41,11 @@ pub struct Removed {
     pub free: Option<Space>,
 }
 
-fn is_root(volume: &Volume) -> bool {
-    let contents = volume
-        .encryption
-        .as_ref()
-        .and_then(|encryption| encryption.cleartext.as_deref())
-        .unwrap_or(volume);
-    contents
-        .mount_points
-        .iter()
-        .any(|point| ROOTS.contains(&point.as_str()))
-}
-
 fn room_after_root(drives: &[Drive]) -> bool {
-    drives.iter().any(|drive| {
-        drive.segments.windows(2).any(|pair| {
-            matches!(&pair[0], Segment::Volume(volume) if is_root(volume))
-                && matches!(pair[1], Segment::Free { .. })
-        })
-    })
+    drives
+        .iter()
+        .flat_map(|drive| &drive.luft)
+        .any(|room| room.reach == Reach::After)
 }
 
 fn largest_free(drives: &[Drive], drive: &str) -> Option<Space> {
@@ -107,10 +94,6 @@ pub async fn remove_old_system_startups() -> Result<(), String> {
         Some(old) => remove_startups(&old).await,
         None => Ok(()),
     }
-}
-
-pub async fn grow(unlock: &str) -> Result<Outcome<u64>, String> {
-    luft_trust::unlocking(&TRUST, "GrowSystem", &(unlock,)).await
 }
 
 pub async fn remove(id: &str, step: impl Fn(Step)) -> Result<Removed, String> {

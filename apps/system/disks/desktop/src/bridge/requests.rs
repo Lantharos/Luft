@@ -165,6 +165,11 @@ pub struct SystemId {
 }
 
 #[derive(Deserialize, Type)]
+pub struct Room {
+    pub offset: u64,
+}
+
+#[derive(Deserialize, Type)]
 pub struct Grow {
     pub unlock: String,
 }

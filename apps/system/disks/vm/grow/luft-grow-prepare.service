@@ -1,0 +1,12 @@
+[Unit]
+Description=Install Luft encrypted next to a Windows-like drive, with free space before and after it
+After=dbus.service local-fs.target
+ConditionPathExists=/dev/disk/by-label/luft-source
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/luft-grow-prepare
+ExecStopPost=/usr/bin/systemctl poweroff --no-block
+
+[Install]
+WantedBy=multi-user.target

@@ -22,7 +22,8 @@ export type OpenDialog =
 	| { kind: 'encryption'; drive: Drive; volume: Volume }
 	| { kind: 'turn-off'; volume: Volume }
 	| { kind: 'recovery-key'; key: string; name: string }
-	| { kind: 'remove-system'; system: OtherSystem };
+	| { kind: 'remove-system'; system: OtherSystem }
+	| { kind: 'give-luft'; drive: Drive; offset: number; size: number };
 
 class Dialogs {
 	current = $state.raw<OpenDialog | null>(null);

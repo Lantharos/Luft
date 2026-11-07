@@ -5,6 +5,7 @@
 	import { CANCELLED, WAIT, openFolder } from '#lib/bridge/index.js';
 	import { KeyRequest } from '#lib/encryption.svelte.js';
 	import { inner } from '#lib/format.js';
+	import { luftRoom } from '#lib/luft.js';
 	import { disks } from '#lib/state/disks.svelte.js';
 	import { systems } from '#lib/state/systems.svelte.js';
 	import { GROW_STEP, plannedSteps, shortName, stepKey } from '#lib/systems.js';
@@ -33,6 +34,7 @@
 
 	let steps = $derived([...plannedSteps(system), ...(growStarted ? [GROW_STEP] : [])]);
 	let drive = $derived(disks.drives.find((candidate) => candidate.id === (removed?.drive ?? system.drive)) ?? null);
+	let room = $derived(drive && removed?.free ? luftRoom(drive, removed.free.offset) : null);
 	let canOpen = $derived(Boolean(system.folder || system.files));
 	let holdsFiles = $derived(system.parts.length > 0 || system.kept !== null);
 	let title = $derived(
@@ -114,6 +116,11 @@
 		dialogs.open({ kind: 'create', drive, offset: removed.free.offset, size: removed.free.size });
 	}
 
+	function giveLuft() {
+		if (!drive || !removed?.free) return;
+		dialogs.open({ kind: 'give-luft', drive, offset: removed.free.offset, size: removed.free.size });
+	}
+
 	function close() {
 		if (phase !== 'working') onclose();
 	}
@@ -151,11 +158,7 @@
 		{#if removed.free}
 			<p class="text-[13.5px] leading-relaxed">
 				{bytes(removed.free.size)} is free on {drive?.name ?? 'the drive'}.
-				{#if drive?.system}
-					Luft can only grow into space right after it while it runs. Make it a partition for your files now, or start Try Luft from a USB stick and move Luft into it with Disks.
-				{:else}
-					You can make it a partition for your files.
-				{/if}
+				{room ? 'Give it to Luft, or make it a partition for your files.' : 'You can make it a partition for your files.'}
 			</p>
 		{/if}
 	{/if}
@@ -174,6 +177,9 @@
 			{/if}
 			{#if removed?.free && drive}
 				<button type="button" class="button" onclick={makePartition}>Make a partition</button>
+			{/if}
+			{#if room}
+				<button type="button" class="button" onclick={giveLuft}>Give to Luft</button>
 			{/if}
 			<button type="button" class="button primary" onclick={onclose}>Done</button>
 		{/if}

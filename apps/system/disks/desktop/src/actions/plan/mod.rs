@@ -2,6 +2,7 @@ mod guard;
 pub mod moving;
 
 use luft_app::Events;
+use luft_disks::systems::luft;
 use luft_disks::{partitions, resize};
 use serde::Deserialize;
 
@@ -134,8 +135,13 @@ async fn place(
     size: u64,
 ) -> Result<Option<String>, String> {
     let guard = Guard::volume(block).await?;
-    if offset == guard.offset && guard.system {
-        return trust::resize_system(size).await.map(|_| None);
+    if guard.system {
+        return if offset < guard.offset {
+            luft::grow_at_start().await
+        } else {
+            trust::resize_system(size).await.map(drop)
+        }
+        .map(|()| None);
     }
     if offset == guard.offset {
         guard.resizable()?;

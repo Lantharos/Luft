@@ -6,7 +6,7 @@ use sabine::SabineWindow;
 use serde::Serialize;
 use specta::Type;
 
-use crate::actions::{drive, encryption, formatting, mounting, plan};
+use crate::actions::{drive, encryption, formatting, luft, mounting, plan};
 use crate::events::SYSTEM_STEP;
 use crate::images::{self, Imaging};
 use crate::launch;
@@ -17,7 +17,8 @@ use luft_disks::{partitions, systems};
 use requests::{
     Block, ChangePassphrase, CreateImage, CreatePartition, Drive, Encrypt, Folder, FormatDrive,
     FormatEncrypted, FormatVolume, Grow, Handoff, KeySheet, Label, NextStep, Place, Remove,
-    RestoreImage, Resume, Selftest, Shown, Startup, SystemId, Unlock, Unlocked, Unlocking, Uuid,
+    RestoreImage, Resume, Room, Selftest, Shown, Startup, SystemId, Unlock, Unlocked, Unlocking,
+    Uuid,
 };
 
 mod requests;
@@ -155,8 +156,20 @@ fn register_systems(window: SabineWindow, state: &State) -> SabineWindow {
             },
         )
         .command_async("disks_grow_system", |Grow { unlock }| async move {
-            systems::grow(&unlock).await
+            systems::luft::grow(&unlock).await
         })
+        .command_async("disks_luft_gift", |Room { offset }| async move {
+            systems::luft::preview(offset).await
+        })
+        .with_async(
+            "disks_give_luft",
+            state,
+            |state, Room { offset }| async move { luft::give(&state.events, offset).await },
+        )
+        .command_async("disks_cancel_system_resize", |Empty {}| {
+            systems::luft::cancel_resize()
+        })
+        .command_async("disks_restart", |Empty {}| luft::restart())
 }
 
 fn register_volumes(window: SabineWindow) -> SabineWindow {

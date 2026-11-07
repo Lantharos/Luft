@@ -1,8 +1,8 @@
 # Disks
 
-Disks shows the drives in your computer and the ones you plug in, and looks after their partitions, formatting, encryption, health and disk images. It can also remove another system and give Luft its space. Using it is described in [the docs](https://docs.luft.computer/apps/disks/).
+Disks shows the drives in your computer and the ones you plug in, and looks after their partitions, formatting, encryption, health and disk images. It can also remove another system and give Luft free space next to it. Using it is described in [the docs](https://docs.luft.computer/apps/disks/).
 
-Changes go through UDisks, and encryption through [trustd](../../../security/README.md). Anything that erases data asks first. The partitions the running system uses can't be changed, except that trustd grows or shrinks Luft's own partition in place.
+Changes go through UDisks, and encryption through [trustd](../../../security/README.md). Anything that erases data asks first. The partitions the running system uses can't be changed, except that trustd grows or shrinks Luft's own partition in place, and moves it into free space in front of it at the next start.
 
 ## Build and run
 
@@ -25,12 +25,13 @@ Installing registers Disks for `.iso` and raw disk image files.
 | `disks image.iso` | Write that image to a drive |
 | `disks disks-space:///path/to/folder` | What's using space in that folder |
 | `disks disks-system://ID` | Removing that other system, as Settings opens it |
+| `disks disks-luft:` | Giving Luft the free space next to it, as Meet Luft opens it on Luft |
 
 ## Testing
 
 `kestrel/tools/session.sh capture` runs Disks against a stand-in UDisks, keyring and trustd without touching a real drive.
 
-`vm/run.sh` installs Luft next to a Windows-like drive and an old Linux in a VM, removes both from the installed system, and checks that Luft grew and still starts. It needs Podman, QEMU with KVM, OVMF and `localhost/luft-system:45` from `os/image/build.sh`.
+`vm/run.sh` installs Luft next to a Windows-like drive and an old Linux in a VM, removes both from the installed system, and checks that Luft grew and still starts. `vm/grow/run.sh` installs an encrypted Luft next to Windows, leaves free space in front of it, right after it and behind other partitions, checks what Disks offers for each, grows Luft into the space after it, then lets it move into the space in front at the next start, cuts the power in the middle of the move and checks that it finishes and starts again. Both need Podman, QEMU with KVM, OVMF and `localhost/luft-system:45` from `os/image/build.sh`.
 
 ## License
 

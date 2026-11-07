@@ -22,10 +22,12 @@ pub struct Launch {
     image: Option<ChosenImage>,
     space: Option<PathBuf>,
     system: Option<String>,
+    luft: bool,
 }
 
 const SPACE: &str = "disks-space://";
 const SYSTEM: &str = "disks-system://";
+const LUFT: &str = "disks-luft:";
 
 pub fn resolve(activation: &Activation, snapshot: &Snapshot) -> Launch {
     let arguments = activation.arguments();
@@ -34,6 +36,7 @@ pub fn resolve(activation: &Activation, snapshot: &Snapshot) -> Launch {
         system: arguments
             .iter()
             .find_map(|argument| argument.strip_prefix(SYSTEM).map(str::to_owned)),
+        luft: arguments.iter().any(|argument| argument.starts_with(LUFT)),
         space: arguments.iter().find_map(|argument| {
             luft_app::portal::uri_path(&format!("file://{}", argument.strip_prefix(SPACE)?))
         }),

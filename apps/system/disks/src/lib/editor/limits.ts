@@ -8,6 +8,7 @@ const ONLINE_GROW = 16;
 const HEADROOM: Record<string, [number, number]> = { btrfs: [1.25, 256 * MiB] };
 const DEFAULT_HEADROOM: [number, number] = [1.1, 64 * MiB];
 const SMALLEST: Record<string, number> = { btrfs: 128 * MiB, ext4: 16 * MiB, vfat: 34 * MiB };
+const SMALLEST_MOVE = 1024 * MiB;
 
 export interface Limits {
 	before: number;
@@ -15,6 +16,7 @@ export interface Limits {
 	smallest: number;
 	largest: number;
 	movable: boolean;
+	movesAtStart: boolean;
 	notes: string[];
 }
 
@@ -43,7 +45,7 @@ export function neighbours(layout: Layout, part: Part) {
 function resizing(part: Part, support: (filesystem: string) => Support | undefined) {
 	if (part.pending || (part.replaced && !part.filesystem)) return { grow: true, shrink: true, smallest: smallestFor(part.filesystem) };
 	if (!part.usage) return { grow: true, shrink: true, smallest: MiB };
-	if (part.usage !== 'filesystem' || part.encrypted) return { grow: false, shrink: false, smallest: part.size };
+	if (part.usage !== 'filesystem' || (part.encrypted && !part.system)) return { grow: false, shrink: false, smallest: part.size };
 	const flags = support(part.filesystem)?.resize ?? 0;
 	const [grows, shrinks] = part.system ? [ONLINE_GROW, ONLINE_SHRINK] : [ONLINE_GROW | OFFLINE_GROW, ONLINE_SHRINK | OFFLINE_SHRINK];
 	const known = part.used !== null;
@@ -57,7 +59,10 @@ export function limitsOf(layout: Layout, part: Part, support: (filesystem: strin
 	const notes: string[] = [];
 	const size = resizing(part, support);
 	const movable = !part.system && !part.logical;
-	if (part.system) {
+	const movesAtStart = part.system && !part.logical && size.grow && part.offset - before >= SMALLEST_MOVE;
+	if (movesAtStart) {
+		notes.push('The running system uses this partition. It grows or shrinks at its end right away, and moves into the free space in front of it the next time the computer starts.');
+	} else if (part.system) {
 		notes.push(
 			size.grow || size.shrink
 				? 'The running system uses this partition, so it can only grow or shrink in place.'
@@ -66,13 +71,13 @@ export function limitsOf(layout: Layout, part: Part, support: (filesystem: strin
 	} else if (part.logical) {
 		notes.push('It sits inside an extended partition, so it stays where it is.');
 	}
-	if (part.encrypted && !part.replaced) notes.push('Encrypted partitions keep their size. Moving one keeps it encrypted.');
+	if (part.encrypted && !part.replaced && !part.system) notes.push('Encrypted partitions keep their size. Moving one keeps it encrypted.');
 	else if (!part.pending && !part.replaced && part.usage === 'filesystem' && part.used === null && !part.system)
 		notes.push('Mount it to see how far it can shrink.');
 	else if (part.usage && part.usage !== 'filesystem' && !part.encrypted) notes.push('Disks can’t resize what’s on it, only move it.');
 	if (!part.system && part.mounted) notes.push('It’s unmounted while it changes, if it has to be.');
 	const grows = size.grow && !part.logical;
-	const start = movable ? before : part.offset;
+	const start = movable || movesAtStart ? before : part.offset;
 	const stop = movable || grows ? after : end(part);
 	return {
 		before: start,
@@ -80,6 +85,7 @@ export function limitsOf(layout: Layout, part: Part, support: (filesystem: strin
 		smallest: size.shrink && !part.logical ? size.smallest : part.size,
 		largest: grows ? stop - start : part.size,
 		movable,
+		movesAtStart,
 		notes
 	};
 }

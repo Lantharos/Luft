@@ -7,7 +7,7 @@ keywords = ["disks", "drives", "storage", "partitions", "partition", "format", "
 version = "0.1.0"
 icon = "public/favicon.svg"
 cargo_manifest = "desktop/Cargo.toml"
-mime_types = ["application/x-cd-image", "application/x-raw-disk-image"]
+mime_types = ["application/x-cd-image", "application/x-raw-disk-image", "x-scheme-handler/disks-luft"]
 
 [install]
 command = "cargo run --manifest-path desktop/Cargo.toml --"

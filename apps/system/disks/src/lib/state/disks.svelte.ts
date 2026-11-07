@@ -2,7 +2,7 @@ import { SvelteSet } from 'svelte/reactivity';
 import { appearance, errorText, Toasts } from '@luft/ui';
 import { events as sabineEvents } from '@lantharos/sabine';
 import { commands, events } from '#lib/bindings.js';
-import type { Activation, Drive, ImageProgress, Protection, Segment, Support, Volume } from '#lib/bindings.js';
+import type { Activation, Drive, ImageProgress, LuftRoom, Protection, Segment, Support, Volume } from '#lib/bindings.js';
 import { CANCELLED } from '#lib/bridge/index.js';
 import { dialogs } from '#lib/dialogs/dialogs.svelte.js';
 import { space } from './space.svelte';
@@ -21,7 +21,7 @@ class Disks {
 	current = $state<string | null>(null);
 	hovered = $state<string | null>(null);
 	image = $state.raw<ImageProgress | null>(null);
-	protection = $state.raw<Protection>({ available: false, autoUnlock: '', drives: {} });
+	protection = $state.raw<Protection>({ available: false, autoUnlock: '', drives: {}, systemResize: '' });
 	loaded = $state(false);
 	readonly busy = new SvelteSet<string>();
 	readonly notices = new Toasts(NOTICE_MS);
@@ -103,11 +103,21 @@ class Disks {
 		dialogs.open({ kind: 'remove-system', system });
 	}
 
+	#offerLuftRoom() {
+		const drive = this.drives.find((candidate) => candidate.luft.length > 0) ?? this.drives.find((candidate) => candidate.system);
+		if (!drive) return;
+		this.select(drive.id);
+		const next = drive.luft.filter((room) => room.reach.kind !== 'apart');
+		const room = (next.length ? next : drive.luft).reduce<LuftRoom | null>((best, candidate) => (best && best.size >= candidate.size ? best : candidate), null);
+		if (room) dialogs.open({ kind: 'give-luft', drive, offset: room.offset, size: room.size });
+	}
+
 	async #locate(activation: Activation) {
 		const located = await commands.disksLocate(activation).catch(() => null);
 		if (located?.target) this.select(located.target.drive, located.target.block);
 		if (located?.image) dialogs.open({ kind: 'write-image', image: located.image });
 		if (located?.system) void this.#offerRemoval(located.system);
+		if (located?.luft) this.#offerLuftRoom();
 		if (located?.space) this.explore(located.space, located.space.split('/').filter(Boolean).at(-1) ?? located.space);
 	}
 }

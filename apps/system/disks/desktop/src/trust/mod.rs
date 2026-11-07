@@ -20,6 +20,7 @@ pub struct Protection {
     available: bool,
     auto_unlock: String,
     drives: HashMap<String, DriveEncryption>,
+    system_resize: String,
 }
 
 #[derive(Serialize, Deserialize, Type)]
@@ -73,11 +74,6 @@ async fn system_disk() -> Result<Map, String> {
         .unwrap_or_default())
 }
 
-async fn system_protected() -> Result<bool, String> {
-    let disk = system_disk().await?;
-    Ok(get::<bool>(&disk, "Encrypted").unwrap_or(false))
-}
-
 pub async fn resize_system(size: u64) -> Result<u64, String> {
     luft_trust::call(&TRUST, "ResizeSystem", &(size, "")).await
 }
@@ -87,9 +83,11 @@ pub async fn state() -> Result<Protection, String> {
         return Ok(Protection::default());
     };
     let drives: HashMap<String, Map> = get(&properties, "Drives").unwrap_or_default();
+    let disk = system_disk().await?;
     Ok(Protection {
         available: true,
-        auto_unlock: if system_protected().await? {
+        system_resize: get(&disk, "Resize").unwrap_or_default(),
+        auto_unlock: if get::<bool>(&disk, "Encrypted").unwrap_or(false) {
             String::new()
         } else {
             NEEDS_DEVICE_ENCRYPTION.to_owned()

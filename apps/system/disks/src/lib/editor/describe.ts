@@ -17,6 +17,11 @@ function amount(from: number, to: number) {
 }
 
 function placement(part: Part, offset: number, size: number) {
+	if (part.system && offset < part.offset) {
+		const rest = offset + size - (part.offset + part.size);
+		const then = rest > 0 ? `, then grow it over the ${bytes(rest)} after it` : '';
+		return `Move ${quoted(part)} into the ${amount(part.offset, offset)} in front of it the next time the computer starts${then}`;
+	}
 	const sizing = size > part.size ? `grow it by ${amount(part.size, size)}` : size < part.size ? `shrink it by ${amount(part.size, size)}` : '';
 	if (offset === part.offset) {
 		const verb = size > part.size ? 'Grow' : 'Shrink';
@@ -63,7 +68,7 @@ function describe(layout: Layout, step: Step): Described {
 				unmounts: part.mounted
 			};
 		case 'place': {
-			const moves = step.offset !== part.offset;
+			const moves = step.offset !== part.offset && !part.system;
 			return {
 				sentence: placement(part, step.offset, step.size),
 				loss: moves && holds ? `Moving ${quoted(part)} copies all of its ${bytes(Math.min(part.size, step.size))}. Keep the computer on and the drive connected until it’s done, or what’s on it can be lost.` : null,

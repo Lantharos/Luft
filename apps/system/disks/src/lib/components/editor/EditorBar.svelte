@@ -59,7 +59,7 @@
 			const size = clamp(part.size + delta, bounds.smallest, Math.min(bounds.largest, bounds.after - part.offset));
 			editor.draft = { key: part.key, offset: part.offset, size };
 		} else if (mode === 'start') {
-			const offset = clamp(part.offset + delta, Math.max(bounds.before, stop - bounds.largest), stop - bounds.smallest);
+			const offset = clamp(part.offset + delta, Math.max(bounds.before, stop - bounds.largest), bounds.movesAtStart ? part.offset : stop - bounds.smallest);
 			editor.draft = { key: part.key, offset, size: alignDown(stop - offset) };
 		} else {
 			editor.draft = { key: part.key, offset: clamp(part.offset + delta, bounds.before, bounds.after - part.size), size: part.size };
@@ -103,7 +103,7 @@
 		</button>
 	{/each}
 	{#if box && resizable}
-		{#if limits?.movable}
+		{#if limits?.movable || limits?.movesAtStart}
 			<span class="handle" style:left="{box.left}px" role="presentation" onpointerdown={(event) => grab(event, 'start')}></span>
 		{/if}
 		<span class="handle" style:left="{box.left + box.width}px" role="presentation" onpointerdown={(event) => grab(event, 'end')}></span>

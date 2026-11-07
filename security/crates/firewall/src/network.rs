@@ -47,6 +47,18 @@ impl Prefix {
             }
         }
     }
+
+    fn covers(self, other: Self) -> bool {
+        match (self, other) {
+            (Self::V4(_, length), Self::V4(address, longer)) if length <= longer => {
+                Self::of(IpAddr::V4(address), length) == self
+            }
+            (Self::V6(_, length), Self::V6(address, longer)) if length <= longer => {
+                Self::of(IpAddr::V6(address), length) == self
+            }
+            _ => false,
+        }
+    }
 }
 
 impl fmt::Display for Prefix {
@@ -177,6 +189,12 @@ pub async fn read(connection: &Connection) -> Result<Layout, String> {
             Role::Guarded => {}
         }
     }
+    let home = layout.home.clone();
+    layout.home.retain(|(interface, prefix)| {
+        !home
+            .iter()
+            .any(|(other, wider)| other == interface && wider != prefix && wider.covers(*prefix))
+    });
     layout
         .unclassified
         .sort_by(|(left, _), (right, _)| left.as_str().cmp(right.as_str()));

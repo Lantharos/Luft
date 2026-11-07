@@ -44,9 +44,21 @@ fn on_filesystem(mount: &Mount, folder: &Path) -> Option<String> {
     (plain && !text.contains(char::is_whitespace)).then_some(text)
 }
 
+/// `folder` with its parent's links resolved, since `/home` is a link to
+/// `/var/home` on Luft and Fedora's atomic editions, and `findmnt` reports
+/// the mount the link leads to.
+fn resolved(folder: &Path) -> PathBuf {
+    let parent = folder.parent().unwrap_or(Path::new("/"));
+    match (std::fs::canonicalize(parent), folder.file_name()) {
+        (Ok(parent), Some(name)) => parent.join(name),
+        _ => folder.to_owned(),
+    }
+}
+
 fn spot(blocks: &[Block], folder: &Path) -> Result<Spot, String> {
-    let mount = disks::mount_of(folder.parent().unwrap_or(Path::new("/")))?;
-    let on_filesystem = on_filesystem(&mount, folder).ok_or_else(|| {
+    let real = resolved(folder);
+    let mount = disks::mount_of(real.parent().unwrap_or(Path::new("/")))?;
+    let on_filesystem = on_filesystem(&mount, &real).ok_or_else(|| {
         t!(
             L10N,
             "drive-folder-not-startable",

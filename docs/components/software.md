@@ -59,7 +59,7 @@ Versions and release notes come from the image's labels:
 | `org.opencontainers.image.version` | The version, such as 1.1 or 1.2-nightly.21 |
 | `com.lantharos.release-notes` | What's new, as the image's [changelog](../releases.md#changelogs) |
 
-When get.luft.computer is reachable, What's new instead merges the changelogs of every version between the installed one and the offered one.
+When get.luft.computer is reachable, What's new instead merges the changelogs of every version between the installed one and the offered one. Once that version runs, Settings merges them again from the version it updated from, the one Luft can go back to, and keeps the result.
 
 ### Schedule
 

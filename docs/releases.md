@@ -69,7 +69,7 @@ Security and data-loss fixes are promoted the same day when the maintainer asks 
 
 Every version has its own changelog with only its changes, grouped into Desktop, each app by name, System, and Installing (Install Luft, Meet Luft and the stick). Where a commit goes depends on which files it changes. Commits that only touch CI, tests, checks, docs or development tools are left out. A nightly's changelog covers the commits since the nightly before it, and a stable release's merges the changelogs of every nightly since the one the previous release came from.
 
-Settings shows the same changelog under What's new, merging every version between the installed one and the offered one. There is no changelog file in the repository.
+Settings shows the same changelog under What's new, merging every version between the installed one and the offered one. After the update, What's new for the running version still covers everything since the version it updated from. There is no changelog file in the repository.
 
 ## GitHub releases
 

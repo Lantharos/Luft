@@ -2,7 +2,7 @@ use std::path::PathBuf;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use luft_app::files;
-use luft_software::system::image::Update;
+use luft_software::system::image::{Section, Update};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 
@@ -24,6 +24,13 @@ pub struct GraphicsSeen {
 #[serde(rename_all = "camelCase")]
 pub struct Found {
     pub update: Option<Update>,
+}
+
+#[derive(Serialize, Deserialize, Default, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct WhatsNew {
+    pub version: Option<String>,
+    pub notes: Option<Vec<Section>>,
 }
 
 fn path(base: Option<PathBuf>, name: &str) -> PathBuf {
@@ -80,6 +87,20 @@ impl Found {
 impl GraphicsSeen {
     fn file() -> PathBuf {
         path(dirs::state_dir(), "graphics.json")
+    }
+
+    pub fn load() -> Self {
+        load(Self::file())
+    }
+
+    pub fn save(&self) -> Result<(), String> {
+        save(Self::file(), self)
+    }
+}
+
+impl WhatsNew {
+    fn file() -> PathBuf {
+        path(dirs::state_dir(), "whats-new.json")
     }
 
     pub fn load() -> Self {

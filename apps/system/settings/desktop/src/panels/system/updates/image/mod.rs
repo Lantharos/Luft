@@ -1,12 +1,12 @@
 mod switch;
 mod watch;
 
-use luft_software::system::image::{self, Deployments, Release, Status, Update};
+use luft_software::system::image::{self, Deployments, Release, Section, Status, Update};
 use luft_software::task::Task;
 use serde::Serialize;
 use specta::Type;
 
-use super::store::{Checked, Found};
+use super::store::{Checked, Found, WhatsNew};
 
 pub use switch::run as switch;
 pub use watch::{scan, watch};
@@ -35,6 +35,22 @@ fn check(deployments: &Deployments) -> Result<Option<Update>, String> {
     }
     .save()?;
     Ok(update)
+}
+
+/// What's new in the running version since the one this system updated from, kept once found.
+fn whats_new(deployments: &Deployments, current: &Release) -> Option<Vec<Section>> {
+    let version = current.version.clone()?;
+    let saved = WhatsNew::load();
+    if saved.version.as_ref() == Some(&version) {
+        return saved.notes;
+    }
+    let notes = deployments.new_since_previous()?;
+    let _ = WhatsNew {
+        version: Some(version),
+        notes: Some(notes.clone()),
+    }
+    .save();
+    Some(notes)
 }
 
 fn expected_size() -> Option<u64> {
@@ -66,7 +82,8 @@ pub fn load(refresh: Option<Task>) -> Result<ImageOverview, String> {
         }
         None => Found::load().update,
     };
-    let status = deployments.status();
+    let mut status = deployments.status();
+    status.current.notes = whats_new(&deployments, &status.current).or(status.current.notes);
     let available = update
         .filter(|update| deployments.lacks(update))
         .map(|update| Available {

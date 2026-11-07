@@ -15,6 +15,7 @@ use host::{Deployment, Host, Reference};
 use registry::Image;
 
 pub use config::Release;
+pub use notes::Section;
 pub use updater::{
     Schedule, UpdatePolicy, changes, download, downloading, follow, policy, rollback, set_policy,
     switch,
@@ -119,6 +120,14 @@ impl Deployments {
             size: self.new_bytes(&image),
             layers: image.config.layers().to_vec(),
         }))
+    }
+
+    /// Everything new since the version this system updated from, when that one was older.
+    pub fn new_since_previous(&self) -> Option<Vec<Section>> {
+        let channel = self.0.followed.as_ref()?.release_channel()?;
+        let current = self.0.booted.release().version?;
+        let previous = self.0.rollback.as_ref()?.release().version?;
+        notes::between(channel, &previous, &current)
     }
 
     pub fn variant_offer(&self) -> Option<Variant> {

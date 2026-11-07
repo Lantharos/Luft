@@ -6,7 +6,7 @@
 	import CloudMark from '#lib/components/cloud/CloudMark.svelte';
 	import VcsBadge from '#lib/components/vcs/VcsBadge.svelte';
 	import { folderCounts } from '#lib/features/onscreen/folder-counts.svelte.js';
-	import { thumbnailOf } from '#lib/file-manager/listing/thumbnails.js';
+	import { entryArt } from '#lib/file-manager/listing/art.js';
 	import { DRAFT_PATH } from '#lib/file-manager/view/draft.js';
 	import { entryClasses, entryContext, entryProps } from '#lib/file-manager/view/entry-props.js';
 	import { ListColumns } from '#lib/file-manager/view/list-columns.svelte.js';
@@ -97,7 +97,7 @@
 		{:else}
 			<div class={[entryClasses(row, context), 'list-grid list-row']} {...entryProps(row, context)}>
 				<span class="list-name">
-					<EntryIcon kind={fileKind(row)} size={24} {...thumbnailOf(row)} />
+					<EntryIcon kind={fileKind(row)} size={24} {...entryArt(row)} />
 					<EntryName entry={row} {manager} class="truncate" />
 					<CloudMark state={manager.cloud.stateOf(row.path)} />
 					<VcsBadge status={vcs.statusFor(row.path, row.isDir)} />

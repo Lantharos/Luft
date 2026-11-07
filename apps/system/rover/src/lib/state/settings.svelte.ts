@@ -48,9 +48,14 @@ class SettingsState {
 
 export const settings = new SettingsState();
 
-export function setPlaceHidden(path: string, hidden: boolean) {
+export function hidePlace(path: string) {
+	settings.update((current) => ({ ...current, hiddenPlaces: [...current.hiddenPlaces, path] }));
+}
+
+export function showPlace(path: string) {
 	settings.update((current) => ({
 		...current,
-		hiddenPlaces: hidden ? [...current.hiddenPlaces, path] : current.hiddenPlaces.filter((place) => place !== path)
+		hiddenPlaces: current.hiddenPlaces.filter((place) => place !== path),
+		pinnedFolders: current.pinnedFolders.filter((bookmark) => bookmark.path !== path)
 	}));
 }

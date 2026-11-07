@@ -18,7 +18,9 @@ pub fn register(window: SabineWindow, state: &RoverState) -> SabineWindow {
     let window = register_trash(window, state);
     let window = register_vcs(window, state);
     let window = tools::register(window, state);
-    let window = crate::locations::places::register(crate::details::inspect::register(window));
+    let window = crate::locations::places::register(crate::details::inspect::register(
+        crate::details::look::register(window),
+    ));
     let window = crate::locations::network::register(window, &state.events);
     let window = crate::locations::cloud::register(window, &state.events);
     let window = crate::integration::nearby::register(window, &state.events);

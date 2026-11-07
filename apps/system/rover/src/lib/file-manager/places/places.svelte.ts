@@ -1,31 +1,20 @@
-import Download from '@lucide/svelte/icons/download';
-import FileText from '@lucide/svelte/icons/file-text';
-import Image from '@lucide/svelte/icons/image';
-import Monitor from '@lucide/svelte/icons/monitor';
-import Music from '@lucide/svelte/icons/music';
-import Video from '@lucide/svelte/icons/video';
 import { basename } from '@luft/ui';
-import type { Component } from 'svelte';
 import { commands } from '#lib/bindings.js';
 import type { Operation, UserDirs } from '#lib/bindings.js';
+import { USER_FOLDER_ICONS, type UserFolder } from '#lib/features/looks/catalogue.js';
 
-export type Place = { path: string; label: string; icon: Component };
-
-const USER_FOLDERS: { key: Exclude<keyof UserDirs, 'home'>; icon: Component }[] = [
-	{ key: 'desktop', icon: Monitor },
-	{ key: 'documents', icon: FileText },
-	{ key: 'downloads', icon: Download },
-	{ key: 'music', icon: Music },
-	{ key: 'pictures', icon: Image },
-	{ key: 'videos', icon: Video }
-];
+export type Place = { path: string; label: string; icon: string };
 
 export function userFolders(dirs: UserDirs | null): Place[] {
 	if (!dirs) return [];
-	return USER_FOLDERS.flatMap(({ key, icon }) => {
-		const path = dirs[key];
+	return Object.entries(USER_FOLDER_ICONS).flatMap(([key, icon]) => {
+		const path = dirs[key as UserFolder];
 		return path && path !== dirs.home ? [{ path, label: basename(path), icon }] : [];
 	});
+}
+
+export function mainPlaces(dirs: UserDirs | null): Place[] {
+	return dirs ? [{ path: dirs.home, label: 'Home', icon: 'house' }, ...userFolders(dirs)] : [];
 }
 
 export class TrashCounter {

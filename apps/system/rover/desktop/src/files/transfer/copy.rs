@@ -5,6 +5,7 @@ use std::path::{Path, PathBuf};
 
 use super::resolve::available_destination;
 use super::tracker::{Mode, Tracker};
+use crate::details::look;
 use crate::files::operations::Resolution;
 use crate::files::privileged::{is_permission_error, os, remove_path, run_pkexec};
 
@@ -93,7 +94,9 @@ fn fill(source: &Path, target: &Path, placed: Placed, tracker: &mut Tracker) -> 
             let permissions = fs::metadata(source)
                 .map_err(|error| error.to_string())?
                 .permissions();
-            fs::set_permissions(target, permissions).map_err(|error| error.to_string())
+            fs::set_permissions(target, permissions).map_err(|error| error.to_string())?;
+            let _ = look::copy(source, target);
+            Ok(())
         }
         Placed::Link => tracker.add_item(target),
         Placed::File(input, output) => stream(source, input, output, tracker),

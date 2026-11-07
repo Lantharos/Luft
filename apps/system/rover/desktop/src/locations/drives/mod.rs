@@ -23,6 +23,7 @@ pub use watch::watch_mounts;
 pub use windows::{closed_windows, open_windows};
 
 const DISKS: &str = "com.lantharos.disks.desktop";
+const SYSTEM: &str = "System";
 const GIB: u64 = 1024 * 1024 * 1024;
 const SAMPLE_SYSTEM_SPACE: (u64, u64) = (931 * GIB, 612 * GIB);
 const SAMPLE_DRIVE_SPACE: (u64, u64) = (64 * GIB, 41 * GIB);
@@ -93,6 +94,12 @@ pub fn list_drives() -> Vec<DriveInfo> {
         && let Some(system) = by_device.get_mut(&home)
     {
         system.mount_point = "/".into();
+    }
+    if let Some(system) = by_device
+        .values_mut()
+        .find(|drive| drive.mount_point == "/")
+    {
+        system.name = SYSTEM.into();
     }
 
     let mut drives: Vec<DriveInfo> = by_device.into_values().collect();
@@ -267,9 +274,6 @@ fn unescape_label(label: &str) -> String {
 }
 
 fn fallback_name(mount_point: &str) -> String {
-    if mount_point == "/" {
-        return "System".to_string();
-    }
     Path::new(mount_point).file_name().map_or_else(
         || mount_point.to_string(),
         |name| name.to_string_lossy().into_owned(),

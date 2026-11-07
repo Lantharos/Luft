@@ -5,12 +5,14 @@
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
 	import type { TrashCounter } from '#lib/file-manager/places/places.svelte.js';
 	import { dialogs } from '#lib/features/dialogs.svelte.js';
+	import { folderLooks } from '#lib/features/looks/looks.svelte.js';
 	import { folderCounts } from '#lib/features/onscreen/folder-counts.svelte.js';
 	import { history } from '#lib/features/history.svelte.js';
 	import { search } from '#lib/features/search.svelte.js';
 	import { thumbnailSize, thumbnails } from '#lib/features/onscreen/thumbnails.svelte.js';
 	import { settings } from '#lib/state/settings.svelte.js';
 	import CompressDialog from './archive/CompressDialog.svelte';
+	import FolderLookDialog from './look/FolderLookDialog.svelte';
 	import EmptyTrashDialog from './trash/EmptyTrashDialog.svelte';
 	import AskDialog from './network/AskDialog.svelte';
 	import ConnectDialog from './network/ConnectDialog.svelte';
@@ -47,6 +49,11 @@
 
 	$effect(() => thumbnails.resize(thumbnailSize(pixels)));
 
+	$effect(() => {
+		void manager.entries;
+		folderLooks.refresh();
+	});
+
 	function driveAt(entries: FileEntry[]) {
 		return entries.length === 1 ? manager.drives.list.find((drive) => drive.mountPoint === entries[0].path) : undefined;
 	}
@@ -66,6 +73,8 @@
 	<BatchRenameDialog entries={dialog.entries} siblings={manager.entries} onclose={dialogs.close} />
 {:else if dialog?.kind === 'compress'}
 	<CompressDialog entries={dialog.entries} destination={dialog.destination} onclose={dialogs.close} />
+{:else if dialog?.kind === 'look'}
+	<FolderLookDialog entries={dialog.entries} onclose={dialogs.close} />
 {:else if dialog?.kind === 'empty-trash'}
 	{@const trashPath = dialog.trashPath}
 	<EmptyTrashDialog onconfirm={() => manager.actions.emptyTrash(trashPath).then(trash.refresh)} onclose={dialogs.close} />

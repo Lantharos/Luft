@@ -3,6 +3,7 @@
 	import { tooltip } from '@luft/ui';
 	import type { PinnedFolder } from '#lib/bindings.js';
 	import { KIND_ICONS } from '#lib/components/pane/kind-icons.js';
+	import { folderLooks } from '#lib/features/looks/looks.svelte.js';
 	import * as bookmarks from '#lib/file-manager/places/bookmarks.js';
 	import type { ChooserState } from '#lib/file-manager/chooser.svelte.js';
 	import type { DragController } from '#lib/file-manager/drag/controller.svelte.js';
@@ -34,8 +35,9 @@
 		return dropKey('sidebar', path);
 	}
 
-	function icon(bookmark: PinnedFolder) {
-		return KIND_ICONS[bookmark.icon as FileKind] ?? KIND_ICONS[bookmark.isDir ? 'folder' : 'file'];
+	function art(bookmark: PinnedFolder) {
+		if (bookmark.isDir) return folderLooks.art(bookmark.path);
+		return { icon: KIND_ICONS[bookmark.icon as FileKind] ?? KIND_ICONS.file };
 	}
 
 	function open(bookmark: PinnedFolder) {
@@ -120,7 +122,7 @@
 	{#each favorites as bookmark (bookmark.path)}
 		<SidebarItem
 			class={insertBefore === bookmark.path ? 'is-insert-target' : ''}
-			icon={icon(bookmark)}
+			{...art(bookmark)}
 			label={bookmark.name}
 			active={manager.view === 'home' && manager.currentPath === bookmark.path}
 			dropping={bookmark.isDir && drag.target?.key === key(bookmark.path)}

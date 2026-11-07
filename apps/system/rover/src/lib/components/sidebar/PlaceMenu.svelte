@@ -5,18 +5,21 @@
 	import Globe from '@lucide/svelte/icons/globe';
 	import HardDrive from '@lucide/svelte/icons/hard-drive';
 	import Info from '@lucide/svelte/icons/info';
+	import Palette from '@lucide/svelte/icons/palette';
 	import Plus from '@lucide/svelte/icons/plus';
 	import Star from '@lucide/svelte/icons/star';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import { ContextMenu, MenuItem, MenuSeparator } from '@luft/ui';
 	import type { Component } from 'svelte';
+	import { commands } from '#lib/bindings.js';
 	import * as api from '#lib/bridge/index.js';
 	import { showPathProperties } from '#lib/features/actions.js';
 	import { dialogs } from '#lib/features/dialogs.svelte.js';
+	import { folderLooks } from '#lib/features/looks/looks.svelte.js';
 	import * as bookmarks from '#lib/file-manager/places/bookmarks.js';
 	import type { FileManager, PlaceMenuState, SidebarPlace } from '#lib/file-manager/manager.svelte.js';
-	import type { TrashCounter } from '#lib/file-manager/places/places.svelte.js';
-	import { setPlaceHidden } from '#lib/state/settings.svelte.js';
+	import { mainPlaces, type TrashCounter } from '#lib/file-manager/places/places.svelte.js';
+	import { hidePlace, settings, showPlace } from '#lib/state/settings.svelte.js';
 
 	interface Props {
 		menu: PlaceMenuState;
@@ -29,6 +32,11 @@
 	let place = $derived(menu.place);
 	let path = $derived(folderOf(place));
 	let opensFolder = $derived(place.kind !== 'favorite' || place.bookmark.isDir);
+	let inMainGroup = $derived(place.kind === 'folder' || place.kind === 'recent' || place.kind === 'trash');
+	let hiddenPlaces = $derived.by(() => {
+		const hidden = new Set(settings.value.hiddenPlaces);
+		return mainPlaces(manager.userDirs).filter((main) => hidden.has(main.path));
+	});
 
 	function folderOf(place: SidebarPlace) {
 		if (place.kind === 'folder') return place.path;
@@ -54,6 +62,10 @@
 		if (place.kind === 'recent' || place.kind === 'trash') return manager.openViewInTab(place.kind);
 		if (place.kind === 'network' && !path) return manager.openAddress(place.entry.place.uri, manager.openTab);
 		return manager.openTab(path!);
+	}
+
+	async function changeIcon(path: string) {
+		dialogs.look([await commands.getFileInfo({ path })]);
 	}
 
 	function emptyTrash() {
@@ -97,11 +109,21 @@
 	{/if}
 	{#if place.kind === 'folder'}
 		{@const folder = place.path}
-		{@render item(EyeOff, 'Remove from sidebar', () => setPlaceHidden(folder, true))}
+		{@render item(EyeOff, 'Remove from sidebar', () => hidePlace(folder))}
 	{/if}
 	{#if place.kind === 'favorite'}
 		{@const bookmark = place.bookmark}
 		{@render item(Star, 'Remove from Favorites', () => bookmarks.unpin(bookmark.path))}
+	{/if}
+	{#if (place.kind === 'folder' || place.kind === 'favorite') && opensFolder && path}
+		{@const folder = path}
+		{@render item(Palette, 'Change icon…', () => changeIcon(folder).catch(manager.notify))}
+	{/if}
+	{#if inMainGroup && hiddenPlaces.length > 0}
+		<MenuSeparator />
+		{#each hiddenPlaces as hidden (hidden.path)}
+			{@render item(folderLooks.art(hidden.path).icon, `Show ${hidden.label}`, () => showPlace(hidden.path))}
+		{/each}
 	{/if}
 	{#if place.kind === 'trash'}
 		<MenuSeparator />

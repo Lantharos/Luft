@@ -3,6 +3,7 @@ import { appearance, basename, errorText, parent } from '@luft/ui';
 import { commands } from '#lib/bindings.js';
 import type { AppState, DriveInfo, FileEntry, GroupBy, Operation, PinnedFolder, SortBy, TrashContents, UserDirs, ViewMode } from '#lib/bindings.js';
 import * as api from '#lib/bridge/index.js';
+import { folderLooks } from '#lib/features/looks/looks.svelte.js';
 import { NearbyState } from '#lib/features/nearby.svelte.js';
 import { settings } from '#lib/state/settings.svelte.js';
 import { Tabs } from '#lib/state/tabs.svelte.js';
@@ -177,6 +178,7 @@ export class FileManager {
 		void this.#findConverter();
 		settings.value = state.settings;
 		this.userDirs = state.userDirs;
+		folderLooks.useFolders(state.userDirs);
 		appearance.start(state);
 		this.drives.manageable = state.canManageDrives;
 		void this.drives.load();

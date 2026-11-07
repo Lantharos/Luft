@@ -5,7 +5,7 @@
 	import EntryIcon from '#lib/components/pane/EntryIcon.svelte';
 	import CloudMark from '#lib/components/cloud/CloudMark.svelte';
 	import VcsBadge from '#lib/components/vcs/VcsBadge.svelte';
-	import { thumbnailOf } from '#lib/file-manager/listing/thumbnails.js';
+	import { entryArt } from '#lib/file-manager/listing/art.js';
 	import type { FolderColumnModel } from '#lib/file-manager/view/columns.svelte.js';
 	import { entryClasses, entryContext, entryProps } from '#lib/file-manager/view/entry-props.js';
 	import { EntrySurface } from '#lib/file-manager/view/surface.svelte.js';
@@ -67,7 +67,7 @@
 >
 	{#snippet children(entry)}
 		<div class={[classes(entry), 'column-row']} {...entryProps(entry, context, select)}>
-			<EntryIcon kind={fileKind(entry)} size={20} {...thumbnailOf(entry)} />
+			<EntryIcon kind={fileKind(entry)} size={20} {...entryArt(entry)} />
 			<EntryName {entry} manager={manager} class="truncate" />
 			<CloudMark state={manager.cloud.stateOf(entry.path)} />
 			<VcsBadge status={vcs.statusFor(entry.path, entry.isDir)} />

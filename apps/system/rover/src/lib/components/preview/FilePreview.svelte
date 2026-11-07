@@ -12,8 +12,9 @@
 	import type { FileEntry } from '#lib/bindings.js';
 	import { localFileSource } from '#lib/bridge/index.js';
 	import EntryIcon from '#lib/components/pane/EntryIcon.svelte';
+	import { thumbnails } from '#lib/features/onscreen/thumbnails.svelte.js';
 	import type { MediaInfo } from '#lib/file-manager/inspect/details.svelte.js';
-	import { thumbnailOf } from '#lib/file-manager/listing/thumbnails.js';
+	import { entryArt } from '#lib/file-manager/listing/art.js';
 	import { fileKind, mayBeTransparent, previewKind } from '#lib/utils/kinds.js';
 	import NativePreview from './NativePreview.svelte';
 
@@ -60,7 +61,7 @@
 		<video
 			class="preview-image"
 			src={full ? source : `${source}#t=0.1`}
-			poster={thumbnailOf(entry).thumbnail ?? undefined}
+			poster={thumbnails.source(entry) ?? undefined}
 			autoplay={full}
 			preload="metadata"
 			playsinline
@@ -78,7 +79,7 @@
 	</div>
 {:else if kind === 'audio'}
 	<div class="preview-stack">
-		<EntryIcon kind="audio" size={iconSize} {...thumbnailOf(entry)} fit="contain" />
+		<EntryIcon kind="audio" size={iconSize} {...entryArt(entry)} fit="contain" />
 		<audio
 			src={source}
 			autoplay={full}
@@ -101,7 +102,7 @@
 	<iframe class="preview-document" src={fileUrl(entry.path)} title={entry.name}></iframe>
 {:else}
 	<div class="preview-stack">
-		<EntryIcon kind={fileKind(entry)} size={iconSize} {...thumbnailOf(entry)} fit="contain" />
+		<EntryIcon kind={fileKind(entry)} size={iconSize} {...entryArt(entry)} fit="contain" />
 	</div>
 {/if}
 

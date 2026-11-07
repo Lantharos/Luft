@@ -101,6 +101,9 @@ export const commands = {
 	fileOwnership: (params: {
 		path: string,
 	}, options?: CallOptions) => invoke<Ownership>("file_ownership", params, options),
+	folderLooks: (params: {
+		paths: string[],
+	}, options?: CallOptions) => invoke<{ [key in string]: FolderLook }>("folder_looks", params, options),
 	getFileInfo: (params: {
 		path: string,
 	}, options?: CallOptions) => invoke<FileEntry>("get_file_info", params, options),
@@ -207,6 +210,10 @@ export const commands = {
 		path: string,
 		app: string,
 	}, options?: CallOptions) => invoke<null>("set_default_app", params, options),
+	setFolderLook: (params: {
+		paths: string[],
+		look?: FolderLook | null,
+	}, options?: CallOptions) => invoke<null>("set_folder_look", params, options),
 	setPermissions: (params: {
 		path: string,
 		mode: number,
@@ -402,6 +409,11 @@ export type FileEntry = {
 };
 
 export type FileState = "online" | "local" | "syncing";
+
+export type FolderLook = {
+	icon: string | null,
+	color: string | null,
+};
 
 export type GroupBy = "none" | "kind" | "date";
 

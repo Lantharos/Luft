@@ -3,7 +3,6 @@
 	import Eye from '@lucide/svelte/icons/eye';
 	import EyeOff from '@lucide/svelte/icons/eye-off';
 	import Globe from '@lucide/svelte/icons/globe';
-	import House from '@lucide/svelte/icons/house';
 	import LayoutGrid from '@lucide/svelte/icons/layout-grid';
 	import Minus from '@lucide/svelte/icons/minus';
 	import PanelRight from '@lucide/svelte/icons/panel-right';
@@ -12,10 +11,11 @@
 	import SquarePen from '@lucide/svelte/icons/square-pen';
 	import { MenuButton, MenuItem, MenuSeparator, tooltip } from '@luft/ui';
 	import { dialogs } from '#lib/features/dialogs.svelte.js';
+	import { folderLooks } from '#lib/features/looks/looks.svelte.js';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
 	import { GRID_SIZES, type ViewState } from '#lib/file-manager/view/view-state.svelte.js';
-	import { userFolders } from '#lib/file-manager/places/places.svelte.js';
-	import { setPlaceHidden, settings } from '#lib/state/settings.svelte.js';
+	import { mainPlaces } from '#lib/file-manager/places/places.svelte.js';
+	import { settings, showPlace } from '#lib/state/settings.svelte.js';
 
 	interface Props {
 		manager: FileManager;
@@ -31,8 +31,7 @@
 	let largest = $derived(view.gridSize >= GRID_SIZES[GRID_SIZES.length - 1]);
 	let hiddenPlaces = $derived.by(() => {
 		const hidden = new Set(settings.value.hiddenPlaces);
-		const places = [{ path: manager.homePath, label: 'Home', icon: House }, ...userFolders(manager.userDirs)];
-		return places.filter((place) => hidden.has(place.path));
+		return mainPlaces(manager.userDirs).filter((place) => hidden.has(place.path));
 	});
 
 	function run(action: () => unknown, close: () => void) {
@@ -77,8 +76,9 @@
 		{#if hiddenPlaces.length > 0}
 			<MenuSeparator />
 			{#each hiddenPlaces as place (place.path)}
-				<MenuItem onclick={() => run(() => setPlaceHidden(place.path, false), close)}>
-					<place.icon size={16} />
+				{@const Icon = folderLooks.art(place.path).icon}
+				<MenuItem onclick={() => run(() => showPlace(place.path), close)}>
+					<Icon size={16} />
 					<span class="flex-1">Show {place.label} in sidebar</span>
 				</MenuItem>
 			{/each}

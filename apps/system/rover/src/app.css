@@ -11,6 +11,25 @@
 	--code: var(--secondary);
 	--archive: color-mix(in oklab, var(--accent) 45%, var(--secondary));
 	--thumbnail-backdrop: var(--kestrel-light-surface-container-highest, #e4e3dc);
+	--look-red: oklch(0.76 0.075 25);
+	--look-orange: oklch(0.79 0.075 60);
+	--look-yellow: oklch(0.85 0.075 95);
+	--look-green: oklch(0.8 0.065 150);
+	--look-teal: oklch(0.8 0.055 195);
+	--look-blue: oklch(0.77 0.065 255);
+	--look-purple: oklch(0.76 0.07 300);
+	--look-pink: oklch(0.78 0.07 350);
+}
+
+:root[data-scheme='light'] {
+	--look-red: oklch(0.55 0.13 25);
+	--look-orange: oklch(0.6 0.12 55);
+	--look-yellow: oklch(0.66 0.11 85);
+	--look-green: oklch(0.55 0.1 150);
+	--look-teal: oklch(0.55 0.08 195);
+	--look-blue: oklch(0.53 0.11 255);
+	--look-purple: oklch(0.53 0.12 300);
+	--look-pink: oklch(0.56 0.12 350);
 }
 
 .glass-shell {

@@ -1,13 +1,13 @@
 <script lang="ts">
 	import Clock from '@lucide/svelte/icons/clock';
-	import House from '@lucide/svelte/icons/house';
 	import Trash from '@lucide/svelte/icons/trash';
 	import { isInside, SearchField, selectionPill } from '@luft/ui';
+	import { folderLooks } from '#lib/features/looks/looks.svelte.js';
 	import type { ChooserState } from '#lib/file-manager/chooser.svelte.js';
 	import type { DragController } from '#lib/file-manager/drag/controller.svelte.js';
 	import { dropKey, TRASH_DROP_PATH } from '#lib/file-manager/drag/drop-targets.js';
 	import type { FileManager, SidebarPlace } from '#lib/file-manager/manager.svelte.js';
-	import { userFolders, type TrashCounter } from '#lib/file-manager/places/places.svelte.js';
+	import { mainPlaces, type TrashCounter } from '#lib/file-manager/places/places.svelte.js';
 	import { settings } from '#lib/state/settings.svelte.js';
 	import CloudGroup from './CloudGroup.svelte';
 	import DriveItem from './DriveItem.svelte';
@@ -28,14 +28,21 @@
 	let search = $state<SearchField>();
 
 	let hidden = $derived(new Set(settings.value.hiddenPlaces));
-	let folders = $derived(userFolders(manager.userDirs).filter((folder) => !hidden.has(folder.path)));
-	let showHome = $derived(!hidden.has(manager.homePath));
-	let placePaths = $derived(new Set([...(showHome ? [manager.homePath] : []), ...folders.map((folder) => folder.path)]));
+	let places = $derived(mainPlaces(manager.userDirs));
+	let shown = $derived(places.filter((place) => !hidden.has(place.path)));
+	let home = $derived(shown.find((place) => place.path === manager.homePath));
+	let folders = $derived(shown.filter((place) => place !== home));
+	let placePaths = $derived(new Set(shown.map((place) => place.path)));
 	let browsing = $derived(manager.view === 'home');
 	let activeDrive = $derived.by(() => {
 		const path = manager.currentPath;
 		if (!browsing || placePaths.has(path) || isInside(path, manager.homePath) || manager.network.holding(path)) return null;
 		return manager.drives.holding(path)?.mountPoint ?? null;
+	});
+
+	$effect(() => {
+		const favorites = settings.value.pinnedFolders.filter((bookmark) => bookmark.isDir).map((bookmark) => bookmark.path);
+		void folderLooks.keep([...places.map((place) => place.path), ...favorites]);
 	});
 
 	export function focusSearch() {
@@ -60,6 +67,7 @@
 
 	function folderItem(path: string) {
 		return {
+			...folderLooks.art(path),
 			oncontextmenu: (event: MouseEvent) => showMenu(event, { kind: 'folder', path }),
 			active: browsing && manager.currentPath === path,
 			dropping: drag.target?.key === key(path),
@@ -79,8 +87,8 @@
 
 	<nav class="sidebar-scroll hidden-scroll scroll-fade" aria-label="Places" {@attach selectionPill('.sidebar-item.is-active')}>
 		<div class="flex flex-none flex-col gap-px">
-			{#if showHome}
-				<SidebarItem icon={House} label="Home" {...folderItem(manager.homePath)} />
+			{#if home}
+				<SidebarItem label={home.label} {...folderItem(home.path)} />
 			{/if}
 			<SidebarItem
 				icon={Clock}
@@ -91,7 +99,7 @@
 				oncontextmenu={(event) => showMenu(event, { kind: 'recent' })}
 			/>
 			{#each folders as folder (folder.path)}
-				<SidebarItem icon={folder.icon} label={folder.label} {...folderItem(folder.path)} />
+				<SidebarItem label={folder.label} {...folderItem(folder.path)} />
 			{/each}
 			{#if !chooser}
 				<SidebarItem

@@ -9,13 +9,15 @@ import {drag, press, type, type Point} from '../lib/input/input.js';
 import {changes, withApp} from './lib/apps.js';
 import {exists, removeTree, write} from './lib/files.js';
 import {checkPalette, showDark, withPalette} from './lib/palette.js';
+import {checkLooks} from './rover/looks.js';
 import {checkNetwork} from './rover/network.js';
+import {checkPlaces, withUserFolders} from './rover/places.js';
 import {checkThumbnails, withThumbnailers} from './rover/thumbnails.js';
 
 const {require, eventually} = checks('Luft app');
 const DRAG = {steps: 24, interval: 30, hover: 300};
 const AT: Record<string, Point> = {note: [338, 140], inbox: [330, 104], pdf: [330, 104], search: [142, 32]};
-const PLACES: Record<string, {menu: Point; item: Point}> = {home: {menu: [70, 82], item: [141, 227]}, system: {menu: [70, 718], item: [141, 694]}};
+const PLACES: Record<string, {menu: Point; item: Point}> = {home: {menu: [70, 82], item: [141, 265]}, system: {menu: [70, 718], item: [141, 694]}};
 const SEARCH = {x: 12, y: 14, width: 236, height: 36};
 const CUT: Point = [40, 23];
 const FOLDER = GLib.build_filenamev([GLib.get_home_dir(), 'Drag check']);
@@ -69,15 +71,17 @@ async function checkTextMenu(app: LuftApp) {
 export async function run() {
   try {
     await withPalette(async palette => {
-      await withThumbnailers(() => withApp('rover', [], async app => {
+      await withUserFolders(() => withThumbnailers(() => withApp('rover', [], async app => {
         await checkPalette(app, palette, {accent: true});
         await showDark(app, palette);
         await checkDrag(app);
         await checkPrinting(app);
         await checkTextMenu(app);
         await checkProperties(app);
+        await checkPlaces(app);
+        await checkLooks(app, GLib.build_filenamev([FOLDER, 'Looks']), open);
         await checkThumbnails(app, GLib.build_filenamev([FOLDER, 'Thumbnails']), open);
-      }));
+      })));
       const rclone = GLib.find_program_in_path('rclone');
       if (rclone) await checkNetwork(rclone);
       else console.log('Kestrel Luft app check: rover network locations skipped without rclone');

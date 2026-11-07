@@ -1,17 +1,20 @@
 <script lang="ts">
+	import type { Component } from 'svelte';
 	import type { FileKind } from '#lib/utils/kinds.js';
 	import { KIND_ICONS } from './kind-icons';
 
 	interface Props {
 		kind: FileKind;
 		size: number;
+		icon?: Component;
+		tint?: string | null;
 		thumbnail?: string | null;
 		backdrop?: boolean;
 		app?: boolean;
 		fit?: 'cover' | 'contain';
 	}
 
-	let { kind, size, thumbnail = null, backdrop = false, app = false, fit = 'cover' }: Props = $props();
+	let { kind, size, icon, tint = null, thumbnail = null, backdrop = false, app = false, fit = 'cover' }: Props = $props();
 	let failedThumbnail = $state<string | null>(null);
 
 	const TONES: Partial<Record<FileKind, string>> = {
@@ -24,7 +27,7 @@
 		code: 'code'
 	};
 
-	let Icon = $derived(KIND_ICONS[kind]);
+	let Icon = $derived(icon ?? KIND_ICONS[kind]);
 	let showThumbnail = $derived(Boolean(thumbnail) && failedThumbnail !== thumbnail);
 	let artwork = $derived(app ? 'entry-icon--app' : `entry-icon--thumbnail entry-icon--${fit}`);
 </script>
@@ -32,6 +35,7 @@
 <span
 	class={['entry-icon', showThumbnail ? artwork : `entry-icon--${TONES[kind] ?? 'file'}`]}
 	style:--icon-size="{size}px"
+	style:--tint={tint}
 	aria-hidden="true"
 >
 	{#if showThumbnail}
@@ -62,8 +66,8 @@
 	}
 
 	.entry-icon--folder {
-		background: color-mix(in srgb, var(--folder) 11%, transparent);
-		color: var(--folder);
+		background: color-mix(in srgb, var(--tint, var(--folder)) 11%, transparent);
+		color: var(--tint, var(--folder));
 	}
 
 	.entry-icon--media {

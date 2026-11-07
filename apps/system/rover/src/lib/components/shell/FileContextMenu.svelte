@@ -12,6 +12,7 @@
 	import Download from '@lucide/svelte/icons/download';
 	import ExternalLink from '@lucide/svelte/icons/external-link';
 	import Eye from '@lucide/svelte/icons/eye';
+	import EyeOff from '@lucide/svelte/icons/eye-off';
 	import FilePlus from '@lucide/svelte/icons/file-plus';
 	import FolderPlus from '@lucide/svelte/icons/folder-plus';
 	import Globe from '@lucide/svelte/icons/globe';
@@ -19,6 +20,8 @@
 	import Link from '@lucide/svelte/icons/link';
 	import Monitor from '@lucide/svelte/icons/monitor';
 	import PackageOpen from '@lucide/svelte/icons/package-open';
+	import Palette from '@lucide/svelte/icons/palette';
+	import PanelLeft from '@lucide/svelte/icons/panel-left';
 	import Plus from '@lucide/svelte/icons/plus';
 	import Printer from '@lucide/svelte/icons/printer';
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
@@ -37,9 +40,12 @@
 	import * as tools from '#lib/features/actions.js';
 	import * as cloud from '#lib/features/cloud.js';
 	import { isArchive } from '#lib/features/archives.js';
+	import { dialogs } from '#lib/features/dialogs.svelte.js';
 	import * as bookmarks from '#lib/file-manager/places/bookmarks.js';
 	import type { ContextMenuState, FileManager } from '#lib/file-manager/manager.svelte.js';
+	import { mainPlaces } from '#lib/file-manager/places/places.svelte.js';
 	import type { ViewState } from '#lib/file-manager/view/view-state.svelte.js';
+	import { hidePlace, settings, showPlace } from '#lib/state/settings.svelte.js';
 	import type { VcsState } from '#lib/vcs/state.svelte.js';
 
 	interface Props {
@@ -53,6 +59,8 @@
 
 	let target = $derived(menu.target);
 	let isPinned = $derived(Boolean(target && bookmarks.isPinned(target.path)));
+	let isMainPlace = $derived(Boolean(target && mainPlaces(manager.userDirs).some((place) => place.path === target.path)));
+	let inSidebar = $derived(Boolean(target && !settings.value.hiddenPlaces.includes(target.path)));
 	let offersVcs = $derived(Boolean(vcs.project && (!target || target.isDir || vcs.statusFor(target.path, false))));
 	let targets = $derived(target ? tools.targetsOf(manager, target) : []);
 	let cloudDrive = $derived(target ? manager.cloud.holding(target.path) : undefined);
@@ -123,7 +131,19 @@
 		{#if target.isDir}
 			{@render item(Plus, 'Open in tab', () => manager.openTab(target.path))}
 		{/if}
-		{@render item(Star, isPinned ? 'Remove from Favorites' : 'Add to Favorites', () => bookmarks.togglePinned(target))}
+		{#if isMainPlace}
+			{#if inSidebar}
+				{@render item(EyeOff, 'Remove from sidebar', () => hidePlace(target.path))}
+			{:else}
+				{@render item(PanelLeft, 'Show in sidebar', () => showPlace(target.path))}
+			{/if}
+		{/if}
+		{#if !isMainPlace || isPinned}
+			{@render item(Star, isPinned ? 'Remove from Favorites' : 'Add to Favorites', () => bookmarks.togglePinned(target))}
+		{/if}
+		{#if targets.every((entry) => entry.isDir)}
+			{@render item(Palette, 'Change icon…', () => dialogs.look(targets))}
+		{/if}
 		{#if cloudDrive}
 			<MenuSeparator />
 			{#if kept}

@@ -5,6 +5,7 @@ export type OpenDialog =
 	| { kind: 'properties'; entries: FileEntry[] }
 	| { kind: 'rename'; entries: FileEntry[] }
 	| { kind: 'compress'; entries: FileEntry[]; destination: string }
+	| { kind: 'look'; entries: FileEntry[] }
 	| { kind: 'empty-trash'; trashPath: string | null }
 	| { kind: 'connect' };
 
@@ -16,6 +17,8 @@ class Dialogs {
 	rename = (entries: FileEntry[]) => this.#open({ kind: 'rename', entries });
 
 	compress = (entries: FileEntry[], destination: string) => this.#open({ kind: 'compress', entries, destination });
+
+	look = (entries: FileEntry[]) => this.#open({ kind: 'look', entries });
 
 	emptyTrash = (trashPath: string | null) => {
 		this.current = { kind: 'empty-trash', trashPath };

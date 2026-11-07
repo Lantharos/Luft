@@ -4,6 +4,7 @@
 
 	interface Props extends Omit<HTMLButtonAttributes, 'children'> {
 		icon: Component;
+		tint?: string | null;
 		label: string;
 		active?: boolean;
 		dropping?: boolean;
@@ -12,7 +13,7 @@
 		trailing?: Snippet;
 	}
 
-	let { icon: Icon, label, active = false, dropping = false, spinning = false, detail, trailing, class: className, onclick, ...rest }: Props =
+	let { icon: Icon, tint = null, label, active = false, dropping = false, spinning = false, detail, trailing, class: className, onclick, ...rest }: Props =
 		$props();
 
 	function click(event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }) {
@@ -23,7 +24,7 @@
 
 <div class={['sidebar-item', active && 'is-active', dropping && 'is-drop-target', className]}>
 	<button class="sidebar-item__main" type="button" aria-current={active ? 'page' : undefined} {...rest} onclick={click}>
-		<Icon size={18} class={spinning ? 'animate-spin' : ''} />
+		<Icon size={18} class={spinning ? 'animate-spin' : ''} style={tint && `color: ${tint}`} />
 		<span class="sidebar-item__text">
 			<span class="truncate">{label}</span>
 			{@render detail?.()}

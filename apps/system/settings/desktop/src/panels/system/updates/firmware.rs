@@ -131,7 +131,7 @@ pub fn install(id: &str, task: Task) -> Result<(), String> {
     if let Some(folder) = file.parent() {
         std::fs::create_dir_all(folder).map_err(failed)?;
     }
-    http::download(&url, &file, task)?;
+    http::download(&url, &file, None, task)?;
     let archive = File::open(&file).map_err(failed)?;
     let result = luft_app::block_on(send(id, &archive));
     let _ = std::fs::remove_file(&file);

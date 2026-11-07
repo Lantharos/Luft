@@ -3,6 +3,7 @@ use std::io::Read;
 use std::path::{Path, PathBuf};
 
 use luft_software::http;
+use luft_software::progress::Stage;
 use luft_software::task::Task;
 use sha2::{Digest, Sha256};
 
@@ -43,7 +44,13 @@ pub fn verified(
     let folder = cache::folder().join("store/downloads");
     fs::create_dir_all(&folder).map_err(|error| error.to_string())?;
     let path = folder.join(format!("{id}.download"));
-    http::download(&format!("{}?reason={reason}", artifact.url), &path, task)?;
+    http::download(
+        &format!("{}?reason={reason}", artifact.url),
+        &path,
+        Some(artifact.size),
+        task,
+    )?;
+    task.progress(Stage::Installing, None);
     if !published(&path, artifact)? {
         let _ = fs::remove_file(&path);
         return Err(CHANGED.into());

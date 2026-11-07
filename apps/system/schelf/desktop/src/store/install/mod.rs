@@ -171,6 +171,7 @@ fn replace(id: &str, replacement: &str, consent: &Consent, task: Task) -> Result
 /// Installs or updates `id` from schelf.store, as you agreed to in `consent`.
 /// Updating an app another took the place of moves you to that one.
 pub fn install(id: &str, consent: &Consent, reason: Reason, task: Task) -> Result<(), String> {
+    task.progress(Stage::Preparing, None);
     let listing = listing::fetch(id, Age::Current)?;
     if let (Reason::Update, Some(replacement)) = (reason, &listing.replaced_by) {
         return replace(id, &replacement.id, consent, task);

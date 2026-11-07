@@ -427,6 +427,7 @@ export type Permissions = {
 export type Progress = {
 	stage: Stage,
 	fraction: number | null,
+	transfer: Transfer | null,
 };
 
 /**  Where a release came from. */
@@ -557,6 +558,12 @@ export type StoreUpdate = {
 export type ToolSummary = {
 	package: string,
 	summary: string,
+};
+
+/**  How many bytes of a download arrived, out of how many. */
+export type Transfer = {
+	done: number,
+	total: number,
 };
 
 export type Typography = {

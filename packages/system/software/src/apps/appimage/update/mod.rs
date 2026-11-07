@@ -120,7 +120,7 @@ pub fn apply(app: &AppImage, task: Task) -> Result<AppImage, String> {
     let available = check(app)?.ok_or("This app is already up to date.")?;
     let key = signature::key(&app.path);
     let staging = app.path.with_extension("AppImage.part");
-    http::download(&available.url, &staging, task)?;
+    http::download(&available.url, &staging, Some(available.size), task)?;
     task.progress(Stage::Installing, None);
     let bundle = verified(&staging, &available, key.as_deref()).inspect_err(|_| {
         let _ = fs::remove_file(&staging);

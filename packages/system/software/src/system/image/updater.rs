@@ -127,7 +127,7 @@ pub async fn downloading() -> Result<bool, String> {
 fn progress(downloaded: u64, size: Option<u64>) -> Progress {
     match size.filter(|size| *size > 0) {
         Some(size) if downloaded >= size => Progress::new(Stage::Finishing, None),
-        Some(size) => Progress::new(Stage::Downloading, Some(downloaded as f32 / size as f32)),
+        Some(size) => Progress::downloading(downloaded, Some(size)),
         None => Progress::new(Stage::Downloading, None),
     }
 }

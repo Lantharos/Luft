@@ -6,17 +6,18 @@
 		title: string;
 		description: string;
 		facts?: string[];
+		note?: string;
 		confirm: string;
 		onconfirm: () => void;
 		onclose: () => void;
 		children?: Snippet;
 	}
 
-	let { title, description, facts = [], confirm, onconfirm, onclose, children }: Props = $props();
+	let { title, description, facts = [], note, confirm, onconfirm, onclose, children }: Props = $props();
 </script>
 
 <Dialog {title} {description} wide={!!children} {onclose}>
-	{#if facts.length || children}
+	{#if facts.length || note || children}
 		<div class="flex flex-col gap-4 text-[13.5px]">
 			{#if facts.length}
 				<ul class="flex flex-col gap-1.5">
@@ -24,6 +25,9 @@
 						<li class="fact">{fact}</li>
 					{/each}
 				</ul>
+			{/if}
+			{#if note}
+				<p class="text-[13px] text-[var(--text-muted)]">{note}</p>
 			{/if}
 			{@render children?.()}
 		</div>

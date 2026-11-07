@@ -145,6 +145,7 @@ The element has `update(changes)`, `refresh()` to ask for its views again, and `
 | `content` | What it shows, see below |
 | `kind` | `panel`, the default, takes the keyboard while it's open and closes on Escape, a click elsewhere, or when something else opens. `window` floats above the windows without taking the keyboard, has a title and a close button, and can be dragged |
 | `width` | 200 to 560 pixels; 340 without it. The height follows the content |
+| `chime` | Plays Luft's notification sound as it opens, for something waiting on people, such as a transfer to accept. It stays quiet during Do Not Disturb and when people turned notification sounds off |
 | `onClosed()` | Runs once when it closes, however it closes |
 
 Content is a tree of Luft's own controls, so a pop-up looks and behaves like the rest of the desktop and can't break it. `update` keeps every control that stayed in its place and kind, so a slider being dragged or a field being typed in carries on.

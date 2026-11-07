@@ -1,3 +1,5 @@
+import { playSound } from '../../../../system/sounds/sounds.js';
+import { heldBack } from '../notifications/notifications.js';
 import { taskbarAnchors } from '../taskbar/taskbar.js';
 import type { ApiContext } from '../context.js';
 import type { Popup, PopupAnchor, PopupOptions, Popups, TaskbarElement, TaskbarItem } from '../types.js';
@@ -65,6 +67,7 @@ export function popupsApi(context: ApiContext): Popups {
       const handle = scope.disposable(() => frame.close());
       if (kind === 'panel') forgetPanel = panels.add(frame);
       frame.open();
+      if (options.chime && !heldBack()) playSound('notification');
       return {
         get open() {
           return open;

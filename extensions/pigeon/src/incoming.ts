@@ -19,7 +19,7 @@ class OfferWindow {
 
   constructor(private readonly pigeon: Pigeon, private readonly offer: Offer, closed: () => void) {
     this.popup = pigeon.extension.popups.open({
-      anchor: 'top-right', kind: 'window', width: WIDTH, title: pigeon.extension.t('pigeon'), content: this.view(),
+      anchor: 'top-right', kind: 'window', width: WIDTH, chime: true, title: pigeon.extension.t('pigeon'), content: this.view(),
       onClosed: () => {
         if (this.stage.kind === 'asking') pigeon.decline(offer.id);
         closed();

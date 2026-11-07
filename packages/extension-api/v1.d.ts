@@ -915,6 +915,11 @@ export interface PopupOptions {
   kind?: 'panel' | 'window';
   /** Width in pixels, 200 to 560; 340 without it. The height follows the content, up to what fits on the display. */
   width?: number;
+  /**
+   * Plays Luft's notification sound as it opens, for something waiting on people, such as a transfer to accept. It
+   * stays quiet during Do Not Disturb and when people turned notification sounds off.
+   */
+  chime?: boolean;
   /** Runs once when it closes, however it closes. */
   onClosed?(): void;
 }

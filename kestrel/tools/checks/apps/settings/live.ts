@@ -55,7 +55,7 @@ async function follow(app: LuftApp, {name, page, schema, key, value, ignore}: Ch
     await changes(app, `settings follows ${schema} ${key}`, () => settings.set_value(key, value));
     (await app.settle(() => true)).save(`settings-live-${name}`);
     const followed = await look(app, ignore);
-    await show(app, 'system/about');
+    await show(app, 'sound');
     const opened = await show(app, page);
     const same = alike(followed, await look(app, ignore));
     if (!same) opened.save(`settings-live-${name}-opened`);

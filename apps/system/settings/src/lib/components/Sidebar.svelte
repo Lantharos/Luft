@@ -1,8 +1,9 @@
 <script lang="ts">
+	import { tick } from 'svelte';
 	import { t } from '@luft/i18n';
 	import { SearchField, selectionPill } from '@luft/ui';
 	import type { Hardware } from '#lib/bindings.js';
-	import { searchPanels, shownGroups, titleOf, type Panel } from '#lib/panels/registry.js';
+	import { iconOf, searchPanels, shownGroups, titleOf, type Panel } from '#lib/panels/registry.js';
 	import { app } from '#lib/state/app.svelte.js';
 	import { hardware } from '#lib/state/hardware.svelte.js';
 	import { updates } from '#lib/state/updates.svelte.js';
@@ -14,7 +15,13 @@
 
 	$effect(() => {
 		void app.query;
-		nav?.scrollTo({ top: 0 });
+		void app.panel;
+		void results;
+		void tick().then(() => {
+			const current = nav?.querySelector('[aria-current="page"]');
+			if (current) current.scrollIntoView({ block: 'nearest' });
+			else nav?.scrollTo({ top: 0 });
+		});
 	});
 
 	function openFirst(event: KeyboardEvent) {
@@ -25,6 +32,7 @@
 </script>
 
 {#snippet item(panel: Panel, present: Hardware)}
+	{@const Icon = iconOf(panel, present)}
 	<button
 		type="button"
 		class="nav-item"
@@ -32,7 +40,7 @@
 		aria-current={app.panel === panel.id ? 'page' : undefined}
 		onclick={() => app.open(panel.id)}
 	>
-		<panel.icon size={18} />
+		<Icon size={18} />
 		<span class="truncate">{titleOf(panel, present)}</span>
 		{#if panel.id === 'system' && app.panel !== 'system' && updates.activity.running}
 			<SidebarProgress activity={updates.activity} />

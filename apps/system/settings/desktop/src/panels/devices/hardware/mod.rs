@@ -23,6 +23,7 @@ pub struct Hardware {
     mouse: bool,
     touchpad: bool,
     copilot_key: bool,
+    wifi: bool,
 }
 
 async fn detect() -> Hardware {
@@ -33,6 +34,7 @@ async fn detect() -> Hardware {
         mouse: pointers.mouse,
         touchpad: pointers.touchpad,
         copilot_key: keyboards::copilot_key(),
+        wifi: luft_network::has_wifi().await,
     }
 }
 

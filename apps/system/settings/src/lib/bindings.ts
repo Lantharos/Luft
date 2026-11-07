@@ -1053,6 +1053,7 @@ export type Hardware = {
 	mouse: boolean,
 	touchpad: boolean,
 	copilotKey: boolean,
+	wifi: boolean,
 };
 
 export type HostSecurity = {
@@ -1418,6 +1419,7 @@ export type Profiles = {
 export type Progress = {
 	stage: Stage,
 	fraction: number | null,
+	transfer: Transfer | null,
 };
 
 export type Protection = {
@@ -1624,6 +1626,12 @@ export type Target = "output" | "input" | "app";
 
 export type Tpm = {
 	usable: boolean,
+};
+
+/**  How many bytes of a download arrived, out of how many. */
+export type Transfer = {
+	done: number,
+	total: number,
 };
 
 export type Trust = {

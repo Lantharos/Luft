@@ -51,18 +51,18 @@
 	}
 
 	[data-effect='translucent'] .glass-sidebar {
-		--sidebar-text: rgba(255, 255, 255, 0.86);
-		--sidebar-text-muted: rgba(255, 255, 255, 0.62);
+		--sidebar-text: rgba(255, 255, 255, 0.93);
+		--sidebar-text-muted: rgba(255, 255, 255, 0.72);
 		--sidebar-control: rgba(255, 255, 255, 0.1);
 		--sidebar-control-hover: rgba(255, 255, 255, 0.14);
 		--sidebar-active: rgba(255, 255, 255, 0.16);
 		background: var(--sidebar-glass);
-		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.28);
+		text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 	}
 
 	[data-scheme='light'] [data-effect='translucent'] .glass-sidebar {
-		--sidebar-text: rgba(0, 0, 0, 0.82);
-		--sidebar-text-muted: rgba(0, 0, 0, 0.56);
+		--sidebar-text: rgba(0, 0, 0, 0.88);
+		--sidebar-text-muted: rgba(0, 0, 0, 0.64);
 		--sidebar-control: rgba(0, 0, 0, 0.06);
 		--sidebar-control-hover: rgba(0, 0, 0, 0.09);
 		--sidebar-active: rgba(0, 0, 0, 0.1);

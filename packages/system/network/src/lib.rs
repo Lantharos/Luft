@@ -68,6 +68,13 @@ async fn objects() -> Result<Objects, String> {
     Objects::fetch(dbus::system().await?, SERVICE, "/org/freedesktop").await
 }
 
+/// Whether the computer has a Wi-Fi adapter, rather than only wired ones.
+pub async fn has_wifi() -> bool {
+    objects()
+        .await
+        .is_ok_and(|objects| snapshot::has_wifi(&objects))
+}
+
 async fn network() -> Result<Network, String> {
     let objects = objects().await?;
     watch::remember(&objects);

@@ -191,6 +191,10 @@ fn devices<'a>(objects: &'a Objects, kind: u32) -> impl Iterator<Item = Object<'
     })
 }
 
+pub fn has_wifi(objects: &Objects) -> bool {
+    devices(objects, WIFI).next().is_some()
+}
+
 fn wifi(objects: &Objects, saved: &[Saved]) -> Option<Wifi> {
     let device = devices(objects, WIFI).min_by_key(|device| device.path)?;
     let manager = objects.get(MANAGER_PATH, MANAGER)?;

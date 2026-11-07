@@ -26,7 +26,7 @@
 <div class="glass-shell flex-col">
 	<header class="drag-region flex h-[52px] flex-none items-center gap-3 pr-3 pl-4">
 		<button type="button" class="icon-button" aria-label="Reload" onclick={() => signIn.reload()}>
-			<RotateCw size={16} class={signIn.loading ? 'animate-spin' : ''} />
+			<RotateCw size={16} class={signIn.loading && signIn.shown ? 'animate-spin' : ''} />
 		</button>
 		<div class="flex min-w-0 flex-1 items-center gap-2 text-[13px]">
 			{#if signIn.network}

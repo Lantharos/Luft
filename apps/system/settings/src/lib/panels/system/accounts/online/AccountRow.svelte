@@ -109,7 +109,7 @@
 {/snippet}
 
 <Row title={account.name} {description} icon={info.icon} expanded={open} onclick={toggle} below={open ? details : undefined} truncate>
-	{#if drive?.state === 'connecting'}<Spinner />{/if}
+	{#if drive?.state === 'connecting' && !removing}<Spinner />{/if}
 </Row>
 
 <style>

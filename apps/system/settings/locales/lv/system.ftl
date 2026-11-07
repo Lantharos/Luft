@@ -152,7 +152,6 @@ settings-updates-stop = Apturēt
 settings-updates-check = Pārbaudīt tagad
 settings-updates-checking-button = Pārbauda
 settings-updates-app-updates = Lietotņu atjauninājumi
-settings-updates-apps-checking = Meklē lietotņu atjauninājumus
 settings-updates-apps-count = { $count ->
     [0] Tiek pārvaldītas lietotnē Schelf
     [zero] Lietotnē Schelf ir atjauninājumi { $count } lietotnēm

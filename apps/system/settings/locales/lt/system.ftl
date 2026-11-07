@@ -154,7 +154,6 @@ settings-updates-stop = Sustabdyti
 settings-updates-check = Tikrinti dabar
 settings-updates-checking-button = Tikrinama
 settings-updates-app-updates = Programų naujinimai
-settings-updates-apps-checking = Ieškoma jūsų programų naujinimų
 settings-updates-apps-count = { $count ->
     [0] Tvarkoma programoje Schelf
     [one] Programoje Schelf galima atnaujinti { $count } programą

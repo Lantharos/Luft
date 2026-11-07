@@ -150,7 +150,6 @@ settings-updates-stop = Pysäytä
 settings-updates-check = Tarkista nyt
 settings-updates-checking-button = Tarkistetaan
 settings-updates-app-updates = Sovelluspäivitykset
-settings-updates-apps-checking = Etsitään sovelluksiesi päivityksiä
 settings-updates-apps-count = { $count ->
     [0] Hallitaan Schelfissä
     [one] { $count } sovelluksen voi päivittää Schelfissä

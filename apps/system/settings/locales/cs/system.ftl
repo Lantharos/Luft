@@ -154,7 +154,6 @@ settings-updates-stop = Zastavit
 settings-updates-check = Zkontrolovat
 settings-updates-checking-button = Kontrola
 settings-updates-app-updates = Aktualizace aplikací
-settings-updates-apps-checking = Hledání aktualizací aplikací
 settings-updates-apps-count = { $count ->
     [0] Spravuje se v aplikaci Schelf
     [one] V aplikaci Schelf čeká aktualizace pro { $count } aplikaci

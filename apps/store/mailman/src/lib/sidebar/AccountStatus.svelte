@@ -23,7 +23,7 @@
 	<button type="button" class="icon-button large mx-auto mb-3 text-[var(--danger)]" aria-label={signIn ? `${failure}, sign in again` : `${failure}, try again`} onclick={signIn ?? mail.checkNow} {@attach tooltip(`${failure}: ${reason}`)}>
 		<CloudOff size={17} />
 	</button>
-{:else if mail.syncing && rail}
+{:else if mail.checking && rail}
 	<span class="mx-auto mb-3 grid h-10 w-10 place-items-center text-[var(--sidebar-text-muted)]" {@attach tooltip('Checking for mail')}>
 		<RefreshCw size={15} class="animate-spin" />
 	</span>
@@ -43,7 +43,7 @@
 		<p class="truncate pl-[25px]">{account?.email}</p>
 		<p class="line-clamp-2 pl-[25px]" {@attach tooltip(reason)}>{reason}</p>
 	</div>
-{:else if mail.syncing}
+{:else if mail.checking}
 	<div class="status">
 		<RefreshCw size={14} class="flex-none animate-spin" />
 		<span class="min-w-0 flex-1 truncate">Checking for mail</span>

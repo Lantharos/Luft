@@ -39,14 +39,12 @@
 	<div class="mx-auto flex w-full max-w-[760px] flex-col gap-7 px-8 pt-2 pb-10">
 		<div class="flex items-center gap-4 px-2">
 			<div class="flex min-w-0 flex-1 flex-col gap-1">
-				<span class="flex items-center gap-3 text-[22px] font-semibold">
-					{headline}
-					{#if !library.updates && library.checking}<Spinner size={18} class="text-[var(--text-muted)]" />{/if}
-				</span>
-				<span class="text-[13px] text-[var(--text-muted)]">
+				<span class="text-[22px] font-semibold">{headline}</span>
+				<span class="flex items-center gap-2 text-[13px] text-[var(--text-muted)]">
 					{#if library.error}
 						{library.error}
 					{:else if library.checking}
+						<Spinner size={13} />
 						Looking at schelf.store, Flathub, your AppImages and your tools
 					{:else if library.updates}
 						{updates.length ? `${bytes(size)} to download · ` : ''}Checked {ago(library.updates.checked)}

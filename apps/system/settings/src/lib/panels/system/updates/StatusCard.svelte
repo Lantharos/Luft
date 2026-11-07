@@ -27,7 +27,7 @@
 	const status = $derived([headline(overview, activity), subline(overview, activity, failure)].filter(Boolean).join(' · '));
 </script>
 
-<HeroCard title={system ?? ''} detail={version} {status} working={busy || !overview} icon={Laptop}>
+<HeroCard title={system ?? ''} detail={version} {status} working={!overview && !busy} icon={Laptop}>
 	{#snippet actions()}
 		{#if current?.notes}
 			<button type="button" class="button" onclick={() => (notes = current)}>{t('settings-updates-whats-new')}</button>

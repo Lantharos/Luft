@@ -150,7 +150,6 @@ settings-updates-stop = Atura
 settings-updates-check = Comprova ara
 settings-updates-checking-button = S’està comprovant
 settings-updates-app-updates = Actualitzacions d’aplicacions
-settings-updates-apps-checking = S’estan cercant actualitzacions de les aplicacions
 settings-updates-apps-count = { $count ->
     [0] Es gestionen a Schelf
     [one] { $count } aplicació té una actualització a Schelf

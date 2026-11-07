@@ -150,7 +150,6 @@ settings-updates-stop = Ndalo
 settings-updates-check = Kontrollo tani
 settings-updates-checking-button = Po kontrollohet
 settings-updates-app-updates = Përditësimet e aplikacioneve
-settings-updates-apps-checking = Po kërkohen përditësime për aplikacionet e tua
 settings-updates-apps-count = { $count ->
     [0] Menaxhohen në Schelf
     [one] { $count } aplikacion ka përditësim në Schelf

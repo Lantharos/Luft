@@ -150,7 +150,6 @@ settings-updates-stop = Leállítás
 settings-updates-check = Ellenőrzés most
 settings-updates-checking-button = Ellenőrzés
 settings-updates-app-updates = Alkalmazásfrissítések
-settings-updates-apps-checking = Frissítések keresése az alkalmazásokhoz
 settings-updates-apps-count = { $count ->
     [0] A Schelf alkalmazásban kezelhető
     [one] { $count } alkalmazáshoz van frissítés a Schelf alkalmazásban

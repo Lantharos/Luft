@@ -150,7 +150,6 @@ settings-updates-stop = Durdur
 settings-updates-check = Şimdi denetle
 settings-updates-checking-button = Denetleniyor
 settings-updates-app-updates = Uygulama güncellemeleri
-settings-updates-apps-checking = Uygulamalarınız için güncellemeler aranıyor
 settings-updates-apps-count = { $count ->
     [0] Schelf uygulamasında yönetilir
     [one] Schelf uygulamasında { $count } uygulamanın güncellemesi var

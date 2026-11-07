@@ -17,7 +17,7 @@
 	let status = $derived.by(() => {
 		if (!update) return '';
 		const unreadable = update.unreadable ? ` · ${update.unreadable.toLocaleString()} ${update.unreadable === 1 ? 'folder' : 'folders'} couldn't be read` : '';
-		if (update.scanning) return `Measuring… ${update.totalItems.toLocaleString()} items${unreadable}`;
+		if (update.scanning) return `Measuring ${update.totalItems.toLocaleString()} items${unreadable}`;
 		return view ? `${bytes(view.size)} in ${view.items.toLocaleString()} items${unreadable}` : '';
 	});
 
@@ -49,7 +49,10 @@
 				{/if}
 			{/each}
 		</nav>
-		<span class="flex-none text-[13px] text-[var(--text-muted)] tabular-nums">{status}</span>
+		<span class="flex flex-none items-center gap-2 text-[13px] text-[var(--text-muted)] tabular-nums">
+			{#if update?.scanning}<Spinner size={13} />{/if}
+			{status}
+		</span>
 		<button type="button" class="icon-button" aria-label="Measure again" disabled={update?.scanning} {@attach tooltip('Measure again')} onclick={() => space.refresh()}>
 			<RefreshCw size={17} />
 		</button>
@@ -57,10 +60,8 @@
 	{#if view && tiles.length}
 		<Treemap {tiles} hovered={space.hovered} onhover={(key) => (space.hovered = key)} onopen={open} />
 		<SpaceList {tiles} hovered={space.hovered} onhover={(key) => (space.hovered = key)} onopen={open} {actions} />
-	{:else}
-		<p class="flex items-center gap-2 px-1.5 pt-6 text-[14px] text-[var(--text-muted)]">
-			{#if view}This folder is empty.{:else}<Spinner size={15} />Measuring{/if}
-		</p>
+	{:else if view}
+		<p class="px-1.5 pt-6 text-[14px] text-[var(--text-muted)]">This folder is empty.</p>
 	{/if}
 </section>
 

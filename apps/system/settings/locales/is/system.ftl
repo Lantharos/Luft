@@ -150,7 +150,6 @@ settings-updates-stop = Stöðva
 settings-updates-check = Athuga núna
 settings-updates-checking-button = Athugar
 settings-updates-app-updates = Forritauppfærslur
-settings-updates-apps-checking = Leitar að uppfærslum fyrir forritin þín
 settings-updates-apps-count = { $count ->
     [0] Stjórnað í Schelf
     [one] { $count } forrit er með uppfærslu í Schelf

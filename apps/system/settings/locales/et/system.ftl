@@ -152,7 +152,6 @@ settings-updates-stop = Lõpeta
 settings-updates-check = Kontrolli kohe
 settings-updates-checking-button = Kontrollimine
 settings-updates-app-updates = Rakenduste värskendused
-settings-updates-apps-checking = Rakenduste värskenduste otsimine
 settings-updates-apps-count =
     { $count ->
         [0] Hallatakse rakenduses Schelf

@@ -156,7 +156,6 @@ settings-updates-stop = Stop
 settings-updates-check = Seiceáil anois
 settings-updates-checking-button = Á sheiceáil
 settings-updates-app-updates = Nuashonruithe aipeanna
-settings-updates-apps-checking = Nuashonruithe do d’aipeanna á lorg
 settings-updates-apps-count = { $count ->
     [0] Á bhainistiú i Schelf
     [one] Nuashonruithe i Schelf do { $count } aip

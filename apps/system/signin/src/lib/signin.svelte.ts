@@ -8,6 +8,7 @@ class SignIn {
 	network = $state('');
 	address = $state('');
 	loading = $state(true);
+	shown = $state(false);
 	private guest: Guest | null = null;
 	private bounds = { x: 0, y: 0, width: 1, height: 1 };
 
@@ -57,6 +58,7 @@ class SignIn {
 			backgroundColor: '#ffffff'
 		});
 		await this.guest.setBounds(this.bounds);
+		this.shown = true;
 	}
 
 	place(rect: DOMRect) {

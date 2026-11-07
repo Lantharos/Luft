@@ -154,7 +154,6 @@ settings-updates-stop = Зупинити
 settings-updates-check = Перевірити зараз
 settings-updates-checking-button = Перевірка
 settings-updates-app-updates = Оновлення програм
-settings-updates-apps-checking = Пошук оновлень для ваших програм
 settings-updates-apps-count = { $count ->
     [0] Керуються в магазині Schelf
     [one] { $count } програма має оновлення в магазині Schelf

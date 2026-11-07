@@ -2,7 +2,7 @@
 	import FileIcon from '@lucide/svelte/icons/file';
 	import Files from '@lucide/svelte/icons/files';
 	import Folder from '@lucide/svelte/icons/folder';
-	import { bytes, Spinner } from '@luft/ui';
+	import { bytes } from '@luft/ui';
 	import ActionMenu from '../ActionMenu.svelte';
 	import type { Action } from '../actions';
 	import type { Tile } from './tiles';
@@ -34,10 +34,7 @@
 					{/if}
 				</span>
 				<span class="name">{tile.label}</span>
-				<span class="facts inline-flex items-center gap-1.5">
-					{#if tile.kind === 'dir' && !tile.done}<Spinner size={12} />{/if}
-					{tile.detail}
-				</span>
+				<span class="facts">{tile.detail}</span>
 				<span class="size">{bytes(tile.size)}</span>
 			</button>
 			<span class="menu">

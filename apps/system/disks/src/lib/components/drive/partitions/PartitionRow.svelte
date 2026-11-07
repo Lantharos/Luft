@@ -61,7 +61,7 @@
 	</button>
 	<div class="actions">
 		<ActionMenu label="More for {volumeName(volume)}" groups={menu} disabled={busy} />
-		{#if job}<Spinner size={14} class="text-[var(--text-muted)]" />{/if}
+		{#if job && job.progress === null}<Spinner size={14} class="text-[var(--text-muted)]" />{/if}
 		{#if status}
 			<span class="status">{status}</span>
 		{/if}

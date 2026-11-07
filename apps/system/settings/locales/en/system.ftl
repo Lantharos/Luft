@@ -169,7 +169,6 @@ settings-updates-stop = Stop
 settings-updates-check = Check now
 settings-updates-checking-button = Checking
 settings-updates-app-updates = App updates
-settings-updates-apps-checking = Looking for updates to your apps
 settings-updates-apps-count = { $count ->
     [0] Managed in Schelf
     [one] { $count } app has an update in Schelf

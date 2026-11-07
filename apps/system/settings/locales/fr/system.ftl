@@ -150,7 +150,6 @@ settings-updates-stop = Arrêter
 settings-updates-check = Vérifier maintenant
 settings-updates-checking-button = Vérification
 settings-updates-app-updates = Mises à jour des applications
-settings-updates-apps-checking = Recherche de mises à jour pour vos applications
 settings-updates-apps-count = { $count ->
     [0] Gérées dans Schelf
     [one] { $count } application a une mise à jour dans Schelf

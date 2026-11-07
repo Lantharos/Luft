@@ -150,7 +150,6 @@ settings-updates-stop = Διακοπή
 settings-updates-check = Έλεγχος τώρα
 settings-updates-checking-button = Έλεγχος
 settings-updates-app-updates = Ενημερώσεις εφαρμογών
-settings-updates-apps-checking = Αναζήτηση ενημερώσεων για τις εφαρμογές σας
 settings-updates-apps-count = { $count ->
     [0] Η διαχείριση γίνεται στο Schelf
     [one] { $count } εφαρμογή έχει ενημέρωση στο Schelf

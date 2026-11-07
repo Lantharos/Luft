@@ -26,7 +26,7 @@ export function tilesOf(view: SpaceView): Tile[] {
 				name: item.name,
 				label: item.name,
 				size: item.size,
-				detail: item.done ? count(item.items, 'item', 'items') : 'Measuring',
+				detail: item.done ? count(item.items, 'item', 'items') : '',
 				inner: item.inner,
 				done: item.done,
 				tone: folders++ % 3

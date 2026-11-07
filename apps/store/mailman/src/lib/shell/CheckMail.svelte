@@ -5,5 +5,5 @@
 </script>
 
 <button type="button" class="icon-button" aria-label="Check for new mail" aria-busy={mail.checking} onclick={mail.checkNow} {@attach tooltip('Check for new mail (F5)')}>
-	<RefreshCw size={16} class={mail.checking ? 'animate-spin' : ''} />
+	<RefreshCw size={16} />
 </button>

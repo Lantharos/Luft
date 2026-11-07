@@ -28,8 +28,12 @@
 			truncate
 		>
 			{#if installing}
-				<Spinner />
-				<span>{activity.progress?.fraction != null ? percent(activity.progress.fraction) : t('settings-updates-firmware-installing')}</span>
+				{#if activity.progress?.fraction != null}
+					<span class="tabular-nums">{percent(activity.progress.fraction)}</span>
+				{:else}
+					<Spinner />
+					<span>{t('settings-updates-firmware-installing')}</span>
+				{/if}
 			{:else}
 				<button type="button" class="button" disabled={busy} onclick={() => install(device)}>{t('settings-updates-firmware-update')}</button>
 			{/if}

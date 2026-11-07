@@ -152,7 +152,6 @@ settings-updates-stop = Oprește
 settings-updates-check = Verifică acum
 settings-updates-checking-button = Se verifică
 settings-updates-app-updates = Actualizări pentru aplicații
-settings-updates-apps-checking = Se caută actualizări pentru aplicații
 settings-updates-apps-count = { $count ->
     [0] Gestionate în Schelf
     [one] { $count } aplicație are o actualizare în Schelf

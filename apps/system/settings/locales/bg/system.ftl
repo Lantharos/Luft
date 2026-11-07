@@ -150,7 +150,6 @@ settings-updates-stop = Спри
 settings-updates-check = Провери сега
 settings-updates-checking-button = Проверка
 settings-updates-app-updates = Актуализации на приложения
-settings-updates-apps-checking = Търсене на актуализации за приложенията ви
 settings-updates-apps-count = { $count ->
     [0] Управляват се в Schelf
     [one] { $count } приложение има актуализация в Schelf

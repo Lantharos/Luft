@@ -5,7 +5,7 @@
 	import RotateCcw from '@lucide/svelte/icons/rotate-ccw';
 	import X from '@lucide/svelte/icons/x';
 	import { t } from '@luft/i18n';
-	import { activationToken, duration, fileDragStart, IconButton, ProgressBar, Spinner } from '@luft/ui';
+	import { activationToken, duration, fileDragStart, IconButton, ProgressBar } from '@luft/ui';
 	import { commands, type ItemUpdate } from '#lib/bindings.js';
 	import { queue } from '#lib/state/queue.svelte.js';
 	import { session } from '#lib/state/session.svelte.js';
@@ -33,10 +33,7 @@
 
 <section class="flex min-h-0 flex-1 flex-col" aria-label={t('queue-title')}>
 	<div class="flex items-center gap-2 px-4 pb-2 text-[13px] text-[var(--text-muted)]">
-		<span class="flex flex-1 items-center gap-2">
-			{#if queue.active.length && !queue.held}<Spinner size={13} />{/if}
-			{summary ?? (queue.active.length ? t('queue-working') : t('queue-all-done'))}
-		</span>
+		<span class="flex-1">{summary ?? (queue.active.length ? t('queue-working') : t('queue-all-done'))}</span>
 		{#if queue.active.length}
 			<button type="button" class="button" onclick={() => queue.hold(!queue.held)}>{queue.held ? t('queue-resume-all') : t('queue-pause-all')}</button>
 		{/if}

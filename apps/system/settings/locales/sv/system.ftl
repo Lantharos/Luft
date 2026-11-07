@@ -150,7 +150,6 @@ settings-updates-stop = Stoppa
 settings-updates-check = Sök nu
 settings-updates-checking-button = Söker
 settings-updates-app-updates = Appuppdateringar
-settings-updates-apps-checking = Söker efter uppdateringar till dina appar
 settings-updates-apps-count = { $count ->
     [0] Hanteras i Schelf
     [one] { $count } app har en uppdatering i Schelf

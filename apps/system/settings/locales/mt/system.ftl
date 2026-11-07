@@ -156,7 +156,6 @@ settings-updates-stop = Waqqaf
 settings-updates-check = Iċċekkja issa
 settings-updates-checking-button = Qed jiċċekkja
 settings-updates-app-updates = Aġġornamenti tal-apps
-settings-updates-apps-checking = Qed jitfittxew aġġornamenti għall-apps
 settings-updates-apps-count = { $count ->
     [0] Immaniġġjati f’Schelf
     [one] { $count } app għandha aġġornament f’Schelf

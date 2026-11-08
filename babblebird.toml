@@ -1,4 +1,5 @@
 glossary = "packages/i18n/glossary/{lang}.tbx"
+icon = "web/site/public/favicon.svg"
 
 [[areas]]
 name = "Desktop"

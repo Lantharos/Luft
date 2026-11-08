@@ -7,7 +7,6 @@ const DEVICE = 'org.freedesktop.UPower.Device';
 const NOT_DISCHARGING = new Set([1, 4, 5]);
 
 export interface PowerDevice {
-  path: string;
   kind: number;
   model: string;
   percentage: number;
@@ -21,7 +20,7 @@ export class PowerDevices {
   private readonly cancellable = new Gio.Cancellable();
   private readonly subscriptions: number[];
 
-  constructor(private readonly changed: Listener, private readonly removed: (path: string) => void) {
+  constructor(private readonly changed: Listener) {
     const bus = Gio.DBus.system;
     this.subscriptions = [
       bus.signal_subscribe(UPOWER, UPOWER, 'DeviceAdded', UPOWER_PATH, null, Gio.DBusSignalFlags.NONE,
@@ -56,7 +55,6 @@ export class PowerDevices {
         const report = () => {
           if (!property<boolean>('IsPresent')) return;
           this.changed({
-            path,
             kind: property<number>('Type'),
             model: property<string>('Model') ?? '',
             percentage: property<number>('Percentage'),
@@ -69,8 +67,8 @@ export class PowerDevices {
   }
 
   private forget(path: string): void {
-    if (!this.proxies.delete(path)) return;
-    this.removed(path);
+    this.proxies.get(path)?.run_dispose();
+    this.proxies.delete(path);
   }
 
   destroy(): void {

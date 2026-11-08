@@ -22,6 +22,7 @@ const ACCESSORIES: Record<number, [name: string, icon: string]> = {
   22: ['battery-device-remote', 'input-gaming-symbolic'],
 };
 const UNKNOWN_ACCESSORY: [name: string, icon: string] = ['battery-device-other', 'battery-low-symbolic'];
+const PEN = 13;
 
 interface Warned {
   threshold: number | null;
@@ -45,7 +46,7 @@ function percent(percentage: number): string {
 
 function warning({ kind, model, percentage }: PowerDevice, threshold: number): Warning {
   const [kindName, icon] = ACCESSORIES[kind] ?? UNKNOWN_ACCESSORY;
-  const device = model.trim() || t(kindName);
+  const device = (kind !== PEN && model.trim()) || t(kindName);
   const left = t('battery-left', { percent: percent(percentage) });
   return threshold === 10
     ? { title: t('battery-device-very-low-title', { device }), body: t('battery-device-very-low-body', { left }), icon, urgency: MessageTray.Urgency.HIGH }
@@ -54,17 +55,18 @@ function warning({ kind, model, percentage }: PowerDevice, threshold: number): W
 
 export class BatteryWarnings {
   private readonly warned = new Map<string, Warned>();
-  private readonly devices = new PowerDevices(device => this.update(device), path => this.clear(path));
+  private readonly devices = new PowerDevices(device => this.update(device));
 
   private update(device: PowerDevice): void {
+    const identity = `${device.kind}:${device.model}`;
     if (!device.discharging) {
-      this.clear(device.path);
+      this.clear(identity);
       return;
     }
-    let warned = this.warned.get(device.path);
+    let warned = this.warned.get(identity);
     if (!warned) {
       warned = { threshold: null, notification: null };
-      this.warned.set(device.path, warned);
+      this.warned.set(identity, warned);
     }
     if (warned.threshold !== null && device.percentage >= warned.threshold + RECHARGED_MARGIN)
       warned.threshold = reached(device.percentage);
@@ -91,13 +93,13 @@ export class BatteryWarnings {
     playSound('low-battery');
   }
 
-  private clear(path: string): void {
-    this.warned.get(path)?.notification?.destroy();
-    this.warned.delete(path);
+  private clear(identity: string): void {
+    this.warned.get(identity)?.notification?.destroy();
+    this.warned.delete(identity);
   }
 
   destroy(): void {
     this.devices.destroy();
-    for (const path of [...this.warned.keys()]) this.clear(path);
+    for (const identity of [...this.warned.keys()]) this.clear(identity);
   }
 }

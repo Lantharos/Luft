@@ -71,3 +71,5 @@
 0071-backends-follow-Kestrel-s-pen-settings.patch
 0072-backends-ignore-the-hand-that-rests-on-the-screen-af.patch
 0073-backends-show-a-dot-under-pens-instead-of-the-arrow.patch
+0074-wayland-know-a-tablet-before-its-first-tool-comes-ne.patch
+0075-clutter-keep-every-motion-sample-of-tablet-tools.patch

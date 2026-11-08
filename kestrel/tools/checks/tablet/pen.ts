@@ -10,6 +10,7 @@ import {show} from '../apps/settings/navigation.js';
 import {named, shown, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {property} from '../lib/dbus.js';
+import {penTap} from '../lib/input/penStroke.js';
 import {capture} from '../lib/screenshots.js';
 import {pause, settled} from '../lib/wait.js';
 import {BTN_STYLUS2, hover, leave, pen, pressButton} from './lib/pen.js';
@@ -68,6 +69,21 @@ async function checkEraserButton() {
   }
 }
 
+/** Taps the moment the pen appears, before Kestrel has heard of it, as a pen held near the screen does when it comes back on resume. */
+async function writeAtOnce() {
+  let tapped = false;
+  const filter = Clutter.Event.prepend_filter(null, event => {
+    if (event.type() === Clutter.EventType.BUTTON_PRESS && event.get_device_tool()) tapped = true;
+    return Clutter.EVENT_PROPAGATE;
+  });
+  try {
+    await penTap([700, 450]);
+    require(tapped, 'a pen that taps the moment it appears reaches the desktop');
+  } finally {
+    Clutter.Event.remove_filter(filter);
+  }
+}
+
 async function withSquareCorners(action: () => Promise<void>) {
   kestrel.set_boolean('rounded-window-corners', false);
   try {
@@ -79,7 +95,7 @@ async function withSquareCorners(action: () => Promise<void>) {
 }
 
 export async function run() {
-  pen();
+  await writeAtOnce();
   await eventually(async () => (await listed()).some(([, , kind]) => kind === 'screen'), 'Kestrel lists the virtual pen as a pen on the screen');
   await checkEraserButton();
   await checkStartButton();

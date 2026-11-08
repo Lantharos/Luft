@@ -1,0 +1,75 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Sun, 8 Nov 2026 13:39:16 +0100
+Subject: [PATCH 74/75] wayland: know a tablet before its first tool comes near
+
+The seat's device-added signal is emitted when the stage processes its
+queued events, on the next frame, but the Wayland seat sees each input
+event as it arrives, from the event filter. Until then, the events of a
+new tablet don't count as tablet events and go nowhere, so a tool that
+comes into proximity right after its tablet appears, as a pen held near
+the screen when a tablet is plugged in or the system resumes does, or
+the first stroke of a virtual tablet, never gets a current tablet. Its
+proximity-out, which comes after the tablet is known, then reaches
+meta_wayland_tablet_update_sprite() with no tablet, and crashes.
+
+Route every event of a device with tablet tools to the tablet seat, add
+the tablet when one of its tools comes near, and let the later
+device-added signal find it already there. The tablet seat lets the
+device-added event through, as it does device-removed, so the stage
+still emits the signal for a tablet it already knows.
+
+Upstream-Status: forwardable
+---
+ src/wayland/meta-wayland-seat.c        | 5 +----
+ src/wayland/meta-wayland-tablet-seat.c | 7 +++++++
+ 2 files changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/src/wayland/meta-wayland-seat.c b/src/wayland/meta-wayland-seat.c
+index 7f758e40c771a8911cd263728d54968f7082ce84..9786b90f6d72ef645875f5b7783ed1599af44efa 100644
+--- a/src/wayland/meta-wayland-seat.c
++++ b/src/wayland/meta-wayland-seat.c
+@@ -417,10 +417,7 @@ is_tablet_event (MetaWaylandSeat    *seat,
+   capabilities = clutter_input_device_get_capabilities (device);
+ 
+   if (capabilities & CLUTTER_INPUT_CAPABILITY_TABLET_TOOL)
+-    {
+-      return meta_wayland_tablet_seat_lookup_tablet (seat->tablet_seat,
+-                                                     device) != NULL;
+-    }
++    return TRUE;
+   if (capabilities & CLUTTER_INPUT_CAPABILITY_TABLET_PAD)
+     {
+       return meta_wayland_tablet_seat_lookup_pad (seat->tablet_seat,
+diff --git a/src/wayland/meta-wayland-tablet-seat.c b/src/wayland/meta-wayland-tablet-seat.c
+index 6464e8716c1b7cfc747aaf02684d4de47e23a8b1..98dd2145fa95d26098c50f43fd97a2dac36fa919 100644
+--- a/src/wayland/meta-wayland-tablet-seat.c
++++ b/src/wayland/meta-wayland-tablet-seat.c
+@@ -188,6 +188,10 @@ meta_wayland_tablet_seat_device_added (MetaWaylandTabletSeat *tablet_seat,
+ {
+   MetaWaylandSurface *pad_focus;
+ 
++  if (g_hash_table_contains (tablet_seat->tablets, device) ||
++      g_hash_table_contains (tablet_seat->pads, device))
++    return;
++
+   pad_focus = meta_wayland_seat_get_input_focus (tablet_seat->seat);
+ 
+   if (is_tablet_device (device))
+@@ -378,6 +382,8 @@ meta_wayland_tablet_seat_update (MetaWaylandTabletSeat *tablet_seat,
+   switch (clutter_event_type (event))
+     {
+     case CLUTTER_PROXIMITY_IN:
++      meta_wayland_tablet_seat_device_added (tablet_seat, device);
++      G_GNUC_FALLTHROUGH;
+     case CLUTTER_PROXIMITY_OUT:
+     case CLUTTER_BUTTON_PRESS:
+     case CLUTTER_BUTTON_RELEASE:
+@@ -442,6 +448,7 @@ meta_wayland_tablet_seat_handle_event (MetaWaylandTabletSeat *tablet_seat,
+         return CLUTTER_EVENT_PROPAGATE;
+ 
+       return meta_wayland_tablet_pad_handle_event (pad, event);
++    case CLUTTER_DEVICE_ADDED:
+     case CLUTTER_DEVICE_REMOVED:
+       return CLUTTER_EVENT_PROPAGATE;
+     default:

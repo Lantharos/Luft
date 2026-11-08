@@ -1,0 +1,100 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Sun, 8 Nov 2026 13:39:46 +0100
+Subject: [PATCH 75/75] clutter: keep every motion sample of tablet tools
+
+The stage drops all but the last motion event a device sends in a
+frame. For a pointer only the position matters, but a pen moves several
+times a frame, and an actor drawing its strokes, such as a shell canvas,
+loses the samples in between along with their pressure and tilt. Wayland
+clients already get every sample, since the compositor's event filter
+sees each event before it is queued.
+
+Keep compressing pointer motion, and hand the stage every motion of a
+tablet tool. Absolute tool motion carries no relative motion, so it was
+dropped rather than merged; merging the wheel axis of relative tool
+motion goes away with it. Repaints stay once a frame, and the extra
+events only reach the actors under the tool.
+
+Upstream-Status: forwardable
+---
+ clutter/clutter/clutter-stage.c | 38 +++++----------------------------
+ 1 file changed, 5 insertions(+), 33 deletions(-)
+
+diff --git a/clutter/clutter/clutter-stage.c b/clutter/clutter/clutter-stage.c
+index 8fae1720a4e40bbd9fd89a928a60514eeb38eb21..51ba16b2402249878a00704f4a10775c059c1f5c 100644
+--- a/clutter/clutter/clutter-stage.c
++++ b/clutter/clutter/clutter-stage.c
+@@ -696,8 +696,6 @@ clutter_stage_compress_motion (ClutterStage       *stage,
+   double dst_dx = 0.0, dst_dy = 0.0;
+   double dst_dx_unaccel = 0.0, dst_dy_unaccel = 0.0;
+   double dst_dx_constrained = 0.0, dst_dy_constrained = 0.0;
+-  double *current_axes, *last_axes;
+-  guint n_current_axes, n_last_axes;
+   graphene_point_t coords;
+ 
+   if (!clutter_event_get_relative_motion (to_discard,
+@@ -713,35 +711,6 @@ clutter_stage_compress_motion (ClutterStage       *stage,
+ 
+   clutter_event_get_position (event, &coords);
+ 
+-  /* All tablet axes but the wheel are absolute so we can use those
+-   * as-is. But for wheels we only compress if the current value goes in the
+-   * same direction.
+-   */
+-  current_axes = clutter_event_get_axes (to_discard, &n_current_axes);
+-  last_axes = clutter_event_get_axes (event, &n_last_axes);
+-
+-  g_return_val_if_fail (!last_axes == !current_axes, NULL);
+-
+-  if (current_axes)
+-    {
+-      double current_val = 0.0;
+-      double last_val = 0.0;
+-
+-      g_return_val_if_fail (n_current_axes == CLUTTER_INPUT_AXIS_LAST, NULL);
+-      g_return_val_if_fail (n_last_axes == CLUTTER_INPUT_AXIS_LAST, NULL);
+-      g_return_val_if_fail (n_current_axes == n_last_axes, NULL);
+-
+-      current_val = current_axes[CLUTTER_INPUT_AXIS_WHEEL];
+-      last_val = last_axes[CLUTTER_INPUT_AXIS_WHEEL];
+-
+-      if ((current_val < 0.0 && last_val > 0.0) ||
+-          (current_val > 0.0 && last_val < 0.0))
+-        return NULL;
+-
+-      current_axes = g_memdup2 (current_axes, sizeof (double) * n_current_axes);
+-      current_axes[CLUTTER_INPUT_AXIS_WHEEL] += last_axes[CLUTTER_INPUT_AXIS_WHEEL];
+-    }
+-
+   return clutter_event_motion_new (CLUTTER_EVENT_FLAG_RELATIVE_MOTION,
+                                    clutter_event_get_time_us (event),
+                                    clutter_event_get_source_device (event),
+@@ -754,7 +723,7 @@ clutter_stage_compress_motion (ClutterStage       *stage,
+                                                         (float) (dy_unaccel + dst_dy_unaccel)),
+                                    GRAPHENE_POINT_INIT ((float) (dx_constrained + dst_dx_constrained),
+                                                         (float) (dy_constrained + dst_dy_constrained)),
+-                                   current_axes);
++                                   NULL);
+ }
+ 
+ CLUTTER_EXPORT void
+@@ -814,7 +783,8 @@ _clutter_stage_process_queued_events (ClutterStage *stage)
+       if (sprite != NULL && next_sprite != NULL)
+         check_sprite = TRUE;
+ 
+-      /* Skip consecutive motion events coming from the same device. */
++      /* Skip consecutive pointer motion events coming from the same device,
++       * but keep every sample of a tablet tool for drawing. */
+       if (next_event != NULL)
+         {
+           float x, y;
+@@ -822,6 +792,8 @@ _clutter_stage_process_queued_events (ClutterStage *stage)
+           clutter_event_get_coords (event, &x, &y);
+ 
+           if (clutter_event_type (event) == CLUTTER_MOTION &&
++              !clutter_event_get_device_tool (event) &&
++              !clutter_event_get_device_tool (next_event) &&
+               (clutter_event_type (next_event) == CLUTTER_MOTION ||
+                clutter_event_type (next_event) == CLUTTER_LEAVE) &&
+               (!check_sprite || (sprite == next_sprite)))

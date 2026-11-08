@@ -6,7 +6,7 @@ import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 import {descendants} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {click, drag, moveTo, rest} from '../lib/input/input.js';
-import {penReady, penStroke} from '../lib/input/penStroke.js';
+import {penStroke} from '../lib/input/penStroke.js';
 import {BTN_STYLUS2, hover, leave, pressButton} from '../tablet/lib/pen.js';
 import {capture} from '../lib/screenshots.js';
 import {pause, settled} from '../lib/wait.js';
@@ -17,6 +17,7 @@ const RED: [number, number, number] = [230, 46, 51];
 const TOLERANCE = 24;
 const ENOUGH_INK = 150;
 const PEN_STEPS = 40;
+const SAMPLES_PER_FRAME = 8;
 const DRAG_SETTLE = 100;
 const PEN_SETTLE = 200;
 const SELECTION = {left: 160, top: 120, right: 1180, bottom: 640};
@@ -68,12 +69,12 @@ async function openEditor() {
   require(!ui().panel.visible, 'the capture panel gives way to the drawing tools');
 }
 
-/** Writes a wave with the virtual pen, so the stroke comes through Kestrel's real pen events with their pressure. */
+/** Writes a wave with the virtual pen, several samples a frame as a real pen sends them, so the stroke comes through Kestrel's real pen events with their pressure. */
 async function penWave(x: number, y: number) {
   await penStroke(Array.from({length: PEN_STEPS + 1}, (_, step) => {
     const t = step / PEN_STEPS;
     return [x + t * 360, y + Math.sin(t * Math.PI * 3) * 50] as [number, number];
-  }));
+  }), SAMPLES_PER_FRAME);
 }
 
 function pressures() {
@@ -104,6 +105,7 @@ async function draw(scheme: string, corners: string) {
   await penWave(left + 80, top + 120);
   await eventually(() => strokesShown() === 1, 'a pen stroke stays on the screenshot');
   const pressed = pressures();
+  require(pressed.length === PEN_STEPS + 1, `the stroke keeps every pen sample, ${SAMPLES_PER_FRAME} a frame (${pressed.length} of ${PEN_STEPS + 1})`);
   require(Math.max(...pressed) - Math.min(...pressed) > 0.3, `the stroke follows how hard the pen presses (${Math.min(...pressed).toFixed(2)} to ${Math.max(...pressed).toFixed(2)})`);
 
   await choose('highlighter');
@@ -150,7 +152,6 @@ async function saved(crop: {width: number; height: number}) {
 export async function run() {
   const scheme = interfaceSettings.get_string('color-scheme');
   rest();
-  await penReady();
   await penOpensDrawing();
   try {
     for (const rounded of [true, false]) {

@@ -348,7 +348,7 @@ recordings-open = Pusti snimak
 recordings-title = Snimci
 
 consent-title = Pitaj pre nego što snimaš
-consent-ask = Snimanje ljudi bez njihovog pitanja je na mnogim mestima protiv zakona, a u Nemačkoj je tajno snimanje tuđih reči krivično delo. Pitaj nastavnika, i odeljenje ako se čuju, pre nego što počneš da snimaš.
+consent-ask = Na mnogim mestima je protivzakonito snimati ljude bez njihovog pristanka, a negde je to i krivično delo. Pitaj nastavnika, i odeljenje ako se čuju, pre nego što počneš da snimaš.
 consent-law = Dok Heft snima, u svesci se vidi crvena tačka, a Luft pokazuje da je mikrofon uključen. Snimanje se nastavlja i ako zatvoriš Heft, sve dok ga ne zaustaviš.
 consent-local = Snimak, ono što je na njemu rečeno i beleške napravljene od toga ostaju u ovoj svesci na ovom računaru. Heft ih nikada ne šalje.
 consent-record = Složili su se, snimaj

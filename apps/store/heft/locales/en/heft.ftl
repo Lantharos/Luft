@@ -363,7 +363,7 @@ recordings-open = Play a recording
 recordings-title = Recordings
 
 consent-title = Ask before you record
-consent-ask = Recording people without asking them is against the law in many places, and in Germany secretly recording what someone says is a crime. Ask your teacher, and the class if they can be heard, before you record.
+consent-ask = In many places it's against the law to record people without asking them, and in some it's a crime. Ask your teacher, and the class if they can be heard, before you record.
 consent-law = While Heft records, a red dot shows in the notebook and Luft shows that the microphone is on. Recording goes on if you close Heft, until you stop it.
 consent-local = The recording, what's said in it and the notes made from it stay in this notebook on this computer. Heft never uploads them.
 consent-record = They agreed, record

@@ -10,6 +10,10 @@
     <file preprocess="xml-stripblanks">scalable/actions/ornament-dot-unchecked-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/actions/screenshooter-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/actions/screenshot-ui-area-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">scalable/actions/screenshot-ui-crop-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">scalable/actions/screenshot-ui-eraser-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">scalable/actions/screenshot-ui-highlighter-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">scalable/actions/screenshot-ui-pen-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/actions/screenshot-ui-display-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/actions/screenshot-ui-show-pointer-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/actions/screenshot-ui-window-symbolic.svg</file>

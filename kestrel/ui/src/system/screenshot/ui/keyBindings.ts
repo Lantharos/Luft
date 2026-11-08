@@ -60,6 +60,9 @@ export function installKeyBindings(pool: Clutter.BindingPool): void {
   install(pool, 'pointer', Clutter.KEY_p, NO_MODIFIERS, ({ panel }) => {
     panel.showPointerButton.checked = !panel.showPointerButton.checked;
   });
+  install(pool, 'draw', Clutter.KEY_d, NO_MODIFIERS, ({ panel }) => {
+    if (panel.drawButton.visible) panel.drawButton.checked = !panel.drawButton.checked;
+  });
 
   for (const [name, key, direction] of ARROWS) {
     const resize: Action = (ui, modifiers) => ui.resizeSelection(direction, increment(direction, modifiers));
@@ -80,7 +83,7 @@ async function captureWindow(window: Meta.Window): Promise<void> {
   try {
     const actor = window.get_compositor_private() as Meta.WindowActor;
     const content = actor.paint_to_content(null) as Clutter.TextureContent;
-    await captureScreenshot(content.get_texture(), null, 1, null);
+    await captureScreenshot(content.get_texture(), null, 1, null, null);
   } catch (e) {
     logError(e as object, 'Error capturing screenshot');
   }
@@ -89,7 +92,7 @@ async function captureWindow(window: Meta.Window): Promise<void> {
 async function captureStage(): Promise<void> {
   try {
     const [content] = await new Shell.Screenshot().screenshot_stage_to_content();
-    await captureScreenshot((content as Clutter.TextureContent).get_texture(), null, 1, null);
+    await captureScreenshot((content as Clutter.TextureContent).get_texture(), null, 1, null, null);
   } catch (e) {
     logError(e as object, 'Error capturing screenshot');
   }

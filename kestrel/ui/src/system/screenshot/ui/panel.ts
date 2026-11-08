@@ -34,6 +34,13 @@ export class ScreenshotPanel extends St.BoxLayout {
     y_align: Clutter.ActorAlign.CENTER,
   });
 
+  readonly drawButton = new St.Button({
+    style_class: 'screenshot-ui-show-pointer-button',
+    icon_name: 'screenshot-ui-pen-symbolic',
+    toggle_mode: true,
+    y_align: Clutter.ActorAlign.CENTER,
+  });
+
   readonly captureButton = new St.Button({
     style_class: 'screenshot-ui-capture-button',
     y_align: Clutter.ActorAlign.CENTER,
@@ -89,6 +96,9 @@ export class ScreenshotPanel extends St.BoxLayout {
 
     this.add_child(this.showPointerButton);
     this.addTooltip(this.showPointerButton, 'screenshot-show-pointer');
+
+    this.add_child(this.drawButton);
+    this.addTooltip(this.drawButton, 'screenshot-draw');
 
     this.addSeparator();
 

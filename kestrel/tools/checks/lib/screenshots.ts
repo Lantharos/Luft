@@ -161,7 +161,7 @@ function primaryView(view: Clutter.StageView) {
 
 function compositeTo(stream: Gio.OutputStream, texture: Cogl.Texture, {x, y, width, height}: Area) {
   return new Promise<void>((resolve, reject) => Shell.Screenshot.composite_to_stream(texture, x, y, width, height,
-    1, null, 0, 0, 1, stream, (_source, result) => {
+    1, null, 0, 0, 1, null, stream, (_source, result) => {
       try {
         Shell.Screenshot.composite_to_stream_finish(result);
         resolve();

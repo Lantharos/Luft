@@ -30,6 +30,25 @@ stop_pick (ClutterActor *actor)
 }
 
 /**
+ * shell_util_get_event_axis:
+ * @event: a #ClutterEvent
+ * @axis: the axis to read, such as the pressure of a pen
+ *
+ * Returns: the value of @axis on @event, or 0 when the event carries none
+ */
+double
+shell_util_get_event_axis (const ClutterEvent *event,
+                           ClutterInputAxis    axis)
+{
+  guint n_axes;
+  double *axes = clutter_event_get_axes (event, &n_axes);
+
+  if (axes == NULL || axis >= n_axes)
+    return 0;
+  return axes[axis];
+}
+
+/**
  * shell_util_set_hidden_from_pick:
  * @actor: A #ClutterActor
  * @hidden: Whether @actor should be hidden from pick

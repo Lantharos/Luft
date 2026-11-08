@@ -536,8 +536,18 @@ screenshot-take = Take Screenshot
 screenshot-record = Record Screen
 # Tooltip: include the mouse pointer in the capture
 screenshot-show-pointer = Show Pointer
+# Tooltip: after capturing, draw on the screenshot before it's saved
+screenshot-draw = Draw on Screenshot
 # Tooltip of the shutter button, a verb
 screenshot-capture = Capture
+# Tooltips and screen-reader labels of the tools for drawing on a screenshot
+screenshot-markup-pen = Pen
+screenshot-markup-highlighter = Highlighter
+screenshot-markup-eraser = Eraser
+screenshot-markup-crop = Crop
+screenshot-markup-undo = Undo
+# Tooltip: copy the drawn-on screenshot and save it to Screenshots
+screenshot-markup-save = Copy and Save
 # Screen-reader label of the button that closes the screenshot tool
 screenshot-close = Close
 # Name of the folder in the home folder where screen recordings are saved

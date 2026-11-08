@@ -1255,6 +1255,8 @@ composite_to_stream_on_png_saved (GObject      *pixbuf,
  * @cursor_y: y coordinate to put the cursor texture at, relative to the full
  * source texture
  * @cursor_scale: scale of the cursor texture
+ * @markup: (nullable): a drawing to paint over the rectangle, at the size of
+ * the rectangle in pixels of the source texture
  * @stream: the stream to write the PNG image into
  * @callback: (scope async): function to call returning success or failure
  * @user_data: the data to pass to callback function
@@ -1274,6 +1276,7 @@ shell_screenshot_composite_to_stream (CoglTexture         *texture,
                                       int                  cursor_x,
                                       int                  cursor_y,
                                       float                cursor_scale,
+                                      cairo_surface_t     *markup,
                                       GOutputStream       *stream,
                                       GAsyncReadyCallback  callback,
                                       gpointer             user_data)
@@ -1356,6 +1359,15 @@ shell_screenshot_composite_to_stream (CoglTexture         *texture,
       cairo_destroy (cr);
 
       cairo_surface_destroy (cursor_surface);
+    }
+
+  if (markup != NULL)
+    {
+      cr = cairo_create (surface);
+      cairo_scale (cr, 1 / scale, 1 / scale);
+      cairo_set_source_surface (cr, markup, 0, 0);
+      cairo_paint (cr);
+      cairo_destroy (cr);
     }
 
   /* Save to an image. */

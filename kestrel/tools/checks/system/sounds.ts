@@ -76,7 +76,7 @@ async function quiet(label: string, action: () => unknown) {
 
 async function takeScreenshot() {
   const [content] = await new Shell.Screenshot().screenshot_stage_to_content();
-  if (content instanceof Clutter.TextureContent) await captureScreenshot(content.get_texture(), null, 1, null);
+  if (content instanceof Clutter.TextureContent) await captureScreenshot(content.get_texture(), null, 1, null, null);
 }
 
 function ringBell() {

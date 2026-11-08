@@ -1,3 +1,4 @@
+import type Cairo from 'cairo';
 import Cogl from 'gi://Cogl';
 import type GdkPixbuf from 'gi://GdkPixbuf';
 import Gio from 'gi://Gio';
@@ -16,7 +17,7 @@ interface Compositor {
   composite_to_stream(
     texture: Cogl.Texture, x: number, y: number, width: number, height: number, scale: number,
     cursor: Cogl.Texture | null, cursorX: number, cursorY: number, cursorScale: number,
-    stream: Gio.OutputStream): Promise<GdkPixbuf.Pixbuf>;
+    markup: Cairo.Surface | null, stream: Gio.OutputStream): Promise<GdkPixbuf.Pixbuf>;
 }
 
 export interface CursorCapture {
@@ -112,13 +113,14 @@ export async function captureScreenshot(
   geometry: [number, number, number, number] | null,
   scale: number,
   cursor: CursorCapture | null,
+  markup: Cairo.Surface | null,
 ): Promise<Gio.File | null> {
   const stream = Gio.MemoryOutputStream.new_resizable();
   const [x, y, w, h] = geometry ?? [0, 0, -1, -1];
   const { texture: cursorTexture, x: cursorX, y: cursorY, scale: cursorScale } = cursor ?? NO_CURSOR;
 
   const pixbuf = await (Shell.Screenshot as unknown as Compositor).composite_to_stream(
-    texture, x, y, w, h, scale, cursorTexture, cursorX, cursorY, cursorScale, stream);
+    texture, x, y, w, h, scale, cursorTexture, cursorX, cursorY, cursorScale, markup, stream);
 
   stream.close(null);
   const file = storeScreenshot(stream.steal_as_bytes(), pixbuf);

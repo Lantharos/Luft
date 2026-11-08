@@ -1,6 +1,6 @@
 ---
 title: Screenshots and recording
-description: Take screenshots of an area, a window or the screen, and record the screen.
+description: Take screenshots of an area, a window or the screen, draw on them, and record the screen.
 sidebar:
   order: 7
 ---
@@ -26,12 +26,37 @@ Choose an area, the whole screen or a window, decide whether to include the poin
 | --- | --- |
 | <kbd>S</kbd> / <kbd>C</kbd> / <kbd>W</kbd> | Area, screen, window |
 | <kbd>P</kbd> | Show the pointer |
+| <kbd>D</kbd> | Draw on the screenshot before it's saved |
 | <kbd>V</kbd> | Switch to recording |
 | Arrows, with <kbd>Ctrl</kbd>, <kbd>Shift</kbd> or <kbd>Alt</kbd> | Move or resize the selected area |
 | <kbd>Enter</kbd>, <kbd>Space</kbd> or <kbd>Ctrl</kbd>+<kbd>C</kbd> | Capture |
 | <kbd>Esc</kbd> | Close |
 
 Screenshots are saved in `~/Pictures/Screenshots` and copied to the clipboard at the same time, ready to paste. A notification offers to show the file.
+
+## Drawing on a screenshot
+
+Turn on the pen button next to **Show Pointer**, and capturing opens the screenshot for drawing instead of saving it straight away. It turns on by itself when you open the screenshot tool with a pen, such as with the pen's button.
+
+<Shot name="screenshot-markup" alt="A screenshot being drawn on, with a pen line, a highlight and the drawing tools below" />
+
+| Tool | Does |
+| --- | --- |
+| Pen | Draws a line that gets thicker the harder you press |
+| Highlighter | Draws a wide, see-through stroke under the pen lines |
+| Eraser | Takes away whole strokes it touches. The eraser end of a pen erases with any tool |
+| Crop | Drag the corners or edges to keep only part of the screenshot, or drag the middle to move what you keep |
+
+Pick a colour for the pen or the highlighter below the tools. The mouse and a finger draw too, without pressure.
+
+| Key | Does |
+| --- | --- |
+| <kbd>P</kbd> / <kbd>H</kbd> / <kbd>E</kbd> / <kbd>C</kbd> | Pen, highlighter, eraser, crop |
+| <kbd>Ctrl</kbd>+<kbd>Z</kbd> | Undo |
+| <kbd>Enter</kbd> | Copy and save |
+| <kbd>Esc</kbd> | Close without saving |
+
+The tick copies the finished screenshot and saves it in `~/Pictures/Screenshots`, like any other.
 
 Screenshots older than 30 days go to the trash by themselves, so the folder doesn't fill up; move one to another folder to keep it. Settings, under Privacy, turns this off or changes how long they stay.
 

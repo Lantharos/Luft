@@ -1,5 +1,4 @@
 import Clutter from 'gi://Clutter';
-import type Cogl from 'gi://Cogl';
 import Gio from 'gi://Gio';
 import GObject from 'gi://GObject';
 import Shell from 'gi://Shell';
@@ -8,7 +7,8 @@ import St from 'gi://St';
 import * as GrabHelper from '../../../shared/popups/grabHelper.js';
 import * as Layout from '../../../core/stage/layout.js';
 import * as Main from '../../../core/main.js';
-import { type CursorCapture, captureScreenshot } from '../capture.js';
+import { type Finished, MarkupEditor } from '../markup/markupEditor.js';
+import type { Shot } from '../markup/shot.js';
 import type { Geometry } from '../selection/areaCursor.js';
 import { UIAreaIndicator } from '../selection/areaIndicator.js';
 import { UIAreaSelector } from '../selection/areaSelector.js';
@@ -16,6 +16,7 @@ import { UIWindowSelector, type UIWindowSelectorWindow } from '../selection/wind
 import { SELECTION_KEYBOARD_INCREMENT, addShortcuts, installKeyBindings } from './keyBindings.js';
 import { ScreenshotPanel } from './panel.js';
 import { Screencaster } from './screencaster.js';
+import { areaShot, saveShot, windowShot } from './shots.js';
 
 Gio._promisify(Shell.Screenshot.prototype, 'screenshot_stage_to_content');
 
@@ -42,14 +43,7 @@ function fadeOut(actor: Clutter.Actor): void {
 
 const bindToStage = () => new Clutter.BindConstraint({ source: global.stage, coordinate: Clutter.BindCoordinate.ALL });
 
-async function capture(texture: Cogl.Texture, geometry: Geometry | null, scale: number, cursor: CursorCapture): Promise<Gio.File | null> {
-  try {
-    return await captureScreenshot(texture, geometry, scale, cursor);
-  } catch (e) {
-    logError(e as object, 'Error capturing screenshot');
-    return null;
-  }
-}
+const PEN_DEVICES = [Clutter.InputDeviceType.TABLET_DEVICE, Clutter.InputDeviceType.PEN_DEVICE, Clutter.InputDeviceType.ERASER_DEVICE];
 
 export namespace ScreenshotUI {
   export interface Signals extends St.Widget.SignalSignatures {
@@ -99,8 +93,10 @@ export class ScreenshotUI extends St.Widget {
   });
 
   private readonly primaryMonitorBin = new St.Widget({ layout_manager: new Clutter.BinLayout() });
+  readonly markup = new MarkupEditor((shot, finished) => void this.saveMarkedUp(shot, finished), () => this.close());
   private currentMode: UIMode = UIMode.SCREENSHOT;
   private openingCoroutineInProgress = false;
+  private penUsedLast = false;
   private scale = 1;
   private cursorScale = 1;
   private monitorBins: St.Widget[] = [];
@@ -143,6 +139,7 @@ export class ScreenshotUI extends St.Widget {
     this.connectPanel();
 
     this.rebuildMonitorBins();
+    this.add_child(this.markup);
 
     Main.layoutManager.connect('monitors-changed', () => {
       this.close(true);
@@ -150,6 +147,10 @@ export class ScreenshotUI extends St.Widget {
     });
 
     addShortcuts(this);
+
+    global.backend.connect('last-device-changed', (_backend, device: Clutter.InputDevice) => {
+      if (device.device_type !== Clutter.InputDeviceType.KEYBOARD_DEVICE) this.penUsedLast = PEN_DEVICES.includes(device.device_type);
+    });
 
     Main.sessionMode.connect('updated', () => this.close(true));
     this.close(true);
@@ -164,6 +165,7 @@ export class ScreenshotUI extends St.Widget {
     if (mode === UIMode.SCREENCAST && !this.screencaster.supported) return;
 
     this.currentMode = mode;
+    if (this.penUsedLast) this.panel.drawButton.checked = true;
     this.panel.castButton.checked = mode === UIMode.SCREENCAST;
     this.syncCastButton();
 
@@ -390,6 +392,12 @@ export class ScreenshotUI extends St.Widget {
     this.stageScreenshot.set_content(null);
     this.cursorActor.set_content(null);
 
+    this.markup.reset();
+    this.panel.show();
+    this.areaSelector.visible = this.panel.selectionButton.checked;
+    for (const selector of this.windowSelectors) selector.visible = this.panel.windowButton.checked;
+    for (const selector of this.screenSelectors) selector.visible = this.panel.screenButton.checked;
+
     this.areaSelector.reset();
     for (const selector of this.windowSelectors) selector.reset();
 
@@ -461,6 +469,7 @@ export class ScreenshotUI extends St.Widget {
     if (castButton.checked) {
       castButton.toggle_mode = false;
       captureButton.add_style_pseudo_class('cast');
+      this.panel.drawButton.hide();
       fadeOut(this.stageScreenshotContainer);
 
       if (windowButton.checked) selectionButton.checked = true;
@@ -468,6 +477,7 @@ export class ScreenshotUI extends St.Widget {
     } else {
       castButton.toggle_mode = true;
       captureButton.remove_style_pseudo_class('cast');
+      this.panel.drawButton.show();
       this.syncWindowButtonSensitivity();
     }
   }
@@ -485,45 +495,46 @@ export class ScreenshotUI extends St.Widget {
       return;
     }
 
-    try {
-      await this.saveScreenshot();
-    } catch (e) {
-      logError(e as object);
+    const shot = this.selectedShot();
+    if (shot && this.panel.drawButton.checked) {
+      this.startMarkup(shot);
+      return;
     }
+    if (shot) await this.save(shot);
     this.close();
   }
 
-  private async saveScreenshot(): Promise<void> {
-    const file = this.panel.windowButton.checked ? await this.saveWindow() : await this.saveArea();
+  private startMarkup(shot: Shot): void {
+    this.panel.hide();
+    this.areaSelector.hide();
+    for (const selector of [...this.windowSelectors, ...this.screenSelectors]) selector.hide();
+    this.markup.open(shot);
+  }
+
+  private async saveMarkedUp(shot: Shot, finished: Finished): Promise<void> {
+    await this.save(shot, finished);
+    this.close();
+  }
+
+  private async save(shot: Shot, finished: Finished | null = null): Promise<void> {
+    const file = await saveShot(shot, finished);
     if (file) this.emit('screenshot-taken', file);
   }
 
-  private async saveArea(): Promise<Gio.File | null> {
+  private selectedShot(): Shot | null {
+    if (this.panel.windowButton.checked) {
+      const window = this.windows().find(win => win.checked);
+      return window ? windowShot(window, this.cursorActor.visible, this.cursorScale) : null;
+    }
+
     const content = this.stageScreenshot.get_content() as Clutter.TextureContent | null;
     if (!content) return null;
 
-    const geometry = this.selectedGeometry().map(value => value * this.scale) as Geometry;
     const cursorContent = this.cursorActor.content as Clutter.TextureContent | null;
-
-    return capture(content.get_texture(), geometry, this.scale, {
+    return areaShot(content, this.selectedGeometry(), this.scale, {
       texture: this.cursorActor.visible ? cursorContent?.get_texture() ?? null : null,
       x: this.cursorActor.x * this.scale,
       y: this.cursorActor.y * this.scale,
-      scale: this.cursorScale,
-    });
-  }
-
-  private async saveWindow(): Promise<Gio.File | null> {
-    const window = this.windows().find(win => win.checked);
-    if (!window) return null;
-
-    const content = window.windowContent;
-    if (!content) return null;
-
-    return capture(content.get_texture(), null, window.bufferScale, {
-      texture: this.cursorActor.visible ? window.getCursorTexture()?.get_texture() ?? null : null,
-      x: window.cursorPoint.x * window.bufferScale,
-      y: window.cursorPoint.y * window.bufferScale,
       scale: this.cursorScale,
     });
   }

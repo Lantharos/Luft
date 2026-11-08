@@ -35,6 +35,9 @@ void shell_util_systemd_unit_exists (const gchar         *unit,
 gboolean shell_util_systemd_unit_exists_finish (GAsyncResult  *res,
                                                 GError       **error);
 
+double shell_util_get_event_axis (const ClutterEvent *event,
+                                  ClutterInputAxis    axis);
+
 void shell_util_sd_notify (void);
 
 gint shell_util_get_uid (void);

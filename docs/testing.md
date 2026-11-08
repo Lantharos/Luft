@@ -27,7 +27,7 @@ The checks, the stand-in services and the test clients are TypeScript in `kestre
 | `--jobs N` | Up to N sessions at once (default: one per four processors, fewer when the inotify limit is close); `--jobs 1` runs one session at a time |
 | `--list` | Lists the groups |
 
-The board groups, `input:dictation`, `input:scrolling`, `panel:battery`, `panel:repaints`, `panel:screenshot`, `tablet:keyboard`, `tablet:longPress`, `windows:serverDecorations` and `windows:x11Frames` also run on two laptop panels at their automatic display scale: a 14-inch 1920×1200 panel at 150%, as the groups ending in `+laptop`, and a 15.6-inch 1080p panel at 125%, as the groups ending in `+laptop15`. Their screenshots go to a `laptop` or `laptop15` folder inside the capture folder.
+The board groups, `input:dictation`, `input:scrolling`, `panel:battery`, `panel:markup`, `panel:repaints`, `panel:screenshot`, `tablet:keyboard`, `tablet:longPress`, `windows:serverDecorations` and `windows:x11Frames` also run on two laptop panels at their automatic display scale: a 14-inch 1920×1200 panel at 150%, as the groups ending in `+laptop`, and a 15.6-inch 1080p panel at 125%, as the groups ending in `+laptop15`. Their screenshots go to a `laptop` or `laptop15` folder inside the capture folder.
 
 The `taskbar`, `start`, `panel` and `tiling` groups also run with the taskbar on the left, top and right, as the groups ending in `+left`, `+top` and `+right`, with their screenshots in a `taskbar-left`, `taskbar-top` or `taskbar-right` folder.
 
@@ -44,6 +44,8 @@ The nested session copies the host's wallpaper, interface settings, keyboard lay
 `system:powerButton` presses a simulated power button on the desktop, over Start, over a fullscreen app that keeps every shortcut, on the lock screen, with the screen off and just after waking, and with each choice for the button in Settings. `kestrel/tools/session.sh greeter` presses it on the login screen. A physical button, and whether it sends the key at all on a given computer, still needs a real computer.
 
 `system:cleanup` takes a screenshot with Shift+Print, puts copies of it aged 20 and 40 days next to it and an old picture in another folder of Pictures, then waits for `kestrel-settings` to move only the 40-day-old copy to the trash, which takes a little over two minutes.
+
+`panel:markup` opens the screenshot tool with a virtual pen's upper button set to take a screenshot and checks that drawing turns on, captures an area, writes a wave with the pen and checks that the stroke follows how hard it presses, then highlights, draws, erases and crops with the mouse, undoes the erasing, and checks that the saved picture is the cropped size, in the display's pixels, with the ink on it. It runs in both styles with rounded and square corners.
 
 `desktop:reminders` runs Reminders through adding, firing, coming back, snoozing, Do Not Disturb, a Focus session, missed reminders, the computer sleeping and waking, a change of time zone, search, calendar files and a Kestrel crash, and prints what it costs at rest with 400 reminders. The clock in it is fake: `kestrel/tools/checks/lib/fakeClock.ts` shifts what `Date` says in Kestrel while timers go on as they are, which is exactly what sleeping looks like to it, and the stand-in logind says when the computer slept and woke. Daylight saving is covered by the tests in `extensions/reminders/tests`, which `bun run check` in `extensions` runs in a time zone that has it. Setting the real clock and a real suspend still need a real session.
 

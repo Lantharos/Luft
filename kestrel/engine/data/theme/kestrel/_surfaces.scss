@@ -85,6 +85,19 @@
 .screenshot-ui-show-pointer-button:checked { background-color: fill(0.22); color: ink(); }
 .screenshot-ui-shot-cast-button:checked { color: ink(); }
 .screenshot-ui-window-selector { background-color: glass(); }
+.screenshot-ui-markup-backdrop .screenshot-ui-area-indicator-shade { background-color: rgba(0, 0, 0, 0.55); }
+.screenshot-ui-markup-swatches { spacing: 2px; padding: 0 2px; }
+.screenshot-ui-markup-swatch { padding: 4px; border-radius: 999px; transition-duration: $motion-tap; }
+.screenshot-ui-markup-swatch:hover, .screenshot-ui-markup-swatch:focus { background-color: fill(0.12); }
+.screenshot-ui-markup-swatch:checked { background-color: fill(0.22); }
+.screenshot-ui-markup-swatch-color { width: 18px; height: 18px; border-radius: 999px; border: 1px solid ink(0.18); }
+.screenshot-ui-markup-button, .screenshot-ui-markup-save { padding: 8px 14px; border-radius: 999px; transition-duration: $motion-tap; }
+.screenshot-ui-markup-button { color: ink(); }
+.screenshot-ui-markup-button:hover, .screenshot-ui-markup-button:focus { background-color: fill(0.22); }
+.screenshot-ui-markup-button:insensitive { color: ink(0.35); }
+.screenshot-ui-markup-save { background-color: ink(); color: paper(); margin: 0 2px; }
+.screenshot-ui-markup-save:hover, .screenshot-ui-markup-save:focus { background-color: ink(0.82); }
+.screenshot-ui-markup-button StIcon, .screenshot-ui-markup-save StIcon { icon-size: 16px; }
 
 .kestrel-dictation { height: 36px; border-radius: 999px; background-color: glass(clear); color: ink(); }
 .kestrel-dictation-content { padding: 0 14px; spacing: 10px; }

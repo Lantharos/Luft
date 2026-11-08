@@ -152,6 +152,8 @@ export namespace Shell {
 
     function util_create_pixbuf_from_data(data: Uint8Array | string, colorspace: GdkPixbuf.Colorspace, has_alpha: boolean, bits_per_sample: number, width: number, height: number, rowstride: number): GdkPixbuf.Pixbuf;
 
+    function util_get_event_axis(event: Clutter.Event, axis: Clutter.InputAxis): number;
+
     function util_get_uid(): number;
 
     function util_get_week_start(locale: string): number;
@@ -1547,7 +1549,7 @@ export namespace Shell {
         emit<K extends keyof Screenshot.SignalSignatures>(signal: K, ...args: GObject.GjsParameters<Screenshot.SignalSignatures[K]>): void;
 
         // Static methods
-        static composite_to_stream(texture: Cogl.Texture, x: number, y: number, width: number, height: number, scale: number, cursor: Cogl.Texture | null, cursor_x: number, cursor_y: number, cursor_scale: number, stream: Gio.OutputStream, callback: Gio.AsyncReadyCallback<Screenshot> | null): void;
+        static composite_to_stream(texture: Cogl.Texture, x: number, y: number, width: number, height: number, scale: number, cursor: Cogl.Texture | null, cursor_x: number, cursor_y: number, cursor_scale: number, markup: cairo.Surface | null, stream: Gio.OutputStream, callback: Gio.AsyncReadyCallback<Screenshot> | null): void;
 
         static composite_to_stream_finish(result: Gio.AsyncResult): GdkPixbuf.Pixbuf | null;
 

@@ -48,7 +48,7 @@ class WindowMenu extends PopupMenu.PopupMenu {
       try {
         const actor = window.get_compositor_private() as Meta.WindowActor;
         const content = actor.paint_to_content(null) as Clutter.TextureContent;
-        await captureScreenshot(content.get_texture(), null, 1, null);
+        await captureScreenshot(content.get_texture(), null, 1, null, null);
       } catch (e) {
         logError(e as Error, 'Error capturing screenshot');
       }

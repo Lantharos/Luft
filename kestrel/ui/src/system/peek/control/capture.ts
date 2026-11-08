@@ -54,7 +54,7 @@ function snapshot(window: Meta.Window): Snapshot {
 
 function encode(shot: Snapshot, output: Gio.OutputStream): Promise<GdkPixbuf.Pixbuf | null> {
   return settled(done => Shell.Screenshot.composite_to_stream(shot.texture, shot.x, shot.y, shot.width, shot.height,
-    shot.scale, null, 0, 0, 1, output, (_source, result) => done(result)), result => Shell.Screenshot.composite_to_stream_finish(result));
+    shot.scale, null, 0, 0, 1, null, output, (_source, result) => done(result)), result => Shell.Screenshot.composite_to_stream_finish(result));
 }
 
 export async function captureWindow(window: Meta.Window, output: Gio.OutputStream): Promise<void> {

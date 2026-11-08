@@ -15,7 +15,7 @@ class UIWindowSelectorWindowContent extends Clutter.Actor {
 
   readonly boundingBox: Mtk.Rectangle;
   readonly bufferScale: number;
-  private readonly bufferRect: Mtk.Rectangle;
+  readonly bufferRect: Mtk.Rectangle;
   private readonly windowActor = new Clutter.Actor();
   private readonly border: St.Bin;
   private readonly shouldShowCursor: boolean;
@@ -132,6 +132,10 @@ export class UIWindowSelectorWindow extends St.Button {
 
   get boundingBox(): Mtk.Rectangle {
     return this.preview.boundingBox;
+  }
+
+  get bufferRect(): Mtk.Rectangle {
+    return this.preview.bufferRect;
   }
 
   get windowCenter(): { x: number; y: number } {

@@ -66,7 +66,7 @@ function copyOf(framebuffer: Cogl.Framebuffer) {
 function probe(texture: Cogl.Texture) {
   const stream = Gio.MemoryOutputStream.new_resizable();
   return new Promise<Uint8Array>((resolve, reject) => Shell.Screenshot.composite_to_stream(texture, 0, 0, texture.get_width(), texture.get_height(),
-    1, null, 0, 0, 1, stream, (_source, result) => {
+    1, null, 0, 0, 1, null, stream, (_source, result) => {
       try {
         Shell.Screenshot.composite_to_stream_finish(result);
         stream.close(null);

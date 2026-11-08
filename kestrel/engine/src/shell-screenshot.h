@@ -1,6 +1,7 @@
 /* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
 #pragma once
 
+#include <cairo.h>
 #include <mtk/mtk.h>
 
 /**
@@ -83,6 +84,7 @@ void shell_screenshot_composite_to_stream (CoglTexture         *texture,
                                            int                  cursor_x,
                                            int                  cursor_y,
                                            float                cursor_scale,
+                                           cairo_surface_t     *markup,
                                            GOutputStream       *stream,
                                            GAsyncReadyCallback  callback,
                                            gpointer             user_data);

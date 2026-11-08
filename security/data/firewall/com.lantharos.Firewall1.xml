@@ -1,22 +1,33 @@
-<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-Bus Object Introspection 1.0//EN"
  "https://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
 <node name="/com/lantharos/Firewall1">
   <!--
     Luft's firewall. Every Wi-Fi and wired network is home or public, kept as the
     NetworkManager connection's connection.zone ("home" or "public"); one nobody chose yet
-    counts as public.
+    counts as public. Devices on a network reach only the apps allowed there.
+
+    An app is ("app", app id) for Flatpaks and apps started from a desktop file, or
+    ("program", name) for programs that run outside an app, such as ones started in a terminal.
 
     Unclassified: the networks in use that nobody chose a type for yet, as (connection, name),
     connection being the NetworkManager settings path.
-    OpenPorts: ports up to 1024 opened on home networks, as (port, protocol), protocol being
-    "tcp" or "udp". Higher ports are always open to devices on a home network.
+    OpenPorts: ports opened on home networks for services that run without an app, as
+    (port, protocol), protocol being "tcp" or "udp".
+    Apps: what each app the firewall was told about may do, as (kind, id, access): "home" lets
+    devices on home networks connect, "anywhere" also devices on public networks, "blocked" none.
+    Waiting: apps listening for connections from the network that nobody decided about yet, as
+    (kind, id, uid), uid being the user running the app. Empty while no home network is connected.
 
-    SetNetworkType sets a connection's type to "home" or "public"; the person at the computer
-    may do it without a password. OpenPort and ClosePort need an administrator.
+    SetNetworkType sets a connection's type to "home" or "public", and SetAppAccess what an app
+    may do; the person at the computer may do both without a password, except allowing an app on
+    public networks. OpenPort and ClosePort need an administrator. SetExtensionPorts is for Kestrel:
+    it opens the ports its extensions listen on, on home networks, for Kestrel alone.
   -->
   <interface name="com.lantharos.Firewall1">
     <property name="Unclassified" type="a(os)" access="read"/>
     <property name="OpenPorts" type="a(qs)" access="read"/>
+    <property name="Apps" type="a(sss)" access="read"/>
+    <property name="Waiting" type="a(ssu)" access="read"/>
     <method name="SetNetworkType">
       <arg name="network" type="o" direction="in"/>
       <arg name="kind" type="s" direction="in"/>
@@ -28,6 +39,14 @@
     <method name="ClosePort">
       <arg name="port" type="q" direction="in"/>
       <arg name="protocol" type="s" direction="in"/>
+    </method>
+    <method name="SetAppAccess">
+      <arg name="kind" type="s" direction="in"/>
+      <arg name="id" type="s" direction="in"/>
+      <arg name="access" type="s" direction="in"/>
+    </method>
+    <method name="SetExtensionPorts">
+      <arg name="ports" type="a(qs)" direction="in"/>
     </method>
   </interface>
 </node>

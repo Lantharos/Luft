@@ -5,10 +5,14 @@ use std::process::Stdio;
 use tokio::io::AsyncWriteExt;
 use tokio::process::Command;
 
+use crate::apps::identity::UNIT_LEVEL;
+use crate::apps::{Reach, Reachable};
 use crate::network::{Layout, Prefix};
-use crate::ports::{HIGHEST_GUARDED, Port, Protocol};
+use crate::ports::{Port, Protocol};
 
 const NFT: &str = "/usr/sbin/nft";
+pub const DISCOVERY: [u16; 2] = [1900, 5353];
+const APP_KEY: &str = "socket cgroupv2 level UNIT_LEVEL . meta l4proto . th dport";
 
 const CHAINS: &str = r#"
 	chain input {
@@ -29,23 +33,23 @@ const CHAINS: &str = r#"
 		iifname @hosted accept
 		iifname . ip saddr @home4 jump home
 		iifname . ip6 saddr @home6 jump home
+		APP_KEY @apps_anywhere accept
 	}
 
 	chain home {
 		icmp type echo-request accept
 		icmpv6 type echo-request accept
-		meta l4proto { tcp, udp } th dport > HIGHEST_GUARDED accept
+		udp dport { DISCOVERY } accept
+		udp sport { DISCOVERY } accept
 		tcp dport @opened_tcp accept
 		udp dport @opened_udp accept
+		APP_KEY @apps_home accept
 	}
 }
 "#;
 
 fn set(script: &mut String, name: &str, kind: &str, elements: &[String]) {
-    let _ = writeln!(script, "\tset {name} {{\n\t\ttype {kind}");
-    if kind.contains(" . ") {
-        script.push_str("\t\tflags interval\n");
-    }
+    let _ = writeln!(script, "\tset {name} {{\n\t\t{kind}");
     if !elements.is_empty() {
         let _ = writeln!(script, "\t\telements = {{ {} }}", elements.join(", "));
     }
@@ -69,39 +73,60 @@ fn opened(ports: &BTreeSet<Port>, protocol: Protocol) -> Vec<String> {
         .collect()
 }
 
-pub fn ruleset(layout: &Layout, ports: &BTreeSet<Port>) -> String {
+fn reach(elements: &Reach) -> Vec<String> {
+    elements
+        .iter()
+        .map(|(unit, port)| format!("\"{unit}\" . {} . {}", port.protocol.name(), port.number))
+        .collect()
+}
+
+pub fn ruleset(layout: &Layout, ports: &BTreeSet<Port>, reachable: &Reachable) -> String {
     let hosted: Vec<String> = layout
         .hosted
         .iter()
         .map(|name| format!("\"{name}\""))
         .collect();
+    let key = APP_KEY.replace("UNIT_LEVEL", &UNIT_LEVEL.to_string());
+    let typed = format!("typeof {key}");
     let mut script = String::from("table inet luft\ndelete table inet luft\ntable inet luft {\n");
     set(
         &mut script,
         "home4",
-        "ifname . ipv4_addr",
+        "type ifname . ipv4_addr\n\t\tflags interval",
         &home(layout, true),
     );
     set(
         &mut script,
         "home6",
-        "ifname . ipv6_addr",
+        "type ifname . ipv6_addr\n\t\tflags interval",
         &home(layout, false),
     );
-    set(&mut script, "hosted", "ifname", &hosted);
+    set(&mut script, "hosted", "type ifname", &hosted);
     set(
         &mut script,
         "opened_tcp",
-        "inet_service",
+        "type inet_service",
         &opened(ports, Protocol::Tcp),
     );
     set(
         &mut script,
         "opened_udp",
-        "inet_service",
+        "type inet_service",
         &opened(ports, Protocol::Udp),
     );
-    script.push_str(&CHAINS.replace("HIGHEST_GUARDED", &HIGHEST_GUARDED.to_string()));
+    set(&mut script, "apps_home", &typed, &reach(&reachable.home));
+    set(
+        &mut script,
+        "apps_anywhere",
+        &typed,
+        &reach(&reachable.anywhere),
+    );
+    let discovery: Vec<String> = DISCOVERY.iter().map(u16::to_string).collect();
+    script.push_str(
+        &CHAINS
+            .replace("APP_KEY", &key)
+            .replace("DISCOVERY", &discovery.join(", ")),
+    );
     script
 }
 

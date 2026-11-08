@@ -1,4 +1,5 @@
 use luft_app::Empty;
+use luft_app::apps::App;
 use luft_app::dbus::{self, error_message, failed};
 use serde::{Deserialize, Serialize};
 use specta::Type;
@@ -52,6 +53,92 @@ impl Protocol {
     }
 }
 
+#[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Type)]
+#[serde(rename_all = "lowercase")]
+pub enum FirewallAccess {
+    Home,
+    Anywhere,
+    Blocked,
+}
+
+impl FirewallAccess {
+    fn parse(name: &str) -> Option<Self> {
+        match name {
+            "home" => Some(Self::Home),
+            "anywhere" => Some(Self::Anywhere),
+            "blocked" => Some(Self::Blocked),
+            _ => None,
+        }
+    }
+
+    fn name(self) -> &'static str {
+        match self {
+            Self::Home => "home",
+            Self::Anywhere => "anywhere",
+            Self::Blocked => "blocked",
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Type)]
+#[serde(rename_all = "lowercase")]
+pub enum FirewallAppKind {
+    App,
+    Program,
+}
+
+impl FirewallAppKind {
+    fn parse(name: &str) -> Option<Self> {
+        match name {
+            "app" => Some(Self::App),
+            "program" => Some(Self::Program),
+            _ => None,
+        }
+    }
+
+    fn name(self) -> &'static str {
+        match self {
+            Self::App => "app",
+            Self::Program => "program",
+        }
+    }
+}
+
+#[derive(Serialize, Type)]
+pub struct FirewallApp {
+    kind: FirewallAppKind,
+    id: String,
+    name: String,
+    icon: Option<String>,
+    access: FirewallAccess,
+}
+
+impl FirewallApp {
+    fn new(kind: &str, id: String, access: &str) -> Option<Self> {
+        let kind = FirewallAppKind::parse(kind)?;
+        let access = FirewallAccess::parse(access)?;
+        let app = (kind == FirewallAppKind::App)
+            .then(|| App::by_id(&format!("{id}.desktop")))
+            .flatten();
+        Some(Self {
+            kind,
+            name: app
+                .as_ref()
+                .map_or_else(|| id.clone(), |app| app.name.clone()),
+            icon: app.and_then(|app| app.icon),
+            id,
+            access,
+        })
+    }
+}
+
+#[derive(Deserialize, Type)]
+pub struct ChangeAppAccess {
+    kind: FirewallAppKind,
+    id: String,
+    access: FirewallAccess,
+}
+
 #[derive(Serialize, Deserialize, Type)]
 #[serde(rename_all = "lowercase")]
 pub enum Medium {
@@ -87,6 +174,7 @@ pub struct Firewall {
     networks: Vec<GuardedNetwork>,
     unclassified: Vec<NewNetwork>,
     open_ports: Vec<OpenPort>,
+    apps: Vec<FirewallApp>,
 }
 
 #[derive(Deserialize, Type)]
@@ -131,6 +219,13 @@ pub async fn read(Empty {}: Empty) -> Result<Option<Firewall>, String> {
         .get_property("Unclassified")
         .await
         .map_err(failed)?;
+    let decided: Vec<(String, String, String)> =
+        firewall.get_property("Apps").await.map_err(failed)?;
+    let mut apps: Vec<FirewallApp> = decided
+        .into_iter()
+        .filter_map(|(kind, id, access)| FirewallApp::new(&kind, id, &access))
+        .collect();
+    apps.sort_by_cached_key(|app| app.name.to_lowercase());
     let objects = objects().await?;
     let connected: Vec<String> = objects
         .implementing(ACTIVE)
@@ -181,6 +276,7 @@ pub async fn read(Empty {}: Empty) -> Result<Option<Firewall>, String> {
                 Some(OpenPort { port, protocol })
             })
             .collect(),
+        apps,
     }))
 }
 
@@ -200,4 +296,10 @@ pub async fn open_port(OpenPort { port, protocol }: OpenPort) -> Result<(), Stri
 
 pub async fn close_port(OpenPort { port, protocol }: OpenPort) -> Result<(), String> {
     call("ClosePort", &(port, protocol.name())).await
+}
+
+pub async fn set_app_access(
+    ChangeAppAccess { kind, id, access }: ChangeAppAccess,
+) -> Result<(), String> {
+    call("SetAppAccess", &(kind.name(), id, access.name())).await
 }

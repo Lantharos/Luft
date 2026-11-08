@@ -20,6 +20,7 @@ sabine.workspace = true
 serde.workspace = true
 specta.workspace = true
 uzers.workspace = true
+zbus.workspace = true
 
 [lints]
 workspace = true

@@ -12,7 +12,17 @@
       <arg name="port" type="q" direction="in"/>
       <arg name="protocol" type="s" direction="in"/>
     </method>
+    <method name="SetAppAccess">
+      <arg name="kind" type="s" direction="in"/>
+      <arg name="id" type="s" direction="in"/>
+      <arg name="access" type="s" direction="in"/>
+    </method>
+    <method name="SetExtensionPorts">
+      <arg name="ports" type="a(qs)" direction="in"/>
+    </method>
+    <property name="Apps" type="a(sss)" access="read"/>
     <property name="OpenPorts" type="a(qs)" access="read"/>
     <property name="Unclassified" type="a(os)" access="read"/>
+    <property name="Waiting" type="a(ssu)" access="read"/>
   </interface>
 </node>

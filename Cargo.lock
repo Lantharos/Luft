@@ -343,6 +343,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "assert_matches"
+version = "1.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9b34d609dfbaf33d6889b2b7106d3ca345eacad44200913df5ba02bfd31d2ba9"
+
+[[package]]
 name = "async-broadcast"
 version = "0.7.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -542,6 +548,36 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e7178fe5f7d460b13895ebb9dcb28a3a6216d2df2574a0806cb51b555d297f38"
 dependencies = [
  "arrayvec",
+]
+
+[[package]]
+name = "aya"
+version = "0.16.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3c193744eaa31250fd29ceb101a85219ae3cc26ea595a2cdb848df5a866cf19e"
+dependencies = [
+ "assert_matches",
+ "aya-obj",
+ "bitflags 2.13.2",
+ "hashbrown 0.17.1",
+ "libc",
+ "log",
+ "object",
+ "once_cell",
+ "scopeguard",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "aya-obj"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "66254e485eda05c8ab20b83fb55ea4bde22a8436981f435e35cffa5e6aa6196d"
+dependencies = [
+ "bytes",
+ "log",
+ "object",
+ "thiserror 2.0.21",
 ]
 
 [[package]]
@@ -5336,6 +5372,7 @@ name = "luft-firewall"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "aya",
  "futures-util",
  "luft-dbus",
  "luft-dbus-macros",
@@ -6585,6 +6622,18 @@ dependencies = [
  "block2",
  "objc2",
  "objc2-foundation",
+]
+
+[[package]]
+name = "object"
+version = "0.40.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dd229a0361b9d0d4396176e02d65897f487eebeab7caa6d443855ee152ca0b9c"
+dependencies = [
+ "crc32fast",
+ "hashbrown 0.17.1",
+ "indexmap",
+ "memchr",
 ]
 
 [[package]]
@@ -9527,6 +9576,7 @@ dependencies = [
  "serde",
  "specta",
  "uzers",
+ "zbus 6.0.0",
 ]
 
 [[package]]

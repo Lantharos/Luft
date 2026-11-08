@@ -1,5 +1,6 @@
 mod budget;
 mod output;
+mod scope;
 mod session;
 mod spawn;
 

@@ -48,11 +48,13 @@ Devices already connected keep working. Turning this off in Settings needs an ad
 
 ## Home and public networks
 
-Every Wi-Fi and wired network is either a home network or a public one. On a home network, your other devices can find this computer and connect to it, so casting to a Chromecast, Spotify Connect, games on the local network, Steam streaming and sharing files work without setting anything up. On a public network, like in a café, hotel or airport, nothing on the network can connect to this computer; only the answers to its own connections come in.
+Every Wi-Fi and wired network is either a home network or a public one. Other devices on a network can only connect to the apps you let them. The first time an app waits for connections from other devices, like a game hosting a match, Steam streaming, Spotify Connect or a file sharing app, Luft asks whether to allow it. Allowing lets your phones, computers and speakers on home networks connect to that app. If you're not sure, choose Don't allow: the app keeps working on this computer, and you can change your mind later. Your answer is remembered for that app.
 
-The first time Luft starts, it asks what kind of network you're on, with Home picked already. After that, a new network counts as public until you choose, and a notification asks. You can change any network in Settings, under Network → Firewall.
+On a public network, like in a café, hotel or airport, no app can be reached unless you allowed it there too, which only Settings offers. Your computer doesn't answer ping there and doesn't announce itself to other devices, so they don't see its name. Printers, AirPlay and Chromecast are found on home networks.
 
-Even on a home network, the ports up to 1024, which belong to system services such as a web or file server, stay closed until you open them there. Opening one needs an administrator. Tailscale, and the virtual machines, containers and Android apps running on this computer, keep working on either kind of network.
+The first time Luft starts, it asks what kind of network you're on, with Home picked already. After that, a new network counts as public until you choose, and a notification asks. You can change any network, and what each app may do, in Settings, under Network → Firewall: Home networks, All networks or Not allowed. Allowing an app on all networks needs an administrator.
+
+Programs you start in Tern, such as a web server you're working on, are asked about by their name, like python3. Services that run without an app, such as an SSH or file server, are never asked about and stay closed until you open their port on that page, which needs an administrator. Extensions that take connections from your network were allowed when you installed them, on home networks. Tailscale, and the virtual machines, containers and Android apps running on this computer, keep working on either kind of network.
 
 ## Games with anti-cheat
 

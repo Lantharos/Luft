@@ -367,6 +367,11 @@ export const commands = {
 	networkSetAirplane: (params: {
 		enabled: boolean,
 	}, options?: CallOptions) => invoke<null>("network_set_airplane", params, options),
+	networkSetAppAccess: (params: {
+		kind: FirewallAppKind,
+		id: string,
+		access: FirewallAccess,
+	}, options?: CallOptions) => invoke<null>("network_set_app_access", params, options),
 	networkSetType: (params: {
 		connection: string,
 		networkType: NetworkType,
@@ -1010,7 +1015,20 @@ export type Firewall = {
 	networks: GuardedNetwork[],
 	unclassified: NewNetwork[],
 	openPorts: OpenPort[],
+	apps: FirewallApp[],
 };
+
+export type FirewallAccess = "home" | "anywhere" | "blocked";
+
+export type FirewallApp = {
+	kind: FirewallAppKind,
+	id: string,
+	name: string,
+	icon: string | null,
+	access: FirewallAccess,
+};
+
+export type FirewallAppKind = "app" | "program";
 
 export type Firmware = {
 	id: string,

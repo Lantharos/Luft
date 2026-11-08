@@ -1,3 +1,4 @@
+import { ExtensionPorts } from './firewall.js';
 import { DesktopState, type ExtensionHost } from './host.js';
 import { ExtensionManager } from './runtime/manager.js';
 import { ExtensionsService } from './service.js';
@@ -10,6 +11,7 @@ export class Extensions {
   private readonly monitorListeners = new Set<() => void>();
   private readonly manager: ExtensionManager;
   private readonly service: ExtensionsService;
+  private readonly ports: ExtensionPorts;
 
   constructor(parts: HostParts) {
     this.manager = new ExtensionManager({
@@ -21,6 +23,7 @@ export class Extensions {
       },
     });
     this.service = new ExtensionsService(this.manager);
+    this.ports = new ExtensionPorts(this.manager);
   }
 
   syncDesktop(wallpaperShown: boolean, active: boolean, locked: boolean): void {
@@ -32,6 +35,7 @@ export class Extensions {
   }
 
   shutdown(): void {
+    this.ports.destroy();
     this.service.destroy();
     this.manager.shutdown();
   }

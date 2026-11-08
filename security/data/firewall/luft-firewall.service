@@ -11,6 +11,9 @@ Restart=on-failure
 UMask=0077
 StateDirectory=luft-firewall
 StateDirectoryMode=0700
+RuntimeDirectory=luft-firewall
+RuntimeDirectoryMode=0700
+RuntimeDirectoryPreserve=restart
 ProtectSystem=strict
 ProtectHome=yes
 PrivateTmp=yes
@@ -22,7 +25,6 @@ ProtectKernelLogs=yes
 ProtectControlGroups=yes
 ProtectClock=yes
 ProtectHostname=yes
-ProtectProc=invisible
 ProcSubset=pid
 RestrictAddressFamilies=AF_UNIX AF_NETLINK
 RestrictNamespaces=yes
@@ -33,7 +35,8 @@ MemoryDenyWriteExecute=yes
 SystemCallArchitectures=native
 SystemCallFilter=@system-service
 SystemCallFilter=~@privileged @resources
-CapabilityBoundingSet=CAP_NET_ADMIN
+SystemCallFilter=bpf
+CapabilityBoundingSet=CAP_NET_ADMIN CAP_BPF
 IPAddressDeny=any
 
 [Install]

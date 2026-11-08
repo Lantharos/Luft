@@ -23,6 +23,7 @@ import { Health } from './health/health.js';
 import { notifyAboutIncidents } from './health/incidents.js';
 import { MemoryNotices } from './health/memoryNotices.js';
 import { confirmStartupOnceSettled } from './health/startup.js';
+import { AppQuestions } from './firewall/appQuestions.js';
 import { DesktopPolicy } from './peek/access/desktop.js';
 import { PeekService } from './peek/service.js';
 import { MonitorWake } from './display/relight/monitorWake.js';
@@ -64,6 +65,7 @@ export class SystemServices {
   private readonly keyring: SystemPrompts;
   private readonly mediaKeys: MediaKeys;
   private readonly peek: PeekService;
+  private readonly firewallQuestions: AppQuestions;
 
   constructor(context: Context, openStart: () => void) {
     this.titleBars = new TitleBars((window, x, y) =>
@@ -74,6 +76,7 @@ export class SystemServices {
     this.keyring = new SystemPrompts(context);
     this.mediaKeys = new MediaKeys(context, openStart);
     this.peek = new PeekService(context, context.activateWindow, new DesktopPolicy());
+    this.firewallQuestions = new AppQuestions(context);
     confirmStartupOnceSettled(context.layoutManager);
     const startup = context.layoutManager.connect('startup-complete', () => {
       context.layoutManager.disconnect(startup);
@@ -84,6 +87,7 @@ export class SystemServices {
 
   destroy(): void {
     this.peek.destroy();
+    this.firewallQuestions.destroy();
     this.keyring.destroy();
     this.appearance.destroy();
     for (const sync of this.loginScreen) sync.destroy();

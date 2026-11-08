@@ -403,6 +403,14 @@ access-dialog-deny = Deny
 # Default button label when the app doesn't name its own
 access-dialog-allow = Allow
 
+## Firewall question when an app starts listening for connections from other devices
+
+# Dialog title. $app is the app's name, or a program's name such as python3
+firewall-app-title = { $app } wants to accept connections from other devices on this network
+firewall-app-body = Allowing it lets phones, computers and other devices on your home networks connect to { $app }. If you’re not sure, choose Don’t allow: it’s safe, { $app } keeps working on this computer, and you can change your mind in Settings.
+firewall-app-deny = Don’t allow
+firewall-app-allow = Allow
+
 ## Display change confirmation
 
 # Dialog title, keep it shorter than 30 characters

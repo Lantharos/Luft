@@ -14,7 +14,7 @@ path = "../../web/network/bridge/bindings.ts"
 futures-util.workspace = true
 getrandom.workspace = true
 gio.workspace = true
-luft-app.workspace = true
+luft-app = { workspace = true, features = ["apps"] }
 sabine.workspace = true
 serde.workspace = true
 serde_json.workspace = true

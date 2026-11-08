@@ -5,10 +5,19 @@
 	import { i18n, t } from '@luft/i18n';
 	import { errorText, IconButton, Row, Section, Segmented, Spinner } from '@luft/ui';
 	import SubPage from '#lib/components/SubPage.svelte';
-	import { waitForPerson, type Firewall, type GuardedNetwork, type NetworkType, type OpenPort } from '@luft/network';
+	import {
+		waitForPerson,
+		type Firewall,
+		type FirewallAccess,
+		type FirewallApp,
+		type GuardedNetwork,
+		type NetworkType,
+		type OpenPort
+	} from '@luft/network';
 	import { commands } from '#lib/bindings.js';
 	import { extensions } from '#lib/panels/personalization/extensions/extensions.svelte.js';
 	import type { NetworkState } from '../state.svelte';
+	import AppsSection from './AppsSection.svelte';
 	import OpenPortRow from './OpenPortRow.svelte';
 	import { protocolLabel } from './ports';
 
@@ -56,6 +65,10 @@
 		void attempt(() => commands.networkSetType({ connection: network.connection, networkType }));
 	}
 
+	function allow(app: FirewallApp, access: FirewallAccess) {
+		void attempt(() => commands.networkSetAppAccess({ kind: app.kind, id: app.id, access }, waitForPerson));
+	}
+
 	async function closePort(port: OpenPort) {
 		closing = portKey(port);
 		await attempt(() => commands.networkClosePort(port, waitForPerson));
@@ -78,7 +91,17 @@
 		{/each}
 	</Section>
 
-	<Section title={t('settings-network-firewall-home-title')} description={t('settings-network-firewall-home-title.description')}>
+	<AppsSection apps={firewall.apps} onchange={allow} />
+
+	{#if listening.length}
+		<Section title={t('settings-network-firewall-extensions')} description={t('settings-network-firewall-extensions.description')}>
+			{#each listening as extension (extension.id)}
+				<Row title={extension.name} description={t('settings-network-firewall-extension-ports', { count: extension.listen.length, ports: portList(extension.listen) })} />
+			{/each}
+		</Section>
+	{/if}
+
+	<Section title={t('settings-network-firewall-services')} description={t('settings-network-firewall-services.description')}>
 		{#each firewall.openPorts as port (portKey(port))}
 			<Row title={t('settings-network-firewall-port', { port: port.port })} description={protocolLabel(port.protocol)}>
 				{#if closing === portKey(port)}
@@ -90,12 +113,4 @@
 		{/each}
 		<OpenPortRow onopen={(port) => attempt(() => commands.networkOpenPort(port, waitForPerson))} />
 	</Section>
-
-	{#if listening.length}
-		<Section title={t('settings-network-firewall-extensions')} description={t('settings-network-firewall-extensions.description')}>
-			{#each listening as extension (extension.id)}
-				<Row title={extension.name} description={t('settings-network-firewall-extension-ports', { count: extension.listen.length, ports: portList(extension.listen) })} />
-			{/each}
-		</Section>
-	{/if}
 </SubPage>

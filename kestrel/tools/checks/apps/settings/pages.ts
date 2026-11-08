@@ -10,7 +10,7 @@ const PAGES = ['bluetooth', 'network', 'network/ethernet', 'network/vpn', 'netwo
   'input/dictation', 'appearance', 'appearance/icons', 'appearance/text', 'appearance/fonts', 'appearance/cursor', 'appearance/wallpaper', 'taskbar', 'taskbar/start', 'taskbar/more', 'windows', 'accessibility', 'apps', 'privacy', 'security',
   'security/encryption', 'security/keyring', 'accounts', 'accounts/login', 'language', 'system', 'system/about'];
 
-const SQUARE_PAGES = ['appearance', 'appearance/icons', 'taskbar', 'windows', 'network'];
+const SQUARE_PAGES = ['appearance', 'appearance/icons', 'taskbar', 'windows', 'network', 'network/firewall'];
 
 async function visit(app: LuftApp, scheme: Scheme) {
   useScheme(scheme);

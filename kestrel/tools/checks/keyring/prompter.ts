@@ -28,7 +28,7 @@ async function checkCaller(client: KeyringClient) {
 async function checkAccess(client: KeyringClient) {
   const allowed = client.access(handle(), {...GITHUB, remember: true});
   const dialog = await openedDialog('an access prompt opens');
-  require(firstStyled('kestrel-keyring-app-icon', dialog)?.mapped, 'access prompts show the app asking');
+  require(firstStyled('kestrel-dialog-app-icon', dialog)?.mapped, 'access prompts show the app asking');
   await capture('keyring-access');
   click(require(labelled('Allow', dialog), 'access prompts offer to allow'));
   const [response, results] = await allowed;

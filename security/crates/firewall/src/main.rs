@@ -1,9 +1,12 @@
+mod apps;
 mod error;
 mod firewall;
+mod listening;
 mod network;
 mod ports;
 mod rules;
 mod service;
+mod store;
 
 use std::sync::Arc;
 
@@ -12,7 +15,8 @@ use tokio::signal::unix::{SignalKind, signal};
 use tokio::sync::Mutex;
 use zbus::Connection;
 
-use firewall::Firewall;
+use firewall::{Firewall, Followed};
+use listening::Watcher;
 use service::{NAME, PATH, Service};
 
 #[tokio::main(flavor = "current_thread")]
@@ -25,7 +29,10 @@ async fn main() -> anyhow::Result<()> {
         eprintln!("Couldn't read the networks yet: {error}");
         Default::default()
     });
-    let firewall = Arc::new(Mutex::new(Firewall::start(layout).await?));
+    let mut watcher = Watcher::start()?;
+    let firewall = Firewall::start(layout).await?;
+    watcher.adopt(firewall.cookies())?;
+    let firewall = Arc::new(Mutex::new(firewall));
     let server = connection.object_server();
     server.at(PATH, Service::new(firewall.clone())).await?;
     connection.request_name(NAME).await?;
@@ -33,25 +40,32 @@ async fn main() -> anyhow::Result<()> {
     let mut terminate = signal(SignalKind::terminate())?;
     let mut interrupt = signal(SignalKind::interrupt())?;
     loop {
-        tokio::select! {
+        let followed = tokio::select! {
             changed = settle(&mut changes) => {
                 if !changed {
                     break;
                 }
+                match network::read(&connection).await {
+                    Ok(layout) => firewall.lock().await.follow(layout).await,
+                    Err(error) => {
+                        eprintln!("Couldn't read the networks: {error}");
+                        continue;
+                    }
+                }
             }
+            bound = watcher.next() => Followed {
+                reclassified: false,
+                waiting: firewall.lock().await.observe(bound?).await,
+            },
             _ = terminate.recv() => break,
             _ = interrupt.recv() => break,
-        }
-        let layout = match network::read(&connection).await {
-            Ok(layout) => layout,
-            Err(error) => {
-                eprintln!("Couldn't read the networks: {error}");
-                continue;
-            }
         };
-        if firewall.lock().await.follow(layout).await {
-            let emitter = interface.signal_emitter();
+        let emitter = interface.signal_emitter();
+        if followed.reclassified {
             interface.get().await.unclassified_changed(emitter).await?;
+        }
+        if followed.waiting {
+            interface.get().await.waiting_changed(emitter).await?;
         }
     }
     Ok(())

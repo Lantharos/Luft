@@ -7,9 +7,15 @@ luft="$(cd "$here/../../.." && pwd)"
 source "$luft/os/vm/check.sh" "${LUFT_FIREWALL_VM:-$luft/target/vm/firewall}"
 image_name="${LUFT_IMAGE_NAME:-localhost/luft}"
 serial="$vm/serial.log"
-high=$((20000 + RANDOM % 20000))
-low=$((high + 1))
-forwarded="hostfwd=tcp:127.0.0.1:$high-:8000,hostfwd=tcp:127.0.0.1:$low-:80"
+first=$((20000 + RANDOM % 20000))
+hosts=()
+forwards=()
+for guest in 8000 8001 8002 8003 80; do
+  host=$((first + ${#hosts[@]}))
+  hosts+=("$host")
+  forwards+=("hostfwd=tcp:127.0.0.1:$host-:$guest")
+done
+forwarded="$(IFS=,; echo "${forwards[*]}")"
 
 start_stage
 bun "$luft/os/image/parts/components/install.ts" "$stage/root" security
@@ -21,7 +27,7 @@ make_root_drive "$image_name-firewall-check"
 relabel_root_drive "$serial.relabel"
 
 for boot in first second; do
-  CPUS=2 MEMORY=3072 SELINUX="selinux=1 enforcing=1" APPEND="luft.firewall-check=$high,$low" \
+  CPUS=2 MEMORY=3072 SELINUX="selinux=1 enforcing=1" APPEND="luft.firewall-check=$(IFS=,; echo "${hosts[*]}")" \
     boot_root_drive "$serial.$boot" 10 -nic "user,model=virtio-net-pci,$forwarded"
   expect_in_log "$serial.$boot" luft-firewall-check "PASS $boot"
 done

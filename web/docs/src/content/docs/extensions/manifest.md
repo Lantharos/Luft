@@ -47,7 +47,7 @@ The API object only has the parts an extension asked for. Settings and Schelf sh
 | `screen-effects` | Draw over and change how your windows and the whole screen look | `screenEffects` |
 | `clipboard` | Copy to your clipboard | `clipboard` |
 
-`locked-sounds` and `input-sounds` need `sounds` too, and `input-sounds` can't go with `audio-levels`. A `[helper]` gives `helper`. It's a native program, so Schelf shows that the extension runs one and scans it like any app. `[network]` with `hosts` gives `network`, and Settings and Schelf show its hosts as "Connect to api.example.com"; a release that adds a host asks again, like one that adds a permission. Ports under `listen` show in Settings as "Take connections from devices on your network", and Luft's firewall lets other devices reach ports above 1024 only on networks people marked as home. `[[shortcuts]]` gives `shortcuts`.
+`locked-sounds` and `input-sounds` need `sounds` too, and `input-sounds` can't go with `audio-levels`. A `[helper]` gives `helper`. It's a native program, so Schelf shows that the extension runs one and scans it like any app. `[network]` with `hosts` gives `network`, and Settings and Schelf show its hosts as "Connect to api.example.com"; a release that adds a host asks again, like one that adds a permission. Ports under `listen` show in Settings as "Take connections from devices on your network". Luft's firewall lets devices on networks people marked as home reach those ports on the extension's helper, without asking again, and keeps them closed on public networks. `[[shortcuts]]` gives `shortcuts`.
 
 `typing` is the one to ask for least: an extension can only type within ten seconds of someone using it, and the taskbar shows that it did.
 

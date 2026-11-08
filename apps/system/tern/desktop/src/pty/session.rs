@@ -13,6 +13,7 @@ use rustix::process::Pid;
 
 use super::budget::Budget;
 use super::output::{Output, State};
+use super::scope;
 use super::spawn::{TerminalSize, spawn};
 
 const READ_BYTES: usize = 64 * 1024;
@@ -36,6 +37,7 @@ impl Session {
         budget: Arc<Budget>,
     ) -> io::Result<Self> {
         let spawned = spawn(command, size)?;
+        scope::separate(spawned.child.id());
         let master = Arc::new(spawned.master);
         let shell = Pid::from_child(&spawned.child);
         let (wake_reader, wake_writer) = rustix::pipe::pipe_with(rustix::pipe::PipeFlags::CLOEXEC)?;

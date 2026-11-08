@@ -281,14 +281,24 @@ settings-network-firewall-summary-home = { $network } is a home network
 # $network is the name of the network the computer is connected to
 settings-network-firewall-summary-public = { $network } is a public network
 settings-network-firewall = Firewall
-    .description = Home networks let your other devices find this computer. On public networks, nothing on the network can reach it, only answers to its own connections come in. A network counts as public until you choose.
+    .description = Other devices on a network can only connect to the apps you let them. On home networks, that’s every app you allowed; on public networks, only the apps you allowed there too. A network counts as public until you choose.
 settings-network-firewall-home = Home
 settings-network-firewall-public = Public
 settings-network-firewall-connected = Connected
 settings-network-firewall-unchosen = Counts as public until you choose
 settings-network-firewall-no-networks = No Wi‑Fi or wired networks yet
-settings-network-firewall-home-title = On home networks
-    .description = Devices on the same network can reach apps that listen on ports above 1024, which casting, games, Spotify Connect and sharing files use. Ports up to 1024 belong to system services and stay closed unless you open them here.
+settings-network-firewall-apps = Apps
+    .description = The first time an app waits for connections from other devices, Luft asks whether to let them in. Casting, games, music speakers and sharing files need this.
+settings-network-firewall-apps-none = No app has asked yet
+settings-network-firewall-access-home = Home networks
+settings-network-firewall-access-anywhere = All networks
+settings-network-firewall-access-blocked = Not allowed
+# $app is the name of an app or a program
+settings-network-firewall-access-label = Networks that can connect to { $app }
+# Shown under a program that runs outside an app, such as one started in a terminal
+settings-network-firewall-program = Program
+settings-network-firewall-services = Services
+    .description = Ports opened on home networks for services that run without an app, such as a web or file server.
 # $port is a port number, like 22
 settings-network-firewall-port = Port { $port }
 settings-network-firewall-extensions = Extensions
@@ -310,7 +320,6 @@ settings-network-firewall-open = Open
 # Button label while opening a port
 settings-network-firewall-opening = Opening
 settings-network-firewall-error-port = Enter a port from 1 to 65535
-settings-network-firewall-error-open-already = Ports above 1024 are already open on home networks
 
 ## Network: VPN
 

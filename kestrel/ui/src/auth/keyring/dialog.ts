@@ -72,7 +72,7 @@ export class KeyringDialog {
     this.header.description = request.body;
     this.appIcon?.destroy();
     const app = request.app ? Shell.AppSystem.get_default().lookup_app(`${request.app}.desktop`) : null;
-    this.appIcon = app ? appIcon(app, ICON_SIZE, { style_class: 'kestrel-keyring-app-icon', x_align: Clutter.ActorAlign.START }) : null;
+    this.appIcon = app ? appIcon(app, ICON_SIZE, { style_class: 'kestrel-dialog-app-icon', x_align: Clutter.ActorAlign.START }) : null;
     this.header.iconName = this.appIcon ? '' : request.icon;
     if (this.appIcon) this.header.insert_child_at_index(this.appIcon, 0);
   }

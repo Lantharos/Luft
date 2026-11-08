@@ -3,9 +3,10 @@ use std::fmt;
 use std::io;
 
 const STORE: &str = "/var/lib/luft-firewall/ports";
-pub const HIGHEST_GUARDED: u16 = 1024;
+const TCP: u8 = 6;
+const UDP: u8 = 17;
 
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug)]
 pub enum Protocol {
     Tcp,
     Udp,
@@ -20,6 +21,14 @@ impl Protocol {
         }
     }
 
+    pub fn of(number: u8) -> Option<Self> {
+        match number {
+            TCP => Some(Self::Tcp),
+            UDP => Some(Self::Udp),
+            _ => None,
+        }
+    }
+
     pub fn name(self) -> &'static str {
         match self {
             Self::Tcp => "tcp",
@@ -28,16 +37,16 @@ impl Protocol {
     }
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug)]
 pub struct Port {
     pub number: u16,
     pub protocol: Protocol,
 }
 
 impl Port {
-    pub fn guarded(number: u16, protocol: &str) -> Option<Self> {
+    pub fn new(number: u16, protocol: &str) -> Option<Self> {
         Some(Self {
-            number: Some(number).filter(|number| (1..=HIGHEST_GUARDED).contains(number))?,
+            number: Some(number).filter(|number| *number != 0)?,
             protocol: Protocol::parse(protocol)?,
         })
     }
@@ -49,23 +58,19 @@ impl fmt::Display for Port {
     }
 }
 
+pub fn parse(text: &str) -> Option<Port> {
+    let (number, protocol) = text.split_once('/')?;
+    Port::new(number.parse().ok()?, protocol)
+}
+
 pub fn load() -> io::Result<BTreeSet<Port>> {
-    let text = match std::fs::read_to_string(STORE) {
-        Err(error) if error.kind() == io::ErrorKind::NotFound => return Ok(BTreeSet::new()),
-        read => read?,
-    };
-    Ok(text
+    Ok(crate::store::read(STORE)?
         .lines()
-        .filter_map(|line| {
-            let (number, protocol) = line.split_once('/')?;
-            Port::guarded(number.parse().ok()?, protocol)
-        })
+        .filter_map(parse)
         .collect())
 }
 
 pub fn save(ports: &BTreeSet<Port>) -> io::Result<()> {
     let text: String = ports.iter().map(|port| format!("{port}\n")).collect();
-    let staged = format!("{STORE}.new");
-    std::fs::write(&staged, text)?;
-    std::fs::rename(staged, STORE)
+    crate::store::replace(STORE, &text)
 }

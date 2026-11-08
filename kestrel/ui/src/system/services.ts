@@ -28,6 +28,7 @@ import { PeekService } from './peek/service.js';
 import { MonitorWake } from './display/relight/monitorWake.js';
 import { MediaKeys } from './mediaKeys/mediaKeys.js';
 import { BatteryWarnings } from './power/batteryWarnings.js';
+import { PenService } from './pens/service.js';
 import { ChargerSound } from './sounds/charger.js';
 import { DeviceSounds } from './sounds/devices.js';
 import { RecordingSounds } from './sounds/recording.js';
@@ -44,6 +45,7 @@ export class SystemServices {
   private readonly deviceSounds = new DeviceSounds();
   private readonly recordingSounds = new RecordingSounds();
   private readonly soundService = new SoundService();
+  private readonly penService = new PenService();
   private readonly launchFeedback = new LaunchFeedback();
   private readonly steamGames = new SteamGames();
   private readonly openWindows = new OpenWindows();
@@ -96,6 +98,7 @@ export class SystemServices {
     this.deviceSounds.destroy();
     this.recordingSounds.destroy();
     this.soundService.destroy();
+    this.penService.destroy();
     this.launchFeedback.destroy();
     this.steamGames.destroy();
     this.openWindows.destroy();

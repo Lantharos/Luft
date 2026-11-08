@@ -8,6 +8,7 @@ import { BatteryIndicator } from '../../../shared/battery/indicator.js';
 import { LOCK, bindAvailability } from '../sessionActions.js';
 import { openSettings, type SettingsLink, type SettingsPageId } from '../../../system/settingsPages.js';
 import { actionTile, TILE_ICON_SIZE, type ActionTile } from './controlTile.js';
+import { PenTile } from './penTile.js';
 import { shortDuration } from '../../../shared/time/duration.js';
 
 export interface Tile {
@@ -47,6 +48,7 @@ export class ActionTiles {
   readonly tiles: Tile[];
   private readonly settings: Gio.Settings[] = [];
   private readonly unwatchBattery: () => void;
+  private readonly pen: PenTile;
 
   constructor(handlers: ActionHandlers) {
     const screenshot = actionTile('camera-photo-symbolic', 'quick-settings-screenshot', handlers.takeScreenshot);
@@ -75,8 +77,13 @@ export class ActionTiles {
       batteryTile.actor.visible = !!state;
       showBattery();
     });
+    this.pen = new PenTile(() => {
+      handlers.close();
+      openSettings('pen');
+    });
     this.tiles = [
       { id: 'battery', actor: batteryTile.actor, settingsPanel: 'power' },
+      { id: 'pen', actor: this.pen.tile.actor, settingsPanel: 'pen' },
       { id: 'screenshot', actor: screenshot.actor, settingsPanel: null },
       { id: 'settings', actor: settings.actor, settingsPanel: null },
       { id: 'lock', actor: lock.actor, settingsPanel: 'privacy' },
@@ -85,6 +92,7 @@ export class ActionTiles {
 
   destroy(): void {
     this.unwatchBattery();
+    this.pen.destroy();
     for (const settings of this.settings) settings.run_dispose();
   }
 }

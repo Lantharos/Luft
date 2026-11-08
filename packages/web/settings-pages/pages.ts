@@ -5,6 +5,7 @@ export type PanelId =
 	| 'sound'
 	| 'power'
 	| 'input'
+	| 'pen'
 	| 'appearance'
 	| 'taskbar'
 	| 'windows'
@@ -66,7 +67,8 @@ export const PANEL_PAGES: Page<PanelId>[][] = [
 		page('input', 'settings-page-input', 'input-keyboard-symbolic', {
 			keywords: ['settings-page-keyboard', 'settings-page-mouse'],
 			copilotKey: 'settings-page-keyboard'
-		})
+		}),
+		page('pen', 'settings-page-pen', 'input-tablet-symbolic')
 	],
 	[
 		page('appearance', 'settings-page-appearance', 'preferences-desktop-appearance-symbolic', {

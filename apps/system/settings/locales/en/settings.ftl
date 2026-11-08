@@ -22,6 +22,7 @@ settings-power-title = Power
 ## Missing hardware
 
 settings-bluetooth-missing = This computer has no Bluetooth adapter
+settings-pen-missing = No pen or drawing tablet is connected
 
 ## Shared pieces
 

@@ -9,6 +9,7 @@ use zbus::{MatchRule, MessageStream};
 
 use super::{Hardware, detect, pointers};
 use crate::panels::connections::bluetooth::rfkill;
+use crate::panels::devices::pen;
 
 pub const CHANGED: BridgeEvent<Hardware> = BridgeEvent::new("hardware.changed");
 const BUS: &str = "org.freedesktop.DBus";
@@ -51,8 +52,16 @@ pub fn start(events: Events) {
             .await
             .inspect_err(|error| eprintln!("hardware: {error}"))
             .ok();
+        let pens = pen::changes()
+            .await
+            .inspect_err(|error| eprintln!("hardware: {error}"))
+            .ok();
         let local = stream::select(pointers::changes(), rfkill::changes());
-        let mut changes = pin!(stream::select(stream::iter(signals).flatten(), local));
+        let remote = stream::select(
+            stream::iter(signals).flatten(),
+            stream::iter(pens).flatten(),
+        );
+        let mut changes = pin!(stream::select(remote, local));
         let mut known = detect().await;
         while objects::settle(&mut changes).await {
             let current = detect().await;

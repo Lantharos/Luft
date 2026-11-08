@@ -11,7 +11,7 @@ use specta::Type;
 
 use crate::panels::connections::bluetooth;
 
-use super::power;
+use super::{pen, power};
 
 static WATCH: Once = Once::new();
 
@@ -24,6 +24,7 @@ pub struct Hardware {
     touchpad: bool,
     copilot_key: bool,
     wifi: bool,
+    pen: bool,
 }
 
 async fn detect() -> Hardware {
@@ -35,6 +36,7 @@ async fn detect() -> Hardware {
         touchpad: pointers.touchpad,
         copilot_key: keyboards::copilot_key(),
         wifi: luft_network::has_wifi().await,
+        pen: pen::present().await,
     }
 }
 

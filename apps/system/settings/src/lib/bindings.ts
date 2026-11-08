@@ -396,6 +396,8 @@ export const commands = {
 		id: string,
 		name: string,
 	}, options?: CallOptions) => invoke<null>("passkeys_rename", params, options),
+	penDevices: (options?: CallOptions) => invoke<PenDevice[]>("pen_devices", {}, options),
+	penNotesInstalled: (options?: CallOptions) => invoke<boolean>("pen_notes_installed", {}, options),
 	powerOffAfter: (options?: CallOptions) => invoke<number | null>("power_off_after", {}, options),
 	powerSetChargeLimit: (params: {
 		enabled: boolean,
@@ -1054,6 +1056,7 @@ export type Hardware = {
 	touchpad: boolean,
 	copilotKey: boolean,
 	wifi: boolean,
+	pen: boolean,
 };
 
 export type HostSecurity = {
@@ -1360,6 +1363,14 @@ export type Passkeys = {
 export type PasswordOutcome = "changed" | "wrongPassword" | "tooShort" | "tooSimilar" | "dictionaryWord" | "tooSimple" | "rejected";
 
 export type Pause = "metered" | "battery";
+
+export type PenDevice = {
+	id: string,
+	name: string,
+	kind: PenKind,
+};
+
+export type PenKind = "screen" | "tablet";
 
 export type Phone = {
 	id: string,

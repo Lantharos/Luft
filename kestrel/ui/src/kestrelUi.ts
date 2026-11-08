@@ -51,6 +51,7 @@ import { EDGE_MARGIN, NO_DEPTHS, type Anchor, type Depths } from './shared/layou
 import { TaskbarEditor } from './desktop/panel/editing/editor.js';
 import { TaskbarService } from './desktop/panel/editing/service.js';
 import { SystemServices } from './system/services.js';
+import { PenActions } from './system/pens/actions.js';
 
 export { appIcon, appIcons, sourceApp, windowIcon } from './appearance/icons/appIcons.js';
 export { signInToNetwork } from './system/network/signIn.js';
@@ -85,6 +86,7 @@ class KestrelUi {
   private readonly extensions: Extensions;
   private readonly rotation: RotationAnimation;
   private readonly copilot: CopilotActions;
+  private readonly penActions: PenActions;
   private readonly fourFingers = new FourFingerSwipe(direction => this.followFourFingers(direction));
   private readonly touchscreen = new TouchscreenGestures({
     handle: event => this.touchpad(event),
@@ -145,6 +147,11 @@ class KestrelUi {
       }, this.menus, () => this.takeScreenshot());
     const clipboard = new ClipboardPanel(this.menus, close, place, context.inputMethod);
     this.copilot = new CopilotActions(context, () => this.surfaces.toggle('start'), text => clipboard.pasteWithoutKeeping(text));
+    this.penActions = new PenActions({
+      canInteract: () => this.canInteract(),
+      takeScreenshot: () => this.takeScreenshot(),
+      toggleStart: () => this.surfaces.toggle('start'),
+    });
     const searchHost: SearchHost = {
       menus: this.menus,
       quickSettings: context.quickSettings,
@@ -506,6 +513,7 @@ class KestrelUi {
     this.extensions.shutdown();
     this.rotation.destroy();
     this.copilot.destroy();
+    this.penActions.destroy();
     this.tiling.destroy();
     this.board.destroy();
     this.services.destroy();

@@ -19,6 +19,7 @@ import Mic from '@lucide/svelte/icons/mic';
 import Monitor from '@lucide/svelte/icons/monitor';
 import MonitorCog from '@lucide/svelte/icons/monitor-cog';
 import Palette from '@lucide/svelte/icons/palette';
+import PenLine from '@lucide/svelte/icons/pen-line';
 import PanelBottom from '@lucide/svelte/icons/panel-bottom';
 import Plus from '@lucide/svelte/icons/plus';
 import Puzzle from '@lucide/svelte/icons/puzzle';
@@ -71,6 +72,11 @@ const VIEWS: Record<PageId, View> = {
 		titleFor: (hardware) => (hardware.battery ? 'settings-page-power' : 'settings-power-title')
 	},
 	input: { icon: Keyboard, load: input },
+	pen: {
+		icon: PenLine,
+		load: () => import('./devices/pen/PenPanel.svelte'),
+		needs: { present: (hardware) => hardware.pen, missing: 'settings-pen-missing' }
+	},
 	appearance: { icon: Palette, load: () => import('./personalization/appearance/AppearancePanel.svelte') },
 	taskbar: { icon: PanelBottom, load: () => import('./personalization/taskbar/TaskbarPanel.svelte') },
 	windows: { icon: AppWindow, load: () => import('./personalization/windows/WindowsPanel.svelte') },

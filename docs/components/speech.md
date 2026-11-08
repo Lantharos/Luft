@@ -15,7 +15,7 @@ Parakeet covers 25 European languages; Whisper covers the rest. Silero VAD (MIT,
 
 ## Models
 
-Models live in `~/.local/share/luft-speech/models`, one folder each. `services/speech/data/models.json` lists every file with its size and SHA-256; downloads resume where they stopped and are checked before they're used. While dictation is on, the service follows the language and engine chosen in Settings: it downloads the model they need and stops downloading the other.
+Models live in `~/.local/share/luft-speech/models`, one folder each, managed by the code in `packages/system/models` that handwriting shares. `services/speech/data/models.json` lists every file with its size and SHA-256; downloads resume where they stopped and are checked before they're used. While dictation is on, the service follows the language and engine chosen in Settings: it downloads the model they need and stops downloading the other.
 
 ## Files
 
@@ -26,4 +26,4 @@ Models live in `~/.local/share/luft-speech/models`, one folder each. `services/s
 
 ## Mirror
 
-`get.luft.computer/models` mirrors the models. `.github/workflows/models.yml` runs `services/speech/mirror/mirror.sh` whenever `services/speech/data/models.json` changes: it downloads each file from the pinned upstream revision, quantizes the Parakeet encoder with `services/speech/mirror/quantize.py` in a pinned Python environment, checks every file against the list and uploads it.
+`get.luft.computer/models` mirrors the models, together with [handwriting's](handwriting.md). `.github/workflows/models.yml` runs `services/speech/mirror/mirror.sh` whenever either list changes: it downloads each file from the pinned upstream revision, quantizes the Parakeet encoder with `services/speech/mirror/quantize.py` in a pinned Python environment, checks every file against the list and uploads it.

@@ -1,0 +1,23 @@
+[package]
+name = "luft-handwriting"
+version = "0.1.0"
+description = "Handwriting recognition on this computer, shared by Kestrel, Settings and apps that keep handwritten notes"
+authors = ["Kristof"]
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[features]
+default = ["client"]
+client = ["dep:futures-util", "dep:luft-dbus", "dep:serde_json", "dep:zbus"]
+
+[dependencies]
+futures-util = { workspace = true, optional = true }
+luft-dbus = { workspace = true, optional = true }
+serde.workspace = true
+serde_json = { workspace = true, optional = true }
+specta.workspace = true
+zbus = { workspace = true, features = ["proxy", "tokio"], optional = true }
+
+[lints]
+workspace = true

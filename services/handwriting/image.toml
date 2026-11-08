@@ -1,0 +1,8 @@
+part = "services"
+
+[programs]
+"/usr/libexec/" = ["luft-handwriting"]
+
+[files]
+"/usr/share/dbus-1/services/" = ["data/com.lantharos.Handwriting1.service"]
+"/usr/lib/systemd/user/" = ["data/luft-handwriting.service"]

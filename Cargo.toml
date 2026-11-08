@@ -55,7 +55,9 @@ members = [
     "packages/system/accounts",
     "packages/system/disks",
     "packages/system/fingerprint",
+    "packages/system/handwriting",
     "packages/system/meet",
+    "packages/system/models",
     "packages/system/network",
     "packages/system/recovery-key",
     "packages/system/software",
@@ -67,6 +69,7 @@ members = [
     "security/crates/trust",
     "security/crates/usb",
     "services/accounts",
+    "services/handwriting",
     "services/packages",
     "services/sleep",
     "services/speech",
@@ -125,7 +128,9 @@ default-members = [
     "packages/system/accounts",
     "packages/system/disks",
     "packages/system/fingerprint",
+    "packages/system/handwriting",
     "packages/system/meet",
+    "packages/system/models",
     "packages/system/network",
     "packages/system/recovery-key",
     "packages/system/software",
@@ -137,6 +142,7 @@ default-members = [
     "security/crates/trust",
     "security/crates/usb",
     "services/accounts",
+    "services/handwriting",
     "services/packages",
     "services/sleep",
     "services/speech",
@@ -171,6 +177,8 @@ luft-network = { path = "packages/system/network" }
 luft-recovery-key = { path = "packages/system/recovery-key" }
 luft-sandbox = { path = "apps/system/schelf/sandbox" }
 luft-software = { path = "packages/system/software", default-features = false }
+luft-handwriting = { path = "packages/system/handwriting" }
+luft-models = { path = "packages/system/models" }
 luft-speech = { path = "packages/system/speech" }
 luft-trust = { path = "packages/system/trust" }
 luft-variant = { path = "packages/system/variant" }
@@ -251,6 +259,7 @@ libloading = "0.9.0"
 liblzma = "0.4.9"
 libm = "0.2.16"
 libpulse-binding = "2.30.1"
+llama-cpp-2 = { version = "0.1.161", default-features = false }
 lofty = "0.25.5"
 log = "0.4.34"
 lol_html = "3.0.1"

@@ -1,0 +1,13 @@
+<node>
+  <interface name="com.lantharos.Handwriting1.Models">
+    <method name="Overview">
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="Install">
+    </method>
+    <method name="Remove">
+    </method>
+    <signal name="Changed">
+    </signal>
+  </interface>
+</node>

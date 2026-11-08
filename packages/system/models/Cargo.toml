@@ -1,0 +1,18 @@
+[package]
+name = "luft-models"
+version = "0.1.0"
+description = "Downloaded models for Luft's services: their lists, their folders and resumable, checked downloads"
+authors = ["Kristof"]
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+ureq.workspace = true
+
+[lints]
+workspace = true

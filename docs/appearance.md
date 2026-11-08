@@ -57,7 +57,7 @@ Terminal colors are the usual sixteen, nudged up to 15° toward the accent, read
 
 ## Reading the palette
 
-`com.lantharos.Kestrel` exports `com.lantharos.Kestrel.Appearance` at `/com/lantharos/Kestrel/Appearance` on the session bus. Properties are read-only and emit `PropertiesChanged`. Colors are `#rrggbb`.
+`com.lantharos.Kestrel` exports `com.lantharos.Kestrel.Appearance` at `/com/lantharos/Kestrel/Appearance` on the session bus. Properties are read-only and emit `PropertiesChanged`. Colors are `#rrggbb`. Sandboxed apps may read this object and nothing else of Kestrel's: their bus proxy lets `Get`, `GetAll` and `PropertiesChanged` through for it.
 
 | Property | Type | Value |
 | --- | --- | --- |

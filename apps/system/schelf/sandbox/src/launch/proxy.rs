@@ -18,6 +18,12 @@ pub const TALK: [&str; 4] = [
     "org.kde.StatusNotifierWatcher",
 ];
 
+/// Kestrel's palette, the one part of Kestrel every app may read, so it
+/// looks like the desktop.
+const PALETTE: &str = "com.lantharos.Kestrel";
+const PALETTE_PATH: &str = "/com/lantharos/Kestrel/Appearance";
+const PALETTE_CALLS: [&str; 2] = ["Get", "GetAll"];
+
 /// The app's filtered view of the session bus. The proxy runs in a sandbox
 /// of its own that carries the app's sandbox info, so services that look at
 /// the process behind the connection see the app, as with Flatpak.
@@ -47,6 +53,12 @@ fn rules(id: &str, talk: &[String]) -> Vec<String> {
     ];
     rules.extend(TALK.iter().map(|name| format!("--talk={name}")));
     rules.extend(talk.iter().map(|name| format!("--talk={name}")));
+    rules.extend(PALETTE_CALLS.iter().map(|method| {
+        format!("--call={PALETTE}=org.freedesktop.DBus.Properties.{method}@{PALETTE_PATH}")
+    }));
+    rules.push(format!(
+        "--broadcast={PALETTE}=org.freedesktop.DBus.Properties.PropertiesChanged@{PALETTE_PATH}"
+    ));
     rules
 }
 

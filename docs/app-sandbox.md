@@ -26,7 +26,7 @@ talk = ["org.mpris.MediaPlayer2.notes"]
 | `network` | `true` | It can go online |
 | `filesystems` | none | `home`, `xdg-desktop`, `xdg-documents`, `xdg-download`, `xdg-music`, `xdg-pictures` or `xdg-videos`, read-only with `:ro`. Files you pick in a file dialog always reach it. An app given your home folder still keeps its own files in `~/.var/app/APP-ID` |
 | `devices` | none | `usb`, `serial` or `all`. The graphics card, sound and the camera through the portal need nothing |
-| `talk` | none | Session bus names it calls besides the portals, notifications, the Secret Service and the tray. Names that would let it widen its own sandbox, such as the permission store, Flatpak's and systemd's, are refused |
+| `talk` | none | Session bus names it calls besides the portals, notifications, the Secret Service, the tray and Kestrel's palette. Names that would let it widen its own sandbox, such as the permission store, Flatpak's and systemd's, are refused |
 
 An app that can't work in a sandbox at all says so, with a reason you'll read before allowing it:
 

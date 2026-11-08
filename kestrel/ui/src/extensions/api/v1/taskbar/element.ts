@@ -123,18 +123,25 @@ export class ElementWidget implements ElementActor {
     this.shown = state.shown;
     if (!animate) {
       this.actor.remove_all_transitions();
-      this.actor.set_size(width, height);
+      this.fitContent();
       this.actor.opacity = state.shown ? 255 : 0;
       this.actor.visible = state.shown;
       return;
     }
     animateActor(this.actor, {
       width, height, opacity: state.shown ? 255 : 0, ...GROW,
-      onStopped: () => {
+      onStopped: (finished: boolean) => {
         if (!this.shown) this.actor.hide();
+        else if (finished) this.fitContent();
       },
     });
     if (state.shown && !was) this.actor.set_size(this.layout.vertical ? across : 0, this.layout.vertical ? 0 : across);
+  }
+
+  private fitContent(): void {
+    const across = this.layout.thickness;
+    if (this.layout.vertical) this.actor.set_size(across, -1);
+    else this.actor.set_size(-1, across);
   }
 
   private crossfade(into: RenderedView, from: RenderedView, animate: boolean): void {

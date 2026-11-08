@@ -837,6 +837,8 @@ export interface ElementLayout {
   readonly thickness: number;
   /** The size of a taskbar button, in pixels, which pictures and controls should match. */
   readonly button: number;
+  /** The size of the taskbar's own symbolic icons, such as the network and volume, in pixels, which icons should match. */
+  readonly icon: number;
 }
 
 export interface TaskbarElementOptions {

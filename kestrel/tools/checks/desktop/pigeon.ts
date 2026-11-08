@@ -18,7 +18,8 @@ import {withScheme} from '../apps/lib/palette.js';
 import {show} from '../apps/settings/navigation.js';
 import {installBuilt, listed, request, setSetting} from '../extensions/lib/extensions.js';
 import {certificate, type FileOffer, PHONE, PHONE_PIN, Phone} from './pigeon/phone.js';
-import {checkRover, checkSpacing} from './pigeon/rover.js';
+import {checkRover} from './pigeon/rover.js';
+import {checkFirstLayout, checkIcon} from './pigeon/taskbar.js';
 
 const {require, eventually} = checks('Pigeon');
 const PIGEON = 'com.lantharos.Pigeon';
@@ -210,6 +211,8 @@ async function checkTrusted(phone: Phone) {
 }
 
 export async function run() {
+  const present = element();
+  if (present instanceof St.Widget) await checkFirstLayout(present);
   GLib.mkdir_with_parents(GLib.path_get_dirname(STORAGE()), 0o700);
   GLib.file_set_contents(STORAGE(), JSON.stringify({folder: INBOX()}));
   await installBuilt(PIGEON);
@@ -220,7 +223,7 @@ export async function run() {
       .recursiveUnpack<[{id: string; listen?: [number, string][]}[]]>();
     require(JSON.stringify(entries.find(extension => extension.id === PIGEON)?.listen) === '[[53317,"tcp"],[53317,"udp"]]',
       'its List entry names the ports it listens on');
-    await checkSpacing(await eventually(element, 'Pigeon sits in the taskbar'));
+    await checkIcon(await eventually(element, 'Pigeon sits in the taskbar'));
     await capture('pigeon-taskbar-dark');
     await withScheme('light', () => capture('pigeon-taskbar-light'));
     await squareCorners(() => capture('pigeon-taskbar-square'));

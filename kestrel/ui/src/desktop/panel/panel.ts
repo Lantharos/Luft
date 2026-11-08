@@ -23,6 +23,7 @@ import { band, isVertical, rightToLeft, type Edge } from '../../shared/layout/ed
 import { EDGE_MARGIN, NO_DEPTHS, type Anchor, type Depths } from '../../shared/layout/anchor.js';
 import { t } from '../../shared/i18n/index.js';
 import { TaskbarElements } from './elements/panelElements.js';
+import { TRAY_ICON_SIZE } from '../tray/icon.js';
 import { IslandSet, type Island } from './islands/islandSet.js';
 import { IslandShapes, type IslandShape, taskbarShapesChanged } from './islands/shapes.js';
 import { PanelTablet } from './tablet/panelTablet.js';
@@ -116,7 +117,7 @@ export class KestrelPanel {
       () => this.surface?.behind(this.islandSet.islandOf('start')?.actor ?? this.actor) ?? this.actor, floorAlong(this.actor, () => this.screen));
     this.launcher.button.visible = this.screen.startButton;
     this.elements = new TaskbarElements(this.launcher.button, this.taskbar, menus, actions, primary, edge => ({
-      vertical: isVertical(edge), thickness: this.screen.metrics.button, button: this.screen.metrics.button,
+      vertical: isVertical(edge), thickness: this.screen.metrics.button, button: this.screen.metrics.button, icon: TRAY_ICON_SIZE,
     }));
     this.islandSet = new IslandSet(this.actor, this.elements, islands => {
       this.surface?.sync();

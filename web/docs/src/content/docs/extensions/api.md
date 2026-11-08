@@ -125,7 +125,7 @@ The toggle has `update(changes)`.
 | --- | --- |
 | `key` | Names it among the extension's elements, lowercase with dashes. Where people put it is kept by this, so keep it across versions |
 | `label` | What screen readers call it, and its name where people arrange the taskbar |
-| `content(layout)` | The view it shows. `layout` has `vertical` (it runs along a side of the display), `thickness` (the room across it) and `button` (a taskbar button's size) |
+| `content(layout)` | The view it shows. `layout` has `vertical` (it runs along a side of the display), `thickness` (the room across it), `button` (a taskbar button's size) and `icon` (the size of the network, volume and other taskbar icons, which icons in it should match) |
 | `expanded(layout)` | What it grows to under the pointer, smoothly |
 | `shown` | Whether it shows; a hidden element takes no room, and comes and goes smoothly |
 | `onClick()`, `menu` | A click outside its controls, and a menu on a right click |

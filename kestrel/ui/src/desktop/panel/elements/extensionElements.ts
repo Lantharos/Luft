@@ -9,6 +9,8 @@ export interface ElementLayout {
   thickness: number;
   /** The size of a taskbar button in pixels. */
   button: number;
+  /** The size of the taskbar's own symbolic icons in pixels, such as the network and volume. */
+  icon: number;
 }
 
 /** One taskbar's actor for an element. Its natural size follows what it shows, animating as it grows, shrinks, shows and hides. */

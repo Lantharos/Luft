@@ -147,7 +147,7 @@ An extension's `taskbar.addElement` puts an element in `taskbarElements` (`kestr
 | Member | Is |
 | --- | --- |
 | `id`, `label` | What the arrangement is kept by, and the element's name where people arrange the taskbar |
-| `create(layout)` | Makes an actor for it on one display's taskbar. `layout` has `vertical`, `thickness` (the room across the island it sits in) and `button` (a taskbar button's size) |
+| `create(layout)` | Makes an actor for it on one display's taskbar. `layout` has `vertical`, `thickness` (the room across the island it sits in), `button` (a taskbar button's size) and `icon` (the size of the taskbar's own symbolic icons) |
 | `watch(changed)` | Its label changed |
 
 The actor's `relayout(layout)` follows its island to another edge or size, and `destroy()` takes it away. The actor sizes itself: its natural size along the taskbar animates as it grows under the pointer, shrinks, and shows or hides, so the islands just allocate natural sizes, and a hidden element takes no room. It has the padding of the taskbar's own buttons at each taskbar size, so an icon in an element sits as far from its neighbours as the tray and status icons do.

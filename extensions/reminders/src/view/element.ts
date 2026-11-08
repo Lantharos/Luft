@@ -11,7 +11,7 @@ export const ICON = 'icons/reminders-symbolic.svg';
 const WIDEST_TITLE = 220;
 const WEEK = 7;
 
-const icon = (layout: ElementLayout): View => ({ type: 'icon', icon: ICON, size: Math.round(layout.button * 0.5) });
+const icon = (layout: ElementLayout): View => ({ type: 'icon', icon: ICON, size: layout.icon });
 
 function nextUp(extension: Extension<Granted>, reminders: Reminders, now: number): Reminder | null {
   const { rules, all } = reminders;

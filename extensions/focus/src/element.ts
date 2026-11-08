@@ -5,7 +5,7 @@ import { countdown, minutesLeft, timeOfDay } from './time.js';
 
 export const ICON = 'icons/focus-symbolic.svg';
 
-const icon = (layout: ElementLayout): View => ({ type: 'icon', icon: ICON, size: Math.round(layout.button * 0.5) });
+const icon = (layout: ElementLayout): View => ({ type: 'icon', icon: ICON, size: layout.icon });
 
 /** The taskbar shows the icon on its own, and while a session runs the minutes left beside it. */
 export function compact({ t }: Extension<Granted>, session: FocusSession, layout: ElementLayout): View {

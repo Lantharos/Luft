@@ -1,4 +1,3 @@
-import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
@@ -224,7 +223,7 @@ class AppAuthorizer {
 }
 
 function askForLocation(name: string, reason: string | null, reqAccuracyLevel: number): Promise<number> {
-  const dialog = new ModalDialog({ styleClass: 'geolocation-dialog' });
+  const dialog = new ModalDialog({ styleClass: 'geolocation-dialog', prompt: true });
 
   const content = new MessageDialogContent({
     title: KestrelUi.t('location-dialog-title'),
@@ -243,7 +242,6 @@ function askForLocation(name: string, reason: string | null, reqAccuracyLevel: n
     const button = dialog.addButton({
       label: KestrelUi.t('location-dialog-deny'),
       action: () => respond(GeoclueAccuracyLevel.NONE),
-      key: Clutter.KEY_Escape,
     });
     dialog.addButton({
       label: KestrelUi.t('location-dialog-grant'),

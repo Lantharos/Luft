@@ -6,7 +6,7 @@ import Shell from 'gi://Shell';
 import St from 'gi://St';
 import {VpnSecrets} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
-import {descendants, labelled, shownStyled} from '../lib/actors.js';
+import {answerable, descendants, labelled, shownStyled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {click, press, type} from '../lib/input/input.js';
 import {fixture, firstLine, scratch, spawn} from '../lib/processes.js';
@@ -73,7 +73,7 @@ function fakeAgent(plugin: NM.VpnPluginInfo | null) {
 async function openedDialog(label: string) {
   await waitUntil(vpnDialog, label);
   await settled();
-  return vpnDialog()!;
+  return waitUntil(() => answerable('kestrel-vpn-dialog'), label);
 }
 
 async function typeInto(entry: St.Entry, text: string) {

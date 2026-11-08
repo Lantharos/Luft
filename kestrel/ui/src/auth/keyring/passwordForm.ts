@@ -69,7 +69,7 @@ export class PasswordForm {
     });
     this.confirmEntry.clutter_text.connect('activate', () => this.submit());
 
-    this.cancelButton = modal.addButton({ label: '', action: () => events.denied(), key: Clutter.KEY_Escape });
+    this.cancelButton = modal.addButton({ label: '', action: () => events.denied() });
     this.submitButton = modal.addButton({ label: '', action: () => this.submit(), default: true });
     modal.setInitialKeyFocus(this.entry);
   }

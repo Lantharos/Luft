@@ -79,7 +79,7 @@ class AuthenticationDialog extends ModalDialog {
   private sessionRequestTimeoutId = 0;
 
   constructor(private readonly actionId: string, description: string, private readonly cookie: string, userNames: string[]) {
-    super({ styleClass: 'prompt-dialog polkit-dialog' });
+    super({ styleClass: 'prompt-dialog polkit-dialog', prompt: true });
 
     Main.sessionMode.connectObject('updated', () => {
       this.visible = !Main.sessionMode.isLocked;
@@ -152,7 +152,6 @@ class AuthenticationDialog extends ModalDialog {
     this.cancelButton = this.addButton({
       label: KestrelUi.t('polkit-cancel'),
       action: () => this.cancel(),
-      key: Clutter.KEY_Escape,
     });
     this.okButton = this.addButton({
       label: KestrelUi.t('polkit-authenticate'),

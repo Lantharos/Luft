@@ -1,5 +1,6 @@
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
+import {ModalDialog} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 export function descendants(actor: Clutter.Actor): Clutter.Actor[] {
   return [actor, ...actor.get_children().flatMap(descendants)];
@@ -45,6 +46,14 @@ export function firstStyled(name: string, root: Clutter.Actor = global.stage): S
 
 export function shownStyled(name: string, root: Clutter.Actor = global.stage): St.Widget | null {
   return styled(name, root).find(actor => actor.mapped) ?? null;
+}
+
+/** A shown dialog with this style once it takes input, which system prompts don't for a moment after they show. */
+export function answerable(name: string): St.Widget | null {
+  const dialog = shownStyled(name);
+  for (let actor: Clutter.Actor | null = dialog; actor; actor = actor.get_parent())
+    if (actor instanceof ModalDialog) return actor.answerable ? dialog : null;
+  return null;
 }
 
 export function labelled(text: string, root: Clutter.Actor = global.stage): Clutter.Actor | null {

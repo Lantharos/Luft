@@ -28,7 +28,7 @@ export class PasskeyDialog {
 
   open(): boolean {
     const copy = copyFor(this.request);
-    const modal = new ModalDialog({ styleClass: 'kestrel-portal-dialog kestrel-passkey-dialog' });
+    const modal = new ModalDialog({ styleClass: 'kestrel-portal-dialog kestrel-passkey-dialog', prompt: true });
     this.modal = modal;
     modal.contentLayout.add_child(new MessageDialogContent({ title: copy.title, description: copy.description, icon_name: copy.icon }));
     const content = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-portal-content', x_expand: true });
@@ -89,7 +89,7 @@ export class PasskeyDialog {
     content.add_child(this.status);
 
     const modal = this.modal!;
-    modal.addButton({ label: t('passkeys-cancel'), action: () => this.cancel(), key: Clutter.KEY_Escape });
+    modal.addButton({ label: t('passkeys-cancel'), action: () => this.cancel() });
     this.continueButton = modal.addButton({ label: t('passkeys-continue'), action: () => this.submit(), default: true, reactive: false });
     this.continueButton.visible = false;
     if (!this.request.fingerprint) this.showPassword();
@@ -98,10 +98,10 @@ export class PasskeyDialog {
   private addConfirmation(): void {
     const modal = this.modal!;
     if (this.request.purpose === 'registered') {
-      modal.addButton({ label: t('passkeys-ok'), action: () => this.confirm(), default: true, key: Clutter.KEY_Escape });
+      modal.addButton({ label: t('passkeys-ok'), action: () => this.confirm(), default: true });
       return;
     }
-    modal.addButton({ label: t('passkeys-cancel'), action: () => this.cancel(), key: Clutter.KEY_Escape });
+    modal.addButton({ label: t('passkeys-cancel'), action: () => this.cancel() });
     modal.addButton({ label: t('passkeys-use-this-computer'), action: () => this.confirm(), default: true });
   }
 

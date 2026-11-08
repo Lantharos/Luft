@@ -1,4 +1,3 @@
-import Clutter from 'gi://Clutter';
 import GObject from 'gi://GObject';
 import NM from 'gi://NM';
 import Pango from 'gi://Pango';
@@ -30,7 +29,7 @@ export class NetworkSecretDialog extends ModalDialog {
 
   constructor(private readonly agent: Shell.NetworkAgent, private readonly requestId: string, connection: NM.Connection,
     settingName: string, hints: string[], flags: NM.SecretAgentGetSecretsFlags) {
-    super({ styleClass: 'prompt-dialog' });
+    super({ styleClass: 'prompt-dialog', prompt: true });
 
     const rejected = !!(flags & NM.SecretAgentGetSecretsFlags.REQUEST_NEW);
     const content = secretContent(connection, settingName, hints, rejected);
@@ -96,7 +95,6 @@ export class NetworkSecretDialog extends ModalDialog {
     this.setButtons([{
       label: KestrelUi.t('network-agent-cancel'),
       action: () => this.cancel(),
-      key: Clutter.KEY_Escape,
     }, this.okButton]);
 
     this.updateOkButton();

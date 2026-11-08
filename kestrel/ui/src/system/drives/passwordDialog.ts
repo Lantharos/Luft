@@ -75,7 +75,7 @@ export class MountPasswordDialog extends ModalDialog {
   private readonly usesKeyfilesButtons: ButtonInfo[];
 
   constructor(message: string, flags: Gio.AskPasswordFlags) {
-    super({ styleClass: 'prompt-dialog' });
+    super({ styleClass: 'prompt-dialog', prompt: true });
 
     const [title, description] = message.split('\n');
     const disksApp = Shell.AppSystem.get_default().lookup_app('com.lantharos.disks.desktop');
@@ -144,7 +144,6 @@ export class MountPasswordDialog extends ModalDialog {
     const cancel: ButtonInfo = {
       label: KestrelUi.t('mount-cancel'),
       action: () => this.onCancelButton(),
-      key: Clutter.KEY_Escape,
     };
 
     this.defaultButtons = [cancel, {

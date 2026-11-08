@@ -5,7 +5,7 @@ import type Shell from 'gi://Shell';
 import St from 'gi://St';
 import {Main, NetworkAgent, NMWirelessNetworkItem, NMWirelessToggle, toggleSurface} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
-import {descendants, named, ofType, shown, showsText, styled} from '../lib/actors.js';
+import {answerable, descendants, labelled, named, ofType, shown, shownStyled, showsText, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {call} from '../lib/dbus.js';
 import {click, press, type} from '../lib/input/input.js';
@@ -36,7 +36,7 @@ const passwordEntry = () => descendants(global.stage).filter((actor): actor is S
 const networkItem = (name: string) => descendants(quick()).filter((actor): actor is NMWirelessNetworkItem => actor instanceof NMWirelessNetworkItem)
   .find(item => item.network.name === name);
 const wifiToggle = () => descendants(quick()).find((actor): actor is NMWirelessToggle => actor instanceof NMWirelessToggle);
-const asking = () => passwordEntry() && Main.modalCount > 0;
+const asking = () => answerable('prompt-dialog') && passwordEntry();
 
 async function keyringRuns() {
   const reply = await call('org.freedesktop.DBus', '/org/freedesktop/DBus', 'org.freedesktop.DBus', 'NameHasOwner',
@@ -89,9 +89,9 @@ async function openNetworks(toggle: NMWirelessToggle) {
 }
 
 async function cancel(request: SecretRequest) {
-  press(Clutter.KEY_Escape);
-  require((await request.answer).failed, 'Escape cancels the request');
-  await eventually(() => Main.modalCount === 0, 'the dialog closes');
+  click(require(labelled('Cancel', shownStyled('prompt-dialog')!), 'the dialog offers to cancel'));
+  require((await request.answer).failed, 'Cancel cancels the request');
+  await eventually(() => Main.modalCount === 0 && !shownStyled('prompt-dialog'), 'the dialog closes');
 }
 
 async function checkNeverEntered(agent: Shell.NetworkAgent, toggle: NMWirelessToggle) {

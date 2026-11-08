@@ -1,6 +1,7 @@
 import { freezeSelection } from '../../appearance/kestrelGlass.js';
 import Atk from 'gi://Atk';
 import Clutter from 'gi://Clutter';
+import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
@@ -16,6 +17,11 @@ const OPEN_AND_CLOSE_TIME = 100;
 const OPEN_RISE_TIME = 220;
 const OPEN_RISE_DISTANCE = 16;
 const FADE_OUT_DIALOG_TIME = 1000;
+const PROMPT_SETTLE_TIME = 750;
+const POINTER_EVENTS = new Set([
+  Clutter.EventType.BUTTON_PRESS, Clutter.EventType.BUTTON_RELEASE,
+  Clutter.EventType.TOUCH_BEGIN, Clutter.EventType.TOUCH_UPDATE, Clutter.EventType.TOUCH_END,
+]);
 
 export const State = {
   OPENED: 0,
@@ -33,6 +39,11 @@ export interface ModalDialogOptions {
   shouldFadeIn?: boolean;
   shouldFadeOut?: boolean;
   destroyOnClose?: boolean;
+  /**
+   * A system prompt, such as a password request or a question about access: it ignores keys, clicks and taps for a
+   * moment after it shows, so input meant for something else can't answer it.
+   */
+  prompt?: boolean;
 }
 
 export namespace ModalDialog {
@@ -73,6 +84,9 @@ export const ModalDialog = GObject.registerClass({
   declare private savedKeyFocus: Clutter.Actor | null;
   declare private modalGrab: Clutter.Grab | null | undefined;
   declare private clearClosingSelection: (() => void) | null | undefined;
+  declare private prompt: boolean;
+  declare private settling: number;
+  declare private earlyKeys: Set<number>;
 
   _init({
     shellReactive = false,
@@ -81,6 +95,7 @@ export const ModalDialog = GObject.registerClass({
     shouldFadeIn = true,
     shouldFadeOut = true,
     destroyOnClose = true,
+    prompt = false,
   }: ModalDialogOptions = {}): void {
     super._init({
       visible: false,
@@ -133,10 +148,49 @@ export const ModalDialog = GObject.registerClass({
     global.focus_manager.add_group(this.dialogLayout);
     this.initialKeyFocus = null;
     this.savedKeyFocus = null;
+
+    this.prompt = prompt;
+    this.settling = 0;
+    this.earlyKeys = new Set();
+    if (prompt) {
+      this.connect('captured-event', (_actor, event: Clutter.Event) => this.holdEarlyInput(event));
+      this.connect('destroy', () => this.stopSettling());
+    }
+  }
+
+  private holdEarlyInput(event: Clutter.Event): boolean {
+    const type = event.type();
+    if (type === Clutter.EventType.KEY_PRESS) {
+      const code = event.get_key_code();
+      if (!this.settling && !this.earlyKeys.has(code)) return Clutter.EVENT_PROPAGATE;
+      this.earlyKeys.add(code);
+      return Clutter.EVENT_STOP;
+    }
+    if (type === Clutter.EventType.KEY_RELEASE)
+      return this.earlyKeys.delete(event.get_key_code()) ? Clutter.EVENT_STOP : Clutter.EVENT_PROPAGATE;
+    return this.settling && POINTER_EVENTS.has(type) ? Clutter.EVENT_STOP : Clutter.EVENT_PROPAGATE;
+  }
+
+  private startSettling(): void {
+    this.stopSettling();
+    this.settling = GLib.timeout_add(GLib.PRIORITY_DEFAULT, PROMPT_SETTLE_TIME, () => {
+      this.settling = 0;
+      return GLib.SOURCE_REMOVE;
+    });
+  }
+
+  private stopSettling(): void {
+    if (this.settling) GLib.source_remove(this.settling);
+    this.settling = 0;
   }
 
   get state(): State {
     return this.currentState;
+  }
+
+  /** Whether keys, clicks and taps reach it, which they don't for a moment after a prompt shows. */
+  get answerable(): boolean {
+    return !this.settling;
   }
 
   private setState(state: State): void {
@@ -199,6 +253,7 @@ export const ModalDialog = GObject.registerClass({
 
     if (!this.pushModal()) return false;
 
+    if (this.prompt) this.startSettling();
     this.fadeOpen();
     return true;
   }

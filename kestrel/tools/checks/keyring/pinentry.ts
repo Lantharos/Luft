@@ -136,9 +136,9 @@ async function checkConfirm(gnupg: GnuPG) {
   require(labelled('Forget the saved passphrase?', dialog) && labelled('OK', dialog) && labelled('Cancel', dialog),
     'confirmations ask in Kestrel');
   await capture('pinentry-confirm');
-  press(Clutter.KEY_Escape);
+  click(require(labelled('Cancel', dialog), 'confirmations offer to cancel'));
   const {output} = await asked;
-  require(output.includes('ERR') && output.toLowerCase().includes('cancel'), 'Escape answers a confirmation with Cancel');
+  require(output.includes('ERR') && output.toLowerCase().includes('cancel'), 'Cancel answers a confirmation with Cancel');
   await promptClosed();
 }
 

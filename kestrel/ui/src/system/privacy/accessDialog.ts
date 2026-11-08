@@ -1,4 +1,3 @@
-import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
@@ -56,7 +55,7 @@ class AccessDialog extends ModalDialog {
 
   constructor(private readonly invocation: Gio.DBusMethodInvocation, private readonly handle: string,
     title: string, description: string, body: string, options: Record<string, GLib.Variant>) {
-    super({ styleClass: 'access-dialog' });
+    super({ styleClass: 'access-dialog', prompt: true });
 
     const unpacked = Object.fromEntries(Object.entries(options).map(([key, value]) => [key, value.deepUnpack()])) as AccessOptions;
     this.buildLayout(title, description, body, unpacked);
@@ -95,7 +94,6 @@ class AccessDialog extends ModalDialog {
     this.addButton({
       label: options.deny_label || KestrelUi.t('access-dialog-deny'),
       action: () => this.sendResponse(DialogResponse.CANCEL),
-      key: Clutter.KEY_Escape,
     });
     this.addButton({
       label: options.grant_label || KestrelUi.t('access-dialog-allow'),

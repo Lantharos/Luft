@@ -47,7 +47,7 @@ export class KeyringDialog {
   }
 
   static open(prompt: Prompt, events: DialogEvents, measure?: Measure): KeyringDialog | null {
-    const modal = new ModalDialog({ styleClass: 'prompt-dialog kestrel-keyring-dialog' });
+    const modal = new ModalDialog({ styleClass: 'prompt-dialog kestrel-keyring-dialog', prompt: true });
     const dialog = new KeyringDialog(modal, prompt, events, measure);
     if (modal.open()) return dialog;
     modal.destroy();
@@ -85,9 +85,9 @@ export class KeyringDialog {
     if (request.alternative)
       this.modal.addButton({ label: request.alternative, action: () => this.events.alternative() });
     if (!request.single)
-      this.modal.addButton({ label: request.deny, action: () => this.events.denied(), key: Clutter.KEY_Escape });
+      this.modal.addButton({ label: request.deny, action: () => this.events.denied() });
     if (!request.fingerprint)
-      this.modal.addButton({ label: request.allow, action: () => this.events.allowed(this.remembered), default: true, key: request.single ? Clutter.KEY_Escape : undefined });
+      this.modal.addButton({ label: request.allow, action: () => this.events.allowed(this.remembered), default: true });
   }
 
   private addRemember(label: string, checked: boolean): CheckBox {

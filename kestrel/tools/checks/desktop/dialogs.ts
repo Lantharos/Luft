@@ -5,12 +5,12 @@ import Shell from 'gi://Shell';
 import St from 'gi://St';
 import {contextMenuOf, toggleSurface, Main, loadStagedImage} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
-import {descendants, existing, shown} from '../lib/actors.js';
+import {answerable, descendants, existing, labelled, shown, shownStyled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {call} from '../lib/dbus.js';
-import {press, rightClick} from '../lib/input/input.js';
+import {click, press, rightClick} from '../lib/input/input.js';
 import {capture} from '../lib/screenshots.js';
-import {nextFrame, waitUntil} from '../lib/wait.js';
+import {nextFrame, settled, waitUntil} from '../lib/wait.js';
 
 const {require, eventually} = checks('dialog');
 const MOUNT = ['org.gtk.MountOperationHandler', '/org/gtk/MountOperationHandler', 'org.Gtk.MountOperationHandler'] as const;
@@ -52,6 +52,7 @@ async function checkVolumePassword() {
   const entry = await waitUntil(() => descendants(global.stage).find((actor): actor is St.PasswordEntry => actor instanceof St.PasswordEntry && actor.mapped),
     'the encrypted volume password dialog opens');
   require(Main.modalCount > 0, 'the encrypted volume password dialog is modal');
+  await waitUntil(() => answerable('prompt-dialog'), 'the encrypted volume password dialog takes input');
   await capture('volume-password-dialog');
   const [x, y] = entry.get_transformed_position();
   rightClick([x + 40, y + entry.height / 2]);
@@ -59,7 +60,8 @@ async function checkVolumePassword() {
   await capture('password-menu');
   press(Clutter.KEY_Escape);
   await eventually(() => !contextMenuOf(entry)?.isOpen, 'Escape closes the password field menu');
-  press(Clutter.KEY_Escape);
+  await settled();
+  click(require(labelled('Cancel', require(shownStyled('prompt-dialog'), 'the password dialog stays open')), 'the password dialog offers to cancel'));
   await request;
   await call(...MOUNT, 'Close');
   await eventually(() => Main.modalCount === 0, 'the password dialog cancels cleanly');

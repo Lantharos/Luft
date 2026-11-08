@@ -3,7 +3,7 @@ import GioUnix from 'gi://GioUnix';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
 
-import {shownStyled} from '../../lib/actors.js';
+import {answerable, shownStyled} from '../../lib/actors.js';
 import {ownName, privateConnection} from '../../lib/dbus.js';
 import {spawn, type Process} from '../../lib/processes.js';
 import {settled, waitUntil, within} from '../../lib/wait.js';
@@ -29,7 +29,7 @@ export const keyringDialog = () => shownStyled('kestrel-keyring-dialog');
 export async function openedDialog(label: string) {
   await waitUntil(keyringDialog, label);
   await settled();
-  return waitUntil(keyringDialog, label);
+  return waitUntil(() => answerable('kestrel-keyring-dialog'), label);
 }
 
 export async function focusedEntry(dialog: St.Widget) {

@@ -24,7 +24,8 @@ export interface PortalDialog {
 
 export function openDialog(dismissal: Dismissal | null, spec: DialogSpec, build: (dialog: PortalDialog) => void): Promise<Outcome> {
   return new Promise(resolve => {
-    const modal = new ModalDialog({ styleClass: `kestrel-portal-dialog ${spec.styleClass ?? ''}` });
+    const prompt = spec.askedBy !== undefined;
+    const modal = new ModalDialog({ styleClass: `kestrel-portal-dialog ${spec.styleClass ?? ''}`, prompt });
     const content = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-portal-content', x_expand: true });
     modal.contentLayout.add_child(new MessageDialogContent({ title: spec.title, icon_name: spec.icon, ...spec.description && { description: spec.description } }));
     modal.contentLayout.add_child(content);
@@ -42,7 +43,7 @@ export function openDialog(dismissal: Dismissal | null, spec: DialogSpec, build:
       cancel: () => finish(CANCELLED),
       buttons: buttons => {
         modal.clearButtons();
-        return buttons.map((button, index) => modal.addButton({ key: index === 0 && !button.default ? Clutter.KEY_Escape : undefined, ...button }));
+        return buttons.map((button, index) => modal.addButton({ key: index === 0 && !button.default && !prompt ? Clutter.KEY_Escape : undefined, ...button }));
       },
     });
     modal.connect('closed', () => {

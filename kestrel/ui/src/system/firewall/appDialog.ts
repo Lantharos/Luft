@@ -21,7 +21,7 @@ export const listenerKey = ({ kind, id }: Listener) => `${kind} ${id}`;
 export function openAppDialog(listener: Listener, answer: (allowed: boolean) => void): ModalDialog | null {
   const app = listener.kind === 'app' ? Shell.AppSystem.get_default().lookup_app(`${listener.id}.desktop`) : null;
   const name = app?.get_name() ?? listener.id;
-  const modal = new ModalDialog({ styleClass: 'access-dialog kestrel-firewall-dialog' });
+  const modal = new ModalDialog({ styleClass: 'access-dialog kestrel-firewall-dialog', prompt: true });
   const content = new MessageDialogContent({
     title: t('firewall-app-title', { app: name }),
     description: t('firewall-app-body', { app: name }),
@@ -33,7 +33,7 @@ export function openAppDialog(listener: Listener, answer: (allowed: boolean) => 
     answer(allowed);
     modal.close();
   };
-  modal.addButton({ label: t('firewall-app-deny'), action: () => respond(false), key: Clutter.KEY_Escape, default: true });
+  modal.addButton({ label: t('firewall-app-deny'), action: () => respond(false), default: true });
   modal.addButton({ label: t('firewall-app-allow'), action: () => respond(true) });
   if (modal.open()) return modal;
   modal.destroy();

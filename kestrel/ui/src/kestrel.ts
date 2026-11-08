@@ -6,6 +6,7 @@ export * as KeyboardManager from './system/inputSources/keyboardManager.js';
 export * as Main from './core/main.js';
 export * as MessageTray from './surfaces/notifications/tray/messageTray.js';
 export { LockBackdrop } from './auth/lockScreen/backdrop.js';
+export { ModalDialog } from './shared/dialogs/modalDialog.js';
 export { captureScreenshot } from './system/screenshot/capture.js';
 export { contextMenuOf } from './shared/widgets/shellEntry.js';
 export { gestureEvent } from './desktop/gestures/gestureEvent.js';

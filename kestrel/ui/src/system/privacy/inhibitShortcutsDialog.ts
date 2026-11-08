@@ -1,4 +1,3 @@
-import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GObject from 'gi://GObject';
 import Meta from 'gi://Meta';
@@ -31,7 +30,7 @@ export const InhibitShortcutsDialog = GObject.registerClass({
 }, class InhibitShortcutsDialog extends GObject.Object {
   declare emit: GObject.SignalMethods<this, InhibitShortcutsDialog.Signals>['emit'];
 
-  private readonly dialog = new ModalDialog();
+  private readonly dialog = new ModalDialog({ prompt: true });
 
   constructor(private currentWindow: Meta.Window) {
     super();
@@ -102,7 +101,6 @@ export const InhibitShortcutsDialog = GObject.registerClass({
         void this.saveToPermissionStore(DENIED);
         this.emitResponse(DialogResponse.DENY);
       },
-      key: Clutter.KEY_Escape,
     });
 
     this.dialog.addButton({

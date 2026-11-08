@@ -1,7 +1,7 @@
 import GLib from 'gi://GLib';
 import GdkPixbuf from 'gi://GdkPixbuf';
 
-import {shownStyled} from '../../lib/actors.js';
+import {answerable} from '../../lib/actors.js';
 import {inAppScope} from '../../lib/access/sandbox.js';
 import {builtFixture, outcome, repository} from '../../lib/processes.js';
 
@@ -17,7 +17,7 @@ export interface PeekWindow {
 }
 
 export const HANDLE = /^[a-z][a-z0-9]{9}$/;
-export const peekDialog = () => shownStyled('kestrel-peek-dialog');
+export const peekDialog = () => answerable('kestrel-peek-dialog');
 
 export function peek(...args: string[]) {
   return outcome([PEEK, ...args]);

@@ -87,7 +87,7 @@ export class VpnDialog {
   }
 
   static open(title: string, events: VpnDialogEvents): VpnDialog {
-    return new VpnDialog(new ModalDialog({ styleClass: 'prompt-dialog kestrel-vpn-dialog' }), title, events);
+    return new VpnDialog(new ModalDialog({ styleClass: 'prompt-dialog kestrel-vpn-dialog', prompt: true }), title, events);
   }
 
   show(step: Step): boolean {
@@ -102,7 +102,7 @@ export class VpnDialog {
     this.form.visible = this.controls.size > 0 || !!step.warning;
     this.setEditable(true);
     this.modal.clearButtons();
-    this.modal.addButton({ label: t('system-cancel'), action: () => this.cancel(), key: Clutter.KEY_Escape });
+    this.modal.addButton({ label: t('system-cancel'), action: () => this.cancel() });
     this.submitButton = this.modal.addButton({ label: step.action ?? t('vpn-connect'), action: () => this.submit(), default: true });
     this.sync();
     if (!this.modal.open()) return false;
@@ -117,7 +117,7 @@ export class VpnDialog {
     this.content.description = message;
     this.setEditable(false);
     this.modal.clearButtons();
-    this.modal.addButton({ label: t('system-cancel'), action: () => this.cancel(), key: Clutter.KEY_Escape });
+    this.modal.addButton({ label: t('system-cancel'), action: () => this.cancel() });
     this.submitButton = null;
   }
 

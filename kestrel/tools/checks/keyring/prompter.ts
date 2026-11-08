@@ -35,10 +35,12 @@ async function checkAccess(client: KeyringClient) {
   require(response === 0 && results.remember === true, 'Allow answers with the remembered choice');
   await eventually(() => !keyringDialog(), 'an answered prompt closes');
 
-  const escaped = client.access(handle(), GITHUB);
-  await openedDialog('a second access prompt opens');
+  const denied = client.access(handle(), GITHUB);
+  const second = await openedDialog('a second access prompt opens');
   press(Clutter.KEY_Escape);
-  require((await escaped)[0] === 1, 'Escape denies access');
+  require(keyringDialog(), 'Escape leaves an access prompt open');
+  click(require(labelled('Don’t Allow', second), 'access prompts offer to deny'));
+  require((await denied)[0] === 1, 'Don’t Allow denies access');
   await eventually(() => !keyringDialog(), 'a denied prompt closes');
 
   const id = handle();

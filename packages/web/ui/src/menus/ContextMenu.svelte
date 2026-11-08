@@ -13,6 +13,18 @@
 	let { at, onclose, children }: Props = $props();
 
 	let placement = $state<PointPlacement | null>(null);
+	let element = $state<HTMLElement>();
+
+	function closeOutside(event: PointerEvent) {
+		if (!element?.contains(event.target as Node)) onclose();
+	}
+
+	function closeOnEscape(event: KeyboardEvent) {
+		if (event.key !== 'Escape') return;
+		event.preventDefault();
+		event.stopImmediatePropagation();
+		onclose();
+	}
 
 	function place(menu: HTMLElement) {
 		placement = atPoint(at, { width: menu.offsetWidth, height: menu.offsetHeight });
@@ -21,9 +33,10 @@
 	const stop = (event: Event) => event.stopPropagation();
 </script>
 
-<svelte:window onresize={onclose} />
+<svelte:window onblur={onclose} onresize={onclose} onpointerdowncapture={closeOutside} onkeydowncapture={closeOnEscape} />
 
 <div
+	bind:this={element}
 	{@attach topLayer}
 	{@attach place}
 	class="menu soft-scroll"
@@ -33,7 +46,7 @@
 	style:transform-origin={placement?.origin ?? 'top left'}
 	role="menu"
 	tabindex="-1"
-	onkeydown={(event) => event.key === 'Escape' && onclose()}
+	onkeydown={closeOnEscape}
 	onclick={stop}
 	onpointerdown={stop}
 	oncontextmenu={stop}

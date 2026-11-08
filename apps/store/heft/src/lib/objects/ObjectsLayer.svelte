@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import { fileUrl } from '@lantharos/sabine';
 	import type { PageDocument } from '#lib/page/document.js';
 	import type { PageObject } from '#lib/page/objects.js';
 	import { tools } from '#lib/tools/tools.svelte.js';
+	import CropDialog from './CropDialog.svelte';
 	import { editing } from './editing.svelte';
+	import Picture from './Picture.svelte';
 	import TextBox from './TextBox.svelte';
 
 	let { document, zoom, dark, assets }: { document: PageDocument; zoom: number; dark: boolean; assets: string } = $props();
@@ -15,6 +16,16 @@
 	$effect(() => document.listen((_, change) => change.objects && (objects = document.objects)));
 
 	let arranging = $derived(tools.active === 'lasso');
+	let cropping: PageObject | null = $state(null);
+
+	$effect(() => {
+		const id = editing.crop;
+		if (!id) return;
+		const found = objects.find((object) => object.id === id);
+		if (!found) return;
+		cropping = found;
+		editing.crop = null;
+	});
 
 	function change(before: PageObject, after: PageObject | null) {
 		document.commit({ removed: [], added: [], objects: [{ before, after }] });
@@ -51,26 +62,14 @@
 		{#if object.kind === 'text'}
 			<TextBox {object} {zoom} editable={tools.active === 'type'} focus={editing.focus === object.id} onchange={(next) => change(object, next)} />
 		{:else}
-			<div
-				class="picture"
-				class:arranging
-				role="img"
-				style:left="{object.x * zoom}px"
-				style:top="{object.y * zoom}px"
-				style:width="{object.width * zoom}px"
-				style:height="{object.height * zoom}px"
-				onpointerdown={(event) => grab(event, object, false)}
-				onpointermove={drag}
-				onpointerup={drop}
-			>
-				<img src={fileUrl(`${assets}/${object.asset}`)} alt="" draggable="false" />
-				{#if arranging}
-					<span class="corner" role="presentation" onpointerdown={(event) => grab(event, object, true)}></span>
-				{/if}
-			</div>
+			<Picture {object} {zoom} {assets} {arranging} ongrab={(event, resize) => grab(event, object, resize)} onmove={drag} ondrop={drop} oncrop={() => (cropping = object)} />
 		{/if}
 	{/each}
 </div>
+
+{#if cropping}
+	<CropDialog object={cropping} src="{assets}/{cropping.asset}" onclose={() => (cropping = null)} onchange={(next) => change(cropping!, next)} />
+{/if}
 
 <style>
 	.objects {
@@ -81,34 +80,5 @@
 
 	.dark :global(.text-box) {
 		color: #ececea;
-	}
-
-	.picture {
-		position: absolute;
-	}
-
-	.picture img {
-		height: 100%;
-		width: 100%;
-		object-fit: contain;
-	}
-
-	.picture.arranging {
-		pointer-events: auto;
-		cursor: move;
-		outline: 1.5px dashed #3d7bd9;
-		touch-action: none;
-	}
-
-	.corner {
-		position: absolute;
-		right: -9px;
-		bottom: -9px;
-		height: 18px;
-		width: 18px;
-		border-radius: var(--radius-pill);
-		background: white;
-		box-shadow: 0 0 0 1.5px #3d7bd9;
-		cursor: nwse-resize;
 	}
 </style>

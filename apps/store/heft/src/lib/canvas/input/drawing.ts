@@ -7,6 +7,7 @@ import type { PageDocument } from '#lib/page/document.js';
 import { inkColor, type Ink } from '../ink-paint';
 import type { PageRect } from '../layout';
 import type { LiveInk } from '../live';
+import type { Guide } from '../ruler/ruler.svelte';
 import type { Viewport } from '../viewport.svelte';
 
 export interface Target {
@@ -48,6 +49,7 @@ export class Drawing {
 		pen: Pen,
 		feel: Feel,
 		private readonly predicting: boolean,
+		private readonly guide: Guide | null,
 		first: PointerEvent
 	) {
 		this.builder = new StrokeBuilder(pen, feel, first.timeStamp);
@@ -61,11 +63,18 @@ export class Drawing {
 		if (this.shape) return;
 		const from = this.builder.count;
 		for (const sample of samples) {
-			const [x, y] = pagePoint(this.viewport, this.origin, this.target.page, sample);
+			const [x, y] = this.point(sample);
 			this.builder.add(x, y, pressureOf(sample), sample.timeStamp);
-			this.holdAt(x, y);
+			if (!this.guide) this.holdAt(x, y);
 		}
 		if (this.builder.count > from) this.live.draw(this.builder.points.subarray(0, this.builder.length), from);
+	}
+
+	private point(sample: Sample): [number, number] {
+		if (!this.guide) return pagePoint(this.viewport, this.origin, this.target.page, sample);
+		const [x, y] = this.guide(sample.clientX - this.origin.left, sample.clientY - this.origin.top);
+		const [contentX, contentY] = this.viewport.toContent(x, y);
+		return [contentX - this.target.page.left, contentY - this.target.page.top];
 	}
 
 	/** Holding the pen still at the end of a stroke turns it into the shape it looks like. */
@@ -90,7 +99,7 @@ export class Drawing {
 
 	predict(predicted: Sample[]) {
 		if (!this.predicting || !this.builder.count) return;
-		const ahead = predicted.map((sample): [number, number, number] => [...pagePoint(this.viewport, this.origin, this.target.page, sample), pressureOf(sample)]);
+		const ahead = predicted.map((sample): [number, number, number] => [...this.point(sample), pressureOf(sample)]);
 		this.live.predict(this.builder.prediction(ahead));
 	}
 

@@ -46,7 +46,7 @@ export function exportPng(notebook: OpenNotebook, page: PageEntry, name: string)
 		const context = canvas.getContext('2d')!;
 		context.setTransform(PNG_SCALE, 0, 0, PNG_SCALE, 0, 0);
 		for (const object of ink.objects) {
-			const drawn = object.kind === 'text' ? await textCanvas(object, LOOKS[paper.color].dark) : await pictureCanvas(`${library.root}/${notebook.folder}/assets/${object.asset}`);
+			const drawn = object.kind === 'text' ? await textCanvas(object, LOOKS[paper.color].dark) : await pictureCanvas(`${library.root}/${notebook.folder}/assets/${object.asset}`, object.crop);
 			context.drawImage(drawn, object.x, object.y, object.width, object.kind === 'text' ? drawn.height / 2 : object.height);
 		}
 		const blob = await new Promise<Blob>((resolve) => canvas.toBlob((made) => resolve(made!), 'image/png'));

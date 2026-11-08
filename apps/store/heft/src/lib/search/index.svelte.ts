@@ -1,14 +1,19 @@
 import { readJson, writeJson } from '#lib/bridge/files.js';
+import { recognized, type InkLine } from '#lib/handwriting/store.js';
 import { library, type NotebookEntry } from '#lib/library/library.svelte.js';
 import { pdfDocument } from '#lib/pdf/document.js';
 import { sourcePath } from '#lib/pdf/sources.js';
 import type { TextItem } from 'pdfjs-dist/types/src/display/api';
 
-/**
- * Where a page's words came from. Handwriting recognition will add `ink`
- * entries in the same shape, from text recognized on the device.
- */
+/** Where a page's words came from: typed, printed in a book, or read from handwriting on this computer. */
 export type TextKind = 'typed' | 'book' | 'ink';
+
+export interface Box {
+	left: number;
+	top: number;
+	width: number;
+	height: number;
+}
 
 export interface Hit {
 	notebook: NotebookEntry;
@@ -17,6 +22,10 @@ export interface Hit {
 	kind: TextKind;
 	snippet: string;
 	at: number;
+	/** Where the hit starts in all the page's text of its kind. */
+	offset: number;
+	/** For handwriting, the line it was read from. */
+	box?: Box;
 }
 
 interface PageText {
@@ -24,6 +33,7 @@ interface PageText {
 	kind: TextKind;
 	text: string;
 	folded: string;
+	box?: Box;
 }
 
 const INDEX_FILE = 'search.json';
@@ -31,7 +41,10 @@ const SNIPPET = 26;
 const LIMIT = 60;
 
 /** Lower case without accents, so "jednacine" finds "jednačine". */
-const fold = (text: string) => text.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+export const fold = (text: string) => text.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+
+const inkEntries = (page: string, lines: InkLine[]): PageText[] =>
+	lines.filter((line) => line.text).map((line) => ({ page, kind: 'ink', text: line.text, folded: fold(line.text), box: line.box }));
 
 /** Every notebook's words, kept in memory so search answers as you type. */
 class SearchIndex {
@@ -51,6 +64,7 @@ class SearchIndex {
 				if (page.pdf?.source === source && book[page.pdf.index]) entries.push({ page: page.id, kind: 'book', text: book[page.pdf.index], folded: fold(book[page.pdf.index]) });
 			}
 		}
+		for (const [page, lines] of Object.entries(await recognized(notebook))) entries.push(...inkEntries(page, lines));
 		this.pages.set(notebook.meta.id, entries);
 		this.revision++;
 	}
@@ -99,6 +113,13 @@ class SearchIndex {
 		return writeJson(`${notebook.folder}/${INDEX_FILE}`, typed);
 	}
 
+	/** Records the handwriting read on a page, replacing what was read there before. */
+	setInk(notebook: NotebookEntry, page: string, lines: InkLine[]) {
+		const entries = (this.pages.get(notebook.meta.id) ?? []).filter((entry) => !(entry.page === page && entry.kind === 'ink'));
+		this.pages.set(notebook.meta.id, [...entries, ...inkEntries(page, lines)]);
+		this.revision++;
+	}
+
 	refresh(notebook: NotebookEntry) {
 		return this.loadNotebook(notebook);
 	}
@@ -116,7 +137,7 @@ class SearchIndex {
 				if (index < 0) continue;
 				const start = Math.max(0, at - SNIPPET);
 				const snippet = (start ? '…' : '') + entry.text.slice(start, at + needle.length + SNIPPET).trim() + (at + needle.length + SNIPPET < entry.text.length ? '…' : '');
-				hits.push({ notebook, page: entry.page, index, kind: entry.kind, snippet, at: at - start + (start ? 1 : 0) });
+				hits.push({ notebook, page: entry.page, index, kind: entry.kind, snippet, at: at - start + (start ? 1 : 0), offset: at, box: entry.box });
 				if (hits.length >= LIMIT) return hits;
 			}
 		}

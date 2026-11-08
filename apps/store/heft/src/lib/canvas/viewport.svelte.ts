@@ -3,15 +3,23 @@ import type { Layout } from './layout';
 export const MIN_ZOOM = 0.25;
 export const MAX_ZOOM = 6;
 const OVERSCROLL = 120;
+const PAGE_MARGIN = 24;
+const PUSH_TO_TURN = 160;
 
-/** Where the notebook is scrolled and how far it is zoomed, in screen pixels. */
+/**
+ * Where the notebook is scrolled and how far it is zoomed, in screen pixels.
+ * With `single` set, only that page shows, and scrolling on past its end
+ * turns to the next.
+ */
 export class Viewport {
 	width = $state(0);
 	height = $state(0);
 	zoom = $state(1);
 	x = $state(0);
 	y = $state(0);
+	single: number | null = $state(null);
 	layout: Layout = $state.raw({ width: 0, height: 0, pages: [] });
+	private push = 0;
 
 	get contentWidth() {
 		return this.layout.width * this.zoom;
@@ -32,14 +40,24 @@ export class Viewport {
 	clamp() {
 		const spareX = this.width - this.contentWidth;
 		this.x = spareX > 0 ? -spareX / 2 : Math.min(Math.max(this.x, 0), -spareX);
-		const spareY = this.height - this.contentHeight;
-		this.y = spareY > 0 ? -spareY / 2 : Math.min(Math.max(this.y, -OVERSCROLL), -spareY + OVERSCROLL);
+		const page = this.single === null ? null : this.layout.pages[this.single];
+		const [top, bottom] = page ? [page.top * this.zoom - PAGE_MARGIN, (page.top + page.height) * this.zoom + PAGE_MARGIN] : [0, this.contentHeight];
+		const overscroll = page ? 0 : OVERSCROLL;
+		const spareY = this.height - (bottom - top);
+		this.y = spareY > 0 ? top - spareY / 2 : Math.min(Math.max(this.y, top - overscroll), bottom - this.height + overscroll);
 	}
 
 	panBy(dx: number, dy: number) {
+		const before = this.y;
 		this.x += dx;
 		this.y += dy;
 		this.clamp();
+		if (this.single === null || this.y !== before || !dy) {
+			this.push = 0;
+			return;
+		}
+		this.push = Math.sign(dy) === Math.sign(this.push) ? this.push + dy : dy;
+		if (Math.abs(this.push) >= PUSH_TO_TURN) this.turn(Math.sign(this.push));
 	}
 
 	zoomAt(zoom: number, viewX: number, viewY: number) {
@@ -63,8 +81,29 @@ export class Viewport {
 		this.clamp();
 	}
 
-	scrollToPage(page: { top: number }) {
+	showPage(index: number) {
+		const page = this.layout.pages[index];
+		if (!page) return;
+		if (this.single !== null) this.single = index;
+		this.push = 0;
 		this.y = page.top * this.zoom - 16;
+		this.clamp();
+	}
+
+	/** Goes `by` pages on in single-page mode, to the top of a page after or the end of one before. */
+	turn(by: number) {
+		if (this.single === null) return;
+		const index = Math.min(this.layout.pages.length - 1, Math.max(0, this.single + by));
+		if (index === this.single) return;
+		this.showPage(index);
+		if (by < 0) this.y = Infinity;
+		this.clamp();
+	}
+
+	/** Shows one page at a time from `index` on, or all of them again with `null`. */
+	setSingle(index: number | null) {
+		this.single = index;
+		this.push = 0;
 		this.clamp();
 	}
 }

@@ -12,12 +12,16 @@ name = "heft_lib"
 
 [dependencies]
 dirs.workspace = true
+futures-util.workspace = true
 luft-app = { workspace = true, features = ["settings"] }
+luft-handwriting.workspace = true
+pipewire.workspace = true
 sabine.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 specta.workspace = true
 tokio = { workspace = true, features = ["rt", "time"] }
+zbus.workspace = true
 
 [lints]
 workspace = true

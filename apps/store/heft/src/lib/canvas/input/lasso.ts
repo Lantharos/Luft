@@ -31,7 +31,7 @@ export class Lassoing {
 
 	end() {
 		this.live.end();
-		if (this.points.length > 2) selection.pick(this.target.id, this.target.document, this.points);
+		if (this.points.length > 2) selection.pick(this.target.id, this.target.document, this.points, !!this.target.pdf);
 	}
 
 	cancel() {

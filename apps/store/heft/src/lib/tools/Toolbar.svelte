@@ -9,6 +9,8 @@
 		zoomBy(factor: number): void;
 		paste(): void;
 		insertPicture(): void;
+		takePhoto(): void;
+		toggleRuler(): void;
 	}
 </script>
 
@@ -19,6 +21,7 @@
 	import Lasso from '@lucide/svelte/icons/lasso';
 	import Type from '@lucide/svelte/icons/type';
 	import Redo from '@lucide/svelte/icons/redo-2';
+	import RulerIcon from '@lucide/svelte/icons/ruler';
 	import TextSelect from '@lucide/svelte/icons/text-select';
 	import Undo from '@lucide/svelte/icons/undo-2';
 	import { t } from '@luft/i18n';
@@ -30,7 +33,13 @@
 	import PenSwatch from './PenSwatch.svelte';
 	import { tools, type Preset } from './tools.svelte';
 
-	let { actions, zoom, books = false }: { actions: ToolbarActions; zoom: number; books?: boolean } = $props();
+	let {
+		actions,
+		zoom,
+		books = false,
+		ruled = false,
+		side = false
+	}: { actions: ToolbarActions; zoom: number; books?: boolean; ruled?: boolean; side?: boolean } = $props();
 
 	let options: { anchor: HTMLElement; preset: Preset | null } | null = $state(null);
 
@@ -47,10 +56,10 @@
 	const label = (preset: Preset) => t('toolbar-pen', { name: preset.tool === 'highlighter' ? t('pen-highlighter') : colorName(preset.color) });
 </script>
 
-<div class="flex items-center gap-1" role="toolbar" aria-label={t('toolbar-label')} data-no-drag>
+<div class={['toolbar flex items-center gap-1', side && 'side flex-col']} role="toolbar" aria-orientation={side ? 'vertical' : 'horizontal'} aria-label={t('toolbar-label')} data-no-drag>
 	<IconButton icon={Undo} label={t('toolbar-undo')} onclick={actions.undo} />
 	<IconButton icon={Redo} label={t('toolbar-redo')} onclick={actions.redo} />
-	<span class="mx-1.5 h-5 w-px bg-(--hairline)"></span>
+	<span class="divider"></span>
 	{#each tools.presets as preset (preset.id)}
 		<button
 			type="button"
@@ -108,10 +117,28 @@
 			<TextSelect size={19} />
 		</button>
 	{/if}
-	<span class="mx-1.5 h-5 w-px bg-(--hairline)"></span>
-	<IconButton icon={ImagePlus} label={t('toolbar-picture')} onclick={actions.insertPicture} />
+	<button
+		type="button"
+		class="tool"
+		aria-pressed={ruled}
+		aria-label={t('toolbar-ruler')}
+		{@attach tooltip(t('toolbar-ruler'))}
+		onclick={actions.toggleRuler}
+	>
+		<RulerIcon size={19} />
+	</button>
+	<span class="divider"></span>
+	<MenuButton label={t('toolbar-picture')} class="icon-button" align={side ? 'start' : 'end'}>
+		{#snippet trigger()}
+			<ImagePlus size={19} />
+		{/snippet}
+		{#snippet children(close)}
+			<MenuItem onclick={() => (actions.insertPicture(), close())}>{t('picture-choose')}</MenuItem>
+			<MenuItem onclick={() => (actions.takePhoto(), close())}>{t('picture-photo')}</MenuItem>
+		{/snippet}
+	</MenuButton>
 	<IconButton icon={FilePlus} label={t('toolbar-add-page')} onclick={actions.addPage} />
-	<MenuButton label={t('toolbar-zoom')} class="plain-button tabular-nums" align="end">
+	<MenuButton label={t('toolbar-zoom')} class="plain-button tabular-nums" align={side ? 'start' : 'end'}>
 		{#snippet trigger()}
 			{t('zoom-percent', { percent: Math.round(zoom * 100) })}
 		{/snippet}
@@ -133,6 +160,19 @@
 {/if}
 
 <style>
+	.divider {
+		margin-inline: 6px;
+		height: 20px;
+		width: 1px;
+		background: var(--hairline);
+	}
+
+	.side .divider {
+		margin-block: 6px;
+		height: 1px;
+		width: 20px;
+	}
+
 	.tool {
 		display: grid;
 		height: 36px;
@@ -156,5 +196,15 @@
 	.tool[aria-pressed='true'] {
 		background: var(--control);
 		color: var(--text);
+	}
+
+	:global([data-posture='tablet']) .tool {
+		height: 46px;
+		width: 46px;
+	}
+
+	:global([data-posture='tablet']) .toolbar :global(.icon-button) {
+		height: 46px;
+		width: 46px;
 	}
 </style>

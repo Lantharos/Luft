@@ -13,6 +13,8 @@
 	import Home from '#lib/home/Home.svelte';
 	import ImportDialog from '#lib/home/ImportDialog.svelte';
 	import { isPdf } from '#lib/pdf/import.js';
+	import CarryGhost from '#lib/drag/CarryGhost.svelte';
+	import { reader } from '#lib/handwriting/reader.svelte.js';
 	import { pen } from '#lib/input/pen.svelte.js';
 	import { library } from '#lib/library/library.svelte.js';
 	import { handleAppKeys } from '#lib/shell/keyboard.js';
@@ -26,11 +28,15 @@
 	let ready = $state(false);
 	let importing: string[] = $state([]);
 	let failure: string | null = $state(null);
+	let stopReading = () => {};
 
 	onMount(() => {
 		const stops = [pen.start(), sabineEvents.singleInstance((activation) => void activate(activation))];
 		start().catch((error) => (failure = errorText(error)));
-		return () => stops.forEach((stop) => stop());
+		return () => {
+			stops.forEach((stop) => stop());
+			stopReading();
+		};
 	});
 
 	$effect(() => {
@@ -46,6 +52,7 @@
 		await session.start();
 		ready = true;
 		void searchIndex.load();
+		stopReading = reader.start();
 		importing = state.launchPaths.filter(isPdf);
 	}
 
@@ -86,6 +93,7 @@
 	</GlassShell>
 </div>
 <DragGhost />
+<CarryGhost />
 <CommandPalette {palette} />
 {#if requests.newSubject}
 	<SubjectDialog onclose={() => (requests.newSubject = false)} />

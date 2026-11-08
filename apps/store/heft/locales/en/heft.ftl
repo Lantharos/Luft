@@ -199,17 +199,15 @@ export-page-name = { $notebook }, page { $page }
 
 ## Settings
 
-settings-title = Pen and touch
+settings-title = Settings
 settings-pressure = Pressure
 settings-pressure-body = Drag the curve up for a light touch to write boldly, or down to need a firmer press.
 settings-smoothing = Smoothing
 settings-smoothing-value = { $percent }%
 settings-smoothing-body = Evens out shaky lines. More smoothing trails the pen a little.
-settings-barrel = Pen button
-settings-second-barrel = Second pen button
-settings-barrel-eraser = Erases
-settings-barrel-highlighter = Highlights
-settings-barrel-none = Nothing
+settings-buttons = Pen buttons
+settings-buttons-body = What the side buttons do is set for every app in Luft's pen settings. A button set to erase erases here too, with the eraser you chose.
+settings-buttons-open = Pen settings
 settings-prediction = Draw slightly ahead of the pen
 settings-prediction-body = Guesses where the pen is going for the next few milliseconds, so ink keeps up with fast writing.
 settings-finger-pans = Scroll with one finger
@@ -275,3 +273,55 @@ section-new-title = New section
 section-rename-title = Section
 section-name = Section name
 section-create = Add section
+
+settings-toolbar = Tools
+settings-toolbar-top = Along the top
+settings-toolbar-side = Down the side
+settings-toolbar-tablet = When the computer is folded into a tablet, the tools move to the side and get bigger.
+settings-toolbar-tablet-now = Folded into a tablet, the tools are down the side.
+settings-pages = Pages
+settings-pages-continuous = One after another
+settings-pages-single = One at a time
+settings-pages-body = One at a time, scroll on past the end of a page or use Page Down to turn to the next.
+
+settings-handwriting = Search handwriting
+settings-handwriting-body = Heft reads what you write by hand on this computer, nothing leaves it, so search finds it like typed text. It reads in the background while you aren't writing, and waits while the battery is low. It knows Serbian, German, English and Albanian in Latin letters.
+# The variable is the download's size, such as 1.5 GB.
+settings-handwriting-download = Download ({ $size })
+settings-handwriting-downloading = Downloading, { $percent }%
+settings-handwriting-remove = Remove
+settings-handwriting-reading = { $pages ->
+    [one] Reading 1 page
+   *[other] Reading { $pages } pages
+}
+settings-handwriting-done = Everything written is searchable.
+settings-handwriting-waiting = Waits for a pause in your writing.
+settings-handwriting-battery = Waits until the computer is charging or the battery is fuller.
+settings-handwriting-missing = This version of Luft can't read handwriting yet.
+settings-handwriting-failed = Couldn't download it: { $error }
+
+## Ruler
+
+toolbar-ruler = Ruler
+ruler-label = Ruler
+# The ruler's angle in degrees.
+ruler-angle = { $degrees }°
+
+## Pages one at a time
+
+page-previous = Previous page
+page-next = Next page
+
+## Pictures
+
+picture-choose = Choose pictures
+picture-photo = Take a photo
+picture-crop = Crop
+crop-title = Crop
+crop-reset = Show all of it
+crop-done = Crop
+camera-title = Take a photo
+camera-opening = Opening the camera…
+camera-refused = Heft may not use the camera. You can allow it in Settings, under Privacy.
+camera-failed = The camera didn't open: { $error }
+camera-take = Take photo

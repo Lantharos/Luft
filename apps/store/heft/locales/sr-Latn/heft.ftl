@@ -189,17 +189,15 @@ export-page-name = { $notebook }, strana { $page }
 
 ## Settings
 
-settings-title = Pero i dodir
+settings-title = Podešavanja
 settings-pressure = Pritisak
 settings-pressure-body = Povucite krivu nagore da lak dodir piše deblje, ili nadole da treba jače pritisnuti.
 settings-smoothing = Izglađivanje
 settings-smoothing-value = { $percent } %
 settings-smoothing-body = Ujednačava nesigurne linije. Jače izglađivanje malo zaostaje za perom.
-settings-barrel = Dugme na peru
-settings-second-barrel = Drugo dugme na peru
-settings-barrel-eraser = Briše
-settings-barrel-highlighter = Markira
-settings-barrel-none = Ništa
+settings-buttons = Dugmad na peru
+settings-buttons-body = Šta bočna dugmad rade podešava se za sve aplikacije u Luftovim podešavanjima pera. Dugme podešeno da briše i ovde briše, gumicom koju ste izabrali.
+settings-buttons-open = Podešavanja pera
 settings-prediction = Crtaj malo ispred pera
 settings-prediction-body = Pogađa kuda pero ide u narednih nekoliko milisekundi, pa mastilo stiže i brzo pisanje.
 settings-finger-pans = Pomeranje jednim prstom
@@ -262,3 +260,54 @@ section-new-title = Novi odeljak
 section-rename-title = Odeljak
 section-name = Naziv odeljka
 section-create = Dodaj odeljak
+
+settings-toolbar = Alatke
+settings-toolbar-top = Gore
+settings-toolbar-side = Sa strane
+settings-toolbar-tablet = Kad se računar preklopi u tablet, alatke prelaze sa strane i postaju veće.
+settings-toolbar-tablet-now = Računar je preklopljen u tablet, pa su alatke sa strane.
+settings-pages = Strane
+settings-pages-continuous = Jedna za drugom
+settings-pages-single = Jedna po jedna
+settings-pages-body = Jednu po jednu okrećete tako što nastavite da pomerate preko kraja strane ili pritisnete Page Down.
+
+settings-handwriting = Pretraga rukopisa
+settings-handwriting-body = Heft čita ono što pišete rukom na ovom računaru, ništa ne izlazi s njega, pa ga pretraga nalazi kao otkucan tekst. Čita u pozadini dok ne pišete i čeka dok je baterija slaba. Zna srpski, nemački, engleski i albanski latinicom.
+settings-handwriting-download = Preuzmi ({ $size })
+settings-handwriting-downloading = Preuzima se, { $percent } %
+settings-handwriting-remove = Ukloni
+settings-handwriting-reading = { $pages ->
+    [one] Čita se { $pages } strana
+    [few] Čitaju se { $pages } strane
+   *[other] Čita se { $pages } strana
+}
+settings-handwriting-done = Sve napisano može da se pretraži.
+settings-handwriting-waiting = Čeka pauzu u pisanju.
+settings-handwriting-battery = Čeka da se računar puni ili da baterija bude punija.
+settings-handwriting-missing = Ova verzija Lufta još ne ume da čita rukopis.
+settings-handwriting-failed = Preuzimanje nije uspelo: { $error }
+
+## Ruler
+
+toolbar-ruler = Lenjir
+ruler-label = Lenjir
+ruler-angle = { $degrees }°
+
+## Pages one at a time
+
+page-previous = Prethodna strana
+page-next = Sledeća strana
+
+## Pictures
+
+picture-choose = Izaberi slike
+picture-photo = Slikaj
+picture-crop = Iseci
+crop-title = Iseci
+crop-reset = Prikaži celu
+crop-done = Iseci
+camera-title = Slikaj
+camera-opening = Kamera se otvara…
+camera-refused = Heft ne sme da koristi kameru. Možete to da dozvolite u Podešavanjima, pod Privatnost.
+camera-failed = Kamera se nije otvorila: { $error }
+camera-take = Slikaj

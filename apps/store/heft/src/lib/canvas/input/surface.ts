@@ -1,14 +1,18 @@
 import { settings } from '#lib/app/settings.svelte.js';
-import { BARREL, pen, SECOND_BARREL } from '#lib/input/pen.svelte.js';
+import { activity } from '#lib/input/activity.js';
+import { pen } from '#lib/input/pen.svelte.js';
 import { tools } from '#lib/tools/tools.svelte.js';
 import { addText } from '#lib/objects/editing.svelte.js';
 import { Drawing, Erasing, pagePoint, type Origin, type Target } from './drawing';
 import { TouchGestures } from './gestures';
 import { selection } from '#lib/selection/selection.svelte.js';
+import { TextCarrying } from './carrying';
 import { Lassoing } from './lasso';
+import { textSelection } from '#lib/pdf/selection.svelte.js';
 import { TextPicking } from './selecting';
 import { pageNear } from '../layout';
 import type { LiveInk } from '../live';
+import type { Ruler } from '../ruler/ruler.svelte';
 import { MAX_ZOOM, MIN_ZOOM, type Viewport } from '../viewport.svelte';
 
 type Tool = 'draw' | 'highlight' | 'erase' | 'text' | 'lasso' | 'type';
@@ -20,11 +24,12 @@ const LINE = 40;
 export interface SurfaceHost {
 	target(index: number): Target | null;
 	preview(scale: number, x: number, y: number): void;
+	ruler(): Ruler;
 	undo(): void;
 	redo(): void;
 }
 
-type Action = Drawing | Erasing | TextPicking | Lassoing | { pan: true; x: number; y: number };
+type Action = Drawing | Erasing | TextPicking | TextCarrying | Lassoing | { pan: true; x: number; y: number };
 
 /** Sorts pointers into writing, erasing, panning and zooming, and keeps the palm out of it. */
 export class Surface {
@@ -75,12 +80,7 @@ export class Surface {
 	}
 
 	private toolFor(event: PointerEvent): Tool | null {
-		if (event.pointerType === 'pen') {
-			if (event.buttons & ERASER_BUTTON || pen.tool === 'eraser') return 'erase';
-			const barrel = pen.buttons & BARREL ? settings.values.barrel : pen.buttons & SECOND_BARREL ? settings.values.secondBarrel : null;
-			if (barrel === 'eraser') return 'erase';
-			if (barrel === 'highlighter') return 'highlight';
-		}
+		if (event.pointerType === 'pen' && (event.buttons & ERASER_BUTTON || pen.tool === 'eraser')) return 'erase';
 		if (tools.active === 'eraser') return 'erase';
 		return tools.active === 'draw' ? 'draw' : tools.active;
 	}
@@ -91,18 +91,28 @@ export class Surface {
 		const index = pageNear(this.viewport.layout, contentY);
 		const target = this.host.target(index);
 		if (!target) return null;
+		activity.mark();
 		selection.clear();
+		if (document.activeElement instanceof HTMLElement && document.activeElement.isContentEditable && tool !== 'type') document.activeElement.blur();
 		if (tool === 'type') {
 			const [x, y] = pagePoint(this.viewport, this.origin, target.page, event);
 			addText(target.document, x, y, target.page.width);
 			return null;
 		}
 		if (tool === 'lasso') return new Lassoing(this.viewport, this.origin, target, this.live, event);
+		if (tool === 'text' && this.onPickedText(target, event)) return new TextCarrying(this.element, textSelection.selection.text, event);
 		if (tool === 'text') return target.pdf ? new TextPicking(this.viewport, this.origin, target, target.pdf, event) : null;
 		if (tool === 'erase') return new Erasing(this.viewport, this.origin, target, tools.eraserMode, tools.eraserRadius, event);
 		const preset = tool === 'highlight' ? (tools.presets.find((candidate) => candidate.tool === 'highlighter') ?? tools.preset) : tools.preset;
 		const feel = { firmness: settings.values.firmness, stabilization: settings.values.stabilization };
-		return new Drawing(this.viewport, this.origin, target, this.live, preset, feel, settings.values.prediction, event);
+		const guide = this.host.ruler().guide(event.clientX - this.origin.left, event.clientY - this.origin.top, (preset.width * this.viewport.zoom) / 2);
+		return new Drawing(this.viewport, this.origin, target, this.live, preset, feel, settings.values.prediction, guide, event);
+	}
+
+	private onPickedText(target: Target, event: PointerEvent) {
+		if (textSelection.page !== target.id) return false;
+		const [x, y] = pagePoint(this.viewport, this.origin, target.page, event);
+		return textSelection.selection.rects.some((rect) => x >= rect.left && x <= rect.left + rect.width && y >= rect.top && y <= rect.top + rect.height);
 	}
 
 	private capture(event: PointerEvent, action: Action) {
@@ -120,11 +130,12 @@ export class Surface {
 		if (event.pointerType === 'pen') pen.seen();
 		const action = this.actions.get(event.pointerId);
 		if (!action) return;
+		activity.mark();
 		if (action instanceof Drawing) {
 			if (!this.raw) action.add(event.getCoalescedEvents());
 			action.predict(event.getPredictedEvents());
 		} else if (action instanceof Erasing) action.move(event.getCoalescedEvents());
-		else if (action instanceof TextPicking) action.move(event);
+		else if (action instanceof TextPicking || action instanceof TextCarrying) action.move(event);
 		else if (action instanceof Lassoing) action.move(event.getCoalescedEvents());
 		else {
 			this.viewport.panBy(action.x - event.clientX, action.y - event.clientY);
@@ -149,14 +160,14 @@ export class Surface {
 		if (event.pointerType === 'touch') this.gestures.up(event.pointerId, event.timeStamp);
 		const action = this.actions.get(event.pointerId);
 		this.actions.delete(event.pointerId);
-		if (action instanceof Drawing || action instanceof Erasing || action instanceof TextPicking || action instanceof Lassoing) action.end();
+		if (action && !('pan' in action)) action.end();
 	}
 
 	cancel(event: PointerEvent) {
 		if (event.pointerType === 'touch') this.gestures.up(event.pointerId, event.timeStamp);
 		const action = this.actions.get(event.pointerId);
 		this.actions.delete(event.pointerId);
-		if (action instanceof Drawing || action instanceof Erasing || action instanceof Lassoing) action.cancel();
+		if (action instanceof Drawing || action instanceof Erasing || action instanceof Lassoing || action instanceof TextCarrying) action.cancel();
 	}
 
 	private touchDown(event: PointerEvent) {

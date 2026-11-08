@@ -1,4 +1,6 @@
 mod bridge;
+mod camera;
+mod handwriting;
 mod library;
 mod state;
 
@@ -17,6 +19,9 @@ pub fn run_app() -> ! {
     luft_app::run(
         &events,
         |window| bridge::register(WINDOW.apply(window)),
-        |_| library::backups::start(),
+        |events| {
+            library::backups::start();
+            luft_app::spawn(handwriting::watch(events));
+        },
     )
 }

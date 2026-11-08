@@ -74,6 +74,9 @@
 						onpointermove={() => (selected = index)}
 						onclick={() => choose(item)}
 					>
+						{#if item.preview}
+							<span class="palette-preview" {@attach item.preview}></span>
+						{/if}
 						<span class="min-w-0 flex-none truncate text-[var(--text)]"><Highlight text={item.label} matches={item.labelMatches} /></span>
 						{#if item.detail}
 							<span class="min-w-0 flex-1 truncate text-[12px] text-[var(--text-muted)]"><Highlight text={item.detail} matches={item.detailMatches} /></span>
@@ -152,6 +155,12 @@
 		padding-inline: 12px;
 		font-size: 13px;
 		text-align: left;
+	}
+
+	.palette-preview {
+		display: block;
+		flex: none;
+		padding-block: 6px;
 	}
 
 	.palette-item.is-selected {

@@ -1,10 +1,13 @@
+import { requests } from '#lib/app/requests.svelte.js';
 import { session } from '#lib/app/session.svelte.js';
+import type { PageFlow } from '#lib/app/settings.svelte.js';
 import { appState } from '#lib/app/state.js';
 import { pageNear } from '#lib/canvas/layout.js';
+import { Ruler } from '#lib/canvas/ruler/ruler.svelte.js';
 import { Viewport } from '#lib/canvas/viewport.svelte.js';
 import type { OpenNotebook } from '#lib/library/notebook.svelte.js';
 import { t } from '@luft/i18n';
-import { addPictureFiles, addText, choosePictures } from '#lib/objects/editing.svelte.js';
+import { addPicture, addPictureFiles, addQuote, choosePictures, editing } from '#lib/objects/editing.svelte.js';
 import { selection } from '#lib/selection/selection.svelte.js';
 import type { ToolbarActions } from '#lib/tools/Toolbar.svelte';
 
@@ -19,13 +22,15 @@ const SAVE_AFTER = 600;
 /** One notebook on screen, scrolled and zoomed on its own, and remembered that way. */
 export class Pane {
 	readonly viewport = new Viewport();
-	placed = false;
+	readonly ruler = new Ruler();
+	placed = $state(false);
 	private saveTimer = 0;
 
 	constructor(readonly notebook: OpenNotebook) {}
 
 	get current() {
 		const { viewport } = this;
+		if (viewport.single !== null) return viewport.single;
 		return viewport.layout.pages.length ? pageNear(viewport.layout, (viewport.y + viewport.height / 3) / viewport.zoom) : 0;
 	}
 
@@ -50,9 +55,18 @@ export class Pane {
 		if (!this.placed || !target || target.notebook !== this.notebook.meta.id) return;
 		const index = this.notebook.indexOf(target.page);
 		if (index >= 0 && this.viewport.layout.pages[index]) {
-			this.viewport.scrollToPage(this.viewport.layout.pages[index]);
+			this.viewport.showPage(index);
 			session.goTo = null;
 		}
+	}
+
+	/** Shows every page one after another, or one at a time, keeping the page in view. */
+	flow(pages: PageFlow) {
+		const { viewport } = this;
+		if (!this.placed || (pages === 'single') === (viewport.single !== null)) return;
+		const current = this.current;
+		viewport.setSingle(pages === 'single' ? current : null);
+		viewport.showPage(current);
 	}
 
 	remember(place: Place) {
@@ -77,17 +91,21 @@ export class Pane {
 		if (page) await addPictureFiles(page.document, this.notebook.folder, page.rect, paths);
 	}
 
+	/** Puts a photo on the page in view and offers to crop it straight away. */
+	async addPhoto(bytes: Uint8Array) {
+		const page = this.page;
+		const object = page && (await addPicture(page.document, this.notebook.folder, page.rect, bytes, 'photo.jpg'));
+		if (object) editing.crop = object.id;
+	}
+
 	/** Adds picked book text to the page in view as a quote. */
 	quote(text: string) {
 		const page = this.page;
-		if (!page) return;
-		const below = Math.max(48, ...page.document.objects.map((object) => object.y + object.height + 12));
-		const escaped = text.replaceAll('&', '&amp;').replaceAll('<', '&lt;');
-		addText(page.document, 40, below, page.rect.width, `<blockquote>${escaped}</blockquote>`);
+		if (page) addQuote(page.document, page.rect.width, text);
 	}
 
 	jump(index: number) {
-		this.viewport.scrollToPage(this.viewport.layout.pages[index]);
+		this.viewport.showPage(index);
 	}
 
 	readonly actions: ToolbarActions = {
@@ -106,6 +124,8 @@ export class Pane {
 			if (store) selection.paste(page.id, store.document);
 		},
 		insertPicture: () => void this.insertPictures(),
+		takePhoto: () => (requests.photo = true),
+		toggleRuler: () => this.ruler.toggle(this.viewport.width, this.viewport.height),
 		zoomBy: (factor) => this.viewport.zoomAt(this.viewport.zoom * factor, this.viewport.width / 2, this.viewport.height / 2)
 	};
 }

@@ -1,21 +1,21 @@
 import { events } from '@lantharos/sabine';
 
-export const BARREL = 1;
-export const SECOND_BARREL = 2;
 const PALM_GRACE = 450;
 
-/** The pen as Sabine reports it, including what Chromium's pointer events leave out. */
+/**
+ * The pen as Sabine reports it, including what Chromium's pointer events
+ * leave out. Its side buttons belong to Luft's pen settings: one held to
+ * erase turns the pen into its eraser end, which Heft erases with.
+ */
 class Pen {
 	near = $state(false);
 	tool: 'pen' | 'eraser' = $state('pen');
-	buttons = $state(0);
 	private lastSeen = 0;
 
 	start() {
 		return events.pen((state) => {
 			this.near = state.near || state.contact;
 			this.tool = state.tool;
-			this.buttons = state.buttons;
 			this.lastSeen = performance.now();
 		});
 	}

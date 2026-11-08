@@ -1,25 +1,29 @@
+import { appearance } from '@luft/ui';
 import { commands } from '#lib/bindings.js';
 
-export type BarrelAction = 'eraser' | 'highlighter' | 'none';
+export type ToolbarPlace = 'top' | 'side';
+export type PageFlow = 'continuous' | 'single';
 
 export interface SettingsValues {
 	firmness: number;
 	stabilization: number;
-	barrel: BarrelAction;
-	secondBarrel: BarrelAction;
 	touchDraws: boolean;
 	fingerPans: boolean;
 	prediction: boolean;
+	toolbar: ToolbarPlace;
+	pages: PageFlow;
+	handwriting: boolean;
 }
 
 const DEFAULTS: SettingsValues = {
 	firmness: 0,
 	stabilization: 0.3,
-	barrel: 'eraser',
-	secondBarrel: 'none',
 	touchDraws: false,
 	fingerPans: true,
-	prediction: true
+	prediction: true,
+	toolbar: 'top',
+	pages: 'continuous',
+	handwriting: false
 };
 
 const SAVE_AFTER = 500;
@@ -27,6 +31,11 @@ const SAVE_AFTER = 500;
 class Settings {
 	values: SettingsValues = $state({ ...DEFAULTS });
 	private timer = 0;
+
+	/** Folded into a tablet, the tools move to the side, where the hand that isn't writing reaches them. */
+	get toolbar(): ToolbarPlace {
+		return appearance.posture === 'tablet' ? 'side' : this.values.toolbar;
+	}
 
 	async load() {
 		const stored = (await commands.settingsLoad({ name: 'settings' })) as Partial<SettingsValues> | null;

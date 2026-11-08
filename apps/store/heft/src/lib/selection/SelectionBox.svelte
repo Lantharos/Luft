@@ -7,11 +7,16 @@
 	import { t } from '@luft/i18n';
 	import { tooltip } from '@luft/ui';
 	import type { Viewport } from '#lib/canvas/viewport.svelte.js';
+	import { carry, type Carried } from '#lib/drag/carry.svelte.js';
 	import { css, readableOn } from '#lib/ink/color.js';
 	import type { OpenNotebook } from '#lib/library/notebook.svelte.js';
+	import { paperOf } from '#lib/library/model.js';
+	import { LOOKS } from '#lib/paper/templates.js';
+	import { sourcePath } from '#lib/pdf/sources.js';
+	import { regionPicture } from './picture';
 	import { colorName } from '#lib/tools/colors.js';
 	import { SWATCHES } from '#lib/tools/tools.svelte.js';
-	import { selection, type Transform } from './selection.svelte';
+	import { IDENTITY, selection, type Transform } from './selection.svelte';
 
 	let { notebook, viewport }: { notebook: OpenNotebook; viewport: Viewport } = $props();
 
@@ -28,6 +33,49 @@
 
 	type Handle = 'move' | 'scale' | 'turn';
 	let dragging: { handle: Handle; x: number; y: number; id: number } | null = null;
+	let element: HTMLDivElement | undefined = $state();
+	let carrying = false;
+
+	/** Takes the picked ink, and on a book the printed part under it, over to the other pane. */
+	function startCarrying(event: PointerEvent, canvas: HTMLElement) {
+		carrying = true;
+		selection.preview(IDENTITY);
+		const index = notebook.indexOf(selection.page!);
+		const entry = notebook.meta.pages[index];
+		const page = viewport.layout.pages[index];
+		const rect = canvas.getBoundingClientRect();
+		const [x, y] = viewport.toContent(event.clientX - rect.left, event.clientY - rect.top);
+		const region = {
+			bounds: selection.bounds,
+			strokes: selection.strokes,
+			ink: { dark: LOOKS[paperOf(notebook.meta, entry).color].dark },
+			pageWidth: page.width,
+			pdf: entry.pdf && { path: sourcePath(notebook, entry.pdf.source), index: entry.pdf.index }
+		};
+		const item: Carried = {
+			kind: 'ink',
+			strokes: selection.strokes,
+			bounds: selection.bounds,
+			grab: [x - page.left - selection.bounds.left, y - page.top - selection.bounds.top],
+			picture: selection.book ? () => regionPicture(region) : null
+		};
+		carry.start(canvas, item, null);
+		void regionPicture(region).then((picture) => {
+			if (carry.item === item) carry.preview = picture.toDataURL();
+		});
+	}
+
+	function follow(event: PointerEvent) {
+		const canvas = element!.parentElement!;
+		const away = carry.elsewhere(canvas, event.clientX, event.clientY) !== null;
+		if (away && !carrying) startCarrying(event, canvas);
+		else if (!away && carrying) {
+			carrying = false;
+			carry.end(false);
+		}
+		carry.move(event.clientX, event.clientY);
+		return carrying;
+	}
 
 	function down(event: PointerEvent, handle: Handle) {
 		event.stopPropagation();
@@ -37,6 +85,7 @@
 
 	function move(event: PointerEvent) {
 		if (!dragging || !box || event.pointerId !== dragging.id) return;
+		if (dragging.handle === 'move' && follow(event)) return;
 		const zoom = viewport.zoom;
 		const dx = (event.clientX - dragging.x) / zoom;
 		const dy = (event.clientY - dragging.y) / zoom;
@@ -53,6 +102,11 @@
 	function up(event: PointerEvent) {
 		if (!dragging || event.pointerId !== dragging.id) return;
 		dragging = null;
+		if (carrying) {
+			carrying = false;
+			if (carry.end(event.type === 'pointerup')) selection.clear();
+			return;
+		}
 		selection.settle();
 	}
 
@@ -61,6 +115,7 @@
 
 {#if box}
 	<div
+		bind:this={element}
 		class="box"
 		role="group"
 		aria-label={t('selection-label')}
@@ -77,24 +132,26 @@
 		<span class="handle scale" role="presentation" onpointerdown={(event) => down(event, 'scale')}></span>
 		<span class="handle turn" role="presentation" onpointerdown={(event) => down(event, 'turn')}><RotateCw size={13} /></span>
 	</div>
-	<div
-		class="bar"
-		role="toolbar"
-		tabindex="-1"
-		aria-label={t('selection-actions')}
-		style:left="{box.x + box.width / 2}px"
-		style:top="{Math.min(box.y + box.height + 14, viewport.height - 60)}px"
-		onpointerdown={(event) => event.stopPropagation()}
-	>
-		{#each SWATCHES.slice(0, 6) as color (color)}
-			<button type="button" class="swatch" aria-label={colorName(color)} style:background={css(color)} style:color={readableOn(color)} onclick={() => selection.recolor(color)}></button>
-		{/each}
-		<span class="mx-1 h-5 w-px bg-(--hairline)"></span>
-		<button type="button" class="icon-button" aria-label={t('selection-copy')} {@attach tooltip(t('selection-copy'))} onclick={() => selection.copy()}><Copy size={16} /></button>
-		<button type="button" class="icon-button" aria-label={t('selection-cut')} {@attach tooltip(t('selection-cut'))} onclick={() => selection.cut()}><Scissors size={16} /></button>
-		<button type="button" class="icon-button" aria-label={t('selection-duplicate')} {@attach tooltip(t('selection-duplicate'))} onclick={() => selection.duplicate()}><CopyPlus size={16} /></button>
-		<button type="button" class="icon-button" aria-label={t('selection-delete')} {@attach tooltip(t('selection-delete'))} onclick={() => selection.remove()}><Trash size={16} /></button>
-	</div>
+	{#if selection.ink}
+		<div
+			class="bar"
+			role="toolbar"
+			tabindex="-1"
+			aria-label={t('selection-actions')}
+			style:left="{box.x + box.width / 2}px"
+			style:top="{Math.min(box.y + box.height + 14, viewport.height - 60)}px"
+			onpointerdown={(event) => event.stopPropagation()}
+		>
+			{#each SWATCHES.slice(0, 6) as color (color)}
+				<button type="button" class="swatch" aria-label={colorName(color)} style:background={css(color)} style:color={readableOn(color)} onclick={() => selection.recolor(color)}></button>
+			{/each}
+			<span class="mx-1 h-5 w-px bg-(--hairline)"></span>
+			<button type="button" class="icon-button" aria-label={t('selection-copy')} {@attach tooltip(t('selection-copy'))} onclick={() => selection.copy()}><Copy size={16} /></button>
+			<button type="button" class="icon-button" aria-label={t('selection-cut')} {@attach tooltip(t('selection-cut'))} onclick={() => selection.cut()}><Scissors size={16} /></button>
+			<button type="button" class="icon-button" aria-label={t('selection-duplicate')} {@attach tooltip(t('selection-duplicate'))} onclick={() => selection.duplicate()}><CopyPlus size={16} /></button>
+			<button type="button" class="icon-button" aria-label={t('selection-delete')} {@attach tooltip(t('selection-delete'))} onclick={() => selection.remove()}><Trash size={16} /></button>
+		</div>
+	{/if}
 {/if}
 
 <style>

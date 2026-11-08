@@ -26,6 +26,7 @@ provider = "schelf"
 [sandbox]
 network = false
 filesystems = ["xdg-documents", "xdg-download:ro", "xdg-pictures:ro"]
+talk = ["com.lantharos.Handwriting1"]
 
 [bindings]
 path = "src/lib/bindings.ts"

@@ -4,11 +4,14 @@ import { commands } from '#lib/bindings.js';
 import { newId } from '#lib/ink/stroke.js';
 import { SvelteMap } from 'svelte/reactivity';
 import { PageStore } from '#lib/page/storage.js';
+import { reader } from '#lib/handwriting/reader.svelte.js';
 import { searchIndex } from '#lib/search/index.svelte.js';
 import type { NotebookEntry } from './library.svelte';
-import type { NotebookMeta, PageEntry, Paper } from './model';
+import { MM, pageSize, paperOf, type NotebookMeta, type PageEntry, type Paper } from './model';
 
 const KEEP_LOADED = 24;
+const GROW_WITHIN = 120 * MM;
+const GROW_BY = 160 * MM;
 const SAVE_AFTER = 400;
 
 /** A notebook whose pages are being read or written, kept for as long as Heft runs. */
@@ -54,8 +57,10 @@ export class OpenNotebook {
 					this.done.push(id);
 					this.undone.length = 0;
 				};
-				store.document.listen((_, change) => {
+				store.document.listen((dirty, change) => {
 					this.revisions.set(id, (this.revisions.get(id) ?? 0) + 1);
+					if (change.added.length || change.objects) this.grow(id, dirty.bottom, store.document.objects);
+					if (change.added.length || change.removed.length) reader.touched(this.entry, id);
 					if (change.objects) void searchIndex.setTyped(this.entry, id, store.document.objects.map((object) => object.text ?? '').join('\n').trim());
 				});
 				this.loaded.set(id, store);
@@ -65,6 +70,18 @@ export class OpenNotebook {
 			this.loading.set(id, pending);
 		}
 		return pending;
+	}
+
+	/** Lengthens an infinite page whenever writing comes near its end, so there's always room to go on. */
+	private grow(id: string, bottom: number, objects: { y: number; height: number }[]) {
+		const entry = this.meta.pages.find((page) => page.id === id);
+		if (!entry || entry.pdf) return;
+		const paper = paperOf(this.meta, entry);
+		if (paper.size !== 'infinite') return;
+		const lowest = Math.max(bottom, ...objects.map((object) => object.y + object.height));
+		if (lowest < pageSize(paper, entry).height - GROW_WITHIN) return;
+		entry.height = Math.round(lowest + GROW_BY);
+		this.changed();
 	}
 
 	/** Keeps a page in memory while it's on screen. */

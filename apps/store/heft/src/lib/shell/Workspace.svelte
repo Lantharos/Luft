@@ -1,15 +1,19 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import { appWindow } from '@lantharos/sabine';
+	import ChevronDown from '@lucide/svelte/icons/chevron-down';
+	import ChevronUp from '@lucide/svelte/icons/chevron-up';
 	import Maximize from '@lucide/svelte/icons/maximize-2';
 	import Minimize from '@lucide/svelte/icons/minimize-2';
 	import PanelLeft from '@lucide/svelte/icons/panel-left';
 	import { t } from '@luft/i18n';
 	import { IconButton } from '@luft/ui';
+	import { settings } from '#lib/app/settings.svelte.js';
 	import { appState } from '#lib/app/state.js';
 	import { addPicture } from '#lib/objects/editing.svelte.js';
 	import { requests } from '#lib/app/requests.svelte.js';
 	import ExportDialog from '#lib/export/ExportDialog.svelte';
+	import CameraDialog from '#lib/objects/CameraDialog.svelte';
 	import type { OpenNotebook } from '#lib/library/notebook.svelte.js';
 	import PageRail from '#lib/rail/PageRail.svelte';
 	import Toolbar from '#lib/tools/Toolbar.svelte';
@@ -41,6 +45,8 @@
 	let height = $state(0);
 	let current = $derived(pane.current);
 	let books = $derived(pane.notebook.meta.pages.some((page) => page.pdf));
+	let side = $derived(settings.toolbar === 'side');
+	let single = $derived(pane.viewport.single !== null);
 
 	function quoteFrom(from: Pane) {
 		return second ? (text: string) => (from === main ? second! : main).quote(text) : undefined;
@@ -84,22 +90,40 @@
 			<IconButton icon={PanelLeft} label={railOpen ? t('rail-hide') : t('rail-show')} onclick={toggleRail} />
 			<NotebookMenu notebook={pane.notebook} />
 		</div>
-		<Toolbar actions={pane.actions} zoom={pane.viewport.zoom} {books} />
+		{#if !side}
+			<Toolbar actions={pane.actions} zoom={pane.viewport.zoom} {books} ruled={pane.ruler.shown} />
+		{/if}
 		<div class="flex flex-1 items-center justify-end gap-2">
+			{#if single}
+				<IconButton icon={ChevronUp} label={t('page-previous')} onclick={() => pane.viewport.turn(-1)} />
+			{/if}
 			<span class="text-[12px] text-(--text-muted) tabular-nums">{t('page-of', { page: current + 1, pages: pane.notebook.meta.pages.length })}</span>
+			{#if single}
+				<IconButton icon={ChevronDown} label={t('page-next')} onclick={() => pane.viewport.turn(1)} />
+			{/if}
 			<IconButton icon={focusing ? Minimize : Maximize} label={focusing ? t('focus-leave') : t('focus-enter')} onclick={() => focusMode(!focusing)} />
 		</div>
 	</div>
-	<div class="flex min-h-0 flex-1 gap-px" class:flex-col={width < height * 1.15} bind:clientWidth={width} bind:clientHeight={height}>
-		<PaneView pane={main} active={second !== null && focused === 'main'} onfocus={() => (focused = 'main')} onquote={quoteFrom(main)} />
-		{#if second}
-			{#key second}
-				<PaneView pane={second} active={focused === 'second'} onfocus={() => (focused = 'second')} onquote={quoteFrom(second)} />
-			{/key}
+	<div class="flex min-h-0 flex-1">
+		{#if side}
+			<div class="soft-scroll flex flex-none flex-col items-center overflow-y-auto px-2 pb-3">
+				<Toolbar actions={pane.actions} zoom={pane.viewport.zoom} {books} ruled={pane.ruler.shown} side />
+			</div>
 		{/if}
+		<div class="flex min-h-0 min-w-0 flex-1 gap-px" class:flex-col={width < height * 1.15} bind:clientWidth={width} bind:clientHeight={height}>
+			<PaneView pane={main} active={second !== null && focused === 'main'} onfocus={() => (focused = 'main')} onquote={quoteFrom(main)} />
+			{#if second}
+				{#key second}
+					<PaneView pane={second} active={focused === 'second'} onfocus={() => (focused = 'second')} onquote={quoteFrom(second)} />
+				{/key}
+			{/if}
+		</div>
 	</div>
 </main>
 
+{#if requests.photo}
+	<CameraDialog onphoto={(bytes) => void pane.addPhoto(bytes)} onclose={() => (requests.photo = false)} />
+{/if}
 {#if requests.export}
 	<ExportDialog notebook={pane.notebook} current={pane.current} format={requests.export} onclose={() => (requests.export = null)} />
 {/if}

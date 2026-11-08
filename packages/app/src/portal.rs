@@ -173,6 +173,32 @@ pub async fn open_files(title: &str, filter: Filter<'_>) -> Result<Vec<String>, 
     .await
 }
 
+/// Asks to use the camera and opens a PipeWire connection that sees only
+/// cameras, or `None` when the person said no.
+pub async fn camera() -> Result<Option<zbus::OwnedFd>, String> {
+    let (response, _) = request("org.freedesktop.portal.Camera", "AccessCamera", |token| {
+        (HashMap::from([("handle_token", Variant::from(token))]),)
+    })
+    .await?;
+    if response != Response::Answered {
+        return Ok(None);
+    }
+    let portal = Proxy::new(
+        dbus::session().await?,
+        PORTAL,
+        PORTAL_PATH,
+        "org.freedesktop.portal.Camera",
+    )
+    .await
+    .map_err(failed)?;
+    let options: HashMap<&str, Variant<'_>> = HashMap::new();
+    portal
+        .call("OpenPipeWireRemote", &(options,))
+        .await
+        .map(Some)
+        .map_err(failed)
+}
+
 pub fn path_uri(path: &Path) -> String {
     let mut uri = String::from(FILE_SCHEME);
     for &byte in path.as_os_str().as_bytes() {

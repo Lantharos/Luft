@@ -34,7 +34,9 @@ export function handleKeys(event: KeyboardEvent, actions: ToolbarActions, viewpo
 	}
 	if (/^[1-9]$/.test(key) && tools.presets[Number(key) - 1]) return run(() => tools.choose(tools.presets[Number(key) - 1].id));
 	if (key === 'e') return run(() => (tools.active = 'eraser'));
+	if (key === 'r') return run(actions.toggleRuler);
 	if (key === 'l') return run(() => (tools.active = 'lasso'));
+	if (viewport.single !== null && (key === 'pagedown' || key === 'pageup')) return run(() => viewport.turn(key === 'pagedown' ? 1 : -1));
 	if (key === 'pagedown' || key === ' ') return run(() => viewport.panBy(0, viewport.height * 0.85));
 	if (key === 'pageup') return run(() => viewport.panBy(0, -viewport.height * 0.85));
 	if (key === 'arrowdown') return run(() => viewport.panBy(0, 60));

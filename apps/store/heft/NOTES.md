@@ -18,18 +18,32 @@ Heft is a store app (`apps/store/heft`), like Draft, Magpie and Convertible: the
 | `canvas/` | The notebook view: layout, viewport, the live ink layer, tiles, pointer routing, gestures, lasso and text picking |
 | `library/` | Subjects, notebooks and their folders |
 | `pdf/` | pdf.js: loading, page backgrounds, text and outlines, import |
-| `objects/` | Text boxes and pictures |
+| `objects/` | Text boxes and pictures, cropping and the camera |
+| `handwriting/` | Reading handwriting for search, in the background |
 | `search/`, `export/` | The search index and command palette; PDF and PNG output |
+| `canvas/ruler/` | The ruler and keeping strokes on its edge |
 | `home/`, `rail/`, `shell/`, `tools/`, `settings/`, `paper/`, `selection/`, `drag/`, `app/`, `input/` | Screens and their state |
 
 ## Ink
 
-- Pen events come from Sabine as Chromium pointer events (`pointerType` pen, pressure). Sabine 0.79 added `events.pen` with what touch events can't carry: whether the pen is near, its barrel buttons and tilt. Heft ignores touch while the pen is near or was seen in the last 450 ms (palm rejection), and uses the barrel buttons as configurable tools (eraser by default). Sabine 0.80 gave the pen a touch id no finger can take, so a palm can't join a stroke inside Chromium.
+- Pen events come from Sabine as Chromium pointer events (`pointerType` pen, pressure). Sabine 0.79 added `events.pen` with what touch events can't carry: whether the pen is near, which end is down and tilt. Heft ignores touch while the pen is near or was seen in the last 450 ms (palm rejection). Sabine 0.80 gave the pen a touch id no finger can take, so a palm can't join a stroke inside Chromium.
+- The pen's side buttons are Luft's, set once for every app in Settings → Pen, and Heft doesn't map them again: a button set to erase makes the compositor swap the pen for its eraser end while held, which Heft erases with like the real other end, with the eraser options chosen in Heft. A button set to click clicks. Heft once had its own button choices, but with the compositor already turning the button into a click, a key or a screenshot, both acted at once.
 - Samples are handled in `pointerrawupdate`, as soon as they reach the page instead of at the next animation frame, with every coalesced sample, so fast strokes keep all of the pen's points. `getPredictedEvents` draws a short predicted tail on a second canvas, the only thing cleared while the pen moves.
 - A stroke is the union of a circle at each point and the tangent quad between neighbours, filled once with the nonzero rule. The live canvas draws only each new segment; committing draws the same geometry into the page's tiles, so nothing moves when the pen lifts. New pen strokes are drawn on top of existing tiles without redrawing them; erasing redraws only the tiles it touched.
 - Committed ink lives in 256-pixel tiles per page at the current zoom, created for what's visible and released when far away. Pinch and Ctrl+wheel zoom scale the content with CSS while the gesture lasts and redraw tiles once it settles.
 - Smoothing is a One Euro filter (steady when slow, close behind when fast); the raw last point ends the stroke. Width is computed per point from pressure through the curve setting and stored, so settings never change old writing.
 - Templates are SVG backgrounds, sharp at any zoom and free to scroll. Dark paper flips ink lightness in OKLab and keeps hue and chroma.
+
+## Ruler, carrying and pictures
+
+- The ruler lives in screen pixels per pane, so pages scroll and zoom under it. A stroke that starts within 26 px of a long edge, or on the ruler, has every sample projected onto that edge, offset by the pen's radius, before smoothing; shape recognition is off for it.
+- Lasso selections and picked book text can be carried to the other pane. A lasso on a book page also keeps the looped area itself, and across panes it lands as a picture of that part of the page (pdf.js at twice the size, plus the ink); ink from notes pages is copied as strokes.
+- Crops are stored with the picture (`crop`, shares of the full picture), so the asset is never rewritten and a crop can be undone or changed later.
+- The camera goes through the camera portal: Heft's native side opens the PipeWire remote the portal hands it, asks for MJPG or raw YUY2/RGB, keeps only the newest frame, and the page pulls frames one at a time, so a slow page never queues frames.
+
+## Handwriting search
+
+The page sorts each page's pen strokes into lines (`handwriting/lines.ts`) and sends them one at a time to `luft-handwriting` over D-Bus, which reads them with Qwen3-VL 2B (see `docs/components/handwriting.md`). It waits until nobody has written for 15 s and the pen isn't near, checks again before every line, and the service itself runs at idle priority and refuses while the battery is low. Results go to `handwriting.json` per notebook and into the search index as `ink` entries with each line's box, which search previews mark.
 
 ## Books
 
@@ -60,7 +74,7 @@ So Heft adds next to nothing over the platform; the rest is one or two display f
 1. **Ink core**: done. Pen, highlighter, both erasers, pressure and curve, smoothing, prediction, palm rejection, undo across pages, pinch and wheel zoom, kinetic pan, templates, sizes and paper colours, journaled autosave.
 2. **Organization**: done. Subjects, notebooks, sections, home with recent pages, tabs, the page rail with thumbnails, dragging pages, notebooks and subjects, archive, trash and deleted pages.
 3. **Books**: done. PDF import (menu, drop, opening PDFs with Heft), writing on books, text picking with clean highlights and copying, contents, a notebook beside the book remembered per subject, quotes into the notes beside.
-4. **Tools**: mostly. Shapes (line, arrow, triangle, rectangle, ellipse), lasso (move, resize, rotate, recolour, copy, cut, duplicate, delete, paste), text boxes with headings, bold and lists, pictures (choose, paste), pens and their colours, two- and three-finger taps. Not yet: the ruler, taking a photo with the webcam, cropping pictures, dragging a lasso selection between the panes.
-5. **Search and export**: done. Search over typed text, section, notebook and subject names and book text, accents ignored, grouped with where each hit is; command palette; PDF (vector ink, with or without the paper) of a page, section or notebook, and PNG of a page. Hits don't show thumbnails yet.
-6. **Polish**: partly. English and Serbian (Cyrillic, and Latin through `bun run transliterate`), settings for pen and touch, full-screen writing. Not yet: tablet mode (Kestrel doesn't tell apps about it; it would need a property on its D-Bus interface), a side toolbar, an infinite page that grows as you write, the single-page mode.
-7. **Later**: handwriting recognition. The search index already keeps a kind per entry (`typed`, `book`, `ink`), so recognized text from the device can be added as `ink` entries without changing search.
+4. **Tools**: done. Shapes (line, arrow, triangle, rectangle, ellipse), lasso (move, resize, rotate, recolour, copy, cut, duplicate, delete, paste), the ruler, text boxes with headings, bold and lists, pictures (choose, paste, take with the camera, crop), pens and their colours, two- and three-finger taps, carrying lasso selections and book text between the panes.
+5. **Search and export**: done. Search over typed text, section, notebook and subject names and book text, accents ignored, grouped with where each hit is; command palette; PDF (vector ink, with or without the paper) of a page, section or notebook, and PNG of a page. Hits show their page small with the hit marked.
+6. **Polish**: done. English and Serbian (Cyrillic, and Latin through `bun run transliterate`), settings for pen and touch, full-screen writing, tools along the top or down the side, pages one at a time, an infinite page that grows as you write, and tablet mode: Kestrel publishes it as `tablet-mode` in the settings portal and `luft-app` hands it to every app as `appearance.posture`; folded, Heft moves its tools to the side, makes targets bigger and keeps the text box being typed in above the on-screen keyboard.
+7. **Handwriting search**: done, as an opt-in download. Not yet: converting picked ink to text, and sync.

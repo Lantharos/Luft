@@ -1,3 +1,13 @@
+/** The part of a picture that shows, as shares of its full width and height. */
+export interface Crop {
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+}
+
+export const WHOLE: Crop = { x: 0, y: 0, width: 1, height: 1 };
+
 /** Typed text or a picture placed on a page, above the ink. */
 export interface PageObject {
 	id: string;
@@ -9,8 +19,9 @@ export interface PageObject {
 	/** Text boxes: their formatted contents, and the same as plain text for search. */
 	html?: string;
 	text?: string;
-	/** Pictures: the file in the notebook's assets folder. */
+	/** Pictures: the file in the notebook's assets folder, and the part of it that shows. */
 	asset?: string;
+	crop?: Crop;
 }
 
 export interface ObjectChange {

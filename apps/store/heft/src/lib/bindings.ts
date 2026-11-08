@@ -4,6 +4,8 @@ import { invoke, listen, type CallOptions } from "@lantharos/sabine";
 
 export const commands = {
 	appState: (options?: CallOptions) => invoke<AppState>("app_state", {}, options),
+	cameraClose: (options?: CallOptions) => invoke<null>("camera_close", {}, options),
+	cameraOpen: (options?: CallOptions) => invoke<boolean>("camera_open", {}, options),
 	chooseFiles: (params: {
 		kind: Kind,
 		title: string,
@@ -15,11 +17,18 @@ export const commands = {
 		name: string,
 		extension: string,
 	}, options?: CallOptions) => invoke<string | null>("choose_save", params, options),
+	handwritingInstall: (options?: CallOptions) => invoke<null>("handwriting_install", {}, options),
+	handwritingOverview: (options?: CallOptions) => invoke<HandwritingModel | null>("handwriting_overview", {}, options),
+	handwritingRead: (params: {
+		strokes: (([number, number])[])[],
+	}, options?: CallOptions) => invoke<Read>("handwriting_read", params, options),
+	handwritingRemove: (options?: CallOptions) => invoke<null>("handwriting_remove", {}, options),
 	importFile: (params: {
 		source: string,
 		to: string,
 	}, options?: CallOptions) => invoke<number>("import_file", params, options),
 	library: (options?: CallOptions) => invoke<Library>("library", {}, options),
+	openPenSettings: (options?: CallOptions) => invoke<null>("open_pen_settings", {}, options),
 	remove: (params: {
 		path: string,
 	}, options?: CallOptions) => invoke<null>("remove", params, options),
@@ -55,7 +64,9 @@ export const events = {
 	appearanceCorners: (callback: (payload: Corners) => void) => listen<Corners>("appearance.corners", callback),
 	appearanceLines: (callback: (payload: Lines) => void) => listen<Lines>("appearance.lines", callback),
 	appearanceMotion: (callback: (payload: Motion) => void) => listen<Motion>("appearance.motion", callback),
+	appearancePosture: (callback: (payload: Posture) => void) => listen<Posture>("appearance.posture", callback),
 	appearanceTypography: (callback: (payload: Typography) => void) => listen<Typography>("appearance.typography", callback),
+	handwritingChanged: (callback: (payload: null) => void) => listen<null>("handwriting.changed", callback),
 	kestrelPalette: (callback: (payload: Palette) => void) => listen<Palette>("kestrel.palette", callback),
 };
 
@@ -79,6 +90,7 @@ export type Appearance = {
 	motion: Motion,
 	corners: Corners,
 	lines: Lines,
+	posture: Posture,
 	locale: Locale,
 };
 
@@ -87,6 +99,22 @@ export type Corners = "rounded" | "square";
 export type Entry = {
 	folder: string,
 	meta: Value,
+};
+
+export type HandwritingDownload = {
+	received: number,
+	total: number,
+	problem: string | null,
+};
+
+export type HandwritingModel = {
+	name: string,
+	licence: string,
+	credit: string,
+	homepage: string,
+	size: number,
+	installed: boolean,
+	download: HandwritingDownload | null,
 };
 
 export type IconPaint = {
@@ -122,6 +150,11 @@ export type Palette = {
 	appIcons: AppIcons,
 	taskbar: import("@luft/ui").TaskbarLooks,
 };
+
+/**  Whether the computer is used as a laptop or folded into a tablet. */
+export type Posture = "laptop" | "tablet";
+
+export type Read = { kind: "text"; text: string } | { kind: "notInstalled" } | { kind: "paused" } | { kind: "missing" };
 
 export type SchemeColors = {
 	light: { [key in string]: string },

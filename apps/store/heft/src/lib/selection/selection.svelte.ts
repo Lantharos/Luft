@@ -8,7 +8,7 @@ export interface Transform {
 	angle: number;
 }
 
-const IDENTITY: Transform = { dx: 0, dy: 0, scale: 1, angle: 0 };
+export const IDENTITY: Transform = { dx: 0, dy: 0, scale: 1, angle: 0 };
 
 let clipboard: Stroke[] = [];
 
@@ -26,6 +26,17 @@ function boundsOf(strokes: Stroke[]): Bounds {
 	const bounds = emptyBounds();
 	for (const stroke of strokes) union(bounds, stroke.bounds);
 	return bounds;
+}
+
+function polygonBounds(polygon: [number, number][]): Bounds {
+	const bounds = emptyBounds();
+	for (const [x, y] of polygon) union(bounds, { left: x, top: y, right: x, bottom: y });
+	return bounds;
+}
+
+/** The ink moved by `dx`, `dy` with new ids above everything on a page whose top order is `order`. */
+export function copied(strokes: Stroke[], dx: number, dy: number, order: number): Stroke[] {
+	return strokes.map((stroke) => ({ ...transformed(stroke, { ...IDENTITY, dx, dy }, [0, 0], newId()), order: ++order }));
 }
 
 function transformed(stroke: Stroke, transform: Transform, center: [number, number], id = stroke.id): Stroke {
@@ -50,14 +61,20 @@ class Selection {
 	strokes: Stroke[] = $state.raw([]);
 	bounds: Bounds = $state.raw(emptyBounds());
 	transform: Transform = $state.raw(IDENTITY);
+	/** On a book page, what was looped is also the printed part under it, which can be taken along as a picture. */
+	book = $state(false);
 	private document: PageDocument | null = null;
 	private shown: Stroke[] = [];
 
 	get active() {
+		return this.page !== null;
+	}
+
+	get ink() {
 		return this.strokes.length > 0;
 	}
 
-	pick(page: string, document: PageDocument, polygon: [number, number][]) {
+	pick(page: string, document: PageDocument, polygon: [number, number][], book: boolean) {
 		const strokes = document.strokes.filter((stroke) => {
 			let hits = 0;
 			for (let index = 0; index < stroke.points.length; index += POINT_FIELDS) {
@@ -65,11 +82,13 @@ class Selection {
 			}
 			return hits / (stroke.points.length / POINT_FIELDS) >= 0.6;
 		});
-		this.set(page, document, strokes);
+		this.set(page, document, strokes, book);
+		if (book) this.bounds = polygonBounds(polygon);
 	}
 
-	private set(page: string, document: PageDocument, strokes: Stroke[]) {
-		this.page = strokes.length ? page : null;
+	private set(page: string, document: PageDocument, strokes: Stroke[], book = false) {
+		this.page = strokes.length || book ? page : null;
+		this.book = book;
 		this.document = document;
 		this.strokes = strokes;
 		this.shown = strokes;
@@ -79,6 +98,7 @@ class Selection {
 
 	clear() {
 		this.page = null;
+		this.book = false;
 		this.document = null;
 		this.strokes = [];
 		this.shown = [];
@@ -134,8 +154,8 @@ class Selection {
 	/** Puts copied ink on a page, a little below and to the right of where it was. */
 	paste(page: string, document: PageDocument) {
 		if (!clipboard.length) return;
-		let order = document.lastOrder;
-		const pasted = clipboard.map((stroke) => ({ ...transformed(stroke, { ...IDENTITY, dx: 18, dy: 18 }, [0, 0], newId()), order: ++order }));
+		const order = document.lastOrder;
+		const pasted = copied(clipboard, 18, 18, order);
 		document.commit({ removed: [], added: pasted });
 		clipboard = pasted;
 		this.set(page, document, pasted);

@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { onMount, untrack } from 'svelte';
+	import { appearance } from '@luft/ui';
+	import { carry } from '#lib/drag/carry.svelte.js';
 	import type { OpenNotebook } from '#lib/library/notebook.svelte.js';
 	import { pageSize, paperOf } from '#lib/library/model.js';
 	import { LOOKS } from '#lib/paper/templates.js';
@@ -7,13 +9,16 @@
 	import TextActions from '#lib/pdf/TextActions.svelte';
 	import SelectionBox from '#lib/selection/SelectionBox.svelte';
 	import type { PageStore } from '#lib/page/storage.js';
+	import { carryZone } from './carried';
 	import { pagesIn, stack } from './layout';
 	import { LiveInk } from './live';
 	import PageView from './PageView.svelte';
 	import { Surface } from './input/surface';
+	import RulerView from './ruler/Ruler.svelte';
+	import type { Ruler } from './ruler/ruler.svelte';
 	import type { Viewport } from './viewport.svelte';
 
-	let { notebook, viewport, onquote }: { notebook: OpenNotebook; viewport: Viewport; onquote?: (text: string) => void } = $props();
+	let { notebook, viewport, ruler, onquote }: { notebook: OpenNotebook; viewport: Viewport; ruler: Ruler; onquote?: (text: string) => void } = $props();
 
 	let element: HTMLDivElement;
 	let liveCanvas: HTMLCanvasElement;
@@ -43,7 +48,8 @@
 	});
 
 	let range = $derived.by(() => {
-		const { y, zoom, height } = viewport;
+		const { y, zoom, height, single } = viewport;
+		if (single !== null) return [single, single];
 		const [first, last] = pagesIn(viewport.layout, y / zoom, (y + height) / zoom);
 		return [Math.max(0, first - 1), Math.min(viewport.layout.pages.length - 1, last + 1)];
 	});
@@ -80,21 +86,31 @@
 			preview(scale, x, y) {
 				preview = { scale, x, y };
 			},
+			ruler: () => ruler,
 			undo: () => notebook.undo(),
 			redo: () => notebook.redo()
 		});
+		const leave = carry.zone(carryZone(element, viewport, notebook, stores));
 		const raw = (event: Event) => surface.rawUpdate(event as PointerEvent);
 		element.addEventListener('pointerrawupdate', raw);
 		const media = matchMedia(`(resolution: ${scale}dppx)`);
 		const rescale = () => (scale = window.devicePixelRatio || 1);
 		media.addEventListener('change', rescale);
 		return () => {
+			leave();
 			media.removeEventListener('change', rescale);
 			element.removeEventListener('pointerrawupdate', raw);
 		};
 	});
 
 	$effect(() => live?.resize(viewport.width, viewport.height, scale));
+
+	function keepAboveKeyboard(event: FocusEvent) {
+		const target = event.target as HTMLElement;
+		if (appearance.posture !== 'tablet' || !target.isContentEditable) return;
+		const top = target.getBoundingClientRect().top - element.getBoundingClientRect().top;
+		if (top > viewport.height * 0.35) viewport.panBy(0, top - viewport.height * 0.2);
+	}
 </script>
 
 <div
@@ -108,6 +124,7 @@
 	onpointercancel={(event) => surface.cancel(event)}
 	onwheel={(event) => surface.wheel(event)}
 	oncontextmenu={(event) => event.preventDefault()}
+	onfocusin={keepAboveKeyboard}
 	role="application"
 >
 	<div
@@ -128,6 +145,9 @@
 		{/each}
 	</div>
 	<canvas class="live" bind:this={liveCanvas}></canvas>
+	{#if ruler.shown}
+		<RulerView {ruler} zoom={viewport.zoom} />
+	{/if}
 	<TextActions {notebook} {viewport} {onquote} />
 	<SelectionBox {notebook} {viewport} />
 	<canvas class="live" bind:this={predictCanvas}></canvas>

@@ -9,6 +9,7 @@
     Beleške.heft/                  a notebook, named after it
       notebook.json
       search.json                  typed text by page, for search
+      handwriting.json             handwriting read on this computer, for search
       pages/<id>.page              a page's ink, text and pictures
       pages/<id>.journal           changes since the .page was last written
       assets/<id>.<ext>            pictures placed on pages
@@ -37,7 +38,7 @@ Names are what people typed, so renaming a subject or notebook renames its folde
 }
 ```
 
-`kind` is `notes` or `book`. A page's own `paper` overrides the notebook's. Templates are `blank`, `lined`, `grid`, `dotted`, `cornell` and `staff`; sizes `a4`, `a5`, `letter` and `infinite`; colours `white`, `cream` and `dark`; spacing is in millimetres. Times are milliseconds since 1970.
+`kind` is `notes` or `book`. A page's own `paper` overrides the notebook's. An infinite page also has `height`, how far it has grown in page units; it grows by 160 mm whenever something is written within 120 mm of its end. Templates are `blank`, `lined`, `grid`, `dotted`, `cornell` and `staff`; sizes `a4`, `a5`, `letter` and `infinite`; colours `white`, `cream` and `dark`; spacing is in millimetres. Times are milliseconds since 1970.
 
 ## Pages
 
@@ -75,7 +76,7 @@ A stroke is a 40-byte header and 14 bytes for each point:
 
 Each point's width is the one it was drawn with, so later changes to settings never change old writing. A stroke's outline is a circle at every point joined by its neighbours' common tangents. Highlighter strokes are drawn under pen strokes, at 38 % opacity.
 
-Objects are `{ id, kind, x, y, width, height }` with `html` and `text` for text boxes (`b`, `strong`, `i`, `em`, `u`, `h2`, `h3`, `ul`, `ol`, `li`, `br`, `div`, `p` and `blockquote` only) and `asset` for pictures.
+Objects are `{ id, kind, x, y, width, height }` with `html` and `text` for text boxes (`b`, `strong`, `i`, `em`, `u`, `h2`, `h3`, `ul`, `ol`, `li`, `br`, `div`, `p` and `blockquote` only) and `asset` for pictures. A cropped picture has `crop`, `{ x, y, width, height }`, the part of the picture that shows as shares of its full width and height; the asset itself is never changed.
 
 A `.journal` is a list of records, each `[length u32][crc32 u32][op u8][payload]`, where the length and CRC cover the op and payload:
 
@@ -83,3 +84,17 @@ A `.journal` is a list of records, each `[length u32][crc32 u32][op u8][payload]
 - Op 2 changes objects: JSON `{ "put": [objects], "drop": [ids] }`.
 
 Reading a page means reading its `.page` and applying its journal in order. A record whose length runs past the end or whose CRC doesn't match was cut short by a power cut, and it and anything after it are ignored. Every record is on the disk before Heft goes on, so nothing written survives only in memory. When the journal grows past 256 KB, when a page leaves memory and when Heft closes, the whole page is written to a new `.page` and the journal emptied; replaying a journal over a page that already has its changes gives the same page.
+
+## handwriting.json
+
+What was read from each page's handwriting when handwriting search is on:
+
+```json
+{
+  "format": 1,
+  "pages": { "<page id>": { "ink": "1x2k9q", "lines": [{ "text": "Kvadratna jednačina", "box": { "left": 72, "top": 140, "width": 410, "height": 38 } }] } },
+  "changed": ["<page id>"]
+}
+```
+
+`ink` names the set of pen strokes the page was read with, so a page whose ink comes back as it was isn't read again. `lines` are in reading order, each with where on the page it was written. `changed` lists pages whose ink changed since they were read; they're read again at the next pause in writing. Deleting the file only means everything is read again.

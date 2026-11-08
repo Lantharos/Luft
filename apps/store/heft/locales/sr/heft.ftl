@@ -189,17 +189,15 @@ export-page-name = { $notebook }, страна { $page }
 
 ## Settings
 
-settings-title = Перо и додир
+settings-title = Подешавања
 settings-pressure = Притисак
 settings-pressure-body = Повуците криву нагоре да лак додир пише дебље, или надоле да треба јаче притиснути.
 settings-smoothing = Изглађивање
 settings-smoothing-value = { $percent } %
 settings-smoothing-body = Уједначава несигурне линије. Јаче изглађивање мало заостаје за пером.
-settings-barrel = Дугме на перу
-settings-second-barrel = Друго дугме на перу
-settings-barrel-eraser = Брише
-settings-barrel-highlighter = Маркира
-settings-barrel-none = Ништа
+settings-buttons = Дугмад на перу
+settings-buttons-body = Шта бочна дугмад раде подешава се за све апликације у Луфтовим подешавањима пера. Дугме подешено да брише и овде брише, гумицом коју сте изабрали.
+settings-buttons-open = Подешавања пера
 settings-prediction = Цртај мало испред пера
 settings-prediction-body = Погађа куда перо иде у наредних неколико милисекунди, па мастило стиже и брзо писање.
 settings-finger-pans = Померање једним прстом
@@ -262,3 +260,54 @@ section-new-title = Нови одељак
 section-rename-title = Одељак
 section-name = Назив одељка
 section-create = Додај одељак
+
+settings-toolbar = Алатке
+settings-toolbar-top = Горе
+settings-toolbar-side = Са стране
+settings-toolbar-tablet = Кад се рачунар преклопи у таблет, алатке прелазе са стране и постају веће.
+settings-toolbar-tablet-now = Рачунар је преклопљен у таблет, па су алатке са стране.
+settings-pages = Стране
+settings-pages-continuous = Једна за другом
+settings-pages-single = Једна по једна
+settings-pages-body = Једну по једну окрећете тако што наставите да померате преко краја стране или притиснете Page Down.
+
+settings-handwriting = Претрага рукописа
+settings-handwriting-body = Хефт чита оно што пишете руком на овом рачунару, ништа не излази с њега, па га претрага налази као откуцан текст. Чита у позадини док не пишете и чека док је батерија слаба. Зна српски, немачки, енглески и албански латиницом.
+settings-handwriting-download = Преузми ({ $size })
+settings-handwriting-downloading = Преузима се, { $percent } %
+settings-handwriting-remove = Уклони
+settings-handwriting-reading = { $pages ->
+    [one] Чита се { $pages } страна
+    [few] Читају се { $pages } стране
+   *[other] Чита се { $pages } страна
+}
+settings-handwriting-done = Све написано може да се претражи.
+settings-handwriting-waiting = Чека паузу у писању.
+settings-handwriting-battery = Чека да се рачунар пуни или да батерија буде пунија.
+settings-handwriting-missing = Ова верзија Луфта још не уме да чита рукопис.
+settings-handwriting-failed = Преузимање није успело: { $error }
+
+## Ruler
+
+toolbar-ruler = Лењир
+ruler-label = Лењир
+ruler-angle = { $degrees }°
+
+## Pages one at a time
+
+page-previous = Претходна страна
+page-next = Следећа страна
+
+## Pictures
+
+picture-choose = Изабери слике
+picture-photo = Сликај
+picture-crop = Исеци
+crop-title = Исеци
+crop-reset = Прикажи целу
+crop-done = Исеци
+camera-title = Сликај
+camera-opening = Камера се отвара…
+camera-refused = Хефт не сме да користи камеру. Можете то да дозволите у Подешавањима, под Приватност.
+camera-failed = Камера се није отворила: { $error }
+camera-take = Сликај

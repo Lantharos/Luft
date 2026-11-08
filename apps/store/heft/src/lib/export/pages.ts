@@ -4,7 +4,7 @@ import { traceStroke, type PathSink } from '#lib/ink/geometry.js';
 import { library } from '#lib/library/library.svelte.js';
 import { pageSize, paperOf, type PageEntry } from '#lib/library/model.js';
 import type { OpenNotebook } from '#lib/library/notebook.svelte.js';
-import type { PageObject } from '#lib/page/objects.js';
+import { WHOLE, type Crop, type PageObject } from '#lib/page/objects.js';
 import { LOOKS, ruling } from '#lib/paper/templates.js';
 import { pdfImage } from '#lib/pdf/render.js';
 import { sourcePath } from '#lib/pdf/sources.js';
@@ -99,12 +99,12 @@ export async function textCanvas(object: PageObject, dark: boolean): Promise<HTM
 	return canvas;
 }
 
-export async function pictureCanvas(path: string): Promise<HTMLCanvasElement> {
+export async function pictureCanvas(path: string, crop: Crop = WHOLE): Promise<HTMLCanvasElement> {
 	const bitmap = await createImageBitmap(await (await fetch(fileUrl(path))).blob());
 	const canvas = document.createElement('canvas');
-	canvas.width = bitmap.width;
-	canvas.height = bitmap.height;
-	canvas.getContext('2d')!.drawImage(bitmap, 0, 0);
+	canvas.width = Math.max(1, Math.round(bitmap.width * crop.width));
+	canvas.height = Math.max(1, Math.round(bitmap.height * crop.height));
+	canvas.getContext('2d')!.drawImage(bitmap, bitmap.width * crop.x, bitmap.height * crop.y, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height);
 	return canvas;
 }
 
@@ -146,7 +146,7 @@ export async function pdfPage(notebook: OpenNotebook, entry: PageEntry, options:
 			const canvas = await textCanvas(object, dark);
 			place(await pixels(canvas), object.x, object.y, object.width, canvas.height / RASTER_SCALE);
 		}
-		else place(await jpeg(await pictureCanvas(`${library.root}/${notebook.folder}/assets/${object.asset}`)), object.x, object.y, object.width, object.height);
+		else place(await jpeg(await pictureCanvas(`${library.root}/${notebook.folder}/assets/${object.asset}`, object.crop)), object.x, object.y, object.width, object.height);
 	}
 	return { width: size.width * POINT, height: size.height * POINT, content: ops.join('\n'), images, opacities };
 }

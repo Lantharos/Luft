@@ -1,3 +1,4 @@
+import { session } from '#lib/app/session.svelte.js';
 import type { Viewport } from '#lib/canvas/viewport.svelte.js';
 import type { ToolbarActions } from '#lib/tools/Toolbar.svelte';
 import { tools } from '#lib/tools/tools.svelte.js';
@@ -31,4 +32,25 @@ export function handleKeys(event: KeyboardEvent, actions: ToolbarActions, viewpo
 	if (key === 'arrowup') return run(() => viewport.panBy(0, -60));
 	if (key === 'home') return run(() => viewport.panBy(0, -1e9));
 	if (key === 'end') return run(() => viewport.panBy(0, 1e9));
+}
+
+/** Shortcuts that work everywhere, the home screen included. */
+export function handleAppKeys(event: KeyboardEvent) {
+	if (typing(event.target) || event.altKey || !(event.ctrlKey || event.metaKey)) return;
+	const key = event.key.toLowerCase();
+	const tabs = session.tabs;
+	const run = (action: () => void) => {
+		event.preventDefault();
+		action();
+	};
+	if (key === 'n' && !event.shiftKey) {
+		const subject = session.current?.meta.subject;
+		if (subject) return run(() => session.newPageIn(subject));
+	}
+	if (key === 'w' && session.current) return run(() => session.close(session.current!));
+	if (key === 'tab' && tabs.length) {
+		const index = session.current ? tabs.indexOf(session.current) : -1;
+		const next = (index + (event.shiftKey ? -1 : 1) + tabs.length + 1) % (tabs.length + 1);
+		return run(() => (next === tabs.length ? session.home() : (session.current = tabs[next])));
+	}
 }

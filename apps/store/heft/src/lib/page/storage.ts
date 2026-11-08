@@ -89,12 +89,19 @@ export class PageStore {
 	private journalSize = 0;
 	private compactedRevision = 0;
 
-	private constructor(private readonly base: string) {
+	private constructor(
+		private readonly folder: () => string,
+		readonly id: string
+	) {
 		this.document = new PageDocument((change) => this.append(change));
 	}
 
-	static async open(folder: string, pageId: string): Promise<PageStore> {
-		const store = new PageStore(`${folder}/pages/${pageId}`);
+	private get base() {
+		return `${this.folder()}/pages/${this.id}`;
+	}
+
+	static async open(folder: () => string, pageId: string): Promise<PageStore> {
+		const store = new PageStore(folder, pageId);
 		const [page, journal] = await Promise.all([readFile(`${store.base}.page`), readFile(`${store.base}.journal`)]);
 		readPage(store.document, page);
 		replayJournal(store.document, journal);
@@ -114,8 +121,9 @@ export class PageStore {
 		if (this.journalSize > COMPACT_AFTER) this.compact();
 	}
 
-	compact() {
-		if (this.compactedRevision === this.document.revision) return this.queue.settled;
+	/** Writes the whole page and empties its journal; `always` writes it even when nothing changed. */
+	compact(always = false) {
+		if (!always && this.compactedRevision === this.document.revision) return this.queue.settled;
 		const bytes = encodePage(this.document);
 		this.compactedRevision = this.document.revision;
 		this.journalSize = 0;

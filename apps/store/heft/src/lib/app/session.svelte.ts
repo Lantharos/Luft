@@ -1,17 +1,27 @@
 import { t } from '@luft/i18n';
 import { library, type NotebookEntry } from '#lib/library/library.svelte.js';
 import type { OpenNotebook } from '#lib/library/notebook.svelte.js';
+import { recent } from './recent.svelte';
 import { appState } from './state';
 
-/** Which notebook is open, and getting to one quickly when Heft starts. */
+const MAX_TABS = 6;
+
+/** The open notebooks as tabs, which one is in front, and getting to a page quickly. */
 class Session {
-	notebook: OpenNotebook | null = $state(null);
+	tabs: OpenNotebook[] = $state([]);
+	current: OpenNotebook | null = $state(null);
+	/** A page to bring into view once its notebook shows. */
+	goTo: { notebook: string; page: string } | null = $state(null);
 
 	async start() {
-		const last = appState.get<string>('notebook');
-		const all = library.subjects.flatMap((subject) => subject.notebooks);
-		const entry = all.find((notebook) => notebook.meta.id === last) ?? all[0] ?? (await this.firstNotebook());
-		this.open(entry);
+		const saved = appState.get<{ tabs: string[]; current: string | null }>('tabs');
+		for (const id of saved?.tabs ?? []) {
+			const entry = library.notebook(id);
+			if (entry) this.tabs.push(library.openNotebook(entry));
+		}
+		const current = saved?.current ? this.tabs.find((tab) => tab.meta.id === saved.current) : null;
+		if (current) this.current = current;
+		else if (!library.notebooks.length) this.open(await this.firstNotebook());
 	}
 
 	private async firstNotebook(): Promise<NotebookEntry> {
@@ -19,14 +29,60 @@ class Session {
 		return library.createNotebook(subject, t('default-notebook'));
 	}
 
-	open(entry: NotebookEntry) {
-		void this.notebook?.close();
-		this.notebook = library.open(entry);
-		void appState.save({ notebook: entry.meta.id });
+	open(entry: NotebookEntry, page?: string) {
+		let tab = this.tabs.find((candidate) => candidate.meta.id === entry.meta.id);
+		if (!tab) {
+			tab = library.openNotebook(entry);
+			if (this.tabs.length >= MAX_TABS) {
+				const oldest = this.tabs.find((candidate) => candidate !== this.current)!;
+				this.close(oldest);
+			}
+			this.tabs.push(tab);
+		}
+		this.current = tab;
+		this.goTo = page ? { notebook: entry.meta.id, page } : null;
+		this.remember();
 	}
 
-	close() {
-		return this.notebook?.close();
+	home() {
+		this.current = null;
+		this.remember();
+	}
+
+	close(tab: OpenNotebook) {
+		void tab.settle();
+		const index = this.tabs.indexOf(tab);
+		this.tabs.splice(index, 1);
+		if (this.current === tab) this.current = this.tabs[Math.min(index, this.tabs.length - 1)] ?? null;
+		this.remember();
+	}
+
+	/** Closes tabs of notebooks that went to the trash. */
+	prune() {
+		for (const tab of [...this.tabs]) {
+			if (!library.notebook(tab.meta.id)) {
+				recent.forget(tab.meta.id);
+				this.close(tab);
+			}
+		}
+	}
+
+	/** A fresh page at the end of the subject's most recently used notebook, for when class starts. */
+	newPageIn(subjectId: string) {
+		const subject = library.subject(subjectId);
+		const notebook = subject?.notebooks.filter((entry) => entry.meta.kind === 'notes').sort((a, b) => b.meta.modified - a.meta.modified)[0];
+		if (!notebook) return;
+		const open = library.openNotebook(notebook);
+		const page = open.addPage(open.meta.pages.length);
+		this.open(notebook, page.id);
+	}
+
+	settle() {
+		return Promise.all(this.tabs.map((tab) => tab.settle()));
+	}
+
+	private remember() {
+		void appState.save({ tabs: { tabs: this.tabs.map((tab) => tab.meta.id), current: this.current?.meta.id ?? null } });
 	}
 }
 

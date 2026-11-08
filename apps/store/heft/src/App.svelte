@@ -3,14 +3,20 @@
 	import { i18n, t } from '@luft/i18n';
 	import { appearance, errorText, GlassShell } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
+	import { recent } from '#lib/app/recent.svelte.js';
 	import { session } from '#lib/app/session.svelte.js';
 	import { settings } from '#lib/app/settings.svelte.js';
 	import { appState } from '#lib/app/state.js';
+	import DragGhost from '#lib/drag/DragGhost.svelte';
+	import '#lib/drag/drops.js';
+	import Home from '#lib/home/Home.svelte';
 	import { pen } from '#lib/input/pen.svelte.js';
 	import { library } from '#lib/library/library.svelte.js';
+	import { handleAppKeys } from '#lib/shell/keyboard.js';
 	import Workspace from '#lib/shell/Workspace.svelte';
 	import { tools } from '#lib/tools/tools.svelte.js';
 
+	let ready = $state(false);
 	let failure: string | null = $state(null);
 
 	onMount(() => {
@@ -28,25 +34,32 @@
 		appearance.start(state);
 		await Promise.all([i18n.ready, settings.load(), appState.load(), library.load()]);
 		tools.load();
+		recent.load();
 		await session.start();
+		ready = true;
 	}
 </script>
 
+<svelte:window onkeydown={handleAppKeys} />
+
 <div class="h-[100dvh] w-screen overflow-hidden">
-	<GlassShell class="h-full">
-		{#if session.notebook}
-			{#key session.notebook}
-				<Workspace notebook={session.notebook} />
-			{/key}
-		{:else if failure}
+	<GlassShell class="h-full select-none">
+		{#if failure}
 			<main class="glass-content drag-region grid place-items-center p-8 text-center">
 				<div class="max-w-[420px]">
 					<h1 class="text-[17px] font-semibold">{t('start-failed-title')}</h1>
 					<p class="mt-2 text-[13px] text-(--text-soft)">{t('start-failed-body', { error: failure })}</p>
 				</div>
 			</main>
-		{:else}
+		{:else if !ready}
 			<main class="glass-content drag-region"></main>
+		{:else if session.current}
+			{#key session.current}
+				<Workspace notebook={session.current} />
+			{/key}
+		{:else}
+			<Home />
 		{/if}
 	</GlassShell>
 </div>
+<DragGhost />

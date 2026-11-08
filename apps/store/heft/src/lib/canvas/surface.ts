@@ -53,6 +53,7 @@ export class Surface {
 	}
 
 	down(event: PointerEvent) {
+		event.preventDefault();
 		const rect = this.element.getBoundingClientRect();
 		this.origin = { left: rect.left, top: rect.top };
 		if (event.pointerType === 'touch') return this.touchDown(event);

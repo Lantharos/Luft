@@ -11,7 +11,7 @@
 	{#if pen.tool === 'highlighter'}
 		<span class="highlighter" style:width="{dot * 0.62}px" style:height="{dot}px" style:background={css(pen.color)}></span>
 	{:else}
-		<span class="rounded-full" style:width="{dot}px" style:height="{dot}px" style:background={css(pen.color)}></span>
+		<span class="dot" style:width="{dot}px" style:height="{dot}px" style:background={css(pen.color)}></span>
 	{/if}
 </span>
 
@@ -22,7 +22,8 @@
 		transform: rotate(18deg);
 	}
 
-	.rounded-full {
+	.dot {
+		border-radius: 50%;
 		box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--ink) 14%, transparent);
 	}
 </style>

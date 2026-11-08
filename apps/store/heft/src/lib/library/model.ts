@@ -47,6 +47,8 @@ export interface NotebookMeta {
 	created: number;
 	modified: number;
 	favorite?: boolean;
+	/** Deleted pages, kept with where they were so they can come back. */
+	trashed?: { page: PageEntry; index: number; at: number }[];
 }
 
 export interface SubjectMeta {

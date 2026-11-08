@@ -32,3 +32,6 @@ players-playing = Playing
 unknown-artist = Unknown artist
 # $position and $length are times such as 1:23
 progress = { $position } of { $length }
+
+expand-on-hover = Show more on hover
+    .description = Widens in the taskbar to show more of what plays when you point at it

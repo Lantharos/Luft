@@ -34,3 +34,9 @@ default = true
 key = "toggle"
 label = "shortcut-toggle"
 default = "<Super><Alt>f"
+
+[[settings]]
+key = "expand-on-hover"
+type = "switch"
+label = "expand-on-hover"
+default = true

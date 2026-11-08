@@ -116,3 +116,9 @@ options = [
 key = "open"
 label = "shortcut-open"
 default = "<Super><Alt>r"
+
+[[settings]]
+key = "expand-on-hover"
+type = "switch"
+label = "expand-on-hover"
+default = true

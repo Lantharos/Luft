@@ -57,7 +57,7 @@ function permissions(summary: Summary): Permissions | null {
 }
 
 function verified(metadata: Appstream['metadata']): string | null {
-	if (!metadata?.['flathub::verification::verified']) return null;
+	if (!metadata || String(metadata['flathub::verification::verified']) !== 'true') return null;
 	const website = metadata['flathub::verification::website'];
 	const login = metadata['flathub::verification::login_name'];
 	return `Verified as ${typeof website === 'string' ? website : typeof login === 'string' ? login : 'Flathub'}`;

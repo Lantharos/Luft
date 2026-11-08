@@ -1,4 +1,4 @@
-import type { Disposable, Enable, Popup } from '@luft/extension-api';
+import type { Disposable, ElementLayout, Enable, Popup } from '@luft/extension-api';
 
 import { compact, expanded } from './element.js';
 import { describePage } from './page.js';
@@ -15,11 +15,12 @@ const enable: Enable<Granted> = extension => {
   let ticking: Disposable | null = null;
 
   const session: FocusSession = new FocusSession(extension, ended => sumUp(extension, ended, () => session.start()));
+  const hoverView = () => extension.settings.get<boolean>('expand-on-hover') ? (layout: ElementLayout) => expanded(extension, session, layout) : undefined;
   const element = extension.taskbar.addElement({
     key: 'focus',
     label: extension.t('focus'),
     content: layout => compact(extension, session, layout),
-    expanded: layout => expanded(extension, session, layout),
+    expanded: hoverView(),
     onExpandedChanged: expanding => {
       grown = expanding;
       tick();
@@ -63,7 +64,10 @@ const enable: Enable<Granted> = extension => {
   }
 
   session.onChanged(refresh);
-  extension.settings.onChanged(refresh);
+  extension.settings.onChanged(key => {
+    if (key === 'expand-on-hover') element.update({ expanded: hoverView() });
+    refresh();
+  });
   extension.peers.onChanged(refresh);
   extension.shortcuts.onActivated('toggle', () => (session.active ? session.finish() : session.start()));
   describePage(extension);

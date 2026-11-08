@@ -46,3 +46,9 @@ key = "hide-paused"
 type = "switch"
 label = "hide-paused"
 default = false
+
+[[settings]]
+key = "expand-on-hover"
+type = "switch"
+label = "expand-on-hover"
+default = true

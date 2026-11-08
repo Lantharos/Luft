@@ -7,7 +7,7 @@ export function describePage(extension: Extension<Granted>): void {
   extension.settingsPage.describe(() => [
     {
       title: t('session'),
-      items: [{ setting: 'length' }, { setting: 'hold-notifications' }, ...extension.peers.handles(SOUNDSCAPES, 'play') ? [{ setting: 'soundscapes' }] : []],
+      items: [{ setting: 'length' }, { setting: 'hold-notifications' }, { setting: 'expand-on-hover' }, ...extension.peers.handles(SOUNDSCAPES, 'play') ? [{ setting: 'soundscapes' }] : []],
     },
     { title: t('taskbar'), items: [{ type: 'taskbar-place', element: 'focus' }] },
   ]);

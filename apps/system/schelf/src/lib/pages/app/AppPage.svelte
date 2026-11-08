@@ -1,4 +1,5 @@
 <script lang="ts">
+	import BadgeCheck from '@lucide/svelte/icons/badge-check';
 	import ShieldOff from '@lucide/svelte/icons/shield-off';
 	import { Row, Section } from '@luft/ui';
 	import { abilities } from '#lib/app/extensionAccess.js';
@@ -90,7 +91,16 @@
 			<div class="flex min-w-0 flex-1 flex-col gap-1">
 				<h2 class="truncate text-[26px] font-semibold">{title}</h2>
 				{#if details?.developer || from || withdrawn}
-					<span class="truncate text-[13px] text-[var(--text-muted)]">{[details?.developer, from, withdrawn && 'No longer available on Schelf'].filter(Boolean).join(' · ')}</span>
+					{@const rest = [from, withdrawn && 'No longer available on Schelf'].filter(Boolean).join(' · ')}
+					<span class="flex min-w-0 items-center gap-1 text-[13px] text-[var(--text-muted)]">
+						{#if details?.developer}
+							<span class="truncate">{details.developer}</span>
+							{#if details.verified}
+								<span class="flex-none text-[var(--accent)]" title={details.verified}><BadgeCheck size={14} aria-label={details.verified} /></span>
+							{/if}
+						{/if}
+						{#if rest}<span class="truncate">{details?.developer ? `· ${rest}` : rest}</span>{/if}
+					</span>
 				{/if}
 				{#if summary}
 					<p class="text-[14px] text-[var(--text-soft)]">{summary}</p>

@@ -12,7 +12,7 @@ export function describePage(extension: Extension<Granted>, following: Following
     return [
       {
         title: t('look'),
-        items: [{ setting: 'layout' }, { setting: 'second-line' }, { setting: 'title-width' }, { setting: 'hide-paused' }, { type: 'taskbar-place', element: 'now-playing' }],
+        items: [{ setting: 'layout' }, { setting: 'second-line' }, { setting: 'title-width' }, { setting: 'hide-paused' }, { setting: 'expand-on-hover' }, { type: 'taskbar-place', element: 'now-playing' }],
       },
       {
         title: t('players'),

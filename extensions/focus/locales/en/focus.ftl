@@ -55,3 +55,6 @@ done-held = { $count ->
 }
 done-quiet = No notifications came in
 again = Another session
+
+expand-on-hover = Show more on hover
+    .description = Widens in the taskbar to show the time left when you point at it

@@ -14,7 +14,7 @@ export class SettingsPage {
       { title: t('section-reminding'), items: [{ setting: 'morning' }, { setting: 'snooze' }, { setting: 'come-back' }, { setting: 'come-back-every' }] },
       { title: t('section-birthdays'), items: [{ setting: 'birthday-heads-up' }] },
       { title: t('section-goals'), items: [{ setting: 'goal-nudges' }, { setting: 'goal-nudge-every' }, { setting: 'goal-humour' }] },
-      { title: t('section-taskbar'), items: [{ setting: 'taskbar-shows' }, { setting: 'taskbar-next-within' }, { type: 'taskbar-place', element: 'reminders' }] },
+      { title: t('section-taskbar'), items: [{ setting: 'taskbar-shows' }, { setting: 'taskbar-next-within' }, { setting: 'expand-on-hover' }, { type: 'taskbar-place', element: 'reminders' }] },
       {
         title: t('section-calendars'),
         description: t('section-calendars-note'),

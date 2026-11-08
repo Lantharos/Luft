@@ -1,4 +1,4 @@
-import type { Enable, Popup } from '@luft/extension-api';
+import type { ElementLayout, Enable, Popup } from '@luft/extension-api';
 
 import { compact, expanded, type Layout } from './element.js';
 import { Following } from './following.js';
@@ -31,13 +31,14 @@ const enable: Enable<Granted> = extension => {
     if (popup?.open) popup.update(nowPlaying(extension, following));
   };
   const following = new Following(extension, () => changed());
+  const hoverView = () => settings.get<boolean>('expand-on-hover') ? (layout: ElementLayout) => expanded(extension, following, layout) : undefined;
 
   const element = extension.taskbar.addElement({
     key: 'now-playing',
     label: extension.t('now-playing'),
     shown: shown(),
     content: layout => compact(extension, following, layout),
-    expanded: layout => expanded(extension, following, layout),
+    expanded: hoverView(),
     onExpandedChanged: grown => {
       if (grown) stopWatching ??= following.watch();
       else if (!popup?.open) {
@@ -69,7 +70,10 @@ const enable: Enable<Granted> = extension => {
   media.output.onChanged(() => {
     if (popup?.open) popup.update(nowPlaying(extension, following));
   });
-  settings.onChanged(changed);
+  settings.onChanged(key => {
+    if (key === 'expand-on-hover') element.update({ expanded: hoverView() });
+    changed();
+  });
   describePage(extension, following);
   following.sync();
 };

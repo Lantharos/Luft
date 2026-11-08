@@ -221,3 +221,6 @@ nudge-6 = Moving the date is allowed, and nobody will know
 
 # Start's search; $title is what would be added
 search-add = Add reminder: { $title }
+
+expand-on-hover = Show more on hover
+    .description = Widens in the taskbar to show what's next when you point at it

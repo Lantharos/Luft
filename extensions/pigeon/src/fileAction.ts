@@ -1,9 +1,13 @@
 import type { FileActionItem } from '@luft/extension-api';
 
-import { deviceIcon, SEND_ICON } from './format.js';
-import type { Pigeon } from './pigeon.js';
+import type { Peer, Pigeon } from './pigeon.js';
 
 const LOOK_AGAIN = 'look-again';
+const MENU_ICONS = 'icons/menu';
+const DEVICES: Record<string, string> = { mobile: 'phone', desktop: 'computer', web: 'web', headless: 'terminal', server: 'server' };
+
+const menuIcon = (name: string) => `${MENU_ICONS}/${name}.svg`;
+const deviceIcon = (peer: Peer) => menuIcon(DEVICES[peer.kind] ?? 'computer');
 
 /** Send to device in Rover's menu of files and folders, with the devices nearby to choose from. */
 export function addFileAction(pigeon: Pigeon): void {
@@ -13,11 +17,11 @@ export function addFileAction(pigeon: Pigeon): void {
     : [{ key: 'nobody', label: t('nobody'), disabled: true }];
   const lookAgain = (): FileActionItem => pigeon.scanning
     ? { key: 'looking', label: t('looking'), disabled: true }
-    : { key: LOOK_AGAIN, label: t('look-again'), icon: 'view-refresh-symbolic', keepsMenuOpen: true };
+    : { key: LOOK_AGAIN, label: t('look-again'), icon: menuIcon(LOOK_AGAIN), keepsMenuOpen: true };
   const action = fileActions.add({
     key: 'send',
     label: t('send-to-device'),
-    icon: SEND_ICON,
+    icon: menuIcon('send'),
     items: () => [...devices(), 'separator', lookAgain()],
     onOpened: () => pigeon.scan(),
     onActivate: (paths, choice) => {

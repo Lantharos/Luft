@@ -376,7 +376,7 @@ if (ext.peers.handles('com.lantharos.Soundscapes', 'play')) await ext.peers.requ
 | Option | Is |
 | --- | --- |
 | `key` | Names it among the extension's actions, lowercase with dashes |
-| `label`, `icon` | What the entry says, and its symbolic icon |
+| `label`, `icon` | What the entry says, and its icon. Rover's menu uses thin outlined icons, so ship an outlined SVG in the extension's folder (such as `icons/menu/send.svg`, drawn with 2 px strokes on a 24 px grid) rather than a filled theme icon, which looks heavier beside them |
 | `on` | Which files and folders it shows for: `kind` (`files`, `folders` or `any`), `types` (MIME types such as `image/png`, or `image/*` for a whole group), `extensions` (such as `pdf`, without the dot) and `multiple` (`false` hides it while several are chosen). It shows for everything when left out |
 | `items()` | Gives the entry a menu of its own, of `{ key, label, icon?, disabled?, keepsMenuOpen? }` and `'separator'`. `disabled` greys out a placeholder such as "Nothing nearby"; `keepsMenuOpen` leaves the menu open when chosen, for an entry such as "Look again" whose results show up in place |
 | `onOpened()` | People opened its menu, such as to look for devices again |

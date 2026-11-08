@@ -1,6 +1,6 @@
 import { overlaps, type Bounds, type Stroke } from '#lib/ink/stroke.js';
 import type { PageDocument } from '#lib/page/document.js';
-import { paintStroke, paintStrokes, type Ink } from './ink-paint';
+import { paintStroke, paintStrokes, unwritten, type Ink, type Unwritten } from './ink-paint';
 
 const TILE = 256;
 const KEEP_AROUND = 2;
@@ -48,8 +48,21 @@ export class TileLayer {
 	}
 
 	setInk(ink: Ink) {
-		this.ink = ink;
+		this.ink = { ...ink, unwritten: this.ink.unwritten };
 		for (const tile of this.tiles.values()) this.paint(tile);
+	}
+
+	/** Fades what a playing recording hasn't reached yet, redrawing only where that changed. */
+	setUnwritten(next: Unwritten | null) {
+		const before = this.ink;
+		const after = { ...before, unwritten: next };
+		const flipped = this.document.strokes.filter((stroke) => unwritten(stroke, before) !== unwritten(stroke, after));
+		this.ink = after;
+		if (!flipped.length) return;
+		for (const tile of this.tiles.values()) {
+			const area = this.area(tile);
+			if (flipped.some((stroke) => overlaps(stroke.bounds, area))) this.paint(tile);
+		}
 	}
 
 	update(zoom: number, scale: number, visible: Visible) {

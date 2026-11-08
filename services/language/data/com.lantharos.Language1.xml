@@ -1,0 +1,43 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+ "https://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node name="/com/lantharos/Language1">
+  <!--
+    A language model writing for apps, run in the session and started on demand, at the lowest
+    priority, so it only uses the computer when nothing else wants it. It exits after half a minute
+    with nothing to do, and unloads the model three minutes after the last request. What it's given
+    is only read in memory and never written anywhere.
+  -->
+  <interface name="com.lantharos.Language1">
+    <!-- Notes of part of a class. The request is JSON, the NotesRequest in
+         packages/system/language/src/types.rs: the language to write in, such as "sr-Latn", and the
+         lines said, each with when in milliseconds. The answer is JSON Notes: key points,
+         definitions, homework and questions, each with when it was said. Can take minutes. Fails with
+         com.lantharos.Language1.Error.NotInstalled, naming the model, when it isn't downloaded, and
+         with com.lantharos.Language1.Error.Paused while the computer runs on a battery below 30% that
+         isn't charging. -->
+    <method name="Notes">
+      <arg name="request" type="s" direction="in"/>
+      <arg name="notes" type="s" direction="out"/>
+    </method>
+    <!-- A title and a short summary of a class from its key points: JSON HeadingRequest in, JSON
+         Heading out. Fails like Notes. -->
+    <method name="Heading">
+      <arg name="request" type="s" direction="in"/>
+      <arg name="heading" type="s" direction="out"/>
+    </method>
+  </interface>
+
+  <interface name="com.lantharos.Language1.Models">
+    <!-- JSON, the LanguageModel in packages/system/language/src/types.rs: the model, its size,
+         whether it's downloaded and any download in progress. -->
+    <method name="Overview">
+      <arg name="overview" type="s" direction="out"/>
+    </method>
+    <!-- Starts downloading the model, or picks up a download that stopped. -->
+    <method name="Install"/>
+    <!-- Deletes the downloaded model, or what there is of it. -->
+    <method name="Remove"/>
+    <!-- The model was downloaded or removed, or its download moved on; ask for the Overview again. -->
+    <signal name="Changed"/>
+  </interface>
+</node>

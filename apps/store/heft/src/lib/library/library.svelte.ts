@@ -85,7 +85,7 @@ class Library {
 		return this.subjects.at(-1)!;
 	}
 
-	async updateSubject(subject: SubjectEntry, changes: Partial<Pick<SubjectMeta, 'name' | 'color' | 'archived'>>) {
+	async updateSubject(subject: SubjectEntry, changes: Partial<Pick<SubjectMeta, 'name' | 'color' | 'archived' | 'languages'>>) {
 		if (changes.name && changes.name !== subject.meta.name) {
 			const folder = unique(folderName(changes.name), this.subjects.filter((other) => other !== subject).map((other) => other.folder));
 			await this.settleIn(subject.notebooks);

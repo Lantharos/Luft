@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=com.lantharos.Transcription1
+Exec=/usr/libexec/luft-speech --transcription
+SystemdService=luft-transcription.service

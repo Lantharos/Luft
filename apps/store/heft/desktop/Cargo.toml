@@ -15,6 +15,10 @@ dirs.workspace = true
 futures-util.workspace = true
 luft-app = { workspace = true, features = ["settings"] }
 luft-handwriting.workspace = true
+luft-language.workspace = true
+luft-speech.workspace = true
+ogg.workspace = true
+opus.workspace = true
 pipewire.workspace = true
 sabine.workspace = true
 serde.workspace = true

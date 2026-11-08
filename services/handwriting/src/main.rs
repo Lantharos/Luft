@@ -1,6 +1,5 @@
 #[cfg(test)]
 mod accuracy;
-mod battery;
 mod bus;
 mod hub;
 mod ink;

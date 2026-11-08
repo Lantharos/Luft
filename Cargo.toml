@@ -57,6 +57,7 @@ members = [
     "packages/system/disks",
     "packages/system/fingerprint",
     "packages/system/handwriting",
+    "packages/system/language",
     "packages/system/meet",
     "packages/system/models",
     "packages/system/network",
@@ -72,6 +73,7 @@ members = [
     "security/crates/usb",
     "services/accounts",
     "services/handwriting",
+    "services/language",
     "services/packages",
     "services/printers",
     "services/sleep",
@@ -133,6 +135,7 @@ default-members = [
     "packages/system/disks",
     "packages/system/fingerprint",
     "packages/system/handwriting",
+    "packages/system/language",
     "packages/system/meet",
     "packages/system/models",
     "packages/system/network",
@@ -148,6 +151,7 @@ default-members = [
     "security/crates/usb",
     "services/accounts",
     "services/handwriting",
+    "services/language",
     "services/packages",
     "services/printers",
     "services/sleep",
@@ -185,6 +189,7 @@ luft-recovery-key = { path = "packages/system/recovery-key" }
 luft-sandbox = { path = "apps/system/schelf/sandbox" }
 luft-software = { path = "packages/system/software", default-features = false }
 luft-handwriting = { path = "packages/system/handwriting" }
+luft-language = { path = "packages/system/language" }
 luft-models = { path = "packages/system/models" }
 luft-speech = { path = "packages/system/speech" }
 luft-trust = { path = "packages/system/trust" }
@@ -282,6 +287,8 @@ nix = "0.31.3"
 nt-hive = "0.3.0"
 ntfs = "0.4.0"
 nvml-wrapper = "0.13.0"
+ogg = "0.9.2"
+opus = "0.4.0"
 ort = { version = "2.0.0-rc.15", default-features = false }
 p256 = { version = "0.14.0", default-features = false }
 parking_lot = "0.13.0"

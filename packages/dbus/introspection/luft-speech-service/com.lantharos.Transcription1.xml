@@ -1,0 +1,11 @@
+<node>
+  <interface name="com.lantharos.Transcription1">
+    <method name="Transcribe">
+      <arg name="audio" type="h" direction="in"/>
+      <arg name="from" type="t" direction="in"/>
+      <arg name="ended" type="b" direction="in"/>
+      <arg name="languages" type="as" direction="in"/>
+      <arg type="s" direction="out"/>
+    </method>
+  </interface>
+</node>

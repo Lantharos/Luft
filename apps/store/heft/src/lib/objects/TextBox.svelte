@@ -55,7 +55,7 @@
 		const html = cleanHtml(element.innerHTML);
 		if (draft && !text) return leaving && onchange(null);
 		if (html === object.html) return;
-		onchange(text ? { ...object, html, text, height: element.offsetHeight } : null);
+		onchange(text ? { ...object, html, text, height: element.offsetHeight, typedAt: object.typedAt ?? Date.now() } : null);
 	}
 
 	function input() {

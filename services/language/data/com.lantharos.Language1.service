@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=com.lantharos.Language1
+Exec=/usr/libexec/luft-language
+SystemdService=luft-language.service

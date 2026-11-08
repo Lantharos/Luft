@@ -32,6 +32,8 @@ export function pagePoint(viewport: Viewport, origin: Origin, page: PageRect, ev
 
 const HOLD_TIME = 520;
 const HOLD_SLOP = 3;
+const TAP_SLOP = 4;
+const TAP_TIME = 300;
 
 const pressureOf = (event: Sample) => (event.pointerType === 'pen' && event.pressure > 0 ? event.pressure : STEADY);
 
@@ -40,6 +42,7 @@ export class Drawing {
 	private readonly builder: StrokeBuilder;
 	private shape: Float32Array[] | null = null;
 	private still: { x: number; y: number; timer: number } = { x: 0, y: 0, timer: 0 };
+	private readonly began = performance.now();
 
 	constructor(
 		private readonly viewport: Viewport,
@@ -95,6 +98,21 @@ export class Drawing {
 		width /= this.builder.count;
 		this.shape = shapes.map((shape) => outlinePoints(shape, width));
 		this.live.replace(this.shape);
+	}
+
+	get page() {
+		return this.target.page;
+	}
+
+	/** Where the pen tapped on the page, if it came down and lifted without moving. */
+	tap(): [number, number] | null {
+		const points = this.builder.points;
+		if (this.shape || !this.builder.count || performance.now() - this.began > TAP_TIME) return null;
+		const slop = TAP_SLOP / this.viewport.zoom;
+		for (let index = POINT_FIELDS; index < this.builder.length; index += POINT_FIELDS) {
+			if (Math.hypot(points[index] - points[0], points[index + 1] - points[1]) > slop) return null;
+		}
+		return [points[0], points[1]];
 	}
 
 	predict(predicted: Sample[]) {

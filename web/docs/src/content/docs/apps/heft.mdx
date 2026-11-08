@@ -48,7 +48,7 @@ With **Turn writing into text** on in **Settings**, a line you write becomes typ
 You correct the text with the pen, as on paper:
 
 - **Write over a word** to replace it with what you wrote.
-- **Draw an accent** over a letter to add it: a ˇ for č, š and ž, a stroke for ć, two dots or a short dash for ë, ä, ö and ü, a hook under c for ç, and a line through d for đ. An accent drawn over the wrong accent replaces it, and one over a B in the middle of a word makes it ß. Accents go on the letters of the languages chosen under **Languages you write in**, though any accent can be added.
+- **Draw an accent** over a letter to add it: a ˇ for č, š and ž, a stroke for ć, two dots or a short dash for ë, ä, ö and ü, a hook under c for ç, and a line through d for đ. An accent drawn over the wrong accent replaces it, and one over a B in the middle of a word makes it ß. Accents go on the letters of the languages chosen under **Languages you use in class**, though any accent can be added.
 - **Cross words out** to delete them.
 - **Tap between words**, or draw a ^ under the line, to mark where the next line you write goes in.
 
@@ -86,7 +86,29 @@ Drag picked text from the book over to your notes to quote it where you let go. 
 
 <kbd>Ctrl</kbd>+<kbd>K</kbd> finds subjects, notebooks and sections, runs commands, and searches everything you typed and every book's text. Accents don't matter: "jednacine" finds "jednačine". Each hit shows its page small, with where the words are marked.
 
-To search what you wrote by hand too, download handwriting search in **Settings** (1.6 GB). Heft then reads your handwriting on this computer, in the background whenever you pause writing for a while, and waits while the battery is below 30% and not charging. It reads Serbian, German, English and Albanian written in Latin letters. Reading takes a few seconds a line, so a full notebook takes a while the first time; after that only pages you change are read again.
+To search what you wrote by hand too, download handwriting search in **Settings** (1.6 GB). Heft then reads your handwriting on this computer, in the background whenever you pause writing for a while. On a laptop it waits for the charger, unless **Heavy work in the background** in **Settings** says **Right away**, and it always waits while the battery is below 30% and not charging. It reads Serbian, German, English and Albanian written in Latin letters. Reading takes a few seconds a line, so a full notebook takes a while the first time; after that only pages you change are read again.
+
+## Recording a class
+
+The microphone button above the page records the class into the notebook, so you can listen again later to what was said while you wrote.
+
+**Ask first.** Recording people without asking is against the law in many places; in Germany, secretly recording what someone says is a crime. The first time you record in a subject, Heft reminds you to ask your teacher, and the class if they can be heard. While Heft records, a red dot and the time show above the page, and Luft shows that the microphone is on.
+
+- **Pause** closes the microphone until you go on; the pause is left out of the recording.
+- Closing Heft doesn't stop the recording. Open Heft again to see it and stop it.
+- The recording is saved second by second, so if the computer turns off mid-class you keep everything up to then.
+
+### Listening
+
+The headphones button plays a notebook's recordings. While one plays, what you wrote later is faint and fills in as the recording reaches the moment you wrote it. **Tap anything you wrote**, by hand or typed, to hear what was being said then; it starts a few seconds before, since writing follows speech. The bar at the bottom plays, skips ten seconds, changes the speed and opens the notes.
+
+### Transcripts and notes
+
+Heft can write out what was said and make notes of it: the key points, definitions, homework and tests with when they're due, and questions asked in class, leaving out chatter and telling-off. Each point has the time it was said; tap it to listen. Edit the notes in the panel, or **put the notes on a page** of the notebook. <kbd>Ctrl</kbd>+<kbd>K</kbd> searches what was said too, and opens the recording at that moment.
+
+This happens on your computer and nothing is uploaded. It needs two downloads the first time, 3.1 GB together: Whisper writes out the speech and Qwen3 makes the notes. Choose the **languages you use in class** in **Settings**, and give a subject its own when you edit it; Heft tells them apart sentence by sentence, so a German class taught partly in Serbian comes out right. Fewer languages are told apart more reliably. Whisper is weak at Albanian: name it alone for a class taught in Albanian, and expect a rough transcript.
+
+It takes a while, and works only while you aren't writing, so it never slows the pen. After you stop recording, choose **Now** or **When charging**. **Heavy work in the background** in **Settings** sets which one new recordings use, and handwriting search follows it too; on a laptop it's **When charging** at first. Work that waits for the charger starts by itself once it's plugged in, stops when it's unplugged and goes on from where it was, also after a restart. Whatever you choose, it also waits while the battery is below 30% and not charging. The panel shows how far it is.
 
 ## Saving copies
 
@@ -94,4 +116,4 @@ To search what you wrote by hand too, download handwriting search in **Settings*
 
 ## Where your notes are
 
-Everything is in **Documents/Heft**, a folder for each subject and a `.heft` folder for each notebook, so Rover can show and back them up. A copy of the whole library is also kept every day for two weeks in `~/.local/state/com.lantharos.Heft/backups`.
+Everything is in **Documents/Heft**, a folder for each subject and a `.heft` folder for each notebook, so Rover can show and back them up. Recordings are in each notebook's `recordings` folder, as Opus files any player opens. A copy of the whole library is also kept every day for two weeks in `~/.local/state/com.lantharos.Heft/backups`.

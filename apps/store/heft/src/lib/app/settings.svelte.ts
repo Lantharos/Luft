@@ -1,5 +1,6 @@
 import { appearance } from '@luft/ui';
 import { commands } from '#lib/bindings.js';
+import type { Processing } from '#lib/recording/model.js';
 
 export type ToolbarPlace = 'top' | 'side';
 export type PageFlow = 'continuous' | 'single';
@@ -19,6 +20,8 @@ export interface SettingsValues {
 	keepCorrections: boolean;
 	/** The languages the person writes in, for where accents go; empty for the system's. */
 	languages: string[];
+	/** When heavy background work runs, transcribing and making notes of recordings and reading handwriting for search; null waits for the charger on computers with a battery. */
+	backgroundWork: Processing | null;
 }
 
 const DEFAULTS: SettingsValues = {
@@ -33,7 +36,8 @@ const DEFAULTS: SettingsValues = {
 	convert: false,
 	convertAfter: 800,
 	keepCorrections: false,
-	languages: []
+	languages: [],
+	backgroundWork: null
 };
 
 const SAVE_AFTER = 500;

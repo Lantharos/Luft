@@ -300,8 +300,8 @@ settings-convert-body = Kad zastanete posle reda, on postaje otkucan tekst tamo 
 settings-convert-after = Pauza pre pretvaranja
 settings-convert-seconds = { $value } s
 settings-convert-pause = Pretvara se u tekst kad olovka miruje { $value } s.
-settings-languages = Jezici na kojima pišete
-settings-languages-body = Kvačice koje nacrtate idu na slova koja ti jezici koriste, mada se može dodati svaka.
+settings-languages = Jezici koje koristiš na času
+settings-languages-body = Kvačice koje nacrtaš idu na slova koja ti jezici koriste, mada se može dodati bilo koja, a snimci se rečenicu po rečenicu razlikuju među njima. Predmet može da ima svoje.
 settings-languages-choose = Izaberi
 settings-keep-corrections = Čuvaj moje ispravke
 settings-keep-corrections-body = Čuva ono što ispravite na ovom računaru, nigde drugde, da kasnije pomogne boljem čitanju.
@@ -334,3 +334,94 @@ camera-opening = Kamera se otvara…
 camera-refused = Heft ne sme da koristi kameru. Možete to da dozvolite u Podešavanjima, pod Privatnost.
 camera-failed = Kamera se nije otvorila: { $error }
 camera-take = Slikaj
+
+## Recording classes
+
+record-start = Snimi čas
+record-pause = Pauziraj snimanje
+record-resume = Nastavi snimanje
+record-stop = Zaustavi snimanje
+record-recording = Snima se, { $time }
+record-elsewhere = Snima se u svesci { $notebook }
+record-failed = Snimanje je prekinuto
+recordings-open = Pusti snimak
+recordings-title = Snimci
+
+consent-title = Pitaj pre nego što snimaš
+consent-ask = Snimanje ljudi bez njihovog pitanja je na mnogim mestima protiv zakona, a u Nemačkoj je tajno snimanje tuđih reči krivično delo. Pitaj nastavnika, i odeljenje ako se čuju, pre nego što počneš da snimaš.
+consent-law = Dok Heft snima, u svesci se vidi crvena tačka, a Luft pokazuje da je mikrofon uključen. Snimanje se nastavlja i ako zatvoriš Heft, sve dok ga ne zaustaviš.
+consent-local = Snimak, ono što je na njemu rečeno i beleške napravljene od toga ostaju u ovoj svesci na ovom računaru. Heft ih nikada ne šalje.
+consent-record = Složili su se, snimaj
+
+stopped-title = Snimljeno { $length }
+stopped-body = Heft može da ispiše šta je rečeno i da od toga napravi beleške, uz trenutak kada je šta rečeno, na ovom računaru. To potraje i radi samo dok ne pišeš.
+stopped-download = Prvo su potrebna dva preuzimanja, ukupno { $size }: Whisper za ispisivanje govora i Qwen3 za beleške.
+stopped-on-battery = Računar radi na bateriju, pa može da sačeka punjač.
+stopped-charging = Računar se puni, pa može odmah da počne.
+stopped-keep = Zatvori
+stopped-charger = Kad se puni
+stopped-now = Sada
+
+player-label = Snimak
+player-play = Pusti
+player-pause = Pauziraj
+player-back = 10 sekundi nazad
+player-forward = 10 sekundi napred
+player-seek = Mesto u snimku
+player-rate = Brzina
+player-close = Zatvori snimak
+player-panel-hide = Sakrij beleške i zapis
+player-panel-show = Beleške i zapis, { $stage }
+
+panel-label = Šta je rečeno
+panel-notes = Beleške
+panel-said = Zapis
+panel-download = Preuzmi ({ $size })
+panel-process-now = Počni sada
+panel-to-page = Stavi beleške na stranu
+
+stage-queued = Čeka na red
+stage-done = Beleške su spremne
+stage-transcribing = Ispisuje se šta je rečeno, { $percent }%
+stage-writing-notes = Prave se beleške, { $percent }%
+stage-waiting-charger = Čeka punjač
+stage-waiting-writing = Čeka pauzu u pisanju
+stage-waiting-battery = Čeka da se baterija napuni ili da se puni
+stage-waiting-models = Čeka preuzimanja
+stage-waiting-recording = Prati snimanje dok traje
+stage-unsupported = Procesor ovog računara ne može da ispisuje govor
+stage-missing = Ova verzija Luft-a još ne može da ispisuje govor
+stage-failed = Nešto nije uspelo: { $error }
+
+transcript-empty = Još ništa nije ispisano.
+notes-empty = Još nema beleški.
+notes-nothing = Na ovom času ništa nije trebalo zabeležiti.
+notes-points = Najvažnije
+notes-definitions = Pojmovi
+notes-homework = Domaći i kontrolni
+notes-questions = Pitanja
+notes-play-from = Pusti od { $time }
+notes-field-text = Tačka
+notes-field-term = Pojam
+notes-field-meaning = Značenje
+notes-field-task = Zadatak
+notes-field-due = Rok
+notes-field-question = Pitanje
+notes-field-answer = Odgovor
+
+palette-hit-said = { $subject } · { $notebook } · rečeno u { $time }
+
+settings-recording = Snimanje časova
+settings-recording-body = Heft snima na ovom računaru i čuva snimak u svesci. Može da ispiše šta je rečeno i da napravi beleške, takođe na ovom računaru; ništa se ne šalje.
+settings-process = Teži poslovi u pozadini
+settings-process-now = Odmah
+settings-process-charger = Kad se puni
+settings-process-body = Ispisivanje snimaka, pravljenje beleški i čitanje rukopisa za pretragu računaru potraju. Kako god da izabereš, rade samo dok ne pišeš i čekaju dok je baterija ispod 30%.
+settings-recording-whisper = ispisuje govor
+settings-recording-writer = pravi beleške
+settings-recording-model = { $use }, { $size }, { $licence }
+
+
+subject-languages = Jezici na časovima ovog predmeta
+subject-languages-body = Za snimke: Heft razlikuje samo ove jezike, i što ih je manje, to ih pouzdanije razlikuje. Whisper najslabije prepoznaje albanski, pa ga na času na albanskom izaberi samog.
+settings-handwriting-charger = Čeka punjač.

@@ -11,6 +11,7 @@
 	import { sourcePath } from '#lib/pdf/sources.js';
 	import { LOOKS } from '#lib/paper/templates.js';
 	import type { PageStore } from '#lib/page/storage.js';
+	import { player } from '#lib/recording/player.svelte.js';
 	import type { PageRect } from './layout';
 	import { TileLayer, type Visible } from './tiles';
 
@@ -60,6 +61,8 @@
 	$effect(() => layer?.setInk({ dark }));
 
 	$effect(() => layer?.update(zoom, scale, visible));
+
+	$effect(() => layer?.setUnwritten(player.unwrittenIn(notebook)));
 
 </script>
 

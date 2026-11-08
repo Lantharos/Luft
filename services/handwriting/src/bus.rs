@@ -5,7 +5,6 @@ use luft_handwriting::types::{HandwritingDownload, HandwritingModel, Stroke};
 use zbus::interface;
 use zbus::object_server::SignalEmitter;
 
-use crate::battery;
 use crate::hub::{self, Hub, NotInstalled, Urgency};
 use crate::priority::Background;
 
@@ -48,7 +47,9 @@ pub fn serve(hub: &Arc<Hub>) -> (Recognition, Models) {
 #[interface(name = "com.lantharos.Handwriting1")]
 impl Recognition {
     async fn recognize(&self, strokes: Vec<Stroke>) -> Result<String, Error> {
-        if battery::low().await {
+        if let Ok(system) = luft_dbus::system().await
+            && luft_dbus::power::battery_low(system).await
+        {
             return Err(Error::Paused("The battery is low".into()));
         }
         let hub = self.hub.clone();

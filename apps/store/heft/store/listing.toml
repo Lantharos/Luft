@@ -1,5 +1,5 @@
 summary = "Notebooks and textbooks you write in with a pen"
-description = "Keeps every subject's notes and textbooks in one place on your 2-in-1. Write with a pen that keeps up with your hand, highlight and annotate PDF textbooks, keep the book open beside your notes, and find anything again by searching what you typed or what the book says."
+description = "Keeps every subject's notes and textbooks in one place on your 2-in-1. Write with a pen that keeps up with your hand, highlight and annotate PDF textbooks, keep the book open beside your notes, and find anything again by searching what you typed or what the book says. Record a class and tap anything you wrote to hear what was said right then, with a transcript and notes made on your computer."
 screenshots = ["light.webp", "dark.webp"]
 categories = ["Office", "Education"]
 homepage = "https://luft.computer"

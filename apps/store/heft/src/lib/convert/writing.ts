@@ -96,7 +96,8 @@ function newBox(page: Page, line: WrittenLine, baseline: number, text: string): 
 		text,
 		line: lines.step,
 		size: lines.size,
-		written: []
+		written: [],
+		typedAt: Math.min(...line.ids.map((id) => page.document.get(id)?.started ?? Date.now()))
 	};
 }
 

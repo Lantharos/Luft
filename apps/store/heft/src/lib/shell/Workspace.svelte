@@ -23,6 +23,13 @@
 	import NotebookMenu from './NotebookMenu.svelte';
 	import { Pane } from './pane.svelte';
 	import PaneView from './PaneView.svelte';
+	import { player } from '#lib/recording/player.svelte.js';
+	import { processing } from '#lib/recording/processing.svelte.js';
+	import { recorder } from '#lib/recording/recorder.svelte.js';
+	import PlayerBar from '#lib/recording/view/PlayerBar.svelte';
+	import RecordControls from '#lib/recording/view/RecordControls.svelte';
+	import RecordingPanel from '#lib/recording/view/RecordingPanel.svelte';
+	import StopDialog from '#lib/recording/view/StopDialog.svelte';
 
 	let { notebook, beside }: { notebook: OpenNotebook; beside: OpenNotebook | null } = $props();
 
@@ -36,6 +43,8 @@
 	let focused = $state<'main' | 'second'>('main');
 	let pane = $derived(focused === 'second' && second ? second : main);
 	let railOpen = $state(appState.get<boolean>('rail') ?? true);
+	let panelOpen = $state(appState.get<boolean>('recordingPanel') ?? false);
+	let playing = $derived(player.openIn(pane.notebook));
 	let focusing = $state(false);
 
 	function focusMode(on: boolean) {
@@ -62,6 +71,13 @@
 		if (image) await addPicture(page.document, pane.notebook.folder, page.rect, new Uint8Array(await image.arrayBuffer()), image.name);
 		else pane.actions.paste();
 	}
+
+	function togglePanel() {
+		panelOpen = !panelOpen;
+		void appState.save({ recordingPanel: panelOpen });
+	}
+
+	const pageInView = () => pane.notebook.meta.pages[pane.current]?.id ?? pane.notebook.meta.pages[0].id;
 
 	function toggleRail() {
 		railOpen = !railOpen;
@@ -95,10 +111,11 @@
 			<Toolbar actions={pane.actions} zoom={pane.viewport.zoom} {books} ruled={pane.ruler.shown} />
 		{/if}
 		<div class="flex flex-1 items-center justify-end gap-2">
+			<RecordControls notebook={pane.notebook} page={pageInView} />
 			{#if single}
 				<IconButton icon={ChevronUp} label={t('page-previous')} onclick={() => pane.viewport.turn(-1)} />
 			{/if}
-			<span class="text-[12px] text-(--text-muted) tabular-nums">{t('page-of', { page: current + 1, pages: pane.notebook.meta.pages.length })}</span>
+			<span class="text-[12px] whitespace-nowrap text-(--text-muted) tabular-nums">{t('page-of', { page: current + 1, pages: pane.notebook.meta.pages.length })}</span>
 			{#if single}
 				<IconButton icon={ChevronDown} label={t('page-next')} onclick={() => pane.viewport.turn(1)} />
 			{/if}
@@ -111,14 +128,20 @@
 				<Toolbar actions={pane.actions} zoom={pane.viewport.zoom} {books} ruled={pane.ruler.shown} side />
 			</div>
 		{/if}
-		<div class="flex min-h-0 min-w-0 flex-1 gap-px" class:flex-col={width < height * 1.15} bind:clientWidth={width} bind:clientHeight={height}>
+		<div class="relative flex min-h-0 min-w-0 flex-1 gap-px" class:flex-col={width < height * 1.15} bind:clientWidth={width} bind:clientHeight={height}>
 			<PaneView pane={main} active={second !== null && focused === 'main'} onfocus={() => (focused = 'main')} onquote={quoteFrom(main)} />
 			{#if second}
 				{#key second}
 					<PaneView pane={second} active={focused === 'second'} onfocus={() => (focused = 'second')} onquote={quoteFrom(second)} />
 				{/key}
 			{/if}
+			{#if playing}
+				<PlayerBar panel={panelOpen} onpanel={togglePanel} />
+			{/if}
 		</div>
+		{#if playing && panelOpen && !focusing}
+			<RecordingPanel notebook={pane.notebook} after={() => pane.current} />
+		{/if}
 	</div>
 </main>
 
@@ -127,6 +150,16 @@
 {/if}
 {#if requests.paper}
 	<PaperDialog notebook={pane.notebook} page={pane.notebook.meta.pages[current]} onclose={() => (requests.paper = false)} />
+{/if}
+{#if recorder.stopped}
+	<StopDialog
+		notebook={recorder.stopped.notebook}
+		recording={recorder.stopped.recording}
+		onclose={() => {
+			recorder.stopped = null;
+			processing.kick();
+		}}
+	/>
 {/if}
 {#if requests.export}
 	<ExportDialog notebook={pane.notebook} current={pane.current} format={requests.export} onclose={() => (requests.export = null)} />

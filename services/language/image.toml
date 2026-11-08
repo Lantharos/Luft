@@ -1,0 +1,8 @@
+part = "services"
+
+[programs]
+"/usr/libexec/" = ["luft-language"]
+
+[files]
+"/usr/share/dbus-1/services/" = ["data/com.lantharos.Language1.service"]
+"/usr/lib/systemd/user/" = ["data/luft-language.service"]

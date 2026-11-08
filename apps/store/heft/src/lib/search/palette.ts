@@ -1,7 +1,8 @@
 import { t } from '@luft/i18n';
-import { matchItems, PaletteState, type PaletteItem, type PaletteSource } from '@luft/ui';
+import { formatClock, matchItems, PaletteState, type PaletteItem, type PaletteSource } from '@luft/ui';
 import { session } from '#lib/app/session.svelte.js';
 import { library } from '#lib/library/library.svelte.js';
+import { player } from '#lib/recording/player.svelte.js';
 import { searchIndex } from './index.svelte';
 import { hitPreview } from './preview';
 
@@ -50,9 +51,14 @@ function hits(query: string): PaletteItem[] {
 			key: `hit:${hit.page}:${hit.kind}:${hit.at}`,
 			label: hit.snippet,
 			labelMatches: Array.from({ length: query.trim().length }, (_, offset) => hit.at + offset),
-			detail: t('palette-hit', { subject: subject?.meta.name ?? '', notebook: hit.notebook.meta.name, page: hit.index + 1 }),
+			detail: hit.moment
+				? t('palette-hit-said', { subject: subject?.meta.name ?? '', notebook: hit.notebook.meta.name, time: formatClock(hit.moment.at / 1000) })
+				: t('palette-hit', { subject: subject?.meta.name ?? '', notebook: hit.notebook.meta.name, page: hit.index + 1 }),
 			preview: hitPreview(hit, query),
-			run: () => session.open(hit.notebook, hit.page)
+			run: () => {
+				session.open(hit.notebook, hit.page);
+				if (hit.moment) void player.playFrom(library.openNotebook(hit.notebook), hit.moment.recording, hit.moment.at);
+			}
 		};
 	});
 }

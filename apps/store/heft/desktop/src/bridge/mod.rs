@@ -105,7 +105,9 @@ async fn open_pen_settings(Empty {}: Empty) -> Result<(), String> {
 }
 
 pub fn register(window: SabineWindow) -> SabineWindow {
-    crate::handwriting::register(crate::camera::register(files::register(window)))
+    crate::processing::register(crate::recording::register(crate::handwriting::register(
+        crate::camera::register(files::register(window)),
+    )))
         .command_async("app_state", |Empty {}| state::app_state())
         .command("resolve_arguments", |activation: Activation| {
             Ok(state::launch_paths(&activation))

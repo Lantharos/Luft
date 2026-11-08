@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import Check from '@lucide/svelte/icons/check';
-	import { t } from '@luft/i18n';
-	import { Dialog, TextField } from '@luft/ui';
+	import { i18n, t } from '@luft/i18n';
+	import { Dialog, MultiChoice, TextField } from '@luft/ui';
+	import { CLASS_LANGUAGES, spokenIn } from '#lib/recording/languages.js';
 	import { focusField } from '#lib/shell/dialogs/focus.js';
 	import { library, SUBJECT_COLORS, type SubjectEntry } from '#lib/library/library.svelte.js';
 
@@ -10,13 +11,17 @@
 
 	let name = $state(untrack(() => subject?.meta.name ?? ''));
 	let color = $state(untrack(() => subject?.meta.color ?? SUBJECT_COLORS[library.subjects.length % SUBJECT_COLORS.length]));
+	const names = new Intl.DisplayNames([i18n.locale], { type: 'language' });
+	let languages = $state(untrack(() => spokenIn(subject?.meta)));
 	let trimmed = $derived(name.trim());
 
 	async function save() {
 		if (!trimmed) return;
-		if (subject) await library.updateSubject(subject, { name: trimmed, color });
+		const spoken = languages.join() === spokenIn().join() ? undefined : languages;
+		if (subject) await library.updateSubject(subject, { name: trimmed, color, languages: spoken });
 		else {
 			const created = await library.createSubject(trimmed, color);
+			if (spoken) await library.updateSubject(created, { languages: spoken });
 			await library.createNotebook(created, t('default-notebook'));
 		}
 		onclose();
@@ -32,6 +37,17 @@
 					{#if color === option}<Check size={16} strokeWidth={2.6} />{/if}
 				</button>
 			{/each}
+		</div>
+		<div class="flex flex-col gap-2">
+			<p class="text-[13.5px]">{t('subject-languages')}</p>
+			<MultiChoice
+				label={t('subject-languages')}
+				value={languages}
+				least={1}
+				options={[...new Set([...CLASS_LANGUAGES, ...spokenIn()])].map((language) => ({ value: language, label: names.of(language) ?? language }))}
+				onchange={(value) => (languages = value)}
+			/>
+			<p class="text-[12px] text-(--text-muted)">{t('subject-languages-body')}</p>
 		</div>
 	</form>
 	{#snippet actions()}

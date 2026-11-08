@@ -15,6 +15,9 @@
 	import { isPdf } from '#lib/pdf/import.js';
 	import CarryGhost from '#lib/drag/CarryGhost.svelte';
 	import { reader } from '#lib/handwriting/reader.svelte.js';
+	import { power } from '#lib/recording/power.svelte.js';
+	import { processing } from '#lib/recording/processing.svelte.js';
+	import { recorder } from '#lib/recording/recorder.svelte.js';
 	import { pen } from '#lib/input/pen.svelte.js';
 	import { library } from '#lib/library/library.svelte.js';
 	import { handleAppKeys } from '#lib/shell/keyboard.js';
@@ -29,6 +32,7 @@
 	let importing: string[] = $state([]);
 	let failure: string | null = $state(null);
 	let stopReading = () => {};
+	let stopRecording = () => {};
 
 	onMount(() => {
 		const stops = [pen.start(), sabineEvents.singleInstance((activation) => void activate(activation))];
@@ -36,6 +40,7 @@
 		return () => {
 			stops.forEach((stop) => stop());
 			stopReading();
+			stopRecording();
 		};
 	});
 
@@ -53,6 +58,8 @@
 		ready = true;
 		void searchIndex.load();
 		stopReading = reader.start();
+		const stops = [await power.start(), recorder.start(), processing.start()];
+		stopRecording = () => stops.forEach((stop) => stop());
 		importing = state.launchPaths.filter(isPdf);
 	}
 

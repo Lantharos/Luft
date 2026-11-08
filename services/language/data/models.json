@@ -1,0 +1,21 @@
+{
+  "mirror": "https://get.luft.computer/models",
+  "models": [
+    {
+      "id": "qwen3-4b-instruct-2507-q4",
+      "engine": "text",
+      "name": "Qwen3 4B",
+      "licence": "Apache 2.0",
+      "credit": "Qwen3 4B Instruct 2507 by the Qwen team at Alibaba Cloud, quantized for llama.cpp by Unsloth",
+      "homepage": "https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507",
+      "source": "https://huggingface.co/unsloth/Qwen3-4B-Instruct-2507-GGUF/resolve/a06e946bb6b655725eafa393f4a9745d460374c9",
+      "files": [
+        {
+          "name": "Qwen3-4B-Instruct-2507-Q4_K_M.gguf",
+          "size": 2497281120,
+          "sha256": "3605803b982cb64aead44f6c1b2ae36e3acdb41d8e46c8a94c6533bc4c67e597"
+        }
+      ]
+    }
+  ]
+}

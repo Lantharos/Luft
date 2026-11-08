@@ -58,3 +58,23 @@ pub struct Overview {
     /// The engines this computer's processor can run.
     pub engines: Vec<Engine>,
 }
+
+/// Something said in a recording, with when it starts and ends in milliseconds
+/// from the start of the recording, and the language it was said in.
+#[derive(Clone, Debug, Serialize, Deserialize, Type)]
+pub struct Said {
+    pub start: u64,
+    pub end: u64,
+    pub language: String,
+    pub text: String,
+}
+
+/// What a recording says from where it was asked for, up to `next`, where the
+/// next request goes on from.
+#[derive(Clone, Debug, Serialize, Deserialize, Type)]
+pub struct Transcribed {
+    pub said: Vec<Said>,
+    pub next: u64,
+    /// Whether the whole recording has been transcribed.
+    pub done: bool,
+}

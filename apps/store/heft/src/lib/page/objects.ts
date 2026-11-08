@@ -36,6 +36,8 @@ export interface PageObject {
 	flow?: boolean;
 	/** Lines turned from handwriting into this text, each with where every character was written. */
 	written?: WrittenLine[];
+	/** Text boxes: when their text was first typed, so a recording can play what was said then. */
+	typedAt?: number;
 	/** Pictures: the file in the notebook's assets folder, and the part of it that shows. */
 	asset?: string;
 	crop?: Crop;

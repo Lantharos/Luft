@@ -22,6 +22,7 @@ Heft is a store app (`apps/store/heft`), like Draft, Magpie and Convertible: the
 | `typing/` | Typing anywhere: the caret, Markdown-like line starts and text carrying on to the next page |
 | `handwriting/` | Reading handwriting for search, in the background |
 | `convert/` | Turning writing into text when the pen pauses, and pen corrections of that text |
+| `recording/` | Recording classes, playing them in step with the writing, and their transcripts and notes |
 | `search/`, `export/` | The search index and command palette; PDF and PNG output |
 | `canvas/ruler/` | The ruler and keeping strokes on its edge |
 | `home/`, `rail/`, `shell/`, `tools/`, `settings/`, `paper/`, `selection/`, `drag/`, `app/`, `input/` | Screens and their state |
@@ -69,6 +70,13 @@ On the synthetic samples (`services/handwriting/tools/samples.py`), words wrong 
 
 Tidying matters most for words read on their own, as when one is written again: Serbian words wrong fall from 37% to 26% and Albanian from 67% to 46%. Albanian stays weak because the model reads ë as ä, ö or i, with the wrong letter under the dots, which an accent can't fix. Each converted line keeps where every character's ink was (`written`), and with the setting on, corrections go to `corrections.jsonl` in Heft's data folder with the strokes, never anywhere else.
 
+## Recording classes
+
+- **Recording** belongs to the native side (`desktop/src/recording/`), not the page: a PipeWire stream from the default microphone at 48 kHz mono, opened only while recording and closed while paused, feeds a thread that encodes 20 ms Opus frames at 24 kbit/s into Ogg pages of one second, each synced before the next. Heft is a Sabine background app, so closing the window during a recording leaves the process recording. It quits when the window closes with nothing recording: a closed window has left the bridge by the time it's reported hidden, so an event sent then reaches no one, while a minimized window still hears it. The PipeWire client is Heft's own process, so Kestrel's microphone indicator names Heft.
+- **Sync** needs nothing new from ink: strokes already carry the clock time they started and each point's delay. A recording keeps `spans`, clock time to recording time for every stretch between pauses, so any stroke maps to its moment. Text boxes gained `written`. While a recording is open, tiles fade what the playhead hasn't reached: `TileLayer.setUnwritten` redraws only the tiles of strokes that crossed it since the last frame. A tap that doesn't move with the player open goes to `SurfaceHost.tapped` instead of drawing a dot, and plays from the nearest point of ink, three seconds early.
+- **Transcripts** come from `luft-speech --transcription` (`com.lantharos.Transcription1`), handed the open file, two minutes per request; **notes** from `luft-language` (`com.lantharos.Language1`) in parts of twelve minutes. Both run at idle priority and refuse below 30% battery. `recording/processing.svelte.ts` drives them one recording at a time: only after 15 s without writing and with the pen away, for `charger` recordings only on mains power (UPower's `OnBattery`, followed by signal), saving after every piece to `recordings/<id>.json` so nothing is redone after unplugging, closing or a power cut. A recording still being made is transcribed as it grows when it's set to `now`.
+- whisper.cpp and llama.cpp each bring their own ggml, which can't be linked into one binary, so notes are a service of their own rather than part of speech. Handwriting runs llama.cpp too; it and the language model could become one local-model service later.
+
 ## Books
 
 pdf.js (as in Magpie), reading only the byte ranges it needs, so a 300-page book opens as fast as a short one. Pages render lazily per zoom (capped at 4096 pixels wide), thumbnails are cached as bitmaps, text comes from `getTextContent` for picking, highlights and search, and `getOutline` gives the contents. Text highlights are stored as straight highlighter strokes along each line, so they erase, undo and export like any ink.
@@ -103,3 +111,4 @@ So Heft adds next to nothing over the platform; the rest is one or two display f
 6. **Polish**: done. English and Serbian (Cyrillic, and Latin through `bun run transliterate`), settings for pen and touch, full-screen writing, tools along the top or down the side, pages one at a time, an infinite page that grows as you write, and tablet mode: Kestrel publishes it as `tablet-mode` in the settings portal and `luft-app` hands it to every app as `appearance.posture`; folded, Heft moves its tools to the side, makes targets bigger and keeps the text box being typed in above the on-screen keyboard.
 7. **Handwriting search**: done, as an opt-in download.
 8. **Typing and writing into text**: done. Typing anywhere on the paper's lines, notebooks made for typing, paper per page, writing turned into text on a pause or from the lasso, and pen corrections. Not yet: sync, and reading trained on corrections.
+9. **Recording classes**: done. Recording that outlives the window, pause and resume, a reminder to ask before recording in each subject, playback that fills in the writing as it plays, tapping ink or text to hear it, transcripts in mixed languages and notes with their moments, searchable, editable and put on a page, waiting for the charger when asked to.

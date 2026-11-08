@@ -1,3 +1,5 @@
+import type { RecordingEntry } from '#lib/recording/model.js';
+
 export const FORMAT = 1;
 
 export type Template = 'blank' | 'lined' | 'grid' | 'dotted' | 'cornell' | 'staff';
@@ -51,6 +53,8 @@ export interface NotebookMeta {
 	typed?: boolean;
 	/** Deleted pages, kept with where they were so they can come back. */
 	trashed?: { page: PageEntry; index: number; at: number }[];
+	/** Classes recorded in this notebook. */
+	recordings?: RecordingEntry[];
 }
 
 export interface SubjectMeta {
@@ -61,6 +65,8 @@ export interface SubjectMeta {
 	icon: string;
 	order: number;
 	archived?: boolean;
+	/** The languages spoken in the subject's classes, for recordings; when unset, the ones chosen in Settings. */
+	languages?: string[];
 }
 
 export const MM = 96 / 25.4;

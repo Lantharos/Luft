@@ -14,6 +14,8 @@
 	import type { Stroke } from '#lib/ink/stroke.js';
 	import { draftText, editing } from '#lib/objects/editing.svelte.js';
 	import { linesOf } from '#lib/typing/flow.js';
+	import { player } from '#lib/recording/player.svelte.js';
+	import { writtenAt } from '#lib/recording/written.js';
 	import { carryZone } from './carried';
 	import { pagesIn, stack } from './layout';
 	import { LiveInk } from './live';
@@ -135,7 +137,14 @@
 			typeAt: (target, x, y, client) => typeAt(target.id, x, y, client),
 			wrote: (target, stroke) => converter.wrote(target.id, stroke),
 			undo: () => notebook.undo(),
-			redo: () => notebook.redo()
+			redo: () => notebook.redo(),
+			tapped(index, x, y) {
+				const entry = notebook.meta.pages[index];
+				const store = entry && stores.get(entry.id);
+				if (!store || !player.openIn(notebook)) return false;
+				const written = writtenAt(store.document, x, y, viewport.zoom);
+				return written !== null && player.playWritten(notebook, written);
+			}
 		});
 		const leave = carry.zone(carryZone(element, viewport, notebook, stores));
 		const raw = (event: Event) => surface.rawUpdate(event as PointerEvent);

@@ -33,6 +33,8 @@ export interface SurfaceHost {
 	wrote(target: Target, stroke: Stroke): void;
 	undo(): void;
 	redo(): void;
+	/** A tap on a page; true when it was taken, such as to play what was said as it was written there. */
+	tapped(index: number, x: number, y: number): boolean;
 }
 
 type Action = Drawing | Erasing | TextPicking | TextCarrying | Lassoing | { pan: true; x: number; y: number };
@@ -187,7 +189,9 @@ export class Surface {
 		const start = this.starts.get(event.pointerId);
 		this.actions.delete(event.pointerId);
 		this.starts.delete(event.pointerId);
-		if (action instanceof Drawing && start && !start.far && event.timeStamp - start.time < TAP_TIME) {
+		const tap = action instanceof Drawing ? action.tap() : null;
+		if (tap && action instanceof Drawing && this.host.tapped(this.viewport.layout.pages.indexOf(action.target.page), ...tap)) action.cancel();
+		else if (action instanceof Drawing && start && !start.far && event.timeStamp - start.time < TAP_TIME) {
 			action.cancel();
 			this.typeAt(action.target, event.clientX, event.clientY);
 		} else if (action instanceof Drawing) {

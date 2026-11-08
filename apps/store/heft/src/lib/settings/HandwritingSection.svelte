@@ -20,6 +20,8 @@
 	let status = $derived(
 		reader.waiting === 'battery'
 			? t('settings-handwriting-battery')
+			: reader.waiting === 'charger'
+				? t('settings-handwriting-charger')
 			: reader.left
 				? `${t('settings-handwriting-reading', { pages: reader.left })}. ${reader.waiting === 'writing' ? t('settings-handwriting-waiting') : ''}`
 				: t('settings-handwriting-done')

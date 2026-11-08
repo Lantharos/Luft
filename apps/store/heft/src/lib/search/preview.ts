@@ -70,6 +70,7 @@ async function boxes(hit: Hit, needle: string): Promise<Box[]> {
 	const entry = hit.notebook.meta.pages[hit.index];
 	const notebook = library.openNotebook(hit.notebook);
 	if (hit.box) return [hit.box];
+	if (hit.kind === 'said') return [];
 	if (hit.kind === 'book' && entry.pdf) return bookBoxes(sourcePath(notebook, entry.pdf.source), entry.pdf.index, needle);
 	return typedBoxes((await notebook.load(entry.id)).document, hit.offset);
 }

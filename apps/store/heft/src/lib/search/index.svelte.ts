@@ -2,11 +2,20 @@ import { readJson, writeJson } from '#lib/bridge/files.js';
 import { recognized, type InkLine } from '#lib/handwriting/store.js';
 import { library, type NotebookEntry } from '#lib/library/library.svelte.js';
 import { pdfDocument } from '#lib/pdf/document.js';
+import type { Said } from '#lib/bindings.js';
+import { recordingsOf, type RecordingEntry } from '#lib/recording/model.js';
+import { transcriptOf } from '#lib/recording/transcript.js';
 import { sourcePath } from '#lib/pdf/sources.js';
 import type { TextItem } from 'pdfjs-dist/types/src/display/api';
 
-/** Where a page's words came from: typed, printed in a book, or read from handwriting on this computer. */
-export type TextKind = 'typed' | 'book' | 'ink';
+/** Where a page's words came from: typed, printed in a book, read from handwriting on this computer, or said in a recorded class. */
+export type TextKind = 'typed' | 'book' | 'ink' | 'said';
+
+/** Where in a recording something was said. */
+export interface Moment {
+	recording: string;
+	at: number;
+}
 
 export interface Box {
 	left: number;
@@ -26,6 +35,8 @@ export interface Hit {
 	offset: number;
 	/** For handwriting, the line it was read from. */
 	box?: Box;
+	/** For what was said in class, when. */
+	moment?: Moment;
 }
 
 interface PageText {
@@ -34,6 +45,7 @@ interface PageText {
 	text: string;
 	folded: string;
 	box?: Box;
+	moment?: Moment;
 }
 
 const INDEX_FILE = 'search.json';
@@ -42,6 +54,9 @@ const LIMIT = 60;
 
 /** Lower case without accents, so "jednacine" finds "jednačine". */
 export const fold = (text: string) => text.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+
+const saidEntries = (recording: RecordingEntry, said: Said[]): PageText[] =>
+	said.map((line) => ({ page: recording.page, kind: 'said', text: line.text, folded: fold(line.text), moment: { recording: recording.id, at: line.start } }));
 
 const inkEntries = (page: string, lines: InkLine[]): PageText[] =>
 	lines.filter((line) => line.text).map((line) => ({ page, kind: 'ink', text: line.text, folded: fold(line.text), box: line.box }));
@@ -65,6 +80,7 @@ class SearchIndex {
 			}
 		}
 		for (const [page, lines] of Object.entries(await recognized(notebook))) entries.push(...inkEntries(page, lines));
+		for (const recording of recordingsOf(notebook.meta)) entries.push(...saidEntries(recording, (await transcriptOf(notebook, recording)).said));
 		this.pages.set(notebook.meta.id, entries);
 		this.revision++;
 	}
@@ -120,6 +136,13 @@ class SearchIndex {
 		this.revision++;
 	}
 
+	/** Records what was said in a recording, replacing what was known of it. */
+	setSaid(notebook: NotebookEntry, recording: RecordingEntry, said: Said[]) {
+		const entries = (this.pages.get(notebook.meta.id) ?? []).filter((entry) => entry.moment?.recording !== recording.id);
+		this.pages.set(notebook.meta.id, [...entries, ...saidEntries(recording, said)]);
+		this.revision++;
+	}
+
 	refresh(notebook: NotebookEntry) {
 		return this.loadNotebook(notebook);
 	}
@@ -137,7 +160,7 @@ class SearchIndex {
 				if (index < 0) continue;
 				const start = Math.max(0, at - SNIPPET);
 				const snippet = (start ? '…' : '') + entry.text.slice(start, at + needle.length + SNIPPET).trim() + (at + needle.length + SNIPPET < entry.text.length ? '…' : '');
-				hits.push({ notebook, page: entry.page, index, kind: entry.kind, snippet, at: at - start + (start ? 1 : 0), offset: at, box: entry.box });
+				hits.push({ notebook, page: entry.page, index, kind: entry.kind, snippet, at: at - start + (start ? 1 : 0), offset: at, box: entry.box, moment: entry.moment });
 				if (hits.length >= LIMIT) return hits;
 			}
 		}

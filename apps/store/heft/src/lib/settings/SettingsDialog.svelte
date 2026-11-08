@@ -7,6 +7,7 @@
 	import HandwritingSection from './HandwritingSection.svelte';
 	import LayoutSection from './LayoutSection.svelte';
 	import PressureCurve from './PressureCurve.svelte';
+	import RecordingSection from './RecordingSection.svelte';
 
 	let { onclose }: { onclose: () => void } = $props();
 </script>
@@ -55,6 +56,7 @@
 		<LayoutSection />
 		<HandwritingSection />
 		<ConvertSection />
+		<RecordingSection />
 	</div>
 	{#snippet actions()}
 		<button type="button" class="button primary" onclick={onclose}>{t('dialog-done')}</button>

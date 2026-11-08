@@ -22,7 +22,7 @@ pub fn words(text: &str, language: &str) -> Vec<String> {
         .collect()
 }
 
-fn word_errors(heard: &[String], said: &[String]) -> usize {
+pub fn word_errors(heard: &[String], said: &[String]) -> usize {
     let mut previous: Vec<usize> = (0..=said.len()).collect();
     for (row, heard_word) in heard.iter().enumerate() {
         let mut current = vec![row + 1; said.len() + 1];

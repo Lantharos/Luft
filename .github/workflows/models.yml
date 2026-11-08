@@ -7,6 +7,7 @@ on:
       - services/speech/data/models.json
       - services/speech/mirror/**
       - services/handwriting/data/models.json
+      - services/language/data/models.json
   workflow_dispatch:
 
 concurrency:
@@ -32,11 +33,12 @@ jobs:
       - name: Fetch, quantize and check the models
         run: |
           mkdir -p "$RUNNER_TEMP/models"
-          docker run --rm -v "$PWD/services/speech:/speech:ro" -v "$PWD/services/handwriting/data:/handwriting:ro" -v "$RUNNER_TEMP/models:/models" "$PYTHON_IMAGE" sh -c '
+          docker run --rm -v "$PWD/services/speech:/speech:ro" -v "$PWD/services/handwriting/data:/handwriting:ro" -v "$PWD/services/language/data:/language:ro" -v "$RUNNER_TEMP/models:/models" "$PYTHON_IMAGE" sh -c '
             apt-get update -qq && apt-get install -qq --yes curl jq > /dev/null &&
             pip install --quiet --no-deps --requirement /speech/mirror/requirements.txt &&
             /speech/mirror/mirror.sh /speech/data/models.json /models &&
-            /speech/mirror/mirror.sh /handwriting/models.json /models'
+            /speech/mirror/mirror.sh /handwriting/models.json /models &&
+            /speech/mirror/mirror.sh /language/models.json /models'
 
       - name: Upload to R2
         working-directory: ${{ runner.temp }}/models

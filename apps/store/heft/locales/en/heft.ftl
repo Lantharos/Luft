@@ -313,8 +313,8 @@ settings-convert-body = When you pause after a line, it becomes typed text where
 settings-convert-after = Pause before it turns
 settings-convert-seconds = { $value } s
 settings-convert-pause = Turns into text once the pen has rested for { $value } s.
-settings-languages = Languages you write in
-settings-languages-body = Accents you draw go on the letters these languages use, though any accent can be added.
+settings-languages = Languages you use in class
+settings-languages-body = Accents you draw go on the letters these languages use, though any accent can be added, and recordings are told apart sentence by sentence among them. A subject can have its own.
 settings-languages-choose = Choose
 settings-keep-corrections = Keep my corrections
 settings-keep-corrections-body = Saves what you correct on this computer, never anywhere else, so it can help reading improve later.
@@ -348,3 +348,103 @@ camera-opening = Opening the camera…
 camera-refused = Heft may not use the camera. You can allow it in Settings, under Privacy.
 camera-failed = The camera didn't open: { $error }
 camera-take = Take photo
+
+## Recording classes
+
+record-start = Record the class
+record-pause = Pause recording
+record-resume = Go on recording
+record-stop = Stop recording
+# The variable is how long it's been recording, such as 12:04.
+record-recording = Recording, { $time }
+record-elsewhere = Recording in { $notebook }
+record-failed = Recording stopped
+recordings-open = Play a recording
+recordings-title = Recordings
+
+consent-title = Ask before you record
+consent-ask = Recording people without asking them is against the law in many places, and in Germany secretly recording what someone says is a crime. Ask your teacher, and the class if they can be heard, before you record.
+consent-law = While Heft records, a red dot shows in the notebook and Luft shows that the microphone is on. Recording goes on if you close Heft, until you stop it.
+consent-local = The recording, what's said in it and the notes made from it stay in this notebook on this computer. Heft never uploads them.
+consent-record = They agreed, record
+
+# The variable is how long the recording is, such as 45:12.
+stopped-title = Recorded { $length }
+stopped-body = Heft can write out what was said and make notes of it, with when each thing was said, on this computer. It takes a while and works only while you aren't writing.
+# The variable is the size of both downloads together, such as 3.1 GB.
+stopped-download = It needs two downloads first, { $size } together: Whisper to write out speech and Qwen3 to make the notes.
+stopped-on-battery = The computer is on battery, so it can wait for the charger.
+stopped-charging = The computer is charging, so it can start right away.
+stopped-keep = Close
+stopped-charger = When charging
+stopped-now = Now
+
+player-label = Recording
+player-play = Play
+player-pause = Pause
+player-back = Back 10 seconds
+player-forward = Forward 10 seconds
+player-seek = Where in the recording
+player-rate = Playback speed
+player-close = Close the recording
+player-panel-hide = Hide notes and transcript
+# The variable says how far the notes are, such as "Transcribing, 40%".
+player-panel-show = Notes and transcript, { $stage }
+
+panel-label = What was said
+panel-notes = Notes
+panel-said = Transcript
+# The variable is the size of the downloads, such as 3.1 GB.
+panel-download = Download ({ $size })
+panel-process-now = Start now
+panel-to-page = Put the notes on a page
+
+stage-queued = Waiting its turn
+stage-done = Notes ready
+# The variable is how far it is, from 0 to 99.
+stage-transcribing = Writing out what was said, { $percent }%
+stage-writing-notes = Making notes, { $percent }%
+stage-waiting-charger = Waits for the charger
+stage-waiting-writing = Waits for a pause in your writing
+stage-waiting-battery = Waits until the battery is fuller or charging
+stage-waiting-models = Needs its downloads
+stage-waiting-recording = Keeps up while you record
+stage-unsupported = This computer's processor can't write out speech
+stage-missing = This version of Luft can't write out speech yet
+stage-failed = Something went wrong: { $error }
+
+transcript-empty = Nothing written out yet.
+notes-empty = No notes yet.
+notes-nothing = Nothing in this class needed notes.
+notes-points = Key points
+notes-definitions = Definitions
+notes-homework = Homework and tests
+notes-questions = Questions
+# The variable is a time in the recording, such as 12:04.
+notes-play-from = Play from { $time }
+notes-field-text = Point
+notes-field-term = Term
+notes-field-meaning = Meaning
+notes-field-task = Task
+notes-field-due = Due
+notes-field-question = Question
+notes-field-answer = Answer
+
+# The variables name where something was said, the time is in the recording, such as 12:04.
+palette-hit-said = { $subject } · { $notebook } · said at { $time }
+
+settings-recording = Recording classes
+settings-recording-body = Heft records on this computer and keeps the recording in the notebook. It can write out what was said and make notes of it, also on this computer; nothing is uploaded.
+settings-process = Heavy work in the background
+settings-process-now = Right away
+settings-process-charger = When charging
+settings-process-body = Transcribing and making notes of recordings, and reading handwriting for search, take the computer a while. Either way they only run while you aren't writing, and wait while the battery is below 30%.
+settings-recording-whisper = writes out speech
+settings-recording-writer = makes notes
+# The variables: what the model does, its size and licence.
+settings-recording-model = { $use }, { $size }, { $licence }
+
+
+subject-languages = Languages spoken in this subject's classes
+subject-languages-body = For recordings: Heft tells only these apart, so fewer is more reliable. Whisper is weakest at Albanian, so name it on its own in a class taught in Albanian.
+settings-handwriting-charger = Waits for the charger.

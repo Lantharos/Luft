@@ -2,6 +2,7 @@ import { settings } from '#lib/app/settings.svelte.js';
 import { commands, events, type HandwritingModel } from '#lib/bindings.js';
 import { activity } from '#lib/input/activity.js';
 import { pen } from '#lib/input/pen.svelte.js';
+import { power } from '#lib/recording/power.svelte.js';
 import { library, type NotebookEntry } from '#lib/library/library.svelte.js';
 import { searchIndex } from '#lib/search/index.svelte.js';
 import { inkPrint, writtenLines } from './lines';
@@ -21,7 +22,7 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 class Reader {
 	model: HandwritingModel | null | undefined = $state(undefined);
 	left = $state(0);
-	waiting: 'writing' | 'battery' | null = $state(null);
+	waiting: 'writing' | 'battery' | 'charger' | null = $state(null);
 	private running = false;
 
 	get on() {
@@ -79,6 +80,10 @@ class Reader {
 	}
 
 	private async quiet() {
+		if (power.waitsForCharger) {
+			this.waiting = 'charger';
+			await power.charger();
+		}
 		while (activity.idleFor() < QUIET || pen.near) {
 			this.waiting = 'writing';
 			await sleep(LOOK_AGAIN);

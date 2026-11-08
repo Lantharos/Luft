@@ -13,7 +13,7 @@ use anyhow::Result;
 pub use file::pcm16_mono;
 pub use level::Meter;
 pub use pauses::Segmenter;
-pub use voice::Voice;
+pub use voice::{FRAME, Voice};
 
 pub const RATE: usize = 16_000;
 

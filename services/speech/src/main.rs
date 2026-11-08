@@ -8,6 +8,7 @@ mod models;
 mod onnx;
 mod plan;
 mod preferences;
+mod transcription;
 mod warm;
 
 use std::sync::Arc;
@@ -25,6 +26,7 @@ use models::Store;
 const WARM_FOR: Duration = Duration::from_secs(180);
 const EXIT_WHEN_IDLE_FOR: Duration = Duration::from_secs(30);
 const CHECK_EVERY: Duration = Duration::from_secs(5);
+const TRANSCRIPTION: &str = "--transcription";
 
 async fn to_shell(
     connection: &zbus::Connection,
@@ -39,7 +41,13 @@ fn main() -> Result<()> {
         .worker_threads(2)
         .enable_all()
         .build()?
-        .block_on(serve())
+        .block_on(async {
+            if std::env::args().any(|argument| argument == TRANSCRIPTION) {
+                transcription::serve().await
+            } else {
+                serve().await
+            }
+        })
 }
 
 async fn serve() -> Result<()> {

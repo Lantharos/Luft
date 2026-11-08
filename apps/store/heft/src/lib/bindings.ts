@@ -21,6 +21,7 @@ export const commands = {
 	handwritingOverview: (options?: CallOptions) => invoke<HandwritingModel | null>("handwriting_overview", {}, options),
 	handwritingRead: (params: {
 		strokes: (([number, number])[])[],
+		/**  Someone waits for it, so it goes ahead of background reading. */
 		now: boolean,
 	}, options?: CallOptions) => invoke<Read>("handwriting_read", params, options),
 	handwritingRemove: (options?: CallOptions) => invoke<null>("handwriting_remove", {}, options),
@@ -29,10 +30,33 @@ export const commands = {
 		to: string,
 	}, options?: CallOptions) => invoke<number>("import_file", params, options),
 	keepCorrection: (params: {
+		/**  One correction as a line of JSON. */
 		line: string,
 	}, options?: CallOptions) => invoke<null>("keep_correction", params, options),
 	library: (options?: CallOptions) => invoke<Library>("library", {}, options),
+	notesHeading: (params: {
+		language: string,
+		points: string[],
+	}, options?: CallOptions) => invoke<Written<Heading>>("notes_heading", params, options),
+	notesInstall: (options?: CallOptions) => invoke<null>("notes_install", {}, options),
+	notesOverview: (options?: CallOptions) => invoke<LanguageModel | null>("notes_overview", {}, options),
+	notesRemove: (options?: CallOptions) => invoke<null>("notes_remove", {}, options),
+	notesWrite: (params: {
+		language: string,
+		lines: Line[],
+	}, options?: CallOptions) => invoke<Written<Notes>>("notes_write", params, options),
 	openPenSettings: (options?: CallOptions) => invoke<null>("open_pen_settings", {}, options),
+	powerState: (options?: CallOptions) => invoke<PowerState>("power_state", {}, options),
+	recordingLength: (params: {
+		path: string,
+	}, options?: CallOptions) => invoke<number>("recording_length", params, options),
+	recordingPause: (options?: CallOptions) => invoke<number>("recording_pause", {}, options),
+	recordingResume: (options?: CallOptions) => invoke<number>("recording_resume", {}, options),
+	recordingStart: (params: {
+		path: string,
+	}, options?: CallOptions) => invoke<null>("recording_start", params, options),
+	recordingState: (options?: CallOptions) => invoke<RecordingState | null>("recording_state", {}, options),
+	recordingStop: (options?: CallOptions) => invoke<number>("recording_stop", {}, options),
 	remove: (params: {
 		path: string,
 	}, options?: CallOptions) => invoke<null>("remove", params, options),
@@ -51,6 +75,12 @@ export const commands = {
 		name: string,
 		value: Value,
 	}, options?: CallOptions) => invoke<null>("settings_save", params, options),
+	transcribe: (params: {
+		path: string,
+		from: number,
+		ended: boolean,
+		languages: string[],
+	}, options?: CallOptions) => invoke<Transcription>("transcribe", params, options),
 	trashList: (options?: CallOptions) => invoke<Trashed[]>("trash_list", {}, options),
 	trashPurge: (params: {
 		id: string,
@@ -62,6 +92,10 @@ export const commands = {
 		id: string,
 		to: string,
 	}, options?: CallOptions) => invoke<null>("trash_restore", params, options),
+	whisperInstall: (params: {
+		id: string,
+	}, options?: CallOptions) => invoke<null>("whisper_install", params, options),
+	whisperOverview: (options?: CallOptions) => invoke<Model | null>("whisper_overview", {}, options),
 };
 
 export const events = {
@@ -72,6 +106,12 @@ export const events = {
 	appearanceTypography: (callback: (payload: Typography) => void) => listen<Typography>("appearance.typography", callback),
 	handwritingChanged: (callback: (payload: null) => void) => listen<null>("handwriting.changed", callback),
 	kestrelPalette: (callback: (payload: Palette) => void) => listen<Palette>("kestrel.palette", callback),
+	languageChanged: (callback: (payload: null) => void) => listen<null>("language.changed", callback),
+	powerBattery: (callback: (payload: boolean) => void) => listen<boolean>("power.battery", callback),
+	recordingFailed: (callback: (payload: string) => void) => listen<string>("recording.failed", callback),
+	recordingLevel: (callback: (payload: number) => void) => listen<number>("recording.level", callback),
+	speechChanged: (callback: (payload: null) => void) => listen<null>("speech.changed", callback),
+	windowPresent: (callback: (payload: null) => void) => listen<null>("window.present", callback),
 };
 
 export type AppIconStyle = "default" | "tinted" | "clear";
@@ -100,6 +140,20 @@ export type Appearance = {
 
 export type Corners = "rounded" | "square";
 
+export type Definition = {
+	term: string,
+	meaning: string,
+	at: number,
+};
+
+export type Download = {
+	received: number,
+	total: number,
+	problem: string | null,
+};
+
+export type Engine = "parakeet" | "whisper";
+
 export type Entry = {
 	folder: string,
 	meta: Value,
@@ -121,6 +175,11 @@ export type HandwritingModel = {
 	download: HandwritingDownload | null,
 };
 
+export type Heading = {
+	title: string,
+	summary: string,
+};
+
 export type IconPaint = {
 	plate: string,
 	ink: string,
@@ -130,9 +189,34 @@ export type IconPaint = {
 
 export type Kind = "pdf" | "image" | "importable";
 
+export type LanguageDownload = {
+	received: number,
+	total: number,
+	problem: string | null,
+};
+
+export type LanguageModel = {
+	name: string,
+	licence: string,
+	credit: string,
+	homepage: string,
+	size: number,
+	installed: boolean,
+	download: LanguageDownload | null,
+};
+
 export type Library = {
 	root: string,
 	subjects: Subject[],
+};
+
+/**
+ *  Something said in class, with when it was said in milliseconds from the
+ *  start of the recording.
+ */
+export type Line = {
+	at: number,
+	text: string,
 };
 
 export type Lines = "none" | "lines" | "scanlines";
@@ -143,7 +227,31 @@ export type Locale = {
 	fixed: boolean,
 };
 
+export type Model = {
+	id: string,
+	engine: Engine,
+	name: string,
+	licence: string,
+	credit: string,
+	homepage: string,
+	size: number,
+	installed: boolean,
+	usage: number,
+	download: Download | null,
+};
+
 export type Motion = "full" | "reduced" | "off";
+
+/**
+ *  Notes of part of a class. Each item has when it was said, so it leads back
+ *  to its moment in the recording.
+ */
+export type Notes = {
+	points: Point[],
+	definitions: Definition[],
+	homework: Task[],
+	questions: Question[],
+};
 
 export type Palette = {
 	accent: string,
@@ -155,10 +263,43 @@ export type Palette = {
 	taskbar: import("@luft/ui").TaskbarLooks,
 };
 
+export type Point = {
+	text: string,
+	at: number,
+};
+
 /**  Whether the computer is used as a laptop or folded into a tablet. */
 export type Posture = "laptop" | "tablet";
 
+export type PowerState = {
+	battery: boolean,
+	onBattery: boolean,
+};
+
+export type Question = {
+	question: string,
+	answer: string | null,
+	at: number,
+};
+
 export type Read = { kind: "text"; text: string } | { kind: "notInstalled" } | { kind: "paused" } | { kind: "missing" };
+
+export type RecordingState = {
+	path: string,
+	length: number,
+	paused: boolean,
+};
+
+/**
+ *  Something said in a recording, with when it starts and ends in milliseconds
+ *  from the start of the recording, and the language it was said in.
+ */
+export type Said = {
+	start: number,
+	end: number,
+	language: string,
+	text: string,
+};
 
 export type SchemeColors = {
 	light: { [key in string]: string },
@@ -168,6 +309,26 @@ export type SchemeColors = {
 export type Subject = {
 	notebooks: Entry[],
 } & Entry;
+
+export type Task = {
+	task: string,
+	/**  When it's due, as the teacher said it, such as "next Tuesday". */
+	due: string | null,
+	at: number,
+};
+
+/**
+ *  What a recording says from where it was asked for, up to `next`, where the
+ *  next request goes on from.
+ */
+export type Transcribed = {
+	said: Said[],
+	next: number,
+	/**  Whether the whole recording has been transcribed. */
+	done: boolean,
+};
+
+export type Transcription = { kind: "done"; transcribed: Transcribed } | { kind: "notInstalled" } | { kind: "paused" } | { kind: "unsupported" } | { kind: "missing" };
 
 export type Trashed = {
 	id: string,
@@ -182,3 +343,5 @@ export type Typography = {
 };
 
 export type Value = null | boolean | number | string | Value[] | { [key in string]: Value };
+
+export type Written<T> = { kind: "done"; written: T } | { kind: "notInstalled" } | { kind: "paused" } | { kind: "missing" };

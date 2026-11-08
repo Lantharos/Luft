@@ -1,0 +1,24 @@
+[Unit]
+Description=Local language model
+PartOf=graphical-session.target
+
+[Service]
+Type=dbus
+BusName=com.lantharos.Language1
+ExecStart=/usr/libexec/luft-language
+Environment=GIO_USE_VFS=local
+Restart=on-failure
+Nice=19
+CPUSchedulingPolicy=idle
+IOSchedulingClass=idle
+MemoryHigh=4608M
+MemoryMax=5G
+MemorySwapMax=0
+NoNewPrivileges=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service

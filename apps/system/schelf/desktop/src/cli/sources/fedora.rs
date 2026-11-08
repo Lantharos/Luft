@@ -116,10 +116,33 @@ pub fn search(query: &str) -> Result<Vec<Candidate>, String> {
 
 pub fn find(name: &str) -> Result<Vec<Candidate>, String> {
     let apps = store::find_in(name, Origin::Fedora, &in_system())?;
-    Ok(with_apps(
-        apps,
-        candidates(tools::find(name)?.into_iter().collect()),
-    ))
+    let tool = match tools::find(name)? {
+        Some(tool) => Some(tool),
+        None if apps.is_empty() => match providing(Repositories::Fedora, name)? {
+            Some(package) => tools::find(&package)?,
+            None => None,
+        },
+        None => None,
+    };
+    Ok(with_apps(apps, candidates(tool.into_iter().collect())))
+}
+
+/// The package that brings the command `name`, for people who ask for a command rather than
+/// the package it's in, such as avahi-browse from avahi-tools.
+pub fn providing(repositories: Repositories, name: &str) -> Result<Option<String>, String> {
+    if !name
+        .chars()
+        .all(|character| character.is_ascii_alphanumeric() || "-_.+".contains(character))
+    {
+        return Ok(None);
+    }
+    let paths = format!("--whatprovides=/usr/bin/{name},/usr/sbin/{name}");
+    let text = repoquery(repositories, &["--queryformat", "%{name}\n", &paths])?;
+    Ok(text
+        .lines()
+        .map(str::trim)
+        .find(|line| !line.is_empty())
+        .map(str::to_owned))
 }
 
 fn repoquery(repositories: Repositories, arguments: &[&str]) -> Result<String, String> {

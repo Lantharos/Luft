@@ -1,9 +1,11 @@
+use luft_software::apps::toolbox::Repositories;
 use luft_software::system::repositories;
 
+use crate::catalog::tools;
 use crate::cli::Exit;
 use crate::cli::arguments::Arguments;
 use crate::cli::perform::{Plan, Verb, carry_out};
-use crate::cli::sources::{Origin, installed};
+use crate::cli::sources::{Origin, fedora, installed};
 use crate::cli::terminal::Ink;
 use crate::operations::{Job, Request};
 
@@ -33,6 +35,26 @@ fn plan(packages: Vec<String>, verb: Verb) -> Plan {
     }
 }
 
+/// The package `name` is, or the one that brings the command `name`.
+fn package_of(name: &str) -> Result<String, String> {
+    for repositories in [Repositories::Fedora, Repositories::Added] {
+        if tools::find_in(repositories, name)?.is_some() {
+            return Ok(name.to_owned());
+        }
+    }
+    for repositories in [Repositories::Fedora, Repositories::Added] {
+        if let Some(package) = fedora::providing(repositories, name)? {
+            println!(
+                "{} comes from {}.",
+                Ink::stdout().bold(name),
+                Ink::stdout().bold(&package)
+            );
+            return Ok(package);
+        }
+    }
+    Ok(name.to_owned())
+}
+
 /// Fedora packages go into the system itself, so services and udev rules they bring work like
 /// on any Fedora install. They're rebuilt with every update of Luft.
 pub fn install(arguments: &Arguments) -> Exit {
@@ -41,10 +63,20 @@ pub fn install(arguments: &Arguments) -> Exit {
         .into_iter()
         .map(|app| app.id)
         .collect();
-    let (already, wanted): (Vec<String>, Vec<String>) = arguments
+    let packages = match arguments
         .words
         .iter()
-        .cloned()
+        .map(|name| package_of(name))
+        .collect::<Result<Vec<String>, String>>()
+    {
+        Ok(packages) => packages,
+        Err(error) => {
+            eprintln!("{error}");
+            return Exit::Failed;
+        }
+    };
+    let (already, wanted): (Vec<String>, Vec<String>) = packages
+        .into_iter()
         .partition(|name| present.contains(name));
     for name in &already {
         println!("{} is already a system package.", ink.bold(name));

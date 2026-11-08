@@ -622,6 +622,7 @@ export const events = {
 	accountsChanged: (callback: (payload: AccountsSnapshot) => void) => listen<AccountsSnapshot>("accounts.changed", callback),
 	accountsStep: (callback: (payload: StepUpdate) => void) => listen<StepUpdate>("accounts.step", callback),
 	appearanceCorners: (callback: (payload: Corners) => void) => listen<Corners>("appearance.corners", callback),
+	appearanceKeyboard: (callback: (payload: boolean) => void) => listen<boolean>("appearance.keyboard", callback),
 	appearanceCursorInstall: (callback: (payload: InstallEvent) => void) => listen<InstallEvent>("appearance.cursorInstall", callback),
 	appearanceLines: (callback: (payload: Lines) => void) => listen<Lines>("appearance.lines", callback),
 	appearanceMotion: (callback: (payload: Motion) => void) => listen<Motion>("appearance.motion", callback),
@@ -785,6 +786,7 @@ export type Appearance = {
 	corners: Corners,
 	lines: Lines,
 	posture: Posture,
+	keyboard: boolean,
 	locale: Locale,
 };
 

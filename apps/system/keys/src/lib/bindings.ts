@@ -115,6 +115,7 @@ export const commands = {
 
 export const events = {
 	appearanceCorners: (callback: (payload: Corners) => void) => listen<Corners>("appearance.corners", callback),
+	appearanceKeyboard: (callback: (payload: boolean) => void) => listen<boolean>("appearance.keyboard", callback),
 	appearanceLines: (callback: (payload: Lines) => void) => listen<Lines>("appearance.lines", callback),
 	appearanceMotion: (callback: (payload: Motion) => void) => listen<Motion>("appearance.motion", callback),
 	appearancePosture: (callback: (payload: Posture) => void) => listen<Posture>("appearance.posture", callback),
@@ -142,6 +143,7 @@ export type Appearance = {
 	corners: Corners,
 	lines: Lines,
 	posture: Posture,
+	keyboard: boolean,
 	locale: Locale,
 };
 

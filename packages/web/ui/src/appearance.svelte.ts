@@ -32,6 +32,7 @@ class AppearanceState {
 	corners = $state<Corners>('rounded');
 	lines = $state<Lines>('none');
 	posture = $state<Posture>('laptop');
+	keyboard = $state(true);
 	fontSans = $derived(fontList(this.typography.interface, SANS));
 	fontMono = $derived(fontList(this.typography.monospace, MONO));
 
@@ -43,6 +44,7 @@ class AppearanceState {
 		this.round(initial.corners);
 		this.line(initial.lines);
 		this.hold(initial.posture);
+		this.keyboard = initial.keyboard;
 		void i18n.start(initial.locale);
 		const stops = [
 			events.kestrelPalette((palette) => this.receive(palette)),
@@ -51,7 +53,8 @@ class AppearanceState {
 			events.appearanceMotion((motion) => this.move(motion)),
 			events.appearanceCorners((corners) => this.round(corners)),
 			events.appearanceLines((lines) => this.line(lines)),
-			events.appearancePosture((posture) => this.hold(posture))
+			events.appearancePosture((posture) => this.hold(posture)),
+			events.appearanceKeyboard((keyboard) => (this.keyboard = keyboard))
 		];
 		void system.appearance().then(({ colorScheme }) => (this.scheme = colorScheme));
 		return () => stops.forEach((stop) => stop());

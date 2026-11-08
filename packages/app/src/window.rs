@@ -92,6 +92,7 @@ pub struct Appearance {
     corners: Corners,
     lines: Lines,
     posture: Posture,
+    keyboard: bool,
     locale: Locale,
 }
 
@@ -104,6 +105,7 @@ impl Appearance {
             corners: Corners::current().await,
             lines: Lines::current().await,
             posture: Posture::current().await,
+            keyboard: desktop::keyboard::current().await,
             locale: Locale {
                 languages: luft_i18n::requested(),
                 formats: luft_i18n::formats(),

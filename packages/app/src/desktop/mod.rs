@@ -1,4 +1,5 @@
 pub mod corners;
+pub mod keyboard;
 pub mod lines;
 pub mod motion;
 pub mod palette;
@@ -20,6 +21,7 @@ pub fn declare_appearance(window: SabineWindow) -> SabineWindow {
         .bridge_event(&corners::CORNERS_CHANGED)
         .bridge_event(&lines::LINES_CHANGED)
         .bridge_event(&posture::POSTURE_CHANGED)
+        .bridge_event(&keyboard::KEYBOARD_CHANGED)
 }
 
 async fn proxy() -> Result<Proxy<'static>, String> {
@@ -53,6 +55,7 @@ pub async fn watch(events: Events) {
         posture::POSTURE_CHANGED,
         posture::Posture::read(&proxy).await,
     );
+    events.emit(keyboard::KEYBOARD_CHANGED, keyboard::read(&proxy).await);
     while let Some(signal) = signals.next().await {
         let Ok((namespace, key, _)) = signal
             .body()
@@ -82,6 +85,9 @@ pub async fn watch(events: Events) {
                 posture::POSTURE_CHANGED,
                 posture::Posture::read(&proxy).await,
             );
+        }
+        if keyboard::changed(&namespace, &key) {
+            events.emit(keyboard::KEYBOARD_CHANGED, keyboard::read(&proxy).await);
         }
     }
 }

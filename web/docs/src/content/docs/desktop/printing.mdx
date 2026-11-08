@@ -1,0 +1,41 @@
+---
+title: Printing
+description: Printers that set themselves up, on your network and by USB, and the Printers page in Settings.
+sidebar:
+  order: 2.7
+---
+
+Most printers need no setting up. Turn the printer on and print from any app: it's already in the list.
+
+## Printers that show up by themselves
+
+- **On your network.** Printers that print without a driver, which is almost every printer sold since about 2012 (look for AirPrint, Mopria or IPP Everywhere on the box), show up as soon as the computer and the printer are on the same network. They stay listed while the printer is on and go away when it's off.
+- **By USB, without a driver.** Printers that offer IPP over USB, which most recent ones do, show up the moment you plug them in.
+- **By USB, with a driver.** Older printers get a driver chosen for them when you plug them in. Luft comes with drivers for most Canon and Epson inkjets, Samsung, Xerox and Dell lasers, Kodak inkjets and Brother label printers. The printer stays set up when you unplug it.
+
+A printer that's both on your network and plugged in by USB is used over the network, where it needs no driver. When it isn't on the network, the USB connection takes over.
+
+Printers are found on home networks only. On a network marked public in Settings → Network → Firewall, such as a café's, the computer doesn't answer or listen for other devices, so printers there don't show up. To print on one anyway, mark the network as home, or add the printer by its address.
+
+## The Printers page
+
+Settings → **Printers** lists every printer with what it's doing: ready, printing, out of paper or ink, or not connected. Open one to see:
+
+- **Ink and toner**, when the printer reports how much is left.
+- **Waiting to print**, the documents in its queue, with a button to cancel the ones you sent.
+- **Printing defaults**: paper size, two-sided printing and color, where the printer offers a choice. These apply to everyone on the computer.
+- **Make default**, so apps pick this printer first. Each person on the computer chooses their own.
+- **Print a test page**, to check the printer works.
+- **Remove printer**, for printers that were added. Printers on your network come back by themselves.
+
+## Adding a printer
+
+When a printer doesn't show up by itself, choose **Add a printer**. Luft looks for printers by USB and on the network for a few seconds:
+
+- Choose a **network printer** to keep it, so it stays listed even when it's off.
+- Choose a **USB printer** and pick its driver. The ones that suit it come first; the others can be searched.
+- **Type an address** for a printer on another network, or one that can't be found: its IP address or name, such as `192.168.1.20`, or a full `ipp://` address. Printers added by address need to print without a driver.
+
+Adding, changing and removing printers needs no password for the person at the computer.
+
+A printer whose driver isn't part of Luft can still work. Install its driver as a [system package](/system/software/#system-packages), for example HP's with `schelf install --system hplip`, then add the printer in Settings.

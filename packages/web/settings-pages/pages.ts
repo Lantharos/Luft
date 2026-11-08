@@ -6,6 +6,7 @@ export type PanelId =
 	| 'power'
 	| 'input'
 	| 'pen'
+	| 'printers'
 	| 'appearance'
 	| 'taskbar'
 	| 'windows'
@@ -68,7 +69,8 @@ export const PANEL_PAGES: Page<PanelId>[][] = [
 			keywords: ['settings-page-keyboard', 'settings-page-mouse'],
 			copilotKey: 'settings-page-keyboard'
 		}),
-		page('pen', 'settings-page-pen', 'input-tablet-symbolic')
+		page('pen', 'settings-page-pen', 'input-tablet-symbolic'),
+		page('printers', 'settings-page-printers', 'printer-symbolic')
 	],
 	[
 		page('appearance', 'settings-page-appearance', 'preferences-desktop-appearance-symbolic', {

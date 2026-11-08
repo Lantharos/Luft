@@ -18,6 +18,7 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
     let window = devices::power::register(window, events);
     let window = devices::input::register(window, events);
     let window = devices::pen::register(window);
+    let window = devices::printers::register(window, events);
     let window = personalization::appearance::register(window, events);
     let window = personalization::accessibility::register(window);
     let window = personalization::extensions::register(window, events);

@@ -3,4 +3,5 @@ pub mod hardware;
 pub mod input;
 pub mod pen;
 pub mod power;
+pub mod printers;
 pub mod sound;

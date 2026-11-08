@@ -21,6 +21,7 @@ import MonitorCog from '@lucide/svelte/icons/monitor-cog';
 import Palette from '@lucide/svelte/icons/palette';
 import PenLine from '@lucide/svelte/icons/pen-line';
 import PanelBottom from '@lucide/svelte/icons/panel-bottom';
+import Printer from '@lucide/svelte/icons/printer';
 import Plus from '@lucide/svelte/icons/plus';
 import Puzzle from '@lucide/svelte/icons/puzzle';
 import Shield from '@lucide/svelte/icons/shield';
@@ -77,6 +78,7 @@ const VIEWS: Record<PageId, View> = {
 		load: () => import('./devices/pen/PenPanel.svelte'),
 		needs: { present: (hardware) => hardware.pen, missing: 'settings-pen-missing' }
 	},
+	printers: { icon: Printer, load: () => import('./devices/printers/PrintersPanel.svelte') },
 	appearance: { icon: Palette, load: () => import('./personalization/appearance/AppearancePanel.svelte') },
 	taskbar: { icon: PanelBottom, load: () => import('./personalization/taskbar/TaskbarPanel.svelte') },
 	windows: { icon: AppWindow, load: () => import('./personalization/windows/WindowsPanel.svelte') },

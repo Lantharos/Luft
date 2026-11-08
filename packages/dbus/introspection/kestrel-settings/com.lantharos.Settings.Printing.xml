@@ -3,6 +3,20 @@
     <method name="Printers">
       <arg type="aa{sv}" direction="out"/>
     </method>
+    <method name="Jobs">
+      <arg type="aa{sv}" direction="out"/>
+    </method>
+    <method name="CancelJob">
+      <arg name="printer" type="s" direction="in"/>
+      <arg name="job" type="u" direction="in"/>
+    </method>
+    <method name="SetDefault">
+      <arg name="printer" type="s" direction="in"/>
+    </method>
+    <method name="PrintTestPage">
+      <arg name="printer" type="s" direction="in"/>
+      <arg type="u" direction="out"/>
+    </method>
     <method name="Print">
       <arg name="printer" type="s" direction="in"/>
       <arg name="document" type="h" direction="in"/>
@@ -10,5 +24,7 @@
       <arg name="options" type="a{sv}" direction="in"/>
       <arg type="u" direction="out"/>
     </method>
+    <signal name="Changed">
+    </signal>
   </interface>
 </node>

@@ -635,3 +635,85 @@ settings-pen-tablet-proportions-description = Leaves part of the tablet unused s
 # $name is the drawing tablet's name
 settings-pen-tablet-choose = { $name }
 settings-pen-tablet-choose-description = Choose the display this tablet draws on
+
+## Printers
+
+settings-printers-none = No printers yet
+settings-printers-none-description = Printers on your network and printers plugged in by USB show up here by themselves
+settings-printers-add = Add a printer
+settings-printers-add-description = Choose one that didn't show up by itself, or type its address
+settings-printers-default = Default
+# $count is the number of documents waiting to print
+settings-printers-waiting = { $count ->
+    [one] 1 document waiting
+   *[other] { $count } documents waiting
+}
+
+settings-printers-status = Status
+settings-printers-status-ready = Ready
+settings-printers-status-printing = Printing
+settings-printers-status-paused = Paused
+settings-printers-status-offline = Not connected
+settings-printers-status-no-paper = Out of paper
+settings-printers-status-low-paper = Low on paper
+settings-printers-status-jam = Paper jam
+settings-printers-status-no-ink = Out of ink
+settings-printers-status-low-ink = Low on ink
+settings-printers-status-no-toner = Out of toner
+settings-printers-status-low-toner = Low on toner
+settings-printers-status-cover-open = A cover is open
+settings-printers-status-cant-print = Can't print what it's sent
+settings-printers-model = Model
+settings-printers-location = Location
+settings-printers-by-usb = Connected by USB
+settings-printers-on-network = On your network
+settings-printers-found-nearby = Found on your network, set up by itself
+
+settings-printers-supplies = Ink and toner
+settings-printers-queue = Waiting to print
+settings-printers-queue-empty = Nothing is waiting
+settings-printers-job-untitled = Untitled document
+settings-printers-job-printing = Printing
+settings-printers-job-waiting = Waiting
+settings-printers-job-held = Held
+settings-printers-job-cancel = Cancel printing
+
+settings-printers-options = Printing defaults
+settings-printers-paper = Paper size
+settings-printers-sides = Two-sided
+settings-printers-sides-off = Off
+settings-printers-sides-long = Long edge
+settings-printers-sides-short = Short edge
+settings-printers-color = Color
+settings-printers-color-color = Color
+settings-printers-color-gray = Black & white
+
+settings-printers-make-default = Make default
+settings-printers-make-default-description = Apps pick this printer first
+settings-printers-test-page = Print a test page
+settings-printers-test-page-description = Checks that the printer is working
+settings-printers-test-page-sent = The test page is on its way
+settings-printers-remove = Remove printer
+settings-printers-remove-description = It shows up again by itself if it's on your network
+# $name is the printer's name
+settings-printers-remove-confirm = Remove { $name }?
+settings-printers-remove-confirm-description = Documents waiting for it are canceled. You can add it again later.
+
+settings-printers-add-dialog-description = Printers found by USB and on your network
+settings-printers-searching = Looking for printers…
+settings-printers-none-found = No other printers were found. Check that the printer is on and connected, or type its address.
+settings-printers-by-address = Type an address
+settings-printers-by-address-detail = For a printer on another network, or one that can't be found
+settings-printers-address = Address
+settings-printers-address-description = The printer's IP address or host name, or a full ipp:// address. It needs to print without a driver, which most printers made since 2012 do.
+settings-printers-add-button = Add
+settings-printers-adding = Setting up the printer…
+# $name is the printer's name
+settings-printers-driver-title = Choose a driver for { $name }
+settings-printers-driver-description = This printer needs a driver to print over USB
+settings-printers-finding-drivers = Finding drivers…
+settings-printers-driver-best = Recommended
+settings-printers-driver-search = Search other drivers
+settings-printers-no-drivers = No driver for this printer is installed. Drivers can be added as system packages.
+settings-printers-back = Back
+settings-printers-cancel = Cancel

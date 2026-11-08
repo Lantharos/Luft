@@ -4,12 +4,13 @@ const VERSION: [u8; 2] = [2, 0];
 const OPERATION: u8 = 0x01;
 pub const JOB: u8 = 0x02;
 const END: u8 = 0x03;
-const PRINTER: u8 = 0x04;
+pub const PRINTER: u8 = 0x04;
 pub const SUBSCRIPTION: u8 = 0x06;
 const INTEGER: u8 = 0x21;
 const BOOLEAN: u8 = 0x22;
 const ENUM: u8 = 0x23;
 const RANGE: u8 = 0x33;
+const TEXT: u8 = 0x41;
 const NAME: u8 = 0x42;
 const KEYWORD: u8 = 0x44;
 const URI: u8 = 0x45;
@@ -69,8 +70,25 @@ impl Request {
         self.attribute(NAME, name, &[value.as_bytes()])
     }
 
+    pub fn text(&mut self, name: &str, value: &str) -> &mut Self {
+        self.attribute(TEXT, name, &[value.as_bytes()])
+    }
+
+    pub fn names(&mut self, name: &str, values: &[&str]) -> &mut Self {
+        let values: Vec<&[u8]> = values.iter().map(|value| value.as_bytes()).collect();
+        self.attribute(NAME, name, &values)
+    }
+
     pub fn integer(&mut self, name: &str, value: i32) -> &mut Self {
         self.attribute(INTEGER, name, &[&value.to_be_bytes()])
+    }
+
+    pub fn enumeration(&mut self, name: &str, value: i32) -> &mut Self {
+        self.attribute(ENUM, name, &[&value.to_be_bytes()])
+    }
+
+    pub fn boolean(&mut self, name: &str, value: bool) -> &mut Self {
+        self.attribute(BOOLEAN, name, &[&[u8::from(value)]])
     }
 
     pub fn ranges(&mut self, name: &str, ranges: &[(i32, i32)]) -> &mut Self {
@@ -106,6 +124,16 @@ impl Request {
 pub struct Attributes(Vec<(String, Value)>);
 
 impl Attributes {
+    #[cfg(test)]
+    pub fn from_texts(texts: &[(&str, &str)]) -> Self {
+        Self(
+            texts
+                .iter()
+                .map(|(key, value)| ((*key).to_owned(), Value::Text((*value).to_owned())))
+                .collect(),
+        )
+    }
+
     fn find<'a, T>(&'a self, name: &str, pick: impl Fn(&'a Value) -> Option<T>) -> Option<T> {
         self.0
             .iter()
@@ -132,6 +160,20 @@ impl Attributes {
             Value::Text(text) => Some(text.as_str()),
             _ => None,
         })
+    }
+
+    pub fn boolean(&self, name: &str) -> bool {
+        self.integer(name) == Some(1)
+    }
+
+    pub fn integers(&self, name: &str) -> Vec<i32> {
+        self.0
+            .iter()
+            .filter_map(|(key, value)| match value {
+                Value::Integer(integer) if key == name => Some(*integer),
+                _ => None,
+            })
+            .collect()
     }
 
     pub fn texts(&self, name: &str) -> Vec<String> {
@@ -227,10 +269,10 @@ impl Response {
             .find_map(|(_, attributes)| attributes.text(name))
     }
 
-    pub fn into_printers(self) -> Vec<Attributes> {
+    pub fn into_groups(self, group: u8) -> Vec<Attributes> {
         self.groups
             .into_iter()
-            .filter(|(tag, _)| *tag == PRINTER)
+            .filter(|(tag, _)| *tag == group)
             .map(|(_, attributes)| attributes)
             .collect()
     }

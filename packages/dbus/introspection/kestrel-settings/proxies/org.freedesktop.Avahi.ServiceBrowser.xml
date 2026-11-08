@@ -1,0 +1,22 @@
+<node>
+  <interface name="org.freedesktop.Avahi.ServiceBrowser">
+    <method name="Start">
+    </method>
+    <signal name="ItemNew">
+      <arg type="i"/>
+      <arg type="i"/>
+      <arg type="s"/>
+      <arg type="s"/>
+      <arg type="s"/>
+      <arg type="u"/>
+    </signal>
+    <signal name="ItemRemove">
+      <arg type="i"/>
+      <arg type="i"/>
+      <arg type="s"/>
+      <arg type="s"/>
+      <arg type="s"/>
+      <arg type="u"/>
+    </signal>
+  </interface>
+</node>

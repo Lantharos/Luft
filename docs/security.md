@@ -229,7 +229,7 @@ Kestrel reads the store and tells the compositor which apps have full access and
 While the screen is locked, and at the login screen, new USB devices wait until you unlock. Devices already connected keep working.
 
 - Keyboards, mice and security keys (HID) and hubs connect right away. For a device with several parts, only those parts connect; storage, network, serial, audio and vendor-specific parts wait. This stops a gadget that poses as a keyboard and a network adapter at once.
-- At unlock everything that waited connects, and Kestrel names it in a notification.
+- At unlock everything that waited connects, and Kestrel names it in a notification. Each device is then announced again as if just plugged in, so what sets devices up, such as printer setup and `ipp-usb`, sees it connected.
 - It uses the kernel's `authorized_default` and `interface_authorized_default` switches per bus, follows logind's lock state, and costs nothing while unlocked. It is not meant to run alongside USBGuard.
 - On by default; turning it off in Settings needs an administrator. The choice is kept in `/var/lib/luft-usb-protection`.
 

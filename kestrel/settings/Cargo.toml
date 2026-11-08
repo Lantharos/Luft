@@ -9,6 +9,7 @@ license.workspace = true
 futures-util = { workspace = true, features = ["std"] }
 gio.workspace = true
 glib = { workspace = true, features = ["v2_72"] }
+luft-cups.workspace = true
 luft-daylight.workspace = true
 luft-dbus.workspace = true
 luft-dbus-macros.workspace = true

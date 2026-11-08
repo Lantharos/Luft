@@ -2,6 +2,7 @@ import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
 import { t } from '../../../shared/i18n/index.js';
+import { openSettings } from '../../../system/settingsPages.js';
 import { openDialog, type PortalDialog } from '../../core/dialog.js';
 import { SUCCESS, type Dismissal } from '../../core/request.js';
 import { choose, list, row } from '../../core/rows.js';
@@ -160,7 +161,10 @@ export async function choosePrint(dismissal: Dismissal, spec: PrintDialogSpec): 
     styleClass: 'kestrel-print-dialog',
   }, dialog => {
     if (!spec.printers.length) {
-      dialog.buttons([{ label: t('portal-cancel'), action: dialog.cancel }]);
+      dialog.buttons([
+        { label: t('portal-cancel'), action: dialog.cancel },
+        { label: t('print-open-settings'), default: true, action: () => { openSettings('printers'); dialog.cancel(); } },
+      ]);
       return;
     }
     const form = new PrintForm(dialog, spec);

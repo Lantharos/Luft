@@ -1,0 +1,10 @@
+[Unit]
+Description=Check printer setup in this VM
+After=dbus.service cups.socket avahi-daemon.service local-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/luft-printers-check
+
+[Install]
+WantedBy=multi-user.target

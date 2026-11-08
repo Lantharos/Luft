@@ -8,7 +8,7 @@ import { type Interface, parse } from './introspection';
 export type Reference = { source: string; definition: Interface };
 
 const FEDORA = '45';
-const SHIPPED = ['systemd', 'NetworkManager-libnm-devel', 'upower-devel', 'fprintd-devel', 'geoclue2-devel', 'ModemManager-devel', 'accountsservice', 'bolt', 'xdg-desktop-portal', 'flatpak', 'fwupd'];
+const SHIPPED = ['systemd', 'NetworkManager-libnm-devel', 'upower-devel', 'fprintd-devel', 'geoclue2-devel', 'ModemManager-devel', 'accountsservice', 'bolt', 'xdg-desktop-portal', 'flatpak', 'fwupd', 'avahi'];
 const IN_SOURCES: Record<string, string[]> = {
 	udisks2: ['data/org.freedesktop.UDisks2.xml'],
 	polkit: ['data/org.freedesktop.PolicyKit1.Authority.xml'],

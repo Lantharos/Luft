@@ -128,7 +128,9 @@ print-title = Print
 print-title-from-app = Print from { $appName }
 # Default label of the button that starts printing
 print-accept = Print
-print-no-printers = No printers are set up.
+print-no-printers = No printers were found. Printers on your network and ones plugged in by USB show up by themselves, and others can be added in Settings.
+# Button that opens the Printers page in Settings
+print-open-settings = Printer Settings
 
 # Picker heading and field label
 print-printer = Printer

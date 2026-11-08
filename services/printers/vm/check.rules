@@ -1,0 +1,4 @@
+polkit.addRule(function(action, subject) {
+  if (action.id == "com.lantharos.printers.manage" && subject.user == "root")
+    return polkit.Result.YES;
+});

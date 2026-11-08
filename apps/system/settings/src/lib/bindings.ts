@@ -418,6 +418,35 @@ export const commands = {
 		profile: string,
 	}, options?: CallOptions) => invoke<null>("power_set_profile", params, options),
 	powerState: (options?: CallOptions) => invoke<PowerState>("power_state", {}, options),
+	printersAdd: (params: {
+		device: string,
+		driver: string,
+		name: string,
+		location: string,
+	}, options?: CallOptions) => invoke<string>("printers_add", params, options),
+	printersCancelJob: (params: {
+		printer: string,
+		job: number,
+	}, options?: CallOptions) => invoke<null>("printers_cancel_job", params, options),
+	printersConfigure: (params: {
+		name: string,
+		options: { [key in string]: string },
+	}, options?: CallOptions) => invoke<null>("printers_configure", params, options),
+	printersDevices: (options?: CallOptions) => invoke<PrinterDevice[]>("printers_devices", {}, options),
+	printersDrivers: (params: {
+		deviceId: string,
+		model: string,
+	}, options?: CallOptions) => invoke<PrinterDriver[]>("printers_drivers", params, options),
+	printersRemove: (params: {
+		name: string,
+	}, options?: CallOptions) => invoke<null>("printers_remove", params, options),
+	printersSetDefault: (params: {
+		name: string,
+	}, options?: CallOptions) => invoke<null>("printers_set_default", params, options),
+	printersState: (options?: CallOptions) => invoke<PrintersState>("printers_state", {}, options),
+	printersTestPage: (params: {
+		name: string,
+	}, options?: CallOptions) => invoke<number>("printers_test_page", params, options),
 	privacyClearHistory: (options?: CallOptions) => invoke<null>("privacy_clear_history", {}, options),
 	regionSetLanguage: (params: {
 		language: string,
@@ -590,6 +619,7 @@ export const events = {
 	networkFailed: (callback: (payload: Failure) => void) => listen<Failure>("network.failed", callback),
 	passkeysChanged: (callback: (payload: Passkeys) => void) => listen<Passkeys>("passkeys.changed", callback),
 	powerChanged: (callback: (payload: PowerState) => void) => listen<PowerState>("power.changed", callback),
+	printersChanged: (callback: (payload: PrintersState) => void) => listen<PrintersState>("printers.changed", callback),
 	securityTrust: (callback: (payload: Trust) => void) => listen<Trust>("security.trust", callback),
 	securityUsb: (callback: (payload: UsbProtection) => void) => listen<UsbProtection>("security.usb", callback),
 	settingsChanged: (callback: (payload: SettingChange) => void) => listen<SettingChange>("settings.changed", callback),
@@ -1420,6 +1450,58 @@ export type PowerState = {
 	keyboard: Keyboard | null,
 	profiles: Profiles | null,
 	canHibernate: boolean,
+};
+
+export type PrintJob = {
+	id: number,
+	printer: string,
+	name: string,
+	owner: string,
+	state: number,
+	created: number,
+	mine: boolean,
+};
+
+export type Printer = {
+	name: string,
+	description: string,
+	location: string,
+	model: string,
+	device: string,
+	state: number,
+	reasons: string[],
+	message: string,
+	accepting: boolean,
+	temporary: boolean,
+	default: boolean,
+	markers: ([string, number, string])[],
+	media: string[],
+	mediaDefault: string,
+	sides: string[],
+	sidesDefault: string,
+	colorModes: string[],
+	colorModeDefault: string,
+};
+
+export type PrinterDevice = {
+	uri: string,
+	link: PrinterLink,
+	name: string,
+	model: string,
+	deviceId: string,
+};
+
+export type PrinterDriver = {
+	name: string,
+	description: string,
+	suits: boolean,
+};
+
+export type PrinterLink = "usb" | "network";
+
+export type PrintersState = {
+	printers: Printer[],
+	jobs: PrintJob[],
 };
 
 export type Problem = {

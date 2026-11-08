@@ -1,24 +1,29 @@
-mod cups;
-mod ipp;
+mod defaults;
+mod discovery;
 mod messages;
+mod printer;
 mod printing;
 
 use std::collections::{HashMap, HashSet};
+use std::sync::Arc;
 use std::time::Duration;
 
 use futures_util::StreamExt;
-use tokio::time::{Instant, interval, sleep_until};
+use luft_cups::{Cups, LEASE_SECONDS};
+use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender, unbounded_channel};
+use tokio::time::{Instant, interval, sleep, sleep_until};
 use zbus::message::Type;
 use zbus::{Connection, MatchRule, Message, MessageStream};
 
 use crate::context::Context;
 use crate::shared::notify::{self, Notification, Sound, URGENCY_CRITICAL, URGENCY_NORMAL};
-use cups::{Cups, LEASE_SECONDS};
+use discovery::Discovered;
 use messages::{CONNECTING, PROCESSING};
 use printing::Printing;
 
 const NOTIFIER: &str = "org.cups.cupsd.Notifier";
 const RETRY: Duration = Duration::from_secs(300);
+const SETTLE: Duration = Duration::from_millis(250);
 const CONNECTING_GRACE: Duration = Duration::from_secs(60);
 const REMOTE_PRINTER: i32 = 0x0002;
 const DISCOVERED_PRINTER: i32 = 0x0100_0000;
@@ -40,7 +45,8 @@ type JobEvent = (
 
 struct Printers {
     session: Connection,
-    cups: Cups,
+    cups: Arc<Cups>,
+    changed: UnboundedSender<()>,
     subscription: Option<i32>,
     renewed_at: Option<Instant>,
     owned_jobs: HashMap<u32, bool>,
@@ -51,12 +57,43 @@ struct Printers {
     unreachable_since: HashMap<String, Instant>,
 }
 
+fn user() -> String {
+    glib::user_name().to_string_lossy().into_owned()
+}
+
+async fn announce(session: Connection, mut changed: UnboundedReceiver<()>) {
+    while changed.recv().await.is_some() {
+        sleep(SETTLE).await;
+        while changed.try_recv().is_ok() {}
+        if let Ok(emitter) = zbus::object_server::SignalEmitter::new(&session, printing::PATH)
+            && let Err(error) = Printing::changed(&emitter).await
+        {
+            eprintln!("Couldn't announce a printer change: {error}");
+        }
+    }
+}
+
 pub async fn start(context: &Context) -> zbus::Result<()> {
+    let cups = Arc::new(Cups::new(user()));
+    let discovered = Arc::new(Discovered::default());
+    let (changed, announced) = unbounded_channel();
     context
         .session
         .object_server()
-        .at(printing::PATH, Printing::new())
+        .at(
+            printing::PATH,
+            Printing::new(cups.clone(), discovered.clone()),
+        )
         .await?;
+    tokio::spawn(announce(context.session.clone(), announced));
+    let system = context.system.clone();
+    let browsing = (cups.clone(), changed.clone());
+    tokio::spawn(async move {
+        let (cups, changed) = browsing;
+        if let Err(error) = discovery::run(system, cups, discovered, changed).await {
+            eprintln!("Printers on the network won't show up: {error}");
+        }
+    });
     let rule = MatchRule::builder()
         .msg_type(Type::Signal)
         .interface(NOTIFIER)
@@ -65,7 +102,8 @@ pub async fn start(context: &Context) -> zbus::Result<()> {
     let mut events = MessageStream::for_match_rule(rule, &context.system, None).await?;
     let mut printers = Printers {
         session: context.session.clone(),
-        cups: Cups::new(),
+        cups,
+        changed,
         subscription: None,
         renewed_at: None,
         owned_jobs: HashMap::new(),
@@ -125,6 +163,7 @@ impl Printers {
             return;
         };
         let body = message.body();
+        let _ = self.changed.send(());
         match member.as_str() {
             "JobCreated" | "JobState" | "JobCompleted" => {
                 if let Ok(event) = body.deserialize::<JobEvent>() {
@@ -239,10 +278,17 @@ impl Printers {
     }
 
     async fn printer_added(&mut self, uri: &str, printer: &str) {
-        let Ok(kind) = self.cups.printer_type(uri).await else {
+        let Ok(added) = self
+            .cups
+            .printer(uri, &["printer-type", "printer-is-temporary"])
+            .await
+        else {
             return;
         };
-        if kind & (REMOTE_PRINTER | DISCOVERED_PRINTER) == 0 {
+        let kind = added.integer("printer-type").unwrap_or_default();
+        if kind & (REMOTE_PRINTER | DISCOVERED_PRINTER) == 0
+            && !added.boolean("printer-is-temporary")
+        {
             self.show("Printer added", printer, URGENCY_NORMAL, 0).await;
         }
     }
@@ -271,7 +317,7 @@ impl Printers {
 impl Drop for Printers {
     fn drop(&mut self) {
         if let Some(subscription) = self.subscription
-            && let Err(error) = self.cups.cancel(subscription)
+            && let Err(error) = self.cups.cancel_subscription(subscription)
         {
             eprintln!("Couldn't stop printer updates: {error}");
         }

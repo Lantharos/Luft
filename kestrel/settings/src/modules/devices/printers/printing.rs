@@ -1,87 +1,57 @@
 use std::io;
 use std::os::fd::OwnedFd;
+use std::sync::Arc;
 
+use luft_cups::ipp::{Attributes, JOB};
+use luft_cups::{Cups, PRINT_JOB, expect_success, printer_uri};
 use luft_dbus_macros::introspect;
 use tokio::fs::File;
+use zbus::object_server::SignalEmitter;
 use zbus::{DeserializeDict, SerializeDict, Type, fdo, interface};
 
-use super::cups::{self, Cups, PRINT_JOB};
-use super::ipp::{Attributes, JOB};
+use super::defaults;
+use super::discovery::Discovered;
+use super::printer::{ATTRIBUTES, Printer};
 
 pub const PATH: &str = "/com/lantharos/Settings/Printing";
 const DOCUMENT_FORMAT: &str = "application/pdf";
-const ATTRIBUTES: [&str; 13] = [
-    "printer-name",
-    "printer-info",
-    "printer-location",
-    "printer-state",
-    "printer-is-accepting-jobs",
-    "media-supported",
-    "media-default",
-    "sides-supported",
-    "sides-default",
-    "print-color-mode-supported",
-    "print-color-mode-default",
-    "copies-supported",
-    "page-ranges-supported",
-];
+const TEST_PAGE: &str = "/usr/share/cups/data/default-testpage.pdf";
 const COLLATED: &str = "separate-documents-collated-copies";
 const UNCOLLATED: &str = "separate-documents-uncollated-copies";
+const PRINTERS_PATH: &str = "/printers/";
 
 #[derive(SerializeDict, Type)]
 #[zbus(signature = "a{sv}", rename_all = "kebab-case")]
-pub struct Printer {
+pub struct Job {
+    id: u32,
+    printer: String,
     name: String,
-    description: String,
-    location: String,
+    owner: String,
     state: i32,
-    accepting: bool,
-    default: bool,
-    media: Vec<String>,
-    media_default: String,
-    sides: Vec<String>,
-    sides_default: String,
-    color_modes: Vec<String>,
-    color_mode_default: String,
-    copies: i32,
-    page_ranges: bool,
+    created: i32,
+    mine: bool,
 }
 
-impl Printer {
-    fn from(attributes: &Attributes) -> Option<Self> {
-        let name = attributes.text("printer-name")?.to_owned();
-        let text = |key| attributes.text(key).unwrap_or_default().to_owned();
-        let description = Some(text("printer-info"))
-            .filter(|info| !info.is_empty())
-            .unwrap_or_else(|| name.clone());
+impl Job {
+    fn from(attributes: &Attributes, user: &str) -> Option<Self> {
+        let owner = attributes
+            .text("job-originating-user-name")
+            .unwrap_or_default()
+            .to_owned();
+        let printer = attributes.text("job-printer-uri")?;
         Some(Self {
-            default: false,
-            description,
-            location: text("printer-location"),
-            state: attributes.integer("printer-state").unwrap_or_default(),
-            accepting: attributes.integer("printer-is-accepting-jobs") == Some(1),
-            media: attributes
-                .texts("media-supported")
-                .into_iter()
-                .filter(|media| {
-                    !media.starts_with("custom_min_") && !media.starts_with("custom_max_")
-                })
-                .collect(),
-            media_default: text("media-default"),
-            sides: attributes.texts("sides-supported"),
-            sides_default: text("sides-default"),
-            color_modes: attributes.texts("print-color-mode-supported"),
-            color_mode_default: text("print-color-mode-default"),
-            copies: attributes
-                .range("copies-supported")
-                .map_or(1, |(_, most)| most),
-            page_ranges: attributes.integer("page-ranges-supported") == Some(1),
-            name,
+            id: u32::try_from(attributes.integer("job-id")?).ok()?,
+            printer: printer[printer.rfind(PRINTERS_PATH)? + PRINTERS_PATH.len()..].to_owned(),
+            name: attributes.text("job-name").unwrap_or_default().to_owned(),
+            state: attributes.integer("job-state").unwrap_or_default(),
+            created: attributes.integer("time-at-creation").unwrap_or_default(),
+            mine: owner == user,
+            owner,
         })
     }
 }
 
-#[derive(DeserializeDict, Type)]
+#[derive(DeserializeDict, Type, Default)]
 #[zbus(signature = "a{sv}", rename_all = "kebab-case")]
 pub struct JobOptions {
     copies: Option<i32>,
@@ -93,77 +63,27 @@ pub struct JobOptions {
 }
 
 pub struct Printing {
-    cups: Cups,
+    cups: Arc<Cups>,
+    discovered: Arc<Discovered>,
 }
 
 impl Printing {
-    pub fn new() -> Self {
-        Self { cups: Cups::new() }
-    }
-}
-
-fn printer_uri(name: &str) -> String {
-    let path: String = name
-        .bytes()
-        .map(|byte| {
-            if byte.is_ascii_alphanumeric() || b"-._~".contains(&byte) {
-                char::from(byte).to_string()
-            } else {
-                format!("%{byte:02X}")
-            }
-        })
-        .collect();
-    format!("ipp://localhost/printers/{path}")
-}
-
-async fn user_default() -> Option<String> {
-    let path = glib::home_dir().join(".cups/lpoptions");
-    let options = tokio::fs::read_to_string(path).await.ok()?;
-    options.lines().find_map(|line| {
-        let destination = line.strip_prefix("Default ")?.split_whitespace().next()?;
-        Some(destination.split('/').next()?.to_owned())
-    })
-}
-
-fn failed(error: io::Error) -> fdo::Error {
-    fdo::Error::Failed(error.to_string())
-}
-
-#[introspect]
-#[interface(name = "com.lantharos.Settings.Printing")]
-impl Printing {
-    async fn printers(&self) -> fdo::Result<Vec<Printer>> {
-        let (found, server_default, user_default) = tokio::join!(
-            self.cups.printers(&ATTRIBUTES),
-            self.cups.default_printer(),
-            user_default()
-        );
-        let mut printers: Vec<Printer> = found
-            .map_err(failed)?
-            .iter()
-            .filter_map(Printer::from)
-            .collect();
-        let default = [user_default, server_default.map_err(failed)?]
-            .into_iter()
-            .flatten()
-            .find(|name| printers.iter().any(|printer| printer.name == *name));
-        for printer in &mut printers {
-            printer.default = default.as_ref() == Some(&printer.name);
-        }
-        Ok(printers)
+    pub fn new(cups: Arc<Cups>, discovered: Arc<Discovered>) -> Self {
+        Self { cups, discovered }
     }
 
-    async fn print(
+    async fn send(
         &self,
         printer: &str,
-        document: zbus::OwnedFd,
         title: &str,
-        options: JobOptions,
+        format: &str,
+        document: File,
+        options: &JobOptions,
     ) -> fdo::Result<u32> {
         let mut request = self.cups.request(PRINT_JOB, &printer_uri(printer));
         request
             .name("job-name", title)
-            .mime_type("document-format", DOCUMENT_FORMAT)
+            .mime_type("document-format", format)
             .group(JOB);
         if let Some(copies) = options.copies {
             request.integer("copies", copies);
@@ -186,16 +106,98 @@ impl Printing {
         if let Some(ranges) = &options.page_ranges {
             request.ranges("page-ranges", ranges);
         }
-        let document = File::from_std(std::fs::File::from(OwnedFd::from(document)));
         let response = self
             .cups
-            .send_document(request.finish(), document)
+            .send_document(request, document)
             .await
             .map_err(failed)?;
-        cups::expect_success(&response).map_err(failed)?;
+        expect_success(&response).map_err(failed)?;
         response
             .integer("job-id")
             .and_then(|job| u32::try_from(job).ok())
             .ok_or_else(|| fdo::Error::Failed("The printer didn't take the document".into()))
     }
+}
+
+fn failed(error: io::Error) -> fdo::Error {
+    match error.kind() {
+        io::ErrorKind::PermissionDenied => fdo::Error::AccessDenied(error.to_string()),
+        _ => fdo::Error::Failed(error.to_string()),
+    }
+}
+
+#[introspect]
+#[interface(name = "com.lantharos.Settings.Printing")]
+impl Printing {
+    async fn printers(&self) -> fdo::Result<Vec<Printer>> {
+        let (found, server_default, user_default) = tokio::join!(
+            self.cups.printers(&ATTRIBUTES),
+            self.cups.default_printer(),
+            defaults::chosen()
+        );
+        let discovered = self.discovered.models();
+        let mut printers: Vec<Printer> = found
+            .map_err(failed)?
+            .iter()
+            .filter_map(Printer::from)
+            .filter(|printer| !printer.reached_another_way(&discovered))
+            .collect();
+        let default = [user_default, server_default.map_err(failed)?]
+            .into_iter()
+            .flatten()
+            .find(|name| printers.iter().any(|printer| printer.name == *name));
+        for printer in &mut printers {
+            printer.default = default.as_ref() == Some(&printer.name);
+        }
+        Ok(printers)
+    }
+
+    async fn jobs(&self) -> fdo::Result<Vec<Job>> {
+        let jobs = self.cups.jobs().await.map_err(failed)?;
+        Ok(jobs
+            .iter()
+            .filter_map(|job| Job::from(job, self.cups.user()))
+            .collect())
+    }
+
+    async fn cancel_job(&self, printer: &str, job: u32) -> fdo::Result<()> {
+        self.cups.cancel_job(printer, job).await.map_err(failed)
+    }
+
+    async fn set_default(
+        &self,
+        printer: &str,
+        #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
+    ) -> fdo::Result<()> {
+        defaults::choose(printer).await.map_err(failed)?;
+        Self::changed(&emitter).await?;
+        Ok(())
+    }
+
+    async fn print_test_page(&self, printer: &str) -> fdo::Result<u32> {
+        let page = File::open(TEST_PAGE).await.map_err(failed)?;
+        self.send(
+            printer,
+            "Test page",
+            DOCUMENT_FORMAT,
+            page,
+            &JobOptions::default(),
+        )
+        .await
+    }
+
+    async fn print(
+        &self,
+        printer: &str,
+        document: zbus::OwnedFd,
+        title: &str,
+        options: JobOptions,
+    ) -> fdo::Result<u32> {
+        let document = File::from_std(std::fs::File::from(OwnedFd::from(document)));
+        self.send(printer, title, DOCUMENT_FORMAT, document, &options)
+            .await
+    }
+
+    #[zbus(signal)]
+    pub async fn changed(emitter: &SignalEmitter<'_>) -> zbus::Result<()>;
 }

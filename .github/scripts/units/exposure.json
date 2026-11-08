@@ -44,6 +44,8 @@
 	"services/packages/data/luft-system-packages-link.service": 0.9,
 	"services/packages/data/luft-system-packages-rebuild.service": 0.9,
 	"services/packages/data/luft-system-packages-settle.service": 4.2,
+	"services/printers/data/luft-printer-setup.service": 0.9,
+	"services/printers/data/luft-printers.service": 0.9,
 	"services/sleep/data/luft-sleep-power-off.service": 0.9,
 	"services/sleep/data/luft-sleep.service": 0.9,
 	"services/speech/data/luft-speech.service": 6,

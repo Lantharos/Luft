@@ -105,19 +105,37 @@ EOF
 ppd 'Office Printer' True True > "$directory/office.ppd"
 ppd 'Label Printer' False False > "$directory/label.ppd"
 
-rm -f "$socket"
-cupsd -f -c "$directory/root/cupsd.conf" -s "$directory/root/cups-files.conf" &
-server=$!
-trap 'kill $server' EXIT
-until [[ -S "$socket" ]]; do
-  kill -0 "$server"
-  sleep 0.05
-done
+serve() {
+  rm -f "$socket"
+  cupsd -f -c "$directory/root/cupsd.conf" -s "$directory/root/cups-files.conf" &
+  server=$!
+  until [[ -S "$socket" ]]; do
+    kill -0 "$server"
+    sleep 0.05
+  done
+}
+
+supplies() {
+  sed -i '/^<\(Default\)\?Printer Office>/,/^<\/Printer>/{/^<\/Printer>/i\
+Attribute marker-colors \\#00B7EB,\\#E5007E,\\#FFD800,\\#1A1A1A\
+Attribute marker-levels 64,38,81,12\
+Attribute marker-names Cyan,Magenta,Yellow,Black\
+Attribute marker-types ink,ink,ink,ink
+}' "$directory/root/printers.conf"
+}
 
 export CUPS_SERVER="$socket"
+serve
+trap 'kill $server' EXIT
 : > "$directory/out/office.pdf"
 : > "$directory/out/label.pdf"
 lpadmin -p Office -E -v "file://$directory/out/office.pdf" -P "$directory/office.ppd" -D 'Office Printer' -L 'Second floor' 2> /dev/null
 lpadmin -p Labels -E -v "file://$directory/out/label.pdf" -P "$directory/label.ppd" -D 'Label Printer' 2> /dev/null
+kill "$server"
+wait "$server" || true
+supplies
+serve
 lpadmin -d Office
+printf '%%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj 2 0 obj<</Type/Pages/Kids[]/Count 0>>endobj\ntrailer<</Root 1 0 R>>\n%%%%EOF\n' > "$directory/labels.pdf"
+lp -d Labels -H hold -t 'Shipping labels' "$directory/labels.pdf" > /dev/null
 wait "$server"

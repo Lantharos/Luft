@@ -70,6 +70,10 @@ impl Device {
         authorize(&self.path);
     }
 
+    pub fn announce(&self) {
+        write(&self.path, "uevent", "add");
+    }
+
     pub fn descriptors(&self) -> Option<Vec<u8>> {
         fs::read(self.path.join("descriptors")).ok()
     }

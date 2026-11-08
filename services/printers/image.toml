@@ -1,0 +1,11 @@
+part = "services"
+
+[programs]
+"/usr/libexec/" = ["luft-printers"]
+
+[files]
+"/usr/share/dbus-1/system.d/" = ["data/com.lantharos.Printers1.conf"]
+"/usr/share/dbus-1/system-services/" = ["data/com.lantharos.Printers1.service"]
+"/usr/lib/systemd/system/" = ["data/luft-printers.service", "data/luft-printer-setup.service"]
+"/usr/lib/udev/rules.d/" = ["data/60-luft-printers.rules"]
+"/usr/share/polkit-1/actions/" = ["data/com.lantharos.printers.policy"]

@@ -4762,6 +4762,7 @@ dependencies = [
  "futures-util",
  "gio",
  "glib",
+ "luft-cups",
  "luft-daylight",
  "luft-dbus",
  "luft-dbus-macros",
@@ -5365,6 +5366,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "luft-cups"
+version = "0.1.0"
+dependencies = [
+ "tokio",
+]
+
+[[package]]
 name = "luft-daylight"
 version = "0.1.0"
 dependencies = [
@@ -5680,6 +5688,18 @@ dependencies = [
  "tokio",
  "zbus 6.0.0",
  "zeroize",
+]
+
+[[package]]
+name = "luft-printers"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "luft-cups",
+ "luft-dbus",
+ "luft-dbus-macros",
+ "tokio",
+ "zbus 6.0.0",
 ]
 
 [[package]]

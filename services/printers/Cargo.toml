@@ -1,0 +1,19 @@
+[package]
+name = "luft-printers"
+version = "0.1.0"
+description = "Sets up printers plugged in by USB and lets Settings add, change and remove printers"
+authors = ["Kristof"]
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+luft-cups.workspace = true
+luft-dbus.workspace = true
+luft-dbus-macros.workspace = true
+tokio = { workspace = true, features = ["macros", "rt", "sync", "time"] }
+zbus = { workspace = true, features = ["service", "tokio"] }
+
+[lints]
+workspace = true

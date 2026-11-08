@@ -83,4 +83,5 @@ pub fn admit(id: &str) {
         .interfaces()
         .filter(|interface| !interface.is_authorized())
         .for_each(|interface| interface.authorize());
+    device.announce();
 }

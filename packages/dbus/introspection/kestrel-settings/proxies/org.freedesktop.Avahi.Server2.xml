@@ -1,0 +1,32 @@
+<node>
+  <interface name="org.freedesktop.Avahi.Server2">
+    <method name="ServiceBrowserPrepare">
+      <arg type="i" direction="in"/>
+      <arg type="i" direction="in"/>
+      <arg type="s" direction="in"/>
+      <arg type="s" direction="in"/>
+      <arg type="u" direction="in"/>
+      <arg type="o" direction="out"/>
+    </method>
+    <method name="ResolveService">
+      <arg type="i" direction="in"/>
+      <arg type="i" direction="in"/>
+      <arg type="s" direction="in"/>
+      <arg type="s" direction="in"/>
+      <arg type="s" direction="in"/>
+      <arg type="i" direction="in"/>
+      <arg type="u" direction="in"/>
+      <arg type="i" direction="out"/>
+      <arg type="i" direction="out"/>
+      <arg type="s" direction="out"/>
+      <arg type="s" direction="out"/>
+      <arg type="s" direction="out"/>
+      <arg type="s" direction="out"/>
+      <arg type="i" direction="out"/>
+      <arg type="s" direction="out"/>
+      <arg type="q" direction="out"/>
+      <arg type="aay" direction="out"/>
+      <arg type="u" direction="out"/>
+    </method>
+  </interface>
+</node>

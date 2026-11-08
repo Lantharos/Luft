@@ -10,6 +10,7 @@ bluez-obexd
 bolt
 btrfs-progs
 bubblewrap
+c2esp
 colord
 cryptsetup
 cups
@@ -50,6 +51,7 @@ gstreamer1-plugin-libav
 gstreamer1-plugins-bad-free
 gstreamer1-plugins-good
 gtk4
+gutenprint-cups
 gvfs
 gvfs-fuse
 gvfs-mtp
@@ -93,10 +95,12 @@ pipewire-utils
 plymouth
 polkit
 power-profiles-daemon
+ptouch-driver
 pulseaudio-utils
 rclone
 shared-mime-info
 skopeo
+splix
 squashfuse
 steam-devices
 switcheroo-control

@@ -1,0 +1,3 @@
+# USB printers without IPP over USB (7/1/4, which ipp-usb serves without a driver). USB protection
+# announces a device again once it lets it in after an unlock.
+ACTION=="add", SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ATTR{authorized}=="1", ENV{ID_USB_INTERFACES}=="*:0701??:*", ENV{ID_USB_INTERFACES}!="*:070104:*", TAG+="systemd", ENV{SYSTEMD_WANTS}+="luft-printer-setup.service"

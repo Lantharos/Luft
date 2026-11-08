@@ -1,0 +1,26 @@
+<node>
+  <interface name="com.lantharos.Printers1">
+    <method name="Devices">
+      <arg type="a(sssss)" direction="out"/>
+    </method>
+    <method name="Drivers">
+      <arg name="device_id" type="s" direction="in"/>
+      <arg name="make_and_model" type="s" direction="in"/>
+      <arg type="a(ssb)" direction="out"/>
+    </method>
+    <method name="Add">
+      <arg name="device" type="s" direction="in"/>
+      <arg name="driver" type="s" direction="in"/>
+      <arg name="info" type="s" direction="in"/>
+      <arg name="location" type="s" direction="in"/>
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="Remove">
+      <arg name="name" type="s" direction="in"/>
+    </method>
+    <method name="Configure">
+      <arg name="name" type="s" direction="in"/>
+      <arg name="options" type="a{ss}" direction="in"/>
+    </method>
+  </interface>
+</node>

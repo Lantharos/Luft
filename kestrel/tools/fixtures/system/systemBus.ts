@@ -7,6 +7,7 @@ import {FINGERPRINT_NAME, publishFingerprint} from './fingerprint.js';
 import {FIREWALL_NAME, publishFirewall} from './network/firewall.js';
 import {NETWORK_MANAGER_NAME, publishNetworkManager} from './network/networkManager.js';
 import {PACKAGES_NAME, publishPackages} from './packages.js';
+import {PRINTERS_NAME, publishPrinters} from './printers.js';
 import {publishSecurity, SECURITY_NAMES} from './security.js';
 import {publishSleep, SLEEP_NAME} from './sleep.js';
 import {publishUdisks} from './udisks/service.js';
@@ -43,10 +44,11 @@ publish(CALLS, {
 publishSecurity(publish, calls, publishUdisks(calls));
 publishWindows(publish);
 publishSleep(publish, calls);
+publishPrinters(publish, calls);
 publishUpdater(publish, calls);
 publishPackages(publish);
 publishFingerprint(publish, calls);
 
-for (const name of [...BASIC_NAMES, ACCOUNTS_NAME, NETWORK_MANAGER_NAME, FIREWALL_NAME, 'com.lantharos.KestrelChecks', 'org.freedesktop.UDisks2', WINDOWS_NAME, SLEEP_NAME, UPDATER_NAME, PACKAGES_NAME, FINGERPRINT_NAME, ...SECURITY_NAMES])
+for (const name of [...BASIC_NAMES, ACCOUNTS_NAME, NETWORK_MANAGER_NAME, FIREWALL_NAME, 'com.lantharos.KestrelChecks', 'org.freedesktop.UDisks2', WINDOWS_NAME, SLEEP_NAME, PRINTERS_NAME, UPDATER_NAME, PACKAGES_NAME, FINGERPRINT_NAME, ...SECURITY_NAMES])
   Gio.bus_own_name_on_connection(Gio.DBus.system, name, Gio.BusNameOwnerFlags.NONE, null, null);
 new GLib.MainLoop(null, false).run();

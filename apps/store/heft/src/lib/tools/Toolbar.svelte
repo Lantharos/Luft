@@ -11,6 +11,7 @@
 		insertPicture(): void;
 		takePhoto(): void;
 		toggleRuler(): void;
+		paper(): void;
 	}
 </script>
 
@@ -18,6 +19,7 @@
 	import Eraser from '@lucide/svelte/icons/eraser';
 	import FilePlus from '@lucide/svelte/icons/file-plus-2';
 	import ImagePlus from '@lucide/svelte/icons/image-plus';
+	import NotebookText from '@lucide/svelte/icons/notebook-text';
 	import Lasso from '@lucide/svelte/icons/lasso';
 	import Type from '@lucide/svelte/icons/type';
 	import Redo from '@lucide/svelte/icons/redo-2';
@@ -27,6 +29,7 @@
 	import { t } from '@luft/i18n';
 	import { IconButton, MenuButton, MenuItem, MenuSeparator, tooltip } from '@luft/ui';
 	import FormatBar from '#lib/objects/FormatBar.svelte';
+	import { editing } from '#lib/objects/editing.svelte.js';
 	import { colorName } from './colors';
 	import EraserOptions from './EraserOptions.svelte';
 	import PenOptions from './PenOptions.svelte';
@@ -102,7 +105,7 @@
 	>
 		<Type size={19} />
 	</button>
-	{#if tools.active === 'type'}
+	{#if tools.active === 'type' || editing.active}
 		<FormatBar />
 	{/if}
 	{#if books}
@@ -138,6 +141,7 @@
 		{/snippet}
 	</MenuButton>
 	<IconButton icon={FilePlus} label={t('toolbar-add-page')} onclick={actions.addPage} />
+	<IconButton icon={NotebookText} label={t('toolbar-paper')} onclick={actions.paper} />
 	<MenuButton label={t('toolbar-zoom')} class="plain-button tabular-nums" align={side ? 'start' : 'end'}>
 		{#snippet trigger()}
 			{t('zoom-percent', { percent: Math.round(zoom * 100) })}

@@ -13,6 +13,12 @@ export interface SettingsValues {
 	toolbar: ToolbarPlace;
 	pages: PageFlow;
 	handwriting: boolean;
+	convert: boolean;
+	/** How long the pen rests before writing turns into text, in milliseconds. */
+	convertAfter: number;
+	keepCorrections: boolean;
+	/** The languages the person writes in, for where accents go; empty for the system's. */
+	languages: string[];
 }
 
 const DEFAULTS: SettingsValues = {
@@ -23,7 +29,11 @@ const DEFAULTS: SettingsValues = {
 	prediction: true,
 	toolbar: 'top',
 	pages: 'continuous',
-	handwriting: false
+	handwriting: false,
+	convert: false,
+	convertAfter: 800,
+	keepCorrections: false,
+	languages: []
 };
 
 const SAVE_AFTER = 500;

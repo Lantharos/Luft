@@ -2,10 +2,12 @@
  "https://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
 <node name="/com/lantharos/Handwriting1">
   <!--
-    Handwriting recognition, run in the session and started on demand, at the lowest priority, so it
-    only uses the processor when nothing else wants it. It exits after half a minute with nothing to
-    do, and unloads the model three minutes after the last line it read. Strokes are only read in
-    memory and never written anywhere.
+    Handwriting recognition, run in the session and started on demand. The model runs on the
+    graphics card when there is one, through Vulkan, and on the processor otherwise. Background
+    reading runs at the lowest priority, so it only uses the processor when nothing else wants it;
+    a line someone is waiting for goes first, at normal priority. It exits after half a minute with
+    nothing to do, and unloads the model three minutes after the last line it read. Strokes are
+    only read in memory and never written anywhere.
   -->
   <interface name="com.lantharos.Handwriting1">
     <!-- Reads one line of handwriting as text. Each stroke is the points the pen passed through,
@@ -14,6 +16,13 @@
          downloaded yet, and with com.lantharos.Handwriting1.Error.Paused while the computer runs on
          a battery below 30% that isn't charging. -->
     <method name="Recognize">
+      <arg name="strokes" type="aa(dd)" direction="in"/>
+      <arg name="text" type="s" direction="out"/>
+    </method>
+    <!-- Like Recognize, for a line someone is waiting for, such as writing turned into text as it's
+         written: it goes ahead of every background line that hasn't started, runs at normal
+         priority and doesn't wait for the charger. -->
+    <method name="RecognizeNow">
       <arg name="strokes" type="aa(dd)" direction="in"/>
       <arg name="text" type="s" direction="out"/>
     </method>

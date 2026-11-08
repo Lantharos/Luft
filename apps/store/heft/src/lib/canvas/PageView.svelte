@@ -78,7 +78,7 @@
 	{/if}
 	<div class="tiles absolute inset-0" bind:this={tilesElement}></div>
 	{#if document}
-		<ObjectsLayer {document} {zoom} {dark} assets="{library.root}/{notebook.folder}/assets" />
+		<ObjectsLayer page={entry.id} {document} {zoom} {dark} assets="{library.root}/{notebook.folder}/assets" />
 	{/if}
 	{#if textSelection.page === entry.id}
 		{#each textSelection.selection.rects as rect, index (index)}

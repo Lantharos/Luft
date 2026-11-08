@@ -44,6 +44,7 @@ python3
 sassc
 sbsigntools
 sccache
+spirv-headers-devel
 sqlite-devel
 systemd-devel
 tpm2-tss-devel

@@ -3,6 +3,7 @@
 	import { Dialog, Slider, Switch } from '@luft/ui';
 	import { settings } from '#lib/app/settings.svelte.js';
 	import { commands } from '#lib/bindings.js';
+	import ConvertSection from './ConvertSection.svelte';
 	import HandwritingSection from './HandwritingSection.svelte';
 	import LayoutSection from './LayoutSection.svelte';
 	import PressureCurve from './PressureCurve.svelte';
@@ -53,6 +54,7 @@
 		</section>
 		<LayoutSection />
 		<HandwritingSection />
+		<ConvertSection />
 	</div>
 	{#snippet actions()}
 		<button type="button" class="button primary" onclick={onclose}>{t('dialog-done')}</button>

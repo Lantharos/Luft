@@ -1,8 +1,8 @@
 import { settings } from '#lib/app/settings.svelte.js';
+import type { Stroke } from '#lib/ink/stroke.js';
 import { activity } from '#lib/input/activity.js';
 import { pen } from '#lib/input/pen.svelte.js';
 import { tools } from '#lib/tools/tools.svelte.js';
-import { addText } from '#lib/objects/editing.svelte.js';
 import { Drawing, Erasing, pagePoint, type Origin, type Target } from './drawing';
 import { TouchGestures } from './gestures';
 import { selection } from '#lib/selection/selection.svelte.js';
@@ -20,11 +20,17 @@ type Tool = 'draw' | 'highlight' | 'erase' | 'text' | 'lasso' | 'type';
 const ERASER_BUTTON = 32;
 const WHEEL_SETTLE = 160;
 const LINE = 40;
+const TAP_SLOP = 4;
+const TAP_TIME = 350;
 
 export interface SurfaceHost {
 	target(index: number): Target | null;
 	preview(scale: number, x: number, y: number): void;
 	ruler(): Ruler;
+	/** A click or tap with something other than the pen, to type there. */
+	typeAt(target: Target, x: number, y: number, client: [number, number]): void;
+	/** A stroke was written with the pen or mouse. */
+	wrote(target: Target, stroke: Stroke): void;
 	undo(): void;
 	redo(): void;
 }
@@ -34,6 +40,7 @@ type Action = Drawing | Erasing | TextPicking | TextCarrying | Lassoing | { pan:
 /** Sorts pointers into writing, erasing, panning and zooming, and keeps the palm out of it. */
 export class Surface {
 	private readonly actions = new Map<number, Action>();
+	private readonly starts = new Map<number, { x: number; y: number; time: number; far: boolean }>();
 	private readonly gestures: TouchGestures;
 	private origin: Origin = { left: 0, top: 0 };
 	private pending = { scale: 1, x: 0, y: 0 };
@@ -51,6 +58,7 @@ export class Surface {
 			{
 				undo: () => host.undo(),
 				redo: () => host.redo(),
+				tap: (x, y) => this.tap(x, y),
 				preview: (scale, x, y) => this.preview(scale, x, y),
 				settle: () => this.settle()
 			},
@@ -77,6 +85,24 @@ export class Surface {
 		if (event.button !== 0) return;
 		const action = this.begin(event, this.toolFor(event));
 		if (action) this.capture(event, action);
+		if (action instanceof Drawing && event.pointerType === 'mouse') this.starts.set(event.pointerId, { x: event.clientX, y: event.clientY, time: event.timeStamp, far: false });
+	}
+
+	private targetAt(clientX: number, clientY: number) {
+		const [, contentY] = this.viewport.toContent(clientX - this.origin.left, clientY - this.origin.top);
+		return this.host.target(pageNear(this.viewport.layout, contentY));
+	}
+
+	private typeAt(target: Target, clientX: number, clientY: number) {
+		const [x, y] = pagePoint(this.viewport, this.origin, target.page, { clientX, clientY });
+		this.host.typeAt(target, x, y, [clientX, clientY]);
+	}
+
+	private tap(clientX: number, clientY: number) {
+		const rect = this.element.getBoundingClientRect();
+		this.origin = { left: rect.left, top: rect.top };
+		const target = this.targetAt(clientX, clientY);
+		if (target) this.typeAt(target, clientX, clientY);
 	}
 
 	private toolFor(event: PointerEvent): Tool | null {
@@ -87,16 +113,13 @@ export class Surface {
 
 	private begin(event: PointerEvent, tool: Tool | null): Action | null {
 		if (!tool) return null;
-		const [, contentY] = this.viewport.toContent(event.clientX - this.origin.left, event.clientY - this.origin.top);
-		const index = pageNear(this.viewport.layout, contentY);
-		const target = this.host.target(index);
+		const target = this.targetAt(event.clientX, event.clientY);
 		if (!target) return null;
 		activity.mark();
 		selection.clear();
 		if (document.activeElement instanceof HTMLElement && document.activeElement.isContentEditable && tool !== 'type') document.activeElement.blur();
 		if (tool === 'type') {
-			const [x, y] = pagePoint(this.viewport, this.origin, target.page, event);
-			addText(target.document, x, y, target.page.width);
+			this.typeAt(target, event.clientX, event.clientY);
 			return null;
 		}
 		if (tool === 'lasso') return new Lassoing(this.viewport, this.origin, target, this.live, event);
@@ -132,6 +155,8 @@ export class Surface {
 		if (!action) return;
 		activity.mark();
 		if (action instanceof Drawing) {
+			const start = this.starts.get(event.pointerId);
+			if (start && Math.hypot(event.clientX - start.x, event.clientY - start.y) > TAP_SLOP) start.far = true;
 			if (!this.raw) action.add(event.getCoalescedEvents());
 			action.predict(event.getPredictedEvents());
 		} else if (action instanceof Erasing) action.move(event.getCoalescedEvents());
@@ -159,14 +184,23 @@ export class Surface {
 	up(event: PointerEvent) {
 		if (event.pointerType === 'touch') this.gestures.up(event.pointerId, event.timeStamp);
 		const action = this.actions.get(event.pointerId);
+		const start = this.starts.get(event.pointerId);
 		this.actions.delete(event.pointerId);
-		if (action && !('pan' in action)) action.end();
+		this.starts.delete(event.pointerId);
+		if (action instanceof Drawing && start && !start.far && event.timeStamp - start.time < TAP_TIME) {
+			action.cancel();
+			this.typeAt(action.target, event.clientX, event.clientY);
+		} else if (action instanceof Drawing) {
+			const stroke = action.end();
+			if (stroke) this.host.wrote(action.target, stroke);
+		} else if (action && !('pan' in action)) action.end();
 	}
 
 	cancel(event: PointerEvent) {
 		if (event.pointerType === 'touch') this.gestures.up(event.pointerId, event.timeStamp);
 		const action = this.actions.get(event.pointerId);
 		this.actions.delete(event.pointerId);
+		this.starts.delete(event.pointerId);
 		if (action instanceof Drawing || action instanceof Erasing || action instanceof Lassoing || action instanceof TextCarrying) action.cancel();
 	}
 

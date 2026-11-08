@@ -1,4 +1,4 @@
-use std::sync::{Arc, LazyLock, Mutex};
+use std::sync::{Arc, Condvar, LazyLock, Mutex};
 use std::time::{Duration, Instant};
 
 use anyhow::Result;
@@ -32,6 +32,13 @@ pub fn model() -> &'static Entry<Engine> {
 
 pub struct NotInstalled;
 
+/// Whether someone is waiting for the line, or it's read in the background.
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum Urgency {
+    Waiting,
+    Background,
+}
+
 struct Loaded {
     recognizer: Recognizer,
     used: Instant,
@@ -41,6 +48,8 @@ pub struct Hub {
     pub store: Store,
     pub downloads: Downloads,
     loaded: Mutex<Option<Loaded>>,
+    waiting: Mutex<usize>,
+    nobody_waiting: Condvar,
     changes: UnboundedSender<()>,
     idle_since: Mutex<Option<Instant>>,
 }
@@ -51,6 +60,8 @@ impl Hub {
             store,
             downloads: Downloads::default(),
             loaded: Mutex::new(None),
+            waiting: Mutex::new(0),
+            nobody_waiting: Condvar::new(),
             changes,
             idle_since: Mutex::new(None),
         }
@@ -72,14 +83,41 @@ impl Hub {
         ))
     }
 
-    pub fn recognize(&self, strokes: &[Stroke]) -> Result<Result<String, NotInstalled>> {
+    /// Reads a line; a line someone waits for goes ahead of every background
+    /// line that hasn't started yet.
+    pub fn recognize(
+        &self,
+        strokes: &[Stroke],
+        urgency: Urgency,
+    ) -> Result<Result<String, NotInstalled>> {
         let Some(line) = ink::draw(strokes) else {
             return Ok(Ok(String::new()));
         };
         if !self.store.installed(model()) {
             return Ok(Err(NotInstalled));
         }
-        let mut slot = self.loaded.lock().expect("recognizer lock");
+        let mut slot = match urgency {
+            Urgency::Waiting => {
+                *self.waiting.lock().expect("waiting lock") += 1;
+                let slot = self.loaded.lock().expect("recognizer lock");
+                let mut waiting = self.waiting.lock().expect("waiting lock");
+                *waiting -= 1;
+                if *waiting == 0 {
+                    self.nobody_waiting.notify_all();
+                }
+                slot
+            }
+            Urgency::Background => {
+                drop(
+                    self.nobody_waiting
+                        .wait_while(self.waiting.lock().expect("waiting lock"), |waiting| {
+                            *waiting > 0
+                        })
+                        .expect("waiting lock"),
+                );
+                self.loaded.lock().expect("recognizer lock")
+            }
+        };
         if slot.is_none() {
             *slot = Some(Loaded {
                 recognizer: Recognizer::load(&self.store.folder(model()))?,

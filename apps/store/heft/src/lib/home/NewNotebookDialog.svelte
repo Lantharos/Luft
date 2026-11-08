@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { Dialog, TextField } from '@luft/ui';
+	import { Dialog, Switch, TextField } from '@luft/ui';
 	import { session } from '#lib/app/session.svelte.js';
 	import { library, type SubjectEntry } from '#lib/library/library.svelte.js';
 	import { DEFAULT_PAPER, type Paper } from '#lib/library/model.js';
@@ -11,11 +11,17 @@
 
 	let name = $state('');
 	let paper: Paper = $state({ ...DEFAULT_PAPER });
+	let typed = $state(false);
 	let trimmed = $derived(name.trim());
 
 	async function create() {
 		if (!trimmed) return;
 		const notebook = await library.createNotebook(subject, trimmed, $state.snapshot(paper));
+		if (typed) {
+			const open = library.openNotebook(notebook);
+			open.meta.typed = true;
+			open.changed();
+		}
 		onclose();
 		session.open(notebook);
 	}
@@ -25,6 +31,13 @@
 	<form id="new-notebook" {@attach focusField} class="flex flex-col gap-5" onsubmit={(event) => (event.preventDefault(), void create())}>
 		<TextField bind:value={name} label={t('notebook-name')} placeholder={t('notebook-name-example')} />
 		<PaperPicker bind:paper />
+		<div class="flex items-center justify-between gap-4">
+			<div class="min-w-0">
+				<p class="text-[13.5px]">{t('notebook-typed')}</p>
+				<p class="text-[12px] text-(--text-muted)">{t('notebook-typed-body')}</p>
+			</div>
+			<Switch label={t('notebook-typed')} checked={typed} onchange={(value) => (typed = value)} />
+		</div>
 	</form>
 	{#snippet actions()}
 		<button type="button" class="button" onclick={onclose}>{t('dialog-cancel')}</button>

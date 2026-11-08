@@ -13,6 +13,7 @@ toolbar-undo = Undo
 toolbar-redo = Redo
 toolbar-eraser = Eraser
 toolbar-add-page = Add a page after this one
+toolbar-paper = Paper
 toolbar-zoom = Zoom
 # A pen in the toolbar; the variable is its color's name or "Highlighter".
 toolbar-pen = { $name }
@@ -119,10 +120,14 @@ notebook-trash = Move to the trash
 notebook-rename = Rename
 notebook-rename-title = Rename notebook
 notebook-paper = Paper
+notebook-typed-start = Carry typing on to the next page
+notebook-typed-stop = Stop carrying typing on to the next page
 notebook-deleted-pages = Deleted pages
 notebook-name = Name
 # An example notebook name, shown in the empty name field.
 notebook-name-example = Class notes
+notebook-typed = Mostly typed
+notebook-typed-body = Enter keeps going down the page, and typing carries on to a new page when one is full.
 # The variable is the subject the notebook goes into.
 notebook-new-title = New notebook in { $subject }
 notebook-create = Create
@@ -136,6 +141,10 @@ deleted-pages-restore = Restore
 
 paper-title = Paper
 paper-body = For every page in this notebook that hasn't been given its own.
+paper-body-page = Only for this page; the others keep the notebook’s.
+paper-scope = Paper for
+paper-this-page = This page
+paper-every-page = Every page
 paper-template = Template
 paper-blank = Blank
 paper-lined = Lined
@@ -229,6 +238,7 @@ selection-copy = Copy
 selection-cut = Cut
 selection-duplicate = Duplicate
 selection-delete = Delete
+selection-convert = Turn into text
 
 ## Books
 
@@ -268,6 +278,7 @@ rail-add-before = Add a page before
 rail-add-after = Add a page after
 rail-duplicate = Duplicate
 rail-section = Start a section here
+rail-paper = Paper
 rail-delete = Delete page
 section-new-title = New section
 section-rename-title = Section
@@ -297,6 +308,18 @@ settings-handwriting-reading = { $pages ->
 settings-handwriting-done = Everything written is searchable.
 settings-handwriting-waiting = Waits for a pause in your writing.
 settings-handwriting-battery = Waits until the computer is charging or the battery is fuller.
+settings-convert = Turn writing into text
+settings-convert-body = When you pause after a line, it becomes typed text where you wrote it. Fix a word by writing over it, add an accent by drawing it over the letter, cross words out to delete them, and tap between words to write more there.
+settings-convert-after = Pause before it turns
+settings-convert-seconds = { $value } s
+settings-convert-pause = Turns into text once the pen has rested for { $value } s.
+settings-languages = Languages you write in
+settings-languages-body = Accents you draw go on the letters these languages use, though any accent can be added.
+settings-languages-choose = Choose
+settings-keep-corrections = Keep my corrections
+settings-keep-corrections-body = Saves what you correct on this computer, never anywhere else, so it can help reading improve later.
+convert-download-title = Turn writing into text
+convert-download-body = Heft reads handwriting on this computer, so it needs a model for reading first. Nothing you write leaves the computer.
 settings-handwriting-missing = This version of Luft can't read handwriting yet.
 settings-handwriting-failed = Couldn't download it: { $error }
 

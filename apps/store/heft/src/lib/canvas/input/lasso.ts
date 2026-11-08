@@ -23,9 +23,7 @@ export class Lassoing {
 	}
 
 	move(samples: Sample[]) {
-		for (const { clientX, clientY } of samples) {
-			this.points.push(pagePoint(this.viewport, this.origin, this.target.page, { clientX, clientY, pressure: 0, timeStamp: 0, pointerType: 'mouse' }));
-		}
+		for (const sample of samples) this.points.push(pagePoint(this.viewport, this.origin, this.target.page, sample));
 		this.live.outline(this.points, 1.5 / this.viewport.zoom);
 	}
 

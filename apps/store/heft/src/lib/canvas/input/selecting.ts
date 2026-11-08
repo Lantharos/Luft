@@ -28,7 +28,7 @@ export class TextPicking {
 	}
 
 	private point(sample: Sample): [number, number] {
-		return pagePoint(this.viewport, this.origin, this.target.page, { clientX: sample.clientX, clientY: sample.clientY, pressure: 0, timeStamp: 0, pointerType: 'mouse' });
+		return pagePoint(this.viewport, this.origin, this.target.page, sample);
 	}
 
 	move(sample: Sample) {

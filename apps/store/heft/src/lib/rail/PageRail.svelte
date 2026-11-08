@@ -6,6 +6,7 @@
 	import type { OpenNotebook } from '#lib/library/notebook.svelte.js';
 	import type { PageEntry, Section } from '#lib/library/model.js';
 	import NameDialog from '#lib/shell/dialogs/NameDialog.svelte';
+	import PaperDialog from '#lib/paper/PaperDialog.svelte';
 	import { notebookOutline, type Heading } from '#lib/pdf/outline.js';
 	import Contents from './Contents.svelte';
 	import Thumbnail from './Thumbnail.svelte';
@@ -16,6 +17,7 @@
 
 	let menu: { x: number; y: number; index: number } | null = $state(null);
 	let naming: { page: string; section?: Section } | null = $state(null);
+	let papering: PageEntry | null = $state(null);
 	let headings: Heading[] = $state([]);
 	let view: 'pages' | 'contents' = $state('pages');
 
@@ -101,9 +103,16 @@
 		<MenuItem onclick={() => run((index) => notebook.addPage(index + 1))}>{t('rail-add-after')}</MenuItem>
 		<MenuItem onclick={() => run((index) => void notebook.duplicatePage(index))}>{t('rail-duplicate')}</MenuItem>
 		<MenuItem onclick={() => run((index) => (naming = { page: notebook.meta.pages[index].id }))}>{t('rail-section')}</MenuItem>
+		{#if !notebook.meta.pages[menu.index]?.pdf}
+			<MenuItem onclick={() => run((index) => (papering = notebook.meta.pages[index]))}>{t('rail-paper')}</MenuItem>
+		{/if}
 		<MenuSeparator />
 		<MenuItem danger onclick={() => run((index) => notebook.trashPage(index))}>{t('rail-delete')}</MenuItem>
 	</ContextMenu>
+{/if}
+
+{#if papering}
+	<PaperDialog {notebook} page={papering} onclose={() => (papering = null)} />
 {/if}
 
 {#if naming}

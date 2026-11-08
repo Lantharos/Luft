@@ -22,6 +22,9 @@ export const DEFAULT_SPACING: Record<Template, number> = {
 	staff: 2
 };
 
+export const FIRST_RULE = 3 * 8 * MM;
+export const CORNELL_HEADER = 26 * MM;
+
 export interface Ruling {
 	/** Thin rules as one SVG path, in page units. */
 	lines: string;
@@ -44,10 +47,9 @@ function vertical(from: number, to: number, step: number, top: number, bottom: n
 
 export function ruling(paper: Paper, width: number, height: number): Ruling {
 	const step = paper.spacing * MM;
-	const top = 3 * 8 * MM;
 	switch (paper.template) {
 		case 'lined':
-			return { lines: horizontal(top, height - step, step, 0, width), accents: `M${22 * MM} 0V${height}`, dots: null };
+			return { lines: horizontal(FIRST_RULE, height - step, step, 0, width), accents: `M${22 * MM} 0V${height}`, dots: null };
 		case 'grid': {
 			const offsetX = (width % step) / 2;
 			const offsetY = (height % step) / 2;
@@ -58,7 +60,7 @@ export function ruling(paper: Paper, width: number, height: number): Ruling {
 		case 'cornell': {
 			const cue = 62 * MM;
 			const summary = height - 52 * MM;
-			const header = 26 * MM;
+			const header = CORNELL_HEADER;
 			return {
 				lines: horizontal(header + step, summary - step / 2, step, 0, width),
 				accents: `M0 ${header}H${width}M${cue} ${header}V${summary}M0 ${summary}H${width}`,

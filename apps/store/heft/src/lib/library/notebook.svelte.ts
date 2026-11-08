@@ -180,6 +180,17 @@ export class OpenNotebook {
 		target.changed();
 	}
 
+	/** Gives a page paper of its own, or the notebook new paper for every page that has none, this one included. */
+	setPaper(paper: Paper, page: string | undefined, own: boolean) {
+		const entry = this.meta.pages.find((candidate) => candidate.id === page);
+		if (own && entry) entry.paper = paper;
+		else {
+			this.meta.paper = paper;
+			if (entry) delete entry.paper;
+		}
+		this.changed();
+	}
+
 	addSection(page: string, title: string) {
 		this.meta.sections = [...this.meta.sections.filter((section) => section.page !== page), { id: newId(), title, page }];
 		this.changed();

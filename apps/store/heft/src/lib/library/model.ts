@@ -47,6 +47,8 @@ export interface NotebookMeta {
 	created: number;
 	modified: number;
 	favorite?: boolean;
+	/** Made for typing: text that reaches the bottom of a page carries on to the next. */
+	typed?: boolean;
 	/** Deleted pages, kept with where they were so they can come back. */
 	trashed?: { page: PageEntry; index: number; at: number }[];
 }

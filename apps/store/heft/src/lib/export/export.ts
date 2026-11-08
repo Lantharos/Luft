@@ -8,7 +8,7 @@ import { sourcePath } from '#lib/pdf/sources.js';
 import { paintThumbnail } from '#lib/rail/thumbnail.js';
 import { library } from '#lib/library/library.svelte.js';
 import { LOOKS } from '#lib/paper/templates.js';
-import { pdfPage, pictureCanvas, textCanvas, type ExportOptions } from './pages';
+import { pdfPage, pictureCanvas, RASTER_SCALE, textCanvas, type ExportOptions } from './pages';
 import { PdfWriter } from './writer';
 
 const PNG_SCALE = 2;
@@ -47,7 +47,8 @@ export function exportPng(notebook: OpenNotebook, page: PageEntry, name: string)
 		context.setTransform(PNG_SCALE, 0, 0, PNG_SCALE, 0, 0);
 		for (const object of ink.objects) {
 			const drawn = object.kind === 'text' ? await textCanvas(object, LOOKS[paper.color].dark) : await pictureCanvas(`${library.root}/${notebook.folder}/assets/${object.asset}`, object.crop);
-			context.drawImage(drawn, object.x, object.y, object.width, object.kind === 'text' ? drawn.height / 2 : object.height);
+			if (object.kind === 'text') context.drawImage(drawn, object.x, object.y, drawn.width / RASTER_SCALE, drawn.height / RASTER_SCALE);
+			else context.drawImage(drawn, object.x, object.y, object.width, object.height);
 		}
 		const blob = await new Promise<Blob>((resolve) => canvas.toBlob((made) => resolve(made!), 'image/png'));
 		return new Uint8Array(await blob.arrayBuffer());

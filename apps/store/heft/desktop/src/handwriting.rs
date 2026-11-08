@@ -1,6 +1,8 @@
+use std::io::Write;
+
 use futures_util::StreamExt;
 use luft_app::{Commands, Empty, Events};
-use luft_handwriting::client::{self, Unread};
+use luft_handwriting::client::{self, Unread, Urgency};
 use luft_handwriting::types::{HandwritingModel, Stroke};
 use sabine::{BridgeEvent, SabineWindow};
 use serde::{Deserialize, Serialize};
@@ -11,6 +13,8 @@ pub const HANDWRITING_CHANGED: BridgeEvent<()> = BridgeEvent::new("handwriting.c
 #[derive(Deserialize, Type)]
 pub struct Line {
     strokes: Vec<Stroke>,
+    /// Someone waits for it, so it goes ahead of background reading.
+    now: bool,
 }
 
 #[derive(Serialize, Type)]
@@ -35,14 +39,39 @@ async fn remove(Empty {}: Empty) -> Result<(), String> {
     client::remove().await
 }
 
-async fn read(Line { strokes }: Line) -> Result<Read, String> {
-    match client::recognize(&strokes).await {
+async fn read(Line { strokes, now }: Line) -> Result<Read, String> {
+    let urgency = if now {
+        Urgency::Waiting
+    } else {
+        Urgency::Background
+    };
+    match client::recognize(&strokes, urgency).await {
         Ok(text) => Ok(Read::Text(text)),
         Err(Unread::NotInstalled) => Ok(Read::NotInstalled),
         Err(Unread::Paused) => Ok(Read::Paused),
         Err(Unread::Failed(_)) if client::overview().await.is_err() => Ok(Read::Missing),
         Err(Unread::Failed(error)) => Err(error),
     }
+}
+
+#[derive(Deserialize, Type)]
+pub struct Correction {
+    /// One correction as a line of JSON.
+    line: String,
+}
+
+/// Adds a correction to the ones kept on this computer, for tuning reading later; they never leave it.
+fn keep_correction(Correction { line }: Correction) -> Result<(), String> {
+    let folder = dirs::data_dir()
+        .ok_or("There's no folder for Heft's data")?
+        .join("com.lantharos.Heft");
+    std::fs::create_dir_all(&folder).map_err(|error| error.to_string())?;
+    let mut file = std::fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(folder.join("corrections.jsonl"))
+        .map_err(|error| error.to_string())?;
+    writeln!(file, "{line}").map_err(|error| error.to_string())
 }
 
 /// Tells the page whenever the model or its download changes.
@@ -63,4 +92,5 @@ pub fn register(window: SabineWindow) -> SabineWindow {
         .command_async("handwriting_install", install)
         .command_async("handwriting_remove", remove)
         .command_async("handwriting_read", read)
+        .command("keep_correction", keep_correction)
 }

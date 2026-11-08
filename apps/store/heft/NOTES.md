@@ -19,7 +19,9 @@ Heft is a store app (`apps/store/heft`), like Draft, Magpie and Convertible: the
 | `library/` | Subjects, notebooks and their folders |
 | `pdf/` | pdf.js: loading, page backgrounds, text and outlines, import |
 | `objects/` | Text boxes and pictures, cropping and the camera |
+| `typing/` | Typing anywhere: the caret, Markdown-like line starts and text carrying on to the next page |
 | `handwriting/` | Reading handwriting for search, in the background |
+| `convert/` | Turning writing into text when the pen pauses, and pen corrections of that text |
 | `search/`, `export/` | The search index and command palette; PDF and PNG output |
 | `canvas/ruler/` | The ruler and keeping strokes on its edge |
 | `home/`, `rail/`, `shell/`, `tools/`, `settings/`, `paper/`, `selection/`, `drag/`, `app/`, `input/` | Screens and their state |
@@ -44,6 +46,28 @@ Heft is a store app (`apps/store/heft`), like Draft, Magpie and Convertible: the
 ## Handwriting search
 
 The page sorts each page's pen strokes into lines (`handwriting/lines.ts`) and sends them one at a time to `luft-handwriting` over D-Bus, which reads them with Qwen3-VL 2B (see `docs/components/handwriting.md`). It waits until nobody has written for 15 s and the pen isn't near, checks again before every line, and the service itself runs at idle priority and refuses while the battery is low. Results go to `handwriting.json` per notebook and into the search index as `ink` entries with each line's box, which search previews mark.
+
+## Typing
+
+A click or tap that isn't the pen puts a caret where it landed: into text that's there, or into a text box that exists only until something is typed in it, so a stray click leaves nothing behind and nothing to undo. With the mouse, a press that doesn't move is the click; anything longer draws. The box sits on the paper's lines (`paper/lines.ts`): lined paper's rules, every grid line or every other one on squared and dotted paper (never closer than 5.5 mm), an unprinted 8 mm grid on blank pages, and the line height text always had on book pages. The type size follows the line height. Where a line's baseline falls is measured once per size from the font itself, so the text sits on the rules whatever the font's metrics. Boxes run to the page's right margin and wrap. Their CSS is global (`objects/text-box.css`), so measuring, the page and the PDF picture of a box all use the same rules.
+
+A notebook made for typing (`typed`) has one flowing box a page; when its lines pass the bottom margin, the lines that don't fit move to the next page's flowing box, onto an empty page, or onto a new page put after this one, and the caret moves with them.
+
+## Turning writing into text
+
+`convert/converter.svelte.ts` collects each page's new pen strokes and waits until the pen has rested (0.8 s at first, a setting). Strokes over text that came from handwriting are corrections (`marks.ts` reads each stroke's shape against the line under it: through the words, a tap or caret, a small stroke above, through or under a letter, or writing); the rest are sorted into lines with the same code search uses and read with `RecognizeNow`, which goes ahead of background reading in the service. On the RTX 3060 of the development PC a line takes about 0.2 s, so text appears a little over a second after the last stroke, most of it the pause.
+
+What the model reads is tidied for the person's languages (`normalize.ts`): words it read as look-alike Cyrillic come back as Latin when they write in Latin letters, and an accent none of their languages use becomes the one they do when the base letter has only one, like ē for ë. Accents drawn over letters are placed by `diacritics.ts`: the mark's shape gives a combining character, Unicode composition says which letters exist with it, and letters of the person's languages win over others, so a caron over `c` makes `č` but over `e` still makes `ě`. Writing over words is read on its own and replaces the run of covered words that matches it best, since handwriting is wider than type; when it reads as another script than the text, it stays ink.
+
+On the synthetic samples (`services/handwriting/tools/samples.py`), words wrong after each step:
+
+| Lines | Read | Tidied | Accents drawn over wrong letters | Words still wrong written again |
+| --- | --- | --- | --- | --- |
+| German, English | 0% | 0% | 0% | 0% |
+| Serbian | 11.4% | 11.4% | 5.7% | 2.9% |
+| Albanian | 43.6% | 43.6% | 41.0% | 28.2% |
+
+Tidying matters most for words read on their own, as when one is written again: Serbian words wrong fall from 37% to 26% and Albanian from 67% to 46%. Albanian stays weak because the model reads ë as ä, ö or i, with the wrong letter under the dots, which an accent can't fix. Each converted line keeps where every character's ink was (`written`), and with the setting on, corrections go to `corrections.jsonl` in Heft's data folder with the strokes, never anywhere else.
 
 ## Books
 
@@ -77,4 +101,5 @@ So Heft adds next to nothing over the platform; the rest is one or two display f
 4. **Tools**: done. Shapes (line, arrow, triangle, rectangle, ellipse), lasso (move, resize, rotate, recolour, copy, cut, duplicate, delete, paste), the ruler, text boxes with headings, bold and lists, pictures (choose, paste, take with the camera, crop), pens and their colours, two- and three-finger taps, carrying lasso selections and book text between the panes.
 5. **Search and export**: done. Search over typed text, section, notebook and subject names and book text, accents ignored, grouped with where each hit is; command palette; PDF (vector ink, with or without the paper) of a page, section or notebook, and PNG of a page. Hits show their page small with the hit marked.
 6. **Polish**: done. English and Serbian (Cyrillic, and Latin through `bun run transliterate`), settings for pen and touch, full-screen writing, tools along the top or down the side, pages one at a time, an infinite page that grows as you write, and tablet mode: Kestrel publishes it as `tablet-mode` in the settings portal and `luft-app` hands it to every app as `appearance.posture`; folded, Heft moves its tools to the side, makes targets bigger and keeps the text box being typed in above the on-screen keyboard.
-7. **Handwriting search**: done, as an opt-in download. Not yet: converting picked ink to text, and sync.
+7. **Handwriting search**: done, as an opt-in download.
+8. **Typing and writing into text**: done. Typing anywhere on the paper's lines, notebooks made for typing, paper per page, writing turned into text on a pause or from the lasso, and pen corrections. Not yet: sync, and reading trained on corrections.

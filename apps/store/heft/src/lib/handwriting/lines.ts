@@ -3,6 +3,7 @@ import type { Box } from '#lib/search/index.svelte.js';
 
 export interface WrittenLine {
 	strokes: [number, number][][];
+	ids: string[];
 	box: Box;
 }
 
@@ -12,6 +13,8 @@ const MARK = 0.5;
 const OVERLAP = 0.4;
 const MARK_REACH = 1.5;
 const COLUMN_GAP = 9;
+const STRAY = 2;
+const SMALL = 0.8;
 
 const height = (stroke: Stroke) => stroke.bounds.bottom - stroke.bounds.top;
 const width = (stroke: Stroke) => stroke.bounds.right - stroke.bounds.left;
@@ -37,6 +40,7 @@ function line(strokes: Stroke[]): WrittenLine {
 			for (let index = 0; index < stroke.points.length; index += POINT_FIELDS) points.push([stroke.points[index], stroke.points[index + 1]]);
 			return points;
 		}),
+		ids: strokes.map((stroke) => stroke.id),
 		box: { left: bounds.left, top: bounds.top, width: bounds.right - bounds.left, height: bounds.bottom - bounds.top }
 	};
 }
@@ -45,7 +49,11 @@ function overlap(row: Row, stroke: Stroke) {
 	return Math.min(row.bottom, stroke.bounds.bottom) - Math.max(row.top, stroke.bounds.top);
 }
 
-/** Letters go to the row they overlap most; dots and accents to the row nearest them. */
+/**
+ * Letters go to the row they overlap most; dots and accents to the row
+ * nearest them, as do one or two small strokes left in a row of their own,
+ * such as an accent over a capital that came out as tall as a letter.
+ */
 function rows(letters: Stroke[], marks: Stroke[], letter: number): Row[] {
 	const found: Row[] = [];
 	for (const stroke of letters.toSorted((a, b) => a.bounds.top - b.bounds.top)) {
@@ -55,6 +63,11 @@ function rows(letters: Stroke[], marks: Stroke[], letter: number): Row[] {
 			row.top = Math.min(row.top, stroke.bounds.top);
 			row.bottom = Math.max(row.bottom, stroke.bounds.bottom);
 		} else found.push({ top: stroke.bounds.top, bottom: stroke.bounds.bottom, strokes: [stroke] });
+	}
+	const strays = found.filter((row) => row.strokes.length <= STRAY && row.strokes.every((stroke) => height(stroke) < letter * SMALL));
+	if (strays.length < found.length) {
+		for (const row of strays) found.splice(found.indexOf(row), 1);
+		marks = [...marks, ...strays.flatMap((row) => row.strokes)];
 	}
 	for (const mark of marks) {
 		const distance = (row: Row) => Math.max(row.top - middle(mark), middle(mark) - row.bottom, 0);

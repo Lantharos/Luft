@@ -4,5 +4,9 @@
       <arg name="strokes" type="aa(dd)" direction="in"/>
       <arg type="s" direction="out"/>
     </method>
+    <method name="RecognizeNow">
+      <arg name="strokes" type="aa(dd)" direction="in"/>
+      <arg type="s" direction="out"/>
+    </method>
   </interface>
 </node>

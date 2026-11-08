@@ -99,7 +99,7 @@ class Reader {
 		for (const line of writtenLines(strokes)) {
 			await this.quiet();
 			if (inkPrint(store.document.strokes) !== ink) return true;
-			const read = await commands.handwritingRead({ strokes: line.strokes });
+			const read = await commands.handwritingRead({ strokes: line.strokes, now: false });
 			if (read.kind === 'paused') {
 				this.waiting = 'battery';
 				await sleep(BATTERY_WAIT);

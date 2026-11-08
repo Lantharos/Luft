@@ -3,7 +3,6 @@ use std::path::Path;
 use std::sync::OnceLock;
 
 use anyhow::{Context, Result, anyhow};
-use llama_cpp_2::LogOptions;
 use llama_cpp_2::context::params::LlamaContextParams;
 use llama_cpp_2::llama_backend::LlamaBackend;
 use llama_cpp_2::llama_batch::LlamaBatch;
@@ -13,6 +12,9 @@ use llama_cpp_2::mtmd::{
     MtmdBitmap, MtmdContext, MtmdContextParams, MtmdInputText, mtmd_default_marker,
 };
 use llama_cpp_2::sampling::LlamaSampler;
+use llama_cpp_2::{
+    LlamaBackendDevice, LlamaBackendDeviceType, LogOptions, list_llama_ggml_backend_devices,
+};
 
 use crate::ink::Line;
 
@@ -21,6 +23,7 @@ pub const VISION_MODEL: &str = "mmproj-Qwen3VL-2B-Instruct-Q8_0.gguf";
 const CONTEXT: u32 = 1024;
 const BATCH: u32 = 512;
 const LONGEST_ANSWER: usize = 96;
+const EVERY_LAYER: u32 = u32::MAX;
 const ASK: &str = "Write out the handwritten text in this picture exactly as it is written, keeping its language and accents. Answer with the text alone.";
 
 static BACKEND: OnceLock<LlamaBackend> = OnceLock::new();
@@ -40,6 +43,25 @@ fn threads() -> i32 {
     (cores / 2).clamp(2, 4) as i32
 }
 
+/// The graphics card llama.cpp reaches through Vulkan, built in or separate.
+fn graphics() -> Option<LlamaBackendDevice> {
+    list_llama_ggml_backend_devices()
+        .into_iter()
+        .find(|device| {
+            matches!(
+                device.device_type,
+                LlamaBackendDeviceType::Gpu | LlamaBackendDeviceType::IntegratedGpu
+            )
+        })
+}
+
+/// Where the model runs: a graphics card's index among llama.cpp's devices, or the processor.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Device {
+    Graphics(usize),
+    Processor,
+}
+
 /// Qwen3-VL 2B reading a picture of a line of handwriting: the picture goes
 /// through its vision encoder, and the language model writes what it says.
 pub struct Recognizer {
@@ -48,7 +70,31 @@ pub struct Recognizer {
 }
 
 impl Recognizer {
+    /// Loads the model onto the graphics card when there is one that takes
+    /// it, and onto the processor otherwise.
     pub fn load(folder: &Path) -> Result<Self> {
+        backend()?;
+        if let Some(card) = graphics() {
+            match Self::load_on(folder, Device::Graphics(card.index)) {
+                Ok(recognizer) => {
+                    eprintln!("Reading on {}", card.description);
+                    return Ok(recognizer);
+                }
+                Err(error) => eprintln!(
+                    "Reading on the processor, as {} couldn't: {error:#}",
+                    card.description
+                ),
+            }
+        }
+        eprintln!("Reading on the processor");
+        Self::load_on(folder, Device::Processor)
+    }
+
+    pub fn load_on(folder: &Path, device: Device) -> Result<Self> {
+        let (devices, layers): (&[usize], u32) = match device {
+            Device::Graphics(index) => (&[index], EVERY_LAYER),
+            Device::Processor => (&[], 0),
+        };
         let path = |name: &str| {
             let path = folder.join(name);
             path.to_str()
@@ -58,11 +104,13 @@ impl Recognizer {
         let model = LlamaModel::load_from_file(
             backend()?,
             path(LANGUAGE_MODEL)?,
-            &LlamaModelParams::default(),
+            &LlamaModelParams::default()
+                .with_devices(devices)?
+                .with_n_gpu_layers(layers),
         )
         .with_context(|| format!("Couldn't load {LANGUAGE_MODEL}"))?;
         let params = MtmdContextParams {
-            use_gpu: false,
+            use_gpu: device != Device::Processor,
             print_timings: false,
             n_threads: threads(),
             ..MtmdContextParams::default()

@@ -8,9 +8,6 @@ BusName=com.lantharos.Handwriting1
 ExecStart=/usr/libexec/luft-handwriting
 Environment=GIO_USE_VFS=local
 Restart=on-failure
-Nice=19
-CPUSchedulingPolicy=idle
-IOSchedulingClass=idle
 MemoryHigh=2560M
 MemoryMax=3G
 MemorySwapMax=0

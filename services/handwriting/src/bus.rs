@@ -6,7 +6,8 @@ use zbus::interface;
 use zbus::object_server::SignalEmitter;
 
 use crate::battery;
-use crate::hub::{self, Hub, NotInstalled};
+use crate::hub::{self, Hub, NotInstalled, Urgency};
+use crate::priority::Background;
 
 #[derive(Debug, zbus::DBusError)]
 #[zbus(prefix = "com.lantharos.Handwriting1.Error")]
@@ -26,6 +27,7 @@ impl From<anyhow::Error> for Error {
 
 pub struct Recognition {
     hub: Arc<Hub>,
+    background: Background,
 }
 
 pub struct Models {
@@ -34,7 +36,10 @@ pub struct Models {
 
 pub fn serve(hub: &Arc<Hub>) -> (Recognition, Models) {
     (
-        Recognition { hub: hub.clone() },
+        Recognition {
+            hub: hub.clone(),
+            background: Background::start(),
+        },
         Models { hub: hub.clone() },
     )
 }
@@ -47,7 +52,16 @@ impl Recognition {
             return Err(Error::Paused("The battery is low".into()));
         }
         let hub = self.hub.clone();
-        let read = tokio::task::spawn_blocking(move || hub.recognize(&strokes))
+        let read = self
+            .background
+            .run(move || hub.recognize(&strokes, Urgency::Background))
+            .await?;
+        read.map_err(|NotInstalled| Error::NotInstalled(hub::model().id.clone()))
+    }
+
+    async fn recognize_now(&self, strokes: Vec<Stroke>) -> Result<String, Error> {
+        let hub = self.hub.clone();
+        let read = tokio::task::spawn_blocking(move || hub.recognize(&strokes, Urgency::Waiting))
             .await
             .map_err(|error| Error::Failed(error.to_string()))??;
         read.map_err(|NotInstalled| Error::NotInstalled(hub::model().id.clone()))

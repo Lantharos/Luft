@@ -30,11 +30,22 @@ pub enum Unread {
     Failed(String),
 }
 
+/// Whether someone waits for the line, or it can be read in the background.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Urgency {
+    Waiting,
+    Background,
+}
+
 /// Reads one line of handwriting, written stroke after stroke, as text.
-pub async fn recognize(strokes: &[Stroke]) -> Result<String, Unread> {
+pub async fn recognize(strokes: &[Stroke], urgency: Urgency) -> Result<String, Unread> {
     let proxy = proxy(NAME).await.map_err(Unread::Failed)?;
+    let method = match urgency {
+        Urgency::Waiting => "RecognizeNow",
+        Urgency::Background => "Recognize",
+    };
     proxy
-        .call("Recognize", &(strokes,))
+        .call(method, &(strokes,))
         .await
         .map_err(|error| match &error {
             zbus::Error::MethodError(name, _, _) if name.ends_with(".NotInstalled") => {

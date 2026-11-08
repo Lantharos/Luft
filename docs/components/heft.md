@@ -30,6 +30,7 @@ Names are what people typed, so renaming a subject or notebook renames its folde
 {
   "format": 1, "id": "…", "name": "Beleške", "kind": "notes", "subject": "<subject id>",
   "paper": { "template": "lined", "size": "a4", "landscape": false, "color": "white", "spacing": 8 },
+  "typed": false,
   "pages": [{ "id": "…", "created": 1794142000000, "paper": { "template": "grid" } },
             { "id": "…", "created": 1794142000000, "pdf": { "source": "<file in sources>", "index": 0, "width": 793.7, "height": 1122.5 } }],
   "sections": [{ "id": "…", "title": "Lekcija 4", "page": "<page id>" }],
@@ -38,7 +39,7 @@ Names are what people typed, so renaming a subject or notebook renames its folde
 }
 ```
 
-`kind` is `notes` or `book`. A page's own `paper` overrides the notebook's. An infinite page also has `height`, how far it has grown in page units; it grows by 160 mm whenever something is written within 120 mm of its end. Templates are `blank`, `lined`, `grid`, `dotted`, `cornell` and `staff`; sizes `a4`, `a5`, `letter` and `infinite`; colours `white`, `cream` and `dark`; spacing is in millimetres. Times are milliseconds since 1970.
+`kind` is `notes` or `book`. A page's own `paper` overrides the notebook's. `typed` is true for a notebook made for typing, where text that reaches the bottom of a page carries on at the top of the next. An infinite page also has `height`, how far it has grown in page units; it grows by 160 mm whenever something is written within 120 mm of its end. Templates are `blank`, `lined`, `grid`, `dotted`, `cornell` and `staff`; sizes `a4`, `a5`, `letter` and `infinite`; colours `white`, `cream` and `dark`; spacing is in millimetres. Times are milliseconds since 1970.
 
 ## Pages
 
@@ -77,6 +78,8 @@ A stroke is a 40-byte header and 14 bytes for each point:
 Each point's width is the one it was drawn with, so later changes to settings never change old writing. A stroke's outline is a circle at every point joined by its neighbours' common tangents. Highlighter strokes are drawn under pen strokes, at 38 % opacity.
 
 Objects are `{ id, kind, x, y, width, height }` with `html` and `text` for text boxes (`b`, `strong`, `i`, `em`, `u`, `h2`, `h3`, `ul`, `ol`, `li`, `br`, `div`, `p` and `blockquote` only) and `asset` for pictures. A cropped picture has `crop`, `{ x, y, width, height }`, the part of the picture that shows as shares of its full width and height; the asset itself is never changed.
+
+Text typed on the page's lines also has `line`, its line height, and `size`, its type size, both in page units; its first baseline sits on a line of the paper, and every line after it on the next. Text without them is set at 16 with a line height of 1.45, as text boxes always were. `flow` marks the text a notebook made for typing carries on from page to page. Text turned from handwriting keeps what was read in `written`, a list of `{ text, glyphs }` with one entry for each line read, where `glyphs` has four numbers for each character of `text`, the left, top, right and bottom of the ink it was read from. Editing the text afterwards doesn't change `written`.
 
 A `.journal` is a list of records, each `[length u32][crc32 u32][op u8][payload]`, where the length and CRC cover the op and payload:
 

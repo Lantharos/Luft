@@ -7,7 +7,9 @@ import { Ruler } from '#lib/canvas/ruler/ruler.svelte.js';
 import { Viewport } from '#lib/canvas/viewport.svelte.js';
 import type { OpenNotebook } from '#lib/library/notebook.svelte.js';
 import { t } from '@luft/i18n';
-import { addPicture, addPictureFiles, addQuote, choosePictures, editing } from '#lib/objects/editing.svelte.js';
+import { addPicture, addPictureFiles, addQuote, choosePictures, draftText, editing } from '#lib/objects/editing.svelte.js';
+import { pageSize, paperOf, type PageEntry } from '#lib/library/model.js';
+import { linesOf } from '#lib/typing/flow.js';
 import { selection } from '#lib/selection/selection.svelte.js';
 import type { ToolbarActions } from '#lib/tools/Toolbar.svelte';
 
@@ -18,6 +20,7 @@ interface Place {
 }
 
 const SAVE_AFTER = 600;
+const DEFAULT_LEFT = 40;
 
 /** One notebook on screen, scrolled and zoomed on its own, and remembered that way. */
 export class Pane {
@@ -104,6 +107,13 @@ export class Pane {
 		if (page) addQuote(page.document, page.rect.width, text);
 	}
 
+	/** Puts the caret on a new page's first line, in a notebook made for typing. */
+	private typeOn(page: PageEntry) {
+		const lines = linesOf(this.notebook, page);
+		const { width } = pageSize(paperOf(this.notebook.meta, page), page);
+		draftText(page.id, lines, lines.margin || DEFAULT_LEFT, lines.first, width, true);
+	}
+
 	jump(index: number) {
 		this.viewport.showPage(index);
 	}
@@ -114,6 +124,7 @@ export class Pane {
 		addPage: () => {
 			const page = this.notebook.addPage(this.current + 1);
 			session.goTo = { notebook: this.notebook.meta.id, page: page.id };
+			if (this.notebook.meta.typed) this.typeOn(page);
 		},
 		fitWidth: () => this.viewport.fitWidth(this.viewport.layout.pages[this.current]),
 		fitPage: () => this.viewport.fitPage(this.viewport.layout.pages[this.current]),
@@ -125,6 +136,7 @@ export class Pane {
 		},
 		insertPicture: () => void this.insertPictures(),
 		takePhoto: () => (requests.photo = true),
+		paper: () => (requests.paper = true),
 		toggleRuler: () => this.ruler.toggle(this.viewport.width, this.viewport.height),
 		zoomBy: (factor) => this.viewport.zoomAt(this.viewport.zoom * factor, this.viewport.width / 2, this.viewport.height / 2)
 	};

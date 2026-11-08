@@ -21,12 +21,16 @@ export const commands = {
 	handwritingOverview: (options?: CallOptions) => invoke<HandwritingModel | null>("handwriting_overview", {}, options),
 	handwritingRead: (params: {
 		strokes: (([number, number])[])[],
+		now: boolean,
 	}, options?: CallOptions) => invoke<Read>("handwriting_read", params, options),
 	handwritingRemove: (options?: CallOptions) => invoke<null>("handwriting_remove", {}, options),
 	importFile: (params: {
 		source: string,
 		to: string,
 	}, options?: CallOptions) => invoke<number>("import_file", params, options),
+	keepCorrection: (params: {
+		line: string,
+	}, options?: CallOptions) => invoke<null>("keep_correction", params, options),
 	library: (options?: CallOptions) => invoke<Library>("library", {}, options),
 	openPenSettings: (options?: CallOptions) => invoke<null>("open_pen_settings", {}, options),
 	remove: (params: {

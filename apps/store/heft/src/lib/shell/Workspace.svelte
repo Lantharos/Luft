@@ -13,6 +13,7 @@
 	import { addPicture } from '#lib/objects/editing.svelte.js';
 	import { requests } from '#lib/app/requests.svelte.js';
 	import ExportDialog from '#lib/export/ExportDialog.svelte';
+	import PaperDialog from '#lib/paper/PaperDialog.svelte';
 	import CameraDialog from '#lib/objects/CameraDialog.svelte';
 	import type { OpenNotebook } from '#lib/library/notebook.svelte.js';
 	import PageRail from '#lib/rail/PageRail.svelte';
@@ -88,7 +89,7 @@
 	<div class="flex h-[48px] flex-none items-center gap-2 px-3">
 		<div class="flex min-w-0 flex-1 items-center gap-1">
 			<IconButton icon={PanelLeft} label={railOpen ? t('rail-hide') : t('rail-show')} onclick={toggleRail} />
-			<NotebookMenu notebook={pane.notebook} />
+			<NotebookMenu notebook={pane.notebook} {current} />
 		</div>
 		{#if !side}
 			<Toolbar actions={pane.actions} zoom={pane.viewport.zoom} {books} ruled={pane.ruler.shown} />
@@ -123,6 +124,9 @@
 
 {#if requests.photo}
 	<CameraDialog onphoto={(bytes) => void pane.addPhoto(bytes)} onclose={() => (requests.photo = false)} />
+{/if}
+{#if requests.paper}
+	<PaperDialog notebook={pane.notebook} page={pane.notebook.meta.pages[current]} onclose={() => (requests.paper = false)} />
 {/if}
 {#if requests.export}
 	<ExportDialog notebook={pane.notebook} current={pane.current} format={requests.export} onclose={() => (requests.export = null)} />

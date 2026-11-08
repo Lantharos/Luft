@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { untrack } from 'svelte';
+	import { getContext, untrack } from 'svelte';
 	import type { PageDocument } from '#lib/page/document.js';
 	import type { PageObject } from '#lib/page/objects.js';
 	import { tools } from '#lib/tools/tools.svelte.js';
@@ -7,15 +7,28 @@
 	import { editing } from './editing.svelte';
 	import Picture from './Picture.svelte';
 	import TextBox from './TextBox.svelte';
+	import { overflow, type Pages } from '#lib/typing/flow.js';
+	import InsertionMark from '#lib/convert/InsertionMark.svelte';
 
-	let { document, zoom, dark, assets }: { document: PageDocument; zoom: number; dark: boolean; assets: string } = $props();
+	let { page, document, zoom, dark, assets }: { page: string; document: PageDocument; zoom: number; dark: boolean; assets: string } = $props();
+
+	const pages = getContext<Pages>('pages');
 
 	let objects: PageObject[] = $state.raw(untrack(() => document.objects));
 	let moving: { id: string; x: number; y: number; pointer: number; resize: boolean; start: PageObject } | null = null;
 
-	$effect(() => document.listen((_, change) => change.objects && (objects = document.objects)));
+	let revision = $state(0);
+
+	$effect(() =>
+		document.listen((_, change) => {
+			revision++;
+			if (change.objects) objects = document.objects;
+		})
+	);
 
 	let arranging = $derived(tools.active === 'lasso');
+	let draft = $derived(editing.draft?.page === page && !objects.some((object) => object.id === editing.draft!.object.id) ? editing.draft.object : null);
+	let shown = $derived(draft ? [...objects, draft] : objects);
 	let cropping: PageObject | null = $state(null);
 
 	$effect(() => {
@@ -28,6 +41,11 @@
 	});
 
 	function change(before: PageObject, after: PageObject | null) {
+		if (before === draft) {
+			if (after) document.commit({ removed: [], added: [], objects: [{ before: null, after }] });
+			editing.draft = null;
+			return;
+		}
 		document.commit({ removed: [], added: [], objects: [{ before, after }] });
 	}
 
@@ -58,13 +76,21 @@
 </script>
 
 <div class="objects" class:dark style:--zoom={zoom}>
-	{#each objects as object (object.id)}
+	{#each shown as object (object.id)}
 		{#if object.kind === 'text'}
-			<TextBox {object} {zoom} editable={tools.active === 'type'} focus={editing.focus === object.id} onchange={(next) => change(object, next)} />
+			<TextBox
+				{object}
+				{zoom}
+				draft={object === draft}
+				editable={tools.active === 'type' || editing.active === object.id || object === draft}
+				onchange={(next) => change(object, next)}
+				onoverflow={(element) => void overflow(pages, page, object, element)}
+			/>
 		{:else}
 			<Picture {object} {zoom} {assets} {arranging} ongrab={(event, resize) => grab(event, object, resize)} onmove={drag} ondrop={drop} oncrop={() => (cropping = object)} />
 		{/if}
 	{/each}
+	<InsertionMark {page} {zoom} {revision} />
 </div>
 
 {#if cropping}
@@ -76,9 +102,5 @@
 		position: absolute;
 		inset: 0;
 		pointer-events: none;
-	}
-
-	.dark :global(.text-box) {
-		color: #ececea;
 	}
 </style>

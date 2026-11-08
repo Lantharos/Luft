@@ -4,11 +4,16 @@ import type { ToolbarActions } from '#lib/tools/Toolbar.svelte';
 import { selection } from '#lib/selection/selection.svelte.js';
 import { tools } from '#lib/tools/tools.svelte.js';
 
-const typing = (target: EventTarget | null) => target instanceof HTMLElement && (target.isContentEditable || ['INPUT', 'TEXTAREA'].includes(target.tagName));
+const inField = (target: EventTarget | null) => target instanceof HTMLElement && ['INPUT', 'TEXTAREA'].includes(target.tagName);
+const typing = (target: EventTarget | null) => inField(target) || (target instanceof HTMLElement && target.isContentEditable);
 
 export function handleKeys(event: KeyboardEvent, actions: ToolbarActions, viewport: Viewport) {
-	if (typing(event.target) || event.altKey) return;
 	const command = event.ctrlKey || event.metaKey;
+	if (command && event.key === 'Enter' && !event.altKey && !inField(event.target)) {
+		event.preventDefault();
+		return actions.addPage();
+	}
+	if (typing(event.target) || event.altKey) return;
 	const key = event.key.toLowerCase();
 	const run = (action: () => void) => {
 		event.preventDefault();
@@ -29,7 +34,6 @@ export function handleKeys(event: KeyboardEvent, actions: ToolbarActions, viewpo
 		if (key === '1') return run(actions.actualSize);
 		if (key === '=' || key === '+') return run(() => actions.zoomBy(1.25));
 		if (key === '-') return run(() => actions.zoomBy(0.8));
-		if (key === 'enter') return run(actions.addPage);
 		return;
 	}
 	if (/^[1-9]$/.test(key) && tools.presets[Number(key) - 1]) return run(() => tools.choose(tools.presets[Number(key) - 1].id));

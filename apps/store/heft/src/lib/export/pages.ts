@@ -8,10 +8,11 @@ import { WHOLE, type Crop, type PageObject } from '#lib/page/objects.js';
 import { LOOKS, ruling } from '#lib/paper/templates.js';
 import { pdfImage } from '#lib/pdf/render.js';
 import { sourcePath } from '#lib/pdf/sources.js';
+import TEXT_BOX from '#lib/objects/text-box.css?raw';
 import { deflate, type PdfPage, type Raster } from './writer';
 
 const POINT = 0.75;
-const RASTER_SCALE = 2;
+export const RASTER_SCALE = 2;
 const n = (value: number) => (Math.round(value * 100) / 100).toString();
 
 /** PDF path operators, traced in page units through the page's flipped transform. */
@@ -80,15 +81,18 @@ async function jpeg(canvas: HTMLCanvasElement): Promise<Raster> {
 
 /** A text box drawn as a picture, the way it shows on the page. */
 export async function textCanvas(object: PageObject, dark: boolean): Promise<HTMLCanvasElement> {
-	const color = dark ? '#ececea' : '#1d1d1f';
-	const style = `font: 16px/1.45 sans-serif; color: ${color}; padding: 2px 4px; overflow-wrap: anywhere; width: ${object.width}px; box-sizing: border-box;`;
+	const ruled = object.line !== undefined;
+	const style = `width: ${object.width}px;${ruled ? ` --line: ${object.line}px; --size: ${object.size}px;` : ''}`;
+	const box = (html: string) => `<div class="${dark ? 'dark' : ''}"><div class="text-box${ruled ? ' ruled' : ''}" style="${style}">${html}</div></div>`;
 	const measure = document.createElement('div');
-	measure.style.cssText = `${style} position: fixed; left: -10000px; top: 0;`;
-	measure.innerHTML = object.html ?? '';
+	measure.style.cssText = 'position: fixed; left: -10000px; top: 0;';
+	measure.innerHTML = box(object.html ?? '');
 	document.body.append(measure);
-	const [width, height] = [Math.ceil(object.width), Math.ceil(Math.max(object.height, measure.offsetHeight))];
+	const shown = measure.querySelector<HTMLElement>('.text-box')!;
+	const [width, height] = [Math.ceil(shown.offsetWidth), Math.ceil(Math.max(object.height, shown.offsetHeight))];
 	measure.remove();
-	const markup = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"><foreignObject width="100%" height="100%"><div xmlns="http://www.w3.org/1999/xhtml" style="${style}">${new XMLSerializer().serializeToString(new DOMParser().parseFromString(object.html ?? '', 'text/html').body).replace(/^<body[^>]*>|<\/body>$/g, '')}</div></foreignObject></svg>`;
+	const html = new XMLSerializer().serializeToString(new DOMParser().parseFromString(object.html ?? '', 'text/html').body).replace(/^<body[^>]*>|<\/body>$/g, '');
+	const markup = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"><foreignObject width="100%" height="100%"><div xmlns="http://www.w3.org/1999/xhtml" style="font-family: ${getComputedStyle(document.body).fontFamily.replaceAll('"', "'")}; width: ${width}px;"><style>${TEXT_BOX}.text-box { position: static; }</style>${box(html)}</div></foreignObject></svg>`;
 	const image = new Image();
 	image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(markup)}`;
 	await image.decode();
@@ -144,7 +148,7 @@ export async function pdfPage(notebook: OpenNotebook, entry: PageEntry, options:
 	for (const object of document.objects) {
 		if (object.kind === 'text') {
 			const canvas = await textCanvas(object, dark);
-			place(await pixels(canvas), object.x, object.y, object.width, canvas.height / RASTER_SCALE);
+			place(await pixels(canvas), object.x, object.y, canvas.width / RASTER_SCALE, canvas.height / RASTER_SCALE);
 		}
 		else place(await jpeg(await pictureCanvas(`${library.root}/${notebook.folder}/assets/${object.asset}`, object.crop)), object.x, object.y, object.width, object.height);
 	}

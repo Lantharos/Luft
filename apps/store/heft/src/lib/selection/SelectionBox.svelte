@@ -4,6 +4,7 @@
 	import RotateCw from '@lucide/svelte/icons/rotate-cw';
 	import Scissors from '@lucide/svelte/icons/scissors';
 	import Trash from '@lucide/svelte/icons/trash-2';
+	import TypeIcon from '@lucide/svelte/icons/type';
 	import { t } from '@luft/i18n';
 	import { tooltip } from '@luft/ui';
 	import type { Viewport } from '#lib/canvas/viewport.svelte.js';
@@ -17,8 +18,26 @@
 	import { colorName } from '#lib/tools/colors.js';
 	import { SWATCHES } from '#lib/tools/tools.svelte.js';
 	import { IDENTITY, selection, type Transform } from './selection.svelte';
+	import HandwritingDialog from '#lib/convert/HandwritingDialog.svelte';
+	import type { Stroke } from '#lib/ink/stroke.js';
 
-	let { notebook, viewport }: { notebook: OpenNotebook; viewport: Viewport } = $props();
+	let {
+		notebook,
+		viewport,
+		ready,
+		onconvert
+	}: { notebook: OpenNotebook; viewport: Viewport; ready: boolean; onconvert: (page: string, strokes: Stroke[]) => void } = $props();
+
+	let offering = $state(false);
+
+	function convert() {
+		if (!ready) {
+			offering = true;
+			return;
+		}
+		onconvert(selection.page!, selection.strokes);
+		selection.clear();
+	}
 
 	const PAD = 8;
 
@@ -149,9 +168,14 @@
 			<button type="button" class="icon-button" aria-label={t('selection-copy')} {@attach tooltip(t('selection-copy'))} onclick={() => selection.copy()}><Copy size={16} /></button>
 			<button type="button" class="icon-button" aria-label={t('selection-cut')} {@attach tooltip(t('selection-cut'))} onclick={() => selection.cut()}><Scissors size={16} /></button>
 			<button type="button" class="icon-button" aria-label={t('selection-duplicate')} {@attach tooltip(t('selection-duplicate'))} onclick={() => selection.duplicate()}><CopyPlus size={16} /></button>
+			<button type="button" class="icon-button" aria-label={t('selection-convert')} {@attach tooltip(t('selection-convert'))} onclick={convert}><TypeIcon size={16} /></button>
 			<button type="button" class="icon-button" aria-label={t('selection-delete')} {@attach tooltip(t('selection-delete'))} onclick={() => selection.remove()}><Trash size={16} /></button>
 		</div>
 	{/if}
+{/if}
+
+{#if offering}
+	<HandwritingDialog onclose={() => (offering = false)} />
 {/if}
 
 <style>

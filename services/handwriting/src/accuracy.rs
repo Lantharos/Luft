@@ -5,7 +5,7 @@ use std::time::Instant;
 use luft_handwriting::types::Stroke;
 
 use crate::ink;
-use crate::recognizer::Recognizer;
+use crate::recognizer::{Device, Recognizer};
 
 fn edits<T: PartialEq>(expected: &[T], read: &[T]) -> usize {
     let mut row: Vec<usize> = (0..=read.len()).collect();
@@ -41,7 +41,9 @@ struct Tally {
 /// `LUFT_HANDWRITING_SAMPLES` at a folder of lines, each a `.json` list of
 /// strokes next to a `.txt` of what it says, reads every line the way the
 /// service does and reports the error rates for each group of samples, named
-/// by what comes before the first `-` of their file names.
+/// by what comes before the first `-` of their file names. With
+/// `LUFT_HANDWRITING_DEVICE=processor` it reads on the processor even when
+/// there's a graphics card.
 #[test]
 #[ignore]
 fn accuracy() {
@@ -49,7 +51,15 @@ fn accuracy() {
         PathBuf::from(std::env::var("LUFT_HANDWRITING_MODELS").expect("LUFT_HANDWRITING_MODELS"));
     let samples =
         PathBuf::from(std::env::var("LUFT_HANDWRITING_SAMPLES").expect("LUFT_HANDWRITING_SAMPLES"));
-    let mut recognizer = Recognizer::load(&models).unwrap();
+    let loading = Instant::now();
+    let mut recognizer =
+        if std::env::var("LUFT_HANDWRITING_DEVICE").as_deref() == Ok("processor") {
+            Recognizer::load_on(&models, Device::Processor)
+        } else {
+            Recognizer::load(&models)
+        }
+        .unwrap();
+    println!("Loaded in {:.1} s", loading.elapsed().as_secs_f64());
     let mut tallies: BTreeMap<String, Tally> = BTreeMap::new();
     let mut files: Vec<_> = std::fs::read_dir(&samples)
         .unwrap()

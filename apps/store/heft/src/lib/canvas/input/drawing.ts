@@ -2,7 +2,7 @@ import { StrokeBuilder, type Feel, type Pen } from '#lib/ink/builder.js';
 import { EraseGesture, type EraseMode } from '#lib/ink/eraser.js';
 import { STEADY } from '#lib/ink/pressure.js';
 import { outlinePoints, recognize } from '#lib/ink/shapes.js';
-import { newId, POINT_FIELDS, strokeBounds } from '#lib/ink/stroke.js';
+import { newId, POINT_FIELDS, strokeBounds, type Stroke } from '#lib/ink/stroke.js';
 import type { PageDocument } from '#lib/page/document.js';
 import { inkColor, type Ink } from '../ink-paint';
 import type { PageRect } from '../layout';
@@ -25,7 +25,7 @@ export interface Origin {
 	top: number;
 }
 
-export function pagePoint(viewport: Viewport, origin: Origin, page: PageRect, event: Sample): [number, number] {
+export function pagePoint(viewport: Viewport, origin: Origin, page: PageRect, event: Pick<Sample, 'clientX' | 'clientY'>): [number, number] {
 	const [x, y] = viewport.toContent(event.clientX - origin.left, event.clientY - origin.top);
 	return [x - page.left, y - page.top];
 }
@@ -44,7 +44,7 @@ export class Drawing {
 	constructor(
 		private readonly viewport: Viewport,
 		private readonly origin: Origin,
-		private readonly target: Target,
+		readonly target: Target,
 		private readonly live: LiveInk,
 		pen: Pen,
 		feel: Feel,
@@ -103,14 +103,19 @@ export class Drawing {
 		this.live.predict(this.builder.prediction(ahead));
 	}
 
-	end() {
+	/** Puts the stroke on its page; the stroke written, or none when it became a shape. */
+	end(): Stroke | null {
 		clearTimeout(this.still.timer);
-		if (this.shape) return this.endShape();
+		if (this.shape) {
+			this.endShape();
+			return null;
+		}
 		const from = this.builder.count;
 		if (this.builder.finish()) this.live.draw(this.builder.points.subarray(0, this.builder.length), from);
 		const stroke = this.builder.build(this.target.document.lastOrder + 1);
 		this.target.document.commit({ removed: [], added: [stroke] });
 		this.live.end();
+		return stroke;
 	}
 
 	private endShape() {

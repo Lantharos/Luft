@@ -3,23 +3,49 @@ import { commands } from '#lib/bindings.js';
 import { newId } from '#lib/ink/stroke.js';
 import type { PageDocument } from '#lib/page/document.js';
 import type { PageObject } from '#lib/page/objects.js';
+import { baselineAt, measure, widthFrom, type TextLines } from '#lib/paper/lines.js';
 
 const TEXT_WIDTH = 300;
 const PICTURE_SHARE = 0.6;
 
-/** The text box that should take the cursor as soon as it shows, and the picture to crop as soon as it shows. */
+/** Where the caret should go in a text box: a point on screen or a number of characters in. */
+export interface FocusRequest {
+	id: string;
+	at?: [number, number];
+	offset?: number;
+}
+
+/**
+ * The text box that should take the caret as soon as it shows, the one being
+ * typed in, a new one that exists only until something is typed in it, and
+ * the picture to crop as soon as it shows.
+ */
 class Editing {
-	focus: string | null = $state(null);
+	focus: FocusRequest | null = $state(null);
+	active: string | null = $state(null);
+	draft: { page: string; object: PageObject } | null = $state.raw(null);
 	crop: string | null = $state(null);
 }
 
 export const editing = new Editing();
 
-export function addText(document: PageDocument, x: number, y: number, pageWidth: number, html = '') {
+function addText(document: PageDocument, x: number, y: number, pageWidth: number, html = '') {
 	const object: PageObject = { id: newId(), kind: 'text', x, y, width: Math.min(TEXT_WIDTH, pageWidth - x - 16), height: 24, html, text: '' };
 	document.commit({ removed: [], added: [], objects: [{ before: null, after: object }] });
-	editing.focus = object.id;
+	editing.focus = { id: object.id };
 	return object;
+}
+
+/**
+ * Gets a text box ready on a page's line at a point, which only becomes part
+ * of the page once something is typed in it.
+ */
+export function draftText(page: string, lines: TextLines, x: number, y: number, pageWidth: number, flow = false) {
+	const left = lines.margin && x < lines.margin + 8 ? lines.margin : Math.max(0, x - 4);
+	const top = baselineAt(lines, y) - measure(lines.size, lines.step).baseline;
+	const object: PageObject = { id: newId(), kind: 'text', x: left, y: top, width: widthFrom(left, pageWidth), height: lines.step, html: '', text: '', line: lines.step, size: lines.size, ...(flow ? { flow } : {}) };
+	editing.draft = { page, object };
+	editing.focus = { id: object.id };
 }
 
 /** Book text set on a page as a quote, at a place or under what's already there. */

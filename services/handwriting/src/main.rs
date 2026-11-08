@@ -4,6 +4,7 @@ mod battery;
 mod bus;
 mod hub;
 mod ink;
+mod priority;
 mod recognizer;
 
 use std::sync::Arc;

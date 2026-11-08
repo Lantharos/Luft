@@ -3,6 +3,7 @@ class Requests {
 	export: 'pdf' | 'png' | null = $state(null);
 	newSubject = $state(false);
 	photo = $state(false);
+	paper = $state(false);
 }
 
 export const requests = new Requests();

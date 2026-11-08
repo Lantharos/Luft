@@ -1,4 +1,5 @@
-"""samples.py HERSHEY_DIR OUT_DIR: writes lines of synthetic cursive handwriting as stroke JSON plus their text.
+"""samples.py HERSHEY_DIR OUT_DIR: writes lines of synthetic cursive handwriting as stroke JSON plus their text,
+and which strokes make up each word as a `.words` list of [first, end) stroke indices.
 
 Letters come from Hershey's single-stroke script fonts, each one shifted, slanted and resized a little at random,
 with accents (č ć š ž đ ë ç ä ö ü ß) drawn as extra strokes over their base letters.
@@ -42,10 +43,12 @@ def mark(letter, left, right, top):
 
 def line(font, text, rng):
     strokes = []
+    words = [0]
     x = 0.0
     for letter in text:
         base = BASE.get(letter, letter)
         if base == ' ':
+            words.append(len(strokes))
             x += 9 + rng.uniform(0, 4)
             continue
         glyph = font.glyphs_for_text(base)
@@ -68,9 +71,10 @@ def line(font, text, rng):
         xs = [px for stroke in placed for px, _ in stroke] or [x]
         ys = [py for stroke in placed for _, py in stroke] or [0]
         placed += [[(px, py) for px, py in accent] for accent in mark(letter, min(xs), max(xs), min(ys))]
-        strokes += placed
+        strokes += [stroke for stroke in placed if len(stroke) > 1]
         x = max(xs) + rng.uniform(0.5, 2.5)
-    return strokes
+    words.append(len(strokes))
+    return strokes, [[first, end] for first, end in zip(words, words[1:])]
 
 
 def main():
@@ -79,10 +83,12 @@ def main():
     for language, sentences in SENTENCES.items():
         for number, sentence in enumerate(sentences):
             font.load_default_font(FONTS[number % len(FONTS)])
-            strokes = line(font, sentence, rng)
+            strokes, words = line(font, sentence, rng)
             name = f'{OUT}/{language}-{number:02}'
             with open(f'{name}.json', 'w') as out:
-                json.dump([[[round(px, 2), round(py, 2)] for px, py in stroke] for stroke in strokes if len(stroke) > 1], out)
+                json.dump([[[round(px, 2), round(py, 2)] for px, py in stroke] for stroke in strokes], out)
+            with open(f'{name}.words', 'w') as out:
+                json.dump(words, out)
             with open(f'{name}.txt', 'w') as out:
                 out.write(sentence + '\n')
 

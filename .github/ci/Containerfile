@@ -7,7 +7,7 @@ RUN dnf install --assumeyes --setopt=install_weak_deps=False \
       glycin-loaders bubblewrap \
       fontconfig-devel wayland-devel libxkbcommon-devel libdrm-devel \
       pam-devel systemd-devel libseccomp-devel tpm2-tss-devel sqlite-devel \
-      onnxruntime-devel vulkan-headers vulkan-loader-devel glslc swtpm mingw64-gcc && \
+      onnxruntime-devel vulkan-headers vulkan-loader-devel glslc spirv-headers-devel swtpm mingw64-gcc && \
     dnf clean all
 
 ENV RUSTUP_HOME=/usr/local/rustup CARGO_HOME=/usr/local/cargo PATH=/usr/local/cargo/bin:$PATH

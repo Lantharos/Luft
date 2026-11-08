@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, untrack } from 'svelte';
+	import { onMount, setContext, untrack } from 'svelte';
 	import { appearance } from '@luft/ui';
 	import { carry } from '#lib/drag/carry.svelte.js';
 	import type { OpenNotebook } from '#lib/library/notebook.svelte.js';
@@ -9,6 +9,11 @@
 	import TextActions from '#lib/pdf/TextActions.svelte';
 	import SelectionBox from '#lib/selection/SelectionBox.svelte';
 	import type { PageStore } from '#lib/page/storage.js';
+	import { Converter } from '#lib/convert/converter.svelte.js';
+	import type { Page } from '#lib/convert/writing.js';
+	import type { Stroke } from '#lib/ink/stroke.js';
+	import { draftText, editing } from '#lib/objects/editing.svelte.js';
+	import { linesOf } from '#lib/typing/flow.js';
 	import { carryZone } from './carried';
 	import { pagesIn, stack } from './layout';
 	import { LiveInk } from './live';
@@ -28,6 +33,46 @@
 	let surface: Surface;
 	let live: LiveInk;
 	const stores = new Map<string, PageStore>();
+
+	setContext('pages', {
+		get notebook() {
+			return notebook;
+		},
+		get viewport() {
+			return viewport;
+		}
+	});
+
+	function pageFor(id: string): Page | null {
+		const index = notebook.indexOf(id);
+		const store = stores.get(id);
+		const page = element.querySelector<HTMLElement>(`[data-page="${id}"]`);
+		if (index < 0 || !store || !page) return null;
+		const rect = viewport.layout.pages[index];
+		return { id, document: store.document, element: page, width: rect.width, lines: linesOf(notebook, notebook.meta.pages[index]), zoom: viewport.zoom };
+	}
+
+	const converter = new Converter({ page: pageFor, writing: () => surface.writing });
+
+	function convertPicked(id: string, strokes: Stroke[]) {
+		const page = pageFor(id);
+		if (page) void converter.convertNow(page, strokes);
+	}
+
+	/** Puts the caret where a click or tap landed: into text that's there, or on a new line of the page. */
+	function typeAt(id: string, x: number, y: number, client: [number, number]) {
+		const index = notebook.indexOf(id);
+		const store = stores.get(id);
+		if (!store) return;
+		const objects = store.document.objects;
+		const hit = objects.find((object) => object.kind === 'text' && x >= object.x && x <= object.x + object.width && y >= object.y && y <= object.y + object.height);
+		const flowing = notebook.meta.typed ? objects.find((object) => object.flow) : undefined;
+		if (hit ?? flowing) {
+			editing.focus = { id: (hit ?? flowing)!.id, at: client };
+			return;
+		}
+		draftText(id, linesOf(notebook, notebook.meta.pages[index]), x, y, viewport.layout.pages[index].width, notebook.meta.typed);
+	}
 
 	$effect(() => {
 		viewport.layout = stack(notebook.meta.pages.map((page) => pageSize(paperOf(notebook.meta, page), page)));
@@ -87,6 +132,8 @@
 				preview = { scale, x, y };
 			},
 			ruler: () => ruler,
+			typeAt: (target, x, y, client) => typeAt(target.id, x, y, client),
+			wrote: (target, stroke) => converter.wrote(target.id, stroke),
 			undo: () => notebook.undo(),
 			redo: () => notebook.redo()
 		});
@@ -97,6 +144,7 @@
 		const rescale = () => (scale = window.devicePixelRatio || 1);
 		media.addEventListener('change', rescale);
 		return () => {
+			converter.destroy();
 			leave();
 			media.removeEventListener('change', rescale);
 			element.removeEventListener('pointerrawupdate', raw);
@@ -149,7 +197,7 @@
 		<RulerView {ruler} zoom={viewport.zoom} />
 	{/if}
 	<TextActions {notebook} {viewport} {onquote} />
-	<SelectionBox {notebook} {viewport} />
+	<SelectionBox {notebook} {viewport} ready={converter.ready} onconvert={convertPicked} />
 	<canvas class="live" bind:this={predictCanvas}></canvas>
 </div>
 

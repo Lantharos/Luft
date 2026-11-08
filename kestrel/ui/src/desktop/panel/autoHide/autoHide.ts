@@ -13,6 +13,12 @@ import type { WindowOverlap } from './windowOverlap.js';
 const HIDE_DELAY = 450;
 const SLIDE_DURATION = 220;
 
+function settleAt(actor: Clutter.Actor, property: 'translation-x' | 'translation-y', value: number): void {
+  if (actor.get_transition(property)?.get_interval().peek_final_value() === value) return;
+  actor.remove_transition(property);
+  actor.set_property(property, value);
+}
+
 /** What slides away to one edge when the taskbar hides: the whole bar, or each separate island on its own edge. */
 export interface Slider {
   actor: St.Widget;
@@ -220,9 +226,10 @@ export class AutoHide {
   }
 
   private settle(edge: Edge, actor: St.Widget): void {
-    actor.remove_transition('translation-x');
-    actor.remove_transition('translation-y');
-    actor.set(this.offset(edge, this.states.get(edge)!.revealed));
-    actor.visible = this.allowed && this.states.get(edge)!.revealed;
+    const revealed = this.states.get(edge)!.revealed;
+    const { translation_x, translation_y } = this.offset(edge, revealed);
+    settleAt(actor, 'translation-x', translation_x);
+    settleAt(actor, 'translation-y', translation_y);
+    actor.visible = this.allowed && revealed;
   }
 }

@@ -16,7 +16,7 @@ import { taskbarArrangement } from './preferences/arrangement.js';
 import { TaskbarSurface } from './preferences/taskbarLook.js';
 import { AutoHide, type Slider } from './autoHide/autoHide.js';
 import { afterMotion, dropAfterMotion } from '../../shared/motion/afterMotion.js';
-import { animateActor, Curve, Duration, reducedMotion } from '../../shared/motion/motion.js';
+import { animateActor, Curve, Duration } from '../../shared/motion/motion.js';
 import { activeWorkspace, WorkspaceWindows } from './taskbar/workspaceWindows.js';
 import { TabletTaskbar } from './tablet/tabletTaskbar.js';
 import { band, isVertical, rightToLeft, type Edge } from '../../shared/layout/edge.js';
@@ -297,7 +297,7 @@ export class KestrelPanel {
   }
 
   fade(change: () => void): void {
-    if (!this.monitor || reducedMotion() || !this.actor.visible) {
+    if (!this.monitor || !this.actor.visible) {
       change();
       return;
     }

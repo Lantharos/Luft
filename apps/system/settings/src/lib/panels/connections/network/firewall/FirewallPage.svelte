@@ -19,7 +19,7 @@
 	import type { NetworkState } from '../state.svelte';
 	import AppsSection from './AppsSection.svelte';
 	import OpenPortRow from './OpenPortRow.svelte';
-	import { protocolLabel } from './ports';
+	import { portDescription } from './ports';
 
 	interface Props {
 		connections: NetworkState;
@@ -103,7 +103,7 @@
 
 	<Section title={t('settings-network-firewall-services')} description={t('settings-network-firewall-services.description')}>
 		{#each firewall.openPorts as port (portKey(port))}
-			<Row title={t('settings-network-firewall-port', { port: port.port })} description={protocolLabel(port.protocol)}>
+			<Row title={t('settings-network-firewall-port', { port: port.port })} description={portDescription(port)}>
 				{#if closing === portKey(port)}
 					<Spinner />
 				{:else}

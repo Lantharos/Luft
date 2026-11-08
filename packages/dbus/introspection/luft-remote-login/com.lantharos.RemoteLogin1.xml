@@ -1,0 +1,32 @@
+<node>
+  <interface name="com.lantharos.RemoteLogin1">
+    <method name="SetEnabled">
+      <arg name="enabled" type="b" direction="in"/>
+    </method>
+    <method name="SetPasswordLogin">
+      <arg name="allowed" type="b" direction="in"/>
+    </method>
+    <method name="SetPublicNetworks">
+      <arg name="allowed" type="b" direction="in"/>
+    </method>
+    <method name="SetAccountAllowed">
+      <arg name="account" type="s" direction="in"/>
+      <arg name="allowed" type="b" direction="in"/>
+    </method>
+    <method name="AuthorizedKeys">
+      <arg type="a(sss)" direction="out"/>
+    </method>
+    <method name="AddAuthorizedKey">
+      <arg name="key" type="s" direction="in"/>
+      <arg type="(sss)" direction="out"/>
+    </method>
+    <method name="RemoveAuthorizedKey">
+      <arg name="fingerprint" type="s" direction="in"/>
+    </method>
+    <property name="Accounts" type="as" access="read"/>
+    <property name="Enabled" type="b" access="read"/>
+    <property name="HostKeys" type="a(ss)" access="read"/>
+    <property name="PasswordLogin" type="b" access="read"/>
+    <property name="PublicNetworks" type="b" access="read"/>
+  </interface>
+</node>

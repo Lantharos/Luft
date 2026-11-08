@@ -22,8 +22,12 @@ const LOGIN = `<node><interface name="org.freedesktop.login1.Manager">
   <method name="CanHibernate"><arg type="s" direction="out"/></method>
   <method name="GetUser"><arg type="u" direction="in"/><arg type="o" direction="out"/></method>
   <method name="GetSession"><arg type="s" direction="in"/><arg type="o" direction="out"/></method>
+  <method name="ListSessions"><arg type="a(susso)" direction="out"/></method>
+  <method name="TerminateSession"><arg type="s" direction="in"/></method>
   <property name="LidClosed" type="b" access="read"/>
   <signal name="PrepareForSleep"><arg type="b"/></signal>
+  <signal name="SessionNew"><arg type="s"/><arg type="o"/></signal>
+  <signal name="SessionRemoved"><arg type="s"/><arg type="o"/></signal>
 </interface></node>`;
 const LOGIN_CONTROL = `<node><interface name="com.lantharos.KestrelChecks.Login">
   <method name="SetLidClosed"><arg type="b" direction="in"/></method>
@@ -34,8 +38,13 @@ const LOGIN_CONTROL = `<node><interface name="com.lantharos.KestrelChecks.Login"
 const LOGIN_USER = `<node><interface name="org.freedesktop.login1.User">
   <property name="Display" type="(so)" access="read"/>
 </interface></node>`;
-const LOGIN_SESSION = `<node><interface name="org.freedesktop.login1.Session">
+export const LOGIN_SESSION = `<node><interface name="org.freedesktop.login1.Session">
   <property name="Id" type="s" access="read"/>
+  <property name="Name" type="s" access="read"/>
+  <property name="Service" type="s" access="read"/>
+  <property name="State" type="s" access="read"/>
+  <property name="RemoteHost" type="s" access="read"/>
+  <property name="Timestamp" type="t" access="read"/>
   <property name="Active" type="b" access="read"/>
   <property name="LockedHint" type="b" access="read"/>
   <method name="SetLockedHint"><arg type="b" direction="in"/></method>
@@ -89,6 +98,15 @@ const TIME = `<node><interface name="org.freedesktop.timedate1">
 export const BASIC_NAMES = ['org.freedesktop.login1', 'org.freedesktop.UPower', 'org.freedesktop.UPower.PowerProfiles', 'org.freedesktop.hostname1', 'org.freedesktop.systemd1',
   'org.freedesktop.locale1', 'org.freedesktop.timedate1', 'org.freedesktop.PolicyKit1', 'com.lantharos.Kestrel.Watchdog1'];
 
+export interface RemoteSession {
+  id: string;
+  user: string;
+  path: string;
+  end: () => void;
+}
+
+export const remoteSessions: RemoteSession[] = [];
+
 const SESSION_ID = 'c1';
 const SESSION_PATH = `/org/freedesktop/login1/session/${SESSION_ID}`;
 const inhibitors = new Set<Gio.SocketConnection>();
@@ -130,6 +148,7 @@ function followRelease(held: Gio.Socket, released: () => void) {
 }
 
 export function publishBasics(publish: Publish, calls: string[]) {
+  const uid = new Gio.Credentials().get_unix_user();
   let lidClosed = false;
   let canHibernate = 'na';
   let sleepRefused = false;
@@ -154,6 +173,11 @@ export function publishBasics(publish: Publish, calls: string[]) {
     CanHibernate: () => canHibernate,
     GetUser: () => '/org/freedesktop/login1/user/self',
     GetSession: () => SESSION_PATH,
+    ListSessions: () => [[SESSION_ID, uid, 'mara', 'seat0', SESSION_PATH], ...remoteSessions.map(({id, user, path}) => [id, uid, user, '', path])],
+    TerminateSession(id: string) {
+      calls.push(`TerminateSession ${id}`);
+      remoteSessions.find(session => session.id === id)?.end();
+    },
     get LidClosed() { return lidClosed; },
   }, '/org/freedesktop/login1');
   publish(LOGIN_CONTROL, {
@@ -173,6 +197,11 @@ export function publishBasics(publish: Publish, calls: string[]) {
   let lockedHint = false;
   const session = publish(LOGIN_SESSION, {
     Id: SESSION_ID,
+    Name: 'mara',
+    Service: 'greetd',
+    State: 'active',
+    RemoteHost: '',
+    Timestamp: GLib.get_real_time(),
     Active: true,
     get LockedHint() { return lockedHint; },
     SetLockedHint: (locked: boolean) => {
@@ -208,4 +237,5 @@ export function publishBasics(publish: Publish, calls: string[]) {
     SetX11Keyboard: (layout: string, _model: string, variant: string) => calls.push(`SetX11Keyboard ${layout} ${variant}`),
   }, '/org/freedesktop/locale1');
   publish(TIME, {Timezone: 'UTC', SetTimezone: (zone: string) => calls.push(`SetTimezone ${zone}`)}, '/org/freedesktop/timedate1');
+  return login;
 }

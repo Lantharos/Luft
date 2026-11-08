@@ -227,6 +227,11 @@ desktop-passkeys-missing = That passkey doesn't exist
 # Suggested file name when saving the disk recovery key
 desktop-security-recovery-file-name = Recovery key.txt
 desktop-security-usb-unavailable = USB protection isn't available on this computer
+# Title of the file chooser for adding a key that may sign in over SSH
+desktop-remote-login-choose-title = Choose a Public Key
+# File type filter in that file chooser
+desktop-remote-login-filter = SSH public keys
+desktop-remote-login-unreadable = This file can't be read as an SSH public key
 
 ## Shared
 desktop-admin-required = Administrator rights are needed to change this

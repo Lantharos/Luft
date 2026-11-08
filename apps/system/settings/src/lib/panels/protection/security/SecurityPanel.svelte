@@ -7,19 +7,24 @@
 	import KeyringPage from './keyring/KeyringPage.svelte';
 	import { KeyringState } from './keyring/state.svelte';
 	import Overview from './Overview.svelte';
+	import RemoteLoginPage from './remote/RemoteLoginPage.svelte';
+	import { RemoteLoginState } from './remote/state.svelte';
 	import SecureBootPage from './secureboot/SecureBootPage.svelte';
 	import { SecurityState } from './state.svelte';
 
 	const security = new SecurityState();
 	const keyring = new KeyringState();
+	const remote = new RemoteLoginState();
 
 	const close = () => (app.section = null);
 
 	void security.start();
 	void keyring.load();
+	void remote.load();
 	onDestroy(() => {
 		security.stop();
 		keyring.stop();
+		remote.stop();
 	});
 </script>
 
@@ -29,8 +34,10 @@
 	<SecureBootPage trust={security.trust} onclose={close} />
 {:else if app.section === 'keyring'}
 	<KeyringPage {keyring} fingerprintReader={security.fingerprintReader} onclose={close} />
+{:else if remote.current && app.section === 'remote-login'}
+	<RemoteLoginPage {remote} current={remote.current} onclose={close} />
 {:else}
-	<Overview {security} {keyring} onopen={(page) => (app.section = page)} />
+	<Overview {security} {keyring} {remote} onopen={(page) => (app.section = page)} />
 {/if}
 
 {#if unlockPrompt.request}

@@ -326,6 +326,7 @@ export const commands = {
 	networkClosePort: (params: {
 		port: number,
 		protocol: Protocol,
+		networks: PortNetworks,
 	}, options?: CallOptions) => invoke<null>("network_close_port", params, options),
 	networkDeactivate: (params: {
 		active: string,
@@ -349,6 +350,7 @@ export const commands = {
 	networkOpenPort: (params: {
 		port: number,
 		protocol: Protocol,
+		networks: PortNetworks,
 	}, options?: CallOptions) => invoke<null>("network_open_port", params, options),
 	networkProfile: (params: {
 		path: string,
@@ -451,6 +453,32 @@ export const commands = {
 	regionSetLanguage: (params: {
 		language: string,
 	}, options?: CallOptions) => invoke<null>("region_set_language", params, options),
+	remoteLogin: (options?: CallOptions) => invoke<RemoteLogin | null>("remote_login", {}, options),
+	remoteLoginAddKey: (params: {
+		key: string,
+	}, options?: CallOptions) => invoke<AuthorizedKey>("remote_login_add_key", params, options),
+	remoteLoginChooseKey: (options?: CallOptions) => invoke<string | null>("remote_login_choose_key", {}, options),
+	remoteLoginDisconnect: (params: {
+		id: string,
+	}, options?: CallOptions) => invoke<null>("remote_login_disconnect", params, options),
+	remoteLoginKeys: (options?: CallOptions) => invoke<AuthorizedKey[]>("remote_login_keys", {}, options),
+	remoteLoginRemoveKey: (params: {
+		fingerprint: string,
+	}, options?: CallOptions) => invoke<null>("remote_login_remove_key", params, options),
+	remoteLoginSessions: (options?: CallOptions) => invoke<SshSession[]>("remote_login_sessions", {}, options),
+	remoteLoginSetAccount: (params: {
+		account: string,
+		allowed: boolean,
+	}, options?: CallOptions) => invoke<null>("remote_login_set_account", params, options),
+	remoteLoginSetEnabled: (params: {
+		on: boolean,
+	}, options?: CallOptions) => invoke<null>("remote_login_set_enabled", params, options),
+	remoteLoginSetPasswords: (params: {
+		on: boolean,
+	}, options?: CallOptions) => invoke<null>("remote_login_set_passwords", params, options),
+	remoteLoginSetPublic: (params: {
+		on: boolean,
+	}, options?: CallOptions) => invoke<null>("remote_login_set_public", params, options),
 	securityAcceptSecureBoot: (options?: CallOptions) => invoke<null>("security_accept_secure_boot", {}, options),
 	securityCancelEncryption: (options?: CallOptions) => invoke<null>("security_cancel_encryption", {}, options),
 	securityCancelEnrollment: (options?: CallOptions) => invoke<null>("security_cancel_enrollment", {}, options),
@@ -620,6 +648,8 @@ export const events = {
 	passkeysChanged: (callback: (payload: Passkeys) => void) => listen<Passkeys>("passkeys.changed", callback),
 	powerChanged: (callback: (payload: PowerState) => void) => listen<PowerState>("power.changed", callback),
 	printersChanged: (callback: (payload: PrintersState) => void) => listen<PrintersState>("printers.changed", callback),
+	remoteLoginChanged: (callback: (payload: RemoteLogin) => void) => listen<RemoteLogin>("remote-login.changed", callback),
+	remoteLoginSessions: (callback: (payload: SshSession[]) => void) => listen<SshSession[]>("remote-login.sessions", callback),
 	securityTrust: (callback: (payload: Trust) => void) => listen<Trust>("security.trust", callback),
 	securityUsb: (callback: (payload: UsbProtection) => void) => listen<UsbProtection>("security.usb", callback),
 	settingsChanged: (callback: (payload: SettingChange) => void) => listen<SettingChange>("settings.changed", callback),
@@ -759,6 +789,12 @@ export type Appearance = {
 };
 
 export type Area = "desktop" | "apps" | "system" | "installing";
+
+export type AuthorizedKey = {
+	kind: string,
+	comment: string,
+	fingerprint: string,
+};
 
 export type Available = {
 	size: number,
@@ -1109,6 +1145,11 @@ export type Hardware = {
 	pen: boolean,
 };
 
+export type HostKey = {
+	kind: string,
+	fingerprint: string,
+};
+
 export type HostSecurity = {
 	level: number,
 	highest: number,
@@ -1315,6 +1356,7 @@ export type Offer = {
 export type OpenPort = {
 	port: number,
 	protocol: Protocol,
+	networks: PortNetworks,
 };
 
 export type Order = "popular" | "rating" | "newest";
@@ -1430,6 +1472,8 @@ export type Phone = {
 export type Port = {
 	detected: boolean,
 } & Choice;
+
+export type PortNetworks = "home" | "anywhere";
 
 /**  Whether the computer is used as a laptop or folded into a tablet. */
 export type Posture = "laptop" | "tablet";
@@ -1569,6 +1613,15 @@ export type Remembered = {
 	total: number,
 };
 
+export type RemoteLogin = {
+	enabled: boolean,
+	passwordLogin: boolean,
+	publicNetworks: boolean,
+	accounts: string[],
+	hostKeys: HostKey[],
+	hostname: string,
+};
+
 export type Requirement = {
 	id: string,
 	met: boolean,
@@ -1671,6 +1724,13 @@ export type SshKey = {
 	chip: boolean,
 	confirm: boolean,
 	added: number,
+};
+
+export type SshSession = {
+	id: string,
+	account: string,
+	address: string,
+	since: number,
 };
 
 export type Stage = "waiting" | "preparing" | "downloading" | "installing" | "removing" | "finishing";

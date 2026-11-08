@@ -54,7 +54,28 @@ On a public network, like in a café, hotel or airport, no app can be reached un
 
 The first time Luft starts, it asks what kind of network you're on, with Home picked already. After that, a new network counts as public until you choose, and a notification asks. You can change any network, and what each app may do, in Settings, under Network → Firewall: Home networks, All networks or Not allowed. Allowing an app on all networks needs an administrator.
 
-Programs you start in Tern, such as a web server you're working on, are asked about by their name, like python3. Services that run without an app, such as an SSH or file server, are never asked about and stay closed until you open their port on that page, which needs an administrator. Extensions that take connections from your network were allowed when you installed them, on home networks. Tailscale, and the virtual machines, containers and Android apps running on this computer, keep working on either kind of network.
+Programs you start in Tern, such as a web server you're working on, are asked about by their name, like python3. Services that run without an app, such as a file server, are never asked about and stay closed until you open their port on that page, which needs an administrator. SSH has a page of its own, [Remote login](#remote-login). Extensions that take connections from your network were allowed when you installed them, on home networks. Tailscale, and the virtual machines, containers and Android apps running on this computer, keep working on either kind of network.
+
+## Remote login
+
+Remote login lets you sign in to this computer from another device with SSH, to use its terminal and files from your laptop or phone. It's off until you turn it on in Settings, under Security → Remote login, and while it's off, nothing on the computer listens for SSH at all.
+
+Turning it on needs an administrator, because anyone with a key you add can then control the computer as you: open your files, run programs and change what you can change. At first only your account can sign in, only from devices on home networks, and only with a key, never a password or as root.
+
+1. On the device you'll connect from, make a key if it has none, with `ssh-keygen -t ed25519`.
+2. In Settings, choose **Add a key** and paste its public key, or choose the `.pub` file, such as `id_ed25519.pub`. Never add the file without `.pub`: that's the private key, and it stays on the other device.
+3. Connect with the command the page shows, such as `ssh anna@annas-laptop.local`, or with one of the addresses it lists.
+
+The first time a device connects, SSH shows a fingerprint and asks whether to trust it. Compare it with the ones under **This computer's keys**. If it doesn't match any of them, something between the two devices is pretending to be your computer, so don't go on.
+
+Every time someone signs in over SSH, a notification says so, with the account and the other device's address, even during Do Not Disturb. **Signed in now** lists who's connected, and **Disconnect** ends a connection right away. Turning remote login off disconnects everyone.
+
+The page also chooses which accounts can sign in. Each one adds its own keys while signed in to it. Two more switches are there for when they're really needed, each with a warning and an administrator's password:
+
+- **Allow passwords** lets accounts sign in with their password as well. Anyone who knows or guesses it can then get in, so it's only for a device that can't use a key.
+- **Also on public networks** lets devices on public networks, like in a café or hotel, connect as well. They can then see that the computer takes SSH connections.
+
+Luft slows down anyone who keeps trying: after a few failed sign-ins from one address, that address has to wait before it can try again, up to an hour.
 
 ## Games with anti-cheat
 

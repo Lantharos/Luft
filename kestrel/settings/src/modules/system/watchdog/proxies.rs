@@ -31,13 +31,3 @@ pub trait LoginUser {
     #[zbus(property)]
     fn display(&self) -> zbus::Result<(String, OwnedObjectPath)>;
 }
-
-#[introspect]
-#[proxy(
-    interface = "org.freedesktop.login1.Session",
-    default_service = "org.freedesktop.login1"
-)]
-pub trait LoginSession {
-    #[zbus(property)]
-    fn active(&self) -> zbus::Result<bool>;
-}

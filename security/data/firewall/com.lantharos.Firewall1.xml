@@ -11,8 +11,9 @@
 
     Unclassified: the networks in use that nobody chose a type for yet, as (connection, name),
     connection being the NetworkManager settings path.
-    OpenPorts: ports opened on home networks for services that run without an app, as
-    (port, protocol), protocol being "tcp" or "udp".
+    OpenPorts: ports opened for services that run without an app, as (port, protocol, networks),
+    protocol being "tcp" or "udp" and networks "home" for home networks only or "anywhere" for
+    every network.
     Apps: what each app the firewall was told about may do, as (kind, id, access): "home" lets
     devices on home networks connect, "anywhere" also devices on public networks, "blocked" none.
     Waiting: apps listening for connections from the network that nobody decided about yet, as
@@ -25,7 +26,7 @@
   -->
   <interface name="com.lantharos.Firewall1">
     <property name="Unclassified" type="a(os)" access="read"/>
-    <property name="OpenPorts" type="a(qs)" access="read"/>
+    <property name="OpenPorts" type="a(qss)" access="read"/>
     <property name="Apps" type="a(sss)" access="read"/>
     <property name="Waiting" type="a(ssu)" access="read"/>
     <method name="SetNetworkType">
@@ -35,6 +36,7 @@
     <method name="OpenPort">
       <arg name="port" type="q" direction="in"/>
       <arg name="protocol" type="s" direction="in"/>
+      <arg name="networks" type="s" direction="in"/>
     </method>
     <method name="ClosePort">
       <arg name="port" type="q" direction="in"/>

@@ -1,4 +1,3 @@
-use std::collections::BTreeSet;
 use std::fmt::Write;
 use std::process::Stdio;
 
@@ -8,7 +7,7 @@ use tokio::process::Command;
 use crate::apps::identity::UNIT_LEVEL;
 use crate::apps::{Reach, Reachable};
 use crate::network::{Layout, Prefix};
-use crate::ports::{Port, Protocol};
+use crate::ports::{Networks, Opened, Protocol};
 
 const NFT: &str = "/usr/sbin/nft";
 pub const DISCOVERY: [u16; 2] = [1900, 5353];
@@ -33,6 +32,8 @@ const CHAINS: &str = r#"
 		iifname @hosted accept
 		iifname . ip saddr @home4 jump home
 		iifname . ip6 saddr @home6 jump home
+		tcp dport @anywhere_tcp accept
+		udp dport @anywhere_udp accept
 		APP_KEY @apps_anywhere accept
 	}
 
@@ -65,11 +66,11 @@ fn home(layout: &Layout, ipv4: bool) -> Vec<String> {
         .collect()
 }
 
-fn opened(ports: &BTreeSet<Port>, protocol: Protocol) -> Vec<String> {
+fn opened(ports: &Opened, networks: Networks, protocol: Protocol) -> Vec<String> {
     ports
         .iter()
-        .filter(|port| port.protocol == protocol)
-        .map(|port| port.number.to_string())
+        .filter(|(port, opened)| port.protocol == protocol && **opened == networks)
+        .map(|(port, _)| port.number.to_string())
         .collect()
 }
 
@@ -80,7 +81,7 @@ fn reach(elements: &Reach) -> Vec<String> {
         .collect()
 }
 
-pub fn ruleset(layout: &Layout, ports: &BTreeSet<Port>, reachable: &Reachable) -> String {
+pub fn ruleset(layout: &Layout, ports: &Opened, reachable: &Reachable) -> String {
     let hosted: Vec<String> = layout
         .hosted
         .iter()
@@ -102,18 +103,16 @@ pub fn ruleset(layout: &Layout, ports: &BTreeSet<Port>, reachable: &Reachable) -
         &home(layout, false),
     );
     set(&mut script, "hosted", "type ifname", &hosted);
-    set(
-        &mut script,
-        "opened_tcp",
-        "type inet_service",
-        &opened(ports, Protocol::Tcp),
-    );
-    set(
-        &mut script,
-        "opened_udp",
-        "type inet_service",
-        &opened(ports, Protocol::Udp),
-    );
+    for (networks, prefix) in [(Networks::Home, "opened"), (Networks::Anywhere, "anywhere")] {
+        for protocol in [Protocol::Tcp, Protocol::Udp] {
+            set(
+                &mut script,
+                &format!("{prefix}_{}", protocol.name()),
+                "type inet_service",
+                &opened(ports, networks, protocol),
+            );
+        }
+    }
     set(&mut script, "apps_home", &typed, &reach(&reachable.home));
     set(
         &mut script,

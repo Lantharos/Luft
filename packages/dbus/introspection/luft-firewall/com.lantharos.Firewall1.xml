@@ -7,6 +7,7 @@
     <method name="OpenPort">
       <arg name="port" type="q" direction="in"/>
       <arg name="protocol" type="s" direction="in"/>
+      <arg name="networks" type="s" direction="in"/>
     </method>
     <method name="ClosePort">
       <arg name="port" type="q" direction="in"/>
@@ -21,7 +22,7 @@
       <arg name="ports" type="a(qs)" direction="in"/>
     </method>
     <property name="Apps" type="a(sss)" access="read"/>
-    <property name="OpenPorts" type="a(qs)" access="read"/>
+    <property name="OpenPorts" type="a(qss)" access="read"/>
     <property name="Unclassified" type="a(os)" access="read"/>
     <property name="Waiting" type="a(ssu)" access="read"/>
   </interface>

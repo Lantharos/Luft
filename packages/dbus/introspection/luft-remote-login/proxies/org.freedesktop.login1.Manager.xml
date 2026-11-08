@@ -1,0 +1,10 @@
+<node>
+  <interface name="org.freedesktop.login1.Manager">
+    <method name="ListSessions">
+      <arg type="a(susso)" direction="out"/>
+    </method>
+    <method name="TerminateSession">
+      <arg type="s" direction="in"/>
+    </method>
+  </interface>
+</node>

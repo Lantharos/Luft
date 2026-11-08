@@ -1,0 +1,12 @@
+[Unit]
+Description=Remote login check
+After=luft-firewall.service NetworkManager.service polkit.service
+
+[Service]
+Type=simple
+ExecStart=/usr/libexec/luft-remote-login-check
+StandardOutput=journal+console
+StandardError=journal+console
+
+[Install]
+WantedBy=multi-user.target

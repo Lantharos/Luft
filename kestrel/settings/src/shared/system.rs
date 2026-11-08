@@ -21,6 +21,28 @@ pub trait Login {
 
     #[zbus(signal)]
     fn prepare_for_sleep(&self, start: bool) -> zbus::Result<()>;
+
+    #[zbus(signal)]
+    fn session_new(&self, id: String, path: OwnedObjectPath) -> zbus::Result<()>;
+}
+
+#[introspect]
+#[proxy(
+    interface = "org.freedesktop.login1.Session",
+    default_service = "org.freedesktop.login1"
+)]
+pub trait LoginSession {
+    #[zbus(property)]
+    fn active(&self) -> zbus::Result<bool>;
+
+    #[zbus(property)]
+    fn service(&self) -> zbus::Result<String>;
+
+    #[zbus(property)]
+    fn name(&self) -> zbus::Result<String>;
+
+    #[zbus(property)]
+    fn remote_host(&self) -> zbus::Result<String>;
 }
 
 #[introspect]

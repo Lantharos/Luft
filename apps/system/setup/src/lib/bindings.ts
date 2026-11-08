@@ -41,6 +41,7 @@ export const commands = {
 	networkClosePort: (params: {
 		port: number,
 		protocol: Protocol,
+		networks: PortNetworks,
 	}, options?: CallOptions) => invoke<null>("network_close_port", params, options),
 	networkDeactivate: (params: {
 		active: string,
@@ -64,6 +65,7 @@ export const commands = {
 	networkOpenPort: (params: {
 		port: number,
 		protocol: Protocol,
+		networks: PortNetworks,
 	}, options?: CallOptions) => invoke<null>("network_open_port", params, options),
 	networkProfile: (params: {
 		path: string,
@@ -422,6 +424,7 @@ export type NewNetwork = {
 export type OpenPort = {
 	port: number,
 	protocol: Protocol,
+	networks: PortNetworks,
 };
 
 export type Owner = {
@@ -441,6 +444,8 @@ export type Palette = {
 };
 
 export type Phase = "live" | "first-boot" | "installed";
+
+export type PortNetworks = "home" | "anywhere";
 
 /**  Whether the computer is used as a laptop or folded into a tablet. */
 export type Posture = "laptop" | "tablet";

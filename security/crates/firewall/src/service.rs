@@ -13,12 +13,13 @@ use crate::apps::{Access, Identity};
 use crate::error::Error;
 use crate::firewall::Firewall;
 use crate::network;
-use crate::ports::Port;
+use crate::ports::{Networks, Port};
 
 pub const NAME: &str = "com.lantharos.Firewall1";
 pub const PATH: &str = "/com/lantharos/Firewall1";
 const CLASSIFY: &str = "com.lantharos.firewall.classify";
 const OPEN: &str = "com.lantharos.firewall.open-ports";
+const OPEN_ANYWHERE: &str = "com.lantharos.firewall.open-ports-anywhere";
 const APPS: &str = "com.lantharos.firewall.apps";
 const ANYWHERE: &str = "com.lantharos.firewall.apps-anywhere";
 const TYPES: [&str; 2] = ["home", "public"];
@@ -38,19 +39,23 @@ impl Service {
         header: &Header<'_>,
         port: u16,
         protocol: &str,
-        open: bool,
+        networks: Option<Networks>,
     ) -> Result<(), Error> {
         let port = Port::new(port, protocol).ok_or_else(|| {
             Error::InvalidArgs("A port is a number from 1 to 65535 over TCP or UDP".into())
         })?;
-        authorize(connection, header, OPEN).await?;
+        let action = if networks == Some(Networks::Anywhere) {
+            OPEN_ANYWHERE
+        } else {
+            OPEN
+        };
+        authorize(connection, header, action).await?;
         let mut firewall = self.firewall.lock().await;
         let mut ports = firewall.ports().clone();
-        if open {
-            ports.insert(port);
-        } else {
-            ports.remove(&port);
-        }
+        match networks {
+            Some(networks) => ports.insert(port, networks),
+            None => ports.remove(&port),
+        };
         firewall.set_ports(ports).await.map_err(Error::Failed)
     }
 }
@@ -89,13 +94,19 @@ impl Service {
     }
 
     #[zbus(property)]
-    async fn open_ports(&self) -> Vec<(u16, String)> {
+    async fn open_ports(&self) -> Vec<(u16, String, String)> {
         self.firewall
             .lock()
             .await
             .ports()
             .iter()
-            .map(|port| (port.number, port.protocol.name().to_owned()))
+            .map(|(port, networks)| {
+                (
+                    port.number,
+                    port.protocol.name().to_owned(),
+                    networks.name().to_owned(),
+                )
+            })
             .collect()
     }
 
@@ -150,8 +161,14 @@ impl Service {
         #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
         port: u16,
         protocol: &str,
+        networks: &str,
     ) -> Result<(), Error> {
-        self.change_port(connection, &header, port, protocol, true)
+        let networks = Networks::parse(networks).ok_or_else(|| {
+            Error::InvalidArgs(format!(
+                "A port opens on home networks or anywhere, not {networks}"
+            ))
+        })?;
+        self.change_port(connection, &header, port, protocol, Some(networks))
             .await?;
         Ok(self.open_ports_changed(&emitter).await?)
     }
@@ -164,7 +181,7 @@ impl Service {
         port: u16,
         protocol: &str,
     ) -> Result<(), Error> {
-        self.change_port(connection, &header, port, protocol, false)
+        self.change_port(connection, &header, port, protocol, None)
             .await?;
         Ok(self.open_ports_changed(&emitter).await?)
     }

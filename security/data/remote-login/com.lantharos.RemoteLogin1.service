@@ -1,0 +1,5 @@
+[D-BUS Service]
+Name=com.lantharos.RemoteLogin1
+Exec=@libexecdir@/luft-remote-login
+User=root
+SystemdService=luft-remote-login.service

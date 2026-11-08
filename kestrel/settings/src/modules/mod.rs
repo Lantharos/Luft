@@ -5,7 +5,7 @@ mod system;
 use crate::context::Context;
 use desktop::{a11y, night_light, xsettings};
 use devices::{keyboard, power, printers, rfkill, sound};
-use system::security::{network_type, signing_key, usb_protection};
+use system::security::{network_type, remote_login, signing_key, usb_protection};
 use system::{drives, housekeeping, memory, profile_locks, timezone, watchdog};
 
 #[derive(Clone, Copy)]
@@ -20,6 +20,7 @@ pub enum Module {
     Power,
     Printers,
     ProfileLocks,
+    RemoteLogin,
     Rfkill,
     SigningKey,
     Sound,
@@ -30,7 +31,7 @@ pub enum Module {
 }
 
 impl Module {
-    pub const ALL: [Self; 17] = [
+    pub const ALL: [Self; 18] = [
         Self::A11y,
         Self::Drives,
         Self::Housekeeping,
@@ -41,6 +42,7 @@ impl Module {
         Self::Power,
         Self::Printers,
         Self::ProfileLocks,
+        Self::RemoteLogin,
         Self::Rfkill,
         Self::SigningKey,
         Self::Sound,
@@ -66,6 +68,7 @@ impl Module {
             Self::Power => "power",
             Self::Printers => "printers",
             Self::ProfileLocks => "profile-locks",
+            Self::RemoteLogin => "remote-login",
             Self::Rfkill => "rfkill",
             Self::SigningKey => "signing-key",
             Self::Sound => "sound",
@@ -88,6 +91,7 @@ impl Module {
             Self::Power => power::start(context).await,
             Self::Printers => printers::start(context).await,
             Self::ProfileLocks => profile_locks::start(context).await,
+            Self::RemoteLogin => remote_login::start(context).await,
             Self::Rfkill => rfkill::start(context).await,
             Self::SigningKey => signing_key::start(context).await,
             Self::Sound => sound::start(context).await,

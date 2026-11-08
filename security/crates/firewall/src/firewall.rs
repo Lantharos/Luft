@@ -5,12 +5,12 @@ use zbus::OwnedObjectPath;
 use crate::apps::{Access, Apps, Decisions, Identity};
 use crate::listening::Change;
 use crate::network::Layout;
-use crate::ports::{self, Port};
+use crate::ports::{self, Opened, Port};
 use crate::rules;
 
 pub struct Firewall {
     layout: Layout,
-    ports: BTreeSet<Port>,
+    ports: Opened,
     apps: Apps,
     loaded: String,
 }
@@ -53,7 +53,7 @@ impl Firewall {
         &self.layout.unclassified
     }
 
-    pub fn ports(&self) -> &BTreeSet<Port> {
+    pub fn ports(&self) -> &Opened {
         &self.ports
     }
 
@@ -95,7 +95,7 @@ impl Firewall {
         waiting != self.waiting()
     }
 
-    pub async fn set_ports(&mut self, ports: BTreeSet<Port>) -> Result<(), String> {
+    pub async fn set_ports(&mut self, ports: Opened) -> Result<(), String> {
         ports::save(&ports).map_err(|error| format!("Couldn't keep the open ports: {error}"))?;
         self.ports = ports;
         self.load(false).await

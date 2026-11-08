@@ -35,6 +35,15 @@ network-type-home = Home
 # Button on the network-type-title notification
 network-type-public = Public
 
+## Signing in over SSH
+
+# $address is the other device's address, such as 192.168.1.20
+remote-login-signed-in-title = Signed in over SSH from { $address }
+# $account is the name of the account that signed in
+remote-login-signed-in = { $account } signed in to this computer from another device. If you don’t know who that is, disconnect them in Settings.
+# Button on the remote-login-signed-in-title notification
+remote-login-settings = Settings
+
 ## Secure Boot notifications
 # Setting up Secure Boot means confirming Luft's signing key on a blue screen after a restart, with an eight-digit code.
 # Don't call it a "key", so it isn't confused with the disk's recovery key.

@@ -1,17 +1,18 @@
 part = "boot"
 
 [programs]
-"/usr/libexec/" = ["luft-firewall", "luft-usb-protection", "trustd"]
+"/usr/libexec/" = ["luft-firewall", "luft-remote-login", "luft-usb-protection", "trustd"]
 "/usr/bin/" = ["trustctl"]
 "/usr/lib/systemd/system-generators/" = ["trustd-drives-generator"]
 
 [files]
-"/usr/lib/systemd/system/" = ["data/firewall/luft-firewall.service", "data/usb/luft-usb-protection.service", "data/trust/systemd/*"]
-"/usr/share/dbus-1/system-services/" = ["data/usb/com.lantharos.UsbProtection1.service", "data/trust/com.lantharos.Trust1.service"]
-"/usr/share/dbus-1/system.d/" = ["data/firewall/com.lantharos.Firewall1.conf", "data/usb/com.lantharos.UsbProtection1.conf", "data/trust/com.lantharos.Trust1.conf"]
-"/usr/share/dbus-1/interfaces/" = ["data/firewall/com.lantharos.Firewall1.xml", "data/usb/com.lantharos.UsbProtection1.xml", "data/trust/com.lantharos.Trust1.xml"]
-"/usr/share/polkit-1/actions/" = ["data/firewall/com.lantharos.firewall.policy", "data/usb/com.lantharos.usb-protection.policy", "data/trust/com.lantharos.trust.policy"]
+"/usr/lib/systemd/system/" = ["data/firewall/luft-firewall.service", "data/remote-login/luft-remote-login.service", "data/usb/luft-usb-protection.service", "data/trust/systemd/*"]
+"/usr/share/dbus-1/system-services/" = ["data/remote-login/com.lantharos.RemoteLogin1.service", "data/usb/com.lantharos.UsbProtection1.service", "data/trust/com.lantharos.Trust1.service"]
+"/usr/share/dbus-1/system.d/" = ["data/firewall/com.lantharos.Firewall1.conf", "data/remote-login/com.lantharos.RemoteLogin1.conf", "data/usb/com.lantharos.UsbProtection1.conf", "data/trust/com.lantharos.Trust1.conf"]
+"/usr/share/dbus-1/interfaces/" = ["data/firewall/com.lantharos.Firewall1.xml", "data/remote-login/com.lantharos.RemoteLogin1.xml", "data/usb/com.lantharos.UsbProtection1.xml", "data/trust/com.lantharos.Trust1.xml"]
+"/usr/share/polkit-1/actions/" = ["data/firewall/com.lantharos.firewall.policy", "data/remote-login/com.lantharos.remote-login.policy", "data/usb/com.lantharos.usb-protection.policy", "data/trust/com.lantharos.trust.policy"]
 "/usr/lib/tmpfiles.d/trustd.conf" = "data/trust/trustd.tmpfiles"
+"/etc/ssh/sshd_config.d/20-luft.conf" = { from = "data/remote-login/20-luft.conf", mode = "600" }
 "/usr/share/selinux/packages/" = ["data/trust/luft-nvpcr.cil", "data/trust/luft-bless-boot.cil"]
 "/usr/lib/udev/rules.d/" = ["data/trust/61-trustd-drives.rules"]
 "/usr/lib/dracut/dracut.conf.d/" = ["data/trust/90-trustd.conf"]
@@ -25,6 +26,9 @@ part = "boot"
     "data/trust/dracut/trustd-move.service",
     "data/trust/dracut/trustd-move-drive.service",
 ]
+
+[links]
+"/etc/systemd/system-generators/systemd-ssh-generator" = "/dev/null"
 
 [enable]
 system = [

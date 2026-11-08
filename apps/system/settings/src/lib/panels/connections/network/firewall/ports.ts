@@ -1,7 +1,10 @@
 import { t } from '@luft/i18n';
-import type { Protocol } from '@luft/network';
+import type { OpenPort, Protocol } from '@luft/network';
 
 export const protocolLabel = (protocol: Protocol) => t(protocol === 'tcp' ? 'settings-network-firewall-tcp' : 'settings-network-firewall-udp');
+
+export const portDescription = (port: OpenPort) =>
+	port.networks === 'anywhere' ? `${protocolLabel(port.protocol)} · ${t('settings-network-firewall-access-anywhere')}` : protocolLabel(port.protocol);
 
 export function portProblem(text: string) {
 	if (!text.trim()) return '';

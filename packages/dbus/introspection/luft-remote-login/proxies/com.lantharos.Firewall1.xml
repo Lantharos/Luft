@@ -1,0 +1,14 @@
+<node>
+  <interface name="com.lantharos.Firewall1">
+    <method name="OpenPort">
+      <arg type="q" direction="in"/>
+      <arg type="s" direction="in"/>
+      <arg type="s" direction="in"/>
+    </method>
+    <method name="ClosePort">
+      <arg type="q" direction="in"/>
+      <arg type="s" direction="in"/>
+    </method>
+    <property name="OpenPorts" type="a(qss)" access="read"/>
+  </interface>
+</node>

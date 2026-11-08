@@ -24,7 +24,7 @@
 	async function open() {
 		if (!ready) return;
 		opening = true;
-		if (await onopen({ port: Number(port), protocol })) port = '';
+		if (await onopen({ port: Number(port), protocol, networks: 'home' })) port = '';
 		opening = false;
 	}
 </script>

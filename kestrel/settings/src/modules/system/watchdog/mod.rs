@@ -14,10 +14,10 @@ use zbus::names::BusName;
 
 use crate::context::Context;
 use crate::modules::system::memory::Relief;
-use crate::shared::system::LoginProxy;
+use crate::shared::system::{LoginProxy, LoginSessionProxy};
 use buttons::Buttons;
 use cadence::{Cadence, Pressure};
-use proxies::{HealthProxy, LoginSessionProxy, LoginUserProxy, WatchdogProxy};
+use proxies::{HealthProxy, LoginUserProxy, WatchdogProxy};
 use stall::Stall;
 
 const KESTREL: &str = "com.lantharos.Kestrel";

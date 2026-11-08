@@ -26,6 +26,7 @@ import Plus from '@lucide/svelte/icons/plus';
 import Puzzle from '@lucide/svelte/icons/puzzle';
 import Shield from '@lucide/svelte/icons/shield';
 import ShieldCheck from '@lucide/svelte/icons/shield-check';
+import SquareTerminal from '@lucide/svelte/icons/square-terminal';
 import UserRound from '@lucide/svelte/icons/user-round';
 import Volume2 from '@lucide/svelte/icons/volume-2';
 import Wifi from '@lucide/svelte/icons/wifi';
@@ -100,6 +101,7 @@ const VIEWS: Record<PageId, View> = {
 	'input/dictation': { icon: Mic, load: input },
 	'security/encryption': { icon: HardDrive, load: security },
 	'security/keyring': { icon: KeyRound, load: security },
+	'security/remote-login': { icon: SquareTerminal, load: security },
 	'accounts/login': { icon: LogIn, load: accounts },
 	'accounts/add': { icon: Plus, load: accounts },
 	'system/about': { icon: Info, load: system }

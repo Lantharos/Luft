@@ -55,6 +55,30 @@ impl Protocol {
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Type)]
 #[serde(rename_all = "lowercase")]
+pub enum PortNetworks {
+    Home,
+    Anywhere,
+}
+
+impl PortNetworks {
+    fn parse(name: &str) -> Option<Self> {
+        match name {
+            "home" => Some(Self::Home),
+            "anywhere" => Some(Self::Anywhere),
+            _ => None,
+        }
+    }
+
+    fn name(self) -> &'static str {
+        match self {
+            Self::Home => "home",
+            Self::Anywhere => "anywhere",
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Type)]
+#[serde(rename_all = "lowercase")]
 pub enum FirewallAccess {
     Home,
     Anywhere,
@@ -166,6 +190,7 @@ pub struct NewNetwork {
 pub struct OpenPort {
     port: u16,
     protocol: Protocol,
+    networks: PortNetworks,
 }
 
 #[derive(Serialize, Type)]
@@ -210,7 +235,7 @@ async fn call(
 pub async fn read(Empty {}: Empty) -> Result<Option<Firewall>, String> {
     let firewall = proxy().await?;
     let Ok(ports) = firewall
-        .get_property::<Vec<(u16, String)>>("OpenPorts")
+        .get_property::<Vec<(u16, String, String)>>("OpenPorts")
         .await
     else {
         return Ok(None);
@@ -267,13 +292,17 @@ pub async fn read(Empty {}: Empty) -> Result<Option<Firewall>, String> {
             .collect(),
         open_ports: ports
             .into_iter()
-            .filter_map(|(port, protocol)| {
+            .filter_map(|(port, protocol, networks)| {
                 let protocol = match protocol.as_str() {
                     "tcp" => Protocol::Tcp,
                     "udp" => Protocol::Udp,
                     _ => return None,
                 };
-                Some(OpenPort { port, protocol })
+                Some(OpenPort {
+                    port,
+                    protocol,
+                    networks: PortNetworks::parse(&networks)?,
+                })
             })
             .collect(),
         apps,
@@ -290,11 +319,17 @@ pub async fn classify(
     call("SetNetworkType", &(connection, network_type.name())).await
 }
 
-pub async fn open_port(OpenPort { port, protocol }: OpenPort) -> Result<(), String> {
-    call("OpenPort", &(port, protocol.name())).await
+pub async fn open_port(
+    OpenPort {
+        port,
+        protocol,
+        networks,
+    }: OpenPort,
+) -> Result<(), String> {
+    call("OpenPort", &(port, protocol.name(), networks.name())).await
 }
 
-pub async fn close_port(OpenPort { port, protocol }: OpenPort) -> Result<(), String> {
+pub async fn close_port(OpenPort { port, protocol, .. }: OpenPort) -> Result<(), String> {
     call("ClosePort", &(port, protocol.name())).await
 }
 

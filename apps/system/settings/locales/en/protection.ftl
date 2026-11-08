@@ -453,6 +453,60 @@ settings-passwords-ssh-chip-description = It can never be copied off this comput
 settings-passwords-ssh-chip-unsupported = This computer’s security chip can’t hold SSH keys
 settings-passwords-ssh-add = Add key
 
+## Remote login: signing in to this computer from another device over SSH
+
+settings-remote-login = Remote login
+    .description = Sign in to this computer from another device with SSH, to use its terminal and files from there.
+settings-remote-login-off = Off
+settings-remote-login-on-home = On for devices on home networks
+settings-remote-login-on-everywhere = On for devices on every network
+settings-remote-login-turn-on-title = Turn on remote login?
+settings-remote-login-turn-on-description = Anyone with a key you add can then control this computer from another device, as you: open your files, run programs and change what you can change. At first only your account can sign in, and only with a key. Turning it on needs an administrator.
+settings-remote-login-connect = Connect
+    .description = From a terminal on a device on the same network:
+# { $text } is a command such as ssh anna@laptop.local
+settings-remote-login-copy = Copy { $text }
+settings-remote-login-addresses = Addresses
+settings-remote-login-host-keys = This computer’s keys
+settings-remote-login-host-keys-description = Check them the first time a device connects
+settings-remote-login-host-keys-explained = The first time a device connects, SSH shows a fingerprint and asks whether to trust it. It should be one of these. If it isn’t, something between the two devices is pretending to be this computer, so don’t go on.
+settings-remote-login-keys = Keys that can sign in
+    .description = Each device signs in as { $account } with a key of its own. Add the public key, the .pub file, of every device you’ll connect from.
+settings-remote-login-key-unnamed = Key without a name
+# { $kind } is the kind of key, such as Ed25519
+settings-remote-login-kind-security-key = { $kind } on a security key
+settings-remote-login-key-remove = Remove { $name }
+settings-remote-login-key-remove-title = Remove “{ $name }”?
+settings-remote-login-key-remove-description = The device with this key can’t sign in anymore. Anyone signed in with it stays connected until they disconnect.
+settings-remote-login-key-add = Add a key
+settings-remote-login-key-add-title = Add a key
+settings-remote-login-key-add-description = Paste the public key of the device that will connect, or choose its .pub file. A device without one can make it with ssh-keygen.
+settings-remote-login-key = Public key
+settings-remote-login-key-choose = Choose a file…
+settings-remote-login-key-add-button = Add key
+settings-remote-login-accounts = Accounts
+    .description = Accounts that can sign in over SSH. Each one signs in with its own keys, added while signed in to it.
+settings-remote-login-account-label = Let { $account } sign in over SSH
+settings-remote-login-safety = Who can connect
+settings-remote-login-passwords = Allow passwords
+settings-remote-login-passwords-description = Keys are much harder to guess or steal than passwords
+settings-remote-login-passwords-title = Allow signing in with a password?
+settings-remote-login-passwords-warning = Anyone who knows or guesses the password of an account above can then sign in from another device. Luft slows down repeated guesses, but a key can’t be guessed at all. Only allow this for a device that can’t use a key.
+settings-remote-login-passwords-allow = Allow passwords
+settings-remote-login-public = Also on public networks
+settings-remote-login-public-description = Otherwise only devices on home networks can connect
+settings-remote-login-public-title = Allow connections on public networks?
+settings-remote-login-public-warning = Devices on public networks, like in a café, hotel or airport, can then see that this computer takes SSH connections and try to sign in. Only the keys you added get in.
+settings-remote-login-public-allow = Allow
+settings-remote-login-sessions = Signed in now
+# { $address } is the address of the other device, such as 192.168.1.20
+settings-remote-login-session = { $account } from { $address }
+# { $when } is a time such as "5 minutes ago"
+settings-remote-login-session-since = Signed in { $when }
+settings-remote-login-disconnect = Disconnect
+settings-remote-login-disconnect-title = Disconnect { $account } at { $address }?
+settings-remote-login-disconnect-description = Their connection ends right away, along with anything running in it. They can sign in again with their key.
+
 ## Passkeys
 
 settings-passkeys-title = Passkeys

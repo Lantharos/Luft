@@ -1,4 +1,4 @@
-use std::collections::BTreeSet;
+use std::collections::BTreeMap;
 use std::fmt;
 use std::io;
 
@@ -58,19 +58,59 @@ impl fmt::Display for Port {
     }
 }
 
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+pub enum Networks {
+    Home,
+    Anywhere,
+}
+
+impl Networks {
+    pub fn parse(name: &str) -> Option<Self> {
+        match name {
+            "home" => Some(Self::Home),
+            "anywhere" => Some(Self::Anywhere),
+            _ => None,
+        }
+    }
+
+    pub fn name(self) -> &'static str {
+        match self {
+            Self::Home => "home",
+            Self::Anywhere => "anywhere",
+        }
+    }
+}
+
+pub type Opened = BTreeMap<Port, Networks>;
+
 pub fn parse(text: &str) -> Option<Port> {
     let (number, protocol) = text.split_once('/')?;
     Port::new(number.parse().ok()?, protocol)
 }
 
-pub fn load() -> io::Result<BTreeSet<Port>> {
+fn parse_opened(line: &str) -> Option<(Port, Networks)> {
+    let mut fields = line.split(' ');
+    let port = parse(fields.next()?)?;
+    let networks = fields
+        .next()
+        .map_or(Some(Networks::Home), Networks::parse)?;
+    Some((port, networks))
+}
+
+pub fn load() -> io::Result<Opened> {
     Ok(crate::store::read(STORE)?
         .lines()
-        .filter_map(parse)
+        .filter_map(parse_opened)
         .collect())
 }
 
-pub fn save(ports: &BTreeSet<Port>) -> io::Result<()> {
-    let text: String = ports.iter().map(|port| format!("{port}\n")).collect();
+pub fn save(ports: &Opened) -> io::Result<()> {
+    let text: String = ports
+        .iter()
+        .map(|(port, networks)| match networks {
+            Networks::Home => format!("{port}\n"),
+            Networks::Anywhere => format!("{port} anywhere\n"),
+        })
+        .collect();
     crate::store::replace(STORE, &text)
 }

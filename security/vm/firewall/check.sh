@@ -182,7 +182,7 @@ first() {
   [[ "$(unclassified)" == "a(os) 0" ]] || fail "a home network still waits for a type"
   apps_on_home
   expect closed "port 80 of a system service on a home network" reaches "$system"
-  firewall OpenPort qs 80 tcp || fail "OpenPort 80"
+  firewall OpenPort qss 80 tcp home || fail "OpenPort 80"
   expect open "port 80 opened in Settings" reaches "$system"
   virtual_networks
   untouched_tables

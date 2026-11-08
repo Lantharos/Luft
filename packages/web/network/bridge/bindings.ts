@@ -14,6 +14,7 @@ export const commands = {
 	networkClosePort: (params: {
 		port: number,
 		protocol: Protocol,
+		networks: PortNetworks,
 	}, options?: CallOptions) => invoke<null>("network_close_port", params, options),
 	networkDeactivate: (params: {
 		active: string,
@@ -37,6 +38,7 @@ export const commands = {
 	networkOpenPort: (params: {
 		port: number,
 		protocol: Protocol,
+		networks: PortNetworks,
 	}, options?: CallOptions) => invoke<null>("network_open_port", params, options),
 	networkProfile: (params: {
 		path: string,
@@ -190,7 +192,10 @@ export type NewNetwork = {
 export type OpenPort = {
 	port: number,
 	protocol: Protocol,
+	networks: PortNetworks,
 };
+
+export type PortNetworks = "home" | "anywhere";
 
 export type Profile = {
 	kind: Kind,

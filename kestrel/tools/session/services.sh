@@ -99,7 +99,7 @@ start "$fixtures/session/soundDefaults.sh"
 wait_until "the print server" printer_ready
 stand_in_power_button
 DBUS_SYSTEM_BUS_ADDRESS="$system_bus" GIO_USE_VFS=local start "$root/target/release/kestrel-settings" \
-  --modules a11y,housekeeping,keyboard,network-type,night-light,power,printers,sound,timezone,watchdog,xsettings
+  --modules a11y,housekeeping,keyboard,network-type,night-light,power,printers,remote-login,sound,timezone,watchdog,xsettings
 gdbus wait --session --timeout 10 com.lantharos.Settings
 DBUS_SYSTEM_BUS_ADDRESS="$system_bus" start "$root/target/release/kestrel-search"
 gdbus wait --session --timeout 10 com.lantharos.Search

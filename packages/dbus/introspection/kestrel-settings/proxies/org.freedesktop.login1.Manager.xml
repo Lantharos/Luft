@@ -26,6 +26,10 @@
     <signal name="PrepareForSleep">
       <arg type="b"/>
     </signal>
+    <signal name="SessionNew">
+      <arg type="s"/>
+      <arg type="o"/>
+    </signal>
     <property name="LidClosed" type="b" access="read"/>
   </interface>
 </node>

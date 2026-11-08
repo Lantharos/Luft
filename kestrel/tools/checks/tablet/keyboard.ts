@@ -8,7 +8,8 @@ import {toggleSurface, Main, getInputSourceManager} from 'resource:///com/lantha
 import {descendants, labelled, labelOf, named, shown, shownStyled, styled} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {inputMethodSettled} from '../lib/input/inputMethod.js';
-import {centerOf, hold, press, release, type Point} from '../lib/input/input.js';
+import {centerOf, click, hold, press, release, type Point} from '../lib/input/input.js';
+import {penTap} from '../lib/input/penStroke.js';
 import {LuftApp} from '../lib/apps/luftApp.js';
 import {fixture, gjs, scratch, spawn, stop, waitForWindow, type Process} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
@@ -182,6 +183,35 @@ function switchInputSource() {
   release(Clutter.KEY_Super_L);
 }
 
+async function penTapsBeside(label: string, point: Point) {
+  await penTap(point);
+  await pause(KEYBOARD_DELAY);
+  await settled();
+  require(keyboardHidden(), `tapping ${label} with the pen leaves the on-screen keyboard hidden`);
+}
+
+async function checkHeft() {
+  const heft = new LuftApp('heft', [], {}, {id: 'com.lantharos.Heft'});
+  try {
+    await heft.open();
+    heft.window.maximize();
+    await settled(1500);
+    const {x, y, width, height} = heft.window.get_frame_rect();
+    const paper: Point = [x + width / 2, y + height * 0.6];
+    await tapsBeside('the paper in Heft', paper);
+    await tapsBeside('the paper in Heft again', paper);
+    await penTapsBeside('the paper in Heft', [paper[0] + 80, paper[1]]);
+    await tapsBeside('the paper in Heft after the pen', paper);
+    click(paper);
+    await pause(KEYBOARD_DELAY);
+    require(!Main.inputMethod.currentFocus, 'text typed on the paper in Heft keeps the on-screen keyboard out of it');
+    await tapsBeside('text being typed in Heft', paper);
+    await capture('tablet-keyboard-heft');
+  } finally {
+    await heft.close();
+  }
+}
+
 async function checkLayouts() {
   const settings = new Gio.Settings({schema_id: 'org.gnome.desktop.input-sources'});
   const saved = {sources: settings.get_value('sources'), mru: settings.get_value('mru-sources')};
@@ -295,6 +325,7 @@ export async function run() {
     await checkSabine();
     await checkLayouts();
     await checkChromiumApps();
+    await checkHeft();
   } finally {
     await fold(false);
   }

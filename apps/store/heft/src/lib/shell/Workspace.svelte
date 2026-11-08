@@ -8,9 +8,10 @@
 	import PanelLeft from '@lucide/svelte/icons/panel-left';
 	import { t } from '@luft/i18n';
 	import { IconButton } from '@luft/ui';
+	import { arrangement } from '#lib/app/arrangement.svelte.js';
 	import { settings } from '#lib/app/settings.svelte.js';
 	import { appState } from '#lib/app/state.js';
-	import { addPicture } from '#lib/objects/editing.svelte.js';
+	import { addPicture, editing } from '#lib/objects/editing.svelte.js';
 	import { requests } from '#lib/app/requests.svelte.js';
 	import ExportDialog from '#lib/export/ExportDialog.svelte';
 	import PaperDialog from '#lib/paper/PaperDialog.svelte';
@@ -19,7 +20,7 @@
 	import PageRail from '#lib/rail/PageRail.svelte';
 	import Toolbar from '#lib/tools/Toolbar.svelte';
 	import Header from './Header.svelte';
-	import { handleKeys } from './keyboard';
+	import { handleKeys, typeFromKey } from './keyboard';
 	import NotebookMenu from './NotebookMenu.svelte';
 	import { Pane } from './pane.svelte';
 	import PaneView from './PaneView.svelte';
@@ -42,7 +43,8 @@
 	});
 	let focused = $state<'main' | 'second'>('main');
 	let pane = $derived(focused === 'second' && second ? second : main);
-	let railOpen = $state(appState.get<boolean>('rail') ?? true);
+	let rails = $state({ laptop: appState.get<boolean>('rail') ?? true, tablet: appState.get<boolean>('railTablet') ?? false });
+	let railOpen = $derived(arrangement.tablet ? rails.tablet : rails.laptop);
 	let panelOpen = $state(appState.get<boolean>('recordingPanel') ?? false);
 	let playing = $derived(player.openIn(pane.notebook));
 	let focusing = $state(false);
@@ -55,7 +57,7 @@
 	let height = $state(0);
 	let current = $derived(pane.current);
 	let books = $derived(pane.notebook.meta.pages.some((page) => page.pdf));
-	let side = $derived(settings.toolbar === 'side');
+	let tools = $derived(settings.toolbar);
 	let single = $derived(pane.viewport.single !== null);
 
 	function quoteFrom(from: Pane) {
@@ -77,11 +79,23 @@
 		void appState.save({ recordingPanel: panelOpen });
 	}
 
+	function beginTyping() {
+		const aim = editing.aim;
+		editing.aim = null;
+		aim?.type();
+		return aim !== null;
+	}
+
 	const pageInView = () => pane.notebook.meta.pages[pane.current]?.id ?? pane.notebook.meta.pages[0].id;
 
 	function toggleRail() {
-		railOpen = !railOpen;
-		void appState.save({ rail: railOpen });
+		if (arrangement.tablet) {
+			rails.tablet = !rails.tablet;
+			void appState.save({ railTablet: rails.tablet });
+		} else {
+			rails.laptop = !rails.laptop;
+			void appState.save({ rail: rails.laptop });
+		}
 	}
 </script>
 
@@ -90,7 +104,7 @@
 		if (event.key === 'F11' || (focusing && event.key === 'Escape')) {
 			event.preventDefault();
 			focusMode(!focusing);
-		} else handleKeys(event, pane.actions, pane.viewport);
+		} else if (!typeFromKey(event, beginTyping)) handleKeys(event, pane.actions, pane.viewport);
 	}}
 	onpaste={(event) => void paste(event)}
 />
@@ -107,7 +121,7 @@
 			<IconButton icon={PanelLeft} label={railOpen ? t('rail-hide') : t('rail-show')} onclick={toggleRail} />
 			<NotebookMenu notebook={pane.notebook} {current} />
 		</div>
-		{#if !side}
+		{#if tools === 'top'}
 			<Toolbar actions={pane.actions} zoom={pane.viewport.zoom} {books} ruled={pane.ruler.shown} />
 		{/if}
 		<div class="flex flex-1 items-center justify-end gap-2">
@@ -122,8 +136,15 @@
 			<IconButton icon={focusing ? Minimize : Maximize} label={focusing ? t('focus-leave') : t('focus-enter')} onclick={() => focusMode(!focusing)} />
 		</div>
 	</div>
+	{#if tools === 'bar'}
+		<div class="hidden-scroll flex-none overflow-x-auto">
+			<div class="mx-auto w-max px-3 pb-2">
+				<Toolbar actions={pane.actions} zoom={pane.viewport.zoom} {books} ruled={pane.ruler.shown} />
+			</div>
+		</div>
+	{/if}
 	<div class="flex min-h-0 flex-1">
-		{#if side}
+		{#if tools === 'side'}
 			<div class="soft-scroll flex flex-none flex-col items-center overflow-y-auto px-2 pb-3">
 				<Toolbar actions={pane.actions} zoom={pane.viewport.zoom} {books} ruled={pane.ruler.shown} side />
 			</div>

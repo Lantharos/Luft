@@ -1,6 +1,7 @@
 import { settings } from '#lib/app/settings.svelte.js';
 import type { Stroke } from '#lib/ink/stroke.js';
 import { activity } from '#lib/input/activity.js';
+import { editing } from '#lib/objects/editing.svelte.js';
 import { pen } from '#lib/input/pen.svelte.js';
 import { tools } from '#lib/tools/tools.svelte.js';
 import { Drawing, Erasing, pagePoint, type Origin, type Target } from './drawing';
@@ -27,14 +28,21 @@ export interface SurfaceHost {
 	target(index: number): Target | null;
 	preview(scale: number, x: number, y: number): void;
 	ruler(): Ruler;
-	/** A click or tap with something other than the pen, to type there. */
+	/** A click with the mouse, to type there. */
 	typeAt(target: Target, x: number, y: number, client: [number, number]): void;
+	/** A tap with a finger, or with the pen while typing, to type there with the next key. */
+	aim(target: Target, x: number, y: number): void;
 	/** A stroke was written with the pen or mouse. */
 	wrote(target: Target, stroke: Stroke): void;
 	undo(): void;
 	redo(): void;
 	/** A tap on a page; true when it was taken, such as to play what was said as it was written there. */
 	tapped(index: number, x: number, y: number): boolean;
+}
+
+function stopTyping() {
+	const active = document.activeElement;
+	if (active instanceof HTMLElement && active.isContentEditable) active.blur();
 }
 
 type Action = Drawing | Erasing | TextPicking | TextCarrying | Lassoing | { pan: true; x: number; y: number };
@@ -100,11 +108,16 @@ export class Surface {
 		this.host.typeAt(target, x, y, [clientX, clientY]);
 	}
 
+	private aimAt(target: Target, clientX: number, clientY: number) {
+		this.host.aim(target, ...pagePoint(this.viewport, this.origin, target.page, { clientX, clientY }));
+	}
+
 	private tap(clientX: number, clientY: number) {
 		const rect = this.element.getBoundingClientRect();
 		this.origin = { left: rect.left, top: rect.top };
 		const target = this.targetAt(clientX, clientY);
-		if (target) this.typeAt(target, clientX, clientY);
+		stopTyping();
+		if (target) this.aimAt(target, clientX, clientY);
 	}
 
 	private toolFor(event: PointerEvent): Tool | null {
@@ -119,9 +132,14 @@ export class Surface {
 		if (!target) return null;
 		activity.mark();
 		selection.clear();
-		if (document.activeElement instanceof HTMLElement && document.activeElement.isContentEditable && tool !== 'type') document.activeElement.blur();
-		if (tool === 'type') {
+		editing.aim = null;
+		if (tool === 'type' && event.pointerType === 'mouse') {
 			this.typeAt(target, event.clientX, event.clientY);
+			return null;
+		}
+		stopTyping();
+		if (tool === 'type') {
+			this.aimAt(target, event.clientX, event.clientY);
 			return null;
 		}
 		if (tool === 'lasso') return new Lassoing(this.viewport, this.origin, target, this.live, event);

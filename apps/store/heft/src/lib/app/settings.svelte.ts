@@ -1,5 +1,5 @@
-import { appearance } from '@luft/ui';
 import { commands } from '#lib/bindings.js';
+import { arrangement } from './arrangement.svelte';
 import type { Processing } from '#lib/recording/model.js';
 
 export type ToolbarPlace = 'top' | 'side';
@@ -46,9 +46,9 @@ class Settings {
 	values: SettingsValues = $state({ ...DEFAULTS });
 	private timer = 0;
 
-	/** Folded into a tablet, the tools move to the side, where the hand that isn't writing reaches them. */
-	get toolbar(): ToolbarPlace {
-		return appearance.posture === 'tablet' ? 'side' : this.values.toolbar;
+	/** Folded into a tablet or standing upright, the tools sit in a bar above the page. */
+	get toolbar(): ToolbarPlace | 'bar' {
+		return arrangement.tablet ? 'bar' : this.values.toolbar;
 	}
 
 	async load() {

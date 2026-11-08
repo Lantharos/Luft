@@ -2,6 +2,7 @@ import { requests } from '#lib/app/requests.svelte.js';
 import { session } from '#lib/app/session.svelte.js';
 import type { PageFlow } from '#lib/app/settings.svelte.js';
 import { appState } from '#lib/app/state.js';
+import { arrangement } from '#lib/app/arrangement.svelte.js';
 import { pageNear } from '#lib/canvas/layout.js';
 import { Ruler } from '#lib/canvas/ruler/ruler.svelte.js';
 import { Viewport } from '#lib/canvas/viewport.svelte.js';
@@ -50,7 +51,7 @@ export class Pane {
 			viewport.clamp();
 		}
 		const first = viewport.layout.pages[0];
-		if (!place || first.width * viewport.zoom > viewport.width) viewport.fitWidth(first);
+		if (!place || arrangement.tablet || first.width * viewport.zoom > viewport.width) viewport.fitWidth(first);
 	}
 
 	follow() {

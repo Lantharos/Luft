@@ -82,7 +82,7 @@
 				{object}
 				{zoom}
 				draft={object === draft}
-				editable={tools.active === 'type' || editing.active === object.id || object === draft}
+				editable={editing.active === object.id || object === draft}
 				onchange={(next) => change(object, next)}
 				onoverflow={(element) => void overflow(pages, page, object, element)}
 			/>
@@ -91,6 +91,9 @@
 		{/if}
 	{/each}
 	<InsertionMark {page} {zoom} {revision} />
+	{#if editing.aim?.page === page}
+		<span class="aim" style:left="{editing.aim.x * zoom}px" style:top="{editing.aim.y * zoom}px" style:height="{editing.aim.height * zoom}px"></span>
+	{/if}
 </div>
 
 {#if cropping}
@@ -102,5 +105,19 @@
 		position: absolute;
 		inset: 0;
 		pointer-events: none;
+	}
+
+	.aim {
+		position: absolute;
+		width: 2px;
+		border-radius: 1px;
+		background: #3d7bd9;
+		animation: blink 1.1s steps(1) infinite;
+	}
+
+	@keyframes blink {
+		50% {
+			opacity: 0;
+		}
 	}
 </style>

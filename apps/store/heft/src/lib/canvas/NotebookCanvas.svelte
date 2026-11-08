@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, setContext, untrack } from 'svelte';
 	import { appearance } from '@luft/ui';
+	import { arrangement } from '#lib/app/arrangement.svelte.js';
 	import { carry } from '#lib/drag/carry.svelte.js';
 	import type { OpenNotebook } from '#lib/library/notebook.svelte.js';
 	import { pageSize, paperOf } from '#lib/library/model.js';
@@ -12,7 +13,7 @@
 	import { Converter } from '#lib/convert/converter.svelte.js';
 	import type { Page } from '#lib/convert/writing.js';
 	import type { Stroke } from '#lib/ink/stroke.js';
-	import { draftText, editing } from '#lib/objects/editing.svelte.js';
+	import { draftPlace, draftText, editing } from '#lib/objects/editing.svelte.js';
 	import { linesOf } from '#lib/typing/flow.js';
 	import { player } from '#lib/recording/player.svelte.js';
 	import { writtenAt } from '#lib/recording/written.js';
@@ -61,19 +62,43 @@
 		if (page) void converter.convertNow(page, strokes);
 	}
 
-	/** Puts the caret where a click or tap landed: into text that's there, or on a new line of the page. */
+	function textAt(id: string, x: number, y: number) {
+		const objects = stores.get(id)!.document.objects;
+		const hit = objects.find((object) => object.kind === 'text' && x >= object.x && x <= object.x + object.width && y >= object.y && y <= object.y + object.height);
+		return hit ?? (notebook.meta.typed ? objects.find((object) => object.flow) : undefined);
+	}
+
+	/** Puts the caret where a click landed or a tap aimed: into text that's there, or on a new line of the page. */
 	function typeAt(id: string, x: number, y: number, client: [number, number]) {
 		const index = notebook.indexOf(id);
-		const store = stores.get(id);
-		if (!store) return;
-		const objects = store.document.objects;
-		const hit = objects.find((object) => object.kind === 'text' && x >= object.x && x <= object.x + object.width && y >= object.y && y <= object.y + object.height);
-		const flowing = notebook.meta.typed ? objects.find((object) => object.flow) : undefined;
-		if (hit ?? flowing) {
-			editing.focus = { id: (hit ?? flowing)!.id, at: client };
+		if (!stores.has(id)) return;
+		const text = textAt(id, x, y);
+		if (text) {
+			editing.focus = { id: text.id, at: client };
 			return;
 		}
 		draftText(id, linesOf(notebook, notebook.meta.pages[index]), x, y, viewport.layout.pages[index].width, notebook.meta.typed);
+	}
+
+	/** Marks where a tap landed, for the next key typed on a keyboard to start typing there. */
+	function aimAt(id: string, x: number, y: number) {
+		if (!appearance.keyboard || !stores.has(id)) return;
+		const index = notebook.indexOf(id);
+		const lines = linesOf(notebook, notebook.meta.pages[index]);
+		const text = textAt(id, x, y);
+		const draft = draftPlace(lines, x, y);
+		editing.aim = {
+			page: id,
+			x: text ? x : draft.left + 4,
+			y: text ? y - lines.step / 2 : draft.top,
+			height: text?.line ?? lines.step,
+			type: () => {
+				const page = viewport.layout.pages[notebook.indexOf(id)];
+				const box = element.getBoundingClientRect();
+				const [viewX, viewY] = viewport.toView(page.left + x, page.top + y);
+				typeAt(id, x, y, [box.left + viewX, box.top + viewY]);
+			}
+		};
 	}
 
 	$effect(() => {
@@ -81,17 +106,20 @@
 		untrack(() => viewport.clamp());
 	});
 
-	let lastWidth = 0;
+	let last = { width: 0, margin: 0 };
 
 	$effect(() => {
 		const width = viewport.width;
+		const margin = arrangement.margin;
 		untrack(() => {
 			const page = viewport.layout.pages[0];
-			const fitted = page && Math.abs(viewport.zoom - (lastWidth - 64) / page.width) < viewport.zoom * 0.02;
-			if (lastWidth && width && fitted) viewport.fitWidth(page);
+			const fit = page && last.width ? (last.width - 2 * last.margin) / page.width : 0;
+			const fitted = Math.abs(viewport.zoom - fit) < viewport.zoom * 0.02;
+			const zoomedIn = viewport.zoom > fit * 1.02;
+			if (fit && width && (fitted || (arrangement.tablet && !zoomedIn))) viewport.fitWidth(page);
 			else viewport.clamp();
 		});
-		lastWidth = width;
+		last = { width, margin };
 	});
 
 	let range = $derived.by(() => {
@@ -135,6 +163,7 @@
 			},
 			ruler: () => ruler,
 			typeAt: (target, x, y, client) => typeAt(target.id, x, y, client),
+			aim: (target, x, y) => aimAt(target.id, x, y),
 			wrote: (target, stroke) => converter.wrote(target.id, stroke),
 			undo: () => notebook.undo(),
 			redo: () => notebook.redo(),
@@ -161,13 +190,6 @@
 	});
 
 	$effect(() => live?.resize(viewport.width, viewport.height, scale));
-
-	function keepAboveKeyboard(event: FocusEvent) {
-		const target = event.target as HTMLElement;
-		if (appearance.posture !== 'tablet' || !target.isContentEditable) return;
-		const top = target.getBoundingClientRect().top - element.getBoundingClientRect().top;
-		if (top > viewport.height * 0.35) viewport.panBy(0, top - viewport.height * 0.2);
-	}
 </script>
 
 <div
@@ -181,7 +203,6 @@
 	onpointercancel={(event) => surface.cancel(event)}
 	onwheel={(event) => surface.wheel(event)}
 	oncontextmenu={(event) => event.preventDefault()}
-	onfocusin={keepAboveKeyboard}
 	role="application"
 >
 	<div

@@ -89,6 +89,7 @@
 	style:--line={object.line && `${object.line}px`}
 	style:--size={object.size && `${object.size}px`}
 	contenteditable={editable}
+	inputmode="none"
 	role="textbox"
 	tabindex={editable ? 0 : -1}
 	aria-multiline="true"
@@ -97,5 +98,5 @@
 	onkeydown={keydown}
 	onfocus={() => (editing.active = object.id)}
 	onblur={blur}
-	onpointerdown={(event) => editable && event.pointerType !== 'pen' && event.stopPropagation()}
+	onpointerdown={(event) => editable && event.pointerType === 'mouse' && event.stopPropagation()}
 ></div>

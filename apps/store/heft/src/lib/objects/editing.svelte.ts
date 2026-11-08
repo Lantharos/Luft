@@ -15,15 +15,25 @@ export interface FocusRequest {
 	offset?: number;
 }
 
+/** Where a tap marked that typing on the keyboard starts, on a page, and how to start it there. */
+export interface Aim {
+	page: string;
+	x: number;
+	y: number;
+	height: number;
+	type(): void;
+}
+
 /**
  * The text box that should take the caret as soon as it shows, the one being
- * typed in, a new one that exists only until something is typed in it, and
- * the picture to crop as soon as it shows.
+ * typed in, a new one that exists only until something is typed in it, where
+ * the next key typed starts typing, and the picture to crop as soon as it shows.
  */
 class Editing {
 	focus: FocusRequest | null = $state(null);
 	active: string | null = $state(null);
 	draft: { page: string; object: PageObject } | null = $state.raw(null);
+	aim: Aim | null = $state.raw(null);
 	crop: string | null = $state(null);
 }
 
@@ -36,13 +46,18 @@ function addText(document: PageDocument, x: number, y: number, pageWidth: number
 	return object;
 }
 
+/** Where a text box drafted at a point starts: on the line there, at the margin when it's close. */
+export function draftPlace(lines: TextLines, x: number, y: number) {
+	const left = lines.margin && x < lines.margin + 8 ? lines.margin : Math.max(0, x - 4);
+	return { left, top: baselineAt(lines, y) - measure(lines.size, lines.step).baseline };
+}
+
 /**
  * Gets a text box ready on a page's line at a point, which only becomes part
  * of the page once something is typed in it.
  */
 export function draftText(page: string, lines: TextLines, x: number, y: number, pageWidth: number, flow = false) {
-	const left = lines.margin && x < lines.margin + 8 ? lines.margin : Math.max(0, x - 4);
-	const top = baselineAt(lines, y) - measure(lines.size, lines.step).baseline;
+	const { left, top } = draftPlace(lines, x, y);
 	const object: PageObject = { id: newId(), kind: 'text', x: left, y: top, width: widthFrom(left, pageWidth), height: lines.step, html: '', text: '', line: lines.step, size: lines.size, ...(flow ? { flow } : {}) };
 	editing.draft = { page, object };
 	editing.focus = { id: object.id };

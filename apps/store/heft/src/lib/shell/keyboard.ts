@@ -1,11 +1,25 @@
+import { flushSync } from 'svelte';
 import { session } from '#lib/app/session.svelte.js';
 import type { Viewport } from '#lib/canvas/viewport.svelte.js';
+import { editing } from '#lib/objects/editing.svelte.js';
 import type { ToolbarActions } from '#lib/tools/Toolbar.svelte';
 import { selection } from '#lib/selection/selection.svelte.js';
 import { tools } from '#lib/tools/tools.svelte.js';
 
 const inField = (target: EventTarget | null) => target instanceof HTMLElement && ['INPUT', 'TEXTAREA'].includes(target.tagName);
 const typing = (target: EventTarget | null) => inField(target) || (target instanceof HTMLElement && target.isContentEditable);
+
+const printable = (event: KeyboardEvent) => [...event.key].length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey;
+
+/** A letter typed on the keyboard while nothing takes text starts typing where `begin` puts the caret, as its first letter. */
+export function typeFromKey(event: KeyboardEvent, begin: () => boolean) {
+	if (!printable(event) || typing(event.target) || !begin()) return false;
+	flushSync();
+	if (!typing(document.activeElement)) return true;
+	event.preventDefault();
+	document.execCommand('insertText', false, event.key);
+	return true;
+}
 
 export function handleKeys(event: KeyboardEvent, actions: ToolbarActions, viewport: Viewport) {
 	const command = event.ctrlKey || event.metaKey;
@@ -19,6 +33,7 @@ export function handleKeys(event: KeyboardEvent, actions: ToolbarActions, viewpo
 		event.preventDefault();
 		action();
 	};
+	if (key === 'escape' && editing.aim) return run(() => (editing.aim = null));
 	if (selection.active) {
 		if (key === 'delete' || key === 'backspace') return run(() => selection.remove());
 		if (key === 'escape') return run(() => selection.clear());

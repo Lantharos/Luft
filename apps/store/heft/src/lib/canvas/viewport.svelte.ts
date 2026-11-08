@@ -1,3 +1,4 @@
+import { arrangement } from '#lib/app/arrangement.svelte.js';
 import type { Layout } from './layout';
 
 export const MIN_ZOOM = 0.25;
@@ -69,9 +70,11 @@ export class Viewport {
 		this.clamp();
 	}
 
-	fitWidth(page: { width: number }, margin = 32) {
+	fitWidth(page: { left: number; width: number }, margin = arrangement.margin) {
 		const zoom = (this.width - margin * 2) / page.width;
 		this.zoomAt(zoom, this.width / 2, 0);
+		this.x = page.left * this.zoom - margin;
+		this.clamp();
 	}
 
 	fitPage(page: { width: number; height: number; top: number }, margin = 24) {

@@ -4,13 +4,22 @@ import GLib from 'gi://GLib';
 const UPOWER = 'org.freedesktop.UPower';
 const UPOWER_PATH = '/org/freedesktop/UPower';
 const DEVICE = 'org.freedesktop.UPower.Device';
-const NOT_DISCHARGING = new Set([1, 4, 5]);
+const CHARGING = 1;
+const DISCHARGING = 2;
+const FULLY_CHARGED = 4;
+
+export type Charge = 'charging' | 'discharging' | 'unknown';
+
+function chargeOf(state: number): Charge {
+  if (state === CHARGING || state === FULLY_CHARGED) return 'charging';
+  return state === DISCHARGING ? 'discharging' : 'unknown';
+}
 
 export interface PowerDevice {
   kind: number;
   model: string;
   percentage: number;
-  discharging: boolean;
+  charge: Charge;
 }
 
 type Listener = (device: PowerDevice) => void;
@@ -58,7 +67,7 @@ export class PowerDevices {
             kind: property<number>('Type'),
             model: property<string>('Model') ?? '',
             percentage: property<number>('Percentage'),
-            discharging: !NOT_DISCHARGING.has(property<number>('State')),
+            charge: chargeOf(property<number>('State')),
           });
         };
         proxy.connect('g-properties-changed', report);

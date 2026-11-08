@@ -7,6 +7,7 @@ import { PowerDevices, type PowerDevice } from './powerDevices.js';
 
 const THRESHOLDS = [20, 10];
 const RECHARGED_MARGIN = 5;
+const REPEAT_AFTER_MS = 6 * 60 * 60 * 1000;
 
 const ACCESSORIES: Record<number, [name: string, icon: string]> = {
   5: ['battery-device-mouse', 'input-mouse-symbolic'],
@@ -55,14 +56,16 @@ function warning({ kind, model, percentage }: PowerDevice, threshold: number): W
 
 export class BatteryWarnings {
   private readonly warned = new Map<string, Warned>();
+  private readonly lastShown = new Map<string, { threshold: number; at: number }>();
   private readonly devices = new PowerDevices(device => this.update(device));
 
   private update(device: PowerDevice): void {
     const identity = `${device.kind}:${device.model}`;
-    if (!device.discharging) {
+    if (device.charge === 'charging') {
       this.clear(identity);
       return;
     }
+    if (device.charge === 'unknown') return;
     let warned = this.warned.get(identity);
     if (!warned) {
       warned = { threshold: null, notification: null };
@@ -73,6 +76,9 @@ export class BatteryWarnings {
     const threshold = reached(device.percentage);
     if (threshold === null || (warned.threshold !== null && threshold >= warned.threshold)) return;
     warned.threshold = threshold;
+    const last = this.lastShown.get(identity);
+    if (last && last.threshold <= threshold && Date.now() - last.at < REPEAT_AFTER_MS) return;
+    this.lastShown.set(identity, { threshold, at: Date.now() });
     this.show(warned, warning(device, threshold));
   }
 

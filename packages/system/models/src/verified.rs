@@ -7,8 +7,8 @@ use std::path::{Path, PathBuf};
 use anyhow::Result;
 use sha2::{Digest, Sha256};
 
-use super::download::BUFFER;
-use super::manifest::File;
+use crate::catalog::File;
+use crate::download::BUFFER;
 
 pub const RECORD: &str = ".verified";
 
@@ -102,7 +102,7 @@ mod tests {
     #[test]
     fn files_are_checked_once_and_thrown_away_when_they_differ() {
         let folder =
-            std::env::temp_dir().join(format!("luft-speech-verified-{}", std::process::id()));
+            std::env::temp_dir().join(format!("luft-models-verified-{}", std::process::id()));
         fs::create_dir_all(&folder).unwrap();
         let target = folder.join("model.bin");
         fs::write(&target, b"hello").unwrap();

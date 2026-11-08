@@ -16,14 +16,13 @@ anyhow.workspace = true
 gio.workspace = true
 libc.workspace = true
 luft-dbus-macros.workspace = true
+luft-models.workspace = true
 luft-speech.workspace = true
 ort = { workspace = true, features = ["api-24", "std"] }
 pipewire.workspace = true
 serde.workspace = true
 serde_json.workspace = true
-sha2.workspace = true
 tokio = { workspace = true, features = ["macros", "rt-multi-thread", "signal", "sync", "time"] }
-ureq.workspace = true
 whisper-rs = { workspace = true, features = ["vulkan"] }
 zbus = { workspace = true, features = ["proxy", "service", "tokio"] }
 

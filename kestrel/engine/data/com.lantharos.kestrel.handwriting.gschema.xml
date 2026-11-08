@@ -1,0 +1,9 @@
+<schemalist>
+  <schema id="com.lantharos.kestrel.handwriting" path="/com/lantharos/kestrel/handwriting/">
+    <key name="enabled" type="b">
+      <default>false</default>
+      <summary>Handwriting</summary>
+      <description>When on, touching a text field with a pen opens a writing strip under it, and what's written there is typed into the field. Turning it on in Settings downloads the handwriting model first.</description>
+    </key>
+  </schema>
+</schemalist>

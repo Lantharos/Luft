@@ -46,7 +46,7 @@ build_helpers() {
   bun "$tools/build.ts" "$built_tools"
   build_extensions
   (cd "$root" && cargo build --release --quiet -p kestrel-session-manager -p kestrel-settings -p kestrel-search -p kestrel-portal -p luft-pinentry \
-    -p kestrel-openconnect -p kestrel-greeter-service -p kestrel-wrapper -p peek -p luft-accounts-service -p luft-speech-service)
+    -p kestrel-openconnect -p kestrel-greeter-service -p kestrel-wrapper -p peek -p luft-accounts-service -p luft-speech-service -p luft-handwriting-service)
 }
 
 dbus_service() {

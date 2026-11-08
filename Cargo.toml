@@ -54,7 +54,9 @@ members = [
     "packages/system/accounts",
     "packages/system/disks",
     "packages/system/fingerprint",
+    "packages/system/handwriting",
     "packages/system/meet",
+    "packages/system/models",
     "packages/system/network",
     "packages/system/recovery-key",
     "packages/system/software",
@@ -66,6 +68,7 @@ members = [
     "security/crates/trust",
     "security/crates/usb",
     "services/accounts",
+    "services/handwriting",
     "services/packages",
     "services/sleep",
     "services/speech",
@@ -123,7 +126,9 @@ default-members = [
     "packages/system/accounts",
     "packages/system/disks",
     "packages/system/fingerprint",
+    "packages/system/handwriting",
     "packages/system/meet",
+    "packages/system/models",
     "packages/system/network",
     "packages/system/recovery-key",
     "packages/system/software",
@@ -135,6 +140,7 @@ default-members = [
     "security/crates/trust",
     "security/crates/usb",
     "services/accounts",
+    "services/handwriting",
     "services/packages",
     "services/sleep",
     "services/speech",
@@ -169,6 +175,8 @@ luft-network = { path = "packages/system/network" }
 luft-recovery-key = { path = "packages/system/recovery-key" }
 luft-sandbox = { path = "apps/system/schelf/sandbox" }
 luft-software = { path = "packages/system/software", default-features = false }
+luft-handwriting = { path = "packages/system/handwriting" }
+luft-models = { path = "packages/system/models" }
 luft-speech = { path = "packages/system/speech" }
 luft-trust = { path = "packages/system/trust" }
 luft-variant = { path = "packages/system/variant" }

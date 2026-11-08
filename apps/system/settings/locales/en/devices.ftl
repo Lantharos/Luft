@@ -504,6 +504,18 @@ settings-shortcuts-save = Save
 # Button: add the new custom shortcut
 settings-shortcuts-add-button = Add
 
+## Handwriting
+
+settings-handwriting-title = Handwriting
+settings-handwriting-not-installed = Handwriting isn’t installed on this computer
+# $size is the size of the handwriting model, such as "7.9 MB"
+settings-handwriting-off = Write into any text field with a pen. Turning it on downloads its model ({ $size }).
+settings-handwriting-on = Touch a text field with your pen and write in the strip that opens under it
+# $received and $total are sizes, such as "2.1 MB" and "7.9 MB"
+settings-handwriting-downloading = Downloading its model: { $received } of { $total }
+# $reason says what went wrong
+settings-handwriting-failed = Couldn’t download its model: { $reason }
+
 ## Dictation
 
 settings-dictation-title = Dictation

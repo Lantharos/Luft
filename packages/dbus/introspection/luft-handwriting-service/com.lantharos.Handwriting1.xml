@@ -1,0 +1,8 @@
+<node>
+  <interface name="com.lantharos.Handwriting1">
+    <method name="Recognize">
+      <arg name="strokes" type="aa(dd)" direction="in"/>
+      <arg type="s" direction="out"/>
+    </method>
+  </interface>
+</node>

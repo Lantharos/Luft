@@ -1,48 +1,23 @@
 use std::sync::LazyLock;
 
+use luft_models::Catalog;
 use luft_speech::types::Engine;
-use serde::Deserialize;
 
-const MANIFEST: &str = include_str!("../../data/models.json");
+pub type Entry = luft_models::Entry<Engine>;
 
-#[derive(Deserialize)]
-struct Manifest {
-    mirror: String,
-    models: Vec<Entry>,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct Entry {
-    pub id: String,
-    pub engine: Engine,
-    pub name: String,
-    pub licence: String,
-    pub credit: String,
-    pub homepage: String,
-    pub files: Vec<File>,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct File {
-    pub name: String,
-    pub size: u64,
-    pub sha256: String,
-}
-
-static PARSED: LazyLock<Manifest> =
-    LazyLock::new(|| serde_json::from_str(MANIFEST).expect("the model list is valid"));
-
-/// Where models are downloaded from: the mirror on the list, or the server
-/// `LUFT_SPEECH_MIRROR` names, for checks.
-static MIRROR: LazyLock<String> =
-    LazyLock::new(|| std::env::var("LUFT_SPEECH_MIRROR").unwrap_or_else(|_| PARSED.mirror.clone()));
+static CATALOG: LazyLock<Catalog<Engine>> =
+    LazyLock::new(|| Catalog::parse(include_str!("../../data/models.json"), "LUFT_SPEECH_MIRROR"));
 
 pub fn models() -> &'static [Entry] {
-    &PARSED.models
+    CATALOG.models()
 }
 
 pub fn find(id: &str) -> Option<&'static Entry> {
-    models().iter().find(|entry| entry.id == id)
+    CATALOG.find(id)
+}
+
+pub fn mirror() -> &'static str {
+    CATALOG.mirror()
 }
 
 pub fn for_engine(engine: Engine) -> &'static Entry {
@@ -50,20 +25,6 @@ pub fn for_engine(engine: Engine) -> &'static Entry {
         .iter()
         .find(|entry| entry.engine == engine)
         .expect("every engine has a model")
-}
-
-impl Entry {
-    pub fn size(&self) -> u64 {
-        self.files.iter().map(|file| file.size).sum()
-    }
-
-    pub fn url(&self, file: &File) -> String {
-        format!("{}/{}/{}", *MIRROR, self.id, file.name)
-    }
-
-    pub fn file_names(&self) -> Vec<String> {
-        self.files.iter().map(|file| file.name.clone()).collect()
-    }
 }
 
 #[cfg(test)]

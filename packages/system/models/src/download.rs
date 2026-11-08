@@ -9,11 +9,11 @@ use std::time::{Duration, Instant};
 use anyhow::{Context, Result, bail};
 use sha2::{Digest, Sha256};
 
-use super::manifest::{Entry, File};
-use super::verified::{self, Verified};
+use crate::catalog::{Entry, File};
+use crate::verified::{self, Verified};
 
 const ATTEMPTS: u32 = 4;
-pub(super) const BUFFER: usize = 256 * 1024;
+pub(crate) const BUFFER: usize = 256 * 1024;
 const REPORT_EVERY: Duration = Duration::from_millis(250);
 
 #[derive(Clone)]
@@ -64,9 +64,10 @@ impl Downloads {
         })
     }
 
-    pub fn start(
+    pub fn start<E: Sync>(
         &self,
-        entry: &'static Entry,
+        entry: &'static Entry<E>,
+        mirror: &'static str,
         folder: PathBuf,
         received: u64,
         changed: impl Fn() + Send + 'static,
@@ -96,7 +97,7 @@ impl Downloads {
         );
         let downloads = self.clone();
         std::thread::spawn(move || {
-            let result = download(entry, &folder, &cancel, |received| {
+            let result = download(entry, mirror, &folder, &cancel, |received| {
                 progress.lock().expect("progress lock").received = received;
                 changed();
             });
@@ -136,8 +137,9 @@ fn agent() -> ureq::Agent {
         .into()
 }
 
-fn download(
-    entry: &Entry,
+fn download<E>(
+    entry: &Entry<E>,
+    mirror: &str,
     folder: &Path,
     cancel: &AtomicBool,
     mut report: impl FnMut(u64),
@@ -158,7 +160,7 @@ fn download(
             attempt += 1;
             let result = fetch(
                 &agent,
-                &entry.url(file),
+                &entry.url(mirror, file),
                 file,
                 &target,
                 cancel,
@@ -184,7 +186,7 @@ fn download(
     remove_other_files(entry, folder)
 }
 
-fn remove_other_files(entry: &Entry, folder: &Path) -> Result<()> {
+fn remove_other_files<E>(entry: &Entry<E>, folder: &Path) -> Result<()> {
     for file in fs::read_dir(folder)?.flatten() {
         let name = file.file_name();
         if name != verified::RECORD && !entry.files.iter().any(|kept| *kept.name == *name) {
@@ -286,7 +288,7 @@ mod tests {
     #[test]
     fn a_partial_download_resumes_from_its_length_and_hash() {
         let folder =
-            std::env::temp_dir().join(format!("luft-speech-resume-{}", std::process::id()));
+            std::env::temp_dir().join(format!("luft-models-resume-{}", std::process::id()));
         fs::create_dir_all(&folder).unwrap();
         let part = folder.join("model.bin.part");
         fs::write(&part, b"hello ").unwrap();

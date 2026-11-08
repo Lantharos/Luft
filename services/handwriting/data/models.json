@@ -1,0 +1,26 @@
+{
+  "mirror": "https://get.luft.computer/models",
+  "models": [
+    {
+      "id": "latin-pp-ocrv5-mobile",
+      "engine": "ctc",
+      "name": "PP-OCRv5 Latin",
+      "licence": "Apache 2.0",
+      "credit": "PP-OCRv5 Latin text recognition by PaddlePaddle, converted to ONNX by Simeon Emanuilov",
+      "homepage": "https://huggingface.co/PaddlePaddle/latin_PP-OCRv5_mobile_rec",
+      "source": "https://huggingface.co/monkt/paddleocr-onnx/resolve/7b02d0a30a07ba2b92ad1ff5a8941ae2c633de65/languages/latin",
+      "files": [
+        {
+          "name": "rec.onnx",
+          "size": 7862832,
+          "sha256": "614ffc2d6d3902d360fad7f1b0dd455ee45e877069d14c4e51a99dc4ef144409"
+        },
+        {
+          "name": "dict.txt",
+          "size": 1634,
+          "sha256": "3c0a8a79b612653c25f765271714f71281e4e955962c153e272b7b8c1d2b13ff"
+        }
+      ]
+    }
+  ]
+}

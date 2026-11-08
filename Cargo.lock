@@ -5344,6 +5344,35 @@ dependencies = [
 ]
 
 [[package]]
+name = "luft-handwriting"
+version = "0.1.0"
+dependencies = [
+ "futures-util",
+ "luft-dbus",
+ "serde",
+ "serde_json",
+ "specta",
+ "zbus 6.0.0",
+]
+
+[[package]]
+name = "luft-handwriting-service"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "gio",
+ "luft-dbus-macros",
+ "luft-handwriting",
+ "luft-models",
+ "ort",
+ "serde",
+ "serde_json",
+ "tiny-skia",
+ "tokio",
+ "zbus 6.0.0",
+]
+
+[[package]]
 name = "luft-i18n"
 version = "0.1.0"
 dependencies = [
@@ -5484,6 +5513,17 @@ dependencies = [
  "serde",
  "serde_json",
  "specta",
+]
+
+[[package]]
+name = "luft-models"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "serde",
+ "serde_json",
+ "sha2",
+ "ureq",
 ]
 
 [[package]]
@@ -5641,14 +5681,13 @@ dependencies = [
  "gio",
  "libc",
  "luft-dbus-macros",
+ "luft-models",
  "luft-speech",
  "ort",
  "pipewire",
  "serde",
  "serde_json",
- "sha2",
  "tokio",
- "ureq",
  "whisper-rs",
  "zbus 6.0.0",
 ]
@@ -8678,6 +8717,7 @@ dependencies = [
  "luft-dbus-macros",
  "luft-disks",
  "luft-fingerprint",
+ "luft-handwriting",
  "luft-i18n",
  "luft-network",
  "luft-software",

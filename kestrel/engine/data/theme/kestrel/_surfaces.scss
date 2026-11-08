@@ -99,6 +99,18 @@
 .screenshot-ui-markup-save:hover, .screenshot-ui-markup-save:focus { background-color: ink(0.82); }
 .screenshot-ui-markup-button StIcon, .screenshot-ui-markup-save StIcon { icon-size: 16px; }
 
+.kestrel-handwriting.kestrel-glass { padding: 10px 12px 12px; color: ink(); }
+.kestrel-handwriting-top { spacing: 8px; min-height: 32px; padding-left: 6px; }
+.kestrel-handwriting-context { font-size: 14px; color: ink(0.72); }
+.kestrel-handwriting-caret { width: 2px; background-color: ink(); border-radius: 1px; }
+.kestrel-handwriting-close { padding: 6px; border-radius: 999px; color: ink(0.7); transition-duration: $motion-tap; }
+.kestrel-handwriting-close:hover, .kestrel-handwriting-close:focus { background-color: fill(0.12); color: ink(); }
+.kestrel-handwriting-close StIcon { icon-size: 16px; }
+.kestrel-handwriting-area { height: 112px; margin-top: 6px; padding: 0 16px; border-radius: 14px; background-color: fill(0.06); }
+.kestrel-square-surface .kestrel-handwriting-area { border-radius: 0; }
+.kestrel-handwriting-baseline { height: 1px; margin-bottom: 30px; background-color: ink(0.16); }
+.kestrel-handwriting-hint { font-size: 15px; color: ink(0.38); margin-bottom: 18px; }
+
 .kestrel-dictation { height: 36px; border-radius: 999px; background-color: glass(clear); color: ink(); }
 .kestrel-dictation-content { padding: 0 14px; spacing: 10px; }
 .kestrel-dictation-waveform { width: 60px; height: 22px; }

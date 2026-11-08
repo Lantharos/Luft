@@ -1,0 +1,30 @@
+---
+title: Handwriting
+description: Write into any text field with a pen, and it's typed for you, without your writing leaving the computer.
+sidebar:
+  order: 6.6
+---
+
+import Shot from '../../../components/Shot.astro';
+
+Touch a text field with your pen. A strip opens under the cursor: write in it, and a moment after you stop, what you wrote is typed into the field.
+
+<Shot name="handwriting-strip" alt="The writing strip under a text field, with handwriting in it and the field's text above" />
+
+The top of the strip shows the field's text around the cursor.
+
+| Do | To |
+| --- | --- |
+| Draw a line through words in the text | Delete them |
+| Tap between two words in the text | Write the next words there |
+| Scribble over what you just wrote | Take it back before it's typed |
+
+The strip closes when you leave the text field or tap its close button. Password fields never open it. Some apps don't show their text to the strip; writing still types at the cursor there.
+
+## Turning it on
+
+Handwriting is off until you turn it on in Settings → Input → **Handwriting**, which downloads its model, about 8 MB. It reads Serbian, Croatian and Bosnian in Latin letters, German, English, Albanian and other languages written in Latin letters. It reads neat, separate letters best; joined-up writing and accents often come out wrong.
+
+## Privacy
+
+Your writing is read on your computer and never saved or sent anywhere. The model is downloaded once from Luft's servers and checked before it's used.

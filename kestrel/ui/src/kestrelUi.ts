@@ -44,6 +44,7 @@ import { prewarmAfterStartup, prewarmSettled, prewarmSoon, type Step } from './s
 import { Surfaces, type Surface } from './surfaces/surfaces.js';
 import { confirmStartupOnceSettled } from './system/health/startup.js';
 import { CopilotActions } from './system/dictation/copilotActions.js';
+import { Handwriting } from './system/handwriting/handwriting.js';
 import { startPeekHost, type HostContext } from './system/peek/host/host.js';
 import type { PeekService } from './system/peek/service.js';
 import { followUserLanguage } from './system/language/language.js';
@@ -87,6 +88,7 @@ class KestrelUi {
   private readonly rotation: RotationAnimation;
   private readonly copilot: CopilotActions;
   private readonly penActions: PenActions;
+  readonly handwriting: Handwriting;
   private readonly fourFingers = new FourFingerSwipe(direction => this.followFourFingers(direction));
   private readonly touchscreen = new TouchscreenGestures({
     handle: event => this.touchpad(event),
@@ -152,6 +154,7 @@ class KestrelUi {
       takeScreenshot: () => this.takeScreenshot(),
       toggleStart: () => this.surfaces.toggle('start'),
     });
+    this.handwriting = new Handwriting(context);
     const searchHost: SearchHost = {
       menus: this.menus,
       quickSettings: context.quickSettings,
@@ -514,6 +517,7 @@ class KestrelUi {
     this.rotation.destroy();
     this.copilot.destroy();
     this.penActions.destroy();
+    this.handwriting.destroy();
     this.tiling.destroy();
     this.board.destroy();
     this.services.destroy();
@@ -623,6 +627,8 @@ export function touchpad(event: Clutter.Event): boolean { return currentUi?.touc
 export function touchClaimed(gesture: Clutter.Gesture): boolean { return currentUi?.touchClaimed(gesture) ?? false; }
 
 export function board(): Board | null { return currentUi?.board ?? null; }
+
+export function handwriting(): Handwriting | null { return currentUi?.handwriting ?? null; }
 
 export function enterBoardWindow(window: Meta.Window): void {
   currentUi?.board.enterWindow(window);

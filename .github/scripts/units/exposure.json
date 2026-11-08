@@ -38,6 +38,7 @@
 	"security/data/trust/systemd/trustd.service": 7.9,
 	"security/data/usb/luft-usb-protection.service": 0.9,
 	"services/accounts/data/luft-accounts.service": 9.2,
+	"services/handwriting/data/luft-handwriting.service": 6.2,
 	"services/packages/data/luft-packages.service": 4,
 	"services/packages/data/luft-system-packages-activate@.service": 5.1,
 	"services/packages/data/luft-system-packages-link.service": 0.9,

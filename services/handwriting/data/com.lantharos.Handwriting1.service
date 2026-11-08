@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=com.lantharos.Handwriting1
+Exec=/usr/libexec/luft-handwriting
+SystemdService=luft-handwriting.service

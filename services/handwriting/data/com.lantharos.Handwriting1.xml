@@ -1,0 +1,34 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+ "https://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node name="/com/lantharos/Handwriting1">
+  <!--
+    Handwriting recognition, run in the session and started on demand. It exits after half a minute
+    with nothing to do, and unloads the model three minutes after the last line it read. Strokes are
+    only read in memory and never written anywhere.
+  -->
+  <interface name="com.lantharos.Handwriting1">
+    <!-- Reads one line of handwriting as text. Each stroke is the points the pen passed through,
+         in any unit as long as the whole line uses the same one, with y growing downwards. Fails
+         with com.lantharos.Handwriting1.Error.NotInstalled, naming the model, when it isn't
+         downloaded yet. -->
+    <method name="Recognize">
+      <arg name="strokes" type="aa(dd)" direction="in"/>
+      <arg name="text" type="s" direction="out"/>
+    </method>
+  </interface>
+
+  <interface name="com.lantharos.Handwriting1.Models">
+    <!-- JSON, the Overview in packages/system/handwriting/src/types.rs: the model, its size, whether
+         it's downloaded and any download in progress. While handwriting is on, the model downloads
+         by itself. -->
+    <method name="Overview">
+      <arg name="overview" type="s" direction="out"/>
+    </method>
+    <!-- Starts downloading the model, or picks up a download that stopped. -->
+    <method name="Install"/>
+    <!-- Deletes the downloaded model, or what there is of it. -->
+    <method name="Remove"/>
+    <!-- The model was downloaded or removed, or its download moved on; ask for the Overview again. -->
+    <signal name="Changed"/>
+  </interface>
+</node>

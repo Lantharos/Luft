@@ -1,4 +1,5 @@
 mod dictation;
+mod handwriting;
 mod layouts;
 mod methods;
 mod names;
@@ -46,6 +47,7 @@ fn app_names(Apps { ids }: Apps) -> Result<HashMap<String, String>, String> {
 }
 
 pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
+    let window = handwriting::register(window, events);
     dictation::register(window, events)
         .command("keyboard_layouts", |Empty {}| Ok(layouts::all()))
         .command_async("keyboard_input_methods", |Empty {}| methods::all())

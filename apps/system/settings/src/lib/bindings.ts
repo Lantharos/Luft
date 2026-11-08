@@ -259,6 +259,8 @@ export const commands = {
 	fingerprintList: (options?: CallOptions) => invoke<Fingerprints | null>("fingerprint_list", {}, options),
 	fingerprintReader: (options?: CallOptions) => invoke<boolean>("fingerprint_reader", {}, options),
 	fingerprintStop: (options?: CallOptions) => invoke<null>("fingerprint_stop", {}, options),
+	handwriting: (options?: CallOptions) => invoke<HandwritingModel>("handwriting", {}, options),
+	handwritingRemove: (options?: CallOptions) => invoke<null>("handwriting_remove", {}, options),
 	hardware: (options?: CallOptions) => invoke<Hardware>("hardware", {}, options),
 	keyboardAppNames: (params: {
 		ids: string[],
@@ -576,6 +578,7 @@ export const events = {
 	extensionsChanged: (callback: (payload: Extension[]) => void) => listen<Extension[]>("extensions.changed", callback),
 	extensionsPageChanged: (callback: (payload: string) => void) => listen<string>("extensions.page-changed", callback),
 	fingerprintEnroll: (callback: (payload: EnrollProgress) => void) => listen<EnrollProgress>("fingerprint.enroll", callback),
+	handwritingChanged: (callback: (payload: HandwritingModel) => void) => listen<HandwritingModel>("handwriting.changed", callback),
 	hardwareChanged: (callback: (payload: Hardware) => void) => listen<Hardware>("hardware.changed", callback),
 	kestrelPalette: (callback: (payload: Palette) => void) => listen<Palette>("kestrel.palette", callback),
 	keyringChanged: (callback: (payload: Keyring) => void) => listen<Keyring>("keyring.changed", callback),
@@ -1047,6 +1050,22 @@ export type Handler = {
 	category: AppCategory,
 	apps: App[],
 	current: string | null,
+};
+
+export type HandwritingDownload = {
+	received: number,
+	total: number,
+	problem: string | null,
+};
+
+export type HandwritingModel = {
+	name: string,
+	licence: string,
+	credit: string,
+	homepage: string,
+	size: number,
+	installed: boolean,
+	download: HandwritingDownload | null,
 };
 
 export type Hardware = {

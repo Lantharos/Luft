@@ -16,6 +16,15 @@ dictation-unsupported-body = Its processor can’t run the speech recognizer { $
 # Notification button
 dictation-settings-action = Dictation settings
 
+## Handwriting strip, which opens under a text field touched with a pen
+
+# Shown in the empty writing area
+handwriting-hint = Write here
+# Shown in the writing area when the handwriting model hasn't finished downloading
+handwriting-downloading = Handwriting is still downloading
+# Screen-reader label of the button that closes the writing strip
+handwriting-close = Close
+
 ## System health notifications
 
 health-gpu-reset-title = The graphics driver stopped responding

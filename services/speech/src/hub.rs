@@ -54,10 +54,11 @@ impl Hub {
 
     /// Starts downloading a model, or picks up where its download stopped.
     pub fn install(self: &Arc<Self>, entry: &'static Entry) -> Result<bool> {
-        self.store.remove_unlisted()?;
+        self.store.remove_unlisted(manifest::models())?;
         let hub = self.clone();
         Ok(self.downloads.start(
             entry,
+            manifest::mirror(),
             self.store.folder(entry),
             self.store.usage(entry),
             move || hub.changed(),

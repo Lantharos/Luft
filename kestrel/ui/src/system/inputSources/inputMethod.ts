@@ -71,6 +71,7 @@ interface CursorWindow {
 
 export namespace InputMethod {
   export interface Signals extends Clutter.InputMethod.SignalSignatures {
+    'focus-changed': () => void;
     'surrounding-text-set': () => void;
     'hides-typing-changed': () => void;
   }
@@ -114,6 +115,7 @@ function x11Caret(): CaretRect | null {
 
 export const InputMethod = GObject.registerClass({
   Signals: {
+    'focus-changed': {},
     'surrounding-text-set': {},
     'hides-typing-changed': {},
   },
@@ -220,6 +222,7 @@ export const InputMethod = GObject.registerClass({
       GLib.source_remove(this.hidePanelId);
       this.hidePanelId = 0;
     }
+    this.emit('focus-changed');
   }
 
   vfunc_focus_out(): void {
@@ -240,6 +243,7 @@ export const InputMethod = GObject.registerClass({
       this.set_input_panel_state(Clutter.InputPanelState.OFF);
       this.hidePanelId = 0;
     });
+    this.emit('focus-changed');
   }
 
   vfunc_reset(): void {

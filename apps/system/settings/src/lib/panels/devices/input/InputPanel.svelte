@@ -6,6 +6,7 @@
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import { hardware } from '#lib/state/hardware.svelte.js';
 	import DictationPage from './dictation/DictationPage.svelte';
+	import HandwritingSection from './handwriting/HandwritingSection.svelte';
 	import CopilotKeySection from './keyboard/CopilotKeySection.svelte';
 	import InputSources from './keyboard/InputSources.svelte';
 	import OwnLayouts from './keyboard/OwnLayouts.svelte';
@@ -43,6 +44,7 @@
 		<TouchpadSection />
 	{/if}
 	<TypingSection />
+	<HandwritingSection />
 	{#if hardware.present?.copilotKey}
 		<CopilotKeySection />
 	{/if}

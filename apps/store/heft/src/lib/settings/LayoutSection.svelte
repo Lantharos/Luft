@@ -5,7 +5,8 @@
 
 	const places = (): { value: ToolbarPlace; label: string }[] => [
 		{ value: 'top', label: t('settings-toolbar-top') },
-		{ value: 'side', label: t('settings-toolbar-side') }
+		{ value: 'side', label: t('settings-toolbar-side') },
+		{ value: 'dock', label: t('settings-toolbar-dock') }
 	];
 
 	const flows = (): { value: PageFlow; label: string }[] => [

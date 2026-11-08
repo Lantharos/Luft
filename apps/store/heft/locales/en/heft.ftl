@@ -18,6 +18,7 @@ toolbar-zoom = Zoom
 # A pen in the toolbar; the variable is its color's name or "Highlighter".
 toolbar-pen = { $name }
 toolbar-pen-options = Change this pen
+toolbar-move = Move the tools
 
 ## Pens
 
@@ -170,6 +171,7 @@ toolbar-picture = Add a picture
 picture-choose-title = Add a picture
 picture-choose-filter = Pictures
 text-to-notes = Add to notes
+format-label = Text formatting
 format-heading = Heading
 format-bold = Bold
 format-list = List
@@ -288,8 +290,9 @@ section-create = Add section
 settings-toolbar = Tools
 settings-toolbar-top = Along the top
 settings-toolbar-side = Down the side
-settings-toolbar-tablet = When the computer is folded into a tablet or the window is taller than it is wide, the page fills the width and the tools sit in a bar above it.
-settings-toolbar-tablet-now = Folded into a tablet, the page fills the width and the tools sit in a bar above it.
+settings-toolbar-dock = Floating
+settings-toolbar-tablet = When the computer is folded into a tablet or the window is taller than it is wide, the page fills the width and the tools float over it, on the side away from the hand you write with. Drag the handle on top to move them.
+settings-toolbar-tablet-now = Folded into a tablet, the page fills the width and the tools float over it. Drag the handle on top to move them.
 settings-pages = Pages
 settings-pages-continuous = One after another
 settings-pages-single = One at a time

@@ -14,15 +14,16 @@ export interface Layout {
 const GAP = 22;
 const MARGIN = 28;
 
-export function stack(sizes: { width: number; height: number }[]): Layout {
-	const width = Math.max(0, ...sizes.map((size) => size.width)) + MARGIN * 2;
-	let top = MARGIN;
+/** Pages one under another, with room around them unless they run edge to edge. */
+export function stack(sizes: { width: number; height: number }[], margin = MARGIN): Layout {
+	const width = Math.max(0, ...sizes.map((size) => size.width)) + margin * 2;
+	let top = margin;
 	const pages = sizes.map((size) => {
 		const rect = { left: (width - size.width) / 2, top, width: size.width, height: size.height };
 		top += size.height + GAP;
 		return rect;
 	});
-	return { width, height: top - GAP + MARGIN, pages };
+	return { width, height: top - GAP + margin, pages };
 }
 
 /** The page under a content position, or the nearest one above or below it. */

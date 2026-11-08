@@ -42,10 +42,11 @@ export class Viewport {
 		const spareX = this.width - this.contentWidth;
 		this.x = spareX > 0 ? -spareX / 2 : Math.min(Math.max(this.x, 0), -spareX);
 		const page = this.single === null ? null : this.layout.pages[this.single];
-		const [top, bottom] = page ? [page.top * this.zoom - PAGE_MARGIN, (page.top + page.height) * this.zoom + PAGE_MARGIN] : [0, this.contentHeight];
+		const margin = arrangement.tablet ? 0 : PAGE_MARGIN;
+		const [top, bottom] = page ? [page.top * this.zoom - margin, (page.top + page.height) * this.zoom + margin] : [0, this.contentHeight];
 		const overscroll = page ? 0 : OVERSCROLL;
 		const spareY = this.height - (bottom - top);
-		this.y = spareY > 0 ? top - spareY / 2 : Math.min(Math.max(this.y, top - overscroll), bottom - this.height + overscroll);
+		this.y = spareY > 0 ? top - (arrangement.tablet ? 0 : spareY / 2) : Math.min(Math.max(this.y, top - overscroll), bottom - this.height + overscroll);
 	}
 
 	panBy(dx: number, dy: number) {

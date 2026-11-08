@@ -2,7 +2,7 @@ import { commands } from '#lib/bindings.js';
 import { arrangement } from './arrangement.svelte';
 import type { Processing } from '#lib/recording/model.js';
 
-export type ToolbarPlace = 'top' | 'side';
+export type ToolbarPlace = 'top' | 'side' | 'dock';
 export type PageFlow = 'continuous' | 'single';
 
 export interface SettingsValues {
@@ -46,9 +46,9 @@ class Settings {
 	values: SettingsValues = $state({ ...DEFAULTS });
 	private timer = 0;
 
-	/** Folded into a tablet or standing upright, the tools sit in a bar above the page. */
-	get toolbar(): ToolbarPlace | 'bar' {
-		return arrangement.tablet ? 'bar' : this.values.toolbar;
+	/** Folded into a tablet or standing upright, the tools float over the page. */
+	get toolbar(): ToolbarPlace {
+		return arrangement.tablet ? 'dock' : this.values.toolbar;
 	}
 
 	async load() {

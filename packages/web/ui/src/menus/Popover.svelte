@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { menu } from '../motion/transitions';
-	import { besideAnchor, type Align, type AnchorPlacement } from './placement';
+	import { besideAnchor, nextToAnchor, type Align, type AnchorPlacement, type Side } from './placement';
 	import { topLayer } from './topLayer';
 
 	interface Props {
@@ -9,13 +9,15 @@
 		label: string;
 		role: 'listbox' | 'dialog' | 'menu';
 		align?: Align;
+		/** Opens to this side of the anchor instead of below it. */
+		side?: Side;
 		minWidth?: number;
 		maxHeight?: number;
 		onclose: () => void;
 		children: Snippet;
 	}
 
-	let { anchor, label, role, align = 'start', minWidth = 0, maxHeight = 320, onclose, children }: Props = $props();
+	let { anchor, label, role, align = 'start', side, minWidth = 0, maxHeight = 320, onclose, children }: Props = $props();
 
 	let placement = $state<AnchorPlacement | null>(null);
 
@@ -27,7 +29,9 @@
 	}
 
 	function place(popover: HTMLElement) {
-		placement = besideAnchor(anchor.getBoundingClientRect(), { width: popover.offsetWidth, height: popover.offsetHeight }, maxHeight, align);
+		const size = { width: popover.offsetWidth, height: popover.offsetHeight };
+		const rect = anchor.getBoundingClientRect();
+		placement = side ? nextToAnchor(rect, size, maxHeight, side) : besideAnchor(rect, size, maxHeight, align);
 	}
 </script>
 
@@ -40,6 +44,7 @@
 	class="popover soft-scroll"
 	class:placed={placement}
 	class:above={placement?.above}
+	class:sideways={side}
 	{role}
 	aria-label={label}
 	style:left="{placement?.left ?? 0}px"
@@ -74,7 +79,7 @@
 		max-width: calc(100vw - 20px);
 		flex-direction: column;
 		gap: 2px;
-		overflow-y: auto;
+		overflow: hidden auto;
 		padding: 6px;
 		border-radius: 18px;
 		background: var(--popover);
@@ -92,6 +97,18 @@
 		top: auto;
 		transform-origin: bottom;
 		animation-name: open-above;
+	}
+
+	.popover.sideways {
+		transform-origin: center;
+		animation-name: open-sideways;
+	}
+
+	@keyframes open-sideways {
+		from {
+			opacity: 0;
+			transform: scale(0.96);
+		}
 	}
 
 	@keyframes open {

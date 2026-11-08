@@ -14,6 +14,7 @@
 	import type { Page } from '#lib/convert/writing.js';
 	import type { Stroke } from '#lib/ink/stroke.js';
 	import { draftPlace, draftText, editing } from '#lib/objects/editing.svelte.js';
+	import FormatBar from '#lib/objects/FormatBar.svelte';
 	import { linesOf } from '#lib/typing/flow.js';
 	import { player } from '#lib/recording/player.svelte.js';
 	import { writtenAt } from '#lib/recording/written.js';
@@ -102,7 +103,7 @@
 	}
 
 	$effect(() => {
-		viewport.layout = stack(notebook.meta.pages.map((page) => pageSize(paperOf(notebook.meta, page), page)));
+		viewport.layout = stack(notebook.meta.pages.map((page) => pageSize(paperOf(notebook.meta, page), page)), arrangement.tablet ? 0 : undefined);
 		untrack(() => viewport.clamp());
 	});
 
@@ -127,6 +128,28 @@
 		if (single !== null) return [single, single];
 		const [first, last] = pagesIn(viewport.layout, y / zoom, (y + height) / zoom);
 		return [Math.max(0, first - 1), Math.min(viewport.layout.pages.length - 1, last + 1)];
+	});
+
+	const FORMAT_BAR = { width: 172, height: 44, gap: 8 };
+
+	/** Where the formatting buttons float: just above the text box being typed in, or under its first line when that's off the top. */
+	let formatAt = $derived.by(() => {
+		const id = editing.active;
+		if (!id) return null;
+		const draft = editing.draft?.object.id === id ? editing.draft : null;
+		for (let index = range[0]; index <= range[1]; index++) {
+			const entry = notebook.meta.pages[index];
+			const object = draft ? (draft.page === entry.id ? draft.object : undefined) : stores.get(entry.id)?.document.objects.find((candidate) => candidate.id === id);
+			if (!object) continue;
+			const page = viewport.layout.pages[index];
+			const [x, y] = viewport.toView(page.left + object.x, page.top + object.y);
+			const above = y - FORMAT_BAR.height - FORMAT_BAR.gap;
+			return {
+				x: Math.min(Math.max(x, FORMAT_BAR.gap), viewport.width - FORMAT_BAR.width - FORMAT_BAR.gap),
+				y: above > FORMAT_BAR.gap ? above : y + (object.line ?? object.height) * viewport.zoom + FORMAT_BAR.gap
+			};
+		}
+		return null;
 	});
 
 	function visibleIn(index: number) {
@@ -227,6 +250,9 @@
 		<RulerView {ruler} zoom={viewport.zoom} />
 	{/if}
 	<TextActions {notebook} {viewport} {onquote} />
+	{#if formatAt}
+		<FormatBar x={formatAt.x} y={formatAt.y} />
+	{/if}
 	<SelectionBox {notebook} {viewport} ready={converter.ready} onconvert={convertPicked} />
 	<canvas class="live" bind:this={predictCanvas}></canvas>
 </div>

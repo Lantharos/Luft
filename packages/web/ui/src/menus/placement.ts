@@ -1,5 +1,6 @@
 const VIEWPORT_MARGIN = 10;
 const ANCHOR_GAP = 6;
+const SIDE_GAP = 16;
 
 export interface Size {
 	width: number;
@@ -29,6 +30,8 @@ const clamp = (value: number, max: number) => Math.min(Math.max(value, VIEWPORT_
 
 export type Align = 'start' | 'end';
 
+export type Side = 'left' | 'right';
+
 export function besideAnchor(anchor: DOMRect, size: Size, maxHeight: number, align: Align): AnchorPlacement {
 	const roomBelow = innerHeight - anchor.bottom - ANCHOR_GAP - VIEWPORT_MARGIN;
 	const roomAbove = anchor.top - ANCHOR_GAP - VIEWPORT_MARGIN;
@@ -41,6 +44,22 @@ export function besideAnchor(anchor: DOMRect, size: Size, maxHeight: number, ali
 		bottom: above ? innerHeight - anchor.top + ANCHOR_GAP : null,
 		maxHeight: Math.min(maxHeight, above ? roomAbove : roomBelow),
 		above
+	};
+}
+
+export function nextToAnchor(anchor: DOMRect, size: Size, maxHeight: number, side: Side): AnchorPlacement {
+	const height = Math.min(size.height, maxHeight, innerHeight - 2 * VIEWPORT_MARGIN);
+	const right = anchor.right + SIDE_GAP;
+	const left = anchor.left - SIDE_GAP - size.width;
+	const fitsRight = right + size.width <= innerWidth - VIEWPORT_MARGIN;
+	const fitsLeft = left >= VIEWPORT_MARGIN;
+	const onRight = side === 'right' ? fitsRight || !fitsLeft : !fitsLeft && fitsRight;
+	return {
+		left: clamp(onRight ? right : left, innerWidth - size.width - VIEWPORT_MARGIN),
+		top: clamp(anchor.top + anchor.height / 2 - height / 2, innerHeight - height - VIEWPORT_MARGIN),
+		bottom: null,
+		maxHeight: Math.min(maxHeight, innerHeight - 2 * VIEWPORT_MARGIN),
+		above: false
 	};
 }
 

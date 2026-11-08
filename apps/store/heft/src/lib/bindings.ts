@@ -46,6 +46,7 @@ export const commands = {
 		lines: Line[],
 	}, options?: CallOptions) => invoke<Written<Notes>>("notes_write", params, options),
 	openPenSettings: (options?: CallOptions) => invoke<null>("open_pen_settings", {}, options),
+	penHand: (options?: CallOptions) => invoke<Hand>("pen_hand", {}, options),
 	powerState: (options?: CallOptions) => invoke<PowerState>("power_state", {}, options),
 	recordingLength: (params: {
 		path: string,
@@ -160,6 +161,9 @@ export type Entry = {
 	folder: string,
 	meta: Value,
 };
+
+/**  The hand that holds the pen, as set for every app in Luft's pen settings. */
+export type Hand = "right" | "left";
 
 export type HandwritingDownload = {
 	received: number,

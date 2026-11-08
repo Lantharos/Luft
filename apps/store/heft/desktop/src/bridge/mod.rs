@@ -1,4 +1,5 @@
 mod files;
+mod hand;
 mod params;
 
 use std::collections::HashMap;
@@ -131,6 +132,7 @@ pub fn register(window: SabineWindow) -> SabineWindow {
         .command_async("choose_files", choose)
         .command_async("choose_save", choose_save)
         .command_async("open_pen_settings", open_pen_settings)
+        .command_async("pen_hand", |Empty {}| hand::pen_hand())
         .command("settings_load", |Name { name }| {
             Ok(settings::load::<Value>(&settings_file(&name)?))
         })

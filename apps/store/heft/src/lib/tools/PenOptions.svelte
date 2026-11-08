@@ -1,12 +1,12 @@
 <script lang="ts">
 	import Check from '@lucide/svelte/icons/check';
 	import { t } from '@luft/i18n';
-	import { Popover, Segmented, Slider } from '@luft/ui';
+	import { Popover, Segmented, Slider, type Side } from '@luft/ui';
 	import { css, readableOn } from '#lib/ink/color.js';
 	import { colorName } from './colors';
 	import { SWATCHES, tools, type Preset } from './tools.svelte';
 
-	let { anchor, preset, onclose }: { anchor: HTMLElement; preset: Preset; onclose: () => void } = $props();
+	let { anchor, preset, side, onclose }: { anchor: HTMLElement; preset: Preset; side?: Side; onclose: () => void } = $props();
 
 	type Kind = 'fountain' | 'ballpoint' | 'highlighter';
 
@@ -19,7 +19,7 @@
 	}
 </script>
 
-<Popover {anchor} label={t('toolbar-pen-options')} role="dialog" minWidth={292} maxHeight={480} {onclose}>
+<Popover {anchor} {side} label={t('toolbar-pen-options')} role="dialog" minWidth={292} maxHeight={480} {onclose}>
 	<div class="flex flex-col gap-4 p-3">
 		<Segmented
 			label={t('pen-kind')}

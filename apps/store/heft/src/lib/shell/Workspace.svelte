@@ -18,6 +18,7 @@
 	import CameraDialog from '#lib/objects/CameraDialog.svelte';
 	import type { OpenNotebook } from '#lib/library/notebook.svelte.js';
 	import PageRail from '#lib/rail/PageRail.svelte';
+	import Dock from '#lib/tools/Dock.svelte';
 	import Toolbar from '#lib/tools/Toolbar.svelte';
 	import Header from './Header.svelte';
 	import { handleKeys, typeFromKey } from './keyboard';
@@ -136,17 +137,10 @@
 			<IconButton icon={focusing ? Minimize : Maximize} label={focusing ? t('focus-leave') : t('focus-enter')} onclick={() => focusMode(!focusing)} />
 		</div>
 	</div>
-	{#if tools === 'bar'}
-		<div class="hidden-scroll flex-none overflow-x-auto">
-			<div class="mx-auto w-max px-3 pb-2">
-				<Toolbar actions={pane.actions} zoom={pane.viewport.zoom} {books} ruled={pane.ruler.shown} />
-			</div>
-		</div>
-	{/if}
 	<div class="flex min-h-0 flex-1">
 		{#if tools === 'side'}
 			<div class="soft-scroll flex flex-none flex-col items-center overflow-y-auto px-2 pb-3">
-				<Toolbar actions={pane.actions} zoom={pane.viewport.zoom} {books} ruled={pane.ruler.shown} side />
+				<Toolbar actions={pane.actions} zoom={pane.viewport.zoom} {books} ruled={pane.ruler.shown} side opens="right" />
 			</div>
 		{/if}
 		<div class="relative flex min-h-0 min-w-0 flex-1 gap-px" class:flex-col={width < height * 1.15} bind:clientWidth={width} bind:clientHeight={height}>
@@ -158,6 +152,9 @@
 			{/if}
 			{#if playing}
 				<PlayerBar panel={panelOpen} onpanel={togglePanel} />
+			{/if}
+			{#if tools === 'dock'}
+				<Dock actions={pane.actions} zoom={pane.viewport.zoom} {books} ruled={pane.ruler.shown} {width} {height} />
 			{/if}
 		</div>
 		{#if playing && panelOpen && !focusing}

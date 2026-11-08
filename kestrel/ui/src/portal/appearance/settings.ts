@@ -24,6 +24,8 @@ const KESTREL = 'com.lantharos.kestrel';
 const KESTREL_KEYS = ['rounded-window-corners', 'app-lines'];
 const TABLET_MODE = 'tablet-mode';
 const KEYBOARD = 'keyboard-attached';
+const PEN = 'com.lantharos.kestrel.pen';
+const PEN_HAND = 'pen-hand';
 const SHARED_SCHEMAS = [
   'org.gnome.desktop.a11y',
   A11Y_INTERFACE,
@@ -53,6 +55,7 @@ export class SettingsPortal {
   private accent: Rgb | null = null;
   private readonly unwatchTablet = tabletMode.watch(() => this.emitValue(KESTREL, TABLET_MODE));
   private readonly unwatchKeyboard = keyboards.watch(() => this.emitValue(KESTREL, KEYBOARD));
+  private readonly pen = new Gio.Settings({ schema_id: PEN });
 
   constructor() {
     for (const id of SHARED_SCHEMAS) {
@@ -63,6 +66,7 @@ export class SettingsPortal {
     const kestrel = new Gio.Settings({ schema_id: KESTREL });
     for (const key of KESTREL_KEYS) kestrel.connect(`changed::${key}`, () => this.emitValue(KESTREL, key));
     this.schemas.set(KESTREL, kestrel);
+    this.pen.connect('changed::hand', () => this.emitValue(KESTREL, PEN_HAND));
     this.shell.connect('notify::enable-animations', () => {
       this.emitValue(INTERFACE, 'enable-animations');
       this.emitValue(APPEARANCE, 'reduced-motion');
@@ -95,7 +99,7 @@ export class SettingsPortal {
   private namespace(namespace: string): Namespace {
     if (namespace === APPEARANCE) return this.appearance();
     if (namespace === FONTCONFIG) return { serial: new GLib.Variant('i', this.fontconfig.serial) };
-    const keys = namespace === KESTREL ? [...KESTREL_KEYS, TABLET_MODE, KEYBOARD] : this.schemas.get(namespace)!.settings_schema.list_keys();
+    const keys = namespace === KESTREL ? [...KESTREL_KEYS, TABLET_MODE, KEYBOARD, PEN_HAND] : this.schemas.get(namespace)!.settings_schema.list_keys();
     return Object.fromEntries(keys.map(key => [key, this.value(namespace, key)!]));
   }
 
@@ -103,6 +107,7 @@ export class SettingsPortal {
     if (namespace === APPEARANCE || namespace === FONTCONFIG) return this.namespace(namespace)[key] ?? null;
     if (namespace === KESTREL && key === TABLET_MODE) return new GLib.Variant('b', tabletMode.active);
     if (namespace === KESTREL && key === KEYBOARD) return new GLib.Variant('b', keyboards.attached);
+    if (namespace === KESTREL && key === PEN_HAND) return this.pen.get_value('hand');
     const settings = this.schemas.get(namespace);
     if (!settings?.settings_schema.has_key(key) || (namespace === KESTREL && !KESTREL_KEYS.includes(key))) return null;
     if (namespace === INTERFACE && key === 'enable-animations') return new GLib.Variant('b', this.shell.enable_animations);

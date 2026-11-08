@@ -16,6 +16,7 @@ toolbar-paper = Папир
 toolbar-zoom = Увеличање
 toolbar-pen = { $name }
 toolbar-pen-options = Промени ово перо
+toolbar-move = Помери алатке
 
 ## Pens
 
@@ -163,6 +164,7 @@ toolbar-picture = Додај слику
 picture-choose-title = Додавање слике
 picture-choose-filter = Слике
 text-to-notes = Додај у белешке
+format-label = Облик текста
 format-heading = Наслов
 format-bold = Подебљано
 format-list = Листа
@@ -275,8 +277,9 @@ section-create = Додај одељак
 settings-toolbar = Алатке
 settings-toolbar-top = Горе
 settings-toolbar-side = Са стране
-settings-toolbar-tablet = Кад се рачунар преклопи у таблет или је прозор виши него шири, страница заузима целу ширину, а алатке су у траци изнад ње.
-settings-toolbar-tablet-now = Рачунар је преклопљен у таблет, па страница заузима целу ширину, а алатке су у траци изнад ње.
+settings-toolbar-dock = Плутајуће
+settings-toolbar-tablet = Кад се рачунар преклопи у таблет или је прозор виши него шири, страница заузима целу ширину, а алатке плутају изнад ње, са стране супротне руци којом пишеш. Превуци ручицу на врху да их помериш.
+settings-toolbar-tablet-now = Рачунар је преклопљен у таблет, па страница заузима целу ширину, а алатке плутају изнад ње. Превуци ручицу на врху да их помериш.
 settings-pages = Стране
 settings-pages-continuous = Једна за другом
 settings-pages-single = Једна по једна

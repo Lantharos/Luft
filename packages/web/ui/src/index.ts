@@ -28,6 +28,7 @@ export { default as MenuButton } from './menus/MenuButton.svelte';
 export { default as MenuItem } from './menus/MenuItem.svelte';
 export { default as MenuSeparator } from './menus/MenuSeparator.svelte';
 export { default as Popover } from './menus/Popover.svelte';
+export type { Side } from './menus/placement';
 export { tooltip } from './menus/tooltip';
 export { topLayer } from './menus/topLayer';
 

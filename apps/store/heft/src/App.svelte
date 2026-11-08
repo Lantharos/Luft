@@ -27,6 +27,7 @@
 	import { everything, palette } from '#lib/search/palette.js';
 	import Workspace from '#lib/shell/Workspace.svelte';
 	import { tools } from '#lib/tools/tools.svelte.js';
+	import { dock } from '#lib/tools/dock.svelte.js';
 
 	let ready = $state(false);
 	let importing: string[] = $state([]);
@@ -53,6 +54,7 @@
 		appearance.start(state);
 		await Promise.all([i18n.ready, settings.load(), appState.load(), library.load()]);
 		tools.load();
+		await dock.load();
 		recent.load();
 		await session.start();
 		ready = true;

@@ -27,9 +27,7 @@
 	import TextSelect from '@lucide/svelte/icons/text-select';
 	import Undo from '@lucide/svelte/icons/undo-2';
 	import { t } from '@luft/i18n';
-	import { IconButton, MenuButton, MenuItem, MenuSeparator, tooltip } from '@luft/ui';
-	import FormatBar from '#lib/objects/FormatBar.svelte';
-	import { editing } from '#lib/objects/editing.svelte.js';
+	import { IconButton, MenuButton, MenuItem, MenuSeparator, tooltip, type Side } from '@luft/ui';
 	import { colorName } from './colors';
 	import EraserOptions from './EraserOptions.svelte';
 	import PenOptions from './PenOptions.svelte';
@@ -41,8 +39,9 @@
 		zoom,
 		books = false,
 		ruled = false,
-		side = false
-	}: { actions: ToolbarActions; zoom: number; books?: boolean; ruled?: boolean; side?: boolean } = $props();
+		side = false,
+		opens
+	}: { actions: ToolbarActions; zoom: number; books?: boolean; ruled?: boolean; side?: boolean; opens?: Side } = $props();
 
 	let options: { anchor: HTMLElement; preset: Preset | null } | null = $state(null);
 
@@ -105,9 +104,6 @@
 	>
 		<Type size={19} />
 	</button>
-	{#if tools.active === 'type' || editing.active}
-		<FormatBar />
-	{/if}
 	{#if books}
 		<button
 			type="button"
@@ -131,7 +127,7 @@
 		<RulerIcon size={19} />
 	</button>
 	<span class="divider"></span>
-	<MenuButton label={t('toolbar-picture')} class="icon-button" align={side ? 'start' : 'end'}>
+	<MenuButton label={t('toolbar-picture')} class="icon-button" align={side ? 'start' : 'end'} side={opens}>
 		{#snippet trigger()}
 			<ImagePlus size={19} />
 		{/snippet}
@@ -142,7 +138,7 @@
 	</MenuButton>
 	<IconButton icon={FilePlus} label={t('toolbar-add-page')} onclick={actions.addPage} />
 	<IconButton icon={NotebookText} label={t('toolbar-paper')} onclick={actions.paper} />
-	<MenuButton label={t('toolbar-zoom')} class="plain-button tabular-nums" align={side ? 'start' : 'end'}>
+	<MenuButton label={t('toolbar-zoom')} class="plain-button tabular-nums" align={side ? 'start' : 'end'} side={opens}>
 		{#snippet trigger()}
 			{t('zoom-percent', { percent: Math.round(zoom * 100) })}
 		{/snippet}
@@ -158,9 +154,9 @@
 </div>
 
 {#if options?.preset}
-	<PenOptions anchor={options.anchor} preset={options.preset} onclose={() => (options = null)} />
+	<PenOptions anchor={options.anchor} preset={options.preset} side={opens} onclose={() => (options = null)} />
 {:else if options}
-	<EraserOptions anchor={options.anchor} onclose={() => (options = null)} />
+	<EraserOptions anchor={options.anchor} side={opens} onclose={() => (options = null)} />
 {/if}
 
 <style>

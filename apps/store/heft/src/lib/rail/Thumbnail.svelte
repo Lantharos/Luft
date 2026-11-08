@@ -5,6 +5,8 @@
 <script lang="ts">
 	import type { OpenNotebook } from '#lib/library/notebook.svelte.js';
 	import { pageSize, paperOf, type PageEntry } from '#lib/library/model.js';
+	import { pdfImage } from '#lib/pdf/render.js';
+	import { sourcePath } from '#lib/pdf/sources.js';
 	import { paintThumbnail } from './thumbnail';
 
 	let { notebook, entry, width }: { notebook: OpenNotebook; entry: PageEntry; width: number } = $props();
@@ -34,9 +36,9 @@
 		if (cached?.revision === revision) return;
 		let alive = true;
 		const timer = setTimeout(async () => {
-			const store = await notebook.load(entry.id);
+			const [store, background] = await Promise.all([notebook.load(entry.id), entry.pdf ? pdfImage(sourcePath(notebook, entry.pdf.source), entry.pdf.index, pixels) : undefined]);
 			if (!alive) return;
-			paintThumbnail(canvas, paper, size, store.document);
+			paintThumbnail(canvas, paper, size, store.document, background);
 			painted.set(key, { revision, bitmap: await createImageBitmap(canvas) });
 		}, cached ? 250 : 0);
 		return () => {

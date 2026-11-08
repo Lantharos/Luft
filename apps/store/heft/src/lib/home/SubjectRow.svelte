@@ -7,6 +7,7 @@
 	import { session } from '#lib/app/session.svelte.js';
 	import { draggable, dropTarget } from '#lib/drag/drag.svelte.js';
 	import { library, type SubjectEntry } from '#lib/library/library.svelte.js';
+	import { choosePdfs, importBooks } from '#lib/pdf/import.js';
 	import NewNotebookDialog from './NewNotebookDialog.svelte';
 	import NotebookCover from './NotebookCover.svelte';
 	import SubjectDialog from './SubjectDialog.svelte';
@@ -17,7 +18,7 @@
 	let notebooks = $derived([...subject.notebooks].sort((a, b) => b.meta.modified - a.meta.modified));
 </script>
 
-<section class="subject" {@attach dropTarget({ kind: 'subject', id: subject.meta.id })}>
+<section class="subject" data-subject={subject.meta.id} {@attach dropTarget({ kind: 'subject', id: subject.meta.id })}>
 	<div class="flex items-center gap-2">
 		<h2
 			class="flex min-w-0 items-center gap-2.5 text-[16px] font-semibold"
@@ -32,6 +33,7 @@
 		<MenuButton label={t('subject-options', { name: subject.meta.name })} class="icon-button">
 			{#snippet trigger()}<Ellipsis size={17} />{/snippet}
 			{#snippet children(close)}
+				<MenuItem onclick={() => (close(), void choosePdfs().then((paths) => importBooks(subject, paths)))}>{t('subject-add-book')}</MenuItem>
 				<MenuItem onclick={() => ((dialog = 'edit'), close())}>{t('subject-edit')}</MenuItem>
 				<MenuItem onclick={() => (void library.updateSubject(subject, { archived: !subject.meta.archived }), close())}>
 					{subject.meta.archived ? t('subject-unarchive') : t('subject-archive')}

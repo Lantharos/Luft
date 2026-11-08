@@ -3,6 +3,9 @@
 	import type { OpenNotebook } from '#lib/library/notebook.svelte.js';
 	import { paperOf, type PageEntry } from '#lib/library/model.js';
 	import PaperBackground from '#lib/paper/PaperBackground.svelte';
+	import PdfBackground from '#lib/pdf/PdfBackground.svelte';
+	import { textSelection } from '#lib/pdf/selection.svelte.js';
+	import { sourcePath } from '#lib/pdf/sources.js';
 	import { LOOKS } from '#lib/paper/templates.js';
 	import type { PageStore } from '#lib/page/storage.js';
 	import type { PageRect } from './layout';
@@ -63,17 +66,40 @@
 	style:height="{rect.height * zoom}px"
 	data-page={entry.id}
 >
-	<PaperBackground {paper} width={rect.width} height={rect.height} id={entry.id} />
+	{#if entry.pdf}
+		<PdfBackground path={sourcePath(notebook, entry.pdf.source)} index={entry.pdf.index} width={rect.width} {zoom} {scale} />
+	{:else}
+		<PaperBackground {paper} width={rect.width} height={rect.height} id={entry.id} />
+	{/if}
 	<div class="tiles absolute inset-0" bind:this={tilesElement}></div>
+	{#if textSelection.page === entry.id}
+		{#each textSelection.selection.rects as rect, index (index)}
+			<span
+				class="picked"
+				style:left="{rect.left * zoom}px"
+				style:top="{rect.top * zoom}px"
+				style:width="{rect.width * zoom}px"
+				style:height="{rect.height * zoom}px"
+			></span>
+		{/each}
+	{/if}
 </div>
 
 <style>
 	.page {
+		background: white;
 		border-radius: 3px;
 		box-shadow:
 			0 0 0 1px var(--hairline),
 			0 6px 24px var(--shadow-faint);
 		contain: strict;
+	}
+
+	.picked {
+		position: absolute;
+		border-radius: 2px;
+		background: color-mix(in oklab, #3d7bd9 30%, transparent);
+		pointer-events: none;
 	}
 
 	.tiles :global(.ink-tile) {

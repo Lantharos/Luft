@@ -1,8 +1,10 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import type { OpenNotebook } from '#lib/library/notebook.svelte.js';
 	import { pageSize, paperOf } from '#lib/library/model.js';
 	import { LOOKS } from '#lib/paper/templates.js';
+	import { sourcePath } from '#lib/pdf/sources.js';
+	import TextActions from '#lib/pdf/TextActions.svelte';
 	import type { PageStore } from '#lib/page/storage.js';
 	import { pagesIn, stack } from './layout';
 	import { LiveInk } from './live';
@@ -10,7 +12,7 @@
 	import { Surface } from './surface';
 	import type { Viewport } from './viewport.svelte';
 
-	let { notebook, viewport }: { notebook: OpenNotebook; viewport: Viewport } = $props();
+	let { notebook, viewport, onquote }: { notebook: OpenNotebook; viewport: Viewport; onquote?: (text: string) => void } = $props();
 
 	let element: HTMLDivElement;
 	let liveCanvas: HTMLCanvasElement;
@@ -23,7 +25,17 @@
 
 	$effect(() => {
 		viewport.layout = stack(notebook.meta.pages.map((page) => pageSize(paperOf(notebook.meta, page), page)));
-		viewport.clamp();
+		untrack(() => viewport.clamp());
+	});
+
+	let lastWidth = 0;
+
+	$effect(() => {
+		const width = viewport.width;
+		untrack(() => {
+			if (lastWidth && width) viewport.zoomAt((viewport.zoom * width) / lastWidth, 0, 0);
+		});
+		lastWidth = width;
 	});
 
 	let range = $derived.by(() => {
@@ -53,7 +65,13 @@
 				const entry = notebook.meta.pages[index];
 				const store = entry && stores.get(entry.id);
 				if (!store) return null;
-				return { page: viewport.layout.pages[index], document: store.document, ink: { dark: LOOKS[paperOf(notebook.meta, entry).color].dark } };
+				return {
+					id: entry.id,
+					page: viewport.layout.pages[index],
+					document: store.document,
+					ink: { dark: LOOKS[paperOf(notebook.meta, entry).color].dark },
+					pdf: entry.pdf && { path: sourcePath(notebook, entry.pdf.source), index: entry.pdf.index }
+				};
 			},
 			preview(scale, x, y) {
 				preview = { scale, x, y };
@@ -106,6 +124,7 @@
 		{/each}
 	</div>
 	<canvas class="live" bind:this={liveCanvas}></canvas>
+	<TextActions {notebook} {viewport} {onquote} />
 	<canvas class="live" bind:this={predictCanvas}></canvas>
 </div>
 

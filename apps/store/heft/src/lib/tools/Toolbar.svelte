@@ -14,6 +14,7 @@
 	import Eraser from '@lucide/svelte/icons/eraser';
 	import FilePlus from '@lucide/svelte/icons/file-plus-2';
 	import Redo from '@lucide/svelte/icons/redo-2';
+	import TextSelect from '@lucide/svelte/icons/text-select';
 	import Undo from '@lucide/svelte/icons/undo-2';
 	import { t } from '@luft/i18n';
 	import { IconButton, MenuButton, MenuItem, MenuSeparator, tooltip } from '@luft/ui';
@@ -23,7 +24,7 @@
 	import PenSwatch from './PenSwatch.svelte';
 	import { tools, type Preset } from './tools.svelte';
 
-	let { actions, zoom }: { actions: ToolbarActions; zoom: number } = $props();
+	let { actions, zoom, books = false }: { actions: ToolbarActions; zoom: number; books?: boolean } = $props();
 
 	let options: { anchor: HTMLElement; preset: Preset | null } | null = $state(null);
 
@@ -66,6 +67,18 @@
 	>
 		<Eraser size={19} />
 	</button>
+	{#if books}
+		<button
+			type="button"
+			class="tool"
+			aria-pressed={tools.active === 'text'}
+			aria-label={t('toolbar-text')}
+			{@attach tooltip(t('toolbar-text'))}
+			onclick={() => (tools.active = 'text')}
+		>
+			<TextSelect size={19} />
+		</button>
+	{/if}
 	<span class="mx-1.5 h-5 w-px bg-(--hairline)"></span>
 	<IconButton icon={FilePlus} label={t('toolbar-add-page')} onclick={actions.addPage} />
 	<MenuButton label={t('toolbar-zoom')} class="plain-button tabular-nums" align="end">

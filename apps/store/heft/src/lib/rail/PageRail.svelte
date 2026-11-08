@@ -1,11 +1,13 @@
 <script lang="ts">
 	import Ellipsis from '@lucide/svelte/icons/ellipsis';
 	import { t } from '@luft/i18n';
-	import { ContextMenu, date, MenuItem, MenuSeparator } from '@luft/ui';
+	import { ContextMenu, date, MenuItem, MenuSeparator, Segmented } from '@luft/ui';
 	import { draggable, dropTarget } from '#lib/drag/drag.svelte.js';
 	import type { OpenNotebook } from '#lib/library/notebook.svelte.js';
 	import type { PageEntry, Section } from '#lib/library/model.js';
 	import NameDialog from '#lib/shell/NameDialog.svelte';
+	import { notebookOutline, type Heading } from '#lib/pdf/outline.js';
+	import Contents from './Contents.svelte';
 	import Thumbnail from './Thumbnail.svelte';
 
 	let { notebook, current, onjump }: { notebook: OpenNotebook; current: number; onjump: (index: number) => void } = $props();
@@ -14,6 +16,14 @@
 
 	let menu: { x: number; y: number; index: number } | null = $state(null);
 	let naming: { page: string; section?: Section } | null = $state(null);
+	let headings: Heading[] = $state([]);
+	let view: 'pages' | 'contents' = $state('pages');
+
+	$effect(() => {
+		if (!notebook.meta.pages.some((page) => page.pdf)) return;
+		void notebookOutline(notebook).then((found) => (headings = found));
+	});
+
 	let sectionAt = $derived(new Map(notebook.meta.sections.map((section) => [section.page, section])));
 
 	$effect(() => {
@@ -34,6 +44,22 @@
 </script>
 
 <aside class="glass-sidebar rail soft-scroll" aria-label={t('rail-label')}>
+	{#if headings.length}
+		<div class="px-3 pt-3">
+			<Segmented
+				label={t('rail-view')}
+				value={view}
+				options={[
+					{ value: 'pages', label: t('rail-pages') },
+					{ value: 'contents', label: t('rail-contents') }
+				]}
+				onchange={(next) => (view = next)}
+			/>
+		</div>
+	{/if}
+	{#if view === 'contents' && headings.length}
+		<Contents {headings} {current} {onjump} />
+	{:else}
 	<ol class="flex flex-col gap-1 px-3 pt-2 pb-6">
 		{#each notebook.meta.pages as page, index (page.id)}
 			{@const section = sectionAt.get(page.id)}
@@ -64,6 +90,7 @@
 			</li>
 		{/each}
 	</ol>
+	{/if}
 </aside>
 
 {#if menu}

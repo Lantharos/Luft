@@ -3,7 +3,8 @@
 	import Plus from '@lucide/svelte/icons/plus';
 	import Trash from '@lucide/svelte/icons/trash-2';
 	import { t } from '@luft/i18n';
-	import { Dialog, relativeDay } from '@luft/ui';
+	import { Dialog, droppedPaths, relativeDay } from '@luft/ui';
+	import { importBooks } from '#lib/pdf/import.js';
 	import { recent } from '#lib/app/recent.svelte.js';
 	import { session } from '#lib/app/session.svelte.js';
 	import { library } from '#lib/library/library.svelte.js';
@@ -15,6 +16,15 @@
 
 	let dialog: 'subject' | 'archive' | 'trash' | null = $state(null);
 
+	function drop(event: DragEvent) {
+		const paths = event.dataTransfer ? droppedPaths(event.dataTransfer) : [];
+		if (!paths.length) return;
+		event.preventDefault();
+		const id = (event.target as HTMLElement | null)?.closest<HTMLElement>('[data-subject]')?.dataset.subject;
+		const subject = id ? library.subject(id) : library.active[0];
+		if (subject) void importBooks(subject, paths);
+	}
+
 	let recentPages = $derived(
 		recent.pages.flatMap((item) => {
 			const entry = library.notebook(item.notebook);
@@ -24,7 +34,7 @@
 	);
 </script>
 
-<main class="glass-content">
+<main class="glass-content" ondragover={(event) => event.preventDefault()} ondrop={drop}>
 	<Header />
 	<div class="min-h-0 flex-1 overflow-y-auto soft-scroll">
 		<div class="mx-auto flex max-w-[1180px] flex-col gap-6 px-6 pt-4 pb-10">

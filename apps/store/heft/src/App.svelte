@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { events as sabineEvents, type SingleInstanceEvent } from '@lantharos/sabine';
 	import { i18n, t } from '@luft/i18n';
 	import { appearance, errorText, GlassShell } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
@@ -10,6 +11,8 @@
 	import DragGhost from '#lib/drag/DragGhost.svelte';
 	import '#lib/drag/drops.js';
 	import Home from '#lib/home/Home.svelte';
+	import ImportDialog from '#lib/home/ImportDialog.svelte';
+	import { isPdf } from '#lib/pdf/import.js';
 	import { pen } from '#lib/input/pen.svelte.js';
 	import { library } from '#lib/library/library.svelte.js';
 	import { handleAppKeys } from '#lib/shell/keyboard.js';
@@ -17,12 +20,13 @@
 	import { tools } from '#lib/tools/tools.svelte.js';
 
 	let ready = $state(false);
+	let importing: string[] = $state([]);
 	let failure: string | null = $state(null);
 
 	onMount(() => {
-		const stop = pen.start();
+		const stops = [pen.start(), sabineEvents.singleInstance((activation) => void activate(activation))];
 		start().catch((error) => (failure = errorText(error)));
-		return stop;
+		return () => stops.forEach((stop) => stop());
 	});
 
 	$effect(() => {
@@ -37,6 +41,11 @@
 		recent.load();
 		await session.start();
 		ready = true;
+		importing = state.launchPaths.filter(isPdf);
+	}
+
+	async function activate(activation: SingleInstanceEvent) {
+		importing = (await commands.resolveArguments(activation)).filter(isPdf);
 	}
 </script>
 
@@ -55,7 +64,7 @@
 			<main class="glass-content drag-region"></main>
 		{:else if session.current}
 			{#key session.current}
-				<Workspace notebook={session.current} />
+				<Workspace notebook={session.current} beside={session.beside} />
 			{/key}
 		{:else}
 			<Home />
@@ -63,3 +72,6 @@
 	</GlassShell>
 </div>
 <DragGhost />
+{#if importing.length && ready}
+	<ImportDialog paths={importing} onclose={() => (importing = [])} />
+{/if}

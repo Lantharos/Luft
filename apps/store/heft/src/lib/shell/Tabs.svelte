@@ -24,7 +24,7 @@
 	</button>
 	{#each session.tabs as tab (tab.meta.id)}
 		<div class="tab-wrap" {@attach dropTarget({ kind: 'notebook', id: tab.meta.id })}>
-			<button type="button" class="tab" role="tab" aria-selected={session.current === tab} onclick={() => (session.current = tab)}>
+			<button type="button" class="tab" role="tab" aria-selected={session.current === tab} onclick={() => session.show(tab)}>
 				<span class="size-2 flex-none rounded-full" style:background={color(tab.meta.subject)}></span>
 				<span class="truncate">{tab.meta.name}</span>
 			</button>

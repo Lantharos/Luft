@@ -154,7 +154,33 @@ paper-spacing = Spacing
 paper-millimetres = { $value } mm
 paper-landscape = Landscape
 
+## Books
+
+subject-add-book = Add a textbook
+book-choose-title = Add a textbook
+book-choose-filter = PDF documents
+notebook-insert-pdf = Add pages from a PDF
+toolbar-text = Pick text
+text-actions = Picked text
+text-highlight = Highlight
+text-copy = Copy
+notebook-split = Open another notebook beside this one
+notebook-unsplit = Close the one beside
+beside-title = Open beside
+beside-body = Both stay open side by side, each on its own page, and come back together next time.
+
+# Shown when PDFs are opened with Heft; the variables are how many there are and the first one's name.
+import-title = { $count ->
+    [one] Add { $name } to which subject?
+   *[other] Add { $count } textbooks to which subject?
+}
+import-body = Each becomes a book you can write and highlight in. The PDF itself stays as it is.
+
 ## Page rail
+
+rail-view = Show
+rail-pages = Pages
+rail-contents = Contents
 
 rail-label = Pages
 rail-show = Show pages

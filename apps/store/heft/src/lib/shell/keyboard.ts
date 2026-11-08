@@ -51,6 +51,6 @@ export function handleAppKeys(event: KeyboardEvent) {
 	if (key === 'tab' && tabs.length) {
 		const index = session.current ? tabs.indexOf(session.current) : -1;
 		const next = (index + (event.shiftKey ? -1 : 1) + tabs.length + 1) % (tabs.length + 1);
-		return run(() => (next === tabs.length ? session.home() : (session.current = tabs[next])));
+		return run(() => (next === tabs.length ? session.home() : session.show(tabs[next])));
 	}
 }

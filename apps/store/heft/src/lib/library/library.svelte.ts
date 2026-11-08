@@ -1,7 +1,7 @@
 import { writeJson } from '#lib/bridge/files.js';
 import { commands, type Trashed } from '#lib/bindings.js';
 import { newId } from '#lib/ink/stroke.js';
-import { DEFAULT_PAPER, FORMAT, type NotebookMeta, type Paper, type SubjectMeta } from './model';
+import { DEFAULT_PAPER, FORMAT, type NotebookMeta, type PageEntry, type Paper, type SubjectMeta } from './model';
 import { OpenNotebook } from './notebook.svelte';
 
 export interface NotebookEntry {
@@ -109,17 +109,21 @@ class Library {
 		await Promise.all(order.map((subject) => this.saveSubject(subject)));
 	}
 
-	async createNotebook(subject: SubjectEntry, name: string, paper: Paper = DEFAULT_PAPER): Promise<NotebookEntry> {
+	/**
+	 * A notebook in the subject; `pages` makes its pages instead of one blank
+	 * page, given the new notebook's folder, as importing a book does.
+	 */
+	async createNotebook(subject: SubjectEntry, name: string, paper: Paper = DEFAULT_PAPER, pages?: (folder: string) => Promise<PageEntry[]>): Promise<NotebookEntry> {
 		const folder = `${subject.folder}/${unique(folderName(name), subject.notebooks.map((notebook) => leaf(notebook.folder)), NOTEBOOK_SUFFIX)}`;
 		const now = Date.now();
 		const meta: NotebookMeta = {
 			format: FORMAT,
 			id: newId(),
 			name,
-			kind: 'notes',
+			kind: pages ? 'book' : 'notes',
 			subject: subject.meta.id,
 			paper,
-			pages: [{ id: newId(), created: now }],
+			pages: pages ? await pages(folder) : [{ id: newId(), created: now }],
 			sections: [],
 			created: now,
 			modified: now

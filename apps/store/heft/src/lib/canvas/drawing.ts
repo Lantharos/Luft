@@ -8,7 +8,9 @@ import type { LiveInk } from './live';
 import type { Viewport } from './viewport.svelte';
 
 export interface Target {
+	id: string;
 	page: PageRect;
+	pdf?: { path: string; index: number };
 	document: PageDocument;
 	ink: Ink;
 }

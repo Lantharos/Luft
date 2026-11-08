@@ -10,6 +10,8 @@ const MAX_TABS = 6;
 class Session {
 	tabs: OpenNotebook[] = $state([]);
 	current: OpenNotebook | null = $state(null);
+	/** The notebook open beside the current one, such as the textbook next to the notes. */
+	beside: OpenNotebook | null = $state(null);
 	/** A page to bring into view once its notebook shows. */
 	goTo: { notebook: string; page: string } | null = $state(null);
 
@@ -20,7 +22,7 @@ class Session {
 			if (entry) this.tabs.push(library.openNotebook(entry));
 		}
 		const current = saved?.current ? this.tabs.find((tab) => tab.meta.id === saved.current) : null;
-		if (current) this.current = current;
+		if (current) this.show(current);
 		else if (!library.notebooks.length) this.open(await this.firstNotebook());
 	}
 
@@ -39,9 +41,37 @@ class Session {
 			}
 			this.tabs.push(tab);
 		}
-		this.current = tab;
 		this.goTo = page ? { notebook: entry.meta.id, page } : null;
+		this.show(tab);
+	}
+
+	show(tab: OpenNotebook) {
+		this.current = tab;
+		this.beside = this.rememberedBeside(tab);
 		this.remember();
+	}
+
+	private rememberedBeside(tab: OpenNotebook): OpenNotebook | null {
+		const pair = appState.get<Record<string, string[]>>('splits')?.[tab.meta.subject];
+		const other = pair?.includes(tab.meta.id) ? pair.find((id) => id !== tab.meta.id) : undefined;
+		const entry = other ? library.notebook(other) : undefined;
+		return entry ? library.openNotebook(entry) : null;
+	}
+
+	/** Opens a notebook beside the current one, and remembers the pair for the subject. */
+	split(entry: NotebookEntry) {
+		if (!this.current || entry.meta.id === this.current.meta.id) return;
+		this.beside = library.openNotebook(entry);
+		const splits = appState.get<Record<string, string[]>>('splits') ?? {};
+		void appState.save({ splits: { ...splits, [this.current.meta.subject]: [this.current.meta.id, entry.meta.id] } });
+	}
+
+	unsplit() {
+		if (!this.current) return;
+		this.beside = null;
+		const splits = { ...appState.get<Record<string, string[]>>('splits') };
+		delete splits[this.current.meta.subject];
+		void appState.save({ splits });
 	}
 
 	home() {
@@ -53,8 +83,11 @@ class Session {
 		void tab.settle();
 		const index = this.tabs.indexOf(tab);
 		this.tabs.splice(index, 1);
-		if (this.current === tab) this.current = this.tabs[Math.min(index, this.tabs.length - 1)] ?? null;
-		this.remember();
+		const next = this.tabs[Math.min(index, this.tabs.length - 1)];
+		if (this.beside === tab) this.beside = null;
+		if (this.current !== tab) this.remember();
+		else if (next) this.show(next);
+		else this.home();
 	}
 
 	/** Closes tabs of notebooks that went to the trash. */

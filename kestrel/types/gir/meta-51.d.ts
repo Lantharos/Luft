@@ -2187,6 +2187,8 @@ export namespace Meta {
             /** @signal */
             "pad-mode-switch": (object: Clutter.InputDevice, p0: number, p1: number) => void;
             /** @signal */
+            "pen-action": (device: Clutter.InputDevice, action: string) => void;
+            /** @signal */
             restacked: () => void;
             /** @signal */
             "show-osd": (object: number, p0: string, p1: string) => void;

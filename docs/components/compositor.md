@@ -26,7 +26,8 @@ Kestrel runs on its own build of Mutter 51 ([kestrel/compositor](../../kestrel/c
 - `ext-idle-notify-v1`, so apps such as password managers can lock themselves after a while without use, sandboxed or not. Idle times are at least a second, and at least ten seconds for sandboxed apps, so no app can follow someone's typing
 - `ext-data-control-v1`, so password managers can copy a password and clear it again while in the background: apps outside a sandbox and Flatpak apps with full access always get it, other Flatpak apps only when they may use the clipboard in the background, see [App permissions](#app-permissions)
 - Screen recording, remote control and input capture sessions that only the desktop portal and Kestrel's screencast service can start, and display changes such as rearranging monitors or turning them off that sandboxed apps can't make
-- Virtual input devices that flip the tablet mode switch, for driving tablet mode in checks
+- Virtual input devices that flip the tablet mode switch or act as pens, for driving tablet mode and writing in checks
+- Palm rejection for pens on a touchscreen, see [Palm rejection](#palm-rejection), a dot under every pen in place of the arrow or the app's cursor (apps that hide the cursor keep it hidden), and pen settings from `com.lantharos.kestrel.pen` for every pen at once instead of one `org.gnome.desktop.peripherals.tablet.stylus` path per pen. Its button actions add erasing while a button is held, and taking a screenshot, opening Heft and opening Start, which reach the shell through `MetaDisplay::pen-action`
 - The audible bell from X11 and Wayland apps handed to the shell, which plays it with the rest of its [sounds](kestrel.md#sounds)
 - Modifiers the shell can treat as used up while a shortcut made of them is held, such as the one held to dictate, so apps scroll, click and type as if they weren't held, and shortcuts that react to being let go that still notice it when a modifier comes up first
 - A Wayland socket the process that starts Kestrel made and keeps, passed in `WAYLAND_SOCKET_NAME` and `WAYLAND_SOCKET_FD`, so apps can reconnect after a crash, see [Crash recovery](kestrel.md#crash-recovery)
@@ -79,6 +80,20 @@ kestrel/compositor/build.sh
 `patches.py trial latest` shows beforehand which patches the new release already carries and which will conflict. Drop patches whose upstream change is in the release before rebasing.
 
 The pinned base only changes when both `--base` and `--version` are given. `git rebase --abort` restores the old stack. A Mutter ABI change also needs the engine build and session library paths updated.
+
+## Palm rejection
+
+libinput ignores a pen's touchscreen while the pen is near it, but the pens of most 2-in-1s only count as near while almost touching the glass, so they leave whenever they lift between strokes, and the hand landing again a moment later would tap whatever is under it. The input thread keeps a short pen session for touches on the pen's own screen, the same libinput device group:
+
+| Since the pen left | A touch that starts... | Is |
+| --- | --- | --- |
+| Under 1.5 s, or the pen is near | where the side of the hand rests | Dropped |
+| Under 1.5 s | within 20 mm of that area | Held up to 150 ms, then let through as a tap, a drag or a still press, or dropped while it creeps |
+| 1.5 s to 4.5 s | where the side of the hand rests | Held 450 ms, then let through unless the pen came back |
+| Any time in the session | within 50 mm of a touch taken for a palm | Dropped, and so is the other |
+| After 4.5 s, or anywhere else | | Let through at once, exactly as without a pen |
+
+The area runs from 50 mm behind the tip to 140 mm ahead of it, and from 45 mm above it to 95 mm below, measured from where the pen was last, ahead meaning towards the writing hand's side, which `hand` in `com.lantharos.kestrel.pen` sets. A touch still held when the pen comes back is dropped, and held touches are let through with their own times. The numbers come from recordings of an IdeaPad 5 2-in-1 with a Wacom AES pen in `kestrel/tools/fixtures/pen`; `tablet:palm` replays them through a virtual pen and touchscreen, for either hand, and fails if a finger is dropped or a palm gets through. New recordings, made with `sudo libinput debug-events` while writing, become fixtures with `bun kestrel/tools/pen/convert.ts RECORDING NAME TOUCHES`. `MUTTER_DEBUG=input` logs every touch the filter judges, with its place relative to the pen.
 
 ## Diagnostics
 

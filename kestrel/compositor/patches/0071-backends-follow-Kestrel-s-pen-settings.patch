@@ -1,0 +1,515 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Sun, 8 Nov 2026 12:22:52 +0100
+Subject: [PATCH 71/73] backends: follow Kestrel's pen settings
+
+Read the pressure curves, the side buttons and the eraser button of
+every pen from com.lantharos.kestrel.pen instead of a relocatable
+org.gnome.desktop.peripherals.tablet.stylus schema per tool serial, so
+one choice in Settings covers every pen people use, including one that
+reports no serial.
+
+Its button actions add to GNOME's: eraser makes the pen an eraser while
+the button is held, as the other end of a pen would, by taking the pen
+out of proximity and bringing an eraser for it in, lifting and pressing
+the tip again around the switch when it is down. Screenshot, notes and
+start reach the shell through the new MetaDisplay::pen-action signal,
+and nothing makes a button do nothing at all.
+
+Upstream-Status: luft-only follows Kestrel's settings instead of GNOME's
+---
+ src/backends/meta-input-settings-private.h    |  9 +++
+ src/backends/meta-input-settings.c            | 57 +++++-------------
+ .../native/meta-input-device-native.c         |  1 +
+ .../native/meta-input-device-native.h         |  2 +
+ .../native/meta-input-device-tool-native.c    | 26 ++++++++
+ .../native/meta-input-device-tool-native.h    |  2 +
+ src/backends/native/meta-seat-impl.c          | 59 ++++++++++++++++++-
+ src/core/display-private.h                    |  4 ++
+ src/core/display.c                            | 26 ++++++++
+ src/core/meta-tool-action-mapper.c            | 37 +++++++++++-
+ 10 files changed, 178 insertions(+), 45 deletions(-)
+
+diff --git a/src/backends/meta-input-settings-private.h b/src/backends/meta-input-settings-private.h
+index cca87fa76f093b5e6f3b967519a839956fd8f9a4..ebcd9eafb8799b100cd5a4b6e04146fb0ef59f0e 100644
+--- a/src/backends/meta-input-settings-private.h
++++ b/src/backends/meta-input-settings-private.h
+@@ -31,6 +31,15 @@
+ #include "clutter/clutter.h"
+ #include "meta/display.h"
+ 
++typedef enum
++{
++  META_PEN_BUTTON_ACTION_ERASER = G_DESKTOP_STYLUS_BUTTON_ACTION_KEYBINDING + 1,
++  META_PEN_BUTTON_ACTION_SCREENSHOT,
++  META_PEN_BUTTON_ACTION_NOTES,
++  META_PEN_BUTTON_ACTION_START,
++  META_PEN_BUTTON_ACTION_NOTHING,
++} MetaPenButtonAction;
++
+ #define META_TYPE_INPUT_SETTINGS (meta_input_settings_get_type ())
+ G_DECLARE_DERIVABLE_TYPE (MetaInputSettings, meta_input_settings,
+                           META, INPUT_SETTINGS, GObject)
+diff --git a/src/backends/meta-input-settings.c b/src/backends/meta-input-settings.c
+index b6be454e5005edbd1d550d4434b611e645afab28..e6e2cd14309ef3e78c402525845ae9e479943037 100644
+--- a/src/backends/meta-input-settings.c
++++ b/src/backends/meta-input-settings.c
+@@ -50,7 +50,6 @@ enum
+ 
+ static GParamSpec *props[N_PROPS] = { 0 };
+ 
+-static GQuark quark_tool_settings = 0;
+ 
+ typedef struct _MetaInputSettingsPrivate MetaInputSettingsPrivate;
+ typedef struct _DeviceMappingInfo DeviceMappingInfo;
+@@ -87,6 +86,7 @@ struct _MetaInputSettingsPrivate
+   GSettings *pointing_stick_settings;
+   GSettings *keyboard_settings;
+   GSettings *keyboard_a11y_settings;
++  GSettings *pen_settings;
+ 
+   GList *devices;
+   GHashTable *mappable_devices;
+@@ -177,6 +177,7 @@ meta_input_settings_dispose (GObject *object)
+   g_clear_object (&priv->pointing_stick_settings);
+   g_clear_object (&priv->keyboard_settings);
+   g_clear_object (&priv->keyboard_a11y_settings);
++  g_clear_object (&priv->pen_settings);
+   g_clear_pointer (&priv->mappable_devices, g_hash_table_unref);
+   g_clear_pointer (&priv->current_tools, g_hash_table_unref);
+   g_clear_list (&priv->devices, NULL);
+@@ -1556,41 +1557,12 @@ lookup_device_settings (ClutterInputDevice *device)
+ }
+ 
+ static GSettings *
+-lookup_tool_settings (ClutterInputDeviceTool *tool,
+-                      ClutterInputDevice     *device)
++lookup_tool_settings (MetaInputSettings *input_settings)
+ {
+-  GSettings *tool_settings;
+-  guint64 serial;
+-  gchar *path;
+-
+-  tool_settings = g_object_get_qdata (G_OBJECT (tool), quark_tool_settings);
+-  if (tool_settings)
+-    return tool_settings;
+-
+-  serial = clutter_input_device_tool_get_serial (tool);
+-
+-  /* The Wacom driver uses serial 1 for serial-less devices but 1 is not a
+-   * real serial, so let's custom-case this */
+-  if (serial == 0 || serial == 1)
+-    {
+-      path = g_strdup_printf ("/org/gnome/desktop/peripherals/stylus/default-%.4x:%.4x/",
+-                              clutter_input_device_get_vendor_id (device),
+-                              clutter_input_device_get_product_id (device));
+-    }
+-  else
+-    {
+-      path = g_strdup_printf ("/org/gnome/desktop/peripherals/stylus/%" G_GINT64_MODIFIER "x/",
+-                              serial);
+-    }
+-
+-  tool_settings =
+-    g_settings_new_with_path ("org.gnome.desktop.peripherals.tablet.stylus",
+-                              path);
+-  g_object_set_qdata_full (G_OBJECT (tool), quark_tool_settings, tool_settings,
+-                           (GDestroyNotify) g_object_unref);
+-  g_free (path);
++  MetaInputSettingsPrivate *priv =
++    meta_input_settings_get_instance_private (input_settings);
+ 
+-  return tool_settings;
++  return priv->pen_settings;
+ }
+ 
+ static void
+@@ -1719,7 +1691,7 @@ update_stylus_pressure (MetaInputSettings      *input_settings,
+   if (!tool)
+     return;
+ 
+-  tool_settings = lookup_tool_settings (tool, device);
++  tool_settings = lookup_tool_settings (input_settings);
+ 
+   if (clutter_input_device_tool_get_tool_type (tool) ==
+       CLUTTER_INPUT_DEVICE_TOOL_ERASER)
+@@ -1767,7 +1739,7 @@ update_stylus_buttonmap (MetaInputSettings      *input_settings,
+   if (!tool)
+     return;
+ 
+-  tool_settings = lookup_tool_settings (tool, device);
++  tool_settings = lookup_tool_settings (input_settings);
+ 
+   primary = g_settings_get_enum (tool_settings, "button-action");
+   secondary = g_settings_get_enum (tool_settings, "secondary-button-action");
+@@ -1795,7 +1767,7 @@ update_stylus_eraserbutton (MetaInputSettings      *input_settings,
+   if (!tool || !clutter_input_device_tool_has_eraser_button (tool))
+     return;
+ 
+-  tool_settings = lookup_tool_settings (tool, device);
++  tool_settings = lookup_tool_settings (input_settings);
+ 
+   mode = g_settings_get_enum (tool_settings, "eraser-button-mode");
+   action = g_settings_get_enum (tool_settings, "eraser-button-action");
+@@ -1885,7 +1857,7 @@ current_tool_info_new (MetaInputSettings      *input_settings,
+   info->input_settings = input_settings;
+   info->device = device;
+   info->tool = tool;
+-  info->settings = lookup_tool_settings (tool, device);
++  info->settings = lookup_tool_settings (input_settings);
+   info->changed_id =
+     g_signal_connect (info->settings, "changed",
+                       G_CALLBACK (current_tool_changed_cb),
+@@ -1999,9 +1971,6 @@ meta_input_settings_class_init (MetaInputSettingsClass *klass)
+                          G_PARAM_STATIC_STRINGS);
+   g_object_class_install_properties (object_class, N_PROPS, props);
+ 
+-  quark_tool_settings =
+-    g_quark_from_static_string ("meta-input-settings-tool-settings");
+-
+   signals[KBD_A11Y_CHANGED] =
+     g_signal_new ("kbd-a11y-changed",
+                   G_TYPE_FROM_CLASS (object_class),
+@@ -2043,6 +2012,8 @@ meta_input_settings_init (MetaInputSettings *settings)
+   g_signal_connect (priv->keyboard_a11y_settings, "changed",
+                     G_CALLBACK (meta_input_keyboard_a11y_settings_changed), settings);
+ 
++  priv->pen_settings = g_settings_new ("com.lantharos.kestrel.pen");
++
+   priv->mappable_devices =
+     g_hash_table_new_full (NULL, NULL, NULL, (GDestroyNotify) device_mapping_info_free);
+ 
+@@ -2229,7 +2200,7 @@ meta_input_settings_get_tool_button_action (MetaInputSettings       *input_setti
+         }
+ 
+       key = g_strdup_printf ("%s-action", prefix);
+-      settings = lookup_tool_settings (tool, device);
++      settings = lookup_tool_settings (input_settings);
+       action = g_settings_get_enum (settings, key);
+       if (keybinding && action == G_DESKTOP_STYLUS_BUTTON_ACTION_KEYBINDING)
+         {
+@@ -2252,7 +2223,7 @@ meta_input_settings_get_eraser_button_action (MetaInputSettings       *input_set
+ 
+   g_return_val_if_fail (META_IS_INPUT_SETTINGS (input_settings), G_DESKTOP_STYLUS_BUTTON_ACTION_DEFAULT);
+ 
+-  settings = lookup_tool_settings (tool, device);
++  settings = lookup_tool_settings (input_settings);
+   action = g_settings_get_enum (settings, "eraser-button-action");
+   if (keybinding && action == G_DESKTOP_STYLUS_BUTTON_ACTION_KEYBINDING)
+     *keybinding = g_settings_get_string (settings, "eraser-button-keybinding");
+diff --git a/src/backends/native/meta-input-device-native.c b/src/backends/native/meta-input-device-native.c
+index e9fc22849683aa2549127951aaa28e858de70dbe..5f88ad01ade96ec997a2548e3623e04f50c7364b 100644
+--- a/src/backends/native/meta-input-device-native.c
++++ b/src/backends/native/meta-input-device-native.c
+@@ -61,6 +61,7 @@ meta_input_device_native_finalize (GObject *object)
+ 
+   g_clear_pointer (&device_evdev->pad_features, g_array_unref);
+   g_clear_pointer (&device_evdev->modes, g_array_unref);
++  g_clear_object (&device_evdev->erasing_pen);
+ 
+   G_OBJECT_CLASS (meta_input_device_native_parent_class)->finalize (object);
+ }
+diff --git a/src/backends/native/meta-input-device-native.h b/src/backends/native/meta-input-device-native.h
+index f8c183b51b1c6f98420a4263bf29b5790ba5a55d..3c891b1c6a1e972144ec8bf9e8aa0176dadd1450 100644
+--- a/src/backends/native/meta-input-device-native.h
++++ b/src/backends/native/meta-input-device-native.h
+@@ -91,6 +91,8 @@ struct _MetaInputDeviceNative
+ 
+   gboolean virtual_tablet_switch;
+ 
++  ClutterInputDeviceTool *erasing_pen;
++
+   /* When the client doesn't support high-resolution scroll, accumulate deltas
+    * until we can notify a discrete event.
+    * Some mice have a free spinning wheel, making possible to lock the wheel
+diff --git a/src/backends/native/meta-input-device-tool-native.c b/src/backends/native/meta-input-device-tool-native.c
+index 28e03063bcf0c51392c1639a3cec2b9fd18fb1de..1918abe1bced31e0047d46b7804b3932ca963566 100644
+--- a/src/backends/native/meta-input-device-tool-native.c
++++ b/src/backends/native/meta-input-device-tool-native.c
+@@ -29,6 +29,7 @@ struct _MetaInputDeviceToolNative
+   graphene_point_t pressure_curve[2];
+   MetaBezier *bezier;
+   GDesktopStylusButtonAction eraser_button_action;
++  ClutterInputDeviceTool *eraser;
+ };
+ 
+ G_DEFINE_FINAL_TYPE (MetaInputDeviceToolNative, meta_input_device_tool_native,
+@@ -41,6 +42,7 @@ meta_input_device_tool_native_finalize (GObject *object)
+ 
+   g_hash_table_unref (tool->button_map);
+   g_clear_pointer (&tool->tool, libinput_tablet_tool_unref);
++  g_clear_object (&tool->eraser);
+   meta_bezier_free (tool->bezier);
+ 
+   G_OBJECT_CLASS (meta_input_device_tool_native_parent_class)->finalize (object);
+@@ -141,6 +143,30 @@ meta_input_device_tool_native_new_virtual (ClutterInputDeviceToolType type)
+   return CLUTTER_INPUT_DEVICE_TOOL (evdev_tool);
+ }
+ 
++ClutterInputDeviceTool *
++meta_input_device_tool_native_ensure_eraser_in_impl (ClutterInputDeviceTool *pen)
++{
++  MetaInputDeviceToolNative *evdev_tool = META_INPUT_DEVICE_TOOL_NATIVE (pen);
++
++  if (evdev_tool->eraser)
++    return evdev_tool->eraser;
++
++  if (evdev_tool->tool)
++    {
++      evdev_tool->eraser =
++        meta_input_device_tool_native_new (evdev_tool->tool,
++                                           clutter_input_device_tool_get_serial (pen),
++                                           CLUTTER_INPUT_DEVICE_TOOL_ERASER);
++    }
++  else
++    {
++      evdev_tool->eraser =
++        meta_input_device_tool_native_new_virtual (CLUTTER_INPUT_DEVICE_TOOL_ERASER);
++    }
++
++  return evdev_tool->eraser;
++}
++
+ void
+ meta_input_device_tool_native_set_pressure_curve_in_impl (ClutterInputDeviceTool *tool,
+                                                           double                  curve[4],
+diff --git a/src/backends/native/meta-input-device-tool-native.h b/src/backends/native/meta-input-device-tool-native.h
+index 3839ba050385d990c34e5b41d25841d34acdda8e..b3198d70a7148ac008aad26acf8ffa2cdc229f73 100644
+--- a/src/backends/native/meta-input-device-tool-native.h
++++ b/src/backends/native/meta-input-device-tool-native.h
+@@ -49,6 +49,8 @@ ClutterInputDeviceTool * meta_input_device_tool_native_new      (struct libinput
+ 
+ ClutterInputDeviceTool * meta_input_device_tool_native_new_virtual (ClutterInputDeviceToolType type);
+ 
++ClutterInputDeviceTool * meta_input_device_tool_native_ensure_eraser_in_impl (ClutterInputDeviceTool *pen);
++
+ gdouble                  meta_input_device_tool_native_translate_pressure_in_impl (ClutterInputDeviceTool *tool,
+                                                                                    double                  pressure);
+ GDesktopStylusButtonAction meta_input_device_tool_native_get_button_code_in_impl (ClutterInputDeviceTool *tool,
+diff --git a/src/backends/native/meta-seat-impl.c b/src/backends/native/meta-seat-impl.c
+index d86d5ecf30fa23466f3921aefcca4fa082ef4c24..6201c07b4987a80851f09b130e0baa586f961fad 100644
+--- a/src/backends/native/meta-seat-impl.c
++++ b/src/backends/native/meta-seat-impl.c
+@@ -1004,6 +1004,56 @@ meta_seat_impl_notify_absolute_motion_in_impl (MetaSeatImpl       *seat_impl,
+   queue_event (seat_impl, event);
+ }
+ 
++static void
++switch_tool (MetaSeatImpl           *seat_impl,
++             ClutterInputDevice     *input_device,
++             ClutterInputDeviceTool *to,
++             uint64_t                time_us)
++{
++  MetaInputDeviceNative *device_native = META_INPUT_DEVICE_NATIVE (input_device);
++  gboolean tip_down = (device_native->button_state & CLUTTER_BUTTON1_MASK) != 0;
++
++  if (tip_down)
++    meta_seat_impl_notify_button_in_impl (seat_impl, input_device, time_us,
++                                          BTN_TOUCH, FALSE);
++
++  meta_seat_impl_notify_tablet_proximity_in_impl (seat_impl, input_device,
++                                                  device_native->last_tool,
++                                                  time_us, FALSE);
++  meta_seat_impl_notify_tablet_proximity_in_impl (seat_impl, input_device,
++                                                  to, time_us, TRUE);
++
++  if (tip_down)
++    meta_seat_impl_notify_button_in_impl (seat_impl, input_device, time_us,
++                                          BTN_TOUCH, TRUE);
++}
++
++static void
++erase_with_pen (MetaSeatImpl       *seat_impl,
++                ClutterInputDevice *input_device,
++                uint64_t            time_us,
++                gboolean            pressed)
++{
++  MetaInputDeviceNative *device_native = META_INPUT_DEVICE_NATIVE (input_device);
++  ClutterInputDeviceTool *pen = device_native->last_tool;
++
++  if (pressed && !device_native->erasing_pen &&
++      clutter_input_device_tool_get_tool_type (pen) != CLUTTER_INPUT_DEVICE_TOOL_ERASER)
++    {
++      device_native->erasing_pen = g_object_ref (pen);
++      switch_tool (seat_impl, input_device,
++                   meta_input_device_tool_native_ensure_eraser_in_impl (pen),
++                   time_us);
++    }
++  else if (!pressed && device_native->erasing_pen)
++    {
++      g_autoptr (ClutterInputDeviceTool) erasing_pen =
++        g_steal_pointer (&device_native->erasing_pen);
++
++      switch_tool (seat_impl, input_device, erasing_pen, time_us);
++    }
++}
++
+ void
+ meta_seat_impl_notify_button_in_impl (MetaSeatImpl       *seat_impl,
+                                       ClutterInputDevice *input_device,
+@@ -1050,7 +1100,7 @@ meta_seat_impl_notify_button_in_impl (MetaSeatImpl       *seat_impl,
+           /* Apply the button event code as per the tool mapping */
+           action = meta_input_device_tool_native_get_button_code_in_impl (tool, tool_button_nr);
+         }
+-      switch (action)
++      switch ((int) action)
+         {
+         case G_DESKTOP_STYLUS_BUTTON_ACTION_DEFAULT:
+           evdev_button = meta_clutter_tool_button_to_evdev (CLUTTER_BUTTON_PRIMARY);
+@@ -1074,9 +1124,16 @@ meta_seat_impl_notify_button_in_impl (MetaSeatImpl       *seat_impl,
+           break;
+         case G_DESKTOP_STYLUS_BUTTON_ACTION_SWITCH_MONITOR:
+         case G_DESKTOP_STYLUS_BUTTON_ACTION_KEYBINDING:
++        case META_PEN_BUTTON_ACTION_SCREENSHOT:
++        case META_PEN_BUTTON_ACTION_NOTES:
++        case META_PEN_BUTTON_ACTION_START:
++        case META_PEN_BUTTON_ACTION_NOTHING:
+           // button evdev code left as-is, i.e. BTN_STYLUS or whatever
+           clutter_button = 0;
+           break;
++        case META_PEN_BUTTON_ACTION_ERASER:
++          erase_with_pen (seat_impl, input_device, time_us, state);
++          return;
+         default:
+           g_warn_if_reached ();
+         }
+diff --git a/src/core/display-private.h b/src/core/display-private.h
+index b9913e0b8fd133e31f83a00b0ec6a8e711fa11c4..a166cc6952f77a9396c434eb49a7072b6c3a463a 100644
+--- a/src/core/display-private.h
++++ b/src/core/display-private.h
+@@ -325,6 +325,10 @@ void meta_display_handle_window_enter (MetaDisplay *display,
+ 
+ void meta_display_maybe_update_sticky_mouse_focus (MetaDisplay *display);
+ 
++void meta_display_notify_pen_action (MetaDisplay        *display,
++                                     ClutterInputDevice *device,
++                                     const char         *action);
++
+ void meta_display_handle_sticky_mouse_focus_event (MetaDisplay        *display,
+                                                    const ClutterEvent *event);
+ 
+diff --git a/src/core/display.c b/src/core/display.c
+index 222054e8fc62d3c842bc9c0750b345e199083555..0194b6c2729a303279ab9a71367146eb8dd966a0 100644
+--- a/src/core/display.c
++++ b/src/core/display.c
+@@ -181,6 +181,7 @@ enum
+   INIT_XSERVER,
+   WINDOW_VISIBILITY_UPDATED,
+   BELL,
++  PEN_ACTION,
+   LAST_SIGNAL
+ };
+ 
+@@ -460,6 +461,23 @@ meta_display_class_init (MetaDisplayClass *klass)
+                   G_TYPE_NONE, 3, CLUTTER_TYPE_INPUT_DEVICE,
+                   G_TYPE_UINT, G_TYPE_UINT);
+ 
++  /**
++   * MetaDisplay::pen-action:
++   * @display: the display
++   * @device: the tablet the pen belongs to
++   * @action: what the pen's button asks for: "screenshot", "notes" or "start"
++   *
++   * Emitted when a pen's button is pressed that people set to do something
++   * the shell does.
++   */
++  display_signals[PEN_ACTION] =
++    g_signal_new ("pen-action",
++                  G_TYPE_FROM_CLASS (klass),
++                  G_SIGNAL_RUN_LAST,
++                  0, NULL, NULL, NULL,
++                  G_TYPE_NONE, 2, CLUTTER_TYPE_INPUT_DEVICE,
++                  G_TYPE_STRING);
++
+   display_signals[WINDOW_ENTERED_MONITOR] =
+     g_signal_new ("window-entered-monitor",
+                   G_TYPE_FROM_CLASS (klass),
+@@ -2585,6 +2603,14 @@ meta_display_show_tablet_mapping_notification (MetaDisplay        *display,
+                          "input-tablet-symbolic", pretty_name);
+ }
+ 
++void
++meta_display_notify_pen_action (MetaDisplay        *display,
++                                ClutterInputDevice *device,
++                                const char         *action)
++{
++  g_signal_emit (display, display_signals[PEN_ACTION], 0, device, action);
++}
++
+ void
+ meta_display_notify_pad_group_switch (MetaDisplay        *display,
+                                       ClutterInputDevice *pad,
+diff --git a/src/core/meta-tool-action-mapper.c b/src/core/meta-tool-action-mapper.c
+index a969535a8b702c83e9f06db1fc0b57e15a366671..369c4090deada9ef9ff8994e1ffee255282e4444 100644
+--- a/src/core/meta-tool-action-mapper.c
++++ b/src/core/meta-tool-action-mapper.c
+@@ -33,6 +33,7 @@
+ struct _MetaToolActionMapper
+ {
+   MetaTabletActionMapper parent_instance;
++  MetaBackend *backend;
+   MetaInputSettings *input_settings;
+ };
+ 
+@@ -74,11 +75,36 @@ meta_tool_action_mapper_new (MetaBackend *backend)
+   action_mapper = g_object_new (META_TYPE_TOOL_ACTION_MAPPER,
+                                 "monitor-manager", monitor_manager,
+                                 NULL);
++  action_mapper->backend = backend;
+   action_mapper->input_settings = g_object_ref (meta_backend_get_input_settings (backend));
+ 
+   return action_mapper;
+ }
+ 
++static void
++notify_pen_action (MetaToolActionMapper *mapper,
++                   ClutterInputDevice   *device,
++                   MetaPenButtonAction   action)
++{
++  MetaContext *context = meta_backend_get_context (mapper->backend);
++  MetaDisplay *display = meta_context_get_display (context);
++
++  switch (action)
++    {
++    case META_PEN_BUTTON_ACTION_SCREENSHOT:
++      meta_display_notify_pen_action (display, device, "screenshot");
++      break;
++    case META_PEN_BUTTON_ACTION_NOTES:
++      meta_display_notify_pen_action (display, device, "notes");
++      break;
++    case META_PEN_BUTTON_ACTION_START:
++      meta_display_notify_pen_action (display, device, "start");
++      break;
++    default:
++      g_assert_not_reached ();
++    }
++}
++
+ static gboolean
+ meta_tool_action_mapper_handle_button (MetaToolActionMapper *mapper,
+                                        ClutterInputDevice   *device,
+@@ -113,7 +139,7 @@ meta_tool_action_mapper_handle_button (MetaToolActionMapper *mapper,
+       action = meta_input_settings_get_tool_button_action (mapper->input_settings,
+                                                            device, tool, button, &accel);
+     }
+-  switch (action)
++  switch ((int) action)
+     {
+     case G_DESKTOP_STYLUS_BUTTON_ACTION_DEFAULT:
+     case G_DESKTOP_STYLUS_BUTTON_ACTION_MIDDLE:
+@@ -130,6 +156,15 @@ meta_tool_action_mapper_handle_button (MetaToolActionMapper *mapper,
+       if (accel)
+         tablet_klass->emulate_keybinding (tablet_mapper, accel, is_press);
+       return TRUE;
++    case META_PEN_BUTTON_ACTION_SCREENSHOT:
++    case META_PEN_BUTTON_ACTION_NOTES:
++    case META_PEN_BUTTON_ACTION_START:
++      if (is_press)
++        notify_pen_action (mapper, device, (MetaPenButtonAction) action);
++      return TRUE;
++    case META_PEN_BUTTON_ACTION_ERASER:
++    case META_PEN_BUTTON_ACTION_NOTHING:
++      return TRUE;
+     default:
+       g_warn_if_reached ();
+       return FALSE;

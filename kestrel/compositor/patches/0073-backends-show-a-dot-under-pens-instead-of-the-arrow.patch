@@ -1,0 +1,89 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Sun, 8 Nov 2026 12:28:52 +0100
+Subject: [PATCH 73/73] backends: show a dot under pens instead of the arrow
+
+Add CLUTTER_CURSOR_PEN, named "pen" in cursor themes with "dot" as its
+Xcursor fallback, and use it for every tablet tool sprite that would
+show a cursor, over the shell and over every client, whatever cursor
+the client sets for the tool. The tip is where the pen points, so an
+arrow or a text cursor next to it only covers what is under the nib. A
+client that hides the cursor for the tool, such as a drawing app that
+draws its own brush outline, keeps it hidden. The dot goes through the
+tool's cursor renderer like any other cursor image.
+
+Upstream-Status: luft-only Kestrel's look for pens
+---
+ clutter/clutter/clutter-cursor.c   |  2 ++
+ clutter/clutter/clutter-enums.h    |  2 ++
+ src/backends/meta-cursor-xcursor.c |  2 ++
+ src/backends/meta-sprite.c         | 10 +++++++++-
+ 4 files changed, 15 insertions(+), 1 deletion(-)
+
+diff --git a/clutter/clutter/clutter-cursor.c b/clutter/clutter/clutter-cursor.c
+index a4445f602aa903ef1fc34cde2e18b459e1d4d317..5183fb3555e84ab4181fdcd050548a91d6767ed3 100644
+--- a/clutter/clutter/clutter-cursor.c
++++ b/clutter/clutter/clutter-cursor.c
+@@ -456,6 +456,8 @@ clutter_cursor_type_to_name (ClutterCursorType cursor)
+       return "dnd-ask";
+     case CLUTTER_CURSOR_ALL_RESIZE:
+       return "all-resize";
++    case CLUTTER_CURSOR_PEN:
++      return "pen";
+     case CLUTTER_CURSOR_INHERIT:
+     case CLUTTER_CURSOR_NONE:
+       break;
+diff --git a/clutter/clutter/clutter-enums.h b/clutter/clutter/clutter-enums.h
+index 70da0dce54ace7c9337214e09dd8558f22d23be8..ac66cc682263fdd7fc829bef00ac77480f8b550c 100644
+--- a/clutter/clutter/clutter-enums.h
++++ b/clutter/clutter/clutter-enums.h
+@@ -1202,6 +1202,7 @@ typedef enum /*< prefix=CLUTTER_SPRITE_ROLE >*/
+  * @CLUTTER_CURSOR_ZOOM_OUT: Zoom out cursor
+  * @CLUTTER_CURSOR_DND_ASK: DnD ask cursor
+  * @CLUTTER_CURSOR_ALL_RESIZE: Resize all directions
++ * @CLUTTER_CURSOR_PEN: The dot that follows a pen
+  */
+ typedef enum
+ {
+@@ -1243,6 +1244,7 @@ typedef enum
+   CLUTTER_CURSOR_ZOOM_OUT,
+   CLUTTER_CURSOR_DND_ASK, /* not css */
+   CLUTTER_CURSOR_ALL_RESIZE, /* not css */
++  CLUTTER_CURSOR_PEN, /* not css */
+ } ClutterCursorType;
+ 
+ /**
+diff --git a/src/backends/meta-cursor-xcursor.c b/src/backends/meta-cursor-xcursor.c
+index 2f0acfc699548c1b9efe2f09e4a302683efbba4f..7718b2f89b8b0a74c40f7fc9abb2e248d95ea9a3 100644
+--- a/src/backends/meta-cursor-xcursor.c
++++ b/src/backends/meta-cursor-xcursor.c
+@@ -138,6 +138,8 @@ meta_cursor_get_legacy_name (ClutterCursorType cursor)
+       return "dnd-copy";
+     case CLUTTER_CURSOR_ALL_RESIZE:
+       return "dnd-move";
++    case CLUTTER_CURSOR_PEN:
++      return "dot";
+     case CLUTTER_CURSOR_INHERIT:
+     case CLUTTER_CURSOR_NONE:
+       break;
+diff --git a/src/backends/meta-sprite.c b/src/backends/meta-sprite.c
+index 2953ac4cf200e3ff83be53ebd63d2f71cee2355b..4a301f4585326ae65c48848be127d631998ec39d 100644
+--- a/src/backends/meta-sprite.c
++++ b/src/backends/meta-sprite.c
+@@ -122,7 +122,15 @@ meta_sprite_update_cursor (ClutterSprite *sprite,
+     }
+   else
+     {
+-      meta_cursor_renderer_set_cursor (cursor_renderer, cursor);
++      g_autoptr (ClutterCursor) pen_cursor = NULL;
++
++      if (cursor && clutter_cursor_get_cursor_type (cursor) != CLUTTER_CURSOR_NONE)
++        {
++          pen_cursor = meta_backend_get_cursor (priv->backend, CLUTTER_CURSOR_PEN);
++          meta_cursor_renderer_prepare_cursor (cursor_renderer, pen_cursor);
++        }
++
++      meta_cursor_renderer_set_cursor (cursor_renderer, pen_cursor);
+     }
+ }
+ 

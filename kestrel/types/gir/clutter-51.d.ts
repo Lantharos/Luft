@@ -260,6 +260,7 @@ export namespace Clutter {
         ZOOM_OUT = 35,
         DND_ASK = 36,
         ALL_RESIZE = 37,
+        PEN = 38,
     }
 
 
@@ -14740,7 +14741,13 @@ export namespace Clutter {
 
         vfunc_notify_scroll_continuous(time_us: number, dx: number, dy: number, scroll_source: ScrollSource, finish_flags: ScrollFinishFlags): void;
 
+        vfunc_notify_tablet_button(time_us: number, button: number, button_state: ButtonState): void;
+
         vfunc_notify_tablet_mode(tablet_mode: boolean): void;
+
+        vfunc_notify_tablet_motion(time_us: number, x: number, y: number, pressure: number): void;
+
+        vfunc_notify_tablet_proximity(time_us: number, in_proximity: boolean, tool_type: InputDeviceToolType): void;
 
         vfunc_notify_touch_down(time_us: number, slot: number, x: number, y: number): void;
 
@@ -14771,7 +14778,13 @@ export namespace Clutter {
 
         notify_scroll_continuous(time_us: bigint | number, dx: number, dy: number, scroll_source: ScrollSource, finish_flags: ScrollFinishFlags): void;
 
+        notify_tablet_button(time_us: bigint | number, button: number, button_state: ButtonState): void;
+
         notify_tablet_mode(tablet_mode: boolean): void;
+
+        notify_tablet_motion(time_us: bigint | number, x: number, y: number, pressure: number): void;
+
+        notify_tablet_proximity(time_us: bigint | number, in_proximity: boolean, tool_type: InputDeviceToolType): void;
 
         notify_touch_down(time_us: bigint | number, slot: number, x: number, y: number): void;
 

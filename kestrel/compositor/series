@@ -67,3 +67,7 @@
 0067-clutter-let-shell-effects-run-view-filters-and-repai.patch
 0068-compositor-tell-the-shell-what-windows-leave-of-the-.patch
 0069-wayland-let-the-shell-take-files-dragged-onto-its-ow.patch
+0070-backends-let-virtual-input-devices-act-as-pens.patch
+0071-backends-follow-Kestrel-s-pen-settings.patch
+0072-backends-ignore-the-hand-that-rests-on-the-screen-af.patch
+0073-backends-show-a-dot-under-pens-instead-of-the-arrow.patch

@@ -49,6 +49,8 @@
     <file preprocess="xml-stripblanks">icons/Adwaita/cursors_scalable/nw-resize/nw-resize.svg</file>
     <file>icons/Adwaita/cursors_scalable/nwse-resize/metadata.json</file>
     <file preprocess="xml-stripblanks">icons/Adwaita/cursors_scalable/nwse-resize/nwse-resize.svg</file>
+    <file>icons/Adwaita/cursors_scalable/pen/metadata.json</file>
+    <file preprocess="xml-stripblanks">icons/Adwaita/cursors_scalable/pen/pen.svg</file>
     <file>icons/Adwaita/cursors_scalable/pointer/metadata.json</file>
     <file preprocess="xml-stripblanks">icons/Adwaita/cursors_scalable/pointer/pointer.svg</file>
     <file>icons/Adwaita/cursors_scalable/progress/metadata.json</file>

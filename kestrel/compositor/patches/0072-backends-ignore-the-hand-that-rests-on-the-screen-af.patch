@@ -1,0 +1,749 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Sun, 8 Nov 2026 12:24:17 +0100
+Subject: [PATCH 72/73] backends: ignore the hand that rests on the screen
+ after a pen lifts
+
+libinput ignores the touchscreen of a pen while the pen is near it,
+but a pen with a short hover range, such as a Wacom AES pen in a 2-in-1,
+leaves proximity whenever it lifts between strokes, and a hand that
+lands again a moment later counts as a tap on whatever is under it.
+
+Keep a short pen session in the input thread. Touches on the pen's own
+screen, the same libinput device group, are judged by where they land
+relative to the last point of the pen and by the hand from
+com.lantharos.kestrel.pen. For 1.5 seconds after the pen leaves, a
+touch in the area the side of the hand covers (from 50 mm behind the
+tip to 140 mm ahead of it, 45 mm above to 95 mm below) is dropped, and
+one within 20 mm of it is held for up to 150 ms and let through if it
+lifts as a tap, drags away or stays still. Until 4.5 seconds, a touch
+in that area waits 450 ms and is dropped if the pen comes back in that
+time. A contact that lands within 50 mm of one already taken for a palm
+is dropped too, and any touch still held when the pen comes back. Held
+touches are replayed with their own times when let through. Without a
+pen nearby, touches take the same path as before, and the filter costs
+a branch.
+
+Upstream-Status: luft-only tuned on recordings of one 2-in-1; wants hardware data from more pens before it is proposed
+---
+ src/backends/meta-input-settings-private.h    |   3 +
+ src/backends/meta-input-settings.c            |  23 +
+ .../native/meta-input-settings-native.c       |  11 +
+ src/backends/native/meta-input-thread.h       |   1 +
+ src/backends/native/meta-palm-filter.c        | 434 ++++++++++++++++++
+ src/backends/native/meta-palm-filter.h        |  58 +++
+ src/backends/native/meta-seat-impl.c          |  22 +
+ src/backends/native/meta-seat-impl.h          |   9 +
+ src/meson.build                               |   2 +
+ 9 files changed, 563 insertions(+)
+ create mode 100644 src/backends/native/meta-palm-filter.c
+ create mode 100644 src/backends/native/meta-palm-filter.h
+
+diff --git a/src/backends/meta-input-settings-private.h b/src/backends/meta-input-settings-private.h
+index ebcd9eafb8799b100cd5a4b6e04146fb0ef59f0e..cbbe1c4e3f85f5a1e9c61b59a48c6cecf5ef1561 100644
+--- a/src/backends/meta-input-settings-private.h
++++ b/src/backends/meta-input-settings-private.h
+@@ -180,6 +180,9 @@ struct _MetaInputSettingsClass
+                                      GDesktopStylusEraserButtonMode  mode,
+                                      GDesktopStylusButtonAction      button);
+ 
++  void (* set_pen_left_handed) (MetaInputSettings *settings,
++                                gboolean           left_handed);
++
+   void (* set_mouse_middle_click_emulation) (MetaInputSettings  *settings,
+                                              ClutterInputDevice *device,
+                                              gboolean            enabled);
+diff --git a/src/backends/meta-input-settings.c b/src/backends/meta-input-settings.c
+index e6e2cd14309ef3e78c402525845ae9e479943037..fde1812ac6ae474910f91476151a41130784359e 100644
+--- a/src/backends/meta-input-settings.c
++++ b/src/backends/meta-input-settings.c
+@@ -1787,6 +1787,26 @@ apply_stylus_settings (MetaInputSettings      *input_settings,
+   update_stylus_eraserbutton (input_settings, device, tool);
+ }
+ 
++static void
++update_pen_hand (MetaInputSettings *input_settings)
++{
++  MetaInputSettingsPrivate *priv =
++    meta_input_settings_get_instance_private (input_settings);
++  MetaInputSettingsClass *input_settings_class =
++    META_INPUT_SETTINGS_GET_CLASS (input_settings);
++
++  input_settings_class->set_pen_left_handed (input_settings,
++                                             g_settings_get_enum (priv->pen_settings, "hand") == 1);
++}
++
++static void
++pen_hand_changed_cb (GSettings  *settings,
++                     const char *key,
++                     gpointer    user_data)
++{
++  update_pen_hand (user_data);
++}
++
+ static void
+ evaluate_two_finger_scrolling (MetaInputSettings  *input_settings,
+                                ClutterInputDevice *device)
+@@ -1932,6 +1952,7 @@ meta_input_settings_constructed (GObject *object)
+   check_mappable_devices (input_settings);
+ 
+   load_keyboard_a11y_settings (input_settings);
++  update_pen_hand (input_settings);
+ }
+ 
+ static void
+@@ -2013,6 +2034,8 @@ meta_input_settings_init (MetaInputSettings *settings)
+                     G_CALLBACK (meta_input_keyboard_a11y_settings_changed), settings);
+ 
+   priv->pen_settings = g_settings_new ("com.lantharos.kestrel.pen");
++  g_signal_connect (priv->pen_settings, "changed::hand",
++                    G_CALLBACK (pen_hand_changed_cb), settings);
+ 
+   priv->mappable_devices =
+     g_hash_table_new_full (NULL, NULL, NULL, (GDestroyNotify) device_mapping_info_free);
+diff --git a/src/backends/native/meta-input-settings-native.c b/src/backends/native/meta-input-settings-native.c
+index cc2280fa28e3546d3f5b08740c2109ca4c5496c9..44db4fa7494f6e0ad769906e75962693ccb9c727 100644
+--- a/src/backends/native/meta-input-settings-native.c
++++ b/src/backends/native/meta-input-settings-native.c
+@@ -195,6 +195,16 @@ meta_input_settings_native_set_scroll_speed (MetaInputSettings  *settings,
+   META_INPUT_DEVICE_NATIVE (device)->scroll_speed = speed;
+ }
+ 
++static void
++meta_input_settings_native_set_pen_left_handed (MetaInputSettings *settings,
++                                                gboolean           left_handed)
++{
++  MetaInputSettingsNative *settings_native = META_INPUT_SETTINGS_NATIVE (settings);
++
++  meta_palm_filter_set_hand (settings_native->seat_impl->palm_filter,
++                             left_handed ? META_PALM_HAND_LEFT : META_PALM_HAND_RIGHT);
++}
++
+ static void
+ meta_input_settings_native_set_left_handed (MetaInputSettings  *settings,
+                                             ClutterInputDevice *device,
+@@ -914,6 +924,7 @@ meta_input_settings_native_class_init (MetaInputSettingsNativeClass *klass)
+   input_settings_class->set_speed = meta_input_settings_native_set_speed;
+   input_settings_class->set_scroll_speed = meta_input_settings_native_set_scroll_speed;
+   input_settings_class->set_left_handed = meta_input_settings_native_set_left_handed;
++  input_settings_class->set_pen_left_handed = meta_input_settings_native_set_pen_left_handed;
+   input_settings_class->set_tap_enabled = meta_input_settings_native_set_tap_enabled;
+   input_settings_class->set_tap_button_map = meta_input_settings_native_set_tap_button_map;
+   input_settings_class->set_tap_and_drag_enabled = meta_input_settings_native_set_tap_and_drag_enabled;
+diff --git a/src/backends/native/meta-input-thread.h b/src/backends/native/meta-input-thread.h
+index 3694ed02cb1ac0f9cb233b887b0bf72670d09694..0be5a4dcebe0e27a04ec559fa84e9a2a833c25c3 100644
+--- a/src/backends/native/meta-input-thread.h
++++ b/src/backends/native/meta-input-thread.h
+@@ -25,6 +25,7 @@
+ #include "src/backends/native/meta-input-device-tool-native.h"
+ #include "src/backends/native/meta-input-settings-native.h"
+ #include "src/backends/native/meta-keymap-native-private.h"
++#include "src/backends/native/meta-palm-filter.h"
+ #include "src/backends/native/meta-seat-impl.h"
+ 
+ #undef META_INPUT_THREAD_H_INSIDE
+diff --git a/src/backends/native/meta-palm-filter.c b/src/backends/native/meta-palm-filter.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..f62f589653a15e11e0a0776c30641ad70b2ebd0e
+--- /dev/null
++++ b/src/backends/native/meta-palm-filter.c
+@@ -0,0 +1,434 @@
++/*
++ * Copyright (C) 2026 Kristof Imeri
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 of the
++ * License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "config.h"
++
++#include <math.h>
++
++#include "backends/native/meta-input-thread.h"
++#include "meta/util.h"
++
++#define FRESH_US (1500 * G_TIME_SPAN_MILLISECOND)
++#define SETTLING_US (4500 * G_TIME_SPAN_MILLISECOND)
++#define SETTLING_HOLD_MS 450
++#define EDGE_HOLD_MS 150
++
++#define ZONE_BEHIND_MM 50.0
++#define ZONE_AHEAD_MM 140.0
++#define ZONE_ABOVE_MM 45.0
++#define ZONE_BELOW_MM 95.0
++#define EDGE_MM 20.0
++#define CROWD_MM 50.0
++#define DRAG_MM 6.0
++#define STILL_MM 2.0
++#define VIRTUAL_PX_PER_MM 4.0f
++
++typedef enum
++{
++  TOUCH_DROPPED,
++  TOUCH_AT_EDGE,
++  TOUCH_SETTLING,
++} TouchVerdict;
++
++typedef struct
++{
++  ClutterEventType type;
++  uint64_t time_us;
++  float x;
++  float y;
++} HeldEvent;
++
++typedef struct
++{
++  MetaPalmFilter *filter;
++  ClutterInputDevice *device;
++  int slot;
++  TouchVerdict verdict;
++  float start_x;
++  float start_y;
++  float px_per_mm;
++  double travel_mm;
++  gboolean ended;
++  GArray *events;
++  GSource *timeout;
++} Touch;
++
++struct _MetaPalmFilter
++{
++  MetaSeatImpl *seat_impl;
++  MetaPalmHand hand;
++  ClutterInputDevice *pen;
++  gboolean pen_near;
++  float pen_x;
++  float pen_y;
++  uint64_t pen_left_us;
++  GHashTable *touches;
++};
++
++static const char *verdict_names[] = { "dropped", "at the edge", "settling" };
++
++static void
++touch_free (Touch *touch)
++{
++  if (touch->timeout)
++    {
++      g_source_destroy (touch->timeout);
++      g_source_unref (touch->timeout);
++    }
++  g_array_unref (touch->events);
++  g_object_unref (touch->device);
++  g_free (touch);
++}
++
++MetaPalmFilter *
++meta_palm_filter_new (MetaSeatImpl *seat_impl)
++{
++  MetaPalmFilter *filter = g_new0 (MetaPalmFilter, 1);
++
++  filter->seat_impl = seat_impl;
++  filter->touches = g_hash_table_new_full (NULL, NULL, NULL,
++                                           (GDestroyNotify) touch_free);
++
++  return filter;
++}
++
++void
++meta_palm_filter_free (MetaPalmFilter *filter)
++{
++  g_hash_table_unref (filter->touches);
++  g_clear_object (&filter->pen);
++  g_free (filter);
++}
++
++void
++meta_palm_filter_set_hand (MetaPalmFilter *filter,
++                           MetaPalmHand    hand)
++{
++  filter->hand = hand;
++}
++
++static gboolean
++on_same_screen (ClutterInputDevice *pen,
++                ClutterInputDevice *touchscreen)
++{
++  struct libinput_device *pen_device =
++    meta_input_device_native_get_libinput_device (pen);
++  struct libinput_device *touch_device =
++    meta_input_device_native_get_libinput_device (touchscreen);
++
++  if (!pen_device || !touch_device)
++    return !pen_device && !touch_device;
++
++  return (libinput_device_get_device_group (pen_device) ==
++          libinput_device_get_device_group (touch_device));
++}
++
++static float
++px_per_mm (MetaPalmFilter     *filter,
++           ClutterInputDevice *touchscreen)
++{
++  MetaSeatImpl *seat_impl = filter->seat_impl;
++  struct libinput_device *device =
++    meta_input_device_native_get_libinput_device (touchscreen);
++  float x0 = 0, y0 = 0, x1, y1;
++  double width_mm, height_mm;
++
++  if (!device || libinput_device_get_size (device, &width_mm, &height_mm) != 0)
++    return VIRTUAL_PX_PER_MM;
++
++  meta_viewport_info_get_extents (seat_impl->viewports, &x1, &y1);
++  meta_input_device_native_translate_coordinates_in_impl (touchscreen,
++                                                          seat_impl->viewports,
++                                                          &x0, &y0);
++  meta_input_device_native_translate_coordinates_in_impl (touchscreen,
++                                                          seat_impl->viewports,
++                                                          &x1, &y1);
++
++  return (float) (hypot (x1 - x0, y1 - y0) / hypot (width_mm, height_mm));
++}
++
++static gboolean
++in_palm_zone (MetaPalmFilter *filter,
++              double          ahead_mm,
++              double          below_mm,
++              double          grow_mm)
++{
++  if (filter->hand == META_PALM_HAND_LEFT)
++    ahead_mm = -ahead_mm;
++
++  return (ahead_mm >= -ZONE_BEHIND_MM - grow_mm &&
++          ahead_mm <= ZONE_AHEAD_MM + grow_mm &&
++          below_mm >= -ZONE_ABOVE_MM - grow_mm &&
++          below_mm <= ZONE_BELOW_MM + grow_mm);
++}
++
++static void
++hold_event (Touch            *touch,
++            ClutterEventType  type,
++            uint64_t          time_us,
++            float             x,
++            float             y)
++{
++  HeldEvent event = { type, time_us, x, y };
++
++  g_array_append_val (touch->events, event);
++}
++
++static void
++let_through (Touch *touch)
++{
++  MetaPalmFilter *filter = touch->filter;
++  unsigned int i;
++
++  meta_topic (META_DEBUG_INPUT, "Palm filter: touch %d is a finger",
++              touch->slot);
++
++  for (i = 0; i < touch->events->len; i++)
++    {
++      HeldEvent *event = &g_array_index (touch->events, HeldEvent, i);
++
++      meta_seat_impl_deliver_touch_in_impl (filter->seat_impl, touch->device,
++                                            event->type, event->time_us,
++                                            touch->slot, event->x, event->y);
++    }
++
++  g_hash_table_remove (filter->touches, GINT_TO_POINTER (touch->slot));
++}
++
++static void
++stop_hold (Touch *touch)
++{
++  if (!touch->timeout)
++    return;
++
++  g_source_destroy (touch->timeout);
++  g_clear_pointer (&touch->timeout, g_source_unref);
++}
++
++static gboolean
++discard (Touch *touch)
++{
++  meta_topic (META_DEBUG_INPUT, "Palm filter: touch %d is a palm",
++              touch->slot);
++
++  stop_hold (touch);
++  touch->verdict = TOUCH_DROPPED;
++  g_array_set_size (touch->events, 0);
++
++  return touch->ended;
++}
++
++static gboolean
++hold_expired (gpointer user_data)
++{
++  Touch *touch = user_data;
++
++  g_clear_pointer (&touch->timeout, g_source_unref);
++
++  if (touch->verdict == TOUCH_AT_EDGE && touch->travel_mm > STILL_MM)
++    {
++      if (discard (touch))
++        g_hash_table_remove (touch->filter->touches, GINT_TO_POINTER (touch->slot));
++    }
++  else
++    {
++      let_through (touch);
++    }
++
++  return G_SOURCE_REMOVE;
++}
++
++static void
++start_hold (Touch        *touch,
++            unsigned int  ms)
++{
++  touch->timeout = g_timeout_source_new (ms);
++  g_source_set_callback (touch->timeout, hold_expired, touch, NULL);
++  g_source_attach (touch->timeout, touch->filter->seat_impl->input_context);
++}
++
++static gboolean
++crowds_a_palm (MetaPalmFilter *filter,
++               float           x,
++               float           y,
++               float           px_per_mm)
++{
++  GHashTableIter iter;
++  Touch *touch;
++  gboolean crowded = FALSE;
++
++  g_hash_table_iter_init (&iter, filter->touches);
++  while (g_hash_table_iter_next (&iter, NULL, (gpointer *) &touch))
++    {
++      if (hypot (touch->start_x - x, touch->start_y - y) / px_per_mm > CROWD_MM)
++        continue;
++
++      crowded = TRUE;
++      if (touch->verdict != TOUCH_DROPPED && discard (touch))
++        g_hash_table_iter_remove (&iter);
++    }
++
++  return crowded;
++}
++
++static gboolean
++judge_new_touch (MetaPalmFilter     *filter,
++                 ClutterInputDevice *device,
++                 uint64_t            time_us,
++                 int                 slot,
++                 float               x,
++                 float               y)
++{
++  int64_t since_pen;
++  gboolean fresh;
++  double ahead_mm, below_mm;
++  float scale;
++  Touch *touch;
++  TouchVerdict verdict;
++
++  since_pen = filter->pen_near ? 0 : MAX (0, (int64_t) (time_us - filter->pen_left_us));
++  if (since_pen > SETTLING_US || !on_same_screen (filter->pen, device))
++    return FALSE;
++
++  scale = px_per_mm (filter, device);
++  ahead_mm = (x - filter->pen_x) / scale;
++  below_mm = (y - filter->pen_y) / scale;
++  fresh = since_pen < FRESH_US;
++
++  if (crowds_a_palm (filter, x, y, scale))
++    verdict = TOUCH_DROPPED;
++  else if (in_palm_zone (filter, ahead_mm, below_mm, 0))
++    verdict = fresh ? TOUCH_DROPPED : TOUCH_SETTLING;
++  else if (fresh && in_palm_zone (filter, ahead_mm, below_mm, EDGE_MM))
++    verdict = TOUCH_AT_EDGE;
++  else
++    return FALSE;
++
++  meta_topic (META_DEBUG_INPUT,
++              "Palm filter: touch %d at %.0f, %.0f mm from the pen, "
++              "%" G_GINT64_FORMAT " ms after it, %s",
++              slot, ahead_mm, below_mm, since_pen / 1000,
++              verdict_names[verdict]);
++
++  touch = g_new0 (Touch, 1);
++  touch->filter = filter;
++  touch->device = g_object_ref (device);
++  touch->slot = slot;
++  touch->verdict = verdict;
++  touch->start_x = x;
++  touch->start_y = y;
++  touch->px_per_mm = scale;
++  touch->events = g_array_new (FALSE, FALSE, sizeof (HeldEvent));
++  g_hash_table_insert (filter->touches, GINT_TO_POINTER (slot), touch);
++
++  if (verdict == TOUCH_DROPPED)
++    return TRUE;
++
++  hold_event (touch, CLUTTER_TOUCH_BEGIN, time_us, x, y);
++  start_hold (touch, verdict == TOUCH_AT_EDGE ? EDGE_HOLD_MS : SETTLING_HOLD_MS);
++  return TRUE;
++}
++
++gboolean
++meta_palm_filter_take_touch (MetaPalmFilter     *filter,
++                             ClutterInputDevice *device,
++                             ClutterEventType    type,
++                             uint64_t            time_us,
++                             int                 slot,
++                             float               x,
++                             float               y)
++{
++  Touch *touch;
++
++  if (!filter->pen)
++    return FALSE;
++
++  if (type == CLUTTER_TOUCH_BEGIN)
++    return judge_new_touch (filter, device, time_us, slot, x, y);
++
++  if (g_hash_table_size (filter->touches) == 0)
++    return FALSE;
++
++  touch = g_hash_table_lookup (filter->touches, GINT_TO_POINTER (slot));
++  if (!touch)
++    return FALSE;
++
++  if (touch->verdict == TOUCH_DROPPED || type == CLUTTER_TOUCH_CANCEL)
++    {
++      if (type != CLUTTER_TOUCH_UPDATE)
++        g_hash_table_remove (filter->touches, GINT_TO_POINTER (slot));
++      return TRUE;
++    }
++
++  hold_event (touch, type, time_us, x, y);
++
++  if (type == CLUTTER_TOUCH_UPDATE)
++    {
++      touch->travel_mm = MAX (touch->travel_mm,
++                              hypot (x - touch->start_x, y - touch->start_y) /
++                              touch->px_per_mm);
++      if (touch->verdict == TOUCH_AT_EDGE && touch->travel_mm >= DRAG_MM)
++        let_through (touch);
++    }
++  else
++    {
++      touch->ended = TRUE;
++      if (touch->verdict == TOUCH_AT_EDGE)
++        let_through (touch);
++    }
++
++  return TRUE;
++}
++
++void
++meta_palm_filter_pen_proximity (MetaPalmFilter     *filter,
++                                ClutterInputDevice *pen,
++                                uint64_t            time_us,
++                                gboolean            in)
++{
++  GHashTableIter iter;
++  Touch *touch;
++
++  filter->pen_near = in;
++  if (!in)
++    {
++      filter->pen_left_us = time_us;
++      return;
++    }
++
++  g_set_object (&filter->pen, pen);
++
++  g_hash_table_iter_init (&iter, filter->touches);
++  while (g_hash_table_iter_next (&iter, NULL, (gpointer *) &touch))
++    {
++      if (touch->verdict != TOUCH_DROPPED && discard (touch))
++        g_hash_table_iter_remove (&iter);
++    }
++}
++
++void
++meta_palm_filter_pen_moved (MetaPalmFilter     *filter,
++                            ClutterInputDevice *pen,
++                            float               x,
++                            float               y)
++{
++  if (pen != filter->pen)
++    return;
++
++  filter->pen_x = x;
++  filter->pen_y = y;
++}
+diff --git a/src/backends/native/meta-palm-filter.h b/src/backends/native/meta-palm-filter.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..85f9efd77e415fda4d1e6c18db57e48f2cd5e18f
+--- /dev/null
++++ b/src/backends/native/meta-palm-filter.h
+@@ -0,0 +1,58 @@
++/*
++ * Copyright (C) 2026 Kristof Imeri
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 of the
++ * License, or (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but
++ * WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#pragma once
++
++#ifndef META_INPUT_THREAD_H_INSIDE
++#error "This header cannot be included directly. Use "backends/native/meta-input-thread.h""
++#endif /* META_INPUT_THREAD_H_INSIDE */
++
++#include "clutter/clutter.h"
++
++typedef struct _MetaSeatImpl MetaSeatImpl;
++typedef struct _MetaPalmFilter MetaPalmFilter;
++
++typedef enum
++{
++  META_PALM_HAND_RIGHT,
++  META_PALM_HAND_LEFT,
++} MetaPalmHand;
++
++MetaPalmFilter * meta_palm_filter_new (MetaSeatImpl *seat_impl);
++
++void meta_palm_filter_free (MetaPalmFilter *filter);
++
++void meta_palm_filter_set_hand (MetaPalmFilter *filter,
++                                MetaPalmHand    hand);
++
++void meta_palm_filter_pen_proximity (MetaPalmFilter     *filter,
++                                     ClutterInputDevice *pen,
++                                     uint64_t            time_us,
++                                     gboolean            in);
++
++void meta_palm_filter_pen_moved (MetaPalmFilter     *filter,
++                                 ClutterInputDevice *pen,
++                                 float               x,
++                                 float               y);
++
++gboolean meta_palm_filter_take_touch (MetaPalmFilter     *filter,
++                                      ClutterInputDevice *device,
++                                      ClutterEventType    type,
++                                      uint64_t            time_us,
++                                      int                 slot,
++                                      float               x,
++                                      float               y);
+diff --git a/src/backends/native/meta-seat-impl.c b/src/backends/native/meta-seat-impl.c
+index 6201c07b4987a80851f09b130e0baa586f961fad..5514ed430a6c60c217083613a574764ee88bfd7e 100644
+--- a/src/backends/native/meta-seat-impl.c
++++ b/src/backends/native/meta-seat-impl.c
+@@ -1502,6 +1502,23 @@ meta_seat_impl_notify_touch_event_in_impl (MetaSeatImpl       *seat_impl,
+                                            int                 slot,
+                                            float               x,
+                                            float               y)
++{
++  if (meta_palm_filter_take_touch (seat_impl->palm_filter, input_device,
++                                   evtype, time_us, slot, x, y))
++    return;
++
++  meta_seat_impl_deliver_touch_in_impl (seat_impl, input_device, evtype,
++                                        time_us, slot, x, y);
++}
++
++void
++meta_seat_impl_deliver_touch_in_impl (MetaSeatImpl       *seat_impl,
++                                      ClutterInputDevice *input_device,
++                                      ClutterEventType    evtype,
++                                      uint64_t            time_us,
++                                      int                 slot,
++                                      float               x,
++                                      float               y)
+ {
+   ClutterEvent *event = NULL;
+   ClutterEventSequence *sequence;
+@@ -2264,6 +2281,8 @@ meta_seat_impl_notify_tablet_proximity_in_impl (MetaSeatImpl           *seat_imp
+                                                 uint64_t                time_us,
+                                                 gboolean                in)
+ {
++  meta_palm_filter_pen_proximity (seat_impl->palm_filter, input_device,
++                                  time_us, in);
+   if (in)
+     set_device_tool (seat_impl, input_device, tool);
+   notify_proximity (input_device, time_us, in);
+@@ -2279,6 +2298,7 @@ meta_seat_impl_notify_tablet_motion_in_impl (MetaSeatImpl       *seat_impl,
+                                              float               y,
+                                              double             *axes)
+ {
++  meta_palm_filter_pen_moved (seat_impl->palm_filter, input_device, x, y);
+   meta_seat_impl_notify_absolute_motion_in_impl (seat_impl, input_device,
+                                                  time_us, x, y, axes);
+ }
+@@ -3350,6 +3370,7 @@ input_thread (MetaSeatImpl *seat_impl)
+   priv->a11y.grabbed_modifiers = g_hash_table_new (NULL, NULL);
+   priv->a11y.pressed_modifiers = g_hash_table_new (NULL, NULL);
+ 
++  seat_impl->palm_filter = meta_palm_filter_new (seat_impl);
+   seat_impl->input_settings = meta_input_settings_native_new_in_impl (seat_impl);
+   g_signal_connect_object (seat_impl->input_settings, "kbd-a11y-changed",
+                            G_CALLBACK (kbd_a11y_changed_cb), seat_impl, 0);
+@@ -3494,6 +3515,7 @@ prepare_shutdown_in_impl (GTask *task)
+ 
+   g_clear_pointer (&seat_impl->libinput, libinput_unref);
+   g_clear_pointer (&seat_impl->tools, g_hash_table_unref);
++  g_clear_pointer (&seat_impl->palm_filter, meta_palm_filter_free);
+   g_clear_pointer (&priv->touch_states, g_hash_table_destroy);
+   g_clear_pointer (&seat_impl->libinput_source, g_source_destroy);
+   g_clear_object (&seat_impl->keyboard_a11y);
+diff --git a/src/backends/native/meta-seat-impl.h b/src/backends/native/meta-seat-impl.h
+index 750656830f18616903ce11e8e2c32c538529e756..8dfa48af2dd90b004c47d9ed4bc0f5bc83da335b 100644
+--- a/src/backends/native/meta-seat-impl.h
++++ b/src/backends/native/meta-seat-impl.h
+@@ -76,6 +76,7 @@ struct _MetaSeatImpl
+   MetaKeyboardA11y *keyboard_a11y;
+   MetaKeymapNative *keymap;
+   MetaInputSettings *input_settings;
++  MetaPalmFilter *palm_filter;
+   ClutterInputDevice *virtual_source_pointer;
+ 
+   MetaViewportInfo *viewports;
+@@ -194,6 +195,14 @@ void meta_seat_impl_notify_tablet_mode_in_impl (MetaSeatImpl       *seat_impl,
+                                                 ClutterInputDevice *input_device,
+                                                 gboolean            tablet_mode);
+ 
++void meta_seat_impl_deliver_touch_in_impl (MetaSeatImpl       *seat_impl,
++                                           ClutterInputDevice *input_device,
++                                           ClutterEventType    evtype,
++                                           uint64_t            time_us,
++                                           int                 slot,
++                                           float               x,
++                                           float               y);
++
+ void meta_seat_impl_notify_tablet_proximity_in_impl (MetaSeatImpl           *seat_impl,
+                                                      ClutterInputDevice     *input_device,
+                                                      ClutterInputDeviceTool *tool,
+diff --git a/src/meson.build b/src/meson.build
+index f2866a9bf0b2fe502461b79a048fc1615646f748..5006e0360737e07472c6a0974e75bbfc085fdf77 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -767,6 +767,8 @@ mutter_sources += [
+   'backends/native/meta-kms.h',
+   'backends/native/meta-onscreen-native.c',
+   'backends/native/meta-onscreen-native.h',
++  'backends/native/meta-palm-filter.c',
++  'backends/native/meta-palm-filter.h',
+   'backends/native/meta-pointer-constraint-native.c',
+   'backends/native/meta-pointer-constraint-native.h',
+   'backends/native/meta-render-device-gbm.c',

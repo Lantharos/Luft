@@ -1,0 +1,586 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Sun, 8 Nov 2026 12:15:40 +0100
+Subject: [PATCH 70/73] backends: let virtual input devices act as pens
+
+Add clutter_virtual_input_device_notify_tablet_proximity(),
+notify_tablet_motion() and notify_tablet_button(), implemented by the
+native backend. A virtual tablet device brings a pen, an eraser or any
+other tool near, moves it in stage coordinates with a pressure, and
+presses its tip and buttons through the same paths a real tablet's
+events take, so its tools follow the stylus settings, reach Wayland
+clients through the tablet protocol and get their own cursor. Programs
+that drive the desktop, such as Kestrel's checks, can write and hover
+with a pen.
+
+Upstream-Status: forwardable
+---
+ .../clutter/clutter-virtual-input-device.c    |  77 ++++++++
+ .../clutter/clutter-virtual-input-device.h    |  35 ++++
+ .../native/meta-input-device-native.c         |   3 +
+ .../native/meta-input-device-tool-native.c    |  20 +-
+ .../native/meta-input-device-tool-native.h    |   2 +
+ src/backends/native/meta-seat-impl.c          |  66 +++++--
+ src/backends/native/meta-seat-impl.h          |  13 ++
+ .../native/meta-virtual-input-device-native.c | 179 ++++++++++++++++++
+ 8 files changed, 377 insertions(+), 18 deletions(-)
+
+diff --git a/clutter/clutter/clutter-virtual-input-device.c b/clutter/clutter/clutter-virtual-input-device.c
+index 2d8ec8fd37becf8de171a0fefafa2aaa0893b15e..c586e2a0e742bd33027217995df9c997e9639373 100644
+--- a/clutter/clutter/clutter-virtual-input-device.c
++++ b/clutter/clutter/clutter-virtual-input-device.c
+@@ -277,6 +277,83 @@ clutter_virtual_input_device_notify_tablet_mode (ClutterVirtualInputDevice *virt
+   klass->notify_tablet_mode (virtual_device, tablet_mode);
+ }
+ 
++/**
++ * clutter_virtual_input_device_notify_tablet_proximity:
++ * @virtual_device: a virtual tablet device
++ * @time_us: the time of the event, in microseconds
++ * @in_proximity: whether the tool comes near the tablet or leaves it
++ * @tool_type: the kind of tool, such as a pen or an eraser
++ *
++ * Brings a tool near the tablet or takes it away, as a pen hovering over
++ * a screen would. The tool draws at stage coordinates, like a pen on the
++ * screen itself.
++ */
++void
++clutter_virtual_input_device_notify_tablet_proximity (ClutterVirtualInputDevice  *virtual_device,
++                                                      uint64_t                    time_us,
++                                                      gboolean                    in_proximity,
++                                                      ClutterInputDeviceToolType  tool_type)
++{
++  ClutterVirtualInputDeviceClass *klass =
++    CLUTTER_VIRTUAL_INPUT_DEVICE_GET_CLASS (virtual_device);
++
++  g_return_if_fail (CLUTTER_IS_VIRTUAL_INPUT_DEVICE (virtual_device));
++  g_return_if_fail (klass->notify_tablet_proximity != NULL);
++
++  klass->notify_tablet_proximity (virtual_device, time_us, in_proximity,
++                                  tool_type);
++}
++
++/**
++ * clutter_virtual_input_device_notify_tablet_motion:
++ * @virtual_device: a virtual tablet device
++ * @time_us: the time of the event, in microseconds
++ * @x: where the tool is, in stage coordinates
++ * @y: where the tool is, in stage coordinates
++ * @pressure: how hard the tool presses, from 0 to 1
++ *
++ * Moves the tool that is near the tablet.
++ */
++void
++clutter_virtual_input_device_notify_tablet_motion (ClutterVirtualInputDevice *virtual_device,
++                                                   uint64_t                   time_us,
++                                                   double                     x,
++                                                   double                     y,
++                                                   double                     pressure)
++{
++  ClutterVirtualInputDeviceClass *klass =
++    CLUTTER_VIRTUAL_INPUT_DEVICE_GET_CLASS (virtual_device);
++
++  g_return_if_fail (CLUTTER_IS_VIRTUAL_INPUT_DEVICE (virtual_device));
++  g_return_if_fail (klass->notify_tablet_motion != NULL);
++
++  klass->notify_tablet_motion (virtual_device, time_us, x, y, pressure);
++}
++
++/**
++ * clutter_virtual_input_device_notify_tablet_button:
++ * @virtual_device: a virtual tablet device
++ * @time_us: the time of the event, in microseconds
++ * @button: the evdev code of the button, BTN_TOUCH for the tip
++ * @button_state: whether the button is pressed or released
++ *
++ * Presses or releases the tip or a button of the tool near the tablet.
++ */
++void
++clutter_virtual_input_device_notify_tablet_button (ClutterVirtualInputDevice *virtual_device,
++                                                   uint64_t                   time_us,
++                                                   uint32_t                   button,
++                                                   ClutterButtonState         button_state)
++{
++  ClutterVirtualInputDeviceClass *klass =
++    CLUTTER_VIRTUAL_INPUT_DEVICE_GET_CLASS (virtual_device);
++
++  g_return_if_fail (CLUTTER_IS_VIRTUAL_INPUT_DEVICE (virtual_device));
++  g_return_if_fail (klass->notify_tablet_button != NULL);
++
++  klass->notify_tablet_button (virtual_device, time_us, button, button_state);
++}
++
+ int
+ clutter_virtual_input_device_get_device_type (ClutterVirtualInputDevice *virtual_device)
+ {
+diff --git a/clutter/clutter/clutter-virtual-input-device.h b/clutter/clutter/clutter-virtual-input-device.h
+index 1c1a8fa1ac24fe9aa2961c30a70a3bbcf13473c7..c5d88e8b891e2bb61ff7ee85a7c6920da342b366 100644
+--- a/clutter/clutter/clutter-virtual-input-device.h
++++ b/clutter/clutter/clutter-virtual-input-device.h
+@@ -124,6 +124,22 @@ struct _ClutterVirtualInputDeviceClass
+ 
+   void (*notify_tablet_mode) (ClutterVirtualInputDevice *virtual_device,
+                               gboolean                   tablet_mode);
++
++  void (*notify_tablet_proximity) (ClutterVirtualInputDevice  *virtual_device,
++                                   uint64_t                    time_us,
++                                   gboolean                    in_proximity,
++                                   ClutterInputDeviceToolType  tool_type);
++
++  void (*notify_tablet_motion) (ClutterVirtualInputDevice *virtual_device,
++                                uint64_t                   time_us,
++                                double                     x,
++                                double                     y,
++                                double                     pressure);
++
++  void (*notify_tablet_button) (ClutterVirtualInputDevice *virtual_device,
++                                uint64_t                   time_us,
++                                uint32_t                   button,
++                                ClutterButtonState         button_state);
+ };
+ 
+ CLUTTER_EXPORT
+@@ -211,6 +227,25 @@ CLUTTER_EXPORT
+ void clutter_virtual_input_device_notify_tablet_mode (ClutterVirtualInputDevice *virtual_device,
+                                                       gboolean                   tablet_mode);
+ 
++CLUTTER_EXPORT
++void clutter_virtual_input_device_notify_tablet_proximity (ClutterVirtualInputDevice  *virtual_device,
++                                                           uint64_t                    time_us,
++                                                           gboolean                    in_proximity,
++                                                           ClutterInputDeviceToolType  tool_type);
++
++CLUTTER_EXPORT
++void clutter_virtual_input_device_notify_tablet_motion (ClutterVirtualInputDevice *virtual_device,
++                                                        uint64_t                   time_us,
++                                                        double                     x,
++                                                        double                     y,
++                                                        double                     pressure);
++
++CLUTTER_EXPORT
++void clutter_virtual_input_device_notify_tablet_button (ClutterVirtualInputDevice *virtual_device,
++                                                        uint64_t                   time_us,
++                                                        uint32_t                   button,
++                                                        ClutterButtonState         button_state);
++
+ CLUTTER_EXPORT
+ int clutter_virtual_input_device_get_device_type (ClutterVirtualInputDevice *virtual_device);
+ 
+diff --git a/src/backends/native/meta-input-device-native.c b/src/backends/native/meta-input-device-native.c
+index f2a5fa4c88ee808ed86e24e5486958253bdc57f2..e9fc22849683aa2549127951aaa28e858de70dbe 100644
+--- a/src/backends/native/meta-input-device-native.c
++++ b/src/backends/native/meta-input-device-native.c
+@@ -485,6 +485,9 @@ meta_input_device_native_new_virtual_in_impl (MetaSeatImpl           *seat_impl,
+     case CLUTTER_TOUCHSCREEN_DEVICE:
+       name = "Virtual touchscreen device for seat";
+       break;
++    case CLUTTER_TABLET_DEVICE:
++      name = "Virtual tablet device for seat";
++      break;
+     default:
+       name = "Virtual device for seat";
+       break;
+diff --git a/src/backends/native/meta-input-device-tool-native.c b/src/backends/native/meta-input-device-tool-native.c
+index 9f3c62482b460cacc92e19c4dccceb4e4de56983..28e03063bcf0c51392c1639a3cec2b9fd18fb1de 100644
+--- a/src/backends/native/meta-input-device-tool-native.c
++++ b/src/backends/native/meta-input-device-tool-native.c
+@@ -40,7 +40,7 @@ meta_input_device_tool_native_finalize (GObject *object)
+   MetaInputDeviceToolNative *tool = META_INPUT_DEVICE_TOOL_NATIVE (object);
+ 
+   g_hash_table_unref (tool->button_map);
+-  libinput_tablet_tool_unref (tool->tool);
++  g_clear_pointer (&tool->tool, libinput_tablet_tool_unref);
+   meta_bezier_free (tool->bezier);
+ 
+   G_OBJECT_CLASS (meta_input_device_tool_native_parent_class)->finalize (object);
+@@ -126,6 +126,21 @@ meta_input_device_tool_native_new (struct libinput_tablet_tool *tool,
+   return CLUTTER_INPUT_DEVICE_TOOL (evdev_tool);
+ }
+ 
++ClutterInputDeviceTool *
++meta_input_device_tool_native_new_virtual (ClutterInputDeviceToolType type)
++{
++  MetaInputDeviceToolNative *evdev_tool;
++
++  evdev_tool = g_object_new (META_TYPE_INPUT_DEVICE_TOOL_NATIVE,
++                             "type", type,
++                             "axes", CLUTTER_INPUT_AXIS_FLAG_PRESSURE,
++                             NULL);
++
++  init_pressurecurve (evdev_tool);
++
++  return CLUTTER_INPUT_DEVICE_TOOL (evdev_tool);
++}
++
+ void
+ meta_input_device_tool_native_set_pressure_curve_in_impl (ClutterInputDeviceTool *tool,
+                                                           double                  curve[4],
+@@ -154,7 +169,8 @@ meta_input_device_tool_native_set_pressure_curve_in_impl (ClutterInputDeviceTool
+       init_pressurecurve (evdev_tool);
+     }
+ 
+-  libinput_tablet_tool_config_pressure_range_set (evdev_tool->tool, range[0], range[1]);
++  if (evdev_tool->tool)
++    libinput_tablet_tool_config_pressure_range_set (evdev_tool->tool, range[0], range[1]);
+ }
+ 
+ void
+diff --git a/src/backends/native/meta-input-device-tool-native.h b/src/backends/native/meta-input-device-tool-native.h
+index 6a1804f127af5134c7e10240daa7f184243203c7..3839ba050385d990c34e5b41d25841d34acdda8e 100644
+--- a/src/backends/native/meta-input-device-tool-native.h
++++ b/src/backends/native/meta-input-device-tool-native.h
+@@ -47,6 +47,8 @@ ClutterInputDeviceTool * meta_input_device_tool_native_new      (struct libinput
+                                                                  uint64_t                     serial,
+                                                                  ClutterInputDeviceToolType   type);
+ 
++ClutterInputDeviceTool * meta_input_device_tool_native_new_virtual (ClutterInputDeviceToolType type);
++
+ gdouble                  meta_input_device_tool_native_translate_pressure_in_impl (ClutterInputDeviceTool *tool,
+                                                                                    double                  pressure);
+ GDesktopStylusButtonAction meta_input_device_tool_native_get_button_code_in_impl (ClutterInputDeviceTool *tool,
+diff --git a/src/backends/native/meta-seat-impl.c b/src/backends/native/meta-seat-impl.c
+index 8238e77dd6feb6d1dc6eeb798c81c76f86784ce9..d86d5ecf30fa23466f3921aefcca4fa082ef4c24 100644
+--- a/src/backends/native/meta-seat-impl.c
++++ b/src/backends/native/meta-seat-impl.c
+@@ -2185,14 +2185,53 @@ translate_tool_type (struct libinput_tablet_tool *libinput_tool)
+     }
+ }
+ 
++static void
++set_device_tool (MetaSeatImpl           *seat_impl,
++                 ClutterInputDevice     *input_device,
++                 ClutterInputDeviceTool *tool)
++{
++  MetaInputDeviceNative *evdev_device = META_INPUT_DEVICE_NATIVE (input_device);
++
++  if (evdev_device->last_tool == tool)
++    return;
++
++  evdev_device->last_tool = tool;
++  meta_input_settings_notify_tool_change (seat_impl->input_settings,
++                                          input_device, tool);
++}
++
++void
++meta_seat_impl_notify_tablet_proximity_in_impl (MetaSeatImpl           *seat_impl,
++                                                ClutterInputDevice     *input_device,
++                                                ClutterInputDeviceTool *tool,
++                                                uint64_t                time_us,
++                                                gboolean                in)
++{
++  if (in)
++    set_device_tool (seat_impl, input_device, tool);
++  notify_proximity (input_device, time_us, in);
++  if (!in)
++    set_device_tool (seat_impl, input_device, NULL);
++}
++
++void
++meta_seat_impl_notify_tablet_motion_in_impl (MetaSeatImpl       *seat_impl,
++                                             ClutterInputDevice *input_device,
++                                             uint64_t            time_us,
++                                             float               x,
++                                             float               y,
++                                             double             *axes)
++{
++  meta_seat_impl_notify_absolute_motion_in_impl (seat_impl, input_device,
++                                                 time_us, x, y, axes);
++}
++
+ static void
+ input_device_update_tool (MetaSeatImpl                *seat_impl,
+                           ClutterInputDevice          *input_device,
+                           struct libinput_tablet_tool *libinput_tool)
+ {
+-  MetaInputDeviceNative *evdev_device = META_INPUT_DEVICE_NATIVE (input_device);
+   ClutterInputDeviceTool *tool = NULL;
+-  MetaInputSettings *input_settings;
+ 
+   if (libinput_tool)
+     {
+@@ -2218,12 +2257,7 @@ input_device_update_tool (MetaSeatImpl                *seat_impl,
+         }
+     }
+ 
+-  if (evdev_device->last_tool != tool)
+-    {
+-      evdev_device->last_tool = tool;
+-      input_settings = seat_impl->input_settings;
+-      meta_input_settings_notify_tool_change (input_settings, input_device, tool);
+-    }
++  set_device_tool (seat_impl, input_device, tool);
+ }
+ 
+ static double *
+@@ -2438,11 +2472,11 @@ process_tablet_axis (MetaSeatImpl          *seat_impl,
+                                                         (uint32_t) stage_width);
+       y = libinput_event_tablet_tool_get_y_transformed (tablet_event,
+                                                         (uint32_t) stage_height);
+-      meta_seat_impl_notify_absolute_motion_in_impl (seat_impl,
+-                                                     device, time,
+-                                                     (float) x,
+-                                                     (float) y,
+-                                                     axes);
++      meta_seat_impl_notify_tablet_motion_in_impl (seat_impl,
++                                                   device, time,
++                                                   (float) x,
++                                                   (float) y,
++                                                   axes);
+     }
+ }
+ 
+@@ -2828,9 +2862,9 @@ process_device_event (MetaSeatImpl          *seat_impl,
+ 
+         if (in)
+           input_device_update_tool (seat_impl, device, libinput_tool);
+-        notify_proximity (device, time, in);
+-        if (!in)
+-          input_device_update_tool (seat_impl, device, NULL);
++        meta_seat_impl_notify_tablet_proximity_in_impl (seat_impl, device,
++                                                        META_INPUT_DEVICE_NATIVE (device)->last_tool,
++                                                        time, in);
+ 
+         break;
+       }
+diff --git a/src/backends/native/meta-seat-impl.h b/src/backends/native/meta-seat-impl.h
+index 18438847a8f30369af992bcfc8d3f3e7d6b3674d..750656830f18616903ce11e8e2c32c538529e756 100644
+--- a/src/backends/native/meta-seat-impl.h
++++ b/src/backends/native/meta-seat-impl.h
+@@ -194,6 +194,19 @@ void meta_seat_impl_notify_tablet_mode_in_impl (MetaSeatImpl       *seat_impl,
+                                                 ClutterInputDevice *input_device,
+                                                 gboolean            tablet_mode);
+ 
++void meta_seat_impl_notify_tablet_proximity_in_impl (MetaSeatImpl           *seat_impl,
++                                                     ClutterInputDevice     *input_device,
++                                                     ClutterInputDeviceTool *tool,
++                                                     uint64_t                time_us,
++                                                     gboolean                in);
++
++void meta_seat_impl_notify_tablet_motion_in_impl (MetaSeatImpl       *seat_impl,
++                                                  ClutterInputDevice *input_device,
++                                                  uint64_t            time_us,
++                                                  float               x,
++                                                  float               y,
++                                                  double             *axes);
++
+ void meta_seat_impl_sync_leds_in_impl (MetaSeatImpl *seat_impl);
+ 
+ void meta_seat_impl_update_xkb_state_in_impl (MetaSeatImpl *seat_impl);
+diff --git a/src/backends/native/meta-virtual-input-device-native.c b/src/backends/native/meta-virtual-input-device-native.c
+index b8c4001a6c4d960c895351abaea466103b2e3c40..30c7bda4e644dd004bd14aae910b748cdc8850bf 100644
+--- a/src/backends/native/meta-virtual-input-device-native.c
++++ b/src/backends/native/meta-virtual-input-device-native.c
+@@ -46,6 +46,7 @@ struct _ImplState
+ {
+   MetaSeatImpl *seat_impl;
+   ClutterInputDevice *device;
++  ClutterInputDeviceTool *tools[CLUTTER_INPUT_DEVICE_TOOL_LENS + 1];
+   int button_count[KEY_CNT];
+ };
+ 
+@@ -107,6 +108,18 @@ typedef struct
+   double scale;
+ } MetaVirtualEventGesture;
+ 
++typedef struct
++{
++  uint64_t time_us;
++  gboolean in_proximity;
++  ClutterInputDeviceToolType tool_type;
++  double x;
++  double y;
++  double pressure;
++  uint32_t button;
++  ClutterButtonState button_state;
++} MetaVirtualEventTablet;
++
+ G_DEFINE_TYPE (MetaVirtualInputDeviceNative,
+                meta_virtual_input_device_native,
+                CLUTTER_TYPE_VIRTUAL_INPUT_DEVICE)
+@@ -209,6 +222,8 @@ release_device_in_impl (GTask *task)
+   meta_seat_impl_remove_virtual_input_device (seat_impl, impl_state->device);
+ 
+   g_clear_object (&impl_state->device);
++  for (int i = 0; i < G_N_ELEMENTS (impl_state->tools); i++)
++    g_clear_object (&impl_state->tools[i]);
+   g_task_return_boolean (task, TRUE);
+   return G_SOURCE_REMOVE;
+ }
+@@ -1129,6 +1144,167 @@ meta_virtual_input_device_native_notify_tablet_mode (ClutterVirtualInputDevice *
+   g_object_unref (task);
+ }
+ 
++static gboolean
++notify_tablet_proximity_in_impl (GTask *task)
++{
++  MetaVirtualInputDeviceNative *virtual_native =
++    g_task_get_source_object (task);
++  ImplState *impl_state = virtual_native->impl_state;
++  MetaVirtualEventTablet *event = g_task_get_task_data (task);
++  ClutterInputDeviceTool **tool = &impl_state->tools[event->tool_type];
++
++  if (event->time_us == CLUTTER_CURRENT_TIME)
++    event->time_us = g_get_monotonic_time ();
++
++  if (!*tool)
++    *tool = meta_input_device_tool_native_new_virtual (event->tool_type);
++
++  meta_seat_impl_notify_tablet_proximity_in_impl (impl_state->seat_impl,
++                                                  impl_state->device,
++                                                  *tool,
++                                                  event->time_us,
++                                                  event->in_proximity);
++
++  g_task_return_boolean (task, TRUE);
++  return G_SOURCE_REMOVE;
++}
++
++static gboolean
++notify_tablet_motion_in_impl (GTask *task)
++{
++  MetaVirtualInputDeviceNative *virtual_native =
++    g_task_get_source_object (task);
++  ImplState *impl_state = virtual_native->impl_state;
++  MetaVirtualEventTablet *event = g_task_get_task_data (task);
++  ClutterInputDeviceTool *tool =
++    META_INPUT_DEVICE_NATIVE (impl_state->device)->last_tool;
++  double *axes;
++
++  if (!tool)
++    {
++      g_task_return_boolean (task, FALSE);
++      return G_SOURCE_REMOVE;
++    }
++
++  if (event->time_us == CLUTTER_CURRENT_TIME)
++    event->time_us = g_get_monotonic_time ();
++
++  axes = g_new0 (double, CLUTTER_INPUT_AXIS_LAST);
++  axes[CLUTTER_INPUT_AXIS_X] = event->x;
++  axes[CLUTTER_INPUT_AXIS_Y] = event->y;
++  axes[CLUTTER_INPUT_AXIS_PRESSURE] =
++    meta_input_device_tool_native_translate_pressure_in_impl (tool, event->pressure);
++
++  meta_seat_impl_notify_tablet_motion_in_impl (impl_state->seat_impl,
++                                               impl_state->device,
++                                               event->time_us,
++                                               (float) event->x,
++                                               (float) event->y,
++                                               axes);
++
++  g_task_return_boolean (task, TRUE);
++  return G_SOURCE_REMOVE;
++}
++
++static gboolean
++notify_tablet_button_in_impl (GTask *task)
++{
++  MetaVirtualInputDeviceNative *virtual_native =
++    g_task_get_source_object (task);
++  ImplState *impl_state = virtual_native->impl_state;
++  MetaVirtualEventTablet *event = g_task_get_task_data (task);
++
++  if (event->time_us == CLUTTER_CURRENT_TIME)
++    event->time_us = g_get_monotonic_time ();
++
++  meta_seat_impl_notify_button_in_impl (impl_state->seat_impl,
++                                        impl_state->device,
++                                        event->time_us,
++                                        event->button,
++                                        event->button_state);
++
++  g_task_return_boolean (task, TRUE);
++  return G_SOURCE_REMOVE;
++}
++
++static void
++run_tablet_task (ClutterVirtualInputDevice *virtual_device,
++                 MetaVirtualEventTablet    *event,
++                 GSourceFunc                func)
++{
++  MetaVirtualInputDeviceNative *virtual_native =
++    META_VIRTUAL_INPUT_DEVICE_NATIVE (virtual_device);
++  MetaSeatNative *seat_native =
++    meta_virtual_input_device_native_get_seat_native (virtual_native);
++  GTask *task;
++
++  task = g_task_new (virtual_native, NULL, NULL, NULL);
++  g_task_set_task_data (task, event, g_free);
++  meta_seat_impl_run_input_task (seat_native->impl, task, func);
++  g_object_unref (task);
++}
++
++static void
++meta_virtual_input_device_native_notify_tablet_proximity (ClutterVirtualInputDevice  *virtual_device,
++                                                          uint64_t                    time_us,
++                                                          gboolean                    in_proximity,
++                                                          ClutterInputDeviceToolType  tool_type)
++{
++  MetaVirtualEventTablet *event;
++
++  g_return_if_fail (META_VIRTUAL_INPUT_DEVICE_NATIVE (virtual_device)->impl_state != NULL);
++  g_return_if_fail (tool_type > CLUTTER_INPUT_DEVICE_TOOL_NONE &&
++                    tool_type <= CLUTTER_INPUT_DEVICE_TOOL_LENS);
++
++  event = g_new0 (MetaVirtualEventTablet, 1);
++  event->time_us = time_us;
++  event->in_proximity = in_proximity;
++  event->tool_type = tool_type;
++
++  run_tablet_task (virtual_device, event,
++                   (GSourceFunc) notify_tablet_proximity_in_impl);
++}
++
++static void
++meta_virtual_input_device_native_notify_tablet_motion (ClutterVirtualInputDevice *virtual_device,
++                                                       uint64_t                   time_us,
++                                                       double                     x,
++                                                       double                     y,
++                                                       double                     pressure)
++{
++  MetaVirtualEventTablet *event;
++
++  g_return_if_fail (META_VIRTUAL_INPUT_DEVICE_NATIVE (virtual_device)->impl_state != NULL);
++
++  event = g_new0 (MetaVirtualEventTablet, 1);
++  event->time_us = time_us;
++  event->x = x;
++  event->y = y;
++  event->pressure = pressure;
++
++  run_tablet_task (virtual_device, event,
++                   (GSourceFunc) notify_tablet_motion_in_impl);
++}
++
++static void
++meta_virtual_input_device_native_notify_tablet_button (ClutterVirtualInputDevice *virtual_device,
++                                                       uint64_t                   time_us,
++                                                       uint32_t                   button,
++                                                       ClutterButtonState         button_state)
++{
++  MetaVirtualEventTablet *event;
++
++  g_return_if_fail (META_VIRTUAL_INPUT_DEVICE_NATIVE (virtual_device)->impl_state != NULL);
++
++  event = g_new0 (MetaVirtualEventTablet, 1);
++  event->time_us = time_us;
++  event->button = button;
++  event->button_state = button_state;
++
++  run_tablet_task (virtual_device, event,
++                   (GSourceFunc) notify_tablet_button_in_impl);
++}
++
+ static void
+ meta_virtual_input_device_native_get_property (GObject    *object,
+                                                guint       prop_id,
+@@ -1289,6 +1465,9 @@ meta_virtual_input_device_native_class_init (MetaVirtualInputDeviceNativeClass *
+   virtual_input_device_class->notify_touchpad_pinch = meta_virtual_input_device_native_notify_touchpad_pinch;
+   virtual_input_device_class->notify_touchpad_swipe = meta_virtual_input_device_native_notify_touchpad_swipe;
+   virtual_input_device_class->notify_tablet_mode = meta_virtual_input_device_native_notify_tablet_mode;
++  virtual_input_device_class->notify_tablet_proximity = meta_virtual_input_device_native_notify_tablet_proximity;
++  virtual_input_device_class->notify_tablet_motion = meta_virtual_input_device_native_notify_tablet_motion;
++  virtual_input_device_class->notify_tablet_button = meta_virtual_input_device_native_notify_tablet_button;
+ 
+   obj_props[PROP_SLOT_BASE] = g_param_spec_uint ("slot-base", NULL, NULL,
+                                                  0, G_MAXUINT, 0,

@@ -4,5 +4,5 @@
     "types": ["@types/bun"],
     "paths": {}
   },
-  "include": ["build.ts", "unicode"]
+  "include": ["build.ts", "pen", "unicode"]
 }

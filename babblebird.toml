@@ -1,0 +1,33 @@
+glossary = "packages/i18n/glossary/{lang}.tbx"
+
+[[areas]]
+name = "Desktop"
+files = ["kestrel/ui/locales/{lang}/desktop.ftl"]
+
+[[areas]]
+name = "Start and quick settings"
+files = ["kestrel/ui/locales/{lang}/surfaces.ftl"]
+
+[[areas]]
+name = "System"
+files = ["kestrel/ui/locales/{lang}/system.ftl", "kestrel/settings/locales/{lang}/settings.ftl"]
+
+[[areas]]
+name = "Sign-in and lock screen"
+files = ["kestrel/ui/locales/{lang}/auth.ftl"]
+
+[[areas]]
+name = "App requests"
+files = ["kestrel/ui/locales/{lang}/portal.ftl", "kestrel/portal/locales/{lang}/portal.ftl"]
+
+[[areas]]
+name = "Shared desktop pieces"
+files = ["kestrel/ui/locales/{lang}/shell.ftl"]
+
+[[areas]]
+name = "App toolkit"
+files = ["packages/web/ui/locales/{lang}/ui.ftl", "packages/system/trust/locales/{lang}/trust.ftl"]
+
+[[areas]]
+name = "Website"
+files = ["web/site/locales/{lang}/*.ftl"]

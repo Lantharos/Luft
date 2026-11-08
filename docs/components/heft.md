@@ -1,0 +1,85 @@
+# Heft's files
+
+[Heft](../../apps/store/heft) keeps its library as ordinary files, so Rover shows them, backups copy them, and other tools can read them. This is format version 1.
+
+```
+~/Documents/Heft/
+  Matematika/                      a subject, named after it
+    subject.json
+    Beleške.heft/                  a notebook, named after it
+      notebook.json
+      search.json                  typed text by page, for search
+      pages/<id>.page              a page's ink, text and pictures
+      pages/<id>.journal           changes since the .page was last written
+      assets/<id>.<ext>            pictures placed on pages
+      sources/<id>-<name>.pdf      PDFs, exactly as they were imported
+      sources/<…>.pdf.text.json    each PDF page's text, for search
+  .trash/                          trashed subjects and notebooks for 30 days
+```
+
+Names are what people typed, so renaming a subject or notebook renames its folder. Everything inside refers to things by ID: random 52-bit numbers written in base 36, which never change.
+
+## subject.json and notebook.json
+
+```json
+{ "format": 1, "id": "…", "name": "Matematika", "color": "#3d6fb6", "icon": "book", "order": 0, "archived": false }
+```
+
+```json
+{
+  "format": 1, "id": "…", "name": "Beleške", "kind": "notes", "subject": "<subject id>",
+  "paper": { "template": "lined", "size": "a4", "landscape": false, "color": "white", "spacing": 8 },
+  "pages": [{ "id": "…", "created": 1794142000000, "paper": { "template": "grid" } },
+            { "id": "…", "created": 1794142000000, "pdf": { "source": "<file in sources>", "index": 0, "width": 793.7, "height": 1122.5 } }],
+  "sections": [{ "id": "…", "title": "Lekcija 4", "page": "<page id>" }],
+  "trashed": [{ "page": { … }, "index": 3, "at": 1794142000000 }],
+  "created": 1794142000000, "modified": 1794142000000
+}
+```
+
+`kind` is `notes` or `book`. A page's own `paper` overrides the notebook's. Templates are `blank`, `lined`, `grid`, `dotted`, `cornell` and `staff`; sizes `a4`, `a5`, `letter` and `infinite`; colours `white`, `cream` and `dark`; spacing is in millimetres. Times are milliseconds since 1970.
+
+## Pages
+
+Page coordinates are CSS pixels at 96 per inch, from the page's top left corner: A4 is 793.7 × 1122.5. All numbers are little endian.
+
+A `.page` file is a 12-byte header, the strokes, then the page's text boxes and pictures:
+
+| Bytes | Holds |
+| --- | --- |
+| 4 | `HEFT` |
+| 2 | Format version, 1 |
+| 2 | Reserved |
+| 4 | Number of strokes |
+| … | Each stroke |
+| 4 | Length of what follows |
+| … | The objects as JSON |
+
+A stroke is a 40-byte header and 14 bytes for each point:
+
+| Bytes | Holds |
+| --- | --- |
+| 8 | ID, as a float64 |
+| 8 | Order on the page, as a float64; higher is on top |
+| 1 | Tool: 0 pen, 1 highlighter |
+| 1 | Nib: 0 fountain, 1 ballpoint |
+| 2 | Reserved |
+| 4 | Colour, `0xRRGGBB` |
+| 4 | Width, float32 |
+| 4 | Number of points |
+| 8 | When the stroke started, float64 milliseconds |
+| 4 + 4 | Each point's x and y, float32 |
+| 2 | Its width, in hundredths |
+| 2 | Pressure, 0 to 65535 |
+| 2 | Milliseconds since the previous point |
+
+Each point's width is the one it was drawn with, so later changes to settings never change old writing. A stroke's outline is a circle at every point joined by its neighbours' common tangents. Highlighter strokes are drawn under pen strokes, at 38 % opacity.
+
+Objects are `{ id, kind, x, y, width, height }` with `html` and `text` for text boxes (`b`, `strong`, `i`, `em`, `u`, `h2`, `h3`, `ul`, `ol`, `li`, `br`, `div`, `p` and `blockquote` only) and `asset` for pictures.
+
+A `.journal` is a list of records, each `[length u32][crc32 u32][op u8][payload]`, where the length and CRC cover the op and payload:
+
+- Op 1 replaces strokes: the number of removed IDs, those IDs as float64, the number of added strokes, and the strokes.
+- Op 2 changes objects: JSON `{ "put": [objects], "drop": [ids] }`.
+
+Reading a page means reading its `.page` and applying its journal in order. A record whose length runs past the end or whose CRC doesn't match was cut short by a power cut, and it and anything after it are ignored. Every record is on the disk before Heft goes on, so nothing written survives only in memory. When the journal grows past 256 KB, when a page leaves memory and when Heft closes, the whole page is written to a new `.page` and the journal emptied; replaying a journal over a page that already has its changes gives the same page.

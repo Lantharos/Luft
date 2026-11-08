@@ -28,15 +28,27 @@ fn settings_file(name: &str) -> Result<String, String> {
 
 fn patterns(kind: Kind) -> Vec<String> {
     let pdf = ["*.pdf", "*.PDF"];
-    let image = ["*.png", "*.jpg", "*.jpeg", "*.webp", "*.gif", "*.avif", "*.PNG", "*.JPG", "*.JPEG"];
+    let image = [
+        "*.png", "*.jpg", "*.jpeg", "*.webp", "*.gif", "*.avif", "*.PNG", "*.JPG", "*.JPEG",
+    ];
     match kind {
         Kind::Pdf => pdf.map(String::from).to_vec(),
         Kind::Image => image.map(String::from).to_vec(),
-        Kind::Importable => pdf.iter().chain(image.iter()).map(|pattern| pattern.to_string()).collect(),
+        Kind::Importable => pdf
+            .iter()
+            .chain(image.iter())
+            .map(|pattern| pattern.to_string())
+            .collect(),
     }
 }
 
-async fn choose(Choose { kind, title, filter }: Choose) -> Result<Vec<String>, String> {
+async fn choose(
+    Choose {
+        kind,
+        title,
+        filter,
+    }: Choose,
+) -> Result<Vec<String>, String> {
     let chooser = FileChooser {
         title: &title,
         filters: vec![Filter {
@@ -76,7 +88,9 @@ pub fn register(window: SabineWindow) -> SabineWindow {
             Ok(state::launch_paths(&activation))
         })
         .command("library", |Empty {}| scan::library())
-        .command("remove", |Path { path }| disk::remove(&library::resolve(&path)?))
+        .command("remove", |Path { path }| {
+            disk::remove(&library::resolve(&path)?)
+        })
         .command("rename", |Rename { from, to }| {
             disk::rename(&library::resolve(&from)?, &library::resolve(&to)?)
         })
@@ -85,7 +99,9 @@ pub fn register(window: SabineWindow) -> SabineWindow {
         })
         .command("trash_put", |Path { path }| trash::put(&path))
         .command("trash_list", |Empty {}| trash::list())
-        .command("trash_restore", |Restore { id, to }| trash::restore(&id, &to))
+        .command("trash_restore", |Restore { id, to }| {
+            trash::restore(&id, &to)
+        })
         .command("trash_purge", |Id { id }| trash::purge(&id))
         .command_async("choose_files", choose)
         .command_async("choose_save", choose_save)

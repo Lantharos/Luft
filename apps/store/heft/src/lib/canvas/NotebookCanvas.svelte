@@ -10,7 +10,7 @@
 	import { pagesIn, stack } from './layout';
 	import { LiveInk } from './live';
 	import PageView from './PageView.svelte';
-	import { Surface } from './surface';
+	import { Surface } from './input/surface';
 	import type { Viewport } from './viewport.svelte';
 
 	let { notebook, viewport, onquote }: { notebook: OpenNotebook; viewport: Viewport; onquote?: (text: string) => void } = $props();
@@ -34,7 +34,10 @@
 	$effect(() => {
 		const width = viewport.width;
 		untrack(() => {
-			if (lastWidth && width) viewport.zoomAt((viewport.zoom * width) / lastWidth, 0, 0);
+			const page = viewport.layout.pages[0];
+			const fitted = page && Math.abs(viewport.zoom - (lastWidth - 64) / page.width) < viewport.zoom * 0.02;
+			if (lastWidth && width && fitted) viewport.fitWidth(page);
+			else viewport.clamp();
 		});
 		lastWidth = width;
 	});

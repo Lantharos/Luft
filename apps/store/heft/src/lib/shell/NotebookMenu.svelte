@@ -10,9 +10,9 @@
 	import { choosePdfs } from '#lib/pdf/import.js';
 	import { insertPdf } from '#lib/pdf/sources.js';
 	import { searchIndex } from '#lib/search/index.svelte.js';
-	import BesideDialog from './BesideDialog.svelte';
-	import DeletedPagesDialog from './DeletedPagesDialog.svelte';
-	import NameDialog from './NameDialog.svelte';
+	import BesideDialog from './dialogs/BesideDialog.svelte';
+	import DeletedPagesDialog from './dialogs/DeletedPagesDialog.svelte';
+	import NameDialog from './dialogs/NameDialog.svelte';
 
 	let { notebook }: { notebook: OpenNotebook } = $props();
 

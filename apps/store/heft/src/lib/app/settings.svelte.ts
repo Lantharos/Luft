@@ -9,8 +9,6 @@ export interface SettingsValues {
 	secondBarrel: BarrelAction;
 	touchDraws: boolean;
 	fingerPans: boolean;
-	toolbar: 'top' | 'side';
-	continuous: boolean;
 	prediction: boolean;
 }
 
@@ -21,8 +19,6 @@ const DEFAULTS: SettingsValues = {
 	secondBarrel: 'none',
 	touchDraws: false,
 	fingerPans: true,
-	toolbar: 'top',
-	continuous: true,
 	prediction: true
 };
 

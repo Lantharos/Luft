@@ -4,10 +4,10 @@ import { STEADY } from '#lib/ink/pressure.js';
 import { outlinePoints, recognize } from '#lib/ink/shapes.js';
 import { newId, POINT_FIELDS, strokeBounds } from '#lib/ink/stroke.js';
 import type { PageDocument } from '#lib/page/document.js';
-import { inkColor, type Ink } from './ink-paint';
-import type { PageRect } from './layout';
-import type { LiveInk } from './live';
-import type { Viewport } from './viewport.svelte';
+import { inkColor, type Ink } from '../ink-paint';
+import type { PageRect } from '../layout';
+import type { LiveInk } from '../live';
+import type { Viewport } from '../viewport.svelte';
 
 export interface Target {
 	id: string;

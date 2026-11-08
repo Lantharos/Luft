@@ -31,7 +31,7 @@ const SNIPPET = 26;
 const LIMIT = 60;
 
 /** Lower case without accents, so "jednacine" finds "jednačine". */
-export const fold = (text: string) => text.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+const fold = (text: string) => text.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
 
 /** Every notebook's words, kept in memory so search answers as you type. */
 class SearchIndex {

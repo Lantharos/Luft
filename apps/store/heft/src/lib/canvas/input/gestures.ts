@@ -1,5 +1,5 @@
 import { Gesture } from '@luft/ui';
-import type { Viewport } from './viewport.svelte';
+import type { Viewport } from '../viewport.svelte';
 
 interface Touch {
 	x: number;

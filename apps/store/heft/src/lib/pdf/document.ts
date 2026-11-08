@@ -7,7 +7,7 @@ type Library = typeof import('pdfjs-dist');
 let library: Promise<Library> | null = null;
 const documents = new Map<string, Promise<PDFDocumentProxy>>();
 
-export function pdfLibrary(): Promise<Library> {
+function pdfLibrary(): Promise<Library> {
 	library ??= import('pdfjs-dist').then((module) => {
 		module.GlobalWorkerOptions.workerSrc = workerUrl;
 		return module;

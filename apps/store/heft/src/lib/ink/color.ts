@@ -50,7 +50,5 @@ export function onDark(rgb: number): number {
 
 export const css = (rgb: number) => `#${rgb.toString(16).padStart(6, '0')}`;
 
-export const parseColor = (hex: string) => Number.parseInt(hex.replace('#', ''), 16);
-
 /** A check mark or label color that stays readable on top of `rgb`. */
 export const readableOn = (rgb: number) => (toOklab(rgb)[0] > 0.72 ? '#1d1d1f' : '#ffffff');

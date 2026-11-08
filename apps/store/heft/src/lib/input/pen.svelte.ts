@@ -9,8 +9,6 @@ class Pen {
 	near = $state(false);
 	tool: 'pen' | 'eraser' = $state('pen');
 	buttons = $state(0);
-	tiltX: number | null = null;
-	tiltY: number | null = null;
 	private lastSeen = 0;
 
 	start() {
@@ -18,8 +16,6 @@ class Pen {
 			this.near = state.near || state.contact;
 			this.tool = state.tool;
 			this.buttons = state.buttons;
-			this.tiltX = state.tiltX;
-			this.tiltY = state.tiltY;
 			this.lastSeen = performance.now();
 		});
 	}

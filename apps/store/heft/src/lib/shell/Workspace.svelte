@@ -1,5 +1,8 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
+	import { appWindow } from '@lantharos/sabine';
+	import Maximize from '@lucide/svelte/icons/maximize-2';
+	import Minimize from '@lucide/svelte/icons/minimize-2';
 	import PanelLeft from '@lucide/svelte/icons/panel-left';
 	import { t } from '@luft/i18n';
 	import { IconButton } from '@luft/ui';
@@ -28,6 +31,12 @@
 	let focused = $state<'main' | 'second'>('main');
 	let pane = $derived(focused === 'second' && second ? second : main);
 	let railOpen = $state(appState.get<boolean>('rail') ?? true);
+	let focusing = $state(false);
+
+	function focusMode(on: boolean) {
+		focusing = on;
+		appWindow.setFullscreen(on);
+	}
 	let width = $state(0);
 	let height = $state(0);
 	let current = $derived(pane.current);
@@ -53,21 +62,32 @@
 	}
 </script>
 
-<svelte:window onkeydown={(event) => handleKeys(event, pane.actions, pane.viewport)} onpaste={(event) => void paste(event)} />
+<svelte:window
+	onkeydown={(event) => {
+		if (event.key === 'F11' || (focusing && event.key === 'Escape')) {
+			event.preventDefault();
+			focusMode(!focusing);
+		} else handleKeys(event, pane.actions, pane.viewport);
+	}}
+	onpaste={(event) => void paste(event)}
+/>
 
-{#if railOpen}
+{#if railOpen && !focusing}
 	<PageRail notebook={pane.notebook} {current} onjump={(index) => pane.jump(index)} />
 {/if}
 <main class="glass-content relative">
-	<Header />
+	{#if !focusing}
+		<Header />
+	{/if}
 	<div class="flex h-[48px] flex-none items-center gap-2 px-3">
 		<div class="flex min-w-0 flex-1 items-center gap-1">
 			<IconButton icon={PanelLeft} label={railOpen ? t('rail-hide') : t('rail-show')} onclick={toggleRail} />
 			<NotebookMenu notebook={pane.notebook} />
 		</div>
 		<Toolbar actions={pane.actions} zoom={pane.viewport.zoom} {books} />
-		<div class="flex flex-1 justify-end">
+		<div class="flex flex-1 items-center justify-end gap-2">
 			<span class="text-[12px] text-(--text-muted) tabular-nums">{t('page-of', { page: current + 1, pages: pane.notebook.meta.pages.length })}</span>
+			<IconButton icon={focusing ? Minimize : Maximize} label={focusing ? t('focus-leave') : t('focus-enter')} onclick={() => focusMode(!focusing)} />
 		</div>
 	</div>
 	<div class="flex min-h-0 flex-1 gap-px" class:flex-col={width < height * 1.15} bind:clientWidth={width} bind:clientHeight={height}>

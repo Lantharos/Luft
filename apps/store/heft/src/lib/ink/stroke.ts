@@ -42,8 +42,6 @@ export function union(into: Bounds, other: Bounds) {
 
 export const overlaps = (a: Bounds, b: Bounds) => a.left <= b.right && a.right >= b.left && a.top <= b.bottom && a.bottom >= b.top;
 
-export const pointCount = (stroke: Stroke) => stroke.points.length / POINT_FIELDS;
-
 export function strokeBounds(points: Float32Array): Bounds {
 	const bounds = emptyBounds();
 	for (let index = 0; index < points.length; index += POINT_FIELDS) {

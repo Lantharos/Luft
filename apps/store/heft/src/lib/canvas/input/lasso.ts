@@ -1,7 +1,7 @@
 import { selection } from '#lib/selection/selection.svelte.js';
 import { pagePoint, type Origin, type Target } from './drawing';
-import type { LiveInk } from './live';
-import type { Viewport } from './viewport.svelte';
+import type { LiveInk } from '../live';
+import type { Viewport } from '../viewport.svelte';
 
 type Sample = Pick<PointerEvent, 'clientX' | 'clientY'>;
 

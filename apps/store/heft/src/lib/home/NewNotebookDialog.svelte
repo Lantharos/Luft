@@ -4,7 +4,7 @@
 	import { session } from '#lib/app/session.svelte.js';
 	import { library, type SubjectEntry } from '#lib/library/library.svelte.js';
 	import { DEFAULT_PAPER, type Paper } from '#lib/library/model.js';
-	import { focusField } from '#lib/shell/focus.js';
+	import { focusField } from '#lib/shell/dialogs/focus.js';
 	import PaperPicker from '#lib/paper/PaperPicker.svelte';
 
 	let { subject, onclose }: { subject: SubjectEntry; onclose: () => void } = $props();

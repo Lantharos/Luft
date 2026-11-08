@@ -7,9 +7,9 @@ import { TouchGestures } from './gestures';
 import { selection } from '#lib/selection/selection.svelte.js';
 import { Lassoing } from './lasso';
 import { TextPicking } from './selecting';
-import { pageNear } from './layout';
-import type { LiveInk } from './live';
-import { MAX_ZOOM, MIN_ZOOM, type Viewport } from './viewport.svelte';
+import { pageNear } from '../layout';
+import type { LiveInk } from '../live';
+import { MAX_ZOOM, MIN_ZOOM, type Viewport } from '../viewport.svelte';
 
 type Tool = 'draw' | 'highlight' | 'erase' | 'text' | 'lasso' | 'type';
 

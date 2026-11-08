@@ -5,7 +5,7 @@
 	import { draggable, dropTarget } from '#lib/drag/drag.svelte.js';
 	import type { OpenNotebook } from '#lib/library/notebook.svelte.js';
 	import type { PageEntry, Section } from '#lib/library/model.js';
-	import NameDialog from '#lib/shell/NameDialog.svelte';
+	import NameDialog from '#lib/shell/dialogs/NameDialog.svelte';
 	import { notebookOutline, type Heading } from '#lib/pdf/outline.js';
 	import Contents from './Contents.svelte';
 	import Thumbnail from './Thumbnail.svelte';
@@ -20,6 +20,8 @@
 	let view: 'pages' | 'contents' = $state('pages');
 
 	$effect(() => {
+		headings = [];
+		view = 'pages';
 		if (!notebook.meta.pages.some((page) => page.pdf)) return;
 		void notebookOutline(notebook).then((found) => (headings = found));
 	});

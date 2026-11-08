@@ -36,7 +36,11 @@ fn today() -> String {
     let day_of_year = day_of_era - (365 * year_of_era + year_of_era / 4 - year_of_era / 100);
     let month_index = (5 * day_of_year + 2) / 153;
     let day = day_of_year - (153 * month_index + 2) / 5 + 1;
-    let month = if month_index < 10 { month_index + 3 } else { month_index - 9 };
+    let month = if month_index < 10 {
+        month_index + 3
+    } else {
+        month_index - 9
+    };
     let year = year_of_era + era * 400 + i64::from(month <= 2);
     format!("{year:04}-{month:02}-{day:02}")
 }
@@ -45,7 +49,11 @@ fn snapshots(folder: &Path) -> Vec<PathBuf> {
     let mut found: Vec<PathBuf> = fs::read_dir(folder)
         .map(|entries| entries.flatten().map(|entry| entry.path()).collect())
         .unwrap_or_default();
-    found.retain(|path| !path.extension().is_some_and(|extension| extension == "partial"));
+    found.retain(|path| {
+        !path
+            .extension()
+            .is_some_and(|extension| extension == "partial")
+    });
     found.sort();
     found
 }
@@ -75,7 +83,9 @@ fn take() -> io::Result<()> {
 
 fn unchanged(source: &fs::Metadata, earlier: &Path) -> bool {
     fs::metadata(earlier).is_ok_and(|kept| {
-        kept.len() == source.len() && kept.mtime() == source.mtime() && kept.mtime_nsec() == source.mtime_nsec()
+        kept.len() == source.len()
+            && kept.mtime() == source.mtime()
+            && kept.mtime_nsec() == source.mtime_nsec()
     })
 }
 
@@ -94,9 +104,13 @@ fn mirror(source: &Path, previous: Option<&Path>, target: &Path) -> io::Result<(
             mirror(&from, earlier.as_deref(), &to)?;
             continue;
         }
-        let appended = from.extension().is_some_and(|extension| extension == APPENDED);
+        let appended = from
+            .extension()
+            .is_some_and(|extension| extension == APPENDED);
         match earlier {
-            Some(earlier) if !appended && unchanged(&metadata, &earlier) => fs::hard_link(earlier, &to)?,
+            Some(earlier) if !appended && unchanged(&metadata, &earlier) => {
+                fs::hard_link(earlier, &to)?
+            }
             _ => {
                 fs::copy(&from, &to)?;
                 let file = fs::File::options().write(true).open(&to)?;

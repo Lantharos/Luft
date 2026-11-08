@@ -197,6 +197,31 @@ export-png-filter = PNG pictures
 # The suggested file name for one page.
 export-page-name = { $notebook }, page { $page }
 
+## Settings
+
+settings-title = Pen and touch
+settings-pressure = Pressure
+settings-pressure-body = Drag the curve up for a light touch to write boldly, or down to need a firmer press.
+settings-smoothing = Smoothing
+settings-smoothing-value = { $percent }%
+settings-smoothing-body = Evens out shaky lines. More smoothing trails the pen a little.
+settings-barrel = Pen button
+settings-second-barrel = Second pen button
+settings-barrel-eraser = Erases
+settings-barrel-highlighter = Highlights
+settings-barrel-none = Nothing
+settings-prediction = Draw slightly ahead of the pen
+settings-prediction-body = Guesses where the pen is going for the next few milliseconds, so ink keeps up with fast writing.
+settings-finger-pans = Scroll with one finger
+settings-finger-pans-body = Two fingers always scroll and zoom.
+settings-touch-draws = Draw with a finger
+settings-touch-draws-body = Off, a hand resting on the screen never leaves marks.
+
+## Focus
+
+focus-enter = Write full screen
+focus-leave = Leave full screen
+
 ## Lasso
 
 toolbar-lasso = Lasso

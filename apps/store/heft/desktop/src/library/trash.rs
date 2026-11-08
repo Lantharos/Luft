@@ -57,7 +57,12 @@ pub fn list() -> Result<Vec<Trashed>, String> {
     };
     let mut items: Vec<Trashed> = entries
         .flatten()
-        .filter(|entry| entry.file_name().to_string_lossy().ends_with(".trashed.json"))
+        .filter(|entry| {
+            entry
+                .file_name()
+                .to_string_lossy()
+                .ends_with(".trashed.json")
+        })
         .filter_map(|entry| serde_json::from_slice(&fs::read(entry.path()).ok()?).ok())
         .collect();
     items.sort_by_key(|item| std::cmp::Reverse(item.trashed_at));

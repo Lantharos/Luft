@@ -3,7 +3,7 @@
 	import Check from '@lucide/svelte/icons/check';
 	import { t } from '@luft/i18n';
 	import { Dialog, TextField } from '@luft/ui';
-	import { focusField } from '#lib/shell/focus.js';
+	import { focusField } from '#lib/shell/dialogs/focus.js';
 	import { library, SUBJECT_COLORS, type SubjectEntry } from '#lib/library/library.svelte.js';
 
 	let { subject, onclose }: { subject?: SubjectEntry; onclose: () => void } = $props();

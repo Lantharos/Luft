@@ -1,7 +1,7 @@
 import { textSelection } from '#lib/pdf/selection.svelte.js';
 import { pageText, select, type Glyphs } from '#lib/pdf/text.js';
 import { pagePoint, type Origin, type Target } from './drawing';
-import type { Viewport } from './viewport.svelte';
+import type { Viewport } from '../viewport.svelte';
 
 type Sample = Pick<PointerEvent, 'clientX' | 'clientY'>;
 

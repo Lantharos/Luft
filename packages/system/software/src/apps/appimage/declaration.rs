@@ -18,7 +18,8 @@ const FILESYSTEMS: [&str; 7] = [
     "xdg-videos",
 ];
 const DEVICES: [&str; 3] = ["usb", "serial", "all"];
-const REFUSED_NAMES: [&str; 5] = [
+const REFUSED_NAMES: [&str; 6] = [
+    "com.lantharos.Kestrel",
     "org.freedesktop.impl.portal",
     "org.freedesktop.portal.Flatpak",
     "org.freedesktop.Flatpak",

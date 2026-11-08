@@ -68,7 +68,10 @@
 		/>
 	{/if}
 	{#if paper.size !== 'infinite'}
-		<Switch label={t('paper-landscape')} checked={paper.landscape} onchange={(landscape) => (paper = { ...paper, landscape })} />
+		<div class="flex items-center justify-between gap-4">
+			<span class="text-[13px]">{t('paper-landscape')}</span>
+			<Switch label={t('paper-landscape')} checked={paper.landscape} onchange={(landscape) => (paper = { ...paper, landscape })} />
+		</div>
 	{/if}
 </div>
 

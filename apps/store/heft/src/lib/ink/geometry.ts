@@ -2,7 +2,10 @@ import { POINT_FIELDS, type Stroke } from './stroke';
 
 const TAU = Math.PI * 2;
 
-export function addDot(path: Path2D, x: number, y: number, radius: number) {
+/** Anything a stroke's outline can be traced into: a Path2D, or a PDF page. */
+export type PathSink = Pick<Path2D, 'moveTo' | 'lineTo' | 'arc' | 'closePath'>;
+
+export function addDot(path: PathSink, x: number, y: number, radius: number) {
 	path.moveTo(x + radius, y);
 	path.arc(x, y, radius, 0, TAU);
 }
@@ -11,7 +14,7 @@ export function addDot(path: Path2D, x: number, y: number, radius: number) {
  * The quad between two round ends, wound the same way as `addDot`'s circles,
  * so a nonzero fill of all of them is their union.
  */
-export function addSegment(path: Path2D, x1: number, y1: number, r1: number, x2: number, y2: number, r2: number) {
+export function addSegment(path: PathSink, x1: number, y1: number, r1: number, x2: number, y2: number, r2: number) {
 	const dx = x2 - x1;
 	const dy = y2 - y1;
 	const distance = Math.hypot(dx, dy);
@@ -31,7 +34,11 @@ export function addSegment(path: Path2D, x1: number, y1: number, r1: number, x2:
 	path.closePath();
 }
 
-export function strokePath(points: Float32Array, from = 0, path = new Path2D()): Path2D {
+export function strokePath(points: Float32Array, from = 0): Path2D {
+	return traceStroke(new Path2D(), points, from);
+}
+
+export function traceStroke<Sink extends PathSink>(path: Sink, points: Float32Array, from = 0): Sink {
 	const start = from * POINT_FIELDS;
 	if (start >= points.length) return path;
 	let x = points[start];

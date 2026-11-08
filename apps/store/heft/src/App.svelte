@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { events as sabineEvents, type SingleInstanceEvent } from '@lantharos/sabine';
 	import { i18n, t } from '@luft/i18n';
-	import { appearance, errorText, GlassShell } from '@luft/ui';
+	import { appearance, CommandPalette, errorText, GlassShell } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import { recent } from '#lib/app/recent.svelte.js';
 	import { session } from '#lib/app/session.svelte.js';
@@ -16,6 +16,10 @@
 	import { pen } from '#lib/input/pen.svelte.js';
 	import { library } from '#lib/library/library.svelte.js';
 	import { handleAppKeys } from '#lib/shell/keyboard.js';
+	import { requests } from '#lib/app/requests.svelte.js';
+	import SubjectDialog from '#lib/home/SubjectDialog.svelte';
+	import { searchIndex } from '#lib/search/index.svelte.js';
+	import { everything, palette } from '#lib/search/palette.js';
 	import Workspace from '#lib/shell/Workspace.svelte';
 	import { tools } from '#lib/tools/tools.svelte.js';
 
@@ -41,7 +45,17 @@
 		recent.load();
 		await session.start();
 		ready = true;
+		void searchIndex.load();
 		importing = state.launchPaths.filter(isPdf);
+	}
+
+	function keys(event: KeyboardEvent) {
+		if (ready && (event.ctrlKey || event.metaKey) && !event.altKey && event.key.toLowerCase() === 'k') {
+			event.preventDefault();
+			palette.show(everything({ newSubject: () => (requests.newSubject = true), exportPdf: () => (requests.export = 'pdf'), exportPng: () => (requests.export = 'png') }));
+			return;
+		}
+		handleAppKeys(event);
 	}
 
 	async function activate(activation: SingleInstanceEvent) {
@@ -49,7 +63,7 @@
 	}
 </script>
 
-<svelte:window onkeydown={handleAppKeys} />
+<svelte:window onkeydown={keys} />
 
 <div class="h-[100dvh] w-screen overflow-hidden">
 	<GlassShell class="h-full select-none">
@@ -72,6 +86,10 @@
 	</GlassShell>
 </div>
 <DragGhost />
+<CommandPalette {palette} />
+{#if requests.newSubject}
+	<SubjectDialog onclose={() => (requests.newSubject = false)} />
+{/if}
 {#if importing.length && ready}
 	<ImportDialog paths={importing} onclose={() => (importing = [])} />
 {/if}

@@ -166,6 +166,37 @@ format-bold = Bold
 format-list = List
 format-numbered = Numbered list
 
+## Search and the command palette
+
+palette-placeholder = Find a subject, notebook, section or words
+palette-empty = Nothing matches
+palette-subject = Subject, start a new page
+palette-new-page = New page in this subject
+# Keys shown next to the command.
+palette-new-page-keys = Ctrl N
+palette-export-pdf = Save as PDF
+palette-export-png = Save this page as a picture
+# Where a search hit is; the variables are the subject, the notebook and the page number.
+palette-hit = { $subject } · { $notebook } · page { $page }
+
+## Exporting
+
+notebook-export = Save as PDF or picture
+export-title = Save a copy
+export-format = Format
+export-pdf = PDF
+export-png = Picture
+export-range = What to save
+export-this-page = This page
+export-this-section = This section
+export-whole-notebook = Whole notebook
+export-paper = Include the paper's lines
+export-save = Save
+export-pdf-filter = PDF documents
+export-png-filter = PNG pictures
+# The suggested file name for one page.
+export-page-name = { $notebook }, page { $page }
+
 ## Lasso
 
 toolbar-lasso = Lasso

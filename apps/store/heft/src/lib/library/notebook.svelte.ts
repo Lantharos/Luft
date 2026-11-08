@@ -4,6 +4,7 @@ import { commands } from '#lib/bindings.js';
 import { newId } from '#lib/ink/stroke.js';
 import { SvelteMap } from 'svelte/reactivity';
 import { PageStore } from '#lib/page/storage.js';
+import { searchIndex } from '#lib/search/index.svelte.js';
 import type { NotebookEntry } from './library.svelte';
 import type { NotebookMeta, PageEntry, Paper } from './model';
 
@@ -53,7 +54,10 @@ export class OpenNotebook {
 					this.done.push(id);
 					this.undone.length = 0;
 				};
-				store.document.listen(() => this.revisions.set(id, (this.revisions.get(id) ?? 0) + 1));
+				store.document.listen((_, change) => {
+					this.revisions.set(id, (this.revisions.get(id) ?? 0) + 1);
+					if (change.objects) void searchIndex.setTyped(this.entry, id, store.document.objects.map((object) => object.text ?? '').join('\n').trim());
+				});
 				this.loaded.set(id, store);
 				this.evict();
 				return store;

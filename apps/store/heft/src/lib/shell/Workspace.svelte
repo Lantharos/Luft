@@ -5,6 +5,8 @@
 	import { IconButton } from '@luft/ui';
 	import { appState } from '#lib/app/state.js';
 	import { addPicture } from '#lib/objects/editing.svelte.js';
+	import { requests } from '#lib/app/requests.svelte.js';
+	import ExportDialog from '#lib/export/ExportDialog.svelte';
 	import type { OpenNotebook } from '#lib/library/notebook.svelte.js';
 	import PageRail from '#lib/rail/PageRail.svelte';
 	import Toolbar from '#lib/tools/Toolbar.svelte';
@@ -77,3 +79,7 @@
 		{/if}
 	</div>
 </main>
+
+{#if requests.export}
+	<ExportDialog notebook={pane.notebook} current={pane.current} format={requests.export} onclose={() => (requests.export = null)} />
+{/if}

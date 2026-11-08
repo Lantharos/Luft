@@ -5,9 +5,11 @@
 	import { library } from '#lib/library/library.svelte.js';
 	import type { OpenNotebook } from '#lib/library/notebook.svelte.js';
 	import PaperDialog from '#lib/paper/PaperDialog.svelte';
+	import { requests } from '#lib/app/requests.svelte.js';
 	import { session } from '#lib/app/session.svelte.js';
 	import { choosePdfs } from '#lib/pdf/import.js';
 	import { insertPdf } from '#lib/pdf/sources.js';
+	import { searchIndex } from '#lib/search/index.svelte.js';
 	import BesideDialog from './BesideDialog.svelte';
 	import DeletedPagesDialog from './DeletedPagesDialog.svelte';
 	import NameDialog from './NameDialog.svelte';
@@ -18,6 +20,7 @@
 
 	async function addPdfPages() {
 		for (const path of await choosePdfs()) await insertPdf(notebook, path, notebook.meta.pages.length);
+		await searchIndex.refresh(notebook.entry);
 	}
 
 	async function rename(name: string) {
@@ -39,6 +42,7 @@
 		{:else}
 			<MenuItem onclick={() => ((dialog = 'beside'), close())}>{t('notebook-split')}</MenuItem>
 		{/if}
+		<MenuItem onclick={() => ((requests.export = 'pdf'), close())}>{t('notebook-export')}</MenuItem>
 		<MenuItem onclick={() => (close(), void addPdfPages())}>{t('notebook-insert-pdf')}</MenuItem>
 		<MenuItem disabled={!notebook.meta.trashed?.length} onclick={() => ((dialog = 'deleted'), close())}>{t('notebook-deleted-pages')}</MenuItem>
 	{/snippet}

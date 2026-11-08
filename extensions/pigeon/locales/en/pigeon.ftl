@@ -1,9 +1,8 @@
 # The name of the extension in Settings and the store
 extension-name = Pigeon
 extension-description = Sends files and text to phones and computers nearby, and takes what they send, with LocalSend's apps
-# Screen-reader name of the tile, the taskbar element and the panel
+# Screen-reader name of the taskbar element and the panel
 pigeon = Pigeon
-open-pigeon = Show nearby devices
 
 receive = Let nearby devices send to this computer
     .description = Phones and computers with LocalSend on the same network can send files and text here. Luft lets them through on networks you've marked as home
@@ -14,17 +13,6 @@ copy-picture = Put a single picture on the clipboard too
 taskbar = Show in the taskbar
     .description = Drop files on it to send them
 
-# Under the tile and in the taskbar; $percent is how far transfers have got, such as "42%"
-moving = { $percent } done
-# $count is how many devices are nearby
-nearby = { $count ->
-    [one] One device nearby
-   *[other] { $count } devices nearby
-}
-ready = Ready to receive
-not-receiving = Not receiving
-# A menu item; $device is a device's name, such as "Pixel 8"
-send-to = Send to { $device }
 # In the menu of files and folders in Rover
 send-to-device = Send to device
 

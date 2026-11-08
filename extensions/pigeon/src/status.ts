@@ -11,12 +11,3 @@ export function moving(pigeon: Pigeon): number | null {
 export function percent(fraction: number): string {
   return new Intl.NumberFormat(undefined, { style: 'percent', maximumFractionDigits: 0 }).format(fraction);
 }
-
-/** One line on what Pigeon is doing, for the quick settings tile and the taskbar. */
-export function status(pigeon: Pigeon): string {
-  const { t, settings } = pigeon.extension;
-  const fraction = moving(pigeon);
-  if (fraction !== null) return t('moving', { percent: percent(fraction) });
-  if (pigeon.devices.length) return t('nearby', { count: pigeon.devices.length });
-  return settings.get<boolean>('receive') ? t('ready') : t('not-receiving');
-}

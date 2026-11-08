@@ -1,10 +1,6 @@
 import Clutter from 'gi://Clutter';
 import GUdev from 'gi://GUdev';
 
-import { PowerDevices } from '../power/powerDevices.js';
-
-const PEN_BATTERY = 13;
-
 export type PenKind = 'screen' | 'tablet';
 
 export interface Pen {
@@ -15,7 +11,6 @@ export interface Pen {
 
 export interface PensState {
   pens: Pen[];
-  battery: number | null;
 }
 
 type Listener = (state: PensState) => void;
@@ -27,9 +22,8 @@ class Pens {
   private readonly seat: Clutter.Seat = global.stage.context.get_backend().get_default_seat();
   private readonly udev = new GUdev.Client();
   private readonly listeners = new Set<Listener>();
-  private power: PowerDevices | null = null;
   private signals: number[] = [];
-  private state: PensState = { pens: [], battery: null };
+  private state: PensState = { pens: [] };
 
   watch(listener: Listener): () => void {
     if (!this.listeners.size) this.start();
@@ -49,8 +43,6 @@ class Pens {
   private stop(): void {
     for (const id of this.signals) this.seat.disconnect(id);
     this.signals = [];
-    this.power?.destroy();
-    this.power = null;
   }
 
   private parentOf(device: Clutter.InputDevice): string | null {
@@ -70,8 +62,7 @@ class Pens {
         kind: parent === null || screens.has(parent) ? 'screen' : 'tablet',
       } satisfies Pen;
     });
-    if (pens.length && !this.power) this.power = new PowerDevices(device => device.kind === PEN_BATTERY && this.publish({ ...this.state, battery: device.percentage }));
-    this.publish({ pens, battery: pens.length ? this.state.battery : null });
+    this.publish({ pens });
   }
 
   private publish(state: PensState): void {

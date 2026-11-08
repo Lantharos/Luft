@@ -3,7 +3,7 @@ import type { ElementLayout, TaskbarElement, View } from '@luft/extension-api';
 import { SEND_ICON } from './format.js';
 import type { Panel } from './panel.js';
 import type { Pigeon } from './pigeon.js';
-import { moving, percent, status } from './status.js';
+import { moving, percent } from './status.js';
 
 /** Pigeon in the taskbar: how a transfer is going, a click away from the devices, and a place to drop files on. */
 export function addElement(pigeon: Pigeon, panel: Panel): void {
@@ -23,13 +23,13 @@ export function addElement(pigeon: Pigeon, panel: Panel): void {
       const fraction = moving(pigeon);
       return stack(layout, [icon(layout), ...fraction === null ? [] : [{ type: 'text', text: percent(fraction), style: 'number' } as const]]);
     },
-    expanded: layout => stack(layout, [icon(layout), { type: 'text', text: status(pigeon), maxWidth: 220 }]),
     onClick: () => panel.show(element),
     onDrop: paths => panel.show(element, { dropped: paths }),
     menu: menu(),
   });
   const sync = () => {
-    const now = status(pigeon);
+    const fraction = moving(pigeon);
+    const now = fraction === null ? '' : percent(fraction);
     if (now === shown) return;
     shown = now;
     element.refresh();

@@ -3,7 +3,7 @@ name = "Pigeon"
 description = "Sends files and text to phones and computers nearby, and takes what they send, with LocalSend's apps."
 version = "1.0.0"
 api = 1
-permissions = ["quick-settings", "taskbar", "popups", "notifications", "clipboard", "file-actions"]
+permissions = ["taskbar", "popups", "notifications", "clipboard", "file-actions"]
 
 [helper]
 path = "pigeon"

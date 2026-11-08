@@ -134,11 +134,6 @@ quick-settings-battery-left = { $duration } left
 quick-settings-battery-discharging = On battery
 quick-settings-battery-full = Fully charged
 quick-settings-battery-plugged-in = Plugged in
-quick-settings-pen = Pen
-quick-settings-pen-right-hand = Right hand
-quick-settings-pen-left-hand = Left hand
-# Subtitle of the pen tile; $percent is the pen's battery, already formatted as a percentage, and $hand is "Right hand" or "Left hand"
-quick-settings-pen-battery = { $percent } · { $hand }
 # Subtitle of a toggle tile without its own status
 quick-settings-on = On
 quick-settings-off = Off

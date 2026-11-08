@@ -16,10 +16,10 @@ export class Panel {
     pigeon.onChanged(() => this.refresh());
   }
 
-  /** Opens on the devices, or on one of them, with files dropped on the taskbar waiting to go. */
-  show(anchor: PopupAnchor, { dropped = [], device = null }: { dropped?: string[]; device?: string | null } = {}): void {
+  /** Opens on the devices, with files dropped on the taskbar waiting to go. */
+  show(anchor: PopupAnchor, { dropped = [] }: { dropped?: string[] } = {}): void {
     this.dropped = dropped;
-    this.chosen = device;
+    this.chosen = null;
     this.draft = '';
     this.popup?.dispose();
     this.pigeon.scan();

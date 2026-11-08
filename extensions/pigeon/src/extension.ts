@@ -8,7 +8,6 @@ import { Outgoing } from './outgoing.js';
 import { describePage } from './page.js';
 import { Panel } from './panel.js';
 import { type Granted, Pigeon } from './pigeon.js';
-import { addTile } from './tile.js';
 
 const enable: Enable<Granted> = extension => {
   const pigeon: Pigeon = new Pigeon(extension, {
@@ -24,7 +23,6 @@ const enable: Enable<Granted> = extension => {
   const incoming = new Incoming(pigeon);
   const outgoing = new Outgoing(pigeon);
   const messages = new Messages(pigeon);
-  addTile(pigeon, panel);
   addElement(pigeon, panel);
   addFileAction(pigeon);
   describePage(pigeon);

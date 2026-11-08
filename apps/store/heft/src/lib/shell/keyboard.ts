@@ -1,6 +1,7 @@
 import { session } from '#lib/app/session.svelte.js';
 import type { Viewport } from '#lib/canvas/viewport.svelte.js';
 import type { ToolbarActions } from '#lib/tools/Toolbar.svelte';
+import { selection } from '#lib/selection/selection.svelte.js';
 import { tools } from '#lib/tools/tools.svelte.js';
 
 const typing = (target: EventTarget | null) => target instanceof HTMLElement && (target.isContentEditable || ['INPUT', 'TEXTAREA'].includes(target.tagName));
@@ -13,6 +14,13 @@ export function handleKeys(event: KeyboardEvent, actions: ToolbarActions, viewpo
 		event.preventDefault();
 		action();
 	};
+	if (selection.active) {
+		if (key === 'delete' || key === 'backspace') return run(() => selection.remove());
+		if (key === 'escape') return run(() => selection.clear());
+		if (command && key === 'c') return run(() => selection.copy());
+		if (command && key === 'x') return run(() => selection.cut());
+		if (command && key === 'd') return run(() => selection.duplicate());
+	}
 	if (command) {
 		if (key === 'z' && event.shiftKey) return run(actions.redo);
 		if (key === 'z' || key === 'y') return run(key === 'z' ? actions.undo : actions.redo);
@@ -26,6 +34,7 @@ export function handleKeys(event: KeyboardEvent, actions: ToolbarActions, viewpo
 	}
 	if (/^[1-9]$/.test(key) && tools.presets[Number(key) - 1]) return run(() => tools.choose(tools.presets[Number(key) - 1].id));
 	if (key === 'e') return run(() => (tools.active = 'eraser'));
+	if (key === 'l') return run(() => (tools.active = 'lasso'));
 	if (key === 'pagedown' || key === ' ') return run(() => viewport.panBy(0, viewport.height * 0.85));
 	if (key === 'pageup') return run(() => viewport.panBy(0, -viewport.height * 0.85));
 	if (key === 'arrowdown') return run(() => viewport.panBy(0, 60));

@@ -3,6 +3,9 @@ import { appState } from '#lib/app/state.js';
 import { pageNear } from '#lib/canvas/layout.js';
 import { Viewport } from '#lib/canvas/viewport.svelte.js';
 import type { OpenNotebook } from '#lib/library/notebook.svelte.js';
+import { t } from '@luft/i18n';
+import { addPictureFiles, addText, choosePictures } from '#lib/objects/editing.svelte.js';
+import { selection } from '#lib/selection/selection.svelte.js';
 import type { ToolbarActions } from '#lib/tools/Toolbar.svelte';
 
 interface Place {
@@ -61,6 +64,28 @@ export class Pane {
 		}, SAVE_AFTER);
 	}
 
+	/** The page in view and what's written on it, once it's loaded. */
+	get page() {
+		const entry = this.notebook.meta.pages[this.current];
+		const store = entry && this.notebook.store(entry.id);
+		return store ? { entry, document: store.document, rect: this.viewport.layout.pages[this.current] } : null;
+	}
+
+	private async insertPictures() {
+		const paths = await choosePictures(t('picture-choose-title'), t('picture-choose-filter'));
+		const page = this.page;
+		if (page) await addPictureFiles(page.document, this.notebook.folder, page.rect, paths);
+	}
+
+	/** Adds picked book text to the page in view as a quote. */
+	quote(text: string) {
+		const page = this.page;
+		if (!page) return;
+		const below = Math.max(48, ...page.document.objects.map((object) => object.y + object.height + 12));
+		const escaped = text.replaceAll('&', '&amp;').replaceAll('<', '&lt;');
+		addText(page.document, 40, below, page.rect.width, `<blockquote>${escaped}</blockquote>`);
+	}
+
 	jump(index: number) {
 		this.viewport.scrollToPage(this.viewport.layout.pages[index]);
 	}
@@ -75,6 +100,12 @@ export class Pane {
 		fitWidth: () => this.viewport.fitWidth(this.viewport.layout.pages[this.current]),
 		fitPage: () => this.viewport.fitPage(this.viewport.layout.pages[this.current]),
 		actualSize: () => this.viewport.zoomAt(1, this.viewport.width / 2, this.viewport.height / 2),
+		paste: () => {
+			const page = this.notebook.meta.pages[this.current];
+			const store = page && this.notebook.store(page.id);
+			if (store) selection.paste(page.id, store.document);
+		},
+		insertPicture: () => void this.insertPictures(),
 		zoomBy: (factor) => this.viewport.zoomAt(this.viewport.zoom * factor, this.viewport.width / 2, this.viewport.height / 2)
 	};
 }

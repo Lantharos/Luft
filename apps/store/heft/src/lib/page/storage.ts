@@ -6,9 +6,29 @@ import { PageDocument, type Change } from './document';
 const MAGIC = 0x54464548;
 const FORMAT = 1;
 const OP_REPLACE = 1;
+const OP_OBJECTS = 2;
+const encoder = new TextEncoder();
+const decoder = new TextDecoder();
 const COMPACT_AFTER = 256 * 1024;
 
-function encodeChange(change: Change): Uint8Array {
+function encodeObjects(change: Change): Uint8Array {
+	const objects = change.objects!;
+	const json = encoder.encode(
+		JSON.stringify({
+			put: objects.flatMap(({ after }) => (after ? [after] : [])),
+			drop: objects.flatMap(({ before, after }) => (after ? [] : [before!.id]))
+		})
+	);
+	const bytes = new Uint8Array(9 + json.length);
+	const view = new DataView(bytes.buffer);
+	view.setUint32(0, json.length + 1, true);
+	view.setUint8(8, OP_OBJECTS);
+	bytes.set(json, 9);
+	view.setUint32(4, crc32(bytes.subarray(8)), true);
+	return bytes;
+}
+
+function encodeStrokes(change: Change): Uint8Array {
 	const size = 8 + 1 + 4 + change.removed.length * 8 + 4 + change.added.reduce((total, stroke) => total + strokeSize(stroke), 0);
 	const bytes = new Uint8Array(size);
 	const view = new DataView(bytes.buffer);
@@ -51,13 +71,17 @@ function replayJournal(document: PageDocument, bytes: Uint8Array) {
 				cursor = next;
 			}
 			document.replay(removed, added);
+		} else if (view.getUint8(at + 8) === OP_OBJECTS) {
+			const { put, drop } = JSON.parse(decoder.decode(bytes.subarray(at + 9, end)));
+			document.replayObjects(put, drop);
 		}
 		at = end;
 	}
 }
 
 function encodePage(document: PageDocument): Uint8Array {
-	const size = 12 + document.strokes.reduce((total, stroke) => total + strokeSize(stroke), 0);
+	const objects = encoder.encode(JSON.stringify(document.objects));
+	const size = 16 + document.strokes.reduce((total, stroke) => total + strokeSize(stroke), 0) + objects.length;
 	const bytes = new Uint8Array(size);
 	const view = new DataView(bytes.buffer);
 	view.setUint32(0, MAGIC, true);
@@ -65,6 +89,8 @@ function encodePage(document: PageDocument): Uint8Array {
 	view.setUint32(8, document.strokes.length, true);
 	let at = 12;
 	for (const stroke of document.strokes) at = writeStroke(view, at, stroke);
+	view.setUint32(at, objects.length, true);
+	bytes.set(objects, at + 4);
 	return bytes;
 }
 
@@ -81,6 +107,7 @@ function readPage(document: PageDocument, bytes: Uint8Array) {
 		at = next;
 	}
 	document.replay([], strokes);
+	if (at + 4 <= bytes.length) document.replayObjects(JSON.parse(decoder.decode(bytes.subarray(at + 4, at + 4 + view.getUint32(at, true)))), []);
 }
 
 export class PageStore {
@@ -115,7 +142,9 @@ export class PageStore {
 	}
 
 	private append(change: Change) {
-		const record = encodeChange(change);
+		const records = [...(change.removed.length || change.added.length ? [encodeStrokes(change)] : []), ...(change.objects?.length ? [encodeObjects(change)] : [])];
+		const record = new Uint8Array(records.reduce((total, part) => total + part.length, 0));
+		records.reduce((at, part) => (record.set(part, at), at + part.length), 0);
 		this.journalSize += record.length;
 		void this.queue.run(() => appendFile(`${this.base}.journal`, record));
 		if (this.journalSize > COMPACT_AFTER) this.compact();

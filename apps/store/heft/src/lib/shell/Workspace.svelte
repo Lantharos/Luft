@@ -4,6 +4,7 @@
 	import { t } from '@luft/i18n';
 	import { IconButton } from '@luft/ui';
 	import { appState } from '#lib/app/state.js';
+	import { addPicture } from '#lib/objects/editing.svelte.js';
 	import type { OpenNotebook } from '#lib/library/notebook.svelte.js';
 	import PageRail from '#lib/rail/PageRail.svelte';
 	import Toolbar from '#lib/tools/Toolbar.svelte';
@@ -30,13 +31,27 @@
 	let current = $derived(pane.current);
 	let books = $derived(pane.notebook.meta.pages.some((page) => page.pdf));
 
+	function quoteFrom(from: Pane) {
+		return second ? (text: string) => (from === main ? second! : main).quote(text) : undefined;
+	}
+
+	async function paste(event: ClipboardEvent) {
+		if ((event.target as HTMLElement | null)?.isContentEditable) return;
+		const image = [...(event.clipboardData?.files ?? [])].find((file) => file.type.startsWith('image/'));
+		const page = pane.page;
+		if (!page) return;
+		event.preventDefault();
+		if (image) await addPicture(page.document, pane.notebook.folder, page.rect, new Uint8Array(await image.arrayBuffer()), image.name);
+		else pane.actions.paste();
+	}
+
 	function toggleRail() {
 		railOpen = !railOpen;
 		void appState.save({ rail: railOpen });
 	}
 </script>
 
-<svelte:window onkeydown={(event) => handleKeys(event, pane.actions, pane.viewport)} />
+<svelte:window onkeydown={(event) => handleKeys(event, pane.actions, pane.viewport)} onpaste={(event) => void paste(event)} />
 
 {#if railOpen}
 	<PageRail notebook={pane.notebook} {current} onjump={(index) => pane.jump(index)} />
@@ -54,10 +69,10 @@
 		</div>
 	</div>
 	<div class="flex min-h-0 flex-1 gap-px" class:flex-col={width < height * 1.15} bind:clientWidth={width} bind:clientHeight={height}>
-		<PaneView pane={main} active={second !== null && focused === 'main'} onfocus={() => (focused = 'main')} />
+		<PaneView pane={main} active={second !== null && focused === 'main'} onfocus={() => (focused = 'main')} onquote={quoteFrom(main)} />
 		{#if second}
 			{#key second}
-				<PaneView pane={second} active={focused === 'second'} onfocus={() => (focused = 'second')} />
+				<PaneView pane={second} active={focused === 'second'} onfocus={() => (focused = 'second')} onquote={quoteFrom(second)} />
 			{/key}
 		{/if}
 	</div>

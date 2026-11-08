@@ -1,9 +1,13 @@
 import { emptyBounds, union, type Bounds, type Stroke } from '#lib/ink/stroke.js';
+import { inverse, type ObjectChange, type PageObject } from './objects';
 
 export interface Change {
 	removed: Stroke[];
 	added: Stroke[];
+	objects?: ObjectChange[];
 }
+
+const empty = (change: Change) => !change.removed.length && !change.added.length && !change.objects?.length;
 
 export type ChangeListener = (dirty: Bounds, change: Change) => void;
 
@@ -11,6 +15,7 @@ const HISTORY_LIMIT = 500;
 
 export class PageDocument {
 	strokes: Stroke[] = [];
+	objects: PageObject[] = [];
 	revision = 0;
 	onRecord: (() => void) | null = null;
 	private readonly byId = new Map<string, Stroke>();
@@ -47,8 +52,17 @@ export class PageDocument {
 		for (const stroke of added) this.insert(stroke);
 	}
 
+	/** Puts objects read back from disk in place, or removes them, without history. */
+	replayObjects(put: PageObject[], dropped: string[]) {
+		this.objects = this.objects.filter((object) => !dropped.includes(object.id) && !put.some((next) => next.id === object.id)).concat(put);
+	}
+
+	object(id: string) {
+		return this.objects.find((object) => object.id === id);
+	}
+
 	commit(change: Change) {
-		if (!change.removed.length && !change.added.length) return;
+		if (empty(change)) return;
 		this.show(change);
 		this.record(change);
 	}
@@ -60,7 +74,7 @@ export class PageDocument {
 
 	/** Keeps a change whose parts were shown with `preview`. */
 	record(change: Change) {
-		if (!change.removed.length && !change.added.length) return;
+		if (empty(change)) return;
 		this.persist(change);
 		this.undoStack.push(change);
 		if (this.undoStack.length > HISTORY_LIMIT) this.undoStack.shift();
@@ -71,7 +85,7 @@ export class PageDocument {
 	undo() {
 		const change = this.undoStack.pop();
 		if (!change) return;
-		this.apply({ removed: change.added, added: change.removed });
+		this.apply({ removed: change.added, added: change.removed, objects: change.objects && inverse(change.objects).reverse() });
 		this.redoStack.push(change);
 	}
 
@@ -95,6 +109,11 @@ export class PageDocument {
 		for (const stroke of change.added) {
 			this.insert(stroke);
 			union(dirty, stroke.bounds);
+		}
+		for (const { before, after } of change.objects ?? []) {
+			const id = (before ?? after)!.id;
+			this.objects = this.objects.filter((object) => object.id !== id);
+			if (after) this.objects.push(after);
 		}
 		this.revision++;
 		for (const listener of this.listeners) listener(dirty, change);

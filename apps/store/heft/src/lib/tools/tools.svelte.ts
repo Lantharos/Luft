@@ -3,7 +3,7 @@ import type { Pen } from '#lib/ink/builder.js';
 import type { EraseMode } from '#lib/ink/eraser.js';
 import { newId } from '#lib/ink/stroke.js';
 
-export type ToolId = 'draw' | 'eraser' | 'text';
+export type ToolId = 'draw' | 'eraser' | 'text' | 'lasso' | 'type';
 export type EraserSize = 'small' | 'medium' | 'large';
 
 export interface Preset extends Pen {

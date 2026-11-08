@@ -7,17 +7,23 @@
 		fitPage(): void;
 		actualSize(): void;
 		zoomBy(factor: number): void;
+		paste(): void;
+		insertPicture(): void;
 	}
 </script>
 
 <script lang="ts">
 	import Eraser from '@lucide/svelte/icons/eraser';
 	import FilePlus from '@lucide/svelte/icons/file-plus-2';
+	import ImagePlus from '@lucide/svelte/icons/image-plus';
+	import Lasso from '@lucide/svelte/icons/lasso';
+	import Type from '@lucide/svelte/icons/type';
 	import Redo from '@lucide/svelte/icons/redo-2';
 	import TextSelect from '@lucide/svelte/icons/text-select';
 	import Undo from '@lucide/svelte/icons/undo-2';
 	import { t } from '@luft/i18n';
 	import { IconButton, MenuButton, MenuItem, MenuSeparator, tooltip } from '@luft/ui';
+	import FormatBar from '#lib/objects/FormatBar.svelte';
 	import { colorName } from './colors';
 	import EraserOptions from './EraserOptions.svelte';
 	import PenOptions from './PenOptions.svelte';
@@ -67,6 +73,29 @@
 	>
 		<Eraser size={19} />
 	</button>
+	<button
+		type="button"
+		class="tool"
+		aria-pressed={tools.active === 'lasso'}
+		aria-label={t('toolbar-lasso')}
+		{@attach tooltip(t('toolbar-lasso'))}
+		onclick={() => (tools.active = 'lasso')}
+	>
+		<Lasso size={19} />
+	</button>
+	<button
+		type="button"
+		class="tool"
+		aria-pressed={tools.active === 'type'}
+		aria-label={t('toolbar-type')}
+		{@attach tooltip(t('toolbar-type'))}
+		onclick={() => (tools.active = 'type')}
+	>
+		<Type size={19} />
+	</button>
+	{#if tools.active === 'type'}
+		<FormatBar />
+	{/if}
 	{#if books}
 		<button
 			type="button"
@@ -80,6 +109,7 @@
 		</button>
 	{/if}
 	<span class="mx-1.5 h-5 w-px bg-(--hairline)"></span>
+	<IconButton icon={ImagePlus} label={t('toolbar-picture')} onclick={actions.insertPicture} />
 	<IconButton icon={FilePlus} label={t('toolbar-add-page')} onclick={actions.addPage} />
 	<MenuButton label={t('toolbar-zoom')} class="plain-button tabular-nums" align="end">
 		{#snippet trigger()}

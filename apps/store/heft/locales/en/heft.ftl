@@ -154,6 +154,28 @@ paper-spacing = Spacing
 paper-millimetres = { $value } mm
 paper-landscape = Landscape
 
+## Text and pictures
+
+toolbar-type = Type
+toolbar-picture = Add a picture
+picture-choose-title = Add a picture
+picture-choose-filter = Pictures
+text-to-notes = Add to notes
+format-heading = Heading
+format-bold = Bold
+format-list = List
+format-numbered = Numbered list
+
+## Lasso
+
+toolbar-lasso = Lasso
+selection-label = Picked ink
+selection-actions = What to do with the picked ink
+selection-copy = Copy
+selection-cut = Cut
+selection-duplicate = Duplicate
+selection-delete = Delete
+
 ## Books
 
 subject-add-book = Add a textbook

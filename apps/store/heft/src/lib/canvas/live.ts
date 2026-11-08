@@ -76,6 +76,32 @@ export class LiveInk {
 		this.context.fill(path);
 	}
 
+	/** A dashed loop through the points, such as the lasso being drawn. */
+	outline(points: [number, number][], width: number) {
+		this.clear(this.context, this.drawn);
+		this.drawn = emptyBounds();
+		const path = new Path2D();
+		for (const [x, y] of points) {
+			path.lineTo(x, y);
+			grow(this.drawn, x, y, width * 2);
+		}
+		this.context.lineWidth = width;
+		this.context.setLineDash([width * 4, width * 3]);
+		this.context.strokeStyle = this.context.fillStyle;
+		this.context.stroke(path);
+	}
+
+	/** Swaps what was drawn so far for these strokes, such as a recognized shape. */
+	replace(strokes: Float32Array[]) {
+		this.clearPredicted();
+		this.clear(this.context, this.drawn);
+		this.drawn = emptyBounds();
+		for (const points of strokes) {
+			for (let index = 0; index < points.length; index += POINT_FIELDS) grow(this.drawn, points[index], points[index + 1], points[index + 2] / 2);
+			this.context.fill(strokePath(points));
+		}
+	}
+
 	/** Shows where the pen is about to be, from the last drawn point. */
 	predict(points: Float32Array) {
 		this.clearPredicted();

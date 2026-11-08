@@ -3,6 +3,9 @@
 	import type { OpenNotebook } from '#lib/library/notebook.svelte.js';
 	import { paperOf, type PageEntry } from '#lib/library/model.js';
 	import PaperBackground from '#lib/paper/PaperBackground.svelte';
+	import { library } from '#lib/library/library.svelte.js';
+	import ObjectsLayer from '#lib/objects/ObjectsLayer.svelte';
+	import type { PageDocument } from '#lib/page/document.js';
 	import PdfBackground from '#lib/pdf/PdfBackground.svelte';
 	import { textSelection } from '#lib/pdf/selection.svelte.js';
 	import { sourcePath } from '#lib/pdf/sources.js';
@@ -33,6 +36,7 @@
 	let dark = $derived(LOOKS[paper.color].dark);
 	let tilesElement: HTMLDivElement;
 	let layer: TileLayer | null = $state(null);
+	let document: PageDocument | null = $state.raw(null);
 
 	$effect(() => {
 		const id = entry.id;
@@ -43,6 +47,7 @@
 			if (!alive) return;
 			created = new TileLayer(tilesElement, store.document, { dark: untrack(() => dark) });
 			layer = created;
+			document = store.document;
 			onready(id, store);
 		});
 		return () => {
@@ -72,6 +77,9 @@
 		<PaperBackground {paper} width={rect.width} height={rect.height} id={entry.id} />
 	{/if}
 	<div class="tiles absolute inset-0" bind:this={tilesElement}></div>
+	{#if document}
+		<ObjectsLayer {document} {zoom} {dark} assets="{library.root}/{notebook.folder}/assets" />
+	{/if}
 	{#if textSelection.page === entry.id}
 		{#each textSelection.selection.rects as rect, index (index)}
 			<span

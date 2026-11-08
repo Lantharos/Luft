@@ -5,6 +5,7 @@
 	import { LOOKS } from '#lib/paper/templates.js';
 	import { sourcePath } from '#lib/pdf/sources.js';
 	import TextActions from '#lib/pdf/TextActions.svelte';
+	import SelectionBox from '#lib/selection/SelectionBox.svelte';
 	import type { PageStore } from '#lib/page/storage.js';
 	import { pagesIn, stack } from './layout';
 	import { LiveInk } from './live';
@@ -125,6 +126,7 @@
 	</div>
 	<canvas class="live" bind:this={liveCanvas}></canvas>
 	<TextActions {notebook} {viewport} {onquote} />
+	<SelectionBox {notebook} {viewport} />
 	<canvas class="live" bind:this={predictCanvas}></canvas>
 </div>
 

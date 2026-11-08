@@ -142,9 +142,9 @@ export class LuftApp {
   private _painted = false;
   private _exited = false;
 
-  constructor(name: string, args: string[] = [], env: Record<string, string | null> = {}, {slice = null}: {slice?: string | null} = {}) {
+  constructor(name: string, args: string[] = [], env: Record<string, string | null> = {}, {slice = null, id = `com.lantharos.${name}`}: {slice?: string | null; id?: string} = {}) {
     this.name = name;
-    this.id = `com.lantharos.${name}`;
+    this.id = id;
     const {path, manifest} = command(name);
     if (!GLib.file_test(path, GLib.FileTest.IS_EXECUTABLE))
       throw new Error(`${name} is not built at ${path}`);

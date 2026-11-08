@@ -146,6 +146,7 @@ export const events = {
 	appearanceCorners: (callback: (payload: Corners) => void) => listen<Corners>("appearance.corners", callback),
 	appearanceLines: (callback: (payload: Lines) => void) => listen<Lines>("appearance.lines", callback),
 	appearanceMotion: (callback: (payload: Motion) => void) => listen<Motion>("appearance.motion", callback),
+	appearancePosture: (callback: (payload: Posture) => void) => listen<Posture>("appearance.posture", callback),
 	appearanceTypography: (callback: (payload: Typography) => void) => listen<Typography>("appearance.typography", callback),
 	fingerprintEnroll: (callback: (payload: EnrollProgress) => void) => listen<EnrollProgress>("fingerprint.enroll", callback),
 	installerChanged: (callback: (payload: InstallerState) => void) => listen<InstallerState>("installer.changed", callback),
@@ -180,6 +181,7 @@ export type Appearance = {
 	motion: Motion,
 	corners: Corners,
 	lines: Lines,
+	posture: Posture,
 	locale: Locale,
 };
 
@@ -439,6 +441,9 @@ export type Palette = {
 };
 
 export type Phase = "live" | "first-boot" | "installed";
+
+/**  Whether the computer is used as a laptop or folded into a tablet. */
+export type Posture = "laptop" | "tablet";
 
 export type Profile = {
 	kind: Kind,

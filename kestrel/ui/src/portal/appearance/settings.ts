@@ -3,6 +3,7 @@ import GLib from 'gi://GLib';
 import St from 'gi://St';
 
 import type { Rgb } from '../../appearance/color.js';
+import { tabletMode } from '../../desktop/panel/tablet/tabletMode.js';
 import { FontconfigSerial } from '../../shared/display/fontconfig.js';
 import { portalObject } from '../core/exported.js';
 
@@ -20,6 +21,7 @@ const A11Y_INTERFACE = 'org.gnome.desktop.a11y.interface';
 const KESTREL = 'com.lantharos.kestrel';
 // Only what apps need to look like the desktop, since the rest of Kestrel's settings are private
 const KESTREL_KEYS = ['rounded-window-corners', 'app-lines'];
+const TABLET_MODE = 'tablet-mode';
 const SHARED_SCHEMAS = [
   'org.gnome.desktop.a11y',
   A11Y_INTERFACE,
@@ -47,6 +49,7 @@ export class SettingsPortal {
   private readonly shell = St.Settings.get();
   private readonly fontconfig = new FontconfigSerial(serial => this.emit(FONTCONFIG, 'serial', new GLib.Variant('i', serial)));
   private accent: Rgb | null = null;
+  private readonly unwatchTablet = tabletMode.watch(() => this.emitValue(KESTREL, TABLET_MODE));
 
   constructor() {
     for (const id of SHARED_SCHEMAS) {
@@ -81,18 +84,20 @@ export class SettingsPortal {
   }
 
   destroy(): void {
+    this.unwatchTablet();
     this.fontconfig.destroy();
   }
 
   private namespace(namespace: string): Namespace {
     if (namespace === APPEARANCE) return this.appearance();
     if (namespace === FONTCONFIG) return { serial: new GLib.Variant('i', this.fontconfig.serial) };
-    const keys = namespace === KESTREL ? KESTREL_KEYS : this.schemas.get(namespace)!.settings_schema.list_keys();
+    const keys = namespace === KESTREL ? [...KESTREL_KEYS, TABLET_MODE] : this.schemas.get(namespace)!.settings_schema.list_keys();
     return Object.fromEntries(keys.map(key => [key, this.value(namespace, key)!]));
   }
 
   private value(namespace: string, key: string): GLib.Variant | null {
     if (namespace === APPEARANCE || namespace === FONTCONFIG) return this.namespace(namespace)[key] ?? null;
+    if (namespace === KESTREL && key === TABLET_MODE) return new GLib.Variant('b', tabletMode.active);
     const settings = this.schemas.get(namespace);
     if (!settings?.settings_schema.has_key(key) || (namespace === KESTREL && !KESTREL_KEYS.includes(key))) return null;
     if (namespace === INTERFACE && key === 'enable-animations') return new GLib.Variant('b', this.shell.enable_animations);

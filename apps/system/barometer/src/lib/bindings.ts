@@ -49,6 +49,7 @@ export const events = {
 	appearanceCorners: (callback: (payload: Corners) => void) => listen<Corners>("appearance.corners", callback),
 	appearanceLines: (callback: (payload: Lines) => void) => listen<Lines>("appearance.lines", callback),
 	appearanceMotion: (callback: (payload: Motion) => void) => listen<Motion>("appearance.motion", callback),
+	appearancePosture: (callback: (payload: Posture) => void) => listen<Posture>("appearance.posture", callback),
 	appearanceTypography: (callback: (payload: Typography) => void) => listen<Typography>("appearance.typography", callback),
 	barometerApps: (callback: (payload: AppUsage[]) => void) => listen<AppUsage[]>("barometer.apps", callback),
 	barometerCatalog: (callback: (payload: Catalog) => void) => listen<Catalog>("barometer.catalog", callback),
@@ -103,6 +104,7 @@ export type Appearance = {
 	motion: Motion,
 	corners: Corners,
 	lines: Lines,
+	posture: Posture,
 	locale: Locale,
 };
 
@@ -340,6 +342,9 @@ export type Palette = {
 	appIcons: AppIcons,
 	taskbar: import("@luft/ui").TaskbarLooks,
 };
+
+/**  Whether the computer is used as a laptop or folded into a tablet. */
+export type Posture = "laptop" | "tablet";
 
 export type ProcessEntry = {
 	pid: number,

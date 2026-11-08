@@ -32,7 +32,7 @@ pub fn run_app() -> ! {
 - `apply_with_page_close` instead of `apply` hands the close button to the page, so `WindowControls`' `onclose` decides when to close.
 - `run` connects `Events` to the page and watches Kestrel's palette and the desktop's fonts. The last closure runs at the same point, for the app's own watchers.
 
-Flatten `Appearance` into the app's startup state so the page gets the palette, fonts, motion preference and the session's languages. `@luft/ui`'s `appearance` store reads it, and follows the `kestrel.palette`, `appearance.typography` and `appearance.motion` events after that:
+Flatten `Appearance` into the app's startup state so the page gets the palette, fonts, motion preference and the session's languages. `@luft/ui`'s `appearance` store reads it, and follows the `kestrel.palette`, `appearance.typography` and `appearance.motion` events after that. `appearance.posture` says whether the computer is folded into a tablet (`tablet`) or used as a laptop (`laptop`), from Kestrel's tablet mode through the `tablet-mode` key of the settings portal's `com.lantharos.kestrel` namespace; the store keeps it in `appearance.posture` and on the page as `data-posture`, so apps can give fingers and the pen more room:
 
 ```rust
 #[derive(Serialize)]

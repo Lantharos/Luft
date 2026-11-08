@@ -1,4 +1,4 @@
-export { appearance, type Appearance, type AppIconStyle, type Palette, type Scheme, type SchemeColors } from './appearance.svelte';
+export { appearance, type Appearance, type AppIconStyle, type Palette, type Posture, type Scheme, type SchemeColors } from './appearance.svelte';
 
 export { default as Choice } from './choices/Choice.svelte';
 export { default as SplitBar } from './choices/SplitBar.svelte';

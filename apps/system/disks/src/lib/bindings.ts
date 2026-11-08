@@ -183,6 +183,7 @@ export const events = {
 	appearanceCorners: (callback: (payload: Corners) => void) => listen<Corners>("appearance.corners", callback),
 	appearanceLines: (callback: (payload: Lines) => void) => listen<Lines>("appearance.lines", callback),
 	appearanceMotion: (callback: (payload: Motion) => void) => listen<Motion>("appearance.motion", callback),
+	appearancePosture: (callback: (payload: Posture) => void) => listen<Posture>("appearance.posture", callback),
 	appearanceTypography: (callback: (payload: Typography) => void) => listen<Typography>("appearance.typography", callback),
 	disksChanged: (callback: (payload: Snapshot) => void) => listen<Snapshot>("disks.changed", callback),
 	disksImage: (callback: (payload: ImageProgress) => void) => listen<ImageProgress>("disks.image", callback),
@@ -221,6 +222,7 @@ export type Appearance = {
 	motion: Motion,
 	corners: Corners,
 	lines: Lines,
+	posture: Posture,
 	locale: Locale,
 };
 
@@ -464,6 +466,9 @@ export type PartRole = "system" | "reserved" | "recovery" | "meet";
 export type PartitionTable = "gpt" | "dos";
 
 export type PlanStep = { kind: "create"; table: string; offset: number; size: number; partitionType: string; name: string; flags: number[]; filesystem: string; label: string } | { kind: "delete"; block: string } | { kind: "place"; block: string; offset: number; size: number } | { kind: "format"; block: string; filesystem: string; label: string } | { kind: "change"; block: string; partitionType?: string | null; name?: string | null; flags?: number[] | null; label?: string | null };
+
+/**  Whether the computer is used as a laptop or folded into a tablet. */
+export type Posture = "laptop" | "tablet";
 
 export type Protection = {
 	available: boolean,

@@ -140,6 +140,7 @@ export const events = {
 	appearanceCorners: (callback: (payload: Corners) => void) => listen<Corners>("appearance.corners", callback),
 	appearanceLines: (callback: (payload: Lines) => void) => listen<Lines>("appearance.lines", callback),
 	appearanceMotion: (callback: (payload: Motion) => void) => listen<Motion>("appearance.motion", callback),
+	appearancePosture: (callback: (payload: Posture) => void) => listen<Posture>("appearance.posture", callback),
 	appearanceTypography: (callback: (payload: Typography) => void) => listen<Typography>("appearance.typography", callback),
 	kestrelPalette: (callback: (payload: Palette) => void) => listen<Palette>("kestrel.palette", callback),
 	mailmanBody: (callback: (payload: BodyArrived) => void) => listen<BodyArrived>("mailman.body", callback),
@@ -196,6 +197,7 @@ export type Appearance = {
 	motion: Motion,
 	corners: Corners,
 	lines: Lines,
+	posture: Posture,
 	locale: Locale,
 };
 
@@ -362,6 +364,9 @@ export type Placement = {
 	id: number,
 	mailbox: number,
 };
+
+/**  Whether the computer is used as a laptop or folded into a tablet. */
+export type Posture = "laptop" | "tablet";
 
 export type Protocol = { kind: "imap"; imap: Server; smtp: Server } | { kind: "jmap"; session: string };
 

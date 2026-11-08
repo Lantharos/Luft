@@ -1,10 +1,10 @@
 import { events as systemEvents, system } from '@lantharos/sabine';
 import { i18n } from '@luft/i18n';
 
-import { events, type AppIcons, type Appearance, type Corners, type Lines, type Motion, type Palette, type SchemeColors, type Typography } from './bindings/appearance';
+import { events, type AppIcons, type Appearance, type Corners, type Lines, type Motion, type Palette, type Posture, type SchemeColors, type Typography } from './bindings/appearance';
 import type { TaskbarLooks } from './taskbar/looks';
 
-export type { AppIconStyle, Appearance, Palette, SchemeColors } from './bindings/appearance';
+export type { AppIconStyle, Appearance, Palette, Posture, SchemeColors } from './bindings/appearance';
 
 const SANS = "'Open Runde', ui-sans-serif, system-ui, sans-serif";
 const MONO = "'Maple Mono NF', ui-monospace, monospace";
@@ -31,6 +31,7 @@ class AppearanceState {
 	motion = $state<Motion>('full');
 	corners = $state<Corners>('rounded');
 	lines = $state<Lines>('none');
+	posture = $state<Posture>('laptop');
 	fontSans = $derived(fontList(this.typography.interface, SANS));
 	fontMono = $derived(fontList(this.typography.monospace, MONO));
 
@@ -41,6 +42,7 @@ class AppearanceState {
 		this.move(initial.motion);
 		this.round(initial.corners);
 		this.line(initial.lines);
+		this.hold(initial.posture);
 		void i18n.start(initial.locale);
 		const stops = [
 			events.kestrelPalette((palette) => this.receive(palette)),
@@ -48,7 +50,8 @@ class AppearanceState {
 			events.appearanceTypography((typography) => this.type(typography)),
 			events.appearanceMotion((motion) => this.move(motion)),
 			events.appearanceCorners((corners) => this.round(corners)),
-			events.appearanceLines((lines) => this.line(lines))
+			events.appearanceLines((lines) => this.line(lines)),
+			events.appearancePosture((posture) => this.hold(posture))
 		];
 		void system.appearance().then(({ colorScheme }) => (this.scheme = colorScheme));
 		return () => stops.forEach((stop) => stop());
@@ -67,6 +70,11 @@ class AppearanceState {
 	private line(lines: Lines) {
 		this.lines = lines;
 		document.documentElement.dataset.lines = lines;
+	}
+
+	private hold(posture: Posture) {
+		this.posture = posture;
+		document.documentElement.dataset.posture = posture;
 	}
 
 	private type(typography: Typography) {

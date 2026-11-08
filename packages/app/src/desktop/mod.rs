@@ -2,6 +2,7 @@ pub mod corners;
 pub mod lines;
 pub mod motion;
 pub mod palette;
+pub mod posture;
 pub mod typography;
 
 use futures_util::StreamExt;
@@ -18,6 +19,7 @@ pub fn declare_appearance(window: SabineWindow) -> SabineWindow {
         .bridge_event(&motion::MOTION_CHANGED)
         .bridge_event(&corners::CORNERS_CHANGED)
         .bridge_event(&lines::LINES_CHANGED)
+        .bridge_event(&posture::POSTURE_CHANGED)
 }
 
 async fn proxy() -> Result<Proxy<'static>, String> {
@@ -47,6 +49,10 @@ pub async fn watch(events: Events) {
     events.set_square_corners(corners == corners::Corners::Square);
     events.emit(corners::CORNERS_CHANGED, corners);
     events.emit(lines::LINES_CHANGED, lines::Lines::read(&proxy).await);
+    events.emit(
+        posture::POSTURE_CHANGED,
+        posture::Posture::read(&proxy).await,
+    );
     while let Some(signal) = signals.next().await {
         let Ok((namespace, key, _)) = signal
             .body()
@@ -70,6 +76,12 @@ pub async fn watch(events: Events) {
         }
         if lines::changed(&namespace, &key) {
             events.emit(lines::LINES_CHANGED, lines::Lines::read(&proxy).await);
+        }
+        if posture::changed(&namespace, &key) {
+            events.emit(
+                posture::POSTURE_CHANGED,
+                posture::Posture::read(&proxy).await,
+            );
         }
     }
 }

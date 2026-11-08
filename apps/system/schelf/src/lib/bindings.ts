@@ -132,6 +132,7 @@ export const events = {
 	appearanceCorners: (callback: (payload: Corners) => void) => listen<Corners>("appearance.corners", callback),
 	appearanceLines: (callback: (payload: Lines) => void) => listen<Lines>("appearance.lines", callback),
 	appearanceMotion: (callback: (payload: Motion) => void) => listen<Motion>("appearance.motion", callback),
+	appearancePosture: (callback: (payload: Posture) => void) => listen<Posture>("appearance.posture", callback),
 	appearanceTypography: (callback: (payload: Typography) => void) => listen<Typography>("appearance.typography", callback),
 	kestrelPalette: (callback: (payload: Palette) => void) => listen<Palette>("kestrel.palette", callback),
 	schelfLibrary: (callback: (payload: Finished) => void) => listen<Finished>("schelf.library", callback),
@@ -184,6 +185,7 @@ export type Appearance = {
 	motion: Motion,
 	corners: Corners,
 	lines: Lines,
+	posture: Posture,
 	locale: Locale,
 };
 
@@ -426,6 +428,9 @@ export type Permissions = {
 	sessionBus: string[],
 	systemBus: string[],
 };
+
+/**  Whether the computer is used as a laptop or folded into a tablet. */
+export type Posture = "laptop" | "tablet";
 
 export type Progress = {
 	stage: Stage,

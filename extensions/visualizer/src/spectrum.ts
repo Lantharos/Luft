@@ -25,9 +25,4 @@ export class Spectrum {
     });
     this.level = follow(this.level, reading.level, elapsed);
   }
-
-  /** How much is still moving, to tell when it has settled after the music stopped. */
-  get energy(): number {
-    return Math.max(this.level, ...this.bands);
-  }
 }

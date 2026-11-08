@@ -7,8 +7,10 @@ import { Spectrum } from './spectrum.js';
 
 type Granted = 'wallpaper' | 'audio-levels';
 
-const SETTLED = 0.004;
 const FADE_IN_S = 0.8;
+const FADE_OUT_S = 1.2;
+
+const eased = (fraction: number) => fraction * fraction * (3 - 2 * fraction);
 
 function rgb(hex: string): number[] {
   return [1, 3, 5].map(start => parseInt(hex.slice(start, start + 2), 16) / 255);
@@ -45,12 +47,9 @@ const enable: Enable<Granted> = visualizer => {
     area: display => settings.get('displays') === 'primary' && !display.primary ? null : edgeAreas(placement, display),
     frame: ({ time, elapsed, displays }) => {
       spectrum.follow(listener.read(), elapsed);
-      presence = audioLevels.playing ? Math.min(1, presence + elapsed / FADE_IN_S) : presence;
-      if (!audioLevels.playing && spectrum.energy < SETTLED) {
-        presence = 0;
-        layer.active = false;
-      }
-      const moment = [spectrum.level, time, presence * settings.get<number>('intensity'), STYLES[settings.get<Style>('style')]];
+      presence = audioLevels.playing ? Math.min(1, presence + elapsed / FADE_IN_S) : Math.max(0, presence - elapsed / FADE_OUT_S);
+      if (presence === 0) layer.active = false;
+      const moment = [spectrum.level, time, eased(presence) * settings.get<number>('intensity'), STYLES[settings.get<Style>('style')]];
       for (const display of displays) paint(display, moment);
     },
   });

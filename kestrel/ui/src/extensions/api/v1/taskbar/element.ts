@@ -98,8 +98,9 @@ export class ElementWidget implements ElementActor {
   }
 
   private along(view: RenderedView): number {
-    const [, width] = view.actor.get_preferred_width(-1);
-    return this.layout.vertical ? view.actor.get_preferred_height(this.layout.thickness)[1] : width;
+    const node = this.actor.get_theme_node();
+    if (this.layout.vertical) return view.actor.get_preferred_height(this.layout.thickness)[1] + node.get_vertical_padding();
+    return view.actor.get_preferred_width(-1)[1] + node.get_horizontal_padding();
   }
 
   private sync(animate: boolean): void {

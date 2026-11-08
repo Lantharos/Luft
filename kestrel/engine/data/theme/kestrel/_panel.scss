@@ -11,8 +11,12 @@
 
 .kestrel-panel.kestrel-taskbar-transparent { @include halo(soft); }
 .kestrel-panel.kestrel-taskbar-transparent .kestrel-tablet-strip-handle { box-shadow: 0 0 3px halo(0.55); }
+.kestrel-extension-element { padding: 0 8px; }
 .kestrel-taskbar-compact .kestrel-status-button { height: 34px; padding: 0 6px; }
 .kestrel-taskbar-large .kestrel-status-button { height: 48px; padding: 0 10px; }
+.kestrel-taskbar-compact .kestrel-extension-element { padding: 0 6px; }
+.kestrel-taskbar-large .kestrel-extension-element { padding: 0 10px; }
+.kestrel-taskbar-touch .kestrel-extension-element { padding: 0 14px; }
 .kestrel-taskbar-compact .kestrel-task-button, .kestrel-taskbar-compact .kestrel-status-button, .kestrel-taskbar-compact .kestrel-task-attention { border-radius: 10px; }
 .kestrel-taskbar-large .kestrel-task-button, .kestrel-taskbar-large .kestrel-status-button, .kestrel-taskbar-large .kestrel-task-attention { border-radius: 14px; }
 .kestrel-taskbar-large .kestrel-clock { font-size: 13px; }
@@ -33,6 +37,9 @@
 .kestrel-taskbar-vertical .kestrel-status-button { width: 40px; height: auto; padding: 8px 0; }
 .kestrel-taskbar-vertical.kestrel-taskbar-compact .kestrel-status-button { width: 34px; padding: 6px 0; }
 .kestrel-taskbar-vertical.kestrel-taskbar-large .kestrel-status-button { width: 48px; padding: 10px 0; }
+.kestrel-taskbar-vertical .kestrel-extension-element { padding: 8px 0; }
+.kestrel-taskbar-vertical.kestrel-taskbar-compact .kestrel-extension-element { padding: 6px 0; }
+.kestrel-taskbar-vertical.kestrel-taskbar-large .kestrel-extension-element { padding: 10px 0; }
 .kestrel-taskbar-vertical .kestrel-tray-button { padding: 7px 0; }
 .kestrel-taskbar-vertical .kestrel-privacy { width: 28px; padding: 10px 0; margin: 4px 0; }
 .kestrel-taskbar-vertical .kestrel-status-icons { spacing: 10px; }

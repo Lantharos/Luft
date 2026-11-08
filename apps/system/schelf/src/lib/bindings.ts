@@ -119,6 +119,9 @@ export const commands = {
 	systemSearch: (params: {
 		query: string,
 	}, options?: CallOptions) => invoke<ToolSummary[]>("system_search", params, options),
+	toolNeedsSystem: (params: {
+		package: string,
+	}, options?: CallOptions) => invoke<boolean>("tool_needs_system", params, options),
 	toolsSearch: (params: {
 		query: string,
 	}, options?: CallOptions) => invoke<ToolSummary[]>("tools_search", params, options),

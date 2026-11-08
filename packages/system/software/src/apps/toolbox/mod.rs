@@ -13,7 +13,7 @@ use crate::apps::operand::operand;
 use crate::progress::Stage;
 use crate::task::Task;
 
-pub use catalog::{Available, Repositories, available};
+pub use catalog::{Available, Repositories, available, needs_system};
 pub use container::name as container;
 pub use installed::{Tool, installed};
 pub use updates::{Update, updates};

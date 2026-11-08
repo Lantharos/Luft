@@ -77,10 +77,10 @@ Toolbox containers share your home folder, so files are where you expect them.
 
 ## System packages
 
-Some software only works as part of the system: services that start with the computer, such as Tailscale, Docker or libvirt, udev rules for devices, and apps their vendors only ship as packages for the system, such as 1Password. These are system packages, from Fedora or from [software sources you add](#software-sources):
+Some software only works as part of the system: services that start with the computer, such as Tailscale, Docker or libvirt, udev rules for devices, and apps their vendors only ship as packages for the system, such as 1Password. These are system packages, from Fedora or from [software sources you add](#software-sources). A Fedora package that brings a service, device rules or a driver goes into the system by itself, after Schelf says so: `schelf install tailscale` is enough. `--system` puts any package there, and `--fedora` keeps a command-line tool in your toolbox instead.
 
 ```sh
-schelf install --system tailscale
+schelf install tailscale
 schelf list --system
 schelf remove --system tailscale
 ```

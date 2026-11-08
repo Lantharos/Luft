@@ -3,7 +3,7 @@ pub mod flathub;
 pub mod tools;
 
 use luft_app::Commands;
-use luft_software::apps::toolbox::Repositories;
+use luft_software::apps::toolbox::{self, Repositories};
 use sabine::SabineWindow;
 use serde::{Deserialize, Serialize};
 use specta::Type;
@@ -58,6 +58,9 @@ pub fn register(window: SabineWindow) -> SabineWindow {
         .command("flathub_summary", |Listing { id }| flathub::summary(&id))
         .command("fedora_details", fedora_details)
         .command("tools_search", |Query { query }| tools::search(&query))
+        .command("tool_needs_system", |Package { package }| {
+            toolbox::needs_system(&package)
+        })
         .command("system_search", |Query { query }| {
             tools::search_in(Repositories::Added, &query)
         })

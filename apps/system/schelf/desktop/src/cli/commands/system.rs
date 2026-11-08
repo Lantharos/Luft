@@ -11,7 +11,7 @@ use crate::operations::{Job, Request};
 
 const KEY: &str = "system";
 
-fn plan(packages: Vec<String>, verb: Verb) -> Plan {
+pub(super) fn plan(packages: Vec<String>, verb: Verb) -> Plan {
     let title = super::list_of(&packages);
     let job = match verb {
         Verb::Remove => Job::RemoveSystemPackages { packages },

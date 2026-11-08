@@ -57,8 +57,10 @@ impl Command {
                  from there, then from Flathub, then from Fedora; when that still leaves a\n\
                  choice, Schelf asks. Apps from schelf.store show what they can use first.\n\
                  You can write add instead of install.\n\n\
-                 With --system, Fedora packages go into the system itself, for services such\n\
-                 as Tailscale, Docker or libvirt. They're rebuilt with every update of Luft."
+                 Fedora packages that bring a service or driver, such as Tailscale, Docker or\n\
+                 libvirt, go into the system itself, where they start with the computer and\n\
+                 are rebuilt with every update of Luft. --system puts any Fedora package\n\
+                 there; --fedora keeps a command-line tool in your toolbox."
             }
             Self::Remove => {
                 "remove NAME...  [--store|--flathub|--fedora|--appimage|--system] [-y]\n\n\

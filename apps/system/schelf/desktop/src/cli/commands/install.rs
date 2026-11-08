@@ -3,8 +3,10 @@ use luft_software::apps::toolbox;
 use super::{catalog, list_of, pick};
 use crate::cli::Exit;
 use crate::cli::arguments::Arguments;
-use crate::cli::perform::{Plan, carry_out};
-use crate::cli::sources::{Candidate, Catalog, Resolved, fedora, file, resolve};
+use crate::cli::perform::{Plan, Verb, carry_out};
+use crate::cli::sources::{
+    Candidate, Catalog, Kind, Origin, Resolved, fedora, file, installed, resolve,
+};
 use crate::cli::terminal::Line;
 use crate::cli::terminal::{Ink, Look, Table};
 use crate::operations::Job;
@@ -97,6 +99,24 @@ fn prepare(target: &str, only: Option<Catalog>, yes: bool) -> Result<Option<Plan
             candidate.catalog.title()
         );
         return Ok(None);
+    }
+    if candidate.catalog == Catalog::Fedora
+        && candidate.kind == Kind::Command
+        && only != Some(Catalog::Fedora)
+        && toolbox::needs_system(&candidate.id).unwrap_or(false)
+    {
+        if installed::all(Some(Origin::System))
+            .iter()
+            .any(|app| app.id == candidate.id)
+        {
+            println!("{} is already a system package.", ink.bold(&candidate.name));
+            return Ok(None);
+        }
+        println!(
+            "{} brings a service or driver that only works as part of the system, so it goes there, starts with the computer and updates with Luft.",
+            ink.bold(&candidate.name)
+        );
+        return Ok(Some(super::system::plan(vec![candidate.id], Verb::Install)));
     }
     candidate.plan(yes).map(Some)
 }

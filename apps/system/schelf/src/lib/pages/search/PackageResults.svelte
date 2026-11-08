@@ -6,6 +6,8 @@
 	import { library } from '#lib/state/library.svelte.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
 	import { operations } from '#lib/state/operations.svelte.js';
+	import { Spinner } from '@luft/ui';
+	import SystemDialog from './SystemDialog.svelte';
 
 	type Kind = 'tool' | 'system';
 
@@ -26,6 +28,8 @@
 
 	let tools = $state<ToolSummary[] | null>(null);
 	let error = $state<string | null>(null);
+	let checking = $state<string | null>(null);
+	let forSystem = $state<ToolSummary | null>(null);
 
 	$effect(() => {
 		const current = query;
@@ -45,16 +49,26 @@
 	});
 
 	const key = (tool: ToolSummary) => `${kind}/${tool.package}`;
-	const installedAs = (tool: ToolSummary) => (kind === 'tool' ? library.tool(tool.package) : library.system(tool.package));
+	const installedAs = (tool: ToolSummary) =>
+		kind === 'tool' ? (library.tool(tool.package) ?? library.system(tool.package)) : library.system(tool.package);
 
-	function install(tool: ToolSummary) {
+	function run(tool: ToolSummary, intoSystem: boolean) {
 		const operation = operations.forKey(key(tool));
 		if (operation?.state === 'failed') void operations.cancel(operation.id);
 		void operations.run(
 			key(tool),
 			tool.package,
-			kind === 'tool' ? { kind: 'installTool', package: tool.package } : { kind: 'installSystemPackages', packages: [tool.package] }
+			intoSystem ? { kind: 'installSystemPackages', packages: [tool.package] } : { kind: 'installTool', package: tool.package }
 		);
+	}
+
+	async function install(tool: ToolSummary) {
+		if (kind === 'system') return run(tool, true);
+		checking = tool.package;
+		const needsSystem = await commands.toolNeedsSystem({ package: tool.package }, SLOW).catch(() => false);
+		checking = null;
+		if (needsSystem) forSystem = tool;
+		else run(tool, false);
 	}
 
 	function open(tool: ToolSummary) {
@@ -95,13 +109,20 @@
 						{:else if installed}
 							<span class="px-3 text-[13px] text-[var(--text-muted)]">Installed</span>
 						{:else}
-							<button type="button" class="button" onclick={() => install(tool)}>Install</button>
+							<button type="button" class="button" disabled={checking !== null} onclick={() => install(tool)}>
+								{#if checking === tool.package}<Spinner />{/if}Install
+							</button>
 						{/if}
 					</div>
 				{/each}
 			</div>
 		{/if}
 	</section>
+{/if}
+
+{#if forSystem}
+	{@const tool = forSystem}
+	<SystemDialog name={tool.package} onclose={() => (forSystem = null)} oninstall={() => run(tool, true)} />
 {/if}
 
 <style>

@@ -5,6 +5,7 @@ members = [
     "apps/store/convertible/desktop",
     "apps/system/disks/desktop",
     "apps/store/draft/desktop",
+    "apps/store/heft/desktop",
     "apps/system/keys/desktop",
     "apps/store/magpie/desktop",
     "apps/store/mailman/desktop",
@@ -78,6 +79,7 @@ default-members = [
     "apps/store/convertible/desktop",
     "apps/system/disks/desktop",
     "apps/store/draft/desktop",
+    "apps/store/heft/desktop",
     "apps/system/keys/desktop",
     "apps/store/magpie/desktop",
     "apps/store/mailman/desktop",
@@ -293,9 +295,9 @@ rustc-hash = "2.1.3"
 rustix = "1.1.5"
 rustls = { version = "0.23.46", default-features = false }
 rustls-platform-verifier = "0.7.1"
-sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.78" }
-sabine-runtime = { git = "https://github.com/Lantharos/Sabine", tag = "v0.78" }
-sabine-service = { git = "https://github.com/Lantharos/Sabine", tag = "v0.78" }
+sabine = { git = "https://github.com/Lantharos/Sabine", tag = "v0.80" }
+sabine-runtime = { git = "https://github.com/Lantharos/Sabine", tag = "v0.80" }
+sabine-service = { git = "https://github.com/Lantharos/Sabine", tag = "v0.80" }
 seccompiler = "0.5.0"
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.154"

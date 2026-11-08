@@ -1,0 +1,23 @@
+[package]
+name = "heft"
+version = "0.1.0"
+description = "Notebooks and textbooks you write in with a pen"
+authors = ["Kristof"]
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[lib]
+name = "heft_lib"
+
+[dependencies]
+dirs.workspace = true
+luft-app = { workspace = true, features = ["settings"] }
+sabine.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+specta.workspace = true
+tokio = { workspace = true, features = ["rt", "time"] }
+
+[lints]
+workspace = true

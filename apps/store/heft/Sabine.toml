@@ -1,0 +1,31 @@
+[app]
+id = "com.lantharos.heft"
+name = "Heft"
+generic_name = "Notebook"
+categories = ["Office", "Education"]
+keywords = ["notes", "notebook", "handwriting", "pen", "stylus", "ink", "school", "textbook", "pdf", "annotate", "highlight", "sketch", "goodnotes", "notability", "xournal", "onenote", "beleške", "sveska"]
+version = "0.1.0"
+maintainer = "Lantharos <kristof@lanth.me>"
+icon = "public/favicon.svg"
+cargo_manifest = "desktop/Cargo.toml"
+mime_types = ["application/pdf"]
+
+[install]
+command = "cargo run --manifest-path desktop/Cargo.toml --"
+
+[web]
+root = "."
+dist = "dist"
+entry = "dist/index.html"
+build = "bun run build"
+local_files = true
+
+[updates]
+provider = "schelf"
+
+[sandbox]
+network = false
+filesystems = ["xdg-documents", "xdg-download:ro", "xdg-pictures:ro"]
+
+[bindings]
+path = "src/lib/bindings.ts"

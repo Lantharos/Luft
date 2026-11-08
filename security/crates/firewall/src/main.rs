@@ -9,6 +9,7 @@ mod service;
 mod store;
 
 use std::sync::Arc;
+use std::time::Instant;
 
 use luft_dbus::objects::settle;
 use tokio::signal::unix::{SignalKind, signal};
@@ -18,6 +19,13 @@ use zbus::Connection;
 use firewall::{Firewall, Followed};
 use listening::Watcher;
 use service::{NAME, PATH, Service};
+
+async fn settled(deadline: Option<Instant>) {
+    match deadline {
+        Some(deadline) => tokio::time::sleep_until(deadline.into()).await,
+        None => std::future::pending().await,
+    }
+}
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> anyhow::Result<()> {
@@ -40,6 +48,7 @@ async fn main() -> anyhow::Result<()> {
     let mut terminate = signal(SignalKind::terminate())?;
     let mut interrupt = signal(SignalKind::interrupt())?;
     loop {
+        let deadline = firewall.lock().await.deadline();
         let followed = tokio::select! {
             changed = settle(&mut changes) => {
                 if !changed {
@@ -56,6 +65,10 @@ async fn main() -> anyhow::Result<()> {
             bound = watcher.next() => Followed {
                 reclassified: false,
                 waiting: firewall.lock().await.observe(bound?).await,
+            },
+            () = settled(deadline) => Followed {
+                reclassified: false,
+                waiting: firewall.lock().await.settle(),
             },
             _ = terminate.recv() => break,
             _ = interrupt.recv() => break,

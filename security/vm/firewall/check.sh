@@ -82,6 +82,63 @@ serve_as() {
   as_person systemd-run --user --quiet --collect --unit="$unit" -- python3 -m http.server --bind "$bind" "$port" --directory /usr/share
 }
 
+sockets_as() {
+  as_person systemd-run --user --quiet --collect --unit="$1" -- python3 /usr/libexec/luft-firewall-check-sockets "$2"
+}
+
+samples() {
+  local count="$1" kind="$2" id="$3" seen=""
+  for _ in $(seq "$count"); do
+    if asks_about "$kind" "$id"; then seen+="1"; else seen+="0"; fi
+    sleep 0.1
+  done
+  echo "$seen"
+}
+
+browse() {
+  local helium=/usr/share/luft/preinstall/net.imput.helium.AppImage
+  [[ -x "$helium" ]] || { say "skipped: Helium isn't in this image"; return; }
+  as_person sh -c "cd /home/$person && $helium --appimage-extract > /dev/null" || fail "Helium doesn't unpack"
+  as_person systemd-run --user --quiet --collect --unit=app-net.imput.helium@check.service \
+    --property=StandardOutput="file:/home/$person/helium.log" --property=StandardError="file:/home/$person/helium.log" -- \
+    "/home/$person/squashfs-root/opt/helium/helium" --headless=new --no-sandbox --no-first-run --user-data-dir="/home/$person/helium" \
+    "data:text/html,<script>setInterval(() => fetch('http://' + Math.random().toString(36).slice(2) + '.example.com/').catch(() => {}), 200)</script>"
+  local seen
+  seen="$(samples 200 app net.imput.helium)"
+  [[ "$seen" != *1* ]] || fail "Helium is asked about while it only browses ($seen)"
+  as_person systemctl --user is-active --quiet app-net.imput.helium@check.service || {
+    tail -n 20 "/home/$person/helium.log" > /dev/console
+    fail "Helium stopped browsing"
+  }
+  as_person systemctl --user stop app-net.imput.helium@check.service
+  say "ok: Helium browsing for 20 seconds is never asked about"
+}
+
+short_lived() {
+  sockets_as app-com.example.Resolving@check.service resolve
+  sockets_as app-com.example.Flapping@check.service flap
+  sockets_as app-com.example.Settling@check.service settle
+  local resolving="" flapping="" settling=""
+  for _ in $(seq 100); do
+    local now
+    now="$(waiting)"
+    if grep -q '"com.example.Resolving"' <<< "$now"; then resolving+="1"; else resolving+="0"; fi
+    if grep -q '"com.example.Flapping"' <<< "$now"; then flapping+="1"; else flapping+="0"; fi
+    if grep -q "\"app\" \"com.example.Settling\" $uid" <<< "$now"; then settling+="1"; else settling+="0"; fi
+    sleep 0.1
+  done
+  [[ "$resolving" != *1* ]] || fail "an app is asked about for the sockets it looks up names with ($resolving)"
+  [[ "$flapping" != *1* ]] || fail "an app is asked about for listeners that close at once ($flapping)"
+  [[ "$settling" =~ ^0+1+$ ]] || fail "an app that stopped listening for a while isn't asked about once and for good ($settling)"
+  say "ok: asked once about an app that listens, stops and listens again, never about short-lived sockets"
+  firewall SetAppAccess sss app com.example.Settling blocked || fail "SetAppAccess blocked for the settling app"
+  as_person systemctl --user stop app-com.example.Settling@check.service
+  sockets_as app-com.example.Settling@again.service settle
+  [[ "$(samples 50 app com.example.Settling)" != *1* ]] || fail "an app that wasn't allowed is asked about again"
+  say "ok: an app that wasn't allowed isn't asked about again"
+  browse
+}
+
 receive_as() {
   local unit="$1" port="$2"
   as_person systemd-run --user --quiet --collect --unit="$unit" -- python3 -c "$RECEIVER" "$port" "/home/$person/received-$port"
@@ -181,6 +238,7 @@ first() {
   eventually "the network becomes a home network" is_home
   [[ "$(unclassified)" == "a(os) 0" ]] || fail "a home network still waits for a type"
   apps_on_home
+  short_lived
   expect closed "port 80 of a system service on a home network" reaches "$system"
   firewall OpenPort qss 80 tcp home || fail "OpenPort 80"
   expect open "port 80 opened in Settings" reaches "$system"

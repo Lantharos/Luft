@@ -10,19 +10,18 @@ const FIREWALL_PATH = '/com/lantharos/Firewall1';
 
 type Session = Pick<Context, 'sessionMode' | 'screenShield'>;
 
-interface Asking {
-  key: string;
-  dialog: ModalDialog;
-}
-
-/** Asks the person once whether devices on the network may connect to an app that just started listening for them. */
+/**
+ * Asks the person once whether devices on the network may connect to an app that started listening for them. A question
+ * stays until it's answered, even when the app stops listening meanwhile.
+ */
 export class AppQuestions {
   private readonly cancellable = new Gio.Cancellable();
   private readonly uid = new Gio.Credentials().get_unix_user();
   private readonly disconnectors: (() => void)[] = [];
   private proxy: Gio.DBusProxy | null = null;
   private waiting: Listener[] = [];
-  private asking: Asking | null = null;
+  private readonly answering = new Set<string>();
+  private asking: ModalDialog | null = null;
 
   constructor(private readonly session: Session) {
     const sessionId = session.sessionMode.connect('updated', () => this.sync());
@@ -50,7 +49,7 @@ export class AppQuestions {
     this.cancellable.cancel();
     for (const disconnect of this.disconnectors) disconnect();
     this.waiting = [];
-    this.asking?.dialog.close();
+    this.asking?.close();
   }
 
   private get locked(): boolean {
@@ -59,21 +58,21 @@ export class AppQuestions {
 
   private read(): void {
     const waiting = (this.proxy?.get_cached_property('Waiting')?.deepUnpack() ?? []) as [Kind, string, number][];
-    this.waiting = waiting.filter(([, , uid]) => uid === this.uid).map(([kind, id]) => ({ kind, id }));
+    this.waiting = waiting.filter(([kind, id, uid]) => uid === this.uid && !this.answering.has(listenerKey({ kind, id })))
+      .map(([kind, id]) => ({ kind, id }));
     this.sync();
   }
 
   private sync(): void {
-    const { asking } = this;
-    if (asking) {
-      if (this.locked || !this.waiting.some(listener => listenerKey(listener) === asking.key)) asking.dialog.close();
+    if (this.asking) {
+      if (this.locked) this.asking.close();
       return;
     }
     const next = this.waiting[0];
     if (!next || this.locked) return;
     const dialog = openAppDialog(next, allowed => this.answer(next, allowed));
     if (!dialog) return;
-    this.asking = { key: listenerKey(next), dialog };
+    this.asking = dialog;
     dialog.connect('closed', () => {
       this.asking = null;
       this.sync();
@@ -81,9 +80,12 @@ export class AppQuestions {
   }
 
   private answer(listener: Listener, allowed: boolean): void {
-    this.waiting = this.waiting.filter(other => listenerKey(other) !== listenerKey(listener));
+    const key = listenerKey(listener);
+    this.answering.add(key);
+    this.waiting = this.waiting.filter(other => listenerKey(other) !== key);
     this.proxy?.call('SetAppAccess', new GLib.Variant('(sss)', [listener.kind, listener.id, allowed ? 'home' : 'blocked']),
       Gio.DBusCallFlags.NONE, -1, null, (proxy, result) => {
+        this.answering.delete(key);
         try {
           proxy!.call_finish(result);
         } catch (error) {

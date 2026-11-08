@@ -13,7 +13,7 @@ aya.workspace = true
 futures-util = { workspace = true, features = ["std"] }
 luft-dbus.workspace = true
 luft-dbus-macros.workspace = true
-tokio = { workspace = true, features = ["io-util", "macros", "net", "process", "rt", "signal", "sync"] }
+tokio = { workspace = true, features = ["io-util", "macros", "net", "process", "rt", "signal", "sync", "time"] }
 zbus = { workspace = true, features = ["proxy", "service", "tokio"] }
 
 [lints]

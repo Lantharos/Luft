@@ -10,7 +10,7 @@ use tokio::io::unix::AsyncFd;
 use crate::ports::{Port, Protocol};
 
 const ROOT: &str = "/sys/fs/cgroup";
-const BINDS: [&str; 2] = ["bind4", "bind6"];
+const ADDRESSES: [&str; 4] = ["bind4", "bind6", "connect4", "connect6"];
 const SOCKETS: [&str; 3] = ["post_bind4", "post_bind6", "sock_release"];
 const BOUND: u8 = 2;
 const CHANGE_BOUND: u8 = 1;
@@ -51,7 +51,7 @@ impl Watcher {
     pub fn start() -> anyhow::Result<Self> {
         let mut ebpf = Ebpf::load(OBJECT).context("Couldn't load the bind watcher")?;
         let root = File::open(ROOT).context("Couldn't open the cgroup tree")?;
-        for name in BINDS {
+        for name in ADDRESSES {
             let program: &mut CgroupSockAddr = ebpf.program_mut(name).context(name)?.try_into()?;
             program
                 .load()

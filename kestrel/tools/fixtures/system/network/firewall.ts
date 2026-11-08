@@ -17,6 +17,7 @@ const FIREWALL = `<node><interface name="com.lantharos.Firewall1">
 const CONTROL = `<node><interface name="com.lantharos.KestrelChecks.Firewall">
   <method name="Join"><arg name="network" type="o" direction="in"/><arg name="name" type="s" direction="in"/></method>
   <method name="Listen"><arg name="kind" type="s" direction="in"/><arg name="id" type="s" direction="in"/></method>
+  <method name="Withdraw"><arg name="kind" type="s" direction="in"/><arg name="id" type="s" direction="in"/></method>
 </interface></node>`;
 
 export const FIREWALL_NAME = 'com.lantharos.Firewall1';
@@ -61,14 +62,17 @@ export function publishFirewall(publish: Publish, calls: string[], classify: Cla
       const known = apps.find(([knownKind, knownId]) => knownKind === kind && knownId === id);
       if (known) known[2] = access;
       else apps.push([kind, id, access]);
-      waiting.splice(0, waiting.length, ...waiting.filter(([waitingKind, waitingId]) => waitingKind !== kind || waitingId !== id));
       firewall.emit_property_changed('Apps', new GLib.Variant('a(sss)', apps));
-      firewall.emit_property_changed('Waiting', new GLib.Variant('a(ssu)', waiting));
+      withdraw(kind, id);
     },
     SetExtensionPorts(listen: [number, string][]) {
       calls.push(`SetExtensionPorts ${listen.map(([port, protocol]) => `${port}/${protocol}`).join(',')}`);
     },
   }, '/com/lantharos/Firewall1');
+  const withdraw = (kind: string, id: string) => {
+    waiting.splice(0, waiting.length, ...waiting.filter(([waitingKind, waitingId]) => waitingKind !== kind || waitingId !== id));
+    firewall.emit_property_changed('Waiting', new GLib.Variant('a(ssu)', waiting));
+  };
   const reclassified = (networks: [string, string][]) => {
     unclassified.splice(0, unclassified.length, ...networks);
     firewall.emit_property_changed('Unclassified', new GLib.Variant('a(os)', unclassified));
@@ -79,5 +83,6 @@ export function publishFirewall(publish: Publish, calls: string[], classify: Cla
       waiting.push([kind, id, uid]);
       firewall.emit_property_changed('Waiting', new GLib.Variant('a(ssu)', waiting));
     },
+    Withdraw: withdraw,
   }, '/com/lantharos/KestrelChecks/Firewall');
 }

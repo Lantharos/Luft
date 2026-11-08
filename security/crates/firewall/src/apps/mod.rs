@@ -1,13 +1,16 @@
 mod access;
 pub mod identity;
 mod listeners;
+mod questions;
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::io;
+use std::time::Instant;
 
 pub use access::{Access, Decisions};
 pub use identity::{Identity, Origin};
 use listeners::{Listener, Listeners};
+use questions::Questions;
 
 use crate::listening::Change;
 use crate::ports::{Port, Protocol};
@@ -15,7 +18,7 @@ use crate::rules::DISCOVERY;
 
 pub type Reach = BTreeSet<(String, Port)>;
 
-#[derive(Default)]
+#[derive(Default, PartialEq)]
 pub struct Reachable {
     pub home: Reach,
     pub anywhere: Reach,
@@ -24,6 +27,7 @@ pub struct Reachable {
 pub struct Apps {
     decisions: Decisions,
     listeners: Listeners,
+    questions: Questions,
     extensions: BTreeMap<String, BTreeSet<Port>>,
 }
 
@@ -33,9 +37,18 @@ fn discovery(port: Port) -> bool {
 
 impl Apps {
     pub fn load() -> io::Result<Self> {
+        let decisions = access::load()?;
+        let listeners = Listeners::restore();
+        let mut questions = Questions::default();
+        for listener in listeners.iter() {
+            if !decisions.contains_key(&listener.identity) {
+                questions.ask(listener);
+            }
+        }
         Ok(Self {
-            decisions: access::load()?,
-            listeners: Listeners::restore(),
+            decisions,
+            listeners,
+            questions,
             extensions: BTreeMap::new(),
         })
     }
@@ -48,18 +61,12 @@ impl Apps {
         &self.decisions
     }
 
-    fn allowed(&self, listener: &Listener) -> bool {
-        self.decisions
-            .get(&listener.identity)
-            .is_some_and(|access| access.on_home())
+    pub fn waiting(&self) -> BTreeSet<(Identity, u32)> {
+        self.questions.waiting()
     }
 
-    pub fn waiting(&self) -> BTreeSet<(Identity, u32)> {
-        self.listeners
-            .iter()
-            .filter(|listener| !self.decisions.contains_key(&listener.identity))
-            .map(|listener| (listener.identity.clone(), listener.uid))
-            .collect()
+    pub fn deadline(&self) -> Option<Instant> {
+        self.questions.deadline()
     }
 
     pub fn reachable(&self) -> Reachable {
@@ -86,14 +93,19 @@ impl Apps {
 
     pub fn prune(&mut self) {
         self.listeners.retain_alive();
+        self.questions.retain_alive();
         self.extensions.retain(|unit, _| identity::alive(unit));
     }
 
-    pub fn observe(&mut self, change: Change) -> bool {
+    pub fn prune_questions(&mut self) {
+        self.questions.retain_alive();
+    }
+
+    pub fn observe(&mut self, change: Change) {
         match change {
             Change::Bound { cookie, pid, port } => {
                 if discovery(port) {
-                    return false;
+                    return;
                 }
                 let Some(Origin::App {
                     unit,
@@ -101,30 +113,44 @@ impl Apps {
                     uid,
                 }) = identity::of_process(pid)
                 else {
-                    return false;
+                    return;
                 };
-                let listener = Listener {
-                    unit,
-                    identity,
-                    uid,
-                    port,
-                };
-                let allowed = self.allowed(&listener);
-                self.listeners.insert(cookie, listener);
-                allowed
+                if !self.decisions.contains_key(&identity) {
+                    self.questions.listening(cookie);
+                }
+                self.listeners.insert(
+                    cookie,
+                    Listener {
+                        unit,
+                        identity,
+                        uid,
+                        port,
+                    },
+                );
             }
-            Change::Released { cookie } => self
-                .listeners
-                .remove(cookie)
-                .is_some_and(|listener| self.allowed(&listener)),
+            Change::Released { cookie } => {
+                self.questions.stopped(cookie);
+                self.listeners.remove(cookie);
+            }
+        }
+    }
+
+    pub fn settle(&mut self, now: Instant) {
+        for cookie in self.questions.settled(now) {
+            if let Some(listener) = self.listeners.get(cookie)
+                && !self.decisions.contains_key(&listener.identity)
+            {
+                self.questions.ask(listener);
+            }
         }
     }
 
     pub fn decide(&mut self, identity: Identity, access: Access) -> io::Result<()> {
         let mut decisions = self.decisions.clone();
-        decisions.insert(identity, access);
+        decisions.insert(identity.clone(), access);
         access::save(&decisions)?;
         self.decisions = decisions;
+        self.questions.answered(&identity);
         Ok(())
     }
 

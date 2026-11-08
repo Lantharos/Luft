@@ -20,6 +20,7 @@ forwarded="$(IFS=,; echo "${forwards[*]}")"
 start_stage
 bun "$luft/os/image/parts/components/install.ts" "$stage/root" security
 place 755 "$here/check.sh" /usr/libexec/luft-firewall-check
+place 644 "$here/sockets.py" /usr/libexec/luft-firewall-check-sockets
 place 644 "$here/luft-firewall-check.service" /usr/lib/systemd/system/luft-firewall-check.service
 build_check_image "${LUFT_FIREWALL_BASE:-$image_name:45}" "$image_name-firewall-check" \
   "systemctl enable luft-firewall.service luft-firewall-check.service"

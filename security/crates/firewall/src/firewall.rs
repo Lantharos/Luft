@@ -1,4 +1,5 @@
 use std::collections::BTreeSet;
+use std::time::Instant;
 
 use zbus::OwnedObjectPath;
 
@@ -83,15 +84,26 @@ impl Firewall {
         }
     }
 
+    pub fn deadline(&self) -> Option<Instant> {
+        self.apps.deadline()
+    }
+
     pub async fn observe(&mut self, changes: Vec<Change>) -> bool {
         let waiting = self.waiting();
-        let mut refresh = false;
+        let reachable = self.apps.reachable();
         for change in changes {
-            refresh |= self.apps.observe(change);
+            self.apps.observe(change);
         }
-        if refresh {
+        self.apps.prune_questions();
+        if reachable != self.apps.reachable() {
             self.reload(true).await;
         }
+        waiting != self.waiting()
+    }
+
+    pub fn settle(&mut self) -> bool {
+        let waiting = self.waiting();
+        self.apps.settle(Instant::now());
         waiting != self.waiting()
     }
 

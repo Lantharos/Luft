@@ -109,8 +109,7 @@ int post_bind6(struct bpf_sock *ctx)
 	return bound(ctx);
 }
 
-SEC("cgroup/sock_release")
-int sock_release(struct bpf_sock *ctx)
+static int released(void *ctx)
 {
 	__u64 cookie = bpf_get_socket_cookie(ctx);
 	__u8 *state = bpf_map_lookup_elem(&sockets, &cookie);
@@ -120,6 +119,24 @@ int sock_release(struct bpf_sock *ctx)
 		send(cookie, 0, 0, CHANGE_RELEASED);
 	bpf_map_delete_elem(&sockets, &cookie);
 	return 1;
+}
+
+SEC("cgroup/connect4")
+int connect4(struct bpf_sock_addr *ctx)
+{
+	return released(ctx);
+}
+
+SEC("cgroup/connect6")
+int connect6(struct bpf_sock_addr *ctx)
+{
+	return released(ctx);
+}
+
+SEC("cgroup/sock_release")
+int sock_release(struct bpf_sock *ctx)
+{
+	return released(ctx);
 }
 
 char LICENSE[] SEC("license") = "GPL";

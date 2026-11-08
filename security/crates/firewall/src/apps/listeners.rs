@@ -70,6 +70,10 @@ impl Listeners {
         self.0.values()
     }
 
+    pub fn get(&self, cookie: u64) -> Option<&Listener> {
+        self.0.get(&cookie)
+    }
+
     pub fn insert(&mut self, cookie: u64, listener: Listener) {
         self.0.insert(cookie, listener);
         self.save();

@@ -1,6 +1,7 @@
 import { ExtensionPorts } from './firewall.js';
 import { DesktopState, type ExtensionHost } from './host.js';
 import { ExtensionManager } from './runtime/manager.js';
+import { FileActionsService } from './fileActions/service.js';
 import { ExtensionsService } from './service.js';
 
 export type HostParts = Omit<ExtensionHost, 'desktop' | 'watchMonitors'>;
@@ -12,6 +13,7 @@ export class Extensions {
   private readonly manager: ExtensionManager;
   private readonly service: ExtensionsService;
   private readonly ports: ExtensionPorts;
+  private readonly fileActions = new FileActionsService();
 
   constructor(parts: HostParts) {
     this.manager = new ExtensionManager({
@@ -36,6 +38,7 @@ export class Extensions {
 
   shutdown(): void {
     this.ports.destroy();
+    this.fileActions.destroy();
     this.service.destroy();
     this.manager.shutdown();
   }

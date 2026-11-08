@@ -96,6 +96,7 @@ Permissions, with the words Settings and the store show for them:
 | `do-not-disturb` | Hold back notifications for a while |
 | `screen-effects` | Draw over and change how your windows and the whole screen look |
 | `clipboard` | Copy to your clipboard |
+| `file-actions` | Add to the menu of files and folders in Rover |
 
 `locked-sounds` and `input-sounds` need `sounds` too, and `input-sounds` can't go with `audio-levels`, which could hear the presses in the sound. A `[helper]` table isn't a permission, but the store shows that the extension runs a program of its own. `[network]` isn't one either, but Settings and the store show the hosts it names as "Connect to api.example.com", and Settings shows the ports under `listen` as "Take connections from devices on your network, on port 4242". `List` reports them too. Kestrel hands the ports of running extensions to Luft's firewall, which lets devices on networks marked as home reach them on Kestrel's helpers, and nowhere else ([details](security.md#extensions)). `[[shortcuts]]` shows in Settings → Keyboard.
 
@@ -149,7 +150,7 @@ An extension's `taskbar.addElement` puts an element in `taskbarElements` (`kestr
 | `create(layout)` | Makes an actor for it on one display's taskbar. `layout` has `vertical`, `thickness` (the room across the island it sits in) and `button` (a taskbar button's size) |
 | `watch(changed)` | Its label changed |
 
-The actor's `relayout(layout)` follows its island to another edge or size, and `destroy()` takes it away. The actor sizes itself: its natural size along the taskbar animates as it grows under the pointer, shrinks, and shows or hides, so the islands just allocate natural sizes, and a hidden element takes no room.
+The actor's `relayout(layout)` follows its island to another edge or size, and `destroy()` takes it away. The actor sizes itself: its natural size along the taskbar animates as it grows under the pointer, shrinks, and shows or hides, so the islands just allocate natural sizes, and a hidden element takes no room. It has the padding of the taskbar's own buttons at each taskbar size, so an icon in an element sits as far from its neighbours as the tray and status icons do.
 
 Where an element sits is the person's choice, never the extension's. They drag it while editing the taskbar, and on a taskbar that's one bar (edge to edge, or floating) the extension's Settings page also offers a place through a `taskbar-place` page item: before or after the apps, next to the tray, or at the start or end of the bar. Settings writes that choice into the arrangement with `placeElement` from `@luft/ui/taskbar`.
 
@@ -164,6 +165,19 @@ Where an element sits is the person's choice, never the extension's. They drag i
 `clipboard` puts text, a picture in its own type, or files as a `text/uri-list` on the clipboard through `St.Clipboard` (`api/v1/clipboard.ts`). Clipboard history sees it like any other copy.
 
 `chooseFiles` asks the file chooser portal for files or a folder and returns their paths where they are, for what an extension hands its helper; `pickFiles` copies what was picked into the data folder instead. Both only work right after the person used the extension.
+
+## File actions
+
+`fileActions.add` puts an action in `fileActions` (`kestrel/ui/src/extensions/fileActions/actions.ts`), which Kestrel serves to Rover as `com.lantharos.Kestrel.FileActions` at `/com/lantharos/Kestrel/FileActions` on `com.lantharos.Kestrel`. Rover asks for the list once, keeps it, and asks again on `Changed`, so its menu opens without a call to Kestrel; it decides which actions fit what was right-clicked and draws them with its own menu items.
+
+| Member | Does |
+| --- | --- |
+| `List() → aa{sv}` | Every action that shows: `id` (`extension-id/key`), `label`, `icon` (the SVG it draws from), `kind` (`files`, `folders` or `any`), `types`, `extensions`, `multiple`, and `items` when it has a menu of its own, each with `key`, `label`, `icon`, `disabled`, `stays` (the menu stays open) and `separator` |
+| `Opened(s id)` | Rover opened the action's own menu |
+| `Activate(s id, s choice, as paths)` | People chose the action, or one of its entries by `key`, on these paths |
+| `Changed` (signal) | An action came, went or changed, or asked to show its entries again |
+
+Only Rover may call it. An action runs on the paths it's handed, so a sandboxed app that could call `Activate` could make Pigeon send any file to a phone. Kestrel checks that the caller's program is Rover's, installed in `/usr/lib/sabine/com.lantharos.rover` or built in a test session's apps folder, and refuses everything else.
 
 ## Dropping files on the taskbar
 

@@ -1,0 +1,6 @@
+id = "com.example.Files"
+name = "Files"
+description = "Adds actions to the menu of files and folders in Rover."
+version = "1.0.0"
+api = 1
+permissions = ["file-actions"]

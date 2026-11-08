@@ -25,6 +25,8 @@ ready = Ready to receive
 not-receiving = Not receiving
 # A menu item; $device is a device's name, such as "Pixel 8"
 send-to = Send to { $device }
+# In the menu of files and folders in Rover
+send-to-device = Send to device
 
 # The panel
 send-dropped = { $count ->

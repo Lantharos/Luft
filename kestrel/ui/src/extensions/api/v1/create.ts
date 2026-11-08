@@ -16,6 +16,7 @@ import { inputSoundsApi } from './audio/inputSounds.js';
 import { lockedSoundsApi, soundsApi } from './audio/sounds.js';
 import { callsApi } from './calls.js';
 import { clipboardApi } from './clipboard.js';
+import { fileActionsApi } from './fileActions.js';
 import { popupsApi } from './popups/popups.js';
 import { screenEffectsApi } from './screenEffects/screenEffects.js';
 import { searchApi } from './search.js';
@@ -49,6 +50,7 @@ const PARTS: { [Name in Capability]: { property: string; create(context: ApiCont
   'do-not-disturb': { property: 'doNotDisturb', create: doNotDisturbApi },
   'screen-effects': { property: 'screenEffects', create: screenEffectsApi },
   'clipboard': { property: 'clipboard', create: clipboardApi },
+  'file-actions': { property: 'fileActions', create: fileActionsApi },
   'helper': { property: 'helper', create: helperApi },
   'shortcuts': { property: 'shortcuts', create: shortcutsApi },
   'network': { property: 'network', create: networkApi },

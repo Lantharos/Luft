@@ -12,15 +12,19 @@ import {scratch} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {settled} from '../lib/wait.js';
 import {withApp} from '../apps/lib/apps.js';
+import {squareCorners} from '../apps/lib/corners.js';
 import {exists} from '../apps/lib/files.js';
+import {withScheme} from '../apps/lib/palette.js';
 import {show} from '../apps/settings/navigation.js';
 import {installBuilt, listed, request, setSetting} from '../extensions/lib/extensions.js';
 import {certificate, type FileOffer, PHONE, PHONE_PIN, Phone} from './pigeon/phone.js';
+import {checkRover, checkSpacing} from './pigeon/rover.js';
 
 const {require, eventually} = checks('Pigeon');
 const PIGEON = 'com.lantharos.Pigeon';
 const ELEMENT = `extension-element:${PIGEON}/pigeon`;
 const PHONE_PORT = 53399;
+const PHONE_FOUND_MS = 20000;
 const FIRST_ENTRY: [number, number] = [330, 104];
 const SWITCH = 'Let nearby devices send to ';
 const encoder = new TextEncoder();
@@ -73,14 +77,14 @@ function bytes(length: number, seed: number): Uint8Array {
 const file = (id: string, fileName: string, size: number, fileType = 'application/octet-stream'): FileOffer => ({id, fileName, size, fileType});
 const text = (message: string): FileOffer => ({id: 'text', fileName: 'message.txt', size: encoder.encode(message).length, fileType: 'text/plain', preview: message});
 
-async function openPanel() {
+async function openPanel(timeout?: number) {
   if (popupStarting(SWITCH)) pressKey(Clutter.KEY_Escape);
   await eventually(() => !popupStarting(SWITCH), 'the panel is closed');
   click(await eventually(element, 'Pigeon sits in the taskbar'));
   return eventually(() => {
     const panel = popupShowing(PHONE);
     return panel && button(panel, PHONE) && panel;
-  }, 'its panel lists the phone nearby');
+  }, 'its panel lists the phone nearby', timeout);
 }
 
 async function checkSending(phone: Phone) {
@@ -216,12 +220,14 @@ export async function run() {
       .recursiveUnpack<[{id: string; listen?: [number, string][]}[]]>();
     require(JSON.stringify(entries.find(extension => extension.id === PIGEON)?.listen) === '[[53317,"tcp"],[53317,"udp"]]',
       'its List entry names the ports it listens on');
+    await checkSpacing(await eventually(element, 'Pigeon sits in the taskbar'));
+    await capture('pigeon-taskbar-dark');
+    await withScheme('light', () => capture('pigeon-taskbar-light'));
+    await squareCorners(() => capture('pigeon-taskbar-square'));
+    await checkRover();
     phone.stayNearby();
-    await eventually(async () => {
-      const reply = await call('com.lantharos.Pigeon', '/com/lantharos/Pigeon', 'org.freedesktop.DBus.Properties', 'Get',
-        new GLib.Variant('(ss)', ['com.lantharos.Pigeon', 'Devices']), '(v)').catch(() => null);
-      return reply?.recursiveUnpack<[[string, string, string][]]>()[0].some(([, name, kind]) => name === PHONE && kind === 'mobile');
-    }, 'apps such as Rover see the phone on Pigeon\'s bus name', 20000);
+    await openPanel(PHONE_FOUND_MS);
+    pressKey(Clutter.KEY_Escape);
     clearNotifications();
     await checkSending(phone);
     await checkDropping(phone);

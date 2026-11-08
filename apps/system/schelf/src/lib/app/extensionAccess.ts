@@ -9,6 +9,7 @@ import Lock from '@lucide/svelte/icons/lock';
 import AudioLines from '@lucide/svelte/icons/audio-lines';
 import Image from '@lucide/svelte/icons/image';
 import Keyboard from '@lucide/svelte/icons/keyboard';
+import ListPlus from '@lucide/svelte/icons/list-plus';
 import Sparkles from '@lucide/svelte/icons/sparkles';
 import MapPin from '@lucide/svelte/icons/map-pin';
 import Music from '@lucide/svelte/icons/music';
@@ -45,7 +46,8 @@ const PERMISSIONS: Record<string, Ability> = {
 	'input-sounds': { icon: Keyboard, title: 'Play a sound when you type and click, without seeing your keys' },
 	'do-not-disturb': { icon: BellOff, title: 'Hold back notifications for a while' },
 	'screen-effects': { icon: Sparkles, title: 'Draw over and change how your windows and the whole screen look' },
-	clipboard: { icon: Clipboard, title: 'Copy to your clipboard' }
+	clipboard: { icon: Clipboard, title: 'Copy to your clipboard' },
+	'file-actions': { icon: ListPlus, title: 'Add to the menu of files and folders in Rover' }
 };
 
 export function abilities(access: ExtensionAccess): Ability[] {

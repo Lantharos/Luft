@@ -1,6 +1,8 @@
 import Gio from 'gi://Gio';
 
+import type {LuftApp} from '../../lib/apps/luftApp.js';
 import {settled} from '../../lib/wait.js';
+import {withScheme} from './palette.js';
 
 const kestrel = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 
@@ -13,4 +15,11 @@ export async function squareCorners(look: () => Promise<void>) {
     kestrel.reset('rounded-window-corners');
     await settled();
   }
+}
+
+/** Saves what an app shows in the dark style, the light style and with square corners. */
+export async function saveEveryLook(app: LuftApp, name: string) {
+  (await app.settle(() => true)).save(`${name}-dark`);
+  await withScheme('light', async () => (await app.settle(() => true)).save(`${name}-light`));
+  await squareCorners(async () => (await app.settle(() => true)).save(`${name}-square`));
 }

@@ -95,6 +95,10 @@ export const commands = {
 		paths: string[],
 		destination: string,
 	}, options?: CallOptions) => invoke<string>("extract_archives", params, options),
+	fileActionOpened: (params: {
+		id: string,
+	}, options?: CallOptions) => invoke<null>("file_action_opened", params, options),
+	fileActions: (options?: CallOptions) => invoke<FileAction[]>("file_actions", {}, options),
 	fileDetails: (params: {
 		path: string,
 	}, options?: CallOptions) => invoke<FileDetails>("file_details", params, options),
@@ -119,7 +123,6 @@ export const commands = {
 	listOperations: (options?: CallOptions) => invoke<Operation[]>("list_operations", {}, options),
 	listTrash: (options?: CallOptions) => invoke<TrashContents>("list_trash", {}, options),
 	listWindows: (options?: CallOptions) => invoke<WindowsDrive[]>("list_windows", {}, options),
-	lookForDevices: (options?: CallOptions) => invoke<null>("look_for_devices", {}, options),
 	manageDrive: (params: {
 		mountPoint: string,
 		token?: string | null,
@@ -134,7 +137,6 @@ export const commands = {
 	moveToTrash: (params: {
 		paths: string[],
 	}, options?: CallOptions) => invoke<null>("move_to_trash", params, options),
-	nearbyDevices: (options?: CallOptions) => invoke<NearbyDevice[]>("nearby_devices", {}, options),
 	networkAnswer: (params: {
 		id: number,
 		cancelled: boolean,
@@ -202,10 +204,11 @@ export const commands = {
 	resumeOperation: (params: {
 		id: string,
 	}, options?: CallOptions) => invoke<null>("resume_operation", params, options),
-	sendToDevice: (params: {
-		device: string,
+	runFileAction: (params: {
+		id: string,
+		choice?: string | null,
 		paths: string[],
-	}, options?: CallOptions) => invoke<null>("send_to_device", params, options),
+	}, options?: CallOptions) => invoke<null>("run_file_action", params, options),
 	setDefaultApp: (params: {
 		path: string,
 		app: string,
@@ -259,9 +262,9 @@ export const events = {
 	roverCounts: (callback: (payload: CountBatch) => void) => listen<CountBatch>("rover.counts", callback),
 	roverDirectory: (callback: (payload: DirectoryChanged) => void) => listen<DirectoryChanged>("rover.directory", callback),
 	roverDrives: (callback: (payload: null) => void) => listen<null>("rover.drives", callback),
+	roverFileActions: (callback: (payload: FileAction[]) => void) => listen<FileAction[]>("rover.fileActions", callback),
 	roverHistory: (callback: (payload: HistoryState) => void) => listen<HistoryState>("rover.history", callback),
 	roverMeasure: (callback: (payload: Measurement) => void) => listen<Measurement>("rover.measure", callback),
-	roverNearby: (callback: (payload: NearbyDevice[]) => void) => listen<NearbyDevice[]>("rover.nearby", callback),
 	roverNetwork: (callback: (payload: null) => void) => listen<null>("rover.network", callback),
 	roverNetworkAsk: (callback: (payload: NetworkAsk) => void) => listen<NetworkAsk>("rover.network.ask", callback),
 	roverOperations: (callback: (payload: Operation[]) => void) => listen<Operation[]>("rover.operations", callback),
@@ -386,6 +389,26 @@ export type DriveInfo = {
 
 export type DriveState = "connecting" | "ready" | "offline" | "signInAgain" | "problem";
 
+export type FileAction = {
+	id: string,
+	label: string,
+	icon: string | null,
+	kind: FileActionTargets,
+	types: string[],
+	extensions: string[],
+	multiple: boolean,
+	/**  Its own menu, when it has one. */
+	items: FileActionChoice[] | null,
+};
+
+export type FileActionChoice = { kind: "choice"; key: string; label: string; 
+/**  An SVG to draw in the menu's colors, when it has one. */
+icon: string | null; disabled: boolean; 
+/**  Whether the menu stays open after it's chosen, so what it finds shows in place. */
+keepsMenuOpen: boolean } | { kind: "separator" };
+
+export type FileActionTargets = "files" | "folders" | "any";
+
 export type FileDetails = {
 	kind: string,
 	mimeType: string | null,
@@ -460,13 +483,6 @@ export type Measurement = {
 };
 
 export type Motion = "full" | "reduced" | "off";
-
-export type NearbyDevice = {
-	id: string,
-	name: string,
-	/**  `mobile`, `desktop`, `web`, `headless` or `server`. */
-	kind: string,
-};
 
 export type NetworkAsk = { kind: "password"; id: number; message: string; user: string; domain: string; needsUser: boolean; needsDomain: boolean; needsPassword: boolean; anonymous: boolean; saving: boolean } | { kind: "question"; id: number; message: string; choices: string[] } | { kind: "done"; id: number };
 

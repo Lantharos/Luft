@@ -1,6 +1,6 @@
 import type { ElementLayout, TaskbarElement, View } from '@luft/extension-api';
 
-import { ICON } from './format.js';
+import { SEND_ICON } from './format.js';
 import type { Panel } from './panel.js';
 import type { Pigeon } from './pigeon.js';
 import { moving, percent, status } from './status.js';
@@ -8,7 +8,7 @@ import { moving, percent, status } from './status.js';
 /** Pigeon in the taskbar: how a transfer is going, a click away from the devices, and a place to drop files on. */
 export function addElement(pigeon: Pigeon, panel: Panel): void {
   const { t, taskbar, settings } = pigeon.extension;
-  const icon = (layout: ElementLayout): View => ({ type: 'icon', icon: ICON, size: Math.round(layout.button * 0.5) });
+  const icon = (layout: ElementLayout): View => ({ type: 'icon', icon: SEND_ICON, size: Math.round(layout.button * 0.5) });
   const stack = (layout: ElementLayout, children: View[]): View => ({ type: layout.vertical ? 'column' : 'row', spacing: 6, children });
   const menu = () => [
     { label: t('receive'), checked: settings.get<boolean>('receive'), onActivate: () => settings.set('receive', !settings.get<boolean>('receive')) },

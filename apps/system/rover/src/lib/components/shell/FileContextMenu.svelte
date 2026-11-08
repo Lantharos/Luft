@@ -18,7 +18,6 @@
 	import Globe from '@lucide/svelte/icons/globe';
 	import Info from '@lucide/svelte/icons/info';
 	import Link from '@lucide/svelte/icons/link';
-	import Monitor from '@lucide/svelte/icons/monitor';
 	import PackageOpen from '@lucide/svelte/icons/package-open';
 	import Palette from '@lucide/svelte/icons/palette';
 	import PanelLeft from '@lucide/svelte/icons/panel-left';
@@ -27,16 +26,13 @@
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 	import Scissors from '@lucide/svelte/icons/scissors';
 	import Search from '@lucide/svelte/icons/search';
-	import Send from '@lucide/svelte/icons/send';
-	import Server from '@lucide/svelte/icons/server';
-	import Smartphone from '@lucide/svelte/icons/smartphone';
 	import SquarePen from '@lucide/svelte/icons/square-pen';
 	import Star from '@lucide/svelte/icons/star';
 	import Terminal from '@lucide/svelte/icons/terminal';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 	import { ContextMenu, MenuItem, MenuSeparator } from '@luft/ui';
 	import type { Component } from 'svelte';
-	import type { FileEntry } from '#lib/bindings.js';
+	import type { FileAction, FileActionChoice, FileEntry } from '#lib/bindings.js';
 	import * as tools from '#lib/features/actions.js';
 	import * as cloud from '#lib/features/cloud.js';
 	import { isArchive } from '#lib/features/archives.js';
@@ -47,6 +43,7 @@
 	import type { ViewState } from '#lib/file-manager/view/view-state.svelte.js';
 	import { hidePlace, settings, showPlace } from '#lib/state/settings.svelte.js';
 	import type { VcsState } from '#lib/vcs/state.svelte.js';
+	import SymbolicIcon from './SymbolicIcon.svelte';
 
 	interface Props {
 		menu: ContextMenuState;
@@ -67,18 +64,25 @@
 	let kept = $derived(cloud.keptEverywhere(manager, targets));
 	let archives = $derived(targets.length > 0 && targets.every((entry) => !entry.isDir && isArchive(entry.name)));
 	let printable = $derived(tools.printable(targets));
-	let nearby = $derived(manager.nearby.devices);
-	let choosingDevice = $state(false);
+	let added = $derived(manager.fileActions.for(targets));
+	let choosingId = $state<string | null>(null);
+	let choosing = $derived(choosingId ? (manager.fileActions.actions.find((action) => action.id === choosingId) ?? null) : null);
 
-	const DEVICE_ICONS: Record<string, Component> = { mobile: Smartphone, web: Globe, headless: Terminal, server: Server };
+	const runAdded = (action: FileAction, choice: string | null = null) =>
+		manager.fileActions.run(action.id, targets.map((entry) => entry.path), choice).catch(manager.notify);
 
-	function chooseDevice() {
-		choosingDevice = true;
-		manager.nearby.lookAgain();
+	function openAction(action: FileAction) {
+		if (!action.items) {
+			run(() => runAdded(action));
+			return;
+		}
+		choosingId = action.id;
+		manager.fileActions.opened(action.id);
 	}
 
-	function sendTo(device: string) {
-		run(() => manager.nearby.send(device, targets.map((entry) => entry.path)));
+	function choose(action: FileAction, choice: Extract<FileActionChoice, { kind: 'choice' }>) {
+		if (choice.keepsMenuOpen) void runAdded(action, choice.key);
+		else run(() => runAdded(action, choice.key));
 	}
 
 	function close() {
@@ -107,17 +111,30 @@
 	</MenuItem>
 {/snippet}
 
+{#snippet glyph(icon: string | null)}
+	{#if icon}
+		<SymbolicIcon path={icon} />
+	{:else}
+		<span class="size-4 flex-none"></span>
+	{/if}
+{/snippet}
+
 <ContextMenu at={menu} onclose={close}>
-	{#if target && choosingDevice}
-		<MenuItem onclick={() => (choosingDevice = false)}>
+	{#if target && choosing}
+		<MenuItem onclick={() => (choosingId = null)}>
 			<ArrowLeft size={16} />
 			<span>Back</span>
 		</MenuItem>
 		<MenuSeparator />
-		{#each nearby as device (device.id)}
-			{@render item(DEVICE_ICONS[device.kind] ?? Monitor, device.name, () => sendTo(device.id))}
-		{:else}
-			{@render item(Send, 'No devices nearby', () => {}, false, true)}
+		{#each choosing.items ?? [] as choice, index (choice.kind === 'choice' ? choice.key : `separator-${index}`)}
+			{#if choice.kind === 'separator'}
+				<MenuSeparator />
+			{:else}
+				<MenuItem disabled={choice.disabled} onclick={() => choose(choosing, choice)}>
+					{@render glyph(choice.icon)}
+					<span>{choice.label}</span>
+				</MenuItem>
+			{/if}
 		{/each}
 	{:else if target}
 		{@render item(ExternalLink, 'Open', () => manager.openEntry(target))}
@@ -175,12 +192,12 @@
 		{#if printable}
 			{@render item(Printer, 'Print…', () => tools.printFiles(manager, targets))}
 		{/if}
-		{#if nearby.length}
-			<MenuItem onclick={chooseDevice}>
-				<Send size={16} />
-				<span>Send to device</span>
+		{#each added as action (action.id)}
+			<MenuItem onclick={() => openAction(action)}>
+				{@render glyph(action.icon)}
+				<span>{action.label}</span>
 			</MenuItem>
-		{/if}
+		{/each}
 		{#if target.isDir}
 			{@render item(Terminal, 'Open in terminal', () => tools.openTerminal(manager, target.path))}
 			{#if manager.drives.manageable}

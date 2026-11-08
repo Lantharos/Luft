@@ -23,7 +23,7 @@ pub fn register(window: SabineWindow, state: &RoverState) -> SabineWindow {
     ));
     let window = crate::locations::network::register(window, &state.events);
     let window = crate::locations::cloud::register(window, &state.events);
-    let window = crate::integration::nearby::register(window, &state.events);
+    let window = crate::integration::file_actions::register(window, &state.events);
     register_app(crate::app::events::declare(window), state)
 }
 

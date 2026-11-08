@@ -1,6 +1,6 @@
 import type { Extension, HelperProcess } from '@luft/extension-api';
 
-export type Granted = 'helper' | 'quick-settings' | 'taskbar' | 'popups' | 'notifications' | 'clipboard';
+export type Granted = 'helper' | 'quick-settings' | 'taskbar' | 'popups' | 'notifications' | 'clipboard' | 'file-actions';
 
 export interface Peer {
   id: string;

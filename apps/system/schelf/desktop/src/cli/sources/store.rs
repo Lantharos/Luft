@@ -192,6 +192,7 @@ pub fn extension_access(access: &ExtensionAccess) -> Vec<String> {
                     "Draw over and change how your windows and the whole screen look"
                 }
                 "clipboard" => "Copy to your clipboard",
+                "file-actions" => "Add to the menu of files and folders in Rover",
                 other => other,
             }
             .to_owned()

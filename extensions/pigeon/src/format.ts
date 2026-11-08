@@ -1,6 +1,7 @@
 import type { Peer } from './pigeon.js';
 
 export const ICON = 'icons/pigeon-symbolic.svg';
+export const SEND_ICON = 'send-to-symbolic';
 
 const UNITS = ['byte', 'kilobyte', 'megabyte', 'gigabyte', 'terabyte'] as const;
 const KINDS: Record<string, string> = {

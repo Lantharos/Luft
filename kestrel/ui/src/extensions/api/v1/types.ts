@@ -25,11 +25,12 @@ export interface Disposable {
  * - `do-not-disturb`: Hold back notifications for a while
  * - `screen-effects`: Draw over and change how your windows and the whole screen look
  * - `clipboard`: Copy to your clipboard
+ * - `file-actions`: Add to the menu of files and folders in Rover
  */
 export type Permission =
   | 'wallpaper' | 'quick-settings' | 'taskbar' | 'search' | 'notifications' | 'weather' | 'location' | 'media'
   | 'popups' | 'typing' | 'sounds' | 'audio-levels' | 'calls' | 'locked-sounds' | 'input-sounds' | 'do-not-disturb' | 'screen-effects'
-  | 'clipboard';
+  | 'clipboard' | 'file-actions';
 
 /**
  * A permission, `helper` for an extension whose manifest declares a native helper, `shortcuts` for one that declares
@@ -59,6 +60,7 @@ export interface Capabilities {
   'do-not-disturb': DoNotDisturb;
   'screen-effects': ScreenEffects;
   clipboard: Clipboard;
+  'file-actions': FileActions;
   helper: Helper;
   shortcuts: Shortcuts;
   network: Network;
@@ -1278,6 +1280,67 @@ export interface Clipboard {
   setImage(path: string): Promise<void>;
   /** Copies files and folders, by their full paths, to paste in Rover and other apps. */
   setFiles(paths: readonly string[]): void;
+}
+
+/** Adds entries to the menu Rover opens on files and folders, drawn by Rover in its own style. */
+export interface FileActions {
+  /** Adds an entry that shows for the files and folders its `on` describes, and gets their full paths when people choose it. */
+  add(action: FileActionOptions): FileAction;
+}
+
+/** Which files and folders an action is for. Leave out a field to take every kind. */
+export interface FileTargets {
+  /** `files`, `folders`, or `any` for both. It's `any` when left out. */
+  kind?: 'files' | 'folders' | 'any';
+  /** MIME types the files need, such as `image/png`, or a whole group such as `image/*`. */
+  types?: readonly string[];
+  /** File name extensions the files need, without the dot, such as `pdf`. A file of a listed type or with a listed extension counts. */
+  extensions?: readonly string[];
+  /** Whether it shows while several are chosen. It does unless this is `false`. */
+  multiple?: boolean;
+}
+
+/**
+ * An entry in an action's own menu. `disabled` greys it out, for a placeholder such as "Nothing nearby".
+ * `keepsMenuOpen` leaves the menu open when it's chosen, for an entry such as "Look again" whose results show up in
+ * place once the action refreshes.
+ */
+export interface FileActionChoice {
+  /** Tells the choices apart in `onActivate`. */
+  key: string;
+  label: string;
+  icon?: Icon;
+  disabled?: boolean;
+  keepsMenuOpen?: boolean;
+}
+
+/** `separator` draws a line between choices. */
+export type FileActionItem = FileActionChoice | 'separator';
+
+export interface FileActionOptions {
+  /** Names the action among the extension's actions, lowercase with dashes. */
+  key: string;
+  label: string;
+  icon: Icon;
+  /** Which files and folders it shows for. It shows for anything people choose when left out. */
+  on?: FileTargets;
+  /**
+   * Gives the action a menu of its own, such as the devices to send to. Kestrel asks again after
+   * {@link FileAction.refresh}, and Rover keeps what it got, so the menu opens without waiting.
+   */
+  items?(): FileActionItem[];
+  /** Runs as people open the action's menu, such as to look for devices again. */
+  onOpened?(): void;
+  /** Runs when people choose the action, or one of its choices by `key`, with the full paths of what they chose. */
+  onActivate(paths: string[], choice?: string): void;
+  /** Whether it shows. It does unless this is `false`. */
+  shown?: boolean;
+}
+
+export interface FileAction extends Disposable {
+  update(changes: Partial<Omit<FileActionOptions, 'key'>>): void;
+  /** Asks for `items` again, when what they show has changed. */
+  refresh(): void;
 }
 
 export interface Helper {

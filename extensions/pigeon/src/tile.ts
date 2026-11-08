@@ -1,6 +1,6 @@
 import type { MenuItem } from '@luft/extension-api';
 
-import { ICON } from './format.js';
+import { SEND_ICON } from './format.js';
 import type { Panel } from './panel.js';
 import type { Pigeon } from './pigeon.js';
 import { status } from './status.js';
@@ -15,7 +15,7 @@ export function addTile(pigeon: Pigeon, panel: Panel): void {
     'settings',
   ];
   let shown = '';
-  const toggle = quickSettings.addToggle({ title: t('pigeon'), icon: ICON, setting: 'receive', subtitle: status(pigeon), menu: menu() });
+  const toggle = quickSettings.addToggle({ title: t('pigeon'), icon: SEND_ICON, setting: 'receive', subtitle: status(pigeon), menu: menu() });
   const sync = () => {
     const now = JSON.stringify([status(pigeon), pigeon.devices.map(peer => [peer.id, peer.alias])]);
     if (now === shown) return;

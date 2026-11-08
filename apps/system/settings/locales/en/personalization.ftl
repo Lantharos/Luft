@@ -354,6 +354,7 @@ settings-extensions-permission-input-sounds = Play a sound when you type and cli
 settings-extensions-permission-do-not-disturb = Hold back notifications for a while
 settings-extensions-permission-screen-effects = Draw over and change how your windows and the whole screen look
 settings-extensions-permission-clipboard = Copy to your clipboard
+settings-extensions-permission-file-actions = Add to the menu of files and folders in Rover
 # $hosts lists the web addresses the extension connects to, such as "app.pult.sh"
 settings-extensions-permission-network = Connect to { $hosts }
 # $ports lists port numbers, such as "53317"; $count is how many there are

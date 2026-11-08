@@ -1,6 +1,7 @@
 import type { Enable } from '@luft/extension-api';
 
 import { addElement } from './element.js';
+import { addFileAction } from './fileAction.js';
 import { Incoming } from './incoming.js';
 import { Messages } from './messages.js';
 import { Outgoing } from './outgoing.js';
@@ -25,6 +26,7 @@ const enable: Enable<Granted> = extension => {
   const messages = new Messages(pigeon);
   addTile(pigeon, panel);
   addElement(pigeon, panel);
+  addFileAction(pigeon);
   describePage(pigeon);
 };
 

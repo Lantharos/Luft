@@ -1,5 +1,4 @@
 mod app;
-mod bus;
 mod client;
 mod config;
 mod discovery;
@@ -52,12 +51,6 @@ async fn run(identity: Identity) {
     tokio::spawn(server::run(app.clone()));
     tokio::spawn(discovery::run(app.clone()));
     tokio::spawn(show_devices(app.clone()));
-    let bus = app.clone();
-    tokio::spawn(async move {
-        if let Err(error) = bus::serve(bus).await {
-            eprintln!("pigeon: apps can't send through Pigeon: {error}");
-        }
-    });
     while let Some(command) = commands.next().await {
         handle(&app, command);
     }

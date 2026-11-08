@@ -369,6 +369,34 @@ if (ext.peers.handles('com.lantharos.Soundscapes', 'play')) await ext.peers.requ
 
 `clipboard.setText(text)` copies text, `clipboard.setImage(path)` a PNG, JPEG, WebP or GIF picture by its full path, resolving once it's there, and `clipboard.setFiles(paths)` files and folders, to paste in Rover and other apps. It's as if people copied them, so clipboard history keeps them too. Reading the clipboard isn't offered.
 
+## fileActions
+
+`fileActions.add(options)` adds an entry to the menu Rover opens on files and folders. Rover draws it in its own style, and the extension gets the full paths of what people chose when they pick it.
+
+| Option | Is |
+| --- | --- |
+| `key` | Names it among the extension's actions, lowercase with dashes |
+| `label`, `icon` | What the entry says, and its symbolic icon |
+| `on` | Which files and folders it shows for: `kind` (`files`, `folders` or `any`), `types` (MIME types such as `image/png`, or `image/*` for a whole group), `extensions` (such as `pdf`, without the dot) and `multiple` (`false` hides it while several are chosen). It shows for everything when left out |
+| `items()` | Gives the entry a menu of its own, of `{ key, label, icon?, disabled?, keepsMenuOpen? }` and `'separator'`. `disabled` greys out a placeholder such as "Nothing nearby"; `keepsMenuOpen` leaves the menu open when chosen, for an entry such as "Look again" whose results show up in place |
+| `onOpened()` | People opened its menu, such as to look for devices again |
+| `onActivate(paths, choice?)` | People chose it, or one of its entries by `key` |
+| `shown` | Whether it shows |
+
+The action has `update(changes)`, `refresh()` to ask for `items()` again when what they show changed, and `dispose()`. Rover keeps what it last got, so the menu opens without waiting on the extension.
+
+```ts
+const send = ext.fileActions.add({
+  key: 'send',
+  label: ext.t('send-to-device'),
+  icon: 'send-to-symbolic',
+  items: () => devices.length
+    ? devices.map(device => ({ key: device.id, label: device.name, icon: 'phone-symbolic' }))
+    : [{ key: 'nobody', label: ext.t('nobody'), disabled: true }],
+  onActivate: (paths, device) => device && sendTo(device, paths),
+});
+```
+
 ## helper
 
 `helper.start(args?)` starts the program `[helper]` names, in the extension's folder and with `LUFT_EXTENSION_DIR` set to it. The process has `running`, `write(line)` to its standard input, `onLine(received)` for lines it prints, `onExit(exited)`, `close()` to close its input so it can finish, and `dispose()` to stop it. Kestrel stops it when the extension is turned off, and Settings counts what it uses.

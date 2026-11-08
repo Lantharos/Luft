@@ -7111,8 +7111,6 @@ dependencies = [
  "hyper",
  "hyper-util",
  "jiff",
- "luft-dbus-macros",
- "luft-identity",
  "nix",
  "rcgen",
  "rustls",

@@ -1,6 +1,6 @@
 [Unit]
 Description=Remote login check
-After=luft-firewall.service NetworkManager.service polkit.service
+After=luft-firewall.service NetworkManager.service polkit.service sshd.service
 
 [Service]
 Type=simple

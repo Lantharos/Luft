@@ -16,6 +16,7 @@ Anything a service writes to `/etc` therefore belongs to one version only. Going
 | Kestrel's login screen | `/var/lib/kestrel-greeter` | Defaults in `/usr`, the display configuration in `/run` |
 | `luft-packages` | `/var/lib/luft/system-packages`, with the software sources in `repositories` and their keys in `keys` | dnf builds with `reposdir` pointing at the build root's copy, and `/usr/share/dnf5/libdnf.conf.d/50-luft-system-packages.conf` adds the folder to `dnf` on the computer |
 | `trustd` | `/var/lib/trustd`, with the keys of drives that unlock by themselves next to their records in `drives` | `trustd-drives-generator` makes their `systemd-cryptsetup@` units; drives being decrypted are recognised from `/var/lib/trustd/decrypting` by its udev rules |
+| `luft-remote-login` | `/var/lib/luft-remote-login/choices` | `luft-remote-login-generator` decides whether `sshd.service` starts, and sshd includes the accounts and passwords from `/run/luft-remote-login/sshd.conf` |
 | `luft-sleep` | `/var/lib/luft-sleep/sleep.conf` | |
 | `luft-updater` | `/var/lib/luft-updater/schedule.json` | `luft-updater-check.timer` asks the updater, which decides |
 

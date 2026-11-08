@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use luft_dbus::idle::Idle;
 use luft_dbus_macros::introspect;
+use luft_remote_login::choices::Choices;
 use tokio::sync::Mutex;
 use zbus::fdo::{self, DBusProxy};
 use zbus::message::Header;
@@ -9,7 +10,6 @@ use zbus::object_server::SignalEmitter;
 use zbus::{Connection, interface};
 
 use crate::accounts::Account;
-use crate::choices::Choices;
 use crate::error::Error;
 use crate::keys::{self, PublicKey};
 use crate::{firewall, sessions, sshd};
@@ -77,23 +77,31 @@ impl RemoteLogin {
         let mut choices = Choices::load()?;
         change(&mut choices);
         choices.save()?;
+        if !choices.enabled {
+            return Ok(());
+        }
+        choices.write_sshd_config()?;
         sshd::reload().await.map_err(Error::Failed)
     }
 
     async fn turn_on(&self, connection: &Connection, header: &Header<'_>) -> Result<(), Error> {
         authorize(connection, header, CONFIGURE).await?;
-        if sshd::enabled(connection).await? {
+        let mut choices = Choices::load()?;
+        if choices.enabled {
             return Ok(());
         }
-        let mut choices = Choices::load()?;
         if choices.accounts.is_empty()
             && let Some(account) = caller(connection, header).await?
         {
             choices.accounts.insert(account.name);
         }
-        choices.save()?;
         firewall::open(connection, false).await?;
+        choices.enabled = true;
+        choices.save()?;
         if let Err(error) = sshd::start().await {
+            choices.enabled = false;
+            choices.save()?;
+            sshd::stop().await.map_err(Error::Failed)?;
             firewall::close(connection).await?;
             return Err(Error::Failed(error));
         }
@@ -102,6 +110,9 @@ impl RemoteLogin {
 
     async fn turn_off(&self, connection: &Connection, header: &Header<'_>) -> Result<(), Error> {
         authorize(connection, header, RESTRICT).await?;
+        let mut choices = Choices::load()?;
+        choices.enabled = false;
+        choices.save()?;
         sshd::stop().await.map_err(Error::Failed)?;
         sessions::end_all(connection).await?;
         firewall::close(connection).await?;
@@ -113,8 +124,8 @@ impl RemoteLogin {
 #[interface(name = "com.lantharos.RemoteLogin1")]
 impl RemoteLogin {
     #[zbus(property)]
-    async fn enabled(&self, #[zbus(connection)] connection: &Connection) -> fdo::Result<bool> {
-        Ok(sshd::enabled(connection).await?)
+    async fn enabled(&self) -> fdo::Result<bool> {
+        Ok(Choices::load().map_err(unreadable)?.enabled)
     }
 
     #[zbus(property)]
@@ -194,7 +205,7 @@ impl RemoteLogin {
         let _activity = self.idle.hold();
         authorize(connection, &header, if allowed { PUBLIC } else { RESTRICT }).await?;
         let _changing = self.changing.lock().await;
-        if !sshd::enabled(connection).await? {
+        if !Choices::load()?.enabled {
             return Err(Error::Failed("Remote login is off".into()));
         }
         firewall::open(connection, allowed).await?;

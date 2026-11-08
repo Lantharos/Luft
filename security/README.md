@@ -9,7 +9,7 @@ How the pieces protect the computer is in [docs/security.md](../docs/security.md
 | `crates/trust` | `trustd` and `trustctl` |
 | `crates/firewall` | `luft-firewall` |
 | `crates/usb` | `luft-usb-protection` |
-| `crates/remote-login` | `luft-remote-login` |
+| `crates/remote-login` | `luft-remote-login` and `luft-remote-login-generator` |
 
 ## Build
 

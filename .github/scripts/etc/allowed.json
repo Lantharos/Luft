@@ -72,6 +72,11 @@
 	"packages/system/software/src/system/repositories/script.rs": {
 		"/etc/yum.repos.d/": "Finds the repository files a package's scriptlets write"
 	},
+	"security/crates/remote-login/src/sshd.rs": {
+		"/etc/ssh/ssh_host_ecdsa_key.pub": "Reads the host key sshd-keygen made, to show its fingerprint",
+		"/etc/ssh/ssh_host_ed25519_key.pub": "Reads the host key sshd-keygen made, to show its fingerprint",
+		"/etc/ssh/ssh_host_rsa_key.pub": "Reads the host key sshd-keygen made, to show its fingerprint"
+	},
 	"security/crates/trust/src/drives/target.rs": {
 		"/etc/fstab": "Reads the drives an administrator mounts"
 	},

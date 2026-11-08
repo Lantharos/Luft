@@ -9,6 +9,7 @@ password=remote-login-check
 key=/root/check-key
 rules=/etc/polkit-1/rules.d/90-remote-login-check.rules
 ldconfig_rewrites=/etc/ld.so.cache
+phase_file=/var/lib/luft-remote-login-check/phase
 read -r forwarded < <(sed -n 's/.*luft\.remote-login-check=\([0-9]*\).*/\1/p' /proc/cmdline)
 
 say() { echo "luft-remote-login-check: $*" > /dev/console; }
@@ -17,7 +18,9 @@ fail() {
   sshd -T > /dev/console 2>&1
   ls -laZ "/home/$person" "/home/$person/.ssh" > /dev/console 2>&1
   nft list ruleset > /dev/console
-  journalctl -b -u sshd -u luft-remote-login -u luft-firewall --no-pager -o cat | tail -n 80 > /dev/console
+  ls -laZ /run/luft-remote-login > /dev/console 2>&1
+  journalctl -b -k --no-pager -o cat -g 'avc: +denied' > /dev/console
+  journalctl -b -u sshd -u luft-remote-login -u luft-firewall -u luft-remote-login-check --no-pager -o short-monotonic | tail -n 80 > /dev/console
   systemctl poweroff
   exit 1
 }
@@ -105,6 +108,8 @@ RULES
   [[ "$(property Accounts)" == "as 1 \"$person\"" ]] || fail "turning it on let in $(property Accounts), not only $person"
   systemctl is-active --quiet sshd.service || fail "sshd doesn't run"
   systemctl is-enabled --quiet sshd.service || fail "sshd doesn't start with the computer"
+  [[ -z "$(find /etc/systemd/system /etc/ssh/sshd_config.d -newer "$rules" \! -type d)" ]] \
+    || fail "turning it on wrote to /etc: $(find /etc/systemd/system /etc/ssh/sshd_config.d -newer "$rules" \! -type d)"
   firewall_ports | grep -q '22 "tcp" "home"' || fail "port 22 isn't open on home networks: $(firewall_ports)"
   local listed fingerprint
   listed="$(property HostKeys)"
@@ -223,22 +228,79 @@ no_denials() {
   local denied
   denied="$(journalctl -b -k --no-pager -o cat -g 'avc: +denied' | grep -v "path=\"$ldconfig_rewrites\"")"
   [[ -z "$denied" ]] || echo "$denied" > /dev/console
-  ! grep -qE 'comm="(sshd|sshd-session|sshd-auth|luft-remote-lo|restorecon|systemctl)"' <<< "$denied" || fail "SELinux denied remote login something"
+  ! grep -qE 'comm="(sshd|sshd-session|sshd-auth|luft-remote-log|restorecon|systemctl)"' <<< "$denied" || fail "SELinux denied remote login something"
   say "ok: SELinux enforcing, nothing of remote login's denied"
+}
+
+older_etc() {
+  install -d /etc/systemd/system/multi-user.target.wants /etc/systemd/system/sockets.target.wants
+  ln -sf /usr/lib/systemd/system/sshd.service /etc/systemd/system/multi-user.target.wants/sshd.service
+  ln -sf /usr/lib/systemd/system/sshd.socket /etc/systemd/system/sockets.target.wants/sshd.socket
+  printf '%s\n' "AllowUsers $person" "PasswordAuthentication yes" > /etc/ssh/sshd_config.d/10-luft-remote-login.conf
+  say "ok: /etc is now one from a version that had remote login and passwords on"
+}
+
+stays_off() {
+  ! systemctl is-active --quiet sshd.service || fail "sshd runs after going back to an /etc that had it on"
+  ! systemctl is-active --quiet sshd.socket || fail "sshd.socket listens after going back to an /etc that had it on"
+  ! ss -Hltn | grep -q ':22 ' || fail "something listens on port 22 after going back"
+  [[ "$(property Enabled)" == "b false" ]] || fail "Enabled is $(property Enabled) after going back"
+  ! firewall_ports | grep -q '22 "tcp"' || fail "port 22 is open after going back: $(firewall_ports)"
+  expect refused "signing in after going back to an /etc that had it on" with_key "$person"
+}
+
+passwords_stay_off() {
+  as_person busctl call "$name" "$path" "$name" SetEnabled b true || fail "SetEnabled true after going back"
+  [[ "$(property Accounts)" == "as 1 \"$person\"" ]] || fail "the accounts are $(property Accounts) after going back"
+  [[ "$(property PasswordLogin)" == "b false" ]] || fail "PasswordLogin is $(property PasswordLogin) after going back"
+  effective
+  expect works "signing in with a key once it's on again" with_key "$person"
+  expect refused "signing in with a password that an older /etc allowed" with_password "$person"
+}
+
+on_at_start() {
+  eventually "sshd starts with the computer" systemctl is-active --quiet sshd.service
+  [[ "$(property Enabled)" == "b true" ]] || fail "Enabled is $(property Enabled) after starting with it on"
+  effective
+  expect works "signing in with a key after starting with it on" with_key "$person"
+  expect refused "signing in with a password after starting with it on" with_password "$person"
+  remote_login SetEnabled b false || fail "SetEnabled false"
 }
 
 [[ "$(getenforce)" == Enforcing ]] || fail "SELinux isn't enforcing"
 [[ -n "$forwarded" ]] || fail "no forwarded port on the command line"
-accounts
-home_network
-off_at_first
-turn_on
-effective
-keys
-who_signs_in
-networks
-sessions
-turned_off
-no_denials
-say "PASS"
+phase="$(cat "$phase_file" 2> /dev/null || echo first)"
+case "$phase" in
+  first)
+    accounts
+    home_network
+    off_at_first
+    turn_on
+    effective
+    keys
+    who_signs_in
+    networks
+    sessions
+    turned_off
+    no_denials
+    older_etc
+    next=went-back
+    ;;
+  went-back)
+    home_network
+    stays_off
+    passwords_stay_off
+    no_denials
+    next=on-at-start
+    ;;
+  on-at-start)
+    home_network
+    on_at_start
+    turned_off
+    no_denials
+    next=done
+    ;;
+esac
+install -D /dev/stdin "$phase_file" <<< "$next"
+say "PASS $phase"
 systemctl poweroff

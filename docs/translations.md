@@ -48,6 +48,7 @@ Luft is translated into Albanian, Bosnian, Bulgarian, Catalan, Croatian, Czech, 
 | site | `web/site/locales/*/site.ftl` | the website's header, footer, language list and missing-page page |
 | site-home | `web/site/locales/*/home.ftl` | the website's home page |
 | site-download | `web/site/locales/*/download.ftl` | the website's download page |
+| site-brand | `web/site/locales/*/brand.ftl` | the website's brand page: logo names, how to use them, colours and app icons |
 
 `packages/i18n/components.json` lists the same components with the code each one covers. Language folders use BCP 47 tags: `en`, `bs`, `ca`, `cs`, `da`, `de`, `et`, `es`, `fr`, `ga`, `hr`, `is`, `it`, `lv`, `lt`, `hu`, `mt`, `nl`, `nb`, `nn`, `pl`, `pt-BR`, `pt`, `ro`, `sq`, `sk`, `sl`, `sr-Latn`, `fi`, `sv`, `tr`, `el`, `bg`, `mk`, `ru`, `sr`, `uk`.
 

@@ -9,6 +9,8 @@ site-nav-download = Download
 site-nav-docs = Docs
 # Link to Luft's source code on GitHub
 site-nav-source = Source
+# Link in the footer to the page with the logo, colours and app icons
+site-nav-brand = Brand
 # { $lantharos } and { $fedora } are links showing those names.
 site-footer-made = Made by { $lantharos }. Free and open source, built on { $fedora }.
 # { $photographers } is a list of linked names, already joined the way the language joins lists ("A, B and C").

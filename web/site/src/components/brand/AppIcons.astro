@@ -1,0 +1,27 @@
+---
+import { apps } from '../../data/apps';
+import { appIcon } from '../../data/appIcons';
+import { localize } from '../../i18n/pages';
+import FileLink from './FileLink.astro';
+
+const { t } = localize(Astro);
+const icons = apps(t).map(({ id, name }) => ({ id, name, src: appIcon(id)! }));
+---
+
+<section class="page pb-24 md:pb-36" aria-labelledby="icons">
+	<h2 id="icons" class="text-3xl font-semibold tracking-tight">{t('brand-icons-heading')}</h2>
+	<p class="mt-3 max-w-2xl text-ink-soft">{t('brand-icons-text')}</p>
+	<ul class="mt-10 grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-5">
+		{
+			icons.map(({ id, name, src }) => (
+				<li class="flex flex-col items-start gap-3">
+					<img src={src} alt="" class="size-20 rounded-[22%] ring-1 ring-hairline" loading="lazy" />
+					<div class="flex w-full items-center gap-2">
+						<span class="min-w-0 flex-1 truncate font-semibold">{name}</span>
+						<FileLink name={name} format="SVG" href={src} file={`${id}.svg`} />
+					</div>
+				</li>
+			))
+		}
+	</ul>
+</section>

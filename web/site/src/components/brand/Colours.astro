@@ -1,0 +1,59 @@
+---
+import { localize } from '../../i18n/pages';
+
+const { t } = localize(Astro);
+const colours = [
+	{ name: t('brand-colour-ink'), hex: '#1d1b17' },
+	{ name: t('brand-colour-paper'), hex: '#fcf9f3' },
+	{ name: t('brand-colour-night'), hex: '#12110e' },
+	{ name: t('brand-colour-mist'), hex: '#ece9e3' },
+	{ name: t('brand-colour-brass'), hex: '#725b2d' },
+	{ name: t('brand-colour-sand'), hex: '#ddc393' }
+];
+---
+
+<section class="page pb-24 md:pb-32" aria-labelledby="colours">
+	<h2 id="colours" class="text-3xl font-semibold tracking-tight">{t('brand-colours-heading')}</h2>
+	<p class="mt-3 text-ink-soft">{t('brand-colours-text')}</p>
+	<ul class="swatches mt-8 grid gap-2 sm:grid-cols-2 lg:grid-cols-3" data-copied={t('brand-colour-copied')}>
+		{
+			colours.map(({ name, hex }) => (
+				<li>
+					<button
+						type="button"
+						data-hex={hex}
+						aria-label={t('brand-colour-copy', { name, hex })}
+						class="flex w-full items-center gap-4 rounded-2xl p-2 pr-4 text-left transition-colors duration-(--motion-tap) hover:bg-ink/5"
+					>
+						<span class="size-14 shrink-0 rounded-xl ring-1 ring-hairline ring-inset" style={`background: ${hex}`} />
+						<span>
+							<span class="block font-semibold">{name}</span>
+							<span class="block font-mono text-sm text-ink-muted" data-code>
+								{hex}
+							</span>
+						</span>
+					</button>
+				</li>
+			))
+		}
+	</ul>
+</section>
+
+<script>
+	const list = document.querySelector<HTMLElement>('.swatches')!;
+	const timers = new WeakMap<Element, ReturnType<typeof setTimeout>>();
+
+	list.addEventListener('click', async (event) => {
+		const button = (event.target as Element).closest<HTMLElement>('[data-hex]');
+		if (!button) return;
+		const hex = button.dataset.hex!;
+		const code = button.querySelector('[data-code]')!;
+		await navigator.clipboard.writeText(hex);
+		code.textContent = list.dataset.copied!;
+		clearTimeout(timers.get(button));
+		timers.set(
+			button,
+			setTimeout(() => (code.textContent = hex), 1600)
+		);
+	});
+</script>

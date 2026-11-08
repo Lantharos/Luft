@@ -13,6 +13,7 @@ interface Props {
 
 const local = localize(Astro);
 const { locale, t, href } = local;
+const links = [...nav(local), { label: t('site-nav-brand'), href: href('brand') }];
 const photographers = Astro.props.credits.map(wallpaper).map((photo) => link(photo.url, photo.photographer));
 ---
 
@@ -29,7 +30,7 @@ const photographers = Astro.props.credits.map(wallpaper).map((photo) => link(pho
 		<div class="flex flex-col gap-6 md:items-end">
 			<ul class="flex flex-wrap gap-x-6 gap-y-2 md:flex-col md:gap-2 md:text-right">
 				{
-					nav(local).map(({ label, href }) => (
+					links.map(({ label, href }) => (
 						<li>
 							<a class="transition-colors duration-(--motion-tap) hover:text-ink" href={href}>
 								{label}

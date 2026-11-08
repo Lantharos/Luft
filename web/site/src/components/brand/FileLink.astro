@@ -1,0 +1,22 @@
+---
+import { localize } from '../../i18n/pages';
+
+interface Props {
+	name: string;
+	href: string;
+	format: string;
+	file: string;
+}
+
+const { t } = localize(Astro);
+const { name, href, format, file } = Astro.props;
+---
+
+<a
+	href={href}
+	download={file}
+	aria-label={t('brand-download', { name, format })}
+	class="inline-flex h-8 items-center rounded-full bg-ink/8 px-3.5 text-sm font-semibold transition-colors duration-(--motion-tap) hover:bg-ink/13"
+>
+	{format}
+</a>

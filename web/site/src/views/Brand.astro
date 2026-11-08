@@ -1,0 +1,19 @@
+---
+import Base from '../layouts/Base.astro';
+import AppIcons from '../components/brand/AppIcons.astro';
+import Colours from '../components/brand/Colours.astro';
+import Logos from '../components/brand/Logos.astro';
+import { localize } from '../i18n/pages';
+
+const { t } = localize(Astro);
+---
+
+<Base title={t('brand-title')} description={t('brand-description')} page="brand">
+	<section class="page pt-36 pb-16 md:pt-44 md:pb-20">
+		<h1 class="enter text-[clamp(3rem,8vw,6.5rem)] leading-none font-semibold tracking-[-0.04em] text-balance">{t('brand-heading')}</h1>
+		<p class="enter mt-5 max-w-2xl text-lede text-ink-soft" style="--order: 1">{t('brand-lede')}</p>
+	</section>
+	<Logos />
+	<Colours />
+	<AppIcons />
+</Base>

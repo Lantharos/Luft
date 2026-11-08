@@ -1,6 +1,6 @@
 # Luft website
 
-The site at [luft.computer](https://luft.computer): the home page and downloads. Built with [Astro](https://astro.build) and Tailwind, as static files for Cloudflare. Colours, fonts and links come from [`web/shared`](../shared/README.md).
+The site at [luft.computer](https://luft.computer): the home page, downloads and the brand page. Built with [Astro](https://astro.build) and Tailwind, as static files for Cloudflare. Colours, fonts and links come from [`web/shared`](../shared/README.md).
 
 ## Run it
 

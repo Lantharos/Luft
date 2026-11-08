@@ -2,6 +2,9 @@
 	"apps/store/meet/desktop/src/linux/helper/machine.rs": {
 		"/etc/os-release": "Reads which Linux Meet Luft runs on"
 	},
+	"apps/store/meet/desktop/src/linux/luft.rs": {
+		"/etc/os-release": "Reads which Linux Meet Luft runs on"
+	},
 	"apps/store/meet/desktop/src/linux/regional/keyboards.rs": {
 		"/etc/vconsole.conf": "Reads the keyboard layout of the Linux Meet Luft runs on",
 		"/etc/default/keyboard": "Reads the keyboard layout of the Linux Meet Luft runs on",
@@ -34,9 +37,6 @@
 	"kestrel/settings/src/modules/system/housekeeping/mounts.rs": {
 		"/etc/fstab": "Reads the drives an administrator mounts"
 	},
-	"kestrel/settings/src/shared/location.rs": {
-		"/etc/localtime": "Reads the time zone"
-	},
 	"kestrel/ui/src/extensions/api/v1/clock.ts": {
 		"/etc/localtime": "Watches for the time zone changing"
 	},
@@ -56,6 +56,9 @@
 		"/etc/ld.so.cache": "Shows the thumbnailer's sandbox what it needs read-only",
 		"/etc/alternatives": "Shows the thumbnailer's sandbox what it needs read-only",
 		"/etc/fonts": "Shows the thumbnailer's sandbox what it needs read-only"
+	},
+	"packages/daylight/src/place.rs": {
+		"/etc/localtime": "Reads the time zone"
 	},
 	"packages/system/network/src/vpn/plugins.rs": {
 		"/etc/NetworkManager/VPN": "Reads the VPN plugins installed"

@@ -29,6 +29,7 @@
 	"security/data/firewall/luft-firewall.service": 1.7,
 	"security/data/remote-login/luft-remote-login.service": 1.6,
 	"security/data/trust/dracut/trustd-encrypt.service": 8.6,
+	"security/data/trust/dracut/trustd-move-drive.service": 8.6,
 	"security/data/trust/dracut/trustd-move.service": 8.6,
 	"security/data/trust/systemd/trustd-before-restart.service": 8.7,
 	"security/data/trust/systemd/trustd-drives.service": 0.9,

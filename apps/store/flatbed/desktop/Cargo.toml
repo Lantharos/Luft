@@ -1,0 +1,35 @@
+[package]
+name = "flatbed"
+version = "0.1.0"
+description = "Scans documents with scanners and the camera"
+authors = ["Kristof"]
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[lib]
+name = "flatbed_lib"
+
+[dependencies]
+dirs.workspace = true
+fast_image_resize = { workspace = true, features = ["image", "rayon"] }
+flate2 = { workspace = true, features = ["zlib-rs"] }
+image = { workspace = true, features = ["jpeg", "png", "webp", "tiff", "bmp", "gif", "rayon"] }
+imageproc.workspace = true
+jpeg-encoder = { workspace = true, features = ["simd"] }
+libc.workspace = true
+libloading.workspace = true
+luft-app = { workspace = true, features = ["camera", "settings"] }
+mdns-sd.workspace = true
+pdf-writer.workspace = true
+rayon.workspace = true
+roxmltree.workspace = true
+sabine.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+specta.workspace = true
+tokio = { workspace = true, features = ["rt"] }
+ureq.workspace = true
+
+[lints]
+workspace = true

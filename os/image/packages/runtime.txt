@@ -98,6 +98,8 @@ power-profiles-daemon
 ptouch-driver
 pulseaudio-utils
 rclone
+sane-backends
+sane-backends-drivers-scanners
 shared-mime-info
 skopeo
 splix
@@ -108,6 +110,11 @@ swtpm
 swtpm-selinux
 systemd-boot-unsigned
 systemd-oomd-defaults
+tesseract
+tesseract-langpack-deu
+tesseract-langpack-eng
+tesseract-langpack-hrv
+tesseract-langpack-sqi
 thermald
 udisks2
 upower

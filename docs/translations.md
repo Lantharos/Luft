@@ -43,6 +43,7 @@ Luft is translated into Albanian, Bosnian, Bulgarian, Catalan, Croatian, Czech, 
 | soundboard | `apps/store/soundboard/locales/*/soundboard.ftl` | Soundboard's boards, tiles, sound editor and levels |
 | soundboard-desktop | `apps/store/soundboard/desktop/locales/*/desktop.ftl` | Soundboard's tray menu and its stop-all shortcut |
 | heft | `apps/store/heft/locales/*/heft.ftl` | Heft: subjects, notebooks and books, the pens and tools, search, saving copies and its pen settings |
+| flatbed | `apps/store/flatbed/locales/*/flatbed.ftl` | Flatbed: scanners, the camera, pages, saving and its settings |
 | convertible | `apps/store/convertible/locales/*/convertible.ftl` | Convertible's window: formats, options, the editor and the queue |
 | convertible-desktop | `apps/store/convertible/desktop/locales/*/desktop.ftl` | why a conversion failed, from Convertible's native side |
 | site | `web/site/locales/*/site.ftl` | the website's header, footer, language list and missing-page page |

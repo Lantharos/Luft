@@ -1,0 +1,39 @@
+[app]
+id = "com.lantharos.Flatbed"
+name = "Flatbed"
+generic_name = "Document Scanner"
+categories = ["Graphics", "Scanning", "Office"]
+keywords = ["scan", "scanner", "scanning", "document", "documents", "paper", "pdf", "ocr", "text recognition", "camera", "photo", "receipt", "airscan", "escl", "sane", "simple-scan", "document scanner", "skeniraj", "skener", "skano", "skaner", "scannen"]
+version = "0.1.0"
+maintainer = "Lantharos <kristof@lanth.me>"
+icon = "public/favicon.svg"
+cargo_manifest = "desktop/Cargo.toml"
+
+[install]
+command = "cargo run --manifest-path desktop/Cargo.toml --"
+
+[web]
+root = "."
+dist = "dist"
+entry = "dist/index.html"
+build = "bun run build"
+local_files = true
+
+[updates]
+provider = "schelf"
+
+[sandbox]
+network = true
+filesystems = ["xdg-pictures:ro", "xdg-download:ro"]
+devices = ["usb"]
+
+[bindings]
+path = "src/lib/bindings.ts"
+id = "com.lantharos.Flatbed"
+kind = "app"
+format = "sabine"
+permissions = "Sabine.toml"
+listing = "store/"
+
+[requires]
+sabine = "0.82"

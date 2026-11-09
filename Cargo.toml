@@ -5,6 +5,7 @@ members = [
     "apps/store/convertible/desktop",
     "apps/system/disks/desktop",
     "apps/store/draft/desktop",
+    "apps/store/flatbed/desktop",
     "apps/store/heft/desktop",
     "apps/system/keys/desktop",
     "apps/store/magpie/desktop",
@@ -87,6 +88,7 @@ default-members = [
     "apps/store/convertible/desktop",
     "apps/system/disks/desktop",
     "apps/store/draft/desktop",
+    "apps/store/flatbed/desktop",
     "apps/store/heft/desktop",
     "apps/system/keys/desktop",
     "apps/store/magpie/desktop",
@@ -255,6 +257,7 @@ icu_time = { version = "2.3.0", default-features = false }
 ignore = "0.4.33"
 image = { version = "0.25.10", default-features = false, features = ["png"] }
 imagequant = { version = "4.4.1", default-features = false }
+imageproc = { version = "0.27.0", default-features = false }
 imagesize = "0.15.0"
 img-parts = "0.4.2"
 infer = { version = "0.19.0", default-features = false, features = ["std"] }
@@ -270,6 +273,7 @@ libc = "0.2.191"
 libloading = "0.9.0"
 liblzma = "0.4.9"
 libm = "0.2.16"
+mdns-sd = { version = "0.21.7", default-features = false }
 libpulse-binding = "2.30.1"
 llama-cpp-2 = { version = "0.1.161", default-features = false }
 lofty = "0.25.5"
@@ -293,6 +297,7 @@ ort = { version = "2.0.0-rc.15", default-features = false }
 p256 = { version = "0.14.0", default-features = false }
 parking_lot = "0.13.0"
 percent-encoding = "2.3.2"
+pdf-writer = "0.15.0"
 pipewire = "0.10.1"
 png = "0.18.1"
 pollster = "1.0.1"

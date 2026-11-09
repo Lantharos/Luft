@@ -34,3 +34,4 @@ kestrel/ui/src/extensions/runtime/manifest.ts	${key}'s when is outside what ${pa
 kestrel/ui/src/system/send/service.ts	Only the app in front can send files
 kestrel/ui/src/system/send/service.ts	The Send sheet is already open
 kestrel/ui/src/system/send/service.ts	Too many Send sheets opened in the last minute
+kestrel/ui/src/extensions/fileActions/service.ts	Only Rover can use file actions

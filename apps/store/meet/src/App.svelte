@@ -59,7 +59,7 @@
 			if (installed && session.step === 'hello') void luft.open();
 		});
 		void commands.meetLocale().then((locale) => {
-			stops.push(appearance.start({ palette: null, lines: 'none', typography: { interface: null, monospace: null, textScale: 1 }, motion: 'full', corners: 'rounded', locale }));
+			stops.push(appearance.start({ palette: null, lines: 'none', typography: { interface: null, monospace: null, textScale: 1 }, motion: 'full', corners: 'rounded', keyboard: true, posture: 'laptop', locale }));
 		});
 		return () => stops.forEach((stop) => stop());
 	});

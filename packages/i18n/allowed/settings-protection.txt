@@ -4,3 +4,4 @@ apps/system/settings/src/lib/panels/protection/security/secureboot/shim.ts	Enrol
 apps/system/settings/src/lib/panels/protection/security/secureboot/shim.ts	Enroll the key(s)?
 apps/system/settings/src/lib/panels/protection/security/secureboot/shim.ts	Delete MOK
 apps/system/settings/src/lib/panels/protection/security/secureboot/shim.ts	Delete the key(s)?
+apps/system/settings/src/lib/panels/protection/security/remote/AddKeyDialog.svelte	ssh-ed25519 AAAAC3NzaC1lZDI1NTE5… you@laptop

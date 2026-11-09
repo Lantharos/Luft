@@ -2,7 +2,7 @@ FROM quay.io/fedora/fedora:45
 
 RUN dnf install --assumeyes --setopt=install_weak_deps=False \
       git rustup gcc gcc-c++ clang-devel cmake pkgconf-pkg-config zstd \
-      glib2-devel gstreamer1-devel gstreamer1-plugins-base-devel gstreamer1-plugins-good pipewire-devel pulseaudio-libs-devel \
+      glib2-devel gstreamer1-devel gstreamer1-plugins-base-devel gstreamer1-plugins-good gstreamer1-plugins-bad-free pipewire-devel pulseaudio-libs-devel \
       pipewire pipewire-utils pipewire-pulseaudio wireplumber \
       glycin-loaders bubblewrap \
       fontconfig-devel wayland-devel libxkbcommon-devel libdrm-devel \

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import MonitorSmartphone from '@lucide/svelte/icons/monitor-smartphone';
+	import Plus from '@lucide/svelte/icons/plus';
 	import { t } from '@luft/i18n';
 	import { basename, errorText, IconButton, Row, Section, Segmented, Switch } from '@luft/ui';
 	import X from '@lucide/svelte/icons/x';
@@ -101,7 +102,7 @@
 	{:else}
 		<Row title={t('settings-post-devices-none')} />
 	{/each}
-	<Row title={t('settings-post-add')} onclick={visibility === 'no-one' ? undefined : () => (pairing = true)} disabled={visibility === 'no-one'} />
+	<Row title={t('settings-post-add')} icon={Plus} onclick={visibility === 'no-one' ? undefined : () => (pairing = true)} disabled={visibility === 'no-one'} />
 </Section>
 
 <Section>

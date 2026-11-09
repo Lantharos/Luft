@@ -122,6 +122,10 @@
 		color: var(--text-muted);
 	}
 
+	.trailing > :global(.icon-button:last-child) {
+		margin-right: -7px;
+	}
+
 	.below {
 		display: flex;
 		flex-direction: column;

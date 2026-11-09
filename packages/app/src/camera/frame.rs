@@ -15,10 +15,41 @@ pub enum Packing {
 
 const JPEG: u8 = 0;
 const RGBA: u8 = 1;
+const HEADER: usize = 12;
 
-/// A frame for the page: a byte saying JPEG or RGBA, three spare, the width
-/// and height as little endian u32, then the pixels.
-pub fn encode(packing: Packing, bytes: &[u8], stride: usize) -> Option<Vec<u8>> {
+/// A frame as it goes to a page: a byte saying JPEG or RGBA, three spare,
+/// the width and height as little endian u32 (zero for JPEG), then the
+/// pixels.
+pub struct Frame(Vec<u8>);
+
+impl Frame {
+    pub fn is_jpeg(&self) -> bool {
+        self.0[0] == JPEG
+    }
+
+    /// The width and height of RGBA pixels.
+    pub fn size(&self) -> (u32, u32) {
+        let word =
+            |at: usize| u32::from_le_bytes(self.0[at..at + 4].try_into().expect("four bytes"));
+        (word(4), word(8))
+    }
+
+    /// The JPEG file or the RGBA pixels.
+    pub fn pixels(&self) -> &[u8] {
+        &self.0[HEADER..]
+    }
+
+    /// The frame as it goes to a page.
+    pub fn as_bytes(&self) -> &[u8] {
+        &self.0
+    }
+
+    pub fn into_bytes(self) -> Vec<u8> {
+        self.0
+    }
+}
+
+pub fn encode(packing: Packing, bytes: &[u8], stride: usize) -> Option<Frame> {
     match packing {
         Packing::Unknown => None,
         Packing::Jpeg => Some(framed(JPEG, 0, 0, bytes.len(), |out| {
@@ -46,13 +77,13 @@ fn framed(
     height: u32,
     size: usize,
     fill: impl FnOnce(&mut Vec<u8>),
-) -> Vec<u8> {
-    let mut out = Vec::with_capacity(12 + size);
+) -> Frame {
+    let mut out = Vec::with_capacity(HEADER + size);
     out.extend_from_slice(&[kind, 0, 0, 0]);
     out.extend_from_slice(&width.to_le_bytes());
     out.extend_from_slice(&height.to_le_bytes());
     fill(&mut out);
-    out
+    Frame(out)
 }
 
 fn rgba(format: VideoFormat, row: &[u8], width: usize, out: &mut Vec<u8>) {

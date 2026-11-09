@@ -1,22 +1,23 @@
-mod frame;
-mod stream;
-
 use std::sync::Mutex;
 
-use luft_app::portal;
+use luft_app::camera::{Camera, Request};
 use luft_app::{Commands, Empty};
 use sabine::{BridgeCommand, BridgeResponse, BridgeResult, SabineWindow};
 
-use stream::Camera;
-
 static CAMERA: Mutex<Option<Camera>> = Mutex::new(None);
+
+const REQUEST: Request = Request {
+    app_name: "Heft",
+    app_id: "com.lantharos.Heft",
+    size: (1280, 720),
+    largest: (1920, 1080),
+};
 
 /// Opens the camera through the camera portal; false when the person said no.
 async fn open(Empty {}: Empty) -> Result<bool, String> {
-    let Some(remote) = portal::camera().await? else {
+    let Some(camera) = Camera::open(REQUEST).await? else {
         return Ok(false);
     };
-    let camera = Camera::open(remote.into())?;
     *CAMERA.lock().expect("camera lock") = Some(camera);
     Ok(true)
 }
@@ -32,7 +33,9 @@ fn frame(_: BridgeCommand) -> BridgeResult {
         .expect("camera lock")
         .as_ref()
         .and_then(Camera::take_frame);
-    Ok(BridgeResponse::bytes(frame.unwrap_or_default()))
+    Ok(BridgeResponse::bytes(
+        frame.map(|frame| frame.into_bytes()).unwrap_or_default(),
+    ))
 }
 
 pub fn register(window: SabineWindow) -> SabineWindow {

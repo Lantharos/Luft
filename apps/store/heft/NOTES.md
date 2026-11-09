@@ -42,7 +42,7 @@ Heft is a store app (`apps/store/heft`), like Draft, Magpie and Convertible: the
 - The ruler lives in screen pixels per pane, so pages scroll and zoom under it. A stroke that starts within 26 px of a long edge, or on the ruler, has every sample projected onto that edge, offset by the pen's radius, before smoothing; shape recognition is off for it.
 - Lasso selections and picked book text can be carried to the other pane. A lasso on a book page also keeps the looped area itself, and across panes it lands as a picture of that part of the page (pdf.js at twice the size, plus the ink); ink from notes pages is copied as strokes.
 - Crops are stored with the picture (`crop`, shares of the full picture), so the asset is never rewritten and a crop can be undone or changed later.
-- The camera goes through the camera portal: Heft's native side opens the PipeWire remote the portal hands it, asks for MJPG or raw YUY2/RGB, keeps only the newest frame, and the page pulls frames one at a time, so a slow page never queues frames.
+- The camera goes through the camera portal: `luft_app::camera` opens the PipeWire remote the portal hands it, asks for MJPG or raw YUY2/RGB, keeps only the newest frame, and the page pulls frames one at a time, so a slow page never queues frames.
 
 ## Handwriting search
 

@@ -12,6 +12,7 @@ path = "../web/ui/src/bindings/appearance.ts"
 
 [features]
 apps = ["dep:dirs", "dep:gio", "dep:gio-unix"]
+camera = ["dep:pipewire"]
 folders = ["dep:dirs"]
 fonts = ["dep:dirs", "dep:gio", "dep:memmap2", "dep:skrifa"]
 ibus = ["dep:dirs"]
@@ -55,6 +56,7 @@ luft-i18n.workspace = true
 md-5 = { workspace = true, optional = true }
 memmap2 = { workspace = true, optional = true }
 parking_lot = { workspace = true, optional = true }
+pipewire = { workspace = true, optional = true }
 png = { workspace = true, optional = true }
 sabine.workspace = true
 skrifa = { workspace = true, optional = true }

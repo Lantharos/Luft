@@ -11,9 +11,19 @@ use spa::param::video::{VideoFormat, VideoInfoRaw};
 use spa::pod::Pod;
 use spa::utils::{Fraction, Rectangle};
 
-use super::frame::{self, Packing};
+use super::frame::{self, Frame, Packing};
 
-type Latest = Arc<Mutex<Option<Vec<u8>>>>;
+type Latest = Arc<Mutex<Option<Frame>>>;
+
+/// What the stream asks the camera for: the size it would like, and the
+/// largest it takes.
+#[derive(Clone, Copy)]
+pub struct Request {
+    pub app_name: &'static str,
+    pub app_id: &'static str,
+    pub size: (u32, u32),
+    pub largest: (u32, u32),
+}
 
 /// The camera streaming on a thread of its own, keeping only its newest
 /// frame for the page to pick up. Dropping it closes the camera.
@@ -24,7 +34,7 @@ pub struct Camera {
 }
 
 impl Camera {
-    pub fn open(remote: OwnedFd) -> Result<Self, String> {
+    pub(super) fn start(remote: OwnedFd, request: Request) -> Result<Self, String> {
         let (quit, quit_receiver) = pw::channel::channel();
         let (opened, opened_receiver) = mpsc::channel();
         let latest = Latest::default();
@@ -32,7 +42,7 @@ impl Camera {
         let thread = std::thread::Builder::new()
             .name("camera".into())
             .spawn(move || {
-                if let Err(error) = stream(remote, frames, quit_receiver, &opened) {
+                if let Err(error) = stream(remote, request, frames, quit_receiver, &opened) {
                     let _ = opened.send(Err(error));
                 }
             })
@@ -47,7 +57,8 @@ impl Camera {
         })
     }
 
-    pub fn take_frame(&self) -> Option<Vec<u8>> {
+    /// The newest frame since the last one taken.
+    pub fn take_frame(&self) -> Option<Frame> {
         self.latest.lock().expect("camera frame lock").take()
     }
 }
@@ -70,7 +81,7 @@ fn serialized(object: spa::pod::Object) -> Result<Vec<u8>, String> {
     .map_err(|error| format!("{error:?}"))
 }
 
-fn formats() -> Result<[Vec<u8>; 2], String> {
+fn formats(request: Request) -> Result<[Vec<u8>; 2], String> {
     let size = || {
         spa::pod::property!(
             FormatProperties::VideoSize,
@@ -78,16 +89,16 @@ fn formats() -> Result<[Vec<u8>; 2], String> {
             Range,
             Rectangle,
             Rectangle {
-                width: 1280,
-                height: 720
+                width: request.size.0,
+                height: request.size.1
             },
             Rectangle {
                 width: 1,
                 height: 1
             },
             Rectangle {
-                width: 1920,
-                height: 1080
+                width: request.largest.0,
+                height: request.largest.1
             }
         )
     };
@@ -155,6 +166,7 @@ fn negotiated(param: &Pod) -> Packing {
 
 fn stream(
     remote: OwnedFd,
+    request: Request,
     latest: Latest,
     quit: pw::channel::Receiver<()>,
     opened: &mpsc::Sender<Result<(), String>>,
@@ -168,10 +180,11 @@ fn stream(
         *pw::keys::MEDIA_TYPE => "Video",
         *pw::keys::MEDIA_CATEGORY => "Capture",
         *pw::keys::MEDIA_ROLE => "Camera",
-        *pw::keys::APP_NAME => "Heft",
-        *pw::keys::APP_ID => "com.lantharos.Heft",
+        *pw::keys::APP_NAME => request.app_name,
+        *pw::keys::APP_ID => request.app_id,
     };
-    let stream = pw::stream::StreamBox::new(&core, "Heft camera", props).map_err(failed)?;
+    let name = format!("{} camera", request.app_name);
+    let stream = pw::stream::StreamBox::new(&core, &name, props).map_err(failed)?;
     let _listener = stream
         .add_local_listener_with_user_data(Packing::default())
         .param_changed(|_, packing, id, param| {
@@ -206,7 +219,7 @@ fn stream(
         })
         .register()
         .map_err(failed)?;
-    let formats = formats()?;
+    let formats = formats(request)?;
     let mut params = formats
         .iter()
         .map(|format| Pod::from_bytes(format).ok_or("Couldn't describe the camera formats"))

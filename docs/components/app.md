@@ -69,7 +69,7 @@ window
 | `dbus` | [luft-dbus](../../packages/dbus): async `session()` and `system()` connections, `at(address)` connects to any other bus |
 | `identity` | [luft-identity](../../packages/identity): who a caller is and what apps were allowed |
 | `dbus::objects` | `Objects` reads `ObjectManager` trees; `signals` and `settle` follow their changes |
-| `portal` | `open_file` and `open_files` show the file chooser and return `file://` URIs; `FileChooser` for saving, folders and several filters; `path_uri` and `uri_path` convert between paths and URIs |
+| `portal` | `open_file` and `open_files` show the file chooser and return `file://` URIs; `FileChooser` for saving, folders and several filters; `reveal` shows a file in the file manager and `open_with` asks which app to open it with, both through the portal so they work from a sandbox; `camera` asks for the camera; `path_uri` and `uri_path` convert between paths and URIs |
 | `file_manager` | `show_in_folder(path, token)` opens the folder with the file selected, `show_folder(path, token)` opens the folder itself |
 | `launch` | `pass_token` gives a launched program the activation token a page got from `activationToken()` in `@luft/ui`, or clears the one the app was started with; `Token` takes a command's `token` alone |
 | `secrets` | `store`, `load` and `delete` for the app's own secrets in Luft Keyring |
@@ -81,6 +81,7 @@ window
 | Feature | Module | Use |
 | --- | --- | --- |
 | `apps` | `apps` | `App` with an installed app's id, name and icon path; `icon_path` and `sort_by_name` |
+| `camera` | `camera` | `Camera::open` asks for the camera through the portal and streams it on a thread of its own, asking PipeWire for MJPG or raw frames of the size given; `take_frame` hands over the newest frame since the last one, as JPEG or RGBA, so a slow page never queues frames |
 | `fonts` | `fonts` | `installed()` lists every font face; `user_folder`, `belongs_to_user`, `refresh` and `remove` manage the user's own fonts; `is_monospaced` and `has_fixed_advances`; `use_family`, `reset` and `defaults` set the desktop's system or monospace font |
 | `ibus` | `ibus` | `address()` finds the session's IBus daemon, to connect to with `dbus::at` |
 | `launch` | `launch::context` | A launch context that hands the page's activation token to the app it starts, so its window comes to the front |

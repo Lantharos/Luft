@@ -13,7 +13,7 @@ name = "heft_lib"
 [dependencies]
 dirs.workspace = true
 futures-util.workspace = true
-luft-app = { workspace = true, features = ["settings"] }
+luft-app = { workspace = true, features = ["camera", "settings"] }
 luft-handwriting.workspace = true
 luft-language.workspace = true
 luft-speech.workspace = true

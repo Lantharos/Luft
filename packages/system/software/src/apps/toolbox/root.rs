@@ -1,5 +1,9 @@
 use std::process::{Command, Stdio};
+use std::thread;
+use std::time::Duration;
 
+const STOPPING_CHECKS: u32 = 20;
+const STOPPING_CHECK_EVERY: Duration = Duration::from_secs(1);
 const SET_UP: &str = "/usr/local/share/luft-set-up";
 const HAND_OFF: &str = "for tool in xdg-open xdg-email; do \
     for handler in /usr/libexec/flatpak-xdg-utils/$tool /usr/bin/flatpak-$tool; do \
@@ -19,15 +23,15 @@ pub fn command(container: &str, program: &[&str]) -> Command {
     command
 }
 
-fn start(container: &str) {
-    if !podman(&["start", container]) {
-        podman(&[
-            "wait",
-            "--condition=stopped",
-            "--condition=exited",
-            container,
-        ]);
-        podman(&["start", container]);
+pub fn start(container: &str) {
+    if !podman(&["container", "exists", container]) {
+        return;
+    }
+    for _ in 0..STOPPING_CHECKS {
+        if podman(&["start", container]) {
+            return;
+        }
+        thread::sleep(STOPPING_CHECK_EVERY);
     }
 }
 

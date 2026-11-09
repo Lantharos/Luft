@@ -95,6 +95,9 @@ pub fn friendly(messages: &str) -> String {
         .map(|line| line.strip_prefix("Error:").unwrap_or(line).trim())
         .unwrap_or_default();
     let lowered = messages.to_lowercase();
+    if lowered.contains("container state improper") {
+        return "Its container is still shutting down. Try again in a minute.".into();
+    }
     if lowered.contains("no match for argument") {
         "That isn't available from Fedora.".into()
     } else if lowered.contains("cannot download")

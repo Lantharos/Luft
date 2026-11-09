@@ -153,7 +153,11 @@ fn from_store(updates: Vec<StoreUpdate>) -> Vec<AppUpdate> {
         .map(|update| {
             let desktop = Some(format!("{}.desktop", update.local));
             let (key, source, desktop) = match update.format {
-                Format::Appimage => (format!("appimage/{}", update.local), Source::AppImage, desktop),
+                Format::Appimage => (
+                    format!("appimage/{}", update.local),
+                    Source::AppImage,
+                    desktop,
+                ),
                 Format::Sabine => (format!("sabine/{}", update.id), Source::Sabine, desktop),
                 Format::LuftExtension => {
                     (format!("extension/{}", update.id), Source::Extension, None)
@@ -197,10 +201,17 @@ pub async fn find() -> (Vec<AppUpdate>, Option<String>) {
     let flatpaks = joined(flatpaks).await;
     let tools = joined(tools).await;
     let appimages = appimages.await.unwrap_or_default();
-    let error = [&flatpaks, &tools, &debs, &store]
-        .into_iter()
-        .find_map(|result| result.as_ref().err())
-        .cloned();
+    let error = [
+        ("Flathub apps", &flatpaks),
+        ("command-line tools", &tools),
+        ("Ubuntu apps", &debs),
+        ("schelf.store apps", &store),
+    ]
+    .into_iter()
+    .find_map(|(source, result)| {
+        let reason = result.as_ref().err()?;
+        Some(format!("Couldn't check your {source}. {reason}"))
+    });
     let mut apps: Vec<AppUpdate> = flatpaks.unwrap_or_default();
     apps.extend(appimages);
     apps.extend(tools.unwrap_or_default());

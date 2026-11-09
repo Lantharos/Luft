@@ -103,6 +103,9 @@ pub fn friendly(messages: &str) -> String {
         .map(|line| line.strip_prefix("E:").unwrap_or(line).trim())
         .unwrap_or_default();
     let lowered = messages.to_lowercase();
+    if lowered.contains("container state improper") {
+        return "Its container is still shutting down. Try again in a minute.".into();
+    }
     if lowered.contains("unmet dependencies") || lowered.contains("but it is not installable") {
         "It needs software that Ubuntu doesn't have, so it can't be installed here.".into()
     } else if lowered.contains("temporary failure resolving")

@@ -15,7 +15,7 @@
 
 	const headline = $derived.by(() => {
 		if (!library.updates) return library.checking ? 'Checking for updates' : 'Updates';
-		if (!updates.length) return 'Your apps are up to date';
+		if (!updates.length) return library.error ? 'No updates found' : 'Your apps are up to date';
 		return `${updates.length} ${updates.length === 1 ? 'update' : 'updates'} available`;
 	});
 

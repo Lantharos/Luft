@@ -30,7 +30,6 @@ jobs:
       web: ${{ steps.affected.outputs.web }}
       kestrel: ${{ steps.affected.outputs.kestrel }}
       units: ${{ steps.affected.outputs.units }}
-      weblate: ${{ steps.affected.outputs.weblate }}
       compositor: ${{ steps.affected.outputs.compositor }}
       dbus: ${{ steps.affected.outputs.dbus }}
     steps:
@@ -256,21 +255,6 @@ jobs:
 
       - run: bun .github/scripts/units/index.ts
 
-  weblate:
-    name: Weblate components
-    needs: changes
-    if: needs.changes.outputs.weblate == 'true'
-    runs-on: ubuntu-slim
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v7
-
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-
-      - run: bun packages/i18n/tools/weblate.ts
-
   compositor-identity:
     name: Compositor identity rules
     needs: changes
@@ -343,7 +327,7 @@ jobs:
 
   checks:
     name: Checks
-    needs: [changes, rust, uefi, meet-windows, web, kestrel, units, weblate, compositor-identity, dbus, etc, image-sources]
+    needs: [changes, rust, uefi, meet-windows, web, kestrel, units, compositor-identity, dbus, etc, image-sources]
     if: always()
     runs-on: ubuntu-slim
     steps:

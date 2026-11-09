@@ -7,7 +7,6 @@ import { covers, Graph } from './graph';
 import { touchesKestrel } from './kestrel';
 import { changedFiles, git, resolveRange } from './range';
 import { buildRust, type Crate, packageArguments, workspaceChanges } from './rust';
-import { touchesTranslations } from './translations';
 import { buildWeb, touchesInstall } from './web';
 
 process.chdir(git('rev-parse', '--show-toplevel')!);
@@ -21,15 +20,14 @@ const graph = new Graph();
 const crates = buildRust(graph, files);
 const webTargets = buildWeb(graph, files);
 
-function plan(changes: { base: string; files: string[] } | undefined): { crates: Crate[]; web: string[]; kestrel: boolean; units: boolean; weblate: boolean; compositor: boolean; dbus: boolean } {
-	if (!changes || changes.files.some((file) => RUNS_EVERYTHING.some((path) => covers(path, file)))) return { crates, web: webTargets, kestrel: true, units: true, weblate: true, compositor: true, dbus: true };
+function plan(changes: { base: string; files: string[] } | undefined): { crates: Crate[]; web: string[]; kestrel: boolean; units: boolean; compositor: boolean; dbus: boolean } {
+	if (!changes || changes.files.some((file) => RUNS_EVERYTHING.some((path) => covers(path, file)))) return { crates, web: webTargets, kestrel: true, units: true, compositor: true, dbus: true };
 	const affected = graph.affected([...changes.files, ...workspaceChanges(crates, changes.files, changes.base)]);
 	return {
 		crates: crates.filter((crate) => affected.has(crate.dir)),
 		web: touchesInstall(changes.files) ? webTargets : webTargets.filter((dir) => affected.has(dir)),
 		kestrel: touchesKestrel(changes.files, affected),
 		units: changes.files.some((file) => isUnitPath(file) || covers(UNIT_CHECK, file)),
-		weblate: touchesTranslations(changes.files),
 		compositor: changes.files.some((file) => COMPOSITOR.some((path) => covers(path, file))),
 		dbus: touchesDbus(changes.files),
 	};
@@ -48,7 +46,6 @@ const outputs = {
 	web: JSON.stringify(runs.web),
 	kestrel: String(runs.kestrel),
 	units: String(runs.units),
-	weblate: String(runs.weblate),
 	compositor: String(runs.compositor),
 	dbus: String(runs.dbus),
 };

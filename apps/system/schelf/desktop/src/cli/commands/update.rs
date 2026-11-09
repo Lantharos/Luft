@@ -182,10 +182,10 @@ fn unknown(names: &[String], updates: &[AppUpdate], only: Option<Origin>) -> Opt
 pub fn run(arguments: &Arguments) -> Exit {
     let line = Line::default();
     line.say("Checking for updates");
-    let (mut updates, error) = block_on(updates::find());
+    let (mut updates, failed) = block_on(updates::find());
     line.clear();
-    if let Some(error) = &error {
-        eprintln!("Not every update could be checked. {error}");
+    for failure in &failed {
+        eprintln!("{failure}");
     }
     updates.retain(|update| {
         arguments
@@ -199,7 +199,7 @@ pub fn run(arguments: &Arguments) -> Exit {
         updates.retain(|update| arguments.words.iter().any(|name| named(update, name)));
     }
     if updates.is_empty() {
-        if error.is_some() {
+        if !failed.is_empty() {
             return Exit::Failed;
         }
         if arguments.words.is_empty() {

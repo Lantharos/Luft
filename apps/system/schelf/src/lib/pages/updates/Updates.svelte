@@ -11,11 +11,12 @@
 	const tools = $derived(updates.filter((update) => update.source === 'tool'));
 	const platforms = $derived(updates.filter((update) => update.platform));
 	const waiting = $derived(updates.filter((update) => !operations.forKey(update.key) || operations.forKey(update.key)?.state === 'failed'));
+	const failed = $derived(library.updates?.failed ?? []);
 	const size = $derived(updates.reduce((sum, update) => sum + update.size, 0));
 
 	const headline = $derived.by(() => {
 		if (!library.updates) return library.checking ? 'Checking for updates' : 'Updates';
-		if (!updates.length) return library.error ? 'No updates found' : 'Your apps are up to date';
+		if (!updates.length) return failed.length ? 'No updates found' : 'Your apps are up to date';
 		return `${updates.length} ${updates.length === 1 ? 'update' : 'updates'} available`;
 	});
 
@@ -50,6 +51,11 @@
 						{updates.length ? `${bytes(size)} to download · ` : ''}Checked {ago(library.updates.checked)}
 					{/if}
 				</span>
+				{#if !library.checking}
+					{#each failed as failure (failure)}
+						<span class="text-[13px] text-[var(--text-muted)]">{failure}</span>
+					{/each}
+				{/if}
 			</div>
 			<button type="button" class="button" disabled={library.checking} onclick={() => library.check()}>Check now</button>
 			{#if waiting.length > 1}

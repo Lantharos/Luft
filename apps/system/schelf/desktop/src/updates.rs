@@ -40,7 +40,7 @@ pub struct AppUpdate {
 struct Updates {
     apps: Vec<AppUpdate>,
     checked: u64,
-    error: Option<String>,
+    failed: Vec<String>,
 }
 
 fn flatpaks(updates: Vec<flatpak::Update>) -> Vec<AppUpdate> {
@@ -190,7 +190,7 @@ async fn joined<T>(work: JoinHandle<Result<T, String>>) -> Result<T, String> {
     work.await.unwrap_or_else(|error| Err(error.to_string()))
 }
 
-pub async fn find() -> (Vec<AppUpdate>, Option<String>) {
+pub async fn find() -> (Vec<AppUpdate>, Vec<String>) {
     let flatpaks = spawn_blocking(|| flatpak::updates().map(flatpaks));
     let tools = spawn_blocking(|| toolbox::updates().map(tools));
     let appimages = spawn_blocking(appimages);
@@ -201,34 +201,32 @@ pub async fn find() -> (Vec<AppUpdate>, Option<String>) {
     let flatpaks = joined(flatpaks).await;
     let tools = joined(tools).await;
     let appimages = appimages.await.unwrap_or_default();
-    let error = [
-        ("Flathub apps", &flatpaks),
-        ("command-line tools", &tools),
-        ("Ubuntu apps", &debs),
-        ("schelf.store apps", &store),
+    let failed = [
+        ("Flathub apps", flatpaks.as_ref().err()),
+        ("command-line tools", tools.as_ref().err()),
+        ("Ubuntu apps", debs.as_ref().err()),
+        ("schelf.store apps", store.as_ref().err()),
     ]
     .into_iter()
-    .find_map(|(source, result)| {
-        let reason = result.as_ref().err()?;
-        Some(format!("Couldn't check your {source}. {reason}"))
-    });
+    .filter_map(|(source, reason)| Some(format!("Couldn't check your {source}. {}", reason?)))
+    .collect();
     let mut apps: Vec<AppUpdate> = flatpaks.unwrap_or_default();
     apps.extend(appimages);
     apps.extend(tools.unwrap_or_default());
     apps.extend(debs.unwrap_or_default());
     apps.extend(store.unwrap_or_default());
     apps.sort_by_cached_key(|update| (update.platform, update.name.to_lowercase()));
-    (apps, error)
+    (apps, failed)
 }
 
 async fn check(Empty {}: Empty) -> Result<Updates, String> {
-    let (apps, error) = find().await;
+    let (apps, failed) = find().await;
     Ok(Updates {
         apps,
         checked: SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .map_or(0, |time| time.as_secs()),
-        error,
+        failed,
     })
 }
 

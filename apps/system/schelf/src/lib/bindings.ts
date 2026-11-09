@@ -585,5 +585,5 @@ export type Typography = {
 export type Updates = {
 	apps: AppUpdate[],
 	checked: number,
-	error: string | null,
+	failed: string[],
 };

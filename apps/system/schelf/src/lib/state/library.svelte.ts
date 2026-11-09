@@ -27,7 +27,7 @@ class Library {
 		this.checking = true;
 		try {
 			this.updates = await commands.updatesCheck(SLOW);
-			this.error = this.updates.error;
+			this.error = null;
 		} catch (reason) {
 			this.error = String(reason);
 		} finally {

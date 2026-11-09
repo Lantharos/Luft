@@ -7422,32 +7422,6 @@ export namespace Gst {
 
     type PadTemplateClass = typeof PadTemplate;
 
-    class ParamSpecArray {
-        static $gtype: GObject.GType<ParamSpecArray>;
-
-        // Fields
-        element_spec: GObject.ParamSpec;
-    }
-
-
-    class ParamSpecFraction {
-        static $gtype: GObject.GType<ParamSpecFraction>;
-
-        // Fields
-        min_num: number;
-
-        min_den: number;
-
-        max_num: number;
-
-        max_den: number;
-
-        def_num: number;
-
-        def_den: number;
-    }
-
-
     class ParentBufferMeta {
         static $gtype: GObject.GType<ParentBufferMeta>;
 

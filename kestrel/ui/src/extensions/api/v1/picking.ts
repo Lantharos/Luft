@@ -25,7 +25,7 @@ let requests = 0;
 
 const string = (value: string) => GLib.Variant.new_string(value);
 
-function asked(method: 'OpenFile' | 'SaveFile', title: string, options: Record<string, GLib.Variant>): Promise<string[]> {
+export function askFileChooser(method: 'OpenFile' | 'SaveFile', title: string, options: Record<string, GLib.Variant>): Promise<string[]> {
   const bus = Gio.DBus.session;
   const token = `kestrel_extension_${++requests}`;
   const sender = bus.get_unique_name()!.slice(1).replaceAll('.', '_');
@@ -51,7 +51,7 @@ function asked(method: 'OpenFile' | 'SaveFile', title: string, options: Record<s
 }
 
 function chosen(options: PickOptions): Promise<string[]> {
-  return asked('OpenFile', options.title, {
+  return askFileChooser('OpenFile', options.title, {
     multiple: GLib.Variant.new_boolean(!!options.multiple),
     ...options.kind === 'folder'
       ? { directory: GLib.Variant.new_boolean(true) }
@@ -118,7 +118,7 @@ export async function pickFiles(context: ApiContext, options: PickOptions): Prom
 /** Lets people choose files or a folder with the file chooser, and returns where they are. */
 export async function chooseFiles(context: ApiContext, options: ChooseOptions): Promise<string[]> {
   if (!context.gestures.recent) throw new Error('Files can only be chosen right after people use the extension');
-  const uris = await asked('OpenFile', options.title, {
+  const uris = await askFileChooser('OpenFile', options.title, {
     multiple: GLib.Variant.new_boolean(!!options.multiple),
     directory: GLib.Variant.new_boolean(!!options.folder),
   });
@@ -138,7 +138,7 @@ export function writeText(context: ApiContext, path: string, text: string): Prom
 /** Asks where to save a text file and writes it there. */
 export async function saveFile(context: ApiContext, options: SaveOptions): Promise<boolean> {
   if (!context.gestures.recent) throw new Error('Files can only be saved right after people use the extension');
-  const [uri] = await asked('SaveFile', options.title, { current_name: string(options.name) });
+  const [uri] = await askFileChooser('SaveFile', options.title, { current_name: string(options.name) });
   if (!uri) return false;
   await replaceFile(Gio.File.new_for_uri(uri), options.text);
   return true;

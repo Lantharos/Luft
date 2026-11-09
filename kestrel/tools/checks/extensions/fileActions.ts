@@ -18,7 +18,8 @@ const {require, eventually} = checks('file actions');
 const FILES = 'com.example.Files';
 const FOLDER: Point = [330, 104];
 const NOTE: Point = [330, 140];
-const FIRST_ADDED = 10;
+const SEND_TO_DEVICE = 10;
+const FIRST_ADDED = SEND_TO_DEVICE + 1;
 const BEFORE_ADDED = 2;
 
 interface Chosen {

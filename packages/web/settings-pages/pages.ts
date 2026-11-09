@@ -1,6 +1,7 @@
 export type PanelId =
 	| 'network'
 	| 'bluetooth'
+	| 'post'
 	| 'display'
 	| 'sound'
 	| 'power'
@@ -61,7 +62,11 @@ const page = <Id extends PageId>(id: Id, title: string, symbol: string, { keywor
 });
 
 export const PANEL_PAGES: Page<PanelId>[][] = [
-	[page('network', 'settings-page-network', 'network-wireless-symbolic'), page('bluetooth', 'settings-page-bluetooth', 'bluetooth-active-symbolic')],
+	[
+		page('network', 'settings-page-network', 'network-wireless-symbolic'),
+		page('bluetooth', 'settings-page-bluetooth', 'bluetooth-active-symbolic'),
+		page('post', 'settings-page-post', 'post-symbolic')
+	],
 	[
 		page('display', 'settings-page-display', 'video-display-symbolic'),
 		page('sound', 'settings-page-sound', 'audio-speakers-symbolic'),

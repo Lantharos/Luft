@@ -12,6 +12,8 @@ const FIREWALL = `<node><interface name="com.lantharos.Firewall1">
   <method name="OpenPort"><arg name="port" type="q" direction="in"/><arg name="protocol" type="s" direction="in"/><arg name="networks" type="s" direction="in"/></method>
   <method name="ClosePort"><arg name="port" type="q" direction="in"/><arg name="protocol" type="s" direction="in"/></method>
   <method name="SetAppAccess"><arg name="kind" type="s" direction="in"/><arg name="id" type="s" direction="in"/><arg name="access" type="s" direction="in"/></method>
+  <method name="ForgetApp"><arg name="kind" type="s" direction="in"/><arg name="id" type="s" direction="in"/></method>
+  <method name="SetPostOpen"><arg name="open" type="b" direction="in"/></method>
   <method name="SetExtensionPorts"><arg name="ports" type="a(qs)" direction="in"/></method>
 </interface></node>`;
 const CONTROL = `<node><interface name="com.lantharos.KestrelChecks.Firewall">
@@ -27,7 +29,7 @@ type Classify = (connection: string, kind: string) => void;
 export function publishFirewall(publish: Publish, calls: string[], classify: Classify, unclassified: [string, string][] = []) {
   const uid = new Gio.Credentials().get_unix_user();
   const ports: [number, string, string][] = [[22, 'tcp', 'home']];
-  const apps: [string, string, string][] = [['app', 'steam', 'home'], ['app', 'com.obsproject.Studio', 'anywhere'], ['program', 'node', 'home'], ['app', 'discord', 'blocked']];
+  const apps: [string, string, string][] = [['app', 'steam', 'home'], ['app', 'com.obsproject.Studio', 'anywhere'], ['program', 'node', 'home'], ['program', 'flatbed', 'home'], ['app', 'discord', 'blocked']];
   const waiting: [string, string, number][] = [];
   const firewall = publish(FIREWALL, {
     get Unclassified() {
@@ -64,6 +66,14 @@ export function publishFirewall(publish: Publish, calls: string[], classify: Cla
       else apps.push([kind, id, access]);
       firewall.emit_property_changed('Apps', new GLib.Variant('a(sss)', apps));
       withdraw(kind, id);
+    },
+    ForgetApp(kind: string, id: string) {
+      calls.push(`ForgetApp ${kind} ${id}`);
+      apps.splice(apps.findIndex(([knownKind, knownId]) => knownKind === kind && knownId === id), 1);
+      firewall.emit_property_changed('Apps', new GLib.Variant('a(sss)', apps));
+    },
+    SetPostOpen(open: boolean) {
+      calls.push(`SetPostOpen ${open}`);
     },
     SetExtensionPorts(listen: [number, string][]) {
       calls.push(`SetExtensionPorts ${listen.map(([port, protocol]) => `${port}/${protocol}`).join(',')}`);

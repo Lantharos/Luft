@@ -9,7 +9,7 @@ Extensions add to Kestrel: layers over the wallpaper, shaders on windows and the
 | `kestrel/ui/src/extensions/service.ts` | The D-Bus interface below |
 | `kestrel/engine/src/sound` | `ShellSoundMix`, which plays an extension's sounds, and `ShellAudioMonitor`, which measures what the computer plays |
 | `packages/extension-api` | `@luft/extension-api`, the types for extension authors, written from `types.ts` by `bun kestrel/ui/extensionApi.ts`. `bun run check` in `kestrel/ui` fails when it's out of date |
-| `extensions` | Lantharos's own extensions, such as Seasons, Strays, Playthings, Keystrokes, Focus, Reminders, Phosphor, Tailor, Pult and Pigeon. Each has a `build.sh` that makes its folder, which `extensions/pack.sh` packs for schelf.store |
+| `extensions` | Lantharos's own extensions, such as Seasons, Strays, Playthings, Keystrokes, Focus, Reminders, Phosphor, Tailor and Pult. Each has a `build.sh` that makes its folder, which `extensions/pack.sh` packs for schelf.store |
 | `apps/system/settings/src/lib/panels/personalization/extensions` | Settings → Extensions, each extension's page, and its rows on other pages |
 
 ## On disk
@@ -168,22 +168,20 @@ Where an element sits is the person's choice, never the extension's. They drag i
 
 ## File actions
 
-`fileActions.add` puts an action in `fileActions` (`kestrel/ui/src/extensions/fileActions/actions.ts`), which Kestrel serves to Rover as `com.lantharos.Kestrel.FileActions` at `/com/lantharos/Kestrel/FileActions` on `com.lantharos.Kestrel`. Rover asks for the list once, keeps it, and asks again on `Changed`, so its menu opens without a call to Kestrel; it decides which actions fit what was right-clicked and draws them with its own menu items.
+`fileActions.add` puts an action in `fileActions` (`kestrel/ui/src/extensions/fileActions/actions.ts`), where Kestrel's own Send to device for [Post](components/kestrel.md#post) is too, and which Kestrel serves to Rover as `com.lantharos.Kestrel.FileActions` at `/com/lantharos/Kestrel/FileActions` on `com.lantharos.Kestrel`. Rover asks for the list once, keeps it, and asks again on `Changed`, so its menu opens without a call to Kestrel; it decides which actions fit what was right-clicked and draws them with its own menu items.
 
 | Member | Does |
 | --- | --- |
-| `List() → aa{sv}` | Every action that shows: `id` (`extension-id/key`), `label`, `icon` (the SVG it draws from), `kind` (`files`, `folders` or `any`), `types`, `extensions`, `multiple`, and `items` when it has a menu of its own, each with `key`, `label`, `icon`, `disabled`, `stays` (the menu stays open) and `separator` |
+| `List() → aa{sv}` | Every action that shows: `id` (`extension-id/key`, or `kestrel/post` for Post's), `label`, `icon` (the SVG it draws from), `kind` (`files`, `folders` or `any`), `types`, `extensions`, `multiple`, and `items` when it has a menu of its own, each with `key`, `label`, `icon`, `disabled`, `stays` (the menu stays open) and `separator` |
 | `Opened(s id)` | Rover opened the action's own menu |
 | `Activate(s id, s choice, as paths)` | People chose the action, or one of its entries by `key`, on these paths |
 | `Changed` (signal) | An action came, went or changed, or asked to show its entries again |
 
-Only Rover may call it. An action runs on the paths it's handed, so a sandboxed app that could call `Activate` could make Pigeon send any file to a phone. Kestrel checks that the caller's program is Rover's, installed in `/usr/lib/sabine/com.lantharos.rover` or built in a test session's apps folder, and refuses everything else.
-
-Actions with `sends` also show in the Send sheet ([App sandbox](app-sandbox.md#sending-files)), which Kestrel draws itself and runs them from with the copies it made of the files an app handed over.
+Only Rover may call it. An action runs on the paths it's handed, so a sandboxed app that could call `Activate` could make Post send any file to a phone. Kestrel checks that the caller's program is Rover's, installed in `/usr/lib/sabine/com.lantharos.rover` or built in a test session's apps folder, and refuses everything else.
 
 ## Dropping files on the taskbar
 
-A taskbar element with `onDrop` takes files dragged from apps. Kestrel can't read a drag that isn't over a window by itself, so patch 69 of the compositor adds `meta_dnd_set_shell_target()`. While a drag that carries `text/uri-list` moves, `XdndHandler` looks for an actor whose delegate has a `fileDrop` target under the pointer, lights it up and tells Mutter. Mutter then tells the app the drop would copy, and when the drag is let go there it reads the URI list from the app and emits `dnd-drop` with it, after `dnd-leave`, which `XdndHandler` hands to the target that was lit last. Drags from X11 apps aren't covered.
+A taskbar element with `onDrop` takes files dragged from apps. Kestrel can't read a drag that isn't over a window by itself, so patch 69 of the compositor adds `meta_dnd_set_shell_target()`. While a drag that carries `text/uri-list` moves, `XdndHandler` looks for an actor whose delegate has a `fileDrop` target under the pointer, lights it up and tells Mutter. Mutter then tells the app the drop would copy, and when the drag is let go there it reads the URI list from the app and emits `dnd-drop` with it, after `dnd-leave`, which `XdndHandler` hands to the target that was lit last. A target is asked about the actor actually under the pointer, so the taskbar itself, which opens the Send sheet for files dropped on a bare part of it, leaves drops on its buttons alone. Post's button takes files the same way. Drags from X11 apps aren't covered.
 
 ## Wallpaper layers
 

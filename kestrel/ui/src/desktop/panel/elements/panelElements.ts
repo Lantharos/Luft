@@ -9,6 +9,8 @@ import { PanelClock } from '../widgets/clock.js';
 import { BatteryIndicator } from '../../../shared/battery/indicator.js';
 import { PrivacyIndicator } from '../../../system/privacy/indicator.js';
 import { InputSourceIndicator } from '../../../system/inputSources/indicator.js';
+import { PostIndicator } from '../../../system/post/indicator.js';
+import { currentPost } from '../../../system/post/post.js';
 import { localized, t } from '../../../shared/i18n/index.js';
 import { isVertical, type Edge } from '../../../shared/layout/edge.js';
 import type { Taskbar } from '../taskbar/taskbar.js';
@@ -34,10 +36,12 @@ export class TaskbarElements implements PanelElements {
   readonly clock = new PanelClock();
   readonly clockButton: St.Button;
   readonly quickButton: St.Button | null = null;
+  readonly post: PostIndicator | null = null;
   readonly tray: Tray | null = null;
   readonly privacy: PrivacyIndicator | null = null;
   readonly inputSource: InputSourceIndicator | null = null;
   private readonly trayBox: St.BoxLayout | null = null;
+  private readonly statusGroup: St.BoxLayout | null = null;
   private readonly extensionItems: ExtensionItems | null = null;
   private readonly statusIcons = new St.BoxLayout({ style_class: 'kestrel-status-icons', x_align: Clutter.ActorAlign.CENTER, y_align: Clutter.ActorAlign.CENTER });
   private readonly edges = new Map<string, Edge>();
@@ -76,6 +80,17 @@ export class TaskbarElements implements PanelElements {
       });
       localized(quickButton, () => (quickButton.accessible_name = t('taskbar-quick-settings')));
       quickButton.connect('clicked', actions.quickSettings);
+      const statusGroup = this.statusGroup = new St.BoxLayout({ name: 'kestrel-taskbar-status-group', style_class: 'kestrel-status-group' });
+      const post = currentPost();
+      if (post) {
+        this.post = new PostIndicator(post, menus);
+        statusGroup.add_child(this.post.actor);
+        const follow = () => (post.client.open ? quickButton.add_style_class_name('kestrel-after-post') : quickButton.remove_style_class_name('kestrel-after-post'));
+        const stop = post.client.onChanged(follow);
+        quickButton.connect('destroy', stop);
+        follow();
+      }
+      statusGroup.add_child(quickButton);
       menus.bind(quickButton, () => [
         { label: t('taskbar-network-settings'), run: () => menus.settings('network') },
         { label: t('taskbar-sound-settings'), run: () => menus.settings('sound') },
@@ -96,7 +111,7 @@ export class TaskbarElements implements PanelElements {
       case 'start': return this.start.visible ? this.start : null;
       case 'dock': return this.dock.actor;
       case 'tray': return this.trayBox;
-      case 'status': return this.quickButton;
+      case 'status': return this.statusGroup;
       case 'clock': return this.clockButton;
       default: return this.extension(id)?.actor ?? null;
     }
@@ -143,6 +158,8 @@ export class TaskbarElements implements PanelElements {
         return;
       case 'status':
         this.statusIcons.orientation = orientation;
+        this.statusGroup!.orientation = orientation;
+        this.post?.orient(orientation);
         return;
       case 'clock': return this.clock.setNarrow(isVertical(edge));
       default: this.extensions.get(id)?.relayout(this.layout(edge));

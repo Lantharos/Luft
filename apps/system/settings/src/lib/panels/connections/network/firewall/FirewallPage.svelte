@@ -18,6 +18,7 @@
 	import { extensions } from '#lib/panels/personalization/extensions/extensions.svelte.js';
 	import type { NetworkState } from '../state.svelte';
 	import AppsSection from './AppsSection.svelte';
+	import HowDialog from './HowDialog.svelte';
 	import OpenPortRow from './OpenPortRow.svelte';
 	import { portDescription } from './ports';
 
@@ -34,6 +35,7 @@
 	void extensions.load();
 
 	let closing = $state<string | null>(null);
+	let explaining = $state(false);
 	let problem = $state('');
 
 	let types = $derived<{ value: NetworkType; label: string }[]>([
@@ -69,6 +71,10 @@
 		void attempt(() => commands.networkSetAppAccess({ kind: app.kind, id: app.id, access }, waitForPerson));
 	}
 
+	function forget(app: FirewallApp) {
+		void attempt(() => commands.networkForgetApp({ kind: app.kind, id: app.id }, waitForPerson));
+	}
+
 	async function closePort(port: OpenPort) {
 		closing = portKey(port);
 		await attempt(() => commands.networkClosePort(port, waitForPerson));
@@ -81,7 +87,12 @@
 		<p class="-my-3 px-2 text-[13px] text-[var(--danger)]">{problem}</p>
 	{/if}
 
-	<Section description={t('settings-network-firewall.description')}>
+	<p class="-mb-2 flex items-baseline justify-between gap-3 px-2 text-[13px] text-[var(--text-soft)]">
+		{t('settings-network-firewall.description')}
+		<button type="button" class="shrink-0 font-medium text-[var(--accent)] hover:underline" onclick={() => (explaining = true)}>{t('settings-network-firewall-how')}</button>
+	</p>
+
+	<Section>
 		{#each firewall.networks as network (network.connection)}
 			<Row title={network.name} icon={network.medium === 'wifi' ? WifiIcon : EthernetPort} description={describe(network)}>
 				<Segmented label={network.name} options={types} value={network.networkType ?? 'public'} onchange={(networkType) => classify(network, networkType)} />
@@ -91,17 +102,17 @@
 		{/each}
 	</Section>
 
-	<AppsSection apps={firewall.apps} onchange={allow} />
+	<AppsSection apps={firewall.apps} onchange={allow} onforget={forget} />
 
 	{#if listening.length}
-		<Section title={t('settings-network-firewall-extensions')} description={t('settings-network-firewall-extensions.description')}>
+		<Section title={t('settings-network-firewall-extensions')}>
 			{#each listening as extension (extension.id)}
 				<Row title={extension.name} description={t('settings-network-firewall-extension-ports', { count: extension.listen.length, ports: portList(extension.listen) })} />
 			{/each}
 		</Section>
 	{/if}
 
-	<Section title={t('settings-network-firewall-services')} description={t('settings-network-firewall-services.description')}>
+	<Section title={t('settings-network-firewall-services')}>
 		{#each firewall.openPorts as port (portKey(port))}
 			<Row title={t('settings-network-firewall-port', { port: port.port })} description={portDescription(port)}>
 				{#if closing === portKey(port)}
@@ -114,3 +125,7 @@
 		<OpenPortRow onopen={(port) => attempt(() => commands.networkOpenPort(port, waitForPerson))} />
 	</Section>
 </SubPage>
+
+{#if explaining}
+	<HowDialog onclose={() => (explaining = false)} />
+{/if}

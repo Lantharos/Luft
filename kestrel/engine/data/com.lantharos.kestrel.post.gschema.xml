@@ -1,0 +1,33 @@
+<schemalist>
+  <enum id="com.lantharos.kestrel.PostVisibility">
+    <value nick="no-one" value="0"/>
+    <value nick="your-devices" value="1"/>
+    <value nick="everyone" value="2"/>
+  </enum>
+  <schema id="com.lantharos.kestrel.post" path="/com/lantharos/kestrel/post/">
+    <key name="visibility" enum="com.lantharos.kestrel.PostVisibility">
+      <default>'your-devices'</default>
+      <summary>Who can find this computer and send to it</summary>
+    </key>
+    <key name="name" type="s">
+      <default>''</default>
+      <summary>The name other devices see, or the computer's name when empty</summary>
+    </key>
+    <key name="folder" type="s">
+      <default>''</default>
+      <summary>Where received files go, or Downloads when empty</summary>
+    </key>
+    <key name="devices" type="a(ss)">
+      <default>[]</default>
+      <summary>Your devices, as their fingerprint and name, which send without asking first</summary>
+    </key>
+    <key name="copy-text" type="b">
+      <default>true</default>
+      <summary>Put text from your devices on the clipboard</summary>
+    </key>
+    <key name="copy-picture" type="b">
+      <default>false</default>
+      <summary>Put a single picture someone sends on the clipboard too</summary>
+    </key>
+  </schema>
+</schemalist>

@@ -10,7 +10,9 @@ use crate::network::{Layout, Prefix};
 use crate::ports::{Networks, Opened, Protocol};
 
 const NFT: &str = "/usr/sbin/nft";
-pub const DISCOVERY: [u16; 2] = [1900, 5353];
+pub const DISCOVERY: [u16; 3] = [1900, 3702, 5353];
+/// LocalSend's port, which Post listens on over TCP and hears announcements on over UDP.
+const POST: u16 = 53317;
 const APP_KEY: &str = "socket cgroupv2 level UNIT_LEVEL . meta l4proto . th dport";
 
 const CHAINS: &str = r#"
@@ -42,7 +44,7 @@ const CHAINS: &str = r#"
 		icmpv6 type echo-request accept
 		udp dport { DISCOVERY } accept
 		udp sport { DISCOVERY } accept
-		tcp dport @opened_tcp accept
+POST		tcp dport @opened_tcp accept
 		udp dport @opened_udp accept
 		APP_KEY @apps_home accept
 	}
@@ -81,7 +83,7 @@ fn reach(elements: &Reach) -> Vec<String> {
         .collect()
 }
 
-pub fn ruleset(layout: &Layout, ports: &Opened, reachable: &Reachable) -> String {
+pub fn ruleset(layout: &Layout, ports: &Opened, reachable: &Reachable, post: bool) -> String {
     let hosted: Vec<String> = layout
         .hosted
         .iter()
@@ -121,10 +123,16 @@ pub fn ruleset(layout: &Layout, ports: &Opened, reachable: &Reachable) -> String
         &reach(&reachable.anywhere),
     );
     let discovery: Vec<String> = DISCOVERY.iter().map(u16::to_string).collect();
+    let post = if post {
+        format!("\t\ttcp dport {POST} accept\n\t\tudp dport {POST} accept\n")
+    } else {
+        String::new()
+    };
     script.push_str(
         &CHAINS
             .replace("APP_KEY", &key)
-            .replace("DISCOVERY", &discovery.join(", ")),
+            .replace("DISCOVERY", &discovery.join(", "))
+            .replace("POST", &post),
     );
     script
 }

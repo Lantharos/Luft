@@ -24,11 +24,9 @@ export interface FileActionShape {
   extensions: readonly string[];
   multiple: boolean;
   items: FileActionChoiceShape[] | null;
-  /** Whether the Send sheet offers its choices too. */
-  sends: boolean;
 }
 
-/** An action an extension added to the menu of files and folders, by `extension-id/key`. */
+/** An action in the menu of files and folders, by `extension-id/key`, or Kestrel's own such as Post's. */
 export interface FileActionEntry {
   readonly id: string;
   /** What it shows now, or `null` while it's hidden. */

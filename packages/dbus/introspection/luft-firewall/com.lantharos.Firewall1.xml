@@ -18,6 +18,13 @@
       <arg name="id" type="s" direction="in"/>
       <arg name="access" type="s" direction="in"/>
     </method>
+    <method name="ForgetApp">
+      <arg name="kind" type="s" direction="in"/>
+      <arg name="id" type="s" direction="in"/>
+    </method>
+    <method name="SetPostOpen">
+      <arg name="open" type="b" direction="in"/>
+    </method>
     <method name="SetExtensionPorts">
       <arg name="ports" type="a(qs)" direction="in"/>
     </method>

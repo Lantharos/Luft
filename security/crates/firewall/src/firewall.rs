@@ -3,7 +3,7 @@ use std::time::Instant;
 
 use zbus::OwnedObjectPath;
 
-use crate::apps::{Access, Apps, Decisions, Identity};
+use crate::apps::{Access, Apps, Decisions, Identity, identity};
 use crate::listening::Change;
 use crate::network::Layout;
 use crate::ports::{self, Opened, Port};
@@ -13,6 +13,8 @@ pub struct Firewall {
     layout: Layout,
     ports: Opened,
     apps: Apps,
+    /// The units of the people whose Post may be found, whose port is open on home networks.
+    post: BTreeSet<String>,
     loaded: String,
 }
 
@@ -28,6 +30,7 @@ impl Firewall {
             layout,
             ports: ports::load()?,
             apps: Apps::load()?,
+            post: BTreeSet::new(),
             loaded: String::new(),
         };
         firewall.load(false).await.map_err(anyhow::Error::msg)?;
@@ -36,7 +39,8 @@ impl Firewall {
 
     async fn load(&mut self, refresh: bool) -> Result<(), String> {
         self.apps.prune();
-        let script = rules::ruleset(&self.layout, &self.ports, &self.apps.reachable());
+        self.post.retain(|unit| identity::alive(unit));
+        let script = rules::ruleset(&self.layout, &self.ports, &self.apps.reachable(), !self.post.is_empty());
         if refresh || script != self.loaded {
             rules::load(&script).await?;
             self.loaded = script;
@@ -95,7 +99,9 @@ impl Firewall {
             self.apps.observe(change);
         }
         self.apps.prune_questions();
-        if reachable != self.apps.reachable() {
+        let posting = self.post.len();
+        self.post.retain(|unit| identity::alive(unit));
+        if reachable != self.apps.reachable() || posting != self.post.len() {
             self.reload(true).await;
         }
         waiting != self.waiting()
@@ -118,6 +124,22 @@ impl Firewall {
             .decide(identity, access)
             .map_err(|error| format!("Couldn't keep what the app may do: {error}"))?;
         self.load(true).await
+    }
+
+    pub async fn forget(&mut self, identity: &Identity) -> Result<(), String> {
+        self.apps
+            .forget(identity)
+            .map_err(|error| format!("Couldn't forget what the app may do: {error}"))?;
+        self.load(true).await
+    }
+
+    pub async fn open_post(&mut self, unit: String, open: bool) -> Result<(), String> {
+        if open {
+            self.post.insert(unit);
+        } else {
+            self.post.remove(&unit);
+        }
+        self.load(false).await
     }
 
     pub async fn declare(&mut self, unit: String, ports: BTreeSet<Port>) -> Result<(), String> {

@@ -1339,11 +1339,6 @@ export interface FileActionOptions {
   onActivate(paths: string[], choice?: string): void;
   /** Whether it shows. It does unless this is `false`. */
   shown?: boolean;
-  /**
-   * Also offers its choices in the Send sheet, which apps open for files they hold, such as the devices to send to.
-   * The paths it gets from there are copies Kestrel keeps for a day, of files, never folders.
-   */
-  sends?: boolean;
 }
 
 export interface FileAction extends Disposable {

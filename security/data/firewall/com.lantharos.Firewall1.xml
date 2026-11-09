@@ -19,10 +19,13 @@
     Waiting: apps listening for connections from the network that nobody decided about yet, as
     (kind, id, uid), uid being the user running the app. Empty while no home network is connected.
 
-    SetNetworkType sets a connection's type to "home" or "public", and SetAppAccess what an app
-    may do; the person at the computer may do both without a password, except allowing an app on
-    public networks. OpenPort and ClosePort need an administrator. SetExtensionPorts is for Kestrel:
-    it opens the ports its extensions listen on, on home networks, for Kestrel alone.
+    SetNetworkType sets a connection's type to "home" or "public", SetAppAccess what an app may
+    do and ForgetApp forgets that again, so the app is asked about the next time it listens; the
+    person at the computer may do these without a password, except allowing an app on public
+    networks. OpenPort and ClosePort need an administrator. SetExtensionPorts is for Kestrel:
+    it opens the ports its extensions listen on, on home networks, for Kestrel alone. SetPostOpen is
+    for Post, Kestrel's way of sending files to devices nearby: it opens LocalSend's port 53317 on
+    home networks while someone may find the computer.
   -->
   <interface name="com.lantharos.Firewall1">
     <property name="Unclassified" type="a(os)" access="read"/>
@@ -46,6 +49,13 @@
       <arg name="kind" type="s" direction="in"/>
       <arg name="id" type="s" direction="in"/>
       <arg name="access" type="s" direction="in"/>
+    </method>
+    <method name="ForgetApp">
+      <arg name="kind" type="s" direction="in"/>
+      <arg name="id" type="s" direction="in"/>
+    </method>
+    <method name="SetPostOpen">
+      <arg name="open" type="b" direction="in"/>
     </method>
     <method name="SetExtensionPorts">
       <arg name="ports" type="a(qs)" direction="in"/>

@@ -371,31 +371,30 @@ if (ext.peers.handles('com.lantharos.Soundscapes', 'play')) await ext.peers.requ
 
 ## fileActions
 
-`fileActions.add(options)` adds an entry to the menu Rover opens on files and folders. Rover draws it in its own style, and the extension gets the full paths of what people chose when they pick it. An action that sends files somewhere, such as to a device, can also show in the Send sheet that apps open for files they hold.
+`fileActions.add(options)` adds an entry to the menu Rover opens on files and folders. Rover draws it in its own style, and the extension gets the full paths of what people chose when they pick it.
 
 | Option | Is |
 | --- | --- |
 | `key` | Names it among the extension's actions, lowercase with dashes |
-| `label`, `icon` | What the entry says, and its icon. Rover's menu uses thin outlined icons, so ship an outlined SVG in the extension's folder (such as `icons/menu/send.svg`, drawn with 2 px strokes on a 24 px grid) rather than a filled theme icon, which looks heavier beside them |
+| `label`, `icon` | What the entry says, and its icon. Rover's menu uses thin outlined icons, so ship an outlined SVG in the extension's folder (such as `icons/menu/printer.svg`, drawn with 2 px strokes on a 24 px grid) rather than a filled theme icon, which looks heavier beside them |
 | `on` | Which files and folders it shows for: `kind` (`files`, `folders` or `any`), `types` (MIME types such as `image/png`, or `image/*` for a whole group), `extensions` (such as `pdf`, without the dot) and `multiple` (`false` hides it while several are chosen). It shows for everything when left out |
-| `items()` | Gives the entry a menu of its own, of `{ key, label, icon?, disabled?, keepsMenuOpen? }` and `'separator'`. `disabled` greys out a placeholder such as "Nothing nearby"; `keepsMenuOpen` leaves the menu open when chosen, for an entry such as "Look again" whose results show up in place |
-| `onOpened()` | People opened its menu, such as to look for devices again |
+| `items()` | Gives the entry a menu of its own, of `{ key, label, icon?, disabled?, keepsMenuOpen? }` and `'separator'`. `disabled` greys out a placeholder such as "No printers"; `keepsMenuOpen` leaves the menu open when chosen, for an entry such as "Look again" whose results show up in place |
+| `onOpened()` | People opened its menu, such as to look for printers again |
 | `onActivate(paths, choice?)` | People chose it, or one of its entries by `key` |
 | `shown` | Whether it shows |
-| `sends` | Also offers its entries in the Send sheet, under its label. There it gets copies of the files the app handed over, which Kestrel keeps for a day, and never folders |
 
 The action has `update(changes)`, `refresh()` to ask for `items()` again when what they show changed, and `dispose()`. Rover keeps what it last got, so the menu opens without waiting on the extension.
 
 ```ts
-const send = ext.fileActions.add({
-  key: 'send',
-  label: ext.t('send-to-device'),
-  icon: 'send-to-symbolic',
-  sends: true,
-  items: () => devices.length
-    ? devices.map(device => ({ key: device.id, label: device.name, icon: 'phone-symbolic' }))
-    : [{ key: 'nobody', label: ext.t('nobody'), disabled: true }],
-  onActivate: (paths, device) => device && sendTo(device, paths),
+const print = ext.fileActions.add({
+  key: 'print',
+  label: ext.t('print-on'),
+  icon: 'icons/menu/printer.svg',
+  on: { kind: 'files', extensions: ['pdf'] },
+  items: () => printers.length
+    ? printers.map(printer => ({ key: printer.id, label: printer.name }))
+    : [{ key: 'nobody', label: ext.t('no-printers'), disabled: true }],
+  onActivate: (paths, printer) => printer && printOn(printer, paths),
 });
 ```
 

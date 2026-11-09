@@ -24,7 +24,7 @@ const answer = (path: string) => call('org.freedesktop.impl.portal.desktop.rover
 
 /** Saves a page in Flatbed as a PDF and sends it on with Send…, which opens the sheet for the file it wrote. */
 export async function checkFlatbed(sheet: () => Clutter.Actor | null, choice: (name: string) => Clutter.Actor | null,
-  sent: () => string | null, picture: string) {
+  arrives: (name: string) => Promise<string>, device: string, picture: string) {
   if (!GLib.file_test(appBinary('flatbed'), GLib.FileTest.IS_EXECUTABLE)) {
     console.log('Kestrel Send sheet: Flatbed skipped while it isn\'t built');
     return;
@@ -45,16 +45,16 @@ export async function checkFlatbed(sheet: () => Clutter.Actor | null, choice: (n
     const open = await eventually(sheet, 'Send… in Flatbed opens the Send sheet');
     require(showsText('Send “Receipt.pdf”', open), 'for the PDF it saved');
     require(!choice('Flatbed'), 'without offering Flatbed itself');
-    await eventually(() => choice('Pixel 8'), 'with the extension\'s device');
+    await eventually(() => choice(device), 'with the computer nearby');
     await settled();
     await capture('send-sheet-flatbed-dark');
     await withScheme('light', async () => {
       await settled();
       await capture('send-sheet-flatbed-light');
     });
-    click(choice('Pixel 8')!);
+    click(choice(device)!);
     await eventually(() => !sheet(), 'choosing it closes the sheet');
-    const copy = await eventually(sent, 'the extension gets the PDF Flatbed handed over');
+    const copy = await arrives('Receipt.pdf');
     const digest = (path: string) => GLib.compute_checksum_for_data(GLib.ChecksumType.SHA256, GLib.file_get_contents(path)[1]);
     require(digest(copy) === digest(saved), 'whole');
   } finally {

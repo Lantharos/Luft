@@ -44,6 +44,7 @@ neighbor() {
   eventually "a second home network connects" sh -c 'nft list set inet luft home4 | grep -q "\"lan8\" . 192.168.88.0/24"'
 }
 from_peer() { ip netns exec peer curl -s -o /dev/null -m 3 "http://$1/"; }
+post_reaches() { ip netns exec neighbor curl -s -o /dev/null -m 3 "http://192.168.88.1:53317/"; }
 
 expect() {
   local verdict="$1" label="$2"
@@ -153,10 +154,13 @@ serve() {
   serve_as app-com.example.Local@check.service 8004 127.0.0.1
   as_person systemd-run --user --quiet --collect --unit=extensions-check.service --slice=session.slice -- sh -c \
     "busctl call $name $path $name SetExtensionPorts 'a(qs)' 1 8003 tcp; exec python3 -m http.server 8003 --directory /usr/share"
+  as_person systemd-run --user --quiet --collect --unit=kestrel-post.service --slice=session.slice -- sh -c \
+    "busctl call $name $path $name SetPostOpen b true; python3 -m http.server 53317 --directory /usr/share & \
+     while [ ! -e /home/$person/post-closed ]; do sleep 0.2; done; busctl call $name $path $name SetPostOpen b false; wait"
   receive_as app-com.example.Approved@udp.service 9000
   receive_as app-com.example.Other@udp.service 9001
   eventually "the test receivers listen" sh -c 'ss -lun | grep -q ":9000 " && ss -lun | grep -q ":9001 "'
-  eventually "the test servers listen" sh -c 'for port in 80 8000 8001 8002 8003 8004; do curl -s -o /dev/null http://localhost:$port/ || exit 1; done'
+  eventually "the test servers listen" sh -c 'for port in 80 8000 8001 8002 8003 8004 53317; do curl -s -o /dev/null http://localhost:$port/ || exit 1; done'
 }
 
 person() {
@@ -223,6 +227,12 @@ apps_on_home() {
   as_person systemd-run --user --quiet --wait --pipe --unit=app-com.example.Sneaky@check.service -- \
     busctl call "$name" "$path" "$name" SetExtensionPorts 'a(qs)' 1 8001 tcp 2> /dev/null && fail "an app opened ports as if it were Kestrel"
   say "ok: only Kestrel declares extension ports"
+  expect open "Post while someone may find the computer" post_reaches
+  as_person systemd-run --user --quiet --wait --pipe --unit=app-com.example.Sneaky@post.service -- \
+    busctl call "$name" "$path" "$name" SetPostOpen b true 2> /dev/null && fail "an app opened Post's port"
+  touch "/home/$person/post-closed"
+  eventually "Post's port closes once no one may find the computer" sh -c '! ip netns exec neighbor curl -s -o /dev/null -m 1 http://192.168.88.1:53317/'
+  say "ok: Post's port follows who may find the computer"
 }
 
 first() {

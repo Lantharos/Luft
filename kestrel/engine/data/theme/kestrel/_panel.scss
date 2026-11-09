@@ -43,6 +43,19 @@
 .kestrel-taskbar-vertical .kestrel-tray-button { padding: 7px 0; }
 .kestrel-taskbar-vertical .kestrel-privacy { width: 28px; padding: 10px 0; margin: 4px 0; }
 .kestrel-taskbar-vertical .kestrel-status-icons { spacing: 10px; }
+
+.kestrel-status-group { spacing: 2px; }
+.kestrel-post-icons { spacing: 6px; }
+.kestrel-post-progress { font-size: 12px; font-weight: 500; font-feature-settings: "tnum"; }
+.kestrel-panel .kestrel-status-button.kestrel-post-button { padding-left: 5px; padding-right: 5px; }
+.kestrel-panel .kestrel-status-button.kestrel-after-post { padding-left: 5px; }
+.kestrel-panel .kestrel-status-button.kestrel-after-post:rtl { padding-left: 8px; padding-right: 5px; }
+.kestrel-panel.kestrel-taskbar-compact .kestrel-status-button.kestrel-after-post:rtl { padding-left: 6px; }
+.kestrel-panel.kestrel-taskbar-large .kestrel-status-button.kestrel-after-post:rtl { padding-left: 10px; }
+.kestrel-panel.kestrel-taskbar-touch .kestrel-status-button.kestrel-after-post:rtl { padding-left: 14px; }
+.kestrel-panel.kestrel-taskbar-vertical .kestrel-status-button.kestrel-post-button { padding: 4px 0; }
+.kestrel-panel.kestrel-taskbar-vertical .kestrel-status-button.kestrel-after-post,
+.kestrel-panel.kestrel-taskbar-vertical .kestrel-status-button.kestrel-after-post:rtl { padding-top: 4px; padding-left: 0; padding-right: 0; }
 .kestrel-taskbar-vertical .kestrel-clock { font-size: 11px; text-align: center; }
 .kestrel-taskbar-vertical.kestrel-taskbar-large .kestrel-clock { font-size: 12px; }
 .kestrel-taskbar-vertical .kestrel-peek { width: auto; height: 8px; }

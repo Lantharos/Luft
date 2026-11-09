@@ -28,6 +28,7 @@ import { RotationAnimation } from './desktop/rotation/rotation.js';
 import { watchTaskbarShapes } from './desktop/panel/islands/shapes.js';
 import { setTaskbarBlurHeld } from './desktop/panel/preferences/taskbarLook.js';
 import { Extensions } from './extensions/extensions.js';
+import { createPost, type Post } from './system/post/post.js';
 import { Setup, type SetupContext } from './session/setup/setup.js';
 import { afterMotion, dropAfterMotion } from './shared/motion/afterMotion.js';
 import { navigateWithKeyboard } from './shared/input/keyboardNavigation.js';
@@ -84,6 +85,7 @@ class KestrelUi {
   private readonly tiling: Tiling;
   private readonly liveWallpaper: LiveWallpaper;
   private readonly extensions: Extensions;
+  private readonly post: Post;
   private readonly rotation: RotationAnimation;
   private readonly copilot: CopilotActions;
   private readonly penActions: PenActions;
@@ -242,6 +244,7 @@ class KestrelUi {
 
     context.layoutManager.addTopChrome(this.menus.shield);
     context.layoutManager.addTopChrome(this.menus.actor);
+    this.post = createPost(this.extensions.host);
 
     this.panels = new PanelSet(context.layoutManager, monitor => ({
       start: () => this.surfaces.toggle('start', monitor()),
@@ -511,6 +514,7 @@ class KestrelUi {
     this.liveWallpaper.destroy();
     this.touchscreen.destroy();
     this.extensions.shutdown();
+    this.post.destroy();
     this.rotation.destroy();
     this.copilot.destroy();
     this.penActions.destroy();

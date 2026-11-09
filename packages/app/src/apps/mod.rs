@@ -34,7 +34,27 @@ impl App {
     pub fn by_id(id: &str) -> Option<Self> {
         Self::from_info(&gio_unix::DesktopAppInfo::new(id)?)
     }
+
+    /// The app a program belongs to, by the program's name: a Luft app's, such as `flatbed`, or one an app starts
+    /// directly. Interpreters and launchers run all kinds of things, so they never name an app.
+    pub fn by_program(program: &str) -> Option<Self> {
+        if LAUNCHERS.contains(&program) {
+            return None;
+        }
+        let luft = format!("com.lantharos.{program}.desktop");
+        gio::AppInfo::all()
+            .into_iter()
+            .find(|info| {
+                info.id().is_some_and(|id| id.eq_ignore_ascii_case(&luft))
+                    || info.executable().file_name().is_some_and(|name| name == program)
+            })
+            .and_then(|info| Self::from_info(&info))
+    }
 }
+
+const LAUNCHERS: [&str; 12] = [
+    "bash", "bun", "env", "flatpak", "java", "node", "perl", "python", "python3", "ruby", "sh", "wine",
+];
 
 pub fn icon_path(icon: &gio::Icon) -> Option<String> {
     let path = if let Some(themed) = icon.downcast_ref::<gio::ThemedIcon>() {

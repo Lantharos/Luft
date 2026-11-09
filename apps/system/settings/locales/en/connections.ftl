@@ -281,28 +281,43 @@ settings-network-firewall-summary-home = { $network } is a home network
 # $network is the name of the network the computer is connected to
 settings-network-firewall-summary-public = { $network } is a public network
 settings-network-firewall = Firewall
-    .description = Other devices on a network can only connect to the apps you let them. On home networks, that’s every app you allowed; on public networks, only the apps you allowed there too. A network counts as public until you choose.
+    .description = Devices on a network reach only what you let them.
+# A link that opens a window explaining the firewall
+settings-network-firewall-how = How this works
+settings-network-firewall-how-done = Done
+settings-network-firewall-how-networks = Home and public networks
+    .description = Every Wi‑Fi and wired network is home or public, and counts as public until you choose. On home networks, devices can find this computer and reach the apps you allowed there. On public networks, such as in a café or a hotel, they reach only the apps you allowed on every network, and this computer doesn't answer when they look for it.
+settings-network-firewall-how-apps = Apps
+    .description = The first time an app waits for connections from other devices, Luft asks whether to let them in. Casting, games, music speakers and sharing files need this. Forgetting an app's answer asks again the next time it waits for connections.
+settings-network-firewall-how-post = Post
+    .description = Post, which sends files to phones and computers nearby, is let in on home networks while someone can find this computer. Choosing No one in Post's settings closes it.
+settings-network-firewall-how-extensions = Extensions
+    .description = Extensions that take connections from devices on your network are let in on home networks while they're on.
+settings-network-firewall-how-services = Services
+    .description = Services that run without an app, such as a web or file server, need a port opened for them here. That takes an administrator.
 settings-network-firewall-home = Home
 settings-network-firewall-public = Public
 settings-network-firewall-connected = Connected
 settings-network-firewall-unchosen = Counts as public until you choose
 settings-network-firewall-no-networks = No Wi‑Fi or wired networks yet
 settings-network-firewall-apps = Apps
-    .description = The first time an app waits for connections from other devices, Luft asks whether to let them in. Casting, games, music speakers and sharing files need this.
+settings-network-firewall-post = Post
+settings-network-firewall-post-open = Open on home networks
+settings-network-firewall-post-closed = Closed, since no one can find this computer
+# $app is the name of an app or a program
+settings-network-firewall-forget = Forget { $app }
 settings-network-firewall-apps-none = No app has asked yet
 settings-network-firewall-access-home = Home networks
 settings-network-firewall-access-anywhere = All networks
 settings-network-firewall-access-blocked = Not allowed
 # $app is the name of an app or a program
 settings-network-firewall-access-label = Networks that can connect to { $app }
-# Shown under a program that runs outside an app, such as one started in a terminal
-settings-network-firewall-program = Program
+# Shown under a program that isn't part of an installed app, such as one started in a terminal
+settings-network-firewall-program = Program on this computer
 settings-network-firewall-services = Services
-    .description = Ports opened on home networks for services that run without an app, such as a web or file server.
 # $port is a port number, like 22
 settings-network-firewall-port = Port { $port }
 settings-network-firewall-extensions = Extensions
-    .description = Extensions that take connections from devices on your network. Home networks let them through.
 # $ports is a list of port numbers, like 53317
 settings-network-firewall-extension-ports = { $count ->
     [one] Port { $ports }
@@ -320,6 +335,39 @@ settings-network-firewall-open = Open
 # Button label while opening a port
 settings-network-firewall-opening = Opening
 settings-network-firewall-error-port = Enter a port from 1 to 65535
+
+## Post
+# Post sends files to phones and computers nearby and takes what they send. Other devices need the free LocalSend app.
+
+settings-post-visibility = Who can find this computer
+settings-post-visibility-no-one = No one
+settings-post-visibility-your-devices = Your devices
+settings-post-visibility-everyone = Everyone
+# $network is the name of the network the computer is connected to
+settings-post-public = { $network } is a public network
+    .description = Devices nearby can't find this computer here.
+settings-post-make-home = Make it a home network
+settings-post-name = Name
+    .description = What other devices call this computer
+settings-post-rename = Rename
+settings-post-folder = Save received files in
+settings-post-folder-change = Change
+settings-post-folder-downloads = Use Downloads
+settings-post-devices = Your devices
+settings-post-devices-none = None yet
+# $device is a device's name
+settings-post-remove = Remove { $device }
+settings-post-add = Add a device
+# $name is what other devices call this computer, such as "Mara's Laptop"
+settings-post-pair = Add a device
+    .description = On the other device, send something to { $name } with LocalSend, and enter this PIN when it asks.
+settings-post-pair-waiting = Waiting for the device
+settings-post-copy-text = Put text from your devices on the clipboard
+settings-post-copy-picture = Put a single picture someone sends on the clipboard too
+settings-post-localsend = Phones and other computers need LocalSend, on the same network.
+settings-post-localsend-link = Get LocalSend
+settings-post-cancel = Cancel
+settings-post-save = Save
 
 ## Network: VPN
 

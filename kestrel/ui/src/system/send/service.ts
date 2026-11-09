@@ -8,7 +8,7 @@ import { luftAppPrograms, runsProgram } from '../../shared/apps/luftApps.js';
 import { callerProcess } from '../../shared/dbus/processes.js';
 import { identify } from '../../shared/dbus/sandbox.js';
 import { type Handed, receive, sweep } from './received.js';
-import { openSendSheet } from './sheet.js';
+import { openSendSheet, sendSheetOpen } from './sheet.js';
 
 const PATH = '/com/lantharos/Kestrel/Share';
 const INTERFACE = `<node>
@@ -92,7 +92,7 @@ export class ShareService {
   }
 
   private async send(invocation: Invocation, handed: Handed[]): Promise<void> {
-    if (this.showing) {
+    if (this.showing || sendSheetOpen()) {
       for (const { fd } of handed) GLib.close(fd);
       throw new Refused('The Send sheet is already open');
     }

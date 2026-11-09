@@ -92,7 +92,8 @@
 
 .kestrel-send-sections { spacing: 14px; }
 .kestrel-send-section { spacing: 6px; }
-.kestrel-send-section .kestrel-portal-label { padding: 0 4px; }
+.kestrel-send-section .kestrel-portal-label, .kestrel-send-note { padding: 0 4px; }
+.kestrel-send-note { font-size: 12px; }
 
 .kestrel-portal-avatar { icon-size: 40px; border-radius: 20px; }
 .kestrel-portal-launcher { spacing: 14px; }

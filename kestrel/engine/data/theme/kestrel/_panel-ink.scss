@@ -19,6 +19,8 @@
   .kestrel-app-focused .kestrel-running-dot { background-color: ink(); }
   .kestrel-task-progress { background-color: fill(0.18); }
   .kestrel-task-progress-fill { background-color: ink(); }
+  &:dropping { background-color: fill(0.16); box-shadow: inset 0 0 0 2px ink(0.6); }
+  .kestrel-post-button:dropping { background-color: fill(0.18); box-shadow: inset 0 0 0 2px ink(0.55); }
   .kestrel-extension-element {
     &.dropping { background-color: fill(0.14); }
     .kestrel-extension-text-caption { color: ink(0.62); }

@@ -7,6 +7,7 @@ import St from 'gi://St';
 import { PanelLayout } from './panelLayout.js';
 import type { WindowPreviews } from './windowPreviews.js';
 import { Taskbar } from './taskbar/taskbar.js';
+import { takeDroppedFiles } from './taskbar/fileDrop.js';
 import type { ContextMenus } from '../menus/contextMenus.js';
 import { createLauncher, floorAlong, type Launcher } from './launcher/launcher.js';
 import { DesktopPeek } from './widgets/desktopPeek.js';
@@ -124,6 +125,7 @@ export class KestrelPanel {
       for (const island of islands) this.autoHide.follow(island.actor);
     });
     this.surface = new TaskbarSurface(this.actor, this.peek.actor, () => this.islandSet.islands, () => this.screen);
+    takeDroppedFiles(this.actor, picked => this.surface.behind(this.islandSet.containing(picked)?.actor ?? this.actor));
     this.shapes = new IslandShapes(this.actor, this.islandSet, () => this.screen, () => this.surface.radius);
     this.tablet = new TabletTaskbar(this.actor, () => this.islandSet.islands.map(island => island.actor), primary, () => this.autoHide.shown, () => this.screen);
     this.morph = new PanelTablet(this, this.surface, this.launcher, this.taskbar);

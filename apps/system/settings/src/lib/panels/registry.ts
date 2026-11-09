@@ -24,6 +24,7 @@ import PanelBottom from '@lucide/svelte/icons/panel-bottom';
 import Printer from '@lucide/svelte/icons/printer';
 import Plus from '@lucide/svelte/icons/plus';
 import Puzzle from '@lucide/svelte/icons/puzzle';
+import Send from '@lucide/svelte/icons/send';
 import Shield from '@lucide/svelte/icons/shield';
 import ShieldCheck from '@lucide/svelte/icons/shield-check';
 import SquareTerminal from '@lucide/svelte/icons/square-terminal';
@@ -66,6 +67,7 @@ const VIEWS: Record<PageId, View> = {
 		load: () => import('./connections/bluetooth/BluetoothPanel.svelte'),
 		needs: { present: (hardware) => hardware.bluetooth, missing: 'settings-bluetooth-missing' }
 	},
+	post: { icon: Send, load: () => import('./connections/post/PostPanel.svelte') },
 	display: { icon: Monitor, load: () => import('./devices/display/DisplayPanel.svelte') },
 	sound: { icon: Volume2, load: sound },
 	power: {

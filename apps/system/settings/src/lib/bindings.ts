@@ -338,6 +338,10 @@ export const commands = {
 	networkForget: (params: {
 		ssid: string,
 	}, options?: CallOptions) => invoke<null>("network_forget", params, options),
+	networkForgetApp: (params: {
+		kind: FirewallAppKind,
+		id: string,
+	}, options?: CallOptions) => invoke<null>("network_forget_app", params, options),
 	networkJoin: (params: {
 		device: string,
 		ssid: string,
@@ -405,6 +409,11 @@ export const commands = {
 	}, options?: CallOptions) => invoke<null>("passkeys_rename", params, options),
 	penDevices: (options?: CallOptions) => invoke<PenDevice[]>("pen_devices", {}, options),
 	penNotesInstalled: (options?: CallOptions) => invoke<boolean>("pen_notes_installed", {}, options),
+	postChooseFolder: (options?: CallOptions) => invoke<string | null>("post_choose_folder", {}, options),
+	postGetLocalsend: (options?: CallOptions) => invoke<null>("post_get_localsend", {}, options),
+	postStartPairing: (options?: CallOptions) => invoke<string>("post_start_pairing", {}, options),
+	postState: (options?: CallOptions) => invoke<PostState>("post_state", {}, options),
+	postStopPairing: (options?: CallOptions) => invoke<null>("post_stop_pairing", {}, options),
 	powerOffAfter: (options?: CallOptions) => invoke<number | null>("power_off_after", {}, options),
 	powerSetChargeLimit: (params: {
 		enabled: boolean,
@@ -622,8 +631,8 @@ export const events = {
 	accountsChanged: (callback: (payload: AccountsSnapshot) => void) => listen<AccountsSnapshot>("accounts.changed", callback),
 	accountsStep: (callback: (payload: StepUpdate) => void) => listen<StepUpdate>("accounts.step", callback),
 	appearanceCorners: (callback: (payload: Corners) => void) => listen<Corners>("appearance.corners", callback),
-	appearanceKeyboard: (callback: (payload: boolean) => void) => listen<boolean>("appearance.keyboard", callback),
 	appearanceCursorInstall: (callback: (payload: InstallEvent) => void) => listen<InstallEvent>("appearance.cursorInstall", callback),
+	appearanceKeyboard: (callback: (payload: boolean) => void) => listen<boolean>("appearance.keyboard", callback),
 	appearanceLines: (callback: (payload: Lines) => void) => listen<Lines>("appearance.lines", callback),
 	appearanceMotion: (callback: (payload: Motion) => void) => listen<Motion>("appearance.motion", callback),
 	appearancePosture: (callback: (payload: Posture) => void) => listen<Posture>("appearance.posture", callback),
@@ -1476,6 +1485,12 @@ export type Port = {
 } & Choice;
 
 export type PortNetworks = "home" | "anywhere";
+
+/**  What Post calls this computer and where received files go, as it last worked them out. */
+export type PostState = {
+	alias: string,
+	folder: string,
+};
 
 /**  Whether the computer is used as a laptop or folded into a tablet. */
 export type Posture = "laptop" | "tablet";

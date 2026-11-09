@@ -150,6 +150,7 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         .command_async("network_open_port", firewall::open_port)
         .command_async("network_close_port", firewall::close_port)
         .command_async("network_set_app_access", firewall::set_app_access)
+        .command_async("network_forget_app", firewall::forget_app)
         .command_async("network_choose_certificate", |Choose { purpose }| {
             certificate::choose(purpose)
         })

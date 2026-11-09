@@ -1,0 +1,37 @@
+[package]
+name = "kestrel-post"
+version = "0.1.0"
+description = "Post, which sends files to phones and computers nearby and takes what they send, over the LocalSend protocol"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+bytes.workspace = true
+dirs.workspace = true
+futures-util = { workspace = true, features = ["alloc"] }
+getrandom.workspace = true
+http-body.workspace = true
+http-body-util.workspace = true
+hyper = { workspace = true, features = ["client", "http1", "server"] }
+hyper-util = { workspace = true, features = ["tokio"] }
+jiff.workspace = true
+luft-dbus-macros.workspace = true
+nix = { workspace = true, features = ["fs", "net"] }
+rcgen = { workspace = true, features = ["crypto", "ring"] }
+rustls = { workspace = true, features = ["ring", "std", "tls12"] }
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+socket2 = { workspace = true, features = ["all"] }
+tokio = { workspace = true, features = ["fs", "io-util", "macros", "net", "rt-multi-thread", "sync", "time"] }
+tokio-rustls = { workspace = true, features = ["ring", "tls12"] }
+url.workspace = true
+walkdir.workspace = true
+zbus = { workspace = true, features = ["proxy", "service", "tokio"] }
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[lints]
+workspace = true

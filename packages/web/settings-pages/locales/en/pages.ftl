@@ -9,6 +9,9 @@ settings-page-network = Network
     .keywords = wifi, wireless, ethernet, wired, vpn, internet, airplane, proxy, dns, ip address, hardware address, metered
 settings-page-bluetooth = Bluetooth
     .keywords = devices, pair, headphones, speaker, visible, discoverable
+# Post sends files to phones and computers nearby, like a postal service
+settings-page-post = Post
+    .keywords = send files, share, nearby, phone, localsend, airdrop, receive, transfer, visible
 settings-page-display = Displays
     .keywords = monitor, screen, resolution, scale, refresh rate, night light, arrangement, brightness
 settings-page-sound = Sound

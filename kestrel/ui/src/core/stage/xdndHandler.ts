@@ -16,10 +16,10 @@ type DelegateActor = Clutter.Actor & { _delegate?: DND.DragDelegate };
 
 const URI_LIST = 'text/uri-list';
 
-function fileTarget(actor: DelegateActor | null): DND.FileDropTarget | null {
-  for (; actor; actor = actor.get_parent()) {
+function fileTarget(picked: DelegateActor | null): DND.FileDropTarget | null {
+  for (let actor = picked; actor; actor = actor.get_parent()) {
     const target = actor._delegate?.fileDrop;
-    if (target) return target.takes() ? target : null;
+    if (target) return target.takes(picked!) ? target : null;
   }
   return null;
 }

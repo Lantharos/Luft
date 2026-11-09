@@ -92,7 +92,7 @@ The app hands over open files rather than paths, so it works from a sandbox that
 - Each file has to be a regular file with a plain name, at most 32 of them and 2 GB together. Pipes, sockets and devices are refused, and a file that grows while it's read is dropped.
 - Kestrel copies the files into `~/.cache/kestrel/sent`, readable only by you, and keeps the copies for a day, so a device that's slow to accept still gets them.
 
-The sheet lists the extensions that send files, such as Pigeon's devices with the same flow as from Rover, and the apps that say they open every one of the files, apart from the app they come from. An app opens its copy as if you'd opened it from Rover, so a sandboxed one gets it through the document portal.
+The sheet lists the devices nearby that [Post](components/kestrel.md#post) finds, with the same flow as from Rover, and the apps that say they open every one of the files, apart from the app they come from. Files people drop on Post in the taskbar, or on a bare part of the taskbar, open the same sheet, without copies, since they're the person's own. An app opens its copy as if you'd opened it from Rover, so a sandboxed one gets it through the document portal.
 
 ## Secrets
 

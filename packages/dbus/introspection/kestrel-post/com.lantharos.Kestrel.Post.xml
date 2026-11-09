@@ -1,0 +1,73 @@
+<node>
+  <interface name="com.lantharos.Kestrel.Post">
+    <method name="Configure">
+      <arg name="visibility" type="s" direction="in"/>
+      <arg name="name" type="s" direction="in"/>
+      <arg name="folder" type="s" direction="in"/>
+      <arg name="trusted" type="as" direction="in"/>
+    </method>
+    <method name="Scan">
+    </method>
+    <method name="Send">
+      <arg name="device" type="s" direction="in"/>
+      <arg name="paths" type="as" direction="in"/>
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="SendText">
+      <arg name="device" type="s" direction="in"/>
+      <arg name="text" type="s" direction="in"/>
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="Accept">
+      <arg name="id" type="s" direction="in"/>
+    </method>
+    <method name="Decline">
+      <arg name="id" type="s" direction="in"/>
+    </method>
+    <method name="Cancel">
+      <arg name="id" type="s" direction="in"/>
+    </method>
+    <method name="AnswerPin">
+      <arg name="id" type="s" direction="in"/>
+      <arg name="pin" type="s" direction="in"/>
+    </method>
+    <method name="StartPairing">
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="StopPairing">
+    </method>
+    <signal name="Offer">
+      <arg name="id" type="s"/>
+      <arg name="from" type="(ssssb)"/>
+      <arg name="files" type="a(sts)"/>
+      <arg name="size" type="t"/>
+    </signal>
+    <signal name="Text">
+      <arg name="from" type="(ssssb)"/>
+      <arg name="text" type="s"/>
+      <arg name="trusted" type="b"/>
+    </signal>
+    <signal name="Transfer">
+      <arg name="id" type="s"/>
+      <arg name="direction" type="s"/>
+      <arg name="device" type="s"/>
+      <arg name="stage" type="s"/>
+      <arg name="progress" type="(ttu)"/>
+    </signal>
+    <signal name="Finished">
+      <arg name="id" type="s"/>
+      <arg name="direction" type="s"/>
+      <arg name="device" type="s"/>
+      <arg name="outcome" type="s"/>
+      <arg name="saved" type="as"/>
+    </signal>
+    <signal name="Paired">
+      <arg name="device" type="(ssssb)"/>
+    </signal>
+    <property name="Alias" type="s" access="read"/>
+    <property name="Devices" type="a(ssssb)" access="read"/>
+    <property name="Folder" type="s" access="read"/>
+    <property name="Listening" type="b" access="read"/>
+    <property name="Scanning" type="b" access="read"/>
+  </interface>
+</node>

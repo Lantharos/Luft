@@ -4828,6 +4828,35 @@ dependencies = [
 ]
 
 [[package]]
+name = "kestrel-post"
+version = "0.1.0"
+dependencies = [
+ "bytes",
+ "dirs",
+ "futures-util",
+ "getrandom 0.4.3",
+ "http-body",
+ "http-body-util",
+ "hyper",
+ "hyper-util",
+ "jiff",
+ "luft-dbus-macros",
+ "nix",
+ "rcgen",
+ "rustls",
+ "serde",
+ "serde_json",
+ "sha2",
+ "socket2",
+ "tempfile",
+ "tokio",
+ "tokio-rustls",
+ "url",
+ "walkdir",
+ "zbus 6.0.0",
+]
+
+[[package]]
 name = "kestrel-search"
 version = "0.1.0"
 dependencies = [
@@ -7427,34 +7456,6 @@ name = "pico-args"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5be167a7af36ee22fe3115051bc51f6e6c7054c9348e28deb4f49bd6f705a315"
-
-[[package]]
-name = "pigeon"
-version = "0.1.0"
-dependencies = [
- "bytes",
- "dirs",
- "futures-util",
- "getrandom 0.4.3",
- "http-body",
- "http-body-util",
- "hyper",
- "hyper-util",
- "jiff",
- "nix",
- "rcgen",
- "rustls",
- "serde",
- "serde_json",
- "sha2",
- "socket2",
- "tempfile",
- "tokio",
- "tokio-rustls",
- "url",
- "walkdir",
- "zbus 6.0.0",
-]
 
 [[package]]
 name = "pin-project"

@@ -169,7 +169,107 @@ send-sheet-description = { $count ->
 }
 # Heading above the apps that can open the files
 send-sheet-apps = Apps
-send-sheet-nothing = Nothing here can take this
+
+## Post
+# Post sends files and text to phones and computers nearby and takes what they send, with the free LocalSend app on the other devices. Its name is like a postal service.
+
+post = Post
+# A menu entry in Rover and the heading of the devices in the Send sheet
+post-send-to-device = Send to device
+post-devices-nearby = Devices nearby
+post-looking = Looking for devices
+post-nobody = No devices nearby
+post-nobody-hint = Open LocalSend on your phone or other computer, on the same network as this one.
+post-look-again = Look again
+post-public-network = This network is public, so devices nearby can't find this computer here.
+post-port-taken = Another app is using LocalSend's port, so devices can't send here.
+post-back = Back
+post-gone = That device isn't nearby anymore
+post-send-files = Send files
+post-send-folder = Send a folder
+# Label of the field for text to send
+post-message = Text to send
+post-message-placeholder = Text or a link
+post-send-text = Send text
+# Title of the file chooser; $device is where the files go
+post-choose-for = Send to { $device }
+# $name is what other devices call this computer, such as “Mara's Laptop”
+post-who-finds = Who can find { $name }
+post-visibility-no-one = No one
+post-visibility-your-devices = Your devices
+post-visibility-everyone = Everyone
+post-settings = Post settings
+# $count is how many files, $device the device's name
+post-sending = { $count ->
+    [one] Sending a file to { $device }
+   *[other] Sending { $count } files to { $device }
+}
+post-sending-text = Sending text to { $device }
+post-receiving = { $count ->
+    [one] Receiving a file from { $device }
+   *[other] Receiving { $count } files from { $device }
+}
+# $done and $size are amounts such as “4.2 MB”
+post-progress = { $done } of { $size }
+post-waiting-for = Waiting for { $device } to accept
+post-asks-for-pin = { $device } asks for a PIN
+post-cancel = Cancel
+
+# A device offers files; $count is how many, $size their total, such as “12 MB”
+post-offers = { $count ->
+    [one] Wants to send you a file, { $size }
+   *[other] Wants to send you { $count } files, { $size }
+}
+# Under the sender's name once the files are on their way
+post-files-size = { $count ->
+    [one] One file, { $size }
+   *[other] { $count } files, { $size }
+}
+post-and-more = { $count ->
+    [one] and one more
+   *[other] and { $count } more
+}
+# A switch that makes the sender one of your devices, which send without asking
+post-always-accept = Always accept from { $device }
+post-decline = Decline
+post-accept = Accept
+# $folder is a folder's name, such as “Downloads”
+post-saved-in = Saved in { $folder }
+post-show-folder = Show in folder
+# Opens a received file
+post-open = Open
+post-received = { $count ->
+    [one] A file from { $device }
+   *[other] { $count } files from { $device }
+}
+post-stopped-by = { $device } stopped the transfer
+post-you-stopped = You stopped the transfer
+post-some-arrived = { $count ->
+    [one] Only one file arrived
+   *[other] Only { $count } files arrived
+}
+post-nothing-arrived = The transfer from { $device } didn't finish
+
+# Text someone sent
+post-sent-text = { $device } sent you text
+post-text-copied = Copied text from { $device }
+post-copy = Copy
+post-open-link = Open link
+
+# Sending
+post-pin-title = Enter the PIN { $device } shows
+post-pin-wrong = That PIN wasn't right. Try again.
+post-pin = PIN
+post-send = Send
+post-sent-text-to = Sent text to { $device }
+post-sent = { $count ->
+    [one] Sent a file to { $device }
+   *[other] Sent { $count } files to { $device }
+}
+post-declined = { $device } declined
+post-busy = { $device } is busy with another transfer
+post-unreachable = Couldn't reach { $device }
+post-send-failed = Sending to { $device } didn't finish
 
 ## Window access prompt
 # A program (often a coding assistant) asks to see or control the windows on the screen. Kestrel can't tell which program it is, only that it runs outside a sandbox.

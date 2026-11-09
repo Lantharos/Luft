@@ -141,9 +141,10 @@ impl FirewallApp {
     fn new(kind: &str, id: String, access: &str) -> Option<Self> {
         let kind = FirewallAppKind::parse(kind)?;
         let access = FirewallAccess::parse(access)?;
-        let app = (kind == FirewallAppKind::App)
-            .then(|| App::by_id(&format!("{id}.desktop")))
-            .flatten();
+        let app = match kind {
+            FirewallAppKind::App => App::by_id(&format!("{id}.desktop")),
+            FirewallAppKind::Program => App::by_program(&id),
+        };
         Some(Self {
             kind,
             name: app
@@ -154,6 +155,12 @@ impl FirewallApp {
             access,
         })
     }
+}
+
+#[derive(Deserialize, Type)]
+pub struct ForgetApp {
+    kind: FirewallAppKind,
+    id: String,
 }
 
 #[derive(Deserialize, Type)]
@@ -331,6 +338,12 @@ pub async fn open_port(
 
 pub async fn close_port(OpenPort { port, protocol, .. }: OpenPort) -> Result<(), String> {
     call("ClosePort", &(port, protocol.name())).await
+}
+
+pub async fn forget_app(
+    ForgetApp { kind, id }: ForgetApp,
+) -> Result<(), String> {
+    call("ForgetApp", &(kind.name(), id)).await
 }
 
 pub async fn set_app_access(

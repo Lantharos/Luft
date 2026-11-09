@@ -11,19 +11,22 @@ export class Extensions {
   private readonly desktop = new DesktopState();
   private readonly monitorListeners = new Set<() => void>();
   private readonly manager: ExtensionManager;
+  /** What the extension API stands on, which Kestrel's own pop-ups use too. */
+  readonly host: ExtensionHost;
   private readonly service: ExtensionsService;
   private readonly ports: ExtensionPorts;
   private readonly fileActions = new FileActionsService();
 
   constructor(parts: HostParts) {
-    this.manager = new ExtensionManager({
+    this.host = {
       ...parts,
       desktop: this.desktop,
       watchMonitors: changed => {
         this.monitorListeners.add(changed);
         return () => this.monitorListeners.delete(changed);
       },
-    });
+    };
+    this.manager = new ExtensionManager(this.host);
     this.service = new ExtensionsService(this.manager);
     this.ports = new ExtensionPorts(this.manager);
   }

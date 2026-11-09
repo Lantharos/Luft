@@ -20,7 +20,27 @@ peek stop $h
 
 `com.lantharos.Kestrel.OpenWindows` at `/com/lantharos/Kestrel/OpenWindows` on `com.lantharos.Kestrel` tells apps which apps have a window open. `List` returns each app's desktop file ID with the process IDs of its windows, and `Changed` is sent whenever that changes. Barometer uses it to show apps running in the background. Sandboxed apps are refused.
 
-`com.lantharos.Kestrel.Share` at `/com/lantharos/Kestrel/Share` opens the Send sheet for files an app hands over as open files, where people choose an extension's device, such as Pigeon's, or an app for them. It's the one call of Kestrel's that sandboxed apps may make besides reading the palette; [App sandbox](../app-sandbox.md#sending-files) has what it checks.
+`com.lantharos.Kestrel.Share` at `/com/lantharos/Kestrel/Share` opens the Send sheet for files an app hands over as open files, where people choose a device nearby through [Post](#post) or an app for them. It's the one call of Kestrel's that sandboxed apps may make besides reading the palette; [App sandbox](../app-sandbox.md#sending-files) has what it checks.
+
+## Post
+
+Post sends files, folders and text to phones and computers nearby and takes what they send, over LocalSend's protocol (version 2.x, HTTPS on port 53317, with announcements to `224.0.0.167:53317`), so LocalSend's apps on Android, iOS, Windows, macOS and Linux work with it. What people see of it is in [the docs](https://docs.luft.computer/desktop/post/).
+
+`kestrel-post` (`kestrel/post`) speaks the protocol. It's a session service in `session.slice`, `kestrel-post.service`, which D-Bus starts as `com.lantharos.Kestrel.Post` the first time Kestrel calls it, sandboxed to the network families it needs. It keeps its certificate in `kestrel/post` in the user's data folder; the certificate's SHA-256 is how other devices know this computer. LocalSend's parts live in `src/localsend`, and the rest (the D-Bus interface, settings, firewall, progress) knows nothing of LocalSend, so another protocol can sit beside it.
+
+`com.lantharos.Kestrel.Post` at `/com/lantharos/Kestrel/Post` has the devices nearby, whether it's looking, the name it goes by and where files go as properties, and methods to send files or text, answer offers and PINs, cancel, and pair. Kestrel calls `Configure` with what people chose, from `com.lantharos.kestrel.post`, whenever that changes and whenever `kestrel-post` starts again. Settings calls `StartPairing` and `StopPairing`. The prefix keeps sandboxed apps from asking for it.
+
+Who can find this computer (`visibility`) decides what it says to whom:
+
+- **No one**: it serves nothing and announces nothing, and the firewall keeps the port closed. Sending still works: looking for devices asks each address on the local `/24` for `/info`, which shows nothing of this computer.
+- **Your devices** (the default): it never announces itself to everyone. It answers `/info`, `/register` and `prepare-upload` only for a device whose TLS client certificate is one of yours, registers back only with those when they announce themselves, and looks for devices by asking each address nearby as above, registering with yours as it finds them.
+- **Everyone**: it announces itself, answers everyone, and asks before taking files from a device that isn't one of yours.
+
+Your devices are the `devices` key, fingerprints with names. A device becomes one either by **Always accept** in the window that asks about its files, which needs a client certificate, or through Settings, which calls `StartPairing`: for as long as the dialog is open the computer can be found by everyone, `prepare-upload` from a device that isn't yours asks for the six-digit PIN Settings shows, three wrong tries per address, and the first device with a certificate that gives it becomes yours (`Paired`), Kestrel keeping it.
+
+Kestrel draws Post in `kestrel/ui/src/system/post`: the window that asks about what comes in and shows it arriving, text windows, the PIN prompt, notifications, Post's button and panel in the taskbar beside the status icons, which shows while someone may find the computer, and Send to device in Rover's menu, which is a file action Kestrel adds itself. Files dropped on Post's button or on a bare part of the taskbar open the Send sheet. `kestrel-post` tells the firewall with `SetPostOpen` whether its port should be open; see [Security](../security.md#post).
+
+Headless sessions run `kestrel-post` in a network of its own (`kestrel/tools/session/postNetwork.sh`): two network namespaces in a user namespace, joined by a veth pair with multicast, this computer at `10.53.17.1` and a computer nearby at `10.53.17.2`. `desktop:post` and `desktop:send` start a second `kestrel-post` at the far end, on a bus of its own, so checks never reach the real network or a real Post on the same computer.
 
 ## Sounds
 

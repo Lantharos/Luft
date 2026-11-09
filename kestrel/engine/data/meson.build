@@ -30,6 +30,9 @@ foreach resource : data_resources
 endforeach
 
 fs.copyfile('characters.json', install: true, install_dir: pkgdatadir)
+foreach icon : ['computer', 'look-again', 'phone', 'send', 'server', 'terminal', 'web']
+  fs.copyfile('post' / icon + '.svg', 'post-' + icon + '.svg', install: true, install_dir: pkgdatadir)
+endforeach
 
 cldr = '/usr/share/unicode/cldr/common'
 if not fs.is_dir(cldr / 'annotations')
@@ -74,7 +77,7 @@ configure_file(
   configuration: schemaconf,
   install_dir: schemadir
 )
-foreach name : ['copilot-key', 'diagnostics', 'dictation', 'drives', 'housekeeping', 'media-keys', 'night-light', 'pen', 'power', 'sounds', 'touchscreen']
+foreach name : ['copilot-key', 'diagnostics', 'dictation', 'drives', 'housekeeping', 'media-keys', 'night-light', 'pen', 'post', 'power', 'sounds', 'touchscreen']
   configure_file(
     input: 'com.lantharos.kestrel.@0@.gschema.xml'.format(name),
     output: 'com.lantharos.kestrel.@0@.gschema.xml'.format(name),

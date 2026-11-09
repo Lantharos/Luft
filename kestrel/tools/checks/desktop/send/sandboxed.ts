@@ -15,7 +15,7 @@ const DENIED = 'org.freedesktop.DBus.Error.AccessDenied';
 
 /**
  * Sends a file from a Sabine AppImage in its sandbox, which can see only its home folder: the sheet opens for the
- * files it hands over, while the rest of Kestrel, Pigeon's file actions among it, stays out of its reach.
+ * files it hands over, while the rest of Kestrel, its file actions among it, stays out of its reach.
  */
 export async function checkSandboxed(sheet: () => unknown, pdf: Uint8Array) {
   if (!GLib.find_program_in_path('squashfuse_ll')) {
@@ -38,7 +38,7 @@ export async function checkSandboxed(sheet: () => unknown, pdf: Uint8Array) {
     const probed = JSON.parse((await caller.next('the sandboxed app tries Kestrel', 15000)).replace(/^probed /, '')) as Record<string, string>;
     require(probed.palette === 'answered', 'a sandboxed app reads Kestrel\'s palette');
     require(probed['file-actions'] === DENIED && probed.extensions === DENIED && probed['share-introspect'] === DENIED,
-      'and reaches nothing else of Kestrel\'s, neither Pigeon\'s file actions nor the extensions, nor even the Send sheet\'s description');
+      'and reaches nothing else of Kestrel\'s, neither the file actions nor the extensions, nor even the Send sheet\'s description');
     await caller.send();
     await eventually(sheet, 'a sandboxed app opens the Send sheet for a file it hands over');
     await settled();

@@ -21,7 +21,6 @@ export default function enable(api) {
     key: 'share',
     label: 'Share with',
     icon: 'send-to-symbolic',
-    sends: true,
     items: () => [
       ...found.length ? found.map(name => ({ key: name, label: name, icon: 'phone-symbolic' })) : [{ key: 'nobody', label: 'Nobody here', disabled: true }],
       'separator',

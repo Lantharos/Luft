@@ -45,7 +45,7 @@ build_helpers() {
   glib-compile-schemas "$build/data"
   bun "$tools/build.ts" "$built_tools"
   build_extensions
-  (cd "$root" && cargo build --release --quiet -p kestrel-session-manager -p kestrel-settings -p kestrel-search -p kestrel-portal -p luft-pinentry \
+  (cd "$root" && cargo build --release --quiet -p kestrel-session-manager -p kestrel-settings -p kestrel-search -p kestrel-portal -p kestrel-post -p luft-pinentry \
     -p kestrel-openconnect -p kestrel-greeter-service -p kestrel-wrapper -p peek -p luft-accounts-service -p luft-speech-service)
 }
 
@@ -65,6 +65,7 @@ write_dbus_services() {
   dbus_service org.freedesktop.Notifications "$(command -v gjs)" -m "$build/ui/com.lantharos.Kestrel.Notifications"
   dbus_service com.lantharos.Kestrel.HotplugSniffer "$build/src/hotplug-sniffer/kestrel-hotplug-sniffer"
   dbus_service com.lantharos.Kestrel.Portal "$root/target/release/kestrel-portal"
+  dbus_service com.lantharos.Kestrel.Post "$tools/session/postNetwork.sh" run "$session/post-network" this "$root/target/release/kestrel-post"
   dbus_service org.freedesktop.impl.portal.desktop.rover "$(command -v gjs)" -m "$built_tools/fixtures/session/fileChooser.js"
   for name in com.lantharos.Keyring1 org.freedesktop.secrets org.freedesktop.portal.IBus org.freedesktop.portal.Desktop \
     org.gtk.vfs.AfcVolumeMonitor org.gtk.vfs.GPhoto2VolumeMonitor org.gtk.vfs.MTPVolumeMonitor; do

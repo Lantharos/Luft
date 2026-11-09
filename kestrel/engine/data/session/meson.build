@@ -57,6 +57,20 @@ configure_file(
 )
 
 configure_file(
+  input: 'kestrel-post.service.in',
+  output: 'kestrel-post.service',
+  configuration: settingsconf,
+  install_dir: systemduserunitdir,
+)
+
+configure_file(
+  input: 'com.lantharos.Kestrel.Post.service.in',
+  output: 'com.lantharos.Kestrel.Post.service',
+  configuration: settingsconf,
+  install_dir: servicedir,
+)
+
+configure_file(
   input: 'com.lantharos.Kestrel.Portal.service.in',
   output: 'com.lantharos.Kestrel.Portal.service',
   configuration: settingsconf,

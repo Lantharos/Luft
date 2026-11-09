@@ -73,6 +73,7 @@
     <file preprocess="xml-stripblanks">scalable/status/osk-layout-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/status/osk-shift-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/status/osk-zwnj-symbolic.svg</file>
+    <file preprocess="xml-stripblanks">scalable/status/post-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/status/switch-off-symbolic.svg</file>
     <file preprocess="xml-stripblanks">scalable/status/switch-on-symbolic.svg</file>
   </gresource>

@@ -218,6 +218,42 @@ impl Service {
         Ok(self.waiting_changed(&emitter).await?)
     }
 
+    async fn forget_app(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
+        kind: &str,
+        id: &str,
+    ) -> Result<(), Error> {
+        let identity = Identity::parse(kind, id)
+            .ok_or_else(|| Error::InvalidArgs(format!("{kind} {id} isn't an app or a program")))?;
+        authorize(connection, &header, APPS).await?;
+        self.firewall
+            .lock()
+            .await
+            .forget(&identity)
+            .await
+            .map_err(Error::Failed)?;
+        self.apps_changed(&emitter).await?;
+        Ok(self.waiting_changed(&emitter).await?)
+    }
+
+    async fn set_post_open(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        open: bool,
+    ) -> Result<(), Error> {
+        let unit = session_unit(connection, &header).await?;
+        self.firewall
+            .lock()
+            .await
+            .open_post(unit, open)
+            .await
+            .map_err(Error::Failed)
+    }
+
     async fn set_extension_ports(
         &self,
         #[zbus(connection)] connection: &Connection,

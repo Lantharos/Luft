@@ -7,7 +7,16 @@
 
 	let { transcript, onedit }: { transcript: Transcript; onedit: () => void } = $props();
 
-	type Field = 'text' | 'term' | 'meaning' | 'task' | 'due' | 'question' | 'answer';
+	const FIELD_LABELS = {
+		text: 'notes-field-text',
+		term: 'notes-field-term',
+		meaning: 'notes-field-meaning',
+		task: 'notes-field-task',
+		due: 'notes-field-due',
+		question: 'notes-field-question',
+		answer: 'notes-field-answer'
+	} as const;
+	type Field = keyof typeof FIELD_LABELS;
 	type Item = { at: number } & Partial<Record<Field, string | null>>;
 
 	let sections = $derived.by(() => {
@@ -52,7 +61,7 @@
 									contenteditable="plaintext-only"
 									role="textbox"
 									tabindex="0"
-									aria-label={t(`notes-field-${field}`)}
+									aria-label={t(FIELD_LABELS[field])}
 									onblur={(event) => edit(item, field, event.currentTarget)}>{item[field] ?? ''}</span
 								>
 							{/if}

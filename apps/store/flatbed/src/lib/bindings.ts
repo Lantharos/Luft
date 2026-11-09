@@ -18,10 +18,6 @@ export const commands = {
 	importPictures: (params: {
 		paths: string[],
 	}, options?: CallOptions) => invoke<number>("import_pictures", params, options),
-	openWith: (params: {
-		path: string,
-		token?: string | null,
-	}, options?: CallOptions) => invoke<null>("open_with", params, options),
 	pageCorners: (params: {
 		id: string,
 		quad: Quad,
@@ -59,6 +55,9 @@ export const commands = {
 	scannerAdd: (params: {
 		address: string,
 	}, options?: CallOptions) => invoke<null>("scanner_add", params, options),
+	send: (params: {
+		files: string[],
+	}, options?: CallOptions) => invoke<null>("send", params, options),
 	settingsSave: (params: {
 		languages: string[],
 		paper: PaperSize,
@@ -182,7 +181,8 @@ export type Quad = [([number, number]), ([number, number]), ([number, number]), 
 export type Saved = {
 	/**  The file, or the folder the pages went into. */
 	path: string,
-	files: number,
+	/**  Every file written, to send on. */
+	files: string[],
 };
 
 export type ScanError = { kind: "cancelled" } | { kind: "busy" } | { kind: "feederEmpty" } | { kind: "gone" } | { kind: "failed"; message: string };

@@ -8,20 +8,18 @@ import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {checks} from '../lib/check.js';
 import {scroll, type Point} from '../lib/input/input.js';
-import {fixture, outcome, repository, scratch, spawn, stop, waitForWindow, windows} from '../lib/processes.js';
+import {fixture, outcome, scratch, spawn, stop, waitForWindow, windows} from '../lib/processes.js';
 import {capture} from '../lib/screenshots.js';
 import {pause, waitUntil} from '../lib/wait.js';
 import {withApp} from './lib/apps.js';
 import {write} from './lib/files.js';
 import {showEnd} from './settings/navigation.js';
 import {withFullAccess} from '../lib/access/permissions.js';
+import {desktopFile, install, launchLine, SABINE_BUILDER} from './lib/appImages.js';
 
 const {require} = checks('AppImage sandbox');
-const SCHELF = repository('target', 'release', 'schelf');
-const SANDBOX = '--sandbox';
 const APPIMAGE_BUILDER = fixture('sandbox', 'appimage.py');
 const RENDERER = fixture('sandbox', 'renderer');
-const SABINE_BUILDER = fixture('sandbox', 'sabine.py');
 const ZYPAK = '/usr/lib/zypak/zypak-helper';
 const WINDOW_TIMEOUT = 60000;
 const LOADING = 5000;
@@ -32,36 +30,6 @@ const TEX = 'text/x-tex';
 const OPEN_TIMEOUT = 20000;
 
 export const timeout = 1200000;
-
-const applications = () => GLib.build_filenamev([GLib.get_user_data_dir(), 'applications']);
-const desktopFile = (id: string) => GLib.build_filenamev([applications(), `${id}.desktop`]);
-
-function entries(): Set<string> {
-  const folder = Gio.File.new_for_path(applications());
-  if (!folder.query_exists(null)) return new Set();
-  return new Set([...folder.enumerate_children('standard::name', Gio.FileQueryInfoFlags.NONE, null)]
-    .map(info => info.get_name()).filter(name => name.endsWith('.desktop')).map(name => name.slice(0, -'.desktop'.length)));
-}
-
-function launchLine(id: string) {
-  const entry = new GLib.KeyFile();
-  entry.load_from_file(desktopFile(id), GLib.KeyFileFlags.NONE);
-  const [program, ...rest] = GLib.shell_parse_argv(entry.get_string('Desktop Entry', 'Exec'))[1]!;
-  return {program, rest: rest.filter(argument => !argument.startsWith('%') && !argument.startsWith('@@')), entry};
-}
-
-async function install(path: string) {
-  const copy = scratch(`appimage-${GLib.path_get_basename(path)}`);
-  Gio.File.new_for_path(path).copy(Gio.File.new_for_path(copy), Gio.FileCopyFlags.OVERWRITE, null, null);
-  const before = entries();
-  const installed = await outcome([SCHELF, 'install', '--yes', copy]);
-  require(installed.ok, `Schelf installs ${GLib.path_get_basename(path)}`);
-  const [id] = [...entries()].filter(name => !before.has(name));
-  require(id, `${GLib.path_get_basename(path)} gets a menu entry`);
-  const {program, rest} = launchLine(id);
-  require(program === GLib.canonicalize_filename(SCHELF, null) && rest[0] === SANDBOX && rest[1] === id, `the menu entry of ${id} starts it in its sandbox`);
-  return id;
-}
 
 function launch(id: string) {
   const {program, rest} = launchLine(id);

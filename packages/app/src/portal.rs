@@ -202,26 +202,18 @@ pub async fn camera() -> Result<Option<zbus::OwnedFd>, String> {
 /// Shows a file in the file manager, through the portal, which finds it
 /// outside a sandbox too.
 pub async fn reveal(path: &Path, token: Option<&str>) -> Result<(), String> {
-    open_uri("OpenDirectory", path, token, false).await
-}
-
-/// Asks which app to open a file with, and opens it there.
-pub async fn open_with(path: &Path, token: Option<&str>) -> Result<(), String> {
-    open_uri("OpenFile", path, token, true).await
-}
-
-async fn open_uri(method: &str, path: &Path, token: Option<&str>, ask: bool) -> Result<(), String> {
     let file = std::fs::File::open(path).map_err(|error| error.to_string())?;
-    request("org.freedesktop.portal.OpenURI", method, |handle| {
-        let mut options = HashMap::from([("handle_token", Variant::from(handle))]);
-        if let Some(token) = token {
-            options.insert("activation_token", Variant::from(token.to_owned()));
-        }
-        if ask {
-            options.insert("ask", Variant::from(true));
-        }
-        ("", zbus::Fd::from(&file), options)
-    })
+    request(
+        "org.freedesktop.portal.OpenURI",
+        "OpenDirectory",
+        |handle| {
+            let mut options = HashMap::from([("handle_token", Variant::from(handle))]);
+            if let Some(token) = token {
+                options.insert("activation_token", Variant::from(token.to_owned()));
+            }
+            ("", zbus::Fd::from(&file), options)
+        },
+    )
     .await
     .map(drop)
 }

@@ -9,7 +9,7 @@ const DEVICES: Record<string, string> = { mobile: 'phone', desktop: 'computer', 
 const menuIcon = (name: string) => `${MENU_ICONS}/${name}.svg`;
 const deviceIcon = (peer: Peer) => menuIcon(DEVICES[peer.kind] ?? 'computer');
 
-/** Send to device in Rover's menu of files and folders, with the devices nearby to choose from. */
+/** Send to device in Rover's menu of files and folders and in the Send sheet apps open, with the devices nearby to choose from. */
 export function addFileAction(pigeon: Pigeon): void {
   const { t, fileActions } = pigeon.extension;
   const devices = (): FileActionItem[] => pigeon.devices.length
@@ -22,6 +22,7 @@ export function addFileAction(pigeon: Pigeon): void {
     key: 'send',
     label: t('send-to-device'),
     icon: menuIcon('send'),
+    sends: true,
     items: () => [...devices(), 'separator', lookAgain()],
     onOpened: () => pigeon.scan(),
     onActivate: (paths, choice) => {

@@ -4,7 +4,7 @@ use std::path::Path as FilePath;
 
 use gio::prelude::*;
 use luft_app::portal::{self, FileChooser, Filter};
-use luft_app::{Activation, Commands, Empty, file_manager};
+use luft_app::{Activation, Commands, Empty, file_manager, share};
 use sabine::SabineWindow;
 
 use crate::app::state::MagpieState;
@@ -80,6 +80,10 @@ fn register_files(window: SabineWindow, state: &MagpieState) -> SabineWindow {
         .command("open_with", |OpenWith { path, app, token }| {
             apps::open_with(FilePath::new(&path), &app, token.as_deref())
         })
+        .command_async(
+            "send",
+            |Path { path }| async move { share::send(&[path]).await },
+        )
         .command_async("show_in_folder", |Handoff { path, token }| async move {
             file_manager::show_in_folder(FilePath::new(&path), token.as_deref()).await
         })

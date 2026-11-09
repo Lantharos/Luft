@@ -257,12 +257,20 @@ notebook-unsplit = Close the one beside
 beside-title = Open beside
 beside-body = Both stay open side by side, each on its own page, and come back together next time.
 
-# Shown when PDFs are opened with Heft; the variables are how many there are and the first one's name.
+# Shown when PDFs or pictures are opened with Heft or sent to it; the variables are how many there are, the first one's name, and $kind: "books" for PDFs, "pictures" for pictures, "files" for both.
 import-title = { $count ->
     [one] Add { $name } to which subject?
-   *[other] Add { $count } textbooks to which subject?
+   *[other] { $kind ->
+        [books] Add { $count } textbooks to which subject?
+        [pictures] Add { $count } pictures to which subject?
+       *[files] Add { $count } files to which subject?
+    }
 }
-import-body = Each becomes a book you can write and highlight in. The PDF itself stays as it is.
+import-body = { $kind ->
+    [books] Each becomes a book you can write and highlight in. The PDF itself stays as it is.
+    [pictures] They go into a new notebook, each on a page of its own.
+   *[files] PDFs become books you can write and highlight in, and pictures go into a new notebook.
+}
 
 ## Page rail
 

@@ -35,6 +35,7 @@ export function fileActionsApi(context: ApiContext): FileActions {
             extensions: state.on?.extensions ?? [],
             multiple: state.on?.multiple !== false,
             items: items ? items.map(choice) : null,
+            sends: !!state.sends,
           };
         },
         opened: () => {

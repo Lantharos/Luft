@@ -4,7 +4,7 @@ use std::fs;
 use std::path::Path;
 
 use luft_app::portal::{self, FileChooser, Filter, uri_path};
-use luft_app::{Commands, Empty};
+use luft_app::{Commands, Empty, share};
 use sabine::SabineWindow;
 
 use crate::document::{self, Kind, Source};
@@ -132,7 +132,7 @@ pub fn register(window: SabineWindow) -> SabineWindow {
         .command_async("reveal", |Saved { path, token }| async move {
             portal::reveal(Path::new(&path), token.as_deref()).await
         })
-        .command_async("open_with", |Saved { path, token }| async move {
-            portal::open_with(Path::new(&path), token.as_deref()).await
+        .command_async("send", |Files { files }| async move {
+            share::send(&files).await
         })
 }

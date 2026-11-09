@@ -137,7 +137,10 @@ saved-several = { $count ->
    *[other] All { $count } pages are saved.
 }
 saved-show = Show in folder
-saved-open-with = Open with…
+# Button that opens the system's Send sheet, to send the saved scan to a device nearby or an app
+saved-send = Send…
+# $reason comes from the system and may be in English
+send-failed = It couldn't be sent: { $reason }
 
 ## Adding a scanner
 

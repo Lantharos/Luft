@@ -11,6 +11,8 @@ Heft is a store app (`apps/store/heft`), like Draft, Magpie and Convertible: the
 - **Native side** (`desktop/`, Rust): a thin, careful file layer. Every path the page names is resolved inside `~/Documents/Heft` and refused if it would leave it. Appends and replacements are synced before they answer (`library/disk.rs`), so an acknowledged stroke survives a power cut. It also scans the library, keeps the trash (30 days), takes a daily backup (hard links for files that are only ever replaced, copies for journals) and talks to the file chooser portal. Binary data travels as raw bridge bodies, never JSON or base64.
 - **Page** (`src/`, Svelte 5, `@luft/ui`, Tailwind): everything else, including the file format, so it has one implementation.
 
+PDFs and pictures reach Heft as launch arguments: opened from Rover, chosen in the Send sheet of another app, or forwarded to the running window when it's already open. Inside the sandbox they come through the document portal, which `file_read_outside` reads. The import dialog asks for a subject; PDFs become books, and pictures go into one new notebook, a page each (`library/pictures.ts`).
+
 | Folder | Holds |
 | --- | --- |
 | `ink/` | Strokes, their geometry, smoothing, pressure, the binary codec, the eraser and shape recognition |

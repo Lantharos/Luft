@@ -248,10 +248,22 @@ beside-title = Otvaranje pored
 beside-body = Obe ostaju otvorene jedna pored druge, svaka na svojoj strani, i sledeći put se vraćaju zajedno.
 import-title = { $count ->
     [one] U koji predmet da se doda { $name }?
-    [few] U koji predmet da se dodaju { $count } udžbenika?
-   *[other] U koji predmet da se doda { $count } udžbenika?
+    [few] { $kind ->
+        [pictures] U koji predmet da se dodaju { $count } slike?
+        [files] U koji predmet da se dodaju { $count } datoteke?
+       *[books] U koji predmet da se dodaju { $count } udžbenika?
+    }
+   *[other] { $kind ->
+        [pictures] U koji predmet da se doda { $count } slika?
+        [files] U koji predmet da se doda { $count } datoteka?
+       *[books] U koji predmet da se doda { $count } udžbenika?
+    }
 }
-import-body = Svaki postaje knjiga u kojoj možete da pišete i markirate. Sam PDF ostaje kakav jeste.
+import-body = { $kind ->
+    [pictures] Idu u novu svesku, svaka na svoju stranu.
+    [files] PDF-ovi postaju knjige u kojima možete da pišete i markirate, a slike idu u novu svesku.
+   *[books] Svaki postaje knjiga u kojoj možete da pišete i markirate. Sam PDF ostaje kakav jeste.
+}
 
 ## Page rail
 

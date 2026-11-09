@@ -8,7 +8,7 @@ version = "0.1.0"
 maintainer = "Lantharos <kristof@lanth.me>"
 icon = "public/favicon.svg"
 cargo_manifest = "desktop/Cargo.toml"
-mime_types = ["application/pdf"]
+mime_types = ["application/pdf", "image/png", "image/jpeg", "image/webp", "image/gif", "image/avif"]
 
 [install]
 command = "cargo run --manifest-path desktop/Cargo.toml --"

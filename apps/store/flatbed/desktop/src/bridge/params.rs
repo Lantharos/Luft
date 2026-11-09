@@ -61,6 +61,11 @@ pub struct Saved {
     pub token: Option<String>,
 }
 
+#[derive(Deserialize, Type)]
+pub struct Files {
+    pub files: Vec<String>,
+}
+
 /// The settings people choose in the window.
 #[derive(Deserialize, Type)]
 pub struct Preferences {

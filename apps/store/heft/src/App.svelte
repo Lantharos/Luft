@@ -13,6 +13,7 @@
 	import Home from '#lib/home/Home.svelte';
 	import ImportDialog from '#lib/home/ImportDialog.svelte';
 	import { isPdf } from '#lib/pdf/import.js';
+	import { isPicture } from '#lib/library/pictures.js';
 	import CarryGhost from '#lib/drag/CarryGhost.svelte';
 	import { reader } from '#lib/handwriting/reader.svelte.js';
 	import { power } from '#lib/recording/power.svelte.js';
@@ -62,7 +63,7 @@
 		stopReading = reader.start();
 		const stops = [await power.start(), recorder.start(), processing.start()];
 		stopRecording = () => stops.forEach((stop) => stop());
-		importing = state.launchPaths.filter(isPdf);
+		importing = state.launchPaths.filter(importable);
 	}
 
 	function keys(event: KeyboardEvent) {
@@ -74,8 +75,10 @@
 		handleAppKeys(event);
 	}
 
+	const importable = (path: string) => isPdf(path) || isPicture(path);
+
 	async function activate(activation: SingleInstanceEvent) {
-		importing = (await commands.resolveArguments(activation)).filter(isPdf);
+		importing = (await commands.resolveArguments(activation)).filter(importable);
 	}
 </script>
 

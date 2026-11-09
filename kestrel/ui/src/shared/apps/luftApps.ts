@@ -12,7 +12,7 @@ function isLuftProgram(path: string): boolean {
 }
 
 export function luftAppPrograms(appId: string): string[] {
-  const built = BUILT_APPS ? [`${BUILT_APPS}/${appId.slice(LUFT_APP.length)}`] : [];
+  const built = BUILT_APPS ? [`${BUILT_APPS}/${appId.slice(LUFT_APP.length).toLowerCase()}`] : [];
   return [`/usr/lib/sabine/${appId}/`, ...built];
 }
 

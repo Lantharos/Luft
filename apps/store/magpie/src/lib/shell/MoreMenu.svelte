@@ -2,7 +2,7 @@
 	import { MenuButton, MenuItem, MenuSeparator, tooltip } from '@luft/ui';
 	import Ellipsis from '@lucide/svelte/icons/ellipsis';
 	import type { Snippet } from 'svelte';
-	import { showInFolder } from '#lib/bridge/index.js';
+	import { send, showInFolder } from '#lib/bridge/index.js';
 	import { openFile } from '#lib/app/actions.js';
 	import { library } from '#lib/library/library.svelte.js';
 
@@ -17,6 +17,12 @@
 			<MenuSeparator />
 		{/if}
 		{#if library.current}
+			<MenuItem
+				onclick={() => {
+					close();
+					void send(library.current!.path);
+				}}>Send…</MenuItem
+			>
 			<MenuItem
 				onclick={() => {
 					close();

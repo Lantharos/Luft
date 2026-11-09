@@ -179,6 +179,8 @@ Where an element sits is the person's choice, never the extension's. They drag i
 
 Only Rover may call it. An action runs on the paths it's handed, so a sandboxed app that could call `Activate` could make Pigeon send any file to a phone. Kestrel checks that the caller's program is Rover's, installed in `/usr/lib/sabine/com.lantharos.rover` or built in a test session's apps folder, and refuses everything else.
 
+Actions with `sends` also show in the Send sheet ([App sandbox](app-sandbox.md#sending-files)), which Kestrel draws itself and runs them from with the copies it made of the files an app handed over.
+
 ## Dropping files on the taskbar
 
 A taskbar element with `onDrop` takes files dragged from apps. Kestrel can't read a drag that isn't over a window by itself, so patch 69 of the compositor adds `meta_dnd_set_shell_target()`. While a drag that carries `text/uri-list` moves, `XdndHandler` looks for an actor whose delegate has a `fileDrop` target under the pointer, lights it up and tells Mutter. Mutter then tells the app the drop would copy, and when the drag is let go there it reads the URI list from the app and emits `dnd-drop` with it, after `dnd-leave`, which `XdndHandler` hands to the target that was lit last. Drags from X11 apps aren't covered.

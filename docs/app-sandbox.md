@@ -26,7 +26,7 @@ talk = ["org.mpris.MediaPlayer2.notes"]
 | `network` | `true` | It can go online |
 | `filesystems` | none | `home`, `xdg-desktop`, `xdg-documents`, `xdg-download`, `xdg-music`, `xdg-pictures` or `xdg-videos`, read-only with `:ro`. Files you pick in a file dialog always reach it. An app given your home folder still keeps its own files in `~/.var/app/APP-ID` |
 | `devices` | none | `usb`, `serial` or `all`. The graphics card, sound and the camera through the portal need nothing |
-| `talk` | none | Session bus names it calls besides the portals, notifications, the Secret Service, the tray and Kestrel's palette. Names that would let it widen its own sandbox, such as the permission store, Flatpak's and systemd's, are refused, and so is Kestrel's, whose other services are only for Luft's own apps |
+| `talk` | none | Session bus names it calls besides the portals, notifications, the Secret Service, the tray, Kestrel's palette and its Send sheet. Names that would let it widen its own sandbox, such as the permission store, Flatpak's and systemd's, are refused, and so is Kestrel's, whose other services are only for Luft's own apps |
 
 An app that can't work in a sandbox at all says so, with a reason you'll read before allowing it:
 
@@ -74,6 +74,25 @@ Whatever an AppImage opens, a download, a link or a folder, goes to the desktop 
 The portal only opens files the sandbox shows at the path they have outside it, such as your Downloads folder and the folders you gave the app, not the files in the app's own folder, which the sandbox shows as your home folder.
 
 The relay follows the bus authentication of every client, including ones that send their commands without waiting for each answer, as zbus does.
+
+## Sending files
+
+An app sends a file it holds, such as a scan it just saved, through Kestrel's Send sheet, where people choose a device nearby or another app for it. The app never learns which devices or apps there are, and nothing goes anywhere until someone picks it in the sheet. `luft_app::share::send(paths)` is all an app calls.
+
+`com.lantharos.Kestrel` exports `com.lantharos.Kestrel.Share` at `/com/lantharos/Kestrel/Share` on the session bus, with one method:
+
+| Method | Does |
+| --- | --- |
+| `Send(a(sh) files)` | Opens the Send sheet for these files, each a name and an open file, and returns once it closes |
+
+The app hands over open files rather than paths, so it works from a sandbox that can't see where they are, and the bus proxy of the AppImage sandbox lets this one call through and nothing else of Kestrel's. Kestrel holds the call to what a person could have asked for:
+
+- It opens only while one of the caller's windows is in front: by the sandbox's app ID, or outside a sandbox by the process behind the window, or for Luft's own apps, whose windows Sabine's shared browser draws, by the program the window's app runs.
+- One sheet is open at a time, and an app opens at most five a minute.
+- Each file has to be a regular file with a plain name, at most 32 of them and 2 GB together. Pipes, sockets and devices are refused, and a file that grows while it's read is dropped.
+- Kestrel copies the files into `~/.cache/kestrel/sent`, readable only by you, and keeps the copies for a day, so a device that's slow to accept still gets them.
+
+The sheet lists the extensions that send files, such as Pigeon's devices with the same flow as from Rover, and the apps that say they open every one of the files, apart from the app they come from. An app opens its copy as if you'd opened it from Rover, so a sandboxed one gets it through the document portal.
 
 ## Secrets
 

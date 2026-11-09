@@ -53,14 +53,15 @@
 		if (saved) await commands.reveal({ path: saved.path, token: await activationToken() });
 	}
 
-	async function openWith() {
-		if (saved) await commands.openWith({ path: saved.path, token: await activationToken() });
+	async function send() {
+		problem = '';
+		if (saved) await commands.send({ files: saved.files }, { timeoutMs: 24 * 60 * 60 * 1000 }).catch((error) => (problem = errorText(error)));
 	}
 </script>
 
 <Dialog
 	title={saved ? t('saved-title') : t('save-dialog-title')}
-	description={saved ? (saved.files > 1 ? t('saved-several', { count: saved.files }) : t('saved-one')) : undefined}
+	description={saved ? (saved.files.length > 1 ? t('saved-several', { count: saved.files.length }) : t('saved-one')) : undefined}
 	wide
 	onclose={() => !busy && onclose()}
 >
@@ -94,10 +95,12 @@
 				<p class="text-[13px] text-[var(--danger)]">{t('save-failed', { reason: problem })}</p>
 			{/if}
 		</div>
+	{:else if problem}
+		<p class="text-[13px] text-[var(--danger)]">{t('send-failed', { reason: problem })}</p>
 	{/if}
 	{#snippet actions()}
 		{#if saved}
-			<button type="button" class="button mr-auto" onclick={() => void openWith()}>{t('saved-open-with')}</button>
+			<button type="button" class="button mr-auto" onclick={() => void send()}>{t('saved-send')}</button>
 			<button type="button" class="button" onclick={() => void reveal()}>{t('saved-show')}</button>
 			<button type="button" class="button primary" onclick={onclose}>{t('dialog-done')}</button>
 		{:else}

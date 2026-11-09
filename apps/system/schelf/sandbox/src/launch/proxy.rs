@@ -18,11 +18,13 @@ pub const TALK: [&str; 4] = [
     "org.kde.StatusNotifierWatcher",
 ];
 
-/// Kestrel's palette, the one part of Kestrel every app may read, so it
-/// looks like the desktop.
-const PALETTE: &str = "com.lantharos.Kestrel";
+/// The parts of Kestrel every app may use: its palette, so it looks like
+/// the desktop, and the Send sheet, which takes files the app hands over
+/// and asks people where they go.
+const KESTREL: &str = "com.lantharos.Kestrel";
 const PALETTE_PATH: &str = "/com/lantharos/Kestrel/Appearance";
 const PALETTE_CALLS: [&str; 2] = ["Get", "GetAll"];
+const SEND: &str = "com.lantharos.Kestrel.Share.Send@/com/lantharos/Kestrel/Share";
 
 /// The app's filtered view of the session bus. The proxy runs in a sandbox
 /// of its own that carries the app's sandbox info, so services that look at
@@ -54,11 +56,12 @@ fn rules(id: &str, talk: &[String]) -> Vec<String> {
     rules.extend(TALK.iter().map(|name| format!("--talk={name}")));
     rules.extend(talk.iter().map(|name| format!("--talk={name}")));
     rules.extend(PALETTE_CALLS.iter().map(|method| {
-        format!("--call={PALETTE}=org.freedesktop.DBus.Properties.{method}@{PALETTE_PATH}")
+        format!("--call={KESTREL}=org.freedesktop.DBus.Properties.{method}@{PALETTE_PATH}")
     }));
     rules.push(format!(
-        "--broadcast={PALETTE}=org.freedesktop.DBus.Properties.PropertiesChanged@{PALETTE_PATH}"
+        "--broadcast={KESTREL}=org.freedesktop.DBus.Properties.PropertiesChanged@{PALETTE_PATH}"
     ));
+    rules.push(format!("--call={KESTREL}={SEND}"));
     rules
 }
 

@@ -77,6 +77,9 @@ export const commands = {
 		arguments: string[],
 		workingDirectory?: string | null,
 	}, options?: CallOptions) => invoke<string[]>("resolve_arguments", params, options),
+	send: (params: {
+		path: string,
+	}, options?: CallOptions) => invoke<null>("send", params, options),
 	setWallpaper: (params: {
 		path: string,
 	}, options?: CallOptions) => invoke<WallpaperStyle>("set_wallpaper", params, options),

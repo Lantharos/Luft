@@ -69,7 +69,8 @@ window
 | `dbus` | [luft-dbus](../../packages/dbus): async `session()` and `system()` connections, `at(address)` connects to any other bus |
 | `identity` | [luft-identity](../../packages/identity): who a caller is and what apps were allowed |
 | `dbus::objects` | `Objects` reads `ObjectManager` trees; `signals` and `settle` follow their changes |
-| `portal` | `open_file` and `open_files` show the file chooser and return `file://` URIs; `FileChooser` for saving, folders and several filters; `reveal` shows a file in the file manager and `open_with` asks which app to open it with, both through the portal so they work from a sandbox; `camera` asks for the camera; `path_uri` and `uri_path` convert between paths and URIs |
+| `portal` | `open_file` and `open_files` show the file chooser and return `file://` URIs; `FileChooser` for saving, folders and several filters; `reveal` shows a file in the file manager through the portal, so it works from a sandbox; `camera` asks for the camera; `path_uri` and `uri_path` convert between paths and URIs |
+| `share` | `send(paths)` opens Kestrel's Send sheet for files the app holds, where people choose a device nearby or an app for them; it hands over the open files, so it works from a sandbox, and only opens while one of the app's windows is in front |
 | `file_manager` | `show_in_folder(path, token)` opens the folder with the file selected, `show_folder(path, token)` opens the folder itself |
 | `launch` | `pass_token` gives a launched program the activation token a page got from `activationToken()` in `@luft/ui`, or clears the one the app was started with; `Token` takes a command's `token` alone |
 | `secrets` | `store`, `load` and `delete` for the app's own secrets in Luft Keyring |

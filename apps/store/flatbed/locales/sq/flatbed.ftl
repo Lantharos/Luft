@@ -132,7 +132,8 @@ saved-several = { $count ->
    *[other] Të { $count } faqet u ruajtën.
 }
 saved-show = Shfaqe në dosje
-saved-open-with = Hape me…
+saved-send = Dërgo…
+send-failed = Nuk u dërgua dot: { $reason }
 
 ## Adding a scanner
 

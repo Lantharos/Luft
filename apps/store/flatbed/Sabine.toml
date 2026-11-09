@@ -29,11 +29,3 @@ devices = ["usb"]
 
 [bindings]
 path = "src/lib/bindings.ts"
-id = "com.lantharos.Flatbed"
-kind = "app"
-format = "sabine"
-permissions = "Sabine.toml"
-listing = "store/"
-
-[requires]
-sabine = "0.82"

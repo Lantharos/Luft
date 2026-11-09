@@ -2,18 +2,21 @@
 	import { t } from '@luft/i18n';
 	import { Dialog, errorText } from '@luft/ui';
 	import { library, type SubjectEntry } from '#lib/library/library.svelte.js';
-	import { importBooks } from '#lib/pdf/import.js';
-	import { bookName } from '#lib/pdf/sources.js';
+	import { importPictures, isPicture, pictureName } from '#lib/library/pictures.js';
+	import { importBooks, isPdf } from '#lib/pdf/import.js';
 
 	let { paths, onclose }: { paths: string[]; onclose: () => void } = $props();
 
 	let busy = $state(false);
 	let error = $state('');
 
+	const kind = $derived(paths.every(isPdf) ? 'books' : paths.every(isPicture) ? 'pictures' : 'files');
+
 	async function pick(subject: SubjectEntry) {
 		busy = true;
 		try {
 			await importBooks(subject, paths);
+			await importPictures(subject, paths);
 			onclose();
 		} catch (reason) {
 			error = errorText(reason);
@@ -22,7 +25,7 @@
 	}
 </script>
 
-<Dialog title={t('import-title', { count: paths.length, name: bookName(paths[0]) })} description={t('import-body')} {onclose}>
+<Dialog title={t('import-title', { count: paths.length, name: pictureName(paths[0]), kind })} description={t('import-body', { kind })} {onclose}>
 	<div class="flex max-h-[360px] flex-col overflow-y-auto soft-scroll">
 		{#each library.active as subject (subject.meta.id)}
 			<button type="button" class="choice" disabled={busy} onclick={() => void pick(subject)}>

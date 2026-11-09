@@ -154,6 +154,23 @@ privacy-windows-using-programs = { $count ->
 # Menu item that takes away a program's access to your windows
 privacy-windows-stop = Stop access
 
+## Send sheet
+# Opens when an app sends files it holds, to a device nearby or another app
+
+# Dialog title. $name is the file name.
+send-sheet-title-one = Send “{ $name }”
+send-sheet-title = Send { $count ->
+    [one] { $count } file
+   *[other] { $count } files
+}
+send-sheet-description = { $count ->
+    [one] Choose where it goes.
+   *[other] Choose where they go.
+}
+# Heading above the apps that can open the files
+send-sheet-apps = Apps
+send-sheet-nothing = Nothing here can take this
+
 ## Window access prompt
 # A program (often a coding assistant) asks to see or control the windows on the screen. Kestrel can't tell which program it is, only that it runs outside a sandbox.
 

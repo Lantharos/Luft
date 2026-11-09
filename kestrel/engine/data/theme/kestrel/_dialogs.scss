@@ -90,6 +90,10 @@
 
 .kestrel-portal-row-title:rtl, .kestrel-portal-row-subtitle:rtl, .kestrel-portal-label:rtl, .kestrel-portal-note:rtl { text-align: right; }
 
+.kestrel-send-sections { spacing: 14px; }
+.kestrel-send-section { spacing: 6px; }
+.kestrel-send-section .kestrel-portal-label { padding: 0 4px; }
+
 .kestrel-portal-avatar { icon-size: 40px; border-radius: 20px; }
 .kestrel-portal-launcher { spacing: 14px; }
 .kestrel-portal-launcher-icon { icon-size: 48px; }

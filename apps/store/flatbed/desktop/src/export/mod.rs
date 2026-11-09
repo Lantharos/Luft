@@ -57,7 +57,8 @@ pub struct Save {
 pub struct Saved {
     /// The file, or the folder the pages went into.
     pub path: String,
-    pub files: u32,
+    /// Every file written, to send on.
+    pub files: Vec<String>,
 }
 
 /// Asks where to save and saves the document there: one file, or a folder
@@ -131,9 +132,10 @@ fn save_pdf(
         .collect::<Result<Vec<_>, String>>()?;
     pdf::write(path, name, &sheets, paper)?;
     progress(1, 1);
+    let path = path.to_string_lossy().into_owned();
     Ok(Saved {
-        path: path.to_string_lossy().into_owned(),
-        files: 1,
+        files: vec![path.clone()],
+        path,
     })
 }
 
@@ -173,6 +175,7 @@ fn save_pictures(
     mode: Mode,
     format: Format,
 ) -> Result<Saved, String> {
+    let mut files = Vec::with_capacity(pages.len());
     for (index, page) in pages.iter().enumerate() {
         let source = document::source_of(page)?;
         let cleaned = imaging::develop(&source, &page.quad, page.turns, page.origin, mode);
@@ -182,11 +185,12 @@ fn save_pictures(
             target.join(format!("{name} {}.{}", index + 1, format.extension()))
         };
         fs::write(&path, picture(&cleaned, format)?).map_err(|error| error.to_string())?;
+        files.push(path.to_string_lossy().into_owned());
         progress(index + 1, pages.len());
     }
     Ok(Saved {
         path: target.to_string_lossy().into_owned(),
-        files: pages.len() as u32,
+        files,
     })
 }
 

@@ -1286,7 +1286,7 @@ export interface Clipboard {
   setFiles(paths: readonly string[]): void;
 }
 
-/** Adds entries to the menu Rover opens on files and folders, drawn by Rover in its own style. */
+/** Adds entries to the menu Rover opens on files and folders, drawn by Rover in its own style, and to the Send sheet. */
 export interface FileActions {
   /** Adds an entry that shows for the files and folders its `on` describes, and gets their full paths when people choose it. */
   add(action: FileActionOptions): FileAction;
@@ -1339,6 +1339,11 @@ export interface FileActionOptions {
   onActivate(paths: string[], choice?: string): void;
   /** Whether it shows. It does unless this is `false`. */
   shown?: boolean;
+  /**
+   * Also offers its choices in the Send sheet, which apps open for files they hold, such as the devices to send to.
+   * The paths it gets from there are copies Kestrel keeps for a day, of files, never folders.
+   */
+  sends?: boolean;
 }
 
 export interface FileAction extends Disposable {

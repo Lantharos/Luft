@@ -24,6 +24,8 @@ export interface FileActionShape {
   extensions: readonly string[];
   multiple: boolean;
   items: FileActionChoiceShape[] | null;
+  /** Whether the Send sheet offers its choices too. */
+  sends: boolean;
 }
 
 /** An action an extension added to the menu of files and folders, by `extension-id/key`. */

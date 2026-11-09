@@ -25,6 +25,7 @@ mod sample;
 pub mod secrets;
 #[cfg(feature = "settings")]
 pub mod settings;
+pub mod share;
 pub mod shortcuts;
 mod tasks;
 #[cfg(feature = "thumbnails")]

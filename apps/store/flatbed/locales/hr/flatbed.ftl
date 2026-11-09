@@ -135,7 +135,8 @@ saved-several = { $count ->
    *[other] Sve stranice ({ $count }) su spremljene.
 }
 saved-show = Prikaži u mapi
-saved-open-with = Otvori s…
+saved-send = Pošalji…
+send-failed = Nije se moglo poslati: { $reason }
 
 ## Adding a scanner
 

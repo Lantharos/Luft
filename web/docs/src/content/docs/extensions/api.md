@@ -371,7 +371,7 @@ if (ext.peers.handles('com.lantharos.Soundscapes', 'play')) await ext.peers.requ
 
 ## fileActions
 
-`fileActions.add(options)` adds an entry to the menu Rover opens on files and folders. Rover draws it in its own style, and the extension gets the full paths of what people chose when they pick it.
+`fileActions.add(options)` adds an entry to the menu Rover opens on files and folders. Rover draws it in its own style, and the extension gets the full paths of what people chose when they pick it. An action that sends files somewhere, such as to a device, can also show in the Send sheet that apps open for files they hold.
 
 | Option | Is |
 | --- | --- |
@@ -382,6 +382,7 @@ if (ext.peers.handles('com.lantharos.Soundscapes', 'play')) await ext.peers.requ
 | `onOpened()` | People opened its menu, such as to look for devices again |
 | `onActivate(paths, choice?)` | People chose it, or one of its entries by `key` |
 | `shown` | Whether it shows |
+| `sends` | Also offers its entries in the Send sheet, under its label. There it gets copies of the files the app handed over, which Kestrel keeps for a day, and never folders |
 
 The action has `update(changes)`, `refresh()` to ask for `items()` again when what they show changed, and `dispose()`. Rover keeps what it last got, so the menu opens without waiting on the extension.
 
@@ -390,6 +391,7 @@ const send = ext.fileActions.add({
   key: 'send',
   label: ext.t('send-to-device'),
   icon: 'send-to-symbolic',
+  sends: true,
   items: () => devices.length
     ? devices.map(device => ({ key: device.id, label: device.name, icon: 'phone-symbolic' }))
     : [{ key: 'nobody', label: ext.t('nobody'), disabled: true }],

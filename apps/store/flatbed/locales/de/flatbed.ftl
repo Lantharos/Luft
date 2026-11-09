@@ -132,7 +132,8 @@ saved-several = { $count ->
    *[other] Alle { $count } Seiten sind gespeichert.
 }
 saved-show = Im Ordner zeigen
-saved-open-with = Öffnen mit …
+saved-send = Senden …
+send-failed = Es konnte nicht gesendet werden: { $reason }
 
 ## Adding a scanner
 

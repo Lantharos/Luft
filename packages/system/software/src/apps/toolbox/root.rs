@@ -11,17 +11,34 @@ done";
 /// people without a password use sudo there, so this goes through podman,
 /// which maps the container's root to the person running it.
 pub fn command(container: &str, program: &[&str]) -> Command {
-    let _ = Command::new("podman")
-        .args(["start", container])
-        .stdin(Stdio::null())
-        .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .status();
+    start(container);
     let mut command = Command::new("podman");
     command
         .args(["exec", "--user", "root", container])
         .args(program);
     command
+}
+
+fn start(container: &str) {
+    if !podman(&["start", container]) {
+        podman(&[
+            "wait",
+            "--condition=stopped",
+            "--condition=exited",
+            container,
+        ]);
+        podman(&["start", container]);
+    }
+}
+
+fn podman(args: &[&str]) -> bool {
+    Command::new("podman")
+        .args(args)
+        .stdin(Stdio::null())
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .status()
+        .is_ok_and(|status| status.success())
 }
 
 fn succeeds(container: &str, program: &[&str]) -> Result<(), String> {

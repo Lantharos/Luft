@@ -2,7 +2,9 @@ use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result, bail};
+use luft_disks::moving::layout::{ESP_TYPE, XBOOTLDR_TYPE};
 
+use crate::disk::SystemDisk;
 use crate::errors::Unsupported;
 use crate::system::host::blocks;
 use crate::system::host::command::Tool;
@@ -17,10 +19,8 @@ const SYSTEM_MOUNTS: &[&str] = &[
     "/var",
     "/sysroot",
 ];
-const STARTUP_TYPES: &[&str] = &[
-    "c12a7328-f81f-11d2-ba4b-00a0c93ec93b",
-    "bc13c2ff-59e6-4262-a352-b275fd6f7172",
-];
+const STARTUP_TYPES: &[&str] = &[ESP_TYPE, XBOOTLDR_TYPE];
+const HOLDS_LUFT: &str = "Luft runs from it.";
 
 pub struct Target {
     pub name: String,
@@ -168,8 +168,21 @@ impl Target {
         })
     }
 
+    fn holds_luft(&self) -> bool {
+        SystemDisk::find().is_ok_and(|disk| disk.partition == self.name)
+    }
+
+    pub fn require_apart_from_luft(&self) -> Result<()> {
+        if self.holds_luft() {
+            bail!(Unsupported(HOLDS_LUFT.to_owned()));
+        }
+        Ok(())
+    }
+
     pub fn in_use_by_system(&self) -> Option<&'static str> {
-        if self.swap() {
+        if self.holds_luft() {
+            Some(HOLDS_LUFT)
+        } else if self.swap() {
             Some("The system uses it for swap.")
         } else if self.needed_at_startup() {
             Some("The computer needs it to start, so it can't be encrypted here.")

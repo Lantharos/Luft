@@ -13,12 +13,11 @@ use super::request::{Request, Stage, Target};
 use super::{Needs, retire};
 use crate::boot::other_systems;
 use crate::disk::SystemDisk;
+use crate::disk::unlock::luks;
 use crate::errors::Unsupported;
-use crate::paths;
 use crate::system::host::command::Tool;
 use crate::system::host::{blocks, uuid, wait};
 
-const HEADER: &str = "/run/trustd/moving-header";
 const ESP_NAME: &str = "EFI system partition";
 const STARTUP_NAME: &str = "Luft startup";
 const ROOT_NAME: &str = "Luft";
@@ -169,31 +168,6 @@ fn format_boot(device: &str, label: &str) -> Result<()> {
         .context("Luft's startup partition couldn't be formatted")
 }
 
-fn copy_header(from: &Path, to: &str) -> Result<()> {
-    paths::ensure_private(paths::RUNTIME)?;
-    let _ = std::fs::remove_file(HEADER);
-    Tool::new("cryptsetup")
-        .args([
-            "luksHeaderBackup",
-            "--batch-mode",
-            "--header-backup-file",
-            HEADER,
-        ])
-        .arg(from)
-        .status()?;
-    let restored = Tool::new("cryptsetup")
-        .args([
-            "luksHeaderRestore",
-            "--batch-mode",
-            "--header-backup-file",
-            HEADER,
-        ])
-        .arg(to)
-        .status();
-    let _ = std::fs::remove_file(HEADER);
-    restored.context("The encryption couldn't be copied to the new drive")
-}
-
 fn device(drive: &Drive, partuuid: &str) -> Result<String> {
     volumes(drive)
         .find(|volume| volume.partition_uuid.eq_ignore_ascii_case(partuuid))
@@ -237,7 +211,8 @@ fn lay_out(drive: &Drive, planned: Planned, disk: &SystemDisk) -> Result<Target>
         .arg(&root_device)
         .status()?;
     if disk.mapping.is_some() {
-        copy_header(&disk.device(), &root_device)?;
+        luks::copy_header(&disk.device(), Path::new(&root_device))
+            .context("The encryption couldn't be copied to the new drive")?;
     }
     Ok(Target {
         drive: drive.id.clone(),

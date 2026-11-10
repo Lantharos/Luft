@@ -1,3 +1,6 @@
+use std::collections::BTreeMap;
+use std::sync::Mutex;
+
 use anyhow::{Result, bail};
 
 use super::CERTIFICATE;
@@ -9,6 +12,7 @@ use crate::system::host::command::Tool;
 use crate::system::secrets::scratch::Scratch;
 use crate::system::secrets::secret::Secret;
 
+static NAMES: Mutex<BTreeMap<Vec<u8>, String>> = Mutex::new(BTreeMap::new());
 const NAME_FIELDS: [&str; 3] = ["commonName", "organizationName", "organizationalUnitName"];
 
 fn shipped() -> Vec<Vec<u8>> {
@@ -37,6 +41,16 @@ fn field<'a>(subject: &'a str, wanted: &str) -> Option<&'a str> {
 }
 
 pub fn name(certificate: &[u8]) -> String {
+    let mut names = NAMES.lock().expect("key names lock");
+    if let Some(name) = names.get(certificate) {
+        return name.clone();
+    }
+    let name = read_name(certificate);
+    names.insert(certificate.to_vec(), name.clone());
+    name
+}
+
+fn read_name(certificate: &[u8]) -> String {
     let subject = Tool::new("openssl")
         .args([
             "x509",

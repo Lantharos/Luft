@@ -13,9 +13,9 @@ base64.workspace = true
 luft-dbus.workspace = true
 luft-dbus-macros.workspace = true
 nix = { workspace = true, features = ["user"] }
-rustix = { workspace = true, features = ["thread"] }
+rustix = { workspace = true, features = ["fs", "thread"] }
 sha2.workspace = true
-tokio = { workspace = true, features = ["macros", "process", "rt", "sync", "time"] }
+tokio = { workspace = true, features = ["macros", "process", "rt", "sync"] }
 zbus = { workspace = true, features = ["proxy", "service", "tokio"] }
 
 [lints]

@@ -2,14 +2,14 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result, ensure};
 
-use super::unlock::{keys, luks, seal};
+use super::unlock::keys::{self, SHORTEST_PASSPHRASE};
+use super::unlock::{luks, seal};
 use crate::keys as signing;
 use crate::system::firmware::tpm;
 use crate::system::host::command::Tool;
 use crate::system::secrets::secret::Secret;
 
 const MAPPING: &str = "luft-installing";
-const SHORTEST_PASSPHRASE: usize = 8;
 
 fn check_recovery_key(recovery_key: &Secret) -> Result<()> {
     ensure!(

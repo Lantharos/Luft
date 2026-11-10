@@ -4,7 +4,11 @@ use std::path::Path;
 use anyhow::Result;
 use serde::Deserialize;
 
+use crate::paths;
 use crate::system::host::command::Tool;
+
+pub const SYSTEMD_CRYPTSETUP: &str = "/usr/bin/systemd-cryptsetup";
+const COPIED_HEADER: &str = "/run/trustd/copied-header";
 
 #[derive(Deserialize)]
 struct Metadata {
@@ -176,4 +180,29 @@ pub fn read(device: &Path, detached: Option<&Path>, device_size: u64) -> Result<
         }),
         reencrypting,
     }))
+}
+
+pub fn copy_header(from: &Path, to: &Path) -> Result<()> {
+    paths::ensure_private(paths::RUNTIME)?;
+    let _ = std::fs::remove_file(COPIED_HEADER);
+    Tool::new("cryptsetup")
+        .args([
+            "luksHeaderBackup",
+            "--batch-mode",
+            "--header-backup-file",
+            COPIED_HEADER,
+        ])
+        .arg(from)
+        .status()?;
+    let restored = Tool::new("cryptsetup")
+        .args([
+            "luksHeaderRestore",
+            "--batch-mode",
+            "--header-backup-file",
+            COPIED_HEADER,
+        ])
+        .arg(to)
+        .status();
+    let _ = std::fs::remove_file(COPIED_HEADER);
+    restored
 }

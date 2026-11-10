@@ -35,8 +35,9 @@ pub async fn start() -> Result<(), String> {
 }
 
 pub async fn stop() -> Result<(), String> {
-    regenerate().await?;
-    systemctl(&["stop", SERVICE]).await
+    let regenerated = regenerate().await;
+    systemctl(&["stop", SERVICE]).await?;
+    regenerated
 }
 
 pub async fn reload() -> Result<(), String> {

@@ -4,9 +4,8 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result, ensure};
 
-use crate::disk::SystemDisk;
 use crate::disk::unlock::{keys, luks};
-use crate::paths;
+use crate::disk::{ROOT_PARTITION, SystemDisk};
 use crate::system::host::command::Tool;
 use crate::system::host::{blocks, uuid};
 use crate::system::secrets::keyring;
@@ -14,8 +13,6 @@ use crate::system::secrets::secret::Secret;
 
 const PREFIX: &str = "luft-move-";
 const TOKEN: &str = "luft-move";
-const HEADER: &str = "/run/trustd/move-header";
-const ROOT_PARTITION: &str = "/dev/luft-root-partition";
 const SECTOR: u64 = 512;
 const BTRFS_FSID: u64 = (64 << 10) + 32;
 
@@ -69,28 +66,7 @@ fn mark(device: &Path, filesystem: &str) -> Result<()> {
 }
 
 fn copy_header(from: &Path, to: &Path) -> Result<()> {
-    paths::ensure_private(paths::RUNTIME)?;
-    let _ = std::fs::remove_file(HEADER);
-    Tool::new("cryptsetup")
-        .args([
-            "luksHeaderBackup",
-            "--batch-mode",
-            "--header-backup-file",
-            HEADER,
-        ])
-        .arg(from)
-        .status()?;
-    let restored = Tool::new("cryptsetup")
-        .args([
-            "luksHeaderRestore",
-            "--batch-mode",
-            "--header-backup-file",
-            HEADER,
-        ])
-        .arg(to)
-        .status();
-    let _ = std::fs::remove_file(HEADER);
-    restored?;
+    luks::copy_header(from, to)?;
     Tool::new("cryptsetup")
         .args(["luksUUID", "--batch-mode", "--uuid", &uuid::random()?])
         .arg(to)
@@ -212,7 +188,7 @@ fn moving_filesystem(device: &Path) -> Option<String> {
 
 fn open_half(device: &Path, partition: &str, filesystem: &str) -> Result<()> {
     let name = format!("{PREFIX}{partition}");
-    Tool::new("/usr/lib/systemd/systemd-cryptsetup")
+    Tool::new(luks::SYSTEMD_CRYPTSETUP)
         .arg("attach")
         .arg(&name)
         .arg(device)
@@ -227,7 +203,7 @@ fn open_half(device: &Path, partition: &str, filesystem: &str) -> Result<()> {
         "{} no longer belongs to Luft's file system, so it stays closed",
         device.display()
     );
-    Tool::new("/usr/lib/systemd/systemd-cryptsetup")
+    Tool::new(luks::SYSTEMD_CRYPTSETUP)
         .arg("detach")
         .arg(&name)
         .status()

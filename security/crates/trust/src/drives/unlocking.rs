@@ -19,7 +19,7 @@ const KEY_BYTES: usize = 64;
 const ESCROW_NAME: &str = "trustd.drive-recovery-key";
 
 pub fn system_protected() -> bool {
-    disk::status().is_some_and(|disk| disk.encrypted)
+    disk::encrypted()
 }
 
 pub fn require_system_protected() -> Result<()> {

@@ -1,4 +1,4 @@
-use anyhow::{Result, bail, ensure};
+use anyhow::{Context, Result, bail, ensure};
 use luft_meet::Folder;
 use luft_meet::resize::{Change, needed};
 use serde::{Deserialize, Serialize};
@@ -90,7 +90,7 @@ impl Move {
         let (start, end, target, need) =
             (self.root.offset, self.root.end(), self.target, self.need);
         ensure!(
-            end - target >= need,
+            end.checked_sub(target).is_some_and(|room| room >= need),
             "Luft wouldn't have room for its files"
         );
         let mut steps = Vec::new();
@@ -201,7 +201,12 @@ pub fn plan(layout: &Layout, change: Change) -> Result<Vec<Step>> {
                 bytes >= GIB.max(startup_size),
                 "That's too little to give back"
             );
-            align_down(layout.root.offset + bytes)
+            layout
+                .root
+                .offset
+                .checked_add(bytes)
+                .map(align_down)
+                .context("Luft wouldn't have room for its files")?
         }
         Change::Trim { .. } => unreachable!("trimming happens in place"),
     };

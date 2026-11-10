@@ -9,6 +9,7 @@ use std::sync::Arc;
 
 use tokio::signal::unix::{SignalKind, signal};
 use tokio::sync::Mutex;
+use tokio::sync::watch::Receiver;
 use zbus::Connection;
 
 use protection::Protection;
@@ -21,6 +22,17 @@ async fn main() -> anyhow::Result<()> {
     let connection = Connection::system().await?;
     let mut unlocked = seat::watch_unlocked(&connection).await?;
     let protection = Arc::new(Mutex::new(Protection::start(*unlocked.borrow_and_update())));
+    let served = serve(&connection, &protection, &events, unlocked).await;
+    protection.lock().await.stop();
+    served
+}
+
+async fn serve(
+    connection: &Connection,
+    protection: &Arc<Mutex<Protection>>,
+    events: &Events,
+    mut unlocked: Receiver<bool>,
+) -> anyhow::Result<()> {
     let server = connection.object_server();
     server
         .at(PATH, UsbProtection::new(protection.clone()))
@@ -49,6 +61,5 @@ async fn main() -> anyhow::Result<()> {
             eprintln!("Couldn't announce the USB protection state: {error}");
         }
     }
-    protection.lock().await.stop();
     Ok(())
 }

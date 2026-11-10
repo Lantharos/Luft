@@ -154,13 +154,16 @@ impl Apps {
         Ok(())
     }
 
-    /// Forgets what was chosen for an app, which is asked about again while it still listens.
     pub fn forget(&mut self, identity: &Identity) -> io::Result<()> {
         let mut decisions = self.decisions.clone();
         decisions.remove(identity);
         access::save(&decisions)?;
         self.decisions = decisions;
-        for listener in self.listeners.iter().filter(|listener| listener.identity == *identity) {
+        for listener in self
+            .listeners
+            .iter()
+            .filter(|listener| listener.identity == *identity)
+        {
             self.questions.ask(listener);
         }
         Ok(())

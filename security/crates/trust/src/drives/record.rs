@@ -36,8 +36,8 @@ fn file(uuid: &str) -> PathBuf {
 }
 
 impl Record {
-    pub fn new(uuid: String, partuuid: Option<String>, removable: bool) -> Self {
-        Self {
+    pub fn new(uuid: String, partuuid: Option<String>, removable: bool) -> Result<Self> {
+        let record = Self {
             uuid,
             partuuid,
             removable,
@@ -45,7 +45,15 @@ impl Record {
             paused: false,
             auto_unlock: false,
             header: None,
-        }
+        };
+        ensure!(
+            record.named_plainly(),
+            Unsupported(
+                "This drive's encryption names itself in a way Luft can't keep track of."
+                    .to_owned()
+            )
+        );
+        Ok(record)
     }
 
     fn named_plainly(&self) -> bool {
@@ -73,13 +81,6 @@ impl Record {
     }
 
     pub fn save(&self) -> Result<()> {
-        ensure!(
-            self.named_plainly(),
-            Unsupported(
-                "This drive's encryption names itself in a way Luft can't keep track of."
-                    .to_owned()
-            )
-        );
         let before = Self::load(&self.uuid);
         paths::ensure_private(FOLDER)?;
         paths::write_private(&self.file(), serde_json::to_string(self)?.as_bytes())?;

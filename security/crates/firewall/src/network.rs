@@ -6,6 +6,7 @@ use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 use futures_util::{Stream, StreamExt};
 use luft_dbus::failed;
 use luft_dbus::objects::{self, Object, Objects};
+use nix::unistd::{Uid, User};
 use zbus::fdo::DBusProxy;
 use zbus::names::BusName;
 use zbus::{Connection, Message, OwnedObjectPath, OwnedVariant, Proxy, Variant};
@@ -92,6 +93,31 @@ fn text(settings: &Settings, group: &str, key: &str) -> String {
         .unwrap_or_default()
 }
 
+fn named(interface: &str) -> bool {
+    interface
+        .chars()
+        .all(|character| character.is_ascii_alphanumeric() || "_.:@-".contains(character))
+}
+
+fn open_to(settings: &Settings, uid: u32) -> bool {
+    let people = settings
+        .get("connection")
+        .and_then(|group| group.get("permissions"))
+        .and_then(|value| Vec::<String>::try_from(value.try_clone().ok()?).ok())
+        .unwrap_or_default();
+    if people.is_empty() || uid == 0 {
+        return true;
+    }
+    User::from_uid(Uid::from_raw(uid))
+        .ok()
+        .flatten()
+        .is_some_and(|user| {
+            people
+                .iter()
+                .any(|person| person.split(':').nth(1) == Some(user.name.as_str()))
+        })
+}
+
 fn role(settings: &Settings) -> Role {
     let shared = ["ipv4", "ipv6"]
         .iter()
@@ -128,6 +154,7 @@ fn interfaces(objects: &Objects, active: &Object) -> Vec<String> {
                 .filter(|name| !name.is_empty())
                 .or_else(|| device.get("Interface"))
         })
+        .filter(|name| named(name))
         .collect()
 }
 
@@ -213,12 +240,22 @@ pub async fn changes(connection: &Connection) -> Result<impl Stream<Item = ()> +
     Ok(messages.filter_map(|message| ready(message.ok().filter(relevant).map(drop))))
 }
 
-pub async fn classify(connection: &Connection, path: &str, kind: &str) -> zbus::Result<()> {
+pub async fn classify(
+    connection: &Connection,
+    path: &str,
+    kind: &str,
+    uid: u32,
+) -> zbus::Result<bool> {
     let proxy = Proxy::new(connection, SERVICE, path, CONNECTION).await?;
     let mut settings: Settings = proxy.call("GetSettings", &()).await?;
+    let classifiable = CLASSIFIABLE.contains(&text(&settings, "connection", "type").as_str());
+    if !classifiable || !open_to(&settings, uid) {
+        return Ok(false);
+    }
     settings.entry("connection".to_owned()).or_default().insert(
         "zone".to_owned(),
         Variant::from(kind.to_owned()).try_into()?,
     );
-    proxy.call("Update", &(settings,)).await
+    proxy.call::<_, _, ()>("Update", &(settings,)).await?;
+    Ok(true)
 }

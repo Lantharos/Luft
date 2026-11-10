@@ -1,8 +1,9 @@
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
+use luft_disks::moving::layout::XBOOTLDR_TYPE;
 
-use super::esp::{self, Esp, XBOOTLDR_TYPE};
+use super::esp::{self, Esp};
 use crate::paths;
 use crate::system::host::blocks;
 use crate::system::host::command::Tool;

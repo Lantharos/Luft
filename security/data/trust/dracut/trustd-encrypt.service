@@ -12,6 +12,7 @@ RemainAfterExit=yes
 ExecStart=/usr/bin/trustctl system-disk start-encrypting
 SyslogIdentifier=trustd
 TimeoutSec=infinity
+NoNewPrivileges=yes
 RestrictAddressFamilies=AF_UNIX AF_NETLINK AF_ALG
 RestrictRealtime=yes
 LockPersonality=yes

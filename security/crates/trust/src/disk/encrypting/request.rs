@@ -84,8 +84,12 @@ impl Request {
     }
 }
 
+pub fn forget_sealed_key() -> std::io::Result<()> {
+    efi::set_luft_variable(SEALED_KEY, None)
+}
+
 pub fn forget(top: &Path) -> Result<()> {
-    efi::set_luft_variable(SEALED_KEY, None)?;
+    forget_sealed_key()?;
     efi::set_luft_variable(MARKER, None)?;
     match std::fs::remove_dir_all(top.join(FOLDER)) {
         Err(error) if error.kind() != std::io::ErrorKind::NotFound => Err(error.into()),

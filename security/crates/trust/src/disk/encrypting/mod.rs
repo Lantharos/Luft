@@ -9,7 +9,8 @@ use luft_meet::resize::ROOT_TYPE;
 
 use super::SystemDisk;
 use super::layout::{self, TopLevel};
-use super::unlock::{keys, luks, seal};
+use super::unlock::keys::{self, SHORTEST_PASSPHRASE};
+use super::unlock::{luks, seal};
 use crate::drives::reencrypt::{self, Progress};
 use crate::drives::room::HEADER_ROOM;
 use crate::errors::Unsupported;
@@ -20,7 +21,6 @@ use request::Request;
 
 pub use initrd::open_in_initrd;
 
-const SHORTEST_PASSPHRASE: usize = 8;
 const BLOCK: u64 = 4096;
 
 #[derive(Clone, Copy, PartialEq, Debug)]
@@ -168,6 +168,9 @@ pub fn run(
         && reencrypting()?
     {
         return Ok(false);
+    }
+    if let Err(error) = request::forget_sealed_key() {
+        eprintln!("The firmware kept its copy of the key Luft was encrypted with: {error}");
     }
     finish(&disk, &request)?;
     request::forget(TopLevel::mount(&disk)?.path())?;

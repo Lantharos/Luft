@@ -7,12 +7,14 @@ use super::luks::{self, Header};
 use crate::errors::{MistypedKey, NeedsKey, Unsupported, WrongKey};
 use crate::keys as signing;
 use crate::paths;
-use crate::system::firmware::{efi, tpm};
+use crate::system::firmware::efi;
+use crate::system::firmware::tpm::{self, Tpm};
 use crate::system::host::command::Tool;
 use crate::system::secrets::creds::{self, Protection};
 use crate::system::secrets::scratch::Scratch;
 use crate::system::secrets::secret::Secret;
 
+pub const SHORTEST_PASSPHRASE: usize = 8;
 const ESCROW: &str = "recovery-key.cred";
 const ESCROW_NAME: &str = "trustd.recovery-key";
 const NEW_PIN_CREDENTIAL: &str = "cryptenroll.new-tpm2-pin";
@@ -136,9 +138,12 @@ pub fn remove_tokens(device: &Path, header: &Header, kind: &str) -> Result<()> {
 }
 
 pub fn tpm_unavailable_reason() -> Option<String> {
-    let tpm = tpm::detect();
+    unavailable_reason(&tpm::detect())
+}
+
+pub fn unavailable_reason(tpm: &Tpm) -> Option<String> {
     if !tpm.usable {
-        return Some(tpm.reason);
+        return Some(tpm.reason.clone());
     }
     if !signing::shipped() || !efi::measured_uki() {
         return Some("Restart through Luft's signed startup first, so the TPM can check how the computer started.".to_owned());

@@ -1,6 +1,6 @@
 use std::path::{Path, PathBuf};
 
-use anyhow::{Result, bail};
+use anyhow::{Context, Result, bail};
 
 use super::CERTIFICATE;
 use super::request::Request;
@@ -13,6 +13,7 @@ use crate::system::secrets::scratch::Scratch;
 use crate::system::secrets::secret::Secret;
 
 const AUTOMATIC_ATTEMPTS: u32 = 3;
+const CODES: u64 = 100_000_000;
 pub const BLUE_SCREEN_SECONDS: u32 = 60;
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
@@ -47,12 +48,14 @@ pub fn enrollment() -> Enrollment {
 }
 
 pub(super) fn one_time_code() -> Result<String> {
-    let mut bytes = [0u8; 8];
-    getrandom::fill(&mut bytes)?;
-    Ok(bytes
-        .iter()
-        .map(|byte| char::from(b'0' + byte % 10))
-        .collect())
+    loop {
+        let mut bytes = [0u8; 8];
+        getrandom::fill(&mut bytes)?;
+        let drawn = u64::from_le_bytes(bytes);
+        if drawn < u64::MAX - u64::MAX % CODES {
+            return Ok(format!("{:08}", drawn % CODES));
+        }
+    }
 }
 
 pub fn request() -> Result<String> {
@@ -89,11 +92,17 @@ fn ask_again(request: Request, state: &Path) -> Result<String> {
 }
 
 pub(super) fn hash_file(scratch: &Scratch, code: &str) -> Result<PathBuf> {
-    let hash = Tool::new("mokutil")
-        .arg(format!("--generate-hash={code}"))
+    let answers = Tool::new("mokutil")
+        .arg("--generate-hash")
+        .input(&Secret::from(format!("{code}\n{code}\n")))
         .output_bytes()
         .map(Secret::new)?;
-    scratch.write("mok-hash", &hash)
+    let hash = answers
+        .text()
+        .lines()
+        .last()
+        .context("mokutil made no hash of the one-time code")?;
+    scratch.write("mok-hash", &Secret::from(format!("{hash}\n")))
 }
 
 pub(super) fn wait_longer_on_blue_screen() -> Result<()> {

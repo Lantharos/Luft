@@ -1,6 +1,7 @@
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
+use luft_disks::moving::layout::{ESP_TYPE, XBOOTLDR_TYPE};
 
 use crate::disk::SystemDisk;
 use crate::paths;
@@ -15,8 +16,6 @@ const MOUNTS: [&str; 5] = [
     "/run/trustd/esp",
     "/run/trustd/xbootldr",
 ];
-const ESP_TYPE: &str = "c12a7328-f81f-11d2-ba4b-00a0c93ec93b";
-pub const XBOOTLDR_TYPE: &str = "bc13c2ff-59e6-4262-a352-b275fd6f7172";
 
 pub struct Esp {
     pub path: PathBuf,

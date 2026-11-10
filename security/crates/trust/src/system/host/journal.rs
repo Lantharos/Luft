@@ -1,3 +1,5 @@
+use std::sync::OnceLock;
+
 use super::command::Tool;
 
 const REFUSALS: [&str; 6] = [
@@ -9,11 +11,15 @@ const REFUSALS: [&str; 6] = [
     "Failed to unseal secret using TPM2",
 ];
 
+static REFUSED_THIS_BOOT: OnceLock<bool> = OnceLock::new();
+
 pub fn tpm_refused_this_boot() -> bool {
-    let cryptsetup = Tool::new("journalctl")
-        .args(["-b", "0", "-o", "cat", "--no-pager"])
-        .arg("SYSLOG_IDENTIFIER=systemd-cryptsetup")
-        .output()
-        .unwrap_or_default();
-    REFUSALS.iter().any(|refusal| cryptsetup.contains(refusal))
+    *REFUSED_THIS_BOOT.get_or_init(|| {
+        let cryptsetup = Tool::new("journalctl")
+            .args(["-b", "0", "-o", "cat", "--no-pager"])
+            .arg("SYSLOG_IDENTIFIER=systemd-cryptsetup")
+            .output()
+            .unwrap_or_default();
+        REFUSALS.iter().any(|refusal| cryptsetup.contains(refusal))
+    })
 }

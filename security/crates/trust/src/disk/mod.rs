@@ -9,11 +9,13 @@ use std::path::PathBuf;
 use anyhow::{Context, Result};
 use luft_meet::resize::Change;
 
+use crate::system::firmware::tpm::Tpm;
 use crate::system::host::blocks::{self, Mount};
 use crate::system::host::journal;
 use unlock::luks::{self, Header};
 use unlock::{keys, seal};
 
+pub const ROOT_PARTITION: &str = "/dev/luft-root-partition";
 const PHYSICAL_ROOTS: [&str; 2] = ["/sysroot", "/"];
 
 pub struct SystemDisk {
@@ -94,7 +96,16 @@ fn unlock_methods(header: &Header) -> Vec<&'static str> {
     methods
 }
 
-pub fn status() -> Option<DiskStatus> {
+pub fn encrypted() -> bool {
+    SystemDisk::find().is_ok_and(|disk| {
+        disk.header()
+            .ok()
+            .flatten()
+            .is_some_and(|header| encrypting::state(&disk, Some(&header)).is_none())
+    })
+}
+
+pub fn status(tpm: &Tpm) -> Option<DiskStatus> {
     let disk = SystemDisk::find().ok()?;
     let header = disk.header().ok().flatten();
     let encrypting = encrypting::state(&disk, header.as_ref());
@@ -103,7 +114,7 @@ pub fn status() -> Option<DiskStatus> {
         encrypted: header.is_some() && encrypting.is_none(),
         encrypting,
         can_encrypt: encrypting::possible(&disk),
-        tpm_unlocks: encrypting::tpm_unlocks(),
+        tpm_unlocks: keys::unavailable_reason(tpm).is_none(),
         unlock: header.as_ref().map(unlock_methods).unwrap_or_default(),
         recovery_key_stored: keys::has_escrow(),
         tpm_refused: header.as_ref().is_some_and(|header| header.has(luks::TPM2))

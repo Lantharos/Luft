@@ -93,9 +93,6 @@ fn seal(device: &Path, header: &Header, measured: &str) -> Result<()> {
     Ok(())
 }
 
-/// A start through "Luft without its key" has no signed startup image for the TPM to check, so the
-/// disk asks for its recovery key. Once it has, the disk key is also sealed to exactly this start,
-/// so the next ones like it unlock by themselves until the key is added or the version changes.
 pub fn follow_up() -> Result<()> {
     let Ok(disk) = SystemDisk::find() else {
         return Ok(());

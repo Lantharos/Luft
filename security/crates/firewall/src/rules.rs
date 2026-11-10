@@ -11,7 +11,6 @@ use crate::ports::{Networks, Opened, Protocol};
 
 const NFT: &str = "/usr/sbin/nft";
 pub const DISCOVERY: [u16; 3] = [1900, 3702, 5353];
-/// LocalSend's port, which Post listens on over TCP and hears announcements on over UDP.
 const POST: u16 = 53317;
 const APP_KEY: &str = "socket cgroupv2 level UNIT_LEVEL . meta l4proto . th dport";
 
@@ -43,7 +42,7 @@ const CHAINS: &str = r#"
 		icmp type echo-request accept
 		icmpv6 type echo-request accept
 		udp dport { DISCOVERY } accept
-		udp sport { DISCOVERY } accept
+		udp sport { DISCOVERY } udp dport 32768-60999 accept
 POST		tcp dport @opened_tcp accept
 		udp dport @opened_udp accept
 		APP_KEY @apps_home accept

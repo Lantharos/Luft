@@ -3,6 +3,7 @@ use std::path::Path;
 use anyhow::{Context, Result};
 
 use super::request::{self, Request};
+use crate::disk::ROOT_PARTITION;
 use crate::disk::layout::TopLevel;
 use crate::disk::unlock::luks;
 use crate::drives::work;
@@ -11,9 +12,7 @@ use crate::system::host::command::Tool;
 use crate::system::secrets::scratch::Scratch;
 use crate::system::secrets::secret::Secret;
 
-const ROOT_PARTITION: &str = "/dev/luft-root-partition";
 const MAPPING: &str = "root";
-const CRYPTSETUP: &str = "/usr/lib/systemd/systemd-cryptsetup";
 
 fn start(partition: &Path, key: &Secret) -> Result<()> {
     Tool::new("cryptsetup")
@@ -38,7 +37,7 @@ fn start(partition: &Path, key: &Secret) -> Result<()> {
 fn open(partition: &Path, key: &Secret) -> Result<()> {
     let scratch = Scratch::empty()?;
     let key_file = scratch.write("key", key)?;
-    Tool::new(CRYPTSETUP)
+    Tool::new(luks::SYSTEMD_CRYPTSETUP)
         .args(["attach", MAPPING])
         .arg(partition)
         .arg(&key_file)

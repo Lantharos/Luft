@@ -11,6 +11,8 @@ const KINDS: [&str; 7] = [
     "sk-ecdsa-sha2-nistp256@openssh.com",
     "ssh-rsa",
 ];
+const RSA: &str = "ssh-rsa";
+const SHORTEST_RSA: usize = 2048;
 const LENGTH: usize = 4;
 
 pub struct PublicKey {
@@ -20,11 +22,20 @@ pub struct PublicKey {
 }
 
 fn names_kind(blob: &[u8], kind: &str) -> bool {
-    let Some((length, rest)) = blob.split_first_chunk::<LENGTH>() else {
-        return false;
-    };
-    let length = u32::from_be_bytes(*length) as usize;
-    rest.get(..length) == Some(kind.as_bytes()) && rest.len() > length
+    field(blob).is_some_and(|(name, rest)| name == kind.as_bytes() && !rest.is_empty())
+}
+
+fn field(blob: &[u8]) -> Option<(&[u8], &[u8])> {
+    let (length, rest) = blob.split_first_chunk::<LENGTH>()?;
+    rest.split_at_checked(u32::from_be_bytes(*length) as usize)
+}
+
+fn rsa_bits(blob: &[u8]) -> Option<usize> {
+    let (_, rest) = field(blob)?;
+    let (_, rest) = field(rest)?;
+    let (modulus, _) = field(rest)?;
+    let leading = modulus.iter().position(|byte| *byte != 0)?;
+    Some((modulus.len() - leading) * 8 - modulus[leading].leading_zeros() as usize)
 }
 
 impl PublicKey {
@@ -52,6 +63,10 @@ impl PublicKey {
             .find_map(|start| Self::parse(&line[start..]))
     }
 
+    pub fn is_short(&self) -> bool {
+        self.kind == RSA && rsa_bits(&self.blob).is_none_or(|bits| bits < SHORTEST_RSA)
+    }
+
     pub fn fingerprint(&self) -> String {
         format!(
             "SHA256:{}",
@@ -66,5 +81,29 @@ impl PublicKey {
         } else {
             format!("{key} {}", self.comment)
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn rsa(modulus: &[u8]) -> Vec<u8> {
+        let mut blob = Vec::new();
+        for part in [RSA.as_bytes(), &[1, 0, 1], modulus] {
+            blob.extend_from_slice(&(part.len() as u32).to_be_bytes());
+            blob.extend_from_slice(part);
+        }
+        blob
+    }
+
+    #[test]
+    fn measures_an_rsa_key_by_its_modulus() {
+        let mut modulus = vec![0u8; 385];
+        modulus[1] = 0x80;
+        assert_eq!(rsa_bits(&rsa(&modulus)), Some(3072));
+        modulus[1] = 0x7f;
+        assert_eq!(rsa_bits(&rsa(&modulus)), Some(3071));
+        assert_eq!(rsa_bits(&rsa(&modulus)[..40]), None);
     }
 }

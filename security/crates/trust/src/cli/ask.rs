@@ -6,6 +6,17 @@ use rustix::termios::{self, LocalModes, OptionalActions};
 use crate::disk::unlock::keys;
 use crate::system::secrets::secret::Secret;
 
+const ANSWER_ROOM: usize = 4096;
+
+fn read(input: &mut impl BufRead) -> std::io::Result<Secret> {
+    let mut answer = Vec::with_capacity(ANSWER_ROOM);
+    input.read_until(b'\n', &mut answer)?;
+    while matches!(answer.last(), Some(b'\n' | b'\r')) {
+        answer.pop();
+    }
+    Ok(Secret::new(answer))
+}
+
 fn line(prompt: &str, hidden: bool) -> Result<Secret> {
     let stdin = std::io::stdin();
     print!("{prompt}: ");
@@ -16,16 +27,12 @@ fn line(prompt: &str, hidden: bool) -> Result<Secret> {
         quiet.local_modes.remove(LocalModes::ECHO);
         termios::tcsetattr(&stdin, OptionalActions::Now, &quiet)?;
     }
-    let mut answer = String::new();
-    let read = stdin.lock().read_line(&mut answer);
+    let answer = read(&mut stdin.lock());
     if let (true, Some(original)) = (hidden, &original) {
         termios::tcsetattr(&stdin, OptionalActions::Now, original)?;
         println!();
     }
-    read?;
-    let secret = Secret::from(answer.trim_end_matches(['\n', '\r']));
-    answer.clear();
-    Ok(secret)
+    Ok(answer?)
 }
 
 pub fn unlock_key() -> Result<Secret> {
@@ -52,13 +59,6 @@ pub fn new_pin() -> Result<Secret> {
 }
 
 pub fn piped(count: usize) -> Result<Vec<Secret>> {
-    let mut given = Vec::with_capacity(count);
-    let mut line = String::new();
-    for _ in 0..count {
-        line.clear();
-        std::io::stdin().lock().read_line(&mut line)?;
-        given.push(Secret::from(line.trim_end_matches(['\n', '\r'])));
-    }
-    line.clear();
-    Ok(given)
+    let mut stdin = std::io::stdin().lock();
+    (0..count).map(|_| Ok(read(&mut stdin)?)).collect()
 }

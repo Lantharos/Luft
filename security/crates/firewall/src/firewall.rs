@@ -13,7 +13,6 @@ pub struct Firewall {
     layout: Layout,
     ports: Opened,
     apps: Apps,
-    /// The units of the people whose Post may be found, whose port is open on home networks.
     post: BTreeSet<String>,
     loaded: String,
 }
@@ -40,7 +39,12 @@ impl Firewall {
     async fn load(&mut self, refresh: bool) -> Result<(), String> {
         self.apps.prune();
         self.post.retain(|unit| identity::alive(unit));
-        let script = rules::ruleset(&self.layout, &self.ports, &self.apps.reachable(), !self.post.is_empty());
+        let script = rules::ruleset(
+            &self.layout,
+            &self.ports,
+            &self.apps.reachable(),
+            !self.post.is_empty(),
+        );
         if refresh || script != self.loaded {
             rules::load(&script).await?;
             self.loaded = script;

@@ -27,6 +27,16 @@ type Key = (String, String, String);
 pub struct RemoteLogin {
     idle: Arc<Idle>,
     changing: Mutex<()>,
+    changing_keys: Mutex<()>,
+}
+
+async fn shut(connection: &Connection, choices: &mut Choices) -> Result<(), Error> {
+    choices.enabled = false;
+    let saved = choices.save().map_err(Error::from);
+    let stopped = sshd::stop().await.map_err(Error::Failed);
+    let ended = sessions::end_all(connection).await.map_err(Error::from);
+    let closed = firewall::close(connection).await.map_err(Error::from);
+    saved.and(stopped).and(ended).and(closed)
 }
 
 async fn authorize(
@@ -70,6 +80,7 @@ impl RemoteLogin {
         Self {
             idle,
             changing: Mutex::new(()),
+            changing_keys: Mutex::new(()),
         }
     }
 
@@ -99,10 +110,9 @@ impl RemoteLogin {
         choices.enabled = true;
         choices.save()?;
         if let Err(error) = sshd::start().await {
-            choices.enabled = false;
-            choices.save()?;
-            sshd::stop().await.map_err(Error::Failed)?;
-            firewall::close(connection).await?;
+            if let Err(undone) = shut(connection, &mut choices).await {
+                eprintln!("Couldn't turn remote login back off: {undone}");
+            }
             return Err(Error::Failed(error));
         }
         Ok(())
@@ -110,13 +120,7 @@ impl RemoteLogin {
 
     async fn turn_off(&self, connection: &Connection, header: &Header<'_>) -> Result<(), Error> {
         authorize(connection, header, RESTRICT).await?;
-        let mut choices = Choices::load()?;
-        choices.enabled = false;
-        choices.save()?;
-        sshd::stop().await.map_err(Error::Failed)?;
-        sessions::end_all(connection).await?;
-        firewall::close(connection).await?;
-        Ok(())
+        shut(connection, &mut Choices::load()?).await
     }
 }
 
@@ -266,8 +270,15 @@ impl RemoteLogin {
                 "This isn't an SSH public key. One starts with ssh-ed25519, ecdsa-sha2 or ssh-rsa, as in a .pub file".into()
             })
         })?;
+        if key.is_short() {
+            return Err(Error::InvalidArgs(
+                "This RSA key is too short to be safe. Make a new key and add that one instead"
+                    .into(),
+            ));
+        }
         let account = person(connection, &header).await?;
         let added = described(&key);
+        let _changing = self.changing_keys.lock().await;
         account
             .run_as(move |account| keys::add(account, &key))
             .await?;
@@ -282,6 +293,7 @@ impl RemoteLogin {
     ) -> Result<(), Error> {
         let _activity = self.idle.hold();
         let account = person(connection, &header).await?;
+        let _changing = self.changing_keys.lock().await;
         let removed = account
             .run_as(move |account| keys::remove(account, &fingerprint))
             .await?;

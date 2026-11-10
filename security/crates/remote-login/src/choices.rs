@@ -1,5 +1,6 @@
 use std::collections::BTreeSet;
-use std::io;
+use std::fs::File;
+use std::io::{self, Write};
 
 const STORE: &str = "/var/lib/luft-remote-login/choices";
 const SSHD_CONFIG: &str = "/run/luft-remote-login/sshd.conf";
@@ -16,7 +17,9 @@ pub struct Choices {
 
 fn replace(path: &str, text: &str) -> io::Result<()> {
     let staged = format!("{path}.new");
-    std::fs::write(&staged, text)?;
+    let mut file = File::create(&staged)?;
+    file.write_all(text.as_bytes())?;
+    file.sync_all()?;
     std::fs::rename(staged, path)
 }
 

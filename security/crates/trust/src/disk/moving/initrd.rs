@@ -8,12 +8,13 @@ use super::boot_files::{self, Mounted};
 use super::copy::{self, Progress};
 use super::request::{Request, Stage};
 use crate::boot::esp;
+use crate::disk::ROOT_PARTITION;
+use crate::disk::unlock::luks::SYSTEMD_CRYPTSETUP;
 use crate::paths;
 use crate::system::host::blocks;
 use crate::system::host::command::Tool;
 use luft_disks::moving::layout::{ESP_TYPE, XBOOTLDR_TYPE};
 
-const ROOT_PARTITION: &str = "/dev/luft-root-partition";
 const ROOT_MAPPING: &str = "/dev/mapper/root";
 const MAPPING: &str = "luft-moving";
 const TICK: Duration = Duration::from_secs(1);
@@ -33,7 +34,7 @@ impl Opened {
                 mapped: false,
             });
         }
-        Tool::new("/usr/lib/systemd/systemd-cryptsetup")
+        Tool::new(SYSTEMD_CRYPTSETUP)
             .args(["attach", MAPPING])
             .arg(&partition)
             .args(["none", "discard,tpm2-device=auto"])
@@ -49,7 +50,7 @@ impl Opened {
 impl Drop for Opened {
     fn drop(&mut self) {
         if self.mapped {
-            let _ = Tool::new("/usr/lib/systemd/systemd-cryptsetup")
+            let _ = Tool::new(SYSTEMD_CRYPTSETUP)
                 .args(["detach", MAPPING])
                 .status();
         }

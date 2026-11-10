@@ -10,7 +10,8 @@ pub mod work;
 
 use anyhow::{Context, Result, bail};
 
-use crate::disk::unlock::{keys, luks};
+use crate::disk::unlock::keys::{self, SHORTEST_PASSPHRASE};
+use crate::disk::unlock::luks;
 use crate::errors::{Busy, NeedsKey, Unsupported};
 use crate::system::host::command::Tool;
 use crate::system::host::uuid;
@@ -19,8 +20,6 @@ use hold::Hold;
 pub use record::{Change, Record};
 use room::Room;
 use target::Target;
-
-const SHORTEST_PASSPHRASE: usize = 8;
 
 pub struct Check {
     pub id: &'static str,
@@ -69,26 +68,6 @@ fn room_sentence(room: &Room) -> String {
     .to_owned()
 }
 
-fn tools(room: Option<&Room>) -> std::result::Result<String, String> {
-    let mut needed = vec![("/usr/sbin/cryptsetup", "cryptsetup")];
-    match room {
-        Some(Room::Grow { .. }) => needed.push(("/usr/sbin/sfdisk", "util-linux")),
-        Some(Room::ShrinkExt { .. }) => needed.push(("/usr/sbin/resize2fs", "e2fsprogs")),
-        Some(Room::ShrinkBtrfs { .. }) => needed.push(("/usr/sbin/btrfs", "btrfs-progs")),
-        _ => {}
-    }
-    let missing: Vec<&str> = needed
-        .iter()
-        .filter(|(path, _)| !std::path::Path::new(path).exists())
-        .map(|(_, package)| *package)
-        .collect();
-    if missing.is_empty() {
-        Ok("Everything needed is installed.".to_owned())
-    } else {
-        Err(format!("Install {} first.", missing.join(" and ")))
-    }
-}
-
 fn plugged_in(on_battery: bool) -> std::result::Result<String, String> {
     if on_battery {
         Err("Plug the computer in. Encrypting takes a while and shouldn't run out of power partway.".to_owned())
@@ -120,7 +99,6 @@ pub fn check(device: &str, on_battery: bool) -> Result<Assessment> {
             "room",
             room.as_ref().map(room_sentence).map_err(Clone::clone),
         ),
-        verdict("tools", tools(room.as_ref().ok())),
         verdict("power", plugged_in(on_battery)),
     ];
     Ok(Assessment {
@@ -229,7 +207,7 @@ pub fn encrypt(
     let room = room::plan(&target).map_err(Unsupported)?;
     let _held = Hold::new(&target.name)?;
     room::make(&target, &room)?;
-    let mut record = Record::new(uuid::random()?, target.partuuid.clone(), target.removable);
+    let mut record = Record::new(uuid::random()?, target.partuuid.clone(), target.removable)?;
     record.change = Some(Change::Encrypt);
     record.save()?;
     let started = start_encrypting(&target, &mut record, &recovery, passphrase, auto_unlock);
@@ -262,13 +240,14 @@ fn encrypted(target: &Target) -> Result<(luks::Header, Record)> {
     if header.reencrypting.is_some() {
         bail!(Busy);
     }
-    let record = Record::load(&header.uuid).unwrap_or_else(|| {
-        Record::new(
+    let record = match Record::load(&header.uuid) {
+        Some(record) => record,
+        None => Record::new(
             header.uuid.clone(),
             target.partuuid.clone(),
             target.removable,
-        )
-    });
+        )?,
+    };
     Ok((header, record))
 }
 
@@ -344,6 +323,7 @@ pub fn set_up_unlocking(
     auto_unlock: bool,
 ) -> Result<()> {
     let target = Target::find(device)?;
+    target.require_apart_from_luft()?;
     let (header, mut record) = encrypted(&target)?;
     let key = unlock_key(&target, &record, typed)?;
     if !recovery.is_empty() && header.has(luks::RECOVERY) {

@@ -1,8 +1,10 @@
-use std::fs::{self, DirBuilder, OpenOptions};
-use std::io::{self, Write};
+use std::fs::{self, DirBuilder, File, OpenOptions};
+use std::io::{self, Read, Write};
 use std::os::unix::fs::{DirBuilderExt, OpenOptionsExt};
 use std::path::{Path, PathBuf};
 use std::process::Command;
+
+use rustix::fs::{Mode, OFlags, open};
 
 use super::key::PublicKey;
 use crate::accounts::Account;
@@ -10,6 +12,7 @@ use crate::accounts::Account;
 const FOLDER: &str = ".ssh";
 const FILE: &str = "authorized_keys";
 const STAGED: &str = "authorized_keys.new";
+const LARGEST: u64 = 1 << 20;
 const RESTORECON: &str = "/usr/sbin/restorecon";
 
 fn folder(account: &Account) -> PathBuf {
@@ -17,10 +20,20 @@ fn folder(account: &Account) -> PathBuf {
 }
 
 fn read(folder: &Path) -> io::Result<String> {
-    match fs::read_to_string(folder.join(FILE)) {
-        Err(error) if error.kind() == io::ErrorKind::NotFound => Ok(String::new()),
-        read => read,
+    let flags = OFlags::RDONLY | OFlags::NONBLOCK | OFlags::CLOEXEC;
+    let file = match open(folder.join(FILE), flags, Mode::empty()) {
+        Err(error) if error.kind() == io::ErrorKind::NotFound => return Ok(String::new()),
+        opened => File::from(opened?),
+    };
+    let about = file.metadata()?;
+    if !about.is_file() || about.len() > LARGEST {
+        return Err(io::Error::other(
+            "authorized_keys isn't a file of keys Luft can read",
+        ));
     }
+    let mut text = String::new();
+    file.take(LARGEST).read_to_string(&mut text)?;
+    Ok(text)
 }
 
 fn holds(line: &str, fingerprint: &str) -> bool {
@@ -33,12 +46,13 @@ fn replace(folder: &Path, text: &str) -> io::Result<()> {
         Err(error) if error.kind() != io::ErrorKind::NotFound => return Err(error),
         _ => {}
     }
-    OpenOptions::new()
+    let mut file = OpenOptions::new()
         .write(true)
         .create_new(true)
         .mode(0o600)
-        .open(&staged)?
-        .write_all(text.as_bytes())?;
+        .open(&staged)?;
+    file.write_all(text.as_bytes())?;
+    file.sync_all()?;
     fs::rename(staged, folder.join(FILE))?;
     label(folder)
 }

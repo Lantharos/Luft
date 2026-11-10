@@ -20,7 +20,8 @@ pub fn ensure_private(path: impl AsRef<std::path::Path>) -> std::io::Result<()> 
 pub fn write_private(path: &std::path::Path, contents: &[u8]) -> std::io::Result<()> {
     use std::io::Write;
     use std::os::unix::fs::OpenOptionsExt;
-    let partial = path.with_extension("partial");
+    let mut partial = path.as_os_str().to_owned();
+    partial.push(".partial");
     let mut file = std::fs::OpenOptions::new()
         .create(true)
         .write(true)

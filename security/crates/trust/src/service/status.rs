@@ -83,12 +83,13 @@ pub fn gather() -> Status {
         other_keys: signing_key.other_keys.len(),
         measured: startup.measured,
     });
+    let disk = disk::status(&tpm);
     Status {
         secure_boot,
         tpm,
         signing_key,
         startup,
-        disk: disk::status(),
+        disk,
         anti_cheat,
     }
 }

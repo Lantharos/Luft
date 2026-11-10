@@ -151,7 +151,19 @@ impl Service {
             )));
         }
         authorize(connection, &header, CLASSIFY).await?;
-        Ok(network::classify(connection, network.as_str(), kind).await?)
+        let sender = header.sender().ok_or_else(Error::not_authorized)?;
+        let uid = DBusProxy::new(connection)
+            .await?
+            .get_connection_unix_user(sender.clone().into())
+            .await
+            .map_err(zbus::Error::from)?;
+        if network::classify(connection, network.as_str(), kind, uid).await? {
+            Ok(())
+        } else {
+            Err(Error::InvalidArgs(
+                "Only your Wi-Fi and wired networks are home or public".into(),
+            ))
+        }
     }
 
     async fn open_port(

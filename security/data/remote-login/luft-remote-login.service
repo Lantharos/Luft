@@ -31,5 +31,6 @@ LockPersonality=yes
 MemoryDenyWriteExecute=yes
 SystemCallArchitectures=native
 SystemCallFilter=@system-service
-SystemCallFilter=~@resources
+SystemCallFilter=~@privileged @resources
+SystemCallFilter=@setuid
 CapabilityBoundingSet=CAP_SETUID CAP_SETGID

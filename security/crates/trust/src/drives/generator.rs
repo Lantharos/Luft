@@ -5,9 +5,9 @@ use std::path::Path;
 use anyhow::Result;
 
 use super::record::Record;
+use crate::disk::unlock::luks::SYSTEMD_CRYPTSETUP;
 use crate::system::host::command::Tool;
 
-const CRYPTSETUP: &str = "/usr/bin/systemd-cryptsetup";
 const STARTUP: &str = "cryptsetup.target";
 
 #[derive(PartialEq, Eq)]
@@ -71,8 +71,8 @@ RemainAfterExit=yes
 TimeoutSec=infinity
 KeyringMode=shared
 OOMScoreAdjust=500
-ExecStart={CRYPTSETUP} attach '{mapping}' '{source}' '{key}' '{options}'
-ExecStop={CRYPTSETUP} detach '{mapping}'
+ExecStart={SYSTEMD_CRYPTSETUP} attach '{mapping}' '{source}' '{key}' '{options}'
+ExecStop={SYSTEMD_CRYPTSETUP} detach '{mapping}'
 ",
         record = record.file().display(),
         key = key.display(),
@@ -102,8 +102,6 @@ fn place(folder: &Path, unit: &Unit) -> Result<()> {
     Ok(())
 }
 
-/// Writes a `systemd-cryptsetup@` unit for every drive that unlocks by itself into the generator
-/// folder `folder`, started at startup when the drive is there and whenever it's plugged in.
 pub fn generate(folder: &Path) -> Result<()> {
     for unit in Record::all().iter().filter_map(unit) {
         place(folder, &unit)?;
@@ -111,7 +109,6 @@ pub fn generate(folder: &Path) -> Result<()> {
     Ok(())
 }
 
-/// Has systemd run the generator again when what it makes of the drive changed.
 pub fn changed(before: Option<&Record>, after: Option<&Record>) {
     if before.and_then(unit) != after.and_then(unit) {
         let _ = Tool::new("systemctl").arg("daemon-reload").status();

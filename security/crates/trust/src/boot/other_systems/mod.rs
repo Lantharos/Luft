@@ -68,7 +68,7 @@ pub struct OtherStartup {
     pub partitions: Vec<String>,
 }
 
-fn is_luft_folder(name: &str) -> bool {
+pub fn is_luft_folder(name: &str) -> bool {
     LUFT_FOLDERS.contains(&name.to_lowercase().as_str())
 }
 
@@ -150,29 +150,19 @@ fn mounted_partuuid(esp: &Esp) -> Result<String> {
     })
 }
 
+fn found(esp: &Esp, partuuid: &str, options: &[LoadOption]) -> Vec<OtherStartup> {
+    let mut startups = on_mounted(esp, partuuid, options);
+    startups.extend(elsewhere(partuuid, options));
+    startups
+}
+
 pub fn list() -> Result<Vec<OtherStartup>> {
     if !startup::installed() {
         return Ok(Vec::new());
     }
     let esp = esp::find()?;
     let partuuid = mounted_partuuid(&esp)?;
-    let options = options::all();
-    let mut startups = on_mounted(&esp, &partuuid, &options);
-    startups.extend(elsewhere(&partuuid, &options));
-    Ok(startups)
-}
-
-fn checked_folder(folder: &str) -> Result<&str> {
-    let name = folder
-        .strip_prefix("EFI/")
-        .filter(|name| !name.is_empty() && !name.contains(['/', '\\']) && *name != "..")
-        .ok_or_else(|| Unsupported(format!("“{folder}” isn't a boot loader's folder.")))?;
-    if is_luft_folder(name) {
-        bail!(Unsupported(format!(
-            "“{folder}” is how Luft starts, so it stays."
-        )));
-    }
-    Ok(name)
+    Ok(found(&esp, &partuuid, &options::all()))
 }
 
 fn shim_fallback_needed(esp: &Esp) -> bool {
@@ -192,11 +182,19 @@ pub fn remove(folders: &[(String, String)], partitions: &[String]) -> Result<()>
             "Luft's own startup isn't set up on this computer, so other systems' startups stay as they are.".to_owned()
         ));
     }
-    for (_, folder) in folders {
-        checked_folder(folder)?;
-    }
     let esp = esp::find()?;
     let partuuid = mounted_partuuid(&esp)?;
+    let known = found(&esp, &partuuid, &options::all());
+    for (on, folder) in folders {
+        if !known
+            .iter()
+            .any(|startup| startup.esp == *on && startup.folder == *folder)
+        {
+            bail!(Unsupported(format!(
+                "“{folder}” isn't another system's startup."
+            )));
+        }
+    }
     startup::place(&esp)?;
 
     let options = options::all();

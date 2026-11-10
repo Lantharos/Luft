@@ -25,13 +25,24 @@ trait Session {
     fn service(&self) -> zbus::Result<String>;
 }
 
-pub async fn end_all(connection: &Connection) -> zbus::Result<()> {
-    let login = LoginProxy::new(connection).await?;
-    for (id, .., path) in login.list_sessions().await? {
-        let session = SessionProxy::builder(connection).path(path).build().await?;
-        if session.service().await? == SSHD {
-            login.terminate_session(&id).await?;
-        }
+async fn end(
+    connection: &Connection,
+    login: &LoginProxy<'_>,
+    id: &str,
+    path: OwnedObjectPath,
+) -> zbus::Result<()> {
+    let session = SessionProxy::builder(connection).path(path).build().await?;
+    if session.service().await? == SSHD {
+        login.terminate_session(id).await?;
     }
     Ok(())
+}
+
+pub async fn end_all(connection: &Connection) -> zbus::Result<()> {
+    let login = LoginProxy::new(connection).await?;
+    let mut ended = Ok(());
+    for (id, .., path) in login.list_sessions().await? {
+        ended = ended.and(end(connection, &login, &id, path).await);
+    }
+    ended
 }

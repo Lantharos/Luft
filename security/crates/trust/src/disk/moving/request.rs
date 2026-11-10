@@ -2,6 +2,7 @@ use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 
 use crate::system::firmware::efi;
+use crate::system::host::uuid;
 
 const VARIABLE: &str = "MovingSystemDisk";
 
@@ -37,8 +38,20 @@ pub struct Request {
 }
 
 impl Request {
+    fn named_plainly(&self) -> bool {
+        uuid::is_partuuid(&self.from)
+            && uuid::is_uuid(&self.filesystem)
+            && [&self.to.root, &self.to.esp]
+                .into_iter()
+                .chain(&self.to.startup)
+                .chain(&self.to.made)
+                .all(|partuuid| uuid::is_partuuid(partuuid))
+    }
+
     pub fn load() -> Option<Self> {
-        serde_json::from_slice(&efi::luft_variable(VARIABLE)?).ok()
+        serde_json::from_slice::<Self>(&efi::luft_variable(VARIABLE)?)
+            .ok()
+            .filter(Self::named_plainly)
     }
 
     pub fn save(&self) -> Result<()> {

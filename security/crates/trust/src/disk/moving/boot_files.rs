@@ -4,6 +4,7 @@ use anyhow::{Context, Result};
 
 use crate::boot::entry;
 use crate::boot::options::{self, LoadOption};
+use crate::boot::other_systems;
 use crate::paths;
 use crate::system::host::blocks;
 use crate::system::host::command::Tool;
@@ -18,7 +19,6 @@ const BOOTC_ENTRY: &str = "bootc";
 const REMOVABLE: &str = "EFI/BOOT";
 const REMOVABLE_LOADER: &str = "EFI/BOOT/BOOTX64.EFI";
 const WINDOWS_LOADER: &str = "EFI/Microsoft/Boot/bootmgfw.efi";
-const LUFT_FOLDERS: [&str; 4] = ["luft", "luft-start", "boot", "linux"];
 const SHIM: &str = "shimx64.efi";
 
 pub struct Mounted {
@@ -127,9 +127,7 @@ pub fn only_luft(esp: &Mounted) -> bool {
         .into_iter()
         .flatten()
         .flatten()
-        .all(|entry| {
-            LUFT_FOLDERS.contains(&entry.file_name().to_string_lossy().to_lowercase().as_str())
-        })
+        .all(|entry| other_systems::is_luft_folder(&entry.file_name().to_string_lossy()))
 }
 
 pub fn trial_label(name: &str) -> String {

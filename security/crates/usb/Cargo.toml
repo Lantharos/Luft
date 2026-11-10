@@ -14,7 +14,7 @@ luft-dbus.workspace = true
 luft-dbus-macros.workspace = true
 luft-identity.workspace = true
 rustix = { workspace = true, features = ["fs", "net", "process"] }
-tokio = { workspace = true, features = ["io-util", "macros", "net", "process", "rt", "signal", "sync", "time"] }
+tokio = { workspace = true, features = ["macros", "net", "rt", "signal", "sync"] }
 zbus = { workspace = true, features = ["proxy", "service", "tokio"] }
 
 [lints]

@@ -191,10 +191,14 @@ pub fn resize(size: u64, typed: &Secret) -> Result<u64> {
         if size == root.span.size {
             return Ok(None);
         }
-        disk.free_after(root.span.end())
-            .filter(|free| at + size <= free.end())
+        let end = at
+            .checked_add(size)
+            .filter(|end| {
+                disk.free_after(root.span.end())
+                    .is_some_and(|free| *end <= free.end())
+            })
             .context("There isn't that much free space right after Luft")?;
-        Ok(Some(Step::Grow { at, end: at + size }))
+        Ok(Some(Step::Grow { at, end }))
     })?;
     Ok(after)
 }

@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use super::boot_files::{self, Mounted};
 use super::earlier::Earlier;
 use super::prepare::remove_made;
-use super::request::{Request, Stage};
+use super::request::{self, Asked, Request, Stage};
 use crate::boot::{entry, esp, startup};
 use crate::disk::SystemDisk;
 use crate::paths;
@@ -88,7 +88,7 @@ fn remember_earlier(request: &Request) -> Result<()> {
 }
 
 pub fn confirmed() -> Result<bool> {
-    let Some(request) = Request::load() else {
+    let Some(request) = Asked::load() else {
         return Ok(false);
     };
     if running_from().as_deref() != Some(request.to.root.as_str()) {
@@ -103,12 +103,12 @@ pub fn confirmed() -> Result<bool> {
     entry::remove(&boot_files::trial_label(&request.to.name))?;
     startup::place(&esp)?;
     Failure::forget();
-    Request::forget()?;
+    request::forget()?;
     eprintln!("Luft now starts from {}", request.to.name);
     Ok(true)
 }
 
-fn roll_back(request: &Request) -> Result<()> {
+fn roll_back(request: &Asked) -> Result<()> {
     entry::remove(&boot_files::trial_label(&request.to.name))?;
     if !request.to.made.contains(&request.to.esp) {
         let esp = Mounted::partuuid(&request.to.esp, "new-esp")?;
@@ -116,7 +116,8 @@ fn roll_back(request: &Request) -> Result<()> {
     }
     remove_made(&request.to.drive, &request.to.made);
     let reason = match request.stage {
-        Stage::Failed => request.reason.clone(),
+        Stage::Failed => request::failed_because()
+            .unwrap_or_else(|| format!("Luft couldn't be copied to {}.", request.to.name)),
         _ => format!(
             "Luft didn't finish starting from {}, so it stayed where it was.",
             request.to.name
@@ -127,11 +128,11 @@ fn roll_back(request: &Request) -> Result<()> {
         reason,
     }
     .save()?;
-    Request::forget()
+    request::forget()
 }
 
 pub fn at_start() -> Result<()> {
-    let Some(request) = Request::load() else {
+    let Some(request) = Asked::load() else {
         return Ok(());
     };
     if request.stage != Stage::Waiting && running_from().as_deref() == Some(request.from.as_str()) {
@@ -145,9 +146,9 @@ pub fn at_start() -> Result<()> {
 }
 
 pub fn cancel() -> Result<()> {
-    let Some(request) = Request::load().filter(|request| request.stage == Stage::Waiting) else {
+    let Some(request) = Asked::load().filter(|request| request.stage == Stage::Waiting) else {
         return Ok(());
     };
     remove_made(&request.to.drive, &request.to.made);
-    Request::forget()
+    request::forget()
 }

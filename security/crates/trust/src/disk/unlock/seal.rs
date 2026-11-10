@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 use anyhow::{Context, Result, bail};
 use sha2::{Digest, Sha256};
 
-use super::{keys, luks};
+use super::{generations, keys, luks};
 use crate::disk::SystemDisk;
 use crate::errors::Unsupported;
 use crate::paths;
@@ -83,7 +83,13 @@ pub fn sealed_this_start() -> bool {
 }
 
 fn seal_to(device: &Path, unlock: &Secret, pin: &Secret, secure_boot_pcr: &str) -> Result<()> {
-    keys::enroll_tpm(device, unlock, pin, secure_boot_pcr)?;
+    generations::link(
+        device,
+        unlock,
+        pin,
+        secure_boot_pcr,
+        Path::new(paths::STATE),
+    )?;
     write_in(Path::new(paths::RUNTIME), SEALED_THIS_START, "")?;
     remember_seal(Path::new(paths::STATE), secure_boot_pcr)?;
     forget(CHANGED);
@@ -108,7 +114,7 @@ pub fn enroll_when_installed(device: &Path, unlock: &Secret, state: &Path) -> Re
         efi::secure_boot() == SecureBoot::On,
     )
     .unwrap_or(now);
-    keys::enroll_tpm(device, unlock, &Secret::default(), &installed)?;
+    generations::link(device, unlock, &Secret::default(), &installed, state)?;
     remember_seal(state, &installed)?;
     write_in(state, INSTALLED, "")
 }
@@ -122,7 +128,19 @@ fn tpm_sealed_disk() -> Option<(PathBuf, Secret)> {
     if !header.has(luks::TPM2) || header.tpm_pin() {
         return None;
     }
-    let device = disk.device();
+    unlockable()
+}
+
+pub fn settled() -> Option<String> {
+    let now = tpm::secure_boot_pcr()?;
+    (read(SEALED_TO).as_deref() == Some(now.as_str())
+        && !secure_boot_changed()
+        && keys::tpm_unavailable_reason().is_none())
+    .then_some(now)
+}
+
+pub fn unlockable() -> Option<(PathBuf, Secret)> {
+    let device = SystemDisk::find().ok()?.device();
     let unlock = keys::escrowed()
         .into_iter()
         .chain(keyring::systemd_cached())

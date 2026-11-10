@@ -4,9 +4,10 @@ pub mod request;
 
 use std::path::Path;
 
+use crate::disk::unlock::generations;
+
 pub const CERTIFICATE: &str = "/usr/share/luft/secure-boot/luft.der";
-pub const PCR_PUBLIC_KEY: &str = "/usr/share/luft/secure-boot/pcr-policy.pem";
 
 pub fn shipped() -> bool {
-    Path::new(CERTIFICATE).exists() && Path::new(PCR_PUBLIC_KEY).exists()
+    Path::new(CERTIFICATE).exists() && generations::current().is_some()
 }

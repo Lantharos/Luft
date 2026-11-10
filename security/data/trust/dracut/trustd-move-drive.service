@@ -3,7 +3,7 @@ Description=Copy Luft onto the drive it moves to, before the system uses its fil
 DefaultDependencies=no
 ConditionPathExists=/sys/firmware/efi/efivars/MovingSystemDisk-b6a4c1e2-3f5d-4c8a-9e71-2d0f6a8b5c3e
 Wants=tpm2.target
-After=tpm2.target systemd-pcrphase-initrd.service initrd-root-device.target trustd-move.service
+After=tpm2.target systemd-pcrphase-initrd.service luft-added-files.service initrd-root-device.target trustd-move.service
 Before=sysroot.mount
 
 [Service]

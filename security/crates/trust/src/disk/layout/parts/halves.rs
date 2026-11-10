@@ -194,6 +194,7 @@ fn open_half(device: &Path, partition: &str, filesystem: &str) -> Result<()> {
         .arg(device)
         .arg("none")
         .arg("discard,tpm2-device=auto")
+        .unhurried()
         .status()
         .with_context(|| format!("{} couldn't be opened", device.display()))?;
     if btrfs_fsid(&mapper(&name)).as_deref() == Some(filesystem) {

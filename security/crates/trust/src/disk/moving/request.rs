@@ -1,17 +1,38 @@
+use std::ops::Deref;
+use std::path::Path;
+
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 
-use crate::system::firmware::efi;
+use crate::disk::SystemDisk;
+use crate::disk::layout::TopLevel;
+use crate::disk::requests::{self, MOVE, Waiting};
+use crate::paths;
 use crate::system::host::uuid;
 
-const VARIABLE: &str = "MovingSystemDisk";
+const FAILED_BECAUSE: &str = "move-failed-because";
 
-#[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Eq, Debug)]
-#[serde(rename_all = "kebab-case")]
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum Stage {
     Waiting,
     Copied,
     Failed,
+}
+
+impl Stage {
+    fn mark(self) -> &'static str {
+        match self {
+            Self::Waiting => "",
+            Self::Copied => "copied",
+            Self::Failed => "failed",
+        }
+    }
+
+    fn of(mark: &str) -> Option<Self> {
+        [Self::Waiting, Self::Copied, Self::Failed]
+            .into_iter()
+            .find(|stage| stage.mark() == mark)
+    }
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -28,13 +49,9 @@ pub struct Target {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Request {
-    pub stage: Stage,
     pub from: String,
     pub to: Target,
     pub filesystem: String,
-    pub encrypted: bool,
-    #[serde(default, skip_serializing_if = "String::is_empty")]
-    pub reason: String,
 }
 
 impl Request {
@@ -48,29 +65,58 @@ impl Request {
                 .all(|partuuid| uuid::is_partuuid(partuuid))
     }
 
+    pub fn save(&self, disk: &SystemDisk) -> Result<()> {
+        requests::keep(TopLevel::mount(disk)?.path(), MOVE, self)
+            .context("Luft's request to move couldn't be kept")
+    }
+}
+
+pub struct Asked {
+    kept: Waiting<Request>,
+    pub stage: Stage,
+}
+
+impl Deref for Asked {
+    type Target = Request;
+
+    fn deref(&self) -> &Request {
+        &self.kept.request
+    }
+}
+
+impl Asked {
+    fn of(kept: Waiting<Request>) -> Option<Self> {
+        let stage = Stage::of(&kept.mark)?;
+        kept.request.named_plainly().then_some(Self { kept, stage })
+    }
+
     pub fn load() -> Option<Self> {
-        serde_json::from_slice::<Self>(&efi::luft_variable(VARIABLE)?)
-            .ok()
-            .filter(Self::named_plainly)
+        Self::of(requests::waiting(&SystemDisk::find().ok()?, MOVE)?)
     }
 
-    pub fn save(&self) -> Result<()> {
-        efi::set_luft_variable(VARIABLE, Some(&serde_json::to_vec(self)?))
-            .context("The firmware didn't keep Luft's request to move")
+    pub fn load_in(top: &Path) -> Option<Self> {
+        Self::of(requests::waiting_in(top, MOVE)?)
     }
 
-    pub fn advance(mut self, stage: Stage) -> Result<Self> {
-        self.stage = stage;
-        self.save()?;
-        Ok(self)
+    pub fn advance(&self, stage: Stage) -> Result<()> {
+        self.kept.mark(MOVE, stage.mark())
     }
 
-    pub fn fail(mut self, reason: String) -> Result<Self> {
-        self.reason = reason;
+    pub fn fail(&self, reason: &str) -> Result<()> {
+        paths::ensure_private(paths::RUNTIME)?;
+        paths::write_private(
+            &Path::new(paths::RUNTIME).join(FAILED_BECAUSE),
+            reason.as_bytes(),
+        )?;
         self.advance(Stage::Failed)
     }
+}
 
-    pub fn forget() -> Result<()> {
-        efi::set_luft_variable(VARIABLE, None).context("Luft's request to move couldn't be cleared")
-    }
+pub fn failed_because() -> Option<String> {
+    std::fs::read_to_string(Path::new(paths::RUNTIME).join(FAILED_BECAUSE)).ok()
+}
+
+pub fn forget() -> Result<()> {
+    requests::forget(TopLevel::mount(&SystemDisk::find()?)?.path(), MOVE)
+        .context("Luft's request to move couldn't be cleared")
 }

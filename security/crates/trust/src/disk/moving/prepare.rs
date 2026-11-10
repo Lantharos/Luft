@@ -9,7 +9,7 @@ use luft_disks::udisks::snapshot::{self, Drive, PartitionTable};
 use luft_disks::udisks::volumes::{Segment, Volume};
 use luft_disks::udisks::{self, BLOCK, TABLE, no_options};
 
-use super::request::{Request, Stage, Target};
+use super::request::{Request, Target};
 use super::{Needs, retire};
 use crate::boot::other_systems;
 use crate::disk::SystemDisk;
@@ -254,14 +254,11 @@ pub fn prepare(drive_id: &str, place: Place, needs: Needs) -> Result<()> {
         }
     };
     Request {
-        stage: Stage::Waiting,
         from,
         to: target,
         filesystem: uuid::random()?,
-        encrypted: disk.mapping.is_some(),
-        reason: String::new(),
     }
-    .save()
+    .save(&disk)
 }
 
 fn made_at(drive_id: &str, planned: Planned) -> Vec<String> {

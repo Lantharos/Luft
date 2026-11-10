@@ -36,12 +36,14 @@ fn run(mut journal: Journal, key: Option<&Secret>) -> Result<()> {
         eprintln!("Changing Luft's partition: {step:?}");
         if let Err(error) = steps::run(&journal.drive, step, key) {
             journal.attempts += 1;
-            if journal.attempts >= ATTEMPTS {
+            if journal.next == 0 && journal.attempts >= ATTEMPTS {
                 Journal::finish();
-                return Err(error.context("Luft gave up changing its partition"));
+                return Err(error.context("Luft gave up before it changed its partition"));
             }
             journal.save()?;
-            return Err(error);
+            return Err(error.context(
+                "Luft's partition is partway through a change, which carries on at the next start",
+            ));
         }
         journal.next += 1;
         journal.attempts = 0;

@@ -4,9 +4,6 @@ use sha2::{Digest, Sha256};
 
 pub const WORDS: usize = 12;
 pub const SHORTEST_PREFIX: usize = 4;
-pub const OLD_LETTERS: usize = 64;
-const OLD_ALPHABET: &[u8; 16] = b"cbdefghijklnrtuv";
-const OLD_GROUP: usize = 8;
 const LONGEST_WORD: usize = 8;
 const ENTROPY: usize = 16;
 const INDEX_BITS: usize = 11;
@@ -41,10 +38,6 @@ fn find(typed: &str) -> Option<&'static str> {
     let found = list[list.partition_point(|word| *word < typed)..].first()?;
     (*found == typed || (typed.len() >= SHORTEST_PREFIX && found.starts_with(typed)))
         .then_some(*found)
-}
-
-pub fn is_old_letter(byte: u8) -> bool {
-    OLD_ALPHABET.contains(&byte.to_ascii_lowercase())
 }
 
 pub fn generate() -> Result<Vec<u8>, getrandom::Error> {
@@ -89,13 +82,6 @@ pub fn checks(words: &[&str; WORDS]) -> bool {
     holds
 }
 
-pub fn read(typed: &[u8]) -> Reading {
-    match old_letters(typed) {
-        Some(key) => Reading::Key(key),
-        None => words(typed),
-    }
-}
-
 fn checksum(entropy: &[u8; ENTROPY]) -> u8 {
     Sha256::digest(entropy)[0] >> (8 - CHECKSUM_BITS)
 }
@@ -111,7 +97,7 @@ fn joined(words: &[&str; WORDS]) -> Vec<u8> {
     key
 }
 
-fn words(typed: &[u8]) -> Reading {
+pub fn read(typed: &[u8]) -> Reading {
     let mut found = [""; WORDS];
     let mut tokens = typed
         .split(u8::is_ascii_whitespace)
@@ -128,28 +114,6 @@ fn words(typed: &[u8]) -> Reading {
         Reading::Key(joined(&found))
     } else {
         Reading::Mistyped
-    }
-}
-
-fn old_letters(typed: &[u8]) -> Option<Vec<u8>> {
-    let mut key = Vec::with_capacity(OLD_LETTERS + OLD_LETTERS / OLD_GROUP - 1);
-    let mut count = 0;
-    for byte in typed.iter().filter(|byte| !matches!(byte, b'-' | b' ')) {
-        if count == OLD_LETTERS || !is_old_letter(*byte) {
-            wipe(&mut key);
-            return None;
-        }
-        if count > 0 && count % OLD_GROUP == 0 {
-            key.push(b'-');
-        }
-        key.push(byte.to_ascii_lowercase());
-        count += 1;
-    }
-    if count == OLD_LETTERS {
-        Some(key)
-    } else {
-        wipe(&mut key);
-        None
     }
 }
 

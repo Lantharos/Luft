@@ -249,6 +249,25 @@ impl Trust {
         Ok(Shown(key))
     }
 
+    async fn check_recovery_key(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        recovery_key: String,
+    ) -> Result<bool, Error> {
+        self.authorize(connection, &header, CHECK).await?;
+        let _activity = self.idle.hold();
+        let Ok(_busy) = self.busy.clone().try_lock_owned() else {
+            return Err(Error::busy());
+        };
+        let typed = Secret::from(recovery_key);
+        Ok(
+            tokio::task::spawn_blocking(move || actions::recovery_key_works(&typed))
+                .await
+                .map_err(|_| Error::Failed("The recovery key couldn't be checked.".to_owned()))??,
+        )
+    }
+
     async fn replace_recovery_key(
         &self,
         #[zbus(connection)] connection: &Connection,

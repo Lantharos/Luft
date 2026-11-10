@@ -9,6 +9,7 @@ use crate::disk::unlock::luks;
 use crate::drives::work;
 use crate::system::host::blocks;
 use crate::system::host::command::Tool;
+use crate::system::secrets::keyring;
 use crate::system::secrets::scratch::Scratch;
 use crate::system::secrets::secret::Secret;
 
@@ -50,23 +51,33 @@ fn open(partition: &Path, key: &Secret) -> Result<()> {
         .status()
 }
 
-pub fn open_in_initrd() -> Result<()> {
-    let Some(requested) = request::partition() else {
+fn start_encrypting(partition: &Path) -> Result<()> {
+    let name = blocks::kernel_name(partition).context("Luft's partition has no name")?;
+    let asked = Request::waiting_in(TopLevel::mount_from(partition, true)?.path())
+        .filter(|request| blocks::partuuid(&name).as_deref() == Some(request.partition.as_str()));
+    let Some(request) = asked else {
         return Ok(());
     };
-    let partition = std::fs::canonicalize(ROOT_PARTITION)?;
-    let name = blocks::kernel_name(&partition).context("Luft's partition has no name")?;
-    if blocks::partuuid(&name).as_deref() != Some(requested.as_str()) {
+    let Some(keys) = request.open_at_start()? else {
+        eprintln!("Luft starts without being encrypted this time");
         return Ok(());
-    }
+    };
+    start(partition, keys.first())?;
+    open(partition, keys.first())?;
+    keys.keep_in_memory();
+    Ok(())
+}
+
+pub fn open_in_initrd() -> Result<()> {
+    let partition = std::fs::canonicalize(ROOT_PARTITION)?;
     match luks::read(&partition, None, work::size_of(&partition))? {
-        None => {
-            let key = Request::load(TopLevel::mount_from(&partition, true)?.path())?.recovery_key;
-            start(&partition, &key)?;
-            open(&partition, &key)
-        }
+        None => start_encrypting(&partition),
         Some(header) if header.reencrypting.is_some() => match request::sealed_key() {
-            Some(key) => open(&partition, &key),
+            Some(key) => {
+                open(&partition, &key)?;
+                keyring::keep(request::FIRST_KEY, &key);
+                Ok(())
+            }
             None => Ok(()),
         },
         Some(_) => Ok(()),

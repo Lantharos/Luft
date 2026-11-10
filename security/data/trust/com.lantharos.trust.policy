@@ -36,7 +36,7 @@
   </action>
 
   <action id="com.lantharos.trust.unlock-drive">
-    <description>Unlock a drive with the key this computer keeps for it</description>
+    <description>Unlock a drive with its passphrase or the key this computer keeps for it</description>
     <message>Authentication is required to unlock this drive</message>
     <defaults>
       <allow_any>auth_admin</allow_any>

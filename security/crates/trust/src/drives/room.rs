@@ -179,11 +179,13 @@ fn shrink_ext(target: &Target, size: u64) -> Result<()> {
     Tool::new("e2fsck")
         .args(["-f", "-p"])
         .arg(&target.device)
+        .unhurried()
         .status()
         .context("The file system needs repairing first.")?;
     Tool::new("resize2fs")
         .arg(&target.device)
         .arg(format!("{}K", size / 1024))
+        .unhurried()
         .status()
         .context("The file system couldn't make room for encryption.")
 }
@@ -200,6 +202,7 @@ fn shrink_btrfs(target: &Target, size: u64) -> Result<()> {
         .args(["filesystem", "resize"])
         .arg(size.to_string())
         .arg(&folder)
+        .unhurried()
         .status()
         .context("The file system couldn't make room for encryption.");
     let released = Tool::new("umount").arg(&folder).status();

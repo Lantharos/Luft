@@ -10,9 +10,20 @@ const FOLDER: &str = "top-level";
 
 pub struct TopLevel {
     path: PathBuf,
+    mounted: bool,
 }
 
 impl TopLevel {
+    pub fn look(disk: &SystemDisk) -> Result<Self> {
+        if disk.root.subvolume == "/" {
+            return Ok(Self {
+                path: PathBuf::from(disk.mounted_at),
+                mounted: false,
+            });
+        }
+        Self::mount_from(&disk.root.source, true)
+    }
+
     pub fn mount(disk: &SystemDisk) -> Result<Self> {
         Self::mount_from(&disk.root.source, false)
     }
@@ -30,7 +41,10 @@ impl TopLevel {
             .arg(source)
             .arg(&path)
             .status()?;
-        Ok(Self { path })
+        Ok(Self {
+            path,
+            mounted: true,
+        })
     }
 
     pub fn path(&self) -> &Path {
@@ -40,6 +54,8 @@ impl TopLevel {
 
 impl Drop for TopLevel {
     fn drop(&mut self) {
-        let _ = Tool::new("umount").arg(&self.path).status();
+        if self.mounted {
+            let _ = Tool::new("umount").arg(&self.path).status();
+        }
     }
 }

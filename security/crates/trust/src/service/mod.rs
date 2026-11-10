@@ -6,6 +6,7 @@ mod properties;
 mod shown;
 pub(crate) mod status;
 mod system_disk;
+mod typed;
 
 use std::sync::Arc;
 use std::time::Duration;

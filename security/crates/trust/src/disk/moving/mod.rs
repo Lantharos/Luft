@@ -20,7 +20,7 @@ use crate::system::firmware::efi;
 use crate::system::host::blocks;
 use earlier::Earlier;
 use finish::Failure;
-use request::{Request, Stage};
+use request::{Asked, Stage};
 
 pub use earlier::remove as remove_earlier;
 pub use finish::{at_start, confirmed};
@@ -93,14 +93,16 @@ fn refused(disk: &SystemDisk) -> Option<String> {
 }
 
 pub fn status(disk: &SystemDisk) -> Status {
-    let request = Request::load();
+    let request = Asked::load();
     Status {
         stage: request.as_ref().map(|request| match request.stage {
             Stage::Waiting => "waiting",
             Stage::Copied => "copied",
             Stage::Failed => "failed",
         }),
-        to: request.map(|request| request.to.name).unwrap_or_default(),
+        to: request
+            .map(|request| request.to.name.clone())
+            .unwrap_or_default(),
         failed: Failure::load(),
         refused: refused(disk),
         needs: needs(disk).unwrap_or_default(),
@@ -110,7 +112,7 @@ pub fn status(disk: &SystemDisk) -> Status {
 
 pub fn request(drive: &str, place: Place) -> Result<()> {
     let disk = SystemDisk::find()?;
-    if Request::load().is_some() {
+    if Asked::load().is_some() {
         bail!(Unsupported(
             "Luft already waits to move. Call that off first.".to_owned()
         ));

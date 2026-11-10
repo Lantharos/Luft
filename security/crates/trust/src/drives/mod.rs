@@ -1,6 +1,7 @@
 pub mod generator;
 mod hold;
 mod mask;
+pub mod passphrase;
 mod record;
 pub mod reencrypt;
 pub(crate) mod room;
@@ -306,14 +307,11 @@ pub fn decrypt(device: &str, typed: &Secret, on_battery: bool) -> Result<Record>
 }
 
 fn slot_opened_by(target: &Target, header: &luks::Header, key: &Secret) -> Option<u32> {
-    header.keyslots.iter().copied().find(|slot| {
-        Tool::new("cryptsetup")
-            .args(["open", "--test-passphrase", "--key-file", "-", "--key-slot"])
-            .arg(slot.to_string())
-            .arg(&target.device)
-            .input(key)
-            .succeeds()
-    })
+    header
+        .keyslots
+        .iter()
+        .copied()
+        .find(|slot| keys::opens_slot(&target.device, *slot, key))
 }
 
 pub fn set_up_unlocking(

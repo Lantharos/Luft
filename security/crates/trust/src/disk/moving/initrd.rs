@@ -6,7 +6,7 @@ use anyhow::{Context, Result};
 
 use super::boot_files::{self, Mounted};
 use super::copy::{self, Progress};
-use super::request::{Request, Stage};
+use super::request::{Asked, Request, Stage};
 use crate::boot::esp;
 use crate::disk::ROOT_PARTITION;
 use crate::disk::unlock::luks::SYSTEMD_CRYPTSETUP;
@@ -26,9 +26,9 @@ struct Opened {
 }
 
 impl Opened {
-    fn new(request: &Request) -> Result<Self> {
+    fn new(request: &Request, encrypted: bool) -> Result<Self> {
         let partition = Path::new("/dev/disk/by-partuuid").join(&request.to.root);
-        if !request.encrypted {
+        if !encrypted {
             return Ok(Self {
                 device: partition,
                 mapped: false,
@@ -38,6 +38,7 @@ impl Opened {
             .args(["attach", MAPPING])
             .arg(&partition)
             .args(["none", "discard,tpm2-device=auto"])
+            .unhurried()
             .status()
             .context("Luft's new partition couldn't be opened")?;
         Ok(Self {
@@ -122,15 +123,9 @@ fn show_progress(progress: &Progress, copying: &AtomicBool) {
     }
 }
 
-fn copy_system(request: &Request) -> Result<()> {
-    let target = Opened::new(request)?;
+fn copy_system(request: &Request, from: &Mount, encrypted: bool) -> Result<()> {
+    let target = Opened::new(request, encrypted)?;
     make_file_system(&target.device, &request.filesystem)?;
-    let source_device = if request.encrypted {
-        Path::new(ROOT_MAPPING)
-    } else {
-        Path::new(ROOT_PARTITION)
-    };
-    let from = Mount::new(source_device, "from", "ro,subvolid=5")?;
     let to = Mount::new(&target.device, "to", "subvolid=5,compress=zstd:1,noatime")?;
     let progress = Progress::default();
     let copying = AtomicBool::new(true);
@@ -170,29 +165,39 @@ fn copy_startup(request: &Request, root: &str) -> Result<()> {
     )
 }
 
-fn run(request: &Request, root: &str) -> Result<()> {
+fn run(request: &Request, root: &str, from: &Mount, encrypted: bool) -> Result<()> {
     sushi(&["moving", &request.to.name]);
-    copy_system(request)?;
+    copy_system(request, from, encrypted)?;
     copy_startup(request, root)
 }
 
 pub fn copy_at_start() -> Result<()> {
-    let Some(request) = Request::load().filter(|request| request.stage == Stage::Waiting) else {
+    let partition = Path::new(ROOT_PARTITION);
+    let root = blocks::kernel_name(partition).context("Luft's partition isn't there")?;
+    let encrypted = Tool::new("cryptsetup")
+        .arg("isLuks")
+        .arg(partition)
+        .succeeds();
+    let source = if encrypted {
+        Path::new(ROOT_MAPPING)
+    } else {
+        partition
+    };
+    let from = Mount::new(source, "from", "ro,subvolid=5")?;
+    let Some(request) = Asked::load_in(&from.path).filter(|request| {
+        request.stage == Stage::Waiting
+            && blocks::partuuid(&root).as_deref() == Some(request.from.as_str())
+    }) else {
         return Ok(());
     };
-    let root =
-        blocks::kernel_name(Path::new(ROOT_PARTITION)).context("Luft's partition isn't there")?;
-    if blocks::partuuid(&root).as_deref() != Some(request.from.as_str()) {
-        return Ok(());
-    }
-    if let Err(error) = run(&request, &root) {
+    if let Err(error) = run(&request, &root, &from, encrypted) {
         eprintln!("Luft didn't move: {error:#}");
         sushi(&["show", "boot-up"]);
-        request.fail(format!("{error:#}"))?;
+        request.fail(&format!("{error:#}"))?;
         return Ok(());
     }
     sushi(&["progress", "100"]);
-    let request = request.advance(Stage::Copied)?;
+    request.advance(Stage::Copied)?;
     boot_files::add_trial_entry(
         &Path::new("/dev/disk/by-partuuid").join(&request.to.esp),
         &request.to.name,

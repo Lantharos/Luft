@@ -5,6 +5,7 @@ use anyhow::{Context, Result, ensure};
 use super::unlock::keys::{self, SHORTEST_PASSPHRASE};
 use super::unlock::{luks, seal};
 use crate::keys as signing;
+use crate::system::firmware::efi::{self, SecureBoot};
 use crate::system::firmware::tpm;
 use crate::system::host::command::Tool;
 use crate::system::secrets::secret::Secret;
@@ -20,14 +21,14 @@ fn check_recovery_key(recovery_key: &Secret) -> Result<()> {
 }
 
 pub fn tpm_unlocks() -> bool {
-    tpm::detect().usable && signing::shipped()
+    tpm::detect().usable && signing::shipped() && efi::secure_boot() == SecureBoot::On
 }
 
 pub fn format(partition: &Path, recovery_key: &Secret, passphrase: &Secret) -> Result<PathBuf> {
     check_recovery_key(recovery_key)?;
     ensure!(
         tpm_unlocks() || passphrase.text().chars().count() >= SHORTEST_PASSPHRASE,
-        "Without a TPM, the disk needs a passphrase of at least {SHORTEST_PASSPHRASE} characters"
+        "Without a TPM and Secure Boot, the disk needs a passphrase of at least {SHORTEST_PASSPHRASE} characters"
     );
     Tool::new("cryptsetup")
         .args([

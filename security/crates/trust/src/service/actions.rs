@@ -52,9 +52,23 @@ pub fn show_recovery_key() -> Result<Secret> {
     match keys::escrowed() {
         Some(key) => Ok(key),
         None => bail!(Unsupported(
-            "This computer doesn't keep a copy of the recovery key. You can make a new one instead.".to_owned()
+            "This computer doesn't keep a copy of the recovery key. Enter it to check it, or make a new one.".to_owned()
         )),
     }
+}
+
+pub fn recovery_key_works(typed: &Secret) -> Result<bool> {
+    let (disk, header) = encrypted_disk()?;
+    let key = if typed.is_empty() {
+        show_recovery_key()?
+    } else {
+        keys::recovery_key(typed)?
+    };
+    let device = disk.device();
+    Ok(header
+        .slots_of(luks::RECOVERY)
+        .into_iter()
+        .any(|slot| keys::opens_slot(&device, slot, &key)))
 }
 
 pub fn replace_recovery_key(typed: &Secret) -> Result<Secret> {

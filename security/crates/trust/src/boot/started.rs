@@ -106,6 +106,7 @@ pub fn went_back() -> Result<()> {
     let shown = Tool::new("sushictl")
         .args(["notice", "show"])
         .arg(&path)
+        .unhurried()
         .status();
     let _ = std::fs::remove_file(&path);
     if let Err(error) = shown {

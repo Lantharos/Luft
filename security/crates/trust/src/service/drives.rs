@@ -6,6 +6,7 @@ use std::time::Duration;
 use luft_dbus::idle::Idle;
 use luft_dbus_macros::introspect;
 use tokio::sync::Mutex;
+use zbus::OwnedFd;
 use zbus::message::Header;
 use zbus::object_server::InterfaceRef;
 use zbus::{Connection, interface};
@@ -14,6 +15,7 @@ use zbus::{OwnedVariant, Variant};
 use super::PATH;
 use super::error::Error;
 use super::shown::Shown;
+use super::typed::typed;
 use crate::drives::reencrypt::Progress;
 use crate::drives::{self, Change, DriveStatus, Record};
 use crate::system::host::uuid;
@@ -400,6 +402,35 @@ impl Drives {
         drive_id(&uuid)?;
         self.authorize(connection, &header, UNLOCK).await?;
         self.run(move || drives::unlock(&uuid)).await
+    }
+
+    async fn unlock_with_passphrase(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        device: String,
+        passphrase: OwnedFd,
+    ) -> Result<String, Error> {
+        self.authorize(connection, &header, UNLOCK).await?;
+        let passphrase = typed(passphrase).await?;
+        let opened = self
+            .run(move || drives::passphrase::unlock(&device, &passphrase))
+            .await?;
+        Ok(opened.display().to_string())
+    }
+
+    async fn change_passphrase(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        device: String,
+        current: OwnedFd,
+        new: OwnedFd,
+    ) -> Result<(), Error> {
+        self.authorize(connection, &header, MANAGE).await?;
+        let (current, new) = (typed(current).await?, typed(new).await?);
+        self.run(move || drives::passphrase::change(&device, &current, &new))
+            .await
     }
 
     async fn show_recovery_key(

@@ -1,3 +1,5 @@
+pub mod drives;
+
 use luft_dbus::service::{Service, absent};
 use luft_dbus::{error_message, error_name, failed};
 use luft_i18n::{Localizer, localizer, t};

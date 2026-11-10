@@ -133,7 +133,7 @@ mod tests {
 
     #[test]
     fn only_the_chosen_passphrase_and_binding_open_the_box() {
-        let recovery = Secret::from("cbdefghi-jklnrtuv");
+        let recovery = Secret::from("the key inside");
         let light = Costs {
             memory_kib: 64,
             passes: 1,

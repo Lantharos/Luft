@@ -60,6 +60,7 @@ pub fn add(device: &str) -> Result<()> {
 pub fn remove(device: &str) -> Result<()> {
     Tool::new("btrfs")
         .args(["device", "remove", device, MOUNTED])
+        .unhurried()
         .status()
         .with_context(|| format!("Luft's files couldn't move off {device}"))
 }
@@ -68,6 +69,7 @@ pub fn resize(devid: u64, size: Option<u64>) -> Result<()> {
     let size = size.map_or_else(|| "max".to_owned(), |size| size.to_string());
     Tool::new("btrfs")
         .args(["filesystem", "resize", &format!("{devid}:{size}"), MOUNTED])
+        .unhurried()
         .status()
         .context("Luft's file system couldn't change its size")
 }

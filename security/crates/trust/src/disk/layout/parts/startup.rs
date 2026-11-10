@@ -61,5 +61,6 @@ pub fn copy(disk: &Disk, from: Span, to: Span) -> Result<()> {
     Tool::new("sync")
         .arg("--file-system")
         .arg(&target.at)
+        .unhurried()
         .status()
 }

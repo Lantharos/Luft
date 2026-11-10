@@ -2,6 +2,7 @@ pub mod encrypting;
 pub mod encryption;
 pub mod layout;
 pub mod moving;
+mod requests;
 pub mod unlock;
 
 use std::path::PathBuf;
@@ -22,14 +23,17 @@ pub struct SystemDisk {
     pub partition: String,
     pub mapping: Option<String>,
     pub root: Mount,
+    pub mounted_at: &'static str,
 }
 
 impl SystemDisk {
     pub fn find() -> Result<Self> {
-        let root = PHYSICAL_ROOTS
-            .iter()
+        let (mounted_at, root) = PHYSICAL_ROOTS
+            .into_iter()
             .find_map(|path| {
-                blocks::mount_at(path).filter(|mount| mount.source.starts_with("/dev"))
+                blocks::mount_at(path)
+                    .filter(|mount| mount.source.starts_with("/dev"))
+                    .map(|mount| (path, mount))
             })
             .context("The system disk couldn't be found.")?;
         let name =
@@ -46,6 +50,7 @@ impl SystemDisk {
             partition,
             mapping,
             root,
+            mounted_at,
         })
     }
 

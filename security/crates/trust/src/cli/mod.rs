@@ -109,6 +109,8 @@ enum TpmAction {
 enum RecoveryAction {
     Show,
     Replace,
+    /// Check that the recovery key still opens the disk, with the copy this computer keeps or one typed in
+    Check,
 }
 
 #[derive(Subcommand)]
@@ -183,6 +185,11 @@ fn follow_up() {
     if let Err(error) = disk::unlock::seal::follow_up() {
         eprintln!("Couldn't seal the disk key to how this computer starts: {error:#}");
     }
+    if let Err(error) = disk::unlock::generations::follow_up() {
+        eprintln!(
+            "Couldn't bring the TPM's disk keys in line with the installed versions: {error:#}"
+        );
+    }
     if let Err(error) = disk::unlock::without_key::follow_up() {
         eprintln!("Couldn't seal the disk key to the start without Luft's key: {error:#}");
     }
@@ -237,10 +244,19 @@ fn tpm_unlock(action: TpmAction) -> Result<()> {
     }
 }
 
+fn check_recovery_key() -> Result<()> {
+    if !actions::recovery_key_works(&ask::recovery_key()?)? {
+        bail!("That recovery key doesn't open the disk anymore. Make a new one.");
+    }
+    println!("The recovery key opens the disk.");
+    Ok(())
+}
+
 fn recovery_key(action: RecoveryAction) -> Result<()> {
     let key = match action {
         RecoveryAction::Show => actions::show_recovery_key()?,
         RecoveryAction::Replace => actions::replace_recovery_key(&ask::unlock_key()?)?,
+        RecoveryAction::Check => return check_recovery_key(),
     };
     report::recovery_key(&key);
     Ok(())

@@ -44,6 +44,13 @@ pub fn unlock_key() -> Result<Secret> {
     line(prompt, true)
 }
 
+pub fn recovery_key() -> Result<Secret> {
+    if keys::has_escrow() {
+        return Ok(Secret::default());
+    }
+    line("Recovery key", true)
+}
+
 fn twice(prompt: &str) -> Result<Secret> {
     let first = line(prompt, true)?;
     if line("Again", true)? != first {

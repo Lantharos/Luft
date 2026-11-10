@@ -60,8 +60,11 @@
       <arg name="key" type="s" direction="out"/>
     </method>
     <!-- Makes room for the encryption header and encrypts Luft's partition in place from the next restart.
-         Until it's done, the recovery key is the only key, kept sealed by the TPM so restarts don't ask for it.
-         The passphrase (required without a TPM) and the TPM are added once it's done. -->
+         With a TPM that can unlock the disk, the recovery key is the only key until it's done, kept sealed by
+         the TPM so restarts don't ask for it, and the passphrase and the TPM are added once it's done.
+         Otherwise a passphrase is required and is the only key until it's done: the restart asks for it
+         before it starts encrypting, each later restart asks for it to unlock, and the recovery key is added
+         once it's done. Neither key is kept anywhere in the clear. -->
     <method name="EncryptSystemDisk">
       <arg name="recovery_key" type="s" direction="in"/>
       <arg name="passphrase" type="s" direction="in"/>
@@ -79,6 +82,12 @@
     </method>
     <method name="ShowRecoveryKey">
       <arg name="key" type="s" direction="out"/>
+    </method>
+    <!-- Whether the recovery key still opens the disk. An empty key checks the copy this computer keeps
+         (RecoveryKeyStored); otherwise the typed key is checked. The key itself is never returned. -->
+    <method name="CheckRecoveryKey">
+      <arg name="recovery_key" type="s" direction="in"/>
+      <arg name="works" type="b" direction="out"/>
     </method>
     <!-- Seals the disk key to the Secure Boot settings this start measured, after SecureBootChanged. -->
     <method name="AcceptSecureBootChange"/>
@@ -217,6 +226,21 @@
          hand. -->
     <method name="Unlock">
       <arg name="uuid" type="s" direction="in"/>
+    </method>
+    <!-- Opens an encrypted drive that isn't Luft's own with a passphrase or recovery key, read from the file
+         descriptor so it is never part of a message, and returns the opened device. A key that doesn't open
+         it is Error.WrongKey. -->
+    <method name="UnlockWithPassphrase">
+      <arg name="device" type="s" direction="in"/>
+      <arg name="passphrase" type="h" direction="in"/>
+      <arg name="opened" type="s" direction="out"/>
+    </method>
+    <!-- Replaces the passphrase of such a drive, both read from file descriptors. Error.WrongKey when the
+         current one isn't one of the drive's passphrases; recovery keys and the TPM stay as they are. -->
+    <method name="ChangePassphrase">
+      <arg name="device" type="s" direction="in"/>
+      <arg name="current" type="h" direction="in"/>
+      <arg name="new" type="h" direction="in"/>
     </method>
     <method name="ShowRecoveryKey">
       <arg name="uuid" type="s" direction="in"/>

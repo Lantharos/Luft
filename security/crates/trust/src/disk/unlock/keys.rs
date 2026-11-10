@@ -7,7 +7,7 @@ use super::luks::{self, Header};
 use crate::errors::{MistypedKey, NeedsKey, Unsupported, WrongKey};
 use crate::keys as signing;
 use crate::paths;
-use crate::system::firmware::efi;
+use crate::system::firmware::efi::{self, SecureBoot};
 use crate::system::firmware::tpm::{self, Tpm};
 use crate::system::host::command::Tool;
 use crate::system::secrets::creds::{self, Protection};
@@ -69,6 +69,15 @@ pub fn opens(device: &Path, header: Option<&Path>, key: &Secret) -> bool {
         None => check,
     };
     check.arg(device).input(key).succeeds()
+}
+
+pub fn opens_slot(device: &Path, slot: u32, key: &Secret) -> bool {
+    Tool::new("cryptsetup")
+        .args(["open", "--test-passphrase", "--key-file", "-", "--key-slot"])
+        .arg(slot.to_string())
+        .arg(device)
+        .input(key)
+        .succeeds()
 }
 
 pub fn unlock_key(device: &Path, header: Option<&Path>, typed: &Secret) -> Result<Secret> {
@@ -145,10 +154,33 @@ pub fn unavailable_reason(tpm: &Tpm) -> Option<String> {
     if !tpm.usable {
         return Some(tpm.reason.clone());
     }
+    if matches!(efi::secure_boot(), SecureBoot::Off | SecureBoot::Setup) {
+        return Some("Secure Boot is off, so anything can start this computer and the TPM can't tell Luft from something made to look like it. Turn Secure Boot on in the firmware settings, and the TPM can unlock the disk.".to_owned());
+    }
     if !signing::shipped() || !efi::measured_uki() {
         return Some("Restart through Luft's signed startup first, so the TPM can check how the computer started.".to_owned());
     }
     None
+}
+
+pub fn remove_slot(device: &Path, header: &Header, slot: u32) -> Result<()> {
+    Tool::new("cryptsetup")
+        .args(["luksKillSlot", "--batch-mode"])
+        .arg(device)
+        .arg(slot.to_string())
+        .status()?;
+    let holders = header
+        .tokens
+        .iter()
+        .filter(|(_, token)| token.keyslots.contains(&slot.to_string()));
+    for (id, _) in holders {
+        Tool::new("cryptsetup")
+            .args(["token", "remove", "--token-id"])
+            .arg(id.to_string())
+            .arg(device)
+            .status()?;
+    }
+    Ok(())
 }
 
 pub fn enroll_tpm(
@@ -156,6 +188,8 @@ pub fn enroll_tpm(
     unlock: &Secret,
     pin: &Secret,
     secure_boot_pcr: &str,
+    public_key: &Path,
+    replace: bool,
 ) -> Result<()> {
     let credentials = Scratch::empty()?;
     if !pin.is_empty() {
@@ -163,10 +197,10 @@ pub fn enroll_tpm(
     }
     Tool::new("systemd-cryptenroll")
         .arg("--unlock-key-file=/dev/stdin")
-        .arg("--wipe-slot=tpm2")
+        .args(replace.then_some("--wipe-slot=tpm2"))
         .arg("--tpm2-device=auto")
         .arg(format!("--tpm2-pcrs=7:sha256={secure_boot_pcr}"))
-        .arg(format!("--tpm2-public-key={}", signing::PCR_PUBLIC_KEY))
+        .arg(format!("--tpm2-public-key={}", public_key.display()))
         .arg("--tpm2-public-key-pcrs=11")
         .arg("--tpm2-pcrlock=")
         .arg(format!(

@@ -17,7 +17,7 @@ use crate::errors::Unsupported;
 use crate::system::host::blocks;
 use crate::system::host::command::Tool;
 use crate::system::secrets::secret::Secret;
-use request::Request;
+use request::{Keys, Request};
 
 pub use initrd::open_in_initrd;
 
@@ -33,23 +33,21 @@ pub fn tpm_unlocks() -> bool {
     keys::tpm_unavailable_reason().is_none()
 }
 
-fn requested_for(disk: &SystemDisk) -> bool {
-    request::partition().is_some_and(|partuuid| {
-        blocks::partuuid(&disk.partition).as_deref() == Some(partuuid.as_str())
+fn requested_for(disk: &SystemDisk) -> Option<Request> {
+    Request::waiting(disk).filter(|request| {
+        blocks::partuuid(&disk.partition).as_deref() == Some(request.partition.as_str())
     })
 }
 
 pub fn state(disk: &SystemDisk, header: Option<&luks::Header>) -> Option<Encrypting> {
-    if !requested_for(disk) {
-        return None;
-    }
+    requested_for(disk)?;
     Some(header.map_or(Encrypting::AfterRestart, |header| {
         Encrypting::Underway(header.done)
     }))
 }
 
 pub fn underway() -> bool {
-    SystemDisk::find().is_ok_and(|disk| requested_for(&disk))
+    SystemDisk::find().is_ok_and(|disk| requested_for(&disk).is_some())
 }
 
 pub fn possible(disk: &SystemDisk) -> bool {
@@ -79,6 +77,7 @@ fn resize(top: &Path, size: &str) -> Result<()> {
     Tool::new("btrfs")
         .args(["filesystem", "resize", size])
         .arg(top)
+        .unhurried()
         .status()
 }
 
@@ -96,11 +95,9 @@ pub fn request(recovery_key: &Secret, passphrase: &Secret, on_battery: bool) -> 
     let room = (disk.size() - HEADER_ROOM) / BLOCK * BLOCK;
     resize(top.path(), &room.to_string())
         .context("Luft's partition couldn't make room for encryption")?;
-    let request = Request {
-        recovery_key,
-        passphrase: passphrase.clone(),
-    };
-    if let Err(error) = request.save(top.path(), &partuuid, tpm_unlocks()) {
+    let kept = Request::new(partuuid, &recovery_key, passphrase, tpm_unlocks())
+        .and_then(|request| request.save(top.path(), &recovery_key));
+    if let Err(error) = kept {
         let _ = request::forget(top.path());
         let _ = resize(top.path(), "max");
         return Err(error);
@@ -110,7 +107,7 @@ pub fn request(recovery_key: &Secret, passphrase: &Secret, on_battery: bool) -> 
 
 pub fn cancel() -> Result<()> {
     let disk = SystemDisk::find()?;
-    if !requested_for(&disk) {
+    if requested_for(&disk).is_none() {
         return Ok(());
     }
     if disk.header()?.is_some() {
@@ -123,20 +120,31 @@ pub fn cancel() -> Result<()> {
     resize(top.path(), "max")
 }
 
-fn finish(disk: &SystemDisk, request: &Request) -> Result<()> {
+fn recovery_slot(device: &Path, keys: &Keys, header: &luks::Header) -> Result<u32> {
+    if !keys.starts_with_passphrase() {
+        return Ok(0);
+    }
+    match header.passphrase_slots().as_slice() {
+        [_, added, ..] => Ok(*added),
+        _ => keys::add_keyslot(device, &keys.passphrase, &keys.recovery_key, header),
+    }
+}
+
+fn finish(disk: &SystemDisk, keys: &Keys) -> Result<()> {
     let device = disk.device();
     let header =
         || luks::read(&device, None, disk.size())?.context("Luft's partition lost its encryption");
     if !header()?.has(luks::RECOVERY) {
-        keys::add_recovery_token(&device, 0)?;
+        let slot = recovery_slot(&device, keys, &header()?)?;
+        keys::add_recovery_token(&device, slot)?;
     }
     let header = header()?;
-    if !request.passphrase.is_empty() && header.passphrase_slots().is_empty() {
-        keys::add_keyslot(&device, &request.recovery_key, &request.passphrase, &header)?;
+    if !keys.passphrase.is_empty() && header.passphrase_slots().is_empty() {
+        keys::add_keyslot(&device, &keys.recovery_key, &keys.passphrase, &header)?;
     }
     if tpm_unlocks() {
-        keys::escrow(&request.recovery_key)?;
-        seal::enroll(&device, &request.recovery_key, &Secret::default())?;
+        keys::escrow(&keys.recovery_key)?;
+        seal::enroll(&device, &keys.recovery_key, &Secret::default())?;
     }
     Ok(())
 }
@@ -147,24 +155,19 @@ pub fn run(
     report: &mut impl FnMut(Progress),
 ) -> Result<bool> {
     let disk = SystemDisk::find()?;
-    let Some(header) = disk.header()?.filter(|_| requested_for(&disk)) else {
+    let (Some(header), Some(request)) = (disk.header()?, requested_for(&disk)) else {
         return Ok(true);
     };
     let device = disk.device();
-    let request = Request::load(TopLevel::mount(&disk)?.path())?;
+    let keys = request.open().context(
+        "Luft carries on being encrypted after the next restart, once the disk has been unlocked",
+    )?;
     let reencrypting = || -> Result<bool> {
         Ok(luks::read(&device, None, disk.size())?
             .is_some_and(|header| header.reencrypting.is_some()))
     };
     if header.reencrypting.is_some()
-        && !reencrypt::run(
-            &device,
-            None,
-            &request.recovery_key,
-            stop,
-            on_battery,
-            report,
-        )?
+        && !reencrypt::run(&device, None, keys.first(), stop, on_battery, report)?
         && reencrypting()?
     {
         return Ok(false);
@@ -172,7 +175,7 @@ pub fn run(
     if let Err(error) = request::forget_sealed_key() {
         eprintln!("The firmware kept its copy of the key Luft was encrypted with: {error}");
     }
-    finish(&disk, &request)?;
+    finish(&disk, &keys)?;
     request::forget(TopLevel::mount(&disk)?.path())?;
     eprintln!("Luft's partition is encrypted");
     Ok(true)

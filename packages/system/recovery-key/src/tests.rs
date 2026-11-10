@@ -90,18 +90,3 @@ fn anything_else_is_not_a_key() {
         );
     }
 }
-
-#[test]
-fn reads_old_letter_keys_with_or_without_groups() {
-    let grouped = "cbdefghi-jklnrtuv-".repeat(4);
-    let grouped = grouped.trim_end_matches('-');
-    for typed in [
-        grouped.to_owned(),
-        grouped.to_uppercase(),
-        grouped.replace('-', ""),
-        grouped.replace('-', " "),
-    ] {
-        assert_eq!(key(&typed).as_deref(), Some(grouped), "{typed}");
-    }
-    assert_eq!(key(&grouped[..70]), None);
-}

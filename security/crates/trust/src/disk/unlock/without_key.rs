@@ -18,7 +18,7 @@ const GRUB_COMMANDS: u32 = 8;
 const GRUB_FILES: u32 = 9;
 const SEALED_TO: &str = "tpm-sealed-without-key";
 
-fn sealed_here(token: &Token) -> bool {
+pub fn sealed_here(token: &Token) -> bool {
     token.kind == TPM2 && token.tpm2_pcrs.contains(&GRUB_FILES)
 }
 

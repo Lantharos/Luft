@@ -13,7 +13,13 @@ bun run preview      # build, then serve dist/ the way Cloudflare does
 bun run check        # type checks the pages and the Worker
 ```
 
-The ISO links go through the site's Worker ([`worker/index.ts`](worker/index.ts)): `/download/latest` and `/download/nightly`, with `.sha256`, `.sha256.minisig` and `.json` after them, read `1/latest.json` or `nightly/latest.json` from get.luft.computer when someone clicks and redirect to that ISO. `latest` is the newest release, or the newest nightly build until there is one. The download page shows the ISO's name and size from the `.json`, so nothing needs rebuilding when a new ISO is published. `bun run types` regenerates the Worker's types after `wrangler.jsonc` changes; `bun run check` does it too, then type-checks the pages and the Worker.
+The ISO links go through the site's Worker ([`worker/index.ts`](worker/index.ts)): `/download/latest` and `/download/nightly`, with `.sha256`, `.sha256.minisig` and `.json` after them, read `1/latest.json` or `nightly/latest.json` from get.luft.computer when someone clicks and redirect to that ISO. `latest` is the newest release, or the newest nightly build until there is one. The download page shows the ISO's name and size from the `.json`, so nothing needs rebuilding when a new ISO is published. The Worker also answers three addresses for Luft computers, none of which sets a cookie or keeps a log:
+
+- `/connectivity` answers `online`, which NetworkManager fetches over plain HTTP to tell whether the network reaches the internet or sits behind a sign-in page. The zone must not redirect this one address to HTTPS.
+- `/api/weather?lat=48.2&lon=16.4` passes the question on to Open-Meteo and answers `{ time, code, temperature, precipitation, wind, sunrise, sunset, day }`. Positions must be rounded to a tenth of a degree, and everyone in the same square shares one answer for a quarter of an hour.
+- `/api/rates` answers the day's currency rates as `{ eur: { usd: 1.08, … } }`, shared for an hour.
+
+`bun run types` regenerates the Worker's types after `wrangler.jsonc` changes; `bun run check` does it too, then type-checks the pages and the Worker.
 
 ## Languages
 
@@ -21,7 +27,7 @@ Every page is built once per language, from the Fluent files in `locales/`; Engl
 
 ## Deploy
 
-The site is a Cloudflare Worker ([`wrangler.jsonc`](wrangler.jsonc)) that serves the files in `dist/`, sends visitors on the home page to their language and resolves the ISO links.
+The site is a Cloudflare Worker ([`wrangler.jsonc`](wrangler.jsonc)) that serves the files in `dist/`, sends visitors on the home page to their language, resolves the ISO links and answers Luft computers.
 
 ```sh
 bunx wrangler login

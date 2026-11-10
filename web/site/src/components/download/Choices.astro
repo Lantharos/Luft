@@ -1,4 +1,5 @@
 ---
+import Checksum from './Checksum.astro';
 import { formatSize, iso, meet } from '../../data/downloads';
 import { localize } from '../../i18n/pages';
 
@@ -33,6 +34,7 @@ const sized = (size: number | null) => (size ? ` · ${formatSize(size, locale)}`
 			<span class="font-mono" data-iso-name></span><a class="link" href={iso.checksum}>{t('download-checksum')}</a> · <a class="link" href={iso.signature}>{t('download-signature')}</a>
 		</p>
 		<div>
+			<Checksum />
 			<p class="mt-8 hidden max-w-md text-sm text-ink-muted [&_a]:link" data-nightly set:html={t('download-nightly', { nightly: iso.nightly })} />
 		</div>
 	</div>
@@ -44,6 +46,7 @@ const sized = (size: number | null) => (size ? ` · ${formatSize(size, locale)}`
 	interface Published {
 		name: string;
 		size: number;
+		sha256: string;
 		folder: string;
 	}
 
@@ -53,6 +56,8 @@ const sized = (size: number | null) => (size ? ` · ${formatSize(size, locale)}`
 		const size = formatSize(published.size, document.documentElement.lang);
 		for (const label of document.querySelectorAll('[data-iso-size]')) label.textContent = ` · ${size}`;
 		for (const name of document.querySelectorAll('[data-iso-name]')) name.textContent = `${published.name} · `;
+		document.querySelector('[data-iso-sha256]')!.textContent = published.sha256;
+		document.querySelector('[data-iso-checksum]')!.classList.remove('hidden');
 		if (published.folder !== 'nightly') document.querySelector('[data-nightly]')?.classList.remove('hidden');
 	}
 </script>

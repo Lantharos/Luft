@@ -1,0 +1,35 @@
+---
+import { localize } from '../../i18n/pages';
+
+const { t } = localize(Astro);
+---
+
+<div class="mt-8 hidden max-w-md" data-iso-checksum>
+	<div class="flex items-center gap-3 rounded-2xl bg-well py-3 pr-3 pl-4">
+		<p class="min-w-0 flex-1 text-xs leading-relaxed text-ink-muted">
+			{t('download-sha256')} <code class="font-mono break-all text-ink-soft" data-iso-sha256></code>
+		</p>
+		<button
+			type="button"
+			class="inline-flex h-9 min-w-20 shrink-0 items-center justify-center rounded-full bg-ink/8 px-4 text-sm font-semibold text-ink transition-[scale,background-color] duration-(--motion-tap) hover:bg-ink/13 active:scale-96"
+			aria-live="polite"
+			data-iso-copy
+			data-copied={t('download-sha256-copied')}>{t('download-sha256-copy')}</button
+		>
+	</div>
+</div>
+
+<script>
+	const SHOWN_MS = 2000;
+	const button = document.querySelector<HTMLButtonElement>('[data-iso-copy]')!;
+	const sum = document.querySelector('[data-iso-sha256]')!;
+	const label = button.textContent;
+	let reverting: ReturnType<typeof setTimeout>;
+
+	button.addEventListener('click', async () => {
+		await navigator.clipboard.writeText(sum.textContent);
+		button.textContent = button.dataset.copied!;
+		clearTimeout(reverting);
+		reverting = setTimeout(() => (button.textContent = label), SHOWN_MS);
+	});
+</script>

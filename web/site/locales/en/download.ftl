@@ -27,6 +27,12 @@ download-iso-text = For a USB stick, a virtual machine, or a computer that start
 download-checksum = checksum
 # Link to the file that proves the checksum was signed by Luft
 download-signature = signature
+# The kind of checksum shown next to it; it's a name, so it stays as it is
+download-sha256 = SHA-256
+# Button that copies the ISO's SHA-256 checksum
+download-sha256-copy = Copy
+# Shown on the same button for a moment after the checksum was copied
+download-sha256-copied = Copied
 # Keep the <a href="{ $nightly }"> and </a> around the words that link to the nightly ISO.
 download-nightly = Testing something new? <a href="{ $nightly }">The nightly ISO</a> is built whenever Luft changes, and computers installed from it keep getting nightly updates.
 

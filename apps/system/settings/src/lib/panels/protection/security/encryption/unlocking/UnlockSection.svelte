@@ -5,10 +5,11 @@
 	import { app } from '#lib/state/app.svelte.js';
 	import { withoutKeySentence } from '../../secureboot/describe';
 	import { acceptSecureBootChange, printRecoveryKey, removeTpmUnlock, replaceRecoveryKey, saveRecoveryKey, setUpTpmUnlock, showRecoveryKey } from '../../api';
+	import CheckKeyDialog from './CheckKeyDialog.svelte';
 	import TpmDialog, { type TpmMode } from './TpmDialog.svelte';
 	import { withUnlock } from './unlock.svelte';
 
-	type Open = { kind: 'removeTpm' | 'removePin' | 'replaceKey' } | { kind: 'tpm'; mode: TpmMode } | { kind: 'key'; key: string; fresh: boolean; description?: string };
+	type Open = { kind: 'removeTpm' | 'removePin' | 'replaceKey' | 'checkKey' } | { kind: 'tpm'; mode: TpmMode } | { kind: 'key'; key: string; fresh: boolean; description?: string };
 
 	let { trust }: { trust: Trust } = $props();
 
@@ -80,6 +81,8 @@
 				<button type="button" class="button" onclick={() => (open = { kind: 'tpm', mode: 'add' })}>{t('settings-encryption-add-pin')}</button>
 			</Row>
 		{/if}
+	{:else if trust.tpm.usable && trust.secureBoot !== 'on'}
+		<Row title={t('settings-encryption-chip-unlock')} description={t('settings-encryption-chip-needs-secure-boot')} />
 	{:else if trust.tpm.usable}
 		<Row title={t('settings-encryption-chip-unlock')} description={t('settings-encryption-chip-unlock-off')}>
 			<button type="button" class="button" onclick={() => (open = { kind: 'tpm', mode: 'setup' })}>{t('settings-protection-set-up')}</button>
@@ -91,6 +94,9 @@
 			<button type="button" class="button" disabled={busy} onclick={showKey}>{t('settings-recovery-show')}</button>
 		{/if}
 		<button type="button" class="button" disabled={busy} onclick={() => (open = { kind: 'replaceKey' })}>{t('settings-recovery-replace')}</button>
+	</Row>
+	<Row title={t('settings-recovery-check-row')} description={t('settings-recovery-check-row-description')}>
+		<button type="button" class="button" disabled={busy} onclick={() => (open = { kind: 'checkKey' })}>{t('settings-recovery-check')}</button>
 	</Row>
 </Section>
 
@@ -125,6 +131,8 @@
 		run={replaceKey}
 		onclose={close}
 	/>
+{:else if open?.kind === 'checkKey'}
+	<CheckKeyDialog stored={disk.recoveryKeyStored} onclose={close} onreplace={() => (open = { kind: 'replaceKey' })} />
 {:else if open?.kind === 'key'}
 	{@const { key, fresh } = open}
 	<RecoveryKeyDialog

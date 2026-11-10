@@ -137,6 +137,10 @@ const KINDS: Record<Drive['kind'], string> = {
 	image: 'disk image'
 };
 
+export function builtIn(drive: Drive) {
+	return !drive.removable && drive.kind !== 'usb' && drive.kind !== 'card' && drive.kind !== 'image';
+}
+
 export function driveKindName(drive: Drive) {
 	const name = KINDS[drive.kind];
 	return name[0].toUpperCase() + name.slice(1);

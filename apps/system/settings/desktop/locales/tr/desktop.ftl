@@ -212,8 +212,6 @@ desktop-picture-filter = Resimler
 desktop-picture-unopenable = Bu resim açılamıyor
 
 ## Users
-desktop-users-password-failed = Parolanız değiştirilemedi: { $reason }
-desktop-users-password-timed-out = passwd yanıt vermeyi bıraktı
 
 ## Updates
 desktop-updates-nvidia-summary = NVIDIA ekran kartınızdan en iyi şekilde yararlanın

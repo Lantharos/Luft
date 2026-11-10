@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
 	import { Dialog, errorText, PasswordField, Spinner } from '@luft/ui';
-	import type { PasswordOutcome, User } from '#lib/bindings.js';
+	import type { User, Weakness } from '#lib/bindings.js';
 	import { changePassword } from './api';
 	import StrengthMeter from './StrengthMeter.svelte';
 	import { MINIMUM_LENGTH, measure } from './strength';
@@ -11,11 +11,12 @@
 		onclose: () => void;
 	}
 
-	const REJECTIONS: Record<Exclude<PasswordOutcome, 'changed' | 'wrongPassword'>, string> = {
-		tooShort: 'settings-users-password-too-short',
-		tooSimilar: 'settings-users-password-too-similar',
-		dictionaryWord: 'settings-users-password-dictionary-word',
-		tooSimple: 'settings-users-password-too-simple',
+	const WEAKNESSES: Record<Weakness, string> = {
+		'too-short': 'settings-users-password-too-short',
+		'too-similar': 'settings-users-password-too-similar',
+		'dictionary-word': 'settings-users-password-dictionary-word',
+		'contains-name': 'settings-users-password-contains-name',
+		'too-simple': 'settings-users-password-too-simple',
 		rejected: 'settings-users-password-rejected'
 	};
 
@@ -43,7 +44,7 @@
 			const outcome = await changePassword(user.hasPassword ? current : null, password);
 			if (outcome === 'changed') return onclose();
 			if (outcome === 'wrongPassword') rejectedCurrent = current;
-			else rejection = { password, message: REJECTIONS[outcome] };
+			else rejection = { password, message: WEAKNESSES[outcome.tooWeak] };
 		} catch (reason) {
 			problem = errorText(reason);
 		}

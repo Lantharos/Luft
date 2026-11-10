@@ -30,7 +30,6 @@ settings-more-show = { $count ->
         [many] Taispeáin { $count } eile
        *[other] Taispeáin { $count } eile
     }
-settings-more-fewer = Taispeáin níos lú
 settings-time-picker = { $label }, { $time }
 settings-time-picker-hour = Uair
 settings-time-picker-minute = Nóiméad

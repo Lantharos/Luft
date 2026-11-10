@@ -1,5 +1,6 @@
 import { commands, events } from '#lib/bindings.js';
-import type { SpaceUpdate } from '#lib/bindings.js';
+import type { Cleanup, SpaceUpdate } from '#lib/bindings.js';
+import { WAIT } from '#lib/bridge/index.js';
 
 const same = (a: string[], b: string[]) => a.length === b.length && a.every((part, index) => part === b[index]);
 
@@ -53,6 +54,11 @@ class Space {
 		this.root = null;
 		this.update = null;
 		void commands.spaceStop();
+	}
+
+	async clean(what: Cleanup) {
+		await commands.spaceClean({ what }, WAIT);
+		this.refresh();
 	}
 
 	async trash(path: string[]) {

@@ -329,3 +329,69 @@ settings-accounts-text-me = Изпрати ми код с SMS
 settings-accounts-choose-phone = На кой номер Apple да изпрати кода?
     .description = Изпращане на SMS
 settings-accounts-approve = Акаунтът ви в Apple използва Разширена защита на данните. Одобрете заявката на вашия iPhone, iPad или Mac, за да може този компютър да отваря iCloud Drive.
+
+## Apps
+
+settings-apps-defaults = Приложения по подразбиране
+settings-apps-defaults-description = Използват се, когато отваряте връзки, файлове и папки
+settings-apps-browser = Уеб браузър
+settings-apps-email = Имейл
+settings-apps-calendar = Календар
+settings-apps-music = Музика
+settings-apps-videos = Видео
+settings-apps-photos = Снимки
+settings-apps-text-editor = Текстов редактор
+settings-apps-files = Файлове
+settings-apps-archives = Архиви
+settings-apps-choose = Изберете
+settings-apps-startup = Стартиране
+settings-apps-startup-description = Тези приложения се отварят, когато влезете
+settings-apps-startup-app = Отваряне на { $app } при вход
+settings-apps-startup-remove = Премахване на { $app } от стартирането
+settings-apps-startup-add = Добави приложение
+settings-apps-startup-add-title = Добавяне на приложение при стартиране
+settings-apps-startup-add-description = Изберете приложение, което да се отваря при всеки вход.
+settings-apps-search = Търсене на приложения
+settings-apps-no-match = Няма приложения, които отговарят на търсенето
+settings-apps-cancel = Отказ
+settings-apps-permissions = Разрешения
+settings-apps-location = Местоположение
+settings-apps-camera = Камера
+settings-apps-clipboard = Клипборд във фонов режим
+settings-apps-full-access = Пълен достъп
+settings-apps-full-access-hint = Работи извън пясъчника си и може всичко, което може програма, която стартирате сами. Премахването важи от следващото му отваряне.
+settings-apps-full-access-remove = Премахни
+settings-apps-full-access-remove-app = Премахни пълния достъп на { $app }
+settings-apps-passwords = Запазени пароли
+settings-apps-passwords-forget = Забрави
+settings-apps-passwords-forget-app = Нека { $app } попита отново
+settings-apps-permissions-allowed = Разрешени: { $allowed } от { $total }
+settings-apps-permissions-description = Приложенията в пясъчник получават собствените си файлове и само това, което разрешите тук.
+settings-apps-sandbox-only = Нищо извън пясъчника
+settings-apps-folders = Папки
+settings-apps-folders-hint = Може да чете и променя всичко в тези папки от следващото си отваряне.
+settings-apps-folders-count = { $count ->
+    [one] { $count } папка
+   *[other] { $count } папки
+}
+settings-apps-folder-add = Добавяне на папка
+settings-apps-folder-remove = Премахване
+settings-apps-folder-remove-app = Спиране на споделянето на { $folder }
+settings-apps-usb = USB устройства
+settings-apps-usb-hint = Например ключове за сигурност, телефони и микроконтролери
+settings-apps-serial = Серийни устройства
+settings-apps-serial-hint = Например 3D принтери и платки, свързани през USB
+settings-apps-folder-read-only = Само за четене
+settings-apps-downloads = Папка Изтегляния
+settings-apps-downloads-hint = Може да записва файлове в папката Изтегляния и да отваря тези в нея, от следващото си отваряне.
+settings-apps-internet = Интернет
+settings-apps-internet-hint = Може да се свързва с интернет от следващото си отваряне.
+settings-apps-service-hint = Услуга на работния плот, с която може да общува
+settings-apps-service-remove = Премахване
+settings-apps-service-remove-app = Спиране на достъпа до { $service }
+settings-apps-services-count = { $count ->
+    [one] { $count } услуга
+   *[other] { $count } услуги
+}
+settings-apps-full-access-off = Работи в пясъчник. Пълният достъп премахва пясъчника.
+settings-apps-full-access-give = Даване на пълен достъп

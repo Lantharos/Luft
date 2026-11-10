@@ -87,6 +87,7 @@ settings-users-password-too-short = This password is too short
 settings-users-password-too-similar = This is too similar to your current password
 settings-users-password-dictionary-word = This is based on a dictionary word. Try something less common.
 settings-users-password-too-simple = This is too simple. Make it longer or mix in more kinds of characters.
+settings-users-password-contains-name = This contains your name. Try something others couldn’t guess.
 settings-users-password-rejected = This password wasn’t accepted. Try a different one.
 settings-users-password-minimum = { $count ->
     [one] Use at least { $count } character
@@ -145,7 +146,7 @@ settings-updates-checking = Looking for updates
 settings-updates-downloading = Downloading updates
 settings-updates-rolling-back = Getting the earlier version ready
 settings-updates-switching-nvidia = Downloading NVIDIA’s driver
-settings-updates-switching-standard = Downloading the standard image
+settings-updates-switching-standard = Downloading Luft without NVIDIA’s driver
 settings-updates-up-to-date = Your system is up to date
 settings-updates-version = Version { $version }
 settings-updates-version-new = A new version
@@ -154,7 +155,7 @@ settings-version-nightly = { $release } Nightly { $number }
 settings-updates-returning = Ready to go back to version { $version }
 settings-updates-returning-unversioned = Ready to go back to the earlier version
 settings-updates-nvidia-ready = NVIDIA’s driver is ready
-settings-updates-standard-ready = The standard image is ready
+settings-updates-standard-ready = Luft without NVIDIA’s driver is ready
 settings-updates-version-available = Version { $version } is available
 settings-updates-version-available-new = A new version is available
 settings-updates-version-staged = Version { $version } is ready to install
@@ -221,7 +222,7 @@ settings-updates-go-back = Go back
 settings-updates-notes-title = What’s new in version { $version }
 settings-updates-notes-title-new = What’s new in the new version
 settings-updates-variant-nvidia = Use NVIDIA’s driver
-settings-updates-variant-standard = Switch to the standard image
+settings-updates-variant-standard = Remove NVIDIA’s driver
 settings-updates-variant-nvidia-reason = Full speed from your NVIDIA graphics
 settings-updates-variant-standard-reason = Smaller, as this computer has no NVIDIA graphics
 # Button, verb
@@ -273,8 +274,7 @@ settings-about-problem-forced = { $when }. Some apps didn’t close in time and 
 settings-about-problem-emergency = { $when }. The computer had to restart without waiting for apps.
 settings-about-problem-help = What can help
 settings-about-problem-what = What happened
-# nvidia-bug-report.sh is a command name, keep it as is
-settings-about-problem-log = The full kernel log of that session stays in the system journal. Running nvidia-bug-report.sh as an administrator collects it for a driver bug report.
+settings-about-problem-log = Luft keeps the full log of that session, in case you report the problem to NVIDIA.
 settings-about-problem-firmware = Restart into firmware settings
 settings-about-done = Done
 
@@ -326,6 +326,10 @@ settings-accounts-on-demand = Files download when you open them
 settings-accounts-sign-in-again = Sign in again
 # Button that cancels removing an account
 settings-accounts-keep = Keep
+settings-accounts-unsynced-title = Remove anyway?
+# $name is the account's name
+settings-accounts-unsynced-description = Files kept on this computer may not have reached { $name } yet. Removing the account now deletes them from this computer.
+settings-accounts-unsynced-remove = Remove anyway
 # Button
 settings-accounts-remove = Remove
 # Button that confirms removing an account
@@ -387,3 +391,90 @@ settings-accounts-text-me = Text me a code instead
 settings-accounts-choose-phone = Which number should Apple text the code to?
     .description = Send a text message
 settings-accounts-approve = Your Apple Account uses Advanced Data Protection. Approve the request on your iPhone, iPad or Mac to let this computer open iCloud Drive.
+
+## Apps
+
+settings-apps-defaults = Default apps
+settings-apps-defaults-description = Used when you open links, files, and folders
+settings-apps-browser = Web browser
+settings-apps-email = Email
+settings-apps-calendar = Calendar
+settings-apps-music = Music
+settings-apps-videos = Videos
+settings-apps-photos = Photos
+settings-apps-text-editor = Text editor
+settings-apps-files = Files
+settings-apps-archives = Archives
+# Placeholder of the app list when no default app is chosen
+settings-apps-choose = Choose
+settings-apps-startup = Startup
+settings-apps-startup-description = These apps open when you sign in
+# Screen-reader label of a switch; $app is an app name
+settings-apps-startup-app = Open { $app } when you sign in
+settings-apps-startup-remove = Remove { $app } from startup
+settings-apps-startup-add = Add app
+settings-apps-startup-add-title = Add a startup app
+settings-apps-startup-add-description = Choose an app to open every time you sign in.
+settings-apps-search = Search apps
+settings-apps-no-match = No apps match your search
+settings-apps-cancel = Cancel
+settings-apps-permissions = Permissions
+settings-apps-location = Location
+settings-apps-camera = Camera
+settings-apps-clipboard = Clipboard in the background
+settings-apps-full-access = Full access
+settings-apps-full-access-hint = It runs outside its sandbox, with everything a program you start yourself can do. Removing it takes effect the next time it opens.
+# Button, verb
+settings-apps-full-access-remove = Remove
+# Screen reader label of the remove button; $app is an app name
+settings-apps-full-access-remove-app = Remove full access from { $app }
+settings-apps-passwords = Saved passwords
+# Button, verb
+settings-apps-passwords-forget = Forget
+# Screen reader label of the forget button; $app is an app name
+settings-apps-passwords-forget-app = Let { $app } ask again
+# $allowed and $total are numbers of apps, or of saved passwords
+settings-apps-permissions-allowed = { $allowed } of { $total } allowed
+settings-apps-permissions-description = Apps in a sandbox get their own files and only what you allow here.
+settings-apps-sandbox-only = Nothing beyond its sandbox
+settings-apps-folders = Folders
+settings-apps-folders-hint = It can read and change everything in these folders, from the next time it opens.
+# $count is a number of folders an app may use
+settings-apps-folders-count = { $count ->
+    [one] { $count } folder
+   *[other] { $count } folders
+}
+settings-apps-folder-add = Add folder
+# Button, verb
+settings-apps-folder-remove = Remove
+# Screen reader label of the remove button; $folder is a folder path
+settings-apps-folder-remove-app = Stop sharing { $folder }
+settings-apps-usb = USB devices
+settings-apps-usb-hint = Such as security keys, phones and microcontrollers
+settings-apps-serial = Serial devices
+settings-apps-serial-hint = Such as 3D printers and boards connected over USB
+# Shown under a folder an app may only read
+settings-apps-folder-read-only = Read only
+settings-apps-microphone = Microphone
+settings-apps-microphone-hint = It can record sound, from the microphone and from what this computer plays. Applies right away.
+settings-apps-camera-hint = It can use the cameras of this computer. Some apps only find them the next time they open.
+settings-apps-downloads = Downloads folder
+settings-apps-downloads-hint = It can save files to your Downloads folder and open the ones there, from the next time it opens.
+settings-apps-internet = Internet
+settings-apps-internet-hint = It can go online, from the next time it opens.
+settings-apps-x11 = Older way of showing windows (X11)
+settings-apps-x11-hint = For apps that don’t open without it. Apps using it can see what you type in other apps that use it too.
+# Under the name of a D-Bus service an app may call
+settings-apps-service-hint = A service on your desktop it can talk to
+# Button, verb
+settings-apps-service-remove = Remove
+# Screen reader label of the remove button; $service is a D-Bus service name
+settings-apps-service-remove-app = Stop letting it talk to { $service }
+# $count is a number of desktop services an app may call
+settings-apps-services-count = { $count ->
+    [one] { $count } service
+   *[other] { $count } services
+}
+settings-apps-full-access-off = It runs in a sandbox. Full access takes the sandbox away.
+# Button that opens Schelf to confirm giving the app full access
+settings-apps-full-access-give = Give full access

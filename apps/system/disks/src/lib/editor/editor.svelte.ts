@@ -55,7 +55,6 @@ class Editor {
 	steps = $state.raw<Step[]>([]);
 	history = $state.raw<Step[][]>([]);
 	selected = $state<string | null>(null);
-	exact = $state(false);
 	draft = $state.raw<Draft | null>(null);
 	frozen = $state.raw<{ layout: Layout; sentences: string[] } | null>(null);
 	progress = $state.raw<Progress | null>(null);

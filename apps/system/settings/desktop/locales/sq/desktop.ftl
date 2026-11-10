@@ -219,8 +219,6 @@ desktop-picture-filter = Figura
 desktop-picture-unopenable = Kjo figurë nuk mund të hapet
 
 ## Users
-desktop-users-password-failed = Fjalëkalimi nuk mund të ndryshohej: { $reason }
-desktop-users-password-timed-out = passwd nuk u përgjigj më
 
 ## Updates
 desktop-updates-nvidia-summary = Përfito sa më shumë nga grafika jote NVIDIA

@@ -8,7 +8,7 @@ use specta::Type;
 use super::archive::{self, Format};
 use super::download::download;
 use super::installed::{UserThemes, only_cursors};
-use super::{store, themes};
+use super::{store, themes, vetting};
 use crate::L10N;
 
 const MAX_SEARCH_DEPTH: usize = 6;
@@ -98,6 +98,7 @@ fn unpack_themes(
                     .to_string_lossy()
                     .into_owned()
             };
+            vetting::keep_only_cursors(theme)?;
             user.adopt(theme, &wanted)
         })
         .collect()
@@ -111,6 +112,9 @@ pub fn install(id: u64, file: u32, report: &impl Fn(InstallState)) -> Result<Vec
     let staging = staging(&user, &format!("{id}-{file}"))?;
     let archive_path = staging.0.join("download");
     download(&link, &archive_path, report)?;
+    if !format.matches(&archive_path) {
+        return Err(t!(L10N, "desktop-cursors-archive-damaged"));
+    }
     report(InstallState::Installing);
     unpack_themes(&user, format, &archive_path, &file_name, &staging.0)
 }
@@ -125,15 +129,22 @@ mod tests {
         fs::write(path, contents).unwrap();
     }
 
-    fn archive_of(files: &[(&str, &str)], into: &Path) {
+    fn cursor() -> Vec<u8> {
+        let words: [u32; 16] = [
+            16, 0x10000, 1, 0xfffd0002, 24, 28, 36, 0xfffd0002, 24, 1, 1, 1, 0, 0, 0, 0xffffffff,
+        ];
+        let mut bytes = b"Xcur".to_vec();
+        bytes.extend(words.iter().flat_map(|word| word.to_le_bytes()));
+        bytes
+    }
+
+    fn archive_of(files: &[(&str, &[u8])], into: &Path) {
         let mut builder = tar::Builder::new(fs::File::create(into).unwrap());
         for (path, contents) in files {
             let mut header = tar::Header::new_gnu();
             header.set_size(contents.len() as u64);
             header.set_mode(0o644);
-            builder
-                .append_data(&mut header, path, contents.as_bytes())
-                .unwrap();
+            builder.append_data(&mut header, path, *contents).unwrap();
         }
         builder.finish().unwrap();
     }
@@ -152,11 +163,13 @@ mod tests {
         let archive_path = scratch.path().join("download.tar");
         archive_of(
             &[
-                ("hicolor/index.theme", "[Icon Theme]\nName=Sneaky\n"),
-                ("hicolor/cursors/left_ptr", "Xcur"),
-                ("Mixed/index.theme", "[Icon Theme]\nName=Mixed\n"),
-                ("Mixed/cursors/left_ptr", "Xcur"),
-                ("Mixed/48x48/apps/other.png", "png"),
+                ("hicolor/index.theme", b"[Icon Theme]\nName=Sneaky\n"),
+                ("hicolor/cursors/left_ptr", &cursor()),
+                ("hicolor/cursors/not_a_cursor", b"#!/bin/sh"),
+                ("hicolor/install.sh", b"#!/bin/sh"),
+                ("Mixed/index.theme", b"[Icon Theme]\nName=Mixed\n"),
+                ("Mixed/cursors/left_ptr", &cursor()),
+                ("Mixed/48x48/apps/other.png", b"png"),
             ],
             &archive_path,
         );
@@ -174,6 +187,8 @@ mod tests {
         assert_eq!(installed, ["hicolor-2"]);
         assert!(app_icon.is_file());
         assert!(icons.join("hicolor-2/cursors/left_ptr").is_file());
+        assert!(!icons.join("hicolor-2/cursors/not_a_cursor").exists());
+        assert!(!icons.join("hicolor-2/install.sh").exists());
         assert!(!icons.join("Mixed").exists());
         assert!(user.remove("hicolor").is_err());
         assert!(app_icon.is_file());

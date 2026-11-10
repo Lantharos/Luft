@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { appWindow } from '@lantharos/sabine';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
 	import { appearance, GlassShell, IconButton, Toast, WindowControls } from '@luft/ui';
+	import { events } from '#lib/bindings.js';
 	import DriveView from '#lib/components/drive/DriveView.svelte';
 	import EditorActions from '#lib/components/editor/EditorActions.svelte';
 	import EditorView from '#lib/components/editor/EditorView.svelte';
@@ -15,6 +17,7 @@
 
 	onMount(() => {
 		void disks.start();
+		return events.disksCloseAsked(close);
 	});
 
 	$effect(() => {
@@ -23,6 +26,13 @@
 
 	let editing = $derived(!space.root && editor.active ? editor.layout : null);
 	let title = $derived(space.root ? space.title : editing ? `Partitions on ${disks.drive?.name}` : (disks.drive?.name ?? 'Disks'));
+
+	let working = $derived(editor.running || disks.busy.size > 0 || (disks.image !== null && !disks.image.finished));
+
+	function close() {
+		if (working) dialogs.open({ kind: 'still-working' });
+		else appWindow.close();
+	}
 
 	function back() {
 		if (space.root) space.up();
@@ -42,7 +52,7 @@
 			{#if editing}
 				<EditorActions />
 			{/if}
-			<WindowControls />
+			<WindowControls onclose={close} />
 		</header>
 		<div class="soft-scroll min-h-0 flex-1 overflow-y-auto">
 			<div class="mx-auto flex w-full max-w-[820px] flex-col gap-7 px-8 pt-2 pb-10">

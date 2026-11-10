@@ -4,9 +4,10 @@
 	import { commands } from '#lib/bindings.js';
 	import type { Drive, Format, Volume } from '#lib/bindings.js';
 	import { WAIT } from '#lib/bridge/index.js';
-	import { volumeName } from '#lib/format.js';
+	import { builtIn, volumeName } from '#lib/format.js';
 	import { disks } from '#lib/state/disks.svelte.js';
 	import FormatFields from './FormatFields.svelte';
+	import TypedName from './TypedName.svelte';
 
 	interface Props {
 		drive: Drive;
@@ -27,6 +28,9 @@
 	);
 	let valid = $state(true);
 	let working = $state(false);
+	let typed = $state(false);
+
+	let guarded = $derived(!volume && builtIn(drive));
 
 	let target = $derived(volume ? `“${volumeName(volume)}” on ${drive.name}` : `${drive.name} (${bytes(drive.size)})`);
 	let loss = $derived(
@@ -46,8 +50,11 @@
 
 <Dialog title={volume ? 'Format partition' : 'Format drive'} description={loss} {onclose}>
 	<FormatFields bind:format bind:valid offerErase />
+	{#if guarded}
+		<TypedName name={drive.name} bind:matches={typed} />
+	{/if}
 	{#snippet actions()}
 		<button type="button" class="button" onclick={onclose}>Cancel</button>
-		<button type="button" class="button danger" disabled={!valid || working} onclick={submit}>{#if working}<Spinner />Formatting{:else}Erase and format{/if}</button>
+		<button type="button" class="button danger" disabled={!valid || working || (guarded && !typed)} onclick={submit}>{#if working}<Spinner />Formatting{:else}Erase and format{/if}</button>
 	{/snippet}
 </Dialog>

@@ -1,5 +1,8 @@
 use std::ops::Range;
 
+use luft_app::dbus::objects::Objects;
+
+use super::plan::moving;
 use crate::udisks;
 use crate::udisks::snapshot::{self, Drive, PartitionTable, Snapshot};
 use crate::udisks::volumes::{Segment, Volume};
@@ -77,9 +80,18 @@ impl Room {
     }
 }
 
-fn writable(drive: &Drive) -> Result<(), String> {
+fn writable(objects: &Objects, drive: &Drive) -> Result<(), String> {
     if drive.read_only {
         return Err(format!("{} can only be read", drive.name));
+    }
+    let interrupted = moving::interrupted(objects)
+        .iter()
+        .any(|pending| pending.drive == drive.block);
+    if interrupted {
+        return Err(format!(
+            "A move on {} was interrupted and has to finish first",
+            drive.name
+        ));
     }
     Ok(())
 }
@@ -99,8 +111,8 @@ fn display_name(volume: &Volume) -> String {
     .to_owned()
 }
 
-fn idle(drive: &Drive) -> Result<(), String> {
-    writable(drive)?;
+fn idle(objects: &Objects, drive: &Drive) -> Result<(), String> {
+    writable(objects, drive)?;
     if drive.system {
         return Err(format!(
             "The running system uses “{}”, so it can't be erased while it runs",
@@ -112,29 +124,36 @@ fn idle(drive: &Drive) -> Result<(), String> {
 
 impl Guard {
     pub async fn table(table: &str) -> Result<Room, String> {
-        let snapshot = snapshot::build(&udisks::objects().await?);
+        let objects = udisks::objects().await?;
+        let snapshot = snapshot::build(&objects);
         let drive = snapshot
             .drives
             .iter()
             .find(|drive| drive.block == table)
             .ok_or("This drive is gone")?;
-        writable(drive)?;
+        writable(&objects, drive)?;
         Ok(Room::around(drive, None))
     }
 
     pub async fn erasable(block: &str) -> Result<(), String> {
-        let snapshot = snapshot::build(&udisks::objects().await?);
+        let objects = udisks::objects().await?;
+        let snapshot = snapshot::build(&objects);
         match snapshot.drives.iter().find(|drive| drive.block == block) {
-            Some(drive) => idle(drive),
-            None => Self::within(&snapshot, block)?.changeable(),
+            Some(drive) => idle(&objects, drive),
+            None => Self::within(&objects, &snapshot, block)?.changeable(),
         }
     }
 
     pub async fn volume(block: &str) -> Result<Self, String> {
-        Self::within(&snapshot::build(&udisks::objects().await?), block)
+        let objects = udisks::objects().await?;
+        Self::within(&objects, &snapshot::build(&objects), block)
     }
 
-    fn within(snapshot: &Snapshot, block: &str) -> Result<Self, String> {
+    pub fn label(&self) -> &str {
+        &self.name
+    }
+
+    fn within(objects: &Objects, snapshot: &Snapshot, block: &str) -> Result<Self, String> {
         let (drive, volume) = snapshot
             .drives
             .iter()
@@ -145,7 +164,7 @@ impl Guard {
                 })
             })
             .ok_or("This partition is gone")?;
-        writable(drive)?;
+        writable(objects, drive)?;
         Ok(Self {
             offset: volume.offset,
             size: volume.size,

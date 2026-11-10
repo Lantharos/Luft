@@ -28,7 +28,6 @@ settings-more-show = { $count ->
         [few] Afișează încă { $count }
        *[other] Afișează încă { $count }
     }
-settings-more-fewer = Afișează mai puține
 settings-time-picker = { $label }, { $time }
 settings-time-picker-hour = Oră
 settings-time-picker-minute = Minut

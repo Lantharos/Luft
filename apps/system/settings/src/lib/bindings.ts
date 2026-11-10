@@ -32,7 +32,8 @@ export const commands = {
 	}, options?: CallOptions) => invoke<null>("accounts_open", params, options),
 	accountsRemove: (params: {
 		account: string,
-	}, options?: CallOptions) => invoke<null>("accounts_remove", params, options),
+		discardUnsynced: boolean,
+	}, options?: CallOptions) => invoke<Removal>("accounts_remove", params, options),
 	accountsRename: (params: {
 		account: string,
 		name: string,
@@ -198,6 +199,10 @@ export const commands = {
 		timezone: string,
 	}, options?: CallOptions) => invoke<null>("datetime_set_timezone", params, options),
 	datetimeZones: (options?: CallOptions) => invoke<Zone[]>("datetime_zones", {}, options),
+	developerTools: (options?: CallOptions) => invoke<boolean | null>("developer_tools", {}, options),
+	developerToolsSet: (params: {
+		on: boolean,
+	}, options?: CallOptions) => invoke<null>("developer_tools_set", params, options),
 	dictation: (options?: CallOptions) => invoke<Overview>("dictation", {}, options),
 	dictationCancel: (params: {
 		model: string,
@@ -293,6 +298,9 @@ export const commands = {
 		name: string,
 		chip: boolean,
 	}, options?: CallOptions) => invoke<string>("keyring_ssh_generate", params, options),
+	keyringSshLoad: (params: {
+		fingerprint: string,
+	}, options?: CallOptions) => invoke<null>("keyring_ssh_load", params, options),
 	keyringSshPublicKey: (params: {
 		fingerprint: string,
 	}, options?: CallOptions) => invoke<string>("keyring_ssh_public_key", params, options),
@@ -435,6 +443,9 @@ export const commands = {
 		name: string,
 		location: string,
 	}, options?: CallOptions) => invoke<string>("printers_add", params, options),
+	printersAddAvailable: (params: {
+		name: string,
+	}, options?: CallOptions) => invoke<null>("printers_add_available", params, options),
 	printersCancelJob: (params: {
 		printer: string,
 		job: number,
@@ -491,6 +502,9 @@ export const commands = {
 	securityAcceptSecureBoot: (options?: CallOptions) => invoke<null>("security_accept_secure_boot", {}, options),
 	securityCancelEncryption: (options?: CallOptions) => invoke<null>("security_cancel_encryption", {}, options),
 	securityCancelEnrollment: (options?: CallOptions) => invoke<null>("security_cancel_enrollment", {}, options),
+	securityCheckKey: (params: {
+		key: string,
+	}, options?: CallOptions) => invoke<Outcome<boolean>>("security_check_key", params, options),
 	securityEncryptDisk: (params: {
 		recoveryKey: string,
 		passphrase: string,
@@ -539,6 +553,10 @@ export const commands = {
 		key: string,
 		value: Value,
 	}) & (Location), options?: CallOptions) => invoke<null>("settings_write", params, options),
+	sharingList: (options?: CallOptions) => invoke<Shared[]>("sharing_list", {}, options),
+	sharingRevoke: (params: {
+		id: string,
+	}, options?: CallOptions) => invoke<null>("sharing_revoke", params, options),
 	soundCustomChoose: (params: {
 		name: string,
 	}, options?: CallOptions) => invoke<null>("sound_custom_choose", params, options),
@@ -663,6 +681,7 @@ export const events = {
 	securityTrust: (callback: (payload: Trust) => void) => listen<Trust>("security.trust", callback),
 	securityUsb: (callback: (payload: UsbProtection) => void) => listen<UsbProtection>("security.usb", callback),
 	settingsChanged: (callback: (payload: SettingChange) => void) => listen<SettingChange>("settings.changed", callback),
+	sharingChanged: (callback: (payload: Shared[]) => void) => listen<Shared[]>("sharing.changed", callback),
 	soundChanged: (callback: (payload: SoundSnapshot) => void) => listen<SoundSnapshot>("sound.changed", callback),
 	soundLevel: (callback: (payload: number) => void) => listen<number>("sound.level", callback),
 	updatesActivity: (callback: (payload: Activity) => void) => listen<Activity>("updates.activity", callback),
@@ -758,6 +777,8 @@ export type AppAccess = {
 	devices: string[],
 	online: boolean,
 	downloads: boolean,
+	x11: boolean,
+	microphone: boolean,
 	services: string[],
 } & App;
 
@@ -810,6 +831,12 @@ export type AuthorizedKey = {
 export type Available = {
 	size: number,
 } & Release;
+
+export type AvailablePrinter = {
+	name: string,
+	description: string,
+	location: string,
+};
 
 export type Battery = {
 	level: number,
@@ -1461,7 +1488,7 @@ export type Passkeys = {
 	passkeys: Passkey[],
 };
 
-export type PasswordOutcome = "changed" | "wrongPassword" | "tooShort" | "tooSimilar" | "dictionaryWord" | "tooSimple" | "rejected";
+export type PasswordOutcome = "changed" | "wrongPassword" | { tooWeak: Weakness };
 
 export type Pause = "metered" | "battery";
 
@@ -1559,6 +1586,7 @@ export type PrinterLink = "usb" | "network";
 
 export type PrintersState = {
 	printers: Printer[],
+	available: AvailablePrinter[],
 	jobs: PrintJob[],
 };
 
@@ -1636,6 +1664,8 @@ export type RemoteLogin = {
 	hostname: string,
 };
 
+export type Removal = "removed" | "mayLoseFiles";
+
 export type Requirement = {
 	id: string,
 	met: boolean,
@@ -1659,7 +1689,7 @@ export type SabineWait = {
 
 export type SandboxDevice = "usb" | "serial";
 
-export type SandboxSwitch = "internet" | "downloads";
+export type SandboxSwitch = "internet" | "downloads" | "x11" | "microphone" | "camera";
 
 export type Schedule = "daily" | "weekly" | "never";
 
@@ -1686,6 +1716,18 @@ export type SettingChange = {
 	key: string,
 	value: Value,
 };
+
+export type Shared = {
+	id: string,
+	app: App | null,
+	developerTools: boolean,
+	kind: SharedKind,
+	since: number,
+	remembered: boolean,
+	active: boolean,
+};
+
+export type SharedKind = "screen" | "control" | "input" | "windows-see" | "windows-use";
 
 export type Shortcut = {
 	schema: string,
@@ -1734,6 +1776,7 @@ export type SshKey = {
 	chip: boolean,
 	confirm: boolean,
 	added: number,
+	loaded: boolean,
 };
 
 export type SshSession = {
@@ -1908,6 +1951,8 @@ export type WallpaperGroup = {
 	name: string,
 	wallpapers: Wallpaper[],
 };
+
+export type Weakness = "too-short" | "too-similar" | "dictionary-word" | "contains-name" | "too-simple" | "rejected";
 
 export type Wifi = {
 	device: string,

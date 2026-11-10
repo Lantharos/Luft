@@ -121,6 +121,12 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         )
         .command_async("keyring_ssh_confirm", set_confirm)
         .command_async(
+            "keyring_ssh_load",
+            |SshKeyTarget { fingerprint }| async move {
+                Ok(bus::call::<_, ()>(SSH, "SetLoaded", &(fingerprint, true)).await?)
+            },
+        )
+        .command_async(
             "keyring_ssh_remove",
             |SshKeyTarget { fingerprint }| async move {
                 Ok(bus::call::<_, ()>(SSH, "Remove", &(fingerprint,)).await?)

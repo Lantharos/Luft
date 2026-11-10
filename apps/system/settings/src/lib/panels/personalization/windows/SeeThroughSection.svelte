@@ -6,7 +6,7 @@
 	import type { App } from '#lib/bindings.js';
 	import { percent } from '#lib/format.js';
 	import { KESTREL_SCHEMA, useSettings } from '#lib/state/gsettings.svelte.js';
-	import ChooseAppDialog from '../../protection/apps/ChooseAppDialog.svelte';
+	import ChooseAppDialog from '#lib/panels/system/apps/ChooseAppDialog.svelte';
 
 	type SeeThrough = {
 		'see-through-apps': string[];

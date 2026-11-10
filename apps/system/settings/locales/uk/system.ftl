@@ -339,3 +339,73 @@ settings-accounts-text-me = Надіслати код у SMS
 settings-accounts-choose-phone = На який номер Apple має надіслати код?
     .description = Надіслати текстове повідомлення
 settings-accounts-approve = Ваш обліковий запис Apple використовує розширений захист даних. Підтвердьте запит на iPhone, iPad або Mac, щоб цей комп’ютер міг відкрити iCloud Drive.
+
+## Apps
+
+settings-apps-defaults = Програми за замовчуванням
+settings-apps-defaults-description = Використовуються, коли ви відкриваєте посилання, файли й папки
+settings-apps-browser = Браузер
+settings-apps-email = Електронна пошта
+settings-apps-calendar = Календар
+settings-apps-music = Музика
+settings-apps-videos = Відео
+settings-apps-photos = Фото
+settings-apps-text-editor = Текстовий редактор
+settings-apps-files = Файли
+settings-apps-archives = Архіви
+settings-apps-choose = Вибрати
+settings-apps-startup = Автозапуск
+settings-apps-startup-description = Ці програми відкриваються, коли ви входите в систему
+settings-apps-startup-app = Відкривати { $app } під час входу
+settings-apps-startup-remove = Прибрати { $app } з автозапуску
+settings-apps-startup-add = Додати програму
+settings-apps-startup-add-title = Додати програму до автозапуску
+settings-apps-startup-add-description = Виберіть програму, яка відкриватиметься щоразу, коли ви входите в систему.
+settings-apps-search = Пошук програм
+settings-apps-no-match = Немає програм, що відповідають запиту
+settings-apps-cancel = Скасувати
+settings-apps-permissions = Дозволи
+settings-apps-location = Розташування
+settings-apps-camera = Камера
+settings-apps-clipboard = Буфер обміну у фоні
+settings-apps-full-access = Повний доступ
+settings-apps-full-access-hint = Працює поза пісочницею й може все, що може запущена вами програма. Скасування діє з наступного запуску.
+settings-apps-full-access-remove = Відкликати
+settings-apps-full-access-remove-app = Відкликати повний доступ у { $app }
+settings-apps-passwords = Збережені паролі
+settings-apps-passwords-forget = Скинути
+settings-apps-passwords-forget-app = Нехай { $app } запитає знову
+settings-apps-permissions-allowed = Дозволено: { $allowed } з { $total }
+settings-apps-permissions-description = Застосунки в пісочниці отримують власні файли й лише те, що ви дозволите тут.
+settings-apps-sandbox-only = Нічого поза пісочницею
+settings-apps-folders = Теки
+settings-apps-folders-hint = З наступного запуску він зможе читати й змінювати все в цих теках.
+settings-apps-folders-count = { $count ->
+    [one] { $count } тека
+    [few] { $count } теки
+    [many] { $count } тек
+   *[other] { $count } теки
+}
+settings-apps-folder-add = Додати теку
+settings-apps-folder-remove = Прибрати
+settings-apps-folder-remove-app = Припинити спільний доступ до { $folder }
+settings-apps-usb = USB-пристрої
+settings-apps-usb-hint = Наприклад, ключі безпеки, телефони й мікроконтролери
+settings-apps-serial = Послідовні пристрої
+settings-apps-serial-hint = Наприклад, 3D-принтери й плати, під'єднані через USB
+settings-apps-folder-read-only = Лише читання
+settings-apps-downloads = Папка «Завантаження»
+settings-apps-downloads-hint = Може зберігати файли в папці «Завантаження» і відкривати ті, що в ній, з наступного запуску.
+settings-apps-internet = Інтернет
+settings-apps-internet-hint = Може виходити в інтернет з наступного запуску.
+settings-apps-service-hint = Служба робочого столу, з якою вона може спілкуватися
+settings-apps-service-remove = Прибрати
+settings-apps-service-remove-app = Заборонити спілкування з { $service }
+settings-apps-services-count = { $count ->
+    [one] { $count } служба
+    [few] { $count } служби
+    [many] { $count } служб
+   *[other] { $count } служби
+}
+settings-apps-full-access-off = Працює в пісочниці. Повний доступ прибирає пісочницю.
+settings-apps-full-access-give = Надати повний доступ

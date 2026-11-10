@@ -27,7 +27,6 @@ settings-more-show = { $count ->
         [one] Näytä { $count } lisää
        *[other] Näytä { $count } lisää
     }
-settings-more-fewer = Näytä vähemmän
 settings-time-picker = { $label }, { $time }
 settings-time-picker-hour = Tunti
 settings-time-picker-minute = Minuutti

@@ -212,8 +212,6 @@ desktop-picture-filter = Слики
 desktop-picture-unopenable = Оваа слика не може да се отвори
 
 ## Users
-desktop-users-password-failed = Лозинката не можеше да се промени: { $reason }
-desktop-users-password-timed-out = passwd престана да одговара
 
 ## Updates
 desktop-updates-nvidia-summary = Извлечете го најдоброто од графиката NVIDIA

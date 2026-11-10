@@ -6,6 +6,7 @@ const FILE_HEADER: usize = 16;
 const TOC_ENTRY: usize = 12;
 const IMAGE_HEADER: usize = 36;
 const MAX_DIMENSION: u32 = 0x7fff;
+const MAX_CHUNKS: usize = 4096;
 
 fn word(bytes: &[u8], offset: usize) -> Option<u32> {
     let slice = bytes.get(offset..offset + 4)?;
@@ -38,6 +39,35 @@ fn image_at(bytes: &[u8], position: usize) -> Option<RgbaImage> {
         })
         .collect();
     RgbaImage::from_raw(width, height, rgba)
+}
+
+fn image_fits(bytes: &[u8], position: usize) -> Option<()> {
+    let (width, height) = (word(bytes, position + 16)?, word(bytes, position + 20)?);
+    let sized = |side: u32| (1..=MAX_DIMENSION).contains(&side);
+    let start = position + IMAGE_HEADER;
+    (sized(width) && sized(height)).then_some(())?;
+    bytes
+        .get(start..start + width as usize * height as usize * 4)
+        .map(drop)
+}
+
+pub fn well_formed(bytes: &[u8]) -> bool {
+    let chunks = || -> Option<bool> {
+        let count = word(bytes, 12)? as usize;
+        (1..=MAX_CHUNKS).contains(&count).then_some(())?;
+        let mut images = 0;
+        for index in 0..count {
+            let entry = FILE_HEADER + index * TOC_ENTRY;
+            let position = word(bytes, entry + 8)? as usize;
+            word(bytes, position)?;
+            if word(bytes, entry)? == IMAGE_CHUNK {
+                image_fits(bytes, position)?;
+                images += 1;
+            }
+        }
+        Some(images > 0)
+    };
+    bytes.get(..4) == Some(MAGIC) && chunks() == Some(true)
 }
 
 pub fn closest_image(bytes: &[u8], size: u32) -> Option<RgbaImage> {

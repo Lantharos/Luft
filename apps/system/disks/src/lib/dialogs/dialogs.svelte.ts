@@ -1,4 +1,4 @@
-import type { ChosenImage, Drive, OtherSystem, Volume } from '#lib/bindings.js';
+import type { ChosenImage, Cleanup, Drive, InterruptedMove, OtherSystem, Volume } from '#lib/bindings.js';
 
 export type OpenDialog =
 	| { kind: 'format-volume'; drive: Drive; volume: Volume }
@@ -18,13 +18,16 @@ export type OpenDialog =
 	| { kind: 'drive'; drive: Drive }
 	| { kind: 'health'; drive: Drive }
 	| { kind: 'trash'; path: string[]; name: string; size: number; folder: boolean }
+	| { kind: 'clean'; what: Cleanup; size: number; items: number }
 	| { kind: 'encrypt'; drive: Drive; volume: Volume }
 	| { kind: 'encryption'; drive: Drive; volume: Volume }
 	| { kind: 'turn-off'; volume: Volume }
 	| { kind: 'recovery-key'; key: string; name: string; fresh: boolean }
 	| { kind: 'remove-system'; system: OtherSystem }
 	| { kind: 'give-luft'; drive: Drive; offset: number; size: number }
-	| { kind: 'move-luft' };
+	| { kind: 'move-luft' }
+	| { kind: 'finish-move'; move: InterruptedMove }
+	| { kind: 'still-working' };
 
 class Dialogs {
 	current = $state.raw<OpenDialog | null>(null);

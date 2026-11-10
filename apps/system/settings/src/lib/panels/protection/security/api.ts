@@ -9,6 +9,7 @@ export const setUsbProtection = (enabled: boolean) => commands.securitySetUsb({ 
 export const setUpTpmUnlock = (pin: string) => (unlock: string) => commands.securitySetUpTpm({ unlock, pin }, WAIT_FOR_PERMISSION);
 export const removeTpmUnlock = (unlock: string) => commands.securityRemoveTpm({ unlock }, WAIT_FOR_PERMISSION);
 export const showRecoveryKey = () => commands.securityShowKey(WAIT_FOR_PERMISSION);
+export const checkRecoveryKey = (key: string) => commands.securityCheckKey({ key }, WAIT_FOR_PERMISSION);
 export const acceptSecureBootChange = () => commands.securityAcceptSecureBoot(WAIT_FOR_PERMISSION);
 export const replaceRecoveryKey = (unlock: string) => commands.securityReplaceKey({ unlock }, WAIT_FOR_PERMISSION);
 export const generateRecoveryKey = () => commands.securityGenerateKey();

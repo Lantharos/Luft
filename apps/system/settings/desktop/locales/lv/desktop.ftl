@@ -212,8 +212,6 @@ desktop-picture-filter = Attēli
 desktop-picture-unopenable = Šo attēlu nevar atvērt
 
 ## Users
-desktop-users-password-failed = Neizdevās mainīt paroli: { $reason }
-desktop-users-password-timed-out = passwd pārstāja atbildēt
 
 ## Updates
 desktop-updates-nvidia-summary = Izmantojiet visas NVIDIA grafikas iespējas

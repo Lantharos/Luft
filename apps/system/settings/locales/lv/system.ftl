@@ -334,3 +334,71 @@ settings-accounts-text-me = Sūtīt kodu īsziņā
 settings-accounts-choose-phone = Uz kuru numuru Apple jāsūta kods?
     .description = Sūtīt īsziņu
 settings-accounts-approve = Jūsu Apple kontam ir ieslēgta papildu datu aizsardzība. Apstipriniet pieprasījumu savā iPhone, iPad vai Mac ierīcē, lai šis dators varētu atvērt iCloud Drive.
+
+## Apps
+
+settings-apps-defaults = Noklusējuma lietotnes
+settings-apps-defaults-description = Tiek izmantotas, atverot saites, failus un mapes
+settings-apps-browser = Tīmekļa pārlūks
+settings-apps-email = E-pasts
+settings-apps-calendar = Kalendārs
+settings-apps-music = Mūzika
+settings-apps-videos = Video
+settings-apps-photos = Fotoattēli
+settings-apps-text-editor = Teksta redaktors
+settings-apps-files = Faili
+settings-apps-archives = Arhīvi
+settings-apps-choose = Izvēlēties
+settings-apps-startup = Palaišana
+settings-apps-startup-description = Šīs lietotnes tiek atvērtas, kad pierakstāties
+settings-apps-startup-app = Atvērt lietotni { $app }, kad pierakstāties
+settings-apps-startup-remove = Noņemt { $app } no palaišanas
+settings-apps-startup-add = Pievienot lietotni
+settings-apps-startup-add-title = Pievienot palaišanas lietotni
+settings-apps-startup-add-description = Izvēlieties lietotni, kas tiks atvērta katru reizi, kad pierakstāties.
+settings-apps-search = Meklēt lietotnes
+settings-apps-no-match = Neviena lietotne neatbilst meklētajam
+settings-apps-cancel = Atcelt
+settings-apps-permissions = Atļaujas
+settings-apps-location = Atrašanās vieta
+settings-apps-camera = Kamera
+settings-apps-clipboard = Starpliktuve fonā
+settings-apps-full-access = Pilna piekļuve
+settings-apps-full-access-hint = Tā darbojas ārpus smilškastes un var visu, ko var jūsu palaista programma. Noņemšana stājas spēkā nākamajā atvēršanā.
+settings-apps-full-access-remove = Noņemt
+settings-apps-full-access-remove-app = Noņemt pilnu piekļuvi lietotnei { $app }
+settings-apps-passwords = Saglabātās paroles
+settings-apps-passwords-forget = Aizmirst
+settings-apps-passwords-forget-app = Ļaut lietotnei { $app } jautāt vēlreiz
+settings-apps-permissions-allowed = Atļauts: { $allowed } no { $total }
+settings-apps-permissions-description = Lietotnes smilškastē saņem savus failus un tikai to, ko šeit atļaujat.
+settings-apps-sandbox-only = Nekā ārpus smilškastes
+settings-apps-folders = Mapes
+settings-apps-folders-hint = No nākamās atvēršanas tā varēs lasīt un mainīt visu šajās mapēs.
+settings-apps-folders-count = { $count ->
+    [zero] { $count } mapju
+    [one] { $count } mape
+   *[other] { $count } mapes
+}
+settings-apps-folder-add = Pievienot mapi
+settings-apps-folder-remove = Noņemt
+settings-apps-folder-remove-app = Pārtraukt koplietot { $folder }
+settings-apps-usb = USB ierīces
+settings-apps-usb-hint = Piemēram, drošības atslēgas, tālruņi un mikrokontrolleri
+settings-apps-serial = Seriālās ierīces
+settings-apps-serial-hint = Piemēram, 3D printeri un caur USB pievienotas plates
+settings-apps-folder-read-only = Tikai lasīšanai
+settings-apps-downloads = Lejupielāžu mape
+settings-apps-downloads-hint = Tā var saglabāt failus lejupielāžu mapē un atvērt tur esošos no nākamās atvēršanas reizes.
+settings-apps-internet = Internets
+settings-apps-internet-hint = Tā var piekļūt internetam no nākamās atvēršanas reizes.
+settings-apps-service-hint = Darbvirsmas pakalpojums, ar kuru tā var sazināties
+settings-apps-service-remove = Noņemt
+settings-apps-service-remove-app = Liegt saziņu ar { $service }
+settings-apps-services-count = { $count ->
+    [zero] { $count } pakalpojumu
+    [one] { $count } pakalpojums
+   *[other] { $count } pakalpojumi
+}
+settings-apps-full-access-off = Tā darbojas smilškastē. Pilna piekļuve noņem smilškasti.
+settings-apps-full-access-give = Piešķirt pilnu piekļuvi

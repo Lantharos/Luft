@@ -322,11 +322,6 @@ settings-passwords-history-denied = { $app } não teve permissão para usar “{
 settings-passwords-history-denied-unnamed = { $app } não teve permissão para usar uma senha salva
 settings-passwords-history-signed = { $app } assinou com “{ $item }”
 settings-passwords-history-signed-unnamed = { $app } assinou com uma senha salva
-settings-passwords-history-fewer = Mostrar menos
-settings-passwords-history-all = { $count ->
-    [one] Mostrar { $count }
-   *[other] Mostrar todos os { $count }
-}
 settings-passwords-history-clear = Limpar histórico
 settings-passwords-history-clear-description = Esquecer quais apps usaram o Chaveiro e quando
 settings-passwords-history-clear-button = Limpar
@@ -384,71 +379,3 @@ settings-passkeys-rename-description = Dê à chave de acesso de { $site } um no
 settings-passkeys-name = Nome
 settings-passkeys-save = Salvar
 
-## Apps
-
-settings-apps-defaults = Apps padrão
-settings-apps-defaults-description = Usados ao abrir links, arquivos e pastas
-settings-apps-browser = Navegador
-settings-apps-email = E-mail
-settings-apps-calendar = Calendário
-settings-apps-music = Música
-settings-apps-videos = Vídeos
-settings-apps-photos = Fotos
-settings-apps-text-editor = Editor de texto
-settings-apps-files = Arquivos
-settings-apps-archives = Arquivos compactados
-settings-apps-choose = Escolher
-settings-apps-startup = Inicialização
-settings-apps-startup-description = Estes apps abrem quando você entra
-settings-apps-startup-app = Abrir { $app } quando você entrar
-settings-apps-startup-remove = Remover { $app } da inicialização
-settings-apps-startup-add = Adicionar app
-settings-apps-startup-add-title = Adicionar um app de inicialização
-settings-apps-startup-add-description = Escolha um app para abrir sempre que você entrar.
-settings-apps-search = Pesquisar apps
-settings-apps-no-match = Nenhum app corresponde à pesquisa
-settings-apps-cancel = Cancelar
-
-## Apps: permissions
-
-settings-apps-permissions = Permissões
-settings-apps-location = Localização
-settings-apps-camera = Câmera
-settings-apps-clipboard = Área de transferência em segundo plano
-settings-apps-full-access = Acesso total
-settings-apps-full-access-hint = Ele roda fora do ambiente isolado e pode fazer tudo o que um programa que você mesmo abre pode. A remoção vale a partir da próxima vez que abrir.
-settings-apps-full-access-remove = Remover
-settings-apps-full-access-remove-app = Remover o acesso total do { $app }
-settings-apps-passwords = Senhas salvas
-settings-apps-passwords-forget = Esquecer
-settings-apps-passwords-forget-app = Fazer o { $app } perguntar de novo
-settings-apps-permissions-allowed = { $allowed } de { $total } permitidos
-settings-apps-permissions-description = Apps em um ambiente isolado recebem seus próprios arquivos e só o que você permitir aqui.
-settings-apps-sandbox-only = Nada além do ambiente isolado
-settings-apps-folders = Pastas
-settings-apps-folders-hint = A partir da próxima vez que abrir, ele pode ler e alterar tudo nestas pastas.
-settings-apps-folders-count = { $count ->
-    [one] { $count } pasta
-   *[other] { $count } pastas
-}
-settings-apps-folder-add = Adicionar pasta
-settings-apps-folder-remove = Remover
-settings-apps-folder-remove-app = Parar de compartilhar { $folder }
-settings-apps-usb = Dispositivos USB
-settings-apps-usb-hint = Como chaves de segurança, celulares e microcontroladores
-settings-apps-serial = Dispositivos seriais
-settings-apps-serial-hint = Como impressoras 3D e placas conectadas por USB
-settings-apps-folder-read-only = Somente leitura
-settings-apps-downloads = Pasta Downloads
-settings-apps-downloads-hint = Pode salvar arquivos na pasta Downloads e abrir os que estão lá, a partir da próxima vez que abrir.
-settings-apps-internet = Internet
-settings-apps-internet-hint = Pode se conectar à internet a partir da próxima vez que abrir.
-settings-apps-service-hint = Um serviço da área de trabalho com o qual pode se comunicar
-settings-apps-service-remove = Remover
-settings-apps-service-remove-app = Não deixar mais se comunicar com { $service }
-settings-apps-services-count = { $count ->
-    [one] { $count } serviço
-   *[other] { $count } serviços
-}
-settings-apps-full-access-off = Ele roda em um ambiente isolado. O acesso total tira o isolamento.
-settings-apps-full-access-give = Dar acesso total

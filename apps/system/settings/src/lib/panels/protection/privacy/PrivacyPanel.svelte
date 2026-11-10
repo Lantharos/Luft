@@ -1,17 +1,20 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { Dialog, longDuration, Row, Section, Select, Switch } from '@luft/ui';
+	import MonitorUp from '@lucide/svelte/icons/monitor-up';
+	import { ActionRow, Dialog, longDuration, Row, Section, Select, Switch } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import { app } from '#lib/state/app.svelte.js';
 	import { hardware } from '#lib/state/hardware.svelte.js';
-	import { useSettings } from '#lib/state/gsettings.svelte.js';
+	import { KESTREL_SCHEMA, useSettings } from '#lib/state/gsettings.svelte.js';
 	import { days, including } from './format';
 	import MessageContent from './MessageContent.svelte';
+	import SharingPage from './sharing/SharingPage.svelte';
 
 	type Screensaver = { 'lock-enabled': boolean; 'lock-delay': number };
 	type Session = { 'idle-delay': number };
 	type Location = { enabled: boolean };
 	type Notifications = { 'show-in-lock-screen': boolean };
+	type Lookups = { 'online-lookups': boolean };
 	type Housekeeping = { 'remove-old-screenshots': boolean };
 	type Privacy = {
 		'disable-camera': boolean;
@@ -27,6 +30,7 @@
 	const session = useSettings<Session>('org.gnome.desktop.session', ['idle-delay']);
 	const location = useSettings<Location>('org.gnome.system.location', ['enabled']);
 	const notifications = useSettings<Notifications>('org.gnome.desktop.notifications', ['show-in-lock-screen']);
+	const lookups = useSettings<Lookups>(KESTREL_SCHEMA, ['online-lookups']);
 	const housekeeping = useSettings<Housekeeping>('com.lantharos.kestrel.housekeeping', ['remove-old-screenshots']);
 	const privacy = useSettings<Privacy>('org.gnome.desktop.privacy', [
 		'disable-camera',
@@ -68,6 +72,9 @@
 	}
 </script>
 
+{#if app.section === 'sharing'}
+	<SharingPage onclose={() => (app.section = null)} />
+{:else}
 <Section title={t('settings-privacy-screen-lock')}>
 	<Row title={t('settings-privacy-screen-off')} description={t('settings-privacy-screen-off-hint', { page: t(hardware.present?.battery ? 'settings-page-power' : 'settings-power-title') })} onclick={() => app.open('power')}>
 		<span>{idle ? t('settings-privacy-screen-off-after', { duration: longDuration(idle) }) : t('settings-privacy-screen-off-never')}</span>
@@ -104,6 +111,20 @@
 			onchange={(on) => privacy.set('disable-microphone', !on)}
 		/>
 	</Row>
+</Section>
+
+<Section title={t('settings-privacy-online')}>
+	<Row title={t('settings-privacy-lookups')} description={t('settings-privacy-lookups-hint')}>
+		<Switch
+			label={t('settings-privacy-lookups')}
+			checked={lookups.values['online-lookups'] ?? true}
+			onchange={(on) => lookups.set('online-lookups', on)}
+		/>
+	</Row>
+</Section>
+
+<Section>
+	<ActionRow title={t('settings-sharing')} icon={MonitorUp} description={t('settings-sharing-description')} onclick={() => (app.section = 'sharing')} />
 </Section>
 
 <Section title={t('settings-privacy-file-history')}>
@@ -156,6 +177,8 @@
 		/>
 	</Row>
 </Section>
+
+{/if}
 
 {#if clearing}
 	<Dialog title={t('settings-privacy-clear-title')} description={t('settings-privacy-clear-description')} onclose={() => (clearing = false)}>

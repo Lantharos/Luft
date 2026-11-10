@@ -6,6 +6,7 @@
 	import { disks } from '#lib/state/disks.svelte.js';
 	import { space } from '#lib/state/space.svelte.js';
 	import type { Action } from '../actions';
+	import Reclaim from './Reclaim.svelte';
 	import SpaceList from './SpaceList.svelte';
 	import { tilesOf, type Tile } from './tiles';
 	import Treemap from './Treemap.svelte';
@@ -62,6 +63,9 @@
 		<SpaceList {tiles} hovered={space.hovered} onhover={(key) => (space.hovered = key)} onopen={open} {actions} />
 	{:else if view}
 		<p class="px-1.5 pt-6 text-[14px] text-[var(--text-muted)]">This folder is empty.</p>
+	{/if}
+	{#if update?.reclaim && !space.path.length}
+		<Reclaim reclaim={update.reclaim} />
 	{/if}
 </section>
 

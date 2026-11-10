@@ -49,6 +49,10 @@ pub struct PrintJob {
 pub trait Printing {
     fn printers(&self) -> zbus::Result<Vec<Printer>>;
 
+    fn available(&self) -> zbus::Result<Vec<(String, String, String)>>;
+
+    fn add_available(&self, printer: &str) -> zbus::Result<()>;
+
     fn jobs(&self) -> zbus::Result<Vec<PrintJob>>;
 
     fn cancel_job(&self, printer: &str, job: u32) -> zbus::Result<()>;

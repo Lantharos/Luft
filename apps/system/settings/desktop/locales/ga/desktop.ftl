@@ -212,8 +212,6 @@ desktop-picture-filter = Íomhánna
 desktop-picture-unopenable = Ní féidir an pictiúr seo a oscailt
 
 ## Users
-desktop-users-password-failed = Níorbh fhéidir do phasfhocal a athrú: { $reason }
-desktop-users-password-timed-out = Stop passwd ag freagairt
 
 ## Updates
 desktop-updates-nvidia-summary = Bain an leas is fearr as do chárta grafaice NVIDIA

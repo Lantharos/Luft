@@ -86,7 +86,7 @@
 	<Row title={t('settings-post-name')} description={info?.alias}>
 		<button type="button" class="button" onclick={() => (naming = true)}>{t('settings-post-rename')}</button>
 	</Row>
-	<Row title={t('settings-post-folder')} description={info ? basename(info.folder) : undefined}>
+	<Row title={t('settings-post-folder')} description={post.values.folder ? (info ? basename(info.folder) : undefined) : t('settings-post-folder-default')}>
 		{#if post.values.folder}
 			<button type="button" class="button" onclick={() => post.set('folder', '')}>{t('settings-post-folder-downloads')}</button>
 		{/if}

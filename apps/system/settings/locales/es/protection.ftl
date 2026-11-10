@@ -322,11 +322,6 @@ settings-passwords-history-denied = { $app } no ha tenido permiso para usar «{ 
 settings-passwords-history-denied-unnamed = { $app } no ha tenido permiso para usar una contraseña guardada
 settings-passwords-history-signed = { $app } ha firmado con «{ $item }»
 settings-passwords-history-signed-unnamed = { $app } ha firmado con una contraseña guardada
-settings-passwords-history-fewer = Mostrar menos
-settings-passwords-history-all = { $count ->
-    [one] Mostrar { $count }
-   *[other] Mostrar los { $count }
-}
 settings-passwords-history-clear = Borrar el historial
 settings-passwords-history-clear-description = Olvida qué aplicaciones han usado tu llavero y cuándo
 settings-passwords-history-clear-button = Borrar
@@ -384,71 +379,3 @@ settings-passkeys-rename-description = Pon a tu llave de acceso de { $site } un 
 settings-passkeys-name = Nombre
 settings-passkeys-save = Guardar
 
-## Apps
-
-settings-apps-defaults = Aplicaciones predeterminadas
-settings-apps-defaults-description = Se usan para abrir enlaces, archivos y carpetas
-settings-apps-browser = Navegador web
-settings-apps-email = Correo electrónico
-settings-apps-calendar = Calendario
-settings-apps-music = Música
-settings-apps-videos = Vídeos
-settings-apps-photos = Fotos
-settings-apps-text-editor = Editor de texto
-settings-apps-files = Archivos
-settings-apps-archives = Archivos comprimidos
-settings-apps-choose = Elegir
-settings-apps-startup = Inicio automático
-settings-apps-startup-description = Estas aplicaciones se abren al iniciar sesión
-settings-apps-startup-app = Abrir { $app } al iniciar sesión
-settings-apps-startup-remove = Quitar { $app } del inicio
-settings-apps-startup-add = Añadir aplicación
-settings-apps-startup-add-title = Añadir una aplicación de inicio
-settings-apps-startup-add-description = Elige una aplicación que se abra cada vez que inicies sesión.
-settings-apps-search = Buscar aplicaciones
-settings-apps-no-match = Ninguna aplicación coincide con tu búsqueda
-settings-apps-cancel = Cancelar
-
-## Apps: permissions
-
-settings-apps-permissions = Permisos
-settings-apps-location = Ubicación
-settings-apps-camera = Cámara
-settings-apps-clipboard = Portapapeles en segundo plano
-settings-apps-full-access = Acceso total
-settings-apps-full-access-hint = Funciona fuera de su entorno aislado y puede hacer todo lo que hace un programa que abras tú. Quitarlo se aplica la próxima vez que se abra.
-settings-apps-full-access-remove = Quitar
-settings-apps-full-access-remove-app = Quitar el acceso total a { $app }
-settings-apps-passwords = Contraseñas guardadas
-settings-apps-passwords-forget = Olvidar
-settings-apps-passwords-forget-app = Hacer que { $app } vuelva a preguntar
-settings-apps-permissions-allowed = { $allowed } de { $total } permitidas
-settings-apps-permissions-description = Las aplicaciones en un entorno aislado tienen sus propios archivos y solo lo que permitas aquí.
-settings-apps-sandbox-only = Nada fuera de su entorno aislado
-settings-apps-folders = Carpetas
-settings-apps-folders-hint = Podrá leer y cambiar todo lo que hay en estas carpetas desde la próxima vez que se abra.
-settings-apps-folders-count = { $count ->
-    [one] { $count } carpeta
-   *[other] { $count } carpetas
-}
-settings-apps-folder-add = Añadir carpeta
-settings-apps-folder-remove = Quitar
-settings-apps-folder-remove-app = Dejar de compartir { $folder }
-settings-apps-usb = Dispositivos USB
-settings-apps-usb-hint = Como llaves de seguridad, teléfonos y microcontroladores
-settings-apps-serial = Dispositivos serie
-settings-apps-serial-hint = Como impresoras 3D y placas conectadas por USB
-settings-apps-folder-read-only = Solo lectura
-settings-apps-downloads = Carpeta Descargas
-settings-apps-downloads-hint = Puede guardar archivos en la carpeta Descargas y abrir los que haya allí, a partir de la próxima vez que se abra.
-settings-apps-internet = Internet
-settings-apps-internet-hint = Puede conectarse a internet a partir de la próxima vez que se abra.
-settings-apps-service-hint = Un servicio del escritorio con el que puede hablar
-settings-apps-service-remove = Quitar
-settings-apps-service-remove-app = Dejar de permitirle hablar con { $service }
-settings-apps-services-count = { $count ->
-    [one] { $count } servicio
-   *[other] { $count } servicios
-}
-settings-apps-full-access-off = Funciona en un entorno aislado. El acceso completo quita el aislamiento.
-settings-apps-full-access-give = Dar acceso completo

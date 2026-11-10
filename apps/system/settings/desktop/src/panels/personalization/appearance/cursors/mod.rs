@@ -5,6 +5,7 @@ mod installed;
 mod preview;
 mod store;
 mod themes;
+mod vetting;
 mod xcursor;
 
 use gio::prelude::*;

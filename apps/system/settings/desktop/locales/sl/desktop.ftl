@@ -212,8 +212,6 @@ desktop-picture-filter = Slike
 desktop-picture-unopenable = Te slike ni mogoče odpreti
 
 ## Users
-desktop-users-password-failed = Gesla ni bilo mogoče spremeniti: { $reason }
-desktop-users-password-timed-out = Program passwd se ne odziva več
 
 ## Updates
 desktop-updates-nvidia-summary = Izkoristite vse zmožnosti grafike NVIDIA

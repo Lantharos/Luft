@@ -27,7 +27,6 @@ settings-more-show = { $count ->
         [one] Sýna { $count } í viðbót
        *[other] Sýna { $count } í viðbót
     }
-settings-more-fewer = Sýna færri
 settings-time-picker = { $label }, { $time }
 settings-time-picker-hour = Klukkustund
 settings-time-picker-minute = Mínúta

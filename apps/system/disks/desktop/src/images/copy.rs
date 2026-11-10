@@ -28,6 +28,15 @@ pub enum Direction {
     },
 }
 
+impl Direction {
+    pub fn reason(&self) -> &'static str {
+        match self {
+            Self::Create { .. } => "Saving a disk image",
+            Self::Restore { .. } => "Writing a disk image",
+        }
+    }
+}
+
 #[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct ImageProgress<'a> {

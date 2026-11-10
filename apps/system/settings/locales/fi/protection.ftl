@@ -322,11 +322,6 @@ settings-passwords-history-denied = { $app } ei saanut käyttää kohdetta ”{ 
 settings-passwords-history-denied-unnamed = { $app } ei saanut käyttää tallennettua salasanaa
 settings-passwords-history-signed = { $app } allekirjoitti kohteella ”{ $item }”
 settings-passwords-history-signed-unnamed = { $app } allekirjoitti tallennetulla salasanalla
-settings-passwords-history-fewer = Näytä vähemmän
-settings-passwords-history-all = { $count ->
-    [one] Näytä kaikki { $count }
-   *[other] Näytä kaikki { $count }
-}
 settings-passwords-history-clear = Tyhjennä historia
 settings-passwords-history-clear-description = Unohda, mitkä sovellukset käyttivät avainnippuasi ja milloin
 settings-passwords-history-clear-button = Tyhjennä
@@ -384,71 +379,3 @@ settings-passkeys-rename-description = Anna sivuston { $site } pääsyavaimelle 
 settings-passkeys-name = Nimi
 settings-passkeys-save = Tallenna
 
-## Apps
-
-settings-apps-defaults = Oletussovellukset
-settings-apps-defaults-description = Käytetään, kun avaat linkkejä, tiedostoja ja kansioita
-settings-apps-browser = Verkkoselain
-settings-apps-email = Sähköposti
-settings-apps-calendar = Kalenteri
-settings-apps-music = Musiikki
-settings-apps-videos = Videot
-settings-apps-photos = Valokuvat
-settings-apps-text-editor = Tekstieditori
-settings-apps-files = Tiedostot
-settings-apps-archives = Pakatut tiedostot
-settings-apps-choose = Valitse
-settings-apps-startup = Käynnistys
-settings-apps-startup-description = Nämä sovellukset avautuvat, kun kirjaudut sisään
-settings-apps-startup-app = Avaa { $app } kirjautuessa
-settings-apps-startup-remove = Poista { $app } käynnistyksestä
-settings-apps-startup-add = Lisää sovellus
-settings-apps-startup-add-title = Lisää käynnistyssovellus
-settings-apps-startup-add-description = Valitse sovellus, joka avautuu aina, kun kirjaudut sisään.
-settings-apps-search = Hae sovelluksia
-settings-apps-no-match = Haulla ei löytynyt sovelluksia
-settings-apps-cancel = Peruuta
-
-## Apps: permissions
-
-settings-apps-permissions = Käyttöoikeudet
-settings-apps-location = Sijainti
-settings-apps-camera = Kamera
-settings-apps-clipboard = Leikepöytä taustalla
-settings-apps-full-access = Täysi käyttöoikeus
-settings-apps-full-access-hint = Se toimii hiekkalaatikkonsa ulkopuolella ja voi tehdä kaiken, mitä itse käynnistämäsi ohjelma voi. Poisto tulee voimaan seuraavalla avauskerralla.
-settings-apps-full-access-remove = Poista
-settings-apps-full-access-remove-app = Poista sovellukselta { $app } täysi käyttöoikeus
-settings-apps-passwords = Tallennetut salasanat
-settings-apps-passwords-forget = Unohda
-settings-apps-passwords-forget-app = Anna sovelluksen { $app } kysyä uudelleen
-settings-apps-permissions-allowed = { $allowed }/{ $total } sallittu
-settings-apps-permissions-description = Hiekkalaatikossa olevat sovellukset saavat omat tiedostonsa ja vain sen, mitä sallit tässä.
-settings-apps-sandbox-only = Ei mitään hiekkalaatikon ulkopuolelta
-settings-apps-folders = Kansiot
-settings-apps-folders-hint = Se voi lukea ja muuttaa kaikkea näissä kansioissa seuraavasta avauskerrasta alkaen.
-settings-apps-folders-count = { $count ->
-    [one] { $count } kansio
-   *[other] { $count } kansiota
-}
-settings-apps-folder-add = Lisää kansio
-settings-apps-folder-remove = Poista
-settings-apps-folder-remove-app = Lopeta kansion { $folder } jakaminen
-settings-apps-usb = USB-laitteet
-settings-apps-usb-hint = Kuten suojausavaimet, puhelimet ja mikro-ohjaimet
-settings-apps-serial = Sarjalaitteet
-settings-apps-serial-hint = Kuten 3D-tulostimet ja USB:llä liitetyt piirilevyt
-settings-apps-folder-read-only = Vain luku
-settings-apps-downloads = Lataukset-kansio
-settings-apps-downloads-hint = Se voi tallentaa tiedostoja Lataukset-kansioon ja avata siellä olevia tiedostoja seuraavasta avauskerrasta alkaen.
-settings-apps-internet = Internet
-settings-apps-internet-hint = Se voi käyttää verkkoa seuraavasta avauskerrasta alkaen.
-settings-apps-service-hint = Työpöydän palvelu, jonka kanssa se voi viestiä
-settings-apps-service-remove = Poista
-settings-apps-service-remove-app = Estä viestintä palvelun { $service } kanssa
-settings-apps-services-count = { $count ->
-    [one] { $count } palvelu
-   *[other] { $count } palvelua
-}
-settings-apps-full-access-off = Se toimii hiekkalaatikossa. Täysi käyttöoikeus poistaa hiekkalaatikon.
-settings-apps-full-access-give = Anna täysi käyttöoikeus

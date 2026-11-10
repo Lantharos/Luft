@@ -232,8 +232,6 @@ desktop-picture-unopenable = Seda pilti ei saa avada
 
 ## Users
 
-desktop-users-password-failed = Salasõna muutmine ei õnnestunud: { $reason }
-desktop-users-password-timed-out = passwd lakkas vastamast
 
 ## Updates
 

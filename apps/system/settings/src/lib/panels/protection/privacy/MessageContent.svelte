@@ -16,7 +16,7 @@
 	<Switch
 		label={t('settings-notifications-content-lock-screen')}
 		disabled={!lockScreen}
-		checked={kestrel.values['lock-screen-content'] ?? true}
+		checked={kestrel.values['lock-screen-content'] ?? false}
 		onchange={(on) => kestrel.set('lock-screen-content', on)}
 	/>
 </Row>

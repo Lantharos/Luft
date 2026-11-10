@@ -329,3 +329,69 @@ settings-accounts-text-me = Skicka en kod via sms i stället
 settings-accounts-choose-phone = Till vilket nummer ska Apple skicka koden?
     .description = Skicka ett sms
 settings-accounts-approve = Ditt Apple-konto använder Avancerat dataskydd. Godkänn begäran på din iPhone, iPad eller Mac så att den här datorn kan öppna iCloud Drive.
+
+## Apps
+
+settings-apps-defaults = Standardappar
+settings-apps-defaults-description = Används när du öppnar länkar, filer och mappar
+settings-apps-browser = Webbläsare
+settings-apps-email = E-post
+settings-apps-calendar = Kalender
+settings-apps-music = Musik
+settings-apps-videos = Videor
+settings-apps-photos = Foton
+settings-apps-text-editor = Textredigerare
+settings-apps-files = Filer
+settings-apps-archives = Arkiv
+settings-apps-choose = Välj
+settings-apps-startup = Autostart
+settings-apps-startup-description = De här apparna öppnas när du loggar in
+settings-apps-startup-app = Öppna { $app } när du loggar in
+settings-apps-startup-remove = Ta bort { $app } från autostart
+settings-apps-startup-add = Lägg till app
+settings-apps-startup-add-title = Lägg till en autostartapp
+settings-apps-startup-add-description = Välj en app som ska öppnas varje gång du loggar in.
+settings-apps-search = Sök efter appar
+settings-apps-no-match = Inga appar matchar sökningen
+settings-apps-cancel = Avbryt
+settings-apps-permissions = Behörigheter
+settings-apps-location = Plats
+settings-apps-camera = Kamera
+settings-apps-clipboard = Urklipp i bakgrunden
+settings-apps-full-access = Full åtkomst
+settings-apps-full-access-hint = Den körs utanför sin sandlåda och kan allt ett program du startar själv kan. Borttagningen gäller från nästa gång den öppnas.
+settings-apps-full-access-remove = Ta bort
+settings-apps-full-access-remove-app = Ta bort full åtkomst för { $app }
+settings-apps-passwords = Sparade lösenord
+settings-apps-passwords-forget = Glöm
+settings-apps-passwords-forget-app = Låt { $app } fråga igen
+settings-apps-permissions-allowed = { $allowed } av { $total } tillåtna
+settings-apps-permissions-description = Appar i en sandlåda får egna filer och bara det du tillåter här.
+settings-apps-sandbox-only = Inget utanför sandlådan
+settings-apps-folders = Mappar
+settings-apps-folders-hint = Från nästa gång den öppnas kan den läsa och ändra allt i de här mapparna.
+settings-apps-folders-count = { $count ->
+    [one] { $count } mapp
+   *[other] { $count } mappar
+}
+settings-apps-folder-add = Lägg till mapp
+settings-apps-folder-remove = Ta bort
+settings-apps-folder-remove-app = Sluta dela { $folder }
+settings-apps-usb = USB-enheter
+settings-apps-usb-hint = Som säkerhetsnycklar, telefoner och mikrokontroller
+settings-apps-serial = Seriella enheter
+settings-apps-serial-hint = Som 3D-skrivare och kort anslutna via USB
+settings-apps-folder-read-only = Skrivskyddad
+settings-apps-downloads = Mappen Hämtade filer
+settings-apps-downloads-hint = Den kan spara filer i mappen Hämtade filer och öppna de som ligger där, från nästa gång den öppnas.
+settings-apps-internet = Internet
+settings-apps-internet-hint = Den kan gå ut på internet från nästa gång den öppnas.
+settings-apps-service-hint = En tjänst på skrivbordet som den kan prata med
+settings-apps-service-remove = Ta bort
+settings-apps-service-remove-app = Låt den inte längre prata med { $service }
+settings-apps-services-count = { $count ->
+    [one] { $count } tjänst
+   *[other] { $count } tjänster
+}
+settings-apps-full-access-off = Den körs i en sandlåda. Full åtkomst tar bort sandlådan.
+settings-apps-full-access-give = Ge full åtkomst

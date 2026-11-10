@@ -43,7 +43,7 @@ settings-display-brightness = Brightness
 # Slider label. $name is the display's name.
 settings-display-brightness-label = { $name } brightness
 # Shown under a display whose brightness can't be read
-settings-display-brightness-unsupported = Turn on DDC/CI in the display’s menu to change it here
+settings-display-brightness-unsupported = To change it here, turn on the setting called DDC/CI in the display’s own menu
 settings-display-brightness-unresponsive = Not responding right now, trying again shortly
 # Row title when several external displays still need setting up
 settings-display-brightness-external = External displays
@@ -147,7 +147,7 @@ settings-sound-set = Sound set
 settings-sound-set-folder = Use a folder of sounds
 settings-sound-set-folder-description = Files named after a sound replace it, such as message-new-instant.ogg. Every other sound goes back to Luft's.
 # Button that opens a folder picker
-settings-sound-set-choose = Choose Folder
+settings-sound-set-choose = Choose folder
 settings-sound-set-used = { $count ->
     [one] Using { $count } sound from the folder.
    *[other] Using { $count } sounds from the folder.
@@ -155,7 +155,7 @@ settings-sound-set-used = { $count ->
 # $files is a comma-separated list of file names
 settings-sound-set-skipped = Couldn't use { $files }.
 # Button that goes back to the sounds Luft comes with
-settings-sound-reset-all = Reset All
+settings-sound-reset-all = Reset all
 # Shown below a sound's name when it plays the sound Luft comes with
 settings-sound-default = Luft's sound
 # Button that opens a file picker
@@ -234,7 +234,7 @@ settings-power-duration-hours-minutes = { $hours ->
     [one] { $minutes } minute
    *[other] { $minutes } minutes
 }
-# Picker option: never turn off or suspend
+# Picker option: never turn off or sleep
 settings-power-never = Never
 
 ## Charge limit
@@ -306,19 +306,19 @@ settings-power-screen-off-description = When you haven't used the computer for a
 settings-power-dim = Dim when inactive
 settings-power-dim-description = Lowers the brightness shortly before the screen turns off
 settings-power-sleep = Sleep
-settings-power-suspend-plugged-in = Suspend when plugged in
+settings-power-suspend-plugged-in = Sleep when plugged in
 # Shown on computers without a battery
-settings-power-suspend-inactive = Suspend when inactive
+settings-power-suspend-inactive = Sleep when inactive
 settings-power-suspend-description = Puts the computer to sleep after a while without use
-settings-power-suspend-battery = Suspend on battery
+settings-power-suspend-battery = Sleep on battery
 settings-power-button = Power button
 # What pressing the power button does
-settings-power-button-suspend = Suspend
+settings-power-button-suspend = Sleep
 settings-power-button-hibernate = Hibernate
 settings-power-button-ask = Ask what to do
 settings-power-button-nothing = Do nothing
 settings-power-long-sleep = Shut down after a long sleep
-settings-power-long-sleep-description = Rather than letting the battery run flat while asleep, the computer shuts down when the battery gets low or after a long sleep on battery. Open windows aren't kept.
+settings-power-long-sleep-description = After this long asleep on battery, the computer shuts down and open windows aren’t kept. It always shuts down before the battery runs flat.
 settings-power-long-sleep-failed = This couldn't be changed. Try again.
 settings-power-long-sleep-after = Shut down after
 settings-power-long-sleep-hours = { $hours ->
@@ -642,6 +642,8 @@ settings-printers-none = No printers yet
 settings-printers-none-description = Printers on your network and printers plugged in by USB show up here by themselves
 settings-printers-add = Add a printer
 settings-printers-add-description = Choose one that didn't show up by itself, or type its address
+settings-printers-available = On this network
+settings-printers-available-description = This network isn’t marked as home, so printers on it are only added when you choose to
 settings-printers-default = Default
 # $count is the number of documents waiting to print
 settings-printers-waiting = { $count ->
@@ -686,7 +688,7 @@ settings-printers-sides-long = Long edge
 settings-printers-sides-short = Short edge
 settings-printers-color = Color
 settings-printers-color-color = Color
-settings-printers-color-gray = Black & white
+settings-printers-color-gray = Black and white
 
 settings-printers-make-default = Make default
 settings-printers-make-default-description = Apps pick this printer first

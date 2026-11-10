@@ -15,7 +15,6 @@
 	let when = $derived(new Intl.DateTimeFormat(i18n.formats, { month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' }));
 	let list = $state<Problem[]>([]);
 	let open = $state<Problem | null>(null);
-	let expanded = $state(false);
 	let error = $state('');
 
 	async function restart() {
@@ -29,21 +28,32 @@
 	commands.aboutProblems().then((loaded) => (list = loaded));
 </script>
 
+{#snippet row(problem: (typeof list)[number], close?: () => void)}
+	<ActionRow
+		icon={MonitorX}
+		title={t('settings-about-problem-gpu')}
+		description={t('settings-about-problem-summary', { when: when.format(problem.time * 1000) })}
+		onclick={() => {
+			close?.();
+			error = '';
+			open = problem;
+		}}
+	/>
+{/snippet}
+
 {#if list.length}
 	<Section title={t('settings-about-problems')}>
-		{#each expanded ? list : list.slice(0, COLLAPSED) as problem (problem.id)}
-			<ActionRow
-				icon={MonitorX}
-				title={t('settings-about-problem-gpu')}
-				description={t('settings-about-problem-summary', { when: when.format(problem.time * 1000) })}
-				onclick={() => {
-					error = '';
-					open = problem;
-				}}
-			/>
+		{#each list.slice(0, COLLAPSED) as problem (problem.id)}
+			{@render row(problem)}
 		{/each}
 		{#if list.length > COLLAPSED}
-			<MoreRow hidden={list.length - COLLAPSED} bind:expanded />
+			<MoreRow hidden={list.length - COLLAPSED} title={t('settings-about-problems')}>
+				{#snippet children(close)}
+					{#each list as problem (problem.id)}
+						{@render row(problem, close)}
+					{/each}
+				{/snippet}
+			</MoreRow>
 		{/if}
 	</Section>
 {/if}

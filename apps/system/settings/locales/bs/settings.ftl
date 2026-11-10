@@ -28,7 +28,6 @@ settings-more-show = { $count ->
         [few] Prikaži još { $count }
        *[other] Prikaži još { $count }
     }
-settings-more-fewer = Prikaži manje
 settings-time-picker = { $label }, { $time }
 settings-time-picker-hour = Sat
 settings-time-picker-minute = Minuta

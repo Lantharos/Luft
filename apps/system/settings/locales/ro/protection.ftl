@@ -332,12 +332,6 @@ settings-passwords-history-denied = Aplicației { $app } nu i s-a permis să fol
 settings-passwords-history-denied-unnamed = Aplicației { $app } nu i s-a permis să folosească o parolă salvată
 settings-passwords-history-signed = Aplicația { $app } a semnat cu „{ $item }”
 settings-passwords-history-signed-unnamed = Aplicația { $app } a semnat cu o parolă salvată
-settings-passwords-history-fewer = Afișează mai puține
-settings-passwords-history-all = { $count ->
-    [one] Afișează tot ({ $count })
-    [few] Afișează tot ({ $count })
-   *[other] Afișează tot ({ $count })
-}
 settings-passwords-history-clear = Șterge istoricul
 settings-passwords-history-clear-description = Uită ce aplicații au folosit portcheiul și când
 settings-passwords-history-clear-button = Șterge
@@ -395,73 +389,3 @@ settings-passkeys-rename-description = Dați cheii de acces pentru { $site } un 
 settings-passkeys-name = Nume
 settings-passkeys-save = Salvează
 
-## Apps
-
-settings-apps-defaults = Aplicații implicite
-settings-apps-defaults-description = Folosite când deschideți linkuri, fișiere și foldere
-settings-apps-browser = Browser web
-settings-apps-email = E-mail
-settings-apps-calendar = Calendar
-settings-apps-music = Muzică
-settings-apps-videos = Videoclipuri
-settings-apps-photos = Fotografii
-settings-apps-text-editor = Editor de text
-settings-apps-files = Fișiere
-settings-apps-archives = Arhive
-settings-apps-choose = Alege
-settings-apps-startup = Pornire
-settings-apps-startup-description = Aceste aplicații se deschid când vă conectați
-settings-apps-startup-app = Deschide { $app } la conectare
-settings-apps-startup-remove = Elimină { $app } de la pornire
-settings-apps-startup-add = Adaugă o aplicație
-settings-apps-startup-add-title = Adăugați o aplicație la pornire
-settings-apps-startup-add-description = Alegeți o aplicație care să se deschidă de fiecare dată când vă conectați.
-settings-apps-search = Caută aplicații
-settings-apps-no-match = Nicio aplicație nu corespunde căutării
-settings-apps-cancel = Anulează
-
-## Apps: permissions
-
-settings-apps-permissions = Permisiuni
-settings-apps-location = Locație
-settings-apps-camera = Cameră
-settings-apps-clipboard = Clipboard în fundal
-settings-apps-full-access = Acces complet
-settings-apps-full-access-hint = Rulează în afara sandboxului și poate face tot ce poate un program pornit de tine. Eliminarea se aplică de la următoarea deschidere.
-settings-apps-full-access-remove = Elimină
-settings-apps-full-access-remove-app = Elimină accesul complet pentru { $app }
-settings-apps-passwords = Parole salvate
-settings-apps-passwords-forget = Uită
-settings-apps-passwords-forget-app = Lasă { $app } să întrebe din nou
-settings-apps-permissions-allowed = Permise: { $allowed } din { $total }
-settings-apps-permissions-description = Aplicațiile dintr-un sandbox primesc propriile fișiere și doar ce permiți aici.
-settings-apps-sandbox-only = Nimic în afara sandboxului
-settings-apps-folders = Dosare
-settings-apps-folders-hint = De la următoarea deschidere poate citi și modifica tot din aceste dosare.
-settings-apps-folders-count = { $count ->
-    [one] { $count } dosar
-    [few] { $count } dosare
-   *[other] { $count } de dosare
-}
-settings-apps-folder-add = Adaugă un dosar
-settings-apps-folder-remove = Elimină
-settings-apps-folder-remove-app = Nu mai partaja { $folder }
-settings-apps-usb = Dispozitive USB
-settings-apps-usb-hint = Cum ar fi chei de securitate, telefoane și microcontrolere
-settings-apps-serial = Dispozitive seriale
-settings-apps-serial-hint = Cum ar fi imprimante 3D și plăci conectate prin USB
-settings-apps-folder-read-only = Doar citire
-settings-apps-downloads = Dosarul Descărcări
-settings-apps-downloads-hint = Poate salva fișiere în dosarul Descărcări și poate deschide fișierele de acolo, de la următoarea deschidere.
-settings-apps-internet = Internet
-settings-apps-internet-hint = Se poate conecta la internet de la următoarea deschidere.
-settings-apps-service-hint = Un serviciu de pe desktop cu care poate comunica
-settings-apps-service-remove = Elimină
-settings-apps-service-remove-app = Nu-i mai permite să comunice cu { $service }
-settings-apps-services-count = { $count ->
-    [one] { $count } serviciu
-    [few] { $count } servicii
-   *[other] { $count } de servicii
-}
-settings-apps-full-access-off = Rulează într-un sandbox. Accesul complet elimină sandboxul.
-settings-apps-full-access-give = Acordă acces complet

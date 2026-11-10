@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { Dialog } from '@luft/ui';
+	import { Dialog, TextField } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { PairingRequest } from '#lib/bindings.js';
 
@@ -62,10 +62,9 @@
 		<p class="code">{request.code}</p>
 	{/if}
 	{#if asksForValue}
-		<input
-			class="text-field"
+		<TextField
+			label={copy.title}
 			inputmode={request.kind === 'passkey' ? 'numeric' : 'text'}
-			autocomplete="off"
 			bind:value
 			onkeydown={(event) => event.key === 'Enter' && ready && respond(true)}
 		/>

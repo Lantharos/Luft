@@ -5,7 +5,6 @@
 	import { filesystemName, folderName, inner, volumeName } from '#lib/format.js';
 	import { explorable, typeName } from '#lib/partitions/types.js';
 	import { disks } from '#lib/state/disks.svelte.js';
-	import Disclosure from '#lib/components/Disclosure.svelte';
 	import Facts from './Facts.svelte';
 	import UsageLine from './UsageLine.svelte';
 
@@ -55,15 +54,21 @@
 		<UsageLine used={contents.used} size={volume.size} />
 	{/if}
 	<Facts {facts} />
-	<div class="-ml-1 flex"><Disclosure bind:open={more}>Technical details</Disclosure></div>
-	{#if more}
-		<Facts facts={technical} />
-	{/if}
 	{#snippet actions()}
+		<button type="button" class="button mr-auto" onclick={() => (more = true)}>Technical details</button>
 		{#if explorable(volume)}
-			<button type="button" class="button mr-auto" onclick={explore}>See what’s using space</button>
+			<button type="button" class="button" onclick={explore}>See what’s using space</button>
 		{/if}
 		<button type="button" class="button primary" onclick={onclose}>Done</button>
 	{/snippet}
 </Dialog>
+
+{#if more}
+	<Dialog title="Technical details of {volumeName(volume)}" wide onclose={() => (more = false)}>
+		<Facts facts={technical} />
+		{#snippet actions()}
+			<button type="button" class="button primary" onclick={() => (more = false)}>Done</button>
+		{/snippet}
+	</Dialog>
+{/if}
 

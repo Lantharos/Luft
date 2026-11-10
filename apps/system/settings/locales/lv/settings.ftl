@@ -28,7 +28,6 @@ settings-more-show = { $count ->
         [one] Rādīt vēl { $count }
        *[other] Rādīt vēl { $count }
     }
-settings-more-fewer = Rādīt mazāk
 settings-time-picker = { $label }, { $time }
 settings-time-picker-hour = Stunda
 settings-time-picker-minute = Minūte

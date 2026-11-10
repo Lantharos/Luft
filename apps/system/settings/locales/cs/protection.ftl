@@ -342,13 +342,6 @@ settings-passwords-history-denied = Aplikace { $app } nesměla použít „{ $it
 settings-passwords-history-denied-unnamed = Aplikace { $app } nesměla použít uložené heslo
 settings-passwords-history-signed = Aplikace { $app } podepsala pomocí „{ $item }“
 settings-passwords-history-signed-unnamed = Aplikace { $app } podepsala pomocí uloženého hesla
-settings-passwords-history-fewer = Zobrazit méně
-settings-passwords-history-all = { $count ->
-    [one] Zobrazit vše ({ $count })
-    [few] Zobrazit vše ({ $count })
-    [many] Zobrazit vše ({ $count })
-   *[other] Zobrazit vše ({ $count })
-}
 settings-passwords-history-clear = Vymazat historii
 settings-passwords-history-clear-description = Zapomenout, které aplikace a kdy použily klíčenku
 settings-passwords-history-clear-button = Vymazat
@@ -406,75 +399,3 @@ settings-passkeys-rename-description = Pojmenujte přístupový klíč pro { $si
 settings-passkeys-name = Název
 settings-passkeys-save = Uložit
 
-## Apps
-
-settings-apps-defaults = Výchozí aplikace
-settings-apps-defaults-description = Používají se při otevírání odkazů, souborů a složek
-settings-apps-browser = Webový prohlížeč
-settings-apps-email = E-mail
-settings-apps-calendar = Kalendář
-settings-apps-music = Hudba
-settings-apps-videos = Videa
-settings-apps-photos = Fotky
-settings-apps-text-editor = Textový editor
-settings-apps-files = Soubory
-settings-apps-archives = Archivy
-settings-apps-choose = Vyberte
-settings-apps-startup = Po spuštění
-settings-apps-startup-description = Tyto aplikace se otevřou po přihlášení
-settings-apps-startup-app = Otevřít aplikaci { $app } po přihlášení
-settings-apps-startup-remove = Odebrat { $app } ze spouštění
-settings-apps-startup-add = Přidat aplikaci
-settings-apps-startup-add-title = Přidat aplikaci po spuštění
-settings-apps-startup-add-description = Vyberte aplikaci, která se otevře při každém přihlášení.
-settings-apps-search = Hledat aplikace
-settings-apps-no-match = Hledání neodpovídají žádné aplikace
-settings-apps-cancel = Zrušit
-
-## Apps: permissions
-
-settings-apps-permissions = Oprávnění
-settings-apps-location = Poloha
-settings-apps-camera = Kamera
-settings-apps-clipboard = Schránka na pozadí
-settings-apps-full-access = Úplný přístup
-settings-apps-full-access-hint = Běží mimo svůj sandbox a může vše, co program, který spustíte sami. Odebrání platí od příštího otevření.
-settings-apps-full-access-remove = Odebrat
-settings-apps-full-access-remove-app = Odebrat aplikaci { $app } úplný přístup
-settings-apps-passwords = Uložená hesla
-settings-apps-passwords-forget = Zapomenout
-settings-apps-passwords-forget-app = Nechat aplikaci { $app } zeptat se znovu
-settings-apps-permissions-allowed = Povoleno: { $allowed } z { $total }
-settings-apps-permissions-description = Aplikace v sandboxu dostávají vlastní soubory a jen to, co zde povolíte.
-settings-apps-sandbox-only = Nic mimo svůj sandbox
-settings-apps-folders = Složky
-settings-apps-folders-hint = Od příštího otevření může číst a měnit vše v těchto složkách.
-settings-apps-folders-count = { $count ->
-    [one] { $count } složka
-    [few] { $count } složky
-    [many] { $count } složky
-   *[other] { $count } složek
-}
-settings-apps-folder-add = Přidat složku
-settings-apps-folder-remove = Odebrat
-settings-apps-folder-remove-app = Přestat sdílet { $folder }
-settings-apps-usb = Zařízení USB
-settings-apps-usb-hint = Například bezpečnostní klíče, telefony a mikrokontroléry
-settings-apps-serial = Sériová zařízení
-settings-apps-serial-hint = Například 3D tiskárny a desky připojené přes USB
-settings-apps-folder-read-only = Jen pro čtení
-settings-apps-downloads = Složka Stažené soubory
-settings-apps-downloads-hint = Může ukládat soubory do složky Stažené soubory a otevírat ty, které v ní jsou, od příštího spuštění.
-settings-apps-internet = Internet
-settings-apps-internet-hint = Může se připojit k internetu, od příštího spuštění.
-settings-apps-service-hint = Služba na ploše, se kterou může komunikovat
-settings-apps-service-remove = Odebrat
-settings-apps-service-remove-app = Zakázat komunikaci se službou { $service }
-settings-apps-services-count = { $count ->
-    [one] { $count } služba
-    [few] { $count } služby
-    [many] { $count } služby
-   *[other] { $count } služeb
-}
-settings-apps-full-access-off = Běží v sandboxu. Plný přístup sandbox odstraní.
-settings-apps-full-access-give = Udělit plný přístup

@@ -332,12 +332,6 @@ settings-passwords-history-denied = { $app } ei saanud luba kasutada kirjet „{
 settings-passwords-history-denied-unnamed = { $app } ei saanud luba kasutada salvestatud salasõna
 settings-passwords-history-signed = { $app } allkirjastas võtmega „{ $item }“
 settings-passwords-history-signed-unnamed = { $app } allkirjastas salvestatud salasõnaga
-settings-passwords-history-fewer = Kuva vähem
-settings-passwords-history-all =
-    { $count ->
-        [one] Kuva kõik { $count }
-       *[other] Kuva kõik { $count }
-    }
 settings-passwords-history-clear = Tühjenda ajalugu
 settings-passwords-history-clear-description = Unusta, millised rakendused ja millal võtmerõngast kasutasid
 settings-passwords-history-clear-button = Tühjenda
@@ -394,74 +388,3 @@ settings-passkeys-rename-title = Pääsuvõtme ümbernimetamine
 settings-passkeys-rename-description = Anna saidi { $site } pääsuvõtmele nimi, mille ära tunned.
 settings-passkeys-name = Nimi
 settings-passkeys-save = Salvesta
-
-## Apps
-
-settings-apps-defaults = Vaikerakendused
-settings-apps-defaults-description = Kasutatakse linkide, failide ja kaustade avamisel
-settings-apps-browser = Veebibrauser
-settings-apps-email = E-post
-settings-apps-calendar = Kalender
-settings-apps-music = Muusika
-settings-apps-videos = Videod
-settings-apps-photos = Fotod
-settings-apps-text-editor = Tekstiredaktor
-settings-apps-files = Failid
-settings-apps-archives = Arhiivid
-settings-apps-choose = Vali
-settings-apps-startup = Käivitus
-settings-apps-startup-description = Need rakendused avatakse sisselogimisel
-settings-apps-startup-app = Ava { $app } sisselogimisel
-settings-apps-startup-remove = Eemalda { $app } käivitusest
-settings-apps-startup-add = Lisa rakendus
-settings-apps-startup-add-title = Käivitusrakenduse lisamine
-settings-apps-startup-add-description = Vali rakendus, mis avatakse igal sisselogimisel.
-settings-apps-search = Otsi rakendusi
-settings-apps-no-match = Otsingule ei vasta ükski rakendus
-settings-apps-cancel = Loobu
-
-## Apps: permissions
-
-settings-apps-permissions = Õigused
-settings-apps-location = Asukoht
-settings-apps-camera = Kaamera
-settings-apps-clipboard = Lõikelaud taustal
-settings-apps-full-access = Täielik juurdepääs
-settings-apps-full-access-hint = See töötab väljaspool liivakasti ja saab teha kõike, mida saab ise käivitatud programm. Eemaldamine kehtib järgmisest avamisest.
-settings-apps-full-access-remove = Eemalda
-settings-apps-full-access-remove-app = Eemalda rakenduselt { $app } täielik juurdepääs
-settings-apps-passwords = Salvestatud salasõnad
-settings-apps-passwords-forget = Unusta
-settings-apps-passwords-forget-app = Lase rakendusel { $app } uuesti küsida
-settings-apps-permissions-allowed = Lubatud { $allowed }/{ $total }
-settings-apps-permissions-description = Liivakastis olevad rakendused saavad oma failid ja ainult selle, mida siin lubad.
-settings-apps-sandbox-only = Mitte midagi väljaspool liivakasti
-settings-apps-folders = Kaustad
-settings-apps-folders-hint = Alates järgmisest avamisest saab see kõike nendes kaustades lugeda ja muuta.
-settings-apps-folders-count =
-    { $count ->
-        [one] { $count } kaust
-       *[other] { $count } kausta
-    }
-settings-apps-folder-add = Lisa kaust
-settings-apps-folder-remove = Eemalda
-settings-apps-folder-remove-app = Lõpeta { $folder } jagamine
-settings-apps-usb = USB-seadmed
-settings-apps-usb-hint = Näiteks turvavõtmed, telefonid ja mikrokontrollerid
-settings-apps-serial = Jadaseadmed
-settings-apps-serial-hint = Näiteks 3D-printerid ja USB kaudu ühendatud plaadid
-settings-apps-folder-read-only = Ainult lugemiseks
-settings-apps-downloads = Allalaadimiste kaust
-settings-apps-downloads-hint = See saab alates järgmisest avamisest salvestada faile allalaadimiste kausta ja avada seal olevaid faile.
-settings-apps-internet = Internet
-settings-apps-internet-hint = See saab internetti alates järgmisest avamisest.
-settings-apps-service-hint = Töölaua teenus, millega see saab suhelda
-settings-apps-service-remove = Eemalda
-settings-apps-service-remove-app = Keela suhtlus teenusega { $service }
-settings-apps-services-count =
-    { $count ->
-        [one] { $count } teenus
-       *[other] { $count } teenust
-    }
-settings-apps-full-access-off = See töötab liivakastis. Täielik ligipääs eemaldab liivakasti.
-settings-apps-full-access-give = Anna täielik ligipääs

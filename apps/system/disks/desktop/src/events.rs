@@ -13,6 +13,7 @@ pub const MOVE_PROGRESS: BridgeEvent<MoveProgress> = BridgeEvent::new("disks.pla
 pub const SPACE_UPDATE: BridgeEvent<SpaceUpdate> = BridgeEvent::new("space.update");
 pub const PROTECTION_CHANGED: BridgeEvent<Protection> = BridgeEvent::new("disks.trust");
 pub const SYSTEM_STEP: BridgeEvent<Step> = BridgeEvent::new("disks.system");
+pub const CLOSE_ASKED: BridgeEvent<()> = BridgeEvent::new("disks.closeAsked");
 
 pub fn declare(window: SabineWindow) -> SabineWindow {
     window
@@ -22,4 +23,5 @@ pub fn declare(window: SabineWindow) -> SabineWindow {
         .bridge_event(&SPACE_UPDATE)
         .bridge_event(&PROTECTION_CHANGED)
         .bridge_event(&SYSTEM_STEP)
+        .bridge_event(&CLOSE_ASKED)
 }

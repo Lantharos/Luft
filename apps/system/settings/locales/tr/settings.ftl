@@ -27,7 +27,6 @@ settings-more-show = { $count ->
         [one] { $count } tane daha göster
        *[other] { $count } tane daha göster
     }
-settings-more-fewer = Daha az göster
 settings-time-picker = { $label }, { $time }
 settings-time-picker-hour = Saat
 settings-time-picker-minute = Dakika

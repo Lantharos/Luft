@@ -339,3 +339,73 @@ settings-accounts-text-me = Verčiau atsiųsti kodą SMS žinute
 settings-accounts-choose-phone = Kokiu numeriu Apple turėtų atsiųsti kodą?
     .description = Siųsti SMS žinutę
 settings-accounts-approve = Jūsų Apple paskyrai įjungta išplėstinė duomenų apsauga. Patvirtinkite užklausą savo iPhone, iPad arba Mac, kad šis kompiuteris galėtų atidaryti iCloud Drive.
+
+## Apps
+
+settings-apps-defaults = Numatytosios programos
+settings-apps-defaults-description = Naudojamos atidarant nuorodas, failus ir aplankus
+settings-apps-browser = Žiniatinklio naršyklė
+settings-apps-email = El. paštas
+settings-apps-calendar = Kalendorius
+settings-apps-music = Muzika
+settings-apps-videos = Vaizdo įrašai
+settings-apps-photos = Nuotraukos
+settings-apps-text-editor = Teksto rengyklė
+settings-apps-files = Failai
+settings-apps-archives = Archyvai
+settings-apps-choose = Pasirinkite
+settings-apps-startup = Paleidimas
+settings-apps-startup-description = Šios programos atsidaro jums prisijungus
+settings-apps-startup-app = Atidaryti programą { $app } prisijungus
+settings-apps-startup-remove = Pašalinti { $app } iš paleisties
+settings-apps-startup-add = Pridėti programą
+settings-apps-startup-add-title = Pridėti paleidžiamą programą
+settings-apps-startup-add-description = Pasirinkite programą, kuri atsidarys kaskart jums prisijungus.
+settings-apps-search = Ieškoti programų
+settings-apps-no-match = Nerasta jokių programų
+settings-apps-cancel = Atšaukti
+settings-apps-permissions = Leidimai
+settings-apps-location = Buvimo vieta
+settings-apps-camera = Kamera
+settings-apps-clipboard = Iškarpinė fone
+settings-apps-full-access = Visiška prieiga
+settings-apps-full-access-hint = Ji veikia už smėlio dėžės ribų ir gali viską, ką gali jūsų paleista programa. Pašalinimas įsigalios kitą kartą atidarius.
+settings-apps-full-access-remove = Pašalinti
+settings-apps-full-access-remove-app = Pašalinti visišką prieigą programai { $app }
+settings-apps-passwords = Įrašyti slaptažodžiai
+settings-apps-passwords-forget = Pamiršti
+settings-apps-passwords-forget-app = Leisti programai { $app } paklausti vėl
+settings-apps-permissions-allowed = Leidžiama { $allowed } iš { $total }
+settings-apps-permissions-description = Smėlio dėžėje veikiančios programos gauna savo failus ir tik tai, ką čia leidžiate.
+settings-apps-sandbox-only = Nieko už smėlio dėžės ribų
+settings-apps-folders = Aplankai
+settings-apps-folders-hint = Nuo kito atidarymo ji galės skaityti ir keisti viską šiuose aplankuose.
+settings-apps-folders-count = { $count ->
+    [one] { $count } aplankas
+    [few] { $count } aplankai
+    [many] { $count } aplanko
+   *[other] { $count } aplankų
+}
+settings-apps-folder-add = Pridėti aplanką
+settings-apps-folder-remove = Pašalinti
+settings-apps-folder-remove-app = Nebebendrinti { $folder }
+settings-apps-usb = USB įrenginiai
+settings-apps-usb-hint = Pavyzdžiui, saugos raktai, telefonai ir mikrovaldikliai
+settings-apps-serial = Nuoseklieji įrenginiai
+settings-apps-serial-hint = Pavyzdžiui, 3D spausdintuvai ir USB prijungtos plokštės
+settings-apps-folder-read-only = Tik skaitymui
+settings-apps-downloads = Atsisiuntimų aplankas
+settings-apps-downloads-hint = Ji gali įrašyti failus į atsisiuntimų aplanką ir atidaryti ten esančius nuo kito atidarymo.
+settings-apps-internet = Internetas
+settings-apps-internet-hint = Ji gali jungtis prie interneto nuo kito atidarymo.
+settings-apps-service-hint = Darbalaukio paslauga, su kuria ji gali bendrauti
+settings-apps-service-remove = Pašalinti
+settings-apps-service-remove-app = Uždrausti bendrauti su { $service }
+settings-apps-services-count = { $count ->
+    [one] { $count } paslauga
+    [few] { $count } paslaugos
+    [many] { $count } paslaugos
+   *[other] { $count } paslaugų
+}
+settings-apps-full-access-off = Ji veikia smėlio dėžėje. Visa prieiga panaikina smėlio dėžę.
+settings-apps-full-access-give = Suteikti visą prieigą

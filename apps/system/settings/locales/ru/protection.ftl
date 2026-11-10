@@ -342,13 +342,6 @@ settings-passwords-history-denied = Приложению { $app } не разр�
 settings-passwords-history-denied-unnamed = Приложению { $app } не разрешено использовать сохранённый пароль
 settings-passwords-history-signed = Приложение { $app } подписало данные ключом «{ $item }»
 settings-passwords-history-signed-unnamed = Приложение { $app } подписало данные сохранённым паролем
-settings-passwords-history-fewer = Показать меньше
-settings-passwords-history-all = { $count ->
-    [one] Показать все ({ $count })
-    [few] Показать все ({ $count })
-    [many] Показать все ({ $count })
-   *[other] Показать все ({ $count })
-}
 settings-passwords-history-clear = Очистить историю
 settings-passwords-history-clear-description = Забыть, какие приложения и когда использовали связку ключей
 settings-passwords-history-clear-button = Очистить
@@ -406,75 +399,3 @@ settings-passkeys-rename-description = Дайте ключу доступа дл
 settings-passkeys-name = Название
 settings-passkeys-save = Сохранить
 
-## Apps
-
-settings-apps-defaults = Приложения по умолчанию
-settings-apps-defaults-description = Открывают ссылки, файлы и папки
-settings-apps-browser = Браузер
-settings-apps-email = Электронная почта
-settings-apps-calendar = Календарь
-settings-apps-music = Музыка
-settings-apps-videos = Видео
-settings-apps-photos = Фото
-settings-apps-text-editor = Текстовый редактор
-settings-apps-files = Файлы
-settings-apps-archives = Архивы
-settings-apps-choose = Выберите
-settings-apps-startup = Автозапуск
-settings-apps-startup-description = Эти приложения открываются при входе в систему
-settings-apps-startup-app = Открывать приложение { $app } при входе
-settings-apps-startup-remove = Убрать { $app } из автозапуска
-settings-apps-startup-add = Добавить приложение
-settings-apps-startup-add-title = Добавить приложение в автозапуск
-settings-apps-startup-add-description = Выберите приложение, которое будет открываться при каждом входе в систему.
-settings-apps-search = Поиск приложений
-settings-apps-no-match = Приложения не найдены
-settings-apps-cancel = Отмена
-
-## Apps: permissions
-
-settings-apps-permissions = Разрешения
-settings-apps-location = Местоположение
-settings-apps-camera = Камера
-settings-apps-clipboard = Буфер обмена в фоне
-settings-apps-full-access = Полный доступ
-settings-apps-full-access-hint = Работает вне песочницы и может всё, что может запущенная вами программа. Отмена вступит в силу при следующем запуске.
-settings-apps-full-access-remove = Отозвать
-settings-apps-full-access-remove-app = Отозвать полный доступ у { $app }
-settings-apps-passwords = Сохранённые пароли
-settings-apps-passwords-forget = Сбросить
-settings-apps-passwords-forget-app = Пусть { $app } спросит снова
-settings-apps-permissions-allowed = Разрешено: { $allowed } из { $total }
-settings-apps-permissions-description = Приложения в песочнице получают свои файлы и только то, что вы разрешите здесь.
-settings-apps-sandbox-only = Ничего за пределами песочницы
-settings-apps-folders = Папки
-settings-apps-folders-hint = Со следующего запуска оно сможет читать и изменять всё в этих папках.
-settings-apps-folders-count = { $count ->
-    [one] { $count } папка
-    [few] { $count } папки
-    [many] { $count } папок
-   *[other] { $count } папки
-}
-settings-apps-folder-add = Добавить папку
-settings-apps-folder-remove = Убрать
-settings-apps-folder-remove-app = Перестать открывать доступ к { $folder }
-settings-apps-usb = USB-устройства
-settings-apps-usb-hint = Например, ключи безопасности, телефоны и микроконтроллеры
-settings-apps-serial = Последовательные устройства
-settings-apps-serial-hint = Например, 3D-принтеры и платы, подключённые по USB
-settings-apps-folder-read-only = Только чтение
-settings-apps-downloads = Папка «Загрузки»
-settings-apps-downloads-hint = Может сохранять файлы в папку «Загрузки» и открывать находящиеся там, со следующего запуска.
-settings-apps-internet = Интернет
-settings-apps-internet-hint = Может выходить в интернет со следующего запуска.
-settings-apps-service-hint = Служба рабочего стола, с которой оно может общаться
-settings-apps-service-remove = Убрать
-settings-apps-service-remove-app = Запретить общение с { $service }
-settings-apps-services-count = { $count ->
-    [one] { $count } служба
-    [few] { $count } службы
-    [many] { $count } служб
-   *[other] { $count } службы
-}
-settings-apps-full-access-off = Работает в песочнице. Полный доступ убирает песочницу.
-settings-apps-full-access-give = Дать полный доступ

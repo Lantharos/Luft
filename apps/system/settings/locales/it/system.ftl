@@ -329,3 +329,69 @@ settings-accounts-text-me = Inviami invece un codice via SMS
 settings-accounts-choose-phone = A quale numero deve inviare il codice Apple?
     .description = Invia un SMS
 settings-accounts-approve = Il tuo account Apple usa la Protezione avanzata dei dati. Approva la richiesta sul tuo iPhone, iPad o Mac per consentire a questo computer di aprire iCloud Drive.
+
+## Apps
+
+settings-apps-defaults = App predefinite
+settings-apps-defaults-description = Usate quando apri link, file e cartelle
+settings-apps-browser = Browser web
+settings-apps-email = Email
+settings-apps-calendar = Calendario
+settings-apps-music = Musica
+settings-apps-videos = Video
+settings-apps-photos = Foto
+settings-apps-text-editor = Editor di testo
+settings-apps-files = File
+settings-apps-archives = Archivi
+settings-apps-choose = Scegli
+settings-apps-startup = Avvio
+settings-apps-startup-description = Queste app si aprono quando accedi
+settings-apps-startup-app = Apri { $app } all’accesso
+settings-apps-startup-remove = Rimuovi { $app } dall’avvio
+settings-apps-startup-add = Aggiungi app
+settings-apps-startup-add-title = Aggiungi un’app all’avvio
+settings-apps-startup-add-description = Scegli un’app da aprire ogni volta che accedi.
+settings-apps-search = Cerca app
+settings-apps-no-match = Nessuna app corrisponde alla ricerca
+settings-apps-cancel = Annulla
+settings-apps-permissions = Autorizzazioni
+settings-apps-location = Posizione
+settings-apps-camera = Fotocamera
+settings-apps-clipboard = Appunti in background
+settings-apps-full-access = Accesso completo
+settings-apps-full-access-hint = Funziona fuori dalla sua sandbox e può fare tutto ciò che fa un programma che avvii tu. La rimozione vale dalla prossima apertura.
+settings-apps-full-access-remove = Rimuovi
+settings-apps-full-access-remove-app = Rimuovi l’accesso completo a { $app }
+settings-apps-passwords = Password salvate
+settings-apps-passwords-forget = Dimentica
+settings-apps-passwords-forget-app = Fai chiedere di nuovo a { $app }
+settings-apps-permissions-allowed = { $allowed } su { $total } consentite
+settings-apps-permissions-description = Le app in una sandbox hanno i propri file e solo ciò che consenti qui.
+settings-apps-sandbox-only = Niente oltre la sua sandbox
+settings-apps-folders = Cartelle
+settings-apps-folders-hint = Dalla prossima apertura potrà leggere e modificare tutto il contenuto di queste cartelle.
+settings-apps-folders-count = { $count ->
+    [one] { $count } cartella
+   *[other] { $count } cartelle
+}
+settings-apps-folder-add = Aggiungi cartella
+settings-apps-folder-remove = Rimuovi
+settings-apps-folder-remove-app = Smetti di condividere { $folder }
+settings-apps-usb = Dispositivi USB
+settings-apps-usb-hint = Come chiavi di sicurezza, telefoni e microcontrollori
+settings-apps-serial = Dispositivi seriali
+settings-apps-serial-hint = Come stampanti 3D e schede collegate via USB
+settings-apps-folder-read-only = Solo lettura
+settings-apps-downloads = Cartella Download
+settings-apps-downloads-hint = Può salvare file nella cartella Download e aprire quelli che ci sono, dalla prossima volta che si apre.
+settings-apps-internet = Internet
+settings-apps-internet-hint = Può andare online dalla prossima volta che si apre.
+settings-apps-service-hint = Un servizio del desktop con cui può comunicare
+settings-apps-service-remove = Rimuovi
+settings-apps-service-remove-app = Non lasciarla più comunicare con { $service }
+settings-apps-services-count = { $count ->
+    [one] { $count } servizio
+   *[other] { $count } servizi
+}
+settings-apps-full-access-off = Funziona in una sandbox. L'accesso completo la rimuove.
+settings-apps-full-access-give = Dai accesso completo

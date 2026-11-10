@@ -329,3 +329,69 @@ settings-accounts-text-me = Send meg en kode på SMS i stedet
 settings-accounts-choose-phone = Hvilket nummer skal Apple sende koden til?
     .description = Send en SMS
 settings-accounts-approve = Apple-kontoen din bruker avansert databeskyttelse. Godkjenn forespørselen på iPhone, iPad eller Mac for at denne datamaskinen skal kunne åpne iCloud Drive.
+
+## Apps
+
+settings-apps-defaults = Standardapper
+settings-apps-defaults-description = Brukes når du åpner lenker, filer og mapper
+settings-apps-browser = Nettleser
+settings-apps-email = E-post
+settings-apps-calendar = Kalender
+settings-apps-music = Musikk
+settings-apps-videos = Videoer
+settings-apps-photos = Bilder
+settings-apps-text-editor = Tekstredigering
+settings-apps-files = Filer
+settings-apps-archives = Arkiver
+settings-apps-choose = Velg
+settings-apps-startup = Oppstart
+settings-apps-startup-description = Disse appene åpnes når du logger inn
+settings-apps-startup-app = Åpne { $app } når du logger inn
+settings-apps-startup-remove = Fjern { $app } fra oppstart
+settings-apps-startup-add = Legg til app
+settings-apps-startup-add-title = Legg til en oppstartsapp
+settings-apps-startup-add-description = Velg en app som skal åpnes hver gang du logger inn.
+settings-apps-search = Søk i apper
+settings-apps-no-match = Ingen apper samsvarer med søket
+settings-apps-cancel = Avbryt
+settings-apps-permissions = Tillatelser
+settings-apps-location = Posisjon
+settings-apps-camera = Kamera
+settings-apps-clipboard = Utklippstavle i bakgrunnen
+settings-apps-full-access = Full tilgang
+settings-apps-full-access-hint = Den kjører utenfor sandkassen og kan alt et program du starter selv kan. Fjerning gjelder fra neste gang den åpnes.
+settings-apps-full-access-remove = Fjern
+settings-apps-full-access-remove-app = Fjern full tilgang for { $app }
+settings-apps-passwords = Lagrede passord
+settings-apps-passwords-forget = Glem
+settings-apps-passwords-forget-app = La { $app } spørre igjen
+settings-apps-permissions-allowed = { $allowed } av { $total } tillatt
+settings-apps-permissions-description = Apper i en sandkasse får egne filer og bare det du tillater her.
+settings-apps-sandbox-only = Ingenting utenfor sandkassen
+settings-apps-folders = Mapper
+settings-apps-folders-hint = Fra neste gang den åpnes, kan den lese og endre alt i disse mappene.
+settings-apps-folders-count = { $count ->
+    [one] { $count } mappe
+   *[other] { $count } mapper
+}
+settings-apps-folder-add = Legg til mappe
+settings-apps-folder-remove = Fjern
+settings-apps-folder-remove-app = Slutt å dele { $folder }
+settings-apps-usb = USB-enheter
+settings-apps-usb-hint = For eksempel sikkerhetsnøkler, telefoner og mikrokontrollere
+settings-apps-serial = Serielle enheter
+settings-apps-serial-hint = For eksempel 3D-skrivere og kort koblet til med USB
+settings-apps-folder-read-only = Skrivebeskyttet
+settings-apps-downloads = Nedlastinger-mappen
+settings-apps-downloads-hint = Den kan lagre filer i Nedlastinger-mappen og åpne de som ligger der, fra neste gang den åpnes.
+settings-apps-internet = Internett
+settings-apps-internet-hint = Den kan koble seg til internett fra neste gang den åpnes.
+settings-apps-service-hint = En tjeneste på skrivebordet som den kan snakke med
+settings-apps-service-remove = Fjern
+settings-apps-service-remove-app = Ikke la den snakke med { $service } lenger
+settings-apps-services-count = { $count ->
+    [one] { $count } tjeneste
+   *[other] { $count } tjenester
+}
+settings-apps-full-access-off = Den kjører i en sandkasse. Full tilgang fjerner sandkassen.
+settings-apps-full-access-give = Gi full tilgang

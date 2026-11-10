@@ -28,7 +28,7 @@
 
 	const label = (key: SshKey) => key.name || t('settings-passwords-ssh-unnamed');
 	const details = (key: SshKey) =>
-		[kind(key.kind), key.chip && t('settings-passwords-ssh-in-chip'), t('settings-passwords-ssh-added', { when: ago(key.added) })].filter(Boolean).join(' · ');
+		[kind(key.kind), !key.loaded && t('settings-passwords-ssh-put-away'), key.chip && t('settings-passwords-ssh-in-chip'), t('settings-passwords-ssh-added', { when: ago(key.added) })].filter(Boolean).join(' · ');
 
 	async function copy(id: string, text: () => Promise<string>) {
 		runner.error = '';
@@ -53,6 +53,11 @@
 <Section title={t('settings-passwords-ssh')} description={t('settings-passwords-ssh-description')}>
 	{#each sorted as key (key.fingerprint)}
 		<Row title={label(key)} description={details(key)} icon={KeyRound} truncate>
+			{#if !key.loaded}
+				<button type="button" class="button" disabled={runner.busy} onclick={() => runner.run(() => commands.keyringSshLoad({ fingerprint: key.fingerprint }))}>
+					{t('settings-passwords-ssh-load')}
+				</button>
+			{/if}
 			<IconButton
 				icon={copied === key.fingerprint ? Check : Copy}
 				label={t('settings-passwords-ssh-copy', { name: label(key) })}

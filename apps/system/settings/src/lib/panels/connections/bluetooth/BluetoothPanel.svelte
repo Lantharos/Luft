@@ -30,12 +30,11 @@
 	let forgetting = $state<BluetoothDevice | null>(null);
 	let inspecting = $state<string | null>(null);
 	let busy = $state<Record<string, Busy>>({});
-	let expanded = $state(false);
 	let problems = $state<Record<string, string>>({});
 
 	let adapter = $derived(bluetooth?.adapter ?? null);
 	let inspected = $derived(bluetooth?.paired.find((device) => device.path === inspecting));
-	let nearby = $derived(bluetooth ? (expanded ? bluetooth.nearby : bluetooth.nearby.slice(0, COLLAPSED)) : []);
+	let nearby = $derived(bluetooth ? bluetooth.nearby.slice(0, COLLAPSED) : []);
 
 	function visibilityLabel(timeout: number) {
 		return timeout ? t('settings-bluetooth-visible-for', { minutes: Math.round(timeout / 60) }) : t('settings-bluetooth-visible-until-off');
@@ -129,6 +128,25 @@
 	});
 </script>
 
+{#snippet nearbyRow(device: BluetoothDevice, close?: () => void)}
+	<ActionRow
+		title={device.name}
+		description={problems[device.path] ?? (busy[device.path] ? t(BUSY_LABELS[busy[device.path]]) : undefined)}
+		alert={Boolean(problems[device.path])}
+		icon={KIND_ICONS[device.kind]}
+		onclick={() => {
+			close?.();
+			void perform(device, 'pairing', pair);
+		}}
+	>
+		{#snippet trailing()}
+			{#if busy[device.path]}
+				<Spinner size={16} />
+			{/if}
+		{/snippet}
+	</ActionRow>
+{/snippet}
+
 {#if bluetooth}
 	{#if adapter}
 		<Section>
@@ -189,19 +207,7 @@
 			<Section title={t('settings-bluetooth-nearby')}>
 				{#each nearby as device (device.path)}
 					<div class="row-slot" animate:reorder in:item out:item>
-						<ActionRow
-							title={device.name}
-							description={problems[device.path] ?? (busy[device.path] ? t(BUSY_LABELS[busy[device.path]]) : undefined)}
-							alert={Boolean(problems[device.path])}
-							icon={KIND_ICONS[device.kind]}
-							onclick={() => perform(device, 'pairing', pair)}
-						>
-							{#snippet trailing()}
-								{#if busy[device.path]}
-									<Spinner size={16} />
-								{/if}
-							{/snippet}
-						</ActionRow>
+						{@render nearbyRow(device)}
 					</div>
 				{:else}
 					<Row title={t('settings-bluetooth-searching')} description={t('settings-bluetooth-searching.description')}>
@@ -209,7 +215,13 @@
 					</Row>
 				{/each}
 				{#if bluetooth.nearby.length > COLLAPSED}
-					<MoreRow hidden={bluetooth.nearby.length - COLLAPSED} bind:expanded />
+					<MoreRow hidden={bluetooth.nearby.length - COLLAPSED} title={t('settings-bluetooth-nearby')}>
+						{#snippet children(close)}
+							{#each bluetooth?.nearby ?? [] as device (device.path)}
+								{@render nearbyRow(device, close)}
+							{/each}
+						{/snippet}
+					</MoreRow>
 				{/if}
 			</Section>
 		{/if}

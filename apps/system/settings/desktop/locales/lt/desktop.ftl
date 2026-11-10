@@ -212,8 +212,6 @@ desktop-picture-filter = Paveikslėliai
 desktop-picture-unopenable = Šio paveikslėlio atidaryti negalima
 
 ## Users
-desktop-users-password-failed = Nepavyko pakeisti slaptažodžio: { $reason }
-desktop-users-password-timed-out = passwd nustojo atsakyti
 
 ## Updates
 desktop-updates-nvidia-summary = Išnaudokite visas NVIDIA vaizdo plokštės galimybes

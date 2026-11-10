@@ -21,7 +21,16 @@ pub fn run() -> ! {
     let state = bridge::State::default();
     luft_app::run(
         &state.events,
-        |window| bridge::register(events::declare(GLASS_WINDOW.apply(window)), &state),
+        |window| {
+            let asking = state.events.clone();
+            let window = GLASS_WINDOW
+                .apply_with_page_close(window)
+                .on_close_requested(move |_| {
+                    asking.emit(events::CLOSE_ASKED, ());
+                    false
+                });
+            bridge::register(events::declare(window), &state)
+        },
         |events| {
             udisks::watch::start(events.clone());
             trust::watch(events);

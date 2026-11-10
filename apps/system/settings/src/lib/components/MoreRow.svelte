@@ -3,10 +3,30 @@
 </script>
 
 <script lang="ts">
+	import type { Snippet } from 'svelte';
 	import { t } from '@luft/i18n';
-	import { Row } from '@luft/ui';
+	import { Dialog, Row } from '@luft/ui';
 
-	let { hidden, expanded = $bindable() }: { hidden: number; expanded: boolean } = $props();
+	interface Props {
+		hidden: number;
+		title: string;
+		children: Snippet<[close: () => void]>;
+	}
+
+	let { hidden, title, children }: Props = $props();
+
+	let open = $state(false);
+
+	const close = () => (open = false);
 </script>
 
-<Row title={expanded ? t('settings-more-fewer') : t('settings-more-show', { count: hidden })} {expanded} onclick={() => (expanded = !expanded)} />
+<Row title={t('settings-more-show', { count: hidden })} onclick={() => (open = true)} />
+
+{#if open}
+	<Dialog {title} wide onclose={close}>
+		<div class="row-group">{@render children(close)}</div>
+		{#snippet actions()}
+			<button type="button" class="button primary" onclick={close}>{t('settings-more-done')}</button>
+		{/snippet}
+	</Dialog>
+{/if}

@@ -329,3 +329,69 @@ settings-accounts-text-me = Më dërgo kodin me SMS
 settings-accounts-choose-phone = Në cilin numër ta dërgojë Apple kodin?
     .description = Dërgo një SMS
 settings-accounts-approve = Llogaria jote Apple përdor Mbrojtjen e avancuar të të dhënave. Mirato kërkesën në iPhone, iPad ose Mac që ky kompjuter të hapë iCloud Drive.
+
+## Apps
+
+settings-apps-defaults = Aplikacionet e parazgjedhura
+settings-apps-defaults-description = Përdoren kur hap lidhje, skedarë dhe dosje
+settings-apps-browser = Shfletuesi i uebit
+settings-apps-email = Posta elektronike
+settings-apps-calendar = Kalendari
+settings-apps-music = Muzika
+settings-apps-videos = Videot
+settings-apps-photos = Fotot
+settings-apps-text-editor = Redaktori i tekstit
+settings-apps-files = Skedarët
+settings-apps-archives = Arkiva
+settings-apps-choose = Zgjidh
+settings-apps-startup = Nisja
+settings-apps-startup-description = Këto aplikacione hapen kur hyn
+settings-apps-startup-app = Hap { $app } kur hyn
+settings-apps-startup-remove = Hiq { $app } nga nisja
+settings-apps-startup-add = Shto aplikacion
+settings-apps-startup-add-title = Shto një aplikacion në nisje
+settings-apps-startup-add-description = Zgjidh një aplikacion që hapet sa herë hyn.
+settings-apps-search = Kërko aplikacione
+settings-apps-no-match = Asnjë aplikacion nuk përputhet me kërkimin
+settings-apps-cancel = Anulo
+settings-apps-permissions = Lejet
+settings-apps-location = Vendndodhja
+settings-apps-camera = Kamera
+settings-apps-clipboard = Kujtesa e fragmenteve në sfond
+settings-apps-full-access = Qasje e plotë
+settings-apps-full-access-hint = Punon jashtë kutisë së izolimit dhe mund të bëjë gjithçka që mund të bëjë një program që e nisni vetë. Heqja vlen nga hapja e ardhshme.
+settings-apps-full-access-remove = Hiq
+settings-apps-full-access-remove-app = Hiq qasjen e plotë për { $app }
+settings-apps-passwords = Fjalëkalimet e ruajtura
+settings-apps-passwords-forget = Harro
+settings-apps-passwords-forget-app = Lëre { $app } të pyesë sërish
+settings-apps-permissions-allowed = { $allowed } nga { $total } të lejuara
+settings-apps-permissions-description = Aplikacionet në një kuti izolimi marrin skedarët e tyre dhe vetëm atë që lejoni këtu.
+settings-apps-sandbox-only = Asgjë jashtë kutisë së izolimit
+settings-apps-folders = Dosje
+settings-apps-folders-hint = Nga hapja e ardhshme mund të lexojë dhe ndryshojë gjithçka në këto dosje.
+settings-apps-folders-count = { $count ->
+    [one] { $count } dosje
+   *[other] { $count } dosje
+}
+settings-apps-folder-add = Shto dosje
+settings-apps-folder-remove = Hiq
+settings-apps-folder-remove-app = Ndalo ndarjen e { $folder }
+settings-apps-usb = Pajisje USB
+settings-apps-usb-hint = Si çelësa sigurie, telefona dhe mikrokontrollues
+settings-apps-serial = Pajisje serike
+settings-apps-serial-hint = Si printera 3D dhe pllaka të lidhura me USB
+settings-apps-folder-read-only = Vetëm për lexim
+settings-apps-downloads = Dosja Shkarkimet
+settings-apps-downloads-hint = Mund të ruajë skedarë te dosja Shkarkimet dhe të hapë ata që ndodhen aty, që nga hapja e radhës.
+settings-apps-internet = Internet
+settings-apps-internet-hint = Mund të dalë në internet që nga hapja e radhës.
+settings-apps-service-hint = Një shërbim i desktopit me të cilin mund të komunikojë
+settings-apps-service-remove = Hiq
+settings-apps-service-remove-app = Mos e lejo më të komunikojë me { $service }
+settings-apps-services-count = { $count ->
+    [one] { $count } shërbim
+   *[other] { $count } shërbime
+}
+settings-apps-full-access-off = Punon në një kuti izolimi. Qasja e plotë e heq kutinë e izolimit.
+settings-apps-full-access-give = Jep qasje të plotë

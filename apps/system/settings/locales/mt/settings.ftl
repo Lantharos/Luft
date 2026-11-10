@@ -30,7 +30,6 @@ settings-more-show = { $count ->
         [many] Uri { $count } aktar
        *[other] Uri { $count } aktar
     }
-settings-more-fewer = Uri inqas
 settings-time-picker = { $label }, { $time }
 settings-time-picker-hour = Siegħa
 settings-time-picker-minute = Minuta

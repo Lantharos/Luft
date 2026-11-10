@@ -10,7 +10,7 @@ settings-search-empty = Nothing matches that.
 # Headings above the groups of pages in the Settings sidebar
 settings-group-connections = Connections
 settings-group-devices = Devices
-settings-group-look = Look & feel
+settings-group-look = Look and feel
 settings-group-protection = Protection
 settings-group-system = System
 
@@ -29,12 +29,13 @@ settings-pen-missing = No pen or drawing tablet is connected
 # Screen-reader label of the back button on a page inside a panel. $page is the panel's title, like "Network".
 settings-navigate-back = Back
 settings-navigate-forward = Forward
-# Last row of a shortened list; it shows the rest of the list
+# Last row of a shortened list; it opens the whole list
 settings-more-show = { $count ->
         [one] Show { $count } more
        *[other] Show { $count } more
     }
-settings-more-fewer = Show fewer
+# Button that closes a list or a group of settings opened from a row
+settings-more-done = Done
 # Screen-reader label of a time picker button. $label names the setting, like "From"; $time is the chosen time.
 settings-time-picker = { $label }, { $time }
 # Screen-reader label of the list of hours in a time picker

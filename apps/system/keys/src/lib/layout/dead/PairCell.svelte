@@ -1,7 +1,7 @@
 <script lang="ts">
 	import ArrowRight from '@lucide/svelte/icons/arrow-right';
 	import Ellipsis from '@lucide/svelte/icons/ellipsis';
-	import { MenuButton, MenuItem, MenuSeparator, tooltip } from '@luft/ui';
+	import { MenuButton, MenuItem, MenuSeparator, TextCell, tooltip } from '@luft/ui';
 	import type { DeadKey, Pair } from '#lib/bindings.js';
 	import type { LayoutEditor } from '../editor.svelte';
 
@@ -36,19 +36,12 @@
 		<ArrowRight size={14} class="flex-none text-[var(--text-muted)]" />
 		<span class="result truncate">{pair.text}</span>
 	{:else}
-		<input class="base" value={pair.base} spellcheck="false" aria-label="Key" placeholder="a" oninput={setBase} />
+		<TextCell value={pair.base} label="Key" placeholder="a" single large invalid={Boolean(problem)} oninput={setBase} />
 		<ArrowRight size={14} class="flex-none text-[var(--text-muted)]" />
 		{#if next}
 			<span class="result chained truncate" {@attach tooltip(`Leads into ${next.name}`)}>{next.symbol}</span>
 		{:else}
-			<input
-				class="result"
-				value={pair.text}
-				spellcheck="false"
-				aria-label="Makes"
-				placeholder="ž"
-				oninput={(event) => editor?.updatePair(key.keysym, index, { text: event.currentTarget.value })}
-			/>
+			<TextCell value={pair.text} label="Makes" placeholder="ž" large oninput={(event) => editor?.updatePair(key.keysym, index, { text: event.currentTarget.value })} />
 		{/if}
 		<MenuButton label="Options" class="more" align="end" minWidth={220}>
 			{#snippet trigger()}
@@ -131,15 +124,6 @@
 	.result {
 		flex: 1;
 		padding-inline: 6px;
-	}
-
-	input:focus {
-		background: var(--control);
-		box-shadow: inset 0 0 0 1.5px var(--accent);
-	}
-
-	input::placeholder {
-		color: color-mix(in oklab, var(--text-muted) 50%, transparent);
 	}
 
 	.chained {

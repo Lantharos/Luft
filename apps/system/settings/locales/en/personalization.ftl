@@ -185,6 +185,8 @@ settings-fonts-remove = Remove
 ## Cursors
 
 settings-cursors = Cursor
+# Title of the window that lists every installed cursor theme
+settings-cursors-all = All cursors
 settings-cursors-size = Size
 settings-cursors-size-label = Cursor size
 settings-cursors-size-default = Default

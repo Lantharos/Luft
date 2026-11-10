@@ -2,9 +2,10 @@ import { luftFonts, luftLocales, sabineTarget } from '@luft/ui/vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vite';
+import { settingsRows } from './rows';
 
 export default defineConfig({
-	plugins: [luftFonts(), luftLocales({ dirs: ['locales', '../../../packages/web/settings-pages/locales'] }), sabineTarget(), tailwindcss(), svelte()],
+	plugins: [luftFonts(), luftLocales({ dirs: ['locales', '../../../packages/web/settings-pages/locales'] }), sabineTarget(), settingsRows(), tailwindcss(), svelte()],
 	clearScreen: false,
 	server: {
 		port: 5174,

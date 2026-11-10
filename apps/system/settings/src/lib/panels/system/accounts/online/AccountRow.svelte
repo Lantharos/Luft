@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { bytes, Row, Spinner, TextField } from '@luft/ui';
+	import { bytes, Dialog, Row, Spinner, TextField } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import type { Account, Drive } from '#lib/bindings.js';
 	import { remove } from './api';
@@ -18,6 +18,7 @@
 	let name = $derived(account.name);
 	let confirming = $state(false);
 	let removing = $state(false);
+	let unsynced = $state(false);
 	let problem = $state('');
 
 	let info = $derived(provider(account.provider));
@@ -50,23 +51,31 @@
 		await commands.accountsRename({ account: account.id, name: wanted }).catch((reason) => (problem = String(reason)));
 	}
 
-	function toggle() {
-		if (open) void saveName();
-		open = !open;
+	function close() {
+		void saveName();
+		open = false;
 		confirming = false;
+		unsynced = false;
 	}
 
 	async function forget() {
 		removing = true;
 		problem = '';
-		await remove(account.id).catch((reason) => (problem = String(reason)));
+		try {
+			unsynced = (await remove(account.id, unsynced)) === 'mayLoseFiles';
+		} catch (reason) {
+			problem = String(reason);
+		}
 		removing = false;
 	}
 </script>
 
-{#snippet details()}
-	<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
-	<div class="flex flex-col gap-4 pt-1" onclick={(event) => event.stopPropagation()}>
+<Row title={account.name} {description} icon={info.icon} onclick={() => (open = true)} truncate>
+	{#if drive?.state === 'connecting' && !removing}<Spinner />{/if}
+</Row>
+
+{#if open}
+	<Dialog title={account.name} wide onclose={close}>
 		{#if account.standing.kind === 'signInAgain'}
 			<p class="text-[13px] leading-relaxed text-[var(--danger)]">{account.standing.reason}</p>
 		{/if}
@@ -88,11 +97,13 @@
 		{#if problem}
 			<p class="text-[12.5px] text-[var(--danger)]">{problem}</p>
 		{/if}
-		<div class="flex flex-wrap items-center gap-2">
+		{#if confirming}
+			<p class="text-[12.5px] text-[var(--text-muted)]">{t('settings-accounts-remove-note', { provider: info.name })}</p>
+		{/if}
+		{#snippet actions()}
 			{#if signInAgain}
-				<button type="button" class="button primary" onclick={onsigninagain}>{t('settings-accounts-sign-in-again')}</button>
+				<button type="button" class="button primary mr-auto" onclick={onsigninagain}>{t('settings-accounts-sign-in-again')}</button>
 			{/if}
-			<span class="flex-1"></span>
 			{#if confirming}
 				<button type="button" class="button" onclick={() => (confirming = false)}>{t('settings-accounts-keep')}</button>
 				<button type="button" class="button danger" disabled={removing} onclick={forget}>
@@ -100,17 +111,20 @@
 				</button>
 			{:else}
 				<button type="button" class="button danger" onclick={() => (confirming = true)}>{t('settings-accounts-remove')}</button>
+				<button type="button" class="button primary" onclick={close}>{t('settings-more-done')}</button>
 			{/if}
-		</div>
-		{#if confirming}
-			<p class="-mt-2 text-right text-[12.5px] text-[var(--text-muted)]">{t('settings-accounts-remove-note', { provider: info.name })}</p>
-		{/if}
-	</div>
-{/snippet}
+		{/snippet}
+	</Dialog>
+{/if}
 
-<Row title={account.name} {description} icon={info.icon} expanded={open} onclick={toggle} below={open ? details : undefined} truncate>
-	{#if drive?.state === 'connecting' && !removing}<Spinner />{/if}
-</Row>
+{#if unsynced}
+	<Dialog title={t('settings-accounts-unsynced-title')} description={t('settings-accounts-unsynced-description', { name: account.name })} onclose={() => !removing && (unsynced = false)}>
+		{#snippet actions()}
+			<button type="button" class="button" disabled={removing} onclick={() => (unsynced = false)}>{t('settings-accounts-keep')}</button>
+			<button type="button" class="button danger" disabled={removing} onclick={forget}>{#if removing}<Spinner />{/if}{t('settings-accounts-unsynced-remove')}</button>
+		{/snippet}
+	</Dialog>
+{/if}
 
 <style>
 	.details {

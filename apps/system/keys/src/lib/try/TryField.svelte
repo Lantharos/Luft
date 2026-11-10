@@ -5,7 +5,7 @@
 <script lang="ts">
 	import { tick } from 'svelte';
 	import X from '@lucide/svelte/icons/x';
-	import { tooltip } from '@luft/ui';
+	import { TextArea, tooltip } from '@luft/ui';
 
 	interface Props {
 		label: string;
@@ -22,7 +22,7 @@
 	let { label, placeholder, rows = 2, onkeydown, onkeyup, onfocus, onblur, onabandon, oncleared }: Props = $props();
 
 	let field = $state<HTMLTextAreaElement>();
-	let mirror = $state<HTMLDivElement>();
+	let scrolled = $state(0);
 	let preedit = $state('');
 	let start = $state(0);
 	let leading = $state('');
@@ -59,7 +59,7 @@
 	}
 
 	function follow() {
-		if (mirror && field) mirror.scrollTop = field.scrollTop;
+		if (field) scrolled = field.scrollTop;
 	}
 
 	export function cancel() {
@@ -127,89 +127,42 @@
 	}
 </script>
 
-<div class="try">
-	{#if preedit}
-		<div bind:this={mirror} class="mirror" aria-hidden="true">{leading}<span class="preedit">{preedit}</span></div>
-	{/if}
-	<textarea
-		bind:this={field}
-		{rows}
-		inputmode="none"
-		spellcheck="false"
-		autocomplete="off"
-		data-own-undo
-		aria-label={label}
-		{placeholder}
-		{onkeydown}
-		{onkeyup}
-		{onfocus}
-		{onblur}
-		oninput={input}
-		onpointerdown={abandon}
-		onscroll={follow}
-	></textarea>
-	{#if !empty}
-		<button type="button" class="clear" aria-label="Clear" {@attach tooltip('Clear')} onpointerdown={(event) => event.preventDefault()} onclick={clear}>
-			<X size={15} />
-		</button>
-	{/if}
-</div>
+<TextArea
+	bind:element={field}
+	{label}
+	{rows}
+	large
+	inputmode="none"
+	data-own-undo
+	{placeholder}
+	{onkeydown}
+	{onkeyup}
+	{onfocus}
+	{onblur}
+	oninput={input}
+	onpointerdown={abandon}
+	onscroll={follow}
+	overlay={preedit ? mirror : undefined}
+	trailing={empty ? undefined : clearing}
+/>
+
+{#snippet mirror()}
+	<div style:transform="translateY({-scrolled}px)">{leading}<span class="preedit">{preedit}</span></div>
+{/snippet}
+
+{#snippet clearing()}
+	<button type="button" class="clear" aria-label="Clear" {@attach tooltip('Clear')} onpointerdown={(event) => event.preventDefault()} onclick={clear}>
+		<X size={15} />
+	</button>
+{/snippet}
 
 <style>
-	.try {
-		position: relative;
-		border-radius: 18px;
-		background: var(--control);
-		box-shadow: inset 0 0 0 1px var(--hairline);
-		transition: box-shadow var(--motion-tap) var(--ease-decelerate);
-	}
-
-	.try:focus-within {
-		box-shadow: inset 0 0 0 1.5px var(--accent);
-	}
-
-	textarea,
-	.mirror {
-		padding: 12px 44px 12px 16px;
-		font-size: 17px;
-		line-height: 1.5;
-		white-space: pre-wrap;
-		overflow-wrap: anywhere;
-	}
-
-	textarea {
-		position: relative;
-		display: block;
-		width: 100%;
-		resize: none;
-		background: transparent;
-		color: var(--text);
-		caret-color: var(--accent);
-		outline: none;
-		scrollbar-width: none;
-	}
-
-	textarea::placeholder {
-		color: var(--text-muted);
-	}
-
-	.mirror {
-		position: absolute;
-		inset: 0;
-		overflow: hidden;
-		color: transparent;
-		pointer-events: none;
-	}
-
 	.preedit {
 		text-decoration: underline 1.5px var(--accent);
 		text-underline-offset: 5px;
 	}
 
 	.clear {
-		position: absolute;
-		top: 9px;
-		right: 9px;
 		display: grid;
 		height: 28px;
 		width: 28px;

@@ -1,4 +1,5 @@
 mod mounts;
+mod reclaim;
 mod tree;
 mod walk;
 
@@ -13,6 +14,8 @@ use parking_lot::Mutex;
 use serde::Serialize;
 
 use crate::events::SPACE_UPDATE;
+pub use reclaim::Cleanup;
+use reclaim::{Places, Reclaim};
 use specta::Type;
 use tree::{Node, SpaceView};
 
@@ -30,6 +33,7 @@ struct Scan {
     cancelled: Arc<AtomicBool>,
     unreadable: Arc<AtomicU64>,
     focus: Arc<Mutex<Vec<String>>>,
+    places: Option<Arc<Places>>,
     started: Instant,
     took: Arc<Mutex<Option<Duration>>>,
 }
@@ -45,6 +49,7 @@ pub struct SpaceUpdate {
     total_size: u64,
     unreadable: u64,
     seconds: f64,
+    reclaim: Option<Reclaim>,
 }
 
 impl Scan {
@@ -60,6 +65,10 @@ impl Scan {
             total_size: self.root.size(),
             unreadable: self.unreadable.load(Ordering::Relaxed),
             seconds: took.unwrap_or_else(|| self.started.elapsed()).as_secs_f64(),
+            reclaim: self
+                .places
+                .as_ref()
+                .map(|places| places.reclaim(&self.root)),
         }
     }
 
@@ -138,11 +147,13 @@ impl Explorer {
             return Err("Only folders can be measured".to_owned());
         }
         let name = path.file_name().unwrap_or(path.as_os_str()).to_owned();
+        let cancelled = Arc::default();
         let scan = Scan {
             id: self.0.lock().as_ref().map_or(1, |scan| scan.id + 1),
             root: Node::root(&name, walk::allocated(&metadata)),
+            places: Places::under(&path, &cancelled),
             path,
-            cancelled: Arc::default(),
+            cancelled,
             unreadable: Arc::default(),
             focus: Arc::default(),
             started: Instant::now(),
@@ -180,7 +191,16 @@ impl Explorer {
             .trash(gio::Cancellable::NONE)
             .map_err(|error| error.to_string())?;
         parent.forget(name);
+        if let Some(places) = &scan.places {
+            places.forget_largest();
+        }
         Ok(scan.update())
+    }
+
+    pub fn clean(&self, what: Cleanup) -> Result<(), String> {
+        let scan = self.current()?;
+        let places = scan.places.ok_or("Nothing here can be cleaned up")?;
+        places.clean(what)
     }
 
     pub async fn show(&self, components: Vec<String>, token: Option<&str>) -> Result<(), String> {

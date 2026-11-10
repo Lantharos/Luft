@@ -10,7 +10,7 @@ const KESTREL: &str = "com.lantharos.Kestrel";
 const PATH: &str = "/com/lantharos/Kestrel/Pens";
 const INTERFACE: &str = "com.lantharos.Kestrel.Pens";
 const BUS: &str = "org.freedesktop.DBus";
-const NOTES: &str = "com.lantharos.Heft.desktop";
+const NOTES: &str = "com.lantharos.heft.desktop";
 
 #[derive(Serialize, Clone, PartialEq, Eq, Type)]
 #[serde(rename_all = "lowercase")]

@@ -20,6 +20,9 @@ export const commands = {
 	disksDeletePartition: (params: {
 		block: string,
 	}, options?: CallOptions) => invoke<null>("disks_delete_partition", params, options),
+	disksFinishMove: (params: {
+		id: string,
+	}, options?: CallOptions) => invoke<null>("disks_finish_move", params, options),
 	disksForgetMoveFailure: (options?: CallOptions) => invoke<null>("disks_forget_move_failure", {}, options),
 	disksForgetPassphrase: (params: {
 		block: string,
@@ -57,6 +60,7 @@ export const commands = {
 		block: string,
 		path: string,
 	}, options?: CallOptions) => invoke<null>("disks_image_restore", params, options),
+	disksInterruptedMoves: (options?: CallOptions) => invoke<InterruptedMove[]>("disks_interrupted_moves", {}, options),
 	disksLabel: (params: {
 		block: string,
 		label: string,
@@ -118,6 +122,9 @@ export const commands = {
 	disksUnmount: (params: {
 		block: string,
 	}, options?: CallOptions) => invoke<null>("disks_unmount", params, options),
+	spaceClean: (params: {
+		what: Cleanup,
+	}, options?: CallOptions) => invoke<null>("space_clean", params, options),
 	spaceScan: (params: {
 		path: string,
 	}, options?: CallOptions) => invoke<SpaceUpdate>("space_scan", params, options),
@@ -187,6 +194,7 @@ export const events = {
 	appearancePosture: (callback: (payload: Posture) => void) => listen<Posture>("appearance.posture", callback),
 	appearanceTypography: (callback: (payload: Typography) => void) => listen<Typography>("appearance.typography", callback),
 	disksChanged: (callback: (payload: Snapshot) => void) => listen<Snapshot>("disks.changed", callback),
+	disksCloseAsked: (callback: (payload: null) => void) => listen<null>("disks.closeAsked", callback),
 	disksImage: (callback: (payload: ImageProgress) => void) => listen<ImageProgress>("disks.image", callback),
 	disksPlan: (callback: (payload: MoveProgress) => void) => listen<MoveProgress>("disks.plan", callback),
 	disksSystem: (callback: (payload: SystemStep) => void) => listen<SystemStep>("disks.system", callback),
@@ -202,6 +210,12 @@ export const events = {
 export type Activation = {
 	arguments: string[],
 	workingDirectory: string | null,
+};
+
+export type Amount = {
+	size: number,
+	items: number,
+	measured: boolean,
 };
 
 export type AppIconStyle = "default" | "tinted" | "clear";
@@ -233,6 +247,8 @@ export type ChosenImage = {
 	name: string,
 	size: number,
 };
+
+export type Cleanup = "trash" | "downloads" | "caches";
 
 export type Corners = "rounded" | "square";
 
@@ -335,9 +351,20 @@ export type ImageProgress = {
 	error: string | null,
 };
 
+export type InterruptedMove = {
+	id: string,
+	drive: string,
+	label: string,
+};
+
 export type Job = {
 	operation: string,
 	progress: number | null,
+};
+
+export type LargeFile = {
+	path: string[],
+	size: number,
 };
 
 export type Launch = {
@@ -479,6 +506,13 @@ export type Protection = {
 	systemResize: string,
 };
 
+export type Reclaim = {
+	trash: Amount | null,
+	downloads: Amount | null,
+	caches: Amount | null,
+	largest: LargeFile[],
+};
+
 export type Removed = {
 	grown: number,
 	needsKey: boolean,
@@ -521,6 +555,7 @@ export type SpaceUpdate = {
 	totalSize: number,
 	unreadable: number,
 	seconds: number,
+	reclaim: Reclaim | null,
 };
 
 export type SpaceView = {

@@ -27,7 +27,6 @@ settings-more-show = { $count ->
         [one] Vis { $count } til
        *[other] Vis { $count } til
     }
-settings-more-fewer = Vis færre
 settings-time-picker = { $label }, { $time }
 settings-time-picker-hour = Time
 settings-time-picker-minute = Minutt

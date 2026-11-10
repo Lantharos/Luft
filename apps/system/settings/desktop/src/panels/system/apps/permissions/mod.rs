@@ -9,7 +9,8 @@ use std::sync::Once;
 use luft_app::apps::App;
 use luft_app::dbus;
 use luft_app::identity::permissions::{
-    self, Apps, BUS, DEVICES, DOWNLOADS, FOLDERS, NETWORK, NO, READ_ONLY_FOLDERS,
+    self, Apps, BUS, DEVICES, DOWNLOADS, FOLDERS, MICROPHONE, NETWORK, NO, READ_ONLY_FOLDERS, X11,
+    YES,
 };
 use luft_app::{Commands, Empty, Events};
 use luft_i18n::t;
@@ -44,6 +45,8 @@ struct AppAccess {
     devices: Vec<String>,
     online: bool,
     downloads: bool,
+    x11: bool,
+    microphone: bool,
     services: Vec<String>,
 }
 
@@ -118,6 +121,12 @@ fn open(closed: &HashMap<String, Vec<String>>, id: &str) -> bool {
         .is_none_or(|answer| answer != NO)
 }
 
+fn given(answers: &HashMap<String, Vec<String>>, id: &str) -> bool {
+    answers
+        .get(id)
+        .is_some_and(|answer| answer.first().map(String::as_str) == Some(YES))
+}
+
 fn by_app(apps: Apps) -> HashMap<String, Vec<String>> {
     apps.into_iter()
         .filter(|(app, _)| !app.is_empty())
@@ -140,6 +149,9 @@ async fn read(connection: &Connection) -> zbus::Result<Vec<AppAccess>> {
     let offline = by_app(permissions::lookup(connection, NETWORK.table, NETWORK.id).await?);
     let without_downloads =
         by_app(permissions::lookup(connection, DOWNLOADS.table, DOWNLOADS.id).await?);
+    let x11 = by_app(permissions::lookup(connection, X11.table, X11.id).await?);
+    let microphone =
+        by_app(permissions::lookup(connection, MICROPHONE.table, MICROPHONE.id).await?);
     let services = by_app(permissions::lookup(connection, BUS.table, BUS.id).await?);
     let app_images: BTreeSet<String> = appimage::list().into_iter().map(|app| app.id).collect();
     let ids: BTreeSet<&String> = location
@@ -170,6 +182,8 @@ async fn read(connection: &Connection) -> zbus::Result<Vec<AppAccess>> {
             devices: devices.get(id).cloned().unwrap_or_default(),
             online: open(&offline, id),
             downloads: open(&without_downloads, id),
+            x11: given(&x11, id),
+            microphone: given(&microphone, id),
             services: services.get(id).cloned().unwrap_or_default(),
         })
         .collect();

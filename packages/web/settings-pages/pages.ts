@@ -29,6 +29,7 @@ export type SubpageId =
 	| 'sound/custom'
 	| 'input/shortcuts'
 	| 'input/dictation'
+	| 'privacy/sharing'
 	| 'security/encryption'
 	| 'security/keyring'
 	| 'security/remote-login'
@@ -105,6 +106,7 @@ export const SUBPAGES: Page<SubpageId>[] = [
 	page('sound/custom', 'settings-page-custom-sounds', 'audio-x-generic-symbolic'),
 	page('input/shortcuts', 'settings-page-shortcuts', 'preferences-desktop-keyboard-shortcuts-symbolic', { keywords: [] }),
 	page('input/dictation', 'settings-page-dictation', 'audio-input-microphone-symbolic', { copilotKey: 'settings-page-dictation' }),
+	page('privacy/sharing', 'settings-page-sharing', 'video-display-symbolic'),
 	page('security/encryption', 'settings-page-encryption', 'drive-harddisk-symbolic', { keywords: [] }),
 	page('security/keyring', 'settings-page-keyring', 'dialog-password-symbolic', { keywords: [] }),
 	page('security/remote-login', 'settings-page-remote-login', 'utilities-terminal-symbolic'),

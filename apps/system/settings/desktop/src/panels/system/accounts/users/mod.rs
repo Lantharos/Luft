@@ -123,6 +123,6 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
             change("SetRealName", &name.trim()).await
         })
         .command_async("users_choose_picture", choose_picture)
-        .command("users_change_password", password::change);
+        .command_async("users_change_password", password::change);
     luft_fingerprint::register(window, events)
 }

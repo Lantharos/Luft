@@ -13,6 +13,8 @@ const RULES: Rules = Rules {
     outward_links: false,
     keep_metadata: false,
 };
+const TAR_MAGIC_AT: usize = 257;
+const TAR_MAGIC: &[u8] = b"ustar";
 const TAR_SUFFIXES: [(&str, Codec); 8] = [
     (".tar", Codec::Plain),
     (".tar.gz", Codec::Gzip),
@@ -48,6 +50,23 @@ impl Format {
             .iter()
             .find(|(suffix, _)| name.ends_with(suffix))
             .map(|(_, codec)| Format::Tar(*codec))
+    }
+}
+
+impl Format {
+    pub fn matches(self, archive: &Path) -> bool {
+        let mut start = [0; TAR_MAGIC_AT + TAR_MAGIC.len()];
+        let read = File::open(archive)
+            .and_then(|mut file| file.read(&mut start))
+            .unwrap_or(0);
+        let start = &start[..read];
+        match self {
+            Format::Zip => start.starts_with(b"PK\x03\x04"),
+            Format::Tar(Codec::Plain) => start.get(TAR_MAGIC_AT..) == Some(TAR_MAGIC),
+            Format::Tar(Codec::Gzip) => start.starts_with(&[0x1f, 0x8b]),
+            Format::Tar(Codec::Bzip2) => start.starts_with(b"BZh"),
+            Format::Tar(Codec::Xz) => start.starts_with(&[0xfd, b'7', b'z', b'X', b'Z', 0]),
+        }
     }
 }
 

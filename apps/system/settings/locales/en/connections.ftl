@@ -351,8 +351,10 @@ settings-post-name = Name
     .description = What other devices call this computer
 settings-post-rename = Rename
 settings-post-folder = Save received files in
+# Where received files go unless another folder is chosen: a folder called Post inside Downloads
+settings-post-folder-default = Post in Downloads
 settings-post-folder-change = Change
-settings-post-folder-downloads = Use Downloads
+settings-post-folder-downloads = Use Post in Downloads
 settings-post-devices = Your devices
 settings-post-devices-none = None yet
 # $device is a device's name

@@ -16,7 +16,7 @@
 	let shown = $derived(printers.find((printer) => printer.name === opened));
 
 	$effect(() => {
-		void commands.printersState().then((current) => (known = current)).catch(() => (known = { printers: [], jobs: [] }));
+		void commands.printersState().then((current) => (known = current)).catch(() => (known = { printers: [], available: [], jobs: [] }));
 		return events.printersChanged((current) => (known = current));
 	});
 
@@ -50,6 +50,15 @@
 		{/each}
 		<Row title={t('settings-printers-add')} description={t('settings-printers-add-description')} onclick={() => (adding = true)} />
 	</Section>
+	{#if known.available.length}
+		<Section title={t('settings-printers-available')} description={t('settings-printers-available-description')}>
+			{#each known.available as printer (printer.name)}
+				<Row title={printer.description || printer.name} description={printer.location || undefined} icon={PrinterIcon}>
+					<button type="button" class="button" onclick={() => commands.printersAddAvailable({ name: printer.name })}>{t('settings-printers-add-button')}</button>
+				</Row>
+			{/each}
+		</Section>
+	{/if}
 {/if}
 
 {#if adding}

@@ -339,3 +339,73 @@ settings-accounts-text-me = Wyślij mi kod SMS-em
 settings-accounts-choose-phone = Na który numer Apple ma wysłać kod?
     .description = Wyślij SMS
 settings-accounts-approve = Twoje konto Apple używa zaawansowanej ochrony danych. Zatwierdź prośbę na iPhonie, iPadzie lub Macu, aby ten komputer mógł otworzyć iCloud Drive.
+
+## Apps
+
+settings-apps-defaults = Aplikacje domyślne
+settings-apps-defaults-description = Używane do otwierania linków, plików i folderów
+settings-apps-browser = Przeglądarka internetowa
+settings-apps-email = Poczta e-mail
+settings-apps-calendar = Kalendarz
+settings-apps-music = Muzyka
+settings-apps-videos = Wideo
+settings-apps-photos = Zdjęcia
+settings-apps-text-editor = Edytor tekstu
+settings-apps-files = Pliki
+settings-apps-archives = Archiwa
+settings-apps-choose = Wybierz
+settings-apps-startup = Autostart
+settings-apps-startup-description = Te aplikacje otwierają się po zalogowaniu
+settings-apps-startup-app = Otwieraj aplikację { $app } po zalogowaniu
+settings-apps-startup-remove = Usuń { $app } z autostartu
+settings-apps-startup-add = Dodaj aplikację
+settings-apps-startup-add-title = Dodaj aplikację do autostartu
+settings-apps-startup-add-description = Wybierz aplikację, która będzie się otwierać po każdym zalogowaniu.
+settings-apps-search = Szukaj aplikacji
+settings-apps-no-match = Brak aplikacji pasujących do wyszukiwania
+settings-apps-cancel = Anuluj
+settings-apps-permissions = Uprawnienia
+settings-apps-location = Lokalizacja
+settings-apps-camera = Kamera
+settings-apps-clipboard = Schowek w tle
+settings-apps-full-access = Pełny dostęp
+settings-apps-full-access-hint = Działa poza swoją piaskownicą i może wszystko, co program uruchomiony przez ciebie. Usunięcie zacznie działać przy następnym uruchomieniu.
+settings-apps-full-access-remove = Usuń
+settings-apps-full-access-remove-app = Usuń pełny dostęp aplikacji { $app }
+settings-apps-passwords = Zapisane hasła
+settings-apps-passwords-forget = Zapomnij
+settings-apps-passwords-forget-app = Pozwól aplikacji { $app } zapytać ponownie
+settings-apps-permissions-allowed = Dozwolone: { $allowed } z { $total }
+settings-apps-permissions-description = Aplikacje w piaskownicy dostają własne pliki i tylko to, na co tu zezwolisz.
+settings-apps-sandbox-only = Nic poza piaskownicą
+settings-apps-folders = Foldery
+settings-apps-folders-hint = Od następnego uruchomienia może czytać i zmieniać wszystko w tych folderach.
+settings-apps-folders-count = { $count ->
+    [one] { $count } folder
+    [few] { $count } foldery
+    [many] { $count } folderów
+   *[other] { $count } folderu
+}
+settings-apps-folder-add = Dodaj folder
+settings-apps-folder-remove = Usuń
+settings-apps-folder-remove-app = Przestań udostępniać { $folder }
+settings-apps-usb = Urządzenia USB
+settings-apps-usb-hint = Na przykład klucze bezpieczeństwa, telefony i mikrokontrolery
+settings-apps-serial = Urządzenia szeregowe
+settings-apps-serial-hint = Na przykład drukarki 3D i płytki podłączone przez USB
+settings-apps-folder-read-only = Tylko do odczytu
+settings-apps-downloads = Folder Pobrane
+settings-apps-downloads-hint = Może zapisywać pliki w folderze Pobrane i otwierać te, które się w nim znajdują, od następnego uruchomienia.
+settings-apps-internet = Internet
+settings-apps-internet-hint = Może łączyć się z internetem od następnego uruchomienia.
+settings-apps-service-hint = Usługa na pulpicie, z którą może się komunikować
+settings-apps-service-remove = Usuń
+settings-apps-service-remove-app = Zabroń komunikacji z { $service }
+settings-apps-services-count = { $count ->
+    [one] { $count } usługa
+    [few] { $count } usługi
+    [many] { $count } usług
+   *[other] { $count } usługi
+}
+settings-apps-full-access-off = Działa w piaskownicy. Pełny dostęp usuwa piaskownicę.
+settings-apps-full-access-give = Daj pełny dostęp

@@ -329,3 +329,69 @@ settings-accounts-text-me = Envia’m un codi per SMS
 settings-accounts-choose-phone = A quin número ha d’enviar Apple el codi?
     .description = Envia un SMS
 settings-accounts-approve = El vostre compte d’Apple fa servir la protecció de dades avançada. Aproveu la sol·licitud a l’iPhone, l’iPad o el Mac perquè aquest ordinador pugui obrir l’iCloud Drive.
+
+## Apps
+
+settings-apps-defaults = Aplicacions predeterminades
+settings-apps-defaults-description = S’utilitzen quan obriu enllaços, fitxers i carpetes
+settings-apps-browser = Navegador web
+settings-apps-email = Correu electrònic
+settings-apps-calendar = Calendari
+settings-apps-music = Música
+settings-apps-videos = Vídeos
+settings-apps-photos = Fotos
+settings-apps-text-editor = Editor de text
+settings-apps-files = Fitxers
+settings-apps-archives = Arxius comprimits
+settings-apps-choose = Trieu
+settings-apps-startup = Arrencada
+settings-apps-startup-description = Aquestes aplicacions s’obren quan inicieu la sessió
+settings-apps-startup-app = Obre { $app } en iniciar la sessió
+settings-apps-startup-remove = Treu { $app } de l’inici
+settings-apps-startup-add = Afegeix una aplicació
+settings-apps-startup-add-title = Afegiu una aplicació d’arrencada
+settings-apps-startup-add-description = Trieu una aplicació que s’obri cada vegada que inicieu la sessió.
+settings-apps-search = Cerca aplicacions
+settings-apps-no-match = Cap aplicació no coincideix amb la cerca
+settings-apps-cancel = Cancel·la
+settings-apps-permissions = Permisos
+settings-apps-location = Ubicació
+settings-apps-camera = Càmera
+settings-apps-clipboard = Porta-retalls en segon pla
+settings-apps-full-access = Accés complet
+settings-apps-full-access-hint = Funciona fora del seu entorn aïllat i pot fer tot el que pot fer un programa que obres tu. Treure-ho s'aplica la pròxima vegada que s'obri.
+settings-apps-full-access-remove = Treu
+settings-apps-full-access-remove-app = Treu l’accés complet a { $app }
+settings-apps-passwords = Contrasenyes desades
+settings-apps-passwords-forget = Oblida
+settings-apps-passwords-forget-app = Fes que { $app } torni a preguntar
+settings-apps-permissions-allowed = { $allowed } de { $total } amb permís
+settings-apps-permissions-description = Les aplicacions en un entorn aïllat tenen els seus propis fitxers i només el que permetis aquí.
+settings-apps-sandbox-only = Res fora del seu entorn aïllat
+settings-apps-folders = Carpetes
+settings-apps-folders-hint = Pot llegir i canviar tot el que hi ha en aquestes carpetes a partir de la pròxima vegada que s'obri.
+settings-apps-folders-count = { $count ->
+    [one] { $count } carpeta
+   *[other] { $count } carpetes
+}
+settings-apps-folder-add = Afegeix una carpeta
+settings-apps-folder-remove = Elimina
+settings-apps-folder-remove-app = Deixa de compartir { $folder }
+settings-apps-usb = Dispositius USB
+settings-apps-usb-hint = Com claus de seguretat, telèfons i microcontroladors
+settings-apps-serial = Dispositius sèrie
+settings-apps-serial-hint = Com impressores 3D i plaques connectades per USB
+settings-apps-folder-read-only = Només lectura
+settings-apps-downloads = Carpeta Baixades
+settings-apps-downloads-hint = Pot desar fitxers a la carpeta Baixades i obrir-hi els que hi ha, a partir de la propera vegada que s'obri.
+settings-apps-internet = Internet
+settings-apps-internet-hint = Pot connectar-se a internet a partir de la propera vegada que s'obri.
+settings-apps-service-hint = Un servei de l'escriptori amb què pot parlar
+settings-apps-service-remove = Elimina
+settings-apps-service-remove-app = Deixa de permetre-li parlar amb { $service }
+settings-apps-services-count = { $count ->
+    [one] { $count } servei
+   *[other] { $count } serveis
+}
+settings-apps-full-access-off = Funciona en un entorn aïllat. L'accés complet elimina l'entorn aïllat.
+settings-apps-full-access-give = Dona accés complet

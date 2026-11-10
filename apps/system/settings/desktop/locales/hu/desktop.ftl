@@ -212,8 +212,6 @@ desktop-picture-filter = Képek
 desktop-picture-unopenable = Ez a kép nem nyitható meg
 
 ## Users
-desktop-users-password-failed = Nem sikerült módosítani a jelszavát: { $reason }
-desktop-users-password-timed-out = A passwd nem válaszol
 
 ## Updates
 desktop-updates-nvidia-summary = Hozza ki a legtöbbet NVIDIA-videokártyájából

@@ -59,8 +59,32 @@ struct AccountRename {
 }
 
 #[derive(Deserialize, Type)]
-struct AccountTarget {
+#[serde(rename_all = "camelCase")]
+struct AccountRemoval {
     account: String,
+    discard_unsynced: bool,
+}
+
+#[derive(Serialize, Type)]
+#[serde(rename_all = "camelCase")]
+enum Removal {
+    Removed,
+    MayLoseFiles,
+}
+
+async fn remove(
+    AccountRemoval {
+        account,
+        discard_unsynced,
+    }: AccountRemoval,
+) -> Result<Removal, String> {
+    match client::remove_account(&account, discard_unsynced).await {
+        Ok(()) => Ok(Removal::Removed),
+        Err(refused) if matches!(refused.kind.as_deref(), Some("Unsynced" | "Offline")) => {
+            Ok(Removal::MayLoseFiles)
+        }
+        Err(refused) => Err(refused.message),
+    }
 }
 
 #[derive(Deserialize, Type)]
@@ -150,8 +174,6 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
             "accounts_rename",
             |AccountRename { account, name }| async move { client::rename(&account, &name).await },
         )
-        .command_async("accounts_remove", |AccountTarget { account }| async move {
-            client::remove(&account).await
-        })
+        .command_async("accounts_remove", remove)
         .command("accounts_open", open)
 }

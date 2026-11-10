@@ -329,3 +329,69 @@ settings-accounts-text-me = Испрати ми код со SMS
 settings-accounts-choose-phone = На кој број Apple да го испрати кодот?
     .description = Со SMS-порака
 settings-accounts-approve = Вашата Apple-сметка користи Напредна заштита на податоците. Одобрете го барањето на вашиот iPhone, iPad или Mac за овој компјутер да може да го отвори iCloud Drive.
+
+## Apps
+
+settings-apps-defaults = Стандардни апликации
+settings-apps-defaults-description = Се користат кога отворате врски, датотеки и папки
+settings-apps-browser = Веб-прелистувач
+settings-apps-email = Е-пошта
+settings-apps-calendar = Календар
+settings-apps-music = Музика
+settings-apps-videos = Видеа
+settings-apps-photos = Фотографии
+settings-apps-text-editor = Уредувач на текст
+settings-apps-files = Датотеки
+settings-apps-archives = Архиви
+settings-apps-choose = Изберете
+settings-apps-startup = Стартување
+settings-apps-startup-description = Овие апликации се отвораат кога ќе се најавите
+settings-apps-startup-app = Отвори { $app } при најава
+settings-apps-startup-remove = Отстрани ја { $app } од стартувањето
+settings-apps-startup-add = Додај апликација
+settings-apps-startup-add-title = Додавање апликација при стартување
+settings-apps-startup-add-description = Изберете апликација што ќе се отвора секогаш кога ќе се најавите.
+settings-apps-search = Пребарај апликации
+settings-apps-no-match = Ниедна апликација не одговара на пребарувањето
+settings-apps-cancel = Откажи
+settings-apps-permissions = Дозволи
+settings-apps-location = Локација
+settings-apps-camera = Камера
+settings-apps-clipboard = Клипборд во позадина
+settings-apps-full-access = Целосен пристап
+settings-apps-full-access-hint = Работи надвор од песочникот и може сè што може програма што ја стартувате сами. Отстранувањето важи од следното отворање.
+settings-apps-full-access-remove = Отстрани
+settings-apps-full-access-remove-app = Отстрани го целосниот пристап за { $app }
+settings-apps-passwords = Зачувани лозинки
+settings-apps-passwords-forget = Заборави
+settings-apps-passwords-forget-app = Нека { $app } повторно праша
+settings-apps-permissions-allowed = Дозволени { $allowed } од { $total }
+settings-apps-permissions-description = Апликациите во песочник добиваат свои датотеки и само она што ќе го дозволите тука.
+settings-apps-sandbox-only = Ништо надвор од песочникот
+settings-apps-folders = Папки
+settings-apps-folders-hint = Од следното отворање може да чита и менува сè во овие папки.
+settings-apps-folders-count = { $count ->
+    [one] { $count } папка
+   *[other] { $count } папки
+}
+settings-apps-folder-add = Додај папка
+settings-apps-folder-remove = Отстрани
+settings-apps-folder-remove-app = Престани да ја споделуваш { $folder }
+settings-apps-usb = USB уреди
+settings-apps-usb-hint = На пример безбедносни клучеви, телефони и микроконтролери
+settings-apps-serial = Сериски уреди
+settings-apps-serial-hint = На пример 3D печатачи и плочки поврзани преку USB
+settings-apps-folder-read-only = Само за читање
+settings-apps-downloads = Папка Преземања
+settings-apps-downloads-hint = Може да зачувува датотеки во папката Преземања и да ги отвора оние во неа, од следното отворање.
+settings-apps-internet = Интернет
+settings-apps-internet-hint = Може да оди на интернет од следното отворање.
+settings-apps-service-hint = Услуга на работната површина со која може да комуницира
+settings-apps-service-remove = Отстрани
+settings-apps-service-remove-app = Забрани комуникација со { $service }
+settings-apps-services-count = { $count ->
+    [one] { $count } услуга
+   *[other] { $count } услуги
+}
+settings-apps-full-access-off = Работи во песочник. Целосниот пристап го отстранува песочникот.
+settings-apps-full-access-give = Дај целосен пристап

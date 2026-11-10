@@ -212,8 +212,6 @@ desktop-picture-filter = Imagini
 desktop-picture-unopenable = Această imagine nu poate fi deschisă
 
 ## Users
-desktop-users-password-failed = Parola nu a putut fi schimbată: { $reason }
-desktop-users-password-timed-out = passwd nu mai răspunde
 
 ## Updates
 desktop-updates-nvidia-summary = Profitați la maximum de placa video NVIDIA

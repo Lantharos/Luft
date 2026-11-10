@@ -29,7 +29,6 @@ settings-more-show = { $count ->
         [many] Zobraziť ešte { $count }
        *[other] Zobraziť ešte { $count }
     }
-settings-more-fewer = Zobraziť menej
 settings-time-picker = { $label }, { $time }
 settings-time-picker-hour = Hodina
 settings-time-picker-minute = Minúta

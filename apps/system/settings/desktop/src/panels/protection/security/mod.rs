@@ -140,6 +140,9 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         .command_async("security_show_key", |Empty {}| {
             luft_trust::call::<_, String>(&TRUST, "ShowRecoveryKey", &())
         })
+        .command_async("security_check_key", |RecoveryKey { key }| async move {
+            luft_trust::unlocking::<_, bool>(&TRUST, "CheckRecoveryKey", &key).await
+        })
         .command_async("security_accept_secure_boot", |Empty {}| {
             luft_trust::call::<_, ()>(&TRUST, "AcceptSecureBootChange", &())
         })

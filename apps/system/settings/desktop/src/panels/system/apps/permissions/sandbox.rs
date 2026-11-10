@@ -1,5 +1,6 @@
 use luft_app::identity::permissions::{
-    self, BUS, DEVICES, DOWNLOADS, FOLDERS, FULL_ACCESS, NETWORK, NO, READ_ONLY_FOLDERS, YES,
+    self, BUS, CAMERA, DEVICES, DOWNLOADS, FOLDERS, FULL_ACCESS, MICROPHONE, NETWORK, NO,
+    READ_ONLY_FOLDERS, X11, YES,
 };
 use luft_app::portal::FileChooser;
 use luft_app::portal::uri_path;
@@ -19,6 +20,9 @@ pub enum SandboxDevice {
 pub enum SandboxSwitch {
     Internet,
     Downloads,
+    X11,
+    Microphone,
+    Camera,
 }
 
 impl SandboxSwitch {
@@ -26,6 +30,17 @@ impl SandboxSwitch {
         match self {
             Self::Internet => &NETWORK,
             Self::Downloads => &DOWNLOADS,
+            Self::X11 => &X11,
+            Self::Microphone => &MICROPHONE,
+            Self::Camera => &CAMERA,
+        }
+    }
+
+    fn answer(self, on: bool) -> &'static [&'static str] {
+        match (self, on) {
+            (Self::Internet | Self::Downloads, false) => &[NO],
+            (Self::X11 | Self::Microphone | Self::Camera, true) => &[YES],
+            _ => &[],
         }
     }
 }
@@ -98,8 +113,7 @@ pub async fn set_switch(
     switch: SandboxSwitch,
     on: bool,
 ) -> zbus::Result<()> {
-    let answer: &[&str] = if on { &[] } else { &[NO] };
-    permissions::set_values(connection, switch.permission(), app, answer).await
+    permissions::set_values(connection, switch.permission(), app, switch.answer(on)).await
 }
 
 pub async fn remove_service(connection: &Connection, app: &str, service: &str) -> zbus::Result<()> {

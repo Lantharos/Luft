@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { t } from '@luft/i18n';
-	import { Row, Section, Switch } from '@luft/ui';
+	import { Dialog, Row, Section, Switch } from '@luft/ui';
 	import { useSettings } from '#lib/state/gsettings.svelte.js';
 	import DelayRow from './DelayRow.svelte';
 
@@ -21,12 +21,11 @@
 		'bouncekeys-delay'
 	]);
 
-	let opened = $state<boolean | null>(null);
+	let assisting = $state(false);
 
 	let slow = $derived(keyboard.values['slowkeys-enable'] ?? false);
 	let bounce = $derived(keyboard.values['bouncekeys-enable'] ?? false);
 	let assists = $derived([keyboard.values['stickykeys-enable'], slow, bounce].filter(Boolean).length);
-	let expanded = $derived(opened ?? assists > 0);
 
 	const seconds = (milliseconds: number | undefined) => (milliseconds ?? 300) / 1000;
 	const milliseconds = (seconds: number) => Math.round(seconds * 1000);
@@ -40,10 +39,14 @@
 			onchange={(on) => applications.set('screen-keyboard-enabled', on)}
 		/>
 	</Row>
-	<Row title={t('settings-accessibility-typing-assist')} {expanded} onclick={() => (opened = !expanded)}>
+	<Row title={t('settings-accessibility-typing-assist')} onclick={() => (assisting = true)}>
 		{t('settings-accessibility-typing-assist-count', { count: assists })}
 	</Row>
-	{#if expanded}
+</Section>
+
+{#if assisting}
+	<Dialog title={t('settings-accessibility-typing-assist')} wide onclose={() => (assisting = false)}>
+		<div class="row-group">
 		<Row title={t('settings-accessibility-sticky-keys')}>
 			<Switch
 				label={t('settings-accessibility-sticky-keys')}
@@ -75,5 +78,9 @@
 				onchange={(value) => keyboard.set('bouncekeys-delay', milliseconds(value))}
 			/>
 		{/if}
-	{/if}
-</Section>
+		</div>
+		{#snippet actions()}
+			<button type="button" class="button primary" onclick={() => (assisting = false)}>{t('settings-more-done')}</button>
+		{/snippet}
+	</Dialog>
+{/if}

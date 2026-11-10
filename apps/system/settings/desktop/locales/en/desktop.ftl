@@ -215,16 +215,16 @@ desktop-wallpaper-add-filter = Images and videos
 desktop-wallpaper-video-no-picture = This video has no picture
 
 ## Keyring
-desktop-keyring-not-running = Your keyring isn’t running
+desktop-keyring-not-running = Your saved passwords and keys aren’t available right now
 desktop-keyring-denied = Only the installed Settings app can change this
-desktop-keyring-unsupported = Your keyring can’t do this yet
-desktop-keyring-reseal-failed = The security chip couldn’t protect your keyring right now
+desktop-keyring-unsupported = Passwords and keys can’t do this yet
+desktop-keyring-reseal-failed = The security chip couldn’t protect your passwords and keys right now
 
 ## Passkeys
 desktop-passkeys-missing = That passkey doesn't exist
 
 ## Device security
-# Suggested file name when saving the disk recovery key
+# Suggested file name when saving the drive recovery key
 desktop-security-recovery-file-name = Recovery key.txt
 desktop-security-usb-unavailable = USB protection isn't available on this computer
 # Title of the file chooser for adding a key that may sign in over SSH
@@ -274,10 +274,6 @@ desktop-picture-filter = Images
 desktop-picture-unopenable = This picture can't be opened
 
 ## Users
-# $reason is a system error message
-desktop-users-password-failed = Couldn't change your password: { $reason }
-# passwd is the name of the program that changes passwords
-desktop-users-password-timed-out = passwd stopped responding
 
 ## Updates
 # Notification shown once when an NVIDIA graphics card could use NVIDIA's driver

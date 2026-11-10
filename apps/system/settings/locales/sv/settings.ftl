@@ -27,7 +27,6 @@ settings-more-show = { $count ->
         [one] Visa { $count } till
        *[other] Visa { $count } till
     }
-settings-more-fewer = Visa färre
 settings-time-picker = { $label }, { $time }
 settings-time-picker-hour = Timme
 settings-time-picker-minute = Minut

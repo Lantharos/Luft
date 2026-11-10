@@ -4,9 +4,9 @@
 # "security chip" is how these pages name the computer's TPM (Trusted Platform Module). Use a plain-language
 # phrase for it rather than "TPM", unless "TPM" is what people in your language commonly say.
 # "Secure Boot" is the firmware feature's product name and normally stays untranslated.
-# "recovery key" is the long code that unlocks an encrypted disk when nothing else can. Use one consistent term.
-# "PIN" is a numeric code typed at startup, before the disk unlocks. Keep it as short as the usual term for a bank card PIN.
-# "passphrase" is a typed password that unlocks the disk at startup; keep it distinct from the account "password".
+# "recovery key" is the long code that unlocks an encrypted drive when nothing else can. Use one consistent term.
+# "PIN" is a numeric code typed at startup, before the drive unlocks. Keep it as short as the usual term for a bank card PIN.
+# "passphrase" is a typed password that unlocks the drive at startup; keep it distinct from the account "password".
 # "keyring" is where saved passwords and keys are kept.
 
 ## Shared buttons
@@ -50,6 +50,12 @@ settings-privacy-location-services-hint = Lets apps find where you are, for maps
 settings-privacy-camera-allow = Allow apps to use the camera
 settings-privacy-microphone-allow = Allow apps to use the microphone
 
+## Privacy: things looked up online
+
+settings-privacy-online = Online
+settings-privacy-lookups = Weather and currency rates
+settings-privacy-lookups-hint = Looked up through luft.computer, which is only told roughly which area you’re in, never your exact place
+
 ## Privacy: file history
 
 settings-privacy-file-history = File history
@@ -81,14 +87,14 @@ settings-privacy-delete-after-hint = How long files stay before they’re remove
 settings-security-protections = Protections
 settings-security-protected = Your device is protected
 settings-security-could-be-safer = Your device could be safer
-settings-security-not-encrypted-description = Its disk isn’t encrypted, so anyone who takes it out can read your files.
-settings-security-starts-differently-description = If you changed its Secure Boot settings, confirm it so the disk unlocks by itself again.
-settings-security-needed-recovery-key = Your disk needed its recovery key
+settings-security-not-encrypted-description = Its drive isn’t encrypted, so anyone who takes it out can read your files.
+settings-security-starts-differently-description = If you changed its Secure Boot settings, confirm it so the drive unlocks by itself again.
+settings-security-needed-recovery-key = Your drive needed its recovery key
 settings-security-needed-recovery-key-description = Link the security chip again so it unlocks by itself.
 # "Updates" is the name of another Settings page
 settings-security-firmware-ready-description = Firmware updates for your hardware are ready in Updates.
-settings-security-encrypted-secure-boot = Your disk is encrypted and Secure Boot checks how it starts.
-settings-security-encrypted = Your disk is encrypted.
+settings-security-encrypted-secure-boot = Your drive is encrypted and Secure Boot checks how it starts.
+settings-security-encrypted = Your drive is encrypted.
 settings-security-secure-boot-unfinished = Secure Boot isn’t set up for Luft yet
 
 ## Security: protections
@@ -140,7 +146,7 @@ settings-secure-boot-missed-description = The blue screen was missed last time. 
 settings-secure-boot-none-title = Set up Secure Boot for Luft
 settings-secure-boot-none-description = It takes one restart and a code you type on a blue screen
 settings-secure-boot-gave-up-description = It wasn’t finished after a few restarts. Try again whenever you’re ready
-settings-secure-boot-without-key = Until it’s set up, Luft starts without its boot menu, and the disk may ask for its recovery key after updates.
+settings-secure-boot-without-key = Until it’s set up, Luft starts without its boot menu, and the drive may ask for its recovery key after updates.
 settings-secure-boot-without-key-unencrypted = Until it’s set up, Luft starts without its boot menu.
 settings-secure-boot-steps = On the blue screen
 settings-secure-boot-steps-description = The blue screen is always in English. Use the arrow keys and Enter there.
@@ -148,7 +154,7 @@ settings-secure-boot-code-hidden = You need the code on the blue screen.
 # Button that shows the eight-digit code for the blue screen
 settings-secure-boot-show-code = Show code
 settings-secure-boot-code-hint = Type all eight digits, without a space.
-settings-secure-boot-missed-note = If you miss it, Luft still starts, though the disk may ask for its recovery key once. The code stays the same, so you can try again.
+settings-secure-boot-missed-note = If you miss it, Luft still starts, though the drive may ask for its recovery key once. The code stays the same, so you can try again.
 
 ## Security: steps on the blue startup screen
 # The blue screen (MokManager) is always in English. Its words are passed in as $screen, $option, $question, $yes,
@@ -267,44 +273,44 @@ settings-encryption-drives-auto-unlock = { $count ->
    *[other] { $count } encrypted drives unlock with this computer
 }
 
-## Device encryption: unlocking the disk
+## Device encryption: unlocking the drive
 
-settings-encryption-unlocking = Unlocking your disk
+settings-encryption-unlocking = Unlocking your drive
 settings-encryption-starts-differently = This computer starts differently now
-settings-encryption-starts-differently-description = Its Secure Boot settings changed, so the disk asked for its recovery key. If you made the change, confirm it to unlock by itself again
+settings-encryption-starts-differently-description = Its Secure Boot settings changed, so the drive asked for its recovery key. If you made the change, confirm it to unlock by itself again
 # Button, verb
 settings-encryption-confirm = Confirm
-settings-encryption-asked-recovery-key = Your disk asked for its recovery key
+settings-encryption-asked-recovery-key = Your drive asked for its recovery key
 settings-encryption-relink-description = Link the security chip again so it unlocks by itself
 settings-encryption-relink = Link again
 settings-encryption-chip-unlock = Unlock with the security chip
 settings-encryption-chip-unlock-on = As long as nothing changes how this computer starts
 settings-encryption-chip-unlock-off = So you don’t type a passphrase at startup
 settings-encryption-pin = PIN at startup
-settings-encryption-pin-description = You type it before the disk unlocks
+settings-encryption-pin-description = You type it before the drive unlocks
 # Button, verb
 settings-encryption-change = Change
 settings-encryption-add-pin-row = Add a PIN at startup
-settings-encryption-add-pin-row-description = Keeps the disk locked even if the computer is taken
+settings-encryption-add-pin-row-description = Keeps the drive locked even if the computer is taken
 settings-encryption-add-pin = Add PIN
-settings-encryption-new-key-description = Your disk didn’t have a recovery key yet. Keep this one somewhere other than this computer.
+settings-encryption-new-key-description = Your drive didn’t have a recovery key yet. Keep this one somewhere other than this computer.
 settings-encryption-stop-chip-title = Stop unlocking with the security chip?
 settings-encryption-stop-chip-passphrase = Your computer will ask for your passphrase every time it starts.
 settings-encryption-stop-chip-recovery-key = Your computer will ask for your recovery key every time it starts, so keep it close.
 settings-encryption-stop-chip = Stop unlocking
 settings-encryption-remove-pin-title = Remove your PIN?
-settings-encryption-remove-pin-description = The disk will unlock by itself again when the computer starts.
+settings-encryption-remove-pin-description = The drive will unlock by itself again when the computer starts.
 settings-encryption-remove-pin = Remove PIN
-settings-encryption-unlock-disk-title = Unlock your disk
+settings-encryption-unlock-disk-title = Unlock your drive
 settings-encryption-unlock-disk-description = This change needs your recovery key, or the passphrase you type when the computer starts.
 settings-encryption-unlock-disk-field = Recovery key or passphrase
 
 ## Device encryption: security chip and PIN
 
 settings-encryption-ask-pin = Also ask for a PIN
-settings-encryption-chip-setup-description = The security chip in your computer unlocks the disk by itself at startup, so you no longer type a passphrase first.
+settings-encryption-chip-setup-description = The security chip in your computer unlocks the drive by itself at startup, so you no longer type a passphrase first.
 settings-encryption-add-pin-title = Add a PIN
-settings-encryption-add-pin-description = You’ll type it each time the computer starts. Without it, the disk stays locked, even if someone takes the whole computer.
+settings-encryption-add-pin-description = You’ll type it each time the computer starts. Without it, the drive stays locked, even if someone takes the whole computer.
 settings-encryption-change-pin-title = Change your PIN
 settings-encryption-change-pin-description = You’ll type the new PIN each time the computer starts.
 settings-encryption-change-pin = Change PIN
@@ -332,7 +338,7 @@ settings-encryption-type-again = Type it again
 ## Recovery key
 
 settings-recovery-title = Recovery key
-settings-recovery-description = Gets you in if the disk can’t unlock by itself
+settings-recovery-description = Gets you in if the drive can’t unlock by itself
 # Button, verb
 settings-recovery-show = Show
 # Button, verb
@@ -348,7 +354,7 @@ settings-recovery-fresh-description = Your previous key no longer works. Keep th
 ## Passwords and keys (the keyring)
 
 settings-passwords-title = Passwords and keys
-settings-passwords-not-running = Your keyring isn’t running
+settings-passwords-not-running = Your saved passwords and keys aren’t available right now
 settings-passwords-not-running-description = Your passwords and keys show up here once it starts
 settings-passwords-locked = Locked
 settings-passwords-contents = { $count ->
@@ -372,12 +378,12 @@ settings-passwords-fingerprint = Unlock with your fingerprint
 # "Users" is the name of another Settings page
 settings-passwords-fingerprint-description = Add a fingerprint in Users first
 settings-passwords-pin = Ask for a PIN after the fingerprint
-settings-passwords-pin-locked = Unlock your keyring to change this
+settings-passwords-pin-locked = Unlock your passwords and keys to change this
 settings-passwords-pin-description = So a fingerprint alone can’t unlock them
 settings-passwords-lock-with-screen = Lock with the screen
 settings-passwords-lock-with-screen-description = They lock and unlock along with the screen
 settings-passwords-apps = App sign-ins and activity
-settings-passwords-apps-locked = Unlock your keyring to see them
+settings-passwords-apps-locked = Unlock your passwords and keys to see them
 settings-passwords-apps-description = What apps keep here and when they used it
 settings-passwords-apps-allowed = Which apps can use your passwords
 # "Apps" is the name of another Settings page
@@ -410,25 +416,24 @@ settings-passwords-history-denied = { $app } wasn’t allowed to use “{ $item 
 settings-passwords-history-denied-unnamed = { $app } wasn’t allowed to use a saved password
 settings-passwords-history-signed = { $app } signed with “{ $item }”
 settings-passwords-history-signed-unnamed = { $app } signed with a saved password
-settings-passwords-history-fewer = Show fewer
-settings-passwords-history-all = { $count ->
-    [one] Show all { $count }
-   *[other] Show all { $count }
-}
 settings-passwords-history-clear = Clear history
-settings-passwords-history-clear-description = Forget which apps used your keyring and when
+settings-passwords-history-clear-description = Forget which apps used your passwords and keys, and when
 # Button, verb
 settings-passwords-history-clear-button = Clear
 settings-passwords-history-clear-title = Clear recent access?
-settings-passwords-history-clear-confirm = The list of which apps used your keyring and when is erased. Your saved passwords and keys stay as they are.
+settings-passwords-history-clear-confirm = The list of which apps used your passwords and keys, and when, is erased. Your saved passwords and keys stay as they are.
 
 ## Passwords and keys: SSH keys
 # SSH is a protocol name and stays untranslated.
 
 settings-passwords-ssh = SSH keys
-settings-passwords-ssh-description = Keys for signing in to servers, kept safe in your keyring.
+settings-passwords-ssh-description = Keys for signing in to servers, kept safe with your passwords.
 settings-passwords-ssh-unnamed = Unnamed key
 settings-passwords-ssh-in-chip = Kept in the security chip
+# A key that is saved but not offered to programs until it is loaded again
+settings-passwords-ssh-put-away = Put away
+# Button: makes a put-away key usable again
+settings-passwords-ssh-load = Load
 # $when is a relative time, such as "3 days ago"
 settings-passwords-ssh-added = Added { $when }
 # Screen reader labels. $name is the name of the key
@@ -510,7 +515,7 @@ settings-remote-login-disconnect-description = Their connection ends right away,
 ## Passkeys
 
 settings-passkeys-title = Passkeys
-settings-passkeys-unavailable = Unlock your keyring to see your passkeys.
+settings-passkeys-unavailable = Unlock your passwords and keys to see your passkeys.
 settings-passkeys-chip-fingerprint = Sealed by this computer’s security chip. Each sign-in asks for your fingerprint or password.
 settings-passkeys-chip-password = Sealed by this computer’s security chip. Each sign-in asks for your password.
 settings-passkeys-password-fingerprint = Encrypted with your password. Each sign-in asks for your fingerprint or password.
@@ -533,87 +538,57 @@ settings-passkeys-rename-description = Give your passkey for { $site } a name yo
 settings-passkeys-name = Name
 settings-passkeys-save = Save
 
-## Apps
+## Screen and input sharing
 
-settings-apps-defaults = Default apps
-settings-apps-defaults-description = Used when you open links, files, and folders
-settings-apps-browser = Web browser
-settings-apps-email = Email
-settings-apps-calendar = Calendar
-settings-apps-music = Music
-settings-apps-videos = Videos
-settings-apps-photos = Photos
-settings-apps-text-editor = Text editor
-settings-apps-files = Files
-settings-apps-archives = Archives
-# Placeholder of the app list when no default app is chosen
-settings-apps-choose = Choose
-settings-apps-startup = Startup
-settings-apps-startup-description = These apps open when you sign in
-# Screen-reader label of a switch; $app is an app name
-settings-apps-startup-app = Open { $app } when you sign in
-settings-apps-startup-remove = Remove { $app } from startup
-settings-apps-startup-add = Add app
-settings-apps-startup-add-title = Add a startup app
-settings-apps-startup-add-description = Choose an app to open every time you sign in.
-settings-apps-search = Search apps
-settings-apps-no-match = No apps match your search
-settings-apps-cancel = Cancel
+settings-sharing = Screen and input sharing
+settings-sharing-description = Apps that may see your screen or use your mouse and keyboard
+settings-sharing-apps = Apps with access
+settings-sharing-empty = No app may see your screen or use your mouse and keyboard. Apps ask the first time they need to.
+settings-sharing-can-screen = Can see your screen
+settings-sharing-can-control = Can see your screen and use your mouse and keyboard
+settings-sharing-can-input = Can use your mouse and keyboard
+settings-sharing-can-windows-see = Can see your open windows
+settings-sharing-can-windows-use = Can see and move your open windows
+settings-sharing-active = Sharing right now
+# $when is a relative time, like "2 days ago"
+settings-sharing-allowed-since = Allowed { $when }
+settings-sharing-unknown-app = An app without a name
+# Shown for access held by Luft's developer tools
+settings-sharing-developer-tools = Developer tools
+# Button, verb
+settings-sharing-revoke = Stop access
+# $app is the app's name
+settings-sharing-revoke-title = Stop access for { $app }?
+settings-sharing-revoke-description = It has to ask again before it can do this.
+settings-sharing-revoke-active = It stops sharing right away, and has to ask again before it can do this.
 
-## Apps: permissions
+## Developer tools
 
-settings-apps-permissions = Permissions
-settings-apps-location = Location
-settings-apps-camera = Camera
-settings-apps-clipboard = Clipboard in the background
-settings-apps-full-access = Full access
-settings-apps-full-access-hint = It runs outside its sandbox, with everything a program you start yourself can do. Removing it takes effect the next time it opens.
+settings-developer-tools = Developer tools
+settings-developer-tools-description = Lets developer tools control apps and the screen
+settings-developer-tools-title = Turn on developer tools?
+settings-developer-tools-warning = Programs you run can then see your screen and use your mouse and keyboard without asking. Leave this off unless you build apps for Luft. Turning it on asks for an administrator’s password.
+
+## Checking the recovery key
+
+settings-recovery-check-row = Check that your recovery key works
+settings-recovery-check-row-description = Type the copy you kept to make sure it still unlocks this computer
 # Button, verb
-settings-apps-full-access-remove = Remove
-# Screen reader label of the remove button; $app is an app name
-settings-apps-full-access-remove-app = Remove full access from { $app }
-settings-apps-passwords = Saved passwords
-# Button, verb
-settings-apps-passwords-forget = Forget
-# Screen reader label of the forget button; $app is an app name
-settings-apps-passwords-forget-app = Let { $app } ask again
-# $allowed and $total are numbers of apps, or of saved passwords
-settings-apps-permissions-allowed = { $allowed } of { $total } allowed
-settings-apps-permissions-description = Apps in a sandbox get their own files and only what you allow here.
-settings-apps-sandbox-only = Nothing beyond its sandbox
-settings-apps-folders = Folders
-settings-apps-folders-hint = It can read and change everything in these folders, from the next time it opens.
-# $count is a number of folders an app may use
-settings-apps-folders-count = { $count ->
-    [one] { $count } folder
-   *[other] { $count } folders
-}
-settings-apps-folder-add = Add folder
-# Button, verb
-settings-apps-folder-remove = Remove
-# Screen reader label of the remove button; $folder is a folder path
-settings-apps-folder-remove-app = Stop sharing { $folder }
-settings-apps-usb = USB devices
-settings-apps-usb-hint = Such as security keys, phones and microcontrollers
-settings-apps-serial = Serial devices
-settings-apps-serial-hint = Such as 3D printers and boards connected over USB
-# Shown under a folder an app may only read
-settings-apps-folder-read-only = Read only
-settings-apps-downloads = Downloads folder
-settings-apps-downloads-hint = It can save files to your Downloads folder and open the ones there, from the next time it opens.
-settings-apps-internet = Internet
-settings-apps-internet-hint = It can go online, from the next time it opens.
-# Under the name of a D-Bus service an app may call
-settings-apps-service-hint = A service on your desktop it can talk to
-# Button, verb
-settings-apps-service-remove = Remove
-# Screen reader label of the remove button; $service is a D-Bus service name
-settings-apps-service-remove-app = Stop letting it talk to { $service }
-# $count is a number of desktop services an app may call
-settings-apps-services-count = { $count ->
-    [one] { $count } service
-   *[other] { $count } services
-}
-settings-apps-full-access-off = It runs in a sandbox. Full access takes the sandbox away.
-# Button that opens Schelf to confirm giving the app full access
-settings-apps-full-access-give = Give full access
+settings-recovery-check = Check
+settings-recovery-check-title = Check your recovery key
+settings-recovery-check-description = Type the recovery key from the copy you kept. Nothing changes on this computer.
+settings-recovery-check-description-stored = Type the recovery key from the copy you kept, or leave the field empty to check the copy this computer keeps. Nothing changes on this computer.
+settings-recovery-check-field = Recovery key
+settings-recovery-check-works = This key unlocks your drive. Keep it where you found it.
+settings-recovery-check-fails = This key doesn’t unlock your drive. Check for typing mistakes, or replace it with a new key and save that one.
+
+## Turning protections off
+
+settings-usb-turn-off-title = Stop holding back USB devices?
+settings-usb-turn-off-warning = Anything plugged in while your computer is locked, such as a device that pretends to be a keyboard, then works right away.
+settings-usb-turn-off = Stop holding back
+settings-security-secure-boot-off-description = Your drive is encrypted, but Secure Boot is off, so nothing checks what starts before Luft. Turn it on in your computer’s firmware settings.
+
+## Unlocking by itself while Secure Boot is off
+
+settings-encryption-chip-needs-secure-boot = Turn on Secure Boot in your computer’s firmware settings to let this computer unlock by itself

@@ -322,11 +322,6 @@ settings-passwords-history-denied = { $app } durfte „{ $item }“ nicht verwen
 settings-passwords-history-denied-unnamed = { $app } durfte ein gespeichertes Passwort nicht verwenden
 settings-passwords-history-signed = { $app } hat mit „{ $item }“ signiert
 settings-passwords-history-signed-unnamed = { $app } hat mit einem gespeicherten Passwort signiert
-settings-passwords-history-fewer = Weniger anzeigen
-settings-passwords-history-all = { $count ->
-    [one] Alle { $count } anzeigen
-   *[other] Alle { $count } anzeigen
-}
 settings-passwords-history-clear = Verlauf löschen
 settings-passwords-history-clear-description = Vergessen, welche Apps deinen Schlüsselbund wann verwendet haben
 settings-passwords-history-clear-button = Löschen
@@ -384,71 +379,3 @@ settings-passkeys-rename-description = Gib deinem Passkey für { $site } einen N
 settings-passkeys-name = Name
 settings-passkeys-save = Speichern
 
-## Apps
-
-settings-apps-defaults = Standard-Apps
-settings-apps-defaults-description = Werden verwendet, wenn du Links, Dateien und Ordner öffnest
-settings-apps-browser = Webbrowser
-settings-apps-email = E-Mail
-settings-apps-calendar = Kalender
-settings-apps-music = Musik
-settings-apps-videos = Videos
-settings-apps-photos = Fotos
-settings-apps-text-editor = Texteditor
-settings-apps-files = Dateien
-settings-apps-archives = Archive
-settings-apps-choose = Auswählen
-settings-apps-startup = Autostart
-settings-apps-startup-description = Diese Apps öffnen sich, wenn du dich anmeldest
-settings-apps-startup-app = { $app } bei der Anmeldung öffnen
-settings-apps-startup-remove = { $app } aus dem Autostart entfernen
-settings-apps-startup-add = App hinzufügen
-settings-apps-startup-add-title = Autostart-App hinzufügen
-settings-apps-startup-add-description = Wähl eine App, die sich bei jeder Anmeldung öffnet.
-settings-apps-search = Apps suchen
-settings-apps-no-match = Keine Apps passen zu deiner Suche
-settings-apps-cancel = Abbrechen
-
-## Apps: permissions
-
-settings-apps-permissions = Berechtigungen
-settings-apps-location = Standort
-settings-apps-camera = Kamera
-settings-apps-clipboard = Zwischenablage im Hintergrund
-settings-apps-full-access = Vollzugriff
-settings-apps-full-access-hint = Die App läuft außerhalb ihrer Sandbox und kann alles, was ein selbst gestartetes Programm kann. Das Entfernen gilt ab dem nächsten Start.
-settings-apps-full-access-remove = Entfernen
-settings-apps-full-access-remove-app = Vollzugriff von { $app } entfernen
-settings-apps-passwords = Gespeicherte Passwörter
-settings-apps-passwords-forget = Vergessen
-settings-apps-passwords-forget-app = { $app } erneut fragen lassen
-settings-apps-permissions-allowed = { $allowed } von { $total } zugelassen
-settings-apps-permissions-description = Apps in einer Sandbox bekommen ihre eigenen Dateien und nur das, was du hier erlaubst.
-settings-apps-sandbox-only = Nichts außerhalb ihrer Sandbox
-settings-apps-folders = Ordner
-settings-apps-folders-hint = Ab dem nächsten Start kann die App alles in diesen Ordnern lesen und ändern.
-settings-apps-folders-count = { $count ->
-    [one] { $count } Ordner
-   *[other] { $count } Ordner
-}
-settings-apps-folder-add = Ordner hinzufügen
-settings-apps-folder-remove = Entfernen
-settings-apps-folder-remove-app = { $folder } nicht mehr freigeben
-settings-apps-usb = USB-Geräte
-settings-apps-usb-hint = Etwa Sicherheitsschlüssel, Telefone und Mikrocontroller
-settings-apps-serial = Serielle Geräte
-settings-apps-serial-hint = Etwa 3D-Drucker und über USB verbundene Platinen
-settings-apps-folder-read-only = Nur lesen
-settings-apps-downloads = Downloads-Ordner
-settings-apps-downloads-hint = Sie kann ab dem nächsten Öffnen Dateien im Ordner „Downloads“ speichern und die dortigen öffnen.
-settings-apps-internet = Internet
-settings-apps-internet-hint = Sie kann ab dem nächsten Öffnen online gehen.
-settings-apps-service-hint = Ein Dienst auf deinem Desktop, mit dem sie sprechen kann
-settings-apps-service-remove = Entfernen
-settings-apps-service-remove-app = Zugriff auf { $service } entziehen
-settings-apps-services-count = { $count ->
-    [one] { $count } Dienst
-   *[other] { $count } Dienste
-}
-settings-apps-full-access-off = Die App läuft in einer Sandbox. Vollzugriff hebt die Sandbox auf.
-settings-apps-full-access-give = Vollzugriff geben

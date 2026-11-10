@@ -26,6 +26,7 @@ import Plus from '@lucide/svelte/icons/plus';
 import Puzzle from '@lucide/svelte/icons/puzzle';
 import Send from '@lucide/svelte/icons/send';
 import Shield from '@lucide/svelte/icons/shield';
+import MonitorUp from '@lucide/svelte/icons/monitor-up';
 import ShieldCheck from '@lucide/svelte/icons/shield-check';
 import SquareTerminal from '@lucide/svelte/icons/square-terminal';
 import UserRound from '@lucide/svelte/icons/user-round';
@@ -35,6 +36,7 @@ import { t } from '@luft/i18n';
 import type { Hardware } from '#lib/bindings.js';
 import { english } from '#lib/state/english.svelte.js';
 import { PANEL_PAGES, pageKeywords, SUBPAGES, type Page, type PageId, type PanelId } from '@luft/settings-pages';
+import { ROWS } from 'virtual:settings-rows';
 
 export type { PanelId };
 
@@ -56,6 +58,7 @@ export interface Panel extends Page, View {}
 const network = () => import('./connections/network/NetworkPanel.svelte');
 const input = () => import('./devices/input/InputPanel.svelte');
 const sound = () => import('./devices/sound/SoundPanel.svelte');
+const privacy = () => import('./protection/privacy/PrivacyPanel.svelte');
 const security = () => import('./protection/security/SecurityPanel.svelte');
 const accounts = () => import('./system/accounts/AccountsPanel.svelte');
 const system = () => import('./system/SystemPanel.svelte');
@@ -87,8 +90,8 @@ const VIEWS: Record<PageId, View> = {
 	windows: { icon: AppWindow, load: () => import('./personalization/windows/WindowsPanel.svelte') },
 	extensions: { icon: Puzzle, load: () => import('./personalization/extensions/ExtensionsPanel.svelte') },
 	accessibility: { icon: Accessibility, load: () => import('./personalization/accessibility/AccessibilityPanel.svelte') },
-	apps: { icon: LayoutGrid, load: () => import('./protection/apps/AppsPanel.svelte') },
-	privacy: { icon: Hand, load: () => import('./protection/privacy/PrivacyPanel.svelte') },
+	apps: { icon: LayoutGrid, load: () => import('./system/apps/AppsPanel.svelte') },
+	privacy: { icon: Hand, load: privacy },
 	security: { icon: ShieldCheck, load: security },
 	accounts: { icon: UserRound, load: accounts },
 	language: { icon: Languages, load: () => import('./system/language/LanguagePanel.svelte') },
@@ -101,6 +104,7 @@ const VIEWS: Record<PageId, View> = {
 	'sound/custom': { icon: AudioLines, load: sound },
 	'input/shortcuts': { icon: Keyboard, load: input },
 	'input/dictation': { icon: Mic, load: input },
+	'privacy/sharing': { icon: MonitorUp, load: privacy },
 	'security/encryption': { icon: HardDrive, load: security },
 	'security/keyring': { icon: KeyRound, load: security },
 	'security/remote-login': { icon: SquareTerminal, load: security },
@@ -156,12 +160,31 @@ export function shownGroups(hardware: Hardware): Group[] {
 	return GROUPS.map((group) => ({ title: t(group.title), panels: group.panels.filter((panel) => isShown(panel, hardware)) }));
 }
 
-export function searchPanels(query: string, hardware: Hardware): Panel[] {
+export interface Found {
+	panel: Panel;
+	setting: string | null;
+}
+
+const ALL_PANELS = [...PANELS, ...SUBPAGE_PANELS];
+
+const shownPage = (panel: Panel, hardware: Hardware) => isShown(PANELS.find((parent) => parent.id === panel.id.split('/')[0])!, hardware);
+
+export function search(query: string, hardware: Hardware): Found[] {
 	const needle = query.trim().toLocaleLowerCase();
 	const inEnglish = english.translate;
-	return [...PANELS, ...SUBPAGE_PANELS].filter(
-		(panel) =>
-			isShown(panel, hardware) &&
-			[titleOf(panel, hardware), ...pageKeywords(panel, hardware.copilotKey, t, inEnglish)].some((term) => term.toLocaleLowerCase().includes(needle))
-	);
+	const matches = (term: string) => term.toLocaleLowerCase().includes(needle);
+	const pages = ALL_PANELS.filter(
+		(panel) => shownPage(panel, hardware) && [titleOf(panel, hardware), ...pageKeywords(panel, hardware.copilotKey, t, inEnglish)].some(matches)
+	).map((panel) => ({ panel, setting: null }));
+	const seen = new Set<string>();
+	const settings = ROWS.flatMap((row) => {
+		const panel = ALL_PANELS.find((candidate) => candidate.id === row.page)!;
+		const setting = t(row.title);
+		const found = shownPage(panel, hardware) && (matches(setting) || Boolean(inEnglish && matches(inEnglish(row.title))));
+		const key = `${panel.id} ${setting}`;
+		if (!found || seen.has(key) || setting === titleOf(panel, hardware)) return [];
+		seen.add(key);
+		return [{ panel, setting }];
+	});
+	return [...pages, ...settings];
 }

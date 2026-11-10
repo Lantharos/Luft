@@ -7,7 +7,7 @@ use serde::Serialize;
 use specta::Type;
 
 use crate::actions::guard::Guard;
-use crate::actions::{drive, encryption, formatting, luft, mounting, plan};
+use crate::actions::{drive, encryption, formatting, hold, luft, mounting, plan};
 use crate::events::SYSTEM_STEP;
 use crate::images::{self, Imaging};
 use crate::launch;
@@ -16,13 +16,17 @@ use crate::trust::{self, drives as encryption_drives};
 use crate::udisks::{self, snapshot};
 use luft_disks::{moving, partitions, systems};
 use requests::{
-    Block, ChangePassphrase, CreateImage, CreatePartition, Drive, Encrypt, Folder, FormatDrive,
-    FormatEncrypted, FormatVolume, GiveBack, Grow, Handoff, KeySheet, Label, MoveLuft, NextStep,
-    Place, Remove, RestoreImage, Resume, Room, Selftest, Shown, Startup, SystemId, Unlock,
-    Unlocked, Unlocking, Uuid,
+    Block, ChangePassphrase, Clean, CreateImage, CreatePartition, Drive, Encrypt, Folder,
+    FormatDrive, FormatEncrypted, FormatVolume, GiveBack, Grow, Handoff, KeySheet, Label, MoveLuft,
+    NextStep, PendingMove, Place, Remove, RestoreImage, Resume, Room, Selftest, Shown, Startup,
+    SystemId, Unlock, Unlocked, Unlocking, Uuid,
 };
 
 mod requests;
+
+const CHANGING: &str = "Changing partitions";
+const FORMATTING: &str = "Formatting a drive";
+const REMOVING: &str = "Removing another system";
 
 #[derive(Clone, Default)]
 pub struct State {
@@ -77,7 +81,11 @@ fn register_trust(window: SabineWindow) -> SabineWindow {
                  auto_unlock,
              }| async move {
                 Guard::erasable(&block).await?;
-                encryption_drives::format(&block, format, &recovery_key, auto_unlock).await
+                hold::during(
+                    FORMATTING,
+                    encryption_drives::format(&block, format, &recovery_key, auto_unlock),
+                )
+                .await
             },
         )
         .command_async("trust_decrypt", |Unlocked { block, unlock }| async move {
@@ -130,6 +138,11 @@ fn register_space(window: SabineWindow, state: &State) -> SabineWindow {
                 state.explorer.show(path, token.as_deref()).await
             },
         )
+        .with_async("space_clean", state, |state, Clean { what }| async move {
+            tokio::task::spawn_blocking(move || state.explorer.clean(what))
+                .await
+                .map_err(|error| error.to_string())?
+        })
         .with("space_stop", state, |state, Empty {}| {
             state.explorer.stop();
             Ok(())
@@ -137,11 +150,24 @@ fn register_space(window: SabineWindow, state: &State) -> SabineWindow {
 }
 
 fn register_plan(window: SabineWindow, state: &State) -> SabineWindow {
-    window.with_async(
-        "disks_plan_step",
-        state,
-        |state, NextStep { step }| async move { plan::run(&state.events, step).await },
-    )
+    window
+        .with_async(
+            "disks_plan_step",
+            state,
+            |state, NextStep { step }| async move {
+                hold::during(CHANGING, plan::run(&state.events, step)).await
+            },
+        )
+        .command_async("disks_interrupted_moves", |Empty {}| async {
+            Ok(plan::moving::interrupted(&udisks::objects().await?))
+        })
+        .with_async(
+            "disks_finish_move",
+            state,
+            |state, PendingMove { id }| async move {
+                hold::during(CHANGING, plan::moving::finish(&state.events, &id)).await
+            },
+        )
 }
 
 fn register_systems(window: SabineWindow, state: &State) -> SabineWindow {
@@ -151,9 +177,12 @@ fn register_systems(window: SabineWindow, state: &State) -> SabineWindow {
             "disks_remove_system",
             state,
             |state, SystemId { id }| async move {
-                systems::remove(&id, |step| {
-                    state.events.emit(SYSTEM_STEP, step);
-                })
+                hold::during(
+                    REMOVING,
+                    systems::remove(&id, |step| {
+                        state.events.emit(SYSTEM_STEP, step);
+                    }),
+                )
                 .await
             },
         )
@@ -166,7 +195,9 @@ fn register_systems(window: SabineWindow, state: &State) -> SabineWindow {
         .with_async(
             "disks_give_luft",
             state,
-            |state, Room { offset }| async move { luft::give(&state.events, offset).await },
+            |state, Room { offset }| async move {
+                hold::during(CHANGING, luft::give(&state.events, offset)).await
+            },
         )
         .command_async("disks_cancel_system_resize", |Empty {}| {
             systems::luft::cancel_resize()
@@ -231,7 +262,7 @@ fn register_volumes(window: SabineWindow) -> SabineWindow {
             "disks_format_volume",
             |FormatVolume { block, format }| async move {
                 Guard::erasable(&block).await?;
-                formatting::format_volume(&block, &format).await
+                hold::during(FORMATTING, formatting::format_volume(&block, &format)).await
             },
         )
         .command_async(
@@ -243,7 +274,11 @@ fn register_volumes(window: SabineWindow) -> SabineWindow {
                  format,
              }| async move {
                 Guard::erasable(&block).await?;
-                formatting::format_drive(&block, size, removable, &format).await
+                hold::during(
+                    FORMATTING,
+                    formatting::format_drive(&block, size, removable, &format),
+                )
+                .await
             },
         )
         .command_async(
@@ -255,7 +290,11 @@ fn register_volumes(window: SabineWindow) -> SabineWindow {
                  format,
              }| async move {
                 Guard::table(&table).await?.free(offset, size)?;
-                formatting::create_partition(&table, offset, size, &format, true).await
+                hold::during(
+                    FORMATTING,
+                    formatting::create_partition(&table, offset, size, &format, true),
+                )
+                .await
             },
         )
         .command_async("disks_delete_partition", |Block { block }| async move {

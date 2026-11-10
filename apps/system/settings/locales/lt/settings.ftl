@@ -29,7 +29,6 @@ settings-more-show = { $count ->
         [many] Rodyti dar { $count }
        *[other] Rodyti dar { $count }
     }
-settings-more-fewer = Rodyti mažiau
 settings-time-picker = { $label }, { $time }
 settings-time-picker-hour = Valanda
 settings-time-picker-minute = Minutė

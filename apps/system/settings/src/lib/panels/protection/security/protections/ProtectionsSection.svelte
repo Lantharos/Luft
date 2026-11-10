@@ -8,6 +8,7 @@
 	import { Row, Section } from '@luft/ui';
 	import { app } from '#lib/state/app.svelte.js';
 	import AntiCheatRow from './AntiCheatRow.svelte';
+	import DeveloperToolsRow from './DeveloperToolsRow.svelte';
 	import type { SecurityState } from '../state.svelte';
 	import HardwareDialog from './HardwareDialog.svelte';
 	import { levelSentence } from './hsi';
@@ -49,6 +50,7 @@
 	{#if security.usb}
 		<UsbRow {security} usb={security.usb} />
 	{/if}
+	<DeveloperToolsRow />
 </Section>
 
 {#if detailing && security.host}

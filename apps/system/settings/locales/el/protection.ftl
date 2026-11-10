@@ -322,11 +322,6 @@ settings-passwords-history-denied = Δεν επιτράπηκε στην εφα�
 settings-passwords-history-denied-unnamed = Δεν επιτράπηκε στην εφαρμογή { $app } να χρησιμοποιήσει αποθηκευμένο κωδικό πρόσβασης
 settings-passwords-history-signed = Η εφαρμογή { $app } υπέγραψε με το «{ $item }»
 settings-passwords-history-signed-unnamed = Η εφαρμογή { $app } υπέγραψε με έναν αποθηκευμένο κωδικό πρόσβασης
-settings-passwords-history-fewer = Εμφάνιση λιγότερων
-settings-passwords-history-all = { $count ->
-    [one] Εμφάνιση όλων ({ $count })
-   *[other] Εμφάνιση όλων ({ $count })
-}
 settings-passwords-history-clear = Διαγραφή ιστορικού
 settings-passwords-history-clear-description = Διαγραφή του ποιες εφαρμογές χρησιμοποίησαν την κλειδοθήκη σας και πότε
 settings-passwords-history-clear-button = Διαγραφή
@@ -384,71 +379,3 @@ settings-passkeys-rename-description = Δώστε στο κλειδί πρόσβ
 settings-passkeys-name = Όνομα
 settings-passkeys-save = Αποθήκευση
 
-## Apps
-
-settings-apps-defaults = Προεπιλεγμένες εφαρμογές
-settings-apps-defaults-description = Χρησιμοποιούνται όταν ανοίγετε συνδέσμους, αρχεία και φακέλους
-settings-apps-browser = Πρόγραμμα περιήγησης
-settings-apps-email = Email
-settings-apps-calendar = Ημερολόγιο
-settings-apps-music = Μουσική
-settings-apps-videos = Βίντεο
-settings-apps-photos = Φωτογραφίες
-settings-apps-text-editor = Επεξεργαστής κειμένου
-settings-apps-files = Αρχεία
-settings-apps-archives = Συμπιεσμένα αρχεία
-settings-apps-choose = Επιλογή
-settings-apps-startup = Εκκίνηση
-settings-apps-startup-description = Αυτές οι εφαρμογές ανοίγουν όταν συνδέεστε
-settings-apps-startup-app = Άνοιγμα της εφαρμογής { $app } κατά τη σύνδεση
-settings-apps-startup-remove = Αφαίρεση του { $app } από την εκκίνηση
-settings-apps-startup-add = Προσθήκη εφαρμογής
-settings-apps-startup-add-title = Προσθήκη εφαρμογής εκκίνησης
-settings-apps-startup-add-description = Επιλέξτε μια εφαρμογή που θα ανοίγει κάθε φορά που συνδέεστε.
-settings-apps-search = Αναζήτηση εφαρμογών
-settings-apps-no-match = Καμία εφαρμογή δεν ταιριάζει με την αναζήτηση
-settings-apps-cancel = Ακύρωση
-
-## Apps: permissions
-
-settings-apps-permissions = Άδειες
-settings-apps-location = Τοποθεσία
-settings-apps-camera = Κάμερα
-settings-apps-clipboard = Πρόχειρο στο παρασκήνιο
-settings-apps-full-access = Πλήρης πρόσβαση
-settings-apps-full-access-hint = Εκτελείται εκτός του περιβάλλοντος απομόνωσης και μπορεί ό,τι μπορεί ένα πρόγραμμα που ξεκινάτε εσείς. Η αφαίρεση ισχύει από το επόμενο άνοιγμα.
-settings-apps-full-access-remove = Αφαίρεση
-settings-apps-full-access-remove-app = Αφαίρεση πλήρους πρόσβασης από το { $app }
-settings-apps-passwords = Αποθηκευμένοι κωδικοί πρόσβασης
-settings-apps-passwords-forget = Επαναφορά
-settings-apps-passwords-forget-app = Να ρωτήσει ξανά το { $app }
-settings-apps-permissions-allowed = Επιτρέπονται { $allowed } από { $total }
-settings-apps-permissions-description = Οι εφαρμογές σε περιβάλλον απομόνωσης έχουν τα δικά τους αρχεία και μόνο ό,τι επιτρέπετε εδώ.
-settings-apps-sandbox-only = Τίποτα έξω από το περιβάλλον απομόνωσης
-settings-apps-folders = Φάκελοι
-settings-apps-folders-hint = Από το επόμενο άνοιγμα μπορεί να διαβάζει και να αλλάζει τα πάντα σε αυτούς τους φακέλους.
-settings-apps-folders-count = { $count ->
-    [one] { $count } φάκελος
-   *[other] { $count } φάκελοι
-}
-settings-apps-folder-add = Προσθήκη φακέλου
-settings-apps-folder-remove = Αφαίρεση
-settings-apps-folder-remove-app = Διακοπή κοινής χρήσης του { $folder }
-settings-apps-usb = Συσκευές USB
-settings-apps-usb-hint = Όπως κλειδιά ασφαλείας, τηλέφωνα και μικροελεγκτές
-settings-apps-serial = Σειριακές συσκευές
-settings-apps-serial-hint = Όπως εκτυπωτές 3D και πλακέτες συνδεδεμένες μέσω USB
-settings-apps-folder-read-only = Μόνο ανάγνωση
-settings-apps-downloads = Φάκελος Λήψεις
-settings-apps-downloads-hint = Μπορεί να αποθηκεύει αρχεία στον φάκελο Λήψεις και να ανοίγει όσα βρίσκονται εκεί, από το επόμενο άνοιγμα.
-settings-apps-internet = Διαδίκτυο
-settings-apps-internet-hint = Μπορεί να συνδέεται στο διαδίκτυο από το επόμενο άνοιγμα.
-settings-apps-service-hint = Μια υπηρεσία της επιφάνειας εργασίας με την οποία μπορεί να επικοινωνεί
-settings-apps-service-remove = Αφαίρεση
-settings-apps-service-remove-app = Διακοπή επικοινωνίας με { $service }
-settings-apps-services-count = { $count ->
-    [one] { $count } υπηρεσία
-   *[other] { $count } υπηρεσίες
-}
-settings-apps-full-access-off = Εκτελείται σε περιβάλλον απομόνωσης. Η πλήρης πρόσβαση το καταργεί.
-settings-apps-full-access-give = Παροχή πλήρους πρόσβασης

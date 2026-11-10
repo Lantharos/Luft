@@ -25,6 +25,7 @@ class Disks {
 	loaded = $state(false);
 	readonly busy = new SvelteSet<string>();
 	readonly notices = new Toasts(NOTICE_MS);
+	readonly #offered = new Set<string>();
 
 	drive = $derived(this.drives.find((drive) => drive.id === this.driveId) ?? this.drives[0] ?? null);
 
@@ -32,8 +33,10 @@ class Disks {
 		const state = await commands.appState();
 		appearance.start(state);
 		events.disksChanged(({ drives }) => {
+			const arrived = drives.some((drive) => !this.drives.some((known) => known.id === drive.id));
 			this.drives = drives;
 			systems.follow(drives);
+			if (arrived) void this.#offerInterruptedMove();
 		});
 		events.disksImage((progress) => this.#imageProgress(progress));
 		space.listen();
@@ -46,6 +49,7 @@ class Disks {
 		this.protection = protection;
 		this.loaded = true;
 		await this.#locate(state.activation);
+		await this.#offerInterruptedMove();
 	}
 
 	select(drive: string, segment: string | null = null) {
@@ -93,6 +97,16 @@ class Disks {
 			return;
 		}
 		this.image = progress;
+	}
+
+	async #offerInterruptedMove() {
+		const moves = await commands.disksInterruptedMoves().catch(() => []);
+		const move = moves.find((candidate) => !this.#offered.has(candidate.id));
+		if (!move || dialogs.current) return;
+		this.#offered.add(move.id);
+		const drive = this.drives.find((candidate) => candidate.block === move.drive);
+		if (drive) this.select(drive.id);
+		dialogs.open({ kind: 'finish-move', move });
 	}
 
 	async #offerRemoval(id: string) {

@@ -342,13 +342,6 @@ settings-passwords-history-denied = Aplikacija { $app } ni smela uporabiti „{ 
 settings-passwords-history-denied-unnamed = Aplikacija { $app } ni smela uporabiti shranjenega gesla
 settings-passwords-history-signed = Aplikacija { $app } je podpisala s ključem „{ $item }“
 settings-passwords-history-signed-unnamed = Aplikacija { $app } je podpisala s shranjenim geslom
-settings-passwords-history-fewer = Pokaži manj
-settings-passwords-history-all = { $count ->
-    [one] Pokaži vse ({ $count })
-    [two] Pokaži vse ({ $count })
-    [few] Pokaži vse ({ $count })
-   *[other] Pokaži vse ({ $count })
-}
 settings-passwords-history-clear = Počisti zgodovino
 settings-passwords-history-clear-description = Pozabi, katere aplikacije so uporabljale zbirko ključev in kdaj
 settings-passwords-history-clear-button = Počisti
@@ -406,75 +399,3 @@ settings-passkeys-rename-description = Ključu za dostop za { $site } dajte ime,
 settings-passkeys-name = Ime
 settings-passkeys-save = Shrani
 
-## Apps
-
-settings-apps-defaults = Privzete aplikacije
-settings-apps-defaults-description = Uporabijo se, ko odprete povezave, datoteke in mape
-settings-apps-browser = Spletni brskalnik
-settings-apps-email = E-pošta
-settings-apps-calendar = Koledar
-settings-apps-music = Glasba
-settings-apps-videos = Videoposnetki
-settings-apps-photos = Fotografije
-settings-apps-text-editor = Urejevalnik besedil
-settings-apps-files = Datoteke
-settings-apps-archives = Arhivi
-settings-apps-choose = Izberite
-settings-apps-startup = Zagon
-settings-apps-startup-description = Te aplikacije se odprejo, ko se prijavite
-settings-apps-startup-app = Odpri aplikacijo { $app } ob prijavi
-settings-apps-startup-remove = Odstrani { $app } iz zagona
-settings-apps-startup-add = Dodaj aplikacijo
-settings-apps-startup-add-title = Dodajte aplikacijo ob zagonu
-settings-apps-startup-add-description = Izberite aplikacijo, ki se bo odprla ob vsaki prijavi.
-settings-apps-search = Iskanje aplikacij
-settings-apps-no-match = Nobena aplikacija se ne ujema z iskanjem
-settings-apps-cancel = Prekliči
-
-## Apps: permissions
-
-settings-apps-permissions = Dovoljenja
-settings-apps-location = Lokacija
-settings-apps-camera = Kamera
-settings-apps-clipboard = Odložišče v ozadju
-settings-apps-full-access = Polni dostop
-settings-apps-full-access-hint = Deluje zunaj peskovnika in lahko naredi vse, kar lahko program, ki ga zaženete sami. Odstranitev velja od naslednjega odprtja.
-settings-apps-full-access-remove = Odstrani
-settings-apps-full-access-remove-app = Odstrani polni dostop za { $app }
-settings-apps-passwords = Shranjena gesla
-settings-apps-passwords-forget = Pozabi
-settings-apps-passwords-forget-app = Naj { $app } znova vpraša
-settings-apps-permissions-allowed = Dovoljeno: { $allowed } od { $total }
-settings-apps-permissions-description = Aplikacije v peskovniku dobijo svoje datoteke in samo to, kar dovolite tukaj.
-settings-apps-sandbox-only = Nič zunaj peskovnika
-settings-apps-folders = Mape
-settings-apps-folders-hint = Od naslednjega odprtja lahko bere in spreminja vse v teh mapah.
-settings-apps-folders-count = { $count ->
-    [one] { $count } mapa
-    [two] { $count } mapi
-    [few] { $count } mape
-   *[other] { $count } map
-}
-settings-apps-folder-add = Dodaj mapo
-settings-apps-folder-remove = Odstrani
-settings-apps-folder-remove-app = Prenehaj deliti { $folder }
-settings-apps-usb = Naprave USB
-settings-apps-usb-hint = Na primer varnostni ključi, telefoni in mikrokrmilniki
-settings-apps-serial = Serijske naprave
-settings-apps-serial-hint = Na primer 3D-tiskalniki in plošče, povezane prek USB
-settings-apps-folder-read-only = Samo za branje
-settings-apps-downloads = Mapa Prenosi
-settings-apps-downloads-hint = Od naslednjega odpiranja lahko shranjuje datoteke v mapo Prenosi in odpira tiste v njej.
-settings-apps-internet = Internet
-settings-apps-internet-hint = Od naslednjega odpiranja lahko dostopa do interneta.
-settings-apps-service-hint = Storitev na namizju, s katero lahko komunicira
-settings-apps-service-remove = Odstrani
-settings-apps-service-remove-app = Prepovej komunikacijo s storitvijo { $service }
-settings-apps-services-count = { $count ->
-    [one] { $count } storitev
-    [two] { $count } storitvi
-    [few] { $count } storitve
-   *[other] { $count } storitev
-}
-settings-apps-full-access-off = Deluje v peskovniku. Polni dostop odstrani peskovnik.
-settings-apps-full-access-give = Dovoli polni dostop

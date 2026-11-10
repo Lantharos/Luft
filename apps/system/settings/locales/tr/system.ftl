@@ -329,3 +329,69 @@ settings-accounts-text-me = Bunun yerine kodu SMS ile gönder
 settings-accounts-choose-phone = Apple kodu hangi numaraya göndersin?
     .description = SMS gönder
 settings-accounts-approve = Apple Hesabınız İleri Düzey Veri Koruması’nı kullanıyor. Bu bilgisayarın iCloud Drive’ı açabilmesi için iPhone, iPad ya da Mac’inizde isteği onaylayın.
+
+## Apps
+
+settings-apps-defaults = Varsayılan uygulamalar
+settings-apps-defaults-description = Bağlantıları, dosyaları ve klasörleri açtığınızda kullanılır
+settings-apps-browser = Web tarayıcısı
+settings-apps-email = E-posta
+settings-apps-calendar = Takvim
+settings-apps-music = Müzik
+settings-apps-videos = Videolar
+settings-apps-photos = Fotoğraflar
+settings-apps-text-editor = Metin düzenleyici
+settings-apps-files = Dosyalar
+settings-apps-archives = Arşivler
+settings-apps-choose = Seçin
+settings-apps-startup = Başlangıç
+settings-apps-startup-description = Bu uygulamalar oturum açtığınızda açılır
+settings-apps-startup-app = Oturum açınca { $app } uygulamasını aç
+settings-apps-startup-remove = { $app } uygulamasını başlangıçtan kaldır
+settings-apps-startup-add = Uygulama ekle
+settings-apps-startup-add-title = Başlangıç uygulaması ekle
+settings-apps-startup-add-description = Her oturum açtığınızda açılacak bir uygulama seçin.
+settings-apps-search = Uygulamalarda ara
+settings-apps-no-match = Aramanızla eşleşen uygulama yok
+settings-apps-cancel = İptal
+settings-apps-permissions = İzinler
+settings-apps-location = Konum
+settings-apps-camera = Kamera
+settings-apps-clipboard = Arka planda pano
+settings-apps-full-access = Tam erişim
+settings-apps-full-access-hint = Korumalı alanının dışında çalışır ve kendi başlattığınız bir programın yapabildiği her şeyi yapabilir. Kaldırma bir sonraki açılışta geçerli olur.
+settings-apps-full-access-remove = Kaldır
+settings-apps-full-access-remove-app = { $app } uygulamasının tam erişimini kaldır
+settings-apps-passwords = Kayıtlı parolalar
+settings-apps-passwords-forget = Unut
+settings-apps-passwords-forget-app = { $app } yeniden sorsun
+settings-apps-permissions-allowed = { $allowed }/{ $total } izinli
+settings-apps-permissions-description = Korumalı alandaki uygulamalar kendi dosyalarını ve yalnızca burada izin verdiklerinizi alır.
+settings-apps-sandbox-only = Korumalı alanı dışında hiçbir şey
+settings-apps-folders = Klasörler
+settings-apps-folders-hint = Bir sonraki açılışından itibaren bu klasörlerdeki her şeyi okuyup değiştirebilir.
+settings-apps-folders-count = { $count ->
+    [one] { $count } klasör
+   *[other] { $count } klasör
+}
+settings-apps-folder-add = Klasör ekle
+settings-apps-folder-remove = Kaldır
+settings-apps-folder-remove-app = { $folder } paylaşımını durdur
+settings-apps-usb = USB aygıtları
+settings-apps-usb-hint = Güvenlik anahtarları, telefonlar ve mikrodenetleyiciler gibi
+settings-apps-serial = Seri aygıtlar
+settings-apps-serial-hint = 3D yazıcılar ve USB ile bağlanan kartlar gibi
+settings-apps-folder-read-only = Salt okunur
+settings-apps-downloads = İndirilenler klasörü
+settings-apps-downloads-hint = Bir sonraki açılışından itibaren İndirilenler klasörüne dosya kaydedebilir ve oradakileri açabilir.
+settings-apps-internet = İnternet
+settings-apps-internet-hint = Bir sonraki açılışından itibaren internete bağlanabilir.
+settings-apps-service-hint = Masaüstünde konuşabildiği bir hizmet
+settings-apps-service-remove = Kaldır
+settings-apps-service-remove-app = { $service } ile konuşmasına artık izin verme
+settings-apps-services-count = { $count ->
+    [one] { $count } hizmet
+   *[other] { $count } hizmet
+}
+settings-apps-full-access-off = Korumalı alanda çalışıyor. Tam erişim korumalı alanı kaldırır.
+settings-apps-full-access-give = Tam erişim ver

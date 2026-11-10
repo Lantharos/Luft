@@ -344,3 +344,75 @@ settings-accounts-text-me = Seol cód chugam i dteachtaireacht téacs ina ionad
 settings-accounts-choose-phone = Cén uimhir ar cheart do Apple an cód a sheoladh chuici?
     .description = Seol teachtaireacht téacs
 settings-accounts-approve = Úsáideann do chuntas Apple Advanced Data Protection. Ceadaigh an t-iarratas ar d’iPhone, d’iPad nó do Mac ionas gur féidir leis an ríomhaire seo iCloud Drive a oscailt.
+
+## Apps
+
+settings-apps-defaults = Aipeanna réamhshocraithe
+settings-apps-defaults-description = Úsáidtear iad nuair a osclaíonn tú naisc, comhaid agus fillteáin
+settings-apps-browser = Brabhsálaí gréasáin
+settings-apps-email = Ríomhphost
+settings-apps-calendar = Féilire
+settings-apps-music = Ceol
+settings-apps-videos = Físeáin
+settings-apps-photos = Grianghraif
+settings-apps-text-editor = Eagarthóir téacs
+settings-apps-files = Comhaid
+settings-apps-archives = Cartlanna
+settings-apps-choose = Roghnaigh
+settings-apps-startup = Tosú
+settings-apps-startup-description = Osclaítear na haipeanna seo nuair a shíníonn tú isteach
+settings-apps-startup-app = Oscail { $app } nuair a shíníonn tú isteach
+settings-apps-startup-remove = Bain { $app } den tosú
+settings-apps-startup-add = Cuir aip leis
+settings-apps-startup-add-title = Cuir aip tosaithe leis
+settings-apps-startup-add-description = Roghnaigh aip le hoscailt gach uair a shíníonn tú isteach.
+settings-apps-search = Cuardaigh aipeanna
+settings-apps-no-match = Níl aon aip ag teacht le do chuardach
+settings-apps-cancel = Cealaigh
+settings-apps-permissions = Ceadanna
+settings-apps-location = Suíomh
+settings-apps-camera = Ceamara
+settings-apps-clipboard = Gearrthaisce sa chúlra
+settings-apps-full-access = Rochtain iomlán
+settings-apps-full-access-hint = Ritheann sé lasmuigh dá bhosca gainimh agus is féidir leis gach rud is féidir le ríomhchlár a thosaíonn tú féin. Beidh feidhm leis an mbaint an chéad uair eile a osclaítear é.
+settings-apps-full-access-remove = Bain
+settings-apps-full-access-remove-app = Bain rochtain iomlán de { $app }
+settings-apps-passwords = Pasfhocail shábháilte
+settings-apps-passwords-forget = Déan dearmad
+settings-apps-passwords-forget-app = Lig do { $app } fiafraí arís
+settings-apps-permissions-allowed = { $allowed } as { $total } ceadaithe
+settings-apps-permissions-description = Faigheann aipeanna i mbosca gainimh a gcuid comhad féin agus a gceadaíonn tú anseo amháin.
+settings-apps-sandbox-only = Faic lasmuigh dá bhosca gainimh
+settings-apps-folders = Fillteáin
+settings-apps-folders-hint = Is féidir leis gach rud sna fillteáin seo a léamh agus a athrú, ón chéad uair eile a osclaítear é.
+settings-apps-folders-count = { $count ->
+    [one] Fillteáin: { $count }
+    [two] Fillteáin: { $count }
+    [few] Fillteáin: { $count }
+    [many] Fillteáin: { $count }
+   *[other] Fillteáin: { $count }
+}
+settings-apps-folder-add = Cuir fillteán leis
+settings-apps-folder-remove = Bain
+settings-apps-folder-remove-app = Stop ag comhroinnt { $folder }
+settings-apps-usb = Gléasanna USB
+settings-apps-usb-hint = Mar eochracha slándála, fóin agus micrea-rialaitheoirí
+settings-apps-serial = Gléasanna sraitheacha
+settings-apps-serial-hint = Mar phrintéirí 3D agus cláir atá ceangailte trí USB
+settings-apps-folder-read-only = Inléite amháin
+settings-apps-downloads = Fillteán Íoslódálacha
+settings-apps-downloads-hint = Is féidir leis comhaid a shábháil i bhfillteán Íoslódálacha agus iad siúd atá ann a oscailt, ón chéad uair eile a osclaítear é.
+settings-apps-internet = Idirlíon
+settings-apps-internet-hint = Is féidir leis dul ar líne ón chéad uair eile a osclaítear é.
+settings-apps-service-hint = Seirbhís ar do dheasc ar féidir leis labhairt léi
+settings-apps-service-remove = Bain
+settings-apps-service-remove-app = Ná lig dó labhairt le { $service } a thuilleadh
+settings-apps-services-count = { $count ->
+    [one] Seirbhísí: { $count }
+    [two] Seirbhísí: { $count }
+    [few] Seirbhísí: { $count }
+    [many] Seirbhísí: { $count }
+   *[other] Seirbhísí: { $count }
+}
+settings-apps-full-access-off = Ritheann sé i mbosca gainimh. Baineann lánrochtain an bosca gainimh.
+settings-apps-full-access-give = Tabhair lánrochtain

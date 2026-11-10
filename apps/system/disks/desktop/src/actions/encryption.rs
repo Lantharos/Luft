@@ -1,14 +1,8 @@
 use luft_trust::Outcome;
-use zbus::OwnedObjectPath;
 
 use super::passphrases;
 use crate::trust::drives;
-use crate::udisks::{self, BLOCK, ENCRYPTED, no_options};
-
-const WRONG_PASSPHRASE: [&str; 2] = [
-    "Incorrect passphrase.",
-    "No keyslot with given passphrase found.",
-];
+use crate::udisks::{self, BLOCK};
 
 async fn text_of(block: &str, property: &str) -> Option<String> {
     udisks::objects()
@@ -53,20 +47,6 @@ async fn remembered(block: &str) -> Option<String> {
     passphrases::load(&uuid_of(block).await.ok()?).await
 }
 
-fn outcome<T>(result: Result<T, String>) -> Result<Outcome<T>, String> {
-    match result {
-        Ok(value) => Ok(Outcome::Done(value)),
-        Err(message)
-            if WRONG_PASSPHRASE
-                .iter()
-                .any(|ending| message.ends_with(ending)) =>
-        {
-            Ok(Outcome::WrongKey(message))
-        }
-        Err(message) => Err(message),
-    }
-}
-
 pub async fn unlock(
     block: &str,
     passphrase: Option<&str>,
@@ -81,20 +61,16 @@ pub async fn unlock(
             .await
             .map(Outcome::Done);
     };
-    let unlocked = outcome(
-        udisks::call::<OwnedObjectPath>(
-            block,
-            ENCRYPTED,
-            "Unlock",
-            &(passphrase.as_str(), no_options()),
-        )
-        .await
-        .map(|_| true),
-    )?;
-    if remember_it && matches!(unlocked, Outcome::Done(true)) {
-        remember(block, &passphrase).await?;
+    let device = drives::device_of(block).await?;
+    match luft_trust::drives::unlock(&device, &passphrase).await? {
+        Outcome::Done(_) => {
+            if remember_it {
+                remember(block, &passphrase).await?;
+            }
+            Ok(Outcome::Done(true))
+        }
+        Outcome::WrongKey(message) => Ok(Outcome::WrongKey(message)),
     }
-    Ok(unlocked)
 }
 
 pub async fn lock(block: &str) -> Result<(), String> {
@@ -106,15 +82,8 @@ pub async fn change_passphrase(
     current: &str,
     next: &str,
 ) -> Result<Outcome<()>, String> {
-    let changed = outcome(
-        udisks::run(
-            block,
-            ENCRYPTED,
-            "ChangePassphrase",
-            &(current, next, no_options()),
-        )
-        .await,
-    )?;
+    let device = drives::device_of(block).await?;
+    let changed = luft_trust::drives::change_passphrase(&device, current, next).await?;
     if matches!(changed, Outcome::Done(())) && remembered(block).await.is_some() {
         remember(block, next).await?;
     }

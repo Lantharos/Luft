@@ -334,3 +334,71 @@ settings-accounts-text-me = Pošalji mi kod u SMS poruci
 settings-accounts-choose-phone = Na koji broj Apple treba da pošalje kod?
     .description = Pošalji SMS poruku
 settings-accounts-approve = Vaš Apple nalog koristi naprednu zaštitu podataka. Odobrite zahtev na uređaju iPhone, iPad ili Mac da bi ovaj računar mogao da otvori iCloud Drive.
+
+## Apps
+
+settings-apps-defaults = Podrazumevane aplikacije
+settings-apps-defaults-description = Koriste se kada otvarate veze, datoteke i fascikle
+settings-apps-browser = Veb pregledač
+settings-apps-email = E-pošta
+settings-apps-calendar = Kalendar
+settings-apps-music = Muzika
+settings-apps-videos = Video-snimci
+settings-apps-photos = Fotografije
+settings-apps-text-editor = Uređivač teksta
+settings-apps-files = Datoteke
+settings-apps-archives = Arhive
+settings-apps-choose = Izaberi
+settings-apps-startup = Pokretanje
+settings-apps-startup-description = Ove aplikacije se otvaraju kada se prijavite
+settings-apps-startup-app = Otvori aplikaciju { $app } pri prijavi
+settings-apps-startup-remove = Ukloni { $app } iz pokretanja
+settings-apps-startup-add = Dodaj aplikaciju
+settings-apps-startup-add-title = Dodajte aplikaciju pri pokretanju
+settings-apps-startup-add-description = Izaberite aplikaciju koja će se otvarati pri svakoj prijavi.
+settings-apps-search = Pretraži aplikacije
+settings-apps-no-match = Nijedna aplikacija ne odgovara pretrazi
+settings-apps-cancel = Otkaži
+settings-apps-permissions = Dozvole
+settings-apps-location = Lokacija
+settings-apps-camera = Kamera
+settings-apps-clipboard = Ostava u pozadini
+settings-apps-full-access = Puni pristup
+settings-apps-full-access-hint = Radi van svog sendboksa i može sve što može program koji sami pokrenete. Uklanjanje važi od sledećeg otvaranja.
+settings-apps-full-access-remove = Ukloni
+settings-apps-full-access-remove-app = Ukloni puni pristup za { $app }
+settings-apps-passwords = Sačuvane lozinke
+settings-apps-passwords-forget = Zaboravi
+settings-apps-passwords-forget-app = Neka { $app } ponovo pita
+settings-apps-permissions-allowed = Dozvoljeno { $allowed } od { $total }
+settings-apps-permissions-description = Aplikacije u sendboksu dobijaju svoje datoteke i samo ono što ovde dozvolite.
+settings-apps-sandbox-only = Ništa van sendboksa
+settings-apps-folders = Fascikle
+settings-apps-folders-hint = Od sledećeg otvaranja može da čita i menja sve u ovim fasciklama.
+settings-apps-folders-count = { $count ->
+    [one] { $count } fascikla
+    [few] { $count } fascikle
+   *[other] { $count } fascikli
+}
+settings-apps-folder-add = Dodaj fasciklu
+settings-apps-folder-remove = Ukloni
+settings-apps-folder-remove-app = Prestani da deliš { $folder }
+settings-apps-usb = USB uređaji
+settings-apps-usb-hint = Poput bezbednosnih ključeva, telefona i mikrokontrolera
+settings-apps-serial = Serijski uređaji
+settings-apps-serial-hint = Poput 3D štampača i pločica povezanih preko USB-a
+settings-apps-folder-read-only = Samo za čitanje
+settings-apps-downloads = Fascikla Preuzimanja
+settings-apps-downloads-hint = Može da čuva datoteke u fascikli Preuzimanja i da otvara one u njoj, od sledećeg otvaranja.
+settings-apps-internet = Internet
+settings-apps-internet-hint = Može da pristupa internetu od sledećeg otvaranja.
+settings-apps-service-hint = Usluga na radnoj površini sa kojom može da komunicira
+settings-apps-service-remove = Ukloni
+settings-apps-service-remove-app = Zabrani komunikaciju sa uslugom { $service }
+settings-apps-services-count = { $count ->
+    [one] { $count } usluga
+    [few] { $count } usluge
+   *[other] { $count } usluga
+}
+settings-apps-full-access-off = Radi u sendboksu. Pun pristup uklanja sendboks.
+settings-apps-full-access-give = Daj pun pristup

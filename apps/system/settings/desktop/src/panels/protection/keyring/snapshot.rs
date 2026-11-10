@@ -93,6 +93,7 @@ struct SshKey {
     chip: bool,
     confirm: bool,
     added: u64,
+    loaded: bool,
 }
 
 #[derive(Serialize, specta::Type)]
@@ -155,10 +156,12 @@ pub async fn access() -> Result<Access, Problem> {
 
 async fn ssh() -> Result<Ssh, Problem> {
     let agent: Agent = bus::properties(SSH).await?;
+    let unloaded = bus::call::<_, Vec<String>>(SSH, "Unloaded", &()).await?;
     let keys = bus::call::<_, Vec<Key>>(SSH, "Keys", &())
         .await?
         .into_iter()
         .map(|(fingerprint, name, kind, chip, confirm, added)| SshKey {
+            loaded: !unloaded.contains(&fingerprint),
             fingerprint,
             name,
             kind: parse(kind),

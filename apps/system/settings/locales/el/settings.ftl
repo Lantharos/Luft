@@ -27,7 +27,6 @@ settings-more-show = { $count ->
         [one] Εμφάνιση { $count } ακόμη
        *[other] Εμφάνιση { $count } ακόμη
     }
-settings-more-fewer = Εμφάνιση λιγότερων
 settings-time-picker = { $label }, { $time }
 settings-time-picker-hour = Ώρα
 settings-time-picker-minute = Λεπτό

@@ -329,3 +329,69 @@ settings-accounts-text-me = Fá kóða með SMS í staðinn
 settings-accounts-choose-phone = Í hvaða númer á Apple að senda kóðann?
     .description = Senda SMS
 settings-accounts-approve = Apple-aðgangurinn þinn notar Advanced Data Protection. Samþykktu beiðnina á iPhone, iPad eða Mac til að leyfa þessari tölvu að opna iCloud Drive.
+
+## Apps
+
+settings-apps-defaults = Sjálfgefin forrit
+settings-apps-defaults-description = Notuð þegar þú opnar tengla, skrár og möppur
+settings-apps-browser = Vafri
+settings-apps-email = Tölvupóstur
+settings-apps-calendar = Dagatal
+settings-apps-music = Tónlist
+settings-apps-videos = Myndskeið
+settings-apps-photos = Ljósmyndir
+settings-apps-text-editor = Textaritill
+settings-apps-files = Skrár
+settings-apps-archives = Þjappaðar skrár
+settings-apps-choose = Veldu
+settings-apps-startup = Ræsing
+settings-apps-startup-description = Þessi forrit opnast þegar þú skráir þig inn
+settings-apps-startup-app = Opna { $app } við innskráningu
+settings-apps-startup-remove = Fjarlægja { $app } úr ræsingu
+settings-apps-startup-add = Bæta við forriti
+settings-apps-startup-add-title = Bæta við ræsiforriti
+settings-apps-startup-add-description = Veldu forrit sem opnast í hvert sinn sem þú skráir þig inn.
+settings-apps-search = Leita að forritum
+settings-apps-no-match = Engin forrit passa við leitina
+settings-apps-cancel = Hætta við
+settings-apps-permissions = Heimildir
+settings-apps-location = Staðsetning
+settings-apps-camera = Myndavél
+settings-apps-clipboard = Klippiborð í bakgrunni
+settings-apps-full-access = Fullur aðgangur
+settings-apps-full-access-hint = Það keyrir utan sandkassans og getur allt sem forrit sem þú ræsir sjálf(ur) getur. Fjarlæging tekur gildi við næstu ræsingu.
+settings-apps-full-access-remove = Fjarlægja
+settings-apps-full-access-remove-app = Fjarlægja fullan aðgang frá { $app }
+settings-apps-passwords = Vistuð lykilorð
+settings-apps-passwords-forget = Gleyma
+settings-apps-passwords-forget-app = Láta { $app } spyrja aftur
+settings-apps-permissions-allowed = { $allowed } af { $total } leyfð
+settings-apps-permissions-description = Forrit í sandkassa fá eigin skrár og aðeins það sem þú leyfir hér.
+settings-apps-sandbox-only = Ekkert utan sandkassans
+settings-apps-folders = Möppur
+settings-apps-folders-hint = Það getur lesið og breytt öllu í þessum möppum frá næstu ræsingu.
+settings-apps-folders-count = { $count ->
+    [one] { $count } mappa
+   *[other] { $count } möppur
+}
+settings-apps-folder-add = Bæta við möppu
+settings-apps-folder-remove = Fjarlægja
+settings-apps-folder-remove-app = Hætta að deila { $folder }
+settings-apps-usb = USB-tæki
+settings-apps-usb-hint = Til dæmis öryggislyklar, símar og örstýringar
+settings-apps-serial = Raðtengitæki
+settings-apps-serial-hint = Til dæmis þrívíddarprentarar og borð tengd með USB
+settings-apps-folder-read-only = Aðeins lestur
+settings-apps-downloads = Niðurhalsmappa
+settings-apps-downloads-hint = Það getur vistað skrár í niðurhalsmöppuna og opnað þær sem eru þar, frá því næst þegar það er opnað.
+settings-apps-internet = Internet
+settings-apps-internet-hint = Það getur farið á netið frá því næst þegar það er opnað.
+settings-apps-service-hint = Þjónusta á skjáborðinu sem það getur talað við
+settings-apps-service-remove = Fjarlægja
+settings-apps-service-remove-app = Hætta að leyfa samskipti við { $service }
+settings-apps-services-count = { $count ->
+    [one] { $count } þjónusta
+   *[other] { $count } þjónustur
+}
+settings-apps-full-access-off = Það keyrir í sandkassa. Fullur aðgangur tekur sandkassann burt.
+settings-apps-full-access-give = Veita fullan aðgang

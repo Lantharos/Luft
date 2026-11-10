@@ -344,3 +344,75 @@ settings-accounts-text-me = Ibgħatli kodiċi b’SMS minflok
 settings-accounts-choose-phone = Għal liema numru għandha Apple tibgħat il-kodiċi?
     .description = Ibgħat SMS
 settings-accounts-approve = L-Apple Account juża Advanced Data Protection. Approva t-talba fuq l-iPhone, l-iPad jew il-Mac biex dan il-kompjuter ikun jista’ jiftaħ iCloud Drive.
+
+## Apps
+
+settings-apps-defaults = Apps default
+settings-apps-defaults-description = Jintużaw meta tiftaħ links, fajls u fowlders
+settings-apps-browser = Web browser
+settings-apps-email = Email
+settings-apps-calendar = Kalendarju
+settings-apps-music = Mużika
+settings-apps-videos = Vidjows
+settings-apps-photos = Ritratti
+settings-apps-text-editor = Editur tat-test
+settings-apps-files = Fajls
+settings-apps-archives = Arkivji
+settings-apps-choose = Agħżel
+settings-apps-startup = Startjar
+settings-apps-startup-description = Dawn l-apps jinfetħu meta tidħol
+settings-apps-startup-app = Iftaħ { $app } meta tidħol
+settings-apps-startup-remove = Neħħi { $app } mill-bidu
+settings-apps-startup-add = Żid app
+settings-apps-startup-add-title = Żid app tal-istartjar
+settings-apps-startup-add-description = Agħżel app li tinfetaħ kull darba li tidħol.
+settings-apps-search = Fittex apps
+settings-apps-no-match = L-ebda app ma taqbel mat-tfittxija
+settings-apps-cancel = Ikkanċella
+settings-apps-permissions = Permessi
+settings-apps-location = Post
+settings-apps-camera = Kamera
+settings-apps-clipboard = Klibbord fl-isfond
+settings-apps-full-access = Aċċess sħiħ
+settings-apps-full-access-hint = Taħdem barra mis-sandbox tagħha u tista' tagħmel dak kollu li jista' jagħmel programm li tibda int. It-tneħħija tidħol fis-seħħ il-ftuħ li jmiss.
+settings-apps-full-access-remove = Neħħi
+settings-apps-full-access-remove-app = Neħħi l-aċċess sħiħ minn { $app }
+settings-apps-passwords = Passwords issejvjati
+settings-apps-passwords-forget = Insa
+settings-apps-passwords-forget-app = Ħalli lil { $app } terġa’ tistaqsi
+settings-apps-permissions-allowed = { $allowed } minn { $total } permessi
+settings-apps-permissions-description = L-apps f'sandbox ikollhom il-fajls tagħhom u biss dak li tippermetti hawn.
+settings-apps-sandbox-only = Xejn lil hinn mis-sandbox tagħha
+settings-apps-folders = Folders
+settings-apps-folders-hint = Mill-ftuħ li jmiss tista' taqra u tibdel kollox f'dawn il-folders.
+settings-apps-folders-count = { $count ->
+    [one] { $count } folder
+    [two] { $count } folders
+    [few] { $count } folders
+    [many] { $count } folders
+   *[other] { $count } folders
+}
+settings-apps-folder-add = Żid folder
+settings-apps-folder-remove = Neħħi
+settings-apps-folder-remove-app = Ieqaf aqsam { $folder }
+settings-apps-usb = Apparat USB
+settings-apps-usb-hint = Bħal ċwievet tas-sigurtà, telefowns u mikrokontrollers
+settings-apps-serial = Apparat serjali
+settings-apps-serial-hint = Bħal printers 3D u boards imqabbda bl-USB
+settings-apps-folder-read-only = Qari biss
+settings-apps-downloads = Folder Downloads
+settings-apps-downloads-hint = Tista' ssejvja fajls fil-folder Downloads u tiftaħ dawk li hemm, mill-darba li jmiss li tinfetaħ.
+settings-apps-internet = Internet
+settings-apps-internet-hint = Tista' tmur online mill-darba li jmiss li tinfetaħ.
+settings-apps-service-hint = Servizz fuq id-desktop li tista' titkellem miegħu
+settings-apps-service-remove = Neħħi
+settings-apps-service-remove-app = Twaqqafha milli titkellem ma' { $service }
+settings-apps-services-count = { $count ->
+    [one] { $count } servizz
+    [two] { $count } servizzi
+    [few] { $count } servizzi
+    [many] { $count } servizzi
+   *[other] { $count } servizzi
+}
+settings-apps-full-access-off = Taħdem f'sandbox. L-aċċess sħiħ ineħħi s-sandbox.
+settings-apps-full-access-give = Agħti aċċess sħiħ

@@ -27,7 +27,6 @@ settings-more-show = { $count ->
         [one] Még { $count } megjelenítése
        *[other] Még { $count } megjelenítése
     }
-settings-more-fewer = Kevesebb megjelenítése
 settings-time-picker = { $label }, { $time }
 settings-time-picker-hour = Óra
 settings-time-picker-minute = Perc

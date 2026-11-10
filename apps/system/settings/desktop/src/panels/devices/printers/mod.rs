@@ -18,7 +18,15 @@ static WATCH: OnceCell<()> = OnceCell::const_new();
 #[serde(rename_all = "camelCase")]
 struct PrintersState {
     printers: Vec<queue::Printer>,
+    available: Vec<AvailablePrinter>,
     jobs: Vec<queue::PrintJob>,
+}
+
+#[derive(Serialize, specta::Type)]
+struct AvailablePrinter {
+    name: String,
+    description: String,
+    location: String,
 }
 
 #[derive(Deserialize, specta::Type)]
@@ -55,8 +63,17 @@ struct PrinterOptions {
 
 async fn read() -> Result<PrintersState, String> {
     let (printers, jobs) = tokio::join!(queue::printers(), queue::jobs());
+    let available = queue::proxy().await?.available().await.unwrap_or_default();
     Ok(PrintersState {
         printers: printers?,
+        available: available
+            .into_iter()
+            .map(|(name, description, location)| AvailablePrinter {
+                name,
+                description,
+                location,
+            })
+            .collect(),
         jobs: jobs.unwrap_or_default(),
     })
 }
@@ -86,6 +103,14 @@ async fn set_default(PrinterName { name }: PrinterName) -> Result<(), String> {
     queue::proxy()
         .await?
         .set_default(&name)
+        .await
+        .map_err(|error| explain(&error))
+}
+
+async fn add_available(PrinterName { name }: PrinterName) -> Result<(), String> {
+    queue::proxy()
+        .await?
+        .add_available(&name)
         .await
         .map_err(|error| explain(&error))
 }
@@ -136,6 +161,7 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
         .bridge_event(&PRINTERS_CHANGED)
         .with_async("printers_state", events, state)
         .command_async("printers_set_default", set_default)
+        .command_async("printers_add_available", add_available)
         .command_async("printers_test_page", test_page)
         .command_async("printers_cancel_job", cancel_job)
         .command_async("printers_devices", |Empty {}| setup::devices())

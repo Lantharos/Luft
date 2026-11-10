@@ -156,7 +156,7 @@ async fn place(
     if size < guard.size {
         resize::resize(block, size, true).await?;
     }
-    let moved = moving::shift(events, block, offset).await?;
+    let moved = moving::shift(events, block, offset, guard.label()).await?;
     if size > guard.size {
         resize::resize(&moved, size, true).await?;
     }

@@ -27,7 +27,6 @@ settings-more-show = { $count ->
         [one] Shfaq edhe { $count }
        *[other] Shfaq edhe { $count }
     }
-settings-more-fewer = Shfaq më pak
 settings-time-picker = { $label }, { $time }
 settings-time-picker-hour = Ora
 settings-time-picker-minute = Minuta

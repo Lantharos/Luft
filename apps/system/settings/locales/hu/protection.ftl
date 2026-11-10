@@ -322,11 +322,6 @@ settings-passwords-history-denied = { $app } nem használhatta: „{ $item }”
 settings-passwords-history-denied-unnamed = { $app } nem használhatott egy mentett jelszót
 settings-passwords-history-signed = { $app } aláírt ezzel: „{ $item }”
 settings-passwords-history-signed-unnamed = { $app } aláírt egy mentett jelszóval
-settings-passwords-history-fewer = Kevesebb megjelenítése
-settings-passwords-history-all = { $count ->
-    [one] Összes megjelenítése ({ $count })
-   *[other] Összes megjelenítése ({ $count })
-}
 settings-passwords-history-clear = Előzmények törlése
 settings-passwords-history-clear-description = Annak elfelejtése, hogy mely alkalmazások és mikor használták a kulcstartót
 settings-passwords-history-clear-button = Törlés
@@ -384,71 +379,3 @@ settings-passkeys-rename-description = Adjon felismerhető nevet a jelkulcsnak e
 settings-passkeys-name = Név
 settings-passkeys-save = Mentés
 
-## Apps
-
-settings-apps-defaults = Alapértelmezett alkalmazások
-settings-apps-defaults-description = Hivatkozások, fájlok és mappák megnyitásakor használatosak
-settings-apps-browser = Webböngésző
-settings-apps-email = E-mail
-settings-apps-calendar = Naptár
-settings-apps-music = Zene
-settings-apps-videos = Videók
-settings-apps-photos = Fényképek
-settings-apps-text-editor = Szövegszerkesztő
-settings-apps-files = Fájlok
-settings-apps-archives = Tömörített fájlok
-settings-apps-choose = Válasszon
-settings-apps-startup = Indítás
-settings-apps-startup-description = Ezek az alkalmazások bejelentkezéskor megnyílnak
-settings-apps-startup-app = Megnyitás bejelentkezéskor: { $app }
-settings-apps-startup-remove = { $app } eltávolítása az indításból
-settings-apps-startup-add = Alkalmazás hozzáadása
-settings-apps-startup-add-title = Indítási alkalmazás hozzáadása
-settings-apps-startup-add-description = Válassza ki, melyik alkalmazás nyíljon meg minden bejelentkezéskor.
-settings-apps-search = Alkalmazások keresése
-settings-apps-no-match = Egy alkalmazás sem felel meg a keresésnek
-settings-apps-cancel = Mégse
-
-## Apps: permissions
-
-settings-apps-permissions = Engedélyek
-settings-apps-location = Hely
-settings-apps-camera = Kamera
-settings-apps-clipboard = Vágólap a háttérben
-settings-apps-full-access = Teljes hozzáférés
-settings-apps-full-access-hint = A homokozóján kívül fut, és mindent megtehet, amit egy általad indított program. Az eltávolítás a következő indításkor lép életbe.
-settings-apps-full-access-remove = Eltávolítás
-settings-apps-full-access-remove-app = Teljes hozzáférés eltávolítása ettől: { $app }
-settings-apps-passwords = Mentett jelszavak
-settings-apps-passwords-forget = Elfelejtés
-settings-apps-passwords-forget-app = { $app } újra kérdezhessen
-settings-apps-permissions-allowed = { $allowed }/{ $total } engedélyezve
-settings-apps-permissions-description = A homokozóban futó alkalmazások saját fájlokat kapnak, és csak azt, amit itt engedélyezel.
-settings-apps-sandbox-only = Semmi a homokozóján kívül
-settings-apps-folders = Mappák
-settings-apps-folders-hint = A következő indítástól mindent olvashat és módosíthat ezekben a mappákban.
-settings-apps-folders-count = { $count ->
-    [one] { $count } mappa
-   *[other] { $count } mappa
-}
-settings-apps-folder-add = Mappa hozzáadása
-settings-apps-folder-remove = Eltávolítás
-settings-apps-folder-remove-app = { $folder } megosztásának leállítása
-settings-apps-usb = USB-eszközök
-settings-apps-usb-hint = Például biztonsági kulcsok, telefonok és mikrovezérlők
-settings-apps-serial = Soros eszközök
-settings-apps-serial-hint = Például 3D-nyomtatók és USB-n csatlakozó panelek
-settings-apps-folder-read-only = Csak olvasható
-settings-apps-downloads = Letöltések mappa
-settings-apps-downloads-hint = A következő megnyitástól menthet fájlokat a Letöltések mappába, és megnyithatja az ott lévőket.
-settings-apps-internet = Internet
-settings-apps-internet-hint = A következő megnyitástól csatlakozhat az internethez.
-settings-apps-service-hint = Asztali szolgáltatás, amellyel kommunikálhat
-settings-apps-service-remove = Eltávolítás
-settings-apps-service-remove-app = Kommunikáció tiltása ezzel: { $service }
-settings-apps-services-count = { $count ->
-    [one] { $count } szolgáltatás
-   *[other] { $count } szolgáltatás
-}
-settings-apps-full-access-off = Homokozóban fut. A teljes hozzáférés megszünteti a homokozót.
-settings-apps-full-access-give = Teljes hozzáférés megadása

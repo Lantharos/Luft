@@ -29,13 +29,11 @@
 
 	let removing = $state<CursorTheme | null>(null);
 	let problem = $state('');
-	let expanded = $state(false);
 
 	let current = $derived(desktop.values['cursor-theme'] ?? 'Adwaita');
 	let themes = $derived(cursors.themes ?? []);
 	let sizes = $derived(cursorSizes());
 	let shown = $derived.by(() => {
-		if (expanded) return themes;
 		const first = themes.slice(0, COLLAPSED);
 		const chosen = themes.find((theme) => theme.name === current);
 		return !chosen || first.includes(chosen) ? first : [...first.slice(0, -1), chosen];
@@ -68,7 +66,23 @@
 		{/each}
 	</div>
 	{#if themes.length > COLLAPSED}
-		<MoreRow hidden={themes.length - COLLAPSED} bind:expanded />
+		<MoreRow hidden={themes.length - COLLAPSED} title={t('settings-cursors-all')}>
+			{#snippet children(close)}
+				<div class="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-2 p-3">
+					{#each themes as theme (theme.name)}
+						<CursorTile
+							{theme}
+							selected={theme.name === current}
+							onselect={() => desktop.set('cursor-theme', theme.name)}
+							onremove={() => {
+								close();
+								removing = theme;
+							}}
+						/>
+					{/each}
+				</div>
+			{/snippet}
+		</MoreRow>
 	{/if}
 	<Row title={t('settings-cursors-size')}>
 		<Select label={t('settings-cursors-size-label')} options={sizes} value={desktop.values['cursor-size'] ?? 24} onchange={(size) => desktop.set('cursor-size', size)} />

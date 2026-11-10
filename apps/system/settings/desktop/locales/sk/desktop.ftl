@@ -212,8 +212,6 @@ desktop-picture-filter = Obrázky
 desktop-picture-unopenable = Tento obrázok sa nedá otvoriť
 
 ## Users
-desktop-users-password-failed = Heslo sa nepodarilo zmeniť: { $reason }
-desktop-users-password-timed-out = Program passwd prestal odpovedať
 
 ## Updates
 desktop-updates-nvidia-summary = Vyťažte z grafiky NVIDIA maximum

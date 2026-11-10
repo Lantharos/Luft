@@ -322,11 +322,6 @@ settings-passwords-history-denied = На { $app } не беше разрешен
 settings-passwords-history-denied-unnamed = На { $app } не беше разрешено да използва запазена парола
 settings-passwords-history-signed = { $app } подписа с „{ $item }“
 settings-passwords-history-signed-unnamed = { $app } подписа със запазена парола
-settings-passwords-history-fewer = Покажи по-малко
-settings-passwords-history-all = { $count ->
-    [one] Покажи всички { $count }
-   *[other] Покажи всички { $count }
-}
 settings-passwords-history-clear = Изчистване на историята
 settings-passwords-history-clear-description = Забравя кои приложения и кога са използвали ключодържателя
 settings-passwords-history-clear-button = Изчисти
@@ -384,71 +379,3 @@ settings-passkeys-rename-description = Дайте на ключа си за до
 settings-passkeys-name = Име
 settings-passkeys-save = Запази
 
-## Apps
-
-settings-apps-defaults = Приложения по подразбиране
-settings-apps-defaults-description = Използват се, когато отваряте връзки, файлове и папки
-settings-apps-browser = Уеб браузър
-settings-apps-email = Имейл
-settings-apps-calendar = Календар
-settings-apps-music = Музика
-settings-apps-videos = Видео
-settings-apps-photos = Снимки
-settings-apps-text-editor = Текстов редактор
-settings-apps-files = Файлове
-settings-apps-archives = Архиви
-settings-apps-choose = Изберете
-settings-apps-startup = Стартиране
-settings-apps-startup-description = Тези приложения се отварят, когато влезете
-settings-apps-startup-app = Отваряне на { $app } при вход
-settings-apps-startup-remove = Премахване на { $app } от стартирането
-settings-apps-startup-add = Добави приложение
-settings-apps-startup-add-title = Добавяне на приложение при стартиране
-settings-apps-startup-add-description = Изберете приложение, което да се отваря при всеки вход.
-settings-apps-search = Търсене на приложения
-settings-apps-no-match = Няма приложения, които отговарят на търсенето
-settings-apps-cancel = Отказ
-
-## Apps: permissions
-
-settings-apps-permissions = Разрешения
-settings-apps-location = Местоположение
-settings-apps-camera = Камера
-settings-apps-clipboard = Клипборд във фонов режим
-settings-apps-full-access = Пълен достъп
-settings-apps-full-access-hint = Работи извън пясъчника си и може всичко, което може програма, която стартирате сами. Премахването важи от следващото му отваряне.
-settings-apps-full-access-remove = Премахни
-settings-apps-full-access-remove-app = Премахни пълния достъп на { $app }
-settings-apps-passwords = Запазени пароли
-settings-apps-passwords-forget = Забрави
-settings-apps-passwords-forget-app = Нека { $app } попита отново
-settings-apps-permissions-allowed = Разрешени: { $allowed } от { $total }
-settings-apps-permissions-description = Приложенията в пясъчник получават собствените си файлове и само това, което разрешите тук.
-settings-apps-sandbox-only = Нищо извън пясъчника
-settings-apps-folders = Папки
-settings-apps-folders-hint = Може да чете и променя всичко в тези папки от следващото си отваряне.
-settings-apps-folders-count = { $count ->
-    [one] { $count } папка
-   *[other] { $count } папки
-}
-settings-apps-folder-add = Добавяне на папка
-settings-apps-folder-remove = Премахване
-settings-apps-folder-remove-app = Спиране на споделянето на { $folder }
-settings-apps-usb = USB устройства
-settings-apps-usb-hint = Например ключове за сигурност, телефони и микроконтролери
-settings-apps-serial = Серийни устройства
-settings-apps-serial-hint = Например 3D принтери и платки, свързани през USB
-settings-apps-folder-read-only = Само за четене
-settings-apps-downloads = Папка Изтегляния
-settings-apps-downloads-hint = Може да записва файлове в папката Изтегляния и да отваря тези в нея, от следващото си отваряне.
-settings-apps-internet = Интернет
-settings-apps-internet-hint = Може да се свързва с интернет от следващото си отваряне.
-settings-apps-service-hint = Услуга на работния плот, с която може да общува
-settings-apps-service-remove = Премахване
-settings-apps-service-remove-app = Спиране на достъпа до { $service }
-settings-apps-services-count = { $count ->
-    [one] { $count } услуга
-   *[other] { $count } услуги
-}
-settings-apps-full-access-off = Работи в пясъчник. Пълният достъп премахва пясъчника.
-settings-apps-full-access-give = Даване на пълен достъп

@@ -3,7 +3,7 @@
 	import ArrowRight from '@lucide/svelte/icons/arrow-right';
 	import Plus from '@lucide/svelte/icons/plus';
 	import X from '@lucide/svelte/icons/x';
-	import { IconButton, SearchField, tooltip, VirtualScroller, type VirtualHandle } from '@luft/ui';
+	import { IconButton, SearchField, TextCell, tooltip, VirtualScroller, type VirtualHandle } from '@luft/ui';
 	import type { MethodEditor, Row, Table } from './editor.svelte';
 
 	interface Props {
@@ -77,11 +77,11 @@
 					data-uid={row.uid}
 					{@attach repeated.has(row.uid) ? tooltip('Same keys as another entry, only the last one is used') : undefined}
 				>
-					<input class="cell font-mono" value={row.keys} spellcheck="false" aria-label="You type" placeholder="a'" oninput={edit(row, 'keys')} />
+					<TextCell class="font-mono" value={row.keys} label="You type" placeholder="a'" invalid={repeated.has(row.uid)} oninput={edit(row, 'keys')} />
 					<ArrowRight size={15} class="text-[var(--text-muted)]" />
-					<input class="cell" value={row.text} spellcheck="false" aria-label="You get" placeholder="á" oninput={edit(row, 'text')} />
+					<TextCell value={row.text} label="You get" placeholder="á" oninput={edit(row, 'text')} />
 					{#if context}
-						<input class="cell font-mono" value={row.after} spellcheck="false" aria-label="Only after" placeholder="Anywhere" oninput={edit(row, 'after')} />
+						<TextCell class="font-mono" value={row.after} label="Only after" placeholder="Anywhere" oninput={edit(row, 'after')} />
 					{/if}
 					<IconButton icon={X} label="Remove" onclick={() => editor.remove(table, row.uid)} />
 				</div>
@@ -142,36 +142,5 @@
 	.row:hover :global(.icon-button),
 	.row:focus-within :global(.icon-button) {
 		opacity: 1;
-	}
-
-	.row.repeated .cell:first-child {
-		color: var(--danger);
-	}
-
-	.cell {
-		height: 34px;
-		min-width: 0;
-		border-radius: 10px;
-		background: transparent;
-		padding-inline: 8px;
-		font-size: 14px;
-		color: var(--text);
-		outline: none;
-		transition:
-			background-color var(--motion-tap) var(--ease-decelerate),
-			box-shadow var(--motion-tap) var(--ease-decelerate);
-	}
-
-	.cell:hover {
-		background: var(--surface-hover);
-	}
-
-	.cell:focus {
-		background: var(--control);
-		box-shadow: inset 0 0 0 1.5px var(--accent);
-	}
-
-	.cell::placeholder {
-		color: color-mix(in oklab, var(--text-muted) 55%, transparent);
 	}
 </style>

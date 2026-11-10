@@ -329,3 +329,69 @@ settings-accounts-text-me = Stuur me liever een code per sms
 settings-accounts-choose-phone = Naar welk nummer moet Apple de code sturen?
     .description = Sms sturen
 settings-accounts-approve = Je Apple Account gebruikt Geavanceerde gegevensbescherming. Keur het verzoek goed op je iPhone, iPad of Mac zodat deze computer iCloud Drive kan openen.
+
+## Apps
+
+settings-apps-defaults = Standaard-apps
+settings-apps-defaults-description = Gebruikt als je links, bestanden en mappen opent
+settings-apps-browser = Webbrowser
+settings-apps-email = E-mail
+settings-apps-calendar = Agenda
+settings-apps-music = Muziek
+settings-apps-videos = Video’s
+settings-apps-photos = Foto’s
+settings-apps-text-editor = Teksteditor
+settings-apps-files = Bestanden
+settings-apps-archives = Archieven
+settings-apps-choose = Kiezen
+settings-apps-startup = Opstarten
+settings-apps-startup-description = Deze apps openen als je je aanmeldt
+settings-apps-startup-app = { $app } openen als je je aanmeldt
+settings-apps-startup-remove = { $app } uit opstarten verwijderen
+settings-apps-startup-add = App toevoegen
+settings-apps-startup-add-title = Opstart-app toevoegen
+settings-apps-startup-add-description = Kies een app die elke keer opent als je je aanmeldt.
+settings-apps-search = Apps zoeken
+settings-apps-no-match = Geen apps gevonden
+settings-apps-cancel = Annuleren
+settings-apps-permissions = Machtigingen
+settings-apps-location = Locatie
+settings-apps-camera = Camera
+settings-apps-clipboard = Klembord op de achtergrond
+settings-apps-full-access = Volledige toegang
+settings-apps-full-access-hint = De app draait buiten haar sandbox en kan alles wat een programma dat je zelf start kan. Verwijderen geldt vanaf de volgende keer dat de app opent.
+settings-apps-full-access-remove = Verwijderen
+settings-apps-full-access-remove-app = Volledige toegang van { $app } verwijderen
+settings-apps-passwords = Opgeslagen wachtwoorden
+settings-apps-passwords-forget = Vergeten
+settings-apps-passwords-forget-app = { $app } opnieuw laten vragen
+settings-apps-permissions-allowed = { $allowed } van { $total } toegestaan
+settings-apps-permissions-description = Apps in een sandbox krijgen hun eigen bestanden en alleen wat je hier toestaat.
+settings-apps-sandbox-only = Niets buiten de sandbox
+settings-apps-folders = Mappen
+settings-apps-folders-hint = Vanaf de volgende keer dat de app opent, kan ze alles in deze mappen lezen en wijzigen.
+settings-apps-folders-count = { $count ->
+    [one] { $count } map
+   *[other] { $count } mappen
+}
+settings-apps-folder-add = Map toevoegen
+settings-apps-folder-remove = Verwijderen
+settings-apps-folder-remove-app = { $folder } niet meer delen
+settings-apps-usb = USB-apparaten
+settings-apps-usb-hint = Zoals beveiligingssleutels, telefoons en microcontrollers
+settings-apps-serial = Seriële apparaten
+settings-apps-serial-hint = Zoals 3D-printers en via USB verbonden borden
+settings-apps-folder-read-only = Alleen-lezen
+settings-apps-downloads = Map Downloads
+settings-apps-downloads-hint = Ze kan bestanden opslaan in de map Downloads en de bestanden daarin openen, vanaf de volgende keer dat ze opent.
+settings-apps-internet = Internet
+settings-apps-internet-hint = Ze kan online vanaf de volgende keer dat ze opent.
+settings-apps-service-hint = Een dienst op je bureaublad waarmee ze kan praten
+settings-apps-service-remove = Verwijderen
+settings-apps-service-remove-app = Niet meer laten praten met { $service }
+settings-apps-services-count = { $count ->
+    [one] { $count } dienst
+   *[other] { $count } diensten
+}
+settings-apps-full-access-off = De app draait in een sandbox. Volledige toegang haalt de sandbox weg.
+settings-apps-full-access-give = Volledige toegang geven

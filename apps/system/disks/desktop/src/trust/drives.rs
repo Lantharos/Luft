@@ -32,7 +32,7 @@ pub struct DriveCheck {
     auto_unlock: String,
 }
 
-async fn device_of(block: &str) -> Result<String, String> {
+pub async fn device_of(block: &str) -> Result<String, String> {
     udisks::objects()
         .await?
         .get(block, BLOCK)

@@ -5,6 +5,7 @@ use luft_trust::Outcome;
 use serde::Serialize;
 use specta::Type;
 
+use super::guard::Guard;
 use super::mounting;
 use super::plan::moving;
 
@@ -28,8 +29,9 @@ pub async fn give(events: &Events, offset: u64) -> Result<Given, String> {
         Route::Move {
             block, to, growth, ..
         } => {
+            let guard = Guard::volume(&block).await?;
             mounting::release(&block).await?;
-            moving::shift(events, &block, to).await?;
+            moving::shift(events, &block, to, guard.label()).await?;
             growth
         }
     };

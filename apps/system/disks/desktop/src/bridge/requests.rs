@@ -3,6 +3,7 @@ use specta::Type;
 
 use crate::actions::formatting::Format;
 use crate::actions::plan::PlanStep;
+use crate::space::Cleanup;
 
 #[derive(Deserialize, Type)]
 pub struct Block {
@@ -59,6 +60,11 @@ pub struct CreatePartition {
 #[derive(Deserialize, Type)]
 pub struct NextStep {
     pub step: PlanStep,
+}
+
+#[derive(Deserialize, Type)]
+pub struct PendingMove {
+    pub id: String,
 }
 
 #[derive(Deserialize, Type)]
@@ -145,6 +151,11 @@ pub struct KeySheet {
 #[derive(Deserialize, Type)]
 pub struct Place {
     pub path: Vec<String>,
+}
+
+#[derive(Deserialize, Type)]
+pub struct Clean {
+    pub what: Cleanup,
 }
 
 #[derive(Deserialize, Type)]

@@ -29,7 +29,6 @@ settings-more-show = { $count ->
         [many] Показать ещё { $count }
        *[other] Показать ещё { $count }
     }
-settings-more-fewer = Показать меньше
 settings-time-picker = { $label }, { $time }
 settings-time-picker-hour = Часы
 settings-time-picker-minute = Минуты

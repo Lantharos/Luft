@@ -2,7 +2,7 @@
 	import { untrack } from 'svelte';
 	import Info from '@lucide/svelte/icons/info';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
-	import { bytes, Select, TextField, tooltip } from '@luft/ui';
+	import { bytes, Dialog, Select, TextField, tooltip } from '@luft/ui';
 	import type { Filesystem } from '#lib/bindings.js';
 	import { editor } from '#lib/editor/editor.svelte.js';
 	import { format, place, remove, rename } from '#lib/editor/edits.js';
@@ -10,7 +10,6 @@
 	import type { Layout, Part } from '#lib/editor/model.js';
 	import { FILESYSTEM_NAMES, LABEL_LIMITS } from '#lib/format.js';
 	import { disks } from '#lib/state/disks.svelte.js';
-	import Disclosure from '#lib/components/Disclosure.svelte';
 	import ExactSize from './ExactSize.svelte';
 	import PartitionSettings from './PartitionSettings.svelte';
 	import SizeInput from './SizeInput.svelte';
@@ -28,6 +27,7 @@
 	const FILESYSTEMS: Filesystem[] = ['ext4', 'btrfs', 'exfat', 'ntfs', 'vfat'];
 
 	let label = $state('');
+	let exact = $state(false);
 
 	$effect.pre(() => {
 		label = part.label;
@@ -67,7 +67,7 @@
 	}
 </script>
 
-<section class={['inspector', editor.exact && 'wide']} aria-label={part.title}>
+<section class="inspector" aria-label={part.title}>
 	<header class="flex items-center gap-1 pl-1">
 		<h2 class="min-w-0 truncate text-[15px] font-semibold">{part.title}</h2>
 		<span class="ml-1.5 flex-none text-[13px] text-[var(--text-muted)]">{facts}</span>
@@ -87,12 +87,8 @@
 
 	<div class="fields">
 		<span class="label">Size</span>
-		{#if editor.exact}
-			<ExactSize {layout} {part} {limits} focused={created} />
-		{:else}
-			<SizeInput label="Size" focused={created} value={part.size} min={limits.smallest} max={largest} oncommit={(next) => place(part, part.offset, next)} />
-		{/if}
-		<Disclosure bind:open={editor.exact} hint={tooltip('Exact sizes and space around it, in MiB')}>Exact</Disclosure>
+		<SizeInput label="Size" focused={created} value={part.size} min={limits.smallest} max={largest} oncommit={(next) => place(part, part.offset, next)} />
+		<button type="button" class="button" {@attach tooltip('Exact sizes and space around it, in MiB')} onclick={() => (exact = true)}>Exact…</button>
 
 		{#if changeable}
 			<span class="label">Format</span>
@@ -116,6 +112,15 @@
 	</div>
 </section>
 
+{#if exact}
+	<Dialog title="Exact size of {part.title}" wide onclose={() => (exact = false)}>
+		<ExactSize {layout} {part} {limits} focused />
+		{#snippet actions()}
+			<button type="button" class="button primary" onclick={() => (exact = false)}>Done</button>
+		{/snippet}
+	</Dialog>
+{/if}
+
 <style>
 	.inspector {
 		display: flex;
@@ -126,10 +131,6 @@
 		border-radius: var(--radius-group);
 		background: var(--group);
 		padding: 10px 12px 14px;
-	}
-
-	.wide {
-		width: 560px;
 	}
 
 	.fields {

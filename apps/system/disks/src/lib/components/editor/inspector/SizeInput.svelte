@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { bytes, tooltip } from '@luft/ui';
+	import { onMount } from 'svelte';
+	import { bytes, TextField, tooltip } from '@luft/ui';
 	import { mebibytes, parseSize, unitOf } from '#lib/editor/units.js';
 
 	interface Props {
@@ -14,83 +15,47 @@
 
 	let { label, value, min, max, exact = false, focused = false, oncommit }: Props = $props();
 
-	let typed = $state<string | null>(null);
+	let field = $state<TextField>();
+	let text = $state('');
 	let fixed = $derived(min >= max);
 	let shown = $derived(exact ? mebibytes(value) : bytes(value));
 	let range = $derived(fixed ? `Stays ${bytes(value)}` : `${bytes(min)} to ${bytes(max)}`);
 
-	function focusOnMount(input: HTMLInputElement) {
-		if (focused) input.focus();
-	}
+	$effect.pre(() => {
+		text = shown;
+	});
+
+	onMount(() => {
+		if (focused) field?.focus();
+	});
 
 	function commit() {
-		if (typed === null) return;
-		const parsed = parseSize(typed, exact ? undefined : unitOf(shown));
-		typed = null;
+		if (text === shown) return;
+		const parsed = parseSize(text, exact ? undefined : unitOf(shown));
+		text = shown;
 		if (parsed !== null) oncommit(Math.min(max, Math.max(min, parsed)));
+	}
+
+	function selectAll(event: FocusEvent) {
+		if (event.target instanceof HTMLInputElement) event.target.select();
 	}
 </script>
 
-<label class="field" class:locked={fixed} {@attach tooltip(range)}>
-	<input
+{#snippet unit()}
+	<span class="px-3 text-[13px] leading-7 text-[var(--text-muted)]">MiB</span>
+{/snippet}
+
+<div class="min-w-0 flex-1" {@attach tooltip(range)} onfocusin={selectAll} onfocusout={commit}>
+	<TextField
+		bind:this={field}
+		label={exact ? `${label} in MiB` : label}
 		inputmode="decimal"
-		aria-label={exact ? `${label} in MiB` : label}
 		disabled={fixed}
-		value={typed ?? shown}
-		{@attach focusOnMount}
-		onfocus={(event) => event.currentTarget.select()}
-		oninput={(event) => (typed = event.currentTarget.value)}
-		onblur={commit}
+		bind:value={text}
+		trailing={exact ? unit : undefined}
 		onkeydown={(event) => {
 			if (event.key === 'Enter') commit();
-			if (event.key === 'Escape') typed = null;
+			if (event.key === 'Escape') text = shown;
 		}}
 	/>
-	{#if exact}
-		<span class="unit">MiB</span>
-	{/if}
-</label>
-
-<style>
-	.field {
-		display: flex;
-		height: 36px;
-		min-width: 0;
-		flex: 1;
-		align-items: center;
-		gap: 6px;
-		border-radius: var(--radius-pill);
-		background: var(--control);
-		padding-inline: 14px;
-		font-size: 13px;
-		transition:
-			background-color var(--motion-tap) var(--ease-decelerate),
-			box-shadow var(--motion-tap) var(--ease-decelerate);
-	}
-
-	.field:hover:not(.locked) {
-		background: var(--control-hover);
-	}
-
-	.field:focus-within {
-		box-shadow: inset 0 0 0 1.5px var(--accent);
-	}
-
-	.field.locked {
-		background: transparent;
-		box-shadow: inset 0 0 0 1px var(--hairline);
-		color: var(--text-soft);
-	}
-
-	input {
-		min-width: 0;
-		flex: 1;
-		background: transparent;
-		font-variant-numeric: tabular-nums;
-		outline: none;
-	}
-
-	.unit {
-		color: var(--text-muted);
-	}
-</style>
+</div>

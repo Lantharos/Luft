@@ -322,11 +322,6 @@ settings-passwords-history-denied = Accès à « { $item } » refusé pour {
 settings-passwords-history-denied-unnamed = Accès à un mot de passe enregistré refusé pour { $app }
 settings-passwords-history-signed = { $app } a signé avec « { $item } »
 settings-passwords-history-signed-unnamed = { $app } a signé avec un mot de passe enregistré
-settings-passwords-history-fewer = Afficher moins
-settings-passwords-history-all = { $count ->
-    [one] Afficher les { $count }
-   *[other] Afficher les { $count }
-}
 settings-passwords-history-clear = Effacer l’historique
 settings-passwords-history-clear-description = Oublier quelles applications ont utilisé votre trousseau et quand
 settings-passwords-history-clear-button = Effacer
@@ -384,71 +379,3 @@ settings-passkeys-rename-description = Donnez à votre clé d’accès pour { $s
 settings-passkeys-name = Nom
 settings-passkeys-save = Enregistrer
 
-## Apps
-
-settings-apps-defaults = Applications par défaut
-settings-apps-defaults-description = Utilisées pour ouvrir les liens, les fichiers et les dossiers
-settings-apps-browser = Navigateur web
-settings-apps-email = E-mail
-settings-apps-calendar = Calendrier
-settings-apps-music = Musique
-settings-apps-videos = Vidéos
-settings-apps-photos = Photos
-settings-apps-text-editor = Éditeur de texte
-settings-apps-files = Fichiers
-settings-apps-archives = Archives
-settings-apps-choose = Choisir
-settings-apps-startup = Démarrage
-settings-apps-startup-description = Ces applications s’ouvrent quand vous vous connectez
-settings-apps-startup-app = Ouvrir { $app } à la connexion
-settings-apps-startup-remove = Retirer { $app } du démarrage
-settings-apps-startup-add = Ajouter une application
-settings-apps-startup-add-title = Ajouter une application au démarrage
-settings-apps-startup-add-description = Choisissez une application à ouvrir à chaque connexion.
-settings-apps-search = Rechercher des applications
-settings-apps-no-match = Aucune application ne correspond à votre recherche
-settings-apps-cancel = Annuler
-
-## Apps: permissions
-
-settings-apps-permissions = Autorisations
-settings-apps-location = Localisation
-settings-apps-camera = Caméra
-settings-apps-clipboard = Presse-papiers en arrière-plan
-settings-apps-full-access = Accès complet
-settings-apps-full-access-hint = Elle fonctionne hors de son bac à sable et peut faire tout ce que peut un programme que vous lancez vous-même. Le retrait s'applique à sa prochaine ouverture.
-settings-apps-full-access-remove = Retirer
-settings-apps-full-access-remove-app = Retirer l’accès complet à { $app }
-settings-apps-passwords = Mots de passe enregistrés
-settings-apps-passwords-forget = Oublier
-settings-apps-passwords-forget-app = Laisser { $app } redemander
-settings-apps-permissions-allowed = { $allowed } sur { $total } autorisées
-settings-apps-permissions-description = Les apps dans un bac à sable ont leurs propres fichiers et seulement ce que vous autorisez ici.
-settings-apps-sandbox-only = Rien en dehors de son bac à sable
-settings-apps-folders = Dossiers
-settings-apps-folders-hint = Elle peut lire et modifier tout le contenu de ces dossiers à partir de sa prochaine ouverture.
-settings-apps-folders-count = { $count ->
-    [one] { $count } dossier
-   *[other] { $count } dossiers
-}
-settings-apps-folder-add = Ajouter un dossier
-settings-apps-folder-remove = Retirer
-settings-apps-folder-remove-app = Ne plus partager { $folder }
-settings-apps-usb = Appareils USB
-settings-apps-usb-hint = Comme les clés de sécurité, les téléphones et les microcontrôleurs
-settings-apps-serial = Appareils série
-settings-apps-serial-hint = Comme les imprimantes 3D et les cartes connectées en USB
-settings-apps-folder-read-only = Lecture seule
-settings-apps-downloads = Dossier Téléchargements
-settings-apps-downloads-hint = Elle peut enregistrer des fichiers dans le dossier Téléchargements et ouvrir ceux qui s’y trouvent, dès sa prochaine ouverture.
-settings-apps-internet = Internet
-settings-apps-internet-hint = Elle peut aller sur internet dès sa prochaine ouverture.
-settings-apps-service-hint = Un service du bureau avec lequel elle peut communiquer
-settings-apps-service-remove = Retirer
-settings-apps-service-remove-app = Ne plus la laisser communiquer avec { $service }
-settings-apps-services-count = { $count ->
-    [one] { $count } service
-   *[other] { $count } services
-}
-settings-apps-full-access-off = Elle fonctionne dans un bac à sable. L'accès complet retire le bac à sable.
-settings-apps-full-access-give = Donner l'accès complet

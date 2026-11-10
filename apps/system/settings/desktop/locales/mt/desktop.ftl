@@ -212,8 +212,6 @@ desktop-picture-filter = Stampi
 desktop-picture-unopenable = Din l-istampa ma tistax tinfetaħ
 
 ## Users
-desktop-users-password-failed = Il-password ma setgħetx tinbidel: { $reason }
-desktop-users-password-timed-out = passwd waqaf iwieġeb
 
 ## Updates
 desktop-updates-nvidia-summary = Ikseb l-aħjar mill-grafika NVIDIA

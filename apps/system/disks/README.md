@@ -2,7 +2,7 @@
 
 Disks shows the drives in your computer and the ones you plug in, and looks after their partitions, formatting, encryption, health and disk images. It can also remove another system, give Luft free space next to it, and move Luft to another drive. Using it is described in [the docs](https://docs.luft.computer/apps/disks/).
 
-Changes go through UDisks, and encryption through [trustd](../../../security/README.md). Anything that erases data asks first. The partitions the running system uses can't be changed, except that trustd grows or shrinks Luft's own partition in place, and moves it into free space in front of it, or to another drive, at the next start.
+Changes go through UDisks, and encryption through [trustd](../../../security/README.md). Anything that erases data asks first. Moving a partition is journalled under `~/.local/state/disks/moves`, so an interrupted move is finished the next time Disks sees the drive. The partitions the running system uses can't be changed, except that trustd grows or shrinks Luft's own partition in place, and moves it into free space in front of it, or to another drive, at the next start.
 
 ## Build and run
 
@@ -23,7 +23,7 @@ Installing registers Disks for `.iso` and raw disk image files.
 | `disks /run/media/USER/LABEL` | The drive and partition holding that path |
 | `disks /dev/sdb` | That drive |
 | `disks image.iso` | Write that image to a drive |
-| `disks disks-space:///path/to/folder` | What's using space in that folder |
+| `disks disks-space:///path/to/folder` | What's using space in that folder, with what can be freed when your home folder is inside it |
 | `disks disks-system://ID` | Removing that other system, as Settings opens it |
 | `disks disks-luft:` | Giving Luft the free space next to it, as Meet Luft opens it on Luft |
 

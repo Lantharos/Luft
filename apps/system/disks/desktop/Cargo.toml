@@ -11,6 +11,7 @@ rust-version.workspace = true
 name = "disks_lib"
 
 [dependencies]
+dirs.workspace = true
 futures-util.workspace = true
 gio.workspace = true
 luft-app = { workspace = true, features = ["launch", "recovery"] }
@@ -20,9 +21,13 @@ parking_lot.workspace = true
 rayon.workspace = true
 sabine.workspace = true
 serde.workspace = true
+serde_json.workspace = true
 specta.workspace = true
 tokio = { workspace = true, features = ["rt", "time"] }
 zbus = { workspace = true, features = ["proxy", "tokio"] }
+
+[dev-dependencies]
+tempfile.workspace = true
 
 [lints]
 workspace = true

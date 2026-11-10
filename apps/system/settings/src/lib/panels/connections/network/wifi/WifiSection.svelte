@@ -25,11 +25,10 @@
 	let { wifi, onconfigure }: Props = $props();
 
 	let joining = $state<Joining | null>(null);
-	let expanded = $state(false);
 	let attempt: string | null = null;
 	let problems = $state<Record<string, string>>({});
 
-	let shown = $derived(expanded ? wifi.networks : wifi.networks.slice(0, COLLAPSED));
+	let shown = $derived(wifi.networks.slice(0, COLLAPSED));
 
 	function describe(network: WifiNetwork) {
 		if (problems[network.ssid]) return problems[network.ssid];
@@ -85,30 +84,44 @@
 	);
 </script>
 
+{#snippet row(network: (typeof wifi.networks)[number], close?: () => void)}
+	<ActionRow
+		title={network.ssid}
+		description={describe(network)}
+		alert={Boolean(problems[network.ssid])}
+		icon={signalIcon(network.strength)}
+		onclick={() => {
+			close?.();
+			choose(network);
+		}}
+	>
+		{#snippet trailing()}
+			{#if network.state === 'connecting'}
+				<Spinner size={16} />
+			{/if}
+			{#if isSecured(network.security)}
+				<Lock size={15} />
+			{/if}
+		{/snippet}
+		{#snippet actions()}
+			{#if network.saved}
+				<IconButton
+					icon={Settings}
+					label={t('settings-network-wifi-settings')}
+					onclick={() => {
+						close?.();
+						configure(network);
+					}}
+				/>
+			{/if}
+		{/snippet}
+	</ActionRow>
+{/snippet}
+
 <Section title={t('settings-network-wifi-networks')}>
 	{#each shown as network (network.ssid)}
 		<div class="row-slot" animate:reorder in:item out:item>
-			<ActionRow
-				title={network.ssid}
-				description={describe(network)}
-				alert={Boolean(problems[network.ssid])}
-				icon={signalIcon(network.strength)}
-				onclick={() => choose(network)}
-			>
-				{#snippet trailing()}
-					{#if network.state === 'connecting'}
-						<Spinner size={16} />
-					{/if}
-					{#if isSecured(network.security)}
-						<Lock size={15} />
-					{/if}
-				{/snippet}
-				{#snippet actions()}
-					{#if network.saved}
-						<IconButton icon={Settings} label={t('settings-network-wifi-settings')} onclick={() => configure(network)} />
-					{/if}
-				{/snippet}
-			</ActionRow>
+			{@render row(network)}
 		</div>
 	{:else}
 		<Row title={t('settings-network-wifi-searching')}>
@@ -116,7 +129,13 @@
 		</Row>
 	{/each}
 	{#if wifi.networks.length > COLLAPSED}
-		<MoreRow hidden={wifi.networks.length - COLLAPSED} bind:expanded />
+		<MoreRow hidden={wifi.networks.length - COLLAPSED} title={t('settings-network-wifi-networks')}>
+			{#snippet children(close)}
+				{#each wifi.networks as network (network.ssid)}
+					{@render row(network, close)}
+				{/each}
+			{/snippet}
+		</MoreRow>
 	{/if}
 	<Row title={t('settings-network-hidden')} onclick={() => (joining = {})} />
 </Section>

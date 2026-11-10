@@ -12,6 +12,7 @@ use parking_lot::Mutex;
 use serde::Serialize;
 use zbus::OwnedObjectPath;
 
+use crate::actions::hold::Hold;
 use crate::actions::mounting;
 use crate::udisks::{self, BLOCK, TABLE, no_options};
 use copy::Direction;
@@ -178,6 +179,7 @@ impl Imaging {
         let events = events.clone();
         let block = block.to_owned();
         std::thread::spawn(move || {
+            let _hold = luft_app::block_on(Hold::take(direction.reason()));
             copy::run(&events, &block, direction, &cancelled);
             *running.lock() = None;
         });

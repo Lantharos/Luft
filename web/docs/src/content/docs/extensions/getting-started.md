@@ -37,7 +37,7 @@ label = "loud"
 default = false
 ```
 
-`api` is the version of the extension API it's written for. `permissions` lists what it uses beyond the basics; the API object only has the parts it asked for. Every setting appears in Settings → Extensions with Luft's own controls. The [manifest reference](/extensions/manifest/) has every field.
+`api` is the version of the extension API it's written for. `permissions` lists what it uses beyond the basics; the API object only has the parts it asked for, and people see the list before they install it. It's a declaration rather than a sandbox, as the [manifest reference](/extensions/manifest/#permissions) explains. Every setting appears in Settings → Extensions with Luft's own controls. The [manifest reference](/extensions/manifest/) has every field.
 
 ## The code
 

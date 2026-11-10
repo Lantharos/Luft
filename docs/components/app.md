@@ -69,7 +69,7 @@ window
 | `dbus` | [luft-dbus](../../packages/dbus): async `session()` and `system()` connections, `at(address)` connects to any other bus |
 | `identity` | [luft-identity](../../packages/identity): who a caller is and what apps were allowed |
 | `dbus::objects` | `Objects` reads `ObjectManager` trees; `signals` and `settle` follow their changes |
-| `portal` | `open_file` and `open_files` show the file chooser and return `file://` URIs; `FileChooser` for saving, folders and several filters; `reveal` shows a file in the file manager through the portal, so it works from a sandbox; `camera` asks for the camera; `path_uri` and `uri_path` convert between paths and URIs |
+| `portal` | `open_file` and `open_files` show the file chooser and return `file://` URIs; `FileChooser` for saving, folders and several filters; `reveal` shows a file in the file manager through the portal, so it works from a sandbox; `open_uri`, `open_web_link` and `open_path` open a link, a file or a folder in the person's default app through the portal, which starts that app outside this app's sandbox; `camera` asks for the camera; `path_uri` and `uri_path` convert between paths and URIs |
 | `share` | `send(paths)` opens Kestrel's Send sheet for files the app holds, where people choose a device nearby or an app for them; it hands over the open files, so it works from a sandbox, and only opens while one of the app's windows is in front |
 | `file_manager` | `show_in_folder(path, token)` opens the folder with the file selected, `show_folder(path, token)` opens the folder itself |
 | `launch` | `pass_token` gives a launched program the activation token a page got from `activationToken()` in `@luft/ui`, or clears the one the app was started with; `Token` takes a command's `token` alone |
@@ -85,7 +85,7 @@ window
 | `camera` | `camera` | `Camera::open` asks for the camera through the portal and streams it on a thread of its own, asking PipeWire for MJPG or raw frames of the size given; `take_frame` hands over the newest frame since the last one, as JPEG or RGBA, so a slow page never queues frames |
 | `fonts` | `fonts` | `installed()` lists every font face; `user_folder`, `belongs_to_user`, `refresh` and `remove` manage the user's own fonts; `is_monospaced` and `has_fixed_advances`; `use_family`, `reset` and `defaults` set the desktop's system or monospace font |
 | `ibus` | `ibus` | `address()` finds the session's IBus daemon, to connect to with `dbus::at` |
-| `launch` | `launch::context` | A launch context that hands the page's activation token to the app it starts, so its window comes to the front |
+| `launch` | `launch::context` | A launch context that hands the page's activation token to the app it starts, so its window comes to the front. `launch::open` and `launch::open_web_link` start the default app for a link or file themselves, and from inside a sandbox ask the portal to, so the app they open never runs in the caller's sandbox |
 | `recovery` | `recovery` | `Sheet` saves or prints a recovery key; `computer()` names this computer |
 | `settings` | `settings` | `load` and `save` a JSON file in the user's configuration folder, such as `"tern/settings.json"` |
 | `thumbnails` | `thumbnails` | `Thumbnails` makes thumbnails in the shared freedesktop cache and sends them to the page in batches |

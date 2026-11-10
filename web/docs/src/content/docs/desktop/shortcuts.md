@@ -27,7 +27,7 @@ sidebar:
 | <kbd>Super</kbd>+<kbd>E</kbd> | Your home folder in Rover |
 | <kbd>Super</kbd>+<kbd>L</kbd> | Lock the screen |
 | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Esc</kbd> | [Barometer](/apps/barometer/), the system monitor |
-| <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Delete</kbd> | Log out, after asking |
+| <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Delete</kbd> | Sign out, after asking |
 | <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Esc</kbd> | Turn off every screen effect from extensions, until you turn them back on |
 | <kbd>Super</kbd>+<kbd>Space</kbd> / <kbd>Shift</kbd>+<kbd>Super</kbd>+<kbd>Space</kbd> | Next or previous keyboard layout |
 | <kbd>Super</kbd>+<kbd>P</kbd> | Switch displays: mirror, join, external only or built-in only |
@@ -114,7 +114,7 @@ Scrolling over the taskbar switches workspaces too.
 
 ## Media and hardware keys
 
-The volume, mute, microphone, play, pause, next and previous, brightness, keyboard backlight, touchpad, airplane mode, Bluetooth, calculator, mail, browser and power keys on your keyboard do what they say. The power button asks whether to power off, restart, suspend or log out; Settings, under Power & Battery, can make it suspend or do nothing instead. While the screen is off, pressing it only turns the screen back on, and holding it down is left to your computer.
+The volume, mute, microphone, play, pause, next and previous, brightness, keyboard backlight, touchpad, airplane mode, Bluetooth, calculator, mail, browser and power keys on your keyboard do what they say. The power button asks whether to power off, restart, suspend or log out; Settings, under Power and battery, can make it suspend or do nothing instead. While the screen is off, pressing it only turns the screen back on, and holding it down is left to your computer.
 
 | Shortcut | Does |
 | --- | --- |

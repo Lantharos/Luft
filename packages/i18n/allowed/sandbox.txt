@@ -4,7 +4,7 @@ apps/system/schelf/sandbox/src/launch/folder.rs	The app didn't quit.
 apps/system/schelf/sandbox/src/launch/mount.rs	This file isn't an AppImage this computer can open.
 apps/system/schelf/sandbox/src/launch/mount.rs	The AppImage couldn't be opened ({status})
 apps/system/schelf/sandbox/src/launch/mount.rs	The AppImage took too long to open.
-apps/system/schelf/sandbox/src/launch/profile.rs	There's no home folder.
+apps/system/schelf/sandbox/src/launch/profile/mod.rs	There's no home folder.
 apps/system/schelf/sandbox/src/launch/proxy.rs	The session bus isn't at a path this sandbox can reach.
 apps/system/schelf/sandbox/src/launch/proxy.rs	The app's view of the session bus couldn't be set up.
 apps/system/schelf/sandbox/src/files.rs	The document portal isn't running.

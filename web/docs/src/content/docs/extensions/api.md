@@ -417,7 +417,7 @@ const print = ext.fileActions.add({
 
 A player has `id`, `app`, `appName`, `title`, `artist`, `album`, `artwork` (a file views can show, or `null` until it's fetched), `playing`, `length` in seconds, `canGoNext`, `canGoPrevious`, `canSeek`, `position()` resolving to seconds, `seek(seconds)`, `playPause()`, `next()`, `previous()` and `raise()`.
 
-`condition` is `clear`, `clouds`, `fog`, `drizzle`, `rain`, `snow` or `storm`, in degrees Celsius, millimetres and kilometres an hour. `sunrise` and `sunset` are today's there, in milliseconds since 1970, and `season` is `spring`, `summer`, `autumn` or `winter` by the date and the side of the equator. Weather comes from Open-Meteo, asked with the position rounded to about a kilometre.
+`condition` is `clear`, `clouds`, `fog`, `drizzle`, `rain`, `snow` or `storm`, in degrees Celsius, millimetres and kilometres an hour. `sunrise` and `sunset` are today's there, in milliseconds since 1970, and `season` is `spring`, `summer`, `autumn` or `winter` by the date and the side of the equator. Weather is asked of Luft's own site, luft.computer, which passes the question on to Open-Meteo. All that's sent is the position rounded to a tenth of a degree, about ten kilometres: no account, no identifier and no cookies, and the site keeps no record of who asked.
 
 ## Icons
 

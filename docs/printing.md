@@ -21,7 +21,7 @@ Settings' Printers page reads from `kestrel-settings` and changes things through
 
 Adding such a printer in Settings, or changing one of its defaults, makes the queue permanent (`printer-is-temporary` false in `CUPS-Add-Modify-Printer`). Network printers found by CUPS's own `dnssd` backend get the same name, so `com.lantharos.Printers1` knows them as set up and Settings doesn't offer them twice. Printers added by address get CUPS's `everywhere` driver, which CUPS builds from the printer's own attributes.
 
-The firewall lets mDNS in from home networks only ([security](security.md)), so printers are found there and not on public networks. Printing itself is a connection the computer makes, which the firewall always lets through, and IPP over USB stays on the loopback interface.
+The firewall lets mDNS in from home networks only ([security](security.md)), so printers are found there and not on public networks. A printer gets its queue by itself only when it is announced on a home network or by this computer (IPP over USB). Which networks are home is the firewall's word (`HomeInterfaces` on `com.lantharos.Firewall1`), so discovery and the firewall never disagree. One that shows up anywhere else, such as on a network you haven't called home or one a virtual machine or container made, is only listed: `Available` on `com.lantharos.Settings.Printing` returns its name, description and location, and `AddAvailable` sets it up once you choose it. Printing itself is a connection the computer makes, which the firewall always lets through, and IPP over USB stays on the loopback interface.
 
 ## USB printers that need a driver
 
@@ -44,4 +44,4 @@ Left out: `hplip` (31 MB with Python dependencies; HP printers since about 2013 
 
 ## Testing
 
-`services/printers/vm/run.sh` checks the whole path in a VM with SELinux enforcing; see [luft-printers](../services/printers/README.md). Headless Kestrel sessions run a private CUPS from `kestrel/tools/fixtures/session/printServer.sh` with two printers, ink levels and a held job, and `kestrel/tools/fixtures/system/printers.ts` stands in for `com.lantharos.Printers1`.
+`services/printers/vm/run.sh` checks the whole path in a VM with SELinux enforcing; see [luft-printers](../services/printers/README.md). Headless Kestrel sessions run a private CUPS from `kestrel/tools/fixtures/session/printServer.sh` with two printers, ink levels and a held job, and `kestrel/tools/fixtures/system/devices/printers.ts` stands in for `com.lantharos.Printers1`.

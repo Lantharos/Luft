@@ -19,6 +19,7 @@ When something has to wait on memory for a tenth of the time and less than a ten
 
 - Kestrel keeps 384 MB and the session services 32 MB each that are never reclaimed, and Kestrel up to 640 MB that is reclaimed last. The user's slices pass this protection down, 640 MB guaranteed and 1 GB preferred.
 - The session gets five times the CPU and disk time of apps and background tasks when they compete.
+- One app can't take the whole computer. Once an app holds nine tenths of the memory, the kernel makes that app give memory back as it asks for more, files it has read first, so it slows down instead of the desktop; games, browsers and editors that stay below that never notice. An app may also run at most a tenth of the processes and threads the computer allows, so one that keeps starting copies of itself stops there and leaves room for everything else. Both apply to every app unit (`app-*.scope` and `app-*.service`), Flatpaks included.
 - If the kernel ever closes a process inside Kestrel's own group, the session keeps running.
 
 Swap is compressed memory (zram, zstd) up to the size of the computer's memory and at most 8 GB, Fedora's default. Swappiness is 180 and swap is read one page at a time, since reading compressed memory back is much cheaper than reading from a disk.

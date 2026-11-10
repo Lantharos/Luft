@@ -618,6 +618,7 @@ dependencies = [
  "libc",
  "luft-app",
  "luft-dbus-macros",
+ "luft-files",
  "nvml-wrapper",
  "parking_lot 0.13.0",
  "sabine",
@@ -1940,6 +1941,7 @@ dependencies = [
 name = "disks"
 version = "0.1.0"
 dependencies = [
+ "dirs",
  "futures-util",
  "gio",
  "luft-app",
@@ -1949,7 +1951,9 @@ dependencies = [
  "rayon",
  "sabine",
  "serde",
+ "serde_json",
  "specta",
+ "tempfile",
  "tokio",
  "zbus 6.0.0",
 ]
@@ -2502,9 +2506,11 @@ dependencies = [
  "pdf-writer",
  "rayon",
  "roxmltree 0.21.1",
+ "rustls",
  "sabine",
  "serde",
  "serde_json",
+ "sha2",
  "specta",
  "tokio",
  "ureq",
@@ -4790,15 +4796,19 @@ dependencies = [
  "image",
  "jpeg-encoder",
  "jxl-oxide",
+ "libc",
+ "libloading 0.9.0",
  "luft-daylight",
  "luft-dbus",
  "luft-dbus-macros",
  "nix",
+ "seccompiler",
  "serde",
  "serde_json",
  "tokio",
  "toml_edit",
  "zbus 6.0.0",
+ "zeroize",
 ]
 
 [[package]]
@@ -4809,6 +4819,7 @@ dependencies = [
  "libloading 0.9.0",
  "serde",
  "serde_json",
+ "zeroize",
 ]
 
 [[package]]
@@ -5454,6 +5465,7 @@ dependencies = [
  "inotify",
  "libc",
  "luft-accounts",
+ "luft-dbus",
  "luft-dbus-macros",
  "rand 0.10.3",
  "serde",
@@ -5515,6 +5527,7 @@ dependencies = [
 name = "luft-dbus"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "futures-util",
  "luft-dbus-macros",
  "serde",
@@ -5548,6 +5561,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "luft-files"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "luft-dbus",
+ "luft-dbus-macros",
+ "percent-encoding",
+ "rustix",
+ "serde",
+ "tempfile",
+ "tokio",
+ "uzers",
+ "zbus 6.0.0",
+]
+
+[[package]]
 name = "luft-fingerprint"
 version = "0.1.0"
 dependencies = [
@@ -5569,6 +5598,7 @@ dependencies = [
  "futures-util",
  "luft-dbus",
  "luft-dbus-macros",
+ "luft-identity",
  "nix",
  "tokio",
  "zbus 6.0.0",
@@ -5650,6 +5680,7 @@ dependencies = [
  "toml",
  "toml_edit",
  "zbus 6.0.0",
+ "zeroize",
 ]
 
 [[package]]
@@ -5660,6 +5691,7 @@ dependencies = [
  "luft-meet",
  "serde",
  "specta",
+ "zeroize",
 ]
 
 [[package]]
@@ -5767,12 +5799,16 @@ dependencies = [
 name = "luft-meet"
 version = "0.1.0"
 dependencies = [
+ "argon2",
+ "chacha20poly1305",
+ "getrandom 0.4.3",
  "icu_locale_core",
  "icu_time",
  "roxmltree 0.21.1",
  "serde",
  "serde_json",
  "specta",
+ "zeroize",
 ]
 
 [[package]]
@@ -5901,6 +5937,7 @@ dependencies = [
  "luft-i18n",
  "luft-identity",
  "luft-software",
+ "pipewire",
  "serde",
  "serde_json",
  "tokio",
@@ -6168,9 +6205,9 @@ dependencies = [
  "crossbeam-channel",
  "dirs",
  "futures-util",
- "gio",
  "hickory-resolver",
  "lettre",
+ "libc",
  "lol_html",
  "luft-app",
  "mail-builder",
@@ -8393,6 +8430,7 @@ dependencies = [
  "luft-accounts",
  "luft-app",
  "luft-dbus-macros",
+ "luft-files",
  "luft-unpack",
  "memchr",
  "parking_lot 0.13.0",
@@ -8629,8 +8667,8 @@ checksum = "9774ba4a74de5f7b1c1451ed6cd5285a32eddb5cccb8cc655a4e50009e06477f"
 
 [[package]]
 name = "sabine"
-version = "0.82.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.82#a00083a418341226fb6b1c328e57ac3500311b58"
+version = "0.84.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.84#b75e3597a200adecee3a174a91574e277e50907f"
 dependencies = [
  "ash",
  "base64 0.23.1",
@@ -8694,8 +8732,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-bridge"
-version = "0.82.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.82#a00083a418341226fb6b1c328e57ac3500311b58"
+version = "0.84.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.84#b75e3597a200adecee3a174a91574e277e50907f"
 dependencies = [
  "serde",
  "serde_json",
@@ -8706,8 +8744,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-dialog"
-version = "0.82.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.82#a00083a418341226fb6b1c328e57ac3500311b58"
+version = "0.84.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.84#b75e3597a200adecee3a174a91574e277e50907f"
 dependencies = [
  "bytemuck",
  "glyphon",
@@ -8722,8 +8760,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-host"
-version = "0.82.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.82#a00083a418341226fb6b1c328e57ac3500311b58"
+version = "0.84.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.84#b75e3597a200adecee3a174a91574e277e50907f"
 dependencies = [
  "sabine-bridge",
  "sabine-runtime",
@@ -8734,8 +8772,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-platform"
-version = "0.82.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.82#a00083a418341226fb6b1c328e57ac3500311b58"
+version = "0.84.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.84#b75e3597a200adecee3a174a91574e277e50907f"
 dependencies = [
  "block2",
  "dunce",
@@ -8760,8 +8798,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-runtime"
-version = "0.82.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.82#a00083a418341226fb6b1c328e57ac3500311b58"
+version = "0.84.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.84#b75e3597a200adecee3a174a91574e277e50907f"
 dependencies = [
  "bzip2",
  "getrandom 0.4.3",
@@ -8778,8 +8816,8 @@ dependencies = [
 
 [[package]]
 name = "sabine-service"
-version = "0.82.0"
-source = "git+https://github.com/Lantharos/Sabine?tag=v0.82#a00083a418341226fb6b1c328e57ac3500311b58"
+version = "0.84.0"
+source = "git+https://github.com/Lantharos/Sabine?tag=v0.84#b75e3597a200adecee3a174a91574e277e50907f"
 dependencies = [
  "base64 0.23.1",
  "clap",
@@ -9150,6 +9188,7 @@ dependencies = [
  "tokio",
  "ureq",
  "zbus 6.0.0",
+ "zeroize",
 ]
 
 [[package]]

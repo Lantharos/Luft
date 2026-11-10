@@ -19,6 +19,8 @@ Writing is background work. `luft-language.service` runs the service at the idle
 
 Qwen3 was trained on 119 languages, Serbian, Croatian, Bosnian, Albanian and German among them, and the 2507 Instruct version answers without a thinking step first. It runs through llama.cpp, built into the service by the `llama-cpp-2` crate with Vulkan, on the graphics card when there is one and on the processor otherwise.
 
+Answers are written to match a llama.cpp grammar, JSON in a fixed shape, so whatever the model writes can be read. Each token is sampled first and only that one is checked against the grammar, which is much quicker than checking every token in the vocabulary; only when it doesn't fit is the whole vocabulary narrowed by the grammar. What an app sends is read as plain text: only the marks the service puts between the messages count as the model's own.
+
 ## Models
 
 The model lives in `~/.local/share/luft-language/models` and downloads only when asked, through `Install` on `com.lantharos.Language1.Models`; Heft asks when someone chooses to make notes of a recording, and `Remove` deletes it again. `services/language/data/models.json` lists the file with its size and SHA-256, and downloads go through the same code as dictation and handwriting (`packages/system/models`). `.github/workflows/models.yml` mirrors it to `get.luft.computer/models`.

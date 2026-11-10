@@ -19,14 +19,20 @@ network = true
 filesystems = ["xdg-documents", "xdg-download:ro"]
 devices = ["usb"]
 talk = ["org.mpris.MediaPlayer2.notes"]
+x11 = false
+microphone = true
+camera = false
 ```
 
 | Key | Default | Means |
 | --- | --- | --- |
 | `network` | `true` | It can go online |
-| `filesystems` | none | Folders besides your Downloads folder, which every sandboxed app gets until you turn that off in Settings → Apps: `home`, `xdg-desktop`, `xdg-documents`, `xdg-download`, `xdg-music`, `xdg-pictures` or `xdg-videos`, read-only with `:ro`. Files you pick in a file dialog always reach it. An app given your home folder still keeps its own files in `~/.var/app/APP-ID` |
-| `devices` | none | `usb`, `serial` or `all`. The graphics card, sound and the camera through the portal need nothing |
-| `talk` | none | Session bus names it calls besides the portals, notifications, the Secret Service, the tray, Kestrel's palette and its Send sheet. Names that would let it widen its own sandbox, such as the permission store, Flatpak's and systemd's, are refused, and so is Kestrel's, whose other services are only for Luft's own apps |
+| `filesystems` | none | Folders besides your Downloads folder, which every sandboxed app starts with, is listed with before you install it, and loses when you turn it off on the app's page in Schelf or in Settings → Apps: `home`, `xdg-desktop`, `xdg-documents`, `xdg-download`, `xdg-music`, `xdg-pictures` or `xdg-videos`, read-only with `:ro`. Files you pick in a file dialog always reach it. An app's own files are in `~/.var/app/APP-ID` |
+| `devices` | none | `usb`, `serial` or `all`. The graphics card and playing sound need nothing |
+| `microphone` | `false` | It records sound: from a microphone, or what the computer plays |
+| `camera` | `false` | It uses cameras. An app that only asks through the camera portal can leave this out and is asked about the first time |
+| `x11` | `false` | It draws through X11 instead of Wayland. X11 apps can see each other's windows and typing, so this is shown before you install it |
+| `talk` | none | Session bus names it calls besides the portals, notifications, the Secret Service, the tray, Kestrel's palette, its Send sheet and playing a sound of the sound theme. Names that would let it widen its own sandbox, such as the permission store, Flatpak's and systemd's, are refused, and so is Kestrel's, whose other services are only for Luft's own apps |
 
 An app that can't work in a sandbox at all says so, with a reason you'll read before allowing it:
 
@@ -50,9 +56,34 @@ Schelf reads the declaration from the AppImage before it installs it and shows i
 | `sandbox` / `network` | `no` when it stays offline |
 | `sandbox` / `downloads` | `no` when it doesn't get your Downloads folder |
 | `sandbox` / `bus` | The extra session bus names it can call |
+| `sandbox` / `x11` | `yes` when it gets the session's X11 display |
+| `devices` / `microphone` | `yes` when it may record sound |
+| `devices` / `camera` | `yes` when it may use cameras; the camera portal asks about and keeps the same entry |
 | `full-access` / `full-access` | It runs outside the sandbox |
 
-An app that asks to run unsandboxed gets Schelf's full access confirmation, with its reason, before it installs; cancelling installs nothing. `schelf install` installs it in its sandbox and says what it asked for, and `schelf trust` gives it full access. Its page in Schelf keeps the full access switch with its reason, and Settings → Apps lists everything in the store, its folders, network, devices and bus names included, so anything can be taken back later. An AppImage without a declaration gets the sandbox every AppImage gets: the network, your Downloads folder, the display, sound and the graphics card, and no other folders, devices or bus names. Its launcher keeps only the name, description, categories, file types and actions from the AppImage's own desktop entry, so an AppImage can't mark itself as something else there. Outside a sandbox, a Sabine app holds itself to its declaration with Landlock; Schelf starts an app you gave full access with `SABINE_FULL_ACCESS` set, so it doesn't.
+An app that asks to run unsandboxed gets Schelf's full access confirmation, with its reason, before it installs; cancelling installs nothing. `schelf install` installs it in its sandbox and says what it asked for, and `schelf trust` gives it full access. Its page in Schelf keeps the full access switch with its reason, and Settings → Apps lists everything in the store, its folders, network, devices and bus names included, so anything can be taken back later. An AppImage without a declaration gets the sandbox every AppImage gets: the network, your Downloads folder, Wayland, playing sound and the graphics card, and no other folders, devices or bus names, no microphone and no camera. The app's page in Schelf has switches for the microphone, cameras, the Downloads folder and X11, and so does Settings → Apps.
+
+## X11 only when asked for
+
+Apps draw through Wayland. An app that wasn't given X11 still finds a socket where display 99 would be, which hangs up on it and tells the sandbox it looked. If the app then closes within a few seconds, Luft says it only works with X11 and offers to review its access, which opens the switches on its page in Schelf; an app that carries on with Wayland is left alone. With X11 on, the app also shares the session's System V memory and message queues, which X11's shared-memory drawing needs; without it the sandbox has its own.
+
+## Microphone and cameras
+
+Every sandboxed AppImage can play sound. Recording it, and using a camera, are permissions of their own, off until the app declared them and you installed it, or you turned them on.
+
+The app reaches the session's PipeWire as its sandbox, which PipeWire reads from the process that connects, so nothing the app says about itself changes who it is. A WirePlumber script shipped with Luft, `client/find-schelf-access.lua`, then holds it to streams of its own: it can't make links itself, and WirePlumber links nothing into a stream or node of the app unless the permission store says `yes`, under `devices` / `microphone` for sound and `devices` / `camera` for video. That covers microphones, the monitor of what the computer plays, and other apps' streams alike. The answer applies right away in both directions: a waiting recording starts when you turn the switch on, and a running one is cut when you turn it off.
+
+Apps that speak PulseAudio get a PulseAudio server of their own inside the sandbox, started when they first connect, which reaches PipeWire as the app. They never get the session's PulseAudio socket, where a program can describe itself as it likes.
+
+With the camera allowed, the app also finds the computer's `/dev/video*` devices the next time it starts, for apps that open cameras directly; without it they are stand-ins, as USB devices are.
+
+When an app without the permission opens a recording stream, a camera stream or a camera stand-in, Luft says so once while it runs and offers to review its access, which opens the switches on its page in Schelf. Until then the app records silence, as it would with no microphone plugged in.
+
+## What every sandbox is made of
+
+An app's own folder, `~/.var/app/APP-ID`, shows in the sandbox at that same path, and `XDG_CONFIG_HOME`, `XDG_DATA_HOME`, `XDG_CACHE_HOME` and `XDG_STATE_HOME` point into it, so what an app keeps in them has one path inside the sandbox and outside. Unless the app was given your home folder, its folder also stands in for your home, for programs that write there directly. Besides its own files, an app sees `/usr`, and from `/etc` only what programs and their libraries read to work: how names are looked up, certificates, fonts, time zone, graphics and sound settings. Its `/etc/passwd` and `/etc/group` hold just you and `nobody`, so it can't list who else has an account. It has its own process, host name and, unless it uses X11, IPC namespaces.
+
+The system call filter is Flatpak's: no kernel log, accounting, kernel keyrings, memory placement, `ptrace`, `perf_event_open`, mounting or namespaces of its own (`clone3` and the newer mount calls answer as if the kernel lacked them, so programs fall back to the calls the filter can inspect), no `personality` other than Linux's, no typing into the terminal, and only local, internet and netlink sockets. Its launcher keeps only the name, description, categories, file types and actions from the AppImage's own desktop entry, so an AppImage can't mark itself as something else there. Outside a sandbox, a Sabine app holds itself to its declaration with Landlock; Schelf starts an app you gave full access with `SABINE_FULL_ACCESS` set, so it doesn't.
 
 ## One Chromium for Luft, one each for everyone else
 
@@ -72,7 +103,7 @@ Renderers then run in their own namespaces with Chromium's system call filter, a
 
 Whatever an AppImage opens, a download, a link or a folder, goes to the desktop portal, which starts your app for it in your own session. Schelf stands in for `xdg-open` for every AppImage: inside the sandbox it takes the place of `/usr/bin/xdg-open`, and an app you gave full access finds it first on its `PATH`, with `GIO_USE_PORTALS` set for GLib apps. It hands files to the portal's `OpenFile` and links to `OpenURI`, with the activation token of the click, so the app that opens comes to the front. That keeps the app for it out of the sandbox, and away from the folders the AppImage keeps its own files in: an app with full access runs with `XDG_CONFIG_HOME` and `XDG_DATA_HOME` pointing at its folder, which Schelf or Draft would otherwise take for yours.
 
-The portal only opens files the sandbox shows at the path they have outside it, such as your Downloads folder and the folders you gave the app, not the files in the app's own folder, which the sandbox shows as your home folder.
+The portal only opens files the sandbox shows at the path they have outside it: your Downloads folder, the folders you gave the app, and the app's own data, config, cache and state folders below `~/.var/app/APP-ID`. That's how Mailman opens an attachment it saved in its cache in your PDF viewer. A file an app writes straight into its stand-in home folder, outside those four, has another path outside the sandbox and doesn't open this way.
 
 The relay follows the bus authentication of every client, including ones that send their commands without waiting for each answer, as zbus does.
 
@@ -86,7 +117,7 @@ An app sends a file it holds, such as a scan it just saved, through Kestrel's Se
 | --- | --- |
 | `Send(a(sh) files)` | Opens the Send sheet for these files, each a name and an open file, and returns once it closes |
 
-The app hands over open files rather than paths, so it works from a sandbox that can't see where they are, and the bus proxy of the AppImage sandbox lets this one call through and nothing else of Kestrel's. Kestrel holds the call to what a person could have asked for:
+The app hands over open files rather than paths, so it works from a sandbox that can't see where they are, and the bus proxy of the AppImage sandbox lets this call through. Of Kestrel's other services it passes only the palette and `Play` on `com.lantharos.Kestrel.Sounds`, which plays a sound of the sound theme by name, as Mailman does when a message is sent. Kestrel holds the call to what a person could have asked for:
 
 - It opens only while one of the caller's windows is in front: by the sandbox's app ID, or outside a sandbox by the process behind the window, or for Luft's own apps, whose windows Sabine's shared browser draws, by the program the window's app runs.
 - One sheet is open at a time, and an app opens at most five a minute.

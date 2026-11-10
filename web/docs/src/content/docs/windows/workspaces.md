@@ -22,7 +22,7 @@ Past the first and last workspace, the desktop resists and springs back.
 
 - Drag a window onto a workspace in [All windows](/windows/task-view/).
 - <kbd>Super</kbd>+<kbd>Shift</kbd>+<kbd>Page Up</kbd> and <kbd>Page Down</kbd> move the window you're using to the workspace before or after.
-- The window menu (<kbd>Alt</kbd>+<kbd>Space</kbd>) has **Move to Workspace** and **Always on Visible Workspace**.
+- The window menu (<kbd>Alt</kbd>+<kbd>Space</kbd>) has **Move to workspace on the left** and **on the right**, and **Show on all workspaces**.
 
 ## Workspaces and the taskbar
 

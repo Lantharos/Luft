@@ -5,4 +5,4 @@ apps/system/settings/desktop/src/panels/personalization/appearance/cursors/insta
 apps/system/settings/desktop/src/panels/personalization/appearance/cursors/themes.rs	Icon Theme
 apps/system/settings/desktop/src/panels/personalization/appearance/cursors/store.rs	Luft Settings
 apps/system/settings/desktop/src/panels/system/about/sample.rs	Luft Alizé
-apps/system/settings/desktop/src/panels/protection/apps/startup.rs	Desktop Entry
+apps/system/settings/desktop/src/panels/system/apps/startup.rs	Desktop Entry

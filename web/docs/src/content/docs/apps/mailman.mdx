@@ -13,7 +13,9 @@ Mailman keeps a local copy of every account, so opening, searching and sorting m
 
 ## Accounts
 
-Type your address and Mailman finds the settings for most providers by itself. IMAP and SMTP accounts work, and so do JMAP accounts. Passwords and sign-in tokens are kept in [Luft Keyring](/files/keyring-and-passkeys/), where only Mailman can read them.
+Type your address and Mailman finds the settings for most providers by itself. IMAP and SMTP accounts work, and so do JMAP accounts. Passwords and sign-in tokens are kept in [Luft Keyring](/files/keyring-and-passkeys/), where only Mailman can read them. Mailman runs in a sandbox that can go online and nothing more: it sees none of your folders, files you attach or save go through the file dialog, and attachments and links open in your other apps, outside the sandbox.
+
+Mailman connects with encryption, and only picks encrypted servers when it finds the settings for you. If you set a server to **Not encrypted** yourself, Mailman asks before it connects, since your password and mail would cross the network readable by anyone on it.
 
 An account can send from several addresses, each with its own signature and reply address. Replies go out from the address a message was written to.
 
@@ -34,7 +36,7 @@ An account can send from several addresses, each with its own signature and repl
 
 ## Reading safely
 
-Mail shows without scripts and without remote pictures until you allow them, and tracking pixels are removed. **Darken bright messages** tones down mail designed for a white page.
+Each message shows in a frame of its own, where it can't run scripts or change anything around it. Remote pictures stay hidden until you allow them, for one message or always for that sender, and tracking pixels are removed. **Darken bright messages** tones down mail designed for a white page.
 
 ## Search
 

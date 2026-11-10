@@ -24,7 +24,9 @@ sidebar:
 
 ## Permissions
 
-The API object only has the parts an extension asked for. Settings and Schelf show each permission in plain words.
+Permissions say what your extension uses. The API object only has the parts you asked for, Settings and Schelf show each permission to people in plain words, and schelf.store reviews a release that asks for more than the one before.
+
+They're a declaration, not a sandbox. Extensions run inside Luft's desktop itself, in the same JavaScript environment, so nothing technically stops code there from reaching past the API object. People who install your extension trust you with their session, and the store's review is what stands behind that trust. Use only the API object: it's what stays stable between versions.
 
 | Permission | Shown as | Gives |
 | --- | --- | --- |

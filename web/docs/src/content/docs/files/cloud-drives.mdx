@@ -16,13 +16,15 @@ Sign in to a cloud service once in Settings, under **Accounts**, and its files a
 | Nextcloud | The server's address, then in your browser, or with a user name and app password |
 | WebDAV | The server's address, user name and password |
 
-Passwords and sign-in tokens are kept in [Luft Keyring](/files/keyring-and-passkeys/) and never written to a file. Removing an account removes its keyring entry and the copies on this computer; the files stay in the cloud.
+Nextcloud and WebDAV servers need an address that starts with `https://`, so your password is protected on the way.
+
+Passwords and sign-in tokens are kept in [Luft Keyring](/files/keyring-and-passkeys/) and never written to a file. Removing an account removes its keyring entry and the copies on this computer; the files stay in the cloud. Anything changed here is sent up first, and while that can't be done, for example without a connection, the account stays until you choose to remove it anyway.
 
 ## Files on demand
 
 Nothing downloads until you open it. Opened files stay for a day, up to 5 GB, and are cleared sooner when the disk runs low, so a large cloud drive doesn't fill yours.
 
-**Keep on this device**, on a file or folder in Rover, keeps it on your computer. Kept files open without a connection, and changes go both ways: within a few seconds of a change here, and every five minutes otherwise. **Free up space** turns it back into a file that downloads when opened; anything changed here is sent up first.
+**Keep on this device**, on a file or folder in Rover, keeps it on your computer. Kept files open without a connection, and changes go both ways: within a few seconds of a change here, and every five minutes otherwise. **Free up space** turns it back into a file that downloads when opened; anything changed here is sent up first, and nothing is deleted while that can't be done.
 
 Rover marks each file:
 

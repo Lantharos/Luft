@@ -4,3 +4,4 @@ kestrel/ui/src/portal/sharing/clipboard.ts	No such session
 kestrel/ui/src/portal/sharing/inputCapture.ts	No such session
 kestrel/ui/src/portal/sharing/remoteDesktop.ts	No such session
 kestrel/ui/src/portal/prompts/service.ts	Only kestrel-portal can open these dialogs
+kestrel/ui/src/portal/apps/background.ts	Desktop Entry

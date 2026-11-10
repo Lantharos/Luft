@@ -43,6 +43,6 @@ Night Light makes colours warmer in the evening, which is easier on the eyes. It
 
 Each display gets its own taskbar, with Start, its apps and the clock, unless you choose otherwise in the [taskbar's options](/desktop/taskbar/#options). Start, Quick settings and notifications open on the display the pointer is on.
 
-Move a window to another display by dragging it, with <kbd>Super</kbd>+<kbd>Shift</kbd>+arrows, or with **Move to Monitor** in the window menu. Only the main display switches [workspaces](/windows/workspaces/); windows on the others stay put. The [board](/windows/board/) uses the main display.
+Move a window to another display by dragging it, with <kbd>Super</kbd>+<kbd>Shift</kbd>+arrows, or with one of the **Move to display** items in the window menu. Only the main display switches [workspaces](/windows/workspaces/); windows on the others stay put. The [board](/windows/board/) uses the main display.
 
 The login screen and the boot splash use the same arrangement as your desktop.

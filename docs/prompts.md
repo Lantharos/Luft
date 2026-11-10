@@ -30,7 +30,7 @@ Request keys:
 
 - Responses: 0 allowed or entered, 1 declined, 2 closed (by `Close`, the screen locking, or a newer prompt with the same handle).
 - After `Password` returns, the dialog stays open until `Close`; calling `Password` again with the same handle and a `warning` asks again in the same dialog.
-- One prompt shows at a time, prompts wait while the screen is locked, and handles are separate per caller.
+- One prompt shows at a time, prompts wait while the screen is locked, and handles are separate per caller. Like every Kestrel dialog they pass the [prompt gate](security.md#confirming-its-you), which keeps prompts off the lock screen.
 
 ## Pinentry
 

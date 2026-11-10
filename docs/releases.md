@@ -34,11 +34,19 @@ The version is only in the image's labels, the `org.opencontainers.image.version
 
 A nightly is built when `main` has new commits, Fedora published a new base image, a package the image adds to Fedora's has an update, which happens most days, or an app the image ships from schelf.store has a newer release out. The build compares the commit, base image, CEF build and store releases recorded in the last nightly's labels and runs `os/image/build.sh updates` on it, which is `dnf check-upgrade` for the packages Luft adds. When all of them match, the night is skipped.
 
-Before `:1-nightly` moves, the new image is installed in a VM on the runner the way Install Luft does, started with Secure Boot, signed in to with a password made up for that run, and checked until the desktop and Settings work ([Testing](testing.md#ci)). When that fails, the nightly isn't published, `:1-nightly` stays on the last one that passed, and the run keeps the screenshots and logs.
+Before `:1-nightly` moves, each of the two new images is installed in its own VM on the runner the way Install Luft does, started with Secure Boot, signed in to with a password made up for that run, and checked until the desktop and Settings work ([Testing](testing.md#ci)). When that fails, the nightly isn't published, `:1-nightly` stays on the last one that passed, and the run keeps the screenshots and logs.
 
 Helium's newest release is picked up at 01:00, so it lands in that night's build. Sabine has its own releases; a new Sabine version reaches the nightlies first and stable with the next promotion. The image build fails when its Sabine would not run one of the image's own apps. On a running system, Sabine holds back an update that would stop an installed app, until a Luft update brings newer apps or, for an app the person installed, they update or remove it; Settings → Updates names those apps.
 
 A new major version lands on the nightlies first.
+
+## What the build trusts
+
+- **Fedora.** Each run resolves `quay.io/fedora/fedora-bootc` to a digest once, builds every part and the image on exactly that, and records it in the image's `org.opencontainers.image.base.name` label. Fedora doesn't sign the image, so the digest isn't committed: a commit that followed the tag by itself would prove nothing more. Packages come from Fedora's and RPM Fusion's repositories with their signatures checked. The two source packages Luft patches and rebuilds (bootc and xdg-desktop-portal), and the kernel headers when the repositories no longer carry the image's kernel, come from Koji's signed copies and are checked against Fedora's key before they're unpacked.
+- **Tools.** `os/versions.env` pins Bun (version and checksum, the same one for the build and for CI), and the Bun and chunkah images the build runs, by digest. It also holds the Fedora release and Luft's major version, which nothing else repeats.
+- **Downloads.** CEF is pinned in `os/image/parts/cef.lock` by version and SHA-256; the CEF workflow moves it to the newest build Sabine would install at 00:30, in a commit. Helium is checked against its publisher's signature, the cursors against a committed checksum, Zypak is fetched at a commit, and Sabine at a tag.
+- **Parts.** A part pushed to `ghcr.io/lantharos/luft-parts` is signed without a key by the workflow that built it, and recorded in sigstore's public log. The build only reuses a part that carries that signature, and pulls it by the digest it checked; anything else under the same tag counts as missing and is built again.
+- **Keys.** The Secure Boot key is only ever mounted into build steps that have no network: one signs SushiBoot, one the startup image, and one NVIDIA's kernel modules. The modules are built first, without any key, in a stage that downloads and runs NVIDIA's code; a second, clean stage with only Fedora's kernel headers signs the files it produced. Jobs that sign run in the `signing` environment, which only `main` may use.
 
 ## Apps on schelf.store
 
@@ -54,7 +62,7 @@ Draft, Flatbed, Magpie, Mailman and Seasons don't need anything only the image c
 
 ## Promoting a nightly
 
-Run the Image workflow with **promote** set to the nightly's version, such as `1.1-nightly.21`, which becomes the release it leads to, `1.1`. Only the next release can be promoted. The workflow tags the nightly's commit `v1.1`, checks the nightly's signature, gives a copy of it the new version and the release's changelog in its labels with crane, keeping every layer, signs that, and moves `:1` and `:1-nvidia` to it, also tagged `:1.1`. Then it publishes the release's changelog, sends the nightly's app releases to stable on schelf.store, builds the stable stick from the promoted images, and creates the GitHub release. If any step fails there is no GitHub release, and running it again picks up where it stopped.
+Run the Image workflow with **promote** set to the nightly's version, such as `1.1-nightly.21`, which becomes the release it leads to, `1.1`. Only the next release can be promoted. The workflow tags the nightly's commit `v1.1`, checks the nightly's signature, gives a copy of it the new version and the release's changelog in its labels with crane, keeping every layer, signs that with the key and in the public log, and moves `:1` and `:1-nvidia` to it, also tagged `:1.1`. Then it publishes the release's changelog, sends the nightly's app releases to stable on schelf.store, builds the stable stick from the promoted images, and creates the GitHub release. If any step fails there is no GitHub release, and running it again picks up where it stopped.
 
 Before promoting, check that:
 
@@ -84,6 +92,7 @@ The stick starts through Fedora's signed shim and GRUB, carries its images so in
 | `nightly/luft-VERSION.iso` | The three newest nightly sticks, such as `luft-1.1-nightly.21.iso` |
 | `1/luft-VERSION.iso` | Stable releases, from the first one on |
 | `…/latest.json` | The newest stick in that folder: its `name`, `version`, `size` and `sha256` |
+| `…/latest.json.minisig` | Its signature, which Meet Luft checks before it trusts the description |
 | `nightly/notes/VERSION.json` | That nightly's changelog |
 | `1/notes/VERSION.json` | That stable release's changelog |
 

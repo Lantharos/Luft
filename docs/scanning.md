@@ -15,7 +15,7 @@ Flatbed is a store app in its sandbox, so everything here happens inside it with
 
 A scanner found both ways shows once: an eSCL scanner hides a SANE device with the same address. SANE's own eSCL drivers (`airscan:e…` and `escl:`) are left out, since Flatbed speaks eSCL itself.
 
-Canon's driver finds network printers by broadcasting, and the answers don't come back through the firewall, which only lets in what answers the computer's own connections and mDNS on home networks. So Flatbed writes the Canon printers it finds through mDNS into a `pixma.conf` of its own as `bjnp://ADDRESS` lines, in `~/.local/state/com.lantharos.Flatbed/sane`, and starts SANE with `SANE_CONFIG_DIR` naming that folder before the system's. Each line makes the driver ask that printer directly.
+Canon's driver finds network printers by broadcasting, and the answers don't come back through the firewall, which only lets in what answers the computer's own connections and mDNS on home networks. So Flatbed writes the Canon printers it finds through mDNS into a `pixma.conf` of its own as `bjnp://ADDRESS` lines, in `~/.local/state/com.lantharos.flatbed/sane`, and starts SANE with `SANE_CONFIG_DIR` naming that folder before the system's. Each line makes the driver ask that printer directly.
 
 Scanners added by address are kept in Flatbed's settings and asked for their eSCL capabilities at each start, over HTTP and then HTTPS.
 
@@ -23,7 +23,7 @@ Scanners added by address are kept in Flatbed's settings and asked for their eSC
 
 Flatbed reads `ScannerCapabilities` for the glass (`Platen`), the feeder (`Adf`, with `AdfDuplexInputCaps` for both sides), the colour modes, formats and resolutions, posts `ScanSettings` to `ScanJobs` for the whole area at 300 or 600 pixels per inch, as JPEG (PNG when that's all it has), and then asks for `NextDocument` until the scanner answers 404: once for the glass, as often as the feeder has paper otherwise. 503 means the scanner is still getting ready, and is asked again every second for a minute and a half. Each page streams in, and what has arrived is shown every 350 ms, so the page fills in while it scans. Cancelling deletes the job.
 
-Scanners on a home network have certificates nobody signed, so HTTPS to a scanner (`_uscans`) is encrypted but can't be verified. Flatbed prefers plain `_uscan` when a scanner offers both.
+Scanners on a home network have certificates nobody signed, so no authority can vouch for one. Flatbed remembers the certificate a scanner shows over HTTPS (`_uscans`) the first time, by its SHA-256 in `scanners.json` next to the settings, and from then on only talks to whoever shows that certificate and proves it holds its key. When a scanner shows another one, Flatbed sends it nothing, keeps it in the sidebar and says *This scanner's identity changed*: *Trust this scanner* takes the new certificate, which is right after a reset or a replacement, and *Don't use it* leaves it alone. Requests to scanners never go through a proxy. Flatbed prefers plain `_uscan` when a scanner offers both.
 
 ## SANE
 
@@ -41,7 +41,7 @@ Flatbed always scans in colour or grey and makes black and white itself, which k
 
 ## Pages
 
-Each page keeps its source picture as it arrived, its four corners on that picture, a number of quarter turns, where it came from (scanner, camera or picture) and, from a scanner, its resolution. The developed page is made again from those whenever the corners, the turn or the document's mode change, one page at a time on a thread of its own, so the window never waits. Everything lives in `~/.local/state/com.lantharos.Flatbed/document`: `document.json`, the sources, each page's current picture and thumbnail, and the words read on it.
+Each page keeps its source picture as it arrived, its four corners on that picture, a number of quarter turns, where it came from (scanner, camera or picture) and, from a scanner, its resolution. The developed page is made again from those whenever the corners, the turn or the document's mode change, one page at a time on a thread of its own, so the window never waits. Everything lives in `~/.local/state/com.lantharos.flatbed/document`: `document.json`, the sources, each page's current picture and thumbnail, and the words read on it.
 
 ### Finding the paper
 

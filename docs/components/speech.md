@@ -13,6 +13,15 @@ Dictation in Luft comes from `luft-speech` ([services/speech](../../services/spe
 
 Parakeet covers 25 European languages; Whisper covers the rest. Silero VAD (MIT, 1.3 MB, built into the service) tells speech from silence and noise every 32 ms. Speech is recognized in stretches that end at a pause of 0.6 s, or at the quietest moment once a stretch reaches 25 seconds, and each finished stretch is typed right away while the one still being spoken shows as a preview. Languages written in more than one script are written in the script of the keyboard layout. The service reads the processor's features from `/proc/cpuinfo` when it starts and refuses languages that need Whisper where it can't run, without loading it. The model loads on the first dictation and unloads three minutes after the last one. `luft-speech.service` caps the service at 2 GB of memory.
 
+## Why it works this way
+
+- Whisper always looks at a whole 30 second window: the turbo model makes words up when shown less. The silence around speech is trimmed first, as it fills that with words nobody said too.
+- The stretch still being spoken is recognized again as it grows, but for at most half the time, so a slower computer keeps up by looking less often.
+- Parakeet sometimes hears nothing more after the end of a sentence, or nothing at all in speech that starts or ends in the middle of a word. When it falls silent well before the end, what comes after the last word it heard is recognized again on its own, and speech it heard nothing in is looked at once more from a moment later.
+- Languages written in both Cyrillic and Latin map onto each other letter for letter, so speech in one of them is written in the script of the keyboard layout being typed with, and switching the layout to another language switches dictation too. Layouts used across many languages, like the US one, say nothing about the language; then the language the computer is set to counts.
+- Recordings come in at 48 kHz and are brought to 16 kHz by keeping every third sample after a low-pass filter at 7.2 kHz (a Blackman-windowed sinc), so nothing above what 16 kHz can hold folds back into speech.
+- The Opus decoder needs a few packets to settle, so decoding starts slightly before the place asked for. A recording still being written, or cut short by a power cut, ends at its last whole page.
+
 ## Transcribing recordings
 
 The same program, started as `luft-speech --transcription`, transcribes recordings such as Heft's of a class. It owns `com.lantharos.Transcription1` (see `com.lantharos.Transcription1.xml` in the same folder) and runs as `luft-transcription.service`, apart from dictation, which has to answer at once: at the idle scheduling class and lowest priority for processor and disk, with half the processor's cores and at most four threads, capped at 2 GB. It exits after half a minute with nothing to do, and unloads Whisper three minutes after the last request.

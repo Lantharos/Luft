@@ -6,7 +6,7 @@ The rules of thumb:
 
 - Anything that moves and can be interrupted or follows a gesture uses a spring, so it can change direction mid-way without a jump.
 - Opacity and colour use short timed fades.
-- Exits are shorter than entrances and start moving at once. There is no ease-in curve.
+- Exits are shorter than entrances and start moving at once. Only things that leave the screen altogether, such as a hiding taskbar or a notification sliding away, gather speed first, on `accelerate` or `depart`.
 
 ## Tokens
 
@@ -15,9 +15,16 @@ The rules of thumb:
 | Token | ms | For |
 | --- | --- | --- |
 | `tap` | 83 | Hover and press fills, the fade-out of menus and tooltips |
+| `brisk` | 120 | Context menus and small hints sliding in and out |
 | `quick` | 167 | Exits, switches, tooltips in, closing dialogs |
+| `moderate` | 200 | Taskbar items making room, the taskbar hiding, text fields and tab markers |
 | `standard` | 250 | Menus, popovers, dialogs and banners in, pages entering |
+| `relaxed` | 300 | Quick settings tiles changing places, an app's taskbar mark settling |
 | `large` | 333 | Full-screen changes that aren't springs |
+| `travel` | 360 | The board's camera going to a window |
+| `slow` | 400 | The wallpaper fading in, the screen dimming, a wrong password's shake, a taskbar mark asking for attention |
+| `long` | 500 | The desktop appearing after sign-in, windows dimming behind a dialog, the screenshot flash |
+| `linger` | 1000 | The wallpaper crossfading to another one |
 
 ### Curves
 
@@ -25,6 +32,16 @@ The rules of thumb:
 | --- | --- | --- |
 | `decelerate` | `cubic-bezier(0, 0, 0, 1)` | Entrances and timed exits |
 | `point` | `cubic-bezier(0.55, 0.55, 0, 1)` | Moving something from one place to another without a spring |
+| `linear` | `cubic-bezier(0, 0, 1, 1)` | Progress that follows time: rings filling, the fade in a window's open and close |
+| `gentle` | `cubic-bezier(0.3333, 0.6667, 0.6667, 1)` | Fades of larger things, such as the wallpaper, window previews and on-screen displays |
+| `glide` | `cubic-bezier(0.3333, 1, 0.6667, 1)` | Things changing places in a grid or strip, and the board's camera |
+| `settle` | `cubic-bezier(0.2581, 1, 0.4882, 1)` | The taskbar and what sits on it arriving and making room |
+| `unfold` | `cubic-bezier(0.15, 1, 0.32, 1)` | Menus opening out of their button |
+| `accelerate` | `cubic-bezier(0.3333, 0, 0.6667, 0.3333)` | Things sliding off the screen |
+| `depart` | `cubic-bezier(0.5118, 0, 0.7419, 0)` | The taskbar hiding |
+| `pulse` | `cubic-bezier(0.47, 0.03, 0.53, 0.97)` | Marks that fade in and out to ask for attention |
+| `drift` | `cubic-bezier(0.37, 0, 0.63, 1)` | Slow back-and-forth movement, as in an extension's popup |
+| `overshoot` | `cubic-bezier(0.3333, 1.5672, 0.6667, 1)` | The one nudge that goes past its target, on the dialog of an app that stopped responding |
 
 Short opacity fades on small things are linear.
 
@@ -87,8 +104,8 @@ The theme's stylesheets have the durations as `$motion-tap`, `$motion-quick`, `$
 
 | Property | Value |
 | --- | --- |
-| `--motion-tap`, `--motion-quick`, `--motion-standard`, `--motion-large` | The durations |
-| `--ease-decelerate`, `--ease-point` | The curves, also as Tailwind's `ease-decelerate` and `ease-point` |
+| `--motion-tap`, `--motion-quick`, `--motion-standard`, `--motion-large` and one for every other duration | The durations |
+| `--ease-decelerate`, `--ease-point` and one for every other curve | The curves; `decelerate` and `point` are also Tailwind's `ease-decelerate` and `ease-point` |
 | `--spring-snappy`, `--spring-smooth`, `--spring-thrown` | Each spring from rest as a `linear()` easing |
 | `--spring-snappy-duration` and so on | The time each of those takes to settle |
 

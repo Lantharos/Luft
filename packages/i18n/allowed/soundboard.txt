@@ -1,0 +1,2 @@
+apps/store/soundboard/src/lib/state/arrange.svelte.ts	${this.offset.x}px ${this.offset.y}px
+apps/store/soundboard/src/lib/state/arrange.svelte.ts	${x}px ${y}px

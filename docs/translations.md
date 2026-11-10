@@ -29,8 +29,8 @@ Luft is translated into Albanian, Bosnian, Bulgarian, Catalan, Croatian, Czech, 
 | settings-connections | `apps/system/settings/locales/*/connections.ftl` | Network, Bluetooth |
 | settings-devices | `apps/system/settings/locales/*/devices.ftl` | Displays, Sound, Power, Input |
 | settings-personalization | `apps/system/settings/locales/*/personalization.ftl` | Appearance, Taskbar and Start, Windows, Extensions, Accessibility |
-| settings-protection | `apps/system/settings/locales/*/protection.ftl` | Apps, Privacy, Security |
-| settings-system | `apps/system/settings/locales/*/system.ftl` | Accounts, Language & time, System |
+| settings-protection | `apps/system/settings/locales/*/protection.ftl` | Privacy, Security |
+| settings-system | `apps/system/settings/locales/*/system.ftl` | Apps, Accounts, Language and time, System |
 | settings-desktop | `apps/system/settings/desktop/locales/*/desktop.ftl` | messages from Settings' native side |
 | sandbox | `apps/system/schelf/sandbox/locales/*/sandbox.ftl` | notifications from the sandbox AppImages run in |
 | trust | `packages/system/trust/locales/*/trust.ftl` | errors from the security service, shared by Disks, Settings and Install Luft |
@@ -64,7 +64,7 @@ The glossary for each language is `packages/i18n/glossary/<language>.tbx`, and i
 - `sr` is Serbian in Cyrillic and `sr-Latn` Serbian in Latin script. The locale `sr_RS.UTF-8@latin` picks Latin, any other Serbian locale Cyrillic. Serbian is translated once, in Cyrillic: `bun run transliterate` in `packages/i18n` writes the Latin files from it, and the checker fails when they differ.
 - Dates, numbers and units follow the formats locale: the region chosen in Settings, or else the account's language. The session applies it as `LC_TIME`, `LC_NUMERIC`, `LC_MONETARY`, `LC_MEASUREMENT` and `LC_PAPER`, and Kestrel follows a change to either right away and hands it to apps started afterwards. Setup only picks formats for the time zone's country when they are in the person's language and script, so English in Serbia keeps following English.
 
-Settings → Language & time sets the account's language through AccountsService, like the language picked during setup. The new language reaches the login screen and the whole session at the next sign-in, and Kestrel and newly started apps right away.
+Settings → Language and time sets the account's language through AccountsService, like the language picked during setup. The new language reaches the login screen and the whole session at the next sign-in, and Kestrel and newly started apps right away.
 
 ## Writing translatable code
 

@@ -105,6 +105,8 @@ $effect(() => {
 | `Switch`, `Checkbox`, `Slider`, `Select`, `Segmented` | Form controls with a `label` and `onchange`; `Segmented` takes an `item` snippet for icons |
 | `SearchField` | Search input; `variant="sidebar"`, `large`, and `focus()` |
 | `TextField`, `PasswordField` | Text inputs with `error`, `live`, `invalid` and bindable `touched`; `PasswordField` adds show and hide with `onreveal` |
+| `TextCell` | A text input for a cell of a grid or table, plain until hovered or focused; `single` for one centred character, `large`, `invalid` |
+| `TextArea` | A text field of several lines with bindable `value` and `element`, `large`, and `overlay` and `trailing` snippets for marks drawn over the text and a button in its corner |
 | `ProgressBar` | Thin bar for a `fraction` from 0 to 1, sliding back and forth while it's `null`; set its height and track color with classes and the fill with `--progress-color` |
 | `Dialog` | Modal with a title, description, body and `actions` snippet; `wide` for longer forms |
 | `ConfirmDialog` | Asks before an action; `run` closes it unless it answers `false`, and a failure shows in the dialog. `danger` for actions that can't be undone |

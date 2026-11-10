@@ -6,8 +6,7 @@ kestrel/ui/src/auth/keyring/prompter.ts	Only the keyring can ask for passwords
 kestrel/ui/src/auth/passkeys/prompt.ts	This prompt belongs to another caller
 kestrel/ui/src/auth/passkeys/service.ts	Only Luft Passkeys can ask about passkeys
 kestrel/ui/src/auth/passkeys/service.ts	The screen is locked
-kestrel/ui/src/auth/passkeys/service.ts	The prompt could not be shown
 kestrel/ui/src/session/actions/endSessionDialog.ts	Unknown dialog type requested
-kestrel/ui/src/session/actions/endSessionDialog.ts	Cannot grab pointer and keyboard
+kestrel/ui/src/session/actions/endSessionDialog.ts	The screen is locked
 kestrel/ui/src/auth/lockScreen/pages.ts	Lock screen swipe tracker
 kestrel/ui/src/auth/greeter/controls/power.ts	The login screen asks what the power button should do

@@ -1,14 +1,14 @@
 # Extensions
 
-Extensions add to Kestrel: layers over the wallpaper, shaders on windows and the whole screen, quick settings tiles, taskbar buttons, pop-up panels and small windows, keyboard shortcuts, search results, notifications, sounds, and pages in Settings. They can follow calls, hold notifications back for a while, connect to the hosts they name, keep secrets in the keyring and ask each other to do things. They run inside Kestrel's process but only see a versioned API object, never Kestrel's internals. What Luft does for everyone, such as the emoji picker, clipboard history and dictation, stays built into Kestrel; extensions are for what's optional. How to write one is in [the developer docs](https://docs.luft.computer/extensions/getting-started/); this page is how it works inside Luft.
+Extensions add to Kestrel: layers over the wallpaper, shaders on windows and the whole screen, quick settings tiles, taskbar buttons, pop-up panels and small windows, keyboard shortcuts, search results, notifications, sounds, and pages in Settings. They can follow calls, hold notifications back for a while, connect to the hosts they name, keep secrets in the keyring and ask each other to do things. They run inside Kestrel's process, as part of it: Kestrel hands each one a versioned API object, which is what extensions are written against, but nothing walls an extension off from the rest of Kestrel, so an extension is trusted the way Kestrel is ([what permissions are](#what-permissions-are-and-arent)). What Luft does for everyone, such as the emoji picker, clipboard history and dictation, stays built into Kestrel; extensions are for what's optional. How to write one is in [the developer docs](https://docs.luft.computer/extensions/getting-started/); this page is how it works inside Luft.
 
 | Where | What |
 | --- | --- |
 | `kestrel/ui/src/extensions/runtime` | Finding, loading, enabling and switching off extensions, their stored settings and crash guard |
-| `kestrel/ui/src/extensions/api/v1` | API version 1. `types.ts` is the contract; everything else implements it |
+| `kestrel/ui/src/extensions/api/v1` | API version 1. `types.ts` and the files in `types` are the contract; everything else implements it |
 | `kestrel/ui/src/extensions/service.ts` | The D-Bus interface below |
 | `kestrel/engine/src/sound` | `ShellSoundMix`, which plays an extension's sounds, and `ShellAudioMonitor`, which measures what the computer plays |
-| `packages/extension-api` | `@luft/extension-api`, the types for extension authors, written from `types.ts` by `bun kestrel/ui/extensionApi.ts`. `bun run check` in `kestrel/ui` fails when it's out of date |
+| `packages/extension-api` | `@luft/extension-api`, the types for extension authors, written from that contract by `bun kestrel/ui/extensionApi.ts`. `bun run check` in `kestrel/ui` fails when it's out of date |
 | `extensions` | Lantharos's own extensions, such as Seasons, Strays, Playthings, Keystrokes, Focus, Reminders, Phosphor, Tailor and Pult. Each has a `build.sh` that makes its folder, which `extensions/pack.sh` packs for schelf.store |
 | `apps/system/settings/src/lib/panels/personalization/extensions` | Settings → Extensions, each extension's page, and its rows on other pages |
 
@@ -74,7 +74,7 @@ default = "<Super><Alt>c"
 
 The full reference, with every setting type, is [the manifest reference](https://docs.luft.computer/extensions/manifest/). Kestrel refuses a manifest that targets an API version it doesn't run, asks for a permission it doesn't know, or declares settings that don't fit together.
 
-Permissions, with the words Settings and the store show for them:
+Permissions say what an extension uses, and decide which parts of the API object it's handed. They aren't a sandbox ([what permissions are](#what-permissions-are-and-arent)). With the words Settings and the store show for them:
 
 | Permission | Shown as |
 | --- | --- |
@@ -138,7 +138,7 @@ While an extension runs, Kestrel grabs its shortcuts from the compositor: what t
 
 ## Pop-ups
 
-Pop-ups are drawn by Kestrel from a tree of its own controls, not by the extension, so they look and move like the rest of Luft and can't reach Kestrel's internals. A panel takes the keyboard and closes when it loses it; a window floats above windows and leaves the keyboard alone until clicked. Updates keep each control that stayed in place, so drags and typing carry on, and a panel keeps the keyboard when the control that had it is replaced, such as a Start button that becomes Pause and End. Pop-ups are for the desktop: they all close the moment the screen locks, and one opened while it's locked or nobody is signed in never shows; it comes back closed and its `onClosed` runs, so an extension that wants to be seen then sends a notification.
+Pop-ups are drawn by Kestrel from a tree of its own controls, not by the extension, so they look and move like the rest of Luft and an extension needs nothing of Kestrel's internals to show one. A panel takes the keyboard and closes when it loses it; a window floats above windows and leaves the keyboard alone until clicked. Updates keep each control that stayed in place, so drags and typing carry on, and a panel keeps the keyboard when the control that had it is replaced, such as a Start button that becomes Pause and End. Pop-ups are for the desktop: they all close the moment the screen locks, and one opened while it's locked or nobody is signed in never shows; it comes back closed and its `onClosed` runs, so an extension that wants to be seen then sends a notification.
 
 ## Taskbar elements
 
@@ -162,7 +162,7 @@ Where an element sits is the person's choice, never the extension's. They drag i
 
 ## Clipboard and files
 
-`clipboard` puts text, a picture in its own type, or files as a `text/uri-list` on the clipboard through `St.Clipboard` (`api/v1/clipboard.ts`). Clipboard history sees it like any other copy.
+`clipboard` puts text, a picture in its own type, or files as a `text/uri-list` on the clipboard through `St.Clipboard` (`api/v1/desktop/clipboard.ts`). Clipboard history sees it like any other copy.
 
 `chooseFiles` asks the file chooser portal for files or a folder and returns their paths where they are, for what an extension hands its helper; `pickFiles` copies what was picked into the data folder instead. Both only work right after the person used the extension.
 
@@ -217,7 +217,7 @@ Seasons follows the pointer without simulating anything. A motion only notes whe
 
 ## Screen effects
 
-`screen-effects` lets an extension run shaders on what's on the screen, in `api/v1/screenEffects`. Phosphor is built on it. Five kinds of effect cover what people ask for, each at the lowest cost that can do it:
+`screen-effects` lets an extension run shaders on what's on the screen, in `api/v1/visuals/screenEffects`. Phosphor is built on it. Five kinds of effect cover what people ask for, each at the lowest cost that can do it:
 
 | Effect | Goes on | Costs |
 | --- | --- | --- |
@@ -345,15 +345,47 @@ The stream stays running for 2 to 4 seconds after the last press, so the first k
 
 To install an extension, unpack it into `~/.local/share/luft/extensions/<id>/` and call `Reload(id)`; to update, replace the folder and call `Reload(id)` again.
 
+## Weather
+
+`weather` asks Luft's own site, `https://luft.computer/api/weather`, which passes the question on to Open-Meteo, so the weather service never sees the computer. Kestrel sends the position GeoClue gives it, rounded to a tenth of a degree (about ten kilometres), and nothing else: no cookies, no language, no identifier. The site shares one answer between everyone in the same square and keeps no record of who asked. Nothing is asked while location services are off or while no extension wants the weather, a report is kept for half an hour, and an answer that's over 4 KB or holds values no weather has is dropped.
+
+Start's currency conversions get the day's rates the same way, from `https://luft.computer/api/rates`, which takes no parameters. Both go through `shared/network/luftSite.ts`. Turning off **Weather and currency rates** in Settings, under Privacy, sets `online-lookups` in `com.lantharos.kestrel` to false, and then neither is asked for: conversions keep using the last rates saved, and extensions get no weather.
+
 ## Settings
 
 Kestrel keeps what the person decided in `com.lantharos.kestrel`: `disabled-extensions`, `extension-settings` (values by id and key, only those changed from the default), `extension-shortcuts` (shortcuts the person set, by id and key) and `extension-problems`. Settings changes them only through the D-Bus interface, so every value is checked against the manifest.
+
+## What permissions are, and aren't
+
+An extension is JavaScript that Kestrel imports into its own realm, the one the compositor and the shell run in. That's what makes extensions cheap and lets them draw in the same scene as everything else, and it also means there's no boundary between an extension and Kestrel.
+
+What the permission list does:
+
+- **It decides what the API object has.** `createApi` (`api/v1/core/create.ts`) builds the object from the basics plus one part for each permission, the helper, shortcuts and network hosts the manifest names. An extension that didn't ask for `taskbar` has no `taskbar`. The parts hold to their own rules: `network.fetch` refuses hosts the manifest doesn't name, `typing.type` only works right after the person used the extension, and so on.
+- **It's what people are shown.** Schelf lists the permissions, the hosts and whether there's a helper before installing, and Settings lists them on the extension's page. Schelf records what the person agreed to, and an update that asks for more waits until they agree again.
+- **It's what schelf.store checks and reviews.** The store reads the list from the release itself, refuses permissions the API doesn't have, and sends a release that adds a permission, a host or a helper to review.
+
+What it doesn't do:
+
+- **It isn't a sandbox.** Code in Kestrel's realm can `import` from `gi://` like Kestrel's own modules do, and reach everything the compositor can: the windows and what's in them, the keyboard and pointer, the clipboard, the person's files, the network and other programs. An extension that goes around the API object isn't held to its permissions, the hosts it named, or anything this page says an extension can't see or do. Those statements describe the API, which is what an honest extension uses, not a limit a hostile one meets.
+- **A helper is a program running as the person.** It's started outside any sandbox, with their files and network.
+- **Kestrel doesn't check where an extension came from.** It runs whatever is in `~/.local/share/luft/extensions`. Schelf checks signatures before it puts anything there, but a program already running as the person can write to that folder too, and what it puts there runs inside the compositor at the next start. A sandboxed app can't, unless it was given the home folder: it sees neither that folder nor the D-Bus interface.
+
+So installing an extension is a decision to trust its author with the session, much like installing an app with full access, and more than installing a sandboxed app. What stands between people and a bad extension today:
+
+- **schelf.store.** Extensions go through the same checks and review as apps: a publisher with a proven namespace, the automatic checks, native helpers scanned like any program, and a person's review where the store's rules call for one.
+- **Signatures.** Schelf only installs a release named in the store's signed index, and throws away a download whose size or SHA-256 differs from the signed entry ([Schelf](components/schelf.md)).
+- **Being asked.** The permission list shown before installing, and again when an update widens it.
+- **Pulling a release.** When schelf.store pulls an extension, Schelf turns it off on the computers that have it.
+- **The guards below**, which are about mistakes, not malice: they keep a broken extension from taking the desktop down with it.
+
+Running extensions outside Kestrel's process would make permissions enforceable. Nothing does that today.
 
 ## Safety
 
 - Every call into an extension's code is timed and guarded. An extension that throws while it turns on, or from anything Kestrel calls in it later, is turned off, everything it made is taken away, and a notification says so.
 - Kestrel writes which extensions run to `~/.local/state/kestrel/extensions-running.json`. When `kestrel-wrapper` starts it again after a crash, each extension that was running gets a crash counted; at two in a row it stays off, with a notification. A start that isn't after a crash forgets the counts.
-- Permissions are what the API object has: an extension that didn't ask for `taskbar` has no `taskbar`.
+- The API object only has what the manifest asked for, which keeps an extension from using a part by accident. It's not a security boundary ([what permissions are](#what-permissions-are-and-arent)).
 - A turned off extension costs nothing: its module is never loaded. A wallpaper layer has no actors while it's inactive and stops its frame clock while nothing shows, and its shader only runs over the area it asks for.
 - Modules load once per path in GJS, so Kestrel copies `extension.js` to a temporary file for each load. That's what lets `Reload` run new code without restarting Kestrel.
 
@@ -380,6 +412,10 @@ Times are kept as they read on the wall, a day and an hour with no time zone, an
 What was due while it couldn't ring takes care of itself: a reminder remembers whether it rang for its current occurrence, so whatever's past due and hasn't rung rings at the next `refresh`, once, and a repeat moves to its latest occurrence first. While banners are held nothing rings and nothing's marked, so it all arrives when the hold ends. While the screen is locked, new reminders still go out, but ones coming back wait.
 
 Reminders live in `reminders.json` in the extension's data folder, written with `writeText` after every change. Each has an `id` that never changes, which is its `UID` in calendar files, and an `updatedAt`, which is what syncing would need to match copies up. There's no sync today, and nothing leaves the computer. Quick add reads English: `parse/parse.ts` takes the phrases it understands out of the text one at a time, and what's left is the title.
+
+## Pult
+
+Pult asks `app.pult.sh` what's waiting with one timer, set again after each answer: a minute later, three minutes on battery, and twice as long after each failure in a row, up to 15 minutes. It only runs while someone is signed in to Pult and at the desktop, so not while the screen is locked, and not while the power saver is on. Unlocking, waking from sleep and opening its panel ask right away, and the panel offers Try again when Pult can't be reached. The API has no way to tell that the person stepped away without locking, so until the screen locks it keeps its pace.
 
 ## Network
 
@@ -413,7 +449,7 @@ Turning an app off runs its `restore`, and turning the extension off or removing
 
 ### Spotify
 
-Spotify is restyled through whichever Spicetify is already there, wherever it's installed: Kestrel doesn't get the PATH of a terminal, so the helper looks in `~/.spicetify` and the other usual folders first, and asks Spicetify with `-c` where its config is. It fills in `spotify_path` and `prefs_path` when they're empty or point at something that's gone, as Spicetify can't find a Flatpak's prefs by itself. The helper puts the `Luft` theme in Spicetify's themes folder, selects it, remembers what was selected before in `previous-theme` next to it, and applies it without restarting Spotify, so the look shows the next time Spotify starts. If that fails, what Spicetify said is matched to something people can do, and its own words show under the status in Settings. A finished `apply` only counts when the theme's script is in Spotify. When Flatpak swaps in a new Spotify, or a package puts back the `xpui.spa` Spicetify took apart, the helper sees it and applies the theme again.
+Spotify is restyled through whichever Spicetify is already there, wherever it's installed: Kestrel doesn't get the PATH of a terminal, so the helper looks in `~/.spicetify` and the other usual folders first, and asks Spicetify with `-c` where its config is. It fills in `spotify_path` and `prefs_path` when they're empty or point at something that's gone, as Spicetify can't find a Flatpak's prefs by itself. The helper puts the `Luft` theme in Spicetify's themes folder, selects it, remembers what was selected before in `previous-theme` next to it, and applies it without restarting Spotify, so the look shows the next time Spotify starts. If that fails, what Spicetify said is matched to something people can do, and its own words show under the status in Settings. A Spotify installed for everyone, as a system-wide Flatpak or a package, belongs to root, so Spicetify can't change it. Tailor never asks people to loosen those files' permissions: when the person also has a Spotify of their own, a Flatpak installed for their account, the helper points Spicetify at that one, and otherwise Settings says to replace it with one from Schelf, which installs Flatpaks for the account, and offers to open Spotify's page there. A finished `apply` only counts when the theme's script is in Spotify. When Flatpak swaps in a new Spotify, or a package puts back the `xpui.spa` Spicetify took apart, the helper sees it and applies the theme again.
 
 Spotify's sandbox can't reach the session bus or `~/.config/kestrel`, and its Chromium doesn't follow the desktop's light and dark styles. So the helper passes the look on as server-sent events on `127.0.0.1:47291`, only to Spotify's origin. The theme's script remembers the last look, so Spotify opens in it before the stream connects.
 

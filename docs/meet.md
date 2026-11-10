@@ -20,7 +20,18 @@ The steps people see are in [Try Luft with Meet Luft](https://docs.luft.computer
 - The download is checked against its `.sha256` as it arrives, and the `.sha256` against its [signature](#signatures). The live system is copied out of the ISO under temporary names, and only takes their place once the whole ISO matched.
 - The start entry *Meet Luft* goes at the end of the firmware's list, and the firmware is asked to use it once (`BootNext`). Some firmware drops entries it doesn't know, so Meet Luft puts it back before each restart. Luft starts through Fedora's signed shim and GRUB, like the stick.
 - The clock (`RealTimeIsUniversal`) and Fast Startup are changed in Windows itself, so they work with BitLocker on, where Luft can't read Windows' drive.
-- The moving box holds folders from the Windows account, the wallpaper, name and account picture, Bluetooth pairings, and Wi-Fi networks with their passwords when ticked.
+- The moving box holds folders from the Windows account, the wallpaper, name and account picture, Bluetooth pairings, and Wi-Fi networks with their passwords when ticked. It's [sealed](#the-moving-boxs-seal) with a code Meet Luft shows once packing is done.
+
+### The moving box's seal
+
+The box sits on a partition any system can read, between Windows and the moment Luft is installed, so Meet Luft encrypts everything in it and Install Luft checks all of it before anything reaches the new account. Nobody who starts the computer from something else can read the Wi-Fi passwords, Bluetooth keys or documents in it, and nobody can add or swap a file in it.
+
+- After packing, Meet Luft shows a code of twelve characters, like `7K2M-0QRX-4TB9`: 60 random bits in letters and digits that can't be mistaken for each other. It's shown until Meet Luft closes and kept nowhere; packing again makes a new box with a new code.
+- The key is Argon2id over the code (64 MiB, three passes) with a random salt, which `box.seal` holds in the clear, the only file in the box that isn't encrypted.
+- Every file is a numbered blob under `blobs`, encrypted with XChaCha20-Poly1305 a megabyte at a time. Each piece is bound to the blob's number, its place in the blob and whether it's the last, so pieces can't be moved, dropped or cut off. Blob `0` is the list: what the box brings (the folders, names of the Wi-Fi, picture, wallpaper and Bluetooth files) and every file's path, size and date, in the order of the blobs.
+- Install Luft asks for the code when it finds a box, forgiving case, dashes and `O`, `I` and `L` typed for `0` and `1`, and offers to leave the box behind. With the code, the installer's `OpenMovingBox` opens the list, and the install unpacks only the files the list names, each checked piece by piece and against its listed size as it's written. A file that was changed, swapped, cut short or is missing stops the unpacking; a file that was added is never read. A box without a seal isn't offered at all.
+
+`luft_meet::sealed` holds the format, for Meet Luft's packing and Install Luft's unpacking alike.
 
 ### Where Luft goes
 
@@ -39,7 +50,7 @@ Wherever the room is, Meet Luft's partitions go right after it on the same drive
 | Partition | Size | What's on it |
 | --- | --- | --- |
 | Luft's room | your choice, at least 32 GB (34 GB next to a small EFI system partition) | Empty until Luft is installed into it |
-| Moving box | what you packed, plus a little | exFAT, labelled *Moving box*, with `box.json` listing what's inside |
+| Moving box | what you packed, plus a little | exFAT, labelled *Moving box*, holding the [sealed](#the-moving-boxs-seal) files |
 | Start | about 512 MB | FAT, an EFI system partition of its own with shim, GRUB, the kernel and its initramfs |
 | Luft | the live system plus 1 GB | exFAT, labelled *Luft*, with `LiveOS` from the ISO, `meet.json` and the logs from Try Luft |
 
@@ -72,7 +83,7 @@ btrfs can only change size from the system that has it mounted, and Windows can 
 3. At Luft's next start, `trustd-system-disk.service` plans the move and runs it in the background, step by step: it makes a new partition, adds it to Luft's btrfs, hands it the root type, lets btrfs move everything off the old partition (`btrfs device remove`), deletes the old one and grows the new one to the end. The startup partition moves first when Luft grows and last when it shrinks, copied to a new FAT partition with the same serial. At the end Luft's partition gets its old partition UUID back, so nothing measured into the TPM changes.
 4. When Luft gave space back, the next time Meet Luft opens it offers to extend Windows into it.
 
-trustd is the only thing that changes Luft's partition, its encryption and its btrfs on an installed Luft. Taking back Meet Luft's space, a change asked for from Windows, and growing or shrinking Luft from Disks are all plans of the same steps. Disks asks for a move into free space in front of Luft the way Meet Luft does, by writing the same `{"change":"grow",…}` request through trustd's `GrowSystemAtStart`, after checking that the plan works out; `CancelSystemResize` takes it back, and the `Resize` field of trustd's `Disk` property says which change waits. The plans are kept in one journal, `/var/lib/trustd/system-disk.json`. Every step is noted there before the next one starts, and only one plan runs at a time; Disks gets a busy error while one is waiting. At every point Luft still starts: while both partitions belong to the file system, the startup finds it through either. After a power cut the service carries on at the next start, and it gives up on a step that fails three times in a row.
+trustd is the only thing that changes Luft's partition, its encryption and its btrfs on an installed Luft. Taking back Meet Luft's space, a change asked for from Windows, and growing or shrinking Luft from Disks are all plans of the same steps. Disks asks for a move into free space in front of Luft the way Meet Luft does, by writing the same `{"change":"grow",…}` request through trustd's `GrowSystemAtStart`, after checking that the plan works out; `CancelSystemResize` takes it back, and the `Resize` field of trustd's `Disk` property says which change waits. The plans are kept in one journal, `/var/lib/trustd/system-disk.json`. Every step is noted there before the next one starts, and only one plan runs at a time; Disks gets a busy error while one is waiting. At every point Luft still starts: while both partitions belong to the file system, the startup finds it through either. After a power cut the service carries on at the next start. A plan whose first step fails three times in a row is dropped, since nothing has changed yet; once a step is done, the plan is never dropped, and every start tries the next step again until the change is finished, so Luft is never left spread over two partitions with nothing to finish the move. The tools the steps run are stopped after five minutes without an end, except the ones that move data or wait for a person, so one that hangs can't hold the service forever.
 
 Free space right after Luft needs no move: Luft grows its partition, its encryption and its btrfs where they are, and trimming shrinks them in the opposite order. A grow takes all the free space right before and after Luft, within a megabyte of its edges, so whatever partition sizes Windows leaves don't hide it.
 
@@ -184,7 +195,9 @@ Meet Luft shows the first of your display languages it's translated into: on Win
 
 Every published `.sha256` has a [minisign](https://jedisct1.github.io/minisign/) signature next to it, `.sha256.minisig`, whose trusted comment is the name of the ISO it's for. The ISO workflow signs with the `LUFT_ISO_MINISIGN_KEY` Actions secret, and Meet Luft has the public key built in as `PUBLIC_KEY` in `apps/store/meet/desktop/src/live/signature.rs`. It only accepts checksums signed for the exact ISO it downloads, so an older or other ISO can't be passed off as the one it asked for, and refuses a download without a signature. An ISO picked with *Use an ISO I already have* is the person's own choice and isn't checked against a signature.
 
-To change the key, make a new pair without a password on a computer you trust (`minisign -G -W -p luft-iso.pub -s luft-iso.key`), replace the secret with the whole of `luft-iso.key`, publish ISOs signed with it, and only then put the second line of `luft-iso.pub` into `PUBLIC_KEY`. Copies of Meet Luft with the old key refuse ISOs signed with the new one.
+Each folder's `latest.json` is signed too, as `latest.json.minisig`, with a second key: the `LUFT_MEET_UPDATE_KEY` Actions secret, whose public half is `POINTER_KEY` in the same file. Its trusted comment is the folder and file it's for, such as `nightly/latest.json`, so a nightly can't be offered as a release. Meet Luft refuses a `latest.json` without that signature, and remembers the newest version each folder offered, in `newest.json` next to its downloads, so it also refuses one that names an older build than it has seen there.
+
+To change the key, make a new pair without a password on a computer you trust (`minisign -G -W -p luft-iso.pub -s luft-iso.key`), replace the secret with the whole of `luft-iso.key`, publish ISOs signed with it, and only then put the second line of `luft-iso.pub` into `PUBLIC_KEY`. Copies of Meet Luft with the old key refuse ISOs signed with the new one. The `latest.json` key changes the same way, with `LUFT_MEET_UPDATE_KEY` and `POINTER_KEY`.
 
 Meet Luft itself isn't signed with an Authenticode certificate yet, so Windows shows it from an unknown publisher. Signing waits on a certificate; with one, the Meet Luft workflow signs `meet.exe` and the setup program through Sabine:
 

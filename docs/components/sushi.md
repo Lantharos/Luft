@@ -19,7 +19,7 @@ Each screen starts in the mode from that arrangement, or else in its preferred m
 | `sushictl deactivate` | Fades the spinner out and hands the display to the next program, keeping the last frame on screen |
 | `sushictl quit` | Closes the splash and returns to the text console |
 | `sushictl update-root ROOT` | Moves the splash into another root file system, as `sushi-switch-root.service` does with `/sysroot` when the initramfs hands over to the installed system |
-| `sushictl show MODE` | Takes the display back: `boot-up`, `shutdown` (or `reboot`), `updates`, `system-upgrade`, `firmware-upgrade` or `encrypting` |
+| `sushictl show MODE` | Takes the display back: `boot-up`, `shutdown` (or `reboot`), `updates`, `system-upgrade` or `firmware-upgrade` |
 | `sushictl load-drivers` | Loads the drivers Sushi takes over |
 | `sushictl moving DRIVE` | Takes the display back and says Luft is moving to the drive named |
 | `sushictl progress PERCENT` | Shows how far the activity on screen is |
@@ -50,3 +50,5 @@ SushiBoot reads unified kernel images and [Boot Loader Specification](https://ua
 - Entry IDs and the Boot Loader Interface match systemd-boot's, so `bootctl status`, `bootctl list` and `bootctl set-oneshot ID` work.
 - Boot counting works like systemd-boot's: an entry named `…+LEFT-DONE.conf` is renamed with one try fewer each time it starts, `LoaderBootCountPath` names it for `systemd-bless-boot`, and an entry with no tries left goes after the others, so a new version that never reaches the login screen goes back to the version before ([details](../boot.md#when-an-update-doesnt-start)).
 - With Secure Boot on it must be signed, has no command line editor, and skips entries that start a kernel directly. It measures what it starts into the TPM like systemd-boot.
+- The menu draws only when something on it changes: a key, a fade or the countdown's next second.
+- When SushiBoot itself fails, it hands back to the firmware, which tries its next boot entry.

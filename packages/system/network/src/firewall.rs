@@ -239,6 +239,18 @@ async fn call(
         .map_err(|error| error_message(&error).map_or_else(|| failed(&error), str::to_owned))
 }
 
+async fn own_user(connection: &zbus::Connection) -> Result<u32, String> {
+    let name = connection
+        .unique_name()
+        .ok_or("The system bus gave this app no name")?;
+    zbus::fdo::DBusProxy::new(connection)
+        .await
+        .map_err(failed)?
+        .get_connection_unix_user(name.clone().into())
+        .await
+        .map_err(failed)
+}
+
 pub async fn read(Empty {}: Empty) -> Result<Option<Firewall>, String> {
     let firewall = proxy().await?;
     let Ok(ports) = firewall
@@ -251,11 +263,13 @@ pub async fn read(Empty {}: Empty) -> Result<Option<Firewall>, String> {
         .get_property("Unclassified")
         .await
         .map_err(failed)?;
-    let decided: Vec<(String, String, String)> =
+    let decided: Vec<(String, String, String, u32)> =
         firewall.get_property("Apps").await.map_err(failed)?;
+    let me = own_user(firewall.connection()).await?;
     let mut apps: Vec<FirewallApp> = decided
         .into_iter()
-        .filter_map(|(kind, id, access)| FirewallApp::new(&kind, id, &access))
+        .filter(|(_, _, _, user)| *user == me)
+        .filter_map(|(kind, id, access, _)| FirewallApp::new(&kind, id, &access))
         .collect();
     apps.sort_by_cached_key(|app| app.name.to_lowercase());
     let objects = objects().await?;

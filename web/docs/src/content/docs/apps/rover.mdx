@@ -7,7 +7,7 @@ sidebar:
 
 import Shot from '../../../components/Shot.astro';
 
-Rover is Luft's file manager. It's also the file dialog: when any app asks you to open or save a file, Rover's chooser appears, with the same sidebar, search and previews. Search for "files" in Start to find it.
+Rover is Luft's file manager. It's also the file dialog: when any app asks you to open or save a file, Rover's chooser appears, with the same sidebar, search and previews, showing the kinds of file the app asked for, with a menu to switch between them. The dialog stays over the window of the app that asked. Search for "files" in Start to find it.
 
 <Shot name="rover" alt="Rover showing your home folder in the list view" />
 
@@ -17,18 +17,22 @@ Rover is Luft's file manager. It's also the file dialog: when any app asks you t
 - **The sidebar** holds your folders, Recent, Favorites, Trash, drives, [cloud drives](/files/cloud-drives/), network locations, and Windows' drive when it's on the same computer.
 - **Remove from sidebar** in the right-click menu of Home, Documents and the other folders at the top takes one out; right-click any of them, or the folder itself, and choose **Show** to put it back in its place. Favorites stay a list of their own.
 - **Change icon…** in the right-click menu of any folder gives it one of Rover's icons and a color, in the sidebar and in every view. The icon is kept with the folder itself, so it stays when you move or rename it, and copies made in Rover keep it too. Drives formatted as FAT32 or exFAT can't keep folder icons.
-- **Search** by name or by what's inside files, narrowed by kind, date and size. <kbd>Ctrl</kbd>+<kbd>F</kbd> filters the folder you're in, and <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd> searches everything inside it.
+- **Search** by name or by what's inside files, narrowed by kind, date and size. Searching your home folder leaves cloud drives out, and inside a cloud drive it goes by name only, so nothing is downloaded just to be searched. <kbd>Ctrl</kbd>+<kbd>F</kbd> filters the folder you're in, and <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd> searches everything inside it.
 - **The details pane** and **Quick Look** (<kbd>Space</kbd>) preview pictures, video, audio, text, code, Markdown and PDFs without opening an app.
 - **App icons**: AppImages, Flatpak bundles and Flatpak references show the icon of the app inside them.
 - **Group** a folder by date or kind.
 
 ## Working with files
 
-- Copy and move run in the background, with pause, cancel and a choice when names clash. Every file operation can be undone and redone.
+- Copy and move run in the background, with pause, cancel and a choice when names clash. Every file operation can be undone and redone. Copies on the same Btrfs or XFS drive are instant and take no extra space until one of them changes, and files with empty stretches, such as virtual machine disks, stay as small as they were.
+- **Copy** and **Cut** put files on the clipboard for other apps as well, and **Paste** takes files copied anywhere.
+- While files are being copied, moved or deleted, the computer won't go to sleep or shut down without asking, and closing Rover asks first.
+- Changing files that belong to the system or to someone else asks for an administrator's password. Files you move to the trash this way land in your own trash.
+- [Cloud drives](/files/cloud-drives/) have no trash: there, Rover offers **Delete permanently** and asks first.
 - **Batch rename** a selection: change the case, replace text, or number them.
 - **Compress** to zip or tar.zst, and **extract** zip, tar, 7z and single compressed files. Opening an archive extracts it next to itself and selects what came out.
 - **Convert…** in the right-click menu brings the selection to [Convertible](/apps/convertible/), when it's installed.
-- **Properties** shows permissions as a grid you can change, and the app that opens this kind of file. For a folder it adds up everything inside, counting a file it reaches twice, through hard links or a folder mounted in two places, only once, and leaving out cloud and system folders mounted inside it. For a drive it shows how much space is used and free.
+- **Properties** shows permissions as a grid you can change, and the app that opens this kind of file. For a folder it adds up everything inside, counting a file it reaches twice, through hard links or a folder mounted in two places, only once, and leaving out cloud and system folders mounted inside it. For a drive it shows how much space is used and free, and **Free up space** opens [Disks](/apps/disks/) on what's using it. A copy or move that doesn't fit on a drive offers the same.
 - **Open in terminal** opens [Tern](/apps/tern/) in that folder.
 - **Print** PDFs, pictures and text files, several at once as one document.
 - **Send to device** sends what you chose to a phone or computer nearby with [Post](/desktop/post/); **Look again** in its list searches again while the menu stays open. Other apps offer the same devices in their **Send** sheet.
@@ -50,7 +54,7 @@ Rover connects to SFTP, SMB, FTP, WebDAV and NFS servers. Type an address such a
 
 ## Code folders
 
-In a folder kept in Git, the details pane shows what changed, with diffs. You can commit changes and sync with the remote from there. Sync only runs when it can do so safely; with changes on both sides, it asks you to pull from a terminal first.
+In a folder kept in Git, Rover shows the branch in the toolbar and marks what changed; click the branch to see the changes with diffs. It does this by itself only for your own folders on the computer's drives. Git follows a folder's own settings, which can run programs, so on USB drives, network locations and folders that belong to someone else Rover leaves Git alone until you right-click the empty space in the folder and choose **Show Git status…**, and remembers that you trust the folder. You can commit changes and sync with the remote from there. Sync only runs when it can do so safely; with changes on both sides, it asks you to pull from a terminal first.
 
 ## Keyboard shortcuts
 
@@ -72,4 +76,4 @@ In a folder kept in Git, the details pane shows what changed, with diffs. You ca
 | <kbd>Alt</kbd>+<kbd>Enter</kbd> | Properties |
 | <kbd>Ctrl</kbd>+<kbd>P</kbd> | Print the selected files |
 | <kbd>Ctrl</kbd>+<kbd>Z</kbd> / <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd> | Undo, redo |
-| <kbd>Delete</kbd> | Move to the trash; inside Trash, delete for good after asking |
+| <kbd>Delete</kbd> | Move to the trash; inside Trash and on cloud drives, delete for good after asking |

@@ -31,7 +31,7 @@ Meet Luft downloads the newest Luft, which works with any graphics card and inst
 3. **It restarts into Luft.** Luft starts through Fedora's signed boot loader, so Secure Boot can stay on. The restart after that goes back to Windows.
    - **Try Luft** opens the desktop. Nothing is installed.
    - **Install Luft** opens the installer with **Alongside Windows** already chosen, in the room Meet Luft made, and your language, time zone and keyboard already filled in from Windows. **More options** shows the other ways to install. Nothing on the drive changes until you confirm there.
-4. **It packs a moving box**, if you like: folders from your Windows account, your wallpaper, your name and account picture, Bluetooth devices, and Wi-Fi networks with their passwords (only when you tick that). The installer fills in your name from it and unpacks the rest into your new account.
+4. **It packs a moving box**, if you like: folders from your Windows account, your wallpaper, your name and account picture, Bluetooth devices, and Wi-Fi networks with their passwords (only when you tick that). Meet Luft locks the box and shows you a code for it: write it down, because the installer asks for it before it fills in your name and unpacks the rest into your new account. Without the code nobody can open the box or change what's in it; if you lose it, pack again.
 
 Before restarting, Meet Luft offers to keep the clock right in both systems and, whenever Fast Startup is on, to turn it off. It changes both in Windows itself, so they work with BitLocker on. [Installing alongside Windows](/start/alongside-windows/) explains why they matter.
 

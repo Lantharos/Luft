@@ -7,7 +7,9 @@ sidebar:
 
 ## In Schelf
 
-Schelf carries extensions next to apps, with `kind = "extension"` and `format = "luft-extension"` in `schelf.toml`. The artifact is a `.tar.zst` of the extension's folder, one for every computer, or one per architecture when it ships a native helper. Schelf checks that the manifest's id matches the listing, that it targets an API version Luft has shipped, and that the permissions it lists are the ones the listing shows, and offers each computer the newest release whose API version it runs.
+Schelf carries extensions next to apps, with `kind = "extension"` and `format = "luft-extension"` in `schelf.toml`. The artifact is a `.tar.zst` of the extension's folder, one for every computer, or one per architecture when it ships a native helper. Schelf checks that the manifest's id matches the listing, that it targets an API version Luft has shipped, and that the permissions it lists are the ones the listing shows, and offers each computer the newest release whose API version it runs. Releases are checked and reviewed like apps, a native helper is scanned like any program, and a release that asks for a new permission, host or helper is reviewed again. Luft only installs releases named in the store's signed index, after checking the download against it.
+
+That review matters more for extensions than for apps: an extension runs inside the desktop itself rather than in a sandbox, so its permissions describe what it does but don't confine it.
 
 ## Where Luft keeps them
 

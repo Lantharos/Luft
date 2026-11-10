@@ -72,6 +72,10 @@
 		transform: scale(0.92);
 	}
 
+	:global(:root[data-motion='reduced']) .checkbox:active:not(:disabled) .box {
+		transform: none;
+	}
+
 	.box.on {
 		background: var(--accent);
 		box-shadow: none;

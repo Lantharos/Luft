@@ -10,6 +10,9 @@
 
 	let { palette, onclose }: Props = $props();
 
+	const id = $props.id();
+	const optionId = (index: number) => `${id}-${index}`;
+
 	let items = $derived(palette.open && palette.source ? palette.source.items(palette.query) : []);
 	let selected = $state(0);
 	let list = $state<HTMLDivElement>();
@@ -45,7 +48,7 @@
 		if (event.key in steps && items.length) selected = Math.min(items.length - 1, Math.max(0, selected + steps[event.key]));
 		else if (event.key === 'Enter') choose(items[selected]);
 		else if (event.key === 'Escape') close();
-		else return;
+		else if (event.key !== 'Tab') return;
 		event.preventDefault();
 	}
 </script>
@@ -60,15 +63,21 @@
 			aria-label={palette.source.placeholder}
 			spellcheck="false"
 			autocomplete="off"
+			role="combobox"
+			aria-expanded={items.length > 0}
+			aria-controls={id}
+			aria-activedescendant={items.length ? optionId(selected) : undefined}
 			bind:value={palette.query}
 			onkeydown={keydown}
 		/>
 		{#if items.length}
-			<div bind:this={list} class="palette-list soft-scroll" role="listbox">
+			<div bind:this={list} {id} class="palette-list soft-scroll" role="listbox" aria-label={palette.source.placeholder}>
 				{#each items as item, index (item.key)}
 					<button
+						id={optionId(index)}
 						type="button"
 						role="option"
+						tabindex="-1"
 						aria-selected={index === selected}
 						class={['palette-item', index === selected && 'is-selected']}
 						onpointermove={() => (selected = index)}
@@ -182,6 +191,10 @@
 		padding: 10px 14px 12px;
 		color: var(--text-muted);
 		font-size: 13px;
+	}
+
+	:global(:root[data-motion='reduced']) .palette {
+		animation-name: fade-in;
 	}
 
 	@keyframes palette-in {

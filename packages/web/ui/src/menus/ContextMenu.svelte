@@ -6,11 +6,15 @@
 
 	interface Props {
 		at: Point;
+		/** Leaves focus where it is, for menus over a field that settles when it loses focus. */
+		keepFocus?: boolean;
 		onclose: () => void;
 		children: Snippet;
 	}
 
-	let { at, onclose, children }: Props = $props();
+	let { at, keepFocus = false, onclose, children }: Props = $props();
+
+	const ITEMS = '[role^="menuitem"]:not(:disabled)';
 
 	let placement = $state<PointPlacement | null>(null);
 	let element = $state<HTMLElement>();
@@ -30,6 +34,31 @@
 		placement = atPoint(at, { width: menu.offsetWidth, height: menu.offsetHeight });
 	}
 
+	$effect(() => {
+		if (keepFocus || !placement || !element) return;
+		const menu = element;
+		const opener = document.activeElement as HTMLElement | null;
+		menu.focus();
+		return () => {
+			const focused = document.activeElement;
+			if (focused === document.body || menu.contains(focused)) opener?.focus();
+		};
+	});
+
+	function navigate(event: KeyboardEvent & { currentTarget: HTMLElement }) {
+		if (event.key === 'Tab') {
+			event.preventDefault();
+			return onclose();
+		}
+		const items = [...event.currentTarget.querySelectorAll<HTMLElement>(ITEMS)];
+		const current = items.indexOf(document.activeElement as HTMLElement);
+		const steps: Record<string, number> = { ArrowDown: current + 1, ArrowUp: current < 0 ? -1 : current - 1, Home: 0, End: -1 };
+		if (!(event.key in steps) || !items.length) return;
+		event.preventDefault();
+		event.stopPropagation();
+		items.at(steps[event.key] % items.length)!.focus();
+	}
+
 	const stop = (event: Event) => event.stopPropagation();
 </script>
 
@@ -46,7 +75,7 @@
 	style:transform-origin={placement?.origin ?? 'top left'}
 	role="menu"
 	tabindex="-1"
-	onkeydown={closeOnEscape}
+	onkeydown={navigate}
 	onclick={stop}
 	onpointerdown={stop}
 	oncontextmenu={stop}
@@ -79,6 +108,10 @@
 	.menu.placed {
 		visibility: visible;
 		animation: open var(--motion-standard) var(--ease-decelerate);
+	}
+
+	:global(:root[data-motion='reduced']) .menu.placed {
+		animation-name: fade-in;
 	}
 
 	@keyframes open {

@@ -93,7 +93,7 @@ Message IDs are stable, semantic and start with the feature they belong to, such
 - Keyboard shortcut labels are built from translatable key names, since German writes Strg for Ctrl.
 - Log messages and errors meant for developers stay in English.
 
-`bun run check` in `packages/i18n` runs the checker. It fails on messages that don't parse, IDs used in code that English doesn't define, English messages nothing uses, duplicate IDs within a bundle, translations using variables English doesn't have, and new interface text written straight into the code of these components. Strings that look like interface text but have to stay as they are, such as a font name, go in `packages/i18n/allowed/<component>.txt`, one per line as the path, a tab and the string. The checks workflow runs it with every other package's checks.
+`bun run check` in `packages/i18n` runs the checker. It fails on messages that don't parse, IDs used in code that English doesn't define, English messages nothing uses, duplicate IDs within a bundle, translations using variables English doesn't have, translations whose HTML tags differ from English's, and new interface text written straight into the code of these components. Strings that look like interface text but have to stay as they are, such as a font name, go in `packages/i18n/allowed/<component>.txt`, one per line as the path, a tab and the string. The checks workflow runs it with every other package's checks.
 
 Builds put each language in its own file: apps get one lazily loaded chunk per language with English filling the gaps, and Kestrel compiles one file per language into its resources and reads only the one in use.
 
@@ -135,7 +135,7 @@ Translations happen on [Hosted Weblate](https://hosted.weblate.org) under its fr
 5. Add a component named **Glossary**: file format **TermBase eXchange file**, file mask `packages/i18n/glossary/*.tbx`, no base file, and turn on **Use as a glossary**. Weblate then shows the agreed terms next to every string.
 6. On GitHub, under the repository's **Settings → Webhooks**, add `https://hosted.weblate.org/hooks/github/` with content type `application/json` and the push event, so Weblate pulls new strings as soon as they land on `main`.
 7. Weblate opens pull requests from its own fork. In the project's **Add-ons**, turn on **Squash Git commits** (per language) to keep them small.
-8. Each pull request runs the checks workflow, which fails if a translation doesn't parse or uses a variable English doesn't have. A pull request that changes Serbian also needs `bun run transliterate` in `packages/i18n`, committed to its branch, before it passes.
+8. Each pull request runs the checks workflow, which fails if a translation doesn't parse, uses a variable English doesn't have or changes the tags of a message that carries markup. A pull request that changes Serbian also needs `bun run transliterate` in `packages/i18n`, committed to its branch, before it passes.
 
 Weblate doesn't remove messages from translations when they leave the English file, so whoever removes an English message removes it from every language in the same change; the checker insists on it.
 

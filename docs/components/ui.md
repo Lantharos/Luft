@@ -112,7 +112,7 @@ $effect(() => {
 | `Section`, `Row`, `ActionRow`, `ItemRow` | Grouped settings lists; `Row` takes `truncate` and `expanded` |
 | `AppIcon`, `Avatar` | App icon that follows the desktop's icon style when given the app's `id`, and a round user picture with initials |
 | `Popover` | Panel anchored to a trigger that stays inside the window |
-| `ContextMenu`, `MenuItem`, `MenuSeparator` | Menu opened at the pointer |
+| `ContextMenu`, `MenuItem`, `MenuSeparator` | Menu opened at the pointer. It takes focus, the arrow keys, Home and End move between items, and closing it returns focus to where it was; `keepFocus` leaves focus alone, for a menu over a field that settles when it loses focus |
 | `MenuButton` | Button with a `trigger` snippet that opens a menu; `children` receives `close` |
 | `VirtualScroller` | List or grid that renders only what is in view; `layout`, `header`, `stagger`, `animateOrder`, `stableOrder`, and `scrollToIndex`, `indicesIn` and `metrics` for keyboard and rubber-band selection |
 | `MediaControls` | Play, position, time and volume bar for a media element; bind `paused`, `currentTime`, `muted` and `volume` |

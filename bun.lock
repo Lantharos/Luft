@@ -482,9 +482,6 @@
     "web/shared": {
       "name": "@luft/web",
       "version": "0.1.0",
-      "dependencies": {
-        "@luft/motion": "workspace:*",
-      },
     },
     "web/site": {
       "name": "@luft/site",

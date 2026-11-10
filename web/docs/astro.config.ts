@@ -3,13 +3,21 @@ import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'astro/config';
 import starlightLinksValidator from 'starlight-links-validator';
 import { urls } from '@luft/web';
+import { starlightScriptHashes } from './src/inline-scripts';
 import { sidebar } from './src/sidebar';
 
 export default defineConfig({
 	site: urls.docs,
 	trailingSlash: 'always',
 	prefetch: { prefetchAll: true, defaultStrategy: 'hover' },
-	vite: { plugins: [tailwindcss()] },
+	vite: { plugins: [tailwindcss()], build: { assetsInlineLimit: (file) => (file.endsWith('.woff2') ? false : undefined) } },
+	security: {
+		csp: {
+			directives: ["default-src 'self'", "img-src 'self' data:", "object-src 'none'", "base-uri 'self'", "form-action 'self'"],
+			scriptDirective: { resources: ["'self'", "'wasm-unsafe-eval'"], hashes: starlightScriptHashes },
+			styleDirective: { resources: ["'self'", "'unsafe-inline'"] }
+		}
+	},
 	integrations: [
 		starlight({
 			title: 'Luft Docs',

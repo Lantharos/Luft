@@ -29,7 +29,7 @@
 
 {#if menu}
 	{@const editing = menu.editing}
-	<ContextMenu at={menu.at} onclose={() => (menu = null)}>
+	<ContextMenu at={menu.at} keepFocus onclose={() => (menu = null)}>
 		{#if editing.field}
 			<MenuItem disabled={!editing.selected || !editing.writable || !editing.copyable} onclick={() => run(editing.cut)}>
 				<Scissors size={16} />

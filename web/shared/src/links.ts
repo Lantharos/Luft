@@ -6,7 +6,7 @@ export const urls = {
 	source: 'https://github.com/Lantharos/Luft'
 } as const;
 
-export interface NavLink {
+interface NavLink {
 	label: string;
 	href: string;
 }

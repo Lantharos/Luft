@@ -6,6 +6,7 @@
 
 	interface Props {
 		anchor: HTMLElement;
+		id?: string;
 		label: string;
 		role: 'listbox' | 'dialog' | 'menu';
 		align?: Align;
@@ -17,7 +18,7 @@
 		children: Snippet;
 	}
 
-	let { anchor, label, role, align = 'start', side, minWidth = 0, maxHeight = 320, onclose, children }: Props = $props();
+	let { anchor, id, label, role, align = 'start', side, minWidth = 0, maxHeight = 320, onclose, children }: Props = $props();
 
 	let placement = $state<AnchorPlacement | null>(null);
 
@@ -45,6 +46,7 @@
 	class:placed={placement}
 	class:above={placement?.above}
 	class:sideways={side}
+	{id}
 	{role}
 	aria-label={label}
 	style:left="{placement?.left ?? 0}px"
@@ -102,6 +104,10 @@
 	.popover.sideways {
 		transform-origin: center;
 		animation-name: open-sideways;
+	}
+
+	:global(:root[data-motion='reduced']) .popover.placed {
+		animation-name: fade-in;
 	}
 
 	@keyframes open-sideways {

@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import openRunde from '@luft/web/fonts/OpenRunde-Regular.woff2?url';
 import openRundeSemibold from '@luft/web/fonts/OpenRunde-Semibold.woff2?url';
+import platform from './platform.js?raw';
 import Header from '../components/site/Header.astro';
 import Footer from '../components/site/Footer.astro';
 import { SOURCE_LOCALE } from '../i18n/locales';
@@ -44,16 +45,7 @@ const absolute = (href: string) => new URL(href, Astro.site);
 		<link rel="preload" href={openRunde} as="font" type="font/woff2" crossorigin />
 		<link rel="preload" href={openRundeSemibold} as="font" type="font/woff2" crossorigin />
 		<slot name="head" />
-		<script is:inline>
-			const agent = navigator.userAgent;
-			document.documentElement.dataset.os = /Android|CrOS|iPhone|iPad/.test(agent)
-				? 'other'
-				: /Windows/.test(agent)
-					? 'windows'
-					: /Linux|X11/.test(agent)
-						? 'linux'
-						: 'other';
-		</script>
+		<script is:inline set:html={platform} />
 	</head>
 	<body class="bg-canvas text-ink font-sans antialiased">
 		<a href="#main" class="skip">{t('site-skip')}</a>

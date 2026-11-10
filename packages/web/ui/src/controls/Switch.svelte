@@ -71,4 +71,8 @@
 	.switch:active:not(:disabled) .knob {
 		scale: 1.15 1;
 	}
+
+	:global(:root[data-motion='reduced']) .switch:active:not(:disabled) .knob {
+		scale: none;
+	}
 </style>

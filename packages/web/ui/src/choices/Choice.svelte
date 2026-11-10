@@ -49,6 +49,10 @@
 		transform: scale(0.985);
 	}
 
+	:global(:root[data-motion='reduced']) .choice:active:not(:disabled) {
+		transform: none;
+	}
+
 	.choice:disabled {
 		opacity: 0.45;
 	}

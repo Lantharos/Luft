@@ -12,8 +12,16 @@ function escapeAttribute(value: string) {
 	return value.replaceAll('&', '&amp;').replaceAll('"', '&quot;').replaceAll('<', '&lt;');
 }
 
+function decoded(source: string) {
+	try {
+		return decodeURI(source);
+	} catch {
+		return source;
+	}
+}
+
 function besideDocument(source: string, path: string) {
-	return source.startsWith('/') ? source : `${path.slice(0, path.lastIndexOf('/'))}/${decodeURI(source)}`;
+	return source.startsWith('/') ? source : `${path.slice(0, path.lastIndexOf('/'))}/${decoded(source)}`;
 }
 
 async function create() {

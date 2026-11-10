@@ -1,6 +1,6 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
-import { Junk, Message, parse, Term, type Entry, type Pattern } from '@fluent/syntax';
+import { Junk, Message, parse, serializeExpression, Term, type Entry, type Pattern } from '@fluent/syntax';
 
 import { LOCALES } from '../src/locales.js';
 import { hardCoded } from './strings.js';
@@ -62,6 +62,23 @@ function variables(pattern: Pattern | null, found = new Set<string>()): Set<stri
 	return found;
 }
 
+const MARKUP = /<[a-zA-Z\/!?][^<>]*>?/g;
+const BRACKETED = /^<[^<>\/=]+>$/;
+
+function sourceOf(entry: Message | Term): string {
+	return [entry.value, ...entry.attributes.map((attribute) => attribute.value)]
+		.flatMap((pattern) => pattern?.elements ?? [])
+		.map((element) => (element.type === 'TextElement' ? element.value : `{${serializeExpression(element.expression)}}`))
+		.join('');
+}
+
+const tagsOf = (text: string) => (text.match(MARKUP) ?? []).map((tag) => tag.replace(/\s+/g, ' ')).join('');
+
+function keepsMarkup(entry: Message | Term, original: Message | Term): boolean {
+	const [text, source] = [sourceOf(entry), sourceOf(original)];
+	return BRACKETED.test(source) ? BRACKETED.test(text) : tagsOf(text) === tagsOf(source);
+}
+
 const english = new Map<string, Map<string, Message | Term>>();
 for (const component of components) {
 	const messages = new Map<string, Message | Term>();
@@ -99,6 +116,7 @@ for (const component of components) {
 			const known = variables(original.value);
 			for (const attribute of original.attributes) variables(attribute.value, known);
 			for (const name of variables(entry.value)) if (!known.has(name)) problems.push(`${relative(ROOT, file)}: ${idOf(entry)} uses $${name}, which English doesn't have`);
+			if (!keepsMarkup(entry, original)) problems.push(`${relative(ROOT, file)}: ${idOf(entry)} must keep exactly the tags English has (${tagsOf(sourceOf(original)) || 'none'})`);
 		}
 	}
 

@@ -43,12 +43,15 @@
 	}
 
 	.menu-item:hover:not(:disabled),
+	.menu-item:focus-visible,
 	.menu-item[aria-checked='true'] {
 		color: var(--text);
 	}
 
-	.menu-item:hover:not(:disabled) {
+	.menu-item:hover:not(:disabled),
+	.menu-item:focus-visible {
 		background: var(--surface-hover);
+		outline: none;
 	}
 
 	.menu-item.danger,
@@ -58,6 +61,10 @@
 
 	.menu-item:active:not(:disabled) {
 		transform: scale(0.96);
+	}
+
+	:global(:root[data-motion='reduced']) .menu-item:active:not(:disabled) {
+		transform: none;
 	}
 
 	.menu-item:disabled {

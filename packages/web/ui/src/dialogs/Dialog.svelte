@@ -18,7 +18,7 @@
 
 	let { title, description, wide = false, onclose, children, actions }: Props = $props();
 
-	const FOCUSABLE = 'button:not(:disabled), input:not(:disabled), textarea:not(:disabled), [tabindex]:not([tabindex="-1"])';
+	const FOCUSABLE = 'a[href], button:not(:disabled), input:not(:disabled), textarea:not(:disabled), [tabindex]:not([tabindex="-1"])';
 
 	const self = Symbol();
 

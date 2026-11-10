@@ -22,6 +22,9 @@
 
 	let { options, value, label, placeholder, disabled = false, onchange }: Props = $props();
 
+	const id = $props.id();
+	const optionId = (index: number) => `${id}-${index}`;
+
 	let trigger = $state<HTMLButtonElement>();
 	let open = $state(false);
 	let highlighted = $state(0);
@@ -66,8 +69,11 @@
 	type="button"
 	class="trigger"
 	class:open
+	role="combobox"
 	aria-haspopup="listbox"
 	aria-expanded={open}
+	aria-controls={id}
+	aria-activedescendant={open ? optionId(highlighted) : undefined}
 	aria-label={label}
 	{disabled}
 	onclick={() => (open ? (open = false) : show())}
@@ -78,11 +84,13 @@
 </button>
 
 {#if open && trigger}
-	<Popover anchor={trigger} {label} role="listbox" minWidth={MIN_WIDTH} onclose={() => (open = false)}>
+	<Popover anchor={trigger} {id} {label} role="listbox" minWidth={MIN_WIDTH} onclose={() => (open = false)}>
 		{#each options as option, index (option.value)}
 			<button
+				id={optionId(index)}
 				type="button"
 				role="option"
+				tabindex="-1"
 				aria-selected={option.value === value}
 				class="option"
 				class:highlighted={index === highlighted}

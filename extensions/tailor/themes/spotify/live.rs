@@ -1,14 +1,15 @@
-use std::io::{self, BufRead, BufReader, Write};
+use std::io::{self, Read, Write};
 use std::net::{Ipv4Addr, TcpListener, TcpStream};
 use std::sync::{Arc, Mutex, MutexGuard};
 use std::thread;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use crate::look::Look;
 
 pub const PORT: u16 = 47291;
 const SPOTIFY_ORIGIN: &str = "https://xpui.app.spotify.com";
 const PATIENCE: Duration = Duration::from_secs(1);
+const MAX_REQUEST: usize = 8 * 1024;
 
 #[derive(Default)]
 struct Listeners {
@@ -24,18 +25,35 @@ fn event(data: &str) -> String {
     format!("data: {data}\n\n")
 }
 
-fn from_spotify(connection: &TcpStream) -> io::Result<bool> {
-    let mut from_spotify = false;
-    for line in BufReader::new(connection).lines() {
-        let line = line?;
-        if line.is_empty() {
-            return Ok(from_spotify);
+fn ended(request: &[u8]) -> bool {
+    request.windows(4).any(|end| end == b"\r\n\r\n") || request.windows(2).any(|end| end == b"\n\n")
+}
+
+fn headers(mut connection: &TcpStream) -> io::Result<String> {
+    let deadline = Instant::now() + PATIENCE;
+    let mut request = Vec::new();
+    let mut chunk = [0; 1024];
+    while !ended(&request) {
+        let left = deadline.saturating_duration_since(Instant::now());
+        if left.is_zero() {
+            return Err(io::ErrorKind::TimedOut.into());
         }
-        if let Some((name, value)) = line.split_once(':') {
-            from_spotify |= name.eq_ignore_ascii_case("origin") && value.trim() == SPOTIFY_ORIGIN;
+        connection.set_read_timeout(Some(left))?;
+        let read = connection.read(&mut chunk)?;
+        if read == 0 || request.len() + read > MAX_REQUEST {
+            return Err(io::ErrorKind::InvalidData.into());
         }
+        request.extend_from_slice(&chunk[..read]);
     }
-    Ok(false)
+    String::from_utf8(request).map_err(|_| io::ErrorKind::InvalidData.into())
+}
+
+fn from_spotify(headers: &str) -> bool {
+    headers
+        .lines()
+        .take_while(|line| !line.is_empty())
+        .filter_map(|line| line.split_once(':'))
+        .any(|(name, value)| name.eq_ignore_ascii_case("origin") && value.trim() == SPOTIFY_ORIGIN)
 }
 
 fn accept_events(mut connection: &TcpStream) -> io::Result<()> {
@@ -54,9 +72,8 @@ impl Stream {
     }
 
     fn welcome(&self, connection: TcpStream) -> io::Result<bool> {
-        connection.set_read_timeout(Some(PATIENCE))?;
         connection.set_write_timeout(Some(PATIENCE))?;
-        if !from_spotify(&connection)? {
+        if !from_spotify(&headers(&connection)?) {
             return Ok(false);
         }
         accept_events(&connection)?;

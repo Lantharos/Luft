@@ -8,8 +8,5 @@
 		"./styles.css": "./styles/index.css",
 		"./logo.svg": "./assets/logo.svg",
 		"./fonts/*": "./fonts/*"
-	},
-	"dependencies": {
-		"@luft/motion": "workspace:*"
 	}
 }

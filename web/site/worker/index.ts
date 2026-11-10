@@ -1,6 +1,6 @@
+import { urls } from '@luft/web';
 import { home } from './language';
 
-const DOWNLOADS = 'https://get.luft.computer';
 const RELEASE = '1';
 const NIGHTLY = 'nightly';
 const POINTER_SECONDS = 300;
@@ -19,12 +19,12 @@ interface Found extends Latest {
 }
 
 async function newest(folder: string): Promise<Found | null> {
-	const response = await fetch(`${DOWNLOADS}/${folder}/latest.json`, {
+	const response = await fetch(`${urls.downloads}/${folder}/latest.json`, {
 		cf: { cacheTtl: POINTER_SECONDS, cacheEverything: true }
 	});
 	if (!response.ok) return null;
 	const latest: Latest = await response.json();
-	return { ...latest, folder, url: `${DOWNLOADS}/${folder}/${latest.name}` };
+	return { ...latest, folder, url: `${urls.downloads}/${folder}/${latest.name}` };
 }
 
 async function find(channel: string) {

@@ -43,9 +43,9 @@ const current = languages.find(({ tag }) => tag === locale)!;
 	</ul>
 </nav>
 
-<script is:inline>
-	document.getElementById('languages').addEventListener('click', (event) => {
-		const choice = event.target.closest('a[hreflang]');
+<script>
+	document.getElementById('languages')!.addEventListener('click', (event) => {
+		const choice = (event.target as Element).closest<HTMLAnchorElement>('a[hreflang]');
 		if (choice) document.cookie = `lang=${choice.hreflang}; path=/; max-age=31536000; samesite=lax; secure`;
 	});
 </script>

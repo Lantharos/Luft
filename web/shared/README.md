@@ -12,7 +12,7 @@ What Luft's websites share: colours, fonts, motion, the logo and the links betwe
 | `@luft/web/styles.css` | Colour tokens, Open Runde and Maple Mono, and Luft's motion tokens, for Tailwind 4 |
 | `@luft/web/logo.svg` | The Luft mark, drawn in `currentColor` |
 | `@luft/web/fonts/*` | The font files, for preloading |
-| `@luft/web` | `urls` and `nav` for the header, and the motion tokens for scripts |
+| `@luft/web` | `urls` and `nav` for the header |
 
 ## Colours
 
@@ -31,7 +31,15 @@ Taken from the palette Luft builds from its Fog wallpaper. They follow the syste
 
 ## Fonts
 
-`font-sans` is Open Runde in regular, medium and semibold, with a size-matched fallback so text doesn't move when it loads, and `font-mono` is Maple Mono. The files in `fonts/` are cut down to Latin text, punctuation, arrows and box drawing, about 30 KB each. Preload the weights the first screen uses:
+`font-sans` is Open Runde in regular, medium and semibold, with a size-matched fallback so text doesn't move when it loads, and `font-mono` is Maple Mono. The files in `fonts/` are cut down to Latin text, punctuation, arrows and box drawing, about 30 KB each. The folders next to them hold the rest of what the site's languages need, and a page only downloads the ones its text uses:
+
+| Folder | Covers | For |
+| --- | --- | --- |
+| `latin-ext` | `U+0180-024F`, `U+1E9E` | Romanian ș and ț |
+| `cyrillic` | `U+0400-045F`, `U+0490-0491`, `U+04B0-04B1`, `U+2116` | Bulgarian, Macedonian, Russian, Serbian, Ukrainian |
+| `greek` | `U+0370-03FF` | Greek |
+
+Preload the weights the first screen uses:
 
 ```astro
 ---
@@ -48,7 +56,7 @@ pyftsubset OpenRunde-Regular.otf --flavor=woff2 --output-file=OpenRunde-Regular.
   --layout-features='kern,liga,calt,tnum,case,ccmp,locl,mark,mkmk'
 ```
 
-Maple Mono also keeps `U+2500-257F`. Both are under the SIL Open Font License, next to the files.
+Maple Mono also keeps `U+2500-257F`. The other folders are cut the same way with the ranges above, which `styles/fonts.css` repeats as each file's `unicode-range`. Both fonts are under the SIL Open Font License, next to the files.
 
 ## Motion
 

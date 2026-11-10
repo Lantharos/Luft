@@ -15,9 +15,8 @@ const choices = [
 				type="button"
 				data-theme-choice={value}
 				aria-label={label}
-				title={label}
 				aria-pressed="false"
-				class="grid size-7 cursor-pointer place-items-center rounded-full bg-transparent text-ink-muted transition-colors duration-(--motion-tap) hover:text-ink aria-pressed:bg-raised aria-pressed:text-ink"
+				class="choice relative grid size-7 cursor-pointer place-items-center rounded-full bg-transparent text-ink-muted transition-colors duration-(--motion-tap) hover:text-ink aria-pressed:bg-raised aria-pressed:text-ink"
 			>
 				<Icon name={icon} size="0.95rem" />
 			</button>
@@ -67,3 +66,37 @@ const choices = [
 		}
 	);
 </script>
+
+<style>
+	.choice::after {
+		content: attr(aria-label);
+		position: absolute;
+		top: calc(100% + 0.625rem);
+		left: 50%;
+		translate: -50% 0;
+		border-radius: 10px;
+		background: var(--raised);
+		padding: 5px 10px;
+		color: var(--ink);
+		font-size: 12px;
+		line-height: 16px;
+		white-space: nowrap;
+		box-shadow:
+			0 0 0 1px var(--hairline),
+			0 8px 24px rgb(0 0 0 / 0.16);
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity var(--motion-quick) var(--ease-decelerate);
+	}
+
+	@media (hover: hover) {
+		.choice:hover::after {
+			opacity: 1;
+			transition-delay: 0.4s;
+		}
+	}
+
+	.choice:focus-visible::after {
+		opacity: 1;
+	}
+</style>

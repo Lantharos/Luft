@@ -60,6 +60,32 @@
 	}
 }
 
+:root[data-motion='reduced'] {
+	*,
+	::before,
+	::after {
+		scroll-behavior: auto !important;
+		transition-property: opacity, color, background-color, border-color, outline-color, box-shadow, fill, stroke, filter, backdrop-filter, display, overlay, visibility !important;
+	}
+
+	.tooltip {
+		animation-name: fade-in;
+	}
+
+	.window-control:active,
+	.button:active:not(:disabled),
+	.plain-button:active:not(:disabled),
+	.icon-button:active:not(:disabled) {
+		transform: none;
+	}
+}
+
+@keyframes fade-in {
+	from {
+		opacity: 0;
+	}
+}
+
 :root[data-corners='square'] {
 	*,
 	::before,

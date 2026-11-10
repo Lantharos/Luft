@@ -25,7 +25,11 @@ export class Pult {
   }
 
   async start(): Promise<void> {
-    if (await this.client.load()) this.follow();
+    const { session, power } = this.extension;
+    session.onChanged(() => this.follow());
+    power.onChanged(() => this.follow());
+    await this.client.load();
+    this.follow();
     this.changed();
   }
 
@@ -49,7 +53,7 @@ export class Pult {
       this.reachable = true;
       this.announceUrgent();
     } catch (error) {
-      if (error instanceof SignedOut) this.stopFollowing();
+      if (error instanceof SignedOut) this.follow();
       else this.reachable = false;
     }
     this.changed();
@@ -57,11 +61,15 @@ export class Pult {
 
   async beginSignIn(): Promise<void> {
     this.cancelSignIn();
-    const code = await this.client.requestCode(DEVICE_NAME);
-    this.signIn = { code };
-    this.extension.open(code.verificationUriComplete);
-    const expires = Date.now() + code.expiresIn * 1000;
-    this.redeeming = this.extension.timers.interval(code.interval * 1000, () => void this.redeem(code, expires));
+    try {
+      const code = await this.client.requestCode(DEVICE_NAME);
+      this.signIn = { code };
+      this.extension.open(code.verificationUriComplete);
+      const expires = Date.now() + code.expiresIn * 1000;
+      this.redeeming = this.extension.timers.interval(code.interval * 1000, () => void this.redeem(code, expires));
+    } catch {
+      this.signIn = { failed: true };
+    }
     this.changed();
   }
 
@@ -78,7 +86,7 @@ export class Pult {
 
   async signOut(): Promise<void> {
     await this.client.signOut();
-    this.stopFollowing();
+    this.follow();
     this.changed();
   }
 
@@ -98,16 +106,17 @@ export class Pult {
     }
   }
 
+  /** Refreshes now and every minute while signed in, someone is at the desktop and the computer isn't saving power. */
   private follow(): void {
-    this.refreshing?.dispose();
-    this.refreshing = this.extension.timers.interval(REFRESH_MS, () => void this.refresh());
-    void this.refresh();
-  }
-
-  private stopFollowing(): void {
+    const { session, power, timers } = this.extension;
+    if (!this.client.signedIn) this.places = null;
+    const wanted = this.client.signedIn && session.active && !power.saving;
+    if (wanted === !!this.refreshing) return;
     this.refreshing?.dispose();
     this.refreshing = null;
-    this.places = null;
+    if (!wanted) return;
+    this.refreshing = timers.interval(REFRESH_MS, () => void this.refresh());
+    void this.refresh();
   }
 
   /** Tells people about each urgent item once, while they want to hear about them. */

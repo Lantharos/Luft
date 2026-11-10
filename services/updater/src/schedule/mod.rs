@@ -12,7 +12,7 @@ pub use conditions::metered;
 
 const FILE: &str = "/var/lib/luft-updater/schedule.json";
 const DAY: u64 = 24 * 60 * 60;
-const EARLY: u64 = 2 * 60 * 60;
+const EARLY: u64 = 4 * 60 * 60;
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Eq, Default, Debug)]
 #[serde(rename_all = "lowercase")]
@@ -95,8 +95,8 @@ impl Schedule {
             .with_context(|| format!("Writing {FILE}"))
     }
 
-    /// Whether a check is due at `now`. The timer comes by every hour, so a check that ran a
-    /// little earlier than the interval last time still counts.
+    /// Whether a check is due at `now`. The timer comes by every three hours, up to an hour
+    /// late, so a check is due once the next visit would come after the interval.
     pub fn due(&self, now: u64) -> bool {
         self.every
             .interval()
@@ -114,8 +114,8 @@ mod tests {
             checked: 10 * DAY,
             ..Schedule::default()
         };
-        assert!(!schedule.due(10 * DAY + 3 * 60 * 60));
-        assert!(schedule.due(11 * DAY - 60 * 60));
+        assert!(!schedule.due(10 * DAY + 6 * 60 * 60));
+        assert!(schedule.due(11 * DAY - 3 * 60 * 60));
         schedule.every = Every::Weekly;
         assert!(!schedule.due(12 * DAY));
         assert!(schedule.due(17 * DAY));

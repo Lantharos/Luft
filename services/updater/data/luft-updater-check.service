@@ -1,6 +1,7 @@
 [Unit]
 Description=Check for system updates when Luft's schedule says so
 After=network-online.target
+ConditionACPower=true
 
 [Service]
 Type=oneshot

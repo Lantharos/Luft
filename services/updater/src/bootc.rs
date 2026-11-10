@@ -7,7 +7,7 @@ use std::process::{Child, ChildStderr, Command, Stdio};
 use std::sync::{Arc, Mutex};
 
 use anyhow::{Context, Result, anyhow, bail};
-use luft_variant::Variant;
+use luft_variant::{Variant, Version};
 use serde::Deserialize;
 use serde_json::{Map, Value, json};
 
@@ -20,6 +20,10 @@ const PROGRESS_FD: i32 = 3;
 const CHECK_TIMEOUT: &str = "2m";
 const SLOTS: [&str; 3] = ["booted", "staged", "rollback"];
 const UNSIGNED: &str = "This update isn't signed by Luft, so it wasn't downloaded.";
+const OLDER: &str =
+    "This update is older than the version of Luft on this computer, so it wasn't installed.";
+const VERSION: &str = "/config/Labels/org.opencontainers.image.version";
+const STAGED: &str = "/status/staged/composefs/verity";
 const KEPT_TO_GO_BACK_TO: &str = "same fs-verity digest as the existing Some(Rollback) deployment";
 const SIGNATURE_REFUSALS: [&str; 4] = [
     "A signature was required",
@@ -77,6 +81,45 @@ fn digests(host: &Value) -> impl Iterator<Item = &str> {
     })
 }
 
+fn slot_config(host: &Value, slot: &str) -> Option<Value> {
+    image_config(
+        host.pointer(&format!("/status/{slot}/image/imageDigest"))?
+            .as_str()?,
+    )
+}
+
+fn version(config: &Value) -> Option<Version> {
+    Version::parse(config.pointer(VERSION)?.as_str()?)
+}
+
+/// Whether an image is older than the running one, going by the version in its configuration,
+/// which the image's signature covers. A running system without a version of Luft's, such as
+/// a development build, has nothing to be older than.
+fn older_than_running(host: &Value, config: Option<&Value>) -> bool {
+    slot_config(host, "booted")
+        .as_ref()
+        .and_then(version)
+        .is_some_and(|running| {
+            config
+                .and_then(version)
+                .is_none_or(|offered| offered < running)
+        })
+}
+
+/// Takes a staged version that's older than the running one away again. Only going back to
+/// the version kept on the computer may start an older one.
+fn refuse_older() -> Result<()> {
+    let host = host()?;
+    let Some(staged) = host.pointer(STAGED).and_then(Value::as_str) else {
+        return Ok(());
+    };
+    if !older_than_running(&host, slot_config(&host, "staged").as_ref()) {
+        return Ok(());
+    }
+    bootc(&["delete-deployment", staged])?;
+    bail!(OLDER);
+}
+
 pub fn status() -> Result<String> {
     let host = host()?;
     let configs: Map<String, Value> = digests(&host)
@@ -99,6 +142,10 @@ pub fn available() -> Result<bool> {
     let offered: Value = serde_json::from_slice(&run(Command::new("skopeo")
         .args(["--command-timeout", CHECK_TIMEOUT, "inspect", "--config"])
         .arg(format!("docker://{image}")))?)?;
+    if older_than_running(&host, Some(&offered)) {
+        eprintln!("The update server offers a version older than the running one.");
+        return Ok(false);
+    }
     let offered = layers(&offered).context("The update server sent no image layers.")?;
     let present = digests(&host)
         .filter_map(image_config)
@@ -110,27 +157,19 @@ pub fn rollback() -> Result<()> {
     bootc(&["rollback"]).map(drop)
 }
 
-#[derive(Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct Order {
-    spec: OrderSpec,
-}
-
-#[derive(Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct OrderSpec {
-    boot_order: String,
-}
-
 fn start_kept_version() -> Result<()> {
-    let host: Order = serde_json::from_slice(&bootc(&["status", "--format=json"])?)?;
-    if host.spec.boot_order == "rollback" {
+    let host = host()?;
+    if older_than_running(&host, slot_config(&host, "rollback").as_ref()) {
+        bail!(OLDER);
+    }
+    if host.pointer("/spec/bootOrder").and_then(Value::as_str) == Some("rollback") {
         return Ok(());
     }
     rollback()
 }
 
 pub fn apply() -> Result<()> {
+    refuse_older()?;
     bootc(&["upgrade", "--from-downloaded"]).map(drop)
 }
 
@@ -273,7 +312,7 @@ impl Fetch {
             }
             return Err(command::failure(BOOTC, &errors));
         }
-        Ok(())
+        refuse_older()
     }
 }
 

@@ -7,10 +7,9 @@ use std::process::Command;
 use anyhow::{Context, Result};
 
 use super::selinux;
-use crate::build::LIBRARY_CACHE;
 use crate::command::{run, text};
 use crate::state::manifest::{Build, Placed};
-use crate::state::{self, IMAGE, NAME};
+use crate::state::{IMAGE, NAME};
 
 const EXTENSIONS: &str = "/run/extensions";
 const FACTORY: &str = "/usr/share/factory";
@@ -98,28 +97,8 @@ fn place_defaults(build: &Build) -> Result<()> {
     Ok(())
 }
 
-fn library_cache_before() -> PathBuf {
-    state::state("ld.so.cache.before")
-}
-
-/// Rebuilds the library cache for the packages' libraries, keeping the system's own copy to
-/// put back once no package brings libraries any more.
 fn cache_libraries() -> Result<()> {
-    let before = library_cache_before();
-    if Path::new(LIBRARY_CACHE).exists() && !before.exists() {
-        fs::copy(LIBRARY_CACHE, &before)?;
-    }
     run(&mut Command::new("ldconfig")).map(drop)
-}
-
-fn restore_library_cache() -> Result<()> {
-    let before = library_cache_before();
-    if !before.exists() {
-        return Ok(());
-    }
-    fs::copy(&before, LIBRARY_CACHE)?;
-    fs::remove_file(&before)?;
-    run(Command::new("restorecon").arg(LIBRARY_CACHE)).map(drop)
 }
 
 /// Brings in what the merged packages need besides their files: users and groups, configuration
@@ -166,7 +145,7 @@ pub fn create_tmpfiles(build: &Build) -> Result<()> {
 pub fn after_removal(old: Option<&Build>, new: Option<&Build>) -> Result<()> {
     let had = |check: fn(&Build) -> bool| old.is_some_and(check) && !new.is_some_and(check);
     if had(|build| build.libraries) {
-        restore_library_cache()?;
+        cache_libraries()?;
     }
     if had(|build| build.udev_rules) {
         run(Command::new("udevadm").args(["control", "--reload"]))?;

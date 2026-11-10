@@ -12,6 +12,7 @@ use crate::activation::request::{self, Request};
 use crate::build::{self, CACHE};
 use crate::repositories;
 use crate::state::deployment;
+use crate::state::manifest::Build;
 use crate::state::requested::{self, Requested};
 use crate::state::sources::{self, Sources};
 use crate::state::{self, IMAGE, Lock, STATE, builds, current_for, folder, load, remove_folder};
@@ -41,12 +42,15 @@ fn quiet() -> Report {
     Arc::new(|_| {})
 }
 
+/// Builds the packages for `digest` into its `.new` folder and says whether it did: with
+/// `newer_than`, a build that would have the same versions isn't made again.
 fn build_into(
     digest: &str,
     requested: &Requested,
     sources: &Sources,
+    newer_than: Option<Build>,
     report: &Report,
-) -> Result<()> {
+) -> Result<bool> {
     let partial = folder(digest, ".new");
     remove_folder(&partial)?;
     fs::create_dir_all(&partial)?;
@@ -57,9 +61,19 @@ fn build_into(
         report.clone(),
         partial.join(IMAGE),
     );
-    let built = build::isolated(move || build::build(&digest, &wanted, &sources, &image, &*report));
+    let built = build::isolated(move || {
+        build::build(
+            &digest,
+            &wanted,
+            &sources,
+            &image,
+            newer_than.as_ref(),
+            &*report,
+        )
+    });
     match built {
-        Ok(build) => state::save(&build, &partial),
+        Ok(Some(build)) => state::save(&build, &partial).map(|()| true),
+        Ok(None) => remove_folder(&partial).map(|()| false),
         Err(error) => {
             let _ = remove_folder(&partial);
             Err(error)
@@ -113,7 +127,7 @@ fn activate(digest: &str, requested: &Requested, sources: &Sources, report: &Rep
         request::send(Request::TakeAway)?;
         return forget();
     }
-    build_into(digest, requested, sources, report)?;
+    build_into(digest, requested, sources, None, report)?;
     report(Step::Starting);
     request::send(Request::BringIn)
 }
@@ -128,8 +142,8 @@ fn prepare_others(requested: &Requested, sources: &Sources) {
         if requested.is_empty() || current_for(other, requested, sources).is_some() {
             continue;
         }
-        if let Err(error) =
-            build_into(other, requested, sources, &quiet()).and_then(|()| state::swap_in(other))
+        if let Err(error) = build_into(other, requested, sources, None, &quiet())
+            .and_then(|_| state::swap_in(other))
         {
             eprintln!("Preparing the system packages for {other}: {error:#}");
         }
@@ -195,6 +209,41 @@ pub fn rebuild() -> Result<()> {
     }
     prepare_others(&requested, &sources);
     prune()
+}
+
+/// Builds the packages for `digest` again when newer versions of them are out, and puts the
+/// build in place: into the running system for the running version, with the build before
+/// put back when that fails, and for its next start for any other.
+fn refresh(digest: &str, requested: &Requested, sources: &Sources, running: bool) -> Result<()> {
+    let current = current_for(digest, requested, sources).and_then(|folder| load(&folder));
+    if !build_into(digest, requested, sources, current, &quiet())? {
+        return Ok(());
+    }
+    if running {
+        request::send(Request::BringIn)
+    } else {
+        state::swap_in(digest)
+    }
+}
+
+/// Brings the system packages up to their newest versions for every version on the computer,
+/// so fixes from Fedora and the software sources arrive without waiting for an update of Luft.
+pub fn update() -> Result<()> {
+    if state::requested()?.is_empty() {
+        return Ok(());
+    }
+    let _lock = Lock::take()?;
+    let requested = state::requested()?;
+    let sources = Sources::current(None);
+    let booted = booted()?;
+    let updated = refresh(&booted, &requested, &sources, true);
+    for other in deployment::all()?.iter().filter(|other| **other != booted) {
+        if let Err(error) = refresh(other, &requested, &sources, false) {
+            eprintln!("Updating the system packages for {other}: {error:#}");
+        }
+    }
+    prune()?;
+    updated
 }
 
 /// The system packages, what the running system has merged and the repositories that were

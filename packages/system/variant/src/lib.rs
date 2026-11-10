@@ -1,9 +1,11 @@
 mod graphics;
+mod version;
 
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
 pub use graphics::nvidia_cards;
+pub use version::Version;
 
 const NVIDIA_TAG: &str = "-nvidia";
 pub const NVIDIA_VENDOR: u16 = 0x10de;

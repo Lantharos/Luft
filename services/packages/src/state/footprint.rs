@@ -13,7 +13,7 @@ use crate::command::run;
 
 /// What the system packages created that wasn't on the computer before them, so removing them
 /// takes exactly that away again.
-#[derive(Serialize, Deserialize, Default, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Default, Clone, Debug, PartialEq, Eq)]
 pub struct Footprint {
     paths: BTreeSet<String>,
     users: BTreeSet<String>,
@@ -85,6 +85,15 @@ impl Footprint {
 
     pub fn groups(&self) -> &BTreeSet<String> {
         &self.groups
+    }
+
+    /// Everything noted here, with what `declared` brings, as what a build may keep.
+    pub fn with(&self, declared: Option<&Declared>) -> Declared {
+        let mut kept = declared.cloned().unwrap_or_default();
+        kept.paths.extend(self.paths.iter().cloned());
+        kept.users.extend(self.users.iter().cloned());
+        kept.groups.extend(self.groups.iter().cloned());
+        kept
     }
 
     pub fn note(&mut self, declared: &Declared) {

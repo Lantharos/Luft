@@ -28,7 +28,7 @@ use stage::Layout;
 pub const CACHE: &str = "/var/cache/luft/system-packages";
 const DNF_CACHE: &str = "/var/cache/luft/system-packages/dnf";
 const WORK: &str = "/var/cache/luft/system-packages/build";
-pub const LIBRARY_CACHE: &str = "/etc/ld.so.cache";
+const LIBRARY_CACHE: &str = "/etc/ld.so.cache";
 const RELEASE: &str = "usr/lib/extension-release.d";
 
 struct Workspace {
@@ -140,16 +140,24 @@ fn entries(folder: &Path, extension: &str) -> Vec<String> {
     names
 }
 
+fn unchanged(current: &Build, rpms: &[rpm::Rpm]) -> bool {
+    current.packages.len() == rpms.len()
+        && rpms
+            .iter()
+            .all(|rpm| current.version_of(&rpm.name) == Some(rpm.version.as_str()))
+}
+
 /// Builds the system packages in `requested` for the deployment `digest` into `image`, from
 /// Fedora's repositories for that deployment's version and `sources`, against the packages it
-/// has.
+/// has. Nothing is built when the newest packages are the versions `newer_than` already has.
 pub fn build(
     digest: &str,
     requested: &Requested,
     sources: &Sources,
     image_path: &Path,
+    newer_than: Option<&Build>,
     step: &dyn Fn(Step),
-) -> Result<Build> {
+) -> Result<Option<Build>> {
     let mut work = Workspace::new()?;
     let (tree, upper, overlay, root) = (
         work.folder("tree")?,
@@ -190,6 +198,9 @@ pub fn build(
         .map(|(path, origin)| rpm::query(&path).map(|rpm| rpm::Rpm { origin, ..rpm }))
         .collect::<Result<Vec<_>>>()?;
     rpms.sort_by(|left, right| left.name.cmp(&right.name));
+    if newer_than.is_some_and(|current| unchanged(current, &rpms)) {
+        return Ok(None);
+    }
     let base: BTreeSet<String> = rpm::installed(&root)?.into_iter().collect();
     checks::check(requested, &rpms, &base)?;
 
@@ -263,7 +274,7 @@ pub fn build(
     };
     label(&root, &stage_folder)?;
     image(&stage_folder, image_path)?;
-    Ok(build)
+    Ok(Some(build))
 }
 
 fn make_private() -> io::Result<()> {

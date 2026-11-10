@@ -25,6 +25,16 @@
     </defaults>
   </action>
 
+  <action id="com.lantharos.updater.variant">
+    <description>Switch between Luft's standard and NVIDIA images</description>
+    <message>Authentication is required to switch this computer to Luft's other image</message>
+    <defaults>
+      <allow_any>auth_admin</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+  </action>
+
   <action id="com.lantharos.updater.rollback">
     <description>Go back to the previous version of the system</description>
     <message>Authentication is required to go back to the previous version</message>

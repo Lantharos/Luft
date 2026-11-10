@@ -16,6 +16,8 @@ use parse::Section;
 pub const FOLDER: &str = "/var/lib/luft/system-packages/repositories";
 pub const KEYS: &str = "/var/lib/luft/system-packages/keys";
 const EXTENSION: &str = "repo";
+const LARGEST: usize = 256 << 10;
+const MOST_KEYS: usize = 16;
 
 #[derive(Serialize, Clone, Debug)]
 pub struct Source {
@@ -157,6 +159,9 @@ fn check(file: &str, text: &str, keys: &BTreeMap<String, String>) -> Result<Chec
     if !valid_file(file) {
         bail!("“{file}” isn't a name a software source can have.");
     }
+    if text.len() > LARGEST {
+        bail!("This file is too big to be a software source.");
+    }
     let sections = parse::enabled(parse::parse(text)?)?;
     let mut wanted: Vec<(String, String)> = Vec::new();
     for address in sections.iter().flat_map(Section::keys) {
@@ -167,6 +172,9 @@ fn check(file: &str, text: &str, keys: &BTreeMap<String, String>) -> Result<Chec
             .get(address)
             .with_context(|| format!("The key at {address} is missing."))?;
         wanted.push((address.to_owned(), armored.clone()));
+    }
+    if wanted.len() > MOST_KEYS {
+        bail!("This software source names more keys than Luft checks.");
     }
     let mut fingerprints = Vec::new();
     for (_, armored) in &wanted {

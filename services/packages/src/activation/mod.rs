@@ -40,11 +40,12 @@ fn bring_in(digest: &str) -> Result<()> {
     let build =
         load(&folder(digest, ".new")).context("The new build of the system packages is missing")?;
     let mut footprint = state::footprint()?;
+    let before = footprint.clone();
     footprint.note(&build.declared);
     state::save_footprint(&footprint)?;
     state::swap_in(digest)?;
     if let Err(error) = apply(digest, old.as_ref(), &build, &mut footprint) {
-        if let Err(restoring) = restore(digest, old.as_ref(), &build, &mut footprint) {
+        if let Err(restoring) = restore(digest, old.as_ref(), &build, &mut footprint, &before) {
             eprintln!("Putting the system packages back: {restoring:#}");
         }
         return Err(error);
@@ -66,6 +67,13 @@ fn take_away(old: Option<&Build>) -> Result<()> {
     stopped.and(unlinked).and(cleared).and(settled)
 }
 
+/// Whether someone took a package off the list between two builds. Only then is what the
+/// packages made deleted: a build that merely stops naming a folder, as when a dependency
+/// changes its name in an update, leaves the data in it alone.
+fn removes(old: Option<&Build>, build: &Build) -> bool {
+    old.is_some_and(|old| !old.requested.is_subset(&build.requested))
+}
+
 fn apply(
     digest: &str,
     old: Option<&Build>,
@@ -77,24 +85,31 @@ fn apply(
     system::refresh()?;
     system::settle(build)?;
     system::create_tmpfiles(build)?;
-    footprint.clear(&build.declared)?;
-    state::save_footprint(footprint)?;
+    if removes(old, build) {
+        footprint.clear(&build.declared)?;
+        state::save_footprint(footprint)?;
+    }
     system::after_removal(old, Some(build))?;
-    units::start_arriving(old, build)
+    if let Err(error) = units::start_arriving(old, build) {
+        eprintln!("Starting the packages' services: {error:#}");
+    }
+    Ok(())
 }
 
-/// Undoes a build that couldn't be brought in: back to the one before, or to none. Every step
-/// is tried, so one that fails doesn't leave the rest in place.
+/// Undoes a build that couldn't be brought in: back to the one before, or to none, deleting
+/// only what this build made beyond what was noted `before` it. Every step is tried, so one
+/// that fails doesn't leave the rest in place.
 fn restore(
     digest: &str,
     old: Option<&Build>,
     build: &Build,
     footprint: &mut Footprint,
+    before: &Footprint,
 ) -> Result<()> {
     let stopped = units::stop_leaving(Some(build), old);
     let relinked = relink(digest, old).and_then(|()| system::refresh());
     let cleared = footprint
-        .clear(old.map_or(&Declared::default(), |old| &old.declared))
+        .clear(&before.with(old.map(|old| &old.declared)))
         .and_then(|()| state::save_footprint(footprint));
     let settled = system::after_removal(Some(build), old);
     let started = old.map_or(Ok(()), |old| units::start_arriving(Some(build), old));
@@ -136,7 +151,5 @@ pub fn settle() -> Result<()> {
     footprint.note(&build.declared);
     state::save_footprint(&footprint)?;
     system::settle(&build)?;
-    footprint.clear(&build.declared)?;
-    state::save_footprint(&footprint)?;
     units::queue_enabled(&build)
 }

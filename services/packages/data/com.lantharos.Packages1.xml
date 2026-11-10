@@ -9,7 +9,7 @@
     Install, InstallFile and Remove need com.lantharos.packages.change, AddRepository and
     RemoveRepository com.lantharos.packages.sources. Those that change the packages return once
     the running system uses the new set; Step tells how far they are. List and
-    DescribeRepository need nothing. Only root can call Rebuild.
+    DescribeRepository need nothing. Only root can call Rebuild and Update.
   -->
   <interface name="com.lantharos.Packages1">
     <!-- JSON: {"requested": [names], "packages": [{"name", "version", "arch", "summary",
@@ -57,6 +57,11 @@
          for the other versions on the computer, such as an update that was just staged. Returns
          when they're built. -->
     <method name="Rebuild"/>
+    <!-- Builds the packages again for every version on the computer whose packages have newer
+         versions out, and has the running system use its new build, or the one before when that
+         fails. com.lantharos.Updater1 calls it when it checks for updates on schedule. Returns
+         when it's done. -->
+    <method name="Update"/>
     <!-- "downloading", "building" or "starting". -->
     <signal name="Step">
       <arg name="step" type="s"/>

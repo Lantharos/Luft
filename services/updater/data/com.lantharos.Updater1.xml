@@ -12,9 +12,14 @@
     DownloadAutomatically: whether an update found on schedule is downloaded and staged too.
     LastChecked: when an update was last checked for on schedule, in seconds since 1970, or 0.
 
-    Download, SwitchVariant, Cancel and Apply need com.lantharos.updater.download; SetSchedule needs
-    com.lantharos.updater.schedule; Rollback needs com.lantharos.updater.rollback. Status needs
-    nothing. Only root can call RunSchedule.
+    Download, Cancel and Apply need com.lantharos.updater.download, which administrators at the
+    computer have without being asked; SwitchVariant needs com.lantharos.updater.variant,
+    SetSchedule com.lantharos.updater.schedule and Rollback com.lantharos.updater.rollback, which
+    ask for a password. Status needs nothing. Only root can call RunSchedule.
+
+    A version older than the running one is never staged or applied: its version is read from the
+    image's configuration, which its signature covers. Only Rollback starts an older version, the
+    one kept on the computer.
 
     A finished download also has com.lantharos.Packages1 build the system packages for the version
     it staged, before Finished.
@@ -50,9 +55,10 @@
       <arg name="schedule" type="s" direction="in"/>
       <arg name="download" type="b" direction="in"/>
     </method>
-    <!-- Checks for an update when the schedule says one is due, the computer isn't on its battery
-         and the connection isn't metered, and downloads and stages it when DownloadAutomatically
-         says so, reported like any download. -->
+    <!-- Checks for an update when the schedule says one is due and the connection isn't metered,
+         and downloads and stages it when DownloadAutomatically says so, reported like any
+         download. When nothing is downloaded, com.lantharos.Packages1 brings the system packages
+         up to their newest versions instead. -->
     <method name="RunSchedule"/>
     <!-- Empty when the download succeeded. -->
     <signal name="Finished">

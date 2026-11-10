@@ -1,6 +1,6 @@
 use anyhow::{Result, bail};
 
-const KEPT: [&str; 14] = [
+const KEPT: [&str; 12] = [
     "name",
     "baseurl",
     "metalink",
@@ -8,8 +8,6 @@ const KEPT: [&str; 14] = [
     "type",
     "skip_if_unavailable",
     "metadata_expire",
-    "priority",
-    "cost",
     "repo_gpgcheck",
     "includepkgs",
     "excludepkgs",
@@ -219,7 +217,7 @@ mod tests {
 
     #[test]
     fn writes_back_only_where_packages_come_from() {
-        let text = "[x]\nname=X\nbaseurl=https://example.com\nsslverify=0\n\
+        let text = "[x]\nname=X\nbaseurl=https://example.com\nsslverify=0\npriority=1\n\
             gpgcheck=1\nrepo_gpgcheck=1\ngpgkey=https://example.com/a\n";
         let sections = enabled(parse(text).unwrap()).unwrap();
         assert_eq!(

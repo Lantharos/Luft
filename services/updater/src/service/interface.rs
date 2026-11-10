@@ -1,3 +1,4 @@
+use std::path::Path;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Arc, Mutex};
 
@@ -17,6 +18,8 @@ use crate::schedule::{self, Every, Schedule};
 const DOWNLOAD: &str = "com.lantharos.updater.download";
 const ROLLBACK: &str = "com.lantharos.updater.rollback";
 const SCHEDULE: &str = "com.lantharos.updater.schedule";
+const VARIANT: &str = "com.lantharos.updater.variant";
+const SYSTEM_PACKAGES: &str = "/var/lib/luft/system-packages/packages";
 const PACKAGES: &str = "com.lantharos.Packages1";
 const PACKAGES_PATH: &str = "/com/lantharos/Packages1";
 
@@ -143,21 +146,29 @@ async fn follow(updater: InterfaceRef<Updater>, fetch: Fetch, scheduled: bool, i
     let _ = Updater::finished(emitter, &error).await;
 }
 
+async fn system_packages(connection: &Connection, method: &str) {
+    if !Path::new(SYSTEM_PACKAGES).exists() {
+        return;
+    }
+    let done = connection
+        .call_method(Some(PACKAGES), PACKAGES_PATH, Some(PACKAGES), method, &())
+        .await;
+    if let Err(error) = done {
+        eprintln!("{method} of the system packages: {error}");
+    }
+}
+
 /// Has the system packages built for the version that was just staged, so they're ready when
 /// it starts.
 async fn build_system_packages(connection: &Connection) {
-    let built = connection
-        .call_method(
-            Some(PACKAGES),
-            PACKAGES_PATH,
-            Some(PACKAGES),
-            "Rebuild",
-            &(),
-        )
-        .await;
-    if let Err(error) = built {
-        eprintln!("Building the system packages for the update: {error}");
-    }
+    system_packages(connection, "Rebuild").await;
+}
+
+/// Has the system packages brought up to their newest versions, for every version of Luft on
+/// the computer.
+async fn update_system_packages(connection: Connection, idle: Arc<Idle>) {
+    let _activity = idle.hold();
+    system_packages(&connection, "Update").await;
 }
 
 #[introspect]
@@ -229,10 +240,6 @@ impl Updater {
         if !planned.due(schedule::now()) || self.fetching().is_some() {
             return Ok(());
         }
-        if luft_dbus::power::on_battery(connection).await {
-            eprintln!("Not checking for updates while the computer runs on its battery.");
-            return Ok(());
-        }
         if schedule::metered(connection).await {
             eprintln!("Not checking for updates over a metered connection.");
             return Ok(());
@@ -246,13 +253,17 @@ impl Updater {
         })
         .await?;
         let _ = self.last_checked_changed(&emitter).await;
-        if !available {
-            return Ok(());
+        if available && planned.download {
+            return self.begin(Fetch::upgrade, true, server, &emitter).await;
         }
-        if !planned.download {
-            return Ok(Updater::update_found(&emitter, false).await?);
+        tokio::spawn(update_system_packages(
+            connection.clone(),
+            self.idle.clone(),
+        ));
+        if available {
+            Updater::update_found(&emitter, false).await?;
         }
-        self.begin(Fetch::upgrade, true, server, &emitter).await
+        Ok(())
     }
 
     async fn status(&self) -> Result<String, Error> {
@@ -278,7 +289,7 @@ impl Updater {
         #[zbus(object_server)] server: &ObjectServer,
         #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
     ) -> Result<(), Error> {
-        self.authorize(connection, &header, DOWNLOAD).await?;
+        self.authorize(connection, &header, VARIANT).await?;
         self.refuse_while_downloading()?;
         let named = Variant::named(variant);
         if named.name() != variant {

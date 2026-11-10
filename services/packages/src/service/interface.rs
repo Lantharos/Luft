@@ -104,6 +104,17 @@ impl Packages {
         self.blocking(changes::rebuild).await
     }
 
+    async fn update(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+    ) -> Result<(), Error> {
+        if luft_identity::caller::uid(connection, &header).await? != Some(0) {
+            return Err(Error::not_authorized());
+        }
+        self.blocking(changes::update).await
+    }
+
     async fn install(
         &self,
         names: Vec<String>,

@@ -3,7 +3,7 @@ use std::path::Path;
 
 use super::Step;
 use crate::files::operations::OperationsQueue;
-use crate::files::privileged::{create_dir_all, is_permission_error, os, run_pkexec};
+use crate::files::privileged::{self, create_dir_all, is_permission_error};
 use crate::files::{rename_no_replace, transfer, trash};
 
 pub(super) fn revert(
@@ -29,9 +29,7 @@ fn revert_step(step: Step, queue: &OperationsQueue, id: &str) -> Result<Step, St
             Ok(Step::Moved { from: to, to: from })
         }
         Step::Trashed(item) => trash::restore_item(&item).map(Step::Created),
-        Step::Created(path) => trash::put(&path)
-            .map(Step::Trashed)
-            .map_err(|error| error.to_string()),
+        Step::Created(path) => trash::put(&path).map(Step::Trashed),
     }
 }
 
@@ -47,15 +45,7 @@ fn relocate(from: &Path, to: &Path, queue: &OperationsQueue, id: &str) -> Result
         Err(error) if error.raw_os_error() == Some(libc::EXDEV) => {
             transfer::relocate(from, to, queue, id)
         }
-        Err(error) if is_permission_error(&error) => run_pkexec(
-            "mv",
-            &[
-                os("--no-clobber"),
-                os("--"),
-                from.as_os_str().into(),
-                to.as_os_str().into(),
-            ],
-        ),
+        Err(error) if is_permission_error(&error) => privileged::move_to(from, to),
         Err(error) => Err(error.to_string()),
     }
 }

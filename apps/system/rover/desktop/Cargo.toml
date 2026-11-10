@@ -16,7 +16,7 @@ sabine.workspace = true
 serde_json.workspace = true
 specta.workspace = true
 serde.workspace = true
-tokio = { workspace = true, features = ["default", "process", "rt"] }
+tokio = { workspace = true, features = ["default", "process", "rt", "sync"] }
 walkdir.workspace = true
 dirs.workspace = true
 chrono.workspace = true
@@ -24,6 +24,7 @@ parking_lot.workspace = true
 libc.workspace = true
 luft-accounts = { workspace = true, features = ["default"] }
 luft-unpack.workspace = true
+luft-files.workspace = true
 luft-app = { workspace = true, features = ["apps", "launch", "settings", "thumbnails", "watch"] }
 gio.workspace = true
 gio-unix.workspace = true

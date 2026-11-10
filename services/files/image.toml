@@ -1,0 +1,10 @@
+part = "services"
+
+[programs]
+"/usr/libexec/" = ["luft-files"]
+
+[files]
+"/usr/share/dbus-1/system.d/" = ["data/com.lantharos.Files1.conf"]
+"/usr/share/dbus-1/system-services/" = ["data/com.lantharos.Files1.service"]
+"/usr/lib/systemd/system/" = ["data/luft-files.service"]
+"/usr/share/polkit-1/actions/" = ["data/com.lantharos.files.policy"]

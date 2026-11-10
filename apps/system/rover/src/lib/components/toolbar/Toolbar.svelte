@@ -108,7 +108,7 @@
 		<MoreMenu {manager} {view} {chooser} />
 	</div>
 
-	<WindowControls minimizable={!chooser} maximizable={!chooser} />
+	<WindowControls minimizable={!chooser} maximizable={!chooser} onclose={manager.actions.closeWindow} />
 </header>
 
 <style>

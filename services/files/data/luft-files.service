@@ -1,0 +1,30 @@
+[Unit]
+Description=Changes to files that need an administrator
+
+[Service]
+Type=dbus
+BusName=com.lantharos.Files1
+ExecStart=/usr/libexec/luft-files
+SyslogIdentifier=luft-files
+ProtectSystem=yes
+PrivateDevices=yes
+PrivateNetwork=yes
+IPAddressDeny=any
+NoNewPrivileges=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+RestrictAddressFamilies=AF_UNIX
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged
+SystemCallFilter=@chown
+CapabilityBoundingSet=CAP_CHOWN CAP_DAC_OVERRIDE CAP_DAC_READ_SEARCH CAP_FOWNER CAP_KILL CAP_SYS_NICE

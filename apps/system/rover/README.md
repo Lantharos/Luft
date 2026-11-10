@@ -2,7 +2,7 @@
 
 Rover is Luft's file manager, and the file dialog every app uses: tabs, list, grid and column views, Quick Look, search by name or contents, network locations, cloud drives and Git status. Using it is described in [the docs](https://docs.luft.computer/apps/rover/).
 
-Network locations need GVfs with `gvfs-fuse` and the backend for each protocol, such as `gvfs-smb`.
+Network locations need GVfs with `gvfs-fuse` and the backend for each protocol, such as `gvfs-smb`. Changing files that belong to the system or someone else goes through [`luft-files`](../../../services/files).
 
 ## Build and run
 
@@ -22,7 +22,7 @@ The desktop entry opens folders, archives, which it extracts next to themselves,
 
 ## File dialogs and "Show in folder"
 
-On Luft, Rover provides file dialogs and Show in folder for every app. Elsewhere, register it for your account:
+On Luft, Rover provides file dialogs and Show in folder for every app. One `rover --portal-backend` process answers every request and opens each dialog in a window of its own, over the window of the app that asked. Elsewhere, register it for your account:
 
 ```sh
 ../../../target/debug/rover --install-file-chooser-portal   # the xdg-desktop-portal FileChooser backend

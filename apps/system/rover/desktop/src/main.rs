@@ -5,13 +5,9 @@ struct Command {
     failure: &'static str,
 }
 
-const COMMANDS: [Command; 4] = [
-    Command {
-        flag: "--portal-backend",
-        run: rover_lib::run_portal_backend,
-        success: None,
-        failure: "Rover file chooser portal failed",
-    },
+const PORTAL_BACKEND: &str = "--portal-backend";
+
+const COMMANDS: [Command; 3] = [
     Command {
         flag: "--install-file-chooser-portal",
         run: rover_lib::install_file_chooser_portal,
@@ -34,6 +30,12 @@ const COMMANDS: [Command; 4] = [
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
+    if sabine::dispatch_host_mode_from_args(&args) {
+        return;
+    }
+    if args.iter().any(|arg| arg == PORTAL_BACKEND) {
+        rover_lib::run_portal_backend();
+    }
     let Some(command) = COMMANDS
         .iter()
         .find(|command| args.iter().any(|arg| arg == command.flag))

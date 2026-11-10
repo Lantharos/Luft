@@ -67,7 +67,7 @@
 
 <Dialog title={`Search in ${basename(search.root) || search.root}`} wide onclose={search.close}>
 	<SearchField bind:this={field} label="Name or text" large bind:value={search.text} onkeydown={keydown} />
-	<SearchFilters />
+	<SearchFilters online={Boolean(manager.cloud.holding(search.root))} />
 	<div class="soft-scroll -mx-2 h-[min(420px,50vh)] overflow-y-auto px-2">
 		<SearchResults
 			results={shown}

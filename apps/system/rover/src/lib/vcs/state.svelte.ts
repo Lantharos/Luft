@@ -1,6 +1,7 @@
 import { errorText } from '@luft/ui';
 import { commands } from '#lib/bindings.js';
 import type { VcsFileStatus, VcsProject, VcsStatusEvent } from '#lib/bindings.js';
+import { settings } from '#lib/state/settings.svelte.js';
 import { absolutePath, relativePath } from '#lib/utils/paths.js';
 import { groupChangedFiles, statusOrder } from './format';
 import type { VcsBusyState, VcsChangedFile } from './types';
@@ -13,6 +14,8 @@ export class VcsState {
 	project = $state.raw<VcsProject | null>(null);
 	statuses = $state.raw(new Map<string, VcsFileStatus>());
 	error = $state<string | null>(null);
+	untrusted = $state<string | null>(null);
+	asking = $state(false);
 	panelOpen = $state(false);
 	saveDialogOpen = $state(false);
 	saveFiles = $state.raw<string[] | null>(null);
@@ -37,13 +40,30 @@ export class VcsState {
 		const root = await commands.vcsRoot({ path }).catch(() => null);
 		if (this.#path !== path) return;
 		if (!root) return this.clear();
+		if (!root.trusted) {
+			this.clear();
+			this.#path = path;
+			this.untrusted = root.root;
+			return;
+		}
+		this.untrusted = null;
 		if (this.project?.root !== root.root) this.#schedule(root.root);
+	};
+
+	trust = async () => {
+		const root = this.untrusted;
+		if (!root) return;
+		await commands.vcsTrust({ root });
+		settings.value = { ...settings.value, trustedFolders: [...settings.value.trustedFolders, root] };
+		this.untrusted = null;
+		this.#schedule(root);
 	};
 
 	clear = () => {
 		this.#path = '';
 		this.#generation += 1;
 		clearTimeout(this.#refreshTimer);
+		this.untrusted = null;
 		this.project = null;
 		this.statuses = new Map();
 		this.diff = '';

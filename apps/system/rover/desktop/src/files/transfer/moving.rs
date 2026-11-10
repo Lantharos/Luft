@@ -6,7 +6,7 @@ use super::copy::{copy_to, parent};
 use super::resolve::available_destination;
 use super::tracker::Tracker;
 use crate::files::operations::Resolution;
-use crate::files::privileged::{is_permission_error, os, run_pkexec};
+use crate::files::privileged::{self, is_permission_error};
 use crate::files::rename_no_replace;
 use crate::history::Step;
 
@@ -33,15 +33,7 @@ pub(super) fn move_to(
                 return copy_to(source, target, true, tracker);
             }
             Err(error) if is_permission_error(&error) => {
-                run_pkexec(
-                    "mv",
-                    &[
-                        os("--no-clobber"),
-                        os("--"),
-                        source.as_os_str().into(),
-                        target.as_os_str().into(),
-                    ],
-                )?;
+                privileged::move_to(source, &target)?;
                 return moved(source, target, tracker);
             }
             Err(error) => return Err(error.to_string()),

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN"
+ "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
+<policyconfig>
+  <vendor>Luft</vendor>
+  <vendor_url>https://github.com/Lantharos</vendor_url>
+
+  <action id="com.lantharos.files.change">
+    <description>Change files that belong to the system or someone else</description>
+    <message>Authentication is required to change files that belong to the system or someone else</message>
+    <defaults>
+      <allow_any>no</allow_any>
+      <allow_inactive>no</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+  </action>
+
+  <action id="com.lantharos.files.processes">
+    <description>Stop, pause or reprioritise apps that belong to the system or someone else</description>
+    <message>Authentication is required to stop, pause or reprioritise something that belongs to the system or someone else</message>
+    <defaults>
+      <allow_any>no</allow_any>
+      <allow_inactive>no</allow_inactive>
+      <allow_active>auth_admin_keep</allow_active>
+    </defaults>
+  </action>
+</policyconfig>

@@ -8,7 +8,7 @@ use crate::app::settings;
 use crate::app::state::RoverState;
 use crate::details::vcs;
 use crate::files::{entries, folders, transfer, trash};
-use crate::integration::chooser::{ChooserResponse, ChooserSession};
+use crate::integration::chooser::ChooserResponse;
 use crate::integration::launch_args;
 use crate::locations::drives;
 use params::*;
@@ -32,9 +32,11 @@ fn register_files(window: SabineWindow, state: &RoverState) -> SabineWindow {
         .command("list_directory", |Listing { path, show_hidden }| {
             entries::list_directory(path, show_hidden)
         })
-        .with("watch_directory", state, |state, Path { path }| {
-            state.watcher.watch(path)
-        })
+        .with(
+            "watch_directory",
+            state,
+            |state, Watching { viewer, path }| state.watcher.watch(viewer, path),
+        )
         .command("list_folders", |Path { path }| folders::list_folders(path))
         .with(
             "count_items",
@@ -122,6 +124,9 @@ fn register_trash(window: SabineWindow, state: &RoverState) -> SabineWindow {
         .with("restore_from_trash", state, |state, Ids { ids }| {
             trash::restore(ids, &state.queue, &state.history)
         })
+        .with("delete_items", state, |state, Paths { paths }| {
+            trash::delete_items(paths, &state.queue)
+        })
         .with("delete_permanently", state, |state, Ids { ids }| {
             trash::delete_permanently(ids, &state.queue)
         })
@@ -147,22 +152,35 @@ fn register_trash(window: SabineWindow, state: &RoverState) -> SabineWindow {
 
 fn register_vcs(window: SabineWindow, state: &RoverState) -> SabineWindow {
     window
-        .command("vcs_root", |Path { path }| Ok(vcs::root(path)))
+        .with("vcs_root", state, |state, Path { path }| {
+            Ok(vcs::root(path, &state.settings.read()))
+        })
+        .with("vcs_trust", state, |state, VcsRoot { root }| {
+            vcs::trust(root, &mut state.settings.write())
+        })
         .with("vcs_status", state, |state, VcsRoot { root }| {
-            Ok(vcs::start_status(root, state.events.clone()))
+            Ok(vcs::start_status(
+                root,
+                &state.settings.read(),
+                state.events.clone(),
+            ))
         })
-        .command("vcs_diff", |VcsDiff { root, file_path }| {
-            vcs::diff(root, file_path)
+        .with("vcs_diff", state, |state, VcsDiff { root, file_path }| {
+            vcs::diff(root, file_path, &state.settings.read())
         })
-        .command(
+        .with(
             "vcs_save",
-            |VcsSave {
+            state,
+            |state,
+             VcsSave {
                  root,
                  message,
                  files,
-             }| { vcs::save(root, message, files) },
+             }| { vcs::save(root, message, files, &state.settings.read()) },
         )
-        .command("vcs_sync", |VcsRoot { root }| vcs::sync(root))
+        .with("vcs_sync", state, |state, VcsRoot { root }| {
+            vcs::sync(root, &state.settings.read())
+        })
 }
 
 fn register_app(window: SabineWindow, state: &RoverState) -> SabineWindow {
@@ -180,20 +198,31 @@ fn register_app(window: SabineWindow, state: &RoverState) -> SabineWindow {
                 settings::update_settings(settings, &state.settings)
             },
         )
-        .with("accept_chooser", state, |state, Paths { paths }| {
-            chooser(state)?.respond(ChooserResponse {
-                accepted: true,
-                paths,
-            })
+        .with("chooser_config", state, |state, Chooser { request }| {
+            state.choosers.config(request)
         })
-        .with("cancel_chooser", state, |state, Empty {}| {
-            chooser(state)?.respond(ChooserResponse::default())
+        .with(
+            "accept_chooser",
+            state,
+            |state,
+             Chosen {
+                 request,
+                 paths,
+                 filter,
+             }| {
+                state.finish_chooser(
+                    request,
+                    ChooserResponse {
+                        accepted: true,
+                        paths,
+                        filter,
+                    },
+                );
+                Ok(())
+            },
+        )
+        .with("cancel_chooser", state, |state, Chooser { request }| {
+            state.finish_chooser(request, ChooserResponse::default());
+            Ok(())
         })
-}
-
-fn chooser(state: &RoverState) -> Result<&ChooserSession, String> {
-    state
-        .chooser
-        .as_deref()
-        .ok_or_else(|| "Rover was not opened as a file chooser".to_string())
 }

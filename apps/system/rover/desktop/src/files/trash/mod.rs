@@ -7,7 +7,7 @@ use std::path::{Path, PathBuf};
 use serde::Serialize;
 
 use super::operations::{OperationPhase, OperationType, OperationsQueue};
-use super::privileged::{is_permission_error, os, remove_path, run_pkexec};
+use super::privileged::remove_path;
 use crate::files::text::{items, subject};
 use crate::history::{History, Step};
 use crate::locations::cloud::is_cloud;
@@ -72,19 +72,10 @@ pub fn move_to_trash(
         paths,
         |path| {
             if is_cloud(&path) {
-                return delete_in_cloud(Path::new(&path));
+                return Err("Cloud drives have no trash".to_string());
             }
-            match put(Path::new(&path)) {
-                Ok(trashed) => {
-                    steps.push(Step::Trashed(trashed));
-                    Ok(())
-                }
-                Err(error) if is_permission_error(&error) => {
-                    run_pkexec("gio", &[os("trash"), os("--"), path.into()])
-                        .map_err(|fallback| format!("{error}; {fallback}"))
-                }
-                Err(error) => Err(error.to_string()),
-            }
+            steps.push(Step::Trashed(put(Path::new(&path))?));
+            Ok(())
         },
     );
     history.record(label, undo_label, steps, true);
@@ -109,6 +100,16 @@ pub fn restore(ids: Vec<String>, queue: &OperationsQueue, history: &History) -> 
     );
     history.record(label, undo_label, steps, false);
     result
+}
+
+pub fn delete_items(paths: Vec<String>, queue: &OperationsQueue) -> Result<(), String> {
+    run_batch(
+        queue,
+        OperationType::Delete,
+        OperationPhase::Deleting,
+        paths,
+        |path| remove_path(Path::new(&path)),
+    )
 }
 
 pub fn delete_permanently(ids: Vec<String>, queue: &OperationsQueue) -> Result<(), String> {
@@ -143,15 +144,6 @@ pub fn empty_trash(trash_path: Option<String>) -> Result<(), String> {
         remove_contents(&target.join("info"))?;
     }
     Ok(())
-}
-
-fn delete_in_cloud(path: &Path) -> Result<(), String> {
-    let removed = if path.is_dir() {
-        fs::remove_dir_all(path)
-    } else {
-        fs::remove_file(path)
-    };
-    removed.map_err(|error| error.to_string())
 }
 
 fn run_batch(

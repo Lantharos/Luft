@@ -14,6 +14,7 @@ use serde::Serialize;
 
 use crate::app::events::SEARCH_RESULTS;
 use crate::files::entries::{FileEntry, file_entry};
+use crate::locations::cloud;
 pub use matcher::SearchQuery;
 use matcher::{Found, Matcher};
 use specta::Type;
@@ -61,7 +62,8 @@ impl Search {
         }
     }
 
-    pub fn start(&self, query: SearchQuery) -> Result<u64, String> {
+    pub fn start(&self, mut query: SearchQuery) -> Result<u64, String> {
+        query.contents &= !cloud::is_cloud(&query.root);
         let matcher = Matcher::new(&query)?;
         let root = PathBuf::from(&query.root);
         if !root.is_dir() {
@@ -165,6 +167,7 @@ fn walk(
             !VIRTUAL_ROOTS
                 .iter()
                 .any(|virtual_root| entry.path() == Path::new(virtual_root))
+                && (entry.depth() == 0 || entry.path() != cloud::root())
         })
         .build_parallel()
         .run(|| {

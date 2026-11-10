@@ -1,0 +1,58 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN"
+ "https://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node name="/com/lantharos/Files1">
+  <!--
+    Changes to files and processes that the person asking can't make themselves. Started on demand
+    and stops when idle. Paths are absolute, as bytes, and may not pass through a link on the way to
+    the item; the item itself may be a link and is then handled as the link, never what it points to.
+    The file methods need com.lantharos.files.change, Signal and SetPriority need
+    com.lantharos.files.processes. The password prompt names the item or the processes and what is
+    about to happen to them; polkit rules get the same as "operation", "path", "target" and
+    "processes".
+  -->
+  <interface name="com.lantharos.Files1">
+    <!-- Copies a file, folder or link. Fails when the target exists. The copy belongs to whoever
+         owns the folder it lands in and never keeps setuid or setgid. -->
+    <method name="Copy">
+      <arg name="source" type="ay" direction="in"/>
+      <arg name="target" type="ay" direction="in"/>
+    </method>
+    <!-- Moves or renames an item. Fails when the target exists. -->
+    <method name="Move">
+      <arg name="source" type="ay" direction="in"/>
+      <arg name="target" type="ay" direction="in"/>
+    </method>
+    <!-- Removes an item and everything in it for good. -->
+    <method name="Delete">
+      <arg name="path" type="ay" direction="in"/>
+    </method>
+    <!-- Moves an item to the caller's own trash, on the drive it's on, and returns where the item
+         and its note went. -->
+    <method name="Trash">
+      <arg name="path" type="ay" direction="in"/>
+      <arg name="file" type="ay" direction="out"/>
+      <arg name="info" type="ay" direction="out"/>
+    </method>
+    <!-- Makes a folder and the missing folders above it, each owned by whoever owns the folder it's
+         in. Answers whether the folder is new. -->
+    <method name="MakeFolder">
+      <arg name="path" type="ay" direction="in"/>
+      <arg name="created" type="b" direction="out"/>
+    </method>
+    <!-- Makes an empty file owned by whoever owns its folder. Fails when it exists. -->
+    <method name="MakeFile">
+      <arg name="path" type="ay" direction="in"/>
+    </method>
+    <!-- Sends SIGTERM, SIGKILL, SIGSTOP or SIGCONT to processes, each given as its number and the
+         clock tick it started on. Processes that ended since are left out. -->
+    <method name="Signal">
+      <arg name="processes" type="a(ut)" direction="in"/>
+      <arg name="signal" type="i" direction="in"/>
+    </method>
+    <!-- Sets the niceness, from -20 to 19, of every thread of a process. -->
+    <method name="SetPriority">
+      <arg name="process" type="(ut)" direction="in"/>
+      <arg name="nice" type="i" direction="in"/>
+    </method>
+  </interface>
+</node>

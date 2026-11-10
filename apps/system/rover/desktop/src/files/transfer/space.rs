@@ -26,6 +26,13 @@ pub(super) fn ensure_space(destination: &Path, required_bytes: u64) -> Result<()
     ))
 }
 
+pub(super) fn drive_folder(destination: &Path) -> String {
+    drives::drive_for_path(destination).map_or_else(
+        || destination.to_string_lossy().into_owned(),
+        |drive| drive.mount_point,
+    )
+}
+
 pub(super) fn crosses_device(sources: &[(PathBuf, PathBuf)]) -> bool {
     sources.iter().any(|(source, destination)| {
         match (fs::symlink_metadata(source), fs::metadata(destination)) {

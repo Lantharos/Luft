@@ -1,0 +1,25 @@
+[package]
+name = "luft-files"
+version = "0.1.0"
+description = "Changes files that need an administrator, for Rover and Barometer"
+authors = ["Kristof"]
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+chrono.workspace = true
+luft-dbus.workspace = true
+luft-dbus-macros.workspace = true
+percent-encoding.workspace = true
+rustix = { workspace = true, features = ["fs", "process"] }
+serde.workspace = true
+tokio = { workspace = true, features = ["macros", "rt", "sync", "time"] }
+uzers.workspace = true
+zbus = { workspace = true, features = ["proxy", "service", "tokio"] }
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[lints]
+workspace = true

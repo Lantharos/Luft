@@ -10,11 +10,11 @@ use rustc_hash::FxHashMap;
 use serde::Serialize;
 use specta::Type;
 
-use super::privileged::{is_permission_error, os, run_pkexec};
+use super::privileged::{self, is_permission_error};
 use super::rename::valid_name;
 use crate::files::text::quoted;
 use crate::history::{History, Step};
-use crate::locations::drives;
+use crate::locations::{cloud, drives, network};
 
 #[derive(Debug, Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
@@ -56,10 +56,7 @@ pub fn list_directory(path: String, show_hidden: bool) -> Result<DirectoryConten
         });
     }
 
-    let mount_points: HashSet<PathBuf> = drives::visible_mount_points()
-        .into_iter()
-        .map(PathBuf::from)
-        .collect();
+    let mount_points = mount_points();
 
     let entries = fs::read_dir(&directory)
         .map_err(|error| error.to_string())?
@@ -71,6 +68,13 @@ pub fn list_directory(path: String, show_hidden: bool) -> Result<DirectoryConten
         .collect();
 
     Ok(DirectoryContents { path, entries })
+}
+
+pub(crate) fn mount_points() -> HashSet<PathBuf> {
+    drives::visible_mount_points()
+        .into_iter()
+        .map(PathBuf::from)
+        .collect()
 }
 
 pub fn get_file_info(path: String) -> Result<FileEntry, String> {
@@ -89,7 +93,7 @@ pub fn create_file(path: String, name: String, history: &History) -> Result<File
             return Err(format!("File already exists: {}", file_path.display()));
         }
         Err(error) if is_permission_error(&error) => {
-            run_pkexec("touch", &[os("--"), file_path.as_os_str().into()])?;
+            privileged::make_file(&file_path)?;
         }
         Err(error) => return Err(error.to_string()),
     }
@@ -109,7 +113,9 @@ pub fn create_directory(
             return Err(format!("Folder already exists: {}", dir_path.display()));
         }
         Err(error) if is_permission_error(&error) => {
-            run_pkexec("mkdir", &[os("--"), dir_path.as_os_str().into()])?;
+            if !privileged::make_folder(&dir_path)? {
+                return Err(format!("Folder already exists: {}", dir_path.display()));
+            }
         }
         Err(error) => return Err(error.to_string()),
     }
@@ -128,15 +134,7 @@ pub fn rename_item(path: String, new_name: String, history: &History) -> Result<
             return Err("An item with that name already exists".to_string());
         }
         Err(error) if is_permission_error(&error) => {
-            run_pkexec(
-                "mv",
-                &[
-                    os("--no-clobber"),
-                    os("--"),
-                    old_path.as_os_str().into(),
-                    new_path.as_os_str().into(),
-                ],
-            )?;
+            privileged::move_to(&old_path, &new_path)?;
         }
         Err(error) => return Err(error.to_string()),
     }
@@ -192,7 +190,10 @@ pub(crate) fn file_entry(path: &Path) -> std::io::Result<FileEntry> {
         .file_name()
         .map(|name| name.to_string_lossy().into_owned())
         .unwrap_or_default();
-    let mime_type = is_file.then(|| mime_type(path, &name)).flatten();
+    let mime_type = target
+        .as_ref()
+        .filter(|_| is_file)
+        .and_then(|target| mime_type(path, &name, target));
 
     Ok(FileEntry {
         is_hidden: name.starts_with('.'),
@@ -231,7 +232,17 @@ const SUFFIX_TYPES: [(&str, &str); 2] = [("mdx", "text/markdown"), ("otf", "font
 
 static SUFFIX_MIME_TYPES: Mutex<Option<FxHashMap<String, Option<Arc<str>>>>> = Mutex::new(None);
 
-fn mime_type(path: &Path, name: &str) -> Option<String> {
+const REMEMBERED_SNIFFS: usize = 20_000;
+
+struct Sniffed {
+    modified: Option<SystemTime>,
+    size: u64,
+    mime: Option<&'static str>,
+}
+
+static SNIFFED: Mutex<Option<FxHashMap<PathBuf, Sniffed>>> = Mutex::new(None);
+
+fn mime_type(path: &Path, name: &str, metadata: &fs::Metadata) -> Option<String> {
     let suffix = name
         .char_indices()
         .skip(1)
@@ -239,8 +250,37 @@ fn mime_type(path: &Path, name: &str) -> Option<String> {
         .map(|(dot, _)| &name[dot + 1..]);
     match suffix.and_then(suffix_mime_type) {
         Some(mime) => Some(mime.to_string()),
-        None => sniffed_mime_type(path).map(str::to_owned),
+        None => remembered_sniff(path, metadata).map(str::to_owned),
     }
+}
+
+fn remembered_sniff(path: &Path, metadata: &fs::Metadata) -> Option<&'static str> {
+    let location = path.to_string_lossy();
+    if cloud::is_cloud(&location) || network::is_remote(&location) {
+        return None;
+    }
+    let (modified, size) = (metadata.modified().ok(), metadata.len());
+    if let Some(sniffed) = SNIFFED.lock().as_ref().and_then(|known| known.get(path))
+        && sniffed.modified == modified
+        && sniffed.size == size
+    {
+        return sniffed.mime;
+    }
+    let mime = sniffed_mime_type(path);
+    let mut known = SNIFFED.lock();
+    let known = known.get_or_insert_with(FxHashMap::default);
+    if known.len() >= REMEMBERED_SNIFFS {
+        known.clear();
+    }
+    known.insert(
+        path.to_path_buf(),
+        Sniffed {
+            modified,
+            size,
+            mime,
+        },
+    );
+    mime
 }
 
 fn suffix_mime_type(suffix: &str) -> Option<Arc<str>> {

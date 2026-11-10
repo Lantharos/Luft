@@ -1,26 +1,16 @@
-use std::env;
-use std::fs::{self, OpenOptions};
-use std::io::Write;
-use std::os::unix::fs::OpenOptionsExt;
-use std::path::PathBuf;
-use std::time::Duration;
+use std::collections::HashMap;
+use std::sync::atomic::{AtomicU32, Ordering};
+use std::sync::{Arc, OnceLock};
 
-use serde::{Deserialize, Serialize};
+use parking_lot::Mutex;
+use sabine::{SabineProcessHandle, SabineWindow};
+use serde::Serialize;
 use specta::Type;
+use tokio::sync::oneshot;
 
-pub const RESPONSE_ENV: &str = "ROVER_CHOOSER_RESPONSE";
-pub const MODE_ENV: &str = "ROVER_CHOOSER_MODE";
-pub const TITLE_ENV: &str = "ROVER_CHOOSER_TITLE";
-pub const ACCEPT_LABEL_ENV: &str = "ROVER_CHOOSER_ACCEPT_LABEL";
-pub const DIRECTORY_ENV: &str = "ROVER_CHOOSER_DIRECTORY";
-pub const MULTIPLE_ENV: &str = "ROVER_CHOOSER_MULTIPLE";
-pub const CURRENT_FOLDER_ENV: &str = "ROVER_CHOOSER_CURRENT_FOLDER";
-pub const CURRENT_NAME_ENV: &str = "ROVER_CHOOSER_CURRENT_NAME";
-pub const FILES_ENV: &str = "ROVER_CHOOSER_FILES";
+use crate::APP_NAME;
 
-const EXIT_DELAY: Duration = Duration::from_millis(80);
-
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Type)]
+#[derive(Debug, Clone, Copy, Serialize, PartialEq, Type)]
 #[serde(rename_all = "snake_case")]
 pub enum ChooserMode {
     Open,
@@ -28,22 +18,12 @@ pub enum ChooserMode {
     SaveFiles,
 }
 
-impl ChooserMode {
-    pub fn as_str(self) -> &'static str {
-        match self {
-            Self::Open => "open",
-            Self::Save => "save",
-            Self::SaveFiles => "save_files",
-        }
-    }
-
-    fn parse(value: &str) -> Self {
-        match value {
-            "save" => Self::Save,
-            "save_files" => Self::SaveFiles,
-            _ => Self::Open,
-        }
-    }
+#[derive(Debug, Clone, Serialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct ChooserFilter {
+    pub name: String,
+    pub patterns: Vec<String>,
+    pub mime_types: Vec<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Type)]
@@ -57,57 +37,88 @@ pub struct ChooserConfig {
     pub current_folder: Option<String>,
     pub current_name: Option<String>,
     pub files: Vec<String>,
+    pub filters: Vec<ChooserFilter>,
+    pub filter: Option<u32>,
 }
 
-#[derive(Debug)]
-pub struct ChooserSession {
-    pub config: ChooserConfig,
-    response_path: PathBuf,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
+#[derive(Debug, Default)]
 pub struct ChooserResponse {
     pub accepted: bool,
     pub paths: Vec<String>,
+    pub filter: Option<u32>,
 }
 
-impl ChooserSession {
-    pub fn from_environment() -> Option<Self> {
-        let response_path = PathBuf::from(env::var_os(RESPONSE_ENV)?);
-        let text = |name: &str| env::var(name).ok().filter(|value| !value.is_empty());
-        let config = ChooserConfig {
-            mode: ChooserMode::parse(&text(MODE_ENV).unwrap_or_default()),
-            title: text(TITLE_ENV).unwrap_or_default(),
-            accept_label: text(ACCEPT_LABEL_ENV).unwrap_or_default(),
-            directory: text(DIRECTORY_ENV).as_deref() == Some("1"),
-            multiple: text(MULTIPLE_ENV).as_deref() == Some("1"),
-            current_folder: text(CURRENT_FOLDER_ENV),
-            current_name: text(CURRENT_NAME_ENV),
-            files: text(FILES_ENV)
-                .and_then(|value| serde_json::from_str(&value).ok())
-                .unwrap_or_default(),
-        };
-        Some(Self {
-            config,
-            response_path,
-        })
+/// The file choosers Rover shows for other apps, each in a window of its
+/// own, all served by the one process that answers the desktop portal.
+#[derive(Clone, Default)]
+pub struct Choosers {
+    inner: Arc<Inner>,
+}
+
+#[derive(Default)]
+struct Inner {
+    process: OnceLock<SabineProcessHandle>,
+    last_request: AtomicU32,
+    open: Mutex<HashMap<u32, Open>>,
+}
+
+struct Open {
+    config: ChooserConfig,
+    answer: oneshot::Sender<ChooserResponse>,
+}
+
+impl Choosers {
+    pub fn attach(&self, process: SabineProcessHandle) {
+        let _ = self.inner.process.set(process);
     }
 
-    pub fn respond(&self, response: ChooserResponse) -> Result<(), String> {
-        let payload = serde_json::to_vec(&response).map_err(|error| error.to_string())?;
-        let staging = self.response_path.with_extension("partial");
-        let result = OpenOptions::new()
-            .write(true)
-            .create_new(true)
-            .mode(0o600)
-            .open(&staging)
-            .and_then(|mut file| file.write_all(&payload))
-            .and_then(|()| fs::rename(&staging, &self.response_path))
-            .map_err(|error| error.to_string());
-        std::thread::spawn(|| {
-            std::thread::sleep(EXIT_DELAY);
-            std::process::exit(0);
-        });
-        result
+    /// Opens a chooser over the window `parent` names, and calls `closed`
+    /// with the chooser's request once its window is gone.
+    pub fn open(
+        &self,
+        config: ChooserConfig,
+        parent: &str,
+        closed: impl Fn(u32) + Send + Sync + 'static,
+    ) -> Result<oneshot::Receiver<ChooserResponse>, String> {
+        let process = self.inner.process.get().ok_or("Rover is still starting")?;
+        let request = self.inner.last_request.fetch_add(1, Ordering::Relaxed) + 1;
+        let title = Some(config.title.as_str())
+            .filter(|title| !title.is_empty())
+            .unwrap_or(APP_NAME);
+        let window = SabineWindow::for_current_app().map_err(|error| error.to_string())?;
+        let mut window = crate::glass_window(window, title, None)
+            .content_suffix(format!("#chooser/{request}"))
+            .modal(true)
+            .on_closed(move |_| closed(request));
+        if !parent.is_empty() {
+            window = window.parent_window(parent);
+        }
+        let (answer, answered) = oneshot::channel();
+        self.inner
+            .open
+            .lock()
+            .insert(request, Open { config, answer });
+        if let Err(error) = process.open_window(window) {
+            self.inner.open.lock().remove(&request);
+            return Err(error.to_string());
+        }
+        Ok(answered)
+    }
+
+    pub fn config(&self, request: u32) -> Result<ChooserConfig, String> {
+        self.inner
+            .open
+            .lock()
+            .get(&request)
+            .map(|open| open.config.clone())
+            .ok_or_else(|| "This file chooser has already closed".to_string())
+    }
+
+    /// Answers a chooser. Only its first answer counts, so a window closing
+    /// after its page answered changes nothing.
+    pub fn respond(&self, request: u32, response: ChooserResponse) {
+        if let Some(open) = self.inner.open.lock().remove(&request) {
+            let _ = open.answer.send(response);
+        }
     }
 }

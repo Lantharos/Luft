@@ -41,9 +41,12 @@ struct Conflict {
     copy: String,
 }
 
+pub fn root() -> &'static Path {
+    CLOUD_ROOT.get_or_init(|| gio::glib::home_dir().join("Cloud"))
+}
+
 pub fn is_cloud(path: &str) -> bool {
-    let root = CLOUD_ROOT.get_or_init(|| gio::glib::home_dir().join("Cloud"));
-    Path::new(path).starts_with(root)
+    Path::new(path).starts_with(root())
 }
 
 fn open(address: &str, token: Option<&str>) -> Result<(), String> {

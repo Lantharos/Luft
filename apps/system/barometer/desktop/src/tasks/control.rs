@@ -2,12 +2,12 @@ use std::fs;
 use std::io;
 use std::os::fd::{AsRawFd, FromRawFd, OwnedFd, RawFd};
 use std::path::{Path, PathBuf};
-use std::process::Command;
 use std::thread;
 use std::time::{Duration, Instant};
 
 use gio::prelude::*;
 use luft_app::launch;
+use luft_files::client::{self, Process};
 use serde::Deserialize;
 use specta::Type;
 
@@ -15,7 +15,6 @@ use super::apps::members;
 use super::process::Stat;
 use crate::system;
 
-const SYSTEM_BIN_DIRS: [&str; 2] = ["/usr/bin", "/bin"];
 const STOP_TIMEOUT: Duration = Duration::from_secs(5);
 const STOP_CHECK: Duration = Duration::from_millis(100);
 
@@ -37,15 +36,6 @@ impl Signal {
             Self::Continue => libc::SIGCONT,
         }
     }
-
-    fn name(self) -> &'static str {
-        match self {
-            Self::End => "TERM",
-            Self::Kill => "KILL",
-            Self::Stop => "STOP",
-            Self::Continue => "CONT",
-        }
-    }
 }
 
 #[derive(Deserialize, Type)]
@@ -60,26 +50,34 @@ pub struct SignalRequest {
     signal: Signal,
 }
 
-struct Handle(OwnedFd);
+struct Handle {
+    descriptor: OwnedFd,
+    process: Process,
+}
 
 impl Handle {
     fn open(pid: u32) -> io::Result<Self> {
-        let pid = libc::pid_t::try_from(pid)
+        let number = libc::pid_t::try_from(pid)
             .ok()
             .filter(|pid| *pid > 0)
             .ok_or(io::ErrorKind::InvalidInput)?;
-        let descriptor = unsafe { libc::syscall(libc::SYS_pidfd_open, pid, 0) };
+        let descriptor = unsafe { libc::syscall(libc::SYS_pidfd_open, number, 0) };
         if descriptor < 0 {
             return Err(io::Error::last_os_error());
         }
-        Ok(Self(unsafe { OwnedFd::from_raw_fd(descriptor as RawFd) }))
+        let descriptor = unsafe { OwnedFd::from_raw_fd(descriptor as RawFd) };
+        let start = start_of(pid).ok_or_else(|| io::Error::from_raw_os_error(libc::ESRCH))?;
+        Ok(Self {
+            descriptor,
+            process: (pid, start),
+        })
     }
 
     fn send(&self, signal: Signal) -> io::Result<()> {
         let sent = unsafe {
             libc::syscall(
                 libc::SYS_pidfd_send_signal,
-                self.0.as_raw_fd(),
+                self.descriptor.as_raw_fd(),
                 signal.number(),
                 std::ptr::null::<libc::siginfo_t>(),
                 0,
@@ -105,13 +103,8 @@ impl Clock {
         }
     }
 
-    fn started(&self, ListedProcess { pid, started }: &ListedProcess) -> bool {
-        fs::read(format!("/proc/{pid}/stat"))
-            .ok()
-            .and_then(|stat| Stat::parse(&stat))
-            .is_some_and(|stat| {
-                (self.boot + stat.start as f64 / self.ticks - started).abs() < 0.5 / self.ticks
-            })
+    fn started(&self, (_, start): Process, listed: &ListedProcess) -> bool {
+        (self.boot + start as f64 / self.ticks - listed.started).abs() < 0.5 / self.ticks
     }
 }
 
@@ -132,7 +125,7 @@ pub fn signal_processes(SignalRequest { processes, signal }: SignalRequest) -> R
     let mut handles = Vec::with_capacity(processes.len());
     for process in &processes {
         match Handle::open(process.pid) {
-            Ok(handle) if clock.started(process) => handles.push((process.pid, handle)),
+            Ok(handle) if clock.started(handle.process, process) => handles.push(handle),
             Ok(_) => {}
             Err(error) if error.raw_os_error() == Some(libc::ESRCH) => {}
             Err(error) => return Err(error.to_string()),
@@ -141,24 +134,22 @@ pub fn signal_processes(SignalRequest { processes, signal }: SignalRequest) -> R
     signal_handles(handles, signal)
 }
 
-fn signal_handles(handles: Vec<(u32, Handle)>, signal: Signal) -> Result<(), String> {
+fn signal_handles(handles: Vec<Handle>, signal: Signal) -> Result<(), String> {
     let mut denied = Vec::new();
-    for (pid, handle) in handles {
+    for handle in handles {
         let Err(error) = handle.send(signal) else {
             continue;
         };
         match error.raw_os_error() {
             Some(libc::ESRCH) => {}
-            Some(libc::EPERM) => denied.push(pid.to_string()),
+            Some(libc::EPERM) => denied.push(handle.process),
             _ => return Err(error.to_string()),
         }
     }
     if denied.is_empty() {
         return Ok(());
     }
-    let mut arguments = vec!["-s".to_owned(), signal.name().to_owned(), "--".to_owned()];
-    arguments.extend(denied);
-    elevated("kill", &arguments)
+    luft_app::block_on(client::signal(&denied, signal.number()))
 }
 
 pub fn renice(PriorityRequest { pid, nice }: PriorityRequest) -> Result<(), String> {
@@ -166,25 +157,23 @@ pub fn renice(PriorityRequest { pid, nice }: PriorityRequest) -> Result<(), Stri
         return Err(io::Error::from(io::ErrorKind::InvalidInput).to_string());
     }
     let nice = nice.clamp(-20, 19);
-    let threads = threads(pid);
-    let mut denied = Vec::new();
-    for thread in &threads {
-        if unsafe { libc::setpriority(libc::PRIO_PROCESS, *thread, nice) } == 0 {
+    let Some(start) = start_of(pid) else {
+        return Ok(());
+    };
+    for thread in threads(pid) {
+        if unsafe { libc::setpriority(libc::PRIO_PROCESS, thread, nice) } == 0 {
             continue;
         }
         let error = io::Error::last_os_error();
         match error.raw_os_error() {
             Some(libc::ESRCH) => {}
-            Some(libc::EPERM | libc::EACCES) => denied.push(thread.to_string()),
+            Some(libc::EPERM | libc::EACCES) => {
+                return luft_app::block_on(client::set_priority((pid, start), nice));
+            }
             _ => return Err(error.to_string()),
         }
     }
-    if denied.is_empty() {
-        return Ok(());
-    }
-    let mut arguments = vec!["-n".to_owned(), nice.to_string(), "-p".to_owned()];
-    arguments.extend(denied);
-    elevated("renice", &arguments)
+    Ok(())
 }
 
 pub fn signal_scopes(scopes: &[PathBuf], signal: Signal) -> Result<(), String> {
@@ -202,7 +191,7 @@ pub fn signal_scopes(scopes: &[PathBuf], signal: Signal) -> Result<(), String> {
             scopes
                 .iter()
                 .flat_map(|scope| members(scope))
-                .filter_map(|pid| Some((pid, Handle::open(pid).ok()?)))
+                .filter_map(|pid| Handle::open(pid).ok())
                 .collect(),
             signal,
         ),
@@ -246,27 +235,9 @@ fn threads(pid: u32) -> Vec<u32> {
         .collect()
 }
 
-fn elevated(program: &str, arguments: &[String]) -> Result<(), String> {
-    let path = SYSTEM_BIN_DIRS
-        .iter()
-        .map(|directory| Path::new(directory).join(program))
-        .find(|path| path.is_file())
-        .ok_or_else(|| format!("{program} isn't installed"))?;
-    let output = Command::new("pkexec")
-        .arg(path)
-        .args(arguments)
-        .output()
-        .map_err(|_| "Authentication isn't available on this system".to_owned())?;
-    let message = String::from_utf8_lossy(&output.stderr);
-    let message = message.lines().last().unwrap_or("").trim();
-    match output.status.code() {
-        Some(0) => Ok(()),
-        Some(126) => Err("Authentication was cancelled".to_owned()),
-        Some(127) if message.contains("agent") => {
-            Err("There's nothing to ask for your password right now".to_owned())
-        }
-        Some(127) => Err("You aren't allowed to do that".to_owned()),
-        _ if message.is_empty() => Err("That didn't work".to_owned()),
-        _ => Err(message.to_owned()),
-    }
+fn start_of(pid: u32) -> Option<u64> {
+    fs::read(format!("/proc/{pid}/stat"))
+        .ok()
+        .and_then(|stat| Stat::parse(&stat))
+        .map(|stat| stat.start)
 }

@@ -74,6 +74,7 @@ pub struct Settings {
     pub hidden_places: Vec<String>,
     pub network_places: Vec<NetworkPlace>,
     pub recent_servers: Vec<String>,
+    pub trusted_folders: Vec<String>,
 }
 
 impl Default for Settings {
@@ -107,6 +108,7 @@ impl Default for Settings {
             hidden_places: Vec::new(),
             network_places: Vec::new(),
             recent_servers: Vec::new(),
+            trusted_folders: Vec::new(),
         }
     }
 }
@@ -117,10 +119,14 @@ impl Settings {
     pub fn load() -> Self {
         luft_app::settings::load(FILE).unwrap_or_default()
     }
+
+    pub fn save(&self) -> Result<(), String> {
+        luft_app::settings::save(FILE, self)
+    }
 }
 
 pub fn update_settings(next: Settings, settings: &RwLock<Settings>) -> Result<(), String> {
     let mut current = settings.write();
     *current = next;
-    luft_app::settings::save(FILE, &*current)
+    current.save()
 }

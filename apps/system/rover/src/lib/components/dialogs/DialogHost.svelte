@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { appWindow } from '@lantharos/sabine';
+	import { Dialog } from '@luft/ui';
 	import { commands, events } from '#lib/bindings.js';
 	import type { FileEntry } from '#lib/bindings.js';
 	import type { FileManager } from '#lib/file-manager/manager.svelte.js';
@@ -82,6 +84,20 @@
 {:else if dialog?.kind === 'delete-forever'}
 	{@const ids = dialog.ids}
 	<DeleteForeverDialog count={ids.length} onconfirm={() => manager.actions.deleteForever(ids).then(trash.refresh)} onclose={dialogs.close} />
+{:else if dialog?.kind === 'delete-items'}
+	{@const paths = dialog.paths}
+	<DeleteForeverDialog count={paths.length} onconfirm={() => manager.actions.deleteItems(paths)} onclose={dialogs.close} />
+{:else if dialog?.kind === 'still-working'}
+	<Dialog
+		title="Rover is still working"
+		description="Files are still being copied, moved or deleted. Closing now stops that partway."
+		onclose={dialogs.close}
+	>
+		{#snippet actions()}
+			<button class="button danger" type="button" onclick={() => appWindow.close()}>Close anyway</button>
+			<button class="button primary" type="button" onclick={dialogs.close}>Keep open</button>
+		{/snippet}
+	</Dialog>
 {:else if dialog?.kind === 'connect'}
 	<ConnectDialog {manager} onclose={dialogs.close} />
 {/if}

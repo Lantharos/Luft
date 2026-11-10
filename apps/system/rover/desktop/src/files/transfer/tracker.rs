@@ -99,7 +99,7 @@ impl<'a> Tracker<'a> {
     }
 
     pub fn trash_existing(&mut self, target: &Path) -> Result<(), String> {
-        let trashed = trash::put(target).map_err(|error| error.to_string())?;
+        let trashed = trash::put(target)?;
         self.steps.push(Step::Trashed(trashed));
         Ok(())
     }

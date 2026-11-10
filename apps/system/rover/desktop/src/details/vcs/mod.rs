@@ -1,5 +1,6 @@
 mod command;
 mod git;
+mod trust;
 
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
@@ -11,12 +12,14 @@ use serde::Serialize;
 use specta::Type;
 
 use crate::app::events::VCS_STATUS;
+use crate::app::settings::Settings;
 
 static NEXT_STATUS_ID: AtomicU64 = AtomicU64::new(1);
 
 #[derive(Debug, Serialize, Type)]
 pub struct VcsRoot {
     pub root: String,
+    pub trusted: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Type)]
@@ -54,18 +57,31 @@ pub struct VcsStatusEvent {
     error: Option<String>,
 }
 
-pub fn root(path: String) -> Option<VcsRoot> {
+pub fn root(path: String, settings: &Settings) -> Option<VcsRoot> {
     let root = find_root(Path::new(&path))?;
     command::is_installed().then(|| VcsRoot {
+        trusted: trust::is_trusted(&root, settings),
         root: root.to_string_lossy().into_owned(),
     })
 }
 
-pub fn start_status(root: String, events: Events) -> String {
+pub fn trust(root: String, settings: &mut Settings) -> Result<(), String> {
+    let root = find_root(Path::new(&root))
+        .filter(|found| found.as_path() == Path::new(&root))
+        .ok_or("No versioned project found")?;
+    let root = root.to_string_lossy().into_owned();
+    if !settings.trusted_folders.contains(&root) {
+        settings.trusted_folders.push(root);
+    }
+    settings.save()
+}
+
+pub fn start_status(root: String, settings: &Settings, events: Events) -> String {
     let id = NEXT_STATUS_ID.fetch_add(1, Ordering::Relaxed).to_string();
     let event_id = id.clone();
+    let root = project_root(&root, settings);
     thread::spawn(move || {
-        let result = project_root(&root).and_then(|root| {
+        let result = root.and_then(|root| {
             let status = git::status(&root)?;
             Ok((project(&root, &status), status.files))
         });
@@ -86,15 +102,24 @@ pub fn start_status(root: String, events: Events) -> String {
     id
 }
 
-pub fn diff(root: String, file_path: Option<String>) -> Result<String, String> {
-    git::diff(&project_root(&root)?, file_path)
+pub fn diff(
+    root: String,
+    file_path: Option<String>,
+    settings: &Settings,
+) -> Result<String, String> {
+    git::diff(&project_root(&root, settings)?, file_path)
 }
 
-pub fn save(root: String, message: String, files: Option<Vec<String>>) -> Result<(), String> {
+pub fn save(
+    root: String,
+    message: String,
+    files: Option<Vec<String>>,
+    settings: &Settings,
+) -> Result<(), String> {
     if message.trim().is_empty() {
         return Err("Message is required".to_string());
     }
-    let root = project_root(&root)?;
+    let root = project_root(&root, settings)?;
     let files: Vec<String> = files
         .unwrap_or_default()
         .iter()
@@ -104,15 +129,19 @@ pub fn save(root: String, message: String, files: Option<Vec<String>>) -> Result
     git::save(&root, &message, &files)
 }
 
-pub fn sync(root: String) -> Result<(), String> {
-    git::sync(&project_root(&root)?)
+pub fn sync(root: String, settings: &Settings) -> Result<(), String> {
+    git::sync(&project_root(&root, settings)?)
 }
 
-fn project_root(root: &str) -> Result<PathBuf, String> {
+fn project_root(root: &str, settings: &Settings) -> Result<PathBuf, String> {
     if !Path::new(root).is_dir() {
         return Err(format!("Project folder no longer exists: {root}"));
     }
-    find_root(Path::new(root)).ok_or_else(|| "No versioned project found".to_string())
+    let root = find_root(Path::new(root)).ok_or("No versioned project found")?;
+    if !trust::is_trusted(&root, settings) {
+        return Err(format!("{} isn't a trusted folder", root.display()));
+    }
+    Ok(root)
 }
 
 fn find_root(path: &Path) -> Option<PathBuf> {

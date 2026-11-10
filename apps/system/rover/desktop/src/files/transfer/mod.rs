@@ -161,9 +161,17 @@ fn start(
     Ok(id)
 }
 
+fn make_sure_it_fits(destination: &Path, tracker: &Tracker) -> Result<(), String> {
+    space::ensure_space(destination, tracker.total_bytes).inspect_err(|_| {
+        tracker
+            .queue
+            .set_full(tracker.id, space::drive_folder(destination));
+    })
+}
+
 fn copy_all(plan: &Plan, tracker: &mut Tracker) -> Result<(), String> {
     if let Some((_, destination)) = plan.first() {
-        space::ensure_space(destination, tracker.total_bytes)?;
+        make_sure_it_fits(destination, tracker)?;
     }
     tracker.queue.set_phase(tracker.id, OperationPhase::Copying);
     for (source, destination) in plan {
@@ -175,7 +183,7 @@ fn copy_all(plan: &Plan, tracker: &mut Tracker) -> Result<(), String> {
 fn move_all(plan: &Plan, tracker: &mut Tracker) -> Result<(), String> {
     let crossing = space::crosses_device(plan);
     if crossing && let Some((_, destination)) = plan.first() {
-        space::ensure_space(destination, tracker.total_bytes)?;
+        make_sure_it_fits(destination, tracker)?;
     }
     tracker.queue.set_phase(tracker.id, OperationPhase::Moving);
     for (source, destination) in plan {

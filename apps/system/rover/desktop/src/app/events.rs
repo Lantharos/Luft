@@ -13,8 +13,7 @@ use crate::search::SearchUpdate;
 
 pub const OPERATIONS_CHANGED: BridgeEvent<Vec<Operation>> = BridgeEvent::new("rover.operations");
 pub const DRIVES_CHANGED: BridgeEvent<()> = BridgeEvent::new("rover.drives");
-pub const DIRECTORY_CHANGED: BridgeEvent<DirectoryChanged<'static>> =
-    BridgeEvent::new("rover.directory");
+pub const DIRECTORY_CHANGED: BridgeEvent<DirectoryChanged> = BridgeEvent::new("rover.directory");
 pub const VCS_STATUS: BridgeEvent<VcsStatusEvent> = BridgeEvent::new("rover.vcs");
 pub const HISTORY_CHANGED: BridgeEvent<HistoryState> = BridgeEvent::new("rover.history");
 pub const THUMBNAILS_READY: BridgeEvent<ThumbnailBatch> = BridgeEvent::new("rover.thumbnails");
@@ -24,6 +23,7 @@ pub const FOLDER_COUNTS: BridgeEvent<CountBatch> = BridgeEvent::new("rover.count
 pub const NETWORK_CHANGED: BridgeEvent<()> = BridgeEvent::new("rover.network");
 pub const NETWORK_ASK: BridgeEvent<NetworkAsk> = BridgeEvent::new("rover.network.ask");
 pub const CLOUD_CHANGED: BridgeEvent<()> = BridgeEvent::new("rover.cloud");
+pub const CLOSE_ASKED: BridgeEvent<()> = BridgeEvent::new("rover.closeAsked");
 pub const FILE_ACTIONS_CHANGED: BridgeEvent<Vec<FileAction>> =
     BridgeEvent::new("rover.fileActions");
 
@@ -42,4 +42,5 @@ pub fn declare(window: SabineWindow) -> SabineWindow {
         .bridge_event(&NETWORK_ASK)
         .bridge_event(&CLOUD_CHANGED)
         .bridge_event(&FILE_ACTIONS_CHANGED)
+        .bridge_event(&CLOSE_ASKED)
 }

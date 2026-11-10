@@ -4,7 +4,9 @@ import { invoke, listen, type CallOptions } from "@lantharos/sabine";
 
 export const commands = {
 	acceptChooser: (params: {
+		request: number,
 		paths: string[],
+		filter?: number | null,
 	}, options?: CallOptions) => invoke<null>("accept_chooser", params, options),
 	appState: (options?: CallOptions) => invoke<AppState>("app_state", {}, options),
 	appsForFile: (params: {
@@ -13,7 +15,9 @@ export const commands = {
 	batchRename: (params: {
 		renamings: Renaming[],
 	}, options?: CallOptions) => invoke<null>("batch_rename", params, options),
-	cancelChooser: (options?: CallOptions) => invoke<null>("cancel_chooser", {}, options),
+	cancelChooser: (params: {
+		request: number,
+	}, options?: CallOptions) => invoke<null>("cancel_chooser", params, options),
 	cancelMeasure: (params: {
 		id: number,
 	}, options?: CallOptions) => invoke<null>("cancel_measure", params, options),
@@ -23,6 +27,9 @@ export const commands = {
 	cancelSearch: (params: {
 		id: number,
 	}, options?: CallOptions) => invoke<null>("cancel_search", params, options),
+	chooserConfig: (params: {
+		request: number,
+	}, options?: CallOptions) => invoke<ChooserConfig>("chooser_config", params, options),
 	cloudAddAccount: (params: {
 		token?: string | null,
 	}, options?: CallOptions) => invoke<null>("cloud_add_account", params, options),
@@ -74,6 +81,9 @@ export const commands = {
 		path: string,
 		name: string,
 	}, options?: CallOptions) => invoke<FileEntry>("create_file", params, options),
+	deleteItems: (params: {
+		paths: string[],
+	}, options?: CallOptions) => invoke<null>("delete_items", params, options),
 	deletePermanently: (params: {
 		ids: string[],
 	}, options?: CallOptions) => invoke<null>("delete_permanently", params, options),
@@ -250,7 +260,11 @@ export const commands = {
 	vcsSync: (params: {
 		root: string,
 	}, options?: CallOptions) => invoke<null>("vcs_sync", params, options),
+	vcsTrust: (params: {
+		root: string,
+	}, options?: CallOptions) => invoke<null>("vcs_trust", params, options),
 	watchDirectory: (params: {
+		viewer: number,
 		path: string,
 	}, options?: CallOptions) => invoke<null>("watch_directory", params, options),
 };
@@ -263,6 +277,7 @@ export const events = {
 	appearancePosture: (callback: (payload: Posture) => void) => listen<Posture>("appearance.posture", callback),
 	appearanceTypography: (callback: (payload: Typography) => void) => listen<Typography>("appearance.typography", callback),
 	kestrelPalette: (callback: (payload: Palette) => void) => listen<Palette>("kestrel.palette", callback),
+	roverCloseAsked: (callback: (payload: null) => void) => listen<null>("rover.closeAsked", callback),
 	roverCloud: (callback: (payload: null) => void) => listen<null>("rover.cloud", callback),
 	roverCounts: (callback: (payload: CountBatch) => void) => listen<CountBatch>("rover.counts", callback),
 	roverDirectory: (callback: (payload: DirectoryChanged) => void) => listen<DirectoryChanged>("rover.directory", callback),
@@ -294,7 +309,6 @@ export type AppIcons = {
 };
 
 export type AppState = {
-	chooser: ChooserConfig | null,
 	launch: Launch,
 	settings: Settings,
 	userDirs: UserDirs | null,
@@ -314,6 +328,11 @@ export type Appearance = {
 
 export type ArchiveFormat = "zip" | "tar-zst";
 
+export type Changes = {
+	present: FileEntry[],
+	gone: string[],
+};
+
 export type ChooserConfig = {
 	mode: ChooserMode,
 	title: string,
@@ -323,6 +342,14 @@ export type ChooserConfig = {
 	currentFolder: string | null,
 	currentName: string | null,
 	files: string[],
+	filters: ChooserFilter[],
+	filter: number | null,
+};
+
+export type ChooserFilter = {
+	name: string,
+	patterns: string[],
+	mimeTypes: string[],
 };
 
 export type ChooserMode = "open" | "save" | "save_files";
@@ -360,6 +387,7 @@ export type Counted = {
 
 export type DirectoryChanged = {
 	path: string,
+	changes: Changes | null,
 };
 
 export type DirectoryContents = {
@@ -527,6 +555,7 @@ export type Operation = {
 	totalItems: number,
 	conflict: Conflict | null,
 	error: string | null,
+	full: string | null,
 	created: string[],
 	startedAt: number,
 	completedAt: number | null,
@@ -625,6 +654,7 @@ export type Settings = {
 	hiddenPlaces: string[],
 	networkPlaces: NetworkPlace[],
 	recentServers: string[],
+	trustedFolders: string[],
 };
 
 export type Side = "thisDevice" | "cloud";
@@ -692,6 +722,7 @@ export type VcsProject = {
 
 export type VcsRoot = {
 	root: string,
+	trusted: boolean,
 };
 
 export type VcsStatusEvent = {

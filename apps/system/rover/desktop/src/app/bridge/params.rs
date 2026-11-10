@@ -59,6 +59,24 @@ pub struct Paths {
 }
 
 #[derive(Deserialize, Type)]
+pub struct Watching {
+    pub viewer: u32,
+    pub path: String,
+}
+
+#[derive(Deserialize, Type)]
+pub struct Chooser {
+    pub request: u32,
+}
+
+#[derive(Deserialize, Type)]
+pub struct Chosen {
+    pub request: u32,
+    pub paths: Vec<String>,
+    pub filter: Option<u32>,
+}
+
+#[derive(Deserialize, Type)]
 pub struct Ids {
     pub ids: Vec<String>,
 }

@@ -1,21 +1,36 @@
+import { appWindow } from '@lantharos/sabine';
 import { join } from '@luft/ui';
 import { commands } from '#lib/bindings.js';
 import type { ChooserConfig, FileEntry, PinnedFolder } from '#lib/bindings.js';
+import { filterMatcher } from './chooser-filter';
 import type { FileManager } from './manager.svelte';
+
+const CHOOSER_ADDRESS = /^#chooser\/(\d+)$/;
+
+export function chooserRequest() {
+	const request = CHOOSER_ADDRESS.exec(location.hash)?.[1];
+	return request ? Number(request) : null;
+}
 
 export class ChooserState {
 	readonly config: ChooserConfig;
+	#request: number;
 	#manager: FileManager;
 	#finished = false;
 	saveName = $state('');
+	filter = $state<number | null>(null);
 
 	acceptPaths = $derived.by(() => this.#acceptPaths());
 	canAccept = $derived(this.acceptPaths.length > 0);
 
-	constructor(config: ChooserConfig, manager: FileManager) {
+	constructor(request: number, config: ChooserConfig, manager: FileManager) {
+		this.#request = request;
 		this.config = config;
 		this.#manager = manager;
 		this.saveName = config.currentName ?? '';
+		this.filter = config.filter ?? (config.filters.length > 0 ? 0 : null);
+		const matchers = config.filters.map(filterMatcher);
+		manager.entryFilter = (entry) => this.filter === null || matchers[this.filter](entry);
 	}
 
 	accepts = (entry: Pick<FileEntry, 'isDir'>) => {
@@ -56,13 +71,17 @@ export class ChooserState {
 	submit = async (paths = this.acceptPaths) => {
 		if (this.#finished || paths.length === 0) return;
 		this.#finished = true;
-		await commands.acceptChooser({ paths }).catch((error) => console.error('Could not return the chosen files', error));
+		await commands
+			.acceptChooser({ request: this.#request, paths, filter: this.filter })
+			.catch((error) => console.error('Could not return the chosen files', error));
+		await appWindow.close();
 	};
 
 	cancel = async () => {
 		if (this.#finished) return;
 		this.#finished = true;
-		await commands.cancelChooser().catch((error) => console.error('Could not cancel the file chooser', error));
+		await commands.cancelChooser({ request: this.#request }).catch((error) => console.error('Could not cancel the file chooser', error));
+		await appWindow.close();
 	};
 
 	#acceptPaths() {

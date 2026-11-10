@@ -7,7 +7,7 @@ use std::path::{Path, PathBuf};
 use chrono::Local;
 
 use super::locations::trash_for;
-use crate::files::privileged::{create_dir_all, is_permission_error, os, run_pkexec};
+use crate::files::privileged::{self, create_dir_all, is_permission_error};
 use crate::files::{rename_no_replace, uri_path};
 
 #[derive(Debug, Clone)]
@@ -17,7 +17,22 @@ pub struct Trashed {
     pub info: PathBuf,
 }
 
-pub fn put(path: &Path) -> io::Result<Trashed> {
+pub fn put(path: &Path) -> Result<Trashed, String> {
+    match place(path) {
+        Ok(trashed) => Ok(trashed),
+        Err(error) if is_permission_error(&error) => {
+            let trashed = privileged::trash(path)?;
+            Ok(Trashed {
+                original: path.to_path_buf(),
+                file: trashed.file,
+                info: trashed.info,
+            })
+        }
+        Err(error) => Err(error.to_string()),
+    }
+}
+
+fn place(path: &Path) -> io::Result<Trashed> {
     let name = path
         .file_name()
         .ok_or_else(|| io::Error::other("This item can't be moved to the trash"))?;
@@ -85,15 +100,9 @@ pub fn restore(item: &Trashed) -> Result<PathBuf, String> {
         Err(error) if error.kind() == io::ErrorKind::AlreadyExists => {
             return Err(format!("{} already exists", item.original.display()));
         }
-        Err(error) if is_permission_error(&error) => run_pkexec(
-            "mv",
-            &[
-                os("--no-clobber"),
-                os("--"),
-                item.file.as_os_str().into(),
-                item.original.as_os_str().into(),
-            ],
-        )?,
+        Err(error) if is_permission_error(&error) => {
+            privileged::move_to(&item.file, &item.original)?;
+        }
         Err(error) => return Err(error.to_string()),
     }
     let _ = fs::remove_file(&item.info);

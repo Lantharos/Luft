@@ -7,6 +7,7 @@ mod integration;
 mod locations;
 mod search;
 
+use app::events::CLOSE_ASKED;
 use app::state::RoverState;
 use luft_app::GlassWindow;
 use sabine::SabineWindow;
@@ -24,19 +25,29 @@ pub fn run_app() -> ! {
     let state = RoverState::new();
     luft_app::run(
         &state.events,
-        |window| build_window(window, &state),
+        |window| {
+            let working = state.clone();
+            let window =
+                glass_window(window, APP_NAME, Some(APP_ID)).on_close_requested(move |_| {
+                    let busy = working.queue.is_busy();
+                    if busy {
+                        working.events.emit(CLOSE_ASKED, ());
+                    }
+                    !busy
+                });
+            app::bridge::register(window, &state)
+        },
         locations::drives::watch_mounts,
     )
 }
 
-fn build_window(window: SabineWindow, state: &RoverState) -> SabineWindow {
-    let title = state.title();
-    let glass = GlassWindow {
-        title: &title,
+fn glass_window(window: SabineWindow, title: &str, single_instance: Option<&str>) -> SabineWindow {
+    GlassWindow {
+        title,
         size: (1200, 800),
         min_size: (800, 600),
         sidebar_width: 260,
-        single_instance: state.chooser.is_none().then_some(APP_ID),
-    };
-    app::bridge::register(glass.apply(window), state)
+        single_instance,
+    }
+    .apply(window)
 }

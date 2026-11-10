@@ -15,6 +15,7 @@
 	import EyeOff from '@lucide/svelte/icons/eye-off';
 	import FilePlus from '@lucide/svelte/icons/file-plus';
 	import FolderPlus from '@lucide/svelte/icons/folder-plus';
+	import GitBranch from '@lucide/svelte/icons/git-branch';
 	import Globe from '@lucide/svelte/icons/globe';
 	import Info from '@lucide/svelte/icons/info';
 	import Link from '@lucide/svelte/icons/link';
@@ -206,12 +207,12 @@
 		{/if}
 		{@render item(Info, 'Properties', () => tools.showProperties(targets))}
 		<MenuSeparator />
-		{@render item(Trash2, 'Move to trash', manager.actions.trashSelected, true)}
+		{@render item(Trash2, cloudDrive ? 'Delete permanently…' : 'Move to trash', manager.actions.trashSelected, true)}
 	{:else}
 		{@render item(FolderPlus, 'New folder', () => manager.startCreate('folder'))}
 		{@render item(FilePlus, 'New file', () => manager.startCreate('file'))}
 		<MenuSeparator />
-		{@render item(Clipboard, 'Paste', manager.actions.paste, false, manager.clipboard.items.length === 0)}
+		{@render item(Clipboard, 'Paste', manager.actions.paste, false, !manager.canPaste)}
 		<MenuSeparator />
 		{@render item(Search, 'Search in this folder', () => tools.searchHere(manager))}
 		{@render item(Terminal, 'Open terminal here', () => tools.openTerminal(manager, manager.currentPath))}
@@ -224,6 +225,9 @@
 			{@render item(Code, 'View project changes', () => viewChanges(null))}
 			{@render item(Check, 'Commit changes', () => saveChanges(null))}
 			{@render item(RefreshCw, 'Sync project', vcs.sync)}
+		{:else if vcs.untrusted}
+			<MenuSeparator />
+			{@render item(GitBranch, 'Show Git status…', () => (vcs.asking = true))}
 		{/if}
 	{/if}
 </ContextMenu>

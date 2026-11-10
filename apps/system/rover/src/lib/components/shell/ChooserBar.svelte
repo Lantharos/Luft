@@ -2,7 +2,7 @@
 	import File from '@lucide/svelte/icons/file';
 	import FolderOpen from '@lucide/svelte/icons/folder-open';
 	import Save from '@lucide/svelte/icons/save';
-	import { plural } from '@luft/ui';
+	import { plural, Select } from '@luft/ui';
 	import type { ChooserState } from '#lib/file-manager/chooser.svelte.js';
 
 	interface Props {
@@ -58,6 +58,15 @@
 			<div class="truncate text-[12px] text-[var(--text-muted)]">{selectionText}</div>
 		</div>
 	</div>
+
+	{#if chooser.filter !== null}
+		<Select
+			label="Kind of file"
+			options={config.filters.map((filter, index) => ({ value: index, label: filter.name }))}
+			value={chooser.filter}
+			onchange={(index) => (chooser.filter = index)}
+		/>
+	{/if}
 
 	{#if config.mode === 'save'}
 		<div class="flex w-[320px] min-w-0 items-center gap-2">

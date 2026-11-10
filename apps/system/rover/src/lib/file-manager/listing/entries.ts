@@ -19,8 +19,8 @@ export function sortedEntries(items: FileEntry[], sortBy: SortBy, sortAsc: boole
 	});
 }
 
-export function visibleEntries(items: FileEntry[], query: string) {
+export function visibleEntries(items: FileEntry[], query: string, shows: ((entry: FileEntry) => boolean) | null) {
 	const normalized = query.trim().toLowerCase();
-	if (!normalized) return items;
-	return items.filter((entry) => entry.name.toLowerCase().includes(normalized));
+	if (!normalized && !shows) return items;
+	return items.filter((entry) => entry.name.toLowerCase().includes(normalized) && (!shows || shows(entry)));
 }

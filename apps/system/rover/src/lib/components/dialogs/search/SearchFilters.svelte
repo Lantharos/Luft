@@ -26,6 +26,12 @@
 		{ value: 'large', label: 'Over 100 MB' }
 	];
 
+	interface Props {
+		online: boolean;
+	}
+
+	let { online }: Props = $props();
+
 	function update(change: () => void) {
 		change();
 		search.schedule();
@@ -38,6 +44,6 @@
 	<Select label="Size" options={SIZES} value={search.size} onchange={(value) => update(() => (search.size = value))} />
 	<label class="ml-auto flex items-center gap-2.5 text-[13px] text-[var(--text-soft)]">
 		<span>Look inside files</span>
-		<Switch label="Look inside files" checked={search.contents} onchange={(value) => update(() => (search.contents = value))} />
+		<Switch label="Look inside files" checked={search.contents && !online} disabled={online} onchange={(value) => update(() => (search.contents = value))} />
 	</label>
 </div>

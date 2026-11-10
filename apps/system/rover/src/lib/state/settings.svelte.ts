@@ -19,7 +19,8 @@ const DEFAULT_SETTINGS: Settings = {
 	groupBy: 'none',
 	hiddenPlaces: [],
 	networkPlaces: [],
-	recentServers: []
+	recentServers: [],
+	trustedFolders: []
 };
 
 class SettingsState {

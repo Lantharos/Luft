@@ -19,16 +19,7 @@ static SEARCH_PATH: LazyLock<Vec<PathBuf>> = LazyLock::new(|| {
     if let Some(home) = dirs::home_dir() {
         paths.extend([".local/bin", ".cargo/bin", ".bun/bin"].map(|dir| home.join(dir)));
     }
-    paths.extend(
-        [
-            "/usr/local/bin",
-            "/usr/bin",
-            "/bin",
-            "/run/current-system/sw/bin",
-            "/nix/var/nix/profiles/default/bin",
-        ]
-        .map(PathBuf::from),
-    );
+    paths.extend(["/usr/local/bin", "/usr/bin"].map(PathBuf::from));
     paths
 });
 

@@ -6,7 +6,6 @@ use parking_lot::RwLock;
 use serde::Serialize;
 use specta::Type;
 
-use crate::APP_NAME;
 use crate::app::events::THUMBNAILS_READY;
 use crate::app::settings::Settings;
 use crate::details::properties::Measurements;
@@ -15,7 +14,7 @@ use crate::files::entries::{self, UserDirs};
 use crate::files::operations::OperationsQueue;
 use crate::files::watch::DirectoryWatcher;
 use crate::history::History;
-use crate::integration::chooser::{ChooserConfig, ChooserSession};
+use crate::integration::chooser::{ChooserResponse, Choosers};
 use crate::integration::launch_args::{self, Launch};
 use crate::search::Search;
 
@@ -30,7 +29,7 @@ pub struct RoverState {
     pub search: Search,
     pub measurements: Measurements,
     pub settings: Arc<RwLock<Settings>>,
-    pub chooser: Option<Arc<ChooserSession>>,
+    pub choosers: Choosers,
     launch: Arc<Launch>,
     user_dirs: Arc<Option<UserDirs>>,
 }
@@ -38,7 +37,6 @@ pub struct RoverState {
 #[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct AppState {
-    chooser: Option<ChooserConfig>,
     launch: Launch,
     settings: Settings,
     user_dirs: Option<UserDirs>,
@@ -61,25 +59,22 @@ impl RoverState {
             queue,
             watcher: DirectoryWatcher::new(events.clone()),
             settings: Arc::new(RwLock::new(Settings::load())),
-            chooser: ChooserSession::from_environment().map(Arc::new),
+            choosers: Choosers::default(),
             launch: Arc::new(launch_args::resolve(&Activation::current_process())),
             user_dirs: Arc::new(user_dirs),
             events,
         }
     }
 
-    pub fn title(&self) -> String {
-        self.chooser
-            .as_ref()
-            .map(|session| session.config.title.clone())
-            .filter(|title| !title.is_empty())
-            .unwrap_or_else(|| APP_NAME.to_string())
+    /// Answers a file chooser and stops following the folder it showed.
+    pub fn finish_chooser(&self, request: u32, response: ChooserResponse) {
+        self.choosers.respond(request, response);
+        self.watcher.forget(request);
     }
 
     pub async fn app_state(&self) -> AppState {
         let appearance = Appearance::current().await;
         AppState {
-            chooser: self.chooser.as_ref().map(|session| session.config.clone()),
             launch: self.launch.as_ref().clone(),
             settings: self.settings.read().clone(),
             user_dirs: self.user_dirs.as_ref().clone(),

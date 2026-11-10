@@ -1,3 +1,4 @@
+pub mod awake;
 pub mod counts;
 pub mod entries;
 pub mod folders;

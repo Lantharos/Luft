@@ -1,5 +1,5 @@
 use std::fs::{self, DirBuilder, File, OpenOptions};
-use std::io::{self, Read, Write};
+use std::io;
 use std::os::unix::fs::{DirBuilderExt, MetadataExt, OpenOptionsExt, symlink};
 use std::path::{Path, PathBuf};
 
@@ -7,9 +7,9 @@ use super::resolve::available_destination;
 use super::tracker::{Mode, Tracker};
 use crate::details::look;
 use crate::files::operations::Resolution;
-use crate::files::privileged::{is_permission_error, os, remove_path, run_pkexec};
+use crate::files::privileged::{self, is_permission_error, remove_path};
+use luft_files::data;
 
-const COPY_BUFFER_SIZE: usize = 1024 * 1024;
 const PERMISSION_BITS: u32 = 0o777;
 const OWNER_ACCESS: u32 = 0o700;
 
@@ -102,6 +102,9 @@ fn fill(source: &Path, target: &Path, placed: Placed, tracker: &mut Tracker) -> 
                 .map_err(|error| error.to_string())?
                 .permissions();
             fs::set_permissions(target, permissions).map_err(|error| error.to_string())?;
+            if let (Ok(from), Ok(to)) = (File::open(source), File::open(target)) {
+                let _ = data::attributes(&from, &to);
+            }
             let _ = look::copy(source, target);
             Ok(())
         }
@@ -123,26 +126,15 @@ fn merge(source: &Path, target: &Path, tracker: &mut Tracker) -> Result<(), Stri
     Ok(())
 }
 
-fn stream(
-    source: &Path,
-    mut input: File,
-    mut output: File,
-    tracker: &mut Tracker,
-) -> Result<(), String> {
+fn stream(source: &Path, input: File, output: File, tracker: &mut Tracker) -> Result<(), String> {
     tracker.set_file(source);
-    let mut buffer = vec![0_u8; COPY_BUFFER_SIZE];
-    loop {
-        tracker.guard()?;
-        let read = input.read(&mut buffer).map_err(|error| error.to_string())?;
-        if read == 0 {
-            break;
-        }
-        output
-            .write_all(&buffer[..read])
-            .map_err(|error| error.to_string())?;
-        tracker.add_bytes(read as u64, source);
-    }
     let metadata = input.metadata().map_err(|error| error.to_string())?;
+    data::contents(&input, &output, metadata.len(), |bytes| {
+        tracker.add_bytes(bytes, source);
+        tracker.guard().map_err(io::Error::other)
+    })
+    .map_err(|error| error.to_string())?;
+    let _ = data::attributes(&input, &output);
     output
         .set_permissions(metadata.permissions())
         .map_err(|error| error.to_string())?;
@@ -163,16 +155,7 @@ fn copy_elevated(
     } else {
         target.to_path_buf()
     };
-    run_pkexec(
-        "cp",
-        &[
-            os("-a"),
-            os("--no-clobber"),
-            os("--"),
-            source.as_os_str().into(),
-            target.as_os_str().into(),
-        ],
-    )?;
+    privileged::copy(source, &target)?;
     tracker.mark_done(source)?;
     if record {
         tracker.placed(source, &target)?;

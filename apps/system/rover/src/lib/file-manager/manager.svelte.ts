@@ -1,7 +1,7 @@
 import { SvelteSet } from 'svelte/reactivity';
 import { appearance, basename, errorText, parent } from '@luft/ui';
 import { commands } from '#lib/bindings.js';
-import type { AppState, DriveInfo, FileEntry, GroupBy, Operation, PinnedFolder, SortBy, TrashContents, UserDirs, ViewMode } from '#lib/bindings.js';
+import type { AppState, Changes, DriveInfo, FileEntry, GroupBy, Operation, PinnedFolder, SortBy, TrashContents, UserDirs, ViewMode } from '#lib/bindings.js';
 import * as api from '#lib/bridge/index.js';
 import { folderLooks } from '#lib/features/looks/looks.svelte.js';
 import { FileActionsState } from '#lib/features/fileActions.svelte.js';
@@ -75,6 +75,8 @@ export class FileManager {
 	converter = $state(false);
 	placeMenu = $state.raw<PlaceMenuState | null>(null);
 	clipboard = $state.raw<ClipboardState>({ items: [], operation: null });
+	canPaste = $state(false);
+	entryFilter = $state.raw<((entry: FileEntry) => boolean) | null>(null);
 	notice = $state<string | null>(null);
 	operations = $state.raw<Operation[]>([]);
 	arrival = $state.raw<Arrival | null>(null);
@@ -84,7 +86,8 @@ export class FileManager {
 		groupEntries(
 			visibleEntries(
 				this.view === 'recent' ? this.entries : sortedEntries(this.entries, settings.value.sortBy, settings.value.sortAsc),
-				this.searchQuery
+				this.searchQuery,
+				this.entryFilter
 			),
 			this.grouping,
 			this.view !== 'recent' && settings.value.sortBy === 'date' && settings.value.sortAsc
@@ -104,6 +107,11 @@ export class FileManager {
 	#selectingWhenDone = new Set<string>();
 	#capture: () => ViewMemory | null = () => null;
 	#recalling: ViewMemory | null = null;
+	#viewer: number;
+
+	constructor(viewer: number) {
+		this.#viewer = viewer;
+	}
 
 	captureViewWith = (capture: () => ViewMemory | null) => {
 		this.#capture = capture;
@@ -197,7 +205,7 @@ export class FileManager {
 			const listing = await commands.listDirectory({ path, showHidden: settings.value.showHidden });
 			if (!this.loading.isCurrent(token)) return;
 			this.#showListing(listing.path, listing.entries);
-			void commands.watchDirectory({ path: listing.path });
+			void commands.watchDirectory({ viewer: this.#viewer, path: listing.path });
 		} catch (caught) {
 			if (!this.loading.isCurrent(token)) return;
 			this.#showListing(path, []);
@@ -215,6 +223,20 @@ export class FileManager {
 		this.cloud.follow(path);
 		const present = new Set(listing.entries.map((entry) => entry.path));
 		for (const selected of this.selection) if (!present.has(selected)) this.selection.delete(selected);
+	};
+
+	applyChanges = (path: string, { present, gone }: Changes) => {
+		if (this.view !== 'home' || this.currentPath !== path || this.loading.active) return;
+		const entries = new Map(this.entries.map((entry) => [entry.path, entry]));
+		for (const removed of gone) {
+			entries.delete(removed);
+			this.selection.delete(removed);
+		}
+		for (const entry of present) {
+			if (settings.value.showHidden || !entry.isHidden) entries.set(entry.path, entry);
+		}
+		this.entries = [...entries.values()];
+		this.cloud.follow(path);
 	};
 
 	loadTrash = async () => {

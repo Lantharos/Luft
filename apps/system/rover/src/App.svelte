@@ -19,7 +19,9 @@
 	import Toolbar from '#lib/components/toolbar/Toolbar.svelte';
 	import VcsPanel from '#lib/components/vcs/VcsPanel.svelte';
 	import VcsSaveDialog from '#lib/components/vcs/VcsSaveDialog.svelte';
-	import { ChooserState } from '#lib/file-manager/chooser.svelte.js';
+	import VcsTrustDialog from '#lib/components/vcs/VcsTrustDialog.svelte';
+	import { dialogs } from '#lib/features/dialogs.svelte.js';
+	import { chooserRequest, ChooserState } from '#lib/file-manager/chooser.svelte.js';
 	import { DragController } from '#lib/file-manager/drag/controller.svelte.js';
 	import { handleKeydown } from '#lib/file-manager/keyboard.js';
 	import { FileManager } from '#lib/file-manager/manager.svelte.js';
@@ -29,7 +31,8 @@
 	import { ViewState } from '#lib/file-manager/view/view-state.svelte.js';
 	import { VcsState } from '#lib/vcs/state.svelte.js';
 
-	const manager = new FileManager();
+	const request = chooserRequest();
+	const manager = new FileManager(request ?? 0);
 	const drag = new DragController(manager);
 	const vcs = new VcsState();
 	const trash = new TrashCounter();
@@ -61,8 +64,10 @@
 			events.roverCloud(manager.cloud.load),
 			events.roverNetworkAsk(manager.network.receiveAsk),
 			events.roverVcs(vcs.receive),
-			events.roverDirectory(({ path }) => {
-				void manager.refreshListing(path);
+			events.roverCloseAsked(dialogs.stillWorking),
+			events.roverDirectory(({ path, changes }) => {
+				if (changes) manager.applyChanges(path, changes);
+				else void manager.refreshListing(path);
 				vcs.refresh();
 			}),
 			sabineEvents.singleInstance((activation) => void openActivation(manager, activation))
@@ -82,9 +87,10 @@
 
 	async function start() {
 		const state = await commands.appState();
-		chooser = state.chooser && new ChooserState(state.chooser, manager);
-		await manager.start(state, state.chooser?.currentFolder ?? undefined);
-		if (!state.chooser) await openLaunch(manager, state.launch);
+		if (request !== null) chooser = new ChooserState(request, await commands.chooserConfig({ request }), manager);
+		await manager.start(state, chooser?.config.currentFolder ?? undefined);
+		if (!chooser) await openLaunch(manager, state.launch);
+		void manager.actions.watchClipboard();
 		const operations = await commands.listOperations();
 		manager.receiveOperations(operations);
 		trash.receiveOperations(operations);
@@ -93,6 +99,7 @@
 	function refreshOnFocus() {
 		vcs.refresh();
 		void trash.refresh();
+		void manager.actions.watchClipboard();
 	}
 
 	function dismissContextMenu(event: Event) {
@@ -138,7 +145,7 @@
 			{/if}
 		</main>
 
-		<OperationDock operations={manager.operations} />
+		<OperationDock operations={manager.operations} onerror={manager.notify} />
 		<QuickLook />
 
 		{#if manager.contextMenu && !chooser}
@@ -153,6 +160,7 @@
 		{/if}
 
 		<VcsSaveDialog {vcs} />
+		<VcsTrustDialog {vcs} />
 		<DialogHost {manager} {trash} />
 	</GlassShell>
 </div>

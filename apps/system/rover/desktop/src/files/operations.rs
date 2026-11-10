@@ -9,6 +9,7 @@ use parking_lot::{Condvar, Mutex, RwLock};
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
+use super::awake::Awake;
 use crate::app::events::OPERATIONS_CHANGED;
 
 const PROGRESS_EMIT_INTERVAL: Duration = Duration::from_millis(100);
@@ -94,6 +95,7 @@ pub struct Operation {
     pub total_items: usize,
     pub conflict: Option<Conflict>,
     pub error: Option<String>,
+    pub full: Option<String>,
     pub created: Vec<String>,
     pub started_at: i64,
     pub completed_at: Option<i64>,
@@ -116,6 +118,7 @@ struct Inner {
     pausing: Mutex<()>,
     unpaused: Condvar,
     events: Events,
+    awake: Awake,
     last_emit: Mutex<Instant>,
     next_id: AtomicU64,
 }
@@ -129,6 +132,7 @@ impl OperationsQueue {
                 pausing: Mutex::new(()),
                 unpaused: Condvar::new(),
                 events,
+                awake: Awake::new(),
                 last_emit: Mutex::new(Instant::now()),
                 next_id: AtomicU64::new(1),
             }),
@@ -165,13 +169,23 @@ impl OperationsQueue {
                 total_items: total_items.max(1),
                 conflict: None,
                 error: None,
+                full: None,
                 created: Vec::new(),
                 started_at: now,
                 completed_at: None,
             });
+            self.inner.awake.keep(true);
         }
         self.emit();
         id
+    }
+
+    pub fn is_busy(&self) -> bool {
+        self.inner
+            .operations
+            .read()
+            .iter()
+            .any(|operation| !operation.is_finished())
     }
 
     pub fn operations(&self) -> Vec<Operation> {
@@ -223,6 +237,10 @@ impl OperationsQueue {
 
     pub fn set_phase(&self, id: &str, phase: OperationPhase) {
         self.update(id, true, |operation| operation.phase = phase);
+    }
+
+    pub fn set_full(&self, id: &str, folder: String) {
+        self.update(id, true, |operation| operation.full = Some(folder));
     }
 
     pub fn set_destination(&self, id: &str, label: Option<String>, removable: bool) {
@@ -293,6 +311,11 @@ impl OperationsQueue {
                 operation.completed_at = completed_at;
             }),
         }
+        let operations = self.inner.operations.read();
+        self.inner
+            .awake
+            .keep(operations.iter().any(|operation| !operation.is_finished()));
+        drop(operations);
         result
     }
 

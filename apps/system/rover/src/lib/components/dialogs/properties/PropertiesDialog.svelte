@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { bytes, dateTime, Dialog, errorText, parent, plural, Spinner } from '@luft/ui';
 	import { commands, events } from '#lib/bindings.js';
+	import { exploreSpace } from '#lib/bridge/index.js';
 	import type { DriveInfo, FileDetails, FileEntry, Measurement, Ownership } from '#lib/bindings.js';
 	import DefaultApp from './DefaultApp.svelte';
 	import PermissionGrid from './PermissionGrid.svelte';
@@ -132,6 +133,10 @@
 	{/if}
 
 	{#snippet actions()}
+		{#if drive}
+			{@const folder = drive.mountPoint}
+			<button class="button" type="button" onclick={() => exploreSpace(folder).then(onclose, (caught) => (error = errorText(caught)))}>Free up space</button>
+		{/if}
 		<button class="button" type="button" onclick={onclose}>Done</button>
 	{/snippet}
 </Dialog>

@@ -1,22 +1,14 @@
 use std::collections::HashMap;
-use std::env;
-use std::fs::{self, DirBuilder};
-use std::os::unix::fs::DirBuilderExt;
-use std::path::{Path, PathBuf};
-use std::sync::atomic::{AtomicU64, Ordering};
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::path::Path;
 
 use luft_dbus_macros::introspect;
-use tokio::process::Command;
 use url::Url;
 use zbus::interface;
 use zbus::{OwnedObjectPath, OwnedVariant, Variant};
 
-use super::chooser::{
-    ACCEPT_LABEL_ENV, CURRENT_FOLDER_ENV, CURRENT_NAME_ENV, ChooserMode, ChooserResponse,
-    DIRECTORY_ENV, FILES_ENV, MODE_ENV, MULTIPLE_ENV, RESPONSE_ENV, TITLE_ENV,
-};
-use super::{data_dir, install_dbus_service, serve_dbus, write_file};
+use super::chooser::{ChooserConfig, ChooserFilter, ChooserMode, ChooserResponse};
+use super::{data_dir, install_dbus_service, serve, write_file};
+use crate::app::state::RoverState;
 
 const BUS_NAME: &str = "org.freedesktop.impl.portal.desktop.rover";
 const PORTAL_PATH: &str = "/org/freedesktop/portal/desktop";
@@ -26,10 +18,12 @@ const RESPONSE_CANCELLED: u32 = 1;
 
 type Options = HashMap<String, OwnedVariant>;
 type Results = HashMap<String, OwnedVariant>;
+type Filter = (String, Vec<(u32, String)>);
 
-#[derive(Default)]
+const GLOB: u32 = 0;
+
 struct FileChooser {
-    next_request: AtomicU64,
+    state: RoverState,
 }
 
 #[introspect]
@@ -40,11 +34,12 @@ impl FileChooser {
         &self,
         _handle: OwnedObjectPath,
         _app_id: String,
-        _parent_window: String,
+        parent_window: String,
         title: String,
         options: Options,
     ) -> zbus::fdo::Result<(u32, Results)> {
-        self.choose(title, &options, ChooserMode::Open).await
+        self.choose(parent_window, title, &options, ChooserMode::Open)
+            .await
     }
 
     #[zbus(out_args("response", "results"))]
@@ -52,11 +47,12 @@ impl FileChooser {
         &self,
         _handle: OwnedObjectPath,
         _app_id: String,
-        _parent_window: String,
+        parent_window: String,
         title: String,
         options: Options,
     ) -> zbus::fdo::Result<(u32, Results)> {
-        self.choose(title, &options, ChooserMode::Save).await
+        self.choose(parent_window, title, &options, ChooserMode::Save)
+            .await
     }
 
     #[zbus(out_args("response", "results"))]
@@ -64,32 +60,65 @@ impl FileChooser {
         &self,
         _handle: OwnedObjectPath,
         _app_id: String,
-        _parent_window: String,
+        parent_window: String,
         title: String,
         options: Options,
     ) -> zbus::fdo::Result<(u32, Results)> {
-        self.choose(title, &options, ChooserMode::SaveFiles).await
+        self.choose(parent_window, title, &options, ChooserMode::SaveFiles)
+            .await
     }
 }
 
 impl FileChooser {
     async fn choose(
         &self,
+        parent_window: String,
         title: String,
         options: &Options,
         mode: ChooserMode,
     ) -> zbus::fdo::Result<(u32, Results)> {
-        let folder = ResponseFolder::create(self.next_request.fetch_add(1, Ordering::Relaxed))
-            .map_err(zbus::fdo::Error::Failed)?;
-        let response = run_chooser(&folder.response(), title, options, mode)
-            .await
-            .map_err(zbus::fdo::Error::Failed)?;
-        Ok(portal_results(response))
+        let filters = option_filters(options);
+        let config = chooser_config(title, options, &filters, mode);
+        let state = self.state.clone();
+        let answered = tokio::task::spawn_blocking(move || {
+            let closing = state.clone();
+            state.choosers.open(config, &parent_window, move |request| {
+                closing.finish_chooser(request, ChooserResponse::default());
+            })
+        })
+        .await
+        .map_err(|error| zbus::fdo::Error::Failed(error.to_string()))?
+        .map_err(zbus::fdo::Error::Failed)?;
+        let response = answered.await.unwrap_or_default();
+        Ok(portal_results(response, filters))
     }
 }
 
-pub fn run() -> Result<(), String> {
-    serve_dbus(BUS_NAME, PORTAL_PATH, FileChooser::default())
+/// Answers the desktop portal's file chooser requests from one process that
+/// stays without a window of its own and opens one for each chooser.
+pub fn run() -> ! {
+    let state = RoverState::new();
+    let choosers = state.choosers.clone();
+    let serving = state.clone();
+    luft_app::run(
+        &state.events,
+        |window| {
+            let window = crate::glass_window(window, crate::APP_NAME, None)
+                .background()
+                .on_launched(move |process| choosers.attach(process));
+            crate::app::bridge::register(window, &state)
+        },
+        move |events| {
+            crate::locations::drives::watch_mounts(events);
+            luft_app::spawn(async move {
+                let chooser = FileChooser { state: serving };
+                if let Err(error) = serve(BUS_NAME, PORTAL_PATH, chooser).await {
+                    eprintln!("Rover file chooser portal failed: {error}");
+                    std::process::exit(1);
+                }
+            });
+        },
+    )
 }
 
 pub fn install() -> Result<(), String> {
@@ -100,58 +129,29 @@ pub fn install() -> Result<(), String> {
     )
 }
 
-async fn run_chooser(
-    response_path: &Path,
+fn chooser_config(
     title: String,
     options: &Options,
+    filters: &[Filter],
     mode: ChooserMode,
-) -> Result<ChooserResponse, String> {
-    let exe = env::args_os()
-        .next()
-        .ok_or("Rover doesn't know where it's installed")?;
-    let directory = option_bool(options, "directory").unwrap_or(mode == ChooserMode::SaveFiles);
-    let files = serde_json::to_string(&option_files(options)).map_err(|error| error.to_string())?;
-    let status = Command::new(exe)
-        .env(RESPONSE_ENV, response_path)
-        .env(MODE_ENV, mode.as_str())
-        .env(TITLE_ENV, title)
-        .env(
-            ACCEPT_LABEL_ENV,
-            option_string(options, "accept_label").unwrap_or_default(),
-        )
-        .env(DIRECTORY_ENV, if directory { "1" } else { "0" })
-        .env(
-            MULTIPLE_ENV,
-            if option_bool(options, "multiple").unwrap_or(false) {
-                "1"
-            } else {
-                "0"
-            },
-        )
-        .env(
-            CURRENT_FOLDER_ENV,
-            current_folder(options).unwrap_or_default(),
-        )
-        .env(
-            CURRENT_NAME_ENV,
-            option_string(options, "current_name").unwrap_or_default(),
-        )
-        .env(FILES_ENV, files)
-        .status()
-        .await
-        .map_err(|error| error.to_string())?;
-
-    let response = fs::read(response_path)
-        .ok()
-        .and_then(|bytes| serde_json::from_slice::<ChooserResponse>(&bytes).ok());
-    match response {
-        Some(response) => Ok(response),
-        None if status.success() => Ok(ChooserResponse::default()),
-        None => Err(format!("Rover chooser exited with status {status}")),
+) -> ChooserConfig {
+    ChooserConfig {
+        mode,
+        title,
+        accept_label: option_string(options, "accept_label").unwrap_or_default(),
+        directory: option_bool(options, "directory").unwrap_or(mode == ChooserMode::SaveFiles),
+        multiple: option_bool(options, "multiple").unwrap_or(false),
+        current_folder: current_folder(options),
+        current_name: option_string(options, "current_name").filter(|name| !name.is_empty()),
+        files: option_files(options),
+        filters: filters.iter().map(chooser_filter).collect(),
+        filter: option::<Filter>(options, "current_filter")
+            .and_then(|current| filters.iter().position(|filter| *filter == current))
+            .map(|index| index as u32),
     }
 }
 
-fn portal_results(response: ChooserResponse) -> (u32, Results) {
+fn portal_results(response: ChooserResponse, mut filters: Vec<Filter>) -> (u32, Results) {
     if !response.accepted {
         return (RESPONSE_CANCELLED, Results::new());
     }
@@ -164,6 +164,14 @@ fn portal_results(response: ChooserResponse) -> (u32, Results) {
     let mut results = Results::new();
     results.insert("uris".to_string(), owned(uris));
     results.insert("writable".to_string(), OwnedVariant::from(true));
+    if let Some(index) = response.filter.map(|index| index as usize)
+        && index < filters.len()
+    {
+        results.insert(
+            "current_filter".to_string(),
+            owned(filters.swap_remove(index)),
+        );
+    }
     (RESPONSE_SUCCESS, results)
 }
 
@@ -178,6 +186,29 @@ fn option_string(options: &Options, key: &str) -> Option<String> {
         .get(key)
         .and_then(|value| value.try_clone().ok())
         .and_then(|value| String::try_from(value).ok())
+}
+
+fn option<T: TryFrom<OwnedVariant>>(options: &Options, key: &str) -> Option<T> {
+    options
+        .get(key)
+        .and_then(|value| value.try_clone().ok())
+        .and_then(|value| T::try_from(value).ok())
+}
+
+fn option_filters(options: &Options) -> Vec<Filter> {
+    option(options, "filters").unwrap_or_default()
+}
+
+fn chooser_filter((name, rules): &Filter) -> ChooserFilter {
+    let (patterns, mime_types): (Vec<_>, Vec<_>) =
+        rules.iter().partition(|(kind, _)| *kind == GLOB);
+    let texts =
+        |rules: Vec<&(u32, String)>| rules.into_iter().map(|(_, text)| text.clone()).collect();
+    ChooserFilter {
+        name: name.clone(),
+        patterns: texts(patterns),
+        mime_types: texts(mime_types),
+    }
 }
 
 fn option_bytes(options: &Options, key: &str) -> Option<String> {
@@ -216,40 +247,10 @@ fn bytes_to_path(mut bytes: Vec<u8>) -> Option<String> {
         .filter(|value| !value.is_empty())
 }
 
-struct ResponseFolder(PathBuf);
-
-impl ResponseFolder {
-    fn create(request: u64) -> Result<Self, String> {
-        let runtime = dirs::runtime_dir().ok_or("Rover can't find the session's runtime folder")?;
-        let started = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap_or_default()
-            .as_nanos();
-        let folder = runtime.join(format!(
-            "rover-chooser-{}-{request}-{started}",
-            std::process::id()
-        ));
-        DirBuilder::new()
-            .mode(0o700)
-            .create(&folder)
-            .map_err(|error| error.to_string())?;
-        Ok(Self(folder))
-    }
-
-    fn response(&self) -> PathBuf {
-        self.0.join("response.json")
-    }
-}
-
-impl Drop for ResponseFolder {
-    fn drop(&mut self) {
-        let _ = fs::remove_dir_all(&self.0);
-    }
-}
-
 fn owned<T>(value: T) -> OwnedVariant
 where
     Variant<'static>: From<T>,
 {
-    OwnedVariant::try_from(Variant::from(value)).expect("URI lists always fit in a D-Bus variant")
+    OwnedVariant::try_from(Variant::from(value))
+        .expect("Chooser results always fit in a D-Bus variant")
 }

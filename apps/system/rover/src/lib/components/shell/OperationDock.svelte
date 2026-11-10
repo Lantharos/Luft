@@ -10,17 +10,20 @@
 	import X from '@lucide/svelte/icons/x';
 	import { basename, bytes, duration, plural } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
+	import { exploreSpace } from '#lib/bridge/index.js';
 	import type { Operation } from '#lib/bindings.js';
 
 	interface Props {
 		operations: Operation[];
+		onerror: (error: unknown) => void;
 	}
 
-	let { operations }: Props = $props();
+	let { operations, onerror }: Props = $props();
 
 	const ATTENTION_DELAY_MS = 650;
 	const COMPLETED_LINGER_MS = 2500;
 	const SAFE_TO_EJECT_LINGER_MS = 8000;
+	const FULL_LINGER_MS = 20_000;
 	const TICK_MS = 500;
 
 	let now = $state(Date.now());
@@ -40,7 +43,7 @@
 
 	function lingerEnded(operation: Operation) {
 		if (operation.completedAt === null) return false;
-		const linger = operation.phase === 'SafeToEject' ? SAFE_TO_EJECT_LINGER_MS : COMPLETED_LINGER_MS;
+		const linger = operation.full ? FULL_LINGER_MS : operation.phase === 'SafeToEject' ? SAFE_TO_EJECT_LINGER_MS : COMPLETED_LINGER_MS;
 		return now - operation.completedAt >= linger;
 	}
 
@@ -140,7 +143,10 @@
 				</div>
 				<div class="mt-2 flex items-center justify-between gap-3 text-[12px] text-[var(--text-muted)]">
 					<span class="min-w-0 truncate">{detail(operation)}</span>
-					{#if isActive(operation)}
+					{#if operation.full}
+						{@const folder = operation.full}
+						<button class="button shrink-0" type="button" onclick={() => exploreSpace(folder).catch(onerror)}>Free up space</button>
+					{:else if isActive(operation)}
 						<div class="flex shrink-0 items-center gap-1">
 							{#if operation.status === 'InProgress'}
 								<button class="icon-button" type="button" aria-label="Pause" onclick={() => commands.pauseOperation({ id: operation.id })}>

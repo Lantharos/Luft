@@ -2,13 +2,15 @@ mod forms;
 mod kestrel;
 mod library;
 
+use std::cell::{OnceCell, RefCell};
 use std::collections::HashMap;
 use std::ffi::{c_char, c_int, c_void};
 use std::io::{self, BufReader, Stdin, Stdout};
 use std::process::ExitCode;
 
-use kestrel::{Answer, Connection, Kestrel, Message};
+use kestrel::{Answer, Connection, Kestrel, Message, Secrets};
 use library::{AuthForm, Callbacks, Info, OpenConnect, PROGRESS_ERROR, text};
+use zeroize::Zeroizing;
 
 const USER_AGENT: &str = "OpenConnect VPN Agent (NetworkManager)";
 const SIGNED_IN: c_int = 0;
@@ -16,16 +18,16 @@ const SIGNED_IN: c_int = 0;
 type Channel = Kestrel<BufReader<Stdin>, Stdout>;
 
 pub struct Session {
-    kestrel: Channel,
-    secrets: HashMap<String, String>,
-    library: Option<OpenConnect>,
-    remembered: HashMap<String, String>,
+    kestrel: RefCell<Channel>,
+    secrets: Secrets,
+    library: OnceCell<OpenConnect>,
+    remembered: RefCell<Secrets>,
 }
 
 impl Session {
     fn library(&self) -> &OpenConnect {
         self.library
-            .as_ref()
+            .get()
             .expect("OpenConnect is loaded before it calls back")
     }
 }
@@ -43,8 +45,8 @@ extern "C" fn kestrel_openconnect_report(_session: *mut c_void, level: c_int, li
     }
 }
 
-unsafe fn session<'a>(pointer: *mut c_void) -> &'a mut Session {
-    unsafe { &mut *pointer.cast::<Session>() }
+unsafe fn session<'a>(pointer: *mut c_void) -> &'a Session {
+    unsafe { &*pointer.cast::<Session>() }
 }
 
 unsafe extern "C" fn validate(pointer: *mut c_void, reason: *const c_char) -> c_int {
@@ -57,22 +59,26 @@ unsafe extern "C" fn validate(pointer: *mut c_void, reason: *const c_char) -> c_
     );
     let key = format!("certificate:{host}");
     let fingerprint = library.certificate_hash().unwrap_or_default();
-    if session
+    let accepted = session
         .secrets
         .get(&key)
-        .or_else(|| session.remembered.get(&key))
-        .is_some_and(|accepted| library.certificate_matches(accepted))
-    {
+        .or(session.remembered.borrow().get(&key))
+        .cloned();
+    if accepted.is_some_and(|accepted| library.certificate_matches(&accepted)) {
         return 0;
     }
     let reason = text(reason).unwrap_or_default();
-    match session.kestrel.ask(&Message::Certificate {
+    let answer = session.kestrel.borrow_mut().ask(&Message::Certificate {
         host: &host,
         reason: &reason,
         fingerprint: &fingerprint,
-    }) {
+    });
+    match answer {
         Some(Answer::Accept { accept: true }) => {
-            session.remembered.insert(key, fingerprint);
+            session
+                .remembered
+                .borrow_mut()
+                .insert(key, Zeroizing::new(fingerprint));
             0
         }
         _ => 1,
@@ -96,6 +102,7 @@ unsafe extern "C" fn browse(_: *mut Info, uri: *const c_char, pointer: *mut c_vo
     }
     session
         .kestrel
+        .borrow_mut()
         .send(&Message::Browse { uri: &uri })
         .map_or(-1, |()| 0)
 }
@@ -134,32 +141,32 @@ fn configure(library: &OpenConnect, data: &HashMap<String, String>) -> Result<()
     Ok(())
 }
 
-fn signed_in(session: &Session) -> HashMap<String, String> {
+fn signed_in(session: &Session) -> Secrets {
     let library = session.library();
-    let mut secrets = session.remembered.clone();
+    let mut secrets = session.remembered.borrow().clone();
     secrets.extend([
         (
             "gateway".to_owned(),
-            library.connect_url().unwrap_or_default(),
+            Zeroizing::new(library.connect_url().unwrap_or_default()),
         ),
         ("cookie".to_owned(), library.cookie().unwrap_or_default()),
     ]);
     if let Some(hash) = library.certificate_hash() {
-        secrets.insert("gwcert".to_owned(), hash);
+        secrets.insert("gwcert".to_owned(), Zeroizing::new(hash));
     }
     if let (Some(address), Some(name)) = (library.hostname(), library.dns_name())
         && address != name
     {
         let address = address.trim_start_matches('[').trim_end_matches(']');
-        secrets.insert("resolve".to_owned(), format!("{name}:{address}"));
+        secrets.insert(
+            "resolve".to_owned(),
+            Zeroizing::new(format!("{name}:{address}")),
+        );
     }
     secrets
 }
 
-fn run(
-    session: &mut Session,
-    data: &HashMap<String, String>,
-) -> Result<Option<HashMap<String, String>>, String> {
+fn run(session: &Session, data: &HashMap<String, String>) -> Result<Option<Secrets>, String> {
     let callbacks = Callbacks {
         validate,
         write_config: keep_config,
@@ -171,10 +178,11 @@ fn run(
         .get("useragent")
         .filter(|agent| !agent.is_empty())
         .map_or(USER_AGENT, String::as_str);
-    let pointer = std::ptr::from_mut(session).cast::<c_void>();
-    session.library = Some(OpenConnect::load(user_agent, &callbacks, pointer)?);
-    configure(session.library(), data)?;
-    match session.library().obtain_cookie() {
+    let pointer = std::ptr::from_ref(session).cast_mut().cast::<c_void>();
+    let loaded = OpenConnect::load(user_agent, &callbacks, pointer)?;
+    let library = session.library.get_or_init(|| loaded);
+    configure(library, data)?;
+    match library.obtain_cookie() {
         SIGNED_IN => Ok(Some(signed_in(session))),
         result if result > 0 => Ok(None),
         _ => Err("Signing in to the VPN didn’t work".to_owned()),
@@ -188,17 +196,18 @@ fn main() -> ExitCode {
         return ExitCode::FAILURE;
     };
     let mut session = Session {
-        kestrel,
+        kestrel: RefCell::new(kestrel),
         secrets,
-        library: None,
-        remembered: HashMap::new(),
+        library: OnceCell::new(),
+        remembered: RefCell::default(),
     };
-    let outcome = run(&mut session, &data);
-    session.library = None;
+    let outcome = run(&session, &data);
+    drop(session.library.take());
+    let kestrel = session.kestrel.get_mut();
     let sent = match &outcome {
-        Ok(Some(secrets)) => session.kestrel.send(&Message::Done { secrets }),
+        Ok(Some(secrets)) => kestrel.send(&Message::Done { secrets }),
         Ok(None) => return ExitCode::SUCCESS,
-        Err(message) => session.kestrel.send(&Message::Failed { message }),
+        Err(message) => kestrel.send(&Message::Failed { message }),
     };
     if sent.is_err() || outcome.is_err() {
         ExitCode::FAILURE

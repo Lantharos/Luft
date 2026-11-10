@@ -10,6 +10,8 @@ use tokio::sync::mpsc::UnboundedSender;
 use tokio::time::interval;
 use zbus::{Connection, OwnedObjectPath, proxy};
 
+use super::home::Trusted;
+
 const SERVICE: &str = "_ipp._tcp";
 const UNSPECIFIED: i32 = -1;
 const DEFAULT_RESOURCE: &str = "ipp/print";
@@ -88,29 +90,83 @@ trait Browser {
     ) -> zbus::Result<()>;
 }
 
-struct Found {
-    queue: String,
+#[derive(Clone)]
+pub struct Queue {
+    pub name: String,
     device: String,
-    info: String,
-    location: String,
+    pub info: String,
+    pub location: String,
+}
+
+struct Found {
+    queue: Queue,
     id: DeviceId,
     seen: HashSet<(i32, i32)>,
 }
 
 #[derive(Default)]
-pub struct Discovered(Mutex<Vec<DeviceId>>);
+struct Seen {
+    models: Vec<DeviceId>,
+    elsewhere: Vec<Queue>,
+    chosen: HashSet<String>,
+}
+
+#[derive(Default)]
+pub struct Discovered(Mutex<Seen>);
 
 impl Discovered {
-    pub fn models(&self) -> Vec<DeviceId> {
-        self.0
-            .lock()
-            .unwrap_or_else(|poison| poison.into_inner())
-            .clone()
+    fn seen(&self) -> std::sync::MutexGuard<'_, Seen> {
+        self.0.lock().unwrap_or_else(|poison| poison.into_inner())
     }
 
-    fn set(&self, found: &HashMap<String, Found>) {
-        *self.0.lock().unwrap_or_else(|poison| poison.into_inner()) =
-            found.values().map(|printer| printer.id.clone()).collect();
+    pub fn models(&self) -> Vec<DeviceId> {
+        self.seen().models.clone()
+    }
+
+    pub fn elsewhere(&self) -> Vec<Queue> {
+        self.seen().elsewhere.clone()
+    }
+
+    pub async fn choose(&self, cups: &Cups, name: &str) -> Option<std::io::Result<()>> {
+        let queue = self
+            .seen()
+            .elsewhere
+            .iter()
+            .find(|queue| queue.name == name)?
+            .clone();
+        let created = queue.create(cups).await;
+        if created.is_ok() {
+            let mut seen = self.seen();
+            seen.elsewhere.retain(|queue| queue.name != name);
+            seen.chosen.insert(name.to_owned());
+        }
+        Some(created)
+    }
+
+    fn keeps(&self, printer: &Found, trusted: &Trusted) -> bool {
+        printer
+            .seen
+            .iter()
+            .any(|(interface, _)| trusted.reaches(*interface))
+            || self.seen().chosen.contains(&printer.queue.name)
+    }
+
+    fn set(&self, found: &HashMap<String, Found>, trusted: &Trusted) {
+        let elsewhere = found
+            .values()
+            .filter(|printer| !self.keeps(printer, trusted))
+            .map(|printer| printer.queue.clone())
+            .collect();
+        let mut seen = self.seen();
+        seen.models = found.values().map(|printer| printer.id.clone()).collect();
+        seen.elsewhere = elsewhere;
+    }
+}
+
+impl Queue {
+    async fn create(&self, cups: &Cups) -> std::io::Result<()> {
+        cups.create_local(&self.name, &self.device, &self.info, &self.location)
+            .await
     }
 }
 
@@ -148,31 +204,23 @@ async fn resolve(
     let resource = text(&record, "rp").unwrap_or_else(|| DEFAULT_RESOURCE.to_owned());
     let product = text(&record, "ty").filter(|product| !product.is_empty());
     Some(Found {
-        queue: name.to_owned(),
-        device: format!("ipp://{}:{port}/{resource}", host.trim_end_matches('.')),
+        queue: Queue {
+            name: name.to_owned(),
+            device: format!("ipp://{}:{port}/{resource}", host.trim_end_matches('.')),
+            info: product.clone().unwrap_or_else(|| name.to_owned()),
+            location: text(&record, "note").unwrap_or_default(),
+        },
         id: DeviceId {
             make: text(&record, "usb_MFG").unwrap_or_default(),
-            model: text(&record, "usb_MDL")
-                .or_else(|| product.clone())
-                .unwrap_or_default(),
+            model: text(&record, "usb_MDL").or(product).unwrap_or_default(),
         },
-        info: product.unwrap_or_else(|| name.to_owned()),
-        location: text(&record, "note").unwrap_or_default(),
         seen: HashSet::new(),
     })
 }
 
-async fn keep(cups: &Cups, printer: &Found) {
-    if let Err(error) = cups
-        .create_local(
-            &printer.queue,
-            &printer.device,
-            &printer.info,
-            &printer.location,
-        )
-        .await
-    {
-        eprintln!("Couldn't set up {}: {error}", printer.info);
+async fn keep(cups: &Cups, queue: &Queue) {
+    if let Err(error) = queue.create(cups).await {
+        eprintln!("Couldn't set up {}: {error}", queue.info);
     }
 }
 
@@ -195,24 +243,33 @@ pub async fn run(
     loop {
         tokio::select! {
             _ = keep_alive.tick() => {
-                for printer in found.values() {
-                    keep(&cups, printer).await;
+                if found.is_empty() {
+                    continue;
                 }
+                let trusted = Trusted::read(&system).await;
+                for printer in found.values().filter(|printer| discovered.keeps(printer, &trusted)) {
+                    keep(&cups, &printer.queue).await;
+                }
+                discovered.set(&found, &trusted);
+                let _ = changed.send(());
             }
             Some(item) = added.next() => {
                 let Ok(item) = item.args() else { continue };
                 let instance = (item.interface, item.protocol);
                 if let Some(printer) = found.get_mut(&item.name) {
                     printer.seen.insert(instance);
+                } else if let Some(mut printer) = resolve(&avahi, item.interface, item.protocol, &item.name, &item.domain).await {
+                    printer.seen.insert(instance);
+                    found.insert(item.name.clone(), printer);
+                } else {
                     continue;
                 }
-                let Some(mut printer) = resolve(&avahi, item.interface, item.protocol, &item.name, &item.domain).await else {
-                    continue;
-                };
-                printer.seen.insert(instance);
-                keep(&cups, &printer).await;
-                found.insert(item.name.clone(), printer);
-                discovered.set(&found);
+                let trusted = Trusted::read(&system).await;
+                let printer = &found[&item.name];
+                if discovered.keeps(printer, &trusted) {
+                    keep(&cups, &printer.queue).await;
+                }
+                discovered.set(&found, &trusted);
                 let _ = changed.send(());
             }
             Some(item) = removed.next() => {
@@ -221,9 +278,9 @@ pub async fn run(
                 printer.seen.remove(&(item.interface, item.protocol));
                 if printer.seen.is_empty() {
                     found.remove(&item.name);
-                    discovered.set(&found);
-                    let _ = changed.send(());
                 }
+                discovered.set(&found, &Trusted::read(&system).await);
+                let _ = changed.send(());
             }
         }
     }

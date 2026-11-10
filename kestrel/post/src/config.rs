@@ -1,5 +1,7 @@
 use std::path::PathBuf;
 
+const RECEIVED: &str = "Post";
+
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum Visibility {
     NoOne,
@@ -33,7 +35,10 @@ impl Config {
     }
 
     pub fn folder(&self) -> PathBuf {
-        self.folder.clone().or_else(dirs::download_dir).or_else(dirs::home_dir).expect("people have a home folder")
+        self.folder.clone().unwrap_or_else(|| {
+            let downloads = dirs::download_dir().unwrap_or_else(|| dirs::home_dir().expect("people have a home folder").join("Downloads"));
+            downloads.join(RECEIVED)
+        })
     }
 
     pub fn trusts(&self, fingerprint: &str) -> bool {

@@ -1,6 +1,7 @@
 use std::ffi::{CStr, CString, c_char, c_int, c_uint, c_void};
 
 use libloading::Library;
+use zeroize::Zeroizing;
 
 pub const FORM_TEXT: c_int = 1;
 pub const FORM_PASSWORD: c_int = 2;
@@ -222,8 +223,8 @@ impl OpenConnect {
         text(unsafe { function(self.info) })
     }
 
-    pub fn cookie(&self) -> Option<String> {
-        self.get("openconnect_get_cookie")
+    pub fn cookie(&self) -> Option<Zeroizing<String>> {
+        self.get("openconnect_get_cookie").map(Zeroizing::new)
     }
 
     pub fn connect_url(&self) -> Option<String> {
@@ -256,7 +257,7 @@ impl OpenConnect {
     }
 
     pub fn set_option(&self, option: *mut FormOption, value: &str) {
-        let value = c_string(value);
+        let value = Zeroizing::new(c_string(value));
         call!(
             self,
             "openconnect_set_option_value",

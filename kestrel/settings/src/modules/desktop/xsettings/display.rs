@@ -22,7 +22,7 @@ use super::wire::Table;
 
 const COOKIE_NAME: &[u8] = b"MIT-MAGIC-COOKIE-1";
 
-type Failure = Box<dyn Error + Send + Sync>;
+pub type Failure = Box<dyn Error + Send + Sync>;
 
 pub struct Display {
     readable: AsyncFd<RawFd>,

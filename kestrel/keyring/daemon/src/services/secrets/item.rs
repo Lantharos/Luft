@@ -31,6 +31,21 @@ impl Item {
         keyring.view()?.item(&self.collection, self.id).map(read)
     }
 
+    async fn read_shown<T: Default>(
+        &self,
+        header: Option<Header<'_>>,
+        read: impl FnOnce(&luft_keyring_vault::Item) -> T,
+    ) -> T {
+        let Some(header) = header else {
+            return T::default();
+        };
+        let requester = self.daemon.requester(&header).await;
+        if !self.daemon.shows(&requester, &self.key()).await {
+            return T::default();
+        }
+        self.read(read).await.unwrap_or_default()
+    }
+
     async fn permit(&self, header: &Header<'_>) -> Result<Requester, SecretError> {
         let requester = self.daemon.requester(header).await;
         if !self.daemon.ensure_unlocked(&requester, false).await {
@@ -167,10 +182,12 @@ impl Item {
     }
 
     #[zbus(property)]
-    async fn attributes(&self) -> HashMap<String, String> {
-        self.read(|item| item.attributes.clone().into_iter().collect())
+    async fn attributes(
+        &self,
+        #[zbus(header)] header: Option<Header<'_>>,
+    ) -> HashMap<String, String> {
+        self.read_shown(header, |item| item.attributes.clone().into_iter().collect())
             .await
-            .unwrap_or_default()
     }
 
     #[zbus(property)]
@@ -196,10 +213,8 @@ impl Item {
     }
 
     #[zbus(property)]
-    async fn label(&self) -> String {
-        self.read(|item| item.label.clone())
-            .await
-            .unwrap_or_default()
+    async fn label(&self, #[zbus(header)] header: Option<Header<'_>>) -> String {
+        self.read_shown(header, |item| item.label.clone()).await
     }
 
     #[zbus(property)]
@@ -219,12 +234,12 @@ impl Item {
     }
 
     #[zbus(property)]
-    async fn created(&self) -> u64 {
-        self.read(|item| item.created).await.unwrap_or_default()
+    async fn created(&self, #[zbus(header)] header: Option<Header<'_>>) -> u64 {
+        self.read_shown(header, |item| item.created).await
     }
 
     #[zbus(property)]
-    async fn modified(&self) -> u64 {
-        self.read(|item| item.modified).await.unwrap_or_default()
+    async fn modified(&self, #[zbus(header)] header: Option<Header<'_>>) -> u64 {
+        self.read_shown(header, |item| item.modified).await
     }
 }

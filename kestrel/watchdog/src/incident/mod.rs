@@ -55,6 +55,10 @@ pub struct Incident {
     pub boot_notice_done: bool,
 }
 
+pub fn id_at(time: jiff::Timestamp) -> String {
+    time.strftime("%Y%m%dT%H%M%SZ").to_string()
+}
+
 impl Incident {
     pub fn path(&self) -> PathBuf {
         Path::new(DIRECTORY).join(format!("{}.json", self.id))

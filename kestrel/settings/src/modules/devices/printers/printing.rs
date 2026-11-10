@@ -152,6 +152,28 @@ impl Printing {
         Ok(printers)
     }
 
+    fn available(&self) -> Vec<(String, String, String)> {
+        self.discovered
+            .elsewhere()
+            .into_iter()
+            .map(|queue| (queue.name, queue.info, queue.location))
+            .collect()
+    }
+
+    async fn add_available(
+        &self,
+        printer: &str,
+        #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
+    ) -> fdo::Result<()> {
+        self.discovered
+            .choose(&self.cups, printer)
+            .await
+            .ok_or_else(|| fdo::Error::InvalidArgs(format!("{printer} isn't nearby")))?
+            .map_err(failed)?;
+        Self::changed(&emitter).await?;
+        Ok(())
+    }
+
     async fn jobs(&self) -> fdo::Result<Vec<Job>> {
         let jobs = self.cups.jobs().await.map_err(failed)?;
         Ok(jobs

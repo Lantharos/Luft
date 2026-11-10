@@ -18,14 +18,10 @@ pub struct Session {
     stream: UnixStream,
 }
 
-fn socket() -> String {
-    std::env::var("KESTREL_AUTHENTICATE_SOCK").unwrap_or_else(|_| SOCKET.to_owned())
-}
-
 impl Session {
     pub async fn start(user: &str, mode: &str) -> io::Result<(Self, Reply)> {
         let mut session = Self {
-            stream: UnixStream::connect(socket()).await?,
+            stream: UnixStream::connect(SOCKET).await?,
         };
         let greeting = serde_json::to_vec(
             &json!({ "type": "create_session", "username": user, "mode": mode }),

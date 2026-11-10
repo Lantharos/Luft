@@ -10,7 +10,7 @@ use zbus::message::Header;
 use zbus::object_server::SignalEmitter;
 use zbus::{Connection, interface};
 
-use crate::access::{self, Access, CONFIGURE, SET_APPEARANCE};
+use crate::access::{self, Access, CONFIGURE, DEVELOPER_TOOLS, SET_APPEARANCE};
 use crate::error::Error;
 use crate::idle::Idle;
 use crate::options::Options;
@@ -18,6 +18,7 @@ use crate::store::{self, Config, Focus, SignInMethod, Store, Style, StyleChoice}
 use crate::system::greetd::{Greetd, InitialSession};
 use crate::system::sessions::{self, Session};
 use crate::system::{accounts, users};
+use crate::wallpaper;
 
 pub struct Greeter {
     store: Store,
@@ -42,16 +43,9 @@ impl Greeter {
         }
     }
 
-    async fn prepare_wallpaper(&self, wallpaper: OwnedFd) -> Result<Vec<u8>, Error> {
-        let bytes = read_within(move || store::read_wallpaper(wallpaper.into())).await?;
-        self.encode_wallpaper(bytes).await
-    }
-
-    async fn encode_wallpaper(&self, bytes: Vec<u8>) -> Result<Vec<u8>, Error> {
+    async fn encode_wallpaper(&self, wallpaper: OwnedFd) -> Result<Vec<u8>, Error> {
         let _decoding = self.decoding.lock().await;
-        spawn_blocking(move || store::encode_wallpaper(&bytes))
-            .await
-            .unwrap_or_else(|_| Err(Error::unsupported_image("This picture couldn't be opened")))
+        wallpaper::encode(wallpaper.into()).await
     }
 
     fn shown_user(&self, config: &Config) -> Option<u32> {
@@ -158,6 +152,11 @@ impl Greeter {
     }
 
     #[zbus(property)]
+    fn developer_tools(&self) -> bool {
+        self.store.config().developer_tools
+    }
+
+    #[zbus(property)]
     fn sessions(&self) -> Vec<(String, String)> {
         sessions::discover()
             .into_iter()
@@ -180,14 +179,12 @@ impl Greeter {
             .await?;
         let (focus, dark_focus) = (Focus::new(focus)?, Focus::new(dark_focus)?);
         let uid = access::caller_uid(connection, &header).await?;
-        let light = read_within(move || store::read_wallpaper(wallpaper.into())).await?;
-        let dark = read_within(move || store::read_wallpaper(dark_wallpaper.into())).await?;
-        let dark = if dark == light && dark_focus == focus {
+        let dark = if dark_focus == focus && wallpaper::same_file(&wallpaper, &dark_wallpaper) {
             None
         } else {
-            Some(self.encode_wallpaper(dark).await?)
+            Some(self.encode_wallpaper(dark_wallpaper).await?)
         };
-        let light = self.encode_wallpaper(light).await?;
+        let light = self.encode_wallpaper(wallpaper).await?;
         let _writing = self.writing.lock().await;
         Ok(self.store.save_user_wallpapers(
             uid,
@@ -306,7 +303,7 @@ impl Greeter {
             .authorize(connection, &header, CONFIGURE)
             .await?;
         let focus = Focus::new(focus)?;
-        let jpeg = self.prepare_wallpaper(wallpaper).await?;
+        let jpeg = self.encode_wallpaper(wallpaper).await?;
         {
             let _writing = self.writing.lock().await;
             self.store.save_shared_wallpaper(&jpeg, focus)?;
@@ -329,6 +326,22 @@ impl Greeter {
             self.store.clear_shared_wallpaper()?;
         }
         Ok(self.shared_wallpaper_changed(&emitter).await?)
+    }
+
+    async fn set_developer_tools(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+        #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
+        on: bool,
+    ) -> Result<(), Error> {
+        let _active = self.idle.hold();
+        self.access
+            .authorize(connection, &header, DEVELOPER_TOOLS)
+            .await?;
+        self.change_config(|config| config.developer_tools = on)
+            .await?;
+        Ok(self.developer_tools_changed(&emitter).await?)
     }
 
     async fn set_show_users(

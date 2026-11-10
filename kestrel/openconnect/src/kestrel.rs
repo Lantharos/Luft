@@ -2,11 +2,14 @@ use std::collections::HashMap;
 use std::io::{self, BufRead, Write};
 
 use serde::{Deserialize, Serialize};
+use zeroize::Zeroizing;
+
+pub type Secrets = HashMap<String, Zeroizing<String>>;
 
 #[derive(Deserialize)]
 pub struct Connection {
     pub data: HashMap<String, String>,
-    pub secrets: HashMap<String, String>,
+    pub secrets: Secrets,
 }
 
 #[derive(Serialize)]
@@ -50,7 +53,7 @@ pub enum Message<'a> {
         uri: &'a str,
     },
     Done {
-        secrets: &'a HashMap<String, String>,
+        secrets: &'a Secrets,
     },
     Failed {
         message: &'a str,
@@ -60,7 +63,7 @@ pub enum Message<'a> {
 #[derive(Deserialize)]
 #[serde(untagged)]
 pub enum Answer {
-    Values { values: HashMap<String, String> },
+    Values { values: Secrets },
     Accept { accept: bool },
 }
 
@@ -81,7 +84,7 @@ impl<R: BufRead, W: Write> Kestrel<R, W> {
     }
 
     fn receive<T: for<'d> Deserialize<'d>>(&mut self) -> Option<T> {
-        let mut line = String::new();
+        let mut line = Zeroizing::new(String::new());
         self.input.read_line(&mut line).ok()?;
         serde_json::from_str(&line).ok()
     }

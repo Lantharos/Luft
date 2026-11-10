@@ -14,7 +14,6 @@ const EVIDENCE_LENGTH: usize = 160;
 
 #[derive(Serialize, Deserialize)]
 struct Summary {
-    id: String,
     time: i64,
     boot_id: String,
     stalled_seconds: u64,
@@ -33,7 +32,6 @@ fn make_mutable() {
 
 pub fn save(incident: &Incident) -> io::Result<()> {
     let summary = Summary {
-        id: incident.id.clone(),
         time: incident.time,
         boot_id: incident.boot_id.clone(),
         stalled_seconds: incident.stalled_seconds,
@@ -63,7 +61,7 @@ pub fn load() -> Option<Incident> {
     let contents = fs::read(VARIABLE).ok()?;
     let summary: Summary = serde_json::from_slice(contents.get(4..)?).ok()?;
     Some(Incident {
-        id: summary.id,
+        id: super::id_at(jiff::Timestamp::from_second(summary.time).ok()?),
         time: summary.time,
         boot_id: summary.boot_id,
         stalled_seconds: summary.stalled_seconds,

@@ -87,7 +87,8 @@ pub async fn start(context: &Context) -> zbus::Result<()> {
                     }
                     match args.action_key.as_str() {
                         "examine" => examine(&warned_path),
-                        "empty-trash" => {
+                        "empty-trash" => warning = confirm_emptying(&session, warning).await,
+                        "delete-trash" => {
                             let _ = tokio::task::spawn_blocking(|| trash::empty(&trash::open_all())).await;
                         }
                         _ => {}
@@ -158,6 +159,26 @@ fn examine(path: &Path) {
         "com.lantharos.disks",
         &["gio", "launch", &disks_path().to_string_lossy(), &space],
     );
+}
+
+async fn confirm_emptying(session: &Connection, replaces: u32) -> u32 {
+    let shown = Notification {
+        app: "Disk Space",
+        icon: "user-trash-symbolic",
+        summary: "Empty the trash?",
+        body: "Everything in it will be deleted for good.",
+        actions: &[("delete-trash", "Delete for good"), ("keep-trash", "Keep")],
+        urgency: URGENCY_CRITICAL,
+        transient: true,
+        sound: Sound::Silent,
+        shows_when_locked: false,
+    }
+    .show(session, replaces)
+    .await;
+    shown.unwrap_or_else(|error| {
+        eprintln!("Couldn't ask before emptying the trash: {error}");
+        replaces
+    })
 }
 
 async fn warn(session: &Connection, low: &Low, replaces: u32) -> u32 {

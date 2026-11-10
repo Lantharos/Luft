@@ -10,7 +10,7 @@ part = "kestrel"
 "/usr/lib/systemd/user/" = ["data/user/luft-keyring.service", "data/user/luft-keyring.socket"]
 "/usr/share/dbus-1/services/" = ["data/dbus/org.freedesktop.secrets.service", "data/dbus/com.lantharos.Keyring1.service"]
 "/usr/share/xdg-desktop-portal/portals/" = ["data/dbus/luft-keyring.portal"]
-"/usr/lib/pam.d/" = ["data/pam/kestrel-unlock", "data/pam/kestrel-unlock-fingerprint", "data/pam/greetd"]
+"/usr/lib/pam.d/" = ["data/pam/kestrel-unlock", "data/pam/kestrel-unlock-fingerprint", "data/pam/greetd", "data/pam/kestrel-password"]
 "/usr/share/selinux/packages/" = ["data/selinux/luft-keyring.cil"]
 "/etc/gnupg/gpg-agent.conf" = "data/gpg-agent.conf"
 

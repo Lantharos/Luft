@@ -1,5 +1,4 @@
 mod extract;
-mod snippet;
 mod store;
 
 use std::collections::BTreeMap;
@@ -9,7 +8,6 @@ use std::time::{Duration, Instant};
 use crate::index::stat::{Stat, stat};
 use crate::index::tree::{Changes, Tree};
 use extract::{Format, extract, fits, format};
-pub use snippet::snippet;
 use store::{Known, Written};
 pub use store::{Store, words};
 

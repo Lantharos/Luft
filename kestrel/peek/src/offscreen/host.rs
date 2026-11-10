@@ -47,9 +47,10 @@ fn bus_config(directory: &Path) -> String {
 }
 
 fn compositor() -> io::Result<PathBuf> {
+    let installed = std::env::current_exe()?.with_file_name("kestrel");
     match std::env::var_os("KESTREL_BUILDDIR") {
-        Some(build) => Ok(PathBuf::from(build).join("kestrel")),
-        None => Ok(std::env::current_exe()?.with_file_name("kestrel")),
+        Some(build) if !installed.exists() => Ok(PathBuf::from(build).join("kestrel")),
+        _ => Ok(installed),
     }
 }
 

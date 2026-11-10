@@ -38,17 +38,21 @@ pub async fn run(app: Arc<App>) {
         }
     };
     if let Some(multicast) = &multicast {
-        multicast.join_new();
         tokio::spawn(hear(app.clone(), multicast.clone()));
     }
+    let follow = || multicast.as_ref().is_some_and(|multicast| multicast.follow(&app.home_interfaces.borrow()));
+    let mut home = app.home_interfaces.subscribe();
     let mut connections = interval(CONNECTIONS_CHECKED_EVERY);
     let mut every = interval(SCANNED_EVERY);
     loop {
         tokio::select! {
             () = app.scans.notified() => {}
             _ = every.tick() => {}
+            Ok(()) = home.changed() => {
+                follow();
+            }
             _ = connections.tick() => {
-                if !multicast.as_ref().is_some_and(|multicast| multicast.join_new()) {
+                if !follow() {
                     continue;
                 }
             }
@@ -143,7 +147,7 @@ pub async fn reach(app: &App, address: SocketAddr, scheme: Scheme, expected: Opt
 }
 
 async fn ask_neighbours(app: &App) {
-    let addresses = interfaces::multicast_addresses().into_iter().flat_map(interfaces::same_subnet_addresses);
+    let addresses = interfaces::multicast_addresses(&app.home_interfaces.borrow()).into_iter().flat_map(interfaces::same_subnet_addresses);
     stream::iter(addresses)
         .map(|address| reach(app, SocketAddr::new(address.into(), PORT), Scheme::Https, None))
         .buffer_unordered(SCAN_AT_ONCE)

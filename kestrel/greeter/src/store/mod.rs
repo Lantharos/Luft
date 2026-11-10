@@ -12,7 +12,7 @@ pub use choices::{SignInMethod, Style};
 pub use config::Config;
 pub use displays::prepare as prepare_displays;
 pub use style::StyleChoice;
-pub use wallpaper::{Focus, encode as encode_wallpaper, read as read_wallpaper};
+pub use wallpaper::Focus;
 
 use crate::files::{self, Readers, write_atomically};
 

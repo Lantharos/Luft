@@ -29,10 +29,16 @@ impl Multicast {
         Ok(Self { socket: UdpSocket::from_std(socket.into())?, joined: Mutex::default(), sending: Default::default() })
     }
 
-    pub fn join_new(&self) -> bool {
-        let current: HashSet<Ipv4Addr> = interfaces::multicast_addresses().into_iter().collect();
+    pub fn follow(&self, home: &HashSet<String>) -> bool {
+        let current: HashSet<Ipv4Addr> = interfaces::multicast_addresses(home).into_iter().collect();
         let mut joined = self.joined.lock().unwrap();
-        joined.retain(|address| current.contains(address));
+        joined.retain(|address| {
+            let home = current.contains(address);
+            if !home {
+                let _ = self.socket.leave_multicast_v4(GROUP, *address);
+            }
+            home
+        });
         let mut any = false;
         for address in current {
             if joined.contains(&address) {

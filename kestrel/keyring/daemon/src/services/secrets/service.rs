@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 use std::sync::Arc;
 
 use luft_dbus_macros::introspect;
@@ -126,7 +126,7 @@ impl Service {
     ) -> (Vec<OwnedObjectPath>, Vec<OwnedObjectPath>) {
         let requester = self.daemon.requester(&header).await;
         self.daemon.ensure_unlocked(&requester, false).await;
-        let query = attributes.into_iter().collect();
+        let query: BTreeMap<String, String> = attributes.into_iter().collect();
         let found: Vec<ItemKey> = {
             let keyring = self.daemon.keyring.lock().await;
             let Some(view) = keyring.view() else {
@@ -146,7 +146,7 @@ impl Service {
                 locked.push(path);
             }
         }
-        if !unlocked.is_empty() {
+        if !unlocked.is_empty() || (query.is_empty() && !requester.is_you()) {
             locked.clear();
         }
         (unlocked, locked)

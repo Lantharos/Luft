@@ -11,8 +11,10 @@ use std::path::{Path, PathBuf};
 use luft_dbus_macros::introspect;
 use tokio::process::Command;
 use tokio::sync::watch;
+use zbus::message::Header;
+use zbus::names::BusName;
 use zbus::object_server::InterfaceRef;
-use zbus::{fdo, interface};
+use zbus::{Connection, fdo, interface};
 
 use crate::context::Context;
 use crate::shared::remote::{Endpoint, RemoteProperty};
@@ -78,25 +80,50 @@ struct Xwayland {
     snapshots: watch::Receiver<Snapshot>,
 }
 
+async fn sent_by_the_compositor(connection: &Connection, header: &Header<'_>) -> bool {
+    let Ok(bus) = fdo::DBusProxy::new(connection).await else {
+        return false;
+    };
+    let name = BusName::from_static_str(MUTTER_X11.service).expect("a valid bus name");
+    let Ok(owner) = bus.get_name_owner(name).await else {
+        return false;
+    };
+    header
+        .sender()
+        .is_some_and(|sender| sender.as_str() == owner.as_str())
+}
+
 #[introspect]
 #[interface(name = "com.lantharos.Settings.Xwayland")]
 impl Xwayland {
-    async fn start(&self, display: &str, authority: &str) -> fdo::Result<()> {
+    async fn start(
+        &self,
+        display: String,
+        authority: String,
+        #[zbus(header)] header: Header<'_>,
+        #[zbus(connection)] connection: &Connection,
+    ) -> fdo::Result<()> {
+        if !sent_by_the_compositor(connection, &header).await {
+            return Err(fdo::Error::AccessDenied(
+                "Only Kestrel starts settings for X11 apps".into(),
+            ));
+        }
         let snapshot = self.snapshots.borrow().clone();
-        let resources = tokio::task::spawn_blocking(resources::load)
-            .await
-            .unwrap_or_default();
-        let connection = Display::connect(display, Path::new(authority))
-            .and_then(|mut connection| {
-                connection.merge_resources(&resources)?;
-                connection.apply(&snapshot)?;
-                Ok(connection)
-            })
-            .map_err(|error| {
-                fdo::Error::Failed(format!("Couldn't serve settings to X11 apps: {error}"))
-            })?;
-        run_session_scripts(display, authority).await;
-        tokio::spawn(connection.serve(self.snapshots.clone()));
+        let (name, cookies) = (display.clone(), authority.clone());
+        let connected = tokio::task::spawn_blocking(move || {
+            let resources = resources::load();
+            let mut connection = Display::connect(&name, Path::new(&cookies))?;
+            connection.merge_resources(&resources)?;
+            connection.apply(&snapshot)?;
+            Ok::<_, display::Failure>(connection)
+        })
+        .await
+        .map_err(|error| fdo::Error::Failed(error.to_string()))?
+        .map_err(|error| {
+            fdo::Error::Failed(format!("Couldn't serve settings to X11 apps: {error}"))
+        })?;
+        run_session_scripts(&display, &authority).await;
+        tokio::spawn(connected.serve(self.snapshots.clone()));
         Ok(())
     }
 }

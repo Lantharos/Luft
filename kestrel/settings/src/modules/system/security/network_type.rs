@@ -21,6 +21,7 @@ trait Firewall {
     #[zbus(property)]
     fn unclassified(&self) -> zbus::Result<Vec<(OwnedObjectPath, String)>>;
 
+    #[zbus(allow_interactive_auth)]
     fn set_network_type(&self, network: &OwnedObjectPath, kind: &str) -> zbus::Result<()>;
 }
 

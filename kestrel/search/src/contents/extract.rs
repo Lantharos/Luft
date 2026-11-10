@@ -75,7 +75,7 @@ fn open(path: &Path) -> Option<File> {
     file.metadata().ok()?.is_file().then_some(file)
 }
 
-pub fn read_text(path: &Path) -> Option<String> {
+fn read_text(path: &Path) -> Option<String> {
     let mut bytes = Vec::new();
     open(path)?.take(TEXT_LIMIT).read_to_end(&mut bytes).ok()?;
     if bytes[..bytes.len().min(BINARY_SNIFF)].contains(&0) {

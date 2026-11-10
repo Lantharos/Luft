@@ -3,9 +3,11 @@ mod error;
 mod files;
 mod idle;
 mod options;
+mod password;
 mod service;
 mod store;
 mod system;
+mod wallpaper;
 
 use std::path::Path;
 use std::process::ExitCode;
@@ -23,6 +25,12 @@ const IDLE_TIMEOUT: Duration = Duration::from_secs(60);
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> ExitCode {
+    if std::env::args().nth(1).as_deref() == Some(wallpaper::ENCODE_FLAG) {
+        return wallpaper::encode_standard_input();
+    }
+    if std::env::args().nth(1).as_deref() == Some(password::FLAG) {
+        return password::serve().await;
+    }
     let options = match Options::parse(std::env::args().skip(1)) {
         Ok(options) => options,
         Err(message) => {

@@ -50,3 +50,8 @@ elif action == "keys":
 elif action == "remove":
     answer = call(f"{KEYRING}.Ssh", "Remove", "(s)", (sys.argv[2],), None)
     sys.stdout.write(answer[0] if answer else "ok")
+elif action == "unloaded":
+    sys.stdout.write(",".join(ssh("Unloaded", None, None, "(as)")))
+elif action == "load":
+    answer = call(f"{KEYRING}.Ssh", "SetLoaded", "(sb)", (sys.argv[2], True), None)
+    sys.stdout.write(answer[0] if answer else "ok")

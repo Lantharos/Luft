@@ -1,5 +1,7 @@
 use std::ffi::c_int;
 
+use zeroize::Zeroizing;
+
 use crate::Session;
 use crate::kestrel::{Answer, Choice, Field, Kind, Message};
 use crate::library::{
@@ -67,9 +69,10 @@ fn asked(session: &Session, auth_id: &str, form: &AuthForm) -> Vec<Asked> {
                     let key = format!("form:{auth_id}:{name}");
                     session
                         .remembered
+                        .borrow()
                         .get(&key)
                         .or_else(|| session.secrets.get(&key))
-                        .cloned()
+                        .map(|value| value.to_string())
                 })
                 .or_else(|| text(option.value))
                 .or_else(|| choices.first().map(|choice| choice.name.clone()))
@@ -89,7 +92,7 @@ fn asked(session: &Session, auth_id: &str, form: &AuthForm) -> Vec<Asked> {
     asked
 }
 
-pub unsafe fn fill(session: &mut Session, form: &mut AuthForm) -> c_int {
+pub unsafe fn fill(session: &Session, form: &mut AuthForm) -> c_int {
     let auth_id = text(form.auth_id).unwrap_or_default();
     let (options, fields): (Vec<_>, Vec<_>) = asked(session, &auth_id, form)
         .into_iter()
@@ -104,27 +107,31 @@ pub unsafe fn fill(session: &mut Session, form: &mut AuthForm) -> c_int {
         .collect::<Vec<_>>()
         .join("\n");
     let error = text(form.error).unwrap_or_default();
-    let Some(Answer::Values { values }) = session.kestrel.ask(&Message::Form {
+    let answer = session.kestrel.borrow_mut().ask(&Message::Form {
         message,
         error,
         fields: &fields,
-    }) else {
+    });
+    let Some(Answer::Values { values }) = answer else {
         return FORM_CANCELLED;
     };
     let mut result = FORM_OK;
     for (option, field) in options.into_iter().zip(&fields) {
-        let value = values.get(&field.name).unwrap_or(&field.value);
+        let value = values
+            .get(&field.name)
+            .map_or(field.value.as_str(), |value| value.as_str());
         session.library().set_option(option, value);
         if field.kind != Kind::Password {
-            session
-                .remembered
-                .insert(format!("form:{auth_id}:{}", field.name), value.clone());
+            session.remembered.borrow_mut().insert(
+                format!("form:{auth_id}:{}", field.name),
+                Zeroizing::new(value.to_owned()),
+            );
         }
-        if option == form.group.cast() && *value != field.value {
+        if option == form.group.cast() && value != field.value {
             form.group_selection = field
                 .choices
                 .iter()
-                .position(|choice| choice.name == *value)
+                .position(|choice| choice.name == value)
                 .map_or(0, |index| index as c_int);
             result = FORM_NEW_GROUP;
         }

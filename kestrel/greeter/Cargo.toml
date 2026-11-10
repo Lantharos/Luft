@@ -10,14 +10,18 @@ fast_image_resize = { workspace = true, features = ["image"] }
 image = { workspace = true, features = ["bmp", "gif", "jpeg", "tiff", "webp"] }
 jpeg-encoder = { workspace = true, features = ["simd"] }
 jxl-oxide.workspace = true
+libc.workspace = true
+libloading.workspace = true
 luft-daylight.workspace = true
 luft-dbus.workspace = true
 luft-dbus-macros.workspace = true
 nix = { workspace = true, features = ["user"] }
+seccompiler.workspace = true
 serde.workspace = true
 serde_json.workspace = true
-tokio = { workspace = true, features = ["macros", "rt", "sync", "time"] }
+tokio = { workspace = true, features = ["io-util", "macros", "process", "rt", "sync", "time"] }
 toml_edit.workspace = true
+zeroize = { workspace = true, features = ["std"] }
 zbus = { workspace = true, features = ["proxy", "service", "tokio"] }
 
 [lints]

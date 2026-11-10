@@ -16,7 +16,7 @@ pub fn build(
 ) -> Incident {
     let time = jiff::Timestamp::now();
     Incident {
-        id: time.strftime("%Y%m%dT%H%M%SZ").to_string(),
+        id: super::id_at(time),
         time: time.as_second(),
         boot_id: read_trimmed("/proc/sys/kernel/random/boot_id"),
         stalled_seconds,

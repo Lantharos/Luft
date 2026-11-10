@@ -1,17 +1,20 @@
 mod confirm;
 mod keys;
+mod session;
 mod wire;
 
 use std::os::fd::{AsRawFd, FromRawFd};
 use std::os::unix::fs::{DirBuilderExt, PermissionsExt};
 use std::path::PathBuf;
 use std::sync::Arc;
+use std::time::Duration;
 
 use luft_keyring_vault::{Action, SshKey};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::{UnixListener, UnixStream};
 
 pub use keys::{fingerprint, generate_in_chip, generate_software, kind, openssh_line};
+pub use session::Session;
 
 use crate::daemon::Daemon;
 use crate::requester::Requester;
@@ -27,6 +30,7 @@ const ADD_IDENTITY: u8 = 17;
 const REMOVE_IDENTITY: u8 = 18;
 const REMOVE_ALL: u8 = 19;
 const ADD_CONSTRAINED: u8 = 25;
+const LIFETIME_CONSTRAINT: u8 = 1;
 const CONFIRM_CONSTRAINT: u8 = 2;
 const LIMIT: usize = 256 * 1024;
 const LISTEN_FD: i32 = 3;
@@ -104,8 +108,8 @@ async fn answer(daemon: &Arc<Daemon>, requester: &Requester, kind: u8, body: &[u
         REQUEST_IDENTITIES => Some(identities(daemon, requester).await),
         SIGN_REQUEST => sign(daemon, requester, body).await,
         ADD_IDENTITY | ADD_CONSTRAINED if requester.is_you() => add(daemon, body).await,
-        REMOVE_IDENTITY if requester.is_you() => remove(daemon, Reader::new(body).string()).await,
-        REMOVE_ALL if requester.is_you() => remove(daemon, None).await,
+        REMOVE_IDENTITY if requester.is_you() => unload(daemon, body).await,
+        REMOVE_ALL if requester.is_you() => Some(unload_all(daemon).await),
         _ => None,
     };
     outcome.unwrap_or_else(|| vec![FAILURE])
@@ -113,8 +117,7 @@ async fn answer(daemon: &Arc<Daemon>, requester: &Requester, kind: u8, body: &[u
 
 async fn identities(daemon: &Arc<Daemon>, requester: &Requester) -> Vec<u8> {
     daemon.ensure_unlocked(requester, false).await;
-    let keyring = daemon.keyring.lock().await;
-    let keys: &[SshKey] = keyring.view().map_or(&[], |view| &view.ssh);
+    let keys = loaded(daemon).await;
     let mut reply = Writer::default()
         .u8(IDENTITIES_ANSWER)
         .u32(u32::try_from(keys.len()).unwrap_or(0));
@@ -124,21 +127,44 @@ async fn identities(daemon: &Arc<Daemon>, requester: &Requester) -> Vec<u8> {
     reply.bytes
 }
 
+async fn loaded(daemon: &Daemon) -> Vec<SshKey> {
+    let mut keys = daemon.ssh.timed();
+    let keyring = daemon.keyring.lock().await;
+    let stored = keyring.view().map_or(&[][..], |view| &view.ssh);
+    let kept: Vec<SshKey> = stored
+        .iter()
+        .filter(|key| {
+            daemon.ssh.is_loaded(&key.public) && keys.iter().all(|timed| timed.public != key.public)
+        })
+        .cloned()
+        .collect();
+    keys.extend(kept);
+    keys
+}
+
 async fn sign(daemon: &Arc<Daemon>, requester: &Requester, body: &[u8]) -> Option<Vec<u8>> {
     let mut reader = Reader::new(body);
     let public = reader.string()?;
     let data = reader.string()?;
-    if !daemon.ensure_unlocked(requester, true).await {
-        return None;
-    }
-    let key = {
-        let keyring = daemon.keyring.lock().await;
-        keyring
-            .contents()?
-            .ssh
-            .iter()
-            .find(|key| key.public == public)?
-            .clone()
+    let timed = daemon
+        .ssh
+        .timed()
+        .into_iter()
+        .find(|key| key.public == public);
+    let key = match timed {
+        Some(key) => key,
+        None => {
+            if !daemon.ssh.is_loaded(public) || !daemon.ensure_unlocked(requester, true).await {
+                return None;
+            }
+            let keyring = daemon.keyring.lock().await;
+            keyring
+                .contents()?
+                .ssh
+                .iter()
+                .find(|key| key.public == public)?
+                .clone()
+        }
     };
     if (key.confirm || !requester.is_you()) && !confirm::confirm(daemon, requester, &key).await {
         return None;
@@ -152,38 +178,72 @@ async fn sign(daemon: &Arc<Daemon>, requester: &Requester, body: &[u8]) -> Optio
     Some(Writer::default().u8(SIGN_RESPONSE).string(&signature).bytes)
 }
 
-async fn add(daemon: &Daemon, body: &[u8]) -> Option<Vec<u8>> {
+async fn add(daemon: &Arc<Daemon>, body: &[u8]) -> Option<Vec<u8>> {
     let (mut key, mut constraints) = keys::parse_added(body)?;
+    let mut lifetime = None;
     while !constraints.is_empty() {
         match constraints.u8()? {
+            LIFETIME_CONSTRAINT => {
+                lifetime = Some(Duration::from_secs(constraints.u32()?.into()));
+            }
             CONFIRM_CONSTRAINT => key.confirm = true,
             _ => return None,
         }
     }
-    let mut keyring = daemon.keyring.lock().await;
-    keyring
-        .edit(|contents| {
-            contents
-                .ssh
-                .retain(|existing| existing.public != key.public);
-            contents.ssh.push(key);
-        })
-        .ok()?;
-    drop(keyring);
+    match lifetime {
+        Some(lifetime) => {
+            daemon.ssh.keep(key, lifetime);
+            let daemon = daemon.clone();
+            tokio::spawn(async move {
+                tokio::time::sleep(lifetime).await;
+                daemon.ssh.expire();
+            });
+        }
+        None => {
+            daemon.ssh.forget(&key.public);
+            daemon.ssh.set_loaded(&key.public, true);
+            daemon
+                .keyring
+                .lock()
+                .await
+                .edit(|contents| {
+                    contents
+                        .ssh
+                        .retain(|existing| existing.public != key.public);
+                    contents.ssh.push(key);
+                })
+                .ok()?;
+        }
+    }
     daemon.ssh_changed().await;
     Some(vec![SUCCESS])
 }
 
-async fn remove(daemon: &Daemon, public: Option<&[u8]>) -> Option<Vec<u8>> {
-    let mut keyring = daemon.keyring.lock().await;
-    keyring
-        .edit(|contents| {
-            contents
-                .ssh
-                .retain(|key| public.is_some_and(|public| key.public != public))
-        })
-        .ok()?;
-    drop(keyring);
+async fn unload(daemon: &Daemon, body: &[u8]) -> Option<Vec<u8>> {
+    let public = Reader::new(body).string()?;
+    let timed = daemon.ssh.forget(public);
+    let stored = {
+        let keyring = daemon.keyring.lock().await;
+        keyring
+            .view()
+            .is_some_and(|view| view.ssh.iter().any(|key| key.public == public))
+    };
+    if stored {
+        daemon.ssh.set_loaded(public, false);
+    }
+    (timed || stored).then_some(())?;
     daemon.ssh_changed().await;
     Some(vec![SUCCESS])
+}
+
+async fn unload_all(daemon: &Daemon) -> Vec<u8> {
+    daemon.ssh.forget_all();
+    {
+        let keyring = daemon.keyring.lock().await;
+        for key in keyring.view().map_or(&[][..], |view| &view.ssh) {
+            daemon.ssh.set_loaded(&key.public, false);
+        }
+    }
+    daemon.ssh_changed().await;
+    vec![SUCCESS]
 }

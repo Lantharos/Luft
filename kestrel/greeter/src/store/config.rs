@@ -8,6 +8,7 @@ pub struct Config {
     pub default_session: String,
     pub num_lock: bool,
     pub shown_user: Option<u32>,
+    pub developer_tools: bool,
 }
 
 impl Default for Config {
@@ -18,6 +19,7 @@ impl Default for Config {
             default_session: String::new(),
             num_lock: true,
             shown_user: None,
+            developer_tools: false,
         }
     }
 }

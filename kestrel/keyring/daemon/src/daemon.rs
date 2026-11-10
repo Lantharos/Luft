@@ -34,6 +34,7 @@ pub struct Daemon {
     pub recorded: Arc<Notify>,
     pub objects: Mutex<BTreeSet<Target>>,
     pub dismissed: std::sync::Mutex<Option<Instant>>,
+    pub ssh: crate::services::ssh::Session,
 }
 
 impl Daemon {
@@ -58,6 +59,7 @@ impl Daemon {
             recorded,
             objects: Mutex::default(),
             dismissed: std::sync::Mutex::default(),
+            ssh: crate::services::ssh::Session::default(),
         }
     }
 

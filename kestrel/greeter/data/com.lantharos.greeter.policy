@@ -24,4 +24,13 @@
       <allow_active>auth_admin_keep</allow_active>
     </defaults>
   </action>
+  <action id="com.lantharos.greeter.developer-tools">
+    <description>Turn developer tools on or off</description>
+    <message>Developer tools let programs see and control your windows. Authentication is required to turn them on or off</message>
+    <defaults>
+      <allow_any>auth_admin</allow_any>
+      <allow_inactive>auth_admin</allow_inactive>
+      <allow_active>auth_admin</allow_active>
+    </defaults>
+  </action>
 </policyconfig>

@@ -114,9 +114,10 @@ pub fn path_inside_folder(name: &str) -> PathBuf {
     let cleaned: PathBuf = Path::new(&name.replace('\\', "/").replace('\0', ""))
         .components()
         .filter_map(|component| match component {
-            Component::Normal(part) => Some(part.to_owned()),
+            Component::Normal(part) => Some(part.to_string_lossy().trim_start_matches('.').to_owned()),
             _ => None,
         })
+        .filter(|part| !part.is_empty())
         .collect();
     if cleaned.as_os_str().is_empty() { PathBuf::from("file") } else { cleaned }
 }
@@ -132,7 +133,9 @@ mod tests {
 
     #[test]
     fn keeps_received_files_inside_the_folder() {
-        assert_eq!(path_inside_folder("../../.ssh/authorized_keys"), PathBuf::from(".ssh/authorized_keys"));
+        assert_eq!(path_inside_folder("../../.ssh/authorized_keys"), PathBuf::from("ssh/authorized_keys"));
+        assert_eq!(path_inside_folder(".config/autostart/run.desktop"), PathBuf::from("config/autostart/run.desktop"));
+        assert_eq!(path_inside_folder("...hidden"), PathBuf::from("hidden"));
         assert_eq!(path_inside_folder("/etc/passwd"), PathBuf::from("etc/passwd"));
         assert_eq!(path_inside_folder("Photos\\2026\\cat.jpg"), PathBuf::from("Photos/2026/cat.jpg"));
         assert_eq!(path_inside_folder(".."), PathBuf::from("file"));
@@ -148,6 +151,5 @@ mod tests {
         let kept = move_without_overwriting(&partial, &wanted).unwrap();
         assert_eq!(kept, folder.path().join("cat (2).jpg"));
         assert_eq!(std::fs::read(&wanted).unwrap(), b"first");
-        assert_eq!(numbered(&folder.path().join(".bashrc"), 2), folder.path().join(".bashrc (2)"));
     }
 }

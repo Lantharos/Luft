@@ -6,7 +6,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use luft_dbus_macros::introspect;
 use zbus::{fdo, interface};
 
-use crate::contents::{Store, snippet, words};
+use crate::contents::{Store, words};
 use crate::index::{Shared, Wake};
 
 pub const NAME: &str = "com.lantharos.Search";
@@ -40,21 +40,12 @@ impl Search {
     async fn find_text(&self, query: String, limit: u32) -> fdo::Result<Vec<(String, String)>> {
         let store = self.store.clone();
         let found = tokio::task::spawn_blocking(move || {
-            let words = words(&query);
-            let paths = store
+            let mut found = store
                 .lock()
                 .unwrap()
-                .search(&words, limit.min(MOST_RESULTS) as usize)?;
-            Ok::<_, rusqlite::Error>(
-                paths
-                    .into_iter()
-                    .filter(|path| Path::new(path).exists())
-                    .map(|path| {
-                        let snippet = snippet(Path::new(&path), &words);
-                        (path, snippet)
-                    })
-                    .collect(),
-            )
+                .search(&words(&query), limit.min(MOST_RESULTS) as usize)?;
+            found.retain(|(path, _)| Path::new(path).exists());
+            Ok::<_, rusqlite::Error>(found)
         })
         .await
         .map_err(|error| fdo::Error::Failed(error.to_string()))?;

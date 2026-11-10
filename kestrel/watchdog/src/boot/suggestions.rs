@@ -1,13 +1,5 @@
-use std::time::Duration;
-
-use tokio::process::Command;
-
 use super::rebar;
 use crate::incident::{Action, Incident, Suggestion};
-use crate::system::output_within;
-
-const DRIVER_PACKAGES: [&str; 3] = ["akmod-nvidia", "kmod-nvidia", "xorg-x11-drv-nvidia"];
-const UPDATE_QUERY_LIMIT: Duration = Duration::from_secs(8);
 
 fn resizable_bar() -> Option<Suggestion> {
     let window = rebar::small_windows().into_iter().next()?;
@@ -20,30 +12,6 @@ fn resizable_bar() -> Option<Suggestion> {
             window.card, window.largest_mib, window.current_mib
         ),
         action: Some(Action::FirmwareSettings),
-    })
-}
-
-async fn driver_update() -> Option<Suggestion> {
-    let query = output_within(
-        Command::new("dnf5")
-            .args(["repoquery", "--upgrades", "--cacheonly", "--latest-limit=1"])
-            .args(["--queryformat", "%{name} %{version}\n"])
-            .args(DRIVER_PACKAGES),
-        UPDATE_QUERY_LIMIT,
-    )
-    .await?;
-    let version = query.lines().find_map(|line| {
-        let (name, version) = line.split_once(' ')?;
-        DRIVER_PACKAGES
-            .contains(&name)
-            .then(|| version.trim().to_owned())
-    })?;
-    Some(Suggestion {
-        step: format!("Install the NVIDIA driver update {version} from Updates in Settings"),
-        detail: format!(
-            "NVIDIA driver {version} is available. Driver updates often fix hangs like this one, and Updates in Settings installs it at the next restart."
-        ),
-        action: None,
     })
 }
 
@@ -60,13 +28,8 @@ fn loose_card(incident: &Incident) -> Option<Suggestion> {
     })
 }
 
-pub async fn compute(incident: &Incident) -> Vec<Suggestion> {
-    let nvidia = incident
-        .gpus
-        .iter()
-        .any(|gpu| gpu.name.starts_with("NVIDIA"));
-    let update = if nvidia { driver_update().await } else { None };
-    [resizable_bar(), update, loose_card(incident)]
+pub fn compute(incident: &Incident) -> Vec<Suggestion> {
+    [resizable_bar(), loose_card(incident)]
         .into_iter()
         .flatten()
         .collect()

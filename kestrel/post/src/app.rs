@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
@@ -15,6 +16,7 @@ pub struct App {
     pub identity: Identity,
     pub computer_name: String,
     pub config: watch::Sender<Config>,
+    pub home_interfaces: watch::Sender<HashSet<String>>,
     pub devices: Devices,
     pub link: Link,
     pub inbox: Inbox,
@@ -36,6 +38,7 @@ impl App {
             identity,
             computer_name,
             config: watch::Sender::new(Config::default()),
+            home_interfaces: watch::Sender::default(),
             devices: Devices::new(),
             link,
             inbox: Inbox::default(),

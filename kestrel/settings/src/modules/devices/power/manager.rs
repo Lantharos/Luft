@@ -383,16 +383,16 @@ impl Power {
     pub async fn warn_about_sleep(&mut self) {
         let (summary, body) = match self.warned_action {
             Action::Logout => (
-                "Logging out soon",
-                "You'll be logged out because the computer isn't being used.",
+                "Signing out soon",
+                "You'll be signed out because the computer isn't being used.",
             ),
             Action::Hibernate => (
                 "Hibernating soon",
                 "The computer will hibernate because it isn't being used.",
             ),
             _ => (
-                "Suspending soon",
-                "The computer will suspend because it isn't being used.",
+                "Going to sleep soon",
+                "The computer will go to sleep because it isn't being used.",
             ),
         };
         let shown = Notification {

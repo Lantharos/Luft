@@ -9,6 +9,7 @@ use crate::error::Error;
 
 pub const SET_APPEARANCE: &str = "com.lantharos.greeter.set-appearance";
 pub const CONFIGURE: &str = "com.lantharos.greeter.configure";
+pub const DEVELOPER_TOOLS: &str = "com.lantharos.greeter.developer-tools";
 
 pub enum Access {
     Polkit,

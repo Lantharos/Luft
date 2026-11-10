@@ -121,7 +121,7 @@ impl Daemon {
         }
     }
 
-    async fn remembered(&self, requester: &Requester, item: &ItemKey) -> Option<bool> {
+    pub async fn remembered(&self, requester: &Requester, item: &ItemKey) -> Option<bool> {
         let app = requester.sandboxed_app()?;
         permissions::answer(&self.connection, KEYRING_ITEMS, &entry(item), app).await
     }

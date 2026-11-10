@@ -158,6 +158,42 @@ impl Ssh {
         Ok(())
     }
 
+    async fn unloaded(&self, #[zbus(header)] header: Header<'_>) -> fdo::Result<Vec<String>> {
+        yours(&self.daemon, &header).await?;
+        let keyring = self.daemon.keyring.lock().await;
+        Ok(keyring
+            .view()
+            .map_or(&[][..], |view| &view.ssh)
+            .iter()
+            .filter(|key| !self.daemon.ssh.is_loaded(&key.public))
+            .map(|key| fingerprint(&key.public))
+            .collect())
+    }
+
+    async fn set_loaded(
+        &self,
+        fingerprint_wanted: &str,
+        loaded: bool,
+        #[zbus(header)] header: Header<'_>,
+    ) -> fdo::Result<()> {
+        yours(&self.daemon, &header).await?;
+        let public = {
+            let keyring = self.daemon.keyring.lock().await;
+            keyring
+                .view()
+                .and_then(|view| {
+                    view.ssh
+                        .iter()
+                        .find(|key| fingerprint(&key.public) == fingerprint_wanted)
+                })
+                .map(|key| key.public.clone())
+                .ok_or_else(|| fdo::Error::InvalidArgs("No such key".into()))?
+        };
+        self.daemon.ssh.set_loaded(&public, loaded);
+        self.daemon.ssh_changed().await;
+        Ok(())
+    }
+
     #[zbus(property)]
     fn socket(&self) -> String {
         socket_path().display().to_string()

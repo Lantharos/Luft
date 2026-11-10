@@ -4,6 +4,7 @@ import signal
 import socket
 import struct
 import subprocess
+import time
 
 SIGN_REQUEST = 13
 SIGN_RESPONSE = 14
@@ -163,3 +164,32 @@ def exercise_agent(session, check, login):
         not requests("access")[-1]["request"].get("remember"),
         "a program of yours is never offered to be remembered for a careful key",
     )
+
+    subprocess.run(["ssh-add", "-q", "-d", generated], env=environment, check=True, capture_output=True)
+    check(
+        "Laptop" not in public_keys()
+        and "Laptop" in session.manager("keys").split(",")
+        and session.manager("unloaded") == made,
+        "ssh-add -d puts a stored key away without deleting it",
+    )
+    check(
+        session.manager("load", made) == "ok" and "Laptop" in public_keys() and session.manager("unloaded") == "",
+        "Settings loads a key that was put away",
+    )
+    subprocess.run(["ssh-add", "-q", "-D"], env=environment, check=True, capture_output=True)
+    check(
+        "no identities" in public_keys() and "Laptop" in session.manager("keys").split(","),
+        "ssh-add -D puts every key away and deletes none",
+    )
+    session.manager("load", made)
+    timed = os.path.join(folder, "timed")
+    subprocess.run(["ssh-keygen", "-q", "-t", "ed25519", "-N", "", "-C", "timed key", "-f", timed], check=True)
+    subprocess.run(["ssh-add", "-q", "-t", "2", timed], env=environment, check=True, capture_output=True)
+    check(
+        "timed key" in public_keys()
+        and "timed key" not in session.manager("keys").split(",")
+        and signs(environment, folder, timed + ".pub", "timed"),
+        "a key added with a time limit signs without being stored",
+    )
+    time.sleep(3)
+    check("timed key" not in public_keys(), "a key added with a time limit goes away when the time is up")

@@ -17,7 +17,7 @@ battery-ups-critical-title = UPS battery almost empty
 # $left is the battery-left, battery-left-minutes or battery-left-hours sentence
 battery-critical-hibernate = { $left } Plug in now, or the computer will hibernate soon.
 # $left is the battery-left, battery-left-minutes or battery-left-hours sentence
-battery-critical-suspend = { $left } Plug in now, or the computer will suspend soon.
+battery-critical-suspend = { $left } Plug in now, or the computer will go to sleep soon.
 # $left is the battery-left, battery-left-minutes or battery-left-hours sentence
 battery-critical-power-off = { $left } Plug in now, or the computer will shut down soon.
 battery-saver-title = Power saver is on

@@ -10,6 +10,7 @@ license.workspace = true
 libloading.workspace = true
 serde.workspace = true
 serde_json.workspace = true
+zeroize = { workspace = true, features = ["serde", "std"] }
 
 [build-dependencies]
 cc.workspace = true

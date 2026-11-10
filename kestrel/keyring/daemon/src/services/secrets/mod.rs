@@ -6,6 +6,7 @@ mod service;
 mod session;
 mod sync;
 mod transfer;
+mod visible;
 
 use std::collections::HashMap;
 

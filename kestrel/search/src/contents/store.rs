@@ -4,6 +4,11 @@ use std::path::Path;
 use rusqlite::types::ToSql;
 use rusqlite::{Connection, OptionalExtension, Transaction, params, params_from_iter};
 
+const LAYOUT: i64 = 2;
+const RESET: &str = "
+DROP TABLE IF EXISTS files;
+DROP TABLE IF EXISTS words;
+";
 const SCHEMA: &str = "
 PRAGMA journal_mode = WAL;
 PRAGMA synchronous = NORMAL;
@@ -15,12 +20,11 @@ CREATE TABLE IF NOT EXISTS files (
 );
 CREATE VIRTUAL TABLE IF NOT EXISTS words USING fts5(
     body,
-    content = '',
-    contentless_delete = 1,
     tokenize = 'unicode61 remove_diacritics 2'
 );
 ";
 const SHORTEST_QUERY: usize = 3;
+const SNIPPET_WORDS: i64 = 14;
 
 pub struct Store {
     connection: Connection,
@@ -45,6 +49,10 @@ pub fn words(query: &str) -> Vec<String> {
         .collect()
 }
 
+fn one_line(snippet: &str) -> String {
+    snippet.split_whitespace().collect::<Vec<_>>().join(" ")
+}
+
 fn expression(words: &[String]) -> Option<String> {
     if words.iter().map(|word| word.chars().count()).sum::<usize>() < SHORTEST_QUERY {
         return None;
@@ -58,6 +66,11 @@ fn expression(words: &[String]) -> Option<String> {
 impl Store {
     pub fn open(path: &Path) -> rusqlite::Result<Self> {
         let connection = Connection::open(path)?;
+        let layout: i64 = connection.query_row("PRAGMA user_version", [], |row| row.get(0))?;
+        if layout != LAYOUT {
+            connection.execute_batch(RESET)?;
+            connection.pragma_update(None, "user_version", LAYOUT)?;
+        }
         connection.execute_batch(SCHEMA)?;
         Ok(Self { connection })
     }
@@ -83,16 +96,24 @@ impl Store {
         self.connection.transaction()
     }
 
-    pub fn search(&self, words: &[String], limit: usize) -> rusqlite::Result<Vec<String>> {
+    pub fn search(
+        &self,
+        words: &[String],
+        limit: usize,
+    ) -> rusqlite::Result<Vec<(String, String)>> {
         let Some(expression) = expression(words) else {
             return Ok(Vec::new());
         };
         let mut statement = self.connection.prepare_cached(
-            "SELECT files.path FROM words JOIN files ON files.id = words.rowid
+            "SELECT files.path, snippet(words, 0, '', '', '…', ?3)
+             FROM words JOIN files ON files.id = words.rowid
              WHERE words MATCH ?1 ORDER BY rank LIMIT ?2",
         )?;
         statement
-            .query_map(params![expression, limit as i64], |row| row.get(0))?
+            .query_map(params![expression, limit as i64, SNIPPET_WORDS], |row| {
+                let snippet: String = row.get(1)?;
+                Ok((row.get(0)?, one_line(&snippet)))
+            })?
             .collect()
     }
 }
@@ -174,4 +195,38 @@ pub fn remove(transaction: &Transaction, path: &str) -> rusqlite::Result<()> {
         transaction.execute("DELETE FROM words WHERE rowid = ?1", [id])?;
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn shows_the_words_around_a_match_on_one_line() {
+        let mut store = Store::open(Path::new(":memory:")).unwrap();
+        let transaction = store.transaction().unwrap();
+        let id = put(&transaction, "/home/someone/notes.txt", 0, 0).unwrap();
+        let text = format!(
+            "{}\nthe harbour\n  ferry leaves at nine\n{}",
+            "before ".repeat(40),
+            "after ".repeat(40)
+        );
+        write(
+            &transaction,
+            &[Written {
+                id,
+                replaced: false,
+                text,
+            }],
+        )
+        .unwrap();
+        transaction.commit().unwrap();
+
+        let found = store.search(&words("ferry"), 5).unwrap();
+
+        assert_eq!(found.len(), 1);
+        assert_eq!(found[0].0, "/home/someone/notes.txt");
+        assert!(found[0].1.contains("the harbour ferry leaves at nine"));
+        assert!(found[0].1.starts_with('…') && found[0].1.ends_with('…'));
+    }
 }

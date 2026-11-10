@@ -45,7 +45,7 @@ async fn show(incident: &Incident, firmware: bool) -> Option<String> {
 
 async fn present(mut incident: Incident) {
     if incident.suggestions.is_empty() {
-        incident.suggestions = suggestions::compute(&incident).await;
+        incident.suggestions = suggestions::compute(&incident);
     }
     let firmware =
         suggestions::wants_firmware_settings(&incident.suggestions) && firmware_setup_supported();

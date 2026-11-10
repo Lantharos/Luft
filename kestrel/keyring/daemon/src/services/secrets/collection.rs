@@ -11,6 +11,7 @@ use zbus::{fdo, interface};
 use super::service::sender;
 use super::session::decode;
 use super::{Properties, Secret, SecretError, Target, item_path, none, sync};
+use crate::access::ItemKey;
 use crate::daemon::Daemon;
 use crate::keyring::has_protected_schema;
 use crate::prompter::{Answer, Request};
@@ -19,6 +20,13 @@ use crate::services::passkeys;
 
 const ITEM_LABEL: &str = "org.freedesktop.Secret.Item.Label";
 const ITEM_ATTRIBUTES: &str = "org.freedesktop.Secret.Item.Attributes";
+
+fn paths(items: &[ItemKey]) -> Vec<OwnedObjectPath> {
+    items
+        .iter()
+        .map(|(collection, item)| item_path(collection, *item))
+        .collect()
+}
 
 pub struct Collection {
     pub daemon: Arc<Daemon>,
@@ -131,21 +139,28 @@ impl Collection {
         attributes: HashMap<String, String>,
         #[zbus(header)] header: Header<'_>,
     ) -> Vec<OwnedObjectPath> {
-        let view = self.daemon.requester(&header).await.view;
+        let requester = self.daemon.requester(&header).await;
         let query: BTreeMap<String, String> = attributes.into_iter().collect();
         let Some(id) = self.id().await else {
             return Vec::new();
         };
-        self.read(|collection| {
-            collection
-                .items
-                .iter()
-                .filter(|item| item.matches(&query) && view.shows(item))
-                .map(|item| item_path(&id, item.id))
-                .collect()
-        })
-        .await
-        .unwrap_or_default()
+        let found = self
+            .read(|collection| {
+                collection
+                    .items
+                    .iter()
+                    .filter(|item| item.matches(&query) && requester.view.shows(item))
+                    .map(|item| (id.clone(), item.id))
+                    .collect()
+            })
+            .await
+            .unwrap_or_default();
+        let listed = if query.is_empty() {
+            self.daemon.shown(&requester, found).await
+        } else {
+            found
+        };
+        paths(&listed)
     }
 
     async fn create_item(
@@ -226,19 +241,22 @@ impl Collection {
     }
 
     #[zbus(property)]
-    async fn items(&self) -> Vec<OwnedObjectPath> {
-        let Some(id) = self.id().await else {
+    async fn items(&self, #[zbus(header)] header: Option<Header<'_>>) -> Vec<OwnedObjectPath> {
+        let (Some(header), Some(id)) = (header, self.id().await) else {
             return Vec::new();
         };
-        self.read(|collection| {
-            collection
-                .items
-                .iter()
-                .map(|item| item_path(&id, item.id))
-                .collect()
-        })
-        .await
-        .unwrap_or_default()
+        let requester = self.daemon.requester(&header).await;
+        let items = self
+            .read(|collection| {
+                collection
+                    .items
+                    .iter()
+                    .map(|item| (id.clone(), item.id))
+                    .collect()
+            })
+            .await
+            .unwrap_or_default();
+        paths(&self.daemon.shown(&requester, items).await)
     }
 
     #[zbus(property)]

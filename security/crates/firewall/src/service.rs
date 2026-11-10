@@ -1,14 +1,16 @@
 use std::collections::BTreeSet;
 use std::sync::Arc;
 
+use luft_dbus::polkit::{self, Details};
 use luft_dbus_macros::introspect;
+use luft_identity::caller;
+use luft_identity::unit::SessionUnit;
 use tokio::sync::Mutex;
 use zbus::fdo::DBusProxy;
 use zbus::message::Header;
 use zbus::object_server::SignalEmitter;
 use zbus::{Connection, OwnedObjectPath, interface};
 
-use crate::apps::identity::{self, Origin};
 use crate::apps::{Access, Identity};
 use crate::error::Error;
 use crate::firewall::Firewall;
@@ -17,12 +19,16 @@ use crate::ports::{Networks, Port};
 
 pub const NAME: &str = "com.lantharos.Firewall1";
 pub const PATH: &str = "/com/lantharos/Firewall1";
+const RESTRICT: &str = "com.lantharos.firewall.restrict";
 const CLASSIFY: &str = "com.lantharos.firewall.classify";
 const OPEN: &str = "com.lantharos.firewall.open-ports";
 const OPEN_ANYWHERE: &str = "com.lantharos.firewall.open-ports-anywhere";
 const APPS: &str = "com.lantharos.firewall.apps";
 const ANYWHERE: &str = "com.lantharos.firewall.apps-anywhere";
-const TYPES: [&str; 2] = ["home", "public"];
+const POST: &str = "kestrel-post.service";
+const KESTREL: &str = "kestrel.service";
+const HOME: &str = "home";
+const PUBLIC: &str = "public";
 
 pub struct Service {
     firewall: Arc<Mutex<Firewall>>,
@@ -44,12 +50,18 @@ impl Service {
         let port = Port::new(port, protocol).ok_or_else(|| {
             Error::InvalidArgs("A port is a number from 1 to 65535 over TCP or UDP".into())
         })?;
-        let action = if networks == Some(Networks::Anywhere) {
-            OPEN_ANYWHERE
-        } else {
-            OPEN
+        let (action, question) = match networks {
+            Some(Networks::Anywhere) => (
+                OPEN_ANYWHERE,
+                format!("Open port {port} to devices on every network, public ones too"),
+            ),
+            Some(Networks::Home) => (
+                OPEN,
+                format!("Open port {port} to devices on home networks"),
+            ),
+            None => (OPEN, format!("Close port {port}")),
         };
-        authorize(connection, header, action).await?;
+        authorize(connection, header, action, &question).await?;
         let mut firewall = self.firewall.lock().await;
         let mut ports = firewall.ports().clone();
         match networks {
@@ -64,25 +76,38 @@ async fn authorize(
     connection: &Connection,
     header: &Header<'_>,
     action: &str,
+    question: &str,
 ) -> Result<(), Error> {
-    if luft_dbus::polkit::is_authorized(connection, header, action).await? {
+    if polkit::is_authorized_to(connection, header, action, &Details::message(question)).await? {
         Ok(())
     } else {
         Err(Error::not_authorized())
     }
 }
 
-async fn session_unit(connection: &Connection, header: &Header<'_>) -> Result<String, Error> {
+async fn user(connection: &Connection, header: &Header<'_>) -> Result<u32, Error> {
     let sender = header.sender().ok_or_else(Error::not_authorized)?;
-    let pid = DBusProxy::new(connection)
+    Ok(DBusProxy::new(connection)
         .await?
-        .get_connection_unix_process_id(sender.clone().into())
+        .get_connection_unix_user(sender.clone().into())
         .await
-        .map_err(zbus::Error::from)?;
-    match identity::of_process(pid) {
-        Some(Origin::Session { unit }) => Ok(unit),
-        _ => Err(Error::not_authorized()),
-    }
+        .map_err(zbus::Error::from)?)
+}
+
+fn identity(kind: &str, id: &str) -> Result<Identity, Error> {
+    Identity::parse(kind, id)
+        .ok_or_else(|| Error::InvalidArgs(format!("{kind} {id} isn't an app or a program")))
+}
+
+async fn session_unit(
+    connection: &Connection,
+    header: &Header<'_>,
+    name: &str,
+) -> Result<SessionUnit, Error> {
+    caller::session_unit(connection, header)
+        .await
+        .filter(|unit| unit.name == name)
+        .ok_or_else(Error::not_authorized)
 }
 
 #[introspect]
@@ -91,6 +116,11 @@ impl Service {
     #[zbus(property)]
     async fn unclassified(&self) -> Vec<(OwnedObjectPath, String)> {
         self.firewall.lock().await.unclassified().to_vec()
+    }
+
+    #[zbus(property)]
+    async fn home_interfaces(&self) -> Vec<String> {
+        self.firewall.lock().await.home_interfaces()
     }
 
     #[zbus(property)]
@@ -111,17 +141,18 @@ impl Service {
     }
 
     #[zbus(property)]
-    async fn apps(&self) -> Vec<(String, String, String)> {
+    async fn apps(&self) -> Vec<(String, String, String, u32)> {
         self.firewall
             .lock()
             .await
             .decisions()
             .iter()
-            .map(|(identity, access)| {
+            .map(|((uid, identity), access)| {
                 (
                     identity.kind().to_owned(),
                     identity.id().to_owned(),
                     access.name().to_owned(),
+                    *uid,
                 )
             })
             .collect()
@@ -134,7 +165,7 @@ impl Service {
             .await
             .waiting()
             .into_iter()
-            .map(|(identity, uid)| (identity.kind().to_owned(), identity.id().to_owned(), uid))
+            .map(|(uid, identity)| (identity.kind().to_owned(), identity.id().to_owned(), uid))
             .collect()
     }
 
@@ -145,25 +176,29 @@ impl Service {
         network: OwnedObjectPath,
         kind: &str,
     ) -> Result<(), Error> {
-        if !TYPES.contains(&kind) {
-            return Err(Error::InvalidArgs(format!(
-                "A network is home or public, not {kind}"
-            )));
-        }
-        authorize(connection, &header, CLASSIFY).await?;
-        let sender = header.sender().ok_or_else(Error::not_authorized)?;
-        let uid = DBusProxy::new(connection)
+        let uid = user(connection, &header).await?;
+        let saved = network::classifiable(connection, network.as_str(), uid)
             .await?
-            .get_connection_unix_user(sender.clone().into())
-            .await
-            .map_err(zbus::Error::from)?;
-        if network::classify(connection, network.as_str(), kind, uid).await? {
-            Ok(())
-        } else {
-            Err(Error::InvalidArgs(
-                "Only your Wi-Fi and wired networks are home or public".into(),
-            ))
-        }
+            .ok_or_else(|| {
+                Error::InvalidArgs("Only your Wi-Fi and wired networks are home or public".into())
+            })?;
+        let name = saved.name();
+        let (action, question) = match kind {
+            HOME => (
+                CLASSIFY,
+                format!(
+                    "Make “{name}” a home network, where other devices can find this computer and connect to the apps you allowed"
+                ),
+            ),
+            PUBLIC => (RESTRICT, format!("Make “{name}” a public network")),
+            _ => {
+                return Err(Error::InvalidArgs(format!(
+                    "A network is home or public, not {kind}"
+                )));
+            }
+        };
+        authorize(connection, &header, action, &question).await?;
+        Ok(saved.classify(kind).await?)
     }
 
     async fn open_port(
@@ -207,25 +242,46 @@ impl Service {
         id: &str,
         access: &str,
     ) -> Result<(), Error> {
-        let identity = Identity::parse(kind, id)
-            .ok_or_else(|| Error::InvalidArgs(format!("{kind} {id} isn't an app or a program")))?;
+        let identity = identity(kind, id)?;
         let access = Access::parse(access).ok_or_else(|| {
             Error::InvalidArgs(format!(
                 "An app is allowed home, anywhere or blocked, not {access}"
             ))
         })?;
-        let action = if access == Access::Anywhere {
-            ANYWHERE
-        } else {
-            APPS
+        let owner = (user(connection, &header).await?, identity);
+        let allowed = self.firewall.lock().await.decisions().get(&owner).copied();
+        let (action, question) = match (allowed, access) {
+            (_, Access::Blocked) => (
+                RESTRICT,
+                format!("Stop other devices from connecting to the {kind} “{id}”"),
+            ),
+            (Some(Access::Anywhere), Access::Home) => (
+                RESTRICT,
+                format!("Let only devices on home networks connect to the {kind} “{id}”"),
+            ),
+            (_, Access::Home) => (
+                APPS,
+                format!("Let other devices on home networks connect to the {kind} “{id}”"),
+            ),
+            (_, Access::Anywhere) => (
+                ANYWHERE,
+                format!(
+                    "Let devices on every network, public ones too, connect to the {kind} “{id}”"
+                ),
+            ),
         };
-        authorize(connection, &header, action).await?;
-        self.firewall
-            .lock()
-            .await
-            .decide(identity, access)
+        authorize(connection, &header, action, &question).await?;
+        let mut firewall = self.firewall.lock().await;
+        if firewall.decisions().get(&owner).copied() != allowed {
+            return Err(Error::Failed(
+                "What it may do changed meanwhile. Try again.".into(),
+            ));
+        }
+        firewall
+            .decide(owner, access)
             .await
             .map_err(Error::Failed)?;
+        drop(firewall);
         self.apps_changed(&emitter).await?;
         Ok(self.waiting_changed(&emitter).await?)
     }
@@ -238,13 +294,18 @@ impl Service {
         kind: &str,
         id: &str,
     ) -> Result<(), Error> {
-        let identity = Identity::parse(kind, id)
-            .ok_or_else(|| Error::InvalidArgs(format!("{kind} {id} isn't an app or a program")))?;
-        authorize(connection, &header, APPS).await?;
+        let owner = (user(connection, &header).await?, identity(kind, id)?);
+        authorize(
+            connection,
+            &header,
+            RESTRICT,
+            &format!("Forget what the {kind} “{id}” is allowed on the network"),
+        )
+        .await?;
         self.firewall
             .lock()
             .await
-            .forget(&identity)
+            .forget(&owner)
             .await
             .map_err(Error::Failed)?;
         self.apps_changed(&emitter).await?;
@@ -257,11 +318,11 @@ impl Service {
         #[zbus(header)] header: Header<'_>,
         open: bool,
     ) -> Result<(), Error> {
-        let unit = session_unit(connection, &header).await?;
+        let post = session_unit(connection, &header, POST).await?;
         self.firewall
             .lock()
             .await
-            .open_post(unit, open)
+            .open_post(post.cgroup, open)
             .await
             .map_err(Error::Failed)
     }
@@ -279,11 +340,25 @@ impl Service {
             .ok_or_else(|| {
                 Error::InvalidArgs("Extensions listen on TCP or UDP ports from 1 to 65535".into())
             })?;
-        let unit = session_unit(connection, &header).await?;
+        let SessionUnit { uid, cgroup, .. } = session_unit(connection, &header, KESTREL).await?;
+        let new = self.firewall.lock().await.new_to(uid, &ports);
+        if !new.is_empty() {
+            let new: Vec<String> = new.iter().map(Port::to_string).collect();
+            authorize(
+                connection,
+                &header,
+                APPS,
+                &format!(
+                    "Let other devices on home networks connect to Kestrel’s extensions on {}",
+                    new.join(", ")
+                ),
+            )
+            .await?;
+        }
         self.firewall
             .lock()
             .await
-            .declare(unit, ports)
+            .declare(uid, cgroup, ports)
             .await
             .map_err(Error::Failed)
     }

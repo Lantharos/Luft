@@ -1,13 +1,15 @@
 mod access;
+mod extensions;
 pub mod identity;
 mod listeners;
 mod questions;
 
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeSet;
 use std::io;
 use std::time::Instant;
 
 pub use access::{Access, Decisions};
+use extensions::Extensions;
 pub use identity::{Identity, Origin};
 use listeners::{Listener, Listeners};
 use questions::Questions;
@@ -28,7 +30,7 @@ pub struct Apps {
     decisions: Decisions,
     listeners: Listeners,
     questions: Questions,
-    extensions: BTreeMap<String, BTreeSet<Port>>,
+    extensions: Extensions,
 }
 
 fn discovery(port: Port) -> bool {
@@ -41,7 +43,7 @@ impl Apps {
         let listeners = Listeners::restore();
         let mut questions = Questions::default();
         for listener in listeners.iter() {
-            if !decisions.contains_key(&listener.identity) {
+            if !decisions.contains_key(&listener.owner()) {
                 questions.ask(listener);
             }
         }
@@ -49,7 +51,7 @@ impl Apps {
             decisions,
             listeners,
             questions,
-            extensions: BTreeMap::new(),
+            extensions: Extensions::load()?,
         })
     }
 
@@ -61,7 +63,7 @@ impl Apps {
         &self.decisions
     }
 
-    pub fn waiting(&self) -> BTreeSet<(Identity, u32)> {
+    pub fn waiting(&self) -> BTreeSet<(u32, Identity)> {
         self.questions.waiting()
     }
 
@@ -72,7 +74,7 @@ impl Apps {
     pub fn reachable(&self) -> Reachable {
         let mut reachable = Reachable::default();
         for listener in self.listeners.iter() {
-            let Some(access) = self.decisions.get(&listener.identity) else {
+            let Some(access) = self.decisions.get(&listener.owner()) else {
                 continue;
             };
             let element = (listener.unit.clone(), listener.port);
@@ -83,29 +85,29 @@ impl Apps {
                 reachable.home.insert(element);
             }
         }
-        for (unit, ports) in &self.extensions {
-            reachable
-                .home
-                .extend(ports.iter().map(|port| (unit.clone(), *port)));
-        }
+        reachable.home.extend(
+            self.extensions
+                .listening()
+                .map(|(unit, port)| (unit.clone(), *port)),
+        );
         reachable
     }
 
     pub fn prune(&mut self) {
         self.listeners.retain_alive();
         self.questions.retain_alive();
-        self.extensions.retain(|unit, _| identity::alive(unit));
+        self.extensions.retain_alive();
     }
 
     pub fn prune_questions(&mut self) {
         self.questions.retain_alive();
     }
 
-    pub fn observe(&mut self, change: Change) {
+    pub fn observe(&mut self, change: Change) -> bool {
         match change {
             Change::Bound { cookie, pid, port } => {
                 if discovery(port) {
-                    return;
+                    return false;
                 }
                 let Some(Origin::App {
                     unit,
@@ -113,24 +115,25 @@ impl Apps {
                     uid,
                 }) = identity::of_process(pid)
                 else {
-                    return;
+                    return false;
                 };
-                if !self.decisions.contains_key(&identity) {
+                let listener = Listener {
+                    unit,
+                    identity,
+                    uid,
+                    port,
+                };
+                let access = self.decisions.get(&listener.owner()).copied();
+                if access.is_none() {
                     self.questions.listening(cookie);
                 }
-                self.listeners.insert(
-                    cookie,
-                    Listener {
-                        unit,
-                        identity,
-                        uid,
-                        port,
-                    },
-                );
+                self.listeners.insert(cookie, listener);
+                access.is_some_and(Access::on_home)
             }
             Change::Released { cookie } => {
                 self.questions.stopped(cookie);
                 self.listeners.remove(cookie);
+                false
             }
         }
     }
@@ -138,42 +141,47 @@ impl Apps {
     pub fn settle(&mut self, now: Instant) {
         for cookie in self.questions.settled(now) {
             if let Some(listener) = self.listeners.get(cookie)
-                && !self.decisions.contains_key(&listener.identity)
+                && !self.decisions.contains_key(&listener.owner())
             {
                 self.questions.ask(listener);
             }
         }
     }
 
-    pub fn decide(&mut self, identity: Identity, access: Access) -> io::Result<()> {
+    pub fn decide(&mut self, owner: (u32, Identity), access: Access) -> io::Result<()> {
         let mut decisions = self.decisions.clone();
-        decisions.insert(identity.clone(), access);
+        decisions.insert(owner.clone(), access);
         access::save(&decisions)?;
         self.decisions = decisions;
-        self.questions.answered(&identity);
+        self.questions.answered(&owner);
         Ok(())
     }
 
-    pub fn forget(&mut self, identity: &Identity) -> io::Result<()> {
+    pub fn forget(&mut self, owner: &(u32, Identity)) -> io::Result<()> {
         let mut decisions = self.decisions.clone();
-        decisions.remove(identity);
+        decisions.remove(owner);
         access::save(&decisions)?;
         self.decisions = decisions;
         for listener in self
             .listeners
             .iter()
-            .filter(|listener| listener.identity == *identity)
+            .filter(|listener| listener.owner() == *owner)
         {
             self.questions.ask(listener);
         }
         Ok(())
     }
 
-    pub fn declare(&mut self, unit: String, ports: BTreeSet<Port>) {
-        if ports.is_empty() {
-            self.extensions.remove(&unit);
-        } else {
-            self.extensions.insert(unit, ports);
+    pub fn new_to(&self, uid: u32, ports: &BTreeSet<Port>) -> Vec<Port> {
+        self.extensions.new_to(uid, ports)
+    }
+
+    pub fn declare(&mut self, uid: u32, unit: String, ports: BTreeSet<Port>) -> io::Result<()> {
+        let new = self.extensions.new_to(uid, &ports);
+        if !new.is_empty() {
+            self.extensions.agree(uid, &new)?;
         }
+        self.extensions.listen(unit, ports);
+        Ok(())
     }
 }

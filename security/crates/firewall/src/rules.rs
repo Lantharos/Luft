@@ -1,62 +1,21 @@
+use std::collections::BTreeMap;
 use std::fmt::Write;
 use std::process::Stdio;
 
 use tokio::io::AsyncWriteExt;
 use tokio::process::Command;
 
-use crate::apps::identity::UNIT_LEVEL;
 use crate::apps::{Reach, Reachable};
 use crate::network::{Layout, Prefix};
 use crate::ports::{Networks, Opened, Protocol};
 
 const NFT: &str = "/usr/sbin/nft";
+const BASE: &str = "/usr/share/luft-firewall/base.nft";
+const APP_SETS: [&str; 2] = ["apps_home", "apps_anywhere"];
 pub const DISCOVERY: [u16; 3] = [1900, 3702, 5353];
 const POST: u16 = 53317;
-const APP_KEY: &str = "socket cgroupv2 level UNIT_LEVEL . meta l4proto . th dport";
 
-const CHAINS: &str = r#"
-	chain input {
-		type filter hook input priority filter; policy drop;
-		ct state { established, related } accept
-		iif lo accept
-		icmpv6 type { destination-unreachable, packet-too-big, time-exceeded, parameter-problem, mld-listener-query, nd-router-advert, nd-neighbor-solicit, nd-neighbor-advert } accept
-		ct state invalid drop
-		icmp type { destination-unreachable, time-exceeded, parameter-problem } accept
-		udp sport 67 udp dport 68 accept
-		ip6 saddr fe80::/10 udp sport 547 udp dport 546 accept
-		iifname "tailscale0" accept
-		iifname "virbr*" accept
-		iifname "podman*" accept
-		iifname "cni-podman*" accept
-		iifname "waydroid*" accept
-		iifname "docker0" accept
-		iifname @hosted accept
-		iifname . ip saddr @home4 jump home
-		iifname . ip6 saddr @home6 jump home
-		tcp dport @anywhere_tcp accept
-		udp dport @anywhere_udp accept
-		APP_KEY @apps_anywhere accept
-	}
-
-	chain home {
-		icmp type echo-request accept
-		icmpv6 type echo-request accept
-		udp dport { DISCOVERY } accept
-		udp sport { DISCOVERY } udp dport 32768-60999 accept
-POST		tcp dport @opened_tcp accept
-		udp dport @opened_udp accept
-		APP_KEY @apps_home accept
-	}
-}
-"#;
-
-fn set(script: &mut String, name: &str, kind: &str, elements: &[String]) {
-    let _ = writeln!(script, "\tset {name} {{\n\t\t{kind}");
-    if !elements.is_empty() {
-        let _ = writeln!(script, "\t\telements = {{ {} }}", elements.join(", "));
-    }
-    script.push_str("\t}\n");
-}
+pub type Sets = BTreeMap<&'static str, Vec<String>>;
 
 fn home(layout: &Layout, ipv4: bool) -> Vec<String> {
     layout
@@ -82,57 +41,61 @@ fn reach(elements: &Reach) -> Vec<String> {
         .collect()
 }
 
-pub fn ruleset(layout: &Layout, ports: &Opened, reachable: &Reachable, post: bool) -> String {
-    let hosted: Vec<String> = layout
-        .hosted
-        .iter()
-        .map(|name| format!("\"{name}\""))
-        .collect();
-    let key = APP_KEY.replace("UNIT_LEVEL", &UNIT_LEVEL.to_string());
-    let typed = format!("typeof {key}");
-    let mut script = String::from("table inet luft\ndelete table inet luft\ntable inet luft {\n");
-    set(
-        &mut script,
-        "home4",
-        "type ifname . ipv4_addr\n\t\tflags interval",
-        &home(layout, true),
-    );
-    set(
-        &mut script,
-        "home6",
-        "type ifname . ipv6_addr\n\t\tflags interval",
-        &home(layout, false),
-    );
-    set(&mut script, "hosted", "type ifname", &hosted);
-    for (networks, prefix) in [(Networks::Home, "opened"), (Networks::Anywhere, "anywhere")] {
-        for protocol in [Protocol::Tcp, Protocol::Udp] {
-            set(
-                &mut script,
-                &format!("{prefix}_{}", protocol.name()),
-                "type inet_service",
-                &opened(ports, networks, protocol),
-            );
+pub fn sets(layout: &Layout, ports: &Opened, reachable: &Reachable, post: bool) -> Sets {
+    Sets::from([
+        ("home4", home(layout, true)),
+        ("home6", home(layout, false)),
+        (
+            "hosted",
+            layout
+                .hosted
+                .iter()
+                .map(|name| format!("\"{name}\""))
+                .collect(),
+        ),
+        ("opened_tcp", opened(ports, Networks::Home, Protocol::Tcp)),
+        ("opened_udp", opened(ports, Networks::Home, Protocol::Udp)),
+        (
+            "anywhere_tcp",
+            opened(ports, Networks::Anywhere, Protocol::Tcp),
+        ),
+        (
+            "anywhere_udp",
+            opened(ports, Networks::Anywhere, Protocol::Udp),
+        ),
+        ("post", post.then(|| POST.to_string()).into_iter().collect()),
+        (APP_SETS[0], reach(&reachable.home)),
+        (APP_SETS[1], reach(&reachable.anywhere)),
+    ])
+}
+
+fn fill(script: &mut String, name: &str, elements: &[String]) {
+    if !elements.is_empty() {
+        let _ = writeln!(
+            script,
+            "add element inet luft {name} {{ {} }}",
+            elements.join(", ")
+        );
+    }
+}
+
+pub fn everything(sets: &Sets) -> String {
+    let mut script = format!("include \"{BASE}\"\n");
+    for (name, elements) in sets {
+        fill(&mut script, name, elements);
+    }
+    script
+}
+
+pub fn changes(loaded: &Sets, wanted: &Sets, renew: bool) -> String {
+    let mut script = String::new();
+    for (name, elements) in wanted {
+        let renewed = renew && APP_SETS.contains(name) && !elements.is_empty();
+        if renewed || loaded.get(name) != Some(elements) {
+            let _ = writeln!(script, "flush set inet luft {name}");
+            fill(&mut script, name, elements);
         }
     }
-    set(&mut script, "apps_home", &typed, &reach(&reachable.home));
-    set(
-        &mut script,
-        "apps_anywhere",
-        &typed,
-        &reach(&reachable.anywhere),
-    );
-    let discovery: Vec<String> = DISCOVERY.iter().map(u16::to_string).collect();
-    let post = if post {
-        format!("\t\ttcp dport {POST} accept\n\t\tudp dport {POST} accept\n")
-    } else {
-        String::new()
-    };
-    script.push_str(
-        &CHAINS
-            .replace("APP_KEY", &key)
-            .replace("DISCOVERY", &discovery.join(", "))
-            .replace("POST", &post),
-    );
     script
 }
 

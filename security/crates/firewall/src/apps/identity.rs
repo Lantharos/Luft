@@ -3,10 +3,10 @@ use std::path::Path;
 
 pub const UNIT_LEVEL: usize = 5;
 const APP_SLICES: [&str; 2] = ["app.slice", "background.slice"];
-const SESSION_SLICE: &str = "session.slice";
 const FLATPAK: &str = "flatpak-";
 const DBUS: &str = "dbus-:";
 const UNKNOWN: &str = "org.freedesktop.Unknown";
+const MAX_ID: usize = 255;
 
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
 pub enum Identity {
@@ -16,7 +16,7 @@ pub enum Identity {
 
 impl Identity {
     pub fn parse(kind: &str, id: &str) -> Option<Self> {
-        if id.is_empty() || id.contains('\n') {
+        if id.is_empty() || id.len() > MAX_ID || id.contains('\n') {
             return None;
         }
         match kind {
@@ -52,9 +52,6 @@ pub enum Origin {
         unit: String,
         identity: Identity,
         uid: u32,
-    },
-    Session {
-        unit: String,
     },
     System,
 }
@@ -108,18 +105,15 @@ fn classify(path: &str, program: impl FnOnce() -> Option<String>) -> Origin {
         return Origin::System;
     }
     let unit_path = parts[..UNIT_LEVEL].join("/");
-    if slice == SESSION_SLICE {
-        return Origin::Session { unit: unit_path };
-    }
     if !APP_SLICES.contains(&slice) {
         return Origin::System;
     }
-    let identity = match app_id(&unescape(unit)) {
-        Some(id) => Identity::App(id),
-        None => match program() {
-            Some(name) => Identity::Program(name),
-            None => return Origin::System,
-        },
+    let named = match app_id(&unescape(unit)) {
+        Some(id) => Identity::parse("app", &id),
+        None => program().and_then(|name| Identity::parse("program", &name)),
+    };
+    let Some(identity) = named else {
+        return Origin::System;
     };
     Origin::App {
         unit: unit_path,
@@ -244,19 +238,6 @@ mod tests {
     }
 
     #[test]
-    fn keeps_to_the_unit_inside_nested_groups() {
-        let path =
-            "user.slice/user-1000.slice/user@1000.service/session.slice/kestrel.service/shell";
-        assert_eq!(
-            classify(path, || None),
-            Origin::Session {
-                unit: "user.slice/user-1000.slice/user@1000.service/session.slice/kestrel.service"
-                    .to_owned()
-            }
-        );
-    }
-
-    #[test]
     fn leaves_system_services_alone() {
         for path in [
             "system.slice/sshd.service",
@@ -264,6 +245,7 @@ mod tests {
             "user.slice/user-1000.slice/session-2.scope",
             "user.slice/user-1000.slice/user@1001.service/app.slice/app-x-1.scope",
             "user.slice/user-1000.slice/user@1000.service/init.scope",
+            "user.slice/user-1000.slice/user@1000.service/session.slice/kestrel.service/shell",
             "user.slice/user-1000.slice/user@1000.service/app.slice/bad\"name.scope",
         ] {
             assert_eq!(

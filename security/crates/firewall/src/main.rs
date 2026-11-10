@@ -63,12 +63,12 @@ async fn main() -> anyhow::Result<()> {
                 }
             }
             bound = watcher.next() => Followed {
-                reclassified: false,
                 waiting: firewall.lock().await.observe(bound?).await,
+                ..Followed::default()
             },
             () = settled(deadline) => Followed {
-                reclassified: false,
                 waiting: firewall.lock().await.settle(),
+                ..Followed::default()
             },
             _ = terminate.recv() => break,
             _ = interrupt.recv() => break,
@@ -76,6 +76,13 @@ async fn main() -> anyhow::Result<()> {
         let emitter = interface.signal_emitter();
         if followed.reclassified {
             interface.get().await.unclassified_changed(emitter).await?;
+        }
+        if followed.home {
+            interface
+                .get()
+                .await
+                .home_interfaces_changed(emitter)
+                .await?;
         }
         if followed.waiting {
             interface.get().await.waiting_changed(emitter).await?;

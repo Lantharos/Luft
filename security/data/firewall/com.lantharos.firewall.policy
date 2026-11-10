@@ -5,13 +5,23 @@
   <vendor>Luft</vendor>
   <vendor_url>https://github.com/Lantharos</vendor_url>
 
-  <action id="com.lantharos.firewall.classify">
-    <description>Choose whether a network is a home or a public network</description>
-    <message>Authentication is required to change what kind of network this is</message>
+  <action id="com.lantharos.firewall.restrict">
+    <description>Make a network public, or stop other devices from connecting to an app</description>
+    <message>Authentication is required to change what other devices can connect to</message>
     <defaults>
       <allow_any>auth_admin_keep</allow_any>
       <allow_inactive>auth_admin_keep</allow_inactive>
       <allow_active>yes</allow_active>
+    </defaults>
+  </action>
+
+  <action id="com.lantharos.firewall.classify">
+    <description>Make a network a home network</description>
+    <message>Authentication is required to make this a home network</message>
+    <defaults>
+      <allow_any>auth_admin_keep</allow_any>
+      <allow_inactive>auth_admin_keep</allow_inactive>
+      <allow_active>auth_self_keep</allow_active>
     </defaults>
   </action>
 
@@ -35,12 +45,12 @@
   </action>
 
   <action id="com.lantharos.firewall.apps">
-    <description>Choose which apps devices on home networks can connect to</description>
-    <message>Authentication is required to change which apps other devices can connect to</message>
+    <description>Let devices on home networks connect to an app</description>
+    <message>Authentication is required to let devices on home networks connect to an app</message>
     <defaults>
       <allow_any>auth_admin_keep</allow_any>
       <allow_inactive>auth_admin_keep</allow_inactive>
-      <allow_active>yes</allow_active>
+      <allow_active>auth_self_keep</allow_active>
     </defaults>
   </action>
 

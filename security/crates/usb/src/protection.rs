@@ -1,7 +1,11 @@
 use std::collections::BTreeMap;
 use std::io;
 
+use zbus::names::OwnedUniqueName;
+
+use crate::seat::SignedIn;
 use crate::store;
+use crate::unlocked::Unlocked;
 use crate::usb::{self, Admission, Event};
 
 pub type Device = (String, String);
@@ -15,17 +19,17 @@ pub struct Change {
 
 pub struct Protection {
     enabled: bool,
-    unlocked: bool,
+    unlocked: Unlocked,
     guarding: bool,
     held: BTreeMap<String, String>,
     unclaimed: Vec<Device>,
 }
 
 impl Protection {
-    pub fn start(unlocked: bool) -> Self {
+    pub fn start(signed_in: Option<SignedIn>) -> Self {
         let mut protection = Self {
             enabled: store::enabled(),
-            unlocked,
+            unlocked: Unlocked::at(signed_in),
             guarding: false,
             held: BTreeMap::new(),
             unclaimed: Vec::new(),
@@ -54,6 +58,10 @@ impl Protection {
         self.held.clone().into_iter().collect()
     }
 
+    pub fn signed_in(&self) -> Option<u32> {
+        self.unlocked.person()
+    }
+
     pub fn take_released(&mut self) -> Vec<Device> {
         std::mem::take(&mut self.unclaimed)
     }
@@ -66,9 +74,23 @@ impl Protection {
         }))
     }
 
-    pub fn set_unlocked(&mut self, unlocked: bool) -> Change {
+    pub fn switch(&mut self, signed_in: Option<SignedIn>) -> Change {
         self.track(|protection| {
-            protection.unlocked = unlocked;
+            protection.unlocked.switch(signed_in);
+            protection.settle()
+        })
+    }
+
+    pub fn declare(&mut self, uid: u32, shell: OwnedUniqueName, locked: bool) -> Change {
+        self.track(|protection| {
+            protection.unlocked.declare(uid, shell, locked);
+            protection.settle()
+        })
+    }
+
+    pub fn shell_left(&mut self, name: &str) -> Change {
+        self.track(|protection| {
+            protection.unlocked.left(name);
             protection.settle()
         })
     }
@@ -105,7 +127,7 @@ impl Protection {
     }
 
     fn should_guard(&self) -> bool {
-        self.enabled && !self.unlocked
+        self.enabled && !self.unlocked.now()
     }
 
     fn settle(&mut self) -> Vec<Device> {

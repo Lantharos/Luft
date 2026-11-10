@@ -20,7 +20,9 @@ fail() {
   exit 1
 }
 firewall() { busctl call "$name" "$path" "$name" "$@"; }
+decide() { as_person busctl call "$name" "$path" "$name" SetAppAccess sss "$@"; }
 waiting() { busctl get-property "$name" "$path" "$name" Waiting; }
+home_interfaces() { busctl get-property "$name" "$path" "$name" HomeInterfaces; }
 
 reaches() { curl -s -o /dev/null -m 3 "http://10.0.2.2:$1/"; }
 datagram_reaches() {
@@ -42,6 +44,7 @@ neighbor() {
     ipv6.method disabled connection.zone home > /dev/null
   nmcli connection up neighbor > /dev/null
   eventually "a second home network connects" sh -c 'nft list set inet luft home4 | grep -q "\"lan8\" . 192.168.88.0/24"'
+  home_interfaces | grep -q '"lan8"' || fail "the second home network isn't among the home interfaces"
 }
 from_peer() { ip netns exec peer curl -s -o /dev/null -m 3 "http://$1/"; }
 post_reaches() { ip netns exec neighbor curl -s -o /dev/null -m 3 "http://192.168.88.1:53317/"; }
@@ -132,7 +135,7 @@ short_lived() {
   [[ "$flapping" != *1* ]] || fail "an app is asked about for listeners that close at once ($flapping)"
   [[ "$settling" =~ ^0+1+$ ]] || fail "an app that stopped listening for a while isn't asked about once and for good ($settling)"
   say "ok: asked once about an app that listens, stops and listens again, never about short-lived sockets"
-  firewall SetAppAccess sss app com.example.Settling blocked || fail "SetAppAccess blocked for the settling app"
+  decide app com.example.Settling blocked || fail "SetAppAccess blocked for the settling app"
   as_person systemctl --user stop app-com.example.Settling@check.service
   sockets_as app-com.example.Settling@again.service settle
   [[ "$(samples 50 app com.example.Settling)" != *1* ]] || fail "an app that wasn't allowed is asked about again"
@@ -152,9 +155,7 @@ serve() {
     python3 -m http.server 8001 --directory /usr/share > /dev/null 2>&1 &
   serve_as dev-server.service 8002
   serve_as app-com.example.Local@check.service 8004 127.0.0.1
-  as_person systemd-run --user --quiet --collect --unit=extensions-check.service --slice=session.slice -- sh -c \
-    "busctl call $name $path $name SetExtensionPorts 'a(qs)' 1 8003 tcp; exec python3 -m http.server 8003 --directory /usr/share"
-  as_person systemctl --user start kestrel-post.service
+  as_person systemctl --user start kestrel.service kestrel-post.service
   receive_as app-com.example.Approved@udp.service 9000
   receive_as app-com.example.Other@udp.service 9001
   eventually "the test receivers listen" sh -c 'ss -lun | grep -q ":9000 " && ss -lun | grep -q ":9001 "'
@@ -175,9 +176,21 @@ virtual_networks() {
   peer virbr0 192.168.122
   peer podman0 10.88.0
   peer lan9 192.168.77
-  expect open "port 80 over Tailscale" from_peer 100.100.0.1:80
-  expect open "port 80 from a virtual machine" from_peer 192.168.122.1:80
-  expect open "port 80 from a container" from_peer 10.88.0.1:80
+  for address in 100.100.0.1 192.168.122.1 10.88.0.1; do
+    python3 -m http.server --bind "$address" 53 --directory /usr/share > /dev/null 2>&1 &
+    python3 -m http.server --bind "$address" 8005 --directory /usr/share > /dev/null 2>&1 &
+  done
+  eventually "the servers on the virtual networks listen" sh -c 'for address in 100.100.0.1 192.168.122.1 10.88.0.1; do curl -s -o /dev/null http://$address:53/ && curl -s -o /dev/null http://$address:8005/ || exit 1; done'
+  expect open "a port opened on home networks, over Tailscale" from_peer 100.100.0.1:80
+  expect open "an app allowed on home networks, over Tailscale" from_peer 100.100.0.1:8000
+  expect closed "a port nobody opened, over Tailscale" from_peer 100.100.0.1:8005
+  expect closed "DNS over Tailscale" from_peer 100.100.0.1:53
+  expect open "DNS for a virtual machine" from_peer 192.168.122.1:53
+  expect open "DNS for a container" from_peer 10.88.0.1:53
+  expect open "a port opened on home networks, from a virtual machine" from_peer 192.168.122.1:80
+  expect open "an app allowed on home networks, from a container" from_peer 10.88.0.1:8000
+  expect closed "a port nobody opened, from a virtual machine" from_peer 192.168.122.1:8005
+  expect closed "a port nobody opened, from a container" from_peer 10.88.0.1:8005
   expect closed "an allowed app from an unknown network" from_peer 192.168.77.1:8000
 }
 
@@ -203,31 +216,57 @@ untouched_tables() {
   say "ok: other software's tables stay"
 }
 
+holds_without_the_service() {
+  local base network
+  base="$(systemctl show -p ActiveEnterTimestampMonotonic --value luft-firewall-base.service)"
+  network="$(systemctl show -p ActiveEnterTimestampMonotonic --value NetworkManager.service)"
+  (( base > 0 && base < network )) || fail "the base rules weren't in place before the network started ($base, $network)"
+  systemctl stop luft-firewall.service
+  nft -f /usr/share/luft-firewall/base.nft || fail "the base rules don't load"
+  expect closed "an allowed app while only the base rules hold" reaches "$approved"
+  expect closed "an opened port while only the base rules hold" reaches "$system"
+  ping -c 1 -W 3 10.0.2.2 > /dev/null || fail "the base rules stop the computer's own connections"
+  systemctl start luft-firewall.service
+  eventually "the firewall fills the base rules again" is_home
+  expect open "an allowed app once the firewall runs again" reaches "$approved"
+  say "ok: without the service nothing gets in, and the computer still gets out"
+}
+
 apps_on_home() {
   eventually "an app listening on a home network waits for an answer" asks_about app com.example.Approved
   asks_about app com.example.Other || fail "a Flatpak listening on a home network isn't asked about"
   asks_about program python3 || fail "a program outside an app isn't asked about by its name"
   not_asking app com.example.Local || fail "an app listening only on this computer is asked about"
   expect closed "an app nobody decided about" reaches "$approved"
-  firewall SetAppAccess sss app com.example.Approved home || fail "SetAppAccess home"
+  firewall SetAppAccess sss app com.example.Approved home || fail "root choosing for its own apps"
+  expect closed "an app only another account allowed" reaches "$approved"
+  id stranger > /dev/null 2>&1 || useradd -m stranger
+  runuser -u stranger -- busctl call "$name" "$path" "$name" SetAppAccess sss app com.example.Approved home 2> /dev/null \
+    && fail "an account allowed an app without anyone confirming"
+  say "ok: allowing an app takes the person's own confirmation, and holds for their apps only"
+  decide app com.example.Approved home || fail "SetAppAccess home"
   expect open "an app allowed on home networks" reaches "$approved"
   expect closed "an app nobody allowed" reaches "$other"
-  firewall SetAppAccess sss app com.example.Other blocked || fail "SetAppAccess blocked"
+  decide app com.example.Other blocked || fail "SetAppAccess blocked"
   expect closed "an app that isn't allowed" reaches "$other"
   not_asking app com.example.Other || fail "an app that was answered is still asked about"
   neighbor
   expect open "UDP to an app allowed on home networks" datagram_reaches 9000
   expect closed "UDP to an app that isn't allowed" datagram_reaches 9001
   expect closed "a program nobody allowed" reaches "$program"
-  firewall SetAppAccess sss program python3 home || fail "SetAppAccess for a program"
+  decide program python3 home || fail "SetAppAccess for a program"
   expect open "a program allowed on home networks" reaches "$program"
   expect open "a port Kestrel's extensions listen on" reaches "$extension"
   as_person systemd-run --user --quiet --wait --pipe --unit=app-com.example.Sneaky@check.service -- \
     busctl call "$name" "$path" "$name" SetExtensionPorts 'a(qs)' 1 8001 tcp 2> /dev/null && fail "an app opened ports as if it were Kestrel"
+  as_person systemd-run --user --quiet --wait --pipe --collect --unit=other-extensions.service --slice=session.slice -- \
+    busctl call "$name" "$path" "$name" SetExtensionPorts 'a(qs)' 1 8001 tcp 2> /dev/null && fail "another part of the desktop opened ports as if it were Kestrel"
   say "ok: only Kestrel declares extension ports"
   expect open "Post while someone may find the computer" post_reaches
   as_person systemd-run --user --quiet --wait --pipe --unit=app-com.example.Sneaky@post.service -- \
     busctl call "$name" "$path" "$name" SetPostOpen b true 2> /dev/null && fail "an app opened Post's port"
+  as_person systemd-run --user --quiet --wait --pipe --collect --unit=other-post.service --slice=session.slice -- \
+    busctl call "$name" "$path" "$name" SetPostOpen b true 2> /dev/null && fail "another part of the desktop opened Post's port"
   touch "/home/$person/post-closed"
   eventually "Post's port closes once no one may find the computer" sh -c '! ip netns exec neighbor curl -s -o /dev/null -m 1 http://192.168.88.1:53317/'
   say "ok: Post's port follows who may find the computer"
@@ -244,6 +283,7 @@ first() {
   expect closed "port 80 on a new network" reaches "$system"
   firewall SetNetworkType os "$(wired_path)" home || fail "SetNetworkType home"
   eventually "the network becomes a home network" is_home
+  home_interfaces | grep -q "\"$device\"" || fail "the home network isn't among the home interfaces"
   [[ "$(unclassified)" == "a(os) 0" ]] || fail "a home network still waits for a type"
   apps_on_home
   short_lived
@@ -252,6 +292,7 @@ first() {
   expect open "port 80 opened in Settings" reaches "$system"
   virtual_networks
   untouched_tables
+  holds_without_the_service
   mkdir -p "$state"
   no_denials
   say "PASS first"
@@ -271,9 +312,10 @@ second() {
   expect closed "port 80 once closed again" reaches "$system"
   firewall SetNetworkType os "$(wired_path)" public || fail "SetNetworkType public"
   eventually "the network becomes public" is_public
+  [[ "$(home_interfaces)" == "as 0" ]] || fail "a public network is among the home interfaces"
   expect closed "an app allowed on home networks, on a public network" reaches "$approved"
   expect closed "Kestrel's extensions on a public network" reaches "$extension"
-  firewall SetAppAccess sss app com.example.Approved anywhere || fail "SetAppAccess anywhere"
+  decide app com.example.Approved anywhere || fail "SetAppAccess anywhere"
   expect open "an app allowed on public networks too" reaches "$approved"
   expect closed "a program allowed only on home networks, on a public network" reaches "$program"
   no_denials

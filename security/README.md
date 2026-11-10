@@ -1,6 +1,6 @@
 # Security
 
-Luft's device security services. **trustd** adds Luft's Secure Boot key to shim, keeps shim and SushiBoot up to date, unlocks the disk with the TPM, changes the size and place of Luft's partition, and encrypts or decrypts other drives in place; Settings shows it on its Security page and `trustctl` from the command line. **luft-usb-protection** holds back new USB devices while the screen is locked, except keyboards, mice and security keys. **luft-firewall** keeps devices on the network from connecting to the computer, except to the apps people allowed, on home networks or everywhere. **luft-remote-login** turns SSH on and off for Settings, with Luft's defaults, and changes who may sign in and with which keys.
+Luft's device security services. **trustd** adds Luft's Secure Boot key to shim, keeps shim and SushiBoot up to date, unlocks the disk with the TPM, changes the size and place of Luft's partition, and encrypts or decrypts other drives in place; Settings shows it on its Security page and `trustctl` from the command line. **luft-usb-protection** holds back new USB devices while the screen is locked, except plain keyboards and mice. **luft-firewall** keeps devices on the network from connecting to the computer, except to the apps people allowed, on home networks or everywhere. **luft-remote-login** turns SSH on and off for Settings, with Luft's defaults, and changes who may sign in and with which keys.
 
 How the pieces protect the computer is in [docs/security.md](../docs/security.md), boot and recovery in [docs/boot.md](../docs/boot.md), and what people see in [Security](https://docs.luft.computer/system/security/).
 
@@ -28,6 +28,7 @@ All commands need root.
 | `trustctl startup install [--esp DIR]` | Puts shim and SushiBoot on the EFI system partition and makes Luft the firmware's boot entry |
 | `trustctl tpm enroll [--pin]` / `remove` | Lets the TPM unlock the encrypted disk, optionally with a PIN, or removes that |
 | `trustctl recovery-key show` / `replace` | Shows or replaces the disk's recovery key |
+| `trustctl recovery-key check` | Checks that the recovery key still opens the disk |
 | `trustctl encryption format` / `seal` | What Install Luft uses to encrypt Luft's partition and link the TPM before the first start |
 | `trustctl system-disk continue` | Carries on with the plan in `/var/lib/trustd/system-disk.json`, or makes one from what Meet Luft asked for ([details](../docs/meet.md#changing-lufts-size)) |
 | `trustctl system-disk move` | The startup step that copies Luft to the drive Disks asked it to move to ([details](../docs/boot.md#moving-to-another-drive)) |
@@ -41,4 +42,4 @@ All commands need root.
 | `com.lantharos.Firewall1` | `data/firewall/com.lantharos.Firewall1.xml` | `com.lantharos.firewall.*` |
 | `com.lantharos.RemoteLogin1` | `data/remote-login/com.lantharos.RemoteLogin1.xml` | `com.lantharos.remote-login.*` |
 
-Reading state is open to everyone. Showing the recovery key asks every time, and confirming that a version started is allowed for the active session. Other drives are on `com.lantharos.Trust1.Drives` at the same object.
+Reading state is open to everyone. The firewall asks the person at the computer to confirm before an app is allowed or a network becomes a home network. Showing the recovery key asks every time, and confirming that a version started is allowed for the active session. Other drives are on `com.lantharos.Trust1.Drives` at the same object.

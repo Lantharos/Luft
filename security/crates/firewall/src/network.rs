@@ -20,6 +20,14 @@ const IP4: &str = "org.freedesktop.NetworkManager.IP4Config";
 const IP6: &str = "org.freedesktop.NetworkManager.IP6Config";
 const ACCESS_POINTS: &str = "/org/freedesktop/NetworkManager/AccessPoint/";
 const CLASSIFIABLE: [&str; 2] = ["802-3-ethernet", "802-11-wireless"];
+const PRIVATE: [&str; 6] = [
+    "tailscale0",
+    "virbr",
+    "podman",
+    "cni-podman",
+    "waydroid",
+    "docker0",
+];
 const ACTIVATING: u32 = 1;
 const ACTIVATED: u32 = 2;
 
@@ -75,6 +83,7 @@ impl fmt::Display for Prefix {
 pub struct Layout {
     pub home: BTreeSet<(String, Prefix)>,
     pub hosted: BTreeSet<String>,
+    pub private: bool,
     pub unclassified: Vec<(OwnedObjectPath, String)>,
 }
 
@@ -190,6 +199,10 @@ pub async fn read(connection: &Connection) -> Result<Layout, String> {
         return Ok(layout);
     }
     let objects = Objects::fetch(connection, SERVICE, ROOT).await?;
+    layout.private = objects
+        .implementing(DEVICE)
+        .filter_map(|device| device.get::<String>("Interface"))
+        .any(|name| PRIVATE.iter().any(|prefix| name.starts_with(prefix)));
     for active in objects.implementing(ACTIVE) {
         if !matches!(active.get::<u32>("State"), Some(ACTIVATING | ACTIVATED)) {
             continue;
@@ -240,22 +253,35 @@ pub async fn changes(connection: &Connection) -> Result<impl Stream<Item = ()> +
     Ok(messages.filter_map(|message| ready(message.ok().filter(relevant).map(drop))))
 }
 
-pub async fn classify(
-    connection: &Connection,
-    path: &str,
-    kind: &str,
-    uid: u32,
-) -> zbus::Result<bool> {
-    let proxy = Proxy::new(connection, SERVICE, path, CONNECTION).await?;
-    let mut settings: Settings = proxy.call("GetSettings", &()).await?;
-    let classifiable = CLASSIFIABLE.contains(&text(&settings, "connection", "type").as_str());
-    if !classifiable || !open_to(&settings, uid) {
-        return Ok(false);
+pub struct Saved<'a> {
+    proxy: Proxy<'a>,
+    settings: Settings,
+}
+
+impl Saved<'_> {
+    pub fn name(&self) -> String {
+        text(&self.settings, "connection", "id")
     }
-    settings.entry("connection".to_owned()).or_default().insert(
-        "zone".to_owned(),
-        Variant::from(kind.to_owned()).try_into()?,
-    );
-    proxy.call::<_, _, ()>("Update", &(settings,)).await?;
-    Ok(true)
+
+    pub async fn classify(mut self, kind: &str) -> zbus::Result<()> {
+        self.settings
+            .entry("connection".to_owned())
+            .or_default()
+            .insert(
+                "zone".to_owned(),
+                Variant::from(kind.to_owned()).try_into()?,
+            );
+        self.proxy.call("Update", &(self.settings,)).await
+    }
+}
+
+pub async fn classifiable<'a>(
+    connection: &Connection,
+    path: &'a str,
+    uid: u32,
+) -> zbus::Result<Option<Saved<'a>>> {
+    let proxy = Proxy::new(connection, SERVICE, path, CONNECTION).await?;
+    let settings: Settings = proxy.call("GetSettings", &()).await?;
+    let classifiable = CLASSIFIABLE.contains(&text(&settings, "connection", "type").as_str());
+    Ok((classifiable && open_to(&settings, uid)).then_some(Saved { proxy, settings }))
 }

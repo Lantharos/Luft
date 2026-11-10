@@ -5,14 +5,8 @@ mod sysfs;
 pub use events::{Event, Events};
 pub use sysfs::is_root_hub;
 
+use descriptors::Function;
 use sysfs::{Bus, Device};
-
-const HID: u8 = 0x03;
-const HUB: u8 = 0x09;
-
-fn usable_while_locked(class: u8) -> bool {
-    matches!(class, HID | HUB)
-}
 
 pub fn hold_new_devices() {
     Bus::all().for_each(|bus| bus.hold_new_devices());
@@ -55,7 +49,7 @@ pub fn admit_usable_part(id: &str) -> Admission {
         let Some(descriptors) = device.descriptors() else {
             return Admission::Complete;
         };
-        if !descriptors::interface_classes(&descriptors).any(usable_while_locked) {
+        if !descriptors::functions(&descriptors).any(Function::usable_while_locked) {
             return Admission::Waiting;
         }
         device.authorize();
@@ -65,7 +59,10 @@ pub fn admit_usable_part(id: &str) -> Admission {
         .interfaces()
         .filter(|interface| !interface.is_authorized())
     {
-        if interface.class().is_some_and(usable_while_locked) {
+        if interface
+            .function()
+            .is_some_and(Function::usable_while_locked)
+        {
             interface.authorize();
         } else {
             admission = Admission::Waiting;

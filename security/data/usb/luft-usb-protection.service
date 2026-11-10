@@ -25,7 +25,6 @@ ProtectKernelLogs=yes
 ProtectControlGroups=yes
 ProtectClock=yes
 ProtectHostname=yes
-ProtectProc=invisible
 ProcSubset=pid
 RestrictAddressFamilies=AF_UNIX AF_NETLINK
 RestrictNamespaces=yes

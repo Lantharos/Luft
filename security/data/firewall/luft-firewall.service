@@ -1,7 +1,8 @@
 [Unit]
 Description=Firewall
-Before=network-pre.target
-Wants=network-pre.target
+Wants=luft-firewall-base.service
+After=luft-firewall-base.service
+PartOf=luft-firewall-base.service
 
 [Service]
 Type=dbus

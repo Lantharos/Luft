@@ -6,25 +6,17 @@ use super::listeners::Listener;
 
 const SETTLE: Duration = Duration::from_secs(2);
 
-struct Asking {
-    uid: u32,
-    unit: String,
-}
-
 #[derive(Default)]
 pub struct Questions {
-    asking: BTreeMap<Identity, Asking>,
+    asking: BTreeMap<(u32, Identity), String>,
     settling: HashMap<u64, Instant>,
 }
 
 impl Questions {
     pub fn ask(&mut self, listener: &Listener) {
         self.asking
-            .entry(listener.identity.clone())
-            .or_insert_with(|| Asking {
-                uid: listener.uid,
-                unit: listener.unit.clone(),
-            });
+            .entry(listener.owner())
+            .or_insert_with(|| listener.unit.clone());
     }
 
     pub fn listening(&mut self, cookie: u64) {
@@ -52,19 +44,15 @@ impl Questions {
         settled
     }
 
-    pub fn answered(&mut self, identity: &Identity) {
-        self.asking.remove(identity);
+    pub fn answered(&mut self, owner: &(u32, Identity)) {
+        self.asking.remove(owner);
     }
 
     pub fn retain_alive(&mut self) {
-        self.asking
-            .retain(|_, asking| identity::alive(&asking.unit));
+        self.asking.retain(|_, unit| identity::alive(unit));
     }
 
-    pub fn waiting(&self) -> BTreeSet<(Identity, u32)> {
-        self.asking
-            .iter()
-            .map(|(identity, asking)| (identity.clone(), asking.uid))
-            .collect()
+    pub fn waiting(&self) -> BTreeSet<(u32, Identity)> {
+        self.asking.keys().cloned().collect()
     }
 }

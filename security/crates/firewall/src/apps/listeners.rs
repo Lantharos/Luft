@@ -14,6 +14,12 @@ pub struct Listener {
     pub port: Port,
 }
 
+impl Listener {
+    pub fn owner(&self) -> (u32, Identity) {
+        (self.uid, self.identity.clone())
+    }
+}
+
 #[derive(Default)]
 pub struct Listeners(HashMap<u64, Listener>);
 

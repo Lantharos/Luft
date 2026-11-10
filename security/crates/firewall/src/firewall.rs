@@ -7,19 +7,20 @@ use crate::apps::{Access, Apps, Decisions, Identity, identity};
 use crate::listening::Change;
 use crate::network::Layout;
 use crate::ports::{self, Opened, Port};
-use crate::rules;
+use crate::rules::{self, Sets};
 
 pub struct Firewall {
     layout: Layout,
     ports: Opened,
     apps: Apps,
     post: BTreeSet<String>,
-    loaded: String,
+    loaded: Sets,
 }
 
 #[derive(Default)]
 pub struct Followed {
     pub reclassified: bool,
+    pub home: bool,
     pub waiting: bool,
 }
 
@@ -30,36 +31,56 @@ impl Firewall {
             ports: ports::load()?,
             apps: Apps::load()?,
             post: BTreeSet::new(),
-            loaded: String::new(),
+            loaded: Sets::new(),
         };
-        firewall.load(false).await.map_err(anyhow::Error::msg)?;
+        let sets = firewall.sets();
+        rules::load(&rules::everything(&sets))
+            .await
+            .map_err(anyhow::Error::msg)?;
+        firewall.loaded = sets;
         Ok(firewall)
     }
 
-    async fn load(&mut self, refresh: bool) -> Result<(), String> {
+    fn sets(&mut self) -> Sets {
         self.apps.prune();
         self.post.retain(|unit| identity::alive(unit));
-        let script = rules::ruleset(
+        rules::sets(
             &self.layout,
             &self.ports,
             &self.apps.reachable(),
             !self.post.is_empty(),
-        );
-        if refresh || script != self.loaded {
+        )
+    }
+
+    async fn load(&mut self, renew: bool) -> Result<(), String> {
+        let sets = self.sets();
+        let script = rules::changes(&self.loaded, &sets, renew);
+        if !script.is_empty() {
             rules::load(&script).await?;
-            self.loaded = script;
+            self.loaded = sets;
         }
         Ok(())
     }
 
-    async fn reload(&mut self, refresh: bool) {
-        if let Err(error) = self.load(refresh).await {
+    async fn reload(&mut self, renew: bool) {
+        if let Err(error) = self.load(renew).await {
             eprintln!("{error}");
         }
     }
 
     pub fn unclassified(&self) -> &[(OwnedObjectPath, String)] {
         &self.layout.unclassified
+    }
+
+    pub fn home_interfaces(&self) -> Vec<String> {
+        let mut interfaces: Vec<String> = self
+            .layout
+            .home
+            .iter()
+            .map(|(interface, _)| interface.clone())
+            .collect();
+        interfaces.dedup();
+        interfaces
     }
 
     pub fn ports(&self) -> &Opened {
@@ -74,8 +95,8 @@ impl Firewall {
         self.apps.decisions()
     }
 
-    pub fn waiting(&self) -> BTreeSet<(Identity, u32)> {
-        if self.layout.home.is_empty() {
+    pub fn waiting(&self) -> BTreeSet<(u32, Identity)> {
+        if self.layout.home.is_empty() && self.layout.hosted.is_empty() && !self.layout.private {
             return BTreeSet::new();
         }
         self.apps.waiting()
@@ -84,10 +105,12 @@ impl Firewall {
     pub async fn follow(&mut self, layout: Layout) -> Followed {
         let waiting = self.waiting();
         let reclassified = layout.unclassified != self.layout.unclassified;
+        let home = self.home_interfaces();
         self.layout = layout;
         self.reload(false).await;
         Followed {
             reclassified,
+            home: home != self.home_interfaces(),
             waiting: waiting != self.waiting(),
         }
     }
@@ -99,14 +122,15 @@ impl Firewall {
     pub async fn observe(&mut self, changes: Vec<Change>) -> bool {
         let waiting = self.waiting();
         let reachable = self.apps.reachable();
+        let mut rebound = false;
         for change in changes {
-            self.apps.observe(change);
+            rebound |= self.apps.observe(change);
         }
         self.apps.prune_questions();
         let posting = self.post.len();
         self.post.retain(|unit| identity::alive(unit));
-        if reachable != self.apps.reachable() || posting != self.post.len() {
-            self.reload(true).await;
+        if rebound || reachable != self.apps.reachable() || posting != self.post.len() {
+            self.reload(rebound).await;
         }
         waiting != self.waiting()
     }
@@ -123,18 +147,18 @@ impl Firewall {
         self.load(false).await
     }
 
-    pub async fn decide(&mut self, identity: Identity, access: Access) -> Result<(), String> {
+    pub async fn decide(&mut self, owner: (u32, Identity), access: Access) -> Result<(), String> {
         self.apps
-            .decide(identity, access)
+            .decide(owner, access)
             .map_err(|error| format!("Couldn't keep what the app may do: {error}"))?;
-        self.load(true).await
+        self.load(false).await
     }
 
-    pub async fn forget(&mut self, identity: &Identity) -> Result<(), String> {
+    pub async fn forget(&mut self, owner: &(u32, Identity)) -> Result<(), String> {
         self.apps
-            .forget(identity)
+            .forget(owner)
             .map_err(|error| format!("Couldn't forget what the app may do: {error}"))?;
-        self.load(true).await
+        self.load(false).await
     }
 
     pub async fn open_post(&mut self, unit: String, open: bool) -> Result<(), String> {
@@ -146,8 +170,19 @@ impl Firewall {
         self.load(false).await
     }
 
-    pub async fn declare(&mut self, unit: String, ports: BTreeSet<Port>) -> Result<(), String> {
-        self.apps.declare(unit, ports);
+    pub fn new_to(&self, uid: u32, ports: &BTreeSet<Port>) -> Vec<Port> {
+        self.apps.new_to(uid, ports)
+    }
+
+    pub async fn declare(
+        &mut self,
+        uid: u32,
+        unit: String,
+        ports: BTreeSet<Port>,
+    ) -> Result<(), String> {
+        self.apps
+            .declare(uid, unit, ports)
+            .map_err(|error| format!("Couldn't keep the ports extensions listen on: {error}"))?;
         self.load(true).await
     }
 }

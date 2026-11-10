@@ -36,13 +36,14 @@ impl Access {
     }
 }
 
-pub type Decisions = BTreeMap<Identity, Access>;
+pub type Decisions = BTreeMap<(u32, Identity), Access>;
 
-fn parse(line: &str) -> Option<(Identity, Access)> {
-    let mut fields = line.splitn(3, ' ');
+fn parse(line: &str) -> Option<((u32, Identity), Access)> {
+    let mut fields = line.splitn(4, ' ');
     let access = Access::parse(fields.next()?)?;
+    let uid = fields.next()?.parse().ok()?;
     let identity = Identity::parse(fields.next()?, fields.next()?)?;
-    Some((identity, access))
+    Some(((uid, identity), access))
 }
 
 pub fn load() -> io::Result<Decisions> {
@@ -52,7 +53,7 @@ pub fn load() -> io::Result<Decisions> {
 pub fn save(decisions: &Decisions) -> io::Result<()> {
     let text: String = decisions
         .iter()
-        .map(|(identity, access)| format!("{} {identity}\n", access.name()))
+        .map(|((uid, identity), access)| format!("{} {uid} {identity}\n", access.name()))
         .collect();
     store::replace(STORE, &text)
 }

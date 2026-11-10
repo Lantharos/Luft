@@ -1,0 +1,88 @@
+table inet luft
+delete table inet luft
+
+table inet luft {
+	set home4 {
+		type ifname . ipv4_addr
+		flags interval
+	}
+
+	set home6 {
+		type ifname . ipv6_addr
+		flags interval
+	}
+
+	set hosted {
+		type ifname
+	}
+
+	set opened_tcp {
+		type inet_service
+	}
+
+	set opened_udp {
+		type inet_service
+	}
+
+	set anywhere_tcp {
+		type inet_service
+	}
+
+	set anywhere_udp {
+		type inet_service
+	}
+
+	set post {
+		type inet_service
+	}
+
+	set apps_home {
+		typeof socket cgroupv2 level 5 . meta l4proto . th dport
+	}
+
+	set apps_anywhere {
+		typeof socket cgroupv2 level 5 . meta l4proto . th dport
+	}
+
+	chain input {
+		type filter hook input priority filter; policy drop;
+		ct state { established, related } accept
+		iif lo accept
+		icmpv6 type { destination-unreachable, packet-too-big, time-exceeded, parameter-problem, mld-listener-query, nd-router-advert, nd-neighbor-solicit, nd-neighbor-advert } accept
+		ct state invalid drop
+		icmp type { destination-unreachable, time-exceeded, parameter-problem } accept
+		udp sport 67 udp dport 68 accept
+		ip6 saddr fe80::/10 udp sport 547 udp dport 546 accept
+		iifname "virbr*" jump guests
+		iifname "podman*" jump guests
+		iifname "cni-podman*" jump guests
+		iifname "waydroid*" jump guests
+		iifname "docker0" jump guests
+		iifname @hosted jump guests
+		iifname "tailscale0" jump home
+		iifname . ip saddr @home4 jump home
+		iifname . ip6 saddr @home6 jump home
+		tcp dport @anywhere_tcp accept
+		udp dport @anywhere_udp accept
+		socket cgroupv2 level 5 . meta l4proto . th dport @apps_anywhere accept
+	}
+
+	chain guests {
+		meta l4proto { tcp, udp } th dport 53 accept
+		udp dport { 67, 547 } accept
+		icmpv6 type nd-router-solicit accept
+		jump home
+	}
+
+	chain home {
+		icmp type echo-request accept
+		icmpv6 type echo-request accept
+		udp dport { 1900, 3702, 5353 } accept
+		udp sport { 1900, 3702, 5353 } udp dport 32768-60999 accept
+		tcp dport @post accept
+		udp dport @post accept
+		tcp dport @opened_tcp accept
+		udp dport @opened_udp accept
+		socket cgroupv2 level 5 . meta l4proto . th dport @apps_home accept
+	}
+}

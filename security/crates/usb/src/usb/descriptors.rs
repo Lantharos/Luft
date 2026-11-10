@@ -1,8 +1,30 @@
 const INTERFACE: u8 = 4;
 const INTERFACE_LENGTH: usize = 9;
 const CLASS_OFFSET: usize = 5;
+const HUB: u8 = 0x09;
+const HID: u8 = 0x03;
+const BOOT: u8 = 0x01;
+const KEYBOARD: u8 = 0x01;
+const MOUSE: u8 = 0x02;
 
-pub fn interface_classes(descriptors: &[u8]) -> impl Iterator<Item = u8> + '_ {
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+pub struct Function {
+    pub class: u8,
+    pub subclass: u8,
+    pub protocol: u8,
+}
+
+impl Function {
+    pub fn usable_while_locked(self) -> bool {
+        match self.class {
+            HUB => true,
+            HID => self.subclass == BOOT && matches!(self.protocol, KEYBOARD | MOUSE),
+            _ => false,
+        }
+    }
+}
+
+pub fn functions(descriptors: &[u8]) -> impl Iterator<Item = Function> + '_ {
     let mut rest = descriptors;
     std::iter::from_fn(move || {
         loop {
@@ -10,7 +32,11 @@ pub fn interface_classes(descriptors: &[u8]) -> impl Iterator<Item = u8> + '_ {
             let (descriptor, next) = rest.split_at_checked(length).filter(|_| length >= 2)?;
             rest = next;
             if descriptor[1] == INTERFACE && length >= INTERFACE_LENGTH {
-                return Some(descriptor[CLASS_OFFSET]);
+                return Some(Function {
+                    class: descriptor[CLASS_OFFSET],
+                    subclass: descriptor[CLASS_OFFSET + 1],
+                    protocol: descriptor[CLASS_OFFSET + 2],
+                });
             }
         }
     })
@@ -41,15 +67,42 @@ mod tests {
             &endpoint,
         ]
         .concat();
+        let found: Vec<Function> = functions(&descriptors).collect();
         assert_eq!(
-            interface_classes(&descriptors).collect::<Vec<_>>(),
+            found.iter().map(|found| found.class).collect::<Vec<_>>(),
             [0x08, 0x03]
         );
+        assert_eq!(
+            found
+                .iter()
+                .map(|found| found.usable_while_locked())
+                .collect::<Vec<_>>(),
+            [false, true]
+        );
+    }
+
+    #[test]
+    fn holds_back_input_devices_that_are_more_than_a_keyboard_or_mouse() {
+        let function = |class, subclass, protocol| Function {
+            class,
+            subclass,
+            protocol,
+        };
+        assert!(function(HID, BOOT, MOUSE).usable_while_locked());
+        assert!(function(HUB, 0, 0).usable_while_locked());
+        assert!(!function(HID, 0, 0).usable_while_locked());
+        assert!(!function(HID, BOOT, 0).usable_while_locked());
+        assert!(!function(0xff, BOOT, KEYBOARD).usable_while_locked());
     }
 
     #[test]
     fn stops_at_a_truncated_descriptor() {
         let descriptors = [9, 4, 0, 0, 1, 0x03, 0, 0, 0, 9, 4, 1];
-        assert_eq!(interface_classes(&descriptors).collect::<Vec<_>>(), [0x03]);
+        assert_eq!(
+            functions(&descriptors)
+                .map(|found| found.class)
+                .collect::<Vec<_>>(),
+            [0x03]
+        );
     }
 }

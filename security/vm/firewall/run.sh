@@ -22,9 +22,11 @@ bun "$luft/os/image/parts/components/install.ts" "$stage/root" security
 place 755 "$here/check.sh" /usr/libexec/luft-firewall-check
 place 644 "$here/sockets.py" /usr/libexec/luft-firewall-check-sockets
 place 644 "$here/luft-firewall-check.service" /usr/lib/systemd/system/luft-firewall-check.service
+place 644 "$here/kestrel.service" /etc/systemd/user/kestrel.service
 place 644 "$here/kestrel-post.service" /etc/systemd/user/kestrel-post.service
+place 644 "$here/check.rules" /etc/polkit-1/rules.d/50-luft-firewall-check.rules
 build_check_image "${LUFT_FIREWALL_BASE:-$image_name:45}" "$image_name-firewall-check" \
-  "systemctl enable luft-firewall.service luft-firewall-check.service"
+  "systemctl enable luft-firewall-base.service luft-firewall.service luft-firewall-check.service"
 make_root_drive "$image_name-firewall-check"
 relabel_root_drive "$serial.relabel"
 

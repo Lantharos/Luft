@@ -1,6 +1,8 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
+use super::descriptors::Function;
+
 const BUS: &str = "/sys/bus/usb";
 const DEVICES: &str = "/sys/bus/usb/devices";
 const DEFAULT_POLICY: &str = "/sys/module/usbcore/parameters/authorized_default";
@@ -110,8 +112,13 @@ impl Interface {
         write(Path::new(BUS), "drivers_probe", &self.name);
     }
 
-    pub fn class(&self) -> Option<u8> {
-        u8::from_str_radix(&read(&self.path, "bInterfaceClass")?, 16).ok()
+    pub fn function(&self) -> Option<Function> {
+        let number = |attribute| u8::from_str_radix(&read(&self.path, attribute)?, 16).ok();
+        Some(Function {
+            class: number("bInterfaceClass")?,
+            subclass: number("bInterfaceSubClass")?,
+            protocol: number("bInterfaceProtocol")?,
+        })
     }
 }
 

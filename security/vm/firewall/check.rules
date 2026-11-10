@@ -1,0 +1,5 @@
+polkit.addRule(function(action, subject) {
+  var confirmed = ["com.lantharos.firewall.apps", "com.lantharos.firewall.apps-anywhere", "com.lantharos.firewall.restrict"];
+  if (confirmed.indexOf(action.id) >= 0 && subject.user == "checker")
+    return polkit.Result.YES;
+});

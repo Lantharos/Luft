@@ -1,0 +1,6 @@
+[Unit]
+Description=Stand-in for Kestrel
+
+[Service]
+Slice=session.slice
+ExecStart=/usr/bin/sh -c "busctl call com.lantharos.Firewall1 /com/lantharos/Firewall1 com.lantharos.Firewall1 SetExtensionPorts 'a(qs)' 1 8003 tcp; exec python3 -m http.server 8003 --directory /usr/share"

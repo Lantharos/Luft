@@ -1,8 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Sat, 7 Nov 2026 12:49:11 +0100
-Subject: [PATCH 69/69] wayland: let the shell take files dragged onto its own
- actors
+Subject: [PATCH] wayland: let the shell take files dragged onto its own actors
 
 A drag from a Wayland client over the shell, such as files from a file
 manager over a taskbar element, has no surface to go to, so dropping it

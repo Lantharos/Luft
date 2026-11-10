@@ -16,6 +16,7 @@ subdir('hotplug-sniffer')
 subdir('st')
 subdir('authenticate')
 subdir('wallpaper')
+subdir('sound/decoder')
 
 typelib_cflags = [
   '-DMUTTER_TYPELIB_DIR="@0@"'.format(mutter_typelibdir),
@@ -29,6 +30,7 @@ kestrel_cflags = [
   '-DLOCALEDIR="@0@"'.format(localedir),
   '-DDATADIR="@0@"'.format(datadir),
   '-DKESTREL_LIBEXECDIR="@0@"'.format(libexecdir),
+  '-DKESTREL_HOST_CPU="@0@"'.format(host_machine.cpu()),
   '-DKESTREL_DATADIR="@0@"'.format(pkgdatadir),
   '-DKESTREL_PKGLIBDIR="@0@"'.format(pkglibdir)
 ]
@@ -94,6 +96,7 @@ libshell_private_headers = [
   'shell-desktop-filter-picture.h',
   'shell-app-private.h',
   'shell-app-scope-private.h',
+  'shell-development-private.h',
   'shell-app-cache-private.h',
   'shell-app-system-private.h',
   'shell-global-private.h',
@@ -109,6 +112,7 @@ libshell_sources = [
   'shell-app-system.c',
   'shell-blur-effect.c',
   'shell-desktop-filter-effect.c',
+  'shell-development.c',
   'shell-backdrop.c',
   'shell-backdrop-behind.c',
   'shell-backdrop-spread.c',
@@ -139,6 +143,7 @@ libshell_sources = [
   'mixer/shell-mixer-players.c',
   'mixer/shell-mixer-server.c',
   'mixer/shell-mixer-stream.c',
+  'sound/decoder/shell-sound-isolated.c',
   'sound/shell-audio-monitor.c',
   'sound/shell-key-sounds.c',
   'sound/shell-sound-decode.c',

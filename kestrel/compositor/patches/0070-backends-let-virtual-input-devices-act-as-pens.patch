@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Sun, 8 Nov 2026 12:15:40 +0100
-Subject: [PATCH 70/73] backends: let virtual input devices act as pens
+Subject: [PATCH] backends: let virtual input devices act as pens
 
 Add clutter_virtual_input_device_notify_tablet_proximity(),
 notify_tablet_motion() and notify_tablet_button(), implemented by the

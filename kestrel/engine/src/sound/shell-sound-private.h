@@ -32,16 +32,17 @@ void            _shell_sound_decode        (const char          *name,
                                             GCancellable        *cancellable,
                                             GAsyncReadyCallback  callback,
                                             gpointer             user_data);
-void            _shell_sound_decode_start  (const char          *name,
-                                            GFile               *file,
-                                            GCancellable        *cancellable,
-                                            GAsyncReadyCallback  callback,
-                                            gpointer             user_data);
-void            _shell_sound_decode_start_fd (const char          *name,
-                                              int                  fd,
+void            _shell_sound_decode_isolated (const char          *name,
+                                              GFile               *file,
+                                              gboolean             cut_longer,
                                               GCancellable        *cancellable,
                                               GAsyncReadyCallback  callback,
                                               gpointer             user_data);
+void            _shell_sound_decode_isolated_fd (const char          *name,
+                                                 int                  fd,
+                                                 GCancellable        *cancellable,
+                                                 GAsyncReadyCallback  callback,
+                                                 gpointer             user_data);
 ShellSoundClip *_shell_sound_decode_finish (GAsyncResult        *result,
                                             GError             **error);
 

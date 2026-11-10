@@ -2,17 +2,13 @@
 #include "config.h"
 
 #include <gst/gst.h>
-#include <unistd.h>
 
+#include "decoder/pipeline.h"
 #include "shell-sound-private.h"
 
-#define PIPELINE \
-  "%s name=source ! decodebin ! audioconvert ! audioresample ! " \
-  "audio/x-raw,format=S16LE,layout=interleaved,rate=48000,channels=2 ! " \
-  "appsink name=sink sync=false"
+#define PIPELINE SHELL_SOUND_DECODE_PIPELINE ("filesrc name=source", "appsink name=sink sync=false")
 #define PULL_TIMEOUT (2 * GST_SECOND)
 #define FRAME_SIZE (SHELL_SOUND_CHANNELS * sizeof (gint16))
-#define CUT_FADE_FRAMES (SHELL_SOUND_RATE / 20)
 
 ShellSoundClip *
 _shell_sound_clip_new (const char *name,
@@ -66,18 +62,14 @@ typedef struct
 {
   char *name;
   GFile *file;
-  int fd;
   gsize max_frames;
-  gboolean cut_longer;
 } Request;
 
 static void
 request_free (Request *request)
 {
   g_free (request->name);
-  g_clear_object (&request->file);
-  if (request->fd >= 0)
-    close (request->fd);
+  g_object_unref (request->file);
   g_free (request);
 }
 
@@ -85,8 +77,7 @@ static GstElement *
 pipeline_for (Request  *request,
               GError  **error)
 {
-  g_autofree char *description = g_strdup_printf (PIPELINE, request->file ? "filesrc" : "fdsrc");
-  g_autoptr (GstElement) pipeline = gst_parse_launch (description, error);
+  g_autoptr (GstElement) pipeline = gst_parse_launch (PIPELINE, error);
   g_autoptr (GstElement) source = NULL;
   g_autofree char *path = NULL;
 
@@ -94,31 +85,9 @@ pipeline_for (Request  *request,
     return NULL;
 
   source = gst_bin_get_by_name (GST_BIN (pipeline), "source");
-  if (request->file)
-    {
-      path = g_file_get_path (request->file);
-      g_object_set (source, "location", path, NULL);
-    }
-  else
-    {
-      g_object_set (source, "fd", request->fd, NULL);
-    }
-
+  path = g_file_get_path (request->file);
+  g_object_set (source, "location", path, NULL);
   return g_steal_pointer (&pipeline);
-}
-
-static void
-cut_to (GByteArray *samples,
-        gsize       frames)
-{
-  gint16 *end;
-
-  g_byte_array_set_size (samples, frames * FRAME_SIZE);
-  end = (gint16 *) (samples->data + (frames - CUT_FADE_FRAMES) * FRAME_SIZE);
-  for (gsize frame = 0; frame < CUT_FADE_FRAMES; frame++)
-    for (guint channel = 0; channel < SHELL_SOUND_CHANNELS; channel++)
-      end[frame * SHELL_SOUND_CHANNELS + channel] =
-        end[frame * SHELL_SOUND_CHANNELS + channel] * (gint64) (CUT_FADE_FRAMES - frame) / CUT_FADE_FRAMES;
 }
 
 static GBytes *
@@ -162,12 +131,6 @@ decode (Request  *request,
       if (samples->len / FRAME_SIZE <= request->max_frames)
         continue;
 
-      if (request->cut_longer)
-        {
-          cut_to (samples, request->max_frames);
-          break;
-        }
-
       gst_element_set_state (pipeline, GST_STATE_NULL);
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_MESSAGE_TOO_LARGE, "%s is too long", request->name);
       return NULL;
@@ -208,21 +171,9 @@ decode_in_thread (GTask        *task,
       return;
     }
 
-  path = request->file ? g_file_get_path (request->file) : NULL;
+  path = g_file_get_path (request->file);
   g_task_return_pointer (task, _shell_sound_clip_new (request->name, path, samples),
                          (GDestroyNotify) _shell_sound_clip_unref);
-}
-
-static void
-run (Request             *request,
-     GCancellable        *cancellable,
-     GAsyncReadyCallback  callback,
-     gpointer             user_data)
-{
-  g_autoptr (GTask) task = g_task_new (NULL, cancellable, callback, user_data);
-
-  g_task_set_task_data (task, request, (GDestroyNotify) request_free);
-  g_task_run_in_thread (task, decode_in_thread);
 }
 
 void
@@ -233,46 +184,14 @@ _shell_sound_decode (const char          *name,
                      GAsyncReadyCallback  callback,
                      gpointer             user_data)
 {
+  g_autoptr (GTask) task = g_task_new (NULL, cancellable, callback, user_data);
   Request *request = g_new0 (Request, 1);
 
   request->name = g_strdup (name);
   request->file = g_object_ref (file);
-  request->fd = -1;
   request->max_frames = max_frames;
-  run (request, cancellable, callback, user_data);
-}
-
-void
-_shell_sound_decode_start (const char          *name,
-                           GFile               *file,
-                           GCancellable        *cancellable,
-                           GAsyncReadyCallback  callback,
-                           gpointer             user_data)
-{
-  Request *request = g_new0 (Request, 1);
-
-  request->name = g_strdup (name);
-  request->file = g_object_ref (file);
-  request->fd = -1;
-  request->max_frames = SHELL_SOUND_LONGEST_CUSTOM_FRAMES;
-  request->cut_longer = TRUE;
-  run (request, cancellable, callback, user_data);
-}
-
-void
-_shell_sound_decode_start_fd (const char          *name,
-                        int                  fd,
-                        GCancellable        *cancellable,
-                        GAsyncReadyCallback  callback,
-                        gpointer             user_data)
-{
-  Request *request = g_new0 (Request, 1);
-
-  request->name = g_strdup (name);
-  request->fd = fd;
-  request->max_frames = SHELL_SOUND_LONGEST_CUSTOM_FRAMES;
-  request->cut_longer = TRUE;
-  run (request, cancellable, callback, user_data);
+  g_task_set_task_data (task, request, (GDestroyNotify) request_free);
+  g_task_run_in_thread (task, decode_in_thread);
 }
 
 ShellSoundClip *

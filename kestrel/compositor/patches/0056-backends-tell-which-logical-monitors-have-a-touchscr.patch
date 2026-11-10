@@ -1,8 +1,8 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Sat, 31 Oct 2026 17:19:18 +0100
-Subject: [PATCH 56/68] backends: tell which logical monitors have a
- touchscreen or pen display
+Subject: [PATCH] backends: tell which logical monitors have a touchscreen or
+ pen display
 
 Kestrel lays the taskbar out for touch on screens people touch or draw
 on, and keeps the layout people chose on the others. The input mapper

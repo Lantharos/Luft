@@ -85,8 +85,7 @@ decode_custom_sound (Decoding *decoding)
 
   file = g_file_new_for_path (path);
   decoding->custom = TRUE;
-  _shell_sound_decode (decoding->name, file, SHELL_SOUND_LONGEST_CUSTOM_FRAMES,
-                       player->cancellable, on_sound_decoded, decoding);
+  _shell_sound_decode_isolated (decoding->name, file, FALSE, player->cancellable, on_sound_decoded, decoding);
   return TRUE;
 }
 
@@ -187,14 +186,14 @@ shell_sound_player_play_file (ShellSoundPlayer *player,
 {
   g_autofree char *name = g_file_get_basename (file);
 
-  _shell_sound_decode_start (name, file, player->cancellable, on_file_decoded, g_object_ref (player));
+  _shell_sound_decode_isolated (name, file, TRUE, player->cancellable, on_file_decoded, g_object_ref (player));
 }
 
 void
 shell_sound_player_play_fd (ShellSoundPlayer *player,
                             int               fd)
 {
-  _shell_sound_decode_start_fd ("sound", fd, player->cancellable, on_file_decoded, g_object_ref (player));
+  _shell_sound_decode_isolated_fd ("sound", fd, player->cancellable, on_file_decoded, g_object_ref (player));
 }
 
 /**
@@ -216,7 +215,7 @@ shell_sound_player_check_file (ShellSoundPlayer    *player,
 {
   g_autofree char *name = g_file_get_basename (file);
 
-  _shell_sound_decode (name, file, SHELL_SOUND_LONGEST_CUSTOM_FRAMES, cancellable, callback, user_data);
+  _shell_sound_decode_isolated (name, file, FALSE, cancellable, callback, user_data);
 }
 
 /**

@@ -33,6 +33,7 @@
 #endif
 
 #include "shell-app-scope-private.h"
+#include "shell-development-private.h"
 #include "shell-enum-types.h"
 #include "shell-fonts.h"
 #include "shell-global-private.h"
@@ -310,7 +311,7 @@ switcheroo_vanished_cb (GDBusConnection *connection,
 static void
 shell_global_init (ShellGlobal *global)
 {
-  const char *datadir = g_getenv ("KESTREL_DATADIR");
+  const char *datadir = shell_development_path ("KESTREL_DATADIR");
   g_autofree char *imagedir = NULL;
   g_autofree char *statedir = NULL;
 

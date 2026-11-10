@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Sun, 8 Nov 2026 12:28:52 +0100
-Subject: [PATCH 73/73] backends: show a dot under pens instead of the arrow
+Subject: [PATCH] backends: show a dot under pens instead of the arrow
 
 Add CLUTTER_CURSOR_PEN, named "pen" in cursor themes with "dot" as its
 Xcursor fallback, and use it for every tablet tool sprite that would

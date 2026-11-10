@@ -101,7 +101,12 @@ on_source_output_info (pa_context                  *context,
 {
   ShellMixerServer *server = user_data;
 
-  if (!eol)
+  if (eol)
+    return;
+
+  if (info->source == PA_INVALID_INDEX)
+    _shell_mixer_remove_recorder (server->mixer, info->index);
+  else
     _shell_mixer_update_recorder (server->mixer, info->index, info->client);
 }
 

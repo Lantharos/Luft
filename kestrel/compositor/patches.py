@@ -136,7 +136,7 @@ def export(base, version):
         raise RuntimeError("Rebase the patch stack into a linear series before exporting")
     old_names = series() if SERIES.exists() else []
     with tempfile.TemporaryDirectory(prefix="kestrel-export-", dir=RUN) as staging:
-        git("format-patch", "--no-signature", "--zero-commit", "--full-index",
+        git("format-patch", "--no-numbered", "--no-signature", "--zero-commit", "--full-index",
             "--output-directory", staging, f"{revision}..HEAD")
         files = sorted(Path(staging).glob("*.patch"))
         for path in files:

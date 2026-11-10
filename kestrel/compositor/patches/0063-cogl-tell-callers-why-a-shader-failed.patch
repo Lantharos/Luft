@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Thu, 5 Nov 2026 12:47:06 +0100
-Subject: [PATCH 63/68] cogl: tell callers why a shader failed
+Subject: [PATCH] cogl: tell callers why a shader failed
 
 Pipelines compile the first time they draw, and a shader that doesn't
 compile only left a warning in the log. The shell runs shaders it was

@@ -1,0 +1,635 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Tue, 10 Nov 2026 18:39:31 +0100
+Subject: [PATCH] core: keep Mutter's D-Bus services from sandboxed apps
+
+Mutter exports its services on the session bus connection the shell
+shares, so an app whose bus proxy lets it talk to any name the shell
+owns, such as org.freedesktop.Notifications, can call every one of
+them. OpenWaylandConnection on the service channel handed such an app
+a Wayland connection that counts as the compositor's own, outside its
+sandbox, and the idle monitor told it the exact idle time and let it
+remove the watches of others.
+
+meta_dbus_guard_interface() refuses every method of an interface to
+sandboxed callers except the ones listed as open, judging the caller
+like a Wayland client. The service channel, input mapping, the
+accessibility services and every session manager, which covers screen
+recording, remote control, input capture and color calibration, get it
+with nothing open, so the owner of the portal's or the screencast
+service's name must run outside a sandbox as well. The display
+configuration gets it with its reading methods open, in place of a
+list of the changing ones.
+
+The idle monitor stays open, held to what ext-idle-notify-v1 gives
+sandboxed clients: idle times under ten seconds read as none, idle
+watches wait at least ten seconds, and a watch for the user coming back
+only fires after such an idle time. A watch can only be removed by the
+connection that added it.
+
+The apps a permission covers are read from the threads that authorize
+calls, so they are now locked.
+
+Upstream-Status: luft-only Luft's sandbox model; upstream leaves these services to the session bus
+---
+ src/backends/meta-a11y-manager.c            |  5 ++
+ src/backends/meta-dbus-session-manager.c    | 12 +--
+ src/backends/meta-display-config-skeleton.c | 37 ++------
+ src/backends/meta-idle-manager.c            | 94 +++++++++++++++++++--
+ src/backends/meta-idle-manager.h            |  2 +
+ src/backends/meta-input-mapper.c            |  7 +-
+ src/core/meta-dbus-guard.c                  | 72 ++++++++++++++++
+ src/core/meta-dbus-guard.h                  | 12 +++
+ src/core/meta-sandbox.c                     |  6 ++
+ src/core/meta-service-channel.c             |  3 +
+ src/meson.build                             |  2 +
+ src/wayland/meta-wayland-idle-notify.c      |  4 +-
+ 12 files changed, 209 insertions(+), 47 deletions(-)
+ create mode 100644 src/core/meta-dbus-guard.c
+ create mode 100644 src/core/meta-dbus-guard.h
+
+diff --git a/src/backends/meta-a11y-manager.c b/src/backends/meta-a11y-manager.c
+index 99a11aefe3894fbded1a6cd17e705cefb8a09364..cef7a807a47b98b70f5663682793424569af1055 100644
+--- a/src/backends/meta-a11y-manager.c
++++ b/src/backends/meta-a11y-manager.c
+@@ -23,6 +23,7 @@
+ #include "backends/meta-a11y-manager.h"
+ #include "backends/meta-dbus-access-checker.h"
+ #include "compositor/compositor-private.h"
++#include "core/meta-dbus-guard.h"
+ #include "core/meta-debug-control-private.h"
+ #include "meta/display.h"
+ #include "meta/meta-backend.h"
+@@ -375,6 +376,8 @@ on_bus_acquired (GDBusConnection *connection,
+   manager->connection = connection;
+ 
+   manager->keyboard_monitor_skeleton = meta_dbus_keyboard_monitor_skeleton_new ();
++  meta_dbus_guard_interface (G_DBUS_INTERFACE_SKELETON (manager->keyboard_monitor_skeleton),
++                             context, NULL);
+ 
+   g_signal_connect (manager->keyboard_monitor_skeleton, "g-authorize-method",
+                     G_CALLBACK (check_access), manager);
+@@ -395,6 +398,8 @@ on_bus_acquired (GDBusConnection *connection,
+                                     NULL);
+ 
+   manager->pointer_locator_skeleton = meta_dbus_pointer_locator_skeleton_new ();
++  meta_dbus_guard_interface (G_DBUS_INTERFACE_SKELETON (manager->pointer_locator_skeleton),
++                             context, NULL);
+ 
+   g_signal_connect (manager->pointer_locator_skeleton, "g-authorize-method",
+                     G_CALLBACK (check_access), manager);
+diff --git a/src/backends/meta-dbus-session-manager.c b/src/backends/meta-dbus-session-manager.c
+index 62531acc790ebf5f68f5162e4d3b53c4d530b187..85170782e1d721ea3d6a793032d3175b788080bd 100644
+--- a/src/backends/meta-dbus-session-manager.c
++++ b/src/backends/meta-dbus-session-manager.c
+@@ -25,7 +25,7 @@
+ #include "backends/meta-backend-private.h"
+ #include "backends/meta-dbus-access-checker.h"
+ #include "backends/meta-dbus-session-watcher.h"
+-#include "core/meta-sandbox.h"
++#include "core/meta-dbus-guard.h"
+ 
+ #define PORTAL_BACKEND_NAME "org.freedesktop.impl.portal.desktop.kestrel"
+ #define SCREENCAST_SERVICE_NAME "com.lantharos.Kestrel.Screencast"
+@@ -131,13 +131,8 @@ authorize_method (GDBusInterfaceSkeleton *interface_skeleton,
+ 
+   if (!g_str_equal (g_dbus_method_invocation_get_method_name (invocation),
+                     "CreateSession") ||
+-      meta_dbus_access_checker_is_sender_allowed (priv->portal_checker, sender))
+-    return TRUE;
+-
+-  if (meta_dbus_access_checker_is_sender_allowed (priv->screencast_checker, sender) &&
+-      meta_dbus_sender_is_unsandboxed (meta_backend_get_context (priv->backend),
+-                                       g_dbus_method_invocation_get_connection (invocation),
+-                                       sender))
++      meta_dbus_access_checker_is_sender_allowed (priv->portal_checker, sender) ||
++      meta_dbus_access_checker_is_sender_allowed (priv->screencast_checker, sender))
+     return TRUE;
+ 
+   g_dbus_method_invocation_return_error (invocation,
+@@ -165,6 +160,7 @@ on_bus_acquired (GDBusConnection *connection,
+   priv->screencast_checker = meta_dbus_access_checker_new (connection, context);
+   meta_dbus_access_checker_allow_sender (priv->screencast_checker,
+                                          SCREENCAST_SERVICE_NAME);
++  meta_dbus_guard_interface (priv->interface_skeleton, context, NULL);
+   g_signal_connect (priv->interface_skeleton, "g-authorize-method",
+                     G_CALLBACK (authorize_method), session_manager);
+ 
+diff --git a/src/backends/meta-display-config-skeleton.c b/src/backends/meta-display-config-skeleton.c
+index 6e23ec6565c88c66a42dd0306cf98088e46b0f7a..d36107f229252c7787f0eb1c7e2a84775cfb22d4 100644
+--- a/src/backends/meta-display-config-skeleton.c
++++ b/src/backends/meta-display-config-skeleton.c
+@@ -3,6 +3,7 @@
+ 
+ #include "backends/meta-display-config-skeleton.h"
+ 
++#include "core/meta-dbus-guard.h"
+ #include "core/meta-sandbox.h"
+ 
+ #define ACCESS_DENIED_MESSAGE "Sandboxed apps cannot change displays"
+@@ -19,36 +20,13 @@ struct _MetaDisplayConfigSkeleton
+ G_DEFINE_TYPE (MetaDisplayConfigSkeleton, meta_display_config_skeleton,
+                META_DBUS_TYPE_DISPLAY_CONFIG_SKELETON)
+ 
+-static const char * const display_changing_methods[] = {
+-  "ApplyConfiguration",
+-  "ApplyMonitorsConfig",
+-  "ChangeBacklight",
+-  "SetBacklight",
+-  "SetCrtcGamma",
+-  "SetOutputCTM",
++static const char * const open_methods[] = {
++  "GetCrtcGamma",
++  "GetCurrentState",
++  "GetResources",
+   NULL,
+ };
+ 
+-static gboolean
+-authorize_method (GDBusInterfaceSkeleton *interface_skeleton,
+-                  GDBusMethodInvocation  *invocation)
+-{
+-  MetaDisplayConfigSkeleton *skeleton = META_DISPLAY_CONFIG_SKELETON (interface_skeleton);
+-
+-  if (!g_strv_contains (display_changing_methods,
+-                        g_dbus_method_invocation_get_method_name (invocation)) ||
+-      meta_dbus_sender_is_unsandboxed (skeleton->context,
+-                                       g_dbus_method_invocation_get_connection (invocation),
+-                                       g_dbus_method_invocation_get_sender (invocation)))
+-    return TRUE;
+-
+-  g_dbus_method_invocation_return_error_literal (invocation,
+-                                                 G_DBUS_ERROR,
+-                                                 G_DBUS_ERROR_ACCESS_DENIED,
+-                                                 ACCESS_DENIED_MESSAGE);
+-  return FALSE;
+-}
+-
+ static gboolean
+ set_property (GDBusConnection  *connection,
+               const char       *sender,
+@@ -88,9 +66,6 @@ meta_display_config_skeleton_init (MetaDisplayConfigSkeleton *skeleton)
+   skeleton->vtable = *parent_class->get_vtable (G_DBUS_INTERFACE_SKELETON (skeleton));
+   skeleton->set_property = skeleton->vtable.set_property;
+   skeleton->vtable.set_property = set_property;
+-
+-  g_signal_connect (skeleton, "g-authorize-method",
+-                    G_CALLBACK (authorize_method), NULL);
+ }
+ 
+ static void
+@@ -109,5 +84,7 @@ meta_display_config_skeleton_new (MetaContext *context)
+     g_object_new (META_TYPE_DISPLAY_CONFIG_SKELETON, NULL);
+ 
+   skeleton->context = context;
++  meta_dbus_guard_interface (G_DBUS_INTERFACE_SKELETON (skeleton), context,
++                             open_methods);
+   return META_DBUS_DISPLAY_CONFIG (skeleton);
+ }
+diff --git a/src/backends/meta-idle-manager.c b/src/backends/meta-idle-manager.c
+index b3c3e4cf22d4f8b707eda0cf7035978cca4573da..d141ed1557c1dc016dc5b4212beedb5a2e660cd4 100644
+--- a/src/backends/meta-idle-manager.c
++++ b/src/backends/meta-idle-manager.c
+@@ -27,7 +27,9 @@
+ #include "backends/meta-idle-monitor-private.h"
+ #include "clutter/clutter-mutter.h"
+ #include "clutter/clutter.h"
++#include "core/meta-dbus-guard.h"
+ #include "meta/main.h"
++#include "meta/meta-backend.h"
+ #include "meta/meta-context.h"
+ #include "meta/meta-idle-monitor.h"
+ #include "meta/util.h"
+@@ -38,9 +40,18 @@ typedef struct _MetaIdleManager
+ {
+   MetaBackend *backend;
+   MetaIdleMonitor *core_monitor;
++  GHashTable *dbus_watches;
+   guint dbus_name_id;
+ } MetaIdleManager;
+ 
++static const char * const open_methods[] = {
++  "AddIdleWatch",
++  "AddUserActiveWatch",
++  "GetIdletime",
++  "RemoveWatch",
++  NULL,
++};
++
+ static gboolean
+ handle_get_idletime (MetaDBusIdleMonitor   *skeleton,
+                      GDBusMethodInvocation *invocation,
+@@ -49,6 +60,10 @@ handle_get_idletime (MetaDBusIdleMonitor   *skeleton,
+   guint64 idletime;
+ 
+   idletime = meta_idle_monitor_get_idletime (monitor);
++  if (meta_dbus_caller_is_sandboxed (invocation) &&
++      idletime < META_IDLE_SANDBOXED_MIN_MS)
++    idletime = 0;
++
+   meta_dbus_idle_monitor_complete_get_idletime (skeleton, invocation, idletime);
+ 
+   return TRUE;
+@@ -79,6 +94,7 @@ typedef struct {
+   MetaIdleMonitor *monitor;
+   char *dbus_name;
+   guint watch_id;
++  guint active_watch_id;
+   guint name_watcher_id;
+ } DBusWatch;
+ 
+@@ -86,6 +102,11 @@ static void
+ destroy_dbus_watch (gpointer data)
+ {
+   DBusWatch *watch = data;
++  MetaIdleManager *manager = meta_idle_monitor_get_manager (watch->monitor);
++
++  g_hash_table_remove (manager->dbus_watches, GUINT_TO_POINTER (watch->watch_id));
++  if (watch->active_watch_id)
++    meta_idle_monitor_remove_watch (watch->monitor, watch->active_watch_id);
+ 
+   g_object_unref (watch->dbus_monitor);
+   g_object_unref (watch->monitor);
+@@ -112,6 +133,32 @@ dbus_idle_callback (MetaIdleMonitor *monitor,
+                                  NULL);
+ }
+ 
++static void
++on_user_active_after_idle (MetaIdleMonitor *monitor,
++                           guint            watch_id,
++                           gpointer         user_data)
++{
++  DBusWatch *watch = user_data;
++
++  watch->active_watch_id = 0;
++  dbus_idle_callback (monitor, watch->watch_id, watch);
++  meta_idle_monitor_remove_watch (monitor, watch->watch_id);
++}
++
++static void
++on_idle_before_user_active (MetaIdleMonitor *monitor,
++                            guint            watch_id,
++                            gpointer         user_data)
++{
++  DBusWatch *watch = user_data;
++
++  if (!watch->active_watch_id)
++    watch->active_watch_id =
++      meta_idle_monitor_add_user_active_watch (monitor,
++                                               on_user_active_after_idle,
++                                               watch, NULL);
++}
++
+ static void
+ name_vanished_callback (GDBusConnection *connection,
+                         const char      *name,
+@@ -143,6 +190,15 @@ make_dbus_watch (MetaDBusIdleMonitor   *skeleton,
+   return watch;
+ }
+ 
++static void
++track_dbus_watch (DBusWatch *watch)
++{
++  MetaIdleManager *manager = meta_idle_monitor_get_manager (watch->monitor);
++
++  g_hash_table_insert (manager->dbus_watches,
++                       GUINT_TO_POINTER (watch->watch_id), watch);
++}
++
+ static gboolean
+ handle_add_idle_watch (MetaDBusIdleMonitor   *skeleton,
+                        GDBusMethodInvocation *invocation,
+@@ -151,9 +207,13 @@ handle_add_idle_watch (MetaDBusIdleMonitor   *skeleton,
+ {
+   DBusWatch *watch;
+ 
++  if (meta_dbus_caller_is_sandboxed (invocation))
++    interval = MAX (interval, META_IDLE_SANDBOXED_MIN_MS);
++
+   watch = make_dbus_watch (skeleton, invocation, monitor);
+   watch->watch_id = meta_idle_monitor_add_idle_watch (monitor, interval,
+                                                       dbus_idle_callback, watch, destroy_dbus_watch);
++  track_dbus_watch (watch);
+ 
+   meta_dbus_idle_monitor_complete_add_idle_watch (skeleton, invocation, watch->watch_id);
+ 
+@@ -168,9 +228,18 @@ handle_add_user_active_watch (MetaDBusIdleMonitor   *skeleton,
+   DBusWatch *watch;
+ 
+   watch = make_dbus_watch (skeleton, invocation, monitor);
+-  watch->watch_id = meta_idle_monitor_add_user_active_watch (monitor,
+-                                                             dbus_idle_callback, watch,
+-                                                             destroy_dbus_watch);
++  if (meta_dbus_caller_is_sandboxed (invocation))
++    watch->watch_id =
++      meta_idle_monitor_add_idle_watch_full (monitor,
++                                             META_IDLE_SANDBOXED_MIN_MS,
++                                             on_idle_before_user_active,
++                                             watch, destroy_dbus_watch,
++                                             META_IDLE_MONITOR_WATCH_FLAGS_UNINHIBITABLE);
++  else
++    watch->watch_id = meta_idle_monitor_add_user_active_watch (monitor,
++                                                               dbus_idle_callback, watch,
++                                                               destroy_dbus_watch);
++  track_dbus_watch (watch);
+ 
+   meta_dbus_idle_monitor_complete_add_user_active_watch (skeleton, invocation, watch->watch_id);
+ 
+@@ -183,7 +252,15 @@ handle_remove_watch (MetaDBusIdleMonitor   *skeleton,
+                      guint                  id,
+                      MetaIdleMonitor       *monitor)
+ {
+-  meta_idle_monitor_remove_watch (monitor, id);
++  MetaIdleManager *manager = meta_idle_monitor_get_manager (monitor);
++  DBusWatch *watch = g_hash_table_lookup (manager->dbus_watches,
++                                          GUINT_TO_POINTER (id));
++
++  if (watch &&
++      g_str_equal (watch->dbus_name,
++                   g_dbus_method_invocation_get_sender (invocation)))
++    meta_idle_monitor_remove_watch (monitor, id);
++
+   meta_dbus_idle_monitor_complete_remove_watch (skeleton, invocation);
+ 
+   return TRUE;
+@@ -191,6 +268,7 @@ handle_remove_watch (MetaDBusIdleMonitor   *skeleton,
+ 
+ static void
+ create_monitor_skeleton (GDBusObjectManagerServer *manager,
++                         MetaContext              *context,
+                          MetaIdleMonitor          *monitor,
+                          const char               *path)
+ {
+@@ -198,6 +276,8 @@ create_monitor_skeleton (GDBusObjectManagerServer *manager,
+   MetaDBusObjectSkeleton *object;
+ 
+   skeleton = meta_dbus_idle_monitor_skeleton_new ();
++  meta_dbus_guard_interface (G_DBUS_INTERFACE_SKELETON (skeleton), context,
++                             open_methods);
+   g_signal_connect (skeleton, "handle-add-idle-watch",
+                     G_CALLBACK (handle_add_idle_watch), monitor);
+   g_signal_connect (skeleton, "handle-add-user-active-watch",
+@@ -232,7 +312,9 @@ on_bus_acquired (GDBusConnection *connection,
+   /* We never clear the core monitor, as that's supposed to cumulate idle times from
+      all devices */
+   monitor = meta_idle_manager_get_core_monitor (manager);
+-  create_monitor_skeleton (object_manager, monitor,
++  create_monitor_skeleton (object_manager,
++                           meta_backend_get_context (manager->backend),
++                           monitor,
+                            "/org/gnome/Mutter/IdleMonitor/Core");
+ 
+   g_dbus_object_manager_server_set_connection (object_manager, connection);
+@@ -279,6 +361,7 @@ meta_idle_manager_new (MetaBackend *backend)
+ 
+   idle_manager = g_new0 (MetaIdleManager, 1);
+   idle_manager->backend = backend;
++  idle_manager->dbus_watches = g_hash_table_new (NULL, NULL);
+ 
+   idle_manager->dbus_name_id =
+     g_bus_own_name (G_BUS_TYPE_SESSION,
+@@ -298,5 +381,6 @@ void
+ meta_idle_manager_free (MetaIdleManager *idle_manager)
+ {
+   g_bus_unown_name (idle_manager->dbus_name_id);
++  g_hash_table_unref (idle_manager->dbus_watches);
+   g_free (idle_manager);
+ }
+diff --git a/src/backends/meta-idle-manager.h b/src/backends/meta-idle-manager.h
+index 6e0c503070d524292b678212814ccab6af415225..1bbb8b63f0be30418c391d5cdfadd3b92760bd3d 100644
+--- a/src/backends/meta-idle-manager.h
++++ b/src/backends/meta-idle-manager.h
+@@ -21,6 +21,8 @@
+ #include "backends/meta-backend-types.h"
+ #include "clutter/clutter.h"
+ 
++#define META_IDLE_SANDBOXED_MIN_MS 10000
++
+ typedef struct _MetaIdleMonitor MetaIdleMonitor;
+ typedef struct _MetaIdleManager MetaIdleManager;
+ 
+diff --git a/src/backends/meta-input-mapper.c b/src/backends/meta-input-mapper.c
+index d7bf11dcbf1b87b1e6b92b1810237d3e1751ade9..8886ddfe728f2e2187c8b2fcfbc5afe97d869836 100644
+--- a/src/backends/meta-input-mapper.c
++++ b/src/backends/meta-input-mapper.c
+@@ -25,6 +25,7 @@
+ #include "backends/meta-monitor-manager-private.h"
+ #include "backends/meta-logical-monitor-private.h"
+ #include "backends/meta-backend-private.h"
++#include "core/meta-dbus-guard.h"
+ 
+ #include "meta-dbus-input-mapping.h"
+ 
+@@ -874,11 +875,13 @@ on_bus_acquired (GDBusConnection *connection,
+                  const char      *name,
+                  gpointer         user_data)
+ {
+-  MetaRemoteDesktop *remote_desktop = user_data;
++  MetaInputMapper *mapper = user_data;
+   GDBusInterfaceSkeleton *interface_skeleton =
+-    G_DBUS_INTERFACE_SKELETON (remote_desktop);
++    G_DBUS_INTERFACE_SKELETON (mapper);
+   g_autoptr (GError) error = NULL;
+ 
++  meta_dbus_guard_interface (interface_skeleton,
++                             meta_backend_get_context (mapper->backend), NULL);
+   if (!g_dbus_interface_skeleton_export (interface_skeleton,
+                                          connection,
+                                          META_INPUT_MAPPING_DBUS_PATH,
+diff --git a/src/core/meta-dbus-guard.c b/src/core/meta-dbus-guard.c
+new file mode 100644
+index 0000000000000000000000000000000000000000..cbd2d79ab10cb8a12806f60a162b336f9d4a029e
+--- /dev/null
++++ b/src/core/meta-dbus-guard.c
+@@ -0,0 +1,72 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++#include "config.h"
++
++#include "core/meta-dbus-guard.h"
++
++#include "core/meta-sandbox.h"
++
++#define SANDBOXED_KEY "-meta-dbus-guard-sandboxed"
++
++typedef struct
++{
++  MetaContext *context;
++  const char * const *open_methods;
++} Guard;
++
++static gboolean
++authorize_method (GDBusInterfaceSkeleton *skeleton,
++                  GDBusMethodInvocation  *invocation,
++                  Guard                  *guard)
++{
++  const char *method = g_dbus_method_invocation_get_method_name (invocation);
++
++  if (meta_dbus_sender_is_unsandboxed (guard->context,
++                                       g_dbus_method_invocation_get_connection (invocation),
++                                       g_dbus_method_invocation_get_sender (invocation)))
++    return TRUE;
++
++  if (guard->open_methods && g_strv_contains (guard->open_methods, method))
++    {
++      g_object_set_data (G_OBJECT (invocation), SANDBOXED_KEY, GINT_TO_POINTER (TRUE));
++      return TRUE;
++    }
++
++  g_dbus_method_invocation_return_error (invocation,
++                                         G_DBUS_ERROR,
++                                         G_DBUS_ERROR_ACCESS_DENIED,
++                                         "Sandboxed apps cannot call %s.%s",
++                                         g_dbus_method_invocation_get_interface_name (invocation),
++                                         method);
++  return FALSE;
++}
++
++/*
++ * meta_dbus_guard_interface:
++ * @skeleton: an interface Mutter exports
++ * @context: the #MetaContext
++ * @open_methods: (array zero-terminated=1) (nullable): the methods sandboxed
++ *   apps may call, which must outlive @skeleton
++ *
++ * Keeps every method of @skeleton to callers outside a sandbox and apps given
++ * full access, except those in @open_methods. A caller that can't be
++ * identified counts as sandboxed.
++ */
++void
++meta_dbus_guard_interface (GDBusInterfaceSkeleton *skeleton,
++                           MetaContext            *context,
++                           const char * const     *open_methods)
++{
++  Guard *guard = g_new0 (Guard, 1);
++
++  guard->context = context;
++  guard->open_methods = open_methods;
++  g_signal_connect_data (skeleton, "g-authorize-method",
++                         G_CALLBACK (authorize_method), guard,
++                         (GClosureNotify) g_free, G_CONNECT_DEFAULT);
++}
++
++gboolean
++meta_dbus_caller_is_sandboxed (GDBusMethodInvocation *invocation)
++{
++  return g_object_get_data (G_OBJECT (invocation), SANDBOXED_KEY) != NULL;
++}
+diff --git a/src/core/meta-dbus-guard.h b/src/core/meta-dbus-guard.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..da3d7059dadc6e1581f945898860de934ed219ae
+--- /dev/null
++++ b/src/core/meta-dbus-guard.h
+@@ -0,0 +1,12 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++#pragma once
++
++#include <gio/gio.h>
++
++#include "meta/types.h"
++
++void meta_dbus_guard_interface (GDBusInterfaceSkeleton *skeleton,
++                                MetaContext            *context,
++                                const char * const     *open_methods);
++
++gboolean meta_dbus_caller_is_sandboxed (GDBusMethodInvocation *invocation);
+diff --git a/src/core/meta-sandbox.c b/src/core/meta-sandbox.c
+index ac866cdda39b66a900780857f870093fc03559e7..e0fac4f4dfb44d1c0f9a23749162c5cfba777871 100644
+--- a/src/core/meta-sandbox.c
++++ b/src/core/meta-sandbox.c
+@@ -15,6 +15,8 @@
+ 
+ #define PERMITTED_APPS_KEY "-meta-permitted-apps"
+ 
++static GMutex permitted_apps_lock;
++
+ static GHashTable *
+ permitted_apps_of (MetaContext *context)
+ {
+@@ -53,7 +55,9 @@ meta_context_set_permitted_apps (MetaContext        *context,
+   for (; app_ids && *app_ids; app_ids++)
+     g_hash_table_add (apps, g_strdup (*app_ids));
+ 
++  g_mutex_lock (&permitted_apps_lock);
+   g_hash_table_replace (permitted_apps_of (context), g_strdup (permission), apps);
++  g_mutex_unlock (&permitted_apps_lock);
+ }
+ 
+ /**
+@@ -69,12 +73,14 @@ meta_context_is_app_permitted (MetaContext *context,
+                                const char  *permission,
+                                const char  *app_id)
+ {
++  g_autoptr (GMutexLocker) locker = NULL;
+   GHashTable *apps;
+ 
+   g_return_val_if_fail (META_IS_CONTEXT (context), FALSE);
+   g_return_val_if_fail (permission, FALSE);
+   g_return_val_if_fail (app_id, FALSE);
+ 
++  locker = g_mutex_locker_new (&permitted_apps_lock);
+   apps = g_hash_table_lookup (permitted_apps_of (context), permission);
+   return apps && g_hash_table_contains (apps, app_id);
+ }
+diff --git a/src/core/meta-service-channel.c b/src/core/meta-service-channel.c
+index 4bd5b028ac744620e613ecdfeb67c1d065ce56a2..cf65632b6a977971f780968dfdf071bf113654e9 100644
+--- a/src/core/meta-service-channel.c
++++ b/src/core/meta-service-channel.c
+@@ -23,6 +23,7 @@
+ 
+ #include "core/meta-service-channel.h"
+ 
++#include "core/meta-dbus-guard.h"
+ #include "mtk/mtk.h"
+ #include "wayland/meta-wayland-client-private.h"
+ 
+@@ -433,6 +434,8 @@ meta_service_channel_new (MetaContext *context)
+ 
+   service_channel = g_object_new (META_TYPE_SERVICE_CHANNEL, NULL);
+   service_channel->context = context;
++  meta_dbus_guard_interface (G_DBUS_INTERFACE_SKELETON (service_channel),
++                             context, NULL);
+ 
+   return service_channel;
+ }
+diff --git a/src/meson.build b/src/meson.build
+index 5006e0360737e07472c6a0974e75bbfc085fdf77..97de536063c35113b74515b20bce41bc9c2c6ef6 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -345,6 +345,8 @@ mutter_sources = [
+   'core/meta-process-identity.c',
+   'core/meta-process-identity.h',
+   'core/meta-sealed-fd.c',
++  'core/meta-dbus-guard.c',
++  'core/meta-dbus-guard.h',
+   'core/meta-sandbox.c',
+   'core/meta-sandbox.h',
+   'core/meta-sealed-fd.h',
+diff --git a/src/wayland/meta-wayland-idle-notify.c b/src/wayland/meta-wayland-idle-notify.c
+index 5d216c4ea916bf13a41b81e1f913a415f3c8a8cd..b56e5d8d62f71a6ec92169fdf9827925afb78605 100644
+--- a/src/wayland/meta-wayland-idle-notify.c
++++ b/src/wayland/meta-wayland-idle-notify.c
+@@ -4,6 +4,7 @@
+ #include "wayland/meta-wayland-idle-notify.h"
+ 
+ #include "backends/meta-backend-private.h"
++#include "backends/meta-idle-manager.h"
+ #include "meta/meta-idle-monitor.h"
+ #include "wayland/meta-wayland-private.h"
+ #include "wayland/meta-wayland-sandbox.h"
+@@ -12,7 +13,6 @@
+ #include "ext-idle-notify-v1-server-protocol.h"
+ 
+ #define MIN_TIMEOUT_MS 1000
+-#define MIN_SANDBOXED_TIMEOUT_MS 10000
+ 
+ typedef struct _MetaWaylandIdleNotification
+ {
+@@ -86,7 +86,7 @@ create_notification (struct wl_client          *client,
+   MetaBackend *backend =
+     meta_context_get_backend (meta_wayland_compositor_get_context (compositor));
+   uint32_t min_timeout_msec = meta_wayland_client_is_sandboxed (client)
+-    ? MIN_SANDBOXED_TIMEOUT_MS
++    ? META_IDLE_SANDBOXED_MIN_MS
+     : MIN_TIMEOUT_MS;
+   MetaWaylandIdleNotification *notification;
+ 

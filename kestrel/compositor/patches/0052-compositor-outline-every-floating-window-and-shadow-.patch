@@ -1,8 +1,8 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Thu, 29 Oct 2026 05:48:18 +0100
-Subject: [PATCH 52/68] compositor: outline every floating window and shadow
- those that draw none
+Subject: [PATCH] compositor: outline every floating window and shadow those
+ that draw none
 
 Windows used to blend into whatever was behind them, most of all dark
 windows over other dark windows, and only Wayland windows that drew no

@@ -65,18 +65,6 @@
     <value nick="at-end" value="1"/>
   </enum>
 
-  <enum id="com.lantharos.kestrel.TaskbarPosition">
-    <value nick="bottom" value="0"/>
-    <value nick="left" value="1"/>
-    <value nick="top" value="2"/>
-    <value nick="right" value="3"/>
-  </enum>
-
-  <enum id="com.lantharos.kestrel.TaskbarAlignment">
-    <value nick="center" value="0"/>
-    <value nick="left" value="1"/>
-  </enum>
-
   <enum id="com.lantharos.kestrel.TaskbarLook">
     <value nick="glass" value="0"/>
     <value nick="solid" value="1"/>
@@ -125,7 +113,7 @@
   <schema id="com.lantharos.kestrel" path="/com/lantharos/kestrel/"
           gettext-domain="@GETTEXT_PACKAGE@">
     <key name="lock-screen-content" type="b">
-      <default>true</default>
+      <default>false</default>
       <summary>Show notification content on the lock screen</summary>
       <description>
         When enabled, the lock screen shows the titles and text of new
@@ -406,6 +394,15 @@
       <default>'duckduckgo'</default>
       <summary>Where Start's search looks up the web</summary>
     </key>
+    <key name="online-lookups" type="b">
+      <default>true</default>
+      <summary>Look up weather and currency rates</summary>
+      <description>
+        Weather and currency rates come from luft.computer. Asking for the
+        weather sends the area this computer is in, rounded to about ten
+        kilometres. When off, neither is asked for.
+      </description>
+    </key>
     <key name="taskbar-shown" type="b">
       <default>true</default>
       <summary>Show the taskbar</summary>
@@ -592,17 +589,6 @@
     <child name="keybindings" schema="com.lantharos.kestrel.keybindings"/>
     <child name="app-switcher" schema="com.lantharos.kestrel.app-switcher"/>
     <child name="window-switcher" schema="com.lantharos.kestrel.window-switcher"/>
-  </schema>
-
-  <schema id="com.lantharos.kestrel.legacy-taskbar" path="/com/lantharos/kestrel/">
-    <key name="taskbar-position" enum="com.lantharos.kestrel.TaskbarPosition">
-      <default>'bottom'</default>
-      <summary>The taskbar's edge before taskbar-arrangement, read once to carry it over</summary>
-    </key>
-    <key name="taskbar-alignment" enum="com.lantharos.kestrel.TaskbarAlignment">
-      <default>'center'</default>
-      <summary>The taskbar's alignment before taskbar-arrangement, read once to carry it over</summary>
-    </key>
   </schema>
 
   <schema id="com.lantharos.kestrel.keybindings" path="/com/lantharos/kestrel/keybindings/"

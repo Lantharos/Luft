@@ -1,8 +1,8 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Sun, 8 Nov 2026 12:24:17 +0100
-Subject: [PATCH 72/73] backends: ignore the hand that rests on the screen
- after a pen lifts
+Subject: [PATCH] backends: ignore the hand that rests on the screen after a
+ pen lifts
 
 libinput ignores the touchscreen of a pen while the pen is near it,
 but a pen with a short hover range, such as a Wacom AES pen in a 2-in-1,

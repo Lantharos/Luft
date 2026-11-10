@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Sun, 8 Nov 2026 13:39:46 +0100
-Subject: [PATCH 75/75] clutter: keep every motion sample of tablet tools
+Subject: [PATCH] clutter: keep every motion sample of tablet tools
 
 The stage drops all but the last motion event a device sends in a
 frame. For a pointer only the position matters, but a pen moves several

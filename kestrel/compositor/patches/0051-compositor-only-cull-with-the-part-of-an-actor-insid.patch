@@ -1,8 +1,8 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Wed, 21 Oct 2026 06:11:56 +0200
-Subject: [PATCH 51/68] compositor: only cull with the part of an actor inside
- its clip
+Subject: [PATCH] compositor: only cull with the part of an actor inside its
+ clip
 
 A shell can clip a window actor to one monitor while the window reaches
 past it, such as a column of a scrolling layout that peeks out at a

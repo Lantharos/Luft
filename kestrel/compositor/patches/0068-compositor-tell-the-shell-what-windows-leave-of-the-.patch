@@ -1,8 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Thu, 5 Nov 2026 23:27:27 +0100
-Subject: [PATCH 68/68] compositor: tell the shell what windows leave of the
- desktop
+Subject: [PATCH] compositor: tell the shell what windows leave of the desktop
 
 The compositor already works out which parts of the stage opaque windows
 cover before each frame. A shader on the desktop that moves by itself has

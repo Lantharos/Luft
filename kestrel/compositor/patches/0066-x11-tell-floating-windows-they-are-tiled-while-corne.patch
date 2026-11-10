@@ -1,8 +1,8 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Thu, 5 Nov 2026 21:05:57 +0100
-Subject: [PATCH 66/68] x11: tell floating windows they are tiled while corners
- are square
+Subject: [PATCH] x11: tell floating windows they are tiled while corners are
+ square
 
 With rounded corners off, Wayland clients are told they are tiled, which
 makes toolkits draw square corners. X11 clients weren't, so GTK 3 apps

@@ -1,0 +1,446 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Kristof Imeri <kristof@lanth.me>
+Date: Tue, 10 Nov 2026 19:17:51 +0100
+Subject: [PATCH] core: keep the writable properties of Mutter's D-Bus services
+ from sandboxed apps
+
+GDBus asks g-authorize-method about method calls only, so a property
+set through org.freedesktop.DBus.Properties went past
+meta_dbus_guard_interface(). An app whose bus proxy lets it talk to a
+name the shell owns could change the X11 scaling factor, or flip the
+debugging switches, the one that turns off the accessibility services'
+access control among them. The debugging switches, the devkit and the
+profiler had no guard on their methods either.
+
+meta_dbus_guard_property_writes() wraps the set_property of a skeleton
+class, and refuses writes from every caller the instance's guard keeps
+from its methods; an instance without a guard takes none. The debug
+control and the display configuration, which had its own copy of this,
+use it from their class, and meta_dbus_guarded_skeleton_new() makes a
+guarded subclass on the spot for interfaces without a type of their
+own, such as org.gnome.Mutter.X11. The devkit and the profiler get the
+method guard with nothing open.
+
+Upstream-Status: luft-only Luft's sandbox model; upstream leaves these services to the session bus
+---
+ src/backends/meta-display-config-skeleton.c |  49 +------
+ src/core/meta-context.c                     |   2 +-
+ src/core/meta-dbus-guard.c                  | 136 +++++++++++++++++++-
+ src/core/meta-dbus-guard.h                  |   5 +
+ src/core/meta-debug-control.c               |   5 +
+ src/core/meta-mdk.c                         |   3 +
+ src/core/meta-profiler.c                    |   6 +-
+ src/core/meta-profiler.h                    |   4 +-
+ src/x11/meta-x11-display.c                  |   5 +-
+ 9 files changed, 162 insertions(+), 53 deletions(-)
+
+diff --git a/src/backends/meta-display-config-skeleton.c b/src/backends/meta-display-config-skeleton.c
+index d36107f229252c7787f0eb1c7e2a84775cfb22d4..6ecc5c1d4320dbf75a2b2e51c222a12de7aebc39 100644
+--- a/src/backends/meta-display-config-skeleton.c
++++ b/src/backends/meta-display-config-skeleton.c
+@@ -4,17 +4,10 @@
+ #include "backends/meta-display-config-skeleton.h"
+ 
+ #include "core/meta-dbus-guard.h"
+-#include "core/meta-sandbox.h"
+-
+-#define ACCESS_DENIED_MESSAGE "Sandboxed apps cannot change displays"
+ 
+ struct _MetaDisplayConfigSkeleton
+ {
+   MetaDBusDisplayConfigSkeleton parent;
+-
+-  MetaContext *context;
+-  GDBusInterfaceVTable vtable;
+-  GDBusInterfaceSetPropertyFunc set_property;
+ };
+ 
+ G_DEFINE_TYPE (MetaDisplayConfigSkeleton, meta_display_config_skeleton,
+@@ -27,54 +20,15 @@ static const char * const open_methods[] = {
+   NULL,
+ };
+ 
+-static gboolean
+-set_property (GDBusConnection  *connection,
+-              const char       *sender,
+-              const char       *object_path,
+-              const char       *interface_name,
+-              const char       *property_name,
+-              GVariant         *value,
+-              GError          **error,
+-              gpointer          user_data)
+-{
+-  MetaDisplayConfigSkeleton *skeleton = META_DISPLAY_CONFIG_SKELETON (user_data);
+-
+-  if (!meta_dbus_sender_is_unsandboxed (skeleton->context, connection, sender))
+-    {
+-      g_set_error_literal (error, G_DBUS_ERROR, G_DBUS_ERROR_ACCESS_DENIED,
+-                           ACCESS_DENIED_MESSAGE);
+-      return FALSE;
+-    }
+-
+-  return skeleton->set_property (connection, sender, object_path,
+-                                 interface_name, property_name, value,
+-                                 error, user_data);
+-}
+-
+-static GDBusInterfaceVTable *
+-get_vtable (GDBusInterfaceSkeleton *interface_skeleton)
+-{
+-  return &META_DISPLAY_CONFIG_SKELETON (interface_skeleton)->vtable;
+-}
+-
+ static void
+ meta_display_config_skeleton_init (MetaDisplayConfigSkeleton *skeleton)
+ {
+-  GDBusInterfaceSkeletonClass *parent_class =
+-    G_DBUS_INTERFACE_SKELETON_CLASS (meta_display_config_skeleton_parent_class);
+-
+-  skeleton->vtable = *parent_class->get_vtable (G_DBUS_INTERFACE_SKELETON (skeleton));
+-  skeleton->set_property = skeleton->vtable.set_property;
+-  skeleton->vtable.set_property = set_property;
+ }
+ 
+ static void
+ meta_display_config_skeleton_class_init (MetaDisplayConfigSkeletonClass *klass)
+ {
+-  GDBusInterfaceSkeletonClass *interface_skeleton_class =
+-    G_DBUS_INTERFACE_SKELETON_CLASS (klass);
+-
+-  interface_skeleton_class->get_vtable = get_vtable;
++  meta_dbus_guard_property_writes (G_DBUS_INTERFACE_SKELETON_CLASS (klass));
+ }
+ 
+ MetaDBusDisplayConfig *
+@@ -83,7 +37,6 @@ meta_display_config_skeleton_new (MetaContext *context)
+   MetaDisplayConfigSkeleton *skeleton =
+     g_object_new (META_TYPE_DISPLAY_CONFIG_SKELETON, NULL);
+ 
+-  skeleton->context = context;
+   meta_dbus_guard_interface (G_DBUS_INTERFACE_SKELETON (skeleton), context,
+                              open_methods);
+   return META_DBUS_DISPLAY_CONFIG (skeleton);
+diff --git a/src/core/meta-context.c b/src/core/meta-context.c
+index 285ed568f0d2fc86b3bbf5f30002059f3653f7be..3d9d9034aae2697b3c98d414af4cc0cbb15d1c0d 100644
+--- a/src/core/meta-context.c
++++ b/src/core/meta-context.c
+@@ -382,7 +382,7 @@ meta_context_configure (MetaContext   *context,
+     }
+ 
+ #ifdef HAVE_PROFILER
+-  priv->profiler = meta_profiler_new (priv->trace_file);
++  priv->profiler = meta_profiler_new (context, priv->trace_file);
+ #endif
+ 
+   priv->state = META_CONTEXT_STATE_CONFIGURED;
+diff --git a/src/core/meta-dbus-guard.c b/src/core/meta-dbus-guard.c
+index cbd2d79ab10cb8a12806f60a162b336f9d4a029e..24b3b23957200a813e916454a691b3330f808820 100644
+--- a/src/core/meta-dbus-guard.c
++++ b/src/core/meta-dbus-guard.c
+@@ -6,6 +6,7 @@
+ #include "core/meta-sandbox.h"
+ 
+ #define SANDBOXED_KEY "-meta-dbus-guard-sandboxed"
++#define GUARD_KEY "-meta-dbus-guard"
+ 
+ typedef struct
+ {
+@@ -13,6 +14,20 @@ typedef struct
+   const char * const *open_methods;
+ } Guard;
+ 
++typedef struct
++{
++  GDBusInterfaceVTable * (* get_vtable) (GDBusInterfaceSkeleton *skeleton);
++  GDBusInterfaceVTable vtable;
++  GDBusInterfaceSetPropertyFunc set_property;
++  size_t filled;
++} GuardedClass;
++
++static GQuark
++guarded_class_quark (void)
++{
++  return g_quark_from_static_string ("meta-dbus-guarded-class");
++}
++
+ static gboolean
+ authorize_method (GDBusInterfaceSkeleton *skeleton,
+                   GDBusMethodInvocation  *invocation,
+@@ -49,7 +64,8 @@ authorize_method (GDBusInterfaceSkeleton *skeleton,
+  *
+  * Keeps every method of @skeleton to callers outside a sandbox and apps given
+  * full access, except those in @open_methods. A caller that can't be
+- * identified counts as sandboxed.
++ * identified counts as sandboxed. Writable properties need
++ * meta_dbus_guard_property_writes() on the skeleton's class as well.
+  */
+ void
+ meta_dbus_guard_interface (GDBusInterfaceSkeleton *skeleton,
+@@ -60,11 +76,129 @@ meta_dbus_guard_interface (GDBusInterfaceSkeleton *skeleton,
+ 
+   guard->context = context;
+   guard->open_methods = open_methods;
++  g_object_set_data (G_OBJECT (skeleton), GUARD_KEY, guard);
+   g_signal_connect_data (skeleton, "g-authorize-method",
+                          G_CALLBACK (authorize_method), guard,
+                          (GClosureNotify) g_free, G_CONNECT_DEFAULT);
+ }
+ 
++static GuardedClass *
++guarded_class_of (GDBusInterfaceSkeleton *skeleton)
++{
++  GType type = G_OBJECT_TYPE (skeleton);
++  GuardedClass *guarded;
++
++  while (!(guarded = g_type_get_qdata (type, guarded_class_quark ())))
++    type = g_type_parent (type);
++
++  return guarded;
++}
++
++static gboolean
++set_property (GDBusConnection  *connection,
++              const char       *sender,
++              const char       *object_path,
++              const char       *interface_name,
++              const char       *property_name,
++              GVariant         *value,
++              GError          **error,
++              gpointer          user_data)
++{
++  GDBusInterfaceSkeleton *skeleton = user_data;
++  Guard *guard = g_object_get_data (G_OBJECT (skeleton), GUARD_KEY);
++
++  if (!guard ||
++      !meta_dbus_sender_is_unsandboxed (guard->context, connection, sender))
++    {
++      g_set_error (error, G_DBUS_ERROR, G_DBUS_ERROR_ACCESS_DENIED,
++                   "Sandboxed apps cannot set %s.%s",
++                   interface_name, property_name);
++      return FALSE;
++    }
++
++  return guarded_class_of (skeleton)->set_property (connection, sender,
++                                                    object_path, interface_name,
++                                                    property_name, value,
++                                                    error, user_data);
++}
++
++static GDBusInterfaceVTable *
++get_vtable (GDBusInterfaceSkeleton *skeleton)
++{
++  GuardedClass *guarded = guarded_class_of (skeleton);
++
++  if (g_once_init_enter (&guarded->filled))
++    {
++      guarded->vtable = *guarded->get_vtable (skeleton);
++      guarded->set_property = guarded->vtable.set_property;
++      guarded->vtable.set_property = set_property;
++      g_once_init_leave (&guarded->filled, 1);
++    }
++
++  return &guarded->vtable;
++}
++
++/*
++ * meta_dbus_guard_property_writes:
++ * @klass: the class of a skeleton Mutter exports, from its class_init
++ *
++ * Keeps the writable properties of the class's interface to the callers
++ * meta_dbus_guard_interface() lets call every method. An instance that
++ * was never passed to it takes no writes at all.
++ */
++void
++meta_dbus_guard_property_writes (GDBusInterfaceSkeletonClass *klass)
++{
++  GuardedClass *guarded = g_new0 (GuardedClass, 1);
++
++  guarded->get_vtable = klass->get_vtable;
++  klass->get_vtable = get_vtable;
++  g_type_set_qdata (G_TYPE_FROM_CLASS (klass), guarded_class_quark (), guarded);
++}
++
++static void
++guarded_class_init (gpointer klass,
++                    gpointer class_data)
++{
++  meta_dbus_guard_property_writes (klass);
++}
++
++/*
++ * meta_dbus_guarded_skeleton_new:
++ * @skeleton_type: a generated skeleton type
++ * @context: the #MetaContext
++ *
++ * Makes a skeleton whose methods and writable properties sandboxed apps
++ * can't reach, for interfaces that have no type of their own in Mutter.
++ *
++ * Returns: (transfer full): the skeleton
++ */
++GDBusInterfaceSkeleton *
++meta_dbus_guarded_skeleton_new (GType        skeleton_type,
++                                MetaContext *context)
++{
++  g_autofree char *name =
++    g_strconcat ("MetaGuarded", g_type_name (skeleton_type), NULL);
++  GType type = g_type_from_name (name);
++  GDBusInterfaceSkeleton *skeleton;
++
++  if (!type)
++    {
++      GTypeQuery query;
++      GTypeInfo info = { 0 };
++
++      g_type_query (skeleton_type, &query);
++      info.class_size = query.class_size;
++      info.class_init = guarded_class_init;
++      info.instance_size = query.instance_size;
++      type = g_type_register_static (skeleton_type, name, &info, 0);
++    }
++
++  skeleton = g_object_new (type, NULL);
++  meta_dbus_guard_interface (skeleton, context, NULL);
++  return skeleton;
++}
++
+ gboolean
+ meta_dbus_caller_is_sandboxed (GDBusMethodInvocation *invocation)
+ {
+diff --git a/src/core/meta-dbus-guard.h b/src/core/meta-dbus-guard.h
+index da3d7059dadc6e1581f945898860de934ed219ae..5a3a59fa9af1ba5ebc07df506a121f59975c1ca5 100644
+--- a/src/core/meta-dbus-guard.h
++++ b/src/core/meta-dbus-guard.h
+@@ -9,4 +9,9 @@ void meta_dbus_guard_interface (GDBusInterfaceSkeleton *skeleton,
+                                 MetaContext            *context,
+                                 const char * const     *open_methods);
+ 
++void meta_dbus_guard_property_writes (GDBusInterfaceSkeletonClass *klass);
++
++GDBusInterfaceSkeleton * meta_dbus_guarded_skeleton_new (GType        skeleton_type,
++                                                         MetaContext *context);
++
+ gboolean meta_dbus_caller_is_sandboxed (GDBusMethodInvocation *invocation);
+diff --git a/src/core/meta-debug-control.c b/src/core/meta-debug-control.c
+index ad6e5ad70a7ef4c7560dc0bc3046396a0b3dca19..37f8d8830bcde378239a65a25815e0d9ed3f40a9 100644
+--- a/src/core/meta-debug-control.c
++++ b/src/core/meta-debug-control.c
+@@ -20,6 +20,7 @@
+ 
+ #include "core/meta-debug-control-private.h"
+ 
++#include "core/meta-dbus-guard.h"
+ #include "core/util-private.h"
+ #include "meta/meta-backend.h"
+ #include "meta/meta-context.h"
+@@ -74,6 +75,8 @@ on_bus_acquired (GDBusConnection *connection,
+               "Acquired D-Bus name '%s', exporting service on '%s'",
+               META_DEBUG_CONTROL_DBUS_SERVICE, META_DEBUG_CONTROL_DBUS_PATH);
+ 
++  meta_dbus_guard_interface (G_DBUS_INTERFACE_SKELETON (debug_control),
++                             debug_control->context, NULL);
+   if (!g_dbus_interface_skeleton_export (G_DBUS_INTERFACE_SKELETON (debug_control),
+                                          connection,
+                                          META_DEBUG_CONTROL_DBUS_PATH,
+@@ -161,6 +164,8 @@ meta_debug_control_class_init (MetaDebugControlClass *klass)
+                                                    G_PARAM_EXPLICIT_NOTIFY |
+                                                    G_PARAM_STATIC_STRINGS);
+   g_object_class_install_properties (object_class, N_PROPS, obj_props);
++
++  meta_dbus_guard_property_writes (G_DBUS_INTERFACE_SKELETON_CLASS (klass));
+ }
+ 
+ static void
+diff --git a/src/core/meta-mdk.c b/src/core/meta-mdk.c
+index 11fb7b27d86322364e1a0fe37ab143c3eadc6741..e0e53097f3be7f075cef54eb19977537ac7ab87a 100644
+--- a/src/core/meta-mdk.c
++++ b/src/core/meta-mdk.c
+@@ -24,6 +24,7 @@
+ 
+ #include "backends/meta-remote-desktop.h"
+ #include "backends/meta-screen-cast.h"
++#include "core/meta-dbus-guard.h"
+ #include "meta/meta-wayland-compositor.h"
+ #include "wayland/meta-wayland.h"
+ 
+@@ -209,6 +210,8 @@ init_api (MetaMdk *mdk)
+ #endif
+ 
+   mdk->api = meta_dbus_devkit_skeleton_new ();
++  meta_dbus_guard_interface (G_DBUS_INTERFACE_SKELETON (mdk->api),
++                             mdk->context, NULL);
+ 
+   g_variant_builder_init (&env_builder, G_VARIANT_TYPE ("a{ss}"));
+ 
+diff --git a/src/core/meta-profiler.c b/src/core/meta-profiler.c
+index b9089d31d900becf600f163e6ff99523111c4644..6d46db7d99f33e6c100970fc2add551fa95b359d 100644
+--- a/src/core/meta-profiler.c
++++ b/src/core/meta-profiler.c
+@@ -24,6 +24,7 @@
+ #include <gio/gunixfdlist.h>
+ 
+ #include "cogl/cogl.h"
++#include "core/meta-dbus-guard.h"
+ 
+ #define META_SYSPROF_PROFILER_DBUS_PATH "/org/gnome/Sysprof3/Profiler"
+ 
+@@ -285,11 +286,14 @@ meta_profiler_init (MetaProfiler *self)
+ }
+ 
+ MetaProfiler *
+-meta_profiler_new (const char *trace_file)
++meta_profiler_new (MetaContext *context,
++                   const char  *trace_file)
+ {
+   MetaProfiler *profiler;
+ 
+   profiler = g_object_new (META_TYPE_PROFILER, NULL);
++  meta_dbus_guard_interface (G_DBUS_INTERFACE_SKELETON (profiler), context,
++                             NULL);
+ 
+   profiler->main_thread_context =
+     g_main_context_ref_thread_default ();
+diff --git a/src/core/meta-profiler.h b/src/core/meta-profiler.h
+index 035674474b42f0f88d59f3f7c138103e879054ea..99205ef3c551062b24ec30d8f4bbcbb15c44fc06 100644
+--- a/src/core/meta-profiler.h
++++ b/src/core/meta-profiler.h
+@@ -20,6 +20,7 @@
+ #include <glib-object.h>
+ 
+ #include "meta-dbus-sysprof3-profiler.h"
++#include "meta/types.h"
+ 
+ G_BEGIN_DECLS
+ 
+@@ -31,7 +32,8 @@ G_DECLARE_FINAL_TYPE (MetaProfiler,
+                       PROFILER,
+                       MetaDBusSysprof3ProfilerSkeleton)
+ 
+-MetaProfiler * meta_profiler_new (const char *trace_file);
++MetaProfiler * meta_profiler_new (MetaContext *context,
++                                  const char  *trace_file);
+ 
+ void meta_profiler_register_thread (MetaProfiler *profiler,
+                                     GMainContext *main_context,
+diff --git a/src/x11/meta-x11-display.c b/src/x11/meta-x11-display.c
+index caf29b8fbbdf4c4b8757dd6b37861b9c9d6a9096..75118ec1cc655a7fe851156c2c58ff7b7cf1b360 100644
+--- a/src/x11/meta-x11-display.c
++++ b/src/x11/meta-x11-display.c
+@@ -51,6 +51,7 @@
+ #include "backends/meta-cursor-xcursor.h"
+ #include "backends/meta-logical-monitor-private.h"
+ #include "backends/meta-settings-private.h"
++#include "core/meta-dbus-guard.h"
+ #include "core/meta-workspace-manager-private.h"
+ #include "core/util-private.h"
+ #include "core/workspace-private.h"
+@@ -1159,7 +1160,9 @@ initialize_dbus_interface (MetaX11Display *x11_display)
+   MetaX11DisplayPrivate *priv =
+     meta_x11_display_get_instance_private (x11_display);
+ 
+-  priv->dbus_api = meta_dbus_x11_skeleton_new ();
++  priv->dbus_api =
++    META_DBUS_X11 (meta_dbus_guarded_skeleton_new (META_DBUS_TYPE_X11_SKELETON,
++                                                   meta_display_get_context (x11_display->display)));
+   priv->dbus_name_id =
+     g_bus_own_name (G_BUS_TYPE_SESSION,
+                     "org.gnome.Mutter.X11",

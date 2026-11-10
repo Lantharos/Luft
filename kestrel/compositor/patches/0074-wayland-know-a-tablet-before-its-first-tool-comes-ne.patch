@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Sun, 8 Nov 2026 13:39:16 +0100
-Subject: [PATCH 74/75] wayland: know a tablet before its first tool comes near
+Subject: [PATCH] wayland: know a tablet before its first tool comes near
 
 The seat's device-added signal is emitted when the stage processes its
 queued events, on the next frame, but the Wayland seat sees each input

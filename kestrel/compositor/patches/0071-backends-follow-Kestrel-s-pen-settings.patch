@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Sun, 8 Nov 2026 12:22:52 +0100
-Subject: [PATCH 71/73] backends: follow Kestrel's pen settings
+Subject: [PATCH] backends: follow Kestrel's pen settings
 
 Read the pressure curves, the side buttons and the eraser button of
 every pen from com.lantharos.kestrel.pen instead of a relocatable

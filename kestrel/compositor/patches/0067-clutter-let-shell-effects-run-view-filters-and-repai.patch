@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Thu, 5 Nov 2026 23:27:17 +0100
-Subject: [PATCH 67/68] clutter: let shell effects run view filters and repaint
+Subject: [PATCH] clutter: let shell effects run view filters and repaint
  regions
 
 A filter that only covers part of what a view shows has to run from an

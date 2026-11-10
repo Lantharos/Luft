@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Thu, 5 Nov 2026 12:47:06 +0100
-Subject: [PATCH 65/68] clutter: let a stage view filter what it shows
+Subject: [PATCH] clutter: let a stage view filter what it shows
 
 A shader over the whole screen could only be an offscreen effect on the
 stage, which spans every monitor at one scale, paints everything again for

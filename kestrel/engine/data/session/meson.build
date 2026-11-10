@@ -84,6 +84,9 @@ install_data('org.freedesktop.impl.portal.desktop.kestrel.service', install_dir:
 foreach slice : ['app', 'background', 'user']
   install_data('slice-oomd.conf', install_dir: systemduserunitdir / slice + '.slice.d', rename: '50-kestrel-oomd.conf')
 endforeach
+foreach kind : ['scope', 'service']
+  install_data('app-' + kind + '-limits.conf', install_dir: systemduserunitdir / 'app-.' + kind + '.d', rename: '50-kestrel-limits.conf')
+endforeach
 install_data('root-slice.conf', install_dir: systemduserunitdir / '-.slice.d', rename: '50-kestrel-session.conf')
 install_data('session-slice.conf', install_dir: systemduserunitdir / 'session.slice.d', rename: '50-kestrel-session.conf')
 foreach service : ['dbus-broker', 'pipewire', 'pipewire-pulse', 'wireplumber', 'xdg-desktop-portal']

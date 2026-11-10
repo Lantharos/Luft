@@ -1,7 +1,7 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Kristof Imeri <kristof@lanth.me>
 Date: Sat, 31 Oct 2026 21:30:43 +0100
-Subject: [PATCH 58/68] wayland: drop the primary selection
+Subject: [PATCH] wayland: drop the primary selection
 
 Middle-click paste pastes whatever was last selected, which is easy to
 trigger by accident and leaks text between apps. Stop advertising

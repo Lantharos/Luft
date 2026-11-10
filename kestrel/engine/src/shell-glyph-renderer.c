@@ -276,6 +276,8 @@ shell_glyph_renderer_render (ShellGlyphRenderer *renderer,
   hb_raster_paint_set_glyph_extents (renderer->paint, &glyph_extents);
   hb_raster_paint_glyph (renderer->paint, font, glyphs[0].codepoint);
   image = hb_raster_paint_render (renderer->paint);
+  if (!image)
+    return NULL;
   hb_raster_image_get_extents (image, &extents);
 
   pixels_up = hb_raster_image_get_buffer (image);

@@ -187,14 +187,14 @@ shell_sound_player_play_file (ShellSoundPlayer *player,
 {
   g_autofree char *name = g_file_get_basename (file);
 
-  _shell_sound_decode (name, file, SHELL_SOUND_ANY_LENGTH, player->cancellable, on_file_decoded, g_object_ref (player));
+  _shell_sound_decode_start (name, file, player->cancellable, on_file_decoded, g_object_ref (player));
 }
 
 void
 shell_sound_player_play_fd (ShellSoundPlayer *player,
                             int               fd)
 {
-  _shell_sound_decode_fd ("sound", fd, player->cancellable, on_file_decoded, g_object_ref (player));
+  _shell_sound_decode_start_fd ("sound", fd, player->cancellable, on_file_decoded, g_object_ref (player));
 }
 
 /**

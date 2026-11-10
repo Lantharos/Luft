@@ -5,6 +5,8 @@ Description=Kestrel unlock authentication
 ListenStream=/run/kestrel/authenticate
 SocketMode=0666
 Accept=yes
+MaxConnections=256
+MaxConnectionsPerSource=16
 RemoveOnStop=yes
 
 [Install]

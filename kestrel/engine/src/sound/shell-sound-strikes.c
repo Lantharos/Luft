@@ -3,7 +3,6 @@
 
 #include <math.h>
 #include <pipewire/pipewire.h>
-#include <spa/param/audio/format-utils.h>
 #include <spa/utils/ringbuffer.h>
 #include <stdatomic.h>
 
@@ -297,16 +296,6 @@ disconnect_locked (ShellSoundStrikes *strikes)
 static gboolean
 connect_locked (ShellSoundStrikes *strikes)
 {
-  uint8_t pod[512];
-  struct spa_pod_builder builder = SPA_POD_BUILDER_INIT (pod, sizeof (pod));
-  const struct spa_pod *params[1];
-  struct spa_audio_info_raw format = {
-    .format = SPA_AUDIO_FORMAT_F32,
-    .rate = SHELL_SOUND_RATE,
-    .channels = SHELL_SOUND_CHANNELS,
-    .position = { SPA_AUDIO_CHANNEL_FL, SPA_AUDIO_CHANNEL_FR },
-  };
-
   if (strikes->broken)
     disconnect_locked (strikes);
   if (strikes->stream)
@@ -316,23 +305,10 @@ connect_locked (ShellSoundStrikes *strikes)
   if (!strikes->core)
     return FALSE;
 
-  strikes->stream = pw_stream_new (strikes->core, strikes->name,
-                                   pw_properties_new (PW_KEY_MEDIA_TYPE, "Audio",
-                                                      PW_KEY_MEDIA_CATEGORY, "Playback",
-                                                      PW_KEY_MEDIA_ROLE, "Music",
-                                                      PW_KEY_MEDIA_NAME, strikes->name,
-                                                      PW_KEY_APP_NAME, strikes->name,
-                                                      PW_KEY_APP_ID, "com.lantharos.Kestrel",
-                                                      PW_KEY_APP_ICON_NAME, strikes->icon_name,
-                                                      PW_KEY_NODE_DESCRIPTION, strikes->name,
-                                                      PW_KEY_NODE_LATENCY, QUANTUM,
-                                                      NULL));
-  pw_stream_add_listener (strikes->stream, &strikes->stream_listener, &stream_events, strikes);
-  params[0] = spa_format_audio_raw_build (&builder, SPA_PARAM_EnumFormat, &format);
-  if (pw_stream_connect (strikes->stream, PW_DIRECTION_OUTPUT, PW_ID_ANY,
-                         PW_STREAM_FLAG_AUTOCONNECT | PW_STREAM_FLAG_MAP_BUFFERS |
-                         PW_STREAM_FLAG_INACTIVE | PW_STREAM_FLAG_RT_PROCESS,
-                         params, 1) < 0)
+  strikes->stream = _shell_sound_stream_connect (strikes->core, strikes->name,
+                                                 _shell_sound_stream_properties (strikes->name, strikes->icon_name, QUANTUM),
+                                                 TRUE, &strikes->stream_listener, &stream_events, strikes);
+  if (!strikes->stream)
     {
       disconnect_locked (strikes);
       return FALSE;
@@ -419,7 +395,6 @@ _shell_sound_strikes_connect (ShellSoundStrikes *strikes)
   pw_thread_loop_unlock (strikes->loop);
 }
 
-/* The clip has to stay alive until it's retired: voices play from its memory. */
 void
 _shell_sound_strikes_play (ShellSoundStrikes    *strikes,
                            const ShellSoundClip *clip,
@@ -451,7 +426,6 @@ _shell_sound_strikes_play (ShellSoundStrikes    *strikes,
   pw_thread_loop_unlock (strikes->loop);
 }
 
-/* Takes the clip, and lets go of it once no voice can be playing it. */
 void
 _shell_sound_strikes_retire (ShellSoundStrikes *strikes,
                              ShellSoundClip    *clip)

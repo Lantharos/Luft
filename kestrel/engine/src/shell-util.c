@@ -198,41 +198,6 @@ shell_util_get_week_start (const char *locale)
 }
 
 /**
- * shell_util_translate_time_string:
- * @str: String to translate
- *
- * Translate @str according to the locale defined by LC_TIME; unlike
- * dcgettext(), the translations is still taken from the LC_MESSAGES
- * catalogue and not the LC_TIME one.
- *
- * Returns: the translated string
- */
-const char *
-shell_util_translate_time_string (const char *str)
-{
-  const char *locale = g_getenv ("LC_TIME");
-  const char *res;
-  const char *sep;
-  locale_t old_loc;
-  locale_t loc = (locale_t) 0;
-
-  if (locale)
-    loc = newlocale (LC_MESSAGES_MASK, locale, (locale_t) 0);
-
-  old_loc = uselocale (loc);
-
-  sep = strchr (str, '\004');
-  res = g_dpgettext (NULL, str, sep ? sep - str + 1 : 0);
-
-  uselocale (old_loc);
-
-  if (loc != (locale_t) 0)
-    freelocale (loc);
-
-  return res;
-}
-
-/**
  * shell_util_create_pixbuf_from_data:
  * @data: (array length=len) (element-type guint8) (transfer full):
  * @len:
@@ -286,20 +251,6 @@ shell_util_create_pixbuf_from_data (const guchar      *data,
   return gdk_pixbuf_new_from_data (data, colorspace, has_alpha,
                                    bits_per_sample, width, height, rowstride,
                                    (GdkPixbufDestroyNotify) g_free, NULL);
-}
-
-/**
- * shell_util_get_uid:
- *
- * A wrapper around getuid() so that it can be used from JavaScript. This
- * function will always succeed.
- *
- * Returns: the real user ID of the calling process
- */
-gint
-shell_util_get_uid (void)
-{
-  return getuid ();
 }
 
 static void

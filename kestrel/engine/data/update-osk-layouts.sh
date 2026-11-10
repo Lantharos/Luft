@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-cldr_layouts=http://www.unicode.org/Public/cldr/latest/keyboards.zip
+cldr_layouts=https://www.unicode.org/Public/cldr/43/keyboards.zip
+cldr_sha256=35112b0c0c604b3aba8366bdcfb3603c5aa89fb8624cb9eaa259557dfd9277b3
 workdir=.osk-layout-workbench
 layouts=osk-layouts
 gresource=kestrel-osk-layouts.gresource.xml
@@ -11,7 +12,9 @@ cd "$(dirname "$0")"
 
 rm -rf "$workdir"
 mkdir -p "$workdir" "$layouts"
-(cd "$workdir" && gio copy "$cldr_layouts" . && unzip keyboards.zip)
+curl -fsSL -o "$workdir/keyboards.zip" "$cldr_layouts"
+echo "$cldr_sha256  $workdir/keyboards.zip" | sha256sum --check --quiet
+unzip -q "$workdir/keyboards.zip" -d "$workdir"
 
 cldr2json/cldr2json.py "$workdir/keyboards/android" "$layouts"
 

@@ -549,6 +549,7 @@ main (int argc, char **argv)
   dump_gjs_stack_on_signal (SIGIOT);
   dump_gjs_stack_on_signal (SIGTRAP);
 
+  shell_init_debug (g_getenv ("SHELL_DEBUG"));
   if ((_shell_debug & SHELL_DEBUG_BACKTRACE_SEGFAULTS))
     {
       dump_gjs_stack_on_signal (SIGBUS);
@@ -575,8 +576,6 @@ main (int argc, char **argv)
       g_printerr ("Failed to setup: %s\n", error->message);
       return EXIT_FAILURE;
     }
-
-  shell_init_debug (g_getenv ("SHELL_DEBUG"));
 
   shell_dbus_init ();
   shell_a11y_init ();

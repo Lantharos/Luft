@@ -67,6 +67,9 @@ converse (int                        count,
   Conversation *conversation = data;
   struct pam_response *responses = calloc (count, sizeof *responses);
 
+  if (!responses)
+    return PAM_BUF_ERR;
+
   for (int i = 0; i < count; i++)
     {
       g_autoptr (JsonObject) request = NULL;
@@ -80,7 +83,7 @@ converse (int                        count,
       type = json_object_get_string_member_with_default (request, "type", "");
       if (strcmp (type, "post_auth_message_response") != 0)
         {
-          conversation->cancelled = TRUE;
+          conversation->cancelled = strcmp (type, "cancel_session") == 0;
           discard_responses (responses, count);
           return PAM_CONV_ERR;
         }

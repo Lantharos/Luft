@@ -117,7 +117,6 @@ systemunitdir = systemd_dep.get_variable('systemdsystemunitdir',
 
 mutter_typelibdir = mutter_dep.get_variable('typelibdir')
 gjs = find_program('gjs')
-generate_app_list = find_program('build-aux/generate-app-list.py')
 
 cc = meson.get_compiler('c')
 

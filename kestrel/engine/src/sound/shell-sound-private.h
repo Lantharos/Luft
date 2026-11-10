@@ -32,11 +32,16 @@ void            _shell_sound_decode        (const char          *name,
                                             GCancellable        *cancellable,
                                             GAsyncReadyCallback  callback,
                                             gpointer             user_data);
-void            _shell_sound_decode_fd     (const char          *name,
-                                            int                  fd,
+void            _shell_sound_decode_start  (const char          *name,
+                                            GFile               *file,
                                             GCancellable        *cancellable,
                                             GAsyncReadyCallback  callback,
                                             gpointer             user_data);
+void            _shell_sound_decode_start_fd (const char          *name,
+                                              int                  fd,
+                                              GCancellable        *cancellable,
+                                              GAsyncReadyCallback  callback,
+                                              gpointer             user_data);
 ShellSoundClip *_shell_sound_decode_finish (GAsyncResult        *result,
                                             GError             **error);
 
@@ -67,6 +72,22 @@ void              _shell_sound_output_set_volume (ShellSoundOutput   *output,
 
 struct pw_thread_loop;
 struct pw_context;
+struct pw_core;
+struct pw_properties;
+struct pw_stream;
+struct pw_stream_events;
+struct spa_hook;
+
+struct pw_properties *_shell_sound_stream_properties (const char *name,
+                                                      const char *icon_name,
+                                                      const char *quantum);
+struct pw_stream     *_shell_sound_stream_connect    (struct pw_core                *core,
+                                                      const char                    *name,
+                                                      struct pw_properties          *properties,
+                                                      gboolean                       realtime,
+                                                      struct spa_hook               *listener,
+                                                      const struct pw_stream_events *events,
+                                                      gpointer                       data);
 
 typedef struct _ShellSoundStrikes ShellSoundStrikes;
 

@@ -3,6 +3,7 @@
 #include <gst/gst.h>
 
 #define STILL_ENCODER "videoconvert ! jpegenc quality=95 snapshot=true ! filesink name=file"
+#define STILL_TIMEOUT (30 * GST_SECOND)
 
 gboolean
 wallpaper_extract_still (const char *uri,
@@ -15,6 +16,12 @@ wallpaper_extract_still (const char *uri,
   g_autoptr (GError) error = NULL;
   GstElement *encoder = gst_parse_bin_from_description (STILL_ENCODER, TRUE, &error);
 
+  if (!encoder)
+    {
+      g_printerr ("Could not extract a still: %s\n", error->message);
+      return FALSE;
+    }
+
   file = gst_bin_get_by_name (GST_BIN (encoder), "file");
   g_object_set (file, "location", path, NULL);
   g_object_set (pipeline, "uri", uri, "video-sink", encoder, NULL);
@@ -22,10 +29,15 @@ wallpaper_extract_still (const char *uri,
 
   bus = gst_element_get_bus (pipeline);
   gst_element_set_state (pipeline, GST_STATE_PLAYING);
-  message = gst_bus_timed_pop_filtered (bus, GST_CLOCK_TIME_NONE,
+  message = gst_bus_timed_pop_filtered (bus, STILL_TIMEOUT,
                                         GST_MESSAGE_EOS | GST_MESSAGE_ERROR);
   gst_element_set_state (pipeline, GST_STATE_NULL);
 
+  if (!message)
+    {
+      g_printerr ("Could not extract a still: %s took too long to play\n", uri);
+      return FALSE;
+    }
   if (GST_MESSAGE_TYPE (message) == GST_MESSAGE_ERROR)
     {
       gst_message_parse_error (message, &error, NULL);

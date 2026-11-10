@@ -187,7 +187,7 @@
           {
             "action": "levelSwitch",
             "iconName": "osk-shift-symbolic",
-            "level": "shift"
+            "level": "shift",
             "width": 1.5
           }
         ],

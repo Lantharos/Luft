@@ -2,7 +2,6 @@
 #include "config.h"
 
 #include <pipewire/pipewire.h>
-#include <spa/param/audio/format-utils.h>
 
 #include "shell-sound-mix.h"
 #include "shell-sound-private.h"
@@ -307,16 +306,6 @@ disconnect_locked (ShellSoundMix *mix)
 static gboolean
 connect_locked (ShellSoundMix *mix)
 {
-  uint8_t pod[512];
-  struct spa_pod_builder builder = SPA_POD_BUILDER_INIT (pod, sizeof (pod));
-  const struct spa_pod *params[1];
-  struct spa_audio_info_raw format = {
-    .format = SPA_AUDIO_FORMAT_F32,
-    .rate = SHELL_SOUND_RATE,
-    .channels = SHELL_SOUND_CHANNELS,
-    .position = { SPA_AUDIO_CHANNEL_FL, SPA_AUDIO_CHANNEL_FR },
-  };
-
   if (mix->broken)
     disconnect_locked (mix);
   if (mix->stream)
@@ -326,22 +315,10 @@ connect_locked (ShellSoundMix *mix)
   if (!mix->core)
     return FALSE;
 
-  mix->stream = pw_stream_new (mix->core, mix->name,
-                               pw_properties_new (PW_KEY_MEDIA_TYPE, "Audio",
-                                                  PW_KEY_MEDIA_CATEGORY, "Playback",
-                                                  PW_KEY_MEDIA_ROLE, "Music",
-                                                  PW_KEY_MEDIA_NAME, mix->name,
-                                                  PW_KEY_APP_NAME, mix->name,
-                                                  PW_KEY_APP_ID, "com.lantharos.Kestrel",
-                                                  PW_KEY_APP_ICON_NAME, mix->icon_name,
-                                                  PW_KEY_NODE_DESCRIPTION, mix->name,
-                                                  PW_KEY_NODE_LATENCY, QUANTUM,
-                                                  NULL));
-  pw_stream_add_listener (mix->stream, &mix->stream_listener, &stream_events, mix);
-  params[0] = spa_format_audio_raw_build (&builder, SPA_PARAM_EnumFormat, &format);
-  if (pw_stream_connect (mix->stream, PW_DIRECTION_OUTPUT, PW_ID_ANY,
-                         PW_STREAM_FLAG_AUTOCONNECT | PW_STREAM_FLAG_MAP_BUFFERS | PW_STREAM_FLAG_INACTIVE,
-                         params, 1) < 0)
+  mix->stream = _shell_sound_stream_connect (mix->core, mix->name,
+                                             _shell_sound_stream_properties (mix->name, mix->icon_name, QUANTUM),
+                                             FALSE, &mix->stream_listener, &stream_events, mix);
+  if (!mix->stream)
     {
       disconnect_locked (mix);
       return FALSE;
@@ -437,10 +414,11 @@ on_decoded (GObject      *source,
   g_autoptr (GError) error = NULL;
   g_autoptr (ShellSoundClip) clip = _shell_sound_decode_finish (result, &error);
   g_autoptr (GArray) waiting = NULL;
+  g_autofree char *key = NULL;
 
   if (!g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
     {
-      g_hash_table_steal_extended (mix->decoding, decoding->path, NULL, (gpointer *) &waiting);
+      g_hash_table_steal_extended (mix->decoding, decoding->path, (gpointer *) &key, (gpointer *) &waiting);
       if (!clip)
         g_warning ("%s can't play %s: %s", mix->name, decoding->path, error->message);
       else
@@ -507,14 +485,19 @@ shell_sound_mix_play (ShellSoundMix *mix,
                       double         volume,
                       guint          fade_ms)
 {
-  g_autofree char *path = g_file_get_path (file);
-  Waiting waiting = { .id = ++mix->next_id, .loop = loop, .volume = volume, .fade_ms = fade_ms };
+  g_autofree char *path = NULL;
+  Waiting waiting = { .loop = loop, .volume = volume, .fade_ms = fade_ms };
   ShellSoundClip *clip;
   GArray *queue;
   Decoding *decoding;
 
   g_return_val_if_fail (SHELL_IS_SOUND_MIX (mix), 0);
+  g_return_val_if_fail (G_IS_FILE (file), 0);
   g_return_val_if_fail (mix->loop, 0);
+
+  path = g_file_get_path (file);
+  g_return_val_if_fail (path, 0);
+  waiting.id = ++mix->next_id;
 
   clip = g_hash_table_lookup (mix->clips, path);
   if (clip)
@@ -638,7 +621,6 @@ shell_sound_mix_set_master (ShellSoundMix *mix,
     _shell_sound_strikes_set_master (mix->strikes, volume);
 }
 
-/* The lane for sounds that have to follow a press, made when it's first asked for, until the mix closes. */
 ShellSoundStrikes *
 _shell_sound_mix_strikes (ShellSoundMix *mix)
 {

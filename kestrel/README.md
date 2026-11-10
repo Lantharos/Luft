@@ -13,6 +13,7 @@ Kestrel is Luft's desktop and login screen. It runs on its own patched Mutter 51
 | `ui` | Everything the shell does on top of the engine, in TypeScript: window management, the lock screen, notifications, the taskbar, Start, quick settings and every other surface |
 | [`compositor`](compositor/README.md) | Mutter patch series |
 | `types` | TypeScript types generated from the GIR files of the compositor, the engine and the libraries they use |
+| `session` | `kestrel-session-manager`, the session manager: logging out and shutting down, what apps hold back, idle presence and the screen saver interface |
 | `settings` | `kestrel-settings`: XSETTINGS, night light, power, printing, housekeeping, time zone, browser profile locks, memory warnings |
 | `search` | `kestrel-search`, the file index behind Start's search |
 | `post` | `kestrel-post`, which sends files to phones and computers nearby and takes what they send |

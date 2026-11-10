@@ -67,10 +67,6 @@ install_data(keybinding_files, install_dir: keysdir)
 
 schemaconf = configuration_data()
 schemaconf.set('GETTEXT_PACKAGE', meson.project_name())
-schemaconf.set('DASH_APPS', run_command(
-  generate_app_list, 'default-apps/dash.txt',
-  check: true,
-).stdout())
 configure_file(
   input: 'com.lantharos.kestrel.gschema.xml.in',
   output: 'com.lantharos.kestrel.gschema.xml',

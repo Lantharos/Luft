@@ -24,33 +24,20 @@ drop_operation (pa_operation *operation)
   g_clear_pointer (&operation, pa_operation_unref);
 }
 
-static GStrv
-sink_port_names (const pa_sink_info *info)
-{
-  GStrvBuilder *builder = g_strv_builder_new ();
-  GStrv names;
+#define DEFINE_PORT_NAMES(kind) \
+  static GStrv \
+  kind##_port_names (const pa_##kind##_info *info) \
+  { \
+    g_autoptr (GStrvBuilder) builder = g_strv_builder_new (); \
+    \
+    for (guint32 i = 0; i < info->n_ports; i++) \
+      g_strv_builder_add (builder, info->ports[i]->name); \
+    \
+    return g_strv_builder_end (builder); \
+  }
 
-  for (guint32 i = 0; i < info->n_ports; i++)
-    g_strv_builder_add (builder, info->ports[i]->name);
-
-  names = g_strv_builder_end (builder);
-  g_strv_builder_unref (builder);
-  return names;
-}
-
-static GStrv
-source_port_names (const pa_source_info *info)
-{
-  GStrvBuilder *builder = g_strv_builder_new ();
-  GStrv names;
-
-  for (guint32 i = 0; i < info->n_ports; i++)
-    g_strv_builder_add (builder, info->ports[i]->name);
-
-  names = g_strv_builder_end (builder);
-  g_strv_builder_unref (builder);
-  return names;
-}
+DEFINE_PORT_NAMES (sink)
+DEFINE_PORT_NAMES (source)
 
 static void
 on_sink_info (pa_context         *context,

@@ -17,7 +17,6 @@ void     shell_util_paint_offscreen            (ClutterActor     *actor);
 
 int      shell_util_get_week_start             (const char *locale);
 
-const char *shell_util_translate_time_string   (const char *str);
 
 GdkPixbuf *shell_util_create_pixbuf_from_data (const guchar      *data,
                                                gsize              len,
@@ -40,7 +39,6 @@ double shell_util_get_event_axis (const ClutterEvent *event,
 
 void shell_util_sd_notify (void);
 
-gint shell_util_get_uid (void);
 
 GPid shell_util_spawn_async (const char          *working_directory,
                              const char * const  *argv,

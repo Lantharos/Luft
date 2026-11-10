@@ -1,6 +1,0 @@
-net.imput.helium.desktop
-org.gnome.Calendar.desktop
-com.lantharos.rover.desktop
-com.lantharos.schelf.desktop
-com.lantharos.draft.desktop
-org.gnome.Calculator.desktop

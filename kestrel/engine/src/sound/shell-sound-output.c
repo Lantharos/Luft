@@ -2,7 +2,6 @@
 #include "config.h"
 
 #include <pipewire/pipewire.h>
-#include <spa/param/audio/format-utils.h>
 
 #include "shell-sound-private.h"
 
@@ -20,7 +19,6 @@ typedef struct
 
 typedef struct
 {
-  ShellSoundOutput *output;
   char *name;
   gint64 latency_us;
 } Started;
@@ -40,6 +38,8 @@ struct _ShellSoundOutput
   gboolean idle_armed;
 
   GArray *voices;
+  GArray *started_voices;
+  guint started_idle;
   float gain;
   gboolean active;
   gboolean broken;
@@ -51,34 +51,54 @@ voice_clear (Voice *voice)
   g_clear_pointer (&voice->clip, _shell_sound_clip_unref);
 }
 
+static void
+started_clear (Started *started)
+{
+  g_free (started->name);
+}
+
+static GArray *
+started_voices_new (void)
+{
+  GArray *started_voices = g_array_new (FALSE, FALSE, sizeof (Started));
+
+  g_array_set_clear_func (started_voices, (GDestroyNotify) started_clear);
+  return started_voices;
+}
+
 static gboolean
 emit_started (gpointer data)
 {
-  Started *started = data;
+  ShellSoundOutput *output = data;
+  g_autoptr (GArray) started_voices = NULL;
 
-  started->output->started (started->name, started->latency_us, started->output->user_data);
+  pw_thread_loop_lock (output->loop);
+  started_voices = g_steal_pointer (&output->started_voices);
+  output->started_voices = started_voices_new ();
+  output->started_idle = 0;
+  pw_thread_loop_unlock (output->loop);
+
+  for (guint i = 0; i < started_voices->len; i++)
+    {
+      Started *started = &g_array_index (started_voices, Started, i);
+
+      output->started (started->name, started->latency_us, output->user_data);
+    }
   return G_SOURCE_REMOVE;
-}
-
-static void
-started_free (gpointer data)
-{
-  Started *started = data;
-
-  g_free (started->name);
-  g_free (started);
 }
 
 static void
 report_started (ShellSoundOutput *output,
                 Voice            *voice)
 {
-  Started *started = g_new0 (Started, 1);
+  Started started = {
+    .name = g_strdup (voice->clip->name),
+    .latency_us = g_get_monotonic_time () - voice->queued_us,
+  };
 
-  started->output = output;
-  started->name = g_strdup (voice->clip->name);
-  started->latency_us = g_get_monotonic_time () - voice->queued_us;
-  g_idle_add_full (G_PRIORITY_DEFAULT, emit_started, started, started_free);
+  g_array_append_val (output->started_voices, started);
+  if (!output->started_idle)
+    output->started_idle = g_idle_add_full (G_PRIORITY_DEFAULT, emit_started, output, NULL);
 }
 
 static void
@@ -130,7 +150,10 @@ on_process (void *data)
 
   block = &buffer->buffer->datas[0];
   if (!block->data)
-    return;
+    {
+      pw_stream_queue_buffer (output->stream, buffer);
+      return;
+    }
 
   frames = block->maxsize / stride;
   if (buffer->requested)
@@ -239,16 +262,6 @@ stream_properties (void)
 static gboolean
 connect_locked (ShellSoundOutput *output)
 {
-  uint8_t pod[512];
-  struct spa_pod_builder builder = SPA_POD_BUILDER_INIT (pod, sizeof (pod));
-  const struct spa_pod *params[1];
-  struct spa_audio_info_raw format = {
-    .format = SPA_AUDIO_FORMAT_F32,
-    .rate = SHELL_SOUND_RATE,
-    .channels = SHELL_SOUND_CHANNELS,
-    .position = { SPA_AUDIO_CHANNEL_FL, SPA_AUDIO_CHANNEL_FR },
-  };
-
   if (output->broken)
     disconnect (output);
   if (output->stream)
@@ -259,15 +272,9 @@ connect_locked (ShellSoundOutput *output)
     return FALSE;
   pw_core_add_listener (output->core, &output->core_listener, &core_events, output);
 
-  output->stream = pw_stream_new (output->core, "System sounds", stream_properties ());
-  pw_stream_add_listener (output->stream, &output->stream_listener, &stream_events, output);
-
-  params[0] = spa_format_audio_raw_build (&builder, SPA_PARAM_EnumFormat, &format);
-  if (pw_stream_connect (output->stream, PW_DIRECTION_OUTPUT, PW_ID_ANY,
-                         PW_STREAM_FLAG_AUTOCONNECT |
-                         PW_STREAM_FLAG_MAP_BUFFERS |
-                         PW_STREAM_FLAG_INACTIVE,
-                         params, 1) < 0)
+  output->stream = _shell_sound_stream_connect (output->core, "System sounds", stream_properties (), FALSE,
+                                                &output->stream_listener, &stream_events, output);
+  if (!output->stream)
     {
       disconnect (output);
       return FALSE;
@@ -349,6 +356,7 @@ _shell_sound_output_new (ShellSoundStartedFunc started,
   output->gain = 1.0f;
   output->voices = g_array_new (FALSE, TRUE, sizeof (Voice));
   g_array_set_clear_func (output->voices, (GDestroyNotify) voice_clear);
+  output->started_voices = started_voices_new ();
 
   output->loop = pw_thread_loop_new ("kestrel-sounds", NULL);
   output->context = pw_context_new (pw_thread_loop_get_loop (output->loop), NULL, 0);
@@ -369,6 +377,8 @@ _shell_sound_output_free (ShellSoundOutput *output)
   pw_thread_loop_stop (output->loop);
   pw_context_destroy (output->context);
   pw_thread_loop_destroy (output->loop);
+  g_clear_handle_id (&output->started_idle, g_source_remove);
   g_array_unref (output->voices);
+  g_array_unref (output->started_voices);
   g_free (output);
 }

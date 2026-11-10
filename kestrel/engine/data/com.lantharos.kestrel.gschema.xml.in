@@ -555,7 +555,14 @@
     </key>
     <key name="favorite-apps" type="as">
       <default>
-        @DASH_APPS@
+        [
+          'net.imput.helium.desktop',
+          'org.gnome.Calendar.desktop',
+          'com.lantharos.rover.desktop',
+          'com.lantharos.schelf.desktop',
+          'com.lantharos.draft.desktop',
+          'org.gnome.Calculator.desktop'
+        ]
       </default>
       <summary>List of desktop file IDs for favorite applications</summary>
       <description>

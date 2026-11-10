@@ -17,7 +17,6 @@ pub enum Mode {
     Updates,
     Upgrade,
     Firmware,
-    Encrypting,
     Moving,
 }
 
@@ -29,7 +28,6 @@ impl Mode {
             Self::Updates => "updates",
             Self::Upgrade => "system-upgrade",
             Self::Firmware => "firmware-upgrade",
-            Self::Encrypting => "encrypting",
             Self::Moving => "moving",
         }
     }
@@ -45,7 +43,6 @@ impl FromStr for Mode {
             "updates" => Self::Updates,
             "system-upgrade" => Self::Upgrade,
             "firmware-upgrade" => Self::Firmware,
-            "encrypting" => Self::Encrypting,
             _ => return Err(format!("{name} isn't something the splash can show")),
         })
     }

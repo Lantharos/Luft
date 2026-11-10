@@ -56,6 +56,14 @@ fn show_choices(screen: &FailureFile) {
     let _ = out.flush();
 }
 
+pub fn tell(title: &str, line: &str) {
+    let mut out = io::stdout().lock();
+    let _ = write!(out, "{CLEAR}{title}\n{line}\n\nPress Enter to go back: ");
+    let _ = out.flush();
+    drop(out);
+    let _ = read_line();
+}
+
 pub fn ask(screen: &FailureFile) -> Option<String> {
     loop {
         show_choices(screen);

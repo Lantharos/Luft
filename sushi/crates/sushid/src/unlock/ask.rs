@@ -21,9 +21,18 @@ pub enum Accepts {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Ask {
-    Passphrase { disk: Option<String> },
-    Pin { security_key: bool },
-    Fallback { why: Why, accepts: Accepts },
+    Disk {
+        name: Option<String>,
+        accepts: Accepts,
+    },
+    Pin {
+        security_key: bool,
+    },
+    Fallback {
+        why: Why,
+        accepts: Accepts,
+    },
+    Encrypting,
     Shell,
 }
 
@@ -33,6 +42,8 @@ pub struct Copy {
     pub placeholder: &'static str,
     pub rejected: &'static str,
 }
+
+const ENCRYPTING: &str = "trustd:encrypting:";
 
 fn disk_name(message: &str) -> Option<String> {
     message
@@ -66,11 +77,8 @@ impl Ask {
         if request.id.starts_with(SHELL) {
             return Self::Shell;
         }
-        if request.id.starts_with("trustd:recovery:") {
-            return Self::Fallback {
-                why: Why::Changed,
-                accepts: Accepts::RecoveryKey,
-            };
+        if request.id.starts_with(ENCRYPTING) {
+            return Self::Encrypting;
         }
         let unlocking = request
             .id
@@ -102,8 +110,9 @@ impl Ask {
                 },
                 accepts: accepts(unlocking),
             },
-            _ => Self::Passphrase {
-                disk: disk_name(message),
+            _ => Self::Disk {
+                name: disk_name(message),
+                accepts: unlocking.map_or(Accepts::Passphrase, accepts),
             },
         }
     }
@@ -112,6 +121,10 @@ impl Ask {
         matches!(
             self,
             Self::Shell
+                | Self::Disk {
+                    accepts: Accepts::RecoveryKey | Accepts::RecoveryKeyOrPassphrase,
+                    ..
+                }
                 | Self::Fallback {
                     accepts: Accepts::RecoveryKey | Accepts::RecoveryKeyOrPassphrase,
                     ..
@@ -126,7 +139,10 @@ impl Ask {
     pub fn wants_only_a_recovery_key(&self) -> bool {
         matches!(
             self,
-            Self::Fallback {
+            Self::Disk {
+                accepts: Accepts::RecoveryKey,
+                ..
+            } | Self::Fallback {
                 accepts: Accepts::RecoveryKey,
                 ..
             }
@@ -135,16 +151,37 @@ impl Ask {
 
     pub fn copy(&self) -> Copy {
         match self {
-            Self::Passphrase { disk } => Copy {
-                title: disk
-                    .as_ref()
-                    .map_or("Unlock this computer".to_owned(), |disk| {
-                        format!("Unlock {disk}")
-                    }),
-                explanation: Vec::new(),
-                placeholder: "Passphrase",
-                rejected: "That passphrase didn't work. Try again.",
-            },
+            Self::Disk { name, accepts } => {
+                let unlock = || {
+                    name.as_ref()
+                        .map_or("Unlock this computer".to_owned(), |name| {
+                            format!("Unlock {name}")
+                        })
+                };
+                let (title, placeholder, rejected) = match accepts {
+                    Accepts::RecoveryKey => (
+                        "Enter your recovery key".to_owned(),
+                        "Recovery key",
+                        "That didn't unlock the disk. Try again.",
+                    ),
+                    Accepts::RecoveryKeyOrPassphrase => (
+                        unlock(),
+                        "Recovery key or passphrase",
+                        "That didn't unlock the disk. Try again.",
+                    ),
+                    Accepts::Passphrase => (
+                        unlock(),
+                        "Passphrase",
+                        "That passphrase didn't work. Try again.",
+                    ),
+                };
+                Copy {
+                    title,
+                    explanation: Vec::new(),
+                    placeholder,
+                    rejected,
+                }
+            }
             Self::Pin {
                 security_key: false,
             } => Copy {
@@ -152,6 +189,15 @@ impl Ask {
                 explanation: Vec::new(),
                 placeholder: "PIN",
                 rejected: "That PIN didn't work. Try again.",
+            },
+            Self::Encrypting => Copy {
+                title: "Start encrypting Luft".to_owned(),
+                explanation: vec![
+                    "Enter the passphrase you chose in Settings.".to_owned(),
+                    "Leave it empty to start without encrypting this time.".to_owned(),
+                ],
+                placeholder: "Passphrase",
+                rejected: "That passphrase didn't work. Try again.",
             },
             Self::Shell => Copy {
                 title: "Enter your recovery key".to_owned(),

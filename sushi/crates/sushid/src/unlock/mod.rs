@@ -1,13 +1,13 @@
 mod ask;
 mod words;
 
-use luft_recovery_key::{OLD_LETTERS, Reading, WORDS};
+use luft_recovery_key::{Reading, WORDS};
 use sushi::ipc::password::{PasswordRequests, Request, Secret};
 use sushi::scene::Prompt;
 use sushi::terminal::{Key, Terminal};
 
 use ask::Ask;
-use words::{Entry, Words};
+use words::Words;
 
 const MISTYPED: &str = "One of the words isn't right. Check them against your recovery key.";
 
@@ -69,21 +69,6 @@ impl Unlock {
         Some(unlock)
     }
 
-    fn letters_note(&self, letters: usize) -> (String, f32) {
-        match letters {
-            OLD_LETTERS => ("Press Enter to unlock".to_owned(), 0.7),
-            letters if letters > OLD_LETTERS => (
-                format!("A recovery key of letters has {OLD_LETTERS}, this is more"),
-                1.0,
-            ),
-            letters if self.incomplete => (
-                format!("{letters} of {OLD_LETTERS} letters. Type the rest first."),
-                1.0,
-            ),
-            letters => (format!("{letters} of {OLD_LETTERS} letters"), 0.5),
-        }
-    }
-
     fn words_note(&self, words: Words) -> (String, f32) {
         match words {
             Words {
@@ -114,13 +99,6 @@ impl Unlock {
         }
     }
 
-    fn key_note(&self) -> (String, f32) {
-        match words::read(self.secret.bytes()) {
-            Entry::Letters(letters) => self.letters_note(letters),
-            Entry::Words(words) => self.words_note(words),
-        }
-    }
-
     fn refresh(&mut self) {
         let copy = self.ask.copy();
         let only_a_key = self.ask.wants_only_a_recovery_key();
@@ -134,7 +112,7 @@ impl Unlock {
         } else if self.caps_lock && !only_a_key {
             Some(("Caps Lock is on".to_owned(), 0.7))
         } else if only_a_key {
-            Some(self.key_note())
+            Some(self.words_note(words::read(self.secret.bytes())))
         } else {
             self.ask
                 .can_go_back()

@@ -1,31 +1,10 @@
 use luft_recovery_key::{self as recovery, SHORTEST_PREFIX, WORDS};
 use sushi::scene::{Shown, ShownKey, Slot};
 
-const LONGEST_GROUP: usize = 8;
-
-pub enum Entry {
-    Letters(usize),
-    Words(Words),
-}
-
 pub struct Words {
     pub typed: usize,
     pub unknown: Option<usize>,
     pub holds: Option<bool>,
-}
-
-fn separator(byte: &u8) -> bool {
-    matches!(byte, b' ' | b'-')
-}
-
-fn is_letters(typed: &[u8]) -> bool {
-    let first = typed.split(separator).next().unwrap_or_default();
-    typed
-        .iter()
-        .all(|byte| separator(byte) || recovery::is_old_letter(*byte))
-        && (typed.contains(&b'-')
-            || first.len() > LONGEST_GROUP
-            || (first.len() >= SHORTEST_PREFIX && recovery::word(first).is_none()))
 }
 
 fn tokens(typed: &[u8]) -> impl Iterator<Item = &[u8]> {
@@ -41,15 +20,10 @@ pub fn current(typed: &[u8]) -> usize {
 }
 
 pub fn can_move_on(typed: &[u8]) -> bool {
-    !is_letters(typed)
-        && typed.last().is_some_and(|last| *last != b' ')
-        && current(typed) < WORDS - 1
+    typed.last().is_some_and(|last| *last != b' ') && current(typed) < WORDS - 1
 }
 
-pub fn read(typed: &[u8]) -> Entry {
-    if is_letters(typed) {
-        return Entry::Letters(typed.iter().filter(|byte| !separator(byte)).count());
-    }
+pub fn read(typed: &[u8]) -> Words {
     let at = current(typed);
     let mut found = [""; WORDS];
     let mut unknown = None;
@@ -68,11 +42,11 @@ pub fn read(typed: &[u8]) -> Entry {
         }
     }
     let complete = count == WORDS && found.iter().all(|word| !word.is_empty());
-    Entry::Words(Words {
+    Words {
         typed: count,
         unknown,
         holds: complete.then(|| recovery::checks(&found)),
-    })
+    }
 }
 
 fn lowercase(token: &[u8]) -> Shown {
@@ -80,14 +54,6 @@ fn lowercase(token: &[u8]) -> Shown {
 }
 
 pub fn shown(typed: &[u8]) -> ShownKey {
-    if is_letters(typed) {
-        return ShownKey::Letters(Shown::new(
-            String::from_utf8_lossy(typed)
-                .chars()
-                .filter(|character| !matches!(character, '-' | ' '))
-                .collect(),
-        ));
-    }
     let current = current(typed);
     let slots = tokens(typed)
         .enumerate()
@@ -114,5 +80,5 @@ pub fn shown(typed: &[u8]) -> ShownKey {
             }
         })
         .collect();
-    ShownKey::Words { slots, current }
+    ShownKey { slots, current }
 }

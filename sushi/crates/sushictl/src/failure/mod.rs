@@ -1,9 +1,11 @@
 mod boot;
+mod disk;
 mod refused;
 mod shell;
 mod situation;
 mod splash;
 mod text;
+mod tpm;
 
 use std::path::Path;
 use std::process::{Command, ExitCode};

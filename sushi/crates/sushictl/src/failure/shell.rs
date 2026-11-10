@@ -6,21 +6,26 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 
 use sushi::ipc::password::{SHELL, Secret};
-use sushi::luks;
+use sushi::started;
 
-use super::splash;
+use super::disk::SystemDisk;
+use super::{splash, text, tpm};
 
-const GREETING: &[u8] =
-    b"\x1b[H\x1b[2JThis shell can change anything on this computer.\nType exit to go back to the Luft screen.\n\n";
+const GREETING: &str = "\x1b[H\x1b[2JThis shell can change anything on this computer.\nType exit to go back to the Luft screen.\n";
+const ASKS_FOR_KEY: &str = "Until the next restart, this computer asks for its recovery key or passphrase\nin place of unlocking by itself.\n";
+const NO_SHELL: &str = "A shell can't open here";
+const UNKNOWN_DISK: &str =
+    "Luft can't tell which disk it started from, so it can't check who is asking.";
+const SILENT_TPM: &str = "The TPM didn't answer, and it has to before a shell may open.";
 const VT_ACTIVATE: libc::c_ulong = 0x5606;
 const VT_WAITACTIVE: libc::c_ulong = 0x5607;
 const FIRST_CONSOLE: libc::c_int = 1;
-const SKIPPED_DEVICES: [&str; 5] = ["dm-", "loop", "ram", "zram", "sr"];
 
 enum Gate {
     Password,
-    Key(Vec<PathBuf>),
+    Key(PathBuf),
     Open,
+    Closed,
 }
 
 fn root_has_password() -> bool {
@@ -37,32 +42,27 @@ fn presence_proven() -> bool {
         .is_ok_and(|value| matches!(value.as_str(), "1" | "yes" | "true" | "on"))
 }
 
-fn encrypted_disks() -> Vec<PathBuf> {
-    std::fs::read_dir("/sys/class/block")
-        .into_iter()
-        .flatten()
-        .flatten()
-        .map(|entry| entry.file_name().to_string_lossy().into_owned())
-        .filter(|name| {
-            !SKIPPED_DEVICES
-                .iter()
-                .any(|skipped| name.starts_with(skipped))
-        })
-        .map(|name| Path::new("/dev").join(name))
-        .filter(|device| luks::unlocking(device).is_some())
-        .collect()
-}
-
 impl Gate {
     fn for_this_system(in_initrd: bool) -> Self {
         if !in_initrd && root_has_password() {
             return Self::Password;
         }
-        let disks = encrypted_disks();
-        if presence_proven() || disks.is_empty() {
-            Self::Open
+        if presence_proven() {
+            return Self::Open;
+        }
+        match SystemDisk::find() {
+            SystemDisk::Encrypted(partition) => Self::Key(partition),
+            SystemDisk::Plain => Self::Open,
+            SystemDisk::Unknown if in_initrd || started::from_stick() => Self::Open,
+            SystemDisk::Unknown => Self::Closed,
+        }
+    }
+
+    fn stop_the_tpm_unlocking(&self, in_initrd: bool) -> std::io::Result<bool> {
+        if !in_initrd && matches!(self, Self::Password | Self::Key(_)) {
+            Ok(false)
         } else {
-            Self::Key(disks)
+            tpm::stop_unlocking()
         }
     }
 }
@@ -103,12 +103,12 @@ fn opens(disk: &Path, key: &Secret) -> bool {
     checking.wait().is_ok_and(|status| status.success())
 }
 
-fn unlocked_by_person(disks: &[PathBuf], on_splash: bool) -> bool {
+fn unlocked_by_person(disk: &Path, on_splash: bool) -> bool {
     loop {
         let Some(key) = ask_for_key(on_splash) else {
             return false;
         };
-        if disks.iter().any(|disk| opens(disk, &key)) {
+        if opens(disk, &key) {
             return true;
         }
         if !on_splash {
@@ -136,11 +136,19 @@ fn login_shell() -> Command {
     shell
 }
 
-fn greet(console: &Path) -> std::io::Result<()> {
-    OpenOptions::new()
-        .write(true)
-        .open(console)?
-        .write_all(GREETING)
+fn greet(console: &Path, asks_for_key: bool) -> std::io::Result<()> {
+    let mut console = OpenOptions::new().write(true).open(console)?;
+    console.write_all(GREETING.as_bytes())?;
+    if asks_for_key {
+        console.write_all(ASKS_FOR_KEY.as_bytes())?;
+    }
+    console.write_all(b"\n")
+}
+
+fn refuse(on_splash: bool, why: &str) {
+    if !on_splash || !splash::tell(NO_SHELL, why) {
+        text::tell(NO_SHELL, why);
+    }
 }
 
 fn attach(command: &mut Command, console: &Path) -> std::io::Result<()> {
@@ -173,16 +181,23 @@ fn console(on_splash: bool) -> Option<PathBuf> {
 
 pub fn open(on_splash: bool, in_initrd: bool) {
     let gate = Gate::for_this_system(in_initrd);
-    if let Gate::Key(disks) = &gate
-        && !unlocked_by_person(disks, on_splash)
-    {
-        return;
+    match &gate {
+        Gate::Closed => return refuse(on_splash, UNKNOWN_DISK),
+        Gate::Key(disk) if !unlocked_by_person(disk, on_splash) => return,
+        _ => {}
     }
+    let asks_for_key = match gate.stop_the_tpm_unlocking(in_initrd) {
+        Ok(stopped) => stopped,
+        Err(error) => {
+            eprintln!("Couldn't keep the TPM from unlocking for the shell: {error}");
+            return refuse(on_splash, SILENT_TPM);
+        }
+    };
     let Some(console) = console(on_splash) else {
         eprintln!("There's no console to open the shell on");
         return;
     };
-    let _ = greet(&console);
+    let _ = greet(&console, asks_for_key);
     let mut shell = if in_initrd {
         login_shell()
     } else {

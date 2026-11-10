@@ -8,6 +8,7 @@ use crate::{Layout, Rect, text, white};
 
 const FIELD_WIDTH: f32 = 340.0;
 const FIELD_HEIGHT: f32 = 46.0;
+const KEY_FIELD_ABOVE_CENTER: f32 = 48.0;
 const KEY_FIELD_WIDTH: f32 = 560.0;
 const TITLE_SIZE: f32 = 17.0;
 const EXPLANATION_SIZE: f32 = 14.0;
@@ -36,20 +37,21 @@ struct Geometry {
     scale: f32,
 }
 
-fn geometry(layout: &Layout, key_height: Option<f32>) -> Geometry {
+fn geometry(layout: &Layout, for_key: bool) -> Geometry {
     let scale = layout.scale;
     let (cx, cy) = layout.loader_center;
-    let (width, height, top) = match key_height {
-        Some(height) => (
+    let (width, height, top) = if for_key {
+        (
             KEY_FIELD_WIDTH * scale,
-            height * scale,
-            cy - key::LETTERS_HEIGHT * scale / 2.0,
-        ),
-        None => (
+            key::HEIGHT * scale,
+            cy - KEY_FIELD_ABOVE_CENTER * scale,
+        )
+    } else {
+        (
             FIELD_WIDTH * scale,
             FIELD_HEIGHT * scale,
             cy - FIELD_HEIGHT * scale / 2.0,
-        ),
+        )
     };
     let field =
         SkRect::from_xywh(cx - width / 2.0, top, width, height).expect("the field has a size");
@@ -72,7 +74,7 @@ fn title_baseline(geometry: &Geometry, lines: usize) -> f32 {
 }
 
 pub fn bounds(layout: &Layout) -> Rect {
-    let geometry = geometry(layout, Some(key::WORDS_HEIGHT));
+    let geometry = geometry(layout, true);
     let top = title_baseline(&geometry, MOST_LINES) - TITLE_SIZE * geometry.scale * 1.4;
     let bottom = geometry.note_baseline + NOTE_SIZE * geometry.scale * 0.6;
     Rect {
@@ -134,7 +136,7 @@ pub fn draw(
     seconds: f32,
     alpha: f32,
 ) {
-    let geometry = geometry(layout, prompt.key.as_ref().map(ShownKey::height));
+    let geometry = geometry(layout, prompt.key.is_some());
     let scale = geometry.scale;
     let shift = view.pre_translate(shake_offset(prompt, seconds, scale), 0.0);
     let center = layout.loader_center.0;

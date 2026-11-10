@@ -33,7 +33,6 @@ fn title(mode: Mode, destination: &str) -> Option<String> {
             }),
         ),
         Mode::Firmware => Some("Updating firmware".to_owned()),
-        Mode::Encrypting => Some("Encrypting your computer".to_owned()),
         Mode::Moving => Some(format!("Moving Luft to {destination}")),
     }
 }

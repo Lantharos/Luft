@@ -11,6 +11,7 @@ const ANSWER_WAIT: Duration = Duration::from_secs(1);
 const START_WAIT: Duration = Duration::from_secs(5);
 const QUIT_WAIT: Duration = Duration::from_secs(5);
 const NO_DISPLAY: &str = "no display";
+const NOTICE: &str = "/run/sushi/notice";
 
 fn answers() -> bool {
     control::send(&Request::Status, ANSWER_WAIT).is_ok()
@@ -71,6 +72,16 @@ pub fn ask(screen: &FailureFile) -> Option<String> {
         leave();
     }
     reply.strip_prefix("choice ").map(str::to_owned)
+}
+
+pub fn tell(title: &str, line: &str) -> bool {
+    let notice = format!("title {title}\nline {line}\nfooter Press Enter to go back.\n");
+    if std::fs::write(NOTICE, notice).is_err() {
+        return false;
+    }
+    let shown = control::send_and_wait(&Request::ShowNotice(Path::new(NOTICE).into()));
+    let _ = std::fs::remove_file(NOTICE);
+    shown.is_ok_and(|reply| reply == "ok")
 }
 
 pub fn leave() {

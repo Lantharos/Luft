@@ -16,18 +16,29 @@ mod tpm;
 #[unsafe(link_section = ".sbat")]
 static SBAT: [u8; 139] = *b"sbat,1,SBAT Version,sbat,1,https://github.com/rhboot/shim/blob/main/SBAT.md\nsushiboot,1,Luft,sushiboot,1,https://github.com/Lantharos/Luft\n";
 
+use core::panic::PanicInfo;
+use core::ptr;
+
 use uefi::boot::{self, SearchType};
 use uefi::prelude::*;
 use uefi::proto::console::gop::GraphicsOutput;
 use uefi::proto::loaded_image::LoadedImage;
+use uefi::runtime::{self, ResetType};
 use uefi::{Handle, Identify};
 
 use entries::Catalog;
 use loader::{back, conf, last, vars};
+use menu::Choice;
 use screen::Screen;
 use start::firmware;
 
 const MENU_SECONDS_NEXT_TO_ANOTHER_SYSTEM: u32 = 10;
+
+#[panic_handler]
+fn leave_to_the_firmware(_: &PanicInfo) -> ! {
+    let _ = unsafe { boot::exit(boot::image_handle(), Status::ABORTED, 0, ptr::null_mut()) };
+    runtime::reset(ResetType::SHUTDOWN, Status::ABORTED, None)
+}
 
 fn graphics_handle() -> Option<Handle> {
     boot::get_handle_for_protocol::<GraphicsOutput>()
@@ -96,25 +107,30 @@ fn efi_main() -> Status {
     } else {
         MENU_SECONDS_NEXT_TO_ANOTHER_SYSTEM
     });
-    let mut chosen = match screen.as_mut() {
+    let mut choice = match screen.as_mut() {
         Some(screen) => menu::choose(screen, &catalog, default, timeout, None),
-        None => default,
+        None => Choice::unasked(default),
     };
     loop {
+        let chosen = choice.entry;
         note_start(&catalog, chosen);
         last::started(&catalog, chosen);
         let entry = &catalog.entries[chosen];
         vars::selected(&entry.id);
-        let previous = catalog
-            .older(chosen)
-            .and_then(|older| catalog.entries[older].image());
+        let older = catalog.older(chosen);
+        let previous = older.and_then(|older| catalog.entries[older].image());
         back::offer_previous(previous.map(|(_, release)| release.version.as_str()));
         if start::start(entry).is_ok() {
             return Status::SUCCESS;
         }
+        if let (false, Some(older)) = (choice.picked, older) {
+            catalog.failed = catalog.image_of(chosen);
+            choice = Choice::unasked(older);
+            continue;
+        }
         let Some(screen) = screen.as_mut() else {
             return Status::LOAD_ERROR;
         };
-        chosen = menu::choose(screen, &catalog, chosen, 0, Some(&entry.title));
+        choice = menu::choose(screen, &catalog, chosen, 0, Some(&entry.title));
     }
 }

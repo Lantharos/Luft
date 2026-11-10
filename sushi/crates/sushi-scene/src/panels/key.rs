@@ -5,15 +5,7 @@ use tiny_skia::{FillRule, PathBuilder, PixmapMut, Rect as SkRect, Transform};
 
 use crate::{text, white};
 
-pub const LETTERS_HEIGHT: f32 = 96.0;
-pub const WORDS_HEIGHT: f32 = 184.0;
-const LETTER_SIZE: f32 = 19.0;
-const LETTER_ROWS: usize = 2;
-const LETTER_GROUPS_PER_ROW: usize = 4;
-const LETTER_GROUP: usize = 8;
-const LETTER_CELL: f32 = 14.0;
-const LETTER_GROUP_GAP: f32 = 18.0;
-const LETTER_ROW_GAP: f32 = 36.0;
+pub const HEIGHT: f32 = 184.0;
 const EMPTY_CELL_RADIUS: f32 = 1.8;
 const WORD_SIZE: f32 = 19.0;
 const NUMBER_SIZE: f32 = 13.0;
@@ -51,30 +43,19 @@ pub struct Slot {
 }
 
 #[derive(Clone, PartialEq)]
-pub enum ShownKey {
-    Letters(Shown),
-    Words { slots: Vec<Slot>, current: usize },
+pub struct ShownKey {
+    pub slots: Vec<Slot>,
+    pub current: usize,
 }
 
 impl core::fmt::Debug for ShownKey {
     fn fmt(&self, formatter: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::Letters(letters) => {
-                write!(formatter, "Letters({} typed)", letters.0.chars().count())
-            }
-            Self::Words { slots, current } => {
-                write!(formatter, "Words({} typed, at {current})", slots.len())
-            }
-        }
-    }
-}
-
-impl ShownKey {
-    pub fn height(&self) -> f32 {
-        match self {
-            Self::Letters(_) => LETTERS_HEIGHT,
-            Self::Words { .. } => WORDS_HEIGHT,
-        }
+        write!(
+            formatter,
+            "ShownKey({} typed, at {})",
+            self.slots.len(),
+            self.current
+        )
     }
 }
 
@@ -86,66 +67,8 @@ pub fn draw(
     key: &ShownKey,
     alpha: f32,
 ) {
-    match key {
-        ShownKey::Letters(letters) => draw_letters(pixmap, field, scale, shift, &letters.0, alpha),
-        ShownKey::Words { slots, current } => {
-            draw_words(pixmap, field, scale, shift, slots, *current, alpha)
-        }
-    }
-}
-
-fn draw_letters(
-    pixmap: &mut PixmapMut,
-    field: SkRect,
-    scale: f32,
-    shift: Transform,
-    letters: &str,
-    alpha: f32,
-) {
-    let cell = LETTER_CELL * scale;
-    let group = LETTER_GROUP as f32 * cell;
-    let row_width = LETTER_GROUPS_PER_ROW as f32 * group
-        + (LETTER_GROUPS_PER_ROW - 1) as f32 * LETTER_GROUP_GAP * scale;
-    let left = field.left() + (field.width() - row_width) / 2.0;
-    let middle = field.top() + field.height() / 2.0;
-    let first_row = middle - LETTER_ROW_GAP * scale / 2.0;
-    let mut letters = letters.chars().flat_map(char::to_uppercase);
-    let mut empty = PathBuilder::new();
-    for index in 0..LETTER_ROWS * LETTER_GROUPS_PER_ROW * LETTER_GROUP {
-        let row = index / (LETTER_GROUPS_PER_ROW * LETTER_GROUP);
-        let in_row = index % (LETTER_GROUPS_PER_ROW * LETTER_GROUP);
-        let gaps = (in_row / LETTER_GROUP) as f32 * LETTER_GROUP_GAP * scale;
-        let center = left + gaps + in_row as f32 * cell + cell / 2.0;
-        let line = first_row + row as f32 * LETTER_ROW_GAP * scale;
-        match letters.next() {
-            Some(letter) => {
-                let mut encoded = [0u8; 4];
-                text::centered(
-                    pixmap,
-                    shift,
-                    letter.encode_utf8(&mut encoded),
-                    (center, line + LETTER_SIZE * scale * 0.36),
-                    LETTER_SIZE * scale,
-                    alpha,
-                );
-            }
-            None => empty.push_circle(center, line, EMPTY_CELL_RADIUS * scale),
-        }
-    }
-    if let Some(empty) = empty.finish() {
-        pixmap.fill_path(&empty, &white(0.35 * alpha), FillRule::Winding, shift, None);
-    }
-}
-
-fn draw_words(
-    pixmap: &mut PixmapMut,
-    field: SkRect,
-    scale: f32,
-    shift: Transform,
-    slots: &[Slot],
-    current: usize,
-    alpha: f32,
-) {
+    let ShownKey { slots, current } = key;
+    let current = *current;
     let size = WORD_SIZE * scale;
     let left = field.left() + (field.width() - WORD_COLUMNS as f32 * WORD_COLUMN * scale) / 2.0;
     let first_row =

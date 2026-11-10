@@ -61,6 +61,5 @@ installer-set-aside-failed = Стари систем није могао да с
 ## Things packed with Meet Luft
 
 installer-box-unopened = Кутија за селидбу није могла да се отвори
-installer-box-no-list = Кутија за селидбу нема списак садржаја
 installer-unpack-failed = Распакивање „{ $path }“ није успело
 installer-wallpaper-unnamed = Позадина нема назив

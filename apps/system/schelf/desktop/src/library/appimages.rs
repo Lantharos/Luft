@@ -33,6 +33,35 @@ pub async fn sandbox(App { id }: App) -> Result<Sandbox, String> {
     })
 }
 
+#[derive(Deserialize, Clone, Copy, Type)]
+#[serde(rename_all = "camelCase")]
+pub enum Switch {
+    Downloads,
+    X11,
+    Microphone,
+    Camera,
+}
+
+#[derive(Deserialize, Type)]
+pub struct Change {
+    id: String,
+    switch: Switch,
+    on: bool,
+}
+
+/// Turns one switch of an AppImage's sandbox on or off, and says whether
+/// the app is open, since it keeps what it started with until it opens again.
+pub async fn set_switch(Change { id, switch, on }: Change) -> Result<bool, String> {
+    let switch = match switch {
+        Switch::Downloads => appimage::Switch::Downloads,
+        Switch::X11 => appimage::Switch::X11,
+        Switch::Microphone => appimage::Switch::Microphone,
+        Switch::Camera => appimage::Switch::Camera,
+    };
+    appimage::set_switch(&id, switch, on).await?;
+    luft_sandbox::running(&id)
+}
+
 pub fn installed() -> Vec<InstalledApp> {
     let from_store = record::all();
     appimage::list()

@@ -1,5 +1,8 @@
 <script lang="ts">
-	import type { CatalogApp, InstalledApp, Job, StoreDetails } from '#lib/bindings.js';
+	import type { CatalogApp, InstalledApp, Job, Permissions, StoreDetails } from '#lib/bindings.js';
+	import type { Access } from '#lib/app/permissions.js';
+	import { broadAccess } from '#lib/catalog/flathub.js';
+	import FlathubConsent from '#lib/components/FlathubConsent.svelte';
 	import ProgressButton from '#lib/components/ProgressButton.svelte';
 	import RemoveDialog from '#lib/components/RemoveDialog.svelte';
 	import { launch, openUrl } from '#lib/bridge/index.js';
@@ -8,20 +11,22 @@
 	import { library } from '#lib/state/library.svelte.js';
 	import { operations } from '#lib/state/operations.svelte.js';
 	import { updateJob } from '#lib/app/jobs.js';
-	import ConsentDialog from './ConsentDialog.svelte';
+	import StoreConsent from './StoreConsent.svelte';
 
 	interface Props {
 		name: string;
 		listing: CatalogApp | null;
 		store: StoreDetails | null;
 		installed: InstalledApp | null;
+		permissions: Permissions | null;
 		pulled: boolean;
 	}
 
-	let { name, listing, store, installed, pulled }: Props = $props();
+	let { name, listing, store, installed, permissions, pulled }: Props = $props();
 
 	let removing = $state(false);
 	let consenting = $state<'install' | 'update' | null>(null);
+	let flathubAccess = $state<Access[] | null>(null);
 
 	const listingKey = $derived(listing?.origin === 'fedora' ? `system/${listing.package ?? listing.id}` : listing ? catalogKey(listing) : null);
 	const operation = $derived((installed && operations.forKey(installed.key)) || (listingKey && operations.forKey(listingKey)) || null);
@@ -46,11 +51,19 @@
 		if (job && key) run(key, job);
 	}
 
-	function install() {
+	function installFlathub() {
+		flathubAccess = null;
+		if (listing && listingKey) run(listingKey, { kind: 'installFlathub', id: listing.id });
+	}
+
+	async function install() {
 		if (!listing || !listingKey) return;
 		if (listing.origin === 'schelf') consenting = 'install';
-		else if (listing.origin === 'flathub') run(listingKey, { kind: 'installFlathub', id: listing.id });
-		else run(listingKey, { kind: 'installSystemPackages', packages: [listing.package ?? listing.id] });
+		else if (listing.origin === 'flathub') {
+			const access = await broadAccess(listing.id, permissions);
+			if (access.length) flathubAccess = access;
+			else installFlathub();
+		} else run(listingKey, { kind: 'installSystemPackages', packages: [listing.package ?? listing.id] });
 	}
 
 	function updateNow() {
@@ -91,5 +104,9 @@
 {/if}
 
 {#if consenting && store}
-	<ConsentDialog {store} updating={consenting === 'update'} onconfirm={agreed} onclose={() => (consenting = null)} />
+	<StoreConsent {store} updating={consenting === 'update'} onconfirm={agreed} onclose={() => (consenting = null)} />
+{/if}
+
+{#if flathubAccess}
+	<FlathubConsent {name} access={flathubAccess} onconfirm={installFlathub} onclose={() => (flathubAccess = null)} />
 {/if}

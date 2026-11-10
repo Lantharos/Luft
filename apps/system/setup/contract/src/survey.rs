@@ -87,7 +87,7 @@ pub struct MeetSurvey {
     pub other_drive: bool,
     pub intent: Intent,
     pub room: Option<Room>,
-    pub moving_box: Option<MovingBox>,
+    pub moving_box: bool,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Eq, Type)]

@@ -61,6 +61,5 @@ installer-set-aside-failed = Nepavyko atidėti senosios sistemos
 ## Things packed with Meet Luft
 
 installer-box-unopened = Nepavyko atidaryti persikraustymo dėžės
-installer-box-no-list = Persikraustymo dėžėje nėra turinio sąrašo
 installer-unpack-failed = Nepavyko išpakuoti { $path }
 installer-wallpaper-unnamed = Fono paveikslėlis neturi pavadinimo

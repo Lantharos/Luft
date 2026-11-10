@@ -12,6 +12,7 @@ luft-disks.workspace = true
 luft-meet.workspace = true
 serde.workspace = true
 specta.workspace = true
+zeroize = { workspace = true, features = ["serde"] }
 
 [lints]
 workspace = true

@@ -1,3 +1,6 @@
+mod stamp;
+mod trust;
+
 use std::fs;
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
@@ -6,8 +9,9 @@ use std::time::{Duration, SystemTime};
 use luft_software::http::{self, MISSING, OFFLINE};
 
 use super::DOWNLOADS;
-use super::trust::{Keys, Seal};
 use crate::catalog::cache;
+use stamp::{Expiry, Stamp};
+use trust::{Keys, Seal};
 
 const STORE_KEYS: &str = "trust/v1/store-keys.json";
 const SEAL: &str = ".sig";
@@ -141,22 +145,35 @@ fn bytes(url: &str) -> Result<Vec<u8>, String> {
 /// copy on disk is used when it's recent enough, otherwise schelf.store is
 /// asked again, and the copy on disk stands in when it can't be reached.
 /// Only what passes `check` is used or kept, so a damaged copy on disk is
-/// fetched anew rather than asked about by its tag.
+/// fetched anew rather than asked about by its tag. A copy that has expired
+/// is never used, and one older than the last taken from schelf.store is
+/// never taken. `expiry` says whether the document has to expire at all.
 fn load<T>(
     document: &str,
     age: Age,
+    expiry: Expiry,
     check: impl Fn(&[u8], &Seal) -> Result<T, String>,
 ) -> Result<(Vec<u8>, T), String> {
     let cached = Cached::of(document);
-    let trusted = |stored: &Stored| check(&stored.body, &Seal::read(&stored.seal)?);
+    let trusted = |stored: &Stored| {
+        let checked = check(&stored.body, &Seal::read(&stored.seal)?)?;
+        Ok::<_, String>((checked, Stamp::read(&stored.body, expiry)?))
+    };
     let on_disk = cached
         .read()
         .and_then(|copy| Some((trusted(&copy).ok()?, copy)));
     let recent = matches!(age, Age::Within(age) if cached.younger_than(age));
     let (held, tag) = match on_disk {
-        Some((checked, copy)) if recent => return Ok((copy.body, checked)),
-        Some((checked, copy)) => (Some((copy.body, checked)), copy.tag),
+        Some(((checked, stamp), copy)) if recent && stamp.current().is_ok() => {
+            return Ok((copy.body, checked));
+        }
+        Some(((checked, stamp), copy)) => (Some((copy.body, checked, stamp)), copy.tag),
         None => (None, None),
+    };
+    let held = |unreachable: String| {
+        let (body, checked, stamp) = held.ok_or(unreachable)?;
+        stamp.current()?;
+        Ok((body, checked))
     };
     let url = format!("{DOWNLOADS}{document}");
     let fetched = get(&url, tag.as_deref()).and_then(|answer| match answer {
@@ -164,7 +181,8 @@ fn load<T>(
         Answer::Changed { body, tag } => {
             let seal = bytes(&format!("{url}{SEAL}"))?;
             let fresh = Stored { body, seal, tag };
-            let checked = trusted(&fresh)?;
+            let (checked, stamp) = trusted(&fresh)?;
+            stamp.accept(document)?;
             cached.store(&fresh);
             Ok(Some((fresh.body, checked)))
         }
@@ -173,10 +191,10 @@ fn load<T>(
         Ok(Some(fresh)) => Ok(fresh),
         Ok(None) => {
             cached.touch();
-            held.ok_or_else(|| OFFLINE.to_owned())
+            held(OFFLINE.to_owned())
         }
         Err(error) if error == MISSING => Err(error),
-        Err(error) => held.ok_or(error),
+        Err(error) => held(error),
     }
 }
 
@@ -185,7 +203,7 @@ fn keys(age: Age) -> Result<Arc<Keys>, String> {
     if let (Some(keys), Age::Within(_)) = (slot.as_ref(), age) {
         return Ok(keys.clone());
     }
-    let (_, keys) = load(STORE_KEYS, age, Keys::read)?;
+    let (_, keys) = load(STORE_KEYS, age, Expiry::WhenGiven, Keys::read)?;
     let keys = Arc::new(keys);
     *slot = Some(keys.clone());
     Ok(keys)
@@ -194,7 +212,7 @@ fn keys(age: Age) -> Result<Arc<Keys>, String> {
 /// A document from schelf.store, checked against the store's keys before
 /// anything reads it or it's kept on disk.
 pub fn fetch(document: &str, age: Age) -> Result<Vec<u8>, String> {
-    let (body, ()) = load(document, age, |body, seal| {
+    let (body, ()) = load(document, age, Expiry::Required, |body, seal| {
         keys(age)?
             .verify(body, seal)
             .or_else(|_| keys(Age::Current)?.verify(body, seal))

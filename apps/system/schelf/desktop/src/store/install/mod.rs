@@ -68,6 +68,9 @@ fn agreed(listing: &Listing, release: &Release, consent: &Consent) -> Result<(),
 
 fn full_access_declared() -> Declared {
     Declared {
+        x11: false,
+        microphone: false,
+        camera: false,
         network: true,
         filesystems: Vec::new(),
         devices: Vec::new(),

@@ -61,6 +61,5 @@ installer-set-aside-failed = Impossible de mettre l’ancien système de côté
 ## Things packed with Meet Luft
 
 installer-box-unopened = Impossible d’ouvrir le carton de déménagement
-installer-box-no-list = Le carton de déménagement n’a pas de liste de contenu
 installer-unpack-failed = Impossible de déballer { $path }
 installer-wallpaper-unnamed = Le fond d’écran n’a pas de nom

@@ -61,6 +61,5 @@ installer-set-aside-failed = Nem sikerült félretenni a régi rendszert
 ## Things packed with Meet Luft
 
 installer-box-unopened = Nem sikerült megnyitni a költöztetődobozt
-installer-box-no-list = A költöztetődobozban nincs tartalomjegyzék
 installer-unpack-failed = Nem sikerült kicsomagolni: { $path }
 installer-wallpaper-unnamed = A háttérképnek nincs neve

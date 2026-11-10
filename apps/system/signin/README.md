@@ -17,7 +17,7 @@ sabine install --bundle .
 Installing registers the `kestrel-signin:` link scheme. It isn't listed with the other apps.
 
 ```
-kestrel-signin:?network=Harbor%20Hotel&url=http%3A%2F%2Ffedoraproject.org%2Fstatic%2Fhotspot.txt
+kestrel-signin:?network=Harbor%20Hotel&url=http%3A%2F%2Fluft.computer%2Fconnectivity
 ```
 
 `network` is the name shown in the window and `url` the page to open, which has to be the web address NetworkManager checks the connection with. Links to any other page are ignored, so only Kestrel's sign-in notification opens a page here.

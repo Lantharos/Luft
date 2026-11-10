@@ -61,6 +61,5 @@ installer-set-aside-failed = Het oude systeem kon niet opzij worden gezet
 ## Things packed with Meet Luft
 
 installer-box-unopened = De verhuisdoos kon niet worden geopend
-installer-box-no-list = De verhuisdoos heeft geen lijst van wat erin zit
 installer-unpack-failed = Kan { $path } niet uitpakken
 installer-wallpaper-unnamed = De achtergrond heeft geen naam

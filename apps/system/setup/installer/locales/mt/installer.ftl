@@ -61,6 +61,5 @@ installer-set-aside-failed = Is-sistema l-qadima ma setgħetx titwarrab
 ## Things packed with Meet Luft
 
 installer-box-unopened = Il-kaxxa tat-trasferiment ma setgħetx tinfetaħ
-installer-box-no-list = Il-kaxxa tat-trasferiment m’għandhiex lista ta’ x’fiha
 installer-unpack-failed = Ma setax jinfetaħ { $path }
 installer-wallpaper-unnamed = L-isfond m’għandux isem

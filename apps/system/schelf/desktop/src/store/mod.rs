@@ -6,7 +6,6 @@ pub mod record;
 pub mod revocations;
 mod search;
 pub mod signed;
-mod trust;
 pub mod updates;
 
 use std::collections::BTreeMap;

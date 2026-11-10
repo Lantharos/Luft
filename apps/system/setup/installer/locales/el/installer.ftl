@@ -61,6 +61,5 @@ installer-set-aside-failed = Δεν ήταν δυνατή η απομόνωση 
 ## Things packed with Meet Luft
 
 installer-box-unopened = Δεν ήταν δυνατό το άνοιγμα του κουτιού μετακόμισης
-installer-box-no-list = Το κουτί μετακόμισης δεν έχει λίστα περιεχομένων
 installer-unpack-failed = Δεν ήταν δυνατή η αποσυμπίεση: { $path }
 installer-wallpaper-unnamed = Η ταπετσαρία δεν έχει όνομα

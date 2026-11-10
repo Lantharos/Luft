@@ -2,16 +2,19 @@ use std::ffi::CString;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 
+use anyhow::Context;
 use luft_dbus::idle::Idle;
 use luft_dbus_macros::introspect;
 use luft_i18n::t;
 use luft_installer_contract::{InstallPlan, Regional};
 use luft_meet::Handoff;
+use luft_meet::sealed::Code;
 use luft_trust::TRUST;
 use tokio::sync::watch;
 use zbus::message::Header;
 use zbus::object_server::{InterfaceRef, ObjectServer, SignalEmitter};
-use zbus::{Connection, interface};
+use zbus::{Connection, OwnedObjectPath, interface};
+use zeroize::Zeroizing;
 
 use super::PATH;
 use super::error::Error;
@@ -26,11 +29,13 @@ use crate::install::windows::Windows;
 use crate::install::{self, Account, Answers, Destination, Job, Stage, Status};
 use crate::options::Options;
 use crate::phase::Phase;
-use crate::{first_boot, phase, survey};
+use crate::{first_boot, meet, phase, survey};
 
 const INSTALL: &str = "com.lantharos.installer.install";
 const FINISH: &str = "com.lantharos.installer.finish-first-boot";
 const SET_UP: &str = "com.lantharos.installer.set-up";
+const FIREWALL: &str = "com.lantharos.Firewall1";
+const FIREWALL_PATH: &str = "/com/lantharos/Firewall1";
 
 pub struct Installer {
     options: Arc<Options>,
@@ -38,8 +43,9 @@ pub struct Installer {
     idle: Arc<Idle>,
     status: Arc<Mutex<Status>>,
     answers: Arc<Answers>,
-    started: AtomicBool,
+    started: Arc<AtomicBool>,
     meet: Option<Handoff>,
+    box_code: Arc<Mutex<Option<Zeroizing<String>>>>,
     enrollment: tokio::sync::Mutex<Option<Enrollment>>,
 }
 
@@ -52,7 +58,8 @@ impl Installer {
             idle,
             status: Arc::new(Mutex::new(Status::idle())),
             answers: Arc::default(),
-            started: AtomicBool::new(false),
+            started: Arc::default(),
+            box_code: Arc::default(),
             enrollment: tokio::sync::Mutex::default(),
         }
     }
@@ -175,6 +182,7 @@ impl Installer {
         #[zbus(object_server)] server: &ObjectServer,
     ) -> Result<(), Error> {
         self.authorize(connection, &header, INSTALL).await?;
+        let request = Zeroizing::new(request);
         let mut request: InstallPlan = serde_json::from_str(&request).map_err(|error| {
             Error::Failed(t!(
                 L10N,
@@ -203,18 +211,21 @@ impl Installer {
         if self.started.swap(true, Ordering::SeqCst) {
             return Err(Error::Busy(t!(L10N, "installer-busy")));
         }
+        let box_code = self.box_code.lock().expect("box code lock").clone();
+        self.answers.forget_account();
         let (sender, updates) = watch::channel(Status::idle());
         let installer = server.interface::<_, Installer>(PATH).await?;
         tokio::spawn(forward(installer, updates));
-        let (options, answers, idle, meet) = (
+        let (options, answers, idle, meet, started) = (
             self.options.clone(),
             self.answers.clone(),
             self.idle.clone(),
             self.meet.clone(),
+            self.started.clone(),
         );
         tokio::spawn(async move {
             let _activity = idle.hold();
-            let _ = tokio::task::spawn_blocking(move || {
+            let installed = tokio::task::spawn_blocking(move || {
                 let job = Job {
                     image: &image,
                     destination,
@@ -223,15 +234,43 @@ impl Installer {
                     windows,
                     meet,
                     encryption,
+                    box_code: box_code.as_deref().and_then(|code| Code::parse(code)),
                 };
                 install::run(job, |status| {
                     let _ = sender.send(status);
-                });
+                })
             })
             .await;
+            if !installed.unwrap_or(false) {
+                started.store(false, Ordering::SeqCst);
+            }
             std::future::pending::<()>().await;
         });
         Ok(())
+    }
+
+    /// Opens the moving box Meet Luft packed with the code it showed, and
+    /// keeps the code so the install unpacks the box into the new account.
+    async fn open_moving_box(
+        &self,
+        code: String,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+    ) -> Result<String, Error> {
+        self.authorize(connection, &header, INSTALL).await?;
+        let _activity = self.idle.hold();
+        let code = Zeroizing::new(code);
+        let handoff = self.meet.clone();
+        let scratch = self.options.target.with_extension("moving-box");
+        let typed = code.clone();
+        let opened = Self::blocking(move || {
+            let handoff = handoff.with_context(|| t!(L10N, "installer-box-unopened"))?;
+            let found = meet::open(&handoff, &scratch, &meet::parse_code(&typed)?)?;
+            Ok(serde_json::to_string(&found)?)
+        })
+        .await?;
+        *self.box_code.lock().expect("box code lock") = Some(code);
+        Ok(opened)
     }
 
     async fn configure(
@@ -265,7 +304,7 @@ impl Installer {
         let account = Account {
             name,
             full_name,
-            password,
+            password: Zeroizing::new(password),
         };
         account.check()?;
         if matches!(self.current().stage, Stage::Configuring | Stage::Finished) {
@@ -291,6 +330,30 @@ impl Installer {
         }
         let _activity = self.idle.hold();
         Self::blocking(move || first_boot::finish(&state_dir)).await
+    }
+
+    /// Says whether a network the computer is on is a home or a public one,
+    /// for the person setting it up, whom the firewall would otherwise ask
+    /// for the password they just chose.
+    async fn set_network_type(
+        &self,
+        network: OwnedObjectPath,
+        kind: String,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+    ) -> Result<(), Error> {
+        self.setup_app_user(connection, &header).await?;
+        let _activity = self.idle.hold();
+        zbus::Proxy::new(connection, FIREWALL, FIREWALL_PATH, FIREWALL)
+            .await?
+            .call::<_, _, ()>("SetNetworkType", &(network, kind))
+            .await
+            .map_err(|error| {
+                Error::Failed(
+                    luft_dbus::error_message(&error)
+                        .map_or_else(|| error.to_string(), str::to_owned),
+                )
+            })
     }
 
     async fn enroll_signing_key(

@@ -61,6 +61,5 @@ installer-set-aside-failed = Sistemi i vjetër nuk u vu dot mënjanë
 ## Things packed with Meet Luft
 
 installer-box-unopened = Kutia e zhvendosjes nuk u hap dot
-installer-box-no-list = Kutia e zhvendosjes nuk ka listë të përmbajtjes
 installer-unpack-failed = { $path } nuk u shpaketua dot
 installer-wallpaper-unnamed = Sfondi nuk ka emër

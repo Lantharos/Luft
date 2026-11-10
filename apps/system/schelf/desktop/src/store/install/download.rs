@@ -10,7 +10,8 @@ use sha2::{Digest, Sha256};
 use crate::catalog::cache;
 use crate::store::listing::Artifact;
 
-const CHANGED: &str = "The download didn't match what schelf.store published, so it wasn't installed.";
+const CHANGED: &str =
+    "The download didn't match what schelf.store published, so it wasn't installed.";
 
 fn sha256(path: &Path) -> Result<String, String> {
     let mut file = File::open(path).map_err(|error| error.to_string())?;

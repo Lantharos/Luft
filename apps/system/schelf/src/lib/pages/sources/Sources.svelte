@@ -13,6 +13,7 @@
 	let error = $state<string | null>(null);
 	let trusting = $state<CheckedSource | null>(null);
 	let removing = $state<AddedSource | null>(null);
+	let explaining = $state(false);
 
 	const key = (source: AddedSource) => `repository/${source.file}`;
 
@@ -75,24 +76,27 @@
 <div class="soft-scroll h-full overflow-y-auto">
 	<div class="mx-auto flex w-full max-w-[760px] flex-col gap-7 px-8 pt-2 pb-10">
 		<p class="px-2 text-[14px] text-[var(--text-soft)]">
-			Software sources are vendors' package repositories, such as Docker's or 1Password's. Their packages install as system packages, checked against the
-			source's key, and update with Luft.
+			A software source is a place a company publishes its own software, such as Docker or 1Password. What you install from one becomes part of the
+			system, is checked to really come from that company, and updates with Luft.
 		</p>
 
-		<Section title="Add a source" description="The address of its .repo file, a COPR project as copr:owner/project, or 1password, docker, google-chrome or vscode.">
+		<Section title="Add a source" description="Type 1password, docker, google-chrome or vscode, or paste the address its maker gives you.">
 			<Row title="Source">
 				<div class="flex items-center gap-2">
 					<div class="w-[320px]">
 						<TextField
 							bind:value={address}
 							label="Source"
-							placeholder="copr:owner/project"
+							placeholder="docker"
 							disabled={checking}
 							onkeydown={(event) => event.key === 'Enter' && check()}
 						/>
 					</div>
 					<button type="button" class="button primary" disabled={!address.trim() || checking} onclick={check}>{#if checking}<Spinner />Checking{:else}Add{/if}</button>
 				</div>
+			</Row>
+			<Row title="Other kinds of address" description="For sources that give you a file address or a project name.">
+				<button type="button" class="button" onclick={() => (explaining = true)}>Show</button>
 			</Row>
 		</Section>
 		{#if error}
@@ -131,6 +135,18 @@
 		{#snippet actions()}
 			<button type="button" class="button" onclick={() => (removing = null)}>Cancel</button>
 			<button type="button" class="button danger" onclick={() => remove(removing!)}>Remove</button>
+		{/snippet}
+	</Dialog>
+{/if}
+
+{#if explaining}
+	<Dialog title="Other kinds of address" description="Schelf takes these too, typed or pasted into the same field." onclose={() => (explaining = false)}>
+		<div class="flex flex-col">
+			<Row title="A .repo file" description="Its full web address, starting with https://, as the maker's install instructions show it." />
+			<Row title="A COPR project" description="Community builds for Fedora. Type copr: and then the owner and project, such as copr:owner/project." />
+		</div>
+		{#snippet actions()}
+			<button type="button" class="button primary" onclick={() => (explaining = false)}>Done</button>
 		{/snippet}
 	</Dialog>
 {/if}

@@ -61,6 +61,5 @@ installer-set-aside-failed = Vana süsteemi ei õnnestunud kõrvale panna
 ## Things packed with Meet Luft
 
 installer-box-unopened = Kolimiskasti ei õnnestunud avada
-installer-box-no-list = Kolimiskastil pole sisu loendit
 installer-unpack-failed = Faili { $path } ei õnnestunud lahti pakkida
 installer-wallpaper-unnamed = Taustapildil pole nime

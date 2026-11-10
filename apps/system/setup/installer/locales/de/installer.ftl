@@ -61,6 +61,5 @@ installer-set-aside-failed = Das alte System konnte nicht beiseitegelegt werden
 ## Things packed with Meet Luft
 
 installer-box-unopened = Der Umzugskarton konnte nicht geöffnet werden
-installer-box-no-list = Der Umzugskarton hat keine Inhaltsliste
 installer-unpack-failed = { $path } konnte nicht ausgepackt werden
 installer-wallpaper-unnamed = Das Hintergrundbild hat keinen Namen

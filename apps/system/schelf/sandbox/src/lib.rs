@@ -8,6 +8,7 @@ mod inside;
 mod launch;
 mod open;
 mod portal;
+mod pulse;
 mod request;
 mod scope;
 

@@ -3,7 +3,8 @@ use std::path::Path;
 
 use luft_app::dbus;
 use luft_app::identity::permissions::{
-    self, BUS, DEVICES, DOWNLOADS, FOLDERS, FULL_ACCESS, NETWORK, NO, Permission, READ_ONLY_FOLDERS,
+    self, BUS, CAMERA, DEVICES, DOWNLOADS, FOLDERS, FULL_ACCESS, MICROPHONE, NETWORK, NO,
+    Permission, READ_ONLY_FOLDERS, X11, YES,
 };
 use zbus::Connection;
 
@@ -22,7 +23,7 @@ async fn store(
         .map_err(|error| dbus::explain(&error))
 }
 
-const EVERYTHING: [&Permission; 7] = [
+const EVERYTHING: [&Permission; 10] = [
     &FULL_ACCESS,
     &FOLDERS,
     &READ_ONLY_FOLDERS,
@@ -30,6 +31,9 @@ const EVERYTHING: [&Permission; 7] = [
     &BUS,
     &NETWORK,
     &DOWNLOADS,
+    &X11,
+    &MICROPHONE,
+    &CAMERA,
 ];
 const ALL_DEVICES: &str = "all";
 
@@ -85,7 +89,49 @@ pub async fn grant(id: &str, declaration: &Declaration, full_access: bool) -> Re
     } else {
         vec![NO.to_owned()]
     };
-    store(connection, &NETWORK, id, &offline).await
+    store(connection, &NETWORK, id, &offline).await?;
+    store(connection, &X11, id, &answer(declaration.x11)).await?;
+    for (asked, permission) in [
+        (declaration.microphone, &MICROPHONE),
+        (declaration.camera, &CAMERA),
+    ] {
+        if asked {
+            store(connection, permission, id, &answer(true)).await?;
+        }
+    }
+    Ok(())
+}
+
+fn answer(given: bool) -> Vec<String> {
+    if given {
+        vec![YES.to_owned()]
+    } else {
+        Vec::new()
+    }
+}
+
+/// One of the switches on an installed AppImage's sandbox.
+#[derive(Clone, Copy)]
+pub enum Switch {
+    Downloads,
+    X11,
+    Microphone,
+    Camera,
+}
+
+/// Turns one switch of the app's sandbox on or off: recording sound and
+/// cameras at once, the rest from its next start.
+pub async fn set_switch(id: &str, switch: Switch, on: bool) -> Result<(), String> {
+    let connection = dbus::session().await?;
+    match switch {
+        Switch::Downloads => {
+            let closed = if on { Vec::new() } else { vec![NO.to_owned()] };
+            store(connection, &DOWNLOADS, id, &closed).await
+        }
+        Switch::X11 => store(connection, &X11, id, &answer(on)).await,
+        Switch::Microphone => store(connection, &MICROPHONE, id, &answer(on)).await,
+        Switch::Camera => store(connection, &CAMERA, id, &answer(on)).await,
+    }
 }
 
 fn names(values: &[String]) -> BTreeSet<&str> {
@@ -179,6 +225,15 @@ pub async fn narrow(id: &str, before: &Declaration, after: &Declaration) -> Resu
     store(connection, &READ_ONLY_FOLDERS, id, &still_read).await?;
     store(connection, &DEVICES, id, &still_devices).await?;
     store(connection, &BUS, id, &still_talk).await?;
+    if !after.x11 {
+        store(connection, &X11, id, &[]).await?;
+    }
+    if before.microphone && !after.microphone {
+        store(connection, &MICROPHONE, id, &[]).await?;
+    }
+    if before.camera && !after.camera {
+        store(connection, &CAMERA, id, &[]).await?;
+    }
     if after.network {
         Ok(())
     } else {
@@ -189,25 +244,32 @@ pub async fn narrow(id: &str, before: &Declaration, after: &Declaration) -> Resu
 /// What the app's sandbox opens to it, in Flatpak's words.
 pub async fn granted(id: &str) -> Result<Permissions, String> {
     let connection = dbus::session().await?;
-    let (folders, read_only, devices, network, talk) = futures_util::join!(
+    let (folders, read_only, devices, network, talk, downloads, x11, microphone, camera) = futures_util::join!(
         permissions::values(connection, &FOLDERS, id),
         permissions::values(connection, &READ_ONLY_FOLDERS, id),
         permissions::values(connection, &DEVICES, id),
         permissions::values(connection, &NETWORK, id),
         permissions::values(connection, &BUS, id),
+        permissions::values(connection, &DOWNLOADS, id),
+        permissions::allowed(connection, &X11, id),
+        permissions::allowed(connection, &MICROPHONE, id),
+        permissions::allowed(connection, &CAMERA, id),
     );
-    let mut permissions = Declaration {
-        network: network.first().map(String::as_str) != Some(NO),
+    let closed = |answer: &[String]| answer.first().map(String::as_str) == Some(NO);
+    Ok(Declaration {
+        network: !closed(&network),
+        filesystems: folders
+            .into_iter()
+            .chain(read_only.into_iter().map(|folder| format!("{folder}:ro")))
+            .collect(),
         devices,
         talk,
-        ..Declaration::default()
+        x11,
+        microphone,
+        camera,
+        unsandboxed: None,
     }
-    .permissions();
-    permissions.filesystems = folders
-        .into_iter()
-        .chain(read_only.into_iter().map(|folder| format!("{folder}:ro")))
-        .collect();
-    Ok(permissions)
+    .opened(!closed(&downloads)))
 }
 
 #[cfg(test)]

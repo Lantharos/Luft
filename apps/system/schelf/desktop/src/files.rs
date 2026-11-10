@@ -35,7 +35,6 @@ pub enum OpenedFile {
         runtime: bool,
         summary: Option<String>,
         homepage: Option<String>,
-        icon: Option<String>,
     },
     FlatpakBundle {
         path: String,
@@ -49,6 +48,8 @@ pub enum OpenedFile {
         /// The repository it keeps getting updates from, when it was built
         /// with one's address.
         origin: Option<String>,
+        /// What its sandbox opens to it.
+        permissions: Option<Permissions>,
     },
     FlatpakRepo {
         path: String,
@@ -146,7 +147,6 @@ fn flatpak_ref(path: &str) -> Result<OpenedFile, String> {
         runtime: values.get("IsRuntime").is_some_and(|value| value == "true"),
         summary: values.get("Comment").cloned(),
         homepage: values.get("Homepage").cloned(),
-        icon: values.get("Icon").cloned(),
         id,
     })
 }
@@ -251,14 +251,13 @@ fn flatpak_bundle(path: &str) -> Result<OpenedFile, String> {
     if kind != "app" {
         return Err("This Flatpak file holds a runtime, not an app. Apps that need it install it themselves.".into());
     }
-    let runtime = bundle_value(&metadata, "metadata")
-        .and_then(|value| value.get::<String>())
-        .and_then(|keyfile| {
-            keyfile
-                .lines()
-                .find_map(|line| line.strip_prefix("runtime="))
-                .map(str::to_owned)
-        });
+    let declared = bundle_value(&metadata, "metadata").and_then(|value| value.get::<String>());
+    let runtime = declared.as_deref().and_then(|keyfile| {
+        keyfile
+            .lines()
+            .find_map(|line| line.strip_prefix("runtime="))
+            .map(str::to_owned)
+    });
     let (name, summary) = bundle_bytes(&metadata, "appdata")
         .map(|appdata| bundle_appstream(&appdata))
         .unwrap_or_default();
@@ -275,6 +274,7 @@ fn flatpak_bundle(path: &str) -> Result<OpenedFile, String> {
         icon,
         size,
         runtime,
+        permissions: declared.as_deref().map(Permissions::parse),
         origin: bundle_value(&metadata, "origin")
             .and_then(|value| value.get::<String>())
             .filter(|origin| !origin.is_empty()),

@@ -7,7 +7,10 @@
 	import Description from '#lib/components/Description.svelte';
 	import ProgressButton from '#lib/components/ProgressButton.svelte';
 	import SourceTrustDialog from '#lib/components/SourceTrustDialog.svelte';
-	import TrustDialog from '#lib/components/TrustDialog.svelte';
+	import ConsentDialog from '#lib/components/ConsentDialog.svelte';
+	import FlathubConsent from '#lib/components/FlathubConsent.svelte';
+	import { describe, type Access } from '#lib/app/permissions.js';
+	import { broadAccess } from '#lib/catalog/flathub.js';
 	import { launch } from '#lib/bridge/index.js';
 	import { library } from '#lib/state/library.svelte.js';
 	import { navigation } from '#lib/state/navigation.svelte.js';
@@ -22,6 +25,8 @@
 	let confirming = $state(false);
 	let unsandboxing = $state(false);
 	let fullAccess = $state(false);
+	let agreeing = $state(false);
+	let flathubAccess = $state<Access[] | null>(null);
 
 	const key = $derived(`file:${path}`);
 	const operation = $derived(operations.forKey(key));
@@ -71,10 +76,21 @@
 	const flathubOperation = $derived(flathubKey ? operations.forKey(flathubKey) : null);
 	const fromFlathub = $derived(flathub ? library.flatpak(flathub.id) : null);
 
+	const permissions = $derived(file?.kind === 'appImage' || file?.kind === 'flatpakBundle' ? file.permissions : null);
+	const broad = $derived(file?.kind === 'flatpakBundle' && permissions ? describe(permissions).filter((entry) => entry.notable) : []);
+
 	function installFromFlathub() {
+		flathubAccess = null;
 		if (!flathub || !flathubKey) return;
 		if (flathubOperation?.state === 'failed') void operations.cancel(flathubOperation.id);
 		void operations.run(flathubKey, flathub.name, { kind: 'installFlathub', id: flathub.id });
+	}
+
+	async function askForFlathub() {
+		if (!flathub) return;
+		const access = await broadAccess(flathub.id);
+		if (access.length) flathubAccess = access;
+		else installFromFlathub();
 	}
 
 	function install() {
@@ -91,9 +107,14 @@
 			unsandboxing = true;
 			return;
 		}
+		if (broad.length && !agreeing) {
+			agreeing = true;
+			return;
+		}
 		trusting = false;
 		confirming = false;
 		unsandboxing = false;
+		agreeing = false;
 		if (operation?.state === 'failed') void operations.cancel(operation.id);
 		started = true;
 		void operations.run(key, name, job(file));
@@ -101,14 +122,14 @@
 
 	const ACTION: Record<OpenedFile['kind'], string> = { flatpakRef: 'Install', flatpakBundle: 'Install', flatpakRepo: 'Add source', package: 'Install', appImage: 'Install', deb: 'Install' };
 	const KIND: Record<OpenedFile['kind'], string> = {
-		flatpakRef: 'Flatpak app',
-		flatpakBundle: 'Flatpak app',
-		deb: 'App for Debian and Ubuntu',
-		flatpakRepo: 'Flatpak app source',
+		flatpakRef: 'App',
+		flatpakBundle: 'App',
+		deb: 'App made for Ubuntu',
+		flatpakRepo: 'App source',
 		package: 'Command-line tool',
-		appImage: 'AppImage'
+		appImage: 'App'
 	};
-	const kind = $derived(file?.kind === 'package' && file.system ? 'System package' : file ? KIND[file.kind] : '');
+	const kind = $derived(file?.kind === 'package' && file.system ? 'Add-on for the system' : file ? KIND[file.kind] : '');
 	const source = $derived(file?.kind === 'package' ? file.repository : null);
 	const sourceName = $derived(source ? (source.described.sources[0]?.name ?? source.described.file) : null);
 </script>
@@ -119,7 +140,7 @@
 			<p class="px-2 text-[14px] text-[var(--text-muted)]">{error}</p>
 		{:else if file}
 			<header class="flex items-center gap-5">
-				<AppArt icon={file.kind === 'appImage' || file.kind === 'flatpakRef' || file.kind === 'flatpakBundle' || file.kind === 'deb' ? file.icon : null} size={80} />
+				<AppArt icon={file.kind === 'appImage' || file.kind === 'flatpakBundle' || file.kind === 'deb' ? file.icon : null} size={80} />
 				<div class="flex min-w-0 flex-1 flex-col gap-1">
 					<h2 class="truncate text-[24px] font-semibold">{name}</h2>
 					<span class="text-[13px] text-[var(--text-muted)]">{kind}</span>
@@ -156,7 +177,7 @@
 						<div class="flex min-w-0 flex-1 flex-col gap-0.5">
 							<span class="truncate text-[15px] font-medium">{flathub.name}{flathub.verified ? ' · Verified' : ''}</span>
 							<span class="text-[13px] text-[var(--text-muted)]">
-								The better way to get it: sandboxed, and it keeps itself up to date, without an Ubuntu container under it.
+								The better way to get it: it runs in a sandbox, keeps itself up to date, and doesn't need Ubuntu's software downloaded for it.
 							</span>
 						</div>
 						{#if flathubOperation && flathubOperation.state !== 'failed'}
@@ -164,7 +185,7 @@
 						{:else if fromFlathub?.desktop}
 							<button type="button" class="button primary" onclick={() => launch(fromFlathub.desktop!)}>Open</button>
 						{:else}
-							<button type="button" class="button primary" onclick={installFromFlathub}>Install from Flathub</button>
+							<button type="button" class="button primary" onclick={askForFlathub}>Install from Flathub</button>
 						{/if}
 					</div>
 					{#if flathubOperation?.state === 'failed'}
@@ -173,8 +194,8 @@
 				</Section>
 			{/if}
 
-			{#if file.kind === 'appImage' && file.permissions}
-				<AccessList permissions={file.permissions} />
+			{#if permissions}
+				<AccessList {permissions} />
 			{/if}
 
 			{#if (file.kind === 'package' || file.kind === 'deb') && file.description}
@@ -208,7 +229,7 @@
 				{#if file.kind === 'deb'}
 					<Row
 						title="Installs to"
-						description="A container with Ubuntu's software, which shares your home folder. Installing the first app downloads Ubuntu itself, a few hundred megabytes."
+						description="A separate space with Ubuntu's software, which this kind of app needs. It can read and change your files. Installing the first one downloads Ubuntu itself, a few hundred megabytes."
 					/>
 					<Row title="Updates" description="From its maker's software source when the package adds one, as many do. Otherwise, install a newer file when one comes out." />
 				{/if}
@@ -220,7 +241,7 @@
 						<Row title="Updates from" description={source.described.sources[0]?.url}><span class="max-w-[320px] truncate">{sourceName}</span></Row>
 					{/if}
 				{:else if file.kind === 'package'}
-					<Row title="Installs to" description="Its commands run in Tern."><span>Tools container</span></Row>
+					<Row title="Installs to" description="For you only, kept apart from the system. Its commands run in Tern, Luft's terminal."><span>Your account</span></Row>
 				{/if}
 				<Row title="File" description={path} />
 			</Section>
@@ -247,11 +268,12 @@
 {/if}
 
 {#if unsandboxing && file?.kind === 'appImage' && file.unsandboxed}
-	<TrustDialog
+	<ConsentDialog
 		title="Give {file.name} full access?"
 		description="{file.name} asks to run outside a sandbox: “{file.unsandboxed}” There it can do anything a program you start yourself can, without asking. You can take full access away on its page later."
 		facts={FULL_ACCESS_ABILITIES}
 		confirm="Install with full access"
+		danger
 		onconfirm={() => {
 			fullAccess = true;
 			install();
@@ -261,15 +283,30 @@
 {/if}
 
 {#if confirming && file?.kind === 'package'}
-	<TrustDialog
+	<ConsentDialog
 		title="Install {file.package} without checking it?"
 		description="Nobody vouches for this package file: it isn't signed by Fedora or by a software source you added. Only install it if you trust whoever gave it to you."
 		facts={file.system
 			? ['Not verified', 'Installs for everyone on this computer', 'Can run as administrator while it installs', "Won't get updates"]
-			: ['Not verified', 'Installs in your tools container, where it can read and change your files', "Won't get updates"]}
+			: ['Not verified', 'Installs for you only, but can read and change your files', "Won't get updates"]}
 		confirm="Install anyway"
+		danger
 		onconfirm={install}
 		onclose={() => (confirming = false)}
 	/>
 {/if}
 
+{#if agreeing && file?.kind === 'flatpakBundle'}
+	<ConsentDialog
+		title="Install {file.title}?"
+		description="{file.title} runs in a sandbox, but asks for more than most apps need. It can use:"
+		access={describe(file.permissions!)}
+		confirm="Install"
+		onconfirm={install}
+		onclose={() => (agreeing = false)}
+	/>
+{/if}
+
+{#if flathubAccess && flathub}
+	<FlathubConsent name={flathub.name} access={flathubAccess} onconfirm={installFromFlathub} onclose={() => (flathubAccess = null)} />
+{/if}

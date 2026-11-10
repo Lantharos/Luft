@@ -53,7 +53,7 @@ impl SecurityContext {
         let context = manager.create_listener(listener.as_fd(), close_read.as_fd(), &handle, ());
         context.set_sandbox_engine(ENGINE.to_owned());
         context.set_app_id(id.to_owned());
-        context.set_instance_id(std::process::id().to_string());
+        context.set_instance_id(super::super::folder::instance_id());
         context.commit();
         context.destroy();
         manager.destroy();

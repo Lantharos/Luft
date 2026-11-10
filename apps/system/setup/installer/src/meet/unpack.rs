@@ -1,12 +1,14 @@
 use std::ffi::OsStr;
-use std::fs;
+use std::fs::{self, OpenOptions};
 use std::os::unix::ffi::OsStrExt;
-use std::os::unix::fs::PermissionsExt;
+use std::os::unix::fs::{OpenOptionsExt, PermissionsExt};
 use std::path::{Path, PathBuf};
+use std::time::{Duration, UNIX_EPOCH};
 
 use anyhow::{Context, Result};
 use luft_i18n::t;
-use luft_meet::moving_box::Manifest;
+use luft_meet::moving_box::{FILES, Manifest};
+use luft_meet::sealed::Opened;
 use luft_meet::wifi;
 use luft_windows::bluetooth::{bluez, saved_pairings};
 
@@ -28,34 +30,59 @@ struct Copying<'a> {
     progress: &'a dyn Fn(f64),
 }
 
-impl Copying<'_> {
-    fn tree(&mut self, from: &Path, to: &Path) -> Result<()> {
-        fs::create_dir_all(to)?;
-        for entry in fs::read_dir(from)? {
-            let entry = entry?;
-            let kind = entry.file_type()?;
-            let target = to.join(entry.file_name());
-            if kind.is_dir() {
-                self.tree(&entry.path(), &target)?;
-            } else if kind.is_file() {
-                self.done += copy(&entry.path(), &target).with_context(|| {
-                    t!(
-                        L10N,
-                        "installer-unpack-failed",
-                        path = entry.path().display().to_string()
-                    )
-                })?;
-                (self.progress)(self.done as f64 / self.total.max(1) as f64);
-            }
-        }
-        Ok(())
+fn extract(opened: &mut Opened, index: usize, to: &Path, read: impl FnMut(u64)) -> Result<()> {
+    fs::create_dir_all(to.parent().expect("unpacked files live in folders"))?;
+    let mut file = OpenOptions::new()
+        .write(true)
+        .create(true)
+        .truncate(true)
+        .mode(0o644)
+        .open(to)?;
+    opened.extract(index, &mut file, read)?;
+    if let Some(modified) = opened.contents.files[index].modified {
+        file.set_modified(UNIX_EPOCH + Duration::from_secs(modified))?;
     }
+    Ok(())
 }
 
-fn copy(from: &Path, to: &Path) -> Result<u64> {
-    let copied = fs::copy(from, to)?;
-    fs::set_permissions(to, fs::Permissions::from_mode(0o644))?;
-    Ok(copied)
+fn extract_named(opened: &mut Opened, path: &str, to: &Path) -> Result<()> {
+    let index = opened.find(path)?;
+    extract(opened, index, to, |_| {})
+}
+
+/// Where a packed file goes in the new home folder, when it belongs to one
+/// of the folders the box says it brings.
+fn in_home(path: &str, manifest: &Manifest, home: &Path) -> Option<PathBuf> {
+    let (folder, inside) = path
+        .strip_prefix(FILES)?
+        .strip_prefix('/')?
+        .split_once('/')?;
+    manifest
+        .folders
+        .iter()
+        .any(|packed| packed.kind.name() == folder)
+        .then(|| home.join(folder).join(inside))
+}
+
+fn folders(opened: &mut Opened, home: &Path, progress: &dyn Fn(f64)) -> Result<()> {
+    let manifest = opened.contents.manifest.clone();
+    let mut copying = Copying {
+        done: 0,
+        total: manifest.bytes(),
+        progress,
+    };
+    for index in 0..opened.contents.files.len() {
+        let path = opened.contents.files[index].path.clone();
+        let Some(target) = in_home(&path, &manifest, home) else {
+            continue;
+        };
+        extract(opened, index, &target, |read| {
+            copying.done += read;
+            (copying.progress)(copying.done as f64 / copying.total.max(1) as f64);
+        })
+        .with_context(|| t!(L10N, "installer-unpack-failed", path = path.as_str()))?;
+    }
+    Ok(())
 }
 
 fn uuid() -> Result<String> {
@@ -76,14 +103,12 @@ fn file_name(name: &str) -> String {
         .collect()
 }
 
-fn networks(deployment: &Deployment, from: &Path, manifest: &Manifest) -> Result<Vec<PathBuf>> {
+fn networks(deployment: &Deployment, opened: &mut Opened) -> Result<Vec<PathBuf>> {
     let folder = deployment.etc(CONNECTIONS);
     fs::create_dir_all(&folder)?;
     let mut written = Vec::new();
-    for profile in &manifest.wifi {
-        let Ok(xml) = fs::read_to_string(from.join(profile)) else {
-            continue;
-        };
+    for profile in opened.contents.manifest.wifi.clone() {
+        let xml = String::from_utf8(opened.read(&profile)?)?;
         let network = match wifi::parse_profile(&xml) {
             Ok(Some(network)) => network,
             Ok(None) => continue,
@@ -100,22 +125,13 @@ fn networks(deployment: &Deployment, from: &Path, manifest: &Manifest) -> Result
     Ok(written)
 }
 
-fn picture(
-    deployment: &Deployment,
-    from: &Path,
-    manifest: &Manifest,
-    user: &str,
-) -> Result<Vec<PathBuf>> {
-    let Some(picture) = manifest
-        .account
-        .as_ref()
-        .and_then(|account| account.picture.as_deref())
-    else {
+fn picture(deployment: &Deployment, opened: &mut Opened, user: &str) -> Result<Vec<PathBuf>> {
+    let account = opened.contents.manifest.account.as_ref();
+    let Some(picture) = account.and_then(|account| account.picture.clone()) else {
         return Ok(Vec::new());
     };
     let icon = deployment.var(&format!("{ICONS}/{user}"));
-    fs::create_dir_all(icon.parent().expect("icons live in a folder"))?;
-    copy(&from.join(picture), &icon)?;
+    extract_named(opened, &picture, &icon)?;
     let settings = deployment.var(&format!("{USERS}/{user}"));
     write(
         &settings,
@@ -139,16 +155,15 @@ fn uri_segment(name: &OsStr) -> String {
         .collect()
 }
 
-fn wallpaper(from: &Path, manifest: &Manifest, home: &Path, user: &str) -> Result<()> {
-    let Some(wallpaper) = manifest.wallpaper.as_deref() else {
+fn wallpaper(opened: &mut Opened, home: &Path, user: &str) -> Result<()> {
+    let Some(wallpaper) = opened.contents.manifest.wallpaper.clone() else {
         return Ok(());
     };
-    let name = Path::new(wallpaper)
+    let name = Path::new(&wallpaper)
         .file_name()
         .with_context(|| t!(L10N, "installer-wallpaper-unnamed"))?;
     let target = home.join(BACKGROUNDS).join(name);
-    fs::create_dir_all(target.parent().expect("backgrounds live in a folder"))?;
-    copy(&from.join(wallpaper), &target)?;
+    extract_named(opened, &wallpaper, &target)?;
     let uri = format!(
         "file:///var/home/{user}/{BACKGROUNDS}/{}",
         uri_segment(name)
@@ -169,15 +184,15 @@ fn wallpaper(from: &Path, manifest: &Manifest, home: &Path, user: &str) -> Resul
     compiled
 }
 
-fn bluetooth(deployment: &Deployment, from: &Path, manifest: &Manifest) -> Result<Vec<PathBuf>> {
-    let Some(saved) = &manifest.bluetooth else {
+fn bluetooth(deployment: &Deployment, opened: &mut Opened) -> Result<Vec<PathBuf>> {
+    let Some(saved) = opened.contents.manifest.bluetooth.clone() else {
         return Ok(Vec::new());
     };
-    let keys = fs::read(from.join(&saved.keys))?;
+    let keys = opened.read(&saved.keys)?;
     let names = saved
         .names
         .as_ref()
-        .map(|names| fs::read(from.join(names)))
+        .map(|names| opened.read(names))
         .transpose()?;
     let pairings = saved_pairings(&keys, names.as_deref())?;
     let storage = deployment.var(bluez::STORAGE.trim_start_matches("/var/"));
@@ -188,24 +203,15 @@ fn bluetooth(deployment: &Deployment, from: &Path, manifest: &Manifest) -> Resul
 pub fn unpack(
     deployment: &Deployment,
     account: &Account,
-    from: &Path,
-    manifest: &Manifest,
+    opened: &mut Opened,
     progress: &dyn Fn(f64),
 ) -> Result<()> {
     let user = &account.name;
     let home = deployment.var(&format!("home/{user}"));
-    let mut copying = Copying {
-        done: 0,
-        total: manifest.bytes(),
-        progress,
-    };
-    for folder in &manifest.folders {
-        let source = from.join(folder.kind.in_box());
-        if source.is_dir() {
-            copying.tree(&source, &home.join(folder.kind.name()))?;
-        }
-    }
-    if let Err(error) = wallpaper(from, manifest, &home, user) {
+    let unpacked = folders(opened, &home, progress);
+    if unpacked.is_ok()
+        && let Err(error) = wallpaper(opened, &home, user)
+    {
         eprintln!("The wallpaper from Windows wasn't set: {error:#}");
     }
     Tool::new("chown")
@@ -213,11 +219,16 @@ pub fn unpack(
         .arg(&home)
         .run()?;
     let mut relabelled = vec![home];
-    relabelled.extend(picture(deployment, from, manifest, user)?);
-    relabelled.extend(networks(deployment, from, manifest)?);
-    match bluetooth(deployment, from, manifest) {
-        Ok(storage) => relabelled.extend(storage),
-        Err(error) => eprintln!("Bluetooth devices from Windows weren't brought over: {error:#}"),
+    if unpacked.is_ok() {
+        relabelled.extend(picture(deployment, opened, user)?);
+        relabelled.extend(networks(deployment, opened)?);
+        match bluetooth(deployment, opened) {
+            Ok(storage) => relabelled.extend(storage),
+            Err(error) => {
+                eprintln!("Bluetooth devices from Windows weren't brought over: {error:#}");
+            }
+        }
     }
-    deployment.relabel(&relabelled)
+    deployment.relabel(&relabelled)?;
+    unpacked
 }

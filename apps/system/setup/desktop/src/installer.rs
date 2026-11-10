@@ -3,14 +3,15 @@ use luft_app::dbus::service::{Map, Service, absent, get};
 use luft_app::dbus::{error_message, error_name, failed};
 use luft_app::{Commands, Empty, Events};
 use luft_i18n::t;
-use luft_installer_contract::{InstallPlan, Regional, Survey};
+use luft_installer_contract::{InstallPlan, MovingBox, Regional, Survey};
 use sabine::{BridgeEvent, SabineWindow};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use specta::Type;
-use zbus::DynamicType;
 use zbus::wire::DynamicDeserialize;
+use zbus::{DynamicType, OwnedObjectPath};
+use zeroize::Zeroizing;
 
 use crate::L10N;
 
@@ -59,7 +60,8 @@ pub struct InstallerState {
 struct Account {
     name: String,
     full_name: String,
-    password: String,
+    #[specta(type = String)]
+    password: Zeroizing<String>,
 }
 
 fn text(map: &Map, key: &str) -> String {
@@ -107,7 +109,19 @@ async fn survey(Empty {}: Empty) -> Result<Survey, String> {
 }
 
 async fn install(plan: InstallPlan) -> Result<(), String> {
-    call("Install", &(serde_json::to_string(&plan).map_err(failed)?,)).await
+    let request = Zeroizing::new(serde_json::to_string(&plan).map_err(failed)?);
+    call("Install", &(request.as_str(),)).await
+}
+
+#[derive(Deserialize, Type)]
+struct BoxCode {
+    #[specta(type = String)]
+    code: Zeroizing<String>,
+}
+
+async fn open_moving_box(BoxCode { code }: BoxCode) -> Result<MovingBox, String> {
+    let found: String = call("OpenMovingBox", &(code.as_str(),)).await?;
+    serde_json::from_str(&found).map_err(failed)
 }
 
 async fn configure(regional: Regional) -> Result<(), String> {
@@ -128,7 +142,24 @@ async fn create_account(
     if let Err(error) = luft_network::store_secrets_system_wide().await {
         eprintln!("Saved networks weren't readied for the new system: {error}");
     }
-    call("CreateAccount", &(name, full_name, password)).await
+    call("CreateAccount", &(name, full_name, password.as_str())).await
+}
+
+#[derive(Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+struct NetworkChoice {
+    connection: String,
+    network_type: String,
+}
+
+async fn set_network_type(
+    NetworkChoice {
+        connection,
+        network_type,
+    }: NetworkChoice,
+) -> Result<(), String> {
+    let connection = OwnedObjectPath::try_from(connection).map_err(failed)?;
+    call("SetNetworkType", &(connection, network_type)).await
 }
 
 async fn finish_first_boot(Empty {}: Empty) -> Result<(), String> {
@@ -154,7 +185,9 @@ pub fn register(window: SabineWindow) -> SabineWindow {
         .command_async("installer_state", |Empty {}| state())
         .command_async("installer_survey", survey)
         .command_async("installer_install", install)
+        .command_async("installer_open_box", open_moving_box)
         .command_async("installer_configure", configure)
         .command_async("installer_account", create_account)
+        .command_async("installer_network_type", set_network_type)
         .command_async("installer_finish_first_boot", finish_first_boot)
 }

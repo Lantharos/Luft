@@ -54,7 +54,12 @@ pub fn read(response: ureq::http::Response<ureq::Body>) -> Result<String, String
 
 /// Downloads `url` to `destination`, reporting how much arrived out of the
 /// size the server gives, or `size` when it gives none.
-pub fn download(url: &str, destination: &Path, size: Option<u64>, task: Task) -> Result<(), String> {
+pub fn download(
+    url: &str,
+    destination: &Path,
+    size: Option<u64>,
+    task: Task,
+) -> Result<(), String> {
     let response = agent().get(url).call().map_err(failure)?;
     let total = response.body().content_length().or(size);
     let mut body = response

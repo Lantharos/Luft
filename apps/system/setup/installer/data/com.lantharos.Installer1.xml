@@ -11,7 +11,7 @@
     SecureBootCode: once finished, the code to type when the computer next starts so Secure Boot trusts Luft's
       signing key, or empty when it already does or Secure Boot is off.
 
-    Survey, Install, Configure and CreateAccount need com.lantharos.installer.install. The rest only answer the
+    Survey, Install, OpenMovingBox, Configure and CreateAccount need com.lantharos.installer.install. The rest only answer the
     account setup is pending for: FinishFirstBoot, and, while setup is still open, the setup steps, which also
     need com.lantharos.installer.set-up and have to come from Install Luft's own program. UseLanguage is taken
     like Install on the live system and like a setup step after it.
@@ -40,6 +40,13 @@
     <method name="Install">
       <arg name="request" type="s" direction="in"/>
     </method>
+    <!-- Opens the sealed moving box Meet Luft packed, with the code it showed, and answers with JSON:
+         {"bytes", "fullName", "userName"}. An install started afterwards unpacks the box into the new
+         account; without this call the box stays closed. A wrong code fails. -->
+    <method name="OpenMovingBox">
+      <arg name="code" type="s" direction="in"/>
+      <arg name="found" type="s" direction="out"/>
+    </method>
     <!-- JSON: {"locale", "keyboard": {"layout", "variant"}, "timezone", "hostname"}. The last one given before
          copying ends is used. -->
     <method name="Configure">
@@ -57,6 +64,13 @@
     </method>
     <!-- Only the account setup is pending for: stops signing in automatically. -->
     <method name="FinishFirstBoot"/>
+    <!-- Only for the account setup is pending for, while its setup window is open: makes one of the
+         computer's Wi-Fi or wired networks "home" or "public" in the firewall, without the password
+         the firewall asks everyone else for. -->
+    <method name="SetNetworkType">
+      <arg name="network" type="o" direction="in"/>
+      <arg name="kind" type="s" direction="in"/>
+    </method>
     <!-- Asks trustd to add Luft's key to shim, and gives the code to type when the computer restarts. -->
     <method name="EnrollSigningKey">
       <arg name="code" type="s" direction="out"/>

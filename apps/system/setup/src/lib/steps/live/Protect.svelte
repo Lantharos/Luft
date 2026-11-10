@@ -16,7 +16,9 @@
 	let problem = $state('');
 	let confirming = $state<{ encryption: Encryption | null } | null>(null);
 
-	let tpm = $derived(setup.trust?.tpm ?? false);
+	let chip = $derived(setup.trust?.tpm ?? false);
+	let tpm = $derived(chip && setup.trust?.secureBoot === 'on');
+	let description = $derived(tpm ? 'setup-protect-tpm' : chip ? 'setup-protect-passphrase-secure-boot-off' : 'setup-protect-passphrase');
 	let passphraseReady = $derived(tpm || (passphrase.length >= SHORTEST_PASSPHRASE && passphrase === repeated));
 	let ready = $derived(Boolean(install.recoveryKey) && install.recoveryKeyKept && passphraseReady);
 
@@ -38,7 +40,7 @@
 	}
 </script>
 
-<StepFrame title={t('setup-protect-title')} description={t(tpm ? 'setup-protect-tpm' : 'setup-protect-passphrase')} hideBack={install.starting}>
+<StepFrame title={t('setup-protect-title')} description={t(description)} hideBack={install.starting}>
 	<div class="flex flex-col gap-5">
 		<p class="max-w-[540px] text-[14px] leading-relaxed text-[var(--text-soft)]">{t('setup-protect-keep-safe')}</p>
 		{#if install.recoveryKey}

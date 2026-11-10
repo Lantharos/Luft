@@ -50,7 +50,6 @@ pub struct Block {
 
 #[derive(Deserialize, Serialize)]
 pub struct Revocations {
-    serial: u64,
     issued: DateTime<Utc>,
     blocked: Vec<Entry>,
 }
@@ -90,16 +89,11 @@ pub fn current() -> Option<Revocations> {
     serde_json::from_slice(&fs::read(accepted()).ok()?).ok()
 }
 
-/// Fetches the list, accepting it only when it's signed and no older than the
-/// one before.
+/// Fetches the list, which is only taken when it's signed and no older than
+/// the one before.
 pub fn refresh() -> Result<Revocations, String> {
     let bytes = signed::fetch(DOCUMENT, Age::Current)?;
     let fetched: Revocations = serde_json::from_slice(&bytes).map_err(|error| error.to_string())?;
-    if let Some(known) = current()
-        && fetched.serial < known.serial
-    {
-        return Err("schelf.store sent an older list of pulled apps than the one Schelf has.".into());
-    }
     luft_app::files::replace(&accepted(), &bytes).map_err(|error| error.to_string())?;
     Ok(fetched)
 }
@@ -126,7 +120,10 @@ mod tests {
         assert!(list.block("com.example.Bad", None).is_some());
         let tool = list.block("io.github.someone.Tool", Some("2.1.0")).unwrap();
         assert_eq!(tool.action, Severity::Warn);
-        assert!(list.block("io.github.someone.Tool", Some("2.1.1")).is_none());
+        assert!(
+            list.block("io.github.someone.Tool", Some("2.1.1"))
+                .is_none()
+        );
         assert!(list.block("io.github.someone.Tool", None).is_none());
     }
 }

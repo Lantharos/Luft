@@ -29,6 +29,7 @@ tokio = { workspace = true, features = ["macros", "rt", "sync", "time"] }
 toml.workspace = true
 toml_edit.workspace = true
 zbus = { workspace = true, features = ["service", "tokio"] }
+zeroize.workspace = true
 
 [dev-dependencies]
 luft-windows = { workspace = true, features = ["testing"] }

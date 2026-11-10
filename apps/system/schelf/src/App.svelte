@@ -61,7 +61,7 @@
 						{:else if entry.page === 'search'}
 							<Search query={entry.query} />
 						{:else if entry.page === 'app'}
-							<AppPage target={entry.target} name={entry.name} askFullAccess={entry.askFullAccess} />
+							<AppPage target={entry.target} name={entry.name} askFullAccess={entry.askFullAccess} reviewAccess={entry.reviewAccess} />
 						{:else if entry.page === 'file'}
 							<OpenFile path={entry.path} />
 						{:else if entry.page === 'sources'}

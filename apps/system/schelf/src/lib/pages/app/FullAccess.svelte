@@ -3,7 +3,7 @@
 	import { commands, type InstalledApp } from '#lib/bindings.js';
 	import { SLOW } from '#lib/bridge/index.js';
 	import { FULL_ACCESS_ABILITIES } from '#lib/app/fullAccess.js';
-	import TrustDialog from '#lib/components/TrustDialog.svelte';
+	import ConsentDialog from '#lib/components/ConsentDialog.svelte';
 
 	let {
 		app,
@@ -78,11 +78,12 @@
 {/if}
 
 {#if asking}
-	<TrustDialog
+	<ConsentDialog
 		title="Give {app.name} full access?"
 		description="{app.name} will run outside its sandbox and can do anything a program you start yourself can, without asking. It takes effect the next time it opens."
 		facts={FULL_ACCESS_ABILITIES}
 		confirm="Give full access"
+		danger
 		onconfirm={() => change(true)}
 		onclose={() => (asking = false)}
 	/>

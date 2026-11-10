@@ -9,11 +9,11 @@
 	const HOSTNAME = /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$/;
 
 	let kept = install.replacing?.owner ?? null;
-	let fullName = $state(kept?.fullName ?? install.survey?.meet?.movingBox?.fullName ?? '');
-	let userName = $state(kept?.name ?? '');
-	let editedUserName = $state(!!kept);
-	let hostname = $state('');
-	let editedHostname = $state(false);
+	let fullName = $state(install.fullName || (kept?.fullName ?? install.movingBox?.fullName ?? ''));
+	let userName = $state(install.user || (kept?.name ?? ''));
+	let editedUserName = $state(!!(install.user || kept));
+	let hostname = $state(install.hostname);
+	let editedHostname = $state(!!install.hostname);
 	let password = $state('');
 	let repeated = $state('');
 	let saving = $state(false);

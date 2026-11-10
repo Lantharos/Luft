@@ -3,6 +3,7 @@
 setup-continue = Continue
 setup-back = Back
 setup-cancel = Cancel
+setup-close = Close
 # Button that skips the current step
 setup-not-now = Not now
 setup-try-again = Try again
@@ -102,7 +103,7 @@ setup-confirm-shrink-title = Shrink Windows to { $size }?
 setup-confirm-meet-title = Install Luft next to Windows?
 setup-confirm-meet-drive-title = Install Luft on { $drive }?
 setup-confirm-free-title = Install Luft in the free space?
-setup-confirm-replace-keep-old = Luft starts copying right away. The old system won’t start anymore, and its files stay until you remove them.
+setup-confirm-replace-keep-old = Luft starts copying right away. The old system won’t start anymore, and its files stay until you remove them. The computer can’t be encrypted this way, so someone who takes the drive could read your files.
 setup-confirm-replace-erase-old = Luft starts copying right away. The old system is erased for good, and your files stay where they are.
 setup-confirm-erase-description = Everything on this drive is erased for good, including other systems and files.
 # $drive is a drive name, like "Samsung SSD 980". The drive has nothing on it
@@ -118,6 +119,7 @@ setup-confirm-install = Install
 setup-protect-title = Protect your files
 setup-protect-tpm = Encrypt this computer so nobody can read your files without signing in, even if it’s lost. It unlocks by itself when it starts.
 setup-protect-passphrase = Encrypt this computer so nobody can read your files without your passphrase, even if it’s lost.
+setup-protect-passphrase-secure-boot-off = Encrypt this computer so nobody can read your files without your passphrase, even if it’s lost. Secure Boot is turned off on this computer. With it turned on in the computer’s startup settings, Luft could unlock by itself when it starts.
 setup-protect-keep-safe = Keep this recovery key somewhere safe, away from this computer. You need it if the computer ever can’t unlock by itself.
 setup-protect-passphrase-label = Passphrase
 setup-protect-repeat = Type it again
@@ -162,6 +164,17 @@ setup-windows-full = Windows needs almost all of its drive. Free up about { $siz
 setup-meet-room-luft = Luft, { $size }
 # $size is a size like "4.2 GB"
 setup-meet-room-packed = The things you packed in Windows, { $size }, are unpacked into your new account.
+
+## The moving box packed in Windows with Meet Luft, which opens with the code Meet Luft showed
+
+setup-box-title = Unpack what you brought from Windows?
+setup-box-description = Meet Luft locked the things you packed with a code and showed it to you in Windows. Type it here and Luft unpacks them into your new account.
+# Label of the field the code is typed into
+setup-box-code = Code from Meet Luft
+# Button that opens the moving box with the typed code
+setup-box-open = Unpack
+# Button that leaves the moving box closed and carries on installing
+setup-box-skip = Leave them behind
 
 ## Windows options
 
@@ -283,8 +296,12 @@ setup-account-mismatch = The passwords don’t match
 
 setup-finishing-failed-title = Luft couldn’t be installed
 setup-finishing-failed-description = Something went wrong while installing.
-setup-finishing-failed-stick = Your computer still starts the way it did before. You can keep using Luft from the USB stick, or restart and try again.
-setup-finishing-failed-trying = Your computer still starts the way it did before. You can keep using Luft as it is now, or restart and try again.
+setup-finishing-failed-stick = Your computer still starts the way it did before. You can try again, or keep using Luft from the USB stick.
+setup-finishing-failed-trying = Your computer still starts the way it did before. You can try again, or keep using Luft as it is now.
+setup-finishing-try-again = Try again
+setup-finishing-details = Details
+setup-finishing-details-title = What went wrong
+setup-finishing-details-description = This is what the installer reported. It can help someone work out what happened.
 setup-finishing-use-stick = Use Luft from the stick
 setup-finishing-keep-trying = Keep trying Luft
 setup-finishing-installed-title = Luft is installed

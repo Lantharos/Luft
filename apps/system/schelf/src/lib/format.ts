@@ -3,10 +3,10 @@ import type { InstalledApp, Operation } from '#lib/bindings.js';
 
 export function sourceName({ source, origin, listing }: Pick<InstalledApp, 'source' | 'origin' | 'listing'>) {
 	if (listing) return source === 'extension' ? 'Extension from schelf.store' : 'schelf.store';
-	if (source === 'appImage') return 'AppImage';
-	if (source === 'tool') return 'Tools container';
-	if (source === 'debian') return '.deb file, in the Ubuntu container';
-	if (source === 'system') return origin === 'Fedora' ? 'System package' : `System package from ${origin}`;
+	if (source === 'appImage') return 'Installed from a file';
+	if (source === 'tool') return 'Command-line tool';
+	if (source === 'debian') return 'Made for Ubuntu';
+	if (source === 'system') return origin === 'Fedora' ? 'Part of the system' : `Part of the system, from ${origin}`;
 	return origin === 'flathub' ? 'Flathub' : origin;
 }
 

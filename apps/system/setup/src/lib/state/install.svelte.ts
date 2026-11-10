@@ -7,6 +7,7 @@ import {
 	type InstallerState,
 	type Intent,
 	type LinuxSystem,
+	type MovingBox,
 	type Survey,
 	type Target,
 	type WindowsChoices,
@@ -25,9 +26,11 @@ class InstallState {
 	starting = $state(false);
 	startError = $state('');
 	user = $state('');
+	fullName = $state('');
 	hostname = $state('');
 	intent = $state<Intent | null>(null);
 	replacing = $state<LinuxSystem | null>(null);
+	movingBox = $state<MovingBox | null>(null);
 	target = $state<Target | null>(null);
 	recoveryKey = $state('');
 	recoveryKeyKept = $state(false);
@@ -65,6 +68,10 @@ class InstallState {
 		} finally {
 			this.surveying = false;
 		}
+	}
+
+	async openBox(code: string) {
+		this.movingBox = await commands.installerOpenBox({ code }, WAIT_FOR_PERSON);
 	}
 
 	async install(target: Target, encryption: Encryption | null) {
@@ -105,6 +112,7 @@ class InstallState {
 
 	async createAccount(name: string, fullName: string, password: string, hostname: string) {
 		this.user = name;
+		this.fullName = fullName;
 		this.hostname = hostname;
 		await this.configure();
 		await commands.installerAccount({ name, fullName, password }, WAIT_FOR_PERSON);

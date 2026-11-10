@@ -61,6 +61,5 @@ installer-set-aside-failed = Старата система не можа да б
 ## Things packed with Meet Luft
 
 installer-box-unopened = Кутията за преместване не можа да бъде отворена
-installer-box-no-list = Кутията за преместване няма списък на съдържанието си
 installer-unpack-failed = Неуспешно разопаковане на { $path }
 installer-wallpaper-unnamed = Тапетът няма име

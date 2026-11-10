@@ -1,3 +1,6 @@
+mod environment;
+mod system;
+
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 
@@ -5,50 +8,18 @@ use super::devices::Decoys;
 use super::display::x11;
 use super::folder::{self, Folder, INSIDE_SERVER, SERVER_SOCKET};
 use super::seccomp::FILTER_FD;
-use super::unsandboxed::NO_SANDBOX;
 use crate::app::{App, Device, Grants};
 use crate::portal::Layout;
 
 pub const INFO_FD: i32 = 5;
 const INSIDE_APP: &str = "/app";
 pub const INSIDE_LAUNCHER: &str = "/run/luft-sandbox-server";
-const OUTER_USER_NAMESPACE: &str = "/run/.userns";
-const X11_AUTHORITY: &str = "Xauthority";
-const APP_RUN: &str = "/app/AppRun";
-const SYSTEMD_RUN: &str = "/usr/bin/systemd-run";
 const XDG_OPEN: &str = "/usr/bin/xdg-open";
-const ZYPAK: &str = "/usr/lib/zypak";
-const ZYPAK_HELPER: &str = "zypak-helper";
-const SYSTEM_FOLDERS: [&str; 5] = [
-    "/sys/block",
-    "/sys/bus",
-    "/sys/class",
-    "/sys/dev",
-    "/sys/devices",
-];
-const SOUND_SOCKETS: [&str; 2] = ["pipewire-0", "pulse/native"];
+const PIPEWIRE_SOCKET: &str = "pipewire-0";
 const HOME_READ_ONLY: [&str; 2] = [".local/share/fonts", ".local/share/icons"];
-const PASSED_ON: [&str; 13] = [
-    "LANG",
-    "LANGUAGE",
-    "TZ",
-    "XDG_CURRENT_DESKTOP",
-    "XDG_SESSION_DESKTOP",
-    "XDG_SESSION_TYPE",
-    "DESKTOP_SESSION",
-    "XCURSOR_THEME",
-    "XCURSOR_SIZE",
-    "GTK_IM_MODULE",
-    "QT_IM_MODULE",
-    "XMODIFIERS",
-    "USER",
-];
-const PORTAL_FILE_CHOOSER: [(&str, &str); 3] = [
-    ("GTK_USE_PORTAL", "1"),
-    ("QT_QPA_PLATFORMTHEME", "xdgdesktopportal"),
-    ("ELECTRON_OZONE_PLATFORM_HINT", "auto"),
-];
-const CHROMIUM_PORTALS: &str = "--xdg-portal-required-version=1";
+const X11_AUTHORITY: &str = "Xauthority";
+
+pub use system::write_accounts;
 
 /// Everything the app's sandbox is made of.
 pub struct Profile<'a> {
@@ -130,63 +101,7 @@ fn nvidia_devices() -> Vec<PathBuf> {
         .collect()
 }
 
-fn zypak() -> Option<&'static Path> {
-    let zypak = Path::new(ZYPAK);
-    zypak.join(ZYPAK_HELPER).exists().then_some(zypak)
-}
-
 impl Profile<'_> {
-    /// What every sandbox of the app stands on, its own and those the portal
-    /// starts: the system read-only, fresh `/proc` and `/dev`, `/tmp`, and
-    /// empty runtime and home folders.
-    fn floor(
-        &self,
-        home: &Path,
-        launcher: &Path,
-        temporary: Temporary,
-    ) -> Result<Arguments, String> {
-        let mut arguments = Arguments::default();
-        match temporary {
-            Temporary::Shared => arguments.bind("--bind", self.folder.temporary(), "/tmp"),
-            Temporary::Own => arguments.flag("--tmpfs").flag("/tmp"),
-        };
-        arguments
-            .same("--ro-bind", "/usr")
-            .bind("--symlink", "usr/lib", "/lib")
-            .bind("--symlink", "usr/lib64", "/lib64")
-            .bind("--symlink", "usr/bin", "/bin")
-            .bind("--symlink", "usr/sbin", "/sbin")
-            .same("--ro-bind", "/etc")
-            .flag("--proc")
-            .flag("/proc")
-            .bind("--ro-bind-try", launcher, SYSTEMD_RUN);
-        for folder in SYSTEM_FOLDERS {
-            arguments.same("--ro-bind-try", folder);
-        }
-        arguments
-            .flag("--tmpfs")
-            .flag("/run")
-            .bind("--ro-bind", launcher, INSIDE_LAUNCHER)
-            .same("--ro-bind-try", "/run/systemd/resolve")
-            .same("--ro-bind-try", "/run/udev")
-            .bind("--ro-bind-try", "/proc/self/ns/user", OUTER_USER_NAMESPACE)
-            .flag("--tmpfs")
-            .flag("/var")
-            .flag("--dir")
-            .flag("/var/tmp")
-            .flag("--dev")
-            .flag("/dev")
-            .flag("--tmpfs")
-            .flag("/dev/shm")
-            .flag("--perms")
-            .flag("0700")
-            .flag("--dir")
-            .path(folder::runtime_dir()?)
-            .flag("--dir")
-            .path(home);
-        Ok(arguments)
-    }
-
     /// The app, and the `.flatpak-info` at both places tools look for it to
     /// know they're in a sandbox and go through portals: `xdg-open` reads the
     /// one in the runtime folder, GLib the one at the root.
@@ -230,12 +145,19 @@ impl Profile<'_> {
         Ok(arguments)
     }
 
-    fn sound(&self) -> Result<Arguments, String> {
+    /// The session's PipeWire socket, where the sound server knows the app
+    /// by its sandbox, and the folder of the sandbox's own PulseAudio
+    /// server, which the app's sandbox keeps and the others only reach.
+    fn sound(&self, pulse: &str) -> Result<Arguments, String> {
         let runtime = folder::runtime_dir()?;
         let mut arguments = Arguments::default();
-        for socket in SOUND_SOCKETS {
-            arguments.same("--ro-bind-try", runtime.join(socket));
-        }
+        arguments
+            .same("--ro-bind-try", runtime.join(PIPEWIRE_SOCKET))
+            .bind(
+                pulse,
+                self.folder.pulse(),
+                runtime.join(crate::pulse::FOLDER),
+            );
         Ok(arguments)
     }
 
@@ -275,19 +197,25 @@ impl Profile<'_> {
         for folder in &self.grants.read_only_folders {
             arguments.same("--ro-bind", folder);
         }
-        if self.shares_home(home) {
-            arguments.same("--bind", &data);
-        } else if let Some(downloads) = dirs::download_dir().filter(|_| self.grants.downloads) {
+        arguments.same("--bind", &data);
+        if !self.shares_home(home)
+            && let Some(downloads) = dirs::download_dir().filter(|_| self.grants.downloads)
+        {
             arguments.same("--bind-try", downloads);
         }
         for folder in HOME_READ_ONLY {
-            arguments.same("--ro-bind-try", home.join(folder));
+            arguments.same("--ro-bind-try", home.join(folder)).bind(
+                "--ro-bind-try",
+                home.join(folder),
+                data.join(folder),
+            );
         }
         Ok(())
     }
 
-    /// Whether the app was given your home folder, where it then finds its
-    /// own folder at `~/.var/app/APP-ID` instead of in place of your home.
+    /// Whether the app was given your home folder. Its own folder then only
+    /// shows at `~/.var/app/APP-ID`, where every app finds it at the path it
+    /// has outside the sandbox, and not in place of your home as well.
     fn shares_home(&self, home: &Path) -> bool {
         self.grants
             .folders
@@ -302,82 +230,11 @@ impl Profile<'_> {
         arguments.bind("--ro-bind", launcher, XDG_OPEN);
         self.devices(&mut arguments);
         arguments.0.extend(self.display()?.0);
-        arguments.0.extend(self.sound()?.0);
+        arguments.0.extend(self.sound("--bind")?.0);
         arguments.0.extend(self.session_bus()?.0);
         self.files(&mut arguments, home)?;
         arguments.0.extend(self.app_files()?.0);
         Ok(arguments)
-    }
-
-    fn environment(&self, home: &Path) -> Result<Arguments, String> {
-        let runtime = folder::runtime_dir()?;
-        let mut arguments = Arguments::default();
-        arguments
-            .flag("--clearenv")
-            .set("HOME", home)
-            .set("PATH", "/usr/bin:/bin")
-            .set("XDG_RUNTIME_DIR", &runtime)
-            .set(
-                "DBUS_SESSION_BUS_ADDRESS",
-                format!("unix:path={}", runtime.join("bus").display()),
-            )
-            .set("APPDIR", INSIDE_APP)
-            .set("APPIMAGE", &self.app.image)
-            .set("OWD", home)
-            .set("DESKTOPINTEGRATION", "1")
-            .set("CHROME_DESKTOP", format!("{}.desktop", self.app.id));
-        if self.shares_home(home) {
-            let data = data_folder(home, &self.app.id)?;
-            arguments
-                .set("XDG_CONFIG_HOME", data.join(".config"))
-                .set("XDG_DATA_HOME", data.join(".local/share"))
-                .set("XDG_CACHE_HOME", data.join(".cache"))
-                .set("XDG_STATE_HOME", data.join(".local/state"));
-        }
-        if let Some(zypak) = zypak() {
-            arguments.set("ZYPAK_BIN", zypak).set("ZYPAK_LIB", zypak);
-        }
-        if self.wayland.is_some() {
-            arguments.set("WAYLAND_DISPLAY", "wayland-0");
-        }
-        if let Some(x11) = self.x11 {
-            arguments.set("DISPLAY", x11::DISPLAY);
-            if x11.authority.is_some() {
-                arguments.set("XAUTHORITY", runtime.join(X11_AUTHORITY));
-            }
-        }
-        for name in PASSED_ON {
-            if let Some(value) = std::env::var_os(name) {
-                arguments.set(name, value);
-            }
-        }
-        for (name, value) in std::env::vars_os() {
-            if name.to_string_lossy().starts_with("LC_") {
-                arguments.set(&name.to_string_lossy(), value);
-            }
-        }
-        for (name, value) in PORTAL_FILE_CHOOSER {
-            arguments.set(name, value);
-        }
-        Ok(arguments)
-    }
-
-    /// Chromium and Electron start their helpers through Zypak, which asks
-    /// the sandbox's portal for a sandbox of their own.
-    fn command(&self) -> Vec<OsString> {
-        if !self.app.chromium {
-            return vec![APP_RUN.into()];
-        }
-        match zypak() {
-            Some(zypak) => vec![
-                zypak.join(ZYPAK_HELPER).into(),
-                "host".into(),
-                "-".into(),
-                APP_RUN.into(),
-                CHROMIUM_PORTALS.into(),
-            ],
-            None => vec![APP_RUN.into(), NO_SANDBOX.into(), CHROMIUM_PORTALS.into()],
-        }
     }
 
     /// What the portal builds the app's nested sandboxes from.
@@ -390,10 +247,11 @@ impl Profile<'_> {
             floor: self.floor(&home, &launcher, Temporary::Own)?.0,
             gpu: self.gpu().0,
             display: self.display()?.0,
-            sound: self.sound()?.0,
+            sound: self.sound("--ro-bind")?.0,
             bus: self.session_bus()?.0,
             environment: self.environment(&home)?.0,
             offline: !self.grants.network,
+            own_ipc: !self.grants.x11,
         })
     }
 
@@ -405,11 +263,15 @@ impl Profile<'_> {
             .flag("--unshare-user")
             .flag("--disable-userns")
             .flag("--unshare-pid")
+            .flag("--unshare-uts")
             .flag("--unshare-cgroup-try")
             .flag("--die-with-parent")
             .flag("--new-session");
         if !self.grants.network {
             arguments.flag("--unshare-net");
+        }
+        if !self.grants.x11 {
+            arguments.flag("--unshare-ipc");
         }
         arguments.0.extend(self.mounts(&home, &launcher)?.0);
         arguments

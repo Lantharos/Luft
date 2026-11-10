@@ -49,7 +49,11 @@ fn ranked<'a>(catalog: &'a Catalog, ids: &[String], query: &str) -> Vec<&'a Entr
         .map(|entry| (Match::of(entry, &needle).unwrap_or(Match::Similar), entry))
         .partition(|(found, _)| *found != Match::Similar);
     close.sort_by_key(|(found, entry)| found.order(entry));
-    close.into_iter().chain(similar).map(|(_, entry)| entry).collect()
+    close
+        .into_iter()
+        .chain(similar)
+        .map(|(_, entry)| entry)
+        .collect()
 }
 
 /// Ranked by how well names match, then by schelf.store's search, which

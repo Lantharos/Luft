@@ -44,9 +44,9 @@ mod tests {
 
     #[test]
     fn reads_the_network_and_page() {
-        let (network, url) = parse("kestrel-signin:?network=Harbor%20Hotel&url=http%3A%2F%2Ffedoraproject.org%2Fstatic%2Fhotspot.txt").unwrap();
+        let (network, url) = parse("kestrel-signin:?network=Harbor%20Hotel&url=http%3A%2F%2Fluft.computer%2Fconnectivity").unwrap();
         assert_eq!(network, "Harbor Hotel");
-        assert_eq!(url.as_str(), "http://fedoraproject.org/static/hotspot.txt");
+        assert_eq!(url.as_str(), "http://luft.computer/connectivity");
     }
 
     #[test]

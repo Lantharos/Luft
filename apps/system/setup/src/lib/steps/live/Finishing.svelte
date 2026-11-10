@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { i18n, t } from '@luft/i18n';
-	import { ProgressBar } from '@luft/ui';
+	import { Dialog, ProgressBar } from '@luft/ui';
 	import { commands } from '#lib/bindings.js';
 	import { WAIT_FOR_PERSON } from '#lib/bridge/system.js';
 	import StepFrame from '#lib/components/StepFrame.svelte';
 	import EnrollSteps from '#lib/components/trust/EnrollSteps.svelte';
+	import { flow } from '#lib/state/flow.svelte.js';
 	import { install } from '#lib/state/install.svelte.js';
 	import { setup } from '#lib/state/setup.svelte.js';
 
@@ -22,24 +23,41 @@
 	let percent = $derived(Math.round((status?.progress ?? 0) * 100));
 	let percentFormat = $derived(new Intl.NumberFormat(i18n.formats, { style: 'percent' }));
 	let problem = $state('');
+	let showingDetails = $state(false);
 	let fromStick = $derived(!install.intent);
 
 	async function restartNow() {
 		problem = '';
 		await commands.sessionRestart(WAIT_FOR_PERSON).catch((error) => (problem = String(error)));
 	}
+
+	function tryAgain() {
+		void install.look();
+		flow.goTo('destination');
+	}
 </script>
 
 {#if install.failed}
-	<StepFrame title={t('setup-finishing-failed-title')} description={status?.error || t('setup-finishing-failed-description')}>
+	<StepFrame title={t('setup-finishing-failed-title')} description={t('setup-finishing-failed-description')}>
 		<p class="max-w-[540px] text-[14px] leading-relaxed text-[var(--text-soft)]">
 			{t(fromStick ? 'setup-finishing-failed-stick' : 'setup-finishing-failed-trying')}
 		</p>
 		{#snippet actions()}
+			{#if status?.error}
+				<button type="button" class="plain-button large" onclick={() => (showingDetails = true)}>{t('setup-finishing-details')}</button>
+			{/if}
 			<button type="button" class="plain-button large" onclick={() => commands.sessionFinish()}>{t(fromStick ? 'setup-finishing-use-stick' : 'setup-finishing-keep-trying')}</button>
-			<button type="button" class="button large px-6" onclick={restartNow}>{t('setup-restart')}</button>
+			<button type="button" class="button primary large px-6" onclick={tryAgain}>{t('setup-finishing-try-again')}</button>
 		{/snippet}
 	</StepFrame>
+	{#if showingDetails}
+		<Dialog title={t('setup-finishing-details-title')} description={t('setup-finishing-details-description')} wide onclose={() => (showingDetails = false)}>
+			<p class="text-[13px] leading-relaxed break-words whitespace-pre-wrap text-[var(--text-soft)] select-text">{status?.error}</p>
+			{#snippet actions()}
+				<button type="button" class="button" onclick={() => (showingDetails = false)}>{t('setup-close')}</button>
+			{/snippet}
+		</Dialog>
+	{/if}
 {:else if install.finished && code}
 	<StepFrame
 		title={t('setup-finishing-installed-title')}

@@ -1,3 +1,4 @@
+mod capture;
 mod devices;
 mod display;
 pub mod fds;
@@ -16,15 +17,16 @@ use luft_software::apps::appimage;
 use zbus::Connection;
 
 use crate::app::{App, Grants};
-use crate::escalate::{self, Reason};
+use crate::escalate::{self, Offers, Reason};
 use crate::files;
 use crate::portal::Bus;
 use crate::request::Request;
+use capture::Kind;
 use display::{wayland, x11};
 use folder::{Folder, Lock};
 pub use profile::INSIDE_LAUNCHER;
 use profile::Profile;
-use wait::Event;
+use wait::{Event, Watched};
 
 pub const BWRAP: &str = "bwrap";
 const QUICK_EXIT: Duration = Duration::from_secs(8);
@@ -137,7 +139,12 @@ fn sandbox(
     let mounted = mount::Image::mount(&app.image, &folder.mount_point())?;
     let proxy = proxy::Proxy::start(folder, &info, &app.id, &grants.bus)?;
     let display = wayland::SecurityContext::create(&folder.wayland_socket(), &app.id)?;
-    let x11 = x11::Display::of_session(&folder.x11_authority());
+    profile::write_accounts(&folder.accounts())?;
+    let x11 = if grants.x11 {
+        x11::Display::of_session(&folder.x11_authority())
+    } else {
+        Some(x11::Display::stand_in(&folder.x11_socket())?)
+    };
     let decoys = devices::Decoys::plant(&folder.decoys(), grants)?;
     let filter = seccomp::filter()?;
     let relay = folder.relay();
@@ -176,15 +183,25 @@ fn sandbox(
     Request::Launch { arguments }
         .send(server)
         .map_err(|error| error.to_string())?;
-    let mut device_offered = false;
-    let status = loop {
-        match wait::next(&mut child, &decoys)? {
-            Event::Exited(status) => break status,
-            Event::DeviceOpened if !device_offered => {
-                device_offered = true;
-                escalate::offer_in_background(app.asking(), Reason::Device);
+    let streams = capture::Watch::start(std::fs::read(&info).map_err(|error| error.to_string())?)?;
+    let watched = Watched {
+        decoys: &decoys,
+        display: x11.as_ref(),
+        streams: &streams,
+    };
+    let mut offers = Offers::new(app.asking());
+    let mut display_wanted = false;
+    let status = 'running: loop {
+        for event in wait::next(&mut child, watched)? {
+            match event {
+                Event::Exited(status) => break 'running status,
+                Event::DisplayWanted => display_wanted = true,
+                Event::DeviceOpened => offers.make(Reason::Device),
+                Event::CameraOpened | Event::StreamOpened(Kind::Video) => {
+                    offers.make(Reason::Camera);
+                }
+                Event::StreamOpened(Kind::Sound) => offers.make(Reason::Microphone),
             }
-            Event::DeviceOpened => {}
         }
     };
     drop(display);
@@ -192,9 +209,15 @@ fn sandbox(
     drop(proxy);
     drop(mounted);
     let _ = std::fs::remove_dir_all(&instance);
-    let quick_failure = !status.success() && started.elapsed() < QUICK_EXIT;
-    let code = status.code().unwrap_or(1);
-    Ok((code, quick_failure.then_some(Reason::Closed)))
+    let quick = started.elapsed() < QUICK_EXIT;
+    let reason = if quick && display_wanted {
+        Some(Reason::Display)
+    } else if quick && !status.success() {
+        Some(Reason::Closed)
+    } else {
+        None
+    };
+    Ok((status.code().unwrap_or(1), reason))
 }
 
 /// The sandbox's first process, from what bubblewrap wrote about it.

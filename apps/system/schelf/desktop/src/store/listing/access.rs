@@ -13,6 +13,12 @@ pub struct Declared {
     pub filesystems: Vec<String>,
     pub devices: Vec<String>,
     pub talk: Vec<String>,
+    #[serde(default)]
+    pub x11: bool,
+    #[serde(default)]
+    pub microphone: bool,
+    #[serde(default)]
+    pub camera: bool,
     pub unsandboxed: Option<String>,
 }
 
@@ -24,6 +30,9 @@ impl Declared {
             filesystems: Vec::new(),
             devices: Vec::new(),
             talk: Vec::new(),
+            x11: false,
+            microphone: false,
+            camera: false,
             unsandboxed: None,
         }
     }
@@ -34,6 +43,9 @@ impl Declared {
             filesystems: self.filesystems.clone(),
             devices: self.devices.clone(),
             talk: self.talk.clone(),
+            x11: self.x11,
+            microphone: self.microphone,
+            camera: self.camera,
             unsandboxed: self.unsandboxed.clone(),
         }
     }
@@ -55,7 +67,12 @@ impl Declared {
         if before.unsandboxed.is_some() {
             return false;
         }
-        if self.unsandboxed.is_some() || (self.network && !before.network) {
+        if self.unsandboxed.is_some()
+            || (self.network && !before.network)
+            || (self.x11 && !before.x11)
+            || (self.microphone && !before.microphone)
+            || (self.camera && !before.camera)
+        {
             return true;
         }
         let had = before.folders();
@@ -146,6 +163,9 @@ mod tests {
             filesystems: owned(filesystems),
             devices: owned(devices),
             talk: owned(talk),
+            x11: false,
+            microphone: false,
+            camera: false,
             unsandboxed: None,
         }
     }

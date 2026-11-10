@@ -1,5 +1,6 @@
 use anyhow::{Context, Result, bail};
 use luft_i18n::t;
+use zeroize::Zeroizing;
 
 use super::deployment::Deployment;
 use super::keyring;
@@ -11,7 +12,7 @@ const HOMES: &str = "/var/home";
 pub struct Account {
     pub name: String,
     pub full_name: String,
-    pub password: String,
+    pub password: Zeroizing<String>,
 }
 
 impl Account {
@@ -58,7 +59,7 @@ impl Account {
             .arg("--root")
             .arg(&deployment.root)
             .args(["--crypt-method", "YESCRYPT"])
-            .input(format!("{}:{}\n", self.name, self.password).as_bytes())
+            .input(Zeroizing::new(format!("{}:{}\n", self.name, *self.password)).as_bytes())
             .run()?;
         let folder = deployment.var(home.trim_start_matches("/var/"));
         std::fs::create_dir_all(&folder)?;
@@ -89,7 +90,7 @@ mod tests {
         Account {
             name: name.to_owned(),
             full_name: full_name.to_owned(),
-            password: "correct horse".to_owned(),
+            password: Zeroizing::new("correct horse".to_owned()),
         }
     }
 

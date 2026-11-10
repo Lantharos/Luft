@@ -12,6 +12,7 @@ use crate::dbus::{self, failed};
 
 pub(crate) const PORTAL: &str = "org.freedesktop.portal.Desktop";
 pub(crate) const PORTAL_PATH: &str = "/org/freedesktop/portal/desktop";
+const OPEN_URI: &str = "org.freedesktop.portal.OpenURI";
 const FILE_SCHEME: &str = "file://";
 
 static TOKENS: AtomicU32 = AtomicU32::new(0);
@@ -208,19 +209,61 @@ pub async fn camera() -> Result<Option<zbus::OwnedFd>, String> {
 /// outside a sandbox too.
 pub async fn reveal(path: &Path, token: Option<&str>) -> Result<(), String> {
     let file = std::fs::File::open(path).map_err(|error| error.to_string())?;
-    request(
-        "org.freedesktop.portal.OpenURI",
-        "OpenDirectory",
-        |handle| {
-            let mut options = HashMap::from([("handle_token", Variant::from(handle))]);
-            if let Some(token) = token {
-                options.insert("activation_token", Variant::from(token.to_owned()));
-            }
-            ("", zbus::Fd::from(&file), options)
-        },
-    )
+    request(OPEN_URI, "OpenDirectory", |handle| {
+        let mut options = HashMap::from([("handle_token", Variant::from(handle))]);
+        if let Some(token) = token {
+            options.insert("activation_token", Variant::from(token.to_owned()));
+        }
+        ("", zbus::Fd::from(&file), options)
+    })
     .await
     .map(drop)
+}
+
+async fn open_uri_portal() -> Result<Proxy<'static>, String> {
+    Proxy::new(dbus::session().await?, PORTAL, PORTAL_PATH, OPEN_URI)
+        .await
+        .map_err(failed)
+}
+
+fn activation(token: Option<&str>) -> HashMap<&'static str, Variant<'_>> {
+    token
+        .map(|token| ("activation_token", Variant::from(token)))
+        .into_iter()
+        .collect()
+}
+
+/// Opens `uri` in the person's default app for it, which the portal starts
+/// outside this app's sandbox.
+pub async fn open_uri(uri: &str, token: Option<&str>) -> Result<(), String> {
+    if let Some(path) = uri_path(uri) {
+        return open_path(&path, token).await;
+    }
+    open_uri_portal()
+        .await?
+        .call::<_, _, OwnedObjectPath>("OpenURI", &("", uri, activation(token)))
+        .await
+        .map(drop)
+        .map_err(failed)
+}
+
+/// Opens a web or mail link from a page in the person's default app for it.
+pub async fn open_web_link(uri: &str, token: Option<&str>) -> Result<(), String> {
+    if !crate::launch::is_web_link(uri) {
+        return Err("Only web and mail links open in other apps".to_owned());
+    }
+    open_uri(uri, token).await
+}
+
+/// Opens the file or folder at `path` in the person's default app for it.
+pub async fn open_path(path: &Path, token: Option<&str>) -> Result<(), String> {
+    let file = std::fs::File::open(path).map_err(|error| error.to_string())?;
+    open_uri_portal()
+        .await?
+        .call::<_, _, OwnedObjectPath>("OpenFile", &("", zbus::Fd::from(&file), activation(token)))
+        .await
+        .map(drop)
+        .map_err(failed)
 }
 
 pub fn path_uri(path: &Path) -> String {

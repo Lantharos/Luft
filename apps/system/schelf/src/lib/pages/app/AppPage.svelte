@@ -20,15 +20,17 @@
 	import Provenance from './Provenance.svelte';
 	import PulledNotice from './PulledNotice.svelte';
 	import ReplacedNotice from './ReplacedNotice.svelte';
+	import SandboxAccess from './SandboxAccess.svelte';
 	import { installedFor, load, type Loaded } from './load';
 
-	let { target, name, askFullAccess = false }: { target: AppTarget; name: string; askFullAccess?: boolean } = $props();
+	let { target, name, askFullAccess = false, reviewAccess = false }: { target: AppTarget; name: string; askFullAccess?: boolean; reviewAccess?: boolean } = $props();
 
 	let loaded = $state<Loaded | null>(null);
 	let localPermissions = $state<Permissions | null>(null);
 	let unsandboxedReason = $state<string | null>(null);
 	let fullAccess = $state(false);
 	let asking = $state(false);
+	let reviewing = $state(false);
 
 	const details = $derived(loaded?.details ?? null);
 	const installed = $derived(installedFor(target));
@@ -47,7 +49,19 @@
 
 	$effect(() => {
 		asking = askFullAccess;
+		reviewing = reviewAccess;
 	});
+
+	function readSandbox(id: string) {
+		void commands
+			.librarySandbox({ id })
+			.then((result) => {
+				if (installed?.id !== id) return;
+				localPermissions = result.permissions;
+				unsandboxedReason = result.unsandboxed;
+			})
+			.catch(() => {});
+	}
 
 	$effect(() => {
 		const current = target;
@@ -62,14 +76,7 @@
 		localPermissions = null;
 		unsandboxedReason = null;
 		if (app?.source === 'appImage') {
-			void commands
-				.librarySandbox({ id: app.id })
-				.then((result) => {
-					if (installed?.id !== app.id) return;
-					localPermissions = result.permissions;
-					unsandboxedReason = result.unsandboxed;
-				})
-				.catch(() => {});
+			readSandbox(app.id);
 			return;
 		}
 		if (app?.source !== 'flatpak' || !app.installation || !app.reference) return;
@@ -106,7 +113,7 @@
 					<p class="text-[14px] text-[var(--text-soft)]">{summary}</p>
 				{/if}
 			</div>
-			<AppActions name={title} {listing} {store} {installed} pulled={block?.action === 'block'} />
+			<AppActions name={title} {listing} {store} {installed} permissions={details?.permissions ?? null} pulled={block?.action === 'block'} />
 		</header>
 
 		{#if block && installed}
@@ -148,6 +155,9 @@
 			{/if}
 			{#if sandboxed}
 				<AccessList permissions={fullAccess ? null : permissions}>
+					{#if sandboxed.source === 'appImage' && !fullAccess && localPermissions}
+						<SandboxAccess app={sandboxed} permissions={localPermissions} bind:open={reviewing} onchange={() => readSandbox(sandboxed.id)} />
+					{/if}
 					<FullAccess app={sandboxed} reason={unsandboxedReason} bind:on={fullAccess} bind:asking />
 				</AccessList>
 			{:else if permissions}

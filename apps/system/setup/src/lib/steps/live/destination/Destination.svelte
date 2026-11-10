@@ -14,6 +14,7 @@
 	import Alongside from './Alongside.svelte';
 	import Custom from './Custom.svelte';
 	import MeetRoom from './MeetRoom.svelte';
+	import MovingBox from './MovingBox.svelte';
 	import Replace from './Replace.svelte';
 	import WholeDrive from './WholeDrive.svelte';
 	import { begin } from '../begin.js';
@@ -42,6 +43,7 @@
 	let wholeDrive = $state<string | null>(null);
 	let freeSpace = $state<string | null>(null);
 	let confirming = $state(false);
+	let boxSkipped = $state(false);
 
 	let survey = $derived(install.survey);
 	let windowsDrive = $derived(install.windowsDrive as (Drive & { windows: WindowsVolume }) | null);
@@ -166,7 +168,7 @@
 			<Choice icon={SlidersHorizontal} title={t('setup-destination-custom-choice')} description={t('setup-destination-custom-choice-description')} onclick={() => open('custom')} />
 		</div>
 	{:else if view === 'alongside' && meet?.space && meetDrive}
-		<MeetRoom drive={meetDrive} space={meet.space} packed={meet.movingBox?.bytes ?? null} elsewhere={meetElsewhere} />
+		<MeetRoom drive={meetDrive} space={meet.space} packed={install.movingBox?.bytes ?? null} elsewhere={meetElsewhere} />
 	{:else if view === 'alongside' && windowsDrive}
 		<Alongside drive={windowsDrive} smallest={survey.smallestSystem} onsize={(next) => (size = next)} />
 	{:else if view === 'whole'}
@@ -193,6 +195,10 @@
 		{/if}
 	{/snippet}
 </StepFrame>
+
+{#if survey?.meet?.movingBox && !install.movingBox && !boxSkipped}
+	<MovingBox onskip={() => (boxSkipped = true)} />
+{/if}
 
 {#if confirming && target}
 	<ConfirmInstall {target} onconfirm={() => start(target!)} onclose={() => (confirming = false)} />

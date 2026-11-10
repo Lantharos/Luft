@@ -3,7 +3,6 @@ mod host;
 mod notes;
 mod registry;
 mod updater;
-mod version;
 
 use std::collections::HashSet;
 

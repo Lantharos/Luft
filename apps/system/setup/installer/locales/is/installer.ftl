@@ -61,6 +61,5 @@ installer-set-aside-failed = Ekki tókst að leggja gamla kerfið til hliðar
 ## Things packed with Meet Luft
 
 installer-box-unopened = Ekki tókst að opna flutningskassann
-installer-box-no-list = Flutningskassinn er ekki með lista yfir innihaldið
 installer-unpack-failed = Ekki tókst að taka upp { $path }
 installer-wallpaper-unnamed = Bakgrunnsmyndin hefur ekkert heiti

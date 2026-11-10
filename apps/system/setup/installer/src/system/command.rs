@@ -3,10 +3,11 @@ use std::io::Write;
 use std::process::{Child, Command, Stdio};
 
 use anyhow::{Context, Result, bail};
+use zeroize::Zeroizing;
 
 pub struct Tool {
     command: Command,
-    input: Option<Vec<u8>>,
+    input: Option<Zeroizing<Vec<u8>>>,
 }
 
 impl Tool {
@@ -34,7 +35,7 @@ impl Tool {
     }
 
     pub fn input(mut self, input: &[u8]) -> Self {
-        self.input = Some(input.to_vec());
+        self.input = Some(Zeroizing::new(input.to_vec()));
         self
     }
 

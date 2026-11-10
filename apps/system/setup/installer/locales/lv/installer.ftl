@@ -61,6 +61,5 @@ installer-set-aside-failed = Veco sistēmu neizdevās novietot malā
 ## Things packed with Meet Luft
 
 installer-box-unopened = Pārvākšanās kasti neizdevās atvērt
-installer-box-no-list = Pārvākšanās kastē nav tās satura saraksta
 installer-unpack-failed = Neizdevās izpakot { $path }
 installer-wallpaper-unnamed = Fona attēlam nav nosaukuma

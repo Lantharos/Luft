@@ -25,6 +25,12 @@ pub enum Lock {
     Running,
 }
 
+/// The name this launch's sandbox goes by. Its prefix tells the sound
+/// server the app is one of Schelf's, which records only when allowed.
+pub fn instance_id() -> String {
+    format!("schelf-{}", std::process::id())
+}
+
 pub fn runtime_dir() -> Result<PathBuf, String> {
     std::env::var_os("XDG_RUNTIME_DIR")
         .map(PathBuf::from)
@@ -158,6 +164,21 @@ impl Folder {
         self.path.join("Xauthority")
     }
 
+    /// The socket the app finds where the X11 display would be.
+    pub fn x11_socket(&self) -> PathBuf {
+        self.path.join("x11")
+    }
+
+    /// The account files the app sees in place of the computer's.
+    pub fn accounts(&self) -> PathBuf {
+        self.path.join("accounts")
+    }
+
+    /// Where the sandbox's own PulseAudio server listens.
+    pub fn pulse(&self) -> PathBuf {
+        self.path.join("pulse")
+    }
+
     pub fn decoys(&self) -> PathBuf {
         self.path.join("devices")
     }
@@ -173,6 +194,8 @@ impl Folder {
             self.proxy(),
             self.server(),
             self.decoys(),
+            self.accounts(),
+            self.pulse(),
             self.temporary(),
         ] {
             private_folder(&folder)?;
@@ -183,9 +206,7 @@ impl Folder {
     /// Where the desktop portal looks for the sandbox's process, as it does
     /// for a running Flatpak.
     pub fn instance(&self) -> Result<PathBuf, String> {
-        Ok(runtime_dir()?
-            .join(".flatpak")
-            .join(std::process::id().to_string()))
+        Ok(runtime_dir()?.join(".flatpak").join(instance_id()))
     }
 
     /// Writes the sandbox's `.flatpak-info`, which names the app and, as
@@ -196,7 +217,7 @@ impl Folder {
         talk: impl IntoIterator<Item = &'a str>,
     ) -> Result<PathBuf, String> {
         let path = self.path.join("flatpak-info");
-        let instance = std::process::id();
+        let instance = instance_id();
         let mut info = format!(
             "[Application]\nname={id}\n\n[Instance]\ninstance-id={instance}\nsession-bus-proxy=true\n\n[Session Bus Policy]\n{id}=own\n{id}.*=own\n"
         );
@@ -216,6 +237,9 @@ impl Folder {
             "server",
             "devices",
             "wayland",
+            "x11",
+            "accounts",
+            "pulse",
             "Xauthority",
             "flatpak-info",
             UNSANDBOXED_APP,

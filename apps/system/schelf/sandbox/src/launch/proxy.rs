@@ -19,12 +19,13 @@ pub const TALK: [&str; 4] = [
 ];
 
 /// The parts of Kestrel every app may use: its palette, so it looks like
-/// the desktop, and the Send sheet, which takes files the app hands over
-/// and asks people where they go.
+/// the desktop, the Send sheet, which takes files the app hands over and
+/// asks people where they go, and playing a sound of the sound theme.
 const KESTREL: &str = "com.lantharos.Kestrel";
 const PALETTE_PATH: &str = "/com/lantharos/Kestrel/Appearance";
 const PALETTE_CALLS: [&str; 2] = ["Get", "GetAll"];
 const SEND: &str = "com.lantharos.Kestrel.Share.Send@/com/lantharos/Kestrel/Share";
+const PLAY_SOUND: &str = "com.lantharos.Kestrel.Sounds.Play@/com/lantharos/Kestrel/Sounds";
 
 /// The app's filtered view of the session bus. The proxy runs in a sandbox
 /// of its own that carries the app's sandbox info, so services that look at
@@ -61,7 +62,7 @@ fn rules(id: &str, talk: &[String]) -> Vec<String> {
     rules.push(format!(
         "--broadcast={KESTREL}=org.freedesktop.DBus.Properties.PropertiesChanged@{PALETTE_PATH}"
     ));
-    rules.push(format!("--call={KESTREL}={SEND}"));
+    rules.extend([SEND, PLAY_SOUND].map(|call| format!("--call={KESTREL}={call}")));
     rules
 }
 

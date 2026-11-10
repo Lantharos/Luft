@@ -28,6 +28,13 @@ export const commands = {
 		windows?: WindowsChoices,
 		encryption?: Encryption | null,
 	}, options?: CallOptions) => invoke<null>("installer_install", params, options),
+	installerNetworkType: (params: {
+		connection: string,
+		networkType: string,
+	}, options?: CallOptions) => invoke<null>("installer_network_type", params, options),
+	installerOpenBox: (params: {
+		code: string,
+	}, options?: CallOptions) => invoke<MovingBox>("installer_open_box", params, options),
 	installerState: (options?: CallOptions) => invoke<InstallerState | null>("installer_state", {}, options),
 	installerSurvey: (options?: CallOptions) => invoke<Survey>("installer_survey", {}, options),
 	networkActivate: (params: {
@@ -399,7 +406,7 @@ export type MeetSurvey = {
 	otherDrive: boolean,
 	intent: Intent,
 	room: Room | null,
-	movingBox: MovingBox | null,
+	movingBox: boolean,
 };
 
 export type Metered = "automatic" | "yes" | "no";

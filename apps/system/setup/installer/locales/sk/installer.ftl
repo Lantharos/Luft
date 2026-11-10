@@ -61,6 +61,5 @@ installer-set-aside-failed = Starý systém sa nepodarilo odložiť bokom
 ## Things packed with Meet Luft
 
 installer-box-unopened = Sťahovaciu krabicu sa nepodarilo otvoriť
-installer-box-no-list = Sťahovacia krabica nemá zoznam svojho obsahu
 installer-unpack-failed = Nepodarilo sa rozbaliť { $path }
 installer-wallpaper-unnamed = Pozadie nemá názov

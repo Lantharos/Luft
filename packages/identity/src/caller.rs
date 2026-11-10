@@ -10,6 +10,7 @@ use zbus::names::BusName;
 
 use crate::permissions::{self, FULL_ACCESS};
 use crate::process::{self, Sandbox};
+use crate::unit::{self, SessionUnit};
 
 pub use crate::process::pid_of;
 
@@ -66,6 +67,19 @@ pub async fn of_sender(connection: &Connection, header: &Header<'_>) -> Caller {
         Some(pidfd) => of_process(connection, pidfd.as_fd()).await,
         None => Caller::Unknown,
     }
+}
+
+/// The unit of the desktop that sent a message, when a process in the
+/// session slice of its own account's systemd did.
+pub async fn session_unit(connection: &Connection, header: &Header<'_>) -> Option<SessionUnit> {
+    let credentials = DBusProxy::new(connection)
+        .await
+        .ok()?
+        .get_connection_credentials(BusName::Unique(header.sender()?.to_owned()))
+        .await
+        .ok()?;
+    let cgroup = process::cgroup_of(credentials.process_fd()?.as_fd())?;
+    unit::session_unit(&cgroup).filter(|unit| credentials.unix_user_id() == Some(unit.uid))
 }
 
 /// Refuses the call unless it comes from you rather than an app in a sandbox.

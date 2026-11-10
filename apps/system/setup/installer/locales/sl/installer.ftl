@@ -61,6 +61,5 @@ installer-set-aside-failed = Starega sistema ni bilo mogoče umakniti
 ## Things packed with Meet Luft
 
 installer-box-unopened = Selitvene škatle ni bilo mogoče odpreti
-installer-box-no-list = Selitvena škatla nima seznama vsebine
 installer-unpack-failed = Datoteke { $path } ni bilo mogoče razpakirati
 installer-wallpaper-unnamed = Ozadje nima imena

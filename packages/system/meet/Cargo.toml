@@ -8,12 +8,16 @@ edition.workspace = true
 rust-version.workspace = true
 
 [dependencies]
+argon2 = { workspace = true, features = ["alloc"] }
+chacha20poly1305 = { workspace = true, features = ["zeroize"] }
+getrandom.workspace = true
 icu_locale_core.workspace = true
 icu_time = { workspace = true, features = ["compiled_data"] }
 roxmltree.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 specta.workspace = true
+zeroize.workspace = true
 
 [lints]
 workspace = true

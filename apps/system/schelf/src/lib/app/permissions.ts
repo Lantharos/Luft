@@ -1,5 +1,6 @@
 import type { Component } from 'svelte';
 import AppWindow from '@lucide/svelte/icons/app-window';
+import Camera from '@lucide/svelte/icons/camera';
 import Folder from '@lucide/svelte/icons/folder';
 import FolderOpen from '@lucide/svelte/icons/folder-open';
 import Gamepad2 from '@lucide/svelte/icons/gamepad-2';
@@ -7,6 +8,7 @@ import Globe from '@lucide/svelte/icons/globe';
 import HardDrive from '@lucide/svelte/icons/hard-drive';
 import KeyRound from '@lucide/svelte/icons/key-round';
 import MessagesSquare from '@lucide/svelte/icons/messages-square';
+import Mic from '@lucide/svelte/icons/mic';
 import Printer from '@lucide/svelte/icons/printer';
 import ShieldCheck from '@lucide/svelte/icons/shield-check';
 import SquareTerminal from '@lucide/svelte/icons/square-terminal';
@@ -81,10 +83,18 @@ export function describe(permissions: Permissions): Access[] {
 		if (has(permissions.devices, 'serial')) access.push({ icon: Usb, title: 'Serial devices', description: 'It can talk to boards and other devices on a serial port.', notable: true });
 		if (has(permissions.devices, 'input')) access.push({ icon: Gamepad2, title: 'Game controllers', description: 'It can read controllers and other input devices.', notable: false });
 	}
-	if (has(permissions.sockets, 'x11') && !has(permissions.sockets, 'fallback-x11') && !has(permissions.sockets, 'wayland')) {
-		access.push({ icon: AppWindow, title: 'Older display system', description: 'It uses X11, which lets it see what other apps show and type.', notable: true });
+	if (has(permissions.sockets, 'x11') && !has(permissions.sockets, 'fallback-x11')) {
+		access.push({
+			icon: AppWindow,
+			title: 'Older way of showing windows',
+			description: 'It can use X11, where apps can see each other’s windows and what you type in them.',
+			notable: !has(permissions.sockets, 'wayland')
+		});
 	}
+	if (has(permissions.devices, 'microphone')) access.push({ icon: Mic, title: 'Microphone', description: 'It can record sound, from the microphone and from what this computer plays.', notable: true });
+	if (has(permissions.devices, 'camera')) access.push({ icon: Camera, title: 'Camera', description: 'It can use the cameras of this computer.', notable: true });
 	if (has(permissions.sockets, 'pulseaudio')) access.push({ icon: Volume2, title: 'Sound', description: 'It can play sound and may be able to record it.', notable: false });
+	if (has(permissions.sockets, 'playback')) access.push({ icon: Volume2, title: 'Sound', description: 'It can play sound.', notable: false });
 	if (bus.includes('org.freedesktop.secrets')) access.push({ icon: KeyRound, title: 'Saved passwords', description: 'It can use the passwords stored on this computer.', notable: true });
 	if (has(permissions.sockets, 'ssh-auth') || has(permissions.sockets, 'gpg-agent')) access.push({ icon: KeyRound, title: 'Your keys', description: 'It can use your SSH or GPG keys.', notable: true });
 	if (has(permissions.sockets, 'cups')) access.push({ icon: Printer, title: 'Printers', description: 'It can print directly.', notable: false });

@@ -1,4 +1,5 @@
 import { commands, type Permissions } from '#lib/bindings.js';
+import { describe, type Access } from '#lib/app/permissions.js';
 import type { AppDetails, Screenshot } from './types';
 
 interface ScreenshotSize {
@@ -54,6 +55,12 @@ function permissions(summary: Summary): Permissions | null {
 		sessionBus: bus(listed['session-bus']),
 		systemBus: bus(listed['system-bus'])
 	};
+}
+
+export async function broadAccess(id: string, known: Permissions | null = null): Promise<Access[]> {
+	const listed = known ?? permissions(await commands.flathubSummary({ id }).catch((): Summary => ({})));
+	const access = listed ? describe(listed) : [];
+	return access.some((entry) => entry.notable) ? access : [];
 }
 
 function verified(metadata: Appstream['metadata']): string | null {

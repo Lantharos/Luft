@@ -61,6 +61,5 @@ installer-set-aside-failed = Nie udało się odłożyć starego systemu na bok
 ## Things packed with Meet Luft
 
 installer-box-unopened = Nie udało się otworzyć kartonu przeprowadzkowego
-installer-box-no-list = Karton przeprowadzkowy nie zawiera spisu zawartości
 installer-unpack-failed = Nie udało się rozpakować { $path }
 installer-wallpaper-unnamed = Tapeta nie ma nazwy

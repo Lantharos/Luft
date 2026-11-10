@@ -61,6 +61,5 @@ installer-set-aside-failed = Não foi possível pôr de parte o sistema antigo
 ## Things packed with Meet Luft
 
 installer-box-unopened = Não foi possível abrir a caixa de mudança
-installer-box-no-list = A caixa de mudança não tem uma lista do que contém
 installer-unpack-failed = Não foi possível desempacotar { $path }
 installer-wallpaper-unnamed = A imagem de fundo não tem nome

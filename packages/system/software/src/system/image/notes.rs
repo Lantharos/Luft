@@ -1,11 +1,10 @@
 use std::collections::BTreeMap;
 
+use luft_variant::Version;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
 use crate::http;
-
-use super::version::newer;
 
 const DOWNLOADS: &str = "https://get.luft.computer";
 
@@ -61,7 +60,10 @@ pub fn merge(lists: impl IntoIterator<Item = Vec<Section>>) -> Option<Vec<Sectio
 pub fn between(channel: &str, installed: &str, offered: &str) -> Option<Vec<Section>> {
     let mut gathered = Vec::new();
     let mut version = Some(offered.to_owned());
-    while let Some(current) = version.take().filter(|current| newer(current, installed)) {
+    while let Some(current) = version
+        .take()
+        .filter(|current| Version::newer(current, installed))
+    {
         let Some(Notes { previous, notes }) = fetch(channel, &current) else {
             break;
         };

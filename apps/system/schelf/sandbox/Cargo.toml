@@ -16,6 +16,7 @@ luft-dbus-macros.workspace = true
 luft-i18n.workspace = true
 luft-identity.workspace = true
 luft-software.workspace = true
+pipewire.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 tokio = { workspace = true, features = ["macros", "rt", "time"] }

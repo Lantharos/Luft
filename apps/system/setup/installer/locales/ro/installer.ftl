@@ -61,6 +61,5 @@ installer-set-aside-failed = Vechiul sistem nu a putut fi pus deoparte
 ## Things packed with Meet Luft
 
 installer-box-unopened = Cutia de mutare nu a putut fi deschisă
-installer-box-no-list = Cutia de mutare nu are o listă cu conținutul ei
 installer-unpack-failed = Nu s-a putut despacheta { $path }
 installer-wallpaper-unnamed = Imaginea de fundal nu are nume

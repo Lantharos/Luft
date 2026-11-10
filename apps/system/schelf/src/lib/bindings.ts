@@ -76,6 +76,11 @@ export const commands = {
 		desktop: string,
 		setting: Setting,
 	}, options?: CallOptions) => invoke<null>("library_set_notification", params, options),
+	librarySetSandboxSwitch: (params: {
+		id: string,
+		switch: Switch,
+		on: boolean,
+	}, options?: CallOptions) => invoke<boolean>("library_set_sandbox_switch", params, options),
 	operationsCancel: (params: {
 		id: number,
 	}, options?: CallOptions) => invoke<null>("operations_cancel", params, options),
@@ -249,6 +254,9 @@ export type Declared = {
 	filesystems: string[],
 	devices: string[],
 	talk: string[],
+	x11: boolean,
+	microphone: boolean,
+	camera: boolean,
 	unsandboxed: string | null,
 };
 
@@ -393,12 +401,14 @@ export type OnFlathub = {
 	verified: boolean,
 };
 
-export type OpenedFile = { kind: "flatpakRef"; path: string; id: string; title: string; branch: string | null; url: string; runtime: boolean; summary: string | null; homepage: string | null; icon: string | null } | { kind: "flatpakBundle"; path: string; id: string; title: string; branch: string; summary: string | null; icon: string | null; size: number; runtime: string | null; 
+export type OpenedFile = { kind: "flatpakRef"; path: string; id: string; title: string; branch: string | null; url: string; runtime: boolean; summary: string | null; homepage: string | null } | { kind: "flatpakBundle"; path: string; id: string; title: string; branch: string; summary: string | null; icon: string | null; size: number; runtime: string | null; 
 /**
  *  The repository it keeps getting updates from, when it was built
  *  with one's address.
  */
-origin: string | null } | { kind: "flatpakRepo"; path: string; name: string; title: string; url: string; summary: string | null; homepage: string | null } | { kind: "package"; path: string; package: string; version: string; summary: string; description: string; license: string; homepage: string | null; size: number; installed: boolean; system: boolean; desktop: string | null; repository: CheckedSource | null; repositoryError: string | null; verified: boolean } | { kind: "deb"; path: string; package: string; name: string; version: string; summary: string; description: string; homepage: string | null; size: number; icon: string | null; installed: boolean; runsHere: boolean; flathub: OnFlathub | null } | { kind: "appImage"; path: string; name: string; summary: string | null; version: string | null; icon: string | null; size: number; 
+origin: string | null; 
+/**  What its sandbox opens to it. */
+permissions: Permissions | null } | { kind: "flatpakRepo"; path: string; name: string; title: string; url: string; summary: string | null; homepage: string | null } | { kind: "package"; path: string; package: string; version: string; summary: string; description: string; license: string; homepage: string | null; size: number; installed: boolean; system: boolean; desktop: string | null; repository: CheckedSource | null; repositoryError: string | null; verified: boolean } | { kind: "deb"; path: string; package: string; name: string; version: string; summary: string; description: string; homepage: string | null; size: number; icon: string | null; installed: boolean; runsHere: boolean; flathub: OnFlathub | null } | { kind: "appImage"; path: string; name: string; summary: string | null; version: string | null; icon: string | null; size: number; 
 /**  What it declared it needs, for a Sabine app. */
 permissions: Permissions | null; 
 /**  Why it asks to run outside a sandbox, when it does. */
@@ -571,6 +581,8 @@ export type StoreUpdate = {
 	 */
 	replacement: string | null,
 };
+
+export type Switch = "downloads" | "x11" | "microphone" | "camera";
 
 export type ToolSummary = {
 	package: string,

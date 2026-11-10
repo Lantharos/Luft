@@ -1,3 +1,5 @@
+use std::os::fd::{AsFd, BorrowedFd};
+use std::os::unix::net::UnixListener;
 use std::path::{Path, PathBuf};
 
 /// The display number apps see. No X server of the session listens on it,
@@ -7,10 +9,13 @@ pub const DISPLAY: &str = ":99";
 pub const SOCKET: &str = "/tmp/.X11-unix/X99";
 const NUMBER: &[u8] = b"99";
 
-/// The session's X11 display, handed to the app as display 99.
+/// What the app finds as display 99: the session's X11 display when you
+/// gave it that, and otherwise a socket nobody answers, which tells the
+/// launcher the app looked for one.
 pub struct Display {
     pub socket: PathBuf,
     pub authority: Option<PathBuf>,
+    asked_at: Option<UnixListener>,
 }
 
 struct Cookie<'a> {
@@ -76,6 +81,40 @@ impl Display {
                 std::fs::write(authority, renumbered(&cookies, number.as_bytes())).ok()
             })
             .map(|()| authority.to_path_buf());
-        Some(Self { socket, authority })
+        Some(Self {
+            socket,
+            authority,
+            asked_at: None,
+        })
+    }
+
+    /// A socket at `socket` that hangs up on whoever connects.
+    pub fn stand_in(socket: &Path) -> Result<Self, String> {
+        let listener = UnixListener::bind(socket).map_err(|error| error.to_string())?;
+        listener
+            .set_nonblocking(true)
+            .map_err(|error| error.to_string())?;
+        Ok(Self {
+            socket: socket.to_path_buf(),
+            authority: None,
+            asked_at: Some(listener),
+        })
+    }
+
+    /// What to watch to learn that the app looked for an X11 display.
+    pub fn asked_fd(&self) -> Option<BorrowedFd<'_>> {
+        self.asked_at.as_ref().map(UnixListener::as_fd)
+    }
+
+    /// Hangs up on the app's connections, and says whether there were any.
+    pub fn asked(&self) -> bool {
+        let Some(listener) = &self.asked_at else {
+            return false;
+        };
+        let mut asked = false;
+        while listener.accept().is_ok() {
+            asked = true;
+        }
+        asked
     }
 }

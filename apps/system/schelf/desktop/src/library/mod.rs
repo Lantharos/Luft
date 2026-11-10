@@ -111,6 +111,7 @@ pub fn register(window: SabineWindow) -> SabineWindow {
         .command("library_launch", launch)
         .command("library_permissions", permissions)
         .command_async("library_sandbox", appimages::sandbox)
+        .command_async("library_set_sandbox_switch", appimages::set_switch)
         .command_async("library_full_access", full_access::has)
         .command_async("library_set_full_access", full_access::set)
         .command_async("library_restart", full_access::restart)

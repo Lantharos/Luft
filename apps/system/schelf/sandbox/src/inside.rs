@@ -24,6 +24,7 @@ pub fn serve(arguments: Vec<String>) -> i32 {
         eprintln!("The sandbox couldn't be confined: {error}");
         return 1;
     }
+    crate::pulse::serve_when_asked();
     let running = Arc::new(Mutex::new(HashSet::new()));
     let first = listener
         .accept()

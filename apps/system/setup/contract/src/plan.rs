@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use specta::Type;
+use zeroize::Zeroizing;
 
 #[derive(Serialize, Deserialize, Type)]
 #[serde(
@@ -25,9 +26,11 @@ pub struct WindowsChoices {
 #[derive(Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Encryption {
-    pub recovery_key: String,
+    #[specta(type = String)]
+    pub recovery_key: Zeroizing<String>,
     #[serde(default)]
-    pub passphrase: String,
+    #[specta(type = String)]
+    pub passphrase: Zeroizing<String>,
 }
 
 #[derive(Serialize, Deserialize, Type)]

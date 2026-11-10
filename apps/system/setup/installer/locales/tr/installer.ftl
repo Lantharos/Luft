@@ -61,6 +61,5 @@ installer-set-aside-failed = Eski sistem bir kenara alınamadı
 ## Things packed with Meet Luft
 
 installer-box-unopened = Taşınma kutusu açılamadı
-installer-box-no-list = Taşınma kutusunda içindekilerin listesi yok
 installer-unpack-failed = Paketten çıkarılamadı: { $path }
 installer-wallpaper-unnamed = Duvar kâğıdının adı yok

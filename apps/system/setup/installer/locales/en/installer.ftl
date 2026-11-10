@@ -68,7 +68,9 @@ installer-set-aside-failed = The old system couldn't be set aside
 
 # The moving box holds the files someone packed in Windows to bring into Luft
 installer-box-unopened = The moving box couldn't be opened
-installer-box-no-list = The moving box has no list of what's in it
+# The code is the one Meet Luft showed in Windows after packing
+installer-box-wrong-code = That code doesn't open the moving box
+installer-box-unsealed = The moving box isn't locked with a code, so it isn't unpacked
 # $path is a file path
 installer-unpack-failed = Couldn't unpack { $path }
 installer-wallpaper-unnamed = The wallpaper has no name

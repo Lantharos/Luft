@@ -18,6 +18,11 @@ const FILESYSTEMS: [&str; 7] = [
     "xdg-videos",
 ];
 const DEVICES: [&str; 3] = ["usb", "serial", "all"];
+const PLAYBACK: &str = "playback";
+const MICROPHONE: &str = "microphone";
+const CAMERA: &str = "camera";
+const DOWNLOADS: &str = "xdg-download";
+const HOME: &str = "home";
 const REFUSED_NAMES: [&str; 6] = [
     "com.lantharos.Kestrel",
     "org.freedesktop.impl.portal",
@@ -35,6 +40,13 @@ pub struct Declaration {
     pub filesystems: Vec<String>,
     pub devices: Vec<String>,
     pub talk: Vec<String>,
+    /// Whether it draws through X11, where apps see each other's windows
+    /// and typing.
+    pub x11: bool,
+    /// Whether it records sound.
+    pub microphone: bool,
+    /// Whether it uses cameras.
+    pub camera: bool,
     /// Why it asks to run outside a sandbox, when it does.
     pub unsandboxed: Option<String>,
 }
@@ -46,6 +58,9 @@ impl Default for Declaration {
             filesystems: Vec::new(),
             devices: Vec::new(),
             talk: Vec::new(),
+            x11: false,
+            microphone: false,
+            camera: false,
             unsandboxed: None,
         }
     }
@@ -66,6 +81,12 @@ struct Table {
     devices: Vec<String>,
     #[serde(default)]
     talk: Vec<String>,
+    #[serde(default)]
+    x11: bool,
+    #[serde(default)]
+    microphone: bool,
+    #[serde(default)]
+    camera: bool,
     #[serde(default)]
     unsandboxed: bool,
     reason: Option<String>,
@@ -146,24 +167,59 @@ impl Declaration {
             filesystems: table.filesystems,
             devices: table.devices,
             talk: table.talk,
+            x11: table.x11,
+            microphone: table.microphone,
+            camera: table.camera,
             unsandboxed: None,
         })
     }
 
-    /// The declaration in Flatpak's words, as Schelf shows every app's access.
+    /// Whether what it asked for already takes in your Downloads folder.
+    fn reaches_downloads(&self) -> bool {
+        self.filesystems.iter().any(|place| {
+            [DOWNLOADS, HOME].contains(&place.strip_suffix(READ_ONLY).unwrap_or(place))
+                && !place.ends_with(READ_ONLY)
+        })
+    }
+
+    /// What a sandbox made from the declaration opens, in Flatpak's words, as
+    /// Schelf shows every app's access: what it asked for, and your Downloads
+    /// folder, which every sandboxed app starts with. Sound is in words of
+    /// its own, since this sandbox tells playing from recording.
     pub fn permissions(&self) -> Permissions {
+        self.opened(true)
+    }
+
+    /// The same for a sandbox whose Downloads folder you may have turned off.
+    pub fn opened(&self, downloads: bool) -> Permissions {
         let owned = |names: &[&str]| names.iter().map(|name| (*name).to_owned()).collect();
-        let mut shared: Vec<String> = owned(&["ipc"]);
+        let mut shared = Vec::new();
         if self.network {
-            shared.insert(0, "network".to_owned());
+            shared.push("network".to_owned());
         }
+        let mut sockets: Vec<String> = owned(&["wayland", PLAYBACK]);
+        if self.x11 {
+            shared.push("ipc".to_owned());
+            sockets.push("x11".to_owned());
+        }
+        let mut filesystems = self.filesystems.clone();
+        if downloads && !self.reaches_downloads() {
+            filesystems.push(DOWNLOADS.to_owned());
+        }
+        let recording = [(self.microphone, MICROPHONE), (self.camera, CAMERA)];
         Permissions {
             shared,
-            sockets: owned(&["wayland", "fallback-x11", "pulseaudio"]),
+            sockets,
             devices: std::iter::once("dri".to_owned())
                 .chain(self.devices.iter().cloned())
+                .chain(
+                    recording
+                        .into_iter()
+                        .filter(|(given, _)| *given)
+                        .map(|(_, name)| name.to_owned()),
+                )
                 .collect(),
-            filesystems: self.filesystems.clone(),
+            filesystems,
             session_bus: self.talk.clone(),
             system_bus: Vec::new(),
         }

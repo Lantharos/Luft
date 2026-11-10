@@ -47,6 +47,7 @@ pub struct Layout {
     pub bus: Vec<OsString>,
     pub environment: Vec<OsString>,
     pub offline: bool,
+    pub own_ipc: bool,
 }
 
 pub struct Request {
@@ -285,6 +286,10 @@ pub fn start(layout: &Layout, sandbox: u32, request: Request) -> Result<Started,
             }
         }
     } else {
+        arguments.push("--unshare-uts".into());
+        if layout.own_ipc {
+            arguments.push("--unshare-ipc".into());
+        }
         arguments.extend(layout.app.iter().cloned());
     }
     for (fd, wants_writing) in &request.exposed {

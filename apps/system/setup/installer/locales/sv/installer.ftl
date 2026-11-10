@@ -61,6 +61,5 @@ installer-set-aside-failed = Det gick inte att flytta undan det gamla systemet
 ## Things packed with Meet Luft
 
 installer-box-unopened = Det gick inte att öppna flyttlådan
-installer-box-no-list = Flyttlådan har ingen lista över vad den innehåller
 installer-unpack-failed = Det gick inte att packa upp { $path }
 installer-wallpaper-unnamed = Bakgrundsbilden har inget namn

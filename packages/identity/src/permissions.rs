@@ -69,6 +69,26 @@ pub const BUS: Permission = Permission {
     id: "bus",
 };
 
+/// AppImages whose sandbox also gets the session's X11 display, with `yes`.
+pub const X11: Permission = Permission {
+    table: "sandbox",
+    id: "x11",
+};
+
+/// Sandboxed apps that may record sound, with `yes`: the entry the desktop
+/// portal keeps for the microphone.
+pub const MICROPHONE: Permission = Permission {
+    table: "devices",
+    id: "microphone",
+};
+
+/// Sandboxed apps that may use cameras, with `yes`: the entry the desktop
+/// portal asks about and keeps.
+pub const CAMERA: Permission = Permission {
+    table: "devices",
+    id: "camera",
+};
+
 /// Sandboxed apps' choices about items in Luft Keyring, one entry per item.
 pub const KEYRING_ITEMS: &str = "keyring-items";
 

@@ -32,6 +32,7 @@ specta.workspace = true
 tokio = { workspace = true, features = ["rt"] }
 ureq.workspace = true
 zbus = { workspace = true, features = ["proxy", "tokio"] }
+zeroize = { workspace = true, features = ["serde"] }
 
 [lints]
 workspace = true

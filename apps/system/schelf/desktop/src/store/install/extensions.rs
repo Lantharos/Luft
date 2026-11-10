@@ -26,9 +26,7 @@ trait Extensions {
 }
 
 fn folder() -> PathBuf {
-    dirs::data_dir()
-        .unwrap_or_default()
-        .join("luft/extensions")
+    dirs::data_dir().unwrap_or_default().join("luft/extensions")
 }
 
 fn failed(error: impl ToString) -> String {

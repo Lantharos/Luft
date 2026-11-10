@@ -20,7 +20,7 @@
 		busy = true;
 		problem = '';
 		try {
-			for (const network of setup.newNetworks) await commands.networkSetType({ connection: network.connection, networkType: choice });
+			for (const network of setup.newNetworks) await commands.installerNetworkType({ connection: network.connection, networkType: choice });
 			flow.next();
 		} catch (error) {
 			problem = String(error);

@@ -3,6 +3,7 @@ use std::path::Path;
 use anyhow::{Context, Result};
 use luft_i18n::t;
 use luft_installer_contract::Encryption;
+use zeroize::Zeroizing;
 
 use super::layout::Role;
 use crate::L10N;
@@ -28,7 +29,10 @@ fn uuid_of(device: &str) -> Result<String> {
 }
 
 pub fn open(encryption: &Encryption, partition: &str) -> Result<Opened> {
-    let given = format!("{}\n{}\n", encryption.recovery_key, encryption.passphrase);
+    let given = Zeroizing::new(format!(
+        "{}\n{}\n",
+        *encryption.recovery_key, *encryption.passphrase
+    ));
     let device = trustctl("format", partition)
         .input(given.as_bytes())
         .output()
@@ -54,7 +58,7 @@ pub fn seal(encryption: &Encryption, opened: &Opened, state: &Path) -> Result<()
     trustctl("seal", &opened.partition)
         .arg("--state")
         .arg(state)
-        .input(format!("{}\n", encryption.recovery_key).as_bytes())
+        .input(Zeroizing::new(format!("{}\n", *encryption.recovery_key)).as_bytes())
         .run()
         .with_context(|| t!(L10N, "installer-encryption-failed"))
 }

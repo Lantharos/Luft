@@ -61,6 +61,5 @@ installer-set-aside-failed = Не удалось отложить старую �
 ## Things packed with Meet Luft
 
 installer-box-unopened = Не удалось открыть коробку для переезда
-installer-box-no-list = В коробке для переезда нет списка содержимого
 installer-unpack-failed = Не удалось распаковать { $path }
 installer-wallpaper-unnamed = У обоев нет имени

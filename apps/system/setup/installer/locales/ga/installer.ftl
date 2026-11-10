@@ -61,6 +61,5 @@ installer-set-aside-failed = Níorbh fhéidir an seanchóras a chur i leataobh
 ## Things packed with Meet Luft
 
 installer-box-unopened = Níorbh fhéidir an bosca aistrithe a oscailt
-installer-box-no-list = Níl liosta den ábhar sa bhosca aistrithe
 installer-unpack-failed = Níorbh fhéidir { $path } a dhíphacáil
 installer-wallpaper-unnamed = Níl aon ainm ar an gcúlbhrat

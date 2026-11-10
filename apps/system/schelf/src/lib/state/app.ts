@@ -20,6 +20,7 @@ function openFiles(files: string[]) {
 
 const SEARCH = 'schelf:search?';
 const FULL_ACCESS = 'schelf:full-access?';
+const ACCESS = 'schelf:access?';
 const APP = 'schelf:app?';
 const LISTING = 'schelf:app/';
 
@@ -27,6 +28,12 @@ async function askFullAccess(id: string) {
 	if (!library.loaded) await library.refresh();
 	const app = library.byKey(`appimage/${id}`) ?? library.flatpak(id);
 	if (app) navigation.open({ page: 'app', target: { installed: app.key }, name: app.name, askFullAccess: true });
+}
+
+async function reviewAccess(id: string) {
+	if (!library.loaded) await library.refresh();
+	const app = library.byKey(`appimage/${id}`);
+	if (app) navigation.open({ page: 'app', target: { installed: app.key }, name: app.name, reviewAccess: true });
 }
 
 async function openApp(id: string) {
@@ -69,6 +76,11 @@ function openPage(argumentsList: (string | null)[]) {
 	const fullAccess = argumentsList.find((argument) => argument?.startsWith(FULL_ACCESS));
 	if (fullAccess) {
 		void askFullAccess(decodeURIComponent(fullAccess.slice(FULL_ACCESS.length)));
+		return;
+	}
+	const access = argumentsList.find((argument) => argument?.startsWith(ACCESS));
+	if (access) {
+		void reviewAccess(decodeURIComponent(access.slice(ACCESS.length)));
 		return;
 	}
 	const search = argumentsList.find((argument) => argument?.startsWith(SEARCH));

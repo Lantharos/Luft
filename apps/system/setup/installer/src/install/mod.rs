@@ -11,6 +11,7 @@ use std::sync::{Condvar, Mutex};
 use anyhow::{Context, Result};
 use luft_installer_contract::{Encryption, Regional};
 use luft_meet::Handoff;
+use luft_meet::sealed::Code;
 
 pub use configure::account::Account;
 
@@ -100,6 +101,12 @@ impl Answers {
         self.given.notify_all();
     }
 
+    /// Drops the account a failed install was given, so the next one waits
+    /// for the person to give it again.
+    pub fn forget_account(&self) {
+        self.inputs.lock().expect("answers lock").account = None;
+    }
+
     pub fn set_account(&self, account: Account) {
         self.inputs.lock().expect("answers lock").account = Some(account);
         self.given.notify_all();
@@ -141,22 +148,24 @@ pub struct Job<'a> {
     pub windows: Option<Windows>,
     pub meet: Option<Handoff>,
     pub encryption: Option<Encryption>,
+    pub box_code: Option<Code>,
 }
 
 fn unpack_box(
-    guid: &str,
+    (guid, code): (&str, &Code),
     deployment: &Deployment,
     account: &Account,
     at: &Path,
     progress: &dyn Fn(f64),
 ) -> Result<()> {
-    let opened = meet::Opened::mount(guid, at)?;
-    let manifest = opened.manifest()?;
-    unpack::unpack(deployment, account, opened.root(), &manifest, progress)
+    let mounted = meet::Mounted::mount(guid, at)?;
+    unpack::unpack(deployment, account, &mut mounted.open(code)?, progress)
 }
 
-pub fn run(job: Job, report: impl Fn(Status)) {
-    if let Err(error) = install(&job, &report) {
+/// Installs, and says whether it worked.
+pub fn run(job: Job, report: impl Fn(Status)) -> bool {
+    let installed = install(&job, &report);
+    if let Err(error) = &installed {
         eprintln!("Installing failed: {error:#}");
         report(Status {
             stage: Stage::Failed,
@@ -165,6 +174,7 @@ pub fn run(job: Job, report: impl Fn(Status)) {
             secure_boot_code: String::new(),
         });
     }
+    installed.is_ok()
 }
 
 fn prepare(job: &Job) -> Result<(Mounted, Option<Kept>)> {
@@ -201,7 +211,11 @@ fn install(job: &Job, report: &impl Fn(Status)) -> Result<()> {
         windows.change();
     }
     let (mounted, kept) = prepare(job)?;
-    let moving_box = job.meet.as_ref().and_then(Handoff::moving_box);
+    let moving_box = job
+        .meet
+        .as_ref()
+        .and_then(Handoff::moving_box)
+        .zip(job.box_code.as_ref());
     let copied = if moving_box.is_some() {
         COPIED_BEFORE_UNPACKING
     } else {
@@ -246,9 +260,9 @@ fn install(job: &Job, report: &impl Fn(Status)) -> Result<()> {
             {
                 eprintln!("Bluetooth devices from Windows weren't brought over: {error:#}");
             }
-            if let Some(guid) = moving_box
+            if let Some(sealed) = moving_box
                 && let Err(error) = unpack_box(
-                    guid,
+                    sealed,
                     &deployment,
                     &account,
                     &job.target.with_extension("box"),

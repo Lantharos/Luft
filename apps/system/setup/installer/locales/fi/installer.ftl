@@ -61,6 +61,5 @@ installer-set-aside-failed = Vanhaa järjestelmää ei voitu siirtää syrjään
 ## Things packed with Meet Luft
 
 installer-box-unopened = Muuttolaatikkoa ei voitu avata
-installer-box-no-list = Muuttolaatikossa ei ole sisältöluetteloa
 installer-unpack-failed = Ei voitu purkaa: { $path }
 installer-wallpaper-unnamed = Taustakuvalla ei ole nimeä

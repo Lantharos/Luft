@@ -7,6 +7,8 @@ use crate::sandbox_info;
 
 const SANDBOX_INFO: &CStr = c"root/.flatpak-info";
 const MOUNTS: &CStr = c"mountinfo";
+const CGROUP: &CStr = c"cgroup";
+const UNIFIED_HIERARCHY: &str = "0::/";
 const SANDBOX_INFO_MOUNT: &str = "/.flatpak-info";
 
 /// What a process's sandbox says about it.
@@ -95,6 +97,20 @@ pub fn sandbox_of(pidfd: BorrowedFd<'_>) -> Sandbox {
     } else {
         Sandbox::Unreadable
     }
+}
+
+/// The control group of the process a pidfd pins, below the root of the
+/// hierarchy. A process that quits while it is read has none.
+pub fn cgroup_of(pidfd: BorrowedFd<'_>) -> Option<String> {
+    let pid = pid_of(pidfd)?;
+    let mut groups = String::new();
+    open_at(&open_folder(pid)?, CGROUP)
+        .and_then(|mut file| file.read_to_string(&mut groups))
+        .ok()?;
+    let cgroup = groups
+        .lines()
+        .find_map(|line| line.strip_prefix(UNIFIED_HIERARCHY))?;
+    (pid_of(pidfd) == Some(pid)).then(|| cgroup.to_owned())
 }
 
 #[cfg(test)]

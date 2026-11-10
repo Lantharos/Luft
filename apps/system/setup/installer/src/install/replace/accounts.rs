@@ -1,6 +1,7 @@
 use std::path::Path;
 
 use anyhow::Result;
+use zeroize::Zeroizing;
 
 use crate::install::configure::deployment::Deployment;
 use crate::survey::linux::Account;
@@ -71,7 +72,7 @@ fn set_password(deployment: &Deployment, name: &str, secret: &str, encrypted: bo
         chpasswd.args(["--crypt-method", "YESCRYPT"])
     };
     chpasswd
-        .input(format!("{name}:{secret}\n").as_bytes())
+        .input(Zeroizing::new(format!("{name}:{secret}\n")).as_bytes())
         .run()
 }
 

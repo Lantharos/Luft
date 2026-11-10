@@ -46,14 +46,18 @@ impl App {
             .into_iter()
             .find(|info| {
                 info.id().is_some_and(|id| id.eq_ignore_ascii_case(&luft))
-                    || info.executable().file_name().is_some_and(|name| name == program)
+                    || info
+                        .executable()
+                        .file_name()
+                        .is_some_and(|name| name == program)
             })
             .and_then(|info| Self::from_info(&info))
     }
 }
 
 const LAUNCHERS: [&str; 12] = [
-    "bash", "bun", "env", "flatpak", "java", "node", "perl", "python", "python3", "ruby", "sh", "wine",
+    "bash", "bun", "env", "flatpak", "java", "node", "perl", "python", "python3", "ruby", "sh",
+    "wine",
 ];
 
 pub fn icon_path(icon: &gio::Icon) -> Option<String> {

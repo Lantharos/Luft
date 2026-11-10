@@ -1,7 +1,6 @@
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
-pub const MANIFEST: &str = "box.json";
 pub const FILES: &str = "files";
 pub const WIFI: &str = "wifi";
 pub const PICTURE: &str = "account-picture";
@@ -82,21 +81,11 @@ pub struct Manifest {
 }
 
 impl Manifest {
-    pub fn parse(text: &str) -> Result<Self, String> {
-        let manifest: Self = serde_json::from_str(text).map_err(|error| error.to_string())?;
-        manifest.check()?;
-        Ok(manifest)
-    }
-
-    pub fn to_json(&self) -> String {
-        serde_json::to_string_pretty(self).expect("a manifest always serializes")
-    }
-
     pub fn bytes(&self) -> u64 {
         self.folders.iter().map(|folder| folder.bytes).sum()
     }
 
-    fn check(&self) -> Result<(), String> {
+    pub(crate) fn check(&self) -> Result<(), String> {
         let named = self
             .account
             .iter()
@@ -120,7 +109,7 @@ impl Manifest {
     }
 }
 
-fn inside_box(path: &str) -> bool {
+pub(crate) fn inside_box(path: &str) -> bool {
     !path.is_empty()
         && !path.starts_with(['/', '\\'])
         && path
@@ -137,14 +126,9 @@ mod tests {
         let manifest = Manifest {
             wallpaper: Some("wallpaper.jpg".into()),
             wifi: vec!["wifi/Home.xml".into()],
-            folders: vec![Folder {
-                kind: FolderKind::Pictures,
-                files: 2,
-                bytes: 3_000,
-            }],
             ..Manifest::default()
         };
-        assert_eq!(Manifest::parse(&manifest.to_json()).unwrap(), manifest);
+        assert!(manifest.check().is_ok());
         for escape in [
             "../etc/shadow",
             "/etc/shadow",
@@ -156,7 +140,7 @@ mod tests {
                 wallpaper: Some(escape.into()),
                 ..Manifest::default()
             };
-            assert!(Manifest::parse(&bad.to_json()).is_err(), "{escape}");
+            assert!(bad.check().is_err(), "{escape}");
         }
     }
 }

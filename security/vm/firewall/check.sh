@@ -154,9 +154,7 @@ serve() {
   serve_as app-com.example.Local@check.service 8004 127.0.0.1
   as_person systemd-run --user --quiet --collect --unit=extensions-check.service --slice=session.slice -- sh -c \
     "busctl call $name $path $name SetExtensionPorts 'a(qs)' 1 8003 tcp; exec python3 -m http.server 8003 --directory /usr/share"
-  as_person systemd-run --user --quiet --collect --unit=kestrel-post.service --slice=session.slice -- sh -c \
-    "busctl call $name $path $name SetPostOpen b true; python3 -m http.server 53317 --directory /usr/share & \
-     while [ ! -e /home/$person/post-closed ]; do sleep 0.2; done; busctl call $name $path $name SetPostOpen b false; wait"
+  as_person systemctl --user start kestrel-post.service
   receive_as app-com.example.Approved@udp.service 9000
   receive_as app-com.example.Other@udp.service 9001
   eventually "the test receivers listen" sh -c 'ss -lun | grep -q ":9000 " && ss -lun | grep -q ":9001 "'

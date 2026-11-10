@@ -3,8 +3,8 @@ set -uo pipefail
 
 STATE=/var/lib/luft-move-check
 SATA=/dev/sda
-NVME=/dev/nvme0n1
-EMPTY=/dev/nvme1n1
+NVME="$(readlink -f /dev/disk/by-id/nvme-QEMU_NVMe_Ctrl_drive1)"
+EMPTY="$(readlink -f /dev/disk/by-id/nvme-QEMU_NVMe_Ctrl_drive2)"
 ROOT_TYPE=4f68bce3-e8cd-4db1-96e7-fbcaf984b709
 TRUST=(com.lantharos.Trust1 /com/lantharos/Trust1 com.lantharos.Trust1)
 APP=com.lantharos.MoveCheck

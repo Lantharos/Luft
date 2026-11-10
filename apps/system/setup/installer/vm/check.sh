@@ -111,6 +111,16 @@ new GLib.MainLoop(null, false).run();
 TRUST
 }
 
+write_trustctl_stand_in() {
+  cp /usr/bin/trustctl /run/luft-check/trustctl
+  cat > /run/luft-check/enroll <<ENROLL
+#!/usr/bin/bash
+[[ "\$1 \$2" == "secure-boot enroll" ]] || exec /run/luft-check/trustctl "\$@"
+echo "$CODE" | tee "$ASKED"
+ENROLL
+  chmod +x /run/luft-check/enroll
+}
+
 trust_says() {
   systemctl stop luft-check-trust 2> /dev/null
   rm -f "$ASKED"
@@ -443,13 +453,15 @@ check_first_boot_finish() {
 mkdir -p "$SOURCE" && mount -o ro LABEL=luft-source "$SOURCE" || fail "the source disk doesn't mount"
 check_meet_hints
 systemctl mask --runtime --now trustd.service
-mkdir -p /run/luft-check && write_trust_stand_in
+mkdir -p /run/luft-check && write_trust_stand_in && write_trustctl_stand_in
 trust_says enrolled
 check_whole_drive
 check_secure_boot_code "" "a computer that already trusts Luft's key gets no code to type"
 trust_says none
+mount --bind /run/luft-check/enroll /usr/bin/trustctl
 check_free_space
 check_secure_boot_code "$CODE" "a computer that doesn't trust Luft's key yet gets the code trustd queued"
+umount /usr/bin/trustctl
 systemctl stop luft-check-trust && systemctl unmask --runtime trustd.service
 check_alongside_windows
 check_first_boot_finish

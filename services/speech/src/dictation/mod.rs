@@ -13,8 +13,6 @@ use crate::audio::{Capture, Input, Meter};
 use crate::hub::{Event, Hub};
 use crate::plan::Plan;
 
-/// One dictation: the microphone is open from start until finish or cancel,
-/// or until recognizing fails, and nothing heard is kept once it ends.
 pub struct Session {
     input: Sender<Input>,
     events: UnboundedSender<Event>,
@@ -52,8 +50,6 @@ impl Session {
         self.capture.lock().expect("capture lock").take();
     }
 
-    /// Answers with what's left to type once everything typed along the way
-    /// has been sent, so it lands after it.
     pub async fn finish(self) -> Result<String> {
         self.close();
         let _ = self.input.send(Input::Finish);

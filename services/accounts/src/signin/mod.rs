@@ -6,7 +6,7 @@ use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
-use anyhow::{Result, anyhow, bail};
+use anyhow::{Result, anyhow};
 use luft_accounts::types::{Answer, Credentials, Provider, Step};
 use tokio::sync::mpsc;
 use tokio::task::AbortHandle;
@@ -105,10 +105,15 @@ impl SignIns {
     }
 }
 
-fn uses_browser(provider: Provider, credentials: &Credentials) -> bool {
+pub struct Typed {
+    pub credentials: Credentials,
+    pub password: Option<Zeroizing<String>>,
+}
+
+fn uses_browser(provider: Provider, typed: &Typed) -> bool {
     match provider {
         Provider::Onedrive | Provider::Dropbox => true,
-        Provider::Nextcloud => credentials.password.is_none(),
+        Provider::Nextcloud => typed.password.is_none(),
         Provider::Icloud | Provider::Webdav => false,
     }
 }
@@ -116,7 +121,7 @@ fn uses_browser(provider: Provider, credentials: &Credentials) -> bool {
 pub async fn start(
     hub: &Arc<Hub>,
     provider: Provider,
-    credentials: Credentials,
+    typed: Typed,
     account: Option<String>,
 ) -> Result<String> {
     if let Some(account) = &account
@@ -125,9 +130,9 @@ pub async fn start(
             .get(account)
             .is_none_or(|record| record.provider != provider)
     {
-        bail!("That account isn't here anymore");
+        return Err(crate::bus::Error::account_gone().into());
     }
-    let browser = uses_browser(provider, &credentials);
+    let browser = uses_browser(provider, &typed);
     if browser {
         hub.signins.cancel_browser_sign_ins();
     }
@@ -147,9 +152,9 @@ pub async fn start(
         hub: hub.clone(),
         session: session.clone(),
         provider,
-        server: credentials.server,
-        user: credentials.user,
-        password: credentials.password.map(Zeroizing::new),
+        server: typed.credentials.server,
+        user: typed.credentials.user,
+        password: typed.password,
         account,
         answers,
     };

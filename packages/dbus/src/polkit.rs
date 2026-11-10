@@ -6,8 +6,30 @@ use zbus::message::{Flags, Header};
 use zbus::{Connection, proxy};
 
 const ALLOW_USER_INTERACTION: u32 = 1;
+const MESSAGE: &str = "polkit.message";
 
 type Subject<'a> = (&'a str, HashMap<&'a str, Variant<'a>>);
+
+/// What the prompt for an action says about the one change it is asked for.
+/// Only a service running as root may hand polkit any.
+#[derive(Default)]
+pub struct Details<'a>(HashMap<&'a str, &'a str>);
+
+impl<'a> Details<'a> {
+    /// The words the prompt shows in place of the action's own message, such
+    /// as `Open port 22/tcp to devices on home networks`.
+    pub fn message(words: &'a str) -> Self {
+        Self(HashMap::from([(MESSAGE, words)]))
+    }
+
+    /// A value that polkit rules read with `action.lookup(key)` and that the
+    /// action's message may name as `$(key)`.
+    #[must_use]
+    pub fn with(mut self, key: &'a str, value: &'a str) -> Self {
+        self.0.insert(key, value);
+        self
+    }
+}
 
 #[introspect]
 #[proxy(
@@ -31,6 +53,16 @@ pub async fn is_authorized(
     header: &Header<'_>,
     action: &str,
 ) -> zbus::Result<bool> {
+    is_authorized_to(connection, header, action, &Details::default()).await
+}
+
+/// Like [`is_authorized`], with a prompt that says what is about to change.
+pub async fn is_authorized_to(
+    connection: &Connection,
+    header: &Header<'_>,
+    action: &str,
+    details: &Details<'_>,
+) -> zbus::Result<bool> {
     let Some(sender) = header.sender() else {
         return Ok(false);
     };
@@ -49,7 +81,25 @@ pub async fn is_authorized(
     };
     let (authorized, ..) = AuthorityProxy::new(connection)
         .await?
-        .check_authorization(&subject, action, &HashMap::new(), flags, "")
+        .check_authorization(&subject, action, &details.0, flags, "")
         .await?;
     Ok(authorized)
+}
+
+pub enum Denied {
+    Refused,
+    Unanswered(zbus::Error),
+}
+
+/// Lets a call go on only when polkit allows its caller the action.
+pub async fn authorize(
+    connection: &Connection,
+    header: &Header<'_>,
+    action: &str,
+) -> Result<(), Denied> {
+    match is_authorized(connection, header, action).await {
+        Ok(true) => Ok(()),
+        Ok(false) => Err(Denied::Refused),
+        Err(error) => Err(Denied::Unanswered(error)),
+    }
 }

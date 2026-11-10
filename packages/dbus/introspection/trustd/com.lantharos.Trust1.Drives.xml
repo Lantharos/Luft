@@ -33,6 +33,16 @@
     <method name="Unlock">
       <arg name="uuid" type="s" direction="in"/>
     </method>
+    <method name="UnlockWithPassphrase">
+      <arg name="device" type="s" direction="in"/>
+      <arg name="passphrase" type="h" direction="in"/>
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="ChangePassphrase">
+      <arg name="device" type="s" direction="in"/>
+      <arg name="current" type="h" direction="in"/>
+      <arg name="new" type="h" direction="in"/>
+    </method>
     <method name="ShowRecoveryKey">
       <arg name="uuid" type="s" direction="in"/>
       <arg type="s" direction="out"/>

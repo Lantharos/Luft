@@ -9,7 +9,7 @@ rust-version.workspace = true
 
 [dependencies]
 anyhow.workspace = true
-luft-dbus.workspace = true
+luft-dbus = { workspace = true, features = ["service"] }
 luft-dbus-macros.workspace = true
 rustix = { workspace = true, features = ["time"] }
 tokio = { workspace = true, features = ["macros", "rt", "sync", "time"] }

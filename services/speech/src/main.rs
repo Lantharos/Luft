@@ -12,21 +12,15 @@ mod transcription;
 mod warm;
 
 use std::sync::Arc;
-use std::time::Duration;
 
 use anyhow::Result;
 use futures_util::StreamExt;
-use tokio::signal::unix::{SignalKind, signal};
 use tokio::sync::mpsc;
 use zbus::object_server::SignalEmitter;
 
 use bus::{Dictation, Models};
 use hub::{Event, Hub, NAME, PATH};
-use models::Store;
 
-const WARM_FOR: Duration = Duration::from_secs(180);
-const EXIT_WHEN_IDLE_FOR: Duration = Duration::from_secs(30);
-const CHECK_EVERY: Duration = Duration::from_secs(5);
 const TRANSCRIPTION: &str = "--transcription";
 
 async fn tell_listener(
@@ -63,10 +57,10 @@ fn main() -> Result<()> {
 
 async fn serve() -> Result<()> {
     let (events, mut received) = mpsc::unbounded_channel();
-    let hub = Arc::new(Hub::new(Store::for_service("luft-speech")?, events));
-    hub.follow();
+    let hub = Arc::new(Hub::new(events)?);
+    hub.follow_settings();
     let following = hub.clone();
-    preferences::watch(move || following.follow())?;
+    preferences::watch(move || following.follow_settings())?;
     let connection = zbus::Connection::session().await?;
     let names = zbus::fdo::DBusProxy::new(&connection).await?;
     let mut shell_owners = names
@@ -93,24 +87,13 @@ async fn serve() -> Result<()> {
             }
         }
     });
-    let mut terminate = signal(SignalKind::terminate())?;
-    let mut interrupt = signal(SignalKind::interrupt())?;
-    let mut tick = tokio::time::interval(CHECK_EVERY);
-    loop {
-        tokio::select! {
-            _ = terminate.recv() => return Ok(()),
-            _ = interrupt.recv() => return Ok(()),
-            Some(_) = shell_owners.next() => {
-                if let Some(session) = hub.session.lock().await.take() {
-                    session.cancel();
-                }
-            }
-            _ = tick.tick() => {
-                hub.warm.expire(WARM_FOR);
-                if hub.idle_for() >= EXIT_WHEN_IDLE_FOR {
-                    return Ok(());
-                }
+    let dictating = hub.clone();
+    tokio::spawn(async move {
+        while shell_owners.next().await.is_some() {
+            if let Some(session) = dictating.session.lock().await.take() {
+                session.cancel();
             }
         }
-    }
+    });
+    Ok(luft_dbus::idle::until_idle(|| hub.busy()).await?)
 }

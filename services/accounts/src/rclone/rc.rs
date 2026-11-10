@@ -1,9 +1,20 @@
 use std::path::PathBuf;
 
-use anyhow::{Context, Result, anyhow, bail};
+use anyhow::{Context, Result, bail};
 use serde_json::{Value, json};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::UnixStream;
+
+#[derive(Debug)]
+struct Refused(String);
+
+impl std::fmt::Display for Refused {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        formatter.write_str(&self.0)
+    }
+}
+
+impl std::error::Error for Refused {}
 
 #[derive(Clone)]
 pub struct Rc {
@@ -40,7 +51,7 @@ impl Rc {
         };
         if status != 200 {
             let message = value["error"].as_str().unwrap_or("rclone failed");
-            return Err(anyhow!("{message}"));
+            return Err(Refused(message.to_owned()).into());
         }
         Ok(value)
     }

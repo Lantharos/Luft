@@ -1,11 +1,3 @@
-//! Writes notes of transcripts the way Heft asks for them, part by part, and
-//! prints them with how long they took. Needs the model, so it only runs when
-//! asked:
-//!
-//! LUFT_LANGUAGE_MODELS=<folder holding the model> LUFT_LANGUAGE_SAMPLES=<folder
-//! of .json transcripts, each { "language": "sq", "lines": [{ "at", "text" }] }>
-//! cargo test --release notes -- --ignored --nocapture
-
 use std::path::PathBuf;
 use std::time::Instant;
 

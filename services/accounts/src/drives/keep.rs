@@ -9,6 +9,7 @@ use luft_accounts::types::DriveState;
 use serde_json::json;
 
 use super::{attach, conflicts, filters, locate, remote, union, upkeep};
+use crate::bus::Error;
 use crate::hub::Hub;
 use crate::providers::trouble::{self, Trouble};
 use crate::store::Record;
@@ -16,6 +17,22 @@ use crate::store::Record;
 const CONFLICT_SUFFIXES: &str = "luft-device,luft-cloud";
 const MAX_DELETE: u8 = 50;
 const UNSYNCED: &str = "Some changes haven't synced yet. Luft keeps trying.";
+const OFFLINE: &str =
+    "Connect to the internet first, so changes made on this computer can reach the cloud.";
+
+#[derive(Clone, Copy, PartialEq)]
+enum Reach {
+    WhenConditionsAllow,
+    Now,
+}
+
+fn unsynced(record: &Record) -> anyhow::Error {
+    Error::Unsynced(format!(
+        "Files kept on this computer may not have reached {} yet.",
+        record.name
+    ))
+    .into()
+}
 
 #[derive(Clone, Copy)]
 enum Run {
@@ -33,21 +50,14 @@ pub async fn keep(hub: &Arc<Hub>, paths: Vec<PathBuf>) -> Result<()> {
         })?;
         hub.drives_changed().await;
         let hub = hub.clone();
-        tokio::spawn(
-            async move { report(&hub, &account, sync(&hub, &account, false).await).await },
-        );
+        tokio::spawn(async move { report(&hub, &account, sync(&hub, &account).await).await });
     }
     Ok(())
 }
 
 pub async fn free(hub: &Arc<Hub>, paths: Vec<PathBuf>) -> Result<()> {
     for (account, relatives) in group(hub, &paths)? {
-        if !hub.conditions().online {
-            bail!(
-                "Connect to the internet first, so changes made on this computer reach the cloud before the space is freed"
-            );
-        }
-        sync(hub, &account, true).await?;
+        exchange_when(hub, &account, Reach::Now).await?;
         let lock = hub.drives.lock(&account);
         let _freeing = lock.lock().await;
         let kept = hub.paths.kept(&account);
@@ -64,14 +74,33 @@ pub async fn free(hub: &Arc<Hub>, paths: Vec<PathBuf>) -> Result<()> {
         hub.drives_changed().await;
         drop(_freeing);
         let hub = hub.clone();
-        tokio::spawn(
-            async move { report(&hub, &account, sync(&hub, &account, false).await).await },
-        );
+        tokio::spawn(async move { report(&hub, &account, sync(&hub, &account).await).await });
     }
     Ok(())
 }
 
-pub async fn sync(hub: &Arc<Hub>, account: &str, force: bool) -> Result<()> {
+pub async fn sync(hub: &Arc<Hub>, account: &str) -> Result<()> {
+    exchange_when(hub, account, Reach::WhenConditionsAllow).await
+}
+
+pub async fn reach_cloud(hub: &Arc<Hub>, record: &Record) -> Result<()> {
+    exchange_when(hub, &record.id, Reach::Now).await?;
+    let live = hub.drives.get(&record.id);
+    let uploading = if live.can_sync() {
+        hub.rclone
+            .queue(&union(&record.id))
+            .await
+            .map_or(true, |queue| !queue.is_empty())
+    } else {
+        !live.uploads.is_empty()
+    };
+    if uploading {
+        return Err(unsynced(record));
+    }
+    Ok(())
+}
+
+async fn exchange_when(hub: &Arc<Hub>, account: &str, reach: Reach) -> Result<()> {
     let lock = hub.drives.lock(account);
     let _syncing = lock.lock().await;
     let Some(record) = hub.records().get(account).cloned() else {
@@ -82,9 +111,18 @@ pub async fn sync(hub: &Arc<Hub>, account: &str, force: bool) -> Result<()> {
         return Ok(());
     }
     let conditions = hub.conditions();
-    let live = hub.drives.get(account);
-    if !conditions.online || conditions.pause.is_some() && !force || !live.can_sync() {
-        return Ok(());
+    let unreachable = if !conditions.online {
+        Some(Error::Offline(OFFLINE.to_owned()).into())
+    } else if !hub.drives.get(account).can_sync() {
+        Some(unsynced(&record))
+    } else {
+        None
+    };
+    match (unreachable, reach) {
+        (Some(reason), Reach::Now) => return Err(reason),
+        (Some(_), Reach::WhenConditionsAllow) => return Ok(()),
+        (None, Reach::WhenConditionsAllow) if conditions.pause.is_some() => return Ok(()),
+        (None, _) => {}
     }
     hub.drives.update(account, |live| {
         live.syncing = true;
@@ -95,7 +133,13 @@ pub async fn sync(hub: &Arc<Hub>, account: &str, force: bool) -> Result<()> {
     upkeep::keep_secret(hub, account).await;
     hub.drives.update(account, |live| live.syncing = false);
     hub.drives_changed().await;
-    outcome
+    match reach {
+        Reach::Now => outcome.map_err(|error| {
+            eprintln!("Syncing {} failed: {error:#}", record.name);
+            unsynced(&record)
+        }),
+        Reach::WhenConditionsAllow => outcome,
+    }
 }
 
 async fn exchange(hub: &Arc<Hub>, record: &Record) -> Result<()> {

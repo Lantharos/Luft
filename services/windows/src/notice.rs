@@ -17,8 +17,22 @@ const ICON: &str = "computer";
 const SHOWN: &str = "luft/windows-notice";
 const CHECKED: &str = "luft/windows-checked";
 
-const OFFER: &str = "Windows doesn't fully shut down with it, which can leave sound, Wi-Fi and Bluetooth in a bad state when Luft starts, and keeps Windows' drive locked. Luft can turn it off for you.";
-const HOW_TO: &str = "Windows wasn't fully off, so Luft reset the sound hardware. To avoid this, turn off Fast Startup in Windows: open Control Panel, Power Options, Choose what the power buttons do, and clear Turn on fast startup.";
+struct Notice {
+    summary: &'static str,
+    body: &'static str,
+    actions: &'static [&'static str],
+}
+
+const OFFER: Notice = Notice {
+    summary: "Turn off Fast Startup in Windows?",
+    body: "It can stop sound, Wi-Fi and Bluetooth from working in Luft.",
+    actions: &[TURN_OFF, "Turn off"],
+};
+const ADVICE: Notice = Notice {
+    summary: "Windows wasn't fully shut down",
+    body: "Turn off Fast Startup in Windows to keep sound, Wi-Fi and Bluetooth working in Luft.",
+    actions: &[],
+};
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -73,7 +87,7 @@ async fn notice() -> Result<()> {
             .installations
             .iter()
             .any(|windows| windows.hibernated);
-    let Some(body) = offer.map(|_| OFFER).or(fast_started.then_some(HOW_TO)) else {
+    let Some(notice) = offer.map(|_| OFFER).or(fast_started.then_some(ADVICE)) else {
         return remember(CHECKED);
     };
     let session = Connection::session().await?;
@@ -81,15 +95,6 @@ async fn notice() -> Result<()> {
         Proxy::new(&session, NOTIFICATIONS, NOTIFICATIONS_PATH, NOTIFICATIONS).await?;
     let mut invoked = notifications.receive_signal("ActionInvoked").await?;
     let mut closed = notifications.receive_signal("NotificationClosed").await?;
-    let actions: Vec<&str> = match offer {
-        Some(_) => vec![TURN_OFF, "Turn off Fast Startup"],
-        None => Vec::new(),
-    };
-    let summary = if offer.is_some() {
-        "Windows uses Fast Startup"
-    } else {
-        "Windows was shut down with Fast Startup"
-    };
     let id: u32 = notifications
         .call(
             "Notify",
@@ -97,9 +102,9 @@ async fn notice() -> Result<()> {
                 "Luft",
                 0u32,
                 ICON,
-                summary,
-                body,
-                actions,
+                notice.summary,
+                notice.body,
+                notice.actions,
                 HashMap::<&str, Variant>::new(),
                 0i32,
             ),
@@ -116,7 +121,7 @@ async fn notice() -> Result<()> {
                 if notification == id && action == TURN_OFF {
                     let outcome = turn_off(&system, &windows.device).await;
                     let (summary, body) = match &outcome {
-                        Ok(()) => ("Fast Startup is off", "Windows will shut down fully from now on."),
+                        Ok(()) => ("Fast Startup is off", ""),
                         Err(error) => ("Fast Startup is still on", error.as_str()),
                     };
                     notifications
@@ -151,8 +156,5 @@ async fn turn_off(system: &Connection, device: &str) -> Result<(), String> {
         )
         .await
         .map(drop)
-        .map_err(|error| match error {
-            zbus::Error::MethodError(_, Some(text), _) => text,
-            other => other.to_string(),
-        })
+        .map_err(|error| luft_dbus::explain(&error))
 }

@@ -12,11 +12,6 @@ const AROUND: usize = 6;
 const LONGEST: usize = 860;
 const CUT_SEARCH: usize = 90;
 
-/// Where someone speaks, as ranges of 32 ms frames: Silero VAD's guess for
-/// each frame, with a pause of half a second ending a stretch, stretches
-/// shorter than a quarter of a second dropped and a little kept on either
-/// side. A stretch running past 27.5 seconds is cut at its quietest moment,
-/// since Whisper hears 30 seconds at a time.
 pub fn find(audio: &[f32]) -> Result<Vec<Range<usize>>> {
     let mut voice = Voice::new()?;
     let mut speaking = false;

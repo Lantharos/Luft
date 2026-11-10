@@ -2,9 +2,10 @@ use std::collections::BTreeMap;
 use std::fs;
 use std::sync::Arc;
 
-use anyhow::{Context, Result};
+use anyhow::Result;
 use luft_accounts::types::Provider;
 
+use crate::bus::Error;
 use crate::drives;
 use crate::hub::Hub;
 use crate::store::{Record, Secret, new_id};
@@ -66,7 +67,7 @@ pub async fn add(hub: &Arc<Hub>, account: NewAccount, replacing: Option<String>)
             drives::report(
                 &attaching,
                 &account,
-                drives::sync(&attaching, &account, false).await,
+                drives::sync(&attaching, &account).await,
             )
             .await;
         }
@@ -79,7 +80,7 @@ pub async fn rename(hub: &Arc<Hub>, id: &str, wanted: &str) -> Result<()> {
         .records()
         .get(id)
         .cloned()
-        .context("That account isn't here anymore")?;
+        .ok_or_else(Error::account_gone)?;
     let name = hub.records().unique_name(wanted, Some(id));
     if name == record.name {
         return Ok(());
@@ -89,13 +90,16 @@ pub async fn rename(hub: &Arc<Hub>, id: &str, wanted: &str) -> Result<()> {
     Ok(())
 }
 
-pub async fn remove(hub: &Arc<Hub>, id: &str) -> Result<()> {
+pub async fn remove(hub: &Arc<Hub>, id: &str, discard_unsynced: bool) -> Result<()> {
     let record = hub
         .records()
         .get(id)
         .cloned()
-        .context("That account isn't here anymore")?;
-    drives::report(hub, id, drives::sync(hub, id, true).await).await;
+        .ok_or_else(Error::account_gone)?;
+    let reached = drives::reach_cloud(hub, &record).await;
+    if !discard_unsynced {
+        reached?;
+    }
     drives::detach(hub, &record).await;
     hub.keyring.delete(id).await?;
     hub.records().remove(id)?;

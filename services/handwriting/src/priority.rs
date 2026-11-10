@@ -7,9 +7,6 @@ const IOPRIO_WHO_PROCESS: libc::c_int = 1;
 const IOPRIO_CLASS_IDLE: libc::c_int = 3;
 const IOPRIO_CLASS_SHIFT: libc::c_int = 13;
 
-/// Puts the calling thread, and the threads it starts, at the idle scheduling
-/// class and the lowest processor and disk priority, for good: a thread can
-/// lower itself but never come back up.
 fn idle_current_thread() {
     let idle = libc::sched_param { sched_priority: 0 };
     unsafe {
@@ -26,8 +23,6 @@ fn idle_current_thread() {
 
 type Job = Box<dyn FnOnce() + Send>;
 
-/// One thread at idle priority that does background work in turn, so that
-/// the processor threads llama.cpp starts from it are idle too.
 pub struct Background(Sender<Job>);
 
 impl Background {

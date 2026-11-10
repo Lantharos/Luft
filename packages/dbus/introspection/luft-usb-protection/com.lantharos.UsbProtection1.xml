@@ -3,6 +3,9 @@
     <method name="SetEnabled">
       <arg name="enabled" type="b" direction="in"/>
     </method>
+    <method name="SetLocked">
+      <arg name="locked" type="b" direction="in"/>
+    </method>
     <method name="TakeReleased">
       <arg type="a(ss)" direction="out"/>
     </method>

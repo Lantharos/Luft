@@ -37,13 +37,6 @@ struct Tally {
     milliseconds: Vec<f64>,
 }
 
-/// With `LUFT_HANDWRITING_MODELS` pointing at a downloaded model's folder and
-/// `LUFT_HANDWRITING_SAMPLES` at a folder of lines, each a `.json` list of
-/// strokes next to a `.txt` of what it says, reads every line the way the
-/// service does and reports the error rates for each group of samples, named
-/// by what comes before the first `-` of their file names. With
-/// `LUFT_HANDWRITING_DEVICE=processor` it reads on the processor even when
-/// there's a graphics card.
 #[test]
 #[ignore]
 fn accuracy() {

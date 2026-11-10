@@ -5,7 +5,6 @@ use crate::language::{self, Spoken};
 use crate::models::manifest::{self, Entry};
 use crate::preferences;
 
-/// How to listen right now: for which language, with which engine and model.
 pub struct Plan {
     pub spoken: Spoken,
     pub engine: Engine,
@@ -14,8 +13,6 @@ pub struct Plan {
 }
 
 impl Plan {
-    /// Follows the layout being typed with when there is one, so switching
-    /// the keyboard to another language switches dictation too.
     pub fn now(layout: Option<&str>, processor: Processor) -> Self {
         let preferences = preferences::read();
         let layout = layout.map(str::to_owned).or_else(preferences::first_layout);

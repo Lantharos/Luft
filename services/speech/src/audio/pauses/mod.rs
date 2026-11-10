@@ -18,11 +18,6 @@ const SHORTEST_SPEECH: usize = frames(160);
 const SPEECH_STARTS: f32 = 0.5;
 const SPEECH_GOES_ON: f32 = 0.35;
 
-/// Splits what's heard into stretches of speech at the pauses between them, so
-/// each stretch is recognized once and only the one still being spoken is
-/// recognized again as it grows. Stretches without speech are dropped, and the
-/// silence around speech is trimmed, which Whisper would otherwise fill with
-/// words nobody said.
 pub struct Segmenter {
     voice: Voice,
     audio: Vec<f32>,
@@ -114,7 +109,6 @@ impl Segmenter {
         self.spoken
     }
 
-    /// How long nobody has spoken: since the last speech, or since the start.
     pub fn quiet_for(&self) -> Duration {
         Duration::from_secs_f64((self.since_speech * FRAME) as f64 / RATE as f64)
     }
@@ -123,7 +117,6 @@ impl Segmenter {
         self.closed.pop_front()
     }
 
-    /// The stretch still being spoken, if any speech has been heard in it.
     pub fn open(&self) -> Option<&[f32]> {
         let first = self.speech.iter().position(|speech| *speech)?;
         Some(&self.audio[first.saturating_sub(KEPT_AROUND_SPEECH) * FRAME..])

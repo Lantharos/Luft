@@ -14,7 +14,7 @@ path = "src/main.rs"
 [dependencies]
 anyhow.workspace = true
 libc.workspace = true
-luft-dbus.workspace = true
+luft-dbus = { workspace = true, features = ["service"] }
 luft-dbus-macros.workspace = true
 luft-handwriting.workspace = true
 luft-models.workspace = true

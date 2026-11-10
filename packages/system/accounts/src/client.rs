@@ -1,11 +1,12 @@
 use std::collections::BTreeMap;
+use std::io::Write;
 
 use futures_util::{Stream, StreamExt};
 use luft_dbus::{explain, objects, session};
 use serde::Serialize;
 use serde::de::DeserializeOwned;
 use zbus::proxy::{Builder, CacheProperties};
-use zbus::{DynamicType, Proxy, Type};
+use zbus::{DynamicType, Fd, Proxy, Type};
 
 use crate::types::{Account, Answer, Credentials, Drive, FileState, Provider, Step};
 
@@ -13,6 +14,15 @@ pub const NAME: &str = "com.lantharos.Accounts1";
 pub const PATH: &str = "/com/lantharos/Accounts1";
 const ACCOUNTS: &str = "com.lantharos.Accounts1";
 const FILES: &str = "com.lantharos.Accounts1.Files";
+
+const LONGEST_PASSWORD: usize = 4096;
+
+/// Why the service refused: `kind` is the last part of its D-Bus error name,
+/// such as `Unsynced`, for apps to translate, and `message` says it in English.
+pub struct Refused {
+    pub kind: Option<String>,
+    pub message: String,
+}
 
 pub enum Signal {
     Accounts,
@@ -60,18 +70,41 @@ pub async fn accounts() -> Result<Vec<Account>, String> {
     call_json(ACCOUNTS, "Accounts", &()).await
 }
 
-pub async fn sign_in(provider: Provider, credentials: &Credentials) -> Result<String, String> {
-    let provider = json(&provider);
+/// Starts a sign-in. The password goes to the service through a pipe, so it
+/// is never part of a message on the bus.
+async fn start_sign_in(
+    method: &str,
+    subject: &str,
+    credentials: &Credentials,
+) -> Result<String, String> {
+    let password = credentials.password.as_deref().unwrap_or_default();
+    if password.len() > LONGEST_PASSWORD {
+        return Err("That password is too long.".to_owned());
+    }
+    let (reader, mut writer) = std::io::pipe().map_err(|error| error.to_string())?;
+    writer
+        .write_all(password.as_bytes())
+        .map_err(|error| error.to_string())?;
+    drop(writer);
+    let without_password = Credentials {
+        password: None,
+        ..credentials.clone()
+    };
     call(
         ACCOUNTS,
-        "SignIn",
-        &(provider.trim_matches('"'), json(credentials)),
+        method,
+        &(subject, json(&without_password), Fd::from(&reader)),
     )
     .await
 }
 
+pub async fn sign_in(provider: Provider, credentials: &Credentials) -> Result<String, String> {
+    let provider = json(&provider);
+    start_sign_in("SignIn", provider.trim_matches('"'), credentials).await
+}
+
 pub async fn sign_in_again(account: &str, credentials: &Credentials) -> Result<String, String> {
-    call(ACCOUNTS, "SignInAgain", &(account, json(credentials))).await
+    start_sign_in("SignInAgain", account, credentials).await
 }
 
 pub async fn step(session: &str) -> Result<Step, String> {
@@ -90,8 +123,21 @@ pub async fn rename(account: &str, name: &str) -> Result<(), String> {
     call(ACCOUNTS, "Rename", &(account, name)).await
 }
 
-pub async fn remove(account: &str) -> Result<(), String> {
-    call(ACCOUNTS, "Remove", &(account,)).await
+/// Removes an account and its files from this computer. Unless
+/// `discard_unsynced`, it is refused as `Unsynced` while files kept here may
+/// not have reached the cloud.
+pub async fn remove_account(account: &str, discard_unsynced: bool) -> Result<(), Refused> {
+    let accounts = proxy(ACCOUNTS).await.map_err(|message| Refused {
+        kind: None,
+        message,
+    })?;
+    accounts
+        .call("Remove", &(account, discard_unsynced))
+        .await
+        .map_err(|error| Refused {
+            kind: luft_dbus::error::kind(&error),
+            message: explain(&error),
+        })
 }
 
 pub async fn drives() -> Result<Vec<Drive>, String> {

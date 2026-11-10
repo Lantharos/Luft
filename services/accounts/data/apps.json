@@ -1,0 +1,10 @@
+{
+	"onedrive": {
+		"clientId": "b15665d9-eda6-4092-8539-0eec376afd59",
+		"clientSecret": "qtyfaBBYA403=unZUP40~_#"
+	},
+	"dropbox": {
+		"clientId": "5jcck7diasz0rqy",
+		"clientSecret": "1n9m04y2zx7bf26"
+	}
+}

@@ -17,13 +17,6 @@ const SAMPLES_PER_FRAME: usize = 1280;
 const STALLED_FRAMES: usize = 25;
 const LOOK_AGAIN_FRAMES: usize = 2;
 
-/// NVIDIA's Parakeet TDT, a transducer that also predicts how many frames
-/// each piece lasts, so decoding skips ahead instead of visiting every frame.
-/// It sometimes hears nothing more after the end of a sentence, or nothing at
-/// all in speech that starts or ends in the middle of a word, so when it falls
-/// silent well before the end, what comes after the last word it heard is
-/// recognized again on its own, and speech it heard nothing in is looked at
-/// once more from a moment later.
 pub struct Parakeet {
     preprocessor: Session,
     encoder: Session,
@@ -126,7 +119,6 @@ impl Parakeet {
         Ok((by_frame, width, (lengths[0] as usize).min(frames)))
     }
 
-    /// The pieces heard, and the frame after the last one.
     fn decode(
         &mut self,
         frames: &[f32],

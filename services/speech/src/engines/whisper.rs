@@ -7,12 +7,6 @@ use whisper_rs::{
 
 use super::Pass;
 
-/// OpenAI's Whisper through whisper.cpp, on the graphics card when Vulkan has
-/// one and on the processor otherwise. It always looks at a whole 30 second
-/// window: the turbo model makes things up when shown less.
-///
-/// Dictation asks for one piece of text at a time; recordings ask which
-/// language a stretch is in, and for what was said in it with timestamps.
 pub struct Whisper {
     state: WhisperState,
     _context: WhisperContext,
@@ -65,8 +59,6 @@ impl Whisper {
         Ok(text.trim().to_owned())
     }
 
-    /// How likely each language Whisper knows is to be the one spoken, by
-    /// its whisper.cpp id.
     pub fn languages(&mut self, audio: &[f32]) -> Result<Vec<f32>> {
         let threads = super::threads();
         self.state
@@ -79,8 +71,6 @@ impl Whisper {
         Ok(chances)
     }
 
-    /// What was said, piece by piece, with when each piece starts and ends
-    /// in hundredths of a second from the start of `audio`.
     pub fn timed(&mut self, audio: &[f32], language: &str) -> Result<Vec<Heard>> {
         let mut parameters = FullParams::new(SamplingStrategy::Greedy { best_of: 1 });
         parameters.set_language(Some(language));

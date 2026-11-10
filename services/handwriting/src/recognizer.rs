@@ -37,13 +37,11 @@ fn backend() -> Result<&'static LlamaBackend> {
     Ok(BACKEND.get_or_init(|| backend))
 }
 
-/// Half the processor, at most four threads, so reading never takes the whole computer.
 fn threads() -> i32 {
     let cores = std::thread::available_parallelism().map_or(2, usize::from);
     (cores / 2).clamp(2, 4) as i32
 }
 
-/// The graphics card llama.cpp reaches through Vulkan, built in or separate.
 fn graphics() -> Option<LlamaBackendDevice> {
     list_llama_ggml_backend_devices()
         .into_iter()
@@ -55,23 +53,18 @@ fn graphics() -> Option<LlamaBackendDevice> {
         })
 }
 
-/// Where the model runs: a graphics card's index among llama.cpp's devices, or the processor.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Device {
     Graphics(usize),
     Processor,
 }
 
-/// Qwen3-VL 2B reading a picture of a line of handwriting: the picture goes
-/// through its vision encoder, and the language model writes what it says.
 pub struct Recognizer {
     model: LlamaModel,
     vision: MtmdContext,
 }
 
 impl Recognizer {
-    /// Loads the model onto the graphics card when there is one that takes
-    /// it, and onto the processor otherwise.
     pub fn load(folder: &Path) -> Result<Self> {
         backend()?;
         if let Some(card) = graphics() {

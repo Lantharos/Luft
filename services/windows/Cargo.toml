@@ -15,7 +15,7 @@ path = "src/main.rs"
 anyhow.workspace = true
 futures-util.workspace = true
 libc.workspace = true
-luft-dbus.workspace = true
+luft-dbus = { workspace = true, features = ["service"] }
 luft-dbus-macros.workspace = true
 luft-windows.workspace = true
 serde.workspace = true

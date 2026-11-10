@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use anyhow::Context;
 use luft_dbus_macros::introspect;
 use luft_language::types::{HeadingRequest, LanguageDownload, LanguageModel, NotesRequest};
 use serde::Serialize;
@@ -9,21 +10,11 @@ use zbus::object_server::SignalEmitter;
 use crate::hub::{self, Hub, NotInstalled};
 use crate::notes;
 
-#[derive(Debug, zbus::DBusError)]
-#[zbus(prefix = "com.lantharos.Language1.Error")]
-pub enum Error {
-    #[zbus(error)]
-    ZBus(zbus::Error),
-    NotInstalled(String),
-    Paused(String),
-    Failed(String),
-}
-
-impl From<anyhow::Error> for Error {
-    fn from(error: anyhow::Error) -> Self {
-        Error::Failed(format!("{error:#}"))
-    }
-}
+luft_dbus::errors!("com.lantharos.Language1.Error" {
+    NotInstalled,
+    Paused,
+    Unreadable,
+});
 
 pub struct Writing {
     hub: Arc<Hub>,
@@ -47,18 +38,16 @@ impl Writing {
         R: serde::de::DeserializeOwned + Send + 'static,
         T: Serialize + Send + 'static,
     {
-        if let Ok(system) = luft_dbus::system().await
-            && luft_dbus::power::battery_low(system).await
-        {
-            return Err(Error::Paused("The battery is low".into()));
+        if luft_dbus::power::saving_battery().await {
+            return Err(Error::Paused("The battery is low.".into()));
         }
         let request: R = serde_json::from_str(request)
-            .map_err(|error| Error::Failed(format!("The request doesn't read: {error}")))?;
+            .map_err(|_| Error::Unreadable("That request couldn't be read.".into()))?;
         let hub = self.hub.clone();
         let written =
             tokio::task::spawn_blocking(move || hub.with_writer(|writer| write(writer, &request)))
                 .await
-                .map_err(|error| Error::Failed(error.to_string()))??
+                .context("Writing stopped unexpectedly.")??
                 .map_err(|NotInstalled| Error::NotInstalled(hub::model().id.clone()))?;
         Ok(serde_json::to_string(&written).expect("what's written always serializes"))
     }
@@ -67,12 +56,10 @@ impl Writing {
 #[introspect]
 #[interface(name = "com.lantharos.Language1")]
 impl Writing {
-    /// Notes of part of a class: JSON NotesRequest in, JSON Notes out.
     async fn notes(&self, request: String) -> Result<String, Error> {
         self.write::<NotesRequest, _>(&request, notes::notes).await
     }
 
-    /// A title and summary of a class from its key points: JSON HeadingRequest in, JSON Heading out.
     async fn heading(&self, request: String) -> Result<String, Error> {
         self.write::<HeadingRequest, _>(&request, notes::heading)
             .await
@@ -90,9 +77,10 @@ impl Models {
             credit: model.credit.clone(),
             homepage: model.homepage.clone(),
             size: model.size(),
-            installed: self.hub.store.installed(model),
+            installed: self.hub.models.store.installed(model),
             download: self
                 .hub
+                .models
                 .downloads
                 .progress(&model.id)
                 .map(|progress| LanguageDownload {
@@ -105,17 +93,12 @@ impl Models {
     }
 
     fn install(&self) -> Result<(), Error> {
-        self.hub.install()?;
-        self.hub.changed();
+        self.hub.models.install(hub::model())?;
         Ok(())
     }
 
     fn remove(&self) -> Result<(), Error> {
-        let model = hub::model();
-        self.hub.downloads.cancel(&model.id);
-        self.hub.store.remove(model)?;
-        self.hub.changed();
-        Ok(())
+        Ok(self.hub.models.remove(hub::model())?)
     }
 
     #[zbus(signal)]

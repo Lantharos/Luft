@@ -2,8 +2,6 @@ use anyhow::{Context, Result};
 
 const WORD_START: char = '\u{2581}';
 
-/// The SentencePiece pieces Parakeet speaks in, by id. The last one is the
-/// blank that means nothing new was heard.
 pub struct Vocabulary {
     pieces: Vec<String>,
 }

@@ -31,14 +31,11 @@ fn backend() -> Result<&'static LlamaBackend> {
     Ok(BACKEND.get_or_init(|| backend))
 }
 
-/// Half the processor, at most four threads, so writing never takes the whole computer.
 fn threads() -> i32 {
     let cores = std::thread::available_parallelism().map_or(2, usize::from);
     (cores / 2).clamp(2, 4) as i32
 }
 
-/// Qwen3 4B Instruct through llama.cpp, on the graphics card when Vulkan has
-/// one and on the processor otherwise.
 pub struct Writer {
     model: LlamaModel,
 }
@@ -51,9 +48,6 @@ impl Writer {
         Ok(Self { model })
     }
 
-    /// Answers a conversation of a system and a user message, written to
-    /// match `grammar`, a llama.cpp GBNF grammar. Only the marks between the
-    /// messages count as the model's own; the messages are read as plain text.
     pub fn write(&self, system: &str, user: &str, grammar: &str, longest: usize) -> Result<String> {
         let vocab = self.model.vocab();
         let marks = |text: &str| vocab.tokenize(text.as_bytes(), false, true);
@@ -107,9 +101,6 @@ impl Writer {
     }
 }
 
-/// Samples the next token, and checks only that one against the grammar,
-/// which is much quicker than checking every token in the vocabulary. Only
-/// when it doesn't fit is the whole vocabulary narrowed by the grammar first.
 fn next_token(
     context: &LlamaContext,
     sampler: &mut LlamaSampler,

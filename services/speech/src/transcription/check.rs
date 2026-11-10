@@ -1,14 +1,3 @@
-//! Transcribes recordings of mixed-language speech the way the service does
-//! and compares them with what was said. Needs the Whisper model, so it only
-//! runs when asked:
-//!
-//! LUFT_SPEECH_MODELS=<folder of models> LUFT_TRANSCRIPTION_SAMPLES=<folder of
-//! .opus recordings, each with a .json list of what was said when>
-//! cargo test --release transcribe -- --ignored --nocapture
-//!
-//! `LUFT_TRANSCRIPTION_LANGUAGES` lists the languages to choose from, by
-//! default Albanian, German, Serbian in Latin and English.
-
 use std::collections::BTreeMap;
 use std::fs::File;
 use std::path::PathBuf;

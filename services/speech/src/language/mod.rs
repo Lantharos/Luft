@@ -5,8 +5,6 @@ use luft_speech::types::{Engine, EngineChoice, Language};
 
 pub use names::{PARAKEET, WHISPER};
 
-/// What the person speaks, with the script to write it in when the language
-/// has two.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Spoken {
     pub code: String,
@@ -46,8 +44,6 @@ pub fn all(choice: EngineChoice) -> Vec<Language> {
     languages
 }
 
-/// The language a keyboard layout is for, such as `fr` for `ch+fr`. Layouts
-/// used across many languages, like the US one, say nothing.
 fn from_layout(layout: &str) -> Option<Spoken> {
     let (country, variant) = layout.split_once('+').unwrap_or((layout, ""));
     let code = match country {
@@ -137,8 +133,6 @@ fn from_locale(locale: &str) -> Option<Spoken> {
     })
 }
 
-/// The language to listen for: the one picked in Settings, or the one the
-/// keyboard layout is for, or the one the computer is set to, or English.
 pub fn resolve(chosen: Option<&str>, layout: Option<&str>, locale: Option<&str>) -> Spoken {
     let from_keyboard = layout.and_then(from_layout);
     let from_computer = locale.and_then(from_locale);

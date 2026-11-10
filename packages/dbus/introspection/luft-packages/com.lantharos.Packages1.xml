@@ -8,6 +8,8 @@
     </method>
     <method name="Rebuild">
     </method>
+    <method name="Update">
+    </method>
     <method name="Install">
       <arg name="names" type="as" direction="in"/>
     </method>

@@ -9,9 +9,6 @@ pub const FRAME: usize = 512;
 const CONTEXT: usize = 64;
 const STATE: [usize; 3] = [2, 1, 128];
 
-/// Silero VAD: how likely each 32 ms of audio is someone speaking, judged by
-/// a small network trained on speech in many languages over all kinds of
-/// noise, so steady speech stays speech however long it goes on.
 pub struct Voice {
     session: Session,
     state: Vec<f32>,

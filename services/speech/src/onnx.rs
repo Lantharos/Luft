@@ -17,7 +17,6 @@ fn environment() -> Result<&'static Environment> {
     Ok(ENVIRONMENT.get_or_init(|| environment))
 }
 
-/// A session builder for models on ONNX Runtime, running on this many threads.
 pub fn builder(threads: usize) -> Result<SessionBuilder> {
     let failed = |error: ort::Error<SessionBuilder>| anyhow!("{error}");
     ort::session::Session::builder(environment()?)?

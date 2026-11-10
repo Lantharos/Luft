@@ -1,12 +1,12 @@
 # luft-sleep
 
-Keeps a sleeping laptop from running its battery flat. Luft can't hibernate (Secure Boot's lockdown rules it out), so instead the computer wakes briefly on a timer while it sleeps on battery, checks the battery and how long it has slept, and either goes straight back to sleep or shuts down the usual way, so apps and sessions close as they would from the power menu. Plugged in, it just sleeps. Waking more than a minute after a check was due counts as someone waking the computer, since some laptops can't be woken by the timer. Computers without a battery sleep normally.
+Keeps a sleeping laptop from running its battery flat. Luft can't hibernate (Secure Boot's lockdown rules it out), so instead the computer wakes briefly on a timer while it sleeps on battery, checks the battery, and either goes straight back to sleep or shuts down the usual way, so apps and sessions close as they would from the power menu. Plugged in, it just sleeps. Waking well before a check was due, or more than a minute after, counts as someone waking the computer, since some laptops can't be woken by the timer. Computers without a battery sleep normally.
 
-It shuts down when the battery falls to 5% or once it has slept on battery for the chosen time, a day unless changed in Settings → Power. Checks start an hour in and come sooner as the battery drains faster.
+It shuts down when the battery falls to 5%. Otherwise it stays asleep, so open windows are kept, unless a time is chosen in Settings → Power: then it also shuts down once it has slept on battery that long. Checks start an hour in and come sooner as the battery drains faster.
 
 | Command | Use |
 | --- | --- |
-| `luft-sleep` | `com.lantharos.Sleep1` (see `data/com.lantharos.Sleep1.xml`), started over D-Bus to read and change the setting in `/var/lib/luft-sleep/sleep.conf`; stops when idle |
+| `luft-sleep` | `com.lantharos.Sleep1` (see `packages/dbus/introspection/luft-sleep`), started over D-Bus to read and change the setting in `/var/lib/luft-sleep/sleep.conf`; stops when idle |
 | `luft-sleep suspend` | Replaces `systemd-sleep suspend` in `systemd-suspend.service` and sleeps in a loop until something other than its own timer wakes the computer |
 
 | File in `data` | Goes to |

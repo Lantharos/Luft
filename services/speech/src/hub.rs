@@ -1,21 +1,23 @@
-use std::sync::{Arc, Mutex};
-use std::time::{Duration, Instant};
+use std::sync::Mutex;
+use std::time::Duration;
 
 use anyhow::Result;
+use luft_models::Library;
+use luft_speech::types::Engine;
 use tokio::sync::mpsc::UnboundedSender;
 use tokio::sync::oneshot;
 use zbus::names::UniqueName;
 
 use crate::dictation::Session;
 use crate::engines::Processor;
-use crate::models::manifest::{self, Entry};
-use crate::models::{Downloads, Store};
+use crate::models::manifest::{self, CATALOG};
 use crate::plan::Plan;
 use crate::preferences;
 use crate::warm::Warm;
 
 pub const NAME: &str = "com.lantharos.Speech1";
 pub const PATH: &str = "/com/lantharos/Speech1";
+const WARM_FOR: Duration = Duration::from_secs(180);
 
 pub enum Event {
     Partial(String),
@@ -28,84 +30,53 @@ pub enum Event {
 
 pub struct Hub {
     pub processor: Processor,
-    pub store: Store,
-    pub downloads: Downloads,
+    pub models: Library<Engine>,
     pub warm: Warm,
     pub session: tokio::sync::Mutex<Option<Session>>,
     pub listener: Mutex<Option<UniqueName<'static>>>,
     pub events: UnboundedSender<Event>,
-    idle_since: Mutex<Option<Instant>>,
 }
 
 impl Hub {
-    pub fn new(store: Store, events: UnboundedSender<Event>) -> Self {
-        Self {
+    pub fn new(events: UnboundedSender<Event>) -> Result<Self> {
+        let changes = events.clone();
+        Ok(Self {
             processor: Processor::detect(),
-            store,
-            downloads: Downloads::default(),
+            models: Library::open("luft-speech", &CATALOG, move || {
+                let _ = changes.send(Event::Changed);
+            })?,
             warm: Warm::default(),
             session: tokio::sync::Mutex::new(None),
             listener: Mutex::new(None),
             events,
-            idle_since: Mutex::new(None),
-        }
+        })
     }
 
-    pub fn changed(&self) {
-        let _ = self.events.send(Event::Changed);
-    }
-
-    /// Starts downloading a model, or picks up where its download stopped.
-    pub fn install(self: &Arc<Self>, entry: &'static Entry) -> Result<bool> {
-        self.store.remove_unlisted(manifest::models())?;
-        let hub = self.clone();
-        Ok(self.downloads.start(
-            entry,
-            manifest::mirror(),
-            self.store.folder(entry),
-            self.store.usage(entry),
-            move || hub.changed(),
-        ))
-    }
-
-    /// While dictation is on, downloads the model the chosen language needs
-    /// and stops downloading any other. Downloaded models stay until removed.
-    pub fn follow(self: &Arc<Self>) {
+    pub fn follow_settings(&self) {
         if !preferences::read().enabled {
             return;
         }
         let plan = Plan::now(None, self.processor);
-        let mut moved = false;
         for entry in manifest::models() {
             if entry.id != plan.model.id {
-                moved |= self.downloads.cancel(&entry.id);
+                self.models.cancel_install(&entry.id);
             }
         }
-        if self.processor.runs(plan.engine) && !self.store.installed(plan.model) {
-            match self.install(plan.model) {
-                Ok(started) => moved |= started,
-                Err(error) => eprintln!("Couldn't download {}: {error:#}", plan.model.id),
-            }
-        }
-        if moved {
-            self.changed();
+        if self.processor.runs(plan.engine)
+            && !self.models.store.installed(plan.model)
+            && let Err(error) = self.models.install(plan.model)
+        {
+            eprintln!("Couldn't download {}: {error:#}", plan.model.id);
         }
     }
 
-    /// How long nothing has been going on: no dictation, no download and no
-    /// model loaded.
-    pub fn idle_for(&self) -> Duration {
-        let busy = self.warm.busy()
-            || self.downloads.active()
+    pub fn busy(&self) -> bool {
+        self.warm.expire(WARM_FOR);
+        self.warm.busy()
+            || self.models.downloads.active()
             || self
                 .session
                 .try_lock()
-                .map_or(true, |session| session.is_some());
-        let mut idle_since = self.idle_since.lock().expect("idle lock");
-        if busy {
-            *idle_since = None;
-            return Duration::ZERO;
-        }
-        idle_since.get_or_insert_with(Instant::now).elapsed()
+                .map_or(true, |session| session.is_some())
     }
 }

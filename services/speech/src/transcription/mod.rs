@@ -7,37 +7,24 @@ mod opus;
 mod regions;
 mod resample;
 
-use std::sync::{Arc, Mutex};
-use std::time::{Duration, Instant};
+use std::sync::Arc;
+use std::time::Duration;
 
 use anyhow::Result;
+use luft_models::{Store, Warm};
 use luft_speech::types::Engine;
-use tokio::signal::unix::{SignalKind, signal};
 
 use crate::engines::{Processor, Whisper};
-use crate::models::Store;
 use crate::models::manifest;
 
 pub const NAME: &str = "com.lantharos.Transcription1";
 pub const PATH: &str = "/com/lantharos/Transcription1";
 const WARM_FOR: Duration = Duration::from_secs(180);
-const EXIT_WHEN_IDLE_FOR: Duration = Duration::from_secs(30);
-const CHECK_EVERY: Duration = Duration::from_secs(5);
 
-struct Loaded {
-    whisper: Whisper,
-    used: Instant,
-}
-
-/// Transcribing recordings, such as Heft's of a class: the same binary as
-/// dictation, run as a service of its own at the lowest priority, so it only
-/// gets time nothing else wants, and kept apart from dictation, which has to
-/// answer at once.
 pub struct Transcriber {
     processor: Processor,
     store: Store,
-    loaded: Mutex<Option<Loaded>>,
-    idle_since: Mutex<Option<Instant>>,
+    whisper: Warm<Whisper>,
 }
 
 pub enum Refusal {
@@ -58,46 +45,19 @@ impl Transcriber {
         if !self.store.installed(model) {
             return Ok(Err(Refusal::NotInstalled(model.id.clone())));
         }
-        let mut slot = self.loaded.lock().expect("model lock");
-        let loaded = match slot.take() {
-            Some(loaded) => loaded,
-            None => Loaded {
-                whisper: Whisper::load(&self.store.folder(model).join(&model.files[0].name))?,
-                used: Instant::now(),
-            },
-        };
-        let loaded = slot.insert(Loaded {
-            used: Instant::now(),
-            ..loaded
-        });
-        Ok(Ok(job::transcribe(&mut loaded.whisper, file, request)?))
+        self.whisper
+            .with(
+                || Whisper::load(&self.store.folder(model).join(&model.files[0].name)),
+                |whisper| job::transcribe(whisper, file, request),
+            )
+            .map(Ok)
     }
 
-    fn expire(&self) {
-        let Ok(mut loaded) = self.loaded.try_lock() else {
-            return;
-        };
-        if loaded
-            .as_ref()
-            .is_some_and(|loaded| loaded.used.elapsed() >= WARM_FOR)
-        {
-            *loaded = None;
-            drop(loaded);
+    fn busy(&self) -> bool {
+        if self.whisper.expire(WARM_FOR) {
             unsafe { libc::malloc_trim(0) };
         }
-    }
-
-    fn idle_for(&self) -> Duration {
-        let busy = self
-            .loaded
-            .try_lock()
-            .map_or(true, |loaded| loaded.is_some());
-        let mut idle_since = self.idle_since.lock().expect("idle lock");
-        if busy {
-            *idle_since = None;
-            return Duration::ZERO;
-        }
-        idle_since.get_or_insert_with(Instant::now).elapsed()
+        self.whisper.loaded()
     }
 }
 
@@ -105,8 +65,7 @@ pub async fn serve() -> Result<()> {
     let transcriber = Arc::new(Transcriber {
         processor: Processor::detect(),
         store: Store::for_service("luft-speech")?,
-        loaded: Mutex::new(None),
-        idle_since: Mutex::new(None),
+        whisper: Warm::default(),
     });
     let connection = zbus::Connection::session().await?;
     connection
@@ -114,19 +73,5 @@ pub async fn serve() -> Result<()> {
         .at(PATH, bus::Transcription::new(transcriber.clone()))
         .await?;
     connection.request_name(NAME).await?;
-    let mut terminate = signal(SignalKind::terminate())?;
-    let mut interrupt = signal(SignalKind::interrupt())?;
-    let mut tick = tokio::time::interval(CHECK_EVERY);
-    loop {
-        tokio::select! {
-            _ = terminate.recv() => return Ok(()),
-            _ = interrupt.recv() => return Ok(()),
-            _ = tick.tick() => {
-                transcriber.expire();
-                if transcriber.idle_for() >= EXIT_WHEN_IDLE_FOR {
-                    return Ok(());
-                }
-            }
-        }
-    }
+    Ok(luft_dbus::idle::until_idle(|| transcriber.busy()).await?)
 }

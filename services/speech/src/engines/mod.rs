@@ -13,8 +13,6 @@ pub use parakeet::Parakeet;
 pub use processor::Processor;
 pub use whisper::Whisper;
 
-/// Whether a recognition is a quick look at speech still going on, or the text
-/// that's typed in the end.
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Pass {
     Partial,

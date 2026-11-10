@@ -1,17 +1,17 @@
-use std::sync::{Arc, Condvar, LazyLock, Mutex};
-use std::time::{Duration, Instant};
+use std::sync::{Condvar, LazyLock, Mutex};
+use std::time::Duration;
 
 use anyhow::Result;
 use luft_handwriting::types::Stroke;
-use luft_models::{Catalog, Downloads, Entry, Store};
+use luft_models::{Catalog, Entry, Library, Warm};
 use serde::Deserialize;
-use tokio::sync::mpsc::UnboundedSender;
 
 use crate::ink;
 use crate::recognizer::Recognizer;
 
 pub const NAME: &str = "com.lantharos.Handwriting1";
 pub const PATH: &str = "/com/lantharos/Handwriting1";
+const WARM_FOR: Duration = Duration::from_secs(180);
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -19,7 +19,7 @@ pub enum Engine {
     Vision,
 }
 
-static CATALOG: LazyLock<Catalog<Engine>> =
+pub static CATALOG: LazyLock<Catalog<Engine>> =
     LazyLock::new(|| Catalog::parse(include_str!("../data/models.json")));
 
 pub fn model() -> &'static Entry<Engine> {
@@ -28,127 +28,83 @@ pub fn model() -> &'static Entry<Engine> {
 
 pub struct NotInstalled;
 
-/// Whether someone is waiting for the line, or it's read in the background.
 #[derive(Clone, Copy, PartialEq, Eq)]
-pub enum Urgency {
+pub enum Reader {
     Waiting,
     Background,
 }
 
-struct Loaded {
-    recognizer: Recognizer,
-    used: Instant,
+pub struct Hub {
+    pub models: Library<Engine>,
+    recognizer: Warm<Recognizer>,
+    readers_waiting: Mutex<usize>,
+    nobody_waiting: Condvar,
 }
 
-pub struct Hub {
-    pub store: Store,
-    pub downloads: Downloads,
-    loaded: Mutex<Option<Loaded>>,
-    waiting: Mutex<usize>,
-    nobody_waiting: Condvar,
-    changes: UnboundedSender<()>,
-    idle_since: Mutex<Option<Instant>>,
+struct AheadOfBackground<'a>(&'a Hub);
+
+impl<'a> AheadOfBackground<'a> {
+    fn new(hub: &'a Hub) -> Self {
+        *hub.readers_waiting.lock().expect("waiting lock") += 1;
+        Self(hub)
+    }
+}
+
+impl Drop for AheadOfBackground<'_> {
+    fn drop(&mut self) {
+        let mut waiting = self.0.readers_waiting.lock().expect("waiting lock");
+        *waiting -= 1;
+        if *waiting == 0 {
+            self.0.nobody_waiting.notify_all();
+        }
+    }
 }
 
 impl Hub {
-    pub fn new(store: Store, changes: UnboundedSender<()>) -> Self {
+    pub fn new(models: Library<Engine>) -> Self {
         Self {
-            store,
-            downloads: Downloads::default(),
-            loaded: Mutex::new(None),
-            waiting: Mutex::new(0),
+            models,
+            recognizer: Warm::default(),
+            readers_waiting: Mutex::new(0),
             nobody_waiting: Condvar::new(),
-            changes,
-            idle_since: Mutex::new(None),
         }
     }
 
-    pub fn changed(&self) {
-        let _ = self.changes.send(());
-    }
-
-    pub fn install(self: &Arc<Self>) -> Result<bool> {
-        self.store.remove_unlisted(CATALOG.models())?;
-        let hub = self.clone();
-        Ok(self.downloads.start(
-            model(),
-            CATALOG.mirror(),
-            self.store.folder(model()),
-            self.store.usage(model()),
-            move || hub.changed(),
-        ))
-    }
-
-    /// Reads a line; a line someone waits for goes ahead of every background
-    /// line that hasn't started yet.
     pub fn recognize(
         &self,
         strokes: &[Stroke],
-        urgency: Urgency,
+        reader: Reader,
     ) -> Result<Result<String, NotInstalled>> {
         let Some(line) = ink::draw(strokes) else {
             return Ok(Ok(String::new()));
         };
-        if !self.store.installed(model()) {
+        if !self.models.store.installed(model()) {
             return Ok(Err(NotInstalled));
         }
-        let mut slot = match urgency {
-            Urgency::Waiting => {
-                *self.waiting.lock().expect("waiting lock") += 1;
-                let slot = self.loaded.lock().expect("recognizer lock");
-                let mut waiting = self.waiting.lock().expect("waiting lock");
-                *waiting -= 1;
-                if *waiting == 0 {
-                    self.nobody_waiting.notify_all();
-                }
-                slot
-            }
-            Urgency::Background => {
+        let _ahead = match reader {
+            Reader::Waiting => Some(AheadOfBackground::new(self)),
+            Reader::Background => {
                 drop(
                     self.nobody_waiting
-                        .wait_while(self.waiting.lock().expect("waiting lock"), |waiting| {
-                            *waiting > 0
-                        })
+                        .wait_while(
+                            self.readers_waiting.lock().expect("waiting lock"),
+                            |waiting| *waiting > 0,
+                        )
                         .expect("waiting lock"),
                 );
-                self.loaded.lock().expect("recognizer lock")
+                None
             }
         };
-        if slot.is_none() {
-            *slot = Some(Loaded {
-                recognizer: Recognizer::load(&self.store.folder(model()))?,
-                used: Instant::now(),
-            });
-        }
-        let loaded = slot.as_mut().expect("the recognizer was just loaded");
-        loaded.used = Instant::now();
-        Ok(Ok(loaded.recognizer.read(&line)?))
+        self.recognizer
+            .with(
+                || Recognizer::load(&self.models.store.folder(model())),
+                |recognizer| recognizer.read(&line),
+            )
+            .map(Ok)
     }
 
-    pub fn expire(&self, after: Duration) {
-        let Ok(mut loaded) = self.loaded.try_lock() else {
-            return;
-        };
-        if loaded
-            .as_ref()
-            .is_some_and(|loaded| loaded.used.elapsed() >= after)
-        {
-            *loaded = None;
-        }
-    }
-
-    /// How long nothing has been going on: no model loaded and no download.
-    pub fn idle_for(&self) -> Duration {
-        let busy = self.downloads.active()
-            || self
-                .loaded
-                .try_lock()
-                .map_or(true, |loaded| loaded.is_some());
-        let mut idle_since = self.idle_since.lock().expect("idle lock");
-        if busy {
-            *idle_since = None;
-            return Duration::ZERO;
-        }
-        idle_since.get_or_insert_with(Instant::now).elapsed()
+    pub fn busy(&self) -> bool {
+        self.recognizer.expire(WARM_FOR);
+        self.models.downloads.active() || self.recognizer.loaded()
     }
 }

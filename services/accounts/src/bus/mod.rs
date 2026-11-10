@@ -8,17 +8,16 @@ pub use files::Files;
 
 use crate::hub::Hub;
 
-#[derive(Debug, zbus::DBusError)]
-#[zbus(prefix = "com.lantharos.Accounts1.Error")]
-pub enum Error {
-    #[zbus(error)]
-    ZBus(zbus::Error),
-    Failed(String),
-}
+luft_dbus::errors!("com.lantharos.Accounts1.Error" {
+    Gone,
+    Offline,
+    Unreadable,
+    Unsynced,
+});
 
-impl From<anyhow::Error> for Error {
-    fn from(error: anyhow::Error) -> Self {
-        Error::Failed(format!("{error:#}"))
+impl Error {
+    pub fn account_gone() -> Self {
+        Self::Gone("That account isn't here anymore.".to_owned())
     }
 }
 
@@ -32,5 +31,5 @@ pub fn json<T: serde::Serialize>(value: &T) -> String {
 
 pub fn parse<T: for<'de> serde::Deserialize<'de>>(text: &str) -> Result<T, Error> {
     serde_json::from_str(text)
-        .map_err(|error| Error::Failed(format!("That request couldn't be read: {error}")))
+        .map_err(|_| Error::Unreadable("That request couldn't be read.".to_owned()))
 }

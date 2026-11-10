@@ -7,8 +7,6 @@ use luft_speech::types::EngineChoice;
 const DICTATION: &str = "com.lantharos.kestrel.dictation";
 const INPUT_SOURCES: &str = "org.gnome.desktop.input-sources";
 
-/// What the person chose in Settings: whether dictation is on, a language,
-/// or none to follow the keyboard, and an engine, or automatic.
 pub struct Preferences {
     pub enabled: bool,
     pub language: Option<String>,
@@ -41,7 +39,6 @@ pub fn read() -> Preferences {
     }
 }
 
-/// The first keyboard layout, which is the one the person set up first.
 pub fn first_layout() -> Option<String> {
     let sources = settings(INPUT_SOURCES)?.value("sources");
     let sources: Vec<(String, String)> = sources.get()?;
@@ -58,8 +55,6 @@ pub fn locale() -> Option<String> {
         .find(|value| !value.is_empty())
 }
 
-/// Calls `changed`, on a thread of its own, whenever a choice that decides
-/// what dictation listens with changes.
 pub fn watch(changed: impl Fn() + Send + 'static) -> std::io::Result<()> {
     std::thread::Builder::new()
         .name("preferences".into())

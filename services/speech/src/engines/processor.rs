@@ -2,10 +2,6 @@ use luft_speech::types::{Engine, EngineChoice};
 
 const WHISPER_NEEDS: [&str; 6] = ["sse4_2", "avx", "avx2", "fma", "f16c", "bmi2"];
 
-/// What this computer's processor can run. whisper.cpp is built for processors
-/// with AVX2, which nearly every one since 2013 has, and stops with an illegal
-/// instruction on older ones, so it's never loaded there. ONNX Runtime picks
-/// code for the processor as it runs, so Parakeet runs on any.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Processor {
     whisper: bool,
@@ -45,8 +41,6 @@ impl Processor {
             .collect()
     }
 
-    /// The engine choice to follow: choosing Whisper where it can't run falls
-    /// back to choosing by language.
     pub fn allow(self, choice: EngineChoice) -> EngineChoice {
         match choice {
             EngineChoice::Whisper if !self.whisper => EngineChoice::Automatic,

@@ -14,25 +14,20 @@ use crate::language;
 use crate::models::manifest;
 use crate::plan::Plan;
 
-#[derive(Debug, zbus::DBusError)]
-#[zbus(prefix = "com.lantharos.Speech1.Error")]
-pub enum Error {
-    #[zbus(error)]
-    ZBus(zbus::Error),
-    NotInstalled(String),
-    Unsupported(String),
-    NotAllowed(String),
-    Failed(String),
-}
+luft_dbus::errors!("com.lantharos.Speech1.Error" {
+    NotInstalled,
+    Unsupported,
+    NotAllowed,
+    UnknownModel,
+});
 
 pub const SHELL: BusName<'static> = BusName::WellKnown(
     zbus::names::WellKnownName::from_static_str_unchecked("com.lantharos.Kestrel"),
 );
 
-impl From<anyhow::Error> for Error {
-    fn from(error: anyhow::Error) -> Self {
-        Error::Failed(format!("{error:#}"))
-    }
+fn listed(model: &str) -> Result<&'static manifest::Entry, Error> {
+    manifest::find(model)
+        .ok_or_else(|| Error::UnknownModel(format!("There's no model called {model}.")))
 }
 
 fn language_name(code: &str) -> &'static str {
@@ -50,7 +45,7 @@ impl Dictation {
         match (owner, header.sender()) {
             (Some(owner), Some(sender)) if *owner == *sender => Ok(sender.to_owned()),
             _ => Err(Error::NotAllowed(
-                "Only the desktop can take dictation".into(),
+                "Only the desktop can take dictation.".into(),
             )),
         }
     }
@@ -84,7 +79,7 @@ impl Dictation {
                 language_name(&plan.spoken.code).to_owned(),
             ));
         }
-        if !self.hub.store.installed(plan.model) {
+        if !self.hub.models.store.installed(plan.model) {
             return Err(Error::NotInstalled(plan.model.id.clone()));
         }
         let mut session = self.hub.session.lock().await;
@@ -142,10 +137,11 @@ impl Models {
                 credit: entry.credit.clone(),
                 homepage: entry.homepage.clone(),
                 size: entry.size(),
-                installed: self.hub.store.installed(entry),
-                usage: self.hub.store.usage(entry),
+                installed: self.hub.models.store.installed(entry),
+                usage: self.hub.models.store.usage(entry),
                 download: self
                     .hub
+                    .models
                     .downloads
                     .progress(&entry.id)
                     .map(|progress| Download {
@@ -170,25 +166,16 @@ impl Models {
     }
 
     fn install(&self, model: String) -> Result<(), Error> {
-        let entry = manifest::find(&model)
-            .ok_or_else(|| Error::Failed(format!("There's no model called {model}")))?;
-        self.hub.install(entry)?;
-        self.hub.changed();
+        self.hub.models.install(listed(&model)?)?;
         Ok(())
     }
 
     fn cancel_install(&self, model: String) {
-        self.hub.downloads.cancel(&model);
-        self.hub.changed();
+        self.hub.models.cancel_install(&model);
     }
 
     fn remove(&self, model: String) -> Result<(), Error> {
-        let entry = manifest::find(&model)
-            .ok_or_else(|| Error::Failed(format!("There's no model called {model}")))?;
-        self.hub.downloads.cancel(&model);
-        self.hub.store.remove(entry)?;
-        self.hub.changed();
-        Ok(())
+        Ok(self.hub.models.remove(listed(&model)?)?)
     }
 
     #[zbus(signal)]

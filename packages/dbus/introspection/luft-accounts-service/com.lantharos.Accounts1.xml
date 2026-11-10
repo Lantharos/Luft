@@ -6,11 +6,13 @@
     <method name="SignIn">
       <arg name="provider" type="s" direction="in"/>
       <arg name="credentials" type="s" direction="in"/>
+      <arg name="password" type="h" direction="in"/>
       <arg type="s" direction="out"/>
     </method>
     <method name="SignInAgain">
       <arg name="account" type="s" direction="in"/>
       <arg name="credentials" type="s" direction="in"/>
+      <arg name="password" type="h" direction="in"/>
       <arg type="s" direction="out"/>
     </method>
     <method name="Step">
@@ -30,6 +32,7 @@
     </method>
     <method name="Remove">
       <arg name="account" type="s" direction="in"/>
+      <arg name="discard_unsynced" type="b" direction="in"/>
     </method>
     <signal name="Changed">
     </signal>

@@ -1,5 +1,3 @@
-/// What the notes are written as: JSON in a fixed shape, so whatever the
-/// model writes can be read. Each item names the line it comes from.
 pub const NOTES: &str = r#"
 root ::= "{" ws "\"points\":" ws points "," ws "\"definitions\":" ws definitions "," ws "\"homework\":" ws homework "," ws "\"questions\":" ws questions ws "}"
 points ::= "[" ws ( point ( "," ws point )* )? ws "]"

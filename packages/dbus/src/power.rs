@@ -55,8 +55,18 @@ pub async fn on_battery_changes(
 
 /// Whether the computer has a battery, such as a laptop.
 pub async fn has_battery(connection: &Connection) -> bool {
-    match Proxy::new(connection, DISPLAY_DEVICE.name, DISPLAY_DEVICE.path, DISPLAY_DEVICE.interface).await {
-        Ok(display) => display.get_property::<bool>("IsPresent").await.unwrap_or(false),
+    match Proxy::new(
+        connection,
+        DISPLAY_DEVICE.name,
+        DISPLAY_DEVICE.path,
+        DISPLAY_DEVICE.interface,
+    )
+    .await
+    {
+        Ok(display) => display
+            .get_property::<bool>("IsPresent")
+            .await
+            .unwrap_or(false),
         Err(_) => false,
     }
 }
@@ -85,4 +95,12 @@ pub async fn battery_low(connection: &Connection) -> bool {
         .await
         .unwrap_or(100.0);
     present && state == DISCHARGING && charge < LOWEST_CHARGE
+}
+
+/// Whether heavy background work should wait for the charger.
+pub async fn saving_battery() -> bool {
+    match crate::system().await {
+        Ok(system) => battery_low(system).await,
+        Err(_) => false,
+    }
 }

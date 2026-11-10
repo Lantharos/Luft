@@ -11,12 +11,15 @@ rust-version.workspace = true
 name = "luft-speech"
 path = "src/main.rs"
 
+[features]
+recorded-audio = []
+
 [dependencies]
 anyhow.workspace = true
 futures-util.workspace = true
 gio.workspace = true
 libc.workspace = true
-luft-dbus.workspace = true
+luft-dbus = { workspace = true, features = ["service"] }
 luft-dbus-macros.workspace = true
 luft-models.workspace = true
 luft-speech.workspace = true

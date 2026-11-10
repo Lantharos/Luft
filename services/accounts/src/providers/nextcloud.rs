@@ -1,6 +1,6 @@
 use anyhow::{Context, Result, anyhow, bail};
 use serde::Deserialize;
-use url::Url;
+use url::{Host, Url};
 use zeroize::Zeroizing;
 
 use super::{encode_path, http};
@@ -64,10 +64,23 @@ pub fn server_address(typed: &str) -> Result<String> {
     };
     let url =
         Url::parse(&with_scheme).map_err(|_| anyhow!("That doesn't look like a server address"))?;
-    if !matches!(url.scheme(), "http" | "https") || url.host_str().is_none() {
-        bail!("That doesn't look like a server address");
+    match (url.scheme(), url.host()) {
+        ("https", Some(_)) => {}
+        ("http", Some(host)) if on_this_computer(&host) => {}
+        ("http", Some(_)) => bail!(
+            "That server doesn't protect the connection, so your password could be read on the way. Use an address that starts with https://"
+        ),
+        _ => bail!("That doesn't look like a server address"),
     }
     Ok(url.as_str().trim_end_matches('/').to_owned())
+}
+
+fn on_this_computer(host: &Host<&str>) -> bool {
+    match host {
+        Host::Domain(name) => *name == "localhost",
+        Host::Ipv4(address) => address.is_loopback(),
+        Host::Ipv6(address) => address.is_loopback(),
+    }
 }
 
 fn same_origin(server: &str, other: &str) -> bool {
@@ -192,6 +205,7 @@ mod tests {
             "http://127.0.0.1:8089"
         );
         assert!(server_address("ftp://example.com").is_err());
+        assert!(server_address("http://cloud.example.com").is_err());
         assert_eq!(
             files_address("https://cloud.example.com", "ada lovelace"),
             "https://cloud.example.com/remote.php/dav/files/ada%20lovelace/"

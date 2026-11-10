@@ -1,6 +1,7 @@
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
+use anyhow::Context;
 use luft_dbus_macros::introspect;
 use zbus::interface;
 use zbus::object_server::SignalEmitter;
@@ -34,7 +35,7 @@ impl Files {
         let hub = self.hub.clone();
         let states = tokio::task::spawn_blocking(move || drives::states(&hub, Path::new(&folder)))
             .await
-            .map_err(|error| Error::Failed(error.to_string()))??;
+            .context("Looking at that folder stopped unexpectedly.")??;
         Ok(json(&states))
     }
 

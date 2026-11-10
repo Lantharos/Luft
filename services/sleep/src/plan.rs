@@ -10,6 +10,7 @@ const PLUGGED_IN_CHECK: Duration = Duration::from_secs(2 * 60 * 60);
 const SOONEST_CHECK: Duration = Duration::from_secs(10 * 60);
 const LATEST_CHECK: Duration = Duration::from_secs(6 * 60 * 60);
 const ALARM_SLACK: Duration = MINUTE;
+const WAKES_EARLY_BY: Duration = Duration::from_secs(3);
 
 #[derive(Debug, PartialEq)]
 pub enum Step {
@@ -17,20 +18,18 @@ pub enum Step {
     PowerOff,
 }
 
-/// Some laptops can't be woken by the alarm, so it can run out unnoticed while
-/// they sleep. Waking long after it was due means a person woke the computer.
-pub fn woken_by_alarm(rang: bool, due: Duration, now: Duration) -> bool {
-    rang && now <= due + ALARM_SLACK
+pub fn woken_by_alarm(due: Duration, now: Duration) -> bool {
+    now + WAKES_EARLY_BY >= due && now <= due + ALARM_SLACK
 }
 
 pub struct Plan {
-    limit: Duration,
+    limit: Option<Duration>,
     on_battery_since: Duration,
     last: Option<(Duration, f64)>,
 }
 
 impl Plan {
-    pub fn start(limit: Duration, now: Duration, reading: Reading) -> (Self, Duration) {
+    pub fn start(limit: Option<Duration>, now: Duration, reading: Reading) -> (Self, Duration) {
         let mut plan = Self {
             limit,
             on_battery_since: now,
@@ -54,12 +53,13 @@ impl Plan {
             return Step::SleepFor(PLUGGED_IN_CHECK);
         }
         let asleep = now.saturating_sub(self.on_battery_since);
-        if reading.level <= LOWEST_LEVEL || asleep >= self.limit {
+        if reading.level <= LOWEST_LEVEL || self.limit.is_some_and(|limit| asleep >= limit) {
             return Step::PowerOff;
         }
         let until_low = self.until_low(now, reading.level);
         self.last = Some((now, reading.level));
-        Step::SleepFor(until_low.min(self.limit - asleep).max(MINUTE))
+        let until_limit = self.limit.map_or(Duration::MAX, |limit| limit - asleep);
+        Step::SleepFor(until_low.min(until_limit).max(MINUTE))
     }
 
     fn until_low(&self, now: Duration, level: f64) -> Duration {
@@ -97,16 +97,17 @@ mod tests {
     }
 
     #[test]
-    fn a_wake_long_after_the_alarm_is_a_person() {
-        assert!(woken_by_alarm(true, HOUR, HOUR));
-        assert!(woken_by_alarm(true, HOUR, HOUR + ALARM_SLACK));
-        assert!(!woken_by_alarm(true, HOUR, HOUR * 9));
-        assert!(!woken_by_alarm(false, HOUR, HOUR));
+    fn a_wake_well_before_or_long_after_the_alarm_is_a_person() {
+        assert!(woken_by_alarm(HOUR, HOUR));
+        assert!(woken_by_alarm(HOUR, HOUR - WAKES_EARLY_BY));
+        assert!(woken_by_alarm(HOUR, HOUR + ALARM_SLACK));
+        assert!(!woken_by_alarm(HOUR, HOUR * 9));
+        assert!(!woken_by_alarm(HOUR, HOUR / 2));
     }
 
     #[test]
     fn checks_sooner_as_the_battery_drains_faster() {
-        let (mut plan, first) = Plan::start(DAY, Duration::ZERO, battery(80.0));
+        let (mut plan, first) = Plan::start(Some(DAY), Duration::ZERO, battery(80.0));
         assert_eq!(first, FIRST_CHECK);
         assert_eq!(plan.woke(HOUR, battery(79.0)), Step::SleepFor(LATEST_CHECK));
         assert_eq!(
@@ -125,7 +126,7 @@ mod tests {
 
     #[test]
     fn powers_off_after_the_chosen_time_on_battery() {
-        let (mut plan, _) = Plan::start(DAY, Duration::ZERO, battery(90.0));
+        let (mut plan, _) = Plan::start(Some(DAY), Duration::ZERO, battery(90.0));
         assert_eq!(
             plan.woke(HOUR * 20, battery(88.0)),
             Step::SleepFor(HOUR * 4)
@@ -134,8 +135,18 @@ mod tests {
     }
 
     #[test]
+    fn sleeps_on_until_the_battery_is_low_unless_a_time_is_chosen() {
+        let (mut plan, _) = Plan::start(None, Duration::ZERO, battery(90.0));
+        assert_eq!(
+            plan.woke(DAY * 5, battery(60.0)),
+            Step::SleepFor(LATEST_CHECK)
+        );
+        assert_eq!(plan.woke(DAY * 9, battery(5.0)), Step::PowerOff);
+    }
+
+    #[test]
     fn stays_asleep_while_plugged_in() {
-        let (mut plan, first) = Plan::start(DAY, Duration::ZERO, plugged_in(3.0));
+        let (mut plan, first) = Plan::start(Some(DAY), Duration::ZERO, plugged_in(3.0));
         assert_eq!(first, PLUGGED_IN_CHECK);
         assert_eq!(
             plan.woke(DAY * 3, plugged_in(100.0)),
@@ -153,7 +164,7 @@ mod tests {
 
     #[test]
     fn checks_soon_when_sleeping_on_an_almost_empty_battery() {
-        let (mut plan, first) = Plan::start(DAY, Duration::ZERO, battery(4.0));
+        let (mut plan, first) = Plan::start(Some(DAY), Duration::ZERO, battery(4.0));
         assert_eq!(first, SOONEST_CHECK);
         assert_eq!(plan.woke(SOONEST_CHECK, battery(4.0)), Step::PowerOff);
     }

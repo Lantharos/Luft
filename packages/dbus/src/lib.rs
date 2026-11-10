@@ -1,9 +1,12 @@
+pub mod error;
 pub mod idle;
 pub mod objects;
 pub mod polkit;
 pub mod power;
 pub mod service;
 
+#[doc(hidden)]
+pub use anyhow;
 use tokio::sync::OnceCell;
 use zbus::connection::Builder;
 use zbus::{Connection, DBusError};

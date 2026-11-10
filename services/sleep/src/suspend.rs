@@ -5,7 +5,6 @@ use std::process::Command;
 use std::time::Duration;
 
 use anyhow::{Context, bail};
-use rustix::io::Errno;
 use rustix::time::{
     ClockId, Itimerspec, TimerfdClockId, TimerfdFlags, TimerfdTimerFlags, Timespec, clock_gettime,
     timerfd_create, timerfd_settime,
@@ -23,11 +22,7 @@ struct Alarm(OwnedFd);
 
 impl Alarm {
     fn new() -> rustix::io::Result<Self> {
-        timerfd_create(
-            TimerfdClockId::BoottimeAlarm,
-            TimerfdFlags::CLOEXEC | TimerfdFlags::NONBLOCK,
-        )
-        .map(Self)
+        timerfd_create(TimerfdClockId::BoottimeAlarm, TimerfdFlags::CLOEXEC).map(Self)
     }
 
     fn ring_in(&self, wait: Duration) -> rustix::io::Result<()> {
@@ -39,15 +34,6 @@ impl Alarm {
             },
         };
         timerfd_settime(&self.0, TimerfdTimerFlags::empty(), &at).map(|_| ())
-    }
-
-    fn rang(&self) -> rustix::io::Result<bool> {
-        let mut expirations = [0; 8];
-        match rustix::io::read(&self.0, &mut expirations) {
-            Ok(_) => Ok(true),
-            Err(Errno::AGAIN) => Ok(false),
-            Err(error) => Err(error),
-        }
     }
 }
 
@@ -81,24 +67,24 @@ fn power_off_after_waking() -> anyhow::Result<()> {
 }
 
 pub fn run() -> anyhow::Result<()> {
-    let (Some(limit), Some(reading)) = (config::power_off_after(), battery::read()) else {
+    let Some(reading) = battery::read() else {
         return Err(Command::new(SYSTEMD_SLEEP).arg("suspend").exec().into());
     };
     let alarm = Alarm::new().context("Couldn't set a wake-up alarm")?;
     let closed_lid = lid_closed() == Some(true);
-    let (mut plan, mut wait) = Plan::start(limit, boot_time(), reading);
+    let (mut plan, mut wait) = Plan::start(config::power_off_after(), boot_time(), reading);
     loop {
         let due = boot_time() + wait;
         alarm.ring_in(wait)?;
         sleep()?;
-        let by_alarm = woken_by_alarm(alarm.rang()?, due, boot_time());
-        if !by_alarm || (closed_lid && lid_closed() == Some(false)) {
+        let woke = boot_time();
+        if !woken_by_alarm(due, woke) || (closed_lid && lid_closed() == Some(false)) {
             return Ok(());
         }
         let Some(reading) = battery::read() else {
             return Ok(());
         };
-        match plan.woke(boot_time(), reading) {
+        match plan.woke(woke.max(due), reading) {
             Step::SleepFor(next) => {
                 eprintln!(
                     "Battery at {:.0}%, sleeping again for {} minutes",

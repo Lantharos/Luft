@@ -6,6 +6,10 @@
     <method name="Install">
       <arg name="request" type="s" direction="in"/>
     </method>
+    <method name="OpenMovingBox">
+      <arg name="code" type="s" direction="in"/>
+      <arg type="s" direction="out"/>
+    </method>
     <method name="Configure">
       <arg name="regional" type="s" direction="in"/>
     </method>
@@ -15,6 +19,10 @@
       <arg name="password" type="s" direction="in"/>
     </method>
     <method name="FinishFirstBoot">
+    </method>
+    <method name="SetNetworkType">
+      <arg name="network" type="o" direction="in"/>
+      <arg name="kind" type="s" direction="in"/>
     </method>
     <method name="EnrollSigningKey">
       <arg type="s" direction="out"/>

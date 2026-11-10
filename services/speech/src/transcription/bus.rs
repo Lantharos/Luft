@@ -1,6 +1,7 @@
 use std::fs::File;
 use std::sync::Arc;
 
+use anyhow::Context;
 use luft_dbus_macros::introspect;
 use zbus::OwnedFd;
 use zbus::interface;
@@ -8,22 +9,11 @@ use zbus::interface;
 use super::job::Request;
 use super::{Refusal, Transcriber};
 
-#[derive(Debug, zbus::DBusError)]
-#[zbus(prefix = "com.lantharos.Transcription1.Error")]
-pub enum Error {
-    #[zbus(error)]
-    ZBus(zbus::Error),
-    NotInstalled(String),
-    Unsupported(String),
-    Paused(String),
-    Failed(String),
-}
-
-impl From<anyhow::Error> for Error {
-    fn from(error: anyhow::Error) -> Self {
-        Error::Failed(format!("{error:#}"))
-    }
-}
+luft_dbus::errors!("com.lantharos.Transcription1.Error" {
+    NotInstalled,
+    Unsupported,
+    Paused,
+});
 
 pub struct Transcription {
     transcriber: Arc<Transcriber>,
@@ -45,10 +35,8 @@ impl Transcription {
         ended: bool,
         languages: Vec<String>,
     ) -> Result<String, Error> {
-        if let Ok(system) = luft_dbus::system().await
-            && luft_dbus::power::battery_low(system).await
-        {
-            return Err(Error::Paused("The battery is low".into()));
+        if luft_dbus::power::saving_battery().await {
+            return Err(Error::Paused("The battery is low.".into()));
         }
         let transcriber = self.transcriber.clone();
         let file = File::from(std::os::fd::OwnedFd::from(audio));
@@ -59,12 +47,12 @@ impl Transcription {
         };
         let progress = tokio::task::spawn_blocking(move || transcriber.transcribe(file, &request))
             .await
-            .map_err(|error| Error::Failed(error.to_string()))??
+            .context("Transcribing stopped unexpectedly.")??
             .map_err(|refusal| match refusal {
                 Refusal::NotInstalled(model) => Error::NotInstalled(model),
-                Refusal::Unsupported => {
-                    Error::Unsupported("This computer's processor can't run Whisper".into())
-                }
+                Refusal::Unsupported => Error::Unsupported(
+                    "This computer's processor can't transcribe recordings.".into(),
+                ),
             })?;
         Ok(serde_json::to_string(&progress).expect("progress always serializes"))
     }

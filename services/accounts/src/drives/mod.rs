@@ -16,7 +16,7 @@ use anyhow::{Context, Result};
 use luft_accounts::types::{Drive, DriveState, Provider, Usage};
 
 pub use attach::{attach, detach, rename};
-pub use keep::{free, keep, report, sync};
+pub use keep::{free, keep, reach_cloud, report, sync};
 pub use links::{share_link, web_address};
 pub use states::states;
 pub use upkeep::run as upkeep;

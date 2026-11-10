@@ -7,7 +7,11 @@ license.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 
+[features]
+service = ["tokio/macros", "tokio/signal", "zbus/service"]
+
 [dependencies]
+anyhow.workspace = true
 futures-util.workspace = true
 luft-dbus-macros.workspace = true
 serde.workspace = true

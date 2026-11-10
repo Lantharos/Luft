@@ -5,7 +5,7 @@ use luft_speech::types::Engine;
 
 pub type Entry = luft_models::Entry<Engine>;
 
-static CATALOG: LazyLock<Catalog<Engine>> = LazyLock::new(|| {
+pub static CATALOG: LazyLock<Catalog<Engine>> = LazyLock::new(|| {
     Catalog::parse(include_str!("../../data/models.json")).mirrored_by("LUFT_SPEECH_MIRROR")
 });
 
@@ -15,10 +15,6 @@ pub fn models() -> &'static [Entry] {
 
 pub fn find(id: &str) -> Option<&'static Entry> {
     CATALOG.find(id)
-}
-
-pub fn mirror() -> &'static str {
-    CATALOG.mirror()
 }
 
 pub fn for_engine(engine: Engine) -> &'static Entry {

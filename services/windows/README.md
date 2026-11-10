@@ -2,7 +2,7 @@
 
 The system service that looks after a Windows installation on the same computer, built on the [luft-windows crate](../../packages/system/windows).
 
-`luft-windows` (`com.lantharos.Windows1`, see `data/com.lantharos.Windows1.xml`) is started over D-Bus and stops when idle. It also runs once at startup (`luft-windows boot`) and once in the session (`luft-windows notice`).
+`luft-windows` (`com.lantharos.Windows1`, see `packages/dbus/introspection/luft-windows-service`) is started over D-Bus and stops when idle. It also runs once at startup (`luft-windows boot`) and once in the session (`luft-windows notice`).
 
 | File in `data` | Goes to |
 | --- | --- |

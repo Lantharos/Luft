@@ -28,7 +28,8 @@
     <method name="SetExtensionPorts">
       <arg name="ports" type="a(qs)" direction="in"/>
     </method>
-    <property name="Apps" type="a(sss)" access="read"/>
+    <property name="Apps" type="a(sssu)" access="read"/>
+    <property name="HomeInterfaces" type="as" access="read"/>
     <property name="OpenPorts" type="a(qss)" access="read"/>
     <property name="Unclassified" type="a(os)" access="read"/>
     <property name="Waiting" type="a(ssu)" access="read"/>

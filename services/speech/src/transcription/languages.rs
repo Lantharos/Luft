@@ -3,11 +3,8 @@ use crate::language::script::{self, Script};
 const SURE: f32 = 0.75;
 const STILL_LIKELY: f32 = 0.15;
 
-/// Languages that Whisper hears as one another, counted together for
-/// whichever of them the class speaks.
 const KIN: &[&[&str]] = &[&["hr", "bs", "sr"]];
 
-/// A language a class may speak, such as `de`, or `sr-Latn` for Serbian in Latin.
 #[derive(Clone, Debug, PartialEq)]
 pub struct Spoken {
     pub code: String,
@@ -36,13 +33,11 @@ impl Spoken {
     }
 }
 
-/// The languages to choose from for each stretch of a recording.
 pub struct Choice {
     spoken: Vec<Spoken>,
 }
 
 impl Choice {
-    /// The languages named, or every language Whisper knows when none are.
     pub fn new(tags: &[String]) -> Self {
         let mut spoken: Vec<Spoken> = tags.iter().filter_map(|tag| Spoken::parse(tag)).collect();
         if spoken.is_empty() {
@@ -66,9 +61,6 @@ impl Choice {
         Self { spoken }
     }
 
-    /// The language a stretch is in. Short stretches are hard to tell apart,
-    /// so one that's still fairly likely to be in the language before it
-    /// stays in that language unless another is clearly ahead.
     pub fn pick(&self, chances: &[f32], before: Option<&Spoken>) -> &Spoken {
         let shares: Vec<f32> = self
             .spoken

@@ -7,8 +7,6 @@ use luft_speech::types::Engine;
 
 use crate::engines::Recognizer;
 
-/// The loaded model, kept a few minutes after dictating so the next time
-/// starts at once, then unloaded to give its memory back.
 #[derive(Default)]
 pub struct Warm {
     slot: Mutex<Slot>,

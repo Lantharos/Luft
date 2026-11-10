@@ -19,6 +19,13 @@
     <method name="Remove">
       <arg name="fingerprint_wanted" type="s" direction="in"/>
     </method>
+    <method name="Unloaded">
+      <arg type="as" direction="out"/>
+    </method>
+    <method name="SetLoaded">
+      <arg name="fingerprint_wanted" type="s" direction="in"/>
+      <arg name="loaded" type="b" direction="in"/>
+    </method>
     <signal name="Changed">
     </signal>
     <property name="ChipKeys" type="b" access="read"/>

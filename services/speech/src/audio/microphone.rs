@@ -10,9 +10,6 @@ use spa::pod::Pod;
 
 use super::{Input, Meter, RATE};
 
-/// Records the default microphone at 16 kHz mono on its own thread. PipeWire
-/// converts from whatever the microphone gives. Dropping it closes the stream,
-/// so the microphone is only open while dictating.
 pub struct Microphone {
     quit: pw::channel::Sender<()>,
     thread: Option<JoinHandle<()>>,

@@ -7,8 +7,6 @@ const WIDEST: u32 = 3200;
 const PEN_WIDTH: f32 = WRITING * 0.055;
 const FLATTEST: f32 = 8.0;
 
-/// A line of handwriting drawn in black on white, as tall as the recognizer
-/// reads, whatever size it was written at.
 pub struct Line {
     pub width: u32,
     pub height: u32,

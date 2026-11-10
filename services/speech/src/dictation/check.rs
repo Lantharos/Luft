@@ -1,11 +1,3 @@
-//! Dictates long recordings the way the service does, stretch by stretch, and
-//! compares what's typed with what was said: until the end, and until the
-//! service would tell a toggled dictation that nobody is speaking anymore.
-//! Needs the models, so it only runs when asked:
-//!
-//! LUFT_SPEECH_MODELS=<folder of models> LUFT_SPEECH_SAMPLES=<folder of .wav
-//! and .txt> LUFT_SPEECH_LANGUAGE=de cargo test --release dictate -- --ignored --nocapture
-
 use std::path::PathBuf;
 use std::time::{Duration, Instant};
 

@@ -1,9 +1,3 @@
-//! Recognizes recorded speech with every downloaded engine and compares it
-//! with what was said. Needs the models, so it only runs when asked:
-//!
-//! LUFT_SPEECH_MODELS=<folder of models> LUFT_SPEECH_SAMPLES=<folder of .wav
-//! and .txt> LUFT_SPEECH_LANGUAGE=de cargo test --release -- --ignored --nocapture
-
 use std::path::PathBuf;
 use std::time::Instant;
 
@@ -37,7 +31,6 @@ pub fn word_errors(heard: &[String], said: &[String]) -> usize {
     previous[said.len()]
 }
 
-/// How many of the words said were heard, in the order they were said.
 pub fn said_in_order(heard: &[String], said: &[String]) -> usize {
     let mut previous = vec![0; said.len() + 1];
     for heard_word in heard {

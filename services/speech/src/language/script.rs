@@ -1,6 +1,3 @@
-/// Some languages are written in both Cyrillic and Latin, which map onto each
-/// other letter for letter. Speech in one of them is written in the script of
-/// the keyboard layout the person types with.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Script {
     Latin,

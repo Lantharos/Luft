@@ -13,8 +13,11 @@ luft-dbus.workspace = true
 | `objects::Objects` | A snapshot of an `ObjectManager` tree; `signals` streams what a service sends and `settle` waits out a burst of them |
 | `service::Service` | A system service's name, path and interface: `read` its properties, `change` calls a method allowing a password prompt, `changes` streams its property changes |
 | `power::on_battery` | Whether the computer runs on its battery, as UPower sees it |
-| `polkit::is_authorized` | Whether polkit lets a service's caller take an action, asking for a password when the caller allows it |
-| `idle::Idle` | Holds a service up while calls are running, and tells it when it has been idle long enough to exit |
+| `polkit::authorize` | Lets a call go on only when polkit allows its caller the action, asking for a password when the caller allows it |
+| `polkit::is_authorized_to`, `polkit::Details` | The same check with a prompt that names what is about to change, and values for polkit rules |
+| `errors!`, `error::kind` | A service's named errors, and reading their kind in an app; see [Errors from Luft's services](../../docs/dbus-errors.md) |
+| `idle::serve`, `idle::until_idle` | Run a service started on demand until it has had nothing to do for half a minute (feature `service`) |
+| `power::saving_battery` | Whether heavy background work should wait for the charger |
 | `error_name`, `error_message`, `explain` | Read a D-Bus error reply, standard or not |
 
 Every call is async. Apps run them on Sabine's runtime, through async bridge commands or `luft_app::spawn`.

@@ -30,9 +30,6 @@ const NAMES: &[(&str, &str)] = &[
     ("fi", "Finnish"),
 ];
 
-/// The language notes are written in, named in English for the model, such
-/// as "German" for `de-AT`. A language without a name here goes by its tag,
-/// and anything that isn't a language tag is refused.
 pub fn name(tag: &str) -> Option<&str> {
     let base = tag.split('-').next().unwrap_or(tag);
     NAMES

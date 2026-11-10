@@ -10,17 +10,11 @@ const PER_MILLISECOND: usize = RATE / 1000;
 const WARM_UP: usize = 80 * PER_MILLISECOND;
 const LONGEST_PACKET: usize = 120 * PER_MILLISECOND;
 
-/// Part of a recording from where it was asked for, decoded at 48 kHz.
 pub struct Stretch {
     pub samples: Vec<f32>,
-    /// Whether the recording has nothing after them yet.
     pub last: bool,
 }
 
-/// Decodes an Ogg Opus recording from `from` up to `until` milliseconds.
-/// Packets before `from` are only counted, not decoded, except the few the
-/// decoder needs to settle. A recording still being written, or cut short by
-/// a power cut, ends at its last whole page.
 pub fn decode(file: File, from: u64, until: u64) -> Result<Stretch> {
     let mut reader = PacketReader::new(BufReader::new(file));
     let head = reader

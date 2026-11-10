@@ -3,8 +3,6 @@ use std::time::{Duration, Instant};
 const INTERVAL: Duration = Duration::from_millis(50);
 const FLOOR_DB: f32 = -60.0;
 
-/// Turns the loudness of recent audio into a level from 0 to 1, reported a
-/// few times a second.
 pub struct Meter {
     report: Box<dyn Fn(f64) + Send>,
     squares: f64,

@@ -4,7 +4,7 @@ use std::io::BufReader;
 use std::path::Path;
 use std::process::Command;
 
-use anyhow::{Context, Result, bail};
+use anyhow::{Context, Result, anyhow};
 use luft_windows::bluetooth::{self, Pairing, bluez};
 use luft_windows::{Installation, Volume, hibernated, is_windows, settled};
 use serde::{Deserialize, Serialize};
@@ -49,10 +49,11 @@ pub fn partitions() -> Result<Vec<Partition>> {
         .output()
         .context("lsblk couldn't be started")?;
     if !output.status.success() {
-        bail!(
-            "lsblk failed: {}",
-            String::from_utf8_lossy(&output.stderr).trim()
-        );
+        return Err(anyhow!(
+            "lsblk: {}",
+            String::from_utf8_lossy(&output.stderr).trim().to_owned()
+        ))
+        .context("The drives couldn't be listed.");
     }
     let listing: Listing = serde_json::from_slice(&output.stdout)?;
     let plugged_in: HashSet<String> = listing
@@ -95,20 +96,6 @@ pub struct Found {
     pub fast_startup: bool,
     pub universal_clock: bool,
     pub bluetooth: Vec<Pairing>,
-}
-
-impl Found {
-    pub fn changeable(&self) -> Result<()> {
-        if self.mounted {
-            bail!("Windows' drive is open in Luft. Close it in Rover first");
-        }
-        if self.hibernated {
-            bail!(
-                "Windows is hibernated or was shut down with Fast Startup. Start Windows and hold Shift while you choose Shut down, then try again"
-            );
-        }
-        Ok(())
-    }
 }
 
 #[derive(Serialize)]

@@ -14,8 +14,6 @@ const SMALLEST_GROWTH: usize = RATE / 4;
 const QUIET_AFTER_SPEECH: Duration = Duration::from_secs(3);
 const QUIET_WITHOUT_SPEECH: Duration = Duration::from_secs(8);
 
-/// What's been typed so far, so each new piece is written in the keyboard's
-/// script and set apart from the one before it.
 struct Transcript<'a> {
     plan: &'a Plan,
     typed: bool,
@@ -38,7 +36,7 @@ impl Transcript<'_> {
 }
 
 pub fn listen(hub: &Hub, plan: &Plan, input: &Receiver<Input>) -> Result<Option<String>> {
-    let folder = hub.store.folder(plan.model);
+    let folder = hub.models.store.folder(plan.model);
     let mut loaded = hub
         .warm
         .take(plan.engine, &folder, &plan.model.file_names())?;
@@ -56,10 +54,6 @@ pub fn quiet_long_enough(segments: &Segmenter) -> bool {
     segments.quiet_for() >= enough
 }
 
-/// Each finished stretch of speech is recognized once and typed at once. The
-/// one still being spoken is recognized again as it grows, but at most half
-/// the time, so a slower computer keeps up by looking less often. What's left
-/// when listening stops is the answer.
 fn transcribe(
     hub: &Hub,
     plan: &Plan,

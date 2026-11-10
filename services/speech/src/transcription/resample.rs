@@ -7,8 +7,6 @@ use crate::audio::RATE;
 const STEP: usize = opus::RATE / RATE;
 const TAPS: usize = 96;
 
-/// A low-pass filter at 7.2 kHz, a Blackman-windowed sinc, so nothing above
-/// what 16 kHz can hold folds back into speech when every third sample is kept.
 static FILTER: LazyLock<[f32; TAPS]> = LazyLock::new(|| {
     let cutoff = 7_200.0 / opus::RATE as f32;
     let middle = (TAPS - 1) as f32 / 2.0;
@@ -27,7 +25,6 @@ static FILTER: LazyLock<[f32; TAPS]> = LazyLock::new(|| {
     taps.map(|tap| tap / sum)
 });
 
-/// From 48 kHz to the 16 kHz the voice detector and Whisper listen at.
 pub fn downsample(samples: &[f32]) -> Vec<f32> {
     let filter = &*FILTER;
     (0..samples.len() / STEP)

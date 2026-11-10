@@ -28,9 +28,6 @@ struct Chunk<'a> {
     language: &'a Spoken,
 }
 
-/// Transcribes about two minutes of a recording from `from`, cut where
-/// nobody speaks. Speech running into the end of what's recorded so far is
-/// left for later, unless the recording has ended.
 pub fn transcribe(whisper: &mut Whisper, file: File, request: &Request) -> Result<Transcribed> {
     let stretch = opus::decode(file, request.from, request.from + WINDOW + MARGIN)?;
     let audio = resample::downsample(&stretch.samples);

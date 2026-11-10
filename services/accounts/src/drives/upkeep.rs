@@ -162,16 +162,14 @@ fn spawn_attach(hub: &Arc<Hub>, account: String) {
     let hub = hub.clone();
     tokio::spawn(async move {
         if attach::attach(&hub, &account).await.is_ok() {
-            keep::report(&hub, &account, sync(&hub, &account, false).await).await;
+            keep::report(&hub, &account, sync(&hub, &account).await).await;
         }
     });
 }
 
 fn spawn_sync(hub: &Arc<Hub>, account: String) {
     let hub = hub.clone();
-    tokio::spawn(
-        async move { keep::report(&hub, &account, sync(&hub, &account, false).await).await },
-    );
+    tokio::spawn(async move { keep::report(&hub, &account, sync(&hub, &account).await).await });
 }
 
 fn sync_all(hub: &Arc<Hub>) {
@@ -236,7 +234,7 @@ async fn recover(hub: &Arc<Hub>) {
         tokio::spawn(async move {
             let _ = hub.rclone.refresh(&union(&record.id)).await;
             check(&hub, &record.id).await;
-            keep::report(&hub, &record.id, sync(&hub, &record.id, false).await).await;
+            keep::report(&hub, &record.id, sync(&hub, &record.id).await).await;
         });
     }
 }

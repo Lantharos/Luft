@@ -1,27 +1,21 @@
 use std::sync::Arc;
 
+use anyhow::Context;
 use luft_dbus_macros::introspect;
 use luft_handwriting::types::{HandwritingDownload, HandwritingModel, Stroke};
 use zbus::interface;
 use zbus::object_server::SignalEmitter;
 
-use crate::hub::{self, Hub, NotInstalled, Urgency};
+use crate::hub::{self, Hub, NotInstalled, Reader};
 use crate::priority::Background;
 
-#[derive(Debug, zbus::DBusError)]
-#[zbus(prefix = "com.lantharos.Handwriting1.Error")]
-pub enum Error {
-    #[zbus(error)]
-    ZBus(zbus::Error),
-    NotInstalled(String),
-    Paused(String),
-    Failed(String),
-}
+luft_dbus::errors!("com.lantharos.Handwriting1.Error" {
+    NotInstalled,
+    Paused,
+});
 
-impl From<anyhow::Error> for Error {
-    fn from(error: anyhow::Error) -> Self {
-        Error::Failed(format!("{error:#}"))
-    }
+fn not_installed(_: NotInstalled) -> Error {
+    Error::NotInstalled(hub::model().id.clone())
 }
 
 pub struct Recognition {
@@ -47,25 +41,22 @@ pub fn serve(hub: &Arc<Hub>) -> (Recognition, Models) {
 #[interface(name = "com.lantharos.Handwriting1")]
 impl Recognition {
     async fn recognize(&self, strokes: Vec<Stroke>) -> Result<String, Error> {
-        if let Ok(system) = luft_dbus::system().await
-            && luft_dbus::power::battery_low(system).await
-        {
-            return Err(Error::Paused("The battery is low".into()));
+        if luft_dbus::power::saving_battery().await {
+            return Err(Error::Paused("The battery is low.".into()));
         }
         let hub = self.hub.clone();
-        let read = self
-            .background
-            .run(move || hub.recognize(&strokes, Urgency::Background))
-            .await?;
-        read.map_err(|NotInstalled| Error::NotInstalled(hub::model().id.clone()))
+        self.background
+            .run(move || hub.recognize(&strokes, Reader::Background))
+            .await?
+            .map_err(not_installed)
     }
 
     async fn recognize_now(&self, strokes: Vec<Stroke>) -> Result<String, Error> {
         let hub = self.hub.clone();
-        let read = tokio::task::spawn_blocking(move || hub.recognize(&strokes, Urgency::Waiting))
+        tokio::task::spawn_blocking(move || hub.recognize(&strokes, Reader::Waiting))
             .await
-            .map_err(|error| Error::Failed(error.to_string()))??;
-        read.map_err(|NotInstalled| Error::NotInstalled(hub::model().id.clone()))
+            .context("Reading the handwriting stopped unexpectedly.")??
+            .map_err(not_installed)
     }
 }
 
@@ -74,37 +65,34 @@ impl Recognition {
 impl Models {
     fn overview(&self) -> String {
         let model = hub::model();
-        let overview =
-            HandwritingModel {
-                name: model.name.clone(),
-                licence: model.licence.clone(),
-                credit: model.credit.clone(),
-                homepage: model.homepage.clone(),
-                size: model.size(),
-                installed: self.hub.store.installed(model),
-                download: self.hub.downloads.progress(&model.id).map(|progress| {
-                    HandwritingDownload {
-                        received: progress.received,
-                        total: progress.total,
-                        problem: progress.problem,
-                    }
+        let overview = HandwritingModel {
+            name: model.name.clone(),
+            licence: model.licence.clone(),
+            credit: model.credit.clone(),
+            homepage: model.homepage.clone(),
+            size: model.size(),
+            installed: self.hub.models.store.installed(model),
+            download: self
+                .hub
+                .models
+                .downloads
+                .progress(&model.id)
+                .map(|progress| HandwritingDownload {
+                    received: progress.received,
+                    total: progress.total,
+                    problem: progress.problem,
                 }),
-            };
+        };
         serde_json::to_string(&overview).expect("the overview always serializes")
     }
 
     fn install(&self) -> Result<(), Error> {
-        self.hub.install()?;
-        self.hub.changed();
+        self.hub.models.install(hub::model())?;
         Ok(())
     }
 
     fn remove(&self) -> Result<(), Error> {
-        let model = hub::model();
-        self.hub.downloads.cancel(&model.id);
-        self.hub.store.remove(model)?;
-        self.hub.changed();
-        Ok(())
+        Ok(self.hub.models.remove(hub::model())?)
     }
 
     #[zbus(signal)]

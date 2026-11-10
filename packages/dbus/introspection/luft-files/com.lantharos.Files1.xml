@@ -1,0 +1,35 @@
+<node>
+  <interface name="com.lantharos.Files1">
+    <method name="Copy">
+      <arg name="source" type="ay" direction="in"/>
+      <arg name="target" type="ay" direction="in"/>
+    </method>
+    <method name="Move">
+      <arg name="source" type="ay" direction="in"/>
+      <arg name="target" type="ay" direction="in"/>
+    </method>
+    <method name="Delete">
+      <arg name="path" type="ay" direction="in"/>
+    </method>
+    <method name="Trash">
+      <arg name="path" type="ay" direction="in"/>
+      <arg name="file" type="ay" direction="out"/>
+      <arg name="info" type="ay" direction="out"/>
+    </method>
+    <method name="MakeFolder">
+      <arg name="path" type="ay" direction="in"/>
+      <arg name="created" type="b" direction="out"/>
+    </method>
+    <method name="MakeFile">
+      <arg name="path" type="ay" direction="in"/>
+    </method>
+    <method name="Signal">
+      <arg name="processes" type="a(ut)" direction="in"/>
+      <arg name="signal" type="i" direction="in"/>
+    </method>
+    <method name="SetPriority">
+      <arg name="process" type="(ut)" direction="in"/>
+      <arg name="nice" type="i" direction="in"/>
+    </method>
+  </interface>
+</node>

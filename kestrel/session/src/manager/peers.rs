@@ -24,7 +24,6 @@ async fn gone(connection: &Connection, peer: &UniqueName<'_>) -> zbus::Result<()
 }
 
 impl Session {
-    /// Forgets what a caller holds once it leaves the bus.
     pub(super) fn watch(self: &Arc<Self>, peer: &UniqueName<'_>) {
         if !self.peers.lock().unwrap().insert(peer.to_string()) {
             return;

@@ -82,7 +82,6 @@ impl Watches {
         }
     }
 
-    /// Seconds since the last input.
     pub async fn idle_for(&self) -> u32 {
         if !self.present {
             return 0;

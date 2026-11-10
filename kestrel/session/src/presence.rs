@@ -211,8 +211,6 @@ fn report(followed: zbus::Result<()>) {
     }
 }
 
-/// Marks the session idle once nobody has used the computer for the idle
-/// delay, and available again at the next input.
 pub async fn follow_idle(
     monitor: IdleMonitorProxy<'static>,
     presence: InterfaceRef<Presence>,

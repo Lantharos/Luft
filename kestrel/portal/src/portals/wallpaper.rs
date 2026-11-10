@@ -1,11 +1,10 @@
 use std::fmt::Write as _;
 use std::fs::File;
-use std::io::{Seek, Write};
-use std::path::{Path, PathBuf};
+use std::io::{self, Read, Seek, Write};
 
 use gio::prelude::*;
 use luft_dbus_macros::introspect;
-use rustix::fs::{MemfdFlags, memfd_create};
+use rustix::fs::{MemfdFlags, Mode, OFlags, memfd_create};
 use sha2::{Digest, Sha256};
 use zbus::message::Header;
 use zbus::{Fd, ObjectPath};
@@ -15,10 +14,8 @@ use super::{ENDED, Options, SUCCESS, option};
 use crate::context::Context;
 use crate::request::while_open;
 
-struct Picture {
-    bytes: Vec<u8>,
-    name: String,
-}
+const LARGEST: u64 = 64 << 20;
+const STORED_PREFIX: &str = "portal-";
 
 pub struct Wallpaper {
     context: Context,
@@ -31,32 +28,14 @@ impl Wallpaper {
         }
     }
 
-    async fn load(&self, uri: String) -> Result<Picture, glib::Error> {
-        self.context
-            .gio
-            .run_async(move || async move {
-                let file = gio::File::for_uri(&uri);
-                let (bytes, _) = file.load_bytes_future().await?;
-                let name = file
-                    .basename()
-                    .map(|name| name.to_string_lossy().into_owned())
-                    .unwrap_or_default();
-                Ok(Picture {
-                    bytes: bytes.to_vec(),
-                    name,
-                })
-            })
-            .await
-    }
-
     async fn confirm(
         &self,
         handle: &ObjectPath<'_>,
         app_id: &str,
-        picture: &Picture,
-    ) -> std::io::Result<u32> {
+        picture: &[u8],
+    ) -> io::Result<u32> {
         let mut image = File::from(memfd_create("wallpaper", MemfdFlags::CLOEXEC)?);
-        image.write_all(&picture.bytes)?;
+        image.write_all(picture)?;
         image.rewind()?;
         let asked = self.context.shell.answer(|dialogs| async move {
             dialogs
@@ -68,32 +47,59 @@ impl Wallpaper {
             .unwrap_or(ENDED))
     }
 
-    async fn apply(&self, picture: &Picture) -> std::io::Result<()> {
+    async fn apply(&self, picture: &[u8]) -> io::Result<()> {
         let folder = glib::user_data_dir().join("backgrounds");
         std::fs::create_dir_all(&folder)?;
-        let stored = folder.join(stored_name(picture));
-        std::fs::write(&stored, &picture.bytes)?;
+        let name = stored_name(picture);
+        let stored = folder.join(&name);
+        std::fs::write(&stored, picture)?;
         let uri = glib::filename_to_uri(&stored, None)
-            .map_err(std::io::Error::other)?
+            .map_err(io::Error::other)?
             .to_string();
         self.context.gio.run(move || use_wallpaper(&uri)).await;
+        for entry in std::fs::read_dir(&folder)?.flatten() {
+            let earlier = entry.file_name();
+            if earlier != *name
+                && earlier
+                    .as_encoded_bytes()
+                    .starts_with(STORED_PREFIX.as_bytes())
+                && let Err(error) = std::fs::remove_file(entry.path())
+            {
+                eprintln!("Couldn't remove the earlier wallpaper: {error}");
+            }
+        }
         Ok(())
     }
 }
 
-fn stored_name(picture: &Picture) -> PathBuf {
-    let digest = Sha256::digest(&picture.bytes);
-    let mut name = String::new();
+fn load(uri: &str) -> io::Result<Vec<u8>> {
+    let unusable = |reason: &str| io::Error::new(io::ErrorKind::InvalidData, reason.to_owned());
+    let (path, _) = glib::filename_from_uri(uri).map_err(io::Error::other)?;
+    let flags = OFlags::RDONLY | OFlags::NONBLOCK | OFlags::CLOEXEC;
+    let file = File::from(rustix::fs::open(&path, flags, Mode::empty())?);
+    let metadata = file.metadata()?;
+    if !metadata.is_file() {
+        return Err(unusable("it isn't a file"));
+    }
+    if metadata.len() > LARGEST {
+        return Err(unusable("it's larger than 64 MB"));
+    }
+    let mut bytes = Vec::new();
+    file.take(LARGEST).read_to_end(&mut bytes)?;
+    let (kind, _) = gio::content_type_guess(Some(&path), bytes.as_slice());
+    if !kind.starts_with("image/") {
+        return Err(unusable("it isn't a picture"));
+    }
+    Ok(bytes)
+}
+
+fn stored_name(picture: &[u8]) -> String {
+    let digest = Sha256::digest(picture);
+    let mut name = STORED_PREFIX.to_owned();
     for byte in &digest[..8] {
         let _ = write!(name, "{byte:02x}");
     }
-    let extension = Path::new(&picture.name)
-        .extension()
-        .map(|extension| extension.to_string_lossy());
-    PathBuf::from(match extension {
-        Some(extension) => format!("{name}.{extension}"),
-        None => name,
-    })
+    name
 }
 
 fn use_wallpaper(uri: &str) {
@@ -126,7 +132,11 @@ impl Wallpaper {
         #[zbus(header)] header: Header<'_>,
     ) -> fdo::Result<u32> {
         self.context.allow(&header).await?;
-        let picture = match self.load(uri).await {
+        let loaded = tokio::task::spawn_blocking(move || load(&uri))
+            .await
+            .map_err(io::Error::other)
+            .flatten();
+        let picture = match loaded {
             Ok(picture) => picture,
             Err(error) => {
                 eprintln!("Couldn't open the wallpaper for {app_id}: {error}");

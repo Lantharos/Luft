@@ -95,7 +95,8 @@ impl Contents {
             let Some(format) = format(&tree.nodes[id as usize].name) else {
                 return;
             };
-            let Some(info) = stat(path).filter(|info| fits(format, info.size)) else {
+            let Some(info) = stat(path).filter(|info| info.is_file() && fits(format, info.size))
+            else {
                 return;
             };
             let Some(path) = path.to_str() else { return };
@@ -117,7 +118,8 @@ fn renew(
     path: &str,
     format: Format,
 ) -> rusqlite::Result<Option<Written>> {
-    let Some(info) = stat(Path::new(path)).filter(|info| fits(format, info.size)) else {
+    let Some(info) = stat(Path::new(path)).filter(|info| info.is_file() && fits(format, info.size))
+    else {
         store::remove(transaction, path)?;
         return Ok(None);
     };

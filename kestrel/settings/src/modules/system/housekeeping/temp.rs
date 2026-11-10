@@ -97,7 +97,10 @@ impl Walk {
     }
 }
 
-fn open_directory<P: rustix::path::Arg>(parent: impl AsFd, path: P) -> rustix::io::Result<OwnedFd> {
+pub(super) fn open_directory<P: rustix::path::Arg>(
+    parent: impl AsFd,
+    path: P,
+) -> rustix::io::Result<OwnedFd> {
     rustix::fs::openat(
         parent,
         path,

@@ -37,10 +37,14 @@ fn read(path: &Path) -> Option<GtkModule> {
     let name = file.string(GROUP, "X-GTK-Module-Name").ok()?.to_string();
     let schema = file.string(GROUP, "X-GTK-Module-Enabled-Schema").ok();
     let key = file.string(GROUP, "X-GTK-Module-Enabled-Key").ok();
-    let switch = schema.zip(key).map(|(schema, key)| {
-        let schema: &'static str = Box::leak(schema.to_string().into_boxed_str());
-        (schema, key.to_string())
-    });
+    let switch = match schema.zip(key) {
+        Some((schema, key)) => {
+            gio::SettingsSchemaSource::default()?.lookup(&schema, true)?;
+            let schema: &'static str = Box::leak(schema.to_string().into_boxed_str());
+            Some((schema, key.to_string()))
+        }
+        None => None,
+    };
     Some(GtkModule { name, switch })
 }
 

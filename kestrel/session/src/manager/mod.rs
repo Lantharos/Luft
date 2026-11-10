@@ -50,7 +50,6 @@ pub struct SessionState {
     pub locked: bool,
 }
 
-/// The session's state, shared by the session manager's objects.
 pub struct Session {
     connection: Connection,
     system: Connection,
@@ -90,8 +89,8 @@ impl Session {
         self.inhibitors.add(owner, app_id, reason, flags).await
     }
 
-    pub async fn uninhibit(&self, cookie: u32) -> zbus::Result<bool> {
-        self.inhibitors.remove(cookie).await
+    pub async fn uninhibit(&self, owner: &UniqueName<'_>, cookie: u32) -> zbus::Result<bool> {
+        self.inhibitors.remove(owner, cookie).await
     }
 
     pub fn inhibited(&self) -> u32 {
@@ -192,8 +191,12 @@ impl Manager {
         Ok(self.0.clients.register(owner).await?)
     }
 
-    async fn unregister_client(&self, path: ObjectPath<'_>) -> Result<(), Failure> {
-        Ok(self.0.clients.unregister(&path).await?)
+    async fn unregister_client(
+        &self,
+        path: ObjectPath<'_>,
+        #[zbus(header)] header: Header<'_>,
+    ) -> Result<(), Failure> {
+        Ok(self.0.clients.unregister(sender(&header), &path).await?)
     }
 
     async fn inhibit(
@@ -213,8 +216,12 @@ impl Manager {
             .await?)
     }
 
-    async fn uninhibit(&self, cookie: u32) -> Result<(), Failure> {
-        match self.0.uninhibit(cookie).await? {
+    async fn uninhibit(
+        &self,
+        cookie: u32,
+        #[zbus(header)] header: Header<'_>,
+    ) -> Result<(), Failure> {
+        match self.0.uninhibit(sender(&header), cookie).await? {
             true => Ok(()),
             false => Err(Failure::general("Unknown inhibitor")),
         }
@@ -254,7 +261,12 @@ impl Manager {
             .offer_power_options(self.0.inhibitors.paths(INHIBIT_LOGOUT));
     }
 
-    async fn suspend(&self) -> Result<(), Failure> {
+    async fn suspend(&self, #[zbus(header)] header: Header<'_>) -> Result<(), Failure> {
+        if self.0.sandboxed(&header).await {
+            return Err(Failure::access_denied(
+                "Sandboxed apps cannot put the computer to sleep",
+            ));
+        }
         system::perform(&self.0.system, Power::Suspend)
             .await
             .map_err(general)

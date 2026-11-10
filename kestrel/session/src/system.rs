@@ -45,8 +45,6 @@ trait Systemd {
     fn set_environment(&self, assignments: &[String]) -> zbus::Result<()>;
 }
 
-/// Whether logind lets you take a power action, in the session manager's
-/// terms.
 pub async fn availability(system: &Connection, action: Power) -> zbus::Result<u32> {
     let login = LoginProxy::new(system).await?;
     let answer = match action {
@@ -78,8 +76,6 @@ pub async fn stop_session(session: &Connection) -> zbus::Result<()> {
         .map(drop)
 }
 
-/// Shares a variable with everything the session starts from now on, through
-/// D-Bus activation and systemd.
 pub async fn export_environment(session: &Connection, name: &str, value: &str) {
     let shared = async {
         DBusProxy::new(session)

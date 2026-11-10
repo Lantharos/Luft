@@ -1,4 +1,5 @@
 use std::fs;
+use std::path::Path;
 
 const GPU_CODE: [&str; 9] = [
     "[nvidia",
@@ -11,6 +12,7 @@ const GPU_CODE: [&str; 9] = [
     "drm_",
     "dma_fence",
 ];
+const KESTREL: &str = "/usr/bin/kestrel";
 
 fn state(stat: &str) -> Option<char> {
     stat.rsplit_once(") ")?.1.chars().next()
@@ -54,6 +56,10 @@ pub fn is_debugged(pid: u32) -> bool {
             .find_map(|line| line.strip_prefix("TracerPid:"))
             .is_some_and(|tracer| tracer.trim() != "0")
     })
+}
+
+pub fn is_kestrel(pid: u32) -> bool {
+    fs::read_link(format!("/proc/{pid}/exe")).is_ok_and(|program| program == Path::new(KESTREL))
 }
 
 pub fn owner(pid: u32) -> Option<u32> {

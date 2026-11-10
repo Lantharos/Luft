@@ -20,7 +20,6 @@ trait LoginSession {
     fn locked_hint(&self) -> zbus::Result<bool>;
 }
 
-/// Follows whether logind counts your session as active and locked.
 pub async fn follow(system: Connection, session: Arc<Session>) -> zbus::Result<()> {
     let login = LoginSessionProxy::new(&system).await?;
     let mut active_changes = login.receive_active_changed().await;

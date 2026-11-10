@@ -45,7 +45,7 @@ impl Watchdog {
         let Some(uid) = caller::uid(connection, header).await? else {
             return denied("The caller can't be identified");
         };
-        if threads::owner(compositor) != Some(uid) {
+        if threads::owner(compositor) != Some(uid) || !threads::is_kestrel(compositor) {
             return denied("That isn't the caller's Kestrel");
         }
         let user = self.login.get_user(uid).await?;

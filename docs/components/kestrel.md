@@ -44,7 +44,7 @@ Headless sessions run `kestrel-post` in a network of its own (`kestrel/tools/ses
 
 ## Sounds
 
-Kestrel plays the `luft` sound theme from `kestrel/engine/data/sounds/luft`, which `kestrel/tools/sounds` renders. Each sound is decoded once, the first time it plays, and kept in memory; all of them play through one PipeWire stream with the Notification role, which keeps its own volume (the System sounds volume in Settings). A sound that plays again before it ends starts over instead of doubling up, so the volume tick keeps up with a held key. `com.lantharos.Kestrel.Sounds` at `/com/lantharos/Kestrel/Sounds` plays theme sounds for apps outside a sandbox: `Play` follows the switches in `com.lantharos.kestrel.sounds` and `org.gnome.desktop.sound event-sounds`, `Preview`, which Settings uses, plays regardless of them, and `Check` tells Settings whether a file can be a custom sound. The `custom` key in `com.lantharos.kestrel.sounds` maps sound names to files Settings copied into `kestrel/sounds` in the user's data folder. The player reads it instead of the theme, drops its decoded sounds when it changes so a new choice plays at once, stops decoding a custom sound past 10 seconds, and falls back to the theme when a file is missing or won't decode. The login screen runs as its own user, so it never sees these files. The headless `system:sounds` check follows what plays, and from which file, through the player's `played` signal.
+Kestrel plays the `luft` sound theme from `kestrel/engine/data/sounds/luft`, which `kestrel/tools/sounds` renders. Each sound is decoded once, the first time it plays, and kept in memory; all of them play through one PipeWire stream with the Notification role, which keeps its own volume (the System sounds volume in Settings). A sound that plays again before it ends starts over instead of doubling up, so the volume tick keeps up with a held key. `com.lantharos.Kestrel.Sounds` at `/com/lantharos/Kestrel/Sounds` plays theme sounds for apps outside a sandbox: `Play` follows the switches in `com.lantharos.kestrel.sounds` and `org.gnome.desktop.sound event-sounds`, `Preview`, which Settings uses, plays regardless of them, and `Check` tells Settings whether a file can be a custom sound. The `custom` key in `com.lantharos.kestrel.sounds` maps sound names to files Settings copied into `kestrel/sounds` in the user's data folder. The player reads it instead of the theme, drops its decoded sounds when it changes so a new choice plays at once, stops decoding a custom sound past 10 seconds, and falls back to the theme when a file is missing or won't decode. A sound file an app's notification names plays for at most 10 seconds, fading out at the cut. The login screen runs as its own user, so it never sees these files. The headless `system:sounds` check follows what plays, and from which file, through the player's `played` signal.
 
 ## Pens
 
@@ -71,6 +71,43 @@ The build runs `annotationData.ts` to turn CLDR's emoji annotations (`cldr-emoji
 
 After sign-in Kestrel reads these files in the background and builds the picker and its search a few milliseconds at a time, along with Start, quick settings and the notification center, so each opens at once the first time without holding up animations or input.
 
+## On-screen keyboard layouts
+
+The on-screen keyboard reads its layouts from `kestrel/engine/data/osk-layouts`, one JSON file per XKB layout, named `layout.json` or `layout+variant.json`. A layout the folder lacks falls back to its base layout and then to `us`; terminals use the `-extended` files, and fields that ask for digits, numbers, phone numbers, email addresses or URLs use `digits`, `number`, `phone`, `email` and `url`.
+
+The files come from the Android keyboards in Unicode CLDR 43, the last release that published them, and are then edited by hand. `kestrel/engine/data/update-osk-layouts.sh` downloads that release, checks it, converts it with [`cldr2json`](../../kestrel/engine/data/cldr2json/README.md) and rewrites the resource list, which overwrites hand edits, so go through the diff before committing.
+
+Each file is an object with `levels`, plus the `locale` and `name` CLDR gave it. A level is one panel of keys:
+
+| Property | Value |
+| --- | --- |
+| `level` | Its name: `default`, `shift`, `opt` or `opt+shift` |
+| `mode` | `default`, `latched` or `locked`, as CLDR marked it |
+| `rows` | An array of rows, each an array of keys |
+
+A key has these properties, all optional:
+
+| Property | Value |
+| --- | --- |
+| `strings` | The strings it types. The first is its label unless `label` is set; the rest show in the popup that opens when the key is held |
+| `label` | The text on the key |
+| `iconName` | An icon to show in place of a label |
+| `keyval` | A keysym in hexadecimal, pressed as a key instead of typing a string |
+| `width` | Its width in keys, in steps of 0.5; 1 when left out |
+| `height` | Its height in rows, in steps of 0.5, growing downwards; 1 when left out |
+| `leftOffset` | Empty space before it, in keys, in steps of 0.5 |
+| `action` | What it does in place of typing, from the list below |
+| `level` | The level a `levelSwitch` key shows |
+
+| Action | What the key does |
+| --- | --- |
+| `hide` | Hides the keyboard |
+| `languageMenu` | Opens the list of keyboard layouts |
+| `emoji` | Switches to the emoji panel |
+| `modifier` | Holds `keyval` as a modifier for the next key, so Ctrl then A sends Ctrl+A |
+| `delete` | Deletes backwards |
+| `levelSwitch` | Shows the level named in `level` |
+
 ## Types
 
 The TypeScript in `kestrel/ui` and `kestrel/tools` is typed against `kestrel/types/gir`, which ts-for-gir generates from the GIR files of Kestrel's own Mutter, its engine (`Shell` and `St`) and every other library they import, so the types match what Kestrel runs, patches included. Regenerate them after changing API the shell uses, in a patch or in the engine:
@@ -93,7 +130,7 @@ The login screen follows the schedule too. The session gives `com.lantharos.Gree
 
 Once the desktop is up, `kestrel-settings` mounts the data drives inside the computer through UDisks, and does the same for any that appear later, while `mount-internal` in `com.lantharos.kestrel.drives` is on. It mounts ext4, Btrfs, XFS, F2FS, exFAT, FAT32 and NTFS file systems on drives that aren't removable, and leaves out partitions with `UDISKS_IGNORE`, `UDISKS_AUTO=0` or an fstab entry, the GPT attributes for required (bit 0), hidden (62) and no automount (63), EFI, XBOOTLDR, Microsoft reserved and recovery, BIOS boot, LDM, Storage Spaces, swap and the discoverable root, `/usr`, `/var` and `/tmp` types, recovery and OEM labels, and Luft's and Meet Luft's own partitions by label. Locked LUKS and BitLocker volumes stay locked. The first time it meets an ext4, Btrfs, XFS or F2FS file system, it mounts it read-only (ext4 without replaying its journal) and closes it again if it holds another system: `etc/os-release`, `usr/lib/os-release`, `etc/fstab`, an OSTree or boot loader files, at the top or in a Btrfs subvolume. What it found is kept by file system UUID in `~/.local/state/luft/internal-drives`, so later sign-ins mount straight away. NTFS mounts read-only while `com.lantharos.Windows1` reports a hibernated Windows, with a notification the first time. A drive you unmount stays unmounted until it appears again. e2fsprogs marks every ext4 file system `UDISKS_AUTO=0`; `65-kestrel-internal-ext4.rules` takes that back for drives that aren't on USB or a memory card and aren't held by trustd, so an explicit `UDISKS_AUTO=0` from a later rule still counts. `50-kestrel-drives.rules` lets administrators at the computer mount internal file systems without a password; for anyone else, mounting at sign-in never asks and leaves the drives closed.
 
-`kestrel-settings` also keeps old files from piling up, with the age in `old-files-age` of `org.gnome.desktop.privacy`, 30 days unless changed. Every hour it removes items deleted longer ago than that from each trash, while `remove-old-trash-files` is on. A couple of minutes after sign-in, once a day and after any of these settings change, it removes your temporary files that nothing has used for that long, while `remove-old-temp-files` is on, and moves screenshots taken longer ago than that to the trash, while `remove-old-screenshots` in `com.lantharos.kestrel.housekeeping` is on. All three are on in a new account. Screenshots go to the trash rather than away for good, so one can still be brought back until the trash forgets it in turn. Kestrel marks the folder it saves screenshots in, `Pictures/Screenshots` in English, with the extended attribute `user.luft.screenshots`, and the cleanup only looks in folders inside Pictures that carry it, so it finds the folder in any language and leaves every other folder alone.
+`kestrel-settings` also keeps old files from piling up, with the age in `old-files-age` of `org.gnome.desktop.privacy`, 30 days unless changed. Every hour it removes items deleted longer ago than that from each trash, while `remove-old-trash-files` is on. A couple of minutes after sign-in, once a day and after any of these settings change, it removes your temporary files that nothing has used for that long, while `remove-old-temp-files` is on, and moves screenshots taken longer ago than that to the trash, while `remove-old-screenshots` in `com.lantharos.kestrel.housekeeping` is on. All three are on in a new account. Screenshots go to the trash rather than away for good, so one can still be brought back until the trash forgets it in turn. Kestrel marks the folder it saves screenshots in, `Pictures/Screenshots` in English, with the extended attribute `user.luft.screenshots`, and the cleanup only looks in folders inside Pictures that carry it, so it finds the folder in any language and leaves every other folder alone. Once a minute it also looks at how much room is left on the system disk and on every other writable drive inside the computer, and warns when one is down to its last 5% and under 1 GB.
 
 Chromium-based browsers and Electron apps lock their profile with the host name, and refuse a profile locked under another name. At sign-in and whenever the host name changes, `kestrel-settings` looks for these locks in `~/.config` and `~/.cache`, in each Flatpak's own config and cache folders under `~/.var/app`, and in Sabine's profiles: a lock still held by its running app is moved to the new name, so launching it again opens a window in that app, and one left behind by an app that's no longer running is removed. NetworkManager never names the computer after the network (`hostname-mode=none`), so the name only changes when you rename it in Settings.
 
@@ -103,9 +140,9 @@ Chromium-based browsers and Electron apps lock their profile with the host name,
 | --- | --- |
 | `kestrel-session` | Started by the login screen; runs `kestrel-session.target` and Kestrel's session manager in place of gnome-session |
 | `kestrel-setup.target` | Kestrel in setup mode with the session manager, before the desktop when setup is pending |
-| `kestrel-session-manager` | `org.gnome.SessionManager` for apps and the shell: inhibitors, registered apps, logging out, restarting and shutting down after Kestrel asks you (each app then gets 10 seconds to close), the question the power button opens, idle presence, and `org.freedesktop.ScreenSaver` for players and browsers. Sandboxed apps can't change the session's environment or end it without asking |
+| `kestrel-session-manager` | `org.gnome.SessionManager` for apps and the shell: inhibitors, registered apps, logging out, restarting and shutting down after Kestrel asks you (registered apps get a second to answer, then 5 seconds to close), the question the power button opens, idle presence, and `org.freedesktop.ScreenSaver` for players and browsers. Sandboxed apps can't change the session's environment, put the computer to sleep or end the session without asking, and only the app that took an inhibitor or registered can give it up |
 | `kestrel-settings` | Settings service started before the shell |
-| `kestrel-search` | Indexes the names and text of files in your home folder for Start, at idle priority |
+| `kestrel-search` | Indexes the names and text of files in your home folder for Start, at idle priority. It reads text only from regular files, never through links, and can write only to its own cache folder |
 | `kestrel-portal` | `com.lantharos.Kestrel.Portal`, the portal backend for email, printing, accounts, app choosers, launchers, USB devices, wallpapers and lockdown. Its dialogs still open in Kestrel |
 | `kestrel-greeter-service` | `com.lantharos.Greeter1` on the system bus, the login screen's settings |
 | `kestrel-authenticate` | Checks lock screen passwords and fingerprints through the `kestrel-unlock` PAM rules, and waits for a fingerprint at the login screen |

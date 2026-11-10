@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 const SYSTEM_TYPES: [&str; 30] = [
     "autofs",
@@ -36,7 +36,42 @@ const NETWORK_TYPES: [&str; 6] = ["cifs", "nfs", "nfs4", "smbfs", "smb3", "sshfs
 
 pub struct Mount {
     pub path: PathBuf,
+    pub source: String,
     pub read_only: bool,
+}
+
+impl Mount {
+    pub fn is_removable(&self) -> bool {
+        let Ok(device) = std::fs::canonicalize(&self.source) else {
+            return false;
+        };
+        device
+            .file_name()
+            .and_then(|name| std::fs::canonicalize(Path::new("/sys/class/block").join(name)).ok())
+            .is_some_and(|block| on_removable_disk(&block))
+    }
+}
+
+fn on_removable_disk(block: &Path) -> bool {
+    let disk = match block.parent() {
+        Some(disk) if block.join("partition").exists() => disk,
+        _ => block,
+    };
+    let reads = |file: &str, value: &str| {
+        std::fs::read_to_string(disk.join(file)).is_ok_and(|text| text.trim() == value)
+    };
+    let on_usb = disk
+        .components()
+        .any(|part| part.as_os_str().as_encoded_bytes().starts_with(b"usb"));
+    on_usb
+        || reads("removable", "1")
+        || reads("device/type", "SD")
+        || std::fs::read_dir(disk.join("slaves")).is_ok_and(|slaves| {
+            slaves
+                .flatten()
+                .filter_map(|slave| std::fs::canonicalize(slave.path()).ok())
+                .any(|slave| on_removable_disk(&slave))
+        })
 }
 
 pub fn mounted() -> Vec<Mount> {
@@ -59,21 +94,9 @@ fn parse(line: &str) -> Option<Mount> {
     }
     Some(Mount {
         path: PathBuf::from(unescape(fields.get(4)?)),
+        source: unescape(source),
         read_only: fields.get(5)?.split(',').any(|option| option == "ro"),
     })
-}
-
-pub fn configured() -> Vec<PathBuf> {
-    let Ok(text) = std::fs::read_to_string("/etc/fstab") else {
-        return Vec::new();
-    };
-    text.lines()
-        .map(str::trim)
-        .filter(|line| !line.starts_with('#'))
-        .filter_map(|line| line.split_whitespace().nth(1))
-        .filter(|path| path.starts_with('/'))
-        .map(|path| PathBuf::from(unescape(path)))
-        .collect()
 }
 
 fn unescape(text: &str) -> String {

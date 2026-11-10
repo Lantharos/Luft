@@ -3,6 +3,8 @@ use std::io::Read;
 use std::path::Path;
 use std::process::{Command, Stdio};
 
+use rustix::fs::{Mode, OFlags};
+
 const TEXT_LIMIT: u64 = 1 << 20;
 const PDF_LIMIT: u64 = 64 << 20;
 const KEPT_LIMIT: usize = 512 << 10;
@@ -67,13 +69,15 @@ fn shorten(mut text: String) -> String {
     text
 }
 
+fn open(path: &Path) -> Option<File> {
+    let flags = OFlags::RDONLY | OFlags::NOFOLLOW | OFlags::NONBLOCK | OFlags::CLOEXEC;
+    let file = File::from(rustix::fs::open(path, flags, Mode::empty()).ok()?);
+    file.metadata().ok()?.is_file().then_some(file)
+}
+
 pub fn read_text(path: &Path) -> Option<String> {
     let mut bytes = Vec::new();
-    File::open(path)
-        .ok()?
-        .take(TEXT_LIMIT)
-        .read_to_end(&mut bytes)
-        .ok()?;
+    open(path)?.take(TEXT_LIMIT).read_to_end(&mut bytes).ok()?;
     if bytes[..bytes.len().min(BINARY_SNIFF)].contains(&0) {
         return None;
     }
@@ -81,7 +85,7 @@ pub fn read_text(path: &Path) -> Option<String> {
 }
 
 fn read_pdf(path: &Path) -> Option<String> {
-    let output = Command::new("timeout")
+    let mut pdftotext = Command::new("timeout")
         .args([
             PDF_SECONDS,
             "pdftotext",
@@ -91,16 +95,20 @@ fn read_pdf(path: &Path) -> Option<String> {
             "-l",
             PDF_PAGES,
         ])
-        .arg(path)
-        .arg("-")
-        .stdin(Stdio::null())
+        .args(["/dev/stdin", "-"])
+        .stdin(open(path)?)
+        .stdout(Stdio::piped())
         .stderr(Stdio::null())
-        .output()
+        .spawn()
         .ok()?;
-    output
-        .status
-        .success()
-        .then(|| String::from_utf8_lossy(&output.stdout).into_owned())
+    let mut bytes = Vec::new();
+    let read = pdftotext
+        .stdout
+        .take()?
+        .take(KEPT_LIMIT as u64)
+        .read_to_end(&mut bytes);
+    let finished = pdftotext.wait().ok()?.success() || bytes.len() == KEPT_LIMIT;
+    (read.is_ok() && finished).then(|| String::from_utf8_lossy(&bytes).into_owned())
 }
 
 pub fn extract(path: &Path, format: Format) -> String {

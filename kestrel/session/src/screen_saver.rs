@@ -31,8 +31,6 @@ trait Shell {
     fn active_changed(&self, active: bool) -> zbus::Result<()>;
 }
 
-/// The freedesktop screen saver, which players and browsers use to keep the
-/// screen on. The lock screen itself is Kestrel's.
 pub struct ScreenSaver {
     session: Arc<Session>,
     shell: ShellProxy<'static>,
@@ -55,8 +53,12 @@ impl ScreenSaver {
     }
 
     #[zbus(name = "UnInhibit")]
-    async fn uninhibit(&self, cookie: u32) -> Result<(), Failure> {
-        self.session.uninhibit(cookie).await?;
+    async fn uninhibit(
+        &self,
+        cookie: u32,
+        #[zbus(header)] header: Header<'_>,
+    ) -> Result<(), Failure> {
+        self.session.uninhibit(sender(&header), cookie).await?;
         Ok(())
     }
 
@@ -77,7 +79,6 @@ impl ScreenSaver {
     async fn active_changed(emitter: &SignalEmitter<'_>, active: bool) -> zbus::Result<()>;
 }
 
-/// Serves the screen saver at both paths apps look for it.
 pub async fn serve(
     connection: &Connection,
     session: &Arc<Session>,

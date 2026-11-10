@@ -91,6 +91,9 @@ unsafe extern "C" fn process_form(pointer: *mut c_void, form: *mut AuthForm) -> 
 unsafe extern "C" fn browse(_: *mut Info, uri: *const c_char, pointer: *mut c_void) -> c_int {
     let session = unsafe { session(pointer) };
     let uri = text(uri).unwrap_or_default();
+    if !uri.starts_with("https://") {
+        return -1;
+    }
     session
         .kestrel
         .send(&Message::Browse { uri: &uri })

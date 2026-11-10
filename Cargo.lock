@@ -5464,6 +5464,7 @@ dependencies = [
  "ureq",
  "url",
  "zbus 6.0.0",
+ "zeroize",
 ]
 
 [[package]]
@@ -5966,6 +5967,7 @@ name = "luft-speech-service"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "futures-util",
  "gio",
  "libc",
  "luft-dbus",

@@ -42,8 +42,6 @@ struct Held {
     flags: u32,
 }
 
-/// What apps asked the session not to do, by cookie, each served as an
-/// object of its own.
 pub struct Inhibitors {
     connection: Connection,
     next: AtomicU32,
@@ -102,8 +100,15 @@ impl Inhibitors {
         Ok(cookie)
     }
 
-    pub async fn remove(&self, cookie: u32) -> zbus::Result<bool> {
-        if self.held.lock().unwrap().remove(&cookie).is_none() {
+    pub async fn remove(&self, owner: &str, cookie: u32) -> zbus::Result<bool> {
+        let removed = {
+            let mut held = self.held.lock().unwrap();
+            let owned = held
+                .get(&cookie)
+                .is_some_and(|inhibitor| inhibitor.owner == owner);
+            owned && held.remove(&cookie).is_some()
+        };
+        if !removed {
             return Ok(false);
         }
         let path = path_of(cookie);
@@ -124,7 +129,7 @@ impl Inhibitors {
                 .collect()
         };
         for cookie in cookies {
-            self.remove(cookie).await?;
+            self.remove(owner, cookie).await?;
         }
         Ok(())
     }

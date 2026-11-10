@@ -1,5 +1,3 @@
-use std::future::Future;
-
 use tokio::sync::oneshot;
 
 #[derive(Clone)]
@@ -26,21 +24,6 @@ impl GioThread {
         let (reply, answer) = oneshot::channel();
         self.context.invoke(move || {
             let _ = reply.send(work());
-        });
-        answer.await.expect("the GIO thread answers")
-    }
-
-    pub async fn run_async<T, F>(&self, work: impl FnOnce() -> F + Send + 'static) -> T
-    where
-        T: Send + 'static,
-        F: Future<Output = T> + 'static,
-    {
-        let (reply, answer) = oneshot::channel();
-        let context = self.context.clone();
-        self.context.invoke(move || {
-            context.spawn_local(async move {
-                let _ = reply.send(work().await);
-            });
         });
         answer.await.expect("the GIO thread answers")
     }

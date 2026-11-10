@@ -4,6 +4,7 @@ use super::threads;
 use crate::system::kmsg::{self, KernelLog};
 
 const STALL_LIMIT: Duration = Duration::from_secs(15);
+const LONGEST_STALL: Duration = Duration::from_secs(5 * 60);
 const BLOCKED_LIMIT: Duration = Duration::from_secs(10);
 const LOOK_BEFORE_STALL: Duration = Duration::from_secs(60);
 const RESUME_GRACE: Duration = Duration::from_secs(30);
@@ -42,6 +43,7 @@ impl Judge {
 
     pub fn consider(&mut self, stalled: Duration, compositor: u32) -> Option<Hang> {
         let now = kmsg::now();
+        let stalled = stalled.min(LONGEST_STALL);
         if stalled < STALL_LIMIT || self.recently_resumed(now) || threads::is_debugged(compositor) {
             self.blocked_since = None;
             return None;

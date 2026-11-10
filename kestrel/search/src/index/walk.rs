@@ -119,7 +119,7 @@ impl Tree {
             let Ok(kind) = entry.file_type() else {
                 continue;
             };
-            if !is_hidden(&name) {
+            if !is_hidden(&name) && (kind.is_dir() || kind.is_file() || kind.is_symlink()) {
                 found.push((name, kind.is_dir()));
             }
         }

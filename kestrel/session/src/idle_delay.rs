@@ -4,9 +4,6 @@ use tokio::sync::watch;
 const SCHEMA: &str = "org.gnome.desktop.session";
 const KEY: &str = "idle-delay";
 
-/// How many seconds without input count as idle, as set in GNOME's session
-/// settings, followed on a thread of its own since GSettings needs a GLib
-/// main loop.
 pub fn follow() -> watch::Receiver<u32> {
     let (sender, delay) = watch::channel(0);
     std::thread::Builder::new()

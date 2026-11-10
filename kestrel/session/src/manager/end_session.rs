@@ -75,7 +75,6 @@ trait Dialog {
     ) -> zbus::Result<()>;
 }
 
-/// Kestrel's confirmation for ending the session, while one is open.
 #[derive(Default)]
 pub struct Confirmation(Mutex<Option<AbortHandle>>);
 
@@ -113,12 +112,10 @@ async fn confirmed(
 }
 
 impl Session {
-    /// Asks you in Kestrel before ending the session, listing what holds it up.
     pub fn confirm(self: &Arc<Self>, action: Action, inhibitors: Vec<OwnedObjectPath>) {
         self.ask(action.prompt(), inhibitors);
     }
 
-    /// Lets you pick how to end the session, with nothing chosen for you.
     pub fn offer_power_options(self: &Arc<Self>, inhibitors: Vec<OwnedObjectPath>) {
         self.ask(POWER_OPTIONS, inhibitors);
     }
@@ -139,7 +136,6 @@ impl Session {
         self.confirmation.replace(Some(waiting.abort_handle()));
     }
 
-    /// Ends the session, after asking registered apps when `ask_clients`.
     pub async fn finish(&self, action: Action, ask_clients: bool) {
         if ask_clients {
             self.clients.end().await;

@@ -7,8 +7,6 @@ const NOT_IN_INITIALIZATION: &str = "org.gnome.SessionManager.NotInInitializatio
 const ACCESS_DENIED: &str = "org.freedesktop.DBus.Error.AccessDenied";
 const FAILED: &str = "org.freedesktop.DBus.Error.Failed";
 
-/// A D-Bus error under any name, so answers from Kestrel and logind reach
-/// callers as they were given.
 #[derive(Debug)]
 pub struct Failure {
     name: OwnedErrorName,

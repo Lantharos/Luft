@@ -65,7 +65,6 @@ enum Ending {
     End,
 }
 
-/// Apps registered with the session, which are asked before it ends.
 pub struct Clients {
     connection: Connection,
     registry: Shared,
@@ -104,14 +103,17 @@ impl Clients {
         Ok(path)
     }
 
-    pub async fn unregister(&self, path: &ObjectPath<'_>) -> zbus::Result<()> {
-        let removed = self
-            .registry
-            .lock()
-            .unwrap()
-            .clients
-            .remove(&OwnedObjectPath::from(path.to_owned()));
-        if removed.is_none() {
+    pub async fn unregister(&self, owner: &str, path: &ObjectPath<'_>) -> zbus::Result<()> {
+        let removed = {
+            let mut registry = self.registry.lock().unwrap();
+            let path = OwnedObjectPath::from(path.to_owned());
+            let owned = registry
+                .clients
+                .get(&path)
+                .is_some_and(|client| client.owner == owner);
+            owned && registry.clients.remove(&path).is_some()
+        };
+        if !removed {
             return Ok(());
         }
         self.connection
@@ -132,13 +134,11 @@ impl Clients {
                 .collect()
         };
         for path in paths {
-            self.unregister(&path).await?;
+            self.unregister(owner, &path).await?;
         }
         Ok(())
     }
 
-    /// Asks every app whether the session may end, then tells them it does,
-    /// moving on once all answer or the time for each runs out.
     pub async fn end(&self) {
         self.broadcast(Ending::Query, QUERY_TIMEOUT).await;
         self.broadcast(Ending::End, END_TIMEOUT).await;

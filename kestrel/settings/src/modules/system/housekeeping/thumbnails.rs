@@ -45,16 +45,12 @@ pub fn purge(maximum_age_days: i32, maximum_size_megabytes: i32) {
 
 fn thumbnails() -> Vec<Thumbnail> {
     let cache = glib::user_cache_dir().join("thumbnails");
-    let legacy = glib::home_dir().join(".thumbnails");
     [
         cache.join("normal"),
         cache.join("large"),
         cache.join("x-large"),
         cache.join("xx-large"),
         cache.join("fail/gnome-thumbnail-factory"),
-        legacy.join("normal"),
-        legacy.join("large"),
-        legacy.join("fail/gnome-thumbnail-factory"),
     ]
     .iter()
     .filter_map(|directory| std::fs::read_dir(directory).ok())

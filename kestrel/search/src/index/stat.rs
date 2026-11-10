@@ -17,6 +17,10 @@ impl Stat {
     pub fn is_dir(&self) -> bool {
         self.kind == FileType::Directory
     }
+
+    pub fn is_file(&self) -> bool {
+        self.kind == FileType::RegularFile
+    }
 }
 
 pub fn stat(path: &Path) -> Option<Stat> {

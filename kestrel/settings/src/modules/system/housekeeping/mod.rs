@@ -16,6 +16,7 @@ use crate::context::Context;
 use crate::shared::notify::{self, Notification, NotificationsProxy, Sound, URGENCY_CRITICAL};
 use crate::shared::settings::Schemas;
 use disk_space::{DiskSpace, Low};
+use trash::Trash;
 
 const PRIVACY: &str = "org.gnome.desktop.privacy";
 const HOUSEKEEPING: &str = "com.lantharos.kestrel.housekeeping";
@@ -71,7 +72,10 @@ pub async fn start(context: &Context) -> zbus::Result<()> {
                 }
                 _ = hourly.tick() => purge_trash(&settings).await,
                 _ = disk_check.tick() => {
-                    if let Some(low) = disk_space.check() {
+                    let volumes = tokio::task::spawn_blocking(disk_space::volumes)
+                        .await
+                        .unwrap_or_default();
+                    if let Some(low) = disk_space.check(volumes) {
                         warned_path = low.path.clone();
                         warning = warn(&session, &low, warning).await;
                     }
@@ -84,7 +88,7 @@ pub async fn start(context: &Context) -> zbus::Result<()> {
                     match args.action_key.as_str() {
                         "examine" => examine(&warned_path),
                         "empty-trash" => {
-                            let _ = tokio::task::spawn_blocking(|| trash::empty(&trash::directories())).await;
+                            let _ = tokio::task::spawn_blocking(|| trash::empty(&trash::open_all())).await;
                         }
                         _ => {}
                     }
@@ -112,7 +116,7 @@ async fn purge_trash(settings: &Schemas) {
     else {
         return;
     };
-    let _ = tokio::task::spawn_blocking(move || trash::purge(&trash::directories(), &cutoff)).await;
+    let _ = tokio::task::spawn_blocking(move || trash::purge(&trash::open_all(), &cutoff)).await;
 }
 
 async fn purge_temp(settings: &Schemas) {
@@ -158,20 +162,19 @@ fn examine(path: &Path) {
 
 async fn warn(session: &Connection, low: &Low, replaces: u32) -> u32 {
     let free = disk_space::format_size(low.free_bytes);
-    let has_trash = trash::directories()
-        .iter()
-        .any(|directory| trash::holds_items(directory));
-    let (summary, mut body) = if low.among_several {
-        let name = volume_name(&low.path);
-        (
+    let has_trash =
+        tokio::task::spawn_blocking(|| trash::open_all().iter().any(Trash::holds_items))
+            .await
+            .unwrap_or(false);
+    let (summary, mut body) = match &low.name {
+        Some(name) => (
             format!("Low disk space on {name}"),
             format!("{name} has only {free} left."),
-        )
-    } else {
-        (
+        ),
+        None => (
             "Low disk space".to_owned(),
             format!("This computer has only {free} left."),
-        )
+        ),
     };
     let mut actions = Vec::new();
     if disks_path().exists() {
@@ -198,11 +201,4 @@ async fn warn(session: &Connection, low: &Low, replaces: u32) -> u32 {
         eprintln!("Couldn't warn about low disk space: {error}");
         replaces
     })
-}
-
-fn volume_name(path: &Path) -> String {
-    path.file_name().map_or_else(
-        || "The system disk".to_owned(),
-        |name| name.to_string_lossy().into_owned(),
-    )
 }

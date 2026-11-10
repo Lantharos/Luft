@@ -17,7 +17,10 @@ struct SignIn {
 }
 
 async fn over_ssh(system: &Connection, path: OwnedObjectPath) -> zbus::Result<Option<SignIn>> {
-    let session = LoginSessionProxy::builder(system).path(path).build().await?;
+    let session = LoginSessionProxy::builder(system)
+        .path(path)
+        .build()
+        .await?;
     if session.service().await? != SSHD {
         return Ok(None);
     }

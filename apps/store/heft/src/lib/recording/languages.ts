@@ -4,7 +4,7 @@ import type { SubjectMeta } from '#lib/library/model.js';
 import type { Transcript } from './transcript';
 
 /** Languages often taught in, for choosing a subject's. */
-export const CLASS_LANGUAGES = ['sr', 'hr', 'bs', 'sq', 'de', 'en', 'fr', 'it', 'es', 'ru', 'hu', 'tr', 'el', 'mk', 'bg', 'sl'] as const;
+export const CLASS_LANGUAGES = ['sq', 'de', 'hr', 'bs', 'sr', 'en', 'fr', 'it', 'es', 'ru', 'hu', 'tr', 'el', 'mk', 'bg', 'sl'] as const;
 
 /** Serbian in the alphabet Heft is shown in. */
 const serbian = () => (i18n.locale === 'sr-Latn' || !i18n.locale.startsWith('sr') ? 'sr-Latn' : 'sr-Cyrl');

@@ -30,15 +30,15 @@ pub struct Discovery {
 
 fn provider_for(host: &str) -> Option<Provider> {
     let host = host.to_ascii_lowercase();
-    if host.ends_with("gmail.com")
-        || host.ends_with("google.com")
-        || host.ends_with("googlemail.com")
-    {
+    let within = |domains: &[&str]| {
+        domains.iter().any(|domain| {
+            host.strip_suffix(domain)
+                .is_some_and(|rest| rest.is_empty() || rest.ends_with('.'))
+        })
+    };
+    if within(&["gmail.com", "google.com", "googlemail.com"]) {
         Some(Provider::Google)
-    } else if host.ends_with("office365.com")
-        || host.ends_with("outlook.com")
-        || host.ends_with("hotmail.com")
-    {
+    } else if within(&["office365.com", "outlook.com", "hotmail.com"]) {
         Some(Provider::Microsoft)
     } else {
         None

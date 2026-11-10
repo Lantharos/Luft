@@ -93,7 +93,7 @@ impl Monitor {
             .as_chunks::<BLOCK>()
             .0
             .iter()
-            .filter(|block| block[0] == CTA_EXTENSION && block[2] >= 4)
+            .filter(|block| block[0] == CTA_EXTENSION && (4..BLOCK).contains(&usize::from(block[2])))
         {
             sizes.extend(
                 extension[usize::from(extension[2])..BLOCK - 1]

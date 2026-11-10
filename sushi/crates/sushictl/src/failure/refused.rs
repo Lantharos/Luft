@@ -2,6 +2,7 @@ use std::fs::OpenOptions;
 use std::io::Read;
 use std::os::unix::fs::OpenOptionsExt;
 
+const REPORTER: &str = "overlayfs: ";
 const REFUSED: &str = "fs-verity digest";
 const LONGEST_RECORD: usize = 8192;
 
@@ -21,7 +22,8 @@ pub fn system_files() -> Vec<String> {
             Ok(length) => {
                 let text = String::from_utf8_lossy(&record[..length]);
                 let message = text.split_once(';').map_or(&*text, |(_, message)| message);
-                if message.contains(REFUSED)
+                if message.starts_with(REPORTER)
+                    && message.contains(REFUSED)
                     && !refused.iter().any(|seen| seen == message.trim_end())
                 {
                     refused.push(message.trim_end().to_owned());

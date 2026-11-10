@@ -191,10 +191,6 @@ fn reason(
         } else {
             Reason::Drive
         })
-    } else if failed(|name| {
-        name == "bootc-root-setup.service" || name == "ostree-prepare-root.service"
-    }) {
-        Some(Reason::Damaged)
     } else if failed(|name| name.starts_with("sysroot") || name.starts_with("initrd-root")) {
         Some(Reason::Unopened)
     } else if failed(|name| {

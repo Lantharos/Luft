@@ -262,6 +262,7 @@ fn exec_line(original: &str, id: &str, bundle: &Bundle) -> String {
     let mut arguments: Vec<String> = original
         .split_whitespace()
         .skip(1)
+        .filter(|argument| ![FILES, URIS].contains(argument))
         .map(str::to_owned)
         .collect();
     if bundle.chromium {

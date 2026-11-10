@@ -31,7 +31,7 @@ fn step(code: u32, value: u32, jump_true: u8, jump_false: u8) -> [u8; 8] {
 pub(super) fn no_new_namespaces() -> Vec<u8> {
     [
         step(LOAD, ARCH_OFFSET, 0, 0),
-        step(EQUALS, AUDIT_ARCH, 0, 7),
+        step(EQUALS, AUDIT_ARCH, 0, 9),
         step(LOAD, NUMBER_OFFSET, 0, 0),
         step(AT_LEAST, X32_SYSCALL_BIT, 7, 0),
         step(EQUALS, libc::SYS_unshare as u32, 6, 0),

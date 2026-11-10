@@ -16,6 +16,10 @@ export function luftAppPrograms(appId: string): string[] {
   return [`/usr/lib/sabine/${appId}/`, ...built];
 }
 
+export function systemPrograms(name: string): string[] {
+  return [`/usr/libexec/${name}`, ...(BUILT_APPS ? [`${BUILT_APPS}/${name}`] : [])];
+}
+
 export const runsProgram = (program: string, programs: string[]) =>
   programs.some(entry => program === entry || (entry.endsWith('/') && program.startsWith(entry)));
 

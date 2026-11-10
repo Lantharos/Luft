@@ -1,9 +1,8 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
-import { identifyProcess } from '../../shared/apps/identity.js';
-import { luftAppPrograms, runsProgram } from '../../shared/apps/luftApps.js';
-import { callerProcess } from '../../shared/dbus/processes.js';
+import { luftAppPrograms } from '../../shared/apps/luftApps.js';
+import { callerRuns } from '../../shared/dbus/sandbox.js';
 import { type FileActionChoiceShape, type FileActionEntry, type FileActionShape, fileActions } from './actions.js';
 
 const PATH = '/com/lantharos/Kestrel/FileActions';
@@ -41,19 +40,6 @@ function actionFields(id: string, shape: FileActionShape): Fields {
   };
   if (shape.items) fields.items = new GLib.Variant('aa{sv}', shape.items.map(choiceFields));
   return fields;
-}
-
-/** Whether a call comes from Luft's file manager, which is the only program that shows these actions and runs them on files. */
-async function fromFileManager(invocation: Gio.DBusMethodInvocation): Promise<boolean> {
-  const caller = await callerProcess(invocation).catch(() => null);
-  if (!caller) return false;
-  try {
-    const pid = caller.pid;
-    const identity = pid ? identifyProcess(pid) : null;
-    return !!identity && 'program' in identity && runsProgram(identity.program, FILE_MANAGER) && caller.pid === pid;
-  } finally {
-    caller.close();
-  }
 }
 
 /**
@@ -108,7 +94,7 @@ export class FileActionsService {
   }
 
   private answer(invocation: Gio.DBusMethodInvocation, act: () => GLib.Variant | void): void {
-    void fromFileManager(invocation).then(allowed => {
+    void callerRuns(invocation, FILE_MANAGER).then(allowed => {
       if (!allowed) {
         invocation.return_dbus_error('org.freedesktop.DBus.Error.AccessDenied', 'Only Rover can use file actions');
         return;

@@ -1,7 +1,9 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
+import { systemPrograms } from '../../shared/apps/luftApps.js';
 import { stealFd } from '../../shared/dbus/processes.js';
+import { callerRuns } from '../../shared/dbus/sandbox.js';
 import { promptKey } from './prompter.js';
 import type { PromptQueue } from './queue.js';
 import { accessRequest, passwordRequest, type Options } from './request.js';
@@ -30,6 +32,7 @@ const PINENTRY_XML = `<node>
 </node>`;
 const PINENTRY_PATH = '/com/lantharos/Kestrel/Pinentry';
 const DEFAULT_ICON = 'dialog-password-symbolic';
+const PINENTRY = systemPrograms('luft-pinentry');
 
 type Invocation = Gio.DBusMethodInvocation;
 
@@ -73,44 +76,60 @@ function withIcon(options: Options): Options {
   return { icon: new GLib.Variant('s', DEFAULT_ICON), ...options };
 }
 
+/**
+ * Asks for GnuPG's passphrases and confirmations. Only Luft's pinentry may call it: whoever asks chooses the dialog's
+ * words and gets what's typed.
+ */
 export class PinentryPrompter {
   private readonly dbus = Gio.DBusExportedObject.wrapJSObject(PINENTRY_XML, this);
+  private incoming = Promise.resolve();
 
   constructor(private readonly queue: PromptQueue) {
     this.dbus.export(Gio.DBus.session, PINENTRY_PATH);
   }
 
   PasswordAsync([handle, options, index]: [string, Options, number], invocation: Invocation, fdList: Gio.UnixFDList | null): void {
-    const fd = stealFd(fdList, index);
-    if (fd === null) {
-      invocation.return_dbus_error('org.freedesktop.DBus.Error.InvalidArgs', 'The passphrase needs a channel to be handed over');
-      return;
-    }
-    const channel = new Channel(fd);
-    this.queue.receive({
-      key: promptKey(invocation, handle),
-      prompt: { kind: 'password', request: passwordRequest(withIcon(options)) },
-      answer: (response, remember) => {
-        channel.close();
-        invocation.return_value(new GLib.Variant('(ua{sv})', [response, { remember: new GLib.Variant('b', remember) }]));
-      },
-      deliver: secret => channel.deliver(secret),
-      measure: secret => channel.measure(secret),
+    this.serialize(invocation, () => {
+      const fd = stealFd(fdList, index);
+      if (fd === null) {
+        invocation.return_dbus_error('org.freedesktop.DBus.Error.InvalidArgs', 'The passphrase needs a channel to be handed over');
+        return;
+      }
+      const channel = new Channel(fd);
+      this.queue.receive({
+        key: promptKey(invocation, handle),
+        prompt: { kind: 'password', request: passwordRequest(withIcon(options)) },
+        answer: (response, remember) => {
+          channel.close();
+          invocation.return_value(new GLib.Variant('(ua{sv})', [response, { remember: new GLib.Variant('b', remember) }]));
+        },
+        deliver: secret => channel.deliver(secret),
+        measure: secret => channel.measure(secret),
+      });
     });
   }
 
   ConfirmAsync([handle, options]: [string, Options], invocation: Invocation): void {
-    this.queue.receive({
+    this.serialize(invocation, () => this.queue.receive({
       key: promptKey(invocation, handle),
       prompt: { kind: 'access', request: accessRequest(withIcon(options)) },
       answer: response => invocation.return_value(new GLib.Variant('(u)', [response])),
       deliver: () => Promise.resolve(),
-    });
+    }));
   }
 
   CloseAsync([handle]: [string], invocation: Invocation): void {
-    this.queue.close(promptKey(invocation, handle));
-    invocation.return_value(null);
+    this.serialize(invocation, () => {
+      this.queue.close(promptKey(invocation, handle));
+      invocation.return_value(null);
+    });
+  }
+
+  private serialize(invocation: Invocation, step: () => void): void {
+    this.incoming = this.incoming.then(async () => {
+      if (await callerRuns(invocation, PINENTRY)) step();
+      else invocation.return_dbus_error('org.freedesktop.DBus.Error.AccessDenied', 'Only luft-pinentry can ask for passphrases');
+    }).catch(error => console.error('Kestrel could not show a pinentry prompt', error));
   }
 
   destroy(): void {

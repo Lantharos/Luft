@@ -2,7 +2,7 @@ import Gio from 'gi://Gio';
 import GioUnix from 'gi://GioUnix';
 import GLib from 'gi://GLib';
 
-import { stealFd } from '../../shared/dbus/processes.js';
+import { callerOwns, stealFd } from '../../shared/dbus/processes.js';
 import { t } from '../../shared/i18n/index.js';
 import { appName } from '../core/apps.js';
 import type { Dismissal, Options } from '../core/request.js';
@@ -158,7 +158,7 @@ export class PortalDialogs {
   }
 
   private answer(invocation: Invocation, reply: () => Promise<GLib.Variant | null>): void {
-    this.authorized(invocation)
+    callerOwns(invocation, PORTAL_SERVICE)
       .then(allowed => {
         if (!allowed) {
           invocation.return_dbus_error('org.freedesktop.DBus.Error.AccessDenied', 'Only kestrel-portal can open these dialogs');
@@ -167,15 +167,5 @@ export class PortalDialogs {
         return reply().then(value => invocation.return_value(value));
       })
       .catch(error => invocation.return_dbus_error('org.freedesktop.DBus.Error.Failed', `${error}`));
-  }
-
-  private async authorized(invocation: Invocation): Promise<boolean> {
-    try {
-      const owner = await invocation.get_connection().call('org.freedesktop.DBus', '/org/freedesktop/DBus', 'org.freedesktop.DBus',
-        'GetNameOwner', new GLib.Variant('(s)', [PORTAL_SERVICE]), new GLib.VariantType('(s)'), Gio.DBusCallFlags.NONE, -1, null);
-      return owner.deepUnpack<[string]>()[0] === invocation.get_sender();
-    } catch {
-      return false;
-    }
   }
 }

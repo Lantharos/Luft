@@ -3,6 +3,7 @@ import GLib from 'gi://GLib';
 
 import type { Context } from '../../context.js';
 import { verifiedName } from '../../shared/apps/identity.js';
+import { callerOwns } from '../../shared/dbus/processes.js';
 import { refuseSandboxed } from '../../shared/dbus/sandbox.js';
 import type { Account, Purpose, Request } from './copy.js';
 import { PasskeyPrompt } from './prompt.js';
@@ -15,16 +16,6 @@ const PURPOSES: Purpose[] = ['register', 'sign-in', 'manage', 'registered', 'cho
 const SERVICE_XML = `<node><interface name="com.lantharos.Kestrel.Passkeys1">
   <method name="Open"><arg type="a{sv}" direction="in"/><arg type="o" direction="out"/></method>
 </interface></node>`;
-
-async function isAgent(invocation: Gio.DBusMethodInvocation): Promise<boolean> {
-  try {
-    const reply = await invocation.get_connection().call('org.freedesktop.DBus', '/org/freedesktop/DBus', 'org.freedesktop.DBus',
-      'GetNameOwner', new GLib.Variant('(s)', [AGENT]), new GLib.VariantType('(s)'), Gio.DBusCallFlags.NONE, -1, null);
-    return reply.deepUnpack<[string]>()[0] === invocation.get_sender();
-  } catch {
-    return false;
-  }
-}
 
 function parse(details: Record<string, GLib.Variant>): Request {
   const value = <T>(key: string): T | undefined => details[key]?.deepUnpack() as T | undefined;
@@ -49,7 +40,7 @@ export class PasskeyPrompts {
   async OpenAsync([details]: [Record<string, GLib.Variant>], invocation: Gio.DBusMethodInvocation): Promise<void> {
     const sender = invocation.get_sender()!;
     if (await refuseSandboxed(invocation, 'ask about passkeys')) return;
-    if (!await isAgent(invocation)) {
+    if (!await callerOwns(invocation, AGENT)) {
       invocation.return_dbus_error('org.freedesktop.DBus.Error.AccessDenied', 'Only Luft Passkeys can ask about passkeys');
       return;
     }

@@ -10,17 +10,23 @@ const DEFAULT_WIDTH = 340;
 const MIN_WIDTH = 200;
 const MAX_WIDTH = 560;
 
-/** An extension's open panels, so they close when it types or opens another. */
-export class OpenPanels {
-  private readonly frames = new Set<PopupFrame>();
+/** An extension's open pop-ups, so its panels close when it types or opens another, and all of them when the screen locks. */
+export class OpenPopups {
+  private readonly panels = new Set<PopupFrame>();
+  private readonly windows = new Set<PopupFrame>();
 
-  add(frame: PopupFrame): () => void {
-    this.frames.add(frame);
-    return () => this.frames.delete(frame);
+  add(frame: PopupFrame, kind: 'panel' | 'window'): () => void {
+    const frames = kind === 'panel' ? this.panels : this.windows;
+    frames.add(frame);
+    return () => frames.delete(frame);
   }
 
-  closeAll(): void {
-    for (const frame of [...this.frames]) frame.close();
+  closePanels(): void {
+    for (const frame of [...this.panels]) frame.close();
+  }
+
+  hideAll(): void {
+    for (const frame of [...this.panels, ...this.windows]) frame.close(false);
   }
 }
 
@@ -43,15 +49,23 @@ function placementFor(context: ApiContext, anchor: PopupAnchor): Placement {
 }
 
 export function popupsApi(context: ApiContext): Popups {
-  const { host, scope, path, dataPath, panels } = context;
+  const { host, scope, path, dataPath, popups } = context;
   const controls = { folders: [path, dataPath], extensionPath: path, act: (run: () => void) => context.fromPerson(run)() };
+  const usable = () => host.desktop.active && !host.desktop.locked;
+  scope.disposable(host.desktop.watch(() => {
+    if (!usable()) popups.hideAll();
+  }));
   return {
     open: (options: PopupOptions): Popup => {
       const kind = options.kind ?? 'panel';
-      if (kind === 'panel') panels.closeAll();
-      let open = true;
-      let forgetPanel = () => {};
       const onClosed = options.onClosed && scope.guard(options.onClosed);
+      if (!usable()) {
+        onClosed?.();
+        return { open: false, update: () => {}, dispose: () => {} };
+      }
+      if (kind === 'panel') popups.closePanels();
+      let open = true;
+      let forget = () => {};
       const frame = new PopupFrame(host, controls, options.content, {
         kind,
         title: options.title,
@@ -59,13 +73,13 @@ export function popupsApi(context: ApiContext): Popups {
         placement: placementFor(context, options.anchor),
         closed: () => {
           open = false;
-          forgetPanel();
+          forget();
           handle.dispose();
           onClosed?.();
         },
       });
       const handle = scope.disposable(() => frame.close());
-      if (kind === 'panel') forgetPanel = panels.add(frame);
+      forget = popups.add(frame, kind);
       frame.open();
       if (options.chime && !heldBack()) playSound('notification');
       return {

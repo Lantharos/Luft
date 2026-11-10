@@ -131,8 +131,11 @@ export class MountOperationHandler {
     dialog.open();
   }
 
-  Close(): void {
+  async CloseAsync(_params: [], invocation: Gio.DBusMethodInvocation): Promise<void> {
+    if (await KestrelUi.refuseSandboxed(invocation, 'close questions from the system')) return;
+
     this.clearCurrentRequest(Gio.MountOperationResult.UNHANDLED, {});
     this.closeDialog();
+    invocation.return_value(null);
   }
 }

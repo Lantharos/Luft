@@ -87,27 +87,18 @@ export class GtkNotificationDaemon {
   async AddNotificationAsync([appId, notificationId, notificationSerialized]: [string, string, SerializedNotification], invocation: Gio.DBusMethodInvocation): Promise<void> {
     if (await KestrelUi.refuseSandboxed(invocation, 'show notifications for other apps')) return;
 
-    let source: GtkNotificationDaemonAppSource;
     try {
-      source = this.ensureAppSource(appId);
+      const source = this.ensureAppSource(appId);
+      notificationSerialized['timestamp'] = new GLib.Variant('x', GLib.DateTime.new_now_local().to_unix());
+      source.addNotification(new GtkNotificationDaemonNotification(source, notificationId, notificationSerialized,
+        invocation.get_message().get_unix_fd_list()));
     } catch (e) {
-      if (e instanceof InvalidAppError) {
-        invocation.return_error_literal(NotificationErrors,
-          NotificationError.INVALID_APP,
-          `The app by ID "${appId}" could not be found`);
-        return;
-      }
-      throw e;
+      if (e instanceof InvalidAppError)
+        invocation.return_error_literal(NotificationErrors, NotificationError.INVALID_APP, `The app by ID "${appId}" could not be found`);
+      else
+        invocation.return_dbus_error('org.freedesktop.DBus.Error.InvalidArgs', `${e}`);
+      return;
     }
-
-    const timestamp = GLib.DateTime.new_now_local().to_unix();
-    notificationSerialized['timestamp'] = new GLib.Variant('x', timestamp);
-
-    const notification = new GtkNotificationDaemonNotification(source,
-      notificationId,
-      notificationSerialized,
-      invocation.get_message().get_unix_fd_list());
-    source.addNotification(notification);
 
     invocation.return_value(null);
   }

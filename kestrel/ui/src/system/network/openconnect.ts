@@ -83,6 +83,7 @@ export class OpenConnectSignIn {
         break;
       }
       case 'browse':
+        if (GLib.Uri.peek_scheme(message.uri) !== 'https') throw new Error(`The VPN asked to open ${message.uri}, which isn't an HTTPS page`);
         Gio.AppInfo.launch_default_for_uri(message.uri, launch());
         steps.wait(t('vpn-finish-in-browser'));
         break;

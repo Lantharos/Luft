@@ -11,6 +11,8 @@ kestrel/ui/src/system/screencast/recorder.ts	Stopped before recording started
 kestrel/ui/src/system/screencast/recorder.ts	The recording was deleted or moved
 kestrel/ui/src/system/screencast/screencastService.ts	Saving to disk is disabled
 kestrel/ui/src/system/screencast/screencastService.ts	Service is already recording
+kestrel/ui/src/system/screencast/screencastService.ts	Only Kestrel can record the screen here
+kestrel/ui/src/system/health/memoryNotices.ts	Only kestrel-settings can report low memory
 kestrel/ui/src/system/display/ddcutil.ts	Invalid display
 kestrel/ui/src/system/privacy/accessDialog.ts	Already showing a system access dialog
 kestrel/ui/src/system/privacy/accessDialog.ts	Only the focused app is allowed to show a system access dialog

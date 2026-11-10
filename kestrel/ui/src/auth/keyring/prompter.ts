@@ -2,7 +2,7 @@ import Gio from 'gi://Gio';
 import GioUnix from 'gi://GioUnix';
 import GLib from 'gi://GLib';
 
-import { stealFd } from '../../shared/dbus/processes.js';
+import { callerOwns, stealFd } from '../../shared/dbus/processes.js';
 import type { PromptQueue } from './queue.js';
 import { accessRequest, passwordRequest, type Options } from './request.js';
 
@@ -88,20 +88,9 @@ export class KeyringPrompter {
 
   private serialize(invocation: Invocation, step: () => void): void {
     this.incoming = this.incoming.then(async () => {
-      if (await this.authorized(invocation)) step();
+      if (global.context.unsafe_mode || await callerOwns(invocation, SECRET_SERVICE)) step();
       else invocation.return_dbus_error('org.freedesktop.DBus.Error.AccessDenied', 'Only the keyring can ask for passwords');
     }).catch(error => console.error('Kestrel could not show a keyring prompt', error));
-  }
-
-  private async authorized(invocation: Invocation): Promise<boolean> {
-    if (global.context.unsafe_mode) return true;
-    try {
-      const owner = await invocation.get_connection().call('org.freedesktop.DBus', '/org/freedesktop/DBus', 'org.freedesktop.DBus',
-        'GetNameOwner', new GLib.Variant('(s)', [SECRET_SERVICE]), new GLib.VariantType('(s)'), Gio.DBusCallFlags.NONE, -1, null);
-      return owner.deepUnpack<[string]>()[0] === invocation.get_sender();
-    } catch {
-      return false;
-    }
   }
 
   destroy(): void {

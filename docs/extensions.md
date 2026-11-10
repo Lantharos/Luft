@@ -138,7 +138,7 @@ While an extension runs, Kestrel grabs its shortcuts from the compositor: what t
 
 ## Pop-ups
 
-Pop-ups are drawn by Kestrel from a tree of its own controls, not by the extension, so they look and move like the rest of Luft and can't reach Kestrel's internals. A panel takes the keyboard and closes when it loses it; a window floats above windows and leaves the keyboard alone until clicked. Updates keep each control that stayed in place, so drags and typing carry on, and a panel keeps the keyboard when the control that had it is replaced, such as a Start button that becomes Pause and End.
+Pop-ups are drawn by Kestrel from a tree of its own controls, not by the extension, so they look and move like the rest of Luft and can't reach Kestrel's internals. A panel takes the keyboard and closes when it loses it; a window floats above windows and leaves the keyboard alone until clicked. Updates keep each control that stayed in place, so drags and typing carry on, and a panel keeps the keyboard when the control that had it is replaced, such as a Start button that becomes Pause and End. Pop-ups are for the desktop: they all close the moment the screen locks, and one opened while it's locked or nobody is signed in never shows; it comes back closed and its `onClosed` runs, so an extension that wants to be seen then sends a notification.
 
 ## Taskbar elements
 
@@ -341,7 +341,7 @@ The stream stays running for 2 to 4 seconds after the last press, so the first k
 
 ## Media
 
-`media` builds on Kestrel's MPRIS client: every player, its album, length, position and seeking, and artwork as a local file. Art a player gives as a web address is downloaded once into `~/.cache/kestrel/media-art`, which keeps the last 64 pictures, and views may show files from there. `media.output` sets the output's volume and device through `ShellMixer`.
+`media` builds on Kestrel's MPRIS client: every player, its album, length, position and seeking, and artwork as a local file. Art a player gives as a web address is downloaded once into `~/.cache/kestrel/media-art`, which keeps the last 64 pictures, and views may show files from there. Any app can be a player, so Kestrel only fetches art from hosts on the internet: an address on this computer or the local network is refused, also when a redirect leads there, and a picture over 16 MB is dropped. `media.output` sets the output's volume and device through `ShellMixer`.
 
 To install an extension, unpack it into `~/.local/share/luft/extensions/<id>/` and call `Reload(id)`; to update, replace the folder and call `Reload(id)` again.
 
@@ -383,7 +383,7 @@ Reminders live in `reminders.json` in the extension's data folder, written with 
 
 ## Network
 
-`network.fetch` talks HTTPS to the hosts the manifest names under `[network]`, through one Soup session, and refuses every other host; plain HTTP is only allowed to `localhost` and `127.0.0.1`. A response is read whole, up to 4 MB, and a request is cancelled after its timeout or when the extension is turned off.
+`network.fetch` talks HTTPS to the hosts the manifest names under `[network]`, through one Soup session, and refuses every other host; plain HTTP is only allowed to `localhost` and `127.0.0.1`. Redirects are followed up to 20 times and held to the same rule at every hop, so a named host can't send an extension on to one the manifest doesn't name; an `Authorization` header isn't passed on to a different host. A response is read whole, up to 4 MB, and a request is cancelled after its timeout or when the extension is turned off.
 
 ## Secrets
 

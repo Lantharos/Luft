@@ -1,6 +1,8 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
+Gio._promisify(Gio.DBusConnection.prototype, 'call');
+
 const decoder = new TextDecoder();
 
 export function readProcFile(path: string): string | null {
@@ -31,7 +33,7 @@ export class PidFd {
   }
 }
 
-async function processOf(connection: Gio.DBusConnection, name: string): Promise<PidFd | null> {
+export async function processOf(connection: Gio.DBusConnection, name: string): Promise<PidFd | null> {
   const [reply, fds] = await connection.call_with_unix_fd_list('org.freedesktop.DBus', '/org/freedesktop/DBus',
     'org.freedesktop.DBus', 'GetConnectionCredentials', new GLib.Variant('(s)', [name]), new GLib.VariantType('(a{sv})'),
     Gio.DBusCallFlags.NONE, -1, null, null);
@@ -41,6 +43,17 @@ async function processOf(connection: Gio.DBusConnection, name: string): Promise<
 }
 
 export const callerProcess = (invocation: Gio.DBusMethodInvocation) => processOf(invocation.get_connection(), invocation.get_sender()!);
+
+/** Whether a call comes from the connection that holds `name` on the bus right now. */
+export async function callerOwns(invocation: Gio.DBusMethodInvocation, name: string): Promise<boolean> {
+  try {
+    const owner = await invocation.get_connection().call('org.freedesktop.DBus', '/org/freedesktop/DBus', 'org.freedesktop.DBus',
+      'GetNameOwner', new GLib.Variant('(s)', [name]), new GLib.VariantType('(s)'), Gio.DBusCallFlags.NONE, -1, null);
+    return owner.deepUnpack<[string]>()[0] === invocation.get_sender();
+  } catch {
+    return false;
+  }
+}
 
 export async function ownerProcess(name: string): Promise<PidFd | null> {
   await Gio.DBus.session.call(name, '/', 'org.freedesktop.DBus.Peer', 'Ping', null, null, Gio.DBusCallFlags.NONE, -1, null);

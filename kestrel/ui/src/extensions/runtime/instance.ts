@@ -4,7 +4,7 @@ import GLib from 'gi://GLib';
 import type { ExtensionHost } from '../host.js';
 import { API_VERSIONS } from '../api/versions.js';
 import type { Manifest } from '../api/v1/types.js';
-import { OpenPanels } from '../api/v1/popups/popups.js';
+import { OpenPopups } from '../api/v1/popups/popups.js';
 import type { EffectsStage } from '../api/v1/screenEffects/stage.js';
 import type { LayerStage } from '../api/v1/wallpaper/stage.js';
 import { dataFolder, type Installed } from './folders.js';
@@ -79,7 +79,7 @@ export class ExtensionInstance {
       const gestures = this.gestures;
       const api = API_VERSIONS[this.manifest.api]({
         manifest: this.manifest, name: this.name, path: this.installed.path, dataPath: dataFolder(this.id), host: this.services.host, scope,
-        translations: this.translations, values: this.values, stored: this.stored, store: this.services.store, shortcuts: this.shortcuts, gestures, panels: new OpenPanels(), page: this.page, layers: this.services.layers, screenEffects: this.services.screenEffects, helpers: this.helpers,
+        translations: this.translations, values: this.values, stored: this.stored, store: this.services.store, shortcuts: this.shortcuts, gestures, popups: new OpenPopups(), page: this.page, layers: this.services.layers, screenEffects: this.services.screenEffects, helpers: this.helpers,
         openSettings: () => this.services.openSettings(this.id),
         fromPerson: callback => (...args) => scope.run(() => {
           gestures.used();

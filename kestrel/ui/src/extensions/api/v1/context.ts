@@ -9,7 +9,7 @@ import type { ExtensionStore } from '../../runtime/store.js';
 import type { StoredValues } from '../../runtime/storage.js';
 import type { Translations } from '../../runtime/translations.js';
 import type { SettingValues } from '../../runtime/values.js';
-import type { OpenPanels } from './popups/popups.js';
+import type { OpenPopups } from './popups/popups.js';
 import type { EffectsStage } from './screenEffects/stage.js';
 import type { Manifest } from './types.js';
 import type { LayerStage } from './wallpaper/stage.js';
@@ -28,8 +28,8 @@ export interface ApiContext {
   readonly values: SettingValues;
   readonly stored: StoredValues;
   readonly store: ExtensionStore;
-  /** The extension's open panels, which close before it types. */
-  readonly panels: OpenPanels;
+  /** The extension's open pop-ups: its panels close before it types, and all of them when the screen locks. */
+  readonly popups: OpenPopups;
   /** The page it describes for Settings. */
   readonly page: ExtensionPage;
   /** The shortcuts grabbed while it runs, so Settings can tell what they're bound to. */

@@ -5,6 +5,8 @@ import GLib from 'gi://GLib';
 import St from 'gi://St';
 
 export const TRAY_ICON_SIZE = 16;
+const MAX_PIXMAP_SIDE = 1024;
+const PIXMAPS = new GLib.VariantType('a(iiay)');
 
 interface IconSource {
   name: string;
@@ -38,10 +40,13 @@ function pixmapContent(pixmaps: GLib.Variant, size: number): St.ImageContent | n
   for (let index = 0; index < pixmaps.n_children(); index++) {
     const pixmap = pixmaps.get_child_value(index);
     const width = pixmap.get_child_value(0).get_int32();
+    const height = pixmap.get_child_value(1).get_int32();
+    const drawable = width > 0 && height > 0 && width <= MAX_PIXMAP_SIDE && height <= MAX_PIXMAP_SIDE &&
+      pixmap.get_child_value(2).n_children() >= width * height * 4;
     const better = !best || (bestWidth < size ? width > bestWidth : width >= size && width < bestWidth);
-    if (better) [best, bestWidth] = [pixmap, width];
+    if (drawable && better) [best, bestWidth] = [pixmap, width];
   }
-  if (!best || bestWidth <= 0) return null;
+  if (!best) return null;
   const height = best.get_child_value(1).get_int32();
   const content = new St.ImageContent({ preferred_width: bestWidth, preferred_height: height });
   const context = global.stage.context.get_backend().get_cogl_context();
@@ -53,7 +58,7 @@ export type TrayGlyph = Gio.Icon | St.ImageContent;
 
 export function resolveGlyph({ name, themePath, pixmaps }: IconSource): TrayGlyph | null {
   const scale = St.ThemeContext.get_for_stage(global.stage).scale_factor;
-  return namedIcon(name, themePath) ?? (pixmaps ? pixmapContent(pixmaps, TRAY_ICON_SIZE * scale) : null);
+  return namedIcon(name, themePath) ?? (pixmaps?.is_of_type(PIXMAPS) ? pixmapContent(pixmaps, TRAY_ICON_SIZE * scale) : null);
 }
 
 export function paintGlyph(icon: St.Icon, glyph: TrayGlyph, size: number): void {

@@ -2,9 +2,31 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Soup from 'gi://Soup?version=3.0';
 
-Gio._promisify(Soup.Session.prototype, 'send_and_read_async');
+import { readAll } from '../network.js';
+
+Gio._promisify(Soup.Session.prototype, 'send_async');
+Gio._promisify(Gio.Resolver.prototype, 'lookup_by_name_async');
+Gio._promisify(Gio.File.prototype, 'replace_contents_bytes_async', 'replace_contents_finish');
+Gio._promisify(Gio.File.prototype, 'enumerate_children_async');
+Gio._promisify(Gio.File.prototype, 'delete_async');
+Gio._promisify(Gio.FileEnumerator.prototype, 'next_files_async');
 
 const KEPT = 64;
+const LISTED = 1024;
+const MAX_BYTES = 16 * 1024 * 1024;
+const MAX_REDIRECTS = 5;
+const REDIRECTS = new Set([301, 302, 303, 307, 308]);
+const RESERVED = /^(?:f[cd][0-9a-f]{2}:|::ffff:|100\.(?:6[4-9]|[7-9]\d|1[01]\d|12[0-7])\.)/;
+
+/**
+ * Whether every address of a host is out on the internet. Any music player says where its art is, so one could
+ * otherwise point Kestrel at this computer or at devices on the network around it.
+ */
+async function onTheInternet(host: string): Promise<boolean> {
+  const addresses = await Gio.Resolver.get_default().lookup_by_name_async(host, null);
+  return addresses.length > 0 && addresses.every(address => !address.get_is_loopback() && !address.get_is_site_local() &&
+    !address.get_is_link_local() && !address.get_is_any() && !address.get_is_multicast() && !RESERVED.test(address.to_string()));
+}
 
 /** Album art as local files: a player's own file as it is, a web address downloaded once into Kestrel's cache. */
 class Artwork {
@@ -40,21 +62,40 @@ class Artwork {
   }
 
   private async fetch(url: string, path: string): Promise<string | null> {
-    const message = Soup.Message.new('GET', url);
-    if (!message) return null;
-    const bytes = await this.session.send_and_read_async(message, GLib.PRIORITY_LOW, null);
-    if (message.get_status() !== Soup.Status.OK) return null;
-    GLib.mkdir_with_parents(this.folder, 0o700);
-    GLib.file_set_contents(path, bytes.toArray());
-    this.prune();
-    return path;
+    for (let hops = 0; hops <= MAX_REDIRECTS; hops++) {
+      const uri = GLib.Uri.parse(url, GLib.UriFlags.NONE);
+      if (!/^https?$/.test(uri.get_scheme()) || !await onTheInternet(uri.get_host() ?? '')) return null;
+      const message = Soup.Message.new_from_uri('GET', uri);
+      message.add_flags(Soup.MessageFlags.NO_REDIRECT);
+      const stream = await this.session.send_async(message, GLib.PRIORITY_LOW, null);
+      try {
+        if (message.get_status() === Soup.Status.OK) {
+          await this.keep(path, await readAll(stream, MAX_BYTES, null));
+          return path;
+        }
+        const location = message.get_response_headers().get_one('Location');
+        if (!REDIRECTS.has(message.get_status()) || !location) return null;
+        url = GLib.Uri.resolve_relative(url, location, GLib.UriFlags.NONE);
+      } finally {
+        stream.close(null);
+      }
+    }
+    return null;
   }
 
-  private prune(): void {
+  private async keep(path: string, picture: Uint8Array): Promise<void> {
+    GLib.mkdir_with_parents(this.folder, 0o700);
+    await Gio.File.new_for_path(path).replace_contents_bytes_async(new GLib.Bytes(picture), null, false, Gio.FileCreateFlags.REPLACE_DESTINATION, null);
+    await this.prune();
+  }
+
+  private async prune(): Promise<void> {
     const folder = Gio.File.new_for_path(this.folder);
-    const files = [...folder.enumerate_children('standard::name,time::modified', Gio.FileQueryInfoFlags.NONE, null)]
+    const listing = await folder.enumerate_children_async('standard::name,time::modified', Gio.FileQueryInfoFlags.NONE, GLib.PRIORITY_LOW, null);
+    const files = (await listing.next_files_async(LISTED, GLib.PRIORITY_LOW, null))
       .sort((a, b) => b.get_modification_date_time()!.compare(a.get_modification_date_time()!));
-    for (const info of files.slice(KEPT)) folder.get_child(info.get_name()).delete(null);
+    listing.close(null);
+    await Promise.all(files.slice(KEPT).map(info => folder.get_child(info.get_name()).delete_async(GLib.PRIORITY_LOW, null)));
   }
 }
 

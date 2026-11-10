@@ -19,7 +19,7 @@ const WATCHER_INTERFACE = `<node>
 </node>`;
 
 const DEFAULT_ITEM_PATH = '/StatusNotifierItem';
-const WELL_KNOWN_NAME = /^[a-zA-Z_-][a-zA-Z0-9_-]*(\.[a-zA-Z_-][a-zA-Z0-9_-]*)+$/;
+const MAX_ITEMS_PER_APP = 8;
 
 export interface TrayItemAddress { busName: string; objectPath: string; }
 
@@ -30,7 +30,7 @@ interface WatcherHost {
 
 export class StatusNotifierWatcher {
   private readonly dbus = Gio.DBusExportedObject.wrapJSObject(WATCHER_INTERFACE, this);
-  private readonly items = new Map<string, number>();
+  private readonly items = new Map<string, { busName: string; subscription: number }>();
   private readonly cancellable = new Gio.Cancellable();
   private readonly release: () => void;
 
@@ -54,9 +54,14 @@ export class StatusNotifierWatcher {
 
   async RegisterStatusNotifierItemAsync([service]: [string], invocation: Gio.DBusMethodInvocation): Promise<void> {
     const sender = invocation.get_sender()!;
-    if (service.startsWith('/')) this.register(sender, service);
-    else if (WELL_KNOWN_NAME.test(service)) this.register(await this.nameOwner(service) ?? sender, DEFAULT_ITEM_PATH);
-    else this.register(service, DEFAULT_ITEM_PATH);
+    const address = service.startsWith('/')
+      ? { busName: sender, objectPath: service }
+      : { busName: await this.nameOwner(service) ?? sender, objectPath: DEFAULT_ITEM_PATH };
+    if (!GLib.Variant.is_object_path(address.objectPath) || this.itemsOf(address.busName) >= MAX_ITEMS_PER_APP) {
+      invocation.return_dbus_error('org.freedesktop.DBus.Error.InvalidArgs', 'Not a tray item, or the app has too many');
+      return;
+    }
+    this.register(address.busName, address.objectPath);
     invocation.return_value(null);
   }
 
@@ -66,7 +71,7 @@ export class StatusNotifierWatcher {
 
   destroy(): void {
     this.cancellable.cancel();
-    for (const subscription of this.items.values()) Gio.DBus.session.signal_unsubscribe(subscription);
+    for (const { subscription } of this.items.values()) Gio.DBus.session.signal_unsubscribe(subscription);
     this.items.clear();
     this.release();
   }
@@ -74,24 +79,33 @@ export class StatusNotifierWatcher {
   private register(busName: string, objectPath: string): void {
     const id = `${busName}${objectPath}`;
     if (this.items.has(id)) return;
-    this.items.set(id, Gio.DBus.session.signal_subscribe('org.freedesktop.DBus', 'org.freedesktop.DBus', 'NameOwnerChanged',
+    const subscription = Gio.DBus.session.signal_subscribe('org.freedesktop.DBus', 'org.freedesktop.DBus', 'NameOwnerChanged',
       '/org/freedesktop/DBus', busName, Gio.DBusSignalFlags.NONE, (_connection, _sender, _path, _iface, _signal, parameters) => {
         const [, , newOwner] = parameters.deep_unpack() as [string, string, string];
         if (!newOwner) this.unregister(id);
-      }));
+      });
+    this.items.set(id, { busName, subscription });
     this.dbus.emit_signal('StatusNotifierItemRegistered', new GLib.Variant('(s)', [id]));
     this.host.added(id, { busName, objectPath });
   }
 
   private unregister(id: string): void {
-    const subscription = this.items.get(id);
-    if (subscription === undefined) return;
-    Gio.DBus.session.signal_unsubscribe(subscription);
+    const item = this.items.get(id);
+    if (!item) return;
+    Gio.DBus.session.signal_unsubscribe(item.subscription);
     this.items.delete(id);
     this.dbus.emit_signal('StatusNotifierItemUnregistered', new GLib.Variant('(s)', [id]));
     this.host.removed(id);
   }
 
+  private itemsOf(busName: string): number {
+    let count = 0;
+    for (const item of this.items.values())
+      if (item.busName === busName) count++;
+    return count;
+  }
+
+  /** The connection behind a name an app gave, so the item goes when that connection does. */
   private async nameOwner(name: string): Promise<string | null> {
     const reply = await busCall('org.freedesktop.DBus', '/org/freedesktop/DBus', 'org.freedesktop.DBus', 'GetNameOwner',
       new GLib.Variant('(s)', [name]), this.cancellable, 1000);

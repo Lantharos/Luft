@@ -8,7 +8,7 @@ export function typingApi(context: ApiContext): Typing {
   return {
     type: text => {
       if (!text || !gestures.recent) return false;
-      context.panels.closeAll();
+      context.popups.closePanels();
       afterModifiersAreReleased(() => {
         if (!scope.open) return;
         host.type(text);

@@ -1,5 +1,6 @@
 kestrel/ui/src/auth/greeter/sessions.ts	Desktop Entry
 kestrel/ui/src/auth/keyring/pinentry.ts	The passphrase needs a channel to be handed over
+kestrel/ui/src/auth/keyring/pinentry.ts	Only luft-pinentry can ask for passphrases
 kestrel/ui/src/auth/keyring/prompter.ts	The secret needs a file descriptor to be written to
 kestrel/ui/src/auth/keyring/prompter.ts	Only the keyring can ask for passwords
 kestrel/ui/src/auth/passkeys/prompt.ts	This prompt belongs to another caller

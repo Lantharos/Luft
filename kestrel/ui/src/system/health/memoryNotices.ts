@@ -4,6 +4,8 @@ import Shell from 'gi://Shell';
 import * as MessageTray from '../../surfaces/notifications/tray/messageTray.js';
 
 import { appIcons } from '../../appearance/icons/appIcons.js';
+import { systemPrograms } from '../../shared/apps/luftApps.js';
+import { callerRuns } from '../../shared/dbus/sandbox.js';
 import { formatsLocale, t } from '../../shared/i18n/index.js';
 
 const SYSTEMD = 'org.freedesktop.systemd1';
@@ -16,6 +18,7 @@ const CONTAINER_CGROUP = /\/libpod-[0-9a-f]+\.scope(?:\/|$)/;
 const SIGKILL = 9;
 const MEGABYTE = 1e6;
 const GIGABYTE = 1e9;
+const MEMORY_WATCHER = systemPrograms('kestrel-settings');
 
 const MEMORY_INTERFACE = `<node>
   <interface name="com.lantharos.Kestrel.Memory">
@@ -74,6 +77,10 @@ function runningLowBody({ name }: Holder, bytes: number): string {
   return name === null ? t('memory-low-container-body', { size }) : t('memory-low-app-body', { app: name, size });
 }
 
+/**
+ * Tells people when memory runs low and when something was closed for it. Only Luft's memory watcher may report it:
+ * the warning offers to force quit the unit it names.
+ */
 export class MemoryNotices {
   private readonly dbus = Gio.DBusExportedObject.wrapJSObject(MEMORY_INTERFACE, this);
   private readonly unitSubscriptions: number[];
@@ -109,7 +116,29 @@ export class MemoryNotices {
     this.warning?.notification.destroy();
   }
 
-  RunningLow(unit: string, bytes: number): void {
+  RunningLowAsync([unit, bytes]: [string, number], invocation: Gio.DBusMethodInvocation): void {
+    this.reported(invocation, () => this.runningLow(unit, bytes));
+  }
+
+  ClosedAsync([unit, bytes]: [string, number], invocation: Gio.DBusMethodInvocation): void {
+    this.reported(invocation, () => {
+      const closed = holder(unit);
+      this.show(closedTitle(closed), closedBody(bytes), closed.app);
+    });
+  }
+
+  private reported(invocation: Gio.DBusMethodInvocation, show: () => void): void {
+    void callerRuns(invocation, MEMORY_WATCHER).then(allowed => {
+      if (!allowed) {
+        invocation.return_dbus_error('org.freedesktop.DBus.Error.AccessDenied', 'Only kestrel-settings can report low memory');
+        return;
+      }
+      show();
+      invocation.return_value(null);
+    });
+  }
+
+  private runningLow(unit: string, bytes: number): void {
     const using = holder(unit);
     this.warning?.notification.destroy();
     const source = MessageTray.getSystemSource();
@@ -128,11 +157,6 @@ export class MemoryNotices {
     });
     this.warning = warning;
     source.addNotification(notification);
-  }
-
-  Closed(unit: string, bytes: number): void {
-    const closed = holder(unit);
-    this.show(closedTitle(closed), closedBody(bytes), closed.app);
   }
 
   private async appClosed(path: string, kind: string): Promise<void> {

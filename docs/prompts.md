@@ -34,7 +34,7 @@ Request keys:
 
 ## Pinentry
 
-`com.lantharos.Kestrel.Pinentry` at `/com/lantharos/Kestrel/Pinentry`, used by `luft-pinentry`.
+`com.lantharos.Kestrel.Pinentry` at `/com/lantharos/Kestrel/Pinentry`. Only `luft-pinentry` may call it: Kestrel looks at the caller's executable, which has to be `/usr/libexec/luft-pinentry` running outside a sandbox, since whoever calls chooses the dialog's words and gets what's typed.
 
 | Method | Arguments | Returns |
 | --- | --- | --- |

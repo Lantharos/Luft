@@ -6,7 +6,6 @@ import St from 'gi://St';
 import * as KestrelUi from '../../../kestrelUi.js';
 import * as Main from '../../../core/main.js';
 import { loadInterfaceXML } from '../../../core/runtime/fileUtils.js';
-import { DBusSenderChecker } from '../../../core/runtime/util.js';
 import { UIMode } from '../ui/screenshotUI.js';
 import { Flashspot } from './flashspot.js';
 import { PickPixel } from './pickPixel.js';
@@ -64,7 +63,6 @@ function flashWhenTaken(screenshot: Shell.Screenshot): Promise<void> {
 export class ScreenshotService {
   private readonly dbusImpl = Gio.DBusExportedObject.wrapJSObject(ScreenshotIface, this);
   private readonly shooters = new Map<string, number>();
-  private readonly senderChecker = new DBusSenderChecker(['org.freedesktop.impl.portal.desktop.kestrel']);
   private readonly lockdownSettings = new Gio.Settings({ schema_id: 'org.gnome.desktop.lockdown' });
 
   constructor() {
@@ -96,8 +94,8 @@ export class ScreenshotService {
       (screenshot, stream) => screenshot.screenshot(includeCursor, stream));
   }
 
-  async InteractiveScreenshotAsync(_params: [], invocation: Gio.DBusMethodInvocation): Promise<void> {
-    if (!await this.allowCaller(invocation)) return;
+  InteractiveScreenshotAsync(_params: [], invocation: Gio.DBusMethodInvocation): void {
+    if (!this.allowCaller(invocation)) return;
 
     Main.screenshotUI.connectObject(
       'screenshot-taken', (_ui: unknown, file: Gio.File) => {
@@ -114,7 +112,7 @@ export class ScreenshotService {
   }
 
   async SelectAreaAsync(_params: [], invocation: Gio.DBusMethodInvocation): Promise<void> {
-    if (!await this.allowCaller(invocation)) return;
+    if (!this.allowCaller(invocation)) return;
 
     const area = await new SelectArea().selectAsync().catch(() => null);
     if (!area) {
@@ -127,7 +125,7 @@ export class ScreenshotService {
   }
 
   async PickColorAsync(_params: [], invocation: Gio.DBusMethodInvocation): Promise<void> {
-    const screenshot = await this.createScreenshot(invocation, false, false);
+    const screenshot = this.createScreenshot(invocation, false);
     if (!screenshot) return;
 
     try {
@@ -145,7 +143,9 @@ export class ScreenshotService {
     }
   }
 
-  private async createScreenshot(invocation: Gio.DBusMethodInvocation, needsDisk = true, restrictCallers = true): Promise<Shell.Screenshot | null> {
+  private createScreenshot(invocation: Gio.DBusMethodInvocation, needsDisk = true): Shell.Screenshot | null {
+    if (!this.allowCaller(invocation)) return null;
+
     const lockedDown = needsDisk && this.lockdownSettings.get_boolean('disable-save-to-disk');
 
     const sender = invocation.get_sender()!;
@@ -159,22 +159,18 @@ export class ScreenshotService {
         'Saving to disk is disabled');
       return null;
     }
-    if (restrictCallers && !await this.allowCaller(invocation)) return null;
-
     this.shooters.set(sender, Gio.bus_watch_name(Gio.BusType.SESSION, sender, Gio.BusNameWatcherFlags.NONE, null,
       (_connection, name) => this.removeShooterForSender(name)));
     return new Shell.Screenshot();
   }
 
-  private async allowCaller(invocation: Gio.DBusMethodInvocation): Promise<boolean> {
-    try {
-      await this.senderChecker.checkInvocation(invocation);
-      return true;
-    } catch {
-      invocation.return_error_literal(Gio.dbus_error_quark(), Gio.DBusError.ACCESS_DENIED,
-        'Screenshots are limited to the system. To see or use windows, run peek --help');
-      return false;
-    }
+  /** Whether Kestrel itself asks, as its portal does for apps. Nothing else gets a picture of the screen from here. */
+  private allowCaller(invocation: Gio.DBusMethodInvocation): boolean {
+    if (global.context.unsafe_mode || invocation.get_sender() === invocation.get_connection().get_unique_name()) return true;
+
+    invocation.return_error_literal(Gio.dbus_error_quark(), Gio.DBusError.ACCESS_DENIED,
+      'Screenshots are limited to the system. To see or use windows, run peek --help');
+    return false;
   }
 
   private removeShooterForSender(sender: string): void {
@@ -215,7 +211,7 @@ export class ScreenshotService {
   }
 
   private async shoot(invocation: Gio.DBusMethodInvocation, filename: string, flash: boolean, take: Take): Promise<void> {
-    const screenshot = await this.createScreenshot(invocation);
+    const screenshot = this.createScreenshot(invocation);
     if (!screenshot) return;
 
     const target = this.createTarget(filename, invocation);

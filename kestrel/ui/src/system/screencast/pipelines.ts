@@ -112,12 +112,14 @@ export function createPipeline(nodeId: number, { pipelineString, sound }: Pipeli
   const numThreads = String(Math.min(Math.max(1, GLib.get_num_processors()), 64));
   const encoder = pipelineString.replaceAll('%T', numThreads).replaceAll('%F', String(FRAMERATE));
 
-  return Gst.parse_launch_full(`
+  const pipeline = Gst.parse_launch_full(`
     pipewiresrc path=${nodeId}
                 do-timestamp=true
                 keepalive-time=1000
                 resend-last=true !
     ${encoder} name=mux !
-    filesink location="${filePath}"
-    ${sound ? DESKTOP_SOUND : ''}`, null, Gst.ParseFlags.FATAL_ERRORS);
+    filesink name=file
+    ${sound ? DESKTOP_SOUND : ''}`, null, Gst.ParseFlags.FATAL_ERRORS) as Gst.Bin;
+  pipeline.get_by_name('file')!.set_property('location', filePath);
+  return pipeline;
 }

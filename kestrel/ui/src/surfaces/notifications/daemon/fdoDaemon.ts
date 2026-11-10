@@ -7,11 +7,16 @@ import * as KestrelUi from '../../../kestrelUi.js';
 import * as Config from '../../../core/config.js';
 import * as Main from '../../../core/main.js';
 import { emitSignalToDestination, loadInterfaceXML } from '../../../core/runtime/dbusUtils.js';
+import { systemPrograms } from '../../../shared/apps/luftApps.js';
+import { callerOwns } from '../../../shared/dbus/processes.js';
+import { connectionRuns } from '../../../shared/dbus/sandbox.js';
 import { Notification, Sound } from '../tray/notification.js';
 import { NotificationDestroyedReason, PrivacyScope, Urgency } from '../tray/notificationEnums.js';
 import { FdoNotificationDaemonSource } from './fdoSource.js';
 
 const FdoNotificationsIface = loadInterfaceXML('org.freedesktop.Notifications')!;
+const RELAY = 'org.freedesktop.Notifications';
+const SYSTEM_NOTICES = systemPrograms('kestrel-settings');
 
 const NotificationClosedReason = {
   EXPIRED: 1,
@@ -182,8 +187,33 @@ export class FdoNotificationDaemon {
     return [id, entry];
   }
 
-  NotifyAsync([appName, replacesId, appIcon, summary, body, actions, packedHints]: NotifyParams, invocation: Gio.DBusMethodInvocation): void {
-    const hints = unpackHints(packedHints);
+  async NotifyAsync(params: NotifyParams, invocation: Gio.DBusMethodInvocation): Promise<void> {
+    let id: number;
+    try {
+      const hints = unpackHints(params[6]);
+      id = this.notify(params, hints, await this.privacyScope(hints, invocation), invocation);
+    } catch (error) {
+      invocation.return_dbus_error('org.freedesktop.DBus.Error.InvalidArgs', `${error}`);
+      return;
+    }
+    invocation.return_value(GLib.Variant.new('(u)', [id]));
+  }
+
+  /**
+   * The `system` scope shows a notification's content on the lock screen whatever people chose, so only Luft's own
+   * system notices get it. Who sent one is what the relay in front of this daemon says, or the caller without it.
+   */
+  private async privacyScope(hints: Hints, invocation: Gio.DBusMethodInvocation): Promise<PrivacyScope> {
+    if (hints['x-gnome-privacy-scope'] !== 'system') return PrivacyScope.USER;
+    const sender = await callerOwns(invocation, RELAY) ? hints['x-shell-sender'] : invocation.get_sender();
+    const trusted = typeof sender === 'string' && await connectionRuns(invocation.get_connection(), sender, SYSTEM_NOTICES);
+    return trusted ? PrivacyScope.SYSTEM : PrivacyScope.USER;
+  }
+
+  private notify([appName, replacesId, appIcon, summary, body, actions]: NotifyParams, hints: Hints, privacyScope: PrivacyScope,
+    invocation: Gio.DBusMethodInvocation): number {
+    const gicon = imageForNotificationData(hints);
+    const sound = soundFromHints(hints);
     const replaced = replacesId !== 0 ? this.notifications.get(replacesId) : undefined;
     const [id, { notification, source }] = replaced
       ? [replacesId, replaced]
@@ -192,9 +222,9 @@ export class FdoNotificationDaemon {
     notification.set({
       title: summary,
       body,
-      gicon: imageForNotificationData(hints),
+      gicon,
       useBodyMarkup: true,
-      sound: soundFromHints(hints),
+      sound,
       senderPid: hints['x-shell-sender-pid'] ?? 0,
       acknowledged: false,
     });
@@ -246,13 +276,11 @@ export class FdoNotificationDaemon {
     notification.resident = !!hints['resident'];
     notification.isTransient = !!hints['transient'];
 
-    const privacyScope = hints['x-gnome-privacy-scope'] || 'user';
-    notification.privacyScope = privacyScope === 'system' ? PrivacyScope.SYSTEM : PrivacyScope.USER;
+    notification.privacyScope = privacyScope;
 
     const sourceGIcon = source.app ? null : iconForNotificationData(appIcon);
     source.processNotification(notification, appName, sourceGIcon);
-
-    invocation.return_value(GLib.Variant.new('(u)', [id]));
+    return id;
   }
 
   CloseNotification(id: number): void {

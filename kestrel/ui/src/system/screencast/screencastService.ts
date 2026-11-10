@@ -4,6 +4,7 @@ import Gst from 'gi://Gst';
 import Gtk from 'gi://Gtk';
 
 import { ServiceImplementation } from '../../shared/dbus/dbusService.js';
+import { callerOwns } from '../../shared/dbus/processes.js';
 
 import { ScreencastErrors, ScreencastError } from '../../core/runtime/dbusErrors.js';
 import { loadInterfaceXML, loadSubInterfaceXML } from '../../core/runtime/dbusUtils.js';
@@ -20,6 +21,8 @@ interface IntrospectRemote {
 }
 
 type Options = Record<string, GLib.Variant>;
+
+const KESTREL = 'org.gnome.Shell';
 
 const ScreencastIface = loadInterfaceXML('com.lantharos.Kestrel.Screencast')!;
 const IntrospectProxy = Gio.DBusProxy.makeProxyWrapper<IntrospectRemote>(loadInterfaceXML('com.lantharos.Kestrel.Introspect'));
@@ -58,6 +61,7 @@ export class ScreencastService extends ServiceImplementation {
   }
 
   async StopScreencastAsync(_params: [], invocation: Gio.DBusMethodInvocation): Promise<void> {
+    if (!await this.fromKestrel(invocation)) return;
     const sender = invocation.get_sender()!;
 
     const recorder = this.recorders.get(sender);
@@ -77,7 +81,15 @@ export class ScreencastService extends ServiceImplementation {
     }
   }
 
+  /** Whether Kestrel itself asks, which records for people from its screenshot tools. Nothing else may record the screen through here. */
+  private async fromKestrel(invocation: Gio.DBusMethodInvocation): Promise<boolean> {
+    if (await callerOwns(invocation, KESTREL)) return true;
+    invocation.return_dbus_error('org.freedesktop.DBus.Error.AccessDenied', 'Only Kestrel can record the screen here');
+    return false;
+  }
+
   private async record(invocation: Gio.DBusMethodInvocation, area: Area, fileTemplate: string, options: Options): Promise<void> {
+    if (!await this.fromKestrel(invocation)) return;
     if (this.lockdownSettings.get_boolean('disable-save-to-disk')) {
       invocation.return_error_literal(ScreencastErrors, ScreencastError.SAVE_TO_DISK_DISABLED, 'Saving to disk is disabled');
       return;

@@ -175,7 +175,8 @@ export class PopupFrame {
       this.actor.grab_key_focus();
   }
 
-  close(): void {
+  /** Closes it, fading out unless it has to be gone at once, as when the screen locks. */
+  close(fade = true): void {
     if (this.closing) return;
     this.closing = true;
     for (const [actor, id] of this.signals.splice(0)) actor.disconnect(id);
@@ -191,12 +192,15 @@ export class PopupFrame {
     }
     this.options.closed();
     this.actor.reactive = false;
-    animateActor(this.actor, {
-      opacity: 0, ...toward(this.options.placement.edge, RISE), ...CLOSE,
-      onStopped: () => {
-        this.host.removePopup(this.actor);
-        this.actor.destroy();
-      },
-    });
+    if (!fade) {
+      this.remove();
+      return;
+    }
+    animateActor(this.actor, { opacity: 0, ...toward(this.options.placement.edge, RISE), ...CLOSE, onStopped: () => this.remove() });
+  }
+
+  private remove(): void {
+    this.host.removePopup(this.actor);
+    this.actor.destroy();
   }
 }

@@ -9,7 +9,7 @@
 <script lang="ts">
 	import { fileUrl } from '@lantharos/sabine';
 	import { canPlayNatively, decodeFailed, MediaControls } from '@luft/ui';
-	import type { FileEntry } from '#lib/bindings.js';
+	import { commands, type FileEntry } from '#lib/bindings.js';
 	import { localFileSource } from '#lib/bridge/index.js';
 	import EntryIcon from '#lib/components/pane/EntryIcon.svelte';
 	import { thumbnails } from '#lib/features/onscreen/thumbnails.svelte.js';
@@ -35,6 +35,13 @@
 	let kind = $derived(failed ? 'none' : previewKind(entry));
 	let source = $derived(localFileSource(entry.path, entry.modified));
 	let iconSize = $derived(full ? 144 : 96);
+	let confirmedPdf = $state<string | null>(null);
+
+	$effect(() => {
+		if (kind !== 'pdf' || !full) return;
+		const { path } = entry;
+		void commands.isPdf({ path }).then((confirmed) => confirmed && (confirmedPdf = path));
+	});
 
 	function reportMedia(event: Event) {
 		const media = event.currentTarget as HTMLImageElement | HTMLVideoElement | HTMLAudioElement;
@@ -98,7 +105,7 @@
 	{#await loadTextPreview() then { default: TextPreview }}
 		<TextPreview {entry} markdown={kind === 'markdown'} {full} />
 	{/await}
-{:else if kind === 'pdf' && full}
+{:else if kind === 'pdf' && full && confirmedPdf === entry.path}
 	<iframe class="preview-document" src={fileUrl(entry.path)} title={entry.name}></iframe>
 {:else}
 	<div class="preview-stack">

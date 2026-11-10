@@ -13,6 +13,7 @@
 	import { settings } from '#lib/state/settings.svelte.js';
 	import CompressDialog from './archive/CompressDialog.svelte';
 	import FolderLookDialog from './look/FolderLookDialog.svelte';
+	import DeleteForeverDialog from './trash/DeleteForeverDialog.svelte';
 	import EmptyTrashDialog from './trash/EmptyTrashDialog.svelte';
 	import AskDialog from './network/AskDialog.svelte';
 	import ConnectDialog from './network/ConnectDialog.svelte';
@@ -78,6 +79,9 @@
 {:else if dialog?.kind === 'empty-trash'}
 	{@const trashPath = dialog.trashPath}
 	<EmptyTrashDialog onconfirm={() => manager.actions.emptyTrash(trashPath).then(trash.refresh)} onclose={dialogs.close} />
+{:else if dialog?.kind === 'delete-forever'}
+	{@const ids = dialog.ids}
+	<DeleteForeverDialog count={ids.length} onconfirm={() => manager.actions.deleteForever(ids).then(trash.refresh)} onclose={dialogs.close} />
 {:else if dialog?.kind === 'connect'}
 	<ConnectDialog {manager} onclose={dialogs.close} />
 {/if}

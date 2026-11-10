@@ -95,13 +95,14 @@ pub fn restore(ids: Vec<String>, queue: &OperationsQueue, history: &History) -> 
     let label = format!("Restored {}", items(ids.len()));
     let undo_label = format!("Moved {} back to the trash", items(ids.len()));
     let mut steps = Vec::new();
+    let locations = trash_locations()?;
     let result = run_batch(
         queue,
         OperationType::Move,
         OperationPhase::Moving,
         ids,
         |id| {
-            let original = restore_item(&resolve(&id)?)?;
+            let original = restore_item(&Located::find(&id, &locations)?.trashed()?)?;
             steps.push(Step::Created(original));
             Ok(())
         },
@@ -111,13 +112,14 @@ pub fn restore(ids: Vec<String>, queue: &OperationsQueue, history: &History) -> 
 }
 
 pub fn delete_permanently(ids: Vec<String>, queue: &OperationsQueue) -> Result<(), String> {
+    let locations = trash_locations()?;
     run_batch(
         queue,
         OperationType::Delete,
         OperationPhase::Deleting,
         ids,
         |id| {
-            let item = resolve(&id)?;
+            let item = Located::find(&id, &locations)?;
             remove_path(&item.file)?;
             let _ = fs::remove_file(&item.info);
             Ok(())
@@ -167,37 +169,48 @@ fn run_batch(
     queue.finish(&id, result)
 }
 
-fn resolve(id: &str) -> Result<Trashed, String> {
-    let file = PathBuf::from(id);
-    let invalid = || format!("Invalid trash item: {id}");
-    let name = file.file_name().ok_or_else(invalid)?.to_os_string();
-    let files_dir = file.parent().ok_or_else(invalid)?;
-    if files_dir.file_name().is_none_or(|dir| dir != "files") {
-        return Err(invalid());
+struct Located {
+    trash: PathBuf,
+    file: PathBuf,
+    info: PathBuf,
+}
+
+impl Located {
+    fn find(id: &str, locations: &[TrashLocation]) -> Result<Self, String> {
+        let file = PathBuf::from(id);
+        let invalid = || format!("Invalid trash item: {id}");
+        let name = file.file_name().ok_or_else(invalid)?;
+        let files_dir = file.parent().ok_or_else(invalid)?;
+        if files_dir.file_name().is_none_or(|dir| dir != "files") {
+            return Err(invalid());
+        }
+        let trash = files_dir.parent().ok_or_else(invalid)?;
+        if !locations
+            .iter()
+            .any(|location| Path::new(&location.path) == trash)
+        {
+            return Err(format!("Trash item is outside known trash locations: {id}"));
+        }
+        let mut info_name = name.to_os_string();
+        info_name.push(".trashinfo");
+        let info = trash.join("info").join(info_name);
+        Ok(Self {
+            trash: trash.to_path_buf(),
+            file,
+            info,
+        })
     }
-    let trash = files_dir.parent().ok_or_else(invalid)?;
-    if !trash_locations()?
-        .iter()
-        .any(|location| Path::new(&location.path) == trash)
-    {
-        return Err(format!("Trash item is outside known trash locations: {id}"));
+
+    fn trashed(self) -> Result<Trashed, String> {
+        let original = parse_trashinfo(&self.info, &self.trash)
+            .map(|(path, _)| PathBuf::from(path))
+            .ok_or_else(|| format!("Could not find where {} came from", self.file.display()))?;
+        Ok(Trashed {
+            original,
+            file: self.file,
+            info: self.info,
+        })
     }
-    let mut info_name = name.clone();
-    info_name.push(".trashinfo");
-    let info = trash.join("info").join(info_name);
-    let original = parse_trashinfo(&info, trash)
-        .map(|(path, _)| PathBuf::from(path))
-        .ok_or_else(|| {
-            format!(
-                "Could not find original path for {}",
-                name.to_string_lossy()
-            )
-        })?;
-    Ok(Trashed {
-        original,
-        file,
-        info,
-    })
 }
 
 fn trash_item(trash: &Path, trash_path: &str, entry: &fs::DirEntry) -> TrashItem {

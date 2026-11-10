@@ -11,6 +11,7 @@ use serde::Serialize;
 use specta::Type;
 
 use super::privileged::{is_permission_error, os, run_pkexec};
+use super::rename::valid_name;
 use crate::files::text::quoted;
 use crate::history::{History, Step};
 use crate::locations::drives;
@@ -77,7 +78,7 @@ pub fn get_file_info(path: String) -> Result<FileEntry, String> {
 }
 
 pub fn create_file(path: String, name: String, history: &History) -> Result<FileEntry, String> {
-    let file_path = PathBuf::from(path).join(name);
+    let file_path = PathBuf::from(path).join(valid_name(&name)?);
     match fs::OpenOptions::new()
         .write(true)
         .create_new(true)
@@ -101,7 +102,7 @@ pub fn create_directory(
     name: String,
     history: &History,
 ) -> Result<FileEntry, String> {
-    let dir_path = PathBuf::from(path).join(name);
+    let dir_path = PathBuf::from(path).join(valid_name(&name)?);
     match fs::create_dir(&dir_path) {
         Ok(()) => {}
         Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => {
@@ -119,7 +120,7 @@ pub fn create_directory(
 pub fn rename_item(path: String, new_name: String, history: &History) -> Result<FileEntry, String> {
     let old_path = PathBuf::from(path);
     let parent = old_path.parent().ok_or("Cannot rename the root folder")?;
-    let new_path = parent.join(new_name);
+    let new_path = parent.join(valid_name(&new_name)?);
 
     match super::rename_no_replace(&old_path, &new_path) {
         Ok(()) => {}
@@ -214,6 +215,16 @@ pub(crate) fn file_entry(path: &Path) -> std::io::Result<FileEntry> {
             })
             .flatten(),
     })
+}
+
+const PDF_MAGIC: &[u8; 5] = b"%PDF-";
+
+pub fn is_pdf(path: &str) -> bool {
+    let mut magic = [0_u8; PDF_MAGIC.len()];
+    fs::File::open(path)
+        .and_then(|mut file| file.read_exact(&mut magic))
+        .is_ok()
+        && magic == *PDF_MAGIC
 }
 
 const SUFFIX_TYPES: [(&str, &str); 2] = [("mdx", "text/markdown"), ("otf", "font/otf")];

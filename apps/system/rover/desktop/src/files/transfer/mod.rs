@@ -4,8 +4,11 @@ mod resolve;
 mod space;
 mod tracker;
 
-use std::collections::BTreeSet;
+use std::collections::{BTreeSet, HashSet};
 use std::fs::File;
+use std::io;
+use std::os::fd::AsRawFd;
+use std::os::unix::fs::MetadataExt;
 use std::path::{Path, PathBuf};
 use std::thread;
 
@@ -195,29 +198,22 @@ fn finalize(tracker: &mut Tracker) -> Result<(), String> {
     tracker
         .queue
         .set_phase(tracker.id, OperationPhase::Finalizing);
-    let targets: Vec<PathBuf> = tracker.created().map(Path::to_path_buf).collect();
-    let parents: BTreeSet<&Path> = targets
-        .iter()
+    let parents: BTreeSet<&Path> = tracker
+        .created()
         .filter_map(|target| target.parent())
         .collect();
-    for target in &targets {
-        for entry in walkdir::WalkDir::new(target).contents_first(true) {
-            let entry = entry.map_err(|error| error.to_string())?;
-            tracker.guard()?;
-            if entry.file_type().is_file() {
-                tracker.set_file(entry.path());
+    let mut flushed = HashSet::new();
+    parents
+        .into_iter()
+        .try_for_each(|parent| {
+            let directory = File::open(parent)?;
+            if flushed.insert(directory.metadata()?.dev())
+                && unsafe { libc::syncfs(directory.as_raw_fd()) } != 0
+            {
+                return Err(io::Error::last_os_error());
             }
-            if !entry.path_is_symlink() {
-                sync(entry.path())?;
-            }
-        }
-    }
-    parents.into_iter().try_for_each(sync)
-}
-
-fn sync(path: &Path) -> Result<(), String> {
-    File::open(path)
-        .and_then(|file| file.sync_all())
+            Ok(())
+        })
         .map_err(|error| error.to_string())
 }
 

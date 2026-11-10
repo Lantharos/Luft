@@ -1,11 +1,18 @@
-use std::fs::{self, File};
+use std::fs::File;
 use std::io::{self, BufReader, BufWriter, Read};
-use std::os::unix::fs::{PermissionsExt, symlink};
 use std::path::Path;
+
+use luft_unpack::{Rules, unpack_tar, unpack_zip};
 
 use super::progress::{Counted, Progress};
 
 const READ_BUFFER: usize = 256 * 1024;
+const UNBOUNDED: Rules = Rules {
+    max_bytes: u64::MAX,
+    max_entries: u32::MAX,
+    outward_links: true,
+    keep_metadata: true,
+};
 const TAR_SUFFIXES: [(&str, Codec); 11] = [
     (".tar", Codec::Plain),
     (".gtar", Codec::Plain),
@@ -78,21 +85,17 @@ pub(super) fn unpack(
 ) -> io::Result<()> {
     let reader =
         BufReader::with_capacity(READ_BUFFER, Counted::new(File::open(archive)?, progress));
+    let unpacked = |path: &Path| progress.item(&staging.join(path));
     match format {
-        Format::Zip => unpack_zip(reader, staging, progress),
+        Format::Zip => unpack_zip(reader, staging, UNBOUNDED, unpacked).map_err(io::Error::from),
         Format::SevenZip => sevenz_rust2::decompress_with_extract_fn(
             reader,
             staging,
             sevenz_rust2::default_entry_extract_fn,
         )
         .map_err(io::Error::other),
-        Format::Tar(codec) => {
-            let mut tar = tar::Archive::new(decoder(codec, reader)?);
-            tar.set_preserve_permissions(true);
-            tar.set_preserve_mtime(true);
-            tar.set_overwrite(false);
-            tar.unpack(staging)
-        }
+        Format::Tar(codec) => unpack_tar(decoder(codec, reader)?, staging, UNBOUNDED, unpacked)
+            .map_err(io::Error::from),
         Format::Stream(codec) => {
             let mut output = BufWriter::new(File::create_new(staging.join(stem))?);
             io::copy(&mut decoder(codec, reader)?, &mut output).map(drop)
@@ -108,37 +111,4 @@ fn decoder<'a>(codec: Codec, reader: impl Read + 'a) -> io::Result<Box<dyn Read 
         Codec::Xz => Box::new(liblzma::read::XzDecoder::new_multi_decoder(reader)),
         Codec::Zstd => Box::new(zstd::Decoder::new(reader)?),
     })
-}
-
-fn unpack_zip(reader: impl Read + io::Seek, staging: &Path, progress: &Progress) -> io::Result<()> {
-    let mut archive = zip::ZipArchive::new(reader).map_err(io::Error::other)?;
-    for index in 0..archive.len() {
-        let mut entry = archive.by_index(index).map_err(io::Error::other)?;
-        let Some(relative) = entry.enclosed_name() else {
-            continue;
-        };
-        let target = staging.join(relative);
-        if entry.is_dir() {
-            fs::create_dir_all(&target)?;
-            continue;
-        }
-        if let Some(parent) = target.parent() {
-            fs::create_dir_all(parent)?;
-        }
-        if entry.is_symlink() {
-            let mut link = String::new();
-            entry.read_to_string(&mut link)?;
-            symlink(link, &target)?;
-        } else {
-            let mut output = BufWriter::new(File::create_new(&target)?);
-            io::copy(&mut entry, &mut output)?;
-            if let Some(mode) = entry.unix_mode() {
-                output
-                    .get_ref()
-                    .set_permissions(fs::Permissions::from_mode(mode & 0o7777))?;
-            }
-        }
-        progress.item(&target);
-    }
-    Ok(())
 }

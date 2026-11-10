@@ -66,16 +66,18 @@ fn available_space(path: &Path) -> Result<u64, String> {
 }
 
 fn format_bytes(bytes: u64) -> String {
-    const UNITS: [&str; 5] = ["B", "KB", "MB", "GB", "TB"];
-    let mut size = bytes as f64;
+    const UNITS: [&str; 5] = ["kB", "MB", "GB", "TB", "PB"];
+    match bytes {
+        1 => return "1 byte".to_string(),
+        0..1000 => return format!("{bytes} bytes"),
+        _ => {}
+    }
+    let mut size = bytes as f64 / 1000.0;
     let mut unit = 0;
-    while size >= 1024.0 && unit < UNITS.len() - 1 {
-        size /= 1024.0;
+    while size >= 1000.0 && unit < UNITS.len() - 1 {
+        size /= 1000.0;
         unit += 1;
     }
-    if unit == 0 {
-        format!("{bytes} B")
-    } else {
-        format!("{size:.1} {}", UNITS[unit])
-    }
+    let digits = if size >= 100.0 { 0 } else { 1 };
+    format!("{size:.digits$} {}", UNITS[unit])
 }

@@ -20,7 +20,7 @@ class Actions {
 		if (!app.backend) return false;
 		try {
 			if ('app' in target) await app.backend.signalApp(target.app, signal);
-			else await app.backend.signal(target.pids, signal);
+			else await app.backend.signal(this.#listed(target.pids), signal);
 			return true;
 		} catch (error) {
 			notices.fail(error);
@@ -73,6 +73,10 @@ class Actions {
 
 	#running(target: Target) {
 		return 'app' in target ? usage.apps.some((candidate) => candidate.key === target.app) : target.pids.some((pid) => this.#alive(pid));
+	}
+
+	#listed(pids: number[]) {
+		return processes.list.filter((process) => pids.includes(process.pid)).map(({ pid, started }) => ({ pid, started }));
 	}
 
 	#alive(pid: number) {

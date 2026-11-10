@@ -1,6 +1,7 @@
 import { appWindow } from '@lantharos/sabine';
 import { isInside, parent } from '@luft/ui';
 import { commands } from '#lib/bindings.js';
+import { dialogs } from '#lib/features/dialogs.svelte.js';
 import type { FileManager } from './manager.svelte';
 
 export class FileActions {
@@ -55,12 +56,13 @@ export class FileActions {
 		const manager = this.#manager;
 		const selected = [...manager.selection];
 		if (selected.length === 0) return;
-		if (manager.view === 'trash') {
-			await commands.deletePermanently({ ids: selected }).catch(manager.notify);
-			await manager.loadTrash();
-			return;
-		}
+		if (manager.view === 'trash') return dialogs.deleteForever(selected);
 		await this.trash(selected);
+	};
+
+	deleteForever = async (ids: string[]) => {
+		await commands.deletePermanently({ ids }).catch(this.#manager.notify);
+		await this.#manager.loadTrash();
 	};
 
 	trash = async (paths: string[]) => {

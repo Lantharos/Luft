@@ -4,6 +4,14 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::sync::LazyLock;
 
+const READ_ONLY: [&str; 5] = [
+    "--no-optional-locks",
+    "-c",
+    "core.fsmonitor=false",
+    "-c",
+    "core.hooksPath=/dev/null",
+];
+
 static SEARCH_PATH: LazyLock<Vec<PathBuf>> = LazyLock::new(|| {
     let mut paths: Vec<PathBuf> = env::var_os("PATH")
         .map(|path| env::split_paths(&path).collect())
@@ -28,6 +36,10 @@ pub(super) fn args(values: &[&str]) -> Vec<OsString> {
     values.iter().map(OsString::from).collect()
 }
 
+pub(super) fn reading(values: &[&str]) -> Vec<OsString> {
+    READ_ONLY.iter().chain(values).map(OsString::from).collect()
+}
+
 pub(super) fn run_text_with_codes(
     cwd: &Path,
     args: Vec<OsString>,
@@ -46,6 +58,7 @@ pub(super) fn run_bytes(
         .args(args)
         .current_dir(cwd)
         .env("LC_ALL", "C")
+        .env("GIT_TERMINAL_PROMPT", "0")
         .env(
             "PATH",
             env::join_paths(SEARCH_PATH.iter()).unwrap_or_default(),

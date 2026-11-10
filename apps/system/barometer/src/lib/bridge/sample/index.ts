@@ -137,7 +137,11 @@ export const sample: SystemBackend = {
 	},
 	snapshot: async (after) => ({ devices: structuredClone(devices) as Devices, ticks: ticks.filter((candidate) => candidate.time > after) }),
 	details: async (pid) => details(pid),
-	signal: async (pids, kind) => signal(pids, kind),
+	signal: async (listed, kind) =>
+		signal(
+			listed.map((process) => process.pid),
+			kind
+		),
 	signalApp: async (key, kind) => signal(membersOf(key), kind),
 	openApp: async (key) => void background.delete(key),
 	stopApp: async (key) => {

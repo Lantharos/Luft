@@ -51,14 +51,19 @@ pub fn batch_rename(renamings: Vec<Renaming>, history: &History) -> Result<(), S
     Ok(())
 }
 
+pub(super) fn valid_name(name: &str) -> Result<&str, String> {
+    let name = name.trim();
+    if name.is_empty() || name == "." || name == ".." || name.contains('/') {
+        return Err(format!("{name:?} isn't a valid name"));
+    }
+    Ok(name)
+}
+
 fn plan(renamings: Vec<Renaming>) -> Result<Vec<(PathBuf, PathBuf)>, String> {
     let mut targets = HashSet::new();
     let mut pairs = Vec::with_capacity(renamings.len());
     for Renaming { path, name } in renamings {
-        let name = name.trim();
-        if name.is_empty() || name == "." || name == ".." || name.contains('/') {
-            return Err(format!("{name:?} isn't a valid name"));
-        }
+        let name = valid_name(&name)?;
         let from = PathBuf::from(path);
         let to = from
             .parent()

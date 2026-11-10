@@ -112,6 +112,9 @@ export const commands = {
 		path: string,
 	}, options?: CallOptions) => invoke<FileEntry>("get_file_info", params, options),
 	historyState: (options?: CallOptions) => invoke<HistoryState>("history_state", {}, options),
+	isPdf: (params: {
+		path: string,
+	}, options?: CallOptions) => invoke<boolean>("is_pdf", params, options),
 	listDirectory: (params: {
 		path: string,
 		showHidden: boolean,
@@ -401,15 +404,10 @@ export type FileAction = {
 	types: string[],
 	extensions: string[],
 	multiple: boolean,
-	/**  Its own menu, when it has one. */
 	items: FileActionChoice[] | null,
 };
 
-export type FileActionChoice = { kind: "choice"; key: string; label: string; 
-/**  An SVG to draw in the menu's colors, when it has one. */
-icon: string | null; disabled: boolean; 
-/**  Whether the menu stays open after it's chosen, so what it finds shows in place. */
-keepsMenuOpen: boolean } | { kind: "separator" };
+export type FileActionChoice = { kind: "choice"; key: string; label: string; icon: string | null; disabled: boolean; keepsMenuOpen: boolean } | { kind: "separator" };
 
 export type FileActionTargets = "files" | "folders" | "any";
 

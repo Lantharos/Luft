@@ -65,8 +65,15 @@ export class VcsState {
 	statusFor = (path: string, isDir: boolean): VcsFileStatus | null => {
 		if (!this.project) return null;
 		const relative = relativePath(this.project.root, path);
-		return this.statuses.get(relative) ?? (isDir ? (this.folderStatuses.get(relative) ?? null) : null);
+		return this.statuses.get(relative) ?? (isDir ? this.folderStatuses.get(relative) : undefined) ?? this.#insideUntracked(relative);
 	};
+
+	#insideUntracked(relative: string): VcsFileStatus | null {
+		for (let slash = relative.lastIndexOf('/'); slash > 0; slash = relative.lastIndexOf('/', slash - 1)) {
+			if (this.statuses.get(relative.slice(0, slash)) === 'untracked') return 'untracked';
+		}
+		return null;
+	}
 
 	relativePath = (path: string) => (this.project ? relativePath(this.project.root, path) : path);
 

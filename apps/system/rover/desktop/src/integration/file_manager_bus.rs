@@ -53,8 +53,6 @@ impl FileManager {
     }
 }
 
-/// The caller's own token, or one Kestrel gives when the caller is the app
-/// in front, since many apps ask without one.
 async fn token(startup_id: String, connection: &Connection, header: &Header<'_>) -> Option<String> {
     if !startup_id.is_empty() {
         return Some(startup_id);

@@ -15,7 +15,7 @@ base64.workspace = true
 dirs.workspace = true
 luft-app = { workspace = true, features = ["launch", "settings"] }
 parking_lot.workspace = true
-rustix = { workspace = true, features = ["event", "fs", "pipe", "process", "pty", "stdio", "termios"] }
+rustix = { workspace = true, features = ["event", "fs", "pipe", "process", "pty", "stdio", "system", "termios"] }
 sabine.workspace = true
 serde.workspace = true
 specta.workspace = true

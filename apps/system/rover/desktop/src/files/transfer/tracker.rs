@@ -1,6 +1,4 @@
 use std::path::{Path, PathBuf};
-use std::thread;
-use std::time::Duration;
 
 use super::resolve::Resolver;
 use super::space::{file_name, path_items, path_size};
@@ -9,8 +7,6 @@ use crate::files::privileged::remove_path;
 use crate::files::trash;
 use crate::history::Step;
 use crate::locations::drives;
-
-const PAUSE_POLL_INTERVAL: Duration = Duration::from_millis(120);
 
 #[derive(Clone, Copy, PartialEq)]
 pub(super) enum Mode {
@@ -67,12 +63,9 @@ impl<'a> Tracker<'a> {
     }
 
     pub fn guard(&self) -> Result<(), String> {
-        loop {
-            match self.queue.status(self.id) {
-                Some(OperationStatus::Cancelled) => return Err("Operation cancelled".to_string()),
-                Some(OperationStatus::Paused) => thread::sleep(PAUSE_POLL_INTERVAL),
-                _ => return Ok(()),
-            }
+        match self.queue.status_once_unpaused(self.id) {
+            Some(OperationStatus::Cancelled) => Err("Operation cancelled".to_string()),
+            _ => Ok(()),
         }
     }
 

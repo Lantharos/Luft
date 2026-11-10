@@ -106,8 +106,6 @@ impl Apps {
         key
     }
 
-    /// The browser, GPU and network processes of the Chromium Sabine apps
-    /// share, whose pages count toward the apps that opened them.
     pub fn sabine_runtime(&mut self, cgroup: &str) -> Option<String> {
         cgroup
             .rsplit('/')

@@ -53,6 +53,7 @@ members = [
     "packages/dbus/macros",
     "packages/i18n",
     "packages/identity",
+    "packages/unpack",
     "packages/system/accounts",
     "packages/system/cups",
     "packages/system/disks",
@@ -133,6 +134,7 @@ default-members = [
     "packages/dbus/macros",
     "packages/i18n",
     "packages/identity",
+    "packages/unpack",
     "packages/system/accounts",
     "packages/system/cups",
     "packages/system/disks",
@@ -196,6 +198,7 @@ luft-language = { path = "packages/system/language" }
 luft-models = { path = "packages/system/models" }
 luft-speech = { path = "packages/system/speech" }
 luft-trust = { path = "packages/system/trust" }
+luft-unpack = { path = "packages/unpack" }
 luft-variant = { path = "packages/system/variant" }
 luft-windows = { path = "packages/system/windows" }
 sushi = { path = "sushi/crates/sushi" }

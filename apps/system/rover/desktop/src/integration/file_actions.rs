@@ -1,5 +1,3 @@
-//! Actions extensions add to the menu of files and folders, which Kestrel hands over and runs.
-
 use std::sync::Once;
 
 use futures_util::{StreamExt, stream};
@@ -55,15 +53,17 @@ struct ListedAction {
 }
 
 #[derive(Clone, Serialize, specta::Type)]
-#[serde(tag = "kind", rename_all = "camelCase", rename_all_fields = "camelCase")]
+#[serde(
+    tag = "kind",
+    rename_all = "camelCase",
+    rename_all_fields = "camelCase"
+)]
 pub enum FileActionChoice {
     Choice {
         key: String,
         label: String,
-        /// An SVG to draw in the menu's colors, when it has one.
         icon: Option<String>,
         disabled: bool,
-        /// Whether the menu stays open after it's chosen, so what it finds shows in place.
         keeps_menu_open: bool,
     },
     Separator,
@@ -87,7 +87,6 @@ pub struct FileAction {
     types: Vec<String>,
     extensions: Vec<String>,
     multiple: bool,
-    /// Its own menu, when it has one.
     items: Option<Vec<FileActionChoice>>,
 }
 
@@ -124,7 +123,9 @@ impl From<ListedAction> for FileAction {
             types: action.types,
             extensions: action.extensions,
             multiple: action.multiple,
-            items: action.items.map(|items| items.into_iter().map(Into::into).collect()),
+            items: action
+                .items
+                .map(|items| items.into_iter().map(Into::into).collect()),
         }
     }
 }
@@ -146,10 +147,15 @@ async fn proxy() -> zbus::Result<FileActionsProxy<'static>> {
 }
 
 async fn current(proxy: &FileActionsProxy<'_>) -> Vec<FileAction> {
-    proxy.list().await.unwrap_or_default().into_iter().map(Into::into).collect()
+    proxy
+        .list()
+        .await
+        .unwrap_or_default()
+        .into_iter()
+        .map(Into::into)
+        .collect()
 }
 
-/// Follows Kestrel's actions changing, and Kestrel starting again, from the first time the list is asked for.
 async fn watch(events: Events) -> zbus::Result<()> {
     let proxy = proxy().await?;
     let owners = proxy.inner().receive_owner_changed().await?.map(|_| ());
@@ -178,9 +184,15 @@ pub fn register(window: SabineWindow, events: &Events) -> SabineWindow {
             let proxy = proxy().await.map_err(|error| error.to_string())?;
             proxy.opened(&id).await.map_err(|error| error.to_string())
         })
-        .command_async("run_file_action", |Activation { id, choice, paths }| async move {
-            let proxy = proxy().await.map_err(|error| error.to_string())?;
-            let choice = choice.unwrap_or_default();
-            proxy.activate(&id, &choice, &paths).await.map_err(|error| error.to_string())
-        })
+        .command_async(
+            "run_file_action",
+            |Activation { id, choice, paths }| async move {
+                let proxy = proxy().await.map_err(|error| error.to_string())?;
+                let choice = choice.unwrap_or_default();
+                proxy
+                    .activate(&id, &choice, &paths)
+                    .await
+                    .map_err(|error| error.to_string())
+            },
+        )
 }

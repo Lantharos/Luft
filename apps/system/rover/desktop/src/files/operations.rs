@@ -1,11 +1,11 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicU64, Ordering};
-use std::sync::mpsc::{self, RecvTimeoutError, Sender};
+use std::sync::mpsc::{self, RecvError, Sender};
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 use luft_app::Events;
-use parking_lot::{Mutex, RwLock};
+use parking_lot::{Condvar, Mutex, RwLock};
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
@@ -13,7 +13,6 @@ use crate::app::events::OPERATIONS_CHANGED;
 
 const PROGRESS_EMIT_INTERVAL: Duration = Duration::from_millis(100);
 const FINISHED_RETENTION_MS: i64 = 30_000;
-const DECISION_POLL_INTERVAL: Duration = Duration::from_millis(150);
 
 #[derive(Debug, Clone, Copy, Serialize, PartialEq, Type)]
 pub enum OperationType {
@@ -114,6 +113,8 @@ pub struct OperationsQueue {
 struct Inner {
     operations: RwLock<Vec<Operation>>,
     decisions: Mutex<HashMap<String, Sender<Decision>>>,
+    pausing: Mutex<()>,
+    unpaused: Condvar,
     events: Events,
     last_emit: Mutex<Instant>,
     next_id: AtomicU64,
@@ -125,6 +126,8 @@ impl OperationsQueue {
             inner: Arc::new(Inner {
                 operations: RwLock::new(Vec::new()),
                 decisions: Mutex::new(HashMap::new()),
+                pausing: Mutex::new(()),
+                unpaused: Condvar::new(),
                 events,
                 last_emit: Mutex::new(Instant::now()),
                 next_id: AtomicU64::new(1),
@@ -184,6 +187,21 @@ impl OperationsQueue {
             .map(|operation| operation.status)
     }
 
+    pub fn status_once_unpaused(&self, id: &str) -> Option<OperationStatus> {
+        let status = self.status(id);
+        if status != Some(OperationStatus::Paused) {
+            return status;
+        }
+        let mut pausing = self.inner.pausing.lock();
+        loop {
+            let status = self.status(id);
+            if status != Some(OperationStatus::Paused) {
+                return status;
+            }
+            self.inner.unpaused.wait(&mut pausing);
+        }
+    }
+
     pub fn update_progress(
         &self,
         id: &str,
@@ -230,14 +248,11 @@ impl OperationsQueue {
         let (sender, receiver) = mpsc::channel();
         self.inner.decisions.lock().insert(id.to_string(), sender);
         self.update(id, true, |operation| operation.conflict = Some(conflict));
-        let decision = loop {
-            match receiver.recv_timeout(DECISION_POLL_INTERVAL) {
-                Ok(decision) => break Ok(decision),
-                Err(RecvTimeoutError::Timeout)
-                    if self.status(id) != Some(OperationStatus::Cancelled) => {}
-                Err(_) => break Err("Operation cancelled".to_string()),
-            }
-        };
+        let decision = match self.status(id) {
+            Some(OperationStatus::Cancelled) => Err(RecvError),
+            _ => receiver.recv(),
+        }
+        .map_err(|_| "Operation cancelled".to_string());
         self.inner.decisions.lock().remove(id);
         self.update(id, true, |operation| operation.conflict = None);
         decision
@@ -287,6 +302,8 @@ impl OperationsQueue {
                 operation.status = OperationStatus::Cancelled;
             }
         });
+        self.inner.decisions.lock().remove(id);
+        self.wake_paused();
     }
 
     pub fn pause(&self, id: &str) {
@@ -303,6 +320,12 @@ impl OperationsQueue {
                 operation.status = OperationStatus::InProgress;
             }
         });
+        self.wake_paused();
+    }
+
+    fn wake_paused(&self) {
+        drop(self.inner.pausing.lock());
+        self.inner.unpaused.notify_all();
     }
 
     fn update(&self, id: &str, significant: bool, updater: impl FnOnce(&mut Operation)) {

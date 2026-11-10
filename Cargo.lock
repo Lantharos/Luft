@@ -4841,6 +4841,7 @@ dependencies = [
  "hyper-util",
  "jiff",
  "luft-dbus-macros",
+ "luft-identity",
  "nix",
  "rcgen",
  "rustls",
@@ -5567,6 +5568,7 @@ dependencies = [
  "futures-util",
  "luft-dbus",
  "luft-dbus-macros",
+ "nix",
  "tokio",
  "zbus 6.0.0",
 ]
@@ -5808,6 +5810,7 @@ dependencies = [
  "libc",
  "luft-dbus",
  "luft-dbus-macros",
+ "luft-identity",
  "serde",
  "serde_json",
  "tokio",
@@ -5822,6 +5825,7 @@ dependencies = [
  "ctap",
  "libc",
  "luft-dbus-macros",
+ "luft-identity",
  "serde",
  "serde_json",
  "tokio",
@@ -6006,6 +6010,15 @@ dependencies = [
  "serde",
  "specta",
  "zbus 6.0.0",
+]
+
+[[package]]
+name = "luft-unpack"
+version = "0.1.0"
+dependencies = [
+ "tar",
+ "tempfile",
+ "zip",
 ]
 
 [[package]]
@@ -8378,6 +8391,7 @@ dependencies = [
  "luft-accounts",
  "luft-app",
  "luft-dbus-macros",
+ "luft-unpack",
  "memchr",
  "parking_lot 0.13.0",
  "percent-encoding",
@@ -8835,6 +8849,7 @@ dependencies = [
  "luft-dbus-macros",
  "luft-sandbox",
  "luft-software",
+ "memmap2",
  "quick-xml 0.42.0",
  "sabine",
  "sabine-service",
@@ -9093,6 +9108,7 @@ dependencies = [
  "luft-software",
  "luft-speech",
  "luft-trust",
+ "luft-unpack",
  "pipewire",
  "roxmltree 0.21.1",
  "sabine",
@@ -9105,7 +9121,6 @@ dependencies = [
  "tokio",
  "ureq",
  "zbus 6.0.0",
- "zip",
 ]
 
 [[package]]

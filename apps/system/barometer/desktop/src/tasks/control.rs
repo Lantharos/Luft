@@ -1,5 +1,6 @@
 use std::fs;
 use std::io;
+use std::os::fd::{AsRawFd, FromRawFd, OwnedFd, RawFd};
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::thread;
@@ -11,6 +12,8 @@ use serde::Deserialize;
 use specta::Type;
 
 use super::apps::members;
+use super::process::Stat;
+use crate::system;
 
 const SYSTEM_BIN_DIRS: [&str; 2] = ["/usr/bin", "/bin"];
 const STOP_TIMEOUT: Duration = Duration::from_secs(5);
@@ -46,9 +49,70 @@ impl Signal {
 }
 
 #[derive(Deserialize, Type)]
+pub struct ListedProcess {
+    pid: u32,
+    started: f64,
+}
+
+#[derive(Deserialize, Type)]
 pub struct SignalRequest {
-    pids: Vec<u32>,
+    processes: Vec<ListedProcess>,
     signal: Signal,
+}
+
+struct Handle(OwnedFd);
+
+impl Handle {
+    fn open(pid: u32) -> io::Result<Self> {
+        let pid = libc::pid_t::try_from(pid)
+            .ok()
+            .filter(|pid| *pid > 0)
+            .ok_or(io::ErrorKind::InvalidInput)?;
+        let descriptor = unsafe { libc::syscall(libc::SYS_pidfd_open, pid, 0) };
+        if descriptor < 0 {
+            return Err(io::Error::last_os_error());
+        }
+        Ok(Self(unsafe { OwnedFd::from_raw_fd(descriptor as RawFd) }))
+    }
+
+    fn send(&self, signal: Signal) -> io::Result<()> {
+        let sent = unsafe {
+            libc::syscall(
+                libc::SYS_pidfd_send_signal,
+                self.0.as_raw_fd(),
+                signal.number(),
+                std::ptr::null::<libc::siginfo_t>(),
+                0,
+            )
+        };
+        if sent < 0 {
+            return Err(io::Error::last_os_error());
+        }
+        Ok(())
+    }
+}
+
+struct Clock {
+    boot: f64,
+    ticks: f64,
+}
+
+impl Clock {
+    fn now() -> Self {
+        Self {
+            boot: system::boot_time(),
+            ticks: system::clock_ticks(),
+        }
+    }
+
+    fn started(&self, ListedProcess { pid, started }: &ListedProcess) -> bool {
+        fs::read(format!("/proc/{pid}/stat"))
+            .ok()
+            .and_then(|stat| Stat::parse(&stat))
+            .is_some_and(|stat| {
+                (self.boot + stat.start as f64 / self.ticks - started).abs() < 0.5 / self.ticks
+            })
+    }
 }
 
 #[derive(Deserialize, Type)]
@@ -63,13 +127,26 @@ pub struct PriorityRequest {
     nice: i32,
 }
 
-pub fn signal_processes(SignalRequest { pids, signal }: SignalRequest) -> Result<(), String> {
-    let mut denied = Vec::new();
-    for pid in pids {
-        if unsafe { libc::kill(pid as i32, signal.number()) } == 0 {
-            continue;
+pub fn signal_processes(SignalRequest { processes, signal }: SignalRequest) -> Result<(), String> {
+    let clock = Clock::now();
+    let mut handles = Vec::with_capacity(processes.len());
+    for process in &processes {
+        match Handle::open(process.pid) {
+            Ok(handle) if clock.started(process) => handles.push((process.pid, handle)),
+            Ok(_) => {}
+            Err(error) if error.raw_os_error() == Some(libc::ESRCH) => {}
+            Err(error) => return Err(error.to_string()),
         }
-        let error = io::Error::last_os_error();
+    }
+    signal_handles(handles, signal)
+}
+
+fn signal_handles(handles: Vec<(u32, Handle)>, signal: Signal) -> Result<(), String> {
+    let mut denied = Vec::new();
+    for (pid, handle) in handles {
+        let Err(error) = handle.send(signal) else {
+            continue;
+        };
         match error.raw_os_error() {
             Some(libc::ESRCH) => {}
             Some(libc::EPERM) => denied.push(pid.to_string()),
@@ -85,6 +162,9 @@ pub fn signal_processes(SignalRequest { pids, signal }: SignalRequest) -> Result
 }
 
 pub fn renice(PriorityRequest { pid, nice }: PriorityRequest) -> Result<(), String> {
+    if pid == 0 {
+        return Err(io::Error::from(io::ErrorKind::InvalidInput).to_string());
+    }
     let nice = nice.clamp(-20, 19);
     let threads = threads(pid);
     let mut denied = Vec::new();
@@ -118,10 +198,14 @@ pub fn signal_scopes(scopes: &[PathBuf], signal: Signal) -> Result<(), String> {
         Signal::Kill => control("cgroup.kill", "1"),
         Signal::Stop => control("cgroup.freeze", "1"),
         Signal::Continue => control("cgroup.freeze", "0"),
-        Signal::End => signal_processes(SignalRequest {
-            pids: scopes.iter().flat_map(|scope| members(scope)).collect(),
+        Signal::End => signal_handles(
+            scopes
+                .iter()
+                .flat_map(|scope| members(scope))
+                .filter_map(|pid| Some((pid, Handle::open(pid).ok()?)))
+                .collect(),
             signal,
-        }),
+        ),
     }
 }
 

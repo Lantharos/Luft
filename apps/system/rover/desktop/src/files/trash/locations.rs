@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 use std::fs;
 use std::os::unix::fs::MetadataExt;
-use std::path::{Path, PathBuf};
+use std::path::{Component, Path, PathBuf};
 
 use chrono::{Local, NaiveDateTime};
 use percent_encoding::percent_decode_str;
@@ -92,13 +92,13 @@ pub(super) fn parse_trashinfo(path: &Path, trash: &Path) -> Option<(String, i64)
     let mut deleted_at = 0;
     for line in content.lines() {
         if let Some(value) = line.strip_prefix("Path=") {
-            let decoded = percent_decode_str(value).decode_utf8_lossy().into_owned();
-            original_path = Some(
-                top_dir(trash)
-                    .map_or_else(|| PathBuf::from(&decoded), |top| top.join(&decoded))
-                    .to_string_lossy()
-                    .into_owned(),
-            );
+            let recorded =
+                PathBuf::from(percent_decode_str(value).decode_utf8_lossy().into_owned());
+            original_path = match top_dir(trash) {
+                Some(top) => descends(&recorded).then(|| top.join(&recorded)),
+                None => recorded.is_absolute().then_some(recorded),
+            }
+            .map(|path| path.to_string_lossy().into_owned());
         } else if let Some(value) = line.strip_prefix("DeletionDate=")
             && let Ok(date) = NaiveDateTime::parse_from_str(value, "%Y-%m-%dT%H:%M:%S")
         {
@@ -109,6 +109,11 @@ pub(super) fn parse_trashinfo(path: &Path, trash: &Path) -> Option<(String, i64)
         }
     }
     Some((original_path?, deleted_at))
+}
+
+fn descends(path: &Path) -> bool {
+    path.components()
+        .all(|component| matches!(component, Component::Normal(_)))
 }
 
 fn top_dir(trash: &Path) -> Option<&Path> {

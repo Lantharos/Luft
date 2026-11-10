@@ -23,6 +23,7 @@ chrono.workspace = true
 parking_lot.workspace = true
 libc.workspace = true
 luft-accounts = { workspace = true, features = ["default"] }
+luft-unpack.workspace = true
 luft-app = { workspace = true, features = ["apps", "launch", "settings", "thumbnails", "watch"] }
 gio.workspace = true
 gio-unix.workspace = true

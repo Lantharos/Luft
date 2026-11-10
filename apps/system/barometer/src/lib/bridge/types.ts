@@ -1,4 +1,4 @@
-import type { AppState, AppUsage, Catalog, commands, Details, Devices, Signal, Snapshot, Tick } from '#lib/bindings.js';
+import type { AppState, AppUsage, Catalog, commands, Details, Devices, ListedProcess, Signal, Snapshot, Tick } from '#lib/bindings.js';
 
 export type View = Parameters<typeof commands.monitorView>[0];
 export type SavedSettings = Parameters<typeof commands.settingsWrite>[0];
@@ -13,7 +13,7 @@ export interface SystemBackend {
 	configure(interval: number, history: number): Promise<unknown>;
 	snapshot(after: number): Promise<Snapshot>;
 	details(pid: number): Promise<Details>;
-	signal(pids: number[], signal: Signal): Promise<unknown>;
+	signal(processes: ListedProcess[], signal: Signal): Promise<unknown>;
 	signalApp(key: string, signal: Signal): Promise<unknown>;
 	openApp(key: string, token: string | null): Promise<unknown>;
 	stopApp(key: string): Promise<unknown>;

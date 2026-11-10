@@ -66,8 +66,8 @@ pub fn start_status(root: String, events: Events) -> String {
     let event_id = id.clone();
     thread::spawn(move || {
         let result = project_root(&root).and_then(|root| {
-            let statuses = git::statuses(&root)?;
-            Ok((project(&root, &statuses), statuses))
+            let status = git::status(&root)?;
+            Ok((project(&root, &status), status.files))
         });
         let (project, statuses, error) = match result {
             Ok((project, statuses)) => (Some(project), Some(statuses), None),
@@ -123,15 +123,14 @@ fn find_root(path: &Path) -> Option<PathBuf> {
         .map(Path::to_path_buf)
 }
 
-fn project(root: &Path, statuses: &Statuses) -> VcsProject {
-    let (branch, ahead, behind) = git::position(root);
+fn project(root: &Path, status: &git::Status) -> VcsProject {
     let count =
-        |matches: fn(&VcsFileStatus) -> bool| statuses.values().filter(|s| matches(s)).count();
+        |matches: fn(&VcsFileStatus) -> bool| status.files.values().filter(|s| matches(s)).count();
     VcsProject {
         root: root.to_string_lossy().into_owned(),
-        branch,
-        ahead,
-        behind,
+        branch: status.branch.clone(),
+        ahead: status.ahead,
+        behind: status.behind,
         changed_count: count(|status| *status != VcsFileStatus::Ignored),
         added_count: count(|status| {
             matches!(status, VcsFileStatus::Added | VcsFileStatus::Untracked)

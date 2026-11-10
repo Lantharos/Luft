@@ -1,0 +1,18 @@
+[package]
+name = "luft-unpack"
+version = "0.1.0"
+description = "Unpacks zip and tar archives without ever writing outside the destination, shared by Rover and Settings"
+authors = ["Kristof"]
+license.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+tar.workspace = true
+zip.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+
+[lints]
+workspace = true

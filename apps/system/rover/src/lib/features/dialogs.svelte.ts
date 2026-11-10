@@ -7,6 +7,7 @@ export type OpenDialog =
 	| { kind: 'compress'; entries: FileEntry[]; destination: string }
 	| { kind: 'look'; entries: FileEntry[] }
 	| { kind: 'empty-trash'; trashPath: string | null }
+	| { kind: 'delete-forever'; ids: string[] }
 	| { kind: 'connect' };
 
 class Dialogs {
@@ -22,6 +23,10 @@ class Dialogs {
 
 	emptyTrash = (trashPath: string | null) => {
 		this.current = { kind: 'empty-trash', trashPath };
+	};
+
+	deleteForever = (ids: string[]) => {
+		this.current = { kind: 'delete-forever', ids };
 	};
 
 	connect = () => {

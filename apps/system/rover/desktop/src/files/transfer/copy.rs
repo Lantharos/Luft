@@ -1,6 +1,6 @@
-use std::fs::{self, File, OpenOptions};
+use std::fs::{self, DirBuilder, File, OpenOptions};
 use std::io::{self, Read, Write};
-use std::os::unix::fs::symlink;
+use std::os::unix::fs::{DirBuilderExt, MetadataExt, OpenOptionsExt, symlink};
 use std::path::{Path, PathBuf};
 
 use super::resolve::available_destination;
@@ -10,6 +10,8 @@ use crate::files::operations::Resolution;
 use crate::files::privileged::{is_permission_error, os, remove_path, run_pkexec};
 
 const COPY_BUFFER_SIZE: usize = 1024 * 1024;
+const PERMISSION_BITS: u32 = 0o777;
+const OWNER_ACCESS: u32 = 0o700;
 
 enum Kind {
     Directory,
@@ -38,8 +40,9 @@ pub(super) fn copy_to(
     } else {
         Kind::File
     };
+    let mode = metadata.mode() & PERMISSION_BITS;
     let placed = loop {
-        match place(source, &target, &kind) {
+        match place(source, &target, &kind, mode) {
             Ok(placed) => break placed,
             Err(error) if error.kind() == io::ErrorKind::AlreadyExists => {
                 match tracker.resolve(source, &target)? {
@@ -67,15 +70,19 @@ pub(super) fn copy_to(
     Ok(())
 }
 
-fn place(source: &Path, target: &Path, kind: &Kind) -> io::Result<Placed> {
+fn place(source: &Path, target: &Path, kind: &Kind, mode: u32) -> io::Result<Placed> {
     match kind {
-        Kind::Directory => fs::create_dir(target).map(|()| Placed::Directory),
+        Kind::Directory => DirBuilder::new()
+            .mode(mode | OWNER_ACCESS)
+            .create(target)
+            .map(|()| Placed::Directory),
         Kind::Link => symlink(fs::read_link(source)?, target).map(|()| Placed::Link),
         Kind::File => {
             let input = File::open(source)?;
             let output = OpenOptions::new()
                 .write(true)
                 .create_new(true)
+                .mode(mode)
                 .open(target)?;
             Ok(Placed::File(input, output))
         }

@@ -38,7 +38,7 @@ export const commands = {
 		nice: number,
 	}, options?: CallOptions) => invoke<null>("process_priority", params, options),
 	processSignal: (params: {
-		pids: number[],
+		processes: ListedProcess[],
 		signal: Signal,
 	}, options?: CallOptions) => invoke<null>("process_signal", params, options),
 	sampleSystem: (options?: CallOptions) => invoke<boolean>("sample_system", {}, options),
@@ -277,6 +277,11 @@ export type IconPaint = {
 };
 
 export type Lines = "none" | "lines" | "scanlines";
+
+export type ListedProcess = {
+	pid: number,
+	started: number,
+};
 
 export type Locale = {
 	languages: string[],

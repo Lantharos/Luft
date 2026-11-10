@@ -1,12 +1,8 @@
 use std::cell::Cell;
 use std::io::{self, Read, Seek, SeekFrom};
 use std::path::Path;
-use std::thread;
-use std::time::Duration;
 
 use crate::files::operations::{OperationStatus, OperationsQueue};
-
-const PAUSE_POLL_INTERVAL: Duration = Duration::from_millis(120);
 
 pub(super) struct Progress<'a> {
     queue: &'a OperationsQueue,
@@ -26,14 +22,9 @@ impl<'a> Progress<'a> {
     }
 
     pub fn guard(&self) -> io::Result<()> {
-        loop {
-            match self.queue.status(self.id) {
-                Some(OperationStatus::Cancelled) => {
-                    return Err(io::Error::other("Operation cancelled"));
-                }
-                Some(OperationStatus::Paused) => thread::sleep(PAUSE_POLL_INTERVAL),
-                _ => return Ok(()),
-            }
+        match self.queue.status_once_unpaused(self.id) {
+            Some(OperationStatus::Cancelled) => Err(io::Error::other("Operation cancelled")),
+            _ => Ok(()),
         }
     }
 

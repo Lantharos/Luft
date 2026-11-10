@@ -20,7 +20,7 @@ const APP_NAME: &str = "Rover";
 const APP_ID: &str = "com.lantharos.rover";
 
 pub fn run_app() -> ! {
-    integration::activation::claim_for_launch();
+    integration::activation::claim_before_threads();
     let state = RoverState::new();
     luft_app::run(
         &state.events,

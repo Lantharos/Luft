@@ -24,7 +24,8 @@ pub const FOLDER_COUNTS: BridgeEvent<CountBatch> = BridgeEvent::new("rover.count
 pub const NETWORK_CHANGED: BridgeEvent<()> = BridgeEvent::new("rover.network");
 pub const NETWORK_ASK: BridgeEvent<NetworkAsk> = BridgeEvent::new("rover.network.ask");
 pub const CLOUD_CHANGED: BridgeEvent<()> = BridgeEvent::new("rover.cloud");
-pub const FILE_ACTIONS_CHANGED: BridgeEvent<Vec<FileAction>> = BridgeEvent::new("rover.fileActions");
+pub const FILE_ACTIONS_CHANGED: BridgeEvent<Vec<FileAction>> =
+    BridgeEvent::new("rover.fileActions");
 
 pub fn declare(window: SabineWindow) -> SabineWindow {
     window

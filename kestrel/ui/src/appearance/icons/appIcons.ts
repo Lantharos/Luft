@@ -47,7 +47,6 @@ class AppIcons {
   style = this.settings.get_string('app-icon-style') as IconStyle;
   private square = !this.settings.get_boolean('rounded-window-corners');
   paints: Record<PaintedStyle, Paint> | null = null;
-  // The taskbar's glass can be light or dark apart from the style, see taskbarScheme()
   taskbarPaints: Record<PaintedStyle, Paint> | null = null;
 
   constructor() {

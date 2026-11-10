@@ -43,30 +43,30 @@ date-just-now = Just now
 ## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
 
 # The taskbar
-ctrl-alt-tab-panel = Panel
+ctrl-alt-tab-panel = Taskbar
 
 ## System notifications
 
 # Notification shown when a developer tool turns off app sandboxing restrictions
-unsafe-mode-title = System was put in unsafe mode
-unsafe-mode-body = Apps now have unrestricted access
+unsafe-mode-title = Unsafe mode is on
+unsafe-mode-body = Apps are no longer limited in what they can reach on this computer.
 # Notification button, turns unsafe mode off again
 unsafe-mode-undo = Undo
-privileged-user-title = Logged in as a privileged user
-privileged-user-body = Running a session as a privileged user should be avoided for security reasons. If possible, you should log in as a normal user.
+privileged-user-title = You’re signed in as the administrator
+privileged-user-body = Everything you open can change the whole system. Sign in with a normal account when you can.
 
 ## Starting programs
 
 # Notification title when a program can't be started. $command is the command that failed
-spawn-failed = Execution of “{ $command }” failed:
+spawn-failed = Couldn’t start “{ $command }”
 
 ## Text field context menu
 
 entry-menu-copy = Copy
 entry-menu-paste = Paste
 # Menu item that reveals the characters typed into a password field
-entry-menu-show-text = Show Text
+entry-menu-show-text = Show text
 # Menu item that hides the characters typed into a password field again
-entry-menu-hide-text = Hide Text
+entry-menu-hide-text = Hide text
 # Warning under password fields
 entry-caps-lock-on = Caps Lock is on

@@ -28,7 +28,7 @@ export class PasskeyDialog {
 
   open(): boolean {
     const copy = copyFor(this.request);
-    const modal = new ModalDialog({ styleClass: 'kestrel-portal-dialog kestrel-passkey-dialog', prompt: true });
+    const modal = new ModalDialog({ styleClass: 'kestrel-portal-dialog kestrel-passkey-dialog', prompt: true, whileLocked: 'refuse' });
     this.modal = modal;
     modal.contentLayout.add_child(new MessageDialogContent({ title: copy.title, description: copy.description, icon_name: copy.icon }));
     const content = new St.BoxLayout({ orientation: Clutter.Orientation.VERTICAL, style_class: 'kestrel-portal-content', x_expand: true });

@@ -2,10 +2,10 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import {BASIC_NAMES, publishBasics} from '../system/basics.js';
-import {FINGERPRINT_NAME, publishFingerprint} from '../system/fingerprint.js';
+import {FINGERPRINT_NAME, publishFingerprint} from '../system/security/fingerprint.js';
 import {FIREWALL_NAME, publishFirewall} from '../system/network/firewall.js';
-import {publishSecurity, SECURITY_NAMES, variants} from '../system/security.js';
-import {publishUdisks} from '../system/udisks/service.js';
+import {publishSecurity, SECURITY_NAMES, variants} from '../system/security/security.js';
+import {publishUdisks} from '../system/devices/udisks/service.js';
 import {INSTALLER_NAME, publishInstaller} from './installer.js';
 import {NETWORK_MANAGER_NAME, publishNetworkManager} from './networkManager.js';
 

@@ -6,7 +6,6 @@ import type { ExtensionManager } from './runtime/manager.js';
 const FIREWALL = 'com.lantharos.Firewall1';
 const FIREWALL_PATH = '/com/lantharos/Firewall1';
 
-/** Tells the firewall which ports the running extensions listen on, so devices on home networks reach them. */
 export class ExtensionPorts {
   private readonly stop: () => void;
   private readonly watch: number;
@@ -39,7 +38,7 @@ export class ExtensionPorts {
     if (listed === this.sent) return;
     this.sent = listed;
     Gio.DBus.system.call(FIREWALL, FIREWALL_PATH, FIREWALL, 'SetExtensionPorts', new GLib.Variant('(a(qs))', [[...ports.values()]]),
-      null, Gio.DBusCallFlags.NO_AUTO_START, -1, null, (connection, result) => {
+      null, Gio.DBusCallFlags.NO_AUTO_START | Gio.DBusCallFlags.ALLOW_INTERACTIVE_AUTHORIZATION, -1, null, (connection, result) => {
         try {
           connection!.call_finish(result);
         } catch (error) {

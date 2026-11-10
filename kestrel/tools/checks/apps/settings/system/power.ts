@@ -1,10 +1,13 @@
 import Clutter from 'gi://Clutter';
+import Gio from 'gi://Gio';
+import GLib from 'gi://GLib';
 
 import type {LuftApp} from '../../../lib/apps/luftApp.js';
 import {checks} from '../../../lib/check.js';
 import {resetBattery, setBattery, UPOWER_STATE} from '../../../lib/battery.js';
 import {scroll, type Point} from '../../../lib/input/input.js';
-import {callLog} from '../../../system/lib/systemCalls.js';
+import {call} from '../../../lib/dbus.js';
+import {callLog, takeCalls} from '../../../system/lib/systemCalls.js';
 import {show} from '../navigation.js';
 
 const {eventually} = checks('Luft app');
@@ -22,6 +25,8 @@ async function toggle(app: LuftApp, calls: () => string[], point: Point, seconds
 }
 
 export async function checkLongSleep(app: LuftApp) {
+  await call('com.lantharos.Sleep1', '/com/lantharos/Sleep1', 'com.lantharos.Sleep1', 'SetPowerOffAfter', new GLib.Variant('(u)', [DAY]), null, {connection: Gio.DBus.system});
+  takeCalls();
   const calls = callLog();
   await setBattery(ON_BATTERY);
   try {

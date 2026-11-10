@@ -27,8 +27,6 @@ interface Tracked {
 
 type Signal = [object: { disconnect(id: number): void }, id: number];
 
-// Windows open when tiling starts, and windows that open while it's on, may be maximized or snapped to a side,
-// which Mutter also counts as maximized; unmaximizing them lets them take their tile instead of covering the others
 function unstretch(window: Meta.Window): void {
   if (!window.fullscreen && (window.maximized_horizontally || window.maximized_vertically)) window.unmaximize();
 }
@@ -299,7 +297,6 @@ export class Tiler {
 
   private natureChanged(window: Meta.Window): void {
     const record = this.tracked.get(window)!;
-    // Apps such as Chromium and Electron ones can open fixed in size and only then become resizable
     if (!record.space && record.floating && !floatsByNature(window) && !this.floatedByHand.has(window) &&
       !this.memory.floats(appKey(window)) && !this.unconfigured.has(window) && !window.minimized) {
       record.floating = false;
@@ -371,7 +368,6 @@ export class Tiler {
   private stretchChanged(window: Meta.Window): void {
     const space = this.tracked.get(window)?.space;
     if (!space) return;
-    // Apps that open maximized can ask for it again once shown
     if (this.opening.has(window)) unstretch(window);
     if (!stretched(window)) this.arrange(space, true);
   }
@@ -402,7 +398,6 @@ export class Tiler {
     window.move_resize_frame(true, box.x, box.y, box.width, box.height);
   }
 
-  // The size a tiled window has while floating, which the board shows it at instead of its tile
   floatingSize(window: Meta.Window): Pick<Box, 'width' | 'height'> | null {
     const record = this.tracked.get(window);
     if (!record?.space || !window.allows_resize()) return null;

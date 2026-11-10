@@ -11,7 +11,6 @@ function met(when: SettingCondition | undefined, value: SettingValue): boolean {
   return typeof value === 'number' && value >= min && value <= max;
 }
 
-/** One extension's declared settings and their values, checked against the manifest both ways. */
 export class SettingValues {
   private readonly described: Map<string, SettingDescription>;
   private readonly listeners = new Set<(key: string) => void>();
@@ -45,7 +44,6 @@ export class SettingValues {
     if (!same(this.get(key), stored)) this.store.setValue(this.id, key, stored);
   }
 
-  /** Whether a setting shows: everything it depends on shows and has a value it wants. `assumedOn` is a switch taken to be on, such as the toggle a menu belongs to. */
   shown(key: string, assumedOn?: string): boolean {
     const { depends, when } = this.describe(key);
     if (!depends) return true;

@@ -1,12 +1,10 @@
 import type { Notification, Source } from './notification.js';
 
-/** One app's notifications that came in during a hold and are still around. */
 export interface HeldFromApp {
   app: string;
   count: number;
 }
 
-/** A hold on banners and sounds that something other than the person started, such as an extension's work session. */
 export class NotificationHold {
   private readonly notifications = new Map<Notification, number>();
 
@@ -40,7 +38,6 @@ export class NotificationHold {
   }
 }
 
-/** Every hold that's on, which the message tray asks before it shows a banner or plays a sound. */
 class NotificationHolds {
   private readonly holds = new Set<NotificationHold>();
   private readonly listeners = new Set<() => void>();
@@ -49,7 +46,6 @@ class NotificationHolds {
     return this.holds.size > 0;
   }
 
-  /** The holds that hold this notification back, which it counts toward. */
   applying(notification: Notification): NotificationHold[] {
     return [...this.holds].filter(hold => hold.applies(notification));
   }

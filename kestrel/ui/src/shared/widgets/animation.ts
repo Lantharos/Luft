@@ -3,7 +3,8 @@ import Gio from 'gi://Gio';
 import GObject from 'gi://GObject';
 import St from 'gi://St';
 
-const SPINNER_ANIMATION_TIME = 300;
+import { Curve, Duration } from '../motion/motion.js';
+
 const SPINNER_ANIMATION_DELAY = 1000;
 const SQUARE_LAP = 1000;
 const SQUARE_LEAD = 0.25;
@@ -17,7 +18,6 @@ function squareCorners(): boolean {
   return !kestrelSettings.get_boolean('rounded-window-corners');
 }
 
-/** The spinner's square shape: a segment that travels around a faint square, as in Luft's apps. */
 class SquareSpinner extends St.DrawingArea {
   static {
     GObject.registerClass(this);
@@ -95,8 +95,8 @@ export class Spinner extends St.Widget {
       this.ease({
         opacity: 255,
         delay: SPINNER_ANIMATION_DELAY,
-        duration: SPINNER_ANIMATION_TIME,
-        mode: Clutter.AnimationMode.LINEAR,
+        duration: Duration.relaxed,
+        curve: Curve.linear,
       });
     } else {
       this.opacity = 255;
@@ -110,8 +110,8 @@ export class Spinner extends St.Widget {
     if (this.animate) {
       this.ease({
         opacity: 0,
-        duration: SPINNER_ANIMATION_TIME,
-        mode: Clutter.AnimationMode.LINEAR,
+        duration: Duration.relaxed,
+        curve: Curve.linear,
         onComplete: () => this.clear(),
       });
     } else {

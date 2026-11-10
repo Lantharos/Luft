@@ -4,7 +4,7 @@ import type GObject from 'gi://GObject';
 import Meta from 'gi://Meta';
 import Mtk from 'gi://Mtk';
 
-import { Duration, Spring, holdMotion, reducedMotion } from '../../../kestrelUi.js';
+import { Curve, Duration, Spring, holdMotion, reducedMotion } from '../../../kestrelUi.js';
 import { type Rect, WindowSnapshot } from './snapshot.js';
 import { transitionVelocity } from './velocity.js';
 
@@ -148,7 +148,7 @@ class Morph {
     snapshot.actor.ease({
       opacity: 0,
       duration: Duration.quick,
-      mode: Clutter.AnimationMode.LINEAR,
+      curve: Curve.linear,
     });
 
     actor.set_pivot_point(0, 0);

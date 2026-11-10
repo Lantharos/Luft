@@ -5,8 +5,9 @@ import type {Publish} from '../bus.js';
 
 const FIREWALL = `<node><interface name="com.lantharos.Firewall1">
   <property name="Unclassified" type="a(os)" access="read"/>
+  <property name="HomeInterfaces" type="as" access="read"/>
   <property name="OpenPorts" type="a(qss)" access="read"/>
-  <property name="Apps" type="a(sss)" access="read"/>
+  <property name="Apps" type="a(sssu)" access="read"/>
   <property name="Waiting" type="a(ssu)" access="read"/>
   <method name="SetNetworkType"><arg name="network" type="o" direction="in"/><arg name="kind" type="s" direction="in"/></method>
   <method name="OpenPort"><arg name="port" type="q" direction="in"/><arg name="protocol" type="s" direction="in"/><arg name="networks" type="s" direction="in"/></method>
@@ -23,17 +24,21 @@ const CONTROL = `<node><interface name="com.lantharos.KestrelChecks.Firewall">
 </interface></node>`;
 
 export const FIREWALL_NAME = 'com.lantharos.Firewall1';
+const HOME_INTERFACES = ['post0'];
 
 type Classify = (connection: string, kind: string) => void;
 
 export function publishFirewall(publish: Publish, calls: string[], classify: Classify, unclassified: [string, string][] = []) {
   const uid = new Gio.Credentials().get_unix_user();
   const ports: [number, string, string][] = [[22, 'tcp', 'home']];
-  const apps: [string, string, string][] = [['app', 'steam', 'home'], ['app', 'com.obsproject.Studio', 'anywhere'], ['program', 'node', 'home'], ['program', 'flatbed', 'home'], ['app', 'discord', 'blocked']];
+  const apps: [string, string, string, number][] = [['app', 'steam', 'home', uid], ['app', 'com.obsproject.Studio', 'anywhere', uid], ['program', 'node', 'home', uid], ['program', 'flatbed', 'home', uid], ['app', 'discord', 'blocked', uid]];
   const waiting: [string, string, number][] = [];
   const firewall = publish(FIREWALL, {
     get Unclassified() {
       return unclassified;
+    },
+    get HomeInterfaces() {
+      return HOME_INTERFACES;
     },
     get OpenPorts() {
       return ports;
@@ -63,14 +68,14 @@ export function publishFirewall(publish: Publish, calls: string[], classify: Cla
       calls.push(`SetAppAccess ${kind} ${id} ${access}`);
       const known = apps.find(([knownKind, knownId]) => knownKind === kind && knownId === id);
       if (known) known[2] = access;
-      else apps.push([kind, id, access]);
-      firewall.emit_property_changed('Apps', new GLib.Variant('a(sss)', apps));
+      else apps.push([kind, id, access, uid]);
+      firewall.emit_property_changed('Apps', new GLib.Variant('a(sssu)', apps));
       withdraw(kind, id);
     },
     ForgetApp(kind: string, id: string) {
       calls.push(`ForgetApp ${kind} ${id}`);
       apps.splice(apps.findIndex(([knownKind, knownId]) => knownKind === kind && knownId === id), 1);
-      firewall.emit_property_changed('Apps', new GLib.Variant('a(sss)', apps));
+      firewall.emit_property_changed('Apps', new GLib.Variant('a(sssu)', apps));
     },
     SetPostOpen(open: boolean) {
       calls.push(`SetPostOpen ${open}`);

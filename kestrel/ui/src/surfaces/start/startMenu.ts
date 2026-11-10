@@ -84,12 +84,12 @@ export class StartMenu implements StartSurface {
     return toward(edge, SLIDE);
   }
 
-  place({ area, available, cornered, anchor }: StartArea): void {
+  place({ area, available, anchor }: StartArea): void {
     const width = Math.min(WIDTH, area.width - 2 * EDGE_MARGIN);
     const height = Math.min(HEIGHT, available);
     const length = isVertical(anchor.edge) ? height : width;
     this.actor.set_size(width, height);
-    this.actor.set_position(...dock(area, anchor.edge, width, height, cornered ? 'end' : middleAt(anchor, length), anchor.align ? 0 : EDGE_MARGIN));
+    this.actor.set_position(...dock(area, anchor.edge, width, height, middleAt(anchor, length), anchor.align ? 0 : EDGE_MARGIN));
   }
   private back(): boolean {
     if (this.footer.sessionOpen) { this.footer.setOpen(false); this.focus(); return true; }

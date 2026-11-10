@@ -117,8 +117,7 @@ export const MprisPlayer = GObject.registerClass({
     return this.albumTitle;
   }
 
-  /** The track's length in microseconds, or 0 when the player doesn't say. */
-  get trackLength(): number {
+  get trackLengthUs(): number {
     return this.lengthUs;
   }
 
@@ -126,8 +125,7 @@ export const MprisPlayer = GObject.registerClass({
     return !!this.playerProxy.CanSeek && !!this.trackId && this.lengthUs > 0;
   }
 
-  /** Where the track is, in microseconds. Players don't announce it as it moves, so it's asked for each time. */
-  async position(): Promise<number> {
+  async positionUs(): Promise<number> {
     const reply = await Gio.DBus.session.call(this.busName, MPRIS_PATH, 'org.freedesktop.DBus.Properties', 'Get',
       new GLib.Variant('(ss)', ['org.mpris.MediaPlayer2.Player', 'Position']), null, Gio.DBusCallFlags.NONE, -1, null);
     return Number((reply.deepUnpack() as [GLib.Variant])[0].deepUnpack());

@@ -3,9 +3,9 @@ import Cogl from 'gi://Cogl';
 import GObject from 'gi://GObject';
 import Meta from 'gi://Meta';
 
+import { Curve, Duration } from '../../../shared/motion/motion.js';
+
 const DIM_BRIGHTNESS = -0.3;
-const DIM_TIME = 500;
-const UNDIM_TIME = 250;
 const WINDOW_DIMMER_EFFECT_NAME = 'kestrel-window-dimmer';
 const BRIGHTNESS_PROPERTY = `@effects.${WINDOW_DIMMER_EFFECT_NAME}.brightness`;
 
@@ -33,8 +33,8 @@ class WindowDimmer extends Clutter.BrightnessContrastEffect {
     });
 
     this.actor!.ease_property(BRIGHTNESS_PROPERTY, color, {
-      mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-      duration: (dimmed ? DIM_TIME : UNDIM_TIME) * (animate ? 1 : 0),
+      curve: Curve.gentle,
+      duration: (dimmed ? Duration.long : Duration.standard) * (animate ? 1 : 0),
       onStopped: () => this.syncEnabled(dimmed),
     });
 

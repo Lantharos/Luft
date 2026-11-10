@@ -39,7 +39,6 @@ cogl_color_out *= mix(opacity, 1.0, solid);`;
 
 const SAMPLE_MARGIN = 6;
 
-/** Lets what's behind a window show through its background, keeping what differs from the background, such as text, solid. */
 export class SeeThroughEffect extends Clutter.ShaderEffect {
   static {
     GObject.registerClass(this);
@@ -57,7 +56,6 @@ export class SeeThroughEffect extends Clutter.ShaderEffect {
     return Cogl.Snippet.new(Cogl.SnippetHook.FRAGMENT, DECLARATIONS, SOURCE);
   }
 
-  /** Where the window's own frame sits in its buffer, which also holds its shadows, in pixels. */
   setFrame(x: number, y: number, width: number, height: number, bufferWidth: number, bufferHeight: number): void {
     this.set_uniform_float('frame', 4, [x / bufferWidth, y / bufferHeight, (x + width) / bufferWidth, (y + height) / bufferHeight]);
     this.set_uniform_float('margin', 2, [SAMPLE_MARGIN / bufferWidth, SAMPLE_MARGIN / bufferHeight]);

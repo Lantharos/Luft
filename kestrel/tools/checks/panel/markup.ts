@@ -30,7 +30,6 @@ const ui = () => Main.screenshotUI;
 const editor = () => ui().markup;
 const toolButton = (icon: string) => descendants(editor().toolbar).find(actor => actor instanceof St.Button && actor.icon_name === icon)!;
 
-/** Drags with the mouse once the pointer has settled where the drag starts, so the press lands there. */
 async function dragFrom(from: [number, number], to: [number, number], steps = 20) {
   moveTo(from);
   await pause(DRAG_SETTLE);
@@ -69,7 +68,6 @@ async function openEditor() {
   require(!ui().panel.visible, 'the capture panel gives way to the drawing tools');
 }
 
-/** Writes a wave with the virtual pen, several samples a frame as a real pen sends them, so the stroke comes through Kestrel's real pen events with their pressure. */
 async function penWave(x: number, y: number) {
   await penStroke(Array.from({length: PEN_STEPS + 1}, (_, step) => {
     const t = step / PEN_STEPS;
@@ -82,7 +80,6 @@ function pressures() {
   return strokes[0].stroke.samples.map(sample => sample.pressure);
 }
 
-/** The upper pen button set to take a screenshot opens the tool with drawing on. */
 async function penOpensDrawing() {
   ui().panel.drawButton.checked = false;
   penSettings.set_string('secondary-button-action', 'screenshot');

@@ -58,7 +58,6 @@ class TaskbarPreferences {
     this.watchers.forEach(watcher => watcher(key));
   }
 
-  /** The taskbar as it's laid out on the screen with this index: for touch on screens people touch or draw on, as chosen on the others. */
   on(monitorIndex: number | undefined): TaskbarLayout {
     if (monitorIndex === undefined || monitorIndex < 0) return this.desktop;
     let layout = this.screens.get(monitorIndex);
@@ -88,11 +87,9 @@ export class TaskbarLayout {
 
   get touch(): boolean { return this.touchHere(); }
 
-  /** The edge the dock sits on, which a taskbar joined into one bar runs along. */
   get edge(): Edge { return this.touch ? 'bottom' : mainEdge(taskbarArrangement.current); }
   get vertical(): boolean { return isVertical(this.edge); }
   get style(): TaskbarStyle { return this.touch ? 'bar' : this.settings.get_string('taskbar-style') as TaskbarStyle; }
-  /** Whether the taskbar runs as one bar along an edge, instead of as islands placed one by one. */
   get joined(): boolean { return this.style !== 'separate'; }
   get size(): TaskbarSize { return this.settings.get_string('taskbar-size') as TaskbarSize; }
   get autoHide(): TaskbarAutoHide { return this.touch ? 'never' : this.settings.get_string('taskbar-auto-hide') as TaskbarAutoHide; }
@@ -120,7 +117,6 @@ export class TaskbarLayout {
     return thickness + margin;
   }
 
-  /** Space a lifted taskbar keeps between itself and windows filling the rest of the screen. */
   get gap(): number {
     return this.shown && !this.touch ? this.metrics.margin : 0;
   }

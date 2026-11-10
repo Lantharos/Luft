@@ -7,10 +7,10 @@ import St from 'gi://St';
 
 import * as Dialog from '../../shared/dialogs/dialog.js';
 import * as KestrelUi from '../../kestrelUi.js';
+import { Curve, Duration } from '../../shared/motion/motion.js';
 
 const FROZEN_WINDOW_BRIGHTNESS = -0.3;
 const FROZEN_WINDOW_EFFECT = 'kestrel-frozen-window';
-const DIALOG_TRANSITION_TIME = 150;
 const ALIVE_TIMEOUT = 5000;
 const GAME_GRACE_TIMEOUT = 60000;
 
@@ -138,8 +138,8 @@ export const CloseDialog = GObject.registerClass({
     dialog.surface.ease({
       scale_x: 1,
       scale_y: 1,
-      mode: Clutter.AnimationMode.EASE_OUT_BACK,
-      duration: DIALOG_TRANSITION_TIME,
+      curve: Curve.overshoot,
+      duration: Duration.quick,
     });
   }
 
@@ -167,8 +167,8 @@ export const CloseDialog = GObject.registerClass({
       opacity: 0,
       scale_x: 0.8,
       scale_y: 0.8,
-      mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-      duration: DIALOG_TRANSITION_TIME,
+      curve: Curve.gentle,
+      duration: Duration.quick,
       onComplete: () => dialog.destroy(),
     });
   }

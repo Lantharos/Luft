@@ -4,7 +4,7 @@ import Meta from 'gi://Meta';
 import Pango from 'gi://Pango';
 import St from 'gi://St';
 
-import { animateActor, Duration } from '../../../shared/motion/motion.js';
+import { animateActor, Curve, Duration } from '../../../shared/motion/motion.js';
 import { localized, t } from '../../../shared/i18n/index.js';
 import { ResizeArea } from '../edges/resizeArea.js';
 
@@ -32,7 +32,7 @@ function windowButton(name: string, labelId: string, activate: () => void): St.B
     scale_x: button.pressed ? PRESSED_SCALE : 1,
     scale_y: button.pressed ? PRESSED_SCALE : 1,
     duration: Duration.tap,
-    mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+    curve: Curve.gentle,
   }));
   button.connect('clicked', activate);
   return button;

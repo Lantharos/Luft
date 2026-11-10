@@ -5,7 +5,7 @@ import St from 'gi://St';
 import type { Rgb } from '../../appearance/color.js';
 import { tabletMode } from '../../desktop/panel/tablet/tabletMode.js';
 import { FontconfigSerial } from '../../shared/display/fontconfig.js';
-import { keyboards } from '../../system/devices/keyboards.js';
+import { keyboards } from '../../system/hardware/devices/keyboards.js';
 import { portalObject } from '../core/exported.js';
 
 const SETTINGS_XML = `<node><interface name="org.freedesktop.impl.portal.Settings">
@@ -20,8 +20,7 @@ const FONTCONFIG = 'org.gnome.fontconfig';
 const INTERFACE = 'org.gnome.desktop.interface';
 const A11Y_INTERFACE = 'org.gnome.desktop.a11y.interface';
 const KESTREL = 'com.lantharos.kestrel';
-// Only what apps need to look like the desktop, since the rest of Kestrel's settings are private
-const KESTREL_KEYS = ['rounded-window-corners', 'app-lines'];
+const APP_VISIBLE_KESTREL_KEYS = ['rounded-window-corners', 'app-lines'];
 const TABLET_MODE = 'tablet-mode';
 const KEYBOARD = 'keyboard-attached';
 const PEN = 'com.lantharos.kestrel.pen';
@@ -64,7 +63,7 @@ export class SettingsPortal {
       this.schemas.set(id, settings);
     }
     const kestrel = new Gio.Settings({ schema_id: KESTREL });
-    for (const key of KESTREL_KEYS) kestrel.connect(`changed::${key}`, () => this.emitValue(KESTREL, key));
+    for (const key of APP_VISIBLE_KESTREL_KEYS) kestrel.connect(`changed::${key}`, () => this.emitValue(KESTREL, key));
     this.schemas.set(KESTREL, kestrel);
     this.pen.connect('changed::hand', () => this.emitValue(KESTREL, PEN_HAND));
     this.shell.connect('notify::enable-animations', () => {
@@ -99,7 +98,7 @@ export class SettingsPortal {
   private namespace(namespace: string): Namespace {
     if (namespace === APPEARANCE) return this.appearance();
     if (namespace === FONTCONFIG) return { serial: new GLib.Variant('i', this.fontconfig.serial) };
-    const keys = namespace === KESTREL ? [...KESTREL_KEYS, TABLET_MODE, KEYBOARD, PEN_HAND] : this.schemas.get(namespace)!.settings_schema.list_keys();
+    const keys = namespace === KESTREL ? [...APP_VISIBLE_KESTREL_KEYS, TABLET_MODE, KEYBOARD, PEN_HAND] : this.schemas.get(namespace)!.settings_schema.list_keys();
     return Object.fromEntries(keys.map(key => [key, this.value(namespace, key)!]));
   }
 
@@ -109,7 +108,7 @@ export class SettingsPortal {
     if (namespace === KESTREL && key === KEYBOARD) return new GLib.Variant('b', keyboards.attached);
     if (namespace === KESTREL && key === PEN_HAND) return this.pen.get_value('hand');
     const settings = this.schemas.get(namespace);
-    if (!settings?.settings_schema.has_key(key) || (namespace === KESTREL && !KESTREL_KEYS.includes(key))) return null;
+    if (!settings?.settings_schema.has_key(key) || (namespace === KESTREL && !APP_VISIBLE_KESTREL_KEYS.includes(key))) return null;
     if (namespace === INTERFACE && key === 'enable-animations') return new GLib.Variant('b', this.shell.enable_animations);
     if (namespace === INTERFACE && key === 'gtk-theme' && this.highContrast()) return new GLib.Variant('s', 'HighContrast');
     return settings.get_value(key);

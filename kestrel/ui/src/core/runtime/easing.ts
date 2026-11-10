@@ -121,7 +121,7 @@ function velocityOf(velocity: EaseOptions['velocity'], property: string): number
   return typeof velocity === 'number' ? velocity : velocity?.[property];
 }
 
-function setCurve(transition: Clutter.Timeline, [x1, y1, x2, y2]: readonly number[]): void {
+export function setCurve(transition: Clutter.Timeline, [x1, y1, x2, y2]: readonly number[]): void {
   transition.set_cubic_bezier_progress(new Graphene.Point({ x: x1, y: y1 }), new Graphene.Point({ x: x2, y: y2 }));
 }
 
@@ -168,7 +168,7 @@ function springEase(animatable: Animatable, actor: Clutter.Actor | null, targets
 
 function easeActor(actor: Clutter.Actor, properties: EaseProperties): Promise<void> {
   const {
-    duration, delay, mode, curve, spring, velocity, epsilon, onComplete, onStopped,
+    duration, delay, curve, spring, velocity, epsilon, onComplete, onStopped,
     repeatCount = 0, autoReverse = false, animationRequired = false, ...targets
   } = properties;
 
@@ -180,8 +180,6 @@ function easeActor(actor: Clutter.Actor, properties: EaseProperties): Promise<vo
   if (delay !== undefined) setEasingDelay.call(actor, adjustAnimationTime(delay, { animationRequired }));
 
   const isReversed = autoReverse && (repeatCount + 1) % 2 === 0;
-
-  if (mode !== undefined) actor.set_easing_mode(mode);
 
   const easingDuration = actor.get_easing_duration();
   const { prepare, cleanup } = unredirectHooks(easingDuration);
@@ -213,7 +211,7 @@ function easeActor(actor: Clutter.Actor, properties: EaseProperties): Promise<vo
 
 function easeProperty(animatable: Animatable, name: string, target: unknown, options: EaseOptions): Promise<void> {
   const {
-    duration, delay, mode, curve, spring, velocity, epsilon, onComplete, onStopped,
+    duration, delay, curve, spring, velocity, epsilon, onComplete, onStopped,
     repeatCount = 0, autoReverse = false, animationRequired = false,
   } = options;
   const actor = animatable.get_actor();
@@ -245,7 +243,6 @@ function easeProperty(animatable: Animatable, name: string, target: unknown, opt
     auto_reverse: autoReverse,
     duration: length,
     delay: delay ? adjustAnimationTime(delay, { animationRequired }) : 0,
-    ...(mode ? { progress_mode: mode } : {}),
   });
   if (curve) setCurve(transition, curve);
   animatable.add_transition(name, transition);

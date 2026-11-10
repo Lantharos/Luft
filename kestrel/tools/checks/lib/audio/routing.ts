@@ -3,7 +3,7 @@ import {outcome} from '../processes.js';
 interface DumpedNode {
   id: number;
   type: string;
-  info?: {props?: Record<string, string | number | boolean>};
+  info?: {direction?: string; props?: Record<string, string | number | boolean>};
 }
 
 export type Match = Record<string, string>;
@@ -17,10 +17,6 @@ async function nodeId(match: Match): Promise<number | null> {
   return node?.id ?? null;
 }
 
-/**
- * Test sessions run PipeWire without a session manager, which is what gives streams their ports and links them. These
- * do its part: give a node ports, and link two ports.
- */
 export async function givePorts(match: Match, direction: 'Input' | 'Output', channels: 1 | 2, monitor = false): Promise<boolean> {
   const id = await nodeId(match);
   if (id === null) return false;
@@ -31,7 +27,6 @@ export async function givePorts(match: Match, direction: 'Input' | 'Output', cha
   return (await outcome(['pw-cli', 's', `${id}`, 'PortConfig', JSON.stringify(config)])).ok;
 }
 
-/** Takes a node away from the sound server, as when the server restarts. */
 export async function removeNode(match: Match): Promise<boolean> {
   const id = await nodeId(match);
   return id !== null && (await outcome(['pw-cli', 'destroy', `${id}`])).ok;
@@ -42,19 +37,30 @@ export async function link(from: string, to: string): Promise<boolean> {
   return ok || stderr.includes('File exists');
 }
 
-/** Gives the speakers their ports and their monitor, once per session. */
+export async function intoRecorder(source: Match, recorder: Match): Promise<boolean> {
+  if (!await givePorts(recorder, 'Input', 2)) return false;
+  const objects = JSON.parse((await outcome(['pw-dump'])).stdout || '[]') as DumpedNode[];
+  const matching = (match: Match) => objects.find(object => object.type === 'PipeWire:Interface:Node' &&
+    Object.entries(match).every(([key, value]) => object.info?.props?.[key] === value));
+  const ports = (node: DumpedNode | undefined, direction: string) => objects.filter(object => object.type === 'PipeWire:Interface:Port' &&
+    object.info?.direction === direction && object.info.props?.['node.id'] === node?.id && !object.info.props?.['port.monitor']);
+  const outputs = ports(matching(source), 'output');
+  const inputs = ports(matching(recorder), 'input');
+  if (!outputs.length || !inputs.length) return false;
+  const linked = await Promise.all(inputs.map((input, index) => link(`${outputs[Math.min(index, outputs.length - 1)].id}`, `${input.id}`)));
+  return linked.every(Boolean);
+}
+
 export async function speakers(): Promise<boolean> {
   return (await outcome(['pw-link', '-i'])).stdout.includes('speakers:playback_FL') || givePorts({'node.name': 'speakers'}, 'Input', 2, true);
 }
 
-/** Routes a playing node into the speakers. */
 export async function intoSpeakers(match: Match, port: string, channels: 1 | 2): Promise<boolean> {
   if (!await speakers() || !await givePorts(match, 'Output', channels)) return false;
   const ports = channels === 1 ? [`${port}_MONO`, `${port}_MONO`] : [`${port}_FL`, `${port}_FR`];
   return await link(ports[0], 'speakers:playback_FL') && await link(ports[1], 'speakers:playback_FR');
 }
 
-/** Lets Kestrel's sound levels hear the speakers. */
 export async function speakersIntoLevels(): Promise<boolean> {
   return await speakers() && await givePorts({'node.name': 'kestrel-sound-levels'}, 'Input', 1) &&
     await link('speakers:monitor_FL', 'kestrel-sound-levels:input_MONO');

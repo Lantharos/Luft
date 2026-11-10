@@ -1,6 +1,6 @@
 import GLib from 'gi://GLib';
 
-import { restartedAfterCrash } from '../../system/health/restarted.js';
+import { restartedAfterCrash } from '../../system/status/health/restarted.js';
 
 const CRASHES_BEFORE_OFF = 2;
 
@@ -11,10 +11,6 @@ interface Record {
 
 const decoder = new TextDecoder();
 
-/**
- * Remembers which extensions run, so that when Kestrel starts again after crashing, the extensions that were running
- * through two crashes in a row are named and kept off.
- */
 export class CrashGuard {
   private readonly file = GLib.build_filenamev([GLib.get_user_state_dir(), 'kestrel', 'extensions-running.json']);
   private readonly record: Record;
@@ -33,7 +29,6 @@ export class CrashGuard {
     }
   }
 
-  /** Extensions that were running through the crashes Kestrel just came back from. */
   get culprits(): string[] {
     return Object.entries(this.record.crashes).filter(([, crashes]) => crashes >= CRASHES_BEFORE_OFF).map(([id]) => id);
   }

@@ -2,10 +2,11 @@ import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
 
+import { setCurve } from '../../../core/runtime/easing.js';
 import type { Box } from '../../../shared/layout/placement.js';
+import { Curve, Duration } from '../../../shared/motion/motion.js';
 import { centerOn, clampScale, copyView, fitView, FULL_SIZE, magnifiedScale, zoomAround, type View } from './geometry.js';
 
-export const CAMERA_DURATION = 360;
 const MOMENTUM_DECAY_MS = 325;
 const MOMENTUM_MIN_SPEED = 0.02;
 const REVEAL_MARGIN = 32;
@@ -43,7 +44,7 @@ export class Camera {
   constructor(private readonly group: Clutter.Actor, private readonly host: CameraHost) {
     const stage = global.stage;
     this.tween = new Clutter.Timeline({ actor: stage, duration: 1 });
-    this.tween.set_progress_mode(Clutter.AnimationMode.EASE_OUT_CUBIC);
+    setCurve(this.tween, Curve.glide);
     this.tween.connect('new-frame', () => this.tweenFrame(this.tween.get_progress()));
     this.tween.connect('completed', () => this.tweenFrame(1));
     this.momentum = new Clutter.Timeline({ actor: stage, duration: 4000 });
@@ -160,7 +161,7 @@ export class Camera {
       target.x = Math.min(Math.max(view.x, box.x + box.width + margin - viewport.width / view.scale), box.x - margin);
       target.y = Math.min(Math.max(view.y, box.y + box.height + margin - viewport.height / view.scale), box.y - margin);
     }
-    this.animateTo(target, CAMERA_DURATION);
+    this.animateTo(target, Duration.travel);
   }
 
   panStep(directionX: number, directionY: number): void {
@@ -168,14 +169,14 @@ export class Camera {
     copyView(target, this.view);
     target.x += directionX * viewport.width / 3 / target.scale;
     target.y += directionY * viewport.height / 3 / target.scale;
-    this.animateTo(target, CAMERA_DURATION);
+    this.animateTo(target, Duration.travel);
   }
 
   zoomStep(factor: number): void {
     const { target, viewport } = this;
     copyView(target, this.view);
     this.zoomView(target, target.scale * factor, viewport.x + viewport.width / 2, viewport.y + viewport.height / 2, true);
-    this.animateTo(target, CAMERA_DURATION);
+    this.animateTo(target, Duration.travel);
   }
 
   destroy(): void {

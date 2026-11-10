@@ -1,7 +1,8 @@
 import type Cogl from 'gi://Cogl';
 import Gio from 'gi://Gio';
-import GLib from 'gi://GLib';
 import St from 'gi://St';
+
+import { developmentPath } from '../shared/apps/development.js';
 
 const SCHEME_SUFFIX = /-(light|dark)\.css$/;
 const SQUARE_CORNERS = 'square-corners.css';
@@ -23,7 +24,7 @@ let themed = false;
 let sourceMonitor: Gio.FileMonitor | null = null;
 
 function sourceDirectories(): Gio.File[] {
-  const source = GLib.getenv('KESTREL_THEME_DIR');
+  const source = developmentPath('KESTREL_THEME_DIR');
   return [
     ...source ? [Gio.File.new_for_path(source)] : [],
     Gio.File.new_for_uri('resource:///com/lantharos/kestrel/theme'),
@@ -99,7 +100,7 @@ export function updateTheme(): void {
 }
 
 function watchSources(): void {
-  const source = GLib.getenv('KESTREL_THEME_DIR');
+  const source = developmentPath('KESTREL_THEME_DIR');
   if (!source) return;
   sourceMonitor = Gio.File.new_for_path(source).monitor_directory(Gio.FileMonitorFlags.NONE, null);
   sourceMonitor.connect('changed', (_monitor, file, _other, event) => {

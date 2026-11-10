@@ -14,12 +14,6 @@ const STARTS = [EventType.BUTTON_PRESS, EventType.TOUCH_BEGIN];
 const MOVES = [EventType.MOTION, EventType.TOUCH_UPDATE];
 const ENDS = [EventType.BUTTON_RELEASE, EventType.TOUCH_END, EventType.TOUCH_CANCEL];
 
-/**
- * Turns a press, drag and release on the actor, with a pen, a finger or the
- * primary mouse button, into a stroke for the writer. Presses on buttons in
- * it stay theirs. The actor holds the input until the stroke ends, so a
- * stroke may leave it.
- */
 export function followInk(actor: Clutter.Actor, writer: InkWriter): void {
   let grab: Clutter.Grab | null = null;
   let sequence: Clutter.EventSequence | null = null;

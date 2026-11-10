@@ -9,7 +9,7 @@ import type { ContextMenus } from '../../menus/contextMenus.js';
 import { taskbarPreferences, type TaskbarMetrics } from '../preferences/taskbarPreferences.js';
 import { direction, isVertical, outward, toward, type Edge } from '../../../shared/layout/edge.js';
 import { taskbarAppIcon } from '../../../appearance/icons/appIcons.js';
-import { animateActor, liftIcon } from '../../../shared/motion/motion.js';
+import { animateActor, Curve, Duration, liftIcon } from '../../../shared/motion/motion.js';
 import { TaskbarDrop } from './taskbarDrop.js';
 import { AppIndicators } from './appIndicators.js';
 import { launcherEntries } from './launcherEntries.js';
@@ -18,7 +18,6 @@ import * as DND from '../../../shared/popups/dnd.js';
 
 const DOT_SIZE = 4;
 const DOT_GAP = 3;
-const RESIZE_DURATION = 220;
 const ENTRY_OFFSET = 18;
 
 interface AppItem {
@@ -78,7 +77,7 @@ export class Taskbar {
     this.metrics = metrics;
     for (const item of this.items.values()) {
       this.layoutItem(item);
-      if (!item.removing) animateActor(item.slot, { [this.lengthKey]: this.slotLength, duration: RESIZE_DURATION, mode: Clutter.AnimationMode.EASE_OUT_QUART });
+      if (!item.removing) animateActor(item.slot, { [this.lengthKey]: this.slotLength, duration: Duration.moderate, curve: Curve.settle });
       this.updateDots(item);
     }
   }
@@ -139,10 +138,6 @@ export class Taskbar {
     this.updateDots(item);
   }
 
-  /**
-   * Keeps every icon where it is while the pointer is over the taskbar, so what's under it stays what gets clicked.
-   * Apps that come and go meanwhile only take or give back their space once the pointer leaves.
-   */
   holdSteady(steady: boolean): void {
     this.steady = steady;
     if (steady || !this.deferred) return;
@@ -151,7 +146,6 @@ export class Taskbar {
     this.update(apps);
   }
 
-  /** Shows these apps in order; `immediate` is for changes people make on the taskbar itself, like pinning. */
   update(apps: Shell.App[], immediate = false): void {
     const wanted = new Set(apps.map(app => app.id));
     if (this.steady && this.initialized && !immediate) {
@@ -165,9 +159,9 @@ export class Taskbar {
       if (wanted.has(id) || item.removing) continue;
       item.removing = true;
       item.button.reactive = false;
-      animateActor(item.button, { opacity: 0, ...toward(this.edge, ENTRY_OFFSET), duration: 160 });
+      animateActor(item.button, { opacity: 0, ...toward(this.edge, ENTRY_OFFSET), duration: Duration.quick });
       animateActor(item.slot, {
-        [this.lengthKey]: 0, duration: 180, mode: Clutter.AnimationMode.EASE_IN_OUT_QUAD,
+        [this.lengthKey]: 0, duration: Duration.quick, curve: Curve.pulse,
         onComplete: () => {
           if (!item.removing) return;
           this.items.delete(id);
@@ -201,8 +195,8 @@ export class Taskbar {
       item.button.reactive = true;
       this.actor.set_child_at_index(item.slot, index);
       this.windowsChanged(item);
-      animateActor(item.slot, { [this.lengthKey]: this.slotLength, duration: this.initialized ? 220 : 0, mode: Clutter.AnimationMode.EASE_OUT_QUART });
-      animateActor(item.button, { opacity: 255, translation_x: 0, translation_y: 0, duration: this.initialized ? 220 : 0, mode: Clutter.AnimationMode.EASE_OUT_QUART });
+      animateActor(item.slot, { [this.lengthKey]: this.slotLength, duration: this.initialized ? Duration.moderate : 0, curve: Curve.settle });
+      animateActor(item.button, { opacity: 255, translation_x: 0, translation_y: 0, duration: this.initialized ? Duration.moderate : 0, curve: Curve.settle });
     });
     this.initialized = true;
     this.updateFocus();
@@ -213,7 +207,7 @@ export class Taskbar {
       if (item.removing) continue;
       const kept = wanted.has(id);
       item.button.reactive = kept;
-      animateActor(item.button, { opacity: kept ? 255 : 0, duration: 160 });
+      animateActor(item.button, { opacity: kept ? 255 : 0, duration: Duration.quick });
     }
     this.updateFocus();
   }
@@ -275,7 +269,7 @@ export class Taskbar {
       dot.visible = index < count;
       animateActor(dot, {
         [position]: start + index * (width + DOT_GAP), [size]: width,
-        duration: animate && dot.visible ? 180 : 0, mode: Clutter.AnimationMode.EASE_OUT_QUART,
+        duration: animate && dot.visible ? Duration.quick : 0, curve: Curve.settle,
       });
     });
   }

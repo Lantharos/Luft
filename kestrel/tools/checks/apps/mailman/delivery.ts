@@ -21,7 +21,7 @@ const SILENT = 3000;
 const ROUNDS = 3;
 const LIST_AREA = {x: 248, y: 60, width: 408, height: 240};
 const BELOW_INBOX = {x: 8, y: 150, width: 232, height: 260};
-const STORE = GLib.build_filenamev([GLib.get_user_data_dir(), 'mailman', 'mail.sqlite']);
+const STORE = GLib.build_filenamev([GLib.get_user_data_dir(), 'com.lantharos.mailman', 'mail.sqlite']);
 
 const elapsed = (since: number) => (GLib.get_monotonic_time() - since) / 1000;
 const median = (values: number[]) => values.toSorted((a, b) => a - b)[Math.floor(values.length / 2)];
@@ -79,9 +79,8 @@ async function deliveries(app: LuftApp, server: MailServer, from: string, to: st
 }
 
 function networkReturned() {
-  Gio.DBus.system.emit_signal(null, '/org/freedesktop/NetworkManager', 'org.freedesktop.DBus.Properties', 'PropertiesChanged',
-    new GLib.Variant('(sa{sv}as)', ['org.freedesktop.NetworkManager', {State: new GLib.Variant('u', 70)}, []]));
-  Gio.DBus.system.flush_sync(null);
+  Gio.DBus.session.emit_signal(null, '/org/freedesktop/portal/desktop', 'org.freedesktop.portal.NetworkMonitor', 'changed', null);
+  Gio.DBus.session.flush_sync(null);
 }
 
 async function afterCutOff(app: LuftApp, server: MailServer, subject: string, recover: () => void) {

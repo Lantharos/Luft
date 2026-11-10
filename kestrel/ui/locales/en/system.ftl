@@ -51,7 +51,7 @@ input-source-indicator = Input source: { $source }
 ## Hardware keys
 # Short notices shown in the middle of the screen when a key is pressed
 
-media-keys-airplane-mode-hardware = Airplane mode is on in hardware
+media-keys-airplane-mode-hardware = Airplane mode is on (hardware switch)
 media-keys-airplane-mode-on = Airplane mode on
 media-keys-airplane-mode-off = Airplane mode off
 media-keys-bluetooth-on = Bluetooth on
@@ -75,7 +75,7 @@ vpn-finish-in-browser = Finish signing in with your browser.
 vpn-certificate-untrusted = { $host } presented a certificate that can’t be verified ({ $reason }). Its fingerprint is { $fingerprint }.
 vpn-certificate-warning = Someone could be pretending to be this server. Only connect if you expected this.
 # Button that connects despite the untrusted certificate
-vpn-certificate-connect = Connect Anyway
+vpn-certificate-connect = Connect anyway
 
 # Field labels in the VPN sign-in dialog
 vpn-field-password = Password
@@ -95,7 +95,7 @@ battery-device-very-low-title = { $device } battery very low
 # $left is the battery-left sentence
 battery-device-low-body = { $left } Charge it soon.
 # $left is the battery-left sentence
-battery-device-very-low-body = { $left } Charge it now so it doesn't turn off.
+battery-device-very-low-body = { $left } Charge it now so it doesn’t turn off.
 
 # Names of accessories with a battery, used in place of a product name
 battery-device-mouse = Mouse
@@ -181,10 +181,10 @@ post-looking = Looking for devices
 post-nobody = No devices nearby
 post-nobody-hint = Open LocalSend on your phone or other computer, on the same network as this one.
 post-look-again = Look again
-post-public-network = This network is public, so devices nearby can't find this computer here.
-post-port-taken = Another app is using LocalSend's port, so devices can't send here.
+post-public-network = This network is public, so devices nearby can’t find this computer here.
+post-port-taken = Another app is using LocalSend’s port, so devices can’t send here.
 post-back = Back
-post-gone = That device isn't nearby anymore
+post-gone = That device isn’t nearby anymore
 post-send-files = Send files
 post-send-folder = Send a folder
 # Label of the field for text to send
@@ -248,7 +248,7 @@ post-some-arrived = { $count ->
     [one] Only one file arrived
    *[other] Only { $count } files arrived
 }
-post-nothing-arrived = The transfer from { $device } didn't finish
+post-nothing-arrived = The transfer from { $device } didn’t finish
 
 # Text someone sent
 post-sent-text = { $device } sent you text
@@ -258,7 +258,7 @@ post-open-link = Open link
 
 # Sending
 post-pin-title = Enter the PIN { $device } shows
-post-pin-wrong = That PIN wasn't right. Try again.
+post-pin-wrong = That PIN wasn’t right. Try again.
 post-pin = PIN
 post-send = Send
 post-sent-text-to = Sent text to { $device }
@@ -268,8 +268,8 @@ post-sent = { $count ->
 }
 post-declined = { $device } declined
 post-busy = { $device } is busy with another transfer
-post-unreachable = Couldn't reach { $device }
-post-send-failed = Sending to { $device } didn't finish
+post-unreachable = Couldn’t reach { $device }
+post-send-failed = Sending to { $device } didn’t finish
 
 ## Window access prompt
 # A program (often a coding assistant) asks to see or control the windows on the screen. Kestrel can't tell which program it is, only that it runs outside a sandbox.
@@ -286,18 +286,19 @@ peek-allow-until-quit = Allow until it quits
 # Shown in a terminal to the person or program that ran the peek command. "peek run" and "peek list" are commands and stay as they are.
 
 peek-error-declined-until-quit = The person using this computer declined this. The program can ask again after it quits.
-peek-error-not-allowed = The person using this computer didn't allow it
-peek-error-sandboxed = Sandboxed apps cannot see or use other windows
-peek-error-unknown-caller = The program asking ended or could not be recognized
-peek-error-no-caller = The session bus did not say which program is asking
+peek-error-not-allowed = The person using this computer didn’t allow it
+peek-error-sandboxed = Sandboxed apps can’t see or use other windows
+peek-error-unknown-caller = The program asking ended or couldn’t be recognized
+peek-error-developer-tools-off = Developer tools are off. Turn them on in Settings → Security to let programs see and use windows
+peek-error-no-caller = Couldn’t tell which program is asking
 peek-error-screen-busy = The screen is locked, or a system prompt is open on it. Try again once it is gone.
 peek-error-input-held = Someone is holding down keys or mouse buttons. Try again in a moment.
 peek-error-input-dropped = The input was stopped because something else was under the point or had the keyboard when it arrived
-peek-error-not-in-front = The window couldn't be brought to the front
+peek-error-not-in-front = The window couldn’t be brought to the front
 peek-error-covered = Something else covers that part of the window
 # $x and $y are the coordinates the person typed, $width and $height the size of the window's picture in pixels, all as plain digits
-peek-error-outside = { $x }, { $y } is outside the window's picture, which is { $width } × { $height }
-peek-error-nothing-to-capture = The window isn't showing anything to capture
+peek-error-outside = { $x }, { $y } is outside the window’s picture, which is { $width } × { $height }
+peek-error-nothing-to-capture = The window isn’t showing anything to capture
 peek-error-window-picture-late = The window’s picture wasn’t ready in time
 peek-error-screen-picture-late = The screen’s picture wasn’t ready in time
 # $id is a window number as peek list prints it
@@ -310,13 +311,13 @@ peek-error-no-window-in-time = No window opened within { $duration }
 peek-error-launch-not-started-by-peek = Only a program that peek run started itself can be launched
 peek-error-ended-while-starting = The program ended while it was starting
 # $program is a technical program name
-peek-error-launch-failed = systemd couldn't start { $program }
+peek-error-launch-failed = { $program } couldn’t be started
 # $handle is a short code that names a started program
 peek-error-unknown-handle = Nothing you started with peek run has the handle { $handle }, or it has quit
 # $key is what the person typed
-peek-error-unknown-key = { $key } isn't a key peek knows
+peek-error-unknown-key = { $key } isn’t a key peek knows
 # $modifier is what the person typed. ctrl, shift, alt and super are typed as they are.
-peek-error-unknown-modifier = { $modifier } isn't a modifier. Use ctrl, shift, alt or super.
+peek-error-unknown-modifier = { $modifier } isn’t a modifier. Use ctrl, shift, alt or super.
 peek-error-display-owner = This display belongs to another program
 peek-error-display-run = Programs in a hidden display are started by peek run
 # $handle and $requested are short codes that name started programs
@@ -325,47 +326,47 @@ peek-error-display-handle = This display was started as { $handle }, not { $requ
 ## Quick settings tiles
 
 # Quick settings tile title, keep short
-auto-rotate-title = Auto Rotate
+auto-rotate-title = Auto-rotate
 # Quick settings tile title, keep short
-dark-style-title = Dark Style
+dark-style-title = Dark style
 # Quick settings tile title, keep short
 do-not-disturb-title = Do Not Disturb
 # Quick settings tile title, keep short
-night-light-title = Night Light
+night-light-title = Night light
 # Quick settings tile title, keep short
-airplane-mode-title = Airplane Mode
+airplane-mode-title = Airplane mode
 
 ## Power mode
 
 # Quick settings tile title
-power-profile-title = Power Mode
+power-profile-title = Power mode
 # Header of the power mode menu in quick settings
-power-profile-header = Power Mode
+power-profile-header = Power mode
 # Screen-reader label of the arrow button next to the power mode tile
-power-profile-open-menu = Open power profiles menu
-power-profile-settings = Power Settings
+power-profile-open-menu = Open power mode menu
+power-profile-settings = Power settings
 # Power profile name, also shown under the tile title
 power-profile-performance = Performance
 # Power profile name, also shown under the tile title
 power-profile-balanced = Balanced
 # Power profile name, also shown under the tile title
-power-profile-power-saver = Power Saver
+power-profile-power-saver = Power saver
 # Shown under the tile title when the system uses a profile Kestrel doesn't know
 power-profile-custom = Custom
 
 ## Keep awake
 
 # Quick settings tile title and menu header: keeps the screen from turning off
-caffeine-title = Keep Awake
+caffeine-title = Keep awake
 # Screen-reader label of the arrow button next to the Keep Awake tile
 caffeine-open-menu = Open keep awake menu
 # Shown under the tile title. $time is a clock time, like 14:30
 caffeine-until = Until { $time }
 # Menu item: keep awake with no time limit
-caffeine-until-turned-off = Until Turned Off
-caffeine-30-minutes = 30 Minutes
-caffeine-1-hour = 1 Hour
-caffeine-2-hours = 2 Hours
+caffeine-until-turned-off = Until turned off
+caffeine-30-minutes = 30 minutes
+caffeine-1-hour = 1 hour
+caffeine-2-hours = 2 hours
 # Reason given to the session manager, shown where the system lists what keeps it awake
 caffeine-inhibit-reason = Kept awake from quick settings
 
@@ -379,11 +380,11 @@ brightness-open-menu = Open brightness menu
 ## Keyboard backlight
 
 # Quick settings tile title and menu header
-backlight-title = Keyboard Backlight
+backlight-title = Keyboard backlight
 # Screen-reader label of the arrow button next to the keyboard backlight tile
 backlight-open-menu = Open keyboard brightness menu
 # Screen-reader label of the keyboard brightness slider
-backlight-slider = Keyboard Brightness
+backlight-slider = Keyboard brightness
 # Keyboard backlight level, shown under its button
 backlight-off = Off
 # Keyboard backlight level, shown under its button
@@ -393,7 +394,7 @@ backlight-high = High
 
 ## Sound
 
-volume-sound-settings = Sound Settings
+volume-sound-settings = Sound settings
 # Screen-reader label of the speaker button on the volume slider (a verb)
 volume-mute = Mute
 # Screen-reader label of the speaker button on the volume slider (a verb)
@@ -401,13 +402,13 @@ volume-unmute = Unmute
 # Screen-reader label of the output volume slider
 volume-output-slider = Volume
 # Header of the sound output menu
-volume-output-title = Sound Output
+volume-output-title = Sound output
 # Screen-reader label of the arrow button next to the volume slider
 volume-output-open-menu = Open sound output menu
 # Screen-reader label of the microphone volume slider
 volume-input-slider = Microphone
 # Header of the sound input menu
-volume-input-title = Sound Input
+volume-input-title = Sound input
 # Screen-reader label of the arrow button next to the microphone slider
 volume-input-open-menu = Open sound input menu
 
@@ -417,7 +418,7 @@ volume-input-open-menu = Open sound input menu
 bluetooth-title = Bluetooth
 # Screen-reader label of the arrow button next to the Bluetooth tile
 bluetooth-open-menu = Open Bluetooth menu
-bluetooth-settings = Bluetooth Settings
+bluetooth-settings = Bluetooth settings
 # Shown next to a paired device in the Bluetooth menu, an action (verb)
 bluetooth-connect = Connect
 # Shown next to a connected device in the Bluetooth menu, an action (verb)
@@ -447,14 +448,14 @@ network-menu-connect-to = Connect to { $name }
 # Screen-reader label of an active connection. $name is a connection or device name like "MyPhone"
 network-menu-disconnect-from = Disconnect { $name }
 # Menu item that turns off a network device
-network-menu-turn-off = Turn Off
+network-menu-turn-off = Turn off
 # Screen-reader label of a Wi-Fi network. $name is the network name, $strength the signal strength from 0 to 100 (a percentage)
 network-menu-wifi-network = { $secure ->
-    [yes] { $name }, Secure, Signal strength { $strength }%
-   *[no] { $name }, Not secure, Signal strength { $strength }%
+    [yes] { $name }, secure, signal strength { $strength }%
+   *[no] { $name }, not secure, signal strength { $strength }%
 }
 # $name is the name of the Wi-Fi device sharing its connection
-network-menu-hotspot = { $name } Hotspot
+network-menu-hotspot = { $name } hotspot
 # Shown under a network tile title when several connections are active
 network-menu-connected-count = { $count ->
     [one] { $count } connected
@@ -463,24 +464,24 @@ network-menu-connected-count = { $count ->
 # Quick settings tile title and menu header
 network-menu-vpn = VPN
 network-menu-vpn-open-menu = Open VPN menu
-network-menu-vpn-settings = VPN Settings
+network-menu-vpn-settings = VPN settings
 # Menu header of the Wi-Fi tile
 network-menu-wifi = Wi-Fi
 network-menu-wifi-open-menu = Open Wi-Fi menu
 # Link to the network settings from the Wi-Fi menu
-network-menu-wifi-settings = All Networks
-network-menu-wired = Wired Connections
+network-menu-wifi-settings = All networks
+network-menu-wired = Wired connections
 network-menu-wired-open-menu = Open wired connections menu
-network-menu-wired-settings = Wired Settings
+network-menu-wired-settings = Wired settings
 # Menu header for internet shared from a phone over Bluetooth
-network-menu-tethers = Bluetooth Tethers
-network-menu-tethers-open-menu = Open Bluetooth tethers menu
+network-menu-tethers = Bluetooth tethering
+network-menu-tethers-open-menu = Open Bluetooth tethering menu
 # Quick settings tile title, "Tether" as in "Bluetooth Tether"
 network-menu-tether = Tether
-network-menu-tether-settings = Bluetooth Settings
-network-menu-mobile-connections = Mobile Connections
+network-menu-tether-settings = Bluetooth settings
+network-menu-mobile-connections = Mobile connections
 network-menu-mobile-open-menu = Open mobile connections menu
-network-menu-mobile-settings = Mobile Broadband Settings
+network-menu-mobile-settings = Mobile network settings
 # Quick settings tile title, "Mobile" as in "Mobile Broadband"
 network-menu-mobile = Mobile
 # Quick settings tile title and menu item for a wired network adapter
@@ -488,43 +489,43 @@ network-device-wired = Wired
 # A network adapter when there are several of the same kind. $kind is its kind, such as Wired; $name is its interface name, such as enp3s0
 network-device-named = { $kind } ({ $name })
 # Notification title shown when a network needs signing in on a web page
-network-menu-sign-in = Sign in to Network
+network-menu-sign-in = Sign in to the network
 network-menu-failed-title = Connection failed
-network-menu-failed-body = Activation of network connection failed
+network-menu-failed-body = The network connection couldn’t be set up. Try again.
 
 ## Location access dialog
 
-location-dialog-title = Allow location access
+location-dialog-title = Allow location access?
 # $appName is the name of the app asking for the location
-location-dialog-description = The app { $appName } wants to access your location
-location-dialog-info = Location access can be changed at any time from the privacy settings
+location-dialog-description = { $appName } wants to know where you are.
+location-dialog-info = You can change this anytime in Settings, under Privacy.
 # Button
-location-dialog-deny = Deny Access
+location-dialog-deny = Don’t allow
 # Button
-location-dialog-grant = Grant Access
+location-dialog-grant = Allow
 
 ## Thunderbolt notifications
 
 thunderbolt-unknown-title = Unknown Thunderbolt device
 thunderbolt-unknown-body = A new device was connected while you were away. Unplug it and plug it in again to start using it.
-thunderbolt-unauthorized-title = Unauthorized Thunderbolt device
-thunderbolt-unauthorized-body = A new device was connected and needs an administrator’s approval
-thunderbolt-error-title = Thunderbolt authorization error
+thunderbolt-unauthorized-title = Thunderbolt device needs approval
+thunderbolt-unauthorized-body = A new device was connected. An administrator has to approve it before it can be used.
+thunderbolt-error-title = The Thunderbolt device couldn’t be approved
 # $reason is the system's error message, usually in English
-thunderbolt-error-body = Could not authorize the Thunderbolt device: { $reason }
+thunderbolt-error-body = Unplug it and plug it in again to retry. Details: { $reason }
 
 ## App permission dialog, used when an app asks for access to something
 
 # Default button label when the app doesn't name its own
-access-dialog-deny = Deny
+access-dialog-deny = Don’t allow
 # Default button label when the app doesn't name its own
 access-dialog-allow = Allow
 
 ## Firewall question when an app starts listening for connections from other devices
 
 # Dialog title. $app is the app's name, or a program's name such as python3
-firewall-app-title = { $app } wants to accept connections from other devices on this network
-firewall-app-body = Allowing it lets phones, computers and other devices on your home networks connect to { $app }. If you’re not sure, choose Don’t allow: it’s safe, { $app } keeps working on this computer, and you can change your mind in Settings.
+firewall-app-title = { $app } wants to accept connections from other devices
+firewall-app-body = Allowing it lets phones, computers and other devices on your home networks, VPNs and virtual machines connect to { $app }. If you’re not sure, choose Don’t allow: it’s safe, { $app } keeps working on this computer, and you can change your mind in Settings.
 firewall-app-deny = Don’t allow
 firewall-app-allow = Allow
 
@@ -533,102 +534,102 @@ firewall-app-allow = Allow
 # Dialog title, keep it shorter than 30 characters
 display-change-title = Keep these display settings?
 display-change-countdown = { $seconds ->
-    [one] Settings changes will revert in { $seconds } second
-   *[other] Settings changes will revert in { $seconds } seconds
+    [one] Your changes will be undone in { $seconds } second
+   *[other] Your changes will be undone in { $seconds } seconds
 }
 # Button, keep short so it isn't cut off
-display-change-revert = Revert Settings
+display-change-revert = Revert settings
 # Button, keep short so it isn't cut off
-display-change-keep = Keep Changes
+display-change-keep = Keep changes
 
 ## Drive connected notification
 
 # $driveName is the name of a partition on an external drive
 autorun-connected = “{ $driveName }” connected
-autorun-ready = Disk can now be used
+autorun-ready = The drive is ready to use
 # Notification button. $appName is the name of an app
 autorun-open-with = Open with { $appName }
 
 ## Keyboard accessibility shortcuts
 
-kbd-a11y-slow-keys-on = Slow Keys Turned On
-kbd-a11y-slow-keys-off = Slow Keys Turned Off
-kbd-a11y-slow-keys-description = You just held down the Shift key for 8 seconds. This is the shortcut for the Slow Keys feature, which affects the way your keyboard works.
-kbd-a11y-sticky-keys-on = Sticky Keys Turned On
-kbd-a11y-sticky-keys-off = Sticky Keys Turned Off
-kbd-a11y-sticky-keys-on-description = You just pressed the Shift key 5 times in a row. This is the shortcut for the Sticky Keys feature, which affects the way your keyboard works.
-kbd-a11y-sticky-keys-off-description = You just pressed two keys at once, or pressed the Shift key 5 times in a row. This turns off the Sticky Keys feature, which affects the way your keyboard works.
+kbd-a11y-slow-keys-on = Slow keys turned on
+kbd-a11y-slow-keys-off = Slow keys turned off
+kbd-a11y-slow-keys-description = You just held down the Shift key for 8 seconds. This is the shortcut for slow keys, which changes the way your keyboard works.
+kbd-a11y-sticky-keys-on = Sticky keys turned on
+kbd-a11y-sticky-keys-off = Sticky keys turned off
+kbd-a11y-sticky-keys-on-description = You just pressed the Shift key 5 times in a row. This is the shortcut for sticky keys, which changes the way your keyboard works.
+kbd-a11y-sticky-keys-off-description = You just pressed two keys at once, or pressed the Shift key 5 times in a row. This turns off sticky keys, which changes the way your keyboard works.
 # Button that keeps the feature that was just turned on
-kbd-a11y-leave-on = Leave On
+kbd-a11y-leave-on = Leave on
 # Button that turns the feature back on after it was just turned off
-kbd-a11y-turn-on = Turn On
+kbd-a11y-turn-on = Turn on
 # Button that turns the feature back off after it was just turned on
-kbd-a11y-turn-off = Turn Off
+kbd-a11y-turn-off = Turn off
 # Button that keeps the feature that was just turned off
-kbd-a11y-leave-off = Leave Off
+kbd-a11y-leave-off = Leave off
 
 ## Audio device selection, shown after plugging something into the headphone jack
 
-audio-device-title = Select Audio Device
+audio-device-title = What did you plug in?
 audio-device-cancel = Cancel
-audio-device-sound-settings = Sound Settings
+audio-device-sound-settings = Sound settings
 audio-device-headphones = Headphones
 audio-device-headset = Headset
 audio-device-microphone = Microphone
 
 ## Keyboard shortcut inhibiting, asked when an app wants to receive system shortcuts itself
 
-inhibit-shortcuts-title = Allow inhibiting shortcuts
+inhibit-shortcuts-title = Send all keyboard shortcuts to this app?
 # $appName is an app name like "Settings"
-inhibit-shortcuts-app = The app { $appName } wants to inhibit shortcuts
-inhibit-shortcuts-unknown-app = An app wants to inhibit shortcuts
+inhibit-shortcuts-app = { $appName } wants to handle keyboard shortcuts itself. Luft’s own shortcuts won’t work while it does.
+inhibit-shortcuts-unknown-app = An app wants to handle keyboard shortcuts itself. Luft’s own shortcuts won’t work while it does.
 # $title is the title an app gave its window
-inhibit-shortcuts-titled-app = An app showing “{ $title }” wants to inhibit shortcuts
+inhibit-shortcuts-titled-app = An app showing “{ $title }” wants to handle keyboard shortcuts itself. Luft’s own shortcuts won’t work while it does.
 # $shortcut is a keyboard shortcut like "Super+Escape"
-inhibit-shortcuts-restore = You can restore shortcuts by pressing { $shortcut }
-inhibit-shortcuts-deny = Deny
+inhibit-shortcuts-restore = Press { $shortcut } to get your shortcuts back.
+inhibit-shortcuts-deny = Don’t allow
 inhibit-shortcuts-allow = Allow
 
 ## Unlocking encrypted drives
 
 # Checkbox for VeraCrypt volumes
-mount-hidden-volume = Hidden Volume
+mount-hidden-volume = Hidden volume
 # Checkbox for VeraCrypt volumes
-mount-windows-system-volume = Windows System Volume
+mount-windows-system-volume = Windows system volume
 # Checkbox for VeraCrypt volumes that are unlocked with key files
-mount-uses-keyfiles = Uses Keyfiles
+mount-uses-keyfiles = Uses key files
 # Keep the <i> tags around the app name. $appName is the disk utility's name
-mount-keyfiles-use-app = To unlock a volume that uses keyfiles, use the <i>{ $appName }</i> utility instead
+mount-keyfiles-use-app = To unlock a volume that uses key files, use <i>{ $appName }</i> instead
 # Keep the <i> tags around the app name
-mount-keyfiles-need-app = You need an external utility like <i>Disks</i> to unlock a volume that uses keyfiles
+mount-keyfiles-need-app = You need an app like <i>Disks</i> to unlock a volume that uses key files
 # Field label: the personal iterations multiplier of a VeraCrypt volume
-mount-pim-number = PIM Number
-mount-pim-invalid = The PIM must be a number or empty
+mount-pim-number = PIM (only if you set one)
+mount-pim-invalid = The PIM is a number. Leave it empty if you didn’t set one.
 mount-password = Password
-mount-remember-password = Remember Password
+mount-remember-password = Remember password
 mount-cancel = Cancel
 mount-unlock = Unlock
 # Button. $appName is the disk utility's name
 mount-open-app = Open { $appName }
-mount-wrong-password = Sorry, that didn’t work. Please try again.
-mount-unlock-failed = Unable to unlock volume
-mount-pim-unsupported = The installed udisks version does not support the PIM setting
+mount-wrong-password = That didn’t work. Try again.
+mount-unlock-failed = Couldn’t unlock the volume
+mount-pim-unsupported = This version of Luft can’t unlock volumes that use a PIM.
 
 ## Network passwords, asked when connecting needs one
 
-network-agent-auth-required = Authentication required
+network-agent-auth-required = Password needed
 # $networkName is a Wi-Fi network name
 network-agent-wifi-rejected = The saved password for “{ $networkName }” didn’t work. Enter it again.
 # $networkName is a Wi-Fi network name
-network-agent-wifi-secrets = Passwords or encryption keys are required to access the wireless network “{ $networkName }”
-network-agent-wps-hint = Alternatively you can connect by pushing the “WPS” button on your router
-network-agent-wired-title = Wired 802.1X authentication
-network-agent-dsl-title = DSL authentication
-network-agent-pin-title = PIN code required
-network-agent-pin-body = PIN code is needed for the mobile broadband device
+network-agent-wifi-secrets = Enter the password for the Wi-Fi network “{ $networkName }”.
+network-agent-wps-hint = You can also press the WPS button on your router.
+network-agent-wired-title = Sign in to the wired network
+network-agent-dsl-title = Sign in to your DSL connection
+network-agent-pin-title = SIM PIN needed
+network-agent-pin-body = Enter the PIN of your SIM card to use mobile data.
 network-agent-vpn-title = VPN password
 # $networkName is the name of a network connection
-network-agent-password-required = A password is required to connect to “{ $networkName }”
+network-agent-password-required = Enter the password to connect to “{ $networkName }”.
 # Button
 network-agent-connect = Connect
 network-agent-cancel = Cancel
@@ -648,21 +649,21 @@ network-agent-pin = PIN
 ## Screenshots and screen recording
 
 # Name shown on screenshot and recording notifications
-screenshot-source = Screen Capture
+screenshot-source = Screen capture
 # Tooltip and screen-reader label: capture part of the screen
-screenshot-area = Area Selection
+screenshot-area = Select an area
 # Tooltip and screen-reader label: capture a whole display
-screenshot-screen = Screen Selection
+screenshot-screen = Select a display
 # Tooltip and screen-reader label: capture one window
-screenshot-window = Window Selection
+screenshot-window = Select a window
 # Tooltip
-screenshot-take = Take Screenshot
+screenshot-take = Take screenshot
 # Tooltip
-screenshot-record = Record Screen
+screenshot-record = Record screen
 # Tooltip: include the mouse pointer in the capture
-screenshot-show-pointer = Show Pointer
+screenshot-show-pointer = Show pointer
 # Tooltip: after capturing, draw on the screenshot before it's saved
-screenshot-draw = Draw on Screenshot
+screenshot-draw = Draw on screenshot
 # Tooltip of the shutter button, a verb
 screenshot-capture = Capture
 # Tooltips and screen-reader labels of the tools for drawing on a screenshot
@@ -672,31 +673,31 @@ screenshot-markup-eraser = Eraser
 screenshot-markup-crop = Crop
 screenshot-markup-undo = Undo
 # Tooltip: copy the drawn-on screenshot and save it to Screenshots
-screenshot-markup-save = Copy and Save
+screenshot-markup-save = Copy and save
 # Screen-reader label of the button that closes the screenshot tool
 screenshot-close = Close
 # Name of the folder in the home folder where screen recordings are saved
 screenshot-screencasts-folder = Screencasts
 # File name of a screen recording. $date and $time are filled in when recording starts, like "2013-07-17" and "10-00-46"
-screenshot-screencast-file = Screencast From { $date } { $time }
+screenshot-screencast-file = Screen recording from { $date } { $time }
 # Name of the folder in Pictures where screenshots are saved
 screenshot-screenshots-folder = Screenshots
 # File name of a screenshot. $timestamp is like "2017-05-21 12-24-03"
-screenshot-file = Screenshot From { $timestamp }
-screenshot-screencast-recorded = Screencast Recorded
-screenshot-screencast-start-failed = Screencast Failed to Start
-screenshot-screencast-out-of-space = Screencast Failed: Out of Disk Space
-screenshot-screencast-try-again = Screencast Failed, Please Try Again
-screenshot-screencast-failed = Screencast Failed
-screenshot-screencast-stopped = Screencast Stopped
+screenshot-file = Screenshot from { $timestamp }
+screenshot-screencast-recorded = Screen recording saved
+screenshot-screencast-start-failed = The screen recording couldn’t start
+screenshot-screencast-out-of-space = The screen recording stopped because the disk is full
+screenshot-screencast-try-again = The screen recording failed. Try again.
+screenshot-screencast-failed = The screen recording failed
+screenshot-screencast-stopped = The screen recording stopped
 # Body of the notification shown when a recording stops because its video was deleted or moved
 screenshot-screencast-file-removed = Its video was deleted or moved while recording.
 # Body of a failed recording whose video can’t be written to disk
 screenshot-screencast-write-failed = The video couldn’t be saved.
-screenshot-screencast-view = Click here to view the video
+screenshot-screencast-view = Click to watch it
 # Notification button that opens the file manager at the saved file
 screenshot-show-in-rover = Show in Rover
-screenshot-captured = Screenshot Captured
+screenshot-captured = Screenshot taken
 screenshot-captured-body = You can paste the image from the clipboard
 
 ## System updates
@@ -709,7 +710,7 @@ updates-ready-body = Restart when it suits you to install them.
 
 ## Extensions
 # Menu item of an extension's quick settings tile or taskbar button; $name is the extension's name
-extension-menu-settings = { $name } Settings
+extension-menu-settings = { $name } settings
 # Button that closes a small window an extension opened
 extension-popup-close = Close
 # Notification title when Kestrel switched an extension off by itself; $name is the extension's name
@@ -719,14 +720,14 @@ extension-turned-off-crash = The desktop restarted twice while it was running. Y
 # Notification title when Kestrel took one effect of an extension off the screen by itself; $effect is the effect's name
 screen-effect-off-title = { $effect } was turned off
 # The effect's shader doesn't work on this computer; $name is the extension's name
-screen-effect-off-shader = Its shader doesn't work on this computer. { $name } keeps running without it.
+screen-effect-off-shader = It doesn’t work with this computer’s graphics. { $name } keeps running without it.
 # The effect made the desktop very slow; $name is the extension's name
 screen-effect-off-slow = It made the desktop very slow. { $name } keeps running without it.
 # Notification after the shortcut turned off everything extensions draw over windows and the screen
 screen-effects-off-title = Screen effects are off
 screen-effects-off-body = They stay off until you turn them back on.
 # Button on that notification
-screen-effects-off-action = Turn Back On
+screen-effects-off-action = Turn back on
 # Notification after an extension stopped holding notifications back, such as at the end of a work session; $name is the extension's name
 extension-held-title = While { $name } held notifications back
 # $count is how many notifications came in, $apps lists the apps they came from, such as "Mailman and Chat"

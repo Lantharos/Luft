@@ -3,9 +3,9 @@ import type Meta from 'gi://Meta';
 import St from 'gi://St';
 
 import * as Main from '../../core/main.js';
+import { Curve, Duration } from '../../shared/motion/motion.js';
 import type { FocusTracker } from './focusTracker.js';
 
-export const KEYBOARD_ANIMATION_TIME = 150;
 const FIELD_CLEARANCE = 16;
 
 function focusedField(): Clutter.Actor | null {
@@ -25,8 +25,8 @@ function chromeOf(actor: Clutter.Actor): Clutter.Actor | null {
 function easeLift(chrome: Clutter.Actor, translation: number): void {
   chrome.ease({
     translation_y: translation,
-    duration: KEYBOARD_ANIMATION_TIME,
-    mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+    duration: Duration.quick,
+    curve: Curve.gentle,
   });
 }
 
@@ -125,8 +125,8 @@ export class FocusLift {
 
     windowActor.ease({
       y: finalY,
-      duration: KEYBOARD_ANIMATION_TIME,
-      mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+      duration: Duration.quick,
+      curve: Curve.gentle,
       onStopped: () => {
         window.disconnect(winUnmanagedId);
         if (unmanaged) return;

@@ -2,8 +2,10 @@
 
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 tools="$root/kestrel/tools"
-built_tools="$root/kestrel/run/tools"
-built_extensions="$root/kestrel/run/extensions"
+builds="$root/kestrel/run/builds"
+built_tools="${KESTREL_BUILT:-}/tools"
+built_extensions="${KESTREL_BUILT:-}/extensions"
+session_dir="${KESTREL_SESSION_DIR:-$root/kestrel/run/session}"
 build="${KESTREL_BUILD:-$root/kestrel/build}"
 compositor_prefix="${KESTREL_COMPOSITOR:-$root/kestrel/run/mutter-install}"
 compositor="$compositor_prefix/lib"
@@ -32,9 +34,27 @@ require_build() {
   fi
 }
 
+remove_unused_builds() {
+  find "$builds" -mindepth 1 -maxdepth 1 -type d -exec flock --nonblock {} rm -rf {} \;
+}
+
+claim_new_build() {
+  local built builds_lock
+  mkdir -p "$builds"
+  exec {builds_lock}< "$builds"
+  flock "$builds_lock"
+  remove_unused_builds
+  built="$(mktemp -d -p "$builds")"
+  exec {built_lock}< "$built"
+  flock --shared "$built_lock"
+  exec {builds_lock}<&-
+  export KESTREL_BUILT="$built"
+  built_tools="$built/tools"
+  built_extensions="$built/extensions"
+}
+
 build_extensions() {
   local source id
-  rm -rf "$built_extensions"
   for source in "$root"/extensions/*/build.sh; do
     id="$(sed -n 's/^id = "\(.*\)"$/\1/p' "${source%/*}/extension.toml")"
     "$source" "$built_extensions/$id"
@@ -43,10 +63,11 @@ build_extensions() {
 
 build_helpers() {
   glib-compile-schemas "$build/data"
-  bun "$tools/build.ts" "$built_tools"
+  claim_new_build
+  bun "$tools/build.ts" "$KESTREL_BUILT"
   build_extensions
   (cd "$root" && cargo build --release --quiet -p kestrel-session-manager -p kestrel-settings -p kestrel-search -p kestrel-portal -p kestrel-post -p luft-pinentry \
-    -p kestrel-openconnect -p kestrel-greeter-service -p kestrel-wrapper -p peek -p luft-accounts-service -p luft-speech-service)
+    -p kestrel-openconnect -p kestrel-greeter-service -p kestrel-wrapper -p peek -p luft-accounts-service -p luft-speech-service --features luft-speech-service/recorded-audio)
 }
 
 dbus_service() {
@@ -97,7 +118,8 @@ use_fixture_desktop() {
   export XDG_DATA_DIRS="$fixture:$XDG_DATA_DIRS"
   printf '%s\n' "['com.lantharos.rover.desktop', 'com.lantharos.draft.desktop', 'com.lantharos.mailman.desktop', 'com.lantharos.tern.desktop', 'com.lantharos.schelf.desktop', 'com.lantharos.settings.desktop']" > "$session/favorites.txt"
   printf '/dev/luft/system / btrfs rw 0 0\n/dev/luft/travel %s exfat rw 0 0\n' "$drives/TRAVEL" > "$fixture/mounts"
-  mkdir -p "$fixture/flatpak"
+  mkdir -p "$fixture/flatpak" "$XDG_DATA_HOME/sabine"
+  printf '{"login_autostart":false}' > "$XDG_DATA_HOME/sabine/service-policy.json"
   export LUFT_MOUNTS="$fixture/mounts" LUFT_SAMPLE_SYSTEM=1 FLATPAK_SYSTEM_DIR="$fixture/flatpak" KESTREL_LUFT_APPS="$(realpath -m "$root/target/release")"
 }
 
@@ -126,7 +148,6 @@ use_luft_defaults() {
   unset LANGUAGE "${!LC_@}"
 }
 
-# A new account gets the extensions Luft preinstalls once, the way Schelf installs them at its first sign-in
 preinstall_extensions() {
   local installed="$session/data/luft/extensions" record="$session/state/luft/preinstalled" id
   mkdir -p "$installed" "${record%/*}"

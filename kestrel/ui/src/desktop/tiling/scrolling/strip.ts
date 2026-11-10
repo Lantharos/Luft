@@ -149,7 +149,6 @@ export class Strip<T> {
     column.width = PRESET_WIDTHS.find(width => width > column.width + PRESET_TOLERANCE) ?? PRESET_WIDTHS[0]!;
   }
 
-  /** Makes the focused column as wide as the view, keeping its gaps, or gives it back the width it had. */
   maximize(): void {
     const column = this.columns[this.focused];
     if (!column) return;
@@ -162,7 +161,6 @@ export class Strip<T> {
     column.width = 1;
   }
 
-  /** Widens the focused column over the space the other columns fully in view leave, so together they fill it. */
   expand(): void {
     const column = this.columns[this.focused];
     if (!column) return;
@@ -257,16 +255,14 @@ export class Strip<T> {
   }
 
   snap(offset: number): Snap {
-    // Edges that would scroll past either end of the strip land on that end instead
     const furthest = Math.max(0, this.totalWidth - this.viewWidth);
-    const within = (candidate: number) => Math.min(furthest, Math.max(0, candidate));
+    const withinStripEnds = (candidate: number) => Math.min(furthest, Math.max(0, candidate));
     let best: Snap = { offset: 0, column: 0 };
     for (let index = 0; index < this.columns.length; index++) {
       const left = this.columnStart(index);
       const right = left + this.columnWidth(this.columns[index]!) - this.viewWidth;
-      for (const candidate of [within(left), within(right)]) {
+      for (const candidate of [withinStripEnds(left), withinStripEnds(right)]) {
         const distance = Math.abs(candidate - offset) - Math.abs(best.offset - offset);
-        // At the end of the strip, the last of the columns sharing that edge is the one in view
         if (distance < 0 || (distance === 0 && candidate === furthest && furthest > 0)) best = { offset: candidate, column: index };
       }
     }

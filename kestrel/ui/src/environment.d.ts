@@ -9,7 +9,6 @@ export interface EaseSpring {
 export interface EaseOptions {
   duration?: number;
   delay?: number;
-  mode?: Clutter.AnimationMode;
   repeatCount?: number;
   autoReverse?: boolean;
   animationRequired?: boolean;

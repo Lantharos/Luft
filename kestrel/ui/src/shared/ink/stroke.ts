@@ -62,7 +62,6 @@ export class Stroke {
     return false;
   }
 
-  /** Paints the stroke opaque; the caller applies the style's opacity to the result. */
   paint(cr: Cairo.Context): void {
     const [r, g, b] = this.style.color;
     cr.setSourceRGBA(r, g, b, 1);
@@ -87,7 +86,6 @@ export class Stroke {
     }
   }
 
-  /** Smooths the polyline from sample `from` to `to` through the midpoints between samples. */
   private trace(cr: Cairo.Context, from: number, to: number): void {
     const points = this.samples;
     const mid = (i: number) => i <= 0 ? points[0] : i >= points.length - 1 ? points[points.length - 1]

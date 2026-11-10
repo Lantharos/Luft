@@ -6,7 +6,6 @@
 
 	interface Props {
 		at: Point;
-		/** Leaves focus where it is, for menus over a field that settles when it loses focus. */
 		keepFocus?: boolean;
 		onclose: () => void;
 		children: Snippet;

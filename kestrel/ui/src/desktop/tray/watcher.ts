@@ -105,7 +105,6 @@ export class StatusNotifierWatcher {
     return count;
   }
 
-  /** The connection behind a name an app gave, so the item goes when that connection does. */
   private async nameOwner(name: string): Promise<string | null> {
     const reply = await busCall('org.freedesktop.DBus', '/org/freedesktop/DBus', 'org.freedesktop.DBus', 'GetNameOwner',
       new GLib.Variant('(s)', [name]), this.cancellable, 1000);

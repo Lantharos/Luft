@@ -4,12 +4,12 @@ import St from 'gi://St';
 import { t } from '../../../shared/i18n/index.js';
 import { list, row } from '../../core/rows.js';
 
-export function rememberRow(app: string): St.Button {
-  return row({ icon: 'document-open-recent-symbolic', title: t('screen-share-remember'), subtitle: t('screen-share-remember-description', { appName: app }), checked: true });
+export function rememberRow(app: string, checked: boolean): St.Button {
+  return row({ icon: 'document-open-recent-symbolic', title: t('screen-share-remember'), subtitle: t('screen-share-remember-description', { appName: app }), checked });
 }
 
 export function clipboardRow(): St.Button {
-  return row({ icon: 'edit-paste-symbolic', title: t('screen-share-clipboard'), subtitle: t('screen-share-clipboard-description'), checked: true });
+  return row({ icon: 'edit-paste-symbolic', title: t('screen-share-clipboard'), subtitle: t('screen-share-clipboard-description'), checked: false });
 }
 
 export function group(title: string, rows: St.Widget[]): St.Widget {

@@ -44,7 +44,6 @@ async function sweep(from: Point, to: Point, frames: number) {
   }
 }
 
-/** Follows how far `actor` swings during `action`. */
 async function furthest(actor: Clutter.Actor, action: () => Promise<void>) {
   let most = 0;
   const watch = global.stage.connect('after-paint', () => { most = Math.max(most, swing(actor)); });
@@ -429,7 +428,6 @@ async function checkDisplaysAndTaskbar() {
   await eventually(() => labelled('Campfire').length > 3, 'putting everything back rebuilds them');
 }
 
-/** Nothing of Playthings changes and nothing paints, however long it's left. */
 async function resting(name: string, milliseconds: number, what: string) {
   const {paints, partsChanged} = await steady(name, milliseconds, ({paints: measured}) => measured <= QUIET_PAINTS);
   require(!partsChanged, `${what}: no part changes`);

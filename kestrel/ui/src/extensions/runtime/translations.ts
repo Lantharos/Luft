@@ -18,7 +18,6 @@ function messages(folder: string): string {
   }
 }
 
-/** An extension's messages from `locales/<language>/*.ftl`, in Kestrel's language with English filling the gaps. */
 export class Translations {
   private readonly chosen: Catalog;
   private readonly english: Catalog;

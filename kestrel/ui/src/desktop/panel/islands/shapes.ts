@@ -5,7 +5,6 @@ import type { Edge } from '../../../shared/layout/edge.js';
 import type { TaskbarLayout } from '../preferences/taskbarPreferences.js';
 import type { IslandSet } from './islandSet.js';
 
-/** What shows of the taskbar on screen, in stage coordinates: the bar, or each separate island, with its rounding. */
 export interface IslandShape extends Box {
   edge: Edge;
   radius: number;
@@ -17,7 +16,6 @@ export function taskbarShapesChanged(): void {
   for (const listener of shapeListeners) listener();
 }
 
-/** Runs `changed` whenever the bar or an island is laid out somewhere else. */
 export function watchTaskbarShapes(changed: () => void): () => void {
   shapeListeners.add(changed);
   return () => shapeListeners.delete(changed);
@@ -29,10 +27,6 @@ function boxOf(actor: St.Widget): Box {
   return { x, y, width, height };
 }
 
-/**
- * The one place that says where the taskbar is: what extensions draw around and collide with, and what surfaces
- * open beside. It follows the islands as they move, hide and glide.
- */
 export class IslandShapes {
   constructor(private readonly panel: St.Widget, private readonly islands: IslandSet, private readonly screen: () => TaskbarLayout,
     private readonly barRadius: () => number) {}
@@ -52,14 +46,12 @@ export class IslandShapes {
       });
   }
 
-  /** The actors of what `shapes` lists. */
   anchors(): { actor: St.Widget; radius: number }[] {
     const screen = this.screen();
     if (screen.joined) return [{ actor: this.panel, radius: this.barRadius() }];
     return this.islands.islands.map(({ actor }) => ({ actor, radius: screen.metrics.radius }));
   }
 
-  /** The taskbar along the dock's edge as one box: the bar, or around the islands on that edge. */
   bar(): Box | null {
     const edge = this.screen().edge;
     const along = this.shapes().filter(shape => shape.edge === edge);

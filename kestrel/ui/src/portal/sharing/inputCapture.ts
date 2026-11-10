@@ -62,7 +62,7 @@ export class InputCaptureSession extends PeerSession {
     try {
       const capabilities = (option<number>(options, 'capabilities') ?? 0) & ALL_DEVICES;
       const persist = persistMode(options);
-      const stored = storedChoice<[number, boolean]>(options, STORED_CAPTURE, this.appId);
+      const stored = await storedChoice<[number, boolean]>(options, STORED_CAPTURE, 'input', this.appId);
       const [response, choice] = stored
         ? [SUCCESS, { clipboard: stored.values[1] && this.clipboardRequested, remember: true }]
         : await this.ask(handle, persist);
@@ -70,9 +70,12 @@ export class InputCaptureSession extends PeerSession {
       if (!this.active) return [ENDED, {}];
       const granted = stored ? capabilities & stored.values[0] : capabilities;
       await this.open(granted, choice.clipboard);
+      const remembered = await persisted(choice.remember ? persist : DONT_PERSIST, STORED_CAPTURE, 'input', this.appId, stored, [granted, !!this.clipboard]);
+      if (!this.active) return [ENDED, {}];
+      this.granted('input', remembered.grant);
       const results: Options = { capabilities: new GLib.Variant('u', granted) };
       if (this.clipboardRequested) results.clipboard_enabled = new GLib.Variant('b', !!this.clipboard);
-      return [SUCCESS, { ...results, ...persisted(choice.remember ? persist : DONT_PERSIST, STORED_CAPTURE, this.appId, stored?.created, [granted, !!this.clipboard]) }];
+      return [SUCCESS, { ...results, ...remembered.results }];
     } catch (error) {
       console.warn(`Couldn't let ${this.appId || 'an app'} capture input: ${(error as Error).message}`);
       return [ENDED, {}];

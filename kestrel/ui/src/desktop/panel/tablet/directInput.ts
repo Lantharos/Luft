@@ -36,7 +36,6 @@ class DirectInput {
     this.watchers.forEach(watcher => watcher());
   }
 
-  /** Whether people touch or draw on this screen itself, such as a pen display or a touch monitor, apart from a laptop's own screen or a mirrored one. */
   on(monitorIndex: number): boolean {
     return this.screens.has(monitorIndex);
   }

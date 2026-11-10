@@ -11,7 +11,6 @@ export interface PaletteItem {
 	labelMatches?: number[];
 	detailMatches?: number[];
 	checked?: boolean;
-	/** Draws a picture of the item at the start of its row, such as a page a search hit is on. */
 	preview?: Attachment<HTMLElement>;
 	run: () => void;
 }

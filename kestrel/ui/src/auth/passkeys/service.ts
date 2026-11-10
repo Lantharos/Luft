@@ -1,7 +1,6 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
-import type { Context } from '../../context.js';
 import { verifiedName } from '../../shared/apps/identity.js';
 import { callerOwns } from '../../shared/dbus/processes.js';
 import { refuseSandboxed } from '../../shared/dbus/sandbox.js';
@@ -32,7 +31,7 @@ export class PasskeyPrompts {
   private readonly watches = new Map<string, number>();
   private serial = 0;
 
-  constructor(private readonly context: Pick<Context, 'sessionMode'>) {
+  constructor() {
     this.exported.export(Gio.DBus.session, PATH);
     this.nameId = Gio.bus_own_name_on_connection(Gio.DBus.session, BUS_NAME, Gio.BusNameOwnerFlags.NONE, null, null);
   }
@@ -42,10 +41,6 @@ export class PasskeyPrompts {
     if (await refuseSandboxed(invocation, 'ask about passkeys')) return;
     if (!await callerOwns(invocation, AGENT)) {
       invocation.return_dbus_error('org.freedesktop.DBus.Error.AccessDenied', 'Only Luft Passkeys can ask about passkeys');
-      return;
-    }
-    if (this.context.sessionMode.isLocked) {
-      invocation.return_dbus_error('org.freedesktop.DBus.Error.AccessDenied', 'The screen is locked');
       return;
     }
     let request: Request;
@@ -60,7 +55,7 @@ export class PasskeyPrompts {
     this.watch(sender);
     if (!prompt.open()) {
       prompt.finish();
-      invocation.return_dbus_error('org.freedesktop.DBus.Error.Failed', 'The prompt could not be shown');
+      invocation.return_dbus_error('org.freedesktop.DBus.Error.AccessDenied', 'The screen is locked');
       return;
     }
     invocation.return_value(new GLib.Variant('(o)', [prompt.path]));

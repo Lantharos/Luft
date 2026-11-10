@@ -2,7 +2,6 @@ import GdkPixbuf from 'gi://GdkPixbuf';
 
 const encoder = new TextEncoder();
 
-/** A blank A4 page as a PDF, laid out with the offsets PDF readers look for. */
 export function onePagePdf(): Uint8Array {
   const objects = [
     '<< /Type /Catalog /Pages 2 0 R >>',
@@ -21,7 +20,6 @@ export function onePagePdf(): Uint8Array {
   return encoder.encode(text);
 }
 
-/** A small picture in one colour, saved as a PNG. */
 export function savePicture(path: string): void {
   const picture = GdkPixbuf.Pixbuf.new(GdkPixbuf.Colorspace.RGB, false, 8, 320, 200)!;
   picture.fill(0x3d6fb6ff);

@@ -47,8 +47,8 @@ export async function run() {
 
   const recent = await takeScreenshot();
   const folder = GLib.path_get_dirname(recent);
-  const old = agedCopy(recent, folder, 'Screenshot From 2026-08-01 09-30-00.png', 40);
-  const young = agedCopy(recent, folder, 'Screenshot From 2026-10-20 18-05-00.png', 20);
+  const old = agedCopy(recent, folder, 'Screenshot from 2026-08-01 09-30-00.png', 40);
+  const young = agedCopy(recent, folder, 'Screenshot from 2026-10-20 18-05-00.png', 20);
   const kept = agedCopy(recent, GLib.build_filenamev([pictures, 'Holiday']), 'Beach.png', 40);
 
   await withApp('settings', [], async app => (await showEnd(app, 'privacy')).save('settings-privacy-cleanup-dark'));

@@ -30,7 +30,7 @@ export async function chooseDevices(dismissal: Dismissal, appId: string, devices
     const rows = devices.map(device => row({ icon: 'media-removable-symbolic', ...describe(device), checked: true }));
     dialog.content.add_child(list(rows, rows.length > 5));
     const [, allow] = dialog.buttons([
-      { label: t('portal-cancel'), action: dialog.cancel },
+      { label: t('portal-deny'), action: dialog.cancel },
       {
         label: t('portal-allow'), default: true, action: () => {
           chosen = devices.filter((_, index) => rows[index].checked).map(([id]) => id);

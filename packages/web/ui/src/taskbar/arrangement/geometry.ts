@@ -17,7 +17,6 @@ export interface Placed {
 	length: number;
 }
 
-/** Where islands go along a span: at its start, at its end, and centred on `middle` between them without overlapping. */
 export function placeAlong(span: Span, items: Placed[], gap: number, middle = (span.start + span.end) / 2): number[] {
 	const ends = { start: span.start, end: span.end };
 	for (const { along, length } of items) {
@@ -36,7 +35,6 @@ export interface IslandFrame {
 	width: number;
 	height: number;
 	thickness: number;
-	/** Space between the screen edge and the islands, and between neighbouring islands. */
 	margin: number;
 	rightToLeft: boolean;
 }
@@ -74,10 +72,6 @@ function layEdge(edge: Edge, islands: { spot: Spot; length: number }[], span: Sp
 	});
 }
 
-/**
- * Lays out separate islands on a screen. Islands on the top and bottom keep the corners; an island on the left or
- * right that would run into one of theirs moves along its edge until it clears it.
- */
 export function layIslands(islands: { spot: Spot; length: number }[], frame: IslandFrame): IslandBox[] {
 	const on = (edge: Edge) => islands.filter(({ spot }) => edgeOf(spot) === edge);
 	const full = (edge: Edge): Span => {
@@ -102,7 +96,6 @@ export function layIslands(islands: { spot: Spot; length: number }[], frame: Isl
 	return boxes;
 }
 
-/** The twelve spots drawn as targets on a screen, each as long as `length`, laid out like islands so none overlap. */
 export function spotTargets(frame: IslandFrame, length: number): IslandBox[] {
 	return layIslands(
 		SPOTS.map((spot) => ({ spot, length })),
@@ -112,7 +105,6 @@ export function spotTargets(frame: IslandFrame, length: number): IslandBox[] {
 
 const middleOf = ({ x, y, width, height }: Box): [number, number] => [x + width / 2, y + height / 2];
 
-/** The target nearest a point, if it's within `reach`. */
 export function spotNear(targets: IslandBox[], x: number, y: number, reach: number): Spot | null {
 	let nearest: Spot | null = null;
 	let distance = reach;
@@ -127,7 +119,6 @@ export function spotNear(targets: IslandBox[], x: number, y: number, reach: numb
 	return nearest;
 }
 
-/** The target whose middle lies nearest in the direction `[dx, dy]` from `spot`'s, for moving with arrow keys. */
 export function spotToward(targets: IslandBox[], spot: Spot, [dx, dy]: [number, number]): Spot | null {
 	const [fromX, fromY] = middleOf(targets.find((target) => target.spot === spot)!);
 	let best: Spot | null = null;

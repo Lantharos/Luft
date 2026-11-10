@@ -18,7 +18,6 @@ function boxOf(actor: Clutter.Actor): Box {
   return { x, y, width, height };
 }
 
-/** Where a handle sits: on the side of its island that faces the middle of the screen. */
 function handleBox({ x, y, width, height }: Box, edge: Edge): Box {
   switch (edge) {
     case 'bottom': return { x: x + (width - HANDLE_LENGTH) / 2, y: y - HANDLE_GAP - HANDLE_DEPTH, width: HANDLE_LENGTH, height: HANDLE_DEPTH };
@@ -37,7 +36,6 @@ const MOVES = ['notify::allocation', 'notify::translation-x', 'notify::translati
 const onMove = (actor: Clutter.Actor, moved: () => void, tracker: Clutter.Actor) =>
   actor.connectObject(...MOVES.flatMap(signal => [signal, moved]), tracker);
 
-/** A grip beside each island to move it by, and a ring around what the keyboard has picked. */
 export class Handles {
   private handles: Handle[] = [];
   private readonly ring = new St.Widget({ name: 'kestrel-arrange-focus', style_class: 'kestrel-arrange-focus', visible: false });
@@ -78,7 +76,6 @@ export class Handles {
     this.hovered = handle;
   }
 
-  /** Rings `actor`, an island or one of its elements, or nothing with `null`. */
   focus(actor: Clutter.Actor | null, radius: number): void {
     this.ringed?.disconnectObject(this.ring);
     this.ringed = actor;

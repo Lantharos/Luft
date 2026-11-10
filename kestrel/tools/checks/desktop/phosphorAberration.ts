@@ -29,7 +29,6 @@ async function frame(): Promise<Frame> {
   return captureFrame({x, y, width, height: height - 64});
 }
 
-/** How far one channel of a row moved between two frames, in pixels. */
 function shift(moved: Frame, still: Frame, channel: number, xStart: number, y: number) {
   const row = (frame: Frame) => {
     const {pixbuf} = frame;

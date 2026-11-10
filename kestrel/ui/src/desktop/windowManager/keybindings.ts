@@ -3,7 +3,7 @@ import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 
 import * as KestrelUi from '../../kestrelUi.js';
-import { recoverDisplays } from '../../system/display/relight/monitorWake.js';
+import { recoverDisplays } from '../../system/hardware/display/relight/monitorWake.js';
 import type { WindowManager } from './windowManager.js';
 
 const SHELL_KEYBINDINGS_SCHEMA = 'com.lantharos.kestrel.keybindings';
@@ -14,6 +14,7 @@ const SHORTCUT_WORKSPACES = 10;
 const NORMAL = Shell.ActionMode.NORMAL;
 const DESKTOP = Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW;
 const DESKTOP_AND_POPUPS = DESKTOP | Shell.ActionMode.POPUP;
+const EVERYWHERE_BUT_LOCKED = Shell.ActionMode.ALL & ~(Shell.ActionMode.LOCK_SCREEN | Shell.ActionMode.UNLOCK_SCREEN);
 const EVERYWHERE_BUT_SYSTEM_MODALS = DESKTOP | Shell.ActionMode.LOCK_SCREEN | Shell.ActionMode.UNLOCK_SCREEN | Shell.ActionMode.LOGIN_SCREEN;
 
 const numbered = (count: number, name: (index: number) => string) => Array.from({ length: count }, (_, i) => name(i + 1));
@@ -53,7 +54,7 @@ interface KeyHandlers {
 
 export function bindKeys(wm: WindowManager, { workspaceSwitcher, switcher, a11ySwitcher }: KeyHandlers): void {
   for (const name of numbered(SESSIONS, index => `switch-to-session-${index}`))
-    wm.allowKeybinding(name, Shell.ActionMode.ALL);
+    wm.allowKeybinding(name, EVERYWHERE_BUT_LOCKED);
 
   for (const [name, modes] of WORKSPACE_KEYS)
     wm.setCustomKeybindingHandler(name, modes, workspaceSwitcher);

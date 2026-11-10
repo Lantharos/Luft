@@ -1,7 +1,7 @@
 import * as Main from './main.js';
-import * as automountManager from '../system/drives/automountManager.js';
-import * as autorunManager from '../system/drives/autorunManager.js';
-import * as networkAgent from '../system/network/networkAgent.js';
+import * as automountManager from '../system/hardware/drives/automountManager.js';
+import * as autorunManager from '../system/hardware/drives/autorunManager.js';
+import * as networkAgent from '../system/connectivity/network/networkAgent.js';
 import * as polkitAgent from '../auth/prompt/polkitAgent.js';
 
 interface Component {

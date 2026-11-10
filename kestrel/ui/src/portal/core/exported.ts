@@ -26,7 +26,6 @@ function returnFailure(invocation: Gio.DBusMethodInvocation, error: unknown): vo
   else invocation.return_dbus_error('org.freedesktop.DBus.Error.Failed', `${error}`);
 }
 
-/** Runs a method that answers by itself, and answers for it when it throws, so the app that asked isn't left waiting. */
 async function answering(invocation: Gio.DBusMethodInvocation, run: () => unknown): Promise<void> {
   try {
     await run();

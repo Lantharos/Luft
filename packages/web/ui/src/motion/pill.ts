@@ -1,10 +1,6 @@
 import type { Attachment } from 'svelte/attachments';
 import { SpringValue } from './spring';
 
-/**
- * Slides one highlight between a list's items to the one that matches
- * `selector`, instead of each item swapping its own background.
- */
 export function selectionPill(selector = '[aria-current="page"]'): Attachment<HTMLElement> {
 	return (list) => {
 		const pill = Object.assign(document.createElement('div'), { className: 'selection-pill' });

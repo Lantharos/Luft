@@ -17,7 +17,6 @@ const SHORTCUTS = 'extension-shortcuts';
 
 type ShortcutChoices = Record<string, Record<string, string[]>>;
 
-/** What the person decided about extensions, kept in Kestrel's settings. */
 export class ExtensionStore {
   private readonly settings = new Gio.Settings({ schema_id: 'com.lantharos.kestrel' });
   private values: Record<string, Record<string, SettingValue>>;
@@ -48,7 +47,6 @@ export class ExtensionStore {
     return this.watch([SHORTCUTS], changed);
   }
 
-  /** The shortcuts people set themselves, by extension id and key. Shortcuts left alone aren't here. */
   get shortcutChoices(): ShortcutChoices {
     return this.settings.get_value(SHORTCUTS).deepUnpack() as ShortcutChoices;
   }

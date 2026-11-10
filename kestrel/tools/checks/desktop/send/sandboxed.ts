@@ -13,10 +13,6 @@ import {Caller, callerArguments} from './caller.js';
 const {require, eventually} = checks('Send sheet');
 const DENIED = 'org.freedesktop.DBus.Error.AccessDenied';
 
-/**
- * Sends a file from a Sabine AppImage in its sandbox, which can see only its home folder: the sheet opens for the
- * files it hands over, while the rest of Kestrel, its file actions among it, stays out of its reach.
- */
 export async function checkSandboxed(sheet: () => unknown, pdf: Uint8Array) {
   if (!GLib.find_program_in_path('squashfuse_ll')) {
     console.log('Kestrel Send sheet: the sandboxed app skipped without squashfuse');

@@ -18,7 +18,7 @@ page-closed = Closed the page?
 open-again = Open it again
 cancel = Cancel
 sign-in-failed = Signing in didn't finish
-    .description = Try again, and confirm the code in your browser within 15 minutes
+    .description = The code wasn't confirmed in time. Sign in again and confirm it in your browser within 15 minutes
 
 showing = In the taskbar
 count = Count
@@ -43,6 +43,8 @@ inboxes = Inboxes
 inbox-detail = { $place } · { $count }
 open-pult = Open Pult
 not-connected = Can't reach Pult right now
+    .description = Check your internet connection, then sign in again
+try-again = Try again
 # The notification for an urgent item; $inbox is where it is, such as Support
 urgent-title = Urgent in { $inbox }
 open = Open

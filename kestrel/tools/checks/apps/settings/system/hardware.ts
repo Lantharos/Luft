@@ -1,4 +1,4 @@
-import {plugInBluetoothAdapter} from '../../../../fixtures/system/bluetoothAdapter.js';
+import {plugInBluetoothAdapter} from '../../../../fixtures/system/devices/bluetoothAdapter.js';
 import type {LuftApp} from '../../../lib/apps/luftApp.js';
 import {checks} from '../../../lib/check.js';
 import type {Frame} from '../../../lib/screenshots.js';

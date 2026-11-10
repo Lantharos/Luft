@@ -14,7 +14,6 @@ const PROBES: [string, string, string, string, GLib.Variant | null][] = [
   ['share-introspect', '/com/lantharos/Kestrel/Share', 'org.freedesktop.DBus.Introspectable', 'Introspect', null],
 ];
 
-/** Each argument is `name=path`: the name to send the file under and the file to open. */
 const files = ARGV.map(argument => {
   const at = argument.indexOf('=');
   return { name: argument.slice(0, at), path: argument.slice(at + 1) };
@@ -27,7 +26,6 @@ let window: Gtk.ApplicationWindow;
 const probed: Record<string, string> = {};
 let answers = 0;
 
-/** Says how each call went in the window's title, numbered, which the check reads. */
 const report = (outcome: string) => { window.title = `${TITLE} ${++answers}: ${outcome}`; };
 
 function send() {

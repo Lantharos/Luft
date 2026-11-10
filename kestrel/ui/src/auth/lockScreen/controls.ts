@@ -1,7 +1,7 @@
 import St from 'gi://St';
 
 import type { Context } from '../../context.js';
-import { InputSourceIndicator } from '../../system/inputSources/indicator.js';
+import { InputSourceIndicator } from '../../system/input/inputSources/indicator.js';
 import { ContextMenus } from '../../desktop/menus/contextMenus.js';
 import { ControlRow } from '../../desktop/menus/controlRow.js';
 import type { Monitor } from '../../desktop/panel/panel.js';

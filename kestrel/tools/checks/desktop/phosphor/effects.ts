@@ -46,7 +46,6 @@ const value = (input: boolean | number | string | string[]) => {
 
 interface Section {items: {type?: string; title?: string; action?: string; options?: {value: string}[]; actions?: {label: string; action: string}[]}[]}
 
-/** What Phosphor's page in Settings shows, as Settings gets it. */
 export async function pageItems() {
   const reply = await call('com.lantharos.Kestrel', PATH, IFACE, 'Page', new GLib.Variant('(s)', [PHOSPHOR]), '(s)');
   return (JSON.parse(reply.deepUnpack<[string]>()[0]) as Section[]).flatMap(section => section.items);
@@ -56,7 +55,6 @@ export const act = (action: string, value: GLib.Variant) => call('com.lantharos.
 
 export const choose = (key: string, input: boolean | number | string | string[]) => setSetting(PHOSPHOR, key, value(input));
 
-/** Everything an effect can leave behind, so a check can tell that nothing is. */
 export function attachedEffects() {
   const views = global.stage.peek_stage_views().filter(view => view.get_filter());
   const overlays = descendants(global.window_group).filter(actor => actor.constructor.name.includes('Overlay'));

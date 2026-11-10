@@ -4,10 +4,10 @@ import GObject from 'gi://GObject';
 import St from 'gi://St';
 
 import * as Main from '../../core/main.js';
+import { Curve, Duration } from '../../shared/motion/motion.js';
 import type { ItemList } from './switcherList.js';
 
 const POPUP_DELAY_TIMEOUT = 150;
-const POPUP_FADE_OUT_TIME = 100;
 
 const DISABLE_HOVER_TIMEOUT = 500;
 const NO_MODS_TIMEOUT = 1500;
@@ -232,8 +232,8 @@ export abstract class SwitcherPopup<Item = unknown> extends St.Widget {
     if (this.opacity > 0) {
       this.ease({
         opacity: 0,
-        duration: POPUP_FADE_OUT_TIME,
-        mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+        duration: Duration.tap,
+        curve: Curve.gentle,
         onComplete: () => this.destroy(),
       });
     } else {

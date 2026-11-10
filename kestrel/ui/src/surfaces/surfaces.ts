@@ -55,7 +55,6 @@ interface SurfaceParts extends SurfaceFactories {
   startReplaced: () => void;
 }
 
-/** Where the taskbar is on a display, for surfaces to open beside it. */
 interface TaskbarPlacement {
   depths(monitor: Monitor): Depths;
   anchor(surface: 'start' | 'quick' | 'notifications', monitor: Monitor): Anchor;
@@ -134,7 +133,7 @@ export class Surfaces {
   }
 
   place(): void {
-    const { context, quick, clipboard, board } = this.parts;
+    const { context, quick, clipboard } = this.parts;
     if (!context.layoutManager.primaryMonitor)
       return;
 
@@ -145,7 +144,7 @@ export class Surfaces {
     const area = this.freeArea(monitor);
     const available = area.height - FAR_MARGIN;
     const { start, notifications, emoji, snapLayouts } = this.created;
-    start?.place({ monitor, area, available, cornered: board.shown, anchor: this.parts.taskbar.anchor('start', monitor) });
+    start?.place({ monitor, area, available, anchor: this.parts.taskbar.anchor('start', monitor) });
 
     for (const [surface, actor, width, height] of [
       ['quick', quick.actor, 420, quick.preferredHeight(420, available)],

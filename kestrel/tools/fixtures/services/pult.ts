@@ -11,7 +11,6 @@ const place = (base: string, project: string, environment: string) => ({
   url: `${base}/harbor/${project.toLowerCase()}/${environment}`,
 });
 
-/** Pult's console API for desktop apps, as far as the Pult extension uses it, with a sign-in someone confirms by calling `approve`. */
 export class StandInPult {
   readonly requests: string[] = [];
   private readonly server = new Soup.Server({});

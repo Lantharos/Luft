@@ -3,7 +3,7 @@ import St from 'gi://St';
 
 import * as KestrelUi from '../../kestrelUi.js';
 import { Ornament, PopupMenu, PopupSeparatorMenuItem, type MenuCloseParams, type MenuOpenParams } from '../../shared/popups/popupMenu.js';
-import { getInputSourceManager } from '../../system/inputSources/keyboard.js';
+import { getInputSourceManager } from '../../system/input/inputSources/keyboard.js';
 
 export class NoGrabPopup extends PopupMenu {
   private readonly clickGesture = new Clutter.ClickGesture();

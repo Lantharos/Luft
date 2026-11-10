@@ -1,6 +1,7 @@
 declare const KESTREL_TOOLS: {
   root: string;
   built: string;
+  extensions: string;
 };
 
 declare module 'gi://Adw?version=1' {

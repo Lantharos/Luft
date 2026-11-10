@@ -1,0 +1,513 @@
+import Clutter from 'gi://Clutter';
+import Meta from 'gi://Meta';
+
+import type { Context } from '../context.js';
+import type { AppearanceService } from '../appearance/service.js';
+import { LockControls } from '../auth/lockScreen/controls.js';
+import { Board } from '../desktop/board/board.js';
+import { FourFingerSwipe, type SwipeDirection, type SwipeTrack } from '../desktop/gestures/fourFingers.js';
+import { TouchscreenGestures } from '../desktop/gestures/touchscreen.js';
+import { ContextMenus, type MenuEntry } from '../desktop/menus/contextMenus.js';
+import { coveredMonitors } from '../desktop/panel/coverage.js';
+import type { Monitor } from '../desktop/panel/panel.js';
+import { PanelSet } from '../desktop/panel/panels.js';
+import { taskbarPreferences } from '../desktop/panel/preferences/taskbarPreferences.js';
+import { WindowPreviews } from '../desktop/panel/windowPreviews.js';
+import { TaskView } from '../desktop/taskView/taskView.js';
+import { wallpaperFloor } from '../desktop/wallpaper/floor.js';
+import { wallpaperPictures, watchWallpaperPictures } from '../desktop/wallpaper/pictures.js';
+import { LiveWallpaper } from '../desktop/wallpaper/liveWallpaper.js';
+import { Tiling } from '../desktop/tiling/tiling.js';
+import { SnapLayouts } from '../desktop/windows/snapLayouts.js';
+import { Workspaces } from '../desktop/windows/workspaces.js';
+import { RotationAnimation } from '../desktop/rotation/rotation.js';
+import { watchTaskbarShapes } from '../desktop/panel/islands/shapes.js';
+import { setTaskbarBlurHeld } from '../desktop/panel/preferences/taskbarLook.js';
+import { Extensions } from '../extensions/extensions.js';
+import { createPost, type Post } from '../system/connectivity/post/post.js';
+import { afterMotion, dropAfterMotion } from '../shared/motion/afterMotion.js';
+import { navigateWithKeyboard } from '../shared/input/keyboardNavigation.js';
+import { t } from '../shared/i18n/index.js';
+import { ClipboardPanel } from '../surfaces/clipboard/panel.js';
+import { EmojiPanel } from '../surfaces/emoji/panel.js';
+import { NotificationCenter } from '../surfaces/notifications/notificationCenter.js';
+import { QuickSettings } from '../surfaces/quickSettings/quickSettings.js';
+import { Palette } from '../surfaces/palette/palette.js';
+import type { SearchHost } from '../surfaces/search/engine.js';
+import { StartMenu } from '../surfaces/start/startMenu.js';
+import { warmHidden } from '../surfaces/prewarm/hidden.js';
+import { prewarmAfterStartup, prewarmSoon, type Step } from '../surfaces/prewarm/queue.js';
+import { Surfaces, type Surface } from '../surfaces/surfaces.js';
+import { CopilotActions } from '../system/input/dictation/copilotActions.js';
+import { followUserLanguage } from '../system/input/language/language.js';
+import { EDGE_MARGIN, NO_DEPTHS, type Anchor, type Depths } from '../shared/layout/anchor.js';
+import { TaskbarEditor } from '../desktop/panel/editing/editor.js';
+import { TaskbarService } from '../desktop/panel/editing/service.js';
+import { SystemServices } from '../system/services.js';
+import { PenActions } from '../system/hardware/pens/actions.js';
+
+
+type Signals = { connect(signal: string, callback: (...args: any[]) => any): number; disconnect(id: number): void };
+
+export class DesktopUi {
+  private readonly services: SystemServices;
+  private readonly menus: ContextMenus;
+  private readonly workspaces: Workspaces;
+  private readonly previews: WindowPreviews;
+  private readonly panels: PanelSet;
+  private readonly quick: QuickSettings;
+  private readonly taskView: TaskView;
+  private readonly surfaces: Surfaces;
+  readonly board: Board;
+  private readonly tiling: Tiling;
+  private readonly liveWallpaper: LiveWallpaper;
+  private readonly extensions: Extensions;
+  private readonly post: Post;
+  private readonly rotation: RotationAnimation;
+  private readonly copilot: CopilotActions;
+  private readonly penActions: PenActions;
+  private readonly fourFingers = new FourFingerSwipe(direction => this.followFourFingers(direction));
+  private readonly touchscreen = new TouchscreenGestures({
+    handle: event => this.touchpad(event),
+    wantsSwipe: (fingers, x, y) => fingers === 4 || (fingers === 3 && (this.board.shown || this.tiling.ownsSwipe(x, y))),
+    wantsPinch: (x, y, pinched) => this.board.shown && this.board.canInteract() && (pinched || this.board.onCanvas(x, y)),
+  });
+  private focusSignals: (() => void)[] = [];
+  private readonly disconnectors: (() => void)[] = [];
+  private sessionSyncLater = 0;
+  private cancelStartPrewarm = () => {};
+  private arranging: TaskbarEditor | null = null;
+  private readonly taskbarService = new TaskbarService(() => this.arrangeTaskbar());
+  private draggedWindow: Meta.Window | null = null;
+  private readonly syncSessionAfterMotion = () => this.syncSession();
+
+  constructor(private readonly context: Context) {
+    this.services = new SystemServices(context, () => this.openStart());
+    const close = () => this.surfaces.close();
+    const place = () => this.surfaces.place();
+    const monitorAt = (x: number, y: number) => this.surfaces.monitorAt(x, y);
+
+    this.workspaces = new Workspaces(() => this.canInteract(), () => this.dismissImmediately(), context.swipeWorkspaces);
+    this.menus = new ContextMenus(monitorAt, close, () => this.canInteract(), () => this.previews.close(), context.activateWindow,
+      actor => this.panels?.containing(actor)?.edgeOf(actor) ?? null);
+    this.previews = new WindowPreviews(actor => monitorAt(...actor.get_transformed_position()), () => this.canInteract() && !this.menus.actor.visible, close, context.activateWindow);
+    context.layoutManager.addTopChrome(this.previews.actor);
+    this.board = new Board({
+      monitors: () => context.layoutManager.monitors,
+      primary: () => context.layoutManager.primaryMonitor,
+      workArea: index => context.layoutManager.getWorkAreaForMonitor(index),
+      createBackground: context.createBackground,
+      wallpaper: context.wallpaper,
+      keybindings: context.keybindings,
+      addChrome: actor => context.layoutManager.addChrome(actor),
+      setPanelsHidden: hidden => this.panels.suppress(hidden),
+      openQuickSettings: () => this.surfaces.toggle('quick'),
+      openStart: () => this.surfaces.toggle('start'),
+      changed: () => this.syncSession(),
+      canInteract: () => this.canInteract() && !this.surfaces.active,
+    });
+    this.tiling = new Tiling({
+      monitors: () => context.layoutManager.monitors.map(({ x, y, width, height }) => ({ x, y, width, height })),
+      primaryIndex: () => context.layoutManager.primaryMonitor?.index ?? 0,
+      workArea: index => context.layoutManager.getWorkAreaForMonitor(index),
+      morph: window => context.morphWindow(window),
+      activate: window => context.activateWindow(window),
+      keybindings: context.keybindings,
+      board: this.board,
+      addChrome: actor => context.layoutManager.addChrome(actor),
+      removeChrome: actor => context.layoutManager.removeChrome(actor),
+      canInteract: () => this.canInteract(),
+    });
+    this.quick = new QuickSettings(context.quickSettings, place, close,
+      icons => {
+        this.panels.updateStatus(icons);
+        this.board.showStatus(icons);
+      }, this.menus, () => this.takeScreenshot());
+    const clipboard = new ClipboardPanel(this.menus, close, place, context.inputMethod);
+    this.copilot = new CopilotActions(context, () => this.surfaces.toggle('start'), text => clipboard.pasteWithoutKeeping(text));
+    this.penActions = new PenActions({
+      canInteract: () => this.canInteract(),
+      takeScreenshot: () => this.takeScreenshot(),
+      toggleStart: () => this.surfaces.toggle('start'),
+    });
+    const searchHost: SearchHost = {
+      menus: this.menus,
+      quickSettings: context.quickSettings,
+      clipboard,
+      paste: text => clipboard.pasteWithoutKeeping(text),
+      activateWindow: context.activateWindow,
+      close,
+    };
+    this.taskView = new TaskView(context.createBackground, workspace => this.board.frameOf(workspace), close, context.activateWindow);
+    this.liveWallpaper = new LiveWallpaper(() => context.layoutManager.monitors);
+    this.extensions = new Extensions({
+      menus: this.menus,
+      keybindings: context.keybindings,
+      wallpaper: context.wallpaper,
+      desktopLayer: context.desktopLayer,
+      monitors: () => context.layoutManager.monitors,
+      primaryIndex: () => context.layoutManager.primaryMonitor?.index ?? 0,
+      monitorAt,
+      workArea: index => {
+        const { x, y, width, height } = context.layoutManager.getWorkAreaForMonitor(index);
+        return { x, y, width, height };
+      },
+      taskbar: monitor => this.panels.panelOn(monitor)?.shapes.bar() ?? null,
+      taskbarIslands: monitor => this.panels.panelOn(monitor)?.islandShapes() ?? [],
+      windowPicture: actor => context.windowPicture(actor),
+      surfaceAnchors: surface => {
+        switch (surface) {
+          case 'taskbar': return this.panels.all.flatMap(panel => panel.islandAnchors());
+          case 'quick-settings': return [{ actor: this.quick.actor }];
+          case 'start': return [{ actor: this.surfaces.start.actor }];
+          case 'notifications': return [{ actor: this.surfaces.notifications.actor }];
+        }
+      },
+      watchSurfaceAnchors: watchTaskbarShapes,
+      desktopPictures: () => [
+        { actor: context.desktopLayer, fillsView: true, underWindows: true },
+        ...wallpaperPictures(),
+        ...this.panels.all.flatMap(panel => panel.islandAnchors()).map(({ actor }) => ({ actor })),
+      ],
+      watchDesktopPictures: changed => {
+        const unwatchShapes = watchTaskbarShapes(changed);
+        const unwatchPictures = watchWallpaperPictures(changed);
+        return () => {
+          unwatchShapes();
+          unwatchPictures();
+        };
+      },
+      holdTaskbarBlur: setTaskbarBlurHeld,
+      accent: () => this.services.appearance.AccentColor || '#ffffff',
+      wallpaperAccent: () => this.services.appearance.WallpaperAccentColor || this.services.appearance.AccentColor || '#ffffff',
+      watchAccent: changed => this.services.appearance.watchAccent(changed),
+      colors: dark => dark ? this.services.appearance.DarkColors : this.services.appearance.LightColors,
+      watchPalette: changed => this.services.appearance.watchPalette(changed),
+      addPopup: actor => context.layoutManager.addTopChrome(actor),
+      removePopup: actor => context.layoutManager.removeChrome(actor),
+      bindDesktopMenu: actor => this.menus.bindSecondaryClick(actor, () => this.desktopMenu()),
+      dismissSurfaces: () => this.dismissImmediately(),
+      showNotifications: () => {
+        if (this.surfaces.active !== 'notifications') this.toggleSurface('notifications');
+      },
+      type: text => {
+        if (context.inputMethod.currentFocus) context.inputMethod.commit(text);
+        else clipboard.pasteWithoutKeeping(text);
+      },
+    });
+    this.rotation = new RotationAnimation(context.layoutManager, context.createBackground);
+    this.surfaces = new Surfaces({
+      context,
+      menus: this.menus,
+      previews: this.previews,
+      panels: () => this.panels,
+      board: this.board,
+      start: () => taskbarPreferences.startStyle === 'palette' ? new Palette(searchHost) : new StartMenu(searchHost),
+      quick: this.quick,
+      notifications: () => new NotificationCenter(context.messageTray, this.menus, place, close),
+      clipboard,
+      emoji: () => new EmojiPanel(context.inputMethod, close, text => clipboard.pasteWithoutKeeping(text)),
+      snapLayouts: () => new SnapLayouts(index => context.layoutManager.getWorkAreaForMonitor(index), context.snapWindow, close, () => this.snappingAllowed()),
+      taskView: this.taskView,
+      canInteract: () => this.canInteract(),
+      syncSession: () => this.syncSession(),
+      taskbar: {
+        depths: monitor => this.taskbarDepths(monitor),
+        anchor: (surface, monitor) => this.taskbarAnchor(surface, monitor),
+      },
+      startReplaced: () => this.prewarmStart(),
+    });
+
+    context.layoutManager.addTopChrome(this.menus.shield);
+    context.layoutManager.addTopChrome(this.menus.actor);
+    this.post = createPost(this.extensions.host);
+
+    this.panels = new PanelSet(context.layoutManager, monitor => ({
+      start: () => this.surfaces.toggle('start', monitor()),
+      quickSettings: () => this.surfaces.toggle('quick', monitor()),
+      notifications: () => this.surfaces.toggle('notifications', monitor()),
+      activateWindow: context.activateWindow,
+      stopScreencast: context.stopScreencast,
+      arrange: () => this.arrangeTaskbar(),
+    }), this.menus, this.previews, () => {
+      place();
+      this.syncSession();
+    });
+    this.quick.updateStatus();
+    const holdPanels = () => this.panels.hold(this.menus.actor.visible || this.previews.actor.visible);
+    for (const actor of [this.menus.actor, this.previews.actor]) actor.connect('notify::visible', holdPanels);
+    this.disconnectors.push(followUserLanguage());
+    this.disconnectors.push(taskbarPreferences.watch(key => {
+      if (key === 'taskbar-arrangement' || key === 'tablet') this.followTaskbarEdge();
+      if (key === 'taskbar-style' || key === 'taskbar-size' || key === 'tablet') place();
+      if (key === 'start-style') this.surfaces.restyleStart();
+    }));
+
+    context.layoutManager.addTopChrome(this.surfaces.cover);
+    context.layoutManager.addTopChrome(this.surfaces.layer);
+    context.layoutManager.addTopChrome(this.taskView.actor);
+
+    this.watch(context.keyboard, 'visibility-changed', place);
+    this.watch(global.stage, 'key-press-event', (_stage, event) => {
+      const active = this.surfaces.active;
+      if (active && event.get_key_symbol() === Clutter.KEY_Escape) {
+        if (active !== 'quick' || !this.quick.closeSubmenu()) close();
+        return Clutter.EVENT_STOP;
+      }
+      return Clutter.EVENT_PROPAGATE;
+    });
+    this.watch(global.stage, 'captured-event', (_stage, event) => {
+      if (this.touchpad(event)) return Clutter.EVENT_STOP;
+      if (event.type() === Clutter.EventType.SCROLL) {
+        const [x, y] = event.get_coords();
+        const target = global.stage.get_actor_at_pos(Clutter.PickMode.REACTIVE, x, y);
+        if ((event.get_state() & (Clutter.ModifierType.SUPER_MASK | Clutter.ModifierType.MOD4_MASK)) || (this.panels.contains(target) && !this.panels.primary.handlesScroll(target)))
+          return this.workspaces.scroll(event) ? Clutter.EVENT_STOP : Clutter.EVENT_PROPAGATE;
+      }
+      if (!this.canInteract() || event.type() !== Clutter.EventType.BUTTON_PRESS)
+        return Clutter.EVENT_PROPAGATE;
+      const [x, y] = event.get_coords();
+      const target = global.stage.get_actor_at_pos(Clutter.PickMode.REACTIVE, x, y);
+      if (!this.previews.contains(target)) this.previews.close();
+      return Clutter.EVENT_PROPAGATE;
+    });
+    const bindWallpaper = (actor: Clutter.Actor) => {
+      if (actor instanceof Meta.BackgroundActor) this.menus.bind(actor, () => this.desktopMenu());
+    };
+    context.wallpaper.get_children().forEach(bindWallpaper);
+    this.watch(context.wallpaper, 'child-added', (_wallpaper, actor: Clutter.Actor) => bindWallpaper(actor));
+    this.watch(global.display, 'overlay-key', () => this.superTapped());
+    this.watch(global.display, 'in-fullscreen-changed', () => this.queueSyncSession());
+    this.watch(global.display, 'notify::focus-window', () => this.trackFocusedWindow());
+    this.watch(global.display, 'restacked', () => this.queueSyncSession());
+    this.watch(global.workspace_manager, 'active-workspace-changed', () => this.queueSyncSession());
+    this.watch(global.display, 'window-visibility-updated', () => this.queueSyncSession());
+    this.watch(global.display, 'grab-op-begin', (_display, window: Meta.Window | null) => { this.draggedWindow = window; });
+    this.watch(global.display, 'grab-op-end', () => {
+      this.draggedWindow = null;
+      this.queueSyncSession();
+    });
+    this.watch(context.sessionMode, 'updated', () => this.syncSession());
+    if (context.screenShield) {
+      this.watch(context.screenShield, 'active-changed', () => this.syncSession());
+      this.watch(context.screenShield, 'locked', () => clipboard.clear());
+    }
+    context.registerPanel(this.panels.primary.actor);
+    for (const actor of [this.previews.actor, this.taskView.actor])
+      navigateWithKeyboard(actor);
+    this.watch(context.layoutManager, 'monitors-changed', () => {
+      this.dismissImmediately();
+      this.panels.sync();
+      this.liveWallpaper.monitorsChanged();
+      this.extensions.monitorsChanged();
+      this.board.monitorsChanged();
+      this.tiling.monitorsChanged();
+      this.followTaskbarEdge();
+      place();
+      this.syncSession();
+    });
+    this.followTaskbarEdge();
+    place();
+    this.syncSession();
+    this.disconnectors.push(prewarmAfterStartup(context.layoutManager, [
+      ...this.startPrewarm(),
+      () => warmHidden(this.quick.actor, { focused: this.quick.actor }),
+      () => warmHidden(this.surfaces.notifications.actor, { focused: this.surfaces.notifications.actor, place }),
+      () => this.surfaces.emoji.prewarm(),
+      () => warmHidden(this.surfaces.emoji.actor, { place }),
+      () => this.taskView.prewarm(context.layoutManager.primaryMonitor!),
+    ]));
+  }
+
+  get appearance(): AppearanceService {
+    return this.services.appearance;
+  }
+
+  private watch(object: Signals, signal: string, callback: (...args: any[]) => any): void {
+    const id = object.connect(signal, callback);
+    this.disconnectors.push(() => object.disconnect(id));
+  }
+
+  private desktopMenu(): MenuEntry[] {
+    const { shown, touch } = this.panels.primary.screen;
+    return [
+      { label: t('desktop-menu-wallpaper'), run: () => this.menus.settings('appearance/wallpaper') },
+      { label: t('desktop-menu-display-settings'), run: () => this.menus.settings('display') },
+      ...shown && !touch ? [{ label: t('taskbar-arrange'), run: () => this.arrangeTaskbar() }] : [],
+      { label: t('desktop-menu-settings'), run: () => this.menus.settings() },
+    ];
+  }
+
+  private desktopAvailable(): boolean {
+    return this.context.sessionMode.hasWindows && !this.context.sessionMode.isLocked && !this.context.screenShield?.active;
+  }
+
+  private canInteract(): boolean {
+    return this.desktopAvailable() && this.context.canInteract();
+  }
+
+  private trackFocusedWindow(): void {
+    for (const disconnect of this.focusSignals) disconnect();
+    const window = global.display.focus_window;
+    const actor = window?.get_compositor_private() as Meta.WindowActor | null;
+    const sync = (object: Signals, signal: string, when = () => true) => {
+      const id = object.connect(signal, () => {
+        if (when()) this.queueSyncSession();
+      });
+      return () => object.disconnect(id);
+    };
+    const notDragged = () => window !== this.draggedWindow;
+    this.focusSignals = [
+      ...window ? [sync(window, 'size-changed', notDragged), sync(window, 'position-changed', notDragged), sync(window, 'notify::fullscreen')] : [],
+      ...actor ? [sync(actor, 'effects-completed')] : [],
+    ];
+    this.queueSyncSession();
+  }
+
+  private queueSyncSession(): void {
+    if (this.sessionSyncLater) return;
+    this.sessionSyncLater = global.compositor.get_laters().add(Meta.LaterType.BEFORE_REDRAW, () => {
+      this.sessionSyncLater = 0;
+      afterMotion(this.syncSessionAfterMotion);
+      return false;
+    });
+  }
+
+  private syncSession(): void {
+    this.tiling.syncBoard();
+    const available = this.desktopAvailable();
+    const covered = coveredMonitors(this.context.layoutManager.monitors);
+    for (const panel of this.panels.all)
+      panel.autoHide.setAllowed(panel.screen.shown && !!panel.monitor && available && !this.taskView.visible && !covered.has(panel.monitor.index));
+    const primary = this.context.layoutManager.primaryMonitor;
+    this.panels.showCorner(!!primary && !taskbarPreferences.on(primary.index).shown && available && !this.taskView.visible && !this.board.shown && !covered.has(primary.index));
+    this.liveWallpaper.sync(available && !this.taskView.visible && !this.board.shown);
+    this.extensions.syncDesktop(available && !this.taskView.visible && !this.board.shown, available, this.context.sessionMode.isLocked || !!this.context.screenShield?.active);
+    if (!available) this.dismissImmediately();
+  }
+
+  private followTaskbarEdge(): void {
+    const primary = this.context.layoutManager.primaryMonitor;
+    if (primary && wallpaperFloor.follow(taskbarPreferences.on(primary.index).edge, primary)) this.services.appearance.repaintTaskbar();
+  }
+
+  taskbarDepths(monitor: Monitor): Depths {
+    if (this.board.shown) return { ...NO_DEPTHS, bottom: this.board.cornerClearance };
+    return this.panels.depthsOn(monitor);
+  }
+
+  taskbarAnchor(surface: 'start' | 'quick' | 'notifications', monitor: Monitor): Anchor {
+    if (this.board.shown) return { edge: 'bottom', target: monitor.x + monitor.width - EDGE_MARGIN, align: 1 };
+    return this.panels.anchorFor(surface, monitor);
+  }
+
+  get taskbarEditor(): TaskbarEditor | null {
+    return this.arranging;
+  }
+
+  get monitors(): Monitor[] {
+    return this.context.layoutManager.monitors;
+  }
+
+  arrangeTaskbar(): void {
+    const screen = this.panels.primary.screen;
+    if (this.arranging || !screen.shown || screen.touch || !this.canInteract()) return;
+    this.dismissImmediately();
+    this.arranging = new TaskbarEditor(this.context.layoutManager, this.panels, () => (this.arranging = null));
+  }
+
+  private prewarmStart(): void {
+    this.cancelStartPrewarm();
+    this.cancelStartPrewarm = prewarmSoon(this.startPrewarm());
+  }
+
+  private startPrewarm(): Step[] {
+    return [
+      () => this.surfaces.start.reset(),
+      () => warmHidden(this.surfaces.start.actor, { focused: this.surfaces.start.search, place: () => this.surfaces.place() }),
+    ];
+  }
+
+  private superTapped(): void {
+    if (this.board.doubleTapped() && this.canInteract()) {
+      this.dismissImmediately();
+      this.board.toggle();
+      return;
+    }
+    this.surfaces.toggle('start');
+  }
+
+  private followFourFingers(direction: SwipeDirection): SwipeTrack | null {
+    const up = direction === 'up';
+    if (this.surfaces.active === 'tasks') return up ? this.surfaces.followTasks() : null;
+    if (!this.canInteract() || this.surfaces.active) return null;
+    if (this.board.shown) return up ? null : this.board.track(false);
+    if (up) return this.board.enabled ? this.board.track(true) : null;
+    return this.surfaces.followTasks();
+  }
+
+  private takeScreenshot(): void {
+    this.dismissImmediately();
+    const stage = global.stage;
+    const painted = stage.connect('after-paint', () => {
+      stage.disconnect(painted);
+      this.context.openScreenshot();
+    });
+  }
+
+  private openStart(): void {
+    if (this.surfaces.active !== 'start') this.surfaces.toggle('start');
+  }
+
+  dismissImmediately(): void {
+    this.surfaces.dismissImmediately();
+  }
+
+  lockControls(): LockControls {
+    return new LockControls(this.context.layoutManager, (x, y) => this.surfaces.monitorAt(x, y));
+  }
+
+  taskViewOpen(): boolean { return this.taskView.visible; }
+  taskViewProgress(): number { return this.taskView.progress; }
+
+  touchpad(event: Clutter.Event): boolean {
+    return this.fourFingers.handle(event) || this.tiling.touchpad(event) || this.board.input.handle(event);
+  }
+
+  touchClaimed(gesture: Clutter.Gesture): boolean {
+    return this.touchscreen.claims(gesture);
+  }
+
+  snappingAllowed(): boolean {
+    return this.tiling.mode === 'off';
+  }
+
+  shutdown(): void {
+    for (const disconnect of [...this.focusSignals, ...this.disconnectors]) disconnect();
+    this.cancelStartPrewarm();
+    if (this.sessionSyncLater) global.compositor.get_laters().remove(this.sessionSyncLater);
+    dropAfterMotion(this.syncSessionAfterMotion);
+    this.arranging?.cancel();
+    this.taskbarService.destroy();
+    this.panels.shutdown();
+    this.liveWallpaper.destroy();
+    this.touchscreen.destroy();
+    this.extensions.shutdown();
+    this.post.destroy();
+    this.rotation.destroy();
+    this.copilot.destroy();
+    this.penActions.destroy();
+    this.tiling.destroy();
+    this.board.destroy();
+    this.services.destroy();
+  }
+
+  switchWorkspace(index: number): void {
+    if (index === 9 && this.board.shown) this.board.fitAll();
+    else this.workspaces.switchTo(index);
+  }
+
+  toggleSurface(surface: Surface): void {
+    this.surfaces.toggle(surface);
+  }
+}

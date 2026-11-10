@@ -2,7 +2,7 @@ import GdkPixbuf from 'gi://GdkPixbuf';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
-const USER_INSTALL = GLib.build_filenamev([GLib.get_home_dir(), '.local/share/sabine']);
+const USER_INSTALL = GLib.getenv('KESTREL_HOST_SABINE')!;
 const SYSTEM_INSTALL = '/usr/lib/sabine';
 const INSTALLED_BY_USER = GLib.file_test(GLib.build_filenamev([USER_INSTALL, 'bin/current.json']), GLib.FileTest.EXISTS);
 const INSTALLED = INSTALLED_BY_USER ? USER_INSTALL : SYSTEM_INSTALL;
@@ -34,7 +34,6 @@ function shareRuntime(sabine: string) {
   }
   Gio.File.new_for_path(path(INSTALLED, 'bin/current.json'))
     .copy(Gio.File.new_for_path(path(sabine, 'bin/current.json')), Gio.FileCopyFlags.OVERWRITE, null, null);
-  GLib.file_set_contents(path(sabine, 'service-policy.json'), JSON.stringify({login_autostart: false}));
 }
 
 function writeSamples(home: string) {

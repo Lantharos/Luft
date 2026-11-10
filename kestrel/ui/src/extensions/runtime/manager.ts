@@ -3,11 +3,11 @@ import GLib from 'gi://GLib';
 
 import { onLocaleChanged } from '../../shared/i18n/index.js';
 import { openSettings } from '../../system/settingsPages.js';
-import { runTurnedOffHelper } from '../api/v1/helper.js';
-import { forgetSecrets } from '../api/v1/secrets.js';
+import { runTurnedOffHelper } from '../api/v1/core/helper.js';
+import { forgetSecrets } from '../api/v1/services/secrets.js';
 import type { SettingValue } from '../api/v1/types.js';
-import { EffectsStage } from '../api/v1/screenEffects/stage.js';
-import { LayerStage } from '../api/v1/wallpaper/stage.js';
+import { EffectsStage } from '../api/v1/visuals/screenEffects/stage.js';
+import { LayerStage } from '../api/v1/visuals/wallpaper/stage.js';
 import type { ExtensionHost } from '../host.js';
 import { CrashGuard } from './crashes.js';
 import { dataFolder, discover, findOne, removeTree, type Installed } from './folders.js';
@@ -17,7 +17,6 @@ import { ExtensionStore, type Problem, type ProblemKind } from './store.js';
 
 const hasManifest = (installed: Installed): installed is Installed & { manifest: NonNullable<Installed['manifest']> } => !!installed.manifest;
 
-/** Finds the installed extensions, runs the ones that are on, and keeps them in step with what the person chose. */
 export class ExtensionManager {
   readonly store = new ExtensionStore();
   private readonly crashes = new CrashGuard();

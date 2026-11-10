@@ -8,6 +8,7 @@ import St from 'gi://St';
 import * as Main from '../../../core/main.js';
 import { EventEmitter } from '../../../core/runtime/signals.js';
 import * as Util from '../../../core/runtime/util.js';
+import { Curve, Duration } from '../../motion/motion.js';
 import { arrowIcon, PopupBaseMenuItem, PopupImageMenuItem, PopupMenuItem, PopupSeparatorMenuItem } from './items.js';
 import { hasVisibleItems, separatesItems, type MenuChild } from './separators.js';
 
@@ -331,7 +332,6 @@ export class PopupMenuSection extends PopupMenuBase {
   }
 }
 
-const SUBMENU_ANIMATION_TIME = 250;
 
 export class PopupSubMenu extends PopupMenuBase {
   declare actor: St.ScrollView;
@@ -377,19 +377,19 @@ export class PopupSubMenu extends PopupMenuBase {
 
     const animate = (params.animate ?? true) && !needsScrollbar;
     const targetAngle = this.actor.text_direction === Clutter.TextDirection.RTL ? -90 : 90;
-    const duration = animate ? SUBMENU_ANIMATION_TIME : 0;
+    const duration = animate ? Duration.standard : 0;
     const [, naturalHeight] = this.actor.get_preferred_height(-1);
     this.actor.height = 0;
     this.actor.ease({
       height: naturalHeight,
       duration,
-      mode: Clutter.AnimationMode.EASE_OUT_EXPO,
+      curve: Curve.unfold,
       onComplete: () => this.actor.set_height(-1),
     });
     this.arrow.ease({
       rotation_angle_z: targetAngle,
       duration,
-      mode: Clutter.AnimationMode.EASE_OUT_EXPO,
+      curve: Curve.unfold,
     });
     return true;
   }
@@ -400,11 +400,11 @@ export class PopupSubMenu extends PopupMenuBase {
     if (this.activeMenuItem) this.activeMenuItem.active = false;
 
     const animate = (params.animate ?? true) && !this.needsScrollbar();
-    const duration = animate ? SUBMENU_ANIMATION_TIME : 0;
+    const duration = animate ? Duration.standard : 0;
     this.actor.ease({
       height: 0,
       duration,
-      mode: Clutter.AnimationMode.EASE_OUT_EXPO,
+      curve: Curve.unfold,
       onComplete: () => {
         this.actor.hide();
         this.actor.set_height(-1);
@@ -413,7 +413,7 @@ export class PopupSubMenu extends PopupMenuBase {
     this.arrow.ease({
       rotation_angle_z: 0,
       duration,
-      mode: Clutter.AnimationMode.EASE_OUT_EXPO,
+      curve: Curve.unfold,
     });
     return true;
   }

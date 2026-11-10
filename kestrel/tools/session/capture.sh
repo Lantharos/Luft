@@ -3,9 +3,8 @@ set -euo pipefail
 
 # shellcheck source-path=SCRIPTDIR
 source "$(dirname "$0")/environment.sh"
-state="${KESTREL_SESSION_DIR:-$root/kestrel/run}"
-out="$state/capture"
-durations="$state/capture-durations.tsv"
+out="$session_dir/capture"
+durations="$session_dir/capture-durations.tsv"
 session_timeout=30m
 max_startup_failures=3
 inotify_per_session=24

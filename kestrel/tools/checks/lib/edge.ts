@@ -14,7 +14,6 @@ interface Box {
 
 const shell = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 
-/** The taskbar's islands as stored: each spot, such as 'bottom-end', with the elements it holds. */
 export type Arrangement = [string, string[]][];
 
 export const arrangement = () => shell.get_value('taskbar-arrangement').deepUnpack() as Arrangement;
@@ -23,7 +22,6 @@ export function arrange(islands: Arrangement) {
   shell.set_value('taskbar-arrangement', new GLib.Variant('a(sas)', islands));
 }
 
-/** Start and the apps in the middle of an edge, or at its start, and the tray, status icons and clock at its end. */
 export function alongEdge(edge: Edge, apps: 'center' | 'start' = 'center'): Arrangement {
   return [[`${edge}-${apps}`, ['start', 'dock']], [`${edge}-end`, ['tray', 'status', 'clock']]];
 }

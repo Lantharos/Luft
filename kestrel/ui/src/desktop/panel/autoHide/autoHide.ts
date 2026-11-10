@@ -3,7 +3,7 @@ import GLib from 'gi://GLib';
 import Mtk from 'gi://Mtk';
 import St from 'gi://St';
 
-import { animateActor } from '../../../shared/motion/motion.js';
+import { animateActor, Curve, Duration } from '../../../shared/motion/motion.js';
 import { band, toward, type Edge } from '../../../shared/layout/edge.js';
 import { EDGES } from '../../../../../../packages/web/ui/src/taskbar/arrangement/index';
 import { taskbarPreferences, type TaskbarLayout } from '../preferences/taskbarPreferences.js';
@@ -11,7 +11,6 @@ import type { Monitor } from '../panel.js';
 import type { WindowOverlap } from './windowOverlap.js';
 
 const HIDE_DELAY = 450;
-const SLIDE_DURATION = 220;
 
 function settleAt(actor: Clutter.Actor, property: 'translation-x' | 'translation-y', value: number): void {
   if (actor.get_transition(property)?.get_interval().peek_final_value() === value) return;
@@ -19,7 +18,6 @@ function settleAt(actor: Clutter.Actor, property: 'translation-x' | 'translation
   actor.set_property(property, value);
 }
 
-/** What slides away to one edge when the taskbar hides: the whole bar, or each separate island on its own edge. */
 export interface Slider {
   actor: St.Widget;
   edge: Edge;
@@ -35,7 +33,6 @@ class EdgeState {
   }
 }
 
-/** Hides the taskbar on each edge it uses, until the pointer reaches that edge or something there needs it. */
 export class AutoHide {
   readonly sensors = new Map<Edge, St.Widget>(EDGES.map(edge =>
     [edge, new St.Widget({ name: `kestrel-taskbar-edge-${edge}`, reactive: true, track_hover: true, visible: false })]));
@@ -63,14 +60,12 @@ export class AutoHide {
     });
   }
 
-  /** Islands take the pointer themselves when the taskbar lets it through, as separate islands do. */
   follow(island: St.Widget): void {
     if (this.hovered.has(island)) return;
     this.hovered.add(island);
     island.connect('notify::hover', () => this.sync());
   }
 
-  /** Whether the dock's edge shows. */
   get shown(): boolean {
     return this.allowed && this.states.get(this.screen.edge)!.revealed;
   }
@@ -81,13 +76,11 @@ export class AutoHide {
     this.sync(true);
   }
 
-  /** Keeps the edge with an open surface's button revealed. */
   setActive(edge: Edge | null): void {
     this.activeEdge = edge;
     this.sync();
   }
 
-  /** Keeps every edge revealed while people arrange the taskbar. */
   arrange(arranging: boolean): void {
     this.arranging = arranging;
     this.sync();
@@ -218,8 +211,8 @@ export class AutoHide {
       actor.show();
       animateActor(actor, {
         ...this.offset(edge, revealed),
-        duration: SLIDE_DURATION,
-        mode: revealed ? Clutter.AnimationMode.EASE_OUT_QUART : Clutter.AnimationMode.EASE_IN_QUART,
+        duration: Duration.moderate,
+        curve: revealed ? Curve.settle : Curve.depart,
         onComplete: () => { if (!this.states.get(edge)!.revealed) actor.hide(); },
       });
     }

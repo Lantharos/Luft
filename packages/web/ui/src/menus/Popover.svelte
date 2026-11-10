@@ -10,7 +10,6 @@
 		label: string;
 		role: 'listbox' | 'dialog' | 'menu';
 		align?: Align;
-		/** Opens to this side of the anchor instead of below it. */
 		side?: Side;
 		minWidth?: number;
 		maxHeight?: number;

@@ -16,7 +16,7 @@ const DEVICE_ACTIVATED = 100;
 const GLOBAL_CONNECTED = 70;
 const ACTIVATED = 2;
 const FULL = 4;
-const CHECK_URI = 'http://fedoraproject.org/static/hotspot.txt';
+const CHECK_URI = 'http://luft.computer/connectivity';
 
 export const NETWORK_MANAGER_NAME = 'org.freedesktop.NetworkManager';
 

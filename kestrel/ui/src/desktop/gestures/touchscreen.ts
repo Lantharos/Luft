@@ -2,14 +2,11 @@ import Clutter from 'gi://Clutter';
 
 import { gestureEvent } from './gestureEvent.js';
 
-// A touchscreen works like one big touchpad: three or more fingers swipe and two pinch, for whatever takes the
-// touchpad's gestures. Fingers nothing wants stay with the app under them, or the desktop's own workspace swipe.
 const SWIPE_FINGERS = 3;
-// Under the workspace swipe's 16, so a swipe that's wanted here is taken before that one starts
-const BEGIN_THRESHOLD = 10;
-// Two fingers over a window only count once they spread or close this much, so they still scroll the app otherwise
-const PINCH_SLOP = 0.08;
+const BEGIN_BEFORE_WORKSPACE_SWIPE_THRESHOLD = 10;
+const PINCH_SLOP_LEAVING_SCROLL_TO_APP = 0.08;
 const UNITS_PER_MM = 1000 / 25.4;
+const TOUCHPAD_SIZED_SHARE_OF_SCREEN = 0.5;
 
 interface TouchGestureTarget {
   handle(event: Clutter.Event): boolean;
@@ -36,18 +33,16 @@ function shapeAt(points: Point[], time: number): Shape {
   return { center, spread, fingers: points.length, time };
 }
 
-// The gesture's own point coordinates follow the actors under the fingers, which the board scales, so read the screen's
-function shapeOf(gesture: Clutter.Gesture): Shape {
+function screenShapeOf(gesture: Clutter.Gesture): Shape {
   const events = gesture.get_points().map(point => gesture.get_point_event(point));
   return shapeAt(events.map(event => event.get_coords()), Math.max(...events.map(event => event.get_time())));
 }
 
 const slotOf = (event: Clutter.Event) => event.get_event_sequence()?.get_slot() ?? -1;
 
-// Gestures that track the touchpad's height cover half the screen's, since a hand travels further over a screen than a touchpad
 function touchpadEvent(type: Clutter.EventType, phase: Clutter.TouchpadGesturePhase, shape: Shape, delta: Point, scale: number): Clutter.Event {
   const device = {
-    get_dimensions: (): [boolean, number, number] => [true, global.screen_width / 2 / UNITS_PER_MM, global.screen_height / 2 / UNITS_PER_MM],
+    get_dimensions: (): [boolean, number, number] => [true, global.screen_width * TOUCHPAD_SIZED_SHARE_OF_SCREEN / UNITS_PER_MM, global.screen_height * TOUCHPAD_SIZED_SHARE_OF_SCREEN / UNITS_PER_MM],
     get_device_type: () => Clutter.InputDeviceType.TOUCHSCREEN_DEVICE,
   };
   return gestureEvent({ type, phase, fingers: shape.fingers, time: shape.time, coords: shape.center, delta, scale, device });
@@ -66,7 +61,7 @@ class TouchGesture {
     private readonly wants: (shape: Shape, scale: number) => boolean,
     private readonly target: TouchGestureTarget,
   ) {
-    this.gesture = new Clutter.PanGesture({ name: `Kestrel touchscreen ${type === Clutter.EventType.TOUCHPAD_PINCH ? 'pinch' : 'swipe'}`, min_n_points: fingers[0], max_n_points: fingers[1], begin_threshold: BEGIN_THRESHOLD });
+    this.gesture = new Clutter.PanGesture({ name: `Kestrel touchscreen ${type === Clutter.EventType.TOUCHPAD_PINCH ? 'pinch' : 'swipe'}`, min_n_points: fingers[0], max_n_points: fingers[1], begin_threshold: BEGIN_BEFORE_WORKSPACE_SWIPE_THRESHOLD });
     this.gesture.connect('should-handle-sequence', (_gesture, event: Clutter.Event) => {
       this.starts.set(slotOf(event), event.get_coords());
       return true;
@@ -82,7 +77,7 @@ class TouchGesture {
   }
 
   private mayRecognize(): boolean {
-    const shape = shapeOf(this.gesture);
+    const shape = screenShapeOf(this.gesture);
     const begin = this.beginShape();
     return this.wants(shape, begin.spread > 0 ? shape.spread / begin.spread : 1);
   }
@@ -93,16 +88,14 @@ class TouchGesture {
   }
 
   private send(phase: Clutter.TouchpadGesturePhase): void {
-    const shape = shapeOf(this.gesture);
+    const shape = screenShapeOf(this.gesture);
     if (phase === Clutter.TouchpadGesturePhase.BEGIN) {
       this.begin = this.last = { ...this.beginShape(), fingers: shape.fingers };
-      // Takes the fingers away from the app under them, as the workspace swipe does
       this.grab = global.stage.grab(global.stage);
     }
     const last = this.last!;
-    // Each finger's move updates the gesture, so wait for the next moment to report them all as one, as a touchpad does
-    if (phase === Clutter.TouchpadGesturePhase.UPDATE && shape.time <= last.time && shape.fingers === last.fingers) return;
-    // A finger landing or lifting moves the center without the hand moving
+    const alreadyReportedThisMoment = shape.time <= last.time && shape.fingers === last.fingers;
+    if (phase === Clutter.TouchpadGesturePhase.UPDATE && alreadyReportedThisMoment) return;
     const delta: Point = shape.fingers === last.fingers ? [shape.center[0] - last.center[0], shape.center[1] - last.center[1]] : [0, 0];
     if (shape.fingers !== this.begin!.fingers) this.begin = { ...shape, spread: shape.spread * this.begin!.spread / Math.max(1, last.spread) };
     this.last = shape;
@@ -129,14 +122,13 @@ export class TouchscreenGestures {
       new TouchGesture(Clutter.EventType.TOUCHPAD_SWIPE, [SWIPE_FINGERS, 0],
         shape => target.wantsSwipe(shape.fingers, ...shape.center), target),
       new TouchGesture(Clutter.EventType.TOUCHPAD_PINCH, [2, 2],
-        (shape, scale) => target.wantsPinch(...shape.center, Math.abs(scale - 1) >= PINCH_SLOP), target),
+        (shape, scale) => target.wantsPinch(...shape.center, Math.abs(scale - 1) >= PINCH_SLOP_LEAVING_SCROLL_TO_APP), target),
     ];
     for (const { gesture } of this.gestures) global.stage.add_action_full(gesture.name, Clutter.EventPhase.CAPTURE, gesture);
   }
 
-  // Whether the fingers of another gesture are a swipe that's wanted here, which that gesture leaves alone then
   claims(gesture: Clutter.Gesture): boolean {
-    const shape = shapeOf(gesture);
+    const shape = screenShapeOf(gesture);
     return shape.fingers >= SWIPE_FINGERS && this.target.wantsSwipe(shape.fingers, ...shape.center);
   }
 

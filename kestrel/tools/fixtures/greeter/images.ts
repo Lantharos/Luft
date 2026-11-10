@@ -1,6 +1,6 @@
 import Cairo from 'cairo';
 
-import {type Color, drawAvatar} from '../system/avatar.js';
+import {type Color, drawAvatar} from '../system/accounts/avatar.js';
 
 const [directory] = ARGV;
 

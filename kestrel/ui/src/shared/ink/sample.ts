@@ -20,7 +20,6 @@ function pressureOf(event: Clutter.Event): number {
   return Shell.util_get_event_axis(event, Clutter.InputAxis.PRESSURE);
 }
 
-/** Where the event happened on the actor, how hard a pen pressed, and when. */
 export function sampleOf(event: Clutter.Event, actor: Clutter.Actor): InkSample {
   const [stageX, stageY] = event.get_coords();
   const [, x, y] = actor.transform_stage_point(stageX, stageY);

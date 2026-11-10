@@ -1,13 +1,12 @@
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
-import { animateActor } from '../../../shared/motion/motion.js';
+import { animateActor, Curve, Duration } from '../../../shared/motion/motion.js';
 import type { ControlMenu } from '../quickControls.js';
 
 const GAP = 8;
-const MOVE = { duration: 280, mode: Clutter.AnimationMode.EASE_OUT_CUBIC };
+const MOVE = { duration: Duration.relaxed, curve: Curve.glide };
 const REVEAL_DELAY = 170;
-const HIDE_DURATION = 90;
 
 interface Slot { x: number; y: number; width: number; height: number }
 
@@ -126,7 +125,7 @@ export class TileGrid {
     menu.actor.opacity = 0;
     menu.actor.show();
     this.layout(true);
-    animateActor(menu.actor, { opacity: 255, delay: REVEAL_DELAY, duration: 180, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
+    animateActor(menu.actor, { opacity: 255, delay: REVEAL_DELAY, duration: Duration.quick, curve: Curve.gentle });
     this.events.menuOpened(menu);
   }
 
@@ -134,8 +133,8 @@ export class TileGrid {
     if (this.expanded === tile) this.expanded = null;
     menu.actor.remove_all_transitions();
     if (this.instant) menu.actor.hide();
-    else animateActor(menu.actor, { opacity: 0, duration: HIDE_DURATION, onStopped: () => { if (!menu.isOpen) menu.actor.hide(); } });
-    this.layout(!this.instant, HIDE_DURATION / 2);
+    else animateActor(menu.actor, { opacity: 0, duration: Duration.tap, onStopped: () => { if (!menu.isOpen) menu.actor.hide(); } });
+    this.layout(!this.instant, Duration.tap / 2);
     this.events.menuClosed(menu);
   }
 

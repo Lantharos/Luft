@@ -81,7 +81,6 @@ export class ScreencastService extends ServiceImplementation {
     }
   }
 
-  /** Whether Kestrel itself asks, which records for people from its screenshot tools. Nothing else may record the screen through here. */
   private async fromKestrel(invocation: Gio.DBusMethodInvocation): Promise<boolean> {
     if (await callerOwns(invocation, KESTREL)) return true;
     invocation.return_dbus_error('org.freedesktop.DBus.Error.AccessDenied', 'Only Kestrel can record the screen here');

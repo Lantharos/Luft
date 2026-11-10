@@ -1,6 +1,7 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
+import { developmentPath } from '../../shared/apps/development.js';
 import * as Config from '../config.js';
 
 let ifaceResource: Gio.Resource | null = null;
@@ -8,7 +9,7 @@ let ifaceResource: Gio.Resource | null = null;
 function ensureIfaceResource(): void {
   if (ifaceResource) return;
 
-  const dir = GLib.getenv('KESTREL_DATADIR') || Config.PKGDATADIR;
+  const dir = developmentPath('KESTREL_DATADIR') ?? Config.PKGDATADIR;
   ifaceResource = Gio.Resource.load(`${dir}/kestrel-dbus-interfaces.gresource`);
   Gio.resources_register(ifaceResource);
 }

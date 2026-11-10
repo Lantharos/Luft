@@ -4,6 +4,7 @@ import Meta from 'gi://Meta';
 import Mtk from 'gi://Mtk';
 import St from 'gi://St';
 
+import { Curve, Duration } from '../../shared/motion/motion.js';
 import * as Background from './background.js';
 import { LockBackdrop } from '../../auth/lockScreen/backdrop.js';
 import * as Main from '../main.js';
@@ -17,7 +18,6 @@ export { MonitorConstraint } from './layout/monitorConstraint.js';
 export type { ChromeOptions } from './layout/chrome.js';
 export type { Monitor } from './layout/monitor.js';
 
-const STARTUP_ANIMATION_TIME = 500;
 const STARTUP_SCALE = 0.94;
 
 export namespace LayoutManager {
@@ -382,8 +382,8 @@ export const LayoutManager = GObject.registerClass({
       scale_x: 1,
       scale_y: 1,
       opacity: 255,
-      duration: STARTUP_ANIMATION_TIME,
-      mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+      duration: Duration.long,
+      curve: Curve.gentle,
     }).catch(logErrorUnlessCancelled);
   }
 

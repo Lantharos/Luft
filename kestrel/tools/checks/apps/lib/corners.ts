@@ -17,7 +17,6 @@ export async function squareCorners(look: () => Promise<void>) {
   }
 }
 
-/** Saves what an app shows in the dark style, the light style and with square corners. */
 export async function saveEveryLook(app: LuftApp, name: string) {
   (await app.settle(() => true)).save(`${name}-dark`);
   await withScheme('light', async () => (await app.settle(() => true)).save(`${name}-light`));

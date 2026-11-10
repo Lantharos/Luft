@@ -5,8 +5,8 @@ import IBus from 'gi://IBus';
 
 import * as Main from '../../core/main.js';
 import { EventEmitter } from '../../core/runtime/signals.js';
-import { getInputSourceManager, INPUT_SOURCE_TYPE_IBUS, type InputSource } from '../../system/inputSources/keyboard.js';
-import { getIBusManager } from '../../system/inputSources/ibusManager.js';
+import { getInputSourceManager, INPUT_SOURCE_TYPE_IBUS, type InputSource } from '../../system/input/inputSources/keyboard.js';
+import { getIBusManager } from '../../system/input/inputSources/ibusManager.js';
 
 const KEY_RELEASE_TIMEOUT = 50;
 const BACKSPACE_WORD_DELETE_THRESHOLD = 50;

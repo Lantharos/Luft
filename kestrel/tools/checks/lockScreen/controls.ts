@@ -59,7 +59,7 @@ async function switchStyle(styles: Gio.Settings, scheme: string) {
 
 async function checkPower(styles: Gio.Settings, scheme: string) {
   const menu = await open('kestrel-lock-power', 'power opens its menu');
-  require(showsText('Suspend'), 'power offers suspend while locked');
+  require(showsText('Sleep'), 'power offers suspend while locked');
   await switchStyle(styles, 'prefer-dark');
   await capture('lock-power-dark');
   await switchStyle(styles, 'prefer-light');
@@ -67,7 +67,7 @@ async function checkPower(styles: Gio.Settings, scheme: string) {
   await capture('lock-power-light');
   await switchStyle(styles, scheme);
   await close();
-  require(!showsText('Suspend'), 'menus close again on the lock screen');
+  require(!showsText('Sleep'), 'menus close again on the lock screen');
 }
 
 export async function run() {

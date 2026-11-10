@@ -79,8 +79,8 @@ board-quick-settings = Quick settings
 
 # Screen-reader label of the close button on a window card.
 task-view-close-window = Close window
-# Name of a virtual desktop (workspace). $number counts from 1.
-task-view-desktop = Desktop { $number }
+# Name of a workspace. $number counts from 1.
+task-view-desktop = Workspace { $number }
 
 ## Snap layouts
 
@@ -103,9 +103,9 @@ window-resize-size = { $width } × { $height }
 
 # $appName is the name of the app that stopped responding
 close-dialog-title = “{ $appName }” isn’t responding
-close-dialog-description = You may choose to wait a short while for it to continue or force the app to quit entirely
+close-dialog-description = You can wait a little longer for it, or force it to quit. Unsaved work may be lost.
 # Button
-close-dialog-force-quit = Force Quit
+close-dialog-force-quit = Force quit
 # Button
 close-dialog-wait = Wait
 
@@ -114,11 +114,11 @@ close-dialog-wait = Wait
 # Show the same picture on every display
 switch-monitor-mirror = Mirror
 # Spread the desktop across all displays
-switch-monitor-join = Join Displays
+switch-monitor-join = Join displays
 # Use only the external displays
-switch-monitor-external-only = External Only
+switch-monitor-external-only = External only
 # Use only the laptop's own display
-switch-monitor-built-in-only = Built-in Only
+switch-monitor-built-in-only = Built-in only
 
 ## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
 
@@ -126,7 +126,7 @@ ctrl-alt-tab-windows = Windows
 
 ## Window menu, opened by right-clicking a window's title bar
 
-title-bar-menu-screenshot = Take Screenshot
+title-bar-menu-screenshot = Take screenshot
 # Minimizes the window
 title-bar-menu-hide = Hide
 # Returns a maximized window to its previous size
@@ -136,16 +136,16 @@ title-bar-menu-maximize = Maximize
 title-bar-menu-move = Move
 # Verb: starts resizing the window with the keyboard or mouse
 title-bar-menu-resize = Resize
-title-bar-menu-always-on-top = Always on Top
-title-bar-menu-see-through = See-Through
+title-bar-menu-always-on-top = Always on top
+title-bar-menu-see-through = See-through
 # Keeps the window on every workspace
-title-bar-menu-always-on-visible-workspace = Always on Visible Workspace
-title-bar-menu-workspace-left = Move to Workspace Left
-title-bar-menu-workspace-right = Move to Workspace Right
-title-bar-menu-workspace-up = Move to Workspace Up
-title-bar-menu-workspace-down = Move to Workspace Down
-title-bar-menu-monitor-up = Move to Monitor Up
-title-bar-menu-monitor-down = Move to Monitor Down
-title-bar-menu-monitor-left = Move to Monitor Left
-title-bar-menu-monitor-right = Move to Monitor Right
+title-bar-menu-always-on-visible-workspace = Show on all workspaces
+title-bar-menu-workspace-left = Move to workspace on the left
+title-bar-menu-workspace-right = Move to workspace on the right
+title-bar-menu-workspace-up = Move to workspace above
+title-bar-menu-workspace-down = Move to workspace below
+title-bar-menu-monitor-up = Move to display above
+title-bar-menu-monitor-down = Move to display below
+title-bar-menu-monitor-left = Move to display on the left
+title-bar-menu-monitor-right = Move to display on the right
 title-bar-menu-close = Close

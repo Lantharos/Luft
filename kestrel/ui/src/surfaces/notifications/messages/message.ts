@@ -7,7 +7,7 @@ import St from 'gi://St';
 
 import * as Util from '../../../core/runtime/util.js';
 import { styleSurface } from '../../../appearance/kestrelGlass.js';
-import { ANIMATION_TIME } from '../tray/messageTray.js';
+import { Curve, Duration } from '../../../shared/motion/motion.js';
 import { MessageHeader } from './messageHeader.js';
 import { LabelExpanderLayout, ScaleLayout } from './messageLayouts.js';
 import type { MessageSource } from './source.js';
@@ -257,9 +257,9 @@ export class Message extends St.Button {
     this.expanded = true;
     this.actionBin.visible = !!this.actionBin.child;
 
-    const duration = animate ? ANIMATION_TIME : 0;
+    const duration = animate ? Duration.moderate : 0;
     this.bodyBin.ease_property('@layout.expansion', 1, {
-      mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+      curve: Curve.gentle,
       duration,
     });
 
@@ -267,7 +267,7 @@ export class Message extends St.Button {
     this.actionBin.ease({
       scale_y: 1,
       duration,
-      mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+      curve: Curve.gentle,
     });
 
     this.header.expandButton.ease({
@@ -279,16 +279,16 @@ export class Message extends St.Button {
   }
 
   unexpand(animate: boolean): void {
-    const duration = animate ? ANIMATION_TIME : 0;
+    const duration = animate ? Duration.moderate : 0;
     this.bodyBin.ease_property('@layout.expansion', 0, {
-      mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+      curve: Curve.gentle,
       duration,
     });
 
     this.actionBin.ease({
       scale_y: 0,
       duration,
-      mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+      curve: Curve.gentle,
       onComplete: () => {
         this.actionBin.hide();
         this.expanded = false;

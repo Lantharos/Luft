@@ -27,7 +27,6 @@ function leftChannel(bytes: Uint8Array): Float32Array {
   return Float32Array.from({length: interleaved.length / CHANNELS}, (_, index) => interleaved[index * CHANNELS]);
 }
 
-/** What reached a recorder while `act` ran, and for a moment after, one channel of it at 48 kHz. `connect` gives the recorder its ports and links them. */
 export async function recorded(eventually: Eventually, connect: (ear: string) => Promise<boolean>, label: string, act: () => void | Promise<void>, afterMs = AFTER_MS): Promise<Float32Array> {
   const path = scratch(`${EAR}-${GLib.uuid_string_random()}.wav`);
   const ear = spawn(['pw-record', '-P', `{ node.name = ${EAR} }`, '--rate', `${RATE}`, '--channels', `${CHANNELS}`, '--format', 'f32', path]);
@@ -41,11 +40,9 @@ export async function recorded(eventually: Eventually, connect: (ear: string) =>
   return samples;
 }
 
-/** What came out of the speakers while `act` ran, and for a moment after, one channel of it at 48 kHz. */
 export const overhear = (eventually: Eventually, act: () => void | Promise<void>, afterMs = AFTER_MS) => recorded(eventually, async ear =>
   await speakers() && await link('speakers:monitor_FL', `${ear}:input_FL`) && await link('speakers:monitor_FR', `${ear}:input_FR`), 'the ear hears the speakers', act, afterMs);
 
-/** How strongly a pure tone of this pitch sounds in the samples, 1 for a full-scale tone. */
 export function toneStrength(samples: Float32Array, pitch: number): number {
   if (!samples.length) return 0;
   const step = 2 * Math.PI * pitch / RATE;
@@ -58,7 +55,6 @@ export function toneStrength(samples: Float32Array, pitch: number): number {
   return 2 * Math.hypot(real, imaginary) / samples.length;
 }
 
-/** Where each separate sound starts, in samples. */
 export function onsets(samples: Float32Array): number[] {
   const gap = RATE * QUIET_BETWEEN_MS / 1000;
   const starts: number[] = [];
@@ -71,7 +67,6 @@ export function onsets(samples: Float32Array): number[] {
   return starts;
 }
 
-/** The pitch of a pure tone starting there, by how often it crosses zero. */
 export function pitchAt(samples: Float32Array, start: number, length = RATE / 100): number {
   let crossings = 0;
   for (let index = start + 1; index < start + length; index++)

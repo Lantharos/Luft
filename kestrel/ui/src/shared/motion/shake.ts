@@ -1,8 +1,8 @@
 import Clutter from 'gi://Clutter';
 
 import { reducedMotion } from './motion.js';
+import { Duration } from './motion.js';
 
-const DURATION = 380;
 const STEPS: readonly [number, number][] = [[0, 0], [0.18, -6], [0.4, 5], [0.62, -3], [0.82, 1.5], [1, 0]];
 
 export function decelerate(t: number): number {
@@ -20,7 +20,7 @@ function offsetAt(progress: number): number {
 
 export function shake(actor: Clutter.Actor): void {
   if (reducedMotion()) return;
-  const timeline = new Clutter.Timeline({ actor, duration: DURATION });
+  const timeline = new Clutter.Timeline({ actor, duration: Duration.slow });
   timeline.connect('new-frame', () => (actor.translation_x = offsetAt(decelerate(timeline.get_progress()))));
   timeline.connect('completed', () => (actor.translation_x = 0));
   timeline.start();

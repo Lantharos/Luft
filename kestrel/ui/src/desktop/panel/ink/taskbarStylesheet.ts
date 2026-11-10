@@ -41,8 +41,6 @@ const shading = ({ glass }: PanelSurface) => glass
   ? ` -kestrel-glass-dim: ${glass.dim}; -kestrel-glass-lift: ${glass.lift}; -kestrel-glass-saturation: ${glass.saturation};`
   : '';
 
-// The stylesheet of each style gives the taskbar that style's glass; a
-// taskbar that takes the other one over its wallpaper gets it here
 function surfaceRules(style: Scheme, scheme: Scheme): string {
   if (scheme === style) return '';
   const glass = schemeThemes()[scheme].surface('kestrel-taskbar-glass', true);

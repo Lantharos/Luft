@@ -1,3 +1,4 @@
+import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import type GObject from 'gi://GObject';
@@ -9,6 +10,7 @@ import {checks} from '../lib/check.js';
 import {failureOf} from '../lib/errors.js';
 import {withFullAccess} from '../lib/access/permissions.js';
 import {call, ownName, privateConnection, subscribe} from '../lib/dbus.js';
+import {press} from '../lib/input/input.js';
 import {fixture, gjs, outcome, spawn, stop, waitForWindow} from '../lib/processes.js';
 import {pause} from '../lib/wait.js';
 import {lock, unlock} from '../lockScreen/lib/shield.js';
@@ -24,6 +26,10 @@ const NOT_IN_INITIALIZATION = 'org.gnome.SessionManager.NotInInitialization';
 const NO_CONFIRMATION = 1;
 const SCREENCAST_SERVICE = 'com.lantharos.Kestrel.Screencast';
 const PASSKEYS = ['/com/lantharos/Kestrel/Passkeys', 'com.lantharos.Kestrel.Passkeys1'] as const;
+const SERVICE_CHANNEL = ['/org/gnome/Mutter/ServiceChannel', 'org.gnome.Mutter.ServiceChannel'] as const;
+const IDLE_MONITOR = ['/org/gnome/Mutter/IdleMonitor/Core', 'org.gnome.Mutter.IdleMonitor'] as const;
+const PORTAL_BACKEND_CLIENT = 1;
+const SHORT_IDLE = 200;
 const PASSKEYS_AGENT = 'com.lantharos.Passkeys';
 const SETTINGS_APP = 'com.lantharos.settings';
 const PRELOADED = 'libm.so.6';
@@ -93,9 +99,6 @@ async function checkShellServices(app: SandboxedApp) {
     'sandboxed apps cannot open passkey prompts');
   await denied('/com/lantharos/Kestrel/Brightness', 'com.lantharos.Kestrel.Brightness', 'SetDimming', new GLib.Variant('(b)', [true]),
     'sandboxed apps cannot dim the screen');
-  await denied('/org/gtk/Notifications', 'org.gtk.Notifications', 'AddNotification',
-    new GLib.Variant('(ssa{sv})', ['com.obsproject.Studio', 'impostor', {title: new GLib.Variant('s', 'Recording stopped')}]),
-    'sandboxed apps cannot show notifications in the name of other apps');
   await denied('/org/gtk/MountOperationHandler', 'org.Gtk.MountOperationHandler', 'AskPassword',
     new GLib.Variant('(sssssu)', ['impostor', 'Enter your password', '', '', '', 0]), 'sandboxed apps cannot ask for passwords as the system');
   await denied(`${MANAGER[0]}/EndSessionDialog`, `${MANAGER[1]}.EndSessionDialog`, 'Open', new GLib.Variant('(uuuao)', [0, 0, 60, []]),
@@ -151,6 +154,42 @@ async function checkTray() {
   }
 }
 
+async function checkGtkNotifications() {
+  const app = await sandboxedApp('org.gtk.Notifications');
+  try {
+    require(await failure(app.call('/org/gtk/Notifications', 'org.gtk.Notifications', 'AddNotification',
+      new GLib.Variant('(ssa{sv})', ['com.obsproject.Studio', 'impostor', {title: new GLib.Variant('s', 'Recording stopped')}]))) === ACCESS_DENIED,
+    'sandboxed apps cannot show notifications in the name of other apps');
+    require(await failure(app.call('/org/gnome/Mutter/RemoteDesktop', 'org.gnome.Mutter.RemoteDesktop', 'CreateSession', null, '(o)')) !== null,
+      'apps allowed to show notifications cannot control the computer');
+  } finally {
+    await app.close();
+  }
+}
+
+async function checkIdleMonitor(app: SandboxedApp) {
+  const idleTime = async (reply: Promise<GLib.Variant>) => (await reply).deepUnpack<[number]>()[0];
+  const idleOutside = () => idleTime(call('org.gnome.Shell', ...IDLE_MONITOR, 'GetIdletime', null, '(t)'));
+  press(Clutter.KEY_Shift_L);
+  await eventually(async () => await idleOutside() > 0, 'programs outside a sandbox read the time since the last key press');
+  require(await idleTime(app.call(...IDLE_MONITOR, 'GetIdletime', null, '(t)')) === 0, 'sandboxed apps read no idle time right after input');
+
+  const [watch] = (await call('org.gnome.Shell', ...IDLE_MONITOR, 'AddIdleWatch', new GLib.Variant('(t)', [SHORT_IDLE]), '(u)')).deepUnpack<[number]>();
+  const fired: number[] = [];
+  try {
+    await app.call(...IDLE_MONITOR, 'RemoveWatch', new GLib.Variant('(u)', [watch]));
+    const unsubscribe = subscribe<[number]>({iface: IDLE_MONITOR[1], member: 'WatchFired', path: IDLE_MONITOR[0]}, (_signal, [id]) => fired.push(id));
+    try {
+      press(Clutter.KEY_Shift_L);
+      await eventually(() => fired.includes(watch), 'an idle watch a sandboxed app tried to remove still fires for the program that added it');
+    } finally {
+      unsubscribe();
+    }
+  } finally {
+    await call('org.gnome.Shell', ...IDLE_MONITOR, 'RemoveWatch', new GLib.Variant('(u)', [watch]));
+  }
+}
+
 async function checkMutter() {
   const app = await sandboxedApp('org.gnome.Shell');
   const denied = async (path: string, iface: string, method: string, parameters: GLib.Variant | null, label: string) =>
@@ -168,6 +207,11 @@ async function checkMutter() {
       new GLib.Variant('(ssv)', ['org.gnome.Mutter.DisplayConfig', 'PowerSaveMode', new GLib.Variant('i', 0)]), 'sandboxed apps cannot turn displays off');
     require(await failure(app.call('/org/gnome/Mutter/DisplayConfig', 'org.gnome.Mutter.DisplayConfig', 'GetCurrentState')) === null,
       'sandboxed apps can still read the display layout');
+    await denied(...SERVICE_CHANNEL, 'OpenWaylandConnection', new GLib.Variant('(a{sv})', [{}]),
+      'sandboxed apps cannot open a Wayland connection that counts as Kestrel\'s own');
+    await denied(...SERVICE_CHANNEL, 'OpenWaylandServiceConnection', new GLib.Variant('(u)', [PORTAL_BACKEND_CLIENT]),
+      'sandboxed apps cannot open a Wayland connection as a portal backend');
+    await checkIdleMonitor(app);
   } finally {
     await app.close();
   }
@@ -234,7 +278,7 @@ async function checkFullAccess() {
   }
 }
 
-const shortcutsPrompt = () => descendants(global.stage).filter(actor => actor.mapped).map(textOf).find(text => text?.includes('wants to inhibit shortcuts'))?.replace(/[\u2068\u2069]/g, '') ?? null;
+const shortcutsPrompt = () => descendants(global.stage).filter(actor => actor.mapped).map(textOf).find(text => text?.includes('wants to handle keyboard shortcuts itself'))?.replace(/[\u2068\u2069]/g, '') ?? null;
 
 async function shortcutsAnswer(window: Meta.Window) {
   const dialog = shortcutsDialogFor(window);
@@ -257,11 +301,11 @@ async function checkWindowImpostors() {
     require(x11Window.get_wm_class() === SETTINGS_APP, 'an X11 window can name itself after Settings');
     const x11Prompt = await shortcutsAnswer(x11Window);
     require(typeof x11Prompt === 'string', 'an X11 window named after Settings asks before it inhibits shortcuts');
-    require(x11Prompt === 'The app gjs-console wants to inhibit shortcuts', `the prompt names the program behind the X11 window, not the name it chose (${x11Prompt})`);
+    require(x11Prompt === 'gjs-console wants to handle keyboard shortcuts itself. Luft’s own shortcuts won’t work while it does.', `the prompt names the program behind the X11 window, not the name it chose (${x11Prompt})`);
     const waylandPrompt = await shortcutsAnswer(await waitForWindow('Kestrel impostor: Wayland'));
     require(typeof waylandPrompt === 'string', 'a program outside Luft\'s apps with a Luft app ID asks before it inhibits shortcuts');
     require(typeof waylandPrompt === 'string' && waylandPrompt.startsWith('The app python'), `the prompt names the program, not its app ID (${waylandPrompt})`);
-    require(await shortcutsAnswer(await waitForWindow('Kestrel impostor: sandboxed')) === `The app ${SANDBOXED_APP} wants to inhibit shortcuts`,
+    require(await shortcutsAnswer(await waitForWindow('Kestrel impostor: sandboxed')) === `${SANDBOXED_APP} wants to handle keyboard shortcuts itself. Luft’s own shortcuts won’t work while it does.`,
       'a sandboxed app with a Luft app ID asks before it inhibits shortcuts, named by its sandbox');
   } finally {
     await Promise.all([stop(x11), stop(unsandboxed), stop(sandboxed)]);
@@ -279,6 +323,7 @@ export async function run() {
   await checkShellConnection();
   await checkScreenSaver();
   await checkTray();
+  await checkGtkNotifications();
   await checkMutter();
   await checkFullAccess();
   await checkHostImpostors();

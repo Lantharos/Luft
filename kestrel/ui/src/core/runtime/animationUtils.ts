@@ -1,9 +1,9 @@
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
+import { Curve, Duration } from '../../shared/motion/motion.js';
 import { logErrorUnlessCancelled } from './errorUtils.js';
 
-const SCROLL_TIME = 100;
 
 const WIGGLE_OFFSET = 6;
 const WIGGLE_DURATION = 65;
@@ -48,8 +48,8 @@ export function ensureActorVisibleInScrollView(scrollView: St.ScrollView, actor:
   else return;
 
   adjustment.ease(value, {
-    mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-    duration: SCROLL_TIME,
+    curve: Curve.gentle,
+    duration: Duration.tap,
   });
 }
 
@@ -63,19 +63,19 @@ export async function wiggle(actor: Clutter.Actor, options?: WiggleOptions): Pro
     await actor.easeAsync({
       translation_x: -offset,
       duration,
-      mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+      curve: Curve.gentle,
     });
     await actor.easeAsync({
       translation_x: offset,
       duration,
-      mode: Clutter.AnimationMode.LINEAR,
+      curve: Curve.linear,
       repeatCount: wiggleCount,
       autoReverse: true,
     });
     await actor.easeAsync({
       translation_x: 0,
       duration,
-      mode: Clutter.AnimationMode.EASE_IN_QUAD,
+      curve: Curve.accelerate,
     });
   } catch (e) {
     logErrorUnlessCancelled(e);

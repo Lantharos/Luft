@@ -10,7 +10,6 @@ const READING_MS = 50;
 
 export const LEVEL_FLOOR_DB = -48;
 
-/** How loud the speakers sound in decibels, averaged over a second, listening afresh since quiet speakers stop feeding the levels. */
 export async function loudness(eventually: Eventually): Promise<number> {
   const monitor = Shell.AudioMonitor.get_default();
   monitor.set_listening(false);

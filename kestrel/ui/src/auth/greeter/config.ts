@@ -1,6 +1,8 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
+import { developmentPath } from '../../shared/apps/development.js';
+
 export interface GreeterConfig {
   showUsers: boolean;
   hiddenUsers: string[];
@@ -10,7 +12,7 @@ export interface GreeterConfig {
 
 const DEFAULTS: GreeterConfig = { showUsers: true, hiddenUsers: [], defaultSession: '', numLock: true };
 
-const STATE_DIRECTORY = GLib.getenv('KESTREL_GREETER_STATE_DIR') ?? '/var/lib/kestrel-greeter';
+const STATE_DIRECTORY = developmentPath('KESTREL_GREETER_STATE_DIR') ?? '/var/lib/kestrel-greeter';
 
 export function stateFile(...path: string[]): Gio.File {
   return Gio.File.new_for_path(GLib.build_filenamev([STATE_DIRECTORY, ...path]));

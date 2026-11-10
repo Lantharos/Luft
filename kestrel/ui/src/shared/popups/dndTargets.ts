@@ -34,11 +34,8 @@ interface DragMonitor {
   dragDrop?(event: DropEvent): DragDropResult;
 }
 
-/** Something that takes files apps drag over it, such as a taskbar element. */
 export interface FileDropTarget {
-  /** Whether it takes files right now, dragged over `picked`, which is it or something inside it. */
   takes(picked: Clutter.Actor): boolean;
-  /** Files are being dragged over it, or no longer are. */
   hover(over: boolean): void;
   drop(paths: string[]): void;
 }

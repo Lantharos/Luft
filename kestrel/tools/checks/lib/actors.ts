@@ -48,7 +48,6 @@ export function shownStyled(name: string, root: Clutter.Actor = global.stage): S
   return styled(name, root).find(actor => actor.mapped) ?? null;
 }
 
-/** A shown dialog with this style once it takes input, which system prompts don't for a moment after they show. */
 export function answerable(name: string): St.Widget | null {
   const dialog = shownStyled(name);
   for (let actor: Clutter.Actor | null = dialog; actor; actor = actor.get_parent())

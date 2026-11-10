@@ -54,7 +54,6 @@ const playingDetail = async () => (await page()).find(item => item.type === 'swi
 
 let routed = false;
 
-/** Whether its sounds play, routed into the speakers once, the way a session manager would. */
 const audible = async () => (routed ||= await intoSpeakers({'media.name': 'Soundscapes'}, 'Soundscapes:output', 2)) && mixer.playing;
 
 async function loudness(): Promise<number> {
@@ -130,7 +129,6 @@ async function checkMedia() {
   }
 }
 
-/** Plays with a sleep timer that has little time left, the way Kestrel finds it stored when it starts the extension. */
 async function checkSleepTimer() {
   await setSetting(SOUNDSCAPES, 'sleep-timer', new GLib.Variant('s', '15'));
   await request('Disable', SOUNDSCAPES);

@@ -21,6 +21,7 @@ export type WindowMatch = string | ((window: Meta.Window) => boolean);
 export const repository = (...parts: string[]) => GLib.build_filenamev([KESTREL_TOOLS.root, ...parts]);
 export const fixture = (...parts: string[]) => repository('kestrel', 'tools', 'fixtures', ...parts);
 export const builtFixture = (...parts: string[]) => GLib.build_filenamev([KESTREL_TOOLS.built, 'fixtures', ...parts]);
+export const builtExtension = (id: string) => GLib.build_filenamev([KESTREL_TOOLS.extensions, id]);
 export const scratch = (...parts: string[]) => GLib.build_filenamev([GLib.get_user_cache_dir(), ...parts]);
 
 export function spawn(argv: string[], {env = {}, flags = Gio.SubprocessFlags.NONE, cwd = null}: SpawnOptions = {}): Process {

@@ -55,7 +55,6 @@ class LauncherEntries {
     this.emit(appId);
   }
 
-  /** Remembers that a sender spoke for an app, so its badge goes when the sender does. A sender only gets so many apps. */
   private track(sender: string, appId: string): boolean {
     const known = this.senders.get(sender);
     if (known) {

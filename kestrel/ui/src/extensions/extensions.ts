@@ -6,12 +6,10 @@ import { ExtensionsService } from './service.js';
 
 type HostParts = Omit<ExtensionHost, 'desktop' | 'watchMonitors'>;
 
-/** Luft extensions in this session: the runtime and its D-Bus interface. */
 export class Extensions {
   private readonly desktop = new DesktopState();
   private readonly monitorListeners = new Set<() => void>();
   private readonly manager: ExtensionManager;
-  /** What the extension API stands on, which Kestrel's own pop-ups use too. */
   readonly host: ExtensionHost;
   private readonly service: ExtensionsService;
   private readonly ports: ExtensionPorts;

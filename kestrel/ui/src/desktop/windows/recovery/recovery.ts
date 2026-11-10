@@ -1,7 +1,7 @@
 import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
 
-import { restartedAfterCrash } from '../../../system/health/restarted.js';
+import { restartedAfterCrash } from '../../../system/status/health/restarted.js';
 import { appOf, capture, read, remembered, type SavedWindow, write } from './snapshot.js';
 
 const NOTE_AFTER_MS = 500;
@@ -12,7 +12,6 @@ interface Returned {
   stack: number;
 }
 
-/** Notes where every window is, so that after Kestrel restarts from a crash, the windows of apps that reconnect come back where they were. */
 export class WindowRecovery {
   private readonly watched = new Map<Meta.Window, number[]>();
   private awaited: SavedWindow[] = [];

@@ -1,8 +1,7 @@
-import type { BuiltPage } from '../api/v1/settingsPage/serialize.js';
+import type { BuiltPage } from '../api/v1/ui/settingsPage/serialize.js';
 
 type Wrap = <Args extends unknown[], Result>(callback: (...args: Args) => Result) => (...args: Args) => Result | undefined;
 
-/** An extension's own Settings page while it runs: built only when Settings asks, with the callbacks of its last build. */
 export class ExtensionPage {
   private build: (() => BuiltPage | null) | null = null;
   private wrap: Wrap | null = null;
@@ -25,7 +24,6 @@ export class ExtensionPage {
     if (this.build) this.announce();
   }
 
-  /** The page as JSON, or an empty string while the extension describes none. */
   json(): string {
     const built = this.build?.();
     this.callbacks = built?.callbacks ?? new Map();

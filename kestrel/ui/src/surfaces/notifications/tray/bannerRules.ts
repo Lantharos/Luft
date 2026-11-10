@@ -24,7 +24,6 @@ export function bannerAllowed(notification: Notification, settings: Gio.Settings
   return wouldBanner(notification) && (!quieted(notification, settings) || allowedDuringDoNotDisturb(notification));
 }
 
-/** The holds that kept this notification's banner from showing. */
 export function heldBack(notification: Notification): NotificationHold[] {
   return wouldBanner(notification) && !allowedDuringDoNotDisturb(notification) ? notificationHolds.applying(notification) : [];
 }

@@ -1,8 +1,6 @@
-import type { Context } from '../../context.js';
+import { promptGate } from '../../shared/dialogs/promptGate.js';
 import { KeyringDialog, type Prompt } from './dialog.js';
 import { ALLOWED, ALTERNATIVE, DENIED, DISMISSED } from './request.js';
-
-type Session = Pick<Context, 'sessionMode' | 'screenShield'>;
 
 interface Call {
   key: string;
@@ -22,22 +20,10 @@ interface Active {
 export class PromptQueue {
   private readonly queue: Call[] = [];
   private readonly refused = new Set<string>();
-  private readonly disconnectors: (() => void)[] = [];
+  private readonly stopWatchingLock = promptGate.watch(locked => {
+    if (!locked) this.next();
+  });
   private active: Active | null = null;
-
-  constructor(private readonly session: Session) {
-    const sessionId = session.sessionMode.connect('updated', () => this.syncLock());
-    this.disconnectors.push(() => session.sessionMode.disconnect(sessionId));
-    const shield = session.screenShield;
-    if (shield) {
-      const shieldId = shield.connect('active-changed', () => this.syncLock());
-      this.disconnectors.push(() => shield.disconnect(shieldId));
-    }
-  }
-
-  private get locked(): boolean {
-    return this.session.sessionMode.isLocked || !!this.session.screenShield?.active;
-  }
 
   receive(call: Call): void {
     const { active } = this;
@@ -66,7 +52,7 @@ export class PromptQueue {
   }
 
   private next(): void {
-    if (this.active || this.locked) return;
+    if (this.active || promptGate.locked) return;
     const call = this.queue.shift();
     if (call) this.show(call);
   }
@@ -119,13 +105,8 @@ export class PromptQueue {
     this.next();
   }
 
-  private syncLock(): void {
-    if (!this.locked) this.next();
-    else if (this.active && !this.active.closing) this.dismiss(this.active);
-  }
-
   destroy(): void {
-    for (const disconnect of this.disconnectors) disconnect();
+    this.stopWatchingLock();
     for (const call of this.queue.splice(0)) call.answer(DISMISSED, false);
     if (this.active) this.dismiss(this.active);
   }

@@ -7,8 +7,8 @@ import St from 'gi://St';
 
 import * as Layout from '../../core/stage/layout.js';
 import * as Main from '../../core/main.js';
+import { Curve, Duration } from '../../shared/motion/motion.js';
 
-export const ANIMATION_TIME = 100;
 const DISPLAY_TIMEOUT = 600;
 
 const MonitorWorkspaceSwitcherPopup = GObject.registerClass(class MonitorWorkspaceSwitcherPopup extends Clutter.Actor {
@@ -81,13 +81,13 @@ export const WorkspaceSwitcherPopup = GObject.registerClass(class WorkspaceSwitc
 
     this.redisplayAllPopups();
 
-    const duration = this.visible ? 0 : ANIMATION_TIME;
+    const duration = this.visible ? 0 : Duration.tap;
     this.show();
     this.opacity = 0;
     this.ease({
       opacity: 255,
       duration,
-      mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+      curve: Curve.gentle,
     });
   }
 
@@ -95,8 +95,8 @@ export const WorkspaceSwitcherPopup = GObject.registerClass(class WorkspaceSwitc
     this.timeoutId = 0;
     this.ease({
       opacity: 0.0,
-      duration: ANIMATION_TIME,
-      mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+      duration: Duration.tap,
+      curve: Curve.gentle,
       onComplete: () => this.destroy(),
     });
   }

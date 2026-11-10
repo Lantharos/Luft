@@ -1,14 +1,12 @@
-import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
 
 import type { Monitor } from '../panel/panel.js';
-import { animateActor } from '../../shared/motion/motion.js';
+import { animateActor, Curve, Duration } from '../../shared/motion/motion.js';
 import { helperProgram } from '../../shared/apps/programs.js';
 import { showsWallpaper } from './pictures.js';
 
-const FADE_DURATION = 400;
 const SIGTERM = 15;
 const UNAVAILABLE_EXIT_STATUS = 69;
 const RESTART_DELAYS_MS = [1000, 5000, 20000];
@@ -39,7 +37,7 @@ export class Renderer {
       this.place(actor.meta_window!);
       showsWallpaper(actor, true);
       actor.opacity = 0;
-      animateActor(actor, { opacity: 255, duration: FADE_DURATION, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
+      animateActor(actor, { opacity: 255, duration: Duration.slow, curve: Curve.gentle });
     });
   }
 
@@ -146,8 +144,8 @@ export class Renderer {
     }
     actors.forEach((actor, index) => animateActor(actor, {
       opacity: 0,
-      duration: FADE_DURATION,
-      mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+      duration: Duration.slow,
+      curve: Curve.gentle,
       onStopped: index === 0 ? quit : undefined,
     }));
   }

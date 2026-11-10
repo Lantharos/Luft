@@ -28,7 +28,6 @@ export async function refuseSandboxed(invocation: Gio.DBusMethodInvocation, acti
   return true;
 }
 
-/** Whether the connection called `name` belongs to one of these programs running outside a sandbox, judged by its executable. */
 export async function connectionRuns(connection: Gio.DBusConnection, name: string, programs: string[]): Promise<boolean> {
   const process = await processOf(connection, name).catch(() => null);
   if (!process) return false;

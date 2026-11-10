@@ -2,8 +2,8 @@ import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
 import { MessageDialogContent } from '../../shared/dialogs/dialog.js';
-import { ModalDialog, type ButtonInfo } from '../../shared/dialogs/modalDialog.js';
-import { promptAppeared } from '../../system/sounds/sounds.js';
+import { ModalDialog, State, type ButtonInfo } from '../../shared/dialogs/modalDialog.js';
+import { promptAppeared } from '../../system/sound/sounds/sounds.js';
 import { CANCELLED, ENDED, type Dismissal, type Options, type Outcome } from './request.js';
 
 interface DialogSpec {
@@ -50,12 +50,12 @@ export function openDialog(dismissal: Dismissal | null, spec: DialogSpec, build:
       stopListening?.();
       resolve(outcome);
     });
-    if (!modal.open()) {
-      stopListening?.();
-      modal.destroy();
-      resolve([ENDED, {}]);
-    } else if (spec.askedBy !== undefined) {
-      promptAppeared(spec.askedBy);
+    const { askedBy } = spec;
+    if (askedBy !== undefined) {
+      modal.connect('notify::state', () => {
+        if (modal.state === State.OPENING) promptAppeared(askedBy);
+      });
     }
+    modal.open();
   });
 }

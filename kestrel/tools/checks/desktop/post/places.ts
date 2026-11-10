@@ -19,7 +19,6 @@ const SEND_TO_DEVICE = menuItem(FILE, 10, 2);
 const FIREWALL = 'com.lantharos.Firewall1';
 const WIRED = '/org/freedesktop/NetworkManager/Settings/1';
 
-/** Send to device in Rover's menu of a file, with the computer nearby to choose. */
 export async function checkRover(nearby: Nearby) {
   await nearbyId();
   const file = GLib.build_filenamev([scratch('post', 'Rover'), 'Boarding pass.txt']);
@@ -39,7 +38,6 @@ function classify(type: 'home' | 'public') {
     null, Gio.DBusCallFlags.NONE, -1, null);
 }
 
-/** Post's page in Settings on a home network and on a public one, where it says devices can't find this computer. */
 export async function checkSettings() {
   await withApp('settings', [], async app => {
     await show(app, 'post');

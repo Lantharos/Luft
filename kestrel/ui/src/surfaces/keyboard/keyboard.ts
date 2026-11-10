@@ -5,10 +5,11 @@ import St from 'gi://St';
 
 import * as Main from '../../core/main.js';
 import { styleSurface } from '../../appearance/kestrelGlass.js';
+import { Curve, Duration } from '../../shared/motion/motion.js';
 import { AspectContainer, Suggestions } from './containers.js';
 import { KeyboardController } from './controller.js';
 import { EmojiSelection } from './emoji/selection.js';
-import { FocusLift, KEYBOARD_ANIMATION_TIME } from './focusLift.js';
+import { FocusLift } from './focusLift.js';
 import { FocusTracker } from './focusTracker.js';
 import { isExtendedKey, type Key } from './key.js';
 import { keyvalOf, levelsFor, type ModelKey } from './model.js';
@@ -16,7 +17,7 @@ import { KeyLevels } from './levels.js';
 import { LanguageSelectionPopup } from './popups.js';
 import { buildLevels, type KeyHandler } from './rows.js';
 
-const KEYBOARD_REST_TIME = KEYBOARD_ANIMATION_TIME * 2;
+const KEYBOARD_REST_TIME = Duration.quick * 2;
 
 const EMOJI_PURPOSES = new Set([
   Clutter.InputContentPurpose.NORMAL,
@@ -482,8 +483,8 @@ export const Keyboard = GObject.registerClass({
     this.ease({
       translation_y: -this.height,
       opacity: 255,
-      duration: KEYBOARD_ANIMATION_TIME,
-      mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+      duration: Duration.quick,
+      curve: Curve.gentle,
       onComplete: () => {
         this.keyboardHeightNotifyId = Main.layoutManager.keyboardBox.connect('notify::height', () => {
           this.translation_y = -this.height;
@@ -503,8 +504,8 @@ export const Keyboard = GObject.registerClass({
     this.ease({
       translation_y: 0,
       opacity: 0,
-      duration: KEYBOARD_ANIMATION_TIME,
-      mode: Clutter.AnimationMode.EASE_IN_QUAD,
+      duration: Duration.quick,
+      curve: Curve.accelerate,
       onStopped: finished => {
         if (this.keyboardVisible) return;
         if (finished) Main.layoutManager.keyboardBox.hide();

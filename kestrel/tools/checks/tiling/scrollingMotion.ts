@@ -11,10 +11,8 @@ import {actorOf, area, focus, frame, openWindow, resetTiling, restingTiles, useT
 const {require, eventually} = checks('scrolling motion');
 const SWIPE_STEPS = 24;
 const OVERLAP_TOLERANCE = 2;
-// A spring may carry the swipe's momentum past its place and come back, but never leaps
 const JUMP_LIMIT = 120;
 
-// Where each window shows on screen, which can differ from its frame while the strip moves
 function shown(window: Meta.Window): Area {
   const actor = actorOf(window);
   const [x, y] = actor.get_transformed_position();
@@ -40,7 +38,6 @@ function overlapping(rects: Area[]) {
   return null;
 }
 
-// Records every painted frame from the end of the swipe until the strip comes to rest
 async function swipeAndRecord(windows: Meta.Window[], distance: number) {
   const [x, y] = [area().x + area().width / 2, area().y + area().height / 2];
   const frames: Area[][] = [];
@@ -62,13 +59,11 @@ async function swipeAndRecord(windows: Meta.Window[], distance: number) {
 }
 
 export async function run() {
-  // The glide only plays with animations, which sessions without a GPU turn off
   const forced = global.force_animations;
   global.force_animations = true;
   useTiling('scrolling');
   try {
     const windows: Meta.Window[] = [];
-    // X11 windows move a round trip later than Wayland ones, so the column parked out of view is one
     gjs('clients/windows/boardWindow.js', ['Notes', '640', '420'], {env: {GDK_BACKEND: 'x11'}});
     windows.push(await waitForWindow(candidate => candidate.get_title()?.startsWith('Notes'), 'an X11 window opens'));
     await focus(windows[0]);

@@ -4,7 +4,6 @@ import { t } from '../../shared/i18n/index.js';
 import * as MessageTray from '../../surfaces/notifications/tray/messageTray.js';
 import type { ProblemKind } from './store.js';
 
-/** Tells the person that Kestrel switched an extension off, and why. */
 export function noticeTurnedOff(name: string, kind: ProblemKind, openSettings: () => void): void {
   const source = MessageTray.getSystemSource();
   const notification = new MessageTray.Notification({
@@ -18,7 +17,6 @@ export function noticeTurnedOff(name: string, kind: ProblemKind, openSettings: (
   source.addNotification(notification);
 }
 
-/** Tells the person that Kestrel took one of an extension's effects off the screen, and why. */
 export function noticeEffectOff(name: string, effect: string, problem: 'shader' | 'slow', openSettings: () => void): void {
   const source = MessageTray.getSystemSource();
   const notification = new MessageTray.Notification({

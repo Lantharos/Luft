@@ -13,8 +13,7 @@ const WHEEL_PAN = 60;
 const FINGER_PAN = 10;
 const FINGER_ZOOM = 0.04;
 const PINCH_ENTER = 1.15;
-// A pinch that moves this far without zooming much is a pan, and leaves the view where it went
-const PINCH_PAN = 24;
+const PINCH_PAN_TRAVEL = 24;
 const PINCH_STILL = 1.08;
 const MAGNIFIED = 1.06;
 const STEP_THRESHOLD = 48;
@@ -147,7 +146,6 @@ export class BoardInput {
     if (Math.hypot(this.swipeX, this.swipeY) < STEP_THRESHOLD) return true;
     this.swipeMode = 'switch';
     if (Math.abs(this.swipeX) >= Math.abs(this.swipeY)) this.actions.navigate(this.swipeX < 0 ? 1 : -1, 0);
-    // Like sideways, the fingers pull the next window in: up for the one below, down for the one above or, with none, out to the board
     else if (!this.actions.navigate(0, this.swipeY < 0 ? 1 : -1) && this.swipeY > 0) this.actions.overview();
     return true;
   }
@@ -202,7 +200,7 @@ export class BoardInput {
       this.actions.freeView();
       return;
     }
-    if (this.pinchTravel >= PINCH_PAN && this.pinchScale < PINCH_STILL && this.pinchScale > 1 / PINCH_STILL) {
+    if (this.pinchTravel >= PINCH_PAN_TRAVEL && this.pinchScale < PINCH_STILL && this.pinchScale > 1 / PINCH_STILL) {
       this.actions.freeView();
       return;
     }

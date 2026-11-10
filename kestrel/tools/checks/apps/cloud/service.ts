@@ -87,9 +87,19 @@ export async function startCloud(rclone: string) {
   };
 }
 
+function fileHolding(text: string): Gio.UnixFDList {
+  const path = GLib.build_filenamev([scratch('cloud'), 'typed-password']);
+  write(path, text);
+  const fds = Gio.UnixFDList.new_from_array([GLib.open(path, 0, 0)]);
+  GLib.unlink(path);
+  return fds;
+}
+
 export async function signIn(cloud: Cloud) {
-  const credentials = JSON.stringify({server: cloud.server, user: USER, password: PASSWORD});
-  const session = (await call(NAME, PATH, ACCOUNTS, 'SignIn', new GLib.Variant('(ss)', ['webdav', credentials]), '(s)')).deepUnpack()[0];
+  const credentials = JSON.stringify({server: cloud.server, user: USER});
+  const [reply] = await Gio.DBus.session.call_with_unix_fd_list(NAME, PATH, ACCOUNTS, 'SignIn', new GLib.Variant('(ssh)', ['webdav', credentials, 0]),
+    new GLib.VariantType('(s)'), Gio.DBusCallFlags.NONE, -1, fileHolding(PASSWORD), null);
+  const session = reply.deepUnpack<[string]>()[0];
   const step = await waitUntil(async () => {
     const current = await json<Step>(ACCOUNTS, 'Step', new GLib.Variant('(s)', [session]));
     return (current.step === 'done' || current.step === 'failed') && current;

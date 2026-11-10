@@ -29,7 +29,6 @@ const panel = () => named('kestrel-panel')!;
 const appButton = (name: string) => descendants(named('kestrel-taskbar-dock')!)
   .find(actor => actor instanceof St.Button && actor.mapped && actor.accessible_name?.startsWith(name)) ?? null;
 
-/** Post runs in the session's own network, never on the real one where the real Post may be. */
 async function checkPrivateNetwork() {
   const [pid] = (await call(DBUS, '/org/freedesktop/DBus', DBUS, 'GetConnectionUnixProcessID',
     new GLib.Variant('(s)', ['com.lantharos.Kestrel.Post']), '(u)')).deepUnpack<[number]>();
@@ -38,7 +37,6 @@ async function checkPrivateNetwork() {
   require(network(String(pid)) !== network('self'), 'Post runs in a network of its own in check sessions');
 }
 
-/** The port is open while someone may find this computer, and Post leaves the taskbar while no one may. */
 async function checkVisibility() {
   await eventually(() => seenCalls().includes('SetPostOpen true'), 'Post opens its port on home networks');
   require(!!indicator()?.visible, 'Post sits in the taskbar while your devices may find this computer');
@@ -50,7 +48,6 @@ async function checkVisibility() {
   await eventually(() => indicator()?.visible, 'and brings Post back');
 }
 
-/** Post's panel lists the computer nearby, and says who can find this one. */
 async function checkPanel() {
   await nearbyId();
   pressKey(Clutter.KEY_Escape);
@@ -65,7 +62,6 @@ async function checkPanel() {
   await eventually(() => !popupShowing(NEARBY), 'Escape closes it');
 }
 
-/** A spot on the taskbar that's the bar itself rather than one of its buttons. */
 function bareSpot(): Point {
   const bar = panel();
   const [x, y] = bar.get_transformed_position();
@@ -87,7 +83,6 @@ async function dragOver(from: Point, to: Point, hovering: () => Promise<void>) {
   releaseButton();
 }
 
-/** Files dragged from Rover onto Post or a bare part of the taskbar open the Send sheet; onto an app's button they don't. */
 async function checkDrops() {
   const folder = scratch('post', 'Drop');
   GLib.mkdir_with_parents(folder, 0o755);

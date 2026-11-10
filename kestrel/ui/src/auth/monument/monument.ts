@@ -13,7 +13,6 @@ interface MonumentOptions {
   auth: Clutter.Actor;
   side: Clutter.Actor;
   controls: Clutter.Actor;
-  /** The message that says how to bring up the prompt, while the screen rests. */
   hint: string;
   actionMode: Shell.ActionMode;
   preparePrompt: () => void;

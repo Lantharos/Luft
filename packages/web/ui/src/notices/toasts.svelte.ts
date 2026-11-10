@@ -23,7 +23,6 @@ interface ShowOptions {
 const SHOWN_MS = 5000;
 const AFTER_HOVER_MS = 2000;
 
-/** One toast at a time: a newer one replaces the one on screen. */
 export class Toasts {
 	current = $state.raw<ToastMessage | null>(null);
 

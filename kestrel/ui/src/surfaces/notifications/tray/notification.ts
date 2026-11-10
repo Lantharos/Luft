@@ -5,7 +5,7 @@ import GObject from 'gi://GObject';
 import * as KestrelUi from '../../../kestrelUi.js';
 import { Source as MessageSource } from '../messages/source.js';
 import * as SignalTracker from '../../../core/runtime/signalTracker.js';
-import type { NotificationSound } from '../../../system/sounds/sounds.js';
+import type { NotificationSound } from '../../../system/sound/sounds/sounds.js';
 
 import { NotificationDestroyedReason, PrivacyScope, Urgency } from './notificationEnums.js';
 import { NotificationGenericPolicy, NotificationPolicy } from './notificationPolicy.js';

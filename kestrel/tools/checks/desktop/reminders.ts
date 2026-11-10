@@ -30,14 +30,12 @@ const WAKEUPS_S = 30;
 const RESTART_MS = 150_000;
 const MANY = 400;
 
-/** Sits the clock a few seconds before `at`, the way the computer waking up would, so only the one timer can make it fire. */
 async function wakeJustBefore(at: number) {
   await prepareForSleep(true);
   setClock(at - 2 * SECOND_MS);
   await prepareForSleep(false);
 }
 
-/** Types into quick add and returns once the preview says all of `expected`. */
 async function quickAdd(text: string, ...expected: string[]) {
   await eventually(() => popup(), 'the pop-up is open');
   type(text);
@@ -385,7 +383,6 @@ const firstOfNextMonth = () => {
   return new Date(date.getFullYear(), date.getMonth() + 1, 1, 12).toISOString().slice(0, 10);
 };
 
-/** A week the way someone might really have it, for the store's pictures. */
 async function capturePictures() {
   realClock();
   clearNotifications();

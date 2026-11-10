@@ -1,17 +1,19 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
+import { sharing, type Kind } from '../../system/capture/privacy/sharing/authority.js';
 import { option, type Options } from '../core/request.js';
 
 export const DONT_PERSIST = 0;
 export const PERSIST_UNTIL_REVOKED = 2;
 
 const PROVIDER = 'Kestrel';
-const FORMAT = 2;
+const FORMAT = 3;
 const KEY_LENGTH = 32;
 const KEY_FILE = GLib.build_filenamev([GLib.get_user_data_dir(), 'kestrel', 'portal-restore.key']);
 
 export interface StoredChoice<T extends unknown[]> {
+  readonly grant: string;
   readonly created: number;
   readonly values: T;
 }
@@ -53,24 +55,37 @@ export function persistMode(options: Options): number {
   return Math.min(option<number>(options, 'persist_mode') ?? DONT_PERSIST, PERSIST_UNTIL_REVOKED);
 }
 
-export function storedChoice<T extends unknown[]>(options: Options, signature: string, appId: string): StoredChoice<T> | null {
+export async function storedChoice<T extends unknown[]>(options: Options, signature: string, kind: Kind, appId: string): Promise<StoredChoice<T> | null> {
   const data = options.restore_data;
   if (data?.get_type_string() !== '(suv)') return null;
   const [provider, format, sealed] = data.deep_unpack() as [string, number, GLib.Variant];
   if (provider !== PROVIDER || format !== FORMAT || sealed.get_type_string() !== '(sv)') return null;
   const [mac, choice] = sealed.deep_unpack() as [string, GLib.Variant];
-  if (choice.get_type_string() !== `(xx${signature})` || !sameText(mac, seal(appId, choice))) return null;
-  const [created, , ...values] = choice.deep_unpack() as [number, number, ...T];
-  return { created, values: values as T };
+  if (choice.get_type_string() !== `(sxx${signature})` || !sameText(mac, seal(appId, choice))) return null;
+  const [grant, created, , ...values] = choice.deep_unpack() as [string, number, number, ...T];
+  return await sharing.remembers(grant, appId, kind) ? { grant, created, values: values as T } : null;
 }
 
-export function persisted(mode: number, signature: string, appId: string, created: number | undefined, values: unknown[]): Options {
-  if (mode === DONT_PERSIST) return {};
+export interface Persisted {
+  readonly grant: string | null;
+  readonly results: Options;
+}
+
+export async function persisted(mode: number, signature: string, kind: Kind, appId: string, stored: StoredChoice<unknown[]> | null,
+  values: unknown[]): Promise<Persisted> {
+  if (mode === DONT_PERSIST) {
+    if (stored) await sharing.forget(stored.grant);
+    return { grant: null, results: {} };
+  }
+  const grant = stored?.grant ?? await sharing.remember(appId, kind);
   const now = GLib.get_real_time();
-  const type: string = `(xx${signature})`;
-  const choice = new GLib.Variant(type, [created ?? now, now, ...values]);
+  const type: string = `(sxx${signature})`;
+  const choice = new GLib.Variant(type, [grant, stored?.created ?? now, now, ...values]);
   return {
-    persist_mode: new GLib.Variant('u', mode),
-    restore_data: new GLib.Variant('(suv)', [PROVIDER, FORMAT, new GLib.Variant('(sv)', [seal(appId, choice), choice])]),
+    grant,
+    results: {
+      persist_mode: new GLib.Variant('u', mode),
+      restore_data: new GLib.Variant('(suv)', [PROVIDER, FORMAT, new GLib.Variant('(sv)', [seal(appId, choice), choice])]),
+    },
   };
 }

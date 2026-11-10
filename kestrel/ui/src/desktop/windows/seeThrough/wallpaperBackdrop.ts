@@ -26,7 +26,6 @@ function overlap(frame: Mtk.Rectangle, { x, y, width, height }: WallpaperPiece['
   return right > left && bottom > top ? [left, top, right, bottom] : null;
 }
 
-/** Paints the part of the frozen wallpaper that lies under a window's frame, as if no other windows were there. */
 export class WallpaperBackdrop extends Clutter.Actor {
   static {
     GObject.registerClass(this);
@@ -42,7 +41,6 @@ export class WallpaperBackdrop extends Clutter.Actor {
     return this.placed.length > 0;
   }
 
-  /** Covers the frame with `pieces` under `frame`, in stage coordinates, with corners of `radius`. */
   cover(pieces: WallpaperPiece[], frame: Mtk.Rectangle, radius: number): void {
     const pipelines = new Map(pieces.map(({ texture }) => [texture, this.pipelines.get(texture) ?? this.pipeline(texture)]));
     this.pipelines = pipelines;

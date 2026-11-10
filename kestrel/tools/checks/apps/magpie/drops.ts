@@ -64,7 +64,6 @@ async function openFolder(rover: LuftApp) {
   await changes(rover, 'Rover opens the folder of samples', () => press(Clutter.KEY_Return));
 }
 
-/** Rover takes focus with every drag, so Magpie stays above it to keep the spot the file lands on showing. */
 async function overlap(rover: LuftApp, magpie: LuftApp) {
   rover.window.move_frame(true, LEFT, TOP);
   magpie.window.move_frame(true, MAGPIE_LEFT, TOP);
@@ -102,7 +101,6 @@ async function checkRunningWindow() {
   });
 }
 
-/** Every kind lands on the view of the one before, so the drop also has to get past a playing video and a PDF's pages. */
 async function checkOpenedFile() {
   await withBoth([inFolder('Picture.png')], async (rover, magpie) => {
     for (const sample of [...SAMPLES.filter(({kind}) => kind !== 'picture'), SAMPLES[2], SAMPLES[0], SAMPLES[2]])

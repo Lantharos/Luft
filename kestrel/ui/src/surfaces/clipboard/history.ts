@@ -44,6 +44,7 @@ function imageType(mimeTypes: string[]): string | undefined {
 export class ClipboardHistory {
   private items: ClipboardEntry[] = [];
   private copies = 0;
+  private cleared = 0;
   private readonly images = new ClipboardImageFiles();
   private readonly clipboard = St.Clipboard.get_default();
   private readonly selection = global.display.get_selection();
@@ -60,7 +61,7 @@ export class ClipboardHistory {
       const copied = ++this.copies;
       const mimeType = imageType(mimeTypes);
       if (mimeTypes.some(type => TEXT_MIME_TYPES.includes(type))) this.readText(copied);
-      else if (mimeType) this.readImage(mimeType, copied);
+      else if (mimeType) void this.readImage(mimeType, copied);
     });
   }
 
@@ -92,6 +93,7 @@ export class ClipboardHistory {
   }
 
   clear(): void {
+    this.cleared = this.copies;
     this.update([]);
   }
 
@@ -101,24 +103,33 @@ export class ClipboardHistory {
     });
   }
 
-  private readImage(mimeType: string, copied: number): void {
-    this.clipboard.get_content(St.ClipboardType.CLIPBOARD, mimeType, (_clipboard, bytes) => {
-      if (bytes && bytes.get_size() <= IMAGE_BYTE_LIMIT)
-        void this.keepImage(mimeType, new GLib.Bytes(bytes.toArray()), copied);
-    });
-  }
-
-  private async keepImage(mimeType: string, bytes: GLib.Bytes, copied: number): Promise<void> {
-    const id = GLib.compute_checksum_for_bytes(GLib.ChecksumType.SHA1, bytes)!;
-    const known = this.items.find(item => item.kind === 'image' && item.id === id);
+  private async readImage(mimeType: string, copied: number): Promise<void> {
+    const file = await this.images.receive(this.selection, mimeType, copied, IMAGE_BYTE_LIMIT);
+    if (!file) return;
+    if (copied <= this.cleared) {
+      this.images.discard(file);
+      return;
+    }
+    const id = await this.images.checksum(file);
+    const thumbnail = this.image(id) ? null : await this.thumbnail(file);
+    const known = this.image(id);
+    if (known || !thumbnail) this.images.discard(file);
     if (known) {
       known.copied = copied;
       this.remember(known);
-      return;
+    } else if (thumbnail) {
+      this.remember({ kind: 'image', id, mimeType, file, thumbnail, copied });
     }
-    const thumbnail = await createThumbnail(bytes, THUMBNAIL_BOUNDS);
-    if (thumbnail) this.remember({ kind: 'image', id, mimeType, file: await this.images.save(id, bytes), thumbnail, copied });
+  }
+
+  private async thumbnail(file: Gio.File): Promise<Thumbnail | null> {
+    const thumbnail = await createThumbnail(file, THUMBNAIL_BOUNDS);
     this.releaseDecodedImages();
+    return thumbnail;
+  }
+
+  private image(id: string): ImageEntry | undefined {
+    return this.items.find((item): item is ImageEntry => item.kind === 'image' && item.id === id);
   }
 
   private releaseDecodedImages(): void {
@@ -133,7 +144,7 @@ export class ClipboardHistory {
   private async redrawThumbnails(): Promise<void> {
     for (const item of this.items) {
       if (item.kind !== 'image') continue;
-      const thumbnail = await createThumbnail(await this.images.load(item.file), THUMBNAIL_BOUNDS);
+      const thumbnail = await createThumbnail(item.file, THUMBNAIL_BOUNDS);
       if (thumbnail) item.thumbnail = thumbnail;
     }
     this.changed();
@@ -141,6 +152,10 @@ export class ClipboardHistory {
   }
 
   private remember(entry: ClipboardEntry): void {
+    if (entry.copied <= this.cleared) {
+      if (entry.kind === 'image' && !this.items.some(item => sameEntry(item, entry))) this.images.discard(entry.file);
+      return;
+    }
     const others = this.items.filter(item => !sameEntry(item, entry));
     const newer = others.filter(item => item.copied > entry.copied);
     this.update([...newer, entry, ...others.slice(newer.length)]);

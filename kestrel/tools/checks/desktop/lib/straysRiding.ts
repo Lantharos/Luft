@@ -17,11 +17,9 @@ const JITTER = 1;
 const SMOOTH_SHARE = 0.6;
 
 interface Ride {
-  /** How far the sprite strayed from where it sat on the window, over every painted frame. */
   drift: number;
   fell: boolean;
   frames: number;
-  /** The most the sprite moved in one frame, against how far it went in all. */
   longestStep: number;
   distance: number;
 }
@@ -56,7 +54,6 @@ async function dropOnto(window: Meta.Window) {
   await eventually(atRest, 'and settles there', 8000);
 }
 
-/** Follows the stray over every painted frame of `action` against where the window shows. */
 async function watch(window: Meta.Window, action: () => Promise<void>): Promise<Ride> {
   const shownLeft = () => {
     const actor = actorOf(window);

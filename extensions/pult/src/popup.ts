@@ -33,6 +33,7 @@ export function waitingView(pult: Pult): View {
       { type: 'text', text: pult.reachable ? t('waiting', { count: pult.count }) : t('not-connected'), style: 'title' },
       ...urgent.length ? [{ type: 'text' as const, text: t('urgent-items'), style: 'caption' as const }, { type: 'column' as const, spacing: 0, children: urgent }] : [],
       ...inboxes.length ? [{ type: 'text' as const, text: t('inboxes'), style: 'caption' as const }, { type: 'column' as const, spacing: 0, children: inboxes }] : [],
+      ...pult.reachable ? [] : [{ type: 'button' as const, label: t('try-again'), style: 'primary' as const, onActivate: () => pult.refresh() }],
       { type: 'button', label: t('open-pult'), onActivate: () => open(SERVER) },
     ],
   };

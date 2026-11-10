@@ -141,7 +141,7 @@ export class DBusService {
   async runAsync(): Promise<void> {
     this.service.register();
 
-    Gio.DBus.own_name(Gio.BusType.SESSION, this.name, Gio.BusNameOwnerFlags.ALLOW_REPLACEMENT,
+    Gio.DBus.own_name(Gio.BusType.SESSION, this.name, Gio.BusNameOwnerFlags.NONE,
       () => this.service.export(), null, () => this.loop.quit());
 
     await this.loop.runAsync();

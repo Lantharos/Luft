@@ -1,6 +1,6 @@
 import Clutter from 'gi://Clutter';
 
-import {NEW_RECOVERY_KEY, RECOVERY_WORD} from '../../fixtures/system/recoveryKeys.js';
+import {NEW_RECOVERY_KEY, RECOVERY_WORD} from '../../fixtures/system/security/recoveryKeys.js';
 import type {Point} from '../lib/input/input.js';
 import {require, Setup} from './lib/driver.js';
 

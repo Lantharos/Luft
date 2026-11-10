@@ -1,9 +1,22 @@
 #!/usr/bin/env bash
-# A network of its own for Post in a check session, so it never announces itself on the real one or meets the real
-# Post on LocalSend's port. `start DIR` makes two network namespaces joined by a cable: this computer, 10.53.17.1, and
-# a device nearby, 10.53.17.2. `run DIR this|nearby COMMAND...` runs a command in one of them.
 set -euo pipefail
 
+usage() {
+  cat >&2 <<'USAGE'
+Usage: kestrel/tools/session/postNetwork.sh start DIR
+       kestrel/tools/session/postNetwork.sh run DIR this|nearby COMMAND...
+
+Gives Post a network of its own in a check session, so it never announces
+itself on the real one or meets the real Post on LocalSend's port.
+
+  start  Makes two network namespaces joined by a cable: this computer,
+         10.53.17.1, and a device nearby, 10.53.17.2.
+  run    Runs a command in one of them.
+USAGE
+  exit 2
+}
+
+[[ $# -ge 2 ]] || usage
 command="$1"
 dir="$2"
 shift 2
@@ -45,4 +58,5 @@ case "$command" in
     done
     exec nsenter --target "$(cat "$dir/$side.pid")" --user --net --preserve-credentials -- "$@"
     ;;
+  *) usage ;;
 esac

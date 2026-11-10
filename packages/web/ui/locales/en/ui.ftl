@@ -10,7 +10,7 @@ ui-window-close = Close
 ui-edit-cut = Cut
 ui-edit-copy = Copy
 ui-edit-paste = Paste
-ui-edit-select-all = Select All
+ui-edit-select-all = Select all
 
 ## Form controls
 

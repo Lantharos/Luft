@@ -52,7 +52,6 @@ async function checkRefusals(note: string) {
   require(!sheet(), 'and no sheet opened for them');
 }
 
-/** The computer nearby takes what's offered, and resolves to where it saved it. */
 function receiving(nearby: Nearby) {
   let taken = 0;
   return async (name: string): Promise<string> => {
@@ -65,7 +64,6 @@ function receiving(nearby: Nearby) {
   };
 }
 
-/** Sends to the computer nearby through Post, which shows up in the sheet as Post finds it. */
 async function checkSending(caller: Caller, scan: string, arrives: (name: string) => Promise<string>) {
   await caller.send();
   const open = await eventually(sheet, 'the app in front opens the Send sheet for its file');

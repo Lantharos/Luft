@@ -1,13 +1,11 @@
-import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
 import St from 'gi://St';
 
-import { animateActor } from '../../../shared/motion/motion.js';
+import { animateActor, Curve, Duration } from '../../../shared/motion/motion.js';
 import { localized, t } from '../../../shared/i18n/index.js';
 
 const PEEK_DELAY = 450;
-const PEEK_DURATION = 180;
 const PEEKED_TYPES = [Meta.WindowType.NORMAL, Meta.WindowType.DIALOG, Meta.WindowType.MODAL_DIALOG, Meta.WindowType.UTILITY];
 
 let hidden: Meta.Window[] = [];
@@ -56,7 +54,7 @@ export class DesktopPeek {
     if (peeking === this.peeking) return;
     this.peeking = peeking;
     for (const [actor] of desktopWindows())
-      animateActor(actor, { opacity: peeking ? 0 : 255, duration: immediate ? 0 : PEEK_DURATION, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
+      animateActor(actor, { opacity: peeking ? 0 : 255, duration: immediate ? 0 : Duration.quick, curve: Curve.gentle });
   }
 
   toggleDesktop(): void {

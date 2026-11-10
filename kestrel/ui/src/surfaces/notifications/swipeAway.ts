@@ -1,6 +1,6 @@
 import Clutter from 'gi://Clutter';
 
-import { animateActor, Duration, Gesture, rubberband, Spring } from '../../shared/motion/motion.js';
+import { animateActor, Curve, Duration, Gesture, rubberband, Spring } from '../../shared/motion/motion.js';
 import { clampUnit } from '../../shared/math.js';
 
 const DISMISS_SHARE = 0.4;
@@ -127,7 +127,7 @@ export class SwipeAway {
     animateActor(actor, {
       opacity: 0,
       duration: Duration.quick,
-      mode: Clutter.AnimationMode.LINEAR,
+      curve: Curve.linear,
       onComplete: () => this.options.dismissed(actor),
     });
   }
@@ -135,7 +135,7 @@ export class SwipeAway {
   private springBack(velocity: number): void {
     const { actor, axis } = this.drag!;
     this.drag = null;
-    animateActor(actor, { opacity: 255, duration: Duration.quick, mode: Clutter.AnimationMode.LINEAR });
+    animateActor(actor, { opacity: 255, duration: Duration.quick, curve: Curve.linear });
     animateActor(actor, { [axis === 'y' ? 'translation_y' : 'translation_x']: 0, spring: Spring.snappy, velocity });
     this.options.held?.(false);
   }

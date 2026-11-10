@@ -17,6 +17,7 @@ import * as Main from '../../core/main.js';
 import * as MessageTray from '../../surfaces/notifications/tray/messageTray.js';
 import * as ShellDBus from '../../core/shellDBus.js';
 import type { UnlockDialog } from './unlockDialog.js';
+import { UsbLockState } from './usbProtection.js';
 
 import { adjustAnimationTime } from '../../core/runtime/animationUtils.js';
 
@@ -30,6 +31,7 @@ const MANUAL_FADE_TIME = 300;
 
 interface ScreenShieldSignals {
   'active-changed': () => void;
+  'locked': () => void;
   'lock-screen-shown': () => void;
   'wake-up-screen': () => void;
 }
@@ -78,6 +80,8 @@ export class ScreenShield extends Signals.EventEmitter {
   private readonly settings = new Gio.Settings({ schema_id: SCREENSAVER_SCHEMA });
   private dialog: UnlockDialog | null = null;
   private grab: Clutter.Grab | null = null;
+  private usbLockState: UsbLockState | null = null;
+  private readonly inputHeldUntilLockIsKnown = global.stage.grab(global.stage);
   private isActive = false;
   private isLocked = false;
   private desktopReady = false;
@@ -133,8 +137,9 @@ export class ScreenShield extends Signals.EventEmitter {
   }
 
   private async watchLoginSession(): Promise<void> {
-    this.loginSession = await this.loginManager.getCurrentSessionProxy();
-    const session = this.loginSession!;
+    const session = await this.loginManager.getCurrentSessionProxy();
+    if (!session) return;
+    this.loginSession = session;
     session.connectSignal('Lock', () => this.lock(false));
     session.connectSignal('Unlock', () => this.deactivate(false));
     session.connect('g-properties-changed', () => void this.syncInhibitor());
@@ -152,7 +157,8 @@ export class ScreenShield extends Signals.EventEmitter {
 
   private setLocked(locked: boolean): void {
     this.isLocked = locked;
-    this.loginSession?.SetLockedHintAsync(locked).catch(logError);
+    this.usbLockState?.set(locked);
+    this.loginSessionReady.then(() => this.loginSession?.SetLockedHintAsync(locked)).catch(logError);
   }
 
   private becomeModal(): void {
@@ -440,6 +446,7 @@ export class ScreenShield extends Signals.EventEmitter {
 
     St.Clipboard.get_default().set_text(St.ClipboardType.CLIPBOARD, '');
     St.Clipboard.get_default().set_text(St.ClipboardType.PRIMARY, '');
+    this.emit('locked');
 
     const user = AccountsService.UserManager.get_default().get_user(GLib.get_user_name());
 
@@ -452,6 +459,8 @@ export class ScreenShield extends Signals.EventEmitter {
     await this.loginSessionReady;
     this.desktopReady = true;
     if (this.loginSession?.LockedHint) this.lock(false);
+    this.usbLockState = new UsbLockState(this.isLocked);
+    this.inputHeldUntilLockIsKnown.dismiss();
     this.onStatusChanged(this.presence.status);
   }
 }

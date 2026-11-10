@@ -144,22 +144,18 @@ function dominantHue(samples: Sample[]): number {
   return (best + 0.5) * 360 / HUE_BINS;
 }
 
-// How much a sample in a row of the wallpaper's grid counts: nothing in the
-// top part, rising to full at the bottom, where the taskbar and everything
-// that opens from it sit over the wallpaper.
-function rowWeight(row: number, rows: number): number {
+function weightTowardTaskbarRows(row: number, rows: number): number {
   const depth = (row + 0.5) / rows;
   return Math.max(0, (depth - IGNORED_TOP) / (1 - IGNORED_TOP));
 }
 
 const totalWeight = (samples: Sample[]) => samples.reduce((sum, { weight }) => sum + weight, 0);
 
-// Samples come as a square grid over the wallpaper, row by row from the top.
 export function seedFromSamples(samples: Rgb[]): Seed {
   const rows = Math.round(Math.sqrt(samples.length));
   const columns = Math.max(1, Math.round(samples.length / Math.max(1, rows)));
   const colors = samples
-    .map((rgb, index): Sample => ({ color: toOklch(rgb), weight: rowWeight(Math.floor(index / columns), rows) }))
+    .map((rgb, index): Sample => ({ color: toOklch(rgb), weight: weightTowardTaskbarRows(Math.floor(index / columns), rows) }))
     .filter(({ color: [lightness], weight }) => weight > 0 && lightness >= MIN_LIGHTNESS);
   const vivid = colors.filter(({ color: [, chroma] }) => chroma >= MIN_CHROMA);
   if (!vivid.length || totalWeight(vivid) <= totalWeight(colors) * MIN_VIVID_SHARE) return NEUTRAL;

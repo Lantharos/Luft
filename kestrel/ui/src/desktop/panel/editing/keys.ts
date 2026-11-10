@@ -15,7 +15,6 @@ const DIRECTIONS = new Map<number, Direction>([
   [Clutter.KEY_Left, [-1, 0]], [Clutter.KEY_Right, [1, 0]], [Clutter.KEY_Up, [0, -1]], [Clutter.KEY_Down, [0, 1]],
 ]);
 
-/** Arranging with the keyboard: Tab walks through islands, their elements and the buttons, and the arrow keys move what's picked. */
 export class EditorKeys {
   private picked: Item | null = null;
 
@@ -40,7 +39,6 @@ export class EditorKeys {
     this.pick('island' in grip ? { island: grip.island } : { element: grip.element });
   }
 
-  /** Rings the picked item again once the taskbar has moved it. */
   refocus(): void {
     if (this.picked) this.pick(this.picked);
   }

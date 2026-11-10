@@ -4,6 +4,7 @@ import GObject from 'gi://GObject';
 import St from 'gi://St';
 
 import type { EaseOptions } from '../../environment.js';
+import { Curve } from '../motion/motion.js';
 
 const DEFAULT_FADE_FACTOR = 0.4;
 const VIGNETTE_BRIGHTNESS = 0.5;
@@ -159,7 +160,7 @@ export const Lightbox = GObject.registerClass({
   lightOn(fadeInTime = 0): void {
     this.remove_all_transitions();
 
-    const easeOptions: EaseOptions = { duration: fadeInTime, mode: Clutter.AnimationMode.EASE_OUT_QUAD };
+    const easeOptions: EaseOptions = { duration: fadeInTime, curve: Curve.gentle };
     const onComplete = () => {
       this.isActive = true;
       this.notify('active');
@@ -181,7 +182,7 @@ export const Lightbox = GObject.registerClass({
     this.isActive = false;
     this.notify('active');
 
-    const easeOptions: EaseOptions = { duration: fadeOutTime, mode: Clutter.AnimationMode.EASE_OUT_QUAD };
+    const easeOptions: EaseOptions = { duration: fadeOutTime, curve: Curve.gentle };
     const onComplete = () => this.hide();
 
     if (this.radialEffect) {

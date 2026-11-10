@@ -13,6 +13,8 @@ export { default as Segmented } from './controls/Segmented.svelte';
 export { default as Select } from './controls/Select.svelte';
 export { default as Slider } from './controls/Slider.svelte';
 export { default as Switch } from './controls/Switch.svelte';
+export { default as TextArea } from './controls/text/TextArea.svelte';
+export { default as TextCell } from './controls/text/TextCell.svelte';
 export { default as TextField } from './controls/TextField.svelte';
 
 export { default as ConfirmDialog } from './dialogs/ConfirmDialog.svelte';

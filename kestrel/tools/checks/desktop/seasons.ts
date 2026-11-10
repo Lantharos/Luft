@@ -35,7 +35,6 @@ async function show(effect: string, label: string) {
   await eventually(() => subtitle() === label && primarySheets().length === 1 && falling(), `choosing ${label} lets it take over from the effect before`, 15000);
 }
 
-// Super+number slides between workspaces like people switch
 async function activate(index: number) {
   hold(Clutter.KEY_Super_L);
   press(Clutter.KEY_1 + index);
@@ -141,7 +140,6 @@ async function checkCovered() {
 }
 
 export async function run() {
-  // Seasons needs animations, which sessions without a GPU turn off
   const forced = global.force_animations;
   global.force_animations = true;
   try {

@@ -43,7 +43,6 @@ async function inkOf(icon: St.Icon, name: string) {
   return ink(frame);
 }
 
-/** The tray close up: Post and the status icons, with a little of what's around them. */
 export async function captureTray(name: string) {
   const post = indicator()!;
   const [x, y] = post.get_transformed_position();
@@ -51,10 +50,6 @@ export async function captureTray(name: string) {
   await captureArea(name, {x: Math.round(x) - PEEK, y: Math.round(y) - PEEK / 2, width: width + 2 * PEEK, height: Math.round(post.height) + PEEK});
 }
 
-/**
- * Post's icon sits in the row of the network and sound icons as one of them: the same size, weight and line, as far
- * from the next icon as they are from each other, in a button of its own 1 or 2 pixels from theirs.
- */
 export async function checkTray() {
   await settled();
   const post = indicator()!;

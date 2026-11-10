@@ -72,10 +72,10 @@ export class RemoteDesktopSession extends PeerSession {
     return new RemoteDesktopSession(handle, appId, peer, mutter, await mutterProperty<string>(mutter, 'SessionId'));
   }
 
-  selectDevices(options: Options): void {
+  async selectDevices(options: Options): Promise<void> {
     this.devices = (option<number>(options, 'types') ?? ALL_DEVICES) & ALL_DEVICES;
     this.persistMode = persistMode(options);
-    this.stored = storedChoice(options, STORED_CONTROL, this.appId);
+    this.stored = await storedChoice(options, STORED_CONTROL, 'control', this.appId);
   }
 
   selectSources(selection: Selection): void {
@@ -142,12 +142,16 @@ export class RemoteDesktopSession extends PeerSession {
       this.recording = null;
       return [ENDED, {}];
     }
+    const remembered = await persisted(persist, STORED_CONTROL, 'control', this.appId, this.stored,
+      [choice.devices, !!this.clipboard, storedSources(choice.sources ?? [])]);
+    if (!this.active) return [ENDED, {}];
     this.shared = choice.devices;
     this.started = true;
+    this.granted('control', remembered.grant);
     const results: Options = { devices: new GLib.Variant('u', this.shared) };
     if (this.clipboardRequested) results.clipboard_enabled = new GLib.Variant('b', !!this.clipboard);
     if (this.recording) results.streams = this.recording.results;
-    return [SUCCESS, { ...results, ...persisted(persist, STORED_CONTROL, this.appId, this.stored?.created, [this.shared, !!this.clipboard, storedSources(choice.sources ?? [])]) }];
+    return [SUCCESS, { ...results, ...remembered.results }];
   }
 
   protected stopped(): void {
@@ -173,9 +177,9 @@ export class RemoteDesktopPortal {
     }
   }
 
-  SelectDevicesAsync([, sessionHandle, , options]: [string, string, string, Options], invocation: Invocation): void {
+  async SelectDevicesAsync([, sessionHandle, , options]: [string, string, string, Options], invocation: Invocation): Promise<void> {
     const session = findSession(sessionHandle, RemoteDesktopSession, invocation);
-    session?.selectDevices(options);
+    await session?.selectDevices(options);
     respond(invocation, [session ? SUCCESS : ENDED, {}]);
   }
 

@@ -20,15 +20,10 @@ export interface Finished {
   saved: string[];
 }
 
-/** Runs a command in one end of the session's own network: `this` computer, where Post runs, or the device `nearby`. */
 export function inNetwork(side: 'this' | 'nearby', argv: string[], env: Record<string, string> = {}): Process {
   return spawn([repository('kestrel', 'tools', 'session', 'postNetwork.sh'), 'run', NETWORK, side, ...argv], {env});
 }
 
-/**
- * Another computer with Luft nearby, on the far end of the session's own network: a second `kestrel-post` on a bus of
- * its own, which the checks drive as Kestrel would. It never reaches the real network, nor does the session's Post.
- */
 export class Nearby {
   readonly offers: {id: string; from: Peer}[] = [];
   readonly finished: Finished[] = [];

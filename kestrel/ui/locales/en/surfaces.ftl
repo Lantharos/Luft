@@ -79,9 +79,9 @@ start-search-answer-time-behind = { $place }, { $hours ->
 } behind
 start-search-answer-time-same = { $place }, the same time as here
 # Describes a converted time: the answer is the time in $place when it's $time in $from, such as "In New York when it's 22:00 in London"
-start-search-answer-converted = In { $place } when it's { $time } in { $from }
-start-search-answer-converted-here = Here when it's { $time } in { $from }
-start-search-answer-converted-from-here = In { $place } when it's { $time } here
+start-search-answer-converted = In { $place } when it’s { $time } in { $from }
+start-search-answer-converted-here = Here when it’s { $time } in { $from }
+start-search-answer-converted-from-here = In { $place } when it’s { $time } here
 
 ## Start search actions
 ## The keyword messages are comma-separated words people might type to find the action.
@@ -109,7 +109,7 @@ start-search-keep-awake-on = Keep awake
 start-search-keep-awake-off = Stop keeping awake
 start-search-keep-awake-keywords = keep awake, stay awake, caffeine, prevent sleep
 start-search-lock-keywords = lock screen, lock computer
-start-search-suspend-keywords = sleep, standby
+start-search-suspend-keywords = sleep, suspend, standby
 start-search-log-out-keywords = log out, logout, sign out, sign off, end session
 start-search-restart-keywords = reboot, restart computer
 start-search-power-off-keywords = shut down, shutdown, turn off computer, power down
@@ -118,8 +118,8 @@ start-search-power-off-keywords = shut down, shutdown, turn off computer, power 
 
 # Session actions, shown as buttons in Start and as search results; "Lock" is a verb
 quick-settings-lock = Lock
-quick-settings-suspend = Suspend
-quick-settings-log-out = Log out
+quick-settings-suspend = Sleep
+quick-settings-log-out = Sign out
 quick-settings-restart = Restart
 quick-settings-power-off = Power off
 quick-settings-screenshot = Screenshot
@@ -177,7 +177,7 @@ notifications-media-next = Next track
 notifications-media-play = Play
 notifications-media-pause = Pause
 # Shown in a notification's header when the app that sent it has no name
-messages-unknown-app = Unknown App
+messages-unknown-app = Unknown app
 # Button that opens the reply field on a notification
 messages-reply = Reply
 # Placeholder of the reply field on a notification
@@ -235,7 +235,7 @@ messages-system-source = System
 
 ## On-screen keyboard
 
-osk-keyboard-settings = Keyboard Settings
+osk-keyboard-settings = Keyboard settings
 # Key on the emoji page of the on-screen keyboard that goes back to the letters, keep very short
 osk-letters-key = ABC
 

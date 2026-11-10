@@ -2,7 +2,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import type {Publish} from './bus.js';
-import {publishUpower} from './upower.js';
+import {publishUpower} from './devices/upower.js';
 
 const LOGIN = `<node><interface name="org.freedesktop.login1.Manager">
   <method name="Reboot"><arg type="b" direction="in"/></method>

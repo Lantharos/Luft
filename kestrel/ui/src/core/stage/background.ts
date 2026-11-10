@@ -3,6 +3,7 @@ import GLib from 'gi://GLib';
 import type GObject from 'gi://GObject';
 import Meta from 'gi://Meta';
 
+import { Curve, Duration } from '../../shared/motion/motion.js';
 import * as Main from '../main.js';
 import { EventEmitter } from '../runtime/signals.js';
 import { getBackgroundCache, type BackgroundSource } from './background/cache.js';
@@ -13,7 +14,6 @@ import type { LayoutManager } from './layout.js';
 export { Background } from './background/wallpaper.js';
 export { SystemBackground };
 
-const FADE_ANIMATION_TIME = 1000;
 
 export type BackgroundActor = Meta.BackgroundActor & {
   content: Meta.BackgroundContent & { background: Background };
@@ -82,8 +82,8 @@ export class BackgroundManager extends EventEmitter {
 
     oldBackgroundActor.ease({
       opacity: 0,
-      duration: FADE_ANIMATION_TIME,
-      mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+      duration: Duration.linger,
+      curve: Curve.gentle,
       onComplete: () => oldBackgroundActor.destroy(),
     });
   }

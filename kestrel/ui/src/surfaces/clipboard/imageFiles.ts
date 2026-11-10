@@ -1,25 +1,52 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
+import Meta from 'gi://Meta';
 
 import { missing, removeFile } from '../../appearance/files.js';
 
 Gio._promisify(Gio.File.prototype, 'load_bytes_async');
 Gio._promisify(Gio.File.prototype, 'enumerate_children_async');
 Gio._promisify(Gio.FileEnumerator.prototype, 'next_files_async');
+Gio._promisify(Gio.OutputStream.prototype, 'close_async');
+Gio._promisify(Gio.Subprocess.prototype, 'communicate_utf8_async');
+Gio._promisify(Meta.Selection.prototype, 'transfer_async');
 
 const BATCH_SIZE = 32;
+
+async function receivedBytes(selection: Meta.Selection, mimeType: string, most: number, stream: Gio.FileOutputStream): Promise<number> {
+  try {
+    await selection.transfer_async(Meta.SelectionType.SELECTION_CLIPBOARD, mimeType, most, stream, null);
+    return stream.tell();
+  } catch (error) {
+    if (error instanceof GLib.Error) return 0;
+    throw error;
+  }
+}
 
 export class ClipboardImageFiles {
   private readonly directory = Gio.File.new_for_path(
     GLib.build_filenamev([GLib.get_user_runtime_dir(), 'kestrel', GLib.getenv('WAYLAND_DISPLAY')!, 'clipboard']));
-  private readonly emptied = this.emptyLeftovers();
+  private readonly ownPrefix = `${GLib.uuid_string_random()}-`;
 
-  async save(id: string, bytes: GLib.Bytes): Promise<Gio.File> {
-    await this.emptied;
+  constructor() {
+    void this.emptyLeftovers();
+  }
+
+  async receive(selection: Meta.Selection, mimeType: string, copied: number, byteLimit: number): Promise<Gio.File | null> {
     GLib.mkdir_with_parents(this.directory.get_path()!, 0o700);
-    const file = this.directory.get_child(id);
-    await file.replace_contents_bytes_async(bytes, null, false, Gio.FileCreateFlags.PRIVATE, null);
-    return file;
+    const file = this.directory.get_child(`${this.ownPrefix}${copied}`);
+    const stream = file.create(Gio.FileCreateFlags.PRIVATE, null);
+    const size = await receivedBytes(selection, mimeType, byteLimit + 1, stream);
+    await stream.close_async(GLib.PRIORITY_DEFAULT, null);
+    if (size > 0 && size <= byteLimit) return file;
+    this.discard(file);
+    return null;
+  }
+
+  async checksum(file: Gio.File): Promise<string> {
+    const hashing = Gio.Subprocess.new(['sha256sum', file.get_path()!], Gio.SubprocessFlags.STDOUT_PIPE);
+    const [output] = await hashing.communicate_utf8_async(null, null);
+    return output.slice(0, output.indexOf(' '));
   }
 
   async load(file: Gio.File): Promise<GLib.Bytes> {
@@ -42,6 +69,6 @@ export class ClipboardImageFiles {
     }
     let batch: Gio.FileInfo[];
     while ((batch = await children.next_files_async(BATCH_SIZE, GLib.PRIORITY_LOW, null)).length)
-      await Promise.all(batch.map(info => removeFile(children.get_child(info))));
+      await Promise.all(batch.filter(info => !info.get_name().startsWith(this.ownPrefix)).map(info => removeFile(children.get_child(info))));
   }
 }

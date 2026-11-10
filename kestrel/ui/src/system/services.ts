@@ -19,24 +19,25 @@ import { PortalBackend } from '../portal/backend.js';
 import { Farewell } from '../session/farewell.js';
 import { LoginDisplays } from '../session/loginScreen/displays.js';
 import { LoginNumLock } from '../session/loginScreen/numLock.js';
-import { Health } from './health/health.js';
-import { notifyAboutIncidents } from './health/incidents.js';
-import { MemoryNotices } from './health/memoryNotices.js';
-import { confirmStartupOnceSettled } from './health/startup.js';
-import { AppQuestions } from './firewall/appQuestions.js';
-import { DesktopPolicy } from './peek/access/desktop.js';
-import { PeekService } from './peek/service.js';
-import { MonitorWake } from './display/relight/monitorWake.js';
-import { MediaKeys } from './mediaKeys/mediaKeys.js';
-import { BatteryWarnings } from './power/batteryWarnings.js';
-import { PenService } from './pens/service.js';
-import { ChargerSound } from './sounds/charger.js';
-import { DeviceSounds } from './sounds/devices.js';
-import { RecordingSounds } from './sounds/recording.js';
-import { ShareService } from './send/service.js';
-import { SoundService } from './sounds/service.js';
-import { playSound } from './sounds/sounds.js';
-import { UpdateNotices } from './updates/updateNotices.js';
+import { Health } from './status/health/health.js';
+import { notifyAboutIncidents } from './status/health/incidents.js';
+import { MemoryNotices } from './status/health/memoryNotices.js';
+import { confirmStartupOnceSettled } from './status/health/startup.js';
+import { AppQuestions } from './connectivity/firewall/appQuestions.js';
+import { SharingService } from './capture/privacy/sharing/service.js';
+import { DesktopPolicy } from './capture/peek/access/desktop.js';
+import { PeekService } from './capture/peek/service.js';
+import { MonitorWake } from './hardware/display/relight/monitorWake.js';
+import { MediaKeys } from './input/mediaKeys/mediaKeys.js';
+import { BatteryWarnings } from './hardware/power/batteryWarnings.js';
+import { PenService } from './hardware/pens/service.js';
+import { ChargerSound } from './sound/sounds/charger.js';
+import { DeviceSounds } from './sound/sounds/devices.js';
+import { RecordingSounds } from './sound/sounds/recording.js';
+import { ShareService } from './connectivity/send/service.js';
+import { SoundService } from './sound/sounds/service.js';
+import { playSound } from './sound/sounds/sounds.js';
+import { UpdateNotices } from './status/updates/updateNotices.js';
 
 export class SystemServices {
   private readonly memoryNotices = new MemoryNotices();
@@ -68,17 +69,18 @@ export class SystemServices {
   private readonly mediaKeys: MediaKeys;
   private readonly peek: PeekService;
   private readonly firewallQuestions: AppQuestions;
+  private readonly sharing = new SharingService();
 
   constructor(context: Context, openStart: () => void) {
     this.titleBars = new TitleBars((window, x, y) =>
       context.showWindowMenu(window, new Mtk.Rectangle({ x: Math.round(x), y: Math.round(y), width: 0, height: 0 })));
     this.portal = PortalBackend.forSession(context);
-    this.passkeys = new PasskeyPrompts(context);
+    this.passkeys = new PasskeyPrompts();
     this.appearance = new AppearanceService(color => this.portal.setAccent(color));
-    this.keyring = new SystemPrompts(context);
+    this.keyring = new SystemPrompts();
     this.mediaKeys = new MediaKeys(context, openStart);
     this.peek = new PeekService(context, context.activateWindow, new DesktopPolicy());
-    this.firewallQuestions = new AppQuestions(context);
+    this.firewallQuestions = new AppQuestions();
     confirmStartupOnceSettled(context.layoutManager);
     const startup = context.layoutManager.connect('startup-complete', () => {
       context.layoutManager.disconnect(startup);
@@ -89,6 +91,7 @@ export class SystemServices {
 
   destroy(): void {
     this.peek.destroy();
+    this.sharing.destroy();
     this.firewallQuestions.destroy();
     this.keyring.destroy();
     this.appearance.destroy();

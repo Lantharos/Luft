@@ -5,6 +5,7 @@ import * as KestrelUi from '../../../kestrelUi.js';
 import * as Main from '../../../core/main.js';
 import { NotificationError, NotificationErrors } from '../../../core/runtime/dbusErrors.js';
 import { loadInterfaceXML } from '../../../core/runtime/dbusUtils.js';
+import { ownOnItsOwnConnection } from '../../../shared/dbus/dedicatedName.js';
 import { GtkNotificationDaemonNotification, type SerializedNotification } from './gtkNotification.js';
 import { GtkNotificationDaemonAppSource, InvalidAppError, type SerializedSource } from './gtkSource.js';
 
@@ -19,11 +20,9 @@ export class GtkNotificationDaemon {
   private isLoading = false;
 
   constructor() {
-    this.dbusImpl.export(Gio.DBus.session, '/org/gtk/Notifications');
-
     this.loadNotifications();
 
-    Gio.DBus.session.own_name('org.gtk.Notifications', Gio.BusNameOwnerFlags.REPLACE, null, null);
+    ownOnItsOwnConnection('org.gtk.Notifications', [[this.dbusImpl, '/org/gtk/Notifications']], () => {});
   }
 
   private ensureAppSource(appId: string): GtkNotificationDaemonAppSource {

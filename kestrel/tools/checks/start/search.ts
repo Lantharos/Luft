@@ -97,7 +97,7 @@ async function checkToggles() {
     style.set_string('color-scheme', scheme);
     notifications.reset('show-banners');
   }
-  for (const [title, query, key] of [['Night Light', 'night light', 'action:night-light'], ['Wi-Fi', 'wifi off', 'action:wifi']]) {
+  for (const [title, query, key] of [['Night light', 'night light', 'action:night-light'], ['Wi-Fi', 'wifi off', 'action:wifi']]) {
     search(query);
     const control = tile(title);
     if (control?.visible) await eventually(() => row(key)?.mapped, `${query} offers the ${title} toggle`);
@@ -119,7 +119,7 @@ async function checkSession() {
 
   await openStart();
   search('sign out');
-  await eventually(() => row('action:can-logout') && titleOf(row('action:can-logout')!) === 'Log out', 'sign out finds Log out');
+  await eventually(() => row('action:can-logout') && titleOf(row('action:can-logout')!) === 'Sign out', 'sign out finds Sign out');
   row('action:can-logout')!.emit('clicked', 1);
   try {
     await eventually(() => Main.modalCount > 0, 'logging out from search still asks first');

@@ -27,7 +27,7 @@ Capture options:
   --list          List the groups and exit.
 
 Environment:
-  KESTREL_SESSION_DIR   Where session state goes (default: kestrel/run).
+  KESTREL_SESSION_DIR   Where session state goes (default: kestrel/run/session).
   KESTREL_CAPTURE_DIR   Where screenshots go (default: kestrel/run/screenshots).
   KESTREL_CAPTURE_SIZE  Size of the virtual monitor (default: 1440x900).
   KESTREL_CAPTURE_SECONDARY_SIZE  Adds a second virtual monitor.

@@ -16,7 +16,7 @@ import { ContextMenus } from '../../desktop/menus/contextMenus.js';
 import type { Monitor } from '../../desktop/panel/panel.js';
 import { terminateOnceShown } from '../../shared/apps/handoff.js';
 import { animateActor, Curve, Duration } from '../../shared/motion/motion.js';
-import type { StartupSignals } from '../../system/health/startup.js';
+import type { StartupSignals } from '../../system/status/health/startup.js';
 import { Accounts } from './accounts.js';
 import { LoginAppearance } from './appearance.js';
 import { readConfig } from './config.js';

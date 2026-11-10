@@ -21,7 +21,6 @@ export const parts = () => groups().flatMap(group => group.get_children());
 export const labelled = (label: string) => parts().filter(actor => actor.accessible_name === label);
 export const hasPart = (actor: Clutter.Actor | null) => !!actor && parts().includes(actor);
 
-/** The part right after `actor`, which is added next. */
 export const nextPart = (actor: Clutter.Actor) => parts()[parts().indexOf(actor) + 1];
 export const middleOf = (actor: Clutter.Actor): Point => {
   const box = actor.get_transformed_extents();
@@ -36,7 +35,6 @@ export async function choose(values: Record<string, GLib.Variant>) {
 
 const on = (value: boolean) => new GLib.Variant('b', value);
 
-/** Leaves only these kinds out, one setting at a time. */
 export const only = (...kinds: string[]) => choose(Object.fromEntries(['lanterns', 'clouds', 'campfire', 'stars'].map(kind => [kind, on(kinds.includes(kind))])));
 export const ambient = (value: boolean) => choose({ambient: on(value)});
 
@@ -61,9 +59,7 @@ export interface Cost {
   paints: number;
   wakeups: number;
   cpu: number;
-  /** Paints a second of displays other than the main one. */
   elsewhere: number;
-  /** Whether any part looks different at the end. */
   partsChanged: boolean;
 }
 
@@ -86,7 +82,6 @@ function cpuTicks() {
 
 const looks = () => parts().map(actor => [actor.translation_x, actor.translation_y, turned(actor), actor.opacity, actor.scale_x, actor.scale_y, actor.visible]).join(';');
 
-/** What Kestrel costs per second while `during` runs, or over `milliseconds` of leaving it alone. */
 export async function cost(milliseconds: number, during: () => Promise<void> = () => pause(milliseconds)): Promise<Cost> {
   let frames = 0;
   let elsewhere = 0;
@@ -106,11 +101,6 @@ export async function cost(milliseconds: number, during: () => Promise<void> = (
   return measured;
 }
 
-/**
- * Measures until `accept` agrees, a few times at most. The taskbar's clock paints every display when the minute turns,
- * and Kestrel itself paints for a second or so now and then with no extension installed, so one window says little;
- * something Playthings does wrong shows in all of them.
- */
 export async function steady(name: string, milliseconds: number, accept: (measured: Cost) => boolean) {
   let measured = await measure(name, milliseconds);
   for (let attempt = 1; attempt < ATTEMPTS && !accept(measured); attempt++) measured = await measure(`${name}, again`, milliseconds);

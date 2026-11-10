@@ -2,11 +2,28 @@
 
 @theme static {
 	--motion-tap: 83ms;
+	--motion-brisk: 120ms;
 	--motion-quick: 167ms;
+	--motion-moderate: 200ms;
 	--motion-standard: 250ms;
+	--motion-relaxed: 300ms;
 	--motion-large: 333ms;
+	--motion-travel: 360ms;
+	--motion-slow: 400ms;
+	--motion-long: 500ms;
+	--motion-linger: 1000ms;
+	--ease-linear: cubic-bezier(0, 0, 1, 1);
 	--ease-decelerate: cubic-bezier(0, 0, 0, 1);
 	--ease-point: cubic-bezier(0.55, 0.55, 0, 1);
+	--ease-gentle: cubic-bezier(0.3333, 0.6667, 0.6667, 1);
+	--ease-accelerate: cubic-bezier(0.3333, 0, 0.6667, 0.3333);
+	--ease-glide: cubic-bezier(0.3333, 1, 0.6667, 1);
+	--ease-settle: cubic-bezier(0.2581, 1, 0.4882, 1);
+	--ease-depart: cubic-bezier(0.5118, 0, 0.7419, 0);
+	--ease-pulse: cubic-bezier(0.47, 0.03, 0.53, 0.97);
+	--ease-unfold: cubic-bezier(0.15, 1, 0.32, 1);
+	--ease-overshoot: cubic-bezier(0.3333, 1.5672, 0.6667, 1);
+	--ease-drift: cubic-bezier(0.37, 0, 0.63, 1);
 	--spring-snappy: linear(0, 0.0313, 0.1049, 0.1987, 0.299, 0.3971, 0.4884, 0.5706, 0.6427, 0.7049, 0.7578, 0.8023, 0.8394, 0.87, 0.8952, 0.9158, 0.9325, 0.946, 0.957, 0.9658, 0.9728, 0.9784, 0.9829, 0.9865, 0.9894, 0.9916, 0.9934, 0.9948, 0.9959, 0.9968, 0.9975, 1);
 	--spring-snappy-duration: 338ms;
 	--spring-smooth: linear(0, 0.0172, 0.0606, 0.1202, 0.1888, 0.2611, 0.3337, 0.4041, 0.4707, 0.5326, 0.5894, 0.6409, 0.6871, 0.7283, 0.7649, 0.797, 0.8252, 0.8499, 0.8713, 0.8899, 0.9059, 0.9198, 0.9317, 0.9419, 0.9506, 0.9581, 0.9645, 0.97, 0.9746, 0.9785, 0.9819, 0.9847, 0.9871, 0.9891, 0.9909, 0.9923, 0.9935, 0.9946, 0.9954, 0.9962, 0.9968, 0.9973, 0.9977, 1);

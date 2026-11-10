@@ -54,7 +54,6 @@ export class XdndHandler extends EventEmitter {
     });
   }
 
-  /** Lights up the file target under the pointer, and tells Mutter whether a drop there is taken. */
   private hoverFiles(target: DND.FileDropTarget | null): void {
     if (target === this.fileHover) return;
     this.fileHover?.hover(false);

@@ -71,7 +71,6 @@ export class Board implements BoardActions {
   private cancelRestore: (() => void) | null = null;
   private aside: Meta.Window | null = null;
   private restoring = false;
-  // The size a window takes on the board when it has one of its own apart from its current size, as tiled windows do
   ownSize: (window: Meta.Window) => Pick<Box, 'width' | 'height'> | null = () => null;
 
   private readonly unwatchScheme: () => void;
@@ -129,7 +128,6 @@ export class Board implements BoardActions {
     return this.presented !== null;
   }
 
-  // Shown, or still giving windows back their sizes on the way in, when nothing else should lay them out
   get holding(): boolean {
     return this.shown || this.restoring;
   }
@@ -249,7 +247,6 @@ export class Board implements BoardActions {
     endGlideTracking();
   }
 
-  // Full screen can't show through the board's view, so the board steps aside until the window leaves it
   setAside(window: Meta.Window, before: Box): void {
     const canvas = this.presented;
     if (!canvas) return;

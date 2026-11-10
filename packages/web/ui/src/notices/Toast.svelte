@@ -9,7 +9,6 @@
 
 	interface Props {
 		toast: ToastMessage | null;
-		/** Shows a button that dismisses the toast. */
 		dismissible?: boolean;
 		class?: ClassValue;
 		ondismiss: () => void;

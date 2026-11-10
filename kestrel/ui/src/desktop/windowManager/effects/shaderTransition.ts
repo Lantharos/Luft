@@ -2,8 +2,8 @@ import Clutter from 'gi://Clutter';
 import type Cogl from 'gi://Cogl';
 import type Meta from 'gi://Meta';
 
-import { frameUniforms, WindowPixels } from '../../../extensions/api/v1/screenEffects/windows/pixels.js';
-import type { Uniforms } from '../../../extensions/api/v1/screenEffects/shaders.js';
+import { frameUniforms, WindowPixels } from '../../../extensions/api/v1/visuals/screenEffects/windows/pixels.js';
+import type { Uniforms } from '../../../extensions/api/v1/visuals/screenEffects/shaders.js';
 
 const EFFECT = 'extension-window-transition';
 
@@ -18,7 +18,6 @@ export interface WindowTransitionSource {
   transitionFor(window: Meta.Window, kind: 'open' | 'close'): ShaderTransition | null;
 }
 
-/** The shaders extensions added for windows opening and closing, asked only when a window does. */
 class WindowTransitions {
   private readonly sources = new Set<WindowTransitionSource>();
 
@@ -39,7 +38,6 @@ class WindowTransitions {
 
 export const windowTransitions = new WindowTransitions();
 
-/** Runs a window through a transition's shader, with `window_progress` going from 0 to 1, over the window and everything drawn with it. */
 export class RunningTransition {
   private readonly effect = new WindowPixels();
   private readonly timeline: Clutter.Timeline;

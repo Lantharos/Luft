@@ -37,7 +37,7 @@ const enable: Enable<Granted> = extension => {
   extension.settings.onChanged(changed);
   describePage(pult);
   addSearch(pult);
-  void pult.start();
+  return pult.start();
 };
 
 export default enable;

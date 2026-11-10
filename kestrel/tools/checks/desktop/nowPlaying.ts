@@ -39,7 +39,6 @@ function player(name: string, identity: string, title: string, artist: string, c
   return gjs('clients/apps/musicPlayer.js', [name, identity, title, artist, fixture('media', cover)]);
 }
 
-/** A 3:2 picture of the element where it sits on the taskbar, for the layout's preview in Settings. */
 async function preview(name: string) {
   const [x] = element()!.get_transformed_position();
   const width = PREVIEW_WIDTH;
@@ -66,11 +65,12 @@ async function checkLayouts() {
     await preview(`now-playing-preview-${layout}`);
   }
   const cover = element()!.height;
-  const compactAtMost = cover + SPACING + TITLE_WIDTH + 4;
+  const padding = (element() as St.Widget).get_theme_node().get_horizontal_padding();
+  const compactAtMost = padding + cover + SPACING + TITLE_WIDTH;
   require(widths.compact <= compactAtMost, `compact is the cover and a short title, ${widths.compact} pixels wide (${compactAtMost} at most)`);
   require(titles.compact <= TITLE_WIDTH && titles.full <= TITLE_WIDTH, 'a long title slides along within the title width instead of widening it');
   require(widths.full > widths.compact + 40, `the wide layout puts the controls beside it (${widths.full} pixels)`);
-  require(widths.cover <= cover + 8, 'just the cover is a small square');
+  require(widths.cover <= padding + cover, 'just the cover is a small square');
   await setSetting(NOW_PLAYING, 'layout', new GLib.Variant('s', 'compact'));
   await setSetting(NOW_PLAYING, 'title-width', new GLib.Variant('d', NARROW_TITLE));
   await eventually(() => element()!.width < widths.compact - 10, 'a narrower title width makes it narrower still');

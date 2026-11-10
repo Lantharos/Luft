@@ -45,7 +45,6 @@ const INTERFACE = `<node>
 </node>`;
 const CHANGED_DELAY = 50;
 
-/** Lets Settings and Schelf see, switch, set up, update and remove extensions. Sandboxed apps get nothing. */
 export class ExtensionsService {
   private readonly dbus = Gio.DBusExportedObject.wrapJSObject(INTERFACE, this);
   private readonly unwatch: () => void;

@@ -2,7 +2,6 @@ import type { NativeVideo, NativeVideoEvent } from '@lantharos/sabine';
 
 const EVENTS: NativeVideoEvent[] = ['play', 'pause', 'playing', 'timeupdate', 'seeked', 'durationchange', 'loadedmetadata', 'volumechange', 'ended', 'resize'];
 
-/** Reactive playback state of a native video, for binding to media controls. */
 export class MediaState {
 	paused = $state(true);
 	currentTime = $state(0);

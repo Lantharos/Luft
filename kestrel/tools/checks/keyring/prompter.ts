@@ -39,8 +39,8 @@ async function checkAccess(client: KeyringClient) {
   const second = await openedDialog('a second access prompt opens');
   press(Clutter.KEY_Escape);
   require(keyringDialog(), 'Escape leaves an access prompt open');
-  click(require(labelled('Don’t Allow', second), 'access prompts offer to deny'));
-  require((await denied)[0] === 1, 'Don’t Allow denies access');
+  click(require(labelled('Don’t allow', second), 'access prompts offer to deny'));
+  require((await denied)[0] === 1, 'Don’t allow denies access');
   await eventually(() => !keyringDialog(), 'a denied prompt closes');
 
   const id = handle();
@@ -55,7 +55,7 @@ async function checkFingerprint(client: KeyringClient) {
   const id = handle();
   const touched = client.access(id, {...GITHUB, fingerprint: true});
   const dialog = await openedDialog('a fingerprint prompt opens');
-  require(labelled('Touch the fingerprint reader to allow', dialog) && labelled('Don’t Allow', dialog) && !labelled('Allow', dialog),
+  require(labelled('Touch the fingerprint reader to allow', dialog) && labelled('Don’t allow', dialog) && !labelled('Allow', dialog),
     'fingerprint access waits for a touch and only offers to deny');
   await capture('keyring-fingerprint');
   await client.close(id);

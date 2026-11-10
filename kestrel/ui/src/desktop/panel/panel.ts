@@ -30,7 +30,6 @@ import { IslandShapes, type IslandShape, taskbarShapesChanged } from './islands/
 import { PanelTablet } from './tablet/panelTablet.js';
 import { alongOf, moveBar } from '../../../../../packages/web/ui/src/taskbar/arrangement/index';
 
-const RESIZE_DURATION = 240;
 const SHAPE_KEYS: TaskbarKey[] = ['taskbar-style', 'taskbar-size'];
 const LOOK_KEYS: TaskbarKey[] = ['taskbar-look', 'taskbar-style', 'taskbar-size', 'pure-black', 'rounded-window-corners'];
 const APP_KEYS: TaskbarKey[] = ['taskbar-show-pinned', 'taskbar-windows-per-display', 'taskbar-windows-per-workspace'];
@@ -66,7 +65,6 @@ export class KestrelPanel {
   private gapMonitor: number | null = null;
   private readonly peek = new DesktopPeek();
   readonly layout = new PanelLayout();
-  /** Runs once the panel shows a new arrangement, so what depends on its edges can follow. */
   arranged = () => {};
   private readonly surface: TaskbarSurface;
   private readonly launcher: Launcher;
@@ -159,12 +157,10 @@ export class KestrelPanel {
     this.morph.sync(true);
   }
 
-  /** The taskbar's layout on this panel's screen, which is laid out for touch on screens people touch or draw on. */
   get screen(): TaskbarLayout {
     return taskbarPreferences.on(this.monitor?.index);
   }
 
-  /** The edge the bar runs along as shown now, which can lag behind the preferences while it moves. */
   get shownEdge(): Edge {
     return this.edge;
   }
@@ -173,17 +169,14 @@ export class KestrelPanel {
     return this.joined;
   }
 
-  /** The edges this panel's islands sit on. */
   get edges(): Edge[] {
     return [...new Set(this.islandSet.islands.map(island => island.edge))];
   }
 
-  /** The edge an element's island sits on, such as the clock's for notifications. */
   edgeOf(actor: Clutter.Actor): Edge {
     return this.joined ? this.edge : this.islandSet.containing(actor)?.edge ?? this.edge;
   }
 
-  /** How far the taskbar reaches in from each edge it uses. */
   get depths(): Depths {
     const depths = { ...NO_DEPTHS };
     for (const edge of this.edges) depths[edge] = this.screen.clearance;
@@ -234,7 +227,7 @@ export class KestrelPanel {
     if (!this.monitor) return;
     this.reserve();
     const frame = this.frame;
-    if (animate) animateActor(this.actor, { ...frame, duration: RESIZE_DURATION, mode: Clutter.AnimationMode.EASE_OUT_QUART });
+    if (animate) animateActor(this.actor, { ...frame, duration: Duration.standard, curve: Curve.settle });
     else {
       for (const property of ['x', 'y', 'width', 'height']) this.actor.remove_transition(property);
       this.actor.set_position(frame.x, frame.y);
@@ -243,7 +236,6 @@ export class KestrelPanel {
     this.autoHide.place();
   }
 
-  /** The bar along its edge, or the whole screen that separate islands sit on. */
   get frame(): Rect {
     const { x, y, width, height } = this.monitor!;
     if (!this.joined) return { x, y, width, height };
@@ -261,7 +253,6 @@ export class KestrelPanel {
     this.markGap(this.monitor!.index);
   }
 
-  /** The struts windows keep clear of: one along each edge with an island. */
   get wantedStruts(): St.Widget[] {
     return this.edges.map(edge => this.struts.get(edge)!);
   }
@@ -272,7 +263,6 @@ export class KestrelPanel {
     if (index !== null) global.compositor.set_monitor_gap(index, this.screen.gap > 0);
   }
 
-  /** Shows the arrangement as it is now, the taskbar running as one bar or as separate islands. */
   arrange(): void {
     this.edge = this.screen.edge;
     this.joined = this.screen.joined;
@@ -321,13 +311,11 @@ export class KestrelPanel {
     return this.shapes.anchors();
   }
 
-  /** The island a surface's button sits in, which the surface opens beside. */
   islandOf(surface: string): Island | null {
     const element = SURFACE_ELEMENTS[surface];
     return element ? this.islandSet.islandOf(element) : null;
   }
 
-  /** Where a surface opens beside its button: from its island's edge, lined up with the island's end or its middle. */
   anchorFor(surface: string): Anchor | null {
     const island = this.islandOf(surface);
     const button = this.buttonFor(surface);

@@ -18,11 +18,9 @@ const GOLD = '#ffb347';
 const BEHIND = '#ffffff';
 const X11_ROOM = 460;
 const SAME = 6;
-// A curved picture pulls in the app's own shadow under the tip of a corner, which lightens it a little
 const BENT_SHADOW = 40;
 const BORDER = 3;
 const WINDOW_RADIUS = 15;
-// Inside the band a 3 pixel border draws along a corner of radius 15, and in the corner's cut off tip
 const ON_THE_ARC = WINDOW_RADIUS * (1 - Math.SQRT1_2) + BORDER / 2 * Math.SQRT1_2;
 const IN_THE_TIP = 1;
 
@@ -84,7 +82,6 @@ async function shotAlone(sampled: Sampled, all: Sampled[]) {
   return shot;
 }
 
-/** Whatever goes on the windows, the tips of their rounded corners keep showing what's behind. */
 async function checkTipsClear({require}: Checks, windows: Sampled[], what: string, plain: Map<Sampled, Frame>, tolerance = SAME) {
   for (const sampled of windows) {
     const frame = await shotAlone(sampled, windows);

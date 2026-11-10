@@ -19,12 +19,12 @@ import {settled, waitUntil} from '../lib/wait.js';
 import {contrast} from '../lib/colors.js';
 
 const {require, eventually} = checks('quick tile');
-const TILES = ['Keep Awake', 'Dark Style', 'Airplane Mode', 'Keyboard Backlight'];
+const TILES = ['Keep awake', 'Dark style', 'Airplane mode', 'Keyboard backlight'];
 const LINK_SCHEME = 'x-scheme-handler/kestrel-settings';
 const LINKS = new Map([
-  ['Sound Settings', 'kestrel-settings:sound'],
-  ['Power Settings', 'kestrel-settings:power'],
-  ['All Networks', 'kestrel-settings:network/wifi'],
+  ['Sound settings', 'kestrel-settings:sound'],
+  ['Power settings', 'kestrel-settings:power'],
+  ['All networks', 'kestrel-settings:network/wifi'],
 ]);
 
 const ACCENT_WALLPAPERS = [['yellow', 0xe8c020ff], ['blue', 0x1838a8ff]] as const;
@@ -73,7 +73,7 @@ async function toggle(control: St.Button, label: string, effect: (checked: boole
 }
 
 async function checkKeepAwake() {
-  const keepAwake = existingTile('Keep Awake');
+  const keepAwake = existingTile('Keep awake');
   const placed = grid().get_n_children();
   new Gio.Settings({schema_id: 'com.lantharos.kestrel'}).set_strv('quick-tiles-removed', []);
   await eventually(() => grid().get_n_children() > placed, 'tiles hidden by default come back when the setting changes');
@@ -82,8 +82,8 @@ async function checkKeepAwake() {
   await toggle(keepAwake, 'turning keep awake off lets the session sleep', checked => !checked);
 
   more(keepAwake).emit('clicked', 1);
-  const hour = () => named('1 Hour', quick()) ?? descendants(quick())
-    .find(actor => actor.visible && actor instanceof St.Widget && textOf(actor.label_actor) === '1 Hour') ?? null;
+  const hour = () => named('1 hour', quick()) ?? descendants(quick())
+    .find(actor => actor.visible && actor instanceof St.Widget && textOf(actor.label_actor) === '1 hour') ?? null;
   const hourItem = ofType(await eventually(() => shown(hour()) && hour(), 'keep awake offers how long to stay awake'), PopupBaseMenuItem);
   await settled();
   const [, hourY] = hourItem.get_transformed_position();
@@ -100,16 +100,16 @@ async function checkKeepAwake() {
 }
 
 async function checkToggles(interfaceSettings: Gio.Settings) {
-  const airplane = existingTile('Airplane Mode');
+  const airplane = existingTile('Airplane mode');
   await toggle(airplane, 'airplane mode turns on and shows in the panel', checked => checked && statusShows('airplane-mode-symbolic'));
   await toggle(airplane, 'airplane mode turns off', checked => !checked && !statusShows('airplane-mode-symbolic'));
 
-  const keyboard = existingTile('Keyboard Backlight');
+  const keyboard = existingTile('Keyboard backlight');
   require(keyboard.checked, 'the keyboard tile reflects a lit backlight');
   await toggle(keyboard, 'the keyboard tile turns the backlight off', checked => !checked);
   await toggle(keyboard, 'and on again', checked => checked);
 
-  const dark = existingTile('Dark Style');
+  const dark = existingTile('Dark style');
   const scheme = interfaceSettings.get_string('color-scheme');
   await toggle(dark, 'dark style switches the app color scheme', () => interfaceSettings.get_string('color-scheme') !== scheme);
 
@@ -173,7 +173,7 @@ async function checkLayout(shellSettings: Gio.Settings) {
   await drag(first, second, {hover: 200});
   await eventually(() => first.x > second.x && shellSettings.get_strv('quick-tile-order').length > 0, 'dragging a tile moves it and remembers the order');
 
-  const dark = existingTile('Dark Style');
+  const dark = existingTile('Dark style');
   await settled();
   rightClick(dark);
   await eventually(() => shown(named('Remove', menu())), 'customizing a tile offers to remove it');
@@ -184,8 +184,8 @@ async function checkLayout(shellSettings: Gio.Settings) {
   rightClick(surfaceCorner());
   await eventually(() => shown(named('Add', menu())), 'customized quick settings offer to add tiles back');
   click(existing('Add', menu()));
-  await eventually(() => shown(named('Dark Style', menu())), 'the removed tiles are listed');
-  click(existing('Dark Style', menu()));
+  await eventually(() => shown(named('Dark style', menu())), 'the removed tiles are listed');
+  click(existing('Dark style', menu()));
   await eventually(() => dark.get_parent() === grid() && dark.visible, 'removed tiles can be added back');
 }
 
@@ -200,17 +200,17 @@ async function openAddList() {
 
 async function checkRotation() {
   const touchscreen = new Gio.Settings({schema_id: 'com.lantharos.kestrel.touchscreen'});
-  require(!tile('Auto Rotate'), 'auto rotate is not shown by default');
+  require(!tile('Auto-rotate'), 'auto rotate is not shown by default');
   await openAddList();
-  require(!named('Auto Rotate', menu()), 'the add list leaves out auto rotate without an accelerometer');
+  require(!named('Auto-rotate', menu()), 'the add list leaves out auto rotate without an accelerometer');
   press(Clutter.KEY_Escape);
   const sensor = gjs('services/sensorProxy.js');
   try {
     await eventually(() => accelerometer.present, 'Kestrel finds the accelerometer');
     await openAddList();
-    require(shown(named('Auto Rotate', menu())), 'the add list offers auto rotate with an accelerometer');
-    click(existing('Auto Rotate', menu()));
-    const rotation = await waitUntil(() => tile('Auto Rotate')?.get_parent() === grid() && tile('Auto Rotate')?.visible && tile('Auto Rotate'), 'auto rotate can be added');
+    require(shown(named('Auto-rotate', menu())), 'the add list offers auto rotate with an accelerometer');
+    click(existing('Auto-rotate', menu()));
+    const rotation = await waitUntil(() => tile('Auto-rotate')?.get_parent() === grid() && tile('Auto-rotate')?.visible && tile('Auto-rotate'), 'auto rotate can be added');
     rest();
     await settled();
     require(rotation.checked && subtitle(rotation) === 'On' && rotation.icon_name === 'rotation-allowed-symbolic', 'auto rotate starts on');
@@ -223,7 +223,7 @@ async function checkRotation() {
     touchscreen.reset('orientation-lock');
     await stop(sensor);
   }
-  await eventually(() => !existingTile('Auto Rotate').visible, 'auto rotate goes away with the accelerometer');
+  await eventually(() => !existingTile('Auto-rotate').visible, 'auto rotate goes away with the accelerometer');
 }
 
 function recordingHandler(opened: string) {
@@ -263,7 +263,7 @@ export async function run() {
   const shellSettings = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
   const interfaceSettings = new Gio.Settings({schema_id: 'org.gnome.desktop.interface'});
   const colorScheme = interfaceSettings.get_string('color-scheme');
-  gjs('system/laptopServices.js');
+  gjs('system/devices/laptopServices.js');
   try {
     toggleSurface('quick');
     await eventually(() => shown(quick()) && TILES.every(title => tile(title)?.visible), 'quick settings show every available tile', 10000);

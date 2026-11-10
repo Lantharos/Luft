@@ -155,7 +155,6 @@ class SeeThroughWindow {
   }
 }
 
-/** Makes the windows of the apps people chose see-through, showing what's behind them or only the wallpaper, blurred or not. */
 export class SeeThroughWindows {
   private readonly settings = settings();
   private readonly treated = new Map<Meta.Window, SeeThroughWindow>();

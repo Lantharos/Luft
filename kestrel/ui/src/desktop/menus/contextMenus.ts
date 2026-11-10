@@ -6,7 +6,7 @@ import Shell from 'gi://Shell';
 import St from 'gi://St';
 import type { Monitor } from '../panel/panel.js';
 import { blurSurface, raiseSurface, SURFACE_GAP } from '../../shared/layout/surface.js';
-import { animateActor } from '../../shared/motion/motion.js';
+import { animateActor, Curve, Duration } from '../../shared/motion/motion.js';
 import { longPress } from '../../shared/input/longPress.js';
 import { menuContent, type MenuEntry, type MenuGroup } from './menuContent.js';
 import { openSettings, type SettingsLink } from '../../system/settingsPages.js';
@@ -21,9 +21,9 @@ const MAX_WIDTH = 420;
 const TRAILING_SPACE = 84;
 const SLIDE_DISTANCE = 40;
 const RISE = 6;
-const RESIZE = { duration: 160, mode: Clutter.AnimationMode.EASE_OUT_CUBIC };
-const SLIDE_OUT = { duration: 120, mode: Clutter.AnimationMode.EASE_IN_QUAD };
-const SLIDE_IN = { duration: 200, mode: Clutter.AnimationMode.EASE_OUT_CUBIC };
+const RESIZE = { duration: Duration.quick, curve: Curve.glide };
+const SLIDE_OUT = { duration: Duration.brisk, curve: Curve.accelerate };
+const SLIDE_IN = { duration: Duration.moderate, curve: Curve.glide };
 
 export class ContextMenus {
   readonly shield = new St.Widget({ reactive: true, visible: false });
@@ -75,7 +75,6 @@ export class ContextMenus {
     });
   }
 
-  /** Opens the menu on a right click only, for what uses a long press itself. */
   bindSecondaryClick(actor: Clutter.Actor, entries: () => MenuEntry[]): void {
     actor.connect('button-press-event', (_actor, event) => {
       if (event.get_button() !== Clutter.BUTTON_SECONDARY) return Clutter.EVENT_PROPAGATE;
@@ -182,7 +181,7 @@ export class ContextMenus {
     this.shield.show();
     this.actor.opacity = 0;
     this.actor.set(toward(this.anchor.edge, RISE));
-    animateActor(this.actor, { opacity: 255, ...toward(this.anchor.edge, 0), duration: 130, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
+    animateActor(this.actor, { opacity: 255, ...toward(this.anchor.edge, 0), duration: Duration.brisk, curve: Curve.gentle });
     this.actor.grab_key_focus();
   }
 
@@ -247,7 +246,7 @@ export class ContextMenus {
     this.sourceDestroy = 0;
     if (immediate) { this.actor.remove_all_transitions(); this.actor.hide(); }
     else if (this.actor.visible) animateActor(this.actor, {
-      opacity: 0, ...toward(this.anchor?.edge ?? 'bottom', RISE), duration: 100, mode: Clutter.AnimationMode.EASE_IN_QUAD,
+      opacity: 0, ...toward(this.anchor?.edge ?? 'bottom', RISE), duration: Duration.tap, curve: Curve.accelerate,
       onComplete: () => { if (!this.source) this.actor.hide(); },
     });
     this.shield.hide();

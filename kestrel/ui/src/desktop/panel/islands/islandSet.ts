@@ -8,7 +8,6 @@ import { taskbarShapesChanged } from './shapes.js';
 export interface Island {
   spot: Spot;
   edge: Edge;
-  /** The island's surface, which floats on its own when islands are separate. */
   readonly actor: St.Bin;
   readonly box: St.BoxLayout;
   elements: string[];
@@ -16,11 +15,9 @@ export interface Island {
 
 export interface PanelElements {
   actor(id: string): Clutter.Actor | null;
-  /** Lays an element out along an edge that runs across or down. */
   orient(id: string, edge: Edge): void;
 }
 
-/** The islands a panel shows, made from an arrangement, each holding its elements' actors in order. */
 export class IslandSet {
   private shown: Island[] = [];
 
@@ -61,7 +58,6 @@ export class IslandSet {
     this.changed(islands);
   }
 
-  /** The island that becomes this one: the one sharing most of its elements, or the one already at its spot. */
   private closest(islands: Island[], spot: Spot, elements: string[]): Island | null {
     const score = (island: Island) => 2 * island.elements.filter(id => elements.includes(id)).length + (island.spot === spot ? 1 : 0);
     return islands.reduce<Island | null>((chosen, island) => score(island) > (chosen ? score(chosen) : 0) ? island : chosen, null);

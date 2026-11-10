@@ -5,7 +5,7 @@ import Shell from 'gi://Shell';
 import St from 'gi://St';
 import { blurSurface, raiseSurface } from '../../shared/layout/surface.js';
 import { taskbarPreferences, type TaskbarLayout } from './preferences/taskbarPreferences.js';
-import { animateActor } from '../../shared/motion/motion.js';
+import { animateActor, Curve, Duration } from '../../shared/motion/motion.js';
 import { freezeSelection } from '../../appearance/kestrelGlass.js';
 import { ensureActorVisibleInScrollView } from '../../core/runtime/animationUtils.js';
 import type { Monitor } from './panel.js';
@@ -135,7 +135,7 @@ export class WindowPreviews {
     raiseSurface(this.actor);
     this.actor.opacity = 0;
     this.actor.set(toward(edge, 8));
-    animateActor(this.actor, { opacity: 255, ...toward(edge, 0), duration: 160, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
+    animateActor(this.actor, { opacity: 255, ...toward(edge, 0), duration: Duration.quick, curve: Curve.gentle });
     if (focus && firstWindow) (firstWindow as St.Button).grab_key_focus();
   }
 
@@ -167,7 +167,7 @@ export class WindowPreviews {
     if (immediate) { this.actor.remove_all_transitions(); finish(); }
     else if (!this.clearSelection) {
       this.clearSelection = freezeSelection(this.actor);
-      animateActor(this.actor, { opacity: 0, ...toward(this.edge, 6), duration: 100, mode: Clutter.AnimationMode.EASE_IN_QUAD, onComplete: finish });
+      animateActor(this.actor, { opacity: 0, ...toward(this.edge, 6), duration: Duration.tap, curve: Curve.accelerate, onComplete: finish });
     }
   }
 

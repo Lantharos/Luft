@@ -20,7 +20,6 @@ function fingerprint(apps: Listing): string {
   return Object.entries(apps).map(([id, pids]) => `${id}:${[...pids].sort().join(',')}`).sort().join(';');
 }
 
-/** Tells trusted apps such as Barometer which apps have a window open, and the processes those windows belong to. */
 export class OpenWindows {
   private readonly dbus = Gio.DBusExportedObject.wrapJSObject(OPEN_WINDOWS_XML, this);
   private readonly appSystem = Shell.AppSystem.get_default();

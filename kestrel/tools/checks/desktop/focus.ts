@@ -30,7 +30,6 @@ const mentions = (root: Clutter.Actor | null, text: string) => !!root && descend
 const banners = () => styled('notification-banner', Main.uiGroup).filter(shown);
 const bannerSays = (text: string) => banners().some(banner => showsText(text, banner));
 
-/** Whether Soundscapes plays, as the switch at the top of its Settings page says. */
 async function soundscapesPlays(): Promise<boolean> {
   const [json] = (await call(NAME, PATH, IFACE, 'Page', new GLib.Variant('(s)', [SOUNDSCAPES]), '(s)')).deepUnpack<[string]>();
   return (JSON.parse(json) as {items: {type: string; checked?: boolean}[]}[])[0]!.items[0]!.checked === true;
@@ -46,7 +45,6 @@ function clearNotifications() {
     for (const notification of [...source.notifications]) notification.destroy();
 }
 
-/** Starts a session that ends in a few seconds, the way Focus finds one it kept across a restart. */
 async function shortSession() {
   await request('Disable', FOCUS);
   GLib.mkdir_with_parents(GLib.path_get_dirname(storageFile()), 0o700);

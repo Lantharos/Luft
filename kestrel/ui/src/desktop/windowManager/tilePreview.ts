@@ -6,10 +6,10 @@ import St from 'gi://St';
 
 import * as Main from '../../core/main.js';
 import { blurBackdrop, followWindowCorners } from '../../appearance/kestrelGlass.js';
+import { Curve, Duration } from '../../shared/motion/motion.js';
 
 const TILE_PREVIEW_GAP = 8;
 const TILE_PREVIEW_RADIUS = 16;
-const WINDOW_ANIMATION_TIME = 250;
 
 export const TilePreview = GObject.registerClass(
 class TilePreview extends St.Widget {
@@ -59,8 +59,8 @@ class TilePreview extends St.Widget {
       width: tileRect.width - 2 * TILE_PREVIEW_GAP,
       height: tileRect.height - 2 * TILE_PREVIEW_GAP,
       opacity: 255,
-      duration: WINDOW_ANIMATION_TIME,
-      mode: Clutter.AnimationMode.EASE_OUT_QUART,
+      duration: Duration.standard,
+      curve: Curve.settle,
     });
   }
 
@@ -70,8 +70,8 @@ class TilePreview extends St.Widget {
     this.showing = false;
     this.ease({
       opacity: 0,
-      duration: WINDOW_ANIMATION_TIME,
-      mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+      duration: Duration.standard,
+      curve: Curve.gentle,
       onComplete: () => this.reset(),
     });
   }

@@ -1,4 +1,3 @@
-import Clutter from 'gi://Clutter';
 import type Gio from 'gi://Gio';
 import GioUnix from 'gi://GioUnix';
 import GLib from 'gi://GLib';
@@ -7,17 +6,16 @@ import St from 'gi://St';
 import * as Main from '../../core/main.js';
 import { PILL, styleSurface } from '../../appearance/kestrelGlass.js';
 import { clamp } from '../../shared/math.js';
+import { Curve, Duration } from '../../shared/motion/motion.js';
 
 const DELAY = 500;
 const GAP = 6;
 
-/** What kind of app it is, from its generic name, when its name alone doesn't say. */
 export function appKind(app: Gio.AppInfo, name: string): string | null {
   const kind = app instanceof GioUnix.DesktopAppInfo ? app.get_generic_name() : null;
   return kind && kind.toLocaleLowerCase() !== name.toLocaleLowerCase() ? kind : null;
 }
 
-/** One label that says what the app under the pointer is, shown after a short rest. */
 export class AppHint {
   private readonly label = new St.Label({ style_class: 'kestrel-start-hint', visible: false });
   private timeout = 0;
@@ -53,7 +51,7 @@ export class AppHint {
       Main.layoutManager.uiGroup.set_child_above_sibling(this.label, null);
       this.label.opacity = 0;
       this.label.show();
-      this.label.ease({ opacity: 255, duration: 120, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
+      this.label.ease({ opacity: 255, duration: Duration.brisk, curve: Curve.gentle });
     });
   }
 

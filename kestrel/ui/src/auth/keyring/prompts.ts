@@ -1,4 +1,3 @@
-import type { Context } from '../../context.js';
 import { PinentryPrompter } from './pinentry.js';
 import { KeyringPrompter } from './prompter.js';
 import { PromptQueue } from './queue.js';
@@ -8,8 +7,8 @@ export class SystemPrompts {
   private readonly keyring: KeyringPrompter;
   private readonly pinentry: PinentryPrompter;
 
-  constructor(session: Pick<Context, 'sessionMode' | 'screenShield'>) {
-    this.queue = new PromptQueue(session);
+  constructor() {
+    this.queue = new PromptQueue();
     this.keyring = new KeyringPrompter(this.queue);
     this.pinentry = new PinentryPrompter(this.queue);
   }

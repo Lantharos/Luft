@@ -165,8 +165,7 @@ impl Theme for Spotify {
             return Ok("no-spotify");
         }
         if !spicetify.can_write_to_spotify() {
-            let command = spicetify.write_access_command();
-            return Err(Problem::new("read-only", command).into());
+            return Ok("read-only");
         }
         self.listen();
         self.stream.publish(look);

@@ -7,6 +7,7 @@ import St from 'gi://St';
 
 import * as KestrelUi from '../../kestrelUi.js';
 import * as Main from '../../core/main.js';
+import { Duration } from '../motion/motion.js';
 import * as PopupMenu from '../popups/popupMenu.js';
 
 type MenuItem = InstanceType<typeof PopupMenu.PopupMenuItem>;
@@ -178,7 +179,7 @@ export const CapsLockWarning = GObject.registerClass(class CapsLockWarning exten
     this.ease({
       height: capsLockOn ? height : 0,
       opacity: capsLockOn ? 255 : 0,
-      duration: animate ? 200 : 0,
+      duration: animate ? Duration.moderate : 0,
       onComplete: () => {
         if (capsLockOn) this.height = -1;
       },

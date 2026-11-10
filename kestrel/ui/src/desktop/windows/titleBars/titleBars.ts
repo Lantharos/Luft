@@ -14,7 +14,7 @@ export class TitleBars {
 
   constructor(private readonly showMenu: ShowWindowMenu) {
     this.createdSignal = global.display.connect('window-created', (_display, window: Meta.Window) => this.track(window));
-    this.cornersSignal = this.settings.connect('changed::rounded-window-corners', () => this.cornersChanged());
+    this.cornersSignal = this.settings.connect('changed::rounded-window-corners', () => this.updateCornersOnceMutterSawChange());
     for (const actor of global.get_window_actors()) this.track(actor.meta_window!);
   }
 
@@ -31,8 +31,7 @@ export class TitleBars {
     this.windows.delete(window);
   }
 
-  // Mutter follows the same key, so wait until it has seen the change before asking windows about their corners
-  private cornersChanged(): void {
+  private updateCornersOnceMutterSawChange(): void {
     this.cornersSource ||= GLib.idle_add(GLib.PRIORITY_DEFAULT_IDLE, () => {
       this.cornersSource = 0;
       for (const bar of this.bars.values()) bar.update();

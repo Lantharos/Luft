@@ -5,12 +5,11 @@ import St from 'gi://St';
 import { Avatar } from '../../shared/widgets/userWidget.js';
 
 import { t } from '../../shared/i18n/index.js';
-import { animateActor } from '../../shared/motion/motion.js';
+import { animateActor, Curve, Duration } from '../../shared/motion/motion.js';
 import type { ContextMenus } from '../../desktop/menus/contextMenus.js';
 import { LOCK, POWER_ACTIONS, bindAvailability, type SessionAction } from '../quickSettings/sessionActions.js';
 import * as SystemActions from '../../session/actions/systemActions.js';
 
-const SWAP_DURATION = 180;
 const SWAP_DISTANCE = 16;
 
 export class StartFooter {
@@ -68,9 +67,9 @@ export class StartFooter {
     shown.show();
     if (animate) {
       shown.translation_x = SWAP_DISTANCE * direction;
-      animateActor(shown, { opacity: 255, translation_x: 0, duration: SWAP_DURATION, mode: Clutter.AnimationMode.EASE_OUT_QUART });
+      animateActor(shown, { opacity: 255, translation_x: 0, duration: Duration.quick, curve: Curve.settle });
       animateActor(hidden, {
-        opacity: 0, translation_x: -SWAP_DISTANCE * direction, duration: SWAP_DURATION, mode: Clutter.AnimationMode.EASE_OUT_QUART,
+        opacity: 0, translation_x: -SWAP_DISTANCE * direction, duration: Duration.quick, curve: Curve.settle,
         onStopped: (finished: boolean) => { if (finished) hidden.hide(); },
       });
     } else {

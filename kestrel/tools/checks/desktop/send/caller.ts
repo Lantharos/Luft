@@ -7,15 +7,10 @@ const TITLE = 'Kestrel send caller';
 const ANSWER = new RegExp(`^${TITLE} (\\d+): (.*)$`);
 const SCRIPT = 'clients/windows/sendCaller.js';
 
-/** The files a caller sends, by the name it gives each. */
 export type Files = Record<string, string>;
 
 export const callerArguments = (files: Files) => Object.entries(files).map(([name, path]) => `${name}=${path}`);
 
-/**
- * A window that asks Kestrel to send files when told to, and shows in its title how each call went, so the check sees
- * what an app would, inside a sandbox too.
- */
 export class Caller {
   private answered = 0;
 
@@ -25,7 +20,6 @@ export class Caller {
     return Caller.launch(() => gjs(SCRIPT, callerArguments(files)), label);
   }
 
-  /** A caller started some other way, such as inside a sandbox, found by its window. */
   static async run(argv: string[], label: string, accepts: (window: Meta.Window) => boolean = () => true): Promise<Caller> {
     return Caller.launch(() => spawn(argv), label, accepts);
   }
@@ -47,7 +41,6 @@ export class Caller {
     return outcome(['kill', '-USR2', String(this.window.get_pid())]);
   }
 
-  /** The next answer the window shows. */
   async next(label: string, timeout?: number): Promise<string> {
     const [, number, answer] = await waitUntil(() => {
       const match = ANSWER.exec(this.window.get_title() ?? '');
@@ -57,7 +50,6 @@ export class Caller {
     return answer!;
   }
 
-  /** Ends the caller, and its window with it, which in a sandbox belongs to a process of its own. */
   async stop(): Promise<void> {
     await outcome(['kill', String(this.window.get_pid())]);
     await stop(this.process);

@@ -1,6 +1,6 @@
 import Clutter from 'gi://Clutter';
 
-import {RECOVERY_WORD} from '../../../../fixtures/system/recoveryKeys.js';
+import {RECOVERY_WORD} from '../../../../fixtures/system/security/recoveryKeys.js';
 import type {LuftApp} from '../../../lib/apps/luftApp.js';
 import {press, type, type Point} from '../../../lib/input/input.js';
 import {changes} from '../../lib/apps.js';

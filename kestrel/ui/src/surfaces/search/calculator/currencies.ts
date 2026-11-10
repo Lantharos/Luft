@@ -26,6 +26,9 @@ const NAMES: Record<string, string[]> = {
   MKD: ['denar', 'denari', 'denara'],
   BAM: ['marka', 'marke', 'maraka'],
 };
+const CODE = /^[a-z]{3}$/;
+const LOWEST_RATE = 1e-6;
+const HIGHEST_RATE = 1e9;
 
 let codes: Set<string> | null = null;
 let mentions: Set<string> | null = null;
@@ -44,6 +47,14 @@ export function mentionsCurrency(text: string): boolean {
   mentions ??= new Set([...[...isoCodes()].map(code => code.toLowerCase()), ...Object.values(NAMES).flat()]);
   const lowered = text.toLocaleLowerCase();
   return /\d/.test(lowered) && (lowered.split(/[\s\d.,]+/).some(word => mentions!.has(word) || mentions!.has(word.replace(/s$/, ''))) || /[$€£¥₺₹₽₴]/.test(lowered));
+}
+
+export function parseRates(text: string): Record<string, number> {
+  const { eur } = JSON.parse(text) as { eur?: unknown };
+  if (!eur || typeof eur !== 'object') throw new Error('The rates have no euro table');
+  const rates = Object.entries(eur).filter(([code, rate]) => CODE.test(code) && typeof rate === 'number' && rate >= LOWEST_RATE && rate <= HIGHEST_RATE);
+  if (!rates.length) throw new Error('The rates name no currency');
+  return Object.fromEntries(rates);
 }
 
 export function useRates(perEuro: Record<string, number>, locale: string): void {

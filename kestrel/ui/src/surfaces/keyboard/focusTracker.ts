@@ -5,7 +5,7 @@ import Meta from 'gi://Meta';
 
 import * as Main from '../../core/main.js';
 import { EventEmitter } from '../../core/runtime/signals.js';
-import { getIBusManager } from '../../system/inputSources/ibusManager.js';
+import { getIBusManager } from '../../system/input/inputSources/ibusManager.js';
 
 interface CursorRect {
   x: number;

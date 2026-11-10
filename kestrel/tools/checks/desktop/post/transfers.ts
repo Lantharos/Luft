@@ -39,7 +39,6 @@ export function bytes(length: number, seed: number): Uint8Array {
   return Uint8Array.from({length}, (_, index) => (index * 31 + seed) % 251);
 }
 
-/** Closes the windows Post left open, such as where received files went. */
 export async function closeWindows() {
   for (const popup of popups()) await press(popup, 'Close');
   await eventually(() => !popups().length, 'Post’s windows close');
@@ -54,7 +53,6 @@ function clipboardText(): Promise<string | null> {
   return new Promise(resolve => St.Clipboard.get_default().get_text(St.ClipboardType.CLIPBOARD, (_clipboard, text) => resolve(text)));
 }
 
-/** Clicks a button once its pop-up stopped moving, so windows coming and going don't take the click. */
 export async function press(popup: Clutter.Actor, name: string) {
   await settled();
   click(button(popup, name)!);
@@ -72,7 +70,6 @@ export function postCall<S extends string>(method: string, parameters: GLib.Vari
   return call(POST, PATH, POST, method, parameters, reply);
 }
 
-/** The id this computer's Post knows the nearby computer by, once it found it. */
 export async function nearbyId(): Promise<string> {
   const found = async () => {
     const reply = await call(POST, PATH, 'org.freedesktop.DBus.Properties', 'Get', new GLib.Variant('(ss)', [POST, 'Devices']), '(v)');
@@ -85,7 +82,6 @@ export async function nearbyId(): Promise<string> {
   }, 'this computer finds the nearby one', FOUND_WITHIN);
 }
 
-/** The id the nearby computer knows this one by, once it can find it. */
 export async function thisId(nearby: Nearby): Promise<string> {
   return eventually(async () => {
     const id = (await nearby.devices()).find(([, alias]) => alias === 'Mara’s Laptop')?.[0];
@@ -94,10 +90,6 @@ export async function thisId(nearby: Nearby): Promise<string> {
   }, 'the nearby computer finds this one', FOUND_WITHIN);
 }
 
-/**
- * Only your devices may find this computer at first, so the nearby computer can't, until Settings adds it with a PIN:
- * it sends something, enters the PIN, and is one of your devices from then on, its files arriving without asking.
- */
 export async function checkPairing(nearby: Nearby) {
   await nearby.scan();
   await pause(SCANNED_WITHIN);
@@ -116,7 +108,6 @@ export async function checkPairing(nearby: Nearby) {
   await postCall('StopPairing');
 }
 
-/** Text from one of your devices goes to the clipboard; from anyone else it waits in a window. */
 export async function checkText(nearby: Nearby, id: string) {
   clearNotifications();
   await nearby.sendText(id, 'https://luft.computer');
@@ -124,7 +115,6 @@ export async function checkText(nearby: Nearby, id: string) {
   await eventually(() => bannerSays(`Copied text from ${NEARBY}`), 'with a note that says so');
 }
 
-/** Files from a device that isn't one of yours wait for an answer; Always accept makes it one of yours. */
 export async function checkOffers(nearby: Nearby, id: string) {
   const photo = GLib.build_filenamev([scratch('post'), 'Lake.jpg']);
   GLib.file_set_contents(photo, bytes(2_400_000, 3));
@@ -154,7 +144,6 @@ export async function checkOffers(nearby: Nearby, id: string) {
   await eventually(() => yours().length === 1, 'and Always accept makes it one of your devices');
 }
 
-/** Sending to a computer that asks for a PIN asks for it here, again when it was wrong. */
 export async function checkPin(nearby: Nearby, device: string) {
   const pin = await nearby.startPairing();
   const notes = GLib.build_filenamev([scratch('post'), 'Notes.txt']);
@@ -165,7 +154,7 @@ export async function checkPin(nearby: Nearby, device: string) {
   await capture('post-pin');
   await typeInto(asking, '111111');
   click(button(asking, 'Send')!);
-  const again = await eventually(() => popupShowing("That PIN wasn't right. Try again."), 'a wrong PIN asks again');
+  const again = await eventually(() => popupShowing('That PIN wasn’t right. Try again.'), 'a wrong PIN asks again');
   await typeInto(again, pin);
   click(button(again, 'Send')!);
   await eventually(() => nearby.finished.some(finished => finished.direction === 'in' && finished.outcome === 'done'

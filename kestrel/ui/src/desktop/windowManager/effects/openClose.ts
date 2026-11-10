@@ -1,4 +1,3 @@
-import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import type GObject from 'gi://GObject';
 import type Meta from 'gi://Meta';
@@ -119,7 +118,7 @@ export class OpenCloseEffects {
     if (!reducedMotion())
       actor.ease({ scale_x: CLOSE_SCALE, scale_y: CLOSE_SCALE, spring: Spring.snappy });
     actor.ease({
-      opacity: 0, duration: Duration.quick, mode: Clutter.AnimationMode.LINEAR,
+      opacity: 0, duration: Duration.quick, curve: Curve.linear,
       onStopped: () => this.finish(actor),
     });
   }

@@ -48,13 +48,11 @@ export function reminder(id: string, change: Partial<Stored>): Stored {
   };
 }
 
-/** Writes the file while the extension is off, the way it would find it after a restart. */
 export function seed(reminders: Stored[]) {
   GLib.mkdir_with_parents(GLib.path_get_dirname(data()), 0o700);
   GLib.file_set_contents(data(), JSON.stringify({version: 1, reminders}));
 }
 
-/** Adds or replaces a reminder and starts the extension on the result, the fastest way to set up a moment. */
 export async function push(added: Stored) {
   await request('Disable', REMINDERS);
   seed([...saved().filter(({id}) => id !== added.id), added]);
@@ -62,7 +60,6 @@ export async function push(added: Stored) {
   await waitUntil(element, 'Reminders is back in the taskbar');
 }
 
-/** Starts the extension with nothing but these reminders. */
 export async function only(...reminders: Stored[]) {
   await request('Disable', REMINDERS);
   seed(reminders);
@@ -86,7 +83,6 @@ export function buttonIn(root: Clutter.Actor | null, name: string, by: 'accessib
   return descendants(root).find(actor => actor instanceof St.Button && actor.accessible_name === name && actor.mapped) as St.Button | undefined;
 }
 
-/** Presses a button on the banner showing. */
 export const answer = (name: string) => ofType(labelled(name, banners()[0]!), St.Button).emit('clicked', Clutter.BUTTON_PRIMARY);
 
 export const row = (title: string) => popup() && descendants(popup()!).find(actor => actor instanceof St.Button && actor.accessible_name?.startsWith(`${title},`) && actor.mapped) as St.Button | undefined;
@@ -107,7 +103,6 @@ export async function answerChooser(path: string) {
   await call('org.freedesktop.impl.portal.desktop.rover', '/org/freedesktop/portal/desktop', 'com.lantharos.KestrelChecks.FileChooser', 'Answer', new GLib.Variant('(s)', [Gio.File.new_for_path(path).get_uri()]));
 }
 
-/** Starts an extension again with these stored values, the way it would find them after a restart. */
 export async function keepFor(id: string, stored: object) {
   await request('Disable', id);
   const path = GLib.build_filenamev([GLib.get_user_state_dir(), 'luft', 'extension-storage', `${id}.json`]);

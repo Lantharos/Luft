@@ -1,7 +1,7 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
-import {FINGERPRINT_NAME, publishFingerprint} from '../system/fingerprint.js';
+import {FINGERPRINT_NAME, publishFingerprint} from '../system/security/fingerprint.js';
 import {answerInhibit} from '../system/basics.js';
 
 const [images, events] = ARGV;

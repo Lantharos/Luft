@@ -55,7 +55,6 @@ async function create() {
 	return markdown;
 }
 
-/** Renders `source` to HTML, holding back pictures from the web unless `remoteImages` allows them. */
 export async function renderMarkdown(source: string, path: string | null, remoteImages = false) {
 	parser ??= create();
 	const env: RenderEnv = { path, remoteImages, heldBack: false };

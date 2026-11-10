@@ -23,7 +23,7 @@ export async function run() {
   const stop = subscribe<[string, string, boolean]>({iface: SETTINGS, member: 'SettingChanged', path: PATH}, (_signal, [namespace, key, value]) => {
     if (namespace === 'com.lantharos.kestrel' && key === 'tablet-mode') heard.push(value);
   });
-  const heft = new LuftApp('heft', [], {}, {id: 'com.lantharos.Heft'});
+  const heft = new LuftApp('heft', [], {}, {id: 'com.lantharos.heft'});
   try {
     require(!(await tabletMode()), 'apps read that the computer is a laptop');
     await heft.open();

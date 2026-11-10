@@ -1,8 +1,10 @@
+import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import type Meta from 'gi://Meta';
 
 import {descendants, labelled, named, showsText, textOf} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
+import {call} from '../lib/dbus.js';
 import {click} from '../lib/input/input.js';
 import {findWindow, gjs, scratch, waitForWindow} from '../lib/processes.js';
 import {capture, output} from '../lib/screenshots.js';
@@ -183,6 +185,21 @@ async function stopStarted() {
   for (const handle of started) await peek('stop', handle);
 }
 
+async function setDeveloperTools(on: boolean) {
+  await call('com.lantharos.Greeter1', '/com/lantharos/Greeter1', 'com.lantharos.Greeter1', 'SetDeveloperTools', new GLib.Variant('(b)', [on]), null, {connection: Gio.DBus.system});
+}
+
+async function checkSwitch() {
+  await setDeveloperTools(false);
+  try {
+    const listed = await peek('list', '--json');
+    require(!listed.ok && listed.stderr.includes('Developer tools are off'), 'with developer tools off peek is refused and says why');
+  } finally {
+    await setDeveloperTools(true);
+  }
+  await eventually(async () => (await peek('list', '--json')).ok, 'turning developer tools on lets peek work again');
+}
+
 export async function run() {
   try {
     await checkHidden();
@@ -190,6 +207,7 @@ export async function run() {
     await checkPrompt();
     await checkPasswordPrompt(here);
     await checkOldScreenshot();
+    await checkSwitch();
     require((await peek('stop', here)).ok, 'stop closes a --here program');
     await eventually(() => !findWindow(window => window.get_title()?.startsWith(HERE)), 'the --here window goes away');
   } finally {

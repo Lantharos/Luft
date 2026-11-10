@@ -3,7 +3,7 @@ import Shell from 'gi://Shell';
 import St from 'gi://St';
 
 import { pixelScale, whenPixelScaleChanges } from '../../../shared/display/graphics.js';
-import { animateAdjustment } from '../../../shared/motion/motion.js';
+import { animateAdjustment, Curve, Duration } from '../../../shared/motion/motion.js';
 import { withTone, type Item, type Tab } from '../catalog/catalog.js';
 import { CellView } from './cellView.js';
 import { GlyphImages, type Glyph } from './images.js';
@@ -12,7 +12,6 @@ import type { Work } from '../../prewarm/queue.js';
 
 const SCROLLBAR_GUTTER = 10;
 export const GRID_WIDTH = COLUMNS * CELL_SIZE + SCROLLBAR_GUTTER;
-const SCROLL_DURATION = 320;
 const EMOJI_SIZE = 26;
 const CHARACTER_SIZE = 20;
 
@@ -97,7 +96,7 @@ export class EmojiGrid {
     if (row === undefined) return;
     const adjustment = this.actor.vadjustment;
     this.scrollTarget = Math.min(this.layout.rows[row].y, Math.max(0, this.layout.height - adjustment.page_size));
-    animateAdjustment(adjustment, this.scrollTarget, { duration: SCROLL_DURATION, mode: Clutter.AnimationMode.EASE_OUT_CUBIC });
+    animateAdjustment(adjustment, this.scrollTarget, { duration: Duration.large, curve: Curve.glide });
   }
 
   firstVisibleCell(): Cell | null {

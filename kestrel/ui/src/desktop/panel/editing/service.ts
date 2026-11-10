@@ -6,7 +6,6 @@ const TASKBAR_XML = `<node><interface name="com.lantharos.Kestrel.Taskbar">
   <method name="Arrange"/>
 </interface></node>`;
 
-/** Lets Settings start arranging the taskbar on the desktop. */
 export class TaskbarService {
   private readonly dbus = Gio.DBusExportedObject.wrapJSObject(TASKBAR_XML, this);
 

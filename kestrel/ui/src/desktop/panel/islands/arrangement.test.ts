@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test';
 
 import {
-  completeArrangement, DEFAULT_ARRANGEMENT, fromEdgeAndAlignment, joinedGroups, layIslands, mainEdge, moveBar, moveElement, moveIsland,
+  completeArrangement, DEFAULT_ARRANGEMENT, joinedGroups, layIslands, mainEdge, moveBar, moveElement, moveIsland,
   parseArrangement, presetArrangement, spotTargets, stepElement, stepIsland, storeArrangement, type Arrangement, type IslandFrame, type Spot,
 } from '../../../../../../packages/web/ui/src/taskbar/arrangement/index';
 
@@ -23,19 +23,6 @@ describe('reading a stored arrangement', () => {
   test('stores and reads back the same arrangement', () => {
     const arrangement: Arrangement = [{ spot: 'left-center', elements: ['start', 'dock'] }, { spot: 'top-end', elements: ['tray', 'status', 'clock'] }];
     expect(parseArrangement(storeArrangement(arrangement))).toEqual(arrangement);
-  });
-});
-
-describe('carrying over the edge and alignment people chose before', () => {
-  test('a left-aligned taskbar on the right edge keeps Start and the apps at its top and the clock at its bottom', () => {
-    expect(fromEdgeAndAlignment('right', 'left')).toEqual([
-      { spot: 'right-start', elements: ['start', 'dock'] },
-      { spot: 'right-end', elements: ['tray', 'status', 'clock'] },
-    ]);
-  });
-
-  test('the centred taskbar at the bottom is the default arrangement', () => {
-    expect(fromEdgeAndAlignment('bottom', 'center')).toEqual(DEFAULT_ARRANGEMENT);
   });
 });
 

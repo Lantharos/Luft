@@ -40,8 +40,6 @@ export type Permission =
  */
 export type Capability = Permission | 'helper' | 'shortcuts' | 'network';
 
-type CamelCase<Name extends string> = Name extends `${infer Head}-${infer Tail}` ? `${Head}${Capitalize<CamelCase<Tail>>}` : Name;
-
 /** The part of the API each capability unlocks, by the name it has on {@link Extension}. */
 export interface Capabilities {
   wallpaper: Wallpaper;
@@ -309,6 +307,8 @@ export interface Basics {
   /** Runs `cleanup` when the extension is turned off, after everything it made through this API is gone. */
   onDisable(cleanup: () => void): Disposable;
 }
+
+type CamelCase<Name extends string> = Name extends `${infer Head}-${infer Tail}` ? `${Head}${Capitalize<CamelCase<Tail>>}` : Name;
 
 /**
  * The object an extension's `enable` gets. Name the capabilities the manifest asks for, and only those show up:

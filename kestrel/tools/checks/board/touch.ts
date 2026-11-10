@@ -16,7 +16,6 @@ const STEPS = 12;
 let screen: Clutter.VirtualInputDevice | null = null;
 const touchscreen = () => (screen ??= seat.create_virtual_device(Clutter.InputDeviceType.TOUCHSCREEN_DEVICE));
 
-// Puts fingers down at the starting points and moves each to its end, together
 async function touch(paths: [Point, Point][]) {
   paths.forEach(([[x, y]], slot) => touchscreen().notify_touch_down(now(), slot, x, y));
   await pause(30);
@@ -36,7 +35,6 @@ const fingers = (count: number, [x, y]: Point, [dx, dy]: Point, spacing = 60) =>
     return [[x + offset, y], [x + offset + dx, y + dy]];
   });
 
-// An empty spot of the board, away from every window
 function emptySpot(): Point | null {
   const {viewport} = board();
   for (let y = viewport.y + 80; y < viewport.y + viewport.height - 80; y += 40) {
@@ -92,10 +90,9 @@ async function checkApps() {
   require(!gesturesOf(notes).slice(before).includes('tc'), 'the app keeps those touches');
   require(board().enteredWindow() === notes, 'the window stays entered');
   const swipedFrom = gesturesOf(notes).length;
-  // Fingers moving left pull in the window on the right, so swipe toward whichever side has one
   const middleX = (window: Meta.Window) => window.get_frame_rect().x + window.get_frame_rect().width / 2;
-  const rightward = boardWindows().some(window => window !== notes && middleX(window) > middleX(notes));
-  await touch(fingers(3, [x, y], [rightward ? -260 : 260, 0]));
+  const nextWindowIsOnTheRight = boardWindows().some(window => window !== notes && middleX(window) > middleX(notes));
+  await touch(fingers(3, [x, y], [nextWindowIsOnTheRight ? -260 : 260, 0]));
   await eventually(() => board().enteredWindow() && board().enteredWindow() !== notes, 'three fingers sideways move to the next window, like on a touchpad');
   require(gesturesOf(notes).slice(swipedFrom).includes('tc'), `the app under a three-finger swipe has its touches taken away (${gesturesOf(notes).slice(swipedFrom)})`);
 }
@@ -115,7 +112,6 @@ async function checkDesktop() {
   require(gesturesOf(notes).slice(from).includes('tc'), 'and take the touches away from the app');
   global.workspace_manager.get_workspace_by_index(index)!.activate(global.get_current_time());
   await eventually(() => global.workspace_manager.get_active_workspace_index() === index && !switching(), 'the first workspace comes back');
-  // Away from the windows: a finger landing where an app moves its window from starts the move, which ends any gesture
   for (const window of boardWindows()) window.minimize();
   await settled();
   await touch(fingers(4, [global.screen_width / 2, global.screen_height * 0.7], [0, -320]));

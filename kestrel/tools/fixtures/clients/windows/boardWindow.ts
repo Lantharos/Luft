@@ -5,7 +5,6 @@ import Gtk from 'gi://Gtk?version=4.0';
 const [title, width, height, state] = ARGV;
 const MOVE_HANDLE = 32;
 const GESTURES: Partial<Record<Gdk.EventType, string>> = {[Gdk.EventType.TOUCHPAD_PINCH]: 'p', [Gdk.EventType.TOUCHPAD_SWIPE]: 's'};
-// Touches show as t, then how they ended: e for lifted, c for taken away by the desktop
 const TOUCHES: Partial<Record<Gdk.EventType, string>> = {[Gdk.EventType.TOUCH_BEGIN]: 't', [Gdk.EventType.TOUCH_END]: 'te', [Gdk.EventType.TOUCH_CANCEL]: 'tc'};
 const PHASES: Record<Gdk.TouchpadGesturePhase, string> = {
   [Gdk.TouchpadGesturePhase.BEGIN]: 'b',
@@ -65,9 +64,7 @@ app.connect('activate', () => {
     show();
   }));
   if (state === 'maximized') window.maximize();
-  // Won't get narrower than 900 pixels, like apps with a minimum width
   if (state === 'wide') window.set_size_request(900, -1);
-  // Opens fixed in size and becomes resizable a moment later, like some Chromium and Electron apps
   if (state === 'fixed') {
     window.resizable = false;
     setTimeout(() => (window.resizable = true), 800);

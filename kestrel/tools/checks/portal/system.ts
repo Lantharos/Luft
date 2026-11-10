@@ -76,7 +76,7 @@ async function checkAccount() {
   }]), '(ua{sv})');
   const dialog = await openedDialog('apps ask before they get your name and picture');
   await capture('portal-account');
-  click(ofType(labelled('Share', dialog), Clutter.Actor));
+  click(ofType(labelled('Allow', dialog), Clutter.Actor));
   const [response, results] = (await shared).recursiveUnpack<[number, {id?: string; name?: string; image?: string}]>();
   const account = AccountsService.UserManager.get_default().get_user(GLib.get_user_name());
   await eventually(() => account.is_loaded, 'the account loads');

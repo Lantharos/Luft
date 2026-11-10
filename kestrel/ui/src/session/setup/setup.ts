@@ -4,13 +4,14 @@ import GioUnix from 'gi://GioUnix';
 import GLib from 'gi://GLib';
 import Meta from 'gi://Meta';
 import { LockBackdrop } from '../../auth/lockScreen/backdrop.js';
+import { UsbLockState } from '../../auth/lockScreen/usbProtection.js';
 
 import { AppearanceService } from '../../appearance/service.js';
 import type { Rgb } from '../../appearance/color.js';
 import { LoginWallpaper } from '../../desktop/wallpaper/loginWallpaper.js';
 import { PortalBackend } from '../../portal/backend.js';
 import { terminateOnceShown } from '../../shared/apps/handoff.js';
-import { animateActor } from '../../shared/motion/motion.js';
+import { animateActor, Curve, Duration } from '../../shared/motion/motion.js';
 import { centerOnArrival } from './placement.js';
 
 const APP = 'com.lantharos.setup.desktop';
@@ -18,7 +19,7 @@ const NAME = 'com.lantharos.Kestrel.Setup';
 const PATH = '/com/lantharos/Kestrel/Setup';
 const INTERFACE = `<node><interface name="${NAME}"><method name="Finish"/></interface></node>`;
 const FIRST_WINDOW_TIMEOUT = 10000;
-const FINISH_DURATION = 250;
+const FINISH_DURATION = Duration.standard;
 
 export interface SetupContext {
   layoutManager: {
@@ -59,6 +60,7 @@ export class Setup {
   constructor(context: SetupContext) {
     context.layoutManager.backgroundGroup.add_child(this.backdrop.actor);
     this.placement = centerOnArrival();
+    new UsbLockState(false);
     this.dbus.export(Gio.DBus.session, PATH);
     this.nameId = Gio.bus_own_name_on_connection(Gio.DBus.session, NAME, Gio.BusNameOwnerFlags.NONE, null, null);
     const launched = !global.backend.is_headless() && this.launch();
@@ -85,7 +87,7 @@ export class Setup {
     if (this.finishing) return;
     this.finishing = true;
     for (const actor of global.get_window_actors())
-      animateActor(actor, { opacity: 0, duration: FINISH_DURATION, mode: Clutter.AnimationMode.EASE_IN_QUAD });
+      animateActor(actor, { opacity: 0, duration: FINISH_DURATION, curve: Curve.accelerate });
     GLib.timeout_add(GLib.PRIORITY_DEFAULT, FINISH_DURATION, () => {
       terminateOnceShown();
       return GLib.SOURCE_REMOVE;

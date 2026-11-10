@@ -11,7 +11,6 @@ const decoder = new TextDecoder();
 
 const entrySize = (key: string, encoded: string) => JSON.stringify(key).length + encoded.length + ':,'.length;
 
-/** One extension's stored values, read once and written soon after each change. */
 export class StoredValues {
   private readonly file: string;
   private values: Record<string, Stored>;

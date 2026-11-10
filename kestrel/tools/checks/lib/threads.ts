@@ -3,13 +3,10 @@ import GLib from 'gi://GLib';
 
 export interface ThreadUse {
   name: string;
-  /** Nanoseconds on a processor. */
   onCpu: number;
-  /** How many times it stopped and was woken again. */
   switches: number;
 }
 
-/** Every thread of Kestrel by its id, for comparing what they did between two moments. */
 export function threads() {
   const tasks = Gio.File.new_for_path('/proc/self/task').enumerate_children('standard::name', Gio.FileQueryInfoFlags.NONE, null);
   const found = new Map<string, ThreadUse>();

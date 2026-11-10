@@ -132,9 +132,9 @@ async function checkOpenConnect(folder: string) {
   new VpnSecrets(agent, 'work', connection('Work', 'org.freedesktop.NetworkManager.openconnect', {gateway, protocol: 'anyconnect'}),
     [], ALLOW_INTERACTION, () => {});
   const dialog = await openedDialog('OpenConnect opens its dialog');
-  require(labelled('Connect Anyway', dialog), 'OpenConnect asks before trusting an unknown certificate');
+  require(labelled('Connect anyway', dialog), 'OpenConnect asks before trusting an unknown certificate');
   await capture('vpn-certificate');
-  click(labelled('Connect Anyway', dialog)!);
+  click(labelled('Connect anyway', dialog)!);
   await eventually(() => entries(dialog).length === 2 && labelled('Use your Example account.', dialog),
     'the gateway’s sign-in form is shown in Kestrel', SIGN_IN_TIMEOUT);
   await typeInto(entries(dialog)[0], 'alice');

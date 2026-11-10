@@ -4,8 +4,8 @@ import GObject from 'gi://GObject';
 import St from 'gi://St';
 
 import { setSourceColor } from '../../shared/display/cairo.js';
+import { Curve, Duration } from '../../shared/motion/motion.js';
 
-const POPUP_SCROLL_TIME = 100;
 
 export namespace ItemList {
   export interface Signals extends St.Widget.SignalSignatures {
@@ -183,8 +183,8 @@ export class SwitcherList extends ItemList {
     else this.scrollableRight = true;
 
     adjustment.ease(value, {
-      mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-      duration: POPUP_SCROLL_TIME,
+      curve: Curve.gentle,
+      duration: Duration.tap,
       onComplete: () => {
         if (right && index === this.items.length - 1) this.scrollableRight = false;
         if (!right && index === 0) this.scrollableLeft = false;

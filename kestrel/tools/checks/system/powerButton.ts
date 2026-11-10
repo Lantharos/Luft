@@ -17,7 +17,7 @@ import {takeCalls} from './lib/systemCalls.js';
 
 const {require, eventually} = checks('power button');
 const TITLE = 'What should the computer do?';
-const CHOICES = ['Cancel', 'Log out', 'Suspend', 'Restart', 'Power off'];
+const CHOICES = ['Cancel', 'Sign out', 'Sleep', 'Restart', 'Power off'];
 const END_CALLS = ['Suspend', 'Hibernate', 'PowerOff', 'Reboot'];
 const LONGER_THAN_A_COUNTDOWN_TICK = 2500;
 const SCREEN_BLANK_DELAY = 3;
@@ -55,8 +55,8 @@ async function checkQuestion() {
   require(!ended().length, 'cancelling ends nothing');
   await asked('after being cancelled');
   await settled();
-  click(labelled('Suspend', Main.endSessionDialog)!);
-  await eventually(() => !shown(Main.endSessionDialog) && takeCalls().includes('Suspend'), 'choosing Suspend suspends the computer');
+  click(labelled('Sleep', Main.endSessionDialog)!);
+  await eventually(() => !shown(Main.endSessionDialog) && takeCalls().includes('Suspend'), 'choosing Sleep suspends the computer');
 }
 
 async function checkOverSurfaces() {
@@ -87,7 +87,7 @@ async function checkLocked() {
   pressButton();
   await eventually(() => {
     const menu = lockMenu();
-    return shown(menu) && ['Suspend', 'Restart…', 'Power off…'].every(item => named(item, menu));
+    return shown(menu) && ['Sleep', 'Restart…', 'Power off…'].every(item => named(item, menu));
   }, 'the power button opens the power menu on the lock screen');
   await capture('power-button-locked');
   press(Clutter.KEY_Escape);

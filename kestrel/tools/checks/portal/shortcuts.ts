@@ -55,7 +55,7 @@ async function answer<T>(reply: Promise<T>, button: string, listed: string[]) {
 
 async function checkBinding() {
   const steam = await session('steam');
-  const [declined] = await answer(request(steam, [['overlay', 'Show the overlay', 'CTRL+ALT+o']]), 'Cancel', ['Show the overlay', 'Ctrl+Alt+O']);
+  const [declined] = await answer(request(steam, [['overlay', 'Show the overlay', 'CTRL+ALT+o']]), 'Don’t allow', ['Show the overlay', 'Ctrl+Alt+O']);
   require(declined === CANCELLED, 'apps get no shortcuts when the request is turned down');
   await call('Session', 'Close', null, null, steam);
 

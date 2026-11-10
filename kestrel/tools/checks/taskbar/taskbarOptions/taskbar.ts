@@ -18,7 +18,6 @@ const CROP_DEPTH = 120;
 
 export const settings = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 export const panel = () => ofType(named('kestrel-panel'), St.Widget);
-/** The island an element of the primary taskbar sits in, such as `clock`. */
 export const islandOf = (element: string) => ofType(named(`kestrel-taskbar-${element}`)!.get_parent()!.get_parent(), St.Widget);
 export const primary = () => Main.layoutManager.primaryMonitor!;
 export const otherMonitor = () => Main.layoutManager.monitors.find(monitor => monitor !== primary()) ?? null;

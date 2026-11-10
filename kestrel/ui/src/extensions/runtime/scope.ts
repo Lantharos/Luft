@@ -1,9 +1,5 @@
 import type { Disposable } from '../api/v1/types.js';
 
-/**
- * Everything one run of an extension made through the API. Disposing the scope takes it all away, and every call into
- * the extension's code goes through `run`, which turns an exception into the extension being switched off.
- */
 export class Scope {
   private readonly owned = new Set<Disposable>();
   private readonly cleanups: (() => void)[] = [];

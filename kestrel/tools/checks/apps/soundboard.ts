@@ -173,7 +173,6 @@ async function checkMenus(app: LuftApp) {
   await closes(app, popover, noPopover, 'Escape closes the microphone list', pressEscape);
 }
 
-/** Clicking a tile to close a menu mustn't play it into someone's call. */
 async function checkDismissingIsSilent(app: LuftApp) {
   const heard = await listening(async () => {
     app.click(FIRST_TILE, Clutter.BUTTON_SECONDARY);
@@ -255,7 +254,6 @@ function threads(pid: number) {
   return found;
 }
 
-/** How often the app's threads wake while `milliseconds` pass, thread by thread, so one that ends can't hide the rest. */
 async function wakeups(pid: number, milliseconds: number) {
   const before = threads(pid);
   await pause(milliseconds);
@@ -272,7 +270,6 @@ async function wakeups(pid: number, milliseconds: number) {
   return {perSecond: all / seconds, audioPerSecond: audio / seconds, cpuPercent: onCpu / 1e9 / seconds * 100};
 }
 
-/** With the window closed nothing should wake the app: no audio callbacks, no timers. */
 async function checkIdle(app: LuftApp) {
   const {pid} = app;
   app.window.delete(global.get_current_time());
@@ -286,7 +283,6 @@ async function checkIdle(app: LuftApp) {
   return pid;
 }
 
-/** An app recording the virtual microphone costs nothing here while the voice is muted and no sound plays. */
 async function checkListenerIdle(pid: number) {
   let quiet = {perSecond: 0, audioPerSecond: 0, cpuPercent: 0};
   let playing = {...quiet};
@@ -312,7 +308,6 @@ async function defaultSource() {
   return (await outcome(['pactl', 'get-default-source'])).stdout.trim();
 }
 
-/** The default input is only taken on request, and given back when the app quits. */
 async function checkDefaultInput() {
   require((await outcome(['pactl', 'set-default-source', 'microphone'])).ok, 'the computer has a default input');
   const before = await defaultSource();

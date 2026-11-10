@@ -1,7 +1,7 @@
 import Clutter from 'gi://Clutter';
 
 import * as KestrelUi from '../../kestrelUi.js';
-import type { Sound } from '../../system/sounds/catalog.js';
+import type { Sound } from '../../system/sound/sounds/catalog.js';
 import { KeyContainer } from './containers.js';
 import { Key } from './key.js';
 import { keyvalOf, type ModelKey, type ModelLevel } from './model.js';

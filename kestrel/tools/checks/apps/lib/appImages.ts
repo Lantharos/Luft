@@ -8,7 +8,6 @@ const {require} = checks('AppImage sandbox');
 const SCHELF = repository('target', 'release', 'schelf');
 const SANDBOX = '--sandbox';
 
-/** Builds a Sabine AppImage that declares what its `[sandbox]` table says. */
 export const SABINE_BUILDER = fixture('sandbox', 'sabine.py');
 
 const applications = () => GLib.build_filenamev([GLib.get_user_data_dir(), 'applications']);
@@ -21,7 +20,6 @@ function entries(): Set<string> {
     .map(info => info.get_name()).filter(name => name.endsWith('.desktop')).map(name => name.slice(0, -'.desktop'.length)));
 }
 
-/** The program and arguments a menu entry starts, without its file placeholders. */
 export function launchLine(id: string) {
   const entry = new GLib.KeyFile();
   entry.load_from_file(desktopFile(id), GLib.KeyFileFlags.NONE);
@@ -29,7 +27,6 @@ export function launchLine(id: string) {
   return {program, rest: rest.filter(argument => !argument.startsWith('%') && !argument.startsWith('@@')), entry};
 }
 
-/** Installs an AppImage with Schelf and checks that its menu entry starts it in its sandbox. */
 export async function install(path: string) {
   const copy = scratch(`appimage-${GLib.path_get_basename(path)}`);
   Gio.File.new_for_path(path).copy(Gio.File.new_for_path(copy), Gio.FileCopyFlags.OVERWRITE, null, null);

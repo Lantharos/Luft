@@ -2,11 +2,11 @@ import Clutter from 'gi://Clutter';
 import Cogl from 'gi://Cogl';
 import Gio from 'gi://Gio';
 
-import { animateActor } from '../shared/motion/motion.js';
+import { animateActor, Curve, Duration } from '../shared/motion/motion.js';
 
 const BUS_NAME = 'org.gnome.SessionManager';
 const MANAGER_PATH = '/org/gnome/SessionManager';
-const FAREWELL_DURATION = 250;
+const FAREWELL_DURATION = Duration.standard;
 
 export class Blackout {
   private cover: Clutter.Actor | null = null;
@@ -25,7 +25,7 @@ export class Blackout {
     return new Promise(resolve => animateActor(cover, {
       opacity: 255,
       duration: FAREWELL_DURATION,
-      mode: Clutter.AnimationMode.EASE_IN_QUAD,
+      curve: Curve.accelerate,
       onComplete: () => {
         this.hidePointer();
         resolve();

@@ -46,19 +46,19 @@ export async function chooseControl(handle: string, appId: string, request: Cont
   }, dialog => {
     opened(dialog);
     const devices = DEVICES.filter(device => request.devices & device.type)
-      .map(device => ({ type: device.type, button: row({ icon: device.icon, title: t(device.title), checked: true }) }));
+      .map(device => ({ type: device.type, button: row({ icon: device.icon, title: t(device.title), checked: false }) }));
     if (devices.length) dialog.content.add_child(group(t('screen-share-devices'), devices.map(device => device.button)));
-    const sources = request.selection ? sourceList(request.selection, count => { allow.reactive = count > 0; }, true) : null;
+    const sources = request.selection ? sourceList(request.selection, () => syncAllow(), true) : null;
     if (sources) dialog.content.add_child(sources.actor);
     const extras: St.Button[] = [];
     const clipboard = request.clipboard ? clipboardRow() : null;
     if (clipboard) extras.push(clipboard);
-    const remember = request.persistMode === PERSIST_UNTIL_REVOKED ? rememberRow(app.subject) : null;
+    const remember = request.persistMode === PERSIST_UNTIL_REVOKED ? rememberRow(app.subject, false) : null;
     if (remember) extras.push(remember);
     if (extras.length) dialog.content.add_child(list(extras));
     const [, allow] = dialog.buttons([
-      { label: t('portal-cancel'), action: dialog.cancel },
-      { label: t('portal-allow'), default: true, action: () => {
+      { label: t('portal-deny'), default: true, action: dialog.cancel },
+      { label: t('portal-allow'), action: () => {
         choice = {
           devices: devices.filter(device => device.button.checked).reduce((mask, device) => mask | device.type, 0),
           sources: sources?.selected() ?? null,
@@ -68,7 +68,11 @@ export async function chooseControl(handle: string, appId: string, request: Cont
         dialog.finish(SUCCESS);
       } },
     ]);
-    allow.reactive = !sources || sources.selected().length > 0;
+    const syncAllow = () => {
+      allow.reactive = sources ? sources.selected().length > 0 : !devices.length || devices.some(device => device.button.checked);
+    };
+    for (const device of devices) device.button.connect('notify::checked', syncAllow);
+    syncAllow();
   });
   return [response, choice];
 }

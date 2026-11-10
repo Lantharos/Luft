@@ -2,7 +2,7 @@ import Gio from 'gi://Gio';
 import GObject from 'gi://GObject';
 import type Shell from 'gi://Shell';
 
-import type { SoundChoice } from '../../../system/sounds/sounds.js';
+import type { SoundChoice } from '../../../system/sound/sounds/sounds.js';
 
 const MASTER_SCHEMA = 'org.gnome.desktop.notifications';
 

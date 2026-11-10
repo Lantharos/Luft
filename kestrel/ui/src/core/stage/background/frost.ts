@@ -63,7 +63,6 @@ function settled(container: Clutter.Actor): Promise<void> {
   });
 }
 
-/** Freezes a monitor's wallpaper, blurred and tinted once, into a small texture kept in memory and on disk until the wallpaper changes. */
 export class FrostedWallpaper {
   readonly shown: Promise<void>;
   private readonly cancellable = new Gio.Cancellable();

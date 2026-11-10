@@ -3,7 +3,7 @@ import Meta from 'gi://Meta';
 
 import type { Keybindings } from '../../context.js';
 import { canonical, claimable, reservedAccelerators } from '../../portal/shortcuts/accelerators.js';
-import { SHORTCUT_MODES } from '../../system/dictation/grabbedShortcut.js';
+import { SHORTCUT_MODES } from '../../system/input/dictation/grabbedShortcut.js';
 import type { Manifest } from '../api/v1/types.js';
 import type { ExtensionStore } from './store.js';
 
@@ -15,10 +15,6 @@ function appShortcuts(): string[] {
   return Object.values(registered).flatMap(shortcuts => Object.values(shortcuts).flatMap(shortcut => shortcut.shortcuts));
 }
 
-/**
- * What each of an extension's shortcuts is set to: what people chose, or else its default, unless Luft, an app or a
- * shortcut people chose for another extension already uses it, or it's something people would type by accident.
- */
 export function chosenShortcuts(id: string, manifest: Manifest, store: ExtensionStore): Record<string, string[]> {
   const choices = store.shortcutChoices;
   const taken = new Set([
@@ -36,7 +32,6 @@ export function chosenShortcuts(id: string, manifest: Manifest, store: Extension
   }));
 }
 
-/** An extension's shortcuts grabbed from the compositor while it runs. */
 export class GrabbedShortcuts {
   private readonly grabs = new Map<number, string>();
   private readonly signal: number;
@@ -53,7 +48,6 @@ export class GrabbedShortcuts {
     this.grab();
   }
 
-  /** What each shortcut is bound to: a shortcut someone else had already grabbed is left out. */
   get accelerators(): Record<string, string[]> {
     return this.bound;
   }

@@ -1,5 +1,6 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
+import GioUnix from 'gi://GioUnix';
 import GLib from 'gi://GLib';
 
 import type {LuftApp} from '../lib/apps/luftApp.js';
@@ -18,9 +19,11 @@ const {require, eventually} = checks('file actions');
 const FILES = 'com.example.Files';
 const FOLDER: Point = [330, 104];
 const NOTE: Point = [330, 140];
-const SEND_TO_DEVICE = 10;
-const FIRST_ADDED = SEND_TO_DEVICE + 1;
-const BEFORE_ADDED = 2;
+const CONVERTIBLE = 'com.lantharos.convertible.desktop';
+const SEPARATOR = null;
+const EDITING = [SEPARATOR, 'Cut', 'Copy', 'Duplicate', 'Copy path', SEPARATOR, 'Rename', 'Compress…', 'Convert…'];
+const TEXT_MENU = ['Open', 'Quick Look', 'Add to Favorites', ...EDITING, 'Print…', 'Send to device'];
+const FOLDER_MENU = ['Open', 'Open in tab', 'Add to Favorites', 'Change icon…', ...EDITING, 'Send to device'];
 
 interface Chosen {
   key: string;
@@ -35,7 +38,13 @@ interface Fixture {
 }
 
 const fixture = () => (globalThis as {fileActionsFixture?: Fixture}).fileActionsFixture!;
-const added = (point: Point, index: number) => menuItem(point, FIRST_ADDED + index, BEFORE_ADDED);
+function added(point: Point, menu: (string | null)[], index: number) {
+  const converts = GioUnix.DesktopAppInfo.new(CONVERTIBLE) !== null;
+  const shown = menu.filter(label => label !== 'Convert…' || converts);
+  const before = shown.slice(0, shown.indexOf('Send to device') + 1);
+  const separators = before.filter(label => label === SEPARATOR).length;
+  return menuItem(point, before.length - separators + index, separators);
+}
 const last = () => fixture().chosen.at(-1);
 const fileId = (path: string) => Gio.File.new_for_path(path).query_info('id::file', Gio.FileQueryInfoFlags.NONE, null).get_attribute_string('id::file');
 const chosenOn = (path: string) => last()!.paths.length === 1 && fileId(last()!.paths[0]!) === fileId(path);
@@ -49,19 +58,19 @@ async function checkOnlyRover() {
 async function checkPlainActions(app: LuftApp, folder: string, note: string) {
   await changes(app, 'right-clicking a text file opens its menu', () => app.click(NOTE, Clutter.BUTTON_SECONDARY));
   await saveEveryLook(app, 'file-actions-text-menu');
-  await changes(app, 'choosing an added action closes the menu', () => app.click(added(NOTE, 0)));
+  await changes(app, 'choosing an added action closes the menu', () => app.click(added(NOTE, TEXT_MENU, 0)));
   await eventually(() => last()?.key === 'words' && chosenOn(note), 'Count words gets the text file it was chosen on');
 
   await changes(app, 'right-clicking a folder opens its menu', () => app.click(FOLDER, Clutter.BUTTON_SECONDARY));
   await saveEveryLook(app, 'file-actions-folder-menu');
-  await changes(app, 'choosing the folder action closes the menu', () => app.click(added(FOLDER, 0)));
+  await changes(app, 'choosing the folder action closes the menu', () => app.click(added(FOLDER, FOLDER_MENU, 0)));
   await eventually(() => last()?.key === 'tidy' && chosenOn(folder), 'an action for folders shows on folders, without the one for text');
 }
 
 async function checkChoices(app: LuftApp, note: string) {
   await changes(app, 'right-clicking the text file again opens its menu', () => app.click(NOTE, Clutter.BUTTON_SECONDARY));
   const opened = fixture().opened;
-  await changes(app, 'an action with choices opens them in the menu', () => app.click(added(NOTE, 1)));
+  await changes(app, 'an action with choices opens them in the menu', () => app.click(added(NOTE, TEXT_MENU, 1)));
   await eventually(() => fixture().opened === opened + 1, 'and tells the extension it opened');
   await saveEveryLook(app, 'file-actions-choices-empty');
   await changes(app, 'Look again keeps the menu open and shows what turned up', () => app.click(menuItem(NOTE, 2, 2)));

@@ -2,7 +2,7 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
-import {DOWNLOAD_SIZE} from '../../../../fixtures/system/updater.js';
+import {DOWNLOAD_SIZE} from '../../../../fixtures/system/software/updater.js';
 import type {LuftApp} from '../../../lib/apps/luftApp.js';
 import {checks} from '../../../lib/check.js';
 import {call} from '../../../lib/dbus.js';

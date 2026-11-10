@@ -2,10 +2,9 @@ import Atk from 'gi://Atk';
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
-import { animateActor, animateAdjustment } from '../../../shared/motion/motion.js';
+import { animateActor, animateAdjustment, Curve, Duration } from '../../../shared/motion/motion.js';
 import type { Tab } from '../catalog/catalog.js';
 
-const INDICATOR_DURATION = 220;
 const REVEAL_MARGIN = 28;
 const WHEEL_STEP = 48;
 
@@ -98,7 +97,7 @@ export class TabStrip {
     if (box.x1 - REVEAL_MARGIN < value) target = box.x1 - REVEAL_MARGIN;
     else if (box.x2 + REVEAL_MARGIN > value + page) target = box.x2 + REVEAL_MARGIN - page;
     this.scrollTarget = Math.max(0, Math.min(upper - page, target));
-    if (this.scrollTarget !== value) animateAdjustment(adjustment, this.scrollTarget, { duration: INDICATOR_DURATION, mode: Clutter.AnimationMode.EASE_OUT_CUBIC });
+    if (this.scrollTarget !== value) animateAdjustment(adjustment, this.scrollTarget, { duration: Duration.moderate, curve: Curve.glide });
   }
 
   private scrollSideways(event: Clutter.Event): boolean {
@@ -128,7 +127,7 @@ export class TabStrip {
     if (!button.has_allocation()) return;
     const box = button.get_allocation_box();
     const x = Math.round(box.x1 + (box.get_width() - this.indicator.width) / 2);
-    if (animate && this.indicator.opacity) animateActor(this.indicator, { translation_x: x, duration: INDICATOR_DURATION, mode: Clutter.AnimationMode.EASE_OUT_CUBIC });
+    if (animate && this.indicator.opacity) animateActor(this.indicator, { translation_x: x, duration: Duration.moderate, curve: Curve.glide });
     else this.indicator.translation_x = x;
     this.indicator.opacity = 255;
   }

@@ -96,8 +96,6 @@ export class ScrollingSpace implements Space {
     this.arrange(false, window);
   }
 
-  /** An app that keeps its window wider than its column, as ones with a minimum width do, widens the column
-   * instead of covering the next one. */
   widened(window: Meta.Window): void {
     if (this.swipeStart !== null || this.zoomed || !this.widen(window)) return;
     this.arrange(true);
@@ -111,7 +109,6 @@ export class ScrollingSpace implements Space {
     return true;
   }
 
-  // Windows that widened during a swipe or the overview get their columns widened once it ends
   private widenAll(): void {
     if (this.strip.windows.filter(window => this.widen(window)).length) this.arrange(true);
   }

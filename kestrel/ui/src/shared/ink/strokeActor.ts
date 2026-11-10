@@ -6,10 +6,6 @@ import type { Stroke } from './stroke.js';
 
 const GROW_BY = 96;
 
-/**
- * Draws one stroke in an area just around it, growing in steps as the stroke
- * leaves it, so a new point repaints only this stroke and never the others.
- */
 export class StrokeActor extends St.DrawingArea {
   static {
     GObject.registerClass(this);

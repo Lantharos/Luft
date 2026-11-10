@@ -7,7 +7,6 @@ const DISMISS_SHARE = 0.4;
 const FLING_SPEED = 500;
 const FADE_SHARE = 0.75;
 
-/** Lets a notice be swiped sideways off screen, following the pointer 1:1. */
 export function swipeAway(ondismiss: () => void): Attachment<HTMLElement> {
 	return (node) => {
 		const width = () => node.offsetWidth;

@@ -7,13 +7,10 @@ import type { Monitor } from '../panel.js';
 import type { TaskbarLayout } from '../preferences/taskbarPreferences.js';
 
 const LENGTH_IN_BUTTONS = 3;
-/** How far from a spot the pointer can be and still aim at it. */
 const REACH = 220;
 
-/** The twelve spots an island can go to, drawn as soft shapes along the screen's edges while people arrange the taskbar. */
 export class SpotTargets {
   readonly actor = new St.Widget({ name: 'kestrel-arrange-targets' });
-  /** Where each spot sits, in stage coordinates. */
   readonly targets: IslandBox[];
   private readonly shapes = new Map<Spot, St.Widget>();
   private lit: Spot | null = null;
@@ -34,7 +31,6 @@ export class SpotTargets {
     }
   }
 
-  /** The spot the pointer aims at: the nearest one within reach. */
   spotNear(x: number, y: number): Spot | null {
     return spotNear(this.targets, x, y, REACH);
   }

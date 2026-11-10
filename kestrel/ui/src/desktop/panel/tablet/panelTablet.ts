@@ -11,7 +11,6 @@ interface Shape {
   radius: number;
 }
 
-/** Turns a panel into the touch taskbar and back, morphing the bar in place when it stays on the same edge. */
 export class PanelTablet {
   private stopWaiting = () => {};
 

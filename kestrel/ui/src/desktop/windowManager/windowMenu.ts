@@ -6,7 +6,7 @@ import St from 'gi://St';
 import * as KestrelUi from '../../kestrelUi.js';
 import * as Main from '../../core/main.js';
 import * as PopupMenu from '../../shared/popups/popupMenu.js';
-import { captureScreenshot } from '../../system/screenshot/capture.js';
+import { captureScreenshot } from '../../system/capture/screenshot/capture.js';
 import { canBeSeeThrough, isSeeThrough, toggleSeeThrough } from '../windows/seeThrough/seeThrough.js';
 
 const WORKSPACE_MOVES = [

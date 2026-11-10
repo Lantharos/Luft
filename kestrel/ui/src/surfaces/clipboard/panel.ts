@@ -67,7 +67,7 @@ export class ClipboardPanel {
     const clear = new St.Button({ style_class: 'kestrel-text-button', can_focus: true, track_hover: true, x_expand: true, x_align: Clutter.ActorAlign.END });
     localized(clear, () => (clear.label = t('clipboard-clear-all')));
     clear.connect('clicked', () => {
-      this.history.clear();
+      this.clear();
       this.close();
     });
     footer.add_child(clear);
@@ -82,6 +82,10 @@ export class ClipboardPanel {
 
   get entries(): readonly ClipboardEntry[] {
     return this.history.entries;
+  }
+
+  clear(): void {
+    this.history.clear();
   }
 
   keep(entry: ClipboardEntry): void {

@@ -4,9 +4,9 @@ import GLib from 'gi://GLib';
 import type { ExtensionHost } from '../host.js';
 import { API_VERSIONS } from '../api/versions.js';
 import type { Manifest } from '../api/v1/types.js';
-import { OpenPopups } from '../api/v1/popups/popups.js';
-import type { EffectsStage } from '../api/v1/screenEffects/stage.js';
-import type { LayerStage } from '../api/v1/wallpaper/stage.js';
+import { OpenPopups } from '../api/v1/ui/popups/popups.js';
+import type { EffectsStage } from '../api/v1/visuals/screenEffects/stage.js';
+import type { LayerStage } from '../api/v1/visuals/wallpaper/stage.js';
 import { dataFolder, type Installed } from './folders.js';
 import { Gestures } from './gestures.js';
 import { ExtensionPage } from './page.js';
@@ -23,7 +23,6 @@ export interface RuntimeServices {
   readonly store: ExtensionStore;
   readonly layers: LayerStage;
   readonly screenEffects: EffectsStage;
-  /** A file name for this load of an extension's module, since a module loads only once per path. */
   snapshotPath(id: string): string;
   failed(id: string, error: unknown): void;
   openSettings(id: string): void;
@@ -32,7 +31,6 @@ export interface RuntimeServices {
 
 type Enable = (extension: object) => unknown;
 
-/** One installed extension with a valid manifest: its settings always, and its code while it runs. */
 export class ExtensionInstance {
   readonly values: SettingValues;
   readonly translations: Translations;

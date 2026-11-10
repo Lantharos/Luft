@@ -7,7 +7,7 @@ import { StartLayout } from './layout.js';
 import { GridDrag } from './drag.js';
 import { SearchResults } from '../search/results/searchResults.js';
 import type { SearchItem, SearchView } from '../search/item.js';
-import { animateActor, liftIcon } from '../../shared/motion/motion.js';
+import { animateActor, Curve, Duration, liftIcon } from '../../shared/motion/motion.js';
 import { appIcon } from '../../appearance/icons/appIcons.js';
 import type { ContextMenus } from '../../desktop/menus/contextMenus.js';
 import { t } from '../../shared/i18n/index.js';
@@ -135,7 +135,7 @@ export class StartGrid {
               button.translation_x = previous[0] - x;
               button.translation_y = previous[1] - y;
             } else button.opacity = 0;
-            animateActor(button, { translation_x: 0, translation_y: 0, opacity: 255, duration: 180, mode: Clutter.AnimationMode.EASE_OUT_QUART });
+            animateActor(button, { translation_x: 0, translation_y: 0, opacity: 255, duration: Duration.quick, curve: Curve.settle });
           });
         }
       }
@@ -145,7 +145,7 @@ export class StartGrid {
       this.scroller.vadjustment.value = 0;
       this.actor.opacity = 0;
       this.actor.translation_y = 8;
-      animateActor(this.actor, { opacity: 255, translation_y: 0, duration: 160, mode: Clutter.AnimationMode.EASE_OUT_QUART });
+      animateActor(this.actor, { opacity: 255, translation_y: 0, duration: Duration.quick, curve: Curve.settle });
     }
   }
 

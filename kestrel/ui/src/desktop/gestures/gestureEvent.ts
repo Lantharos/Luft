@@ -16,7 +16,6 @@ interface GestureFields {
   device: GestureDevice | null;
 }
 
-// Stands in for a touchpad gesture event, for gestures that don't come from a touchpad
 export function gestureEvent({ type, phase, fingers, time, coords, delta, scale, device }: GestureFields): Clutter.Event {
   return {
     type: () => type,

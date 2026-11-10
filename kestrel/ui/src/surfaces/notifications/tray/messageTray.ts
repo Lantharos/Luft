@@ -10,6 +10,7 @@ import * as GnomeSession from '../../../session/actions/gnomeSession.js';
 import * as KestrelUi from '../../../kestrelUi.js';
 import * as Layout from '../../../core/stage/layout.js';
 import * as Main from '../../../core/main.js';
+import { Curve, Duration } from '../../../shared/motion/motion.js';
 import { NotificationMessage } from '../messages/notificationMessage.js';
 
 import { bannerAllowed, heldBack, soundAllowed } from './bannerRules.js';
@@ -26,8 +27,6 @@ export { getSystemSource } from './systemSource.js';
 
 const SHELL_KEYBINDINGS_SCHEMA = 'com.lantharos.kestrel.keybindings';
 
-export const ANIMATION_TIME = 200;
-const BANNER_SHOW_TIME = 260;
 const BANNER_SLIDE_DISTANCE = 48;
 
 const NOTIFICATION_TIMEOUT = 4000;
@@ -462,8 +461,8 @@ export class MessageTray extends St.Widget {
       opacity: 255,
       translation_x: 0,
       translation_y: 0,
-      duration: BANNER_SHOW_TIME,
-      mode: Clutter.AnimationMode.EASE_OUT_QUART,
+      duration: Duration.standard,
+      curve: Curve.settle,
       onComplete: () => {
         this.notificationState = State.SHOWN;
         this.showNotificationCompleted();
@@ -519,8 +518,8 @@ export class MessageTray extends St.Widget {
     this.bannerBin.ease({
       opacity: 0,
       ...toward(this.bannerEdge, BANNER_SLIDE_DISTANCE),
-      duration: animate ? ANIMATION_TIME : 0,
-      mode: Clutter.AnimationMode.EASE_IN_QUAD,
+      duration: animate ? Duration.moderate : 0,
+      curve: Curve.accelerate,
       onComplete: () => {
         this.notificationState = State.HIDDEN;
         this.hideNotificationCompleted();

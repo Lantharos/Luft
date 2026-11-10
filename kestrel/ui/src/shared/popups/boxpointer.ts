@@ -7,6 +7,7 @@ import St from 'gi://St';
 
 import { clamp } from '../math.js';
 import * as Main from '../../core/main.js';
+import { Curve, Duration } from '../motion/motion.js';
 import { drawArrowBorder } from './arrowBorder.js';
 
 export const PopupAnimation = {
@@ -16,7 +17,6 @@ export const PopupAnimation = {
   FULL: ~0,
 } as const;
 
-export const POPUP_ANIMATION_TIME = 150;
 
 const SLIDE_SCALE = 0.96;
 
@@ -102,7 +102,7 @@ export const BoxPointer = GObject.registerClass({
     this.clearClosingSelection?.();
     this.clearClosingSelection = null;
     const rise = this.get_theme_node().get_length('-arrow-rise');
-    const animationTime = animate & PopupAnimation.FULL ? POPUP_ANIMATION_TIME : 0;
+    const animationTime = animate & PopupAnimation.FULL ? Duration.quick : 0;
 
     this.opacity = animate & PopupAnimation.FADE ? 0 : 255;
 
@@ -125,7 +125,7 @@ export const BoxPointer = GObject.registerClass({
       scale_x: 1,
       scale_y: 1,
       duration: animationTime,
-      mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+      curve: Curve.gentle,
       onComplete: () => {
         this.muteInput.enabled = false;
         onComplete?.();
@@ -142,7 +142,7 @@ export const BoxPointer = GObject.registerClass({
     let scale = 1;
     const rise = this.get_theme_node().get_length('-arrow-rise');
     const fade = animate & PopupAnimation.FADE;
-    const animationTime = animate & PopupAnimation.FULL ? POPUP_ANIMATION_TIME : 0;
+    const animationTime = animate & PopupAnimation.FULL ? Duration.quick : 0;
 
     if (useMotion(animate)) {
       const start = slideStart(this.currentArrowSide, rise);
@@ -163,7 +163,7 @@ export const BoxPointer = GObject.registerClass({
       scale_x: scale,
       scale_y: scale,
       duration: animationTime,
-      mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+      curve: Curve.gentle,
       onComplete: () => {
         this.hide();
         this.opacity = 0;

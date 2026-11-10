@@ -1,25 +1,20 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import Soup from 'gi://Soup';
 
 import { formatsLocale, onLocaleChanged } from '../../../shared/i18n/index.js';
-import { mentionsCurrency, useRates } from './currencies.js';
+import { askLuft, lookupsAllowed } from '../../../shared/network/luftSite.js';
+import { mentionsCurrency, parseRates, useRates } from './currencies.js';
 
 Gio._promisify(Gio.File.prototype, 'load_contents_async');
 Gio._promisify(Gio.File.prototype, 'query_info_async');
 Gio._promisify(Gio.File.prototype, 'replace_contents_bytes_async', 'replace_contents_finish');
-Gio._promisify(Soup.Session.prototype, 'send_and_read_async');
 
-const SOURCES = [
-  'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/eur.min.json',
-  'https://latest.currency-api.pages.dev/v1/currencies/eur.min.json',
-];
+const RATES = '/api/rates';
+const MAX_BYTES = 64 * 1024;
 const FRESH_FOR = 12 * GLib.TIME_SPAN_HOUR;
 const RETRY_AFTER = GLib.TIME_SPAN_HOUR;
-
-interface Saved {
-  eur: Record<string, number>;
-}
+const SAVED_ATTRIBUTES = `${Gio.FILE_ATTRIBUTE_TIME_MODIFIED},${Gio.FILE_ATTRIBUTE_STANDARD_SIZE}`;
+const decoder = new TextDecoder();
 
 export class CurrencyRates {
   private readonly file = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_user_cache_dir(), 'kestrel', 'currency-rates.json']));
@@ -37,7 +32,7 @@ export class CurrencyRates {
   }
 
   want(text: string): void {
-    if (this.busy || GLib.get_real_time() - this.fetchedAt < FRESH_FOR || !mentionsCurrency(text)) return;
+    if (this.busy || GLib.get_real_time() - this.fetchedAt < FRESH_FOR || !mentionsCurrency(text) || !lookupsAllowed()) return;
     this.busy = true;
     void this.download().finally(() => (this.busy = false));
   }
@@ -50,19 +45,17 @@ export class CurrencyRates {
     if (this.rates) useRates(this.rates, formatsLocale());
   }
 
-  private receive(contents: Uint8Array, fetchedAt: number): boolean {
-    const saved = JSON.parse(new TextDecoder().decode(contents)) as Saved;
-    if (!saved.eur || typeof saved.eur !== 'object') return false;
-    this.rates = saved.eur;
+  private receive(contents: Uint8Array, fetchedAt: number): void {
+    this.rates = parseRates(decoder.decode(contents));
     this.fetchedAt = fetchedAt;
     this.apply();
     this.changed();
-    return true;
   }
 
   private async readSaved(): Promise<void> {
     try {
-      const info = await this.file.query_info_async(Gio.FILE_ATTRIBUTE_TIME_MODIFIED, Gio.FileQueryInfoFlags.NONE, GLib.PRIORITY_LOW, null);
+      const info = await this.file.query_info_async(SAVED_ATTRIBUTES, Gio.FileQueryInfoFlags.NONE, GLib.PRIORITY_LOW, null);
+      if (info.get_size() > MAX_BYTES) throw new Error(`they are larger than ${MAX_BYTES} bytes`);
       const [contents] = await this.file.load_contents_async(null);
       this.receive(contents, info.get_modification_date_time()!.to_unix() * GLib.USEC_PER_SEC);
     } catch (error) {
@@ -72,20 +65,14 @@ export class CurrencyRates {
   }
 
   private async download(): Promise<void> {
-    const session = new Soup.Session({ timeout: 10 });
-    for (const source of SOURCES) {
-      try {
-        const message = Soup.Message.new('GET', source);
-        const bytes = await session.send_and_read_async(message, GLib.PRIORITY_LOW, null);
-        const contents = bytes.toArray();
-        if (message.get_status() !== Soup.Status.OK || !this.receive(contents, GLib.get_real_time())) continue;
-        GLib.mkdir_with_parents(this.file.get_parent()!.get_path()!, 0o755);
-        await this.file.replace_contents_bytes_async(new GLib.Bytes(contents), null, false, Gio.FileCreateFlags.REPLACE_DESTINATION, null);
-        return;
-      } catch (error) {
-        console.warn(`Currency rates could not be downloaded from ${source}: ${error}`);
-      }
+    try {
+      const contents = await askLuft(RATES, MAX_BYTES);
+      this.receive(contents, GLib.get_real_time());
+      GLib.mkdir_with_parents(this.file.get_parent()!.get_path()!, 0o755);
+      await this.file.replace_contents_bytes_async(new GLib.Bytes(contents), null, false, Gio.FileCreateFlags.REPLACE_DESTINATION, null);
+    } catch (error) {
+      console.warn(`Currency rates could not be downloaded: ${error}`);
+      this.fetchedAt = GLib.get_real_time() - FRESH_FOR + RETRY_AFTER;
     }
-    this.fetchedAt = GLib.get_real_time() - FRESH_FOR + RETRY_AFTER;
   }
 }

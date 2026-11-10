@@ -1,7 +1,6 @@
-import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
-import { animateActor } from '../../../shared/motion/motion.js';
+import { animateActor, Curve, Duration } from '../../../shared/motion/motion.js';
 import { clampUnit } from '../../../shared/math.js';
 import type { LauncherEntry } from './launcherEntries.js';
 import { isVertical, outward, type Edge } from '../../../shared/layout/edge.js';
@@ -58,14 +57,14 @@ export class AppIndicators {
     this.progress.visible = entry.progressVisible;
     if (this.progress.visible) {
       this.fraction = clampUnit(entry.progress);
-      this.fillProgress(200);
+      this.fillProgress(Duration.moderate);
     }
     this.setAttention(attention || entry.urgent);
   }
 
   private fillProgress(duration: number): void {
     const length = Math.round(PROGRESS_LENGTH * this.fraction);
-    animateActor(this.fill, { [this.vertical ? 'height' : 'width']: length, duration, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
+    animateActor(this.fill, { [this.vertical ? 'height' : 'width']: length, duration, curve: Curve.gentle });
   }
 
   private setAttention(attention: boolean): void {
@@ -73,14 +72,14 @@ export class AppIndicators {
     this.attending = attention;
     this.attention.remove_all_transitions();
     if (!attention) {
-      animateActor(this.attention, { opacity: 0, duration: 200, onStopped: () => { if (!this.attending) this.attention.hide(); } });
+      animateActor(this.attention, { opacity: 0, duration: Duration.moderate, onStopped: () => { if (!this.attending) this.attention.hide(); } });
       return;
     }
     this.attention.show();
     this.attention.opacity = 0;
     animateActor(this.attention, {
-      opacity: 255, duration: 420, mode: Clutter.AnimationMode.EASE_IN_OUT_QUAD, autoReverse: true, repeatCount: FLASHES * 2 - 1,
-      onComplete: () => animateActor(this.attention, { opacity: SETTLED_OPACITY, duration: 300 }),
+      opacity: 255, duration: Duration.slow, curve: Curve.pulse, autoReverse: true, repeatCount: FLASHES * 2 - 1,
+      onComplete: () => animateActor(this.attention, { opacity: SETTLED_OPACITY, duration: Duration.relaxed }),
     });
   }
 }

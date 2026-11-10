@@ -12,7 +12,6 @@ const THRESHOLD = 8;
 const AROUND_ISLAND = 12;
 const GHOST_OPACITY = 90;
 
-/** What a press picked up: a whole island by its handle, or one element out of an island. */
 export type Grip = { island: Island } | { element: string; actor: Clutter.Actor };
 
 interface DragHost {
@@ -20,9 +19,7 @@ interface DragHost {
   readonly targets: SpotTargets;
   readonly layer: St.Widget;
   draft(): Arrangement;
-  /** Where an island dropped at `spot` goes. */
   islandTo(arrangement: Arrangement, from: Spot, spot: Spot): Arrangement;
-  /** Where an element dropped at `spot`, at `index` among that island's other elements, goes. */
   elementTo(arrangement: Arrangement, element: string, spot: Spot, index: number): Arrangement;
   preview(arrangement: Arrangement): void;
 }
@@ -36,7 +33,6 @@ function boxOf(actor: Clutter.Actor) {
 const within = ({ x, y, width, height }: ReturnType<typeof boxOf>, px: number, py: number, around = 0) =>
   px >= x - around && px < x + width + around && py >= y - around && py < y + height + around;
 
-/** Picks islands and elements up, follows the pointer with them, and previews where they'd land as it moves. */
 export class Dragging {
   private pressed: { grip: Grip; x: number; y: number } | null = null;
   private moving: { grip: Grip; origin: Arrangement; dx: number; dy: number; clone: Clutter.Clone | null; follow: number } | null = null;
@@ -48,7 +44,6 @@ export class Dragging {
     return this.moving !== null;
   }
 
-  /** The element under a point, for picking it up. */
   elementAt(x: number, y: number): Grip | null {
     for (const island of this.host.panel.islandSet.islands) {
       const index = island.box.get_children().findIndex(child => child.visible && within(boxOf(child), x, y));
@@ -90,7 +85,6 @@ export class Dragging {
     animateActor(actor, { translation_x: 0, translation_y: 0, spring: Spring.snappy });
   }
 
-  /** Puts everything back where it was when the drag began. */
   cancel(): Arrangement | null {
     const origin = this.moving?.origin ?? null;
     this.release();
@@ -150,7 +144,6 @@ export class Dragging {
     return spot ? this.host.elementTo(moving.origin, element, spot, Infinity) : moving.origin;
   }
 
-  /** Where in an island the pointer points, counted among its elements other than the one being moved. */
   private indexAmong(island: Island, element: string, x: number, y: number): number {
     const vertical = isVertical(edgeOf(island.spot));
     const reversed = !vertical && rightToLeft();

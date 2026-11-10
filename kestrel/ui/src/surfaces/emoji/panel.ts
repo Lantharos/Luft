@@ -3,7 +3,7 @@ import St from 'gi://St';
 
 import { blurSurface } from '../../shared/layout/surface.js';
 import { t } from '../../shared/i18n/index.js';
-import { animateActor } from '../../shared/motion/motion.js';
+import { animateActor, Curve, Duration } from '../../shared/motion/motion.js';
 import { boxCenter, findAnchor, heightNear, placeNear, type Anchor, type Box } from '../../shared/layout/placement.js';
 import type { TextInput } from '../../shared/input/textInput.js';
 import { describe, withTone, type Catalog } from './catalog/catalog.js';
@@ -22,7 +22,6 @@ type Zone = 'grid' | 'tone' | 'tabs' | 'tones';
 const ZONES: readonly Zone[] = ['grid', 'tone', 'tabs'];
 const PREFERRED_HEIGHT = 452;
 const SLIDE_DISTANCE = 8;
-const FADE_DURATION = 160;
 const ENTER_KEYS = [Clutter.KEY_Return, Clutter.KEY_KP_Enter, Clutter.KEY_ISO_Enter];
 const NAVIGATION_KEYS = [
   Clutter.KEY_Left, Clutter.KEY_Right, Clutter.KEY_Up, Clutter.KEY_Down,
@@ -314,9 +313,9 @@ export class EmojiPanel {
 
   private crossfade(incoming: Clutter.Actor, outgoing: Clutter.Actor): void {
     incoming.show();
-    animateActor(incoming, { opacity: 255, duration: FADE_DURATION, mode: Clutter.AnimationMode.EASE_OUT_QUAD });
+    animateActor(incoming, { opacity: 255, duration: Duration.quick, curve: Curve.gentle });
     animateActor(outgoing, {
-      opacity: 0, duration: FADE_DURATION, mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+      opacity: 0, duration: Duration.quick, curve: Curve.gentle,
       onStopped: (finished: boolean) => { if (finished) outgoing.hide(); },
     });
   }

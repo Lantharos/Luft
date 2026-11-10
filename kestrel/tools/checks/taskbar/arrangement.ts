@@ -2,7 +2,7 @@ import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import type Meta from 'gi://Meta';
 import St from 'gi://St';
-import {Main, arrangeTaskbar, carryOverEdgeAndAlignment, taskbarEditor, taskbarElements, toggleSurface} from 'resource:///com/lantharos/kestrel/kestrel.js';
+import {Main, arrangeTaskbar, taskbarEditor, taskbarElements, toggleSurface} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {existing, named, shown} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
@@ -14,15 +14,13 @@ import {pause, settled} from '../lib/wait.js';
 
 const {require, eventually} = checks('taskbar arrangement');
 const settings = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
-const legacy = new Gio.Settings({schema_id: 'com.lantharos.kestrel.legacy-taskbar'});
 const KEYS = ['taskbar-arrangement', 'taskbar-style'];
 const SYSTEM = ['tray', 'status', 'clock'];
 const THICKNESS = 48;
 const MARGIN = 8;
 const DRAG_STEPS = 16;
 const WINDOW = ['Arranged', '2e3a46'] as const;
-// Inside a square corner, but outside a rounded one
-const CORNER_INSET = 3;
+const INSIDE_SQUARE_OUTSIDE_ROUNDED_CORNER = 3;
 
 type Box = {x: number; y: number; width: number; height: number};
 type Edge = 'bottom' | 'left' | 'top' | 'right';
@@ -63,11 +61,10 @@ async function pixel(x: number, y: number) {
 
 const near = (pixel: number[], color: number[]) => pixel.every((value, channel) => Math.abs(value - color[channel]) <= 2);
 
-/** Whether each corner of a window, top left, top right, bottom right and bottom left, shows what's behind it. */
 async function roundedCorners(window: Meta.Window, color: number[]) {
   const frame = window.get_frame_rect();
-  const left = frame.x + CORNER_INSET, right = frame.x + frame.width - 1 - CORNER_INSET;
-  const top = frame.y + CORNER_INSET, bottom = frame.y + frame.height - 1 - CORNER_INSET;
+  const left = frame.x + INSIDE_SQUARE_OUTSIDE_ROUNDED_CORNER, right = frame.x + frame.width - 1 - INSIDE_SQUARE_OUTSIDE_ROUNDED_CORNER;
+  const top = frame.y + INSIDE_SQUARE_OUTSIDE_ROUNDED_CORNER, bottom = frame.y + frame.height - 1 - INSIDE_SQUARE_OUTSIDE_ROUNDED_CORNER;
   const shown = await Promise.all([[left, top], [right, top], [right, bottom], [left, bottom]].map(([x, y]) => pixel(x, y)));
   return shown.map(corner => !near(corner, color));
 }
@@ -79,23 +76,6 @@ async function show(name: string) {
   await eventually(() => preset.islands.every(([spot]) => settledIsland(spot)?.mapped), `the ${name} arrangement shows its islands`);
   await settled();
   return preset;
-}
-
-async function checkMigration() {
-  settings.reset('taskbar-arrangement');
-  legacy.set_string('taskbar-position', 'right');
-  legacy.set_string('taskbar-alignment', 'left');
-  carryOverEdgeAndAlignment();
-  require(sameIslands(arrangement(), alongEdge('right', 'start')), 'a taskbar people had on the right with its apps at the top carries over');
-  require(legacy.get_user_value('taskbar-position') === null && legacy.get_user_value('taskbar-alignment') === null,
-    'the old edge and alignment are cleared once carried over');
-  await eventually(() => settledIsland('right-start') && settledIsland('right-end'), 'the taskbar follows the carried over arrangement');
-
-  legacy.set_string('taskbar-position', 'top');
-  carryOverEdgeAndAlignment();
-  require(sameIslands(arrangement(), alongEdge('right', 'start')), 'an arrangement people already made stays as it is');
-  require(legacy.get_user_value('taskbar-position') === null, 'and the old edge is cleared anyway');
-  settings.reset('taskbar-arrangement');
 }
 
 async function checkPresets(window: Meta.Window, color: number[]) {
@@ -309,7 +289,6 @@ async function checkSecondDisplay() {
 
 export async function run() {
   try {
-    await checkMigration();
     spawn(['python3', fixture('clients', 'wayland', 'decorationClient.py'), 'client', ...WINDOW]);
     const window = await waitForWindow(WINDOW[0], 'a window to maximize opens');
     const color = [0, 2, 4].map(offset => parseInt(WINDOW[1].slice(offset, offset + 2), 16));
@@ -325,7 +304,6 @@ export async function run() {
   } finally {
     taskbarEditor()?.cancel();
     for (const key of KEYS) settings.reset(key);
-    for (const key of ['taskbar-position', 'taskbar-alignment']) legacy.reset(key);
     await stopAll();
   }
 }

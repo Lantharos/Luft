@@ -4,6 +4,8 @@
 portal-cancel = Cancel
 # Dialog button that grants what the app asked for
 portal-allow = Allow
+# Dialog button that refuses what the app asked for
+portal-deny = Don’t allow
 # Dialog button (verb)
 portal-share = Share
 
@@ -25,7 +27,7 @@ portal-app-chooser-description = Choose an app to continue.
 portal-app-chooser-kind = Choose an app for this kind of file ({ $kind }).
 portal-app-chooser-nothing-installed = No installed app can open this
 # Button that opens the app store to search for a suitable app
-portal-app-chooser-find = Find an App
+portal-app-chooser-find = Find an app
 # Button (verb): opens the file with the chosen app
 portal-app-chooser-open = Open
 
@@ -48,15 +50,15 @@ portal-screenshot-file-name = Screenshot { $date }
 
 ## Account details
 
-portal-account-title = Share your name and picture with { $appName }?
+portal-account-title = Let { $appName } see your name and picture?
 portal-account-description = { $appName } will see the name and picture of your account.
 
 ## Wallpaper
 
 portal-wallpaper-title = Set as your wallpaper?
-portal-wallpaper-description = { $appName } wants to change your wallpaper. It's used in light and dark style and on the lock screen.
+portal-wallpaper-description = { $appName } wants to change your wallpaper. It’s used in light and dark style and on the lock screen.
 # Button
-portal-wallpaper-set = Set Wallpaper
+portal-wallpaper-set = Set wallpaper
 
 ## USB devices
 
@@ -65,8 +67,8 @@ usb-title = { $count ->
    *[other] Let { $appName } use these devices?
 }
 usb-description = { $count ->
-    [one] { $appName } will be able to talk to the device directly while it's plugged in.
-   *[other] { $appName } will be able to talk to the devices directly while they're plugged in.
+    [one] { $appName } will be able to talk to the device directly while it’s plugged in.
+   *[other] { $appName } will be able to talk to the devices directly while they’re plugged in.
 }
 # Shown in place of the manufacturer's name when the device doesn't report one
 usb-unknown-maker = Unknown maker
@@ -77,18 +79,18 @@ usb-unknown-device = Unknown device
 screen-share-title = Share your screen with { $appName }?
 screen-share-description = { $appName } will be able to see what you choose.
 # Section heading above the list of displays
-screen-share-screens = Screens
+screen-share-screens = Displays
 # Section heading above the list of open windows
 screen-share-windows = Windows
 # Added after a display's resolution to mark the main display
-screen-share-main-screen = Main screen
+screen-share-main-screen = Main display
 # Name of a display that exists only for sharing, not a physical one
-screen-share-virtual-screen = Virtual screen
-screen-share-new-virtual-screen = New virtual screen
-screen-share-new-virtual-screen-description = An extra screen just for sharing
+screen-share-virtual-screen = Virtual display
+screen-share-new-virtual-screen = New virtual display
+screen-share-new-virtual-screen-description = An extra display just for sharing
 screen-share-nothing-to-share = There are no open windows to share.
 screen-share-remember = Remember my choice
-screen-share-remember-description = { $appName } won't have to ask again
+screen-share-remember-description = { $appName } won’t have to ask again
 screen-share-clipboard = Share the clipboard
 screen-share-clipboard-description = Copy and paste in both directions
 
@@ -130,7 +132,7 @@ print-title-from-app = Print from { $appName }
 print-accept = Print
 print-no-printers = No printers were found. Printers on your network and ones plugged in by USB show up by themselves, and others can be added in Settings.
 # Button that opens the Printers page in Settings
-print-open-settings = Printer Settings
+print-open-settings = Printer settings
 
 # Picker heading and field label
 print-printer = Printer
@@ -186,4 +188,4 @@ print-two-sided-short-edge = Short edge
 # Field label
 print-color = Color
 print-color-mode-color = Color
-print-color-mode-monochrome = Black & white
+print-color-mode-monochrome = Black and white

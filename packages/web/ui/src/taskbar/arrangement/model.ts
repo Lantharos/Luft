@@ -2,7 +2,6 @@ export type Edge = 'bottom' | 'left' | 'top' | 'right';
 export type Along = 'start' | 'center' | 'end';
 export type Spot = `${Edge}-${Along}`;
 
-/** A group of taskbar elements that sits together at one of the twelve spots. */
 export interface Island {
 	spot: Spot;
 	elements: string[];
@@ -10,7 +9,6 @@ export interface Island {
 
 export type Arrangement = Island[];
 
-/** How an arrangement is kept in GSettings, as `a(sas)`. */
 export type StoredArrangement = [string, string[]][];
 
 export const EDGES: Edge[] = ['bottom', 'left', 'top', 'right'];
@@ -49,7 +47,6 @@ export function islandOf(arrangement: Arrangement, element: string): Island | nu
 	return arrangement.find((island) => island.elements.includes(element)) ?? null;
 }
 
-/** The edge the dock sits on, which a taskbar joined into one bar runs along. */
 export function mainEdge(arrangement: Arrangement): Edge {
 	const island = islandOf(arrangement, 'dock') ?? arrangement[0];
 	return island ? edgeOf(island.spot) : 'bottom';
@@ -61,7 +58,6 @@ export function sameArrangement(a: Arrangement, b: Arrangement): boolean {
 
 const sorted = (arrangement: Arrangement) => [...arrangement].sort((a, b) => SPOTS.indexOf(a.spot) - SPOTS.indexOf(b.spot));
 
-/** Reads a stored arrangement: one island per spot, each element once, without empty islands. */
 export function parseArrangement(stored: StoredArrangement): Arrangement {
 	const placed = new Set<string>();
 	const islands = new Map<Spot, string[]>();
@@ -108,19 +104,16 @@ function place(arrangement: Arrangement, element: string): Arrangement {
 	return [...arrangement, { spot: firstFreeSpot(arrangement, preferred), elements: [element] }];
 }
 
-/** Gives every element that's missing from the arrangement a place next to its neighbours, such as an extension's next to the tray. */
 export function completeArrangement(arrangement: Arrangement, elements: string[]): Arrangement {
 	return elements.reduce((complete, element) => (islandOf(complete, element) ? complete : place(complete, element)), arrangement);
 }
 
-/** Only the elements that are there, such as those of extensions that run. */
 export function presentIn(arrangement: Arrangement, present: (element: string) => boolean): Arrangement {
 	return arrangement
 		.map((island) => ({ ...island, elements: island.elements.filter(present) }))
 		.filter((island) => island.elements.length);
 }
 
-/** A taskbar joined into one bar along `edge` keeps each island's place along its own edge, those already on `edge` first. */
 export function joinedGroups(arrangement: Arrangement, edge: Edge): Record<Along, string[]> {
 	const order = [edge, ...EDGES.filter((other) => other !== edge)];
 	const islands = [...arrangement].sort((a, b) => order.indexOf(edgeOf(a.spot)) - order.indexOf(edgeOf(b.spot)));

@@ -30,11 +30,6 @@ function lineage(pid: number): number[] {
   return chain;
 }
 
-/**
- * Hands a trusted service, such as Rover's file manager service, an activation token for a request it got from
- * another program, but only when that program, or one that started it, has the focused window or just had it. A
- * request from an app in the background can't bring a window forward this way.
- */
 export class ActivationTokens {
   private readonly dbus = Gio.DBusExportedObject.wrapJSObject(ACTIVATION_XML, this);
   private readonly focusChanged: number;

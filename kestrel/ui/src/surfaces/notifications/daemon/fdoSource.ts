@@ -4,6 +4,7 @@ import Shell from 'gi://Shell';
 
 import * as Main from '../../../core/main.js';
 import { Source, type Notification } from '../tray/notification.js';
+import type { NotificationDestroyedReason } from '../tray/notificationEnums.js';
 import { policyForApp } from '../tray/notificationPolicy.js';
 
 export const FdoNotificationDaemonSource = GObject.registerClass(
@@ -53,13 +54,13 @@ class FdoNotificationDaemonSource extends Source {
     Main.closeShellPopups();
   }
 
-  destroy(): void {
+  destroy(reason?: NotificationDestroyedReason): void {
     if (this.nameWatcherId) {
       Gio.DBus.session.unwatch_name(this.nameWatcherId);
       this.nameWatcherId = 0;
     }
 
-    super.destroy();
+    super.destroy(reason);
   }
 
   get title(): string | null {

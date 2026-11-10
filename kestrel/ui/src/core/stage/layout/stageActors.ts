@@ -6,13 +6,13 @@ import GObject from 'gi://GObject';
 import Mtk from 'gi://Mtk';
 import St from 'gi://St';
 
+import { Curve, Duration } from '../../../shared/motion/motion.js';
 import * as Main from '../../main.js';
 import type { Monitor } from './monitor.js';
 
 const SPLASH_LOGO_PLACEMENT = '/run/sushi/logo';
 const FIRMWARE_LOGO = '/sys/firmware/acpi/bgrt/image';
 const SCREEN_TRANSITION_DELAY = 250;
-const SCREEN_TRANSITION_DURATION = 500;
 
 export function firmwareLogo(monitor: Monitor): Clutter.Actor | null {
   try {
@@ -77,9 +77,9 @@ export const ScreenTransition = GObject.registerClass(class ScreenTransition ext
 
     this.ease({
       opacity: 0,
-      duration: SCREEN_TRANSITION_DURATION,
+      duration: Duration.long,
       delay: SCREEN_TRANSITION_DELAY,
-      mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+      curve: Curve.gentle,
       onStopped: () => this.hide(),
     });
   }

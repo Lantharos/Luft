@@ -32,7 +32,6 @@ class MonitorFrost {
   }
 }
 
-/** Keeps a still, optionally blurred copy of every monitor's wallpaper for see-through windows to show. */
 export class WallpaperFrost {
   private monitors: MonitorFrost[] = [];
   private incoming: MonitorFrost[] = [];

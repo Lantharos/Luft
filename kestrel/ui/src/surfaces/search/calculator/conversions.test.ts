@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 
-import { mentionsCurrency, useRates } from './currencies.js';
+import { mentionsCurrency, parseRates, useRates } from './currencies.js';
 import { evaluate } from './expression.js';
 import { convert } from './units.js';
 
@@ -47,5 +47,16 @@ describe('currencies', () => {
     expect(mentionsCurrency('€20')).toBe(true);
     expect(mentionsCurrency('usd')).toBe(false);
     expect(mentionsCurrency('10 km to mi')).toBe(false);
+  });
+});
+
+describe('downloaded rates', () => {
+  test('only plausible rates of three-letter currencies are kept', () => {
+    const text = '{"date":"2026-11-09","eur":{"usd":1.08,"all":90.9,"1inch":14.3,"__proto__":2,"gbp":"0.85","jpy":0,"chf":-1,"sek":1e999,"nok":1e-9,"USD":3}}';
+    expect(parseRates(text)).toEqual({ usd: 1.08, all: 90.9 });
+  });
+
+  test.each(['null', '[]', '{"eur":[1,2]}', '{"eur":{"usd":"1"}}', '{"usd":1.08}', 'not json'])('%s is refused', text => {
+    expect(() => parseRates(text)).toThrow();
   });
 });

@@ -21,7 +21,6 @@ export const menuItem = ([x, y]: Point, index: number, separators = 0): Point =>
 
 const USER_DIRS = GLib.build_filenamev([GLib.get_user_config_dir(), 'user-dirs.dirs']);
 
-/** Gives the session the folders a new Luft account gets, from the image's defaults, which Rover reads as it starts. */
 export async function withUserFolders(run: () => Promise<void>) {
   const defaults = read(repository('os/image/files/etc/xdg', 'user-dirs.defaults')).trim().split('\n');
   GLib.file_set_contents(USER_DIRS, defaults.map(line => {

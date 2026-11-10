@@ -3,7 +3,7 @@ import Meta from 'gi://Meta';
 import { animateActor, Curve, Duration } from '../../../shared/motion/motion.js';
 import type { Box } from '../../../shared/layout/placement.js';
 import { frameBox } from '../../windows/frames.js';
-import { CAMERA_DURATION, type Camera } from '../view/camera.js';
+import { type Camera } from '../view/camera.js';
 import { boundsOf, copyView, fitView, nearestInDirection, type View } from '../view/geometry.js';
 import { boardWindows } from './windows.js';
 
@@ -86,7 +86,7 @@ export class Focus {
   overview(): void {
     const back = this.state?.overview;
     this.release();
-    if (back) this.host.camera.animateTo(back, CAMERA_DURATION);
+    if (back) this.host.camera.animateTo(back, Duration.travel);
     else this.fitAll();
   }
 
@@ -106,7 +106,7 @@ export class Focus {
     const bounds = boundsOf(boardWindows(this.workspace).filter(window => !window.minimized).map(frameBox));
     if (!bounds) return;
     fitView(this.target, bounds, this.host.viewport, FIT_PADDING);
-    this.host.camera.animateTo(this.target, CAMERA_DURATION);
+    this.host.camera.animateTo(this.target, Duration.travel);
   }
 
   navigate(directionX: number, directionY: number): boolean {
@@ -161,7 +161,7 @@ export class Focus {
     const travel = Math.hypot(
       this.target.x + viewport.width / 2 / this.target.scale - view.x - viewport.width / 2 / view.scale,
       this.target.y + viewport.height / 2 / this.target.scale - view.y - viewport.height / 2 / view.scale) * view.scale;
-    camera.animateTo(this.target, CAMERA_DURATION, travelling ? Math.min(MAX_ARC, travel / viewport.width / ARC_REACH) : 0);
+    camera.animateTo(this.target, Duration.travel, travelling ? Math.min(MAX_ARC, travel / viewport.width / ARC_REACH) : 0);
   }
 
   private watch(window: Meta.Window): void {

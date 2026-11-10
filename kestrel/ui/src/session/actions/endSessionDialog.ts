@@ -21,7 +21,7 @@ import { ModalDialogErrors, ModalDialogError } from '../../core/runtime/dbusErro
 
 import { loadInterfaceXML } from '../../core/runtime/dbusUtils.js';
 import { loadStagedImage, type StagedImage } from './stagedImage.js';
-import { inhibitIdle, uninhibitIdle } from '../../system/power/idleInhibit.js';
+import { inhibitIdle, uninhibitIdle } from '../../system/hardware/power/idleInhibit.js';
 
 const ITEM_ICON_SIZE = 64;
 const LOW_BATTERY_THRESHOLD = 30;
@@ -123,6 +123,7 @@ export class EndSessionDialog extends ModalDialog {
     super({
       styleClass: 'end-session-dialog',
       destroyOnClose: false,
+      whileLocked: 'refuse',
     });
 
     this.loginManager.canRebootToBootLoaderMenu()
@@ -299,6 +300,7 @@ export class EndSessionDialog extends ModalDialog {
 
   override close(skipSignal = false): void {
     super.close();
+    this.stopTimer();
     this.letScreenSleep();
 
     if (!skipSignal) this.dbusImpl.emit_signal('Closed', null);
@@ -481,7 +483,7 @@ export class EndSessionDialog extends ModalDialog {
     this.updateButtons();
 
     if (!this.open()) {
-      invocation.return_error_literal(ModalDialogErrors, ModalDialogError.GRAB_FAILED, 'Cannot grab pointer and keyboard');
+      invocation.return_error_literal(ModalDialogErrors, ModalDialogError.GRAB_FAILED, 'The screen is locked');
       return;
     }
 

@@ -26,7 +26,7 @@ const enable: Enable<'helper'> = extension => {
     });
     if (message === sent) return;
     sent = message;
-    void process.write(message);
+    process.write(message).catch(() => {});
   };
   const hear = (line: string) => {
     const report = JSON.parse(line) as Report;
@@ -35,9 +35,14 @@ const enable: Enable<'helper'> = extension => {
     else return;
     settingsPage.refresh();
   };
+  const stopped = () => {
+    for (const app of APPS) states[app] = { state: 'stopped' };
+    settingsPage.refresh();
+  };
   const start = () => {
     process = helper.start();
     process.onLine(hear);
+    process.onExit(stopped);
     sent = '';
     send();
   };

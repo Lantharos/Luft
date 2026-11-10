@@ -6,33 +6,33 @@ import Meta from 'gi://Meta';
 import Shell from 'gi://Shell';
 
 import * as MessageTray from '../surfaces/notifications/tray/messageTray.js';
-import * as AccessDialog from '../system/privacy/accessDialog.js';
-import { DesktopControls } from '../system/toggles/desktopControls.js';
-import * as BrightnessManager from '../system/display/brightnessManager.js';
+import * as AccessDialog from '../system/capture/privacy/accessDialog.js';
+import { DesktopControls } from '../system/status/toggles/desktopControls.js';
+import * as BrightnessManager from '../system/hardware/display/brightnessManager.js';
 import * as Components from './components.js';
 import * as CtrlAltTab from '../desktop/switchers/ctrlAltTab.js';
 import * as EndSessionDialog from '../session/actions/endSessionDialog.js';
-import * as InputMethod from '../system/inputSources/inputMethod.js';
+import * as InputMethod from '../system/input/inputSources/inputMethod.js';
 import * as Introspect from './introspect.js';
 import * as Keyboard from '../surfaces/keyboard/manager.js';
-import * as InputSources from '../system/inputSources/keyboard.js';
+import * as InputSources from '../system/input/inputSources/keyboard.js';
 import * as KestrelUi from '../kestrelUi.js';
 import { initTheme, updateTheme } from '../appearance/kestrelTheme.js';
 import * as OsdWindow from './stage/osdWindow.js';
 import * as Layout from './stage/layout.js';
 import * as NotificationDaemon from '../surfaces/notifications/tray/notificationDaemon.js';
-import { ScreenshotUI } from '../system/screenshot/ui/screenshotUI.js';
+import { ScreenshotUI } from '../system/capture/screenshot/ui/screenshotUI.js';
 import * as ScreenShield from '../auth/lockScreen/screenShield.js';
 import * as SessionMode from './sessionMode.js';
 import * as ShellDBus from './shellDBus.js';
-import { MountOperationHandler } from '../system/drives/mountOpHandler.js';
+import { MountOperationHandler } from '../system/hardware/drives/mountOpHandler.js';
 import * as WindowManager from '../desktop/windowManager/windowManager.js';
 import { WindowRecovery } from '../desktop/windows/recovery/recovery.js';
-import * as Magnifier from '../system/accessibility/magnifier.js';
+import * as Magnifier from '../system/input/accessibility/magnifier.js';
 import * as XdndHandler from './stage/xdndHandler.js';
-import * as KbdA11yDialog from '../system/accessibility/kbdA11yDialog.js';
-import * as LocatePointer from '../system/accessibility/locatePointer.js';
-import * as PointerA11yTimeout from '../system/accessibility/pointerA11yTimeout.js';
+import * as KbdA11yDialog from '../system/input/accessibility/kbdA11yDialog.js';
+import * as LocatePointer from '../system/input/accessibility/locatePointer.js';
+import * as PointerA11yTimeout from '../system/input/accessibility/pointerA11yTimeout.js';
 import { formatError } from './runtime/errorUtils.js';
 import { AnimationsSettings } from './startup/animationsSettings.js';
 import { loadAutomation } from './startup/automation.js';
@@ -266,7 +266,7 @@ async function initializeGreeter(): Promise<void> {
   layoutManager.connect('startup-complete', () => runAutomation?.());
 }
 
-function initializeDesktop(): void {
+async function initializeDesktop(): Promise<void> {
   const quickSettings = new DesktopControls();
   global.connect('shutdown', () => quickSettings.destroy());
   KestrelUi.initialize({
@@ -293,7 +293,7 @@ function initializeDesktop(): void {
     },
     showOsd: (icon, label, level, maxLevel) => osdWindowManager.showAll(icon, label, level, maxLevel),
   });
-  screenShield.desktopStarted().catch(logError);
+  await screenShield.desktopStarted();
 }
 
 function notifyUnsafeMode(): void {
@@ -352,8 +352,8 @@ async function initializeUI(): Promise<void> {
 
   global.connect('shutdown', () => KestrelUi.shutdown());
 
-  layoutManager.connect('first-frame', initializeDesktop);
-  layoutManager.init();
+  layoutManager.init(new Promise<void>(lockRestored =>
+    layoutManager.connect('first-frame', () => void initializeDesktop().catch(logError).then(lockRestored))));
 
   new PointerA11yTimeout.PointerA11yTimeout();
 

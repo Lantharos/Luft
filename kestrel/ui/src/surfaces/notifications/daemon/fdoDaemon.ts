@@ -8,7 +8,7 @@ import * as Config from '../../../core/config.js';
 import * as Main from '../../../core/main.js';
 import { emitSignalToDestination, loadInterfaceXML } from '../../../core/runtime/dbusUtils.js';
 import { systemPrograms } from '../../../shared/apps/luftApps.js';
-import { callerOwns } from '../../../shared/dbus/processes.js';
+import { callerOwns, callerProcess } from '../../../shared/dbus/processes.js';
 import { connectionRuns } from '../../../shared/dbus/sandbox.js';
 import { Notification, Sound } from '../tray/notification.js';
 import { NotificationDestroyedReason, PrivacyScope, Urgency } from '../tray/notificationEnums.js';
@@ -17,6 +17,8 @@ import { FdoNotificationDaemonSource } from './fdoSource.js';
 const FdoNotificationsIface = loadInterfaceXML('org.freedesktop.Notifications')!;
 const RELAY = 'org.freedesktop.Notifications';
 const SYSTEM_NOTICES = systemPrograms('kestrel-settings');
+const MAX_SOURCES_WITHOUT_APP = 30;
+const MAX_SOURCES_PER_PROCESS = 5;
 
 const NotificationClosedReason = {
   EXPIRED: 1,
@@ -57,6 +59,27 @@ type NotifyParams = [string, number, string, string, string, string[], Record<st
 interface DaemonNotification {
   notification: Notification;
   source: FdoNotificationDaemonSource;
+  sender: string | undefined;
+}
+
+interface Origin {
+  readonly sender: string | undefined;
+  readonly pid: number;
+}
+
+interface SourceWithoutApp {
+  readonly key: string | null;
+  readonly pid: number;
+  readonly source: FdoNotificationDaemonSource;
+}
+
+async function callerPid(invocation: Gio.DBusMethodInvocation): Promise<number> {
+  const process = await callerProcess(invocation).catch(() => null);
+  try {
+    return process?.pid ?? 0;
+  } finally {
+    process?.close();
+  }
 }
 
 function closedReason(reason: NotificationDestroyedReason): number {
@@ -118,9 +141,9 @@ function unpackHints(packed: Record<string, GLib.Variant>): Hints {
   return hints;
 }
 
-function getApp(pid: number | undefined, appId: string | undefined, appName: string): Shell.App | null {
+function getApp(pid: number, appId: string | undefined, appName: string): Shell.App | null {
   const appSys = Shell.AppSystem.get_default();
-  let app: Shell.App | null = Shell.WindowTracker.get_default().get_app_from_pid(pid ?? 0);
+  let app: Shell.App | null = Shell.WindowTracker.get_default().get_app_from_pid(pid);
   if (!app && appId)
     app = appSys.lookup_app(`${appId}.desktop`);
   if (!app)
@@ -131,7 +154,7 @@ function getApp(pid: number | undefined, appId: string | undefined, appName: str
 export class FdoNotificationDaemon {
   private readonly dbusImpl = Gio.DBusExportedObject.wrapJSObject(FdoNotificationsIface, this);
   private readonly sourcesForApp = new Map<Shell.App, FdoNotificationDaemonSource>();
-  private readonly sourceForPidAndName = new Map<string, FdoNotificationDaemonSource>();
+  private readonly sourcesWithoutApp: SourceWithoutApp[] = [];
   private readonly notifications = new Map<number, DaemonNotification>();
   private nextNotificationId = 1;
 
@@ -151,33 +174,34 @@ export class FdoNotificationDaemon {
     return source;
   }
 
-  private getSourceForPidAndName(sender: string | undefined, pid: number | undefined, appName: string): FdoNotificationDaemonSource {
-    const key = `${pid}${appName}`;
-    const existing = this.sourceForPidAndName.get(key);
-    if (existing) return existing;
+  private getSourceForPidAndName({ sender, pid }: Origin, appName: string): FdoNotificationDaemonSource {
+    const key = pid ? `${pid}${appName}` : null;
+    const existing = key && this.sourcesWithoutApp.find(known => known.key === key);
+    if (existing) return existing.source;
+
+    const fromProcess = this.sourcesWithoutApp.filter(known => known.pid === pid);
+    if (fromProcess.length >= MAX_SOURCES_PER_PROCESS) fromProcess[0].source.destroy(NotificationDestroyedReason.EXPIRED);
+    else if (this.sourcesWithoutApp.length >= MAX_SOURCES_WITHOUT_APP) this.sourcesWithoutApp[0].source.destroy(NotificationDestroyedReason.EXPIRED);
 
     const source = new FdoNotificationDaemonSource(sender, null);
-    if (pid) {
-      this.sourceForPidAndName.set(key, source);
-      source.connect('destroy', () => this.sourceForPidAndName.delete(key));
-    }
+    const entry = { key, pid, source };
+    this.sourcesWithoutApp.push(entry);
+    source.connect('destroy', () => this.sourcesWithoutApp.splice(this.sourcesWithoutApp.indexOf(entry), 1));
 
     Main.messageTray.add(source);
     return source;
   }
 
-  private createNotification(hints: Hints, appName: string, invocation: Gio.DBusMethodInvocation): [number, DaemonNotification] {
-    const pid = hints['x-shell-sender-pid'];
-    const sender = hints['x-shell-sender'];
-    const app = getApp(pid, hints['desktop-entry'], appName);
+  private createNotification(origin: Origin, hints: Hints, appName: string, invocation: Gio.DBusMethodInvocation): [number, DaemonNotification] {
+    const app = getApp(origin.pid, hints['desktop-entry'], appName);
 
     const id = this.nextNotificationId++;
     const source = app
-      ? this.getSourceForApp(sender, app)
-      : this.getSourceForPidAndName(sender, pid, appName);
+      ? this.getSourceForApp(origin.sender, app)
+      : this.getSourceForPidAndName(origin, appName);
 
     const notification = new Notification({ source });
-    const entry = { notification, source };
+    const entry = { notification, source, sender: origin.sender };
     this.notifications.set(id, entry);
     notification.connect('destroy', (_notification, reason) => {
       this.notifications.delete(id);
@@ -191,7 +215,8 @@ export class FdoNotificationDaemon {
     let id: number;
     try {
       const hints = unpackHints(params[6]);
-      id = this.notify(params, hints, await this.privacyScope(hints, invocation), invocation);
+      const origin = await this.origin(hints, invocation);
+      id = this.notify(params, hints, origin, await this.privacyScope(hints, origin, invocation), invocation);
     } catch (error) {
       invocation.return_dbus_error('org.freedesktop.DBus.Error.InvalidArgs', `${error}`);
       return;
@@ -199,25 +224,30 @@ export class FdoNotificationDaemon {
     invocation.return_value(GLib.Variant.new('(u)', [id]));
   }
 
-  /**
-   * The `system` scope shows a notification's content on the lock screen whatever people chose, so only Luft's own
-   * system notices get it. Who sent one is what the relay in front of this daemon says, or the caller without it.
-   */
-  private async privacyScope(hints: Hints, invocation: Gio.DBusMethodInvocation): Promise<PrivacyScope> {
+  private async origin(hints: Hints, invocation: Gio.DBusMethodInvocation): Promise<Origin> {
+    if (await this.relayed(invocation)) return { sender: hints['x-shell-sender'], pid: hints['x-shell-sender-pid'] ?? 0 };
+    return { sender: invocation.get_sender()!, pid: await callerPid(invocation) };
+  }
+
+  private async relayed(invocation: Gio.DBusMethodInvocation): Promise<boolean> {
+    return invocation.get_sender() === invocation.get_connection().get_unique_name() || await callerOwns(invocation, RELAY);
+  }
+
+  private async privacyScope(hints: Hints, { sender }: Origin, invocation: Gio.DBusMethodInvocation): Promise<PrivacyScope> {
     if (hints['x-gnome-privacy-scope'] !== 'system') return PrivacyScope.USER;
-    const sender = await callerOwns(invocation, RELAY) ? hints['x-shell-sender'] : invocation.get_sender();
     const trusted = typeof sender === 'string' && await connectionRuns(invocation.get_connection(), sender, SYSTEM_NOTICES);
     return trusted ? PrivacyScope.SYSTEM : PrivacyScope.USER;
   }
 
-  private notify([appName, replacesId, appIcon, summary, body, actions]: NotifyParams, hints: Hints, privacyScope: PrivacyScope,
-    invocation: Gio.DBusMethodInvocation): number {
+  private notify([appName, replacesId, appIcon, summary, body, actions]: NotifyParams, hints: Hints, origin: Origin,
+    privacyScope: PrivacyScope, invocation: Gio.DBusMethodInvocation): number {
     const gicon = imageForNotificationData(hints);
     const sound = soundFromHints(hints);
-    const replaced = replacesId !== 0 ? this.notifications.get(replacesId) : undefined;
+    const known = replacesId !== 0 ? this.notifications.get(replacesId) : undefined;
+    const replaced = known?.sender === origin.sender ? known : undefined;
     const [id, { notification, source }] = replaced
       ? [replacesId, replaced]
-      : this.createNotification(hints, appName, invocation);
+      : this.createNotification(origin, hints, appName, invocation);
 
     notification.set({
       title: summary,
@@ -225,7 +255,7 @@ export class FdoNotificationDaemon {
       gicon,
       useBodyMarkup: true,
       sound,
-      senderPid: hints['x-shell-sender-pid'] ?? 0,
+      senderPid: origin.pid,
       acknowledged: false,
     });
     notification.clearActions();
@@ -283,8 +313,11 @@ export class FdoNotificationDaemon {
     return id;
   }
 
-  CloseNotification(id: number): void {
-    this.notifications.get(id)?.notification.destroy(NotificationDestroyedReason.SOURCE_CLOSED);
+  async CloseNotificationAsync([id]: [number], invocation: Gio.DBusMethodInvocation): Promise<void> {
+    const entry = this.notifications.get(id);
+    if (entry && (entry.sender === invocation.get_sender() || await this.relayed(invocation)))
+      entry.notification.destroy(NotificationDestroyedReason.SOURCE_CLOSED);
+    invocation.return_value(null);
   }
 
   GetCapabilities(): string[] {

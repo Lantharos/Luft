@@ -31,7 +31,7 @@ export async function allowShortcuts(handle: string, appId: string, wanted: Requ
     for (const shortcut of wanted) list.add_child(shortcutRow(shortcut));
     dialog.content.add_child(list);
     dialog.buttons([
-      { label: t('portal-cancel'), action: dialog.cancel },
+      { label: t('portal-deny'), action: dialog.cancel },
       { label: t('portal-allow'), default: true, action: () => dialog.finish(SUCCESS) },
     ]);
   });

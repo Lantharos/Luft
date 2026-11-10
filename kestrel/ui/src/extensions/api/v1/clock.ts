@@ -8,7 +8,6 @@ import type { ClockChange } from './types.js';
 
 const ZONE_FILE = '/etc/localtime';
 
-/** Every way the time can jump instead of ticking by, watched only while an extension listens. Nothing here wakes in between. */
 class ClockChanges {
   private readonly listeners = new Set<(cause: ClockChange) => void>();
   private stop: (() => void) | null = null;

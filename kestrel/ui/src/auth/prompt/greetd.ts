@@ -1,6 +1,8 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
+import { developmentPath } from '../../shared/apps/development.js';
+
 Gio._promisify(Gio.InputStream.prototype, 'read_bytes_async');
 Gio._promisify(Gio.OutputStream.prototype, 'write_all_async');
 Gio._promisify(Gio.SocketClient.prototype, 'connect_async');
@@ -86,5 +88,5 @@ export function connectGreetd(): Promise<GreetdChannel> {
 }
 
 export function connectAuthenticator(): Promise<GreetdChannel> {
-  return connect(GLib.getenv('KESTREL_AUTHENTICATE_SOCK') ?? AUTHENTICATOR_SOCKET, { abortable: true });
+  return connect(developmentPath('KESTREL_AUTHENTICATE_SOCK') ?? AUTHENTICATOR_SOCKET, { abortable: true });
 }

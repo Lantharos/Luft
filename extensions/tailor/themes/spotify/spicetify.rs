@@ -73,6 +73,19 @@ impl Ran {
     }
 }
 
+fn is_spotify(folder: &Path) -> bool {
+    folder.join("Apps").is_dir()
+}
+
+fn can_write_to(spotify: &Path) -> bool {
+    let check = spotify.join(WRITE_CHECK);
+    let writable = File::create(&check).is_ok();
+    if writable {
+        let _ = fs::remove_file(check);
+    }
+    writable
+}
+
 fn program(home: &Home) -> Option<PathBuf> {
     let usual = USUAL_FOLDERS.iter().map(|folder| home.home.join(folder));
     let shared = SHARED_FOLDERS.iter().map(PathBuf::from);
@@ -139,19 +152,9 @@ impl Spicetify {
         self.spotify().join(THEME_SCRIPT).is_file()
     }
 
-    /// Whether Spicetify can change Spotify's files, which it can't in a system-wide Flatpak or package as it comes.
+    /// Whether Spicetify can change Spotify's files, which it can't when Spotify is installed for everyone.
     pub fn can_write_to_spotify(&self) -> bool {
-        let check = self.spotify().join(WRITE_CHECK);
-        let writable = File::create(&check).is_ok();
-        if writable {
-            let _ = fs::remove_file(check);
-        }
-        writable
-    }
-
-    /// What to run so it can, for Settings to show.
-    pub fn write_access_command(&self) -> String {
-        format!("sudo chmod -R a+wr {}", self.spotify().display())
+        can_write_to(&self.spotify())
     }
 
     /// Runs where a terminal would, so a config with paths written from the home folder means the same here.
@@ -193,12 +196,20 @@ impl Spicetify {
         self.configure(&[("prefs_path", &flatpak.to_string_lossy())])
     }
 
-    /// Spicetify doesn't look inside every Flatpak folder for Spotify, so it's told where a Flatpak one is.
+    /// Spicetify doesn't look inside every Flatpak folder for Spotify, so it's told where a Flatpak one is: when it
+    /// knows of none, and when the one it knows can't be changed while this person's own can.
     pub fn find_spotify(&self, flatpaks: &[PathBuf]) -> io::Result<()> {
-        if self.spotify().join("Apps").is_dir() {
-            return Ok(());
-        }
-        match flatpaks.iter().find(|folder| folder.join("Apps").is_dir()) {
+        let known = self.spotify();
+        let found = if !is_spotify(&known) {
+            flatpaks.iter().find(|folder| is_spotify(folder))
+        } else if can_write_to(&known) {
+            None
+        } else {
+            flatpaks
+                .iter()
+                .find(|folder| is_spotify(folder) && can_write_to(folder))
+        };
+        match found {
             Some(folder) => self.configure(&[("spotify_path", &folder.to_string_lossy())]),
             None => Ok(()),
         }

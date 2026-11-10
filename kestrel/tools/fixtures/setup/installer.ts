@@ -11,6 +11,7 @@ const INSTALLER = `<node><interface name="com.lantharos.Installer1">
   <property name="SecureBootCode" type="s" access="read"/>
   <method name="Survey"><arg type="s" direction="out"/></method>
   <method name="Install"><arg type="s" direction="in"/></method>
+  <method name="OpenMovingBox"><arg type="s" direction="in"/><arg type="s" direction="out"/></method>
   <method name="Configure"><arg type="s" direction="in"/></method>
   <method name="CreateAccount"><arg type="s" direction="in"/><arg type="s" direction="in"/><arg type="s" direction="in"/></method>
   <method name="FinishFirstBoot"/>
@@ -74,7 +75,7 @@ const FROM_MEET = {
     language: 'en_US', locale: 'de_AT', timezone: 'Europe/Vienna',
     keyboards: [{layout: 'at', variant: 'nodeadkeys'}, {layout: 'us', variant: ''}],
   },
-  meet: {drive: '/org/freedesktop/UDisks2/block_devices/nvme0n1', space: ROOM, otherDrive: false, intent: 'install', room: ROOM, movingBox: null},
+  meet: {drive: '/org/freedesktop/UDisks2/block_devices/nvme0n1', space: ROOM, otherDrive: false, intent: 'install', room: ROOM, movingBox: false},
 };
 
 function relay([name, path, iface]: Endpoint, method: string, parameters: GLib.Variant | null = null) {
@@ -155,6 +156,10 @@ export function publishInstaller(publish: Publish, calls: string[]) {
       requests.push(request);
       calls.push('installer Install');
       set({Stage: 'copying', Progress: 0.37});
+    },
+    OpenMovingBox: (code: string) => {
+      calls.push(`installer OpenMovingBox ${code}`);
+      return JSON.stringify({bytes: 0, fullName: '', userName: ''});
     },
     Configure: (regional: string) => {
       requests.push(regional);

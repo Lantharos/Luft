@@ -27,13 +27,13 @@ export async function chooseCapture(handle: string, appId: string, clipboardRequ
     const extras: St.Button[] = [];
     const clipboard = clipboardRequested ? clipboardRow() : null;
     if (clipboard) extras.push(clipboard);
-    const remember = persistMode === PERSIST_UNTIL_REVOKED ? rememberRow(app.subject) : null;
+    const remember = persistMode === PERSIST_UNTIL_REVOKED ? rememberRow(app.subject, false) : null;
     if (remember) extras.push(remember);
     if (extras.length) dialog.content.add_child(list(extras));
     else dialog.content.hide();
     dialog.buttons([
-      { label: t('portal-cancel'), action: dialog.cancel },
-      { label: t('portal-allow'), default: true, action: () => {
+      { label: t('portal-deny'), default: true, action: dialog.cancel },
+      { label: t('portal-allow'), action: () => {
         choice = { clipboard: clipboard?.checked ?? false, remember: remember?.checked ?? true };
         dialog.finish(SUCCESS);
       } },

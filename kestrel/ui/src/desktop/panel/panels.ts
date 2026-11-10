@@ -71,14 +71,12 @@ export class PanelSet {
     return actor ? this.all.find(panel => panel.actor.contains(actor)) ?? null : null;
   }
 
-  /** How far the taskbar, or the corner that stands in for it, reaches in from each edge of a display. */
   depthsOn(monitor: Monitor): Depths {
     const screen = taskbarPreferences.on(monitor.index);
     if (screen.shown) return this.panelOn(monitor)?.depths ?? NO_DEPTHS;
     return { ...NO_DEPTHS, [screen.edge]: this.corner.clearance };
   }
 
-  /** Where a surface opens on a display: beside its button's island, or from the corner when the taskbar is hidden. */
   anchorFor(surface: string, monitor: Monitor): Anchor {
     const screen = taskbarPreferences.on(monitor.index);
     const anchor = screen.shown ? this.panelOn(monitor)?.anchorFor(surface) : null;

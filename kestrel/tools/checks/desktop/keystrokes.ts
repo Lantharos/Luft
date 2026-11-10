@@ -69,7 +69,6 @@ function tone(hertz: number): Float32Array {
   return Float32Array.from({length: RATE * TONE_S}, (_, index) => Math.sin(2 * Math.PI * hertz * index / RATE) * 0.5 * Math.min(1, (RATE * TONE_S - index) / 240));
 }
 
-/** A pack that plays a pure tone for each kind of press, so the speakers tell which kind a press was. */
 function installTones() {
   const folder = GLib.build_filenamev([dataFolder(), 'tones']);
   GLib.mkdir_with_parents(folder, 0o700);
@@ -238,7 +237,6 @@ async function checkFastTyping() {
 
 const percentile = (sorted: number[], at: number) => sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * at))];
 
-/** Presses keys through a {@link Shell.KeySounds} of its own, which gives what the extension can't know: how long each took. */
 async function checkLatency() {
   const mix = Shell.SoundMix.new('Keystroke timing', 'application-x-addon-symbolic');
   const sounds = Shell.KeySounds.new(mix);
@@ -272,7 +270,6 @@ async function checkLatency() {
   }
 }
 
-/** Percent of a core all of Kestrel uses and how often its threads wake, while `during` runs. */
 async function usage(during: () => Promise<void>) {
   const before = threads();
   const started = GLib.get_monotonic_time();

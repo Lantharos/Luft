@@ -2,7 +2,6 @@ import type Clutter from 'gi://Clutter';
 
 interface WallpaperPicture {
   actor: Clutter.Actor;
-  /** Whether it lies below the windows, which then hide it. */
   underWindows: boolean;
 }
 
@@ -13,7 +12,6 @@ function changed(): void {
   for (const listener of listeners) listener();
 }
 
-/** Tells whatever filters the desktop about an actor that shows the wallpaper, until it's destroyed. */
 export function showsWallpaper(actor: Clutter.Actor, underWindows: boolean): void {
   const picture = { actor, underWindows };
   pictures.add(picture);

@@ -3,7 +3,7 @@ import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import Meta from 'gi://Meta';
 import St from 'gi://St';
-import { createInputSlider } from '../../system/audio/volume.js';
+import { createInputSlider } from '../../system/sound/audio/volume.js';
 
 import type { ContextMenus, MenuEntry } from '../../desktop/menus/contextMenus.js';
 import { ScrollPane } from './scrollPane.js';

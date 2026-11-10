@@ -218,7 +218,7 @@ fn prefs_written_from_the_home_folder_are_kept() {
 }
 
 #[test]
-fn a_system_wide_flatpak_is_found_and_asks_for_write_access() {
+fn a_spotify_installed_for_everyone_is_found_and_can_t_be_dressed() {
     let mut fixture = fixture();
     let root = fixture.scratch.path().join("system");
     let folder = fixture.flatpak_spotify(&root);
@@ -226,12 +226,25 @@ fn a_system_wide_flatpak_is_found_and_asks_for_write_access() {
     fixture.set("spotify_path", "");
     fs::set_permissions(folder.join("Apps"), fs::Permissions::from_mode(0o555)).unwrap();
 
-    let problem = fixture.problem();
+    let state = fixture.spotify.apply(&sample("#a0c4ff")).unwrap();
 
     fs::set_permissions(folder.join("Apps"), fs::Permissions::from_mode(0o755)).unwrap();
-    assert_eq!(problem.state, "read-only");
-    assert!(problem.detail.starts_with("sudo chmod -R a+wr "));
-    assert!(problem.detail.ends_with(FLATPAK_FOLDER));
+    assert_eq!(state, "read-only");
+    assert_eq!(fixture.get("spotify_path"), folder.to_string_lossy());
+}
+
+#[test]
+fn this_person_s_own_spotify_takes_over_from_one_that_can_t_be_changed() {
+    let mut fixture = fixture();
+    let shared = fixture.scratch.path().join("spotify/Apps");
+    let own = fixture.flatpak_spotify(&fixture.scratch.path().join(".local/share/flatpak/app"));
+    fs::set_permissions(&shared, fs::Permissions::from_mode(0o555)).unwrap();
+
+    let state = fixture.spotify.apply(&sample("#a0c4ff")).unwrap();
+
+    fs::set_permissions(&shared, fs::Permissions::from_mode(0o755)).unwrap();
+    assert_eq!(state, "restart");
+    assert_eq!(fixture.get("spotify_path"), own.to_string_lossy());
 }
 
 #[test]

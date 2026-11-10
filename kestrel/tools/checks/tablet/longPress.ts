@@ -132,9 +132,9 @@ async function checkQuickSettings(settings: Gio.Settings) {
   try {
     settings.set_strv('quick-tiles-removed', ['screenshot', 'settings', 'lock']);
     toggleSurface('quick');
-    await eventually(() => shown(quick()) && tile('Auto Rotate')?.visible, 'the rotation tile shows on a computer with an accelerometer');
+    await eventually(() => shown(quick()) && tile('Auto-rotate')?.visible, 'the rotation tile shows on a computer with an accelerometer');
     await settled();
-    const dark = tile('Dark Style')!;
+    const dark = tile('Dark style')!;
     const checked = dark.checked;
     await hold(centerOf(dark), 'a quick setting', 'Remove');
     require(dark.checked === checked, 'holding a tile does not also toggle it');
@@ -147,7 +147,7 @@ async function checkQuickSettings(settings: Gio.Settings) {
     await tap(centerOf(dark));
     await eventually(() => dark.checked === checked, 'and tapping again toggles it back');
     await settled();
-    await hold(centerOf(tile('Auto Rotate')!), 'the rotation tile', 'Settings');
+    await hold(centerOf(tile('Auto-rotate')!), 'the rotation tile', 'Settings');
     await capture('long-press-quick-tile');
     await dismissByTap();
   } finally {

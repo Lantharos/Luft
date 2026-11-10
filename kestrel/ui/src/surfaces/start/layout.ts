@@ -14,7 +14,6 @@ export class StartLayout {
   folder(id: string): Folder | undefined { return this.layout.folders[id]; }
   items(folder: string | null = null): string[] { return folder ? this.folder(folder)?.apps ?? [] : this.layout.items; }
 
-  /** Until the person arranges Start, it lists `installed` in the order given. */
   sync(installed: string[]): void {
     if (!this.arranged) {
       this.layout.items = [...installed];

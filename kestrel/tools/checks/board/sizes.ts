@@ -58,7 +58,13 @@ async function checkFullscreen({notes}: {notes: Meta.Window}) {
   require(!notes.is_maximized(), 'it isn\'t left maximized');
 }
 
-// Tiled windows show on the board at a size of their own, not squeezed into their tiles
+function bringBackToTheStrip(windows: Meta.Window[]) {
+  for (const window of windows) {
+    if (window.minimized) window.unminimize();
+    if (window.get_maximize_flags()) window.unmaximize();
+  }
+}
+
 async function checkTiled() {
   useTiling('scrolling');
   try {
@@ -82,11 +88,7 @@ async function checkTiled() {
     require(windows.slice(1).every((window, index) => sameRect(frame(window), others[index])), 'resizing it doesn\'t rearrange the strip behind the board');
 
     await leaveBoard();
-    // Leaving maximizes one window and tucks away the rest, so bring them all back to the strip
-    for (const window of windows) {
-      if (window.minimized) window.unminimize();
-      if (window.get_maximize_flags()) window.unmaximize();
-    }
+    bringBackToTheStrip(windows);
     await restingTiles();
     const state = (window: Meta.Window) => `${describe(size(window))}${window.minimized ? ' minimized' : ''}${window.get_maximize_flags() ? ' maximized' : ''}`;
     require(windows.every((window, index) => near(frame(window).width, tiles[index].width, 2)),

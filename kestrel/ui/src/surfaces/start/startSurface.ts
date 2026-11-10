@@ -9,8 +9,6 @@ export interface StartArea {
   monitor: Monitor;
   area: Box;
   available: number;
-  cornered: boolean;
-  /** Where Start opens beside its button. */
   anchor: Anchor;
 }
 

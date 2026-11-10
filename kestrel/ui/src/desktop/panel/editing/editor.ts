@@ -22,10 +22,6 @@ interface ChromeHost {
 
 const RISE = 16;
 
-/**
- * Arranging the taskbar: the desktop dims, the twelve spots show, and islands and their elements can be dragged
- * between them, or moved with the keyboard, while the taskbar previews the result. Done saves, Escape puts it back.
- */
 export class TaskbarEditor {
   readonly panel: KestrelPanel;
   readonly layer = new St.Widget({ name: 'kestrel-arrange', reactive: true, can_focus: true, layout_manager: new Clutter.FixedLayout() });
@@ -88,7 +84,6 @@ export class TaskbarEditor {
     return this.current;
   }
 
-  /** Shows `arrangement` on the taskbar without saving it yet. */
   preview(arrangement: Arrangement): void {
     this.current = arrangement;
     taskbarArrangement.preview(arrangement);

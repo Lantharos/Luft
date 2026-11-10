@@ -17,7 +17,6 @@ const COLOR = '#bf3070';
 const TOLERANCE = 12;
 const DRAG_STEPS = 16;
 const GRAB_HEIGHT = 16;
-// Past the outline floating windows keep, but inside where a rounded corner would cut
 const OUTLINE_INSET = 3;
 const EDGES = [
   [Meta.Direction.TOP, 'top'],

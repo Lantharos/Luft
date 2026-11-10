@@ -4,6 +4,7 @@ import St from 'gi://St';
 
 import {descendants, labelOf, named, textOf} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
+import {intoRecorder} from '../lib/audio/routing.js';
 import {call} from '../lib/dbus.js';
 import {click, press} from '../lib/input/input.js';
 import {outcome, spawn, stop} from '../lib/processes.js';
@@ -55,6 +56,7 @@ export async function run() {
 
   for (const meter of LEVEL_METER_NAMES) {
     const recorder = spawn(['parecord', '--device=microphone', `--property=application.id=${meter}`, '/dev/null']);
+    await eventually(() => intoRecorder({'node.name': 'microphone'}, {'application.id': meter, 'media.class': 'Stream/Input/Audio'}), 'the microphone reaches the recorder');
     await eventually(() => privacy.visible && showsIcon(privacy, 'audio-input-microphone-symbolic'),
       `an app recording under the name ${meter} still shows the microphone`);
     await settled();

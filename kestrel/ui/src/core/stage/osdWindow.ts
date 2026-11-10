@@ -5,6 +5,7 @@ import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import St from 'gi://St';
 
+import { Curve, Duration } from '../../shared/motion/motion.js';
 import * as BarLevel from '../../shared/widgets/barLevel.js';
 import * as Layout from './layout.js';
 import * as KestrelUi from '../../kestrelUi.js';
@@ -12,8 +13,6 @@ import * as Main from '../main.js';
 
 const HIDE_TIMEOUT = 1500;
 const TASKBAR_GAP = 24;
-const FADE_TIME = 100;
-const LEVEL_ANIMATION_TIME = 100;
 
 interface OsdLevel {
   level?: number | null;
@@ -85,8 +84,8 @@ export class OsdWindow extends Clutter.Actor {
     if (value != null) {
       if (this.visible) {
         this.level.ease_property('value', value, {
-          mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-          duration: LEVEL_ANIMATION_TIME,
+          curve: Curve.gentle,
+          duration: Duration.tap,
         });
       } else {
         this.level.value = value;
@@ -115,8 +114,8 @@ export class OsdWindow extends Clutter.Actor {
     } else {
       this.ease({
         opacity: 255,
-        duration: FADE_TIME,
-        mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+        duration: Duration.tap,
+        curve: Curve.gentle,
       });
     }
     this.hideTimeoutId = GLib.timeout_add_once(GLib.PRIORITY_DEFAULT, HIDE_TIMEOUT, () => this.fadeOut());
@@ -138,8 +137,8 @@ export class OsdWindow extends Clutter.Actor {
     this.hideTimeoutId = 0;
     this.ease({
       opacity: 0,
-      duration: FADE_TIME,
-      mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+      duration: Duration.tap,
+      curve: Curve.gentle,
       onStopped: finished => {
         if (!finished) return;
         this.reset();

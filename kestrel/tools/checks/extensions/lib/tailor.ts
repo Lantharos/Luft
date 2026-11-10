@@ -19,7 +19,6 @@ export function write(path: string, text: string) {
   GLib.file_set_contents(path, text);
 }
 
-/** Stands in for Steam and Vesktop as Flatpaks that have run once: their folders hold what the real ones do. */
 export function placeApps() {
   write(VESKTOP_SETTINGS, ORIGINAL_SETTINGS);
   write(LIBRARY, STEAM_STYLES);

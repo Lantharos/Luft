@@ -191,7 +191,7 @@ async function penTapsBeside(label: string, point: Point) {
 }
 
 async function checkHeft() {
-  const heft = new LuftApp('heft', [], {}, {id: 'com.lantharos.Heft'});
+  const heft = new LuftApp('heft', [], {}, {id: 'com.lantharos.heft'});
   try {
     await heft.open();
     heft.window.maximize();

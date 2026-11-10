@@ -38,10 +38,10 @@ class ScreenCastSession extends PeerSession {
   private recording: Recording | null = null;
   private starting = false;
 
-  selectSources(selection: Selection, options: Options): void {
+  async selectSources(selection: Selection, options: Options): Promise<void> {
     this.selection = selection;
     this.persistMode = persistMode(options);
-    this.stored = storedChoice(options, STORED_SOURCES, this.appId);
+    this.stored = await storedChoice(options, STORED_SOURCES, 'screen', this.appId);
   }
 
   async start(handle: string): Promise<Outcome> {
@@ -77,10 +77,10 @@ class ScreenCastSession extends PeerSession {
       this.recording = null;
       return [ENDED, {}];
     }
-    return [SUCCESS, {
-      streams: this.recording.results,
-      ...persisted(persist, STORED_SOURCES, this.appId, this.stored?.created, [storedSources(sources)]),
-    }];
+    const { grant, results } = await persisted(persist, STORED_SOURCES, 'screen', this.appId, this.stored, [storedSources(sources)]);
+    if (!this.active) return [ENDED, {}];
+    this.granted('screen', grant);
+    return [SUCCESS, { streams: this.recording.results, ...results }];
   }
 
   protected stopped(): void {
@@ -99,11 +99,11 @@ export class ScreenCastPortal {
     respond(invocation, [SUCCESS, {}]);
   }
 
-  SelectSourcesAsync([, sessionHandle, , options]: [string, string, string, Options], invocation: Invocation): void {
+  async SelectSourcesAsync([, sessionHandle, , options]: [string, string, string, Options], invocation: Invocation): Promise<void> {
     const selection = selectionFrom(options);
     const session = findSession(sessionHandle, ScreenCastSession, invocation) ?? findSession(sessionHandle, RemoteDesktopSession, invocation);
     if (!selection || !session) return respond(invocation, [ENDED, {}]);
-    session.selectSources(selection, options);
+    await session.selectSources(selection, options);
     respond(invocation, [SUCCESS, {}]);
   }
 

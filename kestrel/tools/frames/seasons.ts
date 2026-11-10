@@ -12,7 +12,6 @@ const choose = (key: string, value: GLib.Variant) => setSetting(SEASONS, key, va
 
 let forced = false;
 
-// Effects need animations, which sessions without a GPU turn off
 async function fall(effect: string, intensity = 'heavy') {
   forced = global.force_animations;
   global.force_animations = true;

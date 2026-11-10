@@ -9,7 +9,7 @@ greeter-power = Power
 greeter-larger-text = Larger text
 greeter-screen-reader = Screen reader
 # Power menu item, puts the computer to sleep
-greeter-suspend = Suspend
+greeter-suspend = Sleep
 greeter-restart = Restart
 greeter-power-off = Power off
 # Last entry of the account list, for signing in to an account that isn't listed
@@ -36,7 +36,7 @@ lock-screen-high-contrast = High contrast
 lock-screen-dwell-click = Dwell click
 lock-screen-larger-text = Larger text
 # Power menu item, puts the computer to sleep
-lock-screen-suspend = Suspend
+lock-screen-suspend = Sleep
 # Power menu item; asks for confirmation before restarting
 lock-screen-restart = Restart…
 # Power menu item; asks for confirmation before turning the computer off
@@ -58,7 +58,7 @@ keyring-confirm = Confirm
 # Button
 keyring-allow = Allow
 # Button
-keyring-deny = Don’t Allow
+keyring-deny = Don’t allow
 # Label of the password field
 keyring-password = Password
 keyring-mismatch = The entries don’t match
@@ -130,22 +130,22 @@ auth-prompt-show-password = Show password
 
 ## Administrator authentication
 
-polkit-title = Authentication Required
+polkit-title = Password needed
 # Shown instead of the user name "root"
 polkit-administrator = Administrator
 polkit-password = Password
 polkit-cancel = Cancel
 # Button
-polkit-authenticate = Authenticate
+polkit-authenticate = Continue
 # Shown when the password or other authentication was wrong
-polkit-failed = Sorry, that didn’t work. Please try again.
+polkit-failed = That didn’t work. Try again.
 
-## Log out, power off and restart dialog
+## Sign out, power off and restart dialog
 
 # Dialog title. $userName is the person's full name
-end-session-log-out-user = Log out { $userName }?
+end-session-log-out-user = Sign out { $userName }?
 # Dialog title
-end-session-log-out-title = Log out?
+end-session-log-out-title = Sign out?
 # $userName is the person's full name
 end-session-log-out-user-countdown = { $seconds ->
     [one] Open apps close and { $userName } goes back to the login screen. This happens by itself in { $seconds } second unless you cancel.
@@ -156,9 +156,9 @@ end-session-log-out-countdown = { $seconds ->
    *[other] Open apps close and you go back to the login screen. This happens by itself in { $seconds } seconds unless you cancel.
 }
 # Button
-end-session-log-out-button = Log out
+end-session-log-out-button = Sign out
 # Why the screen stays on while the dialog counts down
-end-session-awake-reason = Counting down to power off, restart or log out
+end-session-awake-reason = Counting down to power off, restart or sign out
 # Dialog title
 end-session-power-off-title = Turn off the computer?
 # Dialog title when updates are installed before powering off
@@ -190,16 +190,16 @@ end-session-update-restart-button = Restart and install
 # Checkbox
 end-session-power-options-title = What should the computer do?
 end-session-power-options-description = You pressed the power button.
-end-session-suspend-button = Suspend
+end-session-suspend-button = Sleep
 
-end-session-install-updates = Install the update that's ready
+end-session-install-updates = Install the update that’s ready
 # Checkbox. $version is the system version the update installs
 end-session-install-version = Install version { $version }
 # A nightly build of a version that isn't out yet, like "1.2 Nightly 21": $release is the version it leads to, $number counts the nightly builds toward it
 end-session-version-nightly = { $release } Nightly { $number }
-end-session-low-battery = Low battery power: please plug in before installing updates
-end-session-busy-apps = Some applications are busy or have unsaved work
-end-session-other-users = Other users are logged in
+end-session-low-battery = The battery is low. Plug in before installing updates.
+end-session-busy-apps = Some apps are busy or have unsaved work
+end-session-other-users = Other people are signed in
 end-session-cancel = Cancel
 # Button shown in place of Restart while Alt is held; restarts into the boot menu
 end-session-boot-options = Startup options
@@ -214,4 +214,4 @@ end-session-console-user = { $userName } (console)
 ## Ctrl+Alt+Tab switcher, which moves keyboard focus between parts of the desktop
 
 # The lock screen's sign-in prompt
-ctrl-alt-tab-unlock = Unlock Window
+ctrl-alt-tab-unlock = Unlock window

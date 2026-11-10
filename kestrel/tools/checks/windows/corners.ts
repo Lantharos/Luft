@@ -15,8 +15,7 @@ const settings = new Gio.Settings({schema_id: 'com.lantharos.kestrel'});
 const BACKDROP = ['Backdrop', 'f3f3f0', [40, 40, 1100, 700]] as const;
 const NOTES = ['Notes', '1b1b1b', [200, 180, 420, 300]] as const;
 const FRAMED = ['Framed', '2e3a46', [700, 300, 360, 240]] as const;
-// Inside a square corner, but outside a rounded one
-const CORNER_INSET = 3;
+const INSIDE_SQUARE_OUTSIDE_ROUNDED_CORNER = 3;
 const BELOW = 8;
 const SHADOW_DEPTH = 12;
 
@@ -44,8 +43,8 @@ const same = (pixel: number[], color: number[]) => pixel.every((value, channel) 
 
 async function corners({window}: Opened) {
   const frame = window.get_frame_rect();
-  const left = frame.x + CORNER_INSET, right = frame.x + frame.width - 1 - CORNER_INSET;
-  const top = frame.y + CORNER_INSET, bottom = frame.y + frame.height - 1 - CORNER_INSET;
+  const left = frame.x + INSIDE_SQUARE_OUTSIDE_ROUNDED_CORNER, right = frame.x + frame.width - 1 - INSIDE_SQUARE_OUTSIDE_ROUNDED_CORNER;
+  const top = frame.y + INSIDE_SQUARE_OUTSIDE_ROUNDED_CORNER, bottom = frame.y + frame.height - 1 - INSIDE_SQUARE_OUTSIDE_ROUNDED_CORNER;
   return Promise.all([[left, top], [right, top], [left, bottom], [right, bottom]].map(([x, y]) => pixel(x, y)));
 }
 

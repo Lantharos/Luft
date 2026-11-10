@@ -71,7 +71,6 @@ function state(installed: Installed, manager: ExtensionManager): string {
   return 'off';
 }
 
-/** What `List` answers for one extension. */
 export function listed(installed: Installed, manager: ExtensionManager): Fields {
   const instance = manager.instance(installed.id);
   const fields: Fields = {

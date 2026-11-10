@@ -1,6 +1,7 @@
 import Gio from 'gi://Gio';
 import type GLib from 'gi://GLib';
 
+import { sharing, type Kind } from '../../system/capture/privacy/sharing/authority.js';
 import type { PortalDialog } from '../core/dialog.js';
 import { ENDED } from '../core/request.js';
 import { PortalSession } from '../core/session.js';
@@ -10,6 +11,7 @@ const PORTAL_PATH = '/org/freedesktop/portal/desktop';
 export abstract class PeerSession extends PortalSession {
   private readonly watch: number;
   private dialog: PortalDialog | null = null;
+  private stopSharing: (() => void) | null = null;
 
   constructor(handle: string, appId: string, owner: string) {
     super(handle, appId, owner);
@@ -20,11 +22,16 @@ export abstract class PeerSession extends PortalSession {
     Gio.DBus.session.emit_signal(this.owner, PORTAL_PATH, iface, signal, parameters);
   }
 
+  protected granted(kind: Kind, remembered: string | null): void {
+    this.stopSharing = sharing.begin(this.appId, kind, () => this.close(), remembered);
+  }
+
   protected readonly track = (dialog: PortalDialog | null) => { this.dialog = dialog; };
 
   protected closed(): void {
     Gio.bus_unwatch_name(this.watch);
     this.dialog?.finish(ENDED);
+    this.stopSharing?.();
     this.stopped();
   }
 

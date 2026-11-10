@@ -47,7 +47,6 @@ const WINDOW_INSET = 48;
 
 const showing = () => layerSheets(VISUALIZER).some(sheet => sheet.visible && sheet.opacity === 255);
 
-/** Frame times while a window slides across the bottom of the desktop, the way people drag windows over the glow. */
 async function sweep(window: Meta.Window) {
   const start = window.get_frame_rect();
   const runs: FrameRecorder[] = [];
@@ -63,7 +62,6 @@ async function sweep(window: Meta.Window) {
   return {...summarize(runs, view.get_refresh_rate()), gpu: summarizeGpu(runs)};
 }
 
-/** A strip of the desktop just inside each edge, clear of the taskbar. */
 function probes(): Record<Edge, Area> {
   const {x, y, width, height} = Main.layoutManager.getWorkAreaForMonitor(Main.layoutManager.primaryIndex);
   const middleX = Math.round(x + width / 2 - PROBE_LENGTH / 2);
@@ -76,7 +74,6 @@ function probes(): Record<Edge, Area> {
   };
 }
 
-/** The strip at the far end of a band, away from its edge, where nothing may be left of it. */
 function farEnd({x, y, width, height}: Area, edge: Edge): Area {
   const middle = edge === 'left' || edge === 'right'
     ? {x, width, y: y + Math.round((height - SHEET_END_LENGTH) / 2), height: SHEET_END_LENGTH}
@@ -89,7 +86,6 @@ function farEnd({x, y, width, height}: Area, edge: Edge): Area {
   }[edge];
 }
 
-/** What an area shows with the Visualizer's bands and without them, one right after the other. */
 async function withAndWithoutBands(area: Area) {
   const sheets = layerSheets(VISUALIZER);
   const shown = await captureFrame(area);
@@ -156,7 +152,6 @@ async function arrange(edge: Edge) {
   await pause(FADED_IN_MS);
 }
 
-/** What each edge looks like with nothing playing, for the taskbar on every edge. */
 async function restingWithTaskbars() {
   const resting = {} as Record<Edge, Resting>;
   for (const edge of EDGES) {
@@ -192,7 +187,6 @@ async function checkEdges(resting: Resting) {
   await setSetting(VISUALIZER, 'reach', new GLib.Variant('d', DEFAULT_REACH));
 }
 
-/** A spot inside the window that sits over the band of an edge, clear of its shadow and rounded corners. */
 function overBand(edge: Edge): {x: number; y: number} {
   const {x, y, width, height} = Main.layoutManager.getWorkAreaForMonitor(Main.layoutManager.primaryIndex);
   const middle = {x: Math.round(x + (width - OVER_THE_BAND) / 2), y: Math.round(y + (height - OVER_THE_BAND) / 2)};
@@ -204,7 +198,6 @@ function overBand(edge: Edge): {x: number; y: number} {
   }[edge];
 }
 
-/** Mutter lowers restacked windows past whatever else is in the window group, so the windows change places with the band showing. */
 async function checkBehindWindows() {
   const {window: above} = await openWindow('Over the band', OVER_THE_BAND, OVER_THE_BAND);
   const {window: below} = await openWindow('Under the other', OVER_THE_BAND, OVER_THE_BAND);
@@ -267,7 +260,6 @@ function ticks(path: string): number {
   return Number(fields[11]) + Number(fields[12]);
 }
 
-/** Percent of one core Kestrel uses, all of it and its compositor thread, while the music plays on these edges. */
 async function cpu(edges: readonly Edge[]) {
   const whole = '/proc/self/stat';
   const compositor = `/proc/self/task/${new TextDecoder().decode(GLib.file_get_contents(whole)[1]).split(' ')[0]}/stat`;

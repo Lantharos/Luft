@@ -76,10 +76,6 @@ function withIcon(options: Options): Options {
   return { icon: new GLib.Variant('s', DEFAULT_ICON), ...options };
 }
 
-/**
- * Asks for GnuPG's passphrases and confirmations. Only Luft's pinentry may call it: whoever asks chooses the dialog's
- * words and gets what's typed.
- */
 export class PinentryPrompter {
   private readonly dbus = Gio.DBusExportedObject.wrapJSObject(PINENTRY_XML, this);
   private incoming = Promise.resolve();

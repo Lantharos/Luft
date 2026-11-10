@@ -21,11 +21,11 @@ async function checkIdle(power: Gio.Settings) {
   power.set_string('sleep-inactive-ac-type', 'suspend');
   power.set_int('sleep-inactive-ac-timeout', SUSPEND_DELAY);
   wake();
-  await eventually(() => notified('Suspending soon'), 'a notification warns before the computer suspends');
+  await eventually(() => notified('Going to sleep soon'), 'a notification warns before the computer suspends');
   await eventually(() => Main.brightnessManager.dimming, 'the screen dims after half the screen blank delay', (SCREEN_BLANK_DELAY / 2 + 2) * 1000);
   await eventually(() => calls().includes('Suspend'), 'the computer suspends after the idle time', (SUSPEND_DELAY - SCREEN_BLANK_DELAY / 2 + 2) * 1000);
   wake();
-  await eventually(() => !Main.brightnessManager.dimming && !notified('Suspending soon'), 'using the computer brings the brightness back');
+  await eventually(() => !Main.brightnessManager.dimming && !notified('Going to sleep soon'), 'using the computer brings the brightness back');
 }
 
 async function checkInhibited(power: Gio.Settings) {
@@ -34,7 +34,7 @@ async function checkInhibited(power: Gio.Settings) {
   takeCalls();
   wake();
   await pause((INHIBITED_SUSPEND_DELAY + 1) * 1000);
-  require(!takeCalls().includes('Suspend') && !notified('Suspending soon'), 'apps that keep the session awake hold off suspending');
+  require(!takeCalls().includes('Suspend') && !notified('Going to sleep soon'), 'apps that keep the session awake hold off suspending');
 }
 
 export async function run() {

@@ -33,8 +33,8 @@ export async function shareAccount(dismissal: Dismissal, appId: string, reason: 
     card.reactive = card.can_focus = false;
     dialog.content.add_child(card);
     dialog.buttons([
-      { label: t('portal-cancel'), action: dialog.cancel },
-      { label: t('portal-share'), action: () => dialog.finish(SUCCESS), default: true },
+      { label: t('portal-deny'), action: dialog.cancel },
+      { label: t('portal-allow'), action: () => dialog.finish(SUCCESS), default: true },
     ]);
   });
   return [response, response === SUCCESS ? details(user) : {}];

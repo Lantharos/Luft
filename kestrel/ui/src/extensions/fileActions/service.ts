@@ -42,10 +42,6 @@ function actionFields(id: string, shape: FileActionShape): Fields {
   return fields;
 }
 
-/**
- * Hands Rover the actions extensions added to the menu of files and folders, tells it when they change, and runs the
- * one people chose. Only Rover may call it: the actions get the paths it sends, and sandboxed apps must not choose them.
- */
 export class FileActionsService {
   private readonly dbus = Gio.DBusExportedObject.wrapJSObject(INTERFACE, this);
   private readonly unwatched = new Map<FileActionEntry, () => void>();

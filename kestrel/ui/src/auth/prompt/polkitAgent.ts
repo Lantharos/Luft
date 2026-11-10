@@ -10,10 +10,10 @@ import St from 'gi://St';
 
 import * as Dialog from '../../shared/dialogs/dialog.js';
 import * as KestrelUi from '../../kestrelUi.js';
-import * as Main from '../../core/main.js';
 import * as ShellEntry from '../../shared/widgets/shellEntry.js';
 import * as UserWidget from '../../shared/widgets/userWidget.js';
 import { ModalDialog, State } from '../../shared/dialogs/modalDialog.js';
+import { promptGate } from '../../shared/dialogs/promptGate.js';
 import { wiggle } from '../../core/runtime/animationUtils.js';
 
 const DialogMode = {
@@ -81,11 +81,12 @@ class AuthenticationDialog extends ModalDialog {
   constructor(private readonly actionId: string, description: string, private readonly cookie: string, userNames: string[]) {
     super({ styleClass: 'prompt-dialog polkit-dialog', prompt: true });
 
-    Main.sessionMode.connectObject('updated', () => {
-      this.visible = !Main.sessionMode.isLocked;
-    }, this);
-
     this.connect('closed', () => this.onDialogClosed());
+    this.connect('notify::state', () => {
+      if (this.announced || this.state !== State.OPENING) return;
+      this.announced = true;
+      KestrelUi.playSound('notification-low');
+    });
 
     this.contentLayout.add_child(new Dialog.MessageDialogContent({
       title: KestrelUi.t('polkit-title'),
@@ -194,9 +195,6 @@ class AuthenticationDialog extends ModalDialog {
     if (!this.open()) {
       log(`polkitAuthenticationAgent: Failed to show modal dialog. Dismissing authentication request for action-id ${this.actionId} cookie ${this.cookie}`);
       this.emitDone(true);
-    } else if (!this.announced) {
-      this.announced = true;
-      KestrelUi.playSound('notification-low');
     }
   }
 
@@ -261,6 +259,7 @@ class AuthenticationDialog extends ModalDialog {
     this.passwordEntry.reactive = true;
     this.okButton.reactive = false;
 
+    this.setInitialKeyFocus(this.passwordEntry);
     this.ensureOpen();
     this.passwordEntry.grab_key_focus();
   }
@@ -345,8 +344,6 @@ class AuthenticationDialog extends ModalDialog {
   }
 
   private onDialogClosed(): void {
-    Main.sessionMode.disconnectObject(this);
-
     if (this.sessionRequestTimeoutId) GLib.source_remove(this.sessionRequestTimeoutId);
     this.sessionRequestTimeoutId = 0;
 
@@ -362,6 +359,7 @@ class AuthenticationAgent extends Shell.PolkitAuthenticationAgent {
   }
 
   private currentDialog: AuthenticationDialog | null = null;
+  private stopWaiting: (() => void) | null = null;
 
   constructor() {
     super();
@@ -386,11 +384,12 @@ class AuthenticationAgent extends Shell.PolkitAuthenticationAgent {
   }
 
   private onInitiate(actionId: string, message: string, cookie: string, userNames: string[]): void {
-    if (Main.sessionMode.isLocked) {
-      Main.sessionMode.connectObject('updated', () => {
-        Main.sessionMode.disconnectObject(this);
+    if (promptGate.locked) {
+      this.stopWaiting = promptGate.watch(() => {
+        this.stopWaiting!();
+        this.stopWaiting = null;
         this.onInitiate(actionId, message, cookie, userNames);
-      }, this);
+      });
       return;
     }
 
@@ -399,10 +398,11 @@ class AuthenticationAgent extends Shell.PolkitAuthenticationAgent {
   }
 
   private completeRequest(dismissed: boolean): void {
-    this.currentDialog!.close();
+    this.currentDialog?.close();
     this.currentDialog = null;
 
-    Main.sessionMode.disconnectObject(this);
+    this.stopWaiting?.();
+    this.stopWaiting = null;
 
     this.complete(dismissed);
   }

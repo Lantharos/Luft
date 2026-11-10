@@ -8,7 +8,6 @@ const BEAT_S = 0.5;
 const CHORDS = [[220, 261.63, 329.63], [174.61, 220, 261.63], [196, 246.94, 293.66], [164.81, 207.65, 246.94]];
 const BASS = [55, 43.65, 49, 41.2];
 
-/** A 16-bit mono WAV file. */
 export function wav(samples: Float32Array): Uint8Array {
   const bytes = new Uint8Array(44 + samples.length * 2);
   const view = new DataView(bytes.buffer);
@@ -29,7 +28,6 @@ export function wav(samples: Float32Array): Uint8Array {
   return bytes;
 }
 
-/** A few bars of drums, bass and chords, so things that follow music have something to follow. */
 function song(seconds: number): Float32Array {
   const samples = new Float32Array(RATE * seconds);
   let noise = 0;
@@ -50,7 +48,6 @@ function song(seconds: number): Float32Array {
   return samples;
 }
 
-/** Plays music into the session's speakers and lets Kestrel hear it. */
 export async function playMusic(seconds: number, until: (condition: () => Promise<boolean>, label: string) => Promise<unknown>): Promise<Process> {
   const path = GLib.build_filenamev([GLib.get_user_cache_dir(), 'music.wav']);
   GLib.file_set_contents(path, wav(song(seconds)));

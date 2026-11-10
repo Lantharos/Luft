@@ -1,7 +1,7 @@
 import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 
-import { InputSourceIndicator } from '../../../system/inputSources/indicator.js';
+import { InputSourceIndicator } from '../../../system/input/inputSources/indicator.js';
 import type { ContextMenus, MenuEntry } from '../../../desktop/menus/contextMenus.js';
 import { ControlRow } from '../../../desktop/menus/controlRow.js';
 import { t } from '../../../shared/i18n/index.js';

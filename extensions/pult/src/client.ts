@@ -10,6 +10,13 @@ const ACCOUNT = 'account';
 
 export class SignedOut extends Error {}
 
+/** Pult was reached and said no. */
+export class Refused extends Error {
+  constructor(readonly status: number) {
+    super();
+  }
+}
+
 /** Pult's API as the person signed in on this computer, with the token kept in the keyring. */
 export class PultClient {
   private token: string | null = null;
@@ -42,7 +49,7 @@ export class PultClient {
       await this.forget();
       throw new SignedOut();
     }
-    if (!response.ok && response.status !== 202) throw new Error(`Pult answered ${response.status}`);
+    if (!response.ok && response.status !== 202) throw new Refused(response.status);
     return { status: response.status, answer: response.status === 204 ? undefined as Answer : response.json<Answer>() };
   }
 
@@ -58,7 +65,7 @@ export class PultClient {
     return (await this.call<DeviceCode>('POST', '/devices/code', { name })).answer;
   }
 
-  /** Asks whether the code was confirmed: true once signed in, false while it waits. It throws once the code expired or was turned down. */
+  /** Asks whether the code was confirmed: true once signed in, false while it waits. Pult refuses with 410 once the code expired or was turned down. */
   async redeem(code: DeviceCode): Promise<boolean> {
     const { status, answer } = await this.call<{ token: string; user: Account }>('POST', '/devices/token', { deviceCode: code.deviceCode });
     if (status === 202) return false;

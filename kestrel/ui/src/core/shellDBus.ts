@@ -3,9 +3,9 @@ import GLib from 'gi://GLib';
 
 import * as Config from './config.js';
 import * as KestrelUi from '../kestrelUi.js';
-import { ScreenshotService } from '../system/screenshot/service/screenshotService.js';
+import { ScreenshotService } from '../system/capture/screenshot/service/screenshotService.js';
 import type { ScreenShield } from '../auth/lockScreen/screenShield.js';
-import type { BrightnessManager } from '../system/display/brightnessManager.js';
+import type { BrightnessManager } from '../system/hardware/display/brightnessManager.js';
 
 import { loadInterfaceXML } from './runtime/dbusUtils.js';
 

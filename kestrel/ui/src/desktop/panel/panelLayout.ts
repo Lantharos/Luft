@@ -16,16 +16,11 @@ function naturalSize(child: Clutter.Actor): [number, number] {
 const mix = (from: number, to: number, progress: number) => from + (to - from) * progress;
 const actorBox = ({ x, y, width, height }: Box) => new Clutter.ActorBox({ x1: x, y1: y, x2: x + width, y2: y + height });
 
-/**
- * Lays out a panel's islands: along one bar when they're joined, or each at its own spot on the screen when they're
- * separate. When the arrangement changes, islands glide from where they were to where they go.
- */
 export const PanelLayout = GObject.registerClass(
   class PanelLayout extends Clutter.LayoutManager {
     screen: () => TaskbarLayout = () => taskbarPreferences.desktop;
     islands: () => readonly Island[] = () => [];
     peek: Clutter.Actor | null = null;
-    /** Whose `translation-x` runs from 0 to 1 while islands glide to their new places. */
     readonly glide = new Clutter.Actor({ width: 0, height: 0 });
     private from = new Map<Clutter.Actor, Box>();
     private allocated = new Map<Clutter.Actor, Box>();
@@ -35,7 +30,6 @@ export const PanelLayout = GObject.registerClass(
       this.glide.connect('notify::translation-x', () => this.layout_changed());
     }
 
-    /** Lets every island glide from where it is now to its next place. */
     ease(): void {
       this.from = new Map();
       for (const { actor } of this.islands()) {

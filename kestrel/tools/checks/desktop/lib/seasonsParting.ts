@@ -31,7 +31,6 @@ const now = () => GLib.get_monotonic_time();
 
 const around = ([x, y]: Point, reach = CORE): Area => ({x: x - reach, y: y - reach, width: reach * 2, height: reach * 2});
 
-/** How many pixels of `area` change from one look to the next, added up, which is how much falls through it. */
 async function activity(area: Area) {
   let total = 0;
   let last: Frame | null = null;
@@ -44,7 +43,6 @@ async function activity(area: Area) {
   return total;
 }
 
-/** Whether anything hears the pointer on the bare desktop, which only followers do. */
 export const listening = () => descendants(global.window_group).some(actor => actor instanceof Meta.BackgroundActor &&
   !!GObject.signal_handler_find(actor, {signalId: 'motion-event'} as GObject.SignalMatch));
 
@@ -68,7 +66,6 @@ async function partedBy(move: () => void, release: () => void, name: string, sho
   await showing();
 }
 
-/** That what's falling moves out of the way of the pointer, with a picture of it, and comes back after. */
 export const partsForPointer = (name: string, shot: string) => partedBy(() => moveTo(POINT), rest, name, shot);
 
 async function checkFinger() {

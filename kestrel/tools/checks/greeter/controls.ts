@@ -61,7 +61,7 @@ export async function checkControls() {
 
   await eventually(() => happened('inhibit', 'handle-power-key block'), 'the login screen takes over the power button');
   press(Clutter.KEY_PowerOff);
-  await eventually(() => shown(menu) && ['Suspend', 'Restart', 'Power off'].every(item => named(item, menu)),
+  await eventually(() => shown(menu) && ['Sleep', 'Restart', 'Power off'].every(item => named(item, menu)),
     'the power button opens the power menu');
   await capture('login-power-button');
   press(Clutter.KEY_Escape);
@@ -69,10 +69,10 @@ export async function checkControls() {
   require(!events().some(event => event.type === 'power'), 'the power button’s menu ends nothing by itself');
 
   click(existing('kestrel-greeter-power'));
-  await eventually(() => shown(menu) && ['Suspend', 'Restart', 'Power off'].every(item => named(item, menu)),
+  await eventually(() => shown(menu) && ['Sleep', 'Restart', 'Power off'].every(item => named(item, menu)),
     'the power menu offers suspend, restart and power off');
   await capture('login-power-menu');
-  click(existing('Suspend', menu));
+  click(existing('Sleep', menu));
   await eventually(() => happened('power', 'suspend'), 'suspend asks the system to suspend');
   await eventually(() => !shown(menu), 'the power menu closes');
 

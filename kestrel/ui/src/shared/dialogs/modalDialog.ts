@@ -6,17 +6,16 @@ import GObject from 'gi://GObject';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
 
+import { Curve, Duration } from '../motion/motion.js';
 import * as Dialog from './dialog.js';
 import * as Layout from '../../core/stage/layout.js';
 import * as Lightbox from '../popups/lightbox.js';
 import * as Main from '../../core/main.js';
+import { promptGate, type WhileLocked } from './promptGate.js';
 
 export type { ButtonInfo } from './dialog.js';
 
-const OPEN_AND_CLOSE_TIME = 100;
-const OPEN_RISE_TIME = 220;
 const OPEN_RISE_DISTANCE = 16;
-const FADE_OUT_DIALOG_TIME = 1000;
 const PROMPT_SETTLE_TIME = 750;
 const POINTER_EVENTS = new Set([
   Clutter.EventType.BUTTON_PRESS, Clutter.EventType.BUTTON_RELEASE,
@@ -36,11 +35,8 @@ interface ModalDialogOptions {
   styleClass?: string | null;
   actionMode?: Shell.ActionMode;
   destroyOnClose?: boolean;
-  /**
-   * A system prompt, such as a password request or a question about access: it ignores keys, clicks and taps for a
-   * moment after it shows, so input meant for something else can't answer it.
-   */
   prompt?: boolean;
+  whileLocked?: WhileLocked;
 }
 
 export namespace ModalDialog {
@@ -79,6 +75,9 @@ export const ModalDialog = GObject.registerClass({
   declare private modalGrab: Clutter.Grab | null | undefined;
   declare private clearClosingSelection: (() => void) | null | undefined;
   declare private prompt: boolean;
+  declare whileLocked: WhileLocked;
+  declare private waited: boolean;
+  declare private earlyInputId: number;
   declare private settling: number;
   declare private earlyKeys: Set<number>;
 
@@ -87,6 +86,7 @@ export const ModalDialog = GObject.registerClass({
     actionMode = Shell.ActionMode.SYSTEM_MODAL,
     destroyOnClose = true,
     prompt = false,
+    whileLocked = 'wait',
   }: ModalDialogOptions = {}): void {
     super._init({
       visible: false,
@@ -136,12 +136,15 @@ export const ModalDialog = GObject.registerClass({
     this.savedKeyFocus = null;
 
     this.prompt = prompt;
+    this.whileLocked = whileLocked;
+    this.waited = false;
+    this.earlyInputId = 0;
     this.settling = 0;
     this.earlyKeys = new Set();
-    if (prompt) {
-      this.connect('captured-event', (_actor, event: Clutter.Event) => this.holdEarlyInput(event));
-      this.connect('destroy', () => this.stopSettling());
-    }
+    this.connect('destroy', () => {
+      promptGate.forget(this);
+      this.stopSettling();
+    });
   }
 
   private holdEarlyInput(event: Clutter.Event): boolean {
@@ -159,6 +162,7 @@ export const ModalDialog = GObject.registerClass({
 
   private startSettling(): void {
     this.stopSettling();
+    this.earlyInputId ||= this.connect('captured-event', (_actor, event: Clutter.Event) => this.holdEarlyInput(event));
     this.settling = GLib.timeout_add(GLib.PRIORITY_DEFAULT, PROMPT_SETTLE_TIME, () => {
       this.settling = 0;
       return GLib.SOURCE_REMOVE;
@@ -174,7 +178,6 @@ export const ModalDialog = GObject.registerClass({
     return this.currentState;
   }
 
-  /** Whether keys, clicks and taps reach it, which they don't for a moment after a prompt shows. */
   get answerable(): boolean {
     return !this.settling;
   }
@@ -210,13 +213,13 @@ export const ModalDialog = GObject.registerClass({
     this.dialogLayout.translation_y = OPEN_RISE_DISTANCE;
     this.dialogLayout.ease({
       translation_y: 0,
-      duration: OPEN_RISE_TIME,
-      mode: Clutter.AnimationMode.EASE_OUT_QUART,
+      duration: Duration.moderate,
+      curve: Curve.settle,
     });
     this.ease({
       opacity: 255,
-      duration: OPEN_AND_CLOSE_TIME,
-      mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+      duration: Duration.tap,
+      curve: Curve.gentle,
       onComplete: () => {
         this.setState(State.OPENED);
         this.emit('opened');
@@ -235,11 +238,34 @@ export const ModalDialog = GObject.registerClass({
     this.clearClosingSelection = null;
     if (this.state === State.OPENED || this.state === State.OPENING) return true;
 
+    if (!promptGate.admits(this)) {
+      if (this.whileLocked === 'refuse') return false;
+      this.leaveStage();
+      return true;
+    }
+
+    const group = Main.layoutManager.modalDialogGroup;
+    if (this.get_parent() !== group) group.add_child(this);
     if (!this.pushModal()) return false;
 
-    if (this.prompt) this.startSettling();
+    if (this.prompt || this.waited) this.startSettling();
+    this.waited = false;
     this.fadeOpen();
     return true;
+  }
+
+  holdBack(): void {
+    this.popModal();
+    this.remove_all_transitions();
+    this.dialogLayout.remove_all_transitions();
+    this.hide();
+    this.setState(State.CLOSED);
+    this.leaveStage();
+  }
+
+  private leaveStage(): void {
+    this.waited = true;
+    this.get_parent()?.remove_child(this);
   }
 
   private closeComplete(): void {
@@ -251,6 +277,11 @@ export const ModalDialog = GObject.registerClass({
   }
 
   close(): void {
+    if (promptGate.forget(this)) {
+      this.closeComplete();
+      return;
+    }
+
     this.clearClosingSelection ??= freezeSelection(this.dialogLayout);
     if (this.state === State.CLOSED || this.state === State.CLOSING) return;
 
@@ -260,8 +291,8 @@ export const ModalDialog = GObject.registerClass({
 
     this.ease({
       opacity: 0,
-      duration: OPEN_AND_CLOSE_TIME,
-      mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+      duration: Duration.tap,
+      curve: Curve.gentle,
       onComplete: () => this.closeComplete(),
     });
   }
@@ -302,8 +333,8 @@ export const ModalDialog = GObject.registerClass({
     this.popModal();
     this.dialogLayout.ease({
       opacity: 0,
-      duration: FADE_OUT_DIALOG_TIME,
-      mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+      duration: Duration.linger,
+      curve: Curve.gentle,
       onComplete: () => this.setState(State.FADED_OUT),
     });
   }

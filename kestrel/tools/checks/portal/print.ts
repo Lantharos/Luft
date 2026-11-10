@@ -86,7 +86,7 @@ async function checkOptions(dialog: Clutter.Actor) {
   await eventually(() => global.stage.get_key_focus() === ranges.clutter_text, 'the page range takes the typing');
   type('2-3');
   await eventually(() => accept.reactive, 'a page range can be typed');
-  for (const label of ['Landscape', 'Long edge', 'Black & white']) await choose(dialog, label);
+  for (const label of ['Landscape', 'Long edge', 'Black and white']) await choose(dialog, label);
   await pickFrom('A4', 'A5', 'the paper list shows what the printer takes', ['Letter', 'A5']);
 }
 

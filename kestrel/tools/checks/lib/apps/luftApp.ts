@@ -40,11 +40,9 @@ const runtime = () => ({
   WAYLAND_DISPLAY: GLib.build_filenamev([GLib.get_user_runtime_dir(), GLib.getenv('WAYLAND_DISPLAY')!]),
 });
 
-/** Starts the services D-Bus activates, such as Rover's file manager service, in the apps' runtime folder instead of the host's. */
 export const activateInAppRuntime = () => call('org.freedesktop.DBus', '/org/freedesktop/DBus', 'org.freedesktop.DBus', 'UpdateActivationEnvironment',
   new GLib.Variant('(a{ss})', [runtime()]));
 
-/** What Luft apps start with in a check: their own home and runtime folders. */
 export function environment(manifest: string | null = null): Record<string, string | null> {
   home ??= prepareHome();
   const ibus = IBus.get_address();
@@ -66,13 +64,11 @@ function command(name: string) {
 
 export const appBinary = (name: string) => command(name).path;
 
-/** Starts an app again with `args`, as the desktop does, so it hands them to the copy already running. */
 export function launchAgain(name: string, args: string[]) {
   const {path, manifest} = command(name);
   return outcome([path, ...args], {env: environment(manifest), cwd: home});
 }
 
-/** Starts an app with its output in a file instead of a pipe to Kestrel, so it keeps running when Kestrel stops. */
 export function launchDetached(name: string, log: string): number {
   const {path, manifest} = command(name);
   const launcher = new Gio.SubprocessLauncher({flags: Gio.SubprocessFlags.STDOUT_SILENCE});
@@ -102,8 +98,16 @@ function readLines(stream: Gio.InputStream, onLine: (line: string) => void) {
   next();
 }
 
-const exited = (process: Gio.Subprocess) => new Promise<void>(resolve => process.wait_async(null, () => resolve()));
 const readJson = (path: string) => JSON.parse(new TextDecoder().decode(GLib.file_get_contents(path)[1]));
+
+const alive = (pid: number) => GLib.file_test(`/proc/${pid}`, GLib.FileTest.EXISTS);
+
+function sessionDaemon(): number | null {
+  const state = GLib.build_filenamev([SABINE, 'daemon-state.json']);
+  if (!GLib.file_test(state, GLib.FileTest.EXISTS)) return null;
+  const {pid} = readJson(state);
+  return alive(pid) ? pid : null;
+}
 
 async function startSabineService(): Promise<Service> {
   const launcher = new Gio.SubprocessLauncher({flags: Gio.SubprocessFlags.STDOUT_SILENCE | Gio.SubprocessFlags.STDERR_SILENCE});
@@ -113,13 +117,11 @@ async function startSabineService(): Promise<Service> {
   }
   launcher.set_cwd(home!);
   const {active} = readJson(GLib.build_filenamev([SABINE, 'bin/current.json']));
-  const daemon = launcher.spawnv([GLib.build_filenamev([SABINE, 'bin/versions', active, 'sabine-service-daemon'])]);
-  const state = GLib.build_filenamev([SABINE, 'daemon-state.json']);
-  await waitUntil(() => GLib.file_test(state, GLib.FileTest.EXISTS) && readJson(state).pid === Number(daemon.get_identifier()),
-    'the Sabine service starts');
+  launcher.spawnv([GLib.build_filenamev([SABINE, 'bin/versions', active, 'sabine-service-daemon'])]);
+  const pid = await waitUntil(sessionDaemon, 'the Sabine service starts');
   return {stop: async () => {
-    daemon.send_signal(15);
-    await exited(daemon);
+    GLib.spawn_command_line_sync(`kill ${pid}`);
+    await waitUntil(() => !alive(pid), 'the Sabine service stops');
   }};
 }
 

@@ -15,8 +15,8 @@ import {withScheme} from '../apps/lib/palette.js';
 const {require, eventually} = checks('app access');
 const APP = 'spotify';
 const DIALOG = 'kestrel-firewall-dialog';
-const QUESTION = 'Spotify wants to accept connections from other devices on this network';
-const PROGRAM_QUESTION = 'python3 wants to accept connections from other devices on this network';
+const QUESTION = 'Spotify wants to accept connections from other devices';
+const PROGRAM_QUESTION = 'python3 wants to accept connections from other devices';
 const FLAPS = 8;
 
 const shownDialogs = () => styled(DIALOG).filter(actor => actor.mapped);

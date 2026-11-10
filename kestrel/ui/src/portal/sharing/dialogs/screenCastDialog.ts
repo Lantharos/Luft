@@ -27,7 +27,7 @@ export async function chooseSources(handle: string, appId: string, selection: Se
     opened(dialog);
     const sources = sourceList(selection, count => { share.reactive = count > 0; });
     dialog.content.add_child(sources.actor);
-    const remember = persistMode === PERSIST_UNTIL_REVOKED ? rememberRow(app.subject) : null;
+    const remember = persistMode === PERSIST_UNTIL_REVOKED ? rememberRow(app.subject, true) : null;
     if (remember) dialog.content.add_child(list([remember]));
     const [, share] = dialog.buttons([
       { label: t('portal-cancel'), action: dialog.cancel },

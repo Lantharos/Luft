@@ -47,7 +47,7 @@ export class KeyringDialog {
   }
 
   static open(prompt: Prompt, events: DialogEvents, measure?: Measure): KeyringDialog | null {
-    const modal = new ModalDialog({ styleClass: 'prompt-dialog kestrel-keyring-dialog', prompt: true });
+    const modal = new ModalDialog({ styleClass: 'prompt-dialog kestrel-keyring-dialog', prompt: true, whileLocked: 'refuse' });
     const dialog = new KeyringDialog(modal, prompt, events, measure);
     if (modal.open()) return dialog;
     modal.destroy();

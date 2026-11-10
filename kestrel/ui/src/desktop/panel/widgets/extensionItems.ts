@@ -4,14 +4,12 @@ import St from 'gi://St';
 
 import { Registry } from '../../../shared/registry.js';
 
-/** A button an extension placed on the taskbar. */
 export interface TaskbarEntry {
   readonly icon: Gio.Icon;
   readonly label: string;
   click(button: St.Button): void;
   secondaryClick(button: St.Button): void;
   watch(changed: () => void): () => void;
-  /** The button showing it, or `null` once it's gone. */
   shown(button: St.Button | null): void;
 }
 
@@ -19,7 +17,6 @@ export const taskbarEntries = new Registry<TaskbarEntry>();
 
 const ICON_SIZE = 16;
 
-/** The extensions' buttons on the primary taskbar, next to the tray. */
 export class ExtensionItems {
   readonly actor = new St.BoxLayout({ name: 'kestrel-extension-items' });
   private readonly buttons = new Map<TaskbarEntry, { button: St.Button; unwatch: () => void }>();

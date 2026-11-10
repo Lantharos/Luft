@@ -119,7 +119,6 @@ export class MonumentLayout extends Clutter.LayoutManager {
     this.show(this.progress);
   }
 
-  /** The largest clock size whose time fits in `room`, measured from the size the clock has now. */
   private fittingClock(room: number): number {
     if (!this.shownSize) return Infinity;
     const [, natural] = this.parts.time.get_preferred_width(-1);

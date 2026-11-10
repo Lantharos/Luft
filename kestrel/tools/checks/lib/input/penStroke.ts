@@ -7,7 +7,6 @@ import {nextFrame} from '../wait.js';
 
 const now = () => GLib.get_monotonic_time();
 
-/** Writes with the virtual pen through the points given, pressing hardest in the middle, `perFrame` points a frame. */
 export async function penStroke(points: Point[], perFrame = 1) {
   hover(points[0]);
   await nextFrame();

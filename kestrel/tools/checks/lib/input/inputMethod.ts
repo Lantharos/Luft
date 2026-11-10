@@ -8,7 +8,6 @@ const read = (path: string) => new TextDecoder().decode(GLib.file_get_contents(p
 
 let wokeXwayland = false;
 
-/** Xwayland starts with its first X11 client, and IBus restarts with it to serve X11 apps. */
 function wakeXwayland() {
   if (wokeXwayland) return;
   wokeXwayland = true;

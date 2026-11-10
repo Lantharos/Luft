@@ -7,9 +7,10 @@ import {descendants, named} from '../lib/actors.js';
 import {call} from '../lib/dbus.js';
 import {checks} from '../lib/check.js';
 import {click, drag, moveTo, rest} from '../lib/input/input.js';
-import {stopAll} from '../lib/processes.js';
+import {scratch, stopAll} from '../lib/processes.js';
 import {capture, screenshot} from '../lib/screenshots.js';
 import {pause} from '../lib/wait.js';
+import {removeTree} from '../apps/lib/files.js';
 import {openWindow} from '../tiling/lib/tiling.js';
 import {installBuilt, listed, request, userFolder} from '../extensions/lib/extensions.js';
 import {atRest, foot, middle, mood, near, paintsOver, report, setStrays, sprite, sprites, STRAYS, surfaceTop, taskbarTop, withRandom} from './lib/strays.js';
@@ -31,6 +32,7 @@ const SEQUENCE_STEP_MS = 100;
 const GRIP_SHARE = 0.25;
 const SETTLE_MS = 12000;
 const SEEK_ABOVE_TASKBAR = 380;
+const PACKS = scratch('stray-packs');
 const TOGETHER = /saying hello|chasing|running away|playing|sneaking up|getting bumped/;
 
 const carry = (to: [number, number], hover = 100) => drag([middle(), foot() - sprite().height * GRIP_SHARE], to, {steps: 20, hover});
@@ -323,7 +325,7 @@ async function answerFolder(path: string) {
 }
 
 function packFolder(name: string, change: (manifest: Record<string, Record<string, unknown>>) => void) {
-  const folder = GLib.build_filenamev([GLib.get_tmp_dir(), `stray-${name}-${GLib.uuid_string_random()}`]);
+  const folder = GLib.build_filenamev([PACKS, name]);
   GLib.mkdir_with_parents(folder, 0o755);
   const template = GLib.build_filenamev([userFolder(STRAYS), 'template', 'example']);
   Gio.File.new_for_path(`${template}/sheet.png`).copy(Gio.File.new_for_path(`${folder}/sheet.png`), Gio.FileCopyFlags.NONE, null, null);
@@ -342,6 +344,14 @@ async function addPack(folder: string) {
 const pageItems = async () => (await page()).flatMap(section => section.items);
 
 async function checkPacks() {
+  try {
+    await checkAddingPacks();
+  } finally {
+    removeTree(PACKS);
+  }
+}
+
+async function checkAddingPacks() {
   await addPack(packFolder('walkless', manifest => delete manifest.states.walk));
   await eventually(async () => (await pageItems()).some(item => item.type === 'text' && /which frames are walk/.test(item.text!)), 'a pack without walk frames says so plainly');
   await addPack(packFolder('oversized', manifest => (manifest.frame as unknown as number) = 25 as never));

@@ -12,7 +12,7 @@ import {changes} from '../../apps/lib/apps.js';
 import {withScheme} from '../../apps/lib/palette.js';
 
 const {require, eventually} = checks('Send sheet');
-const FLATBED = 'com.lantharos.Flatbed';
+const FLATBED = 'com.lantharos.flatbed';
 const OPEN_PICTURES: Point = [800, 733];
 const SAVE: Point = [980, 29];
 const SAVE_IN_DIALOG: Point = [813, 553];
@@ -22,7 +22,6 @@ const SAVING_MS = 60000;
 const answer = (path: string) => call('org.freedesktop.impl.portal.desktop.rover', '/org/freedesktop/portal/desktop',
   'com.lantharos.KestrelChecks.FileChooser', 'Answer', new GLib.Variant('(s)', [GLib.filename_to_uri(path, null)]));
 
-/** Saves a page in Flatbed as a PDF and sends it on with Send…, which opens the sheet for the file it wrote. */
 export async function checkFlatbed(sheet: () => Clutter.Actor | null, choice: (name: string) => Clutter.Actor | null,
   arrives: (name: string) => Promise<string>, device: string, picture: string) {
   if (!GLib.file_test(appBinary('flatbed'), GLib.FileTest.IS_EXECUTABLE)) {

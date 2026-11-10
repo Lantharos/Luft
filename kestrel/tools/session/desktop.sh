@@ -27,10 +27,10 @@ if [[ "$mode" =~ ^(capture|performance|frames|motion)$ && -n "${KESTREL_CAPTURE_
   args+=(--virtual-monitor "$KESTREL_CAPTURE_SECONDARY_SIZE")
 fi
 
-prepare_session "${KESTREL_SESSION_DIR:-$root/kestrel/run}" "$mode"
+prepare_session "$session_dir" "$mode"
 home="$session/state/luft-home"
-mkdir -p "$home/.local/share"
-ln -sfn "$HOME/.local/share/sabine" "$home/.local/share/sabine"
+mkdir -p "$home"
+export KESTREL_HOST_SABINE="$HOME/.local/share/sabine"
 export RUSTUP_HOME="${RUSTUP_HOME:-$HOME/.rustup}" CARGO_HOME="${CARGO_HOME:-$HOME/.cargo}"
 export HOME="$home"
 

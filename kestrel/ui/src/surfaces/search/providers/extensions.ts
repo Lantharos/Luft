@@ -12,7 +12,6 @@ export interface FoundByExtension {
   activate(): void;
 }
 
-/** Results an extension adds to Start's search, under its own title. */
 export interface ExtensionProvider {
   readonly key: string;
   readonly title: string;

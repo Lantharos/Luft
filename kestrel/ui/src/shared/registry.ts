@@ -1,4 +1,3 @@
-/** Things added while Kestrel runs, such as extension tiles, that a surface shows as they come and go. */
 export class Registry<Item> {
   private readonly entries: Item[] = [];
   private readonly listeners = new Set<(item: Item, added: boolean) => void>();

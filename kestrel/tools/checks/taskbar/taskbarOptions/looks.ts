@@ -50,8 +50,6 @@ function plainWallpaper(name: string, gray: number) {
   return Gio.File.new_for_path(path).get_uri();
 }
 
-// The taskbar takes its glass from the wallpaper behind it when that's
-// clearly light or dark, so each style gets the same wallpaper here
 async function withWallpaper(uri: string, action: () => Promise<void>) {
   const saved = PICTURES.map(key => [key, background.get_string(key)]);
   try {
@@ -87,7 +85,6 @@ export async function checkAlignment() {
   }, 'Start and the apps return to the middle');
 }
 
-// Fog is neither light nor dark only along its bottom
 export async function checkLooks() {
   const inBetween = taskbarEdge() === 'bottom' ? background.get_string('picture-uri') : plainWallpaper('in-between', IN_BETWEEN);
   await withWallpaper(inBetween, checkStyles);

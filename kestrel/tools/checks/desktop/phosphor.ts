@@ -18,8 +18,7 @@ const magnifier = new Gio.Settings({schema_id: 'org.gnome.desktop.a11y.applicati
 const SETTLE_MS = 400;
 const TASKBAR_ROOM = 64;
 const SAME = 2;
-// About 400 ms a frame on a mid-range GPU, slow enough to notice and far from the seconds that make a driver reset it
-const SLOW_STEPS_A_PIXEL = 1.2e11;
+const STEPS_A_PIXEL_FOR_400_MS_FRAMES = 1.2e11;
 const CAPTURED_FILTER_SAME = 8;
 const INVERT = 'filter_color.rgb = 1.0 - filter_color.rgb;';
 const RED_WINDOW = 'window_color = vec4(window_color.a, 0.0, 0.0, window_color.a);';
@@ -181,7 +180,7 @@ async function checkBrokenShaders(before: Frame) {
 
 async function checkSlowShader() {
   const shown = global.stage.peek_stage_views().reduce((total, view) => total + view.get_onscreen().get_width() * view.get_onscreen().get_height(), 0);
-  const steps = Math.round(SLOW_STEPS_A_PIXEL / shown);
+  const steps = Math.round(STEPS_A_PIXEL_FOR_400_MS_FRAMES / shown);
   const slow = `vec3 sum = vec3(0.0); for (int i = 0; i < ${steps}; i++) sum += sin(filter_color.rgb * float(i)) * 0.00001; filter_color.rgb += sum;`;
   const filter = shaders().filter(slow, {animated: 10});
   let corner = 0;

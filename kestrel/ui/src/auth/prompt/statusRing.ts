@@ -23,7 +23,6 @@ export function setColor(cr: Cairo.Context, color: Cogl.Color, alpha: number): v
   cr.setSourceRGBA(color.red / 255, color.green / 255, color.blue / 255, alpha);
 }
 
-/** Traces the ring clockwise from the top, around the avatar and rounded like it, and returns its length. */
 function traceRing(cr: Cairo.Context, avatarRadius: number): number {
   const corner = avatarRadius > 0 ? avatarRadius + RADIUS - AVATAR_RADIUS : 0;
   const straight = RADIUS - corner;
@@ -137,7 +136,7 @@ export class StatusRing extends St.Widget {
     this.progress = SWEEP;
     this.arc.ease({ opacity: 255, duration: Duration.quick, curve: Curve.decelerate });
     this.turn = 0;
-    this.ease({ turn: 1, duration: SWEEP_TIME, mode: Clutter.AnimationMode.LINEAR, repeatCount: -1 });
+    this.ease({ turn: 1, duration: SWEEP_TIME, curve: Curve.linear, repeatCount: -1 });
   }
 
   fill(progress: number, duration: number): void {

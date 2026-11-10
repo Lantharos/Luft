@@ -6,12 +6,11 @@ import St from 'gi://St';
 import * as Signals from '../../core/runtime/signals.js';
 
 import * as Main from '../../core/main.js';
+import { Curve, Duration } from '../motion/motion.js';
 import { DragDropResult, DragMotionResult, dragMonitors, type DragDelegate, type DragEvent, type DropEvent } from './dndTargets.js';
 
 export * from './dndTargets.js';
 
-const SCALE_ANIMATION_TIME = 250;
-const SNAP_BACK_ANIMATION_TIME = 250;
 const REVERT_ANIMATION_TIME = 750;
 
 const DRAG_CURSOR_MAP: Record<Exclude<DragMotionResult, typeof DragMotionResult.CONTINUE>, Clutter.CursorType> = {
@@ -192,8 +191,8 @@ class Draggable extends Signals.EventEmitter {
     dragActor.ease({
       scale_x: scale * origScale,
       scale_y: scale * origScale,
-      duration: SCALE_ANIMATION_TIME,
-      mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+      duration: Duration.standard,
+      curve: Curve.gentle,
       onComplete: update,
     });
     dragActor.get_transition('scale-x')?.connect('new-frame', update);
@@ -415,7 +414,7 @@ class Draggable extends Signals.EventEmitter {
     this.dragActor!.ease({
       ...params,
       opacity: this.dragOrigOpacity,
-      mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+      curve: Curve.gentle,
       onStopped: () => this.onAnimationComplete(eventTime),
     });
   }
@@ -507,7 +506,7 @@ class Draggable extends Signals.EventEmitter {
       y: snapBackY,
       scale_x: snapBackScale,
       scale_y: snapBackScale,
-      duration: SNAP_BACK_ANIMATION_TIME,
+      duration: Duration.standard,
     });
   }
 }

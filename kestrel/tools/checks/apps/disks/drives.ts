@@ -1,7 +1,7 @@
 import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 
-import {RECOVERY_WORD} from '../../../fixtures/system/recoveryKeys.js';
+import {RECOVERY_WORD} from '../../../fixtures/system/security/recoveryKeys.js';
 import type {ScratchKeyring} from '../../../fixtures/services/secretService.js';
 import {checks} from '../../lib/check.js';
 import {type} from '../../lib/input/input.js';

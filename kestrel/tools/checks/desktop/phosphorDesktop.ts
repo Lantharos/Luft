@@ -48,7 +48,6 @@ async function frame() {
   return renderedFrame(screen());
 }
 
-/** A view's own texture holds what it shows before a filter over the display, so a capture is what shows both kinds alike. */
 async function shownWithFilter() {
   await settled();
   await pause(250);
@@ -62,11 +61,6 @@ async function pixelsOf(shot: Frame) {
   return (x: number, y: number) => [0, 1, 2].map(channel => pixels[y * stride + x * size + channel]);
 }
 
-/**
- * Whatever is in front of the desktop stays what it was and the filter only shows through it: a pixel drawn as
- * `window + (1 - alpha) * desktop` moves by `(1 - alpha) * (filtered - plain)`, with the same alpha in each channel. Counts the
- * pixels that break that, so a halo around a window or a filtered window both show up.
- */
 async function pixelsBroken(area: Area, plain: Frame, filtered: Frame, withWindow: Frame, filteredWithWindow: Frame) {
   const [desktop, desktopFiltered, shown, shownFiltered] = await Promise.all([plain, filtered, withWindow, filteredWithWindow].map(pixelsOf));
   const scale = global.display.get_monitor_scale(global.display.get_primary_monitor());
@@ -289,7 +283,6 @@ const LOOKS: Record<string, readonly Setting[]> = {
   aberration: [['chromatic-aberration', 0.6, 0]],
 };
 
-/** With nothing between them, the pieces of the desktop have to add up to what one filter over the display shows. */
 async function checkOnePicture() {
   await stopAll();
   kestrel.set_string('taskbar-look', 'solid');

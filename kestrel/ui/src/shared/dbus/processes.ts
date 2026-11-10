@@ -44,7 +44,6 @@ export async function processOf(connection: Gio.DBusConnection, name: string): P
 
 export const callerProcess = (invocation: Gio.DBusMethodInvocation) => processOf(invocation.get_connection(), invocation.get_sender()!);
 
-/** Whether a call comes from the connection that holds `name` on the bus right now. */
 export async function callerOwns(invocation: Gio.DBusMethodInvocation, name: string): Promise<boolean> {
   try {
     const owner = await invocation.get_connection().call('org.freedesktop.DBus', '/org/freedesktop/DBus', 'org.freedesktop.DBus',

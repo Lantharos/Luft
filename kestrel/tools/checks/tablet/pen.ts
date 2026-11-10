@@ -54,7 +54,6 @@ async function checkEraserButton() {
   }
 }
 
-/** Taps the moment the pen appears, before Kestrel has heard of it, as a pen held near the screen does when it comes back on resume. */
 async function writeAtOnce() {
   let tapped = false;
   const filter = Clutter.Event.prepend_filter(null, event => {

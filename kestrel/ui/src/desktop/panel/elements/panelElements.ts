@@ -7,10 +7,10 @@ import { Tray } from '../../tray/tray.js';
 import { ExtensionItems } from '../widgets/extensionItems.js';
 import { PanelClock } from '../widgets/clock.js';
 import { BatteryIndicator } from '../../../shared/battery/indicator.js';
-import { PrivacyIndicator } from '../../../system/privacy/indicator.js';
-import { InputSourceIndicator } from '../../../system/inputSources/indicator.js';
-import { PostIndicator } from '../../../system/post/indicator.js';
-import { currentPost } from '../../../system/post/post.js';
+import { PrivacyIndicator } from '../../../system/capture/privacy/indicator.js';
+import { InputSourceIndicator } from '../../../system/input/inputSources/indicator.js';
+import { PostIndicator } from '../../../system/connectivity/post/indicator.js';
+import { currentPost } from '../../../system/connectivity/post/post.js';
 import { localized, t } from '../../../shared/i18n/index.js';
 import { isVertical, type Edge } from '../../../shared/layout/edge.js';
 import type { Taskbar } from '../taskbar/taskbar.js';
@@ -31,7 +31,6 @@ interface ElementActions {
   stopScreencast(): void;
 }
 
-/** The taskbar's elements on one display: Start, the dock and the clock everywhere, and the tray and status icons on the primary one. */
 export class TaskbarElements implements PanelElements {
   readonly clock = new PanelClock();
   readonly clockButton: St.Button;
@@ -117,7 +116,6 @@ export class TaskbarElements implements PanelElements {
     }
   }
 
-  /** This taskbar's actor for an extension's element, made the first time the arrangement places it here. */
   private extension(id: string): ElementActor | null {
     let element = this.extensions.get(id);
     if (!element) {
@@ -129,7 +127,6 @@ export class TaskbarElements implements PanelElements {
     return element;
   }
 
-  /** Lays out every extension element again, as the taskbar changes size. */
   resize(): void {
     for (const [id, element] of this.extensions) element.relayout(this.layout(this.edges.get(id) ?? 'bottom'));
   }

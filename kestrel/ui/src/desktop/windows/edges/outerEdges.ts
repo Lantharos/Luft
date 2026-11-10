@@ -34,17 +34,12 @@ function framedByX11(window: Meta.Window): boolean {
   return window.get_client_type() === Meta.WindowClientType.X11 && window.decorated;
 }
 
-/** Whether the window draws nothing outside its frame, such as shadows of its own, so its edges are where people would grab it. */
 function drawsNothingOutside(window: Meta.Window): boolean {
   const frame = window.get_frame_rect();
   const buffer = window.get_buffer_rect();
   return frame.x === buffer.x && frame.y === buffer.y && frame.width === buffer.width && frame.height === buffer.height;
 }
 
-/**
- * Lets people resize windows that draw nothing outside their frame from a band just outside their edges, so those
- * windows keep their own edges for their content. Windows with Kestrel's title bars get theirs with the bar.
- */
 export class OuterEdges {
   private readonly edges = new Map<Meta.Window, OuterEdge>();
   private readonly watched = new Map<Meta.Window, number[]>();

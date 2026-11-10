@@ -41,8 +41,8 @@ function fit(width: number, height: number, bounds: ThumbnailBounds): [number, n
   return [Math.max(1, Math.round(width * scale)), Math.max(1, Math.round(height * scale))];
 }
 
-async function decode(bytes: GLib.Bytes): Promise<Gly.Frame | null> {
-  const loader = Gly.Loader.new_for_bytes(bytes);
+async function decode(source: Gio.File | GLib.Bytes): Promise<Gly.Frame | null> {
+  const loader = source instanceof GLib.Bytes ? Gly.Loader.new_for_bytes(source) : Gly.Loader.new(source);
   loader.set_accepted_memory_formats(Gly.MemoryFormatSelection.R8G8B8A8_PREMULTIPLIED);
   const image = await loader.load_async(null);
   if (image.get_width() * image.get_height() > PIXEL_LIMIT) return null;
@@ -78,9 +78,9 @@ function render(frame: Gly.Frame, bounds: ThumbnailBounds): Thumbnail {
   return { content: Clutter.TextureContent.new_from_texture(texture, null), width, height, imageWidth, imageHeight };
 }
 
-export async function createThumbnail(bytes: GLib.Bytes, bounds: ThumbnailBounds): Promise<Thumbnail | null> {
+export async function createThumbnail(source: Gio.File | GLib.Bytes, bounds: ThumbnailBounds): Promise<Thumbnail | null> {
   try {
-    const frame = await decode(bytes);
+    const frame = await decode(source);
     return frame && render(frame, bounds);
   } catch (error) {
     if (error instanceof GLib.Error) return null;

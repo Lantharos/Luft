@@ -12,7 +12,7 @@ export function addSearch(pult: Pult): void {
     title: extension.t('search-title'),
     search: async (query): Promise<SearchResult[]> => {
       if (!pult.client.signedIn || query.trim().length < SHORTEST) return [];
-      const items = await pult.client.find(query.trim());
+      const items = await pult.client.find(query.trim()).catch(() => []);
       return items.map(item => ({
         title: item.title,
         description: `${item.inboxLabel} · ${item.place.project.name}`,

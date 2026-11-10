@@ -18,7 +18,6 @@ const CLOSE_ENOUGH = 12;
 const path = (...parts: string[]) => GLib.build_filenamev(parts);
 const entryPath = (name: string) => path(GLib.get_user_data_dir(), 'thumbnailers', `${name}.thumbnailer`);
 
-/** Points apps at this tree's thumbnailers, which they read once when they start. */
 export async function withThumbnailers(run: () => Promise<void>) {
   if (!exists(THUMBNAILER)) throw new Error('luft-thumbnailer is not built, run cargo build --release -p luft-thumbnailer');
   for (const name of ENTRIES) {

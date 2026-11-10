@@ -2,6 +2,7 @@ ARG BASE=quay.io/fedora/fedora-bootc:45
 
 FROM ${BASE} AS builder
 ARG BUN_VERSION=1.4.2
+ARG BUN_SHA256=36368faef7527875d5ffa52e53cd48021741f2a83eb6208a8dd64068d422a913
 COPY os/image/packages/build.txt /tmp/build.txt
 RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
     dnf install -y --setopt=keepcache=True dnf5-plugins rust cargo rust-std-static-x86_64-unknown-uefi \
@@ -9,6 +10,7 @@ RUN --mount=type=cache,target=/var/cache/libdnf5,sharing=locked \
     dnf builddep -y --setopt=keepcache=True mutter
 RUN mkdir -p /var/roothome && \
     curl -fsSL "https://github.com/oven-sh/bun/releases/download/bun-v${BUN_VERSION}/bun-linux-x64.zip" -o /tmp/bun.zip && \
+    echo "${BUN_SHA256}  /tmp/bun.zip" | sha256sum -c - && \
     unzip -j /tmp/bun.zip bun-linux-x64/bun -d /usr/local/bin && rm /tmp/bun.zip
 ENV CARGO_HOME=/var/cache/cargo CARGO_TARGET_DIR=/var/cache/luft-part/target LUFT_BUILD=/var/cache/luft-part/build \
     BUN_INSTALL_CACHE_DIR=/var/cache/bun RUSTC_WRAPPER=sccache SCCACHE_DIR=/var/cache/sccache SCCACHE_CACHE_SIZE=2G \
@@ -37,20 +39,23 @@ COPY --from=kestrel-build /out/ /
 FROM builder AS boot-build
 COPY --from=sources . /src/
 COPY os/image/parts/components /src/os/image/parts/components/
-COPY os/image/parts/stages/boot.sh os/image/parts/stages/needed.sh os/image/parts/stages/source-times.ts os/image/parts/stages/workspace.ts \
+COPY os/image/parts/stages/needed.sh os/image/parts/stages/source-times.ts os/image/parts/stages/workspace.ts \
   /src/os/image/parts/stages/
-ARG SIGNED_BY
 RUN --mount=type=cache,from=work,target=/var/cache/luft-part,sharing=locked \
     --mount=type=cache,from=cache,source=cargo,target=/var/cache/cargo \
     --mount=type=cache,from=cache,source=sccache,target=/var/cache/sccache \
-    --mount=type=secret,id=secureboot-key \
-    --mount=type=secret,id=secureboot-cert \
-    : "signed by ${SIGNED_BY}" && \
     exec 9>/var/cache/luft-part/lock && flock 9 && \
     bun /src/os/image/parts/stages/workspace.ts /src && \
     bun /src/os/image/parts/stages/source-times.ts /var/cache/luft-part/sources.json /src && \
-    /src/os/image/parts/stages/boot.sh /stage /run/secrets/secureboot-key /run/secrets/secureboot-cert && \
+    bun /src/os/image/parts/components/install.ts /stage --part boot && \
     /src/os/image/parts/stages/needed.sh /stage /out
+ARG SIGNED_BY
+RUN --network=none \
+    --mount=type=secret,id=secureboot-key \
+    --mount=type=secret,id=secureboot-cert \
+    : "signed by ${SIGNED_BY}" && \
+    sbsign --key /run/secrets/secureboot-key --cert /run/secrets/secureboot-cert \
+      --output /stage/usr/lib/sushi/efi/SushiBoot.efi /stage/usr/lib/sushi/efi/SushiBoot.efi
 
 FROM scratch AS boot
 COPY --from=boot-build /stage /stage
@@ -68,9 +73,11 @@ FROM scratch AS bootc
 COPY --from=bootc-build /out/ /
 
 FROM builder AS zypak-build
-ARG ZYPAK=v2025.09
-RUN git clone --quiet --depth 1 --recurse-submodules --shallow-submodules --branch "${ZYPAK}" \
-      https://github.com/refi64/zypak /var/tmp/zypak && \
+ARG ZYPAK=693a71c5ffa80ec9c9ce2ae03b1ccc493c698e53
+RUN git init --quiet /var/tmp/zypak && \
+    git -C /var/tmp/zypak fetch --quiet --depth 1 https://github.com/refi64/zypak "${ZYPAK}" && \
+    git -C /var/tmp/zypak checkout --quiet FETCH_HEAD && \
+    git -C /var/tmp/zypak submodule update --quiet --init --recursive --depth 1 && \
     make -C /var/tmp/zypak -j"$(nproc)" && \
     install -d /stage/usr/lib/zypak && \
     install -m 755 /var/tmp/zypak/build/zypak-helper /var/tmp/zypak/build/zypak-sandbox /stage/usr/lib/zypak/ && \

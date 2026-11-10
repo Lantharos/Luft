@@ -6,4 +6,6 @@ runs:
   steps:
     - name: Sign in to the registry
       shell: bash
-      run: echo "${{ github.token }}" | podman login ghcr.io --username "${{ github.actor }}" --password-stdin
+      env:
+        TOKEN: ${{ github.token }}
+      run: podman login ghcr.io --username "$GITHUB_ACTOR" --password-stdin <<<"$TOKEN"

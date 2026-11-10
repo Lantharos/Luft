@@ -13,6 +13,17 @@ on:
       channel:
         type: string
         required: true
+    secrets:
+      R2_ACCOUNT_ID:
+        required: true
+      R2_BUCKET:
+        required: true
+      R2_ACCESS_KEY_ID:
+        required: true
+      R2_SECRET_ACCESS_KEY:
+        required: true
+      LUFT_ISO_MINISIGN_KEY:
+        required: true
 
 concurrency:
   group: iso-${{ inputs.channel || 'nightly' }}
@@ -36,7 +47,7 @@ jobs:
       REPOSITORY: ghcr.io/lantharos/luft
       MAJOR: "1"
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - uses: ./.github/actions/make-room
 

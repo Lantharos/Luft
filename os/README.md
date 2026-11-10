@@ -1,4 +1,4 @@
-# Luft OS
+# Building Luft
 
 How Luft becomes an installable system: a [bootc](https://bootc-dev.github.io/bootc/) image built on `quay.io/fedora/fedora-bootc:45`, the USB stick that installs it, and VMs to try both. [How Luft fits together](https://docs.luft.computer/developers/architecture/) explains the design, and [docs/boot.md](../docs/boot.md) how a computer starts from it. The published images and sticks are described in [Images and downloads](../docs/releases.md).
 

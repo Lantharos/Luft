@@ -34,9 +34,6 @@
 	"kestrel/settings/src/modules/desktop/xsettings/resources.rs": {
 		"/etc/X11/Xresources": "Reads the system's X resources"
 	},
-	"kestrel/settings/src/modules/system/housekeeping/mounts.rs": {
-		"/etc/fstab": "Reads the drives an administrator mounts"
-	},
 	"kestrel/ui/src/extensions/api/v1/clock.ts": {
 		"/etc/localtime": "Watches for the time zone changing"
 	},
@@ -59,6 +56,9 @@
 	},
 	"packages/daylight/src/place.rs": {
 		"/etc/localtime": "Reads the time zone"
+	},
+	"packages/system/disks/src/mounting.rs": {
+		"/etc": "Refuses to mount a drive over the system's own folders"
 	},
 	"packages/system/network/src/vpn/plugins.rs": {
 		"/etc/NetworkManager/VPN": "Reads the VPN plugins installed"
@@ -109,20 +109,16 @@
 	"sushi/crates/sushi/src/display/drivers.rs": {
 		"/etc/modprobe.d/sushi.conf": "Reads the graphics drivers an administrator chose for the boot splash"
 	},
+	"sushi/crates/sushi/src/system.rs": {
+		"/etc/os-release": "Reads which system it runs on"
+	},
 	"sushi/crates/sushictl/src/failure/mod.rs": {
 		"/etc/initrd-release": "Tells whether it runs in the initramfs"
 	},
 	"sushi/crates/sushictl/src/failure/shell.rs": {
 		"/etc/shadow": "Reads whether root has a password before offering a shell"
 	},
-	"sushi/crates/sushictl/src/failure/situation.rs": {
-		"/etc/os-release": "Reads which system it runs on"
-	},
-	"sushi/crates/sushid/src/activity.rs": {
-		"/etc/os-release": "Reads which system it runs on"
-	},
 	"sushi/data/dracut/module-setup.sh": {
-		"/etc/modprobe.d/sushi.conf": "Copies an administrator's settings into the initramfs",
 		"/etc/sushi/sushi.conf": "Copies an administrator's settings into the initramfs"
 	},
 	"sushi/data/systemd/sushi-drivers.service": {

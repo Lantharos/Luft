@@ -5,7 +5,6 @@ import type { Viewport } from '../viewport.svelte';
 
 type Sample = Pick<PointerEvent, 'clientX' | 'clientY'>;
 
-/** Dragging across a book page's printed text to pick some of it. */
 export class TextPicking {
 	private glyphs: Glyphs[] | null = null;
 	private readonly from: [number, number];

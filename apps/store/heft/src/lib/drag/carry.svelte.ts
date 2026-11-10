@@ -1,10 +1,5 @@
 import type { Bounds, Stroke } from '#lib/ink/stroke.js';
 
-/**
- * What can be carried from one pane to the other in split view: ink picked
- * with the lasso, with a picture of the printed page under it when it came
- * from a book, or picked book text.
- */
 export type Carried =
 	| { kind: 'ink'; strokes: Stroke[]; bounds: Bounds; grab: [number, number]; picture: (() => Promise<HTMLCanvasElement>) | null }
 	| { kind: 'text'; text: string };
@@ -27,7 +22,6 @@ class Carry {
 		return () => this.zones.delete(zone);
 	}
 
-	/** The pane other than `source` under a point, if any. */
 	elsewhere(source: HTMLElement, x: number, y: number) {
 		for (const zone of this.zones) {
 			if (zone.element === source) continue;
@@ -48,7 +42,6 @@ class Carry {
 		this.y = y;
 	}
 
-	/** Puts what's carried where it was let go, when that's over the other pane. */
 	end(drop: boolean) {
 		const zone = drop && this.source ? this.elsewhere(this.source, this.x, this.y) : null;
 		if (zone && this.item) zone.take(this.item, this.x, this.y);

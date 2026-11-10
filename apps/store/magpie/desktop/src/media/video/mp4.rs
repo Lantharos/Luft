@@ -57,10 +57,10 @@ fn child<'a>(data: &'a [u8], kind: &[u8; 4]) -> Option<&'a [u8]> {
         .find_map(|(found, payload)| (&found == kind).then_some(payload))
 }
 
-fn movie(file: &mut File) -> Option<Vec<u8>> {
-    let length = file.metadata().ok()?.len();
+fn movie(file: &mut (impl Read + Seek)) -> Option<Vec<u8>> {
+    let length = file.seek(SeekFrom::End(0)).ok()?;
     let mut offset = 0;
-    while offset + 8 <= length {
+    while length - offset >= 8 {
         file.seek(SeekFrom::Start(offset)).ok()?;
         let mut header = [0_u8; 16];
         file.read_exact(&mut header[..8]).ok()?;
@@ -72,7 +72,7 @@ fn movie(file: &mut File) -> Option<Vec<u8>> {
             }
             size => (u64::from(size), 8),
         };
-        if size < header_length {
+        if size < header_length || size > length - offset {
             return None;
         }
         if &header[4..8] == b"moov" {
@@ -95,10 +95,10 @@ fn language(packed: u16) -> Option<String> {
 
 fn track(trak: &[u8]) -> Option<Track<'_>> {
     let header = child(trak, b"tkhd")?;
-    let id = be32(header, if header[0] == 1 { 20 } else { 12 })?;
+    let id = be32(header, if *header.first()? == 1 { 20 } else { 12 })?;
     let media = child(trak, b"mdia")?;
     let media_header = child(media, b"mdhd")?;
-    let (timescale_at, language_at) = if media_header[0] == 1 {
+    let (timescale_at, language_at) = if *media_header.first()? == 1 {
         (20, 32)
     } else {
         (12, 20)
@@ -180,18 +180,19 @@ struct Sample {
     duration: u32,
 }
 
-fn samples(table: &[u8]) -> Option<Vec<Sample>> {
-    let sizes_box = child(table, b"stsz")?;
-    let uniform = be32(sizes_box, 4)?;
-    let count = be32(sizes_box, 8)? as usize;
-    let size = |index: usize| {
-        if uniform != 0 {
-            Some(uniform)
-        } else {
-            be32(sizes_box, 12 + index * 4)
-        }
-    };
-    let offsets: Vec<u64> = if let Some(offsets) = child(table, b"stco") {
+struct Layout<'a> {
+    sizes: &'a [u8],
+    uniform_size: u32,
+    count: u64,
+    chunk_offsets: Vec<u64>,
+    chunk_runs: Vec<(usize, u32)>,
+    times: &'a [u8],
+    time_runs: usize,
+}
+
+fn layout(table: &[u8]) -> Option<Layout<'_>> {
+    let sizes = child(table, b"stsz")?;
+    let chunk_offsets = if let Some(offsets) = child(table, b"stco") {
         (0..be32(offsets, 4)? as usize)
             .map(|index| be32(offsets, 8 + index * 4).map(u64::from))
             .collect::<Option<_>>()?
@@ -201,49 +202,81 @@ fn samples(table: &[u8]) -> Option<Vec<Sample>> {
             .map(|index| be64(offsets, 8 + index * 8))
             .collect::<Option<_>>()?
     };
-    let chunk_runs = child(table, b"stsc")?;
-    let runs: Vec<(usize, u32)> = (0..be32(chunk_runs, 4)? as usize)
+    let runs = child(table, b"stsc")?;
+    let chunk_runs = (0..be32(runs, 4)? as usize)
         .map(|index| {
             let at = 8 + index * 12;
-            Some((be32(chunk_runs, at)? as usize, be32(chunk_runs, at + 4)?))
+            Some((be32(runs, at)? as usize, be32(runs, at + 4)?))
         })
         .collect::<Option<_>>()?;
     let times = child(table, b"stts")?;
-    let mut durations = Vec::with_capacity(count);
-    for index in 0..be32(times, 4)? as usize {
-        let at = 8 + index * 8;
-        durations.extend(std::iter::repeat_n(
-            be32(times, at + 4)?,
-            be32(times, at)? as usize,
-        ));
-    }
-    let mut samples = Vec::with_capacity(count);
+    Some(Layout {
+        sizes,
+        uniform_size: be32(sizes, 4)?,
+        count: u64::from(be32(sizes, 8)?),
+        chunk_offsets,
+        chunk_runs,
+        times,
+        time_runs: be32(times, 4)? as usize,
+    })
+}
+
+fn samples(
+    table: &[u8],
+    file_length: u64,
+    mut visit: impl FnMut(Sample) -> Result<(), String>,
+) -> Result<(), String> {
+    const UNREADABLE: &str = "This track can't be read";
+    let layout = layout(table).ok_or(UNREADABLE)?;
+    let mut durations = (0..layout.time_runs)
+        .map_while(|index| {
+            let at = 8 + index * 8;
+            Some((be32(layout.times, at)?, be32(layout.times, at + 4)?))
+        })
+        .flat_map(|(run, duration)| std::iter::repeat_n(duration, run as usize));
+    let count = if layout.uniform_size == 0 {
+        layout.count
+    } else {
+        layout
+            .count
+            .min(file_length / u64::from(layout.uniform_size))
+    };
+    let mut index = 0;
     let mut start = 0_u64;
-    for (chunk, &chunk_offset) in offsets.iter().enumerate() {
-        let per_chunk = runs
+    for (chunk, &chunk_offset) in layout.chunk_offsets.iter().enumerate() {
+        let per_chunk = layout
+            .chunk_runs
             .iter()
             .rev()
             .find(|(first, _)| *first <= chunk + 1)
             .map_or(0, |(_, per_chunk)| *per_chunk);
         let mut offset = chunk_offset;
         for _ in 0..per_chunk {
-            let index = samples.len();
             if index >= count {
-                return Some(samples);
+                return Ok(());
             }
-            let size = size(index)?;
-            let duration = durations.get(index).copied().unwrap_or(0);
-            samples.push(Sample {
+            let size = if layout.uniform_size != 0 {
+                layout.uniform_size
+            } else {
+                be32(layout.sizes, 12 + index as usize * 4).ok_or(UNREADABLE)?
+            };
+            let end = offset
+                .checked_add(u64::from(size))
+                .filter(|end| *end <= file_length)
+                .ok_or(UNREADABLE)?;
+            let duration = durations.next().unwrap_or(0);
+            visit(Sample {
                 offset,
                 size,
                 start,
                 duration,
-            });
-            offset += u64::from(size);
+            })?;
+            index += 1;
+            offset = end;
             start += u64::from(duration);
         }
     }
-    Some(samples)
+    Ok(())
 }
 
 fn sample_text(codec: &[u8; 4], data: &[u8]) -> String {
@@ -267,6 +300,7 @@ fn sample_text(codec: &[u8; 4], data: &[u8]) -> String {
 pub fn cues(path: &Path, id: u32) -> Result<Vec<Cue>, String> {
     let mut file = File::open(path).map_err(|error| error.to_string())?;
     let moov = movie(&mut file).ok_or("This video has no index")?;
+    let file_length = file.metadata().map_err(|error| error.to_string())?.len();
     let track = children(&moov)
         .into_iter()
         .filter(|(kind, _)| kind == b"trak")
@@ -275,20 +309,122 @@ pub fn cues(path: &Path, id: u32) -> Result<Vec<Cue>, String> {
         .ok_or("Unknown track")?;
     let timescale = f64::from(track.timescale.max(1));
     let mut cues = Vec::new();
-    for sample in samples(track.table).ok_or("This track can't be read")? {
+    samples(track.table, file_length, |sample| {
         let mut data = vec![0; sample.size as usize];
         file.seek(SeekFrom::Start(sample.offset))
             .and_then(|_| file.read_exact(&mut data))
             .map_err(|error| error.to_string())?;
         let text = sample_text(&track.codec, &data);
-        if text.trim().is_empty() {
-            continue;
+        if !text.trim().is_empty() {
+            cues.push(Cue {
+                start: sample.start as f64 / timescale,
+                end: (sample.start + u64::from(sample.duration)) as f64 / timescale,
+                text: text.trim().to_string(),
+            });
         }
-        cues.push(Cue {
-            start: sample.start as f64 / timescale,
-            end: (sample.start + u64::from(sample.duration)) as f64 / timescale,
-            text: text.trim().to_string(),
-        });
-    }
+        Ok(())
+    })?;
     Ok(cues)
+}
+
+#[cfg(test)]
+mod tests {
+    use std::io::Cursor;
+
+    use super::*;
+
+    fn boxed(kind: &[u8; 4], payload: &[u8]) -> Vec<u8> {
+        let mut bytes = (payload.len() as u32 + 8).to_be_bytes().to_vec();
+        bytes.extend_from_slice(kind);
+        bytes.extend_from_slice(payload);
+        bytes
+    }
+
+    fn words(values: &[u32]) -> Vec<u8> {
+        values
+            .iter()
+            .flat_map(|value| value.to_be_bytes())
+            .collect()
+    }
+
+    fn sample_table(sizes: &[u32], chunk_offsets: &[u32], runs: &[u32], times: &[u32]) -> Vec<u8> {
+        [
+            boxed(b"stsz", &words(sizes)),
+            boxed(b"stco", &words(chunk_offsets)),
+            boxed(b"stsc", &words(runs)),
+            boxed(b"stts", &words(times)),
+        ]
+        .concat()
+    }
+
+    #[test]
+    fn finds_the_index_after_other_boxes() {
+        let mut file = boxed(b"ftyp", b"isom");
+        file.extend(boxed(b"moov", b"index"));
+        assert_eq!(
+            movie(&mut Cursor::new(file)).as_deref(),
+            Some(&b"index"[..])
+        );
+    }
+
+    #[test]
+    fn refuses_an_index_larger_than_the_file() {
+        let mut file = words(&[1]);
+        file.extend_from_slice(b"moov");
+        file.extend(u64::MAX.to_be_bytes());
+        assert_eq!(movie(&mut Cursor::new(file)), None);
+    }
+
+    #[test]
+    fn refuses_a_box_that_runs_past_the_file() {
+        let mut file = words(&[1]);
+        file.extend_from_slice(b"free");
+        file.extend((u64::MAX - 7).to_be_bytes());
+        file.extend(boxed(b"moov", b"index"));
+        assert_eq!(movie(&mut Cursor::new(file)), None);
+    }
+
+    #[test]
+    fn skips_a_track_with_empty_headers() {
+        let media = [boxed(b"mdhd", &[]), boxed(b"hdlr", &[0; 12])].concat();
+        assert!(track(&boxed(b"tkhd", &[])).is_none());
+        assert!(track(&[boxed(b"tkhd", &[0; 16]), boxed(b"mdia", &media)].concat()).is_none());
+    }
+
+    fn laid_out(table: &[u8], file_length: u64) -> Result<Vec<(u64, u32, u64, u32)>, String> {
+        let mut found = Vec::new();
+        samples(table, file_length, |sample| {
+            found.push((sample.offset, sample.size, sample.start, sample.duration));
+            Ok(())
+        })?;
+        Ok(found)
+    }
+
+    #[test]
+    fn lays_samples_out_by_chunk() {
+        let table = sample_table(
+            &[0, 0, 3, 10, 20, 30],
+            &[0, 2, 100, 200],
+            &[0, 2, 1, 2, 0, 2, 1, 0],
+            &[0, 2, 2, 5, 1, 7],
+        );
+        assert_eq!(
+            laid_out(&table, 1000).unwrap(),
+            [(100, 10, 0, 5), (110, 20, 5, 5), (200, 30, 10, 7)]
+        );
+    }
+
+    #[test]
+    fn samples_stay_inside_the_file() {
+        let past_the_end =
+            sample_table(&[0, 0, 1, 50], &[0, 1, 90], &[0, 1, 1, 1, 0], &[0, 1, 1, 1]);
+        assert!(laid_out(&past_the_end, 100).is_err());
+        let claimed = sample_table(
+            &[0, 4, u32::MAX],
+            &[0, 1, 0],
+            &[0, 1, 1, u32::MAX, 0],
+            &[0, 1, u32::MAX, 1],
+        );
+        assert_eq!(laid_out(&claimed, 40).unwrap().len(), 10);
+    }
 }

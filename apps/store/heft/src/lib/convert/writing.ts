@@ -28,7 +28,6 @@ export interface Insertion {
 
 const escape = (text: string) => text.replaceAll('&', '&amp;').replaceAll('<', '&lt;');
 
-/** Where the letters of a line sit: most letters end on the baseline, a few hang below it. */
 function baselineOf(strokes: Stroke[]) {
 	const bottoms = strokes.map((stroke) => stroke.bounds.bottom).toSorted((a, b) => a - b);
 	return bottoms[Math.floor((bottoms.length - 1) * LETTER_BOTTOMS)];
@@ -36,7 +35,6 @@ function baselineOf(strokes: Stroke[]) {
 
 const boxOf = (page: Page, id: string) => page.element.querySelector<HTMLElement>(`[data-object="${id}"]`);
 
-/** Puts text into a box that's on the page: at a point in it, or at its end on the same line or the next. */
 function into(page: Page, object: PageObject, text: string, at: number | 'end' | 'next') {
 	const box = boxOf(page, object.id);
 	if (!box) return null;
@@ -55,12 +53,6 @@ function into(page: Page, object: PageObject, text: string, at: number | 'end' |
 	return { ...object, html: cleanHtml(box.innerHTML), text: box.innerText.trim(), height: box.offsetHeight };
 }
 
-/**
- * Where a line goes among the text already on the page: onto the end of the
- * box ending on the same line before it, or on the line above in the same
- * column; on paper of its own when it's clear of other text; or nowhere,
- * staying ink, when it was written over text it couldn't replace.
- */
 function placeAmong(page: Page, line: WrittenLine, baseline: number): { object: PageObject; at: 'end' | 'next' } | 'new' | null {
 	const { step, size } = page.lines;
 	const right = line.box.left + line.box.width;
@@ -101,13 +93,6 @@ function newBox(page: Page, line: WrittenLine, baseline: number, text: string): 
 	};
 }
 
-/**
- * Turns handwritten lines into typed text where they were written, line by
- * line: the lines written right after a mark go where it asked, the others
- * onto the end of text they carry on, or as new text on the paper's lines.
- * Each line's ink goes in the same change that adds its text, so undoing
- * brings the handwriting back.
- */
 export async function convert(page: Page, strokes: Stroke[], insertion: Insertion | null) {
 	let pending = insertion;
 	for (const line of writtenLines(strokes)) {

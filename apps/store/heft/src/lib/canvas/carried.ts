@@ -11,7 +11,6 @@ async function png(canvas: HTMLCanvasElement) {
 	return new Uint8Array(await blob.arrayBuffer());
 }
 
-/** A pane that takes what's carried over from the other one, at the page under where it's let go. */
 export function carryZone(element: HTMLElement, viewport: Viewport, notebook: OpenNotebook, stores: Map<string, PageStore>): CarryZone {
 	return {
 		element,

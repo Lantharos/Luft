@@ -1,15 +1,12 @@
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
-/// A page's corners on its picture, top left, top right, bottom right and
-/// bottom left, each as fractions of the picture's width and height.
 #[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize, Type)]
 pub struct Quad(pub [[f32; 2]; 4]);
 
 impl Quad {
     pub const WHOLE: Self = Self([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0]]);
 
-    /// Corners in any order, put clockwise from the top left.
     pub fn ordered(mut corners: [[f32; 2]; 4]) -> Self {
         let centre = corners.iter().fold([0.0, 0.0], |sum, [x, y]| {
             [sum[0] + x / 4.0, sum[1] + y / 4.0]
@@ -37,7 +34,6 @@ impl Quad {
         })
     }
 
-    /// The share of the picture it covers.
     pub fn area(&self) -> f32 {
         let [a, b, c, d] = self.0;
         let cross = |p: [f32; 2], q: [f32; 2]| p[0] * q[1] - p[1] * q[0];
@@ -54,7 +50,6 @@ impl Quad {
         turns.iter().all(|turn| *turn > 0.0) || turns.iter().all(|turn| *turn < 0.0)
     }
 
-    /// The largest angle by which a corner strays from a right angle, in degrees.
     pub fn skew(&self, width: u32, height: u32) -> f64 {
         let corners = self.in_pixels(width, height);
         (0..4)
@@ -67,9 +62,6 @@ impl Quad {
             .fold(0.0, f64::max)
     }
 
-    /// The width and height the page has when straightened, in pixels of
-    /// a picture of this size: as tall as its longer side runs, and as wide
-    /// as its proportions make it.
     pub fn straightened_size(&self, width: u32, height: u32) -> (u32, u32) {
         let [a, b, c, d] = self.in_pixels(width, height);
         let length = |p: [f64; 2], q: [f64; 2]| (p[0] - q[0]).hypot(p[1] - q[1]);
@@ -84,9 +76,6 @@ impl Quad {
         (across.round().max(1.0) as u32, down.round().max(1.0) as u32)
     }
 
-    /// The real width over height of a rectangle seen in perspective as this
-    /// quad, for a camera looking through the picture's centre (Zhang and
-    /// He, "Whiteboard scanning and image enhancement", 2007).
     fn proportion(&self, width: u32, height: u32) -> Option<f64> {
         let [top_left, top_right, bottom_right, bottom_left] =
             self.in_pixels(width, height).map(|[x, y]| [x, y, 1.0]);
@@ -114,7 +103,6 @@ impl Quad {
         (proportion.is_finite() && (0.1..10.0).contains(&proportion)).then_some(proportion)
     }
 
-    /// The quad pulled in towards its middle by `share` of its size.
     pub fn inset(&self, share: f32) -> Self {
         let centre = self.0.iter().fold([0.0, 0.0], |sum, [x, y]| {
             [sum[0] + x / 4.0, sum[1] + y / 4.0]
@@ -140,8 +128,6 @@ fn dot(a: [f64; 3], b: [f64; 3]) -> f64 {
     a[0] * b[0] + a[1] * b[1] + a[2] * b[2]
 }
 
-/// The projective map taking the corners of a `width` × `height` rectangle
-/// to `to`, as the eight free entries of a 3×3 matrix.
 pub fn homography(width: f64, height: f64, to: [[f64; 2]; 4]) -> [f64; 9] {
     let from = [[0.0, 0.0], [width, 0.0], [width, height], [0.0, height]];
     let mut rows = [[0.0; 9]; 8];
@@ -155,8 +141,6 @@ pub fn homography(width: f64, height: f64, to: [[f64; 2]; 4]) -> [f64; 9] {
     ]
 }
 
-/// Solves a system of linear equations given as rows of coefficients
-/// followed by the right-hand side, by Gaussian elimination.
 pub fn solve<const N: usize, const M: usize>(mut rows: [[f64; M]; N]) -> [f64; N] {
     for column in 0..N {
         let pivot = (column..N)

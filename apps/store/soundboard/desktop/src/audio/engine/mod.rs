@@ -78,8 +78,6 @@ enum Command {
     Quit,
 }
 
-/// The audio side of the app: a thread that owns the virtual microphone for as long as this value lives. The sound
-/// server removes the microphone by itself if the process dies.
 pub struct Engine {
     commands: pw::channel::Sender<Command>,
     levels: Arc<Levels>,

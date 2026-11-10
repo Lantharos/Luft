@@ -5,7 +5,6 @@ const alpha = (cutoff: number, elapsed: number) => {
 	return 1 / (1 + tau / elapsed);
 };
 
-/** The One Euro filter: steady when the pen moves slowly, close behind it when it moves fast. */
 class OneEuro {
 	private value = 0;
 	private speed = 0;
@@ -36,7 +35,6 @@ export class Stabilizer {
 	private pressure = -1;
 	private last = 0;
 
-	/** `strength` from 0, raw input, to 1, heavy smoothing for careful lettering. */
 	constructor(strength: number) {
 		const minCutoff = 30 * (1 - strength) ** 2 + 0.6;
 		const beta = 0.35 * (1 - strength) + 0.012;

@@ -1,6 +1,3 @@
-//! The parts of SANE's C interface Flatbed uses, loaded from the system's
-//! `libsane.so.1` when it's there.
-
 use std::ffi::{CStr, CString, c_char, c_int, c_void};
 use std::ptr;
 
@@ -104,7 +101,6 @@ pub struct Device {
     pub kind: String,
 }
 
-/// An option of an open scanner, as SANE describes it.
 pub struct Setting {
     index: Word,
     pub name: String,
@@ -114,8 +110,6 @@ pub struct Setting {
     pub range: Option<(Word, Word)>,
 }
 
-/// # Safety
-/// `T` must be the function type the library's symbol has.
 unsafe fn symbol<T: Copy>(library: &Library, name: &[u8]) -> Result<T, String> {
     // SAFETY: the caller vouches for the type.
     unsafe { library.get::<T>(name) }
@@ -213,13 +207,11 @@ impl Drop for Sane {
     }
 }
 
-/// A scanner SANE opened, closed when dropped.
 pub struct Opened<'a> {
     sane: &'a Sane,
     handle: Handle,
 }
 
-/// A handle that can be cancelled from another thread, as SANE allows.
 #[derive(Clone, Copy)]
 pub struct Canceller {
     cancel: Cancel,
@@ -326,7 +318,6 @@ impl Opened<'_> {
         Ok(parameters)
     }
 
-    /// Reads into `buffer`, giving the bytes read or the status that ended it.
     pub fn read(&self, buffer: &mut [u8]) -> Result<usize, Word> {
         let mut length = 0;
         // SAFETY: SANE writes at most `buffer.len()` bytes.

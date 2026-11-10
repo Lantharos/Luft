@@ -20,7 +20,6 @@ const WINDOW: GlassWindow = GlassWindow {
     single_instance: Some("com.lantharos.Heft"),
 };
 
-/// Sent to see whether a window is still there to hear it.
 const PRESENT: BridgeEvent<()> = BridgeEvent::new("window.present");
 
 pub static EVENTS: LazyLock<Events> = LazyLock::new(Events::default);
@@ -28,16 +27,12 @@ static PROCESS: OnceLock<SabineProcessHandle> = OnceLock::new();
 static SHOWN: AtomicBool = AtomicBool::new(false);
 
 fn launch_activation_token() -> Option<String> {
-    ["XDG_ACTIVATION_TOKEN", "DESKTOP_STARTUP_ID"]
+    luft_app::launch::TOKEN_VARIABLES
         .into_iter()
         .find_map(|name| std::env::var(name).ok())
         .filter(|token| !token.trim().is_empty())
 }
 
-/// Heft runs on when its window closes during a recording, so the class
-/// keeps being recorded, and quits when it closes with nothing recording.
-/// A window that closed has left the bridge by the time it's reported
-/// hidden, while a minimized one still hears events.
 fn visibility_changed(visibility: WindowVisibility) {
     if visibility.visible {
         SHOWN.store(true, Ordering::Relaxed);

@@ -23,7 +23,6 @@ async function save(name: string, extension: 'pdf' | 'png', bytes: () => Promise
 	if (path) await exportFile(path, await bytes());
 }
 
-/** Pages as a PDF whose ink stays sharp at any size. */
 export function exportPdf(notebook: OpenNotebook, pages: PageEntry[], name: string, options: ExportOptions) {
 	return save(name, 'pdf', async () => {
 		const drawn = [];
@@ -32,7 +31,6 @@ export function exportPdf(notebook: OpenNotebook, pages: PageEntry[], name: stri
 	});
 }
 
-/** One page as a picture, twice the size it has on screen at 100 %. */
 export function exportPng(notebook: OpenNotebook, page: PageEntry, name: string) {
 	return save(name, 'png', async () => {
 		const paper = paperOf(notebook.meta, page);

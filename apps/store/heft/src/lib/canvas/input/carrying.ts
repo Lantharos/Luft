@@ -5,7 +5,6 @@ type Sample = Pick<PointerEvent, 'clientX' | 'clientY'>;
 
 const SLOP = 6;
 
-/** Pressing on picked book text and dragging it over to the notes beside the book. */
 export class TextCarrying {
 	private carrying = false;
 

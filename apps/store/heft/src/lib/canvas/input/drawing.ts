@@ -1,6 +1,6 @@
 import { StrokeBuilder, type Feel, type Pen } from '#lib/ink/builder.js';
 import { EraseGesture, type EraseMode } from '#lib/ink/eraser.js';
-import { STEADY } from '#lib/ink/pressure.js';
+import { PRESSURE_WITHOUT_A_SENSOR } from '#lib/ink/pressure.js';
 import { outlinePoints, recognize } from '#lib/ink/shapes.js';
 import { newId, POINT_FIELDS, strokeBounds, type Stroke } from '#lib/ink/stroke.js';
 import type { PageDocument } from '#lib/page/document.js';
@@ -35,9 +35,8 @@ const HOLD_SLOP = 3;
 const TAP_SLOP = 4;
 const TAP_TIME = 300;
 
-const pressureOf = (event: Sample) => (event.pointerType === 'pen' && event.pressure > 0 ? event.pressure : STEADY);
+const pressureOf = (event: Sample) => (event.pointerType === 'pen' && event.pressure > 0 ? event.pressure : PRESSURE_WITHOUT_A_SENSOR);
 
-/** A stroke from pen down to pen up, drawn live and committed to its page at the end. */
 export class Drawing {
 	private readonly builder: StrokeBuilder;
 	private shape: Float32Array[] | null = null;
@@ -80,7 +79,6 @@ export class Drawing {
 		return [contentX - this.target.page.left, contentY - this.target.page.top];
 	}
 
-	/** Holding the pen still at the end of a stroke turns it into the shape it looks like. */
 	private holdAt(x: number, y: number) {
 		if (Math.hypot(x - this.still.x, y - this.still.y) < HOLD_SLOP / this.viewport.zoom) return;
 		clearTimeout(this.still.timer);
@@ -104,7 +102,6 @@ export class Drawing {
 		return this.target.page;
 	}
 
-	/** Where the pen tapped on the page, if it came down and lifted without moving. */
 	tap(): [number, number] | null {
 		const points = this.builder.points;
 		if (this.shape || !this.builder.count || performance.now() - this.began > TAP_TIME) return null;
@@ -121,7 +118,6 @@ export class Drawing {
 		this.live.predict(this.builder.prediction(ahead));
 	}
 
-	/** Puts the stroke on its page; the stroke written, or none when it became a shape. */
 	end(): Stroke | null {
 		clearTimeout(this.still.timer);
 		if (this.shape) {

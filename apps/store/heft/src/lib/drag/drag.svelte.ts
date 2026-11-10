@@ -9,10 +9,6 @@ export type DropHandler = (payload: Payload, target: Target, after: boolean) => 
 const THRESHOLD = 8;
 const TOUCH_HOLD = 320;
 
-/**
- * Dragging with whatever is at hand: a mouse or a pen drags straight away,
- * a finger after holding still for a moment, so it can still scroll.
- */
 class Drag {
 	payload: Payload | null = $state(null);
 	label = $state('');

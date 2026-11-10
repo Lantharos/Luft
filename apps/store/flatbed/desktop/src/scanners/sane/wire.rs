@@ -1,6 +1,3 @@
-//! What Flatbed and its SANE helper say to each other: requests as lines of
-//! JSON, and back frames of a kind byte, a little endian length and the bytes.
-
 use std::io::{self, Read, Write};
 use std::net::IpAddr;
 

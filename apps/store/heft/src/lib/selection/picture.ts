@@ -13,7 +13,6 @@ export interface Region {
 	pdf?: { path: string; index: number };
 }
 
-/** A part of a page drawn as a picture: the printed book page under it, if any, and the ink on it. */
 export async function regionPicture({ bounds, strokes, ink, pageWidth, pdf }: Region): Promise<HTMLCanvasElement> {
 	const width = bounds.right - bounds.left;
 	const height = bounds.bottom - bounds.top;

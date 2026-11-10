@@ -22,7 +22,6 @@ fn listed_files(board: &Board) -> impl Iterator<Item = &str> {
     })
 }
 
-/// One zip with the board's description and its original files, which are compressed already.
 pub fn write(board: &Board, folder: &Path, path: &Path) -> Result<(), String> {
     let mut archive = ZipWriter::new(File::create(path).map_err(failed)?);
     archive
@@ -58,8 +57,6 @@ fn plain_name(file: &str) -> bool {
     )
 }
 
-/// Unpacks a board into `folder` under new names. Boards come from other people, so it only opens the files the board
-/// lists, and only plain names.
 pub fn read(path: &Path, folder: &Path) -> Result<Board, String> {
     let mut archive = ZipArchive::new(File::open(path).map_err(failed)?).map_err(failed)?;
     let mut manifest = String::new();

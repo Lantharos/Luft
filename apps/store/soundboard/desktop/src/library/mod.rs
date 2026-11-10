@@ -38,11 +38,9 @@ fn failed(error: impl ToString) -> String {
 fn new_id() -> u32 {
     let mut bytes = [0; 4];
     getrandom::fill(&mut bytes).expect("the system gives random numbers");
-    // Page code keeps these as numbers, and a sign would make a shortcut's id look different from the sound's.
     u32::from_ne_bytes(bytes) >> 1
 }
 
-/// The boards, and every sound copied and decoded into the app's data folder, so it plays long after the original moved.
 pub struct Store {
     folder: PathBuf,
     pub library: Library,
@@ -147,7 +145,6 @@ impl Store {
         self.save()
     }
 
-    /// Copies and decodes a file, then adds it to a board, all outside the app's lock when `Prepared` is made first.
     pub fn add_prepared(&mut self, board: BoardId, prepared: Prepared) -> Result<Sound, String> {
         let sound = prepared.sound.clone();
         self.decoded.insert(sound.id, prepared.pcm);
@@ -229,7 +226,6 @@ impl Store {
         archive::write(board, &self.sounds_folder(), path)
     }
 
-    /// Adds a board from a file made by [`Self::export`], with new ids so it never collides with what's here.
     pub fn import(&mut self, path: &Path) -> Result<BoardId, String> {
         let mut board = archive::read(path, &self.sounds_folder())?;
         board.id = new_id();
@@ -243,13 +239,11 @@ impl Store {
     }
 }
 
-/// A file copied into the data folder and decoded, ready to join a board.
 pub struct Prepared {
     sound: Sound,
     pcm: Arc<Pcm>,
 }
 
-/// The slow part of adding a file, which takes no lock on the library.
 pub fn prepare(folder: &Path, path: &Path) -> Result<Prepared, String> {
     let samples = decode::decode(path)?;
     let frames = samples.len() / crate::audio::CHANNELS;

@@ -15,7 +15,6 @@ const TONE: f32 = 440.0;
 const PRESS_LIMIT: Duration = Duration::from_millis(20);
 const VOICE_LIMIT: Duration = Duration::from_millis(12);
 
-/// One sound server serves the whole test binary, so tests take turns.
 static TURN: LazyLock<Mutex<()>> = LazyLock::new(Mutex::default);
 
 fn turn() -> MutexGuard<'static, ()> {
@@ -205,7 +204,6 @@ fn press_latency(engine: &Engine, statuses: &Receiver<Status>, listener: &Listen
     let sound = tone(0.2, 0.5);
     let mut press = Vec::new();
     for round in 0..40 {
-        // A prime step, so presses land all over the graph's 5.3 ms cycle instead of at one point in it.
         std::thread::sleep(Duration::from_micros(350_000 + u64::from(round) * 1_733));
         listener.rearm();
         let pressed = Instant::now();

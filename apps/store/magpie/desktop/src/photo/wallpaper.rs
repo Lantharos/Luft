@@ -16,6 +16,10 @@ fn failed(error: impl std::fmt::Display) -> String {
     error.to_string()
 }
 
+fn is_same_picture(source: &Path, kept: &Path) -> bool {
+    fs::read(source).is_ok_and(|picture| fs::read(kept).is_ok_and(|kept| kept == picture))
+}
+
 fn library_copy(source: &Path) -> Result<PathBuf, String> {
     let folder = luft_app::folders::wallpapers();
     if source.parent() == Some(folder.as_path()) {
@@ -32,7 +36,9 @@ fn library_copy(source: &Path) -> Result<PathBuf, String> {
     let mut target = folder.join(name);
     for copy in 2.. {
         match fs::metadata(&target) {
-            Ok(existing) if existing.len() == size => return Ok(target),
+            Ok(existing) if existing.len() == size && is_same_picture(source, &target) => {
+                return Ok(target);
+            }
             Ok(_) => target = folder.join(format!("{stem} ({copy}){extension}")),
             Err(_) => break,
         }

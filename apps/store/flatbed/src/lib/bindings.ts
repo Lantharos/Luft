@@ -27,7 +27,6 @@ export const commands = {
 	}, options?: CallOptions) => invoke<null>("page_remove", params, options),
 	pageTurn: (params: {
 		id: string,
-		/**  Quarter turns clockwise, negative for anticlockwise. */
 		quarters: number,
 	}, options?: CallOptions) => invoke<null>("page_turn", params, options),
 	pagesReorder: (params: {
@@ -40,11 +39,8 @@ export const commands = {
 	save: (params: {
 		format: Format,
 		searchable: boolean,
-		/**  The file's name without its extension. */
 		name: string,
-		/**  The file chooser's title. */
 		title: string,
-		/**  What the file chooser calls files of this format. */
 		filter: string,
 	}, options?: CallOptions) => invoke<Saved | null>("save", params, options),
 	scanCancel: (options?: CallOptions) => invoke<null>("scan_cancel", {}, options),
@@ -94,7 +90,6 @@ export type AppState = {
 	document: DocumentView,
 	scanners: Scanner[],
 	settings: Settings,
-	/**  The languages text can be read in, or `None` without Tesseract. */
 	readingLanguages: string[] | null,
 } & Appearance;
 
@@ -118,7 +113,6 @@ export type DocumentView = {
 	pages: PageView[],
 };
 
-/**  How paper goes into a scanner. */
 export type Feed = "glass" | "feeder" | "bothSides";
 
 export type Format = "pdf" | "jpeg" | "png";
@@ -138,12 +132,10 @@ export type Locale = {
 	fixed: boolean,
 };
 
-/**  How a page comes out. */
 export type Mode = "colour" | "grey" | "blackAndWhite";
 
 export type Motion = "full" | "reduced" | "off";
 
-/**  What the window shows of a page. */
 export type PageView = {
 	id: string,
 	image: string | null,
@@ -166,22 +158,15 @@ export type Palette = {
 	taskbar: import("@luft/ui").TaskbarLooks,
 };
 
-/**  The paper a saved PDF's pages are, unless they keep the size they came in. */
 export type PaperSize = "automatic" | "a4" | "letter";
 
 /**  Whether the computer is used as a laptop or folded into a tablet. */
 export type Posture = "laptop" | "tablet";
 
-/**
- *  A page's corners on its picture, top left, top right, bottom right and
- *  bottom left, each as fractions of the picture's width and height.
- */
 export type Quad = [([number, number]), ([number, number]), ([number, number]), ([number, number])];
 
 export type Saved = {
-	/**  The file, or the folder the pages went into. */
 	path: string,
-	/**  Every file written, to send on. */
 	files: string[],
 };
 
@@ -200,12 +185,9 @@ export type SchemeColors = {
 };
 
 export type Settings = {
-	/**  Tesseract's codes for the languages text is read in. */
 	languages: string[],
 	paper: PaperSize,
-	/**  Scans at 600 pixels per inch instead of 300. */
 	fine: boolean,
-	/**  Scanners added by their address. */
 	addresses: string[],
 	scanner: string | null,
 };

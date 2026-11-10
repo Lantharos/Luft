@@ -6,13 +6,10 @@ import { appState } from './state';
 
 const MAX_TABS = 6;
 
-/** The open notebooks as tabs, which one is in front, and getting to a page quickly. */
 class Session {
 	tabs: OpenNotebook[] = $state([]);
 	current: OpenNotebook | null = $state(null);
-	/** The notebook open beside the current one, such as the textbook next to the notes. */
 	beside: OpenNotebook | null = $state(null);
-	/** A page to bring into view once its notebook shows. */
 	goTo: { notebook: string; page: string } | null = $state(null);
 
 	async start() {
@@ -58,7 +55,6 @@ class Session {
 		return entry ? library.openNotebook(entry) : null;
 	}
 
-	/** Opens a notebook beside the current one, and remembers the pair for the subject. */
 	split(entry: NotebookEntry) {
 		if (!this.current || entry.meta.id === this.current.meta.id) return;
 		this.beside = library.openNotebook(entry);
@@ -90,7 +86,6 @@ class Session {
 		else this.home();
 	}
 
-	/** Closes tabs of notebooks that went to the trash. */
 	prune() {
 		for (const tab of [...this.tabs]) {
 			if (!library.notebook(tab.meta.id)) {
@@ -100,7 +95,6 @@ class Session {
 		}
 	}
 
-	/** A fresh page at the end of the subject's most recently used notebook, for when class starts. */
 	newPageIn(subjectId: string) {
 		const subject = library.subject(subjectId);
 		const notebook = subject?.notebooks.filter((entry) => entry.meta.kind === 'notes').sort((a, b) => b.meta.modified - a.meta.modified)[0];

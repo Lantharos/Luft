@@ -15,7 +15,6 @@ const PAGE_QUALITY: u8 = 88;
 const SOURCE_QUALITY: u8 = 95;
 const THUMBNAIL_WIDTH: u32 = 360;
 
-/// One page of the document as it's kept between runs.
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Page {
@@ -23,13 +22,10 @@ pub struct Page {
     pub origin: Origin,
     pub quad: Quad,
     pub turns: u8,
-    /// Pixels per inch of the source, when a scanner said.
     pub dpi: Option<f32>,
     pub source_size: (u32, u32),
     pub source_kind: Kind,
-    /// Grows whenever the page's corners or turn change.
     pub shape: u32,
-    /// Grows whenever the page is developed again.
     pub version: u32,
     pub size: (u32, u32),
     pub developed: Option<Kind>,
@@ -51,7 +47,6 @@ impl Kind {
     }
 }
 
-/// A version of a page written to disk, waiting to be adopted.
 pub struct Developed {
     version: u32,
     kind: Kind,
@@ -60,7 +55,6 @@ pub struct Developed {
     mode: Mode,
 }
 
-/// What the window shows of a page.
 #[derive(Clone, Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct PageView {
@@ -75,7 +69,6 @@ pub struct PageView {
     turns: u8,
 }
 
-/// A page's own picture, as it arrived.
 pub enum Source {
     Encoded { bytes: Vec<u8>, kind: Kind },
     Pixels(RgbImage),
@@ -155,8 +148,6 @@ impl Page {
         }
     }
 
-    /// Writes the page developed from `source` as `version`, leaving the
-    /// page as it is until it adopts the result.
     pub fn develop(
         &self,
         folder: &Path,
@@ -185,9 +176,6 @@ impl Page {
         Ok(developed)
     }
 
-    /// Takes a developed version in place of the one before, unless the
-    /// page changed meanwhile, and removes the files of whichever is left
-    /// over.
     pub fn adopt(&mut self, folder: &Path, developed: Developed, mode: Mode) {
         let fresh = Self {
             version: developed.version,
@@ -203,7 +191,6 @@ impl Page {
         stale.remove_developed(folder);
     }
 
-    /// Removes a developed version of a page that's gone.
     pub fn discard(&self, folder: &Path, developed: Developed) {
         Self {
             version: developed.version,

@@ -5,14 +5,9 @@ export type DockSide = 'left' | 'right';
 
 interface Stored {
 	side: DockSide;
-	/** How far down the space it can move in the dock sits, from 0 at the top to 1 at the bottom. */
 	along: number;
 }
 
-/**
- * Where the floating dock of tools sits over the paper: on the side away
- * from the hand that writes unless it was moved, and how far down.
- */
 class Dock {
 	side: DockSide = $state('left');
 	along = $state(0.5);

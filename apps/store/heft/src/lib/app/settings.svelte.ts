@@ -15,12 +15,9 @@ export interface SettingsValues {
 	pages: PageFlow;
 	handwriting: boolean;
 	convert: boolean;
-	/** How long the pen rests before writing turns into text, in milliseconds. */
 	convertAfter: number;
 	keepCorrections: boolean;
-	/** The languages the person writes in, for where accents go; empty for the system's. */
 	languages: string[];
-	/** When heavy background work runs, transcribing and making notes of recordings and reading handwriting for search; null waits for the charger on computers with a battery. */
 	backgroundWork: Processing | null;
 }
 
@@ -46,7 +43,6 @@ class Settings {
 	values: SettingsValues = $state({ ...DEFAULTS });
 	private timer = 0;
 
-	/** Folded into a tablet or standing upright, the tools float over the page. */
 	get toolbar(): ToolbarPlace {
 		return arrangement.tablet ? 'dock' : this.values.toolbar;
 	}

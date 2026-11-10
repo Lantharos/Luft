@@ -22,7 +22,6 @@ pub const FINISHED: BridgeEvent<Option<ScanError>> = BridgeEvent::new("scan.fini
 const STANDARD_DPI: u32 = 300;
 const FINE_DPI: u32 = 600;
 
-/// How paper goes into a scanner.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum Feed {
@@ -67,7 +66,6 @@ enum Backend {
 struct Entry {
     scanner: Scanner,
     backend: Backend,
-    /// The address it's at, so the same scanner found twice shows once.
     address: Option<IpAddr>,
 }
 
@@ -88,8 +86,6 @@ pub fn list() -> Vec<Scanner> {
     visible(&SCANNERS.lock().expect("scanners lock"))
 }
 
-/// Every scanner once: one found over eSCL hides the same one found through
-/// SANE at the same address.
 fn visible(entries: &[Entry]) -> Vec<Scanner> {
     let escl: Vec<IpAddr> = entries
         .iter()
@@ -127,7 +123,6 @@ fn feeds(capabilities: &escl::Capabilities) -> Vec<Feed> {
     feeds
 }
 
-/// Adds an eSCL scanner once it has said what it can do.
 fn found_escl(key: String, name: String, endpoint: escl::Endpoint, address: Option<IpAddr>) {
     let Ok(capabilities) = escl::capabilities(&endpoint) else {
         return;
@@ -173,8 +168,6 @@ fn found_sane(devices: Vec<(Scanner, Option<IpAddr>)>) {
     });
 }
 
-/// Adds a scanner by the address someone typed, such as `192.168.1.20` or
-/// `scanner.local:8080`, trying eSCL over HTTP and then HTTPS.
 pub fn add_address(address: &str) -> Result<(), String> {
     let address = address.trim().trim_end_matches('/');
     let (scheme, rest) = address
@@ -218,8 +211,6 @@ pub fn add_address(address: &str) -> Result<(), String> {
     Ok(())
 }
 
-/// Hands each scanned page to the document as it arrives, and shows the
-/// one coming in.
 pub trait Progress {
     fn preview(&mut self, jpeg: &[u8]);
     fn page_encoded(&mut self, bytes: Vec<u8>, dpi: f32);

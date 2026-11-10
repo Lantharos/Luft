@@ -12,7 +12,6 @@ const COMBINING: Record<Exclude<Mark, 'bar'>, string[]> = {
 
 const BARRED: Record<string, string> = { d: 'đ', D: 'Đ', h: 'ħ', H: 'Ħ', l: 'ł', L: 'Ł', t: 'ŧ', T: 'Ŧ', g: 'ǥ', G: 'Ǥ', o: 'ø', O: 'Ø' };
 
-/** The accented letters each language writes, so accents land where the person's languages put them. */
 const LETTERS: Record<string, string> = {
 	sr: 'čćšžđ',
 	hr: 'čćšžđ',
@@ -46,7 +45,6 @@ const LETTERS: Record<string, string> = {
 	ga: 'áéíóú'
 };
 
-/** Every accented letter the person's languages use, upper and lower case. */
 export function lettersOf(languages: readonly string[], seen = ''): Set<string> {
 	const letters = new Set<string>();
 	for (const language of languages) for (const letter of LETTERS[language.split('-')[0].toLowerCase()] ?? '') letters.add(letter);
@@ -56,7 +54,6 @@ export function lettersOf(languages: readonly string[], seen = ''): Set<string> 
 
 const base = (letter: string) => letter.normalize('NFD')[0];
 
-/** What a letter becomes with an accent added, or its accent changed; empty when no single letter has it. */
 export function withMark(letter: string, mark: Mark): string[] {
 	const plain = base(letter);
 	if (mark === 'bar') return BARRED[plain] ? [BARRED[plain]] : [];
@@ -65,12 +62,6 @@ export function withMark(letter: string, mark: Mark): string[] {
 
 const isLower = (letter: string | undefined) => !!letter && letter !== letter.toUpperCase();
 
-/**
- * Picks which of the letters under or beside an accent it belongs to, and
- * what that letter becomes: one of the person's languages' letters if any
- * fits, though any letter that exists with that accent can be made. `nearest`
- * lists the candidate positions in `text`, closest first.
- */
 export function placeMark(text: string, nearest: number[], mark: Mark, letters: Set<string>): { index: number; letter: string } | null {
 	let best: { index: number; letter: string } | null = null;
 	let lowest = Infinity;

@@ -46,13 +46,11 @@ export class PageDocument {
 		return () => this.listeners.delete(listener);
 	}
 
-	/** Applies a change read back from disk: no history, nothing written. */
 	replay(removed: string[], added: Stroke[]) {
 		for (const id of removed) this.drop(id);
 		for (const stroke of added) this.insert(stroke);
 	}
 
-	/** Puts objects read back from disk in place, or removes them, without history. */
 	replayObjects(put: PageObject[], dropped: string[]) {
 		this.objects = this.objects.filter((object) => !dropped.includes(object.id) && !put.some((next) => next.id === object.id)).concat(put);
 	}
@@ -67,12 +65,10 @@ export class PageDocument {
 		this.record(change);
 	}
 
-	/** Shows part of a change that is still being made, such as an erase in progress. */
 	preview(change: Change) {
 		this.show(change);
 	}
 
-	/** Keeps a change whose parts were shown with `preview`. */
 	record(change: Change) {
 		if (empty(change)) return;
 		this.persist(change);

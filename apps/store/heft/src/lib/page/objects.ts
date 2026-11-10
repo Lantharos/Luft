@@ -1,4 +1,3 @@
-/** The part of a picture that shows, as shares of its full width and height. */
 export interface Crop {
 	x: number;
 	y: number;
@@ -8,17 +7,11 @@ export interface Crop {
 
 export const WHOLE: Crop = { x: 0, y: 0, width: 1, height: 1 };
 
-/**
- * A line of handwriting as it was read: the text, and for each of its
- * characters the box of the ink it came from, as left, top, right and bottom
- * in page units, four numbers a character.
- */
 export interface WrittenLine {
 	text: string;
 	glyphs: number[];
 }
 
-/** Typed text or a picture placed on a page, above the ink. */
 export interface PageObject {
 	id: string;
 	kind: 'text' | 'image';
@@ -26,19 +19,13 @@ export interface PageObject {
 	y: number;
 	width: number;
 	height: number;
-	/** Text boxes: their formatted contents, and the same as plain text for search. */
 	html?: string;
 	text?: string;
-	/** Text on the page's lines: the line height and type size it was set in. */
 	line?: number;
 	size?: number;
-	/** Text that carries on to the next page when it reaches the bottom, in notebooks made for typing. */
 	flow?: boolean;
-	/** Lines turned from handwriting into this text, each with where every character was written. */
 	written?: WrittenLine[];
-	/** Text boxes: when their text was first typed, so a recording can play what was said then. */
 	typedAt?: number;
-	/** Pictures: the file in the notebook's assets folder, and the part of it that shows. */
 	asset?: string;
 	crop?: Crop;
 }
@@ -50,7 +37,6 @@ export interface ObjectChange {
 
 const ALLOWED = new Set(['B', 'STRONG', 'I', 'EM', 'U', 'H2', 'H3', 'UL', 'OL', 'LI', 'BR', 'DIV', 'P', 'BLOCKQUOTE']);
 
-/** Keeps only the formatting text boxes offer, so nothing else ever runs or shows. */
 export function cleanHtml(html: string): string {
 	const template = document.createElement('template');
 	template.innerHTML = html;

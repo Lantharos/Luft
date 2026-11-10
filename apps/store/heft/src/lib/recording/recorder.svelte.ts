@@ -10,11 +10,6 @@ import { recordingsOf, type RecordingEntry } from './model';
 const CONSENT = 'recordingConsent';
 const TICK = 250;
 
-/**
- * The class being recorded. The recording itself runs in Heft's native side,
- * so it goes on when the window closes; this follows it, keeps the notebook's
- * list of recordings and the pauses in it, and shows how long it's been.
- */
 class Recorder {
 	notebook: OpenNotebook | null = $state.raw(null);
 	recording: RecordingEntry | null = $state(null);
@@ -22,11 +17,9 @@ class Recorder {
 	length = $state(0);
 	level = $state(0);
 	failure: string | null = $state(null);
-	/** A recording that just stopped, to ask what to do with. */
 	stopped: { notebook: OpenNotebook; recording: RecordingEntry } | null = $state(null);
 	private ticker = 0;
 
-	/** Whether the reminder to ask the teacher was shown for a subject, which has its own teacher. */
 	asked(subject: string) {
 		return appState.get<string[]>(CONSENT)?.includes(subject) ?? false;
 	}
@@ -47,7 +40,6 @@ class Recorder {
 		return () => stops.forEach((stop) => stop());
 	}
 
-	/** Picks up a recording that went on while the window was closed, and finishes ones a crash cut short. */
 	private async follow() {
 		const state = await commands.recordingState();
 		for (const entry of library.notebooks) {

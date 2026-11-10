@@ -6,7 +6,6 @@ const PART_LENGTH = 12 * 60_000;
 
 type Step = { kind: 'done' } | { kind: 'notInstalled' } | { kind: 'paused' } | { kind: 'missing' };
 
-/** How far the next part of the notes reaches: about twelve minutes of class, ending where a line ends. */
 function partEnd(transcript: Transcript) {
 	const { said } = transcript;
 	const first = transcript.notes.next;
@@ -15,11 +14,6 @@ function partEnd(transcript: Transcript) {
 	return end;
 }
 
-/**
- * Writes the notes of the next part of a class, or, once every part has
- * notes, the class's title and summary. The transcript keeps where it got
- * to, so each part is written once.
- */
 export async function writeNotes(transcript: Transcript, language: string): Promise<Step> {
 	const { notes, said } = transcript;
 	if (notes.next < said.length) {

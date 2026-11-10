@@ -51,12 +51,7 @@ fn missing(error: &ureq::Error) -> bool {
     matches!(error, ureq::Error::StatusCode(404))
 }
 
-fn locate_at(
-    agent: &Agent,
-    downloads: &str,
-    key: Option<&str>,
-    channel: Channel,
-) -> io::Result<Located> {
+fn locate_at(agent: &Agent, downloads: &str, key: &str, channel: Channel) -> io::Result<Located> {
     let folder = format!("{downloads}/{}", channel.folder());
     let pointer = match text(agent, &format!("{folder}/{POINTER}")) {
         Err(Fetch::Missing) if channel == Channel::Latest => {
@@ -164,19 +159,17 @@ fn unreadable(message: String) -> Fetch {
     Fetch::Failed(io::Error::new(io::ErrorKind::InvalidData, message))
 }
 
-fn checksum(agent: &Agent, key: Option<&str>, iso: &str) -> Result<[u8; 32], Fetch> {
+fn checksum(agent: &Agent, key: &str, iso: &str) -> Result<[u8; 32], Fetch> {
     let checksum = text(agent, &format!("{iso}.sha256"))?;
-    if let Some(key) = key {
-        let signed = match text(agent, &format!("{iso}.sha256.minisig")) {
-            Err(Fetch::Missing) => Err(unreadable(t!(
-                L10N,
-                "live-not-signed",
-                iso = file_name(iso)
-            ))),
-            other => other,
-        }?;
-        signature::verify(key, &checksum, &signed, file_name(iso)).map_err(unreadable)?;
-    }
+    let signed = match text(agent, &format!("{iso}.sha256.minisig")) {
+        Err(Fetch::Missing) => Err(unreadable(t!(
+            L10N,
+            "live-not-signed",
+            iso = file_name(iso)
+        ))),
+        other => other,
+    }?;
+    signature::verify(key, &checksum, &signed, file_name(iso)).map_err(unreadable)?;
     parse_checksum(&checksum).ok_or_else(|| unreadable(t!(L10N, "live-checksum-unreadable")))
 }
 
@@ -281,6 +274,7 @@ mod tests {
     use std::io::{BufRead, BufReader, Write};
     use std::net::TcpListener;
 
+    use super::signature::signed::{CHECKSUM, KEY, SIGNATURE};
     use super::*;
 
     fn published(names: &'static [(&'static str, &'static str)]) -> String {
@@ -320,62 +314,56 @@ mod tests {
             .into()
     }
 
-    const POINTER: &str = r#"{"name": "luft-1.1-nightly.21.iso", "version": "1.1-nightly.21", "size": 4096, "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}"#;
-    const CHECKSUM: &str = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  luft-1.1-nightly.21.iso\n";
-    const OTHER_CHECKSUM: &str = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb  luft-1.1-nightly.21.iso\n";
+    const POINTER: &str = r#"{"name": "luft-nightly.iso", "version": "1.1-nightly.21", "size": 4096, "sha256": "abababababababababababababababababababababababababababababababab"}"#;
+    const OTHER_POINTER: &str = r#"{"name": "luft-nightly.iso", "version": "1.1-nightly.21", "size": 4096, "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"}"#;
 
     #[test]
     fn the_newest_iso_is_found_through_its_folders_pointer() {
         let downloads = published(&[
             ("nightly/latest.json", POINTER),
-            ("nightly/luft-1.1-nightly.21.iso.sha256", CHECKSUM),
+            ("nightly/luft-nightly.iso.sha256", CHECKSUM),
+            ("nightly/luft-nightly.iso.sha256.minisig", SIGNATURE),
         ]);
-        let located = locate_at(&plain_agent(), &downloads, None, Channel::Nightly).unwrap();
-        assert_eq!(
-            located.iso,
-            format!("{downloads}/nightly/luft-1.1-nightly.21.iso")
-        );
+        let located = locate_at(&plain_agent(), &downloads, KEY, Channel::Nightly).unwrap();
+        assert_eq!(located.iso, format!("{downloads}/nightly/luft-nightly.iso"));
         assert_eq!(located.size, 4096);
-        assert_eq!(located.checksum, [0xaa; 32]);
+        assert_eq!(located.checksum, [0xab; 32]);
     }
 
     #[test]
     fn a_pointer_that_disagrees_with_the_checksum_file_is_refused() {
         let downloads = published(&[
-            ("nightly/latest.json", POINTER),
-            ("nightly/luft-1.1-nightly.21.iso.sha256", OTHER_CHECKSUM),
+            ("nightly/latest.json", OTHER_POINTER),
+            ("nightly/luft-nightly.iso.sha256", CHECKSUM),
+            ("nightly/luft-nightly.iso.sha256.minisig", SIGNATURE),
         ]);
-        assert!(locate_at(&plain_agent(), &downloads, None, Channel::Nightly).is_err());
+        assert!(locate_at(&plain_agent(), &downloads, KEY, Channel::Nightly).is_err());
     }
 
     #[test]
-    fn an_unsigned_checksum_is_refused_once_there_is_a_key() {
+    fn an_unsigned_checksum_is_refused() {
         let downloads = published(&[
             ("nightly/latest.json", POINTER),
-            ("nightly/luft-1.1-nightly.21.iso.sha256", CHECKSUM),
+            ("nightly/luft-nightly.iso.sha256", CHECKSUM),
         ]);
-        let key = Some("RWQuKaSbHEMaG0cGBcTRjFj81Fysjto7YETokGzKqzy6t4/CiyKPriyV");
-        assert!(locate_at(&plain_agent(), &downloads, key, Channel::Nightly).is_err());
+        assert!(locate_at(&plain_agent(), &downloads, KEY, Channel::Nightly).is_err());
     }
 
     #[test]
     fn releases_are_found_in_the_major_versions_folder() {
         let downloads = published(&[
-            (
-                "1/latest.json",
-                r#"{"name": "luft-1.1.iso", "version": "1.1", "size": 2048, "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}"#,
-            ),
-            ("1/luft-1.1.iso.sha256", CHECKSUM),
+            ("1/latest.json", POINTER),
+            ("1/luft-nightly.iso.sha256", CHECKSUM),
+            ("1/luft-nightly.iso.sha256.minisig", SIGNATURE),
         ]);
-        let located = locate_at(&plain_agent(), &downloads, None, Channel::Latest).unwrap();
-        assert_eq!(located.iso, format!("{downloads}/1/luft-1.1.iso"));
-        assert_eq!(located.size, 2048);
+        let located = locate_at(&plain_agent(), &downloads, KEY, Channel::Latest).unwrap();
+        assert_eq!(located.iso, format!("{downloads}/1/luft-nightly.iso"));
     }
 
     #[test]
     fn nothing_published_is_an_error() {
         let downloads = published(&[]);
-        assert!(locate_at(&plain_agent(), &downloads, None, Channel::Nightly).is_err());
+        assert!(locate_at(&plain_agent(), &downloads, KEY, Channel::Nightly).is_err());
     }
 
     #[test]

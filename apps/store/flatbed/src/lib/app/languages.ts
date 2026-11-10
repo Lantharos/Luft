@@ -1,6 +1,5 @@
 import { i18n } from '@luft/i18n';
 
-/** The language tag for each of Tesseract's codes that Luft is translated into. */
 const TAGS: Record<string, string> = {
 	sqi: 'sq',
 	deu: 'de',
@@ -39,7 +38,6 @@ const TAGS: Record<string, string> = {
 	ukr: 'uk'
 };
 
-/** Albanian, German, Croatian and English come first, then the rest by name. */
 export function byPriority(a: { value: string; label: string }, b: { value: string; label: string }): number {
 	const rank = (code: string) => {
 		const index = FIRST.indexOf(code);
@@ -50,7 +48,6 @@ export function byPriority(a: { value: string; label: string }, b: { value: stri
 
 const FIRST = ['sqi', 'deu', 'hrv', 'eng'];
 
-/** A language Tesseract reads, named in the interface's language. */
 export function languageName(code: string): string {
 	const tag = TAGS[code];
 	if (!tag) return code;

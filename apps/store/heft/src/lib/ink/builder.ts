@@ -16,7 +16,6 @@ export interface Feel {
 
 const MIN_STEP = 0.35;
 
-/** Turns pen samples into a stroke's points as they arrive. */
 export class StrokeBuilder {
 	points = new Float32Array(256 * POINT_FIELDS);
 	length = 0;
@@ -43,14 +42,12 @@ export class StrokeBuilder {
 		return widthAt(this.pen.tool, this.pen.nib, this.pen.width, curve(pressure, this.feel.firmness));
 	}
 
-	/** Adds a sample, and says whether it made a new point. */
 	add(x: number, y: number, pressure: number, time: number): boolean {
 		this.raw = [x, y, pressure, time];
 		const [sx, sy, sp] = this.stabilizer.next(x, y, pressure, time);
 		return this.push(sx, sy, sp, time);
 	}
 
-	/** Ends the stroke where the pen actually left the page. */
 	finish(): boolean {
 		const [x, y, pressure, time] = this.raw;
 		return this.count > 0 && this.push(x, y, pressure, time);
@@ -73,7 +70,6 @@ export class StrokeBuilder {
 		return true;
 	}
 
-	/** The last point followed by where the pen is predicted to go. */
 	prediction(samples: [number, number, number][]): Float32Array {
 		const last = this.points.subarray(this.length - POINT_FIELDS, this.length);
 		const points = new Float32Array((samples.length + 1) * POINT_FIELDS);

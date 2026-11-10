@@ -5,7 +5,6 @@ import { commands, events, type AppState, type DocumentView, type Feed, type Mod
 
 export const CAMERA = 'camera';
 
-/** Everything the window shows: the pages, the scanners, and what's going on. */
 class Flatbed {
 	document = $state.raw<DocumentView>({ mode: 'colour', pages: [] });
 	scanners = $state.raw<Scanner[]>([]);
@@ -41,7 +40,6 @@ class Flatbed {
 		return () => stops.forEach((stop) => stop());
 	}
 
-	/** The scanner chosen last, else the first one found, else the camera. */
 	private pickSource(preferred: string | null) {
 		const chosen = this.scanners.find((scanner) => scanner.id === preferred) ?? this.scanners[0];
 		this.choose(chosen?.id ?? CAMERA, false);
@@ -131,7 +129,6 @@ export function scanProblem(problem: ScanError): string {
 	}
 }
 
-/** The camera's newest frame with the corners of the paper it sees. */
 export async function cameraFrame(): Promise<{ frame: ImageBitmap | ImageData; corners: number[] | null } | null> {
 	const bytes = await invoke<Uint8Array>('camera_frame', {});
 	const CORNERS = 32;

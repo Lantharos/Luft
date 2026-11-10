@@ -5,8 +5,8 @@ use serde::Serialize;
 use specta::Type;
 
 use super::params::*;
-use crate::services::compose;
-use crate::state::{MailmanState, cache_folder};
+use crate::services::{cache, compose};
+use crate::state::MailmanState;
 
 #[derive(Serialize, Type)]
 struct Chosen {
@@ -59,11 +59,7 @@ fn stash(command: BridgeCommand) -> BridgeResult {
 }
 
 fn write_stash(name: &str, bytes: &[u8]) -> Result<String, String> {
-    let stamp = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .map(|elapsed| elapsed.as_nanos())
-        .unwrap_or_default();
-    let folder = cache_folder().join("compose").join(stamp.to_string());
+    let folder = cache::new_composing_folder();
     std::fs::create_dir_all(&folder).map_err(|error| error.to_string())?;
     let path = folder.join(name.replace(['/', '\\'], "_"));
     std::fs::write(&path, bytes).map_err(|error| error.to_string())?;

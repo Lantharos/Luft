@@ -16,7 +16,6 @@ pub struct PowerState {
     on_battery: bool,
 }
 
-/// Whether the computer has a battery and runs on it; without UPower it counts as plugged in.
 async fn power_state(Empty {}: Empty) -> Result<PowerState, String> {
     let system = luft_app::dbus::system().await?;
     Ok(PowerState {
@@ -25,8 +24,6 @@ async fn power_state(Empty {}: Empty) -> Result<PowerState, String> {
     })
 }
 
-/// Tells the page whenever the charger is plugged in or out, so recordings
-/// waiting for it start then.
 async fn watch_power(events: Events) {
     let Ok(system) = luft_app::dbus::system().await else {
         return;

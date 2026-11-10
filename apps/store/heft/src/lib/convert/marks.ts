@@ -1,10 +1,7 @@
-/** Accents drawn as a stroke of their own. */
 export type Mark = 'caron' | 'circumflex' | 'acute' | 'grave' | 'dash' | 'dot' | 'cedilla' | 'bar';
 
-/** What a pen stroke over typed text means. */
 export type Gesture = { kind: 'strike' } | { kind: 'insert' } | { kind: 'mark'; mark: Mark } | { kind: 'writing' };
 
-/** A line of typed text: its baseline and type size, in page units. */
 export interface TextLine {
 	baseline: number;
 	size: number;
@@ -24,9 +21,7 @@ interface Shape {
 	width: number;
 	height: number;
 	cy: number;
-	/** Straight, or bent like a V or a ^. */
 	bend: 'straight' | 'v' | 'caret';
-	/** For a straight stroke, how it leans: rising to the right, falling, or level. */
 	lean: 'rising' | 'falling' | 'level';
 }
 
@@ -52,11 +47,6 @@ function shape(points: [number, number][]): Shape {
 	return { left, top, width, height, cy: top + height / 2, bend, lean };
 }
 
-/**
- * Reads a stroke written over a line of typed text: a line through it
- * deletes, a tap or a caret under the line inserts, a small stroke above a
- * letter, through it or under it is an accent, and anything else is writing.
- */
 export function gesture(points: [number, number][], line: TextLine): Gesture {
 	const { baseline, size } = line;
 	const stroke = shape(points);

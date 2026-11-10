@@ -14,7 +14,6 @@ function touches(stroke: Stroke, x: number, y: number, radius: number): boolean 
 	return false;
 }
 
-/** The stroke's points with extra ones in between, so none is further than `step` from the next. */
 function resampled(points: Float32Array, step: number): number[] {
 	const out: number[] = [];
 	for (let index = 0; index < points.length; index += POINT_FIELDS) {
@@ -62,7 +61,6 @@ export class EraseGesture {
 		private readonly radius: number
 	) {}
 
-	/** Erases along the way from the last position to this one. */
 	moveTo(x: number, y: number) {
 		const [fromX, fromY] = this.last ?? [x, y];
 		this.last = [x, y];

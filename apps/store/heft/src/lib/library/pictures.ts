@@ -8,7 +8,6 @@ export const isPicture = (path: string) => /\.(png|jpe?g|webp|gif|avif)$/i.test(
 
 export const pictureName = (path: string) => path.slice(path.lastIndexOf('/') + 1).replace(/\.[^.]+$/, '');
 
-/** Makes a notebook in the subject with each picture on a page of its own, and opens it. */
 export async function importPictures(subject: SubjectEntry, paths: string[]) {
 	const pictures = paths.filter(isPicture);
 	if (!pictures.length) return;

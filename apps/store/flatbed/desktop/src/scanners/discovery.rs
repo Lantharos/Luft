@@ -6,10 +6,7 @@ use mdns_sd::{ResolvedService, ServiceDaemon, ServiceEvent};
 
 use super::{escl, found_escl, lost, sane};
 
-/// Driverless scanners, over HTTP and over HTTPS.
 const ESCL: [(&str, bool); 2] = [("_uscan._tcp.local.", false), ("_uscans._tcp.local.", true)];
-/// Canon's own network protocol, which SANE only finds by itself on networks
-/// that let its broadcasts through.
 const BJNP: &str = "_canon-bjnp1._tcp.local.";
 
 static BJNP_HOSTS: Mutex<BTreeSet<IpAddr>> = Mutex::new(BTreeSet::new());
@@ -50,7 +47,6 @@ fn browse(
         .expect("a thread for finding scanners");
 }
 
-/// The address to reach a service at, IPv4 first.
 fn address(service: &ResolvedService) -> Option<IpAddr> {
     let mut addresses: Vec<IpAddr> = service
         .addresses

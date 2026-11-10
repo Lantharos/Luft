@@ -2,6 +2,7 @@ mod capabilities;
 
 use std::io::Read;
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::mpsc::{self, RecvTimeoutError};
 use std::thread;
 use std::time::{Duration, Instant};
 
@@ -14,8 +15,13 @@ use super::{Feed, Progress, ScanError};
 
 const BUSY_RETRIES: u32 = 90;
 const PREVIEW_EVERY: Duration = Duration::from_millis(350);
+const ANSWER_WITHIN: Duration = Duration::from_secs(60);
+const PAGE_STARTS_WITHIN: Duration = Duration::from_secs(300);
+const PAGE_ARRIVES_WITHIN: Duration = Duration::from_secs(1800);
+const PAGE_STALLS_AFTER: Duration = Duration::from_secs(60);
+const CANCEL_CHECK_EVERY: Duration = Duration::from_millis(100);
+const LARGEST_PAGE: u64 = 1 << 30;
 
-/// Where an eSCL scanner answers, such as `http://192.168.1.20:80/eSCL`.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Endpoint {
     pub base: String,
@@ -45,12 +51,12 @@ impl Endpoint {
     }
 }
 
-/// Scanners on a home network have certificates nobody signed, so a secure
-/// connection to one can only be checked for being encrypted.
 fn agent() -> Agent {
     Agent::config_builder()
         .http_status_as_error(false)
         .timeout_connect(Some(Duration::from_secs(5)))
+        .timeout_recv_response(Some(ANSWER_WITHIN))
+        .timeout_recv_body(Some(ANSWER_WITHIN))
         .tls_config(TlsConfig::builder().disable_verification(true).build())
         .build()
         .new_agent()
@@ -66,7 +72,11 @@ pub fn capabilities(endpoint: &Endpoint) -> Result<Capabilities, String> {
         .call()
         .map_err(|error| error.to_string())?;
     if !response.status().is_success() {
-        return Err(format!("The scanner answered {}", response.status()));
+        eprintln!(
+            "flatbed: the scanner answered {} when asked what it can do",
+            response.status()
+        );
+        return Err("The scanner didn't say what it can do".into());
     }
     capabilities::parse(
         &response
@@ -108,8 +118,6 @@ fn settings(
     )
 }
 
-/// Scans every page `feed` gives, handing each over as the file the
-/// scanner sent, and what has arrived of it while it comes in.
 pub fn scan(
     endpoint: &Endpoint,
     feed: Feed,
@@ -139,26 +147,30 @@ pub fn scan(
         409 | 503 => return Err(ScanError::Busy),
         status => {
             let body = response.body_mut().read_to_string().unwrap_or_default();
-            return Err(failed(format!(
-                "The scanner refused the scan ({status}) {body}"
-            )));
+            eprintln!("flatbed: the scanner refused the scan ({status}) {body}");
+            return Err(failed("The scanner refused the scan"));
         }
     }
     let location = response
         .headers()
         .get("location")
         .and_then(|value| value.to_str().ok())
+        .and_then(path_on_scanner)
         .ok_or_else(|| failed("The scanner didn't say where the scan is"))?;
-    let job = if location.starts_with('/') {
-        format!("{}{location}", endpoint.origin())
-    } else {
-        location.to_owned()
-    };
+    let job = format!("{}{location}", endpoint.origin());
     let result = documents(&agent, &job, feed, dpi, cancel, progress);
     if cancel.load(Ordering::Relaxed) || result.is_err() {
         let _ = agent.delete(&job).call();
     }
     result
+}
+
+fn path_on_scanner(location: &str) -> Option<&str> {
+    if location.starts_with('/') {
+        return Some(location);
+    }
+    let (_, after_scheme) = location.split_once("://")?;
+    Some(&after_scheme[after_scheme.find('/')?..])
 }
 
 fn documents(
@@ -175,15 +187,23 @@ fn documents(
         if cancel.load(Ordering::Relaxed) {
             return Err(ScanError::Cancelled);
         }
-        let mut response = agent
+        let response = agent
             .get(format!("{job}/NextDocument"))
+            .config()
+            .timeout_recv_response(Some(PAGE_STARTS_WITHIN))
+            .timeout_recv_body(Some(PAGE_ARRIVES_WITHIN))
+            .build()
             .call()
             .map_err(failed)?;
         match response.status().as_u16() {
             200 => {
                 busy = 0;
-                let mut reader = response.body_mut().with_config().limit(u64::MAX).reader();
-                let bytes = receive(&mut reader, cancel, progress)?;
+                let reader = response
+                    .into_body()
+                    .into_with_config()
+                    .limit(LARGEST_PAGE)
+                    .reader();
+                let bytes = receive(reader, cancel, progress)?;
                 progress.page_encoded(bytes, dpi as f32);
                 pages += 1;
                 if feed == Feed::Glass {
@@ -203,13 +223,14 @@ fn documents(
                 thread::sleep(Duration::from_secs(1));
             }
             503 => return Err(ScanError::Busy),
-            status => return Err(failed(format!("The scanner answered {status}"))),
+            status => {
+                eprintln!("flatbed: the scanner answered {status} when asked for a page");
+                return Err(failed("The scanner didn't send the page"));
+            }
         }
     }
 }
 
-/// What has arrived of a JPEG, closed with an end marker so it shows as
-/// far as it goes.
 fn ended(partial: &[u8]) -> Vec<u8> {
     let mut closed = Vec::with_capacity(partial.len() + 2);
     closed.extend_from_slice(partial);
@@ -217,27 +238,65 @@ fn ended(partial: &[u8]) -> Vec<u8> {
     closed
 }
 
-/// Reads a scanned page as it streams in, showing what's there so far.
 fn receive(
-    reader: &mut impl Read,
+    mut reader: impl Read + Send + 'static,
     cancel: &AtomicBool,
     progress: &mut dyn Progress,
 ) -> Result<Vec<u8>, ScanError> {
+    let (arrived, arriving) = mpsc::sync_channel(8);
+    thread::spawn(move || {
+        let mut chunk = vec![0; 64 * 1024];
+        loop {
+            let sent = match reader.read(&mut chunk) {
+                Ok(0) => break,
+                Ok(read) => arrived.send(Ok(chunk[..read].to_vec())),
+                Err(error) => arrived.send(Err(error)),
+            };
+            if sent.is_err() {
+                break;
+            }
+        }
+    });
     let mut bytes = Vec::with_capacity(1 << 20);
-    let mut chunk = vec![0; 64 * 1024];
+    let mut heard = Instant::now();
     let mut shown = Instant::now();
     loop {
         if cancel.load(Ordering::Relaxed) {
             return Err(ScanError::Cancelled);
         }
-        let read = reader.read(&mut chunk).map_err(failed)?;
-        if read == 0 {
-            return Ok(bytes);
+        match arriving.recv_timeout(CANCEL_CHECK_EVERY) {
+            Ok(chunk) => {
+                bytes.extend_from_slice(&chunk.map_err(failed)?);
+                heard = Instant::now();
+                if shown.elapsed() >= PREVIEW_EVERY {
+                    progress.preview(&ended(&bytes));
+                    shown = Instant::now();
+                }
+            }
+            Err(RecvTimeoutError::Disconnected) => return Ok(bytes),
+            Err(RecvTimeoutError::Timeout) if heard.elapsed() < PAGE_STALLS_AFTER => {}
+            Err(RecvTimeoutError::Timeout) => {
+                return Err(failed("The scanner stopped sending the page"));
+            }
         }
-        bytes.extend_from_slice(&chunk[..read]);
-        if shown.elapsed() >= PREVIEW_EVERY {
-            progress.preview(&ended(&bytes));
-            shown = Instant::now();
-        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn a_scan_stays_on_the_scanner_that_started_it() {
+        assert_eq!(
+            path_on_scanner("/eSCL/ScanJobs/7"),
+            Some("/eSCL/ScanJobs/7")
+        );
+        assert_eq!(
+            path_on_scanner("http://127.0.0.1:631/eSCL/ScanJobs/7"),
+            Some("/eSCL/ScanJobs/7")
+        );
+        assert_eq!(path_on_scanner("https://printer.local"), None);
+        assert_eq!(path_on_scanner("ScanJobs/7"), None);
     }
 }

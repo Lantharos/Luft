@@ -28,15 +28,11 @@ export interface SurfaceHost {
 	target(index: number): Target | null;
 	preview(scale: number, x: number, y: number): void;
 	ruler(): Ruler;
-	/** A click with the mouse, to type there. */
 	typeAt(target: Target, x: number, y: number, client: [number, number]): void;
-	/** A tap with a finger, or with the pen while typing, to type there with the next key. */
 	aim(target: Target, x: number, y: number): void;
-	/** A stroke was written with the pen or mouse. */
 	wrote(target: Target, stroke: Stroke): void;
 	undo(): void;
 	redo(): void;
-	/** A tap on a page; true when it was taken, such as to play what was said as it was written there. */
 	tapped(index: number, x: number, y: number): boolean;
 }
 
@@ -47,7 +43,6 @@ function stopTyping() {
 
 type Action = Drawing | Erasing | TextPicking | TextCarrying | Lassoing | { pan: true; x: number; y: number };
 
-/** Sorts pointers into writing, erasing, panning and zooming, and keeps the palm out of it. */
 export class Surface {
 	private readonly actions = new Map<number, Action>();
 	private readonly starts = new Map<number, { x: number; y: number; time: number; far: boolean }>();
@@ -189,10 +184,6 @@ export class Surface {
 		}
 	}
 
-	/**
-	 * Pen and mouse samples as soon as they arrive, before the frame's
-	 * pointermove, so the ink reaches the frame that is being drawn.
-	 */
 	rawUpdate(event: PointerEvent) {
 		const action = this.actions.get(event.pointerId);
 		if (event.pointerType === 'touch' || !(action instanceof Drawing)) return;

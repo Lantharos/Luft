@@ -2,7 +2,6 @@ import { POINT_FIELDS, type Stroke } from './stroke';
 
 const TAU = Math.PI * 2;
 
-/** Anything a stroke's outline can be traced into: a Path2D, or a PDF page. */
 export type PathSink = Pick<Path2D, 'moveTo' | 'lineTo' | 'arc' | 'closePath'>;
 
 export function addDot(path: PathSink, x: number, y: number, radius: number) {
@@ -10,10 +9,6 @@ export function addDot(path: PathSink, x: number, y: number, radius: number) {
 	path.arc(x, y, radius, 0, TAU);
 }
 
-/**
- * The quad between two round ends, wound the same way as `addDot`'s circles,
- * so a nonzero fill of all of them is their union.
- */
 export function addSegment(path: PathSink, x1: number, y1: number, r1: number, x2: number, y2: number, r2: number) {
 	const dx = x2 - x1;
 	const dy = y2 - y1;

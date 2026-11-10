@@ -49,11 +49,6 @@ function overlap(row: Row, stroke: Stroke) {
 	return Math.min(row.bottom, stroke.bounds.bottom) - Math.max(row.top, stroke.bounds.top);
 }
 
-/**
- * Letters go to the row they overlap most; dots and accents to the row
- * nearest them, as do one or two small strokes left in a row of their own,
- * such as an accent over a capital that came out as tall as a letter.
- */
 function rows(letters: Stroke[], marks: Stroke[], letter: number): Row[] {
 	const found: Row[] = [];
 	for (const stroke of letters.toSorted((a, b) => a.bounds.top - b.bounds.top)) {
@@ -78,12 +73,6 @@ function rows(letters: Stroke[], marks: Stroke[], letter: number): Row[] {
 	return found.toSorted((a, b) => a.top - b.top);
 }
 
-/**
- * Sorts a page's pen strokes into lines of writing, the way they'd be read:
- * letters that share a band of height, split where a wide gap starts another
- * column. Strokes far taller than the writing are drawings, and long flat
- * ones are rules and underlines.
- */
 export function writtenLines(strokes: Stroke[]): WrittenLine[] {
 	const pens = strokes.filter((stroke) => stroke.tool === 'pen');
 	const letter = Math.max(4, median(pens.map(height)));
@@ -102,7 +91,6 @@ export function writtenLines(strokes: Stroke[]): WrittenLine[] {
 	});
 }
 
-/** A short name for exactly this set of pen strokes. */
 export function inkPrint(strokes: Stroke[]) {
 	let hash = 0x811c9dc5;
 	for (const id of strokes.filter((stroke) => stroke.tool === 'pen').map((stroke) => stroke.id).sort()) {

@@ -3,6 +3,7 @@ use sabine::SabineWindow;
 
 use super::params::*;
 use crate::accounts::{Account, Login, Secret, discover, oauth_sign_in};
+use crate::services::cache;
 use crate::state::MailmanState;
 use crate::store::now;
 use crate::sync::{Engine, Operation};
@@ -115,7 +116,10 @@ fn sign_in_again(state: &MailmanState, request: SignInAgain) -> Result<(), Strin
 fn remove(state: &MailmanState, Id { id }: Id) -> Result<(), String> {
     state.engine.remove(id);
     state.credentials.forget(id);
-    state.store.remove_account(id)
+    state.store.remove_account(id)?;
+    let store = state.store.clone();
+    std::thread::spawn(move || cache::forget_removed_messages(&store));
+    Ok(())
 }
 
 pub fn register(window: SabineWindow, state: &MailmanState) -> SabineWindow {

@@ -9,7 +9,6 @@ const ABOVE = 0.8;
 const BELOW = 0.3;
 const INSERT_WITHIN = 30_000;
 
-/** Where the next line turned into text goes, after a tap or caret between words. */
 export const marked: { insertion: (Insertion & { page: string }) | null } = $state({ insertion: null });
 
 export interface ConverterHost {
@@ -25,11 +24,6 @@ function over(object: PageObject, stroke: Stroke) {
 	return x > object.x - size && x < object.x + object.width + size && y > object.y - line * ABOVE && y < object.y + object.height + line * BELOW;
 }
 
-/**
- * Turns writing into text when the pen pauses, and applies corrections
- * written over text that came from handwriting. Strokes wait until nobody
- * has written for a moment, then each page's are read together.
- */
 export class Converter {
 	private readonly pending = new Map<string, Set<string>>();
 	private timer = 0;
@@ -86,7 +80,6 @@ export class Converter {
 		await convert(page, free, insertion);
 	}
 
-	/** Applies corrections to one text box; the strokes that weren't corrections. */
 	private async correct(page: Page, object: PageObject, strokes: Stroke[]) {
 		const box = page.element.querySelector<HTMLElement>(`[data-object="${object.id}"]`);
 		if (!box) return strokes;
@@ -101,14 +94,12 @@ export class Converter {
 		return strokes.filter((stroke) => !used.includes(stroke));
 	}
 
-	/** Shows where the next line goes, for a while. */
 	private mark(insertion: Insertion & { page: string }) {
 		marked.insertion = insertion;
 		const still = () => marked.insertion?.object === insertion.object && marked.insertion.offset === insertion.offset;
 		window.setTimeout(() => still() && (marked.insertion = null), INSERT_WITHIN);
 	}
 
-	/** Turns picked ink into text straight away, whatever the setting. */
 	async convertNow(page: Page, strokes: Stroke[]) {
 		await convert(page, strokes.filter((stroke) => stroke.tool === 'pen'), null);
 	}

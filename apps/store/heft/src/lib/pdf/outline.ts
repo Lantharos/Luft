@@ -5,13 +5,11 @@ import { sourcePath } from './sources';
 export interface Heading {
 	title: string;
 	depth: number;
-	/** The page in the notebook, or -1 when the book's page was deleted. */
 	page: number;
 }
 
 type Outline = Awaited<ReturnType<Awaited<ReturnType<typeof pdfDocument>>['getOutline']>>;
 
-/** The books' tables of contents, pointing at pages of this notebook. */
 export async function notebookOutline(notebook: OpenNotebook): Promise<Heading[]> {
 	const sources = [...new Set(notebook.meta.pages.flatMap((page) => (page.pdf ? [page.pdf.source] : [])))];
 	const headings: Heading[] = [];

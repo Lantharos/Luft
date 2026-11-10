@@ -15,19 +15,12 @@ export const pointsOf = (stroke: Stroke) => {
 	return points;
 };
 
-/** The languages the person writes in, as chosen in settings or as the system and Heft know them. */
 export function languages() {
 	return settings.values.languages.length ? settings.values.languages : [i18n.locale, ...navigator.languages];
 }
 
-/** Whether the person writes in Cyrillic, as Heft's own language does; otherwise Cyrillic look-alikes are read as Latin. */
 export const writesCyrillic = () => CYRILLIC_LOCALES.has(i18n.locale);
 
-/**
- * Reads strokes as text straight away, ahead of background reading, and
- * tidies it for the person's languages; null when it can't be read, or
- * comes out in Cyrillic to go into Latin text.
- */
 export async function readNow(strokes: Stroke[], context = ''): Promise<string | null> {
 	const read = await commands.handwritingRead({ strokes: strokes.map(pointsOf), now: true });
 	if (read.kind !== 'text' || !read.text) return null;
@@ -43,7 +36,6 @@ export interface Correction {
 	strokes: [number, number][][];
 }
 
-/** Keeps a correction on this computer, when the person agreed to, for tuning reading later. */
 export function keep(correction: Correction) {
 	if (!settings.values.keepCorrections) return;
 	void commands.keepCorrection({ line: JSON.stringify({ at: Date.now(), languages: languages(), ...correction }) });

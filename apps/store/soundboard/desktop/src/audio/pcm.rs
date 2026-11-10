@@ -10,8 +10,6 @@ use super::{CHANNELS, RATE};
 const RESIDENT_HEAD_FRAMES: usize = RATE as usize / 4;
 const PAGE: usize = 4096;
 
-/// A sound decoded to 48 kHz stereo floats, mapped from the app's data folder so a board of long sounds costs no memory
-/// until it plays.
 pub struct Pcm {
     map: Mmap,
 }
@@ -29,7 +27,6 @@ impl Pcm {
         unsafe { self.map.align_to::<f32>().1 }
     }
 
-    /// Reads the start of a range now and the rest ahead, so the mixing thread never waits on the disk.
     pub fn prefault(&self, frames: Range<usize>) {
         let bytes = |frame: usize| frame * CHANNELS * size_of::<f32>();
         let start = bytes(frames.start) / PAGE * PAGE;

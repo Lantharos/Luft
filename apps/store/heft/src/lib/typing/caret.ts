@@ -11,7 +11,6 @@ export function caretAtEnd(element: HTMLElement) {
 	place(range);
 }
 
-/** The text node and offset `count` characters into an element's text. */
 export function pointAt(element: HTMLElement, count: number): [Node, number] {
 	const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
 	let left = count;
@@ -24,7 +23,6 @@ export function pointAt(element: HTMLElement, count: number): [Node, number] {
 	return last ? [last, last.length] : [element, element.childNodes.length];
 }
 
-/** How many characters of an element's text come before a point in it. */
 export function offsetOf(element: HTMLElement, node: Node, offset: number) {
 	const range = document.createRange();
 	range.selectNodeContents(element);
@@ -32,7 +30,6 @@ export function offsetOf(element: HTMLElement, node: Node, offset: number) {
 	return range.toString().length;
 }
 
-/** Puts the caret at a point on screen, or a number of characters into the text. */
 export function caretAt(element: HTMLElement, at: [number, number] | number) {
 	const range = document.createRange();
 	if (typeof at === 'number') {
@@ -47,7 +44,6 @@ export function caretAt(element: HTMLElement, at: [number, number] | number) {
 	place(range);
 }
 
-/** How many characters into the text the caret is, or null when it's elsewhere. */
 export function caretOffset(element: HTMLElement) {
 	const selection = getSelection();
 	if (!selection?.rangeCount || !element.contains(selection.anchorNode)) return null;

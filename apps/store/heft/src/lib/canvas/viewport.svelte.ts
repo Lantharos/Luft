@@ -7,11 +7,6 @@ const OVERSCROLL = 120;
 const PAGE_MARGIN = 24;
 const PUSH_TO_TURN = 160;
 
-/**
- * Where the notebook is scrolled and how far it is zoomed, in screen pixels.
- * With `single` set, only that page shows, and scrolling on past its end
- * turns to the next.
- */
 export class Viewport {
 	width = $state(0);
 	height = $state(0);
@@ -94,7 +89,6 @@ export class Viewport {
 		this.clamp();
 	}
 
-	/** Goes `by` pages on in single-page mode, to the top of a page after or the end of one before. */
 	turn(by: number) {
 		if (this.single === null) return;
 		const index = Math.min(this.layout.pages.length - 1, Math.max(0, this.single + by));
@@ -104,7 +98,6 @@ export class Viewport {
 		this.clamp();
 	}
 
-	/** Shows one page at a time from `index` on, or all of them again with `null`. */
 	setSingle(index: number | null) {
 		this.single = index;
 		this.push = 0;

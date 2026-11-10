@@ -10,7 +10,6 @@ export const choosePdfs = () => commands.chooseFiles({ kind: 'pdf', title: t('bo
 
 export const isPdf = (path: string) => /\.pdf$/i.test(path);
 
-/** Makes a book in the subject from each PDF, and opens the last one. */
 export async function importBooks(subject: SubjectEntry, paths: string[]) {
 	for (const path of paths.filter(isPdf)) {
 		const book = await library.createNotebook(subject, bookName(path), DEFAULT_PAPER, (folder) => pdfPages(folder, path));

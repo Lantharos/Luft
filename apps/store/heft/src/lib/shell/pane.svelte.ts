@@ -23,7 +23,6 @@ interface Place {
 const SAVE_AFTER = 600;
 const DEFAULT_LEFT = 40;
 
-/** One notebook on screen, scrolled and zoomed on its own, and remembered that way. */
 export class Pane {
 	readonly viewport = new Viewport();
 	readonly ruler = new Ruler();
@@ -38,7 +37,6 @@ export class Pane {
 		return viewport.layout.pages.length ? pageNear(viewport.layout, (viewport.y + viewport.height / 3) / viewport.zoom) : 0;
 	}
 
-	/** Puts the notebook back where it was left, once the pane knows its size. */
 	place() {
 		const { viewport } = this;
 		if (this.placed || !viewport.width || !viewport.layout.pages.length) return;
@@ -64,7 +62,6 @@ export class Pane {
 		}
 	}
 
-	/** Shows every page one after another, or one at a time, keeping the page in view. */
 	flow(pages: PageFlow) {
 		const { viewport } = this;
 		if (!this.placed || (pages === 'single') === (viewport.single !== null)) return;
@@ -82,7 +79,6 @@ export class Pane {
 		}, SAVE_AFTER);
 	}
 
-	/** The page in view and what's written on it, once it's loaded. */
 	get page() {
 		const entry = this.notebook.meta.pages[this.current];
 		const store = entry && this.notebook.store(entry.id);
@@ -95,20 +91,17 @@ export class Pane {
 		if (page) await addPictureFiles(page.document, this.notebook.folder, page.rect, paths);
 	}
 
-	/** Puts a photo on the page in view and offers to crop it straight away. */
 	async addPhoto(bytes: Uint8Array) {
 		const page = this.page;
 		const object = page && (await addPicture(page.document, this.notebook.folder, page.rect, bytes, 'photo.jpg'));
 		if (object) editing.crop = object.id;
 	}
 
-	/** Adds picked book text to the page in view as a quote. */
 	quote(text: string) {
 		const page = this.page;
 		if (page) addQuote(page.document, page.rect.width, text);
 	}
 
-	/** Puts the caret on a new page's first line, in a notebook made for typing. */
 	private typeOn(page: PageEntry) {
 		const lines = linesOf(this.notebook, page);
 		const { width } = pageSize(paperOf(this.notebook.meta, page), page);

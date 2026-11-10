@@ -6,10 +6,6 @@ const QUARTER = Math.PI / 4;
 
 export type Guide = (x: number, y: number) => [number, number];
 
-/**
- * A straightedge lying on the screen over the pages, in screen pixels from
- * the pane's corner, so it stays put while the page scrolls under it.
- */
 export class Ruler {
 	shown = $state(false);
 	x = $state(0);
@@ -32,7 +28,6 @@ export class Ruler {
 		this.y += dy;
 	}
 
-	/** Turns to `angle`, settling on the nearest eighth of a turn when close to one. */
 	turnTo(angle: number) {
 		const nearest = Math.round(angle / QUARTER) * QUARTER;
 		this.angle = Math.abs(angle - nearest) < SNAP_ANGLE ? nearest : angle;
@@ -43,11 +38,6 @@ export class Ruler {
 		return degrees > 90 ? 180 - degrees : degrees;
 	}
 
-	/**
-	 * For a stroke starting at a point near either long edge, or on the ruler
-	 * itself, keeps every point of it on that edge, `radius` away so the ink
-	 * touches the edge rather than running under it.
-	 */
 	guide(x: number, y: number, radius: number): Guide | null {
 		if (!this.shown) return null;
 		const [along, across] = this.local(x, y);

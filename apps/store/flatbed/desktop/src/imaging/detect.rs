@@ -11,7 +11,6 @@ use rayon::prelude::*;
 
 use super::geometry::Quad;
 
-/// How large detection looks at a picture, on its longer side.
 const DETECTION_SIZE: u32 = 480;
 
 struct Limits {
@@ -32,14 +31,10 @@ const GLASS: Limits = Limits {
     skew: 6.0,
 };
 
-/// How far found corners are pulled in, so no sliver of what's around the
-/// paper comes along.
 const EDGE_INSET: f32 = 0.006;
 
-/// The most a scanner's lid around a smaller paper may vary in brightness.
 const EVEN_LID: f32 = 22.0;
 
-/// `source` in grey, shrunk by averaging so its longer side is at most `limit`.
 pub fn shrunk_grey(source: &RgbImage, limit: u32) -> GrayImage {
     let (width, height) = source.dimensions();
     let factor = width.max(height).div_ceil(limit).max(1);
@@ -66,12 +61,10 @@ pub fn small_grey(source: &RgbImage) -> GrayImage {
     shrunk_grey(source, DETECTION_SIZE)
 }
 
-/// The paper in a photo, when one stands out from what's around it.
 pub fn find_page(small: &GrayImage) -> Option<Quad> {
     best(small, &PHOTO, |_| true)
 }
 
-/// A paper smaller than the glass on a scan, lying on an even lid.
 pub fn find_page_on_glass(small: &GrayImage) -> Option<Quad> {
     best(small, &GLASS, |quad| even_around(small, quad))
 }
@@ -101,7 +94,6 @@ fn best(small: &GrayImage, limits: &Limits, fits: impl Fn(&Quad) -> bool) -> Opt
         .max_by(|a, b| a.area().total_cmp(&b.area()))
 }
 
-/// Four corners for a contour whose outline is close to a quadrilateral.
 fn quad_around(points: &[Point<i32>], width: u32, height: u32) -> Option<Quad> {
     let hull = convex_hull(points.to_vec());
     let hull_area = contour_area(&hull);
@@ -140,7 +132,6 @@ fn extremes(hull: &[Point<i32>]) -> [Point<i32>; 4] {
     ]
 }
 
-/// Whether what's around `quad` is one even surface, as a scanner's lid is.
 fn even_around(small: &GrayImage, quad: &Quad) -> bool {
     let (width, height) = small.dimensions();
     let corners = quad.in_pixels(width, height);

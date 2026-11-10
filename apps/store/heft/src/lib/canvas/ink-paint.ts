@@ -2,7 +2,6 @@ import { css, HIGHLIGHTER_OPACITY, onDark } from '#lib/ink/color.js';
 import { pathOf } from '#lib/ink/geometry.js';
 import { overlaps, type Bounds, type Stroke } from '#lib/ink/stroke.js';
 
-/** While a recording plays, what was written between `after` and `until` on the clock hasn't been written yet. */
 export interface Unwritten {
 	after: number;
 	until: number;
@@ -21,7 +20,6 @@ const opacity = (stroke: Stroke, ink: Ink) => (stroke.tool === 'highlighter' ? H
 
 export const inkColor = (rgb: number, ink: Ink) => css(ink.dark ? onDark(rgb) : rgb);
 
-/** Draws the strokes that touch `area`: highlighters first, under the ink, then pens. */
 export function paintStrokes(context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D, strokes: Stroke[], area: Bounds, ink: Ink) {
 	for (const highlighters of [true, false]) {
 		for (const stroke of strokes) {

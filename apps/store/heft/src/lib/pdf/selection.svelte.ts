@@ -2,7 +2,6 @@ import { newId, POINT_FIELDS, strokeBounds, type Stroke } from '#lib/ink/stroke.
 import type { PageDocument } from '#lib/page/document.js';
 import type { Selection } from './text';
 
-/** Text picked on a book page, waiting for what to do with it. */
 class TextSelection {
 	page: string | null = $state(null);
 	selection: Selection = $state({ rects: [], text: '' });
@@ -20,7 +19,6 @@ class TextSelection {
 		this.selection = { rects: [], text: '' };
 	}
 
-	/** Marks the text with clean bars of highlighter, one for each line. */
 	highlight(color: number) {
 		const document = this.document;
 		if (!document) return;

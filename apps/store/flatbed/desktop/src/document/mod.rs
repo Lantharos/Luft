@@ -19,7 +19,6 @@ pub use page::{Kind, Page, PageView, Source, decode};
 
 pub const CHANGED: BridgeEvent<DocumentView> = BridgeEvent::new("document.changed");
 
-/// Decoded sources kept for changing a page again soon after.
 const KEPT_SOURCES: usize = 3;
 
 #[derive(Clone, Serialize, Type)]
@@ -131,7 +130,6 @@ impl Document {
     }
 }
 
-/// Adds a page at the end, straightened and cleaned up, and returns its id.
 pub fn add(source: Source, origin: Origin, dpi: Option<f32>) -> Result<String, String> {
     let (id, version, mode) = {
         let mut document = lock();
@@ -169,8 +167,6 @@ fn develop_later(ids: impl IntoIterator<Item = String>) {
     DEVELOP.1.notify_one();
 }
 
-/// Develops pages whose corners, turn or mode changed, one at a time, each
-/// as it is when its turn comes.
 fn develop_queued() {
     loop {
         let id = {
@@ -266,7 +262,6 @@ pub fn clear() {
     changed(&document);
 }
 
-/// Changes how every page comes out, developing them again in turn.
 pub fn set_mode(mode: Mode) {
     let mut document = lock();
     if document.mode == mode {
@@ -281,13 +276,11 @@ pub fn mode() -> Mode {
     lock().mode
 }
 
-/// A copy of the pages as they are now, for saving.
 pub fn snapshot() -> (Vec<Page>, Mode, PathBuf) {
     let document = lock();
     (document.pages.clone(), document.mode, folder())
 }
 
-/// The pages' source pictures, for developing them again when saving.
 pub fn source_of(page: &Page) -> Result<Arc<RgbImage>, String> {
     source(page)
 }

@@ -15,7 +15,6 @@ use crate::settings::PaperSize;
 const POINTS_PER_INCH: f32 = 72.0;
 const A4: (f32, f32) = (595.28, 841.89);
 const LETTER: (f32, f32) = (612.0, 792.0);
-/// How close a page's proportions must be to a paper size to take it.
 const SAME_SHAPE: f32 = 0.04;
 
 pub struct Sheet<'a> {
@@ -24,7 +23,6 @@ pub struct Sheet<'a> {
     pub words: Option<Vec<Word>>,
 }
 
-/// The size a page is printed at, in points.
 fn page_size(page: &Page, paper: PaperSize) -> (f32, f32) {
     let (width, height) = (page.size.0 as f32, page.size.1 as f32);
     let landscape = width > height;
@@ -64,7 +62,6 @@ fn page_size(page: &Page, paper: PaperSize) -> (f32, f32) {
     }
 }
 
-/// A black and white page as one bit per pixel, packed and compressed.
 fn packed_bits(png: &[u8]) -> Result<(Vec<u8>, u32, u32), String> {
     let image: GrayImage = image::load_from_memory(png)
         .map_err(|error| error.to_string())?
@@ -88,7 +85,6 @@ fn packed_bits(png: &[u8]) -> Result<(Vec<u8>, u32, u32), String> {
     ))
 }
 
-/// Whether a JPEG has one channel, read from its header alone.
 fn is_grey_jpeg(bytes: &[u8]) -> bool {
     JpegDecoder::new(Cursor::new(bytes))
         .is_ok_and(|decoder| decoder.color_type().channel_count() == 1)

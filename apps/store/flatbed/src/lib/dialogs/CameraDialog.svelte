@@ -6,8 +6,7 @@
 
 	let { onclose }: { onclose: () => void } = $props();
 
-	/** How quickly the outline follows the paper; lower is steadier. */
-	const FOLLOW = 0.35;
+	const OUTLINE_EASING = 0.35;
 
 	let canvas: HTMLCanvasElement;
 	let phase: 'opening' | 'live' | 'refused' | 'failed' = $state('opening');
@@ -65,7 +64,7 @@
 			corners = null;
 			return;
 		}
-		corners = corners ? corners.map((value, index) => value + (found[index] - value) * FOLLOW) : found;
+		corners = corners ? corners.map((value, index) => value + (found[index] - value) * OUTLINE_EASING) : found;
 	}
 
 	async function take() {

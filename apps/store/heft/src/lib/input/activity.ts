@@ -1,4 +1,3 @@
-/** When someone last wrote, erased or moved around a page, so background work can wait for a pause. */
 class Activity {
 	private last = 0;
 

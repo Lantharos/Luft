@@ -27,7 +27,6 @@ export interface Visible {
 	bottom: number;
 }
 
-/** A page's committed ink, drawn in tiles of 256 screen pixels at the current zoom. */
 export class TileLayer {
 	private readonly tiles = new Map<string, Tile>();
 	private zoom = 0;
@@ -52,7 +51,6 @@ export class TileLayer {
 		for (const tile of this.tiles.values()) this.paint(tile);
 	}
 
-	/** Fades what a playing recording hasn't reached yet, redrawing only where that changed. */
 	setUnwritten(next: Unwritten | null) {
 		const before = this.ink;
 		const after = { ...before, unwritten: next };
@@ -93,7 +91,6 @@ export class TileLayer {
 		}
 	}
 
-	/** Draws a new stroke on top of what the tiles show, without redrawing them. */
 	private add(stroke: Stroke) {
 		for (const tile of this.tiles.values()) {
 			if (!overlaps(stroke.bounds, this.area(tile))) continue;

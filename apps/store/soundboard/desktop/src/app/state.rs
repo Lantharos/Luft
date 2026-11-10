@@ -24,7 +24,6 @@ const CLOSE_SETTLE: Duration = Duration::from_millis(500);
 const DEFAULT_ATTEMPTS: u32 = 20;
 const DEFAULT_RETRY: Duration = Duration::from_millis(100);
 
-/// What a press needs, kept apart from the library so saving a change never makes a press wait for the disk.
 struct Playable {
     pcm: Arc<Pcm>,
     range: Range<usize>,
@@ -86,8 +85,6 @@ impl SoundboardState {
         })
     }
 
-    /// Runs only in the app's own process. Sabine starts this program again for each window's host and for every later
-    /// launch, and none of those may make a virtual microphone of their own.
     pub fn start(&self) {
         let (statuses, status_receiver) = tokio::sync::mpsc::unbounded_channel();
         let engine = Engine::start(self.settings().mix, move |status: &Status| {
@@ -140,7 +137,6 @@ impl SoundboardState {
         }
     }
 
-    /// Call after anything changes a sound.
     pub fn refresh_playable(&self) {
         let store = self.shared.store.lock();
         let playable = store
@@ -201,8 +197,6 @@ impl SoundboardState {
         });
     }
 
-    /// Follows the choice to be the default input. The sound server's PulseAudio side learns about the virtual microphone a moment after it exists, so the first
-    /// tries can fail.
     fn keep_default_input(&self, status: &Status) {
         let wanted = self.shared.settings.lock().use_as_default
             && !self.shared.quitting.load(Ordering::Relaxed);
@@ -254,8 +248,6 @@ impl SoundboardState {
         self.shared.settings.lock().save()
     }
 
-    /// Returns the default input to what it was. The sound server falls back by itself after a crash, and the next
-    /// start finds the old default still saved.
     pub fn give_default_back(&self) -> Result<(), String> {
         let before = self.shared.settings.lock().default_before.take();
         if let Some(before) = before {
@@ -279,7 +271,6 @@ impl SoundboardState {
         settings.save()
     }
 
-    /// Hotkeys work without a window, so this runs at startup; the first page waits for it to know what to show.
     pub async fn open_hotkeys_once(&self) {
         self.shared
             .hotkeys_opened
@@ -317,7 +308,6 @@ impl SoundboardState {
         self.shared.events.emit(TRIGGERS, triggers);
     }
 
-    /// Tells the desktop about the sounds there are now.
     pub async fn bind_hotkeys(&self) -> Result<(), String> {
         let sounds: Vec<(String, String)> = {
             let store = self.shared.store.lock();
@@ -352,7 +342,6 @@ impl SoundboardState {
         });
     }
 
-    /// Meters only run while someone can see them and there's something to measure, so they cost nothing otherwise.
     fn start_meters(&self) {
         if self.shared.metering.swap(true, Ordering::Relaxed) {
             return;

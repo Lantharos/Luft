@@ -26,9 +26,7 @@ export const FIRST_RULE = 3 * 8 * MM;
 export const CORNELL_HEADER = 26 * MM;
 
 export interface Ruling {
-	/** Thin rules as one SVG path, in page units. */
 	lines: string;
-	/** Emphasised rules: margins and the Cornell layout. */
 	accents: string;
 	dots: { spacing: number; offset: number } | null;
 }

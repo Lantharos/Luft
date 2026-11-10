@@ -15,10 +15,6 @@ function pdfLibrary(): Promise<Library> {
 	return library;
 }
 
-/**
- * A PDF opened in pdf.js's worker. Only the parts of the file that the pages
- * on screen need are read, so a scanned 300-page book opens as fast as a short one.
- */
 export function pdfDocument(path: string): Promise<PDFDocumentProxy> {
 	let pending = documents.get(path);
 	if (!pending) {
@@ -40,5 +36,4 @@ export function pdfDocument(path: string): Promise<PDFDocumentProxy> {
 	return pending;
 }
 
-/** Page units are CSS pixels at 96 per inch; PDF points are 72 per inch. */
-export const POINTS = 96 / 72;
+export const PAGE_UNITS_PER_POINT = 96 / 72;

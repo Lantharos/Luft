@@ -19,7 +19,6 @@ pub struct Corners {
 #[derive(Deserialize, Type)]
 pub struct Turn {
     pub id: String,
-    /// Quarter turns clockwise, negative for anticlockwise.
     pub quarters: i8,
 }
 
@@ -66,7 +65,6 @@ pub struct Files {
     pub files: Vec<String>,
 }
 
-/// The settings people choose in the window.
 #[derive(Deserialize, Type)]
 pub struct Preferences {
     pub languages: Vec<String>,

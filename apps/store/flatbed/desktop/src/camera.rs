@@ -16,8 +16,6 @@ const REQUEST: Request = Request {
     largest: (4096, 3072),
 };
 
-/// The page is looked for at most this often, so a fast camera doesn't
-/// keep a core busy.
 const LOOK_EVERY: Duration = Duration::from_millis(90);
 
 struct Live {
@@ -29,7 +27,6 @@ struct Live {
 
 static LIVE: Mutex<Option<Live>> = Mutex::new(None);
 
-/// Opens the camera through the camera portal; false when the person said no.
 async fn open(Empty {}: Empty) -> Result<bool, String> {
     let Some(camera) = Camera::open(REQUEST).await? else {
         return Ok(false);
@@ -60,9 +57,6 @@ fn pixels(frame: &Frame) -> Option<RgbImage> {
     }))
 }
 
-/// The newest frame for the page, after the corners of the paper in it as
-/// eight little endian floats, NaN when there's no paper to see; empty when
-/// no new frame came.
 fn frame(_: BridgeCommand) -> BridgeResult {
     let mut live = LIVE.lock().expect("camera lock");
     let Some(live) = live.as_mut() else {
@@ -88,7 +82,6 @@ fn frame(_: BridgeCommand) -> BridgeResult {
     Ok(BridgeResponse::bytes(bytes))
 }
 
-/// Adds the frame on screen as a page.
 async fn capture(Empty {}: Empty) -> Result<String, String> {
     let frame = LIVE
         .lock()

@@ -21,7 +21,6 @@ interface Read {
 
 export interface Corrected {
 	used: Stroke[];
-	/** Where the next line written goes, characters into the box's text. */
 	insert: number | null;
 }
 
@@ -35,7 +34,6 @@ function nearestLine(lines: RenderedLine[], stroke: Stroke, size: number) {
 	return lineAt(lines, (stroke.bounds.top + stroke.bounds.bottom) / 2 + size * LINE_MIDDLE);
 }
 
-/** Two dots side by side over a letter are one mark, a diaeresis. */
 function pairDots(reads: Read[], size: number): Read[] {
 	const isDot = (read: Read) => read.found.kind === 'mark' && read.found.mark === 'dot';
 	const out = reads.filter((read) => !isDot(read));
@@ -59,12 +57,6 @@ function near(a: Stroke, b: Stroke, size: number) {
 	return across < size * NEAR && down < size * NEAR;
 }
 
-/**
- * Strokes written along with writing belong to it, like the accent over a
- * capital or a joining stroke that looks like a line through a word, rather
- * than being corrections of their own; and writing that touches is one piece,
- * on the line most of it sits on.
- */
 function joinWriting(reads: Read[], size: number): Read[] {
 	const pieces: Read[][] = [];
 	for (const read of reads.filter((candidate) => candidate.found.kind === 'writing')) {
@@ -92,10 +84,6 @@ function accent(line: RenderedLine, x: number, mark: Mark, letters: Set<string>)
 	return true;
 }
 
-/**
- * The words a stroke or some writing goes over: those whose middle it
- * reaches, or else the one it covers most, as handwriting is wider than type.
- */
 function covered(words: Glyph[][], left: number, right: number) {
 	const middles = words.filter((word) => {
 		const middle = (word[0].left + word.at(-1)!.right) / 2;
@@ -107,7 +95,6 @@ function covered(words: Glyph[][], left: number, right: number) {
 	return most && overlap(most) > (most.at(-1)!.right - most[0].left) * COVERED ? [most] : [];
 }
 
-/** Deletes whole words and the space after them, or before them at the end of a line, and the line when nothing is left on it. */
 function strike(box: HTMLElement, line: RenderedLine, left: number, right: number) {
 	const words = covered(wordsOf(line), left, right);
 	const block = line.glyphs[0].node.parentElement!.closest('div, p, li, h2, h3, blockquote');
@@ -129,7 +116,6 @@ function insertionPoint(box: HTMLElement, line: RenderedLine, x: number) {
 	return offsetOf(box, last.node, last.offset + 1);
 }
 
-/** Of the words writing goes over, the run of as many as it says that it covers most, as handwriting is wider than type. */
 function mostCovered(words: Glyph[][], count: number, left: number, right: number) {
 	if (words.length <= count) return words;
 	const overlap = (word: Glyph[]) => Math.max(0, Math.min(word.at(-1)!.right, right) - Math.max(word[0].left, left));
@@ -142,7 +128,6 @@ function mostCovered(words: Glyph[][], count: number, left: number, right: numbe
 	return words.slice(best, best + count);
 }
 
-/** Replaces the words writing covers with what the writing says; false when it covers none or can't be read. */
 async function rewrite(box: HTMLElement, object: PageObject, zoom: number, read: Read, context: string) {
 	const left = Math.min(...read.strokes.map((stroke) => stroke.bounds.left));
 	const right = Math.max(...read.strokes.map((stroke) => stroke.bounds.right));
@@ -158,13 +143,6 @@ async function rewrite(box: HTMLElement, object: PageObject, zoom: number, read:
 	return true;
 }
 
-/**
- * Applies pen corrections written over text turned from handwriting: a line
- * through words deletes them, accents go on the letters under them, a tap or
- * caret marks where the next line written goes, and writing over words
- * replaces them with what it says. Each correction looks at the text as it
- * is after the ones before it.
- */
 export async function correct(box: HTMLElement, object: PageObject, strokes: Stroke[], zoom: number): Promise<Corrected> {
 	const size = object.size ?? 16;
 	const context = box.innerText;

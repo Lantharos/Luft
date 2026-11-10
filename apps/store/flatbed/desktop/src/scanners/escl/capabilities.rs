@@ -1,7 +1,5 @@
 use roxmltree::{Document, Node};
 
-/// What one way of feeding paper into an eSCL scanner can do. Sizes are in
-/// 300ths of an inch.
 #[derive(Clone, Debug, Default)]
 pub struct Input {
     pub width: u32,
@@ -80,7 +78,6 @@ pub fn parse(xml: &str) -> Result<Capabilities, String> {
 }
 
 impl Input {
-    /// The resolution closest to `wanted` the scanner offers.
     pub fn resolution(&self, wanted: u32) -> u32 {
         self.resolutions
             .iter()

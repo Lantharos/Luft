@@ -21,7 +21,6 @@ pub fn state_folder() -> Result<PathBuf, String> {
         .join("com.lantharos.Heft"))
 }
 
-/// Resolves a path inside the library, refusing anything that would leave it.
 pub fn resolve(relative: &str) -> Result<PathBuf, String> {
     let relative = Path::new(relative);
     let inside = relative

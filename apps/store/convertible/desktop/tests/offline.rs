@@ -9,9 +9,8 @@ const ADDRESS: &str = "CONVERTIBLE_TEST_ADDRESS";
 fn workers_cannot_reach_the_network() {
     if let Ok(address) = std::env::var(ADDRESS) {
         assert!(TcpStream::connect(&address).is_ok());
-        if stay_offline() {
-            assert!(TcpStream::connect(&address).is_err());
-        }
+        assert!(stay_offline());
+        assert!(TcpStream::connect(&address).is_err());
         return;
     }
     let listener = TcpListener::bind("127.0.0.1:0").unwrap();

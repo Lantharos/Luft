@@ -119,8 +119,6 @@ pub enum Order {
     Abandon(Output),
 }
 
-/// Runs on the audio thread. Everything reaches it through `orders`, and voices leave through `retired`, so it never
-/// allocates or frees.
 pub struct Mixer {
     voices: Vec<Voice>,
     orders: Consumer<Order>,
@@ -190,7 +188,6 @@ impl Mixer {
         before != self.voices.len()
     }
 
-    /// Adds what plays on `output` to `out`, and says whether a voice ended.
     pub fn render(&mut self, output: Output, out: &mut [f32]) -> bool {
         self.take_orders();
         for voice in &mut self.voices {
@@ -200,7 +197,6 @@ impl Mixer {
     }
 }
 
-/// Keeps stacked sounds and a loud voice from clipping, leaving anything below the knee untouched.
 pub fn limit(samples: &mut [f32]) -> f32 {
     let mut peak = 0f32;
     for sample in samples {

@@ -23,8 +23,6 @@ pub const RECORDING_LEVEL: BridgeEvent<f32> = BridgeEvent::new("recording.level"
 pub const RECORDING_FAILED: BridgeEvent<String> = BridgeEvent::new("recording.failed");
 const LEVEL_EVERY: Duration = Duration::from_millis(100);
 
-/// The class being recorded. It belongs to Heft's process rather than its
-/// window, so it goes on when the window closes, until it's stopped.
 struct Recording {
     path: String,
     samples: Sender<Vec<f32>>,
@@ -115,7 +113,6 @@ fn state(Empty {}: Empty) -> Result<Option<RecordingState>, String> {
         }))
 }
 
-/// Closes the microphone and keeps the file open, answering how much is recorded.
 fn pause(Empty {}: Empty) -> Result<u64, String> {
     let mut slot = RECORDING.lock().expect("recording lock");
     let recording = slot.as_mut().ok_or("Heft isn't recording")?;

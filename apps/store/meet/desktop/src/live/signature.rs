@@ -3,8 +3,7 @@ use minisign_verify::{PublicKey, Signature};
 
 use crate::L10N;
 
-pub const PUBLIC_KEY: Option<&str> =
-    Some("RWRz9rCK/H8Drrze/f851hxNNOH/D42kpyTMpXV7DT7QoUdCZySZwRWA");
+pub const PUBLIC_KEY: &str = "RWRz9rCK/H8Drrze/f851hxNNOH/D42kpyTMpXV7DT7QoUdCZySZwRWA";
 
 pub fn verify(key: &str, checksum: &str, signature: &str, iso: &str) -> Result<(), String> {
     let key = PublicKey::from_base64(key).map_err(|error| error.to_string())?;
@@ -24,17 +23,21 @@ pub fn verify(key: &str, checksum: &str, signature: &str, iso: &str) -> Result<(
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-
-    const KEY: &str = "RWQuKaSbHEMaG0cGBcTRjFj81Fysjto7YETokGzKqzy6t4/CiyKPriyV";
-    const CHECKSUM: &str =
+pub mod signed {
+    pub const KEY: &str = "RWQuKaSbHEMaG0cGBcTRjFj81Fysjto7YETokGzKqzy6t4/CiyKPriyV";
+    pub const CHECKSUM: &str =
         "abababababababababababababababababababababababababababababababab  luft-nightly.iso\n";
-    const SIGNATURE: &str = "untrusted comment: signature from minisign secret key
+    pub const SIGNATURE: &str = "untrusted comment: signature from minisign secret key
 RUQuKaSbHEMaG/KmgbmEw89fyU8DE17aeEOfgCw57XUYR1yL4R+9DunaqCbrGKaW1NutLYt6lMJyq9hyk1muRqg22Cg/XdSomQA=
 trusted comment: luft-nightly.iso
 JCQZBxZqqVLpiZJl6sUpx1LdPjFjE3wulhRDfxAb6+JtXG5zKUrcSQkAK+e7MX7EY1q2o4PXFAqoPpvL/eUyCw==
 ";
+}
+
+#[cfg(test)]
+mod tests {
+    use super::signed::{CHECKSUM, KEY, SIGNATURE};
+    use super::*;
 
     #[test]
     fn a_checksum_counts_only_when_signed_for_that_iso() {

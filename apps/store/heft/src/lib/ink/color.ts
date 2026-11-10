@@ -37,7 +37,6 @@ function fromOklab([lightness, a, b]: [number, number, number]): number {
 
 const forDark = new Map<number, number>();
 
-/** The same ink on dark paper: lightness flipped, hue and colorfulness kept. */
 export function onDark(rgb: number): number {
 	let adapted = forDark.get(rgb);
 	if (adapted === undefined) {
@@ -50,5 +49,4 @@ export function onDark(rgb: number): number {
 
 export const css = (rgb: number) => `#${rgb.toString(16).padStart(6, '0')}`;
 
-/** A check mark or label color that stays readable on top of `rgb`. */
 export const readableOn = (rgb: number) => (toOklab(rgb)[0] > 0.72 ? '#1d1d1f' : '#ffffff');

@@ -109,10 +109,6 @@ class Library {
 		await Promise.all(order.map((subject) => this.saveSubject(subject)));
 	}
 
-	/**
-	 * A notebook in the subject; `pages` makes its pages instead of one blank
-	 * page, given the new notebook's folder, as importing a book does.
-	 */
 	async createNotebook(subject: SubjectEntry, name: string, paper: Paper = DEFAULT_PAPER, pages?: (folder: string) => Promise<PageEntry[]>): Promise<NotebookEntry> {
 		const folder = `${subject.folder}/${unique(folderName(name), subject.notebooks.map((notebook) => leaf(notebook.folder)), NOTEBOOK_SUFFIX)}`;
 		const now = Date.now();
@@ -133,7 +129,6 @@ class Library {
 		return subject.notebooks.at(-1)!;
 	}
 
-	/** Renames a notebook and moves it to another subject, in one step on disk. */
 	async placeNotebook(notebook: NotebookEntry, name: string, subject: SubjectEntry) {
 		const from = this.subjectOf(notebook)!;
 		const others = subject.notebooks.filter((other) => other !== notebook).map((other) => leaf(other.folder));

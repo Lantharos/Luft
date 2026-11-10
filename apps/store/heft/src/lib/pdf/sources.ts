@@ -3,7 +3,7 @@ import { newId } from '#lib/ink/stroke.js';
 import { library } from '#lib/library/library.svelte.js';
 import type { PageEntry } from '#lib/library/model.js';
 import type { OpenNotebook } from '#lib/library/notebook.svelte.js';
-import { pdfDocument, POINTS } from './document';
+import { pdfDocument, PAGE_UNITS_PER_POINT } from './document';
 
 export const sourcePath = (notebook: OpenNotebook | { folder: string }, source: string) => `${library.root}/${notebook.folder}/sources/${source}`;
 
@@ -11,7 +11,6 @@ const fileName = (path: string) => path.slice(path.lastIndexOf('/') + 1);
 
 export const bookName = (path: string) => fileName(path).replace(/\.pdf$/i, '');
 
-/** Copies a PDF into the notebook, untouched, and makes a page for each of its pages. */
 export async function pdfPages(folder: string, path: string): Promise<PageEntry[]> {
 	const source = `${newId()}-${fileName(path)}`;
 	await commands.importFile({ source: path, to: `${folder}/sources/${source}` });
@@ -19,7 +18,7 @@ export async function pdfPages(folder: string, path: string): Promise<PageEntry[
 	const now = Date.now();
 	const pages: PageEntry[] = [];
 	for (let index = 0; index < document.numPages; index++) {
-		const viewport = (await document.getPage(index + 1)).getViewport({ scale: POINTS });
+		const viewport = (await document.getPage(index + 1)).getViewport({ scale: PAGE_UNITS_PER_POINT });
 		pages.push({ id: newId(), created: now, pdf: { source, index, width: viewport.width, height: viewport.height } });
 	}
 	return pages;

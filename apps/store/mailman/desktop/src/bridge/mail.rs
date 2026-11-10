@@ -1,6 +1,3 @@
-use std::hash::{DefaultHasher, Hash, Hasher};
-use std::path::PathBuf;
-
 use gio::prelude::*;
 use luft_app::portal::FileChooser;
 use luft_app::{Commands, Empty, launch};
@@ -13,8 +10,8 @@ use super::params::*;
 use crate::events::IMAGES;
 use crate::mail::envelope::{self, Address};
 use crate::mail::{images, render};
-use crate::services::actions;
-use crate::state::{MailmanState, cache_folder};
+use crate::services::{actions, cache};
+use crate::state::MailmanState;
 use crate::store::View;
 
 #[derive(Serialize, Type)]
@@ -28,17 +25,13 @@ struct OpenedFile {
     rendered: render::Rendered,
 }
 
-fn parts_folder(id: i64) -> PathBuf {
-    cache_folder().join("parts").join(id.to_string())
-}
-
 fn body(state: &MailmanState, Id { id }: Id) -> Result<Option<render::Rendered>, String> {
     let Some(raw) = state.store.body(id)? else {
         let message = state.store.message(id)?.ok_or("That message is gone")?;
         state.engine.request_body(message.account, id);
         return Ok(None);
     };
-    render::render(&raw, &parts_folder(id))
+    render::render(&raw, &cache::message_parts(id))
         .map(Some)
         .ok_or_else(|| "This message can't be read".into())
 }
@@ -58,7 +51,8 @@ fn raw_attachment(state: &MailmanState, part: &Part) -> Result<(String, Vec<u8>)
 fn remote_images(state: &MailmanState, Urls { urls }: Urls) -> Result<(), String> {
     let events = state.events.clone();
     std::thread::spawn(move || {
-        events.emit(IMAGES, images::fetch(urls, &cache_folder().join("remote")));
+        events.emit(IMAGES, images::fetch(urls, &cache::remote_images()));
+        cache::prune_remote_images();
     });
     Ok(())
 }
@@ -83,13 +77,10 @@ fn safe_name(name: &str) -> String {
 
 fn open_attachment(state: &MailmanState, part: Part) -> Result<(), String> {
     let (name, bytes) = raw_attachment(state, &part)?;
-    let source = part
-        .file
-        .clone()
-        .unwrap_or_else(|| part.id.unwrap_or_default().to_string());
-    let folder = cache_folder()
-        .join("attachments")
-        .join(format!("{:x}", digest(&source)));
+    let folder = match &part.file {
+        Some(file) => cache::opened_file(file).join("attachments"),
+        None => cache::message_attachments(part.id.unwrap_or_default()),
+    };
     std::fs::create_dir_all(&folder).map_err(|error| error.to_string())?;
     let path = folder.join(safe_name(&name));
     std::fs::write(&path, bytes).map_err(|error| error.to_string())?;
@@ -126,9 +117,7 @@ fn open_file(Path { path }: Path) -> Result<OpenedFile, String> {
     let raw = std::fs::read(&path).map_err(|error| error.to_string())?;
     let parsed = render::parse(&raw).ok_or("This file isn't an email")?;
     let envelope = envelope::from_message(&parsed);
-    let folder = cache_folder()
-        .join("files")
-        .join(format!("{:x}", digest(&path)));
+    let folder = cache::opened_file(&path);
     Ok(OpenedFile {
         subject: envelope.subject,
         from: envelope.from,
@@ -137,12 +126,6 @@ fn open_file(Path { path }: Path) -> Result<OpenedFile, String> {
         date: envelope.date,
         rendered: render::render(&raw, &folder).ok_or("This file isn't an email")?,
     })
-}
-
-fn digest(text: &str) -> u64 {
-    let mut hasher = DefaultHasher::new();
-    text.hash(&mut hasher);
-    hasher.finish()
 }
 
 pub fn register(window: SabineWindow, state: &MailmanState) -> SabineWindow {

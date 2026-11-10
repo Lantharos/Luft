@@ -21,10 +21,6 @@ interface Stored {
 const FILE = 'handwriting.json';
 const SAVE_AFTER = 1500;
 
-/**
- * What was read from each page's handwriting, kept beside the notebook with
- * the pages whose ink changed since, so reading picks up where it stopped.
- */
 class ReadText {
 	private readonly notebooks = new Map<string, Promise<Stored>>();
 	private readonly queues = new Map<string, WriteQueue>();
@@ -44,13 +40,11 @@ class ReadText {
 		return Object.fromEntries(Object.entries(pages).map(([page, read]) => [page, read.lines]));
 	}
 
-	/** The pages still to read: changed since they were last read, or never read at all. */
 	async unread(notebook: NotebookEntry) {
 		const { pages, changed } = await this.load(notebook);
 		return notebook.meta.pages.map((page) => page.id).filter((id) => changed.includes(id) || !pages[id]);
 	}
 
-	/** The fingerprint of the ink a page was read with, to skip pages whose ink came back as it was. */
 	async readWith(notebook: NotebookEntry, page: string) {
 		return (await this.load(notebook)).pages[page]?.ink;
 	}

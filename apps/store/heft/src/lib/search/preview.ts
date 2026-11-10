@@ -12,7 +12,6 @@ const WIDTH = 60;
 const SMALLEST = 3;
 const pages = new Map<string, Promise<ImageBitmap>>();
 
-/** Where on its page a typed hit is: the text box it's in. */
 function typedBoxes(document: PageDocument, offset: number): Box[] {
 	const texts = document.objects.map((object) => object.text ?? '');
 	const joined = texts.join('\n');
@@ -26,7 +25,6 @@ function typedBoxes(document: PageDocument, offset: number): Box[] {
 	return [];
 }
 
-/** Where on a book page a hit is: the printed runs its letters are in. */
 async function bookBoxes(path: string, index: number, needle: string): Promise<Box[]> {
 	const glyphs = await pageText(path, index);
 	let text = '';
@@ -75,7 +73,6 @@ async function boxes(hit: Hit, needle: string): Promise<Box[]> {
 	return typedBoxes((await notebook.load(entry.id)).document, hit.offset);
 }
 
-/** A small picture of the page a hit is on, with where the hit is marked. */
 export function hitPreview(hit: Hit, query: string): Attachment<HTMLElement> {
 	return (element) => {
 		const entry = hit.notebook.meta.pages[hit.index];

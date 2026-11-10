@@ -1,7 +1,6 @@
 import type { PageObject } from '#lib/page/objects.js';
 import { measure } from '#lib/paper/lines.js';
 
-/** A character of a text box as it shows on the page, in page units. */
 export interface Glyph {
 	node: Text;
 	offset: number;
@@ -20,7 +19,6 @@ export interface RenderedLine {
 
 const SAME_LINE = 0.3;
 
-/** Where every character of a text box shows, sorted into the lines it's laid out in. */
 export function rendered(box: HTMLElement, object: PageObject, zoom: number): RenderedLine[] {
 	const page = box.closest('[data-page]')!.getBoundingClientRect();
 	const size = object.size ?? 16;
@@ -53,7 +51,6 @@ export function rendered(box: HTMLElement, object: PageObject, zoom: number): Re
 	return lines.sort((a, b) => a.baseline - b.baseline);
 }
 
-/** The words of a line, as runs of glyphs between spaces. */
 export function wordsOf(line: RenderedLine): Glyph[][] {
 	const words: Glyph[][] = [];
 	let word: Glyph[] = [];
@@ -67,7 +64,6 @@ export function wordsOf(line: RenderedLine): Glyph[][] {
 	return words;
 }
 
-/** A range in the box from the first glyph's start to the last one's end. */
 export function rangeOver(first: Glyph, last: Glyph) {
 	const range = document.createRange();
 	range.setStart(first.node, first.offset);

@@ -14,7 +14,6 @@ pub struct AppState {
     document: DocumentView,
     scanners: Vec<Scanner>,
     settings: Settings,
-    /// The languages text can be read in, or `None` without Tesseract.
     reading_languages: Option<Vec<String>>,
 }
 

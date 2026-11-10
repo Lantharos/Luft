@@ -35,7 +35,7 @@ Signing in to Gmail and Outlook through the browser needs OAuth client IDs, read
 | Path | Contents |
 |------|----------|
 | `~/.local/share/mailman/mail.sqlite` | Local mail store |
-| `~/.cache/mailman/` | Fetched pictures and saved inline parts |
+| `~/.cache/mailman/` | Fetched pictures, opened attachments and saved inline parts. Mailman tidies it when it starts and when an account is removed |
 
 ## License
 

@@ -3,15 +3,9 @@ import type { Unwritten } from '#lib/canvas/ink-paint.js';
 import type { OpenNotebook } from '#lib/library/notebook.svelte.js';
 import { clockAt, momentOf, recordingsOf, type RecordingEntry } from './model';
 
-/** Writing comes a little after what's said, so playing from something written starts this much before it. */
-const LEAD = 3000;
+const STARTS_BEFORE_WRITING_MS = 3000;
 const FOLLOW_EVERY = 100;
 
-/**
- * Plays a notebook's recordings. While a recording is open, what was written
- * after the moment playing shows faded until the recording reaches it, and
- * tapping writing plays what was said as it was written.
- */
 class Player {
 	notebook: OpenNotebook | null = $state.raw(null);
 	recording: RecordingEntry | null = $state(null);
@@ -62,11 +56,10 @@ class Player {
 		await this.audio.play();
 	}
 
-	/** Plays what was being said when something on the page was written, if a recording was going then. */
 	playWritten(notebook: OpenNotebook, written: number) {
 		const moment = momentOf(notebook.meta, written);
 		if (!moment) return false;
-		void this.playFrom(notebook, moment.recording.id, Math.max(0, moment.offset - LEAD));
+		void this.playFrom(notebook, moment.recording.id, Math.max(0, moment.offset - STARTS_BEFORE_WRITING_MS));
 		return true;
 	}
 
@@ -113,7 +106,6 @@ class Player {
 		this.following = requestAnimationFrame(step);
 	}
 
-	/** What hasn't been written yet at the moment playing, for the notebook it's playing in. */
 	unwrittenIn(notebook: OpenNotebook): Unwritten | null {
 		const recording = this.recording;
 		if (this.notebook !== notebook || !recording?.length) return null;

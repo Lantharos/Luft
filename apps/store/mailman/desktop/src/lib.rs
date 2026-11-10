@@ -24,7 +24,7 @@ const WINDOW: GlassWindow = GlassWindow {
 };
 
 fn launch_activation_token() -> Option<String> {
-    ["XDG_ACTIVATION_TOKEN", "DESKTOP_STARTUP_ID"]
+    luft_app::launch::TOKEN_VARIABLES
         .into_iter()
         .find_map(|name| std::env::var(name).ok())
         .filter(|token| !token.trim().is_empty())

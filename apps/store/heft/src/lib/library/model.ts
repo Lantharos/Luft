@@ -11,7 +11,6 @@ export interface Paper {
 	size: PaperSize;
 	landscape: boolean;
 	color: PaperColor;
-	/** Line or grid spacing in millimetres. */
 	spacing: number;
 }
 
@@ -27,7 +26,6 @@ export interface PageEntry {
 	created: number;
 	paper?: Partial<Paper>;
 	pdf?: PdfBacking;
-	/** How far an infinite page has grown, in page units. */
 	height?: number;
 }
 
@@ -49,11 +47,8 @@ export interface NotebookMeta {
 	created: number;
 	modified: number;
 	favorite?: boolean;
-	/** Made for typing: text that reaches the bottom of a page carries on to the next. */
 	typed?: boolean;
-	/** Deleted pages, kept with where they were so they can come back. */
 	trashed?: { page: PageEntry; index: number; at: number }[];
-	/** Classes recorded in this notebook. */
 	recordings?: RecordingEntry[];
 }
 
@@ -65,7 +60,6 @@ export interface SubjectMeta {
 	icon: string;
 	order: number;
 	archived?: boolean;
-	/** The languages spoken in the subject's classes, for recordings; when unset, the ones chosen in Settings. */
 	languages?: string[];
 }
 

@@ -39,8 +39,6 @@ async fn choose_pictures(Choose { title, filter }: Choose) -> Result<Vec<String>
         .collect())
 }
 
-/// Adds pictures as pages, straightened and cleaned up like photos from
-/// the camera, and says how many were pictures Flatbed could read.
 fn import(paths: &[String]) -> u32 {
     let mut added = 0;
     for path in paths {

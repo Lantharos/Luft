@@ -5,6 +5,7 @@ use std::thread;
 use std::time::{Duration, Instant};
 
 use landlock::{ABI, Access, AccessNet, Ruleset, RulesetAttr, RulesetStatus};
+use luft_i18n::t;
 use serde::{Deserialize, Serialize};
 
 use crate::engine::capabilities::{self, Capabilities};
@@ -12,6 +13,7 @@ use crate::engine::error::{Failure, Result};
 use crate::engine::inspect::{self, Details, Proxy};
 use crate::engine::job::Job;
 use crate::engine::{self, Progress, publish};
+use crate::l10n::L10N;
 
 pub const ARGUMENT: &str = "--convertible-worker";
 const REPORT_EVERY: Duration = Duration::from_millis(200);
@@ -134,9 +136,12 @@ fn read_request() -> Result<Request> {
 }
 
 pub fn run() {
-    stay_offline();
-    let reply = read_request()
-        .and_then(answer)
-        .unwrap_or_else(|failure| Reply::Failed(failure.0));
+    let reply = if stay_offline() {
+        read_request()
+            .and_then(answer)
+            .unwrap_or_else(|failure| Reply::Failed(failure.0))
+    } else {
+        Reply::Failed(t!(L10N, "failure-not-offline"))
+    };
     send(&reply);
 }

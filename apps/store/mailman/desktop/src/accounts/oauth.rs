@@ -15,6 +15,7 @@ use crate::protocols::net;
 use crate::store::now;
 
 const SIGN_IN_TIMEOUT: Duration = Duration::from_secs(300);
+const REQUEST_TIMEOUT: Duration = Duration::from_secs(5);
 const FINISHED_PAGE: &str = "<!doctype html><meta charset=utf-8><title>Mailman</title><body style=\"font:16px system-ui;display:grid;place-items:center;height:90vh;margin:0\"><p>You're signed in. You can close this tab and go back to Mailman.</p>";
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, Type)]
@@ -227,11 +228,14 @@ fn wait_for_code(listener: &TcpListener, state: &str) -> Result<String, String> 
             std::thread::sleep(Duration::from_millis(100));
             continue;
         };
-        stream.set_nonblocking(false).ok();
         let mut request = String::new();
-        BufReader::new(&stream)
-            .read_line(&mut request)
-            .map_err(|error| error.to_string())?;
+        let answered = stream
+            .set_nonblocking(false)
+            .and_then(|()| stream.set_read_timeout(Some(REQUEST_TIMEOUT)))
+            .and_then(|()| BufReader::new(&stream).read_line(&mut request));
+        if answered.is_err() {
+            continue;
+        }
         let target = request.split_whitespace().nth(1).unwrap_or("/");
         let Ok(url) = url::Url::parse(&format!("http://localhost{target}")) else {
             continue;

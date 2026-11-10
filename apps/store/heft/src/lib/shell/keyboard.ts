@@ -11,7 +11,6 @@ const typing = (target: EventTarget | null) => inField(target) || (target instan
 
 const printable = (event: KeyboardEvent) => [...event.key].length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey;
 
-/** A letter typed on the keyboard while nothing takes text starts typing where `begin` puts the caret, as its first letter. */
 export function typeFromKey(event: KeyboardEvent, begin: () => boolean) {
 	if (!printable(event) || typing(event.target) || !begin()) return false;
 	flushSync();
@@ -64,7 +63,6 @@ export function handleKeys(event: KeyboardEvent, actions: ToolbarActions, viewpo
 	if (key === 'end') return run(() => viewport.panBy(0, 1e9));
 }
 
-/** Shortcuts that work everywhere, the home screen included. */
 export function handleAppKeys(event: KeyboardEvent) {
 	if (typing(event.target) || event.altKey || !(event.ctrlKey || event.metaKey)) return;
 	const key = event.key.toLowerCase();

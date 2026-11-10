@@ -71,7 +71,6 @@ pub static SERVER: LazyLock<Server> = LazyLock::new(|| {
     server.recv().unwrap()
 });
 
-/// Starts a program that dies with the thread starting it, so a failed test leaves nothing running.
 fn spawn_tied(command: &mut Command) -> Child {
     // SAFETY: prctl is safe to call between fork and exec.
     unsafe {
@@ -83,8 +82,6 @@ fn spawn_tied(command: &mut Command) -> Child {
     command.spawn().unwrap()
 }
 
-/// A sound server and session manager of the tests' own, with a fake speaker and no hardware, so nothing here reaches
-/// the computer's real sound.
 pub struct Server {
     folder: tempfile::TempDir,
     _daemons: Mutex<Vec<Child>>,
@@ -176,17 +173,14 @@ impl Server {
             .map(str::to_owned)
     }
 
-    /// A fake microphone that hums at `level` until dropped.
     pub fn speak(&self, level: f32) -> FakeMicrophone {
         FakeMicrophone::start("fake-mic", Pattern::Hum(level))
     }
 
-    /// A fake microphone that clicks loudly ten times a second.
     pub fn click_track(&self) -> FakeMicrophone {
         FakeMicrophone::start("fake-mic", Pattern::Clicks)
     }
 
-    /// A copy of this test binary running only an engine, to kill it.
     pub fn killable_engine(&self) -> Child {
         let program = std::env::current_exe().unwrap();
         spawn_tied(
@@ -320,7 +314,6 @@ struct Heard {
 }
 
 impl Heard {
-    /// Notes when each click reached the listener, from the block's arrival and where in the block it starts.
     fn note_clicks(&mut self, samples: &[f32], arrived: Instant) {
         let frames = samples.len() / CHANNELS;
         for (index, frame) in samples.as_chunks::<CHANNELS>().0.iter().enumerate() {
@@ -337,7 +330,6 @@ impl Heard {
     }
 }
 
-/// An app recording a source, like a game or a call would.
 pub struct Listener {
     heard: Arc<Mutex<Heard>>,
     quit: pw::channel::Sender<()>,
@@ -426,7 +418,6 @@ impl Listener {
             .fold(0f32, |peak, sample| peak.max(sample.abs()))
     }
 
-    /// How much later each click reached `through` than `direct`.
     pub fn delays(direct: &Self, through: &Self) -> Vec<Duration> {
         std::thread::sleep(Duration::from_millis(1500));
         let first = direct.heard.lock().unwrap().clicks.clone();

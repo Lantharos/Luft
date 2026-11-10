@@ -1,6 +1,3 @@
-//! The SANE helper: a process of Flatbed's own that loads the system's SANE
-//! drivers, so a driver that crashes or hangs takes nothing else with it.
-
 use std::io::{self, BufRead, BufWriter, Write};
 use std::net::{IpAddr, Ipv4Addr};
 use std::sync::Mutex;
@@ -14,7 +11,6 @@ const READ_SIZE: usize = 256 * 1024;
 
 const DRIVERLESS: &str = "airscan:";
 
-/// Backends Flatbed reaches itself, without SANE.
 const REACHED_DIRECTLY: [&str; 2] = ["airscan:e", "escl:"];
 
 static SCANNING: Mutex<Option<Canceller>> = Mutex::new(None);
@@ -70,8 +66,6 @@ pub fn run() -> ! {
     std::process::exit(0)
 }
 
-/// Every device SANE finds, leaving out what its driverless backend found
-/// again of a scanner another driver has at the same address.
 fn devices(sane: &Sane) -> Vec<FoundDevice> {
     let found = every_device(sane);
     let native: Vec<IpAddr> = found
@@ -117,7 +111,6 @@ fn every_device(sane: &Sane) -> Vec<FoundDevice> {
         .collect()
 }
 
-/// What SANE's driverless backend puts where the maker would go.
 const PROTOCOLS: [&str; 2] = ["WSD", "eSCL"];
 
 fn title(vendor: &str, model: &str) -> String {
@@ -140,7 +133,6 @@ fn title(vendor: &str, model: &str) -> String {
     format!("{vendor} {model}")
 }
 
-/// The IPv4 address in a device's name, such as `pixma:MX490_192.168.1.103`.
 fn address(text: &str) -> Option<IpAddr> {
     text.split(|letter: char| !letter.is_ascii_digit() && letter != '.')
         .find_map(|part| part.parse::<Ipv4Addr>().ok())
@@ -179,8 +171,6 @@ fn find<'a>(settings: &'a [Setting], name: &str) -> Option<&'a Setting> {
     settings.iter().find(|setting| setting.name == name)
 }
 
-/// Sets up the scanner: the source first, since changing it resets the
-/// rest, then the mode, the resolution and the largest area.
 fn prepare(opened: &Opened, feed: Feed, colour: bool, dpi: u32) -> Result<f32, String> {
     if let Some(source) = find(&opened.settings(), "source")
         && let Some(name) = source.strings.iter().find(|name| feed_of(name) == feed)

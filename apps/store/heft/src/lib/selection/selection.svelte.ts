@@ -34,7 +34,6 @@ function polygonBounds(polygon: [number, number][]): Bounds {
 	return bounds;
 }
 
-/** The ink moved by `dx`, `dy` with new ids above everything on a page whose top order is `order`. */
 export function copied(strokes: Stroke[], dx: number, dy: number, order: number): Stroke[] {
 	return strokes.map((stroke) => ({ ...transformed(stroke, { ...IDENTITY, dx, dy }, [0, 0], newId()), order: ++order }));
 }
@@ -55,13 +54,11 @@ function transformed(stroke: Stroke, transform: Transform, center: [number, numb
 	return { ...stroke, id, points, width: stroke.width * scale, bounds: strokeBounds(points), path: undefined };
 }
 
-/** Ink picked with the lasso, and what can be done with it. */
 class Selection {
 	page: string | null = $state(null);
 	strokes: Stroke[] = $state.raw([]);
 	bounds: Bounds = $state.raw(emptyBounds());
 	transform: Transform = $state.raw(IDENTITY);
-	/** On a book page, what was looped is also the printed part under it, which can be taken along as a picture. */
 	book = $state(false);
 	private document: PageDocument | null = null;
 	private shown: Stroke[] = [];
@@ -109,7 +106,6 @@ class Selection {
 		return [(this.bounds.left + this.bounds.right) / 2, (this.bounds.top + this.bounds.bottom) / 2];
 	}
 
-	/** Shows the ink moved, scaled or turned, while a handle is being dragged. */
 	preview(transform: Transform) {
 		if (!this.document) return;
 		this.transform = transform;
@@ -118,7 +114,6 @@ class Selection {
 		this.shown = next;
 	}
 
-	/** Keeps the moved ink as one change that can be undone. */
 	settle() {
 		if (!this.document || this.transform === IDENTITY) return;
 		this.document.record({ removed: this.strokes, added: this.shown });
@@ -151,7 +146,6 @@ class Selection {
 		if (this.document) this.paste(this.page!, this.document);
 	}
 
-	/** Puts copied ink on a page, a little below and to the right of where it was. */
 	paste(page: string, document: PageDocument) {
 		if (!clipboard.length) return;
 		const order = document.lastOrder;

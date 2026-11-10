@@ -14,10 +14,8 @@ const GROW_WITHIN = 120 * MM;
 const GROW_BY = 160 * MM;
 const SAVE_AFTER = 400;
 
-/** A notebook whose pages are being read or written, kept for as long as Heft runs. */
 export class OpenNotebook {
 	readonly loaded = new Map<string, PageStore>();
-	/** How many times each page changed since Heft started, for whatever shows it small. */
 	readonly revisions = new SvelteMap<string, number>();
 	private readonly loading = new Map<string, Promise<PageStore>>();
 	private readonly queue = new WriteQueue();
@@ -72,7 +70,6 @@ export class OpenNotebook {
 		return pending;
 	}
 
-	/** Lengthens an infinite page whenever writing comes near its end, so there's always room to go on. */
 	private grow(id: string, bottom: number, objects: { y: number; height: number }[]) {
 		const entry = this.meta.pages.find((page) => page.id === id);
 		if (!entry || entry.pdf) return;
@@ -84,7 +81,6 @@ export class OpenNotebook {
 		this.changed();
 	}
 
-	/** Keeps a page in memory while it's on screen. */
 	show(id: string) {
 		this.shown.set(id, (this.shown.get(id) ?? 0) + 1);
 		return () => {
@@ -104,7 +100,6 @@ export class OpenNotebook {
 		}
 	}
 
-	/** Undoes the last change on whichever page it was made. */
 	undo() {
 		const id = this.done.pop();
 		const store = id ? this.loaded.get(id) : undefined;
@@ -164,7 +159,6 @@ export class OpenNotebook {
 		this.changed();
 	}
 
-	/** Moves a page with its ink to another notebook. */
 	async sendPage(index: number, target: OpenNotebook, at = target.meta.pages.length) {
 		const page = this.meta.pages[index];
 		const store = await this.load(page.id);
@@ -180,7 +174,6 @@ export class OpenNotebook {
 		target.changed();
 	}
 
-	/** Gives a page paper of its own, or the notebook new paper for every page that has none, this one included. */
 	setPaper(paper: Paper, page: string | undefined, own: boolean) {
 		const entry = this.meta.pages.find((candidate) => candidate.id === page);
 		if (own && entry) entry.paper = paper;
@@ -219,7 +212,6 @@ export class OpenNotebook {
 		return this.queue.run(() => writeJson(`${this.folder}/notebook.json`, snapshot));
 	}
 
-	/** Writes everything still pending, so the notebook's folder can move. */
 	async settle() {
 		await this.save();
 		await Promise.all([...this.loaded.values()].map((store) => store.compact()));

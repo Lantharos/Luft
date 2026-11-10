@@ -5,13 +5,9 @@ use rayon::prelude::*;
 use super::geometry::solve;
 use super::{Cleaned, Mode, Origin};
 
-/// Cells across and down in which the paper's brightness is measured.
-const CELLS: u32 = 28;
-/// A cell counts as bare paper when it's at least this bright next to the fit.
-const BARE: f64 = 0.82;
-/// Too few bare cells means the page is mostly picture, and is left as it is.
-const FEWEST_BARE: f64 = 0.3;
-/// The darkest the darkest ink is stretched from.
+const PAPER_CELLS: u32 = 28;
+const BARE_PAPER_BRIGHTNESS: f64 = 0.82;
+const FEWEST_BARE_CELLS: f64 = 0.3;
 const DARKEST_BLACK_POINT: u8 = 90;
 
 pub fn clean(page: RgbImage, origin: Origin, mode: Mode) -> Cleaned {
@@ -29,8 +25,6 @@ fn degree(origin: Origin) -> usize {
     }
 }
 
-/// The colour page with its paper evened out to white, which also takes
-/// away the tint of the light it was photographed under.
 fn colour(mut page: RgbImage, origin: Origin) -> RgbImage {
     let (width, height) = page.dimensions();
     let samples = paper_samples(width, height, |x, y| page.get_pixel(x, y).0);
@@ -55,7 +49,6 @@ fn colour(mut page: RgbImage, origin: Origin) -> RgbImage {
     page
 }
 
-/// The page in grey with its paper evened out to white.
 pub fn grey(page: RgbImage, origin: Origin) -> GrayImage {
     let (width, height) = page.dimensions();
     let mut out = GrayImage::from_fn(width, height, |x, y| {
@@ -78,8 +71,6 @@ pub fn grey(page: RgbImage, origin: Origin) -> GrayImage {
     out
 }
 
-/// How much of a scan's edges is turned white, where the scanner's own
-/// frame and the shadow of the lid show.
 const SCANNER_EDGE: f32 = 0.004;
 
 pub fn whiten_edges(cleaned: &mut Cleaned) {
@@ -147,18 +138,19 @@ struct Sample {
     colour: [f64; 3],
 }
 
-/// The colour of the brightest tenth of each cell, which is bare paper
-/// wherever the cell has any.
 fn paper_samples(
     width: u32,
     height: u32,
     pixel: impl Fn(u32, u32) -> [u8; 3] + Sync,
 ) -> Vec<Sample> {
-    let (cell_width, cell_height) = ((width / CELLS).max(1), (height / CELLS).max(1));
-    (0..CELLS * CELLS)
+    let (cell_width, cell_height) = ((width / PAPER_CELLS).max(1), (height / PAPER_CELLS).max(1));
+    (0..PAPER_CELLS * PAPER_CELLS)
         .into_par_iter()
         .filter_map(|cell| {
-            let (left, top) = ((cell % CELLS) * cell_width, (cell / CELLS) * cell_height);
+            let (left, top) = (
+                (cell % PAPER_CELLS) * cell_width,
+                (cell / PAPER_CELLS) * cell_height,
+            );
             if left + cell_width > width || top + cell_height > height {
                 return None;
             }
@@ -190,8 +182,6 @@ fn paper_samples(
         .collect()
 }
 
-/// The samples that are bare paper, found by fitting the paper's light and
-/// leaving out cells much darker than the fit, or `None` when too few are.
 fn bare_paper(samples: &[Sample], degree: usize) -> Option<Vec<&Sample>> {
     let brightness = |sample: &Sample| sample.colour.iter().sum::<f64>() / 3.0;
     let mut kept: Vec<&Sample> = samples.iter().collect();
@@ -199,13 +189,14 @@ fn bare_paper(samples: &[Sample], degree: usize) -> Option<Vec<&Sample>> {
         let surface = Surface::fit(&kept, degree, brightness);
         kept = samples
             .iter()
-            .filter(|sample| brightness(sample) >= surface.value(sample.x, sample.y) * BARE)
+            .filter(|sample| {
+                brightness(sample) >= surface.value(sample.x, sample.y) * BARE_PAPER_BRIGHTNESS
+            })
             .collect();
     }
-    (kept.len() as f64 >= samples.len() as f64 * FEWEST_BARE).then_some(kept)
+    (kept.len() as f64 >= samples.len() as f64 * FEWEST_BARE_CELLS).then_some(kept)
 }
 
-/// A smooth surface over the page, a polynomial in x and y.
 struct Surface {
     degree: usize,
     coefficients: Vec<f64>,
@@ -251,21 +242,16 @@ impl Surface {
     }
 }
 
-/// How brightly the paper is lit across the page, cell by cell: where a
-/// cell is bare paper, or paper in a shadow, what it measured, elsewhere a
-/// smooth fit through the bare cells.
 struct Light {
     cells: Vec<[f64; 3]>,
 }
 
-/// A cell this much darker than the fit, and no more coloured, is paper in
-/// a shadow rather than a picture on the page.
 const SHADOWED: f64 = 0.5;
 const SHADOW_TINT: f64 = 0.08;
 
 impl Light {
     fn measure(samples: &[Sample], origin: Origin) -> Option<Self> {
-        if samples.len() != (CELLS * CELLS) as usize {
+        if samples.len() != (PAPER_CELLS * PAPER_CELLS) as usize {
             return None;
         }
         let degree = degree(origin);
@@ -299,23 +285,23 @@ impl Light {
         Some(Self { cells })
     }
 
-    /// The light along one row, every few pixels.
     fn row(&self, row: u32, width: u32, height: u32) -> Along {
-        let y = ((f64::from(row) + 0.5) / f64::from(height) * f64::from(CELLS) - 0.5)
-            .clamp(0.0, f64::from(CELLS - 1));
+        let y = ((f64::from(row) + 0.5) / f64::from(height) * f64::from(PAPER_CELLS) - 0.5)
+            .clamp(0.0, f64::from(PAPER_CELLS - 1));
         let (top, fraction) = (y.floor() as usize, y.fract());
-        let bottom = (top + 1).min(CELLS as usize - 1);
+        let bottom = (top + 1).min(PAPER_CELLS as usize - 1);
         let points = (width / ALONG_STEP + 2) as usize;
         Along(
             (0..points)
                 .map(|index| {
                     let x = ((index as u32 * ALONG_STEP) as f64 + 0.5) / f64::from(width)
-                        * f64::from(CELLS)
+                        * f64::from(PAPER_CELLS)
                         - 0.5;
-                    let x = x.clamp(0.0, f64::from(CELLS - 1));
+                    let x = x.clamp(0.0, f64::from(PAPER_CELLS - 1));
                     let (left, across) = (x.floor() as usize, x.fract());
-                    let right = (left + 1).min(CELLS as usize - 1);
-                    let at = |column: usize, row: usize| self.cells[row * CELLS as usize + column];
+                    let right = (left + 1).min(PAPER_CELLS as usize - 1);
+                    let at =
+                        |column: usize, row: usize| self.cells[row * PAPER_CELLS as usize + column];
                     std::array::from_fn(|channel| {
                         let upper = at(left, top)[channel] * (1.0 - across)
                             + at(right, top)[channel] * across;
@@ -330,7 +316,7 @@ impl Light {
 }
 
 fn smoothed(cells: &[[f64; 3]]) -> Vec<[f64; 3]> {
-    let side = CELLS as i32;
+    let side = PAPER_CELLS as i32;
     (0..cells.len() as i32)
         .map(|index| {
             let (x, y) = (index % side, index / side);
@@ -351,7 +337,6 @@ fn smoothed(cells: &[[f64; 3]]) -> Vec<[f64; 3]> {
         .collect()
 }
 
-/// How far apart the light is worked out along a row; it changes slowly.
 const ALONG_STEP: u32 = 16;
 
 struct Along(Vec<[f64; 3]>);

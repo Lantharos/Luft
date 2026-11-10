@@ -21,7 +21,6 @@ export const commands = {
 	handwritingOverview: (options?: CallOptions) => invoke<HandwritingModel | null>("handwriting_overview", {}, options),
 	handwritingRead: (params: {
 		strokes: (([number, number])[])[],
-		/**  Someone waits for it, so it goes ahead of background reading. */
 		now: boolean,
 	}, options?: CallOptions) => invoke<Read>("handwriting_read", params, options),
 	handwritingRemove: (options?: CallOptions) => invoke<null>("handwriting_remove", {}, options),
@@ -30,7 +29,6 @@ export const commands = {
 		to: string,
 	}, options?: CallOptions) => invoke<number>("import_file", params, options),
 	keepCorrection: (params: {
-		/**  One correction as a line of JSON. */
 		line: string,
 	}, options?: CallOptions) => invoke<null>("keep_correction", params, options),
 	library: (options?: CallOptions) => invoke<Library>("library", {}, options),
@@ -162,7 +160,6 @@ export type Entry = {
 	meta: Value,
 };
 
-/**  The hand that holds the pen, as set for every app in Luft's pen settings. */
 export type Hand = "right" | "left";
 
 export type HandwritingDownload = {

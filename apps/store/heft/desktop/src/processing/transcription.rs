@@ -27,7 +27,6 @@ pub enum Transcription {
     Missing,
 }
 
-/// Whisper, which transcribes recordings, or `None` on a Luft without dictation.
 async fn whisper(Empty {}: Empty) -> Result<Option<Model>, String> {
     Ok(client::overview().await.ok().and_then(|overview| {
         overview

@@ -3,11 +3,6 @@ import type { PageDocument } from '#lib/page/document.js';
 
 const REACH = 10;
 
-/**
- * When what's at a point on a page was written: the point of ink nearest to it
- * within a few screen pixels, or the typed text under it. Null when there's
- * nothing there written at a known time.
- */
 export function writtenAt(document: PageDocument, x: number, y: number, zoom: number): number | null {
 	const text = document.objects.find((object) => object.typedAt && x >= object.x && x <= object.x + object.width && y >= object.y && y <= object.y + object.height);
 	if (text?.typedAt) return text.typedAt;

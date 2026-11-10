@@ -15,7 +15,6 @@ const POINT = 0.75;
 export const RASTER_SCALE = 2;
 const n = (value: number) => (Math.round(value * 100) / 100).toString();
 
-/** PDF path operators, traced in page units through the page's flipped transform. */
 class PdfPath implements PathSink {
 	ops: string[] = [];
 
@@ -47,7 +46,6 @@ const rgb = (color: number) => `${n(((color >> 16) & 255) / 255)} ${n(((color >>
 
 const cssRgb = (css: string) => Number.parseInt(css.slice(1), 16);
 
-/** Our SVG rule paths (M, H and V only) as PDF line operators. */
 function rules(path: string): string {
 	const ops: string[] = [];
 	let x = 0;
@@ -79,7 +77,6 @@ async function jpeg(canvas: HTMLCanvasElement): Promise<Raster> {
 	return { width: canvas.width, height: canvas.height, jpeg: new Uint8Array(await blob.arrayBuffer()) };
 }
 
-/** A text box drawn as a picture, the way it shows on the page. */
 export async function textCanvas(object: PageObject, dark: boolean): Promise<HTMLCanvasElement> {
 	const ruled = object.line !== undefined;
 	const style = `width: ${object.width}px;${ruled ? ` --line: ${object.line}px; --size: ${object.size}px;` : ''}`;
@@ -116,7 +113,6 @@ export interface ExportOptions {
 	paper: boolean;
 }
 
-/** One page as PDF drawing: its paper or book page, its ink as vector paths, and its text and pictures. */
 export async function pdfPage(notebook: OpenNotebook, entry: PageEntry, options: ExportOptions): Promise<PdfPage> {
 	const paper = paperOf(notebook.meta, entry);
 	const look = LOOKS[paper.color];

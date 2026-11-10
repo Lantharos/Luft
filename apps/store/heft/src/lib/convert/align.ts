@@ -5,7 +5,6 @@ const WIDE = new Set([...'mwMWŠŽ']);
 
 const widthOf = (letter: string) => (NARROW.has(letter) ? 0.5 : WIDE.has(letter) ? 1.5 : 1);
 
-/** Strokes that overlap side by side become one run of ink, as joined-up letters do. */
 function runs(strokes: Bounds[]): Bounds[] {
 	const found: Bounds[] = [];
 	for (const stroke of strokes.toSorted((a, b) => a.left - b.left)) {
@@ -19,7 +18,6 @@ function runs(strokes: Bounds[]): Bounds[] {
 	return found;
 }
 
-/** Groups runs into `count` words, split at the widest gaps between them. */
 function words(found: Bounds[], count: number): Bounds[] {
 	const cuts = found
 		.slice(1)
@@ -39,13 +37,6 @@ function words(found: Bounds[], count: number): Bounds[] {
 	});
 }
 
-/**
- * Where each character of a line read from handwriting was written: the
- * line's ink is split into as many words as were read at its widest gaps,
- * and each word's width is shared among its letters by how wide they tend to
- * be. Four numbers a character, left, top, right and bottom; spaces get the
- * gap between their words.
- */
 export function glyphs(strokes: Bounds[], text: string): number[] {
 	const said = text.split(' ');
 	const found = runs(strokes);

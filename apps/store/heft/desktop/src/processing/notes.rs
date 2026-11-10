@@ -27,7 +27,6 @@ async fn written<T>(result: Result<T, Unwritten>) -> Result<Written<T>, String> 
     }
 }
 
-/// The model that writes notes, or `None` on a Luft without it.
 async fn overview(Empty {}: Empty) -> Result<Option<LanguageModel>, String> {
     Ok(client::overview().await.ok())
 }

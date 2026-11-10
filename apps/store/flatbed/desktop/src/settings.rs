@@ -7,7 +7,6 @@ use crate::document;
 
 const FILE: &str = "com.lantharos.Flatbed/settings.json";
 
-/// The paper a saved PDF's pages are, unless they keep the size they came in.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub enum PaperSize {
@@ -20,12 +19,9 @@ pub enum PaperSize {
 #[derive(Clone, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase", default)]
 pub struct Settings {
-    /// Tesseract's codes for the languages text is read in.
     pub languages: Vec<String>,
     pub paper: PaperSize,
-    /// Scans at 600 pixels per inch instead of 300.
     pub fine: bool,
-    /// Scanners added by their address.
     pub addresses: Vec<String>,
     pub scanner: Option<String>,
 }
@@ -42,7 +38,6 @@ impl Default for Settings {
     }
 }
 
-/// Tesseract's code for each language Luft is translated into.
 const TESSERACT_CODES: [(&str, &str); 37] = [
     ("sq", "sqi"),
     ("de", "deu"),
@@ -91,7 +86,6 @@ fn tesseract_code(language: &str) -> Option<&'static str> {
         .map(|(_, code)| *code)
 }
 
-/// The session's languages and English, as far as their data is there.
 fn default_languages() -> Vec<String> {
     let available = document::reading_languages().unwrap_or_default();
     let mut chosen: Vec<String> = Vec::new();

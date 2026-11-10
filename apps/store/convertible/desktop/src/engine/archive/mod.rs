@@ -39,10 +39,7 @@ fn archive_source(job: &Job) -> Option<(&PathBuf, &'static str)> {
 
 fn sink_for(job: &Job) -> Result<Box<dyn Sink>> {
     if job.format == "folder" {
-        fs::create_dir_all(&job.temp)?;
-        return Ok(Box::new(FolderSink {
-            root: job.temp.clone(),
-        }));
+        return Ok(Box::new(FolderSink::new(job.temp.clone())?));
     }
     archive_sink(&job.temp, &job.format, job.options.level)
 }

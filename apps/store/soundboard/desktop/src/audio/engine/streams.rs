@@ -35,7 +35,6 @@ fn load(cell: &AtomicU32) -> f32 {
     f32::from_bits(cell.load(Ordering::Relaxed))
 }
 
-/// What the audio thread reads every block and the meters it leaves behind.
 pub struct Levels {
     microphone: AtomicU32,
     monitor: AtomicU32,
@@ -68,7 +67,6 @@ impl Levels {
         self.monitor_on.store(mix.monitor_on, Ordering::Relaxed);
     }
 
-    /// The loudest the voice and the virtual microphone have been since the last call.
     pub fn take_peaks(&self) -> (f32, f32) {
         let take = |cell: &AtomicU32| f32::from_bits(cell.swap(0, Ordering::Relaxed));
         (take(&self.voice_peak), take(&self.output_peak))
@@ -81,8 +79,6 @@ impl Levels {
     }
 }
 
-/// What the audio callbacks share. They run on PipeWire's one data thread, and the control thread only takes the lock
-/// to drain orders when nothing is rendering or an output just lost its last listener.
 pub struct Shared {
     pub mixer: Mutex<Mixer>,
     pub levels: Arc<Levels>,
@@ -182,7 +178,6 @@ fn fill(stream: &Stream, write: impl FnOnce(&mut [f32])) {
 
 pub type VoiceWriter = Arc<Mutex<Producer<f32>>>;
 
-/// The voice on its way from the capture stream to the virtual microphone.
 pub struct VoiceRing {
     producer: VoiceWriter,
     consumer: Consumer<f32>,

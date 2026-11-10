@@ -17,7 +17,6 @@ fn icon_file() -> Option<PathBuf> {
     Some(path)
 }
 
-/// The tray icon says the virtual microphone exists, also with the window closed.
 pub fn icon() -> TrayIcon {
     let title = luft_i18n::t!(L10N, "app-name");
     let tray = TrayIcon::new(APP_ID, title.clone())

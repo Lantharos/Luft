@@ -1,6 +1,8 @@
 failure-damaged = This file couldn't be read: { $detail }
 failure-unsupported = { $source } can't become { $target }.
 failure-file = The file couldn't be read or written: { $detail }
+failure-no-room = There isn't enough room on this drive to unpack everything.
+failure-not-offline = Convertible couldn't cut this conversion off from the network, so it didn't start.
 failure-target-size = That size is too small to reach, even at the lowest quality.
 failure-no-video-encoder = This computer has no video encoder for { $format }.
 failure-no-audio-encoder = This computer has no audio encoder for { $format }.

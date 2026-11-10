@@ -10,7 +10,6 @@ const WAITING = {
 	recording: 'stage-waiting-recording'
 } as const;
 
-/** Where a recording's transcript and notes are, in a few words. */
 export function stageText(stage: Stage | undefined, recording: RecordingEntry): string {
 	const percent = (share: number) => Math.min(99, Math.round(share * 100));
 	switch (stage?.kind) {

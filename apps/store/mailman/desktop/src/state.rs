@@ -5,6 +5,7 @@ use serde::Serialize;
 use specta::Type;
 
 use crate::accounts::{Account, Credentials, Provider, oauth_providers};
+use crate::services::cache;
 use crate::services::notify::Notifier;
 use crate::store::{Identity, Mailbox, Settings, Store};
 use crate::sync::Engine;
@@ -49,6 +50,7 @@ impl MailmanState {
         let credentials = Credentials::default();
         let notifier = Notifier::default();
         notifier.set_enabled(store.settings().notifications);
+        cache::tidy(store.clone());
         Self {
             engine: Engine::new(
                 store.clone(),

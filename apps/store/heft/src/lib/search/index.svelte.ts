@@ -8,10 +8,8 @@ import { transcriptOf } from '#lib/recording/transcript.js';
 import { sourcePath } from '#lib/pdf/sources.js';
 import type { TextItem } from 'pdfjs-dist/types/src/display/api';
 
-/** Where a page's words came from: typed, printed in a book, read from handwriting on this computer, or said in a recorded class. */
 export type TextKind = 'typed' | 'book' | 'ink' | 'said';
 
-/** Where in a recording something was said. */
 export interface Moment {
 	recording: string;
 	at: number;
@@ -31,11 +29,8 @@ export interface Hit {
 	kind: TextKind;
 	snippet: string;
 	at: number;
-	/** Where the hit starts in all the page's text of its kind. */
 	offset: number;
-	/** For handwriting, the line it was read from. */
 	box?: Box;
-	/** For what was said in class, when. */
 	moment?: Moment;
 }
 
@@ -52,7 +47,6 @@ const INDEX_FILE = 'search.json';
 const SNIPPET = 26;
 const LIMIT = 60;
 
-/** Lower case without accents, so "jednacine" finds "jednačine". */
 export const fold = (text: string) => text.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
 
 const saidEntries = (recording: RecordingEntry, said: Said[]): PageText[] =>
@@ -61,7 +55,6 @@ const saidEntries = (recording: RecordingEntry, said: Said[]): PageText[] =>
 const inkEntries = (page: string, lines: InkLine[]): PageText[] =>
 	lines.filter((line) => line.text).map((line) => ({ page, kind: 'ink', text: line.text, folded: fold(line.text), box: line.box }));
 
-/** Every notebook's words, kept in memory so search answers as you type. */
 class SearchIndex {
 	private readonly pages = new Map<string, PageText[]>();
 	revision = $state(0);
@@ -85,7 +78,6 @@ class SearchIndex {
 		this.revision++;
 	}
 
-	/** What is typed on each page, read from the pages themselves when the notebook has no index yet. */
 	private async typedText(notebook: NotebookEntry): Promise<Record<string, string>> {
 		const open = library.openNotebook(notebook);
 		const typed: Record<string, string> = {};
@@ -97,7 +89,6 @@ class SearchIndex {
 		return typed;
 	}
 
-	/** A book's text, pulled out once and kept beside the PDF. */
 	private async bookText(notebook: NotebookEntry, source: string): Promise<string[]> {
 		const file = `${notebook.folder}/sources/${source}.text.json`;
 		const kept = await readJson<string[]>(file);
@@ -119,7 +110,6 @@ class SearchIndex {
 		return pages;
 	}
 
-	/** Records what is typed on a page, replacing what was there. */
 	setTyped(notebook: NotebookEntry, page: string, text: string) {
 		const entries = (this.pages.get(notebook.meta.id) ?? []).filter((entry) => !(entry.page === page && entry.kind === 'typed'));
 		if (text) entries.push({ page, kind: 'typed', text, folded: fold(text) });
@@ -129,14 +119,12 @@ class SearchIndex {
 		return writeJson(`${notebook.folder}/${INDEX_FILE}`, typed);
 	}
 
-	/** Records the handwriting read on a page, replacing what was read there before. */
 	setInk(notebook: NotebookEntry, page: string, lines: InkLine[]) {
 		const entries = (this.pages.get(notebook.meta.id) ?? []).filter((entry) => !(entry.page === page && entry.kind === 'ink'));
 		this.pages.set(notebook.meta.id, [...entries, ...inkEntries(page, lines)]);
 		this.revision++;
 	}
 
-	/** Records what was said in a recording, replacing what was known of it. */
 	setSaid(notebook: NotebookEntry, recording: RecordingEntry, said: Said[]) {
 		const entries = (this.pages.get(notebook.meta.id) ?? []).filter((entry) => entry.moment?.recording !== recording.id);
 		this.pages.set(notebook.meta.id, [...entries, ...saidEntries(recording, said)]);

@@ -15,7 +15,6 @@ pub struct Hotkey {
     pub keys: Option<String>,
 }
 
-/// The app's session with the desktop's shortcuts. It stays empty where the desktop has none to offer.
 #[derive(Clone, Default)]
 pub struct Hotkeys {
     session: Arc<Mutex<Option<Arc<GlobalShortcuts>>>>,

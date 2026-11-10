@@ -13,7 +13,6 @@ const REQUEST: Request = Request {
     largest: (1920, 1080),
 };
 
-/// Opens the camera through the camera portal; false when the person said no.
 async fn open(Empty {}: Empty) -> Result<bool, String> {
     let Some(camera) = Camera::open(REQUEST).await? else {
         return Ok(false);

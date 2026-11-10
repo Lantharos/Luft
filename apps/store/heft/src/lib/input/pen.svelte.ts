@@ -2,11 +2,6 @@ import { events } from '@lantharos/sabine';
 
 const PALM_GRACE = 450;
 
-/**
- * The pen as Sabine reports it, including what Chromium's pointer events
- * leave out. Its side buttons belong to Luft's pen settings: one held to
- * erase turns the pen into its eraser end, which Heft erases with.
- */
 class Pen {
 	near = $state(false);
 	tool: 'pen' | 'eraser' = $state('pen');
@@ -24,7 +19,6 @@ class Pen {
 		this.lastSeen = performance.now();
 	}
 
-	/** Whether a touch now is most likely the hand holding the pen. */
 	get palmLikely(): boolean {
 		return this.near || performance.now() - this.lastSeen < PALM_GRACE;
 	}

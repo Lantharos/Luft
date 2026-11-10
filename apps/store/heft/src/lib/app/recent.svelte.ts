@@ -9,7 +9,6 @@ export interface RecentPage {
 const KEPT = 16;
 const SAVE_AFTER = 1500;
 
-/** The pages written on most recently, across every subject. */
 class Recent {
 	pages: RecentPage[] = $state([]);
 	private timer = 0;

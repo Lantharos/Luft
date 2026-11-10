@@ -11,7 +11,6 @@ use crate::L10N;
 const WAIT: gst::ClockTime = gst::ClockTime::from_mseconds(50);
 const CAPS: &str = "audio/x-raw,format=F32LE,channels=2,layout=interleaved";
 
-/// Decodes anything GStreamer has a plugin for into 48 kHz stereo floats.
 pub fn decode(path: &Path) -> Result<Vec<f32>, String> {
     gst::init().map_err(|error| error.to_string())?;
     let source = gst::ElementFactory::make("filesrc")
@@ -42,8 +41,6 @@ pub fn decode(path: &Path) -> Result<Vec<f32>, String> {
     samples
 }
 
-/// A file GStreamer can't make sense of only posts an error on the bus and never ends, so waiting alternates with
-/// looking there.
 fn pull(sink: &AppSink, bus: &gst::Bus) -> Result<Vec<f32>, String> {
     let mut samples = Vec::new();
     while !sink.is_eos() {

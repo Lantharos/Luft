@@ -12,7 +12,6 @@ fn sync_folder(path: &Path) -> io::Result<()> {
     }
 }
 
-/// Adds `bytes` to the end of `path` and waits until they are on the disk.
 pub fn append(path: &Path, bytes: &[u8]) -> Result<(), String> {
     let created = !path.exists();
     if let Some(folder) = path.parent() {
@@ -31,8 +30,6 @@ pub fn append(path: &Path, bytes: &[u8]) -> Result<(), String> {
     Ok(())
 }
 
-/// Replaces `path` through a hidden file beside it, so a crash leaves either
-/// the old contents or the new ones, both on the disk.
 pub fn replace(path: &Path, bytes: &[u8]) -> Result<(), String> {
     if let Some(folder) = path.parent() {
         fs::create_dir_all(folder).map_err(failed)?;
@@ -68,7 +65,6 @@ pub fn remove(path: &Path) -> Result<(), String> {
     }
 }
 
-/// Moves `from` to `to`, refusing to replace anything already there.
 pub fn rename(from: &Path, to: &Path) -> Result<(), String> {
     if to.exists() {
         return Err(format!("{} already exists", to.display()));

@@ -11,7 +11,6 @@ export interface Stroke {
 	color: number;
 	width: number;
 	started: number;
-	/** x, y, width, pressure and milliseconds since the previous point, five numbers a point. */
 	points: Float32Array;
 	bounds: Bounds;
 	path?: Path2D;

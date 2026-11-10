@@ -5,7 +5,6 @@ import { LOOKS, ruling } from '#lib/paper/templates.js';
 
 const EVERYTHING = { left: -Infinity, top: -Infinity, right: Infinity, bottom: Infinity };
 
-/** Draws a whole page small: its paper, its rules and its ink. */
 export function paintThumbnail(canvas: HTMLCanvasElement, paper: Paper, size: { width: number; height: number }, document: PageDocument | null, background?: CanvasImageSource) {
 	const context = canvas.getContext('2d')!;
 	const scale = canvas.width / size.width;

@@ -8,7 +8,6 @@ export const openCamera = () => commands.cameraOpen();
 
 export const closeCamera = () => commands.cameraClose();
 
-/** The camera's newest frame since the last one asked for, or `null` when there's none yet. */
 export async function cameraFrame(): Promise<ImageBitmap | ImageData | null> {
 	const bytes = await invoke<Uint8Array>('camera_frame', {});
 	if (bytes.length <= HEADER) return null;

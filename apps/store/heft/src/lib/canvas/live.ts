@@ -10,11 +10,6 @@ export interface Placement {
 	height: number;
 }
 
-/**
- * The stroke being drawn, on a canvas of its own over the notebook. Each new
- * sample draws only its own segment; the predicted tail sits on a second
- * canvas that is the only thing cleared while the pen moves.
- */
 export class LiveInk {
 	private readonly context: CanvasRenderingContext2D;
 	private readonly predictContext: CanvasRenderingContext2D;
@@ -61,7 +56,6 @@ export class LiveInk {
 		context.clip();
 	}
 
-	/** Draws the points from `from` on, joined to the one before it. */
 	draw(points: Float32Array, from: number) {
 		const path = new Path2D();
 		for (let index = from * POINT_FIELDS; index < points.length; index += POINT_FIELDS) {
@@ -76,7 +70,6 @@ export class LiveInk {
 		this.context.fill(path);
 	}
 
-	/** A dashed loop through the points, such as the lasso being drawn. */
 	outline(points: [number, number][], width: number) {
 		this.clear(this.context, this.drawn);
 		this.drawn = emptyBounds();
@@ -91,7 +84,6 @@ export class LiveInk {
 		this.context.stroke(path);
 	}
 
-	/** Swaps what was drawn so far for these strokes, such as a recognized shape. */
 	replace(strokes: Float32Array[]) {
 		this.clearPredicted();
 		this.clear(this.context, this.drawn);
@@ -102,7 +94,6 @@ export class LiveInk {
 		}
 	}
 
-	/** Shows where the pen is about to be, from the last drawn point. */
 	predict(points: Float32Array) {
 		this.clearPredicted();
 		if (points.length <= POINT_FIELDS) return;

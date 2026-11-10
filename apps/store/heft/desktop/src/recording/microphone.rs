@@ -9,10 +9,6 @@ use spa::pod::Pod;
 
 pub const RATE: u32 = 48_000;
 
-/// The default microphone at 48 kHz mono on a thread of its own, handing
-/// every buffer on as it arrives. PipeWire converts from whatever the
-/// microphone gives. Dropping it closes the stream, so the microphone is open
-/// only while recording and not while paused.
 pub struct Microphone {
     quit: pw::channel::Sender<()>,
     thread: Option<JoinHandle<()>>,

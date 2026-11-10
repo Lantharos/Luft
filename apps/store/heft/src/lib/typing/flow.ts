@@ -21,7 +21,6 @@ export function linesOf(notebook: OpenNotebook, entry: PageEntry): TextLines {
 	return textLines(paper, pageSize(paper, entry).height);
 }
 
-/** Wraps text that sits directly in the box into a line of its own, so every line can move as a whole. */
 function blocks(box: HTMLElement): HTMLElement[] {
 	let loose: HTMLElement | null = null;
 	for (const node of [...box.childNodes]) {
@@ -38,7 +37,6 @@ function blocks(box: HTMLElement): HTMLElement[] {
 	return [...box.children] as HTMLElement[];
 }
 
-/** The text box on a page that typing flows into, made at its first line when there isn't one. */
 function flowBox(notebook: OpenNotebook, entry: PageEntry, objects: PageObject[], like: PageObject): { object: PageObject; created: boolean } {
 	const found = objects.find((object) => object.flow);
 	if (found) return { object: found, created: false };
@@ -60,12 +58,6 @@ function flowBox(notebook: OpenNotebook, entry: PageEntry, objects: PageObject[]
 	return { object, created: true };
 }
 
-/**
- * In a notebook made for typing, moves the lines that no longer fit on the
- * page to the top of the next one, when that page is empty or carries typing
- * on already, or else of a new page put after it, and takes the caret along
- * when it was in what moved.
- */
 export async function overflow({ notebook, viewport }: Pages, page: string, object: PageObject, box: HTMLElement) {
 	const index = notebook.indexOf(page);
 	const entry = notebook.meta.pages[index];

@@ -28,8 +28,6 @@ pub enum Action {
     Rebound(Vec<luft_app::shortcuts::Bound>),
 }
 
-/// Turns what the desktop reports about shortcuts into what the audio should do. A held key can report its press more
-/// than once, so hold-to-play sounds remember being held.
 #[derive(Default)]
 pub struct Router {
     held: HashSet<SoundId>,

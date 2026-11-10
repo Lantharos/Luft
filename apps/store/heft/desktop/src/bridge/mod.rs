@@ -87,7 +87,6 @@ async fn choose_save(request: ChooseSave) -> Result<Option<String>, String> {
 
 const PEN_SETTINGS: &str = "kestrel-settings:pen";
 
-/// Luft's own pen settings, where the pen's side buttons are chosen for every app.
 async fn open_pen_settings(Empty {}: Empty) -> Result<(), String> {
     let proxy = Proxy::new(
         dbus::session().await?,

@@ -3,11 +3,8 @@ use jpeg_encoder::{ColorType, Encoder};
 
 const PREVIEW_WIDTH: u32 = 600;
 const PREVIEW_QUALITY: u8 = 70;
-/// When the driver doesn't know how long a page is, it's taken to be A4.
 const ASSUMED_PROPORTION: f32 = 1.414;
 
-/// A page arriving from the scanner line by line, in whatever packing the
-/// driver chose.
 pub struct Assembly {
     width: u32,
     lines: i32,
@@ -79,7 +76,6 @@ impl Assembly {
         RgbImage::from_fn(self.width, rows, |x, y| image::Rgb(self.pixel(y, x)))
     }
 
-    /// What has arrived so far, small, with the rest of the page left white.
     pub fn preview(&self) -> Option<Vec<u8>> {
         let step = self.width.div_ceil(PREVIEW_WIDTH).max(1);
         let (width, rows) = (self.width / step, self.rows() / step);

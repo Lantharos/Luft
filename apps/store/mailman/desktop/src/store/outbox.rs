@@ -79,6 +79,18 @@ impl Store {
         .map(|draft| draft.and_then(|draft| serde_json::from_str(&draft).ok()))
     }
 
+    pub fn mentions_anywhere_kept(&self, text: &str) -> Result<bool, String> {
+        self.reading(|connection| {
+            connection.query_row(
+                "SELECT EXISTS (SELECT 1 FROM outbox WHERE instr(draft, ?1))
+                    OR EXISTS (SELECT 1 FROM templates WHERE instr(body, ?1))
+                    OR EXISTS (SELECT 1 FROM identities WHERE instr(signature, ?1))",
+                [text],
+                |row| row.get(0),
+            )
+        })
+    }
+
     pub fn finish_outgoing(&self, id: i64) -> Result<(), String> {
         self.writing(|connection| connection.execute("DELETE FROM outbox WHERE id = ?1", [id]))
             .map(drop)

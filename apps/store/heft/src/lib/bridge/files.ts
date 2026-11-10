@@ -20,7 +20,6 @@ export async function readJson<T>(path: string): Promise<T | null> {
 	return bytes.length ? (JSON.parse(decoder.decode(bytes)) as T) : null;
 }
 
-/** Runs writes to one file in the order they were asked for. */
 export class WriteQueue {
 	private tail: Promise<unknown> = Promise.resolve();
 

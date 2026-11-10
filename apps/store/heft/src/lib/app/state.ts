@@ -1,6 +1,5 @@
 import { commands, type Value } from '#lib/bindings.js';
 
-/** What Heft remembers between runs that isn't a setting: pens, open notebooks, where each was scrolled. */
 class AppState {
 	private stored: Record<string, unknown> = {};
 

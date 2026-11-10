@@ -5,7 +5,6 @@ use super::geometry::{Quad, homography};
 
 const PAPER: [u8; 3] = [255, 255, 255];
 
-/// The part of `source` inside `quad`, straightened into a rectangle.
 pub fn cut(source: &RgbImage, quad: &Quad) -> RgbImage {
     if *quad == Quad::WHOLE {
         return source.clone();
@@ -55,7 +54,6 @@ fn sample(source: &RgbImage, u: f64, v: f64) -> [u8; 3] {
     })
 }
 
-/// `image` turned clockwise by `turns` quarter turns.
 pub fn rotate_quarter(image: RgbImage, turns: u8) -> RgbImage {
     match turns % 4 {
         1 => imageops::rotate90(&image),

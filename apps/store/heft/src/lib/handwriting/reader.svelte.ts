@@ -14,11 +14,6 @@ const BATTERY_WAIT = 10 * 60_000;
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-/**
- * Reads handwriting in the background so search finds it: page after page
- * whose ink changed, a line at a time, only once nobody has written for a
- * while, and never while the pen is near the screen.
- */
 class Reader {
 	model: HandwritingModel | null | undefined = $state(undefined);
 	left = $state(0);
@@ -49,7 +44,6 @@ class Reader {
 		await commands.handwritingRemove();
 	}
 
-	/** Notes that a page's ink changed, to read it again once there's a pause. */
 	touched(notebook: NotebookEntry, page: string) {
 		if (!settings.values.handwriting) return;
 		void readText.changed(notebook, page).then(() => this.kick());
@@ -91,7 +85,6 @@ class Reader {
 		this.waiting = null;
 	}
 
-	/** Reads one page; false when reading has to stop, such as when the model went away. */
 	private async readPage(notebook: NotebookEntry, page: string): Promise<boolean> {
 		const store = await library.openNotebook(notebook).load(page);
 		const strokes = store.document.strokes;

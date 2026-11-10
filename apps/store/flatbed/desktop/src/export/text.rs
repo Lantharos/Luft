@@ -1,7 +1,3 @@
-//! The invisible text over each page that makes a scan searchable: every
-//! word drawn in a font whose glyphs draw nothing, stretched over the word
-//! it was read from, with each character code mapped back to its letter.
-
 use std::collections::HashMap;
 
 use pdf_writer::types::{SystemInfo, TextRenderingMode, UnicodeCmap};
@@ -9,13 +5,10 @@ use pdf_writer::{Chunk, Content, Name, Rect, Ref, Str};
 
 use crate::document::Word;
 
-/// Codes one font holds; 0 stays unused.
 const CODES: usize = 255;
 const GLYPH_WIDTH: f32 = 500.0;
-/// How far below a line's top its baseline sits, as a share of its height.
 const BASELINE: f32 = 0.78;
 
-/// Fonts of up to 255 letters each, filled as words need them.
 #[derive(Default)]
 pub struct Letters {
     fonts: Vec<Vec<char>>,
@@ -41,7 +34,6 @@ impl Letters {
         format!("T{font}")
     }
 
-    /// Writes every font, with the ids from `next`, and returns their ids.
     pub fn write(&self, chunk: &mut Chunk, mut next: impl FnMut() -> Ref) -> Vec<Ref> {
         let glyph = next();
         chunk.stream(glyph, b"500 0 0 0 0 0 d1");
@@ -80,8 +72,6 @@ impl Letters {
     }
 }
 
-/// Where a page's picture sits on its PDF page: points per pixel and the
-/// offset of its bottom left corner.
 pub struct Placement {
     pub scale: f32,
     pub left: f32,
@@ -89,7 +79,6 @@ pub struct Placement {
     pub height: u32,
 }
 
-/// Draws the words invisibly where they are on the page's picture.
 pub fn draw(content: &mut Content, letters: &mut Letters, words: &[Word], placement: &Placement) {
     content.begin_text();
     content.set_text_rendering_mode(TextRenderingMode::Invisible);

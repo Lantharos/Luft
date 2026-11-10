@@ -55,7 +55,6 @@
 	let element: HTMLDivElement | undefined = $state();
 	let carrying = false;
 
-	/** Takes the picked ink, and on a book the printed part under it, over to the other pane. */
 	function startCarrying(event: PointerEvent, canvas: HTMLElement) {
 		carrying = true;
 		selection.preview(IDENTITY);

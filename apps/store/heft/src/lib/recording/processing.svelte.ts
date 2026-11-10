@@ -17,7 +17,6 @@ const LOOK_AGAIN = 2_000;
 const BATTERY_WAIT = 10 * 60_000;
 const CATCH_UP_AFTER = 60_000;
 
-/** What to do after working on a recording: go on to the next, come back to it later, or stop. */
 type Outcome = 'next' | 'later' | 'stop';
 
 export type Stage =
@@ -29,17 +28,10 @@ export type Stage =
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-/**
- * Turns recordings into transcripts and notes in the background, one at a
- * time: only while nobody writes, never while the pen is near, and for a
- * recording that waits for the charger only once it's plugged in. Both steps
- * keep where they got to after every piece, so they go on from there.
- */
 class Processing {
 	whisper: Model | null | undefined = $state(undefined);
 	writer: LanguageModel | null | undefined = $state(undefined);
 	readonly stages = new SvelteMap<string, Stage>();
-	/** Goes up whenever a transcript or its notes grow, for whatever shows them. */
 	revision = $state(0);
 	private running = false;
 	private wake: (() => void) | null = null;
@@ -64,13 +56,11 @@ class Processing {
 		this.kick();
 	}
 
-	/** Downloads what transcribing and writing notes need. */
 	async download() {
 		if (this.whisper && !this.whisper.installed) await commands.whisperInstall({ id: this.whisper.id });
 		if (this.writer && !this.writer.installed) await commands.notesInstall();
 	}
 
-	/** Has a recording processed now, or once the charger is in. */
 	choose(notebook: OpenNotebook, recording: RecordingEntry, processing: RecordingEntry['processing']) {
 		recording.processing = processing;
 		notebook.changed();
@@ -112,7 +102,6 @@ class Processing {
 		return null;
 	}
 
-	/** Leaves a recording alone for a while, or until Heft starts again when there's no `after`. */
 	private rest(recording: RecordingEntry, after?: number) {
 		this.resting.add(recording.id);
 		if (after)
@@ -122,7 +111,6 @@ class Processing {
 			}, after);
 	}
 
-	/** Waits until the recording may be worked on; false when nothing can happen until something changes. */
 	private async allowed(recording: RecordingEntry): Promise<boolean> {
 		if (!this.ready) {
 			this.stages.set(recording.id, { kind: 'waiting', for: 'models' });
@@ -145,7 +133,6 @@ class Processing {
 		this.wake = null;
 	}
 
-	/** Works on one recording until it's done, or until it has to wait. */
 	private async process(notebook: OpenNotebook, recording: RecordingEntry, transcript: Transcript): Promise<Outcome> {
 		const subject = library.subjectOf(notebook.entry)?.meta;
 		const languages = classLanguages(subject);

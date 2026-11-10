@@ -15,14 +15,11 @@ const MIN_FLING = 120;
 export interface GestureActions {
 	undo(): void;
 	redo(): void;
-	/** A quick tap of one finger, where it touched. */
 	tap(x: number, y: number): void;
-	/** Scale and pan shown while a pinch is under way, before the zoom is applied. */
 	preview(scale: number, x: number, y: number): void;
 	settle(): void;
 }
 
-/** Fingers on the notebook: one pans or taps, two pan and zoom, a quick tap of two or three undoes or redoes. */
 export class TouchGestures {
 	private readonly touches = new Map<number, Touch>();
 	private started = 0;

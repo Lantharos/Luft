@@ -1,5 +1,5 @@
 import type { TextItem } from 'pdfjs-dist/types/src/display/api';
-import { pdfDocument, POINTS } from './document';
+import { pdfDocument, PAGE_UNITS_PER_POINT } from './document';
 
 export interface Glyphs {
 	text: string;
@@ -11,22 +11,21 @@ export interface Glyphs {
 
 const cache = new Map<string, Promise<Glyphs[]>>();
 
-/** The page's text runs in reading order, placed in page units. */
 export function pageText(path: string, index: number): Promise<Glyphs[]> {
 	const key = `${path}#${index}`;
 	let pending = cache.get(key);
 	if (!pending) {
 		pending = (async () => {
 			const page = await (await pdfDocument(path)).getPage(index + 1);
-			const viewport = page.getViewport({ scale: POINTS });
+			const viewport = page.getViewport({ scale: PAGE_UNITS_PER_POINT });
 			const content = await page.getTextContent();
 			return content.items
 				.filter((item): item is TextItem => 'str' in item && item.str.trim().length > 0)
 				.map((item) => {
 					const [a, b, , , e, f] = item.transform;
 					const [x, y] = viewport.convertToViewportPoint(e, f);
-					const height = Math.hypot(a, b) * POINTS;
-					return { text: item.str, left: x, top: y - height * 0.86, width: item.width * POINTS, height: height * 1.12 };
+					const height = Math.hypot(a, b) * PAGE_UNITS_PER_POINT;
+					return { text: item.str, left: x, top: y - height * 0.86, width: item.width * PAGE_UNITS_PER_POINT, height: height * 1.12 };
 				});
 		})();
 		cache.set(key, pending);
@@ -56,7 +55,6 @@ function nearest(glyphs: Glyphs[], x: number, y: number): number {
 
 const share = (glyph: Glyphs, x: number) => Math.max(0, Math.min(1, (x - glyph.left) / glyph.width));
 
-/** The text between two points, the way a reader's eye goes from one to the other. */
 export function select(glyphs: Glyphs[], from: [number, number], to: [number, number]): Selection {
 	if (!glyphs.length) return { rects: [], text: '' };
 	let start = nearest(glyphs, ...from);

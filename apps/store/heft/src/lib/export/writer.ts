@@ -3,7 +3,6 @@ const encoder = new TextEncoder();
 export interface Raster {
 	width: number;
 	height: number;
-	/** JPEG bytes, or deflated RGB with deflated alpha beside it. */
 	jpeg?: Uint8Array;
 	rgb?: Uint8Array;
 	alpha?: Uint8Array;
@@ -14,11 +13,9 @@ export interface PdfPage {
 	height: number;
 	content: string;
 	images: Raster[];
-	/** Opacity of each graphics state the content names as /G0, /G1… */
 	opacities: number[];
 }
 
-/** A minimal PDF 1.4 writer: pages of vector drawing commands and pictures. */
 export class PdfWriter {
 	private readonly objects: (Uint8Array | null)[] = [];
 

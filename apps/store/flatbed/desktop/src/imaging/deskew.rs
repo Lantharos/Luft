@@ -7,11 +7,8 @@ use super::geometry::Quad;
 const SEARCH_DEGREES: f64 = 5.0;
 const COARSE_STEP: f64 = 0.25;
 const FINE_STEP: f64 = 0.05;
-/// Turns smaller than this aren't worth losing the edges for.
 const NOTICEABLE_DEGREES: f64 = 0.3;
 
-/// The page straightened by how far its lines of text lean, losing as
-/// little as possible at the edges, or all of it when nothing leans.
 pub fn straightened(grey: &GrayImage) -> Quad {
     let ink = ink(grey);
     let share = ink.len() as f64 / (f64::from(grey.width()) * f64::from(grey.height()));
@@ -41,8 +38,6 @@ fn ink(grey: &GrayImage) -> Vec<(f32, f32)> {
         .collect()
 }
 
-/// The angle at which the ink falls into the sharpest rows, as lines of
-/// text do when they run level.
 fn steepest(ink: &[(f32, f32)], height: u32, angles: Vec<f64>) -> f64 {
     angles
         .into_par_iter()
@@ -66,8 +61,6 @@ fn steepest(ink: &[(f32, f32)], height: u32, angles: Vec<f64>) -> f64 {
         .map_or(0.0, |(degrees, _)| degrees)
 }
 
-/// The largest rectangle with the picture's proportions that fits inside
-/// it turned by `degrees`.
 fn turned(degrees: f64, width: u32, height: u32) -> Quad {
     let (w, h) = (f64::from(width), f64::from(height));
     let (sin, cos) = (degrees.to_radians().sin(), degrees.to_radians().cos());

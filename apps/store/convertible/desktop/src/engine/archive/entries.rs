@@ -3,6 +3,8 @@ use std::io::{self, BufReader, BufWriter, Read, Write};
 use std::path::{Component, Path, PathBuf};
 use std::time::SystemTime;
 
+use gio::prelude::*;
+
 use crate::engine::error::{Failure, Result};
 use crate::l10n::L10N;
 use luft_i18n::t;
@@ -34,8 +36,25 @@ pub trait Sink {
     fn finish(self: Box<Self>) -> Result<()>;
 }
 
+const ROOM_KEPT_FREE: u64 = 256 * 1024 * 1024;
+
 pub struct FolderSink {
-    pub root: PathBuf,
+    root: PathBuf,
+    room: u64,
+}
+
+impl FolderSink {
+    pub fn new(root: PathBuf) -> Result<Self> {
+        fs::create_dir_all(&root)?;
+        let free = gio::File::for_path(&root)
+            .query_filesystem_info(gio::FILE_ATTRIBUTE_FILESYSTEM_FREE, gio::Cancellable::NONE)
+            .map_err(|error| Failure::new(t!(L10N, "failure-file", detail = error.to_string())))?
+            .attribute_uint64(gio::FILE_ATTRIBUTE_FILESYSTEM_FREE);
+        Ok(Self {
+            root,
+            room: free.saturating_sub(ROOM_KEPT_FREE),
+        })
+    }
 }
 
 impl Sink for FolderSink {
@@ -49,7 +68,11 @@ impl Sink for FolderSink {
             fs::create_dir_all(parent)?;
         }
         let mut file = BufWriter::new(File::create(&target)?);
-        io::copy(content, &mut file)?;
+        let written = io::copy(&mut content.take(self.room + 1), &mut file)?;
+        if written > self.room {
+            return Err(Failure::new(t!(L10N, "failure-no-room")));
+        }
+        self.room -= written;
         file.flush()?;
         let file = file
             .into_inner()

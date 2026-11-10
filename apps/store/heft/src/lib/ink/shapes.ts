@@ -43,7 +43,6 @@ function ellipse(points: Point[]): Point[] {
 	});
 }
 
-/** Lines out a quadrilateral, squared to the page when its sides are nearly level. */
 function quad(corners: Point[]): Point[] {
 	const xs = corners.map(([x]) => x);
 	const ys = corners.map(([, y]) => y);
@@ -57,10 +56,6 @@ function quad(corners: Point[]): Point[] {
 	return [[left, top], [right, top], [right, bottom], [left, bottom], [left, top]];
 }
 
-/**
- * What a held stroke was meant to be: a line, an arrow, a triangle, a
- * rectangle or an ellipse, as the outline to draw instead, or null.
- */
 export function recognize(raw: Point[]): Point[][] | null {
 	if (raw.length < 4) return null;
 	const xs = raw.map(([x]) => x);
@@ -95,7 +90,6 @@ export function recognize(raw: Point[]): Point[][] | null {
 	return null;
 }
 
-/** The outline as stroke points, at one width. */
 export function outlinePoints(outline: Point[], width: number): Float32Array {
 	const points = new Float32Array(outline.length * POINT_FIELDS);
 	outline.forEach(([x, y], index) => points.set([x, y, width, 0.5, 0], index * POINT_FIELDS));

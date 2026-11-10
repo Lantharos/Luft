@@ -9,7 +9,6 @@ use crate::L10N;
 
 const COOKIE_LENGTH: usize = 256;
 
-/// The server only looks at a cookie's length, and an app in a sandbox can't read the real one.
 fn cookie() -> Vec<u8> {
     let mut cookie = pulseaudio::cookie_path_from_env()
         .and_then(|path| std::fs::read(path).ok())
@@ -18,8 +17,6 @@ fn cookie() -> Vec<u8> {
     cookie
 }
 
-/// Makes `name` the system's default input through the sound server's PulseAudio side, which also serves apps in a
-/// sandbox, where PipeWire's own settings are read-only.
 pub fn use_as_default(name: &str) -> Result<(), String> {
     let failed = |error: &dyn std::fmt::Display| error.to_string();
     let socket =

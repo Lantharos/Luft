@@ -20,7 +20,6 @@ use super::super::mixer::{Mixer, MixerControl, Order, Output, Voice, VoiceSpec};
 use super::streams::{self, Handle, Levels, Shared, VoiceRing, VoiceWriter};
 use super::{Command, Microphone, Mix, Play, SOURCE_NAME, Status};
 
-/// One round for the registry to name everything, one for what binding the default metadata then told us.
 const SYNC_ROUNDS: u32 = 2;
 const RECONNECT: Duration = Duration::from_secs(2);
 const DEFAULT_METADATA: &str = "default";
@@ -34,8 +33,6 @@ struct Node {
     priority: i32,
 }
 
-/// What the sound server said since the graph last looked. Callbacks only write here, so the graph can follow it from
-/// one place.
 #[derive(Default)]
 struct Facts {
     nodes: HashMap<u32, Node>,
@@ -71,7 +68,6 @@ impl Facts {
         microphones
     }
 
-    /// The real microphone to pass through: never the virtual one, even while that's the system's default input.
     fn microphone(&self, chosen: Option<&str>) -> Option<String> {
         let exists = |name: &&str| self.sources().any(|node| node.name == *name);
         chosen
@@ -129,7 +125,6 @@ fn learn(facts: &RefCell<Facts>, global: &GlobalObject<&DictRef>) {
     }
 }
 
-/// Keeps the metadata proxy alive and copies the default input into the facts.
 struct DefaultInput {
     _metadata: Metadata,
     _listener: MetadataListener,

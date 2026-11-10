@@ -44,25 +44,18 @@ impl Format {
 pub struct Save {
     pub format: Format,
     pub searchable: bool,
-    /// The file's name without its extension.
     pub name: String,
-    /// The file chooser's title.
     pub title: String,
-    /// What the file chooser calls files of this format.
     pub filter: String,
 }
 
 #[derive(Serialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Saved {
-    /// The file, or the folder the pages went into.
     pub path: String,
-    /// Every file written, to send on.
     pub files: Vec<String>,
 }
 
-/// Asks where to save and saves the document there: one file, or a folder
-/// for a picture of each page.
 pub async fn save(request: Save) -> Result<Option<Saved>, String> {
     let (pages, mode, _) = document::snapshot();
     if pages.is_empty() {
@@ -166,8 +159,6 @@ fn picture(cleaned: &Cleaned, format: Format) -> Result<Vec<u8>, String> {
     Ok(out)
 }
 
-/// Each page developed afresh and saved as a picture of its own: into the
-/// file chosen for one page, or numbered in the folder chosen for several.
 fn save_pictures(
     target: &Path,
     name: &str,

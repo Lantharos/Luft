@@ -69,7 +69,6 @@
 		return hit ?? (notebook.meta.typed ? objects.find((object) => object.flow) : undefined);
 	}
 
-	/** Puts the caret where a click landed or a tap aimed: into text that's there, or on a new line of the page. */
 	function typeAt(id: string, x: number, y: number, client: [number, number]) {
 		const index = notebook.indexOf(id);
 		if (!stores.has(id)) return;
@@ -81,7 +80,6 @@
 		draftText(id, linesOf(notebook, notebook.meta.pages[index]), x, y, viewport.layout.pages[index].width, notebook.meta.typed);
 	}
 
-	/** Marks where a tap landed, for the next key typed on a keyboard to start typing there. */
 	function aimAt(id: string, x: number, y: number) {
 		if (!appearance.keyboard || !stores.has(id)) return;
 		const index = notebook.indexOf(id);
@@ -132,7 +130,6 @@
 
 	const FORMAT_BAR = { width: 172, height: 44, gap: 8 };
 
-	/** Where the formatting buttons float: just above the text box being typed in, or under its first line when that's off the top. */
 	let formatAt = $derived.by(() => {
 		const id = editing.active;
 		if (!id) return null;

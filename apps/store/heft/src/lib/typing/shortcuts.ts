@@ -17,11 +17,6 @@ function blockOf(node: Node, box: HTMLElement): HTMLElement {
 	return box;
 }
 
-/**
- * Typing `#`, `##`, `>`, `-`, `*` or `1.` at the start of a line and then a
- * space turns the line into a heading, quote or list, as in most writing
- * apps. True when it did, so the space isn't typed.
- */
 export function blockShortcut(box: HTMLElement) {
 	const selection = getSelection();
 	if (!selection?.isCollapsed || !selection.anchorNode || !box.contains(selection.anchorNode)) return false;

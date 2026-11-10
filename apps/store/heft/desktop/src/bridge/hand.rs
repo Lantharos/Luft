@@ -3,7 +3,6 @@ use serde::Serialize;
 use specta::Type;
 use zbus::{OwnedVariant, Proxy};
 
-/// The hand that holds the pen, as set for every app in Luft's pen settings.
 #[derive(Serialize, Type)]
 #[serde(rename_all = "lowercase")]
 pub enum Hand {

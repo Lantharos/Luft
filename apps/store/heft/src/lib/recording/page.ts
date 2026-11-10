@@ -17,7 +17,6 @@ function list(title: string, items: { text: string; at: number }[]) {
 	return `<h3>${escape(title)}</h3><ul>${lines}</ul>`;
 }
 
-/** The notes of a class typed out on a new page after `index`, where they can be edited like any text. */
 export async function notesPage(notebook: OpenNotebook, transcript: Transcript, index: number) {
 	const { parts, heading } = transcript.notes;
 	const all = <T>(pick: (part: Transcript['notes']['parts'][number]) => T[]) => parts.flatMap(pick);

@@ -150,7 +150,6 @@ export class PageStore {
 		if (this.journalSize > COMPACT_AFTER) this.compact();
 	}
 
-	/** Writes the whole page and empties its journal; `always` writes it even when nothing changed. */
 	compact(always = false) {
 		if (!always && this.compactedRevision === this.document.revision) return this.queue.settled;
 		const bytes = encodePage(this.document);

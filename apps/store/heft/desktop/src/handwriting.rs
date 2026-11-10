@@ -13,7 +13,6 @@ pub const HANDWRITING_CHANGED: BridgeEvent<()> = BridgeEvent::new("handwriting.c
 #[derive(Deserialize, Type)]
 pub struct Line {
     strokes: Vec<Stroke>,
-    /// Someone waits for it, so it goes ahead of background reading.
     now: bool,
 }
 
@@ -26,7 +25,6 @@ pub enum Read {
     Missing,
 }
 
-/// The handwriting model, or `None` on a Luft without the handwriting service.
 async fn overview(Empty {}: Empty) -> Result<Option<HandwritingModel>, String> {
     Ok(client::overview().await.ok())
 }
@@ -56,11 +54,9 @@ async fn read(Line { strokes, now }: Line) -> Result<Read, String> {
 
 #[derive(Deserialize, Type)]
 pub struct Correction {
-    /// One correction as a line of JSON.
     line: String,
 }
 
-/// Adds a correction to the ones kept on this computer, for tuning reading later; they never leave it.
 fn keep_correction(Correction { line }: Correction) -> Result<(), String> {
     let folder = dirs::data_dir()
         .ok_or("There's no folder for Heft's data")?
@@ -74,7 +70,6 @@ fn keep_correction(Correction { line }: Correction) -> Result<(), String> {
     writeln!(file, "{line}").map_err(|error| error.to_string())
 }
 
-/// Tells the page whenever the model or its download changes.
 pub async fn watch(events: Events) {
     let Ok(changes) = client::changes().await else {
         return;

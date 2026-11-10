@@ -18,10 +18,6 @@ fn failed(error: impl std::fmt::Display) -> String {
     error.to_string()
 }
 
-/// A recording written as Ogg Opus at 24 kbit/s, about 11 MB an hour. Each
-/// second ends a page that's on the disk before the next begins, so a crash
-/// or power cut loses at most the last second, and what's written is always
-/// a recording players can open.
 pub struct OpusFile {
     writer: PacketWriter<'static, File>,
     encoder: Encoder,
@@ -77,7 +73,6 @@ impl OpusFile {
         })
     }
 
-    /// How much has been recorded, in milliseconds.
     pub fn length(&self) -> u64 {
         (self.encoded + self.pending.len() as u64) / PER_MILLISECOND
     }
@@ -116,7 +111,6 @@ impl OpusFile {
         Ok(())
     }
 
-    /// Writes what's left, ending the stream.
     pub fn finish(mut self) -> Result<u64, String> {
         let mut frame = std::mem::take(&mut self.pending);
         let heard = frame.len();
@@ -126,8 +120,6 @@ impl OpusFile {
     }
 }
 
-/// How long a recording is, in milliseconds, from the last page that made it
-/// to the disk, also for one cut short when Heft stopped mid-class.
 pub fn length(path: &Path) -> Result<u64, String> {
     let mut reader = PacketReader::new(BufReader::new(File::open(path).map_err(failed)?));
     let head = reader

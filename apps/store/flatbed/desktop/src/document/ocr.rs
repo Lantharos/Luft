@@ -13,10 +13,8 @@ use crate::imaging;
 use crate::settings;
 
 const TESSERACT: &str = "tesseract";
-/// Background reading stays out of the way of everything else.
 const BACKGROUND_NICENESS: i32 = 15;
 
-/// A word read on a page, in the page's pixels, with the line it sits on.
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Word {
@@ -33,7 +31,6 @@ struct Reading {
     words: Vec<Word>,
 }
 
-/// The languages Tesseract has data for, or `None` without Tesseract.
 pub fn languages() -> Option<&'static [String]> {
     static LANGUAGES: OnceLock<Option<Vec<String>>> = OnceLock::new();
     LANGUAGES
@@ -76,7 +73,6 @@ fn cached(folder: &Path, page: &Page, languages: &[String]) -> Option<Vec<Word>>
     (reading.languages == languages).then_some(reading.words)
 }
 
-/// The words on a page, read now unless they were read already.
 pub fn read(page: &Page) -> Result<Option<Vec<Word>>, String> {
     let languages = chosen_languages();
     if languages.is_empty() {
@@ -111,7 +107,6 @@ fn keep(folder: &Path, page: &Page, languages: &[String], words: &[Word]) {
 
 static QUEUE: (Mutex<VecDeque<Page>>, Condvar) = (Mutex::new(VecDeque::new()), Condvar::new());
 
-/// Reads a page in the background, so saving it later doesn't wait.
 pub fn queue(page: &Page) {
     static WORKER: OnceLock<()> = OnceLock::new();
     if languages().is_none_or(<[String]>::is_empty) {
@@ -189,13 +184,10 @@ fn recognize(page: &Page, languages: &[String], background: bool) -> Result<Vec<
     Ok(words(&String::from_utf8_lossy(&output.stdout)))
 }
 
-/// A page photographed without a known resolution is taken to be as wide
-/// as A4 paper.
 fn assumed_dpi(grey: &GrayImage) -> u32 {
     ((f64::from(grey.width().min(grey.height())) / 8.27).round() as u32).clamp(70, 1200)
 }
 
-/// Words from Tesseract's TSV, each with the box of its line.
 fn words(tsv: &str) -> Vec<Word> {
     let mut words = Vec::new();
     let mut line = (0, 0);

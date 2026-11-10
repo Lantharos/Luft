@@ -12,7 +12,7 @@ pub struct LoaderConfig {
 
 pub fn load(device: Handle) -> LoaderConfig {
     let Some(contents) =
-        Volume::open(device).and_then(|mut volume| volume.read("\\loader\\loader.conf"))
+        Volume::open(device).and_then(|mut volume| volume.read_config("\\loader\\loader.conf"))
     else {
         return parse("");
     };

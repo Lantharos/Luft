@@ -13,9 +13,8 @@ pub fn start(entry: &BootEntry) -> uefi::Result<()> {
             options,
         } => linux::start(entry.volume, linux, initrd.as_deref(), options),
         Action::Efi { path, options } => {
-            // Without a firmware entry for Windows, it starts from here.
             if path.eq_ignore_ascii_case(WINDOWS) {
-                let _ = boot_next::restart_into(entry.volume, path);
+                let _ = boot_next::restart_into_firmware_entry(entry.volume, path);
             }
             image::start(image::load(entry.volume, path)?, options)
         }

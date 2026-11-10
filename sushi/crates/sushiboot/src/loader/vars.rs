@@ -2,35 +2,22 @@ use alloc::format;
 use alloc::string::String;
 use alloc::vec::Vec;
 
+use sushi_scene::firmware::{self, LOADER_VARIABLES, utf16};
 use uefi::runtime::{self, VariableAttributes, VariableVendor};
-use uefi::{CStr16, Handle, cstr16, guid};
+use uefi::{CStr16, Guid, Handle, cstr16};
 
 use crate::entries::{Catalog, volume};
 
-const LOADER: VariableVendor = VariableVendor(guid!("4a67b082-0a4c-41cf-b6c7-440b29bb8c4f"));
+const LOADER: VariableVendor = VariableVendor(Guid::parse_or_panic(LOADER_VARIABLES));
 const ENTRY_DEFAULT: u64 = 1 << 2;
 const ENTRY_ONESHOT: u64 = 1 << 3;
 const BOOT_COUNTING: u64 = 1 << 4;
 const XBOOTLDR: u64 = 1 << 5;
 const MULTI_PROFILE_UKI: u64 = 1 << 14;
 
-fn utf16(text: &str) -> Vec<u8> {
-    text.encode_utf16()
-        .chain([0])
-        .flat_map(u16::to_le_bytes)
-        .collect()
-}
-
 fn text(name: &CStr16) -> Option<String> {
     let (data, _) = runtime::get_variable_boxed(name, &LOADER).ok()?;
-    let units: Vec<u16> = data
-        .as_chunks::<2>()
-        .0
-        .iter()
-        .map(|pair| u16::from_le_bytes(*pair))
-        .take_while(|unit| *unit != 0)
-        .collect();
-    String::from_utf16(&units).ok()
+    Some(firmware::text(&data))
 }
 
 fn announce(name: &CStr16, data: &[u8]) {

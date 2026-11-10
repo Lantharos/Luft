@@ -1,14 +1,15 @@
 use alloc::string::String;
 
+use sushi_scene::firmware::LUFT_VARIABLES;
 use uefi::runtime::{self, VariableAttributes, VariableVendor};
-use uefi::{CStr16, guid};
+use uefi::{CStr16, Guid};
 
 pub mod back;
 pub mod conf;
 pub mod last;
 pub mod vars;
 
-pub const LUFT: VariableVendor = VariableVendor(guid!("b6a4c1e2-3f5d-4c8a-9e71-2d0f6a8b5c3e"));
+pub const LUFT: VariableVendor = VariableVendor(Guid::parse_or_panic(LUFT_VARIABLES));
 
 fn read(name: &CStr16) -> Option<String> {
     let (data, _) = runtime::get_variable_boxed(name, &LUFT).ok()?;

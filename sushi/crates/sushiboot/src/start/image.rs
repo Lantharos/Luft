@@ -1,7 +1,7 @@
-use alloc::vec::Vec;
 use core::mem::MaybeUninit;
 
-use uefi::boot::{self, AllocateType, LoadImageSource, MemoryType};
+use sushi_scene::firmware::utf16;
+use uefi::boot::{self, LoadImageSource};
 use uefi::proto::BootPolicy;
 use uefi::proto::device_path::build::{self, media::FilePath};
 use uefi::proto::device_path::{DevicePath, DeviceSubType, DeviceType};
@@ -45,30 +45,20 @@ fn load_from_memory(volume: Handle, path: &str) -> uefi::Result<Handle> {
     let data = Volume::open(volume)
         .and_then(|mut volume| volume.read(path))
         .ok_or_else(|| uefi::Error::from(Status::NOT_FOUND))?;
-    let pages = data.len().div_ceil(4096);
-    let address = boot::allocate_pages(AllocateType::AnyPages, MemoryType::LOADER_DATA, pages)?;
-    let buffer = unsafe {
-        core::ptr::copy_nonoverlapping(data.as_ptr(), address.as_ptr(), data.len());
-        core::slice::from_raw_parts(address.as_ptr(), data.len())
-    };
     boot::load_image(
         boot::image_handle(),
         LoadImageSource::FromBuffer {
-            buffer,
+            buffer: &data,
             file_path: None,
         },
     )
 }
 
 pub fn load(volume: Handle, path: &str) -> uefi::Result<Handle> {
-    load_from_path(volume, path).or_else(|_| load_from_memory(volume, path))
-}
-
-fn utf16(text: &str) -> Vec<u8> {
-    text.encode_utf16()
-        .chain([0])
-        .flat_map(u16::to_le_bytes)
-        .collect()
+    load_from_path(volume, path).or_else(|refusal| match refusal.status() {
+        Status::SECURITY_VIOLATION | Status::ACCESS_DENIED => Err(refusal),
+        _ => load_from_memory(volume, path),
+    })
 }
 
 pub fn start(image: Handle, options: &str) -> uefi::Result<()> {

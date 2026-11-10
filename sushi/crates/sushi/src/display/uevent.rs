@@ -4,7 +4,9 @@ use std::path::{Path, PathBuf};
 
 use rustix::net::netlink::{self, SocketAddrNetlink};
 use rustix::net::sockopt::set_socket_recv_buffer_size_force;
-use rustix::net::{AddressFamily, RecvFlags, SocketFlags, SocketType, bind, recv, socket_with};
+use rustix::net::{
+    AddressFamily, RecvFlags, SocketAddrAny, SocketFlags, SocketType, bind, recvfrom, socket_with,
+};
 
 const KERNEL_EVENTS: u32 = 1;
 const UDEV_EVENTS: u32 = 2;
@@ -34,6 +36,14 @@ impl AsFd for CardEvents {
 enum Source {
     Kernel,
     Udev,
+}
+
+fn sent_by_the_system(sender: SocketAddrAny) -> bool {
+    SocketAddrNetlink::try_from(sender).is_ok_and(|sender| match sender.groups() {
+        KERNEL_EVENTS => sender.pid() == 0,
+        UDEV_EVENTS => true,
+        _ => false,
+    })
 }
 
 fn properties(message: &[u8]) -> Option<(Source, &[u8])> {
@@ -70,7 +80,7 @@ fn parse(message: &[u8], from_kernel: bool) -> Option<CardEvent> {
             is_drm = true;
         }
     }
-    let path = Path::new("/dev").join(device.filter(|_| is_drm)?);
+    let path = Path::new("/dev").join(device.filter(|name| is_drm && !name.contains(".."))?);
     if !path.to_str()?.starts_with("/dev/dri/card") {
         return None;
     }
@@ -124,8 +134,11 @@ impl CardEvents {
     pub fn drain(&self) -> Vec<CardEvent> {
         let mut events = Vec::new();
         let mut buffer = [0u8; 16384];
-        while let Ok((length, _)) = recv(&self.socket, &mut buffer, RecvFlags::DONTWAIT) {
-            events.extend(parse(&buffer[..length.min(buffer.len())], self.from_kernel));
+        while let Ok((length, _, sender)) = recvfrom(&self.socket, &mut buffer, RecvFlags::DONTWAIT)
+        {
+            if sender.is_some_and(sent_by_the_system) {
+                events.extend(parse(&buffer[..length], self.from_kernel));
+            }
         }
         events
     }
@@ -168,5 +181,7 @@ mod tests {
             parse(card, true),
             Some(CardEvent::Added(PathBuf::from("/dev/dri/card1")))
         );
+        let elsewhere = b"add@/devices/x\0ACTION=add\0SUBSYSTEM=drm\0DEVNAME=dri/card0/../../sda\0";
+        assert_eq!(parse(elsewhere, true), None);
     }
 }

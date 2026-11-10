@@ -1,5 +1,6 @@
 use sushi::ipc::control::Mode;
 use sushi::scene::{Progress, Status};
+use sushi::system;
 
 use crate::screen::Fader;
 
@@ -22,28 +23,17 @@ pub struct Activity {
     alpha: Fader,
 }
 
-fn system_name() -> Option<String> {
-    let release = std::fs::read_to_string("/etc/os-release")
-        .or_else(|_| std::fs::read_to_string("/usr/lib/os-release"))
-        .ok()?;
-    release
-        .lines()
-        .find_map(|line| line.strip_prefix("NAME="))
-        .map(|name| name.trim_matches('"').to_owned())
-        .filter(|name| !name.is_empty())
-}
-
 fn title(mode: Mode, destination: &str) -> Option<String> {
     match mode {
         Mode::Boot | Mode::Shutdown => None,
         Mode::Updates => Some("Installing updates".to_owned()),
         Mode::Upgrade => Some(
-            system_name().map_or("Upgrading your system".to_owned(), |name| {
+            system::name().map_or("Upgrading your system".to_owned(), |name| {
                 format!("Upgrading {name}")
             }),
         ),
         Mode::Firmware => Some("Updating firmware".to_owned()),
-        Mode::Encrypting => Some("Encrypting your device".to_owned()),
+        Mode::Encrypting => Some("Encrypting your computer".to_owned()),
         Mode::Moving => Some(format!("Moving Luft to {destination}")),
     }
 }

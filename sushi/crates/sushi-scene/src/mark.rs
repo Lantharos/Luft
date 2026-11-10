@@ -1,4 +1,6 @@
-use tiny_skia::{FillRule, Paint, Path, PathBuilder, PixmapMut, Transform};
+use tiny_skia::{FillRule, Path, PathBuilder, PixmapMut, Transform};
+
+use crate::white;
 
 const WIDTH: f32 = 187.0;
 const HEIGHT: f32 = 197.0;
@@ -48,18 +50,9 @@ pub fn draw(
 ) {
     let size = height / HEIGHT;
     let placed = view.pre_translate(left, top).pre_scale(size, size);
-    let mut paint = Paint {
-        anti_alias: true,
-        ..Paint::default()
-    };
     for (part, opacity) in [(LOWER, 0.5), (UPPER, 1.0)] {
         let Some(path) = shape(part) else { continue };
-        paint.set_color_rgba8(
-            255,
-            255,
-            255,
-            libm::roundf((alpha * opacity).clamp(0.0, 1.0) * 255.0) as u8,
-        );
+        let paint = white(alpha * opacity);
         pixmap.fill_path(&path, &paint, FillRule::Winding, placed, None);
     }
 }

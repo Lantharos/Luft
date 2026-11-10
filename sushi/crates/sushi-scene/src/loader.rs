@@ -1,8 +1,8 @@
 use core::f32::consts::{FRAC_PI_2, TAU};
 
-use tiny_skia::{LineCap, Paint, PathBuilder, PixmapMut, Stroke, Transform};
+use tiny_skia::{LineCap, PathBuilder, PixmapMut, Stroke, Transform};
 
-use crate::Layout;
+use crate::{Layout, white};
 
 const CYCLE_SECONDS: f32 = 1.6;
 const TURNS_PER_SECOND: f32 = 0.55;
@@ -64,20 +64,10 @@ pub fn draw(pixmap: &mut PixmapMut, layout: &Layout, view: Transform, seconds: f
     push_arc(&mut path, layout.loader_center, radius, start, sweep);
     let Some(path) = path.finish() else { return };
 
-    let mut paint = Paint {
-        anti_alias: true,
-        ..Paint::default()
-    };
-    paint.set_color_rgba8(
-        255,
-        255,
-        255,
-        libm::roundf(alpha.clamp(0.0, 1.0) * 255.0) as u8,
-    );
     let stroke = Stroke {
         width: STROKE * scale,
         line_cap: LineCap::Round,
         ..Stroke::default()
     };
-    pixmap.stroke_path(&path, &paint, &stroke, view, None);
+    pixmap.stroke_path(&path, &white(alpha), &stroke, view, None);
 }

@@ -62,10 +62,10 @@ impl Image {
     }
 
     fn order(&self, other: &Self) -> Ordering {
-        match (&self.sort_key, &other.sort_key) {
-            (Some(ours), Some(theirs)) => ours.cmp(theirs),
-            _ => newest_first(self.version(), other.version()),
-        }
+        let unkeyed = self.sort_key.is_none().cmp(&other.sort_key.is_none());
+        unkeyed
+            .then_with(|| self.sort_key.cmp(&other.sort_key))
+            .then_with(|| newest_first(self.version(), other.version()))
     }
 
     fn command_line(&self, profile: usize) -> Option<&str> {

@@ -21,10 +21,13 @@ Each screen starts in the mode from that arrangement, or else in its preferred m
 | `sushictl update-root ROOT` | Moves the splash into another root file system, as `sushi-switch-root.service` does with `/sysroot` when the initramfs hands over to the installed system |
 | `sushictl show MODE` | Takes the display back: `boot-up`, `shutdown` (or `reboot`), `updates`, `system-upgrade`, `firmware-upgrade` or `encrypting` |
 | `sushictl load-drivers` | Loads the drivers Sushi takes over |
+| `sushictl moving DRIVE` | Takes the display back and says Luft is moving to the drive named |
+| `sushictl progress PERCENT` | Shows how far the activity on screen is |
 | `sushictl notice key-enrollment CODE [--again]` | Explains shim's key enrollment screen at the next restart |
 | `sushictl notice show FILE` | Shows a notice and waits until it's dismissed |
 | `sushictl notice clear` | Withdraws a pending notice |
 | `sushictl failure` | Says why the computer couldn't start and offers what can be done, in place of the emergency and rescue shells ([details](../boot.md#when-luft-cant-start)) |
+| `sushictl check-files` | Fails when the kernel refused a system file because it doesn't match the version that started |
 
 A notice file has one field per line: `title`, `line` and `step` (both repeatable), `footer` (where `{seconds}` counts down), `countdown` and `key`, a letter that dismisses it besides Enter.
 

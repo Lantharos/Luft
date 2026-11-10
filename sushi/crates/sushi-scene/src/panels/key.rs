@@ -1,9 +1,9 @@
 use alloc::string::String;
 use alloc::vec::Vec;
 
-use tiny_skia::{FillRule, Paint, PathBuilder, PixmapMut, Rect as SkRect, Transform};
+use tiny_skia::{FillRule, PathBuilder, PixmapMut, Rect as SkRect, Transform};
 
-use crate::text;
+use crate::{text, white};
 
 pub const LETTERS_HEIGHT: f32 = 96.0;
 pub const WORDS_HEIGHT: f32 = 184.0;
@@ -78,15 +78,6 @@ impl ShownKey {
     }
 }
 
-fn paint(alpha: f32) -> Paint<'static> {
-    let mut paint = Paint {
-        anti_alias: true,
-        ..Paint::default()
-    };
-    paint.set_color_rgba8(255, 255, 255, (alpha.clamp(0.0, 1.0) * 255.0) as u8);
-    paint
-}
-
 pub fn draw(
     pixmap: &mut PixmapMut,
     field: SkRect,
@@ -142,7 +133,7 @@ fn draw_letters(
         }
     }
     if let Some(empty) = empty.finish() {
-        pixmap.fill_path(&empty, &paint(0.35 * alpha), FillRule::Winding, shift, None);
+        pixmap.fill_path(&empty, &white(0.35 * alpha), FillRule::Winding, shift, None);
     }
 }
 
@@ -206,7 +197,7 @@ fn draw_words(
                         MISTAKE_HEIGHT * scale,
                     );
                     if let Some(mistake) = mistake {
-                        pixmap.fill_rect(mistake, &paint(0.7 * alpha), shift, None);
+                        pixmap.fill_rect(mistake, &white(0.7 * alpha), shift, None);
                     }
                 }
                 width
@@ -230,11 +221,11 @@ fn draw_words(
                 size * 0.84,
             );
             if let Some(caret) = caret {
-                pixmap.fill_rect(caret, &paint(0.9 * alpha), shift, None);
+                pixmap.fill_rect(caret, &white(0.9 * alpha), shift, None);
             }
         }
     }
     if let Some(empty) = empty.finish() {
-        pixmap.fill_path(&empty, &paint(0.35 * alpha), FillRule::Winding, shift, None);
+        pixmap.fill_path(&empty, &white(0.35 * alpha), FillRule::Winding, shift, None);
     }
 }

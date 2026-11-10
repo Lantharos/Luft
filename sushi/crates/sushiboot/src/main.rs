@@ -27,9 +27,7 @@ use loader::{back, conf, last, vars};
 use screen::Screen;
 use start::firmware;
 
-// With another system on the computer, the menu shows itself this long
-// unless loader.conf sets a timeout: long enough for a monitor to wake up
-const OTHER_SYSTEM_TIMEOUT: u32 = 10;
+const MENU_SECONDS_NEXT_TO_ANOTHER_SYSTEM: u32 = 10;
 
 fn graphics_handle() -> Option<Handle> {
     boot::get_handle_for_protocol::<GraphicsOutput>()
@@ -75,7 +73,7 @@ fn efi_main() -> Status {
     let default = [
         vars::take_oneshot(),
         vars::chosen_default(),
-        last::other_system(),
+        last::other_system_started_last(),
         config.default,
     ]
     .iter()
@@ -96,7 +94,7 @@ fn efi_main() -> Status {
     let timeout = config.timeout.unwrap_or(if catalog.others.is_empty() {
         0
     } else {
-        OTHER_SYSTEM_TIMEOUT
+        MENU_SECONDS_NEXT_TO_ANOTHER_SYSTEM
     });
     let mut chosen = match screen.as_mut() {
         Some(screen) => menu::choose(screen, &catalog, default, timeout, None),

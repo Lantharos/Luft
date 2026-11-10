@@ -89,12 +89,9 @@ impl Monitor {
                 .iter()
                 .filter_map(|timing| standard(timing, base[19])),
         );
-        for extension in data[BLOCK..]
-            .as_chunks::<BLOCK>()
-            .0
-            .iter()
-            .filter(|block| block[0] == CTA_EXTENSION && (4..BLOCK).contains(&usize::from(block[2])))
-        {
+        for extension in data[BLOCK..].as_chunks::<BLOCK>().0.iter().filter(|block| {
+            block[0] == CTA_EXTENSION && (4..BLOCK).contains(&usize::from(block[2]))
+        }) {
             sizes.extend(
                 extension[usize::from(extension[2])..BLOCK - 1]
                     .as_chunks::<18>()

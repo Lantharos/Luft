@@ -1,10 +1,10 @@
 use alloc::string::String;
 use alloc::vec::Vec;
 
-use tiny_skia::{FillRule, Paint, PathBuilder, PixmapMut, Rect as SkRect, Transform};
+use tiny_skia::{FillRule, PathBuilder, PixmapMut, Rect as SkRect, Transform};
 
 use super::key::{self, ShownKey};
-use crate::{Layout, Rect, text};
+use crate::{Layout, Rect, text, white};
 
 const FIELD_WIDTH: f32 = 340.0;
 const FIELD_HEIGHT: f32 = 46.0;
@@ -112,11 +112,7 @@ fn draw_dots(
     let first_x = field.left() + PADDING * scale;
     let room =
         libm::floorf((field.width() - PADDING * 2.0 * scale) / (DOT_SPACING * scale)) as usize;
-    let mut paint = Paint {
-        anti_alias: true,
-        ..Paint::default()
-    };
-    paint.set_color_rgba8(255, 255, 255, (alpha * 255.0) as u8);
+    let paint = white(alpha);
     let mut dots = PathBuilder::new();
     for index in 0..typed.min(room) {
         dots.push_circle(
@@ -164,11 +160,7 @@ pub fn draw(
     }
 
     let field = geometry.field;
-    let mut paint = Paint {
-        anti_alias: true,
-        ..Paint::default()
-    };
-    paint.set_color_rgba8(255, 255, 255, (0.18 * alpha * 255.0) as u8);
+    let paint = white(0.18 * alpha);
     let corner_radius = (FIELD_HEIGHT / 2.0 * scale).min(field.height() / 2.0);
     if let Some(shape) = crate::rounded(field, corner_radius) {
         pixmap.fill_path(&shape, &paint, FillRule::Winding, shift, None);

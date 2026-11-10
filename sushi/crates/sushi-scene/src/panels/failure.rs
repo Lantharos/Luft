@@ -1,16 +1,14 @@
 use alloc::string::String;
 use alloc::vec::Vec;
 
-use tiny_skia::{FillRule, Paint, PixmapMut, Rect as SkRect, Transform};
+use tiny_skia::{Paint, PixmapMut, Rect as SkRect, Transform};
 
-use crate::{Layout, Rect, mark, pill, text};
+use super::rows;
+use crate::{Layout, Rect, mark, text, white};
 
 const MARK_HEIGHT: f32 = 52.0;
 const TITLE_SIZE: f32 = 22.0;
 const REASON_SIZE: f32 = 15.0;
-const ROW_HEIGHT: f32 = 44.0;
-const ROW_WIDTH: f32 = 420.0;
-const ROW_SIZE: f32 = 15.0;
 const HINT_SIZE: f32 = 13.0;
 const DETAILS_WIDTH: f32 = 760.0;
 const DETAIL_SIZE: f32 = 13.0;
@@ -42,7 +40,7 @@ struct Choices {
 fn choices(layout: &Layout, failure: &Failure) -> Choices {
     let scale = layout.scale;
     let reason = if failure.reason.is_some() { 30.0 } else { 0.0 };
-    let rows = failure.choices.len() as f32 * ROW_HEIGHT;
+    let rows = failure.choices.len() as f32 * rows::HEIGHT;
     let height = (MARK_HEIGHT + 46.0 + reason + 30.0 + rows + 38.0) * scale;
     let top = (layout.height as f32 * 0.5 - height * 0.55).max(EDGE * scale);
     let title = top + (MARK_HEIGHT + 46.0) * scale;
@@ -128,34 +126,14 @@ pub fn bounds(layout: &Layout) -> Rect {
     }
 }
 
-fn fill(pixmap: &mut PixmapMut, view: Transform, area: Option<SkRect>, alpha: f32) {
-    let Some(shape) = area.and_then(pill) else {
-        return;
-    };
-    let mut paint = Paint {
-        anti_alias: true,
-        ..Paint::default()
-    };
-    paint.set_color_rgba8(
-        255,
-        255,
-        255,
-        libm::roundf(alpha.clamp(0.0, 1.0) * 255.0) as u8,
-    );
-    pixmap.fill_path(&shape, &paint, FillRule::Winding, view, None);
-}
-
 fn fill_bar(pixmap: &mut PixmapMut, view: Transform, area: Option<SkRect>, alpha: f32) {
     let Some(area) = area else {
         return;
     };
-    let mut paint = Paint::default();
-    paint.set_color_rgba8(
-        255,
-        255,
-        255,
-        libm::roundf(alpha.clamp(0.0, 1.0) * 255.0) as u8,
-    );
+    let paint = Paint {
+        anti_alias: false,
+        ..white(alpha)
+    };
     pixmap.fill_rect(area, &paint, view, None);
 }
 
@@ -195,29 +173,16 @@ fn draw_choices(
             0.65 * alpha,
         );
     }
-    let (width, height) = (ROW_WIDTH * scale, ROW_HEIGHT * scale);
-    let left = center - width / 2.0;
-    for (index, choice) in failure.choices.iter().enumerate() {
-        let y = at.rows + index as f32 * height;
-        let selected = index == failure.selected;
-        if selected {
-            fill(
-                pixmap,
-                view,
-                SkRect::from_xywh(left, y, width, height),
-                0.16 * alpha,
-            );
-        }
-        let size = ROW_SIZE * scale;
-        text::centered(
-            pixmap,
-            view,
-            choice,
-            (center, y + height / 2.0 + size * 0.36),
-            size,
-            if selected { 1.0 } else { 0.72 } * alpha,
-        );
-    }
+    let width = rows::WIDTH * scale;
+    rows::draw(
+        pixmap,
+        view,
+        (center - width / 2.0, at.rows, width),
+        scale,
+        failure.choices.iter().map(String::as_str),
+        failure.selected,
+        alpha,
+    );
     text::centered(
         pixmap,
         view,

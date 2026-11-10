@@ -3,6 +3,7 @@ use std::os::unix::net::UnixStream;
 use std::path::Path;
 use std::time::Duration;
 
+use rustix::net::sockopt::socket_peercred;
 use sushi::config::Config;
 use sushi::ipc::control::{Command, Mode};
 use sushi::ipc::plymouth::{Client, Request, Response};
@@ -15,6 +16,10 @@ use super::{Daemon, Pending, Phase, hints, listen_for_plymouth_clients};
 impl Daemon {
     pub(super) fn handle_commands(&mut self) {
         while let Ok((stream, _)) = self.listener.accept() {
+            if !socket_peercred(&stream).is_ok_and(|peer| peer.uid.is_root()) {
+                reply(stream, "Only root can control the splash");
+                continue;
+            }
             let _ = stream.set_nonblocking(false);
             let _ = stream.set_read_timeout(Some(Duration::from_secs(1)));
             let mut line = String::new();
@@ -206,6 +211,7 @@ impl Daemon {
                 eprintln!("Handing the display over");
                 let now = self.now();
                 self.unlock = None;
+                self.requests_unread = true;
                 self.look.loader.fade_to(0.0, now);
                 self.look.prompt.fade_to(0.0, now);
                 self.phase = Phase::Leaving(vec![pending]);

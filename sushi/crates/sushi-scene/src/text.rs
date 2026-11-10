@@ -1,20 +1,38 @@
-use ab_glyph::{Font, FontRef, GlyphId, OutlineCurve, PxScale, ScaleFont};
-use tiny_skia::{FillRule, Paint, PathBuilder, PixmapMut, Transform};
+use alloc::boxed::Box;
+use core::ptr;
+use core::sync::atomic::{AtomicPtr, Ordering};
 
-fn font() -> FontRef<'static> {
-    FontRef::try_from_slice(include_bytes!(
-        "../../../../kestrel/engine/data/fonts/OpenRunde-Medium.otf"
-    ))
-    .expect("Open Runde is a valid OpenType font")
+use ab_glyph::{Font, FontRef, GlyphId, OutlineCurve, PxScale, PxScaleFont, ScaleFont};
+use tiny_skia::{FillRule, PathBuilder, PixmapMut, Transform};
+
+use crate::white;
+
+type Sized = PxScaleFont<&'static FontRef<'static>>;
+
+static OPEN_RUNDE: AtomicPtr<FontRef<'static>> = AtomicPtr::new(ptr::null_mut());
+
+fn font() -> &'static FontRef<'static> {
+    if let Some(parsed) = unsafe { OPEN_RUNDE.load(Ordering::Acquire).as_ref() } {
+        return parsed;
+    }
+    let parsed = Box::leak(Box::new(
+        FontRef::try_from_slice(include_bytes!(
+            "../../../../kestrel/engine/data/fonts/OpenRunde-Medium.otf"
+        ))
+        .expect("Open Runde is a valid OpenType font"),
+    ));
+    OPEN_RUNDE.store(parsed, Ordering::Release);
+    parsed
 }
 
-fn scale(size: f32) -> PxScale {
+fn sized(size: f32) -> Sized {
     let font = font();
-    PxScale::from(size * font.height_unscaled() / font.units_per_em().unwrap_or(1000.0))
+    font.as_scaled(PxScale::from(
+        size * font.height_unscaled() / font.units_per_em().unwrap_or(1000.0),
+    ))
 }
 
-fn glyphs(text: &str, size: f32) -> impl Iterator<Item = (GlyphId, f32)> + '_ {
-    let font = font().into_scaled(scale(size));
+fn glyphs<'a>(font: &'a Sized, text: &'a str) -> impl Iterator<Item = (GlyphId, f32)> + 'a {
     let mut pen = 0.0;
     let mut previous: Option<GlyphId> = None;
     text.chars().map(move |character| {
@@ -30,8 +48,8 @@ fn glyphs(text: &str, size: f32) -> impl Iterator<Item = (GlyphId, f32)> + '_ {
 }
 
 pub fn width(text: &str, size: f32) -> f32 {
-    let font = font().into_scaled(scale(size));
-    glyphs(text, size)
+    let font = sized(size);
+    glyphs(&font, text)
         .last()
         .map_or(0.0, |(id, at)| at + font.h_advance(id))
 }
@@ -62,11 +80,11 @@ pub fn draw(
     size: f32,
     alpha: f32,
 ) {
-    let font = font();
-    let factor = font.as_scaled(scale(size)).h_scale_factor();
+    let font = sized(size);
+    let factor = font.h_scale_factor();
     let mut path = PathBuilder::new();
-    for (id, at) in glyphs(text, size) {
-        let Some(outline) = font.outline(id) else {
+    for (id, at) in glyphs(&font, text) {
+        let Some(outline) = font.font.outline(id) else {
             continue;
         };
         let place =
@@ -106,15 +124,5 @@ pub fn draw(
         }
     }
     let Some(path) = path.finish() else { return };
-    let mut paint = Paint {
-        anti_alias: true,
-        ..Paint::default()
-    };
-    paint.set_color_rgba8(
-        255,
-        255,
-        255,
-        libm::roundf(alpha.clamp(0.0, 1.0) * 255.0) as u8,
-    );
-    pixmap.fill_path(&path, &paint, FillRule::Winding, view, None);
+    pixmap.fill_path(&path, &white(alpha), FillRule::Winding, view, None);
 }

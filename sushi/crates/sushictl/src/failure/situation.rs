@@ -1,6 +1,7 @@
 use std::process::{Command, Stdio};
 
 use sushi::failure_file::{Choice, DETAILS, FailureFile};
+use sushi::system;
 
 use super::{boot, refused};
 
@@ -145,15 +146,7 @@ fn journal_errors() -> Vec<String> {
 }
 
 fn system_name() -> String {
-    ["/etc/os-release", "/usr/lib/os-release"]
-        .iter()
-        .find_map(|path| std::fs::read_to_string(path).ok())
-        .unwrap_or_default()
-        .lines()
-        .find_map(|line| line.strip_prefix("NAME="))
-        .map(|name| name.trim_matches('"').to_owned())
-        .filter(|name| !name.is_empty())
-        .unwrap_or_else(|| "This computer".to_owned())
+    system::name().unwrap_or_else(|| "This computer".to_owned())
 }
 
 fn requested() -> bool {
@@ -175,11 +168,7 @@ fn reason(
         .any(|line| line.contains("Timed out waiting for device"));
     let found = if requested() {
         Some(Reason::Requested)
-    } else if !refused.is_empty()
-        || failed(|name| {
-            name == "bootc-root-setup.service" || name == "ostree-prepare-root.service"
-        })
-    {
+    } else if !refused.is_empty() || failed(|name| name == "bootc-root-setup.service") {
         Some(Reason::Damaged)
     } else if failed(|name| {
         name.starts_with("systemd-cryptsetup@") || name == "trustd-move.service"

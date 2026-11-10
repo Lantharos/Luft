@@ -27,7 +27,7 @@ enum Action {
     Quit,
     /// Move the splash into another root file system, such as the installed system when the initramfs hands over to it
     UpdateRoot { root: PathBuf },
-    /// Take the screen back and show the splash: boot-up, shutdown, reboot, updates, system-upgrade, or firmware-upgrade
+    /// Take the screen back and show the splash: boot-up, shutdown, reboot, updates, system-upgrade, firmware-upgrade, or encrypting
     Show { mode: Mode },
     /// Print whether the splash is showing, handing over, or holding the display between sessions
     Status,

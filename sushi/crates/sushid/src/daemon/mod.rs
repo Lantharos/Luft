@@ -3,7 +3,9 @@ mod drivers;
 mod failure;
 mod requests;
 
+use std::fs::Permissions;
 use std::os::fd::AsFd;
+use std::os::unix::fs::PermissionsExt;
 use std::os::unix::net::{UnixListener, UnixStream};
 use std::path::PathBuf;
 use std::time::{Duration, Instant};
@@ -59,6 +61,7 @@ pub struct Daemon {
     signals: VtSignals,
     away: bool,
     requests: PasswordRequests,
+    requests_unread: bool,
     events: CardEvents,
     listener: UnixListener,
     plymouth: Option<plymouth::Server>,
@@ -89,6 +92,7 @@ fn listen() -> Result<UnixListener> {
     std::fs::create_dir_all(control::RUNTIME_DIR)?;
     let _ = std::fs::remove_file(control::SOCKET);
     let listener = UnixListener::bind(control::SOCKET).context("binding the control socket")?;
+    std::fs::set_permissions(control::SOCKET, Permissions::from_mode(0o600))?;
     listener.set_nonblocking(true)?;
     std::fs::write(control::PID_FILE, format!("{}\n", std::process::id()))?;
     Ok(listener)
@@ -114,6 +118,7 @@ impl Daemon {
             signals: VtSignals::catch().context("catching console switches")?,
             away: false,
             requests: PasswordRequests::watch().context("watching password requests")?,
+            requests_unread: true,
             events: CardEvents::open().context("watching displays")?,
             listener: listen()?,
             plymouth: listen_for_plymouth_clients(),
@@ -173,7 +178,7 @@ impl Daemon {
             self.handle_switches();
             self.handle_cards();
             self.retake();
-            self.requests.drain();
+            self.requests_unread |= self.requests.changed();
             self.refresh_unlock();
             self.handle_keys();
             self.advance();
@@ -314,10 +319,11 @@ impl Daemon {
         if self.unlock.as_ref().is_some_and(|unlock| !unlock.is_live()) {
             self.close_prompt();
         }
-        if self.unlock.is_none()
-            && !self.waits_for_an_answer()
-            && let Some(unlock) = Unlock::next(&self.requests, &self.answered, self.now())
-        {
+        if self.unlock.is_some() || self.waits_for_an_answer() || !self.requests_unread {
+            return;
+        }
+        self.requests_unread = false;
+        if let Some(unlock) = Unlock::next(&self.requests, &self.answered, self.now()) {
             if let Some(terminal) = &self.terminal {
                 let _ = terminal.listen();
             }
@@ -335,6 +341,7 @@ impl Daemon {
             terminal.stop_listening();
         }
         self.fading_prompt = self.unlock.take().map(|unlock| unlock.prompt);
+        self.requests_unread = true;
         self.look.prompt.fade_to(0.0, now);
         self.settle_loader(now);
     }

@@ -13,6 +13,7 @@ use uefi::{CString16, Handle};
 use crate::protocol;
 
 const RENAME_STORAGE: usize = 1024;
+const LARGEST_CONFIG: u64 = 64 << 10;
 
 pub struct Volume {
     _fs: ScopedProtocol<SimpleFileSystem>,
@@ -33,9 +34,14 @@ fn path16(path: &str) -> Option<CString16> {
     CString16::try_from(efi_path(path).as_str()).ok()
 }
 
-pub fn read_to_end(file: &mut RegularFile) -> Option<Vec<u8>> {
-    let info = file.get_boxed_info::<FileInfo>().ok()?;
-    let mut data = vec![0u8; info.file_size() as usize];
+fn read_up_to(file: &mut RegularFile, largest: u64) -> Option<Vec<u8>> {
+    let size = file.get_boxed_info::<FileInfo>().ok()?.file_size();
+    if size > largest {
+        return None;
+    }
+    let mut data = Vec::new();
+    data.try_reserve_exact(size as usize).ok()?;
+    data.resize(size as usize, 0);
     let read = file.read(&mut data).ok()?;
     data.truncate(read);
     Some(data)
@@ -64,7 +70,11 @@ impl Volume {
     }
 
     pub fn read(&mut self, path: &str) -> Option<Vec<u8>> {
-        read_to_end(&mut self.file(path)?)
+        read_up_to(&mut self.file(path)?, u64::MAX)
+    }
+
+    pub fn read_config(&mut self, path: &str) -> Option<Vec<u8>> {
+        read_up_to(&mut self.file(path)?, LARGEST_CONFIG)
     }
 
     pub fn rename(&mut self, path: &str, name: &str) -> Option<()> {

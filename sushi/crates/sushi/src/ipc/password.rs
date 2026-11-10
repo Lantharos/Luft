@@ -1,4 +1,4 @@
-use std::io;
+use std::io::{self, Read};
 use std::os::fd::{AsFd, BorrowedFd, OwnedFd};
 use std::os::unix::net::UnixDatagram;
 use std::path::{Path, PathBuf};
@@ -9,15 +9,54 @@ use rustix::time::{ClockId, clock_gettime};
 
 const REQUESTS: &str = "/run/systemd/ask-password";
 pub const SHELL: &str = "sushi:shell";
+const LONGEST_SECRET: usize = 1024;
 
-#[derive(Default)]
 pub struct Secret(Vec<u8>);
 
+fn wipe(bytes: &mut [u8]) {
+    for byte in bytes {
+        unsafe { std::ptr::write_volatile(byte, 0) };
+    }
+}
+
+impl Default for Secret {
+    fn default() -> Self {
+        Self(Vec::with_capacity(LONGEST_SECRET))
+    }
+}
+
 impl Secret {
+    pub fn read_line(mut source: impl Read) -> io::Result<Self> {
+        let mut secret = Self::default();
+        secret.0.resize(LONGEST_SECRET, 0);
+        let mut length = 0;
+        while length < LONGEST_SECRET {
+            match source.read(&mut secret.0[length..])? {
+                0 => break,
+                read => length += read,
+            }
+        }
+        secret.wipe_from(length);
+        let mut beyond = [0u8; 1];
+        if source.read(&mut beyond)? > 0 {
+            wipe(&mut beyond);
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidData,
+                format!("the answer is longer than {LONGEST_SECRET} bytes"),
+            ));
+        }
+        while secret.0.last() == Some(&b'\n') {
+            secret.0.pop();
+        }
+        Ok(secret)
+    }
+
     pub fn push(&mut self, character: char) {
         let mut encoded = [0u8; 4];
-        self.0
-            .extend_from_slice(character.encode_utf8(&mut encoded).as_bytes());
+        let encoded = character.encode_utf8(&mut encoded).as_bytes();
+        if self.0.len() + encoded.len() <= LONGEST_SECRET {
+            self.0.extend_from_slice(encoded);
+        }
     }
 
     pub fn pop(&mut self) {
@@ -35,9 +74,10 @@ impl Secret {
     }
 
     pub fn tidy_recovery_key(&mut self) {
-        if let Reading::Key(key) = luft_recovery_key::read(&self.0) {
+        if let Reading::Key(mut key) = luft_recovery_key::read(&self.0) {
             self.clear();
-            self.0 = key;
+            self.0.extend_from_slice(&key);
+            wipe(&mut key);
         }
     }
 
@@ -50,9 +90,7 @@ impl Secret {
     }
 
     fn wipe_from(&mut self, start: usize) {
-        for byte in &mut self.0[start..] {
-            unsafe { std::ptr::write_volatile(byte, 0) };
-        }
+        wipe(&mut self.0[start..]);
         self.0.truncate(start);
     }
 }
@@ -145,10 +183,14 @@ impl PasswordRequests {
         Ok(Self { watch })
     }
 
-    pub fn drain(&self) {
+    pub fn changed(&self) -> bool {
         let mut buffer = [std::mem::MaybeUninit::uninit(); 4096];
         let mut reader = inotify::Reader::new(&self.watch, &mut buffer);
-        while reader.next().is_ok() {}
+        let mut changed = false;
+        while reader.next().is_ok() {
+            changed = true;
+        }
+        changed
     }
 
     pub fn pending(&self) -> Vec<Request> {
@@ -193,5 +235,17 @@ mod tests {
         secret.pop();
         assert_eq!(secret.0, b"p");
         assert_eq!(secret.characters(), 1);
+    }
+
+    #[test]
+    fn a_secret_never_outgrows_its_first_allocation() {
+        let mut secret = Secret::default();
+        let allocated = secret.0.as_ptr();
+        (0..LONGEST_SECRET).for_each(|_| secret.push('ë'));
+        assert_eq!(secret.0.len(), LONGEST_SECRET);
+        assert_eq!(secret.0.as_ptr(), allocated);
+        assert!(Secret::read_line([b'a'; LONGEST_SECRET + 1].as_slice()).is_err());
+        let line = Secret::read_line(b"correct horse\n".as_slice()).unwrap();
+        assert_eq!(line.bytes(), b"correct horse");
     }
 }

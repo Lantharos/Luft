@@ -1,6 +1,7 @@
 use alloc::string::String;
 use alloc::vec::Vec;
 
+use sushi_scene::firmware::{text, u16_at};
 use uefi::proto::device_path::{DevicePath, DeviceSubType, DeviceType};
 use uefi::runtime::{self, ResetType, VariableAttributes, VariableVendor};
 use uefi::{CString16, Handle, Status, cstr16};
@@ -16,21 +17,6 @@ const SIGNATURE: core::ops::Range<usize> = 20..38;
 struct LoadOption {
     disk: Option<Vec<u8>>,
     path: String,
-}
-
-fn u16_at(data: &[u8], at: usize) -> Option<u16> {
-    Some(u16::from_le_bytes(data.get(at..at + 2)?.try_into().ok()?))
-}
-
-fn text(data: &[u8]) -> String {
-    let units: Vec<u16> = data
-        .as_chunks::<2>()
-        .0
-        .iter()
-        .map(|pair| u16::from_le_bytes(*pair))
-        .take_while(|unit| *unit != 0)
-        .collect();
-    String::from_utf16_lossy(&units)
 }
 
 fn parse(data: &[u8]) -> Option<LoadOption> {
@@ -69,8 +55,7 @@ fn number(name: &str) -> Option<u16> {
         .flatten()
 }
 
-// The partition's signature and its kind, as a firmware boot entry names it.
-fn partition(volume: Handle) -> Option<Vec<u8>> {
+fn partition_signature(volume: Handle) -> Option<Vec<u8>> {
     let path = protocol::shared::<DevicePath>(volume).ok()?;
     path.node_iter()
         .find(|node| {
@@ -85,7 +70,7 @@ fn same_file(listed: &str, path: &str) -> bool {
 }
 
 fn firmware_entry(volume: Handle, path: &str) -> Option<u16> {
-    let disk = partition(volume)?;
+    let disk = partition_signature(volume)?;
     let mut options: Vec<(u16, CString16)> = runtime::variable_keys()
         .filter_map(Result::ok)
         .filter(|key| key.vendor == VariableVendor::GLOBAL_VARIABLE)
@@ -101,10 +86,7 @@ fn firmware_entry(volume: Handle, path: &str) -> Option<u16> {
     })
 }
 
-// Windows checks with the TPM that the firmware started it directly; started
-// from here, BitLocker would ask for its recovery key. So the firmware's own
-// entry for it is set to start next, and the computer restarts.
-pub fn restart_into(volume: Handle, path: &str) -> uefi::Result<()> {
+pub fn restart_into_firmware_entry(volume: Handle, path: &str) -> uefi::Result<()> {
     let number = firmware_entry(volume, path).ok_or(Status::NOT_FOUND)?;
     runtime::set_variable(
         cstr16!("BootNext"),

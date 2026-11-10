@@ -2,6 +2,7 @@ use alloc::string::{String, ToString};
 use alloc::vec;
 use alloc::vec::Vec;
 
+use sushi_scene::firmware;
 use uefi::proto::media::file::RegularFile;
 
 const HEADERS: usize = 4096;
@@ -35,11 +36,11 @@ pub struct Uki {
 }
 
 fn u16_at(data: &[u8], at: usize) -> Option<usize> {
-    Some(u16::from_le_bytes(data.get(at..at + 2)?.try_into().ok()?) as usize)
+    firmware::u16_at(data, at).map(usize::from)
 }
 
 fn u32_at(data: &[u8], at: usize) -> Option<usize> {
-    Some(u32::from_le_bytes(data.get(at..at + 4)?.try_into().ok()?) as usize)
+    firmware::u32_at(data, at).map(|value| value as usize)
 }
 
 fn sections(file: &mut RegularFile) -> Option<Vec<Section>> {

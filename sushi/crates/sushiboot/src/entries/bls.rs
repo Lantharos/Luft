@@ -30,7 +30,7 @@ pub fn scan(volume: &mut Volume, origin: &Origin, secure_boot: bool) -> Found {
             continue;
         }
         let Some(entry) = volume
-            .read(&format!("{ENTRIES}\\{}", listed.name))
+            .read_config(&format!("{ENTRIES}\\{}", listed.name))
             .and_then(|text| parse(core::str::from_utf8(&text).ok()?))
         else {
             continue;

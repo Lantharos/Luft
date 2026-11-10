@@ -11,7 +11,7 @@ use uefi::system;
 
 use crate::entries::{Catalog, Row};
 use crate::screen::Screen;
-use clock::Clock;
+use clock::CycleClock;
 use view::{List, View};
 
 const FRAME: Duration = Duration::from_micros(16_667);
@@ -77,7 +77,7 @@ pub fn choose(
         countdown: (!asked).then_some(timeout as f32),
         notice: failed.map(|title| format!("{title} didn't start")),
     };
-    let clock = Clock::start();
+    let clock = CycleClock::calibrate();
     let mut chosen = None;
     let mut shown = 0.0f32;
     let mut opened = 0.0f32;
@@ -101,7 +101,9 @@ pub fn choose(
             return chosen.unwrap_or(default);
         }
         boot::stall(FRAME);
-        let elapsed = clock.seconds() - shown;
+        let elapsed = clock
+            .as_ref()
+            .map_or(FRAME.as_secs_f32(), |clock| clock.seconds() - shown);
         shown += elapsed;
         if leaving.is_some() {
             continue;

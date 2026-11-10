@@ -6,6 +6,7 @@ pub mod luks;
 pub mod notice_file;
 pub mod render;
 pub mod started;
+pub mod system;
 pub mod terminal;
 
 pub use sushi_scene as scene;

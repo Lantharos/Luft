@@ -73,17 +73,16 @@ fn ask_for_key(on_splash: bool) -> Option<Secret> {
     if on_splash {
         asking.arg("--no-tty");
     }
-    let answer = asking
+    let mut asking = asking
         .arg("Enter the recovery key or the disk's passphrase to open a shell:")
+        .stdin(Stdio::null())
+        .stdout(Stdio::piped())
         .stderr(Stdio::null())
-        .output()
-        .ok()
-        .filter(|output| output.status.success())?;
-    let mut key = Secret::default();
-    String::from_utf8_lossy(&answer.stdout)
-        .trim_end_matches('\n')
-        .chars()
-        .for_each(|character| key.push(character));
+        .spawn()
+        .ok()?;
+    let answer = Secret::read_line(asking.stdout.take()?);
+    let answered = asking.wait().is_ok_and(|status| status.success());
+    let mut key = answer.ok().filter(|_| answered)?;
     key.tidy_recovery_key();
     Some(key)
 }

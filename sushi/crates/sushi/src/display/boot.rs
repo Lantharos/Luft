@@ -1,13 +1,12 @@
 use std::ops::Range;
 
 use sushi_scene::Monitor;
+use sushi_scene::firmware::LUFT_VARIABLES;
 
 const BOOT_PARAMS: &str = "/sys/kernel/boot_params/data";
 const SCREEN_WIDTH: Range<usize> = 0x12..0x14;
 const SCREEN_HEIGHT: Range<usize> = 0x14..0x16;
 const EDID: Range<usize> = 0x140..0x1c0;
-const FIRMWARE_SCREEN: &str =
-    "/sys/firmware/efi/efivars/LuftFirmwareScreen-b6a4c1e2-3f5d-4c8a-9e71-2d0f6a8b5c3e";
 const EFI_VARIABLE_ATTRIBUTES: usize = 4;
 
 fn boot_params() -> Option<Vec<u8>> {
@@ -19,7 +18,10 @@ pub(super) fn monitor() -> Option<Monitor> {
 }
 
 fn announced_by_boot_loader() -> Option<(u32, u32)> {
-    let variable = std::fs::read(FIRMWARE_SCREEN).ok()?;
+    let variable = std::fs::read(format!(
+        "/sys/firmware/efi/efivars/LuftFirmwareScreen-{LUFT_VARIABLES}"
+    ))
+    .ok()?;
     let text = std::str::from_utf8(variable.get(EFI_VARIABLE_ATTRIBUTES..)?).ok()?;
     let (width, height) = text.split_once('x')?;
     Some((width.parse().ok()?, height.parse().ok()?))

@@ -1,8 +1,8 @@
 use alloc::string::String;
 
-use tiny_skia::{FillRule, Paint, PixmapMut, Rect as SkRect, Transform};
+use tiny_skia::{FillRule, PixmapMut, Rect as SkRect, Transform};
 
-use crate::{Layout, Rect, text};
+use crate::{Layout, Rect, text, white};
 
 const TITLE_SIZE: f32 = 17.0;
 const NOTE_SIZE: f32 = 13.0;
@@ -59,12 +59,7 @@ fn fill_pill(pixmap: &mut PixmapMut, area: Option<SkRect>, alpha: f32, view: Tra
     let Some(shape) = area.and_then(crate::pill) else {
         return;
     };
-    let mut paint = Paint {
-        anti_alias: true,
-        ..Paint::default()
-    };
-    paint.set_color_rgba8(255, 255, 255, libm::roundf(alpha * 255.0) as u8);
-    pixmap.fill_path(&shape, &paint, FillRule::Winding, view, None);
+    pixmap.fill_path(&shape, &white(alpha), FillRule::Winding, view, None);
 }
 
 fn filled_span(progress: Progress, width: f32, height: f32) -> Option<(f32, f32)> {

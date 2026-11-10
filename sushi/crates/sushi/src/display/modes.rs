@@ -1,3 +1,6 @@
+use std::fs::OpenOptions;
+use std::io::Read;
+use std::os::unix::fs::OpenOptionsExt;
 use std::path::Path;
 
 use drm::control::{Mode, ModeFlags, ModeTypeFlags};
@@ -13,6 +16,25 @@ struct Wanted {
 #[derive(Debug, Default)]
 pub struct ModeHints {
     arrangements: Vec<Vec<Wanted>>,
+}
+
+const LARGEST_ARRANGEMENT: u64 = 1 << 20;
+
+fn saved(path: &Path) -> Option<String> {
+    let file = OpenOptions::new()
+        .read(true)
+        .custom_flags(libc::O_NOFOLLOW | libc::O_NONBLOCK)
+        .open(path)
+        .ok()?;
+    let details = file.metadata().ok()?;
+    if !details.is_file() || details.len() > LARGEST_ARRANGEMENT {
+        return None;
+    }
+    let mut text = String::new();
+    file.take(LARGEST_ARRANGEMENT)
+        .read_to_string(&mut text)
+        .ok()?;
+    Some(text)
 }
 
 fn tag<'a>(text: &'a str, name: &str) -> Option<&'a str> {
@@ -33,7 +55,7 @@ fn blocks<'a>(text: &'a str, name: &str) -> Vec<&'a str> {
 
 impl ModeHints {
     pub fn load(path: &Path) -> Self {
-        std::fs::read_to_string(path)
+        saved(path)
             .map(|text| Self::parse(&text))
             .unwrap_or_default()
     }

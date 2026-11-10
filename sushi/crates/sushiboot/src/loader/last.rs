@@ -7,10 +7,7 @@ use crate::entries::Catalog;
 
 const LAST: &CStr16 = cstr16!("LuftBootLast");
 
-// The other system started last, such as Windows, so it starts again by
-// itself, as when Windows restarts to finish an update. Starting Luft forgets
-// it, so Luft is always its newest version rather than one picked once.
-pub fn other_system() -> Option<String> {
+pub fn other_system_started_last() -> Option<String> {
     read(LAST)
 }
 

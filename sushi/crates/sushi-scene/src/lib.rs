@@ -2,6 +2,7 @@
 
 extern crate alloc;
 
+pub mod firmware;
 mod image;
 pub mod loader;
 mod logo;
@@ -22,7 +23,7 @@ pub use panels::status::{Progress, Status};
 pub use scene::{Scene, Visuals};
 pub use tiny_skia;
 
-use tiny_skia::{Path, PathBuilder};
+use tiny_skia::{Paint, Path, PathBuilder};
 
 const LOADER_LOGICAL_SIZE: f32 = 56.0;
 const LOADER_GAP_RATIO: f32 = 0.42;
@@ -133,6 +134,20 @@ impl Layout {
 pub fn ease(progress: f32) -> f32 {
     let t = progress.clamp(0.0, 1.0);
     t * t * (3.0 - 2.0 * t)
+}
+
+pub fn white(alpha: f32) -> Paint<'static> {
+    let mut paint = Paint {
+        anti_alias: true,
+        ..Paint::default()
+    };
+    paint.set_color_rgba8(
+        255,
+        255,
+        255,
+        libm::roundf(alpha.clamp(0.0, 1.0) * 255.0) as u8,
+    );
+    paint
 }
 
 pub fn pill(field: tiny_skia::Rect) -> Option<Path> {

@@ -86,7 +86,7 @@ pub enum Untranscribed {
 
 /// Transcribes about two minutes of an Ogg Opus recording from `from`
 /// milliseconds, at the lowest priority. `ended` says the recording won't
-/// grow any more; `languages` are the ones to choose from, such as `sr-Latn`.
+/// grow any more; `languages` are the ones to choose from, such as `sq` or `sr-Latn`.
 pub async fn transcribe(
     audio: std::fs::File,
     from: u64,

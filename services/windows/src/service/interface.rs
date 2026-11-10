@@ -77,7 +77,7 @@ fn import_bluetooth() -> anyhow::Result<u32> {
         .collect();
     let imported = bluez::import(Path::new(bluez::STORAGE), &pairings)?;
     if imported > 0 {
-        let status = Command::new("systemctl")
+        let status = Command::new("/usr/bin/systemctl")
             .args(["try-restart", "bluetooth.service"])
             .status()?;
         if !status.success() {

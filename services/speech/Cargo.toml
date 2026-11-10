@@ -13,6 +13,7 @@ path = "src/main.rs"
 
 [dependencies]
 anyhow.workspace = true
+futures-util.workspace = true
 gio.workspace = true
 libc.workspace = true
 luft-dbus.workspace = true

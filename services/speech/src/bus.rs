@@ -5,7 +5,7 @@ use luft_speech::types::{Download, Language, Model, Overview};
 use zbus::fdo::DBusProxy;
 use zbus::interface;
 use zbus::message::Header;
-use zbus::names::BusName;
+use zbus::names::{BusName, UniqueName};
 use zbus::object_server::SignalEmitter;
 
 use crate::dictation::Session;
@@ -45,10 +45,10 @@ pub struct Dictation {
 }
 
 impl Dictation {
-    async fn require_shell(&self, header: &Header<'_>) -> Result<(), Error> {
+    async fn require_shell(&self, header: &Header<'_>) -> Result<UniqueName<'static>, Error> {
         let owner = self.bus.get_name_owner(SHELL).await.ok();
         match (owner, header.sender()) {
-            (Some(owner), Some(sender)) if *owner == *sender => Ok(()),
+            (Some(owner), Some(sender)) if *owner == *sender => Ok(sender.to_owned()),
             _ => Err(Error::NotAllowed(
                 "Only the desktop can take dictation".into(),
             )),
@@ -74,7 +74,7 @@ pub fn serve(hub: &Arc<Hub>, bus: DBusProxy<'static>) -> (Dictation, Models) {
 #[interface(name = "com.lantharos.Speech1")]
 impl Dictation {
     async fn start(&self, #[zbus(header)] header: Header<'_>, layout: String) -> Result<(), Error> {
-        self.require_shell(&header).await?;
+        let shell = self.require_shell(&header).await?;
         let plan = Plan::now(
             Some(layout.as_str()).filter(|layout| !layout.is_empty()),
             self.hub.processor,
@@ -91,6 +91,7 @@ impl Dictation {
         if let Some(previous) = session.take() {
             previous.cancel();
         }
+        *self.hub.listener.lock().expect("listener lock") = Some(shell);
         *session = Some(Session::start(&self.hub, plan)?);
         Ok(())
     }

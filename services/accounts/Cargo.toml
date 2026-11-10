@@ -38,6 +38,7 @@ tokio = { workspace = true, features = [
 ureq = { workspace = true, features = ["json"] }
 url.workspace = true
 zbus = { workspace = true, features = ["proxy", "service", "tokio"] }
+zeroize = { workspace = true, features = ["serde"] }
 
 [lints]
 workspace = true

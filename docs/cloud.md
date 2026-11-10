@@ -1,6 +1,6 @@
 # Cloud drives
 
-How `luft-accounts` turns online accounts into folders in `~/Cloud`. Using them is described in [Accounts and cloud drives](https://docs.luft.computer/files/cloud-drives/), and the service itself in [packages/system/accounts](../packages/system/accounts/README.md).
+How `luft-accounts` turns online accounts into folders in `~/Cloud`. Using them is described in [Accounts and cloud drives](https://docs.luft.computer/files/cloud-drives/), the service itself in [services/accounts](../services/accounts/README.md), and the crate apps reach it through in [packages/system/accounts](../packages/system/accounts/README.md).
 
 ## Where things are
 
@@ -20,7 +20,7 @@ OneDrive and Dropbox sign in through an app registered with Microsoft and Dropbo
 | OneDrive | [Microsoft Entra admin center](https://entra.microsoft.com), App registrations | Accounts in any organizational directory and personal Microsoft accounts; a Web or Mobile and desktop redirect URI of `http://localhost:53682/`; a client secret; delegated Microsoft Graph permissions `Files.Read`, `Files.ReadWrite`, `Files.Read.All`, `Files.ReadWrite.All`, `Sites.Read.All`, `offline_access`, `openid`, `email` and `profile` |
 | Dropbox | [Dropbox App Console](https://www.dropbox.com/developers/apps) | Scoped access, Full Dropbox; redirect URI `http://localhost:53682/`; permissions `account_info.read`, `files.metadata.write`, `files.content.write`, `files.content.read` and `sharing.write`; then apply for production so more than 500 people can sign in |
 
-Then build `luft-accounts` with the IDs and secrets in the environment, as CI does for the image:
+Then build `luft-accounts` with the IDs and secrets in the environment:
 
 ```sh
 LUFT_ONEDRIVE_CLIENT_ID=… LUFT_ONEDRIVE_CLIENT_SECRET=… \
@@ -28,7 +28,7 @@ LUFT_DROPBOX_CLIENT_ID=… LUFT_DROPBOX_CLIENT_SECRET=… \
 cargo build --release --manifest-path services/accounts/Cargo.toml
 ```
 
-An account keeps the registration it signed in with until it signs in again. iCloud Drive, Nextcloud and WebDAV need no registration.
+The registrations are part of the build, so OneDrive and Dropbox accounts signed in with other registrations have to sign in again. iCloud Drive, Nextcloud and WebDAV need no registration.
 
 ## Testing
 

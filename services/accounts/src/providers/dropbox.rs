@@ -1,7 +1,7 @@
 use anyhow::{Context, Result, anyhow};
 use serde::Deserialize;
 
-use super::encode_path;
+use super::{encode_path, http};
 
 #[derive(Deserialize)]
 struct Account {
@@ -9,7 +9,8 @@ struct Account {
 }
 
 pub fn email(access: &str) -> Result<String> {
-    let account: Account = ureq::post("https://api.dropboxapi.com/2/users/get_current_account")
+    let account: Account = http()
+        .post("https://api.dropboxapi.com/2/users/get_current_account")
         .header("Authorization", &format!("Bearer {access}"))
         .content_type("application/json")
         .send("null")

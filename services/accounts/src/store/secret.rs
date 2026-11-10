@@ -1,26 +1,27 @@
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
+use zeroize::Zeroizing;
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "camelCase")]
 pub enum Secret {
     Token {
-        token: String,
+        token: Zeroizing<String>,
     },
     Password {
-        password: String,
+        password: Zeroizing<String>,
     },
     #[serde(rename_all = "camelCase")]
     Apple {
-        password: String,
-        trust_token: String,
-        cookies: String,
+        password: Zeroizing<String>,
+        trust_token: Zeroizing<String>,
+        cookies: Zeroizing<String>,
     },
 }
 
 impl Secret {
     pub fn parameters(&self) -> Map<String, Value> {
-        let pairs: Vec<(&str, &str)> = match self {
+        let pairs: Vec<(&str, &Zeroizing<String>)> = match self {
             Secret::Token { token } => vec![("token", token)],
             Secret::Password { password } => vec![("pass", password)],
             Secret::Apple {
@@ -35,18 +36,19 @@ impl Secret {
         };
         pairs
             .into_iter()
-            .map(|(key, value)| (key.to_owned(), Value::String(value.to_owned())))
+            .map(|(key, value)| (key.to_owned(), Value::String(value.to_string())))
             .collect()
     }
 
     pub fn absorb(&mut self, live: &Map<String, Value>) -> bool {
-        let take = |slot: &mut String, key: &str| match live.get(key).and_then(Value::as_str) {
-            Some(value) if !value.is_empty() && value != slot => {
-                *slot = value.to_owned();
-                true
-            }
-            _ => false,
-        };
+        let take =
+            |slot: &mut Zeroizing<String>, key: &str| match live.get(key).and_then(Value::as_str) {
+                Some(value) if !value.is_empty() && value != slot.as_str() => {
+                    *slot = Zeroizing::new(value.to_owned());
+                    true
+                }
+                _ => false,
+            };
         match self {
             Secret::Token { token } => take(token, "token"),
             Secret::Password { .. } => false,
@@ -63,27 +65,29 @@ impl Secret {
 mod tests {
     use serde_json::json;
 
+    use zeroize::Zeroizing;
+
     use super::Secret;
 
     #[test]
     fn refreshed_tokens_and_cookies_are_kept() {
         let mut token = Secret::Token {
-            token: "old".into(),
+            token: Zeroizing::new("old".into()),
         };
         let live = json!({"token": "new", "type": "onedrive"});
         assert!(token.absorb(live.as_object().unwrap()));
-        assert_eq!(
-            token,
-            Secret::Token {
-                token: "new".into()
-            }
+        assert!(
+            token
+                == Secret::Token {
+                    token: Zeroizing::new("new".into())
+                }
         );
         assert!(!token.absorb(live.as_object().unwrap()));
 
         let mut apple = Secret::Apple {
-            password: "secret".into(),
-            trust_token: "trust".into(),
-            cookies: "a=1".into(),
+            password: Zeroizing::new("secret".into()),
+            trust_token: Zeroizing::new("trust".into()),
+            cookies: Zeroizing::new("a=1".into()),
         };
         let live = json!({"password": "obscured", "trust_token": "trust", "cookies": "a=2"});
         assert!(apple.absorb(live.as_object().unwrap()));

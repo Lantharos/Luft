@@ -27,12 +27,15 @@ impl Frame {
         let frame = VideoFrameRef::from_buffer_ref_readable(buffer, &info)
             .map_err(|error| error.to_string())?;
         let (width, height) = (frame.width(), frame.height());
-        let stride = frame.plane_stride()[0] as usize;
-        let data = frame.plane_data(0).map_err(|error| error.to_string())?;
         let row = width as usize * 3;
+        let stride = usize::try_from(frame.plane_stride()[0])
+            .ok()
+            .filter(|stride| *stride >= row)
+            .ok_or_else(unreadable)?;
+        let data = frame.plane_data(0).map_err(|error| error.to_string())?;
         let mut pixels = Vec::with_capacity(row * height as usize);
         for line in data.chunks(stride).take(height as usize) {
-            pixels.extend_from_slice(&line[..row]);
+            pixels.extend_from_slice(line.get(..row).ok_or_else(unreadable)?);
         }
         let image = RgbImage::from_raw(width, height, pixels).ok_or_else(unreadable)?;
         let (brightness, spread) = luma_statistics(&image);

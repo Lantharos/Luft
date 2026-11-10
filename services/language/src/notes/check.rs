@@ -3,7 +3,7 @@
 //! asked:
 //!
 //! LUFT_LANGUAGE_MODELS=<folder holding the model> LUFT_LANGUAGE_SAMPLES=<folder
-//! of .json transcripts, each { "language": "sr-Latn", "lines": [{ "at", "text" }] }>
+//! of .json transcripts, each { "language": "sq", "lines": [{ "at", "text" }] }>
 //! cargo test --release notes -- --ignored --nocapture
 
 use std::path::PathBuf;
@@ -18,7 +18,8 @@ const LINES_A_PART: usize = 120;
 #[test]
 #[ignore = "needs the model and transcripts"]
 fn notes_of_transcripts() {
-    let models = PathBuf::from(std::env::var("LUFT_LANGUAGE_MODELS").expect("LUFT_LANGUAGE_MODELS"));
+    let models =
+        PathBuf::from(std::env::var("LUFT_LANGUAGE_MODELS").expect("LUFT_LANGUAGE_MODELS"));
     let samples =
         PathBuf::from(std::env::var("LUFT_LANGUAGE_SAMPLES").expect("LUFT_LANGUAGE_SAMPLES"));
     let loading = Instant::now();
@@ -28,7 +29,10 @@ fn notes_of_transcripts() {
         .unwrap()
         .flatten()
         .map(|entry| entry.path())
-        .filter(|path| path.extension().is_some_and(|extension| extension == "json"))
+        .filter(|path| {
+            path.extension()
+                .is_some_and(|extension| extension == "json")
+        })
         .collect();
     transcripts.sort();
     for path in transcripts {

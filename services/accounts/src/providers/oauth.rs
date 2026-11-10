@@ -12,12 +12,18 @@ use time::OffsetDateTime;
 use time::format_description::well_known::Rfc3339;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::{TcpListener, TcpStream};
+use tokio::time::{sleep, timeout};
+use zeroize::Zeroizing;
 
 use super::apps::{App, REDIRECT, REDIRECT_PORT};
+use super::http;
 
 const FINISHED: &str = "<!doctype html><meta charset=utf-8><title>Signed in</title><body style=\"font:16px system-ui;display:grid;place-items:center;height:90vh;margin:0\"><p>You're signed in. You can close this tab and go back to Settings.</p>";
 const FAILED: &str = "<!doctype html><meta charset=utf-8><title>Not signed in</title><body style=\"font:16px system-ui;display:grid;place-items:center;height:90vh;margin:0\"><p>Signing in didn't finish. Go back to Settings to try again.</p>";
 const TOKEN_LIFETIME: i64 = 3600;
+const WAIT_FOR_BROWSER: Duration = Duration::from_secs(20 * 60);
+const WAIT_FOR_REQUEST: Duration = Duration::from_secs(10);
+const ACCEPT_AGAIN: Duration = Duration::from_millis(200);
 
 pub struct Pending {
     pub url: String,
@@ -27,14 +33,13 @@ pub struct Pending {
     listeners: Vec<TcpListener>,
 }
 
-#[derive(Debug)]
 pub struct Tokens {
-    pub access: String,
-    pub rclone: String,
+    pub access: Zeroizing<String>,
+    pub rclone: Zeroizing<String>,
     pub claims: Claims,
 }
 
-#[derive(Debug, Default, Deserialize)]
+#[derive(Default, Deserialize)]
 pub struct Claims {
     pub email: Option<String>,
     pub preferred_username: Option<String>,
@@ -43,8 +48,8 @@ pub struct Claims {
 
 #[derive(Deserialize)]
 struct TokenResponse {
-    access_token: String,
-    refresh_token: Option<String>,
+    access_token: Zeroizing<String>,
+    refresh_token: Option<Zeroizing<String>>,
     token_type: Option<String>,
     expires_in: Option<i64>,
     id_token: Option<String>,
@@ -107,7 +112,9 @@ pub async fn begin(app: &'static App) -> Result<Pending> {
 
 impl Pending {
     pub async fn finish(self) -> Result<Tokens> {
-        let (code, mut browser) = self.wait_for_code().await?;
+        let (code, mut browser) = timeout(WAIT_FOR_BROWSER, self.wait_for_code())
+            .await
+            .context("Signing in took too long. Try again.")?;
         let app = self.app;
         let verifier = self.verifier;
         let tokens = match code {
@@ -136,31 +143,34 @@ impl Pending {
         tokens
     }
 
-    async fn wait_for_code(&self) -> Result<(Result<String>, TcpStream)> {
+    async fn wait_for_code(&self) -> (Result<String>, TcpStream) {
         loop {
-            let (stream, _) = match self.listeners.as_slice() {
-                [only] => only.accept().await?,
+            let accepted = match self.listeners.as_slice() {
+                [only] => only.accept().await,
                 [first, second, ..] => tokio::select! {
-                    accepted = first.accept() => accepted?,
-                    accepted = second.accept() => accepted?,
+                    accepted = first.accept() => accepted,
+                    accepted = second.accept() => accepted,
                 },
                 [] => unreachable!("begin keeps at least one listener"),
             };
-            if let Some(outcome) = read_redirect(stream, &self.state).await? {
-                return Ok(outcome);
+            let Ok((stream, _)) = accepted else {
+                sleep(ACCEPT_AGAIN).await;
+                continue;
+            };
+            if let Some(outcome) = read_redirect(stream, &self.state).await {
+                return outcome;
             }
         }
     }
 }
 
-async fn read_redirect(
-    mut stream: TcpStream,
-    state: &str,
-) -> Result<Option<(Result<String>, TcpStream)>> {
+async fn read_redirect(mut stream: TcpStream, state: &str) -> Option<(Result<String>, TcpStream)> {
     let mut request = vec![0; 8192];
-    let read = tokio::time::timeout(Duration::from_secs(10), stream.read(&mut request))
+    let read = timeout(WAIT_FOR_REQUEST, stream.read(&mut request))
         .await
-        .unwrap_or(Ok(0))?;
+        .ok()
+        .and_then(Result::ok)
+        .unwrap_or(0);
     let request = String::from_utf8_lossy(&request[..read]);
     let outcome = request
         .lines()
@@ -168,14 +178,14 @@ async fn read_redirect(
         .and_then(|line| line.split_whitespace().nth(1))
         .and_then(|target| redirect_outcome(target, state));
     match outcome {
-        Some(outcome) => Ok(Some((outcome, stream))),
+        Some(outcome) => Some((outcome, stream)),
         None => {
-            stream
+            let _ = stream
                 .write_all(
                     b"HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\nConnection: close\r\n\r\n",
                 )
-                .await?;
-            Ok(None)
+                .await;
+            None
         }
     }
 }
@@ -204,7 +214,8 @@ pub fn exchange(app: &App, form: &[(&str, &str)]) -> Result<Tokens> {
     let mut form = form.to_vec();
     form.push(("client_id", app.client_id));
     form.push(("client_secret", app.client_secret));
-    let mut answer = ureq::post(app.token)
+    let mut answer = http()
+        .post(app.token)
         .config()
         .http_status_as_error(false)
         .build()
@@ -231,12 +242,12 @@ pub fn exchange(app: &App, form: &[(&str, &str)]) -> Result<Tokens> {
         .context("The service didn't allow staying signed in")?;
     let expires = OffsetDateTime::now_utc()
         + time::Duration::seconds(response.expires_in.unwrap_or(TOKEN_LIFETIME));
-    let rclone = serde_json::to_string(&RcloneToken {
+    let rclone = Zeroizing::new(serde_json::to_string(&RcloneToken {
         access_token: &response.access_token,
         token_type: response.token_type.as_deref().unwrap_or("Bearer"),
         refresh_token: refresh,
         expiry: expires.format(&Rfc3339)?,
-    })?;
+    })?);
     Ok(Tokens {
         claims: claims(response.id_token.as_deref()),
         access: response.access_token,

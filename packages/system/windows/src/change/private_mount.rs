@@ -6,7 +6,7 @@ use std::ptr;
 
 use anyhow::{Context, Result, anyhow};
 
-const PLACE: &str = "/run/luft-windows.XXXXXX";
+const PLACES: &str = "/run/luft-windows-drive";
 const FILESYSTEM: &str = "ntfs3";
 
 pub(super) fn with_mounted<T: Send>(
@@ -63,7 +63,8 @@ fn detach_mounts() -> Result<()> {
 }
 
 fn make_place() -> Result<PathBuf> {
-    let mut template = CString::new(PLACE)?.into_bytes_with_nul();
+    std::fs::create_dir_all(PLACES).context("Couldn't make a folder for Windows' drive")?;
+    let mut template = c_path(&Path::new(PLACES).join("XXXXXX"))?.into_bytes_with_nul();
     let made = unsafe { libc::mkdtemp(template.as_mut_ptr().cast::<c_char>()) };
     if made.is_null() {
         return Err(io::Error::last_os_error())

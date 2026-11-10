@@ -8,7 +8,7 @@ mod upkeep;
 mod watch;
 
 use std::collections::{HashMap, HashSet};
-use std::path::{Path, PathBuf};
+use std::path::{Component, Path, PathBuf};
 use std::sync::{Arc, Mutex, MutexGuard};
 use std::time::Instant;
 
@@ -35,6 +35,12 @@ pub struct Live {
     pub uploads: HashSet<String>,
     pub syncing: bool,
     pub dirty: Option<Instant>,
+}
+
+impl Live {
+    pub fn can_sync(&self) -> bool {
+        self.state == DriveState::Ready && !self.fallback
+    }
 }
 
 impl Default for Live {
@@ -160,17 +166,7 @@ pub struct Located {
 }
 
 pub fn locate(hub: &Hub, path: &Path) -> Result<Located> {
-    let inside = path
-        .strip_prefix(&hub.paths.cloud)
-        .ok()
-        .context("That isn't in a cloud drive")?;
-    let mut parts = inside.components();
-    let name = parts
-        .next()
-        .context("That isn't in a cloud drive")?
-        .as_os_str()
-        .to_string_lossy()
-        .into_owned();
+    let (name, relative) = split(&hub.paths.cloud, path).context("That isn't in a cloud drive")?;
     let record = hub
         .records()
         .all()
@@ -178,12 +174,19 @@ pub fn locate(hub: &Hub, path: &Path) -> Result<Located> {
         .find(|record| record.name == name)
         .cloned()
         .context("That cloud drive isn't here anymore")?;
-    let relative = parts
-        .as_path()
-        .to_string_lossy()
-        .trim_matches('/')
-        .to_owned();
     Ok(Located { record, relative })
+}
+
+fn split(cloud: &Path, path: &Path) -> Option<(String, String)> {
+    let mut names = Vec::new();
+    for part in path.strip_prefix(cloud).ok()?.components() {
+        let Component::Normal(name) = part else {
+            return None;
+        };
+        names.push(name.to_string_lossy());
+    }
+    let (drive, inside) = names.split_first()?;
+    Some((drive.to_string(), inside.join("/")))
 }
 
 pub fn covers(parent: &str, path: &str) -> bool {
@@ -196,7 +199,27 @@ pub fn covers(parent: &str, path: &str) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use super::covers;
+    use std::path::Path;
+
+    use super::{covers, split};
+
+    #[test]
+    fn paths_stay_inside_their_drive() {
+        let cloud = Path::new("/home/ada/Cloud");
+        let split = |path: &str| split(cloud, Path::new(path));
+        assert_eq!(
+            split("/home/ada/Cloud/Dropbox/Docs/a.txt"),
+            Some(("Dropbox".to_owned(), "Docs/a.txt".to_owned()))
+        );
+        assert_eq!(
+            split("/home/ada/Cloud/Dropbox/"),
+            Some(("Dropbox".to_owned(), String::new()))
+        );
+        assert_eq!(split("/home/ada/Cloud/Dropbox/../../Documents"), None);
+        assert_eq!(split("/home/ada/Cloud/Dropbox/Docs/.."), None);
+        assert_eq!(split("/home/ada/Cloud"), None);
+        assert_eq!(split("/home/ada/Documents"), None);
+    }
 
     #[test]
     fn folders_cover_what_is_inside_them() {

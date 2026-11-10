@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
@@ -9,6 +10,7 @@ use luft_windows::{Installation, Volume, hibernated, is_windows, settled};
 use serde::{Deserialize, Serialize};
 
 const NTFS: &str = "ntfs";
+const PLUGGED_IN: &str = "usb";
 
 #[derive(Deserialize)]
 struct Listing {
@@ -18,10 +20,12 @@ struct Listing {
 #[derive(Deserialize)]
 struct Block {
     path: String,
+    pkname: Option<String>,
     fstype: Option<String>,
     #[serde(rename = "type")]
     kind: String,
     rm: bool,
+    tran: Option<String>,
     label: Option<String>,
     #[serde(default)]
     mountpoints: Vec<Option<String>>,
@@ -34,13 +38,13 @@ pub struct Partition {
 }
 
 pub fn partitions() -> Result<Vec<Partition>> {
-    let output = Command::new("lsblk")
+    let output = Command::new("/usr/bin/lsblk")
         .args([
             "--json",
             "--list",
             "--paths",
             "--output",
-            "PATH,FSTYPE,TYPE,RM,LABEL,MOUNTPOINTS",
+            "PATH,PKNAME,FSTYPE,TYPE,RM,TRAN,LABEL,MOUNTPOINTS",
         ])
         .output()
         .context("lsblk couldn't be started")?;
@@ -51,10 +55,24 @@ pub fn partitions() -> Result<Vec<Partition>> {
         );
     }
     let listing: Listing = serde_json::from_slice(&output.stdout)?;
+    let plugged_in: HashSet<String> = listing
+        .blockdevices
+        .iter()
+        .filter(|block| block.tran.as_deref() == Some(PLUGGED_IN))
+        .map(|block| block.path.clone())
+        .collect();
     Ok(listing
         .blockdevices
         .into_iter()
-        .filter(|block| block.fstype.as_deref() == Some(NTFS) && block.kind == "part" && !block.rm)
+        .filter(|block| {
+            block.fstype.as_deref() == Some(NTFS)
+                && block.kind == "part"
+                && !block.rm
+                && !block
+                    .pkname
+                    .as_ref()
+                    .is_some_and(|drive| plugged_in.contains(drive))
+        })
         .map(|block| Partition {
             device: block.path,
             label: block.label.filter(|label| !label.is_empty()),

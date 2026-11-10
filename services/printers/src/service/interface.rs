@@ -1,10 +1,11 @@
 use std::collections::HashMap;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex, Weak};
 
 use luft_cups::drivers::Fit;
 use luft_cups::{Cups, Queue};
 use luft_dbus::idle::Idle;
 use luft_dbus_macros::introspect;
+use tokio::sync::OnceCell;
 use zbus::message::Header;
 use zbus::{Connection, interface};
 
@@ -15,9 +16,13 @@ const MANAGE: &str = "com.lantharos.printers.manage";
 const LOOK_FOR: i32 = 6;
 const OPTIONS: [&str; 3] = ["media", "sides", "print-color-mode"];
 
+type Found = Vec<(String, String, String, String, String)>;
+type Scan = OnceCell<Result<Found, String>>;
+
 pub struct Printers {
     idle: Arc<Idle>,
     cups: Cups,
+    scan: Mutex<Weak<Scan>>,
 }
 
 impl Printers {
@@ -25,7 +30,29 @@ impl Printers {
         Self {
             idle,
             cups: Cups::new("root".to_owned()),
+            scan: Mutex::default(),
         }
+    }
+
+    async fn look(&self) -> Result<Found, String> {
+        let devices = queues::new_devices(&self.cups, LOOK_FOR)
+            .await
+            .map_err(|error| {
+                eprintln!("{error}");
+                error.to_string()
+            })?;
+        Ok(devices
+            .into_iter()
+            .map(|device| {
+                (
+                    device.uri,
+                    device.class,
+                    device.info,
+                    device.model,
+                    device.id,
+                )
+            })
+            .collect())
     }
 
     async fn allowed(&self, connection: &Connection, header: &Header<'_>) -> Result<(), Error> {
@@ -42,21 +69,20 @@ impl Printers {
 #[introspect]
 #[interface(name = "com.lantharos.Printers1")]
 impl Printers {
-    async fn devices(&self) -> Result<Vec<(String, String, String, String, String)>, Error> {
+    async fn devices(&self) -> Result<Found, Error> {
         let _activity = self.idle.hold();
-        let devices = queues::new_devices(&self.cups, LOOK_FOR).await?;
-        Ok(devices
-            .into_iter()
-            .map(|device| {
-                (
-                    device.uri,
-                    device.class,
-                    device.info,
-                    device.model,
-                    device.id,
-                )
+        let scan = {
+            let mut running = self.scan.lock().expect("scan lock");
+            running.upgrade().unwrap_or_else(|| {
+                let scan = Arc::new(Scan::new());
+                *running = Arc::downgrade(&scan);
+                scan
             })
-            .collect())
+        };
+        scan.get_or_init(|| self.look())
+            .await
+            .clone()
+            .map_err(Error::Failed)
     }
 
     async fn drivers(

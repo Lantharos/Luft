@@ -1,7 +1,7 @@
 use anyhow::{Context, Result, anyhow};
 use serde::Deserialize;
 
-use super::encode_path;
+use super::{encode_path, http};
 
 const GRAPH: &str = "https://graph.microsoft.com/v1.0";
 
@@ -19,7 +19,8 @@ struct Item {
 }
 
 fn get<T: for<'de> Deserialize<'de>>(access: &str, url: &str) -> Result<T> {
-    ureq::get(url)
+    http()
+        .get(url)
         .header("Authorization", &format!("Bearer {access}"))
         .call()
         .map_err(|error| anyhow!("OneDrive didn't answer: {error}"))?

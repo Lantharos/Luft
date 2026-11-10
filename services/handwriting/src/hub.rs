@@ -19,12 +19,8 @@ pub enum Engine {
     Vision,
 }
 
-static CATALOG: LazyLock<Catalog<Engine>> = LazyLock::new(|| {
-    Catalog::parse(
-        include_str!("../data/models.json"),
-        "LUFT_HANDWRITING_MIRROR",
-    )
-});
+static CATALOG: LazyLock<Catalog<Engine>> =
+    LazyLock::new(|| Catalog::parse(include_str!("../data/models.json")));
 
 pub fn model() -> &'static Entry<Engine> {
     &CATALOG.models()[0]
@@ -130,7 +126,9 @@ impl Hub {
     }
 
     pub fn expire(&self, after: Duration) {
-        let mut loaded = self.loaded.lock().expect("recognizer lock");
+        let Ok(mut loaded) = self.loaded.try_lock() else {
+            return;
+        };
         if loaded
             .as_ref()
             .is_some_and(|loaded| loaded.used.elapsed() >= after)
@@ -141,8 +139,11 @@ impl Hub {
 
     /// How long nothing has been going on: no model loaded and no download.
     pub fn idle_for(&self) -> Duration {
-        let busy =
-            self.downloads.active() || self.loaded.lock().expect("recognizer lock").is_some();
+        let busy = self.downloads.active()
+            || self
+                .loaded
+                .try_lock()
+                .map_or(true, |loaded| loaded.is_some());
         let mut idle_since = self.idle_since.lock().expect("idle lock");
         if busy {
             *idle_since = None;

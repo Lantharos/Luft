@@ -103,7 +103,13 @@ pub async fn follow_changes(hub: Arc<Hub>, mut changes: Changes) {
         if event.mask.contains(EventMask::ISDIR | EventMask::CREATE)
             && let Some(name) = event.name
         {
-            hub.drives.watcher.follow(&account, &path.join(name));
+            let hub = hub.clone();
+            let account = account.clone();
+            let created = path.join(name);
+            let _ = tokio::task::spawn_blocking(move || {
+                hub.drives.watcher.follow(&account, &created);
+            })
+            .await;
         }
         hub.drives
             .update(&account, |live| live.dirty = Some(Instant::now()));

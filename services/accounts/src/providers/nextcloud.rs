@@ -1,13 +1,14 @@
 use anyhow::{Context, Result, anyhow, bail};
 use serde::Deserialize;
 use url::Url;
+use zeroize::Zeroizing;
 
-use super::encode_path;
+use super::{encode_path, http};
 
 pub struct LoginFlow {
     pub url: String,
     endpoint: String,
-    token: String,
+    token: Zeroizing<String>,
 }
 
 #[derive(Deserialize)]
@@ -18,16 +19,25 @@ struct Started {
 
 #[derive(Deserialize)]
 struct Poll {
-    token: String,
+    token: Zeroizing<String>,
     endpoint: String,
 }
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Granted {
-    pub server: String,
+    server: String,
     pub login_name: String,
-    pub app_password: String,
+    pub app_password: Zeroizing<String>,
+}
+
+impl Granted {
+    pub fn server(&self, typed: String) -> String {
+        match server_address(&self.server) {
+            Ok(named) if same_origin(&typed, &named) => named,
+            _ => typed,
+        }
+    }
 }
 
 #[derive(Deserialize)]
@@ -60,18 +70,29 @@ pub fn server_address(typed: &str) -> Result<String> {
     Ok(url.as_str().trim_end_matches('/').to_owned())
 }
 
+fn same_origin(server: &str, other: &str) -> bool {
+    match (Url::parse(server), Url::parse(other)) {
+        (Ok(server), Ok(other)) => server.origin() == other.origin(),
+        _ => false,
+    }
+}
+
 pub fn files_address(server: &str, user: &str) -> String {
     format!("{server}/remote.php/dav/files/{}/", encode_path(user))
 }
 
 pub fn start_login(server: &str) -> Result<LoginFlow> {
-    let started: Started = ureq::post(&format!("{server}/index.php/login/v2"))
+    let started: Started = http()
+        .post(&format!("{server}/index.php/login/v2"))
         .header("User-Agent", "Luft")
         .send_empty()
         .map_err(|error| anyhow!("The server didn't answer like Nextcloud: {error}"))?
         .body_mut()
         .read_json()
         .context("The server didn't answer like Nextcloud")?;
+    if !same_origin(server, &started.poll.endpoint) {
+        bail!("The server sent the sign-in to another address");
+    }
     Ok(LoginFlow {
         url: started.login,
         endpoint: started.poll.endpoint,
@@ -81,7 +102,8 @@ pub fn start_login(server: &str) -> Result<LoginFlow> {
 
 impl LoginFlow {
     pub fn poll(&self) -> Result<Option<Granted>> {
-        let response = ureq::post(&self.endpoint)
+        let response = http()
+            .post(&self.endpoint)
             .config()
             .http_status_as_error(false)
             .build()
@@ -101,16 +123,17 @@ impl LoginFlow {
 }
 
 pub fn share_link(server: &str, user: &str, password: &str, path: &str) -> Result<String> {
-    let shared: Ocs = ureq::post(&format!(
-        "{server}/ocs/v2.php/apps/files_sharing/api/v1/shares?format=json"
-    ))
-    .header("OCS-APIRequest", "true")
-    .header("Authorization", &basic(user, password))
-    .send_form([("path", format!("/{path}").as_str()), ("shareType", "3")])
-    .map_err(|error| anyhow!("The server didn't make a link: {error}"))?
-    .body_mut()
-    .read_json()
-    .context("The server's answer couldn't be read")?;
+    let shared: Ocs = http()
+        .post(&format!(
+            "{server}/ocs/v2.php/apps/files_sharing/api/v1/shares?format=json"
+        ))
+        .header("OCS-APIRequest", "true")
+        .header("Authorization", &basic(user, password))
+        .send_form([("path", format!("/{path}").as_str()), ("shareType", "3")])
+        .map_err(|error| anyhow!("The server didn't make a link: {error}"))?
+        .body_mut()
+        .read_json()
+        .context("The server's answer couldn't be read")?;
     Ok(shared.ocs.data.url)
 }
 
@@ -140,7 +163,23 @@ fn basic(user: &str, password: &str) -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::{files_address, server_address, web_address};
+    use super::{files_address, same_origin, server_address, web_address};
+
+    #[test]
+    fn sign_ins_stay_with_the_typed_server() {
+        assert!(same_origin(
+            "https://cloud.example.com/nextcloud",
+            "https://cloud.example.com/nextcloud/login/v2/poll"
+        ));
+        assert!(!same_origin(
+            "https://cloud.example.com",
+            "https://elsewhere.example/login/v2/poll"
+        ));
+        assert!(!same_origin(
+            "https://cloud.example.com",
+            "http://cloud.example.com/login/v2/poll"
+        ));
+    }
 
     #[test]
     fn addresses_are_completed() {

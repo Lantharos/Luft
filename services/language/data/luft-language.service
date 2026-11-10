@@ -6,7 +6,6 @@ PartOf=graphical-session.target
 Type=dbus
 BusName=com.lantharos.Language1
 ExecStart=/usr/libexec/luft-language
-Environment=GIO_USE_VFS=local
 Restart=on-failure
 Nice=19
 CPUSchedulingPolicy=idle

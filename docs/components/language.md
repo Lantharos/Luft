@@ -4,7 +4,7 @@
 
 ## The service
 
-It owns `com.lantharos.Language1` (see `services/language/data/com.lantharos.Language1.xml`). The session bus starts it when it's needed, and it exits after half a minute with nothing to do. The model loads on the first request and unloads three minutes after the last one.
+It owns `com.lantharos.Language1` (see `packages/dbus/introspection/luft-language-service`). The session bus starts it when it's needed, and it exits after half a minute with nothing to do. The model loads on the first request and unloads three minutes after the last one.
 
 - `Notes` takes part of a class, its lines of transcript each with when it was said, and the language to write in, and answers with the notes of that part: key points, definitions, homework and tests with when they're due, and questions asked with the answers given. Each item names the line it came from, so it carries when it was said. Greetings, attendance, telling students off, jokes, small talk and anything off topic are left out. The answer is held to a JSON grammar while it's written, so it always reads.
 - `Heading` takes the key points of a whole class and answers with a title and a two or three sentence summary.

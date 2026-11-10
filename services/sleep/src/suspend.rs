@@ -71,7 +71,7 @@ fn sleep() -> anyhow::Result<()> {
 }
 
 fn power_off_after_waking() -> anyhow::Result<()> {
-    let status = Command::new("systemctl")
+    let status = Command::new("/usr/bin/systemctl")
         .args(["start", "--no-block", POWER_OFF])
         .status()?;
     if !status.success() {

@@ -2,8 +2,8 @@ use std::fs::File;
 use std::sync::Arc;
 
 use luft_dbus_macros::introspect;
-use zbus::interface;
 use zbus::OwnedFd;
+use zbus::interface;
 
 use super::job::Request;
 use super::{Refusal, Transcriber};

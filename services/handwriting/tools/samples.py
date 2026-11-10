@@ -16,10 +16,10 @@ OUT = sys.argv[2]
 FONTS = ['scripts', 'scriptc', 'cursive']
 
 SENTENCES = {
-    'sr': ['Danas učimo kvadratne jednačine', 'Domaći zadatak za četvrtak', 'Đaci čitaju lektiru u školi', 'Napiši sastav o proleću', 'Profesorka je objasnila gradivo', 'Srbija ima mnogo planina', 'Ćirilica i latinica su pisma', 'Sutra je kontrolni iz hemije'],
-    'de': ['Heute lernen wir die Grammatik', 'Die Hausaufgabe ist für Montag', 'Wir lesen ein schönes Buch', 'Der Lehrer erklärt die Übung', 'Mein Bruder spielt gern Fußball', 'Im Winter ist es sehr kalt', 'Die Prüfung war nicht schwer', 'Wir fahren morgen nach München'],
-    'en': ['The mitochondria is the powerhouse', 'Homework is due on Thursday', 'Read chapter four before class', 'The war ended in nineteen eighteen', 'Photosynthesis needs sunlight', 'Solve for x in both equations', 'Bring your calculator tomorrow', 'Write a short essay about spring'],
     'sq': ['Sot mësojmë gramatikën shqipe', 'Detyra e shtëpisë për të enjten', 'Nxënësit lexojnë një libër', 'Mësuesja shpjegoi mësimin', 'Nesër kemi provim në kimi', 'Shkruaj një hartim për pranverën', 'Qyteti ka shumë rrugë të bukura', 'Ky është një ushtrim i vështirë'],
+    'de': ['Heute lernen wir die Grammatik', 'Die Hausaufgabe ist für Montag', 'Wir lesen ein schönes Buch', 'Der Lehrer erklärt die Übung', 'Mein Bruder spielt gern Fußball', 'Im Winter ist es sehr kalt', 'Die Prüfung war nicht schwer', 'Wir fahren morgen nach München'],
+    'sr': ['Danas učimo kvadratne jednačine', 'Domaći zadatak za četvrtak', 'Đaci čitaju lektiru u školi', 'Napiši sastav o proleću', 'Profesorka je objasnila gradivo', 'Srbija ima mnogo planina', 'Ćirilica i latinica su pisma', 'Sutra je kontrolni iz hemije'],
+    'en': ['The mitochondria is the powerhouse', 'Homework is due on Thursday', 'Read chapter four before class', 'The war ended in nineteen eighteen', 'Photosynthesis needs sunlight', 'Solve for x in both equations', 'Bring your calculator tomorrow', 'Write a short essay about spring'],
 }
 
 BASE = {'č': 'c', 'ć': 'c', 'š': 's', 'ž': 'z', 'đ': 'd', 'Đ': 'D', 'Č': 'C', 'Ć': 'C', 'Š': 'S', 'Ž': 'Z', 'ë': 'e', 'ç': 'c', 'ä': 'a', 'ö': 'o', 'ü': 'u', 'Ü': 'U', 'ß': 'B'}

@@ -15,6 +15,8 @@ use crate::verified::{self, Verified};
 const ATTEMPTS: u32 = 4;
 pub(crate) const BUFFER: usize = 256 * 1024;
 const REPORT_EVERY: Duration = Duration::from_millis(250);
+const SLOWEST: u64 = 16 * 1024;
+const SLACK: Duration = Duration::from_secs(60);
 
 #[derive(Clone)]
 pub struct Progress {
@@ -30,9 +32,12 @@ struct Job {
 
 /// Models being downloaded. A download picks up where it stopped, checks
 /// every file against the list in the image, and only then moves it in place.
+/// Only one download writes a model's files at a time, so one started right
+/// after a cancelled one waits for it to let go.
 #[derive(Clone, Default)]
 pub struct Downloads {
     jobs: Arc<Mutex<HashMap<String, Job>>>,
+    writing: Arc<Mutex<HashMap<String, Arc<Mutex<()>>>>>,
 }
 
 #[derive(Debug)]
@@ -95,8 +100,16 @@ impl Downloads {
                 cancel: cancel.clone(),
             },
         );
+        let writing = self
+            .writing
+            .lock()
+            .expect("writing lock")
+            .entry(entry.id.clone())
+            .or_default()
+            .clone();
         let downloads = self.clone();
         std::thread::spawn(move || {
+            let _alone = writing.lock().expect("writing lock");
             let result = download(entry, mirror, &folder, &cancel, |received| {
                 progress.lock().expect("progress lock").received = received;
                 changed();
@@ -150,6 +163,9 @@ fn download<E>(
     let mut last_report = Instant::now();
     let mut verified = Verified::load(folder);
     for file in &entry.files {
+        if cancel.load(Ordering::Relaxed) {
+            return Err(Cancelled.into());
+        }
         let target = folder.join(&file.name);
         if verified.confirm(&target, file)? {
             done += file.size;
@@ -239,7 +255,11 @@ fn fetch(
         if received > 0 {
             request = request.header("Range", format!("bytes={received}-"));
         }
+        let longest = Duration::from_secs((file.size - received) / SLOWEST) + SLACK;
         let response = request
+            .config()
+            .timeout_recv_body(Some(longest))
+            .build()
             .call()
             .with_context(|| format!("Couldn't reach {url}"))?;
         let mut output = OpenOptions::new().create(true).append(true).open(&part)?;

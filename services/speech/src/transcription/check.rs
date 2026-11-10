@@ -7,7 +7,7 @@
 //! cargo test --release transcribe -- --ignored --nocapture
 //!
 //! `LUFT_TRANSCRIPTION_LANGUAGES` lists the languages to choose from, by
-//! default Serbian in Latin, German, English and Albanian.
+//! default Albanian, German, Serbian in Latin and English.
 
 use std::collections::BTreeMap;
 use std::fs::File;
@@ -40,7 +40,10 @@ struct Tally {
 }
 
 fn overlap(segment: &Segment, said: &Said) -> u64 {
-    segment.end.min(said.end).saturating_sub(segment.start.max(said.start))
+    segment
+        .end
+        .min(said.end)
+        .saturating_sub(segment.start.max(said.start))
 }
 
 #[test]
@@ -51,7 +54,7 @@ fn transcribe_recordings() {
         std::env::var("LUFT_TRANSCRIPTION_SAMPLES").expect("LUFT_TRANSCRIPTION_SAMPLES"),
     );
     let languages: Vec<String> = std::env::var("LUFT_TRANSCRIPTION_LANGUAGES")
-        .unwrap_or_else(|_| "sr-Latn,de,en,sq".into())
+        .unwrap_or_else(|_| "sq,de,sr-Latn,en".into())
         .split(',')
         .map(str::to_owned)
         .collect();
@@ -63,7 +66,10 @@ fn transcribe_recordings() {
         .unwrap()
         .flatten()
         .map(|entry| entry.path())
-        .filter(|path| path.extension().is_some_and(|extension| extension == "opus"))
+        .filter(|path| {
+            path.extension()
+                .is_some_and(|extension| extension == "opus")
+        })
         .collect();
     recordings.sort();
     for recording in recordings {
@@ -101,7 +107,10 @@ fn transcribe_recordings() {
                     best == Some(index) && overlap(segment, utterance) > 0
                 })
                 .collect();
-            let text: Vec<&str> = matched.iter().map(|segment| segment.text.as_str()).collect();
+            let text: Vec<&str> = matched
+                .iter()
+                .map(|segment| segment.text.as_str())
+                .collect();
             let expected = words(&utterance.text, &utterance.language);
             let got = words(&text.join(" "), &utterance.language);
             let wrong = word_errors(&got, &expected);
@@ -117,7 +126,9 @@ fn transcribe_recordings() {
                 utterance.language,
                 utterance.start as f64 / 1000.0,
                 expected.len(),
-                matched.first().map_or("--", |segment| segment.language.as_str()),
+                matched
+                    .first()
+                    .map_or("--", |segment| segment.language.as_str()),
                 text.join(" ")
             );
         }

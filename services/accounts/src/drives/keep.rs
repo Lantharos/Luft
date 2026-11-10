@@ -57,7 +57,8 @@ pub async fn free(hub: &Arc<Hub>, paths: Vec<PathBuf>) -> Result<()> {
             }
         })?;
         for relative in &relatives {
-            remove_local(&kept.join(relative))?;
+            let local = kept.join(relative);
+            tokio::task::spawn_blocking(move || remove_local(&local)).await??;
             let _ = hub.rclone.forget(&union(&account), parent(relative)).await;
         }
         hub.drives_changed().await;
@@ -82,11 +83,7 @@ pub async fn sync(hub: &Arc<Hub>, account: &str, force: bool) -> Result<()> {
     }
     let conditions = hub.conditions();
     let live = hub.drives.get(account);
-    if !conditions.online
-        || conditions.pause.is_some() && !force
-        || live.state != DriveState::Ready
-        || live.fallback
-    {
+    if !conditions.online || conditions.pause.is_some() && !force || !live.can_sync() {
         return Ok(());
     }
     hub.drives.update(account, |live| {
@@ -101,7 +98,7 @@ pub async fn sync(hub: &Arc<Hub>, account: &str, force: bool) -> Result<()> {
     outcome
 }
 
-async fn exchange(hub: &Hub, record: &Record) -> Result<()> {
+async fn exchange(hub: &Arc<Hub>, record: &Record) -> Result<()> {
     let account = record.id.as_str();
     let filters_path = hub.paths.filters(account);
     let rules = filters::render(&record.kept, &record.skipped);
@@ -126,8 +123,11 @@ async fn exchange(hub: &Hub, record: &Record) -> Result<()> {
         .unwrap_or_default();
     if failure.contains("resync") {
         outcome = bisync(hub, account, Run::Resync).await;
-    } else if failure.contains("too many deletes") && holds_files(&hub.paths.kept(account)) {
-        outcome = bisync(hub, account, Run::Forced).await;
+    } else if failure.contains("too many deletes") {
+        let kept = hub.paths.kept(account);
+        if tokio::task::spawn_blocking(move || holds_files(&kept)).await? {
+            outcome = bisync(hub, account, Run::Forced).await;
+        }
     }
     if outcome.is_ok() && conflicts::settle(hub, record).await? {
         outcome = bisync(hub, account, Run::Normal).await;
@@ -135,7 +135,15 @@ async fn exchange(hub: &Hub, record: &Record) -> Result<()> {
     for root in &record.kept {
         let _ = hub.rclone.forget(&union(account), parent(root)).await;
     }
-    hub.drives.watcher.follow(account, &hub.paths.kept(account));
+    let following = hub.clone();
+    let followed = record.id.clone();
+    tokio::task::spawn_blocking(move || {
+        following
+            .drives
+            .watcher
+            .follow(&followed, &following.paths.kept(&followed));
+    })
+    .await?;
     outcome
 }
 
@@ -231,6 +239,11 @@ fn group(hub: &Hub, paths: &[PathBuf]) -> Result<BTreeMap<String, Vec<String>>> 
     let mut grouped: BTreeMap<String, Vec<String>> = BTreeMap::new();
     for path in paths {
         let located = locate(hub, path)?;
+        if located.relative.chars().any(char::is_control) {
+            bail!(
+                "Names with line breaks or other control characters can't be kept on this device"
+            );
+        }
         grouped
             .entry(located.record.id)
             .or_default()

@@ -4,6 +4,7 @@ use std::time::{Duration, Instant};
 use anyhow::Result;
 use tokio::sync::mpsc::UnboundedSender;
 use tokio::sync::oneshot;
+use zbus::names::UniqueName;
 
 use crate::dictation::Session;
 use crate::engines::Processor;
@@ -31,6 +32,7 @@ pub struct Hub {
     pub downloads: Downloads,
     pub warm: Warm,
     pub session: tokio::sync::Mutex<Option<Session>>,
+    pub listener: Mutex<Option<UniqueName<'static>>>,
     pub events: UnboundedSender<Event>,
     idle_since: Mutex<Option<Instant>>,
 }
@@ -43,6 +45,7 @@ impl Hub {
             downloads: Downloads::default(),
             warm: Warm::default(),
             session: tokio::sync::Mutex::new(None),
+            listener: Mutex::new(None),
             events,
             idle_since: Mutex::new(None),
         }

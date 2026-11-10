@@ -58,6 +58,10 @@ struct WrittenQuestion {
     line: usize,
 }
 
+fn language(tag: &str) -> Result<&str> {
+    languages::name(tag).context("That isn't a language to write in")
+}
+
 fn filled(text: &str) -> Option<String> {
     let text = text.trim();
     (!text.is_empty()).then(|| text.to_owned())
@@ -73,7 +77,7 @@ pub fn notes(writer: &Writer, request: &NotesRequest) -> Result<Notes> {
         .enumerate()
         .map(|(index, line)| format!("[{index}] {}\n", line.text.trim()))
         .collect();
-    let system = NOTES_SYSTEM.replace("{language}", languages::name(&request.language));
+    let system = NOTES_SYSTEM.replace("{language}", language(&request.language)?);
     let answer = writer.write(&system, &transcript, grammar::NOTES, LONGEST_NOTES)?;
     let written: Written =
         serde_json::from_str(&answer).context("The notes didn't come out whole")?;
@@ -126,7 +130,7 @@ pub fn notes(writer: &Writer, request: &NotesRequest) -> Result<Notes> {
 }
 
 pub fn heading(writer: &Writer, request: &HeadingRequest) -> Result<Heading> {
-    let system = HEADING_SYSTEM.replace("{language}", languages::name(&request.language));
+    let system = HEADING_SYSTEM.replace("{language}", language(&request.language)?);
     let points: String = request
         .points
         .iter()

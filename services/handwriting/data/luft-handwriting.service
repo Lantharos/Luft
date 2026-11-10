@@ -6,7 +6,6 @@ PartOf=graphical-session.target
 Type=dbus
 BusName=com.lantharos.Handwriting1
 ExecStart=/usr/libexec/luft-handwriting
-Environment=GIO_USE_VFS=local
 Restart=on-failure
 MemoryHigh=2560M
 MemoryMax=3G

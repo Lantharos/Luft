@@ -5,10 +5,25 @@ pub mod oauth;
 pub mod onedrive;
 pub mod trouble;
 
+use std::sync::LazyLock;
+use std::time::Duration;
+
 use luft_accounts::types::Provider;
 use serde_json::{Map, Value};
 
 use crate::store::{Record, Secret};
+
+const ANSWER: Duration = Duration::from_secs(30);
+
+pub fn http() -> &'static ureq::Agent {
+    static AGENT: LazyLock<ureq::Agent> = LazyLock::new(|| {
+        ureq::Agent::config_builder()
+            .timeout_global(Some(ANSWER))
+            .build()
+            .into()
+    });
+    &AGENT
+}
 
 pub fn backend(provider: Provider) -> &'static str {
     match provider {

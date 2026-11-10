@@ -26,7 +26,9 @@ pub fn run() -> Result<()> {
     );
     fs::create_dir_all(Path::new(RECORD).parent().expect("the record has a folder"))?;
     fs::write(RECORD, devices.join("\n") + "\n")?;
-    let _ = Command::new("udevadm").args(["settle", SETTLE]).status();
+    let _ = Command::new("/usr/bin/udevadm")
+        .args(["settle", SETTLE])
+        .status();
     audio::reset_codecs();
     Ok(())
 }

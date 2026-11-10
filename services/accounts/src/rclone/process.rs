@@ -2,7 +2,7 @@ use std::fs::{self, DirBuilder};
 use std::os::unix::fs::DirBuilderExt;
 use std::path::PathBuf;
 use std::process::Stdio;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use anyhow::Result;
 use tokio::io::{AsyncBufReadExt, BufReader};
@@ -14,6 +14,8 @@ use super::rc::Rc;
 
 const STARTUP: Duration = Duration::from_secs(20);
 const RESTART_DELAY: Duration = Duration::from_secs(3);
+const LONGEST_RESTART_DELAY: Duration = Duration::from_secs(5 * 60);
+const STEADY: Duration = Duration::from_secs(60);
 
 pub struct Process {
     socket: PathBuf,
@@ -45,12 +47,18 @@ impl Process {
     }
 
     pub async fn supervise(self) {
+        let mut delay = RESTART_DELAY;
         loop {
+            let began = Instant::now();
             match self.run_once().await {
                 Ok(()) => eprintln!("rclone stopped, starting it again"),
                 Err(error) => eprintln!("rclone couldn't run: {error:#}"),
             }
-            sleep(RESTART_DELAY).await;
+            if began.elapsed() >= STEADY {
+                delay = RESTART_DELAY;
+            }
+            sleep(delay).await;
+            delay = (delay * 2).min(LONGEST_RESTART_DELAY);
         }
     }
 

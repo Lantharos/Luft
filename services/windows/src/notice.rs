@@ -76,8 +76,6 @@ async fn notice() -> Result<()> {
     let Some(body) = offer.map(|_| OFFER).or(fast_started.then_some(HOW_TO)) else {
         return remember(CHECKED);
     };
-    remember(SHOWN)?;
-
     let session = Connection::session().await?;
     let notifications =
         Proxy::new(&session, NOTIFICATIONS, NOTIFICATIONS_PATH, NOTIFICATIONS).await?;
@@ -107,6 +105,7 @@ async fn notice() -> Result<()> {
             ),
         )
         .await?;
+    remember(SHOWN)?;
     let Some(windows) = offer else {
         return Ok(());
     };

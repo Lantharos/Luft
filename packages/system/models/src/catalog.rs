@@ -32,18 +32,26 @@ pub struct Catalog<E> {
 }
 
 impl<E: DeserializeOwned> Catalog<E> {
-    /// Reads the list a service ships. `mirror_variable` names an environment
-    /// variable that points downloads at another server, for checks.
-    pub fn parse(json: &str, mirror_variable: &str) -> Self {
+    /// Reads the list a service ships.
+    pub fn parse(json: &str) -> Self {
         let listed: Listed<E> = serde_json::from_str(json).expect("the model list is valid");
         Self {
-            mirror: std::env::var(mirror_variable).unwrap_or(listed.mirror),
+            mirror: listed.mirror,
             models: listed.models,
         }
     }
 }
 
 impl<E> Catalog<E> {
+    /// Points downloads at the server an environment variable names, for
+    /// checks.
+    pub fn mirrored_by(mut self, variable: &str) -> Self {
+        if let Ok(mirror) = std::env::var(variable) {
+            self.mirror = mirror;
+        }
+        self
+    }
+
     pub fn models(&self) -> &[Entry<E>] {
         &self.models
     }

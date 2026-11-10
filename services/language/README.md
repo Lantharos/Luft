@@ -8,4 +8,4 @@ It builds llama.cpp from source with Vulkan, which needs CMake, a C++ compiler, 
 
 ## Testing
 
-With the model downloaded, `LUFT_LANGUAGE_MODELS=<model folder> LUFT_LANGUAGE_SAMPLES=<folder of .json transcripts> cargo test --release notes -- --ignored --nocapture` writes notes of every transcript part by part, the way Heft asks for them, and prints them with how long each part took. A transcript is `{ "language": "sr-Latn", "lines": [{ "at": 4000, "text": "…" }] }`.
+With the model downloaded, `LUFT_LANGUAGE_MODELS=<model folder> LUFT_LANGUAGE_SAMPLES=<folder of .json transcripts> cargo test --release notes -- --ignored --nocapture` writes notes of every transcript part by part, the way Heft asks for them, and prints them with how long each part took. A transcript is `{ "language": "sq", "lines": [{ "at": 4000, "text": "…" }] }`.

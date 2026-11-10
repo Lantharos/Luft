@@ -60,37 +60,8 @@ fn copy_name(found: &Found, cloud: &str, number: u32) -> String {
 
 pub async fn settle(hub: &Hub, record: &Record) -> Result<bool> {
     let kept = hub.paths.kept(&record.id);
-    let mut found = Vec::new();
-    walk(&kept, "", &mut found)?;
-    let now = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .map_or(0, |elapsed| elapsed.as_secs());
     let cloud = record.provider.name();
-    let mut settled = Vec::new();
-    for (folder, name) in found {
-        let Some(conflict) = parse(&name) else {
-            continue;
-        };
-        let directory = kept.join(&folder);
-        let free = (1..)
-            .map(|number| copy_name(&conflict, cloud, number))
-            .find(|candidate| !directory.join(candidate).exists())
-            .expect("some number is free");
-        fs::rename(directory.join(&name), directory.join(&free))?;
-        let join = |name: &str| {
-            if folder.is_empty() {
-                name.to_owned()
-            } else {
-                format!("{folder}/{name}")
-            }
-        };
-        settled.push(Conflict {
-            path: join(&conflict.original),
-            copy: join(&free),
-            copy_from: conflict.side,
-            at: now,
-        });
-    }
+    let settled = tokio::task::spawn_blocking(move || rename_copies(&kept, cloud)).await??;
     if settled.is_empty() {
         return Ok(false);
     }
@@ -116,6 +87,40 @@ pub async fn settle(hub: &Hub, record: &Record) -> Result<bool> {
     Ok(true)
 }
 
+fn rename_copies(kept: &Path, cloud: &str) -> Result<Vec<Conflict>> {
+    let mut found = Vec::new();
+    walk(kept, "", &mut found)?;
+    let now = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map_or(0, |elapsed| elapsed.as_secs());
+    let mut settled = Vec::new();
+    for (folder, name) in found {
+        let Some(conflict) = parse(&name) else {
+            continue;
+        };
+        let directory = kept.join(&folder);
+        let free = (1..)
+            .map(|number| copy_name(&conflict, cloud, number))
+            .find(|candidate| !directory.join(candidate).exists())
+            .expect("some number is free");
+        fs::rename(directory.join(&name), directory.join(&free))?;
+        let join = |name: &str| {
+            if folder.is_empty() {
+                name.to_owned()
+            } else {
+                format!("{folder}/{name}")
+            }
+        };
+        settled.push(Conflict {
+            path: join(&conflict.original),
+            copy: join(&free),
+            copy_from: conflict.side,
+            at: now,
+        });
+    }
+    Ok(settled)
+}
+
 fn walk(root: &Path, folder: &str, found: &mut Vec<(String, String)>) -> Result<()> {
     let Ok(entries) = fs::read_dir(root.join(folder)) else {
         return Ok(());
@@ -136,9 +141,9 @@ fn walk(root: &Path, folder: &str, found: &mut Vec<(String, String)>) -> Result<
     Ok(())
 }
 
-pub async fn prune(hub: &Hub, record: &Record) -> bool {
+pub async fn prune(hub: &Hub, record: &Record) {
     if record.conflicts.is_empty() {
-        return false;
+        return;
     }
     let drive = hub.paths.cloud.join(&record.name);
     let copies: Vec<String> = record
@@ -154,18 +159,16 @@ pub async fn prune(hub: &Hub, record: &Record) -> bool {
     })
     .await
     else {
-        return false;
+        return;
     };
     if gone.is_empty() {
-        return false;
+        return;
     }
-    hub.records()
-        .edit(&record.id, |record| {
-            record
-                .conflicts
-                .retain(|conflict| !gone.contains(&conflict.copy))
-        })
-        .is_ok()
+    let _ = hub.records().edit(&record.id, |record| {
+        record
+            .conflicts
+            .retain(|conflict| !gone.contains(&conflict.copy))
+    });
 }
 
 #[cfg(test)]

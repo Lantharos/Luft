@@ -19,6 +19,7 @@ const CACHE_MAX_SIZE: &str = "5G";
 const CACHE_MIN_FREE: &str = "5G";
 const WRITE_BACK: &str = "5s";
 const STARTUP: Duration = Duration::from_secs(30);
+const ANSWER: Duration = Duration::from_secs(5 * 60);
 
 #[derive(Clone)]
 pub struct Rclone {
@@ -26,6 +27,21 @@ pub struct Rclone {
     logs: broadcast::Sender<String>,
     pub starts: watch::Receiver<u64>,
     idle: Arc<Mutex<Option<process::Process>>>,
+}
+
+pub struct Temporary {
+    pub name: String,
+    rclone: Rclone,
+}
+
+impl Drop for Temporary {
+    fn drop(&mut self) {
+        let rclone = self.rclone.clone();
+        let name = std::mem::take(&mut self.name);
+        tokio::spawn(async move {
+            let _ = rclone.forget_remote(&name).await;
+        });
+    }
 }
 
 #[derive(Deserialize)]
@@ -86,12 +102,26 @@ impl Rclone {
         *self.starts.borrow() > 0
     }
 
-    async fn call(&self, method: &str, input: Value) -> Result<Value> {
+    async fn ready(&self) -> Result<()> {
         self.start();
         timeout(STARTUP, self.starts.clone().wait_for(|starts| *starts > 0))
             .await
             .context("rclone didn't start")??;
-        self.rc.call(method, input).await
+        Ok(())
+    }
+
+    async fn call(&self, method: &str, input: Value) -> Result<Value> {
+        self.ready().await?;
+        timeout(ANSWER, self.rc.call(method, input))
+            .await
+            .context("rclone took too long to answer")?
+    }
+
+    pub fn temporary(&self, name: String) -> Temporary {
+        Temporary {
+            name,
+            rclone: self.clone(),
+        }
     }
 
     pub fn logs(&self) -> broadcast::Receiver<String> {
@@ -232,7 +262,8 @@ impl Rclone {
     }
 
     pub async fn bisync(&self, input: Value) -> Result<()> {
-        self.call("sync/bisync", input).await?;
+        self.ready().await?;
+        self.rc.call("sync/bisync", input).await?;
         Ok(())
     }
 }

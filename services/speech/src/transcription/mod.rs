@@ -1,11 +1,11 @@
 mod bus;
 #[cfg(test)]
 mod check;
-mod resample;
 mod job;
 mod languages;
 mod opus;
 mod regions;
+mod resample;
 
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
@@ -74,7 +74,9 @@ impl Transcriber {
     }
 
     fn expire(&self) {
-        let mut loaded = self.loaded.lock().expect("model lock");
+        let Ok(mut loaded) = self.loaded.try_lock() else {
+            return;
+        };
         if loaded
             .as_ref()
             .is_some_and(|loaded| loaded.used.elapsed() >= WARM_FOR)

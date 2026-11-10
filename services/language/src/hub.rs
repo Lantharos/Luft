@@ -18,7 +18,7 @@ pub enum Engine {
 }
 
 static CATALOG: LazyLock<Catalog<Engine>> =
-    LazyLock::new(|| Catalog::parse(include_str!("../data/models.json"), "LUFT_LANGUAGE_MIRROR"));
+    LazyLock::new(|| Catalog::parse(include_str!("../data/models.json")));
 
 pub fn model() -> &'static Entry<Engine> {
     &CATALOG.models()[0]

@@ -55,10 +55,11 @@ impl Writing {
         let request: R = serde_json::from_str(request)
             .map_err(|error| Error::Failed(format!("The request doesn't read: {error}")))?;
         let hub = self.hub.clone();
-        let written = tokio::task::spawn_blocking(move || hub.with_writer(|writer| write(writer, &request)))
-            .await
-            .map_err(|error| Error::Failed(error.to_string()))??
-            .map_err(|NotInstalled| Error::NotInstalled(hub::model().id.clone()))?;
+        let written =
+            tokio::task::spawn_blocking(move || hub.with_writer(|writer| write(writer, &request)))
+                .await
+                .map_err(|error| Error::Failed(error.to_string()))??
+                .map_err(|NotInstalled| Error::NotInstalled(hub::model().id.clone()))?;
         Ok(serde_json::to_string(&written).expect("what's written always serializes"))
     }
 }
@@ -73,7 +74,8 @@ impl Writing {
 
     /// A title and summary of a class from its key points: JSON HeadingRequest in, JSON Heading out.
     async fn heading(&self, request: String) -> Result<String, Error> {
-        self.write::<HeadingRequest, _>(&request, notes::heading).await
+        self.write::<HeadingRequest, _>(&request, notes::heading)
+            .await
     }
 }
 

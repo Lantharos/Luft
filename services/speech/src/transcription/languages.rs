@@ -5,9 +5,9 @@ const STILL_LIKELY: f32 = 0.15;
 
 /// Languages that Whisper hears as one another, counted together for
 /// whichever of them the class speaks.
-const KIN: &[&[&str]] = &[&["sr", "hr", "bs"]];
+const KIN: &[&[&str]] = &[&["hr", "bs", "sr"]];
 
-/// A language a class may speak, such as `sr-Latn` for Serbian in Latin.
+/// A language a class may speak, such as `de`, or `sr-Latn` for Serbian in Latin.
 #[derive(Clone, Debug, PartialEq)]
 pub struct Spoken {
     pub code: String,
@@ -73,7 +73,13 @@ impl Choice {
         let shares: Vec<f32> = self
             .spoken
             .iter()
-            .map(|spoken| spoken.ids.iter().map(|id| chances.get(*id).copied().unwrap_or(0.0)).sum())
+            .map(|spoken| {
+                spoken
+                    .ids
+                    .iter()
+                    .map(|id| chances.get(*id).copied().unwrap_or(0.0))
+                    .sum()
+            })
             .collect();
         let total: f32 = shares.iter().sum::<f32>().max(f32::EPSILON);
         let (best, share) = shares

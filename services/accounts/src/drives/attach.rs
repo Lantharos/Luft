@@ -197,17 +197,21 @@ async fn release(hub: &Hub, account: &str) {
 }
 
 async fn prepare(target: &Path) -> Result<()> {
-    if fs::metadata(target).is_err_and(|error| error.raw_os_error() == Some(NOT_CONNECTED)) {
+    if stale(target).await {
         detach_stale(target).await;
     }
-    fs::create_dir_all(target)?;
-    if fs::read_dir(target)?.next().is_some() {
-        bail!(
-            "{} already has files in it, so the drive can't open there",
-            target.display()
-        );
-    }
-    Ok(())
+    let target = target.to_owned();
+    tokio::task::spawn_blocking(move || {
+        fs::create_dir_all(&target)?;
+        if fs::read_dir(&target)?.next().is_some() {
+            bail!(
+                "{} already has files in it, so the drive can't open there",
+                target.display()
+            );
+        }
+        Ok(())
+    })
+    .await?
 }
 
 async fn detach_stale(target: &Path) {
@@ -221,8 +225,13 @@ async fn detach_stale(target: &Path) {
     }
 }
 
-pub fn is_stale(target: &Path) -> bool {
-    fs::metadata(target).is_err_and(|error| error.raw_os_error() == Some(NOT_CONNECTED))
+pub async fn stale(target: &Path) -> bool {
+    let target = target.to_owned();
+    tokio::task::spawn_blocking(move || {
+        fs::metadata(target).is_err_and(|error| error.raw_os_error() == Some(NOT_CONNECTED))
+    })
+    .await
+    .unwrap_or(false)
 }
 
 pub async fn detach(hub: &Hub, record: &Record) {

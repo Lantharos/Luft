@@ -86,13 +86,9 @@ impl Records {
         self.save()
     }
 
-    pub fn remove(&mut self, id: &str) -> Result<Option<Record>> {
-        let Some(index) = self.all.iter().position(|record| record.id == id) else {
-            return Ok(None);
-        };
-        let removed = self.all.remove(index);
-        self.save()?;
-        Ok(Some(removed))
+    pub fn remove(&mut self, id: &str) -> Result<()> {
+        self.all.retain(|record| record.id != id);
+        self.save()
     }
 
     pub fn unique_name(&self, wanted: &str, except: Option<&str>) -> String {

@@ -10,6 +10,7 @@ use anyhow::{Result, anyhow, bail};
 use luft_accounts::types::{Answer, Credentials, Provider, Step};
 use tokio::sync::mpsc;
 use tokio::task::AbortHandle;
+use zeroize::Zeroizing;
 
 use crate::hub::Hub;
 use crate::providers::trouble;
@@ -33,7 +34,9 @@ pub struct Flow {
     pub hub: Arc<Hub>,
     pub session: String,
     pub provider: Provider,
-    pub credentials: Credentials,
+    pub server: Option<String>,
+    pub user: Option<String>,
+    pub password: Option<Zeroizing<String>>,
     pub account: Option<String>,
     answers: mpsc::UnboundedReceiver<Answer>,
 }
@@ -144,7 +147,9 @@ pub async fn start(
         hub: hub.clone(),
         session: session.clone(),
         provider,
-        credentials,
+        server: credentials.server,
+        user: credentials.user,
+        password: credentials.password.map(Zeroizing::new),
         account,
         answers,
     };
@@ -155,19 +160,26 @@ pub async fn start(
     Ok(session)
 }
 
-async fn run(mut flow: Flow) {
+async fn run(flow: Flow) {
     let hub = flow.hub.clone();
     let session = flow.session.clone();
+    let step = attempt(flow).await;
+    set(&hub, &session, step).await;
+    tokio::time::sleep(FORGET_AFTER).await;
+    hub.signins.sessions().remove(&session);
+}
+
+async fn attempt(mut flow: Flow) -> Step {
     let provider = flow.provider;
     let outcome = match provider {
         Provider::Onedrive | Provider::Dropbox => oauth::run(&mut flow).await,
-        Provider::Nextcloud if flow.credentials.password.is_none() => {
+        Provider::Nextcloud if flow.password.is_none() => {
             password::nextcloud_login(&mut flow).await
         }
         Provider::Nextcloud | Provider::Webdav => password::run(&mut flow).await,
         Provider::Icloud => icloud::run(&mut flow).await,
     };
-    let step = match outcome {
+    match outcome {
         Ok(account) => Step::Done { account },
         Err(error) => {
             eprintln!("Signing in to {} failed: {error:#}", provider.name());
@@ -175,10 +187,7 @@ async fn run(mut flow: Flow) {
                 message: trouble::explain_sign_in(provider, &format!("{error:#}")),
             }
         }
-    };
-    set(&hub, &session, step).await;
-    tokio::time::sleep(FORGET_AFTER).await;
-    hub.signins.sessions().remove(&session);
+    }
 }
 
 async fn set(hub: &Hub, session: &str, step: Step) {

@@ -30,7 +30,6 @@ pub fn write(icon: &Icon, size: u32, output: &Path) -> Result<(), String> {
     }
     let png = match icon.size {
         IconSize::Scalable => rasterize(&icon.bytes, size)?,
-        IconSize::Pixels(pixels) if pixels <= size => icon.bytes.clone(),
         IconSize::Pixels(_) => downscale(&icon.bytes, size)?,
     };
     std::fs::write(output, png).map_err(|error| error.to_string())
@@ -106,8 +105,21 @@ fn downscale(bytes: &[u8], size: u32) -> Result<Vec<u8>, String> {
         .decode()
         .map_err(|error| error.to_string())?
         .into_rgba8();
+    let image = if source.width().max(source.height()) > size {
+        shrink(source, size)?
+    } else {
+        source
+    };
+    let mut encoded = Cursor::new(Vec::new());
+    image
+        .write_to(&mut encoded, ImageFormat::Png)
+        .map_err(|error| error.to_string())?;
+    Ok(encoded.into_inner())
+}
+
+fn shrink(source: RgbaImage, size: u32) -> Result<RgbaImage, String> {
     let (width, height) = source.dimensions();
-    let scale = (size as f64 / width.max(height) as f64).min(1.0);
+    let scale = size as f64 / width.max(height) as f64;
     let pixels = |length: u32| ((length as f64 * scale).round() as u32).max(1);
     let (target_width, target_height) = (pixels(width), pixels(height));
     let source = Image::from_vec_u8(width, height, source.into_raw(), PixelType::U8x4)
@@ -120,13 +132,8 @@ fn downscale(bytes: &[u8], size: u32) -> Result<Vec<u8>, String> {
             &ResizeOptions::new().resize_alg(ResizeAlg::Convolution(FilterType::Lanczos3)),
         )
         .map_err(|error| error.to_string())?;
-    let image = RgbaImage::from_raw(target_width, target_height, target.into_vec())
-        .ok_or("The picture could not be resized")?;
-    let mut encoded = Cursor::new(Vec::new());
-    image
-        .write_to(&mut encoded, ImageFormat::Png)
-        .map_err(|error| error.to_string())?;
-    Ok(encoded.into_inner())
+    RgbaImage::from_raw(target_width, target_height, target.into_vec())
+        .ok_or_else(|| "The picture could not be resized".to_string())
 }
 
 #[cfg(test)]

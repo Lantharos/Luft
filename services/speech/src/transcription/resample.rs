@@ -38,7 +38,8 @@ pub fn downsample(samples: &[f32]) -> Vec<f32> {
                 .enumerate()
                 .map(|(tap, weight)| {
                     let at = (centre + tap).checked_sub(TAPS / 2);
-                    at.and_then(|at| samples.get(at)).map_or(0.0, |sample| sample * weight)
+                    at.and_then(|at| samples.get(at))
+                        .map_or(0.0, |sample| sample * weight)
                 })
                 .sum()
         })

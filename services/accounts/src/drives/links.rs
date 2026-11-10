@@ -3,6 +3,7 @@ use std::path::Path;
 use anyhow::{Context, Result, bail};
 use luft_accounts::types::Provider;
 use serde_json::Value;
+use zeroize::Zeroizing;
 
 use super::{locate, remote};
 use crate::hub::Hub;
@@ -40,7 +41,10 @@ pub async fn web_address(hub: &Hub, path: &Path) -> Result<String> {
     let located = locate(hub, path)?;
     let record = &located.record;
     let relative = located.relative;
-    let folder = path.is_dir();
+    let folder = {
+        let path = path.to_owned();
+        tokio::task::spawn_blocking(move || path.is_dir()).await?
+    };
     match record.provider {
         Provider::Onedrive => {
             let access = access_token(hub, record).await?;
@@ -60,7 +64,7 @@ pub async fn web_address(hub: &Hub, path: &Path) -> Result<String> {
     }
 }
 
-async fn password(hub: &Hub, record: &Record) -> Result<String> {
+async fn password(hub: &Hub, record: &Record) -> Result<Zeroizing<String>> {
     match hub.keyring.load(&record.id).await? {
         Some(Secret::Password { password }) => Ok(password),
         _ => bail!("Sign in to {} again", record.name),

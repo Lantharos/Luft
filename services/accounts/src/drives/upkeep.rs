@@ -6,7 +6,7 @@ use luft_accounts::types::{DriveState, Usage};
 use tokio::sync::broadcast::error::RecvError;
 use tokio::time::{Instant, sleep_until};
 
-use super::attach::{self, is_stale};
+use super::attach::{self, stale};
 use super::keep::{self, sync};
 use super::{conflicts, filters, remote, reports_usage, union};
 use crate::hub::Hub;
@@ -104,7 +104,7 @@ pub async fn run(hub: Arc<Hub>) {
                 }
                 let now = hub.conditions();
                 if now.online && !was.online {
-                    recover(&hub);
+                    recover(&hub).await;
                 }
                 if now.pause != was.pause {
                     follow_uploads(&hub, was.pause.is_some()).await;
@@ -115,7 +115,7 @@ pub async fn run(hub: Arc<Hub>) {
                 }
                 was = now;
             }
-            _ = woke.recv() => recover(&hub),
+            _ = woke.recv() => recover(&hub).await,
             line = logs.recv() => match line {
                 Ok(line) if !line.contains(QUEUED_FOR_UPLOAD) => {}
                 Err(RecvError::Closed) => return,
@@ -128,10 +128,16 @@ pub async fn run(hub: Arc<Hub>) {
 }
 
 fn busy(hub: &Hub) -> bool {
+    let syncs = syncs(hub);
     hub.drives
         .live()
         .values()
-        .any(|live| !live.uploads.is_empty() || live.dirty.is_some())
+        .any(|live| !live.uploads.is_empty() || syncs && live.dirty.is_some() && live.can_sync())
+}
+
+fn syncs(hub: &Hub) -> bool {
+    let conditions = hub.conditions();
+    conditions.online && conditions.pause.is_none()
 }
 
 fn unready(hub: &Hub) -> bool {
@@ -175,12 +181,17 @@ fn sync_all(hub: &Arc<Hub>) {
 }
 
 fn sync_settled(hub: &Arc<Hub>) {
+    if !syncs(hub) {
+        return;
+    }
     let settled: Vec<String> = hub
         .drives
         .live()
         .iter()
         .filter(|(_, live)| {
-            live.dirty.is_some_and(|since| since.elapsed() >= SETTLE) && !live.syncing
+            live.dirty.is_some_and(|since| since.elapsed() >= SETTLE)
+                && !live.syncing
+                && live.can_sync()
         })
         .map(|(account, _)| account.clone())
         .collect();
@@ -209,12 +220,14 @@ async fn retry_unready(hub: &Arc<Hub>) {
     }
 }
 
-fn recover(hub: &Arc<Hub>) {
-    for record in hub.records().all().to_vec() {
+async fn recover(hub: &Arc<Hub>) {
+    let records = hub.records().all().to_vec();
+    for record in records {
         let live = hub.drives.get(&record.id);
-        let broken = live.state != DriveState::Ready
-            || live.fallback
-            || live.mounted.as_deref().is_none_or(is_stale);
+        let broken = match &live.mounted {
+            Some(mounted) if live.can_sync() => stale(mounted).await,
+            _ => true,
+        };
         if broken {
             spawn_attach(hub, record.id);
             continue;

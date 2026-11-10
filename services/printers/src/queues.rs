@@ -20,8 +20,7 @@ pub struct Device {
 impl Device {
     fn from(attributes: &Attributes) -> Option<Self> {
         let uri = attributes.text("device-uri")?.to_owned();
-        let (scheme, _) = uri.split_once("://")?;
-        if LEFT_OUT.contains(&scheme) {
+        if !uri.contains("://") || left_out(&uri) {
             return None;
         }
         let text = |key| attributes.text(key).unwrap_or_default().to_owned();
@@ -37,6 +36,13 @@ impl Device {
     pub fn device_id(&self) -> DeviceId {
         identify(&self.id, &self.model)
     }
+}
+
+fn left_out(uri: &str) -> bool {
+    let scheme = uri.split(':').next().unwrap_or_default();
+    LEFT_OUT
+        .iter()
+        .any(|left_out| scheme.eq_ignore_ascii_case(left_out))
 }
 
 pub fn identify(device_id: &str, make_and_model: &str) -> DeviceId {
@@ -110,6 +116,12 @@ pub async fn add(
     info: &str,
     location: &str,
 ) -> io::Result<String> {
+    if left_out(device) {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidInput,
+            "Luft doesn't set up printers connected that way",
+        ));
+    }
     let printers = cups.printers(&QUEUE_ATTRIBUTES).await?;
     if let Some(printer) = queue_for(&printers, device) {
         let name = printer.text("printer-name").unwrap_or_default().to_owned();
@@ -136,7 +148,17 @@ pub async fn add(
 
 #[cfg(test)]
 mod tests {
-    use super::free_name;
+    use super::{free_name, left_out};
+
+    #[test]
+    fn knows_the_connections_it_never_offers() {
+        assert!(left_out("beh:/1/3/5/socket://printer"));
+        assert!(left_out("serial:/dev/ttyS0?baud=115200"));
+        assert!(left_out("PARALLEL:/dev/lp0"));
+        assert!(left_out("gutenprint53+usb://Canon/MX490"));
+        assert!(!left_out("usb://Canon/MX490%20series"));
+        assert!(!left_out("hp:/usb/HP_LaserJet_1020?serial=1"));
+    }
 
     #[test]
     fn names_queues_like_cups() {

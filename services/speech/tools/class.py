@@ -3,7 +3,7 @@
     python3 tools/class.py <samples> <out.opus> [--noise 0.03] [--minutes 6] [--seed 1]
 
 <samples> has one folder per language (named with the tag the transcription
-reports, such as sr, de, en, sq), each holding 16 kHz mono .wav files with a
+reports, such as sq, de, sr, en), each holding 16 kHz mono .wav files with a
 .txt of what is said in them. Sentences, each brought to the same level,
 follow one another in runs of one to four in the same language, with pauses
 of half a second to four seconds, over pink noise and the murmur of other

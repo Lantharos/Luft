@@ -1,6 +1,7 @@
 use anyhow::{Context, Result, bail};
 use luft_accounts::types::{Answer, Phone, Provider, Step};
 use serde_json::{Map, Value, json};
+use zeroize::Zeroizing;
 
 use super::Flow;
 use crate::accounts::{self, NewAccount};
@@ -19,10 +20,10 @@ const WRONG_TEXTED_CODE: &str = "That code didn't work. Try again to get a new o
 
 pub async fn run(flow: &mut Flow) -> Result<String> {
     let (apple_id, password) = identity(flow).await?;
-    let remote = format!("signin{}", flow.session);
-    let outcome = converse(flow, &remote, &apple_id, &password).await;
-    let _ = flow.hub.rclone.forget_remote(&remote).await;
-    let secret = outcome?;
+    let secret = {
+        let remote = flow.hub.rclone.temporary(format!("signin{}", flow.session));
+        converse(flow, &remote.name, &apple_id, &password).await?
+    };
     accounts::add(
         &flow.hub,
         NewAccount {
@@ -37,14 +38,9 @@ pub async fn run(flow: &mut Flow) -> Result<String> {
     .await
 }
 
-async fn identity(flow: &Flow) -> Result<(String, String)> {
-    let typed_user = flow
-        .credentials
-        .user
-        .clone()
-        .filter(|user| !user.trim().is_empty());
+async fn identity(flow: &Flow) -> Result<(String, Zeroizing<String>)> {
+    let typed_user = flow.user.clone().filter(|user| !user.trim().is_empty());
     let typed_password = flow
-        .credentials
         .password
         .clone()
         .filter(|password| !password.is_empty());
@@ -68,11 +64,16 @@ async fn identity(flow: &Flow) -> Result<(String, String)> {
     }
 }
 
-async fn converse(flow: &mut Flow, remote: &str, apple_id: &str, password: &str) -> Result<Secret> {
+async fn converse(
+    flow: &mut Flow,
+    remote: &str,
+    apple_id: &str,
+    password: &Zeroizing<String>,
+) -> Result<Secret> {
     let rclone = flow.hub.rclone.clone();
     let mut parameters = Map::new();
     parameters.insert("apple_id".into(), Value::String(apple_id.to_owned()));
-    parameters.insert("password".into(), Value::String(password.to_owned()));
+    parameters.insert("password".into(), Value::String(password.to_string()));
     let mut question = rclone
         .configure(
             remote,
@@ -114,17 +115,19 @@ async fn converse(flow: &mut Flow, remote: &str, apple_id: &str, password: &str)
     open_drive(flow, remote).await?;
     let live = rclone.remote(remote).await?;
     let field = |key: &str| {
-        live.get(key)
-            .and_then(Value::as_str)
-            .unwrap_or_default()
-            .to_owned()
+        Zeroizing::new(
+            live.get(key)
+                .and_then(Value::as_str)
+                .unwrap_or_default()
+                .to_owned(),
+        )
     };
     let trust_token = field("trust_token");
     if trust_token.is_empty() {
         bail!("Apple didn't confirm this computer. Try again.");
     }
     Ok(Secret::Apple {
-        password: password.to_owned(),
+        password: password.clone(),
         trust_token,
         cookies: field("cookies"),
     })

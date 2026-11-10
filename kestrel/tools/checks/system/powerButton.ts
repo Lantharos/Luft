@@ -4,7 +4,7 @@ import GLib from 'gi://GLib';
 import {Main} from 'resource:///com/lantharos/kestrel/kestrel.js';
 
 import {call} from '../lib/dbus.js';
-import {existing, firstStyled, labelled, named, shown, showsText} from '../lib/actors.js';
+import {answerable, existing, firstStyled, labelled, named, shown, showsText} from '../lib/actors.js';
 import {checks} from '../lib/check.js';
 import {click, moveBy, press} from '../lib/input/input.js';
 import {gjs, stop, waitForWindow} from '../lib/processes.js';
@@ -16,8 +16,8 @@ import {prepareForSleep, screenOn} from '../lockScreen/lib/sleep.js';
 import {takeCalls} from './lib/systemCalls.js';
 
 const {require, eventually} = checks('power button');
-const TITLE = 'What Should This Computer Do?';
-const CHOICES = ['Cancel', 'Log Out', 'Suspend', 'Restart', 'Power Off'];
+const TITLE = 'What should the computer do?';
+const CHOICES = ['Cancel', 'Log out', 'Suspend', 'Restart', 'Power off'];
 const END_CALLS = ['Suspend', 'Hibernate', 'PowerOff', 'Reboot'];
 const LONGER_THAN_A_COUNTDOWN_TICK = 2500;
 const SCREEN_BLANK_DELAY = 3;
@@ -70,7 +70,7 @@ async function checkFullscreenApp() {
   const app = gjs('clients/windows/gtk4Window.js', ['Stage', '#223344', 'keeps-shortcuts']);
   const window = await waitForWindow('Stage');
   await eventually(() => labelled('Allow'), 'the app asks to keep every shortcut');
-  await settled();
+  await eventually(() => answerable('modal-dialog'), 'its question takes input after a moment');
   click(labelled('Allow')!);
   const [device] = global.stage.context.get_backend().get_default_seat().list_devices();
   await eventually(() => window.is_fullscreen() && window.shortcuts_inhibited(device), 'the fullscreen app keeps every shortcut');

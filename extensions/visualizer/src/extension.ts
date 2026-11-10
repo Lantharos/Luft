@@ -48,7 +48,7 @@ const enable: Enable<Granted> = visualizer => {
     frame: ({ time, elapsed, displays }) => {
       spectrum.follow(listener.read(), elapsed);
       presence = audioLevels.playing ? Math.min(1, presence + elapsed / FADE_IN_S) : Math.max(0, presence - elapsed / FADE_OUT_S);
-      if (presence === 0) layer.active = false;
+      if (presence === 0 && !audioLevels.playing) layer.active = false;
       const moment = [spectrum.level, time, eased(presence) * settings.get<number>('intensity'), STYLES[settings.get<Style>('style')]];
       for (const display of displays) paint(display, moment);
     },

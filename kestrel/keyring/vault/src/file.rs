@@ -89,11 +89,28 @@ impl Stored {
         preamble.extend_from_slice(&length.to_le_bytes());
         preamble.extend_from_slice(&encoded_header);
 
-        let mut plaintext = Zeroizing::new(Vec::new());
+        let mut size = EncodedSize::default();
+        ciborium::into_writer(contents, &mut size)
+            .map_err(|_| Error::Corrupt("unencodable contents"))?;
+        let mut plaintext = Zeroizing::new(Vec::with_capacity(size.0));
         ciborium::into_writer(contents, &mut *plaintext)
             .map_err(|_| Error::Corrupt("unencodable contents"))?;
         let body = cipher::seal(&key.derive(BODY_KEY), &plaintext, &preamble);
         replace(path, &[&preamble, &body])
+    }
+}
+
+#[derive(Default)]
+struct EncodedSize(usize);
+
+impl Write for EncodedSize {
+    fn write(&mut self, bytes: &[u8]) -> std::io::Result<usize> {
+        self.0 += bytes.len();
+        Ok(bytes.len())
+    }
+
+    fn flush(&mut self) -> std::io::Result<()> {
+        Ok(())
     }
 }
 

@@ -10,7 +10,6 @@ use sha2::{Digest, Sha256};
 const CERTIFICATE: &str = "certificate.der";
 const KEY: &str = "key.der";
 
-/// This computer's certificate. Its fingerprint is how other devices know and remember it.
 pub struct Identity {
     pub certificate: CertificateDer<'static>,
     key: PrivatePkcs8KeyDer<'static>,
@@ -35,7 +34,6 @@ impl Identity {
     }
 }
 
-/// The SHA-256 of a certificate in uppercase hex, as LocalSend's apps write it.
 pub fn fingerprint(certificate: &[u8]) -> String {
     Sha256::digest(certificate).iter().map(|byte| format!("{byte:02X}")).collect()
 }
@@ -45,7 +43,7 @@ fn create(folder: &Path) -> io::Result<(Vec<u8>, Vec<u8>)> {
     let key = KeyPair::generate().map_err(invalid)?;
     let mut params = CertificateParams::new(Vec::<String>::new()).map_err(invalid)?;
     params.distinguished_name = DistinguishedName::new();
-    params.distinguished_name.push(DnType::CommonName, "Pigeon");
+    params.distinguished_name.push(DnType::CommonName, "Post");
     let certificate = params.self_signed(&key).map_err(invalid)?.der().to_vec();
     let key = key.serialize_der();
     fs::create_dir_all(folder)?;

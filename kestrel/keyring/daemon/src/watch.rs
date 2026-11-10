@@ -78,5 +78,13 @@ pub async fn start(daemon: &Arc<Daemon>) -> zbus::Result<()> {
             crate::services::manage::publish(&publisher).await;
         }
     });
+
+    let historian = daemon.clone();
+    tokio::spawn(async move {
+        loop {
+            historian.recorded.notified().await;
+            crate::services::manage::history_changed(&historian).await;
+        }
+    });
     Ok(())
 }

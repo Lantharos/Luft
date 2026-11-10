@@ -31,15 +31,14 @@ impl From<io::Error> for Failure {
     }
 }
 
-/// Streams one file to disk next to where it goes, and moves it there under a name nothing has yet once it's whole.
 pub async fn save(folder: &Path, file: &FileDto, body: Incoming, done: &AtomicU64, stop: watch::Receiver<bool>) -> Result<PathBuf, Failure> {
-    let wanted = folder.join(relative(&file.file_name));
+    let wanted = folder.join(path_inside_folder(&file.file_name));
     let parent = wanted.parent().unwrap_or(folder);
     fs::create_dir_all(parent).await?;
     let partial = parent.join(format!(".{}.{}.part", wanted.file_name().unwrap_or_default().to_string_lossy(), random_id()));
     let written = write(&partial, file, body, done, stop).await;
     let saved = match written {
-        Ok(()) => keep(&partial, &wanted),
+        Ok(()) => move_without_overwriting(&partial, &wanted),
         Err(failure) => Err(failure),
     };
     if saved.is_err() {
@@ -87,8 +86,7 @@ async fn write(partial: &Path, file: &FileDto, mut body: Incoming, done: &Atomic
     Ok(())
 }
 
-/// Moves the finished file to `wanted`, or to "name (2).ext" and on when that's taken, never over another file.
-fn keep(partial: &Path, wanted: &Path) -> Result<PathBuf, Failure> {
+fn move_without_overwriting(partial: &Path, wanted: &Path) -> Result<PathBuf, Failure> {
     for attempt in 1u32.. {
         let target = numbered(wanted, attempt);
         match renameat2(AT_FDCWD, partial, AT_FDCWD, &target, RenameFlags::RENAME_NOREPLACE) {
@@ -112,8 +110,7 @@ fn numbered(wanted: &Path, attempt: u32) -> PathBuf {
     wanted.with_file_name(numbered)
 }
 
-/// Where a file goes inside the folder: the folders a sender names stay, but nothing can climb out of it.
-pub fn relative(name: &str) -> PathBuf {
+pub fn path_inside_folder(name: &str) -> PathBuf {
     let cleaned: PathBuf = Path::new(&name.replace('\\', "/").replace('\0', ""))
         .components()
         .filter_map(|component| match component {
@@ -135,10 +132,10 @@ mod tests {
 
     #[test]
     fn keeps_received_files_inside_the_folder() {
-        assert_eq!(relative("../../.ssh/authorized_keys"), PathBuf::from(".ssh/authorized_keys"));
-        assert_eq!(relative("/etc/passwd"), PathBuf::from("etc/passwd"));
-        assert_eq!(relative("Photos\\2026\\cat.jpg"), PathBuf::from("Photos/2026/cat.jpg"));
-        assert_eq!(relative(".."), PathBuf::from("file"));
+        assert_eq!(path_inside_folder("../../.ssh/authorized_keys"), PathBuf::from(".ssh/authorized_keys"));
+        assert_eq!(path_inside_folder("/etc/passwd"), PathBuf::from("etc/passwd"));
+        assert_eq!(path_inside_folder("Photos\\2026\\cat.jpg"), PathBuf::from("Photos/2026/cat.jpg"));
+        assert_eq!(path_inside_folder(".."), PathBuf::from("file"));
     }
 
     #[test]
@@ -148,7 +145,7 @@ mod tests {
         std::fs::write(&wanted, b"first").unwrap();
         let partial = folder.path().join(".part");
         std::fs::write(&partial, b"second").unwrap();
-        let kept = keep(&partial, &wanted).unwrap();
+        let kept = move_without_overwriting(&partial, &wanted).unwrap();
         assert_eq!(kept, folder.path().join("cat (2).jpg"));
         assert_eq!(std::fs::read(&wanted).unwrap(), b"first");
         assert_eq!(numbered(&folder.path().join(".bashrc"), 2), folder.path().join(".bashrc (2)"));

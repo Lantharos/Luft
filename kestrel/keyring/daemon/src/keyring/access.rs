@@ -1,6 +1,8 @@
+use std::collections::BTreeMap;
+
 use luft_keyring_vault::Item;
 
-use crate::requester::{Caller, Requester, SABINE, View, sandboxed_app_of};
+use crate::requester::{Caller, Requester, SABINE_OWNER, View, sandboxed_app_of};
 
 pub const PORTAL_SCHEMA: &str = "org.freedesktop.portal.Secret";
 const CHROMIUM: &str = "chromium";
@@ -22,21 +24,21 @@ pub fn decide(requester: &Requester, item: &Item) -> Decision {
     match &requester.caller {
         Caller::You => Decision::Allowed,
         Caller::App(id) if owner == Some(id.as_str()) => Decision::Allowed,
-        _ if is_protected(item) => Decision::Denied,
+        _ if has_protected_schema(&item.attributes) => Decision::Denied,
         Caller::App(_) if owner.is_some() => Decision::ConfirmItsYou,
         _ => Decision::AskTheApp,
     }
 }
 
-fn is_protected(item: &Item) -> bool {
-    item.attributes.get("xdg:schema").is_some_and(|schema| {
+pub fn has_protected_schema(attributes: &BTreeMap<String, String>) -> bool {
+    attributes.get("xdg:schema").is_some_and(|schema| {
         schema == PORTAL_SCHEMA || schema == crate::services::passkeys::SCHEMA
     })
 }
 
 impl View {
     pub fn shows(self, item: &Item) -> bool {
-        let sabine = item.owner.as_deref() == Some(SABINE);
+        let sabine = item.owner.as_deref() == Some(SABINE_OWNER);
         match self {
             Self::Everything => !sabine,
             Self::SabineChromium => sabine || !names_chromium(item),

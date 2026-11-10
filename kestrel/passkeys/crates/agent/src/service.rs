@@ -1,6 +1,8 @@
 use luft_dbus_macros::introspect;
+use luft_identity::caller::refuse_sandboxed;
 use serde::Serialize;
 use zbus::Type;
+use zbus::message::Header;
 use zbus::object_server::SignalEmitter;
 use zbus::{Connection, fdo, interface};
 
@@ -42,7 +44,12 @@ impl Service {
 #[introspect]
 #[interface(name = "com.lantharos.Passkeys1")]
 impl Service {
-    async fn list(&self) -> fdo::Result<Vec<Entry>> {
+    async fn list(
+        &self,
+        #[zbus(header)] header: Header<'_>,
+        #[zbus(connection)] connection: &Connection,
+    ) -> fdo::Result<Vec<Entry>> {
+        refuse_sandboxed(connection, &header).await?;
         let passkeys = self.vault.list().await.map_err(failed)?;
         Ok(passkeys
             .into_iter()
@@ -67,8 +74,11 @@ impl Service {
         &self,
         id: Vec<u8>,
         nickname: String,
+        #[zbus(header)] header: Header<'_>,
+        #[zbus(connection)] connection: &Connection,
         #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
     ) -> fdo::Result<()> {
+        refuse_sandboxed(connection, &header).await?;
         self.vault
             .rename(&id, nickname.trim())
             .await
@@ -80,8 +90,11 @@ impl Service {
     async fn delete(
         &self,
         id: Vec<u8>,
+        #[zbus(header)] header: Header<'_>,
+        #[zbus(connection)] connection: &Connection,
         #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
     ) -> fdo::Result<()> {
+        refuse_sandboxed(connection, &header).await?;
         self.vault.delete(&id).await.map_err(failed)?;
         Self::changed(&emitter).await?;
         Ok(())

@@ -15,6 +15,10 @@ impl SecretError {
         Self::IsLocked("The item is locked".into())
     }
 
+    pub fn refused() -> Self {
+        Self::IsLocked("Apps can't change this through the Secret Service".into())
+    }
+
     pub fn missing() -> Self {
         Self::NoSuchObject("No such item or collection".into())
     }

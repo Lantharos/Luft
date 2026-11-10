@@ -4,6 +4,7 @@ use luft_keyring_vault::{Collection, Contents, Item, Secret};
 use luft_keyring_wire::TpmKey;
 use serde::{Deserialize, Serialize};
 use zbus::{OwnedVariant, Variant};
+use zeroize::Zeroizing;
 
 pub const COLLECTION: &str = "passkeys";
 pub const SCHEMA: &str = "com.lantharos.Passkey";
@@ -38,7 +39,7 @@ pub struct Passkey {
 impl Passkey {
     pub fn read(item: &Item) -> Option<Self> {
         let schema = item.attributes.get("xdg:schema")?;
-        (schema == SCHEMA)
+        (schema == SCHEMA && item.owner.is_none())
             .then(|| postcard::from_bytes(item.secret.expose()).ok())
             .flatten()
     }
@@ -57,7 +58,11 @@ impl Passkey {
     }
 
     pub fn secret(&self) -> Secret {
-        Secret::new(postcard::to_stdvec(self).expect("passkeys always serialize"))
+        let size =
+            postcard::experimental::serialized_size(self).expect("passkeys always serialize");
+        let mut encoded = Zeroizing::new(vec![0; size]);
+        postcard::to_slice(self, &mut encoded).expect("passkeys always serialize");
+        Secret::new(std::mem::take(&mut *encoded))
     }
 
     pub fn on_chip(&self) -> bool {

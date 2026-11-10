@@ -28,7 +28,6 @@ pub enum What {
     Text(String),
 }
 
-/// What's being sent right now, by id.
 #[derive(Default)]
 pub struct Outbox {
     sends: Mutex<HashMap<String, Arc<Sending>>>,
@@ -41,7 +40,6 @@ struct Sending {
 }
 
 impl Outbox {
-    /// Starts sending to the device `device`, or says it's gone, and returns the transfer's id.
     pub fn send(&self, app: &Arc<App>, device: &str, what: What) -> String {
         let id = random_id();
         let Some(device) = app.devices.get(device) else {
@@ -73,7 +71,6 @@ impl Outbox {
         }
     }
 
-    /// The device at `from` stopped receiving `session`.
     pub fn cancel_from(&self, from: IpAddr, session: &str) {
         for sending in self.sends.lock().unwrap().values() {
             if sending.receiver.lock().unwrap().as_ref().is_some_and(|(ip, id)| *ip == from && id == session) {
@@ -122,7 +119,7 @@ async fn run(app: &App, id: &str, sending: &Sending, device: &Device, what: What
             Ok(()) => Outcome::Done,
             Err(_) => Outcome::Failed,
         },
-        _ = transfer.follow(&app.link, never_stopped) => Outcome::Failed,
+        _ = transfer.report_until_stopped_or_stalled(&app.link, never_stopped) => Outcome::Failed,
         outcome = stopped(&mut stop) => {
             if outcome == Outcome::Cancelled {
                 tell_receiver(app, &target, &prepared.session_id).await;
@@ -136,8 +133,6 @@ async fn stopped(stop: &mut watch::Receiver<Option<Outcome>>) -> Outcome {
     stop.wait_for(Option::is_some).await.ok().and_then(|outcome| *outcome).unwrap_or(Outcome::Cancelled)
 }
 
-/// Offers the files, asking for the receiver's PIN as often as it wants one. `None` means it needs nothing more,
-/// as with text.
 async fn prepare(app: &App, sending: &Sending, transfer: &Transfer, target: &Target<'_>, files: &[Outgoing]) -> Result<Option<Prepared>, Outcome> {
     let offer = PrepareUpload {
         info: app.presence(None),

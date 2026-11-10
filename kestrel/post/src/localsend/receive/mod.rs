@@ -22,7 +22,6 @@ use crate::localsend::server::{self, Answer, Caller};
 const PIN_ATTEMPTS: u32 = 3;
 const TELL_SENDER_WITHIN: Duration = Duration::from_secs(5);
 
-/// The one transfer this computer takes at a time, as LocalSend's apps expect.
 #[derive(Default)]
 pub struct Inbox {
     slot: Mutex<Option<Session>>,
@@ -79,7 +78,7 @@ pub async fn prepare(app: &Arc<App>, caller: &Caller, query: &HashMap<String, St
         Err(refused) => return server::status(refused),
     };
     if paired {
-        app.pairing.lock().unwrap().take();
+        app.stop_pairing();
         app.link.send(Event::Paired { device: from.clone() });
     }
     let trusted = known || paired;
@@ -96,7 +95,7 @@ pub async fn prepare(app: &Arc<App>, caller: &Caller, query: &HashMap<String, St
         }
         *slot = Some(Session::Offered { id: id.clone(), from: caller.address.ip(), decide });
     }
-    let waiting = Withdrawn { app, id: &id, armed: true };
+    let waiting = WithdrawOnHangUp { app, id: &id, armed: true };
     let size = files.values().map(|file| file.size).sum();
     if trusted {
         app.inbox.decide(&id, Decision::Accept);
@@ -153,8 +152,8 @@ fn accept(app: &Arc<App>, caller: &Caller, info: &Presence, from: Peer, id: Stri
     active.transfer.tell(&app.link, Stage::Moving);
     let (watcher, app_for_watcher) = (active.clone(), app.clone());
     tokio::spawn(async move {
-        if !watcher.transfer.follow(&app_for_watcher.link, watcher.stop.subscribe()).await {
-            app_for_watcher.inbox.end(&app_for_watcher, &watcher, Outcome::Failed);
+        if !watcher.transfer.report_until_stopped_or_stalled(&app_for_watcher.link, watcher.stop.subscribe()).await {
+            app_for_watcher.inbox.end_once(&app_for_watcher, &watcher, Outcome::Failed);
         }
     });
     server::json(&Prepared { session_id: id, files: tokens })
@@ -184,27 +183,26 @@ pub async fn upload(app: &Arc<App>, caller: &Caller, query: &HashMap<String, Str
             .then(|| files.values().all(|entry| entry.state == State::Saved))
     };
     match finished {
-        Some(true) => app.inbox.end(app, &active, Outcome::Done),
-        Some(false) => app.inbox.end(app, &active, Outcome::Failed),
+        Some(true) => app.inbox.end_once(app, &active, Outcome::Done),
+        Some(false) => app.inbox.end_once(app, &active, Outcome::Failed),
         None => {}
     }
     server::status(answer)
 }
 
-/// Undoes the offer when the sender hangs up before it was answered.
-struct Withdrawn<'a> {
+struct WithdrawOnHangUp<'a> {
     app: &'a App,
     id: &'a str,
     armed: bool,
 }
 
-impl Withdrawn<'_> {
+impl WithdrawOnHangUp<'_> {
     fn disarm(mut self) {
         self.armed = false;
     }
 }
 
-impl Drop for Withdrawn<'_> {
+impl Drop for WithdrawOnHangUp<'_> {
     fn drop(&mut self) {
         if self.armed && self.app.inbox.decide(self.id, Decision::Withdrawn) {
             withdrawn(self.app, self.id);
@@ -227,9 +225,8 @@ impl Inbox {
         self.pin_attempts.lock().unwrap().clear();
     }
 
-    /// Asks a device that isn't one of yours for the PIN while Settings is adding a device, and says whether it gave it.
     fn check_pin(&self, app: &App, from: IpAddr, known: bool, given: Option<&String>) -> Result<bool, StatusCode> {
-        let Some(pin) = app.pairing().filter(|_| !known) else {
+        let Some(pin) = app.pairing_pin().filter(|_| !known) else {
             return Ok(false);
         };
         let mut attempts = self.pin_attempts.lock().unwrap();
@@ -250,7 +247,6 @@ impl Inbox {
         }
     }
 
-    /// Answers the offer `id`, and says whether there was one.
     fn decide(&self, id: &str, decision: Decision) -> bool {
         let mut slot = self.slot.lock().unwrap();
         if !matches!(&*slot, Some(Session::Offered { id: offered, .. }) if offered == id) {
@@ -269,13 +265,12 @@ impl Inbox {
         self.decide(id, Decision::Decline);
     }
 
-    /// Stops what's being received, and tells the sender so it stops too.
     pub fn cancel(&self, app: &Arc<App>, id: &str) {
         if self.decide(id, Decision::Decline) {
             return;
         }
         let Some(active) = self.active(id, None) else { return };
-        self.end(app, &active, Outcome::Cancelled);
+        self.end_once(app, &active, Outcome::Cancelled);
         let app = app.clone();
         tokio::spawn(async move {
             let target = Target { fingerprint: active.sender_fingerprint.as_deref(), ..active.sender.clone() };
@@ -285,7 +280,6 @@ impl Inbox {
         });
     }
 
-    /// The sender at `from` cancelled `session`. Says whether it was one this computer was receiving.
     pub fn cancel_from(&self, app: &App, from: IpAddr, session: &str) -> bool {
         let offered = matches!(&*self.slot.lock().unwrap(), Some(Session::Offered { id, from: there, .. }) if id == session && *there == from);
         if offered && self.decide(session, Decision::Withdrawn) {
@@ -293,7 +287,7 @@ impl Inbox {
             return true;
         }
         let Some(active) = self.active(session, Some(from)) else { return false };
-        self.end(app, &active, Outcome::CancelledThere);
+        self.end_once(app, &active, Outcome::CancelledThere);
         true
     }
 
@@ -315,8 +309,7 @@ impl Inbox {
         Some((active, dto))
     }
 
-    /// Ends the session once, however many ways it ends at the same moment.
-    fn end(&self, app: &App, active: &Arc<Active>, outcome: Outcome) {
+    fn end_once(&self, app: &App, active: &Arc<Active>, outcome: Outcome) {
         {
             let mut slot = self.slot.lock().unwrap();
             if !matches!(&*slot, Some(Session::Active(current)) if Arc::ptr_eq(current, active)) {

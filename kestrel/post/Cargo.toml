@@ -17,6 +17,7 @@ hyper = { workspace = true, features = ["client", "http1", "server"] }
 hyper-util = { workspace = true, features = ["tokio"] }
 jiff.workspace = true
 luft-dbus-macros.workspace = true
+luft-identity.workspace = true
 nix = { workspace = true, features = ["fs", "net"] }
 rcgen = { workspace = true, features = ["crypto", "ring"] }
 rustls = { workspace = true, features = ["ring", "std", "tls12"] }

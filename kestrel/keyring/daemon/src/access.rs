@@ -213,7 +213,7 @@ impl Daemon {
 
     async fn ask_access(&self, requester: &Requester, labels: &[&str]) -> Answer {
         let _turn = self.prompting.lock().await;
-        let who = requester.named();
+        let who = requester.named_mid_sentence();
         let title = match labels {
             [label] => format!("Allow {who} to use “{label}”?"),
             labels => format!(

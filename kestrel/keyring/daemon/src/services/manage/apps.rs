@@ -9,7 +9,7 @@ use zbus::message::Header;
 use zbus::{fdo, interface};
 
 use crate::daemon::Daemon;
-use crate::requester::{Caller, Requester, SANDBOXED};
+use crate::requester::{Caller, Requester, SANDBOXED_OWNER_PREFIX};
 
 const LIMIT: u64 = 1024 * 1024;
 
@@ -23,7 +23,7 @@ impl AppSecrets {
         let requester = self.daemon.requester(header).await;
         let store = match &requester.caller {
             Caller::You => format!("app:{app}"),
-            Caller::App(id) if id == app => format!("{SANDBOXED}{id}"),
+            Caller::App(id) if id == app => format!("{SANDBOXED_OWNER_PREFIX}{id}"),
             Caller::App(_) => {
                 return Err(fdo::Error::AccessDenied(
                     "Apps can only use their own secrets".into(),

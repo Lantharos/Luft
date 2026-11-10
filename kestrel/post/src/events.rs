@@ -4,14 +4,12 @@ use serde::Serialize;
 use tokio::sync::mpsc;
 use zbus::zvariant::Type;
 
-/// A device as Kestrel shows it. `model` is empty when the device didn't say.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Type)]
 pub struct Peer {
     pub id: String,
     pub alias: String,
     pub kind: String,
     pub model: String,
-    /// Whether its certificate proved `id`, which trusting it needs.
     pub verified: bool,
 }
 
@@ -81,7 +79,6 @@ impl Outcome {
     }
 }
 
-/// What Post tells Kestrel, in order: changes to what it shows, and what happens to transfers.
 #[derive(Debug)]
 pub enum Event {
     Ready { alias: String, folder: PathBuf },

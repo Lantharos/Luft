@@ -8,7 +8,8 @@ use tokio::sync::watch;
 use crate::events::Peer;
 use crate::localsend::protocol::{Presence, Scheme};
 
-/// A device on the network, as last heard from.
+const DEVICES_KEPT: usize = 64;
+
 #[derive(Clone, Debug)]
 pub struct Device {
     pub peer: Peer,
@@ -18,7 +19,6 @@ pub struct Device {
 }
 
 impl Device {
-    /// A device known by `fingerprint`, which `verified` says its certificate proved.
     pub fn new(presence: &Presence, fingerprint: String, address: SocketAddr, verified: bool) -> Self {
         let info = &presence.info;
         Self {
@@ -36,7 +36,6 @@ impl Device {
     }
 }
 
-/// The devices heard from lately. Everyone interested watches `list`, which changes only when what shows does.
 pub struct Devices {
     known: Mutex<HashMap<String, Device>>,
     list: watch::Sender<Vec<Peer>>,
@@ -57,11 +56,13 @@ impl Devices {
 
     pub fn heard(&self, device: Device) {
         let mut known = self.known.lock().unwrap();
+        if known.len() >= DEVICES_KEPT && !known.contains_key(&device.peer.id) {
+            return;
+        }
         known.insert(device.peer.id.clone(), device);
         self.publish(&known);
     }
 
-    /// Forgets the devices not heard from since `since`, after a scan asked everyone to answer.
     pub fn forget_older(&self, since: Instant) {
         let mut known = self.known.lock().unwrap();
         known.retain(|_, device| device.seen >= since);

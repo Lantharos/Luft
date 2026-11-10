@@ -73,7 +73,7 @@ impl Portal {
             secret.clone(),
             "application/octet-stream".into(),
         );
-        item.owner = requester.owner();
+        item.owner = requester.item_owner();
         keyring
             .edit(|contents| contents.store_item(&collection, item, None))
             .map_err(|error| error.to_string())?;
@@ -104,7 +104,7 @@ impl Portal {
         _options: HashMap<String, OwnedVariant>,
         #[zbus(header)] header: Header<'_>,
     ) -> fdo::Result<(u32, HashMap<String, OwnedVariant>)> {
-        if !self.daemon.sent_by(&header, PORTAL).await {
+        if !self.daemon.sent_by_owner_of(&header, PORTAL).await {
             return Err(fdo::Error::AccessDenied(
                 "Only the desktop portal may ask for app secrets".into(),
             ));

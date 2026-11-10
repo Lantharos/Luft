@@ -5,6 +5,7 @@ use luft_keyring_vault::{Secret, SshKey, SshPrivate, now};
 use luft_keyring_wire::{Reply, Request, TpmKey};
 use p256::ecdsa::{Signature, SigningKey as EcdsaKey};
 use sha2::{Digest, Sha256};
+use zeroize::Zeroizing;
 
 use super::wire::{Reader, Writer};
 use crate::unlocking::link;
@@ -13,6 +14,7 @@ pub const ED25519: &str = "ssh-ed25519";
 pub const ECDSA: &str = "ecdsa-sha2-nistp256";
 const CURVE: &str = "nistp256";
 const POINT: usize = 32;
+const SEED: usize = 32;
 
 pub fn kind(public: &[u8]) -> &'static str {
     match Reader::new(public).string() {
@@ -57,19 +59,23 @@ fn ecdsa_public(x: &[u8], y: &[u8]) -> Vec<u8> {
         .bytes
 }
 
+fn ed25519_seed(bytes: &[u8]) -> Option<Zeroizing<[u8; SEED]>> {
+    let mut seed = Zeroizing::new([0; SEED]);
+    (bytes.len() == SEED).then(|| seed.copy_from_slice(bytes))?;
+    Some(seed)
+}
+
 pub fn generate_software(comment: String) -> SshKey {
-    let mut seed = [0; 32];
-    getrandom::fill(&mut seed).expect("the kernel's random generator is always available");
+    let mut seed = Zeroizing::new([0; SEED]);
+    getrandom::fill(&mut *seed).expect("the kernel's random generator is always available");
     let signing = SigningKey::from_bytes(&seed);
-    let key = SshKey {
+    SshKey {
         comment,
         public: ed25519_public(&signing),
-        private: SshPrivate::Software(Secret::copy_of(&seed)),
+        private: SshPrivate::Software(Secret::copy_of(&*seed)),
         confirm: true,
         added: now(),
-    };
-    seed.fill(0);
-    key
+    }
 }
 
 pub async fn generate_in_chip(comment: String) -> Result<SshKey, String> {
@@ -103,9 +109,9 @@ pub fn parse_added(body: &[u8]) -> Option<(SshKey, Reader<'_>)> {
     let (public, private) = if name == ED25519.as_bytes() {
         reader.string()?;
         let pair = reader.string()?;
-        let seed: [u8; 32] = pair.get(..32)?.try_into().ok()?;
+        let seed = ed25519_seed(pair.get(..SEED)?)?;
         let signing = SigningKey::from_bytes(&seed);
-        (ed25519_public(&signing), Secret::copy_of(&seed))
+        (ed25519_public(&signing), Secret::copy_of(&*seed))
     } else if name == ECDSA.as_bytes() {
         (reader.string()? == CURVE.as_bytes()).then_some(())?;
         let point = reader.string()?;
@@ -133,7 +139,7 @@ pub fn parse_added(body: &[u8]) -> Option<(SshKey, Reader<'_>)> {
 pub async fn sign(key: &SshKey, data: &[u8]) -> Option<Vec<u8>> {
     match &key.private {
         SshPrivate::Software(secret) if kind(&key.public) == "ed25519" => {
-            let seed: [u8; 32] = secret.expose().try_into().ok()?;
+            let seed = ed25519_seed(secret.expose())?;
             let signature = SigningKey::from_bytes(&seed).sign(data);
             Some(
                 Writer::default()

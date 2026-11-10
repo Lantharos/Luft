@@ -18,7 +18,6 @@ use crate::localsend::protocol::{FileDto, Metadata as Times};
 
 const CHUNK: usize = 256 * 1024;
 
-/// What one file of a transfer is read from.
 pub enum Source {
     Path(PathBuf),
     Text(Bytes),
@@ -29,7 +28,6 @@ pub struct Outgoing {
     pub source: Source,
 }
 
-/// The files to send, with folders sent whole under their own name, as LocalSend's apps do.
 pub fn collect(paths: &[PathBuf]) -> io::Result<Vec<Outgoing>> {
     let mut files = Vec::new();
     for path in paths {
@@ -47,7 +45,6 @@ pub fn collect(paths: &[PathBuf]) -> io::Result<Vec<Outgoing>> {
     Ok(files)
 }
 
-/// Text travels as a text file that carries the text as its preview, so the other device can show it right away.
 pub fn text(text: String) -> Outgoing {
     let bytes = Bytes::from(text.clone());
     Outgoing {
@@ -68,7 +65,7 @@ fn describe(name: String, metadata: &Metadata) -> FileDto {
     let stamp = |time: io::Result<std::time::SystemTime>| time.ok().and_then(|time| jiff::Timestamp::try_from(time).ok()).map(|time| time.to_string());
     FileDto {
         id: random_id(),
-        file_type: kind(&name).into(),
+        file_type: mime_type(&name).into(),
         file_name: name,
         size: metadata.len(),
         sha256: None,
@@ -77,8 +74,7 @@ fn describe(name: String, metadata: &Metadata) -> FileDto {
     }
 }
 
-/// The type phones go by to put pictures and videos in their gallery.
-fn kind(name: &str) -> &'static str {
+fn mime_type(name: &str) -> &'static str {
     let extension = name.rsplit_once('.').map(|(_, extension)| extension.to_ascii_lowercase()).unwrap_or_default();
     match extension.as_str() {
         "jpg" | "jpeg" => "image/jpeg",
@@ -111,7 +107,6 @@ fn kind(name: &str) -> &'static str {
     }
 }
 
-/// Reads the file as it goes out, counting what's read into `done`.
 pub fn body(source: &Source, done: Arc<AtomicU64>) -> Body {
     let path = match source {
         Source::Text(bytes) => {

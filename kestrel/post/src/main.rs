@@ -36,7 +36,6 @@ fn main() -> ExitCode {
     }
 }
 
-/// Serves Post on the session bus, and starts finding and serving devices once Kestrel said what people chose.
 async fn run(identity: Identity) -> zbus::Result<()> {
     let system = zbus::Connection::system().await.ok();
     let (link, events) = Link::new();

@@ -2,9 +2,11 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use luft_dbus_macros::introspect;
+use luft_identity::caller::refuse_sandboxed;
 use tokio::sync::mpsc;
+use zbus::message::Header;
 use zbus::object_server::{InterfaceRef, SignalEmitter};
-use zbus::{ObjectServer, fdo, interface};
+use zbus::{Connection, ObjectServer, fdo, interface};
 
 use crate::app::App;
 use crate::config::{Config, Visibility};
@@ -13,9 +15,9 @@ use crate::localsend::send::What;
 
 pub const NAME: &str = "com.lantharos.Kestrel.Post";
 pub const PATH: &str = "/com/lantharos/Kestrel/Post";
-const PIN_DIGITS: usize = 6;
+const PINS: u32 = 1_000_000;
+const EVENLY_SPREAD_BELOW: u32 = u32::MAX - u32::MAX % PINS;
 
-/// Post on the session bus, for Kestrel and Settings: who's nearby, sending to them, and what they send.
 pub struct Post {
     app: Arc<App>,
     alias: String,
@@ -32,27 +34,29 @@ impl Post {
 }
 
 fn new_pin() -> String {
-    let mut bytes = [0u8; PIN_DIGITS];
-    getrandom::fill(&mut bytes).expect("the system has randomness");
-    bytes.iter().map(|byte| char::from(b'0' + byte % 10)).collect()
+    loop {
+        let mut bytes = [0u8; 4];
+        getrandom::fill(&mut bytes).expect("the system has randomness");
+        let drawn = u32::from_ne_bytes(bytes);
+        if drawn < EVENLY_SPREAD_BELOW {
+            return format!("{:06}", drawn % PINS);
+        }
+    }
 }
 
 #[introspect]
 #[interface(name = "com.lantharos.Kestrel.Post")]
 impl Post {
-    /// The name other devices see.
     #[zbus(property)]
     fn alias(&self) -> String {
         self.alias.clone()
     }
 
-    /// Where received files go.
     #[zbus(property)]
     fn folder(&self) -> String {
         self.folder.clone()
     }
 
-    /// The devices nearby: id, name, kind such as `mobile`, model, and whether its certificate proved its id.
     #[zbus(property)]
     fn devices(&self) -> Vec<Peer> {
         self.devices.clone()
@@ -63,91 +67,94 @@ impl Post {
         self.scanning
     }
 
-    /// Whether Post has its port, which another app may hold instead.
     #[zbus(property)]
     fn listening(&self) -> bool {
         self.listening
     }
 
-    /// What people chose: `no-one`, `your-devices` or `everyone`, a name and a folder (empty for the defaults), and
-    /// the fingerprints of their devices.
-    fn configure(&self, visibility: &str, name: &str, folder: &str, trusted: Vec<String>) -> fdo::Result<()> {
+    async fn configure(&self, visibility: &str, name: &str, folder: &str, trusted: Vec<String>, #[zbus(header)] header: Header<'_>, #[zbus(connection)] bus: &Connection) -> fdo::Result<()> {
+        refuse_sandboxed(bus, &header).await?;
         let visibility = Visibility::parse(visibility).ok_or_else(|| fdo::Error::InvalidArgs(format!("{visibility} isn't a visibility")))?;
         let folder = Some(folder).filter(|folder| !folder.is_empty()).map(PathBuf::from);
         self.app.configure(Config { visibility, alias: Some(name.to_owned()), folder, trusted });
         Ok(())
     }
 
-    fn scan(&self) {
+    async fn scan(&self, #[zbus(header)] header: Header<'_>, #[zbus(connection)] bus: &Connection) -> fdo::Result<()> {
+        refuse_sandboxed(bus, &header).await?;
         self.app.scans.notify_one();
+        Ok(())
     }
 
-    /// Starts sending files and folders, and returns the transfer's id.
-    fn send(&self, device: &str, paths: Vec<String>) -> String {
-        self.app.outbox.send(&self.app, device, What::Files(paths.into_iter().map(PathBuf::from).collect()))
+    async fn send(&self, device: &str, paths: Vec<String>, #[zbus(header)] header: Header<'_>, #[zbus(connection)] bus: &Connection) -> fdo::Result<String> {
+        refuse_sandboxed(bus, &header).await?;
+        Ok(self.app.outbox.send(&self.app, device, What::Files(paths.into_iter().map(PathBuf::from).collect())))
     }
 
-    /// Starts sending text, which the other device shows or puts on its clipboard, and returns the transfer's id.
-    fn send_text(&self, device: &str, text: String) -> String {
-        self.app.outbox.send(&self.app, device, What::Text(text))
+    async fn send_text(&self, device: &str, text: String, #[zbus(header)] header: Header<'_>, #[zbus(connection)] bus: &Connection) -> fdo::Result<String> {
+        refuse_sandboxed(bus, &header).await?;
+        Ok(self.app.outbox.send(&self.app, device, What::Text(text)))
     }
 
-    fn accept(&self, id: &str) {
+    async fn accept(&self, id: &str, #[zbus(header)] header: Header<'_>, #[zbus(connection)] bus: &Connection) -> fdo::Result<()> {
+        refuse_sandboxed(bus, &header).await?;
         self.app.inbox.accept(id);
+        Ok(())
     }
 
-    fn decline(&self, id: &str) {
+    async fn decline(&self, id: &str, #[zbus(header)] header: Header<'_>, #[zbus(connection)] bus: &Connection) -> fdo::Result<()> {
+        refuse_sandboxed(bus, &header).await?;
         self.app.inbox.decline(id);
+        Ok(())
     }
 
-    fn cancel(&self, id: &str) {
+    async fn cancel(&self, id: &str, #[zbus(header)] header: Header<'_>, #[zbus(connection)] bus: &Connection) -> fdo::Result<()> {
+        refuse_sandboxed(bus, &header).await?;
         self.app.inbox.cancel(&self.app, id);
         self.app.outbox.cancel(id);
+        Ok(())
     }
 
-    fn answer_pin(&self, id: &str, pin: String) {
+    async fn answer_pin(&self, id: &str, pin: String, #[zbus(header)] header: Header<'_>, #[zbus(connection)] bus: &Connection) -> fdo::Result<()> {
+        refuse_sandboxed(bus, &header).await?;
         self.app.outbox.pin(id, pin);
+        Ok(())
     }
 
-    /// Lets nearby devices find this computer while Settings adds one of your devices, and returns the PIN it enters.
-    fn start_pairing(&self) -> fdo::Result<String> {
+    async fn start_pairing(&self, #[zbus(header)] header: Header<'_>, #[zbus(connection)] bus: &Connection) -> fdo::Result<String> {
+        refuse_sandboxed(bus, &header).await?;
         if self.app.visibility() == Visibility::NoOne {
             return Err(fdo::Error::Failed("No one can find this computer".into()));
         }
         let pin = new_pin();
         self.app.inbox.forget_attempts();
-        *self.app.pairing.lock().unwrap() = Some(pin.clone());
+        self.app.start_pairing(pin.clone());
         self.app.scans.notify_one();
         Ok(pin)
     }
 
-    fn stop_pairing(&self) {
-        self.app.pairing.lock().unwrap().take();
+    async fn stop_pairing(&self, #[zbus(header)] header: Header<'_>, #[zbus(connection)] bus: &Connection) -> fdo::Result<()> {
+        refuse_sandboxed(bus, &header).await?;
+        self.app.stop_pairing();
+        Ok(())
     }
 
-    /// A device offers files, which wait for `Accept` or `Decline`.
     #[zbus(signal)]
     async fn offer(emitter: &SignalEmitter<'_>, id: &str, from: &Peer, files: &[Offered], size: u64) -> zbus::Result<()>;
 
     #[zbus(signal)]
     async fn text(emitter: &SignalEmitter<'_>, from: &Peer, text: &str, trusted: bool) -> zbus::Result<()>;
 
-    /// How a transfer is going: `direction` is `in` or `out`, `stage` `waiting`, `pin`, `wrong-pin` or `moving`, and
-    /// `progress` the bytes done, the bytes in all and the number of files.
     #[zbus(signal)]
     async fn transfer(emitter: &SignalEmitter<'_>, id: &str, direction: &str, device: &str, stage: &str, progress: (u64, u64, u32)) -> zbus::Result<()>;
 
-    /// A transfer ended: `outcome` is `done`, `declined`, `cancelled`, `cancelled-there`, `busy`, `unreachable` or
-    /// `failed`, and `saved` the files that arrived.
     #[zbus(signal)]
     async fn finished(emitter: &SignalEmitter<'_>, id: &str, direction: &str, device: &str, outcome: &str, saved: &[String]) -> zbus::Result<()>;
 
-    /// A device entered the PIN Settings showed and is one of your devices now.
     #[zbus(signal)]
     async fn paired(emitter: &SignalEmitter<'_>, device: &Peer) -> zbus::Result<()>;
 }
 
-/// Passes what Post's parts say on to the bus, in order.
 pub async fn pump(server: ObjectServer, mut events: mpsc::UnboundedReceiver<Event>) {
     let Ok(post) = server.interface::<_, Post>(PATH).await else { return };
     while let Some(event) = events.recv().await {

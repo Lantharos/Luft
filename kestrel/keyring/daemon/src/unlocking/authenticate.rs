@@ -79,7 +79,7 @@ async fn converse(mode: Mode, password: Option<&[u8]>) -> std::io::Result<Outcom
 }
 
 fn answer(password: &[u8]) -> Zeroizing<Vec<u8>> {
-    let mut payload = Zeroizing::new(Vec::with_capacity(64 + password.len() * 2));
+    let mut payload = Zeroizing::new(Vec::with_capacity(64 + password.len() * 6));
     payload.extend_from_slice(br#"{"type":"post_auth_message_response","response":""#);
     for character in String::from_utf8_lossy(password).chars() {
         match character {

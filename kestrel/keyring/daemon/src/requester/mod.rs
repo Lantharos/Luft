@@ -13,18 +13,12 @@ use zbus::names::BusName;
 pub use luft_identity::caller::Caller;
 
 const SABINE_HOST: &str = "sabine-host";
-/// Prefixes the owner of items, and the app secrets, of an app in a sandbox.
-pub const SANDBOXED: &str = "flatpak:";
+pub const SANDBOXED_OWNER_PREFIX: &str = "flatpak:";
 const YOU: &str = "you";
 const UNKNOWN: &str = "unknown";
 
-/// Marks items the Chromium that Sabine apps share created. They are yours
-/// like any other, only kept out of other programs' searches.
-pub const SABINE: &str = "sabine";
+pub const SABINE_OWNER: &str = "sabine";
 
-/// Which items a requester's searches show. Your browser and the Chromium
-/// Sabine apps share both keep their key under `application=chromium`, so
-/// each must only find its own.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum View {
     Everything,
@@ -77,18 +71,15 @@ impl Requester {
         self.caller.app()
     }
 
-    /// The owner recorded on items it creates.
-    pub fn owner(&self) -> Option<String> {
+    pub fn item_owner(&self) -> Option<String> {
         match (&self.caller, self.view) {
-            (Caller::App(id), _) => Some(format!("{SANDBOXED}{id}")),
-            (Caller::You, View::SabineChromium) => Some(SABINE.to_owned()),
+            (Caller::App(id), _) => Some(format!("{SANDBOXED_OWNER_PREFIX}{id}")),
+            (Caller::You, View::SabineChromium) => Some(SABINE_OWNER.to_owned()),
             _ => None,
         }
     }
 
-    /// How prompts name it, mid-sentence: sandboxed apps by name, any other
-    /// program without guessing what it is.
-    pub fn named(&self) -> String {
+    pub fn named_mid_sentence(&self) -> String {
         match &self.caller {
             Caller::App(id) => app_name(id),
             Caller::You => "an app on this computer".into(),
@@ -96,9 +87,8 @@ impl Requester {
         }
     }
 
-    /// The same at the start of a sentence.
-    pub fn named_first(&self) -> String {
-        let named = self.named();
+    pub fn named_starting_a_sentence(&self) -> String {
+        let named = self.named_mid_sentence();
         let mut characters = named.chars();
         characters.next().map_or(named.clone(), |first| {
             first.to_uppercase().chain(characters).collect()
@@ -109,18 +99,15 @@ impl Requester {
         self.sandboxed_app().unwrap_or_default()
     }
 
-    /// Who the access history files it under.
-    pub fn principal(&self) -> String {
+    pub fn history_key(&self) -> String {
         match &self.caller {
-            Caller::App(id) => format!("{SANDBOXED}{id}"),
+            Caller::App(id) => format!("{SANDBOXED_OWNER_PREFIX}{id}"),
             Caller::You => YOU.into(),
             Caller::Unknown => UNKNOWN.into(),
         }
     }
 
-    /// What the access history shows for it. For your own programs that is
-    /// the program's file name, which only labels the entry.
-    pub fn label(&self) -> String {
+    pub fn history_label(&self) -> String {
         match &self.caller {
             Caller::App(id) => app_name(id),
             Caller::You => self.program.clone(),
@@ -133,9 +120,8 @@ pub fn app_name(id: &str) -> String {
     desktop::name(id).unwrap_or_else(|| id.to_owned())
 }
 
-/// The sandboxed app an item owner or app store key names, when it is one's.
 pub fn sandboxed_app_of(key: &str) -> Option<&str> {
-    key.strip_prefix(SANDBOXED)
+    key.strip_prefix(SANDBOXED_OWNER_PREFIX)
 }
 
 #[derive(Default)]

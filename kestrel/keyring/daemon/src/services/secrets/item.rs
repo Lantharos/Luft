@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 use std::sync::Arc;
 
 use luft_dbus_macros::introspect;
@@ -12,6 +12,7 @@ use super::service::sender;
 use super::session::{decode, encode};
 use super::{Secret, SecretError, collection_path, item_path, none, sync};
 use crate::daemon::Daemon;
+use crate::keyring::has_protected_schema;
 use crate::requester::Requester;
 
 pub struct Item {
@@ -179,15 +180,19 @@ impl Item {
         #[zbus(header)] header: Option<Header<'_>>,
     ) -> fdo::Result<()> {
         let header = header.ok_or_else(|| fdo::Error::AccessDenied("Unknown caller".into()))?;
+        let attributes: BTreeMap<String, String> = attributes.into_iter().collect();
+        if has_protected_schema(&attributes) {
+            return Err(fdo::Error::AccessDenied(
+                "Apps can't change this through the Secret Service".into(),
+            ));
+        }
         let requester = self
             .permit(&header)
             .await
             .map_err(|_| fdo::Error::AccessDenied("The item is locked".into()))?;
-        self.change(&requester, |item| {
-            item.attributes = attributes.into_iter().collect()
-        })
-        .await
-        .map_err(|_| fdo::Error::Failed("The item couldn't be changed".into()))
+        self.change(&requester, |item| item.attributes = attributes)
+            .await
+            .map_err(|_| fdo::Error::Failed("The item couldn't be changed".into()))
     }
 
     #[zbus(property)]

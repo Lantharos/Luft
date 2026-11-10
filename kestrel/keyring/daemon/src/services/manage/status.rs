@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use luft_dbus_macros::introspect;
 use luft_keyring_wire::{Chip, Problem};
+use tokio::sync::Mutex;
 use zbus::message::Header;
 use zbus::{fdo, interface};
 
@@ -10,6 +11,18 @@ use crate::daemon::Daemon;
 
 pub struct Status {
     pub daemon: Arc<Daemon>,
+    published: Mutex<Option<Published>>,
+}
+
+#[derive(Clone, PartialEq, Eq)]
+struct Published {
+    locked: bool,
+    tpm_sealed: bool,
+    fingerprint_unlock: bool,
+    item_count: u32,
+    chip: String,
+    pin: bool,
+    lock_with_screen: bool,
 }
 
 pub async fn publish(daemon: &Daemon) {
@@ -23,13 +36,36 @@ pub async fn publish(daemon: &Daemon) {
     };
     let emitter = status.signal_emitter();
     let status = status.get().await;
-    let _ = status.locked_changed(emitter).await;
-    let _ = status.tpm_sealed_changed(emitter).await;
-    let _ = status.fingerprint_unlock_changed(emitter).await;
-    let _ = status.item_count_changed(emitter).await;
-    let _ = status.chip_changed(emitter).await;
-    let _ = status.pin_changed(emitter).await;
-    let _ = status.lock_with_screen_changed(emitter).await;
+    let now = status.values().await;
+    let before = status.published.lock().await.replace(now.clone());
+    let differs = |same: fn(&Published, &Published) -> bool| {
+        before.as_ref().is_none_or(|before| !same(before, &now))
+    };
+    if differs(|before, now| before.locked == now.locked) {
+        let _ = status.locked_changed(emitter).await;
+    }
+    if differs(|before, now| before.tpm_sealed == now.tpm_sealed) {
+        let _ = status.tpm_sealed_changed(emitter).await;
+    }
+    if differs(|before, now| before.fingerprint_unlock == now.fingerprint_unlock) {
+        let _ = status.fingerprint_unlock_changed(emitter).await;
+    }
+    if differs(|before, now| before.item_count == now.item_count) {
+        let _ = status.item_count_changed(emitter).await;
+    }
+    if differs(|before, now| before.chip == now.chip) {
+        let _ = status.chip_changed(emitter).await;
+    }
+    if differs(|before, now| before.pin == now.pin) {
+        let _ = status.pin_changed(emitter).await;
+    }
+    if differs(|before, now| before.lock_with_screen == now.lock_with_screen) {
+        let _ = status.lock_with_screen_changed(emitter).await;
+    }
+    history_changed(daemon).await;
+}
+
+pub async fn history_changed(daemon: &Daemon) {
     if let Ok(access) = daemon
         .connection
         .object_server()
@@ -53,6 +89,26 @@ fn chip_name(chip: &Chip) -> &'static str {
 }
 
 impl Status {
+    pub fn new(daemon: Arc<Daemon>) -> Self {
+        Self {
+            daemon,
+            published: Mutex::default(),
+        }
+    }
+
+    async fn values(&self) -> Published {
+        let sealed = self.sealed().await;
+        Published {
+            locked: self.locked().await,
+            tpm_sealed: sealed.is_some(),
+            fingerprint_unlock: self.fingerprint_unlock().await,
+            item_count: self.item_count().await,
+            chip: self.chip().await,
+            pin: sealed == Some(true),
+            lock_with_screen: self.lock_with_screen().await,
+        }
+    }
+
     async fn sealed(&self) -> Option<bool> {
         if self
             .daemon
@@ -75,8 +131,10 @@ impl Status {
 #[introspect]
 #[interface(name = "com.lantharos.Keyring1")]
 impl Status {
-    async fn lock(&self) {
+    async fn lock(&self, #[zbus(header)] header: Header<'_>) -> fdo::Result<()> {
+        yours(&self.daemon, &header).await?;
         self.daemon.lock().await;
+        Ok(())
     }
 
     async fn unlock(&self, #[zbus(header)] header: Header<'_>) -> bool {

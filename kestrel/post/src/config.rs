@@ -1,6 +1,5 @@
 use std::path::PathBuf;
 
-/// Who can find this computer and send to it.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum Visibility {
     NoOne,
@@ -20,15 +19,11 @@ impl Visibility {
     }
 }
 
-/// What people chose for Post in Settings.
 #[derive(Clone, Debug, Default)]
 pub struct Config {
     pub visibility: Visibility,
-    /// The name other devices show, or the computer's name when there's none.
     pub alias: Option<String>,
-    /// Where received files go, or Downloads when there's none.
     pub folder: Option<PathBuf>,
-    /// The fingerprints of your devices.
     pub trusted: Vec<String>,
 }
 
@@ -46,7 +41,6 @@ impl Config {
     }
 }
 
-/// The computer's name as people set it, the same one Settings shows, from hostnamed.
 pub async fn computer_name(system: Option<&zbus::Connection>) -> String {
     let named = async {
         let hostnamed = zbus::Proxy::new(

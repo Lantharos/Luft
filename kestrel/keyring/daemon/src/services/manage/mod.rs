@@ -10,7 +10,7 @@ use zbus::message::Header;
 
 pub use access::Access;
 pub use apps::AppSecrets;
-pub use status::{Status, publish};
+pub use status::{Status, history_changed, publish};
 
 use crate::daemon::Daemon;
 use crate::requester::Requester;
@@ -21,7 +21,7 @@ pub const PATH: &str = "/com/lantharos/Keyring1";
 pub async fn serve(daemon: &Arc<Daemon>) -> zbus::Result<()> {
     let server = daemon.connection.object_server();
     let daemon = || daemon.clone();
-    server.at(PATH, Status { daemon: daemon() }).await?;
+    server.at(PATH, Status::new(daemon())).await?;
     server.at(PATH, Access { daemon: daemon() }).await?;
     server.at(PATH, AppSecrets { daemon: daemon() }).await?;
     server.at(PATH, ssh::Ssh { daemon: daemon() }).await?;

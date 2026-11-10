@@ -24,7 +24,6 @@ pub type Body = BoxBody<Bytes, io::Error>;
 
 const ANSWER_LIMIT: usize = 1 << 20;
 
-/// Where a device's server is, and the fingerprint its certificate must have, when it's known.
 #[derive(Clone, Debug)]
 pub struct Target<'a> {
     pub address: SocketAddr,
@@ -32,7 +31,6 @@ pub struct Target<'a> {
     pub fingerprint: Option<&'a str>,
 }
 
-/// A connection to a device, with the fingerprint its certificate showed.
 pub struct Connection {
     sender: SendRequest<Body>,
     host: String,
@@ -94,7 +92,6 @@ pub fn empty() -> Body {
     full(Bytes::new())
 }
 
-/// Reads an answer as JSON, refusing one that's unreasonably large.
 pub async fn json<T: DeserializeOwned>(response: Response<hyper::body::Incoming>) -> io::Result<T> {
     let body = Limited::new(response.into_body(), ANSWER_LIMIT).collect().await.map_err(io::Error::other)?;
     serde_json::from_slice(&body.to_bytes()).map_err(io::Error::other)

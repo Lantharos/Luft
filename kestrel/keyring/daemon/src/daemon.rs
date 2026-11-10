@@ -31,6 +31,7 @@ pub struct Daemon {
     pub unlocked: watch::Sender<bool>,
     pub screen_locked: AtomicBool,
     pub changed: Arc<Notify>,
+    pub recorded: Arc<Notify>,
     pub objects: Mutex<BTreeSet<Target>>,
     pub dismissed: std::sync::Mutex<Option<Instant>>,
 }
@@ -38,6 +39,7 @@ pub struct Daemon {
 impl Daemon {
     pub fn new(connection: Connection, keyring: Keyring) -> Self {
         let changed = keyring.changes.clone();
+        let recorded = keyring.recorded.clone();
         Self {
             prompter: Prompter::new(connection.clone()),
             connection,
@@ -53,13 +55,13 @@ impl Daemon {
             unlocked: watch::Sender::new(false),
             screen_locked: AtomicBool::new(false),
             changed,
+            recorded,
             objects: Mutex::default(),
             dismissed: std::sync::Mutex::default(),
         }
     }
 
-    /// Whether a message comes from the current owner of a well-known name.
-    pub async fn sent_by(&self, header: &Header<'_>, name: &'static str) -> bool {
+    pub async fn sent_by_owner_of(&self, header: &Header<'_>, name: &'static str) -> bool {
         let Ok(proxy) = DBusProxy::new(&self.connection).await else {
             return false;
         };

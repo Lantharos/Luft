@@ -11,8 +11,6 @@ use crate::prompter::Request as Prompt;
 const FINGERPRINT_ROUNDS: usize = 3;
 
 impl Daemon {
-    /// Asks you to prove it's you, by password or fingerprint, before an app
-    /// on this computer gets something no app gets on its own word.
     pub async fn confirm_its_you(self: &Arc<Self>, title: &str, body: &str) -> bool {
         if !authenticate::available() {
             eprintln!("There's no sign-in service to confirm it's you");

@@ -27,25 +27,21 @@ impl Session {
         let mut session = Self {
             stream: UnixStream::connect(socket()).await?,
         };
-        let reply = session
-            .request(&json!({ "type": "create_session", "username": user, "mode": mode }))
-            .await?;
+        let greeting = serde_json::to_vec(
+            &json!({ "type": "create_session", "username": user, "mode": mode }),
+        )?;
+        let reply = session.request(&greeting).await?;
         Ok((session, reply))
     }
 
     pub async fn answer(&mut self, response: Option<&str>) -> io::Result<Reply> {
-        let mut message = json!({ "type": "post_auth_message_response" });
-        if let Some(response) = response {
-            message["response"] = Value::from(response);
-        }
-        self.request(&message).await
+        self.request(&answer(response)).await
     }
 
-    async fn request(&mut self, message: &Value) -> io::Result<Reply> {
-        let payload = Zeroizing::new(serde_json::to_vec(message)?);
+    async fn request(&mut self, payload: &[u8]) -> io::Result<Reply> {
         let length = u32::try_from(payload.len()).map_err(io::Error::other)?;
         self.stream.write_all(&length.to_ne_bytes()).await?;
-        self.stream.write_all(&payload).await?;
+        self.stream.write_all(payload).await?;
         let mut header = [0; 4];
         self.stream.read_exact(&mut header).await?;
         let mut body = vec![0; u32::from_ne_bytes(header) as usize];
@@ -66,6 +62,30 @@ impl Session {
             _ => Reply::Failure,
         })
     }
+}
+
+fn answer(response: Option<&str>) -> Zeroizing<Vec<u8>> {
+    let longest = response.map_or(0, |response| response.len() * 6);
+    let mut payload = Zeroizing::new(Vec::with_capacity(64 + longest));
+    payload.extend_from_slice(br#"{"type":"post_auth_message_response""#);
+    if let Some(response) = response {
+        payload.extend_from_slice(br#","response":""#);
+        for character in response.chars() {
+            match character {
+                '"' => payload.extend_from_slice(b"\\\""),
+                '\\' => payload.extend_from_slice(b"\\\\"),
+                character if character.is_control() => {
+                    payload.extend_from_slice(format!("\\u{:04x}", u32::from(character)).as_bytes())
+                }
+                character => {
+                    payload.extend_from_slice(character.encode_utf8(&mut [0; 4]).as_bytes())
+                }
+            }
+        }
+        payload.push(b'"');
+    }
+    payload.push(b'}');
+    payload
 }
 
 pub async fn password(user: &str, password: &str) -> bool {

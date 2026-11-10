@@ -140,7 +140,7 @@ async fn sign(daemon: &Arc<Daemon>, requester: &Requester, body: &[u8]) -> Optio
             .find(|key| key.public == public)?
             .clone()
     };
-    if key.confirm && !confirm::confirm(daemon, requester, &key).await {
+    if (key.confirm || !requester.is_you()) && !confirm::confirm(daemon, requester, &key).await {
         return None;
     }
     let signature = keys::sign(&key, data).await?;

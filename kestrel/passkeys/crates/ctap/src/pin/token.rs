@@ -11,6 +11,7 @@ pub const CREDENTIAL_MANAGEMENT: u8 = 0x04;
 pub const SUPPORTED: u8 = MAKE_CREDENTIAL | GET_ASSERTION | CREDENTIAL_MANAGEMENT;
 
 const IDLE_LIMIT: Duration = Duration::from_secs(30);
+const LIFETIME: Duration = Duration::from_secs(600);
 
 pub struct Token {
     key: Zeroizing<[u8; 32]>,
@@ -18,6 +19,7 @@ pub struct Token {
     permissions: u8,
     rp_id: Option<String>,
     user_present: bool,
+    issued: Instant,
     last_used: Instant,
 }
 
@@ -29,6 +31,7 @@ impl Token {
             permissions,
             rp_id,
             user_present: true,
+            issued: Instant::now(),
             last_used: Instant::now(),
         }
     }
@@ -45,7 +48,7 @@ impl Token {
         permission: u8,
         rp_id: Option<&str>,
     ) -> Result<()> {
-        let fresh = self.last_used.elapsed() < IDLE_LIMIT;
+        let fresh = self.last_used.elapsed() < IDLE_LIMIT && self.issued.elapsed() < LIFETIME;
         if !fresh
             || protocol != self.protocol
             || !protocol.verify(self.key.as_slice(), message, param)
@@ -101,6 +104,23 @@ mod tests {
                 GET_ASSERTION,
                 Some("evil.example")
             ),
+            Err(Status::PinAuthInvalid)
+        );
+    }
+
+    #[test]
+    fn expires_ten_minutes_after_it_was_issued_even_while_used() {
+        let mut token = Token::issue(Protocol::Two, GET_ASSERTION, None);
+        let param = Protocol::Two.authenticate(token.key(), b"hash");
+        token.issued = Instant::now()
+            .checked_sub(LIFETIME - Duration::from_secs(1))
+            .unwrap();
+        token
+            .authorize(Protocol::Two, b"hash", &param, GET_ASSERTION, None)
+            .unwrap();
+        token.issued = Instant::now().checked_sub(LIFETIME).unwrap();
+        assert_eq!(
+            token.authorize(Protocol::Two, b"hash", &param, GET_ASSERTION, None),
             Err(Status::PinAuthInvalid)
         );
     }

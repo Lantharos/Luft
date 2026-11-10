@@ -11,11 +11,11 @@ use hyper::header::CONTENT_TYPE;
 use hyper::server::conn::http1;
 use hyper::service::service_fn;
 use hyper::{Method, Request, Response, StatusCode};
-use hyper_util::rt::TokioIo;
+use hyper_util::rt::{TokioIo, TokioTimer};
 use serde::Serialize;
 use serde::de::DeserializeOwned;
 use tokio::net::TcpListener;
-use tokio::sync::watch;
+use tokio::sync::{Semaphore, watch};
 use tokio::time::{sleep, timeout};
 use tokio_rustls::TlsAcceptor;
 
@@ -29,18 +29,18 @@ use crate::localsend::tls;
 pub type Answer = Response<Full<Bytes>>;
 
 const HANDSHAKE_WITHIN: Duration = Duration::from_secs(10);
+const HEADERS_WITHIN: Duration = Duration::from_secs(30);
 const RETRY_AFTER: Duration = Duration::from_secs(10);
+const ACCEPT_AGAIN_AFTER: Duration = Duration::from_secs(1);
+const CONNECTIONS_AT_ONCE: usize = 64;
 const REQUEST_LIMIT: usize = 16 << 20;
 
-/// Who's on the other end of a request: where it came from, and the fingerprint its certificate proved, if it showed one.
 #[derive(Clone, Debug)]
 pub struct Caller {
     pub address: SocketAddr,
     pub fingerprint: Option<String>,
 }
 
-/// Serves LocalSend's API on port 53317 while someone may find this computer, binding again while something else holds
-/// the port.
 pub async fn run(app: Arc<App>) {
     let config = tls::server_config(&app.identity).expect("this computer's certificate works");
     let acceptor = TlsAcceptor::from(config);
@@ -77,7 +77,6 @@ pub async fn run(app: Arc<App>) {
     }
 }
 
-/// Returns once people chose that no one finds this computer.
 async fn closed(app: &App, changes: &mut watch::Receiver<Config>) {
     while changes.changed().await.is_ok() {
         if app.visibility() == Visibility::NoOne {
@@ -88,10 +87,17 @@ async fn closed(app: &App, changes: &mut watch::Receiver<Config>) {
 }
 
 async fn accept(app: &Arc<App>, acceptor: &TlsAcceptor, listener: TcpListener) {
-    while let Ok((tcp, address)) = listener.accept().await {
+    let connections = Arc::new(Semaphore::new(CONNECTIONS_AT_ONCE));
+    loop {
+        let connection = connections.clone().acquire_owned().await.expect("the semaphore stays open");
+        let Ok((tcp, address)) = listener.accept().await else {
+            sleep(ACCEPT_AGAIN_AFTER).await;
+            continue;
+        };
         let _ = tcp.set_nodelay(true);
         let (app, acceptor) = (app.clone(), acceptor.clone());
         tokio::spawn(async move {
+            let _connection = connection;
             let Ok(Ok(stream)) = timeout(HANDSHAKE_WITHIN, acceptor.accept(tcp)).await else {
                 return;
             };
@@ -101,7 +107,7 @@ async fn accept(app: &Arc<App>, acceptor: &TlsAcceptor, listener: TcpListener) {
                 let (app, caller) = (app.clone(), caller.clone());
                 async move { Ok::<_, Infallible>(route(&app, &caller, request).await) }
             });
-            let _ = http1::Builder::new().serve_connection(TokioIo::new(stream), service).await;
+            let _ = http1::Builder::new().timer(TokioTimer::new()).header_read_timeout(HEADERS_WITHIN).serve_connection(TokioIo::new(stream), service).await;
         });
     }
 }
@@ -125,7 +131,6 @@ async fn route(app: &Arc<App>, caller: &Caller, request: Request<Incoming>) -> A
     }
 }
 
-/// Another device answers an announcement, or looks for this computer: it shows up among the devices.
 async fn register(app: &App, caller: &Caller, request: Request<Incoming>) -> Answer {
     let Ok(presence) = read::<Presence>(request).await else {
         return status(StatusCode::BAD_REQUEST);

@@ -12,8 +12,10 @@ use super::service::sender;
 use super::session::decode;
 use super::{Properties, Secret, SecretError, Target, item_path, none, sync};
 use crate::daemon::Daemon;
+use crate::keyring::has_protected_schema;
 use crate::prompter::{Answer, Request};
 use crate::requester::Requester;
+use crate::services::passkeys;
 
 const ITEM_LABEL: &str = "org.freedesktop.Secret.Item.Label";
 const ITEM_ATTRIBUTES: &str = "org.freedesktop.Secret.Item.Attributes";
@@ -41,10 +43,7 @@ impl Collection {
         keyring.view()?.collection(&id).map(read)
     }
 
-    /// The item a save replaces: one with the same attributes that the
-    /// requester may already use. Anything else stays as it is, and the
-    /// requester gets an item of its own.
-    async fn replaceable(
+    async fn item_to_replace(
         &self,
         requester: &Requester,
         id: &str,
@@ -79,6 +78,9 @@ impl Collection {
     ) -> Result<OwnedObjectPath, SecretError> {
         let requester = self.daemon.requester(&header).await;
         let id = self.id().await.ok_or_else(SecretError::missing)?;
+        if id == passkeys::COLLECTION {
+            return Err(SecretError::refused());
+        }
         if !self.daemon.ensure_unlocked(&requester, true).await {
             return Err(SecretError::locked());
         }
@@ -88,7 +90,7 @@ impl Collection {
             .unwrap_or_default();
         let title = format!(
             "Allow {} to delete “{label}” and everything in it?",
-            requester.named()
+            requester.named_mid_sentence()
         );
         let request = Request {
             title: &title,
@@ -156,6 +158,9 @@ impl Collection {
     ) -> Result<(OwnedObjectPath, OwnedObjectPath), SecretError> {
         let requester = self.daemon.requester(&header).await;
         let id = self.id().await.ok_or_else(SecretError::missing)?;
+        if id == passkeys::COLLECTION {
+            return Err(SecretError::refused());
+        }
         let transfer = self
             .daemon
             .sessions
@@ -176,8 +181,11 @@ impl Collection {
             .unwrap_or_default()
             .into_iter()
             .collect();
+        if has_protected_schema(&attributes) {
+            return Err(SecretError::refused());
+        }
         let existing = if replace {
-            self.replaceable(&requester, &id, &attributes).await
+            self.item_to_replace(&requester, &id, &attributes).await
         } else {
             None
         };
@@ -192,7 +200,7 @@ impl Collection {
             Stored::copy_of(&value),
             secret.3.clone(),
         );
-        item.owner = requester.owner();
+        item.owner = requester.item_owner();
         let stored = self
             .daemon
             .keyring
@@ -241,7 +249,17 @@ impl Collection {
     }
 
     #[zbus(property)]
-    async fn set_label(&self, label: String) -> fdo::Result<()> {
+    async fn set_label(
+        &self,
+        label: String,
+        #[zbus(header)] header: Option<Header<'_>>,
+    ) -> fdo::Result<()> {
+        let header = header.ok_or_else(|| fdo::Error::AccessDenied("Unknown caller".into()))?;
+        if !self.daemon.requester(&header).await.is_you() {
+            return Err(fdo::Error::AccessDenied(
+                "Apps in a sandbox can't rename a collection".into(),
+            ));
+        }
         let id = self
             .id()
             .await

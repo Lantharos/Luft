@@ -10,7 +10,6 @@ use crate::events::{Direction, Event, Link, Stage};
 const EVERY: Duration = Duration::from_millis(250);
 const STALLED_AFTER: Duration = Duration::from_secs(90);
 
-/// A transfer Kestrel shows: how far it got, out of how much.
 pub struct Transfer {
     pub id: String,
     pub direction: Direction,
@@ -33,9 +32,7 @@ impl Transfer {
         });
     }
 
-    /// Tells Kestrel how far it is a few times a second, until `stop`. Returns `false` when nothing moved for
-    /// so long that the other device must be gone.
-    pub async fn follow(&self, link: &Link, mut stop: watch::Receiver<bool>) -> bool {
+    pub async fn report_until_stopped_or_stalled(&self, link: &Link, mut stop: watch::Receiver<bool>) -> bool {
         let mut ticks = interval(EVERY);
         ticks.set_missed_tick_behavior(MissedTickBehavior::Delay);
         let mut last = (u64::MAX, Instant::now());

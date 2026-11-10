@@ -13,7 +13,6 @@ pub enum Scheme {
     Https,
 }
 
-/// What a device says about itself in `/register` answers and `/info`.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Info {
@@ -30,7 +29,6 @@ pub struct Info {
     pub download: bool,
 }
 
-/// An announcement, a `/register` request, or the sender in a `prepare-upload`: who a device is and where it listens.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Presence {
     #[serde(flatten)]
@@ -93,7 +91,6 @@ fn default_scheme() -> Scheme {
 }
 
 impl FileDto {
-    /// A message travels as a single text file with the text as its preview, and needs no upload.
     pub fn message(files: &HashMap<String, FileDto>) -> Option<&str> {
         let mut only = files.values();
         let file = only.next()?;

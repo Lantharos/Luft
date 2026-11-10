@@ -33,14 +33,14 @@ impl From<io::Error> for FrameError {
 }
 
 fn encode(message: &impl Serialize) -> Result<Zeroizing<Vec<u8>>, FrameError> {
-    let payload = Zeroizing::new(postcard::to_stdvec(message).map_err(FrameError::Malformed)?);
-    if payload.len() > MAX_FRAME {
-        return Err(FrameError::TooLarge(payload.len()));
+    let size = postcard::experimental::serialized_size(message).map_err(FrameError::Malformed)?;
+    if size > MAX_FRAME {
+        return Err(FrameError::TooLarge(size));
     }
-    let length = u32::try_from(payload.len()).map_err(|_| FrameError::TooLarge(payload.len()))?;
-    let mut frame = Zeroizing::new(Vec::with_capacity(4 + payload.len()));
-    frame.extend_from_slice(&length.to_le_bytes());
-    frame.extend_from_slice(&payload);
+    let length = u32::try_from(size).map_err(|_| FrameError::TooLarge(size))?;
+    let mut frame = Zeroizing::new(vec![0; 4 + size]);
+    frame[..4].copy_from_slice(&length.to_le_bytes());
+    postcard::to_slice(message, &mut frame[4..]).map_err(FrameError::Malformed)?;
     Ok(frame)
 }
 

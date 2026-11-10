@@ -15,6 +15,7 @@ const PATIENCE_STEP: std::time::Duration = std::time::Duration::from_millis(250)
 const PATIENCE_STEPS: u32 = 240;
 const CHOSEN: u32 = 0;
 const REFUSED: u32 = 1;
+const LONGEST_PASSWORD: usize = 4096;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Answer {
@@ -178,7 +179,15 @@ impl Prompter {
 }
 
 fn read_all(reader: OwnedFd) -> Option<Zeroizing<Vec<u8>>> {
-    let mut secret = Zeroizing::new(Vec::new());
-    std::fs::File::from(reader).read_to_end(&mut secret).ok()?;
+    let mut pipe = std::fs::File::from(reader);
+    let mut secret = Zeroizing::new(vec![0; LONGEST_PASSWORD]);
+    let mut length = 0;
+    while length < secret.len() {
+        match pipe.read(&mut secret[length..]).ok()? {
+            0 => break,
+            read => length += read,
+        }
+    }
+    secret.truncate(length);
     Some(secret)
 }

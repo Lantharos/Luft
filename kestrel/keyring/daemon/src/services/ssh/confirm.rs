@@ -40,7 +40,7 @@ pub async fn confirm(daemon: &Arc<Daemon>, requester: &Requester, key: &SshKey) 
             .load(std::sync::atomic::Ordering::Relaxed);
     let title = format!(
         "Allow {} to use your SSH key “{}”?",
-        requester.named(),
+        requester.named_mid_sentence(),
         key.comment
     );
     let body = if fingerprint_reader {

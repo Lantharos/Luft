@@ -196,7 +196,7 @@ impl Transport {
         if channel == BROADCAST || channel >= self.next_channel {
             return Inbound::Reply(Message::error(channel, ERR_INVALID_CHANNEL));
         }
-        if self.busy.is_some_and(|busy| busy != channel) {
+        if self.busy.is_some() {
             return Inbound::Reply(Message::error(channel, ERR_CHANNEL_BUSY));
         }
         match message.command {
@@ -301,6 +301,10 @@ mod tests {
         assert_eq!(
             transport.receive(&other.reports()[0]),
             Some(Inbound::Reply(Message::error(second, ERR_CHANNEL_BUSY)))
+        );
+        assert_eq!(
+            transport.receive(&request.reports()[0]),
+            Some(Inbound::Reply(Message::error(first, ERR_CHANNEL_BUSY)))
         );
         let cancel = Message {
             channel: first,

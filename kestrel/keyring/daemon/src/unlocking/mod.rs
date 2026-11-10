@@ -125,7 +125,7 @@ impl Daemon {
             return false;
         }
         let opened = self
-            .ask_for_password(Why::App(requester.named_first()))
+            .ask_for_password(Why::App(requester.named_starting_a_sentence()))
             .await;
         if !opened && !self.screen_is_locked() {
             *self.dismissed.lock().expect("dismissal time") = Some(std::time::Instant::now());
@@ -188,6 +188,7 @@ impl Daemon {
         self.changed.notify_one();
         let daemon = self.clone();
         tokio::spawn(async move {
+            daemon.keyring.lock().await.trim_history();
             daemon.seal_if_needed().await;
             if let Some(password) = password {
                 daemon.rewrap(&password).await;

@@ -193,8 +193,14 @@ impl Service {
         Ok((unlocked, prompt))
     }
 
-    async fn lock(&self, objects: Vec<OwnedObjectPath>) -> (Vec<OwnedObjectPath>, OwnedObjectPath) {
-        self.daemon.lock().await;
+    async fn lock(
+        &self,
+        objects: Vec<OwnedObjectPath>,
+        #[zbus(header)] header: Header<'_>,
+    ) -> (Vec<OwnedObjectPath>, OwnedObjectPath) {
+        if self.daemon.requester(&header).await.is_you() {
+            self.daemon.lock().await;
+        }
         (objects, none())
     }
 
@@ -254,6 +260,9 @@ impl Service {
         #[zbus(header)] header: Header<'_>,
     ) -> Result<(), SecretError> {
         let requester = self.daemon.requester(&header).await;
+        if !requester.is_you() {
+            return Err(SecretError::refused());
+        }
         if !self.daemon.ensure_unlocked(&requester, true).await {
             return Err(SecretError::locked());
         }

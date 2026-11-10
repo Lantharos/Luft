@@ -3,10 +3,12 @@ pub mod requester;
 
 use std::future::{Future, pending};
 use std::pin::Pin;
+use std::rc::Rc;
 use std::time::Duration;
 
 use ctap::hid::{CBOR, Inbound, Keepalive, Message, Transport};
 use ctap::{Authenticator, Status};
+use tokio::sync::Mutex;
 use tokio::time::MissedTickBehavior;
 
 use crate::platform::Agent;
@@ -16,14 +18,14 @@ use relay::{Frame, Relay};
 const KEEPALIVE: Duration = Duration::from_millis(100);
 const RECONNECT: Duration = Duration::from_secs(5);
 
-type Work = Pin<Box<dyn Future<Output = (Authenticator<Agent>, Vec<u8>)>>>;
+type Work = Pin<Box<dyn Future<Output = Vec<u8>>>>;
 
 struct Busy {
     channel: u32,
     work: Work,
 }
 
-async fn finish(busy: &mut Option<Busy>) -> (Authenticator<Agent>, Vec<u8>) {
+async fn finish(busy: &mut Option<Busy>) -> Vec<u8> {
     match busy {
         Some(busy) => busy.work.as_mut().await,
         None => pending().await,
@@ -52,7 +54,7 @@ async fn send(relay: &mut Relay, message: &Message) -> bool {
 
 async fn serve(mut relay: Relay, agent: &Agent, notifier: &Notifier) {
     let mut transport = Transport::default();
-    let mut idle = Some(Authenticator::new(agent.clone()));
+    let authenticator = Rc::new(Mutex::new(Authenticator::new(agent.clone())));
     let mut busy: Option<Busy> = None;
     let mut keepalive = tokio::time::interval(KEEPALIVE);
     keepalive.set_missed_tick_behavior(MissedTickBehavior::Delay);
@@ -81,10 +83,9 @@ async fn serve(mut relay: Relay, agent: &Agent, notifier: &Notifier) {
                     Frame::Report(report) => match transport.receive(&report) {
                         Some(Inbound::Reply(message)) => Some(message),
                         Some(Inbound::Request(message)) => {
-                            let mut authenticator = idle.take().unwrap_or_else(|| Authenticator::new(agent.clone()));
+                            let authenticator = authenticator.clone();
                             let work = Box::pin(async move {
-                                let reply = authenticator.handle(&message.payload).await;
-                                (authenticator, reply)
+                                authenticator.lock().await.handle(&message.payload).await
                             });
                             busy = Some(Busy { channel: message.channel, work });
                             keepalive.reset();
@@ -99,8 +100,7 @@ async fn serve(mut relay: Relay, agent: &Agent, notifier: &Notifier) {
                     },
                 }
             }
-            (authenticator, reply) = finish(&mut busy) => {
-                idle = Some(authenticator);
+            reply = finish(&mut busy) => {
                 transport.finish();
                 busy.take().map(|done| Message { channel: done.channel, command: CBOR, payload: reply })
             }

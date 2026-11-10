@@ -16,7 +16,7 @@ use crate::requester::Requester;
 use crate::unlocking::link;
 use record::{Passkey, collection, find};
 
-pub use record::SCHEMA;
+pub use record::{COLLECTION, SCHEMA};
 
 const AGENT: &str = "com.lantharos.Passkeys";
 
@@ -68,7 +68,7 @@ pub struct Passkeys {
 impl Passkeys {
     async fn caller(&self, header: &Header<'_>) -> Result<Requester, PasskeyError> {
         let requester = self.daemon.requester(header).await;
-        if !requester.is_you() || !self.daemon.sent_by(header, AGENT).await {
+        if !requester.is_you() || !self.daemon.sent_by_owner_of(header, AGENT).await {
             return Err(PasskeyError::NotAllowed(
                 "Only Luft Passkeys can use passkeys".into(),
             ));

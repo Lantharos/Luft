@@ -4,7 +4,7 @@ How [Luft Passkeys](../kestrel/passkeys) talks to Settings, Kestrel and Luft Key
 
 | Bus name | Object | Interface | For |
 | --- | --- | --- | --- |
-| `com.lantharos.Passkeys` | `/com/lantharos/Passkeys1` | `com.lantharos.Passkeys1` | Settings: `List`, `Rename`, `Delete`, `Protection` and `Ready` properties, `Changed` signal |
+| `com.lantharos.Passkeys` | `/com/lantharos/Passkeys1` | `com.lantharos.Passkeys1` | Settings: `List`, `Rename` and `Delete`, for programs outside a sandbox only, `Protection` and `Ready` properties, `Changed` signal |
 | `com.lantharos.Kestrel.Passkeys` | `/com/lantharos/Kestrel/Passkeys` | `com.lantharos.Kestrel.Passkeys1` | The confirmation prompt, for the owner of `com.lantharos.Passkeys` only |
 | `com.lantharos.Keyring1` | `/com/lantharos/Keyring1` | `com.lantharos.Keyring1.Passkeys` | Storage and signing, for the owner of `com.lantharos.Passkeys` only |
 

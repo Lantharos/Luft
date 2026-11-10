@@ -11,7 +11,6 @@ use crate::localsend::protocol::PORT;
 
 pub const GROUP: Ipv4Addr = Ipv4Addr::new(224, 0, 0, 167);
 
-/// The multicast socket announcements go out on and come in through, joined on every network connection.
 pub struct Multicast {
     socket: UdpSocket,
     joined: Mutex<HashSet<Ipv4Addr>>,
@@ -30,9 +29,8 @@ impl Multicast {
         Ok(Self { socket: UdpSocket::from_std(socket.into())?, joined: Mutex::default(), sending: Default::default() })
     }
 
-    /// Joins the group on connections that came up since the last time, and says whether there were any.
     pub fn join_new(&self) -> bool {
-        let current: HashSet<Ipv4Addr> = interfaces::addresses().into_iter().collect();
+        let current: HashSet<Ipv4Addr> = interfaces::multicast_addresses().into_iter().collect();
         let mut joined = self.joined.lock().unwrap();
         joined.retain(|address| current.contains(address));
         let mut any = false;
@@ -52,7 +50,6 @@ impl Multicast {
         any
     }
 
-    /// Sends `message` to the group on each connection, so every network this computer is on hears it.
     pub async fn send(&self, message: &[u8]) {
         let _one_at_a_time = self.sending.lock().await;
         let addresses: Vec<Ipv4Addr> = self.joined.lock().unwrap().iter().copied().collect();

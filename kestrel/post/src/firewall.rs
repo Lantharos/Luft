@@ -10,8 +10,6 @@ use crate::config::Visibility;
 const FIREWALL: &str = "com.lantharos.Firewall1";
 const FIREWALL_PATH: &str = "/com/lantharos/Firewall1";
 
-/// Tells the firewall whether devices on home networks may reach Post, whenever that changes and whenever the firewall
-/// starts again.
 pub async fn run(app: Arc<App>, system: Connection) {
     let Ok(bus) = DBusProxy::new(&system).await else { return };
     let Ok(mut restarts) = bus.receive_name_owner_changed_with_args(&[(0, FIREWALL)]).await else { return };

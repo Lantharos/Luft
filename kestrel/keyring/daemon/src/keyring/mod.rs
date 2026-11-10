@@ -11,7 +11,7 @@ use luft_keyring_vault::{
 
 use crate::requester::Requester;
 
-pub use access::{Decision, PORTAL_SCHEMA, decide, sandboxed_owner};
+pub use access::{Decision, PORTAL_SCHEMA, decide, has_protected_schema, sandboxed_owner};
 
 pub struct Paths {
     pub folder: PathBuf,
@@ -45,6 +45,7 @@ struct Unlocked {
 
 pub struct Keyring {
     pub changes: Arc<Notify>,
+    pub recorded: Arc<Notify>,
     paths: Paths,
     header: Option<Header>,
     unlocked: Option<Unlocked>,
@@ -56,6 +57,7 @@ impl Keyring {
         let header = Stored::load(&paths.vault())?.map(|stored| stored.header);
         Ok(Self {
             changes: Arc::default(),
+            recorded: Arc::default(),
             paths,
             header,
             unlocked: None,
@@ -176,14 +178,21 @@ impl Keyring {
         let Some(key) = self.key() else { return };
         let record = Record {
             time: now(),
-            app: requester.principal(),
-            app_name: requester.label(),
+            app: requester.history_key(),
+            app_name: requester.history_label(),
             action,
             target: target.to_owned(),
         };
-        self.changes.notify_one();
         if let Err(error) = self.audit().append(key, &record) {
             eprintln!("Couldn't add to the access history: {error}");
+        }
+        self.recorded.notify_one();
+    }
+
+    pub fn trim_history(&self) {
+        let Some(key) = self.key() else { return };
+        if let Err(error) = self.audit().trim(key) {
+            eprintln!("Couldn't shorten the access history: {error}");
         }
     }
 }

@@ -17,17 +17,14 @@ fn algorithms() -> &'static WebPkiSupportedAlgorithms {
     &PROVIDER.signature_verification_algorithms
 }
 
-/// Takes connections from anyone, and asks for a certificate so a sender that shows one is known by it.
 pub fn server_config(identity: &Identity) -> Result<Arc<ServerConfig>, Error> {
     let config = ServerConfig::builder_with_provider(PROVIDER.clone())
         .with_safe_default_protocol_versions()?
-        .with_client_cert_verifier(Arc::new(AnyCertificate))
+        .with_client_cert_verifier(Arc::new(AnySelfSignedCertificate))
         .with_single_cert(vec![identity.certificate.clone()], identity.key())?;
     Ok(Arc::new(config))
 }
 
-/// Connects with this computer's certificate, to a device whose certificate must have `expected` as its fingerprint
-/// when it's known.
 pub fn client_config(identity: &Identity, expected: Option<&str>) -> Result<Arc<ClientConfig>, Error> {
     let config = ClientConfig::builder_with_provider(PROVIDER.clone())
         .with_safe_default_protocol_versions()?
@@ -37,11 +34,10 @@ pub fn client_config(identity: &Identity, expected: Option<&str>) -> Result<Arc<
     Ok(Arc::new(config))
 }
 
-/// Devices sign their own certificates, so what matters is that the handshake proves the key behind one.
 #[derive(Debug)]
-struct AnyCertificate;
+struct AnySelfSignedCertificate;
 
-impl ClientCertVerifier for AnyCertificate {
+impl ClientCertVerifier for AnySelfSignedCertificate {
     fn offer_client_auth(&self) -> bool {
         true
     }

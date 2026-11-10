@@ -65,7 +65,14 @@ pub fn write(location: &Location, key: &str, value: &Value) -> Result<(), String
 }
 
 pub fn reset(location: &Location, key: &str) -> Result<(), String> {
-    open(location)?.reset(key);
+    let settings = open(location)?;
+    let schema = settings
+        .settings_schema()
+        .ok_or_else(|| t!(L10N, "desktop-gsettings-no-schema"))?;
+    if !schema.has_key(key) {
+        return Err(format!("{} has no setting called {key}", location.schema));
+    }
+    settings.reset(key);
     gio::Settings::sync();
     Ok(())
 }

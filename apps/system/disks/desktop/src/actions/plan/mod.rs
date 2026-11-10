@@ -1,4 +1,3 @@
-mod guard;
 pub mod moving;
 
 use luft_app::Events;
@@ -7,10 +6,10 @@ use luft_disks::{partitions, resize};
 use serde::Deserialize;
 
 use super::formatting::{self, Format};
+use super::guard::Guard;
 use super::mounting;
 use crate::trust;
 use crate::udisks::{self, BLOCK, ENCRYPTED, FILESYSTEM, PARTITION, TABLE, no_options};
-use guard::Guard;
 use specta::Type;
 
 #[derive(Deserialize, Type)]
@@ -64,7 +63,7 @@ pub async fn run(events: &Events, step: PlanStep) -> Result<Option<String>, Stri
             filesystem,
             label,
         } => {
-            Guard::table(&table).await?;
+            Guard::table(&table).await?.free(offset, size)?;
             let created = if filesystem.is_empty() {
                 udisks::created(
                     &table,
@@ -135,6 +134,7 @@ async fn place(
     size: u64,
 ) -> Result<Option<String>, String> {
     let guard = Guard::volume(block).await?;
+    guard.fits(offset, size)?;
     if guard.system {
         return if offset < guard.offset {
             luft::grow_at_start().await

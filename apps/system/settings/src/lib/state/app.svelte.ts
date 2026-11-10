@@ -44,7 +44,6 @@ class AppStore {
 		this.remember();
 	}
 
-	/** The sub-page shown in place of the panel, whose title heads the window. */
 	get page(): OpenPage | null {
 		return this.#pages.at(-1) ?? null;
 	}

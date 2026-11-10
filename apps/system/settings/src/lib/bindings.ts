@@ -1033,7 +1033,6 @@ export type Extension = {
 	problem: string,
 	permissions: string[],
 	network: string[],
-	/**  The ports it takes connections on from devices on the network. */
 	listen: number[],
 	settings: ExtensionSetting[],
 	shortcuts: ExtensionShortcut[],
@@ -1416,7 +1415,6 @@ export type PageOption = {
 	image: string | null,
 };
 
-/**  A section of an extension's own Settings page, as the extension describes it while it runs. */
 export type PageSection = {
 	title: string | null,
 	description: string | null,
@@ -1486,7 +1484,6 @@ export type Port = {
 
 export type PortNetworks = "home" | "anywhere";
 
-/**  What Post calls this computer and where received files go, as it last worked them out. */
 export type PostState = {
 	alias: string,
 	folder: string,
@@ -1655,10 +1652,6 @@ export type Route = {
 	metric: number | null,
 };
 
-/**
- *  An app that a waiting Sabine update would stop, which the user installed
- *  and so updates or removes themselves.
- */
 export type SabineWait = {
 	name: string,
 	update: boolean,

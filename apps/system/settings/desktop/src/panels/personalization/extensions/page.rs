@@ -100,7 +100,6 @@ pub enum PageItem {
     },
 }
 
-/// A section of an extension's own Settings page, as the extension describes it while it runs.
 #[derive(Deserialize, Serialize, specta::Type)]
 pub struct PageSection {
     title: Option<String>,

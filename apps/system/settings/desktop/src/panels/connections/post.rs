@@ -15,7 +15,6 @@ const NAME: &str = "com.lantharos.Kestrel.Post";
 const LOCALSEND: &str = "https://localsend.org";
 const PATH: &str = "/com/lantharos/Kestrel/Post";
 
-/// What Post calls this computer and where received files go, as it last worked them out.
 #[derive(Serialize, Type)]
 pub struct PostState {
     alias: String,
@@ -23,7 +22,9 @@ pub struct PostState {
 }
 
 async fn post() -> Result<Proxy<'static>, String> {
-    Proxy::new(dbus::session().await?, NAME, PATH, NAME).await.map_err(failed)
+    Proxy::new(dbus::session().await?, NAME, PATH, NAME)
+        .await
+        .map_err(failed)
 }
 
 async fn state(Empty {}: Empty) -> Result<PostState, String> {
@@ -36,8 +37,17 @@ async fn state(Empty {}: Empty) -> Result<PostState, String> {
 
 async fn choose_folder(Empty {}: Empty) -> Result<Option<String>, String> {
     let title = t!(L10N, "desktop-post-choose-folder");
-    let chosen = FileChooser { title: &title, directory: true, ..FileChooser::default() }.open().await?;
-    Ok(chosen.first().and_then(|uri| portal::uri_path(uri)).map(|path: PathBuf| path.to_string_lossy().into_owned()))
+    let chosen = FileChooser {
+        title: &title,
+        directory: true,
+        ..FileChooser::default()
+    }
+    .open()
+    .await?;
+    Ok(chosen
+        .first()
+        .and_then(|uri| portal::uri_path(uri))
+        .map(|path: PathBuf| path.to_string_lossy().into_owned()))
 }
 
 pub fn register(window: SabineWindow) -> SabineWindow {
@@ -45,12 +55,21 @@ pub fn register(window: SabineWindow) -> SabineWindow {
         .command_async("post_state", state)
         .command_async("post_choose_folder", choose_folder)
         .command_async("post_start_pairing", |Empty {}| async move {
-            post().await?.call::<_, _, String>("StartPairing", &()).await.map_err(failed)
+            post()
+                .await?
+                .call::<_, _, String>("StartPairing", &())
+                .await
+                .map_err(failed)
         })
         .command_async("post_stop_pairing", |Empty {}| async move {
-            post().await?.call::<_, _, ()>("StopPairing", &()).await.map_err(failed)
+            post()
+                .await?
+                .call::<_, _, ()>("StopPairing", &())
+                .await
+                .map_err(failed)
         })
         .command("post_get_localsend", |Empty {}| {
-            gio::AppInfo::launch_default_for_uri(LOCALSEND, None::<&gio::AppLaunchContext>).map_err(failed)
+            gio::AppInfo::launch_default_for_uri(LOCALSEND, None::<&gio::AppLaunchContext>)
+                .map_err(failed)
         })
 }

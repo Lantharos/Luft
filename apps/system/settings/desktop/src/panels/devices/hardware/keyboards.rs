@@ -5,8 +5,6 @@ const KEY_F23: usize = 193;
 const KEY_ASSISTANT: usize = 583;
 const WORD_BITS: usize = 64;
 
-/// Whether a keyboard here has keys the Copilot key can send: Shift, Super and
-/// F23 on most laptops, or an assistant key of its own.
 pub fn copilot_key() -> bool {
     fs::read_dir(INPUT)
         .into_iter()

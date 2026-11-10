@@ -62,7 +62,6 @@ async fn change(
     permissions::set_values(connection, permission, app, &values).await
 }
 
-/// Asks you for a folder and opens it to the app. Returns whether you chose one.
 pub async fn add_folder(connection: &Connection, app: &str, title: &str) -> Result<bool, String> {
     let chooser = FileChooser {
         title,

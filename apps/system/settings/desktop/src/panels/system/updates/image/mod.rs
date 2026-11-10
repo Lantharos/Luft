@@ -37,7 +37,6 @@ fn check(deployments: &Deployments) -> Result<Option<Update>, String> {
     Ok(update)
 }
 
-/// What's new in the running version since the one this system updated from, kept once found.
 fn whats_new(deployments: &Deployments, current: &Release) -> Option<Vec<Section>> {
     let version = current.version.clone()?;
     let saved = WhatsNew::load();
@@ -57,8 +56,6 @@ fn expected_size() -> Option<u64> {
     Found::load().update.map(|update| update.size)
 }
 
-/// Whether the system looked for updates on its schedule since this account last did, so what
-/// was found then may be out of date.
 fn checked_on_schedule_since() -> bool {
     let on_schedule = luft_app::block_on(image::policy())
         .ok()

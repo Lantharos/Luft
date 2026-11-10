@@ -2,7 +2,7 @@ use luft_dbus::objects::Objects;
 
 use super::{FILESYSTEM, bytes_text};
 
-const SYSTEM_MOUNTS: &[&str] = &[
+pub(crate) const SYSTEM_MOUNTS: &[&str] = &[
     "/",
     "/boot",
     "/boot/efi",

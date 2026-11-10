@@ -128,8 +128,6 @@ fn identity(key: String, name: String, desktop_id: &str) -> Identity {
     }
 }
 
-/// Which apps keep secrets and what they did lately. The keyring asks you to confirm
-/// before telling, so this is read only when someone opens the list.
 pub async fn access() -> Result<Access, Problem> {
     let mut stores: Vec<AppStore> = bus::call::<_, Vec<Store>>(ACCESS, "AppStores", &())
         .await?

@@ -40,7 +40,6 @@ impl Switchable {
         })
     }
 
-    /// Each app's answer, for the apps that have one.
     pub async fn answers(self, connection: &Connection) -> zbus::Result<HashMap<String, bool>> {
         let (table, id) = self.entry();
         Ok(permissions::lookup(connection, table, id)

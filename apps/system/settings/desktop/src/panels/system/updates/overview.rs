@@ -46,7 +46,7 @@ pub fn load(refresh: Option<Task>) -> Result<(), String> {
     });
     std::thread::spawn(move || {
         let apps = updates::count();
-        let waiting = waiting::apps();
+        let waiting = waiting::installed_by_user();
         state::edit_overview(|overview| {
             overview.apps = Some(apps);
             overview.sabine = waiting;

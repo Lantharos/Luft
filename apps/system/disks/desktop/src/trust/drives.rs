@@ -4,7 +4,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::actions::formatting::{self, Format};
 use crate::actions::mounting;
-use crate::udisks::{self, BLOCK, FILESYSTEM, bytes_text};
+use crate::udisks::{self, BLOCK, FILESYSTEM, ROOT, SERVICE, bytes_text};
+use luft_app::dbus::{self, objects};
 use luft_trust::{self as client, DRIVES, Outcome, TRUST};
 use specta::Type;
 
@@ -13,8 +14,7 @@ const EXPLANATION: [&str; 3] = [
     "Keep it somewhere other than the drive and this computer,",
     "such as on paper or in a password manager.",
 ];
-const MOUNT_WAIT: Duration = Duration::from_millis(100);
-const MOUNT_TRIES: usize = 50;
+const MOUNT_WAIT: Duration = Duration::from_secs(5);
 
 #[derive(Serialize, Deserialize, Type)]
 #[serde(rename_all = "kebab-case")]
@@ -67,20 +67,27 @@ async fn mounted(block: &str) -> bool {
         .is_some_and(|points| !points.is_empty())
 }
 
-async fn remount(block: &str) -> Result<(), String> {
-    for _ in 0..MOUNT_TRIES {
+async fn unlocked(block: &str) -> Result<Option<String>, String> {
+    let mut changes = objects::signals(dbus::system().await?, SERVICE, ROOT).await?;
+    loop {
         let objects = udisks::objects().await?;
         let cleartext = objects
             .implementing(BLOCK)
             .find(|candidate| candidate.link("CryptoBackingDevice").as_deref() == Some(block))
             .filter(|cleartext| objects.get(cleartext.path, FILESYSTEM).is_some())
             .map(|cleartext| cleartext.path.to_owned());
-        if let Some(cleartext) = cleartext {
-            return mounting::mount(&cleartext).await.map(drop);
+        if cleartext.is_some() || !objects::settle(&mut changes).await {
+            return Ok(cleartext);
         }
-        tokio::time::sleep(MOUNT_WAIT).await;
     }
-    Ok(())
+}
+
+async fn remount(block: &str) -> Result<(), String> {
+    match tokio::time::timeout(MOUNT_WAIT, unlocked(block)).await {
+        Ok(Ok(Some(cleartext))) => mounting::mount(&cleartext).await.map(drop),
+        Ok(Err(error)) => Err(error),
+        Ok(Ok(None)) | Err(_) => Ok(()),
+    }
 }
 
 pub async fn encrypt(

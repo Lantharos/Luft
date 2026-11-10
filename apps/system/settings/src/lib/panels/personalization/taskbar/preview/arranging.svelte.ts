@@ -23,7 +23,6 @@ export interface ShownIsland {
 	box: Box;
 }
 
-/** What a drag picked up: an island by its handle, or one element out of an island. */
 export type Grip = { island: Spot } | { element: string };
 
 export interface ArrangingHost {
@@ -31,14 +30,11 @@ export interface ArrangingHost {
 	islands(): ShownIsland[];
 	targets(): IslandBox[];
 	joined(): boolean;
-	/** Where the screen's top left corner is on the page. */
 	origin(): { x: number; y: number };
-	/** The middle of each element on the screen, along its island. */
 	middles(spot: Spot): { element: string; middle: number }[];
 	save(arrangement: Arrangement): void;
 }
 
-/** Dragging the preview's islands and elements to other spots, or moving them with the arrow keys, with the result shown as it goes. */
 export class Arranging {
 	draft = $state<Arrangement | null>(null);
 	grip = $state<Grip | null>(null);

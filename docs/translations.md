@@ -28,7 +28,7 @@ Luft is translated into Albanian, Bosnian, Bulgarian, Catalan, Croatian, Czech, 
 | settings-pages | `packages/web/settings-pages/locales/*/pages.ftl` | Settings' page names and search words, also used by Start |
 | settings-connections | `apps/system/settings/locales/*/connections.ftl` | Network, Bluetooth |
 | settings-devices | `apps/system/settings/locales/*/devices.ftl` | Displays, Sound, Power, Input |
-| settings-personalization | `apps/system/settings/locales/*/personalization.ftl` | Appearance, Desktop, Notifications, Accessibility |
+| settings-personalization | `apps/system/settings/locales/*/personalization.ftl` | Appearance, Taskbar and Start, Windows, Extensions, Accessibility |
 | settings-protection | `apps/system/settings/locales/*/protection.ftl` | Apps, Privacy, Security |
 | settings-system | `apps/system/settings/locales/*/system.ftl` | Accounts, Language & time, System |
 | settings-desktop | `apps/system/settings/desktop/locales/*/desktop.ftl` | messages from Settings' native side |

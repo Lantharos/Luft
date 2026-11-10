@@ -20,22 +20,21 @@
 
 	let access = $state<Access | null>(null);
 	let unlocked = $derived(!!keyring.current && !keyring.current.locked);
-	// Bumped whenever the list closes, so an answer that arrives after that doesn't open it again
-	let request = 0;
+	let latestAccessRequest = 0;
 
 	$effect(() => {
 		if (!unlocked) closeAccess();
 	});
 
 	function closeAccess() {
-		request++;
+		latestAccessRequest++;
 		access = null;
 	}
 
 	async function loadAccess() {
-		const current = ++request;
+		const asked = ++latestAccessRequest;
 		const loaded = await keyringAccess().catch(() => null);
-		if (current === request && unlocked) access = loaded;
+		if (asked === latestAccessRequest && unlocked) access = loaded;
 	}
 </script>
 

@@ -11,7 +11,6 @@ pub struct Remembered {
     total: usize,
 }
 
-/// How many saved items each app was answered about, and allowed.
 pub async fn counts(connection: &Connection) -> zbus::Result<HashMap<String, Remembered>> {
     let mut counts: HashMap<String, Remembered> = HashMap::new();
     for (_, apps) in permissions::entries(connection, KEYRING_ITEMS).await? {

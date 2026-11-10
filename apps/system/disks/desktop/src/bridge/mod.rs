@@ -6,6 +6,7 @@ use sabine::SabineWindow;
 use serde::Serialize;
 use specta::Type;
 
+use crate::actions::guard::Guard;
 use crate::actions::{drive, encryption, formatting, luft, mounting, plan};
 use crate::events::SYSTEM_STEP;
 use crate::images::{self, Imaging};
@@ -75,6 +76,7 @@ fn register_trust(window: SabineWindow) -> SabineWindow {
                  recovery_key,
                  auto_unlock,
              }| async move {
+                Guard::erasable(&block).await?;
                 encryption_drives::format(&block, format, &recovery_key, auto_unlock).await
             },
         )
@@ -228,6 +230,7 @@ fn register_volumes(window: SabineWindow) -> SabineWindow {
         .command_async(
             "disks_format_volume",
             |FormatVolume { block, format }| async move {
+                Guard::erasable(&block).await?;
                 formatting::format_volume(&block, &format).await
             },
         )
@@ -239,6 +242,7 @@ fn register_volumes(window: SabineWindow) -> SabineWindow {
                  removable,
                  format,
              }| async move {
+                Guard::erasable(&block).await?;
                 formatting::format_drive(&block, size, removable, &format).await
             },
         )
@@ -250,10 +254,12 @@ fn register_volumes(window: SabineWindow) -> SabineWindow {
                  size,
                  format,
              }| async move {
+                Guard::table(&table).await?.free(offset, size)?;
                 formatting::create_partition(&table, offset, size, &format, true).await
             },
         )
         .command_async("disks_delete_partition", |Block { block }| async move {
+            Guard::volume(&block).await?.changeable()?;
             partitions::delete(&block).await
         })
 }
@@ -330,6 +336,7 @@ fn register_drives(window: SabineWindow, state: &State) -> SabineWindow {
             "disks_image_restore",
             state,
             |state, RestoreImage { block, path }| async move {
+                Guard::erasable(&block).await?;
                 state
                     .imaging
                     .restore(&state.events, &block, Path::new(&path))

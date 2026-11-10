@@ -80,8 +80,8 @@ impl Volume {
 
 #[derive(Serialize, Type)]
 pub struct Span {
-    offset: u64,
-    size: u64,
+    pub offset: u64,
+    pub size: u64,
 }
 
 pub fn extended(objects: &Objects, whole: &Object) -> Option<Span> {

@@ -15,8 +15,7 @@ use specta::Type;
 use super::cache::failed;
 use crate::L10N;
 
-pub const WALLPAPERS_CHANGED: BridgeEvent<Library> =
-    BridgeEvent::new("appearance.wallpapers");
+pub const WALLPAPERS_CHANGED: BridgeEvent<Library> = BridgeEvent::new("appearance.wallpapers");
 const IMAGE_EXTENSIONS: [&str; 6] = ["jpg", "jpeg", "png", "webp", "jxl", "avif"];
 const VIDEO_EXTENSIONS: [&str; 4] = ["mp4", "webm", "mkv", "mov"];
 

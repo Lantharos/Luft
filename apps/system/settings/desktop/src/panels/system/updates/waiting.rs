@@ -2,8 +2,6 @@ use luft_software::apps::appimage;
 use serde::Serialize;
 use specta::Type;
 
-/// An app that a waiting Sabine update would stop, which the user installed
-/// and so updates or removes themselves.
 #[derive(Serialize, Clone, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct SabineWait {
@@ -11,9 +9,7 @@ pub struct SabineWait {
     update: bool,
 }
 
-/// The apps the user installed that hold back a Sabine update. Apps that come
-/// with Luft are left out: they catch up with the next Luft update.
-pub fn apps() -> Vec<SabineWait> {
+pub fn installed_by_user() -> Vec<SabineWait> {
     sabine_service::held_system_update()
         .map(|held| held.apps)
         .unwrap_or_default()

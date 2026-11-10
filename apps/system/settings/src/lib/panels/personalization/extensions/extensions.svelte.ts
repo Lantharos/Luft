@@ -84,7 +84,6 @@ export function shown(extension: Extension, setting: ExtensionSetting): boolean 
 	return !!parent && met(setting, parent.value) && shown(extension, parent);
 }
 
-/** A section whose settings all hide goes with them, title included. */
 export function shownSections(extension: Extension, sections: PageSection[]): PageSection[] {
 	const showing = (item: PageItem) => {
 		if (item.type !== 'setting') return true;

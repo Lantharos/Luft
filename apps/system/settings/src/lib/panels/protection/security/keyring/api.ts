@@ -2,7 +2,6 @@ import { commands } from '#lib/bindings.js';
 
 const WAIT_FOR_PROMPT = { timeoutMs: 300_000 };
 
-// The keyring asks to confirm it's you before telling which apps keep secrets, so only ask when someone opens the list
 export const keyringAccess = () => commands.keyringAccess(WAIT_FOR_PROMPT);
 
 export const unlock = () => commands.keyringUnlock(WAIT_FOR_PROMPT);

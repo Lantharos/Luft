@@ -3,9 +3,9 @@
 	import { appearance } from '@luft/ui';
 	import type { ExtensionSetting } from '#lib/bindings.js';
 	import ColorPicker from '#lib/components/color/ColorPicker.svelte';
+	import { HUE_WHEEL } from '#lib/components/color/oklch.js';
 	import Swatches from '#lib/components/Swatches.svelte';
 
-	const HUES = 'conic-gradient(#e5484d, #f5a524, #46a758, #12a5b0, #3e63dd, #8e4ec6, #e5484d)';
 	const CHROMA = { min: 0, max: 0.25 };
 	const CUSTOM = 'custom';
 
@@ -25,7 +25,7 @@
 			label: swatch.label,
 			color: swatch.value === 'accent' ? (appearance.accent ?? 'var(--accent)') : swatch.value === 'wallpaper' ? (appearance.wallpaperAccent ?? appearance.accent ?? 'var(--accent)') : swatch.value
 		})),
-		{ value: CUSTOM, label: t('settings-extensions-custom-color'), color: offered ? HUES : value }
+		{ value: CUSTOM, label: t('settings-extensions-custom-color'), color: offered ? HUE_WHEEL : value }
 	]);
 
 	function choose(choice: string, swatch: HTMLElement) {

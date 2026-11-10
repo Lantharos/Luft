@@ -8,14 +8,13 @@
 		anchor: HTMLElement;
 		label: string;
 		color: string;
-		/** Keeps every color at this lightness, so only hue and saturation are picked. */
-		lightness?: number;
+		fixedLightness?: number;
 		chroma: { min: number; max: number };
 		onpick: (color: string) => void;
 		onclose: () => void;
 	}
 
-	let { anchor, label, color, lightness: fixed, chroma: range, onpick, onclose }: Props = $props();
+	let { anchor, label, color, fixedLightness: fixed, chroma: range, onpick, onclose }: Props = $props();
 
 	const WIDTH = 264;
 	const HEIGHT = 132;

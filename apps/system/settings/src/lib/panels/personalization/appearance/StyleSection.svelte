@@ -8,10 +8,10 @@
 	import { KESTREL_SCHEMA, useSettings } from '#lib/state/gsettings.svelte.js';
 	import { currentWallpaper } from '../wallpaper/current.svelte';
 	import ColorPicker from '#lib/components/color/ColorPicker.svelte';
+	import { HUE_WHEEL } from '#lib/components/color/oklch.js';
 	import CornerGlyph from './CornerGlyph.svelte';
 	import MiniDesktop from './MiniDesktop.svelte';
 
-	const HUES = 'conic-gradient(#e5484d, #f5a524, #46a758, #12a5b0, #3e63dd, #8e4ec6, #e5484d)';
 	const FALLBACK_ACCENT = '#3584e4';
 	const ACCENT_LIGHTNESS = 0.72;
 	const ACCENT_CHROMA = { min: 0.03, max: 0.2 };
@@ -55,7 +55,7 @@
 	let accents = $derived<{ value: Accent; label: string; color: string }[]>([
 		{ value: 'wallpaper', label: t('settings-appearance-accent-wallpaper'), color: appearance.wallpaperAccent ?? 'var(--accent)' },
 		{ value: 'white', label: t('settings-appearance-accent-white'), color: '#ffffff' },
-		{ value: 'custom', label: t('settings-appearance-accent-custom'), color: kestrel.values['accent-color'] || HUES }
+		{ value: 'custom', label: t('settings-appearance-accent-custom'), color: kestrel.values['accent-color'] || HUE_WHEEL }
 	]);
 	let picking = $state<HTMLElement | null>(null);
 
@@ -132,7 +132,7 @@
 		anchor={picking}
 		label={t('settings-appearance-accent-custom')}
 		color={kestrel.values['accent-color'] || FALLBACK_ACCENT}
-		lightness={ACCENT_LIGHTNESS}
+		fixedLightness={ACCENT_LIGHTNESS}
 		chroma={ACCENT_CHROMA}
 		onpick={(color) => kestrel.set('accent-color', color)}
 		onclose={() => (picking = null)}

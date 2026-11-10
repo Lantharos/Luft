@@ -138,7 +138,6 @@ pub struct Extension {
     problem: String,
     permissions: Vec<String>,
     network: Vec<String>,
-    /// The ports it takes connections on from devices on the network.
     listen: Vec<u16>,
     settings: Vec<ExtensionSetting>,
     shortcuts: Vec<ExtensionShortcut>,

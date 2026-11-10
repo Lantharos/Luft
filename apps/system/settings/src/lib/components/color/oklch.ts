@@ -8,6 +8,8 @@ export interface Oklch {
 
 const GAMUT_STEPS = 12;
 
+export const HUE_WHEEL = 'conic-gradient(#e5484d, #f5a524, #46a758, #12a5b0, #3e63dd, #8e4ec6, #e5484d)';
+
 const encode = (linear: number) => (linear <= 0.0031308 ? 12.92 * linear : 1.055 * linear ** (1 / 2.4) - 0.055);
 const decode = (value: number) => (value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4);
 
@@ -27,7 +29,6 @@ function linear({ lightness, chroma, hue }: Oklch): Rgb {
 
 const inGamut = (rgb: Rgb) => rgb.every((channel) => channel >= -1e-4 && channel <= 1 + 1e-4);
 
-/** The color at a lightness, chroma and hue, with the chroma lowered as far as the screen's colors need. */
 export function rgbOf(color: Oklch): Rgb {
 	let shown = linear(color);
 	if (!inGamut(shown)) {

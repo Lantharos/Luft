@@ -1,7 +1,7 @@
 pub mod health;
 pub mod room;
 pub mod snapshot;
-mod system;
+pub(crate) mod system;
 pub mod volumes;
 
 use std::collections::HashMap;

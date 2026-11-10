@@ -18,6 +18,3 @@ export function roomAfter(drive: Drive) {
 	return drive.luft.find((room) => room.reach.kind === 'after') ?? null;
 }
 
-export function roomBefore(drive: Drive) {
-	return drive.luft.find((room) => room.reach.kind === 'before') ?? null;
-}

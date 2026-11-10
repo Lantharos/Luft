@@ -69,10 +69,14 @@ impl Disk {
 
     fn read(&self, offset: u64, length: u64) -> Result<Vec<u8>, String> {
         let mut buffer = vec![0; length as usize];
-        self.0
-            .read_exact_at(&mut buffer, offset)
-            .map_err(|error| error.to_string())?;
+        self.read_into(offset, &mut buffer)?;
         Ok(buffer)
+    }
+
+    fn read_into(&self, offset: u64, buffer: &mut [u8]) -> Result<(), String> {
+        self.0
+            .read_exact_at(buffer, offset)
+            .map_err(|error| error.to_string())
     }
 
     fn write(&self, offset: u64, bytes: &[u8]) -> Result<(), String> {
@@ -190,9 +194,11 @@ fn copy_body(
     }
     let mut copied = 0;
     let mut reported = Instant::now();
+    let mut buffer = vec![0; CHUNK.min(total) as usize];
     for (position, length) in chunks {
-        let bytes = disk.read(from + position, length)?;
-        disk.write(to + position, &bytes)?;
+        let bytes = &mut buffer[..length as usize];
+        disk.read_into(from + position, bytes)?;
+        disk.write(to + position, bytes)?;
         copied += length;
         if reported.elapsed() >= REPORT_EVERY {
             reported = Instant::now();

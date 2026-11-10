@@ -1,18 +1,13 @@
 use std::collections::HashMap;
-use std::sync::atomic::{AtomicU32, Ordering};
 
 use futures_util::StreamExt;
 use zbus::{MessageStream, OwnedObjectPath, OwnedVariant, Proxy, Variant};
 
 use crate::dbus::{self, failed};
-use crate::portal::{Response, request};
+use crate::portal::{PORTAL, PORTAL_PATH, Response, request, token};
 
-const PORTAL: &str = "org.freedesktop.portal.Desktop";
-const PORTAL_PATH: &str = "/org/freedesktop/portal/desktop";
 const INTERFACE: &str = "org.freedesktop.portal.GlobalShortcuts";
 const REGISTRY: &str = "org.freedesktop.host.portal.Registry";
-
-static SESSIONS: AtomicU32 = AtomicU32::new(0);
 
 pub struct Shortcut<'a> {
     pub id: &'a str,
@@ -67,11 +62,7 @@ impl GlobalShortcuts {
         let portal = Proxy::new(connection, PORTAL, PORTAL_PATH, INTERFACE)
             .await
             .map_err(failed)?;
-        let token = format!(
-            "luft{}_{}",
-            std::process::id(),
-            SESSIONS.fetch_add(1, Ordering::Relaxed)
-        );
+        let token = token();
         let (response, results) = request(INTERFACE, "CreateSession", |request_token| {
             let mut options = HashMap::new();
             options.insert("handle_token", Variant::from(request_token));

@@ -19,7 +19,9 @@ const SHORTEST_QUERY: usize = 2;
 
 static CURRENT: RwLock<Option<Arc<Catalog>>> = RwLock::new(None);
 
-#[derive(Deserialize, Serialize, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug, Default, Type)]
+#[derive(
+    Deserialize, Serialize, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Debug, Default, Type,
+)]
 #[serde(rename_all = "lowercase")]
 pub enum Origin {
     #[default]
@@ -117,7 +119,10 @@ impl From<&Entry> for CatalogApp {
             summary: entry.summary.clone(),
             icon: entry.icon.clone(),
             art: entry.art.clone(),
-            developer: entry.publisher.as_ref().map(|publisher| publisher.name.clone()),
+            developer: entry
+                .publisher
+                .as_ref()
+                .map(|publisher| publisher.name.clone()),
             package: entry.package.clone(),
         }
     }
@@ -195,12 +200,18 @@ impl Catalog {
             .collect()
     }
 
-    pub fn collection(&self, collection: Collection) -> Vec<CatalogApp> {
+    /// The apps of a collection in its order, all of them or the first `limit`.
+    pub fn collection(&self, collection: Collection, limit: Option<usize>) -> Vec<CatalogApp> {
+        let order = |a: &&Entry, b: &&Entry| match collection {
+            Collection::Popular => (a.origin, b.installs).cmp(&(b.origin, a.installs)),
+            Collection::Updated => (a.origin, &b.updated).cmp(&(b.origin, &a.updated)),
+        };
         let mut apps: Vec<&Entry> = self.apps().collect();
-        match collection {
-            Collection::Popular => apps.sort_by_key(|entry| (entry.origin, u64::MAX - entry.installs)),
-            Collection::Updated => apps.sort_by(|a, b| (a.origin, &b.updated).cmp(&(b.origin, &a.updated))),
+        if let Some(limit) = limit.filter(|limit| (1..apps.len()).contains(limit)) {
+            apps.select_nth_unstable_by(limit - 1, order);
+            apps.truncate(limit);
         }
+        apps.sort_by(order);
         apps.into_iter().map(CatalogApp::from).collect()
     }
 
@@ -242,7 +253,12 @@ pub enum Match {
 impl Match {
     pub fn of(entry: &Entry, needle: &str) -> Option<Self> {
         let name = entry.name.to_lowercase();
-        let last = entry.id.rsplit('.').next().unwrap_or_default().to_lowercase();
+        let last = entry
+            .id
+            .rsplit('.')
+            .next()
+            .unwrap_or_default()
+            .to_lowercase();
         if name == needle || last == needle || entry.id.eq_ignore_ascii_case(needle) {
             Some(Self::Exact)
         } else if name.starts_with(needle) {
@@ -296,7 +312,9 @@ fn load(age: Age) -> Result<Arc<Catalog>, String> {
         (store, join(flathub), join(fedora))
     });
     let catalog = Arc::new(Catalog::merge([store?, flathub?, fedora?]));
-    *CURRENT.write().unwrap_or_else(|poisoned| poisoned.into_inner()) = Some(catalog.clone());
+    *CURRENT
+        .write()
+        .unwrap_or_else(|poisoned| poisoned.into_inner()) = Some(catalog.clone());
     Ok(catalog)
 }
 

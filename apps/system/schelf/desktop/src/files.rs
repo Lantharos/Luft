@@ -15,9 +15,9 @@ use serde::{Deserialize, Serialize};
 use specta::Type;
 
 use crate::catalog::cache;
+use crate::library::sources::CheckedSource;
 use crate::store;
 use crate::store::catalog::Origin;
-use crate::library::sources::CheckedSource;
 
 #[derive(Serialize, Type)]
 #[serde(
@@ -46,6 +46,8 @@ pub enum OpenedFile {
         icon: Option<String>,
         size: u64,
         runtime: Option<String>,
+        /// The repository it keeps getting updates from, when it was built
+        /// with one's address.
         origin: Option<String>,
     },
     FlatpakRepo {
@@ -149,7 +151,8 @@ fn flatpak_ref(path: &str) -> Result<OpenedFile, String> {
     })
 }
 
-// A bundle is an OSTree static delta, whose superblock starts with what's in it
+/// An OSTree static delta's superblock, which a bundle is and which starts
+/// with what's in it.
 const BUNDLE_FORMAT: &str = "(a{sv}tayay(ua(ayay))aya(uayttay)a(yaytt))";
 const BUNDLE_ICONS: [&str; 2] = ["icon-128", "icon-64"];
 
@@ -164,7 +167,8 @@ fn bundle_bytes(metadata: &gio::glib::VariantDict, key: &str) -> Option<Vec<u8>>
         .map(<[u8]>::to_vec)
 }
 
-/// The name and summary of the app in a bundle's AppStream data.
+/// The untranslated name and summary of the app in a bundle's AppStream
+/// data, which describes just that app: its first component.
 fn bundle_appstream(compressed: &[u8]) -> (Option<String>, Option<String>) {
     let mut xml = String::new();
     if flate2::read::GzDecoder::new(compressed)
@@ -185,8 +189,8 @@ fn bundle_appstream(compressed: &[u8]) -> (Option<String>, Option<String>) {
                     .ok()
                     .flatten()
                     .is_some();
-                // The app's untranslated name and summary, not those of the screenshots or releases inside it
-                if (tag == "name" || tag == "summary") && !localized && current == "component" {
+                let of_app = current == "component";
+                if (tag == "name" || tag == "summary") && !localized && of_app {
                     field = Some(tag.clone());
                     text.clear();
                 }
@@ -204,7 +208,6 @@ fn bundle_appstream(compressed: &[u8]) -> (Option<String>, Option<String>) {
                     slot.get_or_insert_with(|| text.trim().to_owned());
                     field = None;
                 }
-                // A bundle's data describes just its app
                 if tag == "component" {
                     break;
                 }
@@ -232,11 +235,12 @@ fn save_icon(bytes: &[u8], extension: &str) -> Option<String> {
 
 fn flatpak_bundle(path: &str) -> Result<OpenedFile, String> {
     let damaged = "This Flatpak file is damaged or isn't a Flatpak app.";
-    let data = std::fs::read(path).map_err(|error| error.to_string())?;
-    let size = data.len() as u64;
+    let file = std::fs::File::open(path).map_err(|error| error.to_string())?;
+    let mapped = unsafe { memmap2::Mmap::map(&file) }.map_err(|error| error.to_string())?;
+    let size = mapped.len() as u64;
     let format = gio::glib::VariantTy::new(BUNDLE_FORMAT).map_err(|error| error.to_string())?;
     let superblock =
-        gio::glib::Variant::from_bytes_with_type(&gio::glib::Bytes::from_owned(data), format);
+        gio::glib::Variant::from_bytes_with_type(&gio::glib::Bytes::from_owned(mapped), format);
     let metadata = gio::glib::VariantDict::new(Some(&superblock.child_value(0)));
     let reference = bundle_value(&metadata, "ref")
         .and_then(|value| value.get::<String>())
@@ -271,7 +275,6 @@ fn flatpak_bundle(path: &str) -> Result<OpenedFile, String> {
         icon,
         size,
         runtime,
-        // Bundles built with a repository's address keep getting updates from it
         origin: bundle_value(&metadata, "origin")
             .and_then(|value| value.get::<String>())
             .filter(|origin| !origin.is_empty()),
@@ -378,7 +381,10 @@ pub fn on_flathub(name: &str) -> Option<OnFlathub> {
             name: entry.name.clone(),
             summary: Some(entry.summary.clone()).filter(|summary| !summary.is_empty()),
             icon: entry.icon.clone(),
-            verified: entry.publisher.as_ref().is_some_and(|publisher| publisher.verified),
+            verified: entry
+                .publisher
+                .as_ref()
+                .is_some_and(|publisher| publisher.verified),
         })
 }
 
@@ -453,6 +459,5 @@ pub fn inspect(path: &str) -> Result<OpenedFile, String> {
 }
 
 pub fn register(window: SabineWindow) -> SabineWindow {
-    window
-        .command("files_inspect", |File { path }| inspect(&path))
+    window.command("files_inspect", |File { path }| inspect(&path))
 }

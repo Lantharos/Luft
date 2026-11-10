@@ -66,7 +66,6 @@
 
 	const unverified = $derived(file?.kind === 'package' && !file.repository && !file.verified);
 
-	// A .deb's app on Flathub installs better, sandboxed and updating itself, so it's offered first
 	const flathub = $derived(file?.kind === 'deb' && !file.installed ? file.flathub : null);
 	const flathubKey = $derived(flathub ? `flathub:${flathub.id}` : null);
 	const flathubOperation = $derived(flathubKey ? operations.forKey(flathubKey) : null);

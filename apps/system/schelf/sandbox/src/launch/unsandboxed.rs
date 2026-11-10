@@ -62,6 +62,7 @@ fn command(app: &App, folder: &Folder, arguments: Vec<String>) -> Result<Command
 /// keeping its own files in the same folder its sandbox would, and waits
 /// for it so later launches find it running.
 pub fn run(app: &App, folder: &Folder, arguments: Vec<String>) -> Result<i32, String> {
+    folder.clean();
     let mut child = command(app, folder, arguments)?
         .spawn()
         .map_err(|error| error.to_string())?;

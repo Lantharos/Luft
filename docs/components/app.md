@@ -116,7 +116,7 @@ thumbnails.request(paths, ThumbnailSize::Large);
 
 Each `request` replaces the previous one, so asking for the files on screen keeps the queue short while scrolling. Batches arrive under the given event name as `{ items }`, each item with the file's `path`, its `thumbnail` path or `null`, and its `modified` time.
 
-Files that need one of the system's thumbnailers from `/usr/share/thumbnailers` are handed to it inside a bubblewrap sandbox that sees only `/usr`, the thumbnailer's own program, the file itself and a private folder for the result, with no network and no way to open new user namespaces. Thumbnailers are read once when the app starts. Music without embedded artwork falls back to a cover picture in its folder. GStreamer keeps its plugin cache for these runs in `~/.cache/com.lantharos.thumbnailers`.
+Files that need a thumbnailer are handed to one of those listed in `~/.local/share/thumbnailers` and in the `thumbnailers` folder of every entry in `XDG_DATA_DIRS`, such as `/usr/share/thumbnailers`. It runs inside a bubblewrap sandbox that sees only `/usr`, the thumbnailer's own program, the file itself and a private folder for the result, with no network and no way to open new user namespaces. Thumbnailers are read once when the app starts. Music without embedded artwork falls back to a cover picture in its folder. GStreamer keeps its plugin cache for these runs in `~/.cache/com.lantharos.thumbnailers`.
 
 ```rust
 use luft_app::watch::{FolderWatcher, Report, Watch, WatchMask};

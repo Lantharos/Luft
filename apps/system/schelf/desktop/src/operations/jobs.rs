@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use luft_app::block_on;
 use luft_software::apps::flatpak::{self, FLATHUB, Installation};
@@ -107,6 +107,22 @@ pub enum Job {
     },
 }
 
+/// Installs the app in a bundle. Most bundles get their runtime from
+/// Flathub unless it's installed already, so Flathub is added first, and
+/// named when the install fails without it.
+fn install_flatpak_bundle(path: &Path, task: Task) -> Result<(), String> {
+    let flathub = flatpak::ensure_flathub(Installation::User);
+    flatpak::install_bundle(Installation::User, path, task).map_err(|error| match flathub {
+        Err(reason) => format!(
+            "{}. Flathub, where its runtime would come from, couldn't be added: {reason}",
+            error.trim_end_matches('.')
+        ),
+        Ok(()) => error,
+    })?;
+    flatpak::integrate();
+    Ok(())
+}
+
 impl Job {
     pub fn action(&self) -> Action {
         match self {
@@ -157,19 +173,7 @@ impl Job {
                 flatpak::integrate();
                 Ok(())
             }
-            Self::InstallFlatpakBundle { path } => {
-                // Apps from bundles still need a runtime, which most get from Flathub, unless it's installed already
-                let flathub = flatpak::ensure_flathub(Installation::User);
-                flatpak::install_bundle(Installation::User, path, task).map_err(|error| match flathub {
-                    Err(reason) => format!(
-                        "{}. Flathub, where its runtime would come from, couldn't be added: {reason}",
-                        error.trim_end_matches('.')
-                    ),
-                    Ok(()) => error,
-                })?;
-                flatpak::integrate();
-                Ok(())
-            }
+            Self::InstallFlatpakBundle { path } => install_flatpak_bundle(path, task),
             Self::InstallDeb { path } => debian::install(path, task).map(drop),
             Self::RemoveDeb { package } => debian::remove(package, task),
             Self::UpdateDebs { packages } => debian::update(packages, task),
@@ -178,14 +182,11 @@ impl Job {
             }
             Self::InstallAppImage { path, full_access } => {
                 let installed = appimage::install(path, task)?;
-                match installed.declaration {
-                    Some(declaration) => block_on(appimage::grant(
-                        &installed.app.id,
-                        &declaration,
-                        *full_access,
-                    )),
-                    None => Ok(()),
-                }
+                block_on(appimage::reset(
+                    &installed.app.id,
+                    installed.declaration.as_ref(),
+                    *full_access,
+                ))
             }
             Self::InstallTool { package } => toolbox::install(package, task),
             Self::InstallToolFile { path } => toolbox::install_file(path, task),

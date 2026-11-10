@@ -29,6 +29,8 @@ class InstallState {
 	intent = $state<Intent | null>(null);
 	replacing = $state<LinuxSystem | null>(null);
 	target = $state<Target | null>(null);
+	recoveryKey = $state('');
+	recoveryKeyKept = $state(false);
 	windowsChoices = $state<Required<WindowsChoices>>({ fastStartupOff: true, universalClock: true, bluetooth: true });
 	private hardware = NO_HARDWARE;
 

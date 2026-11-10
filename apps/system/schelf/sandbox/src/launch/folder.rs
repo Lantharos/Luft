@@ -9,7 +9,7 @@ use std::time::{Duration, Instant};
 
 const SERVER_WAIT: Duration = Duration::from_secs(10);
 const QUIT_WAIT: Duration = Duration::from_secs(20);
-const UNSANDBOXED_APP: &str = "app";
+const UNSANDBOXED_APP: &str = "unsandboxed";
 const SERVER_POLL: Duration = Duration::from_millis(50);
 pub const INSIDE_SERVER: &str = "/run/luft-sandbox";
 pub const SERVER_SOCKET: &str = "launch";

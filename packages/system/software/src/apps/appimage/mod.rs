@@ -18,7 +18,7 @@ pub use elf::{is_appimage, payload_offset};
 #[cfg(feature = "system")]
 pub use full_access::set_full_access;
 #[cfg(feature = "system")]
-pub use grants::{grant, granted};
+pub use grants::{grant, granted, narrow, reset};
 pub use integrate::{
     FILES, Installed, Placement, SANDBOX, URIS, install, install_link, placement, remove, repair,
 };

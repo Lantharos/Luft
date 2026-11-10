@@ -98,6 +98,7 @@ export const commands = {
 	}, options?: CallOptions) => invoke<CatalogApp[]>("store_category", params, options),
 	storeCollection: (params: {
 		collection: Collection,
+		limit?: number | null,
 	}, options?: CallOptions) => invoke<CatalogApp[]>("store_collection", params, options),
 	storeDetails: (params: {
 		id: string,
@@ -239,8 +240,9 @@ export type CustomIcons = {
 };
 
 /**
- *  What an app may use, in Luft's shared permission format; an app that
- *  declares nothing gets full access.
+ *  What an app may use, in Luft's shared permission format. An app that
+ *  declares nothing runs in the sandbox every AppImage gets, unless you give
+ *  it full access.
  */
 export type Declared = {
 	network: boolean,
@@ -391,7 +393,12 @@ export type OnFlathub = {
 	verified: boolean,
 };
 
-export type OpenedFile = { kind: "flatpakRef"; path: string; id: string; title: string; branch: string | null; url: string; runtime: boolean; summary: string | null; homepage: string | null; icon: string | null } | { kind: "flatpakBundle"; path: string; id: string; title: string; branch: string; summary: string | null; icon: string | null; size: number; runtime: string | null; origin: string | null } | { kind: "flatpakRepo"; path: string; name: string; title: string; url: string; summary: string | null; homepage: string | null } | { kind: "package"; path: string; package: string; version: string; summary: string; description: string; license: string; homepage: string | null; size: number; installed: boolean; system: boolean; desktop: string | null; repository: CheckedSource | null; repositoryError: string | null; verified: boolean } | { kind: "deb"; path: string; package: string; name: string; version: string; summary: string; description: string; homepage: string | null; size: number; icon: string | null; installed: boolean; runsHere: boolean; flathub: OnFlathub | null } | { kind: "appImage"; path: string; name: string; summary: string | null; version: string | null; icon: string | null; size: number; 
+export type OpenedFile = { kind: "flatpakRef"; path: string; id: string; title: string; branch: string | null; url: string; runtime: boolean; summary: string | null; homepage: string | null; icon: string | null } | { kind: "flatpakBundle"; path: string; id: string; title: string; branch: string; summary: string | null; icon: string | null; size: number; runtime: string | null; 
+/**
+ *  The repository it keeps getting updates from, when it was built
+ *  with one's address.
+ */
+origin: string | null } | { kind: "flatpakRepo"; path: string; name: string; title: string; url: string; summary: string | null; homepage: string | null } | { kind: "package"; path: string; package: string; version: string; summary: string; description: string; license: string; homepage: string | null; size: number; installed: boolean; system: boolean; desktop: string | null; repository: CheckedSource | null; repositoryError: string | null; verified: boolean } | { kind: "deb"; path: string; package: string; name: string; version: string; summary: string; description: string; homepage: string | null; size: number; icon: string | null; installed: boolean; runsHere: boolean; flathub: OnFlathub | null } | { kind: "appImage"; path: string; name: string; summary: string | null; version: string | null; icon: string | null; size: number; 
 /**  What it declared it needs, for a Sabine app. */
 permissions: Permissions | null; 
 /**  Why it asks to run outside a sandbox, when it does. */

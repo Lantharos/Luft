@@ -114,10 +114,11 @@ fn install_seed(seed: &Path) -> Result<(), String> {
         return Ok(());
     }
     let installed = quietly(|task| appimage::install_link(seed, task))?;
-    match installed.declaration {
-        Some(declaration) => block_on(appimage::grant(&installed.app.id, &declaration, false)),
-        None => Ok(()),
-    }
+    block_on(appimage::reset(
+        &installed.app.id,
+        installed.declaration.as_ref(),
+        false,
+    ))
 }
 
 fn update_store_apps(failures: &mut Vec<String>) {

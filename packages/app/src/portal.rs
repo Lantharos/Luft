@@ -10,11 +10,20 @@ use zbus::{MessageStream, OwnedObjectPath, OwnedVariant, Proxy, Variant};
 
 use crate::dbus::{self, failed};
 
-const PORTAL: &str = "org.freedesktop.portal.Desktop";
-const PORTAL_PATH: &str = "/org/freedesktop/portal/desktop";
+pub(crate) const PORTAL: &str = "org.freedesktop.portal.Desktop";
+pub(crate) const PORTAL_PATH: &str = "/org/freedesktop/portal/desktop";
 const FILE_SCHEME: &str = "file://";
 
-static REQUESTS: AtomicU32 = AtomicU32::new(0);
+static TOKENS: AtomicU32 = AtomicU32::new(0);
+
+/// A handle token no other request or session of this app has.
+pub(crate) fn token() -> String {
+    format!(
+        "luft{}_{}",
+        std::process::id(),
+        TOKENS.fetch_add(1, Ordering::Relaxed)
+    )
+}
 
 #[derive(PartialEq)]
 pub(crate) enum Response {
@@ -118,11 +127,7 @@ where
     let portal = Proxy::new(connection, PORTAL, PORTAL_PATH, interface)
         .await
         .map_err(failed)?;
-    let token = format!(
-        "luft{}_{}",
-        std::process::id(),
-        REQUESTS.fetch_add(1, Ordering::Relaxed)
-    );
+    let token = token();
     let sender = connection
         .unique_name()
         .ok_or("Not connected to the session bus")?

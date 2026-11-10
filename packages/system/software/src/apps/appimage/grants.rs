@@ -1,6 +1,9 @@
+use std::collections::BTreeSet;
+use std::path::Path;
+
 use luft_app::dbus;
 use luft_app::identity::permissions::{
-    self, BUS, DEVICES, FOLDERS, FULL_ACCESS, NETWORK, NO, Permission, READ_ONLY_FOLDERS,
+    self, BUS, DEVICES, DOWNLOADS, FOLDERS, FULL_ACCESS, NETWORK, NO, Permission, READ_ONLY_FOLDERS,
 };
 use zbus::Connection;
 
@@ -19,6 +22,43 @@ async fn store(
         .map_err(|error| dbus::explain(&error))
 }
 
+const EVERYTHING: [&Permission; 7] = [
+    &FULL_ACCESS,
+    &FOLDERS,
+    &READ_ONLY_FOLDERS,
+    &DEVICES,
+    &BUS,
+    &NETWORK,
+    &DOWNLOADS,
+];
+const ALL_DEVICES: &str = "all";
+
+/// Forgets everything the app was given, so another app that later takes its
+/// id starts with nothing.
+pub async fn forget(id: &str) -> Result<(), String> {
+    let connection = dbus::session().await?;
+    for permission in EVERYTHING {
+        permissions::forget(connection, permission.table, permission.id, id)
+            .await
+            .map_err(|error| dbus::explain(&error))?;
+    }
+    Ok(())
+}
+
+/// Gives a newly installed app what it declared and nothing an earlier app
+/// with its id was given.
+pub async fn reset(
+    id: &str,
+    declaration: Option<&Declaration>,
+    full_access: bool,
+) -> Result<(), String> {
+    forget(id).await?;
+    match declaration {
+        Some(declaration) => grant(id, declaration, full_access).await,
+        None => Ok(()),
+    }
+}
+
 /// Writes what the app may use to the permission store, where its sandbox
 /// reads it at every start: what it declared, and full access when it asked
 /// to run unsandboxed and you allowed it.
@@ -35,15 +75,7 @@ pub async fn grant(id: &str, declaration: &Declaration, full_access: bool) -> Re
         .await
         .map_err(|error| dbus::explain(&error));
     }
-    let folders = declaration.folders();
-    let paths = |writable: bool| -> Vec<String> {
-        folders
-            .iter()
-            .filter(|(_, can_write)| *can_write == writable)
-            .map(|(folder, _)| folder.display().to_string())
-            .collect()
-    };
-    let (changed, read_only) = (paths(true), paths(false));
+    let (changed, read_only) = folder_names(declaration);
     store(connection, &FOLDERS, id, &changed).await?;
     store(connection, &READ_ONLY_FOLDERS, id, &read_only).await?;
     store(connection, &DEVICES, id, &declaration.devices).await?;
@@ -54,6 +86,104 @@ pub async fn grant(id: &str, declaration: &Declaration, full_access: bool) -> Re
         vec![NO.to_owned()]
     };
     store(connection, &NETWORK, id, &offline).await
+}
+
+fn names(values: &[String]) -> BTreeSet<&str> {
+    values.iter().map(String::as_str).collect()
+}
+
+fn within(folder: &str, held: &[String]) -> bool {
+    held.iter().any(|held| Path::new(folder).starts_with(held))
+}
+
+fn reaches(held: &[String], name: &str) -> bool {
+    held.iter().any(|held| {
+        held == name
+            || held
+                .strip_suffix('*')
+                .is_some_and(|prefix| name.starts_with(prefix))
+    })
+}
+
+/// What stays of `held` when an app that declared `before` now declares
+/// `after`: what you added yourself, and what it still asks for and
+/// `still_given` finds among what is held.
+fn narrowed(
+    held: &[String],
+    before: &[String],
+    after: &[String],
+    still_given: impl Fn(&str) -> bool,
+) -> Vec<String> {
+    let before = names(before);
+    let kept: BTreeSet<&str> = held
+        .iter()
+        .map(String::as_str)
+        .filter(|value| !before.contains(value))
+        .chain(
+            after
+                .iter()
+                .map(String::as_str)
+                .filter(|value| still_given(value)),
+        )
+        .collect();
+    kept.into_iter().map(str::to_owned).collect()
+}
+
+fn folder_names(declaration: &Declaration) -> (Vec<String>, Vec<String>) {
+    let folders = declaration.folders();
+    let paths = |writable: bool| {
+        folders
+            .iter()
+            .filter(|(_, can_write)| *can_write == writable)
+            .map(|(folder, _)| folder.display().to_string())
+            .collect()
+    };
+    (paths(true), paths(false))
+}
+
+/// Moves an updated app from what it declared `before` to what it declares
+/// now without opening anything to it: it keeps what it still asks for among
+/// what it holds and what you added yourself, and loses the rest. What you
+/// took away from it stays away.
+pub async fn narrow(id: &str, before: &Declaration, after: &Declaration) -> Result<(), String> {
+    if after.unsandboxed.is_some() {
+        return Ok(());
+    }
+    let connection = dbus::session().await?;
+    let (changed, read_only, devices, talk) = futures_util::join!(
+        permissions::values(connection, &FOLDERS, id),
+        permissions::values(connection, &READ_ONLY_FOLDERS, id),
+        permissions::values(connection, &DEVICES, id),
+        permissions::values(connection, &BUS, id),
+    );
+    let (changed_before, read_only_before) = folder_names(before);
+    let (changed_after, read_only_after) = folder_names(after);
+    let declared_before = [changed_before, read_only_before].concat();
+    let declared_after = [changed_after.clone(), read_only_after].concat();
+    let still_changed = narrowed(&changed, &declared_before, &changed_after, |folder| {
+        within(folder, &changed)
+    });
+    let still_read = narrowed(&read_only, &declared_before, &declared_after, |folder| {
+        !still_changed.iter().any(|kept| kept == folder)
+            && (within(folder, &read_only) || within(folder, &changed))
+    });
+    let still_devices = narrowed(&devices, &before.devices, &after.devices, |device| {
+        devices
+            .iter()
+            .any(|held| held == device || held == ALL_DEVICES)
+    });
+    let still_talk = narrowed(&talk, &before.talk, &after.talk, |name| {
+        reaches(&talk, name)
+    });
+    store(connection, &FOLDERS, id, &still_changed).await?;
+    store(connection, &READ_ONLY_FOLDERS, id, &still_read).await?;
+    store(connection, &DEVICES, id, &still_devices).await?;
+    store(connection, &BUS, id, &still_talk).await?;
+    if after.network {
+        Ok(())
+    } else {
+        store(connection, &NETWORK, id, &[NO.to_owned()]).await
+    }
 }
 
 /// What the app's sandbox opens to it, in Flatpak's words.
@@ -78,4 +208,32 @@ pub async fn granted(id: &str) -> Result<Permissions, String> {
         .chain(read_only.into_iter().map(|folder| format!("{folder}:ro")))
         .collect();
     Ok(permissions)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{narrowed, within};
+
+    fn owned(values: &[&str]) -> Vec<String> {
+        values.iter().map(|value| (*value).to_owned()).collect()
+    }
+
+    #[test]
+    fn an_update_keeps_what_is_held_and_still_asked_for() {
+        let held = owned(&["/home/me", "/srv/projects"]);
+        let before = owned(&["/home/me", "/home/me/Pictures"]);
+        let after = owned(&["/home/me/Documents", "/home/me/Music"]);
+        assert_eq!(
+            narrowed(&held, &before, &after, |folder| within(folder, &held)),
+            owned(&["/home/me/Documents", "/home/me/Music", "/srv/projects"])
+        );
+    }
+
+    #[test]
+    fn an_update_does_not_bring_back_what_was_taken_away() {
+        let held = owned(&["/home/me/Music"]);
+        let before = owned(&["/home/me/Music", "/home/me/Pictures"]);
+        let after = owned(&["/home/me/Pictures", "/home/me/Videos"]);
+        assert!(narrowed(&held, &before, &after, |folder| within(folder, &held)).is_empty());
+    }
 }

@@ -20,6 +20,24 @@ pub const SANDBOX: &str = "--sandbox";
 pub const FILES: &str = "@@";
 pub const URIS: &str = "@@u";
 pub const CHROMIUM: &str = "X-Luft-Chromium";
+pub const VERSION: &str = "X-AppImage-Version";
+const ACTION_GROUP: &str = "[Desktop Action ";
+const AUTOSTART_ARGUMENTS: &str = "X-Sabine-Autostart-Arguments";
+const LOCALIZED_KEYS: [&str; 4] = ["Name", "GenericName", "Comment", "Keywords"];
+const MAIN_KEYS: [&str; 12] = [
+    "Type",
+    "Version",
+    "Categories",
+    "MimeType",
+    "Actions",
+    "Terminal",
+    "NoDisplay",
+    "StartupNotify",
+    "StartupWMClass",
+    "SingleMainWindow",
+    "PrefersNonDefaultGPU",
+    VERSION,
+];
 
 fn failed(error: impl std::fmt::Display) -> String {
     error.to_string()
@@ -143,6 +161,8 @@ fn add(source: &Path, transfer: Transfer, task: Task) -> Result<Installed, Strin
         if earlier.path == path && earlier.id != id {
             fs::remove_file(&earlier.desktop).map_err(failed)?;
             remove_icons(&earlier.id);
+            #[cfg(feature = "system")]
+            luft_app::block_on(super::grants::forget(&earlier.id))?;
         }
     }
     integrate(&id, &path, &bundle)?;
@@ -258,11 +278,15 @@ fn quoted(path: &Path) -> String {
     format!("\"{}\"", path.display().to_string().replace('"', "\\\""))
 }
 
+fn plain(argument: &&str) -> bool {
+    ![FILES, URIS].contains(argument)
+}
+
 fn exec_line(original: &str, id: &str, bundle: &Bundle) -> String {
     let mut arguments: Vec<String> = original
         .split_whitespace()
         .skip(1)
-        .filter(|argument| ![FILES, URIS].contains(argument))
+        .filter(plain)
         .map(str::to_owned)
         .collect();
     if bundle.chromium {
@@ -276,45 +300,72 @@ fn exec_line(original: &str, id: &str, bundle: &Bundle) -> String {
         .join(" ")
 }
 
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum Group {
+    Main,
+    Action,
+    Other,
+}
+
+impl Group {
+    fn of(header: &str) -> Self {
+        if header == MAIN_GROUP {
+            Self::Main
+        } else if header.starts_with(ACTION_GROUP) {
+            Self::Action
+        } else {
+            Self::Other
+        }
+    }
+
+    fn keeps(self, key: &str) -> bool {
+        let unlocalized = key.split_once('[').map_or(key, |(name, _)| name);
+        match self {
+            Self::Main => MAIN_KEYS.contains(&key) || LOCALIZED_KEYS.contains(&unlocalized),
+            Self::Action => unlocalized == "Name" || key == "Icon",
+            Self::Other => false,
+        }
+    }
+}
+
 fn desktop_entry(id: &str, bundle: &Bundle, executable: &Path, icon: Option<&str>) -> String {
     let mut lines = Vec::new();
-    let mut main = false;
+    let mut group = Group::Other;
     for line in bundle.entry_text.lines() {
         let trimmed = line.trim();
         if trimmed.starts_with('[') {
-            main = trimmed == MAIN_GROUP;
-            lines.push(trimmed.to_owned());
-            if main {
-                lines.push(format!("TryExec={}", executable.display()));
-                if bundle.electron || bundle.chromium {
-                    lines.push(format!("{CHROMIUM}=true"));
+            group = Group::of(trimmed);
+            match group {
+                Group::Main => {
+                    lines.push(trimmed.to_owned());
+                    lines.push(format!("TryExec={}", executable.display()));
+                    if bundle.electron || bundle.chromium {
+                        lines.push(format!("{CHROMIUM}=true"));
+                    }
                 }
+                Group::Action => lines.extend([String::new(), trimmed.to_owned()]),
+                Group::Other => {}
             }
             continue;
         }
-        let key = trimmed
-            .split_once('=')
-            .map(|(key, _)| key.trim())
-            .unwrap_or_default();
-        match key {
-            "Exec" => lines.push(format!(
-                "Exec={}",
-                exec_line(
-                    trimmed
-                        .split_once('=')
-                        .map(|(_, value)| value)
-                        .unwrap_or_default(),
-                    id,
-                    bundle
-                )
-            )),
-            "TryExec" | CHROMIUM => {}
-            "Icon" if main => {
+        let Some((key, value)) = trimmed.split_once('=') else {
+            continue;
+        };
+        match key.trim() {
+            "Exec" if group != Group::Other => {
+                lines.push(format!("Exec={}", exec_line(value, id, bundle)));
+            }
+            "Icon" if group == Group::Main => {
                 if let Some(icon) = icon {
                     lines.push(format!("Icon={icon}"));
                 }
             }
-            _ => lines.push(trimmed.to_owned()),
+            AUTOSTART_ARGUMENTS if group == Group::Main => {
+                let arguments: Vec<&str> = value.split_whitespace().filter(plain).collect();
+                lines.push(format!("{AUTOSTART_ARGUMENTS}={}", arguments.join(" ")));
+            }
+            key if group.keeps(key) => lines.push(trimmed.to_owned()),
+            _ => {}
         }
     }
     lines.join("\n") + "\n"
@@ -346,6 +397,8 @@ fn remove_icons(id: &str) {
 
 pub fn remove(id: &str) -> Result<(), String> {
     let app = library::find(id)?;
+    #[cfg(feature = "system")]
+    luft_app::block_on(super::grants::forget(id))?;
     fs::remove_file(&app.path).map_err(failed)?;
     fs::remove_file(&app.desktop).map_err(failed)?;
     remove_icons(id);

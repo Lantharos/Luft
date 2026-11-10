@@ -14,6 +14,7 @@ use parking_lot::Mutex;
 use super::cache::{Source, ThumbnailSize};
 use super::child::{Cancellation, Ending};
 use super::sandbox::Sandbox;
+use crate::files::shared_data_folders;
 
 const TIMEOUT: Duration = Duration::from_secs(30);
 const ENTRY_SECTION: &str = "[Thumbnailer Entry]";
@@ -177,15 +178,7 @@ fn expand(argument: &str, source: &Source, size: ThumbnailSize, output: &Path) -
 
 fn folders() -> Vec<PathBuf> {
     let mut folders: Vec<PathBuf> = dirs::data_dir().into_iter().collect();
-    folders.extend(
-        env::var("XDG_DATA_DIRS")
-            .ok()
-            .filter(|dirs| !dirs.is_empty())
-            .unwrap_or_else(|| "/usr/local/share:/usr/share".to_string())
-            .split(':')
-            .filter(|folder| !folder.is_empty())
-            .map(PathBuf::from),
-    );
+    folders.extend(shared_data_folders());
     let mut unique = Vec::with_capacity(folders.len());
     for folder in folders
         .into_iter()

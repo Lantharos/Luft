@@ -24,7 +24,7 @@ talk = ["org.mpris.MediaPlayer2.notes"]
 | Key | Default | Means |
 | --- | --- | --- |
 | `network` | `true` | It can go online |
-| `filesystems` | none | `home`, `xdg-desktop`, `xdg-documents`, `xdg-download`, `xdg-music`, `xdg-pictures` or `xdg-videos`, read-only with `:ro`. Files you pick in a file dialog always reach it. An app given your home folder still keeps its own files in `~/.var/app/APP-ID` |
+| `filesystems` | none | Folders besides your Downloads folder, which every sandboxed app gets until you turn that off in Settings → Apps: `home`, `xdg-desktop`, `xdg-documents`, `xdg-download`, `xdg-music`, `xdg-pictures` or `xdg-videos`, read-only with `:ro`. Files you pick in a file dialog always reach it. An app given your home folder still keeps its own files in `~/.var/app/APP-ID` |
 | `devices` | none | `usb`, `serial` or `all`. The graphics card, sound and the camera through the portal need nothing |
 | `talk` | none | Session bus names it calls besides the portals, notifications, the Secret Service, the tray, Kestrel's palette and its Send sheet. Names that would let it widen its own sandbox, such as the permission store, Flatpak's and systemd's, are refused, and so is Kestrel's, whose other services are only for Luft's own apps |
 
@@ -40,7 +40,7 @@ reason = "It manages the containers Podman runs for you."
 
 ## Schelf decides
 
-Schelf reads the declaration from the AppImage before it installs it and shows it in plain words, as it does for Flatpaks. What you install with is written to the permission store, and the sandbox reads only the store when the app starts, never the app's own files, so an update can't widen what an app was given.
+Schelf reads the declaration from the AppImage before it installs it and shows it in plain words, as it does for Flatpaks. What you install with is written to the permission store, and the sandbox reads only the store when the app starts, never the app's own files, so an update can't widen what an app was given. An update that asks for more waits until you agree to it. Any other update opens nothing new: the app keeps what it still asks for among what it has, and the folders you added yourself, and what you took away in Settings → Apps stays away. Removing an app clears everything the store holds for it, and installing an AppImage from a file starts from what that file declares, so another app that takes the same ID later gets nothing the first one had.
 
 | Store entry | Holds |
 | --- | --- |
@@ -48,10 +48,11 @@ Schelf reads the declaration from the AppImage before it installs it and shows i
 | `sandbox` / `read-only-folders` | Folders it can only read |
 | `sandbox` / `devices` | `usb`, `serial` or `all` |
 | `sandbox` / `network` | `no` when it stays offline |
+| `sandbox` / `downloads` | `no` when it doesn't get your Downloads folder |
 | `sandbox` / `bus` | The extra session bus names it can call |
 | `full-access` / `full-access` | It runs outside the sandbox |
 
-An app that asks to run unsandboxed gets Schelf's full access confirmation, with its reason, before it installs; cancelling installs nothing. `schelf install` installs it in its sandbox and says what it asked for, and `schelf trust` gives it full access. Its page in Schelf keeps the full access switch with its reason, and Settings → Apps lists everything in the store, its folders, network, devices and bus names included, so anything can be taken back later. An AppImage without a declaration gets the sandbox every AppImage gets, with network and nothing else. Outside a sandbox, a Sabine app holds itself to its declaration with Landlock; Schelf starts an app you gave full access with `SABINE_FULL_ACCESS` set, so it doesn't.
+An app that asks to run unsandboxed gets Schelf's full access confirmation, with its reason, before it installs; cancelling installs nothing. `schelf install` installs it in its sandbox and says what it asked for, and `schelf trust` gives it full access. Its page in Schelf keeps the full access switch with its reason, and Settings → Apps lists everything in the store, its folders, network, devices and bus names included, so anything can be taken back later. An AppImage without a declaration gets the sandbox every AppImage gets: the network, your Downloads folder, the display, sound and the graphics card, and no other folders, devices or bus names. Its launcher keeps only the name, description, categories, file types and actions from the AppImage's own desktop entry, so an AppImage can't mark itself as something else there. Outside a sandbox, a Sabine app holds itself to its declaration with Landlock; Schelf starts an app you gave full access with `SABINE_FULL_ACCESS` set, so it doesn't.
 
 ## One Chromium for Luft, one each for everyone else
 

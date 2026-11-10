@@ -7,6 +7,8 @@ use gio::prelude::*;
 use skrifa::instance::{LocationRef, Size};
 use skrifa::{FontRef, MetadataProvider};
 
+use crate::dbus::failed;
+
 pub use system::{Defaults, Role, defaults, reset, use_family};
 
 const LIST_FORMAT: &str = "%{family[0]}\t%{style[0]}\t%{postscriptname}\t%{index}\t%{file}\n";
@@ -20,10 +22,6 @@ pub struct Face {
     pub postscript: String,
     pub face: u32,
     pub file: PathBuf,
-}
-
-fn failed(error: impl std::fmt::Display) -> String {
-    error.to_string()
 }
 
 fn face(line: &str) -> Option<Face> {

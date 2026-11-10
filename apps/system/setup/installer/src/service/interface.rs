@@ -25,6 +25,7 @@ use crate::install::drive::plan;
 use crate::install::windows::Windows;
 use crate::install::{self, Account, Answers, Destination, Job, Stage, Status};
 use crate::options::Options;
+use crate::phase::Phase;
 use crate::{first_boot, phase, survey};
 
 const INSTALL: &str = "com.lantharos.installer.install";
@@ -344,8 +345,20 @@ impl Installer {
         Ok(())
     }
 
-    fn use_language(&self, language: &str) {
+    async fn use_language(
+        &self,
+        language: &str,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+    ) -> Result<(), Error> {
+        match phase::detect(&self.options.state_dir) {
+            Phase::Live => self.authorize(connection, &header, INSTALL).await?,
+            Phase::FirstBoot | Phase::Installed => {
+                self.setup_app_user(connection, &header).await?;
+            }
+        }
         language::choose(language);
+        Ok(())
     }
 
     #[zbus(signal)]

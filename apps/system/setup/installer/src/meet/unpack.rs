@@ -1,4 +1,6 @@
+use std::ffi::OsStr;
 use std::fs;
+use std::os::unix::ffi::OsStrExt;
 use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 
@@ -122,6 +124,21 @@ fn picture(
     Ok(vec![icon, settings])
 }
 
+/// A file name as an address carries it, with everything but letters, digits
+/// and `-._~` percent-encoded, so it can't end the quoted value it's written
+/// into either.
+fn uri_segment(name: &OsStr) -> String {
+    name.as_bytes()
+        .iter()
+        .map(|byte| match byte {
+            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'.' | b'_' | b'~' => {
+                char::from(*byte).to_string()
+            }
+            byte => format!("%{byte:02X}"),
+        })
+        .collect()
+}
+
 fn wallpaper(from: &Path, manifest: &Manifest, home: &Path, user: &str) -> Result<()> {
     let Some(wallpaper) = manifest.wallpaper.as_deref() else {
         return Ok(());
@@ -134,7 +151,7 @@ fn wallpaper(from: &Path, manifest: &Manifest, home: &Path, user: &str) -> Resul
     copy(&from.join(wallpaper), &target)?;
     let uri = format!(
         "file:///var/home/{user}/{BACKGROUNDS}/{}",
-        name.to_string_lossy()
+        uri_segment(name)
     );
     let keyfiles = home.join(DCONF).join("user.d");
     write(

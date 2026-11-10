@@ -92,6 +92,7 @@ pub fn needs_system(package: &str) -> Result<bool, String> {
         .args(["repoquery", "--quiet", "--latest-limit=1", "--list"])
         .args(choice)
         .arg(architectures)
+        .arg("--")
         .arg(package)
         .env("LC_ALL", "C.UTF-8")
         .stdin(Stdio::null())

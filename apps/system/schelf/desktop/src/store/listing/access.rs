@@ -4,8 +4,9 @@ use luft_software::apps::appimage::Declaration;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
-/// What an app may use, in Luft's shared permission format; an app that
-/// declares nothing gets full access.
+/// What an app may use, in Luft's shared permission format. An app that
+/// declares nothing runs in the sandbox every AppImage gets, unless you give
+/// it full access.
 #[derive(Deserialize, Serialize, Clone, PartialEq, Eq, Debug, Type)]
 pub struct Declared {
     pub network: bool,
@@ -16,6 +17,17 @@ pub struct Declared {
 }
 
 impl Declared {
+    /// What the sandbox gives an app that declares nothing.
+    pub fn undeclared() -> Self {
+        Self {
+            network: true,
+            filesystems: Vec::new(),
+            devices: Vec::new(),
+            talk: Vec::new(),
+            unsandboxed: None,
+        }
+    }
+
     pub fn declaration(&self) -> Declaration {
         Declaration {
             network: self.network,
@@ -75,6 +87,18 @@ impl Declared {
     }
 }
 
+/// Whether an update from `before` to `after` lets the app do something it
+/// couldn't. An app that declared nothing so far has only what every sandbox
+/// gets, unless it runs with full access.
+pub fn widens(after: Option<&Declared>, before: Option<&Declared>, full_access: bool) -> bool {
+    match (after, before) {
+        (None, None) => false,
+        (None, Some(_)) => true,
+        (Some(after), None) => !full_access && after.widens(&Declared::undeclared()),
+        (Some(after), Some(before)) => after.widens(before),
+    }
+}
+
 /// A port an extension takes connections on from devices on the network.
 #[derive(Deserialize, Serialize, Clone, PartialEq, Eq, Debug, Type)]
 pub struct ListenPort {
@@ -103,7 +127,10 @@ impl ExtensionAccess {
                 .permissions
                 .iter()
                 .any(|permission| !before.permissions.contains(permission))
-            || self.network.iter().any(|host| !before.network.contains(host))
+            || self
+                .network
+                .iter()
+                .any(|host| !before.network.contains(host))
             || self.listen.iter().any(|port| !before.listen.contains(port))
     }
 }
@@ -136,6 +163,18 @@ mod tests {
             ..declared(false, &[], &[], &[])
         };
         assert!(unsandboxed.widens(&before));
+    }
+
+    #[test]
+    fn a_first_declaration_widens_only_past_the_plain_sandbox() {
+        let home = declared(true, &["home"], &[], &[]);
+        assert!(super::widens(Some(&home), None, false));
+        assert!(!super::widens(Some(&home), None, true));
+        assert!(!super::widens(
+            Some(&declared(false, &[], &[], &[])),
+            None,
+            false
+        ));
     }
 
     #[test]

@@ -11,7 +11,7 @@ use crate::catalog::cache;
 
 const STORE_KEYS: &str = "trust/v1/store-keys.json";
 const SEAL: &str = ".sig";
-const TAG: &str = ".etag";
+const LENGTH: usize = size_of::<u64>();
 
 static KEYS: Mutex<Option<Arc<Keys>>> = Mutex::new(None);
 
@@ -20,6 +20,48 @@ static KEYS: Mutex<Option<Arc<Keys>>> = Mutex::new(None);
 pub enum Age {
     Within(Duration),
     Current,
+}
+
+/// A document as schelf.store answered: its bytes, its seal and the tag to
+/// ask with whether it changed.
+struct Stored {
+    body: Vec<u8>,
+    seal: Vec<u8>,
+    tag: Option<String>,
+}
+
+impl Stored {
+    /// The copy as one file, so a document and its seal never part: the
+    /// bytes, the seal, the tag, then the lengths of the last two.
+    fn pack(&self) -> Vec<u8> {
+        let tag = self.tag.as_deref().unwrap_or_default().as_bytes();
+        [
+            &self.body,
+            &self.seal,
+            tag,
+            &(self.seal.len() as u64).to_le_bytes(),
+            &(tag.len() as u64).to_le_bytes(),
+        ]
+        .concat()
+    }
+
+    fn unpack(mut bytes: Vec<u8>) -> Option<Self> {
+        let mut length = || {
+            let at = bytes.len().checked_sub(LENGTH)?;
+            let length = u64::from_le_bytes(bytes[at..].try_into().ok()?);
+            bytes.truncate(at);
+            usize::try_from(length).ok()
+        };
+        let tag_length = length()?;
+        let seal_length = length()?;
+        let tag = bytes.split_off(bytes.len().checked_sub(tag_length)?);
+        let seal = bytes.split_off(bytes.len().checked_sub(seal_length)?);
+        Some(Self {
+            body: bytes,
+            seal,
+            tag: String::from_utf8(tag).ok().filter(|tag| !tag.is_empty()),
+        })
+    }
 }
 
 struct Cached {
@@ -33,12 +75,6 @@ impl Cached {
         }
     }
 
-    fn sibling(&self, suffix: &str) -> PathBuf {
-        let mut name = self.path.clone().into_os_string();
-        name.push(suffix);
-        PathBuf::from(name)
-    }
-
     fn younger_than(&self, age: Duration) -> bool {
         self.path
             .metadata()
@@ -48,12 +84,8 @@ impl Cached {
             .is_some_and(|elapsed| elapsed < age)
     }
 
-    fn read(&self) -> Option<(Vec<u8>, Vec<u8>)> {
-        Some((fs::read(&self.path).ok()?, fs::read(self.sibling(SEAL)).ok()?))
-    }
-
-    fn tag(&self) -> Option<String> {
-        fs::read_to_string(self.sibling(TAG)).ok()
+    fn read(&self) -> Option<Stored> {
+        Stored::unpack(fs::read(&self.path).ok()?)
     }
 
     fn touch(&self) {
@@ -63,17 +95,8 @@ impl Cached {
             .and_then(|file| file.set_modified(SystemTime::now()));
     }
 
-    fn store(&self, body: &[u8], seal: &[u8], tag: Option<&str>) {
-        let _ = luft_app::files::replace(&self.sibling(SEAL), seal);
-        let _ = luft_app::files::replace(&self.path, body);
-        match tag {
-            Some(tag) => {
-                let _ = luft_app::files::replace(&self.sibling(TAG), tag.as_bytes());
-            }
-            None => {
-                let _ = fs::remove_file(self.sibling(TAG));
-            }
-        }
+    fn store(&self, stored: &Stored) {
+        let _ = luft_app::files::replace(&self.path, &stored.pack());
     }
 }
 
@@ -114,37 +137,46 @@ fn bytes(url: &str) -> Result<Vec<u8>, String> {
     }
 }
 
-/// The document's bytes and seal, from disk when they're recent enough,
-/// otherwise asked for again, falling back to the copy on disk when
-/// schelf.store can't be reached.
-fn load(document: &str, age: Age) -> Result<(Vec<u8>, Seal), String> {
+/// The document's bytes with what `check` makes of them and their seal. A
+/// copy on disk is used when it's recent enough, otherwise schelf.store is
+/// asked again, and the copy on disk stands in when it can't be reached.
+/// Only what passes `check` is used or kept, so a damaged copy on disk is
+/// fetched anew rather than asked about by its tag.
+fn load<T>(
+    document: &str,
+    age: Age,
+    check: impl Fn(&[u8], &Seal) -> Result<T, String>,
+) -> Result<(Vec<u8>, T), String> {
     let cached = Cached::of(document);
-    let on_disk = cached.read();
-    if let (Age::Within(age), Some((body, seal))) = (age, &on_disk)
-        && cached.younger_than(age)
-    {
-        return Ok((body.clone(), Seal::read(seal)?));
-    }
+    let trusted = |stored: &Stored| check(&stored.body, &Seal::read(&stored.seal)?);
+    let on_disk = cached
+        .read()
+        .and_then(|copy| Some((trusted(&copy).ok()?, copy)));
+    let recent = matches!(age, Age::Within(age) if cached.younger_than(age));
+    let (held, tag) = match on_disk {
+        Some((checked, copy)) if recent => return Ok((copy.body, checked)),
+        Some((checked, copy)) => (Some((copy.body, checked)), copy.tag),
+        None => (None, None),
+    };
     let url = format!("{DOWNLOADS}{document}");
-    let tag = on_disk.as_ref().and(cached.tag());
     let fetched = get(&url, tag.as_deref()).and_then(|answer| match answer {
-        Answer::Same => on_disk.clone().ok_or_else(|| OFFLINE.to_owned()),
+        Answer::Same => Ok(None),
         Answer::Changed { body, tag } => {
             let seal = bytes(&format!("{url}{SEAL}"))?;
-            cached.store(&body, &seal, tag.as_deref());
-            Ok((body, seal))
+            let fresh = Stored { body, seal, tag };
+            let checked = trusted(&fresh)?;
+            cached.store(&fresh);
+            Ok(Some((fresh.body, checked)))
         }
     });
     match fetched {
-        Ok((body, seal)) => {
+        Ok(Some(fresh)) => Ok(fresh),
+        Ok(None) => {
             cached.touch();
-            Ok((body, Seal::read(&seal)?))
+            held.ok_or_else(|| OFFLINE.to_owned())
         }
         Err(error) if error == MISSING => Err(error),
-        Err(error) => {
-            let (body, seal) = on_disk.ok_or(error)?;
-            Ok((body, Seal::read(&seal)?))
-        }
+        Err(error) => held.ok_or(error),
     }
 }
 
@@ -153,19 +185,40 @@ fn keys(age: Age) -> Result<Arc<Keys>, String> {
     if let (Some(keys), Age::Within(_)) = (slot.as_ref(), age) {
         return Ok(keys.clone());
     }
-    let (body, seal) = load(STORE_KEYS, age)?;
-    let keys = Arc::new(Keys::read(&body, &seal)?);
+    let (_, keys) = load(STORE_KEYS, age, Keys::read)?;
+    let keys = Arc::new(keys);
     *slot = Some(keys.clone());
     Ok(keys)
 }
 
 /// A document from schelf.store, checked against the store's keys before
-/// anything reads it.
+/// anything reads it or it's kept on disk.
 pub fn fetch(document: &str, age: Age) -> Result<Vec<u8>, String> {
-    let (body, seal) = load(document, age)?;
-    if keys(age)?.verify(&body, &seal).is_ok() {
-        return Ok(body);
-    }
-    keys(Age::Current)?.verify(&body, &seal)?;
+    let (body, ()) = load(document, age, |body, seal| {
+        keys(age)?
+            .verify(body, seal)
+            .or_else(|_| keys(Age::Current)?.verify(body, seal))
+    })?;
     Ok(body)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Stored;
+
+    #[test]
+    fn a_stored_document_reads_back_whole_or_not_at_all() {
+        let stored = Stored {
+            body: b"{\"apps\":[]}".to_vec(),
+            seal: b"{\"key\":\"k\",\"sig\":\"s\"}".to_vec(),
+            tag: Some("\"abc\"".into()),
+        };
+        let packed = stored.pack();
+        let read = Stored::unpack(packed.clone()).unwrap();
+        assert_eq!(read.body, stored.body);
+        assert_eq!(read.seal, stored.seal);
+        assert_eq!(read.tag, stored.tag);
+        assert!(Stored::unpack(packed[packed.len() - 12..].to_vec()).is_none());
+        assert!(Stored::unpack(stored.body).is_none());
+    }
 }

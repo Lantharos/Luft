@@ -13,7 +13,8 @@
 
     Survey, Install, Configure and CreateAccount need com.lantharos.installer.install. The rest only answer the
     account setup is pending for: FinishFirstBoot, and, while setup is still open, the setup steps, which also
-    need com.lantharos.installer.set-up and have to come from Install Luft's own program. Anyone may call UseLanguage.
+    need com.lantharos.installer.set-up and have to come from Install Luft's own program. UseLanguage is taken
+    like Install on the live system and like a setup step after it.
   -->
   <interface name="com.lantharos.Installer1">
     <property name="Phase" type="s" access="read"/>

@@ -3,7 +3,7 @@ import { commands, type CatalogApp, type Collection, type StoreDetails } from '#
 import type { CategoryId } from './categories';
 import type { AppDetails } from './types';
 
-export const collection = (name: Collection) => commands.storeCollection({ collection: name });
+export const collection = (name: Collection, limit?: number) => commands.storeCollection({ collection: name, limit });
 
 export const category = (id: CategoryId) => commands.storeCategory({ category: id });
 

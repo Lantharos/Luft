@@ -6,7 +6,7 @@ use specta::Type;
 
 use super::catalog::Kind;
 use super::install::Consent;
-use super::listing::{self, Declared, ExtensionAccess, Format, Listing, Offer};
+use super::listing::{self, ExtensionAccess, Format, Listing, Offer};
 use super::record::{self, Installed};
 use super::revocations::{self, Severity};
 use super::signed::Age;
@@ -37,14 +37,6 @@ fn widens_extension(after: Option<&ExtensionAccess>, before: Option<&ExtensionAc
         (Some(after), Some(before)) => after.widens(before),
         (Some(_), None) => true,
         (None, _) => false,
-    }
-}
-
-fn widens(after: Option<&Declared>, before: Option<&Declared>) -> bool {
-    match (after, before) {
-        (_, None) => false,
-        (None, Some(_)) => true,
-        (Some(after), Some(before)) => after.widens(before),
     }
 }
 
@@ -94,6 +86,7 @@ fn update(id: String, installed: Installed) -> Result<Option<StoreUpdate>, Strin
         return Ok(None);
     }
     let replacement_installed = replacing && record::get(&listing.id).is_some();
+    let full_access = block_on(full_access(&installed));
     Ok(Some(StoreUpdate {
         widens: match (installed.format, format) {
             _ if replacement_installed => false,
@@ -102,15 +95,23 @@ fn update(id: String, installed: Installed) -> Result<Option<StoreUpdate>, Strin
                 release.extension.as_ref(),
                 installed.agreed_extension.as_ref(),
             ),
-            _ => widens(release.permissions.as_ref(), installed.agreed.as_ref()),
+            _ => listing::widens(
+                release.permissions.as_ref(),
+                installed.agreed.as_ref(),
+                full_access,
+            ),
         },
         consent: Consent {
             version: release.version.clone(),
             permissions: release.permissions.clone(),
             extension: release.extension.clone(),
-            full_access: block_on(full_access(&installed)),
+            full_access,
         },
-        size: if replacement_installed { 0 } else { artifact.size },
+        size: if replacement_installed {
+            0
+        } else {
+            artifact.size
+        },
         to: release.version.clone(),
         icon: listing.icon.clone(),
         replacement: replacing.then(|| listing.name().to_owned()),

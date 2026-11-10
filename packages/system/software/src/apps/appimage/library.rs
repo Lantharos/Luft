@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 use serde::Serialize;
 
 use super::elf;
-use super::integrate::{CHROMIUM, SANDBOX};
+use super::integrate::{CHROMIUM, SANDBOX, VERSION};
 use crate::apps::desktop::DesktopEntry;
 
 const ICON_FOLDERS: [u32; 13] = [16, 22, 24, 32, 36, 48, 64, 72, 96, 128, 192, 256, 512];
@@ -154,7 +154,7 @@ fn read(desktop: &Path) -> Option<AppImage> {
         id: desktop.file_stem()?.to_string_lossy().into_owned(),
         name: entry.get("Name").unwrap_or("AppImage").to_owned(),
         summary: entry.get("Comment").map(str::to_owned),
-        version: entry.get("X-AppImage-Version").map(str::to_owned),
+        version: entry.get(VERSION).map(str::to_owned),
         icon: entry.get("Icon").and_then(icon_path),
         size: path.metadata().map(|metadata| metadata.len()).unwrap_or(0),
         updatable: elf::section(&path, ".upd_info").is_some(),

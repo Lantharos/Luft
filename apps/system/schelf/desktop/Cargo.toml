@@ -25,6 +25,7 @@ luft-app = { workspace = true, features = ["apps", "launch"] }
 luft-dbus-macros.workspace = true
 luft-sandbox.workspace = true
 luft-software = { workspace = true, features = ["default"] }
+memmap2.workspace = true
 quick-xml.workspace = true
 sabine.workspace = true
 sabine-service.workspace = true

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { appearance, Spinner, WindowControls } from '@luft/ui';
+	import { appearance, IconButton, Spinner, WindowControls } from '@luft/ui';
 	import Lock from '@lucide/svelte/icons/lock';
 	import LockOpen from '@lucide/svelte/icons/lock-open';
 	import RotateCw from '@lucide/svelte/icons/rotate-cw';
@@ -25,9 +25,9 @@
 
 <div class="glass-shell flex-col">
 	<header class="drag-region flex h-[52px] flex-none items-center gap-3 pr-3 pl-4">
-		<button type="button" class="icon-button" aria-label="Reload" onclick={() => signIn.reload()}>
-			<RotateCw size={16} class={signIn.loading && signIn.shown ? 'animate-spin' : ''} />
-		</button>
+		<span class={['contents', signIn.loading && signIn.shown && '[&_svg]:animate-spin']}>
+			<IconButton icon={RotateCw} label="Reload" onclick={() => signIn.reload()} />
+		</span>
 		<div class="flex min-w-0 flex-1 items-center gap-2 text-[13px]">
 			{#if signIn.network}
 				<span class="truncate font-medium">{signIn.network}</span>

@@ -6,6 +6,8 @@ use std::sync::OnceLock;
 use gio::glib;
 use gio::prelude::*;
 
+use crate::files::shared_data_folders;
+
 const FALLBACK_THEME: &str = "hicolor";
 const INTERFACE_SCHEMA: &str = "org.gnome.desktop.interface";
 const IDEAL_SIZE: u32 = 128;
@@ -60,13 +62,7 @@ fn build() -> HashMap<String, PathBuf> {
 
 fn icon_bases() -> Vec<PathBuf> {
     let mut data_dirs: Vec<PathBuf> = dirs::data_dir().into_iter().collect();
-    data_dirs.extend(
-        std::env::var("XDG_DATA_DIRS")
-            .unwrap_or_else(|_| "/usr/local/share:/usr/share".into())
-            .split(':')
-            .filter(|directory| !directory.is_empty())
-            .map(PathBuf::from),
-    );
+    data_dirs.extend(shared_data_folders());
     data_dirs.extend(dirs::data_dir().map(|data| data.join("flatpak/exports/share")));
     data_dirs.push(PathBuf::from(FLATPAK_EXPORTS));
     let mut bases: Vec<PathBuf> = dirs::home_dir()

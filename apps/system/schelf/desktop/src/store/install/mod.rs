@@ -4,7 +4,7 @@ pub mod extensions;
 use std::path::Path;
 
 use luft_app::block_on;
-use luft_software::apps::appimage;
+use luft_software::apps::{appimage, flatpak};
 use luft_software::progress::Stage;
 use luft_software::task::Task;
 use sabine_service::SabineService;
@@ -76,25 +76,55 @@ fn full_access_declared() -> Declared {
     }
 }
 
+/// Gives a store AppImage its access after `release` was installed over
+/// `previous`. A new app gets what it declares. An update you agreed to
+/// because it asks for more gets that too; any other update opens nothing
+/// that wasn't open already, so what you took away in Settings stays away.
+async fn give_access(
+    id: &str,
+    release: &Release,
+    previous: Option<&Installed>,
+    full_access: bool,
+) -> Result<(), String> {
+    let declaration = |declared: Option<&Declared>| {
+        declared
+            .cloned()
+            .unwrap_or_else(full_access_declared)
+            .declaration()
+    };
+    let after = declaration(release.permissions.as_ref());
+    let Some(previous) = previous else {
+        return appimage::reset(id, Some(&after), full_access).await;
+    };
+    if previous.agreed == release.permissions {
+        return Ok(());
+    }
+    let widens = listing::widens(
+        release.permissions.as_ref(),
+        previous.agreed.as_ref(),
+        flatpak::has_full_access(&previous.local).await,
+    );
+    if widens {
+        appimage::grant(id, &after, full_access).await
+    } else {
+        appimage::narrow(id, &declaration(previous.agreed.as_ref()), &after).await
+    }
+}
+
 fn install_appimage(
     release: &Release,
     full_access: bool,
-    granting: bool,
+    previous: Option<&Installed>,
     file: &Path,
     task: Task,
 ) -> Result<String, String> {
     let installed = appimage::install(file, task)?;
-    if granting {
-        let declared = release
-            .permissions
-            .clone()
-            .unwrap_or_else(full_access_declared);
-        block_on(appimage::grant(
-            &installed.app.id,
-            &declared.declaration(),
-            full_access,
-        ))?;
-    }
+    block_on(give_access(
+        &installed.app.id,
+        release,
+        previous,
+        full_access,
+    ))?;
     Ok(installed.app.id)
 }
 
@@ -124,17 +154,19 @@ fn remove_installed(installed: &Installed) -> Result<(), String> {
 /// such as from Sabine to an AppImage, the new one replaces the old.
 fn place(
     listing: &Listing,
-    Offer { release, format, .. }: Offer,
+    Offer {
+        release, format, ..
+    }: Offer,
     file: &Path,
     full_access: bool,
     task: Task,
 ) -> Result<(), String> {
     let previous = record::get(&listing.id);
-    let granting = previous.as_ref().is_none_or(|previous| {
-        previous.format != format || previous.agreed != release.permissions
-    });
+    let earlier = previous
+        .as_ref()
+        .filter(|previous| previous.format == format);
     let local = match format {
-        Format::Appimage => install_appimage(release, full_access, granting, file, task),
+        Format::Appimage => install_appimage(release, full_access, earlier, file, task),
         Format::Sabine => install_sabine(&listing.id, file, task),
         Format::LuftExtension => extensions::install(&listing.id, file, task),
     }?;

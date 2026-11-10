@@ -71,6 +71,7 @@ struct Category {
 #[derive(Deserialize, Type)]
 struct Shelf {
     collection: Collection,
+    limit: Option<usize>,
 }
 
 #[derive(Deserialize, Type)]
@@ -149,8 +150,8 @@ pub fn register(window: SabineWindow) -> SabineWindow {
             check_revocations()?;
             Ok(state())
         })
-        .command("store_collection", |Shelf { collection }| {
-            Ok(catalog::current()?.collection(collection))
+        .command("store_collection", |Shelf { collection, limit }| {
+            Ok(catalog::current()?.collection(collection, limit))
         })
         .command("store_category", |Category { category }| {
             Ok(catalog::current()?.category(&category))

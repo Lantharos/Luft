@@ -12,6 +12,7 @@
 	import Spotlight from './Spotlight.svelte';
 
 	const SHELF_SIZE = 6;
+	const SPOTLIGHT = 1;
 	const SHELVES: Collection[] = ['popular', 'updated'];
 
 	let collections = $state<Record<Collection, CatalogApp[]> | null>(null);
@@ -30,10 +31,13 @@
 		return { popular: others(collections.popular), updated: others(collections.updated) };
 	});
 
-	async function load() {
+	async function load(installed: number) {
 		offline = false;
 		try {
-			const [popular, updated] = await Promise.all(SHELVES.map(store.collection));
+			const [popular, updated] = await Promise.all([
+				store.collection('popular', installed + SPOTLIGHT + SHELF_SIZE),
+				store.collection('updated', SPOTLIGHT + SHELF_SIZE)
+			]);
 			collections = { popular, updated };
 		} catch {
 			offline = true;
@@ -42,7 +46,7 @@
 
 	$effect(() => {
 		void catalog.version;
-		void load();
+		if (library.loaded) void load(library.installed.length);
 	});
 
 	const featuredKey = $derived(featured && catalogKey(featured));

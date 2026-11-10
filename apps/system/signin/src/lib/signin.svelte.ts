@@ -37,6 +37,7 @@ class SignIn {
 			})
 		];
 		if (state.target) await this.open(state.target);
+		else appWindow.close();
 		return () => stops.forEach((stop) => stop());
 	}
 

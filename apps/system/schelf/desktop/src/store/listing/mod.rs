@@ -16,7 +16,7 @@ use super::device;
 use super::signed::{self, Age};
 use channel::Following;
 
-pub use access::{Declared, ExtensionAccess, ListenPort};
+pub use access::{Declared, ExtensionAccess, ListenPort, widens};
 pub use details::StoreDetails;
 pub use release::{Artifact, Builder, Format, Provenance, Release};
 pub use version::newer;

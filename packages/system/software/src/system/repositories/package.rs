@@ -11,6 +11,7 @@ fn query(path: &str, format: &str) -> Result<String, String> {
     let output = Command::new("rpm")
         .args(["--query", "--package", "--nosignature", "--queryformat"])
         .arg(format)
+        .arg("--")
         .arg(path)
         .stderr(Stdio::null())
         .output()
@@ -40,6 +41,7 @@ pub fn desktop_entry(path: &str) -> Result<Option<String>, String> {
 /// One file from a package's payload.
 fn extract(path: &str, file: &str) -> Result<String, String> {
     let mut archive = Command::new("rpm2cpio")
+        .arg("--")
         .arg(path)
         .stdout(Stdio::piped())
         .stderr(Stdio::null())

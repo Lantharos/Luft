@@ -11,8 +11,6 @@
 
 	const SHORTEST_PASSPHRASE = 8;
 
-	let key = $state('');
-	let kept = $state(false);
 	let passphrase = $state('');
 	let repeated = $state('');
 	let problem = $state('');
@@ -20,17 +18,18 @@
 
 	let tpm = $derived(setup.trust?.tpm ?? false);
 	let passphraseReady = $derived(tpm || (passphrase.length >= SHORTEST_PASSPHRASE && passphrase === repeated));
-	let ready = $derived(Boolean(key) && kept && passphraseReady);
+	let ready = $derived(Boolean(install.recoveryKey) && install.recoveryKeyKept && passphraseReady);
 
 	$effect(() => {
+		if (install.recoveryKey) return;
 		void commands
 			.trustRecoveryKey()
-			.then((made) => (key = made))
+			.then((made) => (install.recoveryKey = made))
 			.catch((error) => (problem = String(error)));
 	});
 
 	function choose(encrypt: boolean) {
-		confirming = { encryption: encrypt ? { recoveryKey: key, passphrase: tpm ? '' : passphrase } : null };
+		confirming = { encryption: encrypt ? { recoveryKey: install.recoveryKey, passphrase: tpm ? '' : passphrase } : null };
 	}
 
 	async function start(encryption: Encryption | null) {
@@ -42,8 +41,8 @@
 <StepFrame title={t('setup-protect-title')} description={t(tpm ? 'setup-protect-tpm' : 'setup-protect-passphrase')} hideBack={install.starting}>
 	<div class="flex flex-col gap-5">
 		<p class="max-w-[540px] text-[14px] leading-relaxed text-[var(--text-soft)]">{t('setup-protect-keep-safe')}</p>
-		{#if key}
-			<KeyBackup {key} onkept={() => (kept = true)} />
+		{#if install.recoveryKey}
+			<KeyBackup key={install.recoveryKey} onkept={() => (install.recoveryKeyKept = true)} />
 		{/if}
 		{#if !tpm}
 			<div class="grid grid-cols-2 gap-3">

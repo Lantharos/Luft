@@ -14,10 +14,9 @@ use crate::state::manifest::Origin;
 const KEYS: &str = "usr/share/pki/rpm-gpg";
 const PACKAGES: &str = "/run/luft-packages";
 const HIDDEN: [&str; 3] = ["/tmp", "/run", "/var/cache/libdnf5"];
-const CAPABILITIES: [&str; 8] = [
+const CAPABILITIES: [&str; 7] = [
     "chown",
     "dac_override",
-    "dac_read_search",
     "fowner",
     "fsetid",
     "setfcap",

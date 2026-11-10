@@ -11,7 +11,7 @@ use zbus::{Connection, interface};
 
 use super::PATH;
 use super::error::Error;
-use crate::bootc::{self, Fetch};
+use crate::bootc::{self, Fetch, Process};
 use crate::schedule::{self, Every, Schedule};
 
 const DOWNLOAD: &str = "com.lantharos.updater.download";
@@ -22,8 +22,9 @@ const PACKAGES_PATH: &str = "/com/lantharos/Packages1";
 
 pub struct Updater {
     idle: Arc<Idle>,
-    downloading: Mutex<Option<i32>>,
+    downloading: Mutex<Option<Process>>,
     downloaded: AtomicU64,
+    schedule: Mutex<Schedule>,
 }
 
 impl Updater {
@@ -32,11 +33,22 @@ impl Updater {
             idle,
             downloading: Mutex::new(None),
             downloaded: AtomicU64::new(0),
+            schedule: Mutex::new(Schedule::load()),
         }
     }
 
-    fn download_pid(&self) -> Option<i32> {
-        *self.downloading.lock().expect("download lock")
+    fn fetching(&self) -> Option<Process> {
+        self.downloading.lock().expect("download lock").clone()
+    }
+
+    fn planned(&self) -> Schedule {
+        *self.schedule.lock().expect("schedule lock")
+    }
+
+    async fn plan(&self, planned: Schedule) -> Result<(), Error> {
+        self.blocking(move || planned.save()).await?;
+        *self.schedule.lock().expect("schedule lock") = planned;
+        Ok(())
     }
 
     async fn authorize(
@@ -67,7 +79,7 @@ impl Updater {
                 ));
             }
             let fetch = fetch()?;
-            *downloading = Some(fetch.pid());
+            *downloading = Some(fetch.process());
             fetch
         };
         self.downloaded.store(0, Ordering::Relaxed);
@@ -79,10 +91,10 @@ impl Updater {
     }
 
     fn refuse_while_downloading(&self) -> Result<(), Error> {
-        match self.download_pid() {
-            Some(_) => Err(Error::Busy("An update is being downloaded.".to_owned())),
-            None => Ok(()),
+        if self.fetching().is_some_and(|bootc| bootc.running()) {
+            return Err(Error::Busy("An update is being downloaded.".to_owned()));
         }
+        Ok(())
     }
 
     async fn blocking<T: Send + 'static>(
@@ -112,12 +124,14 @@ async fn follow(updater: InterfaceRef<Updater>, fetch: Fetch, scheduled: bool, i
         let _ = inner.downloaded_changed(emitter).await;
     }
     let result = work.await;
+    if matches!(result, Ok(Ok(()))) {
+        build_system_packages(emitter.connection()).await;
+    }
     let inner = updater.get().await;
     *inner.downloading.lock().expect("download lock") = None;
     let _ = inner.downloading_changed(emitter).await;
     let error = match result {
         Ok(Ok(())) => {
-            build_system_packages(emitter.connection()).await;
             if scheduled {
                 let _ = Updater::update_found(emitter, true).await;
             }
@@ -151,7 +165,7 @@ async fn build_system_packages(connection: &Connection) {
 impl Updater {
     #[zbus(property)]
     fn downloading(&self) -> bool {
-        self.download_pid().is_some()
+        self.fetching().is_some()
     }
 
     #[zbus(property)]
@@ -161,17 +175,17 @@ impl Updater {
 
     #[zbus(property)]
     fn schedule(&self) -> &'static str {
-        Schedule::load().every.name()
+        self.planned().every.name()
     }
 
     #[zbus(property)]
     fn download_automatically(&self) -> bool {
-        Schedule::load().download
+        self.planned().download
     }
 
     #[zbus(property)]
     fn last_checked(&self) -> u64 {
-        Schedule::load().checked
+        self.planned().checked
     }
 
     #[zbus(signal)]
@@ -190,13 +204,10 @@ impl Updater {
     ) -> Result<(), Error> {
         self.authorize(connection, &header, SCHEDULE).await?;
         let every = Every::named(schedule)?;
-        self.blocking(move || {
-            Schedule {
-                every,
-                download,
-                ..Schedule::load()
-            }
-            .save()
+        self.plan(Schedule {
+            every,
+            download,
+            ..self.planned()
         })
         .await?;
         let _ = self.schedule_changed(&emitter).await;
@@ -214,8 +225,8 @@ impl Updater {
         if luft_identity::caller::uid(connection, &header).await? != Some(0) {
             return Err(Error::not_authorized());
         }
-        let planned = Schedule::load();
-        if !planned.due(schedule::now()) || self.download_pid().is_some() {
+        let planned = self.planned();
+        if !planned.due(schedule::now()) || self.fetching().is_some() {
             return Ok(());
         }
         if luft_dbus::power::on_battery(connection).await {
@@ -226,13 +237,12 @@ impl Updater {
             eprintln!("Not checking for updates over a metered connection.");
             return Ok(());
         }
-        let available = self.blocking(bootc::available).await?;
-        self.blocking(|| {
-            Schedule {
-                checked: schedule::now(),
-                ..Schedule::load()
-            }
-            .save()
+        let Ok(available) = self.blocking(bootc::available).await else {
+            return Ok(());
+        };
+        self.plan(Schedule {
+            checked: schedule::now(),
+            ..self.planned()
         })
         .await?;
         let _ = self.last_checked_changed(&emitter).await;
@@ -270,8 +280,13 @@ impl Updater {
     ) -> Result<(), Error> {
         self.authorize(connection, &header, DOWNLOAD).await?;
         self.refuse_while_downloading()?;
-        let variant = Variant::named(variant);
-        let target = self.blocking(move || bootc::switch_target(variant)).await?;
+        let named = Variant::named(variant);
+        if named.name() != variant {
+            return Err(Error::Failed(format!(
+                "“{variant}” isn't one of Luft's images."
+            )));
+        }
+        let target = self.blocking(move || bootc::switch_target(named)).await?;
         self.begin(|| Fetch::switch(&target), false, server, &emitter)
             .await
     }
@@ -282,8 +297,8 @@ impl Updater {
         #[zbus(header)] header: Header<'_>,
     ) -> Result<(), Error> {
         self.authorize(connection, &header, DOWNLOAD).await?;
-        if let Some(pid) = self.download_pid() {
-            unsafe { libc::kill(pid, libc::SIGTERM) };
+        if let Some(bootc) = self.fetching() {
+            bootc.stop();
         }
         Ok(())
     }

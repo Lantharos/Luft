@@ -31,6 +31,5 @@
     <method name="RemoveRepository">
       <arg name="file" type="s" direction="in"/>
     </method>
-    <property name="Busy" type="b" access="read"/>
   </interface>
 </node>

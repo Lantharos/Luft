@@ -1,8 +1,10 @@
+use std::collections::BTreeMap;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Read};
 use std::os::fd::{AsRawFd, FromRawFd, OwnedFd};
 use std::os::unix::process::CommandExt;
-use std::process::{Child, Command, Stdio};
+use std::process::{Child, ChildStderr, Command, Stdio};
+use std::sync::{Arc, Mutex};
 
 use anyhow::{Context, Result, anyhow, bail};
 use luft_variant::Variant;
@@ -15,6 +17,7 @@ use crate::progress::Pull;
 const BOOTC: &str = "bootc";
 const REGISTRY: &str = "registry";
 const PROGRESS_FD: i32 = 3;
+const CHECK_TIMEOUT: &str = "2m";
 const SLOTS: [&str; 3] = ["booted", "staged", "rollback"];
 const UNSIGNED: &str = "This update isn't signed by Luft, so it wasn't downloaded.";
 const KEPT_TO_GO_BACK_TO: &str = "same fs-verity digest as the existing Some(Rollback) deployment";
@@ -36,7 +39,14 @@ fn bootc(arguments: &[&str]) -> Result<Vec<u8>> {
     run(Command::new(BOOTC).args(arguments))
 }
 
-fn image_config(digest: &str) -> Option<Value> {
+fn host() -> Result<Value> {
+    Ok(serde_json::from_slice(&bootc(&[
+        "status",
+        "--format=json",
+    ])?)?)
+}
+
+fn inspect(digest: &str) -> Option<Value> {
     let reference = format!("@{digest}");
     let config = bootc(&["internals", "cfs", "oci", "inspect", &reference, "--config"])
         .inspect_err(|error| eprintln!("Reading the image config of {digest}: {error:#}"))
@@ -49,20 +59,29 @@ fn image_config(digest: &str) -> Option<Value> {
     }))
 }
 
-pub fn status() -> Result<String> {
-    let host: Value = serde_json::from_slice(&bootc(&["status", "--format=json"])?)?;
-    let mut configs = Map::new();
-    for slot in SLOTS {
-        let pointer = format!("/status/{slot}/image/imageDigest");
-        let Some(digest) = host.pointer(&pointer).and_then(Value::as_str) else {
-            continue;
-        };
-        if !configs.contains_key(digest)
-            && let Some(config) = image_config(digest)
-        {
-            configs.insert(digest.to_owned(), config);
-        }
+/// The config of an image on the computer. A digest names one image for good, so each is read
+/// once.
+fn image_config(digest: &str) -> Option<Value> {
+    static KNOWN: Mutex<BTreeMap<String, Value>> = Mutex::new(BTreeMap::new());
+    let mut known = KNOWN.lock().expect("image configs");
+    if !known.contains_key(digest) {
+        known.insert(digest.to_owned(), inspect(digest)?);
     }
+    known.get(digest).cloned()
+}
+
+fn digests(host: &Value) -> impl Iterator<Item = &str> {
+    SLOTS.iter().filter_map(move |slot| {
+        host.pointer(&format!("/status/{slot}/image/imageDigest"))
+            .and_then(Value::as_str)
+    })
+}
+
+pub fn status() -> Result<String> {
+    let host = host()?;
+    let configs: Map<String, Value> = digests(&host)
+        .filter_map(|digest| Some((digest.to_owned(), image_config(digest)?)))
+        .collect();
     Ok(json!({ "host": host, "configs": configs }).to_string())
 }
 
@@ -72,21 +91,16 @@ fn layers(config: &Value) -> Option<&Value> {
 
 /// Whether the image this system follows has changed from every version on the computer.
 pub fn available() -> Result<bool> {
-    let Reference { image, transport } = followed()?;
+    let host = host()?;
+    let Reference { image, transport } = followed(&host)?;
     if transport != REGISTRY {
         return Ok(false);
     }
     let offered: Value = serde_json::from_slice(&run(Command::new("skopeo")
-        .args(["inspect", "--config"])
+        .args(["--command-timeout", CHECK_TIMEOUT, "inspect", "--config"])
         .arg(format!("docker://{image}")))?)?;
     let offered = layers(&offered).context("The update server sent no image layers.")?;
-    let host: Value = serde_json::from_slice(&bootc(&["status", "--format=json"])?)?;
-    let present = SLOTS
-        .iter()
-        .filter_map(|slot| {
-            host.pointer(&format!("/status/{slot}/image/imageDigest"))
-                .and_then(Value::as_str)
-        })
+    let present = digests(&host)
         .filter_map(image_config)
         .any(|config| layers(&config) == Some(offered));
     Ok(!present)
@@ -130,30 +144,19 @@ fn pipe() -> Result<(File, OwnedFd)> {
 }
 
 #[derive(Deserialize)]
-struct Followed {
-    spec: Spec,
-}
-
-#[derive(Deserialize)]
-struct Spec {
-    image: Option<Reference>,
-}
-
-#[derive(Deserialize)]
 pub struct Reference {
     image: String,
     transport: String,
 }
 
-fn followed() -> Result<Reference> {
-    let host: Followed = serde_json::from_slice(&bootc(&["status", "--format=json"])?)?;
-    host.spec
-        .image
+fn followed(host: &Value) -> Result<Reference> {
+    host.pointer("/spec/image")
+        .and_then(|image| Reference::deserialize(image).ok())
         .ok_or_else(|| anyhow!("This system doesn't get its updates from an image."))
 }
 
 pub fn switch_target(variant: Variant) -> Result<Reference> {
-    let Reference { image, transport } = followed()?;
+    let Reference { image, transport } = followed(&host()?)?;
     if Variant::of(&image) == variant {
         bail!("This system already uses that image.");
     }
@@ -163,8 +166,30 @@ pub fn switch_target(variant: Variant) -> Result<Reference> {
     Ok(Reference { image, transport })
 }
 
+/// bootc while it downloads, for stopping it. The process is only signalled while it hasn't
+/// been waited for, so its ID can't have passed to another.
+#[derive(Clone)]
+pub struct Process(Arc<Mutex<Child>>);
+
+impl Process {
+    pub fn running(&self) -> bool {
+        self.0
+            .try_lock()
+            .map_or(true, |mut child| matches!(child.try_wait(), Ok(None)))
+    }
+
+    pub fn stop(&self) {
+        if let Ok(mut child) = self.0.try_lock()
+            && let Ok(None) = child.try_wait()
+        {
+            unsafe { libc::kill(child.id() as i32, libc::SIGTERM) };
+        }
+    }
+}
+
 pub struct Fetch {
-    child: Child,
+    process: Process,
+    errors: ChildStderr,
     events: File,
     switching: bool,
 }
@@ -198,38 +223,44 @@ impl Fetch {
                 _ => Ok(()),
             });
         }
-        let child = command.spawn().context("Starting bootc")?;
+        let mut child = command.spawn().context("Starting bootc")?;
         drop(writer);
+        let errors = child.stderr.take().context("bootc has no error output")?;
         Ok(Self {
-            child,
+            process: Process(Arc::new(Mutex::new(child))),
+            errors,
             events,
             switching,
         })
     }
 
-    pub fn pid(&self) -> i32 {
-        self.child.id() as i32
+    pub fn process(&self) -> Process {
+        self.process.clone()
     }
 
-    pub fn follow(mut self, mut downloaded: impl FnMut(u64)) -> Result<()> {
-        let mut stderr = self
-            .child
-            .stderr
-            .take()
-            .context("bootc has no error output")?;
+    pub fn follow(self, mut downloaded: impl FnMut(u64)) -> Result<()> {
+        let mut stderr = self.errors;
         let errors = std::thread::spawn(move || {
             let mut text = Vec::new();
             let _ = stderr.read_to_end(&mut text);
             text
         });
         let mut pull = Pull::default();
-        for line in BufReader::new(self.events).lines() {
+        let read = BufReader::new(self.events).lines().try_for_each(|line| {
             if let Some(bytes) = pull.update(&line?) {
                 downloaded(bytes);
             }
-        }
-        let status = self.child.wait()?;
+            std::io::Result::Ok(())
+        });
+        let status = {
+            let mut child = self.process.0.lock().expect("bootc");
+            if read.is_err() {
+                let _ = child.kill();
+            }
+            child.wait()?
+        };
         let errors = errors.join().unwrap_or_default();
+        read.context("Following the download")?;
         if !status.success() {
             if status.code().is_none() {
                 bail!("The download was stopped.");

@@ -1,6 +1,7 @@
 mod conditions;
 
-use std::fs;
+use std::fs::{self, File};
+use std::io::Write;
 use std::path::Path;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
@@ -53,7 +54,6 @@ impl Every {
 pub struct Schedule {
     pub every: Every,
     pub download: bool,
-    #[serde(default)]
     pub checked: u64,
 }
 
@@ -85,7 +85,12 @@ impl Schedule {
     pub fn save(&self) -> Result<()> {
         let file = Path::new(FILE);
         let partial = file.with_extension("new");
-        fs::write(&partial, serde_json::to_vec(self)?)
+        let text = serde_json::to_vec(self)?;
+        File::create(&partial)
+            .and_then(|mut partial| {
+                partial.write_all(&text)?;
+                partial.sync_all()
+            })
             .and_then(|()| fs::rename(&partial, file))
             .with_context(|| format!("Writing {FILE}"))
     }

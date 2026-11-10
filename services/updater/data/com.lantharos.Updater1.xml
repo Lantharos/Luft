@@ -4,7 +4,8 @@
   <!--
     Updates the system image with bootc. Started on demand and stops when idle.
 
-    Downloading: whether an update is being downloaded right now, by anyone.
+    Downloading: whether an update is being downloaded right now, by anyone, or the system packages
+      are being built for one that just was.
     Downloaded: bytes of image layers fetched so far by the current download.
     Schedule: how often luft-updater-check.timer has updates checked for, "daily", "weekly" or
       "never", kept in /var/lib/luft-updater/schedule.json.

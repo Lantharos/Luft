@@ -5,8 +5,7 @@ pub mod requested;
 pub mod sources;
 
 use std::fs::{self, File};
-use std::io::ErrorKind;
-use std::os::fd::AsRawFd;
+use std::io::{ErrorKind, Write};
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
@@ -22,10 +21,15 @@ pub const STATE: &str = "/var/lib/luft/system-packages";
 const MANIFEST: &str = "build.json";
 const FOOTPRINT: &str = "footprint.json";
 const REQUESTED: &str = "packages";
+const LOCK: &str = "lock";
 
 pub fn replace(path: &Path, contents: &[u8]) -> Result<()> {
     let partial = path.with_extension("new");
-    fs::write(&partial, contents)
+    File::create(&partial)
+        .and_then(|mut file| {
+            file.write_all(contents)?;
+            file.sync_all()
+        })
         .and_then(|()| fs::rename(&partial, path))
         .with_context(|| format!("Writing {}", path.display()))
 }
@@ -36,6 +40,10 @@ pub fn state(name: &str) -> PathBuf {
 
 pub fn builds() -> PathBuf {
     state("builds")
+}
+
+pub fn lock() -> PathBuf {
+    state(LOCK)
 }
 
 pub fn folder(digest: &str, suffix: &str) -> PathBuf {
@@ -49,11 +57,9 @@ pub struct Lock {
 impl Lock {
     pub fn take() -> Result<Self> {
         fs::create_dir_all(builds()).context("Making the folder for system packages")?;
-        let file = File::create(state("lock")).context("Opening the system packages' lock")?;
-        if unsafe { libc::flock(file.as_raw_fd(), libc::LOCK_EX) } != 0 {
-            return Err(std::io::Error::last_os_error())
-                .context("Waiting for other work on system packages");
-        }
+        let file = File::create(lock()).context("Opening the system packages' lock")?;
+        file.lock()
+            .context("Waiting for other work on system packages")?;
         Ok(Self { _held: file })
     }
 }

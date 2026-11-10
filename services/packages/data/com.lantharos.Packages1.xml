@@ -12,8 +12,6 @@
     DescribeRepository need nothing. Only root can call Rebuild.
   -->
   <interface name="com.lantharos.Packages1">
-    <property name="Busy" type="b" access="read"/>
-
     <!-- JSON: {"requested": [names], "packages": [{"name", "version", "arch", "summary",
          "requested", "units", "apps": [desktop entries], "origin": "fedora", "file" or
          {"repository": file}}] merged now,

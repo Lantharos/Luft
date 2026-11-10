@@ -62,7 +62,7 @@ What scriptlets would otherwise do on the computer itself, such as making users 
 | --- | --- | --- |
 | `luft-system-packages-link.service` | Before `systemd-sysext.service` | Links the build for the running version's digest (from `composefs.digest=`), if it was made for the current list; otherwise queues a rebuild |
 | `luft-system-packages-settle.service` | After `systemd-sysext.service`, before `systemd-tmpfiles-setup.service` | Notes what's missing, then runs `systemd-sysusers`, copies `/etc` and `/var` defaults that aren't there, runs `ldconfig` and reloads udev rules when the packages bring them, and queues the services that are turned on |
-| `luft-system-packages-rebuild.service` | Once online, when the link queues it | Asks `luft-packages` to rebuild, which builds for the running version and merges it |
+| `luft-system-packages-rebuild.service` | Once online, when the link queues it | Asks `luft-packages` to rebuild, which builds for the running version and merges it. When that fails, such as without a connection, it tries again after a minute, then less often, up to once an hour |
 
 The services are queued by hand because systemd merges extensions after the start's targets are queued, so links merged then don't pull anything in by themselves. `Upholds=` would, but it also restarts a service someone stopped.
 
@@ -88,11 +88,11 @@ Schelf fetches a source as the user, from the address of a `.repo` file, `copr:o
 - Each key is imported into a throwaway rpm database, so a key rpm wouldn't accept, such as one bound with SHA-1, is refused now rather than at the next build. The fingerprints and names rpm reads are what Schelf shows.
 - A section ID another source already uses is refused.
 
-`AddRepository` checks the same file and keys again and writes the file back with only the settings that choose where packages come from, `gpgcheck=1`, and `gpgkey` pointing at the keys as they were shown, kept in `/var/lib/luft/system-packages/keys`. A source can't change its key later; packages signed with any other key fail at step 5. Both need `com.lantharos.packages.sources`.
+`AddRepository` checks the same file and keys again and writes the file back with only the settings that choose where packages come from, `gpgcheck=1`, and `gpgkey` pointing at the keys as they were shown, kept in `/var/lib/luft/system-packages/keys`. A source can't change its key later; packages signed with any other key fail at step 5. `AddRepository` needs `com.lantharos.packages.sources`; `DescribeRepository` changes nothing and needs no authorisation.
 
 `RemoveRepository` rebuilds without the source and without the requested packages the merged build says came from it, the same way removing packages does, and only then deletes the file and its keys. A build is current only while every source its packages came from is still there, so the other versions on the computer are built again without it too.
 
-A package file someone opens in Schelf becomes a system package when it has a menu entry in `/usr/share/applications` or brings a repository: a `.repo` file in `/etc/yum.repos.d` among its files, as ChatGPT's does, or one its scriptlets write with `cat > FILE <<EOF`, as 1Password's and Chrome's do, read with the script's own variables filled in. Keys the package carries are read from its payload, the others fetched. Schelf shows the source like any other, adds it and installs the package by name from it, so it keeps updating. A desktop app without a source goes in by itself with `InstallFile`, which takes the file as a descriptor and keeps a copy. Command-line packages without a source keep going to the Toolbox container.
+A package file someone opens in Schelf becomes a system package when it has a menu entry in `/usr/share/applications` or brings a repository: a `.repo` file in `/etc/yum.repos.d` among its files, as ChatGPT's does, or one its scriptlets write with `cat > FILE <<EOF`, as 1Password's and Chrome's do, read with the script's own variables filled in. Keys the package carries are read from its payload, the others fetched. Schelf shows the source like any other, adds it and installs the package by name from it, so every later build takes the source's newest version. Builds are made when Luft updates or the list changes, not when a source publishes a new version. A desktop app without a source goes in by itself with `InstallFile`, which takes the file as a descriptor and keeps a copy only root can read. It must be a regular file of at most 4 GB. Command-line packages without a source keep going to the Toolbox container.
 
 ## Updates and going back
 
@@ -105,7 +105,7 @@ Going back needs nothing: the previous version keeps its build. If the list chan
 - **Kernel modules.** Luft starts with Secure Boot and `lockdown=integrity`, so the kernel enforces module signatures (`module.sig_enforce` is on). Modules would have to be signed with a key enrolled in shim, and the only enrolled key is Luft's, whose private half isn't on the computer. Luft has no way to enroll a local key.
 - **SELinux modules that replace or remove one of Luft's own**, at any priority.
 - **Packages Luft already has, or newer versions of them.** The extension would hide part of the system. dnf's resolution against the version's own package database leaves these out unless something needs a newer version, which usually works after the next update.
-- **Files outside `/usr`, `/opt`, `/etc`, `/var` and `/run`**, such as `/boot`.
+- **Files outside `/usr`, `/opt`, `/etc`, `/var`, `/run` and `/tmp`**, such as `/boot`, and paths with `..` in them or behind a link that leads out of the build root.
 - **Sources that don't sign their packages**, such as Stripe's, whose `.repo` file turns `gpgcheck` off and whose packages carry no signature.
 
 ## Security

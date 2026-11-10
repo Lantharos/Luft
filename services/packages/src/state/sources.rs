@@ -1,6 +1,7 @@
 use std::collections::BTreeMap;
 use std::fs::{self, File};
-use std::io::{self, ErrorKind};
+use std::io::{self, ErrorKind, Read};
+use std::os::unix::fs::OpenOptionsExt;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
@@ -12,6 +13,7 @@ use super::state;
 use crate::command::text;
 use crate::repositories;
 
+const LARGEST: u64 = 4 << 30;
 const ARCHITECTURES: [&str; 2] = ["noarch", std::env::consts::ARCH];
 
 fn files() -> PathBuf {
@@ -83,11 +85,23 @@ fn query(path: &Path) -> Result<(String, String)> {
 
 /// Keeps a package file someone opened, so every build can install it again. Returns the
 /// package's name.
-pub fn receive(mut package: File, current: &Requested) -> Result<String> {
+pub fn receive(package: File, current: &Requested) -> Result<String> {
+    let metadata = package.metadata().context("Reading the package file")?;
+    if !metadata.is_file() {
+        bail!("This isn't a package file.");
+    }
+    if metadata.len() > LARGEST {
+        bail!("This package file is too big to install.");
+    }
     fs::create_dir_all(files())?;
     let incoming = files().join(".incoming");
-    let mut copy = File::create(&incoming)?;
-    io::copy(&mut package, &mut copy).context("Reading the package file")?;
+    let mut copy = File::options()
+        .write(true)
+        .create(true)
+        .truncate(true)
+        .mode(0o600)
+        .open(&incoming)?;
+    io::copy(&mut package.take(metadata.len()), &mut copy).context("Reading the package file")?;
     drop(copy);
     let kept = query(&incoming).and_then(|(name, arch)| {
         if !requested::valid(&name) {

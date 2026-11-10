@@ -110,7 +110,7 @@ pub fn installed() -> Vec<String> {
 }
 
 pub fn exists(file: &str) -> bool {
-    path(file).is_file()
+    valid_file(file) && path(file).is_file()
 }
 
 fn sections_of(file: &str) -> Result<Vec<Section>> {

@@ -10,7 +10,6 @@ mod stage;
 mod units;
 
 use std::collections::BTreeSet;
-use std::ffi::CString;
 use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
@@ -271,12 +270,11 @@ fn make_private() -> io::Result<()> {
     if unsafe { libc::unshare(libc::CLONE_NEWNS) } != 0 {
         return Err(io::Error::last_os_error());
     }
-    let root = CString::new("/").expect("static path");
     let flags = libc::MS_REC | libc::MS_PRIVATE;
     let changed = unsafe {
         libc::mount(
             std::ptr::null(),
-            root.as_ptr(),
+            c"/".as_ptr(),
             std::ptr::null(),
             flags,
             std::ptr::null(),

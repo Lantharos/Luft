@@ -1,4 +1,4 @@
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::{BTreeMap, BTreeSet, HashSet};
 use std::fs;
 use std::io::Read;
 use std::os::unix::fs::{MetadataExt, PermissionsExt, symlink};
@@ -113,6 +113,22 @@ pub fn mirror_folder(root: &Path, stage: &Path, path: &Path) -> Result<()> {
     Ok(())
 }
 
+/// Refuses paths that reach their place through a link out of the build root, which copying
+/// would follow into the computer's own files.
+fn stay_inside<'a>(root: &Path, paths: impl IntoIterator<Item = &'a str>) -> Result<()> {
+    let inside = root.canonicalize()?;
+    let mut checked = HashSet::new();
+    for path in paths {
+        let Some(parent) = Path::new(path).parent() else {
+            continue;
+        };
+        if checked.insert(parent) && !root.join(parent).canonicalize()?.starts_with(&inside) {
+            bail!("/{path} is behind a link that leads out of the packages' own files.");
+        }
+    }
+    Ok(())
+}
+
 pub fn copy_files(from: &Path, into: &Path, paths: &[&str]) -> Result<()> {
     for chunk in paths.chunks(512) {
         run(Command::new("cp")
@@ -147,6 +163,7 @@ pub fn merged(layout: &Layout, rpms: &[Rpm]) -> Result<()> {
             }
         }
     }
+    stay_inside(layout.root, files.iter().chain(&folders).copied())?;
     for parent in files.iter().filter_map(|path| Path::new(path).parent()) {
         mirror_folder(layout.root, layout.stage, parent)?;
     }
@@ -186,6 +203,7 @@ pub fn placed(layout: &Layout, rpms: &[Rpm]) -> Result<Vec<Placed>> {
                 continue;
             };
             if let Fate::New = fate(layout, rpm, file)? {
+                stay_inside(layout.root, [relative(&file.path)])?;
                 entries.push(Placed {
                     path: file.path.clone(),
                     user: file.user.clone(),

@@ -8,7 +8,6 @@ const PACKAGES = `<node><interface name="com.lantharos.Packages1">
   <method name="DescribeRepository">
     <arg type="s" direction="in"/><arg type="s" direction="in"/><arg type="a{ss}" direction="in"/><arg type="s" direction="out"/>
   </method>
-  <property name="Busy" type="b" access="read"/>
 </interface></node>`;
 
 export const PACKAGES_NAME = 'com.lantharos.Packages1';
@@ -49,6 +48,5 @@ export function publishPackages(publish: Publish) {
   publish(PACKAGES, {
     List: () => JSON.stringify({requested: [], packages: [], services: [], pending: false, repositories: []}),
     DescribeRepository: (file: string, text: string, keys: Record<string, string>) => JSON.stringify({file, sources: sources(text), keys: Object.values(keys).map(keyOf)}),
-    Busy: false,
   }, '/com/lantharos/Packages1');
 }

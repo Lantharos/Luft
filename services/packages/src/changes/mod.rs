@@ -1,6 +1,7 @@
 mod third_party;
 
 use std::fs;
+use std::path::PathBuf;
 use std::sync::Arc;
 
 use anyhow::{Context, Result};
@@ -80,11 +81,20 @@ fn prune() -> Result<()> {
     Ok(())
 }
 
-/// Leaves nothing of the system packages behind once there are none.
+/// Leaves nothing of the system packages behind once there are none, but the software sources
+/// that were added.
 fn forget() -> Result<()> {
+    let kept = [
+        PathBuf::from(repositories::FOLDER),
+        PathBuf::from(repositories::KEYS),
+        state::lock(),
+    ];
     for folder in [CACHE, STATE] {
         for entry in fs::read_dir(folder).into_iter().flatten().flatten() {
             let path = entry.path();
+            if kept.contains(&path) {
+                continue;
+            }
             let removed = if entry.file_type()?.is_dir() {
                 fs::remove_dir_all(&path)
             } else {

@@ -1,4 +1,5 @@
 use std::collections::BTreeSet;
+use std::path::{Component, Path};
 
 use anyhow::{Result, bail};
 
@@ -16,6 +17,12 @@ pub enum Place {
 }
 
 pub fn place(path: &str) -> Option<Place> {
+    if Path::new(path)
+        .components()
+        .any(|part| part == Component::ParentDir)
+    {
+        return None;
+    }
     let inside = |prefixes: &[&str]| {
         prefixes
             .iter()
@@ -136,5 +143,6 @@ mod tests {
     #[test]
     fn refuses_files_outside_what_extensions_and_placing_cover() {
         assert!(refused(&[rpm("odd", &["/boot/odd.img"])]).contains("/boot/odd.img"));
+        assert!(refused(&[rpm("odd", &["/usr/../boot/odd.img"])]).contains("/usr/../boot"));
     }
 }

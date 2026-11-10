@@ -5,6 +5,10 @@ After=network-online.target dbus.service
 
 [Service]
 Type=oneshot
+Restart=on-failure
+RestartSec=1min
+RestartSteps=6
+RestartMaxDelaySec=1h
 ExecStart=/usr/bin/busctl --timeout=infinity call com.lantharos.Packages1 /com/lantharos/Packages1 com.lantharos.Packages1 Rebuild
 ProtectSystem=strict
 ProtectHome=yes

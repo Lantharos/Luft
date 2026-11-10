@@ -57,7 +57,6 @@ impl Packages {
                 "System packages are already being changed.".to_owned(),
             ));
         }
-        let _ = self.busy_changed(emitter).await;
         let _activity = self.idle.hold();
         let (sender, mut steps) = mpsc::unbounded_channel();
         let report: Report = Arc::new(move |step: Step| {
@@ -69,7 +68,6 @@ impl Packages {
         }
         let result = work.await;
         self.busy.store(false, Ordering::SeqCst);
-        let _ = self.busy_changed(emitter).await;
         result.map_err(|_| stopped())?.map_err(Error::from)
     }
 
@@ -88,11 +86,6 @@ impl Packages {
 #[introspect]
 #[interface(name = "com.lantharos.Packages1")]
 impl Packages {
-    #[zbus(property)]
-    fn busy(&self) -> bool {
-        self.busy.load(Ordering::SeqCst)
-    }
-
     #[zbus(signal)]
     async fn step(emitter: &SignalEmitter<'_>, step: &str) -> zbus::Result<()>;
 
@@ -100,7 +93,14 @@ impl Packages {
         self.blocking(changes::list).await
     }
 
-    async fn rebuild(&self) -> Result<(), Error> {
+    async fn rebuild(
+        &self,
+        #[zbus(connection)] connection: &Connection,
+        #[zbus(header)] header: Header<'_>,
+    ) -> Result<(), Error> {
+        if luft_identity::caller::uid(connection, &header).await? != Some(0) {
+            return Err(Error::not_authorized());
+        }
         self.blocking(changes::rebuild).await
     }
 

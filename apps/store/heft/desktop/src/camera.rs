@@ -8,7 +8,7 @@ static CAMERA: Mutex<Option<Camera>> = Mutex::new(None);
 
 const REQUEST: Request = Request {
     app_name: "Heft",
-    app_id: "com.lantharos.Heft",
+    app_id: "com.lantharos.heft",
     size: (1280, 720),
     largest: (1920, 1080),
 };

@@ -75,14 +75,19 @@
 	async function start() {
 		const state = await commands.appState();
 		appearance.start(state);
-		chrome.start(state.launchPaths.length ? 'viewer' : 'library');
-		if (viewer) return openPaths(state.launchPaths);
-		library.places = await commands.places();
-		if (library.places[0]) await library.browse(library.places[0].path);
+		chrome.start();
+		await show(state.launchPaths);
+	}
+
+	async function show(paths: string[]) {
+		chrome.mode = paths.length ? 'viewer' : 'library';
+		if (paths.length) return openPaths(paths);
+		if (!library.places.length) library.places = await commands.places();
+		if (library.folder === null && library.places[0]) await library.browse(library.places[0].path);
 	}
 
 	async function activate(activation: SingleInstanceEvent) {
-		await openPaths(await commands.resolveArguments(activation));
+		await show(await commands.resolveArguments(activation));
 	}
 
 	const drop = fileDrop((paths) => void openPaths(paths));

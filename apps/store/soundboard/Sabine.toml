@@ -24,6 +24,7 @@ provider = "schelf"
 
 [sandbox]
 network = false
+microphone = true
 filesystems = ["home:ro"]
 
 [bindings]

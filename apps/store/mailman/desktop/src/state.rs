@@ -4,6 +4,7 @@ use luft_app::{Appearance, Events};
 use serde::Serialize;
 use specta::Type;
 
+use crate::APP_ID;
 use crate::accounts::{Account, Credentials, Provider, oauth_providers};
 use crate::services::cache;
 use crate::services::notify::Notifier;
@@ -33,14 +34,14 @@ pub struct AppState {
 
 pub fn data_folder() -> PathBuf {
     dirs::data_dir()
-        .unwrap_or_else(std::env::temp_dir)
-        .join("mailman")
+        .expect("there is a data folder")
+        .join(APP_ID)
 }
 
 pub fn cache_folder() -> PathBuf {
     dirs::cache_dir()
-        .unwrap_or_else(std::env::temp_dir)
-        .join("mailman")
+        .expect("there is a cache folder")
+        .join(APP_ID)
 }
 
 impl MailmanState {

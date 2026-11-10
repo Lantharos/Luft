@@ -17,11 +17,12 @@ SANE scanners need `libsane.so.1` and its drivers, and searchable PDFs need `tes
 
 | Path | Contents |
 |------|----------|
-| `~/.local/state/com.lantharos.Flatbed/document/` | The pages scanned and not removed yet |
-| `~/.local/state/com.lantharos.Flatbed/sane/` | The Canon scanners on the network, for SANE |
-| `~/.config/com.lantharos.Flatbed/settings.json` | Settings and scanners added by address |
+| `~/.local/state/com.lantharos.flatbed/document/` | The pages scanned and not removed yet |
+| `~/.local/state/com.lantharos.flatbed/sane/` | The Canon scanners on the network, for SANE |
+| `~/.config/com.lantharos.flatbed/settings.json` | Settings and scanners added by address |
+| `~/.config/com.lantharos.flatbed/scanners.json` | The certificate each HTTPS scanner showed first |
 
-Installed from the store these are inside `~/.var/app/com.lantharos.Flatbed`.
+Installed from the store these are inside `~/.var/app/com.lantharos.flatbed`.
 
 ## License
 

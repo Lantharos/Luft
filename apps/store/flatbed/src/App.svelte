@@ -7,6 +7,7 @@
 	import AddScannerDialog from '#lib/dialogs/AddScannerDialog.svelte';
 	import CameraDialog from '#lib/dialogs/CameraDialog.svelte';
 	import CornersDialog from '#lib/dialogs/CornersDialog.svelte';
+	import IdentityDialog from '#lib/dialogs/IdentityDialog.svelte';
 	import SaveDialog from '#lib/dialogs/SaveDialog.svelte';
 	import SettingsDialog from '#lib/dialogs/SettingsDialog.svelte';
 	import PageGrid from '#lib/pages/PageGrid.svelte';
@@ -76,6 +77,10 @@
 		</main>
 	</GlassShell>
 </div>
+
+{#if flatbed.changed}
+	<IdentityDialog scanner={flatbed.changed} />
+{/if}
 
 {#if open?.kind === 'camera'}
 	<CameraDialog onclose={close} />

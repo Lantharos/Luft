@@ -17,7 +17,7 @@ const WINDOW: GlassWindow = GlassWindow {
     size: (1280, 820),
     min_size: (560, 480),
     sidebar_width: 280,
-    single_instance: Some("com.lantharos.Heft"),
+    single_instance: Some("com.lantharos.heft"),
 };
 
 const PRESENT: BridgeEvent<()> = BridgeEvent::new("window.present");

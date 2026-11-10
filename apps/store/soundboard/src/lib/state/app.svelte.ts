@@ -19,6 +19,7 @@ class AppStore {
 	search = $state('');
 	editing = $state<Sound | null>(null);
 	menu = $state.raw<Menu | null>(null);
+	dismissal: PointerEvent | null = null;
 	renaming = $state.raw<Board | null>(null);
 	removing = $state.raw<Board | null>(null);
 
@@ -93,6 +94,12 @@ class AppStore {
 
 	async save(sound: Sound) {
 		this.library = await commands.updateSound(sound);
+	}
+
+	reorder(sounds: Sound[]) {
+		const board = this.board!;
+		this.library = { boards: this.library.boards.map((other) => (other === board ? { ...board, sounds } : other)) };
+		void commands.reorderSounds({ board: board.id, sounds: sounds.map((sound) => sound.id) }).then((library) => (this.library = library), this.failed);
 	}
 
 	async removeSound(sound: Sound) {

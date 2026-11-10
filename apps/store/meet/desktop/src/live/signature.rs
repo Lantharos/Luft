@@ -5,6 +5,25 @@ use crate::L10N;
 
 pub const PUBLIC_KEY: &str = "RWRz9rCK/H8Drrze/f851hxNNOH/D42kpyTMpXV7DT7QoUdCZySZwRWA";
 
+pub const POINTER_KEY: &str = "RWSSHST0z1YZO+QgV4e4VExvDhYScMaIfgItjSIJ6Dh8wrbIiNxCfsr1";
+
+pub fn verify_pointer(
+    key: &str,
+    pointer: &str,
+    signature: &str,
+    place: &str,
+) -> Result<(), String> {
+    let key = PublicKey::from_base64(key).map_err(|error| error.to_string())?;
+    let signature =
+        Signature::decode(signature).map_err(|_| t!(L10N, "live-pointer-not-signed"))?;
+    key.verify(pointer.as_bytes(), &signature, false)
+        .map_err(|_| t!(L10N, "live-pointer-not-signed"))?;
+    if signature.trusted_comment() != place {
+        return Err(t!(L10N, "live-pointer-not-signed"));
+    }
+    Ok(())
+}
+
 pub fn verify(key: &str, checksum: &str, signature: &str, iso: &str) -> Result<(), String> {
     let key = PublicKey::from_base64(key).map_err(|error| error.to_string())?;
     let signature = Signature::decode(signature)
@@ -25,6 +44,20 @@ pub fn verify(key: &str, checksum: &str, signature: &str, iso: &str) -> Result<(
 #[cfg(test)]
 pub mod signed {
     pub const KEY: &str = "RWQuKaSbHEMaG0cGBcTRjFj81Fysjto7YETokGzKqzy6t4/CiyKPriyV";
+    pub const POINTER_KEY: &str = "RWRsLdcDouXSg6w+Wpr7Za1c0Owl2mEnl9JC6zASsZw8bU1MBteTWUxF";
+    pub const POINTER: &str = r#"{"name": "luft-nightly.iso", "version": "1.1-nightly.21", "size": 4096, "sha256": "abababababababababababababababababababababababababababababababab"}"#;
+    pub const NIGHTLY_POINTER_SIGNATURE: &str =
+        "untrusted comment: signature from minisign secret key
+RURsLdcDouXSg8LofLlu+rjVEz/zt0T73Kbc23l87LwXBsXKT4k1SxzpmPdsMfmezjP0dPKXc2Tg+jYY4QSL3WY3zqugjB2YzAc=
+trusted comment: nightly/latest.json
+3Wuz993/2rIxDbIlZ0mh6jaiqy9ul07NGxPp4bPwCnwWird0xmOhLx83TVXSYOEUGvO6FQoKmw+bhtWcQRYZCw==
+";
+    pub const RELEASE_POINTER_SIGNATURE: &str =
+        "untrusted comment: signature from minisign secret key
+RURsLdcDouXSg8LofLlu+rjVEz/zt0T73Kbc23l87LwXBsXKT4k1SxzpmPdsMfmezjP0dPKXc2Tg+jYY4QSL3WY3zqugjB2YzAc=
+trusted comment: 1/latest.json
+42yTqoI3ePR6duulQRfbz6z+Px4MYHrwu1UCpo2SGsAtfcDfuHnCq1JUelKmZ7QPM+6KSaG4sB3OcmO3jAKYBA==
+";
     pub const CHECKSUM: &str =
         "abababababababababababababababababababababababababababababababab  luft-nightly.iso\n";
     pub const SIGNATURE: &str = "untrusted comment: signature from minisign secret key

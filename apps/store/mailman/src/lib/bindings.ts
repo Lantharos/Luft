@@ -13,6 +13,7 @@ export const commands = {
 		name: string,
 		config: AccountConfig,
 		secret: NewSecret,
+		unencrypted: boolean,
 		token?: string | null,
 	}, options?: CallOptions) => invoke<Account>("add_account", params, options),
 	allowImages: (params: {
@@ -57,6 +58,10 @@ export const commands = {
 	openMessageFile: (params: {
 		path: string,
 	}, options?: CallOptions) => invoke<OpenedFile>("open_message_file", params, options),
+	openSaved: (params: {
+		path: string,
+		token?: string | null,
+	}, options?: CallOptions) => invoke<null>("open_saved", params, options),
 	openUri: (params: {
 		uri: string,
 		token?: string | null,

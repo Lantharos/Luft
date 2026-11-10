@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Dialog, errorText, PasswordField, Segmented, Spinner, TextField } from '@luft/ui';
+	import { ConfirmDialog, Dialog, errorText, PasswordField, Segmented, Spinner, TextField } from '@luft/ui';
 	import ChevronRight from '@lucide/svelte/icons/chevron-right';
 	import { commands } from '#lib/bindings.js';
 	import type { AccountConfig, NewSecret, Provider, Server } from '#lib/bindings.js';
@@ -31,8 +31,11 @@
 	let showServers = $state(false);
 	let busy = $state(false);
 	let error = $state('');
+	let confirming = $state(false);
 
 	let canOAuth = $derived(oauth !== null && mail.oauth.includes(oauth) && !usePassword);
+	let unencrypted = $derived(protocol === 'jmap' ? !session.trim().startsWith('https://') : imap.security === 'none' || smtp.security === 'none');
+	let exposed = $derived(protocol === 'jmap' ? session.trim() : [imap, smtp].filter((server) => server.security === 'none').map((server) => server.host)[0]);
 
 	async function lookUp() {
 		if (!VALID.test(email.trim())) return (error = 'Enter your full email address');
@@ -63,13 +66,18 @@
 		};
 	}
 
-	async function add() {
+	function add() {
 		if (!canOAuth && !password) return (error = 'Enter the password or app password for this account');
+		if (unencrypted) return (confirming = true);
+		return connect();
+	}
+
+	async function connect() {
 		error = '';
 		busy = true;
 		try {
 			const secret: NewSecret = canOAuth ? { kind: 'oAuth', provider: oauth! } : { kind: 'password', password };
-			const account = await api.addAccount(email.trim(), name.trim(), config(), secret);
+			const account = await api.addAccount(email.trim(), name.trim(), config(), secret, unencrypted);
 			await mail.reloadAccounts();
 			toasts.show(`${account.email} is ready`);
 			onclose();
@@ -145,6 +153,17 @@
 		</button>
 	{/snippet}
 </Dialog>
+
+{#if confirming}
+	<ConfirmDialog
+		title="Connect without encryption?"
+		description="Your password and every message would travel to {exposed} as plain text, readable by anyone on the networks in between. Continue only if you run this server yourself on a network you trust."
+		action="Connect unencrypted"
+		danger
+		run={async () => void connect()}
+		onclose={() => (confirming = false)}
+	/>
+{/if}
 
 <style>
 	.disclosure {

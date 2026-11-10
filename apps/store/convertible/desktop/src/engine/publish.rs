@@ -5,6 +5,8 @@ use std::os::unix::ffi::OsStrExt;
 use std::path::{Path, PathBuf};
 use std::time::SystemTime;
 
+use gio::prelude::*;
+
 use super::error::{Failure, Result};
 use super::job::{Conflict, Job};
 
@@ -58,8 +60,10 @@ fn sync(path: &Path) -> io::Result<()> {
 }
 
 fn replace(from: &Path, to: &Path) -> io::Result<()> {
-    if to.is_dir() {
-        fs::remove_dir_all(to)?;
+    if (from.is_dir() || to.is_dir()) && to.symlink_metadata().is_ok() {
+        gio::File::for_path(to)
+            .trash(gio::Cancellable::NONE)
+            .map_err(io::Error::other)?;
     }
     fs::rename(from, to)
 }

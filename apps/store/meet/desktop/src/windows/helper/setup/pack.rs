@@ -1,22 +1,22 @@
 use std::fs::{self, File};
-use std::io::{Read, Write};
 use std::os::windows::process::CommandExt;
 use std::path::{Path, PathBuf};
 use std::process::Stdio;
+use std::time::UNIX_EPOCH;
 
 use luft_i18n::t;
 use luft_meet::handoff::BOX_LABEL;
 use luft_meet::moving_box::{
-    self, Account, BLUETOOTH_KEYS, BLUETOOTH_NAMES, Bluetooth, Folder, Manifest, PICTURE,
-    WALLPAPER, WIFI,
+    Account, BLUETOOTH_KEYS, BLUETOOTH_NAMES, Bluetooth, Folder, Manifest, PICTURE, WALLPAPER, WIFI,
 };
+use luft_meet::sealed::{Code, Packing as Sealing};
 
 use super::{prepare, room};
 use crate::L10N;
 use crate::plan::gap::{self, Head};
 use crate::plan::layout::{self, Plan, Role};
 use crate::plan::sizes::{self, BOX_CLUSTER};
-use crate::protocol::answers::Prepared;
+use crate::protocol::answers::Packed;
 use crate::protocol::{Packing, Stage};
 use crate::windows::folders::{Item, verbatim, walk};
 use crate::windows::helper::Context;
@@ -32,7 +32,7 @@ use crate::windows::helper::system::{bluetooth, programs};
 
 const EXFAT: &str = "exFAT";
 const NO_WINDOW: u32 = 0x0800_0000;
-const CHUNK: usize = 1 << 20;
+const LISTED: u64 = 64;
 
 fn single(source: &str, name: &str) -> Option<Item> {
     let source = PathBuf::from(source);
@@ -71,40 +71,10 @@ fn export_wifi(into: &Path) -> Result<Vec<PathBuf>, String> {
         .collect())
 }
 
-fn copy(
-    context: &Context,
-    item: &Item,
-    root: &Path,
-    done: &mut u64,
-    total: u64,
-) -> Result<(), String> {
-    let target = item
-        .target
-        .split('/')
-        .fold(root.to_owned(), |path, part| path.join(part));
-    fs::create_dir_all(target.parent().expect("files live in folders"))
-        .map_err(|error| error.to_string())?;
-    let mut source = File::open(verbatim(&item.source))
-        .map_err(|error| format!("{}: {error}", item.source.display()))?;
-    let mut destination = File::create(&target).map_err(|error| error.to_string())?;
-    let mut buffer = vec![0; CHUNK];
-    loop {
-        let read = source
-            .read(&mut buffer)
-            .map_err(|error| format!("{}: {error}", item.source.display()))?;
-        if read == 0 {
-            break;
-        }
-        destination
-            .write_all(&buffer[..read])
-            .map_err(|error| error.to_string())?;
-        *done += read as u64;
-        context.progress(Stage::Packing, *done, total);
-    }
-    if let Ok(modified) = source.metadata().and_then(|metadata| metadata.modified()) {
-        let _ = destination.set_modified(modified);
-    }
-    Ok(())
+fn modified(source: &File) -> Option<u64> {
+    let modified = source.metadata().and_then(|metadata| metadata.modified());
+    let since = modified.ok()?.duration_since(UNIX_EPOCH).ok()?;
+    Some(since.as_secs())
 }
 
 fn fill(
@@ -112,16 +82,26 @@ fn fill(
     storage: &Storage,
     partition: &MSFT_Partition,
     items: &[Item],
-    manifest: &Manifest,
-) -> Result<(), String> {
+    manifest: Manifest,
+) -> Result<Code, String> {
     let root = storage.format(partition, EXFAT, BOX_LABEL, Some(BOX_CLUSTER as u32))?;
     let total: u64 = items.iter().map(|item| item.size).sum();
     let mut done = 0;
+    let (mut packing, code) = Sealing::start(&root).map_err(|error| error.to_string())?;
     for item in items {
-        copy(context, item, &root, &mut done, total)?;
+        let unread = |error: std::io::Error| format!("{}: {error}", item.source.display());
+        let mut source = File::open(verbatim(&item.source)).map_err(unread)?;
+        packing
+            .add(&item.target, modified(&source), &mut source, |read| {
+                done += read;
+                context.progress(Stage::Packing, done, total);
+            })
+            .map_err(unread)?;
     }
-    fs::write(root.join(moving_box::MANIFEST), manifest.to_json())
-        .map_err(|error| error.to_string())
+    packing
+        .finish(manifest)
+        .map_err(|error| error.to_string())?;
+    Ok(code)
 }
 
 fn take_back(
@@ -190,7 +170,7 @@ fn plan_box(
     Ok((plan, disk))
 }
 
-pub fn pack(context: &Context, belongings: &Packing) -> Result<Prepared, String> {
+pub fn pack(context: &Context, belongings: &Packing) -> Result<Packed, String> {
     let storage = Storage::open()?;
     let drive = windows_drive::find()?;
     let found = state::find(&storage.all_partitions()?);
@@ -273,9 +253,13 @@ pub fn pack(context: &Context, belongings: &Packing) -> Result<Prepared, String>
     items.extend(bluetooth_keys);
     items.extend(bluetooth_names);
     let total: u64 = items.iter().map(|item| item.size).sum();
+    let list: u64 = items
+        .iter()
+        .map(|item| item.target.len() as u64 + LISTED)
+        .sum();
 
     let windows_before = storage.layout(&drive.volume)?.windows.Size;
-    let size = sizes::moving_box(items.len() as u64, total);
+    let size = sizes::moving_box(items.len() as u64 + 1, total + list);
     let (plan, disk) = plan_box(&storage, &drive, &found, size)?;
     if let Some(size) = plan.windows_size {
         let windows = storage.layout(&drive.volume)?.windows;
@@ -287,12 +271,15 @@ pub fn pack(context: &Context, belongings: &Packing) -> Result<Prepared, String>
             .guid()
             .ok_or_else(|| t!(L10N, "drive-box-no-guid"))?,
     )?;
-    if let Err(error) = fill(context, &storage, &partition, &items, &manifest) {
-        if let Err(cleanup) = take_back(&storage, &drive, &partition, windows_before) {
-            eprintln!("Cleaning up after packing failed didn't work: {cleanup}");
+    let code = match fill(context, &storage, &partition, &items, manifest) {
+        Ok(code) => code,
+        Err(error) => {
+            if let Err(cleanup) = take_back(&storage, &drive, &partition, windows_before) {
+                eprintln!("Cleaning up after packing failed didn't work: {cleanup}");
+            }
+            return Err(error);
         }
-        return Err(error);
-    }
+    };
     drop(staging);
     if let Some(made) = handoff.partitions_mut() {
         made.moving_box = partition.guid();
@@ -303,5 +290,8 @@ pub fn pack(context: &Context, belongings: &Packing) -> Result<Prepared, String>
         });
     }
     state::write_handoff(&live, &handoff)?;
-    prepare::now_prepared(&storage)
+    Ok(Packed {
+        prepared: prepare::now_prepared(&storage)?,
+        code: code.grouped(),
+    })
 }

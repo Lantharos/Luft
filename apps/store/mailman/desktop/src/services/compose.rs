@@ -1,6 +1,6 @@
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
-use luft_app::launch;
+use luft_app::{block_on, portal};
 use serde::Serialize;
 use specta::Type;
 
@@ -235,6 +235,6 @@ pub fn unsubscribe(
     let url = unsubscribe
         .http
         .ok_or("This sender doesn't offer a way to unsubscribe")?;
-    launch::open_web_link(&url, token)?;
+    block_on(portal::open_web_link(&url, token))?;
     Ok(Unsubscribed::Opened)
 }

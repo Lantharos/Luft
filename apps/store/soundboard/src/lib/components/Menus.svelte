@@ -9,9 +9,8 @@
 
 	const close = () => (app.menu = null);
 
-	function dismiss(event: Event) {
-		if (event.target instanceof Element && event.target.closest('[role="menu"]')) return;
-		close();
+	function dismissing(event: PointerEvent) {
+		app.dismissal = app.menu ? event : null;
 	}
 
 	function run(action: () => unknown) {
@@ -40,7 +39,7 @@
 	}
 </script>
 
-<svelte:window onpointerdown={dismiss} onblur={close} onkeydown={(event) => event.key === 'Escape' && close()} />
+<svelte:window onpointerdowncapture={dismissing} />
 
 {#if app.menu}
 	{#key app.menu}

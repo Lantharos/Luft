@@ -60,7 +60,7 @@ pub struct Correction {
 fn keep_correction(Correction { line }: Correction) -> Result<(), String> {
     let folder = dirs::data_dir()
         .ok_or("There's no folder for Heft's data")?
-        .join("com.lantharos.Heft");
+        .join("com.lantharos.heft");
     std::fs::create_dir_all(&folder).map_err(|error| error.to_string())?;
     let mut file = std::fs::OpenOptions::new()
         .create(true)

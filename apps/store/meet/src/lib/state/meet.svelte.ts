@@ -4,7 +4,7 @@ import { commands, events, type Action, type Channel, type Intent, type PlaceKin
 import * as meet from '#lib/bridge/meet.js';
 import type { Packing } from '#lib/bridge/meet.js';
 
-export type Step = 'hello' | 'onLuft' | 'luft' | 'resize' | 'check' | 'room' | 'working' | 'ready' | 'box' | 'removed' | 'stick' | 'stickDone';
+export type Step = 'hello' | 'onLuft' | 'luft' | 'resize' | 'check' | 'room' | 'working' | 'ready' | 'box' | 'packed' | 'removed' | 'stick' | 'stickDone';
 export type Task =
 	| 'check'
 	| 'room'
@@ -32,7 +32,7 @@ export interface Failure {
 	retry: () => unknown;
 }
 
-const ORDER: Step[] = ['hello', 'onLuft', 'luft', 'resize', 'check', 'room', 'working', 'ready', 'box', 'stick', 'stickDone', 'removed'];
+const ORDER: Step[] = ['hello', 'onLuft', 'luft', 'resize', 'check', 'room', 'working', 'ready', 'box', 'packed', 'stick', 'stickDone', 'removed'];
 const GIB = 1024 ** 3;
 const SHARE = 0.4;
 const NOTE_SHOWN = 6000;
@@ -47,6 +47,7 @@ class MeetState {
 	direction = $state(1);
 	report = $state<Report | null>(null);
 	prepared = $state<Prepared | null>(null);
+	boxCode = $state<string | null>(null);
 	progress = $state<Progress | null>(null);
 	source = $state<Source>({ kind: 'download', channel: 'latest' });
 	luft = $state(0);
@@ -204,12 +205,16 @@ class MeetState {
 	}
 
 	async pack(packing: Packing) {
-		const prepared = await this.working('pack', 'packing', () => meet.pack(packing), () => this.pack(packing), 'ready', 'box');
-		if (prepared) this.prepared = prepared;
+		this.boxCode = null;
+		const packed = await this.working('pack', 'packing', () => meet.pack(packing), () => this.pack(packing), 'packed', 'box');
+		if (!packed) return;
+		this.prepared = packed.prepared;
+		this.boxCode = packed.code;
 	}
 
 	async remove() {
-		await this.working('remove', 'removing', () => meet.undo().then(() => true), () => this.remove(), 'removed', 'ready');
+		const removed = await this.working('remove', 'removing', () => meet.undo().then(() => true), () => this.remove(), 'removed', 'ready');
+		if (removed) this.boxCode = null;
 	}
 
 	async restart(intent: Intent, windows: WindowsChoices): Promise<void> {

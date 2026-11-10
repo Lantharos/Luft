@@ -18,7 +18,7 @@ pub fn state_folder() -> Result<PathBuf, String> {
     Ok(dirs::state_dir()
         .or_else(dirs::data_local_dir)
         .ok_or("There is no state folder")?
-        .join("com.lantharos.Heft"))
+        .join("com.lantharos.heft"))
 }
 
 pub fn resolve(relative: &str) -> Result<PathBuf, String> {

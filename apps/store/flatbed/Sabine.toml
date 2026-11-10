@@ -1,5 +1,5 @@
 [app]
-id = "com.lantharos.Flatbed"
+id = "com.lantharos.flatbed"
 name = "Flatbed"
 generic_name = "Document Scanner"
 categories = ["Graphics", "Scanning", "Office"]

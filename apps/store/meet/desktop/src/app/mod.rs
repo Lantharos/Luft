@@ -14,7 +14,7 @@ use crate::language;
 use crate::linux::app as platform;
 use crate::live::download::Channel;
 use crate::live::source::Source;
-use crate::protocol::answers::{Installed, Prepared, Range, Report};
+use crate::protocol::answers::{Installed, Packed, Prepared, Range, Report};
 use crate::protocol::{Call, Progress, Restarting};
 use crate::stick::Sticks;
 use crate::stick::copy::Room;
@@ -76,7 +76,7 @@ fn window(window: SabineWindow, events: &Events) -> SabineWindow {
         .helped::<_, Report>("meet_check", Call::Check)
         .helped::<_, Prepared>("meet_prepare", Call::Prepare)
         .helped::<_, Prepared>("meet_refresh", Call::Refresh)
-        .helped::<_, Prepared>("meet_pack", Call::Pack)
+        .helped::<_, Packed>("meet_pack", Call::Pack)
         .helped::<_, ()>("meet_restart", |restarting: Restarting| {
             Call::Restart(Restarting {
                 hints: platform::hints(),

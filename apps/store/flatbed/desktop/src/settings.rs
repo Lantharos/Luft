@@ -5,7 +5,7 @@ use specta::Type;
 
 use crate::document;
 
-const FILE: &str = "com.lantharos.Flatbed/settings.json";
+const FILE: &str = "com.lantharos.flatbed/settings.json";
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]

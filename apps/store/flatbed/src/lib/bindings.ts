@@ -51,6 +51,9 @@ export const commands = {
 	scannerAdd: (params: {
 		address: string,
 	}, options?: CallOptions) => invoke<null>("scanner_add", params, options),
+	scannerTrust: (params: {
+		id: string,
+	}, options?: CallOptions) => invoke<null>("scanner_trust", params, options),
 	send: (params: {
 		files: string[],
 	}, options?: CallOptions) => invoke<null>("send", params, options),
@@ -170,13 +173,14 @@ export type Saved = {
 	files: string[],
 };
 
-export type ScanError = { kind: "cancelled" } | { kind: "busy" } | { kind: "feederEmpty" } | { kind: "gone" } | { kind: "failed"; message: string };
+export type ScanError = { kind: "cancelled" } | { kind: "busy" } | { kind: "feederEmpty" } | { kind: "gone" } | { kind: "identityChanged" } | { kind: "failed"; message: string };
 
 export type Scanner = {
 	id: string,
 	name: string,
 	connection: Connection,
 	feeds: Feed[],
+	identityChanged: boolean,
 };
 
 export type SchemeColors = {

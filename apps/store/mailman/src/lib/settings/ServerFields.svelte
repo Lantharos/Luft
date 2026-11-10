@@ -12,7 +12,7 @@
 	const SECURITY: { value: Security; label: string }[] = [
 		{ value: 'tls', label: 'TLS' },
 		{ value: 'startTls', label: 'STARTTLS' },
-		{ value: 'none', label: 'None' }
+		{ value: 'none', label: 'Not encrypted' }
 	];
 
 	let port = $state(String(server.port));

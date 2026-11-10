@@ -46,13 +46,16 @@ async fn install(ModelId { id }: ModelId) -> Result<(), String> {
 }
 
 async fn transcribe(request: Transcribe) -> Result<Transcription, String> {
-    let audio = std::fs::File::open(library::resolve(&request.path)?).map_err(|error| error.to_string())?;
+    let audio =
+        std::fs::File::open(library::resolve(&request.path)?).map_err(|error| error.to_string())?;
     match client::transcribe(audio, request.from, request.ended, &request.languages).await {
         Ok(transcribed) => Ok(Transcription::Done(transcribed)),
         Err(Untranscribed::NotInstalled(_)) => Ok(Transcription::NotInstalled),
         Err(Untranscribed::Paused) => Ok(Transcription::Paused),
         Err(Untranscribed::Unsupported) => Ok(Transcription::Unsupported),
-        Err(Untranscribed::Failed(_)) if client::overview().await.is_err() => Ok(Transcription::Missing),
+        Err(Untranscribed::Failed(_)) if client::overview().await.is_err() => {
+            Ok(Transcription::Missing)
+        }
         Err(Untranscribed::Failed(error)) => Err(error),
     }
 }

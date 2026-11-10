@@ -18,7 +18,10 @@ class Flatbed {
 	saving = $state<number | null>(null);
 	toasts = new Toasts();
 
+	private left = $state<string[]>([]);
+
 	scanner = $derived(this.scanners.find((scanner) => scanner.id === this.source) ?? null);
+	changed = $derived(this.scanners.find((scanner) => scanner.identityChanged && !this.left.includes(scanner.id)) ?? null);
 	pages = $derived(this.document.pages);
 
 	start(state: AppState) {
@@ -66,11 +69,20 @@ class Flatbed {
 		this.scanning = false;
 		if (this.preview) URL.revokeObjectURL(this.preview);
 		this.preview = null;
-		if (problem && problem.kind !== 'cancelled') this.toasts.show(scanProblem(problem), { failed: true });
+		if (problem && problem.kind !== 'cancelled' && problem.kind !== 'identityChanged') this.toasts.show(scanProblem(problem), { failed: true });
+	}
+
+	leaveChanged(id: string) {
+		this.left = [...this.left, id];
 	}
 
 	async scan() {
 		if (!this.scanner || this.scanning) return;
+		if (this.scanner.identityChanged) {
+			const asked = this.scanner.id;
+			this.left = this.left.filter((id) => id !== asked);
+			return;
+		}
 		this.scanning = true;
 		try {
 			await commands.scanStart({ scanner: this.scanner.id, feed: this.feed });

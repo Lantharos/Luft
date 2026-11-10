@@ -152,6 +152,16 @@ add-failed = No scanner answered at { $address }.
 add-looking = Looking for the scanner
 add-confirm = Add
 
+## A network scanner that no longer shows the certificate Flatbed remembered for it
+
+identity-title = This scanner's identity changed
+# $name is the scanner's name
+identity-description = { $name } doesn't identify itself the way it did before. That happens when a scanner is reset or replaced, but it can also mean something else on the network is posing as it. Nothing is sent to it unless you trust it again.
+# Button that leaves the scanner alone
+identity-leave = Don't use it
+# Button that accepts the scanner as it is now
+identity-trust = Trust this scanner
+
 ## Settings
 
 settings-title = Settings

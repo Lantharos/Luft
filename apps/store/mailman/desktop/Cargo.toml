@@ -16,11 +16,11 @@ base64.workspace = true
 crossbeam-channel.workspace = true
 dirs.workspace = true
 futures-util.workspace = true
-gio.workspace = true
 hickory-resolver.workspace = true
+libc.workspace = true
 lol_html.workspace = true
 lettre = { workspace = true, features = ["hostname", "ring", "rustls", "rustls-platform-verifier", "smtp-transport"] }
-luft-app = { workspace = true, features = ["apps", "launch"] }
+luft-app.workspace = true
 mail-builder.workspace = true
 mail-parser.workspace = true
 parking_lot.workspace = true

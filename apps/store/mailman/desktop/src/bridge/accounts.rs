@@ -55,6 +55,9 @@ fn sign_in(
 }
 
 fn add(state: &MailmanState, request: NewAccount) -> Result<Account, String> {
+    if request.config.unencrypted() && !request.unencrypted {
+        return Err("This server isn't encrypted, so the account wasn't added".into());
+    }
     let requested = request.email.trim().to_lowercase();
     let signed_in = sign_in(
         request.secret,

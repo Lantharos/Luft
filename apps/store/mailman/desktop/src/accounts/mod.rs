@@ -5,7 +5,7 @@ mod oauth;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
-use crate::protocols::net::Server;
+use crate::protocols::net::{Security, Server};
 
 pub use credentials::{Credentials, Secret};
 pub use discover::discover;
@@ -51,6 +51,15 @@ pub struct Account {
 }
 
 impl AccountConfig {
+    pub fn unencrypted(&self) -> bool {
+        match &self.protocol {
+            Protocol::Jmap { session } => !session.trim_start().starts_with("https://"),
+            Protocol::Imap { imap, smtp } => {
+                imap.security == Security::None || smtp.security == Security::None
+            }
+        }
+    }
+
     pub fn custom_from(&self, server_allows: bool) -> bool {
         match &self.protocol {
             Protocol::Jmap { .. } => server_allows,

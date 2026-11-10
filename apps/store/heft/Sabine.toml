@@ -1,5 +1,5 @@
 [app]
-id = "com.lantharos.Heft"
+id = "com.lantharos.heft"
 name = "Heft"
 generic_name = "Notebook"
 categories = ["Office", "Education"]
@@ -25,6 +25,7 @@ provider = "schelf"
 
 [sandbox]
 network = false
+microphone = true
 filesystems = ["xdg-documents", "xdg-download:ro", "xdg-pictures:ro"]
 talk = ["com.lantharos.Handwriting1", "com.lantharos.Language1", "com.lantharos.Speech1", "com.lantharos.Transcription1"]
 

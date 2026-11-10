@@ -13,7 +13,7 @@ const PARTIAL: &str = ".part";
 const WRITE_BUFFER: usize = 1 << 20;
 
 #[cfg(target_os = "linux")]
-fn folder() -> io::Result<PathBuf> {
+pub(super) fn folder() -> io::Result<PathBuf> {
     let cache = std::env::var_os("XDG_CACHE_HOME")
         .map(PathBuf::from)
         .filter(|path| path.is_absolute())
@@ -23,7 +23,7 @@ fn folder() -> io::Result<PathBuf> {
 }
 
 #[cfg(windows)]
-fn folder() -> io::Result<PathBuf> {
+pub(super) fn folder() -> io::Result<PathBuf> {
     let local = std::env::var_os("LOCALAPPDATA")
         .ok_or_else(|| io::Error::other(t!(L10N, "live-no-app-data-folder")))?;
     Ok(Path::new(&local).join(r"Lantharos\Meet Luft\Downloads"))

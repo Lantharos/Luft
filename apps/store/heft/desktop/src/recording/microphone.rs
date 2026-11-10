@@ -78,8 +78,8 @@ fn record(
         *pw::keys::MEDIA_CATEGORY => "Capture",
         *pw::keys::MEDIA_ROLE => "Production",
         *pw::keys::APP_NAME => "Heft",
-        *pw::keys::APP_ID => "com.lantharos.Heft",
-        *pw::keys::APP_ICON_NAME => "com.lantharos.Heft",
+        *pw::keys::APP_ID => "com.lantharos.heft",
+        *pw::keys::APP_ICON_NAME => "com.lantharos.heft",
         *pw::keys::NODE_NAME => "heft-recording",
         *pw::keys::NODE_DESCRIPTION => "Heft recording a class",
     };

@@ -48,7 +48,7 @@ pub fn decode(source: &Path) -> Result<Pixels, String> {
     });
     let frame = receiver.recv().map_err(|error| error.to_string())??;
     let pixels = store(&folder, &key, &frame)?;
-    cache::prune(&folder, BUDGET);
+    thread::spawn(move || cache::prune(&folder, BUDGET));
     Ok(pixels)
 }
 
@@ -95,16 +95,19 @@ fn store(folder: &Path, key: &str, frame: &Frame) -> Result<Pixels, String> {
     let stride = frame.stride() as usize;
     let path: PathBuf = folder.join(file_name(key, width, height, channels));
     let partial = path.with_extension("partial");
-    let mut writer = BufWriter::with_capacity(
-        WRITE_BUFFER,
-        File::create(&partial).map_err(|error| error.to_string())?,
-    );
-    for line in frame.buf_slice().chunks(stride).take(height as usize) {
-        writer
-            .write_all(&line[..row])
-            .map_err(|error| error.to_string())?;
-    }
-    writer.flush().map_err(|error| error.to_string())?;
+    let mut file = File::create(&partial).map_err(|error| error.to_string())?;
+    let written = if stride == row {
+        file.write_all(&frame.buf_slice()[..row * height as usize])
+    } else {
+        let mut writer = BufWriter::with_capacity(WRITE_BUFFER, file);
+        frame
+            .buf_slice()
+            .chunks(stride)
+            .take(height as usize)
+            .try_for_each(|line| writer.write_all(&line[..row]))
+            .and_then(|()| writer.flush())
+    };
+    written.map_err(|error| error.to_string())?;
     fs::rename(&partial, &path).map_err(|error| error.to_string())?;
     Ok(Pixels {
         path: path.to_string_lossy().into_owned(),

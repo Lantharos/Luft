@@ -12,6 +12,7 @@
 	import Removed from '#lib/steps/luft/Removed.svelte';
 	import Resize from '#lib/steps/luft/Resize.svelte';
 	import YourLuft from '#lib/steps/luft/YourLuft.svelte';
+	import BoxCode from '#lib/steps/prepare/BoxCode.svelte';
 	import LinuxReady from '#lib/steps/prepare/LinuxReady.svelte';
 	import MovingBox from '#lib/steps/prepare/MovingBox.svelte';
 	import Ready from '#lib/steps/prepare/Ready.svelte';
@@ -32,6 +33,7 @@
 		working: Working,
 		ready: Ready,
 		box: MovingBox,
+		packed: BoxCode,
 		removed: Removed,
 		stick: Stick,
 		stickDone: StickDone

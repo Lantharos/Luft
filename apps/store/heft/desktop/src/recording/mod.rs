@@ -58,11 +58,17 @@ fn sync_folder(path: &Path) -> Result<(), String> {
     }
 }
 
-fn encode(mut file: OpusFile, samples: Receiver<Vec<f32>>, length: Arc<AtomicU64>) -> Result<u64, String> {
+fn encode(
+    mut file: OpusFile,
+    samples: Receiver<Vec<f32>>,
+    length: Arc<AtomicU64>,
+) -> Result<u64, String> {
     let mut loudest = 0.0f32;
     let mut told = Instant::now();
     while let Ok(audio) = samples.recv() {
-        loudest = audio.iter().fold(loudest, |loudest, sample| loudest.max(sample.abs()));
+        loudest = audio
+            .iter()
+            .fold(loudest, |loudest, sample| loudest.max(sample.abs()));
         if let Err(error) = file.write(&audio) {
             crate::EVENTS.emit(RECORDING_FAILED, error.clone());
             return Err(error);

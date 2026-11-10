@@ -31,8 +31,7 @@ class Chrome {
 
 	#idleTimer: ReturnType<typeof setTimeout> | undefined;
 
-	start(mode: Mode) {
-		this.mode = mode;
+	start() {
 		this.sidebar = remembered(SIDEBAR_KEY, true);
 		this.strip = remembered(STRIP_KEY, false);
 	}

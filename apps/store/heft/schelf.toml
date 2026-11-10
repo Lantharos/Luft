@@ -1,4 +1,4 @@
-id = "com.lantharos.Heft"
+id = "com.lantharos.heft"
 kind = "app"
 format = "sabine"
 permissions = "Sabine.toml"

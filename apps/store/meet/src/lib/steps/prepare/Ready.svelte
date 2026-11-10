@@ -23,6 +23,11 @@
 	let choices = $state<Required<WindowsChoices>>({ fastStartupOff: true, universalClock: true });
 	let prepared = $derived(session.prepared);
 	let facts = $derived(session.windows);
+	let boxNote = $derived.by(() => {
+		if (!prepared?.movingBox) return undefined;
+		const size = bytes(prepared.movingBox);
+		return session.boxCode ? t('ready-box-packed-code', { size, code: session.boxCode }) : t('ready-box-packed', { size });
+	});
 
 	let options = $derived(
 		[
@@ -68,7 +73,7 @@
 			icon={Package}
 			title={t('box-title')}
 			description={t('ready-box-description')}
-			note={prepared?.movingBox ? t('ready-box-packed', { size: bytes(prepared.movingBox) }) : undefined}
+			note={boxNote}
 			onclick={() => session.go('box')}
 		/>
 		<Choice

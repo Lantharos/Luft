@@ -26,7 +26,7 @@
 
 	async function save(index: number) {
 		const path = await commands.saveAttachment({ ...source, index }, api.FOREVER).catch(toasts.fail);
-		if (path) toasts.show('Saved', { action: { label: 'Open', run: () => void api.openUri(`file://${path}`) } });
+		if (path) toasts.show('Saved', { action: { label: 'Open', run: () => void api.openSaved(path).catch(toasts.fail) } });
 	}
 </script>
 

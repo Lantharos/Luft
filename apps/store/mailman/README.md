@@ -1,6 +1,6 @@
 # Mailman
 
-Mailman is Luft's mail app. It keeps every account, IMAP/SMTP or JMAP, in one local copy, so opening, searching and sorting mail never waits on the network. Passwords and sign-in tokens stay in Luft Keyring, readable only by Mailman. Using it is described in [the docs](https://docs.luft.computer/apps/mailman/).
+Mailman is Luft's mail app. It keeps every account, IMAP/SMTP or JMAP, in one local copy, so opening, searching and sorting mail never waits on the network. Passwords and sign-in tokens stay in Luft Keyring, readable only by Mailman. It runs in the app sandbox with the network and nothing else: no folders, so files reach it through the file dialog, and attachments and links open in your other apps through the desktop portal. Using it is described in [the docs](https://docs.luft.computer/apps/mailman/).
 
 ## Build and run
 
@@ -34,8 +34,10 @@ Signing in to Gmail and Outlook through the browser needs OAuth client IDs, read
 
 | Path | Contents |
 |------|----------|
-| `~/.local/share/mailman/mail.sqlite` | Local mail store |
-| `~/.cache/mailman/` | Fetched pictures, opened attachments and saved inline parts. Mailman tidies it when it starts and when an account is removed |
+| `~/.local/share/com.lantharos.mailman/mail.sqlite` | Local mail store |
+| `~/.cache/com.lantharos.mailman/` | Fetched pictures, opened attachments and saved inline parts. Mailman tidies it when it starts and when an account is removed |
+
+Installed from the store these are inside `~/.var/app/com.lantharos.mailman`.
 
 ## License
 

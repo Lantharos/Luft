@@ -8,7 +8,7 @@ use specta::Type;
 use ureq::Agent;
 use ureq::tls::{RootCerts, TlsConfig};
 
-use super::signature;
+use super::{newest, signature};
 use crate::L10N;
 
 const DOWNLOADS: &str = "https://get.luft.computer";
@@ -37,6 +37,7 @@ impl Channel {
 #[derive(Deserialize)]
 struct Pointer {
     name: String,
+    version: String,
     size: u64,
     sha256: String,
 }
@@ -47,41 +48,98 @@ pub struct Located {
     pub checksum: [u8; 32],
 }
 
+pub struct Trust<'a> {
+    pub iso_key: &'a str,
+    pub pointer_key: &'a str,
+    pub newest_seen: &'a newest::Seen,
+}
+
+struct Published {
+    located: Located,
+    folder: &'static str,
+    version: String,
+}
+
 fn missing(error: &ureq::Error) -> bool {
     matches!(error, ureq::Error::StatusCode(404))
 }
 
-fn locate_at(agent: &Agent, downloads: &str, key: &str, channel: Channel) -> io::Result<Located> {
-    let folder = format!("{downloads}/{}", channel.folder());
-    let pointer = match text(agent, &format!("{folder}/{POINTER}")) {
+fn invalid(message: String) -> io::Error {
+    io::Error::new(io::ErrorKind::InvalidData, message)
+}
+
+fn signed_pointer(
+    agent: &Agent,
+    downloads: &str,
+    key: &str,
+    folder: &str,
+) -> Result<Pointer, Fetch> {
+    let place = format!("{folder}/{POINTER}");
+    let pointer = text(agent, &format!("{downloads}/{place}"))?;
+    let signature = match text(agent, &format!("{downloads}/{place}.minisig")) {
+        Err(Fetch::Missing) => Err(unreadable(t!(L10N, "live-pointer-not-signed"))),
+        other => other,
+    }?;
+    signature::verify_pointer(key, &pointer, &signature, &place).map_err(unreadable)?;
+    serde_json::from_str(&pointer).map_err(|_| unreadable(t!(L10N, "live-pointer-unreadable")))
+}
+
+fn locate_at(
+    agent: &Agent,
+    downloads: &str,
+    trust: &Trust,
+    channel: Channel,
+) -> io::Result<Published> {
+    let folder = channel.folder();
+    let pointer = match signed_pointer(agent, downloads, trust.pointer_key, folder) {
         Err(Fetch::Missing) if channel == Channel::Latest => {
-            return locate_at(agent, downloads, key, Channel::Nightly);
+            return locate_at(agent, downloads, trust, Channel::Nightly);
         }
         fetched => fetched.map_err(Fetch::into_io)?,
     };
-    let pointer: Pointer = serde_json::from_str(&pointer).map_err(|_| {
-        io::Error::new(
-            io::ErrorKind::InvalidData,
-            t!(L10N, "live-pointer-unreadable"),
-        )
-    })?;
-    let iso = format!("{folder}/{}", pointer.name);
-    let checksum = checksum(agent, key, &iso).map_err(Fetch::into_io)?;
-    if parse_checksum(&pointer.sha256) != Some(checksum) {
-        return Err(io::Error::new(
-            io::ErrorKind::InvalidData,
-            format!("{} has two different checksums", pointer.name),
-        ));
+    if let Some(seen) = trust.newest_seen.get(folder)
+        && newest::older(&pointer.version, seen)
+    {
+        return Err(invalid(t!(
+            L10N,
+            "live-pointer-older",
+            offered = pointer.version,
+            seen = seen.clone()
+        )));
     }
-    Ok(Located {
-        iso,
-        size: pointer.size,
-        checksum,
+    let iso = format!("{downloads}/{folder}/{}", pointer.name);
+    let checksum = checksum(agent, trust.iso_key, &iso).map_err(Fetch::into_io)?;
+    if parse_checksum(&pointer.sha256) != Some(checksum) {
+        return Err(invalid(format!(
+            "{} has two different checksums",
+            pointer.name
+        )));
+    }
+    Ok(Published {
+        located: Located {
+            iso,
+            size: pointer.size,
+            checksum,
+        },
+        folder,
+        version: pointer.version,
     })
 }
 
 pub fn locate(agent: &Agent, channel: Channel) -> io::Result<Located> {
-    locate_at(agent, DOWNLOADS, signature::PUBLIC_KEY, channel)
+    let seen = newest::seen();
+    let published = locate_at(
+        agent,
+        DOWNLOADS,
+        &Trust {
+            iso_key: signature::PUBLIC_KEY,
+            pointer_key: signature::POINTER_KEY,
+            newest_seen: &seen,
+        },
+        channel,
+    )?;
+    newest::remember(seen, published.folder, published.version)?;
+    Ok(published.located)
 }
 
 pub fn agent() -> Agent {
@@ -274,7 +332,10 @@ mod tests {
     use std::io::{BufRead, BufReader, Write};
     use std::net::TcpListener;
 
-    use super::signature::signed::{CHECKSUM, KEY, SIGNATURE};
+    use super::signature::signed::{
+        CHECKSUM, KEY, NIGHTLY_POINTER_SIGNATURE, POINTER, POINTER_KEY, RELEASE_POINTER_SIGNATURE,
+        SIGNATURE,
+    };
     use super::*;
 
     fn published(names: &'static [(&'static str, &'static str)]) -> String {
@@ -314,56 +375,85 @@ mod tests {
             .into()
     }
 
-    const POINTER: &str = r#"{"name": "luft-nightly.iso", "version": "1.1-nightly.21", "size": 4096, "sha256": "abababababababababababababababababababababababababababababababab"}"#;
-    const OTHER_POINTER: &str = r#"{"name": "luft-nightly.iso", "version": "1.1-nightly.21", "size": 4096, "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"}"#;
+    fn located(downloads: &str, seen: &newest::Seen, channel: Channel) -> io::Result<Located> {
+        let trust = Trust {
+            iso_key: KEY,
+            pointer_key: POINTER_KEY,
+            newest_seen: seen,
+        };
+        locate_at(&plain_agent(), downloads, &trust, channel).map(|published| published.located)
+    }
 
     #[test]
     fn the_newest_iso_is_found_through_its_folders_pointer() {
         let downloads = published(&[
             ("nightly/latest.json", POINTER),
+            ("nightly/latest.json.minisig", NIGHTLY_POINTER_SIGNATURE),
             ("nightly/luft-nightly.iso.sha256", CHECKSUM),
             ("nightly/luft-nightly.iso.sha256.minisig", SIGNATURE),
         ]);
-        let located = locate_at(&plain_agent(), &downloads, KEY, Channel::Nightly).unwrap();
+        let located = located(&downloads, &newest::Seen::new(), Channel::Nightly).unwrap();
         assert_eq!(located.iso, format!("{downloads}/nightly/luft-nightly.iso"));
         assert_eq!(located.size, 4096);
         assert_eq!(located.checksum, [0xab; 32]);
     }
 
     #[test]
-    fn a_pointer_that_disagrees_with_the_checksum_file_is_refused() {
-        let downloads = published(&[
-            ("nightly/latest.json", OTHER_POINTER),
+    fn a_pointer_counts_only_when_signed_for_its_folder() {
+        let unsigned = published(&[
+            ("nightly/latest.json", POINTER),
             ("nightly/luft-nightly.iso.sha256", CHECKSUM),
             ("nightly/luft-nightly.iso.sha256.minisig", SIGNATURE),
         ]);
-        assert!(locate_at(&plain_agent(), &downloads, KEY, Channel::Nightly).is_err());
+        assert!(located(&unsigned, &newest::Seen::new(), Channel::Nightly).is_err());
+        let from_releases = published(&[
+            ("nightly/latest.json", POINTER),
+            ("nightly/latest.json.minisig", RELEASE_POINTER_SIGNATURE),
+            ("nightly/luft-nightly.iso.sha256", CHECKSUM),
+            ("nightly/luft-nightly.iso.sha256.minisig", SIGNATURE),
+        ]);
+        assert!(located(&from_releases, &newest::Seen::new(), Channel::Nightly).is_err());
+    }
+
+    #[test]
+    fn an_older_build_than_one_seen_before_is_refused() {
+        let downloads = published(&[
+            ("nightly/latest.json", POINTER),
+            ("nightly/latest.json.minisig", NIGHTLY_POINTER_SIGNATURE),
+            ("nightly/luft-nightly.iso.sha256", CHECKSUM),
+            ("nightly/luft-nightly.iso.sha256.minisig", SIGNATURE),
+        ]);
+        let seen = |version: &str| newest::Seen::from([("nightly".to_owned(), version.to_owned())]);
+        assert!(located(&downloads, &seen("1.1-nightly.22"), Channel::Nightly).is_err());
+        assert!(located(&downloads, &seen("1.1-nightly.21"), Channel::Nightly).is_ok());
     }
 
     #[test]
     fn an_unsigned_checksum_is_refused() {
         let downloads = published(&[
             ("nightly/latest.json", POINTER),
+            ("nightly/latest.json.minisig", NIGHTLY_POINTER_SIGNATURE),
             ("nightly/luft-nightly.iso.sha256", CHECKSUM),
         ]);
-        assert!(locate_at(&plain_agent(), &downloads, KEY, Channel::Nightly).is_err());
+        assert!(located(&downloads, &newest::Seen::new(), Channel::Nightly).is_err());
     }
 
     #[test]
     fn releases_are_found_in_the_major_versions_folder() {
         let downloads = published(&[
             ("1/latest.json", POINTER),
+            ("1/latest.json.minisig", RELEASE_POINTER_SIGNATURE),
             ("1/luft-nightly.iso.sha256", CHECKSUM),
             ("1/luft-nightly.iso.sha256.minisig", SIGNATURE),
         ]);
-        let located = locate_at(&plain_agent(), &downloads, KEY, Channel::Latest).unwrap();
+        let located = located(&downloads, &newest::Seen::new(), Channel::Latest).unwrap();
         assert_eq!(located.iso, format!("{downloads}/1/luft-nightly.iso"));
     }
 
     #[test]
     fn nothing_published_is_an_error() {
         let downloads = published(&[]);
-        assert!(locate_at(&plain_agent(), &downloads, KEY, Channel::Nightly).is_err());
+        assert!(located(&downloads, &newest::Seen::new(), Channel::Nightly).is_err());
     }
 
     #[test]

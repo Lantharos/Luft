@@ -1,5 +1,6 @@
 mod discovery;
 pub mod escl;
+mod known;
 pub mod sane;
 
 use std::net::IpAddr;
@@ -21,6 +22,7 @@ pub const FINISHED: BridgeEvent<Option<ScanError>> = BridgeEvent::new("scan.fini
 
 const STANDARD_DPI: u32 = 300;
 const FINE_DPI: u32 = 600;
+const ADDRESS: &str = "address:";
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
@@ -44,6 +46,7 @@ pub struct Scanner {
     pub name: String,
     pub connection: Connection,
     pub feeds: Vec<Feed>,
+    pub identity_changed: bool,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, Type)]
@@ -53,6 +56,7 @@ pub enum ScanError {
     Busy,
     FeederEmpty,
     Gone,
+    IdentityChanged,
     Failed(String),
 }
 
@@ -124,14 +128,18 @@ fn feeds(capabilities: &escl::Capabilities) -> Vec<Feed> {
 }
 
 fn found_escl(key: String, name: String, endpoint: escl::Endpoint, address: Option<IpAddr>) {
-    let Ok(capabilities) = escl::capabilities(&endpoint) else {
+    let id = format!("escl:{key}");
+    let pin = known::pin(&id);
+    let capabilities = escl::capabilities(&endpoint, &pin);
+    let name = match &capabilities {
+        Ok(capabilities) if name.is_empty() => capabilities.model.clone(),
+        Err(_) if name.is_empty() => key.trim_start_matches(ADDRESS).to_owned(),
+        _ => name,
+    };
+    if capabilities.is_err() && !pin.changed() {
         return;
-    };
-    let name = if name.is_empty() {
-        capabilities.model.clone()
-    } else {
-        name
-    };
+    }
+    known::remember(&id, &pin);
     let connection = if address.is_some_and(|address| address.is_loopback()) {
         Connection::Usb
     } else {
@@ -139,10 +147,11 @@ fn found_escl(key: String, name: String, endpoint: escl::Endpoint, address: Opti
     };
     let entry = Entry {
         scanner: Scanner {
-            id: format!("escl:{key}"),
+            id,
             name,
             connection,
-            feeds: feeds(&capabilities),
+            feeds: capabilities.as_ref().map(feeds).unwrap_or_default(),
+            identity_changed: capabilities.is_err(),
         },
         backend: Backend::Escl(endpoint),
         address,
@@ -150,6 +159,46 @@ fn found_escl(key: String, name: String, endpoint: escl::Endpoint, address: Opti
     update(|entries| {
         entries.retain(|kept| kept.scanner.id != entry.scanner.id);
         entries.push(entry);
+    });
+}
+
+/// Takes the certificate a scanner shows now for its own, after someone
+/// looked at the warning and chose to.
+pub fn trust(id: &str) -> Result<(), String> {
+    let entry = SCANNERS
+        .lock()
+        .expect("scanners lock")
+        .iter()
+        .find(|entry| entry.scanner.id == id)
+        .cloned()
+        .ok_or("That scanner is gone")?;
+    let Backend::Escl(endpoint) = entry.backend else {
+        return Ok(());
+    };
+    known::forget(id);
+    let key = id.trim_start_matches("escl:");
+    let advertised = if key.starts_with(ADDRESS) {
+        String::new()
+    } else {
+        entry.scanner.name
+    };
+    found_escl(key.to_owned(), advertised, endpoint, entry.address);
+    let unanswered = SCANNERS
+        .lock()
+        .expect("scanners lock")
+        .iter()
+        .any(|entry| entry.scanner.id == id && entry.scanner.identity_changed);
+    if unanswered {
+        return Err("The scanner didn't answer".into());
+    }
+    Ok(())
+}
+
+fn identity_changed(id: &str) {
+    update(|entries| {
+        for entry in entries.iter_mut().filter(|entry| entry.scanner.id == id) {
+            entry.scanner.identity_changed = true;
+        }
     });
 }
 
@@ -180,6 +229,8 @@ pub fn add_address(address: &str) -> Result<(), String> {
         }
         _ => (host_port.trim_matches(['[', ']']), None),
     };
+    let key = format!("{ADDRESS}{address}");
+    let id = format!("escl:{key}");
     let tries = [(false, port.unwrap_or(80)), (true, port.unwrap_or(443))];
     let endpoint = tries
         .into_iter()
@@ -187,20 +238,14 @@ pub fn add_address(address: &str) -> Result<(), String> {
             scheme.is_none_or(|scheme| scheme == if *secure { "https" } else { "http" })
         })
         .map(|(secure, port)| escl::Endpoint::new(secure, host, port, root))
-        .find_map(|endpoint| {
-            escl::capabilities(&endpoint)
-                .ok()
-                .map(|capabilities| (endpoint, capabilities))
+        .find(|endpoint| {
+            let pin = known::pin(&id);
+            escl::capabilities(endpoint, &pin).is_ok() || pin.changed()
         });
-    let Some((endpoint, capabilities)) = endpoint else {
+    let Some(endpoint) = endpoint else {
         return Err(format!("No scanner answered at {address}"));
     };
-    found_escl(
-        format!("address:{address}"),
-        capabilities.model,
-        endpoint,
-        host.parse().ok(),
-    );
+    found_escl(key, String::new(), endpoint, host.parse().ok());
     if !settings::current()
         .addresses
         .iter()
@@ -247,6 +292,7 @@ impl Progress for Delivery {
 }
 
 pub fn scan(id: &str, feed: Feed) -> Result<(), String> {
+    let id = id.to_owned();
     let backend = SCANNERS
         .lock()
         .expect("scanners lock")
@@ -274,7 +320,17 @@ pub fn scan(id: &str, feed: Feed) -> Result<(), String> {
             let mut delivery = Delivery;
             let result = match backend {
                 Backend::Escl(endpoint) => {
-                    escl::scan(&endpoint, feed, colour, dpi, &cancel, &mut delivery)
+                    let pin = known::pin(&id);
+                    escl::scan(&endpoint, &pin, feed, colour, dpi, &cancel, &mut delivery).map_err(
+                        |error| {
+                            if pin.changed() {
+                                identity_changed(&id);
+                                ScanError::IdentityChanged
+                            } else {
+                                error
+                            }
+                        },
+                    )
                 }
                 Backend::Sane(device) => {
                     sane::scan(&device, feed, colour, dpi, &cancel, &mut delivery)

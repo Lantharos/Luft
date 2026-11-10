@@ -38,6 +38,7 @@ pub struct NewAccount {
     pub name: String,
     pub config: AccountConfig,
     pub secret: NewSecret,
+    pub unencrypted: bool,
     pub token: Option<String>,
 }
 
@@ -111,6 +112,12 @@ pub struct Paths {
 #[derive(Deserialize, Type)]
 pub struct Uri {
     pub uri: String,
+    pub token: Option<String>,
+}
+
+#[derive(Deserialize, Type)]
+pub struct Saved {
+    pub path: String,
     pub token: Option<String>,
 }
 

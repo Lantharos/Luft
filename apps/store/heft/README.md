@@ -15,13 +15,13 @@ bun run desktop:bundle   # release bundle
 
 `SABINE_TRACE=1` prints how long pen, touch and mouse moves take to reach the screen.
 
-Installed from the store it runs in a sandbox that reaches Documents, reads Downloads and Pictures, and records from the microphone only while you record a class, so its settings and backups are inside `~/.var/app/com.lantharos.Heft`.
+Installed from the store it runs in a sandbox that reaches Documents, reads Downloads and Pictures, and records from the microphone only while you record a class, so its settings and backups are inside `~/.var/app/com.lantharos.heft`.
 
 | Path | Contents |
 |------|----------|
 | `~/Documents/Heft/` | The library: a folder per subject, a `.heft` folder per notebook |
-| `~/.config/com.lantharos.Heft/` | Settings, pens, open tabs and where each notebook was left |
-| `~/.local/state/com.lantharos.Heft/backups/` | A copy of the library for each of the last 14 days |
+| `~/.config/com.lantharos.heft/` | Settings, pens, open tabs and where each notebook was left |
+| `~/.local/state/com.lantharos.heft/backups/` | A copy of the library for each of the last 14 days |
 
 ## License
 

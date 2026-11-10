@@ -1,4 +1,5 @@
 mod capabilities;
+mod pinned;
 
 use std::io::Read;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -7,9 +8,12 @@ use std::thread;
 use std::time::{Duration, Instant};
 
 use ureq::Agent;
-use ureq::tls::TlsConfig;
+use ureq::unversioned::resolver::DefaultResolver;
+use ureq::unversioned::transport::{Connector, TcpConnector};
 
 pub use capabilities::{Capabilities, Input};
+pub use pinned::Pin;
+use pinned::PinnedTls;
 
 use super::{Feed, Progress, ScanError};
 
@@ -51,23 +55,24 @@ impl Endpoint {
     }
 }
 
-fn agent() -> Agent {
-    Agent::config_builder()
+fn agent(pin: &Pin) -> Agent {
+    let config = Agent::config_builder()
         .http_status_as_error(false)
+        .proxy(None)
         .timeout_connect(Some(Duration::from_secs(5)))
         .timeout_recv_response(Some(ANSWER_WITHIN))
         .timeout_recv_body(Some(ANSWER_WITHIN))
-        .tls_config(TlsConfig::builder().disable_verification(true).build())
-        .build()
-        .new_agent()
+        .build();
+    let connector = TcpConnector::default().chain(PinnedTls::new(pin));
+    Agent::with_parts(config, connector, DefaultResolver::default())
 }
 
 fn failed(error: impl std::fmt::Display) -> ScanError {
     ScanError::Failed(error.to_string())
 }
 
-pub fn capabilities(endpoint: &Endpoint) -> Result<Capabilities, String> {
-    let mut response = agent()
+pub fn capabilities(endpoint: &Endpoint, pin: &Pin) -> Result<Capabilities, String> {
+    let mut response = agent(pin)
         .get(format!("{}/ScannerCapabilities", endpoint.base))
         .call()
         .map_err(|error| error.to_string())?;
@@ -120,13 +125,14 @@ fn settings(
 
 pub fn scan(
     endpoint: &Endpoint,
+    pin: &Pin,
     feed: Feed,
     colour: bool,
     dpi: u32,
     cancel: &AtomicBool,
     progress: &mut dyn Progress,
 ) -> Result<(), ScanError> {
-    let capabilities = capabilities(endpoint).map_err(ScanError::Failed)?;
+    let capabilities = capabilities(endpoint, pin).map_err(ScanError::Failed)?;
     let input = match feed {
         Feed::Glass => capabilities.platen.as_ref(),
         Feed::Feeder | Feed::BothSides => capabilities.feeder.as_ref(),
@@ -136,7 +142,7 @@ pub fn scan(
         .format()
         .ok_or_else(|| failed("The scanner sends no pictures Flatbed reads"))?;
     let dpi = input.resolution(dpi);
-    let agent = agent();
+    let agent = agent(pin);
     let mut response = agent
         .post(format!("{}/ScanJobs", endpoint.base))
         .header("Content-Type", "text/xml")

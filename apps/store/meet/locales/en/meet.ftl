@@ -165,8 +165,10 @@ ready-update-description = A newer build is out. It replaces this one and keeps 
 ready-try-title = Try Luft
 ready-try-description = Restart into Luft without installing anything. Windows starts as usual next time.
 ready-box-description = Pack documents, photos, Wi-Fi networks and more for Luft to unpack when it’s installed.
-# $size is how much was packed, like "12 GB"
-ready-box-packed = Packed, { $size }
+# $size is how much was packed, like "12 GB". The code is what opens the moving box in Luft
+ready-box-packed = Packed, { $size }. Pack again if you no longer have its code
+# $size is how much was packed, like "12 GB"; $code is the code that opens the moving box, like "7K2M-0QRX-4TB9"
+ready-box-packed-code = Packed, { $size }. Its code is { $code }
 ready-install-title = Install Luft
 # $size is the space waiting for Luft, like "120 GB"
 ready-install-description = Restart into the installer. The { $size } next to Windows is already waiting for it.
@@ -307,6 +309,14 @@ box-total-slow = { $size }, which takes about { $minutes ->
 } to pack
 # Button, verb
 box-pack = Pack
+
+## The code shown after packing, which opens the moving box when Luft is installed
+
+packed-title = Write this code down
+packed-description = Your things are packed and locked. Luft asks for this code before it unpacks them, so nobody else can open the box or change what’s in it.
+packed-lost = The code isn’t kept anywhere. If you lose it, pack again to get a new one.
+# Button
+packed-done = I’ve written it down
 
 ## Progress while Meet Luft works
 ## Each message is the title, and .description the line below it.

@@ -4,16 +4,18 @@
 	import type { Sound } from '#lib/bindings.js';
 	import { ICONS, COLORS } from '#lib/sounds/looks.js';
 	import { app } from '#lib/state/app.svelte.js';
+	import { arrangement } from '#lib/state/arrange.svelte.js';
 
 	const RATE = 48000;
 	const SIDE_BUTTON = 2;
 
 	interface Props {
 		sound: Sound;
+		index: number;
 		onmenu: (at: { x: number; y: number }) => void;
 	}
 
-	let { sound, onmenu }: Props = $props();
+	let { sound, index, onmenu }: Props = $props();
 
 	let playing = $derived(app.status.playing.includes(sound.id));
 	let keys = $derived(app.keysOf(sound));
@@ -24,7 +26,8 @@
 	const held = () => sound.trigger === 'hold';
 
 	function down(event: PointerEvent) {
-		if (event.button === SIDE_BUTTON || app.menu) return;
+		if (event.button === SIDE_BUTTON || app.dismissal === event) return;
+		if (arrangement.active) return arrangement.grab(event, index);
 		void commands.press({ sound: sound.id, preview: false });
 	}
 
@@ -33,6 +36,7 @@
 	}
 
 	function key(event: KeyboardEvent) {
+		if (arrangement.active) return arrangement.key(event, index);
 		if ((event.key !== 'Enter' && event.key !== ' ') || event.repeat) return;
 		event.preventDefault();
 		void commands.press({ sound: sound.id, preview: false });
@@ -52,6 +56,7 @@
 	type="button"
 	class="tile"
 	class:playing
+	class:arranging={arrangement.active}
 	style:--tile={color}
 	aria-pressed={playing}
 	onpointerdown={down}
@@ -99,6 +104,11 @@
 
 	.tile:active {
 		transform: scale(0.97);
+	}
+
+	.tile.arranging {
+		cursor: grab;
+		touch-action: none;
 	}
 
 	.tile.playing {

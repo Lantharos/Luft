@@ -22,6 +22,9 @@ board-imported = Board imported
 sounds-search = Search sounds
 sounds-add = Add sounds
 sounds-stop-all = Stop all
+sounds-arrange = Arrange
+sounds-arrange-done = Done
+sounds-arrange-moved = { $name } is now { $position } of { $count }
 sounds-file-kind = Audio files
 sounds-choose-title = Choose sounds
 

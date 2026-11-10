@@ -24,9 +24,11 @@ mdns-sd.workspace = true
 pdf-writer.workspace = true
 rayon.workspace = true
 roxmltree.workspace = true
+rustls = { workspace = true, features = ["ring", "std", "tls12"] }
 sabine.workspace = true
 serde.workspace = true
 serde_json.workspace = true
+sha2.workspace = true
 specta.workspace = true
 tokio = { workspace = true, features = ["rt"] }
 ureq.workspace = true

@@ -1,4 +1,4 @@
-id = "com.lantharos.Flatbed"
+id = "com.lantharos.flatbed"
 kind = "app"
 format = "sabine"
 permissions = "Sabine.toml"

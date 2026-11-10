@@ -117,6 +117,9 @@ pub fn register(window: SabineWindow) -> SabineWindow {
         .command_async("scanner_add", |Address { address }| async move {
             blocking(move || scanners::add_address(&address)).await?
         })
+        .command_async("scanner_trust", |Id { id }| async move {
+            blocking(move || scanners::trust(&id)).await?
+        })
         .command("settings_save", |chosen: Preferences| {
             settings::update(|settings| {
                 settings.languages = chosen.languages;

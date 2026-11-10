@@ -56,11 +56,11 @@ fn fetch(agent: &ureq::Agent, url: &str) -> Option<String> {
     agent.get(url).call().ok()?.body_mut().read_to_string().ok()
 }
 
-fn security(socket: &str) -> Security {
+fn security(socket: &str) -> Option<Security> {
     match socket.to_ascii_uppercase().as_str() {
-        "SSL" | "TLS" => Security::Tls,
-        "STARTTLS" => Security::StartTls,
-        _ => Security::None,
+        "SSL" | "TLS" => Some(Security::Tls),
+        "STARTTLS" => Some(Security::StartTls),
+        _ => None,
     }
 }
 
@@ -78,11 +78,10 @@ fn from_ispdb(xml: &str, email: &str) -> Option<Discovery> {
                         .and_then(|child| child.text())
                         .map(str::trim)
                 };
-                let socket = security(text("socketType").unwrap_or("plain"));
                 let server = Server {
                     host: text("hostname")?.to_owned(),
                     port: text("port")?.parse().ok()?,
-                    security: socket,
+                    security: security(text("socketType")?)?,
                 };
                 let username = text("username")
                     .unwrap_or("%EMAILADDRESS%")
@@ -93,11 +92,7 @@ fn from_ispdb(xml: &str, email: &str) -> Option<Discovery> {
                 });
                 Some((server, username, oauth))
             })
-            .min_by_key(|(server, _, _)| match server.security {
-                Security::Tls => 0,
-                Security::StartTls => 1,
-                Security::None => 2,
-            })
+            .min_by_key(|(server, _, _)| server.security != Security::Tls)
     };
     let (imap, username, oauth) = server("incomingServer", "imap")?;
     let (smtp, _, _) = server("outgoingServer", "smtp")?;

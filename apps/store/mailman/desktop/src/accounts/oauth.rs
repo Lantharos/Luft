@@ -4,7 +4,7 @@ use std::time::{Duration, Instant};
 
 use base64::Engine;
 use base64::engine::general_purpose::URL_SAFE_NO_PAD;
-use luft_app::launch;
+use luft_app::{block_on, portal};
 use rand::RngExt;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
@@ -203,7 +203,7 @@ pub fn sign_in(
     if let Some(hint) = hint {
         authorize.query_pairs_mut().append_pair("login_hint", hint);
     }
-    launch::open(authorize.as_str(), token).map_err(|error| error.to_string())?;
+    block_on(portal::open_web_link(authorize.as_str(), token))?;
     let code = wait_for_code(&listener, &state)?;
     let mut form = vec![
         ("grant_type", "authorization_code"),

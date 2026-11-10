@@ -14,7 +14,7 @@ use sabine::SabineWindow;
 
 pub use scanners::sane::{SANE_HELPER, run_helper as run_sane_helper};
 
-pub const APP_ID: &str = "com.lantharos.Flatbed";
+pub const APP_ID: &str = "com.lantharos.flatbed";
 
 const WINDOW: GlassWindow = GlassWindow {
     title: "Flatbed",

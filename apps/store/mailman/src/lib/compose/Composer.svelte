@@ -21,6 +21,7 @@
 	import { composer, type Composition } from './composer.svelte';
 	import ComposeField from './ComposeField.svelte';
 	import Editor from './Editor.svelte';
+	import QuotedMail from './QuotedMail.svelte';
 	import RecipientField from './RecipientField.svelte';
 	import SenderField from './SenderField.svelte';
 
@@ -138,7 +139,7 @@
 					<Quote size={15} />{showQuote ? 'Hide quoted text' : 'Show quoted text'}
 				</button>
 				{#if showQuote}
-					<div class="quote soft-scroll">{@html composition.quote}</div>
+					<div class="quote soft-scroll"><QuotedMail html={composition.quote} /></div>
 				{/if}
 			</div>
 		{/if}
@@ -278,8 +279,6 @@
 		margin-top: 6px;
 		border-left: 2px solid var(--hairline);
 		padding-left: 12px;
-		font-size: 13px;
-		color: var(--text-muted);
 	}
 
 	.attachment {

@@ -28,8 +28,8 @@ local_files = true
 provider = "schelf"
 
 [sandbox]
-unsandboxed = true
-reason = "It keeps your accounts' passwords in Luft Keyring and listens on the system bus for the computer waking up and the network coming back."
+network = true
+talk = ["com.lantharos.Keyring1"]
 
 [bindings]
 path = "src/lib/bindings.ts"

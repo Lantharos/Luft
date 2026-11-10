@@ -1,13 +1,9 @@
-use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
-use luft_app::portal::{FileChooser, uri_path};
-use luft_app::{dbus, file_manager, launch};
+use luft_app::file_manager;
+use luft_app::portal::{self, FileChooser, uri_path};
 use serde::Deserialize;
 use specta::Type;
-use zbus::{OwnedObjectPath, Proxy, Variant};
-
-use crate::files::failed;
 
 #[derive(Deserialize, Type)]
 pub struct Open {
@@ -81,27 +77,5 @@ pub async fn show_in_folder(Handoff { path, token }: Handoff) -> Result<(), Stri
 }
 
 pub async fn open_link(Link { uri, token }: Link) -> Result<(), String> {
-    if !launch::is_web_link(&uri) {
-        return Err("Only web and mail links open outside Draft".into());
-    }
-    let proxy = Proxy::new(
-        dbus::session().await?,
-        "org.freedesktop.portal.Desktop",
-        "/org/freedesktop/portal/desktop",
-        "org.freedesktop.portal.OpenURI",
-    )
-    .await
-    .map_err(failed)?;
-    proxy
-        .call::<_, _, OwnedObjectPath>("OpenURI", &("", uri.as_str(), activation(token.as_deref())))
-        .await
-        .map(drop)
-        .map_err(failed)
-}
-
-fn activation(token: Option<&str>) -> HashMap<&str, Variant<'_>> {
-    token
-        .map(|token| ("activation_token", Variant::from(token)))
-        .into_iter()
-        .collect()
+    portal::open_web_link(&uri, token.as_deref()).await
 }

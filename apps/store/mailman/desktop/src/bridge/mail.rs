@@ -1,6 +1,5 @@
-use gio::prelude::*;
-use luft_app::portal::FileChooser;
-use luft_app::{Commands, Empty, launch};
+use luft_app::portal::{self, FileChooser};
+use luft_app::{Commands, Empty, block_on};
 use sabine::SabineWindow;
 use serde::Serialize;
 use specta::Type;
@@ -84,8 +83,7 @@ fn open_attachment(state: &MailmanState, part: Part) -> Result<(), String> {
     std::fs::create_dir_all(&folder).map_err(|error| error.to_string())?;
     let path = folder.join(safe_name(&name));
     std::fs::write(&path, bytes).map_err(|error| error.to_string())?;
-    let uri = gio::File::for_path(&path).uri();
-    launch::open(&uri, part.token.as_deref()).map_err(|error| error.to_string())
+    block_on(portal::open_path(&path, part.token.as_deref()))
 }
 
 async fn save_attachment(state: MailmanState, part: Part) -> Result<Option<String>, String> {
@@ -174,7 +172,10 @@ pub fn register(window: SabineWindow, state: &MailmanState) -> SabineWindow {
             state.store.contacts(&query, 8)
         })
         .command("open_message_file", open_file)
-        .command("open_uri", |Uri { uri, token }| {
-            launch::open_web_link(&uri, token.as_deref())
+        .command_async("open_uri", |Uri { uri, token }| async move {
+            portal::open_web_link(&uri, token.as_deref()).await
+        })
+        .command_async("open_saved", |Saved { path, token }| async move {
+            portal::open_path(std::path::Path::new(&path), token.as_deref()).await
         })
 }

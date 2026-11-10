@@ -122,6 +122,7 @@ fn list() {
                         Connection::Usb
                     },
                     feeds: device.feeds,
+                    identity_changed: false,
                 };
                 (scanner, device.address)
             })

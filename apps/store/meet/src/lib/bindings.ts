@@ -29,7 +29,7 @@ export const commands = {
 		account?: ChosenAccount | null,
 		wifi?: boolean,
 		bluetooth?: boolean,
-	}, options?: CallOptions) => invoke<Outcome<Prepared>>("meet_pack", params, options),
+	}, options?: CallOptions) => invoke<Outcome<Packed>>("meet_pack", params, options),
 	meetPickIso: (options?: CallOptions) => invoke<Outcome<string | null>>("meet_pick_iso", {}, options),
 	meetPlatform: (options?: CallOptions) => invoke<Platform>("meet_platform", {}, options),
 	meetPrepare: (params: {
@@ -237,6 +237,11 @@ export type Older = {
 };
 
 export type Outcome<T> = { value: T } | Failed;
+
+export type Packed = {
+	prepared: Prepared,
+	code: string,
+};
 
 export type Place = {
 	id: string,

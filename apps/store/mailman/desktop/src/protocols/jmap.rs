@@ -72,9 +72,13 @@ impl Client {
             else {
                 break;
             };
-            url = url
+            let next = url
                 .join(location.to_str().map_err(|error| error.to_string())?)
                 .map_err(|error| error.to_string())?;
+            if url.scheme() == "https" && next.scheme() != "https" {
+                return Err("The server sent the sign-in somewhere unencrypted".into());
+            }
+            url = next;
             response = agent
                 .get(url.as_str())
                 .header("Authorization", &authorization)

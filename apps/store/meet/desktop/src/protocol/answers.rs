@@ -16,6 +16,12 @@ pub struct Prepared {
 }
 
 #[derive(Serialize, Deserialize, Type)]
+pub struct Packed {
+    pub prepared: Prepared,
+    pub code: String,
+}
+
+#[derive(Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct Report {
     pub facts: Facts,
